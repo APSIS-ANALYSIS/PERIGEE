@@ -1,0 +1,191 @@
+#include "NBC_Partition_2D.hpp"
+
+NBC_Partition_2D::NBC_Partition_2D( const IPart * const &part,
+    const Map_Node_Index * const &mnindex,
+    const std::vector<INodalBC *> &nbc_list )
+: cpu_rank(part->get_cpu_rank())
+{
+  const int dof = (int) nbc_list.size();
+
+  Num_LD.clear(); Num_LPS.clear(); Num_LPM.clear();
+  LID.clear(); LDN.clear(); LPSN.clear(); LPMN.clear();
+  LocalMaster.clear(); LocalMasterSlave.clear();
+  
+  Num_LD.resize(dof); Num_LPS.resize(dof); Num_LPM.resize(dof);
+
+  // Loop over nbc_list and store the Dirichlet nodes
+  unsigned int node_index, node_num;
+  for(int ii=0; ii<dof; ++ii)
+  {
+    node_num = 0;
+    for(unsigned int jj=0; jj<nbc_list[ii]->get_num_dir_nodes(); ++jj)
+    {
+      node_index = nbc_list[ii]->get_dir_nodes(jj);
+      node_index = mnindex->get_old2new(node_index);
+
+      if(part->isNodeInPart(node_index))
+      {
+        LDN.push_back(node_index);
+        node_num += 1;
+      }
+    }
+    Num_LD[ii] = node_num;
+  }
+
+  unsigned int node_ps, node_pm;
+  unsigned int ps_num, pm_num;
+  for(int ii=0; ii<dof; ++ii)
+  {
+    ps_num = 0;
+    pm_num = 0;
+    for(unsigned int jj=0; jj<nbc_list[ii]->get_num_per_nodes(); ++jj)
+    {
+      node_ps = nbc_list[ii]->get_per_slave_nodes(jj);
+      node_pm = nbc_list[ii]->get_per_master_nodes(jj);
+      node_ps = mnindex->get_old2new(node_ps);
+      node_pm = mnindex->get_old2new(node_pm);
+      
+      if(part->isNodeInPart(node_ps))
+      {
+        LPSN.push_back(node_ps);
+        LPMN.push_back(node_pm);
+        ps_num += 1;
+      }
+
+      if(part->isNodeInPart(node_pm))
+      {
+        LocalMaster.push_back(node_pm);
+        LocalMasterSlave.push_back(node_ps);
+        pm_num += 1;
+      }
+
+    }
+    Num_LPS[ii] = ps_num;
+    Num_LPM[ii] = pm_num;
+  }
+  
+  const int totnode = part->get_nlocghonode();
+
+  LID.resize(totnode * dof);
+
+  int new_index, old_index;
+  for(int ii=0; ii<dof; ++ii)
+  {
+    for(int jj=0; jj<totnode; ++jj)
+    {
+      new_index = part->get_local_to_global(jj);
+      old_index = mnindex->get_new2old(new_index);
+      LID[ii*totnode + jj] = nbc_list[ii]->get_ID(old_index);
+    }
+  }
+
+  for(int ii=0; ii<dof*totnode; ++ii)
+  {
+    if(LID[ii] != -1)
+    {
+      LID[ii] = mnindex->get_old2new(LID[ii]);
+    }
+  }
+
+  VEC_T::shrink2fit(LID); VEC_T::shrink2fit(LDN);
+  VEC_T::shrink2fit(LPSN); VEC_T::shrink2fit(LPMN);
+  VEC_T::shrink2fit(LocalMaster); VEC_T::shrink2fit(LocalMasterSlave);
+}
+
+
+NBC_Partition_2D::~NBC_Partition_2D()
+{
+  VEC_T::clean(LID);
+  VEC_T::clean(LDN);
+  VEC_T::clean(LPSN);
+  VEC_T::clean(LPMN);
+  VEC_T::clean(LocalMaster);
+  VEC_T::clean(LocalMasterSlave);
+  VEC_T::clean(Num_LD);
+  VEC_T::clean(Num_LPS);
+  VEC_T::clean(Num_LPM);
+}
+
+
+void NBC_Partition_2D::write_hdf5(const char * FileName) const
+{
+  std::string fName(FileName);
+  fName.append("_p");
+
+  if( cpu_rank / 10 == 0 )
+    fName.append("0000");
+  else if( cpu_rank / 100 == 0 )
+    fName.append("000");
+  else if( cpu_rank / 1000 == 0 )
+    fName.append("00");
+  else if( cpu_rank / 10000 == 0 )
+    fName.append("0");
+
+  std::stringstream sstrm;
+  sstrm<<cpu_rank;
+  fName.append(sstrm.str());
+
+  fName.append(".h5");
+
+  hid_t file_id, group_id;
+  
+  file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
+
+  group_id = H5Gcreate(file_id, "/nbc", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  
+  HDF5_Writer * h5writer = new HDF5_Writer(file_id);
+
+  h5writer->write_intVector(group_id, "LID", LID);
+
+  if(LDN.size() > 0)
+    h5writer->write_intVector(group_id, "LDN", LDN);
+
+  
+  if(LPSN.size() > 0)
+  {
+    h5writer->write_intVector(group_id, "LPSN", LPSN);
+    h5writer->write_intVector(group_id, "LPMN", LPMN);
+  }
+
+  if(LocalMaster.size() > 0)
+  {
+    h5writer->write_intVector(group_id, "LocalMaster", LocalMaster);
+    h5writer->write_intVector(group_id, "LocalMasterSlave", LocalMasterSlave);
+  }
+  
+  h5writer->write_intVector(group_id, "Num_LD", Num_LD);
+  h5writer->write_intVector(group_id, "Num_LPS", Num_LPS);
+  h5writer->write_intVector(group_id, "Num_LPM", Num_LPM);
+
+  delete h5writer;
+  H5Gclose(group_id);
+  H5Fclose(file_id);
+}
+
+
+void NBC_Partition_2D::print_info() const
+{
+  std::cout<<"=========================================== \n";
+  std::cout<<"NBC_Partition_2D : \n";
+  std::cout<<"--- LID : \n";
+  VEC_T::print(LID);
+  std::cout<<"\n--- LDN : \n";
+  VEC_T::print(LDN);
+  std::cout<<"\n--- LPSN : \n";
+  VEC_T::print(LPSN);
+  std::cout<<"\n--- LPMN : \n";
+  VEC_T::print(LPMN);
+  std::cout<<"\n--- LocalMaster : \n";
+  VEC_T::print(LocalMaster);
+  std::cout<<"\n--- LocalMasterSlave : \n";
+  VEC_T::print(LocalMasterSlave);
+  std::cout<<"\n--- Num_LD : \n";
+  VEC_T::print(Num_LD);
+  std::cout<<"\n--- Num_LPS : \n";
+  VEC_T::print(Num_LPS);
+  std::cout<<"\n--- Num_LPM : \n";
+  VEC_T::print(Num_LPM);
+  std::cout<<"=========================================== \n";
+}
+
+// EOF
