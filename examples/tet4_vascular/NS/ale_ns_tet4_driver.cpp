@@ -16,7 +16,6 @@
 #include "QuadPts_Gauss_Tet.hpp"
 #include "FEAElement_Triangle3_3D_der0.hpp"
 #include "FEAElement_Tet4.hpp"
-#include "CVFlowRate_Steady.hpp"
 #include "CVFlowRate_Unsteady.hpp"
 #include "CVFlowRate_Linear2Steady.hpp"
 #include "GenBC_Resistance.hpp"
