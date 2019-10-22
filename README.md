@@ -7,10 +7,6 @@ PERIGEE is a nonlinear dynamic finite element and isogeometric analysis code for
 - [Design Pattern](#Design-Pattern)
 - [References](#References)
 
-## Installation
-One has to install necessary libraries to compile and run PERIGEE. The guide for library installation is [here](docs/install_external_libs.md). After the libraries are properly installed, one has to modify the configuration file in the conf folder, following the steps in this [guide](docs/configure_perigee_guide.md).
-
-
 ## Code Style
 1. Be clean. If you don't know what clean is, read code until you do.
 2. Be consistent. Match the style of surrounding code, unless its not clean.
