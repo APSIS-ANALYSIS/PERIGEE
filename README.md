@@ -2,14 +2,9 @@
 PERIGEE is a nonlinear dynamic finite element and isogeometric analysis code for multiphysics problems. The code has been under development since 2012 with the goal of providing a single C++ framework for parallel implementation of different physics problems using different element technologies.
 
 ## Table of Contents
-- [Install](#Install)
 - [Code Style](#Code-Style)
 - [Design Pattern](#Design-Pattern)
 - [References](#References)
-
-## Installation
-One has to install necessary libraries to compile and run PERIGEE. The guide for library installation is [here](docs/install_external_libs.md). After the libraries are properly installed, one has to modify the configuration file in the conf folder, following the steps in this [guide](docs/configure_perigee_guide.md).
-
 
 ## Code Style
 1. Be clean. If you don't know what clean is, read code until you do.
