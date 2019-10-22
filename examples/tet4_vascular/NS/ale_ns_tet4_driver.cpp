@@ -34,6 +34,10 @@ int main(int argc, char *argv[])
   // Estimate of the nonzero per row for the sparse matrix 
   int nz_estimate = 60;
 
+  // fluid properties
+  double fluid_density = 1.065;
+  double fluid_mu = 3.5e-2;
+  
   // inflow file
   std::string inflow_file("inflow_fourier_series.txt");
 
@@ -92,6 +96,8 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionInt("-nqp_tri", nqp_tri);
   SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
   SYS_T::GetOptionReal("-bs_beta", bs_beta);
+  SYS_T::GetOptionReal("-fl_density", fluid_density);
+  SYS_T::GetOptionReal("-fl_mu", fluid_mu);
   SYS_T::GetOptionString("-inflow_file", inflow_file);
   SYS_T::GetOptionString("-lpn_file", lpn_file);
   SYS_T::GetOptionString("-part_file", part_file);
@@ -120,6 +126,8 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-nqp_tri:", nqp_tri);
   SYS_T::cmdPrint("-nz_estimate:", nz_estimate);
   SYS_T::cmdPrint("-bs_beta:", bs_beta);
+  SYS_T::cmdPrint("-fl_density:", fluid_density);
+  SYS_T::cmdPrint("-fl_mu:", fluid_mu);
   SYS_T::cmdPrint("-inflow_file:", inflow_file);
   SYS_T::cmdPrint("-lpn_file:", lpn_file);
   SYS_T::cmdPrint("-part_file:", part_file);
@@ -218,8 +226,6 @@ int main(int argc, char *argv[])
   tm_galpha_ptr->print_info();
 
   // ===== Local assembly initialization =====
-  const double fluid_density = 1.065;
-  const double fluid_mu = 3.5e-2;
   IPLocAssem * locAssem_ptr = new PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha(
       tm_galpha_ptr, GMIptr->get_nLocBas(),
       quadv->get_num_quadPts(), elements->get_nLocBas(),
@@ -391,22 +397,28 @@ int main(int argc, char *argv[])
     const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure( 
         sol, locAssem_ptr, elements, quads, pNode, locebc, ff );
 
+    // set the gbc initial conditions using the 3D data
+    gbc -> reset_initial_sol( ff, face_flrate, face_avepre );
+
     const double lpn_flowrate = face_flrate;
     const double lpn_pressure = gbc -> get_P( ff, lpn_flowrate );
-
-    // set the gbc initial conditions
-    gbc -> reset_initial_sol( ff, lpn_flowrate, lpn_pressure );
 
     // Create the txt files and write the initial flow rates
     if(rank == 0)
     {
       std::ofstream ofile;
+      
+      // If this is NOT a restart run, generate a new file, otherwise append to
+      // existing file
       if( !is_restart )
         ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
       else
         ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
 
-      ofile<<timeinfo->get_time()<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
+      // If this is NOT a restart, then record the initial values
+      if( !is_restart )
+        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
+      
       ofile.close();
     }
   }
