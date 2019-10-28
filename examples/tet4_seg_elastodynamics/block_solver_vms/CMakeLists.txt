@@ -1,6 +1,6 @@
 PROJECT(perigee)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
 IF(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
@@ -247,8 +247,8 @@ ADD_EXECUTABLE( gmshIO gmsh_process.cpp)
 # 1.2 Analysis and tests
 ADD_EXECUTABLE( lpsso3d solid_driver.cpp)
 ADD_EXECUTABLE( blockvms3d block_solid_solver.cpp)
-ADD_EXECUTABLE( dssegso3d seg_diagscale_solid_driver.cpp)
-ADD_EXECUTABLE( shsegso3d shellpc_diagscale_solid_driver.cpp)
+#ADD_EXECUTABLE( dssegso3d seg_diagscale_solid_driver.cpp)
+#ADD_EXECUTABLE( shsegso3d shellpc_diagscale_solid_driver.cpp)
 
 # 1.3 Post-process
 ADD_EXECUTABLE( preposth5 prepost_tet_h5.cpp)

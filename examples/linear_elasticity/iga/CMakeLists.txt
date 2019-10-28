@@ -1,6 +1,6 @@
 PROJECT(perigee)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
 IF(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
@@ -159,7 +159,7 @@ ADD_LIBRARY( perigee_postprocess ${perigee_postprocess_lib_src} )
 TARGET_LINK_LIBRARIES( perigee_postprocess ${EXTRA_LINK_LIBS} perigee_analysis )
 
 ADD_LIBRARY( perigee_hexlib ${perigee_hex_aux_tool_lib_src} )
-TARGET_LINK_LIBRARIES( perigee_hexlib ${EXTRA_LINK_LIBS} )
+TARGET_LINK_LIBRARIES( perigee_hexlib ${EXTRA_LINK_LIBS} perigee_analysis )
 # -------------------------------------------------------------------
 
 # ===================================================================
