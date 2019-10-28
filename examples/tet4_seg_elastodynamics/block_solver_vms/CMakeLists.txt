@@ -220,11 +220,11 @@ ENDIF( ${CMAKE_BUILD_TYPE} MATCHES "Debug" )
 
 # 5. Hex-auxiliary lib
 ADD_LIBRARY( perigee_hexlib ${perigee_hex_aux_tool_lib_src} )
-TARGET_LINK_LIBRARIES( perigee_hexlib ${EXTRA_LINK_LIBS} )
+TARGET_LINK_LIBRARIES( perigee_hexlib ${EXTRA_LINK_LIBS} perigee_analysis )
 
 # 6. Block solver lib
 ADD_LIBRARY( perigee_bstlib ${perigee_bst_lib_src} )
-TARGET_LINK_LIBRARIES( perigee_bstlib ${EXTRA_LINK_LIBS} )
+TARGET_LINK_LIBRARIES( perigee_bstlib ${EXTRA_LINK_LIBS} perigee_analysis)
 
 # Add SLEPc flag if it is defined
 IF(DEFINED SLEPC_DIR)
