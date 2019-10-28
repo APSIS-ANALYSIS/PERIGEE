@@ -114,7 +114,6 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/PGAssem.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
   ${perigee_source}/Solver/PLinear_Solver_DiagScale.cpp
-  ${perigee_source}/Solver/PLinear_Solver_DiagScale_Shell.cpp
   ${perigee_source}/Solver/IPLinear_Solver_2x2Block.cpp
   ${perigee_source}/Solver/PLinear_Solver_2x2Block_BIPN.cpp
   ${perigee_source}/Solver/PLinear_Solver_2x2Block_BIPN_SIMPLE.cpp
@@ -137,11 +136,11 @@ SET( perigee_analysis_lib_src
   ${perigee_SOURCE_DIR}/../src/PTime_Solver_2x2Block_HED.cpp
   )
 
-IF(DEFINED SLEPC_DIR)
-  SET( perigee_analysis_lib_src ${perigee_analysis_lib_src}
-    ${perigee_source}/Solver/PEigen_Solver_SLEPc.cpp
-    )
-ENDIF(DEFINED SLEPC_DIR)
+#IF(DEFINED SLEPC_DIR)
+#  SET( perigee_analysis_lib_src ${perigee_analysis_lib_src}
+#    ${perigee_source}/Solver/PEigen_Solver_SLEPc.cpp
+#    )
+#ENDIF(DEFINED SLEPC_DIR)
 
 # 3. Postprocess cpp
 SET( perigee_postprocess_lib_src
@@ -272,10 +271,10 @@ TARGET_LINK_LIBRARIES( gmshIO perigee_preprocess )
 TARGET_LINK_LIBRARIES( lpsso3d ${EXTRA_LINK_LIBS} perigee_analysis )
 TARGET_LINK_LIBRARIES( blockvms3d ${EXTRA_LINK_LIBS} perigee_analysis
   perigee_bstlib )
-TARGET_LINK_LIBRARIES( dssegso3d ${EXTRA_LINK_LIBS} perigee_analysis
-  perigee_bstlib )
-TARGET_LINK_LIBRARIES( shsegso3d ${EXTRA_LINK_LIBS} perigee_analysis
-  perigee_bstlib )
+#TARGET_LINK_LIBRARIES( dssegso3d ${EXTRA_LINK_LIBS} perigee_analysis
+#  perigee_bstlib )
+#TARGET_LINK_LIBRARIES( shsegso3d ${EXTRA_LINK_LIBS} perigee_analysis
+#  perigee_bstlib )
 
 # 2.3 Postprocess
 TARGET_LINK_LIBRARIES( preposth5 ${EXTRA_LINK_LIBS} perigee_analysis 
