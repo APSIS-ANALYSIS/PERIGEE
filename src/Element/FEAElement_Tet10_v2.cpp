@@ -31,8 +31,8 @@ FEAElement_Tet10_v2::FEAElement_Tet10_v2( const int &in_nqua )
   d2R_dss[0] = 4.0; d2R_dss[2] = 4.0; d2R_dss[6] = -8.0;
   d2R_dtt[0] = 4.0; d2R_dtt[3] = 4.0; d2R_dtt[7] = -8.0;
   d2R_drs[0] = 4.0; d2R_drs[4] = -4.0; d2R_drs[5] = 4.0; d2R_drs[6] = -4.0;
-  d2R_drt[0] = 4.0; d2R_drt[4] = -4.0; d2R_drt[7] = -4.0; d2R_drt[9] = 4.0;
-  d2R_dst[0] = 4.0; d2R_dst[6] = -4.0; d2R_dst[7] = -4.0; d2R_dst[8] = 4.0;
+  d2R_drt[0] = 4.0; d2R_drt[4] = -4.0; d2R_drt[7] = -4.0; d2R_drt[8] = 4.0;
+  d2R_dst[0] = 4.0; d2R_dst[6] = -4.0; d2R_dst[7] = -4.0; d2R_dst[9] = 4.0;
 }
 
 
@@ -110,15 +110,14 @@ void FEAElement_Tet10_v2::buildBasis( const IQuadPts * const &quad,
     zst += ctrl_z[ii] * d2R_dst[ii];
   }
 
-  double qua_r, qua_s, qua_t, qua_u;
   for(int qua=0; qua<numQuapts; ++qua)
   {
     const int q10 = qua * 10;
 
-    qua_r = quad -> get_qp( qua, 0 );
-    qua_s = quad -> get_qp( qua, 1 );
-    qua_t = quad -> get_qp( qua, 2 );
-    qua_u = quad -> get_qp( qua, 3 ); 
+    const double qua_r = quad -> get_qp( qua, 0 );
+    const double qua_s = quad -> get_qp( qua, 1 );
+    const double qua_t = quad -> get_qp( qua, 2 );
+    const double qua_u = quad -> get_qp( qua, 3 ); 
 
     R[q10+0] = qua_u * (2.0*qua_u - 1.0);
     R[q10+1] = qua_r * (2.0*qua_r - 1.0);
@@ -128,8 +127,8 @@ void FEAElement_Tet10_v2::buildBasis( const IQuadPts * const &quad,
     R[q10+5] = 4.0 * qua_r * qua_s;
     R[q10+6] = 4.0 * qua_s * qua_u;
     R[q10+7] = 4.0 * qua_t * qua_u;
-    R[q10+8] = 4.0 * qua_s * qua_t;
-    R[q10+9] = 4.0 * qua_r * qua_t;
+    R[q10+8] = 4.0 * qua_r * qua_t;
+    R[q10+9] = 4.0 * qua_s * qua_t;
 
     dR_dr[0] = 1.0 - 4.0 * qua_u;
     dR_dr[1] = 4.0 * qua_r - 1.0;
@@ -139,8 +138,8 @@ void FEAElement_Tet10_v2::buildBasis( const IQuadPts * const &quad,
     dR_dr[5] = 4.0 * qua_s;
     dR_dr[6] = -4.0 * qua_s;
     dR_dr[7] = -4.0 * qua_t;
-    dR_dr[8] = 0.0;
-    dR_dr[9] = 4.0 * qua_t; 
+    dR_dr[8] = 4.0 * qua_t;
+    dR_dr[9] = 0.0; 
 
     dR_ds[0] = 1.0 - 4.0 * qua_u;
     dR_ds[1] = 0.0;
@@ -150,8 +149,8 @@ void FEAElement_Tet10_v2::buildBasis( const IQuadPts * const &quad,
     dR_ds[5] = 4.0 * qua_r;
     dR_ds[6] = 4.0 * (qua_u - qua_s);
     dR_ds[7] = -4.0 * qua_t;
-    dR_ds[8] = 4.0 * qua_t;
-    dR_ds[9] = 0.0;
+    dR_ds[8] = 0.0;
+    dR_ds[9] = 4.0 * qua_t;
     
     dR_dt[0] = 1.0 - 4.0 * qua_u;
     dR_dt[1] = 0.0;
@@ -161,8 +160,8 @@ void FEAElement_Tet10_v2::buildBasis( const IQuadPts * const &quad,
     dR_dt[5] = 0.0;
     dR_dt[6] = -4.0 * qua_s;
     dR_dt[7] = 4.0 * (qua_u - qua_t);
-    dR_dt[8] = 4.0 * qua_s;
-    dR_dt[9] = 4.0 * qua_r;
+    dR_dt[8] = 4.0 * qua_r;
+    dR_dt[9] = 4.0 * qua_s;
     
     double xr = 0.0, xs = 0.0, xt = 0.0;
     double yr = 0.0, ys = 0.0, yt = 0.0;
@@ -252,14 +251,12 @@ double FEAElement_Tet10_v2::get_h( const double * const &ctrl_x,
   return 2.0 * r;
 }
 
-
 void FEAElement_Tet10_v2::get_R( const int &quaindex, double * const &basis ) const
 {
   assert( quaindex >= 0 && quaindex < numQuapts );
   const int offset = quaindex * 10;
   for(int ii=0; ii<10; ++ii) basis[ii] = R[offset+ii];
 }
-
 
 void FEAElement_Tet10_v2::get_gradR( const int &quaindex, double * const &basis_x,
     double * const &basis_y, double * const &basis_z ) const
@@ -273,7 +270,6 @@ void FEAElement_Tet10_v2::get_gradR( const int &quaindex, double * const &basis_
     basis_z[ii] = dR_dz[offset + ii];
   }
 }
-
 
 void FEAElement_Tet10_v2::get_R_gradR( const int &quaindex, double * const &basis,
     double * const &basis_x, double * const &basis_y,
@@ -289,7 +285,6 @@ void FEAElement_Tet10_v2::get_R_gradR( const int &quaindex, double * const &basi
     basis_z[ii] = dR_dz[offset + ii];
   }
 }
-
 
 void FEAElement_Tet10_v2::get_3D_R_dR_d2R( const int &quaindex,
     double * const &basis, double * const &basis_x,
@@ -315,19 +310,16 @@ void FEAElement_Tet10_v2::get_3D_R_dR_d2R( const int &quaindex,
   }
 }
 
-
 void FEAElement_Tet10_v2::get_Jacobian(const int &quaindex,
     double * const &jac_value) const
 {
   for(int ii=0; ii<9; ++ii) jac_value[ii] = dx_dr[9*quaindex + ii];
 }
 
-
 void FEAElement_Tet10_v2::get_invJacobian(const int &quaindex,
     double * const &jac_value) const
 {
   for(int ii=0; ii<9; ++ii) jac_value[ii] = dr_dx[9*quaindex + ii];
 }
-
 
 // EOF
