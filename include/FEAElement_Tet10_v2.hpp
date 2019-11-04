@@ -1,9 +1,11 @@
-#ifndef FEAELEMENT_TET10_HPP
-#define FEAELEMENT_TET10_HPP
+#ifndef FEAELEMENT_TET10_V2_HPP
+#define FEAELEMENT_TET10_V2_HPP
 // ==================================================================
-// FEAElement_Tet10.hpp
+// FEAElement_Tet10_v2.hpp
 // This is an implementation of the element routine for quadratic 10
-// node tetrahedral element.
+// node tetrahedral element. Version 2 means this is a second version
+// implementation of the Tet10 element to make the node numbering
+// compatible with the vtk format, see the graph below.
 //
 // Tet10 : 10-node tet element, aka, quadratic tet.
 //
@@ -14,11 +16,11 @@
 //                    /| -
 //                     |   -
 //                  /  |     -
-//                     7        8
-//               /    |           -
-//                9    |             -
+//                     7        9
+//                /    |           -
+//               8     |             -
 //                     |                - 
-//              /    /0--------6---------2-------> s
+//               /    /0--------6---------2-------> s
 //              /    /                -
 //              /   /              -
 //                 4           -   
@@ -33,21 +35,23 @@
 // This class is designed for the volumetric integration in model
 // assembly.
 //
-// Date created: Feb. 16 2018
+// Date created: Nov. 3 2019
 // ==================================================================
 #include "FEAElement.hpp"
 #include "Matrix_double_6by6_Array.hpp"
 
-class FEAElement_Tet10 : public FEAElement
+class FEAElement_Tet10_v2 : public FEAElement
 {
   public:
-    FEAElement_Tet10( const int &in_nqua );
+    FEAElement_Tet10_v2( const int &in_nqua );
 
-    virtual ~FEAElement_Tet10();
+    virtual ~FEAElement_Tet10_v2();
 
     virtual int get_elemDim() const {return 3;}
 
-    virtual int get_Type() const {return 532;}
+    // A unique number for this element. Recall 532 is the original
+    // Tet10 element
+    virtual int get_Type() const {return 533;}
 
     virtual int get_numType() const {return 1;}
 
