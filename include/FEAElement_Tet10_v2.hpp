@@ -6,6 +6,9 @@
 // node tetrahedral element. Version 2 means this is a second version
 // implementation of the Tet10 element to make the node numbering
 // compatible with the vtk format, see the graph below.
+// 
+// Notice that only the node number 8 and 9 are switched. The rest
+// numbering are identical to that of FEAElement_Tet10 class.
 //
 // Tet10 : 10-node tet element, aka, quadratic tet.
 //
@@ -49,8 +52,8 @@ class FEAElement_Tet10_v2 : public FEAElement
 
     virtual int get_elemDim() const {return 3;}
 
-    // A unique number for this element. Recall 532 is the original
-    // Tet10 element
+    // A unique number for this element. 
+    // Recall that 532 is the original Tet10 element
     virtual int get_Type() const {return 533;}
 
     virtual int get_numType() const {return 1;}
@@ -63,6 +66,8 @@ class FEAElement_Tet10_v2 : public FEAElement
 
     virtual double get_memory_usage() const;
 
+    // Given the quadrature points and nodes' coordinates, evaluate
+    // the basis functions and their derivatives up to second order.
     virtual void buildBasis( const IQuadPts * const &quad_rule,
         const double * const &ctrl_x,
         const double * const &ctrl_y,
@@ -75,6 +80,8 @@ class FEAElement_Tet10_v2 : public FEAElement
         const double * const &ctrl_y,
         const double * const &ctrl_z ) const;
 
+    // get_xxx functions give access to the basis functions' value
+    // at the corresponding quadrature points
     virtual void get_R( const int &quaindex, double * const &basis ) const;
 
     virtual void get_gradR( const int &quaindex, double * const &basis_x,
