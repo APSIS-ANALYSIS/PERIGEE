@@ -1,6 +1,6 @@
-#include "FEAElement_Tet10.hpp"
+#include "FEAElement_Tet10_v2.hpp"
 
-FEAElement_Tet10::FEAElement_Tet10( const int &in_nqua )
+FEAElement_Tet10_v2::FEAElement_Tet10_v2( const int &in_nqua )
 : numQuapts( in_nqua )
 {
   R = new double [10 * numQuapts];
@@ -36,7 +36,7 @@ FEAElement_Tet10::FEAElement_Tet10( const int &in_nqua )
 }
 
 
-FEAElement_Tet10::~FEAElement_Tet10()
+FEAElement_Tet10_v2::~FEAElement_Tet10_v2()
 {
   delete [] R; R = NULL;
   delete [] dR_dx; dR_dx = NULL;
@@ -55,16 +55,16 @@ FEAElement_Tet10::~FEAElement_Tet10()
 }
 
 
-void FEAElement_Tet10::print_info() const
+void FEAElement_Tet10_v2::print_info() const
 {
-  SYS_T::commPrint("Tet10: ");
-  SYS_T::commPrint("10-node tetrahedral element with up to 2nd derivatives. \n");
+  SYS_T::commPrint("Tet10_v2: ");
+  SYS_T::commPrint("10-node tetrahedral element with up to 2nd derivatives. Compatible with vtk format \n");
   PetscPrintf(PETSC_COMM_WORLD, "elemType: %d \n", get_Type());
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
 }
 
 
-double FEAElement_Tet10::get_memory_usage() const
+double FEAElement_Tet10_v2::get_memory_usage() const
 {
   const double d_size = 119 * numQuapts + 90;
   const double i_size = 1;
@@ -72,7 +72,7 @@ double FEAElement_Tet10::get_memory_usage() const
 }
 
 
-void FEAElement_Tet10::buildBasis( const IQuadPts * const &quad,
+void FEAElement_Tet10_v2::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_x,
     const double * const &ctrl_y,
     const double * const &ctrl_z )
@@ -237,7 +237,7 @@ void FEAElement_Tet10::buildBasis( const IQuadPts * const &quad,
 }
 
 
-double FEAElement_Tet10::get_h( const double * const &ctrl_x,
+double FEAElement_Tet10_v2::get_h( const double * const &ctrl_x,
     const double * const &ctrl_y,
     const double * const &ctrl_z ) const
 {
@@ -253,7 +253,7 @@ double FEAElement_Tet10::get_h( const double * const &ctrl_x,
 }
 
 
-void FEAElement_Tet10::get_R( const int &quaindex, double * const &basis ) const
+void FEAElement_Tet10_v2::get_R( const int &quaindex, double * const &basis ) const
 {
   assert( quaindex >= 0 && quaindex < numQuapts );
   const int offset = quaindex * 10;
@@ -261,7 +261,7 @@ void FEAElement_Tet10::get_R( const int &quaindex, double * const &basis ) const
 }
 
 
-void FEAElement_Tet10::get_gradR( const int &quaindex, double * const &basis_x,
+void FEAElement_Tet10_v2::get_gradR( const int &quaindex, double * const &basis_x,
     double * const &basis_y, double * const &basis_z ) const
 {
   assert( quaindex >= 0 && quaindex < numQuapts );
@@ -275,7 +275,7 @@ void FEAElement_Tet10::get_gradR( const int &quaindex, double * const &basis_x,
 }
 
 
-void FEAElement_Tet10::get_R_gradR( const int &quaindex, double * const &basis,
+void FEAElement_Tet10_v2::get_R_gradR( const int &quaindex, double * const &basis,
     double * const &basis_x, double * const &basis_y,
     double * const &basis_z ) const
 {
@@ -291,7 +291,7 @@ void FEAElement_Tet10::get_R_gradR( const int &quaindex, double * const &basis,
 }
 
 
-void FEAElement_Tet10::get_3D_R_dR_d2R( const int &quaindex,
+void FEAElement_Tet10_v2::get_3D_R_dR_d2R( const int &quaindex,
     double * const &basis, double * const &basis_x,
     double * const &basis_y, double * const &basis_z,
     double * const &basis_xx, double * const &basis_yy,
@@ -316,14 +316,14 @@ void FEAElement_Tet10::get_3D_R_dR_d2R( const int &quaindex,
 }
 
 
-void FEAElement_Tet10::get_Jacobian(const int &quaindex,
+void FEAElement_Tet10_v2::get_Jacobian(const int &quaindex,
     double * const &jac_value) const
 {
   for(int ii=0; ii<9; ++ii) jac_value[ii] = dx_dr[9*quaindex + ii];
 }
 
 
-void FEAElement_Tet10::get_invJacobian(const int &quaindex,
+void FEAElement_Tet10_v2::get_invJacobian(const int &quaindex,
     double * const &jac_value) const
 {
   for(int ii=0; ii<9; ++ii) jac_value[ii] = dr_dx[9*quaindex + ii];
