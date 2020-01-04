@@ -17,7 +17,7 @@
 # =========================================================
 # 1. VTK VARIABLES
 # =========================================================
-SET(VTK_DIR /home/jliu/lib/VTK-7.1.0-shared)
+SET(VTK_DIR /home/jliu/lib/VTK-7.1.1)
 SET(VTK_VERSION vtk-7.1)
 SET(VTK_link_lib vtkCommonCore-7.1 vtkCommonSystem-7.1 vtkCommonDataModel-7.1
   vtkCommonExecutionModel-7.1 vtkCommonMisc-7.1 vtkCommonTransforms-7.1
@@ -29,9 +29,9 @@ SET(VTK_link_lib vtkCommonCore-7.1 vtkCommonSystem-7.1 vtkCommonDataModel-7.1
 # ========================================================
 
 IF( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
-  SET(PETSC_DIR /home/jliu/lib/petsc-3.10.4-opt)
+  SET(PETSC_DIR /home/jliu/lib/petsc-3.8.4-opt)
 ELSE( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
-  SET(PETSC_DIR /home/jliu/lib/petsc-3.10.4-debug)
+  SET(PETSC_DIR /home/jliu/lib/petsc-3.8.4-debug)
 ENDIF( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
 
 SET(PETSC_ARCH .)
@@ -58,7 +58,7 @@ SET(PETSC_link_lib ${PETSC_LIBRARIES} ${PETSC_PACKAGE_LIBS})
 # ========================================================
 # 3. METIS VARIABLES
 # ========================================================
-SET(METIS_DIR /home/jliu/lib/metis-5.0.3)
+SET(METIS_DIR /home/jliu/lib/metis-5.0.3-32bit)
 
 # ========================================================
 # 4. HDF5 VARIABLES
@@ -68,22 +68,22 @@ SET(HDF5_DIR /home/jliu/lib/hdf5-1.8.17)
 # ========================================================
 # 5. Eigen VARIABLES
 # ========================================================
-INCLUDE_DIRECTORIES(/home/jliu/lib/eigen-3.3.4/include/eigen3)
+INCLUDE_DIRECTORIES(/home/jliu/lib/Eigen-3.3.7/include/eigen3)
 
 # ========================================================
 # 6. Slepc VARIABLES
 # ========================================================
-IF( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
-  SET(SLEPC_DIR /home/jliu/lib/slepc-3.10.2-opt)
-ELSE( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
-  SET(SLEPC_DIR /home/jliu/lib/slepc-3.10.2-debug)
-ENDIF( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
+#IF( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
+#  SET(SLEPC_DIR /home/jliu/lib/slepc-3.10.2-opt)
+#ELSE( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
+#  SET(SLEPC_DIR /home/jliu/lib/slepc-3.10.2-debug)
+#ENDIF( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
 
 # ========================================================
 # 7. Compiler options 
 # ========================================================
-SET(CMAKE_C_COMPILER  /home/jliu/lib/mpich-3.2/bin/mpicc)
-SET(CMAKE_CXX_COMPILER /home/jliu/lib/mpich-3.2/bin/mpicxx)
+SET(CMAKE_C_COMPILER  /home/jliu/lib/mpich-3.3.2/bin/mpicc)
+SET(CMAKE_CXX_COMPILER /home/jliu/lib/mpich-3.3.2/bin/mpicxx)
 
 IF( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
   SET(CMAKE_CXX_FLAGS "-O3 -Wall")

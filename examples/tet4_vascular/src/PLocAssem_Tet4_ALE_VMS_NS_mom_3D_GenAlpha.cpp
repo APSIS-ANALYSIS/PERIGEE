@@ -796,7 +796,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Mass_Residual(
     {
       NA = R[A]; NA_x = dR_dx[A]; NA_y = dR_dy[A]; NA_z = dR_dz[A];
 
-      Residual[4*A+1] += gwts * ( NA * rho0 * (u*u_x + v*v_y + w*u_z) 
+      Residual[4*A+1] += gwts * ( NA * rho0 * (u*u_x + v*u_y + w*u_z) 
           - NA_x * p
           + two_mu * NA_x * u_x
           + vis_mu * NA_y * (u_y + v_x)
