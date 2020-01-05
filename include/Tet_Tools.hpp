@@ -4,7 +4,9 @@
 // Tet_Tools.hpp
 //
 // This is a suite of basic tetrahedral element tools with IO and
-// basic quality evaluation.
+// basic mesh quality evaluation.
+// 
+// Author: Ju Liu, liujuy@gmail.com
 // ==================================================================
 #include "Vec_Tools.hpp"
 #include "Math_Tools.hpp"
@@ -18,6 +20,7 @@
 #include "vtkPointData.h"
 #include "vtkTriangle.h"
 #include "vtkTetra.h"
+#include "vtkQuadraticTetra.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkUnstructuredGridWriter.h"
 #include "vtkXMLUnstructuredGridWriter.h"
@@ -36,13 +39,15 @@ namespace TET_T
   // --------------------------------------------------------------
   // ! read_vtu_grid: read the mesh generated from other software
   //                  in the .vtu file. The mesh file is assumed to be a
-  //                  tetrahedral mesh, otherwise, an error message will be
-  //                  thrown.
+  //                  tetrahedral mesh with 4 or 10 nodes; 
+  //                  otherwise, an error message will be thrown.
   //   Input:  \para filename : the filename ending with .vtu
   //   Output: \para numpts: the number of grid points
   //           \para numcels: the number of cells
-  //           \para pt: xyz coordinate of the grids, length is 3 numpts
-  //           \para ien_array: the connectivity array, length is 4 numcels
+  //           \para pt: xyz coordinate of the grids, 
+  //                     length is 3 x numpts
+  //           \para ien_array: the connectivity array, 
+  //                            length is 4 or 10 x numcels
   //   Note: reload the function with output in int type instead
   //         of the VTK builtin type vtkIdType by doing a static_cast.
   // ----------------------------------------------------------------
@@ -54,10 +59,17 @@ namespace TET_T
   // ----------------------------------------------------------------
   // ! read_vtu_grid: read the mesh info just exactly the same way
   //                  as the original read_vtu_grid. In addition,
-  //                  this one reads the physical tag as an additional
-  //                  information.
-  //                  This function is specifically designed for FSI
-  //                  type, multi-domain problems.
+  //                  this function reads the <physical tag> as an 
+  //                  additional output data.
+  //   Input:  \para filename : the filename ending with .vtu
+  //   Output: \para numpts: the number of grid points
+  //           \para numcels: the number of cells
+  //           \para pt: xyz coordinate of the grids, length is 3 numpts
+  //           \para ien_array: the connectivity array, 
+  //                            length is 4 or 10 x numcels
+  //           \para phy_tag: the tag of the elements, length is numcels
+  //   This function is specifically designed for FSI or multi-domain 
+  //   problems, where we need a tag to identify the physical domain.
   // ----------------------------------------------------------------
   void read_vtu_grid( const std::string &filename,
       int &numpts, int &numcels,
@@ -66,17 +78,38 @@ namespace TET_T
 
 
   // ----------------------------------------------------------------
+  // ! read_vtp_grid: read the surface mesh from a .vtp file. The mesh
+  //                  file is assumed to be a VTK trangle grid with 3
+  //                  or 6 nodes. 
+  //                  We do not read in the associated volumetric nodal
+  //                  or element indices in this routine. Hence, this 
+  //                  is used primarily for reading Dirichlet type BC 
+  //                  information.
+  //                  
+  //   Input:  \para filename : the file name ending with .vtp
+  //   Output: \para numpts : the number of grid points
+  //           \para numcels : the number of triangle cells
+  //           \para pt : the xyz-coordinate of grid points
+  //           \para ien_array: the connectivity array for the triangles,
+  //                            length is 3 or 6 x numcels
+  // ----------------------------------------------------------------
+  void read_vtp_grid( const std::string &filename,
+      int &numpts, int &numcels,
+      std::vector<double> &pt, std::vector<int> &ien_array );
+
+
+  // ----------------------------------------------------------------
   // ! read_vtp_grid: read the surface mesh generated from other software
   //                  in .vtp files. The mesh file is assumed to be a VTK
-  //                  triangle grid (type 5 in VTK cell type); otherwise,
-  //                  an error message will be thrown.
+  //                  triangle grid (type 5 or 22 in VTK cell type); 
+  //                  otherwise, an error message will be thrown.
   //   Input:  \para filename : the file name ending with .vtp
   //   Output: \para numpts: the number of grid points
   //           \para numcels: the number of triangle cells
   //           \para pt: xyz coordinate of the triangles, 
-  //                     length is 3 numpts.
+  //                     length is 3 x numpts.
   //           \para ien_array: the connectivity array, 
-  //                            length is 3 numcels.
+  //                            length is 3 or 6 x numcels.
   //           \para global_node_index: the mapping from local nodal
   //                                    index to global nodal index
   //           \para global_ele_index: the mapping from the triangle
@@ -90,36 +123,22 @@ namespace TET_T
       std::vector<int> &global_ele_index );
 
 
-  // ----------------------------------------------------------------
-  // ! read_vtp_grid: read the surface mesh from a .vtp file. The mesh
-  //                  file is assumed to be a VTK trangle grid. We do
-  //                  not read in the associated nodal/element indices
-  //                  in this routine. Hence, this is used for Dirichlet
-  //                  type BC enforcement.
-  //   Input:  \para filename : the file name ending with .vtp
-  //   Output: \para numpts : the number of grid points
-  //           \para numcels : the number of triangle cells
-  //           \para pt : the xyz-coordinate of grid points
-  //           \para ien_array: the connectivity array for the triangles
-  // ----------------------------------------------------------------
-  void read_vtp_grid( const std::string &filename,
-      int &numpts, int &numcels,
-      std::vector<double> &pt, std::vector<int> &ien_array );
-
-
   // ================================================================
   // ===> 2. The second set of tools WRITE volumetric mesh to .vtu 
   //         file and surface mesh to .vtp file.  
   // ================================================================
   // ----------------------------------------------------------------
   // ! write_tet_grid: write the volumetric mesh described by linear 
-  //                   tetrahedral elements.
+  //                   or quadratic tetrahedral elements. The routine
+  //                   will detect the element type from the length of
+  //                   the ien_array and the numcels.
   //   Input: \para filename : the filename.vtu is the file to be written.
   //          \para numpts : the number of grid points
   //          \para numcels : the number of tetrahedral elements
   //          \para pt: xyz coordinates of the linear tets, length 
   //                    3 x numpts
-  //          \para ien_array : connectivity array, length 4 x numcels
+  //          \para ien_array : connectivity array, 
+  //                            length 4 or 10 x numcels
   // ----------------------------------------------------------------
   void write_tet_grid( const std::string &filename,
       const int &numpts, const int &numcels,
@@ -127,13 +146,13 @@ namespace TET_T
 
 
   // ----------------------------------------------------------------
-  // ! write_tet_grid_node_elem_index : write the volumetric mesh with
-  //   additional data including the NodalIndex, the ElemIndex.
+  // ! write_tet_grid_node_elem_index : Similar to the above function,
+  //   this routine writes the volumetric mesh with  additional data :
+  //   NodalIndex & ElemIndex.
   // ----------------------------------------------------------------
   void write_tet_grid_node_elem_index( const std::string &filename,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, const std::vector<int> &ien_array );
-
   
   void write_tet_grid_node_elem_index( const std::string &filename,
       const int &numpts, const int &numcels,
@@ -211,7 +230,11 @@ namespace TET_T
   //          x0 y0 z0 x1 y1 z1 x2 y2 z2 x3 y3 z3
   //   Output: The ratio between the longest edge and the shortest edge.
   //           l_max / l_min.
-  //   Lower aspect ratio implies better shape.
+  //   Lower aspect ratio implies better shape. If the input contains
+  //   more than 4 points' coordinate, (e.g. you give the coor of 10-node
+  //   tet), the routine will still read the first four nodes. This means
+  //   for quadratic tets, the aspect ratio is calculated by extracting
+  //   its four vertices and ignoring the mid-edge points.
   // ----------------------------------------------------------------
   double get_aspect_ratio( const std::vector<double> &coors );
 
