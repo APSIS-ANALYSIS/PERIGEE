@@ -9,6 +9,7 @@
 // This mesh is assumed to be linear tetrahedral elements. Hence, the 
 // number of local nodes is 4. The length of the IEN array is 4 nElem.
 //
+// Author: Ju Liu
 // Date: Dec.18 2016.
 // ==================================================================
 #include <vector>
