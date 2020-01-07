@@ -9,6 +9,7 @@
 // num_pts = 4, exact for quad. polynomials, order of prec. 2
 // num_pts = 5, exact for cubic polynomials, order of prec. 3
 // num_pts = 17, exact for quintic polynomials, order of prec. 5
+// num_pts = 29, exact for sextic polynomials, order of prec. 6
 //
 // Reference: T.J.R. Hughes FEM Book p.174
 //            J. Yu Symmetric Gaussian Quadrature Formulae for 
@@ -16,7 +17,6 @@
 //
 // Date Created: Jan. 18 2017
 // ==================================================================
-
 #include "Vec_Tools.hpp"
 #include "IQuadPts.hpp"
 
@@ -57,6 +57,5 @@ class QuadPts_Gauss_Tet : public IQuadPts
     void gen_permutations( const double &a, const double &b, 
         const double &c, std::vector<double> &out ) const;
 };
-
 
 #endif

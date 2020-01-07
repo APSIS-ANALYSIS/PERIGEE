@@ -148,7 +148,8 @@ namespace TET_T
   // ----------------------------------------------------------------
   // ! write_tet_grid_node_elem_index : Similar to the above function,
   //   this routine writes the volumetric mesh with  additional data :
-  //   NodalIndex & ElemIndex.
+  //   NodalIndex & ElemIndex. If the node_idx & elem_idx is not given
+  //   the function will write based on the natural numbering.
   // ----------------------------------------------------------------
   void write_tet_grid_node_elem_index( const std::string &filename,
       const int &numpts, const int &numcels,
@@ -157,8 +158,7 @@ namespace TET_T
   void write_tet_grid_node_elem_index( const std::string &filename,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, const std::vector<int> &ien_array,
-      const std::vector<int> &node_idx,
-      const std::vector<int> &elem_idx );
+      const std::vector<int> &node_idx, const std::vector<int> &elem_idx );
 
   // ----------------------------------------------------------------
   // ! write_tet_grid : write a volumetric mesh with 

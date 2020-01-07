@@ -135,8 +135,6 @@ Global_Part_METIS::Global_Part_METIS( const int &cpu_size,
   std::cout<<"=== Global partition generated. \n";
 }
 
-
-
 Global_Part_METIS::~Global_Part_METIS()
 {
   delete [] epart;
@@ -144,8 +142,6 @@ Global_Part_METIS::~Global_Part_METIS()
   epart = NULL; npart = NULL;
   std::cout<<"-- Global_Part_METIS deleted. \n";
 }
-
-
 
 void Global_Part_METIS::write_part_hdf5( const char * const &fileName,
     const idx_t * const &part_in,
@@ -220,7 +216,6 @@ void Global_Part_METIS::write_part_hdf5( const char * const &fileName,
   H5Fclose(file_id);
 }
 
-
 void Global_Part_METIS::write_part_hdf5_64bit( const char * const &fileName,
     const int64_t * const &part_in,
     const int64_t &part_size, const int &cpu_size,
@@ -261,7 +256,5 @@ void Global_Part_METIS::write_part_hdf5_64bit( const char * const &fileName,
 
   H5Fclose(file_id);
 }
-
-
 
 // EOF

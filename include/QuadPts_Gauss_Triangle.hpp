@@ -12,6 +12,13 @@
 //
 // Reference: T.J.R.Hughes FEM book, pp 173-174.
 // 
+// num_pts = 19, deg. of precision 8
+// num_pts = 37, deg. of precision 13
+//
+// DCUTRI: an algorithm for adaptive cubature over a collection of triangles, 
+// ACM Transactions on Mathematical Software,
+// Volume 18, Number 3, September 1992, pages 329-342.
+//
 // https://people.sc.fsu.edu/~jburkardt/datasets/
 // quadrature_rules_tri/quadrature_rules_tri.html
 //

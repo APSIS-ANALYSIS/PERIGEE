@@ -67,6 +67,50 @@ QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( const int &in_num_pts )
       qw[16] = 0.1884185567365411;
 
       break;
+
+    case 29:
+      a = 0.05135188412556341;
+      b = 0.4860510285706072;
+      c = (1.0 - a - b) * 0.5;
+      w = 0.04361493840666568;
+      gen_permutations(a,b,c, temp);
+      for(int ii=0; ii<48; ++ii) qp[ii] = temp[ii];
+
+      for(int ii=0; ii<12; ++ii) qw[ii] = w;
+
+      a = 0.2967538129690260;
+      b = 0.6081079894015281;
+      c = (1.0 - a - b) * 0.5;
+      w = 0.02581167596199161;
+      gen_permutations(a,b,c, temp);
+      offset = 48;
+      for(int ii=0; ii<48; ++ii) qp[offset+ii] = temp[ii];
+      
+      for(int ii=0; ii<12; ++ii) qw[12+ii] = w;
+
+      a = 0.8277192480479295;
+      b = (1.0 -a) / 3.0;
+      w = 0.01911983427899124;
+
+      offset = 96;
+      qp[offset+0] = a; qp[offset+1] = b; qp[offset+2] = b; qp[offset+3] = b;
+      qw[24] = w;
+
+      qp[offset+4] = b; qp[offset+5] = a; qp[offset+6] = b; qp[offset+7] = b;
+      qw[25] = w;
+
+      qp[offset+8] = b; qp[offset+9] = b; qp[offset+10] = a; qp[offset+11] = b;
+      qw[26] = w;
+
+      qp[offset+12] = b; qp[offset+13] = b; qp[offset+14] = b; qp[offset+15] = a;
+      qw[27] = w;
+
+      qp[offset+16] = 0.25; qp[offset+17] = 0.25; 
+      qp[offset+18] = 0.25; qp[offset+19] = 0.25;
+      qw[28] = 0.09040129046014750;
+
+      break;
+
     default:
       SYS_T::print_fatal("Error: QuadPts_Gauss_Tet: input number of quadrature points is not implemented. \n");
       break;
