@@ -133,7 +133,6 @@ class Part_Tet4 : public IPart
         const IIEN * const &IEN,
         const std::vector<double> &ctrlPts,
         const bool &isPrintinfo );
-
 };
 
 #endif
