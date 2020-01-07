@@ -349,24 +349,21 @@ void PGAssem_ALE_NS_FEM::EssBC_KG(
 
   if(local_dir > 0)
   {
-    int row, col;
     for(int i=0; i<local_dir; ++i)
     {
-      row = nbc_part->get_LDN(field, i) * dof_mat + field;
-      col = row;
+      const int row = nbc_part->get_LDN(field, i) * dof_mat + field;
       VecSetValue(G, row, 0.0, INSERT_VALUES);
-      MatSetValue(K, row, col, 1.0, ADD_VALUES);
+      MatSetValue(K, row, row, 1.0, ADD_VALUES);
     }
   }
 
   const int local_sla = nbc_part->get_Num_LPS(field);
   if(local_sla > 0)
   {
-    int row, col;
     for(int i=0; i<local_sla; ++i)
     {
-      row = nbc_part->get_LPSN(field, i) * dof_mat + field;
-      col = nbc_part->get_LPMN(field, i) * dof_mat + field;
+      const int row = nbc_part->get_LPSN(field, i) * dof_mat + field;
+      const int col = nbc_part->get_LPMN(field, i) * dof_mat + field;
       MatSetValue(K, row, col, 1.0, ADD_VALUES);
       MatSetValue(K, row, row, -1.0, ADD_VALUES);
       VecSetValue(G, row, 0.0, INSERT_VALUES);
@@ -380,12 +377,11 @@ void PGAssem_ALE_NS_FEM::EssBC_G(
 {
   const int local_dir = nbc_part->get_Num_LD(field);
   const int local_sla = nbc_part->get_Num_LPS(field);
-  int row;
   if( local_dir > 0 )
   {
     for(int ii=0; ii<local_dir; ++ii)
     {
-      row = nbc_part->get_LDN(field, ii) * dof_mat + field;
+      const int row = nbc_part->get_LDN(field, ii) * dof_mat + field;
       VecSetValue(G, row, 0.0, INSERT_VALUES);
     }
   }
@@ -394,7 +390,7 @@ void PGAssem_ALE_NS_FEM::EssBC_G(
   {
     for(int ii=0; ii<local_sla; ++ii)
     {
-      row = nbc_part->get_LPSN(field, ii) * dof_mat + field;
+      const int row = nbc_part->get_LPSN(field, ii) * dof_mat + field;
       VecSetValue(G, row, 0.0, INSERT_VALUES);
     }
   }

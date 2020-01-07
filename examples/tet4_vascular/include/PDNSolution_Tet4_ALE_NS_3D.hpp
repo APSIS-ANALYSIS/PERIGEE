@@ -41,7 +41,6 @@ class PDNSolution_Tet4_ALE_NS_3D : public PDNSolution
 
   private:
     const bool is_print;
-
 };
 
 #endif
