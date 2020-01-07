@@ -25,6 +25,7 @@
 // ==================================================================
 #include "IPGAssem.hpp"
 #include "PETSc_Tools.hpp"
+#include "PDNSolution_Mixed_UPV_3D.hpp"
 
 class PGAssem_FSI_FEM : public IPGAssem
 {
@@ -51,7 +52,8 @@ class PGAssem_FSI_FEM : public IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
         const ALocal_NodalBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part );
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc );
 
     virtual void Assem_mass_residual(
         const PDNSolution * const &sol_a,
