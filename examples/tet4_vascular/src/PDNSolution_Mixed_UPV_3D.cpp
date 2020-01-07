@@ -10,7 +10,7 @@ PDNSolution_Mixed_UPV_3D::PDNSolution_Mixed_UPV_3D(
   switch(type)
   {
     case 0:
-      Init_zero( pNode, fNode_ptr );
+      Init_zero( pNode );
       break;
     case 2:
       Init_pressure( pNode, fNode_ptr );

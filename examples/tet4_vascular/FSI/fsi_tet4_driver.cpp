@@ -24,7 +24,7 @@
 #include "PGAssem_FSI_FEM.hpp"
 #include "PGAssem_Seg_FEM.hpp"
 #include "PDNSolution_Mixed_UPV_3D.hpp"
-//#include "PTime_Seg_Solver.hpp"
+#include "PTime_Seg_Solver.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -328,34 +328,34 @@ int main(int argc, char *argv[])
   mesh_lsolver -> Info();
 
   // ===== Nonlinear solver context =====
-  PNonlinear_Seg_Solver * nsolver = new PNonlinear_Seg_Solver(
-      pNode, fNode, nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq);
-  SYS_T::commPrint("===> Nonlinear solver setted up:\n");
-  nsolver->print_info();
+  //PNonlinear_Seg_Solver * nsolver = new PNonlinear_Seg_Solver(
+  //    pNode, fNode, nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq);
+  //SYS_T::commPrint("===> Nonlinear solver setted up:\n");
+  //nsolver->print_info();
 
   // ===== Temporal solver context =====
-  PTime_Seg_Solver * tsolver = new PTime_Seg_Solver( sol_bName,
-      sol_record_freq, ttan_renew_freq, final_time );
-  SYS_T::commPrint("===> Time marching solver setted up:\n");
-  tsolver->print_info();
+  //PTime_Seg_Solver * tsolver = new PTime_Seg_Solver( sol_bName,
+  //    sol_record_freq, ttan_renew_freq, final_time );
+  //SYS_T::commPrint("===> Time marching solver setted up:\n");
+  //tsolver->print_info();
 
   // ===== Outlet flowrate recording files =====
   for(int ff=0; ff<locebc->get_num_ebc(); ++ff)
   {
-    const double face_flrate = tsolver->Get_flow_rate( sol, 
-        locAssem_fluid_ptr, elements, quads, pNode, locebc, ff );
-    if(rank == 0)
-    {
-      std::ofstream ofile;
+    //const double face_flrate = tsolver->Get_flow_rate( sol, 
+    //    locAssem_fluid_ptr, elements, quads, pNode, locebc, ff );
+    //if(rank == 0)
+    //{
+    //  std::ofstream ofile;
 
-      if( !is_restart )
-        ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
-      else
-        ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
+      //if( !is_restart )
+      //  ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
+      //else
+      //  ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
 
-      ofile<<timeinfo->get_time()<<'\t'<<face_flrate<<'\n';
-      ofile.close();
-    }
+      //ofile<<timeinfo->get_time()<<'\t'<<face_flrate<<'\n';
+      //ofile.close();
+    //}
   }
 
   // ===== FEM analysis =====
@@ -371,7 +371,8 @@ int main(int argc, char *argv[])
   //lsolver -> Info();
 
   // ===== PETSc Finalize =====
-  delete tsolver; delete nsolver; delete lsolver; delete mesh_lsolver;
+  // delete tsolver; delete nsolver;
+  delete lsolver; delete mesh_lsolver;
   delete gloAssem_ptr; delete gloAssem_mesh_ptr;
   delete timeinfo; delete sol; delete dot_sol; delete base;
   delete locAssem_solid_ptr;

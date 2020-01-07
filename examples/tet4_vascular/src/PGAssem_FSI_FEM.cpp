@@ -10,7 +10,9 @@ PGAssem_FSI_FEM::PGAssem_FSI_FEM(
     ALocal_IEN const * const &aien_ptr,
     APart_Node const * const &pnode_ptr,
     ALocal_NodalBC const * const &part_nbc,
-    ALocal_EBC const * const &part_ebc )
+    ALocal_EBC const * const &part_ebc,
+    IGenBC const * const &gbc,
+    const int &in_nz_estimate )
 {
   nLocBas = agmi_ptr->get_nLocBas();
   dof_sol = pnode_ptr->get_dof(); // pnode_ptr stores dofNum
@@ -49,7 +51,10 @@ PGAssem_FSI_FEM::PGAssem_FSI_FEM(
   // Allocate the AIJ matrix
   int * dnnz = new int [nlocrow];
   int * onnz = new int [nlocrow];
-  const int empirical_neibor_number = 250;
+  const int empirical_neibor_number = in_nz_estimate;
+  
+  PetscPrintf(PETSC_COMM_WORLD, "     Empirical nonzero estimate: %d \n", empirical_neibor_number);
+
   Get_dnz_onz( nlocalnode,  empirical_neibor_number,
       part_nbc, dnnz, onnz );
 
@@ -99,7 +104,7 @@ PGAssem_FSI_FEM::PGAssem_FSI_FEM(
 
   // Now we run a nonzero estimate trial assembly
   Assem_nonzero_estimate( alelem_ptr, locassem_f_ptr, locassem_s_ptr, 
-      elements, quads, aien_ptr, pnode_ptr, part_nbc, part_ebc );
+      elements, quads, aien_ptr, pnode_ptr, part_nbc, part_ebc, gbc );
 
   // Obtain the precise dnz and onz count
   std::vector<int> Kdnz, Konz;
@@ -312,7 +317,8 @@ void PGAssem_FSI_FEM::Assem_nonzero_estimate(
     const ALocal_IEN * const &lien_ptr,
     const APart_Node * const &node_ptr,
     const ALocal_NodalBC * const &nbc_part,
-    const ALocal_EBC * const &ebc_part )
+    const ALocal_EBC * const &ebc_part,
+    const IGenBC * const &gbc )
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
@@ -474,7 +480,7 @@ void PGAssem_FSI_FEM::Assem_residual(
     const FEANode * const &fnode_ptr,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
-    const IGenBC * const gbc )
+    const IGenBC * const &gbc )
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
@@ -696,7 +702,7 @@ void PGAssem_FSI_FEM::NatBC_Resis_G(
     const double P_np1 = gbc -> get_P( ebc_id, flrate );
 
     // P_n+alpha_f
-    const double val = P_n + lassem_ptr->get_model_para_1() * (P_np1 - P_n);
+    const double val = P_n + lassem_f_ptr->get_model_para_1() * (P_np1 - P_n);
 
     const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
     for(int ee=0; ee<num_sele; ++ee)
@@ -753,7 +759,7 @@ void PGAssem_FSI_FEM::NatBC_Resis_KG(
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
     // Calculate flow rate for face with ebc_id
-    const double flrate = Assem_surface_flowrate( sol, lassem_ptr,
+    const double flrate = Assem_surface_flowrate( sol, lassem_f_ptr,
         element_s, quad_s, node_ptr, ebc_part, ebc_id );
 
     // Get the pressure value on the outlet surface
@@ -761,7 +767,7 @@ void PGAssem_FSI_FEM::NatBC_Resis_KG(
     const double P_np1 = gbc -> get_P( ebc_id, flrate );
 
     // P_n+alpha_f
-    const double resis_val = P_n + lassem_ptr->get_model_para_1() * (P_np1 - P_n);
+    const double resis_val = P_n + lassem_f_ptr->get_model_para_1() * (P_np1 - P_n);
 
     // Get m := dP/dQ
     const double m_val = gbc -> get_m( ebc_id, flrate );

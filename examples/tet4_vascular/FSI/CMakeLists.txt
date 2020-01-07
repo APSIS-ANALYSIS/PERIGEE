@@ -166,7 +166,7 @@ INCLUDE(../../../conf/message_compiler_setup.cmake)
 ADD_EXECUTABLE( preprocess_fsi preprocess_sv_fsi_tets.cpp)
 
 # 1.2 Analysis and tests
-#ADD_EXECUTABLE( fsi_tet4_3d fsi_tet4_driver.cpp)
+ADD_EXECUTABLE( fsi_tet4_3d fsi_tet4_driver.cpp)
 
 # 1.3 Post
 ADD_EXECUTABLE( prepostproc prepost_tets.cpp)
@@ -181,7 +181,7 @@ ADD_EXECUTABLE( vis_fsi_solid vis_fsi_solid.cpp)
 TARGET_LINK_LIBRARIES( preprocess_fsi ${EXTRA_LINK_LIBS} perigee_preprocess )
 
 # 3.2
-#TARGET_LINK_LIBRARIES( fsi_tet4_3d ${EXTRA_LINK_LIBS} perigee_analysis )
+TARGET_LINK_LIBRARIES( fsi_tet4_3d ${EXTRA_LINK_LIBS} perigee_analysis )
 
 # 3.3
 TARGET_LINK_LIBRARIES( prepostproc ${EXTRA_LINK_LIBS} perigee_analysis 

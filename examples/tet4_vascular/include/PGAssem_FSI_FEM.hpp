@@ -39,7 +39,9 @@ class PGAssem_FSI_FEM : public IPGAssem
         ALocal_IEN const * const &aien_ptr,
         APart_Node const * const &pnode_ptr,
         ALocal_NodalBC const * const &part_nbc,
-        ALocal_EBC const * const &part_ebc );
+        ALocal_EBC const * const &part_ebc,
+        IGenBC const * const &gbc,
+        const int &in_nz_estimate = 60 );
 
     virtual ~PGAssem_FSI_FEM();
 
