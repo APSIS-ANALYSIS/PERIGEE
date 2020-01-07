@@ -672,31 +672,6 @@ void PGAssem_FSI_FEM::NatBC_G( const double &curr_time, const double &dt,
 }
 
 
-double PGAssem_FSI_FEM::Get_flow_rate( IPLocAssem * const &lassem_f_ptr,
-    FEAElement * const &ele_s,
-    const IQuadPts * const &quad_s,
-    const ALocal_EBC * const &ebc_part,
-    const int &ebc_id ) const
-{
-  const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
-
-  double sum = 0.0;
-
-  for(int ee=0; ee<num_sele; ++ee)
-  {
-    ebc_part -> get_SIEN( ebc_id, ee, LSIEN);
-    ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
-
-    GetLocal(array_b, LSIEN, snLocBas, local_bs);
-
-    sum += lassem_f_ptr -> get_flowrate( local_bs, ele_s, sctrl_x,
-        sctrl_y, sctrl_z, quad_s );
-  }
-
-  return sum;
-}
-
-
 void PGAssem_FSI_FEM::NatBC_Resis_G(
     const PDNSolution * const &sol,
     IPLocAssem * const &lassem_f_ptr,

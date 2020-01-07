@@ -211,18 +211,6 @@ class PGAssem_FSI_FEM : public IPGAssem
         const int &empirical_neighbor_node_number,
         const ALocal_NodalBC * const &nbc_ptr,
         PetscInt * const &dnz, PetscInt * const &onz ) const;
-
-    // --- to be removed
-    // This function will return the flow rate of the ebc with
-    // id ebc_id on the local CPU's portion.
-    // One needs to call a mpi_reduce to sum up all CPU's
-    // contribution.
-    double Get_flow_rate( IPLocAssem * const &lassem_ptr,
-        FEAElement * const &ele_s,
-        const IQuadPts * const &quad_s,
-        const ALocal_EBC * const &ebc_part,
-        const int &ebc_id ) const;
-    // -------------------
 };
 
 #endif
