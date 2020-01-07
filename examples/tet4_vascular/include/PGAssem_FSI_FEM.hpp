@@ -74,6 +74,7 @@ class PGAssem_FSI_FEM : public IPGAssem
     virtual void Assem_residual(
         const PDNSolution * const &sol_a,
         const PDNSolution * const &sol_b,
+        const PDNSolution * const &sol_np1,
         const double &curr_time,
         const double &dt,
         const ALocal_Elem * const &alelem_ptr,
@@ -87,7 +88,8 @@ class PGAssem_FSI_FEM : public IPGAssem
         const APart_Node * const &node_ptr,
         const FEANode * const &fnode_ptr,
         const ALocal_NodalBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part );
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc );
 
 
     virtual void Assem_tangent_residual(
