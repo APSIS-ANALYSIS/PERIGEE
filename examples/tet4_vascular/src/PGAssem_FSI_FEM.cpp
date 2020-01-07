@@ -539,6 +539,7 @@ void PGAssem_FSI_FEM::Assem_residual(
 void PGAssem_FSI_FEM::Assem_tangent_residual(
     const PDNSolution * const &sol_a,
     const PDNSolution * const &sol_b,
+    const PDNSolution * const &sol_np1,
     const double &curr_time,
     const double &dt,
     const ALocal_Elem * const &alelem_ptr,
@@ -552,7 +553,8 @@ void PGAssem_FSI_FEM::Assem_tangent_residual(
     const APart_Node * const &node_ptr,
     const FEANode * const &fnode_ptr,
     const ALocal_NodalBC * const &nbc_part,
-    const ALocal_EBC * const &ebc_part )
+    const ALocal_EBC * const &ebc_part,
+    const IGenBC * const &gbc )
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
@@ -611,7 +613,8 @@ void PGAssem_FSI_FEM::Assem_tangent_residual(
   }
 
   // Resistance BC for K and G
-  NatBC_Resis_KG( dt, lassem_f_ptr, elements, quad_s, nbc_part, ebc_part );
+  NatBC_Resis_KG( dt, sol_np1, lassem_f_ptr, elements, quad_s, node_ptr,
+      nbc_part, ebc_part, gbc );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
