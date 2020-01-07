@@ -38,6 +38,7 @@ int main( int argc, char * argv[] )
   SYS_T::print_fatal_if(sysret != 0, "Error: system call failed. \n");
 
   // Define basic settins
+  const int probDim = 3;
   const int dofNum = 7; // degree-of-freedom for the physical problem
   const int dofMat = 4; // degree-of-freedom in the matrix problem
   const int elemType = 501; // first order simplicial element
@@ -60,12 +61,11 @@ int main( int argc, char * argv[] )
   int in_ncommon = 2;
   bool isDualGraph = true;
 
-  PetscMPIInt rank, size;
+  PetscMPIInt size;
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
   MPI_Comm_size(PETSC_COMM_WORLD, &size);
-  MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
 
   if(size != 1) SYS_T::print_fatal("ERROR: preprocessor is a serial program! \n");
 
@@ -88,6 +88,7 @@ int main( int argc, char * argv[] )
   std::cout<<" -in_ncommon: "<<in_ncommon<<std::endl;
   std::cout<<" -isDualGraph: true \n";
   std::cout<<"----------------------------------\n";
+  std::cout<<" probDim: "<<probDim<<std::endl;
   std::cout<<" dofNum: "<<dofNum<<std::endl;
   std::cout<<" dofMat: "<<dofMat<<std::endl;
   std::cout<<" elemType: "<<elemType<<std::endl;
@@ -129,6 +130,7 @@ int main( int argc, char * argv[] )
   cmdh5w->write_intScalar("in_ncommon", in_ncommon); 
   cmdh5w->write_intScalar("dofNum", dofNum); 
   cmdh5w->write_intScalar("dofMat", dofMat); 
+  cmdh5w->write_intScalar("probDim", probDim); 
   cmdh5w->write_intScalar("elemType", elemType); 
   cmdh5w->write_string("geo_file", geo_file);
   cmdh5w->write_string("sur_file_in", sur_file_in);

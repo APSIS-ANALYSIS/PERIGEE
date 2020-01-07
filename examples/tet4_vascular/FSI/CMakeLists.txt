@@ -51,9 +51,11 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Mesh_Tet4.cpp
   ${perigee_source}/Mesh/IPart.cpp
   ${perigee_source}/Mesh/Part_Tet4.cpp
+  ${perigee_source}/Mesh/Part_Tet4_FSI.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet4.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet4_outflow.cpp
   ${perigee_source}/Mesh/NodalBC_3D_vtp.cpp
+  ${perigee_source}/Mesh/NodalBC_3D_vtu.cpp
   ${perigee_source}/Mesh/NodalBC_3D_inflow.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
@@ -73,7 +75,9 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/System/PETSc_Tools.cpp
   ${perigee_source}/System/Matrix_double_3by3_Array.cpp
   ${perigee_source}/System/Matrix_PETSc.cpp
+  ${perigee_source}/System/Matrix_3x3.cpp
   ${perigee_source}/System/Math_Tools.cpp
+  ${perigee_source}/System/Tensor4_3D.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
   ${perigee_source}/System/HDF5_Reader.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
@@ -92,8 +96,8 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Element/FEANode.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
-  ${perigee_source}/Model/GenBC_RCR.cpp
-  ${perigee_source}/Model/GenBC_Resistance.cpp
+  ${perigee_source}/Model/MaterialModel_NeoHookean_M94_Mixed.cpp
+  ${perigee_source}/Model/MaterialModel_NeoHookean_Incompressible_Mixed.cpp
   ${perigee_source}/Model/CVFlowRate_Unsteady.cpp
   ${perigee_source}/Model/CVFlowRate_Linear2Steady.cpp
   ${perigee_source}/Solver/PDNSolution.cpp
@@ -103,9 +107,12 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/PGAssem.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
   ${perigee_SOURCE_DIR}/../src/PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha.cpp
-  ${perigee_SOURCE_DIR}/../src/PLocAssem_Tet4_FSI_Mesh_Laplacian.cpp
-  ${perigee_SOURCE_DIR}/../src/PGAssem_ALE_NS_FEM.cpp
-  ${perigee_SOURCE_DIR}/../src/PDNSolution_Tet4_ALE_NS_3D.cpp
+  ${perigee_SOURCE_DIR}/../src/PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha.cpp
+  ${perigee_SOURCE_DIR}/../src/PLocAssem_Tet4_VMS_Seg_Incompressible.cpp
+  ${perigee_SOURCE_DIR}/../src/PLocAssem_Tet4_FSI_Mesh_Elastostatic.cpp
+  ${perigee_SOURCE_DIR}/../src/PGAssem_FSI_FEM.cpp
+  ${perigee_SOURCE_DIR}/../src/PGAssem_Seg_FEM.cpp
+  ${perigee_SOURCE_DIR}/../src/PDNSolution_Mixed_UPV_3D.cpp
   ${perigee_SOURCE_DIR}/../src/PDNSolution_P_V_Mixed_3D.cpp
   ${perigee_SOURCE_DIR}/../src/PDNSolution_U_Mixed_3D.cpp
   ${perigee_SOURCE_DIR}/../src/PNonlinear_Seg_Solver.cpp
@@ -115,13 +122,14 @@ SET( perigee_analysis_lib_src
 
 # 3. Postprocess cpp
 SET( perigee_postprocess_lib_src
-  ${perigee_source}/Mesh/Tet_Tools.cpp
-  ${perigee_source}/Mesh/Gmsh_FileIO.cpp
   ${perigee_source}/Analysis_Tool/AInt_Weight.cpp
   ${perigee_source}/Postproc_Tool/PostVectSolution.cpp
   ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   ${perigee_SOURCE_DIR}/../src/VisDataPrep_ALE_NS_3D.cpp
+  ${perigee_SOURCE_DIR}/../src/VisDataPrep_Mixed_U_Hyperelastic_3D.cpp
+  ${perigee_SOURCE_DIR}/../src/VisDataPrep_Mixed_FSI_3D.cpp
   ${perigee_SOURCE_DIR}/../src/VTK_Writer_Fluids_ALE_Tet4.cpp
+  ${perigee_SOURCE_DIR}/../src/VTK_Writer_FSI_Tet4.cpp
   ${perigee_SOURCE_DIR}/../src/Post_error_tet4_ns.cpp
   ${perigee_source}/Postproc_Tool/Interpolater.cpp
   ${perigee_source}/Mesh/QuadPts_vis_tet4.cpp
@@ -157,31 +165,33 @@ INCLUDE(../../../conf/message_compiler_setup.cmake)
 # ===================================================================
 # 1. Make executable for ALE-CFD code
 # 1.1 Preprocess
-ADD_EXECUTABLE( preprocess3d preprocess_sv_ale_tets.cpp)
-ADD_EXECUTABLE( gmshIO gmsh_process.cpp)
+ADD_EXECUTABLE( preprocess_fsi preprocess_sv_fsi_tets.cpp)
 
 # 1.2 Analysis and tests
-ADD_EXECUTABLE( ale_ns_tet4_3d ale_ns_tet4_driver.cpp)
+#ADD_EXECUTABLE( fsi_tet4_3d fsi_tet4_driver.cpp)
 
-# 1.3 Post-process
-ADD_EXECUTABLE( prepost_ale_ns prepost_ale_ns_tets.cpp)
-ADD_EXECUTABLE( vis_ale_ns vis_ale_ns.cpp)
-ADD_EXECUTABLE( vis_ale_ns_wss vis_wss.cpp)
+# 1.3 Post
+ADD_EXECUTABLE( prepostproc prepost_tets.cpp)
+
+ADD_EXECUTABLE( vis_fsi vis_driver.cpp)
+ADD_EXECUTABLE( vis_fsi_fluid vis_fsi_fluid.cpp)
+ADD_EXECUTABLE( vis_fsi_solid vis_fsi_solid.cpp)
 
 # -------------------------------------------------------------------
 # 3. Link libraries
-# 3.1 Preprocess
-TARGET_LINK_LIBRARIES( preprocess3d ${EXTRA_LINK_LIBS} perigee_preprocess )
-TARGET_LINK_LIBRARIES( gmshIO ${EXTRA_LINK_LIBS} perigee_preprocess )
+# 3.1
+TARGET_LINK_LIBRARIES( preprocess_fsi ${EXTRA_LINK_LIBS} perigee_preprocess )
 
-# 3.2 Analysis and tests
-TARGET_LINK_LIBRARIES( ale_ns_tet4_3d ${EXTRA_LINK_LIBS} perigee_analysis )
+# 3.2
+#TARGET_LINK_LIBRARIES( fsi_tet4_3d ${EXTRA_LINK_LIBS} perigee_analysis )
 
-# 3.3 Postprocess
-TARGET_LINK_LIBRARIES( prepost_ale_ns ${EXTRA_LINK_LIBS} perigee_analysis 
-  perigee_preprocess )
+# 3.3
+TARGET_LINK_LIBRARIES( prepostproc ${EXTRA_LINK_LIBS} perigee_analysis 
+    perigee_preprocess )
 
-TARGET_LINK_LIBRARIES( vis_ale_ns ${EXTRA_LINK_LIBS} perigee_postprocess )
-TARGET_LINK_LIBRARIES( vis_ale_ns_wss ${EXTRA_LINK_LIBS} perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_fsi ${EXTRA_LINK_LIBS} perigee_postprocess )
+
+TARGET_LINK_LIBRARIES( vis_fsi_fluid ${EXTRA_LINK_LIBS} perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_fsi_solid ${EXTRA_LINK_LIBS} perigee_postprocess )
 
 #EOF
