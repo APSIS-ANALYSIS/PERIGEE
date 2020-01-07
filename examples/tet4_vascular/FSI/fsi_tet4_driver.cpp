@@ -15,6 +15,8 @@
 #include "FEAElement_Tet4.hpp"
 #include "CVFlowRate_Unsteady.hpp"
 #include "CVFlowRate_Linear2Steady.hpp"
+#include "GenBC_Resistance.hpp"
+#include "GenBC_RCR.hpp"
 #include "MaterialModel_NeoHookean_M94_Mixed.hpp"
 #include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
 #include "PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha.hpp"
@@ -31,6 +33,12 @@ int main(int argc, char *argv[])
   int nqp_tet = 5, nqp_tri = 4;
 
   std::string part_file("part");
+
+  // Estimate the nonzero per row for the sparse matrix
+  int nz_estimate = 60;
+
+  // LPN file
+  std::string lpn_file("lpn_rcr_input.txt");
 
   double fluid_density = 1.06;
   double fluid_mu = 4.0e-2;
@@ -70,9 +78,11 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
 
   SYS_T::GetOptionString("-part_file", part_file);
+  SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
   SYS_T::GetOptionReal("-bs_beta", bs_beta);
   SYS_T::GetOptionReal("-fl_density", fluid_density);
   SYS_T::GetOptionReal("-fl_mu", fluid_mu);
+  SYS_T::GetOptionString("-lpn_file", lpn_file);
   SYS_T::GetOptionInt("-nqp_tet", nqp_tet);
   SYS_T::GetOptionInt("-nqp_tri", nqp_tri);
   SYS_T::GetOptionReal("-nl_rtol", nl_rtol);
@@ -95,11 +105,13 @@ int main(int argc, char *argv[])
 
   // ===== Print the command line argumetn on screen =====
   SYS_T::cmdPrint("-part_file:", part_file);
+  SYS_T::cmdPrint("-lpn_file:", lpn_file);
   SYS_T::cmdPrint("-bs_beta:", bs_beta);
   SYS_T::cmdPrint("-fl_density:", fluid_density);
   SYS_T::cmdPrint("-fl_mu:", fluid_mu);
   SYS_T::cmdPrint("-nqp_tet:", nqp_tet);
   SYS_T::cmdPrint("-nqp_tri:", nqp_tri);
+  SYS_T::cmdPrint("-nz_estimate:", nz_estimate);
   SYS_T::cmdPrint("-nl_rtol:", nl_rtol);
   SYS_T::cmdPrint("-nl_atol:", nl_atol);
   SYS_T::cmdPrint("-nl_dtol:", nl_dtol);
@@ -243,12 +255,27 @@ int main(int argc, char *argv[])
   }
 
   PDNTimeStep * timeinfo = new PDNTimeStep(initial_index, initial_time, initial_step);
+  
+  // ===== GenBC =====
+  IGenBC * gbc = NULL;
+
+  if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 1  )
+    gbc = new GenBC_Resistance( lpn_file.c_str() );
+  else if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 2  )
+    gbc = new GenBC_RCR( lpn_file.c_str(), 1000, initial_step );
+  else
+    SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
+
+  gbc -> print_info(); 
+
+  SYS_T::print_fatal_if(gbc->get_num_ebc() != locebc->get_num_ebc(),
+      "Error: GenBC number of faces does not match with that in ALocal_EBC.\n");
 
   // ===== Global assembly routine =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
   IPGAssem * gloAssem_ptr = new PGAssem_FSI_FEM( locAssem_fluid_ptr,
       locAssem_solid_ptr, elements, quads, GMIptr, locElem, locIEN, 
-      pNode, locnbc, locebc );
+      pNode, locnbc, locebc, gbc, nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
   gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_fluid_ptr,
@@ -314,7 +341,7 @@ int main(int argc, char *argv[])
 
   PLinear_Solver_PETSc * mesh_lsolver = new PLinear_Solver_PETSc(
       1.0e-12, 1.0e-55, 1.0e30, 500, "ls_mesh_", "pc_mesh_" );
-  
+
   gloAssem_mesh_ptr->Assem_tangent_residual( sol, sol, 0.0,
       timeinfo->get_step(), locElem, locAssem_mesh_ptr, elementv,
       elements, quadv, quads, locIEN, pNode, fNode, mesh_locnbc,
@@ -323,7 +350,7 @@ int main(int argc, char *argv[])
   mesh_lsolver -> SetOperator( gloAssem_mesh_ptr->K );
   PC mesh_pc; mesh_lsolver->GetPC(&mesh_pc);
   PCFieldSplitSetBlockSize( mesh_pc, 3 );
-  
+
   SYS_T::commPrint("===> mesh solver LHS setted up.\n");
   mesh_lsolver -> Info();
 
@@ -348,13 +375,13 @@ int main(int argc, char *argv[])
     //{
     //  std::ofstream ofile;
 
-      //if( !is_restart )
-      //  ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
-      //else
-      //  ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
+    //if( !is_restart )
+    //  ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
+    //else
+    //  ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
 
-      //ofile<<timeinfo->get_time()<<'\t'<<face_flrate<<'\n';
-      //ofile.close();
+    //ofile<<timeinfo->get_time()<<'\t'<<face_flrate<<'\n';
+    //ofile.close();
     //}
   }
 
@@ -383,7 +410,7 @@ int main(int argc, char *argv[])
   delete pmat; delete mmat; delete tm_galpha_ptr;
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
   delete locElem; delete locnbc; delete locinfnbc; delete mesh_locnbc;
-  delete locebc; delete pNode; delete mesh_locebc;
+  delete locebc; delete pNode; delete mesh_locebc; delete gbc;
   PetscFinalize();
   return EXIT_SUCCESS;
 }
