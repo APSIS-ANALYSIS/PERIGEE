@@ -24,7 +24,7 @@
 #include "PGAssem_FSI_FEM.hpp"
 #include "PGAssem_Seg_FEM.hpp"
 #include "PDNSolution_Mixed_UPV_3D.hpp"
-#include "PTime_Seg_Solver.hpp"
+//#include "PTime_Seg_Solver.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -359,16 +359,16 @@ int main(int argc, char *argv[])
   }
 
   // ===== FEM analysis =====
-  SYS_T::commPrint("===> Start Finite Element Analysis:\n");
-  tsolver->TM_FSI_GenAlpha(is_restart, base, dot_sol, sol, tm_galpha_ptr,
-      timeinfo, inflow_rate_ptr,locElem, locIEN, pNode, fNode, locnbc,
-      locinfnbc, mesh_locnbc,
-      locebc, mesh_locebc, pmat, mmat, elementv, elements, quadv, quads,
-      locAssem_fluid_ptr, locAssem_solid_ptr, locAssem_mesh_ptr,
-      gloAssem_ptr, gloAssem_mesh_ptr, lsolver, mesh_lsolver, nsolver);
+  //SYS_T::commPrint("===> Start Finite Element Analysis:\n");
+  //tsolver->TM_FSI_GenAlpha(is_restart, base, dot_sol, sol, tm_galpha_ptr,
+  //    timeinfo, inflow_rate_ptr,locElem, locIEN, pNode, fNode, locnbc,
+  //    locinfnbc, mesh_locnbc,
+  //    locebc, mesh_locebc, pmat, mmat, elementv, elements, quadv, quads,
+  //    locAssem_fluid_ptr, locAssem_solid_ptr, locAssem_mesh_ptr,
+  //    gloAssem_ptr, gloAssem_mesh_ptr, lsolver, mesh_lsolver, nsolver);
 
   // ===== Print solver full information =====
-  lsolver -> Info();
+  //lsolver -> Info();
 
   // ===== PETSc Finalize =====
   delete tsolver; delete nsolver; delete lsolver; delete mesh_lsolver;
