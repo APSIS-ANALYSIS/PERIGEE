@@ -379,20 +379,35 @@ int main(int argc, char *argv[])
   // ===== Outlet flowrate recording files =====
   for(int ff=0; ff<locebc->get_num_ebc(); ++ff)
   {
-    //const double face_flrate = tsolver->Get_flow_rate( sol, 
-    //    locAssem_fluid_ptr, elements, quads, pNode, locebc, ff );
-    //if(rank == 0)
-    //{
-    //  std::ofstream ofile;
+    const double face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
+        sol, locAssem_fluid_ptr, elements, quads, pNode, locebc, ff );
 
-    //if( !is_restart )
-    //  ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
-    //else
-    //  ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
+    const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
+        sol, locAssem_fluid_ptr, elements, quads, pNode, locebc, ff );
 
-    //ofile<<timeinfo->get_time()<<'\t'<<face_flrate<<'\n';
-    //ofile.close();
-    //}
+    // set the gbc initial conditions using the 3D data
+    gbc -> reset_initial_sol( ff, face_flrate, face_avepre );
+
+    const double lpn_flowrate = face_flrate;
+    const double lpn_pressure = gbc -> get_P( ff, lpn_flowrate );
+
+    if(rank == 0)
+    {
+      std::ofstream ofile;
+
+      // If this is NOT a restart run, generate a new file, otherwise append to
+      // a existing file
+      if( !is_restart )
+        ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
+      else
+        ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
+
+      // if this is NOT a restart run, record the initial values
+      if( !is_restart )
+        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
+
+      ofile.close();
+    }
   }
 
   // ===== FEM analysis =====
