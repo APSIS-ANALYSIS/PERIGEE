@@ -32,18 +32,25 @@ int main(int argc, char *argv[])
 {
   int nqp_tet = 5, nqp_tri = 4;
 
-  std::string part_file("part");
-
   // Estimate the nonzero per row for the sparse matrix
   int nz_estimate = 60;
+
+  // fluid properties
+  double fluid_density = 1.06;
+  double fluid_mu = 4.0e-2;
+
+  // inflow file
+  std::string inflow_file("inflow_fourier_series.txt");
 
   // LPN file
   std::string lpn_file("lpn_rcr_input.txt");
 
-  double fluid_density = 1.06;
-  double fluid_mu = 4.0e-2;
+  // back flow stabilization
   double bs_beta = 0.2;
   
+  // part file location
+  std::string part_file("part");
+
   // Nonlinear solver parameters
   double nl_rtol = 1.0e-3;
   double nl_atol = 1.0e-6;
@@ -77,14 +84,15 @@ int main(int argc, char *argv[])
   // ===== Command Line Argument =====
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
 
-  SYS_T::GetOptionString("-part_file", part_file);
+  SYS_T::GetOptionInt("-nqp_tet", nqp_tet);
+  SYS_T::GetOptionInt("-nqp_tri", nqp_tri);
   SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
   SYS_T::GetOptionReal("-bs_beta", bs_beta);
   SYS_T::GetOptionReal("-fl_density", fluid_density);
   SYS_T::GetOptionReal("-fl_mu", fluid_mu);
+  SYS_T::GetOptionString("-inflow_file", inflow_file);
   SYS_T::GetOptionString("-lpn_file", lpn_file);
-  SYS_T::GetOptionInt("-nqp_tet", nqp_tet);
-  SYS_T::GetOptionInt("-nqp_tri", nqp_tri);
+  SYS_T::GetOptionString("-part_file", part_file);
   SYS_T::GetOptionReal("-nl_rtol", nl_rtol);
   SYS_T::GetOptionReal("-nl_atol", nl_atol);
   SYS_T::GetOptionReal("-nl_dtol", nl_dtol);
@@ -104,14 +112,15 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionString("-restart_name", restart_name);
 
   // ===== Print the command line argumetn on screen =====
-  SYS_T::cmdPrint("-part_file:", part_file);
-  SYS_T::cmdPrint("-lpn_file:", lpn_file);
-  SYS_T::cmdPrint("-bs_beta:", bs_beta);
-  SYS_T::cmdPrint("-fl_density:", fluid_density);
-  SYS_T::cmdPrint("-fl_mu:", fluid_mu);
   SYS_T::cmdPrint("-nqp_tet:", nqp_tet);
   SYS_T::cmdPrint("-nqp_tri:", nqp_tri);
   SYS_T::cmdPrint("-nz_estimate:", nz_estimate);
+  SYS_T::cmdPrint("-bs_beta:", bs_beta);
+  SYS_T::cmdPrint("-fl_density:", fluid_density);
+  SYS_T::cmdPrint("-fl_mu:", fluid_mu);
+  SYS_T::cmdPrint("-inflow_file:", inflow_file);
+  SYS_T::cmdPrint("-lpn_file:", lpn_file);
+  SYS_T::cmdPrint("-part_file:", part_file);
   SYS_T::cmdPrint("-nl_rtol:", nl_rtol);
   SYS_T::cmdPrint("-nl_atol:", nl_atol);
   SYS_T::cmdPrint("-nl_dtol:", nl_dtol);
@@ -153,8 +162,6 @@ int main(int argc, char *argv[])
   
   ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
   
-  locebc -> print_info();
-
   ALocal_EBC * mesh_locebc = new ALocal_EBC(part_file, rank, "mesh_ebc");
   
   APart_Node * pNode = new APart_Node_FSI(part_file, rank, locElem, locIEN);
@@ -173,7 +180,8 @@ int main(int argc, char *argv[])
   
   ICVFlowRate * inflow_rate_ptr = new CVFlowRate_Linear2Steady( 1.0 , 0.1 );
   
-  //ICVFlowRate * inflow_rate_ptr = new CVFlowRate_Unsteady();
+  //ICVFlowRate * inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
+  
   inflow_rate_ptr->print_info();
 
   // ===== Quadrature rules and FEM container =====
@@ -195,8 +203,8 @@ int main(int argc, char *argv[])
 
   // ===== Generate the generalized-alpha method
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
-  const bool genA_is2ndSystem = false;
   const double genA_spectrium = 0.5;
+  const bool genA_is2ndSystem = false;
   TimeMethod_GenAlpha * tm_galpha_ptr = new TimeMethod_GenAlpha(
       genA_spectrium, genA_is2ndSystem);
   tm_galpha_ptr->print_info();
@@ -243,10 +251,12 @@ int main(int argc, char *argv[])
     initial_time  = restart_time;
     initial_step  = restart_step;
 
+    // Read sol file
     SYS_T::file_exist_check(restart_name.c_str());
-
     sol->ReadBinary(restart_name.c_str());
-    
+   
+    // Might need to read dot_sol as well
+     
     PetscPrintf(PETSC_COMM_WORLD, "===> Read sol from disk as a restart run... \n");
     PetscPrintf(PETSC_COMM_WORLD, "     restart_name: %s \n", restart_name.c_str());
     PetscPrintf(PETSC_COMM_WORLD, "     restart_time: %e \n", restart_time);
