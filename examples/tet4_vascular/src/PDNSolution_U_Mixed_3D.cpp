@@ -1,8 +1,8 @@
 #include "PDNSolution_U_Mixed_3D.hpp"
 
 PDNSolution_U_Mixed_3D::PDNSolution_U_Mixed_3D(
-    const class APart_Node * const &pNode,
-    const class FEANode * const &fNode_ptr,
+    const APart_Node * const &pNode,
+    const FEANode * const &fNode_ptr,
     const int &type ) : PDNSolution( pNode, 3 )
 {
   if( pNode->get_dof() != 7 ) SYS_T::print_fatal("Error: PDNSolution_U_Mixed_3D : the APart_Node gives wrong dof number. \n");
