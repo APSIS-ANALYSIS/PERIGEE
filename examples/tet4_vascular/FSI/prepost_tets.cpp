@@ -27,12 +27,11 @@ int main( int argc, char * argv[] )
   int cpu_size = 1;
   bool isDualGraph = true;
 
-  PetscMPIInt rank, size;
+  PetscMPIInt size;
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
   MPI_Comm_size(PETSC_COMM_WORLD, &size);
-  MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
 
   SYS_T::print_fatal_if(size!=1, "ERROR: preprocessor is a serial program! \n");
 
