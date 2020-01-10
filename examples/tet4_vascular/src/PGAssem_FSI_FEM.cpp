@@ -531,6 +531,9 @@ void PGAssem_FSI_FEM::Assem_residual(
     }
   }
 
+  // Backflow stabilization
+  BackFlow_G( lassem_f_ptr, elements, dof_mat*snLocBas, quad_s, nbc_part, ebc_part );
+
   // Resistance BC for G
   NatBC_Resis_G( sol_np1, lassem_f_ptr, elements, quad_s, node_ptr, 
       nbc_part, ebc_part, gbc );
@@ -621,6 +624,10 @@ void PGAssem_FSI_FEM::Assem_tangent_residual(
     }
   }
 
+  // Backflow stabilization
+  BackFlow_KG( dt, lassem_f_ptr, elements, dof_mat*snLocBas, quad_s, 
+      nbc_part, ebc_part );
+
   // Resistance BC for K and G
   NatBC_Resis_KG( dt, sol_np1, lassem_f_ptr, elements, quad_s, node_ptr,
       nbc_part, ebc_part, gbc );
@@ -698,8 +705,8 @@ void PGAssem_FSI_FEM::BackFlow_G( IPLocAssem * const &lassem_f_ptr,
       GetLocal(array_a, LSIEN, snLocBas, local_as);
       GetLocal(array_b, LSIEN, snLocBas, local_bs);
 
-      lassem_ptr->Assem_Residual_BackFlowStab( local_as, local_bs,
-          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+      lassem_f_ptr->Assem_Residual_BackFlowStab( local_as, local_bs,
+          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s );
 
       for(int ii=0; ii<snLocBas; ++ii)
       {
@@ -712,7 +719,7 @@ void PGAssem_FSI_FEM::BackFlow_G( IPLocAssem * const &lassem_f_ptr,
         }
       }
 
-      VecSetValues(G, in_loc_dof, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
+      VecSetValues(G, in_loc_dof, srow_index, lassem_f_ptr->sur_Residual, ADD_VALUES);
     }
   }
 }
@@ -739,8 +746,8 @@ void PGAssem_FSI_FEM::BackFlow_KG( const double &dt,
       GetLocal(array_a, LSIEN, snLocBas, local_as);
       GetLocal(array_b, LSIEN, snLocBas, local_bs);
 
-      lassem_ptr->Assem_Tangent_Residual_BackFlowStab( dt, local_as, local_bs,
-          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+      lassem_f_ptr->Assem_Tangent_Residual_BackFlowStab( dt, local_as, local_bs,
+          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s );
 
       for(int ii=0; ii<snLocBas; ++ii)
       {
@@ -754,9 +761,9 @@ void PGAssem_FSI_FEM::BackFlow_KG( const double &dt,
       }
 
       MatSetValues(K, in_loc_dof, srow_index, in_loc_dof, srow_index,
-          lassem_ptr->sur_Tangent, ADD_VALUES);
+          lassem_f_ptr->sur_Tangent, ADD_VALUES);
 
-      VecSetValues(G, in_loc_dof, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
+      VecSetValues(G, in_loc_dof, srow_index, lassem_f_ptr->sur_Residual, ADD_VALUES);
     }
   }
 }
