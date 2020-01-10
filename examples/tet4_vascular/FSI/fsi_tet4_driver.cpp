@@ -243,12 +243,19 @@ int main(int argc, char *argv[])
     initial_time  = restart_time;
     initial_step  = restart_step;
 
+    // Read sol file
     SYS_T::file_exist_check(restart_name.c_str());
-
     sol->ReadBinary(restart_name.c_str());
     
+    // Read dot_sol file
+    std::string restart_dot_name = "dot_";
+    restart_dot_name.append(restart_name);
+    SYS_T::file_exist_check(restart_dot_name.c_str());
+    dot_sol->ReadBinary(restart_dot_name.c_str());
+
     PetscPrintf(PETSC_COMM_WORLD, "===> Read sol from disk as a restart run... \n");
     PetscPrintf(PETSC_COMM_WORLD, "     restart_name: %s \n", restart_name.c_str());
+    PetscPrintf(PETSC_COMM_WORLD, "     restart_dot_name: %s \n", restart_dot_name.c_str());
     PetscPrintf(PETSC_COMM_WORLD, "     restart_time: %e \n", restart_time);
     PetscPrintf(PETSC_COMM_WORLD, "     restart_index: %d \n", restart_index);
     PetscPrintf(PETSC_COMM_WORLD, "     restart_step: %e \n", restart_step);
@@ -299,36 +306,40 @@ int main(int argc, char *argv[])
   gloAssem_mesh_ptr->Clear_KG();
 
   // ===== Initialize dot sol =====
-  SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n");
-  PLinear_Solver_PETSc * lsolver_acce = new PLinear_Solver_PETSc(
-      1.0e-14, 1.0e-85, 1.0e30, 1000, "ls_mass_", "pc_mass_" );
+  if( is_restart == false )
+  {
+    SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n");
+    PLinear_Solver_PETSc * lsolver_acce = new PLinear_Solver_PETSc(
+        1.0e-14, 1.0e-85, 1.0e30, 1000, "ls_mass_", "pc_mass_" );
 
-  KSPSetType(lsolver_acce->ksp, KSPGMRES);
-  KSPGMRESSetOrthogonalization(lsolver_acce->ksp,
-      KSPGMRESModifiedGramSchmidtOrthogonalization);
-  KSPGMRESSetRestart(lsolver_acce->ksp, 500);
+    KSPSetType(lsolver_acce->ksp, KSPGMRES);
+    KSPGMRESSetOrthogonalization(lsolver_acce->ksp,
+        KSPGMRESModifiedGramSchmidtOrthogonalization);
+    KSPGMRESSetRestart(lsolver_acce->ksp, 500);
 
-  lsolver_acce->Monitor();
+    lsolver_acce->Monitor();
 
-  PC preproc; lsolver_acce->GetPC(&preproc);
-  PCSetType( preproc, PCASM ); PCASMSetOverlap(preproc, 1);
+    PC preproc; lsolver_acce->GetPC(&preproc);
+    PCSetType( preproc, PCHYPRE );
+    PCHYPRESetType( preproc, "boomeramg" );
 
-  lsolver_acce->Info();
-  gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_fluid_ptr,
-      locAssem_solid_ptr, elementv,
-      elements, quadv, quads, locIEN, pNode, fNode, locnbc, locebc );
+    lsolver_acce->Info();
+    gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_fluid_ptr,
+        locAssem_solid_ptr, elementv,
+        elements, quadv, quads, locIEN, pNode, fNode, locnbc, locebc );
 
-  PDNSolution * dot_pres_velo = new PDNSolution_P_V_Mixed_3D( pNode, fNode, 0 );
+    PDNSolution * dot_pres_velo = new PDNSolution_P_V_Mixed_3D( pNode, fNode, 0 );
 
-  lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_pres_velo);
+    lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_pres_velo);
 
-  SEG_SOL_T::PlusAiPV(0.0, -1.0, -1.0, dot_pres_velo, dot_sol);
+    SEG_SOL_T::PlusAiPV(0.0, -1.0, -1.0, dot_pres_velo, dot_sol);
 
-  SEG_SOL_T::PlusAiVPV(1.0, 0.0, 0.0, sol, dot_sol);
+    SEG_SOL_T::PlusAiVPV(1.0, 0.0, 0.0, sol, dot_sol);
 
-  delete lsolver_acce; delete dot_pres_velo;
-  SYS_T::commPrint("\n===> Consistent initial acceleration is obtained.");
-  SYS_T::commPrint("\n===> The mass matrix lsolver is destroyed. \n\n");
+    delete lsolver_acce; delete dot_pres_velo;
+    SYS_T::commPrint("\n===> Consistent initial acceleration is obtained.");
+    SYS_T::commPrint("\n===> The mass matrix lsolver is destroyed. \n\n");
+  }
 
   // ===== Linear and nonlinear solver context =====
   PLinear_Solver_PETSc * lsolver = new PLinear_Solver_PETSc();
@@ -374,7 +385,7 @@ int main(int argc, char *argv[])
 
     const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
         sol, locAssem_fluid_ptr, elements, quads, pNode, locebc, ff );
-   
+
     // set the gbc initial conditions using the 3D data
     gbc -> reset_initial_sol( ff, face_flrate, face_avepre );
 
