@@ -117,6 +117,7 @@ SET( perigee_analysis_lib_src
   ${perigee_SOURCE_DIR}/../src/PDNSolution_Mixed_UPV_3D.cpp
   ${perigee_SOURCE_DIR}/../src/PDNSolution_P_V_Mixed_3D.cpp
   ${perigee_SOURCE_DIR}/../src/PDNSolution_U_Mixed_3D.cpp
+  ${perigee_SOURCE_DIR}/../src/PNonlinear_Seg_Solver.cpp
   )
 
 
