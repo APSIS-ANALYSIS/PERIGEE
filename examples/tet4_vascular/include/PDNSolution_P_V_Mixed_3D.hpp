@@ -20,8 +20,8 @@ class PDNSolution_P_V_Mixed_3D : public PDNSolution
 {
   public:
     PDNSolution_P_V_Mixed_3D(
-        const class APart_Node * const &pNode,
-        const class FEANode * const &fNode_ptr,
+        const APart_Node * const &pNode,
+        const FEANode * const &fNode_ptr,
         const int &type );
 
     virtual ~PDNSolution_P_V_Mixed_3D();

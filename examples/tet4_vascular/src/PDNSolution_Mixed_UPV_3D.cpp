@@ -1,8 +1,8 @@
 #include "PDNSolution_Mixed_UPV_3D.hpp"
 
 PDNSolution_Mixed_UPV_3D::PDNSolution_Mixed_UPV_3D(
-    const class APart_Node * const &pNode,
-    const class FEANode * const &fNode_ptr,
+    const APart_Node * const &pNode,
+    const FEANode * const &fNode_ptr,
     const int &type ) : PDNSolution( pNode )
 {
   if( pNode->get_dof() != 7 ) SYS_T::print_fatal("Error: PDNSolution_Mixed_UPV_3D : the APart_Node gives wrong dof number. \n");
@@ -23,8 +23,8 @@ PDNSolution_Mixed_UPV_3D::PDNSolution_Mixed_UPV_3D(
 
 
 PDNSolution_Mixed_UPV_3D::PDNSolution_Mixed_UPV_3D(
-    const class APart_Node * const &pNode,
-    const class FEANode * const &fNode_ptr,
+    const APart_Node * const &pNode,
+    const FEANode * const &fNode_ptr,
     const ALocal_Inflow_NodalBC * const &infbc,
     const int &type ) : PDNSolution( pNode )
 {
