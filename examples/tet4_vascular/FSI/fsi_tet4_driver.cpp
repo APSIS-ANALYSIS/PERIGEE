@@ -355,51 +355,63 @@ int main(int argc, char *argv[])
   mesh_lsolver -> Info();
 
   // ===== Nonlinear solver context =====
-  //PNonlinear_Seg_Solver * nsolver = new PNonlinear_Seg_Solver(
-  //    pNode, fNode, nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq);
-  //SYS_T::commPrint("===> Nonlinear solver setted up:\n");
-  //nsolver->print_info();
+  PNonlinear_Seg_Solver * nsolver = new PNonlinear_Seg_Solver(
+      pNode, fNode, nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq);
+  SYS_T::commPrint("===> Nonlinear solver setted up:\n");
+  nsolver->print_info();
 
   // ===== Temporal solver context =====
-  //PTime_Seg_Solver * tsolver = new PTime_Seg_Solver( sol_bName,
-  //    sol_record_freq, ttan_renew_freq, final_time );
-  //SYS_T::commPrint("===> Time marching solver setted up:\n");
-  //tsolver->print_info();
+  PTime_Seg_Solver * tsolver = new PTime_Seg_Solver( sol_bName,
+      sol_record_freq, ttan_renew_freq, final_time );
+  SYS_T::commPrint("===> Time marching solver setted up:\n");
+  tsolver->print_info();
 
   // ===== Outlet flowrate recording files =====
   for(int ff=0; ff<locebc->get_num_ebc(); ++ff)
   {
-    //const double face_flrate = tsolver->Get_flow_rate( sol, 
-    //    locAssem_fluid_ptr, elements, quads, pNode, locebc, ff );
-    //if(rank == 0)
-    //{
-    //  std::ofstream ofile;
+    const double face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
+        sol, locAssem_fluid_ptr, elements, quads, pNode, locebc, ff );
 
-    //if( !is_restart )
-    //  ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
-    //else
-    //  ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
+    const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
+        sol, locAssem_fluid_ptr, elements, quads, pNode, locebc, ff );
+   
+    // set the gbc initial conditions using the 3D data
+    gbc -> reset_initial_sol( ff, face_flrate, face_avepre );
 
-    //ofile<<timeinfo->get_time()<<'\t'<<face_flrate<<'\n';
-    //ofile.close();
-    //}
+    const double lpn_flowrate = face_flrate;
+    const double lpn_pressure = gbc -> get_P( ff, lpn_flowrate );
+
+    if(rank == 0)
+    {
+      std::ofstream ofile;
+
+      if( !is_restart )
+        ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
+      else
+        ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
+
+      // If this is NOT a restart, record the initial values
+      if( !is_restart )
+        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
+
+      ofile.close();
+    }
   }
 
   // ===== FEM analysis =====
-  //SYS_T::commPrint("===> Start Finite Element Analysis:\n");
-  //tsolver->TM_FSI_GenAlpha(is_restart, base, dot_sol, sol, tm_galpha_ptr,
-  //    timeinfo, inflow_rate_ptr,locElem, locIEN, pNode, fNode, locnbc,
-  //    locinfnbc, mesh_locnbc,
-  //    locebc, mesh_locebc, pmat, mmat, elementv, elements, quadv, quads,
-  //    locAssem_fluid_ptr, locAssem_solid_ptr, locAssem_mesh_ptr,
-  //    gloAssem_ptr, gloAssem_mesh_ptr, lsolver, mesh_lsolver, nsolver);
+  SYS_T::commPrint("===> Start Finite Element Analysis:\n");
+  tsolver->TM_FSI_GenAlpha(is_restart, base, dot_sol, sol, tm_galpha_ptr,
+      timeinfo, inflow_rate_ptr, locElem, locIEN, pNode, fNode, locnbc,
+      locinfnbc, mesh_locnbc, locebc, mesh_locebc, gbc, pmat, mmat, 
+      elementv, elements, quadv, quads, 
+      locAssem_fluid_ptr, locAssem_solid_ptr, locAssem_mesh_ptr,
+      gloAssem_ptr, gloAssem_mesh_ptr, lsolver, mesh_lsolver, nsolver);
 
   // ===== Print solver full information =====
-  //lsolver -> Info();
+  lsolver -> Info();
 
   // ===== PETSc Finalize =====
-  // delete tsolver; delete nsolver;
-  delete lsolver; delete mesh_lsolver;
+  delete tsolver; delete nsolver; delete lsolver; delete mesh_lsolver;
   delete gloAssem_ptr; delete gloAssem_mesh_ptr;
   delete timeinfo; delete sol; delete dot_sol; delete base;
   delete locAssem_solid_ptr;
