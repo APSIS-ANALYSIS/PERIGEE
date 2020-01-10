@@ -684,7 +684,38 @@ void PGAssem_FSI_FEM::BackFlow_G( IPLocAssem * const &lassem_f_ptr,
     const IQuadPts * const &quad_s,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
-{}
+{
+  for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
+  {
+    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+
+    for(int ee=0; ee<num_sele; ++ee)
+    {
+      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
+
+      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+
+      GetLocal(array_a, LSIEN, snLocBas, local_as);
+      GetLocal(array_b, LSIEN, snLocBas, local_bs);
+
+      lassem_ptr->Assem_Residual_BackFlowStab( local_as, local_bs,
+          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+
+      for(int ii=0; ii<snLocBas; ++ii)
+      {
+        int loc_index = LSIEN[ii];
+        int offset1 = dof_mat * ii;
+        for(int mm=0; mm<dof_mat; ++mm)
+        {
+          int lrow_index = nbc_part -> get_LID(mm, loc_index);
+          srow_index[offset1 + mm] = dof_mat * lrow_index + mm;
+        }
+      }
+
+      VecSetValues(G, in_loc_dof, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
+    }
+  }
+}
 
 
 void PGAssem_FSI_FEM::BackFlow_KG( const double &dt,
@@ -694,7 +725,41 @@ void PGAssem_FSI_FEM::BackFlow_KG( const double &dt,
     const IQuadPts * const &quad_s,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
-{}
+{
+  for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
+  {
+    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+
+    for(int ee=0; ee<num_sele; ++ee)
+    {
+      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
+
+      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+
+      GetLocal(array_a, LSIEN, snLocBas, local_as);
+      GetLocal(array_b, LSIEN, snLocBas, local_bs);
+
+      lassem_ptr->Assem_Tangent_Residual_BackFlowStab( dt, local_as, local_bs,
+          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+
+      for(int ii=0; ii<snLocBas; ++ii)
+      {
+        int loc_index = LSIEN[ii];
+        int offset1 = dof_mat * ii;
+        for(int mm=0; mm<dof_mat; ++mm)
+        {
+          int lrow_index = nbc_part -> get_LID(mm, loc_index);
+          srow_index[offset1 + mm] = dof_mat * lrow_index + mm;
+        }
+      }
+
+      MatSetValues(K, in_loc_dof, srow_index, in_loc_dof, srow_index,
+          lassem_ptr->sur_Tangent, ADD_VALUES);
+
+      VecSetValues(G, in_loc_dof, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
+    }
+  }
+}
 
 
 void PGAssem_FSI_FEM::NatBC_Resis_G(
