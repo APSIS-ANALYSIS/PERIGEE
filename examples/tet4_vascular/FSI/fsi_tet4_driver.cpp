@@ -40,6 +40,9 @@ int main(int argc, char *argv[])
   // LPN file
   std::string lpn_file("lpn_rcr_input.txt");
 
+  // inflow file
+  std::string inflow_file("inflow_fourier_series.txt");
+
   double fluid_density = 1.06;
   double fluid_mu = 4.0e-2;
   double bs_beta = 0.2;
@@ -82,6 +85,7 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-bs_beta", bs_beta);
   SYS_T::GetOptionReal("-fl_density", fluid_density);
   SYS_T::GetOptionReal("-fl_mu", fluid_mu);
+  SYS_T::GetOptionString("-inflow_file", inflow_file);
   SYS_T::GetOptionString("-lpn_file", lpn_file);
   SYS_T::GetOptionInt("-nqp_tet", nqp_tet);
   SYS_T::GetOptionInt("-nqp_tri", nqp_tri);
@@ -106,6 +110,7 @@ int main(int argc, char *argv[])
   // ===== Print the command line argumetn on screen =====
   SYS_T::cmdPrint("-part_file:", part_file);
   SYS_T::cmdPrint("-lpn_file:", lpn_file);
+  SYS_T::cmdPrint("-inflow_file:", inflow_file);
   SYS_T::cmdPrint("-bs_beta:", bs_beta);
   SYS_T::cmdPrint("-fl_density:", fluid_density);
   SYS_T::cmdPrint("-fl_mu:", fluid_mu);
@@ -153,13 +158,11 @@ int main(int argc, char *argv[])
   
   ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
   
-  locebc -> print_info();
-
   ALocal_EBC * mesh_locebc = new ALocal_EBC(part_file, rank, "mesh_ebc");
   
   APart_Node * pNode = new APart_Node_FSI(part_file, rank, locElem, locIEN);
   
-  SYS_T::commPrint("Done! \n");
+  SYS_T::commPrint("===> Mesh HDF5 files are read from disk.\n");
 
   // ===== Basic Checking =====
   SYS_T::print_fatal_if( size!= PartBasic->get_cpu_size(),
@@ -171,9 +174,10 @@ int main(int argc, char *argv[])
   // ===== Inflow rate function =====
   SYS_T::commPrint("===> Setup inflow flow rate. \n");
   
-  ICVFlowRate * inflow_rate_ptr = new CVFlowRate_Linear2Steady( 1.0 , 0.1 );
+  //ICVFlowRate * inflow_rate_ptr = new CVFlowRate_Linear2Steady( 1.0 , 66.68 );
   
-  //ICVFlowRate * inflow_rate_ptr = new CVFlowRate_Unsteady();
+  ICVFlowRate * inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
+
   inflow_rate_ptr->print_info();
 
   // ===== Quadrature rules and FEM container =====
