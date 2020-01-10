@@ -76,7 +76,7 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::get_tau(
 
   const double dt_ka = dx / c_max;
 
-  tau_m_qua = 0.010 * dt_ka * Jin / rho0;
+  tau_m_qua = 0.001 * dt_ka * Jin / rho0;
   tau_c_qua = 0.000 * dx * c_max * rho0 / Jin;
 }
 
