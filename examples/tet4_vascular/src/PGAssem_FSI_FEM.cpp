@@ -678,6 +678,25 @@ void PGAssem_FSI_FEM::NatBC_G( const double &curr_time, const double &dt,
 }
 
 
+void PGAssem_FSI_FEM::BackFlow_G( IPLocAssem * const &lassem_f_ptr,
+    FEAElement * const &element_s,
+    const int &in_loc_dof,
+    const IQuadPts * const &quad_s,
+    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_part )
+{}
+
+
+void PGAssem_FSI_FEM::BackFlow_KG( const double &dt,
+    IPLocAssem * const &lassem_f_ptr,
+    FEAElement * const &element_s,
+    const int &in_loc_dof,
+    const IQuadPts * const &quad_s,
+    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_part )
+{}
+
+
 void PGAssem_FSI_FEM::NatBC_Resis_G(
     const PDNSolution * const &sol,
     IPLocAssem * const &lassem_f_ptr,
@@ -712,7 +731,7 @@ void PGAssem_FSI_FEM::NatBC_Resis_G(
 
       GetLocal(array_a, LSIEN, snLocBas, local_as);
       GetLocal(array_b, LSIEN, snLocBas, local_bs);
-      
+
       lassem_f_ptr->Assem_Residual_EBC_Resistance(ebc_id, val,
           local_bs, element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
 

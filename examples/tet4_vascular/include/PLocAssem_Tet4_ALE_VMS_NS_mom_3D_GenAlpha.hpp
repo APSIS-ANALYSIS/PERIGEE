@@ -157,7 +157,7 @@ class PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha : public IPLocAssem
         const IQuadPts * const &quad );
 
   private:
-    // beta is the back flow stabilization parameter default to be 0.5
+    // beta is the back flow stabilization parameter
     const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta;
 
     const int nLocBas, dof_per_node, vec_size, sur_size;
