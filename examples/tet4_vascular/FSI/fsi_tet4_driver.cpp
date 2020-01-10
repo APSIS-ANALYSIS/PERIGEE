@@ -404,12 +404,14 @@ int main(int argc, char *argv[])
     {
       std::ofstream ofile;
 
+      // If this is NOT a restart run, generate a new file, otherwise append to
+      // a existing file
       if( !is_restart )
         ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
       else
         ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
 
-      // If this is NOT a restart, record the initial values
+      // if this is NOT a restart run, record the initial values
       if( !is_restart )
         ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
 
