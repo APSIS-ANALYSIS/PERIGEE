@@ -286,6 +286,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_FSI(
     const ALocal_NodalBC * const &nbc_mesh_part,
     const ALocal_EBC * const &ebc_part,
     const ALocal_EBC * const &ebc_mesh_part,
+    const IGenBC * const &gbc,
     const Matrix_PETSc * const &bc_mat,
     const Matrix_PETSc * const &bc_mesh_mat,
     FEAElement * const &elementv,
@@ -357,20 +358,20 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_FSI(
   if( new_tangent_flag )
   {
     gassem_ptr->Clear_KG();
-    gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha,
+    gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, sol,
         curr_time, dt, alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr,
         elementv, elements, quad_v, quad_s, lien_ptr, anode_ptr,
-        feanode_ptr, nbc_part, ebc_part );
+        feanode_ptr, nbc_part, ebc_part, gbc );
     PetscPrintf(PETSC_COMM_WORLD, "  --- M updated");
     lsolver_ptr->SetOperator(gassem_ptr->K);
   }
   else
   {
     gassem_ptr->Clear_G();
-    gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha,
+    gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, sol,
         curr_time, dt, alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr, 
         elementv, elements, quad_v, quad_s, lien_ptr, anode_ptr,
-        feanode_ptr, nbc_part, ebc_part );
+        feanode_ptr, nbc_part, ebc_part, gbc );
   }
 
   VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
@@ -422,20 +423,20 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_FSI(
     if( nl_counter >= nrenew_freq )
     {
       gassem_ptr->Clear_KG();
-      gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha,
+      gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, sol,
           curr_time, dt, alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr, 
           elementv, elements, quad_v, quad_s, lien_ptr, anode_ptr,
-          feanode_ptr, nbc_part, ebc_part );
+          feanode_ptr, nbc_part, ebc_part, gbc );
       PetscPrintf(PETSC_COMM_WORLD, "  - M");
       lsolver_ptr->SetOperator(gassem_ptr->K);
     }
     else
     {
       gassem_ptr->Clear_G();
-      gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha,
+      gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, sol,
           curr_time, dt, alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr, 
           elementv, elements, quad_v, quad_s, lien_ptr, anode_ptr,
-          feanode_ptr, nbc_part, ebc_part );
+          feanode_ptr, nbc_part, ebc_part, gbc );
     }
 
     VecNorm(gassem_ptr->G, NORM_2, &residual_norm);

@@ -23,9 +23,9 @@ class PNonlinear_Seg_Solver
   public:
     PNonlinear_Seg_Solver( const APart_Node * const &anode_ptr,
         const FEANode * const &feanode_ptr,
-        const double &input_nrtol, 
-        const double &input_natol, const double &input_ndtol,
-        const int &input_max_iteration, const int &input_renew_freq );
+        const double &input_nrtol, const double &input_natol, 
+        const double &input_ndtol, const int &input_max_iteration, 
+        const int &input_renew_freq );
 
     ~PNonlinear_Seg_Solver();
 
@@ -112,6 +112,7 @@ class PNonlinear_Seg_Solver
         const ALocal_NodalBC * const &nbc_mesh_part,
         const ALocal_EBC * const &ebc_part,
         const ALocal_EBC * const &ebc_mesh_part,
+        const IGenBC * const &gbc,
         const Matrix_PETSc * const &bc_mat,
         const Matrix_PETSc * const &bc_mesh_mat,
         FEAElement * const &elementv,
