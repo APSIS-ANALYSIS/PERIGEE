@@ -72,6 +72,7 @@ class PTime_Seg_Solver
         const ALocal_NodalBC * const &nbc_mesh_part,
         const ALocal_EBC * const &ebc_part,
         const ALocal_EBC * const &ebc_mesh_part,
+        IGenBC * const &gbc,
         const Matrix_PETSc * const &bc_mat,
         const Matrix_PETSc * const &bc_mesh_mat,
         FEAElement * const &elementv,

@@ -219,6 +219,7 @@ void PTime_Seg_Solver::TM_FSI_GenAlpha(
     const ALocal_NodalBC * const &nbc_mesh_part,
     const ALocal_EBC * const &ebc_part,
     const ALocal_EBC * const &ebc_mesh_part,
+    IGenBC * const &gbc,
     const Matrix_PETSc * const &bc_mat,
     const Matrix_PETSc * const &bc_mesh_mat,
     FEAElement * const &elementv,
@@ -239,8 +240,18 @@ void PTime_Seg_Solver::TM_FSI_GenAlpha(
   PDNSolution * pre_velo = new PDNSolution(*init_velo);
   PDNSolution * cur_velo = new PDNSolution(*init_velo);
 
-  std::string sol_name = Name_Generator(time_info->get_index());
-  cur_disp->WriteBinary(sol_name.c_str());
+  std::string sol_name ("");
+  std::string sol_dot_name (""); 
+
+  // Do not overwrite solution if this is a restart 
+  if( restart_init_assembly_flag == false )
+  {
+    sol_name = Name_Generator(time_info->get_index());
+    cur_disp->WriteBinary(sol_name.c_str());
+
+    sol_dot_name = Name_dot_Generator(time_info->get_index());
+    cur_velo->WriteBinary(sol_dot_name.c_str());
+  }
 
   bool conv_flag, renew_flag;
   int nl_counter;
@@ -259,7 +270,7 @@ void PTime_Seg_Solver::TM_FSI_GenAlpha(
     nsolver_ptr->GenAlpha_Seg_solve_FSI( renew_flag, time_info->get_time(),
         time_info->get_step(), sol_base, pre_velo, pre_disp, tmga_ptr, flr_ptr,
         alelem_ptr, lien_ptr, anode_ptr, feanode_ptr, nbc_part, infnbc_part,
-        nbc_mesh_part, ebc_part, ebc_mesh_part, bc_mat, bc_mesh_mat, 
+        nbc_mesh_part, ebc_part, ebc_mesh_part, gbc, bc_mat, bc_mesh_mat, 
         elementv, elements, quad_v, quad_s, lassem_fluid_ptr,
         lassem_solid_ptr, lassem_mesh_ptr,
         gassem_ptr, gassem_mesh_ptr, lsolver_ptr, lsolver_mesh_ptr,
@@ -267,20 +278,36 @@ void PTime_Seg_Solver::TM_FSI_GenAlpha(
 
     time_info->TimeIncrement();
 
-    PetscPrintf(PETSC_COMM_WORLD, "Time = %e, dt = %e, index = %d \n",
-        time_info->get_time(), time_info->get_step(), time_info->get_index());
+    PetscPrintf(PETSC_COMM_WORLD, "Time = %e, dt = %e, index = %d, %s \n",
+        time_info->get_time(), time_info->get_step(), time_info->get_index(),
+        SYS_T::get_time().c_str() );
 
     if( time_info->get_index()%sol_record_freq == 0)
     {
       sol_name = Name_Generator( time_info->get_index() );
       cur_disp->WriteBinary(sol_name.c_str());
+
+      sol_dot_name = Name_dot_Generator(time_info->get_index());
+      cur_velo->WriteBinary(sol_dot_name.c_str());
     }
 
     // Calculate the flow rate on all outlets
     for(int face=0; face<ebc_part -> get_num_ebc(); ++face)
     {
+      // Calculate 3D flow rate on the outlets
       const double face_flrate = gassem_ptr -> Assem_surface_flowrate( cur_disp,
           lassem_fluid_ptr, elements, quad_s, anode_ptr, ebc_part, face); 
+     
+      // Calculate 3D averaged pressure on outlets
+      const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
+          cur_disp, lassem_fluid_ptr, elements, quad_s, anode_ptr, ebc_part, face);
+      
+      // Calculate 0D pressure from LPN model
+      const double lpn_flowrate = face_flrate;
+      const double lpn_pressure = gbc -> get_P( face, lpn_flowrate );
+
+      // Update the initial values in genbc
+      gbc -> reset_initial_sol( face, lpn_flowrate, lpn_pressure );
 
       PetscMPIInt rank;
       MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
@@ -288,9 +315,11 @@ void PTime_Seg_Solver::TM_FSI_GenAlpha(
       {
         std::ofstream ofile;
         ofile.open( ebc_part->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
-        ofile<<time_info->get_time()<<'\t'<<face_flrate<<'\n';
+        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
         ofile.close();
       }
+
+      MPI_Barrier(PETSC_COMM_WORLD);
     }
 
     pre_disp->Copy(*cur_disp);
