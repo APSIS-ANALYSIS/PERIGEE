@@ -362,7 +362,7 @@ int main(int argc, char *argv[])
   PCFieldSplitSetFields(upc,"p",1,pfield,pfield);  // A_11 for pres
 
   PLinear_Solver_PETSc * mesh_lsolver = new PLinear_Solver_PETSc(
-      1.0e-12, 1.0e-55, 1.0e30, 500, "ls_mesh_", "pc_mesh_" );
+      1.0e-12, 1.0e-55, 1.0e30, 500, "mesh_", "mesh_" );
 
   gloAssem_mesh_ptr->Assem_tangent_residual( sol, sol, 0.0,
       timeinfo->get_step(), locElem, locAssem_mesh_ptr, elementv,
