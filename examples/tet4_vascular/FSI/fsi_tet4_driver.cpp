@@ -178,7 +178,7 @@ int main(int argc, char *argv[])
   // ===== Inflow rate function =====
   SYS_T::commPrint("===> Setup inflow flow rate. \n");
   
-  //ICVFlowRate * inflow_rate_ptr = new CVFlowRate_Linear2Steady( 1.0 , 66.68 );
+  //ICVFlowRate * inflow_rate_ptr = new CVFlowRate_Linear2Steady( 1.0 , 8.68 );
   
   ICVFlowRate * inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
 
@@ -227,7 +227,7 @@ int main(int argc, char *argv[])
         matmodel, tm_galpha_ptr, GMIptr->get_nLocBas(),
         quadv->get_num_quadPts(), elements->get_nLocBas() );
 
-  /* 
+/*
   IMaterialModel * matmodel = new MaterialModel_NeoHookean_M94_Mixed(
       mat_in_rho0, mat_in_E, 0.49 );
   
@@ -235,8 +235,8 @@ int main(int argc, char *argv[])
     = new PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha(
         matmodel, tm_galpha_ptr, GMIptr->get_nLocBas(),
         quadv->get_num_quadPts(), elements->get_nLocBas() );
-  */
-
+*/
+  
   // Pseudo elastic mesh motion
   IPLocAssem * locAssem_mesh_ptr = new PLocAssem_Tet4_FSI_Mesh_Elastostatic(
       1.0, 0.3 );
@@ -321,7 +321,7 @@ int main(int argc, char *argv[])
   {
     SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n");
     PLinear_Solver_PETSc * lsolver_acce = new PLinear_Solver_PETSc(
-        1.0e-14, 1.0e-85, 1.0e30, 1000, "ls_mass_", "pc_mass_" );
+        1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
 
     KSPSetType(lsolver_acce->ksp, KSPGMRES);
     KSPGMRESSetOrthogonalization(lsolver_acce->ksp,
@@ -362,7 +362,7 @@ int main(int argc, char *argv[])
   PCFieldSplitSetFields(upc,"p",1,pfield,pfield);  // A_11 for pres
 
   PLinear_Solver_PETSc * mesh_lsolver = new PLinear_Solver_PETSc(
-      1.0e-12, 1.0e-55, 1.0e30, 500, "ls_mesh_", "pc_mesh_" );
+      1.0e-12, 1.0e-55, 1.0e30, 500, "mesh_", "mesh_" );
 
   gloAssem_mesh_ptr->Assem_tangent_residual( sol, sol, 0.0,
       timeinfo->get_step(), locElem, locAssem_mesh_ptr, elementv,
