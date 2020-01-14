@@ -176,6 +176,8 @@ namespace TET_T
       const std::vector<int> &phy_tag, const bool &isXML,
       const int &start_cell_index = 0 );
 
+
+  // Modify and verify
   void write_tet_grid( const std::string &filename,
       const bool &isXML, const int &numpts, const int &numcels,
       const std::vector<double> &pt, const std::vector<int> &ien_array,
@@ -194,6 +196,7 @@ namespace TET_T
   //          \para nodal_index : the point data to be written
   //          \para elem_index : the element index to be written 
   // ----------------------------------------------------------------
+  // Modify and verify
   void write_triangle_grid( const std::string &filename,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, 
@@ -212,6 +215,7 @@ namespace TET_T
   //   surface between two physical domains, e.g. interior surface
   //   in FSI problem.
   // ----------------------------------------------------------------
+  // Modify and verify
   void write_triangle_grid( const std::string &filename,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, 
@@ -257,6 +261,8 @@ namespace TET_T
   //          \para vol_ien, the volume mesh IEN array
   //   Output: outVec, the normal vector
   // ----------------------------------------------------------------
+  
+  // To be modified
   void get_out_normal( const std::string &vtpfile,
       const std::vector<double> &vol_ctrlPts,
       const IIEN * const &vol_ien,
@@ -378,6 +384,8 @@ namespace TET_T
   //    nelem: total number of element
   //    crit_aspect_ratio: the element above this value will be counted.
   // ================================================================
+  
+  // to be modified
   void tetmesh_check(const std::vector<double> &cpts,
       const IIEN * const &ienptr, const int &nelem,
       const double &crit_aspect_ratio = 3.5 );
