@@ -29,8 +29,12 @@ int main( int argc, char * argv[] )
 
   std::string out_name("./test-output");
 
-  TET_T::write_tet_grid_node_elem_index( out_name, 20, 2, ptout, ienout,
-     ptidx, elemidx );
+  std::vector<int> ptag;
+  ptag.push_back(2);
+  ptag.push_back(4);
+
+  TET_T::write_tet_grid( out_name, 20, 2, ptout, ienout,
+     ptag, false, -101 );
 
   PetscFinalize();
   return 0;
