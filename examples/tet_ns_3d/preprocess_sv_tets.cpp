@@ -134,8 +134,8 @@ int main( int argc, char * argv[] )
   
   TET_T::read_vtu_grid(geo_file.c_str(), nFunc, nElem, ctrlPts, vecIEN);
   
-  IIEN * IEN = NULL;
-  IMesh * mesh = NULL;
+  IIEN * IEN = nullptr;
+  IMesh * mesh = nullptr;
 
   if(elemType == 501)
   {

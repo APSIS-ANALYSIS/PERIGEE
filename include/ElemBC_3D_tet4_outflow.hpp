@@ -17,7 +17,6 @@
 #include "ElemBC_3D_tet4.hpp"
 #include "FEAElement_Triangle3_3D_der0.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
-#include "HDF5_Writer.hpp"
 
 class ElemBC_3D_tet4_outflow : public ElemBC_3D_tet4
 {
