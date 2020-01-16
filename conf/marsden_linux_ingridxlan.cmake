@@ -32,7 +32,7 @@ SET(PETSC_DIR /home/ingridxlan/lib/petsc-3.11.3)
 # output. If you forget it, go to your PETSc home director and open
 # configure.log. Go the end of the file, and you shall find the value 
 # of PETSC_ARCH
-SET(PETSC_ARCH arch-linux2-c-debug)
+SET(PETSC_ARCH arch-linux2-cxx-opt)
 
 # You do not need to modify the rest of PETSc variables.
 SET(PETSC_LIBRARY_DIRS ${PETSC_DIR}/${PETSC_ARCH}/lib )
@@ -65,8 +65,8 @@ SET(HDF5_DIR /home/ingridxlan/lib/hdf5-1.8.16)
 # ========================================================
 # Specify the MPI compilers. There should be compilers in
 # $PETSC_DIR/$PETSC_ARCH/bin
-SET(CMAKE_C_COMPILER  /home/ingridxlan/lib/petsc-3.11.3/arch-linux2-c-debug/bin/mpicc)
-SET(CMAKE_CXX_COMPILER /home/ingridxlan/lib/petsc-3.11.3/arch-linux2-c-debug/bin/mpicxx)
+SET(CMAKE_C_COMPILER  /home/ingridxlan/lib/petsc-3.11.3/arch-linux2-cxx-opt/bin/mpicc)
+SET(CMAKE_CXX_COMPILER /home/ingridxlan/lib/petsc-3.11.3/arch-linux2-cxx-opt/bin/mpicxx)
 
 IF( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
   SET(CMAKE_CXX_FLAGS "-O3 -Wall")
