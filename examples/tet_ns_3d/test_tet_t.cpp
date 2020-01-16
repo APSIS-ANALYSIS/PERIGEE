@@ -33,8 +33,8 @@ int main( int argc, char * argv[] )
   ptag.push_back(2);
   ptag.push_back(4);
 
-  TET_T::write_tet_grid( out_name, 20, 2, ptout, ienout,
-     ptag, false, -101 );
+  TET_T::write_tet_grid( out_name, false, 20, 2, ptout, ienout,
+     ptag, ptidx, elemidx );
 
   PetscFinalize();
   return 0;

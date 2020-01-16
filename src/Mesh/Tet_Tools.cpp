@@ -254,7 +254,7 @@ void TET_T::write_tet_grid( const std::string &filename,
   int nlocbas = -1;
   if( int(ien_array.size()) == 4*numcels ) nlocbas = 4;
   else if( int(ien_array.size()) == 10*numcels ) nlocbas = 10;
-  else SYS_T::print_fatal("Error: TET_T::write_tet_grid ien array size does not match the numver of cells. \n");
+  else SYS_T::print_fatal("Error: TET_T::write_tet_grid ien array size does not match the number of cells. \n");
 
   std::vector<int> temp = ien_array;
   VEC_T::sort_unique_resize(temp);
@@ -373,7 +373,7 @@ void TET_T::write_tet_grid_node_elem_index(
   int nlocbas = -1;
   if( int(ien_array.size()) == 4*numcels ) nlocbas = 4;
   else if( int(ien_array.size()) == 10*numcels ) nlocbas = 10;
-  else SYS_T::print_fatal("Error: TET_T::write_tet_grid ien array size does not match the numver of cells. \n");
+  else SYS_T::print_fatal("Error: TET_T::write_tet_grid ien array size does not match the number of cells. \n");
 
   // Setup the VTK objects
   vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
@@ -503,7 +503,7 @@ void TET_T::write_tet_grid_node_elem_index(
   int nlocbas = -1;
   if( int(ien_array.size()) == 4*numcels ) nlocbas = 4;
   else if( int(ien_array.size()) == 10*numcels ) nlocbas = 10;
-  else SYS_T::print_fatal("Error: TET_T::write_tet_grid ien array size does not match the numver of cells. \n");
+  else SYS_T::print_fatal("Error: TET_T::write_tet_grid ien array size does not match the number of cells. \n");
 
   if(int(node_idx.size()) != numpts) SYS_T::print_fatal("Error: TET_T::write_tet_grid node_idx size does not match the number of points. \n");
 
@@ -637,7 +637,7 @@ void TET_T::write_tet_grid( const std::string &filename,
   int nlocbas = -1;
   if( int(ien_array.size()) == 4*numcels ) nlocbas = 4;
   else if( int(ien_array.size()) == 10*numcels ) nlocbas = 10;
-  else SYS_T::print_fatal("Error: TET_T::write_tet_grid ien array size does not match the numver of cells. \n");
+  else SYS_T::print_fatal("Error: TET_T::write_tet_grid ien array size does not match the number of cells. \n");
 
   if(int(phytag.size()) != numcels) SYS_T::print_fatal("Error: TET_T::write_tet_grid: phytag length does not match the number of cells. \n");
 
@@ -738,7 +738,7 @@ void TET_T::write_tet_grid( const std::string &filename,
       std::vector<double> cell_node; cell_node.clear();
       for(int lnode=0; lnode<4; ++lnode)
       {
-        int node_offset = 3 * ien_array[4*ii + lnode];
+        int node_offset = 3 * ien_array[10*ii + lnode];
         cell_node.push_back(pt[node_offset]);
         cell_node.push_back(pt[node_offset+1]);
         cell_node.push_back(pt[node_offset+2]);
@@ -797,7 +797,11 @@ void TET_T::write_tet_grid( const std::string &filename,
   // Check the compatibility
   if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: TET_T::write_tet_grid: point vector size does not match the number of points. \n");
 
-  if(int(ien_array.size()) != 4*numcels) SYS_T::print_fatal("Error: TET_T::write_tet_grid: ien array size does not match the numver of cells. \n");
+  // Detect the element type
+  int nlocbas = -1;
+  if( int(ien_array.size()) == 4*numcels ) nlocbas = 4;
+  else if( int(ien_array.size()) == 10*numcels ) nlocbas = 10;
+  else SYS_T::print_fatal("Error: TET_T::write_tet_grid ien array size does not match the number of cells. \n");
 
   if(int(phytag.size()) != numcels) SYS_T::print_fatal("Error: TET_T::write_tet_grid: phytag length does not match the number of cells. \n");
 
@@ -850,32 +854,75 @@ void TET_T::write_tet_grid( const std::string &filename,
   cellindex -> SetName("ElemIndex");
   cellindex -> SetNumberOfComponents(1);
 
-  vtkCell * cl = vtkTetra::New();
-  for(int ii=0; ii<numcels; ++ii)
+
+  if( nlocbas == 4 )
   {
-    // cell geometry
-    cl->GetPointIds()->SetId( 0, ien_array[4*ii] );
-    cl->GetPointIds()->SetId( 1, ien_array[4*ii+1] );
-    cl->GetPointIds()->SetId( 2, ien_array[4*ii+2] );
-    cl->GetPointIds()->SetId( 3, ien_array[4*ii+3] );
-    grid_w->InsertNextCell( cl->GetCellType(), cl->GetPointIds() );
 
-    // Obtain the cell node coordinates and calculate teh aspect ratio
-    std::vector<double> cell_node; cell_node.clear();
-    for(int lnode=0; lnode<4; ++lnode)
+    vtkCell * cl = vtkTetra::New();
+    for(int ii=0; ii<numcels; ++ii)
     {
-      int node_offset = 3 * ien_array[4*ii + lnode];
-      cell_node.push_back(pt[node_offset]);
-      cell_node.push_back(pt[node_offset+1]);
-      cell_node.push_back(pt[node_offset+2]);
+      // cell geometry
+      cl->GetPointIds()->SetId( 0, ien_array[4*ii] );
+      cl->GetPointIds()->SetId( 1, ien_array[4*ii+1] );
+      cl->GetPointIds()->SetId( 2, ien_array[4*ii+2] );
+      cl->GetPointIds()->SetId( 3, ien_array[4*ii+3] );
+
+      grid_w->InsertNextCell( cl->GetCellType(), cl->GetPointIds() );
+  
+      // Obtain the cell node coordinates and calculate the aspect ratio
+      std::vector<double> cell_node; cell_node.clear();
+      for(int lnode=0; lnode<4; ++lnode)
+      {
+        int node_offset = 3 * ien_array[4*ii + lnode];
+        cell_node.push_back(pt[node_offset]);
+        cell_node.push_back(pt[node_offset+1]);
+        cell_node.push_back(pt[node_offset+2]);
+      }
+      edge_aspect_ratio -> InsertNextValue( TET_T::get_aspect_ratio(cell_node) );
+  
+      cellindex -> InsertNextValue( cell_index[ii] );
+  
+      phy_tag -> InsertNextValue( phytag[ii] );
     }
-    edge_aspect_ratio -> InsertNextValue( TET_T::get_aspect_ratio(cell_node) );
-
-    cellindex -> InsertNextValue( cell_index[ii] );
-
-    phy_tag -> InsertNextValue( phytag[ii] );
+    cl -> Delete();
   }
-  cl -> Delete();
+  else if( nlocbas == 10 )
+  {
+    vtkCell * cl = vtkQuadraticTetra::New();
+    for(int ii=0; ii<numcels; ++ii)
+    {
+      // cell geometry
+      cl->GetPointIds()->SetId( 0, ien_array[10*ii] );
+      cl->GetPointIds()->SetId( 1, ien_array[10*ii+1] );
+      cl->GetPointIds()->SetId( 2, ien_array[10*ii+2] );
+      cl->GetPointIds()->SetId( 3, ien_array[10*ii+3] );
+      cl->GetPointIds()->SetId( 4, ien_array[10*ii+4] );
+      cl->GetPointIds()->SetId( 5, ien_array[10*ii+5] );
+      cl->GetPointIds()->SetId( 6, ien_array[10*ii+6] );
+      cl->GetPointIds()->SetId( 7, ien_array[10*ii+7] );
+      cl->GetPointIds()->SetId( 8, ien_array[10*ii+8] );
+      cl->GetPointIds()->SetId( 9, ien_array[10*ii+9] );
+
+      grid_w->InsertNextCell( cl->GetCellType(), cl->GetPointIds() );
+
+      // Obtain the cell node coordinates and calculate the aspect ratio
+      std::vector<double> cell_node; cell_node.clear();
+      for(int lnode=0; lnode<4; ++lnode)
+      {
+        int node_offset = 3 * ien_array[10*ii + lnode];
+        cell_node.push_back(pt[node_offset]);
+        cell_node.push_back(pt[node_offset+1]);
+        cell_node.push_back(pt[node_offset+2]);
+      }
+      edge_aspect_ratio -> InsertNextValue( TET_T::get_aspect_ratio(cell_node) );
+
+      cellindex -> InsertNextValue( cell_index[ii] );
+
+      phy_tag -> InsertNextValue( phytag[ii] );
+    }
+    cl -> Delete();
+  }
+  else SYS_T::print_fatal("Error: TET_T::write_tet_grid unknown local basis number.\n");
 
   grid_w -> GetCellData() -> AddArray( edge_aspect_ratio );
   grid_w -> GetCellData() -> AddArray( cellindex );
