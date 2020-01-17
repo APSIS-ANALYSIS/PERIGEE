@@ -13,15 +13,25 @@ int main( int argc, char * argv[] )
 
   std::vector<double> ptout;
   std::vector<int> ienout, ptidx, elemidx;
-  
-  for(int ii=0; ii<6; ++ii) 
-  {
-    ptout.push_back(ptcoor[3*ien[ii]+0]);
-    ptout.push_back(ptcoor[3*ien[ii]+1]);
-    ptout.push_back(ptcoor[3*ien[ii]+2]);
-    ienout.push_back(ii);
-    ptidx.push_back(ii*10);
-  }
+
+  ptout.push_back( 0.0 ); ptout.push_back( 0.0 ); ptout.push_back( 0.0 );
+  ptout.push_back( 1.0 ); ptout.push_back( 0.0 ); ptout.push_back( 0.0 );
+  ptout.push_back( 0.0 ); ptout.push_back( 1.0 ); ptout.push_back( 0.0 );
+  ptout.push_back( 0.5 ); ptout.push_back( 0.0 ); ptout.push_back( 0.0 );
+  ptout.push_back( 0.5 ); ptout.push_back( 0.5 ); ptout.push_back( 0.0 );
+  ptout.push_back( 0.0 ); ptout.push_back( 0.5 ); ptout.push_back( 0.0 );
+  ienout.push_back(0);
+  ienout.push_back(1);
+  ienout.push_back(2);
+  ienout.push_back(3);
+  ienout.push_back(4);
+  ienout.push_back(5);
+  ptidx.push_back(0);
+  ptidx.push_back(1);
+  ptidx.push_back(2);
+  ptidx.push_back(3);
+  ptidx.push_back(4);
+  ptidx.push_back(0);
 
   //elemidx.push_back(-1);
   elemidx.push_back(231);
@@ -33,7 +43,7 @@ int main( int argc, char * argv[] )
   ptag.push_back(4);
 
   TET_T::write_triangle_grid( out_name, 6, 1, ptout, ienout,
-     ptidx, elemidx );
+      ptidx, elemidx );
 
   PetscFinalize();
   return 0;
