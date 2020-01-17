@@ -160,8 +160,6 @@ void TET_T::read_vtp_grid( const std::string &filename,
       ien_array.push_back( static_cast<int>( cell->GetPointId(0) ) );
       ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
       ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
-    
-      cout<<"hello \n";
     }
     else if( cell->GetCellType() == 22 )
     {
