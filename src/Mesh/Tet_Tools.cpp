@@ -133,6 +133,7 @@ void TET_T::read_vtp_grid( const std::string &filename,
 {
   vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
   reader -> SetFileName( filename.c_str() );
+  
   reader -> Update();
 
   vtkPolyData * polydata = reader -> GetOutput();
@@ -159,6 +160,8 @@ void TET_T::read_vtp_grid( const std::string &filename,
       ien_array.push_back( static_cast<int>( cell->GetPointId(0) ) );
       ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
       ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
+    
+      cout<<"hello \n";
     }
     else if( cell->GetCellType() == 22 )
     {
@@ -854,7 +857,6 @@ void TET_T::write_tet_grid( const std::string &filename,
   cellindex -> SetName("ElemIndex");
   cellindex -> SetNumberOfComponents(1);
 
-
   if( nlocbas == 4 )
   {
     vtkCell * cl = vtkTetra::New();
@@ -1001,7 +1003,7 @@ void TET_T::write_triangle_grid( const std::string &filename,
     vtkCellArray * cl = vtkCellArray::New();
     for(int ii=0; ii<numcels; ++ii)
     {
-      vtkTriangle * tr = vtkTriangle::New();
+      vtkCell * tr = vtkTriangle::New();
 
       tr->GetPointIds()->SetId( 0, ien_array[3*ii] );
       tr->GetPointIds()->SetId( 1, ien_array[3*ii+1] );
@@ -1017,14 +1019,14 @@ void TET_T::write_triangle_grid( const std::string &filename,
     vtkCellArray * cl = vtkCellArray::New();
     for(int ii=0; ii<numcels; ++ii)
     {
-      vtkTriangle * tr = vtkTriangle::New();
+      vtkCell * tr = vtkQuadraticTriangle::New();
 
-      tr->GetPointIds()->SetId( 0, ien_array[3*ii] );
-      tr->GetPointIds()->SetId( 1, ien_array[3*ii+1] );
-      tr->GetPointIds()->SetId( 2, ien_array[3*ii+2] );
-      tr->GetPointIds()->SetId( 3, ien_array[3*ii+3] );
-      tr->GetPointIds()->SetId( 4, ien_array[3*ii+4] );
-      tr->GetPointIds()->SetId( 5, ien_array[3*ii+5] );
+      tr->GetPointIds()->SetId( 0, ien_array[6*ii] );
+      tr->GetPointIds()->SetId( 1, ien_array[6*ii+1] );
+      tr->GetPointIds()->SetId( 2, ien_array[6*ii+2] );
+      tr->GetPointIds()->SetId( 3, ien_array[6*ii+3] );
+      tr->GetPointIds()->SetId( 4, ien_array[6*ii+4] );
+      tr->GetPointIds()->SetId( 5, ien_array[6*ii+5] );
       cl -> InsertNextCell(tr);
       tr -> Delete();
     }
@@ -1114,7 +1116,7 @@ void TET_T::write_triangle_grid( const std::string &filename,
     vtkCellArray * cl = vtkCellArray::New();
     for(int ii=0; ii<numcels; ++ii)
     {
-      vtkTriangle * tr = vtkTriangle::New();
+      vtkCell * tr = vtkTriangle::New();
 
       tr->GetPointIds()->SetId( 0, ien_array[3*ii] );
       tr->GetPointIds()->SetId( 1, ien_array[3*ii+1] );
@@ -1130,14 +1132,14 @@ void TET_T::write_triangle_grid( const std::string &filename,
     vtkCellArray * cl = vtkCellArray::New();
     for(int ii=0; ii<numcels; ++ii)
     {
-      vtkTriangle * tr = vtkTriangle::New();
+      vtkCell * tr = vtkQuadraticTriangle::New();
 
-      tr->GetPointIds()->SetId( 0, ien_array[3*ii] );
-      tr->GetPointIds()->SetId( 1, ien_array[3*ii+1] );
-      tr->GetPointIds()->SetId( 2, ien_array[3*ii+2] );
-      tr->GetPointIds()->SetId( 3, ien_array[3*ii+3] );
-      tr->GetPointIds()->SetId( 4, ien_array[3*ii+4] );
-      tr->GetPointIds()->SetId( 5, ien_array[3*ii+5] );
+      tr->GetPointIds()->SetId( 0, ien_array[6*ii] );
+      tr->GetPointIds()->SetId( 1, ien_array[6*ii+1] );
+      tr->GetPointIds()->SetId( 2, ien_array[6*ii+2] );
+      tr->GetPointIds()->SetId( 3, ien_array[6*ii+3] );
+      tr->GetPointIds()->SetId( 4, ien_array[6*ii+4] );
+      tr->GetPointIds()->SetId( 5, ien_array[6*ii+5] );
       cl -> InsertNextCell(tr);
       tr -> Delete();
     }

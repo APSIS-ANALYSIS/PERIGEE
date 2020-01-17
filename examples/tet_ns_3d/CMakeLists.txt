@@ -102,4 +102,6 @@ ADD_EXECUTABLE( testtetsurface test_tet_t_vtp.cpp)
 
 TARGET_LINK_LIBRARIES( testtetsurface ${EXTRA_LINK_LIBS} perigee_preprocess )
 
+ADD_EXECUTABLE( vtu2vtp vtu2vtp.cpp)
+TARGET_LINK_LIBRARIES( vtu2vtp ${EXTRA_LINK_LIBS} perigee_preprocess )
 

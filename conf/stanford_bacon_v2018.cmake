@@ -22,7 +22,7 @@ SET(VTK_VERSION vtk-7.1)
 SET(VTK_link_lib vtkCommonCore-7.1 vtkCommonSystem-7.1 vtkCommonDataModel-7.1
   vtkCommonExecutionModel-7.1 vtkCommonMisc-7.1 vtkCommonTransforms-7.1
   vtkCommonMath-7.1 vtkIOCore-7.1 vtkIOLegacy-7.1 vtkIOXML-7.1 vtksys-7.1 
-  vtkzlib-7.1 )
+  vtkzlib-7.1 vtkFiltersGeometry-7.1 )
 
 # ========================================================
 # 2. PETSc VARIABLES

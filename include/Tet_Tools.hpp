@@ -19,6 +19,7 @@
 #include "vtkCellArray.h"
 #include "vtkPointData.h"
 #include "vtkTriangle.h"
+#include "vtkQuadraticTriangle.h"
 #include "vtkTetra.h"
 #include "vtkQuadraticTetra.h"
 #include "vtkUnstructuredGrid.h"
@@ -177,7 +178,6 @@ namespace TET_T
       const int &start_cell_index = 0 );
 
 
-  // Modify and verify
   void write_tet_grid( const std::string &filename,
       const bool &isXML, const int &numpts, const int &numcels,
       const std::vector<double> &pt, const std::vector<int> &ien_array,
