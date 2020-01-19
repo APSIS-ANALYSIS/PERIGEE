@@ -161,15 +161,6 @@ void TET_T::read_vtp_grid( const std::string &filename,
       ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
       ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
     }
-    else if( cell->GetCellType() == 22 )
-    {
-      ien_array.push_back( static_cast<int>( cell->GetPointId(0) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(3) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(4) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(5) ) );
-    }
     else SYS_T::print_fatal("Error: read_vtp_grid read a mesh with non triangle elements. \n");
   }
 
@@ -226,19 +217,7 @@ void TET_T::read_vtp_grid( const std::string &filename,
 
       global_ele_index.push_back( static_cast<int>( cd->GetComponent(ii, 0)));
     }
-    else if( cell->GetCellType() == 22 )
-    {
-      ien_array.push_back( static_cast<int>( cell->GetPointId(0) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(3) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(4) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(5) ) );
-
-      global_ele_index.push_back( static_cast<int>( cd->GetComponent(ii, 0)));
-    }
     else SYS_T::print_fatal("Error: read_vtp_grid read a mesh with non triangle elements. \n");
-
   }
   reader->Delete();
 }
