@@ -227,6 +227,13 @@ namespace TET_T
       const std::vector<int> &global_node_index,
       const std::vector<int> &global_ele_index );
 
+  
+  void write_quadratic_triangle_grid( const std::string &filename,
+      const int &numpts, const int &numcels,
+      const std::vector<double> &pt, 
+      const std::vector<int> &ien_array,
+      const std::vector<int> &global_node_index,
+      const std::vector<int> &global_ele_index );
 
   // ----------------------------------------------------------------
   // ! write_triangle_grid: write the surface mesh described by triangle

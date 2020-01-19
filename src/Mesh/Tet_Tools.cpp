@@ -152,7 +152,7 @@ void TET_T::read_vtu_grid( const std::string &filename,
   vtkCellData * celldata = vtkugrid->GetCellData();
   vtkDataArray * cd = celldata->GetScalars("ElemIndex");
 
-  vtkPointData * pointdata = polydata->GetPointData();
+  vtkPointData * pointdata = vtkugrid->GetPointData();
   vtkDataArray * pd = pointdata->GetScalars("NodalIndex");
 
   double pt_xyz[3];
@@ -169,7 +169,7 @@ void TET_T::read_vtu_grid( const std::string &filename,
   }
 
   ien_array.clear();
-  globla_elem_index.clear();
+  global_elem_index.clear();
   for(int ii=0; ii<numcels; ++ii)
   {
     vtkCell * cell = vtkugrid -> GetCell(ii);
@@ -1011,18 +1011,14 @@ void TET_T::write_triangle_grid( const std::string &filename,
   // check the input data compatibility
   if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: TET_T::write_triangle_grid point vector size does not match the number of points. \n");
 
-  int nlocbas = -1;
-  if( int(ien_array.size()) == 3*numcels ) nlocbas = 3;
-  else if( int(ien_array.size()) == 3*numcels ) nlocbas = 6;
-  else SYS_T::print_fatal("Error: TET_T::write_triangle_grid ien array size does not match the number of cells. \n");
+  if( int(ien_array.size()) != 3*numcels ) SYS_T::print_fatal("Error: TET_T::write_triangle_grid ien array size does not match the number of cells. \n");
 
   if(int(node_index.size()) != numpts) SYS_T::print_fatal("Error: TET_T::write_triangle_grid node_index size does not match the number of points. \n"); 
 
   if(int(ele_index.size()) != numcels) SYS_T::print_fatal("Error: TET_T::write_triangle_grid ele_index size does not match the number of cells. \n");
 
   // Setup the VTK objects
-  if( nlocbas == 3 ) vtkPolyData * grid_w = vtkPolyData::New();
-  else vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
+  vtkPolyData * grid_w = vtkPolyData::New();
 
   // 1. nodal points
   vtkPoints * ppt = vtkPoints::New(); 
@@ -1040,53 +1036,27 @@ void TET_T::write_triangle_grid( const std::string &filename,
   ppt -> Delete();
 
   // 2. Cell
-  if( nlocbas == 3 )
+  vtkCellArray * cl = vtkCellArray::New();
+  for(int ii=0; ii<numcels; ++ii)
   {
-    vtkCellArray * cl = vtkCellArray::New();
-    for(int ii=0; ii<numcels; ++ii)
-    {
-      vtkTriangle * tr = vtkTriangle::New();
+    vtkTriangle * tr = vtkTriangle::New();
 
-      tr->GetPointIds()->SetId( 0, ien_array[3*ii] );
-      tr->GetPointIds()->SetId( 1, ien_array[3*ii+1] );
-      tr->GetPointIds()->SetId( 2, ien_array[3*ii+2] );
-      cl -> InsertNextCell(tr);
-      tr -> Delete();
-    }
-    grid_w->SetPolys(cl);
-    cl->Delete();
+    tr->GetPointIds()->SetId( 0, ien_array[3*ii] );
+    tr->GetPointIds()->SetId( 1, ien_array[3*ii+1] );
+    tr->GetPointIds()->SetId( 2, ien_array[3*ii+2] );
+    cl -> InsertNextCell(tr);
+    tr -> Delete();
   }
-  else if( nlocbas == 6 )
-  {
-    vtkCellArray * cl = vtkCellArray::New();
-
-    for(int ii=0; ii<numcels; ++ii)
-    {
-      vtkQuadraticTriangle * tr = vtkQuadTriangle::New();
-
-      tr->GetPointIds()->SetId( 0, ien_array[6*ii] );
-      tr->GetPointIds()->SetId( 1, ien_array[6*ii+1] );
-      tr->GetPointIds()->SetId( 2, ien_array[6*ii+2] );
-      tr->GetPointIds()->SetId( 3, ien_array[6*ii+3] );
-      tr->GetPointIds()->SetId( 4, ien_array[6*ii+4] );
-      tr->GetPointIds()->SetId( 5, ien_array[6*ii+5] );
-      cl -> InsertNextCell(tr);
-      tr -> Delete();
-    }
-
-    grid_w -> SetCells(22, cl);
-    cl -> Delete();
-  }
-  else SYS_T::print_fatal("Error: unknown cell type. \n");
+  grid_w->SetPolys(cl);
+  cl->Delete();
 
   // 3. nodal indices
   vtkIntArray * ptindex = vtkIntArray::New();
   ptindex -> SetNumberOfComponents(1);
   ptindex -> SetName("NodalIndex");
   for(int ii=0; ii<numpts; ++ii)
-  {
     ptindex -> InsertComponent(ii, 0, node_index[ii]);
-  }
+  
   grid_w -> GetPointData() -> AddArray( ptindex );
   ptindex->Delete();
 
@@ -1100,27 +1070,100 @@ void TET_T::write_triangle_grid( const std::string &filename,
   clindex -> Delete();
 
   // write vtk
-  if( nlocbas == 3 )
+  vtkXMLPolyDataWriter * writer = vtkXMLPolyDataWriter::New();
+  std::string name_to_write(filename);
+  name_to_write.append(".vtp");
+  writer -> SetFileName( name_to_write.c_str() );
+  writer->SetInputData(grid_w);
+  writer->Write();
+  writer->Delete();
+
+  grid_w->Delete();
+}
+
+
+void TET_T::write_quadratic_triangle_grid( 
+    const std::string &filename,
+    const int &numpts, const int &numcels,
+    const std::vector<double> &pt,
+    const std::vector<int> &ien_array,
+    const std::vector<int> &node_index,
+    const std::vector<int> &ele_index )
+{
+  // check the input data compatibility
+  if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: TET_T::write_triangle_grid point vector size does not match the number of points. \n");
+
+  if( int(ien_array.size()) != 6*numcels ) SYS_T::print_fatal("Error: TET_T::write_quadratic_triangle_grid ien array size does not match the number of cells. \n");
+
+  if(int(node_index.size()) != numpts) SYS_T::print_fatal("Error: TET_T::write_triangle_grid node_index size does not match the number of points. \n"); 
+
+  if(int(ele_index.size()) != numcels) SYS_T::print_fatal("Error: TET_T::write_triangle_grid ele_index size does not match the number of cells. \n");
+
+  // Setup the VTK objects
+  vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
+
+  // 1. nodal points
+  vtkPoints * ppt = vtkPoints::New(); 
+  ppt->SetDataTypeToDouble();
+  double coor[3];
+  for(int ii=0; ii<numpts; ++ii)
   {
-    vtkXMLPolyDataWriter * writer = vtkXMLPolyDataWriter::New();
-    std::string name_to_write(filename);
-    name_to_write.append(".vtp");
-    writer -> SetFileName( name_to_write.c_str() );
-    writer->SetInputData(grid_w);
-    writer->Write();
-    writer->Delete();
+    coor[0] = pt[3*ii];
+    coor[1] = pt[3*ii+1];
+    coor[2] = pt[3*ii+2];
+    ppt -> InsertPoint(ii, coor);
   }
-  else if( nlocbas == 6 )
+
+  grid_w -> SetPoints(ppt);
+  ppt -> Delete();
+
+  // 2. Cell
+  vtkCellArray * cl = vtkCellArray::New();
+
+  for(int ii=0; ii<numcels; ++ii)
   {
-    vtkXMLUnstructuredGridWriter * writer = vtkXMLUnstructuredGridWriter::New();
-    std::string name_to_write(filename);
-    name_to_write.append(".vtu");
-    writer -> SetFileName( name_to_write.c_str() );
-    writer->SetInputData(grid_w);
-    writer->Write();
-    writer->Delete();
+    vtkQuadraticTriangle * tr = vtkQuadraticTriangle::New();
+
+    tr->GetPointIds()->SetId( 0, ien_array[6*ii] );
+    tr->GetPointIds()->SetId( 1, ien_array[6*ii+1] );
+    tr->GetPointIds()->SetId( 2, ien_array[6*ii+2] );
+    tr->GetPointIds()->SetId( 3, ien_array[6*ii+3] );
+    tr->GetPointIds()->SetId( 4, ien_array[6*ii+4] );
+    tr->GetPointIds()->SetId( 5, ien_array[6*ii+5] );
+    cl -> InsertNextCell(tr);
+    tr -> Delete();
   }
-  else SYS_T::print_fatal("Error: unknown cell type. \n");
+
+  grid_w -> SetCells(22, cl);
+  cl -> Delete();
+
+  // 3. nodal indices
+  vtkIntArray * ptindex = vtkIntArray::New();
+  ptindex -> SetNumberOfComponents(1);
+  ptindex -> SetName("NodalIndex");
+  for(int ii=0; ii<numpts; ++ii)
+    ptindex -> InsertComponent(ii, 0, node_index[ii]);
+  
+  grid_w -> GetPointData() -> AddArray( ptindex );
+  ptindex->Delete();
+
+  // 4. cell indices
+  vtkIntArray * clindex = vtkIntArray::New();
+  clindex -> SetName("ElemIndex");
+  clindex -> SetNumberOfComponents(1);
+  for(int ii=0; ii<numcels; ++ii)
+    clindex -> InsertNextValue( ele_index[ii] );
+  grid_w -> GetCellData() -> AddArray( clindex );
+  clindex -> Delete();
+
+  // write vtk
+  vtkXMLUnstructuredGridWriter * writer = vtkXMLUnstructuredGridWriter::New();
+  std::string name_to_write(filename);
+  name_to_write.append(".vtu");
+  writer -> SetFileName( name_to_write.c_str() );
+  writer->SetInputData(grid_w);
+  writer->Write();
+  writer->Delete();
 
   grid_w->Delete();
 }
