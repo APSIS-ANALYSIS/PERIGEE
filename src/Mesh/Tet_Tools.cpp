@@ -9,13 +9,13 @@ void TET_T::read_vtu_grid( const std::string &filename,
   reader -> Update();
   vtkUnstructuredGrid * vtkugrid = reader -> GetOutput();
 
-  // Number of point in the mesh
+  // Number of grid points in the mesh
   numpts  = static_cast<int>( vtkugrid -> GetNumberOfPoints() );
   
-  // Number of cell in the mesh
+  // Number of cells in the mesh
   numcels = static_cast<int>( vtkugrid -> GetNumberOfCells() );
 
-  // Coordinates of the points
+  // xyz coordinates of the points
   double pt_xyz[3];
   pt.clear();
   for(int ii=0; ii<numpts; ++ii)
@@ -41,6 +41,16 @@ void TET_T::read_vtu_grid( const std::string &filename,
       ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
       ien_array.push_back( static_cast<int>( cell->GetPointId(3) ) );
     }
+    else if( cell-> GetCellType() == 22 )
+    {
+      // cell type 22 is six-node triangle
+      ien_array.push_back( static_cast<int>( cell->GetPointId(0) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(3) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(4) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(5) ) );
+    }
     else if( cell-> GetCellType() == 24 )
     {
       // cell type 24 is ten-node tet
@@ -55,7 +65,7 @@ void TET_T::read_vtu_grid( const std::string &filename,
       ien_array.push_back( static_cast<int>( cell->GetPointId(8) ) );
       ien_array.push_back( static_cast<int>( cell->GetPointId(9) ) );
     }
-    else SYS_T::print_fatal("Error: TET_T::read_vtu_grid read a mesh with VTK cell type 10 or 24. \n"); 
+    else SYS_T::print_fatal("Error: TET_T::read_vtu_grid read a mesh with VTK cell type 10, 24, or 22. \n"); 
   }
 
   // Close the mesh

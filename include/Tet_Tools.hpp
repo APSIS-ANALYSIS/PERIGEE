@@ -81,7 +81,7 @@ namespace TET_T
   // ----------------------------------------------------------------
   // ! read_vtp_grid: read the surface mesh from a .vtp file. The mesh
   //                  file is assumed to be a VTK trangle grid with 3
-  //                  or 6 nodes. 
+  //                  nodes. 
   //                  We do not read in the associated volumetric nodal
   //                  or element indices in this routine. Hence, this 
   //                  is used primarily for reading Dirichlet type BC 
@@ -102,7 +102,7 @@ namespace TET_T
   // ----------------------------------------------------------------
   // ! read_vtp_grid: read the surface mesh generated from other software
   //                  in .vtp files. The mesh file is assumed to be a VTK
-  //                  triangle grid (type 5 or 22 in VTK cell type); 
+  //                  triangle grid (type 5 in VTK cell type); 
   //                  otherwise, an error message will be thrown.
   //   Input:  \para filename : the file name ending with .vtp
   //   Output: \para numpts: the number of grid points
@@ -110,7 +110,7 @@ namespace TET_T
   //           \para pt: xyz coordinate of the triangles, 
   //                     length is 3 x numpts.
   //           \para ien_array: the connectivity array, 
-  //                            length is 3 or 6 x numcels.
+  //                            length is 3 x numcels.
   //           \para global_node_index: the mapping from local nodal
   //                                    index to global nodal index
   //           \para global_ele_index: the mapping from the triangle
