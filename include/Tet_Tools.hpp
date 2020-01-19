@@ -212,7 +212,7 @@ namespace TET_T
   // ----------------------------------------------------------------
   // ! write_triangle_gird: write the surface mesh described by triangle
   //                        elements.
-  //   Input: \para filename : the filename.vtu is the file to be written.
+  //   Input: \para filename : the filename.vtp is the file to be written.
   //          \para numpts : the number of grid points
   //          \para numcels : the number of tetrahedral elements
   //          \para pt: xyz coordinates of the linear tets, length 3 numpts
@@ -228,6 +228,17 @@ namespace TET_T
       const std::vector<int> &global_ele_index );
 
   
+  // ----------------------------------------------------------------
+  // ! write_quadratic_triangle_gird: write the surface mesh described 
+  //                                  by quadratic triangle elements.
+  //   Input: \para filename : the filename.vtu is the file to be written.
+  //          \para numpts : the number of grid points
+  //          \para numcels : the number of tetrahedral elements
+  //          \para pt: xyz coordinates of the linear tets, length 3 numpts
+  //          \para ien_array : connectivity array, length 3 numcels
+  //          \para nodal_index : the point data to be written
+  //          \para elem_index : the element index to be written
+  // ----------------------------------------------------------------
   void write_quadratic_triangle_grid( const std::string &filename,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, 
@@ -246,6 +257,26 @@ namespace TET_T
   //   in FSI problem.
   // ----------------------------------------------------------------
   void write_triangle_grid( const std::string &filename,
+      const int &numpts, const int &numcels,
+      const std::vector<double> &pt, 
+      const std::vector<int> &ien_array,
+      const std::vector<int> &global_node_index,
+      const std::vector<int> &global_ele_index_1, 
+      const std::vector<int> &global_ele_index_2 );
+
+
+  // ----------------------------------------------------------------
+  // ! write_quadratic_triangle_grid: write the surface mesh described 
+  //                                  by quadratic triangle elements
+  //                                  with two element index arrays.
+  //   The input parameter is identical to the former one, with one
+  //   more array, global_ele_index_2, for the additional triangle-to
+  //   -tetrahedron mapping.
+  //   This function is implemented specifically for the interior
+  //   surface between two physical domains, e.g. interior surface
+  //   in FSI problem.
+  // ----------------------------------------------------------------
+  void write_quadratic_triangle_grid( const std::string &filename,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, 
       const std::vector<int> &ien_array,
