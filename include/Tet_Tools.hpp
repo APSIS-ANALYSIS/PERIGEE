@@ -218,7 +218,7 @@ namespace TET_T
   //          \para pt: xyz coordinates of the linear tets, length 3 numpts
   //          \para ien_array : connectivity array, length 3 numcels
   //          \para nodal_index : the point data to be written
-  //          \para elem_index : the element index to be written 
+  //          \para elem_index : the element index to be written
   // ----------------------------------------------------------------
   void write_triangle_grid( const std::string &filename,
       const int &numpts, const int &numcels,

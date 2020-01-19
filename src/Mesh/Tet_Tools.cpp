@@ -1011,14 +1011,18 @@ void TET_T::write_triangle_grid( const std::string &filename,
   // check the input data compatibility
   if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: TET_T::write_triangle_grid point vector size does not match the number of points. \n");
 
-  if(int(ien_array.size()) != 3*numcels) SYS_T::print_fatal("Error: TET_T::write_triangle_grid ien array size does not match the number of cells. \n");
+  int nlocbas = -1;
+  if( int(ien_array.size()) == 3*numcels ) nlocbas = 3;
+  else if( int(ien_array.size()) == 3*numcels ) nlocbas = 6;
+  else SYS_T::print_fatal("Error: TET_T::write_triangle_grid ien array size does not match the number of cells. \n");
 
   if(int(node_index.size()) != numpts) SYS_T::print_fatal("Error: TET_T::write_triangle_grid node_index size does not match the number of points. \n"); 
 
   if(int(ele_index.size()) != numcels) SYS_T::print_fatal("Error: TET_T::write_triangle_grid ele_index size does not match the number of cells. \n");
 
   // Setup the VTK objects
-  vtkPolyData * grid_w = vtkPolyData::New();
+  if( nlocbas == 3 ) vtkPolyData * grid_w = vtkPolyData::New();
+  else vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
 
   // 1. nodal points
   vtkPoints * ppt = vtkPoints::New(); 
@@ -1036,19 +1040,44 @@ void TET_T::write_triangle_grid( const std::string &filename,
   ppt -> Delete();
 
   // 2. Cell
-  vtkCellArray * cl = vtkCellArray::New();
-  for(int ii=0; ii<numcels; ++ii)
+  if( nlocbas == 3 )
   {
-    vtkTriangle * tr = vtkTriangle::New();
+    vtkCellArray * cl = vtkCellArray::New();
+    for(int ii=0; ii<numcels; ++ii)
+    {
+      vtkTriangle * tr = vtkTriangle::New();
 
-    tr->GetPointIds()->SetId( 0, ien_array[3*ii] );
-    tr->GetPointIds()->SetId( 1, ien_array[3*ii+1] );
-    tr->GetPointIds()->SetId( 2, ien_array[3*ii+2] );
-    cl -> InsertNextCell(tr);
-    tr -> Delete();
+      tr->GetPointIds()->SetId( 0, ien_array[3*ii] );
+      tr->GetPointIds()->SetId( 1, ien_array[3*ii+1] );
+      tr->GetPointIds()->SetId( 2, ien_array[3*ii+2] );
+      cl -> InsertNextCell(tr);
+      tr -> Delete();
+    }
+    grid_w->SetPolys(cl);
+    cl->Delete();
   }
-  grid_w->SetPolys(cl);
-  cl->Delete();
+  else if( nlocbas == 6 )
+  {
+    vtkCellArray * cl = vtkCellArray::New();
+
+    for(int ii=0; ii<numcels; ++ii)
+    {
+      vtkQuadraticTriangle * tr = vtkQuadTriangle::New();
+
+      tr->GetPointIds()->SetId( 0, ien_array[6*ii] );
+      tr->GetPointIds()->SetId( 1, ien_array[6*ii+1] );
+      tr->GetPointIds()->SetId( 2, ien_array[6*ii+2] );
+      tr->GetPointIds()->SetId( 3, ien_array[6*ii+3] );
+      tr->GetPointIds()->SetId( 4, ien_array[6*ii+4] );
+      tr->GetPointIds()->SetId( 5, ien_array[6*ii+5] );
+      cl -> InsertNextCell(tr);
+      tr -> Delete();
+    }
+
+    grid_w -> SetCells(22, cl);
+    cl -> Delete();
+  }
+  else SYS_T::print_fatal("Error: unknown cell type. \n");
 
   // 3. nodal indices
   vtkIntArray * ptindex = vtkIntArray::New();
@@ -1071,14 +1100,28 @@ void TET_T::write_triangle_grid( const std::string &filename,
   clindex -> Delete();
 
   // write vtk
-  vtkXMLPolyDataWriter * writer = vtkXMLPolyDataWriter::New();
-  std::string name_to_write(filename);
-  name_to_write.append(".vtp");
-  writer -> SetFileName( name_to_write.c_str() );
-  writer->SetInputData(grid_w);
-  writer->Write();
+  if( nlocbas == 3 )
+  {
+    vtkXMLPolyDataWriter * writer = vtkXMLPolyDataWriter::New();
+    std::string name_to_write(filename);
+    name_to_write.append(".vtp");
+    writer -> SetFileName( name_to_write.c_str() );
+    writer->SetInputData(grid_w);
+    writer->Write();
+    writer->Delete();
+  }
+  else if( nlocbas == 6 )
+  {
+    vtkXMLUnstructuredGridWriter * writer = vtkXMLUnstructuredGridWriter::New();
+    std::string name_to_write(filename);
+    name_to_write.append(".vtu");
+    writer -> SetFileName( name_to_write.c_str() );
+    writer->SetInputData(grid_w);
+    writer->Write();
+    writer->Delete();
+  }
+  else SYS_T::print_fatal("Error: unknown cell type. \n");
 
-  writer->Delete();
   grid_w->Delete();
 }
 
