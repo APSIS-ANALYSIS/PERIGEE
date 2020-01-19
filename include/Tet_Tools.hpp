@@ -196,7 +196,6 @@ namespace TET_T
   //          \para nodal_index : the point data to be written
   //          \para elem_index : the element index to be written 
   // ----------------------------------------------------------------
-  // Modify and verify
   void write_triangle_grid( const std::string &filename,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, 
@@ -215,7 +214,6 @@ namespace TET_T
   //   surface between two physical domains, e.g. interior surface
   //   in FSI problem.
   // ----------------------------------------------------------------
-  // Modify and verify
   void write_triangle_grid( const std::string &filename,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, 
