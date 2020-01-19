@@ -48,7 +48,7 @@ namespace TET_T
   //           \para pt: xyz coordinate of the grids, 
   //                     length is 3 x numpts
   //           \para ien_array: the connectivity array, 
-  //                            length is 4 or 10 x numcels
+  //                            length is 4, 10, or 6 x numcels
   //   Note: reload the function with output in int type instead
   //         of the VTK builtin type vtkIdType by doing a static_cast.
   // ----------------------------------------------------------------
@@ -67,7 +67,7 @@ namespace TET_T
   //           \para numcels: the number of cells
   //           \para pt: xyz coordinate of the grids, length is 3 numpts
   //           \para ien_array: the connectivity array, 
-  //                            length is 4 or 10 x numcels
+  //                            length is 4, 10, or 6 x numcels
   //           \para phy_tag: the tag of the elements, length is numcels
   //   This function is specifically designed for FSI or multi-domain 
   //   problems, where we need a tag to identify the physical domain.
@@ -76,6 +76,30 @@ namespace TET_T
       int &numpts, int &numcels,
       std::vector<double> &pt, std::vector<int> &ien_array,
       std::vector<int> &phy_tag );
+
+  // ----------------------------------------------------------------
+  // ! read_vtu_grid: read the surface mesh generated from other software
+  //                  in .vtu files. The mesh file is assumed to be a VTK
+  //                  triangle grid (type 22 in VTK cell type); 
+  //                  otherwise, an error message will be thrown.
+  //   Input:  \para filename : the file name ending with .vtu
+  //   Output: \para numpts: the number of grid points
+  //           \para numcels: the number of triangle cells
+  //           \para pt: xyz coordinate of the triangles, 
+  //                     length is 3 x numpts.
+  //           \para ien_array: the connectivity array, 
+  //                            length is 6 x numcels.
+  //           \para global_node_index: the mapping from local nodal
+  //                                    index to global nodal index
+  //           \para global_ele_index: the mapping from the triangle
+  //                                   cell to its corresponding tet
+  //                                   cell index
+  // ----------------------------------------------------------------
+  void read_vtu_grid( const std::string &filename,
+      int &numpts, int &numcels,
+      std::vector<double> &pt, std::vector<int> &ien_array,
+      std::vector<int> &global_node_index,
+      std::vector<int> &global_elem_index );
 
 
   // ----------------------------------------------------------------
@@ -92,7 +116,7 @@ namespace TET_T
   //           \para numcels : the number of triangle cells
   //           \para pt : the xyz-coordinate of grid points
   //           \para ien_array: the connectivity array for the triangles,
-  //                            length is 3 or 6 x numcels
+  //                            length is 3 x numcels
   // ----------------------------------------------------------------
   void read_vtp_grid( const std::string &filename,
       int &numpts, int &numcels,

@@ -68,7 +68,6 @@ void TET_T::read_vtu_grid( const std::string &filename,
     else SYS_T::print_fatal("Error: TET_T::read_vtu_grid read a mesh with VTK cell type 10, 24, or 22. \n"); 
   }
 
-  // Close the mesh
   reader->Delete();
 }
 
@@ -132,7 +131,63 @@ void TET_T::read_vtu_grid( const std::string &filename,
     else SYS_T::print_fatal("Error: read_vtu_grid read a mesh with non-tet elements. \n"); 
   }
 
-  // close the mesh
+  reader->Delete();
+}
+
+
+void TET_T::read_vtu_grid( const std::string &filename,
+    int &numpts, int &numcels,
+    std::vector<double> &pt, std::vector<int> &ien_array,
+    std::vector<int> &global_node_index,
+    std::vector<int> &global_elem_index )
+{
+  vtkXMLUnstructuredGridReader * reader = vtkXMLUnstructuredGridReader::New();
+  reader -> SetFileName( filename.c_str() );
+  reader -> Update();
+  vtkUnstructuredGrid * vtkugrid = reader -> GetOutput();
+
+  numpts  = static_cast<int>( vtkugrid -> GetNumberOfPoints() );
+  numcels = static_cast<int>( vtkugrid -> GetNumberOfCells() );
+
+  vtkCellData * celldata = vtkugrid->GetCellData();
+  vtkDataArray * cd = celldata->GetScalars("ElemIndex");
+
+  vtkPointData * pointdata = polydata->GetPointData();
+  vtkDataArray * pd = pointdata->GetScalars("NodalIndex");
+
+  double pt_xyz[3];
+  pt.clear();
+  global_node_index.clear();
+  for(int ii=0; ii<numpts; ++ii)
+  {
+    vtkugrid -> GetPoint(ii, pt_xyz);
+    pt.push_back(pt_xyz[0]);
+    pt.push_back(pt_xyz[1]);
+    pt.push_back(pt_xyz[2]);
+    
+    global_node_index.push_back( static_cast<int>(pd->GetComponent(ii,0)) );
+  }
+
+  ien_array.clear();
+  globla_elem_index.clear();
+  for(int ii=0; ii<numcels; ++ii)
+  {
+    vtkCell * cell = vtkugrid -> GetCell(ii);
+
+    if( cell->GetCellType() == 22 )
+    {
+      ien_array.push_back( static_cast<int>( cell->GetPointId(0) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(3) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(4) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(5) ) );
+
+      global_elem_index.push_back( static_cast<int>( cd->GetComponent(ii, 0) ) );
+    }
+    else SYS_T::print_fatal("Error: read_vtu_grid read a mesh with unknown element type. \n"); 
+  }
+
   reader->Delete();
 }
 
