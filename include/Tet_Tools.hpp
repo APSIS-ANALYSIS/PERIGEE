@@ -312,8 +312,6 @@ namespace TET_T
   //   product and compare with the 0-out-of-surface node. If the normal
   //   vector is in the same direction with the 0-out-of-surface line,
   //   correct its direction by multiplying -1.
-  //   Typically, one obtains the unit outward vector for the inflow
-  //   boundary.
   //   Note: This function requires one obtain the element index for
   //         the outlet vtp file.
   //   Input: \para vtpfile
@@ -321,8 +319,6 @@ namespace TET_T
   //          \para vol_ien, the volume mesh IEN array
   //   Output: outVec, the normal vector
   // ----------------------------------------------------------------
-  
-  // To be modified
   void get_out_normal( const std::string &vtpfile,
       const std::vector<double> &vol_ctrlPts,
       const IIEN * const &vol_ien,
