@@ -1380,7 +1380,7 @@ double TET_T::get_aspect_ratio( const std::vector<double> &pt )
 }
 
 
-void TET_T::get_out_normal( const std::string &vtpfile,
+void TET_T::get_out_normal( const std::string &file,
     const std::vector<double> &vol_ctrlPts,
     const IIEN * const &vol_ien,
     std::vector<double> &outVec )
@@ -1389,7 +1389,15 @@ void TET_T::get_out_normal( const std::string &vtpfile,
   std::vector<double> pts;
   std::vector<int> ien, gnode, gelem;
 
-  TET_T::read_vtp_grid( vtpfile, numpts, numcels, pts, ien, gnode, gelem );
+  // Analyze the file type
+  std::string fend; fend.assign( file.end()-4 , file.end() );
+
+  if( fend.compare(".vtp") == 0 )
+    TET_T::read_vtp_grid( file, numpts, numcels, pts, ien, gnode, gelem );
+  else if( fend.compare(".vtu") == 0 )
+    TET_T::read_vtu_grid( file, numpts, numcels, pts, ien, gnode, gelem );
+  else
+    SYS_T::print_fatal("Error: get_out_normal unknown file type.\n");
 
   std::vector<int> trn; trn.resize(3); 
   trn[0] = gnode[ ien[0] ]; // triangle nodes' global indices
