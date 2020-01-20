@@ -314,17 +314,17 @@ namespace TET_T
   //   correct its direction by multiplying -1.
   //   Note: This function requires one obtain the element index for
   //         the outlet vtp file.
-  //   Input: \para vtpfile
+  //   Input: \para file : surface file
   //          \para vol_ctrlPts, the volume mesh control points
   //          \para vol_ien, the volume mesh IEN array
   //   Output: outVec, the normal vector
   // ----------------------------------------------------------------
-  void get_out_normal( const std::string &vtpfile,
+  void get_out_normal( const std::string &file,
       const std::vector<double> &vol_ctrlPts,
       const IIEN * const &vol_ien,
       std::vector<double> &outVec );
 
-
+  
   // ================================================================
   // 4. TetGen interface
   // ----------------------------------------------------------------
