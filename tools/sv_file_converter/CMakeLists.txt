@@ -67,12 +67,14 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # 1. Make executable
 # 1.1 Preprocess
 ADD_EXECUTABLE( sv_converter convert_sv_files.cpp)
+ADD_EXECUTABLE( quad_sv_converter convert_quad_sv_files.cpp)
 ADD_EXECUTABLE( svpre_converter convert_svpre_files.cpp)
 ADD_EXECUTABLE( svrcr_converter convert_rcrt_dat_file.cpp)
 
 # -------------------------------------------------------------------
 # 2. Link libraries
 TARGET_LINK_LIBRARIES( sv_converter ${EXTRA_LINK_LIBS} perigee )
+TARGET_LINK_LIBRARIES( quad_sv_converter ${EXTRA_LINK_LIBS} perigee )
 TARGET_LINK_LIBRARIES( svpre_converter ${EXTRA_LINK_LIBS} perigee )
 TARGET_LINK_LIBRARIES( svrcr_converter ${EXTRA_LINK_LIBS} perigee )
 
