@@ -26,13 +26,6 @@ void write_triangle_grid_wss( const std::string &filename,
     const std::vector<int> &ien_array,
     const std::vector< std::vector<double> > &wss_on_node );
 
-void write_triangle_grid_tawss_osi( const std::string &filename,
-    const int &numpts, const int &numcels,
-    const std::vector<double> &pt,
-    const std::vector<int> &ien_array,
-    const std::vector<double> &tawss,
-    const std::vector<double> &osi );
-
 int main( int argc, char * argv[] )
 {
   std::string sol_bname("SOL_");
@@ -226,24 +219,6 @@ int main( int argc, char * argv[] )
   // Container for the area associated with the node
   std::vector<double> node_area; node_area.resize(nFunc);
 
-  // Container for TAWSS & OSI
-  std::vector<double> tawss, osi; 
-  std::vector< std::vector<double> > osi_top;
-  tawss.resize( nFunc ); osi.resize( nFunc ); osi_top.resize( nFunc );
-
-  for(int ii=0; ii<nFunc; ++ii)
-  {
-    tawss[ii]   = 0.0;
-    osi[ii]     = 0.0;
-
-    osi_top[ii].resize(3);
-    osi_top[ii][0] = 0.0;
-    osi_top[ii][1] = 0.0;
-    osi_top[ii][2] = 0.0;
-  }
-
-  const double inv_T = 1.0 / ( static_cast<double>((time_end - time_start)/time_step) + 1.0 );
-  
   for(int time = time_start; time <= time_end; time += time_step)
   {
     // Generate the file name
@@ -366,36 +341,10 @@ int main( int argc, char * argv[] )
 
     // write the wall shear stress at this time instance
     write_triangle_grid_wss( name_to_write, nFunc, nElem, ctrlPts, vecIEN, wss_ave );
-
-    for(int ii=0; ii<nFunc; ++ii)
-    {
-      tawss[ii] += inv_T * std::sqrt( wss_ave[ii][0] * wss_ave[ii][0] 
-          + wss_ave[ii][1] * wss_ave[ii][1] + wss_ave[ii][2] * wss_ave[ii][2] );
-
-      osi_top[ii][0] += inv_T * wss_ave[ii][0];
-      osi_top[ii][1] += inv_T * wss_ave[ii][1];
-      osi_top[ii][2] += inv_T * wss_ave[ii][2];
-    } 
-
+  
   }// Loop over each time instance
 
   MPI_Barrier(PETSC_COMM_WORLD);
-
-  for(int ii=0; ii<nFunc; ++ii)
-  {
-    const double mag = std::sqrt( osi_top[ii][0] * osi_top[ii][0] +
-        osi_top[ii][1] * osi_top[ii][1] + osi_top[ii][2] * osi_top[ii][2] );
-
-    // We will disallow very small tawss in the osi calculation
-    if( std::abs(tawss[ii]) > 1.0e-12 )
-      osi[ii] = 0.5 * (1.0 - mag / tawss[ii] );
-    else
-      osi[ii] = 0.0;
-  }
-
-  // write time averaged wss and osi
-  std::string tawss_osi_file("SOL_TAWSS_OSI" );
-  write_triangle_grid_tawss_osi( tawss_osi_file, nFunc, nElem, ctrlPts, vecIEN, tawss, osi );
 
   delete quad; delete element;
   PetscFinalize();
@@ -555,87 +504,6 @@ void write_triangle_grid_wss( const std::string &filename,
   grid_w -> GetPointData() -> AddArray( ptindex );
   ptindex->Delete();
 
-  vtkXMLPolyDataWriter * writer = vtkXMLPolyDataWriter::New();
-  std::string name_to_write(filename);
-  name_to_write.append(".vtp");
-  writer -> SetFileName( name_to_write.c_str() );
-  writer->SetInputData(grid_w);
-  writer->Write();
-
-  writer->Delete();
-  grid_w->Delete();
-}
-
-void write_triangle_grid_tawss_osi( const std::string &filename,
-    const int &numpts, const int &numcels,
-    const std::vector<double> &pt,
-    const std::vector<int> &ien_array,
-    const std::vector<double> &tawss,
-    const std::vector<double> &osi )
-{
-  if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: point vector size does not match the number of points. \n");
-
-  if(int(ien_array.size()) != 3*numcels) SYS_T::print_fatal("Error: ien array size does not match the number of cells. \n");
-
-  if(int(tawss.size()) != numpts) SYS_T::print_fatal("Error: tawss size does not match the number of points. \n");
-
-  if(int(osi.size()) != numpts) SYS_T::print_fatal("Error: osi size does not match the number of points. \n");
-
-  vtkPolyData * grid_w = vtkPolyData::New();
-
-  // 1. nodal points
-  vtkPoints * ppt = vtkPoints::New();
-  ppt->SetDataTypeToDouble();
-  double coor[3];
-  for(int ii=0; ii<numpts; ++ii)
-  {
-    coor[0] = pt[3*ii];
-    coor[1] = pt[3*ii+1];
-    coor[2] = pt[3*ii+2];
-    ppt -> InsertPoint(ii, coor);
-  }
-
-  grid_w -> SetPoints(ppt);
-  ppt -> Delete();
-
-  // 2. cell data
-  vtkCellArray * cl = vtkCellArray::New();
-  for(int ii=0; ii<numcels; ++ii)
-  {
-    vtkTriangle * tr = vtkTriangle::New();
-
-    tr->GetPointIds()->SetId( 0, ien_array[3*ii] );
-    tr->GetPointIds()->SetId( 1, ien_array[3*ii+1] );
-    tr->GetPointIds()->SetId( 2, ien_array[3*ii+2] );
-    cl -> InsertNextCell(tr);
-    tr -> Delete();
-  }
-  grid_w->SetPolys(cl);
-  cl->Delete();
-
-  // write tawss
-  vtkDoubleArray * ptindex = vtkDoubleArray::New();
-  ptindex -> SetNumberOfComponents(1);
-  ptindex -> SetName("TAWSS");
-  for(int ii=0; ii<numpts; ++ii)
-  {
-    ptindex -> InsertComponent(ii, 0, tawss[ii]);
-  }
-  grid_w -> GetPointData() -> AddArray( ptindex );
-  ptindex->Delete();
-
-  // write osi 
-  vtkDoubleArray * vtkosi = vtkDoubleArray::New();
-  vtkosi -> SetNumberOfComponents(1);
-  vtkosi -> SetName("OSI");
-  for(int ii=0; ii<numpts; ++ii)
-  {
-    vtkosi -> InsertComponent(ii, 0, osi[ii]);
-  }
-  grid_w -> GetPointData() -> AddArray( vtkosi );
-  vtkosi -> Delete();
-
-  // write vtp
   vtkXMLPolyDataWriter * writer = vtkXMLPolyDataWriter::New();
   std::string name_to_write(filename);
   name_to_write.append(".vtp");
