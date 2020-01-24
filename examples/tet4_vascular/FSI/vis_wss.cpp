@@ -5,7 +5,7 @@
 // defined on the wall elements only.
 //
 // Author: Ju Liu
-// Date: Sept 16 2019
+// Date: Jan 24 2020 
 // ==================================================================
 #include "Tet_Tools.hpp"
 #include "QuadPts_vis_tet4.hpp"
@@ -46,7 +46,7 @@ int main( int argc, char * argv[] )
   std::string geo_file, wall_file;
 
   // fluid properties
-  double fluid_mu = 3.5e-2;
+  double fluid_mu = 4.0e-2;
 
   const int dof = 7;
 
@@ -60,8 +60,8 @@ int main( int argc, char * argv[] )
   hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
-  cmd_h5r -> read_string("/", "geo_file", geo_file);
-  cmd_h5r -> read_string("/", "sur_file_wall", wall_file);
+  cmd_h5r -> read_string("/", "geo_f_file", geo_file);
+  cmd_h5r -> read_string("/", "sur_f_file_wall", wall_file);
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
