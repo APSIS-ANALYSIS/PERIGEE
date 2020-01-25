@@ -74,9 +74,10 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::get_tau(
 
   const double c_max = std::pow( rho0 / mu, -0.5); // Fully incompressible case
 
-  const double dt_ka = dx / c_max;
+  //const double dt_ka = dx / c_max;
+  const double dt_ka = 5.0e-3 / c_max;
 
-  tau_m_qua = 0.0001 * dt_ka * Jin / rho0;
+  tau_m_qua = 1.0e-5 * dt_ka * Jin / rho0;
   tau_c_qua = 0.000 * dx * c_max * rho0 / Jin;
 }
 

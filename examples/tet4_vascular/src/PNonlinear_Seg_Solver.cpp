@@ -420,7 +420,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_FSI(
     // --------------------------------------------------------------
 
     // Assembly residual (& tangent) 
-    if( nl_counter >= nrenew_freq )
+    if( nl_counter % nrenew_freq == 0 || nl_counter >= 4 )
     {
       gassem_ptr->Clear_KG();
       gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, sol,

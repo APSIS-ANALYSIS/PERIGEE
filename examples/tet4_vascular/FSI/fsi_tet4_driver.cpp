@@ -217,8 +217,8 @@ int main(int argc, char *argv[])
 
   // Solids CGS units
   const double mat_in_rho0 = 1.0;
-  const double mat_in_E = 3.0e6;
- 
+  const double mat_in_E = 2.0e6;
+
   IMaterialModel * matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed(
       mat_in_rho0, mat_in_E );
 
@@ -229,7 +229,7 @@ int main(int argc, char *argv[])
 
 /*
   IMaterialModel * matmodel = new MaterialModel_NeoHookean_M94_Mixed(
-      mat_in_rho0, mat_in_E, 0.49 );
+      mat_in_rho0, mat_in_E, 0.499 );
   
   IPLocAssem * locAssem_solid_ptr 
     = new PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha(
