@@ -178,6 +178,7 @@ ADD_EXECUTABLE( prepostproc prepost_tets.cpp)
 ADD_EXECUTABLE( vis_fsi vis_driver.cpp)
 ADD_EXECUTABLE( vis_fsi_fluid vis_fsi_fluid.cpp)
 ADD_EXECUTABLE( vis_fsi_solid vis_fsi_solid.cpp)
+ADD_EXECUTABLE( vis_fsi_wss vis_fsi_wss.cpp)
 
 # -------------------------------------------------------------------
 # 3. Link libraries
@@ -195,5 +196,6 @@ TARGET_LINK_LIBRARIES( vis_fsi ${EXTRA_LINK_LIBS} perigee_postprocess )
 
 TARGET_LINK_LIBRARIES( vis_fsi_fluid ${EXTRA_LINK_LIBS} perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_fsi_solid ${EXTRA_LINK_LIBS} perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_fsi_wss ${EXTRA_LINK_LIBS} perigee_preprocess perigee_postprocess )
 
 #EOF
