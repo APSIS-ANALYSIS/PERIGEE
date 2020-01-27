@@ -349,7 +349,7 @@ int main(int argc, char *argv[])
 
     delete lsolver_acce; delete dot_pres_velo;
     SYS_T::commPrint("\n===> Consistent initial acceleration is obtained.");
-    SYS_T::commPrint("\n===> The mass matrix lsolver is destroyed. \n\n");
+    SYS_T::commPrint("\n===> The mass matrix lsolver is destroyed.\n");
   }
 
   // ===== Linear and nonlinear solver context =====

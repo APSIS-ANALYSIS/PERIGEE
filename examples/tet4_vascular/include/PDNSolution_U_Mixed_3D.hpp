@@ -19,7 +19,7 @@ class PDNSolution_U_Mixed_3D : public PDNSolution
     PDNSolution_U_Mixed_3D(
         const APart_Node * const &pNode,
         const FEANode * const &fNode_ptr,
-        const int &type );
+        const int &type, const bool &isprint = true );
 
     virtual ~PDNSolution_U_Mixed_3D();
 
@@ -34,6 +34,9 @@ class PDNSolution_U_Mixed_3D : public PDNSolution
     // Case 0: Full zero vector
     void Init_zero(const APart_Node * const &pNode_ptr,
         const FEANode * const &fNode_ptr );
+
+  private:
+    const bool is_print;
 };
 
 #endif

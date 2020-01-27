@@ -13,7 +13,7 @@ PNonlinear_Seg_Solver::PNonlinear_Seg_Solver(
   dot_P_V_step = new PDNSolution_P_V_Mixed_3D( anode_ptr, feanode_ptr, 0, false );
 
   // Generate the solution vector for the mesh displacement
-  mesh_disp = new PDNSolution_U_Mixed_3D( anode_ptr, feanode_ptr, 0 );
+  mesh_disp = new PDNSolution_U_Mixed_3D( anode_ptr, feanode_ptr, 0, false );
 }
 
 
