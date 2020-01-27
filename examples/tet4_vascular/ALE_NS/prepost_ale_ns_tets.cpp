@@ -19,7 +19,7 @@ int main( int argc, char * argv[] )
   SYS_T::print_fatal_if(sysret != 0, "Error: system call failed. \n");
 
   std::string geo_file;
-  int dofNum, dofMat, elemType, in_ncommon, probDim;
+  int dofNum, dofMat, elemType, in_ncommon;
 
   const std::string part_file("postpart");
   int cpu_size = 1;
@@ -39,7 +39,6 @@ int main( int argc, char * argv[] )
   elemType = cmd_h5r -> read_intScalar("/","elemType");
   dofNum = cmd_h5r -> read_intScalar("/","dofNum");
   dofMat   = cmd_h5r -> read_intScalar("/","dofMat");
-  probDim = cmd_h5r -> read_intScalar("/","probDim");
   in_ncommon = cmd_h5r -> read_intScalar("/","in_ncommon");
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
@@ -57,7 +56,6 @@ int main( int argc, char * argv[] )
   else cout<<" -METIS_isDualGraph: false \n";
   cout<<"----------------------------------\n";
   cout<<"geo_file: "<<geo_file<<endl;
-  cout<<"probDim: "<<probDim<<endl;
   cout<<"dofNum: "<<dofNum<<endl;
   cout<<"elemType: "<<elemType<<endl;
   cout<<"==== Command Line Arguments ===="<<endl;
