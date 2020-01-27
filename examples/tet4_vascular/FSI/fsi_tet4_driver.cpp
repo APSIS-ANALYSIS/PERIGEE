@@ -339,7 +339,7 @@ int main(int argc, char *argv[])
         locAssem_solid_ptr, elementv,
         elements, quadv, quads, locIEN, pNode, fNode, locnbc, locebc );
 
-    PDNSolution * dot_pres_velo = new PDNSolution_P_V_Mixed_3D( pNode, fNode, 0 );
+    PDNSolution * dot_pres_velo = new PDNSolution_P_V_Mixed_3D( pNode, fNode, 0, false );
 
     lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_pres_velo);
 

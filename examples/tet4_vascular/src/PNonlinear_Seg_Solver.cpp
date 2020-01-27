@@ -10,7 +10,7 @@ PNonlinear_Seg_Solver::PNonlinear_Seg_Solver(
   nmaxits(input_max_iteration), nrenew_freq(input_renew_freq)
 {
   // Generate the solution vector for P-V system as the step updater
-  dot_P_V_step = new PDNSolution_P_V_Mixed_3D( anode_ptr, feanode_ptr, 0 );
+  dot_P_V_step = new PDNSolution_P_V_Mixed_3D( anode_ptr, feanode_ptr, 0, false );
 
   // Generate the solution vector for the mesh displacement
   mesh_disp = new PDNSolution_U_Mixed_3D( anode_ptr, feanode_ptr, 0 );

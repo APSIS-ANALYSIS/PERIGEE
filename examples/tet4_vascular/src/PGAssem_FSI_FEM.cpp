@@ -358,7 +358,7 @@ void PGAssem_FSI_FEM::Assem_nonzero_estimate(
   }
 
   // Resis BC for K and G
-  PDNSolution * temp = new PDNSolution_Mixed_UPV_3D( node_ptr, 0 );
+  PDNSolution * temp = new PDNSolution_Mixed_UPV_3D( node_ptr, 0, false );
 
   // choose an arbitrary (0.1) time step size just to get the nonzero pattern
   NatBC_Resis_KG(0.1, temp, lassem_f_ptr, elements, quad_s, node_ptr, 

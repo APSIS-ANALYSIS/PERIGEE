@@ -18,15 +18,15 @@ class PDNSolution_Mixed_UPV_3D : public PDNSolution
   public:
     PDNSolution_Mixed_UPV_3D( const APart_Node * const &pNode,
         const FEANode * const &fNode_ptr,
-        const int &type );
+        const int &type, const bool &isprint = true );
 
     PDNSolution_Mixed_UPV_3D( const APart_Node * const &pNode,
         const FEANode * const &fNode_ptr,
         const ALocal_Inflow_NodalBC * const &infbc,
-        const int &type );
+        const int &type, const bool &isprint = true );
 
     PDNSolution_Mixed_UPV_3D( const APart_Node * const &pNode,
-        const int &type );
+        const int &type, const bool &isprint = true );
 
     virtual ~PDNSolution_Mixed_UPV_3D();
 
@@ -43,6 +43,10 @@ class PDNSolution_Mixed_UPV_3D : public PDNSolution
     //         for whole continuum body, and zero velocity and displacement
     void Init_pressure( const APart_Node * const &pNode_ptr,
         const FEANode * const &fNode_ptr );
+
+  private:
+    const bool is_print;
+
 };
 
 #endif

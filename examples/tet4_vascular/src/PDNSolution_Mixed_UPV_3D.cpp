@@ -3,7 +3,8 @@
 PDNSolution_Mixed_UPV_3D::PDNSolution_Mixed_UPV_3D(
     const APart_Node * const &pNode,
     const FEANode * const &fNode_ptr,
-    const int &type ) : PDNSolution( pNode )
+    const int &type, const bool &isprint ) 
+: PDNSolution( pNode ), is_print( isprint )
 {
   if( pNode->get_dof() != 7 ) SYS_T::print_fatal("Error: PDNSolution_Mixed_UPV_3D : the APart_Node gives wrong dof number. \n");
 
@@ -26,7 +27,8 @@ PDNSolution_Mixed_UPV_3D::PDNSolution_Mixed_UPV_3D(
     const APart_Node * const &pNode,
     const FEANode * const &fNode_ptr,
     const ALocal_Inflow_NodalBC * const &infbc,
-    const int &type ) : PDNSolution( pNode )
+    const int &type, const bool &isprint ) 
+: PDNSolution( pNode ), is_print( isprint )
 {
   if( pNode->get_dof() != 7 ) SYS_T::print_fatal("Error: PDNSolution_Mixed_UPV_3D : the APart_Node gives wrong dof number. \n");
 
@@ -44,7 +46,8 @@ PDNSolution_Mixed_UPV_3D::PDNSolution_Mixed_UPV_3D(
 
 PDNSolution_Mixed_UPV_3D::PDNSolution_Mixed_UPV_3D(
     const APart_Node * const &pNode,
-    const int &type ) : PDNSolution( pNode )
+    const int &type, const bool &isprint ) 
+: PDNSolution( pNode ), is_print( isprint )
 {
   if( pNode->get_dof() != 7 ) SYS_T::print_fatal("Error: PDNSolution_Mixed_UPV_3D : the APart_Node gives wrong dof number. \n");
 
@@ -89,13 +92,16 @@ void PDNSolution_Mixed_UPV_3D::Init_zero(
 
   GhostUpdate();
 
-  SYS_T::commPrint("===> Initial solution: disp_x = 0.0 \n");
-  SYS_T::commPrint("                       disp_y = 0.0 \n");
-  SYS_T::commPrint("                       disp_z = 0.0 \n");
-  SYS_T::commPrint("                       pres   = 0.0 \n");
-  SYS_T::commPrint("                       velo_x = 0.0 \n");
-  SYS_T::commPrint("                       velo_y = 0.0 \n");
-  SYS_T::commPrint("                       velo_z = 0.0 \n");
+  if( is_print )
+  {
+    SYS_T::commPrint("===> Initial solution: disp_x = 0.0 \n");
+    SYS_T::commPrint("                       disp_y = 0.0 \n");
+    SYS_T::commPrint("                       disp_z = 0.0 \n");
+    SYS_T::commPrint("                       pres   = 0.0 \n");
+    SYS_T::commPrint("                       velo_x = 0.0 \n");
+    SYS_T::commPrint("                       velo_y = 0.0 \n");
+    SYS_T::commPrint("                       velo_z = 0.0 \n");
+  }
 }
 
 
@@ -148,20 +154,23 @@ void PDNSolution_Mixed_UPV_3D::Init_flow_parabolic(
   VecAssemblyBegin(solution); VecAssemblyEnd(solution);
   GhostUpdate();
 
-  SYS_T::commPrint("===> Initial solution: pres   = 0.0 \n");
-  SYS_T::commPrint("                       velo_x = parabolic \n");
-  SYS_T::commPrint("                       velo_y = parabolic \n");
-  SYS_T::commPrint("                       velo_z = parabolic \n");
-  PetscPrintf(PETSC_COMM_WORLD,
-      "                       flow rate 1.0 .\n");
-  PetscPrintf(PETSC_COMM_WORLD,
-      "                       max speed %e.\n", vmax);
-  PetscPrintf(PETSC_COMM_WORLD,
-      "                       active area is %e.\n", infbc->get_actarea() );
-  PetscPrintf(PETSC_COMM_WORLD,
-      "                       full area is %e.\n", infbc->get_fularea() );
-  PetscPrintf(PETSC_COMM_WORLD,
-      "                       direction [%e %e %e].\n", out_nx, out_ny, out_nz);
+  if( is_print )
+  {
+    SYS_T::commPrint("===> Initial solution: pres   = 0.0 \n");
+    SYS_T::commPrint("                       velo_x = parabolic \n");
+    SYS_T::commPrint("                       velo_y = parabolic \n");
+    SYS_T::commPrint("                       velo_z = parabolic \n");
+    PetscPrintf(PETSC_COMM_WORLD,
+        "                       flow rate 1.0 .\n");
+    PetscPrintf(PETSC_COMM_WORLD,
+        "                       max speed %e.\n", vmax);
+    PetscPrintf(PETSC_COMM_WORLD,
+        "                       active area is %e.\n", infbc->get_actarea() );
+    PetscPrintf(PETSC_COMM_WORLD,
+        "                       full area is %e.\n", infbc->get_fularea() );
+    PetscPrintf(PETSC_COMM_WORLD,
+        "                       direction [%e %e %e].\n", out_nx, out_ny, out_nz);
+  }
 }
 
 
@@ -192,13 +201,16 @@ void PDNSolution_Mixed_UPV_3D::Init_pressure(
   VecAssemblyBegin(solution); VecAssemblyEnd(solution);
   GhostUpdate();
 
-  SYS_T::commPrint("===> Initial solution: disp_x = 0.0 \n");
-  SYS_T::commPrint("                       disp_y = 0.0 \n");
-  SYS_T::commPrint("                       disp_z = 0.0 \n");
-  SYS_T::commPrint("                       pres   = prescribed value \n");
-  SYS_T::commPrint("                       velo_x = 0.0 \n");
-  SYS_T::commPrint("                       velo_y = 0.0 \n");
-  SYS_T::commPrint("                       velo_z = 0.0 \n");
+  if( is_print )
+  {
+    SYS_T::commPrint("===> Initial solution: disp_x = 0.0 \n");
+    SYS_T::commPrint("                       disp_y = 0.0 \n");
+    SYS_T::commPrint("                       disp_z = 0.0 \n");
+    SYS_T::commPrint("                       pres   = prescribed value \n");
+    SYS_T::commPrint("                       velo_x = 0.0 \n");
+    SYS_T::commPrint("                       velo_y = 0.0 \n");
+    SYS_T::commPrint("                       velo_z = 0.0 \n");
+  }
 }
 
 // EOF
