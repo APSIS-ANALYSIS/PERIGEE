@@ -1,10 +1,29 @@
 # PERIGEE
 PERIGEE is a nonlinear dynamic finite element and isogeometric analysis code for multiphysics problems. The code has been under development since 2012 with the goal of providing a single C++ framework for parallel implementation of different physics problems using different element technologies.
 
+![GitHub](https://img.shields.io/github/license/ju-liu/PERIGEE)
+![GitHub repo size](https://img.shields.io/github/repo-size/ju-liu/PERIGEE)
+![GitHub language count](https://img.shields.io/github/languages/count/ju-liu/PERIGEE)
+
 ## Table of Contents
+
+- [Install](#Install)
 - [Code Style](#Code-Style)
 - [Design Pattern](#Design-Pattern)
 - [References](#References)
+
+## Install
+Please follow the following steps to compile the code.
+
+1. For Sherlock@Stanford users, go to step 2. Before compiling the PERIGEE code, one has to install necessary libraries. The guide for library installation is [here](docs/install_external_libs.md) as a quick guide and [there](docs/install-advanced.md) as a guide for advanced users. After the libraries are all installed, proceed to step 3.
+
+2. On Sherlock@Stanford, the libraries have already been installed in `/home/groups/amarsden/lib-perigee`. You need to add the following to your `.bash_profile` or `.bashrc` file, and then proceed to step 3.
+```sh
+export MACHINE_NAME=sherlock
+export LD_LIBRARY_PATH=/home/groups/amarsden/lib-perigee/VTK-7.1.1-shared/lib:$LD_LIBRARY_PATH
+```
+ 
+3. After the libraries are installed, one has to modify the configuration file in the [conf](conf) folder, following the steps [here](docs/configure_perigee_guide.md). *If you are on Sherlock@Stanford, you do not need to do anything at this step. The CMake configuration file for Sherlock is [here](conf/stanford_sherlock.cmake). As long as you have your machine named as `sherlock`, the code will load the proper CMake file and compile the code*.
 
 ## Code Style
 1. Be clean. If you don't know what clean is, read code until you do.
