@@ -3,7 +3,8 @@
 PDNSolution_P_V_Mixed_3D::PDNSolution_P_V_Mixed_3D(
     const APart_Node * const &pNode,
     const FEANode * const &fNode_ptr,
-    const int &type ) : PDNSolution( pNode, 4 )
+    const int &type, const bool &isprint ) 
+: PDNSolution( pNode, 4 ), is_print( isprint )
 {
   if( pNode->get_dof() != 7 ) SYS_T::print_fatal("Error: PDNSolution_P_V_Mixed_3D : the APart_Node gives wrong dof number. \n");
 
@@ -57,10 +58,13 @@ void PDNSolution_P_V_Mixed_3D::Init_test_1(
 
   GhostUpdate();
 
-  SYS_T::commPrint("===> Initial solution: pres   = test \n");
-  SYS_T::commPrint("                       velo_x = test \n");
-  SYS_T::commPrint("                       velo_y = test \n");
-  SYS_T::commPrint("                       velo_z = test \n");
+  if(is_print)
+  {
+    SYS_T::commPrint("===> Initial solution: pres   = test \n");
+    SYS_T::commPrint("                       velo_x = test \n");
+    SYS_T::commPrint("                       velo_y = test \n");
+    SYS_T::commPrint("                       velo_z = test \n");
+  }
 }
 
 
@@ -93,12 +97,14 @@ void PDNSolution_P_V_Mixed_3D::Init_test_2(
 
   GhostUpdate();
 
-  SYS_T::commPrint("===> Initial solution: pres   = random \n");
-  SYS_T::commPrint("                       velo_x = random \n");
-  SYS_T::commPrint("                       velo_y = random \n");
-  SYS_T::commPrint("                       velo_z = random \n");
+  if(is_print)
+  {
+    SYS_T::commPrint("===> Initial solution: pres   = random \n");
+    SYS_T::commPrint("                       velo_x = random \n");
+    SYS_T::commPrint("                       velo_y = random \n");
+    SYS_T::commPrint("                       velo_z = random \n");
+  }
 }
-
 
 void PDNSolution_P_V_Mixed_3D::Init_zero(
     const APart_Node * const &pNode_ptr,
@@ -123,10 +129,13 @@ void PDNSolution_P_V_Mixed_3D::Init_zero(
 
   GhostUpdate();
 
-  SYS_T::commPrint("===> Initial solution: pres   = 0.0 \n");
-  SYS_T::commPrint("                       velo_x = 0.0 \n");
-  SYS_T::commPrint("                       velo_y = 0.0 \n");
-  SYS_T::commPrint("                       velo_z = 0.0 \n");
+  if(is_print)
+  {
+    SYS_T::commPrint("===> Initial solution: pres   = 0.0 \n");
+    SYS_T::commPrint("                       velo_x = 0.0 \n");
+    SYS_T::commPrint("                       velo_y = 0.0 \n");
+    SYS_T::commPrint("                       velo_z = 0.0 \n");
+  }
 }
 
 // EOF
