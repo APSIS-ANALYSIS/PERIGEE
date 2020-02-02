@@ -2,14 +2,14 @@
 // preprocess_sv_ale_tets.cpp
 // ------------------------------------------------------------------
 // This preprocess code is used for handling the 3D geometry described
-// by tetrahedral elements, and it is tailored for patient-specific
-// geometry adopted from SimVascular.
+// by tetrahedral elements.
 //
 // Users should call the sv converter tool to convert the node and
-// element indices to start from zero.
+// element indices to make them start from zero rather than one.
 //
-// Then the user should give the proper input file name for this routine
-// to input the volumetric mesh and boundary mesh for analysis preparation. 
+// Then the user should give the proper input file name and number of 
+// outlets from the command-line argument to specify the volumetric 
+// mesh and boundary mesh. 
 //
 // Date: Dec. 18 2016
 // Modified: May 22 2017
@@ -30,6 +30,7 @@
 
 int main( int argc, char * argv[] )
 {
+  // Call system routine to clean the previously generated hdf5 files
   int sysret = system("rm -rf part_p*.h5");
   SYS_T::print_fatal_if(sysret != 0, "Error: system call failed. \n");
   sysret = system("rm -rf preprocessor_cmd.h5");
@@ -37,12 +38,12 @@ int main( int argc, char * argv[] )
   sysret = system("rm -rf NumLocalNode.h5");
   SYS_T::print_fatal_if(sysret != 0, "Error: system call failed. \n");
 
-  // Define basic settins
+  // Declare basic parameters
   const int dofNum = 7; // degree-of-freedom for the physical problem
   const int dofMat = 4; // degree-of-freedom in the matrix problem
   const int elemType = 501; // first order simplicial element
 
-  // Input files
+  // volumetric, wall, and cap files
   std::string geo_file("./whole_vol.vtu");
   std::string sur_file_in("./inflow_vol.vtp");
   std::string sur_file_wall("./wall_vol.vtp");
@@ -54,20 +55,19 @@ int main( int argc, char * argv[] )
   // the name will be sur_file_out_basexx.vtp. e.g. outlet_00.vtp.
   std::vector< std::string > sur_file_out;
   
-  const std::string part_file("part");
-  
+  const std::string part_file("part"); // name of partition file
+ 
+  // mesh partition settings 
   int cpu_size = 1;
   int in_ncommon = 2;
   bool isDualGraph = true;
 
   PetscMPIInt size;
-
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-
   MPI_Comm_size(PETSC_COMM_WORLD, &size);
-
   if(size != 1) SYS_T::print_fatal("ERROR: preprocessor is a serial program! \n");
 
+  // Get command-line argument
   SYS_T::GetOptionInt("-cpu_size", cpu_size);
   SYS_T::GetOptionInt("-in_ncommon", in_ncommon);
   SYS_T::GetOptionInt("-num_outlet", num_outlet);
@@ -139,9 +139,9 @@ int main( int argc, char * argv[] )
   // ----- Finish writing
 
   // Read the volumetric mesh file from a vtu file
-  int nFunc, nElem;
-  std::vector<int> vecIEN;
-  std::vector<double> ctrlPts;
+  int nFunc, nElem; // number of nodes and elements
+  std::vector<int> vecIEN; // IEN stored in a std::vector
+  std::vector<double> ctrlPts; // x-y-z coordinates of the nodes
 
   TET_T::read_vtu_grid(geo_file.c_str(), nFunc, nElem, ctrlPts, vecIEN);
 
@@ -152,10 +152,11 @@ int main( int argc, char * argv[] )
   // check and display the tet mesh quality
   TET_T::tetmesh_check(ctrlPts, IEN, nElem, 3.5);
 
+  // Create the global mesh
   IMesh * mesh = new Mesh_Tet4(nFunc, nElem);
   mesh -> print_mesh_info();
 
-  // Call METIS to partition the grid
+  // Call METIS to partition the mesh
   IGlobal_Part * global_part;
   if(cpu_size > 1)
     global_part = new Global_Part_METIS( cpu_size, in_ncommon,
@@ -168,11 +169,13 @@ int main( int argc, char * argv[] )
     exit(EXIT_FAILURE);
   }
 
+  // Generate the new numbering of the nodes based on the partition
   Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, mesh->get_nFunc());
   mnindex->write_hdf5("node_mapping");
 
   // ----------------------------------------------------------------
   // Setup boundary condition
+  // Nodal boundary conditions
   std::vector<INodalBC *> NBC_list;
   NBC_list.clear();
   NBC_list.resize( dofMat );
@@ -187,7 +190,7 @@ int main( int argc, char * argv[] )
   NBC_list[2] = new NodalBC_3D_vtp( dir_list, nFunc );
   NBC_list[3] = new NodalBC_3D_vtp( dir_list, nFunc );
 
-  // Generate the mesh bc
+  // Generate the BC for the ALE mesh motion
   std::vector<INodalBC *> meshBC_list;
   meshBC_list.clear();
   meshBC_list.resize( 3 );
@@ -222,53 +225,54 @@ int main( int argc, char * argv[] )
   // direction easily. See the document for this reset function
   ebc -> resetTriIEN_outwardnormal( IEN );
   
-  // mesh ebc
+  // Elemental BC for the ALE mesh
   std::vector<std::string> mesh_ebclist;
   mesh_ebclist.clear();
   ElemBC * mesh_ebc = new ElemBC_3D_tet4( mesh_ebclist );
   // ----------------------------------------------------------------
-
+  
+  // flag for printing partition statistics
   const bool isPrintPartInfo = true;
-  const int proc_size = cpu_size;
 
   std::vector<int> list_nlocalnode, list_nghostnode, list_ntotalnode, list_nbadnode;
   std::vector<double> list_ratio_g2l;
 
-  int sum_nghostnode = 0;
+  int sum_nghostnode = 0; // total number of ghost nodes
 
   SYS_T::Timer * mytimer = new SYS_T::Timer();
-  for(int proc_rank = 0; proc_rank < proc_size; ++proc_rank)
+  for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
   {
     mytimer->Reset();
     mytimer->Start();
     IPart * part = new Part_Tet4( mesh, global_part, mnindex, IEN,
-        ctrlPts, proc_rank, proc_size, dofNum, dofMat, elemType,
+        ctrlPts, proc_rank, cpu_size, dofNum, dofMat, elemType,
         isPrintPartInfo );
     mytimer->Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
+    // write the part hdf5 file
     part -> write( part_file.c_str() );
 
     part -> print_part_loadbalance_edgecut();
 
-    // Part Nodal BC
+    // Partition Nodal BC
     INBC_Partition * nbcpart = new NBC_Partition_3D(part, mnindex, NBC_list);
     nbcpart -> write_hdf5(part_file.c_str());
 
-    // Part Nodal Inflow BC
+    // Partition Nodal Inflow BC
     INBC_Partition * infpart = new NBC_Partition_3D_inflow(part, mnindex, InFBC);
     infpart->write_hdf5( part_file.c_str() );
 
-    // Part Elem BC
+    // Partition Elem BC
     IEBC_Partition * ebcpart = new EBC_Partition_vtp_outflow(part, mnindex, ebc, NBC_list);
 
     ebcpart -> write_hdf5(part_file.c_str());
 
-    // Part Mesh Nodal BC
+    // Partition Mesh Nodal BC
     INBC_Partition * mbcpart = new NBC_Partition_3D(part, mnindex, meshBC_list);
     mbcpart -> write_hdf5(part_file.c_str(), "/mesh_nbc");
 
-    // Part Mesh Elem BC
+    // Partition Mesh Elem BC
     IEBC_Partition * mebcpart = new EBC_Partition_vtp(part, mnindex, mesh_ebc);
     mebcpart-> write_hdf5(part_file.c_str(), "/mesh_ebc");
 
@@ -285,7 +289,7 @@ int main( int argc, char * argv[] )
 
   VEC_T::write_int_h5("NumLocalNode","nln", list_nlocalnode);
 
-  cout<<"\n===> Partition Quality: "<<endl;
+  cout<<"\n===> Mesh Partition Quality: "<<endl;
   cout<<"The largest ghost / local node ratio is: ";
   cout<<*std::max_element(&list_ratio_g2l[0], &list_ratio_g2l[cpu_size-1])<<endl;
 
