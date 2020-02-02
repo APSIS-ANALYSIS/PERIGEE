@@ -226,6 +226,48 @@ void SV_T::update_sv_vtp( const std::string &filename,
 }
 
 
+void SV_T::update_sv_sur_vtu( const std::string &filename,
+    const std::string &writename,
+    const int &nstart, const int &estart )
+{
+  int nFunc, nElem;
+  std::vector<int> vecIEN;
+  std::vector<double> ctrlPts;
+
+  TET_T::read_vtu_grid( filename, nFunc, nElem, ctrlPts, vecIEN );
+
+  vtkXMLUnstructuredGridReader * reader = vtkXMLUnstructuredGridReader::New();
+  reader -> SetFileName( filename.c_str() );
+  reader -> Update();
+  vtkUnstructuredGrid * vtkugrid = reader -> GetOutput();
+
+  vtkCellData * celldata = vtkugrid->GetCellData();
+  vtkDataArray * cd = celldata->GetScalars("GlobalElementID");
+
+  std::vector<int> eid; eid.clear();
+  for(int ii=0; ii<nElem; ++ii)
+    eid.push_back( static_cast<int>( cd->GetComponent(ii, 0) ) - estart );
+
+  vtkPointData * pointdata = vtkugrid->GetPointData();
+  vtkDataArray * pd = pointdata->GetScalars("GlobalNodeID");
+
+  std::vector<int> nid; nid.clear();
+  for(int ii=0; ii<nFunc; ++ii)
+    nid.push_back( static_cast<int>(pd->GetComponent(ii,0)) - nstart );
+
+  reader->Delete();
+
+  std::string fname(writename);
+  std::string fend;
+  fend.assign( fname.end()-4 , fname.end() );
+
+  if(fend.compare(".vtu") == 0) fname.erase(fname.end()-4, fname.end());
+
+  TET_T::write_quadratic_triangle_grid( fname, nFunc, nElem, ctrlPts,
+      vecIEN, nid, eid );
+}
+
+
 void SV_T::update_sv_vtp( const std::string &filename,
     const std::string &writename,
     const std::vector<int> &nmap, const std::vector<int> &emap )

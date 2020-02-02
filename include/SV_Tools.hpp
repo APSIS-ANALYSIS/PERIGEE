@@ -67,6 +67,16 @@ namespace SV_T
       const int &nstart, const int &estart );
 
   // ---------------------------------------------------------------- 
+  // ! update_sv_sur_vtu : read the surface mesh written in a vtu file
+  //                       and update the nodal & elemental indices.
+  //                       This function is designed for quadratic
+  //                       triangle mesh primarily.
+  // ---------------------------------------------------------------- 
+  void update_sv_sur_vtu( const std::string &filename,
+      const std::string &writename,
+      const int &nstart, const int &estart );
+
+  // ---------------------------------------------------------------- 
   // update the vtp file with a node map and element map to map
   // the nodal and elemental indices to new values.
   // \para filename : the original SV generated solid surface vtp file.
@@ -79,7 +89,7 @@ namespace SV_T
   void update_sv_vtp( const std::string &filename,
       const std::string &writename,
       const std::vector<int> &nmap, const std::vector<int> &emap );
-  
+
   // ----------------------------------------------------------------
   // ! compare_sv_vtp : compare two vtp and make sure they are matched
   //                    in the sense that they contain the same number

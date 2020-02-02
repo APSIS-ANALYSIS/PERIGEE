@@ -40,7 +40,8 @@ namespace TET_T
   // --------------------------------------------------------------
   // ! read_vtu_grid: read the mesh generated from other software
   //                  in the .vtu file. The mesh file is assumed to be a
-  //                  tetrahedral mesh with 4 or 10 nodes; 
+  //                  tetrahedral mesh with 4 or 10 nodes;
+  //                  or a triangle mesh with 6 nodes; 
   //                  otherwise, an error message will be thrown.
   //   Input:  \para filename : the filename ending with .vtu
   //   Output: \para numpts: the number of grid points
@@ -172,7 +173,7 @@ namespace TET_T
 
   // ----------------------------------------------------------------
   // ! write_tet_grid_node_elem_index : Similar to the above function,
-  //   this routine writes the volumetric mesh with  additional data :
+  //   this routine writes the volumetric mesh with additional data :
   //   NodalIndex & ElemIndex. If the node_idx & elem_idx is not given
   //   the function will write based on the natural numbering.
   // ----------------------------------------------------------------

@@ -16,14 +16,14 @@ int main( int argc, char * argv[] )
   // Users are allowed to input the geo_file, sur_file_in, and
   // sur_file_wall, as well as sur_file_out_base. 
   std::string geo_file("vol.vtu");
-  std::string sur_file_in("inlet.vtp");
-  std::string sur_file_wall("wall.vtp");
+  std::string sur_file_in("inlet.vtu");
+  std::string sur_file_wall("wall.vtu");
   std::string sur_file_out_base("outlet_");
   int num_outlet = 1;
 
   std::string geo_out_name("whole_vol.vtu");
-  std::string inl_out_name("inflow_vol.vtp");
-  std::string wal_out_name("wall_vol.vtp");
+  std::string inl_out_name("inflow_vol.vtu");
+  std::string wal_out_name("wall_vol.vtu");
   std::string out_out_base("outflow_vol_");
 
   PetscMPIInt size;
@@ -90,8 +90,8 @@ int main( int argc, char * argv[] )
       ss<<"0";
       sw<<"0";
     }
-    ss<<ii<<".vtp";
-    sw<<ii<<".vtp";
+    ss<<ii<<".vtu";
+    sw<<ii<<".vtu";
     sur_file_out[ii] = ss.str();
     sur_file_out_write[ii] = sw.str();
   }
@@ -99,15 +99,13 @@ int main( int argc, char * argv[] )
   // Check the files are on the disk  
   SYS_T::file_check(geo_file);
   
-  /*
   SYS_T::file_check(sur_file_in);
   SYS_T::file_check(sur_file_wall);
  
   for( unsigned int ii=0; ii<sur_file_out.size(); ++ii )
     SYS_T::file_check(sur_file_out[ii]);
-  */
 
-  std::cout<<"Status: All vtu/vtp files are found.\n";
+  std::cout<<"Status: All vtu files are found.\n";
 
   // Update the volumetric mesh file
   int nstart, estart;
@@ -117,21 +115,19 @@ int main( int argc, char * argv[] )
   
   std::cout<<"Status: "<<geo_file<< " updated, the starting node index "<<nstart<<" and the starting element index "<<estart<<" are corrected to 0.\n";
 
-  /*
   // Now use the nstart and estart to correct the vtp files  
-  SV_T::update_sv_vtp( sur_file_in, inl_out_name, nstart, estart );
+  SV_T::update_sv_sur_vtu( sur_file_in, inl_out_name, nstart, estart );
   std::cout<<"Status: inflow wall mesh is updated. \n";
 
-  SV_T::update_sv_vtp( sur_file_wall, wal_out_name, nstart, estart );
+  SV_T::update_sv_sur_vtu( sur_file_wall, wal_out_name, nstart, estart );
   std::cout<<"Stauts: wall mesh is updated. \n";
 
   for( int ii=0; ii<num_outlet; ++ii )
-    SV_T::update_sv_vtp( sur_file_out[ii], sur_file_out_write[ii], nstart, estart );
+    SV_T::update_sv_sur_vtu( sur_file_out[ii], sur_file_out_write[ii], nstart, estart );
   
   std::cout<<"Status: outflow meshes are updated.\n";
 
   std::cout<<"Conversion is complete.\n";
-  */
 
   PetscFinalize();
   return EXIT_SUCCESS;

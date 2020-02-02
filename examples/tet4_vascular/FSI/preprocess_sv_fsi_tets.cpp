@@ -302,7 +302,6 @@ int main( int argc, char * argv[] )
   // ----------------------------------------------------------------
 
   const bool isPrintPartInfo = true;
-  const int proc_size = cpu_size;
 
   std::vector<int> list_nlocalnode, list_nghostnode, list_ntotalnode, list_nbadnode;
   std::vector<double> list_ratio_g2l;
@@ -311,14 +310,14 @@ int main( int argc, char * argv[] )
 
   SYS_T::Timer * mytimer = new SYS_T::Timer();
 
-  for(int proc_rank = 0; proc_rank < proc_size; ++proc_rank)
+  for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
   {
     mytimer->Reset();
     mytimer->Start();
 
     IPart * part = new Part_Tet4_FSI( mesh, global_part, mnindex, IEN,
         ctrlPts, phy_tag, node_f, node_s, 
-        proc_rank, proc_size, dofNum, dofMat, elemType, isPrintPartInfo );
+        proc_rank, cpu_size, dofNum, dofMat, elemType, isPrintPartInfo );
 
     mytimer -> Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
