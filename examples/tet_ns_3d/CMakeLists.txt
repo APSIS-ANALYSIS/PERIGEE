@@ -94,11 +94,4 @@ ADD_EXECUTABLE( preprocess3d preprocess_sv_tets.cpp)
 
 TARGET_LINK_LIBRARIES( preprocess3d ${EXTRA_LINK_LIBS} perigee_preprocess )
 
-ADD_EXECUTABLE( testtet test_tet_t.cpp)
-
-TARGET_LINK_LIBRARIES( testtet ${EXTRA_LINK_LIBS} perigee_preprocess )
-
-ADD_EXECUTABLE( testtetsurface test_tet_t_vtp.cpp)
-
-TARGET_LINK_LIBRARIES( testtetsurface ${EXTRA_LINK_LIBS} perigee_preprocess )
-
+# EOF
