@@ -1,5 +1,10 @@
 // ==================================================================
 // preprocess_sv_tets.cpp
+//
+// This is a preprocessor code for handling Navier-Stokes equations 
+// discretized by tetradedral elements.
+//
+// Date Created: Jan 01 2020
 // ==================================================================
 #include "Math_Tools.hpp"
 #include "Mesh_Tet4.hpp"
@@ -65,8 +70,11 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionString("-sur_file_wall", sur_file_wall);
   SYS_T::GetOptionString("-sur_file_out_base", sur_file_out_base);
 
+  if( elemType != 501 && elemType !=502 ) SYS_T::print_fatal("Error: unknown element type.\n");
+
   // Print the command line arguments
   std::cout<<"==== Command Line Arguments ===="<<std::endl;
+  std::cout<<" -elem_type: "<<elemType<<std::endl;
   std::cout<<" -num_outlet: "<<num_outlet<<std::endl;
   std::cout<<" -geo_file: "<<geo_file<<std::endl;
   std::cout<<" -sur_file_in: "<<sur_file_in<<std::endl;
@@ -79,18 +87,22 @@ int main( int argc, char * argv[] )
   std::cout<<"---- Problem definition ----\n";
   std::cout<<" dofNum: "<<dofNum<<std::endl;
   std::cout<<" dofMat: "<<dofMat<<std::endl;
-  std::cout<<" elemType: "<<elemType<<std::endl;
   std::cout<<"====  Command Line Arguments/ ===="<<std::endl;
 
   // Check if the vtu geometry files exist on disk
-  //SYS_T::file_check(geo_file);
-  //std::cout<<geo_file<<" found. \n";
+  SYS_T::file_check(geo_file); std::cout<<geo_file<<" found. \n";
 
-  //SYS_T::file_check(sur_file_in);
-  //std::cout<<sur_file_in<<" found. \n";
+  if(elemType == 502)
+  {
+    sur_file_in.erase( sur_file_in.end()-4, sur_file_in.end() );
+    sur_file_in += ".vtu";
+    sur_file_wall.erase( sur_file_wall.end()-4, sur_file_wall.end() );
+    sur_file_wall += ".vtu";
+  }
 
-  //SYS_T::file_check(sur_file_wall);
-  //std::cout<<sur_file_wall<<" found. \n";
+  SYS_T::file_check(sur_file_in); std::cout<<sur_file_in<<" found. \n";
+
+  SYS_T::file_check(sur_file_wall); std::cout<<sur_file_wall<<" found. \n";
 
   // Generate the outlet file names and check existance
   sur_file_out.resize( num_outlet );
@@ -102,10 +114,13 @@ int main( int argc, char * argv[] )
     if( ii/10 == 0 ) ss<<"00";
     else if( ii/100 == 0 ) ss<<"0";
 
-    ss<<ii<<".vtp";
+    if(elemType == 501 ) ss<<ii<<".vtp";
+    else ss<<ii<<".vtu";
+      
     sur_file_out[ii] = ss.str(); // generate the outlet face file name
-    //SYS_T::file_check(sur_file_out[ii]);
-    //std::cout<<sur_file_out[ii]<<" found. \n";
+    
+    SYS_T::file_check(sur_file_out[ii]);
+    std::cout<<sur_file_out[ii]<<" found. \n";
   }
 
   // Record the problem setting into a HDF5 file: preprocessor_cmd.h5
@@ -144,15 +159,13 @@ int main( int argc, char * argv[] )
     IEN = new IEN_Tetra_P1(nElem, vecIEN);
     mesh = new Mesh_Tet4(nFunc, nElem);
   }
-  else if(elemType == 502) 
+  else
   {
     SYS_T::print_fatal_if(vecIEN.size() / nElem != 10, "Error: the mesh connectivity array size does not match with the element type 502. \n");
     
     IEN = new IEN_Tetra_P2(nElem, vecIEN);
     mesh = new Mesh_Tet10(nFunc, nElem);
   }
-  else 
-    SYS_T::print_fatal("Error: unknown element type.\n");
 
   VEC_T::clean( vecIEN );
   
