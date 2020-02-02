@@ -66,7 +66,9 @@ int main( int argc, char * argv[] )
   const bool isDualGraph = true;
 
   PetscMPIInt size;
+
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+
   MPI_Comm_size(PETSC_COMM_WORLD, &size);
 
   if(size != 1) SYS_T::print_fatal("ERROR: preprocessor is a serial program! \n");
