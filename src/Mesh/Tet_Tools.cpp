@@ -1918,7 +1918,7 @@ void TET_T::tetmesh_check(const std::vector<double> &cpts,
     const IIEN * const &ienptr, const int &nelem,
     const double &crit_aspect_ratio )
 {
-  std::cout<<"\n======= Tet4 mesh quality =======\n";
+  std::cout<<"\n======= Tet mesh quality =======\n";
   TET_T::Tet4 * teton = new TET_T::Tet4();
   teton -> reset( cpts, ienptr, 0 );
   double teton_max_vol = teton -> get_volume();
@@ -1927,7 +1927,7 @@ void TET_T::tetmesh_check(const std::vector<double> &cpts,
   double teton_min_h = teton_max_h;
   int num_dist_elem = 0; // number of element that has negative volume
   int num_aspt_elem = 0; // number of element that has aspect ratio larger
-  // than the given critical aspect ratio value
+                         // than the given critical aspect ratio value
   for(int ee = 0; ee<nelem; ++ee)
   {
     teton->reset( cpts, ienptr, ee );

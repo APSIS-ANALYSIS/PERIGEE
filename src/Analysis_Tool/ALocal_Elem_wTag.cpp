@@ -34,5 +34,4 @@ void ALocal_Elem_wTag::print_info() const
   std::cout<<std::endl;
 }
 
-
 // EOF

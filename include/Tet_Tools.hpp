@@ -441,8 +441,6 @@ namespace TET_T
   //    nelem: total number of element
   //    crit_aspect_ratio: the element above this value will be counted.
   // ================================================================
-  
-  // to be modified
   void tetmesh_check(const std::vector<double> &cpts,
       const IIEN * const &ienptr, const int &nelem,
       const double &crit_aspect_ratio = 3.5 );
