@@ -23,7 +23,7 @@
 
 int main( int argc, char * argv[] )
 {
-  // Clean the potentially pre-existing hdf5 files in the folder
+  // Clean the potentially pre-existing hdf5 files in the job folder
   int sysret = system("rm -rf part_p*.h5");
   SYS_T::print_fatal_if(sysret != 0, "Error: system call failed. \n");
   sysret = system("rm -rf preprocessor_cmd.h5");
@@ -31,23 +31,22 @@ int main( int argc, char * argv[] )
   sysret = system("rm -rf NumLocalNode.h5");
   SYS_T::print_fatal_if(sysret != 0, "Error: system call failed. \n");
 
-  // Define basic settins
+  // Define basic problem settins
   const int dofNum = 4; // degree-of-freedom for the physical problem
   const int dofMat = 4; // degree-of-freedom in the matrix problem
   const std::string part_file("part");
   
-  // Two options: 501 linear tets, 502 quadratic tets
+  // Element options: 501 linear tets, 502 quadratic tets
   int elemType = 501;
   int num_outlet = 1;
   
-  // Default names for input files
+  // Default names for input geometry files
   std::string geo_file("./whole_vol.vtu");
   std::string sur_file_in("./inflow_vol.vtp");
   std::string sur_file_wall("./wall_vol.vtp");
   std::string sur_file_out_base("./outflow_vol_");
 
-  std::vector< std::string > sur_file_out;
-
+  // Mesh partition setting
   int cpu_size = 1;
   int in_ncommon = 2;
   bool isDualGraph = true;
@@ -92,6 +91,7 @@ int main( int argc, char * argv[] )
   // Check if the vtu geometry files exist on disk
   SYS_T::file_check(geo_file); std::cout<<geo_file<<" found. \n";
 
+  // If it is quadratic mesh, the mesh file will be all in vtu format
   if(elemType == 502)
   {
     sur_file_in.erase( sur_file_in.end()-4, sur_file_in.end() );
@@ -105,6 +105,7 @@ int main( int argc, char * argv[] )
   SYS_T::file_check(sur_file_wall); std::cout<<sur_file_wall<<" found. \n";
 
   // Generate the outlet file names and check existance
+  std::vector< std::string > sur_file_out;
   sur_file_out.resize( num_outlet );
 
   for(int ii=0; ii<num_outlet; ++ii)
@@ -171,8 +172,8 @@ int main( int argc, char * argv[] )
   
   mesh -> print_mesh_info();
   
-  // Call METIS to partition the grid
-  IGlobal_Part * global_part;
+  // Call METIS to partition the mesh 
+  IGlobal_Part * global_part = nullptr;
   if(cpu_size > 1)
     global_part = new Global_Part_METIS( cpu_size, in_ncommon,
         isDualGraph, mesh, IEN, "epart", "npart" );
@@ -184,8 +185,22 @@ int main( int argc, char * argv[] )
     exit(EXIT_FAILURE);
   }
 
+  // Generate the new nodal numbering
   Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, mesh->get_nFunc());
   mnindex->write_hdf5("node_mapping");
+
+  // Setup Nodal Boundary Conditions
+  std::vector<INodalBC *> NBC_list;
+  NBC_list.clear(); NBC_list.resize( dofMat );
+
+  std::vector<std::string> dir_list;
+  dir_list.push_back( sur_file_in );
+  dir_list.push_back( sur_file_wall );
+
+
+
+
+
 
   // Finalize the code and exit
   delete mnindex; delete global_part; delete mesh; delete IEN;
