@@ -32,7 +32,8 @@ class NodalBC_3D_inflow : public INodalBC
     NodalBC_3D_inflow( const std::string &inffile,
         const std::string &wallfile,
         const int &nFunc,
-        const std::vector<double> &in_outnormal );
+        const std::vector<double> &in_outnormal,
+        const int &elemtype = 501 );
 
     virtual ~NodalBC_3D_inflow() {};
 

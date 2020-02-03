@@ -26,7 +26,8 @@ NodalBC_3D_inflow::NodalBC_3D_inflow(const int &nFunc)
 
 NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
     const std::string &wallfile, const int &nFunc,
-    const std::vector<double> &in_outnormal )
+    const std::vector<double> &in_outnormal,
+    const int &elemtype )
 {
   SYS_T::file_check(inffile);
   SYS_T::file_check(wallfile);
@@ -154,7 +155,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   }
   delete [] temp_sol;
 
-  // assign outward normal vector
+  // assign outward normal vector from the input
   outnormal = in_outnormal;
 
   // Finish and print info on screen
