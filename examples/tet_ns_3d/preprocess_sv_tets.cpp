@@ -213,8 +213,6 @@ int main( int argc, char * argv[] )
     NBC_list[3] = new NodalBC_3D_vtu( dir_list, nFunc );
   }
 
-  NBC_list[0] -> print_info();
-
   // Inflow BC info
   std::vector<double> inflow_outward_vec;
   TET_T::get_out_normal( sur_file_in, ctrlPts, IEN, inflow_outward_vec );

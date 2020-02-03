@@ -8,8 +8,7 @@
 //
 // For Inflow boundary conditions, 1. there is no periodic type
 // boundary condition; 2. the node that belong to the wall should be
-// removed from the node list. This will ease the implementation of
-// unsteady flow problems.
+// removed from the node list.
 //
 // Author: Ju Liu
 // Date: Aug. 6 2017
@@ -22,8 +21,14 @@
 class NodalBC_3D_inflow : public INodalBC
 {
   public:
+    // --------------------------------------------------------------
+    // Generate an empty inflow type boundary condition class
+    // --------------------------------------------------------------
     NodalBC_3D_inflow(const int &nFunc);
     
+    // --------------------------------------------------------------
+    // Generate the inflow bc given by the inffile.
+    // --------------------------------------------------------------
     NodalBC_3D_inflow( const std::string &inffile,
         const std::string &wallfile,
         const int &nFunc,
@@ -50,7 +55,7 @@ class NodalBC_3D_inflow : public INodalBC
   private:
     NodalBC_3D_inflow() {};
     
-    // This is the area calculated by setting the boundary nodes to be zero.
+    // This is the area calculated by setting the wall nodes to be zero.
     // It is designed to compute the area to give a plug flow profile with
     // a prescribed flow rate.
     double inf_active_area;

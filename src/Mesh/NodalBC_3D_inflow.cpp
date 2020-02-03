@@ -36,27 +36,43 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   per_master_nodes.clear();
   num_per_nodes = 0;
 
+  // 2. Analyze the file type and read in the data
+  // Read the files
   int numpts, numcels;
   std::vector<double> pts;
   std::vector<int> ien, gnode, gelem;
-
-  TET_T::read_vtp_grid( inffile, numpts, numcels, pts, ien, gnode, gelem );
 
   int wall_numpts, wall_numcels;
   std::vector<double> wall_pts;
   std::vector<int> wall_ien, wall_gnode, wall_gelem;
 
-  TET_T::read_vtp_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
-      wall_ien, wall_gnode, wall_gelem );
+  std::string fend; fend.assign( inffile.end()-4 , inffile.end() );
+ 
+  if( fend.compare(".vtp") == 0 )
+  { 
+    TET_T::read_vtp_grid( inffile, numpts, numcels, pts, ien, gnode, gelem );
 
-  // Generate the dir-node list
+    TET_T::read_vtp_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
+        wall_ien, wall_gnode, wall_gelem );
+  }
+  else if( fend.compare(".vtu") == 0 )
+  {
+    TET_T::read_vtu_grid( inffile, numpts, numcels, pts, ien, gnode, gelem );
+
+    TET_T::read_vtu_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
+        wall_ien, wall_gnode, wall_gelem );
+  }
+  else
+    SYS_T::print_fatal("Error: get_out_normal unknown file type.\n");
+
+  // Generate the dir-node list. The nodes belonging to the wall are excluded.
   dir_nodes.clear();
   for(unsigned int ii=0; ii<gnode.size(); ++ii)
   {
-    SYS_T::print_fatal_if(gnode[ii]<0,
+    SYS_T::print_fatal_if( gnode[ii]<0,
         "Error: there are negative nodal index! \n");
 
-    if( !VEC_T::is_invec(wall_gnode, gnode[ii]) )
+    if( !VEC_T::is_invec( wall_gnode, gnode[ii]) )
       dir_nodes.push_back( gnode[ii] );
   }
 
@@ -77,21 +93,23 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   centroid[1] = centroid[1] / (double) numpts;
   centroid[2] = centroid[2] / (double) numpts;
 
-  // Calculate the active area of the inflow surface
-  QuadPts_Gauss_Triangle quad(3);
-  FEAElement_Triangle3_3D_der0 ele(3);
-
+  // Collect the nodes that belong to the wall, and setup a vector that
+  // is 1 on the interior nodes and 0 on the wall bc nodes.
   outline_pts.clear();
   num_out_bc_pts = 0;
   double * temp_sol = new double [numpts];  
   for(int ii=0; ii<numpts; ++ii)
   {
-    // If the node is not in the wall
-    if( !VEC_T::is_invec(wall_gnode, gnode[ii]) ) temp_sol[ii] = 1.0;
+    // If the node is not in the wall, it is an interior node and set
+    // the vector to be 1.
+    if( !VEC_T::is_invec(wall_gnode, gnode[ii]) ) 
+      temp_sol[ii] = 1.0;
     else 
     {
+      // otherwise, the node is on the wall surface, set the vector to
+      // be 0.
       temp_sol[ii] = 0.0;
-      // Also store the points into outline points
+      // Also store the point's coordinates into outline points
       num_out_bc_pts += 1;
       outline_pts.push_back( pts[3*ii+0] );
       outline_pts.push_back( pts[3*ii+1] );
@@ -104,11 +122,15 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
 
   double eptx[3]; double epty[3]; double eptz[3]; double R[3];
   double nx, ny, nz, ele_surface_area;
+  
+  QuadPts_Gauss_Triangle quad(3); // quadrature rule
+  FEAElement_Triangle3_3D_der0 ele(3); // element
+
   for(int ee=0; ee<numcels; ++ee)
   {
     for(int ii=0; ii<3; ++ii)
     {
-      int nodidx = ien[3*ee+ii];
+      const int nodidx = ien[3*ee+ii];
       eptx[ii] = pts[ 3*nodidx ];
       epty[ii] = pts[ 3*nodidx+1 ];
       eptz[ii] = pts[ 3*nodidx+2 ];
@@ -125,7 +147,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
       {
         inf_active_area += ele_surface_area * quad.get_qw(qua) 
           * R[ii] * temp_sol[ ien[3*ee+ii] ];
-        
+
         face_area += ele_surface_area * quad.get_qw(qua) * R[ii];
       }
     }
