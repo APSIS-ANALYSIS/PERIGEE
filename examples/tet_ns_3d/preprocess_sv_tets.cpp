@@ -15,6 +15,7 @@
 #include "Global_Part_Serial.hpp"
 #include "Part_Tet4.hpp"
 #include "NodalBC_3D_vtp.hpp"
+#include "NodalBC_3D_vtu.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_tet4_outflow.hpp"
 #include "NBC_Partition_3D.hpp"
@@ -197,12 +198,36 @@ int main( int argc, char * argv[] )
   dir_list.push_back( sur_file_in );
   dir_list.push_back( sur_file_wall );
 
+  if(elemType == 501)
+  {
+    NBC_list[0] = new NodalBC_3D_vtp( nFunc );
+    NBC_list[1] = new NodalBC_3D_vtp( dir_list, nFunc );
+    NBC_list[2] = new NodalBC_3D_vtp( dir_list, nFunc );
+    NBC_list[3] = new NodalBC_3D_vtp( dir_list, nFunc );
+  }
+  else
+  {
+    NBC_list[0] = new NodalBC_3D_vtu( nFunc );
+    NBC_list[1] = new NodalBC_3D_vtu( dir_list, nFunc );
+    NBC_list[2] = new NodalBC_3D_vtu( dir_list, nFunc );
+    NBC_list[3] = new NodalBC_3D_vtu( dir_list, nFunc );
+  }
 
+  NBC_list[0] -> print_info();
 
-
+  // Inflow BC info
+  std::vector<double> inflow_outward_vec;
+  TET_T::get_out_normal( sur_file_in, ctrlPts, IEN, inflow_outward_vec );
+  //INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall,
+  //    nFunc, inflow_outward_vec );
 
 
   // Finalize the code and exit
+  //delete InFBC;
+
+  for(auto it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc)
+    delete *it_nbc;
+
   delete mnindex; delete global_part; delete mesh; delete IEN;
   PetscFinalize();
   return EXIT_SUCCESS;

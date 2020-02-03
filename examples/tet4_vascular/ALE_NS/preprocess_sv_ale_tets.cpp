@@ -190,7 +190,7 @@ int main( int argc, char * argv[] )
   NBC_list[2] = new NodalBC_3D_vtp( dir_list, nFunc );
   NBC_list[3] = new NodalBC_3D_vtp( dir_list, nFunc );
 
-  // Generate the BC for the ALE mesh motion
+  // Generate the nodal BC for the ALE mesh motion
   std::vector<INodalBC *> meshBC_list;
   meshBC_list.clear();
   meshBC_list.resize( 3 );
@@ -213,7 +213,7 @@ int main( int argc, char * argv[] )
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall, 
       nFunc, inflow_outward_vec );
 
-  // Elemental BC
+  // Elemental boundary conditions
   std::vector< std::vector<double> > outflow_outward_vec;
   outflow_outward_vec.resize( sur_file_out.size() );
   for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
