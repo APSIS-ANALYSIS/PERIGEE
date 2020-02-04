@@ -1,5 +1,5 @@
 # PERIGEE
-PERIGEE is a nonlinear dynamic finite element and isogeometric analysis code for multiphysics problems. The code has been under development since 2012 with the goal of providing a single C++ framework for parallel implementation of different physics problems using different element technologies.
+PERIGEE is a nonlinear dynamic finite element and isogeometric analysis code for multiphysics problems. The code has been developed with the goal of providing a single C++ framework for parallel implementation of different physics problems using different element technologies.
 
 ## Table of Contents
 
