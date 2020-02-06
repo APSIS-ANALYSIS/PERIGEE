@@ -320,7 +320,6 @@ namespace TET_T
   //          \para vol_ien, the volume mesh IEN array
   //   Output: outVec, the normal vector
   // ----------------------------------------------------------------
-  // THIS ROUTINE NEEDS TO BE TESTED FOR QUAD TET MESH WITH VTU INPUT!!
   void get_out_normal( const std::string &file,
       const std::vector<double> &vol_ctrlPts,
       const IIEN * const &vol_ien,

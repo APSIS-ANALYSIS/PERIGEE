@@ -1404,7 +1404,7 @@ void TET_T::get_out_normal( const std::string &file,
   trn[1] = gnode[ ien[1] ];
   trn[2] = gnode[ ien[2] ];
 
-  int tete0 = gelem[0]; // triangle's associated tet element indices
+  const int tete0 = gelem[0]; // triangle's associated tet element indices
 
   SYS_T::print_fatal_if(tete0 == -1, "Error: TET_T::get_out_normal requires the element indices for the vtp file.\n");
 
