@@ -19,6 +19,37 @@ class ElemBC_3D_tet : public ElemBC
 
     virtual ~ElemBC_3D_tet();
 
+    virtual int get_num_ebc() const {return num_ebc;}
+
+    virtual int get_num_node(const int &ebc_id) const
+    {return num_node[ebc_id];}
+
+    virtual int get_num_cell(const int &ebc_id) const
+    {return num_cell[ebc_id];}
+
+    virtual int get_cell_nLocBas(const int &ebc_id) const
+    {return cell_nLocBas[ebc_id];}
+
+    virtual double get_pt_xyz(const int &ebc_id, const int &node,
+        const int &dir) const
+    {return pt_xyz[ebc_id][3*node+dir];}
+
+    virtual int get_ien(const int &ebc_id, const int &cell,
+        const int &lnode) const
+    {return tri_ien[ebc_id][ cell_nLocBas[ebc_id] * cell + lnode ];}
+
+    virtual int get_global_node(const int &ebc_id, const int &node_index) const
+    {return global_node[ebc_id][node_index];}
+
+    virtual void get_global_node(const int &ebc_id, std::vector<int> &out) const
+    {out = global_node[ebc_id];}
+
+    virtual int get_global_cell(const int &ebc_id, const int &cell_index) const
+    {return global_cell[ebc_id][cell_index];}
+
+    virtual void print_info() const;
+
+
   protected:
     ElemBC_3D_tet() {}; // Disallow default constructor
     

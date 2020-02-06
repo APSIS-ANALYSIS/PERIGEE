@@ -46,4 +46,27 @@ ElemBC_3D_tet::~ElemBC_3D_tet()
   delete [] cell_nLocBas; cell_nLocBas = nullptr;
 }
 
+
+void ElemBC_3D_tet::print_info() const
+{
+  std::cout<<"========================= \n";
+  std::cout<<"ElemBC_3D_tet : ";
+  std::cout<<" num_ebc = "<<num_ebc<<std::endl;
+  for(int ii=0; ii<num_ebc; ++ii)
+  {
+    std::cout<<"== ebc_id = "<<ii<<'\n';
+    std::cout<<" num_node = "<<num_node[ii]<<'\t';
+    std::cout<<" num_cell = "<<num_cell[ii]<<'\t';
+    std::cout<<" cell_nLocBas = "<<cell_nLocBas[ii]<<'\n';
+    std::cout<<" global node : ";
+    VEC_T::print(global_node[ii]);
+    std::cout<<" global elem : ";
+    VEC_T::print(global_cell[ii]);
+    std::cout<<" surface IEN : ";
+    VEC_T::print(tri_ien[ii]);
+  }
+  std::cout<<"========================= \n";
+}
+
+
 // EOF
