@@ -225,6 +225,14 @@ int main( int argc, char * argv[] )
   VEC_T::print(temp);
   // end of debugging
 
+  // Setup Elemental Boundary Conditions
+  std::vector< std::vector<double> > outflow_outward_vec;
+  outflow_outward_vec.resize( sur_file_out.size() );
+  for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
+    TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN, outflow_outward_vec[ii] );
+
+
+
   // Finalize the code and exit
   delete InFBC;
 
