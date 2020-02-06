@@ -144,6 +144,13 @@ class INodalBC
       return 0.0;
     }
 
+    // --------------------------------------------------------------
+    // get_intNA returns the basis N_A integral on surface
+    // --------------------------------------------------------------
+    virtual void get_intNA( std::vector<double> &fintNA ) const
+    {SYS_T::commPrint("Warning: get_intNA is not implemented. \n");}
+
+
   protected:
     std::vector<unsigned int> dir_nodes;
     unsigned int num_dir_nodes;

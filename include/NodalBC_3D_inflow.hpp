@@ -54,6 +54,10 @@ class NodalBC_3D_inflow : public INodalBC
     // Access to the face area
     virtual double get_para_6() const {return face_area;}
 
+    // Access to the integral of NA
+    virtual void get_intNA( std::vector<double> &fintNA ) const
+    { fintNA = intNA; }
+
   private:
     NodalBC_3D_inflow() {};
     

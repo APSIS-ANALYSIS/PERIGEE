@@ -216,12 +216,12 @@ int main( int argc, char * argv[] )
   // Inflow BC info
   std::vector<double> inflow_outward_vec;
   TET_T::get_out_normal( sur_file_in, ctrlPts, IEN, inflow_outward_vec );
-  //INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall,
-  //    nFunc, inflow_outward_vec );
+  INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall,
+      nFunc, inflow_outward_vec );
 
 
   // Finalize the code and exit
-  //delete InFBC;
+  delete InFBC;
 
   for(auto it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc)
     delete *it_nbc;

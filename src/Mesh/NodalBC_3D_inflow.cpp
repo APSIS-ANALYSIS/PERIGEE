@@ -185,7 +185,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
         for(int ii=0; ii<6; ++ii)
         {
           inf_active_area += jac * quad.get_qw(qua) 
-            * R[ii] * temp_sol[ ien[3*ee+ii] ];
+            * R[ii] * temp_sol[ ien[6*ee+ii] ];
 
           face_area += jac * quad.get_qw(qua) * R[ii];
         }
