@@ -69,4 +69,83 @@ void ElemBC_3D_tet::print_info() const
 }
 
 
+void ElemBC_3D_tet::resetTriIEN_outwardnormal( const IIEN * const &VIEN )
+{
+  for(int etype = 0; etype < num_ebc; ++etype)
+  {
+    int e_num_cell = num_cell[etype];
+    std::vector<int> node_t(3, 0);
+    // the cell's first three nodes' volumetric indices
+    std::vector<int> node_t_gi(3, 0);
+    
+    int cell_gi; // this cell's global index
+
+    std::vector<int> tet_n(4,0);
+
+    TET_T::Tet4 * tetcell = new TET_T::Tet4();
+
+    for(int ee=0; ee<e_num_cell; ++ee)
+    {
+      node_t[0] = get_ien(etype, ee, 0);
+      node_t[1] = get_ien(etype, ee, 1);
+      node_t[2] = get_ien(etype, ee, 2);
+
+      node_t_gi[0] = get_global_node(etype, node_t[0]);
+      node_t_gi[1] = get_global_node(etype, node_t[1]);
+      node_t_gi[2] = get_global_node(etype, node_t[2]);
+      
+      cell_gi = get_global_cell(etype, ee);
+
+      tet_n[0] = VIEN->get_IEN(cell_gi, 0);
+      tet_n[1] = VIEN->get_IEN(cell_gi, 1);
+      tet_n[2] = VIEN->get_IEN(cell_gi, 2);
+      tet_n[3] = VIEN->get_IEN(cell_gi, 3);
+
+      tetcell->reset(tet_n[0], tet_n[1], tet_n[2], tet_n[3]);
+      
+      int tet_face_id = tetcell->get_face_id(node_t_gi[0], 
+          node_t_gi[1], node_t_gi[2]);
+
+      int pos0 = -1, pos1 = -1, pos2 = -1;
+      switch( tet_face_id )
+      {
+        case 0:
+          pos0 = VEC_T::get_pos(node_t_gi, tet_n[1]);
+          pos1 = VEC_T::get_pos(node_t_gi, tet_n[2]);
+          pos2 = VEC_T::get_pos(node_t_gi, tet_n[3]);
+          break;
+        case 1:
+          pos0 = VEC_T::get_pos(node_t_gi, tet_n[0]);
+          pos1 = VEC_T::get_pos(node_t_gi, tet_n[3]);
+          pos2 = VEC_T::get_pos(node_t_gi, tet_n[2]);
+          break;
+        case 2:
+          pos0 = VEC_T::get_pos(node_t_gi, tet_n[0]);
+          pos1 = VEC_T::get_pos(node_t_gi, tet_n[1]);
+          pos2 = VEC_T::get_pos(node_t_gi, tet_n[3]);
+          break;
+        case 3:
+          pos0 = VEC_T::get_pos(node_t_gi, tet_n[0]);
+          pos1 = VEC_T::get_pos(node_t_gi, tet_n[2]);
+          pos2 = VEC_T::get_pos(node_t_gi, tet_n[1]);
+          break;
+        default:
+          SYS_T::print_fatal("Error: resetTriIEN_outwardnormal : tet_face_id is out of range. \n");
+          break;
+      }
+      assert(pos0 >=0 && pos0 <=2);
+      assert(pos1 >=0 && pos1 <=2);
+      assert(pos2 >=0 && pos2 <=2); 
+
+      // Now we have got the corrected ordering of node_t, put them back into
+      // tri_ien.
+      tri_ien[etype][3*ee+0] = node_t[pos0];
+      tri_ien[etype][3*ee+1] = node_t[pos1];
+      tri_ien[etype][3*ee+2] = node_t[pos2];
+    }
+    delete tetcell; 
+  }
+}
+
+
 // EOF

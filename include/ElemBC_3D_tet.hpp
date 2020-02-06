@@ -49,6 +49,7 @@ class ElemBC_3D_tet : public ElemBC
 
     virtual void print_info() const;
 
+    virtual void resetTriIEN_outwardnormal( const IIEN * const &VIEN );
 
   protected:
     ElemBC_3D_tet() {}; // Disallow default constructor
