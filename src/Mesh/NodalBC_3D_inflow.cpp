@@ -19,6 +19,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow(const int &nFunc)
 
   num_out_bc_pts = 0;
   VEC_T::clean(outline_pts);
+  VEC_T::clean(intNA);
 
   std::cout<<"===> NodalBC_3D_inflow::empty is generated. \n";
 }
@@ -157,6 +158,31 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
 
   // assign outward normal vector from the input
   outnormal = in_outnormal;
+
+  // Perform surface integral
+  intNA.resize( gnode.size() );
+ 
+  IQuadPts * quads = nullptr;
+  FEAElement * elems = nullptr;
+   
+  if( elemtype == 501 )
+  {
+    quads = new QuadPts_Gauss_Triangle( 3 );
+    elems = new FEAElement_Triangle3_3D_der0( 3 );
+  }
+  else if(elemtype == 502 )
+  {
+    quads = new QuadPts_Gauss_Triangle( 6 );
+    elems = new FEAElement_Triangle6_3D_der0( 6 );
+  }
+  else SYS_T::print_fatal("Error: unknown element type.\n");
+
+
+
+
+  if(quads != nullptr) delete quads;
+
+  if(elems != nullptr) delete elems;
 
   // Finish and print info on screen
   std::cout<<"===> NodalBC_3D_inflow specified by "<<inffile

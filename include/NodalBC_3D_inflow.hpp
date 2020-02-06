@@ -17,6 +17,7 @@
 #include "Tet_Tools.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "FEAElement_Triangle3_3D_der0.hpp"
+#include "FEAElement_Triangle6_3D_der0.hpp"
 
 class NodalBC_3D_inflow : public INodalBC
 {
@@ -77,6 +78,12 @@ class NodalBC_3D_inflow : public INodalBC
 
     // x-y-z coordinates of the outline points. length is 3 x num_out_bc_pts
     std::vector<double> outline_pts;
+
+    // intNA with length equal the number of nodes on the inlet surface,
+    // which does NOT equal to num_dir_nodes in this class.
+    // It stores teh surface integral of each nodal basis function on
+    // the inlet surface.
+    std::vector<double> intNA;
 };
 
 #endif
