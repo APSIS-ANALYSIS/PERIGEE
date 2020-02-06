@@ -44,6 +44,11 @@ class FEAElement_Triangle6_3D_der0 : public FEAElement
 
     virtual void get_R( const int &quaindex, double * const &basis ) const;
 
+    // Assuming the triangle points has been organized so that the outward
+    // direction is given by dx_dr x dx_ds
+    virtual void get_2d_normal_out( const int &quaindex,
+        double &nx, double &ny, double &nz, double &len ) const;
+
     virtual void get_normal_out( const int &quaindex,
         const double &sur_pt_x, const double &sur_pt_y, const double &sur_pt_z,
         const double &intpt_x, const double &intpt_y, const double &intpt_z,

@@ -162,27 +162,81 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   // Perform surface integral
   intNA.resize( gnode.size() );
  
-  IQuadPts * quads = nullptr;
-  FEAElement * elems = nullptr;
-   
   if( elemtype == 501 )
   {
-    quads = new QuadPts_Gauss_Triangle( 3 );
-    elems = new FEAElement_Triangle3_3D_der0( 3 );
+    const int nqp_tri = 3; // number of quadrature points
+    IQuadPts * quads = new QuadPts_Gauss_Triangle( nqp_tri );
+    FEAElement * elems = new FEAElement_Triangle3_3D_der0( nqp_tri );
+    
+    double ectrl_x[3]; double ectrl_y[3]; double ectrl_z[3];
+    int node_idx[3]; double R[3];
+    double nx, ny, nz, jac;
+
+    // Calculate the surface integral of basis functions
+    for( int ee = 0; ee<numcels; ++ee )
+    {
+      for(int ii=0; ii<3; ++ii)
+      {
+        node_idx[ii] = ien[3*ee+ii];
+        ectrl_x[ii] = pts[3*node_idx[ii] + 0];
+        ectrl_y[ii] = pts[3*node_idx[ii] + 1];
+        ectrl_z[ii] = pts[3*node_idx[ii] + 2];
+      }
+
+      elems -> buildBasis(quads, ectrl_x, ectrl_y, ectrl_z);
+
+      for(int qua=0; qua<nqp_tri; ++qua)
+      {
+        elems -> get_R(qua, R);
+        elems -> get_2d_normal_out(qua, nx, ny, nz, jac);
+
+        const double gwts = jac * quads -> get_qw( qua );
+      
+        for(int ii=0; ii<3; ++ii) intNA[node_idx[ii]] += gwts * R[ii];
+      
+      } // loop over quadrature points
+    } // loop over linear triangle elements
+
+    delete quads; delete elems;
   }
   else if(elemtype == 502 )
   {
-    quads = new QuadPts_Gauss_Triangle( 6 );
-    elems = new FEAElement_Triangle6_3D_der0( 6 );
+    const int nqp_tri = 6; // number of quadrature points
+    IQuadPts * quads = new QuadPts_Gauss_Triangle( nqp_tri );
+    FEAElement * elems = new FEAElement_Triangle6_3D_der0( nqp_tri );
+    
+    double ectrl_x[6]; double ectrl_y[6]; double ectrl_z[6];
+    int node_idx[6]; double R[6];
+    double nx, ny, nz, jac; 
+    
+    // Calculate the surface integral for quadratic triangle element
+    for( int ee=0; ee<numcels; ++ee )
+    {
+      for(int ii=0; ii<6; ++ii)
+      {
+        node_idx[ii] = ien[6*ee+ii];
+        ectrl_x[ii] = pts[6*node_idx[ii] + 0];
+        ectrl_y[ii] = pts[6*node_idx[ii] + 1];
+        ectrl_z[ii] = pts[6*node_idx[ii] + 2];
+      }
+    
+      elems -> buildBasis(quads, ectrl_x, ectrl_y, ectrl_z);
+
+      for(int qua=0; qua<nqp_tri; ++qua)
+      {
+        elems -> get_R(qua, R);
+        elems -> get_2d_normal_out(qua, nx, ny, nz, jac);
+
+        const double gwts = jac * quads -> get_qw( qua );
+
+        for(int ii=0; ii<6; ++ii) intNA[node_idx[ii]] += gwts * R[ii];
+      
+      } // loop over quadrature points
+    } // loop over quadratic triangle elements
+
+    delete quads; delete elems;
   }
   else SYS_T::print_fatal("Error: unknown element type.\n");
-
-
-
-
-  if(quads != nullptr) delete quads;
-
-  if(elems != nullptr) delete elems;
 
   // Finish and print info on screen
   std::cout<<"===> NodalBC_3D_inflow specified by "<<inffile
