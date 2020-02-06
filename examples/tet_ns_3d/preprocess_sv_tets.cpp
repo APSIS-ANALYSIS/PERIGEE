@@ -217,8 +217,13 @@ int main( int argc, char * argv[] )
   std::vector<double> inflow_outward_vec;
   TET_T::get_out_normal( sur_file_in, ctrlPts, IEN, inflow_outward_vec );
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall,
-      nFunc, inflow_outward_vec );
+      nFunc, inflow_outward_vec, elemType );
 
+  // debugging
+  std::vector<double> temp;
+  InFBC -> get_intNA( temp );
+  VEC_T::print(temp);
+  // end of debugging
 
   // Finalize the code and exit
   delete InFBC;

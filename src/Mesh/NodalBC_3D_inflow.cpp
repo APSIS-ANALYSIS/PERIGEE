@@ -170,9 +170,9 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
       for(int ii=0; ii<6; ++ii)
       {
         const int nodidx = ien[6*ee+ii];
-        eptx[ii] = pts[ 6*nodidx ];
-        epty[ii] = pts[ 6*nodidx+1 ];
-        eptz[ii] = pts[ 6*nodidx+2 ];
+        eptx[ii] = pts[ 3*nodidx ];
+        epty[ii] = pts[ 3*nodidx+1 ];
+        eptz[ii] = pts[ 3*nodidx+2 ];
       }
 
       ele.buildBasis(&quad, eptx, epty, eptz);
@@ -200,7 +200,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   outnormal = in_outnormal;
 
   // Perform surface integral
-  intNA.resize( gnode.size() );
+  intNA.resize( numpts );
 
   if( elemtype == 501 )
   {
@@ -255,9 +255,9 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
       for(int ii=0; ii<6; ++ii)
       {
         node_idx[ii] = ien[6*ee+ii];
-        ectrl_x[ii] = pts[6*node_idx[ii] + 0];
-        ectrl_y[ii] = pts[6*node_idx[ii] + 1];
-        ectrl_z[ii] = pts[6*node_idx[ii] + 2];
+        ectrl_x[ii] = pts[3*node_idx[ii] + 0];
+        ectrl_y[ii] = pts[3*node_idx[ii] + 1];
+        ectrl_z[ii] = pts[3*node_idx[ii] + 2];
       }
 
       elems -> buildBasis(quads, ectrl_x, ectrl_y, ectrl_z);
