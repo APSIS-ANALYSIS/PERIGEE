@@ -14,12 +14,13 @@
 class ElemBC_3D_tet : public ElemBC
 {
   public:
-    ElemBC_3D_tet( const std::vector<std::string> &vtkfileList );
+    ElemBC_3D_tet( const std::vector<std::string> &vtkfileList,
+       const int &elemtype=501 );
 
     virtual ~ElemBC_3D_tet();
 
   protected:
-    ElemBC_3D_tet4() {}; // Disallow default constructor
+    ElemBC_3D_tet() {}; // Disallow default constructor
     
     int num_ebc;
     int * num_node;     // length num_ebc
