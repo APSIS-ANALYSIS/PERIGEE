@@ -51,7 +51,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Mesh_Tet4.cpp
   ${perigee_source}/Mesh/IPart.cpp
   ${perigee_source}/Mesh/Part_Tet.cpp
-  ${perigee_source}/Mesh/Part_Tet4_FSI.cpp
+  ${perigee_source}/Mesh/Part_Tet_FSI.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet4.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet4_outflow.cpp
   ${perigee_source}/Mesh/NodalBC_3D_vtp.cpp
@@ -59,6 +59,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/NodalBC_3D_inflow.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
   ${perigee_source}/Mesh/NBC_Partition_3D.cpp
   ${perigee_source}/Mesh/NBC_Partition_3D_inflow.cpp
   ${perigee_source}/Mesh/EBC_Partition_vtp.cpp
