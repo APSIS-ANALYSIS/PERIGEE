@@ -291,20 +291,20 @@ int main( int argc, char * argv[] )
 
   cout<<"\n===> Mesh Partition Quality: "<<endl;
   cout<<"The largest ghost / local node ratio is: ";
-  cout<<*std::max_element(&list_ratio_g2l[0], &list_ratio_g2l[cpu_size-1])<<endl;
+  cout<<*std::max_element(list_ratio_g2l.begin(), list_ratio_g2l.end())<<endl;
 
   cout<<"The smallest ghost / local node ratio is: ";
-  cout<<*std::min_element(&list_ratio_g2l[0], &list_ratio_g2l[cpu_size-1])<<endl;
+  cout<<*std::min_element(list_ratio_g2l.begin(), list_ratio_g2l.end())<<endl;
 
   cout<<"The summation of the number of ghost nodes is: "<<sum_nghostnode<<endl;
 
   cout<<"The maximum badnode number is: ";
-  cout<<*std::max_element(&list_nbadnode[0], &list_nbadnode[cpu_size-1])<<endl;
+  cout<<*std::max_element(list_nbadnode.begin(), list_nbadnode.end())<<endl;
 
-  const int maxpart_nlocalnode = *std::max_element(&list_nlocalnode[0],
-      &list_nlocalnode[cpu_size-1]);
-  const int minpart_nlocalnode = *std::min_element(&list_nlocalnode[0],
-      &list_nlocalnode[cpu_size-1]);
+  const int maxpart_nlocalnode = *std::max_element(list_nlocalnode.begin(),
+      list_nlocalnode.end());
+  const int minpart_nlocalnode = *std::min_element(list_nlocalnode.begin(),
+      list_nlocalnode.end());
 
   cout<<"The maximum and minimum local node numbers are ";
   cout<<maxpart_nlocalnode<<"\t";
