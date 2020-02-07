@@ -13,7 +13,7 @@
 #include "IEN_Tetra_P2.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
-#include "Part_Tet4.hpp"
+#include "Part_Tet.hpp"
 #include "NodalBC_3D_vtp.hpp"
 #include "NodalBC_3D_vtu.hpp"
 #include "NodalBC_3D_inflow.hpp"
@@ -228,19 +228,31 @@ int main( int argc, char * argv[] )
   ElemBC * ebc = new ElemBC_3D_tet_outflow( sur_file_out, outflow_outward_vec, elemType );
 
   ebc -> resetTriIEN_outwardnormal( IEN );
+  
+  const bool isPrintPartInfo = true;
 
-  // debug
-  std::vector<double> intNA;
+  std::vector<int> list_nlocalnode, list_nghostnode, list_ntotalnode, list_nbadnode;
+  std::vector<double> list_ratio_g2l;
 
-  std::cout<<"\n outlet 0 \n";
-  ebc -> get_intNA(0, intNA);
-  VEC_T::print(intNA);
+  int sum_nghostnode = 0; // total number of ghost nodes
 
-  std::cout<<"\n outlet 1 \n";
-  ebc -> get_intNA(1, intNA);
-  VEC_T::print(intNA);
+  SYS_T::Timer * mytimer = new SYS_T::Timer();
 
-  // end of debug
+  for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
+  {
+    mytimer->Reset();
+    mytimer->Start();
+    IPart * part = new Part_Tet( mesh, global_part, mnindex, IEN,
+        ctrlPts, proc_rank, cpu_size, dofNum, dofMat, elemType,
+        isPrintPartInfo );
+    mytimer->Stop();
+    cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
+
+    // write the part hdf5 file
+    part -> write( part_file.c_str() );
+
+    part -> print_part_loadbalance_edgecut();
+  }
 
 
   // Finalize the code and exit
