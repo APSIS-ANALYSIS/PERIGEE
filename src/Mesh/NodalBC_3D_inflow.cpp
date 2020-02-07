@@ -202,6 +202,9 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   // Perform surface integral
   intNA.resize( numpts );
 
+  // zero the container
+  for(int ii=0; ii<numpts; ++ii) intNA[ii] = 0.0;
+
   if( elemtype == 501 )
   {
     const int nqp_tri = 3; // number of quadrature points

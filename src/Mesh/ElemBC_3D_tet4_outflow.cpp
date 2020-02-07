@@ -87,7 +87,6 @@ void ElemBC_3D_tet4_outflow::print_info() const
     std::cout<<"Surface id : "<<face<<std::endl;
     VEC_T::print( intNA[face] );
   }
-
 }
 
 // EOF
