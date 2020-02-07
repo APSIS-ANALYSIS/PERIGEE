@@ -261,7 +261,19 @@ int main( int argc, char * argv[] )
     INBC_Partition * infpart = new NBC_Partition_3D_inflow(part, mnindex, InFBC);
     infpart->write_hdf5( part_file.c_str() );
     
-  
+    // Partition Elemental BC
+    IEBC_Partition * ebcpart = new EBC_Partition_vtp_outflow(part, mnindex, ebc, NBC_list);
+
+    ebcpart -> write_hdf5(part_file.c_str());
+
+    list_nlocalnode.push_back(part->get_nlocalnode());
+    list_nghostnode.push_back(part->get_nghostnode());
+    list_ntotalnode.push_back(part->get_ntotalnode());
+    list_nbadnode.push_back(part->get_nbadnode());
+    list_ratio_g2l.push_back((double)part->get_nghostnode()/(double) part->get_nlocalnode());
+
+    sum_nghostnode += part->get_nghostnode();
+    delete part; delete nbcpart; delete infpart; delete ebcpart; 
   }
 
 
