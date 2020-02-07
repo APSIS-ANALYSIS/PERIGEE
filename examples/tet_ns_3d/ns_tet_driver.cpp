@@ -27,6 +27,7 @@
 #include "Matrix_PETSc.hpp"
 #include "TimeMethod_GenAlpha.hpp"
 #include "PDNTimeStep.hpp"
+#include "PLocAssem_Tet_VMS_NS_GenAlpha.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -51,9 +52,6 @@ int main(int argc, char *argv[])
 
   // part file location
   std::string part_file("part");
-
-  // determine if the mesh moving
-  bool is_ale = true;
 
   // determine if we want to print solver info
   bool is_LS_info = false;
@@ -99,7 +97,6 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionString("-inflow_file", inflow_file);
   SYS_T::GetOptionString("-lpn_file", lpn_file);
   SYS_T::GetOptionString("-part_file", part_file);
-  SYS_T::GetOptionBool("-is_ale", is_ale);
   SYS_T::GetOptionBool("-is_ls_info", is_LS_info);
   SYS_T::GetOptionReal("-nl_rtol", nl_rtol);
   SYS_T::GetOptionReal("-nl_atol", nl_atol);
@@ -151,9 +148,6 @@ int main(int argc, char *argv[])
   }
   else PetscPrintf(PETSC_COMM_WORLD, "-is_restart: false \n");
 
-  if(is_ale) PetscPrintf(PETSC_COMM_WORLD, "-is_ale: true \n");
-  else PetscPrintf(PETSC_COMM_WORLD, "-is_ale: false \n");
-
   if(is_LS_info) PetscPrintf(PETSC_COMM_WORLD, "-is_ls_info: true \n");
   else PetscPrintf(PETSC_COMM_WORLD, "-is_ls_info: false \n");
 
@@ -192,7 +186,7 @@ int main(int argc, char *argv[])
 
   PetscPrintf(PETSC_COMM_WORLD,
       "===> %d processor(s) are assigned for FEM analysis. \n", size);
-
+  
   // ===== Inflow flow rate =====
   SYS_T::commPrint("===> Setup inflow flow rate. \n");
 
@@ -242,12 +236,19 @@ int main(int argc, char *argv[])
   // ===== Time step info =====
   PDNTimeStep * timeinfo = new PDNTimeStep(initial_index, initial_time, initial_step);
 
+  // ===== Local Assembly routine =====
+  IPLocAssem * locAssem_ptr = new PLocAssem_Tet_VMS_NS_GenAlpha(
+      tm_galpha_ptr, GMIptr->get_nLocBas(),
+      quadv->get_num_quadPts(), elements->get_nLocBas(),
+      fluid_density, fluid_mu, bs_beta );
 
   // ===== Clean Memory =====
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
   delete locElem; delete locnbc; delete locebc; delete pNode; delete locinfnbc;
   delete tm_galpha_ptr; delete pmat; delete elementv; delete elements;
   delete quads; delete quadv; delete inflow_rate_ptr; delete gbc; delete timeinfo;
+  delete locAssem_ptr;
+
   PetscFinalize();
   return EXIT_SUCCESS;
 }
