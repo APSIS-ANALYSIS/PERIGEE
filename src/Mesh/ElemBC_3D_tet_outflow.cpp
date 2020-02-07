@@ -101,6 +101,7 @@ ElemBC_3D_tet_outflow::ElemBC_3D_tet_outflow(
         } // loop over quadrature points
       } // loop over elements
     } // loop over outlet surfaces
+    delete quads; delete elems;
   }
   else SYS_T::print_fatal("Error: unknown element type.\n");
 

@@ -17,7 +17,7 @@
 #include "NodalBC_3D_vtp.hpp"
 #include "NodalBC_3D_vtu.hpp"
 #include "NodalBC_3D_inflow.hpp"
-#include "ElemBC_3D_tet.hpp"
+#include "ElemBC_3D_tet_outflow.hpp"
 #include "NBC_Partition_3D.hpp"
 #include "NBC_Partition_3D_inflow.hpp"
 #include "EBC_Partition_vtp_outflow.hpp"
@@ -225,7 +225,7 @@ int main( int argc, char * argv[] )
   for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
     TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN, outflow_outward_vec[ii] );
 
-  ElemBC * ebc = new ElemBC_3D_tet( sur_file_out, elemType );
+  ElemBC * ebc = new ElemBC_3D_tet_outflow( sur_file_out, outflow_outward_vec, elemType );
 
   ebc -> resetTriIEN_outwardnormal( IEN );
 
