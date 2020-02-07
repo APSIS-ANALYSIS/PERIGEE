@@ -232,8 +232,12 @@ int main( int argc, char * argv[] )
   // debug
   std::vector<double> intNA;
 
+  std::cout<<"\n outlet 0 \n";
   ebc -> get_intNA(0, intNA);
+  VEC_T::print(intNA);
 
+  std::cout<<"\n outlet 1 \n";
+  ebc -> get_intNA(1, intNA);
   VEC_T::print(intNA);
 
   // end of debug
