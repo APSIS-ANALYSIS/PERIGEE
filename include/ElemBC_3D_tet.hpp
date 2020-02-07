@@ -61,6 +61,13 @@ class ElemBC_3D_tet : public ElemBC
     //   Tet-Face-3 : Node 0 2 1 6 5 4
     virtual void resetTriIEN_outwardnormal( const IIEN * const &VIEN );
 
+    virtual void get_normal_vec( const int &ebc_id, double &out_nx,
+        double &out_ny, double &out_nz ) const
+    {SYS_T::commPrint("Warning: get_normal_vec is not implemented. \n");}
+
+    virtual void get_intNA( const int &ebc_id, std::vector<double> &fintNA ) const
+    {SYS_T::commPrint("Warning: get_intNA is not implemented. \n");}
+
   protected:
     const int elem_type;
      
