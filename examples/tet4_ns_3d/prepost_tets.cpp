@@ -11,7 +11,7 @@
 #include "IEN_Tetra_P1.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
-#include "Part_Tet4.hpp"
+#include "Part_Tet.hpp"
 
 int main( int argc, char * argv[] )
 {
@@ -110,7 +110,7 @@ int main( int argc, char * argv[] )
   for(int proc_rank = 0; proc_rank < proc_size; ++proc_rank)
   {
     mytimer->Reset(); mytimer->Start();
-    IPart * part = new Part_Tet4( mesh, global_part, mnindex, IEN,
+    IPart * part = new Part_Tet( mesh, global_part, mnindex, IEN,
         ctrlPts, proc_rank, proc_size, dofNum, elemType,
         isPrintPartInfo );
     part->write(part_file.c_str());

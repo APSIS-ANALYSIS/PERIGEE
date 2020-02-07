@@ -50,7 +50,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/IElemBC.cpp
   ${perigee_source}/Mesh/Mesh_Tet4.cpp
   ${perigee_source}/Mesh/IPart.cpp
-  ${perigee_source}/Mesh/Part_Tet4.cpp
+  ${perigee_source}/Mesh/Part_Tet.cpp
   ${perigee_source}/Mesh/Part_Tet4_FSI.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet4.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet4_outflow.cpp

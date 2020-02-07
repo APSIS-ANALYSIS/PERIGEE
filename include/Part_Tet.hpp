@@ -1,9 +1,9 @@
-#ifndef PART_TET4_HPP
-#define PART_TET4_HPP
+#ifndef PART_TET_HPP
+#define PART_TET_HPP
 // ==================================================================
-// Part_Tet4.hpp
+// Part_Tet.hpp
 //
-// Object: Partition 3D 4-node linear tetrahedral mesh into subdomains,
+// Object: Partition 3D tetrahedral mesh into subdomains,
 //         and record each subdomain in hdf5 file format.
 //
 // Date: Jan. 12 2017
@@ -14,10 +14,10 @@
 #include "IMesh.hpp"
 #include "IPart.hpp"
 
-class Part_Tet4 : public IPart
+class Part_Tet : public IPart
 {
   public:
-    Part_Tet4( const IMesh * const &mesh,
+    Part_Tet( const IMesh * const &mesh,
         const IGlobal_Part * const &gpart,
         const Map_Node_Index * const &mnindex,
         const IIEN * const &IEN,
@@ -26,7 +26,7 @@ class Part_Tet4 : public IPart
         const int &in_dofNum, const int &in_elemType,
         const bool isPrintInfo );
 
-    Part_Tet4( const IMesh * const &mesh,
+    Part_Tet( const IMesh * const &mesh,
         const IGlobal_Part * const &gpart,
         const Map_Node_Index * const &mnindex,
         const IIEN * const &IEN,
@@ -36,7 +36,7 @@ class Part_Tet4 : public IPart
         const int &in_elemType,
         const bool isPrintInfo );
 
-    virtual ~Part_Tet4();
+    virtual ~Part_Tet();
 
     virtual void write( const char * inputFileName ) const;
     

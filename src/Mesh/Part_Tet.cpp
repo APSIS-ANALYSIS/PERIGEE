@@ -1,6 +1,6 @@
-#include "Part_Tet4.hpp"
+#include "Part_Tet.hpp"
 
-Part_Tet4::Part_Tet4(
+Part_Tet::Part_Tet(
     const IMesh * const &mesh,
     const IGlobal_Part * const &gpart,
     const Map_Node_Index * const &mnindex,
@@ -23,16 +23,16 @@ Part_Tet4::Part_Tet4(
   dual_edge_ncommon = gpart->get_dual_edge_ncommon();
 
   // Check the cpu info
-  SYS_T::print_exit_if(cpu_size < 1, "Error: Part_Tet4 input cpu_size is wrong! \n");
-  SYS_T::print_exit_if(cpu_rank >= cpu_size, "Error: Part_Tet4 input cpu_rank is wrong! \n");
-  SYS_T::print_exit_if(cpu_rank < 0, "Error: Part_Tet4 input cpu_rank is wrong! \n");
+  SYS_T::print_exit_if(cpu_size < 1, "Error: Part_Tet input cpu_size is wrong! \n");
+  SYS_T::print_exit_if(cpu_rank >= cpu_size, "Error: Part_Tet input cpu_rank is wrong! \n");
+  SYS_T::print_exit_if(cpu_rank < 0, "Error: Part_Tet input cpu_rank is wrong! \n");
 
   // Generate group 1, 2, 5, and 6.
   Generate_Partition( mesh, gpart, mnindex, IEN, ctrlPts, isPrintInfo );
 }
 
 
-Part_Tet4::Part_Tet4(
+Part_Tet::Part_Tet(
     const IMesh * const &mesh,
     const IGlobal_Part * const &gpart,
     const Map_Node_Index * const &mnindex,
@@ -55,23 +55,23 @@ Part_Tet4::Part_Tet4(
   dual_edge_ncommon = gpart->get_dual_edge_ncommon();
 
   // Check the cpu info
-  SYS_T::print_exit_if(cpu_size < 1, "Error: Part_Tet4 input cpu_size is wrong! \n");
-  SYS_T::print_exit_if(cpu_rank >= cpu_size, "Error: Part_Tet4 input cpu_rank is wrong! \n");
-  SYS_T::print_exit_if(cpu_rank < 0, "Error: Part_Tet4 input cpu_rank is wrong! \n");
+  SYS_T::print_exit_if(cpu_size < 1, "Error: Part_Tet input cpu_size is wrong! \n");
+  SYS_T::print_exit_if(cpu_rank >= cpu_size, "Error: Part_Tet input cpu_rank is wrong! \n");
+  SYS_T::print_exit_if(cpu_rank < 0, "Error: Part_Tet input cpu_rank is wrong! \n");
 
   // Generate group 1, 2, 5, and 6.
   Generate_Partition( mesh, gpart, mnindex, IEN, ctrlPts, isPrintInfo );
 }
 
 
-Part_Tet4::~Part_Tet4()
+Part_Tet::~Part_Tet()
 {
   for(int i=0; i<nlocalele; ++i) delete [] LIEN[i];
   delete [] LIEN;
 }
 
 
-void Part_Tet4::Generate_Partition( const IMesh * const &mesh,
+void Part_Tet::Generate_Partition( const IMesh * const &mesh,
     const IGlobal_Part * const &gpart,
     const Map_Node_Index * const &mnindex,
     const IIEN * const &IEN,
@@ -239,7 +239,7 @@ void Part_Tet4::Generate_Partition( const IMesh * const &mesh,
 }
 
 
-int Part_Tet4::get_elemLocIndex(const int &gloindex) const
+int Part_Tet::get_elemLocIndex(const int &gloindex) const
 {
   std::vector<int>::const_iterator findindex;
   findindex = find(elem_loc.begin(), elem_loc.end(), gloindex);
@@ -250,7 +250,7 @@ int Part_Tet4::get_elemLocIndex(const int &gloindex) const
 }
 
 
-void Part_Tet4::write( const char * inputFileName ) const
+void Part_Tet::write( const char * inputFileName ) const
 {
   std::string fName( inputFileName );
   fName.append("_p");
@@ -366,7 +366,7 @@ void Part_Tet4::write( const char * inputFileName ) const
 }
 
 
-void Part_Tet4::print_part_ele() const
+void Part_Tet::print_part_ele() const
 {
   std::cout<<"Proc: "<<cpu_rank<<" local elements: "<<std::endl;
   for(int e=0; e<nlocalele; ++e)
@@ -375,7 +375,7 @@ void Part_Tet4::print_part_ele() const
 }
 
 
-void Part_Tet4::print_part_node() const
+void Part_Tet::print_part_node() const
 {
   std::cout<<"Proc: "<<cpu_rank<<" local nodes: "<<std::endl;
   for(int n=0; n<nlocalnode; ++n)
@@ -390,7 +390,7 @@ void Part_Tet4::print_part_node() const
 }
 
 
-void Part_Tet4::print_part_ghost_node() const
+void Part_Tet::print_part_ghost_node() const
 {
   std::cout<<"Proc: "<<cpu_rank<<" ghost nodes: "<<std::endl;
   for(int n=0; n<nghostnode; ++n)
@@ -399,7 +399,7 @@ void Part_Tet4::print_part_ghost_node() const
 }
 
 
-void Part_Tet4::print_part_local_to_global() const
+void Part_Tet::print_part_local_to_global() const
 {
   std::cout<<"Proc: "<<cpu_rank<<" local_to_global array: "<<std::endl;
   for(int n=0; n<nlocghonode; ++n)
@@ -408,7 +408,7 @@ void Part_Tet4::print_part_local_to_global() const
 }
 
 
-void Part_Tet4::print_part_LIEN() const
+void Part_Tet::print_part_LIEN() const
 {
   std::cout<<"Proc: "<<cpu_rank<<" LIEN: "<<std::endl;
   for(int ee=0; ee<nlocalele; ++ee)
@@ -421,7 +421,7 @@ void Part_Tet4::print_part_LIEN() const
 }
 
 
-void Part_Tet4::print_part_loadbalance_edgecut() const
+void Part_Tet::print_part_loadbalance_edgecut() const
 {
   std::cout<<"Proc:"<<" "<<cpu_rank;
   std::cout<<" "<<"element ratio:"<<" "<<(double) nlocalele / (double) nElem;
