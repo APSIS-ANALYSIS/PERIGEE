@@ -224,9 +224,9 @@ void ElemBC_3D_tet::resetTriIEN_outwardnormal( const IIEN * const &VIEN )
         tri_ien[ebcid][6*ee+0] = node_t[pos0];
         tri_ien[ebcid][6*ee+1] = node_t[pos1];
         tri_ien[ebcid][6*ee+2] = node_t[pos2];
-        tri_ien[ebcid][6*ee+2] = node_t[pos3];
-        tri_ien[ebcid][6*ee+2] = node_t[pos4];
-        tri_ien[ebcid][6*ee+2] = node_t[pos5];
+        tri_ien[ebcid][6*ee+3] = node_t[pos3];
+        tri_ien[ebcid][6*ee+4] = node_t[pos4];
+        tri_ien[ebcid][6*ee+5] = node_t[pos5];
       }
       delete tetcell;
     }

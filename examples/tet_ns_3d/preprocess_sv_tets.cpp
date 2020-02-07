@@ -219,12 +219,6 @@ int main( int argc, char * argv[] )
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall,
       nFunc, inflow_outward_vec, elemType );
 
-  // debugging
-  std::vector<double> temp;
-  InFBC -> get_intNA( temp );
-  VEC_T::print(temp);
-  // end of debugging
-
   // Setup Elemental Boundary Conditions
   std::vector< std::vector<double> > outflow_outward_vec;
   outflow_outward_vec.resize( sur_file_out.size() );
@@ -233,10 +227,13 @@ int main( int argc, char * argv[] )
 
   ElemBC * ebc = new ElemBC_3D_tet( sur_file_out, elemType );
 
-  ebc -> print_info();
+  ebc -> resetTriIEN_outwardnormal( IEN );
+
+
+
 
   // Finalize the code and exit
-  delete InFBC;
+  delete InFBC; delete ebc;
 
   for(auto it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc)
     delete *it_nbc;
