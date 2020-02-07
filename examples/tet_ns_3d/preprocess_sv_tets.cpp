@@ -252,6 +252,16 @@ int main( int argc, char * argv[] )
     part -> write( part_file.c_str() );
 
     part -> print_part_loadbalance_edgecut();
+    
+    // Partition Nodal BC
+    INBC_Partition * nbcpart = new NBC_Partition_3D(part, mnindex, NBC_list);
+    nbcpart -> write_hdf5(part_file.c_str());
+
+    // Partition Nodal Inflow BC
+    INBC_Partition * infpart = new NBC_Partition_3D_inflow(part, mnindex, InFBC);
+    infpart->write_hdf5( part_file.c_str() );
+    
+  
   }
 
 
