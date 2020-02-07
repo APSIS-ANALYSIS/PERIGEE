@@ -67,6 +67,43 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Global_Part_Serial.cpp
   )
 
+SET( perigee_analysis_lib_src
+  ${perigee_source}/System/Sys_Tools.cpp
+  ${perigee_source}/System/Vec_Tools.cpp
+  ${perigee_source}/System/PETSc_Tools.cpp
+  ${perigee_source}/System/Matrix_double_3by3_Array.cpp
+  ${perigee_source}/System/Matrix_PETSc.cpp
+  ${perigee_source}/System/Math_Tools.cpp
+  ${perigee_source}/System/HDF5_Writer.cpp
+  ${perigee_source}/System/HDF5_Reader.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_Tet.cpp
+  ${perigee_source}/Analysis_Tool/AGlobal_Mesh_Info_FEM_3D.cpp
+  ${perigee_source}/Analysis_Tool/APart_Basic_Info.cpp
+  ${perigee_source}/Analysis_Tool/ALocal_Elem.cpp
+  ${perigee_source}/Analysis_Tool/ALocal_Elem_wTag.cpp
+  ${perigee_source}/Analysis_Tool/ALocal_IEN.cpp
+  ${perigee_source}/Analysis_Tool/ALocal_NodalBC.cpp
+  ${perigee_source}/Analysis_Tool/ALocal_Inflow_NodalBC.cpp
+  ${perigee_source}/Analysis_Tool/ALocal_EBC.cpp
+  ${perigee_source}/Analysis_Tool/ALocal_EBC_outflow.cpp
+  ${perigee_source}/Analysis_Tool/APart_Node.cpp
+  ${perigee_source}/Analysis_Tool/APart_Node_FSI.cpp
+  ${perigee_source}/Element/FEANode.cpp
+  ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Tet4.cpp
+  ${perigee_source}/Model/GenBC_RCR.cpp
+  ${perigee_source}/Model/GenBC_Resistance.cpp
+  ${perigee_source}/Model/CVFlowRate_Unsteady.cpp
+  ${perigee_source}/Model/CVFlowRate_Linear2Steady.cpp
+  ${perigee_source}/Solver/PDNSolution.cpp
+  ${perigee_source}/Solver/PDNTimeStep.cpp
+  ${perigee_source}/Solver/Seg_Sol_Tools.cpp
+  ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp
+  ${perigee_source}/Solver/PGAssem.cpp
+  ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
+  )
 
 INCLUDE_DIRECTORIES( ../../include )
 INCLUDE_DIRECTORIES( ./include )
@@ -78,8 +115,8 @@ ADD_LIBRARY( perigee_preprocess ${perigee_preprocess_lib_src} )
 TARGET_LINK_LIBRARIES( perigee_preprocess ${EXTRA_LINK_LIBS} )
 
 # 2. Analysis libs
-#ADD_LIBRARY( perigee_analysis ${perigee_analysis_lib_src} )
-#TARGET_LINK_LIBRARIES( perigee_analysis ${EXTRA_LINK_LIBS} )
+ADD_LIBRARY( perigee_analysis ${perigee_analysis_lib_src} )
+TARGET_LINK_LIBRARIES( perigee_analysis ${EXTRA_LINK_LIBS} )
 
 # 3. Postprocess lib
 #ADD_LIBRARY( perigee_postprocess ${perigee_postprocess_lib_src} )
@@ -93,7 +130,9 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 
 
 ADD_EXECUTABLE( preprocess3d preprocess_sv_tets.cpp)
+ADD_EXECUTABLE( ns_tet_3d ns_tet_driver.cpp)
 
 TARGET_LINK_LIBRARIES( preprocess3d ${EXTRA_LINK_LIBS} perigee_preprocess )
+TARGET_LINK_LIBRARIES( ns_tet_3d ${EXTRA_LINK_LIBS} perigee_analysis )
 
 # EOF

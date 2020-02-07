@@ -64,7 +64,6 @@ class ALocal_IEN
         elem_ien[ii] = LIEN[offset + ii];
     }
 
-
     // --------------------------------------------------------------
     // ! isNode_in_Elem returns a bool value that tells if the node ii
     //   is in the element ee.
