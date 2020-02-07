@@ -157,23 +157,31 @@ int main(int argc, char *argv[])
   else PetscPrintf(PETSC_COMM_WORLD, "-is_ls_info: false \n");
 
   // ===== Data from Files =====
+  // Control points' xyz coordinates
   FEANode * fNode = new FEANode(part_file, rank);
 
+  // Local IEN array
   ALocal_IEN * locIEN = new ALocal_IEN(part_file, rank);
 
+  // Global mesh info
   IAGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info_FEM_3D(part_file,rank);
 
+  // Mesh partition info
   APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file, rank);
 
+  // Local element indices
   ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
 
+  // Local nodal bc
   ALocal_NodalBC * locnbc = new ALocal_NodalBC(part_file, rank);
 
-  // THIS CLASS NEEDS TO BE MODIFIED!!
+  // Local inflow bc
   ALocal_Inflow_NodalBC * locinfnbc = new ALocal_Inflow_NodalBC(part_file, rank);
 
+  // Local elemental bc
   ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
 
+  // Nodal indices in the subdomain
   APart_Node * pNode = new APart_Node(part_file, rank);
 
   SYS_T::commPrint("===> Mesh HDF5 files are read from disk.\n");
