@@ -49,11 +49,21 @@ class ElemBC_3D_tet : public ElemBC
 
     virtual void print_info() const;
 
+    // For linear element (type 501), the face node numbering is
+    //   Tet-Face-0 : Node 1 2 3
+    //   Tet-Face-1 : Node 0 3 2
+    //   Tet-Face-2 : Node 0 1 3
+    //   Tet-Face-3 : Node 0 2 1
+    // For quadratic element (type 502), the face node numbering is
+    //   Tet-Face-0 : Node 1 2 3 5 9 8
+    //   Tet-Face-1 : Node 0 3 2 7 9 6
+    //   Tet-Face-2 : Node 0 1 3 4 8 7
+    //   Tet-Face-3 : Node 0 2 1 6 5 4
     virtual void resetTriIEN_outwardnormal( const IIEN * const &VIEN );
 
   protected:
-    ElemBC_3D_tet() {}; // Disallow default constructor
-    
+    const int elem_type;
+     
     int num_ebc;
     int * num_node;     // length num_ebc
     int * num_cell;     // length num_ebc
