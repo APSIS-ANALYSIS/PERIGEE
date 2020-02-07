@@ -25,7 +25,7 @@ ElemBC_3D_tet_outflow::ElemBC_3D_tet_outflow(
 
     double ectrl_x[3]; double ectrl_y[3]; double ectrl_z[3];
     int node_idx[3]; double R[3];
-    double nx, ny, nz, surface_area;
+    double nx, ny, nz, jac;
 
     for( int fid=0; fid < num_ebc; ++fid )
     {
@@ -52,9 +52,9 @@ ElemBC_3D_tet_outflow::ElemBC_3D_tet_outflow(
         for(int qua=0; qua<nqp_tri; ++qua)
         {
           elems -> get_R(qua, R);
-          elems -> get_2d_normal_out(qua, nx, ny, nz, surface_area);
+          elems -> get_2d_normal_out(qua, nx, ny, nz, jac);
 
-          const double gwts = surface_area * quads -> get_qw( qua );
+          const double gwts = jac * quads -> get_qw( qua );
 
           intNA[fid][node_idx[0]] += gwts * R[0];
           intNA[fid][node_idx[1]] += gwts * R[1];
@@ -92,9 +92,9 @@ ElemBC_3D_tet_outflow::ElemBC_3D_tet_outflow(
         for(int qua=0; qua<nqp_tri; ++qua)
         {
           elems -> get_R(qua, R);
-          elems -> get_2d_normal_out(qua, nx, ny, nz, surface_area);
+          elems -> get_2d_normal_out(qua, nx, ny, nz, jac);
 
-          const double gwts = surface_area * quads -> get_qw( qua );
+          const double gwts = jac * quads -> get_qw( qua );
 
           for(int ii=0; ii<6; ++ii) intNA[fid][node_idx[ii]] += gwts * R[ii];
         
