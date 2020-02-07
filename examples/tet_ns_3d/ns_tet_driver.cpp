@@ -26,6 +26,7 @@
 #include "APart_Node.hpp"
 #include "Matrix_PETSc.hpp"
 #include "TimeMethod_GenAlpha.hpp"
+#include "PDNTimeStep.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -198,7 +199,23 @@ int main(int argc, char *argv[])
   ICVFlowRate * inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
 
   inflow_rate_ptr->print_info();
+
+  // ===== GenBC =====
+  IGenBC * gbc = nullptr;
   
+  if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 1  )
+    gbc = new GenBC_Resistance( lpn_file.c_str() );
+  else if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 2  )
+    gbc = new GenBC_RCR( lpn_file.c_str(), 1000, initial_step );
+  else
+    SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
+
+  gbc -> print_info();
+  
+  // Make sure the gbc number of faces mathes that of ALocal_EBC
+  SYS_T::print_fatal_if(gbc->get_num_ebc() != locebc->get_num_ebc(),
+      "Error: GenBC number of faces does not match with that in ALocal_EBC.\n");
+
   // ===== Quadrature rules =====
   SYS_T::commPrint("===> Build quadrature rules. \n");
   IQuadPts * quadv = new QuadPts_Gauss_Tet( nqp_tet );
@@ -222,20 +239,17 @@ int main(int argc, char *argv[])
       genA_spectrium, genA_is2ndSystem);
   tm_galpha_ptr->print_info();
 
-
+  // ===== Time step info =====
+  PDNTimeStep * timeinfo = new PDNTimeStep(initial_index, initial_time, initial_step);
 
 
   // ===== Clean Memory =====
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
   delete locElem; delete locnbc; delete locebc; delete pNode; delete locinfnbc;
   delete tm_galpha_ptr; delete pmat; delete elementv; delete elements;
-  delete quads; delete quadv; delete inflow_rate_ptr;
+  delete quads; delete quadv; delete inflow_rate_ptr; delete gbc; delete timeinfo;
   PetscFinalize();
   return EXIT_SUCCESS;
 }
-
-
-
-
 
 // EOF
