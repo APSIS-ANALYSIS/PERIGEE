@@ -72,7 +72,7 @@ CVFlowRate_Unsteady::CVFlowRate_Unsteady( const char * const &filename )
 
   // Check the compatibility of period and w, if the difference
   // is larger than 0.01, print a warning message
-  if( std::abs(2.0 * MATH_T::PI / period - w ) >= 0.01 ) SYS_T::commPrint("Warning: CVFlowRate_Unsteady period and w does not match well: \n2xpi/period = %e and w = %e.\n", 2.0*MATH_T::PI/period, w);
+  if( std::abs(2.0 * MATH_T::PI / period - w ) >= 0.01 ) SYS_T::commPrint("\nWARNING: CVFlowRate_Unsteady period and w does not match well: \n2xpi/period = %e and w = %e.\n", 2.0*MATH_T::PI/period, w);
 
   // Calculate the flow rate and record them on disk as 
   // Inlet_flowrate.txt with sampling interval 0.001

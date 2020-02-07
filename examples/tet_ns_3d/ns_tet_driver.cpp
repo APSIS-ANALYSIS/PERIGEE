@@ -24,6 +24,8 @@
 #include "ALocal_Elem.hpp"
 #include "ALocal_NodalBC.hpp"
 #include "APart_Node.hpp"
+#include "Matrix_PETSc.hpp"
+#include "TimeMethod_GenAlpha.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -83,8 +85,6 @@ int main(int argc, char *argv[])
 
   MPI_Comm_size(PETSC_COMM_WORLD, &size);
   MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
-
-  SYS_T::print_perigee_art();
 
   // ===== Read Command Line Arguments =====
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
@@ -184,7 +184,7 @@ int main(int argc, char *argv[])
   // Nodal indices in the subdomain
   APart_Node * pNode = new APart_Node(part_file, rank);
 
-  SYS_T::commPrint("===> Mesh HDF5 files are read from disk.\n");
+  SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
 
   SYS_T::print_fatal_if( size!= PartBasic->get_cpu_size(),
       "Error: Assigned CPU number does not match the partition. \n");
@@ -192,11 +192,44 @@ int main(int argc, char *argv[])
   PetscPrintf(PETSC_COMM_WORLD,
       "===> %d processor(s) are assigned for FEM analysis. \n", size);
 
- 
+  // ===== Inflow flow rate =====
+  SYS_T::commPrint("===> Setup inflow flow rate. \n");
+
+  ICVFlowRate * inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
+
+  inflow_rate_ptr->print_info();
+  
+  // ===== Quadrature rules =====
+  SYS_T::commPrint("===> Build quadrature rules. \n");
+  IQuadPts * quadv = new QuadPts_Gauss_Tet( nqp_tet );
+  IQuadPts * quads = new QuadPts_Gauss_Triangle( nqp_tri );
+
+  // ===== Finite Element Container =====
+  SYS_T::commPrint("===> Setup element container. \n");
+  FEAElement * elementv = new FEAElement_Tet4( quadv-> get_num_quadPts() );
+  FEAElement * elements = new FEAElement_Triangle3_3D_der0(
+      quads-> get_num_quadPts() );
+
+  // ===== Generate a sparse matrix for strong enforcement of essential BCs
+  Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
+  pmat->gen_perm_bc(pNode, locnbc);
+
+  // ===== Generalized-alpha ====
+  SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
+  const double genA_spectrium = 0.5;
+  const bool genA_is2ndSystem = false;
+  TimeMethod_GenAlpha * tm_galpha_ptr = new TimeMethod_GenAlpha(
+      genA_spectrium, genA_is2ndSystem);
+  tm_galpha_ptr->print_info();
+
+
+
 
   // ===== Clean Memory =====
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
   delete locElem; delete locnbc; delete locebc; delete pNode; delete locinfnbc;
+  delete tm_galpha_ptr; delete pmat; delete elementv; delete elements;
+  delete quads; delete quadv; delete inflow_rate_ptr;
   PetscFinalize();
   return EXIT_SUCCESS;
 }
