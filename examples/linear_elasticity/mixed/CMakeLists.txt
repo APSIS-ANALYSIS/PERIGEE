@@ -45,7 +45,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/INodalBC.cpp
   ${perigee_source}/Mesh/IElemBC.cpp
   ${perigee_source}/Mesh/Mesh_Tet4.cpp
-  ${perigee_source}/Mesh/Part_Tet4.cpp
+  ${perigee_source}/Mesh/Part_Tet.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet4.cpp
   ${perigee_source}/Mesh/NodalBC_3D_vtp.cpp
   ${perigee_source}/Mesh/NBC_Partition_3D.cpp
