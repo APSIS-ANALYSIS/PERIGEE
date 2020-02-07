@@ -1,9 +1,9 @@
-#ifndef PART_TET4_FSI_HPP
-#define PART_TET4_FSI_HPP
+#ifndef PART_TET_FSI_HPP
+#define PART_TET_FSI_HPP
 // ==================================================================
-// Part_Tet4_FSI.hpp
+// Part_Tet_FSI.hpp
 //
-// Object: Partition 3D 4-node linear tet mesh into subdomains. The
+// Object: Partition 3D tet mesh into subdomains. The
 //         mesh contains sub-domains that has a physical tag.
 //         In the partitioned file, there will be a physical tag, an
 //         integer array with the length equaling to the number of 
@@ -11,12 +11,12 @@
 //
 // Date Created: July 27 2017
 // ==================================================================
-#include "Part_Tet4.hpp"
+#include "Part_Tet.hpp"
 
-class Part_Tet4_FSI : public Part_Tet4
+class Part_Tet_FSI : public Part_Tet
 {
   public:
-    Part_Tet4_FSI( const IMesh * const &mesh,
+    Part_Tet_FSI( const IMesh * const &mesh,
         const IGlobal_Part * const &gpart,
         const Map_Node_Index * const &mnindex,
         const IIEN * const &IEN,
@@ -29,7 +29,7 @@ class Part_Tet4_FSI : public Part_Tet4
         const int &in_elemType,
         const bool isPrintInfo );
 
-    virtual ~Part_Tet4_FSI();
+    virtual ~Part_Tet_FSI();
 
     virtual void write( const char * inputFileName ) const;
 

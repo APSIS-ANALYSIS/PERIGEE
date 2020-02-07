@@ -1,6 +1,6 @@
-#include "Part_Tet4_FSI.hpp"
+#include "Part_Tet_FSI.hpp"
 
-Part_Tet4_FSI::Part_Tet4_FSI( const IMesh * const &mesh,
+Part_Tet_FSI::Part_Tet_FSI( const IMesh * const &mesh,
     const IGlobal_Part * const &gpart,
     const Map_Node_Index * const &mnindex,
     const IIEN * const &IEN,
@@ -12,7 +12,7 @@ Part_Tet4_FSI::Part_Tet4_FSI( const IMesh * const &mesh,
     const int &in_dofNum, const int &in_dofMat,
     const int &in_elemType,
     const bool isPrintInfo )
-: Part_Tet4( mesh, gpart, mnindex, IEN, ctrlPts, in_cpu_rank,
+: Part_Tet( mesh, gpart, mnindex, IEN, ctrlPts, in_cpu_rank,
     in_cpu_size, in_dofNum, in_dofMat, in_elemType, isPrintInfo )
 {
   // Generate the local array tagging the element's property.
@@ -39,11 +39,11 @@ Part_Tet4_FSI::Part_Tet4_FSI( const IMesh * const &mesh,
 }
 
 
-Part_Tet4_FSI::~Part_Tet4_FSI()
+Part_Tet_FSI::~Part_Tet_FSI()
 {}
 
 
-void Part_Tet4_FSI::write( const char * inputFileName ) const
+void Part_Tet_FSI::write( const char * inputFileName ) const
 {
   std::string inputName( inputFileName );
   std::string fName = SYS_T::gen_partfile_name( inputName, cpu_rank );
