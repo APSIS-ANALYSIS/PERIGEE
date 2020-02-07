@@ -229,7 +229,14 @@ int main( int argc, char * argv[] )
 
   ebc -> resetTriIEN_outwardnormal( IEN );
 
+  // debug
+  std::vector<double> intNA;
 
+  ebc -> get_intNA(0, intNA);
+
+  VEC_T::print(intNA);
+
+  // end of debug
 
 
   // Finalize the code and exit
