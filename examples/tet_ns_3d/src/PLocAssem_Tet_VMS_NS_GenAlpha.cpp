@@ -372,7 +372,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
   double velo_prime_dot_gradR;
 
-  double NB, NB_x, NB_y, NB_z;
+  double NB, NB_x, NB_y, NB_z, NB_xx, NB_yy, NB_zz, NB_lap;
   double NANB, NAxNB, NAyNB, NAzNB;
   double NANBx, NAxNBx, NAyNBx, NAzNBx;
   double NANBy, NAxNBy, NAyNBy, NAzNBy;
@@ -537,6 +537,8 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
       {
         index = B + A * nLocBas;
         NB = R[B]; NB_x = dR_dx[B]; NB_y = dR_dy[B]; NB_z = dR_dz[B];
+        NB_xx = d2R_dxx[B]; NB_yy = d2R_dyy[B]; NB_zz = d2R_dzz[B];
+        NB_lap = NB_xx + NB_yy + NB_zz;
         velo_dot_gradNB = u * NB_x + v * NB_y + w * NB_z;
         velo_prime_dot_gradNB = u_prime * NB_x + v_prime * NB_y + w_prime * NB_z;
 
@@ -545,17 +547,17 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
         NAyNB = NA_y*NB; NAyNBx = NA_y*NB_x; NAyNBy = NA_y*NB_y; NAyNBz = NA_y*NB_z;
         NAzNB = NA_z*NB; NAzNBx = NA_z*NB_x; NAzNBy = NA_z*NB_y; NAzNBz = NA_z*NB_z;
 
-        drx_du_B = rho0 * ( u_x * NB + velo_dot_gradNB ); 
+        drx_du_B = rho0 * ( u_x * NB + velo_dot_gradNB ) - vis_mu * NB_lap; 
         drx_dv_B = rho0 * u_y * NB;
         drx_dw_B = rho0 * u_z * NB;
 
         dry_du_B = rho0 * v_x * NB;
-        dry_dv_B = rho0 * ( v_y * NB + velo_dot_gradNB );
+        dry_dv_B = rho0 * ( v_y * NB + velo_dot_gradNB ) - vis_mu * NB_lap;
         dry_dw_B = rho0 * v_z * NB;
 
         drz_du_B = rho0 * w_x * NB;
         drz_dv_B = rho0 * w_y * NB;
-        drz_dw_B = rho0 * (w_z * NB + velo_dot_gradNB);
+        drz_dw_B = rho0 * ( w_z * NB + velo_dot_gradNB ) - vis_mu * NB_lap;
 
         // Continuity equation with respect to p, u, v, w
         Sub_Tan[0][index] += gwts * dd_dv * tau_m * (NAxNBx + NAyNBy + NAzNBz);
@@ -727,7 +729,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
       {
         for(B=0; B<nLocBas; ++B)
         {
-          Tangent[ 4*nLocBas*(4*A+ii) + 4*B + jj  ] =
+          Tangent[ 4*nLocBas*(4*A+ii) + 4*B + jj ] =
             Sub_Tan[ii*4+jj][A*nLocBas + B];
         }
       }
