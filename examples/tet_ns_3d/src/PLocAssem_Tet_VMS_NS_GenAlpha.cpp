@@ -413,29 +413,29 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     {
       ii4 = 4 * ii;
 
-      u_t += velo[ii4+1] * R[ii];
-      v_t += velo[ii4+2] * R[ii];
-      w_t += velo[ii4+3] * R[ii];
+      u_t += dot_sol[ii4+1] * R[ii];
+      v_t += dot_sol[ii4+2] * R[ii];
+      w_t += dot_sol[ii4+3] * R[ii];
 
-      u += disp[ii4+1] * R[ii];
-      v += disp[ii4+2] * R[ii];
-      w += disp[ii4+3] * R[ii];
-      p += disp[ii4+0] * R[ii];
+      u += sol[ii4+1] * R[ii];
+      v += sol[ii4+2] * R[ii];
+      w += sol[ii4+3] * R[ii];
+      p += sol[ii4+0] * R[ii];
 
-      u_x += disp[ii4+1] * dR_dx[ii];
-      v_x += disp[ii4+2] * dR_dx[ii];
-      w_x += disp[ii4+3] * dR_dx[ii];
-      p_x += disp[ii4+0] * dR_dx[ii];
+      u_x += sol[ii4+1] * dR_dx[ii];
+      v_x += sol[ii4+2] * dR_dx[ii];
+      w_x += sol[ii4+3] * dR_dx[ii];
+      p_x += sol[ii4+0] * dR_dx[ii];
 
-      u_y += disp[ii4+1] * dR_dy[ii];
-      v_y += disp[ii4+2] * dR_dy[ii];
-      w_y += disp[ii4+3] * dR_dy[ii];
-      p_y += disp[ii4+0] * dR_dy[ii];
+      u_y += sol[ii4+1] * dR_dy[ii];
+      v_y += sol[ii4+2] * dR_dy[ii];
+      w_y += sol[ii4+3] * dR_dy[ii];
+      p_y += sol[ii4+0] * dR_dy[ii];
 
-      u_z += disp[ii4+1] * dR_dz[ii];
-      v_z += disp[ii4+2] * dR_dz[ii];
-      w_z += disp[ii4+3] * dR_dz[ii];
-      p_z += disp[ii4+0] * dR_dz[ii];
+      u_z += sol[ii4+1] * dR_dz[ii];
+      v_z += sol[ii4+2] * dR_dz[ii];
+      w_z += sol[ii4+3] * dR_dz[ii];
+      p_z += sol[ii4+0] * dR_dz[ii];
 
       u_xx += sol[ii4+1] * d2R_dxx[ii];
       u_yy += sol[ii4+1] * d2R_dyy[ii];

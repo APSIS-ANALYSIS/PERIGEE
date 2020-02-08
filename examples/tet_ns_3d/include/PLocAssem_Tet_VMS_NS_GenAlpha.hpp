@@ -65,83 +65,91 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
+    virtual void Assem_Tangent_Residual(
+        const double &time, const double &dt,
+        const double * const &dot_sol,
+        const double * const &sol,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad );
 
 
   private:
-    // Private data
-    const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta;
+      // Private data
+      const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta;
 
-    const int dof_per_node, nqp;
+      const int dof_per_node, nqp;
 
-    double CI, CT;
-    int nLocBas, snLocBas, vec_size, sur_size;
+      double CI, CT;
+      int nLocBas, snLocBas, vec_size, sur_size;
 
-    std::vector<double> R, dR_dx, dR_dy, dR_dz;
-    std::vector<double> d2R_dxx, d2R_dxy, d2R_dxz;
-    std::vector<double> d2R_dyy, d2R_dyz, d2R_dzz;
-    
-    double dxi_dx[9];
+      std::vector<double> R, dR_dx, dR_dy, dR_dz;
+      std::vector<double> d2R_dxx, d2R_dxy, d2R_dxz;
+      std::vector<double> d2R_dyy, d2R_dyz, d2R_dzz;
 
-    std::vector< std::vector<double> > Sub_Tan, Sub_sur_Tan;
+      double dxi_dx[9];
 
-    // Private functions
-    void print_info() const;
+      std::vector< std::vector<double> > Sub_Tan, Sub_sur_Tan;
 
-    void get_metric( const double * const &dxi_dx,
-        double &G11, double &G12, double &G13,
-        double &G22, double &G23, double &G33 ) const;
+      // Private functions
+      void print_info() const;
 
-    void get_tau( double &tau_m_qua, double &tau_c_qua,
-        const double &dt, const double * const &dxi_dx,
-        const double &u, const double &v, const double &w ) const;
+      void get_metric( const double * const &dxi_dx,
+          double &G11, double &G12, double &G13,
+          double &G22, double &G23, double &G33 ) const;
 
-    void get_DC( double &dc_tau, const double * const &dxi_dx,
-        const double &u, const double &v, const double &w ) const;
+      void get_tau( double &tau_m_qua, double &tau_c_qua,
+          const double &dt, const double * const &dxi_dx,
+          const double &u, const double &v, const double &w ) const;
 
-    void get_f(const double &x, const double &y, const double &z,
-        const double &t, double &fx, double &fy, double &fz ) const
-    {
-      fx = 0.0; fy = 0.0; fz = 0.0;
-    }
+      void get_DC( double &dc_tau, const double * const &dxi_dx,
+          const double &u, const double &v, const double &w ) const;
 
-    void get_H1(const double &x, const double &y, const double &z,
-        const double &t, const double &nx, const double &ny,
-        const double &nz, double &gx, double &gy, double &gz ) const
-    {
-      const double p0 = 0.0;
-      gx = p0*nx; gy = p0*ny; gz = p0*nz;
-    }
-
-    typedef void ( PLocAssem_Tet_VMS_NS_GenAlpha::*locassem_tet_vms_ns_funs )( const double &x, const double &y, const double &z,
-        const double &t, const double &nx, const double &ny,
-        const double &nz, double &gx, double &gy, double &gz ) const;
-
-    locassem_tet_vms_ns_funs * flist;
-
-    void get_ebc_fun( const int &ebc_id,
-        const double &x, const double &y, const double &z,
-        const double &t, const double &nx, const double &ny,
-        const double &nz, double &gx, double &gy, double &gz ) const
-    {
-      return ((*this).*(flist[ebc_id]))(x,y,z,t,nx,ny,nz,gx,gy,gz);
-    }
-
-    void Zero_Sub_Tan()
-    {
-      for(int ii=0; ii<16; ++ii)
+      void get_f(const double &x, const double &y, const double &z,
+          const double &t, double &fx, double &fy, double &fz ) const
       {
-        for(int jj=0; jj<nLocBas * nLocBas; ++jj) Sub_Tan[ii][jj] = 0.0;
+        fx = 0.0; fy = 0.0; fz = 0.0;
       }
-    }
 
-    void Zero_Sub_sur_Tan()
-    {
-      for(int ii=0; ii<16; ++ii)
+      void get_H1(const double &x, const double &y, const double &z,
+          const double &t, const double &nx, const double &ny,
+          const double &nz, double &gx, double &gy, double &gz ) const
       {
-        for(int jj=0; jj<snLocBas * snLocBas; ++jj) Sub_sur_Tan[ii][jj] = 0.0;
+        const double p0 = 0.0;
+        gx = p0*nx; gy = p0*ny; gz = p0*nz;
       }
-    }
 
+      typedef void ( PLocAssem_Tet_VMS_NS_GenAlpha::*locassem_tet_vms_ns_funs )( const double &x, const double &y, const double &z,
+          const double &t, const double &nx, const double &ny,
+          const double &nz, double &gx, double &gy, double &gz ) const;
+
+      locassem_tet_vms_ns_funs * flist;
+
+      void get_ebc_fun( const int &ebc_id,
+          const double &x, const double &y, const double &z,
+          const double &t, const double &nx, const double &ny,
+          const double &nz, double &gx, double &gy, double &gz ) const
+      {
+        return ((*this).*(flist[ebc_id]))(x,y,z,t,nx,ny,nz,gx,gy,gz);
+      }
+
+      void Zero_Sub_Tan()
+      {
+        for(int ii=0; ii<16; ++ii)
+        {
+          for(int jj=0; jj<nLocBas * nLocBas; ++jj) Sub_Tan[ii][jj] = 0.0;
+        }
+      }
+
+      void Zero_Sub_sur_Tan()
+      {
+        for(int ii=0; ii<16; ++ii)
+        {
+          for(int jj=0; jj<snLocBas * snLocBas; ++jj) Sub_sur_Tan[ii][jj] = 0.0;
+        }
+      }
 };
 
 #endif
