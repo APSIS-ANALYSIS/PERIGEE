@@ -33,10 +33,7 @@ PLocAssem_Tet_VMS_NS_GenAlpha::PLocAssem_Tet_VMS_NS_GenAlpha(
   dR_dy.resize(nLocBas);
   dR_dz.resize(nLocBas);
   d2R_dxx.resize(nLocBas);
-  d2R_dxy.resize(nLocBas);
-  d2R_dxz.resize(nLocBas);
   d2R_dyy.resize(nLocBas);
-  d2R_dyz.resize(nLocBas);
   d2R_dzz.resize(nLocBas);
 
   Sub_Tan.resize(16); Sub_sur_Tan.resize(16);
@@ -215,9 +212,8 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
     v_xx = 0.0; v_yy = 0.0; v_zz = 0.0;
     w_xx = 0.0; w_yy = 0.0; w_zz = 0.0;
 
-    element->get_3D_R_dR_d2R( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0],
-        &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0],
-        &d2R_dxy[0], &d2R_dxz[0], &d2R_dyz[0] );
+    element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
+        &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
 
     element->get_invJacobian( qua, dxi_dx );
 
@@ -414,9 +410,8 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     v_xx = 0.0; v_yy = 0.0; v_zz = 0.0;
     w_xx = 0.0; w_yy = 0.0; w_zz = 0.0;
 
-    element->get_3D_R_dR_d2R( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0],
-        &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0],
-        &d2R_dxy[0], &d2R_dxz[0], &d2R_dyz[0] );
+    element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
+        &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
 
     element->get_invJacobian( qua, dxi_dx );
 
