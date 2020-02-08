@@ -63,9 +63,9 @@ PLocAssem_Tet_VMS_NS_GenAlpha::~PLocAssem_Tet_VMS_NS_GenAlpha()
 void PLocAssem_Tet_VMS_NS_GenAlpha::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
-  SYS_T::commPrint("  Three-dimensional Incompressible Navier-Stokes with rho in momentum equations: \n");
+  SYS_T::commPrint("  Three-dimensional Incompressible Navier-Stokes equations: \n");
   SYS_T::commPrint("  FEM: 4/10-node Tetrahedral \n");
-  SYS_T::commPrint("  Spatial: VMS \n");
+  SYS_T::commPrint("  Spatial: Residual-based VMS \n");
   SYS_T::commPrint("  Temporal: Generalized-alpha Method \n");
   SYS_T::commPrint("  Density rho = %e \n", rho0);
   SYS_T::commPrint("  Dynamic Viscosity mu = %e \n", vis_mu);
@@ -73,9 +73,10 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::print_info() const
   SYS_T::commPrint("  Stabilization para CI = %e \n", CI);
   SYS_T::commPrint("  Stabilization para CT = %e \n", CT);
   SYS_T::commPrint("  Backflow Stab. para beta = %e \n", beta);
-  SYS_T::commPrint("  Consistent tangent matrix used. \n");
-  SYS_T::commPrint("  Nonlinear quadratic term is in advective form. \n");
-  SYS_T::commPrint("  Pressure is evaluated at n+alpha_f rather than n+1. \n");
+  SYS_T::commPrint("  Note: \n");
+  SYS_T::commPrint("  1. Consistent tangent matrix used. \n");
+  SYS_T::commPrint("  2. Nonlinear quadratic term is in advective form. \n");
+  SYS_T::commPrint("  3. Pressure is evaluated at n+alpha_f rather than n+1. \n");
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
