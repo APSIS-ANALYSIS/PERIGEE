@@ -28,6 +28,7 @@
 #include "TimeMethod_GenAlpha.hpp"
 #include "PDNTimeStep.hpp"
 #include "PLocAssem_Tet_VMS_NS_GenAlpha.hpp"
+#include "PDNSolution_NS.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -187,22 +188,6 @@ int main(int argc, char *argv[])
 
   inflow_rate_ptr->print_info();
 
-  // ===== GenBC =====
-  IGenBC * gbc = nullptr;
-  
-  if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 1  )
-    gbc = new GenBC_Resistance( lpn_file.c_str() );
-  else if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 2  )
-    gbc = new GenBC_RCR( lpn_file.c_str(), 1000, initial_step );
-  else
-    SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
-
-  gbc -> print_info();
-  
-  // Make sure the gbc number of faces mathes that of ALocal_EBC
-  SYS_T::print_fatal_if(gbc->get_num_ebc() != locebc->get_num_ebc(),
-      "Error: GenBC number of faces does not match with that in ALocal_EBC.\n");
-
   // ===== Quadrature rules =====
   SYS_T::commPrint("===> Build quadrature rules. \n");
   IQuadPts * quadv = new QuadPts_Gauss_Tet( nqp_tet );
@@ -225,21 +210,71 @@ int main(int argc, char *argv[])
       genA_spectrium, genA_is2ndSystem);
   tm_galpha_ptr->print_info();
 
-  // ===== Time step info =====
-  PDNTimeStep * timeinfo = new PDNTimeStep(initial_index, initial_time, initial_step);
-
   // ===== Local Assembly routine =====
   IPLocAssem * locAssem_ptr = new PLocAssem_Tet_VMS_NS_GenAlpha(
       tm_galpha_ptr, GMIptr->get_nLocBas(),
       quadv->get_num_quadPts(), elements->get_nLocBas(),
       fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType() );
+ 
+  // ===== Initial condition =====
+  PDNSolution * base = new PDNSolution_NS( pNode, fNode, locinfnbc, 1 );
+
+  PDNSolution * sol = new PDNSolution_NS( pNode, 0 );
+
+  PDNSolution * dot_sol = new PDNSolution_NS( pNode, 0 );
+
+  if( is_restart )
+  {
+    initial_index = restart_index;
+    initial_time  = restart_time;
+    initial_step  = restart_step;
+
+    // Read sol file
+    SYS_T::file_exist_check(restart_name.c_str());
+    sol->ReadBinary(restart_name.c_str());
+   
+    // generate the corresponding dot_sol file name 
+    std::string restart_dot_name = "dot_";
+    restart_dot_name.append(restart_name);
+
+    // Read dot_sol file
+    SYS_T::file_exist_check(restart_dot_name.c_str());
+    dot_sol->ReadBinary(restart_dot_name.c_str());
+    
+    PetscPrintf(PETSC_COMM_WORLD, "===> Read sol from disk as a restart run... \n");
+    PetscPrintf(PETSC_COMM_WORLD, "     restart_name: %s \n", restart_name.c_str());
+    PetscPrintf(PETSC_COMM_WORLD, "     restart_dot_name: %s \n", restart_dot_name.c_str());
+    PetscPrintf(PETSC_COMM_WORLD, "     restart_time: %e \n", restart_time);
+    PetscPrintf(PETSC_COMM_WORLD, "     restart_index: %d \n", restart_index);
+    PetscPrintf(PETSC_COMM_WORLD, "     restart_step: %e \n", restart_step);
+  }
+
+  // ===== Time step info =====
+  PDNTimeStep * timeinfo = new PDNTimeStep(initial_index, initial_time, initial_step);
+
+  // ===== GenBC =====
+  IGenBC * gbc = nullptr;
+  
+  if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 1  )
+    gbc = new GenBC_Resistance( lpn_file.c_str() );
+  else if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 2  )
+    gbc = new GenBC_RCR( lpn_file.c_str(), 1000, initial_step );
+  else
+    SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
+
+  gbc -> print_info();
+  
+  // Make sure the gbc number of faces mathes that of ALocal_EBC
+  SYS_T::print_fatal_if(gbc->get_num_ebc() != locebc->get_num_ebc(),
+      "Error: GenBC number of faces does not match with that in ALocal_EBC.\n");
+
 
   // ===== Clean Memory =====
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
   delete locElem; delete locnbc; delete locebc; delete pNode; delete locinfnbc;
   delete tm_galpha_ptr; delete pmat; delete elementv; delete elements;
   delete quads; delete quadv; delete inflow_rate_ptr; delete gbc; delete timeinfo;
-  delete locAssem_ptr;
+  delete locAssem_ptr; delete base; delete sol; delete dot_sol;
 
   PetscFinalize();
   return EXIT_SUCCESS;

@@ -104,6 +104,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/PGAssem.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_Tet_VMS_NS_GenAlpha.cpp
+  ${perigee_SOURCE_DIR}/src/PDNSolution_NS.cpp
   )
 
 INCLUDE_DIRECTORIES( ../../include )
