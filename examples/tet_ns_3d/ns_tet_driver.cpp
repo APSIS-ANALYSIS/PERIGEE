@@ -53,9 +53,6 @@ int main(int argc, char *argv[])
   // part file location
   std::string part_file("part");
 
-  // determine if we want to print solver info
-  bool is_LS_info = false;
-
   // nonlinear solver parameters
   double nl_rtol = 1.0e-3;
   double nl_atol = 1.0e-6;
@@ -97,7 +94,6 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionString("-inflow_file", inflow_file);
   SYS_T::GetOptionString("-lpn_file", lpn_file);
   SYS_T::GetOptionString("-part_file", part_file);
-  SYS_T::GetOptionBool("-is_ls_info", is_LS_info);
   SYS_T::GetOptionReal("-nl_rtol", nl_rtol);
   SYS_T::GetOptionReal("-nl_atol", nl_atol);
   SYS_T::GetOptionReal("-nl_dtol", nl_dtol);
@@ -147,9 +143,6 @@ int main(int argc, char *argv[])
     SYS_T::cmdPrint("-restart_name:", restart_name);
   }
   else PetscPrintf(PETSC_COMM_WORLD, "-is_restart: false \n");
-
-  if(is_LS_info) PetscPrintf(PETSC_COMM_WORLD, "-is_ls_info: true \n");
-  else PetscPrintf(PETSC_COMM_WORLD, "-is_ls_info: false \n");
 
   // ===== Data from Files =====
   // Control points' xyz coordinates
@@ -217,9 +210,8 @@ int main(int argc, char *argv[])
 
   // ===== Finite Element Container =====
   SYS_T::commPrint("===> Setup element container. \n");
-  FEAElement * elementv = new FEAElement_Tet4( quadv-> get_num_quadPts() );
-  FEAElement * elements = new FEAElement_Triangle3_3D_der0(
-      quads-> get_num_quadPts() );
+  FEAElement * elementv = new FEAElement_Tet4( nqp_tet );
+  FEAElement * elements = new FEAElement_Triangle3_3D_der0( nqp_tri );
 
   // ===== Generate a sparse matrix for strong enforcement of essential BCs
   Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
@@ -240,7 +232,7 @@ int main(int argc, char *argv[])
   IPLocAssem * locAssem_ptr = new PLocAssem_Tet_VMS_NS_GenAlpha(
       tm_galpha_ptr, GMIptr->get_nLocBas(),
       quadv->get_num_quadPts(), elements->get_nLocBas(),
-      fluid_density, fluid_mu, bs_beta );
+      fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType() );
 
   // ===== Clean Memory =====
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
