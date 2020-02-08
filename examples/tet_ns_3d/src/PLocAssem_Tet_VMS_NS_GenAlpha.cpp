@@ -5,15 +5,25 @@ PLocAssem_Tet_VMS_NS_GenAlpha::PLocAssem_Tet_VMS_NS_GenAlpha(
         const int &in_nlocbas, const int &in_nqp,
         const int &in_snlocbas,
         const double &in_rho, const double &in_vis_mu,
-        const double &in_beta )
+        const double &in_beta, const int &elemtype )
 : rho0( in_rho ), vis_mu( in_vis_mu ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()), beta(in_beta),
   dof_per_node(4), nqp(in_nqp)
 {
-  // for linear elements
-  CI = 36.0; CT = 4.0;
-  nLocBas = 4; snLocBas = 3;
+  if(elemtype == 501)
+  {
+    // 501 is linear element
+    CI = 36.0; CT = 4.0;
+    nLocBas = 4; snLocBas = 3;
+  }
+  else if(elemtype == 502)
+  {
+    // 502 is quadratic element
+    CI = 60.0; CT = 4.0;
+    nLocBas = 10; snLocBas = 6;
+  }
+  else SYS_T::print_fatal("Error: unknown elem type.\n");
 
   vec_size = nLocBas * dof_per_node;
   sur_size = snLocBas * dof_per_node;
@@ -28,7 +38,7 @@ PLocAssem_Tet_VMS_NS_GenAlpha::PLocAssem_Tet_VMS_NS_GenAlpha(
   d2R_dyy.resize(nLocBas);
   d2R_dyz.resize(nLocBas);
   d2R_dzz.resize(nLocBas);
-  
+
   Sub_Tan.resize(16); Sub_sur_Tan.resize(16);
   for(int ii=0; ii<16; ++ii)
   {
@@ -206,9 +216,9 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
     w_xx = 0.0; w_yy = 0.0; w_zz = 0.0;
 
     element->get_3D_R_dR_d2R( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0],
-       &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0],
-       &d2R_dxy[0], &d2R_dxz[0], &d2R_dyz[0] );
-    
+        &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0],
+        &d2R_dxy[0], &d2R_dxz[0], &d2R_dyz[0] );
+
     element->get_invJacobian( qua, dxi_dx );
 
     for(ii=0; ii<nLocBas; ++ii)
@@ -722,6 +732,13 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     } // A-loop
   } // qua-loop
 
+  // ----------------------------------------------------------------
+  // The local `stiffness' matrix 
+  //            K[p][q] = Sub_Tan[4*ii + jj][A*nLocBas+B],
+  // where p = 4*A+ii, q = 4*B+jj, and K has 4*nLocBas rows/columns.
+  // Tangent is a 1D vector storing K by rows:
+  // Tangent[4*nLocBas*p + q] = K[p][q] = Sub_Tan[4*ii+jj][A*nLocBas+B]
+  // ----------------------------------------------------------------
   for(ii=0; ii<4; ++ii)
   {
     for(jj=0; jj<4; ++jj)
@@ -736,6 +753,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
       }
     }
   }
+
 }
 
 // EOF

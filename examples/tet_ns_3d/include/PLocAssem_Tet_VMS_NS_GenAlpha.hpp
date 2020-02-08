@@ -16,7 +16,8 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
         const int &in_nlocbas, const int &in_nqp,
         const int &in_snlocbas,
         const double &in_rho, const double &in_vis_mu,
-        const double &in_beta );
+        const double &in_beta,
+        const int &elemtype = 501 );
 
     virtual ~PLocAssem_Tet_VMS_NS_GenAlpha();
 
