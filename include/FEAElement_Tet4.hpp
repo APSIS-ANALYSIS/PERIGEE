@@ -65,6 +65,12 @@ class FEAElement_Tet4 : public FEAElement
         double * const &basis_zz, double * const &basis_xy, 
         double * const &basis_xz, double * const &basis_yz ) const;
 
+    virtual void get_3D_R_gradR_LaplacianR( const int &quaindex,
+        double * const &basis, double * const &basis_x, 
+        double * const &basis_y, double * const &basis_z, 
+        double * const &basis_xx, double * const &basis_yy, 
+        double * const &basis_zz ) const;
+
     virtual void get_Jacobian(const int &quaindex, 
         double * const &jac_value) const;
 

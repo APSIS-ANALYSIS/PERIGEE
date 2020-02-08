@@ -184,6 +184,27 @@ void FEAElement_Tet4::get_3D_R_dR_d2R( const int &quaindex,
 }
 
 
+void FEAElement_Tet4::get_3D_R_gradR_LaplacianR( const int &quaindex,
+    double * const &basis, double * const &basis_x,
+    double * const &basis_y, double * const &basis_z,
+    double * const &basis_xx, double * const &basis_yy,
+    double * const &basis_zz ) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  const int offset = quaindex * 4;
+  for( int ii=0; ii<4; ++ii )
+  {
+    basis[ii] = R[offset + ii];
+    basis_x[ii] = dR_dx[ii];
+    basis_y[ii] = dR_dy[ii];
+    basis_z[ii] = dR_dz[ii];
+    basis_xx[ii] = 0.0;
+    basis_yy[ii] = 0.0;
+    basis_zz[ii] = 0.0;
+  }
+}
+
+
 void FEAElement_Tet4::get_Jacobian(const int &quaindex,
     double * const &jac_value) const
 {
