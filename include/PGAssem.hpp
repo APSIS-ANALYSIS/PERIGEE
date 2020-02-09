@@ -31,7 +31,10 @@
 class PGAssem
 {
   public:
+    // K is the tangent matrix
     Mat K;
+    
+    // G is the residual vector
     Vec G;
 
     PGAssem( const IPLocAssem * const &locassem_ptr,
@@ -95,7 +98,6 @@ class PGAssem
     void Keep_nonzero_pattern()
     {MatSetOption(K, MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);} 
    
-    
     // ------------------------------------------------------------------------
     // ! clear K G  to be zero
     // ------------------------------------------------------------------------
@@ -104,7 +106,6 @@ class PGAssem
       MatZeroEntries(K);
       VecSet(G, 0.0);
     }
-
    
     // ------------------------------------------------------------------------
     // ! clear G to be zero
