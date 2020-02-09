@@ -71,11 +71,11 @@ class Part_NURBS_1Patch_3D_METIS : public IPart
     virtual int get_nFunc_y() const {return nFunc_y;}
     virtual int get_nFunc_z() const {return nFunc_z;}
 
-    virtual l_int get_sDegree() const {return sDegree;}
-    virtual l_int get_tDegree() const {return tDegree;}
-    virtual l_int get_uDegree() const {return uDegree;}
+    virtual int get_sDegree() const {return sDegree;}
+    virtual int get_tDegree() const {return tDegree;}
+    virtual int get_uDegree() const {return uDegree;}
 
-    virtual l_int get_nLocBas() const {return nLocBas;}
+    virtual int get_nLocBas() const {return nLocBas;}
 
     virtual double get_hx_max() const {return hx_max;}
     virtual double get_hy_max() const {return hy_max;}

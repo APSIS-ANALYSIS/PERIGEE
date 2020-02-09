@@ -85,10 +85,10 @@ class Part_Tet : public IPart
 
     virtual int get_nElem() const {return nElem;}
     virtual int get_nFunc() const {return nFunc;}
-    virtual l_int get_sDegree() const {return sDegree;}
-    virtual l_int get_tDegree() const {return tDegree;}
-    virtual l_int get_uDegree() const {return uDegree;}
-    virtual l_int get_nLocBas() const {return nLocBas;}
+    virtual int get_sDegree() const {return sDegree;}
+    virtual int get_tDegree() const {return tDegree;}
+    virtual int get_uDegree() const {return uDegree;}
+    virtual int get_nLocBas() const {return nLocBas;}
     virtual int get_LIEN(int ee, int ii) const {return LIEN[ee][ii];}
 
     virtual double get_ctrlPts_x_loc(int pos) const {return ctrlPts_x_loc[pos];}
