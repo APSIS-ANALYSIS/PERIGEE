@@ -14,7 +14,6 @@
 //
 // Date: Sept 23rd 2013.
 // ==================================================================
-#include "IsoPETSc3D_System.hpp"
 #include "Sys_Tools.hpp"
 
 class IMesh
@@ -29,26 +28,26 @@ class IMesh
     virtual int get_s_degree() const = 0;
     virtual int get_t_degree() const = 0;
     virtual int get_u_degree() const = 0;
-    virtual s_int get_nFunc() const = 0;
-    virtual s_int get_nElem() const = 0;
+    virtual int get_nFunc() const = 0;
+    virtual int get_nElem() const = 0;
     virtual int get_nLocBas() const = 0;
 
-    virtual s_int get_nFunc_x() const
+    virtual int get_nFunc_x() const
     {SYS_T::print_exit("Error: get_nFunc_x is not implemented. \n"); return 0;}
     
-    virtual s_int get_nFunc_y() const
+    virtual int get_nFunc_y() const
     {SYS_T::print_exit("Error: get_nFunc_y is not implemented. \n"); return 0;}
     
-    virtual s_int get_nFunc_z() const
+    virtual int get_nFunc_z() const
     {SYS_T::print_exit("Error: get_nFunc_z is not implemented. \n"); return 0;}
     
-    virtual s_int get_nElem_x() const
+    virtual int get_nElem_x() const
     {SYS_T::print_exit("Error: get_nElem_x is not implemented. \n"); return 0;}
     
-    virtual s_int get_nElem_y() const
+    virtual int get_nElem_y() const
     {SYS_T::print_exit("Error: get_nElem_y is not implemented. \n"); return 0;}
     
-    virtual s_int get_nElem_z() const
+    virtual int get_nElem_z() const
     {SYS_T::print_exit("Error: get_nElem_z is not implemented. \n"); return 0;}
     
     virtual double get_hx_max() const
@@ -69,29 +68,29 @@ class IMesh
     virtual double get_hz_min() const
     {SYS_T::print_exit("Error: get_hz_min is not implemented. \n"); return 0.0;}
 
-    virtual double get_hx(s_int ee) const
+    virtual double get_hx(int ee) const
     {SYS_T::print_exit("Error: get_hx is not implemented. \n"); return 0.0;}
     
-    virtual double get_hy(s_int ee) const
+    virtual double get_hy(int ee) const
     {SYS_T::print_exit("Error: get_hy is not implemented. \n"); return 0.0;}
     
-    virtual double get_hz(s_int ee) const
+    virtual double get_hz(int ee) const
     {SYS_T::print_exit("Error: get_hz is not implemented. \n"); return 0.0;}
 
 
     // ------------------------------------------------------------------------
     // Nonzero element numbering info
     // ------------------------------------------------------------------------
-    virtual s_int get_nElem_x_nz() const
+    virtual int get_nElem_x_nz() const
     {std::cerr<<"Error: get_nElem_x_nz is not implemented. \n"; exit(EXIT_FAILURE); return 0;}
     
-    virtual s_int get_nElem_y_nz() const
+    virtual int get_nElem_y_nz() const
     {std::cerr<<"Error: get_nElem_y_nz is not implemented. \n"; exit(EXIT_FAILURE); return 0;}
     
-    virtual s_int get_nElem_z_nz() const
+    virtual int get_nElem_z_nz() const
     {std::cerr<<"Error: get_nElem_z_nz is not implemented. \n"; exit(EXIT_FAILURE); return 0;}
     
-    virtual s_int get_nElem_nz() const
+    virtual int get_nElem_nz() const
     {std::cerr<<"Error: get_nElem_nz is not implemented. \n"; exit(EXIT_FAILURE); return 0;}
 
     
@@ -101,10 +100,10 @@ class IMesh
     virtual int get_patch_index() const
     {std::cerr<<"Error: get_patch_index is not implemented. \n"; exit(EXIT_FAILURE); return 0;}
 
-    virtual s_int get_nElem_start() const
+    virtual int get_nElem_start() const
     {std::cerr<<"Error: get_nElem_start is not implemented. \n"; exit(EXIT_FAILURE); return 0;}
 
-    virtual s_int get_nFunc_start() const
+    virtual int get_nFunc_start() const
     {std::cerr<<"Error: get_nElem_start is not implemented. \n"; exit(EXIT_FAILURE); return 0;}
 
     // ------------------------------------------------------------------------

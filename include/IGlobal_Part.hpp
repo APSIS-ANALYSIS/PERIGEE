@@ -1,5 +1,5 @@
-#ifndef I_GLOBAL_PART_HPP
-#define I_GLOBAL_PART_HPP
+#ifndef IGLOBAL_PART_HPP
+#define IGLOBAL_PART_HPP
 // ==================================================================
 // IGlobal_Part.hpp
 // Object:
