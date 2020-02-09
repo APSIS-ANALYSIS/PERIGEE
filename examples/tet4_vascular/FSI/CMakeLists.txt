@@ -107,7 +107,6 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/PDNTimeStep.cpp
   ${perigee_source}/Solver/Seg_Sol_Tools.cpp
   ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp
-  ${perigee_source}/Solver/PGAssem.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
   ${perigee_SOURCE_DIR}/../src/PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha.cpp
   ${perigee_SOURCE_DIR}/../src/PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha.cpp
