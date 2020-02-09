@@ -30,10 +30,11 @@ class Global_Part_Serial : public IGlobal_Part
     virtual int get_dual_edge_ncommon() const {return dual_edge_ncommon;}
   
   private:
+    const bool isMETIS, isDual;
+    const int dual_edge_ncommon;
+    
     idx_t * epart;
     idx_t * npart;
-    bool isMETIS, isDual;
-    int dual_edge_ncommon;
 
     virtual void write_part_hdf5( const char * const &fileName, 
         const idx_t * const &part_in,

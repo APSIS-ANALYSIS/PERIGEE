@@ -2,20 +2,17 @@
 
 Global_Part_Serial::Global_Part_Serial( const class IMesh * const &mesh,
    const char * const &element_part_name, const char * const &node_part_name )
+: isMETIS(false), isDual(false), dual_edge_ncommon(0)
 {
   const int nElem = mesh->get_nElem();
   const int nFunc = mesh->get_nFunc();
  
-  isMETIS = false;
-  isDual = false;
-  dual_edge_ncommon = 0;
-
   epart = new idx_t [nElem];
   npart = new idx_t [nFunc];
 
-  for(int e=0; e<nElem; ++e) epart[e] = 0;
+  for(int ee=0; ee<nElem; ++ee) epart[ee] = 0;
 
-  for(int n=0; n<nFunc; ++n) npart[n] = 0;
+  for(int nn=0; nn<nFunc; ++nn) npart[nn] = 0;
 
   const int cpu_size = 1;
   const bool isDualGraph = true;
