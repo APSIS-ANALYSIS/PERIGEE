@@ -23,7 +23,9 @@ class APart_Basic_Info
     virtual ~APart_Basic_Info();
 
     virtual int get_cpu_rank() const {return cpu_rank;}
+    
     virtual int get_cpu_size() const {return cpu_size;}
+    
     virtual int get_dual_edge_ncommon() const {return dual_edge_ncommon;}
 
     virtual void print_info() const;

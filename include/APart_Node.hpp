@@ -36,9 +36,13 @@ class APart_Node
     virtual int get_dof() const {return dof;}
 
     virtual int get_nlocalnode() const {return nlocalnode;}
+    
     virtual int get_nghostnode() const {return nghostnode;}
+    
     virtual int get_nbadnode() const {return nbadnode;}
+    
     virtual int get_nlocghonode() const {return nlocghonode;}
+    
     virtual int get_ntotalnode() const {return ntotalnode;}
 
     virtual int get_local_to_global(const int &index) 
