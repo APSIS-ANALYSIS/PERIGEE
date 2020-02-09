@@ -3,8 +3,8 @@
 Global_Part_Serial::Global_Part_Serial( const class IMesh * const &mesh,
    const char * const &element_part_name, const char * const &node_part_name )
 {
-  const s_int nElem = mesh->get_nElem();
-  const s_int nFunc = mesh->get_nFunc();
+  const int nElem = mesh->get_nElem();
+  const int nFunc = mesh->get_nFunc();
  
   isMETIS = false;
   isDual = false;
@@ -13,9 +13,9 @@ Global_Part_Serial::Global_Part_Serial( const class IMesh * const &mesh,
   epart = new idx_t [nElem];
   npart = new idx_t [nFunc];
 
-  for(s_int e = 0; e<nElem; ++e) epart[e] = 0;
+  for(int e = 0; e<nElem; ++e) epart[e] = 0;
 
-  for(s_int n=0; n<nFunc; ++n) npart[n] = 0;
+  for(int n=0; n<nFunc; ++n) npart[n] = 0;
 
   int cpu_size = 1;
   bool isDualGraph = true;
@@ -35,13 +35,13 @@ Global_Part_Serial::~Global_Part_Serial()
 }
 
 
-inline idx_t Global_Part_Serial::get_epart( s_int e ) const
+inline idx_t Global_Part_Serial::get_epart( int e ) const
 {
   return epart[e];
 }
 
 
-inline idx_t Global_Part_Serial::get_npart( s_int n ) const
+inline idx_t Global_Part_Serial::get_npart( int n ) const
 {
   return npart[n];
 }
@@ -49,7 +49,7 @@ inline idx_t Global_Part_Serial::get_npart( s_int n ) const
 
 void Global_Part_Serial::write_part_hdf5( const char * const &fileName,
     const idx_t * const &part_in,
-    const s_int &part_size, const int &cpu_size,
+    const int &part_size, const int &cpu_size,
     const bool &part_isdual, const int &in_ncommon,
     const bool &isMETIS ) const
 {

@@ -145,7 +145,7 @@ Global_Part_METIS::~Global_Part_METIS()
 
 void Global_Part_METIS::write_part_hdf5( const char * const &fileName,
     const idx_t * const &part_in,
-    const s_int &part_size, const int &cpu_size,
+    const int &part_size, const int &cpu_size,
     const bool &part_isdual, const int &in_ncommon,
     const bool &isMETIS ) const
 {

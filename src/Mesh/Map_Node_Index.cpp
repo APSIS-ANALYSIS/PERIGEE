@@ -1,9 +1,9 @@
 #include "Map_Node_Index.hpp"
 
 Map_Node_Index::Map_Node_Index( const class IGlobal_Part * const &gpart,
-    const int &cpu_size, const s_int nFunc )
+    const int &cpu_size, const int nFunc )
 {
-  s_int newnum = 0;
+  int newnum = 0;
   old_2_new.resize(nFunc);
   new_2_old.resize(nFunc);
   
@@ -12,7 +12,7 @@ Map_Node_Index::Map_Node_Index( const class IGlobal_Part * const &gpart,
   // old to new mapping
   for(int proc = 0; proc<cpu_size; ++proc)
   {
-    for( s_int nn=0; nn<nFunc; ++nn )
+    for( int nn=0; nn<nFunc; ++nn )
     {
       if( (int) gpart->get_npart(nn) == proc )
       {
@@ -26,7 +26,7 @@ Map_Node_Index::Map_Node_Index( const class IGlobal_Part * const &gpart,
   VEC_T::shrink2fit(new_2_old);
   
   std::cout<<"-- mapping generated. Memory usage: ";
-  SYS_T::print_mem_size( double(old_2_new.size())*2.0*sizeof(s_int) );
+  SYS_T::print_mem_size( double(old_2_new.size())*2.0*sizeof(int) );
   std::cout<<std::endl;
   std::cout<<"=== Node index mapping generated. \n \n";
 }
@@ -42,10 +42,10 @@ void Map_Node_Index::print_info() const
   std::cout<<std::endl;
   std::cout<<"========================== "<<std::endl;
   std::cout<<" ii - old_2_new - new_2_old "<<std::endl;
-  for(s_int ii=0; ii<(s_int) old_2_new.size(); ++ii)
+  for(int ii=0; ii<(int) old_2_new.size(); ++ii)
     std::cout<<ii<<'\t'<<get_old2new(ii)<<'\t'<<get_new2old(ii)<<std::endl;
   std::cout<<std::endl;
-  std::cout<<" Memory usage: "<<old_2_new.size() * 2 * sizeof(s_int)<<" bytes."<<std::endl;
+  std::cout<<" Memory usage: "<<old_2_new.size() * 2 * sizeof(int)<<" bytes."<<std::endl;
   std::cout<<"========================== "<<std::endl;
 }
 

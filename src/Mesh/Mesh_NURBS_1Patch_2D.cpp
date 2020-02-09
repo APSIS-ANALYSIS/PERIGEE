@@ -64,17 +64,17 @@ Mesh_NURBS_1Patch_2D::~Mesh_NURBS_1Patch_2D()
 }
 
 
-void Mesh_NURBS_1Patch_2D::get_elem_index( const s_int &ee,
-    s_int &ex, s_int &ey ) const
+void Mesh_NURBS_1Patch_2D::get_elem_index( const int &ee,
+    int &ex, int &ey ) const
 {
   ex = ee % nElem_x;
   ey = (ee - ex) / nElem_x;
 }
 
 
-double Mesh_NURBS_1Patch_2D::get_hx( s_int ee ) const
+double Mesh_NURBS_1Patch_2D::get_hx( int ee ) const
 {
-  s_int ex, ey;
+  int ex, ey;
 
   get_elem_index(ee, ex, ey);
 
@@ -82,9 +82,9 @@ double Mesh_NURBS_1Patch_2D::get_hx( s_int ee ) const
 }
 
 
-double Mesh_NURBS_1Patch_2D::get_hy( s_int ee ) const 
+double Mesh_NURBS_1Patch_2D::get_hy( int ee ) const 
 {
-  s_int ex, ey;
+  int ex, ey;
 
   get_elem_index(ee, ex, ey);
 
@@ -92,7 +92,7 @@ double Mesh_NURBS_1Patch_2D::get_hy( s_int ee ) const
 }
 
 
-double Mesh_NURBS_1Patch_2D::get_hz( s_int ee ) const
+double Mesh_NURBS_1Patch_2D::get_hz( int ee ) const
 {
   std::cerr<<"Error: this is a 2D mesh class, get_hz is invalid! \n";
 

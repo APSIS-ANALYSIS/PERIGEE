@@ -198,7 +198,7 @@ void BoundaryCond::Create_ID(const IMesh * const &mesh)
 }
 
 
-void BoundaryCond::Create_ID(const s_int &in_nfunc)
+void BoundaryCond::Create_ID(const int &in_nfunc)
 {
   ID.clear();
   ID.resize(in_nfunc);

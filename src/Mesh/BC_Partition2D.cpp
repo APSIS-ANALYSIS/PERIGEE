@@ -64,8 +64,8 @@ BC_Partition2D::BC_Partition2D( const IPart * const &part,
   {
     for(int j=0; j<totnode; ++j)
     {
-      s_int new_index = part->get_local_to_global(j);
-      s_int old_index = mnindex->get_new2old(new_index);
+      int new_index = part->get_local_to_global(j);
+      int old_index = mnindex->get_new2old(new_index);
       LID[i*totnode+j] = bc_list[i]->get_ID( old_index );
     }
   }
@@ -186,7 +186,7 @@ void BC_Partition2D::write_hdf5(const char * FileName) const
   // LID
   hid_t dataspace_id_LID, setid_LID;
   hsize_t dim_LID[1];
-  dim_LID[0] = (s_int) LID.size();
+  dim_LID[0] = (int) LID.size();
   dataspace_id_LID = H5Screate_simple(1, dim_LID, NULL);
   setid_LID = H5Dcreate( group_id, "LID", H5T_NATIVE_INT, dataspace_id_LID,
       H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
@@ -199,7 +199,7 @@ void BC_Partition2D::write_hdf5(const char * FileName) const
   {
     hid_t dataspace_id_LDN, setid_LDN;
     hsize_t dim_LDN[1];
-    dim_LDN[0] = (s_int) LDN.size();
+    dim_LDN[0] = (int) LDN.size();
     dataspace_id_LDN = H5Screate_simple(1, dim_LDN, NULL);
     setid_LDN = H5Dcreate( group_id, "LDN", H5T_NATIVE_INT, dataspace_id_LDN,
         H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
@@ -213,7 +213,7 @@ void BC_Partition2D::write_hdf5(const char * FileName) const
   {
     hid_t dataspace_id_LPN, setid_LPSN, setid_LPMN;
     hsize_t dim_LPN[1];
-    dim_LPN[0] = (s_int) LPSN.size();
+    dim_LPN[0] = (int) LPSN.size();
     dataspace_id_LPN = H5Screate_simple(1, dim_LPN, NULL);
     setid_LPSN = H5Dcreate( group_id, "LPSN", H5T_NATIVE_INT, dataspace_id_LPN,
         H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );

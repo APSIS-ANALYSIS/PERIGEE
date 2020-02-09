@@ -26,14 +26,14 @@ void IPart::GenPart( const int &nElem,
   // 1. Create local partition based on epart & npart
   elem_loc.clear(); node_loc.clear();
 
-  for( s_int e=0; e<nElem; ++e )
+  for( int e=0; e<nElem; ++e )
   {
     if( gpart->get_epart(e) == cpu_rank ) elem_loc.push_back(e);
   }
   VEC_T::shrink2fit(elem_loc);
   nlocalele = static_cast<int>( elem_loc.size() );
 
-  for( s_int n=0; n<nFunc; ++n )
+  for( int n=0; n<nFunc; ++n )
   {
     if( gpart->get_npart(n) == cpu_rank )
     {
@@ -56,12 +56,12 @@ void IPart::GenPart( const int &nElem,
     node_loc[ii] = mnindex->get_old2new( node_loc[ii] );
 
   // 3. Generate node_tot, all the nodes needed by the subdomain
-  std::vector<s_int> node_tot; node_tot.clear();
+  std::vector<int> node_tot; node_tot.clear();
   for( int e=0; e<nlocalele; ++e )
   {
     for( int ii=0; ii<nLocBas; ++ii )
     {
-      s_int temp_node = IEN->get_IEN(elem_loc[e], ii);
+      int temp_node = IEN->get_IEN(elem_loc[e], ii);
       temp_node = mnindex->get_old2new(temp_node);
       node_tot.push_back( temp_node );
     }
@@ -82,8 +82,8 @@ void IPart::GenPart( const int &nElem,
   nbadnode = 0;
   if( nghostnode + nlocalnode != ntotalnode )
   {
-    std::vector<s_int> badnode;
-    std::vector<s_int>::iterator badnode_it;
+    std::vector<int> badnode;
+    std::vector<int>::iterator badnode_it;
     for( int n=0; n<nlocalnode; ++n )
     {
       badnode_it = find( node_tot.begin(), node_tot.end(), node_loc[n] );
@@ -112,7 +112,7 @@ void IPart::GenPart( const int &nElem,
 
   // 5. local_to_global mapping
   local_to_global = node_loc;
-  for( s_int n=0; n<nghostnode; ++n )
+  for( int n=0; n<nghostnode; ++n )
     local_to_global.push_back( node_ghost[n] );
 
   VEC_T::shrink2fit(local_to_global);
@@ -126,7 +126,7 @@ void IPart::GenPart( const int &nElem,
   for(int e=0; e<nlocalele; ++e) LIEN[e].resize(nLocBas);
 
   std::vector<int>::iterator lien_ptr;
-  s_int global_index;
+  int global_index;
   for(int e=0; e<nlocalele; ++e)
   {
     for(int i=0; i<nLocBas; ++i)

@@ -46,7 +46,7 @@ Part_NURBS_1Patch_2D_METIS::Part_NURBS_1Patch_2D_METIS( const IMesh * const &mes
 
   // create indices for nonzero elements
   nonzero_x.clear(); nonzero_y.clear();
-  s_int temp_index = 0;
+  int temp_index = 0;
   for(int ee = 0 ; ee<nElem_x; ++ee)
   {
     if(mesh->get_hx(ee) == 0.0)
@@ -81,17 +81,17 @@ Part_NURBS_1Patch_2D_METIS::~Part_NURBS_1Patch_2D_METIS()
 }
 
 
-bool Part_NURBS_1Patch_2D_METIS::isElemInPart(s_int gloindex) const
+bool Part_NURBS_1Patch_2D_METIS::isElemInPart(int gloindex) const
 {
-  std::vector<s_int>::const_iterator findindex;
+  std::vector<int>::const_iterator findindex;
   findindex = find(elem_loc.begin(), elem_loc.end(), gloindex);
   return findindex != elem_loc.end();
 }
 
 
-int Part_NURBS_1Patch_2D_METIS::get_elemLocIndex(const s_int &gloindex) const
+int Part_NURBS_1Patch_2D_METIS::get_elemLocIndex(const int &gloindex) const
 {
-  std::vector<s_int>::const_iterator findindex;
+  std::vector<int>::const_iterator findindex;
   findindex = find(elem_loc.begin(), elem_loc.end(), gloindex);
   if( findindex == elem_loc.end() )
     return -1;
@@ -100,9 +100,9 @@ int Part_NURBS_1Patch_2D_METIS::get_elemLocIndex(const s_int &gloindex) const
 }
 
 
-bool Part_NURBS_1Patch_2D_METIS::isNodeInPart(s_int gloindex) const
+bool Part_NURBS_1Patch_2D_METIS::isNodeInPart(int gloindex) const
 {
-  std::vector<s_int>::const_iterator findindex;
+  std::vector<int>::const_iterator findindex;
   findindex = find(node_loc.begin(), node_loc.end(), gloindex);
   return findindex != node_loc.end();
 }
@@ -291,7 +291,7 @@ void Part_NURBS_1Patch_2D_METIS::Generate_Partition( const class IMesh * const &
   // 1. Create local partition based on the epart npart info from gpart
   elem_loc.clear(); node_loc.clear();
 
-  for(s_int e=0; e<nElem; ++e)
+  for(int e=0; e<nElem; ++e)
   {
     if( gpart->get_epart(e) == cpu_rank )
       elem_loc.push_back(e);
@@ -299,7 +299,7 @@ void Part_NURBS_1Patch_2D_METIS::Generate_Partition( const class IMesh * const &
   VEC_T::shrink2fit(elem_loc);
   nlocalele = elem_loc.size();
 
-  for( s_int n=0; n<nFunc; ++n )
+  for( int n=0; n<nFunc; ++n )
   {
     if( gpart->get_npart(n) == cpu_rank )
     {
@@ -323,19 +323,19 @@ void Part_NURBS_1Patch_2D_METIS::Generate_Partition( const class IMesh * const &
 
   // 3. generate node_tot, which stores the nodes needed by the subdomain
   //    including ghostnodes
-  std::vector<s_int> node_tot;
+  std::vector<int> node_tot;
   node_tot.clear();
   for( int e=0; e<nlocalele; ++e )
   {
     for( int ii=0; ii<nLocBas; ++ii )
     {
-      s_int temp_node = IEN->get_IEN(elem_loc[e], ii);
+      int temp_node = IEN->get_IEN(elem_loc[e], ii);
       temp_node = mnindex->get_old2new(temp_node);
       node_tot.push_back( temp_node );
     }
   }
   sort(node_tot.begin(), node_tot.end());
-  std::vector<s_int>::iterator it = unique(node_tot.begin(), node_tot.end());
+  std::vector<int>::iterator it = unique(node_tot.begin(), node_tot.end());
   node_tot.resize( it - node_tot.begin() );
 
   ntotalnode = (int) node_tot.size();
@@ -355,8 +355,8 @@ void Part_NURBS_1Patch_2D_METIS::Generate_Partition( const class IMesh * const &
   nbadnode = 0;
   if( nghostnode + nlocalnode != ntotalnode )
   {
-    std::vector<s_int> badnode;
-    std::vector<s_int>::iterator badnode_it;
+    std::vector<int> badnode;
+    std::vector<int>::iterator badnode_it;
     for( int n=0; n<nlocalnode; ++n )
     {
       badnode_it = find( node_tot.begin(), node_tot.end(), node_loc[n] );
@@ -387,9 +387,9 @@ void Part_NURBS_1Patch_2D_METIS::Generate_Partition( const class IMesh * const &
 
   // 5. local_to_global mapping
   local_to_global.clear();
-  for( s_int n=0; n<nlocalnode; ++n )
+  for( int n=0; n<nlocalnode; ++n )
     local_to_global.push_back( node_loc[n] );
-  for( s_int n=0; n<nghostnode; ++n )
+  for( int n=0; n<nghostnode; ++n )
     local_to_global.push_back( node_ghost[n] );
 
   VEC_T::shrink2fit(local_to_global);
@@ -404,7 +404,7 @@ void Part_NURBS_1Patch_2D_METIS::Generate_Partition( const class IMesh * const &
     LIEN[e] = new int [nLocBas];
 
   std::vector<int>::iterator lien_ptr;
-  s_int global_index;
+  int global_index;
   for(int e=0; e<nlocalele; ++e)
   {
     for(int i=0; i<nLocBas; ++i)
@@ -456,7 +456,7 @@ void Part_NURBS_1Patch_2D_METIS::Generate_Partition( const class IMesh * const &
   // 8. hx hy hz for local elements
   for( int e=0; e<nlocalele; ++e )
   {
-    s_int e_global = get_elem_loc(e);
+    int e_global = get_elem_loc(e);
     hx.push_back(mesh->get_hx(e_global));
     hy.push_back(mesh->get_hy(e_global));
   }
@@ -693,7 +693,7 @@ void Part_NURBS_1Patch_2D_METIS::write_global_mesh_info( hid_t file_id ) const
   // element dataset crate and write
   setid_nElem = H5Dcreate( group_id, "nElem", H5T_NATIVE_INT, dataspace_id_4,
       H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-  std::vector<s_int> vec_temp;
+  std::vector<int> vec_temp;
   vec_temp.clear();
   vec_temp.push_back(nElem); vec_temp.push_back(nElem_x);
   vec_temp.push_back(nElem_y);

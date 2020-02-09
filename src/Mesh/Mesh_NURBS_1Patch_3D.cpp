@@ -152,34 +152,34 @@ Mesh_NURBS_1Patch_3D::~Mesh_NURBS_1Patch_3D()
   std::cout<<"-- Mesh_NURBS_1Patch_3D deleted. \n";
 }
 
-void Mesh_NURBS_1Patch_3D::get_elem_index( const s_int &ee, 
-    s_int &ex, s_int &ey, s_int &ez ) const 
+void Mesh_NURBS_1Patch_3D::get_elem_index( const int &ee, 
+    int &ex, int &ey, int &ez ) const 
 {
-  s_int exy = ee % (nElem_x * nElem_y);
+  int exy = ee % (nElem_x * nElem_y);
   ez = (ee - exy) / (nElem_x * nElem_y);
   ex = exy % nElem_x;
   ey = (exy - ex)/nElem_x;
 }
 
-double Mesh_NURBS_1Patch_3D::get_hx( s_int ee ) const
+double Mesh_NURBS_1Patch_3D::get_hx( int ee ) const
 {
-  s_int ex, ey, ez;
+  int ex, ey, ez;
   get_elem_index(ee, ex, ey, ez);
 
   return hx[ex];
 }
 
-double Mesh_NURBS_1Patch_3D::get_hy( s_int ee) const
+double Mesh_NURBS_1Patch_3D::get_hy( int ee) const
 {
-  s_int ex, ey, ez;
+  int ex, ey, ez;
   get_elem_index(ee, ex, ey, ez);
 
   return hy[ey];
 }
 
-double Mesh_NURBS_1Patch_3D::get_hz( s_int ee) const
+double Mesh_NURBS_1Patch_3D::get_hz( int ee) const
 {
-  s_int ex, ey, ez;
+  int ex, ey, ez;
   get_elem_index(ee, ex, ey, ez);
 
   return hz[ez];

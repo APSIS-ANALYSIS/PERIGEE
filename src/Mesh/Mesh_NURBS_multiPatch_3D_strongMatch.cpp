@@ -112,7 +112,7 @@ Mesh_NURBS_multiPatch_3D_strongMatch::~Mesh_NURBS_multiPatch_3D_strongMatch()
 
 
 
-double Mesh_NURBS_multiPatch_3D_strongMatch::get_hx( s_int ee ) const
+double Mesh_NURBS_multiPatch_3D_strongMatch::get_hx( int ee ) const
 {
   int p_ind, e_ind;
   get_locelem_index(ee, p_ind, e_ind);
@@ -120,7 +120,7 @@ double Mesh_NURBS_multiPatch_3D_strongMatch::get_hx( s_int ee ) const
 }
 
 
-double Mesh_NURBS_multiPatch_3D_strongMatch::get_hy( s_int ee ) const
+double Mesh_NURBS_multiPatch_3D_strongMatch::get_hy( int ee ) const
 {
   int p_ind, e_ind;
   get_locelem_index(ee, p_ind, e_ind);
@@ -129,7 +129,7 @@ double Mesh_NURBS_multiPatch_3D_strongMatch::get_hy( s_int ee ) const
 
 
 
-double Mesh_NURBS_multiPatch_3D_strongMatch::get_hz( s_int ee ) const
+double Mesh_NURBS_multiPatch_3D_strongMatch::get_hz( int ee ) const
 {
   int p_ind, e_ind;
   get_locelem_index(ee, p_ind, e_ind);
