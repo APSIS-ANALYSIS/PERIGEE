@@ -35,18 +35,6 @@ Global_Part_Serial::~Global_Part_Serial()
 }
 
 
-inline idx_t Global_Part_Serial::get_epart( int e ) const
-{
-  return epart[e];
-}
-
-
-inline idx_t Global_Part_Serial::get_npart( int n ) const
-{
-  return npart[n];
-}
-
-
 void Global_Part_Serial::write_part_hdf5( const char * const &fileName,
     const idx_t * const &part_in,
     const int &part_size, const int &cpu_size,

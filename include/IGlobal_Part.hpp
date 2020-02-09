@@ -20,8 +20,8 @@ class IGlobal_Part
     IGlobal_Part(){};
     virtual ~IGlobal_Part(){};
 
-    virtual idx_t get_epart( int e ) const = 0;
-    virtual idx_t get_npart( int n ) const = 0;
+    virtual idx_t get_epart( const int &ee ) const = 0;
+    virtual idx_t get_npart( const int &nn ) const = 0;
 
     virtual bool get_isMETIS() const = 0;
     virtual bool get_isDual() const = 0;

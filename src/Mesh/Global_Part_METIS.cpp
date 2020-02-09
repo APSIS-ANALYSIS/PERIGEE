@@ -2,8 +2,8 @@
 
 Global_Part_METIS::Global_Part_METIS( const int &cpu_size,
         const int &in_ncommon, const bool &isDualGraph,
-        const class IMesh * const &mesh,
-        const class IIEN * const &IEN,
+        const IMesh * const &mesh,
+        const IIEN * const &IEN,
         const char * const &element_part_name,
         const char * const &node_part_name )
 {

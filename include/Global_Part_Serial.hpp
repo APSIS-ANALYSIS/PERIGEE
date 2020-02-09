@@ -16,14 +16,14 @@
 class Global_Part_Serial : public IGlobal_Part
 {
   public:
-    Global_Part_Serial( const class IMesh * const &mesh,
+    Global_Part_Serial( const IMesh * const &mesh,
        const char * const &element_part_name,
        const char * const &node_part_name );
 
     virtual ~Global_Part_Serial();
 
-    virtual idx_t get_epart( int e ) const;
-    virtual idx_t get_npart( int n ) const;
+    virtual idx_t get_epart( const int &ee ) const {return epart[ee];}
+    virtual idx_t get_npart( const int &nn ) const {return npart[nn];}
 
     virtual bool get_isMETIS() const {return isMETIS;};
     virtual bool get_isDual() const {return isDual;};
