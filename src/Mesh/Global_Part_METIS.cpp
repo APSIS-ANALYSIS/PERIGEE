@@ -6,15 +6,12 @@ Global_Part_METIS::Global_Part_METIS( const int &cpu_size,
         const IIEN * const &IEN,
         const char * const &element_part_name,
         const char * const &node_part_name )
+: isMETIS(true), isDual(isDualGraph), dual_edge_ncommon(in_ncommon)
 {
   const idx_t nElem = mesh->get_nElem();
   const idx_t nFunc = mesh->get_nFunc();
   const idx_t nLocBas = mesh->get_nLocBas();
   
-  isMETIS = true;
-  isDual = isDualGraph;
-  dual_edge_ncommon = in_ncommon;
-
   if(cpu_size <= 1)
   {
     std::cerr<<"ERROR: METIS cannot handle partition graph into one subdomain. \n";
@@ -57,11 +54,11 @@ Global_Part_METIS::Global_Part_METIS( const int &cpu_size,
 
   clock_t time_tracker = clock();
   
-  for( idx_t e=0; e<nElem; ++e )
+  for( idx_t ee=0; ee<nElem; ++ee )
   {
-    eptr[e] = e * nLocBas;
+    eptr[ee] = ee * nLocBas;
     for(int ii=0; ii<nLocBas; ++ii)
-      eind[e*nLocBas + ii] = IEN->get_IEN(e, ii);
+      eind[ee*nLocBas + ii] = IEN->get_IEN(ee, ii);
   }
   eptr[nElem] = nElem * nLocBas;
   
