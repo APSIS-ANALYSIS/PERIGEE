@@ -21,11 +21,11 @@ class IPLocAssem
   public:
     IPLocAssem()
     {
-      Tangent  = NULL;
-      Residual = NULL;
+      Tangent  = nullptr;
+      Residual = nullptr;
       
-      sur_Tangent  = NULL;
-      sur_Residual = NULL;
+      sur_Tangent  = nullptr;
+      sur_Residual = nullptr;
     }
     
     virtual ~IPLocAssem(){};
@@ -86,11 +86,11 @@ class IPLocAssem
         double time, double dt,
         const double * const &vec_a,
         const double * const &vec_b,
-        const class FEAElement * const &element,
+        const FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
-        const class AInt_Weight * const &weight )
+        const AInt_Weight * const &weight )
     {SYS_T::commPrint("Warning: this Assem_Residual(...) is not implemented. \n");}
     
     
@@ -120,7 +120,7 @@ class IPLocAssem
         const double * const &ext_x,
         const double * const &ext_y,
         const double * const &ext_z,
-        const class AInt_Weight * const &weight )
+        const AInt_Weight * const &weight )
     {SYS_T::commPrint("Warning: this Assem_Residual(...) is not implemented. \n");}
   
 
@@ -141,7 +141,7 @@ class IPLocAssem
         const double * const &ext_x,
         const double * const &ext_y,
         const double * const &ext_z,
-        const class AInt_Weight * const &weight )
+        const AInt_Weight * const &weight )
     {SYS_T::commPrint("Warning: this Assem_Residual(...) is not implemented. \n");}
 
 
@@ -169,7 +169,7 @@ class IPLocAssem
         const double * const &ext_x,
         const double * const &ext_y,
         const double * const &ext_z,
-        const class AInt_Weight * const &weight )
+        const AInt_Weight * const &weight )
     {SYS_T::commPrint("Warning: this Assem_Residual(...) is not implemented. \n");}
 
 
@@ -228,11 +228,11 @@ class IPLocAssem
         double time, double dt,
         const double * const &vec_a,
         const double * const &vec_b,
-        const class FEAElement * const &element,
+        const FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
-        const class AInt_Weight * const &weight )
+        const AInt_Weight * const &weight )
     {SYS_T::commPrint("Warning: this Assem_Tangent_Residual(...) is not implemented. \n");}
 
 
@@ -260,7 +260,7 @@ class IPLocAssem
         const double * const &ext_x,
         const double * const &ext_y,
         const double * const &ext_z,
-        const class AInt_Weight * const &weight )
+        const AInt_Weight * const &weight )
     {SYS_T::commPrint("Warning: this Assem_Tangent_Residual(...) is not implemented. \n");}
 
 
@@ -282,7 +282,7 @@ class IPLocAssem
         const double * const &ext_x,
         const double * const &ext_y,
         const double * const &ext_z,
-        const class AInt_Weight * const &weight )
+        const AInt_Weight * const &weight )
     {SYS_T::commPrint("Warning: this Assem_Tangent_Residual(...) is not implemented. \n");}
 
 
@@ -309,7 +309,7 @@ class IPLocAssem
         const double * const &ext_x,
         const double * const &ext_y,
         const double * const &ext_z,
-        const class AInt_Weight * const &weight )
+        const AInt_Weight * const &weight )
     {SYS_T::commPrint("Warning: this Assem_Tangent_Residual(...) is not implemented. \n");}
 
 
@@ -568,14 +568,13 @@ class IPLocAssem
     {SYS_T::commPrint("Warning: Assem_Residual_BacFace() is not implemented. \n");}
 
 
-
     // -------------------------------------------------------------------
     // ! Assembly the mass matrix
     // \para element: the element quadrature info
     // \para wight: the corresponding quadrature weights    
     virtual void Assem_Mass(
-        const class FEAElement * const &element,
-        const class AInt_Weight * const &weight )
+        const FEAElement * const &element,
+        const AInt_Weight * const &weight )
     {SYS_T::commPrint("Warning: this Assem_Mass(...) is not implemented. \n");}
 
 
@@ -597,7 +596,7 @@ class IPLocAssem
         const double * const &ext_x,
         const double * const &ext_y,
         const double * const &ext_z,
-        const class AInt_Weight * const &weight )
+        const AInt_Weight * const &weight )
     {SYS_T::commPrint("Warning: this Assem_Mass(...) is not implemented. \n");}
 
 
@@ -610,11 +609,11 @@ class IPLocAssem
     // \para wight: the corresponding quadrature weights    
     virtual void Assem_Mass_Residual(
         const double * const &vec_a,
-        const class FEAElement * const &element,
+        const FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
-        const class AInt_Weight * const &weight )
+        const AInt_Weight * const &weight )
     {SYS_T::commPrint("Warning: this Assem_Mass_Residual(...) is not implemented. \n");}
 
 
@@ -639,7 +638,7 @@ class IPLocAssem
         const double * const &ext_x,
         const double * const &ext_y,
         const double * const &ext_z,
-        const class AInt_Weight * const &weight )
+        const AInt_Weight * const &weight )
     {SYS_T::commPrint("Warning: this Assem_Mass_Residual(...) is not implemented. \n");}
 
 
@@ -659,7 +658,7 @@ class IPLocAssem
         const double * const &ext_x,
         const double * const &ext_y,
         const double * const &ext_z,
-        const class AInt_Weight * const &weight )
+        const AInt_Weight * const &weight )
     {SYS_T::commPrint("Warning: this Assem_Mass_Residual(...) is not implemented. \n");}
 
 
@@ -683,7 +682,7 @@ class IPLocAssem
         const double * const &ext_x,
         const double * const &ext_y,
         const double * const &ext_z,
-        const class AInt_Weight * const &weight )
+        const AInt_Weight * const &weight )
     {SYS_T::commPrint("Warning: this Assem_Mass_Residual(...) is not implemented. \n");}
 
     // \para element: the container for classical element routine. It only
