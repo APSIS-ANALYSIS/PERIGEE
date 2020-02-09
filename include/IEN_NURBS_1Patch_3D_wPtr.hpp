@@ -38,14 +38,14 @@ class IEN_NURBS_1Patch_3D_wPtr : public IIEN
 
     virtual ~IEN_NURBS_1Patch_3D_wPtr();
 
-    virtual s_int get_IEN( const s_int &e, const s_int &l_node) const;
+    virtual int get_IEN( const int &e, const int &l_node) const;
 
     virtual void print_IEN() const;
 
   private:
-    s_int * IEN;
+    int * IEN;
     
-    s_int nElem, nLocBas;
+    int nElem, nLocBas;
 };
 
 #endif

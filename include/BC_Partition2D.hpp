@@ -23,10 +23,10 @@ class BC_Partition2D
     
     virtual ~BC_Partition2D();
 
-    virtual s_int get_LID(int pos) const {return LID[pos];}
-    virtual s_int get_LDN(int pos) const {return LDN[pos];}
-    virtual s_int get_LPSN(int pos) const {return LPSN[pos];}
-    virtual s_int get_LPMN(int pos) const {return LPMN[pos];}
+    virtual int get_LID(int pos) const {return LID[pos];}
+    virtual int get_LDN(int pos) const {return LDN[pos];}
+    virtual int get_LPSN(int pos) const {return LPSN[pos];}
+    virtual int get_LPMN(int pos) const {return LPMN[pos];}
     virtual int get_Num_LD(int pos) const {return Num_LD[pos];}
     virtual int get_Num_LP(int pos) const {return Num_LP[pos];}
 
@@ -35,13 +35,13 @@ class BC_Partition2D
     int cpu_rank;
 
     // Local ID array
-    std::vector<s_int> LID;
+    std::vector<int> LID;
     
     // Local Dirichlet Nodes
-    std::vector<s_int> LDN;
+    std::vector<int> LDN;
 
     // Local Periodic Slave / Master Nodes
-    std::vector<s_int> LPSN, LPMN;
+    std::vector<int> LPSN, LPMN;
 
     // Number of Local Dirichlet Nodes
     std::vector<int> Num_LD;

@@ -32,14 +32,14 @@ class Part_NURBS_1Patch_3D_METIS : public IPart
     virtual ~Part_NURBS_1Patch_3D_METIS();
 
     // 1. function access element partition.
-    virtual s_int get_elem_loc(int pos) const {return elem_loc[pos];}
+    virtual int get_elem_loc(int pos) const {return elem_loc[pos];}
     virtual int get_nlocalele() const {return nlocalele;}
 
     // 2. function access node partition
-    virtual s_int get_node_loc(int pos) const {return node_loc[pos];}
-    virtual s_int get_node_loc_original(int pos) const {return node_loc_original[pos];}
-    virtual s_int get_node_ghost(int pos) const {return node_ghost[pos];}
-    virtual s_int get_local_to_global(int pos) const {return local_to_global[pos];}
+    virtual int get_node_loc(int pos) const {return node_loc[pos];}
+    virtual int get_node_loc_original(int pos) const {return node_loc_original[pos];}
+    virtual int get_node_ghost(int pos) const {return node_ghost[pos];}
+    virtual int get_local_to_global(int pos) const {return local_to_global[pos];}
     
     virtual int get_nlocalnode() const {return nlocalnode;}
     virtual int get_nghostnode() const {return nghostnode;}
@@ -47,10 +47,10 @@ class Part_NURBS_1Patch_3D_METIS : public IPart
     virtual int get_nbadnode() const {return nbadnode;}
     virtual int get_nlocghonode() const {return nlocghonode;}
 
-    virtual bool isElemInPart(s_int gloindex) const;
-    virtual bool isNodeInPart(s_int gloindex) const;
+    virtual bool isElemInPart(int gloindex) const;
+    virtual bool isNodeInPart(int gloindex) const;
     
-    virtual int get_elemLocIndex(const s_int &gloindex) const;
+    virtual int get_elemLocIndex(const int &gloindex) const;
 
     // 3. function that return the partition method parameters
     virtual int get_cpu_rank() const {return cpu_rank;}
@@ -61,15 +61,15 @@ class Part_NURBS_1Patch_3D_METIS : public IPart
 
 
     // 3. Global mesh information
-    virtual s_int get_nElem() const {return nElem;}
-    virtual s_int get_nElem_x() const {return nElem_x;}
-    virtual s_int get_nElem_y() const {return nElem_y;}
-    virtual s_int get_nElem_z() const {return nElem_z;}
+    virtual int get_nElem() const {return nElem;}
+    virtual int get_nElem_x() const {return nElem_x;}
+    virtual int get_nElem_y() const {return nElem_y;}
+    virtual int get_nElem_z() const {return nElem_z;}
 
-    virtual s_int get_nFunc() const {return nFunc;}
-    virtual s_int get_nFunc_x() const {return nFunc_x;}
-    virtual s_int get_nFunc_y() const {return nFunc_y;}
-    virtual s_int get_nFunc_z() const {return nFunc_z;}
+    virtual int get_nFunc() const {return nFunc;}
+    virtual int get_nFunc_x() const {return nFunc_x;}
+    virtual int get_nFunc_y() const {return nFunc_y;}
+    virtual int get_nFunc_z() const {return nFunc_z;}
 
     virtual l_int get_sDegree() const {return sDegree;}
     virtual l_int get_tDegree() const {return tDegree;}
@@ -118,14 +118,14 @@ class Part_NURBS_1Patch_3D_METIS : public IPart
   private:
     // ----------------------- Private Data -------------------------------
     // 1. local element
-    std::vector<s_int> elem_loc;
+    std::vector<int> elem_loc;
     int nlocalele;
 
     // 2. local node 
-    std::vector<s_int> node_loc;
-    std::vector<s_int> node_loc_original;
-    std::vector<s_int> node_ghost;
-    std::vector<s_int> local_to_global;
+    std::vector<int> node_loc;
+    std::vector<int> node_loc_original;
+    std::vector<int> node_ghost;
+    std::vector<int> local_to_global;
     
     int nlocalnode;
     int nghostnode;
@@ -139,8 +139,8 @@ class Part_NURBS_1Patch_3D_METIS : public IPart
     int dual_edge_ncommon;
 
     // 4. global mesh info
-    s_int nElem, nElem_x, nElem_y, nElem_z;
-    s_int nFunc, nFunc_x, nFunc_y, nFunc_z;
+    int nElem, nElem_x, nElem_y, nElem_z;
+    int nFunc, nFunc_x, nFunc_y, nFunc_z;
     int sDegree, tDegree, uDegree;
     int nLocBas;
     

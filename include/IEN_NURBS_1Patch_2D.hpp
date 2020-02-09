@@ -17,14 +17,14 @@ class IEN_NURBS_1Patch_2D : public IIEN
 
     virtual ~IEN_NURBS_1Patch_2D();
 
-    virtual s_int get_IEN( const s_int &e, const s_int &l_node) const
+    virtual int get_IEN( const int &e, const int &l_node) const
     {return IEN[e][l_node];}
 
     virtual void print_IEN() const;
 
   private:
-    s_int ** IEN;
-    s_int nElem, nLocBas;
+    int ** IEN;
+    int nElem, nLocBas;
 };
 
 #endif

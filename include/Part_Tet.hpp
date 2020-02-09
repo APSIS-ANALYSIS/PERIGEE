@@ -83,8 +83,8 @@ class Part_Tet : public IPart
     virtual bool get_isMETIS() const {return isMETIS;}
     virtual int get_dual_edge_ncommon() const {return dual_edge_ncommon;}
 
-    virtual s_int get_nElem() const {return nElem;}
-    virtual s_int get_nFunc() const {return nFunc;}
+    virtual int get_nElem() const {return nElem;}
+    virtual int get_nFunc() const {return nFunc;}
     virtual l_int get_sDegree() const {return sDegree;}
     virtual l_int get_tDegree() const {return tDegree;}
     virtual l_int get_uDegree() const {return uDegree;}

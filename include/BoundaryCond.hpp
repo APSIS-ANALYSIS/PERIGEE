@@ -99,7 +99,7 @@ class BoundaryCond
     // -------------------------------------------------------------------------
     void Create_ID( const IMesh * const &mesh);
 
-    void Create_ID( const s_int &in_nfunc );
+    void Create_ID( const int &in_nfunc );
 
     // -------------------------------------------------------------------------
     // Function that generate node global indices based on IMesh.This may helps 

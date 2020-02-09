@@ -34,20 +34,20 @@ class Mesh_NURBS_1Patch_3D : public IMesh
     virtual int get_t_degree() const {return t_degree;}
     virtual int get_u_degree() const {return u_degree;}
 
-    virtual s_int get_nFunc_x() const {return nFunc_x;}
-    virtual s_int get_nFunc_y() const {return nFunc_y;}
-    virtual s_int get_nFunc_z() const {return nFunc_z;}
-    virtual s_int get_nFunc() const {return nFunc;}
+    virtual int get_nFunc_x() const {return nFunc_x;}
+    virtual int get_nFunc_y() const {return nFunc_y;}
+    virtual int get_nFunc_z() const {return nFunc_z;}
+    virtual int get_nFunc() const {return nFunc;}
 
-    virtual s_int get_nElem_x() const {return nElem_x;}
-    virtual s_int get_nElem_y() const {return nElem_y;}
-    virtual s_int get_nElem_z() const {return nElem_z;}
-    virtual s_int get_nElem() const {return nElem;}
+    virtual int get_nElem_x() const {return nElem_x;}
+    virtual int get_nElem_y() const {return nElem_y;}
+    virtual int get_nElem_z() const {return nElem_z;}
+    virtual int get_nElem() const {return nElem;}
 
-    virtual s_int get_nElem_x_nz() const {return nElem_x_nz;} 
-    virtual s_int get_nElem_y_nz() const {return nElem_y_nz;} 
-    virtual s_int get_nElem_z_nz() const {return nElem_z_nz;} 
-    virtual s_int get_nElem_nz() const {return nElem_nz;}
+    virtual int get_nElem_x_nz() const {return nElem_x_nz;} 
+    virtual int get_nElem_y_nz() const {return nElem_y_nz;} 
+    virtual int get_nElem_z_nz() const {return nElem_z_nz;} 
+    virtual int get_nElem_nz() const {return nElem_nz;}
 
     virtual int get_nLocBas() const {return nLocBas;}
 
@@ -60,27 +60,27 @@ class Mesh_NURBS_1Patch_3D : public IMesh
     virtual double get_hy_min() const {return hy_min;}
     virtual double get_hz_min() const {return hz_min;}
 
-    virtual double get_hx( s_int ee ) const;
-    virtual double get_hy( s_int ee ) const;
-    virtual double get_hz( s_int ee ) const;
+    virtual double get_hx( int ee ) const;
+    virtual double get_hy( int ee ) const;
+    virtual double get_hz( int ee ) const;
 
     virtual int get_patch_index() const {return 0;}
-    virtual s_int get_nElem_start() const {return 0;}
-    virtual s_int get_nFunc_start() const {return 0;}
+    virtual int get_nElem_start() const {return 0;}
+    virtual int get_nFunc_start() const {return 0;}
 
-    virtual void get_elem_index( const s_int &ee, 
-        s_int &ex, s_int &ey, s_int &ez) const;
+    virtual void get_elem_index( const int &ee, 
+        int &ex, int &ey, int &ez) const;
 
   private:
     double hx_max, hy_max, hz_max;
     double hx_min, hy_min, hz_min;
     int s_degree, t_degree, u_degree;
-    s_int nFunc_x, nFunc_y, nFunc_z, nFunc;
-    s_int nElem_x, nElem_y, nElem_z, nElem;
+    int nFunc_x, nFunc_y, nFunc_z, nFunc;
+    int nElem_x, nElem_y, nElem_z, nElem;
     int nLocBas;
     std::vector<double> hx, hy, hz;
 
-    s_int nElem_x_nz, nElem_y_nz, nElem_z_nz, nElem_nz;
+    int nElem_x_nz, nElem_y_nz, nElem_z_nz, nElem_nz;
 };
 
 #endif

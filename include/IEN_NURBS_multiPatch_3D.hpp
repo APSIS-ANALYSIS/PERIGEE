@@ -19,14 +19,14 @@ class IEN_NURBS_multiPatch_3D : public IIEN
     
     virtual ~IEN_NURBS_multiPatch_3D();
 
-    virtual s_int get_IEN( const s_int &ee, const s_int &l_node ) const
+    virtual int get_IEN( const int &ee, const int &l_node ) const
     {return IEN[ee*nLocBas + l_node];}
 
     virtual void print_IEN() const;
 
   private:
-    s_int * IEN;
-    const s_int nElem;
+    int * IEN;
+    const int nElem;
     const int nLocBas;
 };
 

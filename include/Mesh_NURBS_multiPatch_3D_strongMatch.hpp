@@ -27,25 +27,25 @@ class Mesh_NURBS_multiPatch_3D_strongMatch : public IMesh
     virtual int get_t_degree() const {return t_degree;}
     virtual int get_u_degree() const {return u_degree;}
 
-    virtual s_int get_nFunc_x() const 
+    virtual int get_nFunc_x() const 
     {std::cerr<<"Error: get_nFunc_x not implemented. \n"; exit(EXIT_FAILURE); return 0;}
     
-    virtual s_int get_nFunc_y() const 
+    virtual int get_nFunc_y() const 
     {std::cerr<<"Error: get_nFunc_y not implemented. \n"; exit(EXIT_FAILURE); return 0;}
     
-    virtual s_int get_nFunc_z() const 
+    virtual int get_nFunc_z() const 
     {std::cerr<<"Error: get_nFunc_z not implemented. \n"; exit(EXIT_FAILURE); return 0;}
     
-    virtual s_int get_nFunc() const {return nFunc;}
+    virtual int get_nFunc() const {return nFunc;}
 
-    virtual s_int get_nElem_x() const
+    virtual int get_nElem_x() const
     {std::cerr<<"Error: get_nElem_x not implemented. \n"; exit(EXIT_FAILURE); return 0;}
-    virtual s_int get_nElem_y() const
+    virtual int get_nElem_y() const
     {std::cerr<<"Error: get_nElem_y not implemented. \n"; exit(EXIT_FAILURE); return 0;}
-    virtual s_int get_nElem_z() const
+    virtual int get_nElem_z() const
     {std::cerr<<"Error: get_nElem_z not implemented. \n"; exit(EXIT_FAILURE); return 0;}
 
-    virtual s_int get_nElem() const {return nElem;}
+    virtual int get_nElem() const {return nElem;}
 
     virtual int get_nLocBas() const {return nLocBas;}
     
@@ -57,9 +57,9 @@ class Mesh_NURBS_multiPatch_3D_strongMatch : public IMesh
     virtual double get_hy_min() const {return hy_min;}
     virtual double get_hz_min() const {return hz_min;}
 
-    virtual double get_hx( s_int ee ) const;
-    virtual double get_hy( s_int ee ) const;
-    virtual double get_hz( s_int ee ) const;
+    virtual double get_hx( int ee ) const;
+    virtual double get_hy( int ee ) const;
+    virtual double get_hz( int ee ) const;
 
     virtual IMesh * get_patch_mesh(const int &pp) const {return mlist[pp];}
     
@@ -77,7 +77,7 @@ class Mesh_NURBS_multiPatch_3D_strongMatch : public IMesh
 
     int s_degree, t_degree, u_degree;
 
-    s_int nFunc, nElem;
+    int nFunc, nElem;
 
     int nLocBas;
 
@@ -89,7 +89,7 @@ class Mesh_NURBS_multiPatch_3D_strongMatch : public IMesh
     // of element in each patch. It starts with 0. Given the global element
     // index ee, the ee element belongs to patch ii if 
     // elem_ptr[ii] <= ee < elem_ptr[ii+1]
-    std::vector<s_int> elem_ptr;
+    std::vector<int> elem_ptr;
 };
 
 #endif
