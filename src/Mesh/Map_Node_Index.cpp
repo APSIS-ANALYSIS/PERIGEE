@@ -1,6 +1,6 @@
 #include "Map_Node_Index.hpp"
 
-Map_Node_Index::Map_Node_Index( const class IGlobal_Part * const &gpart,
+Map_Node_Index::Map_Node_Index( const IGlobal_Part * const &gpart,
     const int &cpu_size, const int nFunc )
 {
   int newnum = 0;
@@ -82,6 +82,5 @@ void Map_Node_Index::write_hdf5( const char * const &fileName ) const
   H5Sclose(dataspace_id);
   H5Fclose(file_id);
 }
-
 
 // EOF

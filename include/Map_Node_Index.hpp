@@ -16,7 +16,7 @@
 class Map_Node_Index
 {
   public:
-    Map_Node_Index( const class IGlobal_Part * const &gpart,
+    Map_Node_Index( const IGlobal_Part * const &gpart,
         const int &cpu_size, const int nFunc );
     
     virtual ~Map_Node_Index();

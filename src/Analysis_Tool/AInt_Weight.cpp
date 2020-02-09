@@ -1,12 +1,12 @@
 #include "AInt_Weight.hpp"
 
-AInt_Weight::AInt_Weight( const class IQuadPts * const &qua_s,
-		const class IQuadPts * const &qua_t,
-		const class IQuadPts * const &qua_u )
+AInt_Weight::AInt_Weight( const IQuadPts * const &qua_s,
+		const IQuadPts * const &qua_t,
+		const IQuadPts * const &qua_u )
 {
-	int n_s = qua_s->get_num_quadPts();
-	int n_t = qua_t->get_num_quadPts();
-	int n_u = qua_u->get_num_quadPts();
+	const int n_s = qua_s->get_num_quadPts();
+	const int n_t = qua_t->get_num_quadPts();
+	const int n_u = qua_u->get_num_quadPts();
 
 	num = n_s * n_t * n_u;
 
@@ -31,11 +31,11 @@ AInt_Weight::AInt_Weight( const class IQuadPts * const &qua_s,
 }
 
 
-AInt_Weight::AInt_Weight( const class IQuadPts * const &qua_s,
-		const class IQuadPts * const &qua_t  )
+AInt_Weight::AInt_Weight( const IQuadPts * const &qua_s,
+		const IQuadPts * const &qua_t  )
 {
-	int n_s = qua_s->get_num_quadPts();
-	int n_t = qua_t->get_num_quadPts();
+	const int n_s = qua_s->get_num_quadPts();
+	const int n_t = qua_t->get_num_quadPts();
 
 	num = n_s * n_t;
 
@@ -56,7 +56,7 @@ AInt_Weight::AInt_Weight( const class IQuadPts * const &qua_s,
 }
 
 
-AInt_Weight::AInt_Weight( const class IQuadPts * const &qua )
+AInt_Weight::AInt_Weight( const IQuadPts * const &qua )
 {
   num = qua->get_num_quadPts();
   Weight = new double [num];
@@ -66,7 +66,7 @@ AInt_Weight::AInt_Weight( const class IQuadPts * const &qua )
 
 AInt_Weight::~AInt_Weight()
 {
-	delete [] Weight; Weight = NULL;
+	delete [] Weight; Weight = nullptr;
 }
 
 
@@ -78,7 +78,5 @@ void AInt_Weight::print_info() const
   for(int ii=0; ii<num; ++ii) std::cout<<Weight[ii]<<'\n';
   std::cout<<"======================= \n";
 }
-
-
 
 // EOF
