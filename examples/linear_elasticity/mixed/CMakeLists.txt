@@ -63,6 +63,7 @@ SET( perigee_preprocess_lib_src
 SET( perigee_analysis_lib_src
   ${perigee_source}/System/Sys_Tools.cpp
   ${perigee_source}/System/Vec_Tools.cpp
+  ${perigee_source}/System/PETSc_Tools.cpp
   ${perigee_source}/System/Matrix_double_3by3_Array.cpp
   ${perigee_source}/System/Matrix_PETSc.cpp
   ${perigee_source}/System/Matrix_3x3.cpp
@@ -101,7 +102,6 @@ SET( perigee_analysis_lib_src
 # 3. Postprocess cpp
 SET( perigee_postprocess_lib_src
   ${perigee_source}/Postproc_Tool/PostVectSolution.cpp
-  ${perigee_source}/Postproc_Tool/Post_error.cpp
   ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   ${perigee_source}/Postproc_Tool/Interpolater.cpp
   ${perigee_source}/Mesh/QuadPts_vis_tet4.cpp

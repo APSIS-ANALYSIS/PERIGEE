@@ -17,12 +17,6 @@
 #include "NBC_Partition_3D.hpp"
 #include "EBC_Partition_vtp.hpp"
 
-#ifdef ENABLE_TEST
-#include "BoundaryCond_Test.hpp"
-#include "Part_Test.hpp"
-#include "ALocal_EBC.hpp"
-#endif
-
 int main( int argc, char * argv[] )
 {
   const int probDim = 3;
@@ -203,11 +197,6 @@ int main( int argc, char * argv[] )
   ebc -> resetTriIEN_outwardnormal( IEN );
   // ----------------------------------------------------------------
 
-#ifdef ENABLE_TEST
-  TEST_T::EBC_node_compatibility_check(ebc, ctrlPts);
-  TEST_T::EBC_cell_IEN_check(ebc, IEN);
-#endif
-
   const bool isPrintPartInfo = true;
   const int proc_size = cpu_size;
   
@@ -232,20 +221,6 @@ int main( int argc, char * argv[] )
     IEBC_Partition * ebcpart = new EBC_Partition_vtp(part, mnindex, ebc);
 
     ebcpart -> write_hdf5(part_file.c_str());
-
-#ifdef ENABLE_TEST
-    TEST_T::Part_LIEN_Test( part, mnindex, IEN );
-    TEST_T::Part_Node_Test( part, mnindex );
-    TEST_T::Part_CtrlPts_Test( part, mnindex, ctrlPts );
-    TEST_T::Part_NBC_Test( part, mnindex, NBC_list, nbcpart, dofNum );
-    TEST_T::Part_EBC_Test( ebcpart, part, ebc );
-
-    ALocal_EBC * aebc = new ALocal_EBC( part_file.c_str(), proc_rank );
-
-    TEST_T::EBCPart_AEBC_Test(ebcpart, aebc);
-
-    delete aebc;
-#endif
 
     list_nlocalnode.push_back(part->get_nlocalnode());
     list_nghostnode.push_back(part->get_nghostnode());

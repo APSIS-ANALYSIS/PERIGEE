@@ -60,7 +60,7 @@ int main( int argc, char * argv[] )
   int IEN_e[4];
   double ectrl_x[4], ectrl_y[4], ectrl_z[4];
   double loc_u[4], loc_v[4], loc_w[4], loc_p[4];
-  double el2disp = 0.0, el2strain = 0.0, el2pres = 0.0;
+  double el2disp = 0.0;
 
   for(int ee=0; ee<locElem->get_nlocalele(); ++ee)
   {
@@ -76,13 +76,6 @@ int main( int argc, char * argv[] )
     
     el2disp += POST_T_TET4_LE::get_manu_disp_error(loc_u, loc_v, loc_w,
         elem, ectrl_x, ectrl_y, ectrl_z, Int_w, R);
-  
-    el2strain += POST_T_TET4_LE::get_manu_strain_error(loc_u, loc_v, loc_w,
-        elem, ectrl_x, ectrl_y, ectrl_z, Int_w, R, Rx, Ry, Rz );
-    
-    el2pres += POST_T_TET4_LE::get_manu_pres_error( loc_p,
-        elem, ectrl_x, ectrl_y, ectrl_z, Int_w, R);
-  
   }
 
   double l2disp = 0.0;
@@ -90,16 +83,6 @@ int main( int argc, char * argv[] )
   l2disp = sqrt(l2disp);
   PetscPrintf(PETSC_COMM_WORLD, "Error in L2 norm of disp is : %e \n", l2disp);
   
-  double l2strain = 0.0;
-  MPI_Reduce(&el2strain, &l2strain, 1, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
-  l2strain = sqrt(l2strain);
-  PetscPrintf(PETSC_COMM_WORLD, "Error in L2 norm of strain is: %e \n", l2strain);
-  
-  double l2pres = 0.0;
-  MPI_Reduce(&el2pres, &l2pres, 1, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
-  l2pres = sqrt(l2pres);
-  PetscPrintf(PETSC_COMM_WORLD, "Error in L2 norm of pres is: %e \n", l2pres);
-
   delete elem; delete Int_w; delete quad; delete locElem; delete pNode;
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
   PetscFinalize();
