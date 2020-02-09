@@ -9,16 +9,30 @@
 //
 // Date: April 18 2014
 // ==================================================================
+#include <cmath>
+#include <vector>
+
+#include "Sys_Tools.hpp"
+#include "IQuadPts.hpp"
 #include "QuadPts_Gauss.hpp"
+#include "HDF5_PartReader.hpp"
+
+#include "BernsteinBasis_Array.hpp"
+#include "FEANode.hpp"
+#include "IAExtractor.hpp"
 #include "AExtractor_2D_NURBS_xy.hpp"
+#include "FEAElement.hpp"
 #include "FEAElement_NURBS_2D_der1.hpp"
 #include "FEAElement_NURBS_2D_der2.hpp"
+#include "APart_Node.hpp"
 #include "IAGlobal_Mesh_Info.hpp"
 #include "AGlobal_Mesh_Info_1Patch_NURBS_2D.hpp"
 #include "APart_Basic_Info.hpp"
 #include "ALocal_Elem.hpp"
+#include "ALocal_IEN.hpp"
 #include "IALocal_meshSize.hpp"
 #include "ALocal_meshSize_2D_NURBS.hpp"
+#include "AInt_Weight.hpp"
 #include "PostVectSolution.hpp"
 #include "Post_error.hpp"
 
@@ -80,7 +94,8 @@ int main( int argc, char * argv[] )
   APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file, rank);
   SYS_T::synPrint(" done\t", rank);
 
-  if(size != PartBasic->get_cpu_size()) MPI_Abort(PETSC_COMM_WORLD, 1);
+  if(size != PartBasic->get_cpu_size())
+    MPI_Abort(PETSC_COMM_WORLD, 1);
 
   int dof_check;
   h5reader->get_GMI_dofNum(dof_check);
@@ -165,14 +180,27 @@ int main( int argc, char * argv[] )
   PetscPrintf(PETSC_COMM_WORLD, "Error in L2 norm is : %e \n", l2error);
   PetscPrintf(PETSC_COMM_WORLD, "Error in H1 norm is : %e \n", h1error);
 
-  delete [] IEN_e; delete [] R; delete [] Rx; delete [] Ry;
-  delete [] ectrl_x; delete [] ectrl_y; delete [] ectrl_z;
+  delete [] IEN_e;
+  delete [] R; delete [] Rx; delete [] Ry;
+  delete [] ectrl_x;
+  delete [] ectrl_y;
+  delete [] ectrl_z;
   delete [] loc_sol;
-  delete pNode; delete pSolu; delete GMIptr; delete fNode;
-  delete locmSize; delete fExt; delete locIEN; delete locElem;
-  delete PartBasic; delete quad_x; delete quad_y;
+
+  delete pNode;
+  delete pSolu;
+  delete GMIptr;
+  delete fNode;
+  delete locmSize;
+  delete fExt;
+  delete locIEN;
+  delete locElem;
+  delete PartBasic;
+
+  delete quad_x; delete quad_y;
+
   PetscFinalize();
-  return EXIT_SUCCESS;
+  return 0;
 }
 
 

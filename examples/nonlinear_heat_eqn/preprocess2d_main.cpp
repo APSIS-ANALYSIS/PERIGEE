@@ -53,7 +53,7 @@ int main(int argc, char * argv[])
   // Geometry file
   char * char_home_dir = getenv("HOME");
   string geo_file(char_home_dir);
-  geo_file.append("/PERIGEE/input/geometry_2d_square.txt");
+  geo_file.append("/IsoPETSc3D/trunk/input/geometry_2d_square.txt");
 
   // partition file name
   string part_file("part");
@@ -208,9 +208,7 @@ int main(int argc, char * argv[])
   mnindex->write_hdf5("node_mapping");
 
 
-  // ----------------------------------------------------------------
   // Boundary conditions
-  // ----------------------------------------------------------------
   BoundaryCond2D * bc_1 = new BoundaryCond2D(Mesh, 1);
 
   vector<BoundaryCond2D *> BC_list;
