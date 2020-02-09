@@ -123,21 +123,17 @@ int main(int argc, char *argv[])
 
   // ===== Main Data Structure =====
   SYS_T::commPrint("===> Reading mesh files ... ");
-  HDF5_PartReader * h5reader = new HDF5_PartReader(part_file, rank);
-
+  
   FEANode * fNode = new FEANode(part_file, rank);
-  ALocal_IEN * locIEN = new ALocal_IEN(h5reader);
-  IAGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info_FEM_3D(part_file, 
-      rank);
-  APart_Basic_Info * PartBasic = new APart_Basic_Info(h5reader);
-  ALocal_Elem * locElem = new ALocal_Elem(h5reader);
-  ALocal_NodalBC * locnbc = new ALocal_NodalBC(h5reader); 
+  ALocal_IEN * locIEN = new ALocal_IEN(part_file, rank);
+  IAGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info_FEM_3D(part_file, rank);
+  APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file, rank);
+  ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
+  ALocal_NodalBC * locnbc = new ALocal_NodalBC(part_file, rank); 
   ALocal_EBC * locebc = new ALocal_EBC(part_file, rank);
-  APart_Node * pNode = new APart_Node(h5reader, rank);
+  APart_Node * pNode = new APart_Node(part_file, rank);
   SYS_T::commPrint("Done! \n");
  
-  delete h5reader;
-  
   SYS_T::print_fatal_if( size!= PartBasic->get_cpu_size(),
       "Error: Assigned CPU number does not match the partition. \n");
 

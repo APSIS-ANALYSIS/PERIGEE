@@ -18,6 +18,7 @@ class ALocal_Elem
 
     virtual ~ALocal_Elem();
 
+    // Assess the data
     virtual int get_elem_loc(const int &index) const {return elem_loc[index];}
     
     virtual int get_nlocalele() const {return nlocalele;}

@@ -90,29 +90,26 @@ int main( int argc, char * argv[] )
   }
 
   SYS_T::commPrint("===> Reading mesh files ... ");
-  HDF5_PartReader * h5reader = new HDF5_PartReader(part_file, rank);
-
+  
   // Control points
   FEANode * fNode = new FEANode(part_file, rank);
 
   // LIEN
-  ALocal_IEN * locIEN = new ALocal_IEN(h5reader);
+  ALocal_IEN * locIEN = new ALocal_IEN(part_file, rank);
 
   // Global mesh info
-  IAGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info_FEM_3D(part_file,
-      rank);
+  IAGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info_FEM_3D(part_file, rank);
 
   // Partitioning info
-  APart_Basic_Info * PartBasic = new APart_Basic_Info(h5reader);
+  APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file, rank);
 
   // Local element info
-  ALocal_Elem * locElem = new ALocal_Elem(h5reader);
+  ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
 
   // Node partitioning info
-  APart_Node * pNode = new APart_Node(h5reader, rank);
+  APart_Node * pNode = new APart_Node(part_file, rank);
 
   SYS_T::commPrint("Done! \n");
-  delete h5reader;
 
   if(size != PartBasic->get_cpu_size()) SYS_T::print_fatal(
       "Error: number of processors does not match with prepost! \n");

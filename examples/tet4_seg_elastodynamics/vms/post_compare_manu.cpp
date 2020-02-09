@@ -42,16 +42,13 @@ int main( int argc, char * argv[] )
   SYS_T::cmdPrint("-sol_name:", sol_name);
   SYS_T::cmdPrint("-sol_time:", sol_time);
 
-  HDF5_PartReader * h5reader = new HDF5_PartReader( part_file, rank );
-
   FEANode * fNode = new FEANode(part_file, rank);
-  ALocal_IEN * locIEN = new ALocal_IEN(h5reader);
+  ALocal_IEN * locIEN = new ALocal_IEN(part_file, rank);
   IAGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info_FEM_3D(part_file, rank);
-  APart_Basic_Info * PartBasic = new APart_Basic_Info(h5reader);
-  ALocal_Elem * locElem = new ALocal_Elem(h5reader);
-  APart_Node * pNode = new APart_Node(h5reader, rank);
+  APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file, rank);
+  ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
+  APart_Node * pNode = new APart_Node(part_file, rank);
 
-  delete h5reader;
   PetscPrintf(PETSC_COMM_WORLD, "\n===> %d processor(s) are assigned for:", size);
   SYS_T::commPrint("Postprocessing - compute error from manufactured solutions.\n");
 
@@ -139,6 +136,5 @@ int main( int argc, char * argv[] )
   PetscFinalize();
   return 0;
 }
-
 
 // EOF

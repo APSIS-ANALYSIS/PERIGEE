@@ -15,8 +15,10 @@
 class ALocal_IEN
 {
   public:
-    // Constructor : read data by specifying the part file base name and
-    //               cpu rank
+    // --------------------------------------------------------------
+    // Constructor : read data by specifying the part file base name 
+    //               and cpu rank
+    // --------------------------------------------------------------
     ALocal_IEN( const std::string &fileBaseName, const int &cpu_rank );
 
     // Destructor
@@ -39,7 +41,7 @@ class ALocal_IEN
     // --------------------------------------------------------------
     virtual int get_nlocalele() const {return nlocalele;}
 
-    // Get functions
+    // Data access functions
     virtual int get_LIEN(const int &elem, const int &node) const
     { return LIEN[elem*nLocBas + node]; }
     
