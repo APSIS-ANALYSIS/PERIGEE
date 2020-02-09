@@ -1,7 +1,7 @@
 #include "BernsteinBasis_Array.hpp"
 
 BernsteinBasis_Array::BernsteinBasis_Array( const int &input_degree,
-    const class IQuadPts * const &in_quaInfo )
+    const IQuadPts * const &in_quaInfo )
 : degree(input_degree), nQuapts(in_quaInfo->get_num_quadPts()),
   degp1(degree+1)
 {

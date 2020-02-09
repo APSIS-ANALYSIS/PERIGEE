@@ -20,7 +20,7 @@ class BernsteinBasis_Array
     // quadrature points given by the IQuadPts object.
     // --------------------------------------------------------------
     BernsteinBasis_Array( const int &input_degree, 
-        const class IQuadPts * const &in_quaInfo );
+        const IQuadPts * const &in_quaInfo );
     
     // --------------------------------------------------------------
     // Construct a Bernstein polynomial array evaluated at a given 
