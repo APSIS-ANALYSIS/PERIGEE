@@ -92,8 +92,10 @@ class ALocal_EBC
       SYS_T::print_fatal("Error: ALocal_EBC::get_intPts_xyz in not implemented. \n");
     }
 
+    // --------------------------------------------------------------
     // Generate a file name for outlet face ii
     // Outlet_xx_flowrate.txt
+    // --------------------------------------------------------------
     virtual std::string gen_flowfile_name(const int &ii) const
     {
       std::ostringstream ss;
@@ -154,23 +156,6 @@ class ALocal_EBC
     {
       SYS_T::print_fatal("Error: ALocal_EBC::get_outvec in not implemented. \n");
     }
-
-    // ==============================================================
-    // The following two functions are kept merely to keep the current
-    // code compatible with the tet4_vascular/FSI project. I will remove
-    // them once I get the genbc class added to the FSI project.
-    virtual double get_resis_C( const int &ii ) const
-    {
-      SYS_T::print_fatal("Error: ALocal_EBC::get_resis_C in not implemented. \n");
-      return 0.0;
-    }
-
-    virtual double get_resis_p( const int &ii ) const
-    {
-      SYS_T::print_fatal("Error: ALocal_EBC::get_resis_p in not implemented. \n");
-      return 0.0;
-    }
-    // ==============================================================
 
   protected:
     // the number of different ebc domain

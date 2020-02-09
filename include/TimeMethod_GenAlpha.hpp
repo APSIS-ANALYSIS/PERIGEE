@@ -78,9 +78,13 @@ class TimeMethod_GenAlpha
     ~TimeMethod_GenAlpha();
 
     double get_alpha_m() const {return alpha_m;}
+    
     double get_alpha_f() const {return alpha_f;}
+    
     double get_gamma() const {return gamma;}
+    
     double get_beta() const {return beta;}
+    
     double get_rho_infty() const {return rho_infty;}
 
     bool get_flag() const {return is2nd;}
