@@ -155,5 +155,4 @@ void Matrix_PETSc::MatMultSol( PDNSolution * const &sol ) const
   delete temp;
 }
 
-
 // EOF
