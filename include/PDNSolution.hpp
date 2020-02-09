@@ -126,7 +126,7 @@ class PDNSolution
     //   safer way is to call the function with std::vector as output.
     // --------------------------------------------------------------
     virtual void GetLocalArray( double * &local_array,
-        const class APart_Node * const &pNode ) const;
+        const APart_Node * const &pNode ) const;
 
     virtual void GetLocalArray( double * const &local_array ) const;
     
