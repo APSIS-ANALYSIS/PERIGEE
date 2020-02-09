@@ -112,8 +112,8 @@ Global_Part_METIS::Global_Part_METIS( const int &cpu_size,
     exit(1);
   }
 
-  delete [] eptr;
-  delete [] eind;
+  delete [] eptr; eptr = nullptr;
+  delete [] eind; eind = nullptr;
   
   time_tracker = clock() - time_tracker;
 
@@ -137,9 +137,8 @@ Global_Part_METIS::Global_Part_METIS( const int &cpu_size,
 
 Global_Part_METIS::~Global_Part_METIS()
 {
-  delete [] epart;
-  delete [] npart;
-  epart = NULL; npart = NULL;
+  delete [] epart; delete [] npart;
+  epart = nullptr; npart = nullptr;
   std::cout<<"-- Global_Part_METIS deleted. \n";
 }
 

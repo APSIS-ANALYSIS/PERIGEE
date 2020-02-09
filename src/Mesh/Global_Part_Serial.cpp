@@ -13,13 +13,13 @@ Global_Part_Serial::Global_Part_Serial( const class IMesh * const &mesh,
   epart = new idx_t [nElem];
   npart = new idx_t [nFunc];
 
-  for(int e = 0; e<nElem; ++e) epart[e] = 0;
+  for(int e=0; e<nElem; ++e) epart[e] = 0;
 
   for(int n=0; n<nFunc; ++n) npart[n] = 0;
 
-  int cpu_size = 1;
-  bool isDualGraph = true;
-  int in_ncommon = 1;
+  const int cpu_size = 1;
+  const bool isDualGraph = true;
+  const int in_ncommon = 1;
 
   write_part_hdf5(element_part_name, epart, nElem, cpu_size, isDualGraph, in_ncommon, isMETIS );
   write_part_hdf5(node_part_name, npart, nFunc, cpu_size, isDualGraph, in_ncommon, isMETIS );
@@ -29,8 +29,8 @@ Global_Part_Serial::Global_Part_Serial( const class IMesh * const &mesh,
 
 Global_Part_Serial::~Global_Part_Serial()
 {
-  delete [] epart; epart = NULL;
-  delete [] npart; npart = NULL;
+  delete [] epart; epart = nullptr;
+  delete [] npart; npart = nullptr;
   std::cout<<"-- Global_Part_Serial deleted. \n";
 }
 
