@@ -152,15 +152,6 @@ SET( perigee_postprocess_lib_src
   ${perigee_SOURCE_DIR}/../src/Post_error_tet4_eladyn.cpp
   )
 
-# 4. Test code
-IF( ${CMAKE_BUILD_TYPE} MATCHES "Debug" )
-  SET( perigee_test_lib_src
-    ${perigee_source}/Test/BoundaryCond_Test.cpp
-    ${perigee_source}/Test/Part_Test.cpp
-    ${perigee_source}/Analysis_Tool/ALocal_EBC.cpp
-    )
-ENDIF( ${CMAKE_BUILD_TYPE} MATCHES "Debug" )
-
 # 5. Hex-mesh tools
 SET( perigee_hex_aux_tool_lib_src
   ${perigee_source}/NURBS_Tool/NURBS_Bezier.cpp
@@ -205,13 +196,6 @@ TARGET_LINK_LIBRARIES( perigee_analysis ${EXTRA_LINK_LIBS} )
 # 3. Postprocess lib
 ADD_LIBRARY( perigee_postprocess ${perigee_postprocess_lib_src} )
 TARGET_LINK_LIBRARIES( perigee_postprocess ${EXTRA_LINK_LIBS} perigee_analysis )
-
-# 4. Test lib
-IF( ${CMAKE_BUILD_TYPE} MATCHES "Debug" )
-  ADD_LIBRARY( perigee_test ${perigee_test_lib_src} )
-  TARGET_LINK_LIBRARIES( perigee_test ${EXTRA_LINK_LIBS} perigee_preprocess)
-  SET(CMAKE_CXX_FLAGS "-DENABLE_TEST -O0 -Wall")
-ENDIF( ${CMAKE_BUILD_TYPE} MATCHES "Debug" )
 # -------------------------------------------------------------------
 
 # 5. Hex-auxiliary lib
@@ -244,12 +228,7 @@ ADD_EXECUTABLE( vis3d_coupled vis_coupled.cpp)
 # -------------------------------------------------------------------
 # 2. Link libraries
 # 2.1 Preprocess
-IF( ${CMAKE_BUILD_TYPE} MATCHES "Debug" )
-  TARGET_LINK_LIBRARIES( preprocess3d_h5 ${EXTRA_LINK_LIBS} perigee_preprocess
-    perigee_test )
-ELSE( ${CMAKE_BUILD_TYPE} MATCHES "Debug" )
-  TARGET_LINK_LIBRARIES( preprocess3d_h5 ${EXTRA_LINK_LIBS} perigee_preprocess )
-ENDIF( ${CMAKE_BUILD_TYPE} MATCHES "Debug" )
+TARGET_LINK_LIBRARIES( preprocess3d_h5 ${EXTRA_LINK_LIBS} perigee_preprocess )
 
 TARGET_LINK_LIBRARIES( gmshIO perigee_preprocess )
 
@@ -261,6 +240,5 @@ TARGET_LINK_LIBRARIES( preposth5 ${EXTRA_LINK_LIBS} perigee_analysis
   perigee_preprocess )
 
 TARGET_LINK_LIBRARIES( vis3d_coupled ${EXTRA_LINK_LIBS} perigee_postprocess )
-
 
 #EOF
