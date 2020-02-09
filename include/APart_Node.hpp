@@ -89,21 +89,6 @@ class APart_Node
       return -1;
     }
     
-    // Virtual function for _wBubble derived class
-    // Get the total number of bubble nodes
-    virtual int get_nbubblenode() const
-    {
-      SYS_T::print_fatal("Error: APart_Node::get_nbubblenode() is not implemented. \n");
-      return -1;
-    }
-
-    // Get the bubble node index
-    virtual int get_bubble_node(const int &index) const
-    {
-      SYS_T::print_fatal("Error: APart_Node::get_bubble_node() is not implemented. \n");
-      return -1;
-    }
-
   protected:
     int cpu_rank, dof;
     int nlocalnode, nghostnode, nbadnode, nlocghonode, ntotalnode;
