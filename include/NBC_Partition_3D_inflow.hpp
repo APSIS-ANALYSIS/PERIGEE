@@ -13,7 +13,6 @@
 // Date crated: Aug. 9 2017
 // Author: Ju Liu
 // ==================================================================
-
 #include "NBC_Partition_3D.hpp"
 
 class NBC_Partition_3D_inflow : public NBC_Partition_3D

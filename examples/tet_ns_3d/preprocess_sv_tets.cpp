@@ -18,7 +18,6 @@
 #include "NodalBC_3D_vtu.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_tet_outflow.hpp"
-#include "NBC_Partition_3D.hpp"
 #include "NBC_Partition_3D_inflow.hpp"
 #include "EBC_Partition_vtp_outflow.hpp"
 
@@ -228,7 +227,8 @@ int main( int argc, char * argv[] )
   ElemBC * ebc = new ElemBC_3D_tet_outflow( sur_file_out, outflow_outward_vec, elemType );
 
   ebc -> resetTriIEN_outwardnormal( IEN );
-  
+ 
+  // Start partition the mesh for each cpu_rank 
   const bool isPrintPartInfo = true;
 
   std::vector<int> list_nlocalnode, list_nghostnode, list_ntotalnode, list_nbadnode;
