@@ -23,7 +23,7 @@ int main( int argc, char * argv[] )
   
   char * char_home_dir = getenv("HOME");
   std::string poly_file(char_home_dir);
-  poly_file.append("/IsoPETSc3D/trunk/input/tet_poly/cube");
+  poly_file.append("/PERIGEE/input/tet_poly/cube");
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 

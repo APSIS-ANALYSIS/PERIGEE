@@ -68,7 +68,7 @@ int main(int argc, char * argv[])
   // geometry file
   char * char_home_dir = getenv("HOME");
   string geo_file(char_home_dir);
-  geo_file.append("/IsoPETSc3D/trunk/input/geometry_2d_square.txt");
+  geo_file.append("/PERIGEE/input/geometry_2d_square.txt");
 
   // partition file basename
   string part_file("postpart");

@@ -3818,7 +3818,7 @@ void BoundaryCond::BC_type_201( const IMesh * const &mesh, const std::vector<dou
 
   char * char_home_dir = getenv("HOME");
   std::string interface_file(char_home_dir);
-  interface_file.append("/IsoPETSc3D/trunk/input/pig_coronary_107patch/global_data.dat");
+  interface_file.append("/PERIGEE/input/pig_coronary_107patch/global_data.dat");
 
   // Two patches intpat1[i] and intpat2[i] meet with intpat1's intfac1[i] and
   // intpat2's intfac2[i]. 
