@@ -10,10 +10,8 @@
 // to create the partition for each processor. This helps us avoid 
 // rerunning the same METIS call.
 //
-// Date:
-// Oct. 2 2013
+// Date: Oct. 2 2013
 // ==================================================================
-#include "IsoPETSc3D_System.hpp"
 #include "metis.h"
 
 class IGlobal_Part
@@ -22,8 +20,8 @@ class IGlobal_Part
     IGlobal_Part(){};
     virtual ~IGlobal_Part(){};
 
-    virtual idx_t get_epart( s_int e ) const = 0;
-    virtual idx_t get_npart( s_int n ) const = 0;
+    virtual idx_t get_epart( int e ) const = 0;
+    virtual idx_t get_npart( int n ) const = 0;
 
     virtual bool get_isMETIS() const = 0;
     virtual bool get_isDual() const = 0;

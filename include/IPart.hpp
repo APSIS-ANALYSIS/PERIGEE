@@ -37,7 +37,6 @@
 //
 // Date: Sept. 30 2013
 // ==================================================================
-#include "IsoPETSc3D_System.hpp"
 #include "Vec_Tools.hpp"
 #include "IGlobal_Part.hpp"
 #include "Map_Node_Index.hpp"
@@ -112,104 +111,104 @@ class IPart
     virtual void write( const char * inputFileName ) const = 0;
 
     // 1. function access element partition.
-    virtual s_int get_elem_loc(l_int pos) const
+    virtual int get_elem_loc(int pos) const
     {SYS_T::print_exit("Error: get_elem_loc is not implemented. \n"); return 0;}
 
-    virtual l_int get_nlocalele() const
+    virtual int get_nlocalele() const
     {SYS_T::print_exit("Error: get_nlocalele is not implemented. \n"); return 0;}
 
     // 2. function access node partition
-    virtual s_int get_node_loc(l_int pos) const
+    virtual int get_node_loc(int pos) const
     {SYS_T::print_exit("Error: get_node_loc is not implemented. \n"); return 0;}
 
-    virtual s_int get_node_loc_original(l_int pos) const
+    virtual int get_node_loc_original(int pos) const
     {SYS_T::print_exit("Error: get_node_loc_original is not implemented. \n"); return 0;}
 
-    virtual s_int get_node_ghost(l_int pos) const
+    virtual int get_node_ghost(int pos) const
     {SYS_T::print_exit("Error: get_node_ghost is not implemented. \n"); return 0;}
 
-    virtual s_int get_local_to_global(l_int pos) const
+    virtual int get_local_to_global(int pos) const
     {SYS_T::print_exit("Error: get_local_to_global is not implemented. \n"); return 0;}
 
-    virtual l_int get_nlocalnode() const
+    virtual int get_nlocalnode() const
     {SYS_T::print_exit("Error: get_nlocalnode is not implemented. \n"); return 0;}
 
-    virtual l_int get_nghostnode() const
+    virtual int get_nghostnode() const
     {SYS_T::print_exit("Error: get_nghostnode is not implemented. \n"); return 0;}
 
-    virtual l_int get_ntotalnode() const
+    virtual int get_ntotalnode() const
     {SYS_T::print_exit("Error: get_ntotalnode is not implemented. \n"); return 0;}
 
-    virtual l_int get_nbadnode() const
+    virtual int get_nbadnode() const
     {SYS_T::print_exit("Error: get_nbadnode is not implemented. \n"); return 0;}
 
-    virtual l_int get_nlocghonode() const
+    virtual int get_nlocghonode() const
     {SYS_T::print_exit("Error: get_nlocghonode is not implemented. \n"); return 0;}
 
-    virtual bool isElemInPart(s_int gloindex) const
+    virtual bool isElemInPart(int gloindex) const
     {SYS_T::print_exit("Error: isElemInPart is not implemented. \n"); return false;}
 
-    virtual bool isNodeInPart(s_int gloindex) const
+    virtual bool isNodeInPart(int gloindex) const
     {SYS_T::print_exit("Error: isNodeInPart is not implemented. \n"); return false;}
 
-    virtual int get_elemLocIndex(const s_int &gloindex) const
+    virtual int get_elemLocIndex(const int &gloindex) const
     {SYS_T::print_exit("Error: get_elemLocIndex is not implemented. \n"); return 0;}
 
 
-    virtual int get_nodeLocGhoIndex(const s_int &gloindex) const
+    virtual int get_nodeLocGhoIndex(const int &gloindex) const
     {SYS_T::print_exit("Error: get_nodeLocGhoIndex is not implemented. \n"); return 0;}
 
     // 3. function that return the partition method parameters
-    virtual l_int get_cpu_rank() const
+    virtual int get_cpu_rank() const
     {SYS_T::print_exit("Error: get_cpu_rank is not implemented. \n"); return 0;}
 
-    virtual l_int get_cpu_size() const
+    virtual int get_cpu_size() const
     {SYS_T::print_exit("Error: get_cpu_size is not implemented. \n"); return 0;}
 
     virtual bool get_part_isDual() const
     {SYS_T::print_exit("Error: get_part_isDual is not implemented. \n"); return false;}
 
-    virtual l_int get_dual_edge_ncommon() const
+    virtual int get_dual_edge_ncommon() const
     {SYS_T::print_exit("Error: get_dual_edge_ncommon is not implemented. \n"); return 0;}
 
     virtual bool get_isMETIS() const
     {SYS_T::print_exit("Error: get_isMETIS is not implemented. \n"); return false;}
 
     // 3. Global mesh information
-    virtual s_int get_nElem() const
+    virtual int get_nElem() const
     {SYS_T::print_exit("Error: get_nElem is not implemented. \n"); return 0;}
 
-    virtual s_int get_nElem_x() const
+    virtual int get_nElem_x() const
     {SYS_T::print_exit("Error: get_nElem_x is not implemented. \n"); return 0;}
 
-    virtual s_int get_nElem_y() const
+    virtual int get_nElem_y() const
     {SYS_T::print_exit("Error: get_nElem_y is not implemented. \n"); return 0;}
 
-    virtual s_int get_nElem_z() const
+    virtual int get_nElem_z() const
     {SYS_T::print_exit("Error: get_nElem_z is not implemented. \n"); return 0;}
 
-    virtual s_int get_nFunc() const
+    virtual int get_nFunc() const
     {SYS_T::print_exit("Error: get_nFunc is not implemented. \n"); return 0;}
 
-    virtual s_int get_nFunc_x() const
+    virtual int get_nFunc_x() const
     {SYS_T::print_exit("Error: get_nFunc_x is not implemented. \n"); return 0;}
 
-    virtual s_int get_nFunc_y() const
+    virtual int get_nFunc_y() const
     {SYS_T::print_exit("Error: get_nFunc_y is not implemented. \n"); return 0;}
 
-    virtual s_int get_nFunc_z() const
+    virtual int get_nFunc_z() const
     {SYS_T::print_exit("Error: get_nFunc_z is not implemented. \n"); return 0;}
 
-    virtual l_int get_sDegree() const
+    virtual int get_sDegree() const
     {SYS_T::print_exit("Error: get_sDegree is not implemented. \n"); return 0;}
 
-    virtual l_int get_tDegree() const
+    virtual int get_tDegree() const
     {SYS_T::print_exit("Error: get_tDegree is not implemented. \n"); return 0;}
 
-    virtual l_int get_uDegree() const
+    virtual int get_uDegree() const
     {SYS_T::print_exit("Error: get_uDegree is not implemented. \n"); return 0;}
 
-    virtual l_int get_nLocBas() const
+    virtual int get_nLocBas() const
     {SYS_T::print_exit("Error: get_nLocBas is not implemented. \n"); return 0;}
 
     virtual double get_hx_max() const
@@ -230,30 +229,30 @@ class IPart
     virtual double get_hz_min() const
     {SYS_T::print_exit("Error: get_hz_min is not implemented. \n"); return 0.0;}
 
-    virtual double get_hx(s_int ee) const
+    virtual double get_hx(int ee) const
     {SYS_T::print_exit("Error: get_hx is not implemented. \n"); return 0.0;}
 
-    virtual double get_hy(s_int ee) const
+    virtual double get_hy(int ee) const
     {SYS_T::print_exit("Error: get_hy is not implemented. \n"); return 0.0;}
 
-    virtual double get_hz(s_int ee) const
+    virtual double get_hz(int ee) const
     {SYS_T::print_exit("Error: get_hz is not implemented. \n"); return 0.0;}
 
     // 4. LIEN array
-    virtual int get_LIEN(l_int ee, l_int ii) const
+    virtual int get_LIEN(int ee, int ii) const
     {SYS_T::print_exit("Error: get_LIEN is not implemented. \n"); return 0;}
 
     // 5. Control points in this processor
-    virtual double get_ctrlPts_x_loc(l_int pos) const
+    virtual double get_ctrlPts_x_loc(int pos) const
     {SYS_T::print_exit("Error: get_ctrlPts_x is not implemented. \n"); return 0.0;}
 
-    virtual double get_ctrlPts_y_loc(l_int pos) const
+    virtual double get_ctrlPts_y_loc(int pos) const
     {SYS_T::print_exit("Error: get_ctrlPts_y is not implemented. \n"); return 0.0;}
 
-    virtual double get_ctrlPts_z_loc(l_int pos) const
+    virtual double get_ctrlPts_z_loc(int pos) const
     {SYS_T::print_exit("Error: get_ctrlPts_z is not implemented. \n"); return 0.0;}
 
-    virtual double get_ctrlPts_w_loc(l_int pos) const
+    virtual double get_ctrlPts_w_loc(int pos) const
     {SYS_T::print_exit("Error: get_ctrlPts_w is not implemented. \n"); return 0.0;}
 
 
