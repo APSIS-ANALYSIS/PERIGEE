@@ -15,21 +15,21 @@
 
 class AInt_Weight
 {
-	public:
-		AInt_Weight( const IQuadPts * const &qua_s,
-				const IQuadPts * const &qua_t,
-				const IQuadPts * const &qua_u );
-		
+  public:
     AInt_Weight( const IQuadPts * const &qua_s,
-				const IQuadPts * const &qua_t );
-		
+        const IQuadPts * const &qua_t,
+        const IQuadPts * const &qua_u );
+
+    AInt_Weight( const IQuadPts * const &qua_s,
+        const IQuadPts * const &qua_t );
+
     // Obtain the weights from a single quadrature rule.
     // This can be used for initializing a weight object for 1D problem
     // or can be used for initializing a weight object for a multi-dim
     // problem with all quadrature rule written in one quad file, like
     // the Quad_Gauss_Tet class.
     AInt_Weight( const IQuadPts * const &qua );
-		
+
     ~AInt_Weight();
 
     double get_weight(const int &index) const {return Weight[index];}
@@ -38,9 +38,9 @@ class AInt_Weight
 
     void print_info() const;
 
-	private:
-		int num; // number of the quadrature points/weights
-		double * Weight; // dynamic array storing the weights
+  private:
+    int num; // number of the quadrature points/weights
+    double * Weight; // dynamic array storing the weights
 };
 
 #endif
