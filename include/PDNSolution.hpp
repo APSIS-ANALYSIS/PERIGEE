@@ -50,7 +50,6 @@ class PDNSolution
 
     virtual ~PDNSolution();
 
-
     // --------------------------------------------------------------
     // ! Generate a random solution vector.
     //   This is used mainly for debugging.
@@ -59,7 +58,7 @@ class PDNSolution
 
     // --------------------------------------------------------------
     // ! Copy the INPUT's Vec, nlocal, nghost to the current vector.
-    //   (identical to the copy constructor)
+    //   (similar to the copy constructor)
     // --------------------------------------------------------------
     virtual void Copy(const PDNSolution &INPUT);
     
@@ -78,14 +77,12 @@ class PDNSolution
 		virtual double Norm_2() const;
 		virtual double Norm_inf() const;
 
-    
     // --------------------------------------------------------------
     // ! Perform solution = solution + a * x 
     // --------------------------------------------------------------
     virtual void PlusAX(const PDNSolution &x, const double &a);
     
     virtual void PlusAX(const PDNSolution * const &x_ptr, const double &a);
-
 
     // --------------------------------------------------------------
     // ! Perform += a_i * x_i.
@@ -100,7 +97,6 @@ class PDNSolution
     virtual void PlusAiX(PDNSolution &x, const double &a,
         const double &b, const int &na, const int &nb );
 
-    
     // -------------------------------------------------------------
     // ! Perform solution[ii*dofNum + jj] += a[jj] * x[ii*dofNum + jj].
     //   This is a generalized version for the PlusAiX( PDNSolution,
@@ -113,13 +109,11 @@ class PDNSolution
     virtual void PlusAiX( const PDNSolution &xx, 
         const std::vector<double> &aa );
 
-
     // --------------------------------------------------------------
     // ! Perform uniform scaling operation : solution = a * solution
     // --------------------------------------------------------------
     virtual void ScaleValue(const double &a);
 
-    
     // --------------------------------------------------------------
     // ! Get the part of the solution vector that belongs to the local 
     //   nodes and ghost nodes. Here the local_array should have been 
@@ -138,7 +132,6 @@ class PDNSolution
     
     virtual void GetLocalArray( std::vector<double> &local_array ) const;
 
-    
     // --------------------------------------------------------------
     // ! Assembly the vector and update the ghost node values. It is
     //   just a routine calling the following things. This is called

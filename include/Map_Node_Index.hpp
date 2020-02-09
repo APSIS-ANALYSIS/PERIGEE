@@ -21,7 +21,11 @@ class Map_Node_Index
     
     virtual ~Map_Node_Index();
 
+    // Map the natural node numbering to the new numbering based on
+    // mesh partition
     virtual int get_old2new(const int &ii) const {return old_2_new[ii];}
+    
+    // Map the new numbering back to the old, natural numbering for nodes
     virtual int get_new2old(const int &ii) const {return new_2_old[ii];}
     
     virtual void print_info() const;
