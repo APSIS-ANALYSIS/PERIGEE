@@ -29,8 +29,8 @@ class Global_Part_METIS : public IGlobal_Part
 
     virtual ~Global_Part_METIS();
 
-    virtual idx_t get_epart( s_int e ) const {return epart[e];}
-    virtual idx_t get_npart( s_int n ) const {return npart[n];}
+    virtual idx_t get_epart( int e ) const {return epart[e];}
+    virtual idx_t get_npart( int n ) const {return npart[n];}
 
     virtual bool get_isMETIS() const {return isMETIS;};
     virtual bool get_isDual() const {return isDual;};
@@ -45,7 +45,7 @@ class Global_Part_METIS : public IGlobal_Part
 
     virtual void write_part_hdf5( const char * const &fileName, 
         const idx_t * const &part_in,
-        const s_int &part_size, const int &cpu_size,
+        const int &part_size, const int &cpu_size,
         const bool &part_isdual, const int &in_ncommon,
         const bool &isMETIS ) const;
 
