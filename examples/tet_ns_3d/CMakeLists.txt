@@ -37,11 +37,9 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/System/Vec_Tools.cpp
   ${perigee_source}/System/Matrix_double_3by3_Array.cpp
   ${perigee_source}/System/Math_Tools.cpp
-  ${perigee_source}/Mesh/Tet_Tools.cpp
-  ${perigee_source}/Mesh/Gmsh_FileIO.cpp
-  ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
   ${perigee_source}/System/HDF5_Reader.cpp
+  ${perigee_source}/Mesh/Tet_Tools.cpp
   ${perigee_source}/Mesh/IEN_Tetra_P1.cpp
   ${perigee_source}/Mesh/IEN_Tetra_P2.cpp
   ${perigee_source}/Mesh/INodalBC.cpp
@@ -56,8 +54,6 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/NodalBC_3D_vtu.cpp
   ${perigee_source}/Mesh/NodalBC_3D_inflow.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
-  ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
-  ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
   ${perigee_source}/Mesh/NBC_Partition_3D.cpp
   ${perigee_source}/Mesh/NBC_Partition_3D_inflow.cpp
   ${perigee_source}/Mesh/EBC_Partition_vtp.cpp
@@ -65,6 +61,9 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Map_Node_Index.cpp
   ${perigee_source}/Mesh/Global_Part_METIS.cpp
   ${perigee_source}/Mesh/Global_Part_Serial.cpp
+  ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
+  ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   )
 
 SET( perigee_analysis_lib_src
@@ -81,14 +80,12 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/AGlobal_Mesh_Info_FEM_3D.cpp
   ${perigee_source}/Analysis_Tool/APart_Basic_Info.cpp
   ${perigee_source}/Analysis_Tool/ALocal_Elem.cpp
-  ${perigee_source}/Analysis_Tool/ALocal_Elem_wTag.cpp
   ${perigee_source}/Analysis_Tool/ALocal_IEN.cpp
   ${perigee_source}/Analysis_Tool/ALocal_NodalBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_Inflow_NodalBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_EBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_EBC_outflow.cpp
   ${perigee_source}/Analysis_Tool/APart_Node.cpp
-  ${perigee_source}/Analysis_Tool/APart_Node_FSI.cpp
   ${perigee_source}/Element/FEANode.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
@@ -99,7 +96,6 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Model/CVFlowRate_Linear2Steady.cpp
   ${perigee_source}/Solver/PDNSolution.cpp
   ${perigee_source}/Solver/PDNTimeStep.cpp
-  ${perigee_source}/Solver/Seg_Sol_Tools.cpp
   ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp
   ${perigee_source}/Solver/PGAssem.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
