@@ -23,7 +23,7 @@ class FEAElement_Tet4 : public FEAElement
 
     virtual int get_elemDim() const {return 3;}
 
-    virtual int get_Type() const {return 531;}
+    virtual int get_Type() const {return 501;}
 
     virtual int get_numType() const {return 1;}
 

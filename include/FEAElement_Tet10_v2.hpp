@@ -53,8 +53,7 @@ class FEAElement_Tet10_v2 : public FEAElement
     virtual int get_elemDim() const {return 3;}
 
     // A unique number for this element. 
-    // Recall that 532 is the original Tet10 element
-    virtual int get_Type() const {return 533;}
+    virtual int get_Type() const {return 502;}
 
     virtual int get_numType() const {return 1;}
 
