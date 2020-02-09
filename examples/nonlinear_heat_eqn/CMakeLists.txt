@@ -105,10 +105,10 @@ SET( perigee_analysis_lib_src
 # 3. Postprocess cpp
 SET( perigee_postprocess_lib_src
   ${perigee_source}/Postproc_Tool/PostVectSolution.cpp
-  ${perigee_source}/Postproc_Tool/Post_error.cpp
   ${perigee_source}/Postproc_Tool/VTK_Writer.cpp
   ${perigee_SOURCE_DIR}/src/VisDataPrep_2DNLHeat.cpp
   ${perigee_SOURCE_DIR}/src/VisDataPrep_3DNLHeat.cpp
+  ${perigee_SOURCE_DIR}/src/Post_error.cpp
   )
 # ===============================================
 # Finish setting my own source code
