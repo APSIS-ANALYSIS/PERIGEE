@@ -2979,7 +2979,7 @@ void BoundaryCond::BC_type_104( const IMesh * const &mesh, const std::vector<dou
 
   char * char_home_dir = getenv("HOME");
   std::string interface_file(char_home_dir);
-  interface_file.append("/IsoPETSc3D/trunk/input/coronary_3patch/global_data.dat");
+  interface_file.append("/PERIGEE/input/coronary_3patch/global_data.dat");
 
   // Two patches intpat1[i] and intpat2[i] meet with intpat1's intfac1[i] and
   // intpat2's intfac2[i]. 
@@ -3257,7 +3257,7 @@ void BoundaryCond::BC_type_105( const IMesh * const &mesh, const std::vector<dou
 
   char * char_home_dir = getenv("HOME");
   std::string interface_file(char_home_dir);
-  interface_file.append("/IsoPETSc3D/trunk/input/coronary_3patch/global_data.dat");
+  interface_file.append("/PERIGEE/input/coronary_3patch/global_data.dat");
 
   // Two patches intpat1[i] and intpat2[i] meet with intpat1's intfac1[i] and
   // intpat2's intfac2[i]. 
@@ -3548,7 +3548,7 @@ void BoundaryCond::BC_type_200( const IMesh * const &mesh, const std::vector<dou
 
   char * char_home_dir = getenv("HOME");
   std::string interface_file(char_home_dir);
-  interface_file.append("/IsoPETSc3D/trunk/input/pig_coronary_107patch/global_data.dat");
+  interface_file.append("/PERIGEE/input/pig_coronary_107patch/global_data.dat");
 
   // Two patches intpat1[i] and intpat2[i] meet with intpat1's intfac1[i] and
   // intpat2's intfac2[i]. 

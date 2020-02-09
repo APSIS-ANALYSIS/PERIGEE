@@ -69,7 +69,7 @@ int main( int argc, char * argv[] )
 
   char * char_home_dir = getenv("HOME");
   std::string geo_file(char_home_dir);
-  geo_file.append("/IsoPETSc3D/trunk/input/geometry_3d_cube_0d1.txt");
+  geo_file.append("/PERIGEE/input/geometry_3d_cube_0d1.txt");
 
   PetscMPIInt rank, size;
 
