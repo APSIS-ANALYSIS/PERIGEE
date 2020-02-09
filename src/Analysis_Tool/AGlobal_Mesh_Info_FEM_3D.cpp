@@ -66,7 +66,7 @@ AGlobal_Mesh_Info_FEM_3D::~AGlobal_Mesh_Info_FEM_3D()
 {}
 
 
-void AGlobal_Mesh_Info_FEM_3D::print() const
+void AGlobal_Mesh_Info_FEM_3D::print_info() const
 {
   std::cout<<"AGlobal_Mesh_Info_FEM_3D:"<<std::endl;
   std::cout<<"degree: "<<xdegree<<'\t'<<ydegree<<'\t'<<zdegree<<'\n';

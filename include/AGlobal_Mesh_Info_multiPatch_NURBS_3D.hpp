@@ -33,7 +33,7 @@ class AGlobal_Mesh_Info_multiPatch_NURBS_3D : public IAGlobal_Mesh_Info
     virtual int get_probDim() const {return probDim;}
     virtual int get_elemType() const {return elemType;}
 
-    virtual void print() const;
+    virtual void print_info() const;
 
   private:
     int xdegree, ydegree, zdegree;

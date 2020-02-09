@@ -23,7 +23,7 @@ AGlobal_Mesh_Info_1Patch_NURBS_3D::AGlobal_Mesh_Info_1Patch_NURBS_3D(
 AGlobal_Mesh_Info_1Patch_NURBS_3D::~AGlobal_Mesh_Info_1Patch_NURBS_3D()
 {}
 
-void AGlobal_Mesh_Info_1Patch_NURBS_3D::print() const
+void AGlobal_Mesh_Info_1Patch_NURBS_3D::print_info() const
 {
   std::cout<<"AGlobal_Mesh_Info_1Patch_NURBS_3D:"<<std::endl;
   std::cout<<"degree: "<<xdegree<<'\t'<<ydegree<<'\t'<<zdegree<<'\n';

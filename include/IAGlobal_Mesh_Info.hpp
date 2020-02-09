@@ -32,14 +32,7 @@ class IAGlobal_Mesh_Info
     virtual int get_elemType() const
     {SYS_T::print_fatal("Error: IAGLobal_Mesh_Info::get_elemType is not implemented. \n"); return -1;}
 
-    virtual void print() const = 0;
-
-    virtual void gen_local_bubble_enrichment(const int &num_enrich_node)
-    {
-      SYS_T::print_fatal("Error: IAGlobal_Mesh_Info::gen_local_bubble_enrichment is not implemented. \n");
-    }
-
+    virtual void print_info() const = 0;
 };
-
 
 #endif
