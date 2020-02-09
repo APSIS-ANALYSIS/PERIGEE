@@ -3,7 +3,7 @@
 IEN_NURBS_multiPatch_3D::IEN_NURBS_multiPatch_3D( const IMesh * const &mmesh )
 : nElem(mmesh->get_nElem()), nLocBas(mmesh->get_nLocBas())
 {
-  IEN = new s_int [nElem * nLocBas];
+  IEN = new int [nElem * nLocBas];
 
   const int num_patch = mmesh->get_num_patch();
 
@@ -31,7 +31,7 @@ IEN_NURBS_multiPatch_3D::IEN_NURBS_multiPatch_3D( const IMesh * const &mmesh )
   }
 
   std::cout<<"\n=== IEN for multi-patch NURBS strongly match mesh generated. Memory usage: ";
-  SYS_T::print_mem_size(double(nElem) * double(nLocBas) * sizeof(s_int));
+  SYS_T::print_mem_size(double(nElem) * double(nLocBas) * sizeof(int));
   std::cout<<std::endl;
 }
 
@@ -51,7 +51,7 @@ void IEN_NURBS_multiPatch_3D::print_IEN() const
 {
   std::cout<<std::endl;
   std::cout<<"====== IEN ====== \n";
-  for(s_int ii=0; ii<nElem; ++ii)
+  for(int ii=0; ii<nElem; ++ii)
   {
     std::cout<<ii<<'\t';
     for(int jj=0; jj<nLocBas; ++jj)

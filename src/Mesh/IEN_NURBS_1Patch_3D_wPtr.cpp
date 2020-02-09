@@ -5,25 +5,25 @@ IEN_NURBS_1Patch_3D_wPtr::IEN_NURBS_1Patch_3D_wPtr( const IMesh * const &mesh )
   nElem = mesh->get_nElem();
   nLocBas = mesh->get_nLocBas();
 
-  IEN = new s_int [nElem*nLocBas];
+  IEN = new int [nElem*nLocBas];
 
-  const s_int nFunc_x = mesh->get_nFunc_x();
-  const s_int nFunc_y = mesh->get_nFunc_y();
-  const s_int nFunc_z = mesh->get_nFunc_z();
+  const int nFunc_x = mesh->get_nFunc_x();
+  const int nFunc_y = mesh->get_nFunc_y();
+  const int nFunc_z = mesh->get_nFunc_z();
 
   const int sdegree = mesh->get_s_degree();
   const int tdegree = mesh->get_t_degree();
   const int udegree = mesh->get_u_degree();
 
-  s_int A = -1;
-  s_int e = -1;
-  s_int B = 0;
-  s_int b = 0;
-  for(s_int kk = 0; kk<nFunc_z; ++kk)
+  int A = -1;
+  int e = -1;
+  int B = 0;
+  int b = 0;
+  for(int kk = 0; kk<nFunc_z; ++kk)
   {
-    for(s_int jj=0; jj<nFunc_y; ++jj)
+    for(int jj=0; jj<nFunc_y; ++jj)
     {
-      for(s_int ii=0; ii<nFunc_x; ++ii)
+      for(int ii=0; ii<nFunc_x; ++ii)
       {
         A = A + 1; // Global function index increment
         if( (ii>=sdegree) && (jj>=tdegree) && (kk>=udegree) )
@@ -130,16 +130,16 @@ void IEN_NURBS_1Patch_3D_wPtr::print_IEN() const
 {
   std::cout<<std::endl;
   std::cout<<"====== IEN ====== \n";
-  for(s_int ii=0; ii<nElem; ++ii)
+  for(int ii=0; ii<nElem; ++ii)
   {
-    for(s_int jj=0; jj<nLocBas; ++jj)
+    for(int jj=0; jj<nLocBas; ++jj)
       std::cout<<get_IEN(ii, jj)<<'\t';
     std::cout<<std::endl;
   }
   std::cout<<"================= \n";
 }
 
-inline s_int IEN_NURBS_1Patch_3D_wPtr::get_IEN( const s_int &e, const s_int &l_node) const
+inline int IEN_NURBS_1Patch_3D_wPtr::get_IEN( const int &e, const int &l_node) const
 {
   return IEN[e*nLocBas + l_node];
 }
