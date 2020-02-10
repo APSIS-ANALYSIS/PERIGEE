@@ -51,6 +51,7 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
+    // Assem mass matrix and residual vector
     virtual void Assem_mass_residual(
         const PDNSolution * const &sol_a,
         const ALocal_Elem * const &alelem_ptr,
@@ -65,7 +66,7 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
-    // Assembly the residual for the NS equations
+    // Assembly the residual vector for the NS equations
     virtual void Assem_residual(
         const PDNSolution * const &sol_a,
         const PDNSolution * const &sol_b,
@@ -85,7 +86,8 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
-    // Assembly the residual and tangent for the NS equations
+    // Assembly the residual vector and tangent matrix 
+    // for the NS equations
     virtual void Assem_tangent_residual(
         const PDNSolution * const &sol_a,
         const PDNSolution * const &sol_b,
@@ -126,6 +128,7 @@ class PGAssem_NS_FEM : public IPGAssem
         const int &ebc_id );
 
   private:
+    // --------------------------------------------------------------
     // Private data
     int nLocBas, snLocBas, dof_sol, dof_mat, num_ebc;
 
@@ -142,6 +145,7 @@ class PGAssem_NS_FEM : public IPGAssem
     double * ectrl_x, * ectrl_y, * ectrl_z;
     double * sctrl_x, * sctrl_y, * sctrl_z;
 
+    // --------------------------------------------------------------
     // Private function
     // Essential boundary condition
     void EssBC_KG( const ALocal_NodalBC * const &nbc_part, const int &field );
