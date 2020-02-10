@@ -57,7 +57,6 @@ PLocAssem_Tet_VMS_NS_GenAlpha::PLocAssem_Tet_VMS_NS_GenAlpha(
 }
 
 
-
 PLocAssem_Tet_VMS_NS_GenAlpha::~PLocAssem_Tet_VMS_NS_GenAlpha()
 {
   delete [] Tangent; Tangent = nullptr; 

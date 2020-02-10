@@ -2,8 +2,11 @@
 #define PLOCASSEM_TET_VMS_NS_GENALPHA_HPP
 // ==================================================================
 // PLocAssem_Tet_VMS_NS_GenAlpha.hpp
+// 
+// Parallel Local Assembly routine for VMS and Gen-alpha based NS
+// solver.
 //
-//
+// Date: Feb. 10 2020
 // ==================================================================
 #include "IPLocAssem.hpp"
 #include "TimeMethod_GenAlpha.hpp"
@@ -14,9 +17,8 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
     PLocAssem_Tet_VMS_NS_GenAlpha(
         const TimeMethod_GenAlpha * const &tm_gAlpha,
         const int &in_nlocbas, const int &in_nqp,
-        const int &in_snlocbas,
-        const double &in_rho, const double &in_vis_mu,
-        const double &in_beta,
+        const int &in_snlocbas, const double &in_rho, 
+        const double &in_vis_mu, const double &in_beta,
         const int &elemtype = 501 );
 
     virtual ~PLocAssem_Tet_VMS_NS_GenAlpha();
