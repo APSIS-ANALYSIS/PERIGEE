@@ -112,5 +112,136 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
 }
 
 
+PGAssem_NS_FEM::~PGAssem_NS_FEM()
+{
+  VecDestroy(&G);
+  MatDestroy(&K);
+  delete [] row_index; row_index = NULL;
+  delete [] array_a;     array_a = NULL;
+  delete [] array_b;     array_b = NULL;
+  delete [] local_a;     local_a = NULL;
+  delete [] local_b;     local_b = NULL;
+  delete [] IEN_e;       IEN_e = NULL;
+  delete [] ectrl_x;     ectrl_x = NULL;
+  delete [] ectrl_y;     ectrl_y = NULL;
+  delete [] ectrl_z;     ectrl_z = NULL;
+
+  if(num_ebc > 0)
+  {
+    delete [] LSIEN; LSIEN = NULL;
+    delete [] local_as; local_as = NULL;
+    delete [] local_bs; local_bs = NULL;
+    delete [] sctrl_x; sctrl_x = NULL;
+    delete [] sctrl_y; sctrl_y = NULL;
+    delete [] sctrl_z; sctrl_z = NULL;
+    delete [] srow_index; srow_index = NULL;
+  }
+}
+
+
+void PGAssem_NS_FEM::Get_dnz_onz( const int &nlocnode,
+    const int &empirical_neighbor_node_number,
+    const ALocal_NodalBC * const &nbc_ptr,
+    PetscInt * const &dnz, PetscInt * const &onz ) const
+{
+  const int nzbase = dof_mat * empirical_neighbor_node_number;
+
+  Vec vdnz, vonz;
+  VecCreateMPI(PETSC_COMM_WORLD, dof_mat * nlocnode, PETSC_DETERMINE, &vdnz);
+  VecCreateMPI(PETSC_COMM_WORLD, dof_mat * nlocnode, PETSC_DETERMINE, &vonz);
+  VecSet(vdnz, 0.0);
+  VecSet(vonz, 0.0);
+
+  VecSetOption(vdnz, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
+  VecSetOption(vonz, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
+
+  int row;
+  for(int ii=0; ii<nlocnode; ++ii)
+  {
+    for(int mm=0; mm<dof_mat; ++mm)
+    {
+      row = nbc_ptr->get_LID(mm, ii) * dof_mat + mm;
+      VecSetValue(vdnz, row, double(nzbase), ADD_VALUES);
+      VecSetValue(vonz, row, double(nzbase), ADD_VALUES);
+    }
+  }
+
+  for(int mm=0; mm<dof_mat; ++mm)
+  {
+    // Check the master nodes for each d.o.f.
+    const int num_master = nbc_ptr->get_Num_LPM(mm);
+    for(int ii=0; ii<num_master; ++ii)
+    {
+      row = nbc_ptr->get_LocalMaster(mm, ii) * dof_mat + mm;
+      VecSetValue(vdnz, row, double(nzbase), ADD_VALUES);
+      VecSetValue(vonz, row, double(nzbase), ADD_VALUES);
+    }
+  }
+
+  VecAssemblyBegin(vdnz);
+  VecAssemblyEnd(vdnz);
+
+  VecAssemblyBegin(vonz);
+  VecAssemblyEnd(vonz);
+
+
+  for(int mm=0; mm<dof_mat; ++mm)
+  {
+    // Check the Dirichlet nodes for each d.o.f.
+    const int num_dir = nbc_ptr->get_Num_LD(mm);
+    for(int ii=0; ii<num_dir; ++ii)
+    {
+      row = nbc_ptr->get_LDN(mm, ii) * dof_mat + mm;
+      VecSetValue(vdnz, row, 1.0, INSERT_VALUES);
+      VecSetValue(vonz, row, 0.0, INSERT_VALUES);
+    }
+
+    // Check the slave nodes for each d.o.f.
+    const int num_slave = nbc_ptr->get_Num_LPS(mm);
+    for(int ii=0; ii<num_slave; ++ii)
+    {
+      row = nbc_ptr->get_LPSN(mm, ii) * dof_mat + mm;
+      VecSetValue(vdnz, row, 2.0, INSERT_VALUES);
+      VecSetValue(vonz, row, 2.0, INSERT_VALUES);
+    }
+  }
+
+  VecAssemblyBegin(vdnz);
+  VecAssemblyEnd(vdnz);
+
+  VecAssemblyBegin(vonz);
+  VecAssemblyEnd(vonz);
+
+  PetscInt mat_length;
+  VecGetSize(vdnz, &mat_length);
+
+  const int max_dnz = dof_mat * nlocnode;
+  const int max_onz = mat_length - dof_mat * nlocnode;
+
+  PetscScalar * array_d;
+  PetscScalar * array_o;
+
+  VecGetArray(vdnz, &array_d);
+  for(int ii=0; ii<dof_mat*nlocnode; ++ii)
+  {
+    dnz[ii] = int(array_d[ii]);
+    if(dnz[ii] > max_dnz)
+      dnz[ii] = max_dnz;
+  }
+  VecRestoreArray(vdnz, &array_d);
+
+  VecGetArray(vonz, &array_o);
+  for(int ii=0; ii<dof_mat*nlocnode; ++ii)
+  {
+    onz[ii] = int(array_o[ii]);
+    if(onz[ii] > max_onz)
+      onz[ii] = max_onz;
+  }
+  VecRestoreArray(vonz, &array_o);
+
+  VecDestroy(&vdnz);
+  VecDestroy(&vonz);
+}
+
 
 // EOF
