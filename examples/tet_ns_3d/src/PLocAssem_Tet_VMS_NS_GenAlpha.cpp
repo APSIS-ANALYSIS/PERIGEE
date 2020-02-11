@@ -876,7 +876,42 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad )
-{}
+{
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  const int face_nqp = quad -> get_num_quadPts();
+
+  double gwts, coor_x, coor_y, coor_z, gx, gy, gz, nx, ny, nz, surface_area;
+  const double curr = time + alpha_f * dt;
+
+  Zero_Residual();
+
+  for(int qua = 0; qua < face_nqp; ++qua)
+  {
+    element->get_R(qua, R);
+    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+
+    coor_x = 0.0; coor_y = 0.0; coor_z = 0.0;
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      coor_x += eleCtrlPts_x[ii] * R[ii];
+      coor_y += eleCtrlPts_y[ii] * R[ii];
+      coor_z += eleCtrlPts_z[ii] * R[ii];
+    }
+
+    get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr, nx, ny, nz,
+        gx, gy, gz );
+
+    gwts = surface_area * quad -> get_qw(qua);
+
+    for(int A=0; A<snLocBas; ++A)
+    {
+      Residual[4*A+1] -= gwts * R[A] * gx;
+      Residual[4*A+2] -= gwts * R[A] * gy;
+      Residual[4*A+3] -= gwts * R[A] * gz;
+    }
+  }
+}
 
 
 double PLocAssem_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &vec,
