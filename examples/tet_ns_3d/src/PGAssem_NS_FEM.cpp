@@ -244,4 +244,118 @@ void PGAssem_NS_FEM::Get_dnz_onz( const int &nlocnode,
 }
 
 
+void PGAssem_NS_FEM::EssBC_KG(
+    const ALocal_NodalBC * const &nbc_part, const int &field )
+{
+  const int local_dir = nbc_part->get_Num_LD(field);
+
+  if(local_dir > 0)
+  {
+    for(int i=0; i<local_dir; ++i)
+    {
+      const int row = nbc_part->get_LDN(field, i) * dof_mat + field;
+      VecSetValue(G, row, 0.0, INSERT_VALUES);
+      MatSetValue(K, row, row, 1.0, ADD_VALUES);
+    }
+  }
+
+  const int local_sla = nbc_part->get_Num_LPS(field);
+  if(local_sla > 0)
+  {
+    for(int i=0; i<local_sla; ++i)
+    {
+      const int row = nbc_part->get_LPSN(field, i) * dof_mat + field;
+      const int col = nbc_part->get_LPMN(field, i) * dof_mat + field;
+      MatSetValue(K, row, col, 1.0, ADD_VALUES);
+      MatSetValue(K, row, row, -1.0, ADD_VALUES);
+      VecSetValue(G, row, 0.0, INSERT_VALUES);
+    }
+  }
+}
+
+
+void PGAssem_NS_FEM::EssBC_G(
+    const ALocal_NodalBC * const &nbc_part, const int &field )
+{
+  const int local_dir = nbc_part->get_Num_LD(field);
+  if( local_dir > 0 )
+  {
+    for(int ii=0; ii<local_dir; ++ii)
+    {
+      const int row = nbc_part->get_LDN(field, ii) * dof_mat + field;
+      VecSetValue(G, row, 0.0, INSERT_VALUES);
+    }
+  }
+
+  const int local_sla = nbc_part->get_Num_LPS(field);
+  if( local_sla > 0 )
+  {
+    for(int ii=0; ii<local_sla; ++ii)
+    {
+      const int row = nbc_part->get_LPSN(field, ii) * dof_mat + field;
+      VecSetValue(G, row, 0.0, INSERT_VALUES);
+    }
+  }
+}
+
+
+void PGAssem_ALE_NS_FEM::Assem_nonzero_estimate(
+    const ALocal_Elem * const &alelem_ptr,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &elements,
+    const IQuadPts * const &quad_s,
+    const ALocal_IEN * const &lien_ptr,
+    const APart_Node * const &node_ptr,
+    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_part,
+    const IGenBC * const &gbc )
+{
+  const int nElem = alelem_ptr->get_nlocalele();
+  const int loc_dof = dof_mat * nLocBas;
+  int loc_index, lrow_index, offset1;
+
+  lassem_ptr->Assem_Estimate();
+
+  for(int e=0; e<nElem; ++e)
+  {
+    for(int i=0; i<nLocBas; ++i)
+    {
+      loc_index  = lien_ptr->get_LIEN(e, i);
+
+      offset1 = dof_mat * i;
+
+      for(int m=0; m<dof_mat; ++m)
+      {
+        lrow_index = nbc_part->get_LID( m, loc_index );
+
+        row_index[offset1 + m] = dof_mat * lrow_index + m;
+      }
+    }
+    MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
+        lassem_ptr->Tangent, ADD_VALUES);
+  }
+
+  // Create a temporary zero solution vector
+  PDNSolution * temp = new PDNSolution_Tet4_ALE_NS_3D( node_ptr, 0, false );
+
+  // 0.1 is an (arbitrary) nonzero time step size given into the NatBC_Resis_KG 
+  NatBC_Resis_KG(0.1, temp, lassem_ptr, elements, quad_s, node_ptr,
+      nbc_part, ebc_part, gbc );
+
+  delete temp;
+
+  VecAssemblyBegin(G);
+  VecAssemblyEnd(G);
+
+  for(int fie=0; fie<dof_mat; ++fie) EssBC_KG( nbc_part, fie );
+
+  MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
+  MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
+  VecAssemblyBegin(G);
+  VecAssemblyEnd(G);
+}
+
+
+
+
 // EOF
