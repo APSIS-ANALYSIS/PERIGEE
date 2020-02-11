@@ -1071,14 +1071,82 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
 
 void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
         const double &dt,
-        const double * const &vec_a,
-        const double * const &vec_b,
+        const double * const &dot_sol,
+        const double * const &sol,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad )
-{}
+{
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  const int face_nqp = quad -> get_num_quadPts();
+
+  double gwts, nx, ny, nz, surface_area;
+  double u, v, w;
+  double factor;
+  
+  const double dd_dv = alpha_f * gamma * dt;
+
+  Zero_sur_Tangent_Residual();
+
+  Zero_Sub_sur_Tan();
+
+  for(int qua = 0; qua < face_nqp; ++qua)
+  {
+    element->get_R(qua, &R[0]);
+    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+
+    u = 0.0; v = 0.0; w = 0.0;
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      const int ii4 = ii * 4;
+      u += sol[ii4+1] * R[ii];
+      v += sol[ii4+2] * R[ii];
+      w += sol[ii4+3] * R[ii];
+    }
+
+    const double temp = u * nx + v * ny + w * nz;
+
+    if(temp < 0.0) factor = temp * rho0 * beta;
+    else factor = 0.0;
+
+    gwts = surface_area * quad -> get_qw(qua);
+
+    // snLocBas = 3 for linear tet/tri element
+    for(int A=0; A<snLocBas; ++A)
+    {
+      sur_Residual[4*A+1] -= gwts * R[A] * factor * u;
+      sur_Residual[4*A+2] -= gwts * R[A] * factor * v;
+      sur_Residual[4*A+3] -= gwts * R[A] * factor * w;
+
+      for(B=0; B<snLocBas; ++B)
+      {
+        const int index = B + A * snLocBas; // index here ranges 0 to 8
+
+        Sub_sur_Tan[5][index]  -= gwts * dd_dv * R[A] * factor * R[B];
+        Sub_sur_Tan[10][index] -= gwts * dd_dv * R[A] * factor * R[B];
+        Sub_sur_Tan[15][index] -= gwts * dd_dv * R[A] * factor * R[B];
+      }
+    }
+  }
+  
+  for(A=0; A<snLocBas; ++A)
+  {
+    for(B=0; B<snLocBas; ++B)
+    {
+      // ii = jj = 1
+      sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+1 ] = Sub_sur_Tan[5][A*snLocBas + B];
+
+      // ii = jj = 2
+      sur_Tangent[ 4*snLocBas*(4*A+2) + 4*B+2 ] = Sub_sur_Tan[10][A*snLocBas + B];
+      
+      // ii = jj = 3
+      sur_Tangent[ 4*snLocBas*(4*A+3) + 4*B+3 ] = Sub_sur_Tan[15][A*snLocBas + B];
+    }
+  }
+}
 
 
 // EOF
