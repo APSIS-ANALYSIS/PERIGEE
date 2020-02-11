@@ -747,4 +747,81 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
 }
 
+
+void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
+        const double * const &sol,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+{}
+
+
+void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
+        const int &ebc_id,
+        const double &time, const double &dt,
+        const double * const &vec_a,
+        const double * const &vec_b,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+{}
+
+
+double PLocAssem_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &vec,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+{}
+
+
+void PLocAssem_Tet_VMS_NS_GenAlpha::get_pressure_area( const double * const &vec,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad,
+        double &pres, double &area )
+{}
+
+
+void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
+        const int &ebc_id,
+        const double &val,
+        const double * const &vec_b,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+{}
+
+
+void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
+        const double * const &vec_a,
+        const double * const &vec_b,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+{}
+
+void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
+        const double &dt,
+        const double * const &vec_a,
+        const double * const &vec_b,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+{}
+
+
 // EOF
