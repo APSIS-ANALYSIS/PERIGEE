@@ -1114,16 +1114,19 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
 
     gwts = surface_area * quad -> get_qw(qua);
 
-    // snLocBas = 3 for linear tet/tri element
+    // snLocBas = 3 for linear tri element
+    //            6 for quadratic tri element
     for(int A=0; A<snLocBas; ++A)
     {
       sur_Residual[4*A+1] -= gwts * R[A] * factor * u;
       sur_Residual[4*A+2] -= gwts * R[A] * factor * v;
       sur_Residual[4*A+3] -= gwts * R[A] * factor * w;
 
-      for(B=0; B<snLocBas; ++B)
+      for(int B=0; B<snLocBas; ++B)
       {
-        const int index = B + A * snLocBas; // index here ranges 0 to 8
+        // index here ranges from 0 to 8 for linear triangle
+        //                        0 to 35 for quadratic triangle
+        const int index = B + A * snLocBas; 
 
         Sub_sur_Tan[5][index]  -= gwts * dd_dv * R[A] * factor * R[B];
         Sub_sur_Tan[10][index] -= gwts * dd_dv * R[A] * factor * R[B];
@@ -1132,9 +1135,9 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
     }
   }
   
-  for(A=0; A<snLocBas; ++A)
+  for(int A=0; A<snLocBas; ++A)
   {
-    for(B=0; B<snLocBas; ++B)
+    for(int B=0; B<snLocBas; ++B)
     {
       // ii = jj = 1
       sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+1 ] = Sub_sur_Tan[5][A*snLocBas + B];
