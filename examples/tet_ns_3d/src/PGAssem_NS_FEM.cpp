@@ -356,6 +356,64 @@ void PGAssem_ALE_NS_FEM::Assem_nonzero_estimate(
 }
 
 
+void PGAssem_ALE_NS_FEM::Assem_mass_residual(
+    const PDNSolution * const &sol_a,
+    const ALocal_Elem * const &alelem_ptr,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &elementv,
+    FEAElement * const &elements,
+    const IQuadPts * const &quad_v,
+    const IQuadPts * const &quad_s,
+    const ALocal_IEN * const &lien_ptr,
+    const APart_Node * const &node_ptr,
+    const FEANode * const &fnode_ptr,
+    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_part )
+{
+  const int nElem = alelem_ptr->get_nlocalele();
+  const int loc_dof = dof_mat * nLocBas;
+  int loc_index, lrow_index, offset1;
+
+  sol_a->GetLocalArray( array_a, node_ptr );
+  sol_a->GetLocalArray( array_b, node_ptr );
+
+  for(int ee=0; ee<nElem; ++ee)
+  {
+    lien_ptr->get_LIEN_e(ee, IEN_e);
+    GetLocal(array_a, IEN_e, local_a);
+    fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
+
+    lassem_ptr->Assem_Mass_Residual( local_a, elementv,
+        ectrl_x, ectrl_y, ectrl_z, quad_v );
+
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      loc_index = IEN_e[ii];
+      offset1 = dof_mat * ii;
+
+      for(int mm=0; mm<dof_mat; ++mm)
+      {
+        lrow_index = nbc_part -> get_LID(mm, loc_index);
+        row_index[offset1+mm] = dof_mat * lrow_index + mm;
+      }
+    }
+    MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
+        lassem_ptr->Tangent, ADD_VALUES);
+
+    VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+  }
+
+  VecAssemblyBegin(G);
+  VecAssemblyEnd(G);
+
+  for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
+
+  MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
+  MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
+  VecAssemblyBegin(G);
+  VecAssemblyEnd(G);
+}
+
 
 
 // EOF
