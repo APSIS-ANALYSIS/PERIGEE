@@ -173,7 +173,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  int ii, qua, A, ii4;
   double u, u_t, u_x, u_y, u_z, u_xx, u_yy, u_zz;
   double v, v_t, v_x, v_y, v_z, v_xx, v_yy, v_zz;
   double w, w_t, w_x, w_y, w_z, w_xx, w_yy, w_zz;
@@ -199,7 +198,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
 
   Zero_Residual();
 
-  for(qua=0; qua<nqp; ++qua)
+  for(int qua=0; qua<nqp; ++qua)
   {
     u = 0.0; u_t = 0.0; u_x = 0.0; u_y = 0.0; u_z = 0.0;
     v = 0.0; v_t = 0.0; v_x = 0.0; v_y = 0.0; v_z = 0.0;
@@ -215,9 +214,9 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
 
     element->get_invJacobian( qua, dxi_dx );
 
-    for(ii=0; ii<nLocBas; ++ii)
+    for(int ii=0; ii<nLocBas; ++ii)
     {
-      ii4 = 4 * ii;
+      const int ii4 = 4 * ii;
 
       u_t += dot_sol[ii4+1] * R[ii];
       v_t += dot_sol[ii4+2] * R[ii];
@@ -284,7 +283,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
 
     get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
 
-    for(A=0; A<nLocBas; ++A)
+    for(int A=0; A<nLocBas; ++A)
     {
       NA = R[A]; NA_x = dR_dx[A]; NA_y = dR_dy[A]; NA_z = dR_dz[A];
 
@@ -355,7 +354,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  int ii, qua, A, ii4, B, jj, index;
   double u, u_t, u_x, u_y, u_z, u_xx, u_yy, u_zz;
   double v, v_t, v_x, v_y, v_z, v_xx, v_yy, v_zz;
   double w, w_t, w_x, w_y, w_z, w_xx, w_yy, w_zz;
@@ -397,7 +395,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
   Zero_Sub_Tan();
 
-  for(qua=0; qua<nqp; ++qua)
+  for(int qua=0; qua<nqp; ++qua)
   {
     u = 0.0; u_t = 0.0; u_x = 0.0; u_y = 0.0; u_z = 0.0;
     v = 0.0; v_t = 0.0; v_x = 0.0; v_y = 0.0; v_z = 0.0;
@@ -413,9 +411,9 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
     element->get_invJacobian( qua, dxi_dx );
 
-    for(ii=0; ii<nLocBas; ++ii)
+    for(int ii=0; ii<nLocBas; ++ii)
     {
-      ii4 = 4 * ii;
+      const int ii4 = 4 * ii;
 
       u_t += dot_sol[ii4+1] * R[ii];
       v_t += dot_sol[ii4+2] * R[ii];
@@ -482,7 +480,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
     get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
 
-    for(A=0; A<nLocBas; ++A)
+    for(int A=0; A<nLocBas; ++A)
     {
       NA = R[A]; NA_x = dR_dx[A]; NA_y = dR_dy[A]; NA_z = dR_dz[A];
 
@@ -537,9 +535,9 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
           * (u_prime * w_x + v_prime * w_y + w_prime * w_z)
           - NA * rho0 * f3 );
 
-      for(B=0; B<nLocBas; ++B)
+      for(int B=0; B<nLocBas; ++B)
       {
-        index = B + A * nLocBas;
+        const int index = B + A * nLocBas;
         NB = R[B]; NB_x = dR_dx[B]; NB_y = dR_dy[B]; NB_z = dR_dz[B];
         NB_xx = d2R_dxx[B]; NB_yy = d2R_dyy[B]; NB_zz = d2R_dzz[B];
         NB_lap = NB_xx + NB_yy + NB_zz;
@@ -732,13 +730,13 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
   // Tangent is a 1D vector storing K by rows:
   // Tangent[4*nLocBas*p + q] = K[p][q] = Sub_Tan[4*ii+jj][A*nLocBas+B]
   // ----------------------------------------------------------------
-  for(ii=0; ii<4; ++ii)
+  for(int ii=0; ii<4; ++ii)
   {
-    for(jj=0; jj<4; ++jj)
+    for(int jj=0; jj<4; ++jj)
     {
-      for(A=0; A<nLocBas; ++A)
+      for(int A=0; A<nLocBas; ++A)
       {
-        for(B=0; B<nLocBas; ++B)
+        for(int B=0; B<nLocBas; ++B)
         {
           Tangent[ 4*nLocBas*(4*A+ii) + 4*B + jj ] =
             Sub_Tan[ii*4+jj][A*nLocBas + B];

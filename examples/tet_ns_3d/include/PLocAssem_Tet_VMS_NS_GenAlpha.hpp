@@ -23,7 +23,7 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
 
     virtual ~PLocAssem_Tet_VMS_NS_GenAlpha();
 
-    virtual int get_dof() const {return dof_per_node;}
+    virtual int get_dof() const {return 4;}
 
     virtual int get_dof_mat() const {return 4;}
 
@@ -60,8 +60,8 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
 
     virtual void Assem_Residual(
         const double &time, const double &dt,
-        const double * const &vec_a,
-        const double * const &vec_b,
+        const double * const &dot_sol,
+        const double * const &sol,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
