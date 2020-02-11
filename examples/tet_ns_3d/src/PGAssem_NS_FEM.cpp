@@ -356,7 +356,7 @@ void PGAssem_ALE_NS_FEM::Assem_nonzero_estimate(
 }
 
 
-void PGAssem_ALE_NS_FEM::Assem_mass_residual(
+void PGAssem_NS_FEM::Assem_mass_residual(
     const PDNSolution * const &sol_a,
     const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
@@ -414,6 +414,70 @@ void PGAssem_ALE_NS_FEM::Assem_mass_residual(
   VecAssemblyEnd(G);
 }
 
+void PGAssem_ALE_NS_FEM::Assem_residual(
+    const PDNSolution * const &sol_a,
+    const PDNSolution * const &sol_b,
+    const PDNSolution * const &sol_np1,
+    const double &curr_time,
+    const double &dt,
+    const ALocal_Elem * const &alelem_ptr,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &elementv,
+    FEAElement * const &elements,
+    const IQuadPts * const &quad_v,
+    const IQuadPts * const &quad_s,
+    const ALocal_IEN * const &lien_ptr,
+    const APart_Node * const &node_ptr,
+    const FEANode * const &fnode_ptr,
+    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_part,
+    const IGenBC * const &gbc )
+{
+  const int nElem = alelem_ptr->get_nlocalele();
+  const int loc_dof = dof_mat * nLocBas;
+  int loc_index, lrow_index, offset1;
+
+  sol_a->GetLocalArray( array_a, node_ptr );
+  sol_b->GetLocalArray( array_b, node_ptr );
+
+  for( int ee=0; ee<nElem; ++ee )
+  {
+    lien_ptr->get_LIEN_e(ee, IEN_e);
+    GetLocal(array_a, IEN_e, local_a);
+    GetLocal(array_b, IEN_e, local_b);
+
+    fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
+
+    lassem_ptr->Assem_Residual(curr_time, dt, local_a, local_b,
+        elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
+
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      loc_index = IEN_e[ii];
+      offset1 = dof_mat * ii;
+      for(int mm=0; mm<dof_mat; ++mm)
+      {
+        lrow_index = nbc_part -> get_LID(mm, loc_index);
+        row_index[offset1+mm] = dof_mat * lrow_index + mm;
+      }
+    }
+    VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+  }
+
+  // Backflow stabilization residual contribution
+  BackFlow_G( lassem_ptr, elements, dof_mat*snLocBas, quad_s, nbc_part, ebc_part );
+
+  // Resistance type boundary condition
+  NatBC_Resis_G(sol_np1, lassem_ptr, elements, quad_s, node_ptr, nbc_part, ebc_part, gbc );
+
+  VecAssemblyBegin(G);
+  VecAssemblyEnd(G);
+
+  for(int ii = 0; ii<dof_mat; ++ii) EssBC_G( nbc_part, ii );
+
+  VecAssemblyBegin(G);
+  VecAssemblyEnd(G);
+}
 
 
 // EOF
