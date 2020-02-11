@@ -755,7 +755,115 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad )
-{}
+{
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  double u, u_x, u_y, u_z;
+  double v, v_x, v_y, v_z;
+  double w, w_x, w_y, w_z;
+  double p, f1, f2, f3;
+  double gwts, coor_x, coor_y, coor_z;
+
+  double NA, NA_x, NA_y, NA_z;
+
+  const double two_mu = 2.0 * vis_mu;
+
+  double curr = 0.0;
+
+  Zero_Tangent_Residual();
+
+  Zero_Sub_Tan();
+
+  for(int qua=0; qua<nqp; ++qua)
+  {
+    u = 0.0; u_x = 0.0; u_y = 0.0; u_z = 0.0;
+    v = 0.0; v_x = 0.0; v_y = 0.0; v_z = 0.0;
+    w = 0.0; w_x = 0.0; w_y = 0.0; w_z = 0.0;
+    p = 0.0; coor_x = 0.0; coor_y = 0.0; coor_z = 0.0;
+
+    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
+
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      const int ii4 = ii * 4;
+
+      u += sol[ii4+1] * R[ii];
+      v += sol[ii4+2] * R[ii];
+      w += sol[ii4+3] * R[ii];
+      p += sol[ii4+0] * R[ii];
+
+      u_x += sol[ii4+1] * dR_dx[ii];
+      v_x += sol[ii4+2] * dR_dx[ii];
+      w_x += sol[ii4+3] * dR_dx[ii];
+
+      u_y += sol[ii4+1] * dR_dy[ii];
+      v_y += sol[ii4+2] * dR_dy[ii];
+      w_y += sol[ii4+3] * dR_dy[ii];
+
+      u_z += sol[ii4+1] * dR_dz[ii];
+      v_z += sol[ii4+2] * dR_dz[ii];
+      w_z += sol[ii4+3] * dR_dz[ii];
+
+      coor_x += eleCtrlPts_x[ii] * R[ii];
+      coor_y += eleCtrlPts_y[ii] * R[ii];
+      coor_z += eleCtrlPts_z[ii] * R[ii];
+    }
+
+    gwts = element->get_detJac(qua) * quad->get_qw(qua);
+
+    get_f(coor_x, coor_y, coor_z, curr, f1, f2, f3);
+
+    for(int A=0; A<nLocBas; ++A)
+    {
+      NA = R[A]; NA_x = dR_dx[A]; NA_y = dR_dy[A]; NA_z = dR_dz[A];
+
+      Residual[4*A+1] += gwts * ( NA * rho0 * (u*u_x + v*u_y + w*u_z) 
+          - NA_x * p
+          + two_mu * NA_x * u_x
+          + vis_mu * NA_y * (u_y + v_x)
+          + vis_mu * NA_z * (u_z + w_x)
+          - NA * rho0 * f1 );
+
+      Residual[4*A+2] += gwts * ( NA * rho0 * (u*v_x + v*v_y + w*v_z) 
+          - NA_y * p
+          + vis_mu * NA_x * (u_y + v_x)
+          + two_mu * NA_y * v_y
+          + vis_mu * NA_z * (v_z + w_y)
+          - NA * rho0 * f2 );
+
+      Residual[4*A+3] += gwts * ( NA * rho0 * (u*w_x + v*w_y + w*w_z) 
+          - NA_z * p
+          + vis_mu * NA_x * (u_z + w_x)
+          + vis_mu * NA_y * (w_y + v_z)
+          + two_mu * NA_z * w_z
+          - NA * rho0 * f3 );
+
+      for(int B=0; B<nLocBas; ++B)
+      {
+        const int index = A * nLocBas + B;
+        Sub_Tan[0][index]  += gwts * rho0 * NA * R[B];
+        Sub_Tan[5][index]  += gwts * rho0 * NA * R[B];
+        Sub_Tan[10][index] += gwts * rho0 * NA * R[B];
+        Sub_Tan[15][index] += gwts * rho0 * NA * R[B];
+      }
+    }
+  }
+
+  for(int ii=0; ii<4; ++ii)
+  {
+    for(int jj=0; jj<4; ++jj)
+    {
+      for(int A=0; A<nLocBas; ++A)
+      {
+        for(int B=0; B<nLocBas; ++B)
+        {
+          Tangent[ 4*nLocBas*(4*A+ii) + 4*B + jj ] =
+            Sub_Tan[ii*4+jj][A*nLocBas + B];
+        }
+      }
+    }
+  }
+}
 
 
 void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
