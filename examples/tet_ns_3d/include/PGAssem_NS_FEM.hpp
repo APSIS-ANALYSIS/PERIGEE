@@ -13,7 +13,6 @@
 // the dot solution contains
 //  [ dot pressure; dot velcoty ].
 // 
-// Author: Ju Liu
 // Date Created: Feb. 10 2020
 // ==================================================================
 #include "IPGAssem.hpp"
@@ -68,8 +67,8 @@ class PGAssem_NS_FEM : public IPGAssem
 
     // Assembly the residual vector for the NS equations
     virtual void Assem_residual(
-        const PDNSolution * const &sol_a,
-        const PDNSolution * const &sol_b,
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
         const PDNSolution * const &sol_np1,
         const double &curr_time,
         const double &dt,
@@ -89,8 +88,8 @@ class PGAssem_NS_FEM : public IPGAssem
     // Assembly the residual vector and tangent matrix 
     // for the NS equations
     virtual void Assem_tangent_residual(
-        const PDNSolution * const &sol_a,
-        const PDNSolution * const &sol_b,
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
         const PDNSolution * const &sol_np1,
         const double &curr_time,
         const double &dt,
@@ -130,7 +129,9 @@ class PGAssem_NS_FEM : public IPGAssem
   private:
     // --------------------------------------------------------------
     // Private data
-    int nLocBas, snLocBas, dof_sol, dof_mat, num_ebc;
+    const int nLocBas, dof_sol, dof_mat, num_ebc;
+    
+    int snLocBas;
 
     PetscInt * row_index, * srow_index;
 
@@ -143,6 +144,7 @@ class PGAssem_NS_FEM : public IPGAssem
     int * IEN_e, * LSIEN;
 
     double * ectrl_x, * ectrl_y, * ectrl_z;
+    
     double * sctrl_x, * sctrl_y, * sctrl_z;
 
     // --------------------------------------------------------------

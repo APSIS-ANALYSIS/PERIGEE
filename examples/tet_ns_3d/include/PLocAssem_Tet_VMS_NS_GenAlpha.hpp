@@ -83,12 +83,14 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
       // Private data
       const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta;
 
-      const int dof_per_node, nqp;
+      const int nqp;
 
       double CI, CT;
+      
       int nLocBas, snLocBas, vec_size, sur_size;
 
       std::vector<double> R, dR_dx, dR_dy, dR_dz;
+      
       std::vector<double> d2R_dxx, d2R_dyy, d2R_dzz;
 
       double dxi_dx[9];

@@ -8,8 +8,7 @@ PLocAssem_Tet_VMS_NS_GenAlpha::PLocAssem_Tet_VMS_NS_GenAlpha(
         const double &in_beta, const int &elemtype )
 : rho0( in_rho ), vis_mu( in_vis_mu ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
-  gamma(tm_gAlpha->get_gamma()), beta(in_beta),
-  dof_per_node(4), nqp(in_nqp)
+  gamma(tm_gAlpha->get_gamma()), beta(in_beta), nqp(in_nqp)
 {
   if(elemtype == 501)
   {
@@ -25,8 +24,8 @@ PLocAssem_Tet_VMS_NS_GenAlpha::PLocAssem_Tet_VMS_NS_GenAlpha(
   }
   else SYS_T::print_fatal("Error: unknown elem type.\n");
 
-  vec_size = nLocBas * dof_per_node;
-  sur_size = snLocBas * dof_per_node;
+  vec_size = nLocBas * 4; // dof_per_node = 4
+  sur_size = snLocBas * 4;
 
   R.resize(nLocBas);
   dR_dx.resize(nLocBas);
