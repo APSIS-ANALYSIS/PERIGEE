@@ -947,7 +947,6 @@ double PLocAssem_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &vec,
   }
 
   return flrate;
-
 }
 
 
@@ -958,7 +957,31 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_pressure_area( const double * const &vec
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad,
         double &pres, double &area )
-{}
+{
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  const int face_nqp = quad -> get_num_quadPts();
+
+  double gwts, nx, ny, nz, surface_area, pp;
+
+  // Initialize the two variables to be passed out
+  pres = 0.0;
+  area = 0.0;
+
+  for(int qua =0; qua < face_nqp; ++qua)
+  {
+    element->get_R(qua, &R[0]);
+    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+
+    pp = 0.0;
+    for(int ii=0; ii<snLocBas; ++ii) pp += vec[4*ii+0] * R[ii];
+
+    gwts = surface_area * quad->get_qw(qua);
+
+    pres += gwts * pp;
+    area += gwts;
+  }
+}
 
 
 void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
@@ -970,7 +993,29 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad )
-{}
+{
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  const int face_nqp = quad -> get_num_quadPts();
+
+  double gwts, nx, ny, nz, surface_area;
+
+  Zero_Residual();
+
+  for(int qua = 0; qua < face_nqp; ++qua)
+  {
+    element->get_R(qua, &R[0]);
+    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+    gwts = surface_area * quad -> get_qw(qua);
+
+    for(int A=0; A<snLocBas; ++A)
+    {
+      Residual[4*A+1] += gwts * R[A] * nx * val;
+      Residual[4*A+2] += gwts * R[A] * ny * val;
+      Residual[4*A+3] += gwts * R[A] * nz * val;
+    }
+  }
+}
 
 
 void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
