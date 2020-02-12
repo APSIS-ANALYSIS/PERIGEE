@@ -13,28 +13,22 @@
 #include "ALocal_Inflow_NodalBC.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
-#include "FEAElement_Triangle3_3D_der0.hpp"
 #include "FEAElement_Tet4.hpp"
+#include "FEAElement_Tet10_v2.hpp"
+#include "FEAElement_Triangle3_3D_der0.hpp"
+#include "FEAElement_Triangle6_3D_der0.hpp"
 #include "CVFlowRate_Unsteady.hpp"
 #include "CVFlowRate_Linear2Steady.hpp"
 #include "GenBC_Resistance.hpp"
 #include "GenBC_RCR.hpp"
-
-
-#include "ALocal_Elem.hpp"
-#include "ALocal_NodalBC.hpp"
-#include "APart_Node.hpp"
-#include "Matrix_PETSc.hpp"
-#include "TimeMethod_GenAlpha.hpp"
-#include "PDNTimeStep.hpp"
 #include "PLocAssem_Tet_VMS_NS_GenAlpha.hpp"
-#include "PDNSolution_NS.hpp"
 #include "PGAssem_NS_FEM.hpp"
-#include "PLinear_Solver_PETSc.hpp"
+#include "PTime_NS_Solver.hpp"
 
 int main(int argc, char *argv[])
 {
   // Number of quadrature points for tets and triangles
+  // Suggested values: 5 / 4 for linear, 17 / 13 for quadratic
   int nqp_tet = 5, nqp_tri = 4;
   
   // Estimate of the nonzero per row for the sparse matrix 
@@ -197,8 +191,25 @@ int main(int argc, char *argv[])
 
   // ===== Finite Element Container =====
   SYS_T::commPrint("===> Setup element container. \n");
-  FEAElement * elementv = new FEAElement_Tet4( nqp_tet );
-  FEAElement * elements = new FEAElement_Triangle3_3D_der0( nqp_tri );
+  FEAElement * elementv = nullptr; 
+  FEAElement * elements = nullptr; 
+  
+  if( GMIptr->get_elemType() == 501 )
+  {
+    elementv = new FEAElement_Tet4( nqp_tet );
+    elements = new FEAElement_Triangle3_3D_der0( nqp_tri ); 
+  }
+  else if( GMIptr->get_elemType() == 502 )
+  {
+    SYS_T::print_fatal_if( nqp_tet < 6, "Error: not enough quadrature points.\n" );
+    SYS_T::print_fatal_if( nqp_tri < 7, "Error: not enough quadrature points.\n" );
+
+    elementv = new FEAElement_Tet10_v2( nqp_tet );
+    elements = new FEAElement_Triangle6_3D_der0( nqp_tri ); 
+  }
+  else
+    SYS_T::print_fatal("Error: Element type not supported.\n");
+
 
   // ===== Generate a sparse matrix for strong enforcement of essential BCs
   Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
@@ -321,6 +332,60 @@ int main(int argc, char *argv[])
   PCFieldSplitSetFields(upc,"u",3,vfields,vfields);
   PCFieldSplitSetFields(upc,"p",1,pfield,pfield);
 
+  // ===== Nonlinear solver context =====
+  PNonlinear_NS_Solver * nsolver = new PNonlinear_NS_Solver(
+      pNode, fNode, nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq);
+  SYS_T::commPrint("===> Nonlinear solver setted up:\n");
+  nsolver->print_info();
+
+  // ===== Temporal solver context =====
+  PTime_NS_Solver * tsolver = new PTime_NS_Solver( sol_bName,
+      sol_record_freq, ttan_renew_freq, final_time );
+  SYS_T::commPrint("===> Time marching solver setted up:\n");
+  tsolver->print_info();
+
+  // ===== Outlet flowrate recording files =====
+  for(int ff=0; ff<locebc->get_num_ebc(); ++ff)
+  {
+    const double face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
+        sol, locAssem_ptr, elements, quads, pNode, locebc, ff );
+
+    const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
+        sol, locAssem_ptr, elements, quads, pNode, locebc, ff );
+
+    // set the gbc initial conditions using the 3D data
+    gbc -> reset_initial_sol( ff, face_flrate, face_avepre );
+
+    const double lpn_flowrate = face_flrate;
+    const double lpn_pressure = gbc -> get_P( ff, lpn_flowrate );
+
+    // Create the txt files and write the initial flow rates
+    if(rank == 0)
+    {
+      std::ofstream ofile;
+
+      // If this is NOT a restart run, generate a new file, otherwise append to
+      // existing file
+      if( !is_restart )
+        ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
+      else
+        ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
+
+      // If this is NOT a restart, then record the initial values
+      if( !is_restart )
+        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
+
+      ofile.close();
+    }
+  }
+
+  // ===== FEM analysis =====
+  SYS_T::commPrint("===> Start Finite Element Analysis:\n");
+
+  tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol,
+      tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN, pNode, fNode,
+      locnbc, locinfnbc, locebc, gbc, pmat, elementv, elements, quadv, quads,
+      locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
 
   // ===== Clean Memory =====
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
@@ -328,7 +393,7 @@ int main(int argc, char *argv[])
   delete tm_galpha_ptr; delete pmat; delete elementv; delete elements;
   delete quads; delete quadv; delete inflow_rate_ptr; delete gbc; delete timeinfo;
   delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete gloAssem_ptr;
-  delete lsolver;
+  delete lsolver; delete nsolver; delete tsolver;
 
   PetscFinalize();
   return EXIT_SUCCESS;
