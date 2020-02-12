@@ -133,8 +133,10 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 
 ADD_EXECUTABLE( preprocess3d preprocess_sv_tets.cpp)
 ADD_EXECUTABLE( ns_tet_3d ns_tet_driver.cpp)
+ADD_EXECUTABLE( prepost prepost_ns_tets.cpp)
 
 TARGET_LINK_LIBRARIES( preprocess3d ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( ns_tet_3d ${EXTRA_LINK_LIBS} perigee_analysis )
+TARGET_LINK_LIBRARIES( prepost ${EXTRA_LINK_LIBS} perigee_preprocess )
 
 # EOF

@@ -273,7 +273,6 @@ int main(int argc, char *argv[])
   PCFieldSplitSetFields(upc,"u",3,vfields,vfields); // A_00 for velo
   PCFieldSplitSetFields(upc,"p",1,pfield,pfield);  // A_11 for pres
 
-
   // FEM 7. Nonlinear solver context
   PNonlinear_Seg_Solver * nsolver = new PNonlinear_Seg_Solver(
       pNode, locAssem_ptr, fNode,
@@ -307,6 +306,5 @@ int main(int argc, char *argv[])
   PetscFinalize();
   return 0;
 }
-
 
 // EOF

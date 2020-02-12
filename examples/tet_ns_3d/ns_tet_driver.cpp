@@ -201,15 +201,13 @@ int main(int argc, char *argv[])
   }
   else if( GMIptr->get_elemType() == 502 )
   {
-    SYS_T::print_fatal_if( nqp_tet < 6, "Error: not enough quadrature points.\n" );
-    SYS_T::print_fatal_if( nqp_tri < 7, "Error: not enough quadrature points.\n" );
+    SYS_T::print_fatal_if( nqp_tet < 29, "Error: not enough quadrature points.\n" );
+    SYS_T::print_fatal_if( nqp_tri < 13, "Error: not enough quadrature points.\n" );
 
     elementv = new FEAElement_Tet10_v2( nqp_tet );
     elements = new FEAElement_Triangle6_3D_der0( nqp_tri ); 
   }
-  else
-    SYS_T::print_fatal("Error: Element type not supported.\n");
-
+  else SYS_T::print_fatal("Error: Element type not supported.\n");
 
   // ===== Generate a sparse matrix for strong enforcement of essential BCs
   Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
