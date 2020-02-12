@@ -19,10 +19,10 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
 {
   // Make sure the data structure is compatible
   SYS_T::print_fatal_if(dof_sol != locassem_ptr->get_dof(),
-      "PGAssem_ALE_NS_FEM::dof_sol != locassem_ptr->get_dof(). \n");
+      "PGAssem_NS_FEM::dof_sol != locassem_ptr->get_dof(). \n");
 
   SYS_T::print_fatal_if(dof_mat != part_nbc->get_dofMat(),
-      "PGAssem_ALE_NS_FEM::dof_mat != part_nbc->get_dofMat(). \n");
+      "PGAssem_NS_FEM::dof_mat != part_nbc->get_dofMat(). \n");
 
   // Make sure that the surface element's number of local basis are 
   // the same. This is an assumption in this assembly routine.
@@ -299,7 +299,7 @@ void PGAssem_NS_FEM::EssBC_G(
 }
 
 
-void PGAssem_ALE_NS_FEM::Assem_nonzero_estimate(
+void PGAssem_NS_FEM::Assem_nonzero_estimate(
     const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &elements,
@@ -336,7 +336,7 @@ void PGAssem_ALE_NS_FEM::Assem_nonzero_estimate(
   }
 
   // Create a temporary zero solution vector
-  PDNSolution * temp = new PDNSolution_Tet4_ALE_NS_3D( node_ptr, 0, false );
+  PDNSolution * temp = new PDNSolution_NS( node_ptr, 0, false );
 
   // 0.1 is an (arbitrary) nonzero time step size given into the NatBC_Resis_KG 
   NatBC_Resis_KG(0.1, temp, lassem_ptr, elements, quad_s, node_ptr,
@@ -414,7 +414,8 @@ void PGAssem_NS_FEM::Assem_mass_residual(
   VecAssemblyEnd(G);
 }
 
-void PGAssem_ALE_NS_FEM::Assem_residual(
+
+void PGAssem_NS_FEM::Assem_residual(
     const PDNSolution * const &sol_a,
     const PDNSolution * const &sol_b,
     const PDNSolution * const &sol_np1,
@@ -479,5 +480,482 @@ void PGAssem_ALE_NS_FEM::Assem_residual(
   VecAssemblyEnd(G);
 }
 
+
+void PGAssem_NS_FEM::Assem_tangent_residual(
+    const PDNSolution * const &sol_a,
+    const PDNSolution * const &sol_b,
+    const PDNSolution * const &sol_np1,
+    const double &curr_time,
+    const double &dt,
+    const ALocal_Elem * const &alelem_ptr,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &elementv,
+    FEAElement * const &elements,
+    const IQuadPts * const &quad_v,
+    const IQuadPts * const &quad_s,
+    const ALocal_IEN * const &lien_ptr,
+    const APart_Node * const &node_ptr,
+    const FEANode * const &fnode_ptr,
+    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_part,
+    const IGenBC * const &gbc )
+{
+  const int nElem = alelem_ptr->get_nlocalele();
+  const int loc_dof = dof_mat * nLocBas;
+  int loc_index, lrow_index, offset1;
+
+  sol_a->GetLocalArray( array_a, node_ptr );
+  sol_b->GetLocalArray( array_b, node_ptr );
+
+  for(int ee=0; ee<nElem; ++ee)
+  {
+    lien_ptr->get_LIEN_e(ee, IEN_e);
+    GetLocal(array_a, IEN_e, local_a);
+    GetLocal(array_b, IEN_e, local_b);
+
+    fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
+
+    lassem_ptr->Assem_Tangent_Residual(curr_time, dt, local_a, local_b,
+        elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
+
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      loc_index = IEN_e[ii];
+      offset1 = dof_mat * ii;
+
+      for(int mm=0; mm<dof_mat; ++mm)
+      {
+        lrow_index = nbc_part -> get_LID(mm, loc_index);
+
+        row_index[offset1 + mm] = dof_mat * lrow_index + mm;
+      }
+    }
+    MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
+        lassem_ptr->Tangent, ADD_VALUES);
+
+    VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+  }
+
+  // Backflow stabilization residual & tangent contribution
+  BackFlow_KG( dt, lassem_ptr, elements, dof_mat*snLocBas, quad_s, nbc_part, ebc_part );
+
+  // Resistance type boundary condition
+  NatBC_Resis_KG( dt, sol_np1, lassem_ptr, elements, quad_s, node_ptr, 
+      nbc_part, ebc_part, gbc );
+
+  VecAssemblyBegin(G);
+  VecAssemblyEnd(G);
+
+  for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
+
+  MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
+  MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
+  VecAssemblyBegin(G);
+  VecAssemblyEnd(G);
+}
+
+
+void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const int &in_loc_dof,
+    const IQuadPts * const &quad_s,
+    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_part )
+{
+  for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
+  {
+    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+
+    for(int ee=0; ee<num_sele; ++ee)
+    {
+      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
+
+      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+
+      GetLocal(array_a, LSIEN, snLocBas, local_as);
+      GetLocal(array_b, LSIEN, snLocBas, local_bs);
+
+      lassem_ptr->Assem_Residual_EBC(ebc_id, curr_time, dt,
+          local_as, local_bs, element_s, sctrl_x, sctrl_y, sctrl_z,
+          quad_s);
+
+      for(int ii=0; ii<snLocBas; ++ii)
+      {
+        int loc_index = LSIEN[ii];
+        int offset1 = dof_mat * ii;
+        for(int mm=0; mm<dof_mat; ++mm)
+        {
+          int lrow_index = nbc_part -> get_LID(mm, loc_index);
+          srow_index[offset1 + mm] = dof_mat * lrow_index + mm;
+        }
+      }
+
+      VecSetValues(G, in_loc_dof, srow_index, lassem_ptr->Residual, ADD_VALUES);
+    }
+  }
+}
+
+
+void PGAssem_NS_FEM::BackFlow_G( IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const int &in_loc_dof,
+    const IQuadPts * const &quad_s,
+    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_part )
+{
+  for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
+  {
+    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+
+    for(int ee=0; ee<num_sele; ++ee)
+    {
+      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
+
+      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+
+      GetLocal(array_a, LSIEN, snLocBas, local_as);
+      GetLocal(array_b, LSIEN, snLocBas, local_bs);
+
+      lassem_ptr->Assem_Residual_BackFlowStab( local_as, local_bs,
+          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+
+      for(int ii=0; ii<snLocBas; ++ii)
+      {
+        int loc_index = LSIEN[ii];
+        int offset1 = dof_mat * ii;
+        for(int mm=0; mm<dof_mat; ++mm)
+        {
+          int lrow_index = nbc_part -> get_LID(mm, loc_index);
+          srow_index[offset1 + mm] = dof_mat * lrow_index + mm;
+        }
+      }
+
+      VecSetValues(G, in_loc_dof, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
+    }
+  }
+}
+
+
+void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const int &in_loc_dof,
+    const IQuadPts * const &quad_s,
+    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_part )
+{
+  for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
+  {
+    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+
+    for(int ee=0; ee<num_sele; ++ee)
+    {
+      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
+
+      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+
+      GetLocal(array_a, LSIEN, snLocBas, local_as);
+      GetLocal(array_b, LSIEN, snLocBas, local_bs);
+
+      lassem_ptr->Assem_Tangent_Residual_BackFlowStab( dt, local_as, local_bs,
+          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+
+      for(int ii=0; ii<snLocBas; ++ii)
+      {
+        int loc_index = LSIEN[ii];
+        int offset1 = dof_mat * ii;
+        for(int mm=0; mm<dof_mat; ++mm)
+        {
+          int lrow_index = nbc_part -> get_LID(mm, loc_index);
+          srow_index[offset1 + mm] = dof_mat * lrow_index + mm;
+        }
+      }
+
+      MatSetValues(K, in_loc_dof, srow_index, in_loc_dof, srow_index,
+          lassem_ptr->sur_Tangent, ADD_VALUES);
+
+      VecSetValues(G, in_loc_dof, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
+    }
+  }
+}
+
+
+double PGAssem_NS_FEM::Assem_surface_flowrate(
+    const PDNSolution * const &vec,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const APart_Node * const &pnode_ptr,
+    const ALocal_EBC * const &ebc_part,
+    const int &ebc_id )
+{
+  const int nlgn = pnode_ptr->get_nlocghonode();
+  double * array = new double [nlgn * dof_sol];
+  double * local = new double [snLocBas * dof_sol];
+
+  vec -> GetLocalArray( array, pnode_ptr );
+
+  const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+
+  double esum = 0.0;
+
+  for(int ee=0; ee<num_sele; ++ee)
+  {
+    // Obtain the LSIEN array
+    ebc_part -> get_SIEN( ebc_id, ee, LSIEN);
+
+    // Obtain the control points coordinates
+    ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+
+    // Obtain the solution vector in this element
+    GetLocal(array, LSIEN, snLocBas, local);
+
+    esum += lassem_ptr -> get_flowrate( local, element_s, sctrl_x,
+        sctrl_y, sctrl_z, quad_s );
+  }
+
+  delete [] array; array = nullptr;
+  delete [] local; local = nullptr;
+
+  double sum = 0.0;
+  MPI_Allreduce(&esum, &sum, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+
+  return sum;
+}
+
+
+double PGAssem_NS_FEM::Assem_surface_ave_pressure(
+    const PDNSolution * const &vec,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const APart_Node * const &pnode_ptr,
+    const ALocal_EBC * const &ebc_part,
+    const int &ebc_id )
+{
+  const int nlgn = pnode_ptr->get_nlocghonode();
+  double * array = new double [nlgn * dof_sol];
+  double * local = new double [snLocBas * dof_sol];
+
+  vec -> GetLocalArray( array, pnode_ptr );
+
+  const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+
+  double val_pres = 0.0, val_area = 0.0;
+
+  for(int ee=0; ee<num_sele; ++ee)
+  {
+    // Obtain the LSIEN array
+    ebc_part -> get_SIEN( ebc_id, ee, LSIEN);
+
+    // Obtain the control points coordinates
+    ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+
+    // Obtain the solution vector in this element
+    GetLocal(array, LSIEN, snLocBas, local);
+
+    double ele_pres, ele_area;
+
+    lassem_ptr-> get_pressure_area( local, element_s, sctrl_x, sctrl_y,
+        sctrl_z, quad_s, ele_pres, ele_area);
+
+    val_pres += ele_pres;
+    val_area += ele_area;
+  }
+
+  delete [] array; array = nullptr;
+  delete [] local; local = nullptr;
+
+  // Summation over CPUs
+  double sum_pres = 0.0, sum_area = 0.0;
+
+  MPI_Allreduce(&val_pres, &sum_pres, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+  MPI_Allreduce(&val_area, &sum_area, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+
+  return sum_pres / sum_area;
+}
+
+
+void PGAssem_NS_FEM::NatBC_Resis_G(
+    const PDNSolution * const &sol,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const APart_Node * const &node_ptr,
+    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_part,
+    const IGenBC * const &gbc )
+{
+  PetscScalar * Res = new PetscScalar [snLocBas * 3];
+  PetscInt * srow_idx = new PetscInt [snLocBas * 3];
+
+  for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
+  {
+    // Calculate flow rate for face with ebc_id from solution vector sol
+    const double flrate = Assem_surface_flowrate( sol, lassem_ptr, 
+        element_s, quad_s, node_ptr, ebc_part, ebc_id ); 
+
+    // Get the (pressure) value on the outlet surface for traction evaluation    
+    const double P_n   = gbc -> get_P0( ebc_id );
+    const double P_np1 = gbc -> get_P( ebc_id, flrate );
+   
+    // P_n+alpha_f
+    // lassem_ptr->get_model_para_1() gives alpha_f 
+    const double val = P_n + lassem_ptr->get_model_para_1() * (P_np1 - P_n);
+
+    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+    for(int ee=0; ee<num_sele; ++ee)
+    {
+      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
+      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+
+      GetLocal(array_a, LSIEN, snLocBas, local_as);
+      GetLocal(array_b, LSIEN, snLocBas, local_bs);
+
+      // Here, val is Pressure, and is used as the surface traction h = P I 
+      // to calculate the boundary integral
+      lassem_ptr->Assem_Residual_EBC_Resistance(ebc_id, val,
+          local_bs, element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+
+      for(int ii=0; ii<snLocBas; ++ii)
+      {
+        Res[3*ii+0] = lassem_ptr->Residual[4*ii+1];
+        Res[3*ii+1] = lassem_ptr->Residual[4*ii+2];
+        Res[3*ii+2] = lassem_ptr->Residual[4*ii+3];
+
+        srow_idx[3*ii+0] = dof_mat * nbc_part->get_LID(1, LSIEN[ii]) + 1;
+        srow_idx[3*ii+1] = dof_mat * nbc_part->get_LID(2, LSIEN[ii]) + 2;
+        srow_idx[3*ii+2] = dof_mat * nbc_part->get_LID(3, LSIEN[ii]) + 3;
+      }
+
+      VecSetValues(G, snLocBas*3, srow_idx, Res, ADD_VALUES);
+    }
+  }
+
+  delete [] Res; Res = nullptr; delete [] srow_idx; srow_idx = nullptr;
+}
+
+
+void PGAssem_NS_FEM::NatBC_Resis_KG(
+    const double &dt,
+    const PDNSolution * const &sol,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const APart_Node * const &node_ptr,
+    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_part,
+    const IGenBC * const &gbc )
+{
+  // dd_dv = dt x alpha_f x gamma
+  const double dd_dv = dt * lassem_ptr->get_model_para_1() * lassem_ptr->get_model_para_2();
+
+  // Allocate the vector to hold the residual on each surface element
+  PetscScalar * Res = new PetscScalar [snLocBas * 3];
+  PetscInt * srow_idx = new PetscInt [snLocBas * 3];
+  PetscScalar * Tan;
+  PetscInt * scol_idx;
+  double out_nx, out_ny, out_nz;
+  std::vector<double> intNB;
+  std::vector<int> map_Bj;
+
+  for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
+  {
+    // Calculate flow rate for face with ebc_id and MPI_Allreduce them
+    // Here, sol is the solution at time step n+1 (not n+alpha_f!)
+    const double flrate = Assem_surface_flowrate( sol, lassem_ptr, 
+        element_s, quad_s, node_ptr, ebc_part, ebc_id ); 
+
+    // Get the (pressure) value on the outlet surface for traction evaluation    
+    const double P_n   = gbc -> get_P0( ebc_id );
+    const double P_np1 = gbc -> get_P( ebc_id, flrate );
+   
+    // P_n+alpha_f 
+    const double resis_val = P_n + lassem_ptr->get_model_para_1() * (P_np1 - P_n);
+
+    // Get the (potentially approximated) m := dP/dQ
+    const double m_val = gbc -> get_m( ebc_id, flrate );
+
+    const int num_face_nodes = ebc_part -> get_num_face_nodes(ebc_id);
+    if(num_face_nodes > 0)
+    {
+      Tan = new PetscScalar [snLocBas * 3 * num_face_nodes * 3];
+      scol_idx = new PetscInt [num_face_nodes * 3];
+      ebc_part -> get_outvec( ebc_id, out_nx, out_ny, out_nz );
+      ebc_part -> get_intNA( ebc_id, intNB );
+      ebc_part -> get_LID( ebc_id, map_Bj );
+    }
+    else
+    {
+      Tan = nullptr;
+      scol_idx = nullptr;
+    }
+
+    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+    for(int ee=0; ee<num_sele; ++ee)
+    {
+      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
+      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+
+      GetLocal(array_a, LSIEN, snLocBas, local_as);
+      GetLocal(array_b, LSIEN, snLocBas, local_bs);
+
+      // For here, we scale the int_NA nx/y/z by factor 1
+      lassem_ptr->Assem_Residual_EBC_Resistance(ebc_id, 1.0,
+          local_bs, element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+
+      // Residual vector is scaled by the resistance value
+      for(int ii=0; ii<snLocBas; ++ii)
+      {
+        Res[3*ii+0] = resis_val * lassem_ptr->Residual[4*ii+1];
+        Res[3*ii+1] = resis_val * lassem_ptr->Residual[4*ii+2];
+        Res[3*ii+2] = resis_val * lassem_ptr->Residual[4*ii+3];
+      }
+
+      for(int A=0; A<snLocBas; ++A)
+      {
+        for(int ii=0; ii<3; ++ii)
+        {
+          const int temp_row = (3*A+ii) * num_face_nodes * 3;
+          for(int B=0; B<num_face_nodes; ++B)
+          {
+            // Residual[4*A+ii+1] is intNB[A]*out_n[ii]
+            Tan[temp_row + 3*B + 0] = dd_dv * m_val * lassem_ptr->Residual[4*A+ii+1] * intNB[B] * out_nx;
+            Tan[temp_row + 3*B + 1] = dd_dv * m_val * lassem_ptr->Residual[4*A+ii+1] * intNB[B] * out_ny;
+            Tan[temp_row + 3*B + 2] = dd_dv * m_val * lassem_ptr->Residual[4*A+ii+1] * intNB[B] * out_nz;
+          }
+        }
+      }
+
+      for(int ii=0; ii<snLocBas; ++ii)
+      {
+        srow_idx[3*ii+0] = dof_mat * nbc_part->get_LID(1,LSIEN[ii]) + 1;
+        srow_idx[3*ii+1] = dof_mat * nbc_part->get_LID(2,LSIEN[ii]) + 2;
+        srow_idx[3*ii+2] = dof_mat * nbc_part->get_LID(3,LSIEN[ii]) + 3;
+      }
+
+      for(int ii=0; ii<num_face_nodes; ++ii)
+      {
+        scol_idx[ii*3+0] = dof_mat * map_Bj[ii*3+0] + 1;
+        scol_idx[ii*3+1] = dof_mat * map_Bj[ii*3+1] + 2;
+        scol_idx[ii*3+2] = dof_mat * map_Bj[ii*3+2] + 3;
+      }
+
+      MatSetValues(K, snLocBas*3, srow_idx, num_face_nodes*3, scol_idx, Tan, ADD_VALUES);
+      VecSetValues(G, snLocBas*3, srow_idx, Res, ADD_VALUES);
+    }
+
+    if( num_face_nodes > 0 ) 
+    {
+      delete [] Tan; 
+      Tan = nullptr;
+      delete [] scol_idx;
+      scol_idx = nullptr;
+    }
+  }
+
+  delete [] Res; Res = nullptr; delete [] srow_idx; srow_idx = nullptr;
+}
 
 // EOF
