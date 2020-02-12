@@ -8,6 +8,7 @@
 // Date: May 23 2017
 // ==================================================================
 #include "PDNTimeStep.hpp"
+#include "PNonlinear_NS_Solver.hpp"
 
 class PTime_NS_Solver
 {
@@ -44,7 +45,7 @@ class PTime_NS_Solver
         IPLocAssem * const &lassem_ptr,
         IPGAssem * const &gassem_ptr,
         PLinear_Solver_PETSc * const &lsolver_ptr,
-        PNonlinear_Seg_Solver * const &nsolver_ptr ) const;
+        PNonlinear_NS_Solver * const &nsolver_ptr ) const;
 
   private:
     const double final_time;
