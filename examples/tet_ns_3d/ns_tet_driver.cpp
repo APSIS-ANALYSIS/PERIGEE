@@ -311,6 +311,15 @@ int main(int argc, char *argv[])
     delete lsolver_acce;
     SYS_T::commPrint(" The mass matrix lsolver is destroyed. \n\n");
   }
+  
+  // ===== Linear solver context =====
+  PLinear_Solver_PETSc * lsolver = new PLinear_Solver_PETSc();
+
+  PC upc; lsolver->GetPC(&upc);
+  const PetscInt pfield[1] = {0}, vfields[] = {1,2,3};
+  PCFieldSplitSetBlockSize(upc,4);
+  PCFieldSplitSetFields(upc,"u",3,vfields,vfields);
+  PCFieldSplitSetFields(upc,"p",1,pfield,pfield);
 
 
   // ===== Clean Memory =====
@@ -319,6 +328,7 @@ int main(int argc, char *argv[])
   delete tm_galpha_ptr; delete pmat; delete elementv; delete elements;
   delete quads; delete quadv; delete inflow_rate_ptr; delete gbc; delete timeinfo;
   delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete gloAssem_ptr;
+  delete lsolver;
 
   PetscFinalize();
   return EXIT_SUCCESS;
