@@ -29,6 +29,8 @@
 #include "PDNTimeStep.hpp"
 #include "PLocAssem_Tet_VMS_NS_GenAlpha.hpp"
 #include "PDNSolution_NS.hpp"
+#include "PGAssem_NS_FEM.hpp"
+#include "PLinear_Solver_PETSc.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -268,13 +270,55 @@ int main(int argc, char *argv[])
   SYS_T::print_fatal_if(gbc->get_num_ebc() != locebc->get_num_ebc(),
       "Error: GenBC number of faces does not match with that in ALocal_EBC.\n");
 
+  // ===== Global assembly =====
+  SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
+  IPGAssem * gloAssem_ptr = new PGAssem_NS_FEM( locAssem_ptr, elements, quads,
+      GMIptr, locElem, locIEN, pNode, locnbc, locebc, gbc, nz_estimate );
+
+  SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
+  gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_ptr,
+      elements, quads, locIEN, pNode, locnbc, locebc, gbc );
+
+  SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
+  gloAssem_ptr->Fix_nonzero_err_str();
+  gloAssem_ptr->Clear_KG();
+  
+  // ===== Initialize the dot_sol vector by solving mass matrix =====
+  if( is_restart == false )
+  {
+    SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n");
+    PLinear_Solver_PETSc * lsolver_acce = new PLinear_Solver_PETSc(
+        1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
+
+    KSPSetType(lsolver_acce->ksp, KSPGMRES);
+    KSPGMRESSetOrthogonalization(lsolver_acce->ksp,
+        KSPGMRESModifiedGramSchmidtOrthogonalization);
+    KSPGMRESSetRestart(lsolver_acce->ksp, 500);
+
+    PC preproc; lsolver_acce->GetPC(&preproc);
+    PCSetType( preproc, PCHYPRE );
+    PCHYPRESetType( preproc, "boomeramg" );
+
+    gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_ptr, elementv,
+        elements, quadv, quads, locIEN, pNode, fNode, locnbc, locebc );
+
+    lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
+
+    dot_sol -> ScaleValue(-1.0);
+
+    SYS_T::commPrint("\n===> Consistent initial acceleration is obtained. \n");
+    lsolver_acce->Info();
+    delete lsolver_acce;
+    SYS_T::commPrint(" The mass matrix lsolver is destroyed. \n\n");
+  }
+
 
   // ===== Clean Memory =====
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
   delete locElem; delete locnbc; delete locebc; delete pNode; delete locinfnbc;
   delete tm_galpha_ptr; delete pmat; delete elementv; delete elements;
   delete quads; delete quadv; delete inflow_rate_ptr; delete gbc; delete timeinfo;
-  delete locAssem_ptr; delete base; delete sol; delete dot_sol;
+  delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete gloAssem_ptr;
 
   PetscFinalize();
   return EXIT_SUCCESS;
