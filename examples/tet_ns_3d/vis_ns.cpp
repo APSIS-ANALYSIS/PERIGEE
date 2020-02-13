@@ -6,16 +6,14 @@
 #include "Sys_Tools.hpp"
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
-#include "ALocal_Elem.hpp"
 #include "APart_Node.hpp"
 #include "FEANode.hpp"
 #include "ALocal_IEN.hpp"
-
 #include "QuadPts_vis_tet4.hpp"
 #include "QuadPts_vis_tet10_v2.hpp"
 #include "FEAElement_Tet4.hpp"
 #include "FEAElement_Tet10_v2.hpp"
-#include "VisDataPrep_NS_3D.hpp"
+#include "VisDataPrep_NS.hpp"
 #include "VTK_Writer_NS.hpp"
 
 int main( int argc, char * argv[] )
@@ -121,15 +119,17 @@ int main( int argc, char * argv[] )
 
   quad -> print_info();
 
-  IVisDataPrep * visprep = new VisDataPrep_NS_3D();
+  IVisDataPrep * visprep = new VisDataPrep_NS();
 
   visprep->print_info();
-
+ 
+  // Allocate the container to store the solution values into
+  // physical fields.
   double ** solArrays = new double * [visprep->get_ptarray_size()];
   for(int ii=0; ii<visprep->get_ptarray_size(); ++ii)
     solArrays[ii] = new double [pNode->get_nlocghonode() * visprep->get_ptarray_comp_length(ii)];
 
-  
+  // VTK writer 
   VTK_Writer_NS * vtk_w = new VTK_Writer_NS( GMIptr->get_nElem(), 
       GMIptr->get_nLocBas(), element_part_file );
 

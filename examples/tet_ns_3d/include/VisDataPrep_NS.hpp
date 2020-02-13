@@ -1,24 +1,27 @@
-#ifndef VISDATAPREP_NS_3D_HPP
-#define VISDATAPREP_NS_3D_HPP
+#ifndef VISDATAPREP_NS_HPP
+#define VISDATAPREP_NS_HPP
 // ==================================================================
-// VisDataPrep_NS_3D.hpp
+// VisDataPrep_NS.hpp
 //
-// This is the data preparation for 3D NS problems.
+// This is the data preparation for NS problems.
 //
 // Author: Ju Liu
 // Date Created: Aug 5 2017
 // ==================================================================
 #include "IVisDataPrep.hpp"
 
-class VisDataPrep_NS_3D : public IVisDataPrep
+class VisDataPrep_NS : public IVisDataPrep
 {
   public:
-    VisDataPrep_NS_3D();
+    VisDataPrep_NS();
 
-    virtual ~VisDataPrep_NS_3D();
+    virtual ~VisDataPrep_NS();
 
+    // Return the number of physical fields to be read from solution
+    // vector
     virtual int get_ptarray_size() const {return 2;}
    
+    // Return the number of components for each physical field
     virtual int get_ptarray_comp_length( const int &ii ) const
     { return pt_array_len[ii]; }
 

@@ -1,6 +1,6 @@
-#include "VisDataPrep_NS_3D.hpp"
+#include "VisDataPrep_NS.hpp"
 
-VisDataPrep_NS_3D::VisDataPrep_NS_3D()
+VisDataPrep_NS::VisDataPrep_NS()
 {
   // Data to be written
   arrayCompSize = 2;
@@ -16,12 +16,10 @@ VisDataPrep_NS_3D::VisDataPrep_NS_3D()
   pt_array_len.push_back(3);
 }
 
-
-VisDataPrep_NS_3D::~VisDataPrep_NS_3D()
+VisDataPrep_NS::~VisDataPrep_NS()
 {}
 
-
-void VisDataPrep_NS_3D::get_pointArray(
+void VisDataPrep_NS::get_pointArray(
     const std::string solution_file_name,
     const std::string analysis_node_mapping_file,
     const std::string post_node_mapping_file,
@@ -33,8 +31,11 @@ void VisDataPrep_NS_3D::get_pointArray(
   PostVectSolution pvsolu(solution_file_name, analysis_node_mapping_file,
       post_node_mapping_file, nNode_ptr, gInfo_ptr, input_dof);
 
+  // Total number of nodes to be read from the solution vector
   const int ntotal = nNode_ptr->get_nlocghonode();
-  
+ 
+  // Assign the solution values to the corresponding physical field
+  // container 
   for(int ii=0; ii<ntotal; ++ii)
   {
     solArrays[0][ii]     = pvsolu.get_locsol(ii*input_dof+0);
