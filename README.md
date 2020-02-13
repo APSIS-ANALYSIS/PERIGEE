@@ -1,5 +1,5 @@
 # PERIGEE
-PERIGEE is a nonlinear dynamic finite element and isogeometric analysis code for multiphysics problems. The code has been developed with the goal of providing a single C++ framework for parallel implementation of different physics problems using different element technologies.
+PERIGEE is a nonlinear dynamic finite element / isogeometric analysis code for multiphysics simulations. The code has been developed with the goal of providing a single C++ framework for parallel implementation of different physics problems using different element technologies.
 
 ## Table of Contents
 
@@ -9,9 +9,9 @@ PERIGEE is a nonlinear dynamic finite element and isogeometric analysis code for
 ## Install
 Please follow the following steps to compile PERIGEE.
 
-1. For Sherlock@Stanford users, go to step 2. Before compiling PERIGEE, one has to install several libraries. The guide for library installation is [here](docs/install_external_libs.md) as a quick guide and [there](docs/install-advanced.md) for advanced users. After the libraries are all installed, proceed to step 2.
+1. For Sherlock@Stanford users, go to step 2. Before compiling PERIGEE, one has to install several libraries. The guide for library installation is [here](docs/install_external_libs.md) as a quick guide and [there](docs/install-advanced.md) for advanced users. After the libraries are all properly installed, proceed to step 2.
 
-2. On Sherlock@Stanford, the libraries have already been installed in `/home/groups/amarsden/lib-perigee`. You need to add the following to your `.bash_profile` or `.bashrc` file to give your machine a name, and then proceed to step 3. With the name given, the code will identify the system and load the proper configuration file.
+2. On Sherlock@Stanford, all the libraries have been installed in `/home/groups/amarsden/lib-perigee`. You need to add the following to your `.bash_profile` or `.bashrc` file to give your machine a name, and then proceed to step 3. With the `MACHINE_NAME`, PERIGEE will load the proper configuration file for compiling.
 ```sh
 export MACHINE_NAME=sherlock
 export LD_LIBRARY_PATH=/home/groups/amarsden/lib-perigee/VTK-7.1.1-shared/lib:$LD_LIBRARY_PATH
@@ -22,12 +22,10 @@ export LD_LIBRARY_PATH=/home/groups/amarsden/lib-perigee/VTK-7.1.1-shared/lib:$L
 ## References
 ### Finite Element Method
 * [The Finite Element Method: Linear Static and Dynamic Finite Element Analysis](https://www.amazon.com/Finite-Element-Method-Mechanical-Engineering/dp/0486411818/ref=sr_1_2?keywords=the+finite+element+method&qid=1566093145&s=books&sr=1-2) by Thomas J.R. Hughes
-
 * Incompressible Flow and the Finite Element Method, Volume 1: Advection-Diffusion and Isothermal Laminar Flow by P.M. Gresho and R.L. Sani
 
 ### C++
 * [www.learncpp.com](http://www.learncpp.com).
-
 * [Google C++ Style](https://google.github.io/styleguide/cppguide.html).
 
 ## Contact
