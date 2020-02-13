@@ -63,7 +63,6 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Global_Part_Serial.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
-  ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   )
 
 SET( perigee_analysis_lib_src
@@ -108,10 +107,8 @@ SET( perigee_analysis_lib_src
   )
 
 SET( perigee_postprocess_lib_src
-  ${perigee_source}/Mesh/Tet_Tools.cpp
   ${perigee_source}/Mesh/QuadPts_vis_tet4.cpp
   ${perigee_source}/Mesh/QuadPts_vis_tet10_v2.cpp
-  ${perigee_source}/Analysis_Tool/AInt_Weight.cpp
   ${perigee_source}/Postproc_Tool/PostVectSolution.cpp
   ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   ${perigee_source}/Postproc_Tool/Interpolater.cpp
