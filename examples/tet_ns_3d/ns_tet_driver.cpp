@@ -141,6 +141,20 @@ int main(int argc, char *argv[])
   }
   else SYS_T::commPrint("-is_restart: false \n");
 
+  // ===== Record important parameters =====
+  if(rank == 0)
+  {
+    hid_t cmd_file_id = H5Fcreate("solver_cmd.h5",
+      H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+    HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
+
+    cmdh5w->write_doubleScalar("fl_density", fluid_density);
+    cmdh5w->write_doubleScalar("fl_mu", fluid_mu);
+    cmdh5w->write_doubleScalar("init_step", initial_step);
+
+    delete cmdh5w; H5Fclose(cmd_file_id);
+  }
+
   // ===== Data from Files =====
   // Control points' xyz coordinates
   FEANode * fNode = new FEANode(part_file, rank);
