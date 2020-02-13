@@ -17,12 +17,12 @@
 # =========================================================
 # 1. VTK VARIABLES
 # =========================================================
-SET(VTK_DIR /home/jliu/lib/VTK-7.1.1)
-SET(VTK_VERSION vtk-7.1)
-SET(VTK_link_lib vtkCommonCore-7.1 vtkCommonSystem-7.1 vtkCommonDataModel-7.1
-  vtkCommonExecutionModel-7.1 vtkCommonMisc-7.1 vtkCommonTransforms-7.1
-  vtkCommonMath-7.1 vtkIOCore-7.1 vtkIOLegacy-7.1 vtkIOXML-7.1 vtksys-7.1 
-  vtkzlib-7.1 vtkFiltersGeometry-7.1 )
+SET(VTK_DIR /home/jliu/lib/VTK-8.2.0)
+SET(VTK_VERSION vtk-8.2)
+SET(VTK_link_lib vtkCommonCore-8.2 vtkCommonSystem-8.2 vtkCommonDataModel-8.2
+  vtkCommonExecutionModel-8.2 vtkCommonMisc-8.2 vtkCommonTransforms-8.2
+  vtkCommonMath-8.2 vtkIOCore-8.2 vtkIOLegacy-8.2 vtkIOXML-8.2 vtksys-8.2 
+  vtkzlib-8.2 vtkFiltersGeometry-8.2 )
 
 # ========================================================
 # 2. PETSc VARIABLES
