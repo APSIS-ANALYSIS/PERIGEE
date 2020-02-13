@@ -151,6 +151,11 @@ namespace VIS_T
   // ----------------------------------------------------------------
   void setQuadTetraelem( const int &ptoffset, vtkUnstructuredGrid * gridData );
 
+  void setQuadTetraelem( const int &ptid0, const int &ptid1,
+      const int &ptid2, const int &ptid3, const int &ptid4,
+      const int &ptid5, const int &ptid6, const int &ptid7,
+      const int &ptid8, const int &ptid9,
+      vtkUnstructuredGrid * gridData );
 
   // ================================================================
   // The 3rd set of tools contain

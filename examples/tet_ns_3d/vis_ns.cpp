@@ -11,6 +11,13 @@
 #include "FEANode.hpp"
 #include "ALocal_IEN.hpp"
 
+#include "QuadPts_vis_tet4.hpp"
+#include "QuadPts_vis_tet10_v2.hpp"
+#include "FEAElement_Tet4.hpp"
+#include "FEAElement_Tet10_v2.hpp"
+#include "VisDataPrep_NS_3D.hpp"
+#include "VTK_Writer_NS.hpp"
+
 int main( int argc, char * argv[] )
 {
   const std::string element_part_file = "epart.h5";
@@ -96,16 +103,67 @@ int main( int argc, char * argv[] )
       "\n===> %d processor(s) are assigned for:", size);
   PetscPrintf(PETSC_COMM_WORLD, "Postprocessing - visualization.\n");
 
+  SYS_T::commPrint("===> Build sampling points and element.");
+  IQuadPts * quad = nullptr;
+  FEAElement * element = nullptr; 
 
+  if( GMIptr->get_elemType() == 501 )
+  {
+    quad = new QuadPts_vis_tet4();
+    element = new FEAElement_Tet4( quad-> get_num_quadPts() );
+  }
+  else if( GMIptr->get_elemType() == 502 )
+  {
+    quad = new QuadPts_vis_tet10_v2();
+    element = new FEAElement_Tet10_v2( quad-> get_num_quadPts() );
+  }
+  else SYS_T::print_fatal( "Error: unsupported element type \n" );
 
+  quad -> print_info();
 
+  IVisDataPrep * visprep = new VisDataPrep_NS_3D();
 
+  visprep->print_info();
 
+  double ** solArrays = new double * [visprep->get_ptarray_size()];
+  for(int ii=0; ii<visprep->get_ptarray_size(); ++ii)
+    solArrays[ii] = new double [pNode->get_nlocghonode() * visprep->get_ptarray_comp_length(ii)];
 
+  
+  VTK_Writer_NS * vtk_w = new VTK_Writer_NS( GMIptr->get_nElem(), 
+      GMIptr->get_nLocBas(), element_part_file );
+
+  std::ostringstream time_index;
+
+  for(int time = time_start; time<=time_end; time+= time_step)
+  {
+    std::string name_to_read(sol_bname);
+    std::string name_to_write(out_bname);
+    time_index.str("");
+    time_index<< 900000000 + time;
+    name_to_read.append(time_index.str());
+    name_to_write.append(time_index.str());
+
+    PetscPrintf(PETSC_COMM_WORLD, "Time %d: Read %s and Write %s \n",
+        time, name_to_read.c_str(), name_to_write.c_str() );
+
+    visprep->get_pointArray(name_to_read, anode_mapping_file, pnode_mapping_file,
+        pNode, GMIptr, dof, solArrays);
+
+    vtk_w->writeOutput( fNode, locIEN, locElem,
+        visprep, element, quad, solArrays,
+        rank, size, time * dt, sol_bname, out_bname, name_to_write, isXML );
+  }
+
+  MPI_Barrier(PETSC_COMM_WORLD);
 
   // ===== Clean the memory =====
+  for(int ii=0; ii<visprep->get_ptarray_size(); ++ii)
+    delete [] solArrays[ii];
+  delete [] solArrays;
+  
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic; delete locElem;
-  delete pNode;
+  delete pNode; delete quad; delete element; delete visprep; delete vtk_w;
   PetscFinalize();
   return EXIT_SUCCESS;
 }

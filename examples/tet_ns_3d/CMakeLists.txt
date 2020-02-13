@@ -107,6 +107,18 @@ SET( perigee_analysis_lib_src
   ${perigee_SOURCE_DIR}/src/PTime_NS_Solver.cpp
   )
 
+SET( perigee_postprocess_lib_src
+  ${perigee_source}/Mesh/Tet_Tools.cpp
+  ${perigee_source}/Mesh/QuadPts_vis_tet4.cpp
+  ${perigee_source}/Mesh/QuadPts_vis_tet10_v2.cpp
+  ${perigee_source}/Analysis_Tool/AInt_Weight.cpp
+  ${perigee_source}/Postproc_Tool/PostVectSolution.cpp
+  ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
+  ${perigee_source}/Postproc_Tool/Interpolater.cpp
+  ${perigee_SOURCE_DIR}/src/VisDataPrep_NS_3D.cpp
+  ${perigee_SOURCE_DIR}/src/VTK_Writer_NS.cpp
+  )
+
 INCLUDE_DIRECTORIES( ../../include )
 INCLUDE_DIRECTORIES( ./include )
 
@@ -121,8 +133,8 @@ ADD_LIBRARY( perigee_analysis ${perigee_analysis_lib_src} )
 TARGET_LINK_LIBRARIES( perigee_analysis ${EXTRA_LINK_LIBS} )
 
 # 3. Postprocess lib
-#ADD_LIBRARY( perigee_postprocess ${perigee_postprocess_lib_src} )
-#TARGET_LINK_LIBRARIES( perigee_postprocess ${EXTRA_LINK_LIBS} perigee_analysis )
+ADD_LIBRARY( perigee_postprocess ${perigee_postprocess_lib_src} )
+TARGET_LINK_LIBRARIES( perigee_postprocess ${EXTRA_LINK_LIBS} perigee_analysis )
 # -------------------------------------------------------------------
 
 # Print compiler setup
@@ -139,6 +151,6 @@ ADD_EXECUTABLE( vis_ns vis_ns.cpp)
 TARGET_LINK_LIBRARIES( preprocess3d ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( ns_tet_3d ${EXTRA_LINK_LIBS} perigee_analysis )
 TARGET_LINK_LIBRARIES( prepost ${EXTRA_LINK_LIBS} perigee_preprocess )
-TARGET_LINK_LIBRARIES( vis_ns ${EXTRA_LINK_LIBS} perigee_analysis )
+TARGET_LINK_LIBRARIES( vis_ns ${EXTRA_LINK_LIBS} perigee_analysis perigee_postprocess )
 
 # EOF
