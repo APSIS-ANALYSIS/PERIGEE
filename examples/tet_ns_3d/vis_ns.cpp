@@ -3,12 +3,8 @@
 //
 // Date Created: Feb. 12 2020
 // ==================================================================
-#include "Sys_Tools.hpp"
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
-#include "APart_Node.hpp"
-#include "FEANode.hpp"
-#include "ALocal_IEN.hpp"
 #include "QuadPts_vis_tet4.hpp"
 #include "QuadPts_vis_tet10_v2.hpp"
 #include "FEAElement_Tet4.hpp"
@@ -43,7 +39,7 @@ int main( int argc, char * argv[] )
   MPI_Comm_size(PETSC_COMM_WORLD, &size);
   MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
 
-  SYS_T::commPrint("===> Reading arguments from Command line ... \n");
+  SYS_T::commPrint("=== Command line arguments ===\n");
   SYS_T::GetOptionInt("-time_start", time_start);
   SYS_T::GetOptionInt("-time_step", time_step);
   SYS_T::GetOptionInt("-time_end", time_end);
@@ -66,6 +62,7 @@ int main( int argc, char * argv[] )
 
   if(isRestart) PetscPrintf(PETSC_COMM_WORLD, "-restart: true \n");
   else PetscPrintf(PETSC_COMM_WORLD, "-restart: false \n");
+  SYS_T::commPrint("==============================\n");
   
   // Clean the visualization files if not restart
   if( !isRestart )
@@ -77,8 +74,6 @@ int main( int argc, char * argv[] )
     sysret = system("rm -rf *_.pvd");
     SYS_T::print_fatal_if(sysret != 0, "Error: system call failed. \n");
   }
-  
-  SYS_T::commPrint("===> Reading mesh files ... ");
   
   FEANode * fNode = new FEANode(part_file, rank);
   
@@ -92,13 +87,9 @@ int main( int argc, char * argv[] )
   
   APart_Node * pNode = new APart_Node(part_file, rank);
   
-  SYS_T::commPrint("Done! \n");
-  
-  if(size != PartBasic->get_cpu_size()) SYS_T::print_fatal(
-      "Error: number of processors does not match with prepost! \n");
+  SYS_T::print_fatal_if(size != PartBasic->get_cpu_size(), "Error: number of processors does not match with prepost! \n");
 
-  PetscPrintf(PETSC_COMM_WORLD,
-      "\n===> %d processor(s) are assigned for:", size);
+  PetscPrintf(PETSC_COMM_WORLD, "===> %d processor(s) are assigned for:", size);
   PetscPrintf(PETSC_COMM_WORLD, "Postprocessing - visualization.\n");
 
   SYS_T::commPrint("===> Build sampling points and element.");
@@ -117,14 +108,15 @@ int main( int argc, char * argv[] )
   }
   else SYS_T::print_fatal( "Error: unsupported element type \n" );
 
+  // Print the sampling points on screen
   quad -> print_info();
 
+  // Create the visualization data object
   IVisDataPrep * visprep = new VisDataPrep_NS();
 
   visprep->print_info();
  
-  // Allocate the container to store the solution values into
-  // physical fields.
+  // Allocate the container to store the solution values into physical fields.
   double ** solArrays = new double * [visprep->get_ptarray_size()];
   for(int ii=0; ii<visprep->get_ptarray_size(); ++ii)
     solArrays[ii] = new double [pNode->get_nlocghonode() * visprep->get_ptarray_comp_length(ii)];

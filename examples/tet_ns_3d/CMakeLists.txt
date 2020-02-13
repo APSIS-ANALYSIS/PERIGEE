@@ -137,9 +137,9 @@ TARGET_LINK_LIBRARIES( perigee_postprocess ${EXTRA_LINK_LIBS} perigee_analysis )
 # Print compiler setup
 INCLUDE(../../conf/message_compiler_setup.cmake)
 
-
-
-
+# ===================================================================
+# BUILD THE MAIN DRIVERS
+# ===================================================================
 ADD_EXECUTABLE( preprocess3d preprocess_sv_tets.cpp)
 ADD_EXECUTABLE( ns_tet_3d ns_tet_driver.cpp)
 ADD_EXECUTABLE( prepost prepost_ns_tets.cpp)
