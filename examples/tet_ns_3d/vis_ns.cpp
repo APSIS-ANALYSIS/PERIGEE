@@ -1,6 +1,8 @@
 // ==================================================================
 // vis_ns.cpp
 //
+// Visualization driver for the NS equation solver.
+//
 // Date Created: Feb. 12 2020
 // ==================================================================
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
@@ -17,8 +19,7 @@ int main( int argc, char * argv[] )
   const std::string element_part_file = "epart.h5";
   const std::string anode_mapping_file = "node_mapping.h5";
   const std::string pnode_mapping_file = "post_node_mapping.h5";
-  
-  std::string part_file="postpart";
+  const std::string part_file="postpart";
   
   std::string sol_bname("SOL_");
 
@@ -50,7 +51,6 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionBool("-xml", isXML);
   SYS_T::GetOptionBool("-restart", isRestart);
 
-  SYS_T::cmdPrint("-part_file:", part_file);
   SYS_T::cmdPrint("-sol_bname:", sol_bname);
   SYS_T::cmdPrint("-out_bname:", out_bname);
   SYS_T::cmdPrint("-time_start:", time_start);

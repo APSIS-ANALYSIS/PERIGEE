@@ -133,13 +133,13 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-sol_name:", sol_bName);
   if(is_restart)
   {
-    PetscPrintf(PETSC_COMM_WORLD, "-is_restart: true \n");
+    SYS_T::commPrint("-is_restart: true \n");
     SYS_T::cmdPrint("-restart_index:", restart_index);
     SYS_T::cmdPrint("-restart_time:", restart_time);
     SYS_T::cmdPrint("-restart_step:", restart_step);
     SYS_T::cmdPrint("-restart_name:", restart_name);
   }
-  else PetscPrintf(PETSC_COMM_WORLD, "-is_restart: false \n");
+  else SYS_T::commPrint("-is_restart: false \n");
 
   // ===== Data from Files =====
   // Control points' xyz coordinates
@@ -174,8 +174,7 @@ int main(int argc, char *argv[])
   SYS_T::print_fatal_if( size!= PartBasic->get_cpu_size(),
       "Error: Assigned CPU number does not match the partition. \n");
 
-  PetscPrintf(PETSC_COMM_WORLD,
-      "===> %d processor(s) are assigned for FEM analysis. \n", size);
+  SYS_T::commPrint("===> %d processor(s) are assigned for FEM analysis. \n", size);
   
   // ===== Inflow flow rate =====
   SYS_T::commPrint("===> Setup inflow flow rate. \n");
@@ -196,20 +195,20 @@ int main(int argc, char *argv[])
   
   if( GMIptr->get_elemType() == 501 )
   {
-    elementv = new FEAElement_Tet4( nqp_tet );
+    elementv = new FEAElement_Tet4( nqp_tet ); // elem type 501
     elements = new FEAElement_Triangle3_3D_der0( nqp_tri ); 
   }
   else if( GMIptr->get_elemType() == 502 )
   {
-    SYS_T::print_fatal_if( nqp_tet < 29, "Error: not enough quadrature points.\n" );
-    SYS_T::print_fatal_if( nqp_tri < 13, "Error: not enough quadrature points.\n" );
+    SYS_T::print_fatal_if( nqp_tet < 29, "Error: not enough quadrature points for tets.\n" );
+    SYS_T::print_fatal_if( nqp_tri < 13, "Error: not enough quadrature points for triangles.\n" );
 
-    elementv = new FEAElement_Tet10_v2( nqp_tet );
+    elementv = new FEAElement_Tet10_v2( nqp_tet ); // elem type 502
     elements = new FEAElement_Triangle6_3D_der0( nqp_tri ); 
   }
   else SYS_T::print_fatal("Error: Element type not supported.\n");
 
-  // ===== Generate a sparse matrix for strong enforcement of essential BCs
+  // ===== Generate a sparse matrix for the enforcement of essential BCs
   Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
   pmat->gen_perm_bc(pNode, locnbc);
 
@@ -252,12 +251,12 @@ int main(int argc, char *argv[])
     SYS_T::file_exist_check(restart_dot_name.c_str());
     dot_sol->ReadBinary(restart_dot_name.c_str());
     
-    PetscPrintf(PETSC_COMM_WORLD, "===> Read sol from disk as a restart run... \n");
-    PetscPrintf(PETSC_COMM_WORLD, "     restart_name: %s \n", restart_name.c_str());
-    PetscPrintf(PETSC_COMM_WORLD, "     restart_dot_name: %s \n", restart_dot_name.c_str());
-    PetscPrintf(PETSC_COMM_WORLD, "     restart_time: %e \n", restart_time);
-    PetscPrintf(PETSC_COMM_WORLD, "     restart_index: %d \n", restart_index);
-    PetscPrintf(PETSC_COMM_WORLD, "     restart_step: %e \n", restart_step);
+    SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
+    SYS_T::commPrint("     restart_name: %s \n", restart_name.c_str());
+    SYS_T::commPrint("     restart_dot_name: %s \n", restart_dot_name.c_str());
+    SYS_T::commPrint("     restart_time: %e \n", restart_time);
+    SYS_T::commPrint("     restart_index: %d \n", restart_index);
+    SYS_T::commPrint("     restart_step: %e \n", restart_step);
   }
 
   // ===== Time step info =====
@@ -339,7 +338,7 @@ int main(int argc, char *argv[])
   // ===== Temporal solver context =====
   PTime_NS_Solver * tsolver = new PTime_NS_Solver( sol_bName,
       sol_record_freq, ttan_renew_freq, final_time );
-  SYS_T::commPrint("===> Time marching solver setted up:\n");
+  SYS_T::commPrint("===> Time stepping solver setted up:\n");
   tsolver->print_info();
 
   // ===== Outlet flowrate recording files =====
