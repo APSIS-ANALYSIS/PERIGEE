@@ -1,6 +1,6 @@
 #include "QuadPts_vis_tet10.hpp"
 
-QuadPts_vis_tet10_v2::QuadPts_vis_tet10_v2()
+QuadPts_vis_tet10::QuadPts_vis_tet10()
 {
   qp[0]  = 0.0; qp[1]  = 0.0; qp[2]  = 0.0; qp[3]  = 1.0;
   qp[4]  = 1.0; qp[5]  = 0.0; qp[6]  = 0.0; qp[7]  = 0.0;
