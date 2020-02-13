@@ -7,11 +7,11 @@ PERIGEE is a nonlinear dynamic finite element and isogeometric analysis code for
 - [References](#References)
 
 ## Install
-Please follow the following steps to compile the code.
+Please follow the following steps to compile PERIGEE.
 
-1. For Sherlock@Stanford users, go to step 2. Before compiling the PERIGEE code, one has to install necessary libraries. The guide for library installation is [here](docs/install_external_libs.md) as a quick guide and [there](docs/install-advanced.md) as a guide for advanced users. After the libraries are all installed, proceed to step 3.
+1. For Sherlock@Stanford users, go to step 2. Before compiling PERIGEE, one has to install several libraries. The guide for library installation is [here](docs/install_external_libs.md) as a quick guide and [there](docs/install-advanced.md) for advanced users. After the libraries are all installed, proceed to step 2.
 
-2. On Sherlock@Stanford, the libraries have already been installed in `/home/groups/amarsden/lib-perigee`. You need to add the following to your `.bash_profile` or `.bashrc` file, and then proceed to step 3.
+2. On Sherlock@Stanford, the libraries have already been installed in `/home/groups/amarsden/lib-perigee`. You need to add the following to your `.bash_profile` or `.bashrc` file to give your machine a name, and then proceed to step 3. With the name given, the code will identify the system and load the proper configuration file.
 ```sh
 export MACHINE_NAME=sherlock
 export LD_LIBRARY_PATH=/home/groups/amarsden/lib-perigee/VTK-7.1.1-shared/lib:$LD_LIBRARY_PATH
@@ -31,4 +31,4 @@ export LD_LIBRARY_PATH=/home/groups/amarsden/lib-perigee/VTK-7.1.1-shared/lib:$L
 * [Google C++ Style](https://google.github.io/styleguide/cppguide.html).
 
 ## Contact
-Ju Liu, liujuy@gmail.com
+Ju Liu, liujuy@gmail.com, liuju@stanford.edu
