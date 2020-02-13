@@ -27,12 +27,20 @@ int main( int argc, char * argv[] )
   int time_start = 0;
   int time_step = 1;
   int time_end = 1;
-  double dt = 0.1;
   bool isXML = true;
   bool isRestart = false;
 
-  PetscMPIInt rank, size;
+  // Read analysis code parameter if the solver_cmd.h5 exists
+  hid_t prepcmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
+  HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
+
+  double dt = cmd_h5r -> read_doubleScalar("/","init_step");
+
+  delete cmd_h5r; H5Fclose(prepcmd_file);
+
+  // ===== Initialize the MPI run =====
+  PetscMPIInt rank, size;
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
   MPI_Comm_size(PETSC_COMM_WORLD, &size);
   MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
