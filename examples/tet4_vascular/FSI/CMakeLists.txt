@@ -40,11 +40,10 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/System/Vec_Tools.cpp
   ${perigee_source}/System/Matrix_double_3by3_Array.cpp
   ${perigee_source}/System/Math_Tools.cpp
-  ${perigee_source}/Mesh/Tet_Tools.cpp
-  ${perigee_source}/Mesh/Gmsh_FileIO.cpp
-  ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
   ${perigee_source}/System/HDF5_Reader.cpp
+  ${perigee_source}/Mesh/Tet_Tools.cpp
+  ${perigee_source}/Mesh/Gmsh_FileIO.cpp
   ${perigee_source}/Mesh/IEN_Tetra_P1.cpp
   ${perigee_source}/Mesh/INodalBC.cpp
   ${perigee_source}/Mesh/IElemBC.cpp
@@ -58,8 +57,6 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/NodalBC_3D_vtu.cpp
   ${perigee_source}/Mesh/NodalBC_3D_inflow.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
-  ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
-  ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
   ${perigee_source}/Mesh/NBC_Partition_3D.cpp
   ${perigee_source}/Mesh/NBC_Partition_3D_inflow.cpp
   ${perigee_source}/Mesh/EBC_Partition_vtp.cpp
@@ -67,6 +64,8 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Map_Node_Index.cpp
   ${perigee_source}/Mesh/Global_Part_METIS.cpp
   ${perigee_source}/Mesh/Global_Part_Serial.cpp
+  ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
   )
 
 # 2. Anlysis source cpp
@@ -121,10 +120,8 @@ SET( perigee_analysis_lib_src
   ${perigee_SOURCE_DIR}/../src/PTime_Seg_Solver.cpp
   )
 
-
 # 3. Postprocess cpp
 SET( perigee_postprocess_lib_src
-  ${perigee_source}/Analysis_Tool/AInt_Weight.cpp
   ${perigee_source}/Postproc_Tool/PostVectSolution.cpp
   ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   ${perigee_SOURCE_DIR}/../src/VisDataPrep_ALE_NS_3D.cpp
@@ -167,6 +164,7 @@ INCLUDE(../../../conf/message_compiler_setup.cmake)
 # ===================================================================
 # 1. Make executable for ALE-CFD code
 # 1.1 Preprocess
+ADD_EXECUTABLE( gmshIO gmsh_process.cpp)
 ADD_EXECUTABLE( preprocess_fsi preprocess_sv_fsi_tets.cpp)
 
 # 1.2 Analysis and tests
@@ -182,18 +180,12 @@ ADD_EXECUTABLE( vis_fsi_wss vis_fsi_wss.cpp)
 
 # -------------------------------------------------------------------
 # 3. Link libraries
-# 3.1
+TARGET_LINK_LIBRARIES( gmshIO ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( preprocess_fsi ${EXTRA_LINK_LIBS} perigee_preprocess )
-
-# 3.2
 TARGET_LINK_LIBRARIES( fsi_tet4_3d ${EXTRA_LINK_LIBS} perigee_analysis )
-
-# 3.3
 TARGET_LINK_LIBRARIES( prepostproc ${EXTRA_LINK_LIBS} perigee_analysis 
     perigee_preprocess )
-
 TARGET_LINK_LIBRARIES( vis_fsi ${EXTRA_LINK_LIBS} perigee_postprocess )
-
 TARGET_LINK_LIBRARIES( vis_fsi_fluid ${EXTRA_LINK_LIBS} perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_fsi_solid ${EXTRA_LINK_LIBS} perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_fsi_wss ${EXTRA_LINK_LIBS} perigee_preprocess perigee_postprocess )
