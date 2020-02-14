@@ -6,7 +6,6 @@
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
 #include "ALocal_Elem_wTag.hpp"
-#include "APart_Node.hpp"
 #include "QuadPts_vis_tet4.hpp"
 #include "FEAElement_Tet4.hpp"
 #include "VisDataPrep_Mixed_FSI_3D.hpp"
@@ -17,8 +16,7 @@ int main( int argc, char * argv[] )
   const std::string element_part_file = "epart.h5";
   const std::string anode_mapping_file = "node_mapping.h5";
   const std::string pnode_mapping_file = "post_node_mapping.h5";
-  
-  const std::string part_file("postpart");
+  const std::string part_file = "postpart";
 
   std::string sol_bname("SOL_");
   std::string out_bname("VIS_FSI_");
@@ -71,33 +69,25 @@ int main( int argc, char * argv[] )
     SYS_T::print_fatal_if(sysret != 0, "Error: system call failed. \n");
   }
 
-  SYS_T::commPrint("===> Reading mesh files ... ");
   FEANode * fNode = new FEANode(part_file, rank);
   ALocal_IEN * locIEN = new ALocal_IEN(part_file, rank);
   IAGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info_FEM_3D(part_file, rank);
   APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file, rank);
   ALocal_Elem * locElem = new ALocal_Elem_wTag(part_file, rank);
   APart_Node * pNode = new APart_Node(part_file, rank);
-  SYS_T::commPrint("Done! \n");
   
-  if(size != PartBasic->get_cpu_size()) SYS_T::print_fatal(
-      "Error: number of processors does not match with prepost! \n");
+  SYS_T::print_fatal_if(size != PartBasic->get_cpu_size(), "Error: number of processors does not match with prepost! \n");
 
-  PetscPrintf(PETSC_COMM_WORLD,
-      "===> %d processor(s) are assigned for:", size);
-  PetscPrintf(PETSC_COMM_WORLD, "Postprocessing - visualization.\n");
+  SYS_T::commPrint("===> %d processor(s) are assigned for:", size);
 
-  SYS_T::commPrint("===> Build sampling points.");
   IQuadPts * quad = new QuadPts_vis_tet4();
 
   quad -> print_info();
   
-  SYS_T::print_fatal_if(quad->get_num_quadPts() != 4, "Error: This visualization code requires 4 quadrature points.\n");
-
-  SYS_T::commPrint("===> Setup element container. \n");
   FEAElement * element = new FEAElement_Tet4( quad-> get_num_quadPts() );
 
   IVisDataPrep * visprep = new VisDataPrep_Mixed_FSI_3D();
+  
   visprep->print_info();
 
   double ** pointArrays = new double * [visprep->get_ptarray_size()];
@@ -118,7 +108,7 @@ int main( int argc, char * argv[] )
     name_to_read.append(time_index.str());
     name_to_write.append(time_index.str());
 
-    PetscPrintf(PETSC_COMM_WORLD, "Time %d: Read %s and Write %s \n",
+    SYS_T::commPrint("Time %d: Read %s and Write %s \n",
         time, name_to_read.c_str(), name_to_write.c_str() );
 
     visprep->get_pointArray(name_to_read, anode_mapping_file, pnode_mapping_file,
@@ -133,13 +123,12 @@ int main( int argc, char * argv[] )
   MPI_Barrier(PETSC_COMM_WORLD);
 
   // Clean up memory
-  delete vtk_w;
   for(int ii=0; ii<visprep->get_ptarray_size(); ++ii)
     delete [] pointArrays[ii];
   delete [] pointArrays;
   delete visprep; delete element; delete quad;
   delete pNode; delete locElem; delete PartBasic; delete GMIptr;
-  delete locIEN; delete fNode;
+  delete locIEN; delete fNode; delete vtk_w;
   PetscFinalize();
   return EXIT_SUCCESS;
 }
