@@ -255,11 +255,6 @@ int main( int argc, char * argv[] )
   dir_list.push_back( sur_s_file_in );
   for(int ii=0; ii<num_outlet; ++ii) dir_list.push_back( sur_s_file_out[ii] );
 
-  // inn stores the inner wall nodes. They are used in pre-stretch
-  // calculation, in which they are not included for wall deformation
-  // calculation
-  std::vector<std::string> inn; inn.clear(); inn.push_back( sur_f_file_wall );
-
   NBC_list[0] = new NodalBC_3D_vtp( nFunc );
   NBC_list[1] = new NodalBC_3D_vtp( dir_list, nFunc );
   NBC_list[2] = new NodalBC_3D_vtp( dir_list, nFunc );
@@ -378,15 +373,14 @@ int main( int argc, char * argv[] )
   cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<endl;
 
   // Clean memory
-  delete ebc; delete InFBC; delete mesh_ebc;
-  std::vector<INodalBC *>::iterator it_nbc;
-  for(it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc)
+  for(auto it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc)
     delete *it_nbc;
 
-  for(it_nbc=meshBC_list.begin(); it_nbc != meshBC_list.end(); ++it_nbc)
+  for(auto it_nbc=meshBC_list.begin(); it_nbc != meshBC_list.end(); ++it_nbc)
     delete *it_nbc;
 
-  delete mnindex; delete global_part; delete mesh; delete IEN; delete mytimer;
+  delete ebc; delete InFBC; delete mesh_ebc; delete mnindex; 
+  delete global_part; delete mesh; delete IEN; delete mytimer;
   PetscFinalize();
   return EXIT_SUCCESS;
 }

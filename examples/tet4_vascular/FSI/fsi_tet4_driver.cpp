@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
   int nqp_tet = 5, nqp_tri = 4;
 
   // Estimate the nonzero per row for the sparse matrix
-  int nz_estimate = 60;
+  int nz_estimate = 300;
 
   // fluid properties
   double fluid_density = 1.06;
@@ -143,6 +143,20 @@ int main(int argc, char *argv[])
   }
   else PetscPrintf(PETSC_COMM_WORLD, "-is_restart: false \n");
 
+  // ===== Record important parameters =====
+  if(rank == 0)
+  {
+    hid_t cmd_file_id = H5Fcreate("solver_cmd.h5",
+      H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+    HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
+
+    cmdh5w->write_doubleScalar("fl_density", fluid_density);
+    cmdh5w->write_doubleScalar("fl_mu", fluid_mu);
+    cmdh5w->write_doubleScalar("init_step", initial_step);
+
+    delete cmdh5w; H5Fclose(cmd_file_id);
+  }
+
   // ===== Main Data Strucutre =====
   FEANode * fNode = new FEANode(part_file, rank);
   
@@ -172,13 +186,10 @@ int main(int argc, char *argv[])
   SYS_T::print_fatal_if( size!= PartBasic->get_cpu_size(),
             "Error: Assigned CPU number does not match the partition. \n");
 
-  PetscPrintf(PETSC_COMM_WORLD,
-            "===> %d processor(s) are assigned for FEM analysis. \n", size);
+  SYS_T::commPrint("===> %d processor(s) are assigned for FEM analysis. \n", size);
 
   // ===== Inflow rate function =====
   SYS_T::commPrint("===> Setup inflow flow rate. \n");
-  
-  //ICVFlowRate * inflow_rate_ptr = new CVFlowRate_Linear2Steady( 1.0 , 8.68 );
   
   ICVFlowRate * inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
 
@@ -190,9 +201,8 @@ int main(int argc, char *argv[])
   IQuadPts * quads = new QuadPts_Gauss_Triangle( nqp_tri );
 
   SYS_T::commPrint("===> Setup element container. \n");
-  FEAElement * elementv = new FEAElement_Tet4( quadv-> get_num_quadPts() );
-  FEAElement * elements = new FEAElement_Triangle3_3D_der0(
-      quads-> get_num_quadPts() );
+  FEAElement * elementv = new FEAElement_Tet4( nqp_tet );
+  FEAElement * elements = new FEAElement_Triangle3_3D_der0( nqp_tri );
 
   // ===== Generate a sparse matrix for strong enforcement of essential BC
   Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
@@ -215,15 +225,13 @@ int main(int argc, char *argv[])
       quadv->get_num_quadPts(), elements->get_nLocBas(),
       fluid_density, fluid_mu, bs_beta );
 
-  // Solids CGS units
   const double mat_in_rho0 = 1.0;
   const double mat_in_E = 2.0e6;
 
   IMaterialModel * matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed(
       mat_in_rho0, mat_in_E );
 
-  IPLocAssem * locAssem_solid_ptr
-    = new PLocAssem_Tet4_VMS_Seg_Incompressible(
+  IPLocAssem * locAssem_solid_ptr = new PLocAssem_Tet4_VMS_Seg_Incompressible(
         matmodel, tm_galpha_ptr, GMIptr->get_nLocBas(),
         quadv->get_num_quadPts(), elements->get_nLocBas() );
 
@@ -238,8 +246,10 @@ int main(int argc, char *argv[])
 */
   
   // Pseudo elastic mesh motion
+  const double mesh_mat_E = 1.0;
+  const double mesh_mat_nu = 0.3;
   IPLocAssem * locAssem_mesh_ptr = new PLocAssem_Tet4_FSI_Mesh_Elastostatic(
-      1.0, 0.3 );
+      mesh_mat_E, mesh_mat_nu );
 
   // ===== Initial condition =====
   PDNSolution * base = new PDNSolution_Mixed_UPV_3D( pNode, fNode, locinfnbc, 1 );
@@ -264,14 +274,15 @@ int main(int argc, char *argv[])
     SYS_T::file_exist_check(restart_dot_name.c_str());
     dot_sol->ReadBinary(restart_dot_name.c_str());
 
-    PetscPrintf(PETSC_COMM_WORLD, "===> Read sol from disk as a restart run... \n");
-    PetscPrintf(PETSC_COMM_WORLD, "     restart_name: %s \n", restart_name.c_str());
-    PetscPrintf(PETSC_COMM_WORLD, "     restart_dot_name: %s \n", restart_dot_name.c_str());
-    PetscPrintf(PETSC_COMM_WORLD, "     restart_time: %e \n", restart_time);
-    PetscPrintf(PETSC_COMM_WORLD, "     restart_index: %d \n", restart_index);
-    PetscPrintf(PETSC_COMM_WORLD, "     restart_step: %e \n", restart_step);
+    SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
+    SYS_T::commPrint("     restart_name: %s \n", restart_name.c_str());
+    SYS_T::commPrint("     restart_dot_name: %s \n", restart_dot_name.c_str());
+    SYS_T::commPrint("     restart_time: %e \n", restart_time);
+    SYS_T::commPrint("     restart_index: %d \n", restart_index);
+    SYS_T::commPrint("     restart_step: %e \n", restart_step);
   }
 
+  // ===== Time step info =====
   PDNTimeStep * timeinfo = new PDNTimeStep(initial_index, initial_time, initial_step);
   
   // ===== GenBC =====
@@ -358,8 +369,8 @@ int main(int argc, char *argv[])
   PC upc; lsolver->GetPC(&upc);
   const PetscInt pfield[1] = {0}, vfields[] = {1,2,3};
   PCFieldSplitSetBlockSize(upc,4);
-  PCFieldSplitSetFields(upc,"u",3,vfields,vfields); // A_00 for velo
-  PCFieldSplitSetFields(upc,"p",1,pfield,pfield);  // A_11 for pres
+  PCFieldSplitSetFields(upc,"u",3,vfields,vfields);
+  PCFieldSplitSetFields(upc,"p",1,pfield,pfield);
 
   PLinear_Solver_PETSc * mesh_lsolver = new PLinear_Solver_PETSc(
       1.0e-12, 1.0e-55, 1.0e30, 500, "mesh_", "mesh_" );
@@ -438,9 +449,7 @@ int main(int argc, char *argv[])
   delete tsolver; delete nsolver; delete lsolver; delete mesh_lsolver;
   delete gloAssem_ptr; delete gloAssem_mesh_ptr;
   delete timeinfo; delete sol; delete dot_sol; delete base;
-  delete locAssem_solid_ptr;
-  delete locAssem_fluid_ptr;
-  delete locAssem_mesh_ptr;
+  delete locAssem_solid_ptr; delete locAssem_fluid_ptr; delete locAssem_mesh_ptr;
   delete matmodel; delete inflow_rate_ptr;
   delete elementv; delete elements; delete quadv; delete quads;
   delete pmat; delete mmat; delete tm_galpha_ptr;
