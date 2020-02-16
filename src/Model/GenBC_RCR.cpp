@@ -76,6 +76,8 @@ GenBC_RCR::GenBC_RCR( const char * const &lpn_filename, const int &in_N,
   for(int ii=0; ii<num_ebc; ++ii)
   {
     Q0[ii] = 0.0; Pi0[ii] = 0.0;
+  
+    SYS_T::print_fatal_if(C[ii]==0.0, "Error: GenBC_RCR C cannot be zero.\n");
   }
 }
 
