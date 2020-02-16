@@ -37,10 +37,10 @@ namespace SV_T
   //                     single file for the whole domain, and write 
   //                     the solid mesh with the updated nodal and 
   //                     element indices.
-  //  \para filename_f : the original fluid mesh vtu
-  //  \para filename_s : the original solid mesh vtu
+  //  \para filename_f      : the original fluid mesh vtu
+  //  \para filename_s      : the original solid mesh vtu
   //  \para filename_f_wall : the UPDATED fluid wall vtp file
-  //  \para writename : the file name for the FSI whole domain
+  //  \para writename       : the file name for the FSI whole domain
   //  \para wirtename_solid : the file name for the solid subdomain
   //  
   //  \output map_s_node : the mapping for the solid node to the FSI
@@ -93,11 +93,11 @@ namespace SV_T
   // ----------------------------------------------------------------
   // ! compare_sv_vtp : compare two vtp and make sure they are matched
   //                    in the sense that they contain the same number
-  //                    of nodes and the nodal xyz coordinates are
-  //                    matched, the element IEN are matched.
-  //                    This is used to make sure the FSI mesh the
+  //                    of nodes and the nodal xyz coordinates match,
+  //                    and the element IEN match.
+  //                    It is used to make sure in the FSI mesh the
   //                    lumen wall and the tissue inner surface are
-  //                    matched. 
+  //                    from the same geometry.
   // ----------------------------------------------------------------
   void compare_sv_vtp( const std::string &filename_1,
       const std::string &filename_2 );
