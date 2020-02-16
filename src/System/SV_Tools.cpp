@@ -69,7 +69,7 @@ void SV_T::gen_sv_fsi_vtus( const std::string &filename_f,
 
   TET_T::read_vtu_grid(filename_f, nFunc_f, nElem_f, ctrlPts_f, vecIEN_f);
 
-  // The FSI mesh info start with fluid sub-domain
+  // The FSI mesh IEN and control points start from those in fluid sub-domain
   VEC_T::insert_end( wIEN, vecIEN_f );
   VEC_T::clean( vecIEN_f );
   for(int ii=0; ii<nElem_f; ++ii) wtag.push_back(0);
@@ -160,6 +160,7 @@ void SV_T::update_sv_vtp( const std::string &filename,
     const std::string &writename,
     const int &nstart, const int &estart )
 {
+  // Read the vtp file
   vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
   reader -> SetFileName( filename.c_str() );
   reader -> Update();
