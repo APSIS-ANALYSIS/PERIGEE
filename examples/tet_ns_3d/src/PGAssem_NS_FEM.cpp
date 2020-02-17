@@ -341,7 +341,7 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 
-  for(int fie=0; fie<dof_mat; ++fie) EssBC_KG( nbc_part, fie );
+  for(int ii=0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
@@ -444,6 +444,7 @@ void PGAssem_NS_FEM::Assem_residual(
       for(int mm=0; mm<dof_mat; ++mm)
         row_index[dof_mat*ii+mm] = dof_mat * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
     }
+    
     VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
 
@@ -484,7 +485,6 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
-  int loc_index, lrow_index, offset1;
 
   sol_a->GetLocalArray( array_a, node_ptr );
   sol_b->GetLocalArray( array_b, node_ptr );
@@ -502,16 +502,10 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
-      loc_index = IEN_e[ii];
-      offset1 = dof_mat * ii;
-
       for(int mm=0; mm<dof_mat; ++mm)
-      {
-        lrow_index = nbc_part -> get_LID(mm, loc_index);
-
-        row_index[offset1 + mm] = dof_mat * lrow_index + mm;
-      }
+        row_index[dof_mat*ii + mm] = dof_mat*nbc_part->get_LID(mm, IEN_e[ii])+mm;
     }
+
     MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
         lassem_ptr->Tangent, ADD_VALUES);
 
@@ -522,8 +516,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   BackFlow_KG( dt, lassem_ptr, elements, dof_mat*snLocBas, quad_s, nbc_part, ebc_part );
 
   // Resistance type boundary condition
-  NatBC_Resis_KG( dt, sol_np1, lassem_ptr, elements, quad_s, node_ptr, 
-      nbc_part, ebc_part, gbc );
+  NatBC_Resis_KG( dt, sol_np1, lassem_ptr, elements, quad_s, node_ptr, nbc_part, ebc_part, gbc );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
