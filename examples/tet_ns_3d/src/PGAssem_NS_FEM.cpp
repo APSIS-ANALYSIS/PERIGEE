@@ -366,7 +366,6 @@ void PGAssem_NS_FEM::Assem_mass_residual(
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
-  int loc_index, lrow_index, offset1;
 
   sol_a->GetLocalArray( array_a, node_ptr );
   sol_a->GetLocalArray( array_b, node_ptr );
@@ -382,15 +381,10 @@ void PGAssem_NS_FEM::Assem_mass_residual(
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
-      loc_index = IEN_e[ii];
-      offset1 = dof_mat * ii;
-
       for(int mm=0; mm<dof_mat; ++mm)
-      {
-        lrow_index = nbc_part -> get_LID(mm, loc_index);
-        row_index[offset1+mm] = dof_mat * lrow_index + mm;
-      }
+        row_index[dof_mat*ii+mm] = dof_mat * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
     }
+    
     MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
         lassem_ptr->Tangent, ADD_VALUES);
 
@@ -430,7 +424,6 @@ void PGAssem_NS_FEM::Assem_residual(
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
-  int loc_index, lrow_index, offset1;
 
   sol_a->GetLocalArray( array_a, node_ptr );
   sol_b->GetLocalArray( array_b, node_ptr );
@@ -448,13 +441,8 @@ void PGAssem_NS_FEM::Assem_residual(
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
-      loc_index = IEN_e[ii];
-      offset1 = dof_mat * ii;
       for(int mm=0; mm<dof_mat; ++mm)
-      {
-        lrow_index = nbc_part -> get_LID(mm, loc_index);
-        row_index[offset1+mm] = dof_mat * lrow_index + mm;
-      }
+        row_index[dof_mat*ii+mm] = dof_mat * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
     }
     VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
@@ -793,7 +781,7 @@ void PGAssem_NS_FEM::NatBC_Resis_G(
     // Get the (pressure) value on the outlet surface for traction evaluation    
     const double P_n   = gbc -> get_P0( ebc_id );
     const double P_np1 = gbc -> get_P( ebc_id, flrate );
-   
+
     // P_n+alpha_f
     // lassem_ptr->get_model_para_1() gives alpha_f 
     const double val = P_n + lassem_ptr->get_model_para_1() * (P_np1 - P_n);
@@ -864,7 +852,7 @@ void PGAssem_NS_FEM::NatBC_Resis_KG(
     // Get the (pressure) value on the outlet surface for traction evaluation    
     const double P_n   = gbc -> get_P0( ebc_id );
     const double P_np1 = gbc -> get_P( ebc_id, flrate );
-   
+
     // P_n+alpha_f 
     const double resis_val = P_n + lassem_ptr->get_model_para_1() * (P_np1 - P_n);
 
