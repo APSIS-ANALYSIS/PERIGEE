@@ -181,7 +181,7 @@ int main( int argc, char * argv[] )
   delete cmdh5w; H5Fclose(cmd_file_id);
   // ----- Finish writing
 
-  // Read file for the whole geometry
+  // Read the geometry file for the whole FSI domain
   int nFunc, nElem;
   std::vector<int> vecIEN;
   std::vector<int> phy_tag;
@@ -196,6 +196,7 @@ int main( int argc, char * argv[] )
 
   // Generate IEN
   IIEN * IEN = new IEN_Tetra_P1(nElem, vecIEN);
+  
   VEC_T::clean( vecIEN );
 
   // Generate the list of nodes for fluid and solid
@@ -367,9 +368,8 @@ int main( int argc, char * argv[] )
       list_nlocalnode.end());
 
   cout<<"The maximum and minimum local node numbers are ";
-  cout<<maxpart_nlocalnode<<"\t";
-  cout<<minpart_nlocalnode<<endl;
-  cout<<"The maximum / minimum of local node is: ";
+  cout<<maxpart_nlocalnode<<'\t'<<minpart_nlocalnode<<endl;
+  cout<<"The maximum / minimum of nlocalnode is: ";
   cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<endl;
 
   // Clean memory

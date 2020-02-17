@@ -135,7 +135,10 @@ class PGAssem_FSI_FEM : public IPGAssem
         const int &ebc_id );
 
   private:
-    int nLocBas, snLocBas, dof_sol, dof_mat, num_ebc;
+    // Private data
+    const int nLocBas, dof_sol, dof_mat, num_ebc;
+    
+    int snLocBas;
 
     PetscInt * row_index, * srow_index;
 
@@ -150,6 +153,7 @@ class PGAssem_FSI_FEM : public IPGAssem
     double * ectrl_x, * ectrl_y, * ectrl_z;
     double * sctrl_x, * sctrl_y, * sctrl_z;
 
+    // Private functions
     void EssBC_KG( const ALocal_NodalBC * const &nbc_part, const int &field );
     void EssBC_G( const ALocal_NodalBC * const &nbc_part, const int &field );
 

@@ -39,6 +39,15 @@ int main(int argc, char *argv[])
   double fluid_density = 1.06;
   double fluid_mu = 4.0e-2;
 
+  // solid properties
+  double solid_density = 1.0;
+  double solid_E = 2.0e6;
+  double solid_nu = 0.5;
+
+  // mesh motion elasticity solver parameters
+  double mesh_E  = 1.0;
+  double mesh_nu = 0.3;
+
   // inflow file
   std::string inflow_file("inflow_fourier_series.txt");
 
@@ -90,6 +99,11 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-bs_beta", bs_beta);
   SYS_T::GetOptionReal("-fl_density", fluid_density);
   SYS_T::GetOptionReal("-fl_mu", fluid_mu);
+  SYS_T::GetOptionReal("-sl_density", solid_density);
+  SYS_T::GetOptionReal("-sl_E", solid_E);
+  SYS_T::GetOptionReal("-sl_nu", solid_nu);
+  SYS_T::GetOptionReal("-mesh_E", mesh_E);
+  SYS_T::GetOptionReal("-mesh_nu", mesh_nu);
   SYS_T::GetOptionString("-inflow_file", inflow_file);
   SYS_T::GetOptionString("-lpn_file", lpn_file);
   SYS_T::GetOptionString("-part_file", part_file);
@@ -118,6 +132,11 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-bs_beta:", bs_beta);
   SYS_T::cmdPrint("-fl_density:", fluid_density);
   SYS_T::cmdPrint("-fl_mu:", fluid_mu);
+  SYS_T::cmdPrint("-sl_density:", solid_density);
+  SYS_T::cmdPrint("-sl_E:", solid_E);
+  SYS_T::cmdPrint("-sl_nu:", solid_nu);
+  SYS_T::cmdPrint("-mesh_E:", mesh_E);
+  SYS_T::cmdPrint("-mesh_nu:", mesh_nu);
   SYS_T::cmdPrint("-inflow_file:", inflow_file);
   SYS_T::cmdPrint("-lpn_file:", lpn_file);
   SYS_T::cmdPrint("-part_file:", part_file);
@@ -152,6 +171,11 @@ int main(int argc, char *argv[])
 
     cmdh5w->write_doubleScalar("fl_density", fluid_density);
     cmdh5w->write_doubleScalar("fl_mu", fluid_mu);
+    cmdh5w->write_doubleScalar("sl_density", solid_density);
+    cmdh5w->write_doubleScalar("sl_E", solid_E);
+    cmdh5w->write_doubleScalar("sl_nu", solid_nu);
+    cmdh5w->write_doubleScalar("mesh_E", mesh_E);
+    cmdh5w->write_doubleScalar("mesh_nu", mesh_nu);
     cmdh5w->write_doubleScalar("init_step", initial_step);
 
     delete cmdh5w; H5Fclose(cmd_file_id);
@@ -225,31 +249,28 @@ int main(int argc, char *argv[])
       quadv->get_num_quadPts(), elements->get_nLocBas(),
       fluid_density, fluid_mu, bs_beta );
 
-  const double mat_in_rho0 = 1.0;
-  const double mat_in_E = 2.0e6;
+  IMaterialModel * matmodel = nullptr;
+  IPLocAssem * locAssem_solid_ptr = nullptr;
 
-  IMaterialModel * matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed(
-      mat_in_rho0, mat_in_E );
+  if( solid_nu == 0.5 )
+  {
+    matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( solid_density, solid_E );
 
-  IPLocAssem * locAssem_solid_ptr = new PLocAssem_Tet4_VMS_Seg_Incompressible(
+    locAssem_solid_ptr = new PLocAssem_Tet4_VMS_Seg_Incompressible(
         matmodel, tm_galpha_ptr, GMIptr->get_nLocBas(),
         quadv->get_num_quadPts(), elements->get_nLocBas() );
+  }
+  else
+  {
+    matmodel = new MaterialModel_NeoHookean_M94_Mixed( solid_density, solid_E, solid_nu );
 
-/*
-  IMaterialModel * matmodel = new MaterialModel_NeoHookean_M94_Mixed(
-      mat_in_rho0, mat_in_E, 0.499 );
-  
-  IPLocAssem * locAssem_solid_ptr 
-    = new PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha(
+    locAssem_solid_ptr = new PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha(
         matmodel, tm_galpha_ptr, GMIptr->get_nLocBas(),
         quadv->get_num_quadPts(), elements->get_nLocBas() );
-*/
-  
+  }
+
   // Pseudo elastic mesh motion
-  const double mesh_mat_E = 1.0;
-  const double mesh_mat_nu = 0.3;
-  IPLocAssem * locAssem_mesh_ptr = new PLocAssem_Tet4_FSI_Mesh_Elastostatic(
-      mesh_mat_E, mesh_mat_nu );
+  IPLocAssem * locAssem_mesh_ptr = new PLocAssem_Tet4_FSI_Mesh_Elastostatic( mesh_E, mesh_nu );
 
   // ===== Initial condition =====
   PDNSolution * base = new PDNSolution_Mixed_UPV_3D( pNode, fNode, locinfnbc, 1 );
@@ -267,7 +288,7 @@ int main(int argc, char *argv[])
     // Read sol file
     SYS_T::file_exist_check(restart_name.c_str());
     sol->ReadBinary(restart_name.c_str());
-    
+
     // Read dot_sol file
     std::string restart_dot_name = "dot_";
     restart_dot_name.append(restart_name);
@@ -284,7 +305,7 @@ int main(int argc, char *argv[])
 
   // ===== Time step info =====
   PDNTimeStep * timeinfo = new PDNTimeStep(initial_index, initial_time, initial_step);
-  
+
   // ===== GenBC =====
   IGenBC * gbc = NULL;
 

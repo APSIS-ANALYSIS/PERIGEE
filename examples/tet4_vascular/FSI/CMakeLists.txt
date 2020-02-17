@@ -43,7 +43,6 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/System/HDF5_Writer.cpp
   ${perigee_source}/System/HDF5_Reader.cpp
   ${perigee_source}/Mesh/Tet_Tools.cpp
-  ${perigee_source}/Mesh/Gmsh_FileIO.cpp
   ${perigee_source}/Mesh/IEN_Tetra_P1.cpp
   ${perigee_source}/Mesh/INodalBC.cpp
   ${perigee_source}/Mesh/IElemBC.cpp
@@ -164,7 +163,6 @@ INCLUDE(../../../conf/message_compiler_setup.cmake)
 # ===================================================================
 # 1. Make executable for ALE-CFD code
 # 1.1 Preprocess
-ADD_EXECUTABLE( gmshIO gmsh_process.cpp)
 ADD_EXECUTABLE( preprocess_fsi preprocess_sv_fsi_tets.cpp)
 
 # 1.2 Analysis and tests
@@ -180,7 +178,6 @@ ADD_EXECUTABLE( vis_fsi_wss vis_fsi_wss.cpp)
 
 # -------------------------------------------------------------------
 # 3. Link libraries
-TARGET_LINK_LIBRARIES( gmshIO ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( preprocess_fsi ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( fsi_tet4_3d ${EXTRA_LINK_LIBS} perigee_analysis )
 TARGET_LINK_LIBRARIES( prepostproc ${EXTRA_LINK_LIBS} perigee_analysis 

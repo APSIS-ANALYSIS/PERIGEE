@@ -13,12 +13,11 @@ PGAssem_FSI_FEM::PGAssem_FSI_FEM(
     ALocal_EBC const * const &part_ebc,
     IGenBC const * const &gbc,
     const int &in_nz_estimate )
+: nLocBas( agmi_ptr->get_nLocBas() ),
+  dof_sol( pnode_ptr->get_dof() ),
+  dof_mat( locassem_f_ptr->get_dof_mat() ),
+  num_ebc( part_ebc->get_num_ebc() )
 {
-  nLocBas = agmi_ptr->get_nLocBas();
-  dof_sol = pnode_ptr->get_dof(); // pnode_ptr stores dofNum
-  dof_mat = locassem_f_ptr->get_dof_mat(); // locassem_ptr defines the matrix size
-  num_ebc = part_ebc->get_num_ebc();
-
   // Make sure the data structure is compatible
   SYS_T::print_fatal_if(dof_sol != locassem_f_ptr->get_dof(),
       "PGAssem_FSI_FEM::dof_sol != locassem_f_ptr->get_dof(). \n");
@@ -55,8 +54,7 @@ PGAssem_FSI_FEM::PGAssem_FSI_FEM(
   
   PetscPrintf(PETSC_COMM_WORLD, "     Empirical nonzero estimate: %d \n", empirical_neibor_number);
 
-  Get_dnz_onz( nlocalnode,  empirical_neibor_number,
-      part_nbc, dnnz, onnz );
+  Get_dnz_onz( nlocalnode,  empirical_neibor_number, part_nbc, dnnz, onnz );
 
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
       PETSC_DETERMINE, 0, dnnz, 0, onnz, &K);
@@ -68,8 +66,8 @@ PGAssem_FSI_FEM::PGAssem_FSI_FEM(
   VecSet(G, 0.0);
   VecSetOption(G, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
 
-  delete [] dnnz; dnnz = NULL;
-  delete [] onnz; onnz = NULL;
+  delete [] dnnz; dnnz = nullptr;
+  delete [] onnz; onnz = nullptr;
 
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE. \n");
   Release_nonzero_err_str();
@@ -99,8 +97,12 @@ PGAssem_FSI_FEM::PGAssem_FSI_FEM(
     srow_index = new PetscInt [dof_mat * snLocBas];
   }
 
-  // Initialize array_b for nonzero assembly
-  for(int ii=0; ii<nlgn*dof_sol; ++ii) array_b[ii] = 0.0;
+  // Initialize array_a/b for nonzero assembly
+  for(int ii=0; ii<nlgn*dof_sol; ++ii) 
+  {
+    array_a[ii] = 1.0;
+    array_b[ii] = 1.0;
+  }
 
   // Now we run a nonzero estimate trial assembly
   Assem_nonzero_estimate( alelem_ptr, locassem_f_ptr, locassem_s_ptr, 
@@ -122,25 +124,25 @@ PGAssem_FSI_FEM::~PGAssem_FSI_FEM()
 {
   VecDestroy(&G);
   MatDestroy(&K);
-  delete [] row_index; row_index = NULL;
-  delete [] array_a;     array_a = NULL;
-  delete [] array_b;     array_b = NULL;
-  delete [] local_a;     local_a = NULL;
-  delete [] local_b;     local_b = NULL;
-  delete [] IEN_e;       IEN_e = NULL;
-  delete [] ectrl_x;     ectrl_x = NULL;
-  delete [] ectrl_y;     ectrl_y = NULL;
-  delete [] ectrl_z;     ectrl_z = NULL;
+  delete [] row_index; row_index = nullptr;
+  delete [] array_a;     array_a = nullptr;
+  delete [] array_b;     array_b = nullptr;
+  delete [] local_a;     local_a = nullptr;
+  delete [] local_b;     local_b = nullptr;
+  delete [] IEN_e;       IEN_e = nullptr;
+  delete [] ectrl_x;     ectrl_x = nullptr;
+  delete [] ectrl_y;     ectrl_y = nullptr;
+  delete [] ectrl_z;     ectrl_z = nullptr;
 
   if(num_ebc > 0)
   {
-    delete [] LSIEN; LSIEN = NULL;
-    delete [] local_as; local_as = NULL;
-    delete [] local_bs; local_bs = NULL;
-    delete [] sctrl_x; sctrl_x = NULL;
-    delete [] sctrl_y; sctrl_y = NULL;
-    delete [] sctrl_z; sctrl_z = NULL;
-    delete [] srow_index; srow_index = NULL;
+    delete [] LSIEN; LSIEN = nullptr;
+    delete [] local_as; local_as = nullptr;
+    delete [] local_bs; local_bs = nullptr;
+    delete [] sctrl_x; sctrl_x = nullptr;
+    delete [] sctrl_y; sctrl_y = nullptr;
+    delete [] sctrl_z; sctrl_z = nullptr;
+    delete [] srow_index; srow_index = nullptr;
   }
 }
 
@@ -395,7 +397,6 @@ void PGAssem_FSI_FEM::Assem_mass_residual(
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
-  int loc_index, lrow_index, offset1;
 
   sol_a->GetLocalArray( array_a, node_ptr );
 
@@ -409,33 +410,18 @@ void PGAssem_FSI_FEM::Assem_mass_residual(
     GetLocal(array_a, IEN_e, local_a);
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      for(int mm=0; mm<dof_mat; ++mm)
+        row_index[dof_mat*ii + mm] = dof_mat * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
+    }
+
     // If elem_tag is 0, do fluid assembly, else do solid
     if(alelem_ptr->get_elem_tag(ee) == 0)
     {
       lassem_f_ptr->Assem_Mass_Residual( local_a, elementv,
           ectrl_x, ectrl_y, ectrl_z, quad_v );
-    }
-    else
-    {
-      lassem_s_ptr->Assem_Mass_Residual( local_a, elementv,
-          ectrl_x, ectrl_y, ectrl_z, quad_v );
-    }
-
-    for(int ii=0; ii<nLocBas; ++ii)
-    {
-      loc_index = IEN_e[ii];
-      offset1 = dof_mat * ii;
-
-      for(int mm=0; mm<dof_mat; ++mm)
-      {
-        lrow_index = nbc_part -> get_LID(mm, loc_index);
-        row_index[offset1+mm] = dof_mat * lrow_index + mm;
-      }
-    }
-
-    // If elem_tag is 0, use fluid pointer, else use solid pointer 
-    if(alelem_ptr->get_elem_tag(ee) == 0)
-    {
+    
       MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
           lassem_f_ptr->Tangent, ADD_VALUES);
 
@@ -443,6 +429,9 @@ void PGAssem_FSI_FEM::Assem_mass_residual(
     }
     else
     {
+      lassem_s_ptr->Assem_Mass_Residual( local_a, elementv,
+          ectrl_x, ectrl_y, ectrl_z, quad_v );
+    
       MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
           lassem_s_ptr->Tangent, ADD_VALUES);
 
@@ -484,7 +473,6 @@ void PGAssem_FSI_FEM::Assem_residual(
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
-  int loc_index, lrow_index, offset1;
 
   sol_a->GetLocalArray( array_a, node_ptr );
   sol_b->GetLocalArray( array_b, node_ptr );
@@ -497,36 +485,25 @@ void PGAssem_FSI_FEM::Assem_residual(
 
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      for(int mm=0; mm<dof_mat; ++mm)
+        row_index[dof_mat*ii+mm] = dof_mat * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
+    }
+
     // If elem tag is zero, do fluid, otherwise, do solid
     if(alelem_ptr->get_elem_tag(ee) == 0)
     {
       lassem_f_ptr->Assem_Residual(curr_time, dt, local_a, local_b,
           elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
+    
+      VecSetValues(G, loc_dof, row_index, lassem_f_ptr->Residual, ADD_VALUES);
     }
     else
     {
       lassem_s_ptr->Assem_Residual(curr_time, dt, local_a, local_b,
           elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
-    }
 
-    for(int ii=0; ii<nLocBas; ++ii)
-    {
-      loc_index = IEN_e[ii];
-      offset1 = dof_mat * ii;
-      for(int mm=0; mm<dof_mat; ++mm)
-      {
-        lrow_index = nbc_part -> get_LID(mm, loc_index);
-        row_index[offset1+mm] = dof_mat * lrow_index + mm;
-      }
-    }
-
-    // If elem tag is zero, use fluid, otherwise, use solid
-    if(alelem_ptr->get_elem_tag(ee) == 0)
-    {
-      VecSetValues(G, loc_dof, row_index, lassem_f_ptr->Residual, ADD_VALUES);
-    }
-    else
-    {
       VecSetValues(G, loc_dof, row_index, lassem_s_ptr->Residual, ADD_VALUES);
     }
   }
@@ -570,7 +547,6 @@ void PGAssem_FSI_FEM::Assem_tangent_residual(
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
-  int loc_index, lrow_index, offset1;
 
   sol_a->GetLocalArray( array_a, node_ptr );
   sol_b->GetLocalArray( array_b, node_ptr );
@@ -580,36 +556,21 @@ void PGAssem_FSI_FEM::Assem_tangent_residual(
     lien_ptr->get_LIEN_e(ee, IEN_e);
     GetLocal(array_a, IEN_e, local_a);
     GetLocal(array_b, IEN_e, local_b);
-
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
-    // If elem tag is zero, do fluid assembly; else do solid
+    // prepare the row_index array
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      for(int mm=0; mm<dof_mat; ++mm)
+        row_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
+    }
+    
+    // If elem tag is zero, do fluid assembly; else do solid assembly
     if(alelem_ptr->get_elem_tag(ee) == 0)
     {
       lassem_f_ptr->Assem_Tangent_Residual(curr_time, dt, local_a, local_b,
           elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
-    }
-    else
-    {
-      lassem_s_ptr->Assem_Tangent_Residual(curr_time, dt, local_a, local_b,
-          elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
-    }
-
-    for(int ii=0; ii<nLocBas; ++ii)
-    {
-      loc_index = IEN_e[ii];
-      offset1 = dof_mat * ii;
-
-      for(int mm=0; mm<dof_mat; ++mm)
-      {
-        lrow_index = nbc_part -> get_LID(mm, loc_index);
-
-        row_index[offset1 + mm] = dof_mat * lrow_index + mm;
-      }
-    }
-
-    if(alelem_ptr->get_elem_tag(ee) == 0)
-    {
+      
       MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
           lassem_f_ptr->Tangent, ADD_VALUES);
 
@@ -617,6 +578,9 @@ void PGAssem_FSI_FEM::Assem_tangent_residual(
     }
     else
     {
+      lassem_s_ptr->Assem_Tangent_Residual(curr_time, dt, local_a, local_b,
+          elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
+      
       MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
           lassem_s_ptr->Tangent, ADD_VALUES);
 
@@ -874,8 +838,8 @@ void PGAssem_FSI_FEM::NatBC_Resis_KG(
     }
     else
     {
-      Tan = NULL;
-      scol_idx = NULL;
+      Tan = nullptr;
+      scol_idx = nullptr;
     }
 
     const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
