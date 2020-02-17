@@ -10,7 +10,6 @@
 // Author: Ju Liu
 // Date: Aug. 19 2019
 // ==================================================================
-#include "Sys_Tools.hpp"
 #include "IGenBC.hpp"
 
 class GenBC_RCR : public IGenBC

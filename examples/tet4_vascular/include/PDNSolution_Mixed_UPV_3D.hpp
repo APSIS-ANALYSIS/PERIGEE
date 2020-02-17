@@ -30,23 +30,30 @@ class PDNSolution_Mixed_UPV_3D : public PDNSolution
 
     virtual ~PDNSolution_Mixed_UPV_3D();
 
+    // --------------------------------------------------------------
     // case 0: generate full zero vector 
+    // --------------------------------------------------------------
     void Init_zero( const APart_Node * const &pNode_ptr );
 
+    // --------------------------------------------------------------
     // case 1: generate flow parabolic for an arbitrary inlet
-    //         face with unit flow rate
+    //         face with unit flow rate. This solution is used as the
+    //         base solution and will be scaled by the flow rate to 
+    //         adjust the inlet Dirichlet nodal values.
+    // --------------------------------------------------------------
     void Init_flow_parabolic( const APart_Node * const &pNode_ptr,
         const FEANode * const &fNode_ptr,
         const ALocal_Inflow_NodalBC * const &infbc );
   
+    // --------------------------------------------------------------
     // case 2: generate pressure with a prescribed value
     //         for whole continuum body, and zero velocity and displacement
+    // --------------------------------------------------------------
     void Init_pressure( const APart_Node * const &pNode_ptr,
         const FEANode * const &fNode_ptr );
 
   private:
     const bool is_print;
-
 };
 
 #endif

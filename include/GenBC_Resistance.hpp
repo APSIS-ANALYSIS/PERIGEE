@@ -11,7 +11,6 @@
 // Author: Ju Liu
 // Date: Aug 21 2019
 // ==================================================================
-#include "Sys_Tools.hpp"
 #include "IGenBC.hpp"
 
 class GenBC_Resistance : public IGenBC

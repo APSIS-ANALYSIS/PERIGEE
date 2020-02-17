@@ -72,7 +72,7 @@ void PDNSolution_Mixed_UPV_3D::Init_zero(
 {
   int location[7];
   double value[7] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-  int nlocalnode = pNode_ptr->get_nlocalnode();
+  const int nlocalnode = pNode_ptr->get_nlocalnode();
 
   for(int ii=0; ii<nlocalnode; ++ii)
   {
@@ -112,7 +112,7 @@ void PDNSolution_Mixed_UPV_3D::Init_flow_parabolic(
 {
   int location[7];
   double value[7] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-  int nlocalnode = pNode_ptr->get_nlocalnode();
+  const int nlocalnode = pNode_ptr->get_nlocalnode();
   double x, y, z, r, vel;
 
   const double vmax = 2.0 / infbc->get_fularea();
