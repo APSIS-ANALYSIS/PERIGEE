@@ -116,25 +116,25 @@ PGAssem_NS_FEM::~PGAssem_NS_FEM()
 {
   VecDestroy(&G);
   MatDestroy(&K);
-  delete [] row_index; row_index = NULL;
-  delete [] array_a;     array_a = NULL;
-  delete [] array_b;     array_b = NULL;
-  delete [] local_a;     local_a = NULL;
-  delete [] local_b;     local_b = NULL;
-  delete [] IEN_e;       IEN_e = NULL;
-  delete [] ectrl_x;     ectrl_x = NULL;
-  delete [] ectrl_y;     ectrl_y = NULL;
-  delete [] ectrl_z;     ectrl_z = NULL;
+  delete [] row_index; row_index = nullptr;
+  delete [] array_a;     array_a = nullptr;
+  delete [] array_b;     array_b = nullptr;
+  delete [] local_a;     local_a = nullptr;
+  delete [] local_b;     local_b = nullptr;
+  delete [] IEN_e;       IEN_e = nullptr;
+  delete [] ectrl_x;     ectrl_x = nullptr;
+  delete [] ectrl_y;     ectrl_y = nullptr;
+  delete [] ectrl_z;     ectrl_z = nullptr;
 
   if(num_ebc > 0)
   {
-    delete [] LSIEN; LSIEN = NULL;
-    delete [] local_as; local_as = NULL;
-    delete [] local_bs; local_bs = NULL;
-    delete [] sctrl_x; sctrl_x = NULL;
-    delete [] sctrl_y; sctrl_y = NULL;
-    delete [] sctrl_z; sctrl_z = NULL;
-    delete [] srow_index; srow_index = NULL;
+    delete [] LSIEN; LSIEN = nullptr;
+    delete [] local_as; local_as = nullptr;
+    delete [] local_bs; local_bs = nullptr;
+    delete [] sctrl_x; sctrl_x = nullptr;
+    delete [] sctrl_y; sctrl_y = nullptr;
+    delete [] sctrl_z; sctrl_z = nullptr;
+    delete [] srow_index; srow_index = nullptr;
   }
 }
 
@@ -312,7 +312,6 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
-  int loc_index, lrow_index, offset1;
 
   lassem_ptr->Assem_Estimate();
 
@@ -320,17 +319,12 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
   {
     for(int i=0; i<nLocBas; ++i)
     {
-      loc_index  = lien_ptr->get_LIEN(e, i);
-
-      offset1 = dof_mat * i;
+      const int loc_index  = lien_ptr->get_LIEN(e, i);
 
       for(int m=0; m<dof_mat; ++m)
-      {
-        lrow_index = nbc_part->get_LID( m, loc_index );
-
-        row_index[offset1 + m] = dof_mat * lrow_index + m;
-      }
+        row_index[dof_mat * i + m] = dof_mat * nbc_part->get_LID( m, loc_index ) + m;
     }
+    
     MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
         lassem_ptr->Tangent, ADD_VALUES);
   }
