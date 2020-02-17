@@ -3,13 +3,16 @@
 // ==================================================================
 // IGenBC.hpp
 //
-// Interface file for GenBC classes
+// Interface for GenBC classes
 //
 // This is a pure virtual class for General BC for outflow boundary
 // conditions.
 // 
 // Author: Ju Liu
 // Date: Aug 21 2019
+// Reference: J. Liu, et al. The nested block preconditioning technique 
+// for the incompressible Navier-Stokes equations with emphasis on 
+// hemodynamic simulations.
 // ==================================================================
 #include "Sys_Tools.hpp"
 
@@ -35,7 +38,11 @@ class IGenBC
     // for simple models, e.g. resistance type bc, this value is just
     // the resistance value on this bc.
     // --------------------------------------------------------------
-    virtual double get_m( const int &ii, const double &Q ) const = 0;
+    virtual double get_m( const int &ii, const double &Q ) const
+    {
+      SYS_T::print_fatal("Error: IGenBC::get_m is not implemented.\n");
+      return 0.0;
+    }
 
     // --------------------------------------------------------------
     // Get the P value for surface ii, the traction on the surface is
@@ -43,7 +50,11 @@ class IGenBC
     // for resistance bc, for example, this value is
     // Resistance x Q + P_offset
     // --------------------------------------------------------------
-    virtual double get_P( const int &ii, const double &Q ) const = 0;
+    virtual double get_P( const int &ii, const double &Q ) const
+    {
+      SYS_T::print_fatal("Error: IGenBC::get_P is not implemented.\n");
+      return 0.0;
+    }
 
     // --------------------------------------------------------------
     // Return the pressure at the time step n, which is used as the
@@ -52,7 +63,11 @@ class IGenBC
     // For RCR, it is get_P(ii, Q_previous), which is also stored
     // as Pi_0 + Q_0 x Rp
     // --------------------------------------------------------------
-    virtual double get_P0( const int &ii ) const = 0;
+    virtual double get_P0( const int &ii ) const
+    {
+      SYS_T::print_fatal("Error: IGenBC::get_P0 is not implemented.\n");
+      return 0.0;
+    }
 
     // --------------------------------------------------------------
     // Record solution values as initial conditions for the next time step
@@ -65,7 +80,10 @@ class IGenBC
     // implementation.
     // --------------------------------------------------------------
     virtual void reset_initial_sol( const int &ii, const double &in_Q_0,
-        const double &in_P_0 ) = 0;
+        const double &in_P_0 )
+    {
+      SYS_T::print_fatal("Error: IGenBC::reset_initial_sol is not implemented.\n");
+    }
 };
 
 #endif
