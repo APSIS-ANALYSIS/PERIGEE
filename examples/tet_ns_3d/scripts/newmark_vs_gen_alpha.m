@@ -39,7 +39,7 @@ a(:, 1) = M \ (-K * d(:, 1));
 % (a): damped_Newmark
 % (b): gen-alpha-2nd_order_IVP
 % (c): gen-alpha-1st_order_IVP
-method = 'b';
+method = 'c';
 
 switch method
     
@@ -78,7 +78,7 @@ switch method
         % for structural dynamics with improved numerical dissipation: The
         % generalized-alpha method.
         
-        rho_inf = 0.0;
+        rho_inf = 0.5;
         
         alpha_m = (2.0 - rho_inf) / (1 + rho_inf);
         alpha_f = 1 / (1 + rho_inf);
@@ -125,7 +125,7 @@ switch method
         dot_v = zeros(2, length(t));    % Time derivative of velocity
         
         % Initial conditions
-        dot_d(:, 1) = [0; 0];
+        dot_d(:, 1) = v(:, 1);
         dot_v(:, 1) = M \ (-K * d(:, 1));
         
         for i = 2 : length(t)
@@ -154,11 +154,10 @@ switch method
                           (gamma - alpha_m) / (alpha_f * gamma^2 * dt) * dot_d_n;
             
             % Compute residual
-            r(:, i) = M * dot_v(:, i) + K * d(:, i);
+            r(:, i) = M * ( (1-alpha_m) * dot_v(:, i-1) + alpha_m * dot_v(:, i) ) ...
+                + K * ( (1-alpha_f) * d(:, i-1) + alpha_f * d(:, i) );
             
         end
-        
-
 end
 
 
