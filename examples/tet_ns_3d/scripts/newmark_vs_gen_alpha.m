@@ -2,7 +2,6 @@
 % Hughes Section 9.3 Exercise 16
 % Linear IVP: Md'' + Kd = 0, where d = [d1; d2]
 
-
 % System parameters
 m1    = 1.0;
 m2    = 1.0;
@@ -20,7 +19,8 @@ K = [k1 + k2, -k2; -k2, k2];
 w = sqrt(diag(eval));
 
 % Time stepping
-T  = 25;
+% T1 = 2 * pi / w1
+T  = 2*pi / w(1);
 dt = T / 100;
 t = 0 : dt : T;
 
