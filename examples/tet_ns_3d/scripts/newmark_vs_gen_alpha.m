@@ -22,8 +22,8 @@ w = sqrt(diag(eval));
 % Time stepping
 % oscillation period T1 = 2 * pi / w1
 T  = 2*pi / w(1);
-dt = T / 10;
-NN = 2;
+dt = T / 5;
+NN = 3;
 t = 0 : dt : NN * T; % run for NN periods
 
 d = zeros(2, length(t));        % Displacement
@@ -160,22 +160,50 @@ switch method
         end
 end
 
+% Analytical solutions
+a = evec(1,1); b = evec(2,1);
+
+coef = [1;10]; coef = evec * coef;
+
+tt = 0 : dt/100 : NN * T;
+
+d1 = coef(1) * a * cos(w(1) * tt) + coef(2) * b * cos(w(2) * tt);
+d2 = coef(1) * b * cos(w(1) * tt) - coef(2) * a * cos(w(2) * tt);
+
+v1 = -coef(1) * a * w(1) * sin(w(1) * tt) - coef(2) * b * w(2) * sin(w(2) * tt);
+v2 = -coef(1) * b * w(1) * sin(w(1) * tt) + coef(2) * a * w(2) * sin(w(2) * tt);
 
 figure;
-subplot(3, 1, 1); plot(0 : dt : dt*(length(t) - 1), d(1, :)); 
+subplot(3, 1, 1); hold on; 
+plot(0 : dt/100 : dt*(length(t) - 1), d1);
+plot(0 : dt : dt*(length(t) - 1), d(1, :), 'LineWidth', 2);
+grid on;
 ylabel('d1'); xlim([0, NN*T]); ylim([-2, 2])
-subplot(3, 1, 2); plot(0 : dt : dt*(length(t) - 1), v(1, :)); 
+legend('Analytical', 'Numerical');
+subplot(3, 1, 2); hold on; 
+plot(0 : dt/100 : dt*(length(t) - 1), v1);
+plot(0 : dt : dt*(length(t) - 1), v(1, :), 'LineWidth', 2); 
+grid on;
+legend('Analytical', 'Numerical');
 ylabel('v1'); xlim([0, NN*T]); % ylim([-80, 80]);
 subplot(3, 1, 3); plot(0 : dt : dt*(length(t) - 1), r(1, :));
 ylabel('Residual'); xlim([0, NN*T]); xlabel('t');
-%saveas(gcf, [method_name, '_1.png']);
+grid on;
+saveas(gcf, [method_name, '_1.png']);
 
 figure;
-subplot(3, 1, 1); plot(0 : dt : dt*(length(t) - 1), d(2, :));
+subplot(3, 1, 1); hold on; plot(0 : dt : dt*(length(t) - 1), d(2, :));
 ylabel('d2'); xlim([0, NN*T]); ylim([-20, 20]);
-subplot(3, 1, 2); plot(0 : dt : dt*(length(t) - 1), v(2, :));
+plot(0 : dt/100 : dt*(length(t) - 1), d2);
+grid on;
+legend('Numerical', 'Analytical');
+subplot(3, 1, 2); hold on; plot(0 : dt : dt*(length(t) - 1), v(2, :));
+plot(0 : dt/100 : dt*(length(t) - 1), v2);
+grid on;
+legend('Numerical', 'Analytical');
 ylabel('v2'); xlim([0, NN*T]); ylim([-20, 20]);
 subplot(3, 1, 3); plot(0 : dt : dt*(length(t) - 1), r(2, :)); 
+grid on;
 ylabel('Residual'); xlim([0, NN*T]); xlabel('t');
 
-%saveas(gcf, [method_name, '_2.png']);
+saveas(gcf, [method_name, '_2.png']);
