@@ -22,7 +22,7 @@ w = sqrt(diag(eval));
 % Time stepping
 % oscillation period T1 = 2 * pi / w1
 T  = 2*pi / w(1);
-dt = T / 1000;
+dt = T / 10;
 NN = 2;
 t = 0 : dt : NN * T; % run for NN periods
 
@@ -39,7 +39,7 @@ a(:, 1) = M \ (-K * d(:, 1));
 % (a): damped_Newmark
 % (b): gen-alpha-2nd_order_IVP
 % (c): gen-alpha-1st_order_IVP
-method = 'a';
+method = 'b';
 
 switch method
     
@@ -78,7 +78,7 @@ switch method
         % for structural dynamics with improved numerical dissipation: The
         % generalized-alpha method.
         
-        rho_inf = 0.5;
+        rho_inf = 0.0;
         
         alpha_m = (2.0 - rho_inf) / (1 + rho_inf);
         alpha_f = 1 / (1 + rho_inf);
@@ -102,12 +102,11 @@ switch method
                       ( (1 - 2 * beta) * a_n + 2 * beta * a(:, i) );
             
             % Compute residual
-            r(:, i) = M * a(:, i) + K * d(:, i);
+            r(:, i) = M * ( (1-alpha_m) * a(:, i-1) + alpha_m * a(:, i) ) ...
+                + K * ( (1-alpha_f) * d(:, i-1) + alpha_f * d(:, i) );
             
         end
-        
-        
-        
+                
     % ================= Gen-alpha for 1st-order IVP ================= %
     case 'c'
         
