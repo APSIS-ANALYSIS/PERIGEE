@@ -1,6 +1,7 @@
 % Ingrid Lan - Feb. 2020
 % Hughes Section 9.3 Exercise 16
 % Linear IVP: Md'' + Kd = 0, where d = [d1; d2]
+clear all; clc; clf; close all;
 
 % System parameters
 m1    = 1.0;
@@ -19,28 +20,26 @@ K = [k1 + k2, -k2; -k2, k2];
 w = sqrt(diag(eval));
 
 % Time stepping
-% T1 = 2 * pi / w1
+% oscillation period T1 = 2 * pi / w1
 T  = 2*pi / w(1);
-dt = T / 100;
-t = 0 : dt : T;
+dt = T / 1000;
+NN = 2;
+t = 0 : dt : NN * T; % run for NN periods
+
+d = zeros(2, length(t));        % Displacement
+v = zeros(2, length(t));        % Velocity
+a = zeros(2, length(t));        % Acceleration
+r = zeros(2, length(t));        % Residual (for debugging)
+
+% Initial conditions
+d(:, 1) = [1; 10];
+v(:, 1) = [0;  0];
+a(:, 1) = M \ (-K * d(:, 1));
 
 % (a): damped_Newmark
 % (b): gen-alpha-2nd_order_IVP
 % (c): gen-alpha-1st_order_IVP
-method = 'b';
-
-if strcmp(method, 'a')
-    % Damped Newmark-beta parameters
-    beta  = 0.3025;
-    gamma = 0.6;
-else
-    % Generalized-alpha parameters
-    rho_inf = 0.5;
-    alpha_m = 0.5 * (3 - rho_inf) / (1 + rho_inf);
-    alpha_f = 1 / (1 + rho_inf);
-    gamma   = 0.5 + alpha_m - alpha_f;
-    beta    = (1 + alpha_m - alpha_f)^2 / 4;       % only for 2nd-order IVP
-end
+method = 'a';
 
 switch method
     
@@ -49,16 +48,8 @@ switch method
         
         method_name = 'damped_Newmark';
 
-        d = zeros(2, length(t));        % Displacement
-        v = zeros(2, length(t));        % Velocity
-        a = zeros(2, length(t));        % Acceleration
-        r = zeros(2, length(t));        % Residual (for debugging)
-        
-        % Initial conditions
-        d(:, 1) = [1; 10];
-        v(:, 1) = [0;  0];
-        a(:, 1) = M \ (-K * d(:, 1));
-
+        gamma = 0.6;
+        beta  = 0.3025;
         
         for i = 2 : length(t)
             
@@ -77,8 +68,7 @@ switch method
             r(:, i) = M * a(:, i) + K * d(:, i);
             
         end
-        
-        
+                
     % ================= Gen-alpha for 2nd-order IVP ================= %
     case 'b'
         
@@ -88,15 +78,12 @@ switch method
         % for structural dynamics with improved numerical dissipation: The
         % generalized-alpha method.
         
-        d = zeros(2, length(t));        % Displacement
-        v = zeros(2, length(t));        % Velocity
-        a = zeros(2, length(t));        % Acceleration
-        r = zeros(2, length(t));        % Residual (for debugging)
+        rho_inf = 0.5;
         
-        % Initial conditions
-        d(:, 1) = [1; 10];
-        v(:, 1) = [0;  0];
-        a(:, 1) = M \ (-K * d(:, 1));
+        alpha_m = (2.0 - rho_inf) / (1 + rho_inf);
+        alpha_f = 1 / (1 + rho_inf);
+        gamma   = 0.5 + alpha_m - alpha_f;
+        beta    = (1 + alpha_m - alpha_f)^2 / 4; 
         
         for i = 2 : length(t)
             d_n = d(:, i - 1);
@@ -129,15 +116,16 @@ switch method
         % Reference: Kadapa et al. (2017). On the advantages of using the
         % first-order generalized-alpha scheme for structural dynamic problems.
         
-        d = zeros(2, length(t));        % Displacement
-        v = zeros(2, length(t));        % Velocity
+        rho_inf = 0.5;
+        
+        alpha_m = 0.5 * (3 - rho_inf) / (1 + rho_inf);
+        alpha_f = 1 / (1 + rho_inf);
+        gamma   = 0.5 + alpha_m - alpha_f;
+        
         dot_d = zeros(2, length(t));    % Time derivative of displacement
         dot_v = zeros(2, length(t));    % Time derivative of velocity
-        r = zeros(2, length(t));        % Residual (for debugging)
         
         % Initial conditions
-        d(:, 1) = [1; 10];
-        v(:, 1) = [0;  0];
         dot_d(:, 1) = [0; 0];
         dot_v(:, 1) = M \ (-K * d(:, 1));
         
@@ -176,20 +164,20 @@ end
 
 
 figure;
-subplot(3, 1, 1); plot(0 : (length(t) - 1), d(1, :)); 
-ylabel('d1'); xlim([0, 100]); ylim([-2, 2])
-subplot(3, 1, 2); plot(0 : (length(t) - 1), v(1, :)); 
-ylabel('v1'); xlim([0, 100]); % ylim([-80, 80]);
-subplot(3, 1, 3); plot(1 : length(t), r(1, :));
-ylabel('Residual'); xlim([0, 100]); xlabel('n');
+subplot(3, 1, 1); plot(0 : dt : dt*(length(t) - 1), d(1, :)); 
+ylabel('d1'); xlim([0, NN*T]); ylim([-2, 2])
+subplot(3, 1, 2); plot(0 : dt : dt*(length(t) - 1), v(1, :)); 
+ylabel('v1'); xlim([0, NN*T]); % ylim([-80, 80]);
+subplot(3, 1, 3); plot(0 : dt : dt*(length(t) - 1), r(1, :));
+ylabel('Residual'); xlim([0, NN*T]); xlabel('t');
 %saveas(gcf, [method_name, '_1.png']);
 
 figure;
-subplot(3, 1, 1); plot(0 : (length(t) - 1), d(2, :));
-ylabel('d2'); xlim([0, 100]); ylim([-20, 20]);
-subplot(3, 1, 2); plot(0 : (length(t) - 1), v(2, :));
-ylabel('v2'); xlim([0, 100]); ylim([-20, 20]);
-subplot(3, 1, 3); plot(1 : length(t), r(2, :)); xlabel('n');
-ylabel('Residual'); xlim([0, 100]);
+subplot(3, 1, 1); plot(0 : dt : dt*(length(t) - 1), d(2, :));
+ylabel('d2'); xlim([0, NN*T]); ylim([-20, 20]);
+subplot(3, 1, 2); plot(0 : dt : dt*(length(t) - 1), v(2, :));
+ylabel('v2'); xlim([0, NN*T]); ylim([-20, 20]);
+subplot(3, 1, 3); plot(0 : dt : dt*(length(t) - 1), r(2, :)); 
+ylabel('Residual'); xlim([0, NN*T]); xlabel('t');
 
 %saveas(gcf, [method_name, '_2.png']);
