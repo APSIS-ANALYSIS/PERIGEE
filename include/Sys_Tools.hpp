@@ -158,6 +158,7 @@ namespace SYS_T
   //       {gen_randomD_xxx(...); ...}
   // ----------------------------------------------------------------
   double gen_randomD_closed( const double &min, const double &max );
+  
   double gen_randomD_open( const double &min, const double &max );
 
   int gen_randomI_closed( const int &min, const int &max );
