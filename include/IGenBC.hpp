@@ -44,6 +44,13 @@ class IGenBC
       return 0.0;
     }
 
+    virtual double get_m( const int &ii, const double &dot_Q,
+       const double &Q ) const
+    {
+      SYS_T::print_fatal("Error: IGenBC::get_m is not implemented.\n");
+      return 0.0;
+    }
+
     // --------------------------------------------------------------
     // Get the P value for surface ii, the traction on the surface is
     // modeled as h = P I
@@ -51,6 +58,13 @@ class IGenBC
     // Resistance x Q + P_offset
     // --------------------------------------------------------------
     virtual double get_P( const int &ii, const double &Q ) const
+    {
+      SYS_T::print_fatal("Error: IGenBC::get_P is not implemented.\n");
+      return 0.0;
+    }
+
+    virtual double get_P( const int &ii, const double &dot_Q,
+       const double &Q ) const
     {
       SYS_T::print_fatal("Error: IGenBC::get_P is not implemented.\n");
       return 0.0;
