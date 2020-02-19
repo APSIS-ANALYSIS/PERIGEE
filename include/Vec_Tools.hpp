@@ -17,8 +17,7 @@ namespace VEC_T
   // print int / double vector on screen
   template<typename T> void print( const std::vector<T> &vec )
   {
-    typename std::vector<T>::const_iterator it;
-    for( it = vec.begin(); it != vec.end(); ++it )
+    for( auto it = vec.begin(); it != vec.end(); ++it )
       std::cout<<std::setprecision(16)<<*it<<'\t';
     std::cout<<'\n';
   }
@@ -28,9 +27,8 @@ namespace VEC_T
   template<typename T> void print( const std::vector<T> &vec, 
       const unsigned int pres )
   {
-    std::streamsize ss = std::cout.precision();
-    typename std::vector<T>::const_iterator it;
-    for( it = vec.begin(); it != vec.end(); ++it )
+    const std::streamsize ss = std::cout.precision();
+    for( auto it = vec.begin(); it != vec.end(); ++it )
       std::cout<<std::setprecision(pres)<<*it<<'\t';
     std::cout<<'\n';
     std::cout.precision(ss);
@@ -42,9 +40,8 @@ namespace VEC_T
       const std::string &file_name )
   {
     std::ofstream efile(file_name.c_str(), std::ofstream::out | std::ofstream::trunc );
-    typename std::vector<T>::const_iterator it;
-    for(it = vec.begin(); it!= vec.end(); ++it)
-      efile<<*it<<'\t';
+    for(auto it = vec.begin(); it!= vec.end(); ++it) efile<<*it<<'\t';
+    
     efile.close();
   }
 
@@ -60,10 +57,9 @@ namespace VEC_T
   template<typename T> void fillArray( std::vector<T> &vec,
       const T * const &input, const int &len )
   {
-    vec.clear();
-    vec.resize(len);
-    for(int ii=0; ii<len; ++ii)
-      vec[ii] = input[ii];
+    vec.clear(); vec.resize(len);
+    for(int ii=0; ii<len; ++ii) vec[ii] = input[ii];
+    
     shrink2fit(vec);
   }
 
@@ -130,7 +126,7 @@ namespace VEC_T
   template<typename T> void sort_unique_resize( std::vector<T> &vec )
   {
     sort(vec.begin(), vec.end());
-    typename std::vector<T>::const_iterator ite = unique(vec.begin(), vec.end());
+    auto ite = unique(vec.begin(), vec.end());
     vec.resize( ite - vec.begin() );
   }
 
@@ -142,8 +138,7 @@ namespace VEC_T
   template<typename T> bool is_invec( const std::vector<T> &vec, 
       const T &val)
   {
-    typename std::vector<T>::const_iterator it;
-    it = find(vec.begin(), vec.end(), val);
+    auto it = find(vec.begin(), vec.end(), val);
     return it != vec.end();
   }
 
@@ -175,23 +170,10 @@ namespace VEC_T
   template<typename T> int get_pos( const std::vector<T> &vec,
       const T &val )
   {
-    typename std::vector<T>::const_iterator it;
-    it = find(vec.begin(), vec.end(), val);
+    const auto it = find(vec.begin(), vec.end(), val);
     if( it == vec.end() ) return -1;
     else return it - vec.begin();
   }
-
-
-  // -----------------------------------------------------------------
-  // ! write_int_h5
-  //   Write an int vector to disk as HDF5 file.
-  //   \para file_name : the input that will name the .h5 file
-  //   \para dataname : the name of the dataset in the file
-  //   \para value : the vector that is to be written.
-  // -----------------------------------------------------------------
-  void write_int_h5( const char * const &file_name, 
-      const char * const &dataname,
-      const std::vector<int> &value );
 
 
   // -----------------------------------------------------------------
@@ -206,6 +188,7 @@ namespace VEC_T
       const std::vector<T> &vec, const bool &wIdx=true,
       const unsigned int &pres=6 )
   {
+    const std::streamsize ss = std::cout.precision();
     std::string fname(file_name);
     fname.append(".vec.txt");
     std::ofstream vfile;
@@ -221,7 +204,20 @@ namespace VEC_T
         vfile <<std::setprecision(pres) << vec[ii] << std::endl;
     }
     vfile.close();
+    std::cout.precision(ss);
   }
+
+
+  // -----------------------------------------------------------------
+  // ! write_int_h5
+  //   Write an int vector to disk as HDF5 file.
+  //   \para file_name : the input that will name the .h5 file
+  //   \para dataname : the name of the dataset in the file
+  //   \para value : the vector that is to be written.
+  // -----------------------------------------------------------------
+  void write_int_h5( const char * const &file_name, 
+      const char * const &dataname,
+      const std::vector<int> &value );
 
 
   // -----------------------------------------------------------------
