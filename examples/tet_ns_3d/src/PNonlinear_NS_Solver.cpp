@@ -137,7 +137,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PetscLogEventBegin(vec_assem_0_event, 0,0,0,0);
 #endif
 
-    gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, sol,
+    gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
         curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
         quad_v, quad_s, lien_ptr, anode_ptr,
         feanode_ptr, nbc_part, ebc_part, gbc );
@@ -203,7 +203,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
       PetscLogEventBegin(vec_assem_1_event, 0,0,0,0);
 #endif
 
-      gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, sol,
+      gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
           curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
           quad_v, quad_s, lien_ptr, anode_ptr,
           feanode_ptr, nbc_part, ebc_part, gbc );
