@@ -4,6 +4,7 @@ PERIGEE is a nonlinear dynamic finite element / isogeometric analysis code for m
 ## Table of Contents
 
 - [Install](#Install)
+- [Build](#Build)
 - [References](#References)
 
 ## Install
