@@ -19,7 +19,8 @@ export LD_LIBRARY_PATH=/home/groups/amarsden/lib-perigee/VTK-7.1.1-shared/lib:$L
  
 3. After the libraries are installed, one has to modify the configuration file in the [conf](conf) folder, following the steps [here](docs/configure_perigee_guide.md). *If you are on Sherlock@Stanford, you do not need to do anything at this step. The CMake configuration file for Sherlock is [here](conf/stanford_sherlock.cmake). As long as you have your machine named as `sherlock`, PERIGEE will load the proper CMake file and compile the code*.
 
-4. Do an out-of-source build. Create a folder `build` out of the PERGIEE source directory. Enter the folder, and run the following command to build a suite of heat equation solvers.
+## Build
+We need to first create a folder `build` out of the PERGIEE source directory. Enter the folder, and run the following command to build a suite of heat equation solvers.
 ```sh
 CMake ~/PERIGEE/examples/nonlinear_heat_eqn/
 make
