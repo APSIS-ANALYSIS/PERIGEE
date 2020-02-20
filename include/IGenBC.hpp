@@ -51,6 +51,28 @@ class IGenBC
       return 0.0;
     }
 
+
+    // --------------------------------------------------------------
+    // Get the dP/d(dot_Q) for surface ii
+    // for implicit BC's, this value is defined via a difference quotient
+    // that is, (get_P(dot_Q+epsilon) - get_P(dot_Q)) / epsilon
+    // for simple models, e.g. inductance type bc, this value is just
+    // the inductance value on this bc.
+    // --------------------------------------------------------------
+    virtual double get_n( const int &ii, const double &dot_Q ) const
+    {
+      SYS_T::print_fatal("Error: IGenBC::get_n is not implemented.\n");
+      return 0.0;
+    }
+
+    virtual double get_n( const int &ii, const double &dot_Q,
+       const double &Q ) const
+    {
+      SYS_T::print_fatal("Error: IGenBC::get_n is not implemented.\n");
+      return 0.0;
+    }
+
+
     // --------------------------------------------------------------
     // Get the P value for surface ii, the traction on the surface is
     // modeled as h = P I
