@@ -1,5 +1,5 @@
 # PERIGEE
-PERIGEE is a nonlinear dynamic finite element / isogeometric analysis code for multiphysics simulations. The code has been developed with the goal of providing a single C++ framework for parallel implementation of different physics problems using different element technologies.
+PERIGEE is a nonlinear dynamic finite element / isogeometric analysis code for multiphysics simulations. The code has been developed with the goal of providing an object-oriented framework for parallel implementation of multiphysics problems using different finite element technologies.
 
 ## Table of Contents
 
@@ -26,6 +26,7 @@ We need to first create a folder `build` out of the PERGIEE source directory. En
 CMake ~/PERIGEE/examples/nonlinear_heat_eqn/
 make
 ```
+
 
 ## References
 ### Finite Element Method
