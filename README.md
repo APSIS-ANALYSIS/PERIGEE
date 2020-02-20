@@ -9,15 +9,22 @@ PERIGEE is a nonlinear dynamic finite element / isogeometric analysis code for m
 ## Install
 Please follow the following steps to compile PERIGEE.
 
-1. For Sherlock@Stanford users, go to step 2. Before compiling PERIGEE, one has to install several libraries. A quick guide for library installation is [here](docs/install_external_libs.md) and [there](docs/install-advanced.md) for advanced users. After the libraries are all properly installed, proceed to step 3.
+1. For Sherlock@Stanford users, go to step 2. Before compiling PERIGEE, one has to install several libraries. A quick guide for library installation is [here](docs/install_external_libs.md) and a slightly advanced guide is [there](docs/install-advanced.md). After the libraries are all properly installed, proceed to step 3.
 
-2. On Sherlock@Stanford, all the libraries have been installed in `/home/groups/amarsden/lib-perigee`. You need to add the following to your `.bash_profile` or `.bashrc` file to give your machine a name, and then proceed to step 3. With the `MACHINE_NAME`, PERIGEE will load the proper configuration file for compiling.
+2. On Sherlock@Stanford, all the libraries have been installed in `/home/groups/amarsden/lib-perigee`. You need to add the following to your `.bash_profile` or `.bashrc` file to define `MACHINE_NAME` as an environment variable, and then proceed to step 3. With the `MACHINE_NAME`, PERIGEE can load the proper configuration file for compiling.
 ```sh
 export MACHINE_NAME=sherlock
 export LD_LIBRARY_PATH=/home/groups/amarsden/lib-perigee/VTK-7.1.1-shared/lib:$LD_LIBRARY_PATH
 ```
  
 3. After the libraries are installed, one has to modify the configuration file in the [conf](conf) folder, following the steps [here](docs/configure_perigee_guide.md). *If you are on Sherlock@Stanford, you do not need to do anything at this step. The CMake configuration file for Sherlock is [here](conf/stanford_sherlock.cmake). As long as you have your machine named as `sherlock`, PERIGEE will load the proper CMake file and compile the code*.
+
+4. Do an out-of-source build. Create a folder `build` out of the PERGIEE source directory. Enter the folder, and run 
+```sh
+CMake ~/PERIGEE/examples/nonlinear_heat_eqn/
+make
+```
+The code will be built for a heat transfer problem.
 
 ## References
 ### Finite Element Method
