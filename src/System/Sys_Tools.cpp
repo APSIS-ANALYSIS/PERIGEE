@@ -285,6 +285,12 @@ int SYS_T::get_genbc_file_type( const char * const &lpn_filename )
   {
     return 2;
   }
+  else if( bc_type.compare("Inductance") ==0
+      || bc_type.compare("inductance") == 0
+      || bc_type.compare("INDUCTANCE") == 0 )
+  {
+    return 3;
+  }
   else
   {
     return 0;
