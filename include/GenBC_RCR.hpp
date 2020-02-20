@@ -24,11 +24,19 @@ class GenBC_RCR : public IGenBC
 
     virtual int get_num_ebc() const {return num_ebc;}
 
-    virtual double get_m( const int &ii, const double &in_Q ) const;
+    virtual double get_m( const int &ii, const double &in_dot_Q,
+       const double &in_Q ) const;
+
+    virtual double get_n( const int &ii, const double &in_dot_Q,
+       const double &in_Q ) const
+    {
+      return 0.0;
+    }
 
     // Obtain P in order to the define the outlet traction for the ii-th 
     // outlet surface
-    virtual double get_P( const int &ii, const double &in_Q ) const;
+    virtual double get_P( const int &ii, const double &in_dot_Q,
+       const double &in_Q ) const;
 
     virtual double get_P0( const int &ii ) const
     {

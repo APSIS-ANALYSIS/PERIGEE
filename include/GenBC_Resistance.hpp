@@ -26,14 +26,21 @@ class GenBC_Resistance : public IGenBC
 
     // We do not perform boundary check. Users are responsible to
     // make sure 0 <= ii < num_ebc;
-    virtual double get_m( const int &ii, const double &Q ) const
+    virtual double get_m( const int &ii, const double &dot_Q, const double &Q ) const
     {
       return resis[ii];
     }
 
     // We do not perform boundary check. Users are responsible to
     // make sure 0 <= ii < num_ebc;
-    virtual double get_P( const int &ii, const double &Q ) const
+    virtual double get_n( const int &ii, const double &dot_Q, const double &Q ) const
+    {
+      return 0.0;
+    }
+    
+    // We do not perform boundary check. Users are responsible to
+    // make sure 0 <= ii < num_ebc;
+    virtual double get_P( const int &ii, const double &dot_Q, const double &Q ) const
     {
       return resis[ii] * Q + pres_offset[ii];
     }

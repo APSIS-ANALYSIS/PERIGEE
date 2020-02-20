@@ -95,20 +95,22 @@ void GenBC_RCR::print_info() const
 }
 
 
-double GenBC_RCR::get_m( const int &ii, const double &in_Q ) const
+double GenBC_RCR::get_m( const int &ii, const double &in_dot_Q,
+   const double &in_Q ) const
 {
   double diff = std::abs(in_Q) * relTol;
 
   if( diff < absTol ) diff = absTol;  
 
-  const double left  = get_P(ii, in_Q + 0.5 * diff);
-  const double right = get_P(ii, in_Q - 0.5 * diff);
+  const double left  = get_P(ii, in_dot_Q, in_Q + 0.5 * diff);
+  const double right = get_P(ii, in_dot_Q, in_Q - 0.5 * diff);
 
   return (left - right) / diff;
 }
 
 
-double GenBC_RCR::get_P( const int &ii, const double &in_Q ) const
+double GenBC_RCR::get_P( const int &ii, const double &in_dot_Q,
+   const double &in_Q ) const
 {
   const double fac13 = 1.0 / 3.0;
   const double fac23 = 2.0 / 3.0;

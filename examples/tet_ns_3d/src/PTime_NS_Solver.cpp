@@ -155,6 +155,10 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     // Calculate the flow rate & averaged pressure on all outlets
     for(int face=0; face<ebc_part -> get_num_ebc(); ++face)
     {
+      // Calculate the 3D dot flow rate on the outlet
+      const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( 
+          cur_dot_sol, lassem_fluid_ptr, elements, quad_s, anode_ptr, ebc_part, face); 
+
       // Calculate the 3D flow rate on the outlet
       const double face_flrate = gassem_ptr -> Assem_surface_flowrate( 
           cur_sol, lassem_fluid_ptr, elements, quad_s, anode_ptr, ebc_part, face); 
@@ -164,8 +168,9 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
           cur_sol, lassem_fluid_ptr, elements, quad_s, anode_ptr, ebc_part, face);
 
       // Calculate the 0D pressure from LPN model
+      const double dot_lpn_flowrate = dot_face_flrate;
       const double lpn_flowrate = face_flrate;
-      const double lpn_pressure = gbc -> get_P( face, lpn_flowrate );
+      const double lpn_pressure = gbc -> get_P( face, dot_lpn_flowrate, lpn_flowrate );
 
       // Update the initial values in genbc
       gbc -> reset_initial_sol( face, lpn_flowrate, lpn_pressure );
