@@ -43,7 +43,7 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   int * onnz = new int [nlocrow];
   const int empirical_neibor_number = in_nz_estimate;
   
-  PetscPrintf(PETSC_COMM_WORLD, "     Empirical nonzero estimate: %d \n", empirical_neibor_number);
+  SYS_T::commPrint("     Empirical nonzero estimate: %d \n", empirical_neibor_number);
 
   // Obtain the diagonal and off-diagonal nonzero entry number dnnz and onnz
   Get_dnz_onz( nlocalnode,  empirical_neibor_number,

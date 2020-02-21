@@ -24,7 +24,6 @@ class Matrix_PETSc
     // ------------------------------------------------------------------------
     Matrix_PETSc( const int &loc_row, const int &loc_col );
 
-    
     // ------------------------------------------------------------------------
     // Constructor: Generate a sparse square matrix with size defined
     // locally. Local row/column num = pnode_ptr->get_nlocalnode() 
@@ -32,7 +31,6 @@ class Matrix_PETSc
     // ------------------------------------------------------------------------
     Matrix_PETSc( const APart_Node * const &pnode_ptr );
 
-    
     // ------------------------------------------------------------------------
     // Constructor: Generate a sparse square matrix with size defined
     // locally. Local row/column num = pnode_ptr->get_nlocalnode()
@@ -41,12 +39,10 @@ class Matrix_PETSc
     Matrix_PETSc( const APart_Node * const &pnode_ptr,
        const ALocal_NodalBC * const &bc_part );
 
-
     // ------------------------------------------------------------------------
     // Destroyer
     // ------------------------------------------------------------------------
     virtual ~Matrix_PETSc();
-
 
     // ------------------------------------------------------------------------
     // ! Flag : Fix nonzero structure
@@ -56,7 +52,6 @@ class Matrix_PETSc
     void Fix_nonzero_str()
     {MatSetOption(K, MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);}
 
-
     // ------------------------------------------------------------------------
     // ! Flag : New allocation error
     //          Add or insert in new locations will generate an error message.
@@ -65,7 +60,6 @@ class Matrix_PETSc
     // ------------------------------------------------------------------------
     void Fix_nonzero_err_str()
     {MatSetOption(K, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);}
-
 
     // ------------------------------------------------------------------------
     // ! Flag : Ignore new allocation
@@ -77,32 +71,27 @@ class Matrix_PETSc
     void Release_nonzero_err_str()
     {MatSetOption(K, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);}
 
-
     // ------------------------------------------------------------------------
     // ! Flag : Keep nonzero pattern of the matrix K
     // ------------------------------------------------------------------------
     void Keep_nonzero_pattern() 
     {MatSetOption(K, MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);}
 
-
     // ------------------------------------------------------------------------
     // MatView : print the matrix on screen
     // ------------------------------------------------------------------------
     void print_matrix() const {MatView(K, PETSC_VIEWER_STDOUT_WORLD);}
-
 
     // ------------------------------------------------------------------------
     // Clear K
     // ------------------------------------------------------------------------
     void Clear() {MatZeroEntries(K);}
 
-
     // ------------------------------------------------------------------------
     // Gen_id : Generate an idnetity matrix that is compatible with the
     // mesh partition.
     // ------------------------------------------------------------------------
     void gen_id( const APart_Node * const &pnode_ptr );
-
 
     // ------------------------------------------------------------------------
     // Gen_perm_bc : Generate a permutation matrix accounting for the essential
@@ -111,7 +100,6 @@ class Matrix_PETSc
     void gen_perm_bc( const APart_Node * const &pnode_ptr , 
        const ALocal_NodalBC * const &bc_part );
 
-    
     // ------------------------------------------------------------------------
     // Gen_extractor_for_Dirichlet_nodes : Generate a matrix that is zero for
     // all regular rows. On the row corresponding to the Dirichlet dof, make
@@ -126,7 +114,6 @@ class Matrix_PETSc
     // ------------------------------------------------------------------------
     void gen_extractor_for_Dirichlet_nodes( const APart_Node * const &pnode_ptr ,
         const ALocal_NodalBC * const &bc_part );
-
 
     // ------------------------------------------------------------------------
     // MatMultSol : perform a matrix-vector multiplication : sol = K sol

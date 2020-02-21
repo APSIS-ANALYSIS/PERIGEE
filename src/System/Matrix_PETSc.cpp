@@ -2,7 +2,7 @@
 
 Matrix_PETSc::Matrix_PETSc( const int &loc_row, const int &loc_col )
 {
-  SYS_T::commPrint("===> PETSc-3.6.x: MatCreateAIJ called. \n");
+  SYS_T::commPrint("===> PETSc: MatCreateAIJ called. \n");
   MatCreateAIJ(PETSC_COMM_WORLD, loc_row, loc_col, PETSC_DECIDE, PETSC_DECIDE, 
       1, PETSC_NULL, 1, PETSC_NULL, &K);
 
@@ -17,7 +17,7 @@ Matrix_PETSc::Matrix_PETSc( const int &loc_row, const int &loc_col )
 
 Matrix_PETSc::Matrix_PETSc(const APart_Node * const &pnode_ptr)
 {
-  SYS_T::commPrint("===> PETSc-3.6.x: MatCreateAIJ called. \n");
+  SYS_T::commPrint("===> PETSc: MatCreateAIJ called. \n");
   
   lm = pnode_ptr->get_nlocalnode() * pnode_ptr->get_dof();
   ln = lm;
@@ -34,7 +34,7 @@ Matrix_PETSc::Matrix_PETSc(const APart_Node * const &pnode_ptr)
 Matrix_PETSc::Matrix_PETSc(const APart_Node * const &pnode_ptr,
     const ALocal_NodalBC * const &bc_part )
 {
-  SYS_T::commPrint("===> PETSc-3.6.x: MatCreateAIJ called. \n");
+  SYS_T::commPrint("===> PETSc: MatCreateAIJ called. \n");
   
   lm = pnode_ptr->get_nlocalnode() * bc_part->get_dofMat();
   ln = lm;
