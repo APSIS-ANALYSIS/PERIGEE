@@ -31,8 +31,8 @@ class GenBC_Inductance : public IGenBC
     virtual double get_m( const int &ii, const double &dot_Q,
        const double &Q ) const
     {
-      return induct[ii] / dt3d;
-      //return 0.0;
+      //return induct[ii] / dt3d;
+      return 0.0;
     }
 
     // We do not perform boundary check. Users are responsible to
@@ -40,8 +40,8 @@ class GenBC_Inductance : public IGenBC
     virtual double get_n( const int &ii, const double &dot_Q,
        const double &Q ) const
     {
-      return 0.0;
-      //return induct[ii];
+      //return 0.0;
+      return induct[ii];
     }
 
 
@@ -50,8 +50,8 @@ class GenBC_Inductance : public IGenBC
     virtual double get_P( const int &ii, const double &dot_Q,
        const double &Q ) const
     {
-      return induct[ii] * (Q - Q0[ii]) / dt3d + pres_offset[ii];
-      //return induct[ii] * dot_Q + pres_offset[ii];
+      //return induct[ii] * (Q - Q0[ii]) / dt3d + pres_offset[ii];
+      return induct[ii] * dot_Q + pres_offset[ii];
     }
 
     virtual double get_P0( const int &ii ) const
