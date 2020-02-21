@@ -184,7 +184,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
       {
         std::ofstream ofile;
         ofile.open( ebc_part->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
-        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
+        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<dot_face_flrate<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
         ofile.close();
       }
       MPI_Barrier(PETSC_COMM_WORLD);
