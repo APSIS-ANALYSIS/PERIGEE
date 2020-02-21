@@ -285,7 +285,7 @@ int main(int argc, char *argv[])
   else if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 2  )
     gbc = new GenBC_RCR( lpn_file.c_str(), 1000, initial_step );
   else if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 3  )
-    gbc = new GenBC_Inductance( lpn_file.c_str() );
+    gbc = new GenBC_Inductance( lpn_file.c_str(), initial_step );
   else
     SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
 

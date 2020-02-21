@@ -1,6 +1,8 @@
 #include "GenBC_Inductance.hpp"
 
-GenBC_Inductance::GenBC_Inductance( const char * const &lpn_filename )
+GenBC_Inductance::GenBC_Inductance( const char * const &lpn_filename,
+   const double &in_dt3d )
+: dt3d( in_dt3d )
 {
   // Now read the values of induct_L and induct_p from disk file lpn_filename
   std::string temp_name( lpn_filename );
