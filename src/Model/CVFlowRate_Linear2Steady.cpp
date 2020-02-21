@@ -34,8 +34,8 @@ double CVFlowRate_Linear2Steady::get_flow_rate(const double &time) const
 void CVFlowRate_Linear2Steady::print_info() const
 {
   SYS_T::commPrint("---- CVFlowRate_Linear2Steady:\n");
-  PetscPrintf(PETSC_COMM_WORLD, "     Steady flow rate is %e \n", target_flow_rate);
-  PetscPrintf(PETSC_COMM_WORLD, "     Time to steady state is %e \n", thred_time);
+  SYS_T::commPrint("  Steady flow rate is %e \n", target_flow_rate);
+  SYS_T::commPrint("  Time to steady state is %e \n", thred_time);
 }
 
 // EOF

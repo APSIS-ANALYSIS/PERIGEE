@@ -110,10 +110,10 @@ double CVFlowRate_Unsteady::get_flow_rate(const double &time) const
 void CVFlowRate_Unsteady::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
-  SYS_T::commPrint("     CVFlowRate_Unsteady: ");
-  PetscPrintf(PETSC_COMM_WORLD, " w = %e, period =%e \n", w, period);
-  PetscPrintf(PETSC_COMM_WORLD, "     a[0] + Sum{ a[i] cos(i x w x t) + b[i] sin(i x w x t) }, for i = 1,...,%d. \n", num_of_mode);
-  for(int ii=0; ii<=num_of_mode; ++ii) PetscPrintf(PETSC_COMM_WORLD, "     i = %d, a = %e, b = %e \n", ii, coef_a[ii], coef_b[ii]);
+  SYS_T::commPrint("  CVFlowRate_Unsteady:\n");
+  SYS_T::commPrint("  w = %e, period =%e \n", w, period);
+  SYS_T::commPrint("  a[0] + Sum{ a[i] cos(i x w x t) + b[i] sin(i x w x t) }, for i = 1,...,%d. \n", num_of_mode);
+  for(int ii=0; ii<=num_of_mode; ++ii) SYS_T::commPrint("  i = %d, a = %e, b = %e \n", ii, coef_a[ii], coef_b[ii]);
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
