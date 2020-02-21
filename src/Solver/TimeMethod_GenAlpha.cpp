@@ -48,17 +48,18 @@ TimeMethod_GenAlpha::TimeMethod_GenAlpha( const double &input_spectral,
 
 void TimeMethod_GenAlpha::print_info() const
 {
-  PetscPrintf(PETSC_COMM_WORLD, "----------------------------------------------------------- \n");
-  PetscPrintf(PETSC_COMM_WORLD, "Generalized-alpha method ");
-  if(is2nd) PetscPrintf(PETSC_COMM_WORLD, "for 2nd-order system: \n");
-  else PetscPrintf(PETSC_COMM_WORLD, "for 1st-order system: \n");
-  if(is_rho_set) PetscPrintf(PETSC_COMM_WORLD, "  --- rho_inf: %e \n", rho_infty);
-  else PetscPrintf(PETSC_COMM_WORLD, "  --- rho_inf: unset \n");
-  PetscPrintf(PETSC_COMM_WORLD, "  --- Alpha_f: %e \n", alpha_f);
-  PetscPrintf(PETSC_COMM_WORLD, "  --- Alpha_m: %e \n", alpha_m);
-  PetscPrintf(PETSC_COMM_WORLD, "  --- Gamma  : %e \n", gamma);
-  PetscPrintf(PETSC_COMM_WORLD, "  --- Beta   : %e \n", beta);
-  PetscPrintf(PETSC_COMM_WORLD, "----------------------------------------------------------- \n");
+  SYS_T::commPrint("----------------------------------------------------------- \n");
+  SYS_T::commPrint("Generalized-alpha method ");
+  if(is2nd) SYS_T::commPrint("for 2nd-order system: \n");
+  else SYS_T::commPrint("for 1st-order system: \n");
+  if(is_rho_set) SYS_T::commPrint("  --- rho_inf: %e \n", rho_infty);
+  else SYS_T::commPrint("  --- rho_inf: unset \n");
+  SYS_T::commPrint("  --- Alpha_f: %e \n", alpha_f);
+  SYS_T::commPrint("  --- Alpha_m: %e \n", alpha_m);
+  SYS_T::commPrint("  --- Gamma  : %e \n", gamma);
+  if(is2nd) SYS_T::commPrint("  --- Beta   : %e \n", beta);
+  else SYS_T::commPrint("  --- Beta   : %e (unused) \n", beta);
+  SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
 // EOF

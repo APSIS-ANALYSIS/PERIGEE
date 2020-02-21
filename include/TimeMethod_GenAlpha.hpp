@@ -33,8 +33,7 @@
 //            CAD & FEA, J.A. Cottrell, et al. 2009.
 // Date: Dec 3rd 2013
 // ==================================================================
-
-#include "petscsys.h"
+#include "Sys_Tools.hpp"
 
 class TimeMethod_GenAlpha
 {
@@ -77,6 +76,7 @@ class TimeMethod_GenAlpha
 
     ~TimeMethod_GenAlpha();
 
+    // Functions give access to the method parameter
     double get_alpha_m() const {return alpha_m;}
     
     double get_alpha_f() const {return alpha_f;}
@@ -93,11 +93,9 @@ class TimeMethod_GenAlpha
 
   private:
     const double rho_infty;
-    double alpha_m;
-    double alpha_f;
-    double gamma;
-    double beta;
-
+    
+    double alpha_m, alpha_f, gamma, beta;
+    
     // indicate if the method is for 1st-order and 2nd-order system
     const bool is2nd;
 

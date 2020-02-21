@@ -230,7 +230,7 @@ int main(int argc, char *argv[])
   // ===== Generalized-alpha ====
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
   const double genA_spectrium = 0.5;
-  const bool genA_is2ndSystem = false;
+  const bool genA_is2ndSystem = false; 
   TimeMethod_GenAlpha * tm_galpha_ptr = new TimeMethod_GenAlpha(
       genA_spectrium, genA_is2ndSystem);
   tm_galpha_ptr->print_info();
