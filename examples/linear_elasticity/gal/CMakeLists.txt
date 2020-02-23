@@ -38,7 +38,6 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Tet_Tools.cpp
   ${perigee_source}/Mesh/tetgen.cxx
   ${perigee_source}/Mesh/predicates.cxx
-  ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   ${perigee_source}/Mesh/IEN_Tetra_P1.cpp
   ${perigee_source}/Mesh/INodalBC.cpp
   ${perigee_source}/Mesh/IElemBC.cpp
@@ -67,8 +66,6 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/System/Matrix_3x3.cpp
   ${perigee_source}/System/Matrix_2x2.cpp
   ${perigee_source}/System/Math_Tools.cpp
-  ${perigee_source}/System/Tensor4_3D.cpp
-  ${perigee_source}/System/Tensor4_2D.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
   ${perigee_source}/System/HDF5_Reader.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
@@ -89,16 +86,13 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/PGAssem.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
   ${perigee_SOURCE_DIR}/../src/PDNSolution_LinearElastic_3D.cpp
-  ${perigee_SOURCE_DIR}/../src/PDNSolution_Mixed_LinearElastic_3D.cpp
   ${perigee_SOURCE_DIR}/../src/PLocAssem_LinearElastic_3D_Static.cpp
-  ${perigee_SOURCE_DIR}/../src/PLocAssem_Mixed_LinearElastic_3D_Static.cpp
   )
 
 
 # 3. Postprocess cpp
 SET( perigee_postprocess_lib_src
   ${perigee_source}/Postproc_Tool/PostVectSolution.cpp
-  ${perigee_source}/Postproc_Tool/Post_error.cpp
   ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   ${perigee_source}/Postproc_Tool/Interpolater.cpp
   ${perigee_source}/Mesh/QuadPts_vis_tet4.cpp
