@@ -41,6 +41,11 @@ class IGenBC
     virtual double get_m( const int &ii, const double &dot_Q,
        const double &Q ) const = 0;
 
+    virtual double get_m( const int &ii, const double &Q ) const
+    {
+      return get_m(ii, 0.0, Q);
+    }
+
     // --------------------------------------------------------------
     // Get the dP/d(dot_Q) for surface ii
     // for implicit BC's, this value is defined via a difference quotient
@@ -59,6 +64,11 @@ class IGenBC
     // --------------------------------------------------------------
     virtual double get_P( const int &ii, const double &dot_Q,
        const double &Q ) const = 0;
+
+    virtual double get_P( const int &ii, const double &Q ) const
+    {
+      return get_P(ii, 0.0, Q);
+    }
 
     // --------------------------------------------------------------
     // Return the pressure at the time step n, which is used as the
