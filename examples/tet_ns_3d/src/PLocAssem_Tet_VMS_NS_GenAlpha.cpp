@@ -306,7 +306,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
           - NA * tau_m * rho0 * r_dot_gradu
           + NA_x * tau_c * div_vel
           - r_dot_gradR * tau_m_2 * rho0 * rx
-          + velo_prime_dot_gradR * tau_dc * rho0 
+          + velo_prime_dot_gradR * tau_dc 
           * (u_prime * u_x + v_prime * u_y + w_prime * u_z)
           - NA * rho0 * f1 );
 
@@ -320,7 +320,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
           - NA * tau_m * rho0 * r_dot_gradv
           + NA_y * tau_c * div_vel
           - r_dot_gradR * tau_m_2 * rho0 * ry
-          + velo_prime_dot_gradR * tau_dc * rho0
+          + velo_prime_dot_gradR * tau_dc
           * (u_prime * v_x + v_prime * v_y + w_prime * v_z)
           - NA * rho0 * f2 );
 
@@ -334,7 +334,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
           - NA * tau_m * rho0 * r_dot_gradw
           + NA_z * tau_c * div_vel
           - r_dot_gradR * tau_m_2 * rho0 * rz
-          + velo_prime_dot_gradR * tau_dc * rho0
+          + velo_prime_dot_gradR * tau_dc
           * (u_prime * w_x + v_prime * w_y + w_prime * w_z)
           - NA * rho0 * f3 );
     }
@@ -503,7 +503,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
           - NA * tau_m * rho0 * r_dot_gradu
           + NA_x * tau_c * div_vel
           - r_dot_gradR * tau_m_2 * rho0 * rx
-          + velo_prime_dot_gradR * tau_dc * rho0 
+          + velo_prime_dot_gradR * tau_dc 
           * (u_prime * u_x + v_prime * u_y + w_prime * u_z)
           - NA * rho0 * f1 );
 
@@ -517,7 +517,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
           - NA * tau_m * rho0 * r_dot_gradv
           + NA_y * tau_c * div_vel
           - r_dot_gradR * tau_m_2 * rho0 * ry
-          + velo_prime_dot_gradR * tau_dc * rho0
+          + velo_prime_dot_gradR * tau_dc
           * (u_prime * v_x + v_prime * v_y + w_prime * v_z)
           - NA * rho0 * f2 );
 
@@ -531,7 +531,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
           - NA * tau_m * rho0 * r_dot_gradw
           + NA_z * tau_c * div_vel
           - r_dot_gradR * tau_m_2 * rho0 * rz
-          + velo_prime_dot_gradR * tau_dc * rho0
+          + velo_prime_dot_gradR * tau_dc
           * (u_prime * w_x + v_prime * w_y + w_prime * w_z)
           - NA * rho0 * f3 );
 
@@ -602,7 +602,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * rz * NA_z * drx_du_B
               - rho0 * tau_m_2 * rx * NA_y * dry_du_B
               - rho0 * tau_m_2 * rx * NA_z * drz_du_B
-              + velo_prime_dot_gradR * tau_dc * rho0 * velo_prime_dot_gradNB ) );
+              + velo_prime_dot_gradR * tau_dc * velo_prime_dot_gradNB ) );
 
         Sub_Tan[6][index] += gwts * ( 
             alpha_m * (-1.0) * rho0_2 * (tau_m * u_y * NANB + tau_m_2 * rx * NAyNB)
@@ -660,7 +660,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_x * (rx * dry_dv_B + ry * drx_dv_B)
               - 2.0 * rho0 * tau_m_2 * ry * NA_y * dry_dv_B
               - rho0 * tau_m_2 * NA_z * (ry * drz_dv_B + rz * dry_dv_B)
-              + velo_prime_dot_gradR * tau_dc * rho0 * velo_prime_dot_gradNB ) );
+              + velo_prime_dot_gradR * tau_dc * velo_prime_dot_gradNB ) );
 
         Sub_Tan[11][index] += gwts * (
             alpha_m * (-1.0) * rho0_2 * ( tau_m * v_z * NANB + tau_m_2 * ry * NAzNB ) 
@@ -718,7 +718,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_x * (rx * drz_dw_B + rz * drx_dw_B)
               - rho0 * tau_m_2 * NA_y * (ry * drz_dw_B + rz * dry_dw_B)
               - 2.0 * rho0 * tau_m_2 * NA_z * rz * drz_dw_B 
-              + velo_prime_dot_gradR * tau_dc * rho0 * velo_prime_dot_gradNB ) );
+              + velo_prime_dot_gradR * tau_dc * velo_prime_dot_gradNB ) );
       } // B-loop
     } // A-loop
   } // qua-loop
@@ -744,7 +744,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
       }
     }
   }
-
 }
 
 
