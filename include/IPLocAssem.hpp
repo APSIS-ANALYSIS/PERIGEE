@@ -741,8 +741,6 @@ class IPLocAssem
     virtual void Assem_Residual_EBC(
         const int &ebc_id,
         const double &time, const double &dt,
-        const double * const &vec_a,
-        const double * const &vec_b,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -809,7 +807,6 @@ class IPLocAssem
     virtual void Assem_Residual_EBC_Resistance(
         const int &ebc_id,
         const double &flow_rate,
-        const double * const &vec_b,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,

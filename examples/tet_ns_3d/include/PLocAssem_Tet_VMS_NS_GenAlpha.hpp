@@ -89,8 +89,6 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
     virtual void Assem_Residual_EBC(
         const int &ebc_id,
         const double &time, const double &dt,
-        const double * const &vec_a,
-        const double * const &vec_b,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -115,7 +113,6 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
     virtual void Assem_Residual_EBC_Resistance(
         const int &ebc_id,
         const double &val,
-        const double * const &vec_b,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,

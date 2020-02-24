@@ -866,8 +866,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
 void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
         const int &ebc_id,
         const double &time, const double &dt,
-        const double * const &vec_a,
-        const double * const &vec_b,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -984,7 +982,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_pressure_area( const double * const &vec
 void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
         const int &ebc_id,
         const double &val,
-        const double * const &vec_b,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
