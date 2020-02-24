@@ -171,7 +171,8 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
           const double &dt, const double * const &dxi_dx,
           const double &u, const double &v, const double &w ) const;
 
-      // Return tau_bar := (v' G v')^-0.5, which scales like a time variable
+      // Return tau_bar := (v' G v')^-0.5 / rho0, 
+      //        which scales like TL^3/M
       void get_DC( double &dc_tau, const double * const &dxi_dx,
           const double &u, const double &v, const double &w ) const;
 
