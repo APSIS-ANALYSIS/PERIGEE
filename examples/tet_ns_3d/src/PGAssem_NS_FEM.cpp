@@ -788,13 +788,10 @@ void PGAssem_NS_FEM::NatBC_Resis_G(
       ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
       ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
-      GetLocal(array_a, LSIEN, snLocBas, local_as);
-      GetLocal(array_b, LSIEN, snLocBas, local_bs);
-
       // Here, val is Pressure, and is used as the surface traction h = P I 
       // to calculate the boundary integral
       lassem_ptr->Assem_Residual_EBC_Resistance(ebc_id, val,
-          local_bs, element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
 
       for(int ii=0; ii<snLocBas; ++ii)
       {
@@ -891,12 +888,9 @@ void PGAssem_NS_FEM::NatBC_Resis_KG(
       ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
       ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
-      GetLocal(array_a, LSIEN, snLocBas, local_as);
-      GetLocal(array_b, LSIEN, snLocBas, local_bs);
-
       // For here, we scale the int_NA nx/y/z by factor 1
       lassem_ptr->Assem_Residual_EBC_Resistance(ebc_id, 1.0,
-          local_bs, element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
 
       // Residual vector is scaled by the resistance value
       for(int ii=0; ii<snLocBas; ++ii)
@@ -941,10 +935,8 @@ void PGAssem_NS_FEM::NatBC_Resis_KG(
 
     if( num_face_nodes > 0 ) 
     {
-      delete [] Tan; 
-      Tan = nullptr;
-      delete [] scol_idx;
-      scol_idx = nullptr;
+      delete [] Tan; Tan = nullptr;
+      delete [] scol_idx; scol_idx = nullptr;
     }
   }
 
