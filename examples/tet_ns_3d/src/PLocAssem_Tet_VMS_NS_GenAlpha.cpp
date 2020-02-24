@@ -348,13 +348,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
   const double two_mu = 2.0 * vis_mu;
   const double rho0_2 = rho0 * rho0;
-  double NA, NA_x, NA_y, NA_z;
-  double velo_dot_gradR, r_dot_gradR;
-  double r_dot_gradu, r_dot_gradv, r_dot_gradw;
 
-  double velo_prime_dot_gradR;
-
-  double NB, NB_x, NB_y, NB_z, NB_xx, NB_yy, NB_zz, NB_lap;
   double NANB, NAxNB, NAyNB, NAzNB;
   double NANBx, NAxNBx, NAyNBx, NAzNBx;
   double NANBy, NAxNBy, NAyNBy, NAzNBy;
@@ -363,8 +357,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
   double drx_du_B, drx_dv_B, drx_dw_B;
   double dry_du_B, dry_dv_B, dry_dw_B;
   double drz_du_B, drz_dv_B, drz_dw_B;
-
-  double velo_dot_gradNB, velo_prime_dot_gradNB;
 
   const double curr = time + alpha_f * dt;
 
@@ -461,14 +453,14 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
     for(int A=0; A<nLocBas; ++A)
     {
-      NA = R[A]; NA_x = dR_dx[A]; NA_y = dR_dy[A]; NA_z = dR_dz[A];
+      const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
-      velo_dot_gradR = NA_x * u + NA_y * v + NA_z * w;
-      r_dot_gradR = NA_x * rx + NA_y * ry + NA_z * rz;
-      r_dot_gradu = u_x * rx + u_y * ry + u_z * rz;
-      r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
-      r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
-      velo_prime_dot_gradR = NA_x * u_prime + NA_y * v_prime + NA_z * w_prime;
+      const double velo_dot_gradR = NA_x * u + NA_y * v + NA_z * w;
+      const double r_dot_gradR = NA_x * rx + NA_y * ry + NA_z * rz;
+      const double r_dot_gradu = u_x * rx + u_y * ry + u_z * rz;
+      const double r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
+      const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
+      const double velo_prime_dot_gradR = NA_x * u_prime + NA_y * v_prime + NA_z * w_prime;
 
       Residual[4*A] += gwts * ( NA * div_vel + tau_m * r_dot_gradR );
 
@@ -517,11 +509,11 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
       for(int B=0; B<nLocBas; ++B)
       {
         const int index = B + A * nLocBas;
-        NB = R[B]; NB_x = dR_dx[B]; NB_y = dR_dy[B]; NB_z = dR_dz[B];
-        NB_xx = d2R_dxx[B]; NB_yy = d2R_dyy[B]; NB_zz = d2R_dzz[B];
-        NB_lap = NB_xx + NB_yy + NB_zz;
-        velo_dot_gradNB = u * NB_x + v * NB_y + w * NB_z;
-        velo_prime_dot_gradNB = u_prime * NB_x + v_prime * NB_y + w_prime * NB_z;
+        const double NB = R[B], NB_x = dR_dx[B], NB_y = dR_dy[B], NB_z = dR_dz[B];
+        const double NB_xx = d2R_dxx[B], NB_yy = d2R_dyy[B], NB_zz = d2R_dzz[B];
+        const double NB_lap = NB_xx + NB_yy + NB_zz;
+        const double velo_dot_gradNB = u * NB_x + v * NB_y + w * NB_z;
+        const double velo_prime_dot_gradNB = u_prime * NB_x + v_prime * NB_y + w_prime * NB_z;
 
         NANB  = NA*NB; NANBx = NA*NB_x; NANBy = NA*NB_y; NANBz = NA*NB_z;
         NAxNB = NA_x*NB; NAxNBx = NA_x*NB_x; NAxNBy = NA_x*NB_y; NAxNBz = NA_x*NB_z;
