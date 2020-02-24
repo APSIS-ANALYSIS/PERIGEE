@@ -755,17 +755,11 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  double u, u_x, u_y, u_z;
-  double v, v_x, v_y, v_z;
-  double w, w_x, w_y, w_z;
-  double p, f1, f2, f3;
-  double gwts, coor_x, coor_y, coor_z;
-
-  double NA, NA_x, NA_y, NA_z;
+  double f1, f2, f3;
 
   const double two_mu = 2.0 * vis_mu;
 
-  double curr = 0.0;
+  const double curr = 0.0;
 
   Zero_Tangent_Residual();
 
@@ -773,10 +767,10 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
 
   for(int qua=0; qua<nqp; ++qua)
   {
-    u = 0.0; u_x = 0.0; u_y = 0.0; u_z = 0.0;
-    v = 0.0; v_x = 0.0; v_y = 0.0; v_z = 0.0;
-    w = 0.0; w_x = 0.0; w_y = 0.0; w_z = 0.0;
-    p = 0.0; coor_x = 0.0; coor_y = 0.0; coor_z = 0.0;
+    double u = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
+    double v = 0.0, v_x = 0.0, v_y = 0.0, v_z = 0.0;
+    double w = 0.0, w_x = 0.0, w_y = 0.0, w_z = 0.0;
+    double p = 0.0, coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
 
     element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
 
@@ -806,13 +800,13 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
       coor_z += eleCtrlPts_z[ii] * R[ii];
     }
 
-    gwts = element->get_detJac(qua) * quad->get_qw(qua);
+    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
     get_f(coor_x, coor_y, coor_z, curr, f1, f2, f3);
 
     for(int A=0; A<nLocBas; ++A)
     {
-      NA = R[A]; NA_x = dR_dx[A]; NA_y = dR_dy[A]; NA_z = dR_dz[A];
+      const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
       Residual[4*A+1] += gwts * ( NA * rho0 * (u*u_x + v*u_y + w*u_z) 
           - NA_x * p
