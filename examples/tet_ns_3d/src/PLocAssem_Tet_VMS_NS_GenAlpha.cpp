@@ -175,15 +175,11 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
 
   double f1, f2, f3;
 
-  double rx, ry, rz;
-
   double tau_m, tau_c, tau_dc;
-
-  double u_prime, v_prime, w_prime;
 
   const double two_mu = 2.0 * vis_mu;
   double NA, NA_x, NA_y, NA_z;
-  double velo_dot_gradR, div_vel, r_dot_gradR;
+  double velo_dot_gradR, r_dot_gradR;
 
   double r_dot_gradu, r_dot_gradv, r_dot_gradw;
   double velo_prime_dot_gradR; // v' dot grad NA
@@ -265,15 +261,15 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
     const double v_lap = v_xx + v_yy + v_zz;
     const double w_lap = w_xx + w_yy + w_zz;
 
-    rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f1 ) + p_x - vis_mu * u_lap;
-    ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f2 ) + p_y - vis_mu * v_lap;
-    rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f3 ) + p_z - vis_mu * w_lap;
+    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f1 ) + p_x - vis_mu * u_lap;
+    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f2 ) + p_y - vis_mu * v_lap;
+    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f3 ) + p_z - vis_mu * w_lap;
 
-    div_vel = u_x + v_y + w_z;
+    const double div_vel = u_x + v_y + w_z;
 
-    u_prime = -1.0 * tau_m * rx;
-    v_prime = -1.0 * tau_m * ry;
-    w_prime = -1.0 * tau_m * rz;
+    const double u_prime = -1.0 * tau_m * rx;
+    const double v_prime = -1.0 * tau_m * ry;
+    const double w_prime = -1.0 * tau_m * rz;
 
     get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
 
