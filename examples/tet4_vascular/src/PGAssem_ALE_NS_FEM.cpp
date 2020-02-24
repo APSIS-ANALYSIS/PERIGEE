@@ -1072,7 +1072,8 @@ void PGAssem_ALE_NS_FEM::NatBC_Resis_G(
       ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
       ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
-      GetLocal(array_a, LSIEN, snLocBas, local_as);
+      // Get local copy of solution, which is used to update the mesh due to
+      // ALE mesh motion
       GetLocal(array_b, LSIEN, snLocBas, local_bs);
 
       // Here, val is Pressure, and is used as the surface traction h = P I 
@@ -1160,7 +1161,8 @@ void PGAssem_ALE_NS_FEM::NatBC_Resis_KG(
       ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
       ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
-      GetLocal(array_a, LSIEN, snLocBas, local_as);
+      // Get the local copy of solution, the displacement will be used to update
+      // the mesh due to the ALE mesh motion
       GetLocal(array_b, LSIEN, snLocBas, local_bs);
 
       // For here, we scale the int_NA nx/y/z by factor 1
