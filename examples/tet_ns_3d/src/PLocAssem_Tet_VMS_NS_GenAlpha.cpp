@@ -173,12 +173,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  double u, u_t, u_x, u_y, u_z, u_xx, u_yy, u_zz;
-  double v, v_t, v_x, v_y, v_z, v_xx, v_yy, v_zz;
-  double w, w_t, w_x, w_y, w_z, w_xx, w_yy, w_zz;
-  double p, f1, f2, f3;
-  double p_x, p_y, p_z;
-  double gwts, coor_x, coor_y, coor_z;
+  double f1, f2, f3;
 
   double rx, ry, rz;
 
@@ -199,14 +194,14 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
 
   for(int qua=0; qua<nqp; ++qua)
   {
-    u = 0.0; u_t = 0.0; u_x = 0.0; u_y = 0.0; u_z = 0.0;
-    v = 0.0; v_t = 0.0; v_x = 0.0; v_y = 0.0; v_z = 0.0;
-    w = 0.0; w_t = 0.0; w_x = 0.0; w_y = 0.0; w_z = 0.0;
-    p = 0.0; coor_x = 0.0; coor_y = 0.0; coor_z = 0.0;
-    p_x = 0.0; p_y = 0.0; p_z = 0.0;
-    u_xx = 0.0; u_yy = 0.0; u_zz = 0.0;
-    v_xx = 0.0; v_yy = 0.0; v_zz = 0.0;
-    w_xx = 0.0; w_yy = 0.0; w_zz = 0.0;
+    double u = 0.0, u_t = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
+    double v = 0.0, v_t = 0.0, v_x = 0.0, v_y = 0.0, v_z = 0.0;
+    double w = 0.0, w_t = 0.0, w_x = 0.0, w_y = 0.0, w_z = 0.0;
+    double p = 0.0, coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    double p_x = 0.0, p_y = 0.0, p_z = 0.0;
+    double u_xx = 0.0, u_yy = 0.0, u_zz = 0.0;
+    double v_xx = 0.0, v_yy = 0.0, v_zz = 0.0;
+    double w_xx = 0.0, w_yy = 0.0, w_zz = 0.0;
 
     element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
         &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
@@ -262,7 +257,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
 
     const double tau_m_2 = tau_m * tau_m;
 
-    gwts = element->get_detJac(qua) * quad->get_qw(qua);
+    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
     get_f(coor_x, coor_y, coor_z, curr, f1, f2, f3);
 
