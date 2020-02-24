@@ -166,10 +166,12 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
           double &G11, double &G12, double &G13,
           double &G22, double &G23, double &G33 ) const;
 
+      // Return tau_m and tau_c in RB-VMS
       void get_tau( double &tau_m_qua, double &tau_c_qua,
           const double &dt, const double * const &dxi_dx,
           const double &u, const double &v, const double &w ) const;
 
+      // Return tau_bar := (v' G v')^-0.5, which scales like a time variable
       void get_DC( double &dc_tau, const double * const &dxi_dx,
           const double &u, const double &v, const double &w ) const;
 
