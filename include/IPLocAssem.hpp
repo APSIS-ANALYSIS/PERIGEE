@@ -748,6 +748,18 @@ class IPLocAssem
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Residual_EBC is not implemented.\n");}
 
+    virtual void Assem_Residual_EBC(
+        const int &ebc_id,
+        const double &time, const double &dt,
+        const double * const &vec_a,
+        const double * const &vec_b,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: this Assem_Residual_EBC is not implemented.\n");}
+
 
     // Perform elemental BC surface integration for backflow stabilization
     // for the residual only.
@@ -814,6 +826,16 @@ class IPLocAssem
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Residual_EBC_Resistance is not implemented.\n");}
 
+    virtual void Assem_Residual_EBC_Resistance(
+        const int &ebc_id,
+        const double &flow_rate,
+        const double * const &vec_b,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: this Assem_Residual_EBC_Resistance is not implemented.\n");}
 
     // ! Get the model parameter 1
     //   This function is used to pass out the parameters appearing in the weak
