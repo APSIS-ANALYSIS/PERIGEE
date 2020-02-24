@@ -37,7 +37,16 @@
 class IPLocAssem_2x2Block
 {
   public:
-    IPLocAssem_2x2Block(){};
+    IPLocAssem_2x2Block()
+    {
+      Tangent00 = nullptr;
+      Tangent01 = nullptr;
+      Tangent10 = nullptr;
+      Tangent11 = nullptr;
+
+      Residual0 = nullptr;
+      Residual1 = nullptr;
+    };
 
     virtual ~IPLocAssem_2x2Block(){};
 
@@ -49,25 +58,36 @@ class IPLocAssem_2x2Block
     PetscScalar * Residual0; // R0
     PetscScalar * Residual1; // R1
 
-    // Get the degree-of-freedom of this problem. For segregated algorithms
-    // this returns the fully-coupled multiphysics problem's dof.
+    // -------------------------------------------------------------- 
+    // Get the degree-of-freedom of this problem. For segregated 
+    // algorithms this returns the fully-coupled multiphysics 
+    // problem's dof.
+    // -------------------------------------------------------------- 
     virtual int get_dof() const = 0;
 
+    // -------------------------------------------------------------- 
     // Get the degree of freedom of the full matrix (i.e. n0 + n1).
     // In most problems, this value is the same as the get_dof value;
     // In the solid dynamics with kinematic segregated, this returns 4
     // (3 for velocity plus 1 for pressure); while get_dof returns 7 with
     // 3 additional displacement variables.
+    // -------------------------------------------------------------- 
     virtual int get_dof_mat() const = 0;
 
+    // -------------------------------------------------------------- 
     // Return the first variable's dof.
+    // -------------------------------------------------------------- 
     virtual int get_dof_mat_0() const = 0;
     
+    // -------------------------------------------------------------- 
     // Return the second variable's dof.
+    // -------------------------------------------------------------- 
     virtual int get_dof_mat_1() const = 0;
 
+    // -------------------------------------------------------------- 
     // Return the number of ebc functions implemented inside this local
     // assembly routine.
+    // -------------------------------------------------------------- 
     virtual int get_num_ebc_fun() const = 0;
     
     // Assign all values in Tangent and Residual as 0.0.

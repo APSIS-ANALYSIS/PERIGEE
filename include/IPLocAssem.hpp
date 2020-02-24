@@ -33,29 +33,39 @@ class IPLocAssem
     PetscScalar * Tangent;
     
     PetscScalar * Residual;
- 
+
+    // -------------------------------------------------------------- 
     // Tangent and Residual on surface elements 
+    // -------------------------------------------------------------- 
     PetscScalar * sur_Tangent;
 
     PetscScalar * sur_Residual;
 
+    // -------------------------------------------------------------- 
     // ! Get degree of freedom of this problem. In segregated algorithms
     //   this dof returns the fully coupled multiphysics problem's dof.
+    // -------------------------------------------------------------- 
     virtual int get_dof() const = 0;
 
+    // -------------------------------------------------------------- 
     // ! Get degree of freedom of the matrix. In segregated algorithms, 
     //   this dof returns the actually implicit solver's dof per node.
     //   In fully coupled fashions, this defaults to the get_dof function.
+    // -------------------------------------------------------------- 
     virtual int get_dof_mat() const {return get_dof();}
 
+    // -------------------------------------------------------------- 
     // ! Get the number of ebc functions implemented inside this 
     //   local assembly routine
+    // -------------------------------------------------------------- 
     virtual int get_num_ebc_fun() const
     {SYS_T::commPrint("Warning: IPLocAssem::get_num_ebc_fun is not implemented. \n");
       return 0;}
 
+    // -------------------------------------------------------------- 
     // ! Assign all values in Tangent matrix 0.0
-    //   Call this function before assembly.
+    //   Call this function before assembly to zero everything in container
+    // -------------------------------------------------------------- 
     virtual void Zero_Tangent_Residual() = 0;
 
     virtual void Zero_sur_Tangent_Residual()
@@ -63,8 +73,10 @@ class IPLocAssem
       SYS_T::print_fatal("Error: Zero_sur_Tangent_Residual is not implemented.\n");
     }
 
+    // -------------------------------------------------------------- 
     // ! Assign all values in Residual vector 0.0
-    //   Call this function before assembly.
+    //   Call this function before assembly to zero everything in container
+    // -------------------------------------------------------------- 
     virtual void Zero_Residual() = 0;
 
     virtual void Zero_sur_Residual()
@@ -72,16 +84,19 @@ class IPLocAssem
       SYS_T::print_fatal("Error: Zero_sur_Residual is not implemented. \n");
     }
 
+    // -------------------------------------------------------------- 
     // ! Give nonzero pattern of the sparse matrix 
+    // -------------------------------------------------------------- 
     virtual void Assem_Estimate() = 0;
 
-
+    // -------------------------------------------------------------- 
     // ! Assembly element residual vector: Residual
     // \para vec_a: input vector a -- displacement / current solution
     // \para vec_b: input vector b -- velocity / next solution
     // \para element: the element quadrature info
     // \para eleCtrlPts: this element's control points
     // \para wight: the corresponding quadrature weights    
+    // -------------------------------------------------------------- 
     virtual void Assem_Residual(
         double time, double dt,
         const double * const &vec_a,
@@ -94,6 +109,7 @@ class IPLocAssem
     {SYS_T::commPrint("Warning: this Assem_Residual(...) is not implemented. \n");}
     
     
+    // -------------------------------------------------------------- 
     // ! Assembly element residual vector without precached quadrature info for
     //   3D element.
     //   Element quadrature info is computed inside the element assembly
@@ -104,6 +120,7 @@ class IPLocAssem
     // \para bt : Bernstein basis function precomputed in t direction
     // \para bu : Bernstein basis function precomputed in u direction
     // \para extractor : Bezier extraction operator
+    // -------------------------------------------------------------- 
     virtual void Assem_Residual(
         const double &time, const double &dt,
         const double * const &vec_a,
