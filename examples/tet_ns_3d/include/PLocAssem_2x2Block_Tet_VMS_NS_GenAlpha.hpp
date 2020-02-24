@@ -1,27 +1,27 @@
-#ifndef PLOCASSEM_TET_VMS_NS_GENALPHA_HPP
-#define PLOCASSEM_TET_VMS_NS_GENALPHA_HPP
+#ifndef PLOCASSEM_2X2BLOCK_TET_VMS_NS_GENALPHA_HPP
+#define PLOCASSEM_2X2BLOCK_TET_VMS_NS_GENALPHA_HPP
 // ==================================================================
-// PLocAssem_Tet_VMS_NS_GenAlpha.hpp
+// PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha.hpp
 // 
 // Parallel Local Assembly routine for VMS and Gen-alpha based NS
-// solver.
+// solver into 4 sub blocks.
 //
 // Date: Feb. 10 2020
 // ==================================================================
-#include "IPLocAssem.hpp"
+#include "IPLocAssem_2x2Block.hpp"
 #include "TimeMethod_GenAlpha.hpp"
 
-class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
+class PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
 {
   public:
-    PLocAssem_Tet_VMS_NS_GenAlpha(
+    PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha(
         const TimeMethod_GenAlpha * const &tm_gAlpha,
         const int &in_nlocbas, const int &in_nqp,
         const int &in_snlocbas, const double &in_rho, 
         const double &in_vis_mu, const double &in_beta,
         const int &elemtype = 501 );
 
-    virtual ~PLocAssem_Tet_VMS_NS_GenAlpha();
+    virtual ~PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha();
 
     virtual int get_dof() const {return 4;}
 
@@ -187,7 +187,7 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
         gx = p0*nx; gy = p0*ny; gz = p0*nz;
       }
 
-      typedef void ( PLocAssem_Tet_VMS_NS_GenAlpha::*locassem_tet_vms_ns_funs )( const double &x, const double &y, const double &z,
+      typedef void ( PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::*locassem_tet_vms_ns_funs )( const double &x, const double &y, const double &z,
           const double &t, const double &nx, const double &ny,
           const double &nz, double &gx, double &gy, double &gz ) const;
 
