@@ -875,9 +875,10 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   const int face_nqp = quad -> get_num_quadPts();
-
-  double gwts, coor_x, coor_y, coor_z, gx, gy, gz, nx, ny, nz, surface_area;
+  
   const double curr = time + alpha_f * dt;
+
+  double gx, gy, gz, nx, ny, nz, surface_area;
 
   Zero_Residual();
 
@@ -886,7 +887,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
     element->get_R(qua, &R[0]);
     element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
 
-    coor_x = 0.0; coor_y = 0.0; coor_z = 0.0;
+    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
     for(int ii=0; ii<snLocBas; ++ii)
     {
       coor_x += eleCtrlPts_x[ii] * R[ii];
@@ -897,7 +898,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
     get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr, nx, ny, nz,
         gx, gy, gz );
 
-    gwts = surface_area * quad -> get_qw(qua);
+    const double gwts = surface_area * quad -> get_qw(qua);
 
     for(int A=0; A<snLocBas; ++A)
     {
