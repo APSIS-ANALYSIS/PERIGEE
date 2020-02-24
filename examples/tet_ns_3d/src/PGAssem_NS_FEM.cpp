@@ -550,12 +550,8 @@ void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
 
       ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
-      GetLocal(array_a, LSIEN, snLocBas, local_as);
-      GetLocal(array_b, LSIEN, snLocBas, local_bs);
-
       lassem_ptr->Assem_Residual_EBC(ebc_id, curr_time, dt,
-          local_as, local_bs, element_s, sctrl_x, sctrl_y, sctrl_z,
-          quad_s);
+          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
 
       for(int ii=0; ii<snLocBas; ++ii)
       {
