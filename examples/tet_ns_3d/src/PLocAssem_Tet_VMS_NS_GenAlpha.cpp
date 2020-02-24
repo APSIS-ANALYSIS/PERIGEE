@@ -178,11 +178,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
   double tau_m, tau_c, tau_dc;
 
   const double two_mu = 2.0 * vis_mu;
-  double NA, NA_x, NA_y, NA_z;
-  double velo_dot_gradR, r_dot_gradR;
-
-  double r_dot_gradu, r_dot_gradv, r_dot_gradw;
-  double velo_prime_dot_gradR; // v' dot grad NA
 
   const double curr = time + alpha_f * dt;
 
@@ -249,12 +244,14 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
       coor_z += eleCtrlPts_z[ii] * R[ii];
     }
 
+    // Get the tau_m and tau_c
     get_tau(tau_m, tau_c, dt, dxi_dx, u, v, w);
 
     const double tau_m_2 = tau_m * tau_m;
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
+    // Get the body force
     get_f(coor_x, coor_y, coor_z, curr, f1, f2, f3);
 
     const double u_lap = u_xx + u_yy + u_zz;
@@ -271,18 +268,19 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
     const double v_prime = -1.0 * tau_m * ry;
     const double w_prime = -1.0 * tau_m * rz;
 
+    // Get the Discontinuity Capturing tau
     get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
 
     for(int A=0; A<nLocBas; ++A)
     {
-      NA = R[A]; NA_x = dR_dx[A]; NA_y = dR_dy[A]; NA_z = dR_dz[A];
+      const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
-      velo_dot_gradR = NA_x * u + NA_y * v + NA_z * w;
-      r_dot_gradR = NA_x * rx + NA_y * ry + NA_z * rz;
-      r_dot_gradu = u_x * rx + u_y * ry + u_z * rz;
-      r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
-      r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
-      velo_prime_dot_gradR = NA_x * u_prime + NA_y * v_prime + NA_z * w_prime;
+      const double velo_dot_gradR = NA_x * u + NA_y * v + NA_z * w;
+      const double r_dot_gradR = NA_x * rx + NA_y * ry + NA_z * rz;
+      const double r_dot_gradu = u_x * rx + u_y * ry + u_z * rz;
+      const double r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
+      const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
+      const double velo_prime_dot_gradR = NA_x * u_prime + NA_y * v_prime + NA_z * w_prime;
 
       Residual[4*A] += gwts * ( NA * div_vel + tau_m * r_dot_gradR );
 
