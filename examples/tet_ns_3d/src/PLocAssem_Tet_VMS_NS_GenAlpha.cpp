@@ -921,7 +921,7 @@ double PLocAssem_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &vec,
 
   const int face_nqp = quad -> get_num_quadPts();
 
-  double gwts, nx, ny, nz, surface_area, u, v, w;
+  double nx, ny, nz, surface_area;
 
   double flrate = 0.0;
 
@@ -930,7 +930,7 @@ double PLocAssem_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &vec,
     element->get_R(qua, &R[0]);
     element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
 
-    u = 0.0; v = 0.0; w = 0.0;
+    double u = 0.0, v = 0.0, w = 0.0;
     for(int ii=0; ii<snLocBas; ++ii)
     {
       const int ii4 = ii * 4;
@@ -938,7 +938,9 @@ double PLocAssem_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &vec,
       v += vec[ii4+2] * R[ii];
       w += vec[ii4+3] * R[ii];
     }
-    gwts = surface_area * quad->get_qw(qua);
+    
+    const double gwts = surface_area * quad->get_qw(qua);
+    
     flrate += gwts * ( u * nx + v * ny + w * nz );
   }
 
@@ -958,7 +960,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_pressure_area( const double * const &vec
 
   const int face_nqp = quad -> get_num_quadPts();
 
-  double gwts, nx, ny, nz, surface_area, pp;
+  double nx, ny, nz, surface_area;
 
   // Initialize the two variables to be passed out
   pres = 0.0;
@@ -969,10 +971,10 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_pressure_area( const double * const &vec
     element->get_R(qua, &R[0]);
     element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
 
-    pp = 0.0;
+    double pp = 0.0;
     for(int ii=0; ii<snLocBas; ++ii) pp += vec[4*ii+0] * R[ii];
 
-    gwts = surface_area * quad->get_qw(qua);
+    const double gwts = surface_area * quad->get_qw(qua);
 
     pres += gwts * pp;
     area += gwts;
@@ -993,7 +995,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
 
   const int face_nqp = quad -> get_num_quadPts();
 
-  double gwts, nx, ny, nz, surface_area;
+  double nx, ny, nz, surface_area;
 
   Zero_Residual();
 
@@ -1001,7 +1003,8 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
   {
     element->get_R(qua, &R[0]);
     element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
-    gwts = surface_area * quad -> get_qw(qua);
+    
+    const double gwts = surface_area * quad -> get_qw(qua);
 
     for(int A=0; A<snLocBas; ++A)
     {
