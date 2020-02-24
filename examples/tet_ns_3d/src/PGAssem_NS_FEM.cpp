@@ -556,10 +556,7 @@ void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
       for(int ii=0; ii<snLocBas; ++ii)
       {
         for(int mm=0; mm<dof_mat; ++mm)
-        {
-          int lrow_index = nbc_part -> get_LID(mm, LSIEN[ii]);
-          srow_index[dof_mat * ii + mm] = dof_mat * lrow_index + mm;
-        }
+          srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
       }
 
       VecSetValues(G, in_loc_dof, srow_index, lassem_ptr->Residual, ADD_VALUES);
@@ -594,10 +591,7 @@ void PGAssem_NS_FEM::BackFlow_G( IPLocAssem * const &lassem_ptr,
       for(int ii=0; ii<snLocBas; ++ii)
       {
         for(int mm=0; mm<dof_mat; ++mm)
-        {
-          int lrow_index = nbc_part -> get_LID(mm, LSIEN[ii]);
-          srow_index[dof_mat * ii + mm] = dof_mat * lrow_index + mm;
-        }
+          srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
       }
 
       VecSetValues(G, in_loc_dof, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
@@ -633,10 +627,7 @@ void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
       for(int ii=0; ii<snLocBas; ++ii)
       {
         for(int mm=0; mm<dof_mat; ++mm)
-        {
-          int lrow_index = nbc_part -> get_LID(mm, LSIEN[ii]);
-          srow_index[dof_mat * ii + mm] = dof_mat * lrow_index + mm;
-        }
+          srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
       }
 
       MatSetValues(K, in_loc_dof, srow_index, in_loc_dof, srow_index,
