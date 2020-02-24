@@ -189,7 +189,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
   const double two_mu = 2.0 * vis_mu;
   double NA, NA_x, NA_y, NA_z;
   double velo_dot_gradR, div_vel, r_dot_gradR;
-  double tau_m_2;
 
   double r_dot_gradu, r_dot_gradv, r_dot_gradw;
   double velo_prime_dot_gradR; // v' dot grad NA
@@ -261,7 +260,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
 
     get_tau(tau_m, tau_c, dt, dxi_dx, u, v, w);
 
-    tau_m_2 = tau_m * tau_m;
+    const double tau_m_2 = tau_m * tau_m;
 
     gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
@@ -370,7 +369,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
   const double rho0_2 = rho0 * rho0;
   double NA, NA_x, NA_y, NA_z;
   double velo_dot_gradR, div_vel, r_dot_gradR;
-  double tau_m_2;
   double r_dot_gradu, r_dot_gradv, r_dot_gradw;
 
   double velo_prime_dot_gradR;
@@ -458,7 +456,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
     get_tau(tau_m, tau_c, dt, dxi_dx, u, v, w);
 
-    tau_m_2 = tau_m * tau_m;
+    const double tau_m_2 = tau_m * tau_m;
 
     gwts = element->get_detJac(qua) * quad->get_qw(qua); 
 
