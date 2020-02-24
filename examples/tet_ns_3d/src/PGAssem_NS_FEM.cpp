@@ -555,12 +555,10 @@ void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
 
       for(int ii=0; ii<snLocBas; ++ii)
       {
-        int loc_index = LSIEN[ii];
-        int offset1 = dof_mat * ii;
         for(int mm=0; mm<dof_mat; ++mm)
         {
-          int lrow_index = nbc_part -> get_LID(mm, loc_index);
-          srow_index[offset1 + mm] = dof_mat * lrow_index + mm;
+          int lrow_index = nbc_part -> get_LID(mm, LSIEN[ii]);
+          srow_index[dof_mat * ii + mm] = dof_mat * lrow_index + mm;
         }
       }
 
@@ -595,12 +593,10 @@ void PGAssem_NS_FEM::BackFlow_G( IPLocAssem * const &lassem_ptr,
 
       for(int ii=0; ii<snLocBas; ++ii)
       {
-        int loc_index = LSIEN[ii];
-        int offset1 = dof_mat * ii;
         for(int mm=0; mm<dof_mat; ++mm)
         {
-          int lrow_index = nbc_part -> get_LID(mm, loc_index);
-          srow_index[offset1 + mm] = dof_mat * lrow_index + mm;
+          int lrow_index = nbc_part -> get_LID(mm, LSIEN[ii]);
+          srow_index[dof_mat * ii + mm] = dof_mat * lrow_index + mm;
         }
       }
 
@@ -636,12 +632,10 @@ void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
 
       for(int ii=0; ii<snLocBas; ++ii)
       {
-        int loc_index = LSIEN[ii];
-        int offset1 = dof_mat * ii;
         for(int mm=0; mm<dof_mat; ++mm)
         {
-          int lrow_index = nbc_part -> get_LID(mm, loc_index);
-          srow_index[offset1 + mm] = dof_mat * lrow_index + mm;
+          int lrow_index = nbc_part -> get_LID(mm, LSIEN[ii]);
+          srow_index[dof_mat * ii + mm] = dof_mat * lrow_index + mm;
         }
       }
 
