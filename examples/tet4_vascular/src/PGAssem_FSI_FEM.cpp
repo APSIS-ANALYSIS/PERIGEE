@@ -454,6 +454,7 @@ void PGAssem_FSI_FEM::Assem_mass_residual(
 void PGAssem_FSI_FEM::Assem_residual(
     const PDNSolution * const &sol_a,
     const PDNSolution * const &sol_b,
+    const PDNSolution * const &dot_sol_np1,
     const PDNSolution * const &sol_np1,
     const double &curr_time,
     const double &dt,
@@ -512,7 +513,7 @@ void PGAssem_FSI_FEM::Assem_residual(
   BackFlow_G( lassem_f_ptr, elements, dof_mat*snLocBas, quad_s, nbc_part, ebc_part );
 
   // Resistance BC for G
-  NatBC_Resis_G( sol_np1, lassem_f_ptr, elements, quad_s, node_ptr, 
+  NatBC_Resis_G( dot_sol_np1, sol_np1, lassem_f_ptr, elements, quad_s, node_ptr, 
       nbc_part, ebc_part, gbc );
 
   VecAssemblyBegin(G);
@@ -734,6 +735,7 @@ void PGAssem_FSI_FEM::BackFlow_KG( const double &dt,
 
 
 void PGAssem_FSI_FEM::NatBC_Resis_G(
+    const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     IPLocAssem * const &lassem_f_ptr,
     FEAElement * const &element_s,
@@ -748,13 +750,17 @@ void PGAssem_FSI_FEM::NatBC_Resis_G(
 
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
+    // Calculate dot flow rate for face with ebc_id
+    const double dot_flrate = Assem_surface_flowrate( dot_sol, lassem_f_ptr,
+        element_s, quad_s, node_ptr, ebc_part, ebc_id );
+
     // Calculate flow rate for face with ebc_id
     const double flrate = Assem_surface_flowrate( sol, lassem_f_ptr,
         element_s, quad_s, node_ptr, ebc_part, ebc_id );
 
     // Get the pressure value on the outlet surfaces
     const double P_n = gbc -> get_P0( ebc_id );
-    const double P_np1 = gbc -> get_P( ebc_id, flrate );
+    const double P_np1 = gbc -> get_P( ebc_id, dot_flrate, flrate );
 
     // P_n+alpha_f
     const double val = P_n + lassem_f_ptr->get_model_para_1() * (P_np1 - P_n);
@@ -786,7 +792,7 @@ void PGAssem_FSI_FEM::NatBC_Resis_G(
     }
   }
 
-  delete [] Res; Res = NULL; delete [] srow_idx; srow_idx = NULL;
+  delete [] Res; Res = nullptr; delete [] srow_idx; srow_idx = nullptr;
 }
 
 void PGAssem_FSI_FEM::NatBC_Resis_KG(
