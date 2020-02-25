@@ -34,13 +34,13 @@ class PGAssem_FSI_FEM : public IPGAssem
         IPLocAssem * const &locassem_s_ptr,
         FEAElement * const &elements,
         const IQuadPts * const &quads,
-        IAGlobal_Mesh_Info const * const &agmi_ptr,
-        ALocal_Elem const * const &alelem_ptr,
-        ALocal_IEN const * const &aien_ptr,
-        APart_Node const * const &pnode_ptr,
-        ALocal_NodalBC const * const &part_nbc,
-        ALocal_EBC const * const &part_ebc,
-        IGenBC const * const &gbc,
+        const IAGlobal_Mesh_Info * const &agmi_ptr,
+        const ALocal_Elem * const &alelem_ptr,
+        const ALocal_IEN * const &aien_ptr,
+        const APart_Node * const &pnode_ptr,
+        const ALocal_NodalBC * const &part_nbc,
+        const ALocal_EBC * const &part_ebc,
+        const IGenBC * const &gbc,
         const int &in_nz_estimate = 60 );
 
     virtual ~PGAssem_FSI_FEM();
