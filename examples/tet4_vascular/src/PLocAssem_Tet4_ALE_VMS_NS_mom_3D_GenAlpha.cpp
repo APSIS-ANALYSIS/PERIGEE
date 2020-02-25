@@ -720,33 +720,26 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Mass_Residual(
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
-  int ii, jj, qua, A, B, index;
-  double u, u_x, u_y, u_z;
-  double v, v_x, v_y, v_z;
-  double w, w_x, w_y, w_z;
-  double p, f1, f2, f3;
-  double gwts, coor_x, coor_y, coor_z;
-
-  double NA, NA_x, NA_y, NA_z;
+  double f1, f2, f3;
 
   const double two_mu = 2.0 * vis_mu;
 
-  double curr = 0.0;
+  const double curr = 0.0;
 
   Zero_Tangent_Residual();
 
   Zero_Sub_Tan();
 
-  for(qua=0; qua<nqp; ++qua)
+  for(int qua=0; qua<nqp; ++qua)
   {
-    u = 0.0; u_x = 0.0; u_y = 0.0; u_z = 0.0;
-    v = 0.0; v_x = 0.0; v_y = 0.0; v_z = 0.0;
-    w = 0.0; w_x = 0.0; w_y = 0.0; w_z = 0.0;
-    p = 0.0; coor_x = 0.0; coor_y = 0.0; coor_z = 0.0;
+    double u = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
+    double v = 0.0, v_x = 0.0, v_y = 0.0, v_z = 0.0;
+    double w = 0.0, w_x = 0.0, w_y = 0.0, w_z = 0.0;
+    double p = 0.0, coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
 
     element->get_R_gradR( qua, R, dR_dx, dR_dy, dR_dz );
 
-    for(ii=0; ii<nLocBas; ++ii)
+    for(int ii=0; ii<nLocBas; ++ii)
     {
       u += disp[7*ii+4] * R[ii];
       v += disp[7*ii+5] * R[ii];
@@ -770,13 +763,13 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Mass_Residual(
       coor_z += curPt_z[ii] * R[ii];
     }
 
-    gwts = element->get_detJac(qua) * quad->get_qw(qua);
+    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
     get_f(coor_x, coor_y, coor_z, curr, f1, f2, f3);
 
-    for(A=0; A<nLocBas; ++A)
+    for(int A=0; A<nLocBas; ++A)
     {
-      NA = R[A]; NA_x = dR_dx[A]; NA_y = dR_dy[A]; NA_z = dR_dz[A];
+      const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
       Residual[4*A+1] += gwts * ( NA * rho0 * (u*u_x + v*u_y + w*u_z) 
           - NA_x * p
@@ -799,9 +792,9 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Mass_Residual(
           + two_mu * NA_z * w_z
           - NA * rho0 * f3 );
 
-      for(B=0; B<nLocBas; ++B)
+      for(int B=0; B<nLocBas; ++B)
       {
-        index = A * nLocBas + B;
+        const int index = A * nLocBas + B;
         Sub_Tan[0][index]  += gwts * rho0 * NA * R[B];
         Sub_Tan[5][index]  += gwts * rho0 * NA * R[B];
         Sub_Tan[10][index] += gwts * rho0 * NA * R[B];
@@ -810,13 +803,13 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Mass_Residual(
     }
   }
 
-  for(ii=0; ii<4; ++ii)
+  for(int ii=0; ii<4; ++ii)
   {
-    for(jj=0; jj<4; ++jj)
+    for(int jj=0; jj<4; ++jj)
     {
-      for(A=0; A<nLocBas; ++A)
+      for(int A=0; A<nLocBas; ++A)
       {
-        for(B=0; B<nLocBas; ++B)
+        for(int B=0; B<nLocBas; ++B)
         {
           Tangent[ 4*nLocBas*(4*A+ii) + 4*B + jj ] =
             Sub_Tan[ii*4+jj][A*nLocBas + B];
