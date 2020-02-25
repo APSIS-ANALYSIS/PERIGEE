@@ -74,8 +74,8 @@ class PGAssem_FSI_FEM : public IPGAssem
 
 
     virtual void Assem_residual(
-        const PDNSolution * const &sol_a,
-        const PDNSolution * const &sol_b,
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
         const PDNSolution * const &dot_sol_np1,
         const PDNSolution * const &sol_np1,
         const double &curr_time,
@@ -96,8 +96,9 @@ class PGAssem_FSI_FEM : public IPGAssem
 
 
     virtual void Assem_tangent_residual(
-        const PDNSolution * const &sol_a,
-        const PDNSolution * const &sol_b,
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
+        const PDNSolution * const &dot_sol_np1,
         const PDNSolution * const &sol_np1,
         const double &curr_time,
         const double &dt,
@@ -180,6 +181,7 @@ class PGAssem_FSI_FEM : public IPGAssem
         const IGenBC * const &gbc );
 
     void NatBC_Resis_KG( const double &dt,
+        const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
         IPLocAssem * const &lassem_f_ptr,
         FEAElement * const &element_s,

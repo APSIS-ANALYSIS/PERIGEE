@@ -358,7 +358,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_FSI(
   if( new_tangent_flag )
   {
     gassem_ptr->Clear_KG();
-    gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, sol,
+    gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
         curr_time, dt, alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr,
         elementv, elements, quad_v, quad_s, lien_ptr, anode_ptr,
         feanode_ptr, nbc_part, ebc_part, gbc );
@@ -423,7 +423,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_FSI(
     if( nl_counter % nrenew_freq == 0 || nl_counter >= 4 )
     {
       gassem_ptr->Clear_KG();
-      gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, sol,
+      gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
           curr_time, dt, alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr, 
           elementv, elements, quad_v, quad_s, lien_ptr, anode_ptr,
           feanode_ptr, nbc_part, ebc_part, gbc );

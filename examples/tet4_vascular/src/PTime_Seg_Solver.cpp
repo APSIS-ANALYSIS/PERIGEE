@@ -299,6 +299,10 @@ void PTime_Seg_Solver::TM_FSI_GenAlpha(
     // Calculate the flow rate on all outlets
     for(int face=0; face<ebc_part -> get_num_ebc(); ++face)
     {
+      // Calculate 3D dot flow rate on the outlets
+      const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( cur_velo,
+          lassem_fluid_ptr, elements, quad_s, anode_ptr, ebc_part, face); 
+     
       // Calculate 3D flow rate on the outlets
       const double face_flrate = gassem_ptr -> Assem_surface_flowrate( cur_disp,
           lassem_fluid_ptr, elements, quad_s, anode_ptr, ebc_part, face); 
@@ -308,8 +312,9 @@ void PTime_Seg_Solver::TM_FSI_GenAlpha(
           cur_disp, lassem_fluid_ptr, elements, quad_s, anode_ptr, ebc_part, face);
       
       // Calculate 0D pressure from LPN model
+      const double dot_lpn_flowrate = dot_face_flrate;
       const double lpn_flowrate = face_flrate;
-      const double lpn_pressure = gbc -> get_P( face, lpn_flowrate );
+      const double lpn_pressure = gbc -> get_P( face, dot_lpn_flowrate, lpn_flowrate );
 
       // Update the initial values in genbc
       gbc -> reset_initial_sol( face, lpn_flowrate, lpn_pressure );

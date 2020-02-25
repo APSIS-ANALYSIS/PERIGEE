@@ -363,7 +363,7 @@ void PGAssem_FSI_FEM::Assem_nonzero_estimate(
   PDNSolution * temp = new PDNSolution_Mixed_UPV_3D( node_ptr, 0, false );
 
   // choose an arbitrary (0.1) time step size just to get the nonzero pattern
-  NatBC_Resis_KG(0.1, temp, lassem_f_ptr, elements, quad_s, node_ptr, 
+  NatBC_Resis_KG(0.1, temp, temp, lassem_f_ptr, elements, quad_s, node_ptr, 
       nbc_part, ebc_part, gbc );
 
   delete temp;
@@ -529,6 +529,7 @@ void PGAssem_FSI_FEM::Assem_residual(
 void PGAssem_FSI_FEM::Assem_tangent_residual(
     const PDNSolution * const &sol_a,
     const PDNSolution * const &sol_b,
+    const PDNSolution * const &dot_sol_np1,
     const PDNSolution * const &sol_np1,
     const double &curr_time,
     const double &dt,
@@ -594,7 +595,7 @@ void PGAssem_FSI_FEM::Assem_tangent_residual(
       nbc_part, ebc_part );
 
   // Resistance BC for K and G
-  NatBC_Resis_KG( dt, sol_np1, lassem_f_ptr, elements, quad_s, node_ptr,
+  NatBC_Resis_KG( dt, dot_sol_np1, sol_np1, lassem_f_ptr, elements, quad_s, node_ptr,
       nbc_part, ebc_part, gbc );
 
   VecAssemblyBegin(G);
@@ -797,6 +798,7 @@ void PGAssem_FSI_FEM::NatBC_Resis_G(
 
 void PGAssem_FSI_FEM::NatBC_Resis_KG(
     const double &dt,
+    const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     IPLocAssem * const &lassem_f_ptr,
     FEAElement * const &element_s,
@@ -806,7 +808,9 @@ void PGAssem_FSI_FEM::NatBC_Resis_KG(
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc )
 {
-  const double dd_dv = dt * lassem_f_ptr->get_model_para_1() * lassem_f_ptr->get_model_para_2();
+  const double a_f = lassem_f_ptr->get_model_para_1();
+
+  const double dd_dv = dt * a_f * lassem_f_ptr->get_model_para_2();
 
   // Allocate the vector to hold the residual on each surface element
   PetscScalar * Res = new PetscScalar [snLocBas * 3];
@@ -819,19 +823,29 @@ void PGAssem_FSI_FEM::NatBC_Resis_KG(
 
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
+    // Calculate dot flow rate for face with ebc_id
+    const double dot_flrate = Assem_surface_flowrate( dot_sol, lassem_f_ptr,
+        element_s, quad_s, node_ptr, ebc_part, ebc_id );
+
     // Calculate flow rate for face with ebc_id
     const double flrate = Assem_surface_flowrate( sol, lassem_f_ptr,
         element_s, quad_s, node_ptr, ebc_part, ebc_id );
 
     // Get the pressure value on the outlet surface
     const double P_n   = gbc -> get_P0( ebc_id );
-    const double P_np1 = gbc -> get_P( ebc_id, flrate );
+    const double P_np1 = gbc -> get_P( ebc_id, dot_flrate, flrate );
 
     // P_n+alpha_f
-    const double resis_val = P_n + lassem_f_ptr->get_model_para_1() * (P_np1 - P_n);
+    const double resis_val = P_n + a_f * (P_np1 - P_n);
 
     // Get m := dP/dQ
-    const double m_val = gbc -> get_m( ebc_id, flrate );
+    const double m_val = gbc -> get_m( ebc_id, dot_flrate, flrate );
+
+    // Get n := dP/d(dot_Q)
+    const double n_val = gbc -> get_n( ebc_id, dot_flrate, flrate );
+
+    // Define alpha_f x n + alpha_f x gamma x dt x m
+    const double coef = a_f * n_val + dd_dv * m_val;
 
     const int num_face_nodes = ebc_part -> get_num_face_nodes(ebc_id);
     if(num_face_nodes > 0)
@@ -876,9 +890,9 @@ void PGAssem_FSI_FEM::NatBC_Resis_KG(
           const int temp_row = (3*A+ii) * num_face_nodes * 3;
           for(int B=0; B<num_face_nodes; ++B)
           {
-            Tan[temp_row + 3*B + 0] = dd_dv * m_val * lassem_f_ptr->Residual[4*A+ii+1] * intNB[B] * out_nx;
-            Tan[temp_row + 3*B + 1] = dd_dv * m_val * lassem_f_ptr->Residual[4*A+ii+1] * intNB[B] * out_ny;
-            Tan[temp_row + 3*B + 2] = dd_dv * m_val * lassem_f_ptr->Residual[4*A+ii+1] * intNB[B] * out_nz;
+            Tan[temp_row + 3*B + 0] = coef * lassem_f_ptr->Residual[4*A+ii+1] * intNB[B] * out_nx;
+            Tan[temp_row + 3*B + 1] = coef * lassem_f_ptr->Residual[4*A+ii+1] * intNB[B] * out_ny;
+            Tan[temp_row + 3*B + 2] = coef * lassem_f_ptr->Residual[4*A+ii+1] * intNB[B] * out_nz;
           }
         }
       }
@@ -903,14 +917,12 @@ void PGAssem_FSI_FEM::NatBC_Resis_KG(
 
     if( num_face_nodes > 0 ) 
     {
-      delete [] Tan; 
-      Tan = NULL;
-      delete [] scol_idx;
-      scol_idx = NULL;
+      delete [] Tan; Tan = nullptr;
+      delete [] scol_idx; scol_idx = nullptr;
     }
   }
 
-  delete [] Res; Res = NULL; delete [] srow_idx; srow_idx = NULL;
+  delete [] Res; Res = nullptr; delete [] srow_idx; srow_idx = nullptr;
 }
 
 
@@ -945,8 +957,8 @@ double PGAssem_FSI_FEM::Assem_surface_flowrate(
         sctrl_y, sctrl_z, quad_s );
   }
 
-  delete [] array; array = NULL;
-  delete [] local; local = NULL;
+  delete [] array; array = nullptr;
+  delete [] local; local = nullptr;
 
   double sum = 0.0;
 
@@ -992,8 +1004,8 @@ double PGAssem_FSI_FEM::Assem_surface_ave_pressure(
     val_area += ele_area;
   }
 
-  delete [] array; array = NULL;
-  delete [] local; local = NULL;
+  delete [] array; array = nullptr;
+  delete [] local; local = nullptr;
 
   double sum_pres = 0.0, sum_area = 0.0;
 
