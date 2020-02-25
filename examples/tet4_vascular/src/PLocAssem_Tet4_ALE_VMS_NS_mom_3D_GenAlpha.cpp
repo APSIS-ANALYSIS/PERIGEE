@@ -337,19 +337,8 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
   double tau_m, tau_c, tau_dc;
 
   const double two_mu = 2.0 * vis_mu;
+  
   const double rho0_2 = rho0 * rho0;
-
-  double NB, NB_x, NB_y, NB_z;
-  double NANB, NAxNB, NAyNB, NAzNB;
-  double NANBx, NAxNBx, NAyNBx, NAzNBx;
-  double NANBy, NAxNBy, NAyNBy, NAzNBy;
-  double NANBz, NAxNBz, NAyNBz, NAzNBz;
-
-  double drx_du_B, drx_dv_B, drx_dw_B;
-  double dry_du_B, dry_dv_B, dry_dw_B;
-  double drz_du_B, drz_dv_B, drz_dw_B;
-
-  double velo_dot_gradNB, velo_prime_dot_gradNB;
 
   const double curr = time + alpha_f * dt;
 
@@ -490,26 +479,26 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
       for(int B=0; B<nLocBas; ++B)
       {
         const int index = B + A * nLocBas;
-        NB = R[B]; NB_x = dR_dx[B]; NB_y = dR_dy[B]; NB_z = dR_dz[B];
-        velo_dot_gradNB = cu * NB_x + cv * NB_y + cw * NB_z;
-        velo_prime_dot_gradNB = u_prime * NB_x + v_prime * NB_y + w_prime * NB_z;
+        const double NB = R[B], NB_x = dR_dx[B], NB_y = dR_dy[B], NB_z = dR_dz[B];
+        const double velo_dot_gradNB = cu * NB_x + cv * NB_y + cw * NB_z;
+        const double velo_prime_dot_gradNB = u_prime * NB_x + v_prime * NB_y + w_prime * NB_z;
 
-        NANB  = NA*NB; NANBx = NA*NB_x; NANBy = NA*NB_y; NANBz = NA*NB_z;
-        NAxNB = NA_x*NB; NAxNBx = NA_x*NB_x; NAxNBy = NA_x*NB_y; NAxNBz = NA_x*NB_z;
-        NAyNB = NA_y*NB; NAyNBx = NA_y*NB_x; NAyNBy = NA_y*NB_y; NAyNBz = NA_y*NB_z;
-        NAzNB = NA_z*NB; NAzNBx = NA_z*NB_x; NAzNBy = NA_z*NB_y; NAzNBz = NA_z*NB_z;
+        const double NANB  = NA*NB, NANBx = NA*NB_x, NANBy = NA*NB_y, NANBz = NA*NB_z;
+        const double NAxNB = NA_x*NB, NAxNBx = NA_x*NB_x, NAxNBy = NA_x*NB_y, NAxNBz = NA_x*NB_z;
+        const double NAyNB = NA_y*NB, NAyNBx = NA_y*NB_x, NAyNBy = NA_y*NB_y, NAyNBz = NA_y*NB_z;
+        const double NAzNB = NA_z*NB, NAzNBx = NA_z*NB_x, NAzNBy = NA_z*NB_y, NAzNBz = NA_z*NB_z;
 
-        drx_du_B = rho0 * ( u_x * NB + velo_dot_gradNB ); 
-        drx_dv_B = rho0 * u_y * NB;
-        drx_dw_B = rho0 * u_z * NB;
+        const double drx_du_B = rho0 * ( u_x * NB + velo_dot_gradNB ); 
+        const double drx_dv_B = rho0 * u_y * NB;
+        const double drx_dw_B = rho0 * u_z * NB;
 
-        dry_du_B = rho0 * v_x * NB;
-        dry_dv_B = rho0 * ( v_y * NB + velo_dot_gradNB );
-        dry_dw_B = rho0 * v_z * NB;
+        const double dry_du_B = rho0 * v_x * NB;
+        const double dry_dv_B = rho0 * ( v_y * NB + velo_dot_gradNB );
+        const double dry_dw_B = rho0 * v_z * NB;
 
-        drz_du_B = rho0 * w_x * NB;
-        drz_dv_B = rho0 * w_y * NB;
-        drz_dw_B = rho0 * (w_z * NB + velo_dot_gradNB);
+        const double drz_du_B = rho0 * w_x * NB;
+        const double drz_dv_B = rho0 * w_y * NB;
+        const double drz_dw_B = rho0 * (w_z * NB + velo_dot_gradNB);
 
         // Continuity equation with respect to p, u, v, w
         Sub_Tan[0][index] += gwts * dd_dv * tau_m * (NAxNBx + NAyNBy + NAzNBz);
