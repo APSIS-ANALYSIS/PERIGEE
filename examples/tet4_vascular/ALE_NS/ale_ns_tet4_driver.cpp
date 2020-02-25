@@ -391,6 +391,9 @@ int main(int argc, char *argv[])
   // ===== Outlet flowrate recording files =====
   for(int ff=0; ff<locebc->get_num_ebc(); ++ff)
   {
+    const double dot_face_flrate = gloAssem_ptr -> Assem_surface_flowrate( 
+        dot_sol, locAssem_ptr, elements, quads, pNode, locebc, ff );
+
     const double face_flrate = gloAssem_ptr -> Assem_surface_flowrate( 
         sol, locAssem_ptr, elements, quads, pNode, locebc, ff );
 
@@ -400,8 +403,9 @@ int main(int argc, char *argv[])
     // set the gbc initial conditions using the 3D data
     gbc -> reset_initial_sol( ff, face_flrate, face_avepre );
 
+    const double dot_lpn_flowrate = dot_face_flrate;
     const double lpn_flowrate = face_flrate;
-    const double lpn_pressure = gbc -> get_P( ff, lpn_flowrate );
+    const double lpn_pressure = gbc -> get_P( ff, dot_lpn_flowrate, lpn_flowrate );
 
     // Create the txt files and write the initial flow rates
     if(rank == 0)
