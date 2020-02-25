@@ -85,8 +85,9 @@ class PGAssem_ALE_NS_FEM : public IPGAssem
     // Assembly the residual for the ALE-NS equations
     // notice the IGenBC input
     virtual void Assem_residual(
-        const PDNSolution * const &sol_a,
-        const PDNSolution * const &sol_b,
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
+        const PDNSolution * const &dot_sol_np1,
         const PDNSolution * const &sol_np1,
         const double &curr_time,
         const double &dt,
@@ -220,7 +221,8 @@ class PGAssem_ALE_NS_FEM : public IPGAssem
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
-    void NatBC_Resis_G( const PDNSolution * const &sol,
+    void NatBC_Resis_G( const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
