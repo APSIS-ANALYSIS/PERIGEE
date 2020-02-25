@@ -962,7 +962,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual_EBC_Resistance(
 
   const int face_nqp = quad -> get_num_quadPts();
 
-  double gwts, nx, ny, nz, surface_area;
+  double nx, ny, nz, surface_area;
 
   Zero_Residual();
 
@@ -970,7 +970,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual_EBC_Resistance(
   {
     element->get_R(qua, R);
     element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
-    gwts = surface_area * quad -> get_qw(qua);
+    const double gwts = surface_area * quad -> get_qw(qua);
 
     for(int A=0; A<snLocBas; ++A)
     {
@@ -997,20 +997,17 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual_BackFlowStab(
 
   const int face_nqp = quad -> get_num_quadPts();
 
-  int ii, qua, A;
-  double gwts, nx, ny, nz, surface_area;
-  double u, v, w, mu, mv, mw, cu, cv, cw;
-  double factor;
+  double nx, ny, nz, surface_area, factor;
   
   Zero_sur_Residual();
 
-  for(qua = 0; qua < face_nqp; ++qua)
+  for(int qua = 0; qua < face_nqp; ++qua)
   {
     element->get_R(qua, R);
     element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
 
-    u = 0.0; v = 0.0; w = 0.0; mu = 0.0; mv = 0.0; mw = 0.0;
-    for(ii=0; ii<snLocBas; ++ii)
+    double u = 0.0, v = 0.0, w = 0.0, mu = 0.0, mv = 0.0, mw = 0.0;
+    for(int ii=0; ii<snLocBas; ++ii)
     {
       mu += velo[ii*7+0] * R[ii];
       mv += velo[ii*7+1] * R[ii];
@@ -1021,18 +1018,18 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual_BackFlowStab(
       w += disp[ii*7+6] * R[ii];
     }
 
-    cu = u - mu;
-    cv = v - mv;
-    cw = w - mw;
+    const double cu = u - mu;
+    const double cv = v - mv;
+    const double cw = w - mw;
 
     const double temp = cu * nx + cv * ny + cw * nz;
 
     if(temp < 0.0) factor = temp * rho0 * beta;
     else factor = 0.0;
 
-    gwts = surface_area * quad -> get_qw(qua);
+    const double gwts = surface_area * quad -> get_qw(qua);
 
-    for(A=0; A<snLocBas; ++A)
+    for(int A=0; A<snLocBas; ++A)
     {
       sur_Residual[4*A+1] -= gwts * R[A] * factor * u;
       sur_Residual[4*A+2] -= gwts * R[A] * factor * v;
@@ -1058,10 +1055,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual_BackFlowS
 
   const int face_nqp = quad -> get_num_quadPts();
 
-  int ii, qua, A, B;
-  double gwts, nx, ny, nz, surface_area;
-  double u, v, w, mu, mv, mw, cu, cv, cw;
-  double factor;
+  double nx, ny, nz, surface_area, factor;
   
   const double dd_dv = alpha_f * gamma * dt;
 
@@ -1069,13 +1063,13 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual_BackFlowS
 
   Zero_Sub_sur_Tan();
 
-  for(qua = 0; qua < face_nqp; ++qua)
+  for(int qua = 0; qua < face_nqp; ++qua)
   {
     element->get_R(qua, R);
     element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
 
-    u = 0.0; v = 0.0; w = 0.0; mu = 0.0; mv = 0.0; mw = 0.0;
-    for(ii=0; ii<snLocBas; ++ii)
+    double u = 0.0, v = 0.0, w = 0.0, mu = 0.0, mv = 0.0, mw = 0.0;
+    for(int ii=0; ii<snLocBas; ++ii)
     {
       mu += velo[ii*7+0] * R[ii];
       mv += velo[ii*7+1] * R[ii];
@@ -1086,25 +1080,25 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual_BackFlowS
       w += disp[ii*7+6] * R[ii];
     }
 
-    cu = u - mu;
-    cv = v - mv;
-    cw = w - mw;
+    const double cu = u - mu;
+    const double cv = v - mv;
+    const double cw = w - mw;
 
     const double temp = cu * nx + cv * ny + cw * nz;
 
     if(temp < 0.0) factor = temp * rho0 * beta;
     else factor = 0.0;
 
-    gwts = surface_area * quad -> get_qw(qua);
+    const double gwts = surface_area * quad -> get_qw(qua);
 
     // snLocBas = 3 for linear tet/tri element
-    for(A=0; A<snLocBas; ++A)
+    for(int A=0; A<snLocBas; ++A)
     {
       sur_Residual[4*A+1] -= gwts * R[A] * factor * u;
       sur_Residual[4*A+2] -= gwts * R[A] * factor * v;
       sur_Residual[4*A+3] -= gwts * R[A] * factor * w;
 
-      for(B=0; B<snLocBas; ++B)
+      for(int B=0; B<snLocBas; ++B)
       {
         const int index = B + A * snLocBas; // index here ranges 0 to 8
 
@@ -1115,9 +1109,9 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual_BackFlowS
     }
   }
   
-  for(A=0; A<snLocBas; ++A)
+  for(int A=0; A<snLocBas; ++A)
   {
-    for(B=0; B<snLocBas; ++B)
+    for(int B=0; B<snLocBas; ++B)
     {
       // ii = jj = 1
       sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+1 ] = Sub_sur_Tan[5][A*snLocBas + B];
