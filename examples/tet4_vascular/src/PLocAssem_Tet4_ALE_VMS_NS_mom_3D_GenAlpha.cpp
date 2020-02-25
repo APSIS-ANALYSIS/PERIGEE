@@ -338,11 +338,6 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
 
   const double two_mu = 2.0 * vis_mu;
   const double rho0_2 = rho0 * rho0;
-  double NA, NA_x, NA_y, NA_z;
-  double velo_dot_gradR, r_dot_gradR;
-  double r_dot_gradu, r_dot_gradv, r_dot_gradw;
-
-  double velo_prime_dot_gradR;
 
   double NB, NB_x, NB_y, NB_z;
   double NANB, NAxNB, NAyNB, NAzNB;
@@ -439,14 +434,14 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
 
     for(int A=0; A<nLocBas; ++A)
     {
-      NA = R[A]; NA_x = dR_dx[A]; NA_y = dR_dy[A]; NA_z = dR_dz[A];
+      const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
-      velo_dot_gradR = NA_x * cu + NA_y * cv + NA_z * cw;
-      r_dot_gradR = NA_x * rx + NA_y * ry + NA_z * rz;
-      r_dot_gradu = u_x * rx + u_y * ry + u_z * rz;
-      r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
-      r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
-      velo_prime_dot_gradR = NA_x * u_prime + NA_y * v_prime + NA_z * w_prime;
+      const double velo_dot_gradR = NA_x * cu + NA_y * cv + NA_z * cw;
+      const double r_dot_gradR = NA_x * rx + NA_y * ry + NA_z * rz;
+      const double r_dot_gradu = u_x * rx + u_y * ry + u_z * rz;
+      const double r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
+      const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
+      const double velo_prime_dot_gradR = NA_x * u_prime + NA_y * v_prime + NA_z * w_prime;
 
       Residual[4*A] += gwts * ( NA * div_vel + tau_m * r_dot_gradR );
 
