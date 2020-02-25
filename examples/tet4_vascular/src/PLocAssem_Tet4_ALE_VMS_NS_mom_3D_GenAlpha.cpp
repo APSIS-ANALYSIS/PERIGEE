@@ -175,50 +175,31 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual(
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
-  int ii, qua, A, ii7;
-  double u, u_t, u_x, u_y, u_z;
-  double v, v_t, v_x, v_y, v_z;
-  double w, w_t, w_x, w_y, w_z;
-  double p, f1, f2, f3;
-  double p_x, p_y, p_z;
-  double gwts, coor_x, coor_y, coor_z;
-
-  double mu, mv, mw; // mesh velocity, i.e. hat(v)
-  double cu, cv, cw; // v - hat(v)
-
-  double rx, ry, rz;
+  double f1, f2, f3;
 
   double tau_m, tau_c, tau_dc;
 
-  double u_prime, v_prime, w_prime;
-
   const double two_mu = 2.0 * vis_mu;
-  double NA, NA_x, NA_y, NA_z;
-  double velo_dot_gradR, div_vel, r_dot_gradR;
-  double tau_m_2;
-
-  double r_dot_gradu, r_dot_gradv, r_dot_gradw;
-  double velo_prime_dot_gradR; // v' dot grad NA
 
   const double curr = time + alpha_f * dt;
 
   Zero_Residual();
 
-  for(qua=0; qua<nqp; ++qua)
+  for(int qua=0; qua<nqp; ++qua)
   {
-    u = 0.0; u_t = 0.0; u_x = 0.0; u_y = 0.0; u_z = 0.0;
-    v = 0.0; v_t = 0.0; v_x = 0.0; v_y = 0.0; v_z = 0.0;
-    w = 0.0; w_t = 0.0; w_x = 0.0; w_y = 0.0; w_z = 0.0;
-    p = 0.0; coor_x = 0.0; coor_y = 0.0; coor_z = 0.0;
-    p_x = 0.0; p_y = 0.0; p_z = 0.0;
-    mu = 0.0; mv = 0.0; mw = 0.0;
+    double u = 0.0, u_t = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
+    double v = 0.0, v_t = 0.0, v_x = 0.0, v_y = 0.0, v_z = 0.0;
+    double w = 0.0, w_t = 0.0, w_x = 0.0, w_y = 0.0, w_z = 0.0;
+    double p = 0.0, coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    double p_x = 0.0, p_y = 0.0, p_z = 0.0;
+    double mu = 0.0, mv = 0.0, mw = 0.0; // mesh velocity, i.e. hat-v
 
     element->get_R_gradR( qua, R, dR_dx, dR_dy, dR_dz );
     element->get_invJacobian( qua, dxi_dx );
 
-    for(ii=0; ii<nLocBas; ++ii)
+    for(int ii=0; ii<nLocBas; ++ii)
     {
-      ii7 = 7 * ii;
+      const int ii7 = 7 * ii;
 
       mu += velo[ii7+0] * R[ii];
       mv += velo[ii7+1] * R[ii];
@@ -253,40 +234,41 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual(
       coor_z += curPt_z[ii] * R[ii];
     }
 
-    cu = u - mu;
-    cv = v - mv;
-    cw = w - mw;
+    // v - hat(v)
+    const double cu = u - mu;
+    const double cv = v - mv;
+    const double cw = w - mw;
 
     get_tau(tau_m, tau_c, dt, dxi_dx, cu, cv, cw);
 
-    tau_m_2 = tau_m * tau_m;
+    const double tau_m_2 = tau_m * tau_m;
 
-    gwts = element->get_detJac(qua) * quad->get_qw(qua);
+    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
     get_f(coor_x, coor_y, coor_z, curr, f1, f2, f3);
 
-    rx = rho0 * ( u_t + u_x * cu + u_y * cv + u_z * cw - f1 ) + p_x;
-    ry = rho0 * ( v_t + v_x * cu + v_y * cv + v_z * cw - f2 ) + p_y;
-    rz = rho0 * ( w_t + w_x * cu + w_y * cv + w_z * cw - f3 ) + p_z;
+    const double rx = rho0 * ( u_t + u_x * cu + u_y * cv + u_z * cw - f1 ) + p_x;
+    const double ry = rho0 * ( v_t + v_x * cu + v_y * cv + v_z * cw - f2 ) + p_y;
+    const double rz = rho0 * ( w_t + w_x * cu + w_y * cv + w_z * cw - f3 ) + p_z;
 
-    div_vel = u_x + v_y + w_z;
+    const double div_vel = u_x + v_y + w_z;
 
-    u_prime = -1.0 * tau_m * rx;
-    v_prime = -1.0 * tau_m * ry;
-    w_prime = -1.0 * tau_m * rz;
+    const double u_prime = -1.0 * tau_m * rx;
+    const double v_prime = -1.0 * tau_m * ry;
+    const double w_prime = -1.0 * tau_m * rz;
 
     get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
 
-    for(A=0; A<nLocBas; ++A)
+    for(int A=0; A<nLocBas; ++A)
     {
-      NA = R[A]; NA_x = dR_dx[A]; NA_y = dR_dy[A]; NA_z = dR_dz[A];
+      const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
-      velo_dot_gradR = NA_x * cu + NA_y * cv + NA_z * cw;
-      r_dot_gradR = NA_x * rx + NA_y * ry + NA_z * rz;
-      r_dot_gradu = u_x * rx + u_y * ry + u_z * rz;
-      r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
-      r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
-      velo_prime_dot_gradR = NA_x * u_prime + NA_y * v_prime + NA_z * w_prime;
+      const double velo_dot_gradR = NA_x * cu + NA_y * cv + NA_z * cw;
+      const double r_dot_gradR = NA_x * rx + NA_y * ry + NA_z * rz;
+      const double r_dot_gradu = u_x * rx + u_y * ry + u_z * rz;
+      const double r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
+      const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
+      const double velo_prime_dot_gradR = NA_x * u_prime + NA_y * v_prime + NA_z * w_prime;
 
       Residual[4*A] += gwts * ( NA * div_vel + tau_m * r_dot_gradR );
 
