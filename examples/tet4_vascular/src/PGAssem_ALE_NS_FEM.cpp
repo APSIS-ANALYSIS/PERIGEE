@@ -4,13 +4,13 @@ PGAssem_ALE_NS_FEM::PGAssem_ALE_NS_FEM(
     IPLocAssem * const &locassem_ptr,
     FEAElement * const &elements,
     const IQuadPts * const &quads,
-    IAGlobal_Mesh_Info const * const &agmi_ptr,
-    ALocal_Elem const * const &alelem_ptr,
-    ALocal_IEN const * const &aien_ptr,
-    APart_Node const * const &pnode_ptr,
-    ALocal_NodalBC const * const &part_nbc,
-    ALocal_EBC const * const &part_ebc,
-    IGenBC const * const &gbc,
+    const IAGlobal_Mesh_Info * const &agmi_ptr,
+    const ALocal_Elem * const &alelem_ptr,
+    const ALocal_IEN * const &aien_ptr,
+    const APart_Node * const &pnode_ptr,
+    const ALocal_NodalBC * const &part_nbc,
+    const ALocal_EBC * const &part_ebc,
+    const IGenBC * const &gbc,
     const int &in_nz_estimate ) 
 {
   nLocBas = agmi_ptr->get_nLocBas();
@@ -112,12 +112,12 @@ PGAssem_ALE_NS_FEM::PGAssem_ALE_NS_FEM(
 
 PGAssem_ALE_NS_FEM::PGAssem_ALE_NS_FEM( 
     IPLocAssem * const &locassem_ptr,
-    IAGlobal_Mesh_Info const * const &agmi_ptr,
-    ALocal_Elem const * const &alelem_ptr,
-    ALocal_IEN const * const &aien_ptr,
-    APart_Node const * const &pnode_ptr,
-    ALocal_NodalBC const * const &part_nbc,
-    ALocal_EBC const * const &part_ebc )
+    const IAGlobal_Mesh_Info * const &agmi_ptr,
+    const ALocal_Elem * const &alelem_ptr,
+    const ALocal_IEN * const &aien_ptr,
+    const APart_Node * const &pnode_ptr,
+    const ALocal_NodalBC * const &part_nbc,
+    const ALocal_EBC * const &part_ebc )
 {
   nLocBas = agmi_ptr->get_nLocBas();
   dof_sol = pnode_ptr->get_dof(); // pnode_ptr stores dofNum
