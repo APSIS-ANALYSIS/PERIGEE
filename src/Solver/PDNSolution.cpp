@@ -339,5 +339,4 @@ void PDNSolution::PlusAiX( const PDNSolution &xx, const std::vector<double> &aa 
   VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
 }
 
-
 // EOF

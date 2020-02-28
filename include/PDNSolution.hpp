@@ -2,18 +2,17 @@
 #define PDNSOLUTION_HPP
 // ==================================================================
 // PDNSolution.hpp
-// This is a prototype for my finite element solution.
-// PDN stands for Parallel Dynamic Nonlinear Solution class.
-// It is a class that based on the PETSc ghost vector object.
+//
+// This is a base class for my finite element solutions.
 //
 // Main functions: 1. save the solution on disk;
 //                 2. perform linear operations on the solution vector;
 //                 3. obtain the local element solution efficiently;
 //                 4. print the solution on screen.
 // 
-// Data: public : Vec solution, the PETSc vector storing the solution
+// Data: public : Vec the solution
 //       private: int nlocal, nghost, the number of local and ghost
-//                nodes in the partitioned subdomain.
+//                nodes in the subdomain.
 //                int dof_num, the number of degrees of freedom per
 //                node.
 //
