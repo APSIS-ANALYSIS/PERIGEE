@@ -64,7 +64,9 @@ void PLinear_Solver_PETSc::Solve( const Vec &G, Vec &out_sol )
   PetscLogEventEnd(solver_gmres,0,0,0,0);
 #endif
 
+  PetscInt its;
   KSPGetIterationNumber(ksp, &its);
+  PetscReal resnorm;
   KSPGetResidualNorm(ksp, &resnorm);
   PetscPrintf(PETSC_COMM_WORLD, "  --- KSP: %d, %e", its, resnorm);
 }
@@ -87,7 +89,9 @@ void PLinear_Solver_PETSc::Solve( const Mat &K, const Vec &G, PDNSolution * cons
   PetscLogEventEnd(solver_gmres,0,0,0,0);
 #endif
   
+  PetscInt its;
   KSPGetIterationNumber(ksp, &its);
+  PetscReal resnorm;
   KSPGetResidualNorm(ksp, &resnorm);
 
   PetscPrintf(PETSC_COMM_WORLD, "  --- KSP: %d, %e", its, resnorm);
@@ -111,7 +115,9 @@ void PLinear_Solver_PETSc::Solve( const Vec &G, PDNSolution * const &out_sol)
   PetscLogEventEnd(solver_gmres,0,0,0,0);
 #endif
 
+  PetscInt its;
   KSPGetIterationNumber(ksp, &its);
+  PetscReal resnorm;
   KSPGetResidualNorm(ksp, &resnorm);
 
   PetscPrintf(PETSC_COMM_WORLD, "  --- KSP: %d, %e ", its, resnorm);

@@ -5,8 +5,6 @@
 //
 // Parallel Linear Solver wapper based on PETSc, i.e., KSP object.
 //
-// This class provides various functions for the KSP object.
-//
 // Author: Ju Liu
 // Date: Dec 8, 2013
 // ==================================================================
@@ -122,12 +120,6 @@ class PLinear_Solver_PETSc
     
     // maximum number of iterations 
     const PetscInt maxits;
-    
-    // real iteration number for linear solver
-    PetscInt its;
-    
-    // KSP residual norm
-    PetscReal resnorm; 
 };
 
 #endif
