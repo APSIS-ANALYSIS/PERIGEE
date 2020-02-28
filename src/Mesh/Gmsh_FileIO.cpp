@@ -499,7 +499,7 @@ void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
   TET_T::write_triangle_grid( vtp_file_name, bcnumpt, bcnumcl,
       tript, trien, bcpt, face2elem_1, face2elem_2 );
 
-  delete [] bcmap; bcmap = NULL;
+  delete [] bcmap; bcmap = nullptr;
   mytimer->Stop();
   std::cout<<"      Time taken "<<mytimer->get_sec()<<" sec. \n";
   delete mytimer;
@@ -584,7 +584,7 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
     total += bcmap[ vol_IEN[4*ee+3] ];
     if(total >= 3) gelem.push_back(ee);
   }
-  delete [] bcmap; bcmap = NULL;
+  delete [] bcmap; bcmap = nullptr;
   std::cout<<"      "<<gelem.size()<<" tets have faces over the surface. \n";
 
   // generate the local triangle IEN array
@@ -887,7 +887,7 @@ void Gmsh_FileIO::write_tri_h5( const int &index_2d,
 
       if(total >= 2) gelem.push_back(ee); 
     } 
-    delete [] bcmap; bcmap = NULL;
+    delete [] bcmap; bcmap = nullptr;
     std::cout<<"      "<<gelem.size()<<" elems have edge over the boundary.\n";
 
     // generate the local edge element IEN array
@@ -1056,7 +1056,7 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
 
       if(total >= 3) gelem.push_back(ee);
     }
-    delete [] bcmap; bcmap = NULL;
+    delete [] bcmap; bcmap = nullptr;
     std::cout<<"      "<<gelem.size()<<" elems have face over the boundary.\n";
     
     // Generate the local face element IEN array
@@ -1222,7 +1222,7 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
 
       if(total >= 3) gelem.push_back(ee);
     }
-    delete [] bcmap; bcmap = NULL;
+    delete [] bcmap; bcmap = nullptr;
     std::cout<<"      "<<gelem.size()<<" elems have face over the boundary.\n";
     
     // Generate the local face element IEN array
