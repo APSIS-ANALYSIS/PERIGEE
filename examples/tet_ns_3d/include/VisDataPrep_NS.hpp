@@ -3,7 +3,7 @@
 // ==================================================================
 // VisDataPrep_NS.hpp
 //
-// This is the data preparation for NS problems.
+// This is the data preparation for visualizing NS problems.
 //
 // Author: Ju Liu
 // Date Created: Aug 5 2017

@@ -66,11 +66,8 @@ class PNonlinear_NS_Solver
         bool &conv_flag, int &nl_counter ) const;
 
   private:
-    const double nr_tol;
-    const double na_tol;
-    const double nd_tol;
-    const int nmaxits;
-    const int nrenew_freq;
+    const double nr_tol, na_tol, nd_tol;
+    const int nmaxits, nrenew_freq;
 
     // vector container for the step update in the smaller matrix problem
     PDNSolution * dot_step;

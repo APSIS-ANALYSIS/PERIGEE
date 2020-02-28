@@ -15,7 +15,6 @@
 #include "Vis_Tools.hpp"
 
 #include "vtkIntArray.h"
-#include "vtkCellData.h"
 
 class VTK_Writer_NS
 {
