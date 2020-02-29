@@ -25,7 +25,7 @@ First, create a folder `build` out of the PERGIEE source directory. Enter that f
 ```sh
 CMake ~/PERIGEE/examples/nonlinear_heat_eqn/
 ```
-Cmake will print system information on screen. Pay a look at the variable `CMAKE_BUILD_TYPE`. If its value is `Debug`, this means your code will be compiled in the debug mode. If you want to have better code efficiency, run CMake as follows,
+CMake will print some information on screen. Pay a look at the variable `CMAKE_BUILD_TYPE`. If its value is `Debug`, this means your code will be compiled in the debug mode. If you want to have better code efficiency, run CMake as follows,
 ```sh
 CMake ~/PERIGEE/examples/nonlinear_heat_eqn/ -DCMAKE_BUILD_TYPE=Release
 ```
