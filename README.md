@@ -10,7 +10,7 @@ PERIGEE is a nonlinear dynamic finite element / isogeometric analysis code for m
 ## Install
 Please follow the following steps to compile PERIGEE.
 
-1. For Sherlock@Stanford users, go to step 2. Before compiling PERIGEE, one has to install several libraries. A quick guide for library installation is [here](docs/install_external_libs.md) and a slightly advanced guide is [there](docs/install-advanced.md). After the libraries are all properly installed, proceed to step 3.
+1. For Sherlock@Stanford users, directly go to step 2. Before compiling PERIGEE, one has to install several libraries. A quick guide for library installation is [here](docs/install_external_libs.md) and a slightly advanced guide is [there](docs/install-advanced.md). After the libraries are all properly installed, proceed to step 3.
 
 2. On Sherlock@Stanford, all the libraries have been installed in `/home/groups/amarsden/lib-perigee`. You need to add the following to your `.bash_profile` or `.bashrc` file to define `MACHINE_NAME` as an environment variable, and then proceed to step 3. With the `MACHINE_NAME`, PERIGEE can load the proper configuration file for compiling. Because VTK is typically installed as a shared library in a non-standard folder, one has to edit the `LD_LIBRARY_PATH` environmental variable for the linker. For more information on this environmental variable, see [here](http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html).
 ```sh
@@ -24,6 +24,13 @@ export LD_LIBRARY_PATH=/home/groups/amarsden/lib-perigee/VTK-7.1.1-shared/lib:$L
 First, create a folder `build` out of the PERGIEE source directory. Enter that folder, and run the following commands to build, as an example, a suite of heat equation solvers.
 ```sh
 CMake ~/PERIGEE/examples/nonlinear_heat_eqn/
+```
+Cmake will print system information on screen. Pay a look at the variable `CMAKE_BUILD_TYPE`. If its value is `Debug`, this means your code will be compiled in the debug mode. If you want to have better code efficiency, run CMake as follows,
+```sh
+CMake ~/PERIGEE/examples/nonlinear_heat_eqn/ -DCMAKE_BUILD_TYPE=Release
+```
+Now the value of `CMAKE_BUILD_TYPE` is set to `Release`. The code will be compiled in optimized mode. Then run the following command to compile the code.
+```sh
 make
 ```
 If the make complains about the auto keyword or the nullptr, your default compiler does not support C++11. You may add `set (CMAKE_CXX_STANDARD 11)` in your .cmake configuration file to enforce the C++11 standard. 
