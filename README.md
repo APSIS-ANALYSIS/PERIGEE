@@ -29,7 +29,7 @@ CMake will print some information on screen. Pay a look at the variable `CMAKE_B
 ```sh
 CMake ~/PERIGEE/examples/nonlinear_heat_eqn/ -DCMAKE_BUILD_TYPE=Release
 ```
-Now the value of `CMAKE_BUILD_TYPE` is set to `Release`. The code will be compiled in the optimized mode. For more information about the compiler, please refer to this [note](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html). CMake will generate the Makefile for you and you just need to run the following command to compile the source code.
+Now the value of `CMAKE_BUILD_TYPE` is set to `Release`. The code will be compiled in the optimized mode. For more information about the compiler, please refer to [this](https://stackoverflow.com/questions/48754619/what-are-cmake-build-type-debug-release-relwithdebinfo-and-minsizerel/48755129). CMake will generate the Makefile for you and you just need to run the following command to compile the source code.
 ```sh
 make
 ```
