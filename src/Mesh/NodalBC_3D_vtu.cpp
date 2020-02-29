@@ -27,7 +27,7 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &vtufilename,
   const int numpts = static_cast<int>( vtkugrid -> GetNumberOfPoints() );
 
   vtkPointData * pointdata = vtkugrid->GetPointData();
-  vtkDataArray * pd = pointdata->GetScalars("NodalIndex");
+  vtkDataArray * pd = pointdata->GetScalars("GlobalNodeID");
 
   std::vector<unsigned int> gnode; gnode.clear();
 
@@ -137,7 +137,7 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &vtufilename,
   const int numpts = static_cast<int>( vtkugrid -> GetNumberOfPoints() );
 
   vtkPointData * pointdata = vtkugrid->GetPointData();
-  vtkDataArray * pd = pointdata->GetScalars("NodalIndex");
+  vtkDataArray * pd = pointdata->GetScalars("GlobalNodeID");
 
   std::vector<unsigned int> gnode; gnode.clear();
 
@@ -217,7 +217,7 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &vtufilename,
   const int numpts = static_cast<int>( vtkugrid -> GetNumberOfPoints() );
 
   vtkPointData * pointdata = vtkugrid->GetPointData();
-  vtkDataArray * pd = pointdata->GetScalars("NodalIndex");
+  vtkDataArray * pd = pointdata->GetScalars("GlobalNodeID");
 
   std::vector<unsigned int> gnode; gnode.clear();
 

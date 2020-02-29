@@ -98,7 +98,7 @@ void SV_T::gen_sv_fsi_vtus( const std::string &filename_f,
   for(int ii=0; ii<nFunc_s; ++ii)
   {
     const int loc = find_idx( ctrlPts_i, nFunc_i, ctrlPts_s[3*ii], 
-        ctrlPts_s[3*ii+1], ctrlPts_s[3*ii+2], 1.0e-15 );
+        ctrlPts_s[3*ii+1], ctrlPts_s[3*ii+2], 1.0e-6 );
 
     if( loc == -1 )
     {
@@ -106,7 +106,7 @@ void SV_T::gen_sv_fsi_vtus( const std::string &filename_f,
       ctrlPts.push_back( ctrlPts_s[3*ii] );
       ctrlPts.push_back( ctrlPts_s[3*ii+1] );
       ctrlPts.push_back( ctrlPts_s[3*ii+2] );
-      counter += 1; 
+      counter += 1;
     }
     else
       map_s_node[ii] = node_idx_i[loc]; 

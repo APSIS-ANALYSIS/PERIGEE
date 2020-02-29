@@ -150,10 +150,10 @@ void TET_T::read_vtu_grid( const std::string &filename,
   numcels = static_cast<int>( vtkugrid -> GetNumberOfCells() );
 
   vtkCellData * celldata = vtkugrid->GetCellData();
-  vtkDataArray * cd = celldata->GetScalars("ElemIndex");
+  vtkDataArray * cd = celldata->GetScalars("GlobalElementID");
 
   vtkPointData * pointdata = vtkugrid->GetPointData();
-  vtkDataArray * pd = pointdata->GetScalars("NodalIndex");
+  vtkDataArray * pd = pointdata->GetScalars("GlobalNodeID");
 
   double pt_xyz[3];
   pt.clear();
@@ -249,11 +249,11 @@ void TET_T::read_vtp_grid( const std::string &filename,
 
   // read the cell data
   vtkCellData * celldata = polydata->GetCellData();
-  vtkDataArray * cd = celldata->GetScalars("ElemIndex");
+  vtkDataArray * cd = celldata->GetScalars("GlobalElementID");
 
   // read the point nodal data
   vtkPointData * pointdata = polydata->GetPointData();
-  vtkDataArray * pd = pointdata->GetScalars("NodalIndex");
+  vtkDataArray * pd = pointdata->GetScalars("GlobalNodeID");
 
   pt.clear();
   global_node_index.clear();
@@ -440,7 +440,7 @@ void TET_T::write_tet_grid_node_elem_index(
 
   vtkIntArray * ptindex = vtkIntArray::New();
   ptindex -> SetNumberOfComponents(1);
-  ptindex -> SetName("NodalIndex");
+  ptindex -> SetName("GlobalNodeID");
   for(int ii=0; ii<numpts; ++ii) 
     ptindex -> InsertComponent(ii, 0, ii );
 
@@ -453,7 +453,7 @@ void TET_T::write_tet_grid_node_elem_index(
   edge_aspect_ratio -> SetNumberOfComponents(1);
 
   vtkIntArray * cellindex = vtkIntArray::New();
-  cellindex -> SetName("ElemIndex");
+  cellindex -> SetName("GlobalElementID");
   cellindex -> SetNumberOfComponents(1);
 
   if( nlocbas == 4 )
@@ -574,7 +574,7 @@ void TET_T::write_tet_grid_node_elem_index(
 
   vtkIntArray * ptindex = vtkIntArray::New();
   ptindex -> SetNumberOfComponents(1);
-  ptindex -> SetName("NodalIndex");
+  ptindex -> SetName("GlobalNodeID");
   for(int ii=0; ii<numpts; ++ii)
     ptindex -> InsertComponent(ii, 0, node_idx[ii] );
 
@@ -587,7 +587,7 @@ void TET_T::write_tet_grid_node_elem_index(
   edge_aspect_ratio -> SetNumberOfComponents(1);
 
   vtkIntArray * cellindex = vtkIntArray::New();
-  cellindex -> SetName("ElemIndex");
+  cellindex -> SetName("GlobalElementID");
   cellindex -> SetNumberOfComponents(1);
 
   if( nlocbas == 4 )
@@ -711,7 +711,7 @@ void TET_T::write_tet_grid( const std::string &filename,
 
   vtkIntArray * ptindex = vtkIntArray::New();
   ptindex -> SetNumberOfComponents(1);
-  ptindex -> SetName("NodalIndex");
+  ptindex -> SetName("GlobalNodeID");
   for(int ii=0; ii<numpts; ++ii)
     ptindex -> InsertComponent(ii, 0, ii);
 
@@ -728,7 +728,7 @@ void TET_T::write_tet_grid( const std::string &filename,
   phy_tag -> SetNumberOfComponents(1);
 
   vtkIntArray * cellindex = vtkIntArray::New();
-  cellindex -> SetName("ElemIndex");
+  cellindex -> SetName("GlobalElementID");
   cellindex -> SetNumberOfComponents(1);
 
   if( nlocbas == 4 )
@@ -879,7 +879,7 @@ void TET_T::write_tet_grid( const std::string &filename,
 
   vtkIntArray * ptindex = vtkIntArray::New();
   ptindex -> SetNumberOfComponents(1);
-  ptindex -> SetName("NodalIndex");
+  ptindex -> SetName("GlobalNodeID");
   for(int ii=0; ii<numpts; ++ii)
     ptindex -> InsertComponent( ii, 0, node_index[ii] );
 
@@ -896,7 +896,7 @@ void TET_T::write_tet_grid( const std::string &filename,
   phy_tag -> SetNumberOfComponents(1);
 
   vtkIntArray * cellindex = vtkIntArray::New();
-  cellindex -> SetName("ElemIndex");
+  cellindex -> SetName("GlobalElementID");
   cellindex -> SetNumberOfComponents(1);
 
   if( nlocbas == 4 )
@@ -1053,7 +1053,7 @@ void TET_T::write_triangle_grid( const std::string &filename,
   // 3. nodal indices
   vtkIntArray * ptindex = vtkIntArray::New();
   ptindex -> SetNumberOfComponents(1);
-  ptindex -> SetName("NodalIndex");
+  ptindex -> SetName("GlobalNodeID");
   for(int ii=0; ii<numpts; ++ii)
     ptindex -> InsertComponent(ii, 0, node_index[ii]);
   
@@ -1062,7 +1062,7 @@ void TET_T::write_triangle_grid( const std::string &filename,
 
   // 4. cell indices
   vtkIntArray * clindex = vtkIntArray::New();
-  clindex -> SetName("ElemIndex");
+  clindex -> SetName("GlobalElementID");
   clindex -> SetNumberOfComponents(1);
   for(int ii=0; ii<numcels; ++ii)
     clindex -> InsertNextValue( ele_index[ii] );
@@ -1140,7 +1140,7 @@ void TET_T::write_quadratic_triangle_grid(
   // 3. nodal indices
   vtkIntArray * ptindex = vtkIntArray::New();
   ptindex -> SetNumberOfComponents(1);
-  ptindex -> SetName("NodalIndex");
+  ptindex -> SetName("GlobalNodeID");
   for(int ii=0; ii<numpts; ++ii)
     ptindex -> InsertComponent(ii, 0, node_index[ii]);
   
@@ -1149,7 +1149,7 @@ void TET_T::write_quadratic_triangle_grid(
 
   // 4. cell indices
   vtkIntArray * clindex = vtkIntArray::New();
-  clindex -> SetName("ElemIndex");
+  clindex -> SetName("GlobalElementID");
   clindex -> SetNumberOfComponents(1);
   for(int ii=0; ii<numcels; ++ii)
     clindex -> InsertNextValue( ele_index[ii] );
@@ -1224,7 +1224,7 @@ void TET_T::write_triangle_grid( const std::string &filename,
   // 3. nodal indices
   vtkIntArray * ptindex = vtkIntArray::New();
   ptindex -> SetNumberOfComponents(1);
-  ptindex -> SetName("NodalIndex");
+  ptindex -> SetName("GlobalNodeID");
   for(int ii=0; ii<numpts; ++ii)
   {
     ptindex -> InsertComponent(ii, 0, node_index[ii]);
@@ -1234,7 +1234,7 @@ void TET_T::write_triangle_grid( const std::string &filename,
 
   // 4. cell indices
   vtkIntArray * clindex = vtkIntArray::New();
-  clindex -> SetName("ElemIndex_1");
+  clindex -> SetName("GlobalElementID_1");
   clindex -> SetNumberOfComponents(1);
   for(int ii=0; ii<numcels; ++ii)
     clindex -> InsertNextValue( ele_index_1[ii] );
@@ -1242,7 +1242,7 @@ void TET_T::write_triangle_grid( const std::string &filename,
   clindex -> Delete();
 
   vtkIntArray * clindex2 = vtkIntArray::New();
-  clindex2 -> SetName("ElemIndex_2");
+  clindex2 -> SetName("GlobalElementID_2");
   clindex2 -> SetNumberOfComponents(1);
   for(int ii=0; ii<numcels; ++ii)
     clindex2 -> InsertNextValue( ele_index_2[ii] );
@@ -1320,7 +1320,7 @@ void TET_T::write_quadratic_triangle_grid( const std::string &filename,
   // 3. nodal indices
   vtkIntArray * ptindex = vtkIntArray::New();
   ptindex -> SetNumberOfComponents(1);
-  ptindex -> SetName("NodalIndex");
+  ptindex -> SetName("GlobalNodeID");
   for(int ii=0; ii<numpts; ++ii)
   {
     ptindex -> InsertComponent(ii, 0, node_index[ii]);
@@ -1330,7 +1330,7 @@ void TET_T::write_quadratic_triangle_grid( const std::string &filename,
 
   // 4. cell indices
   vtkIntArray * clindex = vtkIntArray::New();
-  clindex -> SetName("ElemIndex_1");
+  clindex -> SetName("GlobalElementID_1");
   clindex -> SetNumberOfComponents(1);
   for(int ii=0; ii<numcels; ++ii)
     clindex -> InsertNextValue( ele_index_1[ii] );
@@ -1338,7 +1338,7 @@ void TET_T::write_quadratic_triangle_grid( const std::string &filename,
   clindex -> Delete();
 
   vtkIntArray * clindex2 = vtkIntArray::New();
-  clindex2 -> SetName("ElemIndex_2");
+  clindex2 -> SetName("GlobalElementID_2");
   clindex2 -> SetNumberOfComponents(1);
   for(int ii=0; ii<numcels; ++ii)
     clindex2 -> InsertNextValue( ele_index_2[ii] );
@@ -1873,7 +1873,7 @@ namespace TET_T
 
     vtkIntArray * ptindex = vtkIntArray::New();
     ptindex -> SetNumberOfComponents(1);
-    ptindex -> SetName("NodalIndex");
+    ptindex -> SetName("GlobalNodeID");
     for(int ii=0; ii<4; ++ii) ptindex->InsertComponent(ii, 0, gindex[ii]);
 
     grid_w -> GetPointData() -> AddArray( ptindex );
