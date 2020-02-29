@@ -29,11 +29,11 @@ CMake will print some information on screen. Pay a look at the variable `CMAKE_B
 ```sh
 CMake ~/PERIGEE/examples/nonlinear_heat_eqn/ -DCMAKE_BUILD_TYPE=Release
 ```
-Now the value of `CMAKE_BUILD_TYPE` is set to `Release`. The code will be compiled in the optimized mode. For more information about the compiler, please refer this [note](docs/Introduction_to_Scientific_and_Technical_Computing/Compilers.pdf). Then run the following command to compile the code.
+Now the value of `CMAKE_BUILD_TYPE` is set to `Release`. The code will be compiled in the optimized mode. For more information about the compiler, please refer to this [note](docs/Introduction_to_Scientific_and_Technical_Computing/Compilers.pdf). CMake will generate the Makefile for you and you just need to run the following command to compile the source code.
 ```sh
 make
 ```
-If the make complains about the auto keyword or the nullptr, your default compiler does not support C++11. You may add `set (CMAKE_CXX_STANDARD 11)` in your .cmake configuration file to enforce the C++11 standard. 
+Of course you may add `-j2` to run Makefile with 2 threads. If the make complains about the auto keyword or the nullptr, your default compiler does not support C++11. You may add `set (CMAKE_CXX_STANDARD 11)` in your .cmake configuration file to enforce the C++11 standard. 
 
 ## References
 ### Finite Element Method
