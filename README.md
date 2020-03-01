@@ -37,11 +37,11 @@ make
 Of course you may add `-j2` to run Makefile with 2 threads. If the make complains about the auto keyword or the nullptr, your default compiler does not support C++11. You may add `set (CMAKE_CXX_STANDARD 11)` in your .cmake configuration file to enforce the C++11 standard. 
 
 ## Tutorial
-In general, one has to run the following commands to perform the simulation.
-* Obtain the mesh from SimVascular or Gmsh.
-* Run a preprocessor to prepare the mesh, assign boundary conditions, and partition the mesh. The preprocessor is a serial code and potentially may need to be run on a large memory node if you are handling a very large problem.
-* Run an analysis code in parallel to solve the partial differential equations. The solutions will be saved on disk in the binary format.
-* Run a preprocessor for postprocessing. This step repartition the mesh to make preparation for postprocessing. Postprocessing can be visualization, error calculation, etc. Similar to the preprocessor, this routine should be run in serial and may consume a lot memory if your mesh is fine. With this routine, we are able to run the postprocessing routine with different number of CPUs. For example, we run FEM analysis with, say, 360 CPUs; visualizing the solution is much less intensive in computing and may only need, say, 24 CPUs. So you should repartition the domain into 24 sub-domains in this step.
+In general, one has to run the following commands to perform a simulation.
+* Obtain a mesh in vtu/vtp format from SimVascular or Gmsh.
+* Run a preprocessor to load the mesh, assign boundary conditions, and partition the mesh. The preprocessor is a serial code and may need to be run on a large memory node if you are dealing with a very large problem.
+* Run a FEM dynamic analysis code in parallel to solve the partial differential equations. The solutions will be saved on disk in the binary format.
+* Run a preprocessor for postprocessing. This step re-partition the mesh to make preparation for postprocessing. Postprocessing can be visualization, error calculation, etc. Similar to the preprocessor, this routine should be run in serial and may consume a lot memory if your mesh is fine. With this routine, we are able to run the postprocessing routine with different number of CPUs. For example, we run FEM analysis with, say, 360 CPUs; visualizing the solution is much less intensive in computing and may only need, say, 24 CPUs. So you should repartition the domain into 24 sub-domains in this step.
 * Run a postprocessor in parallel. Often, this step refers to the visualization of the solutions. The visualzation routine will read the solution binary files and write the data into (parallel) vtu/vtp format. Then the data can be visualized in Paraview.
 
 In the folloing, we give more detailed tutorials on running the code.
