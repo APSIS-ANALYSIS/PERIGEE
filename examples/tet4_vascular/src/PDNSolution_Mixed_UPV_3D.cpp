@@ -87,8 +87,7 @@ void PDNSolution_Mixed_UPV_3D::Init_zero(
     VecSetValues(solution, 7, location, value, INSERT_VALUES);
   }
 
-  VecAssemblyBegin(solution);
-  VecAssemblyEnd(solution);
+  VecAssemblyBegin(solution); VecAssemblyEnd(solution);
 
   GhostUpdate();
 
@@ -113,7 +112,20 @@ void PDNSolution_Mixed_UPV_3D::Init_flow_parabolic(
   int location[7];
   double value[7] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   const int nlocalnode = pNode_ptr->get_nlocalnode();
-  double x, y, z, r, vel;
+
+  // First enforce everything to be zero
+  for(int ii=0; ii<nlocalnode; ++ii)
+  {
+    location[0] = pNode_ptr->get_node_loc(ii) * 7;
+    location[1] = location[0] + 1;
+    location[2] = location[0] + 2;
+    location[3] = location[0] + 3;
+    location[4] = location[0] + 4;
+    location[5] = location[0] + 5;
+    location[6] = location[0] + 6;
+
+    VecSetValues(solution, 7, location, value, INSERT_VALUES);
+  }
 
   const double vmax = 2.0 / infbc->get_fularea();
 
@@ -121,6 +133,8 @@ void PDNSolution_Mixed_UPV_3D::Init_flow_parabolic(
   const double out_ny = infbc->get_outvec(1);
   const double out_nz = infbc->get_outvec(2);
 
+  // If this sub-domain contains inflow nodes, set their values based on the
+  // parabolic flow profile
   if( infbc->get_Num_LD() > 0)
   {
     for(int ii=0; ii<nlocalnode; ++ii)
@@ -135,12 +149,12 @@ void PDNSolution_Mixed_UPV_3D::Init_flow_parabolic(
         location[5] = location[0] + 5;
         location[6] = location[0] + 6;
 
-        x = fNode_ptr->get_ctrlPts_x(ii);
-        y = fNode_ptr->get_ctrlPts_y(ii);
-        z = fNode_ptr->get_ctrlPts_z(ii);
+        const double x = fNode_ptr->get_ctrlPts_x(ii);
+        const double y = fNode_ptr->get_ctrlPts_y(ii);
+        const double z = fNode_ptr->get_ctrlPts_z(ii);
 
-        r = infbc->get_radius(x,y,z);
-        vel = vmax * (1.0 - r*r);
+        const double r = infbc->get_radius(x,y,z);
+        const double vel = vmax * (1.0 - r*r);
 
         value[4] = vel * (-1.0) * out_nx;
         value[5] = vel * (-1.0) * out_ny;
@@ -160,16 +174,11 @@ void PDNSolution_Mixed_UPV_3D::Init_flow_parabolic(
     SYS_T::commPrint("                       velo_x = parabolic \n");
     SYS_T::commPrint("                       velo_y = parabolic \n");
     SYS_T::commPrint("                       velo_z = parabolic \n");
-    PetscPrintf(PETSC_COMM_WORLD,
-        "                       flow rate 1.0 .\n");
-    PetscPrintf(PETSC_COMM_WORLD,
-        "                       max speed %e.\n", vmax);
-    PetscPrintf(PETSC_COMM_WORLD,
-        "                       active area is %e.\n", infbc->get_actarea() );
-    PetscPrintf(PETSC_COMM_WORLD,
-        "                       full area is %e.\n", infbc->get_fularea() );
-    PetscPrintf(PETSC_COMM_WORLD,
-        "                       direction [%e %e %e].\n", out_nx, out_ny, out_nz);
+    SYS_T::commPrint("                       flow rate 1.0 .\n");
+    SYS_T::commPrint("                       max speed %e.\n", vmax);
+    SYS_T::commPrint("                       active area is %e.\n", infbc->get_actarea() );
+    SYS_T::commPrint("                       full area is %e.\n", infbc->get_fularea() );
+    SYS_T::commPrint("                       direction [%e %e %e].\n", out_nx, out_ny, out_nz);
   }
 }
 
