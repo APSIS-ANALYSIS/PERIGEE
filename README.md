@@ -5,6 +5,7 @@ PERIGEE is a nonlinear dynamic finite element / isogeometric analysis code for m
 
 - [Install](#Install)
 - [Build](#Build)
+- [Tutorial](#Tutorial)
 - [References](#References)
 
 ## Install
@@ -34,6 +35,15 @@ Now the value of `CMAKE_BUILD_TYPE` is set to `Release`. The code will be compil
 make
 ```
 Of course you may add `-j2` to run Makefile with 2 threads. If the make complains about the auto keyword or the nullptr, your default compiler does not support C++11. You may add `set (CMAKE_CXX_STANDARD 11)` in your .cmake configuration file to enforce the C++11 standard. 
+
+## Tutorial
+Here we demonstrate how to run a simple job. Assume one has built the heat equation solver. There will be a suit of executable binaries generated in the build folder. In general, one has to run the following commands to perform the simulation.
+* Run a preprocessor to prepare the mesh, assign boundary conditions, and partition the mesh. The preprocessor is a serial code and potentially should be run on a large memory node if you are handling very a large mesh.
+* Run an analysis code in parallel to solve the partial differential equations.
+* Run a preprocessor for postprocessing. This step repartition the mesh to make preparation for postprocessing. Postprocessing may include visualization, error calculation, etc. Similar to the preprocessor, this routine should be run in serial and it may consume a lot memory if your mesh is very fine. With this routine, we are able to run the postprocessing routine with different number of CPUs.
+* Run a postprocessor in parallel. Often, this step refers to the visualization of the solutions. The visualzation routine will read the solution binary files and write the data into (parallel) vtu/vtp format.
+
+
 
 ## References
 ### Finite Element Method
