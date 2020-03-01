@@ -50,8 +50,8 @@ PDNSolution_Tet4_ALE_NS_3D::~PDNSolution_Tet4_ALE_NS_3D()
 void PDNSolution_Tet4_ALE_NS_3D::Init_zero(const APart_Node * const &pNode_ptr)
 {
   int location[7];
-  double value[7] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-  int nlocalnode = pNode_ptr->get_nlocalnode();
+  const double value[7] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  const int nlocalnode = pNode_ptr->get_nlocalnode();
 
   for(int ii=0; ii<nlocalnode; ++ii)
   {
@@ -90,7 +90,20 @@ void PDNSolution_Tet4_ALE_NS_3D::Init_flow_parabolic(
   int location[7];
   double value[7] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   int nlocalnode = pNode_ptr->get_nlocalnode();
-  double x, y, z, r, vel;
+
+  // First enforce everything to be zero
+  for(int ii=0; ii<nlocalnode; ++ii)
+  {
+    location[0] = pNode_ptr->get_node_loc(ii) * 7;
+    location[1] = location[0] + 1;
+    location[2] = location[0] + 2;
+    location[3] = location[0] + 3;
+    location[4] = location[0] + 4;
+    location[5] = location[0] + 5;
+    location[6] = location[0] + 6;
+
+    VecSetValues(solution, 7, location, value, INSERT_VALUES);
+  }
 
   // Maximum speed formula is 
   //             2.0 x flow rate (1.0) / surface area
@@ -116,12 +129,12 @@ void PDNSolution_Tet4_ALE_NS_3D::Init_flow_parabolic(
         location[5] = location[0] + 5;
         location[6] = location[0] + 6;
 
-        x = fNode_ptr->get_ctrlPts_x(ii);
-        y = fNode_ptr->get_ctrlPts_y(ii);
-        z = fNode_ptr->get_ctrlPts_z(ii);
+        const double x = fNode_ptr->get_ctrlPts_x(ii);
+        const double y = fNode_ptr->get_ctrlPts_y(ii);
+        const double z = fNode_ptr->get_ctrlPts_z(ii);
 
-        r = infbc->get_radius(x,y,z);
-        vel = vmax * (1.0 - r*r);
+        const double r = infbc->get_radius(x,y,z);
+        const double vel = vmax * (1.0 - r*r);
 
         // -1.0 is multiplied to make the flow direction inward
         value[4] = vel * (-1.0) * out_nx;

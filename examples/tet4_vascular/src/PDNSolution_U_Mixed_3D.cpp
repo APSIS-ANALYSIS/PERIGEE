@@ -106,8 +106,8 @@ void PDNSolution_U_Mixed_3D::Init_zero(
     const FEANode * const &fNode_ptr )
 {
   int location[3];
-  double value[3] = {0.0, 0.0, 0.0};
-  int nlocalnode = pNode_ptr->get_nlocalnode();
+  const double value[3] = {0.0, 0.0, 0.0};
+  const int nlocalnode = pNode_ptr->get_nlocalnode();
 
   for(int ii=0; ii<nlocalnode; ++ii)
   {
@@ -118,8 +118,7 @@ void PDNSolution_U_Mixed_3D::Init_zero(
     VecSetValues(solution, 3, location, value, INSERT_VALUES);
   }
 
-  VecAssemblyBegin(solution);
-  VecAssemblyEnd(solution);
+  VecAssemblyBegin(solution); VecAssemblyEnd(solution);
 
   GhostUpdate();
 
