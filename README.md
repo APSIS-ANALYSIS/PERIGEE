@@ -26,11 +26,11 @@ First, create a folder `build` out of the PERGIEE source directory. Enter that f
 ```sh
 CMake ~/PERIGEE/examples/nonlinear_heat_eqn/
 ```
-CMake will print some information on screen. Pay a look at the variable `CMAKE_BUILD_TYPE`. If its value is `Debug`, this means your code will be compiled in the debug mode. If you want to have better code efficiency, run CMake as follows,
+CMake will print some information on screen. Pay a look at the variable `CMAKE_BUILD_TYPE`. If its value is `Debug`, this means your code will be compiled in the debug mode. If you are not developing the code and wants to make the code faster, run CMake as follows,
 ```sh
 CMake ~/PERIGEE/examples/nonlinear_heat_eqn/ -DCMAKE_BUILD_TYPE=Release
 ```
-Now the value of `CMAKE_BUILD_TYPE` is set to `Release`. The code will be compiled in the optimized mode. For more information about the compiler, please refer to [this](https://stackoverflow.com/questions/48754619/what-are-cmake-build-type-debug-release-relwithdebinfo-and-minsizerel/48755129). CMake will generate the Makefile for you and you just need to run the following command to compile the source code.
+Now the value of `CMAKE_BUILD_TYPE` is set to `Release`. The code will be compiled in the optimized mode. For more information about the compiler, please refer to [this](https://stackoverflow.com/questions/48754619/what-are-cmake-build-type-debug-release-relwithdebinfo-and-minsizerel/48755129). Of course, a fully optimized code requires that your external libraries, especially PETSc, are compiled in the optimized mode. See the [advanced guide](docs/install-advanced.md) to learn how to build libraries in optimal mode. CMake will generate the Makefile for you and you just need to run the following command to compile the source code.
 ```sh
 make
 ```
