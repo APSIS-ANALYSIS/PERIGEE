@@ -37,12 +37,14 @@ make
 Of course you may add `-j2` to run Makefile with 2 threads. If the make complains about the auto keyword or the nullptr, your default compiler does not support C++11. You may add `set (CMAKE_CXX_STANDARD 11)` in your .cmake configuration file to enforce the C++11 standard. 
 
 ## Tutorial
-Here we demonstrate how to run a simple job. Assume one has built the heat equation solver. There will be a suit of executable binaries generated in the build folder. In general, one has to run the following commands to perform the simulation.
-* Run a preprocessor to prepare the mesh, assign boundary conditions, and partition the mesh. The preprocessor is a serial code and potentially should be run on a large memory node if you are handling very a large mesh.
-* Run an analysis code in parallel to solve the partial differential equations.
-* Run a preprocessor for postprocessing. This step repartition the mesh to make preparation for postprocessing. Postprocessing may include visualization, error calculation, etc. Similar to the preprocessor, this routine should be run in serial and it may consume a lot memory if your mesh is very fine. With this routine, we are able to run the postprocessing routine with different number of CPUs.
-* Run a postprocessor in parallel. Often, this step refers to the visualization of the solutions. The visualzation routine will read the solution binary files and write the data into (parallel) vtu/vtp format.
+In general, one has to run the following commands to perform the simulation.
+* Obtain the mesh from SimVascular or Gmsh.
+* Run a preprocessor to prepare the mesh, assign boundary conditions, and partition the mesh. The preprocessor is a serial code and potentially may need to be run on a large memory node if you are handling a very large problem.
+* Run an analysis code in parallel to solve the partial differential equations. The solutions will be saved on disk in the binary format.
+* Run a preprocessor for postprocessing. This step repartition the mesh to make preparation for postprocessing. Postprocessing can be visualization, error calculation, etc. Similar to the preprocessor, this routine should be run in serial and may consume a lot memory if your mesh is fine. With this routine, we are able to run the postprocessing routine with different number of CPUs. Often times, we run FEM analysis code with, say, 360 CPUs. Visualizing the solution is much less intensive in computing and may only need, say, 24 CPUs.
+* Run a postprocessor in parallel. Often, this step refers to the visualization of the solutions. The visualzation routine will read the solution binary files and write the data into (parallel) vtu/vtp format. Then the data can be visualized in Paraview.
 
+Here we demonstrate how to run a simple job. Assume one has built the heat equation solver. There will be a suit of executable binaries generated in the build folder.
 
 
 ## References
