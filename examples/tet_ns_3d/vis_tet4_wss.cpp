@@ -37,7 +37,7 @@ int main( int argc, char * argv[] )
 {
   std::string sol_bname("SOL_");
 
-  // visualization sampling pattern
+  // visualization sampling pattern over time
   int time_start = 0;
   int time_step = 1;
   int time_end = 1;
@@ -48,12 +48,13 @@ int main( int argc, char * argv[] )
   
   // fluid properties
   double fluid_mu = 3.5e-2;
+  
   const int dof = 4;
 
   PetscMPIInt size;
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
   MPI_Comm_size(PETSC_COMM_WORLD, &size);
-  SYS_T::print_fatal_if(size!=1, "ERROR: preprocessor is a serial program! \n");
+  SYS_T::print_fatal_if(size!=1, "ERROR: vis_tet4_wss is a serial program! \n");
 
   // Directly read in the volumetric and wall file from the file
   // that record the preprocessor command lines.
@@ -66,6 +67,7 @@ int main( int argc, char * argv[] )
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
+  // Now read the material properties from the solver cmd h5 file
   prepcmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
   
   cmd_h5r = new HDF5_Reader( prepcmd_file );
@@ -74,6 +76,7 @@ int main( int argc, char * argv[] )
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
+  // enforce this code is for linear element only
   if( elemType != 501 ) SYS_T::print_fatal("Error: element type should be 501 linear tet element.\n");
 
   SYS_T::GetOptionString("-sol_bname", sol_bname);
