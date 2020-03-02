@@ -6,7 +6,7 @@
 #include "Tet_Tools.hpp"
 #include "QuadPts_vis_tet10_v2.hpp"
 #include "FEAElement_Tet10_v2.hpp"
-#include "FEAElement_Triangle6_3d_der0.hpp"
+#include "FEAElement_Triangle6_3D_der0.hpp"
 
 int main( int argc, char * argv[] )
 {
