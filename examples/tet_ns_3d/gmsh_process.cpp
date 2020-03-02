@@ -14,8 +14,10 @@ int main( int argc, char * argv[] )
   int num_outlet = 1;
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+  
   SYS_T::GetOptionString("-gmsh_file", gmshFile);
   SYS_T::GetOptionInt("-num_outlet", num_outlet);
+  
   std::cout<<" -gmsh_file: "<<gmshFile<<std::endl;
   std::cout<<" -num_outlet: "<<num_outlet<<std::endl;
 
@@ -23,8 +25,8 @@ int main( int argc, char * argv[] )
 
   GIO -> print_info();
 
-  GIO -> write_vtp(0,0,false); // assumed to be wall vtp
-  GIO -> write_vtp(1,0,false); // assumed to be inlet vtp
+  GIO -> write_vtp(0,0,true); // assumed to be wall vtp
+  GIO -> write_vtp(1,0,true); // assumed to be inlet vtp
   
   for(int ii=0; ii<num_outlet; ++ii)
     GIO -> write_vtp(2+ii,0,true);

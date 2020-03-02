@@ -109,6 +109,7 @@ SET( perigee_analysis_lib_src
   )
 
 SET( perigee_postprocess_lib_src
+  ${perigee_source}/Mesh/Tet_Tools.cpp
   ${perigee_source}/Mesh/QuadPts_vis_tet4.cpp
   ${perigee_source}/Mesh/QuadPts_vis_tet10_v2.cpp
   ${perigee_source}/Postproc_Tool/PostVectSolution.cpp
@@ -147,11 +148,13 @@ ADD_EXECUTABLE( preprocess3d preprocess_sv_tets.cpp)
 ADD_EXECUTABLE( ns_tet_3d ns_tet_driver.cpp)
 ADD_EXECUTABLE( prepost prepost_ns_tets.cpp)
 ADD_EXECUTABLE( vis_ns vis_ns.cpp)
+ADD_EXECUTABLE( vis_tet4_wss vis_tet4_wss.cpp)
 
 TARGET_LINK_LIBRARIES( gmshIO ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( preprocess3d ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( ns_tet_3d ${EXTRA_LINK_LIBS} perigee_analysis )
 TARGET_LINK_LIBRARIES( prepost ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( vis_ns ${EXTRA_LINK_LIBS} perigee_analysis perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_tet4_wss ${EXTRA_LINK_LIBS} perigee_analysis perigee_postprocess )
 
 # EOF
