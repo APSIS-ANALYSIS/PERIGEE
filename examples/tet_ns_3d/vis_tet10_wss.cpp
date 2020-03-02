@@ -4,9 +4,14 @@
 // WSS visualization for ten-node tet elements.
 // ==================================================================
 #include "Tet_Tools.hpp"
+#include "QuadPts_vis_tri6.hpp"
+#include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_vis_tet10_v2.hpp"
 #include "FEAElement_Tet10_v2.hpp"
 #include "FEAElement_Triangle6_3D_der0.hpp"
+
+void range_generator( const int &ii, std::vector<int> &surface_id_range );
+
 
 int main( int argc, char * argv[] )
 {
@@ -18,6 +23,9 @@ int main( int argc, char * argv[] )
 
   std::string geo_file, wall_file;
   int elemType = 502;
+
+  const int nLocBas = 6;
+  const int v_nLocBas = 10;
 
   double fluid_mu = 3.5e-2;
 
@@ -48,7 +56,7 @@ int main( int argc, char * argv[] )
   delete cmd_h5r; H5Fclose(prepcmd_file);
   
   // Enforce the element to be quadratic tet for now
-  if( elemType != 502 ) SYS_T::print_fatal("Error: element type should be 502 quadratic tet element.\n");
+  //if( elemType != 502 ) SYS_T::print_fatal("Error: element type should be 502 quadratic tet element.\n");
 
   SYS_T::GetOptionString("-sol_bname", sol_bname);
   SYS_T::GetOptionInt("-time_start", time_start);
@@ -102,25 +110,40 @@ int main( int argc, char * argv[] )
   std::vector<double> interior_node_coord;
   interior_node_coord.resize(3*nElem);
 
+  // take values 0, 1, 2, or 3, it determines the side of the surface in the
+  // tetrahedron
+  std::vector<int> interior_node_local_index; 
+  interior_node_local_index.resize( nElem );
+
   std::vector< std::vector<double> > outnormal;
-  outnormal.resize( 6*nElem ); // quad triangle element has 6 nodes with different normal vectors
+  outnormal.resize( nLocBas*nElem ); // quad triangle element has 6 nodes with different normal vectors
 
   std::vector<double> tri_area;
   tri_area.resize( nElem );
+
+  IQuadPts * quad_tri_vis = new QuadPts_vis_tri6();
+
+  quad_tri_vis -> print_info();
+
+  IQuadPts * quad_tri_gau = new QuadPts_Gauss_Triangle( quad_tri_vis->get_num_quadPts() );
+
+  quad_tri_gau -> print_info();
+
+  FEAElement * element_tri = new FEAElement_Triangle6_3D_der0( quad_tri_vis-> get_num_quadPts() );
 
   for(int ee=0; ee<nElem; ++ee)
   {
     std::vector<int> trn; trn.resize(3);
     int ten[4];
 
-    trn[0] = global_node_idx[ vecIEN[3*ee+0] ];
-    trn[1] = global_node_idx[ vecIEN[3*ee+1] ];
-    trn[2] = global_node_idx[ vecIEN[3*ee+2] ];
+    trn[0] = global_node_idx[ vecIEN[nLocBas*ee+0] ];
+    trn[1] = global_node_idx[ vecIEN[nLocBas*ee+1] ];
+    trn[2] = global_node_idx[ vecIEN[nLocBas*ee+2] ];
 
-    ten[0] = v_vecIEN[ global_ele_idx[ee]*4+0 ];
-    ten[1] = v_vecIEN[ global_ele_idx[ee]*4+1 ];
-    ten[2] = v_vecIEN[ global_ele_idx[ee]*4+2 ];
-    ten[3] = v_vecIEN[ global_ele_idx[ee]*4+3 ];
+    ten[0] = v_vecIEN[ global_ele_idx[ee]*v_nLocBas+0 ];
+    ten[1] = v_vecIEN[ global_ele_idx[ee]*v_nLocBas+1 ];
+    ten[2] = v_vecIEN[ global_ele_idx[ee]*v_nLocBas+2 ];
+    ten[3] = v_vecIEN[ global_ele_idx[ee]*v_nLocBas+3 ];
     
     bool gotnode[4];
     int node_check = 0;
@@ -128,7 +151,11 @@ int main( int argc, char * argv[] )
     {
       gotnode[ii] = VEC_T::is_invec( trn, ten[ii] );
 
-      if(!gotnode[ii]) interior_node[ee] = ten[ii];
+      if(!gotnode[ii]) 
+      {
+        interior_node[ee] = ten[ii]; // interior node's global volumetric mesh nodal index
+        interior_node_local_index[ee] = ii; // interior node's local tetrahedral element index
+      }
       else node_check += 1;
     }
 
@@ -139,17 +166,62 @@ int main( int argc, char * argv[] )
     interior_node_coord[3*ee+0] = v_ctrlPts[ 3*interior_node[ee] + 0 ];
     interior_node_coord[3*ee+1] = v_ctrlPts[ 3*interior_node[ee] + 1 ];
     interior_node_coord[3*ee+2] = v_ctrlPts[ 3*interior_node[ee] + 2 ];
+
+    // Obtain the control point coordinates for this element
+    double * ectrl_x = new double [nLocBas];
+    double * ectrl_y = new double [nLocBas];
+    double * ectrl_z = new double [nLocBas];
+
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      ectrl_x[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii] + 0 ];
+      ectrl_y[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii] + 1 ];
+      ectrl_z[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii] + 2 ];
+    }
+
+    // Build a basis based on the visualization sampling point 
+    element_tri -> buildBasis(quad_tri_vis, ectrl_x, ectrl_y, ectrl_z); 
+
+    // For each nodal point, calculate the outward normal vector 
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      double nx, ny, nz, len;
+
+      element_tri -> get_normal_out( ii, ectrl_x[ii], ectrl_y[ii], ectrl_z[ii],
+          interior_node_coord[3*ee+0], interior_node_coord[3*ee+1], 
+          interior_node_coord[3*ee+2], nx, ny, nz, len );
+
+      outnormal[nLocBas * ee + ii].resize(3);
+      outnormal[nLocBas * ee + ii][0] = nx;
+      outnormal[nLocBas * ee + ii][1] = ny;
+      outnormal[nLocBas * ee + ii][2] = nz;
+    } 
+  
+    // Now calcualte the element surface area
+    element_tri -> buildBasis( quad_tri_gau, ectrl_x, ectrl_y, ectrl_z );
+
+    tri_area[ee] = 0.0;
+    for(int qua=0; qua<quad_tri_gau->get_num_quadPts(); ++qua)
+      tri_area[ee] += element_tri->get_detJac(qua) * quad_tri_gau->get_qw(qua);
  
-     
-  
-  
-  
-  
-  
-  
-  
+    delete [] ectrl_x; delete [] ectrl_y; delete [] ectrl_z; 
   }
 
+  delete quad_tri_vis; delete quad_tri_gau; delete element_tri;
+  
+  // Volumetric element visualization sampling point 
+  IQuadPts * quad = new QuadPts_vis_tet10_v2();
+
+  quad -> print_info();
+
+  FEAElement * element = new FEAElement_Tet10_v2( quad-> get_num_quadPts() );
+
+  double * ectrl_x = new double [v_nLocBas];
+  double * ectrl_y = new double [v_nLocBas];
+  double * ectrl_z = new double [v_nLocBas];
+  double * esol_u  = new double [v_nLocBas];
+  double * esol_v  = new double [v_nLocBas];
+  double * esol_w  = new double [v_nLocBas];
 
 
 
@@ -169,21 +241,56 @@ int main( int argc, char * argv[] )
 
 
 
-
-
-
-
-
-
-
-
-
+  delete [] ectrl_x; delete [] ectrl_y; delete [] ectrl_z;
+  delete [] esol_u; delete [] esol_v; delete [] esol_w;
+  delete quad; delete element;
 
   PetscFinalize();
   return EXIT_SUCCESS;
 }
 
 
-
+void range_generator( const int &ii, std::vector<int> &surface_id_range )
+{
+  surface_id_range.resize(6);
+  switch (ii)
+  {
+    case 0:
+      surface_id_range[0] = 1;
+      surface_id_range[1] = 2;
+      surface_id_range[2] = 3;
+      surface_id_range[3] = 5;
+      surface_id_range[4] = 8;
+      surface_id_range[5] = 9;
+      break;
+    case 1:
+      surface_id_range[0] = 0;
+      surface_id_range[1] = 2;
+      surface_id_range[2] = 3;
+      surface_id_range[3] = 6;
+      surface_id_range[4] = 7;
+      surface_id_range[5] = 9;
+      break;
+    case 2:
+      surface_id_range[0] = 0;
+      surface_id_range[1] = 1;
+      surface_id_range[2] = 3;
+      surface_id_range[3] = 4;
+      surface_id_range[4] = 7;
+      surface_id_range[5] = 8;
+      break;
+    case 3:
+      surface_id_range[0] = 0;
+      surface_id_range[1] = 1;
+      surface_id_range[2] = 2;
+      surface_id_range[3] = 4;
+      surface_id_range[4] = 5;
+      surface_id_range[5] = 6;
+      break;
+    default:
+      SYS_T::print_fatal("Error: the interior node index is wrong!\n");
+      break;
+  }
+}
 
 // EOF
