@@ -169,7 +169,7 @@ class Gmsh_FileIO
     // size is {num_phy_domain} x { ele_nlocbas[ii] times phy_domain_nElem[ii] }
     // note: the eIEN values are with nodal indices starting from 0.       
     //       the first argument 0 <= ii < num_phy_domain is the physical tag
-    std::vector<std::vector<int> > eIEN;
+    std::vector< std::vector<int> > eIEN;
 
     // stores the number of basis functions in each physical domain. 
     // This implicitly implies that the we use the same type of element 
