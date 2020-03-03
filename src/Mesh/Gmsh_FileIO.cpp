@@ -57,12 +57,12 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
     sstrm.clear(); getline(infile, sline); sstrm.str(sline);
     sstrm >> pdim; sstrm >> pidx; sstrm >> pname;
 
-    // Gmsh have "name" as the physical name, the following removes
+    // Gmsh have "name" as the physical name, first removes
     // the two primes in the name.
     pname.erase( pname.begin() ); 
     pname.erase( pname.end()-1 );
     
-    // minus 1 because .msh file has things starting with 1
+    // minus 1 because .msh file index starts from 1
     phy_dim.push_back(pdim);
     phy_index.push_back(pidx-1);
     phy_name.push_back(pname);
@@ -91,22 +91,20 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
   sstrm.clear();
   getline(infile, sline); sstrm.str(sline); sstrm>>num_node;
 
-  // x-y-z coordinates for the nodes
+  // Record x-y-z coordinates for the nodes into the vector node
   node.resize(3*num_node);
 
-  int nidx; // node index
-  double nx, ny, nz;
   for(int ii=0; ii<num_node; ++ii)
   {
     sstrm.clear(); getline(infile, sline); sstrm.str(sline);
+    int nidx; // node index
     sstrm >> nidx;
   
-    SYS_T::print_fatal_if( nidx != ii+1, 
-        "Error: .msh file, the nodal index should be in the range [1, num_node]. \n");
+    SYS_T::print_fatal_if( nidx != ii+1, "Error: .msh file, the nodal index should be in the range [1, num_node]. \n");
 
-    sstrm >> nx; node[ii*3]   = nx;
-    sstrm >> ny; node[ii*3+1] = ny;
-    sstrm >> nz; node[ii*3+2] = nz;
+    sstrm >> node[ii*3];
+    sstrm >> node[ii*3+1];
+    sstrm >> node[ii*3+2];
   }
 
   // file syntax $EndNodes, $Elements
@@ -151,7 +149,8 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
     SYS_T::print_fatal_if( num_tag!=2,
         "Error: .msh file number of tag for element is not 2.\n");
 
-    // The pre-defined const array gives the element number of nodes
+    // The pre-defined const array in the beginning of the constructor
+    // gives the element number of nodes
     enum_node = elem_nlocbas[ etype ];
 
     // elem_phy_tag stores phy_tag-1 to be compatible with phy_index
@@ -183,7 +182,7 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
       // the node index by minus 1.
       eIEN[phy_tag-1].push_back( temp_index - 1 );
     }
-  } 
+  }
 
   // Finish the file reading, the last line should be $EndElements  
   getline(infile, sline);
