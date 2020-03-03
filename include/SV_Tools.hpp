@@ -35,8 +35,17 @@ namespace SV_T
   // ----------------------------------------------------------------
   // ! gen_sv_fsi_vtus : merge fluid and solid vtu files into one 
   //                     single file for the whole domain, and write 
-  //                     the solid mesh with the updated nodal and 
-  //                     element indices.
+  //                     the SOLID mesh with the updated nodal and 
+  //                     element indices. Since SV will generate fluid
+  //                     and solid domains separately. In the merging,
+  //                     we take fluid element and nodal indices first,
+  //                     meaning their values will not be changed. Then
+  //                     the solid domain element and nodal indices 
+  //                     follow those of the fluid domain, meaning we
+  //                     will adjust the nodes in the solid domain, adjust
+  //                     the solid IEN array, and append the solid IEN
+  //                     array after the fluid IEN array to generate
+  //                     the new whole domain IEN array.
   //  \para filename_f      : the original fluid mesh vtu
   //  \para filename_s      : the original solid mesh vtu
   //  \para filename_f_wall : the UPDATED fluid wall vtp file
