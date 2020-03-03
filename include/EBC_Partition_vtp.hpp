@@ -60,8 +60,9 @@ class EBC_Partition_vtp : public IEBC_Partition
     {return local_global_cell[ii][jj];}
 
   protected:
-    const int cpu_rank;
-    const int num_ebc;
+    const int cpu_rank; // The rank or id of the subdomain
+    
+    const int num_ebc; // Number of groups of bc faces that require bc integral
 
     std::vector<int> num_local_node, num_local_cell, cell_nLocBas;
 

@@ -24,7 +24,7 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
   std::istringstream sstrm;
   std::string sline;
 
-  // First four lines are system info
+  // First four lines are Gmsh default file format 
   getline(infile, sline); 
   SYS_T::print_fatal_if(sline.compare("$MeshFormat") != 0, 
       "Error: .msh format first line should be $MeshFormat. \n");
@@ -251,8 +251,7 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
 
 
 Gmsh_FileIO::~Gmsh_FileIO()
-{
-}
+{}
 
 
 void Gmsh_FileIO::print_info() const
