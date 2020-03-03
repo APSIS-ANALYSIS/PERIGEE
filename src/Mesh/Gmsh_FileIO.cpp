@@ -781,13 +781,16 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
 }
 
 
-void Gmsh_FileIO::check_FSI_ordering() const
+void Gmsh_FileIO::check_FSI_ordering( const std::string &phy1,
+   const std::string &phy2 ) const
 {
+  SYS_T::print_fatal_if( num_phy_domain_3d != 2, "Error: Gmsh_FileIO FSI mesh should contain only 2 physical domains.\n");
+
   const std::string name0 = phy_3d_name[ 0 ];
   const std::string name1 = phy_3d_name[ 1 ];
 
-  SYS_T::print_fatal_if( name0.compare("fluid"), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 0 should be fluid domain.\n" );
-  SYS_T::print_fatal_if( name1.compare("solid"), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 1 should be solid domain.\n" );
+  SYS_T::print_fatal_if( name0.compare(phy1), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 0 should be fluid domain.\n" );
+  SYS_T::print_fatal_if( name1.compare(phy2), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 1 should be solid domain.\n" );
 }
 
 
@@ -1297,6 +1300,63 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
   // Close the HDF5 file
   delete h5w;
   H5Fclose( file_id ); 
+}
+
+
+void Gmsh_FileIO::update_FSI_nodal_ordering()
+{
+  // First generate the fluid and solid node lists
+  std::vector<int> new2old = eIEN[ phy_3d_index[0] ];
+  VEC_T::sort_unique_resize( new2old );
+
+  std::vector<int> snode = eIEN[ phy_3d_index[1] ];
+  VEC_T::sort_unique_resize(snode);
+ 
+  // append the node unique in the solid domain after the fluid node to generate
+  // a new2old mapping 
+  for( const int ii : snode )
+  {
+    // if solid node is NOT in the fluid node, append it
+    if( !VEC_T::is_invec(new2old, ii) ) new2old.push_back( ii );
+  }
+
+  // Now clean the snode vector to save memory
+  VEC_T::clean( snode );
+
+  SYS_T::print_fatal_if( static_cast<int>( new2old.size() ) != num_node, "Error: Gmsh_FildIO::update_FSI_nodal_ordering the number of nodes in the first two sub-domain does match the num_node!\n" );
+
+  // Now generate the old2new mapping
+  std::vector<int> old2new;
+  old2new.resize( num_node );
+
+  for(int ii=0; ii<num_node; ++ii) old2new[ new2old[ii] ] = ii;
+
+  // Now clean the new2old mapper to save memory
+  VEC_T::clean( new2old );
+
+  // Now update the nodal x-y-z coordinates
+  std::vector<double> temp; // temporary xyz coordinates based on new indices
+  
+  temp.resize( 3 * num_node );
+
+  for( int ii=0; ii<num_node; ++ii )
+  {
+    const int new_idx = old2new[ ii ]; // ii is the old index
+
+    temp[3 * new_idx + 0] = node[3 * ii + 0];
+    temp[3 * new_idx + 1] = node[3 * ii + 1];
+    temp[3 * new_idx + 2] = node[3 * ii + 2];
+  }
+
+  node = temp; // now update the node vector
+
+  // Now update all the IEN arrays by the new nodal index set
+  for(int ii=0; ii<num_phy_domain; ++ii)
+  {
+    const int len = static_cast<int>( eIEN[ii].size() );
+    for( int jj=0; jj<len; ++jj )
+      eIEN[ii][jj] = old2new[ eIEN[ii][jj] ];
+  }
 }
 
 // EOF

@@ -31,8 +31,21 @@ class Gmsh_FileIO
     // solid domain. This function will check the ordering once the
     // Gmsh is constructed and throw a fatal error message if the 
     // ordering is wrong.
+    // Sometimes, we use "lumen" as the name for fluid sub-domain,
+    // and "tissue" as the name for the solid sub-domain, in the gmsh
+    // file, so the user may put proper name in the argument.
     // --------------------------------------------------------------
-    void check_FSI_ordering() const;
+    void check_FSI_ordering( const std::string &phy1="fluid",
+       const std::string &phy2="solid" ) const;
+
+    // --------------------------------------------------------------
+    // In FSI problems, in addition to make the elements start from
+    // the fluid sub-domain, we may also need to have the nodal
+    // indices start from the fluid domain. This funciton will update
+    // the nodal indices such that the fluid domain owns the first
+    // a few nodal points, and the solid domain owns the next.
+    // --------------------------------------------------------------
+    void update_FSI_nodal_ordering();
 
     // --------------------------------------------------------------
     // write a vtp file for an interior surface between two physical
@@ -155,13 +168,19 @@ class Gmsh_FileIO
     std::vector<int> phy_3d_nElem, phy_2d_nElem, phy_1d_nElem;
 
     // Stores the starting index for the 3d/2d volume mesh, with length
-    // num_phy_domain_3d/num_phy_domain_2d. 
+    // num_phy_domain_3d/num_phy_domain_2d.
+    // This is a data generated within this code. It is utilized such
+    // that the first phy domain starts with the first a few elements,
+    // the second phy domain element indices follows, etc. This is because
+    // Gmsh has an element id for 1d, 2d, and 3d elements all together,
+    // we need to manage our own element id ourselves. 
     std::vector<int> phy_3d_start_index;
     std::vector<int> phy_2d_start_index;
 
     // --------------------------------------------------------------
     // Geometry info    
-    int num_node; // number of nodes
+    int num_node; // number of nodal points
+    
     std::vector<double> node; // 3 x num_node: x-y-z coordinates
 
     int num_elem; // number of total elem (2D and 3D together)
