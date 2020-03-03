@@ -1385,4 +1385,158 @@ void Gmsh_FileIO::update_quadratic_tet_IEN( const int &index_3d )
 }
 
 
+void Gmsh_FileIO::write_quadratic_sur_vtu( const int &index_sur,
+    const int &index_vol, const bool &isf2e ) const
+{
+  SYS_T::print_fatal_if( index_sur >= num_phy_domain_2d || index_sur < 0,
+      "Error: Gmsh_FileIO::write_vtp, surface index is wrong. \n");
+
+  SYS_T::print_fatal_if( index_vol >= num_phy_domain_3d || index_vol < 0,
+      "Error: Gmsh_FileIO::write_vtp, volume index is wrong. \n");
+
+  const int phy_index_sur = phy_2d_index[index_sur];
+  const int phy_index_vol = phy_3d_index[index_vol];
+  const int bcnumcl = phy_2d_nElem[index_sur];
+  const int numcel = phy_3d_nElem[index_vol];
+
+  SYS_T::print_fatal_if( ele_nlocbas[phy_index_sur] != 6, "Error: Gmsh_FileIO write_quadratic_sur_vtu only works for 6-node triangle surface mesh.\n");
+  
+  SYS_T::print_fatal_if( ele_nlocbas[phy_index_vol] != 10, "Error: Gmsh_FileIO write_quadratic_sur_vtu only works for 10-node tetrahedral volumetric mesh.\n");
+
+  std::cout<<"=== Gmsh_FileIO::write_quadratuc_sur_vtu for "
+    <<phy_2d_name[index_sur]
+    <<" associated with "<<phy_3d_name[index_vol];
+
+  if( isf2e )
+    std::cout<<" with face-to-volume element index. \n";
+  else
+    std::cout<<" without face-to-volume element index. \n";
+
+  SYS_T::Timer * mytimer = new SYS_T::Timer();
+
+  std::string vtu_file_name(phy_2d_name[index_sur]);
+  vtu_file_name += "_";
+  vtu_file_name += phy_3d_name[index_vol];
+  std::cout<<"-----> write "<<vtu_file_name<<".vtu \n";
+  
+  mytimer->Reset(); mytimer->Start();
+
+  // triangle mesh ien copied from eIEN
+  std::vector<int> trien_global( eIEN[phy_index_sur] );
+  
+  // global node index
+  std::vector<int> bcpt( trien_global );
+
+  SYS_T::print_fatal_if( int(trien_global.size() ) != 6 * bcnumcl,
+      "Error: Gmsh_FileIO::write_quadratic_sur_vtu, sur IEN size wrong. \n" );
+
+  VEC_T::sort_unique_resize( bcpt ); // unique ascending order nodes
+ 
+  const int bcnumpt = static_cast<int>( bcpt.size() );
+
+  std::cout<<"      num of bc pt = "<<bcnumpt<<'\n';
+
+  // tript stores the coordinates of the boundary points
+  std::vector<double> tript; tript.clear(); tript.resize(3*bcnumpt);
+  for( int ii=0; ii<bcnumpt; ++ii )
+  {
+    tript[ii*3]   = node[bcpt[ii]*3] ;
+    tript[ii*3+1] = node[bcpt[ii]*3+1] ;
+    tript[ii*3+2] = node[bcpt[ii]*3+2] ;
+  }
+
+  // A mapper that maps bc node to 1 other to 0
+  bool * bcmap = new bool [num_node];
+  for(int ii=0; ii<num_node; ++ii) bcmap[ii] = 0;
+  for(int ii=0; ii<bcnumpt; ++ii) bcmap[bcpt[ii]] = 1;
+
+  // Volume mesh IEN
+  std::vector<int> vol_IEN( eIEN[phy_index_vol] );
+
+  SYS_T::print_fatal_if( int( vol_IEN.size() ) != 10 * numcel,
+      "Error: Gmsh_FileIO::write_quadratic_sur_vtu, vol IEN size wrong. \n");
+
+  std::vector<int> gelem; gelem.clear();
+  for( int ee=0; ee<numcel; ++ee )
+  {
+    int total = 0;
+    total += bcmap[ vol_IEN[10*ee] ];
+    total += bcmap[ vol_IEN[10*ee+1] ];
+    total += bcmap[ vol_IEN[10*ee+2] ];
+    total += bcmap[ vol_IEN[10*ee+3] ];
+    if(total >= 3) gelem.push_back(ee);
+  }
+  delete [] bcmap; bcmap = nullptr;
+  std::cout<<"      "<<gelem.size()<<" tets have faces over the surface. \n";
+
+  // generate local triangle IEN array
+  std::vector<int> trien; trien.clear();
+  for(int ee=0; ee<bcnumcl; ++ee)
+  {
+    auto it = find(bcpt.begin(), bcpt.end(), trien_global[6*ee]);
+    trien.push_back( it - bcpt.begin() );
+
+    it = find(bcpt.begin(), bcpt.end(), trien_global[6*ee+1]);
+    trien.push_back( it - bcpt.begin() );
+
+    it = find(bcpt.begin(), bcpt.end(), trien_global[6*ee+2]);
+    trien.push_back( it - bcpt.begin() );
+    
+    it = find(bcpt.begin(), bcpt.end(), trien_global[6*ee+3]);
+    trien.push_back( it - bcpt.begin() );
+
+    it = find(bcpt.begin(), bcpt.end(), trien_global[6*ee+4]);
+    trien.push_back( it - bcpt.begin() );
+
+    it = find(bcpt.begin(), bcpt.end(), trien_global[6*ee+5]);
+    trien.push_back( it - bcpt.begin() );
+  }
+  std::cout<<"      triangle IEN generated. \n"; 
+
+  std::vector<int> face2elem; face2elem.resize( bcnumcl, -1 );
+  if( isf2e )
+  {
+    int vnode[4];
+    bool got0, got1, got2, gotit;
+    for(int ff=0; ff<bcnumcl; ++ff)
+    {
+      const int node0 = trien_global[6*ff];
+      const int node1 = trien_global[6*ff+1];
+      const int node2 = trien_global[6*ff+2];
+      gotit = false;
+      int ee = -1;
+      while( !gotit && ee < int(gelem.size()) - 1 )
+      {
+        ee += 1;
+        const int vol_elem = gelem[ee];
+        vnode[0] = vol_IEN[10*vol_elem];
+        vnode[1] = vol_IEN[10*vol_elem+1];
+        vnode[2] = vol_IEN[10*vol_elem+2];
+        vnode[3] = vol_IEN[10*vol_elem+3];
+        std::sort(vnode, vnode+4);
+
+        got0 = ( std::find(vnode, vnode+4, node0) != vnode+4 );
+        got1 = ( std::find(vnode, vnode+4, node1) != vnode+4 );
+        got2 = ( std::find(vnode, vnode+4, node2) != vnode+4 );
+        gotit = got0 && got1 && got2;
+      }
+
+      // If the boundary surface element is not found,
+      // we write -1 as the mapping value
+      if(gotit)
+        face2elem[ff] = gelem[ee] + phy_3d_start_index[index_vol];
+      else
+        face2elem[ff] = -1;
+    }
+    std::cout<<"      face2elem mapping generated. \n";
+  }
+
+  TET_T::write_quadratic_triangle_grid( vtu_file_name, bcnumpt, bcnumcl,
+      tript, trien, bcpt, face2elem );
+
+  mytimer->Stop();
+  std::cout<<"      Time taken "<<mytimer->get_sec()<<" sec. \n";
+  delete mytimer;
+}
+
 // EOF

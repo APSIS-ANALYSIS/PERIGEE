@@ -100,7 +100,17 @@ class Gmsh_FileIO
     // --------------------------------------------------------------
     void write_vtp(const int &index_sur, const int &index_vol,
         const bool &isf2e = false) const;
-   
+  
+    // --------------------------------------------------------------
+    // write a vtu file for a surface associated with a volume mesh
+    // with name surfacename_volumename.vtu
+    // This function is used specifically for quadratic triangle mesh
+    // and will write the surface mesh into a vtu file. It functionality
+    // is quite close to write_vtp.
+    // --------------------------------------------------------------
+    void write_quadratic_sur_vtu( const int &index_sur, 
+        const int &index_vol, const bool &isf2e = false) const;
+
     // --------------------------------------------------------------
     // Write a vtu file for all volumetric physical domain together.
     // a physical tag will be added to distinguish the physical problem
