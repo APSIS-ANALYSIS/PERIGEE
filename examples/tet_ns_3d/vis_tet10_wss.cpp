@@ -28,6 +28,18 @@ int get_tri_local_id( const double * const &coor_x,
     const double &x, const double &y, const double &z,
     const double &tol = 1.0e-8 );
 
+void write_triangle_grid_wss( const std::string &filename,
+    const int &numpts, const int &numcels,
+    const std::vector<double> &pt,
+    const std::vector<int> &ien_array,
+    const std::vector< std::vector<double> > &wss_on_node );
+
+void write_triangle_grid_tawss_osi( const std::string &filename,
+    const int &numpts, const int &numcels,
+    const std::vector<double> &pt,
+    const std::vector<int> &ien_array,
+    const std::vector<double> &tawss,
+    const std::vector<double> &osi );
 
 int main( int argc, char * argv[] )
 {
@@ -72,7 +84,7 @@ int main( int argc, char * argv[] )
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
   // Enforce the element to be quadratic tet for now
-  //if( elemType != 502 ) SYS_T::print_fatal("Error: element type should be 502 quadratic tet element.\n");
+  if( elemType != 502 ) SYS_T::print_fatal("Error: element type should be 502 quadratic tet element.\n");
 
   SYS_T::GetOptionString("-sol_bname", sol_bname);
   SYS_T::GetOptionInt("-time_start", time_start);
@@ -387,7 +399,7 @@ int main( int argc, char * argv[] )
     }
 
     // TO-DO Write the wall shear stress at this time instance
-    // write_triangle_grid_wss( name_to_write, nFunc, nElem, ctrlPts, vecIEN, wss_ave );
+    write_triangle_grid_wss( name_to_write, nFunc, nElem, ctrlPts, vecIEN, wss_ave );
 
     for(int ii=0; ii<nFunc; ++ii)
     {
@@ -416,8 +428,8 @@ int main( int argc, char * argv[] )
   }
 
   // TO-DO write the TAWSS and OSI
-  //std::string tawss_osi_file("SOL_TAWSS_OSI" );
-  //write_triangle_grid_tawss_osi( tawss_osi_file, nFunc, nElem, ctrlPts, vecIEN, tawss, osi );
+  std::string tawss_osi_file("SOL_TAWSS_OSI" );
+  write_triangle_grid_tawss_osi( tawss_osi_file, nFunc, nElem, ctrlPts, vecIEN, tawss, osi );
 
   delete [] v_ectrl_x; delete [] v_ectrl_y; delete [] v_ectrl_z;
   delete [] esol_u; delete [] esol_v; delete [] esol_w;
@@ -592,10 +604,165 @@ int get_tri_local_id( const double * const &coor_x,
   return -1;
 }
 
+void write_triangle_grid_wss( const std::string &filename,
+    const int &numpts, const int &numcels,
+    const std::vector<double> &pt,
+    const std::vector<int> &ien_array,
+    const std::vector< std::vector<double> > &wss_on_node )
+{
+  if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: point vector size does not match the number of points. \n");
+
+  if(int(ien_array.size()) != 6*numcels) SYS_T::print_fatal("Error: ien array size does not match the number of cells. \n");
+
+  if(int(wss_on_node.size()) != numpts) SYS_T::print_fatal("Error: wss_on_node size does not match the number of points. \n");
+
+  vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
+
+  // 1. nodal points
+  vtkPoints * ppt = vtkPoints::New();
+  ppt->SetDataTypeToDouble();
+  double coor[3];
+  for(int ii=0; ii<numpts; ++ii)
+  {
+    coor[0] = pt[3*ii];
+    coor[1] = pt[3*ii+1];
+    coor[2] = pt[3*ii+2];
+    ppt -> InsertPoint(ii, coor);
+  }
+
+  grid_w -> SetPoints(ppt);
+  ppt -> Delete();
+
+  // 2. cell data
+  vtkCellArray * cl = vtkCellArray::New();
+  for(int ii=0; ii<numcels; ++ii)
+  {
+    vtkQuadraticTriangle * tr = vtkQuadraticTriangle::New();
+
+    tr->GetPointIds()->SetId( 0, ien_array[6*ii] );
+    tr->GetPointIds()->SetId( 1, ien_array[6*ii+1] );
+    tr->GetPointIds()->SetId( 2, ien_array[6*ii+2] );
+    tr->GetPointIds()->SetId( 3, ien_array[6*ii+3] );
+    tr->GetPointIds()->SetId( 4, ien_array[6*ii+4] );
+    tr->GetPointIds()->SetId( 5, ien_array[6*ii+5] );
+    cl -> InsertNextCell(tr);
+    tr -> Delete();
+  }
+  
+  grid_w -> SetCells(22, cl);
+  
+  cl->Delete();
+
+  // write wss
+  vtkDoubleArray * ptindex = vtkDoubleArray::New();
+  ptindex -> SetNumberOfComponents(3);
+  ptindex -> SetName("WSS");
+  for(int ii=0; ii<numpts; ++ii)
+  {
+    ptindex -> InsertComponent(ii, 0, wss_on_node[ii][0]);
+    ptindex -> InsertComponent(ii, 1, wss_on_node[ii][1]);
+    ptindex -> InsertComponent(ii, 2, wss_on_node[ii][2]);
+  }
+  grid_w -> GetPointData() -> AddArray( ptindex );
+  ptindex->Delete();
+
+  vtkXMLUnstructuredGridWriter * writer = vtkXMLUnstructuredGridWriter::New();
+  std::string name_to_write(filename);
+  name_to_write.append(".vtu");
+  writer -> SetFileName( name_to_write.c_str() );
+  writer->SetInputData(grid_w);
+  writer->Write();
+
+  writer->Delete();
+  grid_w->Delete();
+}
 
 
+void write_triangle_grid_tawss_osi( const std::string &filename,
+    const int &numpts, const int &numcels,
+    const std::vector<double> &pt,
+    const std::vector<int> &ien_array,
+    const std::vector<double> &tawss,
+    const std::vector<double> &osi )
+{
+  if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: point vector size does not match the number of points. \n");
 
+  if(int(ien_array.size()) != 6*numcels) SYS_T::print_fatal("Error: ien array size does not match the number of cells. \n");
 
+  if(int(tawss.size()) != numpts) SYS_T::print_fatal("Error: tawss size does not match the number of points. \n");
 
+  if(int(osi.size()) != numpts) SYS_T::print_fatal("Error: osi size does not match the number of points. \n");
+
+  vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
+
+  // 1. nodal points
+  vtkPoints * ppt = vtkPoints::New();
+  ppt->SetDataTypeToDouble();
+  double coor[3];
+  for(int ii=0; ii<numpts; ++ii)
+  {
+    coor[0] = pt[3*ii];
+    coor[1] = pt[3*ii+1];
+    coor[2] = pt[3*ii+2];
+    ppt -> InsertPoint(ii, coor);
+  }
+
+  grid_w -> SetPoints(ppt);
+  ppt -> Delete();
+
+  // 2. cell data
+  vtkCellArray * cl = vtkCellArray::New();
+  for(int ii=0; ii<numcels; ++ii)
+  {
+    vtkQuadraticTriangle * tr = vtkQuadraticTriangle::New();
+
+    tr->GetPointIds()->SetId( 0, ien_array[6*ii] );
+    tr->GetPointIds()->SetId( 1, ien_array[6*ii+1] );
+    tr->GetPointIds()->SetId( 2, ien_array[6*ii+2] );
+    tr->GetPointIds()->SetId( 3, ien_array[6*ii+3] );
+    tr->GetPointIds()->SetId( 4, ien_array[6*ii+4] );
+    tr->GetPointIds()->SetId( 5, ien_array[6*ii+5] );
+    
+    cl -> InsertNextCell(tr);
+    tr -> Delete();
+  }
+  
+  grid_w -> SetCells(22, cl);
+  
+  cl->Delete();
+
+  // write tawss
+  vtkDoubleArray * ptindex = vtkDoubleArray::New();
+  ptindex -> SetNumberOfComponents(1);
+  ptindex -> SetName("TAWSS");
+  for(int ii=0; ii<numpts; ++ii)
+  {
+    ptindex -> InsertComponent(ii, 0, tawss[ii]);
+  }
+  grid_w -> GetPointData() -> AddArray( ptindex );
+  ptindex->Delete();
+
+  // write osi
+  vtkDoubleArray * vtkosi = vtkDoubleArray::New();
+  vtkosi -> SetNumberOfComponents(1);
+  vtkosi -> SetName("OSI");
+  for(int ii=0; ii<numpts; ++ii)
+  {
+    vtkosi -> InsertComponent(ii, 0, osi[ii]);
+  }
+  grid_w -> GetPointData() -> AddArray( vtkosi );
+  vtkosi -> Delete();
+
+  // write vtu
+  vtkXMLUnstructuredGridWriter * writer = vtkXMLUnstructuredGridWriter::New();
+  std::string name_to_write(filename);
+  name_to_write.append(".vtu");
+  writer -> SetFileName( name_to_write.c_str() );
+  writer->SetInputData(grid_w);
+  writer->Write();
+
+  writer->Delete();
+  grid_w->Delete();
+}
 
 // EOF
