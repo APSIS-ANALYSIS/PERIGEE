@@ -174,7 +174,7 @@ int main( int argc, char * argv[] )
     SYS_T::print_fatal_if(node_check!=3, "Error: the associated tet element is incompatible with the triangle element.\n");
 
     // Now we have found the interior node's volumetric mesh index, record its
-    // coordinate
+    // spatial xyz coordinate
     interior_node_coord[3*ee+0] = v_ctrlPts[ 3*interior_node[ee] + 0 ];
     interior_node_coord[3*ee+1] = v_ctrlPts[ 3*interior_node[ee] + 1 ];
     interior_node_coord[3*ee+2] = v_ctrlPts[ 3*interior_node[ee] + 2 ];
@@ -193,9 +193,6 @@ int main( int argc, char * argv[] )
   double * esol_u  = new double [v_nLocBas];
   double * esol_v  = new double [v_nLocBas];
   double * esol_w  = new double [v_nLocBas];
-
-  std::vector<double> tri_area;
-  tri_area.resize( nElem );
 
   IQuadPts * quad_tri_vis = new QuadPts_vis_tri6();
 
@@ -278,6 +275,8 @@ int main( int argc, char * argv[] )
       // ee element's volumetric element id
       const int ee_vol_id = global_ele_idx[ ee ];
 
+      // get the tetrahedron's control points and associated solution nodal
+      // value
       for(int ii=0; ii<v_nLocBas; ++ii)
       {
         v_ectrl_x[ii] = v_ctrlPts[ 3 * v_vecIEN[ee_vol_id*v_nLocBas + ii] + 0 ];
@@ -289,8 +288,10 @@ int main( int argc, char * argv[] )
         esol_w[ii] = sol[ dof * v_vecIEN[ee_vol_id*v_nLocBas + ii] + 3 ];
       }
 
+      // Construct the quadratic tetrahedral element
       element -> buildBasis(quad, v_ectrl_x, v_ectrl_y, v_ectrl_z);
 
+      // Obtain the local indices of nodes on the wall surface
       std::vector<int> id_range;
       range_generator( interior_node_local_index[ee], id_range );
 
@@ -306,13 +307,16 @@ int main( int argc, char * argv[] )
         ectrl_z[ii] = v_ctrlPts[ 3*v_vecIEN[v_nLocBas * ee_vol_id + id_range[ii] ] + 2 ];
       }
 
-      // Build a basis based on the visualization sampling point
+      // Build a basis based on the visualization sampling point for wall
+      // triangle element
       element_tri -> buildBasis(quad_tri_vis, ectrl_x, ectrl_y, ectrl_z);
 
       std::vector< std::vector<double> > outnormal;
       outnormal.resize( nLocBas );
 
-      // For each nodal point, calculate the outward normal vector
+      // For each nodal point, calculate the outward normal vector using the
+      // triangle element. The triangle element's ii-th basis corresponds to the
+      // tetrahedral element's id_range[ii]-th basis
       for(int ii=0; ii<nLocBas; ++ii)
       {
         double nx, ny, nz, len;
@@ -331,12 +335,21 @@ int main( int argc, char * argv[] )
       // Now calcualte the element surface area
       element_tri -> buildBasis( quad_tri_gau, ectrl_x, ectrl_y, ectrl_z );
 
-      tri_area[ee] = 0.0;
+      double tri_area = 0.0;
       for(int qua=0; qua<quad_tri_gau->get_num_quadPts(); ++qua)
-        tri_area[ee] += element_tri->get_detJac(qua) * quad_tri_gau->get_qw(qua);
+        tri_area += element_tri->get_detJac(qua) * quad_tri_gau->get_qw(qua);
 
+      for(int ii=0; ii<nLocBas; ++ii)
+      {
+        ectrl_x[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii ] + 0 ];
+        ectrl_y[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii ] + 1 ];
+        ectrl_z[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii ] + 2 ];
+      }
+
+      // Loop over the 6 sampling points on the wall quadratic triangle element
       for(int qua=0; qua<nLocBas; ++qua)
       {
+        // Obtain the 10 basis function's value at the wall boundary points
         element -> get_gradR( id_range[qua], Rx, Ry, Rz );
 
         double ux = 0.0, uy = 0.0, uz = 0.0;
@@ -379,11 +392,11 @@ int main( int argc, char * argv[] )
        
         const int tri_global_id = vecIEN[nLocBas * ee + tri_local_id];
 
-        wss_ave[ tri_global_id ][0] += wss_x * tri_area[ee];
-        wss_ave[ tri_global_id ][1] += wss_y * tri_area[ee];
-        wss_ave[ tri_global_id ][2] += wss_z * tri_area[ee];
+        wss_ave[ tri_global_id ][0] += wss_x * tri_area;
+        wss_ave[ tri_global_id ][1] += wss_y * tri_area;
+        wss_ave[ tri_global_id ][2] += wss_z * tri_area;
 
-        node_area[ tri_global_id ] += tri_area[ee];
+        node_area[ tri_global_id ] += tri_area;
 
       } // loop over the sampling points (on surface)
 
@@ -398,7 +411,7 @@ int main( int argc, char * argv[] )
       wss_ave[ii][2] /= node_area[ii];
     }
 
-    // TO-DO Write the wall shear stress at this time instance
+    // Write the wall shear stress at this time instance
     write_triangle_grid_wss( name_to_write, nFunc, nElem, ctrlPts, vecIEN, wss_ave );
 
     for(int ii=0; ii<nFunc; ++ii)
@@ -427,7 +440,7 @@ int main( int argc, char * argv[] )
       osi[ii] = 0.0;
   }
 
-  // TO-DO write the TAWSS and OSI
+  // write the TAWSS and OSI
   std::string tawss_osi_file("SOL_TAWSS_OSI" );
   write_triangle_grid_tawss_osi( tawss_osi_file, nFunc, nElem, ctrlPts, vecIEN, tawss, osi );
 

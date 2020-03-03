@@ -1160,6 +1160,7 @@ void TET_T::write_quadratic_triangle_grid(
   vtkXMLUnstructuredGridWriter * writer = vtkXMLUnstructuredGridWriter::New();
   std::string name_to_write(filename);
   name_to_write.append(".vtu");
+
   writer -> SetFileName( name_to_write.c_str() );
   writer->SetInputData(grid_w);
   writer->Write();
