@@ -2,13 +2,13 @@
 #define GMSH_FILEIO_HPP
 // ==================================================================
 // Gmsh_FileIO.hpp
+//
 // This is a class of tools that read and write Gmsh's .msh files.
 //
 // Date Created: July 1 2017
 // Author: Ju Liu
 // ==================================================================
 #include "Tet_Tools.hpp"
-#include <cstring>
 
 class Gmsh_FileIO
 {
@@ -27,7 +27,7 @@ class Gmsh_FileIO
     
     // --------------------------------------------------------------
     // In FSI problems, we require that the 3d physical domain index
-    // 0 be the fluid domain, and 3d physical domain index 1 be the 
+    // 0 be the fluid domain and 3d physical domain index 1 be the 
     // solid domain. This function will check the ordering once the
     // Gmsh is constructed and throw a fatal error message if the 
     // ordering is wrong.
@@ -78,8 +78,8 @@ class Gmsh_FileIO
         const bool &isf2e = false) const;
    
     // --------------------------------------------------------------
-    // write a vtu file for all volumetric physical domain together
-    // a physical tag will be added to differentiate the physical problem
+    // Write a vtu file for all volumetric physical domain together.
+    // a physical tag will be added to distinguish the physical problem
     // domain.
     // --------------------------------------------------------------
     void write_vtu( const std::string &in_fname, const bool &isXML ) const;

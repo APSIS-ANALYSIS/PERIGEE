@@ -5,17 +5,19 @@
 // This is an implementation of the element routine for quadratic
 // triangle element in three-dimensional space, with basis function
 // value evaluated only.
-// 
+//
+//     s
+//     |
 //     2
 //     | -
 //     |   -
 //     |     -
-//     |       -
+//     |       -      t = 1 - r - s
 //     5         4
 //     |           -
 //     |             -
 //     |               -
-//     0---------3------- 1
+//     0---------3------- 1 -- r
 //
 //
 // Triangle6 represents 6-node triangle; _3D means that this element
