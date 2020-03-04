@@ -158,8 +158,8 @@ TARGET_LINK_LIBRARIES( gmsh_quad_IO ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( preprocess3d ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( ns_tet_3d ${EXTRA_LINK_LIBS} perigee_analysis )
 TARGET_LINK_LIBRARIES( prepost ${EXTRA_LINK_LIBS} perigee_preprocess )
-TARGET_LINK_LIBRARIES( vis_ns ${EXTRA_LINK_LIBS} perigee_analysis perigee_postprocess )
-TARGET_LINK_LIBRARIES( vis_line_wss ${EXTRA_LINK_LIBS} perigee_analysis perigee_postprocess )
-TARGET_LINK_LIBRARIES( vis_quad_wss ${EXTRA_LINK_LIBS} perigee_analysis perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_ns ${EXTRA_LINK_LIBS} perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_line_wss ${EXTRA_LINK_LIBS} perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_quad_wss ${EXTRA_LINK_LIBS} perigee_postprocess )
 
 # EOF
