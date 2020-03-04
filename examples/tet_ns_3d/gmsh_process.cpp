@@ -25,11 +25,14 @@ int main( int argc, char * argv[] )
 
   GIO -> print_info();
 
-  GIO -> write_vtp(0,0,true); // assumed to be wall vtp
-  GIO -> write_vtp(1,0,true); // assumed to be inlet vtp
+  // Gmsh file should contain only one 3D domain
+  const int vol_id = 0;
+
+  GIO -> write_vtp( 0, vol_id, true); // assumed to be wall vtp
+  GIO -> write_vtp( 1, vol_id, true); // assumed to be inlet vtp
   
   for(int ii=0; ii<num_outlet; ++ii)
-    GIO -> write_vtp(2+ii,0,true);
+    GIO -> write_vtp( 2+ii, vol_id, true);
 
   const std::string wmname("whole_vol");
   const bool isXML = true;
