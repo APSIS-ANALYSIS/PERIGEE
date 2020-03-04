@@ -33,7 +33,7 @@ int main( int argc, char * argv[] )
   GIO -> update_quadratic_tet_IEN( vol_id );
 
   // Write the surface mesh into vtu files
-  GIO -> write_quadratic_sur_vtu( 0, vol_id, false); // assumed to be wall vtp
+  GIO -> write_quadratic_sur_vtu( 0, vol_id, true); // assumed to be wall vtp
   GIO -> write_quadratic_sur_vtu( 1, vol_id, true); // assumed to be wall vtp
   
   for(int ii=0; ii<num_outlet; ++ii)
