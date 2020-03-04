@@ -144,8 +144,8 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 # BUILD THE MAIN DRIVERS
 # ===================================================================
-ADD_EXECUTABLE( gmsh_line_IO gmsh_line_process.cpp )
-ADD_EXECUTABLE( gmsh_quad_IO gmsh_quad_process.cpp )
+ADD_EXECUTABLE( gmsh_p1_IO gmsh_p1_process.cpp )
+ADD_EXECUTABLE( gmsh_p2_IO gmsh_p2_process.cpp )
 ADD_EXECUTABLE( preprocess3d preprocess_sv_tets.cpp)
 ADD_EXECUTABLE( ns_tet_3d ns_tet_driver.cpp)
 ADD_EXECUTABLE( prepost prepost_ns_tets.cpp)
@@ -153,8 +153,8 @@ ADD_EXECUTABLE( vis_ns vis_ns.cpp)
 ADD_EXECUTABLE( vis_line_wss vis_line_wss.cpp)
 ADD_EXECUTABLE( vis_quad_wss vis_quad_wss.cpp)
 
-TARGET_LINK_LIBRARIES( gmsh_line_IO ${EXTRA_LINK_LIBS} perigee_preprocess )
-TARGET_LINK_LIBRARIES( gmsh_quad_IO ${EXTRA_LINK_LIBS} perigee_preprocess )
+TARGET_LINK_LIBRARIES( gmsh_p1_IO ${EXTRA_LINK_LIBS} perigee_preprocess )
+TARGET_LINK_LIBRARIES( gmsh_p2_IO ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( preprocess3d ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( ns_tet_3d ${EXTRA_LINK_LIBS} perigee_analysis )
 TARGET_LINK_LIBRARIES( prepost ${EXTRA_LINK_LIBS} perigee_preprocess )
