@@ -1,5 +1,5 @@
 // ==================================================================
-// gmsh_quad_process.cpp
+// gmsh_p2_process.cpp
 //
 // Code that handles the gmsh file generated with quadratic tet elem.
 //

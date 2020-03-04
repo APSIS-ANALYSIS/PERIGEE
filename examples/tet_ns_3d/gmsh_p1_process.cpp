@@ -1,5 +1,5 @@
 // ==================================================================
-// gmsh_line_process.cpp
+// gmsh_p1_process.cpp
 //
 // Code that handles the gmsh file generated using linear tet elem.
 //
