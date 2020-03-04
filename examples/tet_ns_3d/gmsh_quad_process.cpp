@@ -1,7 +1,7 @@
 // ==================================================================
-// gmsh_process.cpp
+// gmsh_quad_process.cpp
 //
-// Code that handles the gmsh file.
+// Code that handles the gmsh file generated with quadratic tet elem.
 //
 // Date Created: March 3 2020
 // Author: Ju Liu

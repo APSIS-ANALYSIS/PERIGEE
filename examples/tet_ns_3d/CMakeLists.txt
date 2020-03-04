@@ -144,8 +144,8 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 # BUILD THE MAIN DRIVERS
 # ===================================================================
-ADD_EXECUTABLE( gmsh_line_IO gmsh_linear_process.cpp )
-ADD_EXECUTABLE( gmsh_quad_IO gmsh_quadratic_process.cpp )
+ADD_EXECUTABLE( gmsh_line_IO gmsh_line_process.cpp )
+ADD_EXECUTABLE( gmsh_quad_IO gmsh_quad_process.cpp )
 ADD_EXECUTABLE( preprocess3d preprocess_sv_tets.cpp)
 ADD_EXECUTABLE( ns_tet_3d ns_tet_driver.cpp)
 ADD_EXECUTABLE( prepost prepost_ns_tets.cpp)

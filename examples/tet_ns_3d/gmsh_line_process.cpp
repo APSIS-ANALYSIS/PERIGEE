@@ -1,7 +1,7 @@
 // ==================================================================
-// gmsh_process.cpp
+// gmsh_line_process.cpp
 //
-// Code that handles the gmsh file.
+// Code that handles the gmsh file generated using linear tet elem.
 //
 // Date Created: July 1 2017
 // Author: Ju Liu
