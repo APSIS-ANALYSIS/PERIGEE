@@ -1,8 +1,10 @@
 // ==================================================================
-// vis_tet4_wss.cpp
+// vis_line_wss.cpp
 //
 // This is a visualization driver for Wall Shear Stress, which is
 // defined on the wall elements only.
+// 
+// This routine works only for linear tetrahedral element.
 //
 // Author: Ju Liu
 // Date: Sept 16 2019

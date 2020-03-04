@@ -1,7 +1,9 @@
 // ==================================================================
-// vis_tet10_wss.cpp
+// vis_quad_wss.cpp
 //
 // WSS visualization for ten-node tet elements.
+//
+// Date: March 2nd 2020
 // ==================================================================
 #include "Tet_Tools.hpp"
 #include "QuadPts_vis_tri6.hpp"
