@@ -17,6 +17,9 @@ PDNSolution_NS::PDNSolution_NS(
     case 1:
       Init_flow_parabolic( pNode, fNode_ptr, infbc );
       break;
+    case 2:
+      Init_pipe_parabolic( pNode, fNode_ptr );
+      break;
     default:
       SYS_T::print_fatal("Error: PDNSolution_NS: No such type of initional condition.\n");
       break;
@@ -148,6 +151,72 @@ void PDNSolution_NS::Init_flow_parabolic(
     SYS_T::commPrint("                       max speed %e.\n", vmax);
     SYS_T::commPrint("                       active area is %e.\n", infbc->get_actarea() );
     SYS_T::commPrint("                       full area is %e.\n", infbc->get_fularea() );
+    SYS_T::commPrint("                       direction [%e %e %e].\n", out_nx, out_ny, out_nz);
+  }
+}
+
+
+void PDNSolution_NS::Init_pipe_parabolic(
+    const APart_Node * const &pNode_ptr,
+    const FEANode * const &fNode_ptr )
+{
+  int location[4];
+  double value[4] = {0.0, 0.0, 0.0, 0.0};
+  const int nlocalnode = pNode_ptr->get_nlocalnode();
+
+  // First enforce everything to be zero
+  for(int ii=0; ii<nlocalnode; ++ii)
+  {
+    location[0] = pNode_ptr->get_node_loc(ii) * 4;
+    location[1] = location[0] + 1;
+    location[2] = location[0] + 2;
+    location[3] = location[0] + 3;
+
+    VecSetValues(solution, 4, location, value, INSERT_VALUES);
+  }
+
+  // Maximum speed formula is 
+  //             2.0 x flow rate (1.0) / surface area
+  // Here I use the unit flow rate, and the actual flow rate is adjusted
+  // based on the CVFlowRate class.
+  const double vmax = 2.0 * 100.0 / (3.14 * 4);
+
+  const double out_nx = 0.0; 
+  const double out_ny = 0.0;
+  const double out_nz = 1.0;
+
+  for(int ii=0; ii<nlocalnode; ++ii)
+  {
+    location[0] = pNode_ptr->get_node_loc(ii) * 4;
+    location[1] = location[0] + 1;
+    location[2] = location[0] + 2;
+    location[3] = location[0] + 3;
+
+    const double x = fNode_ptr->get_ctrlPts_x(ii);
+    const double y = fNode_ptr->get_ctrlPts_y(ii);
+    //const double z = fNode_ptr->get_ctrlPts_z(ii);
+
+    const double r = std::sqrt(x*x + y*y) / 2.0;
+    const double vel = vmax * (1.0 - r*r);
+
+    // -1.0 is multiplied to make the flow direction inward
+    value[1] = vel * (-1.0) * out_nx;
+    value[2] = vel * (-1.0) * out_ny;
+    value[3] = vel * (-1.0) * out_nz;
+
+    VecSetValues(solution, 4, location, value, INSERT_VALUES);
+  }
+
+  VecAssemblyBegin(solution); VecAssemblyEnd(solution);
+  GhostUpdate();
+
+  if(is_print)
+  {
+    SYS_T::commPrint("===> Initial solution: pres   = 0.0 \n");
+    SYS_T::commPrint("                       velo_x = parabolic \n");
+    SYS_T::commPrint("                       velo_y = parabolic \n");
+    SYS_T::commPrint("                       velo_z = parabolic \n");
+    SYS_T::commPrint("                       flow rate 100.0 .\n");
     SYS_T::commPrint("                       direction [%e %e %e].\n", out_nx, out_ny, out_nz);
   }
 }

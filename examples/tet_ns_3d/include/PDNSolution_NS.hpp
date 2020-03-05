@@ -36,6 +36,11 @@ class PDNSolution_NS : public PDNSolution
         const FEANode * const &fNode_ptr,
         const ALocal_Inflow_NodalBC * const &infbc );
 
+    // case 2: generate flow parabolic for an arbitrary inlet face
+    //         with the unit flow rate.
+    void Init_pipe_parabolic( const APart_Node * const &pNode_ptr,
+        const FEANode * const &fNode_ptr );
+
   private:
     const bool is_print;
 };
