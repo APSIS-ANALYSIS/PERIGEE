@@ -21,7 +21,8 @@ class PNonlinear_NS_Solver
         const FEANode * const &feanode_ptr,
         const double &input_nrtol, const double &input_natol, 
         const double &input_ndtol, const int &input_max_iteration, 
-        const int &input_renew_freq );
+        const int &input_renew_freq, 
+        const int &input_renew_threshold = 3 );
 
     ~PNonlinear_NS_Solver();
 
@@ -67,7 +68,7 @@ class PNonlinear_NS_Solver
 
   private:
     const double nr_tol, na_tol, nd_tol;
-    const int nmaxits, nrenew_freq;
+    const int nmaxits, nrenew_freq, nrenew_threshold;
 
     // vector container for the step update in the smaller matrix problem
     PDNSolution * dot_step;

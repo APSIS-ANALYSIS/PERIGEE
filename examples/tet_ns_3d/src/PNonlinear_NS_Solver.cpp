@@ -5,11 +5,15 @@ PNonlinear_NS_Solver::PNonlinear_NS_Solver(
     const FEANode * const &feanode_ptr,
     const double &input_nrtol, const double &input_natol,
     const double &input_ndtol,
-    const int &input_max_iteration, const int &input_renew_freq )
+    const int &input_max_iteration, 
+    const int &input_renew_freq,
+    const int &input_renew_threshold )
 : nr_tol(input_nrtol), na_tol(input_natol), nd_tol(input_ndtol),
-  nmaxits(input_max_iteration), nrenew_freq(input_renew_freq)
+  nmaxits(input_max_iteration), nrenew_freq(input_renew_freq),
+  nrenew_threshold(input_renew_threshold)
 {
-  // Generate the incremental solution vector 
+  // Generate the incremental solution vector used for update 
+  // the solution of the nonlinear algebraic system 
   dot_step = new PDNSolution_NS( anode_ptr, 0, false );
 }
 
@@ -22,13 +26,14 @@ PNonlinear_NS_Solver::~PNonlinear_NS_Solver()
 
 void PNonlinear_NS_Solver::print_info() const
 {
-  PetscPrintf(PETSC_COMM_WORLD, "----------------------------------------------------------- \n");
-  PetscPrintf(PETSC_COMM_WORLD, "relative tolerance: %e \n", nr_tol);
-  PetscPrintf(PETSC_COMM_WORLD, "absolute tolerance: %e \n", na_tol);
-  PetscPrintf(PETSC_COMM_WORLD, "divergence tolerance: %e \n", nd_tol);
-  PetscPrintf(PETSC_COMM_WORLD, "maximum iteration: %d \n", nmaxits);
-  PetscPrintf(PETSC_COMM_WORLD, "tangent matrix renew frequency: %d \n", nrenew_freq);
-  PetscPrintf(PETSC_COMM_WORLD, "----------------------------------------------------------- \n");
+  SYS_T::commPrint("----------------------------------------------------------- \n");
+  SYS_T::commPrint("relative tolerance: %e \n", nr_tol);
+  SYS_T::commPrint("absolute tolerance: %e \n", na_tol);
+  SYS_T::commPrint("divergence tolerance: %e \n", nd_tol);
+  SYS_T::commPrint("maximum iteration: %d \n", nmaxits);
+  SYS_T::commPrint("tangent matrix renew frequency: %d \n", nrenew_freq);
+  SYS_T::commPrint("tangent matrix renew threshold: %d \n", nrenew_threshold);
+  SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
 
@@ -174,8 +179,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     dot_sol_alpha.PlusAX( dot_step, (-1.0) * alpha_m );
     sol_alpha.PlusAX( dot_step, (-1.0) * alpha_f * gamma * dt );
 
-    // Assembly ALE-NS residual (& tangent) 
-    if( nl_counter % nrenew_freq == 0 || nl_counter >= 4 )
+    // Assembly residual (& tangent if condition satisfied) 
+    if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )
     {
       gassem_ptr->Clear_KG();
 
@@ -214,17 +219,14 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     }
 
     VecNorm(gassem_ptr->G, NORM_2, &residual_norm);
-    PetscPrintf(PETSC_COMM_WORLD, "  --- nl_res: %e \n", residual_norm);
+    
+    SYS_T::commPrint("  --- nl_res: %e \n", residual_norm);
 
     relative_error = residual_norm / initial_norm;
 
     if( relative_error >= nd_tol )
-    {
-      PetscPrintf(PETSC_COMM_WORLD,
-          "Warning: nonlinear solver is diverging with error %e \n",
-          relative_error);
-      break;
-    }
+      SYS_T::print_fatal( "Error: nonlinear solver is diverging with error %e. Job killed.\n", relative_error);
+
   }while(nl_counter<nmaxits && relative_error > nr_tol && residual_norm > na_tol);
 
   Print_convergence_info(nl_counter, relative_error, residual_norm);
