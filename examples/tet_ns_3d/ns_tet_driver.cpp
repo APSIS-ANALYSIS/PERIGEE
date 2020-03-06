@@ -57,6 +57,7 @@ int main(int argc, char *argv[])
   double nl_dtol = 10.0;
   int nl_maxits = 20;
   int nl_refreq = 4;
+  int nl_threshold = 4;
 
   // time stepping parameters
   double initial_time = 0.0;
@@ -97,6 +98,7 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-nl_dtol", nl_dtol);
   SYS_T::GetOptionInt("-nl_maxits", nl_maxits);
   SYS_T::GetOptionInt("-nl_refreq", nl_refreq);
+  SYS_T::GetOptionInt("-nl_threshold", nl_threshold);
   SYS_T::GetOptionReal("-init_time", initial_time);
   SYS_T::GetOptionReal("-fina_time", final_time);
   SYS_T::GetOptionReal("-init_step", initial_step);
@@ -125,6 +127,7 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-nl_dtol:", nl_dtol);
   SYS_T::cmdPrint("-nl_maxits:", nl_maxits);
   SYS_T::cmdPrint("-nl_refreq:", nl_refreq);
+  SYS_T::cmdPrint("-nl_threshold:", nl_threshold);
   SYS_T::cmdPrint("-init_time:", initial_time);
   SYS_T::cmdPrint("-init_step:", initial_step);
   SYS_T::cmdPrint("-init_index:", initial_index);
@@ -347,8 +350,8 @@ int main(int argc, char *argv[])
   PCFieldSplitSetFields(upc,"p",1,pfield,pfield);
 
   // ===== Nonlinear solver context =====
-  PNonlinear_NS_Solver * nsolver = new PNonlinear_NS_Solver(
-      pNode, fNode, nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq);
+  PNonlinear_NS_Solver * nsolver = new PNonlinear_NS_Solver( pNode, fNode, 
+      nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
   SYS_T::commPrint("===> Nonlinear solver setted up:\n");
   nsolver->print_info();
 
