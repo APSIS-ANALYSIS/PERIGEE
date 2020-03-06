@@ -110,25 +110,29 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
   }
 
   bool conv_flag, renew_flag;
-  int nl_counter;
+  int nl_counter = 0;
 
   bool rest_flag = restart_init_assembly_flag;
 
-  PetscPrintf(PETSC_COMM_WORLD, "Time = %e, dt = %e, index = %d, %s \n",
+  SYS_T::commPrint("Time = %e, dt = %e, index = %d, %s \n",
       time_info->get_time(), time_info->get_step(), time_info->get_index(),
       SYS_T::get_time().c_str());
 
   // Enter into time integration
   while( time_info->get_time() < final_time )
   {
-    if(time_info->get_index() % renew_tang_freq == 0 || rest_flag)
+    if(time_info->get_index() % renew_tang_freq == 0 || rest_flag )
     {
       renew_flag = true;
       rest_flag = false;
     }
     else renew_flag = false;
 
-    // Inoke the nonlinear equation solver
+    // If the previous step is solved in ONE Newton iteration, we do not update
+    // the tangent matrix
+    if( nl_counter == 1 ) renew_flag = false;
+
+    // Call the nonlinear equation solver
     nsolver_ptr->GenAlpha_Solve_NS( renew_flag, 
         time_info->get_time(), time_info->get_step(), 
         sol_base, pre_dot_sol, pre_sol, tmga_ptr, flr_ptr,
@@ -139,7 +143,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     // Update the time step information
     time_info->TimeIncrement();
 
-    PetscPrintf(PETSC_COMM_WORLD, "Time = %e, dt = %e, index = %d, %s \n",
+    SYS_T::commPrint("Time = %e, dt = %e, index = %d, %s \n",
         time_info->get_time(), time_info->get_step(), time_info->get_index(),
         SYS_T::get_time().c_str());
 
