@@ -38,12 +38,13 @@ std::string PTime_NS_Solver::Name_dot_Generator(const int &counter) const
 
 void PTime_NS_Solver::print_info() const
 {
-  PetscPrintf(PETSC_COMM_WORLD, "----------------------------------------------------------- \n");
-  PetscPrintf(PETSC_COMM_WORLD, "final time: %e \n", final_time);
-  PetscPrintf(PETSC_COMM_WORLD, "solution record frequency : %d \n", sol_record_freq);
-  PetscPrintf(PETSC_COMM_WORLD, "tangent update frequency over time steps: %d \n", renew_tang_freq);
-  PetscPrintf(PETSC_COMM_WORLD, "solution base name: %s \n", pb_name.c_str());
-  PetscPrintf(PETSC_COMM_WORLD, "----------------------------------------------------------- \n");
+  SYS_T::commPrint("----------------------------------------------------------- \n");
+  SYS_T::commPrint("Time stepping solver setted up:\n");
+  SYS_T::commPrint("  final time: %e \n", final_time);
+  SYS_T::commPrint("  solution record frequency : %d \n", sol_record_freq);
+  SYS_T::commPrint("  tangent update frequency over time steps: %d \n", renew_tang_freq);
+  SYS_T::commPrint("  solution base name: %s \n", pb_name.c_str());
+  SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
 

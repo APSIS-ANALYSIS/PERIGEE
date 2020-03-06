@@ -27,12 +27,13 @@ PNonlinear_NS_Solver::~PNonlinear_NS_Solver()
 void PNonlinear_NS_Solver::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
-  SYS_T::commPrint("relative tolerance: %e \n", nr_tol);
-  SYS_T::commPrint("absolute tolerance: %e \n", na_tol);
-  SYS_T::commPrint("divergence tolerance: %e \n", nd_tol);
-  SYS_T::commPrint("maximum iteration: %d \n", nmaxits);
-  SYS_T::commPrint("tangent matrix renew frequency: %d \n", nrenew_freq);
-  SYS_T::commPrint("tangent matrix renew threshold: %d \n", nrenew_threshold);
+  SYS_T::commPrint("Nonlinear solver setted up:\n");
+  SYS_T::commPrint("  relative tolerance: %e \n", nr_tol);
+  SYS_T::commPrint("  absolute tolerance: %e \n", na_tol);
+  SYS_T::commPrint("  divergence tolerance: %e \n", nd_tol);
+  SYS_T::commPrint("  maximum iteration: %d \n", nmaxits);
+  SYS_T::commPrint("  tangent matrix renew frequency: %d \n", nrenew_freq);
+  SYS_T::commPrint("  tangent matrix renew threshold: %d \n", nrenew_threshold);
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 

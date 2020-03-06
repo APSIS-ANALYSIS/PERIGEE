@@ -352,13 +352,13 @@ int main(int argc, char *argv[])
   // ===== Nonlinear solver context =====
   PNonlinear_NS_Solver * nsolver = new PNonlinear_NS_Solver( pNode, fNode, 
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
-  SYS_T::commPrint("===> Nonlinear solver setted up:\n");
+  
   nsolver->print_info();
 
   // ===== Temporal solver context =====
   PTime_NS_Solver * tsolver = new PTime_NS_Solver( sol_bName,
       sol_record_freq, ttan_renew_freq, final_time );
-  SYS_T::commPrint("===> Time stepping solver setted up:\n");
+  
   tsolver->print_info();
 
   // ===== Outlet flowrate recording files =====
