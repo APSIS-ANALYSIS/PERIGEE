@@ -22,7 +22,7 @@ class PNonlinear_NS_Solver
         const double &input_nrtol, const double &input_natol, 
         const double &input_ndtol, const int &input_max_iteration, 
         const int &input_renew_freq, 
-        const int &input_renew_threshold = 3 );
+        const int &input_renew_threshold = 4 );
 
     ~PNonlinear_NS_Solver();
 

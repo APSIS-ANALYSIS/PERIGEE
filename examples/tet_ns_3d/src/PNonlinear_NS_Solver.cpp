@@ -128,7 +128,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PetscLogEventEnd(mat_assem_0_event,0,0,0,0);
 #endif
 
-    PetscPrintf(PETSC_COMM_WORLD, "  --- M updated");
+    SYS_T::commPrint("  --- M updated");
     
     // SetOperator will pass the tangent matrix to the linear solver and the
     // linear solver will generate the preconditioner based on the new matrix.
@@ -153,7 +153,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   }
 
   VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
-  PetscPrintf(PETSC_COMM_WORLD, "  Init res 2-norm: %e \n", initial_norm);
+  SYS_T::commPrint("  Init res 2-norm: %e \n", initial_norm);
 
   // Now do consistent Newton-Raphson iteration
   do
@@ -197,7 +197,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
       PetscLogEventEnd(mat_assem_1_event,0,0,0,0);
 #endif
 
-      PetscPrintf(PETSC_COMM_WORLD, "  --- M updated");
+      SYS_T::commPrint("  --- M updated");
       lsolver_ptr->SetOperator(gassem_ptr->K);
     }
     else
