@@ -97,6 +97,12 @@ class NodalBC_3D_inflow : public INodalBC
 
     // coordinates of nodes
     std::vector<double> pt_xyz;
+
+    // Surface nodes' volumetric mesh ID
+    std::vector<int> global_node;
+
+    // Surface cell's volumetric mesh ID
+    std::vector<int> global_cell;
 };
 
 #endif

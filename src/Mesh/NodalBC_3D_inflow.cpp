@@ -40,8 +40,6 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
 
   // 2. Analyze the file type and read in the data
   // Read the files
-  std::vector<int> gnode, gelem;
-
   int wall_numpts, wall_numcels;
   std::vector<double> wall_pts;
   std::vector<int> wall_ien, wall_gnode, wall_gelem;
@@ -50,14 +48,14 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
  
   if( fend.compare(".vtp") == 0 )
   { 
-    TET_T::read_vtp_grid( inffile, num_node, num_cell, pt_xyz, tri_ien, gnode, gelem );
+    TET_T::read_vtp_grid( inffile, num_node, num_cell, pt_xyz, tri_ien, global_node, global_cell );
 
     TET_T::read_vtp_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
         wall_ien, wall_gnode, wall_gelem );
   }
   else if( fend.compare(".vtu") == 0 )
   {
-    TET_T::read_vtu_grid( inffile, num_node, num_cell, pt_xyz, tri_ien, gnode, gelem );
+    TET_T::read_vtu_grid( inffile, num_node, num_cell, pt_xyz, tri_ien, global_node, global_cell );
 
     TET_T::read_vtu_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
         wall_ien, wall_gnode, wall_gelem );
@@ -67,13 +65,13 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
 
   // Generate the dir-node list. The nodes belonging to the wall are excluded.
   dir_nodes.clear();
-  for(unsigned int ii=0; ii<gnode.size(); ++ii)
+  for(unsigned int ii=0; ii<global_node.size(); ++ii)
   {
-    SYS_T::print_fatal_if( gnode[ii]<0,
+    SYS_T::print_fatal_if( global_node[ii]<0,
         "Error: there are negative nodal index! \n");
 
-    if( !VEC_T::is_invec( wall_gnode, gnode[ii]) )
-      dir_nodes.push_back( gnode[ii] );
+    if( !VEC_T::is_invec( wall_gnode, global_node[ii]) )
+      dir_nodes.push_back( global_node[ii] );
   }
 
   num_dir_nodes = dir_nodes.size(); 
@@ -102,7 +100,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   {
     // If the node is not in the wall, it is an interior node and set
     // the vector to be 1.
-    if( !VEC_T::is_invec(wall_gnode, gnode[ii]) ) 
+    if( !VEC_T::is_invec(wall_gnode, global_node[ii]) ) 
       temp_sol[ii] = 1.0;
     else 
     {
