@@ -65,7 +65,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
         wall_ien, wall_gnode, wall_gelem );
   }
   else
-    SYS_T::print_fatal("Error: get_out_normal unknown file type.\n");
+    SYS_T::print_fatal("Error: Nodal_3D_inflow unknown file type.\n");
 
   // Generate the dir-node list. The nodes belonging to the wall are excluded.
   dir_nodes.clear();
