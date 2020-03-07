@@ -30,9 +30,9 @@ ElemBC_3D_tet4::ElemBC_3D_tet4( const std::vector<std::string> &vtpfileList )
 
 ElemBC_3D_tet4::~ElemBC_3D_tet4()
 {
-  delete [] num_node; num_node = NULL;
-  delete [] num_cell; num_cell = NULL;
-  delete [] cell_nLocBas; cell_nLocBas = NULL;
+  delete [] num_node; num_node = nullptr; 
+  delete [] num_cell; num_cell = nullptr;
+  delete [] cell_nLocBas; cell_nLocBas = nullptr;
 }
 
 
