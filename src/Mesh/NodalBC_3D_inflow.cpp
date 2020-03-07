@@ -282,6 +282,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   // Finish and print info on screen
   std::cout<<"===> NodalBC_3D_inflow specified by "<<inffile
     <<" and wall file "<<wallfile<<" is generated. \n";
+  std::cout<<"     num_node: "<<num_node<<" num_cell: "<<num_cell<<'\n';
   std::cout<<"     centroid: "<<centroid[0]<<'\t'<<centroid[1]<<'\t'<<centroid[2]<<'\n';
   std::cout<<"     number of outline points is "<<num_out_bc_pts<<'\n';
   std::cout<<"     outward normal is ["<<outnormal[0]<<'\t'<<outnormal[1]<<'\t'<<outnormal[2]<<"]. \n";

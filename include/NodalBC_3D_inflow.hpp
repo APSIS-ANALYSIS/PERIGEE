@@ -96,7 +96,7 @@ class NodalBC_3D_inflow : public INodalBC
     std::vector<int> tri_ien;
 
     // coordinates of nodes
-    std::vector<double> pt_xyz
+    std::vector<double> pt_xyz;
 };
 
 #endif
