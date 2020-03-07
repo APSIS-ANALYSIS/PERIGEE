@@ -3,8 +3,8 @@
 NBC_Partition_3D_inflow::NBC_Partition_3D_inflow(
     const IPart * const &part,
     const Map_Node_Index * const &mnindex,
-    const INodalBC * const &nbc ) : NBC_Partition_3D( part,
-      mnindex, nbc )
+    const INodalBC * const &nbc ) 
+: NBC_Partition_3D( part, mnindex, nbc )
 {
   actarea  = nbc -> get_para_1();
   facearea = nbc -> get_para_6();
