@@ -88,6 +88,15 @@ class NodalBC_3D_inflow : public INodalBC
     // It stores teh surface integral of each nodal basis function on
     // the inlet surface.
     std::vector<double> intNA;
+
+    // number of nodes and cells on the surface
+    int num_node, num_cell;
+
+    // IEN for the surface, length nLocBas (3 or 6) x num of cells
+    std::vector<int> tri_ien;
+
+    // coordinates of nodes
+    std::vector<double> pt_xyz
 };
 
 #endif

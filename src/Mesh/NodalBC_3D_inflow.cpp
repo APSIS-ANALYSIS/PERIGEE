@@ -40,9 +40,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
 
   // 2. Analyze the file type and read in the data
   // Read the files
-  int numpts, numcels;
-  std::vector<double> pts;
-  std::vector<int> ien, gnode, gelem;
+  std::vector<int> gnode, gelem;
 
   int wall_numpts, wall_numcels;
   std::vector<double> wall_pts;
@@ -52,14 +50,14 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
  
   if( fend.compare(".vtp") == 0 )
   { 
-    TET_T::read_vtp_grid( inffile, numpts, numcels, pts, ien, gnode, gelem );
+    TET_T::read_vtp_grid( inffile, num_node, num_cell, pt_xyz, tri_ien, gnode, gelem );
 
     TET_T::read_vtp_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
         wall_ien, wall_gnode, wall_gelem );
   }
   else if( fend.compare(".vtu") == 0 )
   {
-    TET_T::read_vtu_grid( inffile, numpts, numcels, pts, ien, gnode, gelem );
+    TET_T::read_vtu_grid( inffile, num_node, num_cell, pt_xyz, tri_ien, gnode, gelem );
 
     TET_T::read_vtu_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
         wall_ien, wall_gnode, wall_gelem );
@@ -85,22 +83,22 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
 
   // Calculate the centroid of the surface
   centroid[0] = 0.0; centroid[1] = 0.0; centroid[2] = 0.0;
-  for(int ii=0; ii<numpts; ++ii)
+  for(int ii=0; ii<num_node; ++ii)
   {
-    centroid[0] += pts[3*ii+0];
-    centroid[1] += pts[3*ii+1];
-    centroid[2] += pts[3*ii+2];
+    centroid[0] += pt_xyz[3*ii+0];
+    centroid[1] += pt_xyz[3*ii+1];
+    centroid[2] += pt_xyz[3*ii+2];
   }
-  centroid[0] = centroid[0] / (double) numpts;
-  centroid[1] = centroid[1] / (double) numpts;
-  centroid[2] = centroid[2] / (double) numpts;
+  centroid[0] = centroid[0] / (double) num_node;
+  centroid[1] = centroid[1] / (double) num_node;
+  centroid[2] = centroid[2] / (double) num_node;
 
   // Collect the nodes that belong to the wall, and setup a vector that
   // is 1 on the interior nodes and 0 on the wall bc nodes.
   outline_pts.clear();
   num_out_bc_pts = 0;
-  double * temp_sol = new double [numpts];  
-  for(int ii=0; ii<numpts; ++ii)
+  double * temp_sol = new double [num_node];  
+  for(int ii=0; ii<num_node; ++ii)
   {
     // If the node is not in the wall, it is an interior node and set
     // the vector to be 1.
@@ -113,9 +111,9 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
       temp_sol[ii] = 0.0;
       // Also store the point's coordinates into outline points
       num_out_bc_pts += 1;
-      outline_pts.push_back( pts[3*ii+0] );
-      outline_pts.push_back( pts[3*ii+1] );
-      outline_pts.push_back( pts[3*ii+2] );
+      outline_pts.push_back( pt_xyz[3*ii+0] );
+      outline_pts.push_back( pt_xyz[3*ii+1] );
+      outline_pts.push_back( pt_xyz[3*ii+2] );
     }
   }
 
@@ -130,14 +128,14 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
     QuadPts_Gauss_Triangle quad(3); // quadrature rule
     FEAElement_Triangle3_3D_der0 ele(3); // element
 
-    for(int ee=0; ee<numcels; ++ee)
+    for(int ee=0; ee<num_cell; ++ee)
     {
       for(int ii=0; ii<3; ++ii)
       {
-        const int nodidx = ien[3*ee+ii];
-        eptx[ii] = pts[ 3*nodidx ];
-        epty[ii] = pts[ 3*nodidx+1 ];
-        eptz[ii] = pts[ 3*nodidx+2 ];
+        const int nodidx = tri_ien[3*ee+ii];
+        eptx[ii] = pt_xyz[ 3*nodidx ];
+        epty[ii] = pt_xyz[ 3*nodidx+1 ];
+        eptz[ii] = pt_xyz[ 3*nodidx+2 ];
       }
 
       ele.buildBasis(&quad, eptx, epty, eptz);
@@ -150,7 +148,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
         for(int ii=0; ii<3; ++ii)
         {
           inf_active_area += jac * quad.get_qw(qua) 
-            * R[ii] * temp_sol[ ien[3*ee+ii] ];
+            * R[ii] * temp_sol[ tri_ien[3*ee+ii] ];
 
           face_area += jac * quad.get_qw(qua) * R[ii];
         }
@@ -165,14 +163,14 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
     QuadPts_Gauss_Triangle quad(6); // quadrature rule
     FEAElement_Triangle6_3D_der0 ele(6); // element
 
-    for(int ee=0; ee<numcels; ++ee)
+    for(int ee=0; ee<num_cell; ++ee)
     {
       for(int ii=0; ii<6; ++ii)
       {
-        const int nodidx = ien[6*ee+ii];
-        eptx[ii] = pts[ 3*nodidx ];
-        epty[ii] = pts[ 3*nodidx+1 ];
-        eptz[ii] = pts[ 3*nodidx+2 ];
+        const int nodidx = tri_ien[6*ee+ii];
+        eptx[ii] = pt_xyz[ 3*nodidx ];
+        epty[ii] = pt_xyz[ 3*nodidx+1 ];
+        eptz[ii] = pt_xyz[ 3*nodidx+2 ];
       }
 
       ele.buildBasis(&quad, eptx, epty, eptz);
@@ -185,7 +183,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
         for(int ii=0; ii<6; ++ii)
         {
           inf_active_area += jac * quad.get_qw(qua) 
-            * R[ii] * temp_sol[ ien[6*ee+ii] ];
+            * R[ii] * temp_sol[ tri_ien[6*ee+ii] ];
 
           face_area += jac * quad.get_qw(qua) * R[ii];
         }
@@ -200,10 +198,10 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   outnormal = in_outnormal;
 
   // Perform surface integral
-  intNA.resize( numpts );
+  intNA.resize( num_node );
 
   // zero the container
-  for(int ii=0; ii<numpts; ++ii) intNA[ii] = 0.0;
+  for(int ii=0; ii<num_node; ++ii) intNA[ii] = 0.0;
 
   if( elemtype == 501 )
   {
@@ -216,14 +214,14 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
     double nx, ny, nz, jac;
 
     // Calculate the surface integral of basis functions
-    for( int ee = 0; ee<numcels; ++ee )
+    for( int ee = 0; ee<num_cell; ++ee )
     {
       for(int ii=0; ii<3; ++ii)
       {
-        node_idx[ii] = ien[3*ee+ii];
-        ectrl_x[ii] = pts[3*node_idx[ii] + 0];
-        ectrl_y[ii] = pts[3*node_idx[ii] + 1];
-        ectrl_z[ii] = pts[3*node_idx[ii] + 2];
+        node_idx[ii] = tri_ien[3*ee+ii];
+        ectrl_x[ii] = pt_xyz[3*node_idx[ii] + 0];
+        ectrl_y[ii] = pt_xyz[3*node_idx[ii] + 1];
+        ectrl_z[ii] = pt_xyz[3*node_idx[ii] + 2];
       }
 
       elems -> buildBasis(quads, ectrl_x, ectrl_y, ectrl_z);
@@ -253,14 +251,14 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
     double nx, ny, nz, jac; 
 
     // Calculate the surface integral for quadratic triangle element
-    for( int ee=0; ee<numcels; ++ee )
+    for( int ee=0; ee<num_cell; ++ee )
     {
       for(int ii=0; ii<6; ++ii)
       {
-        node_idx[ii] = ien[6*ee+ii];
-        ectrl_x[ii] = pts[3*node_idx[ii] + 0];
-        ectrl_y[ii] = pts[3*node_idx[ii] + 1];
-        ectrl_z[ii] = pts[3*node_idx[ii] + 2];
+        node_idx[ii] = tri_ien[6*ee+ii];
+        ectrl_x[ii] = pt_xyz[3*node_idx[ii] + 0];
+        ectrl_y[ii] = pt_xyz[3*node_idx[ii] + 1];
+        ectrl_z[ii] = pt_xyz[3*node_idx[ii] + 2];
       }
 
       elems -> buildBasis(quads, ectrl_x, ectrl_y, ectrl_z);
