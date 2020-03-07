@@ -155,12 +155,11 @@ void PGAssem_NS_FEM::Get_dnz_onz( const int &nlocnode,
   VecSetOption(vdnz, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
   VecSetOption(vonz, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
 
-  int row;
   for(int ii=0; ii<nlocnode; ++ii)
   {
     for(int mm=0; mm<dof_mat; ++mm)
     {
-      row = nbc_ptr->get_LID(mm, ii) * dof_mat + mm;
+      const int row = nbc_ptr->get_LID(mm, ii) * dof_mat + mm;
       VecSetValue(vdnz, row, double(nzbase), ADD_VALUES);
       VecSetValue(vonz, row, double(nzbase), ADD_VALUES);
     }
@@ -172,17 +171,15 @@ void PGAssem_NS_FEM::Get_dnz_onz( const int &nlocnode,
     const int num_master = nbc_ptr->get_Num_LPM(mm);
     for(int ii=0; ii<num_master; ++ii)
     {
-      row = nbc_ptr->get_LocalMaster(mm, ii) * dof_mat + mm;
+      const int row = nbc_ptr->get_LocalMaster(mm, ii) * dof_mat + mm;
       VecSetValue(vdnz, row, double(nzbase), ADD_VALUES);
       VecSetValue(vonz, row, double(nzbase), ADD_VALUES);
     }
   }
 
-  VecAssemblyBegin(vdnz);
-  VecAssemblyEnd(vdnz);
+  VecAssemblyBegin(vdnz); VecAssemblyEnd(vdnz);
 
-  VecAssemblyBegin(vonz);
-  VecAssemblyEnd(vonz);
+  VecAssemblyBegin(vonz); VecAssemblyEnd(vonz);
 
 
   for(int mm=0; mm<dof_mat; ++mm)
@@ -191,7 +188,7 @@ void PGAssem_NS_FEM::Get_dnz_onz( const int &nlocnode,
     const int num_dir = nbc_ptr->get_Num_LD(mm);
     for(int ii=0; ii<num_dir; ++ii)
     {
-      row = nbc_ptr->get_LDN(mm, ii) * dof_mat + mm;
+      const int row = nbc_ptr->get_LDN(mm, ii) * dof_mat + mm;
       VecSetValue(vdnz, row, 1.0, INSERT_VALUES);
       VecSetValue(vonz, row, 0.0, INSERT_VALUES);
     }
@@ -200,17 +197,15 @@ void PGAssem_NS_FEM::Get_dnz_onz( const int &nlocnode,
     const int num_slave = nbc_ptr->get_Num_LPS(mm);
     for(int ii=0; ii<num_slave; ++ii)
     {
-      row = nbc_ptr->get_LPSN(mm, ii) * dof_mat + mm;
+      const int row = nbc_ptr->get_LPSN(mm, ii) * dof_mat + mm;
       VecSetValue(vdnz, row, 2.0, INSERT_VALUES);
       VecSetValue(vonz, row, 2.0, INSERT_VALUES);
     }
   }
 
-  VecAssemblyBegin(vdnz);
-  VecAssemblyEnd(vdnz);
+  VecAssemblyBegin(vdnz); VecAssemblyEnd(vdnz);
 
-  VecAssemblyBegin(vonz);
-  VecAssemblyEnd(vonz);
+  VecAssemblyBegin(vonz); VecAssemblyEnd(vonz);
 
   PetscInt mat_length;
   VecGetSize(vdnz, &mat_length);
@@ -225,8 +220,7 @@ void PGAssem_NS_FEM::Get_dnz_onz( const int &nlocnode,
   for(int ii=0; ii<dof_mat*nlocnode; ++ii)
   {
     dnz[ii] = int(array_d[ii]);
-    if(dnz[ii] > max_dnz)
-      dnz[ii] = max_dnz;
+    if(dnz[ii] > max_dnz) dnz[ii] = max_dnz;
   }
   VecRestoreArray(vdnz, &array_d);
 
@@ -234,8 +228,7 @@ void PGAssem_NS_FEM::Get_dnz_onz( const int &nlocnode,
   for(int ii=0; ii<dof_mat*nlocnode; ++ii)
   {
     onz[ii] = int(array_o[ii]);
-    if(onz[ii] > max_onz)
-      onz[ii] = max_onz;
+    if(onz[ii] > max_onz) onz[ii] = max_onz;
   }
   VecRestoreArray(vonz, &array_o);
 

@@ -219,6 +219,7 @@ int main( int argc, char * argv[] )
       nFunc, inflow_outward_vec, elemType );
 
   // Setup Elemental Boundary Conditions
+  // Obtain the outward normal vector
   std::vector< std::vector<double> > outflow_outward_vec;
   outflow_outward_vec.resize( sur_file_out.size() );
   for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
@@ -226,7 +227,7 @@ int main( int argc, char * argv[] )
 
   ElemBC * ebc = new ElemBC_3D_tet_outflow( sur_file_out, outflow_outward_vec, elemType );
 
-  ebc -> resetTriIEN_outwardnormal( IEN );
+  ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
  
   // Start partition the mesh for each cpu_rank 
   const bool isPrintPartInfo = true;
@@ -253,18 +254,20 @@ int main( int argc, char * argv[] )
 
     part -> print_part_loadbalance_edgecut();
     
-    // Partition Nodal BC
+    // Partition Nodal BC and write to h5 file
     INBC_Partition * nbcpart = new NBC_Partition_3D(part, mnindex, NBC_list);
-    nbcpart -> write_hdf5(part_file.c_str());
+    
+    nbcpart -> write_hdf5( part_file.c_str() );
 
-    // Partition Nodal Inflow BC
+    // Partition Nodal Inflow BC and write to h5 file
     INBC_Partition * infpart = new NBC_Partition_3D_inflow(part, mnindex, InFBC);
+    
     infpart->write_hdf5( part_file.c_str() );
     
-    // Partition Elemental BC
+    // Partition Elemental BC and write to h5 file
     IEBC_Partition * ebcpart = new EBC_Partition_vtp_outflow(part, mnindex, ebc, NBC_list);
 
-    ebcpart -> write_hdf5(part_file.c_str());
+    ebcpart -> write_hdf5( part_file.c_str() );
 
     list_nlocalnode.push_back(part->get_nlocalnode());
     list_nghostnode.push_back(part->get_nghostnode());
@@ -275,8 +278,6 @@ int main( int argc, char * argv[] )
     sum_nghostnode += part->get_nghostnode();
     delete part; delete nbcpart; delete infpart; delete ebcpart; 
   }
-
-  VEC_T::write_int_h5("NumLocalNode","nln", list_nlocalnode);
 
   cout<<"\n===> Mesh Partition Quality: "<<endl;
   cout<<"The largest ghost / local node ratio is: ";
