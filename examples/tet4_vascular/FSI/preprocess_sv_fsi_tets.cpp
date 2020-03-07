@@ -191,7 +191,7 @@ int main( int argc, char * argv[] )
 
   for(unsigned int ii=0; ii<phy_tag.size(); ++ii)
   {
-    if(phy_tag[ii] != 0 && phy_tag[ii] != 1) SYS_T::print_fatal("Error: FSI problem, the physical tag for element should be 0 for fluid domain or 1 for solid domain. \n");
+    if(phy_tag[ii] != 0 && phy_tag[ii] != 1) SYS_T::print_fatal("Error: FSI problem, the physical tag for element should be 0 (fluid domain) or 1 (solid domain).\n");
   }
 
   // Generate IEN
@@ -346,8 +346,6 @@ int main( int argc, char * argv[] )
     delete part; delete nbcpart; delete infpart; delete ebcpart;
     delete mbcpart; delete mebcpart;
   }
-  
-  VEC_T::write_int_h5("NumLocalNode","nln", list_nlocalnode);
 
   // Print mesh partition statistics
   cout<<"\n===> Partition Quality: "<<endl;

@@ -287,8 +287,6 @@ int main( int argc, char * argv[] )
     delete mbcpart; delete mebcpart;
   }
 
-  VEC_T::write_int_h5("NumLocalNode","nln", list_nlocalnode);
-
   cout<<"\n===> Mesh Partition Quality: "<<endl;
   cout<<"The largest ghost / local node ratio is: ";
   cout<<*std::max_element(list_ratio_g2l.begin(), list_ratio_g2l.end())<<endl;
