@@ -34,7 +34,7 @@ Now the value of `CMAKE_BUILD_TYPE` is set to `Release`. The code will be compil
 ```sh
 make
 ```
-Of course you may add `-j2` to run Makefile with 2 threads. If the make complains about the auto keyword or the nullptr, your default compiler does not support C++11. You may add `set (CMAKE_CXX_STANDARD 11)` in your .cmake configuration file to enforce the C++11 standard. 
+Of course you may add `-j2` to run Makefile with 2 threads. If the make complains about the auto keyword or the nullptr, your default compiler does not support C++11. You may add `SET(CMAKE_CXX_STANDARD 11)` in your .cmake configuration file to enforce the C++11 standard. 
 
 ## Tutorial
 In general, one has to follow the following steps for simulation.
