@@ -68,6 +68,18 @@ class NodalBC_3D_inflow : public INodalBC
     virtual int get_ien(const int &cell, const int &lnode) const
     {return tri_ien[nLocBas * cell + lnode];}
 
+    // Access to point coordinates
+    virtual double get_pt_xyz(const int &node, const int &dir) const
+    {return pt_xyz[3*node+dir];}
+
+    // Access to volumetric nodal index
+    virtual int get_global_node(const int &node_idx) const
+    {return global_node[node_idx];}
+
+    // Access to volumetric cell index
+    virtual int get_global_cell(const int &cell_idx) const
+    {return global_cell[cell_idx];}
+
   private:
     NodalBC_3D_inflow() {};
     
