@@ -64,11 +64,16 @@ class NodalBC_3D_inflow : public INodalBC
     // Access to num_cell
     virtual void get_num_cell() const {return num_cell;}
 
+    // Access to (surface) nLocBas
+    virtual void get_nLocBas() const {return nLocBas;}
+
     // Access to (surface) ien
     virtual int get_ien(const int &cell, const int &lnode) const
     {return tri_ien[nLocBas * cell + lnode];}
 
-    // Access to point coordinates
+    // Access to point coordinates, 
+    // node = 0, ..., num_node-1.
+    // dir  = 0, 1, 2.
     virtual double get_pt_xyz(const int &node, const int &dir) const
     {return pt_xyz[3*node+dir];}
 
