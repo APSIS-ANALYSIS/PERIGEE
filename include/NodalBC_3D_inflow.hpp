@@ -58,6 +58,16 @@ class NodalBC_3D_inflow : public INodalBC
     virtual void get_intNA( std::vector<double> &fintNA ) const
     { fintNA = intNA; }
 
+    // Access to num_node
+    virtual void get_num_node() const {return num_node;}
+
+    // Access to num_cell
+    virtual void get_num_cell() const {return num_cell;}
+
+    // Access to (surface) ien
+    virtual int get_ien(const int &cell, const int &lnode) const
+    {return tri_ien[nLocBas * cell + lnode];}
+
   private:
     NodalBC_3D_inflow() {};
     
@@ -90,7 +100,7 @@ class NodalBC_3D_inflow : public INodalBC
     std::vector<double> intNA;
 
     // number of nodes and cells on the surface
-    int num_node, num_cell;
+    int num_node, num_cell, nLocBas;
 
     // IEN for the surface, length nLocBas (3 or 6) x num of cells
     std::vector<int> tri_ien;
