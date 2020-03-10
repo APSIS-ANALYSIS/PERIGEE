@@ -39,13 +39,17 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   num_per_nodes = 0;
 
   // 2. Analyze the file type and read in the data
+  if( elemtype == 501 ) nLocBas = 3;
+  else if( elemtype == 502 ) nLocBas = 6;
+  else SYS_T::print_fatal("Error: unknown element type.\n");
+
   // Read the files
   int wall_numpts, wall_numcels;
   std::vector<double> wall_pts;
   std::vector<int> wall_ien, wall_gnode, wall_gelem;
 
   std::string fend; fend.assign( inffile.end()-4 , inffile.end() );
- 
+
   if( fend.compare(".vtp") == 0 )
   { 
     TET_T::read_vtp_grid( inffile, num_node, num_cell, pt_xyz, tri_ien, global_node, global_cell );
@@ -189,7 +193,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
     }
   }
   else SYS_T::print_fatal("Error: unknown element type.\n");
-  
+
   delete [] temp_sol;
 
   // assign outward normal vector from the input
