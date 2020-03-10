@@ -59,13 +59,13 @@ class NodalBC_3D_inflow : public INodalBC
     { fintNA = intNA; }
 
     // Access to num_node
-    virtual void get_num_node() const {return num_node;}
+    virtual int get_num_node() const {return num_node;}
 
     // Access to num_cell
-    virtual void get_num_cell() const {return num_cell;}
+    virtual int get_num_cell() const {return num_cell;}
 
     // Access to (surface) nLocBas
-    virtual void get_nLocBas() const {return nLocBas;}
+    virtual int get_nLocBas() const {return nLocBas;}
 
     // Access to (surface) ien
     virtual int get_ien(const int &cell, const int &lnode) const

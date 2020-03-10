@@ -151,6 +151,69 @@ class INodalBC
     {SYS_T::commPrint("Warning: get_intNA is not implemented. \n");}
 
 
+    // --------------------------------------------------------------
+    // get_num_node returns the number of nodes on surface
+    // --------------------------------------------------------------
+    virtual int get_num_node() const
+    {
+      SYS_T::commPrint("Warning: get_num_node is not implemented. \n");
+      return -1;
+    }
+  
+    // --------------------------------------------------------------
+    // get_num_cell returns the number of cells on surface
+    // --------------------------------------------------------------
+    virtual int get_num_cell() const
+    {
+      SYS_T::commPrint("Warning: get_num_cell is not implemented. \n");
+      return -1;
+    }
+  
+    // --------------------------------------------------------------
+    // get_num_nLocBas returns the number of local basis on surface
+    // --------------------------------------------------------------
+    virtual int get_nLocBas() const
+    {
+      SYS_T::commPrint("Warning: get_nLocBas is not implemented. \n");
+      return -1;
+    }
+  
+    // --------------------------------------------------------------
+    // get_ien returns the surface mesh ien array
+    // --------------------------------------------------------------
+    virtual int get_ien(const int &cell, const int &lnode) const
+    {
+      SYS_T::commPrint("Warning: get_ien is not implemented. \n");
+      return -1;
+    }
+
+    // --------------------------------------------------------------
+    // get_pt_xyz returns the points' coordinates
+    // --------------------------------------------------------------
+    virtual double get_pt_xyz(const int &node, const int &dir) const
+    {
+      SYS_T::commPrint("Warning: get_pt_xyz is not implemented. \n");
+      return -1.0;
+    }
+
+    // --------------------------------------------------------------
+    // get_global_node returns the node's global volumetric index
+    // --------------------------------------------------------------
+    virtual int get_global_node(const int &node_idx) const
+    {
+      SYS_T::commPrint("Warning: get_global_node is not implemented. \n");
+      return -1;
+    }
+
+    // --------------------------------------------------------------
+    // get_global_cell returns the cell's global volumetric index
+    // --------------------------------------------------------------
+    virtual int get_global_cell(const int &cell_idx) const
+    {
+      SYS_T::commPrint("Warning: get_global_cell is not implemented. \n");
+      return -1;
+    } 
+  
   protected:
     std::vector<unsigned int> dir_nodes;
     unsigned int num_dir_nodes;
