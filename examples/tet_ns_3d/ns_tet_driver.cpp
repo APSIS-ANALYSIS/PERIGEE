@@ -52,28 +52,28 @@ int main(int argc, char *argv[])
   std::string part_file("part");
 
   // nonlinear solver parameters
-  double nl_rtol = 1.0e-3;
-  double nl_atol = 1.0e-6;
-  double nl_dtol = 10.0;
-  int nl_maxits = 20;
-  int nl_refreq = 4;
-  int nl_threshold = 4;
+  double nl_rtol = 1.0e-3; // convergence criterion relative tolerance
+  double nl_atol = 1.0e-6; // convergence criterion absolute tolerance
+  double nl_dtol = 10.0;   // divergence criterion
+  int nl_maxits = 20;      // maximum number if nonlinear iterations
+  int nl_refreq = 4;       // frequency of tangent matrix renewal
+  int nl_threshold = 4;    // threshold of tangent matrix renewal
 
   // time stepping parameters
-  double initial_time = 0.0;
-  double initial_step = 0.1;
-  int initial_index = 0;
-  double final_time = 1.0;
-  std::string sol_bName("SOL_");
-  int ttan_renew_freq = 1;
-  int sol_record_freq = 1;
+  double initial_time = 0.0; // time of the initial condition
+  double initial_step = 0.1; // time step size
+  int initial_index = 0;     // indiex of the initial condition
+  double final_time = 1.0;   // final time
+  std::string sol_bName("SOL_"); // base name of the solution file
+  int ttan_renew_freq = 1;   // frequency of tangent matrix renewal
+  int sol_record_freq = 1;   // frequency of recording the solution
 
   // Restart options
   bool is_restart = false;
-  int restart_index = 0;
-  double restart_time = 0.0;
-  double restart_step = 1.0e-3;
-  std::string restart_name = "SOL_";
+  int restart_index = 0;     // restart solution time index
+  double restart_time = 0.0; // restart time
+  double restart_step = 1.0e-3; // restart simulation time step size
+  std::string restart_name = "SOL_"; // restart solution base name
 
   PetscMPIInt rank, size;
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
   }
   else SYS_T::commPrint("-is_restart: false \n");
 
-  // ===== Record important parameters =====
+  // ===== Record important solver options =====
   if(rank == 0)
   {
     hid_t cmd_file_id = H5Fcreate("solver_cmd.h5",
@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
   // Control points' xyz coordinates
   FEANode * fNode = new FEANode(part_file, rank);
 
-  // Local IEN array
+  // Local sub-domain's IEN array
   ALocal_IEN * locIEN = new ALocal_IEN(part_file, rank);
 
   // Global mesh info
@@ -172,19 +172,19 @@ int main(int argc, char *argv[])
   // Mesh partition info
   APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file, rank);
 
-  // Local element indices
+  // Local sub-domain's element indices
   ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
 
-  // Local nodal bc
+  // Local sub-domain's nodal bc
   ALocal_NodalBC * locnbc = new ALocal_NodalBC(part_file, rank);
 
-  // Local inflow bc
+  // Local sub-domain's inflow bc
   ALocal_Inflow_NodalBC * locinfnbc = new ALocal_Inflow_NodalBC(part_file, rank);
 
-  // Local elemental bc
+  // Local sub-domain's elemental bc
   ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
 
-  // Nodal indices in the subdomain
+  // Local sub-domain's nodal indices
   APart_Node * pNode = new APart_Node(part_file, rank);
 
   SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
@@ -213,6 +213,9 @@ int main(int argc, char *argv[])
   
   if( GMIptr->get_elemType() == 501 )
   {
+    if( nqp_tet > 5 ) SYS_T::commPrint("Warning: the tet element is linear and you are using more than 5 quadrature points.\n");
+    if( nqp_tri > 4 ) SYS_T::commPrint("Warning: the tri element is linear and you are using more than 4 quadrature points.\n");
+
     elementv = new FEAElement_Tet4( nqp_tet ); // elem type 501
     elements = new FEAElement_Triangle3_3D_der0( nqp_tri ); 
   }
