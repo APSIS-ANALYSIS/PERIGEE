@@ -51,9 +51,13 @@ In general, one has to go through the following steps for simulation.
 ## Simulation Samples
 A pulmonary model is built from a healthy 20 month old male, consisting of 772 outlets. The simulation is performed with a boundary layer mesh with 26 million linear elements. The model is prepared by M. Dong and the mesh is prepared by W. Yang.
 
+Reference: J. Liu, W. Yang, M. Dong, and A.L. Marsden, "The nested block preconditioning technique for the incompressible Navier-Stokes equations with emphasis on hemodynamic simulations.", Computer Methods in Applied Mechanics and Engineering, 2020.
+
 [![Pulmonary CFD](http://img.youtube.com/vi/nbrhpyRE4IU/0.jpg)](https://www.youtube.com/watch?v=nbrhpyRE4IU "Pulmonary CFD")
 
 A fluid-structure interaction simulation of a pulmonary model using the unified continuum and variational multiscale formulation. The model and mesh are prepared by W. Yang.
+
+Reference: J. Liu, W. Yang, I.S. Lan, and A.L. Marsden, "Fluid-structure interaction modeling of blood flow in the pulmonary arteries using the unified continuum and variational multiscale formulation.", Mechanics Research Communications, 2020.
 
 [![Pulmonary FSI](http://img.youtube.com/vi/Y84vSN64ZCk/0.jpg)](https://www.youtube.com/watch?v=Y84vSN64ZCk "Pulmonary FSI")
 
