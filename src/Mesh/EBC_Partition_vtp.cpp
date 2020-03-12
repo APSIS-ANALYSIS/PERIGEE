@@ -32,7 +32,6 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
   // obtain the node belonging to this partition
   std::vector<int> local_node, local_elem;
 
-  int elem_index, elem_pos; 
   for(int ii=0; ii<num_ebc; ++ii)
   {
     local_node.clear(); local_elem.clear();
@@ -43,12 +42,10 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
 
     for(int jj=0; jj<num_global_bccell; ++jj)
     {
-      elem_index = ebc -> get_global_cell(ii, jj);
+      const int elem_index = ebc -> get_global_cell(ii, jj);
 
-      // Determine if the element is in the partitioned subdomain
-      elem_pos = part -> get_elemLocIndex( elem_index );
-
-      if( elem_pos != -1 )
+      // If the element is in the partitioned subdomain, record it
+      if( part -> get_elemLocIndex( elem_index ) != -1 )
       {
         local_elem.push_back( jj );
 
@@ -90,10 +87,9 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
     {
       for(int kk=0; kk<cell_nLocBas[ii]; ++kk)
       {
-        int temp_node = ebc->get_ien(ii, local_elem[jj], kk);
-        int temp_npos = VEC_T::get_pos( local_node, temp_node );
-        SYS_T::print_exit_if( temp_npos < 0, 
-            "Error: EBC_Partition_vtp, local_node is incomplete. \n" );
+        const int temp_node = ebc->get_ien(ii, local_elem[jj], kk);
+        const int temp_npos = VEC_T::get_pos( local_node, temp_node );
+        SYS_T::print_exit_if( temp_npos < 0, "Error: EBC_Partition_vtp, local_node is incomplete. \n" );
         local_tri_ien[ii][jj*cell_nLocBas[ii] + kk] = temp_npos;
       }
     }
