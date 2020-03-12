@@ -76,6 +76,15 @@ class ALocal_Inflow_NodalBC
 
     // Centroid point
     std::vector<double> centroid;
+
+    // number of local nodes, cells, and cell's nLocBas
+    int num_local_node, num_local_cell, cell_nLocBas;
+
+    // local nodes' coordinates
+    std::vector<double> local_pt_xyz;
+
+    // local cell's IEN
+    std::vector<int> local_tri_ien;
 };
 
 #endif

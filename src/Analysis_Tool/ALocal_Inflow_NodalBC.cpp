@@ -26,11 +26,19 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
     num_out_bc_pts = h5r->read_intScalar( gname.c_str(), "num_out_bc_pts");
     h5r->read_doubleVector( gname.c_str(), "centroid", centroid);
     h5r->read_doubleVector( gname.c_str(), "outline_pts", outline_pts );
+  
+    num_local_node = h5r->read_intScalar( gname.c_str(), "num_local_node" );
+    num_local_cell = h5r->read_intScalar( gname.c_str(), "num_local_cell" );
+    cell_nLocBas   = h5r->read_intScalar( gname.c_str(), "cell_nLocBas" );
+
+    h5r->read_doubleVector( gname.c_str(), "local_pt_xyz", local_pt_xyz );
+    h5r->read_intVector( gname.c_str(), "local_tri_ien", local_tri_ien );
   }
   else
   {
     num_out_bc_pts = 0;
   }
+
 
   delete h5r; H5Fclose( file_id );
 }
@@ -41,6 +49,8 @@ ALocal_Inflow_NodalBC::~ALocal_Inflow_NodalBC()
   VEC_T::clean(outvec);
   VEC_T::clean(centroid);
   VEC_T::clean(outline_pts);
+  VEC_T::clean(local_pt_xyz);
+  VEC_T::clean(local_tri_ien);
 }
 
 
