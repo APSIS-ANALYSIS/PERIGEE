@@ -19,22 +19,24 @@ class ALocal_Inflow_NodalBC
 
     virtual ~ALocal_Inflow_NodalBC();
 
-    // \para node ranges [ 0 , Num_LD ).
-    virtual int get_LDN( const int &node ) const
-    {return LDN[node];}
+    // Get the Dirichlet node's index in this local partition
+    // para node ranges [ 0 , Num_LD ).
+    virtual int get_LDN( const int &node ) const {return LDN[node];}
 
+    // Get the number of Dirichlet nodes in this local partition
     virtual int get_Num_LD() const {return Num_LD;}
 
     // get the outward normal vector components.
-    // ii=0 : x-component
-    // ii=1 : y-component
-    // ii=2 : z-component
+    // ii=0 : x-component; ii=1 : y-component; ii=2 : z-component
     virtual double get_outvec( const int &ii ) const {return outvec[ii];}
 
+    // get the active area of the surface
     virtual double get_actarea() const {return act_area;}
     
+    // get the full area of the surface
     virtual double get_fularea() const {return ful_area;}
 
+    // determine if a given index belong to LDN array
     virtual bool is_inLDN( const int &ii) const
     {return VEC_T::is_invec(LDN, ii); }
 
