@@ -52,6 +52,41 @@ class ALocal_Inflow_NodalBC
     virtual double get_radius( const double &x, const double &y,
                 const double &z ) const;
 
+    // get the number of nodes beloging to this local partition
+    virtual int get_num_local_node() const {return num_local_node;}
+
+    // get the number of cells belonging to this local partition
+    virtual int get_num_local_cell() const {return num_local_cell;}
+
+    // get the element's number of nodes
+    virtual int get_cell_nLocBas() const {return cell_nLocBas;}
+
+    // get the coordinates of the nodes
+    virtual double get_local_pt_xyz(const int &ii) const {return local_pt_xyz[ii];}
+
+    // get the element's IEN array
+    virtual int get_local_tri_ien(const int &ii) const {return local_tri_ien[ii];}
+
+    // --------------------------------------------------------------
+    // get_ctrlPts_xyz: given element index eindex,
+    // return the control point's geometry.
+    // The users are responsible for allocating the deleting the ctrl_xyz
+    // array.
+    // surface element id: 0 <= eindex < num_local_cell;
+    // ctrl_x/y/z : output geometry array, length is cell_nLocBas.
+    // --------------------------------------------------------------
+    virtual void get_ctrlPts_xyz( const int &eindex, double * const &ctrl_x,
+        double * const &ctrl_y, double * const &ctrl_z ) const;
+
+    // --------------------------------------------------------------
+    // get_SIEN: returns the surface element's IEN.
+    // The users are responsible for allocating and deleting the sien
+    // array.
+    // eindex : 0 <= eindex < num_local_cell
+    // sien : length cell_nLocBas.
+    // --------------------------------------------------------------
+    virtual void get_SIEN( const int &eindex, int * const &sien ) const;
+
   private:
     // Number of Local Dirichlet nodes
     int Num_LD;
