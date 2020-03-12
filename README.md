@@ -55,7 +55,7 @@ Reference: J. Liu, W. Yang, M. Dong, and A.L. Marsden, "The nested block precond
 
 [![Pulmonary CFD](http://img.youtube.com/vi/nbrhpyRE4IU/0.jpg)](https://www.youtube.com/watch?v=nbrhpyRE4IU "Pulmonary CFD")
 
-A fluid-structure interaction simulation of a pulmonary model is performed using the unified continuum and variational multiscale formulation. The model and mesh are prepared by W. Yang. The solid model is *fully incompressible* and is numerically modeled via the residual-based variational multiscale formulation.
+A fluid-structure interaction simulation of a pulmonary model is performed using **the unified continuum and variational multiscale formulation**. The model and mesh are prepared by W. Yang. The solid model is *fully incompressible* and is numerically modeled via the residual-based variational multiscale formulation.
 
 Reference: J. Liu, W. Yang, I.S. Lan, and A.L. Marsden, "Fluid-structure interaction modeling of blood flow in the pulmonary arteries using the unified continuum and variational multiscale formulation.", Mechanics Research Communications, 2020.
 
