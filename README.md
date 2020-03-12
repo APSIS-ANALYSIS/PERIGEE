@@ -22,7 +22,7 @@ export LD_LIBRARY_PATH=/home/groups/amarsden/lib-perigee/VTK-7.1.1-shared/lib:$L
 3. After the libraries are installed, modify the configuration file in the [conf](conf) folder, following the steps [here](docs/configure_perigee_guide.md). *If you are on Sherlock@Stanford, you do not need to do anything at this step. The CMake configuration file for Sherlock is [here](conf/stanford_sherlock.cmake). As long as you have your machine named as `sherlock`, PERIGEE will load the proper CMake file and compile the code*.
 
 ## Build
-First, create a folder `build` out of the PERGIEE source directory. Enter that folder, and run the following commands to build, as an example, a suite of heat equation solvers.
+First, create a folder `build` out of the source directory. Enter that folder, and run the following commands to build, as an example, a suite of heat equation solvers.
 ```sh
 CMake ~/PERIGEE/examples/nonlinear_heat_eqn/
 ```
@@ -37,10 +37,10 @@ make
 Of course you may add `-j2` to run Makefile with 2 threads. If the make complains about the auto keyword or the nullptr, your default compiler does not support C++11. You may add `SET(CMAKE_CXX_STANDARD 11)` in your .cmake configuration file to enforce the C++11 standard. 
 
 ## Tutorial
-In general, one has to follow the following steps for simulation.
+In general, one has to go through the following steps for simulation.
 * Obtain the mesh in vtu/vtp format from SimVascular or Gmsh.
-* Run a preprocessor to load the mesh, assign boundary conditions, and partition the mesh. The preprocessor is a *serial* code and may need to be run on a large memory node if you are dealing with a very large problem.
-* Run a FEM analysis code in parallel to solve the partial differential equations. The solutions will be saved on disk in the binary format.
+* Run a preprocessor to load the mesh, assign boundary conditions, and partition the mesh. The preprocessor is a *serial* code and may need to be run on a large memory cluster node if you are dealing with a very large problem.
+* Run a finite element analysis code to solve the partial differential equations. The solutions will be saved on disk in the binary format.
 * Run a preprocessor for postprocessing. This step re-partition the mesh to make preparations for postprocessing, such as visualization, error calculation, etc. Similar to the preprocessor, this routine should be run in *serial* and may consume a lot memory if your mesh is fine. With this routine, we are able to run the postprocessing routine with different number of CPUs. For example, we run FEM analysis with, say, 360 CPUs; visualizing the solution is much less intensive in computing and may only need, say, 24 CPUs. So you should repartition the domain into 24 sub-domains in this step.
 * Run a postprocessor in parallel. Often, this step refers to the visualization of the solutions. The visualzation routine will read the binary solution files and write the data into (parallel) vtu/vtp format. Then the data can be visualized in Paraview.
 
