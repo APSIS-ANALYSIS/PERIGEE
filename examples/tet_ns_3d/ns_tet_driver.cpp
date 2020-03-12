@@ -338,7 +338,7 @@ int main(int argc, char *argv[])
     dot_sol -> ScaleValue(-1.0);
 
     SYS_T::commPrint("\n===> Consistent initial acceleration is obtained. \n");
-    lsolver_acce->Info();
+    lsolver_acce -> print_info();
     delete lsolver_acce;
     SYS_T::commPrint(" The mass matrix lsolver is destroyed. \n\n");
   }
@@ -435,6 +435,9 @@ int main(int argc, char *argv[])
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN, pNode, fNode,
       locnbc, locinfnbc, locebc, gbc, pmat, elementv, elements, quadv, quads,
       locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
+
+  // ===== Print complete solver info =====
+  lsolver -> print_info();
 
   // ===== Clean Memory =====
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic;

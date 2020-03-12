@@ -98,6 +98,13 @@ class PLinear_Solver_PETSc
       SYS_T::commPrint("----------------------------------------------------------- \n");
     }
 
+    void print_info() const
+    {
+      SYS_T::commPrint("----------------------------------------------------------- \n");
+      KSPView(ksp, PETSC_VIEWER_STDOUT_WORLD);
+      SYS_T::commPrint("----------------------------------------------------------- \n");
+    }
+
     // --------------------------------------------------------------
     // ! Print the solver convergence info on screen
     //   This function is called repeatedly inside nonlinear solver
