@@ -53,6 +53,9 @@ A pulmonary model is built from a healthy 20 month old male, consisting of 772 o
 
 [![Pulmonary CFD](http://img.youtube.com/vi/nbrhpyRE4IU/0.jpg)](https://www.youtube.com/watch?v=nbrhpyRE4IU "Pulmonary CFD")
 
+A fluid-structure interaction simulation of a pulmonary model using the unified continuum and variational multiscale formulation. The model and mesh are prepared by W. Yang.
+
+[![Pulmonary FSI](http://img.youtube.com/vi/Y84vSN64ZCk/0.jpg)](https://www.youtube.com/watch?v=Y84vSN64ZCk "Pulmonary FSI")
 
 ## References
 ### Finite Element Method
