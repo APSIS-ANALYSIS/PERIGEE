@@ -9,7 +9,7 @@ If you are looking for something that can generate pretty pictures by just click
 - [Install](#Install)
 - [Build](#Build)
 - [Tutorial](#Tutorial)
-- [Simulation Samples](#Simulation Samples)
+- [Simulation Samples](#Simulation-Samples)
 - [References](#References)
 
 ## Install
@@ -50,6 +50,7 @@ In general, one has to go through the following steps for simulation.
 
 ## Simulation Samples
 A pulmonary model is built from a healthy 20 month old male, consisting of 772 outlets. The simulation is performed with a boundary layer mesh with 26 million linear elements. The model is prepared by M. Dong and the mesh is prepared by W. Yang.
+
 [![Pulmonary CFD](http://img.youtube.com/vi/nbrhpyRE4IU/0.jpg)](https://www.youtube.com/watch?v=nbrhpyRE4IU "Pulmonary CFD")
 
 
