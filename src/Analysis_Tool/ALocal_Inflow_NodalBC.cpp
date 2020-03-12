@@ -76,4 +76,23 @@ double ALocal_Inflow_NodalBC::get_radius( const double &x, const double &y,
   return rc / (rb + rc);
 }
 
+void ALocal_Inflow_NodalBC::get_ctrlPts_xyz( const int &eindex, 
+    double * const &ctrl_x, double * const &ctrl_y, 
+    double * const &ctrl_z ) const
+{
+  for(int jj=0; jj<cell_nLocBas; ++jj)
+  {
+    const int pos = local_tri_ien[len*eindex+jj];
+    ctrl_x[jj] = local_pt_xyz[3*pos];
+    ctrl_y[jj] = local_pt_xyz[3*pos+1];
+    ctrl_z[jj] = local_pt_xyz[3*pos+2];
+  }
+}
+
+void ALocal_Inflow_NodalBC::get_SIEN( const int &eindex, int * const &sien ) const
+{
+  for(int jj=0; jj<cell_nLocBas; ++jj)
+    sien[jj] = local_node_pos[ local_tri_ien[cell_nLocBas*eindex+jj] ];
+}
+
 // EOF
