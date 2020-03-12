@@ -120,6 +120,10 @@ class ALocal_Inflow_NodalBC
 
     // local cell's IEN
     std::vector<int> local_tri_ien;
+
+    // local node's position in the volumetric local portion's local_to_global
+    // array
+    std::vector<int> local_node_pos;
 };
 
 #endif

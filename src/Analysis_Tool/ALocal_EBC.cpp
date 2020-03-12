@@ -66,8 +66,7 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
     }
   }
 
-  delete h5r;
-  H5Fclose( file_id );
+  delete h5r; H5Fclose( file_id );
 }
 
 

@@ -33,12 +33,12 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
 
     h5r->read_doubleVector( gname.c_str(), "local_pt_xyz", local_pt_xyz );
     h5r->read_intVector( gname.c_str(), "local_tri_ien", local_tri_ien );
+    h5r->read_intVector( gname.c_str(), "local_node_pos", local_node_pos );
   }
   else
   {
     num_out_bc_pts = 0;
   }
-
 
   delete h5r; H5Fclose( file_id );
 }
@@ -51,6 +51,7 @@ ALocal_Inflow_NodalBC::~ALocal_Inflow_NodalBC()
   VEC_T::clean(outline_pts);
   VEC_T::clean(local_pt_xyz);
   VEC_T::clean(local_tri_ien);
+  VEC_T::clean(local_node_pos);
 }
 
 
@@ -82,7 +83,7 @@ void ALocal_Inflow_NodalBC::get_ctrlPts_xyz( const int &eindex,
 {
   for(int jj=0; jj<cell_nLocBas; ++jj)
   {
-    const int pos = local_tri_ien[len*eindex+jj];
+    const int pos = local_tri_ien[ cell_nLocBas*eindex+jj ];
     ctrl_x[jj] = local_pt_xyz[3*pos];
     ctrl_y[jj] = local_pt_xyz[3*pos+1];
     ctrl_z[jj] = local_pt_xyz[3*pos+2];
