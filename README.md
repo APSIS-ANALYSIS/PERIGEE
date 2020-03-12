@@ -2,7 +2,7 @@
 PERIGEE is a nonlinear dynamic finite element / isogeometric analysis code for multiphysics simulations. The code has been developed with the goal of providing an object-oriented framework for parallel implementation of multiphysics problems using different finite element technologies.
 
 ## Disclaimer
-If you just want to click the button and get a pretty picture, please close this page.
+If you are looking for something that can generate pretty pictures by just clicking the button, please close this page.
 
 ## Table of Contents
 
