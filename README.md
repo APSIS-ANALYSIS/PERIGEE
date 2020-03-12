@@ -49,6 +49,7 @@ In general, one has to go through the following steps for simulation.
 * Run a postprocessor in parallel. Often, this step refers to the visualization of the solutions. The visualzation routine will read the binary solution files and write the data into (parallel) vtu/vtp format. Then the data can be visualized in Paraview.
 
 ## Simulation Samples
+A pulmonary model is built from a healthy 20 month old male, consisting of 772 outlets. The simulation is performed with a boundary layer mesh with 26 million linear elements. The model is prepared by M. Dong and the mesh is prepared by W. Yang.
 [![Pulmonary CFD](http://img.youtube.com/vi/nbrhpyRE4IU/0.jpg)](https://www.youtube.com/watch?v=nbrhpyRE4IU "Pulmonary CFD")
 
 
