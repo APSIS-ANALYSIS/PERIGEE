@@ -12,7 +12,7 @@ If you are looking for something that can generate pretty pictures by just click
 - [References](#References)
 
 ## Install
-Please follow the following steps to compile PERIGEE.
+Please go through the following steps to install external libraries.
 
 1. For Sherlock@Stanford users, directly go to step 2. Before compiling PERIGEE, one has to install several libraries. A quick guide for library installation is [here](docs/install_external_libs.md) and a slightly advanced guide is [there](docs/install-advanced.md). After the libraries are all properly installed, proceed to step 3.
 
