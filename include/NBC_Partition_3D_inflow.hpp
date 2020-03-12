@@ -41,7 +41,23 @@ class NBC_Partition_3D_inflow : public NBC_Partition_3D
     // coordindates of the boundary points
     std::vector<double> outline_pts;
 
+    // number of local node / cell, element number of nodes
+    int num_local_node, num_local_cell, cell_nLocBas;
 
+    // local nodes' coordinates, length 3 x num_local_node
+    std::vector<double> local_pt_xyz;
+
+    // local cell IEN array, size cell_nLocBas x num_local_cell
+    std::vector<int> local_tri_ien;
+
+    // local node's global index, length num_local_node
+    std::vector<int> local_global_node;
+
+    // local node's postion in the local_to_global_array
+    std::vector<int> local_node_pos;
+
+    // local cell's global index, length num_local_cell
+    std::vector<int> local_global_cell;
 };
 
 #endif
