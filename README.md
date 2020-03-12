@@ -1,10 +1,6 @@
 # PERIGEE
 PERIGEE is a nonlinear dynamic finite element / isogeometric analysis code for multiphysics simulations. The code has been developed with the goal of providing an object-oriented framework for parallel implementation of multiphysics problems using different finite element technologies.
 
-<a href="https://www.youtube.com/watch?v=nbrhpyRE4IU" target="_blank"><img src="http://img.youtube.com/vi/nbrhpyRE4IU/0.jpg" alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
-
-[![Audi R8](http://img.youtube.com/vi/nbrhpyRE4IU/0.jpg)](https://www.youtube.com/watch?v=nbrhpyRE4IU "Pulmonary CFD")
-
 ## Disclaimer
 If you are looking for something that can generate pretty pictures by just clicking the button, please close this page.
 
@@ -13,6 +9,7 @@ If you are looking for something that can generate pretty pictures by just click
 - [Install](#Install)
 - [Build](#Build)
 - [Tutorial](#Tutorial)
+- [Simulation Samples](#Simulation Samples)
 - [References](#References)
 
 ## Install
@@ -50,6 +47,10 @@ In general, one has to go through the following steps for simulation.
 * Run a finite element analysis code to solve the partial differential equations. The solutions will be saved on disk in the binary format.
 * Run a preprocessor for postprocessing. This step re-partition the mesh to make preparations for postprocessing, such as visualization, error calculation, etc. Similar to the preprocessor, this routine should be run in *serial* and may consume a lot memory if your mesh is fine. With this routine, we are able to run the postprocessing routine with different number of CPUs. For example, we run FEM analysis with, say, 360 CPUs; visualizing the solution is much less intensive in computing and may only need, say, 24 CPUs. So you should repartition the domain into 24 sub-domains in this step.
 * Run a postprocessor in parallel. Often, this step refers to the visualization of the solutions. The visualzation routine will read the binary solution files and write the data into (parallel) vtu/vtp format. Then the data can be visualized in Paraview.
+
+## Simulation Samples
+[![Pulmonary CFD](http://img.youtube.com/vi/nbrhpyRE4IU/0.jpg)](https://www.youtube.com/watch?v=nbrhpyRE4IU "Pulmonary CFD")
+
 
 ## References
 ### Finite Element Method
