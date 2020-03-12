@@ -194,7 +194,26 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
       }
       MPI_Barrier(PETSC_COMM_WORLD);
     }
+   
+    // Calcualte the inlet data
+    const double inlet_face_flrate = gassem_ptr -> Assem_surface_flowrate(
+        cur_sol, lassem_fluid_ptr, elements, quad_s, anode_ptr, infnbc_part ); 
 
+    const double inlet_face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
+        cur_sol, lassem_fluid_ptr, elements, quad_s, anode_ptr, infnbc_part );
+
+    PetscMPIInt rank;
+    MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
+    if( rank == 0 )
+    {
+      std::ofstream ofile;
+      ofile.open( infnbc_part->gen_flowfile_name().c_str(), std::ofstream::out | std::ofstream::app );
+      ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
+      ofile.close();
+    } 
+    MPI_Barrier(PETSC_COMM_WORLD);
+    
+    // Prepare for next time step
     pre_sol->Copy(*cur_sol);
     pre_dot_sol->Copy(*cur_dot_sol);
   }

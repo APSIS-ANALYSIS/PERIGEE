@@ -26,20 +26,31 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
     num_out_bc_pts = h5r->read_intScalar( gname.c_str(), "num_out_bc_pts");
     h5r->read_doubleVector( gname.c_str(), "centroid", centroid);
     h5r->read_doubleVector( gname.c_str(), "outline_pts", outline_pts );
-  
-    num_local_node = h5r->read_intScalar( gname.c_str(), "num_local_node" );
-    num_local_cell = h5r->read_intScalar( gname.c_str(), "num_local_cell" );
-    cell_nLocBas   = h5r->read_intScalar( gname.c_str(), "cell_nLocBas" );
-
-    h5r->read_doubleVector( gname.c_str(), "local_pt_xyz", local_pt_xyz );
-    h5r->read_intVector( gname.c_str(), "local_tri_ien", local_tri_ien );
-    h5r->read_intVector( gname.c_str(), "local_node_pos", local_node_pos );
   }
   else
   {
     num_out_bc_pts = 0;
   }
 
+  num_local_cell = h5r->read_intScalar( gname.c_str(), "num_local_cell" );
+  num_local_node = h5r->read_intScalar( gname.c_str(), "num_local_node" );
+  cell_nLocBas   = h5r->read_intScalar( gname.c_str(), "cell_nLocBas" );
+  
+  if(num_local_cell > 0)
+  {
+    h5r->read_doubleVector( gname.c_str(), "local_pt_xyz", local_pt_xyz );
+    h5r->read_intVector( gname.c_str(), "local_tri_ien", local_tri_ien );
+    h5r->read_intVector( gname.c_str(), "local_node_pos", local_node_pos );
+  }
+  else
+  {
+    num_local_node = 0;
+  
+    local_pt_xyz.clear();
+    local_tri_ien.clear();
+    local_node_pos.clear();
+  }
+  
   delete h5r; H5Fclose( file_id );
 }
 

@@ -402,6 +402,8 @@ int main(int argc, char *argv[])
       ofile.close();
     }
   }
+  
+  MPI_Barrier(PETSC_COMM_WORLD);
 
   // ===== Inlet data recording files =====
   const double inlet_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
@@ -409,6 +411,7 @@ int main(int argc, char *argv[])
 
   const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
       sol, locAssem_ptr, elements, quads, pNode, locinfnbc );
+
 
   if( rank == 0 )
   {
@@ -419,8 +422,12 @@ int main(int argc, char *argv[])
       ofile.open( locinfnbc->gen_flowfile_name().c_str(), std::ofstream::out | std::ofstream::app );
 
     if( !is_restart ) ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
+    
+    ofile.close();
   }
 
+  MPI_Barrier(PETSC_COMM_WORLD);
+  
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
