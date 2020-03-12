@@ -64,7 +64,7 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   delete [] dnnz; dnnz = nullptr;
   delete [] onnz; onnz = nullptr;
 
-  SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE. \n");
+  SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();
 
   row_index = new PetscInt [nLocBas * dof_mat];
@@ -322,10 +322,10 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
         lassem_ptr->Tangent, ADD_VALUES);
   }
 
-  // Create a temporary zero solution vector
+  // Create a temporary zero solution vector to feed Natbc_Resis_KG
   PDNSolution * temp = new PDNSolution_NS( node_ptr, 0, false );
 
-  // 0.1 is an (arbitrary) nonzero time step size given into the NatBC_Resis_KG 
+  // 0.1 is an (arbitrarily chosen) nonzero time step size feeding the NatBC_Resis_KG 
   NatBC_Resis_KG(0.1, temp, temp, lassem_ptr, elements, quad_s, node_ptr,
       nbc_part, ebc_part, gbc );
 
