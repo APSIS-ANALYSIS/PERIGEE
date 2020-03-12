@@ -103,7 +103,7 @@ class ALocal_EBC
       if( ii/10 == 0 ) ss<<"00";
       else if(ii/100 == 0) ss<<"0";
 
-      ss<<ii<<"_flowrate.txt";
+      ss<<ii<<"_data.txt";
       
       return ss.str();
     }
