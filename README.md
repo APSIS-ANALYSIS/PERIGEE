@@ -3,6 +3,8 @@ PERIGEE is a nonlinear dynamic finite element / isogeometric analysis code for m
 
 <a href="https://www.youtube.com/watch?v=nbrhpyRE4IU" target="_blank"><img src="http://img.youtube.com/vi/nbrhpyRE4IU/0.jpg" alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
 
+[![Audi R8](http://img.youtube.com/vi/nbrhpyRE4IU/0.jpg)](https://www.youtube.com/watch?v=nbrhpyRE4IU "Pulmonary CFD")
+
 ## Disclaimer
 If you are looking for something that can generate pretty pictures by just clicking the button, please close this page.
 
