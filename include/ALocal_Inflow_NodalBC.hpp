@@ -87,6 +87,18 @@ class ALocal_Inflow_NodalBC
     // --------------------------------------------------------------
     virtual void get_SIEN( const int &eindex, int * const &sien ) const;
 
+    // --------------------------------------------------------------
+    // Generate a file name for inlet face
+    // Inlet_data.txt
+    // --------------------------------------------------------------
+    virtual std::string gen_flowfile_name() const
+    {
+      std::ostringstream ss;
+      ss<<"Inlet_data.txt";
+
+      return ss.str();
+    }
+
   private:
     // Number of Local Dirichlet nodes
     int Num_LD;
