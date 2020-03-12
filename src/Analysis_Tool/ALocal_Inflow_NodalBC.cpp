@@ -35,7 +35,9 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
   num_local_cell = h5r->read_intScalar( gname.c_str(), "num_local_cell" );
   num_local_node = h5r->read_intScalar( gname.c_str(), "num_local_node" );
   cell_nLocBas   = h5r->read_intScalar( gname.c_str(), "cell_nLocBas" );
-  
+ 
+  // If this partitioned sub-domain contains inlet surface element,
+  // load its geometrical info 
   if(num_local_cell > 0)
   {
     h5r->read_doubleVector( gname.c_str(), "local_pt_xyz", local_pt_xyz );
@@ -44,8 +46,6 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
   }
   else
   {
-    num_local_node = 0;
-  
     local_pt_xyz.clear();
     local_tri_ien.clear();
     local_node_pos.clear();
