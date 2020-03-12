@@ -24,6 +24,65 @@ NBC_Partition_3D_inflow::NBC_Partition_3D_inflow(
   outline_pts.resize( 3*num_out_bc_pts );
   for(int ii=0; ii<3*num_out_bc_pts; ++ii)
     outline_pts[ii] = nbc->get_para_5(ii);
+
+  // Record the geometrical info of the inlet in this CPU
+  cell_nLocBas = nbc -> get_nLocBas();
+
+  std::vector<int> local_node, local_elem;
+  local_node.clear(); local_elem.clear();
+
+  local_global_cell.clear();
+
+  // Loop over all cells on inlet surface
+  for(int jj=0; jj < nbc -> get_num_cell(); ++jj)
+  {
+    const int elem_index = nbc -> get_global_cell(jj); // cell vol id
+
+    if( part -> get_elemLocIndex( elem_index ) != -1  )
+    {
+      local_elem.push_back( jj );
+
+      local_global_cell.push_back( elem_index );
+
+      for( int kk=0; kk < cell_nLocBas; ++kk )
+        local_node.push_back( nbc->get_ien(jj, kk) );
+    }
+  }
+
+  VEC_T::sort_unique_resize( local_node );
+
+  num_local_node = static_cast<int>( local_node.size() );
+  num_local_cell = static_cast<int>( local_global_cell.size() );
+
+  local_pt_xyz.resize( num_local_node * 3 );
+  local_global_node.resize( num_local_node );
+  local_node_pos.resize( num_local_node );
+
+  for(int jj=0; jj<num_local_node; ++jj)
+  {
+    local_pt_xyz[3*jj+0] = nbc -> get_pt_xyz( local_node[jj], 0 );
+    local_pt_xyz[3*jj+1] = nbc -> get_pt_xyz( local_node[jj], 1 );
+    local_pt_xyz[3*jj+2] = nbc -> get_pt_xyz( local_node[jj], 2 );
+
+    local_global_node[jj] = nbc -> get_global_node( local_node[jj] );
+
+    local_node_pos[jj] = part->get_nodeLocGhoIndex( mnindex->get_old2new(local_global_node[jj]) );
+
+    assert( local_node_pos[jj] >= 0 );
+  }
+
+  // create new IEN
+  local_tri_ien.resize( num_local_cell * cell_nLocBas );
+
+  for(int jj=0; jj<num_local_cell; ++jj)
+  {
+    for(int kk=0; kk<cell_nLocBas; ++kk)
+    {
+      const int temp_node = nbc -> get_ien( local_elem[jj], kk );
+      const int temp_npos = VEC_T::get_pos( local_node, temp_node );
+      local_tri_ien[jj*cell_nLocBas + kk] = temp_npos;
+    }
+  }
 }
 
 
