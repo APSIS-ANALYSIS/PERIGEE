@@ -67,8 +67,6 @@ NBC_Partition_3D_inflow::NBC_Partition_3D_inflow(
     local_global_node[jj] = nbc -> get_global_node( local_node[jj] );
 
     local_node_pos[jj] = part->get_nodeLocGhoIndex( mnindex->get_old2new(local_global_node[jj]) );
-
-    assert( local_node_pos[jj] >= 0 );
   }
 
   // create new IEN
@@ -126,15 +124,15 @@ void NBC_Partition_3D_inflow::write_hdf5( const char * FileName ) const
   
   h5writer->write_intScalar( group_id, "cell_nLocBas", cell_nLocBas );
 
-  h5writer->write_doublaVector( group_id, "local_pt_xyz", local_pt_xyz );
+  h5writer->write_doubleVector( group_id, "local_pt_xyz", local_pt_xyz );
 
-  h5w->write_intVector( group_id, "local_tri_ien", local_tri_ien );
+  h5writer->write_intVector( group_id, "local_tri_ien", local_tri_ien );
 
-  h5w->write_intVector( group_id, "local_global_node", local_global_node );
+  h5writer->write_intVector( group_id, "local_global_node", local_global_node );
 
-  h5w->write_intVector( group_id, "local_node_pos", local_node_pos );
+  h5writer->write_intVector( group_id, "local_node_pos", local_node_pos );
 
-  h5w->write_intVector( group_id, "local_global_cell", local_global_cell );
+  h5writer->write_intVector( group_id, "local_global_cell", local_global_cell );
 
   delete h5writer; H5Gclose(group_id); H5Fclose(file_id);
 }
