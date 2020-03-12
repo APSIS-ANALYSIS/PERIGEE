@@ -23,6 +23,7 @@
 #include "ALocal_meshSize_3D_NURBS.hpp"
 #include "AExtractor_3D_NURBS_xyz.hpp"
 #include "ALocal_NodalBC.hpp"
+#include "ALocal_Inflow_NodalBC.hpp"
 #include "ALocal_ElemBC.hpp"
 #include "ALocal_EBC.hpp"
 #include "IGenBC.hpp"
@@ -700,6 +701,18 @@ class IPGAssem
       return 0.0;
     }
 
+    virtual double Assem_surface_flowrate(
+        const PDNSolution * const &vec,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const APart_Node * const &pnode_ptr,
+        const ALocal_Inflow_NodalBC * const &infbc_part )
+    {
+      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
+      return 0.0;
+    }
+
     // Assem_surface_ave_pressure
     // Performs surface integral to calculated the pressure integrated
     // over the surface as well as the surface area. Return the
@@ -716,7 +729,19 @@ class IPGAssem
         const ALocal_EBC * const &ebc_part,
         const int &ebc_id )
     {
-      SYS_T::commPrint("Warning: Assem_surface_ave_pressure() is not implemented. \n");
+      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
+      return 0.0;
+    }
+    
+    virtual double Assem_surface_ave_pressure(
+        const PDNSolution * const &vec,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const APart_Node * const &pnode_ptr,
+        const ALocal_Inflow_NodalBC * const &infbc_part )
+    {
+      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
       return 0.0;
     }
 };
