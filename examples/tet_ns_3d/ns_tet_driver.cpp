@@ -48,6 +48,9 @@ int main(int argc, char *argv[])
   // back flow stabilization
   double bs_beta = 0.2;
 
+  // generalized-alpha rho_inf
+  double genA_rho_inf = 0.5;
+  
   // part file location
   std::string part_file("part");
 
@@ -88,6 +91,7 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionInt("-nqp_tri", nqp_tri);
   SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
   SYS_T::GetOptionReal("-bs_beta", bs_beta);
+  SYS_T::GetOptionReal("-rho_inf", genA_rho_inf);
   SYS_T::GetOptionReal("-fl_density", fluid_density);
   SYS_T::GetOptionReal("-fl_mu", fluid_mu);
   SYS_T::GetOptionString("-inflow_file", inflow_file);
@@ -117,6 +121,7 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-nqp_tri:", nqp_tri);
   SYS_T::cmdPrint("-nz_estimate:", nz_estimate);
   SYS_T::cmdPrint("-bs_beta:", bs_beta);
+  SYS_T::cmdPrint("-rho_inf:", genA_rho_inf);
   SYS_T::cmdPrint("-fl_density:", fluid_density);
   SYS_T::cmdPrint("-fl_mu:", fluid_mu);
   SYS_T::cmdPrint("-inflow_file:", inflow_file);
@@ -237,10 +242,9 @@ int main(int argc, char *argv[])
 
   // ===== Generalized-alpha ====
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
-  const double genA_spectrium = 0.5;
   const bool genA_is2ndSystem = false; 
   TimeMethod_GenAlpha * tm_galpha_ptr = new TimeMethod_GenAlpha(
-      genA_spectrium, genA_is2ndSystem);
+      genA_rho_inf, genA_is2ndSystem);
   tm_galpha_ptr->print_info();
 
   // ===== Local Assembly routine =====
