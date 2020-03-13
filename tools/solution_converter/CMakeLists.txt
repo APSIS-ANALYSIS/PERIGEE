@@ -64,6 +64,6 @@ ADD_EXECUTABLE( sol_converter conv_driver.cpp)
 
 # -------------------------------------------------------------------
 # 2. Link libraries
-TARGET_LINK_LIBRARIES( sol_converter ${EXTRA_LINK_LIBS} perigee )
+TARGET_LINK_LIBRARIES( sol_converter perigee )
 
 #EOF
