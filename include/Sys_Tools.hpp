@@ -118,6 +118,15 @@ namespace SYS_T
     }
   }
 
+  inline bool is_file_exist( const std::string &fName )
+  {
+    if( FILE *ff = fopen(fName.c_str(), "r") )
+    {
+      fclose(ff);
+      return true;
+    }
+    else return false;
+  }
 
   // ----------------------------------------------------------------
   // get_xyz_index() 
