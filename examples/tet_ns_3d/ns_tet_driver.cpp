@@ -241,7 +241,7 @@ int main(int argc, char *argv[])
   
   pmat->gen_perm_bc(pNode, locnbc);
 
-  // ===== Generalized-alpha ====
+  // ===== Generalized-alpha =====
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
   
   TimeMethod_GenAlpha * tm_galpha_ptr = new TimeMethod_GenAlpha(
@@ -291,7 +291,7 @@ int main(int argc, char *argv[])
   // ===== Time step info =====
   PDNTimeStep * timeinfo = new PDNTimeStep(initial_index, initial_time, initial_step);
 
-  // ===== GenBC =====
+  // ===== LPN models =====
   IGenBC * gbc = nullptr;
   
   if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 1  )
@@ -305,7 +305,7 @@ int main(int argc, char *argv[])
 
   gbc -> print_info();
   
-  // Make sure the gbc number of faces mathes that of ALocal_EBC
+  // Make sure the gbc number of faces matches that of ALocal_EBC
   SYS_T::print_fatal_if(gbc->get_num_ebc() != locebc->get_num_ebc(),
       "Error: GenBC number of faces does not match with that in ALocal_EBC.\n");
 

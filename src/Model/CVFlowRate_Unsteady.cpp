@@ -86,6 +86,8 @@ CVFlowRate_Unsteady::CVFlowRate_Unsteady( const char * const &filename )
       ofile<<tt<<'\t'<<get_flow_rate(tt)<<'\n';
     ofile.close();
   }
+
+  MPI_Barrier(PETSC_COMM_WORLD);
 }
 
 

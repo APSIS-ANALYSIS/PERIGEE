@@ -15,6 +15,8 @@ CVFlowRate_Linear2Steady::CVFlowRate_Linear2Steady(
       ofile<<tt<<'\t'<<get_flow_rate(tt)<<'\n';
     ofile.close();
   }
+
+  MPI_Barrier(PETSC_COMM_WORLD);
 }
 
 CVFlowRate_Linear2Steady::~CVFlowRate_Linear2Steady()
@@ -22,11 +24,10 @@ CVFlowRate_Linear2Steady::~CVFlowRate_Linear2Steady()
 
 double CVFlowRate_Linear2Steady::get_flow_rate(const double &time) const
 {
-  double out_rate = 0.0;
+  double out_rate = target_flow_rate;
+
   if( time < thred_time && time >= 0.0 ) 
     out_rate = target_flow_rate * time / thred_time;
-  else 
-    out_rate = target_flow_rate;
 
   return out_rate;
 }
