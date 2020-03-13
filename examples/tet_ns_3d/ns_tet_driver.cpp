@@ -238,13 +238,15 @@ int main(int argc, char *argv[])
 
   // ===== Generate a sparse matrix for the enforcement of essential BCs
   Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
+  
   pmat->gen_perm_bc(pNode, locnbc);
 
   // ===== Generalized-alpha ====
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
-  const bool genA_is2ndSystem = false; 
+  
   TimeMethod_GenAlpha * tm_galpha_ptr = new TimeMethod_GenAlpha(
-      genA_rho_inf, genA_is2ndSystem);
+      genA_rho_inf, false );
+  
   tm_galpha_ptr->print_info();
 
   // ===== Local Assembly routine =====
@@ -417,7 +419,6 @@ int main(int argc, char *argv[])
 
   const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
       sol, locAssem_ptr, elements, quads, pNode, locinfnbc );
-
 
   if( rank == 0 )
   {
