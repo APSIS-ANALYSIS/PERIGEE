@@ -67,16 +67,9 @@ SET( perigee_preprocess_lib_src
   )
 
 SET( perigee_analysis_lib_src
-  ${perigee_source}/System/Sys_Tools.cpp
-  ${perigee_source}/System/Vec_Tools.cpp
   ${perigee_source}/System/PETSc_Tools.cpp
-  ${perigee_source}/System/Matrix_double_3by3_Array.cpp
   ${perigee_source}/System/Matrix_double_6by6_Array.cpp
   ${perigee_source}/System/Matrix_PETSc.cpp
-  ${perigee_source}/System/Math_Tools.cpp
-  ${perigee_source}/System/HDF5_Writer.cpp
-  ${perigee_source}/System/HDF5_Reader.cpp
-  ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Tet.cpp
   ${perigee_source}/Analysis_Tool/AGlobal_Mesh_Info_FEM_3D.cpp
   ${perigee_source}/Analysis_Tool/APart_Basic_Info.cpp
@@ -88,8 +81,6 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/ALocal_EBC_outflow.cpp
   ${perigee_source}/Analysis_Tool/APart_Node.cpp
   ${perigee_source}/Element/FEANode.cpp
-  ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
-  ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
   ${perigee_source}/Element/FEAElement_Tet10_v2.cpp
   ${perigee_source}/Model/GenBC_RCR.cpp
@@ -109,7 +100,6 @@ SET( perigee_analysis_lib_src
   )
 
 SET( perigee_postprocess_lib_src
-  ${perigee_source}/Mesh/Tet_Tools.cpp
   ${perigee_source}/Mesh/QuadPts_vis_tri6.cpp
   ${perigee_source}/Mesh/QuadPts_vis_tet4.cpp
   ${perigee_source}/Mesh/QuadPts_vis_tet10_v2.cpp
@@ -131,11 +121,12 @@ TARGET_LINK_LIBRARIES( perigee_preprocess ${EXTRA_LINK_LIBS} )
 
 # 2. Analysis libs
 ADD_LIBRARY( perigee_analysis ${perigee_analysis_lib_src} )
-TARGET_LINK_LIBRARIES( perigee_analysis ${EXTRA_LINK_LIBS} )
+TARGET_LINK_LIBRARIES( perigee_analysis ${EXTRA_LINK_LIBS} perigee_preprocess )
 
 # 3. Postprocess lib
 ADD_LIBRARY( perigee_postprocess ${perigee_postprocess_lib_src} )
-TARGET_LINK_LIBRARIES( perigee_postprocess ${EXTRA_LINK_LIBS} perigee_analysis )
+TARGET_LINK_LIBRARIES( perigee_postprocess ${EXTRA_LINK_LIBS} perigee_analysis
+  perigee_preprocess )
 # -------------------------------------------------------------------
 
 # Print compiler setup
