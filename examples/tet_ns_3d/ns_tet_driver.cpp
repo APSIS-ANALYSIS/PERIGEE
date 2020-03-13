@@ -42,6 +42,9 @@ int main(int argc, char *argv[])
   // inflow file
   std::string inflow_file("inflow_fourier_series.txt");
 
+  double inflow_thd_time = 1.0; // prescribed time for inflow to reach steadness
+  double inflow_tgt_rate = 1.0; // prescribed flow rate at steady state
+
   // LPN file
   std::string lpn_file("lpn_rcr_input.txt");
 
@@ -95,6 +98,8 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-fl_density", fluid_density);
   SYS_T::GetOptionReal("-fl_mu", fluid_mu);
   SYS_T::GetOptionString("-inflow_file", inflow_file);
+  SYS_T::GetOptionReal("-inflow_thd_time", inflow_thd_time);
+  SYS_T::GetOptionReal("-inflow_tgt_rate", inflow_tgt_rate);
   SYS_T::GetOptionString("-lpn_file", lpn_file);
   SYS_T::GetOptionString("-part_file", part_file);
   SYS_T::GetOptionReal("-nl_rtol", nl_rtol);
@@ -124,7 +129,17 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-rho_inf:", genA_rho_inf);
   SYS_T::cmdPrint("-fl_density:", fluid_density);
   SYS_T::cmdPrint("-fl_mu:", fluid_mu);
-  SYS_T::cmdPrint("-inflow_file:", inflow_file);
+ 
+  // if inflow file exists, print the file name
+  // otherwise, print the parameter for linear2steady inflow setting 
+  if( SYS_T::is_file_exist( inflow_file ) )
+    SYS_T::cmdPrint("-inflow_file:", inflow_file);
+  else
+  {
+    SYS_T::cmdPrint("-inflow_thd_time:", inflow_thd_time);
+    SYS_T::cmdPrint("-inflow_tgt_rate:", inflow_tgt_rate);
+  }
+
   SYS_T::cmdPrint("-lpn_file:", lpn_file);
   SYS_T::cmdPrint("-part_file:", part_file);
   SYS_T::cmdPrint("-nl_rtol:", nl_rtol);
@@ -154,7 +169,7 @@ int main(int argc, char *argv[])
   if(rank == 0)
   {
     hid_t cmd_file_id = H5Fcreate("solver_cmd.h5",
-      H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+        H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
     HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
 
     cmdh5w->write_doubleScalar("fl_density", fluid_density);
@@ -165,7 +180,7 @@ int main(int argc, char *argv[])
   }
 
   MPI_Barrier(PETSC_COMM_WORLD);
-  
+
   // ===== Data from Files =====
   // Control points' xyz coordinates
   FEANode * fNode = new FEANode(part_file, rank);
@@ -200,11 +215,18 @@ int main(int argc, char *argv[])
       "Error: Assigned CPU number does not match the partition. \n");
 
   SYS_T::commPrint("===> %d processor(s) are assigned for FEM analysis. \n", size);
-  
+
   // ===== Inflow flow rate =====
   SYS_T::commPrint("===> Setup inflow flow rate. \n");
 
-  ICVFlowRate * inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
+  ICVFlowRate * inflow_rate_ptr = nullptr;
+
+  // If inflow file exist, load it
+  // otherwise, call the linear incremental flow rate to reach a steady flow
+  if( SYS_T::is_file_exist( inflow_file ) )
+    inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
+  else
+    inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_tgt_rate );
 
   inflow_rate_ptr->print_info();
 
@@ -217,7 +239,7 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("===> Setup element container. \n");
   FEAElement * elementv = nullptr; 
   FEAElement * elements = nullptr; 
-  
+
   if( GMIptr->get_elemType() == 501 )
   {
     if( nqp_tet > 5 ) SYS_T::commPrint("Warning: the tet element is linear and you are using more than 5 quadrature points.\n");
@@ -238,15 +260,15 @@ int main(int argc, char *argv[])
 
   // ===== Generate a sparse matrix for the enforcement of essential BCs
   Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
-  
+
   pmat->gen_perm_bc(pNode, locnbc);
 
   // ===== Generalized-alpha =====
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
-  
+
   TimeMethod_GenAlpha * tm_galpha_ptr = new TimeMethod_GenAlpha(
       genA_rho_inf, false );
-  
+
   tm_galpha_ptr->print_info();
 
   // ===== Local Assembly routine =====
@@ -254,7 +276,7 @@ int main(int argc, char *argv[])
       tm_galpha_ptr, GMIptr->get_nLocBas(),
       quadv->get_num_quadPts(), elements->get_nLocBas(),
       fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType() );
- 
+
   // ===== Initial condition =====
   PDNSolution * base = new PDNSolution_NS( pNode, fNode, locinfnbc, 1 );
 
@@ -271,7 +293,7 @@ int main(int argc, char *argv[])
     // Read sol file
     SYS_T::file_exist_check(restart_name.c_str());
     sol->ReadBinary(restart_name.c_str());
-   
+
     // generate the corresponding dot_sol file name 
     std::string restart_dot_name = "dot_";
     restart_dot_name.append(restart_name);
@@ -279,7 +301,7 @@ int main(int argc, char *argv[])
     // Read dot_sol file
     SYS_T::file_exist_check(restart_dot_name.c_str());
     dot_sol->ReadBinary(restart_dot_name.c_str());
-    
+
     SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
     SYS_T::commPrint("     restart_name: %s \n", restart_name.c_str());
     SYS_T::commPrint("     restart_dot_name: %s \n", restart_dot_name.c_str());
@@ -293,7 +315,7 @@ int main(int argc, char *argv[])
 
   // ===== LPN models =====
   IGenBC * gbc = nullptr;
-  
+
   if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 1  )
     gbc = new GenBC_Resistance( lpn_file.c_str() );
   else if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 2  )
@@ -304,7 +326,7 @@ int main(int argc, char *argv[])
     SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
 
   gbc -> print_info();
-  
+
   // Make sure the gbc number of faces matches that of ALocal_EBC
   SYS_T::print_fatal_if(gbc->get_num_ebc() != locebc->get_num_ebc(),
       "Error: GenBC number of faces does not match with that in ALocal_EBC.\n");
@@ -321,7 +343,7 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
   gloAssem_ptr->Fix_nonzero_err_str();
   gloAssem_ptr->Clear_KG();
-  
+
   // ===== Initialize the dot_sol vector by solving mass matrix =====
   if( is_restart == false )
   {
@@ -350,7 +372,7 @@ int main(int argc, char *argv[])
     delete lsolver_acce;
     SYS_T::commPrint(" The mass matrix lsolver is destroyed. \n\n");
   }
-  
+
   // ===== Linear solver context =====
   PLinear_Solver_PETSc * lsolver = new PLinear_Solver_PETSc();
 
@@ -363,13 +385,13 @@ int main(int argc, char *argv[])
   // ===== Nonlinear solver context =====
   PNonlinear_NS_Solver * nsolver = new PNonlinear_NS_Solver( pNode, fNode, 
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
-  
+
   nsolver->print_info();
 
   // ===== Temporal solver context =====
   PTime_NS_Solver * tsolver = new PTime_NS_Solver( sol_bName,
       sol_record_freq, ttan_renew_freq, final_time );
-  
+
   tsolver->print_info();
 
   // ===== Outlet data recording files =====
@@ -410,7 +432,7 @@ int main(int argc, char *argv[])
       ofile.close();
     }
   }
-  
+
   MPI_Barrier(PETSC_COMM_WORLD);
 
   // ===== Inlet data recording files =====
@@ -429,12 +451,12 @@ int main(int argc, char *argv[])
       ofile.open( locinfnbc->gen_flowfile_name().c_str(), std::ofstream::out | std::ofstream::app );
 
     if( !is_restart ) ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
-    
+
     ofile.close();
   }
 
   MPI_Barrier(PETSC_COMM_WORLD);
-  
+
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
