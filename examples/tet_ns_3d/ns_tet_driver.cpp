@@ -159,6 +159,8 @@ int main(int argc, char *argv[])
     delete cmdh5w; H5Fclose(cmd_file_id);
   }
 
+  MPI_Barrier(PETSC_COMM_WORLD);
+  
   // ===== Data from Files =====
   // Control points' xyz coordinates
   FEANode * fNode = new FEANode(part_file, rank);
