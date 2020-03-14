@@ -3,9 +3,7 @@
 // ==================================================================
 // Sys_Tools.hpp
 // ------------------------------------------------------------------
-// The SYS_T namespace contains a suite of frequently called functions.
-// It is built based on the PETSc library to handle functions for 
-// parallel settings when a communitor is available.
+// The SYS_T namespace contains a suite of tools at the system level.
 // ==================================================================
 #include <cstdlib>
 #include <iostream>
