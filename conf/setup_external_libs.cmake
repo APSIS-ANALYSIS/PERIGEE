@@ -1,6 +1,7 @@
 # This File Setup the value of EXTRA_LINK_LIBS and the INCLUDE_DIRS
 
 MESSAGE(STATUS "=================== External library setup ===================")
+
 # ===============================================
 # SET VTK
 # ===============================================
@@ -41,36 +42,9 @@ SET(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${VTK_link_lib} )
 # ===============================================
 # SET PETSc library 
 # ===============================================
-IF(DEFINED PETSC_DIR)
-  MESSAGE(STATUS "PETSc directory = ${PETSC_DIR}")
-ELSE(DEFINED PETSC_DIR)
-  MESSAGE(FATAL_ERROR "PETSC_DIR is NOT defined! Check ~/PETSc_VTK.cmake")
-ENDIF(DEFINED PETSC_DIR)
+SET(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${PETSC_LIB})
+SET(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${PETSC_METIS_LIB})
 
-IF(DEFINED PETSC_ARCH)
-  MESSAGE(STATUS "PETSc arch = ${PETSC_ARCH}")
-ELSE(DEFINED PETSC_ARCH)
-  MESSAGE(FATAL_ERROR "PETSC_ARCH is NOT defined! Check ~/PETSc_VTK.cmake")
-ENDIF(DEFINED PETSC_ARCH)
-
-IF(DEFINED PETSC_LIBRARY_DIRS)
-  MESSAGE(STATUS "PETSC_LIBRARY_DIRS = ${PETSC_LIBRARY_DIRS}")
-ELSE(DEFINED PETSC_LIBRARY_DIRS)
-  MESSAGE(FATAL_ERROR "PETSC_LIBRARY_DIRS is NOT defined! Check ~/PETSc_VTK.cmake")
-ENDIF(DEFINED PETSC_LIBRARY_DIRS)
-
-IF(DEFINED PETSC_link_lib)
-  MESSAGE(STATUS "PETSC_link_lib = ${PETSC_link_lib}")
-ELSE(DEFINED PETSC_link_lib)
-  MESSAGE(FATAL_ERROR "PETSC_link_lib is NOT defined! Check
-  ~/PETSc_VTK.cmake")
-ENDIF(DEFINED PETSC_link_lib)
-
-# Add the PETSc libs to the lib-link-list
-SET(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${PETSC_link_lib})
-
-SET(PETSC_INCLUDE_DIRS ${PETSC_DIR}/include
-  ${PETSC_DIR}/${PETSC_ARCH}/include)
 # ===============================================
 # Finish PETSc Library Setup
 # ===============================================
@@ -78,17 +52,11 @@ SET(PETSC_INCLUDE_DIRS ${PETSC_DIR}/include
 # ===============================================
 # SET METIS library
 # ===============================================
-IF(DEFINED METIS_DIR)
-  MESSAGE(STATUS "METIS DIR = ${METIS_DIR}")
-ELSE(DEFINED METIS_DIR)
-  MESSAGE(FATAL_ERROR "METIS_DIR is NOT defined! check ~/PETSc_VTK.cmake")
-ENDIF(DEFINED METIS_DIR)
+#SET(METIS_LIBRARY_DIRS ${METIS_DIR}/lib)
+#SET(METIS_INCLUDE_DIRS ${METIS_DIR}/include)
+#SET(METIS_LINK_LIBS metis)
 
-SET(METIS_LIBRARY_DIRS ${METIS_DIR}/lib)
-SET(METIS_INCLUDE_DIRS ${METIS_DIR}/include)
-SET(METIS_LINK_LIBS metis)
-
-SET(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${METIS_LINK_LIBS})
+#SET(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${METIS_LIBRARIES})
 # ===============================================
 # FINISH METIS setup
 # ===============================================
@@ -116,14 +84,12 @@ SET(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${HDF5_LINK_LIBS})
 # ===============================================
 # INCLUDE LIBRARY HEADER FILES
 INCLUDE_DIRECTORIES( ${VTK_INCLUDE_DIRS} )
-INCLUDE_DIRECTORIES( ${PETSC_INCLUDE_DIRS} )
-INCLUDE_DIRECTORIES( ${METIS_INCLUDE_DIRS} )
+INCLUDE_DIRECTORIES( ${PETSC_INC} )
+#INCLUDE_DIRECTORIES( ${METIS_INCLUDE_DIRS} )
 INCLUDE_DIRECTORIES( ${HDF5_INCLUDE_DIRS} )
 
 # LINK TO LIBRARY LIBS
 LINK_DIRECTORIES(${VTK_LINK_DIRS})
-LINK_DIRECTORIES(${PETSC_LIBRARY_DIRS})
-LINK_DIRECTORIES(${METIS_LIBRARY_DIRS})
 LINK_DIRECTORIES(${HDF5_LIBRARY_DIRS})
 
 # EOF

@@ -7,8 +7,8 @@
 # IN THE CMAKELISTS.TXT FILE, YOU ONLY NEED TO INCLUDE
 # THIS FILE TO HAVE THESE VARIABLES DEFINED IN YOUR CMAKE.
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
 
-# This one is for espresso, my 2nd desktop linux system.
 # =========================================================
 # 1. VTK VARIABLES
 # =========================================================
@@ -23,27 +23,34 @@ SET(VTK_link_lib vtkCommonCore-7.1 vtkCommonSystem-7.1 vtkCommonDataModel-7.1
 # ========================================================
 # 2. PETSc VARIABLES
 # ========================================================
-IF( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
-  SET(PETSC_DIR /home/jliu/lib/petsc-3.9.3-opt)
-ELSE( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
-  SET(PETSC_DIR /home/jliu/lib/petsc-3.9.3-debug)
-ENDIF( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
+if( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
+  set(PETSC_DIR /home/jliu/lib/petsc-3.9.3-opt)
+else( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
+  set(PETSC_DIR /home/jliu/lib/petsc-3.9.3-debug)
+endif( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
 
-SET(PETSC_ARCH .)
+set(PETSC_ARCH .)
 
-SET(PETSC_LIBRARY_DIRS ${PETSC_DIR}/${PETSC_ARCH}/lib )
-find_library (PETSC_LIBRARIES NAMES petsc HINTS "${PETSC_DIR}" 
-  PATH_SUFFIXES "${PETSC_ARCH}/lib" "lib" NO_DEFAULT_PATH)
-find_path (PETSC_CONF_DIR petscrules HINTS "${PETSC_DIR}/${PETSC_ARCH}"
-  PATH_SUFFIXES "lib/petsc/conf" "conf" NO_DEFAULT_PATH)
-include(${PETSC_CONF_DIR}/PETScBuildInternal.cmake)
-SET(PETSC_link_lib ${PETSC_LIBRARIES} ${PETSC_PACKAGE_LIBS})
+find_package(PETSc)
+
+#SET(PETSC_LIBRARY_DIRS ${PETSC_DIR}/${PETSC_ARCH}/lib )
+#find_library (PETSC_LIBRARIES NAMES petsc HINTS "${PETSC_DIR}" 
+#  PATH_SUFFIXES "${PETSC_ARCH}/lib" "lib" NO_DEFAULT_PATH)
+#find_path (PETSC_CONF_DIR petscrules HINTS "${PETSC_DIR}/${PETSC_ARCH}"
+#  PATH_SUFFIXES "lib/petsc/conf" "conf" NO_DEFAULT_PATH)
+#include(${PETSC_CONF_DIR}/PETScBuildInternal.cmake)
+#SET(PETSC_link_lib ${PETSC_LIBRARIES} ${PETSC_PACKAGE_LIBS})
 
 
 # ========================================================
 # 3. PETSc VARIABLES
 # ========================================================
-SET(METIS_DIR ${PETSC_DIR}/${PETSC_ARCH}/lib)
+set(METIS_DIR /home/jliu/lib/metis-5.0.3)
+
+FIND_PACKAGE( METIS )
+
+message(status ${METIS_INCLUDE_DIRS})
+message(status ${METIS_LIBRARIES})
 
 # ========================================================
 # 4. HDF5 VARIABLES
