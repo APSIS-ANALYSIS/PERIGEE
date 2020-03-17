@@ -45,12 +45,12 @@ find_package(PETSc)
 # ========================================================
 # 3. PETSc VARIABLES
 # ========================================================
-set(METIS_DIR /home/jliu/lib/metis-5.0.3)
+#set(METIS_DIR /home/jliu/lib/metis-5.0.3)
 
-FIND_PACKAGE( METIS )
+#FIND_PACKAGE( METIS )
 
-message(status ${METIS_INCLUDE_DIRS})
-message(status ${METIS_LIBRARIES})
+#message(status ${METIS_INCLUDE_DIRS})
+#message(status ${METIS_LIBRARIES})
 
 # ========================================================
 # 4. HDF5 VARIABLES
