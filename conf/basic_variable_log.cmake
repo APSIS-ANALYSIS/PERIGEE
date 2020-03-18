@@ -84,13 +84,13 @@ MESSAGE( STATUS "CMAKE_COMMAND: " ${CMAKE_COMMAND} )
 MESSAGE( STATUS "CMAKE_SYSTEM_PROCESSOR: " ${CMAKE_SYSTEM_PROCESSOR} )
 
 # is TRUE on all UNIX-like OS's, including Apple OS X and CygWin
-MESSAGE( STATUS "UNIX: " ${UNIX} )
+#MESSAGE( STATUS "UNIX: " ${UNIX} )
 
 # is TRUE on Windows, including CygWin 
-MESSAGE( STATUS "WIN32: " ${WIN32} )
+#MESSAGE( STATUS "WIN32: " ${WIN32} )
 
 # is TRUE on Apple OS X
-MESSAGE( STATUS "APPLE: " ${APPLE} )
+#MESSAGE( STATUS "APPLE: " ${APPLE} )
 
 # is TRUE when using the MinGW compiler in Windows
 #MESSAGE( STATUS "MINGW: " ${MINGW} )
