@@ -33,7 +33,7 @@ find_package(PETSc)
 # 4. HDF5 VARIABLES
 # ===================================================================
 #SET(HDF5_DIR /opt/apps/intel18/hdf5/1.8.16/x86_64)
-SET(HDF5_DIR ${PETSC_DIR}/${PETSC_ARCH}/lib )
+SET(HDF5_DIR ${PETSC_DIR}/${PETSC_ARCH})
 
 # ===================================================================
 # 5. Eigen VARIABLES
@@ -47,7 +47,7 @@ SET(HDF5_DIR ${PETSC_DIR}/${PETSC_ARCH}/lib )
 
 #SET(BOOST_DIR /opt/apps/intel18/boost/1.64)
 
-SET(BESSEL_DIR /work/01346/liujuy/lonestar/lib/complex-bessel)
+#SET(BESSEL_DIR /work/01346/liujuy/lonestar/lib/complex-bessel)
 
 # ===================================================================
 # 6. Compiler options
