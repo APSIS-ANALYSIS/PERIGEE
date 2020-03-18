@@ -11,6 +11,8 @@
 # This one is for stampede2 build.
 # ===================================================================
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
+
 # ===================================================================
 # 1. VTK VARIABLES
 # ===================================================================
@@ -29,24 +31,9 @@ MESSAGE(STATUS ${VTK_DIR})
 SET(PETSC_DIR /work/01346/liujuy/stampede2/lib/petsc-3.9.1-opt)
 SET(PETSC_ARCH .)
 
-SET(PETSC_LIBRARY_DIRS ${PETSC_DIR}/${PETSC_ARCH}/lib )
+set(PETSC_ARCH .)
 
-find_library (PETSC_LIBRARIES NAMES petsc HINTS "${PETSC_DIR}/${PETSC_ARCH}" 
-  PATH_SUFFIXES "lib" NO_DEFAULT_PATH)
-
-find_path (PETSC_CONF_DIR petscrules HINTS "${PETSC_DIR}/${PETSC_ARCH}"
-  PATH_SUFFIXES "lib/petsc/conf" "conf" NO_DEFAULT_PATH)
-
-#include(${PETSC_CONF_DIR}/PETScConfig.cmake)
-include(${PETSC_CONF_DIR}/PETScBuildInternal.cmake)
-
-# Load libpetsc and the external libs
-SET(PETSC_link_lib ${PETSC_LIBRARIES} ${PETSC_PACKAGE_LIBS})
-
-# ===================================================================
-# 3. METIS VARIABLES
-# ===================================================================
-SET(METIS_DIR ${PETSC_DIR}/${PETSC_ARCH}/lib)
+find_package(PETSc)
 
 # ===================================================================
 # 4. HDF5 VARIABLES
