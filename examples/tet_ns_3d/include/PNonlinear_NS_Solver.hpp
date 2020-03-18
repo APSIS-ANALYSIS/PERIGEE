@@ -1,5 +1,5 @@
 #ifndef PNONLINEAR_NS_SOLVER_HPP
-#define PNONLINEAR_SOLVER_HPP
+#define PNONLINEAR_NS_SOLVER_HPP
 // ==================================================================
 // PNonlinear_NS_Solver.hpp
 // 
