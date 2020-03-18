@@ -28,7 +28,6 @@ SET(CMAKE_VERBOSE_MAKEFILE FALSE)
 
 INCLUDE(../../conf/basic_variable_log.cmake)
 INCLUDE(../../conf/system_lib_loading.cmake)
-INCLUDE(../../conf/setup_external_libs.cmake)
 
 SET( perigee_source ${perigee_SOURCE_DIR}/../../src )
 # 1. Preprocessor source cpp
