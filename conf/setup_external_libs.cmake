@@ -40,18 +40,6 @@ SET(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${VTK_link_lib} )
 # ===============================================
 
 # ===============================================
-# SET METIS library
-# ===============================================
-#SET(METIS_LIBRARY_DIRS ${METIS_DIR}/lib)
-#SET(METIS_INCLUDE_DIRS ${METIS_DIR}/include)
-#SET(METIS_LINK_LIBS metis)
-
-#SET(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${METIS_LIBRARIES})
-# ===============================================
-# FINISH METIS setup
-# ===============================================
-
-# ===============================================
 # SET HDF5 library
 # ===============================================
 IF(DEFINED HDF5_DIR)

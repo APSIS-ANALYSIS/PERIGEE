@@ -26,7 +26,7 @@ SET(VTK_link_lib vtkCommonCore-7.1 vtkCommonSystem-7.1 vtkCommonDataModel-7.1
 if( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
   set(PETSC_DIR /home/jliu/lib/petsc-3.9.3-opt)
 else( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
-  set(PETSC_DIR /home/jliu/lib/petsc-3.9.3-test)
+  set(PETSC_DIR /home/jliu/lib/petsc-3.9.3-debug)
 endif( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
 
 set(PETSC_ARCH .)
