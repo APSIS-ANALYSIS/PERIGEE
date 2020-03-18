@@ -9,20 +9,16 @@
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
 
-# =========================================================
 # 1. VTK
-# =========================================================
-SET(VTK_DIR /home/jliu/lib/VTK-7.1.1)
-SET(VTK_VERSION vtk-7.1)
-SET(VTK_link_lib vtkCommonCore-7.1 vtkCommonSystem-7.1 vtkCommonDataModel-7.1
-  vtkCommonExecutionModel-7.1 vtkCommonMisc-7.1 vtkCommonTransforms-7.1
-  vtkCommonMath-7.1 vtkIOCore-7.1 vtkIOLegacy-7.1 vtkIOXML-7.1 vtksys-7.1
-  vtkzlib-7.1 )
+set(VTK_DIR /home/jliu/lib/VTK-8.1.1/lib/cmake/vtk-8.1)
 
+find_package(VTK REQUIRED)
 
-# ========================================================
+include_directories(${VTK_INCLUDE_DIRS})
+
+set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${VTK_LIBRARIES})
+
 # 2. PETSc & METIS
-# ========================================================
 if( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
   set(PETSC_DIR /home/jliu/lib/petsc-3.9.3-opt)
 else( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
@@ -47,9 +43,7 @@ else(PETSC_METIS)
   set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${METIS_LIBRARIES})
 endif(PETSC_METIS)
 
-# ========================================================
 # 3. HDF5
-# ========================================================
 SET(HDF5_ROOT /home/jliu/lib/hdf5-1.8.20)
 
 find_package( HDF5 )
