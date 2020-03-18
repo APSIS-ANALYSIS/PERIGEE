@@ -28,8 +28,7 @@ MESSAGE(STATUS ${VTK_DIR})
 #SET(PETSC_DIR /home1/apps/intel18/impi18_0/petsc/3.10)
 #SET(PETSC_ARCH skylake)
 
-SET(PETSC_DIR /work/01346/liujuy/stampede2/lib/petsc-3.9.1-opt)
-SET(PETSC_ARCH .)
+set(PETSC_DIR /work/01346/liujuy/stampede2/lib/petsc-3.6.4-opt)
 
 set(PETSC_ARCH .)
 
