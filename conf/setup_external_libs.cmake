@@ -40,16 +40,6 @@ SET(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${VTK_link_lib} )
 # ===============================================
 
 # ===============================================
-# SET PETSc library 
-# ===============================================
-SET(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${PETSC_LIB})
-SET(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${PETSC_METIS_LIB})
-
-# ===============================================
-# Finish PETSc Library Setup
-# ===============================================
-
-# ===============================================
 # SET METIS library
 # ===============================================
 #SET(METIS_LIBRARY_DIRS ${METIS_DIR}/lib)
@@ -84,7 +74,6 @@ SET(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${HDF5_LINK_LIBS})
 # ===============================================
 # INCLUDE LIBRARY HEADER FILES
 INCLUDE_DIRECTORIES( ${VTK_INCLUDE_DIRS} )
-INCLUDE_DIRECTORIES( ${PETSC_INC} )
 #INCLUDE_DIRECTORIES( ${METIS_INCLUDE_DIRS} )
 INCLUDE_DIRECTORIES( ${HDF5_INCLUDE_DIRS} )
 

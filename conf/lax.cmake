@@ -26,31 +26,26 @@ SET(VTK_link_lib vtkCommonCore-7.1 vtkCommonSystem-7.1 vtkCommonDataModel-7.1
 if( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
   set(PETSC_DIR /home/jliu/lib/petsc-3.9.3-opt)
 else( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
-  set(PETSC_DIR /home/jliu/lib/petsc-3.9.3-debug)
+  set(PETSC_DIR /home/jliu/lib/petsc-3.9.3-test)
 endif( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
 
 set(PETSC_ARCH .)
 
+set(METIS_DIR /home/jliu/lib/metis-5.0.3)
+
 find_package(PETSc)
 
-#SET(PETSC_LIBRARY_DIRS ${PETSC_DIR}/${PETSC_ARCH}/lib )
-#find_library (PETSC_LIBRARIES NAMES petsc HINTS "${PETSC_DIR}" 
-#  PATH_SUFFIXES "${PETSC_ARCH}/lib" "lib" NO_DEFAULT_PATH)
-#find_path (PETSC_CONF_DIR petscrules HINTS "${PETSC_DIR}/${PETSC_ARCH}"
-#  PATH_SUFFIXES "lib/petsc/conf" "conf" NO_DEFAULT_PATH)
-#include(${PETSC_CONF_DIR}/PETScBuildInternal.cmake)
-#SET(PETSC_link_lib ${PETSC_LIBRARIES} ${PETSC_PACKAGE_LIBS})
+INCLUDE_DIRECTORIES( ${PETSC_INC} )
 
+set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${PETSC_LIB})
 
-# ========================================================
-# 3. PETSc VARIABLES
-# ========================================================
-#set(METIS_DIR /home/jliu/lib/metis-5.0.3)
-
-#FIND_PACKAGE( METIS )
-
-#message(status ${METIS_INCLUDE_DIRS})
-#message(status ${METIS_LIBRARIES})
+if(PETSC_METIS)
+  set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${PETSC_METIS_LIB})
+else(PETSC_METIS)
+  find_package( METIS )
+  INCLUDE_DIRECTORIES(${METIS_INCLUDE_DIRS})
+  set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${METIS_LIBRARIES})
+endif(PETSC_METIS)
 
 # ========================================================
 # 4. HDF5 VARIABLES
