@@ -9,6 +9,8 @@
 # THIS FILE TO HAVE THESE VARIABLES DEFINED IN YOUR CMAKE.
 # ===================================================================
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
+
 # ===================================================================
 # 1. VTK VARIABLES
 # ===================================================================
@@ -21,32 +23,11 @@ SET(VTK_link_lib vtkCommonCore-6.3 vtkCommonSystem-6.3 vtkIOCore-6.3 vtksys-6.3 
 # ===================================================================
 #SET(PETSC_DIR /work/01346/liujuy/lonestar/lib/petsc-3.8.4-opt-largemem)
 #SET(PETSC_ARCH .)
-SET(PETSC_DIR /opt/apps/intel18/cray_mpich_7_7/petsc/3.11)
-SET(PETSC_ARCH haswell)
 
-SET(PETSC_LIBRARY_DIRS ${PETSC_DIR}/${PETSC_ARCH}/lib)
+set(PETSC_DIR /opt/apps/intel18/cray_mpich_7_7/petsc/3.11)
+set(PETSC_ARCH haswell)
 
-# Locate libpetsc
-find_library (PETSC_LIBRARIES NAMES petsc HINTS "${PETSC_DIR}" 
-  PATH_SUFFIXES "${PETSC_ARCH}/lib" "lib" NO_DEFAULT_PATH)
-
-# Locate configuration folder
-find_path (PETSC_CONF_DIR petscrules HINTS "${PETSC_DIR}/${PETSC_ARCH}"
-  PATH_SUFFIXES "lib/petsc/conf" "conf" NO_DEFAULT_PATH)
-
-# Load the configuration file
-#include(${PETSC_CONF_DIR}/PETScConfig.cmake)
-include(${PETSC_CONF_DIR}/PETScBuildInternal.cmake)
-
-# Load libpetsc and the external libs
-SET(PETSC_link_lib ${PETSC_LIBRARIES} ${PETSC_PACKAGE_LIBS})
-
-# ===================================================================
-# 3. METIS VARIABLES
-# ===================================================================
-#SET(METIS_DIR /work/01346/liujuy/lonestar/lib/metis-5.1.0)
-#SET(METIS_DIR /work/01346/liujuy/lonestar/lib/metis-5.0.3)
-SET(METIS_DIR ${PETSC_DIR}/${PETSC_ARCH}/lib )
+find_package(PETSc)
 
 # ===================================================================
 # 4. HDF5 VARIABLES
