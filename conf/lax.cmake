@@ -10,7 +10,7 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
 
 # =========================================================
-# 1. VTK VARIABLES
+# 1. VTK
 # =========================================================
 SET(VTK_DIR /home/jliu/lib/VTK-7.1.1)
 SET(VTK_VERSION vtk-7.1)
@@ -21,7 +21,7 @@ SET(VTK_link_lib vtkCommonCore-7.1 vtkCommonSystem-7.1 vtkCommonDataModel-7.1
 
 
 # ========================================================
-# 2. PETSc VARIABLES
+# 2. PETSc & METIS
 # ========================================================
 if( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
   set(PETSC_DIR /home/jliu/lib/petsc-3.9.3-opt)
@@ -48,9 +48,17 @@ else(PETSC_METIS)
 endif(PETSC_METIS)
 
 # ========================================================
-# 4. HDF5 VARIABLES
+# 3. HDF5
 # ========================================================
-SET(HDF5_DIR /home/jliu/lib/hdf5-1.8.20)
+SET(HDF5_ROOT /home/jliu/lib/hdf5-1.8.20)
+
+find_package( HDF5 )
+
+include_directories( ${HDF5_INCLUDE_DIRS} )
+
+set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${HDF5_LIBRARIES})
+
+message(STATUS ${EXTRA_LINK_LIBS})
 
 # ========================================================
 # 5. EIGEN variables 

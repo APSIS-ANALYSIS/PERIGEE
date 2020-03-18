@@ -1,7 +1,5 @@
 # This File Setup the value of EXTRA_LINK_LIBS and the INCLUDE_DIRS
 
-MESSAGE(STATUS "=================== External library setup ===================")
-
 # ===============================================
 # SET VTK
 # ===============================================
@@ -19,25 +17,10 @@ SET(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${VTK_link_lib} )
 # ===============================================
 # SET HDF5 library
 # ===============================================
-IF(DEFINED HDF5_DIR)
-  MESSAGE(STATUS "HDF5 DIR = ${HDF5_DIR}")
-ELSE(DEFINED HDF5_DIR)
-  MESSAGE(FATAL_ERROR "HDF5_DIR is NOT defined! check ~/PETSc_VTK.cmake")
-ENDIF(DEFINED HDF5_DIR)
-
-SET(HDF5_LIBRARY_DIRS ${HDF5_DIR}/lib)
-SET(HDF5_INCLUDE_DIRS ${HDF5_DIR}/include)
-SET(HDF5_LINK_LIBS hdf5)
-
-SET(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${HDF5_LINK_LIBS})
-
 # INCLUDE LIBRARY HEADER FILES
 INCLUDE_DIRECTORIES( ${VTK_INCLUDE_DIRS} )
-#INCLUDE_DIRECTORIES( ${METIS_INCLUDE_DIRS} )
-INCLUDE_DIRECTORIES( ${HDF5_INCLUDE_DIRS} )
 
 # LINK TO LIBRARY LIBS
 LINK_DIRECTORIES(${VTK_LINK_DIRS})
-LINK_DIRECTORIES(${HDF5_LIBRARY_DIRS})
 
 # EOF
