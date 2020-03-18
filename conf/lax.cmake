@@ -33,16 +33,16 @@ set(PETSC_ARCH .)
 
 set(METIS_DIR /home/jliu/lib/metis-5.0.3)
 
+# ---------------------------------------------------------
 find_package(PETSc)
 
-INCLUDE_DIRECTORIES( ${PETSC_INC} )
-
+include_directories(${PETSC_INC})
 set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${PETSC_LIB})
 
 if(PETSC_METIS)
   set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${PETSC_METIS_LIB})
 else(PETSC_METIS)
-  find_package( METIS )
+  find_package(METIS)
   INCLUDE_DIRECTORIES(${METIS_INCLUDE_DIRS})
   set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${METIS_LIBRARIES})
 endif(PETSC_METIS)
@@ -57,8 +57,6 @@ find_package( HDF5 )
 include_directories( ${HDF5_INCLUDE_DIRS} )
 
 set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${HDF5_LIBRARIES})
-
-message(STATUS ${EXTRA_LINK_LIBS})
 
 # ========================================================
 # 5. EIGEN variables 
@@ -85,6 +83,8 @@ ELSE( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
   SET(CMAKE_CXX_FLAGS "-DENABLE_TEST -O0 -Wall")
 ENDIF( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
 SET(CMAKE_CXX_STANDARD 11)
+
+message(STATUS ${EXTRA_LINK_LIBS})
 
 # This an example for buiding code with prof for profiling
 #SET(CMAKE_CXX_FLAGS "-pg -Wall")
