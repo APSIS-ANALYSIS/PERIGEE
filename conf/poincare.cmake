@@ -3,7 +3,7 @@
 # ========================================================
 # Specify the library locations
 # ========================================================
-set(VTK_DIR /Users/juliu/lib/VTK-7.1.1-debug/lib/cmake/vtk-7.1)
+set(VTK_DIR /Users/juliu/lib/VTK-8.2.0-shared/lib/cmake/vtk-8.2)
 
 set(PETSC_DIR /Users/juliu/lib/petsc-3.11.3-debug)
 
@@ -38,7 +38,7 @@ message(STATUS "External Libraries: " ${EXTRA_LINK_LIBS})
 # ========================================================
 set(CMAKE_C_COMPILER  /Users/juliu/lib/mpich-3.2.1/bin/mpicc)
 set(CMAKE_CXX_COMPILER  /Users/juliu/lib/mpich-3.2.1/bin/mpicxx)
-set(CMAKE_CXX_FLAGS "-O0 -Wall -Winconsistent-missing-override")
+set(CMAKE_CXX_FLAGS "-O0 -Wall")
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_MACOSX_RPATH 1)
 set(CMAKE_VERBOSE_MAKEFILE OFF)
