@@ -38,7 +38,7 @@ set(CMAKE_C_COMPILER  /opt/intel/compilers_and_libraries_2017.4.196/linux/mpi/in
 set(CMAKE_CXX_COMPILER /opt/intel/compilers_and_libraries_2017.4.196/linux/mpi/intel64/bin/mpicxx)
 set(CMAKE_CXX_FLAGS "-xCORE-AVX512 -O3 -xhost -Wall")
 set(CMAKE_BUILD_TYPE RELEASE)
-set( CMAKE_VERBOSE_MAKEFILE OFF )
+set(CMAKE_VERBOSE_MAKEFILE OFF)
 set(CMAKE_CXX_STANDARD 11)
 
 # END OF FILE

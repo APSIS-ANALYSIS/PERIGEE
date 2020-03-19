@@ -1,54 +1,40 @@
-# THIS IS THE CMAKE FILE THAT DEFINES THE BASIC
-# VAIRABLES FOR BUILDING PROJECTS ON THIS SPECIFIC
-# MACHINE WITH PETSC AND VTK LIBRARIES.
-# NOTE: THIS FILE DEPENDS ON THE MACHINE. THE DEVELOPER
-# IS RESPONSIBLE FOR SETTING CORRECT VALUES FOR THESE
-# VARIABLES.
-# IN THE CMAKELISTS.TXT FILE, YOU ONLY NEED TO INCLUDE
-# THIS FILE TO HAVE THESE VARIABLES DEFINED IN YOUR CMAKE.
-# =========================================================
-# 1. VTK VARIABLES
-# =========================================================
-SET(VTK_DIR /oasis/scratch/comet/liujuy/temp_project/lib/VTK-7.1.1)
-SET(VTK_VERSION vtk-7.1)
-SET(VTK_link_lib vtkCommonCore-7.1 vtkCommonSystem-7.1 vtkIOCore-7.1 vtksys-7.1 vtkCommonDataModel-7.1 vtkIOXML-7.1 vtkIOLegacy-7.1 vtkCommonExecutionModel-7.1 vtkCommonMisc-7.1 vtkCommonTransforms-7.1 vtkCommonMath-7.1 vtkIOCore-7.1 vtkzlib-7.1 )
+# Configuration setup for machine comet
 
-# ========================================================
-# 2. PETSc VARIABLES
-# ========================================================
-SET(PETSC_DIR /oasis/scratch/comet/liujuy/temp_project/lib/petsc-3.9.4-opt )
-SET(PETSC_ARCH . )
-SET(PETSC_LIBRARY_DIRS ${PETSC_DIR}/${PETSC_ARCH}/lib )
+# Library locations
+set(VTK_DIR /oasis/scratch/comet/liujuy/temp_project/lib/VTK-7.1.1/lib/cmake/vtk-7.1)
 
-SET(PETSC_LIBRARY_DIRS ${PETSC_DIR}/${PETSC_ARCH}/lib )
+set(PETSC_DIR /oasis/scratch/comet/liujuy/temp_project/lib/petsc-3.9.4-opt )
 
-find_library (PETSC_LIBRARIES NAMES petsc HINTS "${PETSC_DIR}/${PETSC_ARCH}" 
-  PATH_SUFFIXES "lib" NO_DEFAULT_PATH)
+set(PETSC_ARCH . )
 
-find_path (PETSC_CONF_DIR petscrules HINTS "${PETSC_DIR}/${PETSC_ARCH}"
-  PATH_SUFFIXES "lib/petsc/conf" "conf" NO_DEFAULT_PATH)
+set(HDF5_ROOT /opt/hdf5/intel/mvapich2_ib )
 
-include(${PETSC_CONF_DIR}/PETScBuildInternal.cmake)
+# Setup the libraries
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
 
-# Load libpetsc and the external libs
-SET(PETSC_link_lib ${PETSC_LIBRARIES} ${PETSC_PACKAGE_LIBS})
+find_package(VTK REQUIRED)
+find_package(PETSc REQUIRED)
+find_package(HDF5 REQUIRED)
 
-# ========================================================
-# 3. METIS VARIABLES
-# ========================================================
-SET(METIS_DIR ${PETSC_DIR}/${PETSC_ARCH}/lib)
+include_directories(${VTK_INCLUDE_DIRS})
+include_directories(${PETSC_INC})
+include_directories(${HDF5_INCLUDE_DIRS})
 
-# ========================================================
-# 4. HDF5 VARIABLES
-# ========================================================
-SET(HDF5_DIR /opt/hdf5/intel/mvapich2_ib )
+set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${VTK_LIBRARIES})
+set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${PETSC_LIB})
+set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${PETSC_METIS_LIB})
+set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${HDF5_LIBRARIES})
+
+message(STATUS "External Libraries: " ${EXTRA_LINK_LIBS})
 
 # ========================================================
 # 5. Compiler options 
 # ========================================================
-SET(CMAKE_C_COMPILER  /oasis/scratch/comet/liujuy/temp_project/lib/mpich-3.3/bin/mpicc)
-SET(CMAKE_CXX_COMPILER /oasis/scratch/comet/liujuy/temp_project/lib/mpich-3.3/bin/mpicxx)
-SET(CMAKE_CXX_FLAGS "-O3 -Wall")
-SET(CMAKE_BUILD_TYPE RELEASE)
+set(CMAKE_C_COMPILER  /oasis/scratch/comet/liujuy/temp_project/lib/mpich-3.3/bin/mpicc)
+set(CMAKE_CXX_COMPILER /oasis/scratch/comet/liujuy/temp_project/lib/mpich-3.3/bin/mpicxx)
+set(CMAKE_CXX_FLAGS "-O3 -Wall")
+set(CMAKE_BUILD_TYPE RELEASE)
+set(CMAKE_VERBOSE_MAKEFILE OFF)
+set(CMAKE_CXX_STANDARD 11)
 
 # EOF
