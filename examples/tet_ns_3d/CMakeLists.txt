@@ -1,4 +1,4 @@
-PROJECT(perigee)
+project(perigee)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 
@@ -22,9 +22,6 @@ SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
 # binary location
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
-
-# print makefile details or not
-SET(CMAKE_VERBOSE_MAKEFILE FALSE)
 
 INCLUDE(../../conf/basic_variable_log.cmake)
 INCLUDE(../../conf/system_lib_loading.cmake)
