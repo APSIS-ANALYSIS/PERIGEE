@@ -2,7 +2,7 @@
 
 FEANode::FEANode( const std::string &fileBaseName, const int &cpu_rank )
 {
-  std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
+  const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
   hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
 
@@ -21,10 +21,8 @@ FEANode::FEANode( const std::string &fileBaseName, const int &cpu_rank )
   delete h5r; H5Fclose( file_id );
 }
 
-
 FEANode::~FEANode()
 {}
-
 
 void FEANode::print_info() const
 {
@@ -38,68 +36,55 @@ void FEANode::print_info() const
   VEC_T::print(ctrlPts_w);
 }
 
-
 void FEANode::get_ctrlPts_xyz( 
     const int &num, const int * const &index,
     double * const &ctrl_x, double * const &ctrl_y, double * const &ctrl_z ) const
 {
-  int pos;
   for(int ii=0; ii<num; ++ii)
   {
-    pos = index[ii];
-    ctrl_x[ii] = ctrlPts_x[pos];
-    ctrl_y[ii] = ctrlPts_y[pos];
-    ctrl_z[ii] = ctrlPts_z[pos];
+    ctrl_x[ii] = ctrlPts_x[index[ii]];
+    ctrl_y[ii] = ctrlPts_y[index[ii]];
+    ctrl_z[ii] = ctrlPts_z[index[ii]];
   }
 }
-
 
 void FEANode::get_ctrlPts_xyzw( 
     const int &num, const int * const &index,
     double * const &ctrl_x, double * const &ctrl_y, 
     double * const &ctrl_z, double * const &ctrl_w ) const
 {
-  int pos;
   for(int ii=0; ii<num; ++ii)
   {
-    pos = index[ii];
-    ctrl_x[ii] = ctrlPts_x[pos];
-    ctrl_y[ii] = ctrlPts_y[pos];
-    ctrl_z[ii] = ctrlPts_z[pos];
-    ctrl_w[ii] = ctrlPts_w[pos];
+    ctrl_x[ii] = ctrlPts_x[index[ii]];
+    ctrl_y[ii] = ctrlPts_y[index[ii]];
+    ctrl_z[ii] = ctrlPts_z[index[ii]];
+    ctrl_w[ii] = ctrlPts_w[index[ii]];
   }
 }
-
 
 void FEANode::get_ctrlPts_xyw( 
     const int &num, const int * const &index,
     double * const &ctrl_x, double * const &ctrl_y, 
     double * const &ctrl_w ) const
 {
-  int pos;
   for(int ii=0; ii<num; ++ii)
   {
-    pos = index[ii];
-    ctrl_x[ii] = ctrlPts_x[pos];
-    ctrl_y[ii] = ctrlPts_y[pos];
-    ctrl_w[ii] = ctrlPts_w[pos];
+    ctrl_x[ii] = ctrlPts_x[index[ii]];
+    ctrl_y[ii] = ctrlPts_y[index[ii]];
+    ctrl_w[ii] = ctrlPts_w[index[ii]];
   }
 }
-
 
 void FEANode::get_ctrlPts_xy( 
     const int &num, const int * const &index,
     double * const &ctrl_x, double * const &ctrl_y ) const
 {
-  int pos;
   for(int ii=0; ii<num; ++ii)
   {
-    pos = index[ii];
-    ctrl_x[ii] = ctrlPts_x[pos];
-    ctrl_y[ii] = ctrlPts_y[pos];
+    ctrl_x[ii] = ctrlPts_x[index[ii]];
+    ctrl_y[ii] = ctrlPts_y[index[ii]];
   }
 }
-
 
 double FEANode::get_memory_usage() const
 {
