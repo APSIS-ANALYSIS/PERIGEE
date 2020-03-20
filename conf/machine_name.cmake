@@ -5,73 +5,80 @@
 # This one is a sample one, assuming the libraries are installed
 # following the guide documented in
 # https://github.com/ju-liu/PERIGEE-NS/blob/master/install-external-libs.md
-# The value of $HOME will be /home/jliu
-
-# =========================================================
-# 1. VTK VARIABLES
-# =========================================================
-# VTK_DIR should be the prefix value you run cmake when installing VTK.
-# In the guide, it is $HOME/lib/VTK-7.1.1-shared
-SET(VTK_DIR /home/jliu/lib/VTK-7.1.1-shared)
-
-# You do not need to modify VTK_VERSION and VTK_link_lib, if you are 
-# using VTK-7.x.x
-SET(VTK_VERSION vtk-7.1)
-SET(VTK_link_lib vtkCommonCore-7.1 vtkCommonSystem-7.1 vtkCommonDataModel-7.1
-  vtkCommonExecutionModel-7.1 vtkCommonMisc-7.1 vtkCommonTransforms-7.1
-  vtkCommonMath-7.1 vtkIOCore-7.1 vtkIOLegacy-7.1 vtkIOXML-7.1 vtksys-7.1 
-  vtkzlib-7.1 )
+# The value of $HOME is /home/jliu
 
 # ========================================================
-# 2. PETSc VARIABLES
+# Specify the library locations
 # ========================================================
+# VTK_DIR should be the vtk directory/lib/cmake/vtk-version,
+# which contains VTKConfig.cmake file.
+# In the guide, vtk directory is $HOME/lib/VTK-7.1.1-shared
+set(VTK_DIR /home/jliu/lib/VTK-7.1.1-shared/lib/cmake/vtk-7.1)
+
 # Modify the PETSC_DIR variable to point to the location of PETSc.
-SET(PETSC_DIR /home/jliu/lib/petsc-3.11.3)
+set(PETSC_DIR /home/jliu/lib/petsc-3.11.3)
 
 # Modify the PETSC_ARCH variable. You can find it in your configuration
 # output. If you forget it, go to your PETSc home director and open
 # configure.log. Go the end of the file, and you shall find the value 
 # of PETSC_ARCH
-SET(PETSC_ARCH arch-linux2-c-debug)
+set(PETSC_ARCH arch-linux2-c-debug)
 
-# You do not need to modify the rest of PETSc variables.
-SET(PETSC_LIBRARY_DIRS ${PETSC_DIR}/${PETSC_ARCH}/lib )
-
-find_library (PETSC_LIBRARIES NAMES petsc HINTS "${PETSC_DIR}/${PETSC_ARCH}" 
-  PATH_SUFFIXES "lib" NO_DEFAULT_PATH)
-
-find_path (PETSC_CONF_DIR petscrules HINTS "${PETSC_DIR}/${PETSC_ARCH}"
-  PATH_SUFFIXES "lib/petsc/conf" "conf" NO_DEFAULT_PATH)
-
-include(${PETSC_CONF_DIR}/PETScBuildInternal.cmake)
-#include(${PETSC_CONF_DIR}/PETScConfig.cmake)
-
-SET(PETSC_link_lib ${PETSC_LIBRARIES} ${PETSC_PACKAGE_LIBS})
-
-# ========================================================
-# 3. METIS VARIABLES
-# ========================================================
 # Modify the METIS_DIR.
-SET(METIS_DIR /home/jliu/lib/metis-5.0.3)
+# Note: If your PETSc has METIS installed, the conf
+# file will directly load that METIS; otherwise this METIS will
+# be used for PERIGEE. This means, if you are sure that you have
+# METIS in PETSc, you do not have to specify the METIS_DIR variable.
+set(METIS_DIR /home/jliu/lib/metis-5.0.3)
+
+# Modify the HDF5_ROOT, pointing to your hdf5 library location
+set(HDF5_ROOT /home/jliu/lib/hdf5-1.8.16)
 
 # ========================================================
-# 4. HDF5 VARIABLES
+# Setup the libraries
+# You do NOT have to modify anything in this part
 # ========================================================
-# Modify the HDF5_DIR
-SET(HDF5_DIR /home/jliu/lib/hdf5-1.8.16)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
+
+find_package(VTK REQUIRED)
+find_package(PETSc REQUIRED)
+find_package(HDF5 REQUIRED)
+
+include_directories(${VTK_INCLUDE_DIRS})
+include_directories(${PETSC_INC})
+
+set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${VTK_LIBRARIES})
+set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${PETSC_LIB})
+
+if(PETSC_METIS)
+  set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${PETSC_METIS_LIB})
+  message(STATUS "Use METIS in PETSc: " ${PETSC_METIS_LIB})
+else(PETSC_METIS)
+  find_package(METIS)
+  INCLUDE_DIRECTORIES(${METIS_INCLUDE_DIRS})
+  set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${METIS_LIBRARIES})
+endif(PETSC_METIS)
+
+include_directories(${HDF5_INCLUDE_DIRS})
+set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${HDF5_LIBRARIES})
+
+message(STATUS "External Libraries: " ${EXTRA_LINK_LIBS})
 
 # ========================================================
-# 5. Compiler options 
+# Compiler options 
 # ========================================================
 # Specify the MPI compilers. There should be compilers in
-# $PETSC_DIR/$PETSC_ARCH/bin
-SET(CMAKE_C_COMPILER  /home/jliu/lib/petsc-3.11.3/bin/mpicc)
-SET(CMAKE_CXX_COMPILER /home/jliu/lib/petsc-3.11.3/bin/mpicxx)
+# $PETSC_DIR/$PETSC_ARCH/bin, or the mpich you specified for 
+# PETSc install.
+set(CMAKE_C_COMPILER  /home/jliu/lib/petsc-3.11.3/bin/mpicc)
+set(CMAKE_CXX_COMPILER /home/jliu/lib/petsc-3.11.3/bin/mpicxx)
+set(CMAKE_CXX_STANDARD 11)
+if( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
+  set(CMAKE_CXX_FLAGS "-O3 -Wall")
+else( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
+  set(CMAKE_CXX_FLAGS "-DENABLE_TEST -O0 -Wall")
+endif( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
 
-IF( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
-  SET(CMAKE_CXX_FLAGS "-O3 -Wall")
-ELSE( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
-  SET(CMAKE_CXX_FLAGS "-O0 -Wall")
-ENDIF( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
+set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 # EOF
