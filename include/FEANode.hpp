@@ -22,25 +22,27 @@
 class FEANode
 {
   public:
+    // -------------------------------------------------------------- 
     // Read ctrl_x/y/z directly from part file with base name and 
-    // given cpu index.
-    // Note: currently, this constructor is for the FEA mesh only, 
-    //       meaning that ctrl_w will not be read in this function.
+    // given cpu index. If the weight exists in the h5 file, the 
+    // constructor will read its value as well; otherwise, the ctrlPts_w
+    // vector will be empty.
+    // -------------------------------------------------------------- 
     FEANode( const std::string &fileBaseName, const int &cpu_rank );
 
     virtual ~FEANode();
 
-    virtual double get_ctrlPts_x(const int &index) 
-      const {return ctrlPts_x[index];}
+    virtual double get_ctrlPts_x(const int &index) const 
+    {return ctrlPts_x[index];}
     
-    virtual double get_ctrlPts_y(const int &index)
-      const {return ctrlPts_y[index];}
+    virtual double get_ctrlPts_y(const int &index) const 
+    {return ctrlPts_y[index];}
     
-    virtual double get_ctrlPts_z(const int &index)
-      const {return ctrlPts_z[index];}
+    virtual double get_ctrlPts_z(const int &index) const 
+    {return ctrlPts_z[index];}
     
-    virtual double get_ctrlPts_w(const int &index)
-      const {return ctrlPts_w[index];}
+    virtual double get_ctrlPts_w(const int &index) const 
+    {return ctrlPts_w[index];}
 
     // -------------------------------------------------------------- 
     // Get n control points' x-y-z index in a batch
