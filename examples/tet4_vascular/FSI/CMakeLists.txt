@@ -4,6 +4,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 
 IF(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
+  cmake_policy(SET CMP0074 NEW)
 ENDIF(COMMAND cmake_policy)
 
 SET(perigee_VERSION_MAJOR 0)
@@ -23,12 +24,8 @@ SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 # binary location
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
-# print makefile details or not
-SET(CMAKE_VERBOSE_MAKEFILE FALSE)
-
 INCLUDE(../../../conf/basic_variable_log.cmake)
 INCLUDE(../../../conf/system_lib_loading.cmake)
-INCLUDE(../../../conf/setup_external_libs.cmake)
 
 # ===============================================
 # Set my own source code
@@ -162,15 +159,11 @@ INCLUDE(../../../conf/message_compiler_setup.cmake)
 # ===================================================================
 # BUILD THE MAIN DRIVERS
 # ===================================================================
-# 1. Make executable for ALE-CFD code
-# 1.1 Preprocess
 ADD_EXECUTABLE( gmshIO gmsh_process.cpp )
 ADD_EXECUTABLE( preprocess_fsi preprocess_sv_fsi_tets.cpp)
 
-# 1.2 Analysis and tests
 ADD_EXECUTABLE( fsi_tet4_3d fsi_tet4_driver.cpp)
 
-# 1.3 Post
 ADD_EXECUTABLE( prepostproc prepost_tets.cpp)
 
 ADD_EXECUTABLE( vis_fsi vis_driver.cpp)
@@ -178,8 +171,7 @@ ADD_EXECUTABLE( vis_fsi_fluid vis_fsi_fluid.cpp)
 ADD_EXECUTABLE( vis_fsi_solid vis_fsi_solid.cpp)
 ADD_EXECUTABLE( vis_fsi_wss vis_fsi_wss.cpp)
 
-# -------------------------------------------------------------------
-# 3. Link libraries
+# Link libraries
 TARGET_LINK_LIBRARIES( gmshIO ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( preprocess_fsi ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( fsi_tet4_3d ${EXTRA_LINK_LIBS} perigee_analysis )
