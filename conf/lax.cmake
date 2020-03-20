@@ -69,6 +69,6 @@ endif( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 # This an example for buiding code with prof for profiling
-#SET(CMAKE_CXX_FLAGS "-pg -Wall")
+#set(CMAKE_CXX_FLAGS "-pg -Wall")
 
 # EOF
