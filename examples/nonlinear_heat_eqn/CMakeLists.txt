@@ -4,6 +4,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 
 IF(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
+  cmake_policy(SET CMP0074 NEW)
 ENDIF(COMMAND cmake_policy)
 
 SET(perigee_VERSION_MAJOR 0)
@@ -21,12 +22,8 @@ SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 # binary location
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
-# print makefile details or not
-SET(CMAKE_VERBOSE_MAKEFILE FALSE)
-
 INCLUDE(../../conf/basic_variable_log.cmake)
 INCLUDE(../../conf/system_lib_loading.cmake)
-INCLUDE(../../conf/setup_external_libs.cmake)
 
 # ===============================================
 # Set my own source code
@@ -119,9 +116,9 @@ INCLUDE_DIRECTORIES( ../../include )
 INCLUDE_DIRECTORIES( ./include )
 
 MESSAGE(STATUS "=================== Misc setup ==========================")
-MESSAGE( STATUS "CMAKE_MODULE_PATH: " ${CMAKE_MODULE_PATH} )
-MESSAGE( STATUS "CMAKE_VERBOSE_MAKEFILE: " ${CMAKE_VERBOSE_MAKEFILE} )
-MESSAGE( STATUS "CMAKE_BUILD_TYPE: " ${CMAKE_BUILD_TYPE} )
+MESSAGE(STATUS "CMAKE_MODULE_PATH: " ${CMAKE_MODULE_PATH} )
+MESSAGE(STATUS "CMAKE_VERBOSE_MAKEFILE: " ${CMAKE_VERBOSE_MAKEFILE} )
+MESSAGE(STATUS "CMAKE_BUILD_TYPE: " ${CMAKE_BUILD_TYPE} )
 # -------------------------------------------------------------------
 # MAKE MY OWN LIBRARIES
 # 1. Preprocess libs
@@ -185,6 +182,5 @@ TARGET_LINK_LIBRARIES( vis_2d_nlheat ${EXTRA_LINK_LIBS}
 
 TARGET_LINK_LIBRARIES( vis_3d_nlheat ${EXTRA_LINK_LIBS}
   perigee_preprocess perigee_analysis perigee_postprocess )
-
 
 #EOF
