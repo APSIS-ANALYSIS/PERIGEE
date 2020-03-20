@@ -2,7 +2,7 @@
 
 ALocal_Elem::ALocal_Elem(const std::string &fileBaseName, const int &cpu_rank)
 {
-  std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
+  const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
   hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
 
@@ -14,17 +14,13 @@ ALocal_Elem::ALocal_Elem(const std::string &fileBaseName, const int &cpu_rank)
 
   nlocalele = h5r->read_intScalar( gname.c_str(), "nlocalele" );
 
-  delete h5r;
-  H5Fclose( file_id );
+  delete h5r; H5Fclose( file_id );
 }
-
 
 ALocal_Elem::~ALocal_Elem()
 {
   VEC_T::clean(elem_loc);
-  nlocalele = 0;
 }
-
 
 void ALocal_Elem::print_info() const
 {
