@@ -45,14 +45,14 @@ class APart_Node
     
     virtual int get_ntotalnode() const {return ntotalnode;}
 
-    virtual int get_local_to_global(const int &index) 
-      const {return local_to_global[index];}
+    virtual int get_local_to_global(const int &index) const 
+    {return local_to_global[index];}
 
-    virtual int get_node_ghost(const int &index) 
-      const {return node_ghost[index];}
+    virtual int get_node_ghost(const int &index) const 
+    {return node_ghost[index];}
 
-    virtual int get_node_loc(const int &index) 
-      const {return node_loc[index];}
+    virtual int get_node_loc(const int &index) const 
+    {return node_loc[index];}
 
     virtual bool is_node_local(const int &index) const
     {
