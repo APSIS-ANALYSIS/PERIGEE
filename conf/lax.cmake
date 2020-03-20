@@ -66,7 +66,7 @@ else( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
   set(CMAKE_CXX_FLAGS "-DENABLE_TEST -O0 -Wall")
 endif( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
 
-set( CMAKE_VERBOSE_MAKEFILE OFF )
+set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 # This an example for buiding code with prof for profiling
 #SET(CMAKE_CXX_FLAGS "-pg -Wall")
