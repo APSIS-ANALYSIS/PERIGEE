@@ -3,11 +3,11 @@
 # Library locations
 set(VTK_DIR /oasis/scratch/comet/liujuy/temp_project/lib/VTK-7.1.1/lib/cmake/vtk-7.1)
 
-set(PETSC_DIR /oasis/scratch/comet/liujuy/temp_project/lib/petsc-3.9.4-opt )
+set(PETSC_DIR /oasis/scratch/comet/liujuy/temp_project/lib/petsc-3.7.7-opt )
 
 set(PETSC_ARCH . )
 
-set(HDF5_ROOT /opt/hdf5/intel/mvapich2_ib )
+set(HDF5_ROOT /opt/hdf5/1.8.21/intel/mvapich2_ib )
 
 # Setup the libraries
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
@@ -30,8 +30,8 @@ message(STATUS "External Libraries: " ${EXTRA_LINK_LIBS})
 # ========================================================
 # 5. Compiler options 
 # ========================================================
-set(CMAKE_C_COMPILER  /oasis/scratch/comet/liujuy/temp_project/lib/mpich-3.3/bin/mpicc)
-set(CMAKE_CXX_COMPILER /oasis/scratch/comet/liujuy/temp_project/lib/mpich-3.3/bin/mpicxx)
+set(CMAKE_C_COMPILER  ${PETSC_DIR}/bin/mpicc)
+set(CMAKE_CXX_COMPILER ${PETSC_DIR}/bin/mpicxx)
 set(CMAKE_CXX_FLAGS "-O3 -Wall")
 set(CMAKE_BUILD_TYPE RELEASE)
 set(CMAKE_VERBOSE_MAKEFILE OFF)
