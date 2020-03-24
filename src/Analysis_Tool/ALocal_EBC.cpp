@@ -9,20 +9,15 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
 
   HDF5_Reader * h5r = new HDF5_Reader( file_id );
 
-  const std::string ebcgroup_name(gname);
-
-  num_ebc = h5r -> read_intScalar(ebcgroup_name.c_str(), "num_ebc");
+  num_ebc = h5r -> read_intScalar(gname.c_str(), "num_ebc");
 
   if( num_ebc > 0)
   {
-    h5r -> read_intVector( ebcgroup_name.c_str(), "num_local_node",
-        num_local_node );
+    h5r -> read_intVector(gname.c_str(), "num_local_node", num_local_node );
 
-    h5r -> read_intVector( ebcgroup_name.c_str(), "num_local_cell",
-        num_local_cell );
+    h5r -> read_intVector(gname.c_str(), "num_local_cell", num_local_cell );
 
-    h5r -> read_intVector( ebcgroup_name.c_str(), "cell_nLocBas",
-        cell_nLocBas );
+    h5r -> read_intVector(gname.c_str(), "cell_nLocBas", cell_nLocBas );
   }
 
   std::string groupbase(gname);
