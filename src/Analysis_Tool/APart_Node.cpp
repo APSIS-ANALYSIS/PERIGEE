@@ -1,10 +1,9 @@
 #include "APart_Node.hpp"
 
 APart_Node::APart_Node( const std::string &fbasename, const int &rank )
+: cpu_rank( rank )
 {
-  cpu_rank = rank;
-
-  std::string fName = SYS_T::gen_partfile_name( fbasename, cpu_rank );
+  const std::string fName = SYS_T::gen_partfile_name( fbasename, cpu_rank );
 
   hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
 
