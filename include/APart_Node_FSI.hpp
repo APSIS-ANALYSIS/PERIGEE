@@ -30,8 +30,7 @@ class APart_Node_FSI : public APart_Node
 {
   public:
     APart_Node_FSI(const std::string &fileBaseName, const int &rank,
-        const ALocal_Elem * const &lelem,
-        const ALocal_IEN * const &lIEN );
+        const ALocal_Elem * const &lelem, const ALocal_IEN * const &lIEN );
 
     virtual ~APart_Node_FSI();
 

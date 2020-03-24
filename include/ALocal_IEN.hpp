@@ -85,16 +85,22 @@ class ALocal_IEN
     virtual void print_info() const;
   
   protected:
-    // The number of local element. This int data is assumed to be also
-    // stored in ALocal_Elem.
+    // --------------------------------------------------------------
+    // The number of local element. This integer data is assumed to be 
+    // also stored in ALocal_Elem.
+    // --------------------------------------------------------------
     int nlocalele; 
     
+    // --------------------------------------------------------------
     // The value can be changed due to the FEM basis function enrichment
     // Users should check if one uses a derived class.
+    // --------------------------------------------------------------
     int nLocBas; 
     
+    // --------------------------------------------------------------
     // The LIEN array may be enriched due to use of non-isoparametric elements.
     // Users should check if one uses a derived class.
+    // --------------------------------------------------------------
     std::vector<int> LIEN; 
 };
 
