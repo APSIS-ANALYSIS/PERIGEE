@@ -90,8 +90,8 @@ class APart_Node
     }
     
   protected:
-    int cpu_rank, dof;
-    int nlocalnode, nghostnode, nbadnode, nlocghonode, ntotalnode;
+    const int cpu_rank;
+    int nlocalnode, nghostnode, nbadnode, nlocghonode, ntotalnode, dof;
     std::vector<int> local_to_global, node_ghost, node_loc;
 };
 
