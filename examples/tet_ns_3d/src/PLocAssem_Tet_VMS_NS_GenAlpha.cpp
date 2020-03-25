@@ -5,10 +5,12 @@ PLocAssem_Tet_VMS_NS_GenAlpha::PLocAssem_Tet_VMS_NS_GenAlpha(
         const int &in_nlocbas, const int &in_nqp,
         const int &in_snlocbas,
         const double &in_rho, const double &in_vis_mu,
-        const double &in_beta, const int &elemtype )
+        const double &in_beta, const double &in_ctauc, 
+        const int &elemtype )
 : rho0( in_rho ), vis_mu( in_vis_mu ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
-  gamma(tm_gAlpha->get_gamma()), beta(in_beta), nqp(in_nqp)
+  gamma(tm_gAlpha->get_gamma()), beta(in_beta), nqp(in_nqp),
+  Ctauc( in_ctauc )
 {
   if(elemtype == 501)
   {
@@ -77,6 +79,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::print_info() const
   SYS_T::commPrint("  Kienmatic Viscosity nu = %e \n", vis_mu / rho0);
   SYS_T::commPrint("  Stabilization para CI = %e \n", CI);
   SYS_T::commPrint("  Stabilization para CT = %e \n", CT);
+  SYS_T::commPrint("  Scaling factor for tau_C = %e \n", Ctauc);
   SYS_T::commPrint("  Backflow Stab. para beta = %e \n", beta);
   SYS_T::commPrint("  Note: \n");
   SYS_T::commPrint("  1. Consistent tangent matrix used. \n");
@@ -140,7 +143,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_tau(
 
   const double denom_c = tau_m_qua * g_dot_g;
 
-  tau_c_qua = 1.0 / denom_c;
+  tau_c_qua = Ctauc / denom_c;
 }
 
 
