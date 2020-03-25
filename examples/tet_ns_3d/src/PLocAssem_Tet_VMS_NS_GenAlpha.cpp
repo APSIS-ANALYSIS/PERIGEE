@@ -71,7 +71,11 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
   SYS_T::commPrint("  Three-dimensional Incompressible Navier-Stokes equations: \n");
-  SYS_T::commPrint("  FEM: 4/10-node Tetrahedral \n");
+  if(nLocBas == 4)
+    SYS_T::commPrint("  FEM: 4-node Tetrahedral element \n");
+  else if(nLocBas == 10)
+    SYS_T::commPrint("  FEM: 10-node Tetrahedral element \n");
+  else SYS_T::print_fatal("Error: unknown elem type.\n");
   SYS_T::commPrint("  Spatial: Residual-based VMS \n");
   SYS_T::commPrint("  Temporal: Generalized-alpha Method \n");
   SYS_T::commPrint("  Density rho = %e \n", rho0);
