@@ -111,8 +111,7 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
         double &pres, double &area );
 
     virtual void Assem_Residual_EBC_Resistance(
-        const int &ebc_id,
-        const double &val,
+        const int &ebc_id, const double &val,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -120,8 +119,8 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
         const IQuadPts * const &quad );
 
     virtual void Assem_Residual_BackFlowStab(
-        const double * const &vec_a,
-        const double * const &vec_b,
+        const double * const &dot_sol,
+        const double * const &sol,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -130,8 +129,8 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
 
     virtual void Assem_Tangent_Residual_BackFlowStab(
         const double &dt,
-        const double * const &vec_a,
-        const double * const &vec_b,
+        const double * const &dot_sol,
+        const double * const &sol,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,

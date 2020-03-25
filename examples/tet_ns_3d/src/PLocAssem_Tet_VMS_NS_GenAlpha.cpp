@@ -907,13 +907,14 @@ double PLocAssem_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &vec,
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::get_pressure_area( const double * const &vec,
-        FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad,
-        double &pres, double &area )
+void PLocAssem_Tet_VMS_NS_GenAlpha::get_pressure_area( 
+    const double * const &vec,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad,
+    double &pres, double &area )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -942,13 +943,13 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_pressure_area( const double * const &vec
 
 
 void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
-        const int &ebc_id,
-        const double &val,
-        FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad )
+    const int &ebc_id,
+    const double &val,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -962,7 +963,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
   {
     element->get_R(qua, &R[0]);
     element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
-    
+
     const double gwts = surface_area * quad -> get_qw(qua);
 
     for(int A=0; A<snLocBas; ++A)
@@ -976,13 +977,13 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
 
 
 void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
-        const double * const &dot_sol,
-        const double * const &sol,
-        FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad )
+    const double * const &dot_sol,
+    const double * const &sol,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -1024,21 +1025,21 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
 
 
 void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
-        const double &dt,
-        const double * const &dot_sol,
-        const double * const &sol,
-        FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad )
+    const double &dt,
+    const double * const &dot_sol,
+    const double * const &sol,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   const int face_nqp = quad -> get_num_quadPts();
 
   const double dd_dv = alpha_f * gamma * dt;
-  
+
   double nx, ny, nz, surface_area, factor;
 
   Zero_sur_Tangent_Residual();
@@ -1086,7 +1087,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
       }
     }
   }
-  
+
   for(int A=0; A<snLocBas; ++A)
   {
     for(int B=0; B<snLocBas; ++B)
@@ -1096,7 +1097,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
 
       // ii = jj = 2
       sur_Tangent[ 4*snLocBas*(4*A+2) + 4*B+2 ] = Sub_sur_Tan[10][A*snLocBas + B];
-      
+
       // ii = jj = 3
       sur_Tangent[ 4*snLocBas*(4*A+3) + 4*B+3 ] = Sub_sur_Tan[15][A*snLocBas + B];
     }
