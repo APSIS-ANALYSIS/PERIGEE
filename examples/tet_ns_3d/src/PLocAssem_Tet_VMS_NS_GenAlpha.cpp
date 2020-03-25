@@ -869,7 +869,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
 }
 
 
-double PLocAssem_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &vec,
+double PLocAssem_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &sol,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -892,10 +892,9 @@ double PLocAssem_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &vec,
     double u = 0.0, v = 0.0, w = 0.0;
     for(int ii=0; ii<snLocBas; ++ii)
     {
-      const int ii4 = ii * 4;
-      u += vec[ii4+1] * R[ii];
-      v += vec[ii4+2] * R[ii];
-      w += vec[ii4+3] * R[ii];
+      u += sol[ii*4+1] * R[ii];
+      v += sol[ii*4+2] * R[ii];
+      w += sol[ii*4+3] * R[ii];
     }
     
     const double gwts = surface_area * quad->get_qw(qua);
@@ -908,7 +907,7 @@ double PLocAssem_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &vec,
 
 
 void PLocAssem_Tet_VMS_NS_GenAlpha::get_pressure_area( 
-    const double * const &vec,
+    const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
@@ -932,7 +931,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_pressure_area(
     element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
 
     double pp = 0.0;
-    for(int ii=0; ii<snLocBas; ++ii) pp += vec[4*ii+0] * R[ii];
+    for(int ii=0; ii<snLocBas; ++ii) pp += sol[4*ii+0] * R[ii];
 
     const double gwts = surface_area * quad->get_qw(qua);
 

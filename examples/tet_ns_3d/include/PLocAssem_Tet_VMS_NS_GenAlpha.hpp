@@ -95,14 +95,14 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
-    virtual double get_flowrate( const double * const &vec,
+    virtual double get_flowrate( const double * const &sol,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
-    virtual void get_pressure_area( const double * const &vec,
+    virtual void get_pressure_area( const double * const &sol,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
