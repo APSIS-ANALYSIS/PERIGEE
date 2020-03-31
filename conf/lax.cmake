@@ -24,7 +24,8 @@ set(HDF5_ROOT /home/jliu/lib/hdf5-1.8.20)
 # ========================================================
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
 
-find_package(VTK REQUIRED)
+find_package(VTK COMPONENTS vtkCommonCore vtkIOCore 
+  vtkIOLegacy vtkIOXML REQUIRED)
 find_package(PETSc REQUIRED)
 find_package(HDF5 REQUIRED)
 find_package(SLEPc)
