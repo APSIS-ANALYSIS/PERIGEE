@@ -17,19 +17,18 @@ set(HDF5_ROOT ${PETSC_DIR})
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
 
 find_package(VTK REQUIRED)
-find_package(PETSc REQUIRED)
 find_package(HDF5 REQUIRED)
+find_package(PETSc REQUIRED)
 
 include_directories(${VTK_INCLUDE_DIRS})
+include_directories(${HDF5_INCLUDE_DIRS})
 include_directories(${PETSC_INC})
 
 set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${VTK_LIBRARIES})
+set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${HDF5_LIBRARIES})
 set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${PETSC_LIB})
 set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${PETSC_METIS_LIB})
 message(STATUS "Use METIS in PETSc: " ${PETSC_METIS_LIB})
-
-include_directories(${HDF5_INCLUDE_DIRS})
-set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${HDF5_LIBRARIES})
 
 message(STATUS "External Libraries: " ${EXTRA_LINK_LIBS})
 
