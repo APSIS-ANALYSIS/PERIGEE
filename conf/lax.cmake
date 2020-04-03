@@ -31,9 +31,11 @@ find_package(HDF5 REQUIRED)
 find_package(SLEPc)
 
 include_directories(${VTK_INCLUDE_DIRS})
+include_directories(${HDF5_INCLUDE_DIRS})
 include_directories(${PETSC_INC})
 
 set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${VTK_LIBRARIES})
+set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${HDF5_LIBRARIES})
 set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${PETSC_LIB})
 
 if(PETSC_METIS)
@@ -44,9 +46,6 @@ else(PETSC_METIS)
   INCLUDE_DIRECTORIES(${METIS_INCLUDE_DIRS})
   set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${METIS_LIBRARIES})
 endif(PETSC_METIS)
-
-include_directories(${HDF5_INCLUDE_DIRS})
-set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${HDF5_LIBRARIES})
 
 if(SLEPC_FOUND)
   include_directories(${SLEPC_INC})
