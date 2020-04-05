@@ -19,7 +19,6 @@
 // Author: Ju Liu
 // Date: June 21 2016
 // ==================================================================
-
 #include <iostream>
 #include <iomanip>
 #include <cstdlib>
@@ -54,7 +53,7 @@ class Matrix_3x3
     const double& operator()(const int &index) const {return mat[index];}
 
     // Parenthesis operator. Access through row and col index: ii jj
-    // Note: We do not check that ii , jj = 0, 1, 2.
+    // Note: index boundary ii , jj = 0, 1, 2 is NOT checked.
     double& operator()(const int &ii, const int &jj)
     {return mat[3*ii+jj];}
 
@@ -129,7 +128,6 @@ class Matrix_3x3
 
     // Matrix multiplication mat = mleft * mright
     void MatMult( const Matrix_3x3 &mleft, const Matrix_3x3 &mright );
-
   
     // Matrix multiplication as mat = source^T * source
     // This is used for the evaluation of right Cauchy-Green strain tensor:
@@ -156,6 +154,5 @@ class Matrix_3x3
   private:
     double mat[9];
 };
-
 
 #endif
