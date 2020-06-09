@@ -543,57 +543,22 @@ void PLocAssem_Tet_VMS_NS_InExact_GenAlpha::Assem_Tangent_Residual(
 
         Sub_Tan[3][index] += gwts * ( alpha_m * tau_m * rho0 * NAzNB
             + dd_dv * ( NANBz + tau_m * rho0 * NA_z * velo_dot_gradNB ) );
-        /*
+        
         // Momentum-x with respect to p, u, v, w
         Sub_Tan[4][index] += gwts * dd_dv * ((-1.0) * NAxNB
-            + velo_dot_gradR * tau_m * rho0 * NB_x
-            - NA * tau_m * rho0 * (u_x * NB_x + u_y * NB_y + u_z * NB_z)
-            - 2.0 * tau_m_2 * rho0 * rx * NAxNBx
-            - tau_m_2 * rho0 * NA_y * (rx * NB_y + ry * NB_x)
-            - tau_m_2 * rho0 * NA_z * (rx * NB_z + rz * NB_x) );
+            + velo_dot_gradR * tau_m * rho0 * NB_x );
 
         Sub_Tan[5][index] += gwts * ( 
-            alpha_m * ( rho0 * NANB + velo_dot_gradR * rho0_2 * tau_m * NB
-              - rho0_2 * tau_m * u_x * NANB
-              - rho0_2 * tau_m_2 * rx * NAxNB
-              - rho0_2 * tau_m_2 * (rx * NAxNB + ry * NAyNB + rz * NAzNB) )
-            + dd_dv * ( NA * rho0 * velo_dot_gradNB + NANB * rho0 * u_x
+            alpha_m * ( rho0 * NANB + velo_dot_gradR * rho0_2 * tau_m * NB )
+            + dd_dv * ( NA * rho0 * velo_dot_gradNB + 
               + vis_mu * (2.0*NAxNBx + NAyNBy + NAzNBz)
-              + velo_dot_gradR * rho0 * tau_m * drx_du_B
-              + rho0 * tau_m * rx * NAxNB
-              - rho0 * tau_m * (rx * NANBx + ry * NANBy + rz * NANBz)
-              - rho0 * tau_m * NA * (u_x * drx_du_B 
-                + u_y * dry_du_B + u_z * drz_du_B ) 
-              + tau_c * NAxNBx
-              - 2.0 * rho0 * tau_m_2 * rx  * NA_x * drx_du_B
-              - rho0 * tau_m_2 * ry * NA_y * drx_du_B
-              - rho0 * tau_m_2 * rz * NA_z * drx_du_B
-              - rho0 * tau_m_2 * rx * NA_y * dry_du_B
-              - rho0 * tau_m_2 * rx * NA_z * drz_du_B
-              + velo_prime_dot_gradR * tau_dc * velo_prime_dot_gradNB ) );
+              + velo_dot_gradR * rho0_2 * tau_m * velo_dot_gradNB
+              + tau_c * NAxNBx );
 
-        Sub_Tan[6][index] += gwts * ( 
-            alpha_m * (-1.0) * rho0_2 * (tau_m * u_y * NANB + tau_m_2 * rx * NAyNB)
-            + dd_dv * ( NANB * rho0 * u_y + vis_mu * NAyNBx 
-              + rho0 * tau_m * rx * NAyNB
-              + velo_dot_gradR * rho0 * tau_m * drx_dv_B
-              - rho0 * tau_m * NA * (u_x*drx_dv_B + u_y*dry_dv_B + u_z*drz_dv_B)
-              + tau_c * NAxNBy
-              - 2.0 * rho0 * tau_m_2 * rx * NA_x * drx_dv_B
-              - rho0 * tau_m_2 * NA_y * (rx * dry_dv_B + ry * drx_dv_B)
-              - rho0 * tau_m_2 * NA_z * (rx * drz_dv_B + rz * drx_dv_B) ) );
+        Sub_Tan[6][index] += gwts * dd_dv * ( vis_mu * NAyNBx + tau_c * NAxNBy );
 
-        Sub_Tan[7][index] += gwts * (
-            alpha_m * (-1.0) * rho0_2 * (tau_m * u_z * NANB + tau_m_2 * rx * NAzNB)
-            + dd_dv * ( NANB * rho0 * u_z + vis_mu * NAzNBx 
-              + rho0 * tau_m * rx * NAzNB
-              + velo_dot_gradR * rho0 * tau_m * drx_dw_B
-              - rho0 * tau_m * NA * (u_x*drx_dw_B + u_y*dry_dw_B + u_z*drz_dw_B)
-              + tau_c * NAxNBz
-              - 2.0 * rho0 * tau_m_2 * rx * NA_x * drx_dw_B
-              - rho0 * tau_m_2 * NA_y * (rx * dry_dw_B + ry * drx_dw_B)
-              - rho0 * tau_m_2 * NA_z * (rx * drz_dw_B + rz * drx_dw_B) ) );
-
+        Sub_Tan[7][index] += gwts * dd_dv * ( vis_mu * NAzNBx + tau_c * NAxNBz ) ;
+        /*
         // Momentum-y with respect to p u v w
         Sub_Tan[8][index] += gwts * dd_dv * ( (-1.0) * NAyNB
             + velo_dot_gradR * tau_m * rho0 * NB_y
