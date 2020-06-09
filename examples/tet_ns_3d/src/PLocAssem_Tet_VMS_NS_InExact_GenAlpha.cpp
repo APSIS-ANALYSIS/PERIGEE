@@ -573,54 +573,22 @@ void PLocAssem_Tet_VMS_NS_InExact_GenAlpha::Assem_Tangent_Residual(
               + tau_c * NAyNBy ) );
 
         Sub_Tan[11][index] += gwts * dd_dv * ( vis_mu * NAzNBy + tau_c * NAyNBz );
-        /*
+        
         // Momentum-z with respect to p u v w
         Sub_Tan[12][index] += gwts * dd_dv * ( (-1.0) * NAzNB
-            + velo_dot_gradR * tau_m * rho0 * NB_z
-            - NA * tau_m * rho0 * (w_x * NB_x + w_y * NB_y + w_z * NB_z)
-            - tau_m_2 * rho0 * NA_x * (rx * NB_z + rz * NB_x)
-            - tau_m_2 * rho0 * NA_y * (ry * NB_z + rz * NB_y)
-            - 2.0 * tau_m_2 * rho0 * rz * NAzNBz );
+            + velo_dot_gradR * tau_m * rho0 * NB_z );
 
-        Sub_Tan[13][index] += gwts * (
-            alpha_m * (-1.0) * rho0_2 * (tau_m * w_x * NANB + tau_m_2 * rz * NAxNB)
-            + dd_dv * ( NANB * rho0 * w_x + vis_mu * NAxNBz
-              + rho0 * tau_m * rz * NAxNB
-              + velo_dot_gradR * rho0 * tau_m * drz_du_B
-              - rho0 * tau_m * NA * (w_x*drx_du_B + w_y*dry_du_B + w_z*drz_du_B)
-              + tau_c * NAzNBx
-              - rho0 * tau_m_2 * NA_x * (rx * drz_du_B + rz * drx_du_B)
-              - rho0 * tau_m_2 * NA_y * (ry * drz_du_B + rz * dry_du_B)
-              - 2.0 * rho0 * tau_m_2 * rz * NA_z * drz_du_B ) );
+        Sub_Tan[13][index] += gwts * dd_dv * ( vis_mu * NAxNBz + tau_c * NAzNBx );
 
-        Sub_Tan[14][index] += gwts * (
-            alpha_m * (-1.0) * rho0_2 * (tau_m * w_y * NANB + tau_m_2 * rz * NAyNB)
-            + dd_dv * ( NANB * rho0 * w_y + vis_mu * NAyNBz
-              + rho0 * tau_m * rz * NAyNB
-              + velo_dot_gradR * rho0 * tau_m * drz_dv_B
-              - rho0 * tau_m * NA * (w_x*drx_dv_B + w_y*dry_dv_B + w_z*drz_dv_B)
-              + tau_c * NAzNBy
-              - rho0 * tau_m_2 * NA_x * (rx * drz_dv_B + rz * drx_dv_B)
-              - rho0 * tau_m_2 * NA_y * (ry * drz_dv_B + rz * dry_dv_B)
-              - 2.0 * rho0 * tau_m_2 * rz * NA_z * drz_dv_B ) );
+        Sub_Tan[14][index] += gwts * dd_dv * ( vis_mu * NAyNBz + tau_c * NAzNBy ) ;
 
         Sub_Tan[15][index] += gwts * (
-            alpha_m * ( rho0 * NANB + velo_dot_gradR * rho0_2 * tau_m * NB
-              - rho0_2 * tau_m * w_z * NANB
-              - rho0_2 * tau_m_2 * rz * NAzNB
-              - rho0_2 * tau_m_2 * (rx*NAxNB + ry*NAyNB + rz * NAzNB) )
-            + dd_dv * ( rho0 * NA * velo_dot_gradNB + NANB * rho0 * w_z
+            alpha_m * ( rho0 * NANB + velo_dot_gradR * rho0_2 * tau_m * NB )
+            + dd_dv * ( NA * rho0 * velo_dot_gradNB + 
               + vis_mu * (NAxNBx + NAyNBy + 2.0 * NAzNBz)
-              + velo_dot_gradR * rho0 * tau_m * drz_dw_B
-              + rho0 * tau_m * rz * NAzNB
-              - rho0 * tau_m * (rx*NANBx + ry * NANBy + rz * NANBz)
-              - rho0 * tau_m * NA * (w_x*drx_dw_B + w_y*dry_dw_B + w_z*drz_dw_B)
-              + tau_c * NAzNBz
-              - rho0 * tau_m_2 * NA_x * (rx * drz_dw_B + rz * drx_dw_B)
-              - rho0 * tau_m_2 * NA_y * (ry * drz_dw_B + rz * dry_dw_B)
-              - 2.0 * rho0 * tau_m_2 * NA_z * rz * drz_dw_B 
-              + velo_prime_dot_gradR * tau_dc * velo_prime_dot_gradNB ) );
-        */
+              + velo_dot_gradR * rho0_2 * tau_m * velo_dot_gradNB
+              + tau_c * NAzNBz ) );
+        
       } // B-loop
     } // A-loop
   } // qua-loop
