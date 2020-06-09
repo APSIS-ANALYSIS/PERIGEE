@@ -553,11 +553,11 @@ void PLocAssem_Tet_VMS_NS_InExact_GenAlpha::Assem_Tangent_Residual(
             + dd_dv * ( NA * rho0 * velo_dot_gradNB + 
               + vis_mu * (2.0*NAxNBx + NAyNBy + NAzNBz)
               + velo_dot_gradR * rho0_2 * tau_m * velo_dot_gradNB
-              + tau_c * NAxNBx );
+              + tau_c * NAxNBx ) );
 
         Sub_Tan[6][index] += gwts * dd_dv * ( vis_mu * NAyNBx + tau_c * NAxNBy );
 
-        Sub_Tan[7][index] += gwts * dd_dv * ( vis_mu * NAzNBx + tau_c * NAxNBz ) ;
+        Sub_Tan[7][index] += gwts * dd_dv * ( vis_mu * NAzNBx + tau_c * NAxNBz );
         
         // Momentum-y with respect to p u v w
         Sub_Tan[8][index] += gwts * dd_dv * ( (-1.0) * NAyNB
@@ -570,7 +570,7 @@ void PLocAssem_Tet_VMS_NS_InExact_GenAlpha::Assem_Tangent_Residual(
             + dd_dv * ( NA * rho0 * velo_dot_gradNB + 
               + vis_mu * (NAxNBx + 2.0 * NAyNBy + NAzNBz)
               + velo_dot_gradR * rho0_2 * tau_m * velo_dot_gradNB
-              + tau_c * NAyNBy );
+              + tau_c * NAyNBy ) );
 
         Sub_Tan[11][index] += gwts * dd_dv * ( vis_mu * NAzNBy + tau_c * NAyNBz );
         /*
