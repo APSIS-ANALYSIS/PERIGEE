@@ -531,6 +531,7 @@ void PLocAssem_Tet_VMS_NS_InExact_GenAlpha::Assem_Tangent_Residual(
         const double drz_dv_B = rho0 * w_y * NB;
         const double drz_dw_B = rho0 * ( w_z * NB + velo_dot_gradNB ) - vis_mu * NB_lap;
 
+        /*
         // Continuity equation with respect to p, u, v, w
         Sub_Tan[0][index] += gwts * dd_dv * tau_m * (NAxNBx + NAyNBy + NAzNBz);
 
@@ -689,6 +690,7 @@ void PLocAssem_Tet_VMS_NS_InExact_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_y * (ry * drz_dw_B + rz * dry_dw_B)
               - 2.0 * rho0 * tau_m_2 * NA_z * rz * drz_dw_B 
               + velo_prime_dot_gradR * tau_dc * velo_prime_dot_gradNB ) );
+        */
       } // B-loop
     } // A-loop
   } // qua-loop
