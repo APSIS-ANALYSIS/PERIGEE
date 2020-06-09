@@ -531,22 +531,19 @@ void PLocAssem_Tet_VMS_NS_InExact_GenAlpha::Assem_Tangent_Residual(
         const double drz_dv_B = rho0 * w_y * NB;
         const double drz_dw_B = rho0 * ( w_z * NB + velo_dot_gradNB ) - vis_mu * NB_lap;
 
-        /*
+        
         // Continuity equation with respect to p, u, v, w
         Sub_Tan[0][index] += gwts * dd_dv * tau_m * (NAxNBx + NAyNBy + NAzNBz);
 
         Sub_Tan[1][index] += gwts * ( alpha_m * tau_m * rho0 * NAxNB
-            + dd_dv * ( NANBx + tau_m * NA_x * drx_du_B
-              + tau_m * NA_y * dry_du_B + tau_m * NA_z * drz_du_B ) );
+            + dd_dv * ( NANBx + tau_m * rho0 * NA_x * velo_dot_gradNB ) );
 
         Sub_Tan[2][index] += gwts * ( alpha_m * tau_m * rho0 * NAyNB
-            + dd_dv * ( NANBy + tau_m * NA_x * drx_dv_B
-              + tau_m * NA_y * dry_dv_B + tau_m * NA_z * drz_dv_B ) );
+            + dd_dv * ( NANBy + tau_m * rho0 * NA_y * velo_dot_gradNB ) );
 
         Sub_Tan[3][index] += gwts * ( alpha_m * tau_m * rho0 * NAzNB
-            + dd_dv * ( NANBz + tau_m * NA_x * drx_dw_B
-              + tau_m * NA_y * dry_dw_B + tau_m * NA_z * drz_dw_B ) );
-
+            + dd_dv * ( NANBz + tau_m * rho0 * NA_z * velo_dot_gradNB ) );
+        /*
         // Momentum-x with respect to p, u, v, w
         Sub_Tan[4][index] += gwts * dd_dv * ((-1.0) * NAxNB
             + velo_dot_gradR * tau_m * rho0 * NB_x
