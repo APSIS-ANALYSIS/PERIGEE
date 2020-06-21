@@ -101,8 +101,7 @@ void Tensor4_3D::gen_proj_dev()
 void Tensor4_3D::gen_P( const Matrix_3x3 &C, const Matrix_3x3 &invC )
 {
   gen_symm_id();
-  const double mpt33 = -1.0 / 3.0;
-  add_OutProduct(mpt33, invC, C);
+  add_OutProduct( -1.0 / 3.0, invC, C );
 }
 
 
@@ -110,8 +109,7 @@ void Tensor4_3D::gen_Ptilde( const Matrix_3x3 &invC )
 {
   gen_zero();
   add_SymmProduct(1.0, invC, invC);
-  const double mpt33 = -1.0 / 3.0;
-  add_OutProduct(mpt33, invC, invC);
+  add_OutProduct( -1.0 / 3.0, invC, invC );
 }
 
 
@@ -132,6 +130,7 @@ void Tensor4_3D::gen_zero()
 {
   for(int ii=0; ii<81; ++ii) ten[ii] = 0.0;
 }
+
 
 void Tensor4_3D::scale( const double &val )
 {
@@ -186,7 +185,6 @@ void Tensor4_3D::add_SymmProduct( const double &val, const Matrix_3x3 &mleft,
     }
   }
 }
-
 
 
 void Tensor4_3D::MatMult_1( const Matrix_3x3 &source )
@@ -287,10 +285,9 @@ void Tensor4_3D::LeftContraction( const Matrix_3x3 &a, Matrix_3x3 &out ) const
 
 void Tensor4_3D::RightContraction( const Matrix_3x3 &a, Matrix_3x3 &out ) const
 {
-  int loc;
   for(int n=0; n<9; ++n)
   {
-    loc = 9*n;
+    const int loc = 9*n;
     out(n) = ten[loc] * a(0) + ten[loc+1] * a(1) + ten[loc+2] * a(2)
       + ten[loc+3] * a(3) + ten[loc+4] * a(4) + ten[loc+5] * a(5)
       + ten[loc+6] * a(6) + ten[loc+7] * a(7) + ten[loc+8] * a(8);
@@ -300,11 +297,10 @@ void Tensor4_3D::RightContraction( const Matrix_3x3 &a, Matrix_3x3 &out ) const
 
 double Tensor4_3D::LnRContraction( const Matrix_3x3 &Left, const Matrix_3x3 &Right ) const
 {
-  int loc;
   double sum = 0.0;
   for(int n=0; n<9; ++n)
   {
-    loc = 9*n;
+    const int loc = 9*n;
     sum += ( ten[loc] * Right(0) + ten[loc+1] * Right(1) + ten[loc+2] * Right(2)
         + ten[loc+3] * Right(3) + ten[loc+4] * Right(4) + ten[loc+5] * Right(5)
         + ten[loc+6] * Right(6) + ten[loc+7] * Right(7) + ten[loc+8] * Right(8) ) * Left(n);
@@ -327,12 +323,11 @@ double Tensor4_3D::Ten4Contraction( const Tensor4_3D &input ) const
 void Tensor4_3D::TenMult( const Tensor4_3D &tleft, const Tensor4_3D &tright )
 {
   double temp[81];
-  int index;
   for(int ii=0; ii<9; ++ii)
   {
     for(int jj=0; jj<9; ++jj)
     {
-      index = 9*ii + jj;
+      const int index = 9*ii + jj;
       temp[index] = 0.0;
       for(int kk=0; kk<9; ++kk)
         temp[index] += tleft(9*ii+kk) * tright(9*kk+jj);
@@ -346,12 +341,11 @@ void Tensor4_3D::TenMult( const Tensor4_3D &tleft, const Tensor4_3D &tright )
 void Tensor4_3D::TenRMult( const Tensor4_3D &tright )
 {
   double temp[81];
-  int index;
   for(int ii=0; ii<9; ++ii)
   {
     for(int jj=0; jj<9; ++jj)
     {
-      index = 9*ii + jj;
+      const int index = 9*ii + jj;
       temp[index] = 0.0;
       for(int kk=0; kk<9; ++kk)
         temp[index] += ten[9*ii+kk] * tright(9*kk+jj);
@@ -365,12 +359,11 @@ void Tensor4_3D::TenRMult( const Tensor4_3D &tright )
 void Tensor4_3D::TenLMult( const Tensor4_3D &tleft )
 {
   double temp[81];
-  int index;
   for(int ii=0; ii<9; ++ii)
   {
     for(int jj=0; jj<9; ++jj)
     {
-      index = 9*ii + jj;
+      const int index = 9*ii + jj;
       temp[index] = 0.0;
       for(int kk=0; kk<9; ++kk)
         temp[index] += tleft(9*ii+kk) * ten[9*kk+jj];
@@ -384,12 +377,11 @@ void Tensor4_3D::TenLMult( const Tensor4_3D &tleft )
 void Tensor4_3D::TenLRMult( const Tensor4_3D &tleft, const Tensor4_3D &tright )
 {
   double temp[81];
-  int index;
   for(int ii=0; ii<9; ++ii)
   {
     for(int jj=0; jj<9; ++jj)
     {
-      index = 9*ii+jj;
+      const int index = 9*ii+jj;
       temp[index] = 0.0;
       for(int mm=0; mm<9; ++mm)
       {
@@ -406,12 +398,11 @@ void Tensor4_3D::TenLRMult( const Tensor4_3D &tleft, const Tensor4_3D &tright )
 void Tensor4_3D::TenPMult( const Tensor4_3D &P )
 {
   double temp[81];
-  int index;
   for(int ii=0; ii<9; ++ii)
   {
     for(int jj=0; jj<9; ++jj)
     {
-      index = 9*ii + jj;
+      const int index = 9*ii + jj;
       temp[index] = 0.0;
       for(int mm=0; mm<9; ++mm)
       {
