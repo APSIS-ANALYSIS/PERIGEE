@@ -178,7 +178,7 @@ class Tensor4_3D
 
     // Tensor Left and Right Multiplication modification with the same
     // tensor P. See Holzapfel p. 255, the first term in eqn. (6.168) for
-    // an example fo this function.
+    // an example of this function.
     // ten_IJKL = P_IJMN ten_MNST P_KLST
     void TenPMult( const Tensor4_3D &P );
 
