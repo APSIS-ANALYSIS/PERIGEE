@@ -46,6 +46,9 @@ class Matrix_3x3
     
     void copy( double source[9] );
 
+    // Assignment operator
+    Matrix_3x3& operator= (const Matrix_3x3 &source);
+
     // Parenthesis operator. It allows accessing and assigning the matrix
     // entries.
     double& operator()(const int &index) {return mat[index];}
@@ -53,12 +56,27 @@ class Matrix_3x3
     const double& operator()(const int &index) const {return mat[index];}
 
     // Parenthesis operator. Access through row and col index: ii jj
-    // Note: index boundary ii , jj = 0, 1, 2 is NOT checked.
+    // Note: We do not check that ii , jj = 0, 1, 2.
     double& operator()(const int &ii, const int &jj)
     {return mat[3*ii+jj];}
 
     const double& operator()(const int &ii, const int &jj) const
     {return mat[3*ii+jj];}
+
+    // Addition operator : return left + right
+    friend Matrix_3x3 operator+( const Matrix_3x3 &left, const Matrix_3x3 &right);
+
+    // Minus operator : return left - right
+    friend Matrix_3x3 operator-( const Matrix_3x3 &left, const Matrix_3x3 &right);
+    
+    // Add the source matrix to the object
+    Matrix_3x3& operator+=( const Matrix_3x3 &source );
+
+    // Minus the source matrix to the object
+    Matrix_3x3& operator-=( const Matrix_3x3 &source );
+
+    // Scalar product
+    Matrix_3x3& operator*=( const double &val );
 
     // Return true if the input matrix is identical to the mat
     bool is_identical( const Matrix_3x3 source ) const;
@@ -105,6 +123,13 @@ class Matrix_3x3
     // Get the trace of the matrix
     double tr() const {return mat[0] + mat[4] + mat[8];}
 
+    // Get the invariants
+    double I1() const {return tr();}
+
+    double I2() const;
+
+    double I3() const {return det();}
+
     // Return x^T Mat y, assuming x, y are both column vectors of size 3
     double VecMatVec( const double * const &x, 
         const double * const &y ) const;
@@ -128,6 +153,7 @@ class Matrix_3x3
 
     // Matrix multiplication mat = mleft * mright
     void MatMult( const Matrix_3x3 &mleft, const Matrix_3x3 &mright );
+
   
     // Matrix multiplication as mat = source^T * source
     // This is used for the evaluation of right Cauchy-Green strain tensor:

@@ -23,8 +23,10 @@ Matrix_3x3::Matrix_3x3(
   mat[6] = a31; mat[7] = a32; mat[8] = a33;
 }
 
+
 Matrix_3x3::~Matrix_3x3()
 {}
+
 
 bool Matrix_3x3::is_identical( const Matrix_3x3 source ) const
 {
@@ -45,6 +47,52 @@ void Matrix_3x3::copy( double source[9] )
   for(int ii=0; ii<9; ++ii) mat[ii] = source[ii];
 }
 
+
+Matrix_3x3& Matrix_3x3::operator= (const Matrix_3x3 &source)
+{
+  if(this == &source) return *this;
+
+  for(int ii=0; ii<9; ++ii) mat[ii] = source(ii);
+  return *this; 
+}
+
+
+Matrix_3x3 operator+(const Matrix_3x3 &left, const Matrix_3x3 &right)
+{
+  Matrix_3x3 result;
+  for(int ii=0; ii<9; ++ii) result.mat[ii] = left.mat[ii] + right.mat[ii];
+  
+  return result;
+}
+
+
+Matrix_3x3 operator-(const Matrix_3x3 &left, const Matrix_3x3 &right)
+{
+  Matrix_3x3 result;
+  for(int ii=0; ii<9; ++ii) result.mat[ii] = left.mat[ii] - right.mat[ii];
+  
+  return result;
+}
+
+Matrix_3x3& Matrix_3x3::operator+= (const Matrix_3x3 &source)
+{
+  for(int ii=0; ii<9; ++ii) mat[ii] += source(ii);
+  return *this;
+}
+
+
+Matrix_3x3& Matrix_3x3::operator-= (const Matrix_3x3 &source)
+{
+  for(int ii=0; ii<9; ++ii) mat[ii] -= source(ii);
+  return *this;
+}
+
+
+Matrix_3x3& Matrix_3x3::operator*= (const double &val)
+{
+  for(int ii=0; ii<9; ++ii) mat[ii] *= val;
+  return *this;
+}
 
 void Matrix_3x3::gen_zero()
 {
@@ -151,6 +199,12 @@ double Matrix_3x3::det() const
     - mat[0] * mat[5] * mat[7] - mat[1] * mat[3] * mat[8];
 }
 
+
+double Matrix_3x3::I2() const
+{
+  return 0.5 * ( I1() * I1() - mat[0]*mat[0] - mat[4] * mat[4]
+     - mat[8] * mat[8] - 2.0 * ( mat[1]*mat[3] + mat[2] * mat[6] + mat[5] * mat[7] ) );
+}
 
 double Matrix_3x3::VecMatVec( const double * const &x,
     const double * const &y ) const
