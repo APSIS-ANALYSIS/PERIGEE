@@ -43,11 +43,96 @@ Vector_3& Vector_3::operator= (const Vector_3 &source)
 }
 
 
+Vector_3 operator+( const Vector_3 &left, const Vector_3 &right )
+{
+  Vector_3 result;
+  result.vec[0] = left(0) + right(0);
+  result.vec[1] = left(1) + right(1);
+  result.vec[2] = left(2) + right(2);
+
+  return result;
+}
+
+
+Vector_3 operator-( const Vector_3 &left, const Vector_3 &right )
+{
+  Vector_3 result;
+  result.vec[0] = left(0) - right(0);
+  result.vec[1] = left(1) - right(1);
+  result.vec[2] = left(2) - right(2);
+
+  return result;
+}
+
+
+Vector_3& Vector_3::operator+=( const Vector_3 &source )
+{
+  vec[0] += source(0);
+  vec[1] += source(1);
+  vec[2] += source(2);
+ 
+  return *this;
+}
+
+
+Vector_3& Vector_3::operator-=( const Vector_3 &source )
+{
+  vec[0] -= source(0);
+  vec[1] -= source(1);
+  vec[2] -= source(2);
+
+  return *this;
+}
+
+
+Vector_3& Vector_3::operator*=( const double &val )
+{
+  vec[0] *= val;
+  vec[1] *= val;
+  vec[2] *= val;
+
+  return *this;
+}
+
+
 void Vector_3::print() const
 {
   std::cout<<std::setprecision(9)<<vec[0]<<'\t'<<vec[1]<<'\t'<<vec[2]<<std::endl;
 }
 
 
+void Vector_3::gen_zero()
+{
+  vec[0] = 0.0;
+  vec[1] = 0.0;
+  vec[2] = 0.0;
+}
+
+
+void Vector_3::gen_val(const double &val)
+{
+  vec[0] = val;
+  vec[1] = val;
+  vec[2] = val;
+}
+
+
+void Vector_3::gen_rand()
+{
+  srand(time(NULL));
+
+  for(int ii=0; ii<3; ++ii)
+  {
+    const double value = rand() % 10000;
+
+    vec[ii] = value * 1.0e-3 - 5.0;
+  }
+}
+
+
+void Vector_3::scale( const double &val )
+{
+  vec[0] *= val; vec[1] *= val; vec[2] *= val;
+}
 
 // EOF

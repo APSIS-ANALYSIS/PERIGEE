@@ -42,7 +42,26 @@ class Vector_3
 
     const double& operator()(const int &index) const {return vec[index];}
 
+    // Addition and substraction operators
+    friend Vector_3 operator+( const Vector_3 &left, const Vector_3 &right);
+
+    friend Vector_3 operator-( const Vector_3 &left, const Vector_3 &right);
+
+    Vector_3& operator+=( const Vector_3 &source );
+
+    Vector_3& operator-=( const Vector_3 &source );
+
+    Vector_3& operator*=( const double &val );
+
     void print() const;
+
+    void gen_zero();
+
+    void gen_val(const double &val);
+
+    void gen_rand();
+
+    void scale( const double &val );
 
   private:
     double vec[3];
