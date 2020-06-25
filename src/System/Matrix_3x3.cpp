@@ -215,11 +215,27 @@ double Matrix_3x3::VecMatVec( const double * const &x,
 }
 
 
+double Matrix_3x3::VecMatVec( const Vector_3 &x, const Vector_3 &y ) const
+{
+  return x(0) * ( mat[0] * y(0) + mat[1] * y(1) + mat[2] * y(2) )
+    + x(1) * ( mat[3] * y(0) + mat[4] * y(1) + mat[5] * y(2) )
+    + x(2) * ( mat[6] * y(0) + mat[7] * y(1) + mat[8] * y(2) );
+}
+
+
 void Matrix_3x3::VecMult( const double * const &x, double * const &y ) const
 {
   y[0] = mat[0] * x[0] + mat[1] * x[1] + mat[2] * x[2];
   y[1] = mat[3] * x[0] + mat[4] * x[1] + mat[5] * x[2];
   y[2] = mat[6] * x[0] + mat[7] * x[1] + mat[8] * x[2];
+}
+
+
+void Matrix_3x3::VecMult( const Vector_3 &x, Vector_3 &y ) const
+{
+  y(0) = mat[0] * x(0) + mat[1] * x(1) + mat[2] * x(2);
+  y(1) = mat[3] * x(0) + mat[4] * x(1) + mat[5] * x(2);
+  y(2) = mat[6] * x(0) + mat[7] * x(1) + mat[8] * x(2);
 }
 
 
