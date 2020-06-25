@@ -143,6 +143,8 @@ class Matrix_3x3
 
     // y = x^T A,  in indices: y_i = x_I A_Ii
     void VecMultT( const double * const &x, double * const &y ) const;
+    
+    void VecMultT( const Vector_3 &x, Vector_3 &y ) const;
 
     // y = x^T A, wherein x = [x0; x1; x2]
     void VecMultT( const double &x0, const double &x1, const double &x2,
@@ -150,6 +152,8 @@ class Matrix_3x3
 
     // x = Ax, vector x has to be of size 3
     void VecMult( double * const &x ) const;
+    
+    void VecMult( Vector_3 &x ) const;
 
     // Matrix multiplication mat = mleft * mright
     void MatMult( const Matrix_3x3 &mleft, const Matrix_3x3 &mright );
