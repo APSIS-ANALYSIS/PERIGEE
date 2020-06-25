@@ -135,4 +135,11 @@ void Vector_3::scale( const double &val )
   vec[0] *= val; vec[1] *= val; vec[2] *= val;
 }
 
+
+double Vector_3::dot_product( const Vector_3 &source ) const
+{
+  return vec[0]*source(0) + vec[1]*source(1) + vec[2]*source(2);
+}
+
+
 // EOF

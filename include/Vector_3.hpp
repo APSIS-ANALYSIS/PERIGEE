@@ -63,6 +63,10 @@ class Vector_3
 
     void scale( const double &val );
 
+    double sum() const {return vec[0]+vec[1]+vec[2];}
+
+    double dot_product( const Vector_3 &source ) const;
+
   private:
     double vec[3];
 };
