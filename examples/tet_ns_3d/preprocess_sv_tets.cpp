@@ -69,7 +69,7 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionString("-sur_file_wall", sur_file_wall);
   SYS_T::GetOptionString("-sur_file_out_base", sur_file_out_base);
 
-  if( elemType != 501 && elemType !=502 ) SYS_T::print_fatal("ERROR: unknown element type.\n");
+  if( elemType != 501 && elemType !=502 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
 
   // Print the command line arguments
   cout<<"==== Command Line Arguments ===="<<endl;
@@ -179,11 +179,7 @@ int main( int argc, char * argv[] )
         isDualGraph, mesh, IEN, "epart", "npart" );
   else if(cpu_size == 1)
     global_part = new Global_Part_Serial( mesh, "epart", "npart" );
-  else
-  {
-    cerr<<"ERROR: wrong cpu_size: "<<cpu_size<<endl;
-    exit(EXIT_FAILURE);
-  }
+  else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
 
   // Generate the new nodal numbering
   Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, mesh->get_nFunc());

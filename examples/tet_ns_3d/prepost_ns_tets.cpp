@@ -92,21 +92,17 @@ int main( int argc, char * argv[] )
     IEN = new IEN_Tetra_P2(nElem, vecIEN);
     mesh = new Mesh_Tet10(nFunc, nElem);
   }
-  else SYS_T::print_fatal("ERROR: element type not supported.\n");
+  else SYS_T::print_fatal("ERROR: element type %d not supported.\n", elemType);
 
   mesh -> print_mesh_info();
 
-  IGlobal_Part * global_part;
+  IGlobal_Part * global_part = nullptr;
   if(cpu_size > 1)
     global_part = new Global_Part_METIS( cpu_size, in_ncommon,
         isDualGraph, mesh, IEN, "post_epart", "post_npart" );
   else if(cpu_size == 1)
     global_part = new Global_Part_Serial( mesh, "post_epart", "post_npart" );
-  else
-  {
-    cerr<<"ERROR: wrong cpu_size: "<<cpu_size<<endl;
-    exit(EXIT_FAILURE);
-  }
+  else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
 
   Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, mesh->get_nFunc());
   mnindex->write_hdf5("post_node_mapping");
