@@ -34,17 +34,17 @@ int main( int argc, char * argv[] )
   // Define basic problem settins
   const int dofNum = 4; // degree-of-freedom for the physical problem
   const int dofMat = 4; // degree-of-freedom in the matrix problem
-  const string part_file("part");
+  const std::string part_file("part");
   
   // Element options: 501 linear tets, 502 quadratic tets
   int elemType = 501;
   int num_outlet = 1;
   
   // Default names for input geometry files
-  string geo_file("./whole_vol.vtu");
-  string sur_file_in("./inflow_vol.vtp");
-  string sur_file_wall("./wall_vol.vtp");
-  string sur_file_out_base("./outflow_vol_");
+  std::string geo_file("./whole_vol.vtu");
+  std::string sur_file_in("./inflow_vol.vtp");
+  std::string sur_file_wall("./wall_vol.vtp");
+  std::string sur_file_out_base("./outflow_vol_");
 
   // Mesh partition setting
   int cpu_size = 1;
@@ -105,7 +105,7 @@ int main( int argc, char * argv[] )
   SYS_T::file_check(sur_file_wall); cout<<sur_file_wall<<" found. \n";
 
   // Generate the outlet file names and check existance
-  vector< string > sur_file_out;
+  std::vector< std::string > sur_file_out;
   sur_file_out.resize( num_outlet );
 
   for(int ii=0; ii<num_outlet; ++ii)
@@ -145,8 +145,8 @@ int main( int argc, char * argv[] )
 
   // Read the volumetric mesh file from the vtu file: geo_file
   int nFunc, nElem;
-  vector<int> vecIEN;
-  vector<double> ctrlPts;
+  std::vector<int> vecIEN;
+  std::vector<double> ctrlPts;
   
   TET_T::read_vtu_grid(geo_file.c_str(), nFunc, nElem, ctrlPts, vecIEN);
   
@@ -190,10 +190,10 @@ int main( int argc, char * argv[] )
   mnindex->write_hdf5("node_mapping");
 
   // Setup Nodal Boundary Conditions
-  vector<INodalBC *> NBC_list;
+  std::vector<INodalBC *> NBC_list;
   NBC_list.clear(); NBC_list.resize( dofMat );
 
-  vector<string> dir_list;
+  std::vector<std::string> dir_list;
   dir_list.push_back( sur_file_in );
   dir_list.push_back( sur_file_wall );
 
@@ -213,14 +213,14 @@ int main( int argc, char * argv[] )
   }
 
   // Inflow BC info
-  vector<double> inflow_outward_vec;
+  std::vector<double> inflow_outward_vec;
   TET_T::get_out_normal( sur_file_in, ctrlPts, IEN, inflow_outward_vec );
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall,
       nFunc, inflow_outward_vec, elemType );
 
   // Setup Elemental Boundary Conditions
   // Obtain the outward normal vector
-  vector< vector<double> > outflow_outward_vec;
+  std::vector< std::vector<double> > outflow_outward_vec;
   outflow_outward_vec.resize( sur_file_out.size() );
   for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
     TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN, outflow_outward_vec[ii] );
@@ -232,8 +232,8 @@ int main( int argc, char * argv[] )
   // Start partition the mesh for each cpu_rank 
   const bool isPrintPartInfo = true;
 
-  vector<int> list_nlocalnode, list_nghostnode, list_ntotalnode, list_nbadnode;
-  vector<double> list_ratio_g2l;
+  std::vector<int> list_nlocalnode, list_nghostnode, list_ntotalnode, list_nbadnode;
+  std::vector<double> list_ratio_g2l;
 
   int sum_nghostnode = 0; // total number of ghost nodes
 
