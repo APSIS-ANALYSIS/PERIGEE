@@ -19,7 +19,7 @@ int main( int argc, char * argv[] )
 {
   // Clean the existing part hdf5 files
   int sysret = system("rm -rf postpart_p*.h5");
-  SYS_T::print_fatal_if(sysret != 0, "Error: system call failed. \n");
+  SYS_T::print_fatal_if(sysret != 0, "ERROR: system call failed. \n");
 
   std::string geo_file;
   int dofNum, dofMat, elemType, in_ncommon;
@@ -73,26 +73,26 @@ int main( int argc, char * argv[] )
 
   TET_T::read_vtu_grid(geo_file.c_str(), nFunc, nElem, ctrlPts, vecIEN);
   
-  if(int(ctrlPts.size()) != nFunc * 3) SYS_T::print_fatal("Error: the ctrlPts from geo_file does not match the given number of nodes. \n");
+  if(int(ctrlPts.size()) != nFunc * 3) SYS_T::print_fatal("ERROR: the ctrlPts from geo_file does not match the given number of nodes. \n");
 
   IIEN * IEN = nullptr;
   IMesh * mesh = nullptr;
 
   if(elemType == 501)
   {
-    SYS_T::print_fatal_if(vecIEN.size() / nElem != 4, "Error: the mesh connectivity array size does not match with the element type 501. \n");
+    SYS_T::print_fatal_if(vecIEN.size() / nElem != 4, "ERROR: the mesh connectivity array size does not match with the element type 501. \n");
 
     IEN = new IEN_Tetra_P1(nElem, vecIEN);
     mesh = new Mesh_Tet4(nFunc, nElem);
   }
   else if(elemType == 502)
   {
-    SYS_T::print_fatal_if(vecIEN.size() / nElem != 10, "Error: the mesh connectivity array size does not match with the element type 502. \n");
+    SYS_T::print_fatal_if(vecIEN.size() / nElem != 10, "ERROR: the mesh connectivity array size does not match with the element type 502. \n");
 
     IEN = new IEN_Tetra_P2(nElem, vecIEN);
     mesh = new Mesh_Tet10(nFunc, nElem);
   }
-  else SYS_T::print_fatal("Error: element type not supported.\n");
+  else SYS_T::print_fatal("ERROR: element type not supported.\n");
 
   mesh -> print_mesh_info();
 
