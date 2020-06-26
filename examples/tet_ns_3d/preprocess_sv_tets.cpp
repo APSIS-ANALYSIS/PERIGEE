@@ -34,17 +34,17 @@ int main( int argc, char * argv[] )
   // Define basic problem settins
   const int dofNum = 4; // degree-of-freedom for the physical problem
   const int dofMat = 4; // degree-of-freedom in the matrix problem
-  const std::string part_file("part");
+  const string part_file("part");
   
   // Element options: 501 linear tets, 502 quadratic tets
   int elemType = 501;
   int num_outlet = 1;
   
   // Default names for input geometry files
-  std::string geo_file("./whole_vol.vtu");
-  std::string sur_file_in("./inflow_vol.vtp");
-  std::string sur_file_wall("./wall_vol.vtp");
-  std::string sur_file_out_base("./outflow_vol_");
+  string geo_file("./whole_vol.vtu");
+  string sur_file_in("./inflow_vol.vtp");
+  string sur_file_wall("./wall_vol.vtp");
+  string sur_file_out_base("./outflow_vol_");
 
   // Mesh partition setting
   int cpu_size = 1;
@@ -69,27 +69,27 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionString("-sur_file_wall", sur_file_wall);
   SYS_T::GetOptionString("-sur_file_out_base", sur_file_out_base);
 
-  if( elemType != 501 && elemType !=502 ) SYS_T::print_fatal("Error: unknown element type.\n");
+  if( elemType != 501 && elemType !=502 ) SYS_T::print_fatal("ERROR: unknown element type.\n");
 
   // Print the command line arguments
-  std::cout<<"==== Command Line Arguments ===="<<std::endl;
-  std::cout<<" -elem_type: "<<elemType<<std::endl;
-  std::cout<<" -num_outlet: "<<num_outlet<<std::endl;
-  std::cout<<" -geo_file: "<<geo_file<<std::endl;
-  std::cout<<" -sur_file_in: "<<sur_file_in<<std::endl;
-  std::cout<<" -sur_file_wall: "<<sur_file_wall<<std::endl;
-  std::cout<<" -sur_file_out_base: "<<sur_file_out_base<<std::endl;
-  std::cout<<" -part_file: "<<part_file<<std::endl;
-  std::cout<<" -cpu_size: "<<cpu_size<<std::endl;
-  std::cout<<" -in_ncommon: "<<in_ncommon<<std::endl;
-  std::cout<<" -isDualGraph: true \n";
-  std::cout<<"---- Problem definition ----\n";
-  std::cout<<" dofNum: "<<dofNum<<std::endl;
-  std::cout<<" dofMat: "<<dofMat<<std::endl;
-  std::cout<<"====  Command Line Arguments/ ===="<<std::endl;
+  cout<<"==== Command Line Arguments ===="<<endl;
+  cout<<" -elem_type: "<<elemType<<endl;
+  cout<<" -num_outlet: "<<num_outlet<<endl;
+  cout<<" -geo_file: "<<geo_file<<endl;
+  cout<<" -sur_file_in: "<<sur_file_in<<endl;
+  cout<<" -sur_file_wall: "<<sur_file_wall<<endl;
+  cout<<" -sur_file_out_base: "<<sur_file_out_base<<endl;
+  cout<<" -part_file: "<<part_file<<endl;
+  cout<<" -cpu_size: "<<cpu_size<<endl;
+  cout<<" -in_ncommon: "<<in_ncommon<<endl;
+  cout<<" -isDualGraph: true \n";
+  cout<<"---- Problem definition ----\n";
+  cout<<" dofNum: "<<dofNum<<endl;
+  cout<<" dofMat: "<<dofMat<<endl;
+  cout<<"====  Command Line Arguments/ ===="<<endl;
 
   // Check if the vtu geometry files exist on disk
-  SYS_T::file_check(geo_file); std::cout<<geo_file<<" found. \n";
+  SYS_T::file_check(geo_file); cout<<geo_file<<" found. \n";
 
   // If it is quadratic mesh, the mesh file will be all in vtu format
   if(elemType == 502)
@@ -100,12 +100,12 @@ int main( int argc, char * argv[] )
     sur_file_wall += ".vtu";
   }
 
-  SYS_T::file_check(sur_file_in); std::cout<<sur_file_in<<" found. \n";
+  SYS_T::file_check(sur_file_in); cout<<sur_file_in<<" found. \n";
 
-  SYS_T::file_check(sur_file_wall); std::cout<<sur_file_wall<<" found. \n";
+  SYS_T::file_check(sur_file_wall); cout<<sur_file_wall<<" found. \n";
 
   // Generate the outlet file names and check existance
-  std::vector< std::string > sur_file_out;
+  vector< string > sur_file_out;
   sur_file_out.resize( num_outlet );
 
   for(int ii=0; ii<num_outlet; ++ii)
@@ -121,7 +121,7 @@ int main( int argc, char * argv[] )
     sur_file_out[ii] = ss.str(); // generate the outlet face file name
     
     SYS_T::file_check(sur_file_out[ii]);
-    std::cout<<sur_file_out[ii]<<" found. \n";
+    cout<<sur_file_out[ii]<<" found. \n";
   }
 
   // Record the problem setting into a HDF5 file: preprocessor_cmd.h5
@@ -145,8 +145,8 @@ int main( int argc, char * argv[] )
 
   // Read the volumetric mesh file from the vtu file: geo_file
   int nFunc, nElem;
-  std::vector<int> vecIEN;
-  std::vector<double> ctrlPts;
+  vector<int> vecIEN;
+  vector<double> ctrlPts;
   
   TET_T::read_vtu_grid(geo_file.c_str(), nFunc, nElem, ctrlPts, vecIEN);
   
@@ -181,7 +181,7 @@ int main( int argc, char * argv[] )
     global_part = new Global_Part_Serial( mesh, "epart", "npart" );
   else
   {
-    std::cerr<<"ERROR: wrong cpu_size: "<<cpu_size<<std::endl;
+    cerr<<"ERROR: wrong cpu_size: "<<cpu_size<<endl;
     exit(EXIT_FAILURE);
   }
 
@@ -190,10 +190,10 @@ int main( int argc, char * argv[] )
   mnindex->write_hdf5("node_mapping");
 
   // Setup Nodal Boundary Conditions
-  std::vector<INodalBC *> NBC_list;
+  vector<INodalBC *> NBC_list;
   NBC_list.clear(); NBC_list.resize( dofMat );
 
-  std::vector<std::string> dir_list;
+  vector<string> dir_list;
   dir_list.push_back( sur_file_in );
   dir_list.push_back( sur_file_wall );
 
@@ -213,14 +213,14 @@ int main( int argc, char * argv[] )
   }
 
   // Inflow BC info
-  std::vector<double> inflow_outward_vec;
+  vector<double> inflow_outward_vec;
   TET_T::get_out_normal( sur_file_in, ctrlPts, IEN, inflow_outward_vec );
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall,
       nFunc, inflow_outward_vec, elemType );
 
   // Setup Elemental Boundary Conditions
   // Obtain the outward normal vector
-  std::vector< std::vector<double> > outflow_outward_vec;
+  vector< vector<double> > outflow_outward_vec;
   outflow_outward_vec.resize( sur_file_out.size() );
   for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
     TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN, outflow_outward_vec[ii] );
@@ -232,8 +232,8 @@ int main( int argc, char * argv[] )
   // Start partition the mesh for each cpu_rank 
   const bool isPrintPartInfo = true;
 
-  std::vector<int> list_nlocalnode, list_nghostnode, list_ntotalnode, list_nbadnode;
-  std::vector<double> list_ratio_g2l;
+  vector<int> list_nlocalnode, list_nghostnode, list_ntotalnode, list_nbadnode;
+  vector<double> list_ratio_g2l;
 
   int sum_nghostnode = 0; // total number of ghost nodes
 
