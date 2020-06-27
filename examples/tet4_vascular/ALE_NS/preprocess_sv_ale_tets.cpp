@@ -154,7 +154,7 @@ int main( int argc, char * argv[] )
 
   // Create the global mesh
   IMesh * mesh = new Mesh_Tet4(nFunc, nElem);
-  mesh -> print_mesh_info();
+  mesh -> print_info();
 
   // Call METIS to partition the mesh
   IGlobal_Part * global_part;

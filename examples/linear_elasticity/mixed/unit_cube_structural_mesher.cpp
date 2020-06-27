@@ -139,7 +139,7 @@ int main( int argc, char * argv[] )
   IMesh * mesh_wz = new Mesh_NURBS_1Patch_3D( sDegree, tDegree, uDegree,
       hs_max, ht_max, hu_max, hs_min, ht_min, hu_min, sKnots, tKnots, uKnots );
 
-  mesh_wz->print_mesh_info();
+  mesh_wz->print_info();
 
   IIEN * IEN_wz = new IEN_NURBS_1Patch_3D_wPtr( mesh_wz );
 
@@ -151,7 +151,7 @@ int main( int argc, char * argv[] )
 
   delete mesh_wz;
 
-  mesh->print_mesh_info();
+  mesh->print_info();
 
   // Get useful hex mesh quantities
   const int nFunc = mesh -> get_nFunc();
