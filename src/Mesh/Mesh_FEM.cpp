@@ -11,7 +11,7 @@ Mesh_FEM:: ~Mesh_FEM()
 {}
 
 
-void Mesh_FEM::print_mesh_info() const
+void Mesh_FEM::print_info() const
 {
   std::cout<<'\n';
   std::cout<<"======= Mesh_FEM ======="<<std::endl;

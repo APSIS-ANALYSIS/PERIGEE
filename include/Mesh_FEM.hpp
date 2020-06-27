@@ -19,7 +19,7 @@ class Mesh_FEM : public IMesh
 
     virtual ~Mesh_FEM();
 
-    virtual void print_mesh_info() const;
+    virtual void print_info() const;
 
     virtual int get_s_degree() const {return sdeg;}
     virtual int get_t_degree() const {return tdeg;}

@@ -18,7 +18,7 @@ class Mesh_Tet10 : public IMesh
 
     virtual ~Mesh_Tet10();
 
-    virtual void print_mesh_info() const;
+    virtual void print_info() const;
 
     virtual int get_s_degree() const {return 2;}
     virtual int get_t_degree() const {return 2;}

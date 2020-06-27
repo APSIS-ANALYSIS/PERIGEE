@@ -7,7 +7,7 @@ Mesh_Tet10::Mesh_Tet10(const int &in_nfunc, const int &in_nelem)
 Mesh_Tet10::~Mesh_Tet10()
 {}
 
-void Mesh_Tet10::print_mesh_info() const
+void Mesh_Tet10::print_info() const
 {
   std::cout<<'\n';
   std::cout<<"======= Mesh_Tet10 ======="<<std::endl;

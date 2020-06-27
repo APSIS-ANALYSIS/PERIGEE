@@ -9,7 +9,7 @@ Mesh_Tet4::~Mesh_Tet4()
 {}
 
 
-void Mesh_Tet4::print_mesh_info() const
+void Mesh_Tet4::print_info() const
 {
   std::cout<<'\n';
   std::cout<<"======= Mesh_Tet4 ======="<<std::endl;
