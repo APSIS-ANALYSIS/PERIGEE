@@ -5,7 +5,6 @@
 // matrix for comparison purposes.
 //
 // Author: Ju Liu
-// Date: May 8 2020
 // ==================================================================
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "ALocal_Elem.hpp"

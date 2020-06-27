@@ -2,8 +2,6 @@
 // prepost.cpp
 //
 // This is the partitioning routine for postprocessing.
-//
-// Date: June 5 2020
 // ==================================================================
 #include "HDF5_Reader.hpp"
 #include "Tet_Tools.hpp"
