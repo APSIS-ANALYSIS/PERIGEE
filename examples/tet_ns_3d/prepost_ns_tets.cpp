@@ -94,7 +94,7 @@ int main( int argc, char * argv[] )
   }
   else SYS_T::print_fatal("ERROR: element type %d not supported.\n", elemType);
 
-  mesh -> print_mesh_info();
+  mesh -> print_info();
 
   IGlobal_Part * global_part = nullptr;
   if(cpu_size > 1)

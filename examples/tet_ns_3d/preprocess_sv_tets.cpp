@@ -169,7 +169,7 @@ int main( int argc, char * argv[] )
 
   VEC_T::clean( vecIEN ); // clean the vector
   
-  mesh -> print_mesh_info();
+  mesh -> print_info();
   
   // Call METIS to partition the mesh 
   IGlobal_Part * global_part = nullptr;

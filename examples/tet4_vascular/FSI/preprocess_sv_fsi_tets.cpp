@@ -225,7 +225,7 @@ int main( int argc, char * argv[] )
 
   // Generate the mesh
   IMesh * mesh = new Mesh_Tet4(nFunc, nElem);
-  mesh -> print_mesh_info();
+  mesh -> print_info();
 
   // Partition
   IGlobal_Part * global_part;

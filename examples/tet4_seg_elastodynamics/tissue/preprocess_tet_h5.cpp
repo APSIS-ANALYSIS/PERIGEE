@@ -175,7 +175,7 @@ int main( int argc, char * argv[] )
 
   IMesh * mesh = new Mesh_FEM(nFunc, nElem, nLocBas, degree);
 
-  mesh -> print_mesh_info();
+  mesh -> print_info();
 
   // Call METIS for partitioning
   IGlobal_Part * global_part;

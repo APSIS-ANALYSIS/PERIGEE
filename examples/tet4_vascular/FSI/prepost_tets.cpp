@@ -104,7 +104,7 @@ int main( int argc, char * argv[] )
   std::cout<<"Solid domain number of nodes: "<<node_s.size()<<'\n';
 
   IMesh * mesh = new Mesh_Tet4(nFunc, nElem);
-  mesh -> print_mesh_info();
+  mesh -> print_info();
 
   IGlobal_Part * global_part;
   if(cpu_size > 1)
