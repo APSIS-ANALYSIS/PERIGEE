@@ -125,7 +125,7 @@ int main( int argc, char * argv[] )
   TET_T::tetmesh_check(ctrlPts, IEN, nElem, 3.5);
 
   IMesh * mesh = new Mesh_Tet4(nFunc, nElem);
-  mesh -> print_mesh_info();
+  mesh -> print_info();
 
   // Call METIS to partition the grid
   IGlobal_Part * global_part;
