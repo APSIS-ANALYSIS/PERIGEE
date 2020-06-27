@@ -23,7 +23,7 @@ class IMesh
     
     virtual ~IMesh(){};
 
-    virtual void print_mesh_info() const = 0;
+    virtual void print_info() const = 0;
 
     virtual int get_s_degree() const = 0;
     virtual int get_t_degree() const = 0;

@@ -125,8 +125,7 @@ int main( int argc, char * argv[] )
   }
 
   // Record the problem setting into a HDF5 file: preprocessor_cmd.h5
-  hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5",
-      H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+  hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
   HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
 
   cmdh5w->write_intScalar("num_outlet", num_outlet);
@@ -168,7 +167,7 @@ int main( int argc, char * argv[] )
     mesh = new Mesh_Tet10(nFunc, nElem);
   }
 
-  VEC_T::clean( vecIEN );
+  VEC_T::clean( vecIEN ); // clean the vector
   
   mesh -> print_mesh_info();
   
@@ -185,7 +184,7 @@ int main( int argc, char * argv[] )
   Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, mesh->get_nFunc());
   mnindex->write_hdf5("node_mapping");
 
-  // Setup Nodal Boundary Conditions
+  // Setup Nodal i.e. Dirichlet type Boundary Conditions
   std::vector<INodalBC *> NBC_list;
   NBC_list.clear(); NBC_list.resize( dofMat );
 
@@ -265,6 +264,7 @@ int main( int argc, char * argv[] )
 
     ebcpart -> write_hdf5( part_file.c_str() );
 
+    // Collect partition statistics
     list_nlocalnode.push_back(part->get_nlocalnode());
     list_nghostnode.push_back(part->get_nghostnode());
     list_ntotalnode.push_back(part->get_ntotalnode());
@@ -299,8 +299,7 @@ int main( int argc, char * argv[] )
   cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<endl;
 
   // Finalize the code and exit
-  for(auto it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc)
-    delete *it_nbc;
+  for(auto it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc) delete *it_nbc;
 
   delete InFBC; delete ebc; delete mytimer;
   delete mnindex; delete global_part; delete mesh; delete IEN;
