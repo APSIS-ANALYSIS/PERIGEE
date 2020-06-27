@@ -185,7 +185,7 @@ double Mesh_NURBS_1Patch_3D::get_hz( int ee) const
   return hz[ez];
 }
 
-void Mesh_NURBS_1Patch_3D::print_mesh_info() const
+void Mesh_NURBS_1Patch_3D::print_info() const
 {
   std::cout<<std::endl;
   std::cout<<"====== Mesh_NURBS_1Patch_3D ======"<<std::endl;

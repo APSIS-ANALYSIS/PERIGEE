@@ -100,7 +100,7 @@ double Mesh_NURBS_1Patch_2D::get_hz( int ee ) const
 }
 
 
-void Mesh_NURBS_1Patch_2D::print_mesh_info() const
+void Mesh_NURBS_1Patch_2D::print_info() const
 {
   std::cout<<std::endl;
   std::cout<<"====== Mesh_NURBS_1Patch_2D ======"<<std::endl;

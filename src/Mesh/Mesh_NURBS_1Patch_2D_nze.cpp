@@ -56,12 +56,10 @@ Mesh_NURBS_1Patch_2D_nze::Mesh_NURBS_1Patch_2D_nze( IMesh const * const &inmesh 
 }
 
 
-
 Mesh_NURBS_1Patch_2D_nze::~Mesh_NURBS_1Patch_2D_nze()
 {
   std::cout<<"-- Mesh_NURBS_1Patch_2D_nze deleted. \n";
 }
-
 
 
 void Mesh_NURBS_1Patch_2D_nze::get_elem_index( const int &ee,
@@ -70,7 +68,6 @@ void Mesh_NURBS_1Patch_2D_nze::get_elem_index( const int &ee,
   ex = ee % nElem_x;
   ey = (ee - ex) / nElem_x;
 }
-
 
 
 double Mesh_NURBS_1Patch_2D_nze::get_hx( int ee ) const
@@ -97,7 +94,7 @@ double Mesh_NURBS_1Patch_2D_nze::get_hz( int ee ) const
 }
 
 
-void Mesh_NURBS_1Patch_2D_nze::print_mesh_info() const
+void Mesh_NURBS_1Patch_2D_nze::print_info() const
 {
   std::cout<<std::endl;
   std::cout<<"====== Mesh_NURBS_1Patch_2D ======"<<std::endl;
@@ -114,6 +111,5 @@ void Mesh_NURBS_1Patch_2D_nze::print_mesh_info() const
   std::cout<<"Start function: "<<get_nFunc_start()<<std::endl;
   std::cout<<"=================================="<<std::endl;
 }
-
 
 // EOF
