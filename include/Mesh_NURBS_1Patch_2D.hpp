@@ -15,7 +15,7 @@ class Mesh_NURBS_1Patch_2D : public IMesh
 
     virtual ~Mesh_NURBS_1Patch_2D();
 
-    virtual void print_mesh_info() const;
+    virtual void print_info() const;
     
     virtual int get_s_degree() const {return s_degree;}
     virtual int get_t_degree() const {return t_degree;}
