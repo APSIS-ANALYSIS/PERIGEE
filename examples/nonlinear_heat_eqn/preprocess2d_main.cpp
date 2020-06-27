@@ -184,7 +184,7 @@ int main(int argc, char * argv[])
   Mesh = new Mesh_NURBS_1Patch_2D( sDegree, tDegree,
       hs_max, ht_max, hs_min, ht_min, sKnots, tKnots );
 
-  Mesh->print_mesh_info();
+  Mesh->print_info();
 
   // IEN array
   IIEN * IEN;

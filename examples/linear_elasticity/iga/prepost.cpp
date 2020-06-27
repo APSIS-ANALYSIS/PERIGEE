@@ -180,7 +180,7 @@ int main( int argc, char * argv[] )
     delete check_reader;
   }
 
-  Mesh->print_mesh_info();
+  Mesh->print_info();
 
   IGlobal_Part * global_part;
   if(cpu_size > 1)

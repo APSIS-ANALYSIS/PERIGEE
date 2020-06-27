@@ -222,7 +222,7 @@ int main(int argc, char *argv[])
     delete check_reader;
   }
 
-  Mesh->print_mesh_info();
+  Mesh->print_info();
 
   // Generate global mesh partition files
   IGlobal_Part * global_part;

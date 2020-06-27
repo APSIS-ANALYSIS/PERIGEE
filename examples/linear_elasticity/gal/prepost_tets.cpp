@@ -95,7 +95,7 @@ int main( int argc, char * argv[] )
   VEC_T::clean(vecIEN);
 
   IMesh * mesh = new Mesh_Tet4(nFunc, nElem);
-  mesh -> print_mesh_info();
+  mesh -> print_info();
 
   IGlobal_Part * global_part;
   if(cpu_size > 1)
