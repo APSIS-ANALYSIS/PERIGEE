@@ -53,7 +53,6 @@ Vector_3 operator+( const Vector_3 &left, const Vector_3 &right )
   return result;
 }
 
-
 Vector_3 operator-( const Vector_3 &left, const Vector_3 &right )
 {
   Vector_3 result;
@@ -136,10 +135,33 @@ void Vector_3::scale( const double &val )
 }
 
 
+void Vector_3::normalize()
+{
+  const double len = norm2();
+  scale(1.0/len);
+}
+
+
 double Vector_3::dot_product( const Vector_3 &source ) const
 {
   return vec[0]*source(0) + vec[1]*source(1) + vec[2]*source(2);
 }
 
+
+double dot_product( const Vector_3 &a, const Vector_3 &b )
+{
+  return a(0)*b(0) + a(1)*b(1) + a(2)*b(2);
+}
+
+
+Vector_3 cross_product( const Vector_3 &a, const Vector_3 &b )
+{
+  Vector_3 result;
+  result.vec[0] = a(1) * b(2) - a(2) * b(1);
+  result.vec[1] = a(2) * b(0) - a(0) * b(2);
+  result.vec[2] = a(0) * b(1) - a(1) * b(0);
+
+  return result;
+}
 
 // EOF
