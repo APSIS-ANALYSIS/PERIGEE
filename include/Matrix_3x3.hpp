@@ -185,8 +185,30 @@ class Matrix_3x3
     // print the matrix
     void print() const;
 
+    // Eigen decomposition of the matrix M = eta1 v1 v1T + eta2 v2 v2T + eta3 v3
+    // v3T. The algorithm is based on CMAME 197 2008 4007-4015 paper by
+    // W.M. Scherzinger and C.R. Dohrmann
+    void eigen_decomp( double &eta1, double &eta2, double &eta3,
+       Vector_3 &v1, Vector_3 &v2, Vector_3 &v3 ) const;
+
   private:
     double mat[9];
+
+    // Find the eignevector correspond to a eigenvalue
+    // This implements the algorithm documented in
+    // CMAME 2008 v197 4007-4015, sec 2.4
+    // It will return an eigenvector v for this eigenvalue,
+    // and two additional vectors s1 s2; v-s1-s2 forms a orthonormal basis.
+    void find_eigen_vector( const double &eta, Vector_3 &v,
+        Vector_3 &s1, Vector_3 &s2 ) const;
+
+    // Return the deviatoric component's contraction scaled by 0.5.
+    // M' = M - 0.3333 tr(M) I, return 0.5 M : M.
+    double J2() const;
+
+    // Return the determinant of the deviatoric component.
+    // M' = M - 0.3333 tr(M) I, return det(M').
+    double J3() const;
 };
 
 #endif

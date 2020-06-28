@@ -96,7 +96,7 @@ Vector_3& Vector_3::operator*=( const double &val )
 
 void Vector_3::print() const
 {
-  std::cout<<std::setprecision(9)<<vec[0]<<'\t'<<vec[1]<<'\t'<<vec[2]<<std::endl;
+  std::cout<<std::setprecision(12)<<vec[0]<<'\t'<<vec[1]<<'\t'<<vec[2]<<std::endl;
 }
 
 
