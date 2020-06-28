@@ -135,6 +135,14 @@ void Vector_3::scale( const double &val )
 }
 
 
+void Vector_3::AXPY( const double &val, const Vector_3 &source )
+{
+  vec[0] += val * source(0);
+  vec[1] += val * source(1);
+  vec[2] += val * source(2);
+}
+
+
 void Vector_3::normalize()
 {
   const double len = norm2();
