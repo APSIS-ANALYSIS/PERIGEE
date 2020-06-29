@@ -518,54 +518,64 @@ void Matrix_3x3::eigen_decomp( double &eta1, double &eta2, double &eta3,
   else
   {
     const double mJ3 = J3();
-    
-    // Find the angle pincipal value
-    const double alpha = acos( 0.5*mJ3*std::pow(3.0/mJ2, 1.5) ) * frac13;
-    
-    // Find the most distinct eigenvalue as eta1
-    if( alpha <= PI*frac13*0.5 ) eta1 = val * cos(alpha); 
-    else eta1 = val * cos(alpha + 4.0*PI*frac13);
-    
-    // v1 is determined, v2 and v3 are used to hold s1 s2 for now
-    find_eigen_vector(eta1, v1, v2, v3);
-  
-    // Form the reduced matrix
-    const double A22 = VecMatVec(v2,v2) - frac13_tr * dot_product(v2, v2);
-    const double A23 = VecMatVec(v2,v3) - frac13_tr * dot_product(v2, v3);
-    const double A33 = VecMatVec(v3,v3) - frac13_tr * dot_product(v3, v3);
-  
-    const double diff_2233 = A22 - A33;
-    if( diff_2233 >= 0.0 )
-      eta2 = 0.5 * ( (A22+A33) - std::sqrt( diff_2233 * diff_2233 + 4.0*A23*A23 ) );
-    else
-      eta2 = 0.5 * ( (A22+A33) + std::sqrt( diff_2233 * diff_2233 + 4.0*A23*A23 ) );
- 
-    eta3 = A22 + A33 - eta2;
 
-    // Now form u1 and u2
-    // u1 = (A - 0.333 tr - eta2 ) s1
-    // u2 = (A - 0.333 tr - eta2 ) s2
-    Vector_3 temp; temp.copy(v2);
-    VecMult(v2); v2.AXPY( -1.0*(frac13_tr + eta2), temp );
+    const double val_cos = 0.5*mJ3*std::pow(3.0/mJ2, 1.5);
 
-    temp.copy(v3);
-    VecMult(v3); v3.AXPY( -1.0*(frac13_tr + eta2), temp );
+    if( val_cos > -1.0 && val_cos < 1.0 )
+    { 
+      // Find the angle pincipal value
+      const double alpha = acos( val_cos ) * frac13;
 
-    if( v2.norm2() >= v3.norm2() )
-    {
-      v2.normalize(); // w1 
-      v2 = cross_product( v1, v2 ); // v2 = w1 x v1
-      v3 = cross_product( v1, v2 ); // v3 = v1 x v2
+      // Find the most distinct eigenvalue as eta1
+      if( alpha <= PI*frac13*0.5 ) eta1 = val * cos(alpha); 
+      else eta1 = val * cos(alpha + 4.0*PI*frac13);
+
+      // v1 is determined, v2 and v3 are used to hold s1 s2 for now
+      find_eigen_vector(eta1, v1, v2, v3);
+
+      // Form the reduced matrix
+      const double A22 = VecMatVec(v2,v2) - frac13_tr * dot_product(v2, v2);
+      const double A23 = VecMatVec(v2,v3) - frac13_tr * dot_product(v2, v3);
+      const double A33 = VecMatVec(v3,v3) - frac13_tr * dot_product(v3, v3);
+
+      const double diff_2233 = A22 - A33;
+      if( diff_2233 >= 0.0 )
+        eta2 = 0.5 * ( (A22+A33) - std::sqrt( diff_2233 * diff_2233 + 4.0*A23*A23 ) );
+      else
+        eta2 = 0.5 * ( (A22+A33) + std::sqrt( diff_2233 * diff_2233 + 4.0*A23*A23 ) );
+
+      eta3 = A22 + A33 - eta2;
+
+      // Now form u1 and u2
+      // u1 = (A - 0.333 tr - eta2 ) s1
+      // u2 = (A - 0.333 tr - eta2 ) s2
+      Vector_3 temp; temp.copy(v2);
+      VecMult(v2); v2.AXPY( -1.0*(frac13_tr + eta2), temp );
+
+      temp.copy(v3);
+      VecMult(v3); v3.AXPY( -1.0*(frac13_tr + eta2), temp );
+
+      if( v2.norm2() >= v3.norm2() )
+      {
+        v2.normalize(); // w1 
+        v2 = cross_product( v1, v2 ); // v2 = w1 x v1
+        v3 = cross_product( v1, v2 ); // v3 = v1 x v2
+      }
+      else
+      {
+        v3.normalize(); // w1 
+        v2 = cross_product( v1, v3 ); // v2 = w1 x v1
+        v3 = cross_product( v1, v2 ); // v3 = v1 x v2
+      }
+
+      // Shift back from deviatoric to the original matrix eigenvalues
+      eta1 += frac13_tr; eta2 += frac13_tr; eta3 += frac13_tr;
     }
     else
     {
-      v3.normalize(); // w1 
-      v2 = cross_product( v1, v3 ); // v2 = w1 x v1
-      v3 = cross_product( v1, v2 ); // v3 = v1 x v2
+      eta1 = frac13_tr; eta2 = eta1; eta3 = eta1;
+      v1.gen_e1(); v2.gen_e2(); v3.gen_e3();
     }
-
-    // Shift back from deviatoric to the original matrix eigenvalues
-    eta1 += frac13_tr; eta2 += frac13_tr; eta3 += frac13_tr;
   }
 }
 
