@@ -188,7 +188,11 @@ class Matrix_3x3
     // Eigen decomposition of the matrix M = eta1 v1 v1T + eta2 v2 v2T + eta3 v3
     // v3T. The algorithm is based on CMAME 197 2008 4007-4015 paper by
     // W.M. Scherzinger and C.R. Dohrmann
-    void eigen_decomp( double &eta1, double &eta2, double &eta3,
+    // return 1 if the three eigenvalues are the same
+    // return 2 if there are two identical eigenvalues, the most distinct one is
+    // eta_1 and eta_1's associated eigenvector is v1
+    // return 3 if all three are distinct
+    int eigen_decomp( double &eta1, double &eta2, double &eta3,
        Vector_3 &v1, Vector_3 &v2, Vector_3 &v3 ) const;
 
   private:
