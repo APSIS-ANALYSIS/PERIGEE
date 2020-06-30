@@ -1,10 +1,14 @@
 // ==================================================================
 // preprocess_sv_tets.cpp
 //
-// This is a preprocessor code for handling CMM-FSI problem 
+// This is a preprocessor code for handling Navier-Stokes equations 
 // discretized by tetradedral elements.
 //
-// Date Created: June 26 2020
+// To Do: 1. Restrict the element choice;
+//        2. Modify the Dirichlet boundary condition (done);
+//        3. Add an element boundary condition for the wall.
+//
+// Date Created: Jan 01 2020
 // ==================================================================
 #include "Math_Tools.hpp"
 #include "Mesh_Tet4.hpp"
@@ -125,8 +129,7 @@ int main( int argc, char * argv[] )
   }
 
   // Record the problem setting into a HDF5 file: preprocessor_cmd.h5
-  hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5",
-      H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+  hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
   HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
 
   cmdh5w->write_intScalar("num_outlet", num_outlet);
@@ -168,7 +171,7 @@ int main( int argc, char * argv[] )
     mesh = new Mesh_Tet10(nFunc, nElem);
   }
 
-  VEC_T::clean( vecIEN );
+  VEC_T::clean( vecIEN ); // clean the vector
   
   mesh -> print_info();
   
@@ -185,13 +188,12 @@ int main( int argc, char * argv[] )
   Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, mesh->get_nFunc());
   mnindex->write_hdf5("node_mapping");
 
-  // Setup Nodal Boundary Conditions
+  // Setup Nodal i.e. Dirichlet type Boundary Conditions
   std::vector<INodalBC *> NBC_list;
   NBC_list.clear(); NBC_list.resize( dofMat );
 
   std::vector<std::string> dir_list;
   dir_list.push_back( sur_file_in );
-  dir_list.push_back( sur_file_wall );
 
   if(elemType == 501)
   {
@@ -224,7 +226,13 @@ int main( int argc, char * argv[] )
   ElemBC * ebc = new ElemBC_3D_tet_outflow( sur_file_out, outflow_outward_vec, elemType );
 
   ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
- 
+
+  // Wall mesh is set as an elemental bc.
+  // std::vector< std::string > sur_file_wall_list; sur_file_wall_list.clear();
+  // sur_file_wall_list.push_back( sur_file_wall );
+  // ElemBC * wall_bc = new ElemBC_3D_tet( sur_file_wall_list );
+  // wall_bc -> resetTriIEN_outwardnormal( IEN );
+
   // Start partition the mesh for each cpu_rank 
   const bool isPrintPartInfo = true;
 
@@ -265,6 +273,11 @@ int main( int argc, char * argv[] )
 
     ebcpart -> write_hdf5( part_file.c_str() );
 
+    // Partition Elemental Wall BC and write it to h5 file
+    // IEBC_Partition * wbcpart = new EBC_Partition_vtp(part, mnindex, wall_bc );
+    // wbcpart -> write_hdf5( part_file.c_str() );
+
+    // Collect partition statistics
     list_nlocalnode.push_back(part->get_nlocalnode());
     list_nghostnode.push_back(part->get_nghostnode());
     list_ntotalnode.push_back(part->get_ntotalnode());
@@ -272,7 +285,8 @@ int main( int argc, char * argv[] )
     list_ratio_g2l.push_back((double)part->get_nghostnode()/(double) part->get_nlocalnode());
 
     sum_nghostnode += part->get_nghostnode();
-    delete part; delete nbcpart; delete infpart; delete ebcpart; 
+    delete part; delete nbcpart; delete infpart; delete ebcpart;
+    // delete wbcpart; 
   }
 
   cout<<"\n===> Mesh Partition Quality: "<<endl;
@@ -299,10 +313,9 @@ int main( int argc, char * argv[] )
   cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<endl;
 
   // Finalize the code and exit
-  for(auto it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc)
-    delete *it_nbc;
+  for(auto it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc) delete *it_nbc;
 
-  delete InFBC; delete ebc; delete mytimer;
+  delete InFBC; delete ebc; delete mytimer; // delete wall_bc;
   delete mnindex; delete global_part; delete mesh; delete IEN;
   PetscFinalize();
   return EXIT_SUCCESS;
