@@ -79,7 +79,7 @@ int main( int argc, char * argv[] )
   std::vector<double> ctrlPts;
 
   // Check if the given geo file exist
-  SYS_T::file_exist_check( geo_file.c_str() );
+  SYS_T::file_check( geo_file.c_str() );
 
   TET_T::read_vtu_grid(geo_file.c_str(), nFunc, nElem, ctrlPts, vecIEN);
 

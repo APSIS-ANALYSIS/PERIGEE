@@ -286,13 +286,13 @@ int main(int argc, char *argv[])
     initial_step  = restart_step;
 
     // Read sol file
-    SYS_T::file_exist_check(restart_name.c_str());
+    SYS_T::file_check(restart_name.c_str());
     sol->ReadBinary(restart_name.c_str());
 
     // Read dot_sol file
     std::string restart_dot_name = "dot_";
     restart_dot_name.append(restart_name);
-    SYS_T::file_exist_check(restart_dot_name.c_str());
+    SYS_T::file_check(restart_dot_name.c_str());
     dot_sol->ReadBinary(restart_dot_name.c_str());
 
     SYS_T::commPrint("===> Read sol from disk as a restart run... \n");

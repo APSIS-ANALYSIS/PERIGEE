@@ -237,7 +237,7 @@ int main(int argc, char *argv[])
     initial_time  = restart_time;
     initial_step  = restart_step;
 
-    SYS_T::file_exist_check(restart_name.c_str());
+    SYS_T::file_check(restart_name.c_str());
 
     sol->ReadBinary(restart_name.c_str());
     PetscPrintf(PETSC_COMM_WORLD, "===> Read sol from disk as a restart run... \n");

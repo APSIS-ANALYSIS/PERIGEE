@@ -70,7 +70,7 @@ int main( int argc, char * argv[] )
   std::vector<int> vecIEN, phy_tag;
   std::vector<double> ctrlPts;
 
-  SYS_T::file_exist_check( geo_file.c_str() );
+  SYS_T::file_check( geo_file.c_str() );
   TET_T::read_vtu_grid(geo_file.c_str(), nFunc, nElem, ctrlPts, vecIEN, phy_tag);
 
   if(int(vecIEN.size()) != nElem * 4) SYS_T::print_fatal("Error: the IEN from geo_file does not match the given number of element. \n");

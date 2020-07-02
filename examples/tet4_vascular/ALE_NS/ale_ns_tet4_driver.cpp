@@ -248,7 +248,7 @@ int main(int argc, char *argv[])
     initial_step  = restart_step;
 
     // Read sol file
-    SYS_T::file_exist_check(restart_name.c_str());
+    SYS_T::file_check(restart_name.c_str());
     sol->ReadBinary(restart_name.c_str());
    
     // generate the corresponding dot_sol file name 
@@ -256,7 +256,7 @@ int main(int argc, char *argv[])
     restart_dot_name.append(restart_name);
 
     // Read dot_sol file
-    SYS_T::file_exist_check(restart_dot_name.c_str());
+    SYS_T::file_check(restart_dot_name.c_str());
     dot_sol->ReadBinary(restart_dot_name.c_str());
     
     PetscPrintf(PETSC_COMM_WORLD, "===> Read sol from disk as a restart run... \n");
