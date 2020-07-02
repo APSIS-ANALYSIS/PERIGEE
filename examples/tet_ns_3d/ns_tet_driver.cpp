@@ -82,11 +82,10 @@ int main(int argc, char *argv[])
   double restart_step = 1.0e-3; // restart simulation time step size
   std::string restart_name = "SOL_"; // restart solution base name
 
-  PetscMPIInt rank, size;
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
-  MPI_Comm_size(PETSC_COMM_WORLD, &size);
-  MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
+  PetscMPIInt rank = SYS_T::get_MPI_rank();
+  PetscMPIInt size = SYS_T::get_MPI_size();
 
   SYS_T::print_perigee_art();
 

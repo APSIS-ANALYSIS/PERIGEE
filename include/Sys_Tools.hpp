@@ -19,6 +19,20 @@ namespace SYS_T
   // Print ASCII art fonts
   void print_perigee_art();
 
+  inline PetscMPIInt get_MPI_rank()
+  {
+    PetscMPIInt rank;
+    MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
+    return rank;
+  }
+
+  inline PetscMPIInt get_MPI_size()
+  {
+    PetscMPIInt size;
+    MPI_Comm_size(PETSC_COMM_WORLD, &size);
+    return size;
+  }
+
   // ================================================================
   // The following tools are used in preprocessors.
   // ================================================================
@@ -43,7 +57,7 @@ namespace SYS_T
       int& uDegree, int& numCPts,
       std::vector<double>& ctrlPts );
 
-  
+
   // ----------------------------------------------------------------
   // ! get_genbc_file_type : read the genbc file and determine what
   //   type of gen bc the file specifies. It will return   
@@ -155,7 +169,7 @@ namespace SYS_T
   //       {gen_randomD_xxx(...); ...}
   // ----------------------------------------------------------------
   double gen_randomD_closed( const double &min, const double &max );
-  
+
   double gen_randomD_open( const double &min, const double &max );
 
   int gen_randomI_closed( const int &min, const int &max );
