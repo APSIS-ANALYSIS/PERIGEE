@@ -13,7 +13,6 @@
 #include <vector>
 #include <ctime>
 #include "petsc.h"
-#include "./petsc/private/petscimpl.h"
 
 namespace SYS_T
 {
