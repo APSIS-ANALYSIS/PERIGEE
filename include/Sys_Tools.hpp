@@ -93,21 +93,12 @@ namespace SYS_T
 
 
   // ----------------------------------------------------------------
-  // file_exist_check()
-  // a void function that check if the given file name exists. If the 
-  // file name given does not exist, kill the run immediately.
-  // ----------------------------------------------------------------
-  void file_exist_check(const char * const &file_name);
-
-
-  // ----------------------------------------------------------------
   // Check if a file exists. If a file cannot be found, throw an error
   // message and exit code
   // ----------------------------------------------------------------
   inline void file_check( const std::string &fName )
   {
-    if( FILE *ff = fopen(fName.c_str(), "r") )
-      fclose(ff);
+    if( FILE *ff = fopen(fName.c_str(), "r") ) fclose(ff);
     else
     {
       PetscPrintf(PETSC_COMM_WORLD, "Error: The file %s does not exist. Job is killed. \n", fName.c_str());

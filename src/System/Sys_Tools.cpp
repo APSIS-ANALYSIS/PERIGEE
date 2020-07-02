@@ -371,24 +371,6 @@ int SYS_T::readKnotVector(std::istringstream& sstrm,
 };
 
 
-
-void SYS_T::file_exist_check(const char * const &file_name)
-{
-  std::ifstream f(file_name);
-  if(!f.is_open())
-  {
-    f.close();
-    PetscPrintf(PETSC_COMM_WORLD, "Error: The file %s does not exist. Job is killed. \n",
-        file_name);
-    MPI_Abort(PETSC_COMM_WORLD, 1);
-  }
-  else
-  {
-    f.close();
-  }
-}
-
-
 double SYS_T::gen_randomD_closed(const double &min, const double &max)
 {
   return ( rand() % 1000001 ) * 1.0e-6 * (max - min) + min;
@@ -404,7 +386,6 @@ int SYS_T::gen_randomI_closed(const int &min, const int &max)
 {
   return ( rand() % (max - min + 1)) + min;
 }
-
 
 
 void SYS_T::print_MaxMemUsage()

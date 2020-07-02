@@ -67,7 +67,7 @@ int main( int argc, char * argv[] )
   cout<<"elemType: "<<elemType<<endl;
   cout<<"==== Command Line Arguments ===="<<endl;
   
-  SYS_T::file_exist_check( geo_file.c_str() );
+  SYS_T::file_check( geo_file.c_str() );
   int nFunc, nElem, nLocBas;
   std::vector<int> vecIEN;
   std::vector<double> ctrlPts;

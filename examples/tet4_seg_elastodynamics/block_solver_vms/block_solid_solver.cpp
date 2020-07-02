@@ -204,9 +204,9 @@ int main( int argc, char * argv[] )
     initial_time  = restart_time;
     initial_step  = restart_step;
 
-    SYS_T::file_exist_check(restart_d_name.c_str());
-    SYS_T::file_exist_check(restart_p_name.c_str());
-    SYS_T::file_exist_check(restart_v_name.c_str());
+    SYS_T::file_check(restart_d_name.c_str());
+    SYS_T::file_check(restart_p_name.c_str());
+    SYS_T::file_check(restart_v_name.c_str());
 
     disp->ReadBinary(restart_d_name.c_str());
     pres->ReadBinary(restart_p_name.c_str());
