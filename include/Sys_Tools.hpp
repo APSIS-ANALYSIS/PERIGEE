@@ -116,7 +116,7 @@ namespace SYS_T
     }
   }
 
-  inline bool is_file_exist( const std::string &fName )
+  inline bool file_exist( const std::string &fName )
   {
     if( FILE *ff = fopen(fName.c_str(), "r") )
     {
