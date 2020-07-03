@@ -21,7 +21,6 @@ class HDF5_Reader
     // --------------------------------------------------------------
     HDF5_Reader( const hid_t &in_file_id );
     
-    
     // --------------------------------------------------------------
     // ! ~HDF5_Reader : Destructor.
     // --------------------------------------------------------------
@@ -40,12 +39,14 @@ class HDF5_Reader
     int read_intScalar( const char * const &group_name,
         const char * const &data_name ) const;
 
+    
     // --------------------------------------------------------------
     // !read_doubleScalar: return the double scalar data by specifing 
     //                  its group_name with data_name.
     // --------------------------------------------------------------
     double read_doubleScalar( const char * const &group_name,
         const char * const &data_name ) const;
+
 
     // --------------------------------------------------------------
     // ! read_intVector: output the 1D integer array data into 
@@ -55,6 +56,14 @@ class HDF5_Reader
         const char * const &data_name,
         std::vector<int> &out ) const;
 
+    std::vector<int> read_intVector( const char * const &group_name,
+        const char * const &data_name ) const
+    {
+      std::vector<int> out;
+      read_intVector( group_name, data_name, out );
+      return out;
+    }
+    
     // --------------------------------------------------------------
     // ! read_doubleVector: output the 1D integer array data into 
     //                      vector<double>.
@@ -62,6 +71,14 @@ class HDF5_Reader
     void read_doubleVector( const char * const &group_name, 
         const char * const &data_name,
         std::vector<double> &out ) const;
+
+    std::vector<double> read_doubleVector( const char * const &group_name,
+        const char * const &data_name ) const
+    {
+      std::vector<double> out;
+      read_doubleVector(group_name, data_name, out);
+      return out;
+    }
 
     // --------------------------------------------------------------
     // ! read_intMatrix : output a 2D integer Matrix into vector<int>,
@@ -72,6 +89,7 @@ class HDF5_Reader
         const char * const &data_name,
         std::vector<int> &out, int &num_row, int &num_col ) const;
 
+
     // --------------------------------------------------------------
     // ! read_doubleMatrix : output a 2D double Matrix into 
     //                       vector<double>, with size num_row x num_col. 
@@ -80,6 +98,7 @@ class HDF5_Reader
     void read_doubleMatrix( const char * const &group_name,
         const char * const &data_name,
         std::vector<double> &out, int &num_row, int &num_col ) const;
+
 
     // --------------------------------------------------------------
     // ! read_intArray
@@ -105,6 +124,7 @@ class HDF5_Reader
         const char * const &data_name,
         hid_t &data_rank, hsize_t * &data_dims, int * &data  ) const;
 
+
     // --------------------------------------------------------------
     // ! read_doubleArray
     //   This is the read function that will read from the file 
@@ -128,6 +148,7 @@ class HDF5_Reader
     void read_doubleArray(const char * const &group_name, 
         const char * const &data_name,
         hid_t &data_rank, hsize_t * &data_dims, double * &data  ) const;
+
   
     // --------------------------------------------------------------
     // ! read_string
@@ -140,6 +161,14 @@ class HDF5_Reader
     void read_string( const char * const &group_name,
         const char * const &data_name,
         std::string &string_out ) const;
+
+    std::string read_string( const char * const &group_name,
+        const char * const &data_name ) const
+    {
+      std::string output;
+      read_string( group_name, data_name, output );
+      return output;
+    }
 
   private:
     const hid_t file_id;
