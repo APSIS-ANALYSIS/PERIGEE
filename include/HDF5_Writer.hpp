@@ -92,7 +92,6 @@ class HDF5_Writer
         const char * const &data_name, const int * const &value, 
         const int &length ) const;
     
-
     // --- write an int array with given length and saved as /data_name
     void write_intVector( const char * const &data_name, 
         const int * const &value, const int &length ) const;
