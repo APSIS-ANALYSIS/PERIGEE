@@ -1,7 +1,7 @@
 #include "QuadPts_Gauss.hpp"
 
 QuadPts_Gauss::QuadPts_Gauss( const int &in_num_pts )
-  : num_pts(in_num_pts)
+: num_pts(in_num_pts)
 {
   switch( num_pts )
   {
@@ -140,15 +140,17 @@ QuadPts_Gauss::QuadPts_Gauss( const int &in_num_pts )
       qw.push_back(0.033335672154344);
       break;
 
-
     default:
       compute_npts();
       break;
   }
   VEC_T::shrink2fit(qp);
   VEC_T::shrink2fit(qw);
-}
 
+  // Reverse the points and weights to make them in ascending order
+  std::reverse(qp.begin(), qp.end());
+  std::reverse(qw.begin(), qw.end());
+}
 
 
 QuadPts_Gauss::~QuadPts_Gauss()
