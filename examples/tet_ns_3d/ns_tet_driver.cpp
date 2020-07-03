@@ -179,6 +179,9 @@ int main(int argc, char *argv[])
     cmdh5w->write_doubleScalar("fl_density", fluid_density);
     cmdh5w->write_doubleScalar("fl_mu", fluid_mu);
     cmdh5w->write_doubleScalar("init_step", initial_step);
+    cmdh5w->write_intScalar("sol_record_freq", sol_record_freq);
+    cmdh5w->write_string("inflow_file", inflow_file);
+    cmdh5w->write_string("lpn_file", lpn_file);
 
     delete cmdh5w; H5Fclose(cmd_file_id);
   }
