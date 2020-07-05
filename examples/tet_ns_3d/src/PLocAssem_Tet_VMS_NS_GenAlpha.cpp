@@ -717,8 +717,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
 
   Zero_Tangent_Residual();
 
-  Zero_Sub_Tan();
-
   for(int qua=0; qua<nqp; ++qua)
   {
     double u = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
@@ -785,26 +783,10 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
 
       for(int B=0; B<nLocBas; ++B)
       {
-        const int index = A * nLocBas + B;
-        Sub_Tan[0][index]  += gwts * rho0 * NA * R[B];
-        Sub_Tan[5][index]  += gwts * rho0 * NA * R[B];
-        Sub_Tan[10][index] += gwts * rho0 * NA * R[B];
-        Sub_Tan[15][index] += gwts * rho0 * NA * R[B];
-      }
-    }
-  }
-
-  for(int ii=0; ii<4; ++ii)
-  {
-    for(int jj=0; jj<4; ++jj)
-    {
-      for(int A=0; A<nLocBas; ++A)
-      {
-        for(int B=0; B<nLocBas; ++B)
-        {
-          Tangent[ 4*nLocBas*(4*A+ii) + 4*B + jj ] =
-            Sub_Tan[ii*4+jj][A*nLocBas + B];
-        }
+        Tangent[4*nLocBas*(4*A) + 4*B] += gwts * rho0 * NA * R[B];
+        Tangent[4*nLocBas*(4*A+1) + 4*B+1] += gwts * rho0 * NA * R[B];
+        Tangent[4*nLocBas*(4*A+2) + 4*B+2] += gwts * rho0 * NA * R[B];
+        Tangent[4*nLocBas*(4*A+3) + 4*B+3] += gwts * rho0 * NA * R[B];
       }
     }
   }
