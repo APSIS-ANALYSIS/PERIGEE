@@ -113,12 +113,22 @@ class IPLocAssem_2x2Block
     // Assign all values in Tangent and Residual as 0.0.
     virtual void Zero_Tangent_Residual() = 0;
 
+    virtual void Zero_sur_Tangent_Residual()
+    {
+      SYS_T::print_fatal("Error: Zero_sur_Tangent_Residual is not implemented.\n");
+    }
+
     // Assign all values in Residual as 0.0.
     virtual void Zero_Residual() = 0;
 
+    virtual void Zero_sur_Residual()
+    {
+      SYS_T::print_fatal("Error: Zero_sur_Residual is not implemented. \n");
+    }
+
     // Generate nonzero pattern of all the sparse matrices.
     virtual void Assem_Estimate() = 0;
-   
+
     // Assembly the Residuals: Residual0 and Residual1. 
     virtual void Assem_Residual(
         const double &time, const double &dt,
