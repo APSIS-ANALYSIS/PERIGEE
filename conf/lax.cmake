@@ -3,7 +3,7 @@
 # ========================================================
 # Specify the library locations
 # ========================================================
-set(VTK_DIR /home/jliu/lib/VTK-8.1.1/lib/cmake/vtk-8.1)
+set(VTK_DIR /home/jliu/lib/VTK-8.2.0-shared/lib/cmake/vtk-8.2)
 
 if( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
   set(PETSC_DIR /home/jliu/lib/petsc-3.9.3-opt)
