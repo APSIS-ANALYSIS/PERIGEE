@@ -164,4 +164,153 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::get_DC(
   dc_tau = 0.0;
 }
 
+
+void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual(
+    const double &time, const double &dt,
+    const double * const &dot_velo,
+    const double * const &dot_pres,
+    const double * const &velo,
+    const double * const &pres,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
+{}
+
+
+void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual( 
+    const double &time, const double &dt,
+    const double * const &dot_velo,
+    const double * const &dot_pres,
+    const double * const &velo,
+    const double * const &pres,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
+{}
+
+
+void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
+    const double * const &velo,
+    const double * const &pres,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
+{}
+
+
+void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
+    const int &ebc_id,
+    const double &time, const double &dt,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
+{}
+
+
+void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
+    const int &ebc_id,
+    const double &val,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
+{}
+
+
+void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
+    const double * const &velo,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
+{}
+
+
+void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
+    const double &dt,
+    const double * const &velo,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
+{}
+
+
+double PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &velo,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
+{
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  const int face_nqp = quad -> get_num_quadPts();
+
+  double nx, ny, nz, surface_area;
+
+  double flrate = 0.0;
+
+  for(int qua =0; qua< face_nqp; ++qua)
+  {
+    element->get_R(qua, &R[0]);
+    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+
+    double u = 0.0, v = 0.0, w = 0.0;
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      u += velo[ii*3]   * R[ii];
+      v += velo[ii*3+1] * R[ii];
+      w += velo[ii*3+2] * R[ii];
+    }
+
+    flrate += surface_area * quad->get_qw(qua) * ( u * nx + v * ny + w * nz );
+  }
+
+  return flrate;
+}
+
+
+double PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::get_pressure_area( 
+    const double * const &sol,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad,
+    double &pres, double &area )
+{
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  const int face_nqp = quad -> get_num_quadPts();
+
+  double nx, ny, nz, surface_area;
+
+  pres = 0.0;
+  area = 0.0;
+
+  for(int qua =0; qua < face_nqp; ++qua)
+  {
+    element->get_R(qua, &R[0]);
+    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+
+    double pp = 0.0;
+    for(int ii=0; ii<snLocBas; ++ii) pp += sol[ii] * R[ii];
+
+    pres += surface_area * quad->get_qw(qua) * pp;
+    area += surface_area * quad->get_qw(qua);
+  }
+}
+
 // EOF
