@@ -28,10 +28,9 @@ int main( int argc, char * argv[] )
   int cpu_size = 1;
   bool isDualGraph = true;
 
-  PetscMPIInt size;
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-  MPI_Comm_size(PETSC_COMM_WORLD, &size);
-  SYS_T::print_fatal_if(size!=1, "ERROR: preprocessor is a serial program! \n");
+  
+  SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: prepost is a serial program! \n");
 
   // Read preprocessor command-line arguements recorded in the .h5 file
   hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);

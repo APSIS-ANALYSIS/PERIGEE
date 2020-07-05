@@ -40,10 +40,10 @@ int main( int argc, char * argv[] )
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
   // ===== Initialize the MPI run =====
-  PetscMPIInt rank, size;
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-  MPI_Comm_size(PETSC_COMM_WORLD, &size);
-  MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
+
+  PetscMPIInt rank = SYS_T::get_MPI_rank();
+  PetscMPIInt size = SYS_T::get_MPI_size();
 
   SYS_T::GetOptionInt("-time_start", time_start);
   SYS_T::GetOptionInt("-time_step", time_step);
