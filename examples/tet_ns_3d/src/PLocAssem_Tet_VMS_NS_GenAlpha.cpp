@@ -363,8 +363,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
   Zero_Tangent_Residual();
 
-  Zero_Sub_Tan();
-
   for(int qua=0; qua<nqp; ++qua)
   {
     double u = 0.0, u_t = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
@@ -507,7 +505,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
       for(int B=0; B<nLocBas; ++B)
       {
-        const int index = B + A * nLocBas;
         const double NB = R[B], NB_x = dR_dx[B], NB_y = dR_dy[B], NB_z = dR_dz[B];
         const double NB_xx = d2R_dxx[B], NB_yy = d2R_dyy[B], NB_zz = d2R_dzz[B];
         const double NB_lap = NB_xx + NB_yy + NB_zz;
@@ -532,29 +529,29 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
         const double drz_dw_B = rho0 * ( w_z * NB + velo_dot_gradNB ) - vis_mu * NB_lap;
 
         // Continuity equation with respect to p, u, v, w
-        Sub_Tan[0][index] += gwts * dd_dv * tau_m * (NAxNBx + NAyNBy + NAzNBz);
+        Tangent[16*nLocBas*A+4*B] += gwts * dd_dv * tau_m * (NAxNBx + NAyNBy + NAzNBz);
 
-        Sub_Tan[1][index] += gwts * ( alpha_m * tau_m * rho0 * NAxNB
+        Tangent[16*nLocBas*A+4*B+1] += gwts * ( alpha_m * tau_m * rho0 * NAxNB
             + dd_dv * ( NANBx + tau_m * NA_x * drx_du_B
               + tau_m * NA_y * dry_du_B + tau_m * NA_z * drz_du_B ) );
 
-        Sub_Tan[2][index] += gwts * ( alpha_m * tau_m * rho0 * NAyNB
+        Tangent[16*nLocBas*A+4*B+2] += gwts * ( alpha_m * tau_m * rho0 * NAyNB
             + dd_dv * ( NANBy + tau_m * NA_x * drx_dv_B
               + tau_m * NA_y * dry_dv_B + tau_m * NA_z * drz_dv_B ) );
 
-        Sub_Tan[3][index] += gwts * ( alpha_m * tau_m * rho0 * NAzNB
+        Tangent[16*nLocBas*A+4*B+3] += gwts * ( alpha_m * tau_m * rho0 * NAzNB
             + dd_dv * ( NANBz + tau_m * NA_x * drx_dw_B
               + tau_m * NA_y * dry_dw_B + tau_m * NA_z * drz_dw_B ) );
 
         // Momentum-x with respect to p, u, v, w
-        Sub_Tan[4][index] += gwts * dd_dv * ((-1.0) * NAxNB
+        Tangent[4*nLocBas*(4*A+1)+4*B] += gwts * dd_dv * ((-1.0) * NAxNB
             + velo_dot_gradR * tau_m * rho0 * NB_x
             - NA * tau_m * rho0 * (u_x * NB_x + u_y * NB_y + u_z * NB_z)
             - 2.0 * tau_m_2 * rho0 * rx * NAxNBx
             - tau_m_2 * rho0 * NA_y * (rx * NB_y + ry * NB_x)
             - tau_m_2 * rho0 * NA_z * (rx * NB_z + rz * NB_x) );
 
-        Sub_Tan[5][index] += gwts * ( 
+        Tangent[4*nLocBas*(4*A+1)+4*B+1] += gwts * ( 
             alpha_m * ( rho0 * NANB + velo_dot_gradR * rho0_2 * tau_m * NB
               - rho0_2 * tau_m * u_x * NANB
               - rho0_2 * tau_m_2 * rx * NAxNB
@@ -574,7 +571,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * rx * NA_z * drz_du_B
               + velo_prime_dot_gradR * tau_dc * velo_prime_dot_gradNB ) );
 
-        Sub_Tan[6][index] += gwts * ( 
+        Tangent[4*nLocBas*(4*A+1)+4*B+2] += gwts * ( 
             alpha_m * (-1.0) * rho0_2 * (tau_m * u_y * NANB + tau_m_2 * rx * NAyNB)
             + dd_dv * ( NANB * rho0 * u_y + vis_mu * NAyNBx 
               + rho0 * tau_m * rx * NAyNB
@@ -585,7 +582,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_y * (rx * dry_dv_B + ry * drx_dv_B)
               - rho0 * tau_m_2 * NA_z * (rx * drz_dv_B + rz * drx_dv_B) ) );
 
-        Sub_Tan[7][index] += gwts * (
+        Tangent[4*nLocBas*(4*A+1)+4*B+3] += gwts * (
             alpha_m * (-1.0) * rho0_2 * (tau_m * u_z * NANB + tau_m_2 * rx * NAzNB)
             + dd_dv * ( NANB * rho0 * u_z + vis_mu * NAzNBx 
               + rho0 * tau_m * rx * NAzNB
@@ -597,14 +594,14 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_z * (rx * drz_dw_B + rz * drx_dw_B) ) );
 
         // Momentum-y with respect to p u v w
-        Sub_Tan[8][index] += gwts * dd_dv * ( (-1.0) * NAyNB
+        Tangent[4*nLocBas*(4*A+2)+4*B] += gwts * dd_dv * ( (-1.0) * NAyNB
             + velo_dot_gradR * tau_m * rho0 * NB_y
             - NA * tau_m * rho0 * (v_x * NB_x + v_y * NB_y + v_z * NB_z)
             - tau_m_2 * rho0 * NA_x * (rx * NB_y + ry * NB_x)
             - 2.0 * tau_m_2 * rho0 * ry * NAyNBy
             - tau_m_2 * rho0 * NA_z * (ry * NB_z + rz * NB_y) );
 
-        Sub_Tan[9][index] += gwts * (
+        Tangent[4*nLocBas*(4*A+2)+4*B+1] += gwts * (
             alpha_m * (-1.0) * rho0_2 * (tau_m * v_x * NANB + tau_m_2 * ry * NAxNB)
             + dd_dv * ( NANB * rho0 * v_x + vis_mu * NAxNBy
               + rho0 * tau_m * ry * NAxNB
@@ -615,7 +612,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - 2.0 * rho0 * tau_m_2 * ry * NA_y * dry_du_B
               - rho0 * tau_m_2 * NA_z * (ry * drz_du_B + rz * dry_du_B) ) );
 
-        Sub_Tan[10][index] += gwts * (
+        Tangent[4*nLocBas*(4*A+2)+4*B+2] += gwts * (
             alpha_m * ( rho0 * NANB + velo_dot_gradR * rho0_2 * tau_m * NB
               - rho0_2 * tau_m * v_y * NANB
               - rho0_2 * tau_m_2 * ry * NAyNB
@@ -632,7 +629,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_z * (ry * drz_dv_B + rz * dry_dv_B)
               + velo_prime_dot_gradR * tau_dc * velo_prime_dot_gradNB ) );
 
-        Sub_Tan[11][index] += gwts * (
+        Tangent[4*nLocBas*(4*A+2)+4*B+3] += gwts * (
             alpha_m * (-1.0) * rho0_2 * ( tau_m * v_z * NANB + tau_m_2 * ry * NAzNB ) 
             + dd_dv * ( NANB * rho0 * v_z + vis_mu * NAzNBy
               + rho0 * tau_m * ry * NAzNB
@@ -644,14 +641,14 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_z * (ry * drz_dw_B + rz * dry_dw_B) ) );
 
         // Momentum-z with respect to p u v w
-        Sub_Tan[12][index] += gwts * dd_dv * ( (-1.0) * NAzNB
+        Tangent[4*nLocBas*(4*A+3)+4*B] += gwts * dd_dv * ( (-1.0) * NAzNB
             + velo_dot_gradR * tau_m * rho0 * NB_z
             - NA * tau_m * rho0 * (w_x * NB_x + w_y * NB_y + w_z * NB_z)
             - tau_m_2 * rho0 * NA_x * (rx * NB_z + rz * NB_x)
             - tau_m_2 * rho0 * NA_y * (ry * NB_z + rz * NB_y)
             - 2.0 * tau_m_2 * rho0 * rz * NAzNBz );
 
-        Sub_Tan[13][index] += gwts * (
+        Tangent[4*nLocBas*(4*A+3)+4*B+1] += gwts * (
             alpha_m * (-1.0) * rho0_2 * (tau_m * w_x * NANB + tau_m_2 * rz * NAxNB)
             + dd_dv * ( NANB * rho0 * w_x + vis_mu * NAxNBz
               + rho0 * tau_m * rz * NAxNB
@@ -662,7 +659,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_y * (ry * drz_du_B + rz * dry_du_B)
               - 2.0 * rho0 * tau_m_2 * rz * NA_z * drz_du_B ) );
 
-        Sub_Tan[14][index] += gwts * (
+        Tangent[4*nLocBas*(4*A+3)+4*B+2] += gwts * (
             alpha_m * (-1.0) * rho0_2 * (tau_m * w_y * NANB + tau_m_2 * rz * NAyNB)
             + dd_dv * ( NANB * rho0 * w_y + vis_mu * NAyNBz
               + rho0 * tau_m * rz * NAyNB
@@ -673,7 +670,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_y * (ry * drz_dv_B + rz * dry_dv_B)
               - 2.0 * rho0 * tau_m_2 * rz * NA_z * drz_dv_B ) );
 
-        Sub_Tan[15][index] += gwts * (
+        Tangent[4*nLocBas*(4*A+3)+4*B+3] += gwts * (
             alpha_m * ( rho0 * NANB + velo_dot_gradR * rho0_2 * tau_m * NB
               - rho0_2 * tau_m * w_z * NANB
               - rho0_2 * tau_m_2 * rz * NAzNB
@@ -692,7 +689,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
       } // B-loop
     } // A-loop
   } // qua-loop
-
   // ----------------------------------------------------------------
   // The local `stiffness' matrix 
   //            K[p][q] = Sub_Tan[4*ii + jj][A*nLocBas+B],
@@ -700,20 +696,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
   // Tangent is a 1D vector storing K by rows:
   // Tangent[4*nLocBas*p + q] = K[p][q] = Sub_Tan[4*ii+jj][A*nLocBas+B]
   // ----------------------------------------------------------------
-  for(int ii=0; ii<4; ++ii)
-  {
-    for(int jj=0; jj<4; ++jj)
-    {
-      for(int A=0; A<nLocBas; ++A)
-      {
-        for(int B=0; B<nLocBas; ++B)
-        {
-          Tangent[ 4*nLocBas*(4*A+ii) + 4*B + jj ] =
-            Sub_Tan[ii*4+jj][A*nLocBas + B];
-        }
-      }
-    }
-  }
 }
 
 
