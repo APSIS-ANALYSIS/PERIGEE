@@ -94,7 +94,7 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::print_info() const
 }
 
 
-void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::get_metric( const double * const &dxi_dx,
+void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::get_metric( const double * const &f,
     double &G11, double &G12, double &G13,
     double &G22, double &G23, double &G33 ) const
 {

@@ -213,10 +213,6 @@ class IPLocAssem_2x2Block
     virtual void Assem_Residual_EBC(
         const int &ebc_id,
         const double &time, const double &dt,
-        const double * const &dot_vec_0,
-        const double * const &dot_vec_1,
-        const double * const &vec_0,
-        const double * const &vec_1,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -224,37 +220,57 @@ class IPLocAssem_2x2Block
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Residual_EBC is not implemented.\n");}
 
-    virtual void Assem_Residual_EBC(
-        const int &ebc_id,
-        const double &time, const double &dt,
-        const double &in_x, const double &in_y, const double &in_z,
-        const double * const &dot_vec_0,
-        const double * const &dot_vec_1,
-        const double * const &vec_0,
-        const double * const &vec_1,
-        FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad )
-    {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Residual_EBC is not implemented.\n");}
 
-    virtual void Assem_Residual_EBC(
-        const int &ebc_id,
-        const double &time, const double &dt,
-        const double &in_x, const double &in_y, const double &in_z,
-        const double * const &dot_vec_0,
-        const double * const &dot_vec_1,
-        const double * const &dot_vec_2,
-        const double * const &vec_0,
-        const double * const &vec_1,
-        const double * const &vec_2,
+    virtual double get_flowrate( const double * const &velo,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad )
-    {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Residual_EBC is not implemented.\n");}
+    {
+      SYS_T::commPrint("Warning: get_flowrate() is not implemented. \n");
+      return 0.0;
+    }
+
+    virtual void get_pressure_area( const double * const &vec,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad,
+        double &pres, double &area )
+    {
+      SYS_T::commPrint("Warning: get_pressure_area() is not implemented. \n");
+    }
+
+    virtual void Assem_Residual_EBC_Resistance(
+        const int &ebc_id,
+        const double &val,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: this Assem_Residual_EBC_Resistance is not implemented.\n");}
+
+    virtual void Assem_Residual_BackFlowStab(
+        const double * const &velo,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: this Assem_Residual_BackFlowStab is not implemented.\n");}
+
+    virtual void Assem_Tangent_Residual_BackFlowStab(
+        const double &dt,
+        const double * const &velo,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: this Assem_Tangent_Residual_BackFlowStab is not implemented.\n");}
 
 };
 
