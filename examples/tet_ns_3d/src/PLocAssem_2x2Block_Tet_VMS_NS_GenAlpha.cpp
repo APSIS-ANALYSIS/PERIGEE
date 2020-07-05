@@ -282,7 +282,7 @@ double PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::get_flowrate( const double * cons
 }
 
 
-double PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::get_pressure_area( 
+void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::get_pressure_area( 
     const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
