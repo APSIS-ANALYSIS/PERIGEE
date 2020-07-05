@@ -176,7 +176,161 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual(
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
-{}
+{
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  double fx, fy, fz, tau_m, tau_c, tau_dc;
+
+  const double two_mu = 2.0 * vis_mu;
+  const double curr = time + alpha_f * dt;
+
+  Zero_Residual();
+
+  for(int qua=0; qua<nqp; ++qua)
+  {
+    double u = 0.0, u_t = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
+    double v = 0.0, v_t = 0.0, v_x = 0.0, v_y = 0.0, v_z = 0.0;
+    double w = 0.0, w_t = 0.0, w_x = 0.0, w_y = 0.0, w_z = 0.0;
+    double p = 0.0, coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    double p_x = 0.0, p_y = 0.0, p_z = 0.0;
+    double u_xx = 0.0, u_yy = 0.0, u_zz = 0.0;
+    double v_xx = 0.0, v_yy = 0.0, v_zz = 0.0;
+    double w_xx = 0.0, w_yy = 0.0, w_zz = 0.0;
+
+    element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
+        &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
+
+    element->get_invJacobian( qua, dxi_dx );
+
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      const int ii3 = 3 * ii;
+
+      u_t += dot_velo[ii3]   * R[ii];
+      v_t += dot_velo[ii3+1] * R[ii];
+      w_t += dot_velo[ii3+2] * R[ii];
+
+      u += velo[ii3]   * R[ii];
+      v += velo[ii3+1] * R[ii];
+      w += velo[ii3+2] * R[ii];
+      p += pres[ii]    * R[ii];
+
+      u_x += velo[ii3]   * dR_dx[ii];
+      v_x += velo[ii3+1] * dR_dx[ii];
+      w_x += velo[ii3+2] * dR_dx[ii];
+      p_x += pres[ii]    * dR_dx[ii];
+
+      u_y += velo[ii3]   * dR_dy[ii];
+      v_y += velo[ii3+1] * dR_dy[ii];
+      w_y += velo[ii3+2] * dR_dy[ii];
+      p_y += pres[ii]    * dR_dy[ii];
+
+      u_z += velo[ii3]   * dR_dz[ii];
+      v_z += velo[ii3+1] * dR_dz[ii];
+      w_z += velo[ii3+2] * dR_dz[ii];
+      p_z += pres[ii]    * dR_dz[ii];
+
+      u_xx += velo[ii3] * d2R_dxx[ii];
+      u_yy += velo[ii3] * d2R_dyy[ii];
+      u_zz += velo[ii3] * d2R_dzz[ii];
+
+      v_xx += velo[ii3+1] * d2R_dxx[ii];
+      v_yy += velo[ii3+1] * d2R_dyy[ii];
+      v_zz += velo[ii3+1] * d2R_dzz[ii];
+
+      w_xx += velo[ii3+2] * d2R_dxx[ii];
+      w_yy += velo[ii3+2] * d2R_dyy[ii];
+      w_zz += velo[ii3+2] * d2R_dzz[ii];
+
+      coor_x += eleCtrlPts_x[ii] * R[ii];
+      coor_y += eleCtrlPts_y[ii] * R[ii];
+      coor_z += eleCtrlPts_z[ii] * R[ii];
+    }
+
+    // Get the tau_m and tau_c
+    get_tau(tau_m, tau_c, dt, dxi_dx, u, v, w);
+
+    const double tau_m_2 = tau_m * tau_m;
+
+    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
+
+    // Get the body force
+    get_f(coor_x, coor_y, coor_z, curr, fx, fy, fz);
+
+    const double u_lap = u_xx + u_yy + u_zz;
+    const double v_lap = v_xx + v_yy + v_zz;
+    const double w_lap = w_xx + w_yy + w_zz;
+
+    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - fx ) + p_x - vis_mu * u_lap;
+    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - fy ) + p_y - vis_mu * v_lap;
+    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - fz ) + p_z - vis_mu * w_lap;
+
+    const double div_vel = u_x + v_y + w_z;
+
+    const double u_prime = -1.0 * tau_m * rx;
+    const double v_prime = -1.0 * tau_m * ry;
+    const double w_prime = -1.0 * tau_m * rz;
+
+    // Get the Discontinuity Capturing tau
+    get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
+
+    for(int A=0; A<nLocBas; ++A)
+    {
+      const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
+
+      const double velo_dot_gradR = NA_x * u + NA_y * v + NA_z * w;
+      const double r_dot_gradR = NA_x * rx + NA_y * ry + NA_z * rz;
+      const double r_dot_gradu = u_x * rx + u_y * ry + u_z * rz;
+      const double r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
+      const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
+      const double velo_prime_dot_gradR = NA_x * u_prime + NA_y * v_prime + NA_z * w_prime;
+
+      Residual1[A] += gwts * ( NA * div_vel + tau_m * r_dot_gradR );
+
+      Residual0[3*A] += gwts * ( NA * rho0 * u_t
+          + NA * rho0 * (u * u_x + v * u_y + w * u_z)
+          - NA_x * p
+          + NA_x * two_mu * u_x
+          + NA_y * vis_mu * (u_y + v_x)
+          + NA_z * vis_mu * (u_z + w_x)
+          + velo_dot_gradR * tau_m * rho0 * rx
+          - NA * tau_m * rho0 * r_dot_gradu
+          + NA_x * tau_c * div_vel
+          - r_dot_gradR * tau_m_2 * rho0 * rx
+          + velo_prime_dot_gradR * tau_dc 
+          * (u_prime * u_x + v_prime * u_y + w_prime * u_z)
+          - NA * rho0 * fx );
+
+      Residual0[3*A+1] += gwts * ( NA * rho0 * v_t
+          + NA * rho0 * (u * v_x + v * v_y + w * v_z)
+          - NA_y * p
+          + NA_x * vis_mu * (u_y + v_x)
+          + NA_y * two_mu * v_y
+          + NA_z * vis_mu * (v_z + w_y)
+          + velo_dot_gradR * tau_m * rho0 * ry
+          - NA * tau_m * rho0 * r_dot_gradv
+          + NA_y * tau_c * div_vel
+          - r_dot_gradR * tau_m_2 * rho0 * ry
+          + velo_prime_dot_gradR * tau_dc
+          * (u_prime * v_x + v_prime * v_y + w_prime * v_z)
+          - NA * rho0 * fy );
+
+      Residual0[3*A+2] += gwts * (NA * rho0 * w_t
+          + NA * rho0 * (u * w_x + v * w_y + w * w_z)
+          - NA_z * p
+          + NA_x * vis_mu * (u_z + w_x)
+          + NA_y * vis_mu * (w_y + v_z)
+          + NA_z * two_mu * w_z
+          + velo_dot_gradR * tau_m * rho0 * rz
+          - NA * tau_m * rho0 * r_dot_gradw
+          + NA_z * tau_c * div_vel
+          - r_dot_gradR * tau_m_2 * rho0 * rz
+          + velo_prime_dot_gradR * tau_dc
+          * (u_prime * w_x + v_prime * w_y + w_prime * w_z)
+          - NA * rho0 * fz );
+    }
+  }
+}
 
 
 void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual( 
