@@ -37,10 +37,9 @@ PLocAssem_Tet_VMS_NS_GenAlpha::PLocAssem_Tet_VMS_NS_GenAlpha(
   d2R_dyy.resize(nLocBas);
   d2R_dzz.resize(nLocBas);
 
-  Sub_Tan.resize(16); Sub_sur_Tan.resize(16);
+  Sub_sur_Tan.resize(16);
   for(int ii=0; ii<16; ++ii)
   {
-    Sub_Tan[ii].resize( nLocBas * nLocBas );
     Sub_sur_Tan[ii].resize( snLocBas * snLocBas );
   }
 
