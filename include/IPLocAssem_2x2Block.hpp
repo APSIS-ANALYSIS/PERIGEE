@@ -104,7 +104,11 @@ class IPLocAssem_2x2Block
     // Return the number of ebc functions implemented inside this local
     // assembly routine.
     // -------------------------------------------------------------- 
-    virtual int get_num_ebc_fun() const = 0;
+    virtual int get_num_ebc_fun() const
+    {
+      SYS_T::commPrint("Warning: IPLocAssem_2x2Block::get_num_ebc_fun is not implemented. \n");
+      return 0;
+    }
     
     // Assign all values in Tangent and Residual as 0.0.
     virtual void Zero_Tangent_Residual() = 0;

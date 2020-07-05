@@ -38,29 +38,37 @@ class PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
 
     virtual void Zero_Tangent_Residual()
     {
-      for(int ii=0; ii<vec_size; ++ii) Residual[ii] = 0.0;
-      for(int ii=0; ii<vec_size*vec_size; ++ii) Tangent[ii] = 0.0;
+      for(int ii=0; ii<vec_size_v; ++ii) Residual0[ii] = 0.0;
+      for(int ii=0; ii<vec_size_p; ++ii) Residual1[ii] = 0.0;
+      for(int ii=0; ii<vec_size_v*vec_size_v; ++ii) Tangent00[ii] = 0.0;
+      for(int ii=0; ii<vec_size_v*vec_size_p; ++ii) Tangent01[ii] = 0.0;
+      for(int ii=0; ii<vec_size_p*vec_size_v; ++ii) Tangent10[ii] = 0.0;
+      for(int ii=0; ii<vec_size_p*vec_size_p; ++ii) Tangent11[ii] = 0.0;
     }
 
     virtual void Zero_sur_Tangent_Residual()
     {
-      for(int ii=0; ii<sur_size; ++ii) sur_Residual[ii] = 0.0;
-      for(int ii=0; ii<sur_size*sur_size; ++ii) sur_Tangent[ii] = 0.0;
+      for(int ii=0; ii<sur_size_v; ++ii) sur_Residual0[ii] = 0.0;
+      for(int ii=0; ii<sur_size_v * sur_size_v; ++ii) sur_Tangent00[ii] = 0.0;
     }
 
     virtual void Zero_Residual()
     {
-      for(int ii=0; ii<vec_size; ++ii) Residual[ii] = 0.0;
+      for(int ii=0; ii<vec_size_v; ++ii) Residual0[ii] = 0.0;
+      for(int ii=0; ii<vec_size_p; ++ii) Residual1[ii] = 0.0;
     }
 
     virtual void Zero_sur_Residual()
     {
-      for(int ii=0; ii<sur_size; ++ii) sur_Residual[ii] = 0.0;
+      for(int ii=0; ii<sur_size_v; ++ii) sur_Residual0[ii] = 0.0;
     }
 
     virtual void Assem_Estimate()
     {
-      for(int ii=0; ii<vec_size*vec_size; ++ii) Tangent[ii] = 1.0;
+      for(int ii=0; ii<vec_size_v*vec_size_v; ++ii) Tangent00[ii] = 1.0;
+      for(int ii=0; ii<vec_size_v*vec_size_p; ++ii) Tangent01[ii] = 1.0;
+      for(int ii=0; ii<vec_size_p*vec_size_v; ++ii) Tangent10[ii] = 1.0;
+      for(int ii=0; ii<vec_size_p*vec_size_p; ++ii) Tangent11[ii] = 1.0;
     }
 
     virtual void Assem_Residual(
