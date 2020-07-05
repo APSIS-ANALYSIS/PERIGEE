@@ -155,8 +155,6 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
 
     double dxi_dx[9];
 
-    std::vector< std::vector<double> > Sub_sur_Tan;
-
     // Private functions
     void print_info() const;
 
@@ -200,14 +198,6 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
         const double &nz, double &gx, double &gy, double &gz ) const
     {
       return ((*this).*(flist[ebc_id]))(x,y,z,t,nx,ny,nz,gx,gy,gz);
-    }
-
-    void Zero_Sub_sur_Tan()
-    {
-      for(int ii=0; ii<16; ++ii)
-      {
-        for(int jj=0; jj<snLocBas * snLocBas; ++jj) Sub_sur_Tan[ii][jj] = 0.0;
-      }
     }
 };
 
