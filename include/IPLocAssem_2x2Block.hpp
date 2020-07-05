@@ -44,8 +44,16 @@ class IPLocAssem_2x2Block
       Tangent10 = nullptr;
       Tangent11 = nullptr;
 
+      sur_Tangent00 = nullptr;
+      sur_Tangent01 = nullptr;
+      sur_Tangent10 = nullptr;
+      sur_Tangent11 = nullptr;
+
       Residual0 = nullptr;
       Residual1 = nullptr;
+      
+      sur_Residual0 = nullptr;
+      sur_Residual1 = nullptr;
     };
 
     virtual ~IPLocAssem_2x2Block(){};
@@ -55,9 +63,17 @@ class IPLocAssem_2x2Block
     PetscScalar * Tangent10; // A10
     PetscScalar * Tangent11; // A11
 
+    PetscScalar * sur_Tangent00; // sur_A00
+    PetscScalar * sur_Tangent01; // sur_A01
+    PetscScalar * sur_Tangent10; // sur_A10
+    PetscScalar * sur_Tangent11; // sur_A11
+
     PetscScalar * Residual0; // R0
     PetscScalar * Residual1; // R1
 
+    PetscScalar * sur_Residual0; // sur_R0
+    PetscScalar * sur_Residual1; // sur_R1
+    
     // -------------------------------------------------------------- 
     // Get the degree-of-freedom of this problem. For segregated 
     // algorithms this returns the fully-coupled multiphysics 

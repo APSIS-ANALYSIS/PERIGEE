@@ -6,6 +6,7 @@
 // Parallel Local Assembly routine for VMS and Gen-alpha based NS
 // solver into 4 sub blocks.
 //
+// Author: Ju Liu
 // Date: Feb. 10 2020
 // ==================================================================
 #include "IPLocAssem_2x2Block.hpp"
@@ -19,7 +20,7 @@ class PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
         const int &in_nlocbas, const int &in_nqp,
         const int &in_snlocbas, const double &in_rho, 
         const double &in_vis_mu, const double &in_beta,
-        const int &elemtype = 501 );
+        const double &in_ctauc, const int &elemtype = 501 );
 
     virtual ~PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha();
 
@@ -153,15 +154,15 @@ class PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
 
       double CI, CT;
       
-      int nLocBas, snLocBas, vec_size, sur_size;
+      const double Ctauc; // Constant scaling factor for tau_C
+
+      int nLocBas, snLocBas, vec_size_v, vec_size_p, sur_size_v;
 
       std::vector<double> R, dR_dx, dR_dy, dR_dz;
       
       std::vector<double> d2R_dxx, d2R_dyy, d2R_dzz;
 
       double dxi_dx[9];
-
-      std::vector< std::vector<double> > Sub_Tan, Sub_sur_Tan;
 
       // Private functions
       void print_info() const;
@@ -203,22 +204,6 @@ class PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
           const double &nz, double &gx, double &gy, double &gz ) const
       {
         return ((*this).*(flist[ebc_id]))(x,y,z,t,nx,ny,nz,gx,gy,gz);
-      }
-
-      void Zero_Sub_Tan()
-      {
-        for(int ii=0; ii<16; ++ii)
-        {
-          for(int jj=0; jj<nLocBas * nLocBas; ++jj) Sub_Tan[ii][jj] = 0.0;
-        }
-      }
-
-      void Zero_Sub_sur_Tan()
-      {
-        for(int ii=0; ii<16; ++ii)
-        {
-          for(int jj=0; jj<snLocBas * snLocBas; ++jj) Sub_sur_Tan[ii][jj] = 0.0;
-        }
       }
 };
 
