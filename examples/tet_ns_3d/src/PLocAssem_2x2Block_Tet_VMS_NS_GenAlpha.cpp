@@ -827,13 +827,11 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
     get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr, nx, ny, nz,
         gx, gy, gz );
 
-    const double gwts = surface_area * quad -> get_qw(qua);
-
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual0[3*A]   -= gwts * R[A] * gx;
-      Residual0[3*A+1] -= gwts * R[A] * gy;
-      Residual0[3*A+2] -= gwts * R[A] * gz;
+      Residual0[3*A]   -= surface_area * quad -> get_qw(qua) * R[A] * gx;
+      Residual0[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * gy;
+      Residual0[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * gz;
     }
   }
 }
@@ -861,13 +859,11 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
     element->get_R(qua, &R[0]);
     element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
 
-    const double gwts = surface_area * quad -> get_qw(qua);
-
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual0[3*A]   += gwts * R[A] * nx * val;
-      Residual0[3*A+1] += gwts * R[A] * ny * val;
-      Residual0[3*A+2] += gwts * R[A] * nz * val;
+      Residual0[3*A]   += surface_area * quad -> get_qw(qua) * R[A] * nx * val;
+      Residual0[3*A+1] += surface_area * quad -> get_qw(qua) * R[A] * ny * val;
+      Residual0[3*A+2] += surface_area * quad -> get_qw(qua) * R[A] * nz * val;
     }
   }
 }
