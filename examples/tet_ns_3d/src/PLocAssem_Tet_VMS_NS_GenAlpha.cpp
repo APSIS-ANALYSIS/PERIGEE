@@ -1004,9 +1004,7 @@ double PLocAssem_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &sol,
       w += sol[ii*4+3] * R[ii];
     }
     
-    const double gwts = surface_area * quad->get_qw(qua);
-    
-    flrate += gwts * ( u * nx + v * ny + w * nz );
+    flrate += surface_area * quad->get_qw(qua) * ( u * nx + v * ny + w * nz );
   }
 
   return flrate;
