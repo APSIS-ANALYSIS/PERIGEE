@@ -55,13 +55,9 @@ int main( int argc, char * argv[] )
   int in_ncommon = 2;
   bool isDualGraph = true;
 
-  PetscMPIInt size;
-
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
-  MPI_Comm_size(PETSC_COMM_WORLD, &size);
-
-  SYS_T::print_fatal_if(size!=1, "ERROR: preprocessor needs to be run in serial.\n");
+  SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: preprocessor needs to be run in serial.\n");
 
   // Get the command line arguments
   SYS_T::GetOptionInt("-cpu_size", cpu_size);
