@@ -268,18 +268,18 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
     const double v_prime = -1.0 * tau_m * ry;
     const double w_prime = -1.0 * tau_m * rz;
 
+    const double r_dot_gradu = u_x * rx + u_y * ry + u_z * rz;
+    const double r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
+    const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
+    
     // Get the Discontinuity Capturing tau
     get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
 
     for(int A=0; A<nLocBas; ++A)
     {
       const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
-
       const double velo_dot_gradR = NA_x * u + NA_y * v + NA_z * w;
       const double r_dot_gradR = NA_x * rx + NA_y * ry + NA_z * rz;
-      const double r_dot_gradu = u_x * rx + u_y * ry + u_z * rz;
-      const double r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
-      const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
       const double velo_prime_dot_gradR = NA_x * u_prime + NA_y * v_prime + NA_z * w_prime;
 
       Residual[4*A] += gwts * ( NA * div_vel + tau_m * r_dot_gradR );
@@ -347,7 +347,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
   double tau_m, tau_c, tau_dc;
 
   const double two_mu = 2.0 * vis_mu;
-  
+
   const double rho0_2 = rho0 * rho0;
 
   const double curr = time + alpha_f * dt;
@@ -439,6 +439,10 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     const double v_prime = -1.0 * tau_m * ry;
     const double w_prime = -1.0 * tau_m * rz;
 
+    const double r_dot_gradu = u_x * rx + u_y * ry + u_z * rz;
+    const double r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
+    const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
+    
     get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
 
     for(int A=0; A<nLocBas; ++A)
@@ -447,9 +451,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
       const double velo_dot_gradR = NA_x * u + NA_y * v + NA_z * w;
       const double r_dot_gradR = NA_x * rx + NA_y * ry + NA_z * rz;
-      const double r_dot_gradu = u_x * rx + u_y * ry + u_z * rz;
-      const double r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
-      const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
       const double velo_prime_dot_gradR = NA_x * u_prime + NA_y * v_prime + NA_z * w_prime;
 
       Residual[4*A] += gwts * ( NA * div_vel + tau_m * r_dot_gradR );
@@ -693,12 +694,12 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
 
 void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
-        const double * const &sol,
-        FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad )
+    const double * const &sol,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -787,18 +788,18 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
 
 
 void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
-        const int &ebc_id,
-        const double &time, const double &dt,
-        FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad )
+    const int &ebc_id,
+    const double &time, const double &dt,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   const int face_nqp = quad -> get_num_quadPts();
-  
+
   const double curr = time + alpha_f * dt;
 
   double gx, gy, gz, nx, ny, nz, surface_area;
@@ -971,11 +972,11 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
 
 
 double PLocAssem_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &sol,
-        FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad )
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -997,7 +998,7 @@ double PLocAssem_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &sol,
       v += sol[ii*4+2] * R[ii];
       w += sol[ii*4+3] * R[ii];
     }
-    
+
     flrate += surface_area * quad->get_qw(qua) * ( u * nx + v * ny + w * nz );
   }
 

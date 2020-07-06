@@ -271,6 +271,10 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual(
     const double v_prime = -1.0 * tau_m * ry;
     const double w_prime = -1.0 * tau_m * rz;
 
+    const double r_dot_gradu = u_x * rx + u_y * ry + u_z * rz;
+    const double r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
+    const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
+    
     // Get the Discontinuity Capturing tau
     get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
 
@@ -280,9 +284,6 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual(
 
       const double velo_dot_gradR = NA_x * u + NA_y * v + NA_z * w;
       const double r_dot_gradR = NA_x * rx + NA_y * ry + NA_z * rz;
-      const double r_dot_gradu = u_x * rx + u_y * ry + u_z * rz;
-      const double r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
-      const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
       const double velo_prime_dot_gradR = NA_x * u_prime + NA_y * v_prime + NA_z * w_prime;
 
       Residual1[A] += gwts * ( NA * div_vel + tau_m * r_dot_gradR );
@@ -352,7 +353,7 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
   double tau_m, tau_c, tau_dc;
 
   const double two_mu = 2.0 * vis_mu;
-  
+
   const double rho0_2 = rho0 * rho0;
 
   const double curr = time + alpha_f * dt;
@@ -444,6 +445,10 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     const double v_prime = -1.0 * tau_m * ry;
     const double w_prime = -1.0 * tau_m * rz;
 
+    const double r_dot_gradu = u_x * rx + u_y * ry + u_z * rz;
+    const double r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
+    const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
+    
     get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
 
     for(int A=0; A<nLocBas; ++A)
@@ -452,9 +457,6 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
       const double velo_dot_gradR = NA_x * u + NA_y * v + NA_z * w;
       const double r_dot_gradR = NA_x * rx + NA_y * ry + NA_z * rz;
-      const double r_dot_gradu = u_x * rx + u_y * ry + u_z * rz;
-      const double r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
-      const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
       const double velo_prime_dot_gradR = NA_x * u_prime + NA_y * v_prime + NA_z * w_prime;
 
       Residual1[A] += gwts * ( NA * div_vel + tau_m * r_dot_gradR );
@@ -784,7 +786,7 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
         Tangent00[3*nLocBas*(3*A) + 3*B]     += gwts * rho0 * NA * R[B];
         Tangent00[3*nLocBas*(3*A+1) + 3*B+1] += gwts * rho0 * NA * R[B];
         Tangent00[3*nLocBas*(3*A+2) + 3*B+2] += gwts * rho0 * NA * R[B];
-        
+
         Tangent11[nLocBas*A + B] += gwts * rho0 * NA * R[B];
       }
     }
@@ -804,7 +806,7 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   const int face_nqp = quad -> get_num_quadPts();
-  
+
   const double curr = time + alpha_f * dt;
 
   double gx, gy, gz, nx, ny, nz, surface_area;
