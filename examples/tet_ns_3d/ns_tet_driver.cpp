@@ -5,6 +5,7 @@
 // equations using Variational Multiscale Formulation and Generalized
 // alpha time stepping.
 //
+// Author: Ju Liu, liujuy@gmail.com
 // Date: Feb. 6 2020
 // ==================================================================
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"

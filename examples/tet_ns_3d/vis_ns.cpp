@@ -2,7 +2,8 @@
 // vis_ns.cpp
 //
 // Visualization driver for the NS equation solver.
-//
+// 
+// Author: Ju Liu, liujuy@gmail.com
 // Date Created: Feb. 12 2020
 // ==================================================================
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
