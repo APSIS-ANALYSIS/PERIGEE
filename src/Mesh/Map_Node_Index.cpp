@@ -7,7 +7,7 @@ Map_Node_Index::Map_Node_Index( const IGlobal_Part * const &gpart,
   old_2_new.resize(nFunc);
   new_2_old.resize(nFunc);
   
-  std::cout<<"\n-- generating old2new & new2old index mapping. \n";
+  std::cout<<"-- generating old2new & new2old index mapping. \n";
 
   // old to new mapping
   for(int proc = 0; proc<cpu_size; ++proc)
@@ -28,7 +28,7 @@ Map_Node_Index::Map_Node_Index( const IGlobal_Part * const &gpart,
   std::cout<<"-- mapping generated. Memory usage: ";
   SYS_T::print_mem_size( double(old_2_new.size())*2.0*sizeof(int) );
   std::cout<<std::endl;
-  std::cout<<"=== Node index mapping generated. \n \n";
+  std::cout<<"=== Node index mapping generated.\n";
 }
 
 Map_Node_Index::~Map_Node_Index()

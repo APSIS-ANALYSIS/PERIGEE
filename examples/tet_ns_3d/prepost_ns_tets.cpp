@@ -106,7 +106,7 @@ int main( int argc, char * argv[] )
   Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, mesh->get_nFunc());
   mnindex->write_hdf5("post_node_mapping");
 
-  cout<<"\n=== Start Partition ... \n";
+  cout<<"=== Start Partition ... \n";
   int proc_size = cpu_size; bool isPrintPartInfo = true;
   SYS_T::Timer * mytimer = new SYS_T::Timer();
   for(int proc_rank = 0; proc_rank < proc_size; ++proc_rank)
@@ -122,7 +122,7 @@ int main( int argc, char * argv[] )
   }
 
   // Clean memory
-  cout<<"\n=== Clean memory. \n";
+  cout<<"=== Clean memory. \n";
   delete mnindex; delete global_part; delete mesh; delete IEN; delete mytimer;
   PetscFinalize();
   return EXIT_SUCCESS;

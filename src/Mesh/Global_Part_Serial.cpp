@@ -21,7 +21,7 @@ Global_Part_Serial::Global_Part_Serial( const class IMesh * const &mesh,
   write_part_hdf5(element_part_name, epart, nElem, cpu_size, isDualGraph, in_ncommon, isMETIS );
   write_part_hdf5(node_part_name, npart, nFunc, cpu_size, isDualGraph, in_ncommon, isMETIS );
 
-  std::cout<<"\n=== Global partition generated. \n";
+  std::cout<<"=== Global partition generated. \n";
 }
 
 Global_Part_Serial::~Global_Part_Serial()
