@@ -855,13 +855,11 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
     element->get_R(qua, &R[0]);
     element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
 
-    const double gwts = surface_area * quad -> get_qw(qua);
-
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual[4*A+1] += gwts * R[A] * nx * val;
-      Residual[4*A+2] += gwts * R[A] * ny * val;
-      Residual[4*A+3] += gwts * R[A] * nz * val;
+      Residual[4*A+1] += surface_area * quad -> get_qw(qua) * R[A] * nx * val;
+      Residual[4*A+2] += surface_area * quad -> get_qw(qua) * R[A] * ny * val;
+      Residual[4*A+3] += surface_area * quad -> get_qw(qua) * R[A] * nz * val;
     }
   }
 }
