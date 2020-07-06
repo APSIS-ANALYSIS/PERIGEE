@@ -7,10 +7,8 @@ PTime_NS_Solver::PTime_NS_Solver(
   renew_tang_freq(input_renew_tang_freq), pb_name(input_name)
 {}
 
-
 PTime_NS_Solver::~PTime_NS_Solver()
 {}
-
 
 std::string PTime_NS_Solver::Name_Generator(const int &counter) const
 {
@@ -22,7 +20,6 @@ std::string PTime_NS_Solver::Name_Generator(const int &counter) const
   out_name.append(temp.str());
   return out_name;
 }
-
 
 std::string PTime_NS_Solver::Name_dot_Generator(const int &counter) const
 {
@@ -47,7 +44,6 @@ void PTime_NS_Solver::print_info() const
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
-
 void PTime_NS_Solver::Write_restart_file(const PDNTimeStep * const &timeinfo,
     const std::string &solname ) const
 {
@@ -63,7 +59,6 @@ void PTime_NS_Solver::Write_restart_file(const PDNTimeStep * const &timeinfo,
   else
     SYS_T::print_fatal("Error: PTimeSolver cannot open restart_file.txt");
 }
-
 
 void PTime_NS_Solver::TM_NS_GenAlpha( 
     const bool &restart_init_assembly_flag,
