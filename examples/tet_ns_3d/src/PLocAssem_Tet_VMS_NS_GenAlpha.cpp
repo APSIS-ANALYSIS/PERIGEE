@@ -1029,8 +1029,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_pressure_area(
   double nx, ny, nz, surface_area;
 
   // Initialize the two variables to be passed out
-  pres = 0.0;
-  area = 0.0;
+  pres = 0.0; area = 0.0;
 
   for(int qua =0; qua < face_nqp; ++qua)
   {
@@ -1040,12 +1039,9 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_pressure_area(
     double pp = 0.0;
     for(int ii=0; ii<snLocBas; ++ii) pp += sol[4*ii+0] * R[ii];
 
-    const double gwts = surface_area * quad->get_qw(qua);
-
-    pres += gwts * pp;
-    area += gwts;
+    pres += surface_area * quad->get_qw(qua) * pp;
+    area += surface_area * quad->get_qw(qua);
   }
 }
-
 
 // EOF
