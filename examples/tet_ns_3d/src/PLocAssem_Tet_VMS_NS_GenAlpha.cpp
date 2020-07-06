@@ -833,78 +833,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
 }
 
 
-double PLocAssem_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &sol,
-        FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad )
-{
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  const int face_nqp = quad -> get_num_quadPts();
-
-  double nx, ny, nz, surface_area;
-
-  double flrate = 0.0;
-
-  for(int qua =0; qua< face_nqp; ++qua)
-  {
-    element->get_R(qua, &R[0]);
-    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
-
-    double u = 0.0, v = 0.0, w = 0.0;
-    for(int ii=0; ii<snLocBas; ++ii)
-    {
-      u += sol[ii*4+1] * R[ii];
-      v += sol[ii*4+2] * R[ii];
-      w += sol[ii*4+3] * R[ii];
-    }
-    
-    const double gwts = surface_area * quad->get_qw(qua);
-    
-    flrate += gwts * ( u * nx + v * ny + w * nz );
-  }
-
-  return flrate;
-}
-
-
-void PLocAssem_Tet_VMS_NS_GenAlpha::get_pressure_area( 
-    const double * const &sol,
-    FEAElement * const &element,
-    const double * const &eleCtrlPts_x,
-    const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad,
-    double &pres, double &area )
-{
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  const int face_nqp = quad -> get_num_quadPts();
-
-  double nx, ny, nz, surface_area;
-
-  // Initialize the two variables to be passed out
-  pres = 0.0;
-  area = 0.0;
-
-  for(int qua =0; qua < face_nqp; ++qua)
-  {
-    element->get_R(qua, &R[0]);
-    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
-
-    double pp = 0.0;
-    for(int ii=0; ii<snLocBas; ++ii) pp += sol[4*ii+0] * R[ii];
-
-    const double gwts = surface_area * quad->get_qw(qua);
-
-    pres += gwts * pp;
-    area += gwts;
-  }
-}
-
-
 void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
     const int &ebc_id,
     const double &val,
@@ -1046,5 +974,78 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
     }
   }
 }
+
+
+double PLocAssem_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &sol,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+{
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  const int face_nqp = quad -> get_num_quadPts();
+
+  double nx, ny, nz, surface_area;
+
+  double flrate = 0.0;
+
+  for(int qua =0; qua< face_nqp; ++qua)
+  {
+    element->get_R(qua, &R[0]);
+    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+
+    double u = 0.0, v = 0.0, w = 0.0;
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      u += sol[ii*4+1] * R[ii];
+      v += sol[ii*4+2] * R[ii];
+      w += sol[ii*4+3] * R[ii];
+    }
+    
+    const double gwts = surface_area * quad->get_qw(qua);
+    
+    flrate += gwts * ( u * nx + v * ny + w * nz );
+  }
+
+  return flrate;
+}
+
+
+void PLocAssem_Tet_VMS_NS_GenAlpha::get_pressure_area( 
+    const double * const &sol,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad,
+    double &pres, double &area )
+{
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  const int face_nqp = quad -> get_num_quadPts();
+
+  double nx, ny, nz, surface_area;
+
+  // Initialize the two variables to be passed out
+  pres = 0.0;
+  area = 0.0;
+
+  for(int qua =0; qua < face_nqp; ++qua)
+  {
+    element->get_R(qua, &R[0]);
+    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+
+    double pp = 0.0;
+    for(int ii=0; ii<snLocBas; ++ii) pp += sol[4*ii+0] * R[ii];
+
+    const double gwts = surface_area * quad->get_qw(qua);
+
+    pres += gwts * pp;
+    area += gwts;
+  }
+}
+
 
 // EOF
