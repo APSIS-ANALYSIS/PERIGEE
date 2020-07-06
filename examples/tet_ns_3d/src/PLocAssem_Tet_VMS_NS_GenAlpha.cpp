@@ -821,13 +821,11 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
     get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr, nx, ny, nz,
         gx, gy, gz );
 
-    const double gwts = surface_area * quad -> get_qw(qua);
-
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual[4*A+1] -= gwts * R[A] * gx;
-      Residual[4*A+2] -= gwts * R[A] * gy;
-      Residual[4*A+3] -= gwts * R[A] * gz;
+      Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * gx;
+      Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * gy;
+      Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * gz;
     }
   }
 }
