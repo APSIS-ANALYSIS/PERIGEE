@@ -345,6 +345,355 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  double fx, fy, fz;
+
+  double tau_m, tau_c, tau_dc;
+
+  const double two_mu = 2.0 * vis_mu;
+  
+  const double rho0_2 = rho0 * rho0;
+
+  const double curr = time + alpha_f * dt;
+
+  const double dd_dv = alpha_f * gamma * dt;
+
+  Zero_Tangent_Residual();
+
+  for(int qua=0; qua<nqp; ++qua)
+  {
+    double u = 0.0, u_t = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
+    double v = 0.0, v_t = 0.0, v_x = 0.0, v_y = 0.0, v_z = 0.0;
+    double w = 0.0, w_t = 0.0, w_x = 0.0, w_y = 0.0, w_z = 0.0;
+    double p = 0.0, coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    double p_x = 0.0, p_y = 0.0, p_z = 0.0;
+    double u_xx = 0.0, u_yy = 0.0, u_zz = 0.0;
+    double v_xx = 0.0, v_yy = 0.0, v_zz = 0.0;
+    double w_xx = 0.0, w_yy = 0.0, w_zz = 0.0;
+
+    element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
+        &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
+
+    element->get_invJacobian( qua, dxi_dx );
+
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      const int ii3 = 3 * ii;
+
+      u_t += dot_velo[ii3]   * R[ii];
+      v_t += dot_velo[ii3+1] * R[ii];
+      w_t += dot_velo[ii3+2] * R[ii];
+
+      u += velo[ii3]   * R[ii];
+      v += velo[ii3+1] * R[ii];
+      w += velo[ii3+2] * R[ii];
+      p += pres[ii]    * R[ii];
+
+      u_x += velo[ii3]   * dR_dx[ii];
+      v_x += velo[ii3+1] * dR_dx[ii];
+      w_x += velo[ii3+2] * dR_dx[ii];
+      p_x += pres[ii]    * dR_dx[ii];
+
+      u_y += velo[ii3]   * dR_dy[ii];
+      v_y += velo[ii3+1] * dR_dy[ii];
+      w_y += velo[ii3+2] * dR_dy[ii];
+      p_y += pres[ii]    * dR_dy[ii];
+
+      u_z += velo[ii3]   * dR_dz[ii];
+      v_z += velo[ii3+1] * dR_dz[ii];
+      w_z += velo[ii3+2] * dR_dz[ii];
+      p_z += pres[ii]    * dR_dz[ii];
+
+      u_xx += velo[ii3] * d2R_dxx[ii];
+      u_yy += velo[ii3] * d2R_dyy[ii];
+      u_zz += velo[ii3] * d2R_dzz[ii];
+
+      v_xx += velo[ii3+1] * d2R_dxx[ii];
+      v_yy += velo[ii3+1] * d2R_dyy[ii];
+      v_zz += velo[ii3+1] * d2R_dzz[ii];
+
+      w_xx += velo[ii3+2] * d2R_dxx[ii];
+      w_yy += velo[ii3+2] * d2R_dyy[ii];
+      w_zz += velo[ii3+2] * d2R_dzz[ii];
+
+      coor_x += eleCtrlPts_x[ii] * R[ii];
+      coor_y += eleCtrlPts_y[ii] * R[ii];
+      coor_z += eleCtrlPts_z[ii] * R[ii];
+    }
+
+    get_tau(tau_m, tau_c, dt, dxi_dx, u, v, w);
+
+    const double tau_m_2 = tau_m * tau_m;
+
+    const double gwts = element->get_detJac(qua) * quad->get_qw(qua); 
+
+    get_f(coor_x, coor_y, coor_z, curr, fx, fy, fz);
+
+    const double u_lap = u_xx + u_yy + u_zz;
+    const double v_lap = v_xx + v_yy + v_zz;
+    const double w_lap = w_xx + w_yy + w_zz;
+
+    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - fx ) + p_x - vis_mu * u_lap;
+    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - fy ) + p_y - vis_mu * v_lap ;
+    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - fz ) + p_z - vis_mu * w_lap;
+
+    const double div_vel = u_x + v_y + w_z;
+
+    const double u_prime = -1.0 * tau_m * rx;
+    const double v_prime = -1.0 * tau_m * ry;
+    const double w_prime = -1.0 * tau_m * rz;
+
+    get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
+
+    for(int A=0; A<nLocBas; ++A)
+    {
+      const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
+
+      const double velo_dot_gradR = NA_x * u + NA_y * v + NA_z * w;
+      const double r_dot_gradR = NA_x * rx + NA_y * ry + NA_z * rz;
+      const double r_dot_gradu = u_x * rx + u_y * ry + u_z * rz;
+      const double r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
+      const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
+      const double velo_prime_dot_gradR = NA_x * u_prime + NA_y * v_prime + NA_z * w_prime;
+
+      Residual1[A] += gwts * ( NA * div_vel + tau_m * r_dot_gradR );
+
+      Residual0[3*A] += gwts * ( NA * rho0 * u_t
+          + NA * rho0 * (u * u_x + v * u_y + w * u_z)
+          - NA_x * p
+          + NA_x * two_mu * u_x
+          + NA_y * vis_mu * (u_y + v_x)
+          + NA_z * vis_mu * (u_z + w_x)
+          + velo_dot_gradR * tau_m * rho0 * rx
+          - NA * tau_m * rho0 * r_dot_gradu
+          + NA_x * tau_c * div_vel
+          - r_dot_gradR * tau_m_2 * rho0 * rx
+          + velo_prime_dot_gradR * tau_dc 
+          * (u_prime * u_x + v_prime * u_y + w_prime * u_z)
+          - NA * rho0 * f1 );
+
+      Residual0[3*A+1] += gwts * ( NA * rho0 * v_t
+          + NA * rho0 * (u * v_x + v * v_y + w * v_z)
+          - NA_y * p
+          + NA_x * vis_mu * (u_y + v_x)
+          + NA_y * two_mu * v_y
+          + NA_z * vis_mu * (v_z + w_y)
+          + velo_dot_gradR * tau_m * rho0 * ry
+          - NA * tau_m * rho0 * r_dot_gradv
+          + NA_y * tau_c * div_vel
+          - r_dot_gradR * tau_m_2 * rho0 * ry
+          + velo_prime_dot_gradR * tau_dc
+          * (u_prime * v_x + v_prime * v_y + w_prime * v_z)
+          - NA * rho0 * f2 );
+
+      Residual0[3*A+2] += gwts * (NA * rho0 * w_t
+          + NA * rho0 * (u * w_x + v * w_y + w * w_z)
+          - NA_z * p
+          + NA_x * vis_mu * (u_z + w_x)
+          + NA_y * vis_mu * (w_y + v_z)
+          + NA_z * two_mu * w_z
+          + velo_dot_gradR * tau_m * rho0 * rz
+          - NA * tau_m * rho0 * r_dot_gradw
+          + NA_z * tau_c * div_vel
+          - r_dot_gradR * tau_m_2 * rho0 * rz
+          + velo_prime_dot_gradR * tau_dc
+          * (u_prime * w_x + v_prime * w_y + w_prime * w_z)
+          - NA * rho0 * f3 );
+
+      for(int B=0; B<nLocBas; ++B)
+      {
+        const double NB = R[B], NB_x = dR_dx[B], NB_y = dR_dy[B], NB_z = dR_dz[B];
+        const double NB_xx = d2R_dxx[B], NB_yy = d2R_dyy[B], NB_zz = d2R_dzz[B];
+        const double NB_lap = NB_xx + NB_yy + NB_zz;
+        const double velo_dot_gradNB = u * NB_x + v * NB_y + w * NB_z;
+        const double velo_prime_dot_gradNB = u_prime * NB_x + v_prime * NB_y + w_prime * NB_z;
+
+        const double NANB  = NA*NB, NANBx = NA*NB_x, NANBy = NA*NB_y, NANBz = NA*NB_z;
+        const double NAxNB = NA_x*NB, NAxNBx = NA_x*NB_x, NAxNBy = NA_x*NB_y, NAxNBz = NA_x*NB_z;
+        const double NAyNB = NA_y*NB, NAyNBx = NA_y*NB_x, NAyNBy = NA_y*NB_y, NAyNBz = NA_y*NB_z;
+        const double NAzNB = NA_z*NB, NAzNBx = NA_z*NB_x, NAzNBy = NA_z*NB_y, NAzNBz = NA_z*NB_z;
+
+        const double drx_du_B = rho0 * ( u_x * NB + velo_dot_gradNB ) - vis_mu * NB_lap; 
+        const double drx_dv_B = rho0 * u_y * NB;
+        const double drx_dw_B = rho0 * u_z * NB;
+
+        const double dry_du_B = rho0 * v_x * NB;
+        const double dry_dv_B = rho0 * ( v_y * NB + velo_dot_gradNB ) - vis_mu * NB_lap;
+        const double dry_dw_B = rho0 * v_z * NB;
+
+        const double drz_du_B = rho0 * w_x * NB;
+        const double drz_dv_B = rho0 * w_y * NB;
+        const double drz_dw_B = rho0 * ( w_z * NB + velo_dot_gradNB ) - vis_mu * NB_lap;
+
+        // Continuity equation with respect to p, u, v, w
+        Tangent11[nLocBas*A+B] += gwts * dd_dv * tau_m * (NAxNBx + NAyNBy + NAzNBz);
+
+        Tangent10[3*nLocBas*A+3*B] += gwts * ( alpha_m * tau_m * rho0 * NAxNB
+            + dd_dv * ( NANBx + tau_m * NA_x * drx_du_B
+              + tau_m * NA_y * dry_du_B + tau_m * NA_z * drz_du_B ) );
+
+        Tangent10[3*nLocBas*A+3*B+1] += gwts * ( alpha_m * tau_m * rho0 * NAyNB
+            + dd_dv * ( NANBy + tau_m * NA_x * drx_dv_B
+              + tau_m * NA_y * dry_dv_B + tau_m * NA_z * drz_dv_B ) );
+
+        Tangent10[3*nLocBas*A+3*B+2] += gwts * ( alpha_m * tau_m * rho0 * NAzNB
+            + dd_dv * ( NANBz + tau_m * NA_x * drx_dw_B
+              + tau_m * NA_y * dry_dw_B + tau_m * NA_z * drz_dw_B ) );
+
+        // Momentum-x with respect to p, u, v, w
+        Tangent01[nLocBas*(3*A)+B] += gwts * dd_dv * ((-1.0) * NAxNB
+            + velo_dot_gradR * tau_m * rho0 * NB_x
+            - NA * tau_m * rho0 * (u_x * NB_x + u_y * NB_y + u_z * NB_z)
+            - 2.0 * tau_m_2 * rho0 * rx * NAxNBx
+            - tau_m_2 * rho0 * NA_y * (rx * NB_y + ry * NB_x)
+            - tau_m_2 * rho0 * NA_z * (rx * NB_z + rz * NB_x) );
+
+        Tangent00[9*nLocBas*A+3*B] += gwts * ( 
+            alpha_m * ( rho0 * NANB + velo_dot_gradR * rho0_2 * tau_m * NB
+              - rho0_2 * tau_m * u_x * NANB
+              - rho0_2 * tau_m_2 * rx * NAxNB
+              - rho0_2 * tau_m_2 * (rx * NAxNB + ry * NAyNB + rz * NAzNB) )
+            + dd_dv * ( NA * rho0 * velo_dot_gradNB + NANB * rho0 * u_x
+              + vis_mu * (2.0*NAxNBx + NAyNBy + NAzNBz)
+              + velo_dot_gradR * rho0 * tau_m * drx_du_B
+              + rho0 * tau_m * rx * NAxNB
+              - rho0 * tau_m * (rx * NANBx + ry * NANBy + rz * NANBz)
+              - rho0 * tau_m * NA * (u_x * drx_du_B 
+                + u_y * dry_du_B + u_z * drz_du_B ) 
+              + tau_c * NAxNBx
+              - 2.0 * rho0 * tau_m_2 * rx  * NA_x * drx_du_B
+              - rho0 * tau_m_2 * ry * NA_y * drx_du_B
+              - rho0 * tau_m_2 * rz * NA_z * drx_du_B
+              - rho0 * tau_m_2 * rx * NA_y * dry_du_B
+              - rho0 * tau_m_2 * rx * NA_z * drz_du_B
+              + velo_prime_dot_gradR * tau_dc * velo_prime_dot_gradNB ) );
+
+        Tangent00[9*nLocBas*A+3*B+1] += gwts * ( 
+            alpha_m * (-1.0) * rho0_2 * (tau_m * u_y * NANB + tau_m_2 * rx * NAyNB)
+            + dd_dv * ( NANB * rho0 * u_y + vis_mu * NAyNBx 
+              + rho0 * tau_m * rx * NAyNB
+              + velo_dot_gradR * rho0 * tau_m * drx_dv_B
+              - rho0 * tau_m * NA * (u_x*drx_dv_B + u_y*dry_dv_B + u_z*drz_dv_B)
+              + tau_c * NAxNBy
+              - 2.0 * rho0 * tau_m_2 * rx * NA_x * drx_dv_B
+              - rho0 * tau_m_2 * NA_y * (rx * dry_dv_B + ry * drx_dv_B)
+              - rho0 * tau_m_2 * NA_z * (rx * drz_dv_B + rz * drx_dv_B) ) );
+
+        Tangent00[9*nLocBas*A+3*B+2] += gwts * (
+            alpha_m * (-1.0) * rho0_2 * (tau_m * u_z * NANB + tau_m_2 * rx * NAzNB)
+            + dd_dv * ( NANB * rho0 * u_z + vis_mu * NAzNBx 
+              + rho0 * tau_m * rx * NAzNB
+              + velo_dot_gradR * rho0 * tau_m * drx_dw_B
+              - rho0 * tau_m * NA * (u_x*drx_dw_B + u_y*dry_dw_B + u_z*drz_dw_B)
+              + tau_c * NAxNBz
+              - 2.0 * rho0 * tau_m_2 * rx * NA_x * drx_dw_B
+              - rho0 * tau_m_2 * NA_y * (rx * dry_dw_B + ry * drx_dw_B)
+              - rho0 * tau_m_2 * NA_z * (rx * drz_dw_B + rz * drx_dw_B) ) );
+
+        // Momentum-y with respect to p u v w
+        Tangent01[nLocBas*(3*A+1)+B] += gwts * dd_dv * ( (-1.0) * NAyNB
+            + velo_dot_gradR * tau_m * rho0 * NB_y
+            - NA * tau_m * rho0 * (v_x * NB_x + v_y * NB_y + v_z * NB_z)
+            - tau_m_2 * rho0 * NA_x * (rx * NB_y + ry * NB_x)
+            - 2.0 * tau_m_2 * rho0 * ry * NAyNBy
+            - tau_m_2 * rho0 * NA_z * (ry * NB_z + rz * NB_y) );
+
+        Tangent00[3*nLocBas*(3*A+1)+3*B] += gwts * (
+            alpha_m * (-1.0) * rho0_2 * (tau_m * v_x * NANB + tau_m_2 * ry * NAxNB)
+            + dd_dv * ( NANB * rho0 * v_x + vis_mu * NAxNBy
+              + rho0 * tau_m * ry * NAxNB
+              + velo_dot_gradR * rho0 * tau_m * dry_du_B
+              - rho0 * tau_m * NA * (v_x*drx_du_B + v_y*dry_du_B + v_z*drz_du_B)
+              + tau_c * NAyNBx
+              - rho0 * tau_m_2 * NA_x * (ry * drx_du_B + rx * dry_du_B)
+              - 2.0 * rho0 * tau_m_2 * ry * NA_y * dry_du_B
+              - rho0 * tau_m_2 * NA_z * (ry * drz_du_B + rz * dry_du_B) ) );
+
+        Tangent00[3*nLocBas*(3*A+1)+3*B+1] += gwts * (
+            alpha_m * ( rho0 * NANB + velo_dot_gradR * rho0_2 * tau_m * NB
+              - rho0_2 * tau_m * v_y * NANB
+              - rho0_2 * tau_m_2 * ry * NAyNB
+              - rho0_2 * tau_m_2 * (rx * NAxNB + ry * NAyNB + rz * NAzNB) )
+            + dd_dv * ( NA * rho0 * velo_dot_gradNB + NANB * rho0 * v_y
+              + vis_mu * (NAxNBx + 2.0 * NAyNBy + NAzNBz)
+              + velo_dot_gradR * rho0 * tau_m * dry_dv_B
+              + rho0 * tau_m * ry * NAyNB
+              - rho0 * tau_m * ( rx * NANBx + ry * NANBy + rz * NANBz )
+              - rho0 * tau_m * NA * (v_x * drx_dv_B + v_y * dry_dv_B + v_z * drz_dv_B)
+              + tau_c * NAyNBy
+              - rho0 * tau_m_2 * NA_x * (rx * dry_dv_B + ry * drx_dv_B)
+              - 2.0 * rho0 * tau_m_2 * ry * NA_y * dry_dv_B
+              - rho0 * tau_m_2 * NA_z * (ry * drz_dv_B + rz * dry_dv_B)
+              + velo_prime_dot_gradR * tau_dc * velo_prime_dot_gradNB ) );
+
+        Tangent00[3*nLocBas*(3*A+1)+3*B+2] += gwts * (
+            alpha_m * (-1.0) * rho0_2 * ( tau_m * v_z * NANB + tau_m_2 * ry * NAzNB ) 
+            + dd_dv * ( NANB * rho0 * v_z + vis_mu * NAzNBy
+              + rho0 * tau_m * ry * NAzNB
+              + velo_dot_gradR * rho0 * tau_m * dry_dw_B
+              - rho0 * tau_m * NA * (v_x*drx_dw_B + v_y*dry_dw_B + v_z*drz_dw_B)
+              + tau_c * NAyNBz
+              - rho0 * tau_m_2 * NA_x * (rx * dry_dw_B + ry * drx_dw_B)
+              - rho0 * tau_m_2 * 2.0 * ry * NA_y * dry_dw_B
+              - rho0 * tau_m_2 * NA_z * (ry * drz_dw_B + rz * dry_dw_B) ) );
+
+        // Momentum-z with respect to p u v w
+        Tangent01[nLocBas*(3*A+2)+B] += gwts * dd_dv * ( (-1.0) * NAzNB
+            + velo_dot_gradR * tau_m * rho0 * NB_z
+            - NA * tau_m * rho0 * (w_x * NB_x + w_y * NB_y + w_z * NB_z)
+            - tau_m_2 * rho0 * NA_x * (rx * NB_z + rz * NB_x)
+            - tau_m_2 * rho0 * NA_y * (ry * NB_z + rz * NB_y)
+            - 2.0 * tau_m_2 * rho0 * rz * NAzNBz );
+
+        Tangent00[3*nLocBas*(3*A+2)+3*B] += gwts * (
+            alpha_m * (-1.0) * rho0_2 * (tau_m * w_x * NANB + tau_m_2 * rz * NAxNB)
+            + dd_dv * ( NANB * rho0 * w_x + vis_mu * NAxNBz
+              + rho0 * tau_m * rz * NAxNB
+              + velo_dot_gradR * rho0 * tau_m * drz_du_B
+              - rho0 * tau_m * NA * (w_x*drx_du_B + w_y*dry_du_B + w_z*drz_du_B)
+              + tau_c * NAzNBx
+              - rho0 * tau_m_2 * NA_x * (rx * drz_du_B + rz * drx_du_B)
+              - rho0 * tau_m_2 * NA_y * (ry * drz_du_B + rz * dry_du_B)
+              - 2.0 * rho0 * tau_m_2 * rz * NA_z * drz_du_B ) );
+
+        Tangent00[3*nLocBas*(3*A+2)+3*B+1] += gwts * (
+            alpha_m * (-1.0) * rho0_2 * (tau_m * w_y * NANB + tau_m_2 * rz * NAyNB)
+            + dd_dv * ( NANB * rho0 * w_y + vis_mu * NAyNBz
+              + rho0 * tau_m * rz * NAyNB
+              + velo_dot_gradR * rho0 * tau_m * drz_dv_B
+              - rho0 * tau_m * NA * (w_x*drx_dv_B + w_y*dry_dv_B + w_z*drz_dv_B)
+              + tau_c * NAzNBy
+              - rho0 * tau_m_2 * NA_x * (rx * drz_dv_B + rz * drx_dv_B)
+              - rho0 * tau_m_2 * NA_y * (ry * drz_dv_B + rz * dry_dv_B)
+              - 2.0 * rho0 * tau_m_2 * rz * NA_z * drz_dv_B ) );
+
+        Tangent00[3*nLocBas*(3*A+2)+3*B+2] += gwts * (
+            alpha_m * ( rho0 * NANB + velo_dot_gradR * rho0_2 * tau_m * NB
+              - rho0_2 * tau_m * w_z * NANB
+              - rho0_2 * tau_m_2 * rz * NAzNB
+              - rho0_2 * tau_m_2 * (rx*NAxNB + ry*NAyNB + rz * NAzNB) )
+            + dd_dv * ( rho0 * NA * velo_dot_gradNB + NANB * rho0 * w_z
+              + vis_mu * (NAxNBx + NAyNBy + 2.0 * NAzNBz)
+              + velo_dot_gradR * rho0 * tau_m * drz_dw_B
+              + rho0 * tau_m * rz * NAzNB
+              - rho0 * tau_m * (rx*NANBx + ry * NANBy + rz * NANBz)
+              - rho0 * tau_m * NA * (w_x*drx_dw_B + w_y*dry_dw_B + w_z*drz_dw_B)
+              + tau_c * NAzNBz
+              - rho0 * tau_m_2 * NA_x * (rx * drz_dw_B + rz * drx_dw_B)
+              - rho0 * tau_m_2 * NA_y * (ry * drz_dw_B + rz * dry_dw_B)
+              - 2.0 * rho0 * tau_m_2 * NA_z * rz * drz_dw_B 
+              + velo_prime_dot_gradR * tau_dc * velo_prime_dot_gradNB ) );
+      } // B-loop
+    } // A-loop
+  } // qua-loop
+  // ----------------------------------------------------------------
+  // The local `stiffness' matrix 
+  //            K[p][q] = Sub_Tan[4*ii + jj][A*nLocBas+B],
+  // where p = 4*A+ii, q = 4*B+jj, and K has 4*nLocBas rows/columns.
+  // Tangent is a 1D vector storing K by rows:
+  // Tangent[4*nLocBas*p + q] = K[p][q] = Sub_Tan[4*ii+jj][A*nLocBas+B]
+  // ----------------------------------------------------------------
 }
 
 
