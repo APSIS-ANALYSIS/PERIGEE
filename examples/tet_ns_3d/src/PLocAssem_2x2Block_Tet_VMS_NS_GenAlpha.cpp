@@ -800,7 +800,43 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
-{}
+{
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  const int face_nqp = quad -> get_num_quadPts();
+  
+  const double curr = time + alpha_f * dt;
+
+  double gx, gy, gz, nx, ny, nz, surface_area;
+
+  Zero_Residual();
+
+  for(int qua = 0; qua < face_nqp; ++qua)
+  {
+    element->get_R(qua, &R[0]);
+    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+
+    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      coor_x += eleCtrlPts_x[ii] * R[ii];
+      coor_y += eleCtrlPts_y[ii] * R[ii];
+      coor_z += eleCtrlPts_z[ii] * R[ii];
+    }
+
+    get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr, nx, ny, nz,
+        gx, gy, gz );
+
+    const double gwts = surface_area * quad -> get_qw(qua);
+
+    for(int A=0; A<snLocBas; ++A)
+    {
+      Residual0[3*A]   -= gwts * R[A] * gx;
+      Residual0[3*A+1] -= gwts * R[A] * gy;
+      Residual0[3*A+2] -= gwts * R[A] * gz;
+    }
+  }
+}
 
 
 void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
@@ -811,7 +847,8 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
-{}
+{
+}
 
 
 void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
@@ -821,7 +858,8 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
-{}
+{
+}
 
 
 void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
@@ -832,7 +870,8 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
-{}
+{
+}
 
 
 double PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &velo,
