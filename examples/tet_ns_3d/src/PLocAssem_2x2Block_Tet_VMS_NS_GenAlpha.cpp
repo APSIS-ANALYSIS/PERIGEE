@@ -471,7 +471,7 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * rx
           + velo_prime_dot_gradR * tau_dc 
           * (u_prime * u_x + v_prime * u_y + w_prime * u_z)
-          - NA * rho0 * f1 );
+          - NA * rho0 * fx );
 
       Residual0[3*A+1] += gwts * ( NA * rho0 * v_t
           + NA * rho0 * (u * v_x + v * v_y + w * v_z)
@@ -485,7 +485,7 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * ry
           + velo_prime_dot_gradR * tau_dc
           * (u_prime * v_x + v_prime * v_y + w_prime * v_z)
-          - NA * rho0 * f2 );
+          - NA * rho0 * fy );
 
       Residual0[3*A+2] += gwts * (NA * rho0 * w_t
           + NA * rho0 * (u * w_x + v * w_y + w * w_z)
@@ -499,7 +499,7 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * rz
           + velo_prime_dot_gradR * tau_dc
           * (u_prime * w_x + v_prime * w_y + w_prime * w_z)
-          - NA * rho0 * f3 );
+          - NA * rho0 * fz );
 
       for(int B=0; B<nLocBas; ++B)
       {
