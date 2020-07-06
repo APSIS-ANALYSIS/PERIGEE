@@ -881,6 +881,41 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  const int face_nqp = quad -> get_num_quadPts();
+
+  double nx, ny, nz, surface_area, factor;
+
+  Zero_sur_Residual();
+
+  for(int qua = 0; qua < face_nqp; ++qua)
+  {
+    element->get_R(qua, &R[0]);
+    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+
+    double u = 0.0, v = 0.0, w = 0.0;;
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      u += velo[ii*3]   * R[ii];
+      v += velo[ii*3+1] * R[ii];
+      w += velo[ii*3+2] * R[ii];
+    }
+
+    const double temp = u * nx + v * ny + w * nz;
+
+    if(temp < 0.0) factor = temp * rho0 * beta;
+    else factor = 0.0;
+
+    const double gwts = surface_area * quad -> get_qw(qua);
+
+    for(int A=0; A<snLocBas; ++A)
+    {
+      sur_Residual0[3*A]   -= gwts * R[A] * factor * u;
+      sur_Residual0[3*A+1] -= gwts * R[A] * factor * v;
+      sur_Residual0[3*A+2] -= gwts * R[A] * factor * w;
+    }
+  }
 }
 
 
@@ -893,6 +928,54 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  const int face_nqp = quad -> get_num_quadPts();
+
+  const double dd_dv = alpha_f * gamma * dt;
+
+  double nx, ny, nz, surface_area, factor;
+
+  Zero_sur_Tangent_Residual();
+
+  for(int qua = 0; qua < face_nqp; ++qua)
+  {
+    element->get_R(qua, &R[0]);
+    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+
+    double u = 0.0, v = 0.0, w = 0.0;
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      u += velo[ii*3]   * R[ii];
+      v += velo[ii*3+1] * R[ii];
+      w += velo[ii*3+2] * R[ii];
+    }
+
+    const double temp = u * nx + v * ny + w * nz;
+
+    if(temp < 0.0) factor = temp * rho0 * beta;
+    else factor = 0.0;
+
+    const double gwts = surface_area * quad -> get_qw(qua);
+
+    // snLocBas = 3 for linear tri element
+    //            6 for quadratic tri element
+    for(int A=0; A<snLocBas; ++A)
+    {
+      sur_Residual0[3*A]   -= gwts * R[A] * factor * u;
+      sur_Residual0[3*A+1] -= gwts * R[A] * factor * v;
+      sur_Residual0[3*A+2] -= gwts * R[A] * factor * w;
+
+      for(int B=0; B<snLocBas; ++B)
+      {
+        // index := A *snLocBas+B here ranges from 0 to 8 for linear triangle
+        //                        0 to 35 for quadratic triangle
+        sur_Tangent00[ 3*snLocBas*(3*A) + 3*B ]     -= gwts * dd_dv * R[A] * factor * R[B];
+        sur_Tangent00[ 3*snLocBas*(3*A+1) + 3*B+1 ] -= gwts * dd_dv * R[A] * factor * R[B];
+        sur_Tangent00[ 3*snLocBas*(3*A+2) + 3*B+2 ] -= gwts * dd_dv * R[A] * factor * R[B];
+      }
+    }
+  }
 }
 
 
