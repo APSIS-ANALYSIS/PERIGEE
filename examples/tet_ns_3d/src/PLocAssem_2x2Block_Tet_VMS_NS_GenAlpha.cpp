@@ -907,13 +907,11 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
     if(temp < 0.0) factor = temp * rho0 * beta;
     else factor = 0.0;
 
-    const double gwts = surface_area * quad -> get_qw(qua);
-
     for(int A=0; A<snLocBas; ++A)
     {
-      sur_Residual0[3*A]   -= gwts * R[A] * factor * u;
-      sur_Residual0[3*A+1] -= gwts * R[A] * factor * v;
-      sur_Residual0[3*A+2] -= gwts * R[A] * factor * w;
+      sur_Residual0[3*A]   -= surface_area * quad -> get_qw(qua) * R[A] * factor * u;
+      sur_Residual0[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * factor * v;
+      sur_Residual0[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * factor * w;
     }
   }
 }
