@@ -4,7 +4,7 @@
 // This is a preprocessor code for handling Navier-Stokes equations 
 // discretized by tetradedral elements.
 //
-// To Do: 1. Restrict the element choice;
+// To Do: 1. Restrict the element choice (done);
 //        2. Modify the Dirichlet boundary condition (done);
 //        3. Add an element boundary condition for the wall.
 //
@@ -41,7 +41,7 @@ int main( int argc, char * argv[] )
   const std::string part_file("part");
   
   // Element options: 501 linear tets, 502 quadratic tets
-  int elemType = 501;
+  const int elemType = 501;
   int num_outlet = 1;
   
   // Default names for input geometry files
@@ -63,17 +63,13 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionInt("-cpu_size", cpu_size);
   SYS_T::GetOptionInt("-in_ncommon", in_ncommon);
   SYS_T::GetOptionInt("-num_outlet", num_outlet);
-  SYS_T::GetOptionInt("-elem_type", elemType);
   SYS_T::GetOptionString("-geo_file", geo_file);
   SYS_T::GetOptionString("-sur_file_in", sur_file_in);
   SYS_T::GetOptionString("-sur_file_wall", sur_file_wall);
   SYS_T::GetOptionString("-sur_file_out_base", sur_file_out_base);
 
-  if( elemType != 501 && elemType !=502 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
-
   // Print the command line arguments
   cout<<"==== Command Line Arguments ===="<<endl;
-  cout<<" -elem_type: "<<elemType<<endl;
   cout<<" -num_outlet: "<<num_outlet<<endl;
   cout<<" -geo_file: "<<geo_file<<endl;
   cout<<" -sur_file_in: "<<sur_file_in<<endl;
@@ -84,21 +80,13 @@ int main( int argc, char * argv[] )
   cout<<" -in_ncommon: "<<in_ncommon<<endl;
   cout<<" -isDualGraph: true \n";
   cout<<"---- Problem definition ----\n";
+  cout<<" elem_type: "<<elemType<<endl;
   cout<<" dofNum: "<<dofNum<<endl;
   cout<<" dofMat: "<<dofMat<<endl;
   cout<<"====  Command Line Arguments/ ===="<<endl;
 
   // Check if the vtu geometry files exist on disk
   SYS_T::file_check(geo_file); cout<<geo_file<<" found. \n";
-
-  // If it is quadratic mesh, the mesh file will be all in vtu format
-  if(elemType == 502)
-  {
-    sur_file_in.erase( sur_file_in.end()-4, sur_file_in.end() );
-    sur_file_in += ".vtu";
-    sur_file_wall.erase( sur_file_wall.end()-4, sur_file_wall.end() );
-    sur_file_wall += ".vtu";
-  }
 
   SYS_T::file_check(sur_file_in); cout<<sur_file_in<<" found. \n";
 
@@ -115,8 +103,7 @@ int main( int argc, char * argv[] )
     if( ii/10 == 0 ) ss<<"00";
     else if( ii/100 == 0 ) ss<<"0";
 
-    if(elemType == 501 ) ss<<ii<<".vtp";
-    else ss<<ii<<".vtu";
+    ss<<ii<<".vtp";
       
     sur_file_out[ii] = ss.str(); // generate the outlet face file name
     
@@ -152,25 +139,15 @@ int main( int argc, char * argv[] )
   IIEN * IEN = nullptr;
   IMesh * mesh = nullptr;
 
-  if(elemType == 501)
-  {
-    SYS_T::print_fatal_if(vecIEN.size() / nElem != 4, "Error: the mesh connectivity array size does not match with the element type 501. \n");
-    
-    IEN = new IEN_Tetra_P1(nElem, vecIEN);
-    mesh = new Mesh_Tet4(nFunc, nElem);
-  }
-  else
-  {
-    SYS_T::print_fatal_if(vecIEN.size() / nElem != 10, "Error: the mesh connectivity array size does not match with the element type 502. \n");
-    
-    IEN = new IEN_Tetra_P2(nElem, vecIEN);
-    mesh = new Mesh_Tet10(nFunc, nElem);
-  }
+  SYS_T::print_fatal_if(vecIEN.size() / nElem != 4, "Error: the mesh connectivity array size does not match with the element type 501. \n");
+
+  IEN = new IEN_Tetra_P1(nElem, vecIEN);
+  mesh = new Mesh_Tet4(nFunc, nElem);
 
   VEC_T::clean( vecIEN ); // clean the vector
-  
+
   mesh -> print_info();
-  
+
   // Call METIS to partition the mesh 
   IGlobal_Part * global_part = nullptr;
   if(cpu_size > 1)
@@ -191,20 +168,10 @@ int main( int argc, char * argv[] )
   std::vector<std::string> dir_list;
   dir_list.push_back( sur_file_in );
 
-  if(elemType == 501)
-  {
-    NBC_list[0] = new NodalBC_3D_vtp( nFunc );
-    NBC_list[1] = new NodalBC_3D_vtp( dir_list, nFunc );
-    NBC_list[2] = new NodalBC_3D_vtp( dir_list, nFunc );
-    NBC_list[3] = new NodalBC_3D_vtp( dir_list, nFunc );
-  }
-  else
-  {
-    NBC_list[0] = new NodalBC_3D_vtu( nFunc );
-    NBC_list[1] = new NodalBC_3D_vtu( dir_list, nFunc );
-    NBC_list[2] = new NodalBC_3D_vtu( dir_list, nFunc );
-    NBC_list[3] = new NodalBC_3D_vtu( dir_list, nFunc );
-  }
+  NBC_list[0] = new NodalBC_3D_vtp( nFunc );
+  NBC_list[1] = new NodalBC_3D_vtp( dir_list, nFunc );
+  NBC_list[2] = new NodalBC_3D_vtp( dir_list, nFunc );
+  NBC_list[3] = new NodalBC_3D_vtp( dir_list, nFunc );
 
   // Inflow BC info
   std::vector<double> inflow_outward_vec;
@@ -253,17 +220,17 @@ int main( int argc, char * argv[] )
     part -> write( part_file.c_str() );
 
     part -> print_part_loadbalance_edgecut();
-    
+
     // Partition Nodal BC and write to h5 file
     INBC_Partition * nbcpart = new NBC_Partition_3D(part, mnindex, NBC_list);
-    
+
     nbcpart -> write_hdf5( part_file.c_str() );
 
     // Partition Nodal Inflow BC and write to h5 file
     INBC_Partition * infpart = new NBC_Partition_3D_inflow(part, mnindex, InFBC);
-    
+
     infpart->write_hdf5( part_file.c_str() );
-    
+
     // Partition Elemental BC and write to h5 file
     IEBC_Partition * ebcpart = new EBC_Partition_vtp_outflow(part, mnindex, ebc, NBC_list);
 
