@@ -4,22 +4,15 @@
 // This is a preprocessor code for handling Navier-Stokes equations 
 // discretized by tetradedral elements.
 //
-// To Do: 1. Restrict the element choice (done);
-//        2. Modify the Dirichlet boundary condition (done);
-//        3. Add an element boundary condition for the wall.
-//
 // Date Created: Jan 01 2020
 // ==================================================================
 #include "Math_Tools.hpp"
 #include "Mesh_Tet4.hpp"
-#include "Mesh_Tet10.hpp"
 #include "IEN_Tetra_P1.hpp"
-#include "IEN_Tetra_P2.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
 #include "Part_Tet.hpp"
 #include "NodalBC_3D_vtp.hpp"
-#include "NodalBC_3D_vtu.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_tet_outflow.hpp"
 #include "NBC_Partition_3D_inflow.hpp"
@@ -191,10 +184,10 @@ int main( int argc, char * argv[] )
   ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
 
   // Wall mesh is set as an elemental bc.
-  // std::vector< std::string > sur_file_wall_list; sur_file_wall_list.clear();
-  // sur_file_wall_list.push_back( sur_file_wall );
-  // ElemBC * wall_bc = new ElemBC_3D_tet( sur_file_wall_list );
-  // wall_bc -> resetTriIEN_outwardnormal( IEN );
+  std::vector< std::string > sur_file_wall_list; sur_file_wall_list.clear();
+  sur_file_wall_list.push_back( sur_file_wall );
+  ElemBC * wall_bc = new ElemBC_3D_tet( sur_file_wall_list );
+  wall_bc -> resetTriIEN_outwardnormal( IEN );
 
   // Start partition the mesh for each cpu_rank 
   const bool isPrintPartInfo = true;
@@ -223,22 +216,19 @@ int main( int argc, char * argv[] )
 
     // Partition Nodal BC and write to h5 file
     INBC_Partition * nbcpart = new NBC_Partition_3D(part, mnindex, NBC_list);
-
     nbcpart -> write_hdf5( part_file.c_str() );
 
     // Partition Nodal Inflow BC and write to h5 file
     INBC_Partition * infpart = new NBC_Partition_3D_inflow(part, mnindex, InFBC);
-
     infpart->write_hdf5( part_file.c_str() );
 
     // Partition Elemental BC and write to h5 file
     IEBC_Partition * ebcpart = new EBC_Partition_vtp_outflow(part, mnindex, ebc, NBC_list);
-
     ebcpart -> write_hdf5( part_file.c_str() );
 
     // Partition Elemental Wall BC and write it to h5 file
-    // IEBC_Partition * wbcpart = new EBC_Partition_vtp(part, mnindex, wall_bc );
-    // wbcpart -> write_hdf5( part_file.c_str() );
+    IEBC_Partition * wbcpart = new EBC_Partition_vtp(part, mnindex, wall_bc );
+    wbcpart -> write_hdf5( part_file.c_str() );
 
     // Collect partition statistics
     list_nlocalnode.push_back(part->get_nlocalnode());
@@ -248,8 +238,7 @@ int main( int argc, char * argv[] )
     list_ratio_g2l.push_back((double)part->get_nghostnode()/(double) part->get_nlocalnode());
 
     sum_nghostnode += part->get_nghostnode();
-    delete part; delete nbcpart; delete infpart; delete ebcpart;
-    // delete wbcpart; 
+    delete part; delete nbcpart; delete infpart; delete ebcpart; delete wbcpart; 
   }
 
   cout<<"\n===> Mesh Partition Quality: "<<endl;
@@ -278,7 +267,7 @@ int main( int argc, char * argv[] )
   // Finalize the code and exit
   for(auto it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc) delete *it_nbc;
 
-  delete InFBC; delete ebc; delete mytimer; // delete wall_bc;
+  delete InFBC; delete ebc; delete mytimer; delete wall_bc;
   delete mnindex; delete global_part; delete mesh; delete IEN;
   PetscFinalize();
   return EXIT_SUCCESS;
