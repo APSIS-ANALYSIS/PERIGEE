@@ -224,11 +224,11 @@ int main( int argc, char * argv[] )
 
     // Partition Elemental BC and write to h5 file
     IEBC_Partition * ebcpart = new EBC_Partition_vtp_outflow(part, mnindex, ebc, NBC_list);
-    ebcpart -> write_hdf5( part_file.c_str() );
+    ebcpart -> write_hdf5( part_file.c_str(), "outlet_ebc" );
 
     // Partition Elemental Wall BC and write it to h5 file
     IEBC_Partition * wbcpart = new EBC_Partition_vtp(part, mnindex, wall_bc );
-    wbcpart -> write_hdf5( part_file.c_str() );
+    wbcpart -> write_hdf5( part_file.c_str(), "wall_ebc" );
 
     // Collect partition statistics
     list_nlocalnode.push_back(part->get_nlocalnode());
