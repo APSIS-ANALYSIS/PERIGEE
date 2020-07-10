@@ -93,11 +93,9 @@ void NBC_Partition_3D_inflow::write_hdf5( const char * FileName ) const
   std::string filebname(FileName);
   std::string fName = SYS_T::gen_partfile_name( filebname, cpu_rank );
   
-  hid_t file_id, group_id;
+  hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
-  file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
-
-  group_id = H5Gcreate(file_id, "/inflow", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  hid_t group_id = H5Gcreate(file_id, "/inflow", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
   HDF5_Writer * h5writer = new HDF5_Writer(file_id);
 
