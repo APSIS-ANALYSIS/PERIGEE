@@ -14,10 +14,10 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
   Num_LD.resize(dof); Num_LPS.resize(dof); Num_LPM.resize(dof);
 
   // Loop over nbc_list and store the Dirichlet nodes
-  unsigned int node_index, node_num;
+  unsigned int node_index;
   for(int ii=0; ii<dof; ++ii)
   {
-    node_num = 0;
+    unsigned int node_num = 0;
     for(unsigned int jj=0; jj<nbc_list[ii]->get_num_dir_nodes(); ++jj)
     {
       node_index = nbc_list[ii]->get_dir_nodes(jj);
@@ -108,8 +108,8 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
   Num_LD.resize(dof); Num_LPS.resize(dof); Num_LPM.resize(dof);
 
   // Loop over nbc_list and store the Dirichlet nodes
-  unsigned int node_index, node_num;
-  node_num = 0;
+  unsigned int node_index;
+  unsigned int node_num = 0;
   for(unsigned int jj=0; jj<nbc->get_num_dir_nodes(); ++jj)
   {
     node_index = nbc -> get_dir_nodes(jj);
