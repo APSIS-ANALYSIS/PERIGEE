@@ -21,10 +21,13 @@ class IEBC_Partition
 
     virtual ~IEBC_Partition(){};
 
+    // Write the EBC partitioned info in the root directory of a HDF5 file
+    virtual void write_hdf5( const char * FileName ) const = 0;
+
     // Write the EBC partitioned info in a prescribed directory of a HDF5 file
-    virtual void write_hdf5( const char * const &FileName,
-        const char * const &GroupName = "/ebc" ) const
-    {SYS_T::print_exit("Error: write_hdf5 is not implemented.\n");}
+    virtual void write_hdf5( const char * FileName,
+        const char * GroupName ) const
+    {SYS_T::print_exit("Error: write_hdf5(fname,gname) is not implemented.\n");}
 
     virtual void print_info() const = 0;
 
