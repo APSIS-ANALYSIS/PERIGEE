@@ -31,16 +31,14 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
     Num_LD[ii] = node_num;
   }
 
-  unsigned int node_ps, node_pm;
-  unsigned int ps_num, pm_num;
   for(int ii=0; ii<dof; ++ii)
   {
-    ps_num = 0;
-    pm_num = 0;
+    unsigned int ps_num = 0;
+    unsigned int pm_num = 0;
     for(unsigned int jj=0; jj<nbc_list[ii]->get_num_per_nodes(); ++jj)
     {
-      node_ps = nbc_list[ii]->get_per_slave_nodes(jj);
-      node_pm = nbc_list[ii]->get_per_master_nodes(jj);
+      unsigned int node_ps = nbc_list[ii]->get_per_slave_nodes(jj);
+      unsigned int node_pm = nbc_list[ii]->get_per_master_nodes(jj);
       node_ps = mnindex->get_old2new(node_ps);
       node_pm = mnindex->get_old2new(node_pm);
       
@@ -57,8 +55,8 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
         LocalMasterSlave.push_back(node_ps);
         pm_num += 1;
       }
-
     }
+    
     Num_LPS[ii] = ps_num;
     Num_LPM[ii] = pm_num;
   }
@@ -67,13 +65,12 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
 
   LID.resize(totnode * dof);
 
-  int new_index, old_index;
   for(int ii=0; ii<dof; ++ii)
   {
     for(int jj=0; jj<totnode; ++jj)
     {
-      new_index = part->get_local_to_global(jj);
-      old_index = mnindex->get_new2old(new_index);
+      const int new_index = part->get_local_to_global(jj);
+      const int old_index = mnindex->get_new2old(new_index);
       LID[ii*totnode + jj] = nbc_list[ii]->get_ID(old_index);
     }
   }
@@ -119,14 +116,12 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
   }
   Num_LD[0] = node_num;
 
-  unsigned int node_ps, node_pm;
-  unsigned int ps_num, pm_num;
-  ps_num = 0;
-  pm_num = 0;
+  unsigned int ps_num = 0;
+  unsigned int pm_num = 0;
   for(unsigned int jj=0; jj<nbc->get_num_per_nodes(); ++jj)
   {
-    node_ps = nbc -> get_per_slave_nodes(jj);
-    node_pm = nbc -> get_per_master_nodes(jj);
+    unsigned int node_ps = nbc -> get_per_slave_nodes(jj);
+    unsigned int node_pm = nbc -> get_per_master_nodes(jj);
     node_ps = mnindex -> get_old2new(node_ps);
     node_pm = mnindex -> get_old2new(node_pm);
 
@@ -152,11 +147,10 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
 
   LID.resize(totnode * dof);
 
-  int new_index, old_index;
   for(int jj=0; jj<totnode; ++jj)
   {
-    new_index = part->get_local_to_global(jj);
-    old_index = mnindex->get_new2old(new_index);
+    const int new_index = part->get_local_to_global(jj);
+    const int old_index = mnindex->get_new2old(new_index);
     LID[jj] = nbc -> get_ID(old_index);
   }
 
