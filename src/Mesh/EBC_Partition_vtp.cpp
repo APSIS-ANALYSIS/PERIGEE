@@ -109,7 +109,7 @@ EBC_Partition_vtp::~EBC_Partition_vtp()
   VEC_T::clean( local_global_cell );
 }
 
-
+/*
 void EBC_Partition_vtp::write_hdf5( const char * FileName ) const
 {
   const std::string input_fName(FileName);
@@ -159,6 +159,7 @@ void EBC_Partition_vtp::write_hdf5( const char * FileName ) const
   H5Gclose( g_id );
   H5Fclose( file_id );
 }
+*/
 
 
 void EBC_Partition_vtp::write_hdf5( const char * FileName,

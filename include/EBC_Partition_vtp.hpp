@@ -25,11 +25,11 @@ class EBC_Partition_vtp : public IEBC_Partition
     virtual ~EBC_Partition_vtp();
 
     // Write the data to hdf5 file in group /ebc
-    virtual void write_hdf5( const char * FileName ) const;
+    //virtual void write_hdf5( const char * FileName ) const;
     
     // Write the data to hdf5 file in group /GroupName
     virtual void write_hdf5( const char * FileName,
-       const char * GroupName ) const;
+       const char * GroupName = "/ebc" ) const;
 
     virtual void print_info() const;
 
@@ -60,9 +60,11 @@ class EBC_Partition_vtp : public IEBC_Partition
     {return local_global_cell[ii][jj];}
 
   protected:
-    const int cpu_rank; // The rank or id of the subdomain
+    // The rank or id of the subdomain
+    const int cpu_rank; 
     
-    const int num_ebc; // Number of groups of bc faces that require bc integral
+    // The number of groups of bc faces that require bc integral
+    const int num_ebc; 
 
     std::vector<int> num_local_node, num_local_cell, cell_nLocBas;
 
