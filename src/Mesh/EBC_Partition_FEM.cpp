@@ -107,7 +107,6 @@ EBC_Partition_FEM::EBC_Partition_FEM( const IPart * const &part,
   }// end-loop-over-ebc
 }
 
-
 EBC_Partition_FEM::~EBC_Partition_FEM()
 {
   VEC_T::clean( num_local_node );
@@ -120,26 +119,10 @@ EBC_Partition_FEM::~EBC_Partition_FEM()
   VEC_T::clean( local_global_cell );
 }
 
-
 void EBC_Partition_FEM::write_hdf5( const char * FileName ) const
 {
-  std::string fName(FileName);
-  fName.append("_p");
-
-  if( cpu_rank / 10 == 0 )
-    fName.append("0000");
-  else if( cpu_rank / 100 == 0 )
-    fName.append("000");
-  else if( cpu_rank / 1000 == 0 )
-    fName.append("00");
-  else if( cpu_rank / 10000 == 0 )
-    fName.append("0");
-
-  std::stringstream sstrm;
-  sstrm<<cpu_rank;
-  fName.append(sstrm.str());
-
-  fName.append(".h5");
+  const std::string input_fName(FileName);
+  const std::string fName = SYS_T::gen_partfile_name( input_fName, cpu_rank );
 
   hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
@@ -188,27 +171,11 @@ void EBC_Partition_FEM::write_hdf5( const char * FileName ) const
   H5Fclose( file_id );
 }
 
-
 void EBC_Partition_FEM::write_hdf5( const char * FileName,
    const char * GroupName ) const
 {
-  std::string fName(FileName);
-  fName.append("_p");
-
-  if( cpu_rank / 10 == 0 )
-    fName.append("0000");
-  else if( cpu_rank / 100 == 0 )
-    fName.append("000");
-  else if( cpu_rank / 1000 == 0 )
-    fName.append("00");
-  else if( cpu_rank / 10000 == 0 )
-    fName.append("0");
-
-  std::stringstream sstrm;
-  sstrm<<cpu_rank;
-  fName.append(sstrm.str());
-
-  fName.append(".h5");
+  const std::string input_fName(FileName);
+  const std::string fName = SYS_T::gen_partfile_name( input_fName, cpu_rank );
 
   hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
@@ -257,7 +224,6 @@ void EBC_Partition_FEM::write_hdf5( const char * FileName,
   H5Fclose( file_id );
 }
 
-
 void EBC_Partition_FEM::print_info() const
 {
   std::cout<<"=========================================== \n";
@@ -283,6 +249,5 @@ void EBC_Partition_FEM::print_info() const
   } 
   std::cout<<"=========================================== \n";
 }
-
 
 // EOF
