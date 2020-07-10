@@ -27,10 +27,8 @@ class EBC_Partition_FEM : public IEBC_Partition
 
     virtual ~EBC_Partition_FEM();
 
-    virtual void write_hdf5( const char * FileName ) const;
-    
-    virtual void write_hdf5( const char * FileName,
-       const char * GroupName ) const;
+    virtual void write_hdf5( const char * const &FileName,
+       const char * const &GroupName = "/ebc" ) const;
 
     virtual void print_info() const;
 

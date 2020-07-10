@@ -121,94 +121,11 @@ EBC_Partition_FEM::~EBC_Partition_FEM()
 }
 
 
-void EBC_Partition_FEM::write_hdf5( const char * FileName ) const
+void EBC_Partition_FEM::write_hdf5( const char * const &FileName,
+   const char * const &GroupName ) const
 {
-  std::string fName(FileName);
-  fName.append("_p");
-
-  if( cpu_rank / 10 == 0 )
-    fName.append("0000");
-  else if( cpu_rank / 100 == 0 )
-    fName.append("000");
-  else if( cpu_rank / 1000 == 0 )
-    fName.append("00");
-  else if( cpu_rank / 10000 == 0 )
-    fName.append("0");
-
-  std::stringstream sstrm;
-  sstrm<<cpu_rank;
-  fName.append(sstrm.str());
-
-  fName.append(".h5");
-
-  hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
-
-  hid_t g_id = H5Gcreate(file_id, "/ebc", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT); 
-
-  HDF5_Writer * h5w = new HDF5_Writer( file_id );
-
-  h5w -> write_intScalar( g_id, "num_ebc", num_ebc );
-
-  h5w -> write_intVector( g_id, "num_local_node", num_local_node );
-
-  h5w -> write_intVector( g_id, "num_local_cell", num_local_cell );
-
-  h5w -> write_intVector( g_id, "cell_nLocBas", cell_nLocBas );
-
-  const std::string groupbase("ebcid_");
-
-  for(int ii=0; ii<num_ebc; ++ii)
-  {
-    if( num_local_cell[ii] > 0 )
-    {
-      std::string subgroup_name(groupbase);
-      subgroup_name.append( SYS_T::to_string(ii) );
-
-      hid_t group_id = H5Gcreate(g_id, subgroup_name.c_str(), 
-          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-
-      h5w->write_doubleVector( group_id, "local_pt_xyz", local_pt_xyz[ii] );
-
-      h5w->write_intVector( group_id, "local_tri_ien", local_tri_ien[ii] );
-
-      h5w->write_intVector( group_id, "local_global_node", local_global_node[ii] );
-      
-      h5w->write_intVector( group_id, "local_node_pos", local_node_pos[ii] );
-
-      h5w->write_intVector( group_id, "local_global_cell", local_global_cell[ii] );
-
-      h5w->write_doubleVector( group_id, "local_intpt_xyz", local_intpt[ii] );
-
-      H5Gclose( group_id );
-    }
-  }
-
-  delete h5w;
-  H5Gclose( g_id );
-  H5Fclose( file_id );
-}
-
-
-void EBC_Partition_FEM::write_hdf5( const char * FileName,
-   const char * GroupName ) const
-{
-  std::string fName(FileName);
-  fName.append("_p");
-
-  if( cpu_rank / 10 == 0 )
-    fName.append("0000");
-  else if( cpu_rank / 100 == 0 )
-    fName.append("000");
-  else if( cpu_rank / 1000 == 0 )
-    fName.append("00");
-  else if( cpu_rank / 10000 == 0 )
-    fName.append("0");
-
-  std::stringstream sstrm;
-  sstrm<<cpu_rank;
-  fName.append(sstrm.str());
-
-  fName.append(".h5");
+  const std::string input_fName(FileName);
+  const std::string fName = SYS_T::gen_partfile_name( input_fName, cpu_rank );
 
   hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
@@ -283,6 +200,5 @@ void EBC_Partition_FEM::print_info() const
   } 
   std::cout<<"=========================================== \n";
 }
-
 
 // EOF
