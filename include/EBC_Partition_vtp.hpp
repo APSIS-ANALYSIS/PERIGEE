@@ -24,9 +24,6 @@ class EBC_Partition_vtp : public IEBC_Partition
 
     virtual ~EBC_Partition_vtp();
 
-    // Write the data to hdf5 file in group /ebc
-    //virtual void write_hdf5( const char * FileName ) const;
-    
     // Write the data to hdf5 file in group /GroupName
     virtual void write_hdf5( const char * const &FileName,
        const char * const &GroupName = "/ebc" ) const;
