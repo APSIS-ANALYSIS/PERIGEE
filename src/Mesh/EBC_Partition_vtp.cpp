@@ -162,8 +162,8 @@ void EBC_Partition_vtp::write_hdf5( const char * FileName ) const
 */
 
 
-void EBC_Partition_vtp::write_hdf5( const char * FileName,
-   const char * GroupName ) const
+void EBC_Partition_vtp::write_hdf5( const char * const &FileName,
+   const char * const &GroupName ) const
 {
   const std::string input_fName(FileName);
   const std::string fName = SYS_T::gen_partfile_name( input_fName, cpu_rank );

@@ -28,13 +28,10 @@ class EBC_Partition_vtp_outflow : public EBC_Partition_vtp
 
     virtual ~EBC_Partition_vtp_outflow();
 
-    // write the data to hdf5 file in group /ebc/ebcid_xxx, 
-    // xxx is the ebc_id
-    virtual void write_hdf5( const char * FileName ) const;
-
     // write the data to hdf5 file in group /group-name/ebcid_xxx, 
     // xxx is the ebc_id
-    virtual void write_hdf5( const char * FileName, const char * GroupName ) const;
+    virtual void write_hdf5( const char * const &FileName, 
+        const char * const &GroupName = "/ebc" ) const;
 
   protected:
     // Length is num_ebc x [ 0 if this part does not own this bc,
