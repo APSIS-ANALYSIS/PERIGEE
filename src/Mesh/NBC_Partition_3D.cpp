@@ -62,7 +62,6 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
     Num_LPS[ii] = ps_num;
     Num_LPM[ii] = pm_num;
   }
-
   
   const int totnode = part->get_nlocghonode();
 
