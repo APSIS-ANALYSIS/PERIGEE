@@ -193,38 +193,19 @@ NBC_Partition_3D::~NBC_Partition_3D()
 
 void NBC_Partition_3D::write_hdf5(const char * FileName) const
 {
-  std::string fName(FileName);
-  fName.append("_p");
+  const std::string input_fName(FileName);
+  const std::string fName = SYS_T::gen_partfile_name( input_fName, cpu_rank );
 
-  if( cpu_rank / 10 == 0 )
-    fName.append("0000");
-  else if( cpu_rank / 100 == 0 )
-    fName.append("000");
-  else if( cpu_rank / 1000 == 0 )
-    fName.append("00");
-  else if( cpu_rank / 10000 == 0 )
-    fName.append("0");
+  hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
-  std::stringstream sstrm;
-  sstrm<<cpu_rank;
-  fName.append(sstrm.str());
-
-  fName.append(".h5");
-
-  hid_t file_id, group_id;
-
-  file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
-
-  group_id = H5Gcreate(file_id, "/nbc", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  hid_t group_id = H5Gcreate(file_id, "/nbc", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
   HDF5_Writer * h5writer = new HDF5_Writer(file_id);
-
 
   h5writer->write_intVector(group_id, "LID", LID);
 
   if(LDN.size() > 0)
     h5writer->write_intVector(group_id, "LDN", LDN);
-
 
   if(LPSN.size() > 0)
   {
@@ -251,29 +232,12 @@ void NBC_Partition_3D::write_hdf5(const char * FileName) const
 void NBC_Partition_3D::write_hdf5( const char * FileName,
     const char * GroupName ) const
 {
-  std::string fName(FileName);
-  fName.append("_p");
+  const std::string input_fName(FileName);
+  const std::string fName = SYS_T::gen_partfile_name( input_fName, cpu_rank );
 
-  if( cpu_rank / 10 == 0 )
-    fName.append("0000");
-  else if( cpu_rank / 100 == 0 )
-    fName.append("000");
-  else if( cpu_rank / 1000 == 0 )
-    fName.append("00");
-  else if( cpu_rank / 10000 == 0 )
-    fName.append("0");
+  hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
-  std::stringstream sstrm;
-  sstrm<<cpu_rank;
-  fName.append(sstrm.str());
-
-  fName.append(".h5");
-
-  hid_t file_id, group_id;
-
-  file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
-
-  group_id = H5Gcreate(file_id, GroupName, H5P_DEFAULT, H5P_DEFAULT, 
+  hid_t group_id = H5Gcreate(file_id, GroupName, H5P_DEFAULT, H5P_DEFAULT, 
       H5P_DEFAULT);
 
   HDF5_Writer * h5writer = new HDF5_Writer(file_id);
@@ -329,6 +293,5 @@ void NBC_Partition_3D::print_info() const
   VEC_T::print(Num_LPM);
   std::cout<<"=========================================== \n";
 }
-
 
 // EOF
