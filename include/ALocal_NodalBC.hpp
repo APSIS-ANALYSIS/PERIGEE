@@ -21,8 +21,7 @@ class ALocal_NodalBC
     // the name mesh_nbc.
     // --------------------------------------------------------------
     ALocal_NodalBC( const std::string &fileBaseName, 
-        const int &cpu_rank,
-        const std::string &gname="/nbc" );
+        const int &cpu_rank, const std::string &gname="/nbc" );
 
     virtual ~ALocal_NodalBC();
 

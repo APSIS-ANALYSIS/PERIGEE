@@ -17,8 +17,7 @@ class ALocal_EBC
     // stored in the group /ebc by default. Give a group name if
     // the data is written to a different groupname.
     ALocal_EBC( const std::string &fileBaseName,
-        const int &cpu_rank,
-        const std::string &gname="/ebc" );
+        const int &cpu_rank, const std::string &gname="/ebc" );
 
     virtual ~ALocal_EBC();
 
