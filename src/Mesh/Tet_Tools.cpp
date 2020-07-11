@@ -288,6 +288,12 @@ void TET_T::read_vtp_grid( const std::string &filename,
 }
 
 
+void TET_T::read_polydata( const std::string &filename,
+    vtkPolyData * &output_polydata )
+{
+  // To be filled.
+}
+
 void TET_T::write_tet_grid( const std::string &filename,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt, const std::vector<int> &ien_array )
@@ -353,7 +359,7 @@ void TET_T::write_tet_grid( const std::string &filename,
       }
       edge_aspect_ratio -> InsertNextValue( TET_T::get_aspect_ratio(cell_node) );
     }
-    
+
     cl -> Delete();
   }
   else if(nlocbas == 10)
@@ -385,7 +391,7 @@ void TET_T::write_tet_grid( const std::string &filename,
       }
       edge_aspect_ratio -> InsertNextValue( TET_T::get_aspect_ratio(cell_node) );
     }
-    
+
     cl -> Delete();
   }
   else SYS_T::print_fatal("Error: TET_T::write_tet_grid unknown local basis number.\n");
@@ -763,7 +769,7 @@ void TET_T::write_tet_grid( const std::string &filename,
   else if( nlocbas == 10 )
   {
     vtkCell * cl = vtkQuadraticTetra::New();
-    
+
     for(int ii=0; ii<numcels; ++ii)
     {
       cl->GetPointIds()->SetId( 0, ien_array[10*ii] );
@@ -911,7 +917,7 @@ void TET_T::write_tet_grid( const std::string &filename,
       cl->GetPointIds()->SetId( 3, ien_array[4*ii+3] );
 
       grid_w->InsertNextCell( cl->GetCellType(), cl->GetPointIds() );
-  
+
       // Obtain the cell node coordinates and calculate the aspect ratio
       std::vector<double> cell_node; cell_node.clear();
       for(int lnode=0; lnode<4; ++lnode)
@@ -922,9 +928,9 @@ void TET_T::write_tet_grid( const std::string &filename,
         cell_node.push_back(pt[node_offset+2]);
       }
       edge_aspect_ratio -> InsertNextValue( TET_T::get_aspect_ratio(cell_node) );
-  
+
       cellindex -> InsertNextValue( cell_index[ii] );
-  
+
       phy_tag -> InsertNextValue( phytag[ii] );
     }
     cl -> Delete();
@@ -1056,7 +1062,7 @@ void TET_T::write_triangle_grid( const std::string &filename,
   ptindex -> SetName("GlobalNodeID");
   for(int ii=0; ii<numpts; ++ii)
     ptindex -> InsertComponent(ii, 0, node_index[ii]);
-  
+
   grid_w -> GetPointData() -> AddArray( ptindex );
   ptindex->Delete();
 
@@ -1143,7 +1149,7 @@ void TET_T::write_quadratic_triangle_grid(
   ptindex -> SetName("GlobalNodeID");
   for(int ii=0; ii<numpts; ++ii)
     ptindex -> InsertComponent(ii, 0, node_index[ii]);
-  
+
   grid_w -> GetPointData() -> AddArray( ptindex );
   ptindex->Delete();
 
@@ -1927,7 +1933,7 @@ void TET_T::tetmesh_check(const std::vector<double> &cpts,
   double teton_min_h = teton_max_h;
   int num_dist_elem = 0; // number of element that has negative volume
   int num_aspt_elem = 0; // number of element that has aspect ratio larger
-                         // than the given critical aspect ratio value
+  // than the given critical aspect ratio value
   for(int ee = 0; ee<nelem; ++ee)
   {
     teton->reset( cpts, ienptr, ee );
