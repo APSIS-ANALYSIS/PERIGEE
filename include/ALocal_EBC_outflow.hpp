@@ -15,9 +15,6 @@
 class ALocal_EBC_outflow : public ALocal_EBC
 {
   public:
-    // Constructor will read the input lumped parameters from a file
-    // lpn_file.txt is the default name.
-    // It is allowed to use # to comment lines in the file.
     ALocal_EBC_outflow( const std::string &fileBaseName,
         const int &cpu_rank, const std::string &gname="/ebc" );
 

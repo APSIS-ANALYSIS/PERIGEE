@@ -13,11 +13,11 @@
 class ALocal_EBC
 {
   public:
-    // Constructor. Read from part file, and the EBC info is typically
-    // stored in the group /ebc.
+    // Constructor. Read from part file, and the EBC info is
+    // stored in the group /ebc by default. Give a group name if
+    // the data is written to a different groupname.
     ALocal_EBC( const std::string &fileBaseName,
-        const int &cpu_rank,
-        const std::string &gname="/ebc" );
+        const int &cpu_rank, const std::string &gname="/ebc" );
 
     virtual ~ALocal_EBC();
 
