@@ -340,6 +340,14 @@ namespace TET_T
   //   point on the wall), find the xyz coordinates of the closest
   //   point in the centerline, and the distance between the two point,
   //   which is the radius for the given point.
+  //   Input: \para centerlineData : the polydata storing all centerline
+  //                                 information
+  //          \para coor_x/y/z : the xyz coordinate of a given point
+  //   Output:
+  //          \para line_pt_x/y/z : the xyz coordinate of the cloest
+  //                                point on the centerline to the 
+  //                                given point
+  //          \para dist : the distance between the two points
   // ----------------------------------------------------------------
   void get_dist2centerline( const vtkPolyData * const &centerlineData,
       const double &coor_x, const double &coor_y, const double &coor_z,
