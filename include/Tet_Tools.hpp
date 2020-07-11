@@ -333,6 +333,19 @@ namespace TET_T
       const IIEN * const &vol_ien,
       std::vector<double> &outVec );
 
+
+  // ----------------------------------------------------------------
+  // ! get_dist2centerline:
+  //   Given the centerline polydata, given a point (conceputally a 
+  //   point on the wall), find the xyz coordinates of the closest
+  //   point in the centerline, and the distance between the two point,
+  //   which is the radius for the given point.
+  // ----------------------------------------------------------------
+  void get_dist2centerline( const vtkPolyData * const &centerlineData,
+      const double &coor_x, const double &coor_y, const double &coor_z,
+      double &line_pt_x, double &line_pt_y, double &line_pt_z,
+      double &dist );
+
   
   // ================================================================
   // 4. TetGen interface

@@ -1468,6 +1468,15 @@ void TET_T::get_out_normal( const std::string &file,
 }
 
 
+void TET_T::get_dist2centerline( const vtkPolyData * const &centerlineData,
+    const double &coor_x, const double &coor_y, const double &coor_z,
+    double &line_pt_x, double &line_pt_y, double &line_pt_z,
+    double &dist )
+{
+  // To be filled
+}
+
+
 void TET_T::tetgenio2vtu( const tetgenio &meshout, const std::string &fName )
 {
   const int index_offset = meshout.firstnumber;
