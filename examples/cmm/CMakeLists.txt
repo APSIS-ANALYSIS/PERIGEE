@@ -32,6 +32,7 @@ SET( perigee_source ${perigee_SOURCE_DIR}/../../src )
 SET( perigee_preprocess_lib_src 
   ${perigee_source}/System/Sys_Tools.cpp
   ${perigee_source}/System/Vec_Tools.cpp
+  ${perigee_source}/System/Vector_3.cpp
   ${perigee_source}/System/Matrix_double_3by3_Array.cpp
   ${perigee_source}/System/Math_Tools.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
@@ -45,6 +46,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/IPart.cpp
   ${perigee_source}/Mesh/Part_Tet.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet.cpp
+  ${perigee_source}/Mesh/ElemBC_3D_tet_wall.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet_outflow.cpp
   ${perigee_source}/Mesh/NodalBC_3D_vtp.cpp
   ${perigee_source}/Mesh/NodalBC_3D_vtu.cpp

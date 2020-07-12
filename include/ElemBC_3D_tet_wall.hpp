@@ -10,17 +10,18 @@
 // Date: July 12 2020
 // ==================================================================
 #include "ElemBC_3D_tet.hpp"
+#include "Vector_3.hpp"
 
 class ElemBC_3D_tet_wall : public ElemBC_3D_tet
 {
   public:
-    ElemBC_3D_tet_outflow( const std::vector<std::string> &vtkfileList,
+    ElemBC_3D_tet_wall( const std::vector<std::string> &vtkfileList,
         const int &elemtype = 501 );
 
     virtual ~ElemBC_3D_tet_wall();
 
   private:
-    std::vector<double> raidus;
+    std::vector<double> radius;
 
     std::vector<Vector_3> radial, tangential, circumferential; 
 };
