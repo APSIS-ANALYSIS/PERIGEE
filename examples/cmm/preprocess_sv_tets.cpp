@@ -15,6 +15,7 @@
 #include "NodalBC_3D_vtp.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_tet_outflow.hpp"
+#include "ElemBC_3D_tet_wall.hpp"
 #include "NBC_Partition_3D_inflow.hpp"
 #include "EBC_Partition_vtp_outflow.hpp"
 
@@ -186,7 +187,7 @@ int main( int argc, char * argv[] )
   // Wall mesh is set as an elemental bc.
   std::vector< std::string > sur_file_wall_list; sur_file_wall_list.clear();
   sur_file_wall_list.push_back( sur_file_wall );
-  ElemBC * wall_bc = new ElemBC_3D_tet( sur_file_wall_list );
+  ElemBC * wall_bc = new ElemBC_3D_tet_wall( sur_file_wall_list );
   wall_bc -> resetTriIEN_outwardnormal( IEN );
 
   // Start partition the mesh for each cpu_rank 
