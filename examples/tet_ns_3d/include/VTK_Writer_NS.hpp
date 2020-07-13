@@ -6,6 +6,7 @@
 // This is a class that specifically designed for the visualization
 // for fluid mechanics. 
 //
+// Author: Ju Liu
 // Date Created: Feb. 12 2020
 // ==================================================================
 #include "IAGlobal_Mesh_Info.hpp"

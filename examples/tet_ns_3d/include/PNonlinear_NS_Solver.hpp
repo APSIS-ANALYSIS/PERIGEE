@@ -5,6 +5,7 @@
 // 
 // Parallel nonlinear solver for Navier-Stokes equations. 
 //
+// Author: Ju Liu
 // Date: Feb 11 2020
 // ==================================================================
 #include "ICVFlowRate.hpp"

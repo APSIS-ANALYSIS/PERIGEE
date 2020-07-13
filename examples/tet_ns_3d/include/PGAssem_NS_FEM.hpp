@@ -12,7 +12,8 @@
 //  [ pressure; velocity ],
 // the dot solution contains
 //  [ dot pressure; dot velcoty ].
-// 
+//
+// Author: Ju Liu 
 // Date Created: Feb. 10 2020
 // ==================================================================
 #include "IPGAssem.hpp"

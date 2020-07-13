@@ -6,6 +6,7 @@
 // Parallel Local Assembly routine for VMS and Gen-alpha based NS
 // solver.
 //
+// Author: Ju Liu
 // Date: Feb. 10 2020
 // ==================================================================
 #include "IPLocAssem.hpp"
