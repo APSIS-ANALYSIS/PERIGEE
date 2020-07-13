@@ -18,6 +18,7 @@
 #include "vtkCellData.h"
 #include "vtkCellArray.h"
 #include "vtkPointData.h"
+#include "vtkPointLocator.h"
 #include "vtkTriangle.h"
 #include "vtkQuadraticTriangle.h"
 #include "vtkTetra.h"
@@ -349,7 +350,7 @@ namespace TET_T
   //                                given point
   //          \para dist : the distance between the two points
   // ----------------------------------------------------------------
-  void get_dist2centerline( const vtkPolyData * const &centerlineData,
+  void get_dist2centerline( vtkPolyData * const &centerlineData,
       const double &coor_x, const double &coor_y, const double &coor_z,
       double &line_pt_x, double &line_pt_y, double &line_pt_z,
       double &dist );

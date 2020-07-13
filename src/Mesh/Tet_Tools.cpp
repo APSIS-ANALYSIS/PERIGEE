@@ -291,8 +291,13 @@ void TET_T::read_vtp_grid( const std::string &filename,
 void TET_T::read_polydata( const std::string &filename,
     vtkPolyData * &output_polydata )
 {
-  // To be filled.
+  vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
+  reader -> SetFileName( filename.c_str() );
+  reader -> Update();
+
+  output_polydata = reader -> GetOutput();
 }
+
 
 void TET_T::write_tet_grid( const std::string &filename,
     const int &numpts, const int &numcels,
@@ -1468,12 +1473,26 @@ void TET_T::get_out_normal( const std::string &file,
 }
 
 
-void TET_T::get_dist2centerline( const vtkPolyData * const &centerlineData,
+void TET_T::get_dist2centerline( vtkPolyData * const &centerlineData,
     const double &coor_x, const double &coor_y, const double &coor_z,
     double &line_pt_x, double &line_pt_y, double &line_pt_z,
     double &dist )
 {
-  // To be filled
+  vtkPointLocator * locator = vtkPointLocator::New();
+  locator -> Initialize();
+  locator -> SetDataSet(centerlineData);
+  locator -> BuildLocator();
+
+  // Find index of closest centerline point
+  const double pt [] = {coor_x, coor_y, coor_z};
+  const int closest_id = locator -> FindClosestPoint(&pt[0]);
+  
+  const double * closest_cl_pt = centerlineData -> GetPoints() -> GetPoint(closest_id);
+  line_pt_x = closest_cl_pt[0];
+  line_pt_y = closest_cl_pt[1];
+  line_pt_z = closest_cl_pt[2];
+
+  dist = MATH_T::norm2(line_pt_x - coor_x, line_pt_y - coor_y, line_pt_z - coor_z);
 }
 
 
