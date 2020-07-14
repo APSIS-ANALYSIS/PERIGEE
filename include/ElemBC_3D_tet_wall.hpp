@@ -22,7 +22,8 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     virtual ~ElemBC_3D_tet_wall();
 
   private:
-    std::vector<double> radius;
+    // num_ebc times num_node[ii] in size
+    std::vector< std::vector<double> > radius;
 };
 
 #endif
