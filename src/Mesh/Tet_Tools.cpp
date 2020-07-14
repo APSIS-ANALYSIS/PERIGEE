@@ -288,18 +288,6 @@ void TET_T::read_vtp_grid( const std::string &filename,
 }
 
 
-void TET_T::read_polydata( const std::string &filename,
-    vtkPolyData * &output_polydata )
-{
-  vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
-  reader -> SetFileName( filename.c_str() );
-  reader -> Update();
-
-  output_polydata = reader -> GetOutput();
-  reader -> Delete();
-}
-
-
 void TET_T::write_tet_grid( const std::string &filename,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt, const std::vector<int> &ien_array )

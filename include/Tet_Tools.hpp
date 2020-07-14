@@ -150,14 +150,6 @@ namespace TET_T
       std::vector<int> &global_ele_index );
 
 
-  // ----------------------------------------------------------------
-  // ! read_polydata: read the polydata from a file.
-  //   Input: \para filename : the name of the vtp file to be read
-  //   Output: \para output_polydata : the pointer to a vtk polydata
-  // ----------------------------------------------------------------
-  void read_polydata( const std::string &filename,
-      vtkPolyData * &output_polydata );
-
   // ================================================================
   // ===> 2. The second set of tools WRITE volumetric mesh to .vtu 
   //         file and surface mesh to .vtp file.  
