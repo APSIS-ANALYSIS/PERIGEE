@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <ctime>
+#include "vtkPointLocator.h"
 #include "petsc.h"
 
 namespace SYS_T
