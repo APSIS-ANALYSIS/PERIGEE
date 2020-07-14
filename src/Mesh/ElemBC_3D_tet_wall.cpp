@@ -3,13 +3,12 @@
 ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const std::vector<std::string> &vtkfileList,
     const std::vector<double> thickness_to_radius,
+    const std::string &centerlineFile,
     const int &elemtype )
 : ElemBC_3D_tet( vtkfileList, elemtype )
 {
   radius.resize(num_ebc);
   for(int ii=0; ii<num_ebc; ++ii) radius.resize( num_node[ii] );
-
-  const std::string centerlineFile("centerlines.vtp");
 
   vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
   reader -> SetFileName( centerlineFile.c_str() );
@@ -30,7 +29,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
       const double coor_y = pt_xyz[ebc_id][3*ii+1];
       const double coor_z = pt_xyz[ebc_id][3*ii+2];
 
-      const double pt [] = {coor_x, coor_y, coor_z};
+      const double pt[3] = {coor_x, coor_y, coor_z};
 
       const int closest_id = locator -> FindClosestPoint(&pt[0]);
 
