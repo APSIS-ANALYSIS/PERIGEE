@@ -10,17 +10,22 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   for(int ii=0; ii<num_ebc; ++ii) total_num_nodes += num_node[ii];
 
   radius.resize( total_num_nodes );
-  radial.resize( total_num_nodes );
-  tangential.resize( total_num_nodes );
-  circumferential.resize( total_num_nodes );
+
+  const std::string centerlineFile("centerlines.vtp");
+
+  vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
+  reader -> SetFileName( centerlineFile.c_str() );
+  reader -> Update();
+
+  line_polydata = reader -> GetOutput();
+  reader -> Delete();
 
 }
 
 
 ElemBC_3D_tet_wall::~ElemBC_3D_tet_wall()
 {
-  VEC_T::clean( radius ); VEC_T::clean( radial );
-  VEC_T::clean( tangential ); VEC_T::clean( circumferential );
+  VEC_T::clean( radius );
 }
 
 // EOF

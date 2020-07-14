@@ -23,8 +23,6 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
 
   private:
     std::vector<double> radius;
-
-    std::vector<Vector_3> radial, tangential, circumferential; 
 };
 
 #endif
