@@ -7,7 +7,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 : ElemBC_3D_tet( vtkfileList, elemtype )
 {
   radius.resize(num_ebc);
-  for(int ii=0; ii<num_ebc; ++ii) radius.reisze( num_node[ii] );
+  for(int ii=0; ii<num_ebc; ++ii) radius.resize( num_node[ii] );
 
   const std::string centerlineFile("centerlines.vtp");
 
