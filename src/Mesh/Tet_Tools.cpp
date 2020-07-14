@@ -296,6 +296,7 @@ void TET_T::read_polydata( const std::string &filename,
   reader -> Update();
 
   output_polydata = reader -> GetOutput();
+  reader -> Delete();
 }
 
 
@@ -1493,6 +1494,7 @@ void TET_T::get_dist2centerline( vtkPolyData * const &centerlineData,
   line_pt_z = closest_cl_pt[2];
 
   dist = MATH_T::norm2(line_pt_x - coor_x, line_pt_y - coor_y, line_pt_z - coor_z);
+  locator -> Delete();
 }
 
 
