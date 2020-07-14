@@ -2,6 +2,7 @@
 
 ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const std::vector<std::string> &vtkfileList,
+    const std::vector<double> thickness_to_radius,
     const int &elemtype )
 : ElemBC_3D_tet( vtkfileList, elemtype )
 {
