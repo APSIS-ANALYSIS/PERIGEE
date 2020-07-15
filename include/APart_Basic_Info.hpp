@@ -15,10 +15,11 @@
 class APart_Basic_Info
 {
   public:
+    // --------------------------------------------------------------
     // Constructor: read from h5 file by giving the part file base name
     //              and rank
-    APart_Basic_Info( const std::string &fileBaseName, 
-        const int &in_cpu_rank );
+    // --------------------------------------------------------------
+    APart_Basic_Info( const std::string &fbasename, const int &in_rank );
 
     virtual ~APart_Basic_Info();
 
@@ -31,7 +32,9 @@ class APart_Basic_Info
     virtual void print_info() const;
   
   private:
-    // Disallow default constructor
+    // --------------------------------------------------------------
+    // Disallow the default constructor
+    // --------------------------------------------------------------
     APart_Basic_Info(){};  
 
     int cpu_rank, cpu_size, dual_edge_ncommon;
