@@ -15,21 +15,22 @@
 namespace VEC_T
 {
   // print int / double vector on screen
-  template<typename T> void print( const std::vector<T> &vec )
+  template<typename T> void print( const std::vector<T> &vec,
+     const char &sep = '\t' )
   {
     for( auto it = vec.begin(); it != vec.end(); ++it )
-      std::cout<<std::setprecision(16)<<*it<<'\t';
+      std::cout<<std::setprecision(16)<<*it<<sep;
     std::cout<<'\n';
   }
  
   
   // Print the vector with given precision pres 
   template<typename T> void print( const std::vector<T> &vec, 
-      const unsigned int pres )
+      const unsigned int pres, const char &sep = '\t' )
   {
     const std::streamsize ss = std::cout.precision();
     for( auto it = vec.begin(); it != vec.end(); ++it )
-      std::cout<<std::setprecision(pres)<<*it<<'\t';
+      std::cout<<std::setprecision(pres)<<*it<<sep;
     std::cout<<'\n';
     std::cout.precision(ss);
   }
