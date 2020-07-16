@@ -188,6 +188,8 @@ int main( int argc, char * argv[] )
   std::vector< std::string > sur_file_wall_list; sur_file_wall_list.clear();
   std::vector<double> thickness_to_radius; thickness_to_radius.clear();
   sur_file_wall_list.push_back( sur_file_wall );
+  sur_file_wall_list.push_back( "wall_right_iliac.vtp" );
+  thickness_to_radius.push_back( 0.2 );
   thickness_to_radius.push_back( 0.2 );
   ElemBC * wall_bc = new ElemBC_3D_tet_wall( sur_file_wall_list, thickness_to_radius );
   wall_bc -> resetTriIEN_outwardnormal( IEN );

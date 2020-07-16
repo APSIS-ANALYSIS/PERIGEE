@@ -40,7 +40,7 @@ namespace VEC_T
       const std::string &file_name )
   {
     std::ofstream efile(file_name.c_str(), std::ofstream::out | std::ofstream::trunc );
-    for(auto it = vec.begin(); it!= vec.end(); ++it) efile<<*it<<'\t';
+    for(auto it = vec.begin(); it!= vec.end(); ++it) efile<<*it<<'\n';
     
     efile.close();
   }

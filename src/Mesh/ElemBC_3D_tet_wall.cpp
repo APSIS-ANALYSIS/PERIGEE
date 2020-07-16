@@ -55,4 +55,13 @@ ElemBC_3D_tet_wall::~ElemBC_3D_tet_wall()
   VEC_T::clean( radius );
 }
 
+void ElemBC_3D_tet_wall::print_info() const
+{
+  ElemBC_3D_tet::print_info();
+
+  for(int face=0; face<num_ebc; ++face)
+  {
+    VEC_T::print( radius[face], "wall_id_" + SYS_T::to_string(face) + "_radius.txt");
+  }
+}
 // EOF
