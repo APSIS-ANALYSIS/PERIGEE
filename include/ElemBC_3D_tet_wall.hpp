@@ -16,7 +16,7 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
 {
   public:
     ElemBC_3D_tet_wall( const std::vector<std::string> &vtkfileList,
-        const std::vector<double> thickness_to_radius,
+        const std::vector<double> &thickness_to_radius,
         const std::string &centerlineFile = "centerlines.vtp",
         const int &elemtype = 501 );
 
