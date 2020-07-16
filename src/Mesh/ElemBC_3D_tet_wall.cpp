@@ -61,7 +61,7 @@ void ElemBC_3D_tet_wall::print_info() const
 
   for(int face=0; face<num_ebc; ++face)
   {
-    VEC_T::print( radius[face], "wall_id_" + SYS_T::to_string(face) + "_radius.txt");
+    VEC_T::print( radius[face], "wall_id_" + SYS_T::to_string(face) + "_radius.txt", '\n');
   }
 }
 // EOF

@@ -37,10 +37,10 @@ namespace VEC_T
   
   // Print the vector to a file with given file name
   template<typename T> void print( const std::vector<T> &vec,
-      const std::string &file_name )
+      const std::string &file_name, const char &sep = '\t'  )
   {
     std::ofstream efile(file_name.c_str(), std::ofstream::out | std::ofstream::trunc );
-    for(auto it = vec.begin(); it!= vec.end(); ++it) efile<<*it<<'\n';
+    for(auto it = vec.begin(); it!= vec.end(); ++it) efile<<*it<<sep;
     
     efile.close();
   }

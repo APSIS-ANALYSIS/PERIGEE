@@ -194,6 +194,8 @@ int main( int argc, char * argv[] )
   ElemBC * wall_bc = new ElemBC_3D_tet_wall( sur_file_wall_list, thickness_to_radius );
   wall_bc -> resetTriIEN_outwardnormal( IEN );
 
+  wall_bc -> print_info();
+
   // Start partition the mesh for each cpu_rank 
   const bool isPrintPartInfo = true;
 
