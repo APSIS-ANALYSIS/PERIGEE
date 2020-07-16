@@ -8,7 +8,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 : ElemBC_3D_tet( vtkfileList, elemtype )
 {
   radius.resize(num_ebc);
-  for(int ii=0; ii<num_ebc; ++ii) radius.resize( num_node[ii] );
+  for(int ii=0; ii<num_ebc; ++ii) radius[ii].resize( num_node[ii] );
 
   vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
   reader -> SetFileName( centerlineFile.c_str() );
@@ -50,6 +50,8 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 
 ElemBC_3D_tet_wall::~ElemBC_3D_tet_wall()
 {
+  for(int ii=0; ii<num_ebc; ++ii) VEC_T::clean( radius[ii] );
+
   VEC_T::clean( radius );
 }
 
