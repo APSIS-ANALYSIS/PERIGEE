@@ -85,8 +85,8 @@ int main(int argc, char *argv[])
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
-  PetscMPIInt rank = SYS_T::get_MPI_rank();
-  PetscMPIInt size = SYS_T::get_MPI_size();
+  const PetscMPIInt rank = SYS_T::get_MPI_rank();
+  const PetscMPIInt size = SYS_T::get_MPI_size();
 
   SYS_T::print_perigee_art();
 
