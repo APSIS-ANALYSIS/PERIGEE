@@ -7,8 +7,17 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const int &elemtype )
 : ElemBC_3D_tet( vtkfileList, elemtype )
 {
+  // Check input size
+  SYS_T::print_fatal_if( thickness_to_radius.size() != vtkfileList.size(),
+      "Error: thickness_to_radius length does not match that of the vtkfileList.\n");
+
   radius.resize(num_ebc);
-  for(int ii=0; ii<num_ebc; ++ii) radius[ii].resize( num_node[ii] );
+  thickness.resize(num_ebc);
+  for(int ii=0; ii<num_ebc; ++ii) 
+  {
+    radius[ii].resize( num_node[ii] );
+    thickness[ii].resize( num_node[ii] );
+  }
 
   vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
   reader -> SetFileName( centerlineFile.c_str() );
@@ -39,6 +48,8 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
       const double line_pt_z = closest_cl_pt[2];
 
       radius[ebc_id][ii] = MATH_T::norm2(line_pt_x - coor_x, line_pt_y - coor_y, line_pt_z - coor_z);
+   
+      thickness[ebc_id][ii] = radius[ebc_id][ii] * thickness_to_raidus[ebc_id]; 
     }
   }
 
@@ -55,6 +66,7 @@ ElemBC_3D_tet_wall::~ElemBC_3D_tet_wall()
   VEC_T::clean( radius );
 }
 
+
 void ElemBC_3D_tet_wall::print_info() const
 {
   ElemBC_3D_tet::print_info();
@@ -64,4 +76,5 @@ void ElemBC_3D_tet_wall::print_info() const
     VEC_T::print( radius[face], "wall_id_" + SYS_T::to_string(face) + "_radius.txt", '\n');
   }
 }
+
 // EOF
