@@ -34,20 +34,13 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   {
     for(int ii=0; ii<num_node[ebc_id]; ++ii)
     {
-      const double coor_x = pt_xyz[ebc_id][3*ii];
-      const double coor_y = pt_xyz[ebc_id][3*ii+1];
-      const double coor_z = pt_xyz[ebc_id][3*ii+2];
-
-      const double pt[3] = {coor_x, coor_y, coor_z};
+      const double pt[3] = {pt_xyz[ebc_id][3*ii], pt_xyz[ebc_id][3*ii+1], pt_xyz[ebc_id][3*ii+2]};
 
       const int closest_id = locator -> FindClosestPoint(&pt[0]);
 
-      const double * closest_cl_pt = centerlineData -> GetPoints() -> GetPoint(closest_id);
-      const double line_pt_x = closest_cl_pt[0];
-      const double line_pt_y = closest_cl_pt[1];
-      const double line_pt_z = closest_cl_pt[2];
+      const double * cl_pt = centerlineData -> GetPoints() -> GetPoint(closest_id);
 
-      radius[ebc_id][ii] = MATH_T::norm2(line_pt_x - coor_x, line_pt_y - coor_y, line_pt_z - coor_z);
+      radius[ebc_id][ii] = MATH_T::norm2(cl_pt[0] - pt[0], cl_pt[1] - pt[1], cl_pt[2] - pt[2]);
    
       thickness[ebc_id][ii] = radius[ebc_id][ii] * thickness_to_raidus[ebc_id]; 
     }
