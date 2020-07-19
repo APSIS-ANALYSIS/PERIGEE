@@ -104,17 +104,6 @@ namespace VEC_T
   }
 
 
-  // inner product of two vectors with given length len
-  inline double vDot( const std::vector<double> &vec1, 
-      const std::vector<double> &vec2, const unsigned int &len)
-  {
-    double result = 0;
-    for(unsigned int ii=0; ii<len; ++ii)
-      result += vec1[ii] * vec2[ii];
-    return result;
-  }
-
-
   // ----------------------------------------------------------------
   // ! sort_unique_resize
   //   \para vec : the vector to be sorted and resized.
