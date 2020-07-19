@@ -70,9 +70,9 @@ class ElemBC_3D_tet : public ElemBC
     virtual void get_intNA( const int &ebc_id, std::vector<double> &fintNA ) const
     {SYS_T::commPrint("Warning: get_intNA is not implemented. \n");}
 
-    // Access the data in ElemBC_3D_tet_wall, wall thickness
-    virtual void get_thickness( const int &ebc_id, std::vector<double> &thickness ) const
-    {SYS_T::commPrint("Warning: get_thickness is not implemented. \n");}
+    // Access the data in ElemBC_3D_tet_wall, wall thickness used in CMM
+    virtual void get_wall_thickness( const int &ebc_id, std::vector<double> &th ) const
+    {SYS_T::commPrint("Warning: get_wall_thickness is not implemented. \n");}
 
   protected:
     const int elem_type;

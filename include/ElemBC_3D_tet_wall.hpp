@@ -34,6 +34,9 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
 
     virtual void print_info() const;
 
+    virtual void get_wall_thickness( const int &ebc_id, std::vector<double> &th ) const
+    {th = thickness[ebc_id];}
+
   private:
     // num_ebc times num_node[ii] in size, 0 <= ii <num_ebc
     // here num_ebc means the number of different wall regions, which

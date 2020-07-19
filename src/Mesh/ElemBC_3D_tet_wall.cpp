@@ -42,7 +42,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 
       radius[ebc_id][ii] = MATH_T::norm2(cl_pt[0] - pt[0], cl_pt[1] - pt[1], cl_pt[2] - pt[2]);
    
-      thickness[ebc_id][ii] = radius[ebc_id][ii] * thickness_to_raidus[ebc_id]; 
+      thickness[ebc_id][ii] = radius[ebc_id][ii] * thickness_to_radius[ebc_id]; 
     }
   }
 
