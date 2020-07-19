@@ -36,31 +36,6 @@ namespace SYS_T
     return size;
   }
 
-  // ================================================================
-  // The following tools are used in preprocessors.
-  // ================================================================
-  int readFile(std::ifstream& infile,
-      std::vector<double>& sKnots,
-      std::vector<double>& tKnots,
-      std::vector<double>& uKnots,
-      int& sDegree, int& tDegree,
-      int& uDegree, int& numCPts,
-      std::vector<double>& ctrlPts);
-
-
-  // ----------------------------------------------------------------
-  // readSHFile()
-  // Read in patch files in Shaolie Hossain's format
-  // ----------------------------------------------------------------
-  int readSHFile( std::ifstream &infile,
-      std::vector<double>& sKnots,
-      std::vector<double>& tKnots,
-      std::vector<double>& uKnots,
-      int& sDegree, int& tDegree,
-      int& uDegree, int& numCPts,
-      std::vector<double>& ctrlPts );
-
-
   // ----------------------------------------------------------------
   // ! get_genbc_file_type : read the genbc file and determine what
   //   type of gen bc the file specifies. It will return   
