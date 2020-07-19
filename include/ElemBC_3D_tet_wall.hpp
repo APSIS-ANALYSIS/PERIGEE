@@ -17,14 +17,14 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
 {
   public:
     // Constructing the wall boundary conditions.
-    // para vtkfileList stores the set of vtp files of the wall, the
-    //      union of these vtp files is the whole wall surface. Its
-    //      length is num_ebc.
-    // para thickness_to_radius has the length num_ebc, which gives
-    //      the thickness ratio to the radius at the corresponding
-    //      wall surface vtp file. For most arteries, the ratio is
-    //      ten percent to the diameter, that is twenty percent to
-    //      the radius.
+    // \para: vtkfileList stores the set of vtp files of the wall, the
+    //        union of these vtp files is the whole wall surface. Its
+    //        length is num_ebc.
+    // \para: thickness_to_radius has the length num_ebc, which gives
+    //        the thickness ratio to the radius at the corresponding
+    //        wall surface vtp file. For most arteries, the ratio is
+    //        ten percent to the diameter, that is twenty percent to
+    //        the radius.
     ElemBC_3D_tet_wall( const std::vector<std::string> &vtkfileList,
         const std::vector<double> &thickness_to_radius,
         const std::string &centerlineFile = "centerlines.vtp",

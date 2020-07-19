@@ -18,6 +18,10 @@
 class ElemBC_3D_tet_outflow : public ElemBC_3D_tet
 {
   public:
+    // Constructor for outlet boundaries that will be associated
+    // with reduced order models in the analysis code. 
+    // \para vtkfileList: the list of the vtp files for the outlet surfaces
+    // \para outlet_normal_vec: the outward normal vectors for the surfaces
     ElemBC_3D_tet_outflow( const std::vector<std::string> &vtkfileList,
        const std::vector< std::vector<double> > &outlet_normal_vec,
        const int &elemtype = 501 );
