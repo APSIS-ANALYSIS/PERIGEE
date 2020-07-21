@@ -58,6 +58,7 @@ PetscErrorCode MyMatMult(Mat shell, Vec X, Vec Y)
 
 PetscErrorCode MyPCSetup(PC pc)
 {
+  std::cout<<"SETUP \n";
   PGAssem_Heat * ptr;
   PCShellGetContext(pc,(void**)&ptr);
 
@@ -73,6 +74,7 @@ PetscErrorCode MyPCSetup(PC pc)
 
 PetscErrorCode MyPCApply(PC pc, Vec x, Vec y)
 {
+  std::cout<<"APPLY \n";
   PGAssem_Heat * ptr;
   PCShellGetContext(pc,(void**)&ptr);
 
