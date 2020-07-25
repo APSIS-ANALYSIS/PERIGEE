@@ -229,7 +229,20 @@ namespace TET_T
       const std::vector<int> &global_node_index,
       const std::vector<int> &global_ele_index );
 
-  
+
+  // ----------------------------------------------------------------
+  // ! gen_triangle_grid: generate the surface mesh described by triangle
+  //                      elements, but don't write.
+  //   All input parameters are the same as above, but grid_w is to be
+  //   modified by reference. This is convenient for adding additional
+  //   fields to the polydata before writing.
+  void gen_triangle_grid( vtkPolyData * const& grid_w,
+      const int &numpts, const int &numcels,
+      const std::vector<double> &pt,
+      const std::vector<int> &ien_array,
+      const std::vector<int> &global_node_index,
+      const std::vector<int> &global_ele_index );
+ 
   // ----------------------------------------------------------------
   // ! write_quadratic_triangle_grid: write the surface mesh described 
   //                                  by quadratic triangle elements.
@@ -247,6 +260,21 @@ namespace TET_T
       const std::vector<int> &ien_array,
       const std::vector<int> &global_node_index,
       const std::vector<int> &global_ele_index );
+
+
+  // ----------------------------------------------------------------
+  // ! gen_quadratic_triangle_grid: generate the surface mesh described by
+  //                                triangle elements, but don't write.
+  //   All input parameters are the same as above, but grid_w is to be
+  //   modified by reference. This is convenient for adding additional
+  //   fields to the unstructured grid before writing.
+  void gen_quadratic_triangle_grid( vtkUnstructuredGrid * const& grid_w,
+      const int &numpts, const int &numcels,
+      const std::vector<double> &pt,
+      const std::vector<int> &ien_array,
+      const std::vector<int> &global_node_index,
+      const std::vector<int> &global_ele_index );
+
 
   // ----------------------------------------------------------------
   // ! write_triangle_grid: write the surface mesh described by triangle
