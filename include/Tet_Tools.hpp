@@ -212,7 +212,7 @@ namespace TET_T
       const std::vector<int> &cell_index );
 
   // ----------------------------------------------------------------
-  // ! write_triangle_gird: write the surface mesh described by triangle
+  // ! write_triangle_grid: write the surface mesh described by triangle
   //                        elements.
   //   Input: \para filename : the filename.vtp is the file to be written.
   //          \para numpts : the number of grid points
@@ -231,7 +231,7 @@ namespace TET_T
 
   
   // ----------------------------------------------------------------
-  // ! write_quadratic_triangle_gird: write the surface mesh described 
+  // ! write_quadratic_triangle_grid: write the surface mesh described 
   //                                  by quadratic triangle elements.
   //   Input: \para filename : the filename.vtu is the file to be written.
   //          \para numpts : the number of grid points
@@ -285,6 +285,26 @@ namespace TET_T
       const std::vector<int> &global_node_index,
       const std::vector<int> &global_ele_index_1, 
       const std::vector<int> &global_ele_index_2 );
+
+
+  // ----------------------------------------------------------------
+  // ! write_vtkUnstructuredGrid: helper fcn for writing volumetric mesh 
+  //   Input: \para filename : filename.{vtu/vtk} is the file to be written
+  //          \para grid_w : vtkUnstructuredGrid object to be written
+  //          \para isXML : flag for vtu (true) or vtk (false)
+  // ----------------------------------------------------------------
+  void write_vtkUnstructuredGrid( const std::string &filename,
+      vtkUnstructuredGrid * const &grid_w,
+      const bool &isXML );
+
+
+  // ----------------------------------------------------------------
+  // ! write_vtkXMLPolyData: helper fcn for writing linear triangle mesh 
+  //   Input: \para filename : filename.vtp is the file to be written
+  //          \para grid_w : vtkPolyData object to be written
+  // ----------------------------------------------------------------
+  void write_vtkXMLPolyData( const std::string &filename,
+      vtkPolyData * const &grid_w );
 
 
   // ================================================================
@@ -357,7 +377,7 @@ namespace TET_T
   // Input: \para meshout: tetgenio object containing the mesh points 
   //                      and cell connectivity.
   //        \para fName: fName.vtu will be write on disk as the volumetric
-  //                     gird.
+  //                     grid.
   // ----------------------------------------------------------------
   void tetgenio2vtu( const tetgenio &meshout, const std::string &fName );
 
@@ -376,7 +396,7 @@ namespace TET_T
   // Input: \para meshout: tetgenio object containing the mesh points 
   //                      and cell connectivity.
   //        \para fName: fName.vtp will be write on disk as the surface 
-  //                     gird.
+  //                     grid.
   //        \para bcmarker: the marker input in the tetgen input file
   //                        specifying the boundary domain.
   // Output: fName.bcmarker.vtp will be write on disk for the boundary

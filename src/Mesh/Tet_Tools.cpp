@@ -393,15 +393,10 @@ void TET_T::write_tet_grid( const std::string &filename,
   grid_w -> GetCellData() -> AddArray( edge_aspect_ratio );
   edge_aspect_ratio -> Delete();
 
-  // write vtk
-  vtkXMLUnstructuredGridWriter * writer = vtkXMLUnstructuredGridWriter::New();
-  std::string name_to_write(filename);
-  name_to_write.append(".vtu");
-  writer -> SetFileName( name_to_write.c_str() );
+  // write vtu
+  const bool isXML = true;
+  write_vtkUnstructuredGrid(filename, grid_w, isXML);
 
-  writer->SetInputData(grid_w);
-  writer->Write();
-  writer->Delete();
   grid_w->Delete();
 }
 
@@ -522,15 +517,10 @@ void TET_T::write_tet_grid_node_elem_index(
   edge_aspect_ratio -> Delete();
   cellindex -> Delete();
 
-  // write vtk
-  vtkXMLUnstructuredGridWriter * writer = vtkXMLUnstructuredGridWriter::New();
-  std::string name_to_write(filename);
-  name_to_write.append(".vtu");
-  writer -> SetFileName( name_to_write.c_str() );
+  // write vtu
+  const bool isXML = true;
+  write_vtkUnstructuredGrid(filename, grid_w, isXML);
 
-  writer->SetInputData(grid_w);
-  writer->Write();
-  writer->Delete();
   grid_w->Delete();
 }
 
@@ -656,15 +646,10 @@ void TET_T::write_tet_grid_node_elem_index(
   edge_aspect_ratio -> Delete();
   cellindex -> Delete();
 
-  // write vtk
-  vtkXMLUnstructuredGridWriter * writer = vtkXMLUnstructuredGridWriter::New();
-  std::string name_to_write(filename);
-  name_to_write.append(".vtu");
-  writer -> SetFileName( name_to_write.c_str() );
+  // write vtu
+  const bool isXML = true;
+  write_vtkUnstructuredGrid(filename, grid_w, isXML);
 
-  writer->SetInputData(grid_w);
-  writer->Write();
-  writer->Delete();
   grid_w->Delete();
 }
 
@@ -806,28 +791,9 @@ void TET_T::write_tet_grid( const std::string &filename,
   cellindex -> Delete();
   phy_tag -> Delete();
 
-  if( isXML )
-  {
-    vtkXMLUnstructuredGridWriter * writer = vtkXMLUnstructuredGridWriter::New();
-    std::string name_to_write(filename);
-    name_to_write.append(".vtu");
-    writer -> SetFileName( name_to_write.c_str() );
-
-    writer->SetInputData(grid_w);
-    writer->Write();
-    writer->Delete();
-  }
-  else
-  {
-    vtkUnstructuredGridWriter * writer = vtkUnstructuredGridWriter::New();
-    std::string name_to_write(filename);
-    name_to_write.append(".vtk");
-    writer -> SetFileName( name_to_write.c_str() );
-
-    writer->SetInputData(grid_w);
-    writer->Write();
-    writer->Delete();
-  }
+  // write vtu or vtk
+  write_vtkUnstructuredGrid(filename, grid_w, isXML);
+  
   grid_w->Delete();
 }
 
@@ -975,28 +941,9 @@ void TET_T::write_tet_grid( const std::string &filename,
   cellindex -> Delete();
   phy_tag -> Delete();
 
-  if( isXML )
-  {
-    vtkXMLUnstructuredGridWriter * writer = vtkXMLUnstructuredGridWriter::New();
-    std::string name_to_write(filename);
-    name_to_write.append(".vtu");
-    writer -> SetFileName( name_to_write.c_str() );
+  // write vtu or vtk
+  write_vtkUnstructuredGrid(filename, grid_w, isXML);
 
-    writer->SetInputData(grid_w);
-    writer->Write();
-    writer->Delete();
-  }
-  else
-  {
-    vtkUnstructuredGridWriter * writer = vtkUnstructuredGridWriter::New();
-    std::string name_to_write(filename);
-    name_to_write.append(".vtk");
-    writer -> SetFileName( name_to_write.c_str() );
-
-    writer->SetInputData(grid_w);
-    writer->Write();
-    writer->Delete();
-  }
   grid_w->Delete();
 }
 
@@ -1069,14 +1016,8 @@ void TET_T::write_triangle_grid( const std::string &filename,
   grid_w -> GetCellData() -> AddArray( clindex );
   clindex -> Delete();
 
-  // write vtk
-  vtkXMLPolyDataWriter * writer = vtkXMLPolyDataWriter::New();
-  std::string name_to_write(filename);
-  name_to_write.append(".vtp");
-  writer -> SetFileName( name_to_write.c_str() );
-  writer->SetInputData(grid_w);
-  writer->Write();
-  writer->Delete();
+  // write vtp
+  write_vtkXMLPolyData(filename, grid_w);
 
   grid_w->Delete();
 }
@@ -1156,14 +1097,9 @@ void TET_T::write_quadratic_triangle_grid(
   grid_w -> GetCellData() -> AddArray( clindex );
   clindex -> Delete();
 
-  // write vtk
-  vtkXMLUnstructuredGridWriter * writer = vtkXMLUnstructuredGridWriter::New();
-  std::string name_to_write(filename);
-  name_to_write.append(".vtu");
-  writer -> SetFileName( name_to_write.c_str() );
-  writer->SetInputData(grid_w);
-  writer->Write();
-  writer->Delete();
+  // write vtu
+  const bool isXML = true;
+  write_vtkUnstructuredGrid(filename, grid_w, isXML);
 
   grid_w->Delete();
 }
@@ -1249,15 +1185,9 @@ void TET_T::write_triangle_grid( const std::string &filename,
   grid_w -> GetCellData() -> AddArray( clindex2 );
   clindex2 -> Delete();
 
-  // write vtk
-  vtkXMLPolyDataWriter * writer = vtkXMLPolyDataWriter::New();
-  std::string name_to_write(filename);
-  name_to_write.append(".vtp");
-  writer -> SetFileName( name_to_write.c_str() );
+  // write vtp
+  write_vtkXMLPolyData(filename, grid_w);
 
-  writer->SetInputData(grid_w);
-  writer->Write();
-  writer->Delete();
   grid_w->Delete();
 }
 
@@ -1345,15 +1275,53 @@ void TET_T::write_quadratic_triangle_grid( const std::string &filename,
   grid_w -> GetCellData() -> AddArray( clindex2 );
   clindex2 -> Delete();
 
-  // write vtk
-  vtkXMLUnstructuredGridWriter * writer = vtkXMLUnstructuredGridWriter::New();
+  // write vtu
+  const bool isXML = true;
+  write_vtkUnstructuredGrid(filename, grid_w, isXML);
+
+  grid_w->Delete();
+}
+
+
+void TET_T::write_vtkUnstructuredGrid( const std::string &filename,
+    vtkUnstructuredGrid * const &grid_w,
+    const bool &isXML )
+{
+  if ( isXML )
+  {
+    vtkXMLUnstructuredGridWriter * writer = vtkXMLUnstructuredGridWriter::New();
+    std::string name_to_write(filename);
+    name_to_write.append(".vtu");
+    writer -> SetFileName( name_to_write.c_str() );
+
+    writer->SetInputData(grid_w);
+    writer->Write();
+    writer->Delete();
+  }
+  else
+  {
+    vtkUnstructuredGridWriter * writer = vtkUnstructuredGridWriter::New();
+    std::string name_to_write(filename);
+    name_to_write.append(".vtk");
+    writer -> SetFileName( name_to_write.c_str() );
+
+    writer->SetInputData(grid_w);
+    writer->Write();
+    writer->Delete();
+  }
+}
+
+
+void TET_T::write_vtkXMLPolyData( const std::string &filename,
+    vtkPolyData * const &grid_w )
+{
+  vtkXMLPolyDataWriter * writer = vtkXMLPolyDataWriter::New();
   std::string name_to_write(filename);
-  name_to_write.append(".vtu");
+  name_to_write.append(".vtp");
   writer -> SetFileName( name_to_write.c_str() );
   writer->SetInputData(grid_w);
   writer->Write();
   writer->Delete();
-  grid_w->Delete();
 }
 
 
