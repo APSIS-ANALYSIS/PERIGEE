@@ -187,11 +187,20 @@ int main( int argc, char * argv[] )
   // Wall mesh is set as an elemental bc.
   std::vector< std::string > sur_file_wall_list; sur_file_wall_list.clear();
   std::vector<double> thickness_to_radius; thickness_to_radius.clear();
+  std::vector<double> youngsmod_alpha; youngsmod_alpha.clear();
+  std::vector<double> youngsmod_beta;  youngsmod_beta.clear();
   sur_file_wall_list.push_back( sur_file_wall );
   sur_file_wall_list.push_back( "wall_right_iliac.vtp" );
+
+  // Set properties for each wall file
   thickness_to_radius.push_back( 0.2 );
   thickness_to_radius.push_back( 0.2 );
-  ElemBC * wall_bc = new ElemBC_3D_tet_wall( sur_file_wall_list, thickness_to_radius );
+  youngsmod_alpha.push_back( 13.3 );
+  youngsmod_alpha.push_back( 13.3 );
+  youngsmod_beta.push_back( 0.3 );
+  youngsmod_beta.push_back( 0.3 );
+  ElemBC * wall_bc = new ElemBC_3D_tet_wall( sur_file_wall_list, thickness_to_radius, 
+                                             youngsmod_alpha, youngsmod_beta );
   wall_bc -> resetTriIEN_outwardnormal( IEN );
 
   // Start partition the mesh for each cpu_rank 

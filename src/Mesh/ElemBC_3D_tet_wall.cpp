@@ -3,7 +3,10 @@
 ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const std::vector<std::string> &vtkfileList,
     const std::vector<double> &thickness_to_radius,
+    const std::vector<double> &youngsmod_alpha,
+    const std::vector<double> &youngsmod_beta,
     const std::string &centerlineFile,
+    const int &fluid_density,
     const int &elemtype )
 : ElemBC_3D_tet( vtkfileList, elemtype )
 {
@@ -13,10 +16,12 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 
   radius.resize(num_ebc);
   thickness.resize(num_ebc);
+  youngsmod.resize(num_ebc);
   for(int ii=0; ii<num_ebc; ++ii) 
   {
     radius[ii].resize( num_node[ii] );
     thickness[ii].resize( num_node[ii] );
+    youngsmod[ii].resize( num_node[ii] );
   }
 
   vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
@@ -32,6 +37,9 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
+    const double rho_alpha2 = fluid_density * youngsmod_alpha[ebc_id] * youngsmod_alpha[ebc_id];
+    const double beta_exp   = 2.0 * youngsmod_beta[ebc_id] - 1.0; 
+
     for(int ii=0; ii<num_node[ebc_id]; ++ii)
     {
       const double pt[3] = {pt_xyz[ebc_id][3*ii], pt_xyz[ebc_id][3*ii+1], pt_xyz[ebc_id][3*ii+2]};
@@ -43,6 +51,8 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
       radius[ebc_id][ii] = MATH_T::norm2(cl_pt[0] - pt[0], cl_pt[1] - pt[1], cl_pt[2] - pt[2]);
    
       thickness[ebc_id][ii] = radius[ebc_id][ii] * thickness_to_radius[ebc_id]; 
+
+      youngsmod[ebc_id][ii] = rho_alpha2 / ( thickness[ebc_id][ii] * pow( 2.0*radius[ebc_id][ii], beta_exp ) );
     }
   }
 
@@ -54,9 +64,16 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 
 ElemBC_3D_tet_wall::~ElemBC_3D_tet_wall()
 {
-  for(int ii=0; ii<num_ebc; ++ii) VEC_T::clean( radius[ii] );
+  for(int ii=0; ii<num_ebc; ++ii)
+  {
+    VEC_T::clean( radius[ii]    );
+    VEC_T::clean( thickness[ii] );
+    VEC_T::clean( youngsmod[ii] );
+  }
 
-  VEC_T::clean( radius );
+  VEC_T::clean( radius    );
+  VEC_T::clean( thickness );
+  VEC_T::clean( youngsmod );
 }
 
 
@@ -67,6 +84,8 @@ void ElemBC_3D_tet_wall::print_info() const
   for(int face=0; face<num_ebc; ++face)
   {
     VEC_T::print( radius[face], "wall_id_" + SYS_T::to_string(face) + "_radius.txt", '\n');
+    VEC_T::print( radius[face], "wall_id_" + SYS_T::to_string(face) + "_thickness.txt", '\n');
+    VEC_T::print( radius[face], "wall_id_" + SYS_T::to_string(face) + "_youngsmod.txt", '\n');
   }
 }
 

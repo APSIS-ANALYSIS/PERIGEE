@@ -27,7 +27,10 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     //        the radius.
     ElemBC_3D_tet_wall( const std::vector<std::string> &vtkfileList,
         const std::vector<double> &thickness_to_radius,
+        const std::vector<double> &youngsmod_alpha,
+        const std::vector<double> &youngsmod_beta,
         const std::string &centerlineFile = "centerlines.vtp",
+        const int &fluid_density = 1.065,
         const int &elemtype = 501 );
 
     virtual ~ElemBC_3D_tet_wall();
@@ -37,6 +40,9 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     virtual void get_wall_thickness( const int &ebc_id, std::vector<double> &th ) const
     {th = thickness[ebc_id];}
 
+    virtual void get_wall_youngsmod( const int &ebc_id, std::vector<double> &E ) const
+    {E = youngsmod[ebc_id];}
+
   private:
     // num_ebc times num_node[ii] in size, 0 <= ii <num_ebc
     // here num_ebc means the number of different wall regions, which
@@ -45,6 +51,8 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     
     // num_ebc times num_node[ii] in size, 0 <= ii <num_ebc
     std::vector< std::vector<double> > thickness;
+    std::vector< std::vector<double> > youngsmod;
+
 };
 
 #endif
