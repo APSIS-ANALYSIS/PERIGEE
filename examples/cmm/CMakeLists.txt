@@ -55,6 +55,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/NBC_Partition_3D.cpp
   ${perigee_source}/Mesh/NBC_Partition_3D_inflow.cpp
   ${perigee_source}/Mesh/EBC_Partition_vtp.cpp
+  ${perigee_source}/Mesh/EBC_Partition_vtp_wall.cpp
   ${perigee_source}/Mesh/EBC_Partition_vtp_outflow.cpp
   ${perigee_source}/Mesh/Map_Node_Index.cpp
   ${perigee_source}/Mesh/Global_Part_METIS.cpp

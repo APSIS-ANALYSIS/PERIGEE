@@ -122,6 +122,21 @@ class ElemBC
     {SYS_T::commPrint("Warning: get_intNA is not implemented. \n");}
 
 
+    // This returns the wall thickness used in CMM
+    virtual void get_wall_thickness( const int &ebc_id, std::vector<double> &th ) const
+    {SYS_T::commPrint("Warning: get_wall_thickness is not implemented. \n");}
+
+
+    // This returns the wall youngs modulus used in CMM
+    virtual void get_wall_youngsmod( const int &ebc_id, std::vector<double> &E ) const
+    {SYS_T::commPrint("Warning: get_wall_youngsmod is not implemented. \n");}
+
+
+    // write variable wall properties for CMM
+    virtual void write_wall_prop( const int &ebc_id ) const
+    {SYS_T::commPrint("Warning: write_wall_prop is not implemented. \n");}
+
+
     // print the information of the ebc object on screen.    
     virtual void print_info() const
     {SYS_T::commPrint("Warning: print_info is not implemented. \n");}

@@ -18,6 +18,7 @@
 #include "ElemBC_3D_tet_wall.hpp"
 #include "NBC_Partition_3D_inflow.hpp"
 #include "EBC_Partition_vtp_outflow.hpp"
+#include "EBC_Partition_vtp_wall.hpp"
 
 int main( int argc, char * argv[] )
 {
@@ -241,7 +242,7 @@ int main( int argc, char * argv[] )
     ebcpart -> write_hdf5( part_file.c_str() );
 
     // Partition Elemental Wall BC and write it to h5 file
-    IEBC_Partition * wbcpart = new EBC_Partition_vtp(part, mnindex, wall_bc );
+    IEBC_Partition * wbcpart = new EBC_Partition_vtp_wall(part, mnindex, wall_bc );
     wbcpart -> write_hdf5( part_file.c_str(), "wall_ebc" );
 
     // Collect partition statistics
