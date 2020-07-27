@@ -2,15 +2,18 @@
 
 ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const std::vector<std::string> &vtkfileList,
+    const std::vector<std::string> &centerlineList,
     const std::vector<double> &thickness_to_radius,
     const std::vector<double> &youngsmod_alpha,
     const std::vector<double> &youngsmod_beta,
-    const std::string &centerlineFile,
     const int &fluid_density,
     const int &elemtype )
 : ElemBC_3D_tet( vtkfileList, elemtype )
 {
   // Check inputs
+  SYS_T::print_fatal_if( centerlineList.size() != vtkfileList.size(),
+      "Error: centerlineList length does not match that of the vtkfileList.\n");
+
   SYS_T::print_fatal_if( thickness_to_radius.size() != vtkfileList.size(),
       "Error: thickness_to_radius length does not match that of the vtkfileList.\n");
 
@@ -33,21 +36,20 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     youngsmod[ii].resize( num_node[ii] );
   }
 
-  vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
-  reader -> SetFileName( centerlineFile.c_str() );
-  reader -> Update();
-
-  vtkPolyData * centerlineData = reader -> GetOutput();
-  
-  vtkPointLocator * locator = vtkPointLocator::New();
-  locator -> Initialize();
-  locator -> SetDataSet( centerlineData );
-  locator -> BuildLocator();
-
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
     const double rho_alpha2 = fluid_density * youngsmod_alpha[ebc_id] * youngsmod_alpha[ebc_id];
     const double beta_exp   = 2.0 * youngsmod_beta[ebc_id] - 1.0; 
+
+    vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
+    reader -> SetFileName( centerlineList[ebc_id].c_str() );
+    reader -> Update();
+    vtkPolyData * centerlineData = reader -> GetOutput();
+
+    vtkPointLocator * locator = vtkPointLocator::New();
+    locator -> Initialize();
+    locator -> SetDataSet( centerlineData );
+    locator -> BuildLocator();
 
     for(int ii=0; ii<num_node[ebc_id]; ++ii)
     {
@@ -63,15 +65,15 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 
       youngsmod[ebc_id][ii] = rho_alpha2 / ( thickness[ebc_id][ii] * pow( 2.0*radius[ebc_id][ii], beta_exp ) );
     }
+
+    // clean memory
+    locator -> Delete();
+    reader -> Delete();
   }
 
   // Write out vtp's with wall properties
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
     write_wall_prop(ebc_id, "varwallprop_" + SYS_T::to_string(ebc_id));
-
-  // clean memory
-  locator -> Delete();
-  reader -> Delete();
 }
 
 

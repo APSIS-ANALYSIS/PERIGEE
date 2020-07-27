@@ -26,10 +26,10 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     //        ten percent to the diameter, that is twenty percent to
     //        the radius.
     ElemBC_3D_tet_wall( const std::vector<std::string> &vtkfileList,
+        const std::vector<std::string> &centerlineList,
         const std::vector<double> &thickness_to_radius,
         const std::vector<double> &youngsmod_alpha,
         const std::vector<double> &youngsmod_beta,
-        const std::string &centerlineFile = "centerlines.vtp",
         const int &fluid_density = 1.065,
         const int &elemtype = 501 );
 
