@@ -1018,13 +1018,7 @@ void TET_T::gen_triangle_grid( vtkPolyData * const &grid_w,
   add_int_PointData( grid_w, node_index, "GlobalNodeID" );
 
   // 4. cell indices
-  vtkIntArray * clindex = vtkIntArray::New();
-  clindex -> SetName("GlobalElementID");
-  clindex -> SetNumberOfComponents(1);
-  for(int ii=0; ii<numcels; ++ii)
-    clindex -> InsertNextValue( ele_index[ii] );
-  grid_w -> GetCellData() -> AddArray( clindex );
-  clindex -> Delete();
+  add_int_CellData( grid_w, ele_index, "GlobalElementID");
 }
 
 
@@ -1330,6 +1324,40 @@ void TET_T::add_int_PointData( vtkPolyData * const &grid_w,
     data -> InsertComponent(ii, 0, ptdata[ii]);
 
   grid_w -> GetPointData() -> AddArray( data );
+  data -> Delete();
+}
+
+
+void TET_T::add_int_CellData( vtkUnstructuredGrid * const &grid_w,
+    const std::vector<int> cldata, const std::string &dataname )
+{
+  SYS_T::print_fatal_if( cldata.size() != static_cast<unsigned int>( grid_w -> GetNumberOfCells() ), "Error: add_int_CellData data size does not match with the number of cells.\n" );
+
+  vtkIntArray * data = vtkIntArray::New();
+  data -> SetNumberOfComponents(1);
+  data -> SetName(dataname.c_str());
+ 
+  for(unsigned int ii=0; ii<cldata.size(); ++ii)
+    data -> InsertComponent(ii, 0, cldata[ii]);
+
+  grid_w -> GetCellData() -> AddArray( data );
+  data -> Delete();
+}
+
+
+void TET_T::add_int_CellData( vtkPolyData * const &grid_w,
+    const std::vector<int> cldata, const std::string &dataname )
+{
+  SYS_T::print_fatal_if( cldata.size() != static_cast<unsigned int>( grid_w -> GetNumberOfPolys() ), "Error: add_int_CellData data size does not match with the number of polys.\n" );
+
+  vtkIntArray * data = vtkIntArray::New();
+  data -> SetNumberOfComponents(1);
+  data -> SetName(dataname.c_str());
+ 
+  for(unsigned int ii=0; ii<cldata.size(); ++ii)
+    data -> InsertComponent(ii, 0, cldata[ii]);
+
+  grid_w -> GetCellData() -> AddArray( data );
   data -> Delete();
 }
 

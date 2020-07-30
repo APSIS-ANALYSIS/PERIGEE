@@ -318,11 +318,39 @@ namespace TET_T
       const std::vector<int> &global_ele_index_2 );
 
 
+  // ----------------------------------------------------------------
+  // ! add_int_PointData : add a point data associated with nodal
+  //                       points in the grid_w, which can be either
+  //                       a vtkUnstructuredGrid or vtkPolyData.
+  //   Input: \para grid_w : the grid vtk object that has been setted
+  //                         up with the basic geometry infomation.
+  //          \para ptdata : the integer data associated with the grid
+  //                         points.
+  //          \para dataname : the name of the data to be written.
+  // ----------------------------------------------------------------
   void add_int_PointData( vtkUnstructuredGrid * const &grid_w,
       const std::vector<int> ptdata, const std::string &dataname );
 
   void add_int_PointData( vtkPolyData * const &grid_w,
       const std::vector<int> ptdata, const std::string &dataname );
+
+
+  // ----------------------------------------------------------------
+  // ! add_int_CellData : add a cell data associated with cells in 
+  //                      thegrid_w, which can be either
+  //                      a vtkUnstructuredGrid or vtkPolyData.
+  //   Input: \para grid_w : the grid vtk object that has been setted
+  //                         up with the basic geometry infomation.
+  //          \para ptdata : the cell data associated with the grid
+  //                         points.
+  //          \para dataname : the name of the data to be written.
+  // ----------------------------------------------------------------
+  void add_int_CellData( vtkUnstructuredGrid * const &grid_w, 
+      const std::vector<int> cldata, const std::string &dataname );
+
+  void add_int_CellData( vtkPolyData * const &grid_w,
+      const std::vector<int> cldata, const std::string &dataname );
+
 
   // ----------------------------------------------------------------
   // ! write_vtkUnstructuredGrid: helper fcn for writing volumetric mesh 
