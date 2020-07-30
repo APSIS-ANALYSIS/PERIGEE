@@ -1307,6 +1307,23 @@ void TET_T::write_quadratic_triangle_grid( const std::string &filename,
 }
 
 
+void TET_T::add_int_PointData( vtkUnstructuredGrid * const &grid_w,
+    const std::vector<int> ptdata, const std::string &dataname )
+{
+  SYS_T::print_fatal_if( ptdata.size() != static_cast<unsigned int>( grid_w -> GetNumberOfPoints() ), "Error: add_int_PointData data size does not match with the number of points.\n" );
+
+  vtkIntArray * data = vtkIntArray::New();
+  data -> SetNumberOfComponents(1);
+  data -> SetName(dataname.c_str());
+
+  for(unsigned int ii=0; ii<ptdata.size(); ++ii)
+    data -> InsertComponent(ii, 0, ptdata[ii]);
+
+  grid_w -> GetPointData() -> AddArray( data );
+  data -> Delete();
+}
+
+
 void TET_T::write_vtkUnstructuredGrid( const std::string &filename,
     vtkUnstructuredGrid * const &grid_w, const bool &isXML )
 {
@@ -1466,7 +1483,7 @@ void TET_T::get_dist2centerline( vtkPolyData * const &centerlineData,
   // Find index of closest centerline point
   const double pt [] = {coor_x, coor_y, coor_z};
   const int closest_id = locator -> FindClosestPoint(&pt[0]);
-  
+
   const double * closest_cl_pt = centerlineData -> GetPoints() -> GetPoint(closest_id);
   line_pt_x = closest_cl_pt[0];
   line_pt_y = closest_cl_pt[1];
