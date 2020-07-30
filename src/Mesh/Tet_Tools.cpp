@@ -1308,8 +1308,7 @@ void TET_T::write_quadratic_triangle_grid( const std::string &filename,
 
 
 void TET_T::write_vtkUnstructuredGrid( const std::string &filename,
-    vtkUnstructuredGrid * const &grid_w,
-    const bool &isXML )
+    vtkUnstructuredGrid * const &grid_w, const bool &isXML )
 {
   if ( isXML )
   {

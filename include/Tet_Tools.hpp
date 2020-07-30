@@ -325,8 +325,7 @@ namespace TET_T
   //          \para isXML : flag for vtu (true) or vtk (false)
   // ----------------------------------------------------------------
   void write_vtkUnstructuredGrid( const std::string &filename,
-      vtkUnstructuredGrid * const &grid_w,
-      const bool &isXML );
+      vtkUnstructuredGrid * const &grid_w, const bool &isXML );
 
 
   // ----------------------------------------------------------------

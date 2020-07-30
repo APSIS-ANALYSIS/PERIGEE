@@ -107,37 +107,37 @@ void ElemBC_3D_tet_wall::print_info() const
 
 void ElemBC_3D_tet_wall::write_wall_prop( const int &ebc_id, const std::string &filename ) const
 {
-    vtkPolyData * grid_w = vtkPolyData::New();
-    TET_T::gen_triangle_grid( grid_w, 
-        num_node[ebc_id], num_cell[ebc_id],
-        pt_xyz[ebc_id], tri_ien[ebc_id], 
-        global_node[ebc_id], global_cell[ebc_id] );    
-    
-    // Add thickness
-    vtkDoubleArray * prop0 = vtkDoubleArray::New();
-    prop0 -> SetName("Thickness");
-    prop0 -> SetNumberOfComponents(1);
-    for(int ii=0; ii<num_node[ebc_id]; ++ii)
-    {
-      prop0 -> InsertNextValue( thickness[ebc_id][ii] );
-    }
-    grid_w -> GetPointData() -> AddArray( prop0 );
-    prop0->Delete();
+  vtkPolyData * grid_w = vtkPolyData::New();
+  TET_T::gen_triangle_grid( grid_w, 
+      num_node[ebc_id], num_cell[ebc_id],
+      pt_xyz[ebc_id], tri_ien[ebc_id], 
+      global_node[ebc_id], global_cell[ebc_id] );    
 
-    // Add Young's modulus
-    vtkDoubleArray * prop1 = vtkDoubleArray::New();
-    prop1 -> SetName("YoungsModulus");
-    prop1 -> SetNumberOfComponents(1);
-    for(int ii=0; ii<num_node[ebc_id]; ++ii)
-      prop1 -> InsertNextValue( youngsmod[ebc_id][ii] );
-    grid_w -> GetPointData() -> AddArray( prop1 );
-    prop1->Delete();
+  // Add thickness
+  vtkDoubleArray * prop0 = vtkDoubleArray::New();
+  prop0 -> SetName("Thickness");
+  prop0 -> SetNumberOfComponents(1);
+  for(int ii=0; ii<num_node[ebc_id]; ++ii)
+  {
+    prop0 -> InsertNextValue( thickness[ebc_id][ii] );
+  }
+  grid_w -> GetPointData() -> AddArray( prop0 );
+  prop0->Delete();
 
-    // write vtp
-    TET_T::write_vtkXMLPolyData(filename, grid_w);
+  // Add Young's modulus
+  vtkDoubleArray * prop1 = vtkDoubleArray::New();
+  prop1 -> SetName("YoungsModulus");
+  prop1 -> SetNumberOfComponents(1);
+  for(int ii=0; ii<num_node[ebc_id]; ++ii)
+    prop1 -> InsertNextValue( youngsmod[ebc_id][ii] );
+  grid_w -> GetPointData() -> AddArray( prop1 );
+  prop1->Delete();
 
-    // Clean memory
-    grid_w->Delete();
+  // write vtp
+  TET_T::write_vtkXMLPolyData(filename, grid_w);
+
+  // Clean memory
+  grid_w->Delete();
 
 }
 
