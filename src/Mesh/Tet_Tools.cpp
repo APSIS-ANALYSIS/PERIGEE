@@ -1023,7 +1023,7 @@ void TET_T::write_triangle_grid( const std::string &filename,
 }
 
 
-void TET_T::gen_triangle_grid( vtkPolyData * const& grid_w,
+void TET_T::gen_triangle_grid( vtkPolyData * const &grid_w,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt,
       const std::vector<int> &ien_array,
@@ -1033,7 +1033,7 @@ void TET_T::gen_triangle_grid( vtkPolyData * const& grid_w,
   // check the input data compatibility
   if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: TET_T::write_triangle_grid point vector size does not match the number of points. \n");
 
-  if( int(ien_array.size()) != 3*numcels ) SYS_T::print_fatal("Error: TET_T::write_triangle_grid ien array size does not match the number of cells. \n");
+  if(int(ien_array.size()) != 3*numcels) SYS_T::print_fatal("Error: TET_T::write_triangle_grid ien array size does not match the number of cells. \n");
 
   if(int(node_index.size()) != numpts) SYS_T::print_fatal("Error: TET_T::write_triangle_grid node_index size does not match the number of points. \n");
 
@@ -1101,7 +1101,7 @@ void TET_T::write_quadratic_triangle_grid(
   // check the input data compatibility
   if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: TET_T::write_triangle_grid point vector size does not match the number of points. \n");
 
-  if( int(ien_array.size()) != 6*numcels ) SYS_T::print_fatal("Error: TET_T::write_quadratic_triangle_grid ien array size does not match the number of cells. \n");
+  if(int(ien_array.size()) != 6*numcels) SYS_T::print_fatal("Error: TET_T::write_quadratic_triangle_grid ien array size does not match the number of cells. \n");
 
   if(int(node_index.size()) != numpts) SYS_T::print_fatal("Error: TET_T::write_triangle_grid node_index size does not match the number of points. \n"); 
 
@@ -1172,7 +1172,7 @@ void TET_T::write_quadratic_triangle_grid(
 }
 
 
-void TET_T::gen_quadratic_triangle_grid( vtkUnstructuredGrid * const& grid_w,
+void TET_T::gen_quadratic_triangle_grid( vtkUnstructuredGrid * const &grid_w,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt,
       const std::vector<int> &ien_array,
@@ -1182,7 +1182,7 @@ void TET_T::gen_quadratic_triangle_grid( vtkUnstructuredGrid * const& grid_w,
   // check the input data compatibility
   if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: TET_T::write_triangle_grid point vector size does not match the number of points. \n");
 
-  if( int(ien_array.size()) != 6*numcels ) SYS_T::print_fatal("Error: TET_T::write_quadratic_triangle_grid ien array size does not match the number of cells. \n");
+  if(int(ien_array.size()) != 6*numcels) SYS_T::print_fatal("Error: TET_T::write_quadratic_triangle_grid ien array size does not match the number of cells. \n");
 
   if(int(node_index.size()) != numpts) SYS_T::print_fatal("Error: TET_T::write_triangle_grid node_index size does not match the number of points. \n"); 
 
@@ -1242,7 +1242,6 @@ void TET_T::gen_quadratic_triangle_grid( vtkUnstructuredGrid * const& grid_w,
     clindex -> InsertNextValue( ele_index[ii] );
   grid_w -> GetCellData() -> AddArray( clindex );
   clindex -> Delete();
-
 }
 
 void TET_T::write_triangle_grid( const std::string &filename,

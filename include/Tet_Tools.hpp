@@ -232,11 +232,12 @@ namespace TET_T
 
   // ----------------------------------------------------------------
   // ! gen_triangle_grid: generate the surface mesh described by triangle
-  //                      elements, but don't write.
+  //                      elements, and pass the data to vtkPolyData.
   //   All input parameters are the same as above, but grid_w is to be
   //   modified by reference. This is convenient for adding additional
   //   fields to the polydata before writing.
-  void gen_triangle_grid( vtkPolyData * const& grid_w,
+  // ----------------------------------------------------------------
+  void gen_triangle_grid( vtkPolyData * const &grid_w,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt,
       const std::vector<int> &ien_array,
@@ -264,11 +265,13 @@ namespace TET_T
 
   // ----------------------------------------------------------------
   // ! gen_quadratic_triangle_grid: generate the surface mesh described by
-  //                                triangle elements, but don't write.
+  //                                triangle elements and pass the data
+  //                                to vtkUnstructuredGrid data.
   //   All input parameters are the same as above, but grid_w is to be
   //   modified by reference. This is convenient for adding additional
   //   fields to the unstructured grid before writing.
-  void gen_quadratic_triangle_grid( vtkUnstructuredGrid * const& grid_w,
+  // ----------------------------------------------------------------
+  void gen_quadratic_triangle_grid( vtkUnstructuredGrid * const &grid_w,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt,
       const std::vector<int> &ien_array,
