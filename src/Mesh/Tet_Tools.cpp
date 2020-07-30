@@ -1015,14 +1015,7 @@ void TET_T::gen_triangle_grid( vtkPolyData * const &grid_w,
   cl->Delete();
   
   // 3. nodal indices
-  vtkIntArray * ptindex = vtkIntArray::New();
-  ptindex -> SetNumberOfComponents(1);
-  ptindex -> SetName("GlobalNodeID");
-  for(int ii=0; ii<numpts; ++ii)
-    ptindex -> InsertComponent(ii, 0, node_index[ii]);
-
-  grid_w -> GetPointData() -> AddArray( ptindex );
-  ptindex->Delete();
+  add_int_PointData( grid_w, node_index, "GlobalNodeID" );
 
   // 4. cell indices
   vtkIntArray * clindex = vtkIntArray::New();
@@ -1308,6 +1301,23 @@ void TET_T::write_quadratic_triangle_grid( const std::string &filename,
 
 
 void TET_T::add_int_PointData( vtkUnstructuredGrid * const &grid_w,
+    const std::vector<int> ptdata, const std::string &dataname )
+{
+  SYS_T::print_fatal_if( ptdata.size() != static_cast<unsigned int>( grid_w -> GetNumberOfPoints() ), "Error: add_int_PointData data size does not match with the number of points.\n" );
+
+  vtkIntArray * data = vtkIntArray::New();
+  data -> SetNumberOfComponents(1);
+  data -> SetName(dataname.c_str());
+
+  for(unsigned int ii=0; ii<ptdata.size(); ++ii)
+    data -> InsertComponent(ii, 0, ptdata[ii]);
+
+  grid_w -> GetPointData() -> AddArray( data );
+  data -> Delete();
+}
+
+
+void TET_T::add_int_PointData( vtkPolyData * const &grid_w,
     const std::vector<int> ptdata, const std::string &dataname )
 {
   SYS_T::print_fatal_if( ptdata.size() != static_cast<unsigned int>( grid_w -> GetNumberOfPoints() ), "Error: add_int_PointData data size does not match with the number of points.\n" );

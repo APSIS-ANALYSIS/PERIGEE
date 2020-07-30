@@ -321,6 +321,9 @@ namespace TET_T
   void add_int_PointData( vtkUnstructuredGrid * const &grid_w,
       const std::vector<int> ptdata, const std::string &dataname );
 
+  void add_int_PointData( vtkPolyData * const &grid_w,
+      const std::vector<int> ptdata, const std::string &dataname );
+
   // ----------------------------------------------------------------
   // ! write_vtkUnstructuredGrid: helper fcn for writing volumetric mesh 
   //   Input: \para filename : filename.{vtu/vtk} is the file to be written

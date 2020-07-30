@@ -132,11 +132,15 @@ ADD_EXECUTABLE( preprocess3d preprocess_sv_tets.cpp)
 #ADD_EXECUTABLE( vis_ns vis_ns.cpp)
 #ADD_EXECUTABLE( vis_p1_wss vis_p1_wss.cpp)
 
+ADD_EXECUTABLE( test test.cpp )
+
 TARGET_LINK_LIBRARIES( gmsh_p1_IO perigee_preprocess )
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
 #TARGET_LINK_LIBRARIES( ns_tet_3d perigee_analysis )
 #TARGET_LINK_LIBRARIES( prepost perigee_preprocess )
 #TARGET_LINK_LIBRARIES( vis_ns perigee_postprocess )
 #TARGET_LINK_LIBRARIES( vis_p1_wss perigee_postprocess )
+
+TARGET_LINK_LIBRARIES( test perigee_preprocess )
 
 # EOF
