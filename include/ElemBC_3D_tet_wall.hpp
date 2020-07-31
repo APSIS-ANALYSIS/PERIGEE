@@ -30,7 +30,7 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
         const std::vector<double> &thickness_to_radius,
         const std::vector<double> &youngsmod_alpha,
         const std::vector<double> &youngsmod_beta,
-        const int &fluid_density = 1.065,
+        const double &fluid_density = 1.065,
         const int &elemtype = 501 );
 
     virtual ~ElemBC_3D_tet_wall();

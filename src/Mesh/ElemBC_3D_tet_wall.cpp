@@ -6,7 +6,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const std::vector<double> &thickness_to_radius,
     const std::vector<double> &youngsmod_alpha,
     const std::vector<double> &youngsmod_beta,
-    const int &fluid_density,
+    const double &fluid_density,
     const int &elemtype )
 : ElemBC_3D_tet( vtkfileList, elemtype )
 {
