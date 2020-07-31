@@ -1096,24 +1096,10 @@ void TET_T::gen_quadratic_triangle_grid( vtkUnstructuredGrid * const &grid_w,
   cl -> Delete();
 
   // 3. nodal indices
-  vtkIntArray * ptindex = vtkIntArray::New();
-  ptindex -> SetNumberOfComponents(1);
-  ptindex -> SetName("GlobalNodeID");
-  ptindex -> SetNumberOfComponents(1);
-  for(int ii=0; ii<numpts; ++ii)
-    ptindex -> InsertNextValue( node_index[ii] );
-
-  grid_w -> GetPointData() -> AddArray( ptindex );
-  ptindex->Delete();
+  add_int_PointData( grid_w, node_index, "GlobalNodeID" );
 
   // 4. cell indices
-  vtkIntArray * clindex = vtkIntArray::New();
-  clindex -> SetName("GlobalElementID");
-  clindex -> SetNumberOfComponents(1);
-  for(int ii=0; ii<numcels; ++ii)
-    clindex -> InsertNextValue( ele_index[ii] );
-  grid_w -> GetCellData() -> AddArray( clindex );
-  clindex -> Delete();
+  add_int_CellData( grid_w, ele_index, "GlobalElementID" );
 }
 
 void TET_T::write_triangle_grid( const std::string &filename,
