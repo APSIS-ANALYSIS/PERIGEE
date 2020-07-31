@@ -126,7 +126,7 @@ void ElemBC_3D_tet_wall::write_wall_prop( const int &ebc_id, const std::string &
   TET_T::add_double_PointData( grid_w, youngsmod[ebc_id], "YoungsModulus" );
 
   // write vtp
-  TET_T::write_vtkXMLPolyData(filename, grid_w);
+  TET_T::write_vtkPointSet(filename, grid_w);
 
   // Clean memory
   grid_w->Delete();

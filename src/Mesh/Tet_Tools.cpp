@@ -968,7 +968,7 @@ void TET_T::write_triangle_grid( const std::string &filename,
   add_int_CellData( grid_w, ele_index, "GlobalElementID");
   
   // write grid_w to vtp file
-  write_vtkXMLPolyData(filename, grid_w);
+  write_vtkPointSet(filename, grid_w);
 
   grid_w->Delete();
 }
@@ -1113,7 +1113,7 @@ void TET_T::write_triangle_grid( const std::string &filename,
   add_int_CellData( grid_w, ele_index_2, "GlobalElementID_2" );
 
   // write vtp
-  write_vtkXMLPolyData(filename, grid_w);
+  write_vtkPointSet(filename, grid_w);
 
   grid_w->Delete();
 }
@@ -1217,18 +1217,9 @@ void TET_T::add_double_CellData( vtkPointSet * const &grid_w,
 }
 
 
-void TET_T::write_vtkXMLPolyData( const std::string &filename,
-    vtkPolyData * const &grid_w )
-{
-  write_vtkPointSet(filename, grid_w, false);
-}
-
-
 void TET_T::write_vtkPointSet( const std::string &filename,
     vtkPointSet * const &grid_w, const bool &isXML )
 {
-  std::cout<<grid_w -> GetDataObjectType()<<'\n';
-
   if( grid_w -> GetDataObjectType() == VTK_UNSTRUCTURED_GRID )
   {
     if ( isXML )
