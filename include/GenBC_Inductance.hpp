@@ -17,8 +17,7 @@
 class GenBC_Inductance : public IGenBC
 {
   public:
-    GenBC_Inductance( const char * const &lpn_filename, 
-        const double &in_dt3d );
+    GenBC_Inductance( const char * const &lpn_filename );
 
     virtual ~GenBC_Inductance();
 
@@ -31,7 +30,6 @@ class GenBC_Inductance : public IGenBC
     virtual double get_m( const int &ii, const double &dot_Q,
        const double &Q ) const
     {
-      //return induct[ii] / dt3d;
       return 0.0;
     }
 
@@ -40,7 +38,6 @@ class GenBC_Inductance : public IGenBC
     virtual double get_n( const int &ii, const double &dot_Q,
        const double &Q ) const
     {
-      //return 0.0;
       return induct[ii];
     }
 
@@ -50,7 +47,6 @@ class GenBC_Inductance : public IGenBC
     virtual double get_P( const int &ii, const double &dot_Q,
        const double &Q ) const
     {
-      //return induct[ii] * (Q - Q0[ii]) / dt3d + pres_offset[ii];
       return induct[ii] * dot_Q + pres_offset[ii];
     }
 
@@ -67,8 +63,6 @@ class GenBC_Inductance : public IGenBC
     }
 
   private:
-    const double dt3d;
-
     int num_ebc; // number of elemental boundary faces
     
     // vector storing the inductance and pressure offset values
