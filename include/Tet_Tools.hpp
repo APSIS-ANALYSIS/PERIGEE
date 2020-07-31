@@ -353,19 +353,20 @@ namespace TET_T
 
 
   // ----------------------------------------------------------------
-  // ! write_vtkUnstructuredGrid: helper fcn for writing volumetric mesh 
+  // ! write_vtkUnstructuredGrid: write the info in vtkUnstructuredGrid
+  //                              to a vtu or vtk file. 
   //   Input: \para filename : filename.{vtu/vtk} is the file to be written
-  //          \para grid_w : vtkUnstructuredGrid object to be written
-  //          \para isXML : flag for vtu (true) or vtk (false)
+  //          \para grid_w   : vtkUnstructuredGrid object to be written
+  //          \para isXML    : flag for vtu (true) or vtk (false)
   // ----------------------------------------------------------------
   void write_vtkUnstructuredGrid( const std::string &filename,
       vtkUnstructuredGrid * const &grid_w, const bool &isXML );
 
 
   // ----------------------------------------------------------------
-  // ! write_vtkXMLPolyData: helper fcn for writing linear triangle mesh 
+  // ! write_vtkXMLPolyData: write the info in vtkPolyData to a vtp file 
   //   Input: \para filename : filename.vtp is the file to be written
-  //          \para grid_w : vtkPolyData object to be written
+  //          \para grid_w   : vtkPolyData object to be written
   // ----------------------------------------------------------------
   void write_vtkXMLPolyData( const std::string &filename,
       vtkPolyData * const &grid_w );
