@@ -327,6 +327,9 @@ namespace TET_T
   void add_int_PointData( vtkPointSet * const &grid_w,
       const std::vector<int> ptdata, const std::string &dataname );
 
+  void add_double_PointData( vtkPointSet * const &grid_w,
+      const std::vector<double> ptdata, const std::string &dataname );
+
 
   // ----------------------------------------------------------------
   // ! add_int_CellData : add a cell data associated with cells in 
