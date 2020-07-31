@@ -1036,9 +1036,8 @@ void TET_T::write_quadratic_triangle_grid(
   // cell indices
   add_int_CellData( grid_w, ele_index, "GlobalElementID" );
   
-  // write vtu
-  const bool isXML = true;
-  write_vtkPointSet(filename, grid_w, isXML);
+  // write vtu (by default of the writer function)
+  write_vtkPointSet(filename, grid_w);
 
   grid_w->Delete();
 }
@@ -1141,9 +1140,8 @@ void TET_T::write_quadratic_triangle_grid( const std::string &filename,
 
   add_int_CellData( grid_w, ele_index_2, "GlobalElementID_2" );
 
-  // write vtu
-  const bool isXML = true;
-  write_vtkPointSet(filename, grid_w, isXML);
+  // write vtu (by default of write function)
+  write_vtkPointSet(filename, grid_w);
 
   grid_w->Delete();
 }
