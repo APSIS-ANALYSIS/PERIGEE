@@ -79,7 +79,8 @@ class ElemBC_3D_tet : public ElemBC
     {SYS_T::commPrint("Warning: get_wall_youngsmod is not implemented. \n");}
 
     // write variable wall properties from ElemBC_3D_tet_wall for CMM
-    virtual void write_wall_prop( const int &ebc_id ) const
+    virtual void write_wall_prop( const int &ebc_id,
+       const std::string &filename="varwallprop" ) const
     {SYS_T::commPrint("Warning: write_wall_prop is not implemented. \n");}
 
   protected:

@@ -133,7 +133,8 @@ class ElemBC
 
 
     // write variable wall properties for CMM
-    virtual void write_wall_prop( const int &ebc_id ) const
+    virtual void write_wall_prop( const int &ebc_id,
+       const std::string &filename="varwallprop" ) const
     {SYS_T::commPrint("Warning: write_wall_prop is not implemented. \n");}
 
 
