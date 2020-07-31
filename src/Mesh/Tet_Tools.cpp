@@ -1319,6 +1319,23 @@ void TET_T::add_int_CellData( vtkPointSet * const &grid_w,
 }
 
 
+void TET_T::add_double_CellData( vtkPointSet * const &grid_w,
+    const std::vector<double> cldata, const std::string &dataname )
+{
+  SYS_T::print_fatal_if( cldata.size() != static_cast<unsigned int>( grid_w -> GetNumberOfCells() ), "Error: add_double_CellData data size does not match with the number of cells.\n" );
+
+  vtkDoubleArray * data = vtkDoubleArray::New();
+  data -> SetNumberOfComponents(1);
+  data -> SetName(dataname.c_str());
+ 
+  for(unsigned int ii=0; ii<cldata.size(); ++ii)
+    data -> InsertComponent(ii, 0, cldata[ii]);
+
+  grid_w -> GetCellData() -> AddArray( data );
+  data -> Delete();
+}
+
+
 void TET_T::write_vtkUnstructuredGrid( const std::string &filename,
     vtkUnstructuredGrid * const &grid_w, const bool &isXML )
 {

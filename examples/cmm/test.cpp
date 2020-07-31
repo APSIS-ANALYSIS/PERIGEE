@@ -45,8 +45,12 @@ int main( int argc, char *argv[] )
   n2idx.push_back(2.5);
   n2idx.push_back(-1.5);
   n2idx.push_back(32.3333);
-  
+ 
+  std::vector<double> e2idx;
+  e2idx.push_back(10.99);
+
   TET_T::add_double_PointData( grid_w, n2idx, "testid" );
+  TET_T::add_double_CellData( grid_w, e2idx, "testidcell" );
 
   TET_T::write_vtkXMLPolyData("sample_tri", grid_w);
 

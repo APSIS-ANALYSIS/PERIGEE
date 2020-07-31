@@ -344,6 +344,9 @@ namespace TET_T
   void add_int_CellData( vtkPointSet * const &grid_w, 
       const std::vector<int> cldata, const std::string &dataname );
 
+  void add_double_CellData( vtkPointSet * const &grid_w, 
+      const std::vector<double> cldata, const std::string &dataname );
+
 
   // ----------------------------------------------------------------
   // ! write_vtkUnstructuredGrid: write the info in vtkUnstructuredGrid
