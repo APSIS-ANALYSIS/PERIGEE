@@ -1028,8 +1028,14 @@ void TET_T::write_quadratic_triangle_grid(
   vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
 
   // Generate the data for grid_w
-  gen_quadratic_triangle_grid( grid_w, numpts, numcels, pt, ien_array, node_index, ele_index );
+  gen_quadratic_triangle_grid( grid_w, numpts, numcels, pt, ien_array );
 
+  // nodal indices
+  add_int_PointData( grid_w, node_index, "GlobalNodeID" );
+
+  // cell indices
+  add_int_CellData( grid_w, ele_index, "GlobalElementID" );
+  
   // write vtu
   const bool isXML = true;
   write_vtkUnstructuredGrid(filename, grid_w, isXML);
@@ -1041,9 +1047,7 @@ void TET_T::write_quadratic_triangle_grid(
 void TET_T::gen_quadratic_triangle_grid( vtkUnstructuredGrid * const &grid_w,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt,
-      const std::vector<int> &ien_array,
-      const std::vector<int> &node_index,
-      const std::vector<int> &ele_index )
+      const std::vector<int> &ien_array )
 {
   // check the input data compatibility
   if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: TET_T::gen_quadratic_triangle_grid point vector size does not match the number of points. \n");
@@ -1084,12 +1088,6 @@ void TET_T::gen_quadratic_triangle_grid( vtkUnstructuredGrid * const &grid_w,
 
   grid_w -> SetCells(22, cl);
   cl -> Delete();
-
-  // 3. nodal indices
-  add_int_PointData( grid_w, node_index, "GlobalNodeID" );
-
-  // 4. cell indices
-  add_int_CellData( grid_w, ele_index, "GlobalElementID" );
 }
 
 void TET_T::write_triangle_grid( const std::string &filename,

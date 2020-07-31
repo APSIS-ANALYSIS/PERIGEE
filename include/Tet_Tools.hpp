@@ -272,9 +272,7 @@ namespace TET_T
   void gen_quadratic_triangle_grid( vtkUnstructuredGrid * const &grid_w,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt,
-      const std::vector<int> &ien_array,
-      const std::vector<int> &global_node_index,
-      const std::vector<int> &global_ele_index );
+      const std::vector<int> &ien_array );
 
 
   // ----------------------------------------------------------------
