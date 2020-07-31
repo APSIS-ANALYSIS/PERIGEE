@@ -355,9 +355,6 @@ namespace TET_T
   //          \para grid_w   : vtkUnstructuredGrid object to be written
   //          \para isXML    : flag for vtu (true) or vtk (false)
   // ----------------------------------------------------------------
-  void write_vtkUnstructuredGrid( const std::string &filename,
-      vtkUnstructuredGrid * const &grid_w, const bool &isXML );
-
 
   // ----------------------------------------------------------------
   // ! write_vtkXMLPolyData: write the info in vtkPolyData to a vtp file 
@@ -367,6 +364,9 @@ namespace TET_T
   void write_vtkXMLPolyData( const std::string &filename,
       vtkPolyData * const &grid_w );
 
+
+  void write_vtkPointSet( const std::string &filename, 
+      vtkPointSet * const &grid_w, const bool &isXML );
 
   // ================================================================
   // 3. Mesh quality measures

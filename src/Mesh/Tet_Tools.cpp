@@ -395,7 +395,7 @@ void TET_T::write_tet_grid( const std::string &filename,
 
   // write vtu
   const bool isXML = true;
-  write_vtkUnstructuredGrid(filename, grid_w, isXML);
+  write_vtkPointSet(filename, grid_w, isXML);
 
   grid_w->Delete();
 }
@@ -519,7 +519,7 @@ void TET_T::write_tet_grid_node_elem_index(
 
   // write vtu
   const bool isXML = true;
-  write_vtkUnstructuredGrid(filename, grid_w, isXML);
+  write_vtkPointSet(filename, grid_w, isXML);
 
   grid_w->Delete();
 }
@@ -648,7 +648,7 @@ void TET_T::write_tet_grid_node_elem_index(
 
   // write vtu
   const bool isXML = true;
-  write_vtkUnstructuredGrid(filename, grid_w, isXML);
+  write_vtkPointSet(filename, grid_w, isXML);
 
   grid_w->Delete();
 }
@@ -792,7 +792,7 @@ void TET_T::write_tet_grid( const std::string &filename,
   phy_tag -> Delete();
 
   // write vtu or vtk
-  write_vtkUnstructuredGrid(filename, grid_w, isXML);
+  write_vtkPointSet(filename, grid_w, isXML);
   
   grid_w->Delete();
 }
@@ -942,7 +942,7 @@ void TET_T::write_tet_grid( const std::string &filename,
   phy_tag -> Delete();
 
   // write vtu or vtk
-  write_vtkUnstructuredGrid(filename, grid_w, isXML);
+  write_vtkPointSet(filename, grid_w, isXML);
 
   grid_w->Delete();
 }
@@ -1038,7 +1038,7 @@ void TET_T::write_quadratic_triangle_grid(
   
   // write vtu
   const bool isXML = true;
-  write_vtkUnstructuredGrid(filename, grid_w, isXML);
+  write_vtkPointSet(filename, grid_w, isXML);
 
   grid_w->Delete();
 }
@@ -1143,7 +1143,7 @@ void TET_T::write_quadratic_triangle_grid( const std::string &filename,
 
   // write vtu
   const bool isXML = true;
-  write_vtkUnstructuredGrid(filename, grid_w, isXML);
+  write_vtkPointSet(filename, grid_w, isXML);
 
   grid_w->Delete();
 }
@@ -1217,44 +1217,55 @@ void TET_T::add_double_CellData( vtkPointSet * const &grid_w,
 }
 
 
-void TET_T::write_vtkUnstructuredGrid( const std::string &filename,
-    vtkUnstructuredGrid * const &grid_w, const bool &isXML )
+void TET_T::write_vtkXMLPolyData( const std::string &filename,
+    vtkPolyData * const &grid_w )
 {
-  if ( isXML )
-  {
-    vtkXMLUnstructuredGridWriter * writer = vtkXMLUnstructuredGridWriter::New();
-    std::string name_to_write(filename);
-    name_to_write.append(".vtu");
-    writer -> SetFileName( name_to_write.c_str() );
+  write_vtkPointSet(filename, grid_w, false);
+}
 
+
+void TET_T::write_vtkPointSet( const std::string &filename,
+    vtkPointSet * const &grid_w, const bool &isXML )
+{
+  std::cout<<grid_w -> GetDataObjectType()<<'\n';
+
+  if( grid_w -> GetDataObjectType() == VTK_UNSTRUCTURED_GRID )
+  {
+    if ( isXML )
+    {
+      vtkXMLUnstructuredGridWriter * writer = vtkXMLUnstructuredGridWriter::New();
+      std::string name_to_write(filename);
+      name_to_write.append(".vtu");
+      writer -> SetFileName( name_to_write.c_str() );
+
+      writer->SetInputData(grid_w);
+      writer->Write();
+      writer->Delete();
+    }
+    else
+    {
+      vtkUnstructuredGridWriter * writer = vtkUnstructuredGridWriter::New();
+      std::string name_to_write(filename);
+      name_to_write.append(".vtk");
+      writer -> SetFileName( name_to_write.c_str() );
+
+      writer->SetInputData(grid_w);
+      writer->Write();
+      writer->Delete();
+    }
+  }
+  else if( grid_w -> GetDataObjectType() == VTK_POLY_DATA )
+  {
+    vtkXMLPolyDataWriter * writer = vtkXMLPolyDataWriter::New();
+    std::string name_to_write(filename);
+    name_to_write.append(".vtp");
+    writer -> SetFileName( name_to_write.c_str() );
     writer->SetInputData(grid_w);
     writer->Write();
     writer->Delete();
   }
   else
-  {
-    vtkUnstructuredGridWriter * writer = vtkUnstructuredGridWriter::New();
-    std::string name_to_write(filename);
-    name_to_write.append(".vtk");
-    writer -> SetFileName( name_to_write.c_str() );
-
-    writer->SetInputData(grid_w);
-    writer->Write();
-    writer->Delete();
-  }
-}
-
-
-void TET_T::write_vtkXMLPolyData( const std::string &filename,
-    vtkPolyData * const &grid_w )
-{
-  vtkXMLPolyDataWriter * writer = vtkXMLPolyDataWriter::New();
-  std::string name_to_write(filename);
-  name_to_write.append(".vtp");
-  writer -> SetFileName( name_to_write.c_str() );
-  writer->SetInputData(grid_w);
-  writer->Write();
-  writer->Delete();
+    SYS_T::print_fatal("Error: TET_T::write_vtkPointSet unknown vtkPointSet data. \n");
 }
 
 
