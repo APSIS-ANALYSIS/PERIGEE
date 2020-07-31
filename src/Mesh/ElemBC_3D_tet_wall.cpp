@@ -120,24 +120,10 @@ void ElemBC_3D_tet_wall::write_wall_prop( const int &ebc_id, const std::string &
   TET_T::add_int_CellData( grid_w, global_cell[ebc_id], "GlobalElementID");
 
   // Add thickness
-  vtkDoubleArray * prop0 = vtkDoubleArray::New();
-  prop0 -> SetName("Thickness");
-  prop0 -> SetNumberOfComponents(1);
-  for(int ii=0; ii<num_node[ebc_id]; ++ii)
-  {
-    prop0 -> InsertNextValue( thickness[ebc_id][ii] );
-  }
-  grid_w -> GetPointData() -> AddArray( prop0 );
-  prop0->Delete();
+  TET_T::add_double_PointData( grid_w, thickness[ebc_id], "Thickness" );
 
   // Add Young's modulus
-  vtkDoubleArray * prop1 = vtkDoubleArray::New();
-  prop1 -> SetName("YoungsModulus");
-  prop1 -> SetNumberOfComponents(1);
-  for(int ii=0; ii<num_node[ebc_id]; ++ii)
-    prop1 -> InsertNextValue( youngsmod[ebc_id][ii] );
-  grid_w -> GetPointData() -> AddArray( prop1 );
-  prop1->Delete();
+  TET_T::add_double_PointData( grid_w, youngsmod[ebc_id], "YoungsModulus" );
 
   // write vtp
   TET_T::write_vtkXMLPolyData(filename, grid_w);
