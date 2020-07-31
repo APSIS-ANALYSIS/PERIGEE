@@ -111,8 +111,13 @@ void ElemBC_3D_tet_wall::write_wall_prop( const int &ebc_id, const std::string &
   
   TET_T::gen_triangle_grid( grid_w, 
       num_node[ebc_id], num_cell[ebc_id],
-      pt_xyz[ebc_id], tri_ien[ebc_id], 
-      global_node[ebc_id], global_cell[ebc_id] );    
+      pt_xyz[ebc_id], tri_ien[ebc_id] );    
+
+  // Add nodal indices
+  TET_T::add_int_PointData( grid_w, global_node[ebc_id], "GlobalNodeID" );
+
+  // Add cell indices
+  TET_T::add_int_CellData( grid_w, global_cell[ebc_id], "GlobalElementID");
 
   // Add thickness
   vtkDoubleArray * prop0 = vtkDoubleArray::New();
@@ -139,7 +144,6 @@ void ElemBC_3D_tet_wall::write_wall_prop( const int &ebc_id, const std::string &
 
   // Clean memory
   grid_w->Delete();
-
 }
 
 // EOF

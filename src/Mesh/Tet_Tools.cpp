@@ -959,8 +959,14 @@ void TET_T::write_triangle_grid( const std::string &filename,
   vtkPolyData * grid_w = vtkPolyData::New();
 
   // Generate the polydata grid_w
-  gen_triangle_grid( grid_w, numpts, numcels, pt, ien_array, node_index, ele_index );
+  gen_triangle_grid( grid_w, numpts, numcels, pt, ien_array );
 
+  // nodal indices
+  add_int_PointData( grid_w, node_index, "GlobalNodeID" );
+
+  // cell indices
+  add_int_CellData( grid_w, ele_index, "GlobalElementID");
+  
   // write grid_w to vtp file
   write_vtkXMLPolyData(filename, grid_w);
 
@@ -971,9 +977,7 @@ void TET_T::write_triangle_grid( const std::string &filename,
 void TET_T::gen_triangle_grid( vtkPolyData * const &grid_w,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt,
-      const std::vector<int> &ien_array,
-      const std::vector<int> &node_index,
-      const std::vector<int> &ele_index )
+      const std::vector<int> &ien_array )
 {
   // check the input data compatibility
   if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: TET_T::gen_triangle_grid point vector size does not match the number of points. \n");
@@ -1009,12 +1013,6 @@ void TET_T::gen_triangle_grid( vtkPolyData * const &grid_w,
   }
   grid_w->SetPolys(cl);
   cl->Delete();
-  
-  // 3. nodal indices
-  add_int_PointData( grid_w, node_index, "GlobalNodeID" );
-
-  // 4. cell indices
-  add_int_CellData( grid_w, ele_index, "GlobalElementID");
 }
 
 
