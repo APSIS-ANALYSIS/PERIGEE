@@ -353,7 +353,7 @@ void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
     for(int ii=0; ii<numcels; ++ii)
     {
       for(int lnode=0; lnode<4; ++lnode)
-        cl->GetPointIds()->SetId( ii, ien_array[4*ii + lnode] );
+        cl->GetPointIds()->SetId( lnode, ien_array[4*ii + lnode] );
       
       grid_w->InsertNextCell( cl->GetCellType(), cl->GetPointIds() );
 
@@ -377,7 +377,7 @@ void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
     for(int ii=0; ii<numcels; ++ii)
     {
       for(int lnode=0; lnode<10; ++lnode)
-        cl->GetPointIds()->SetId( ii, ien_array[10*ii + lnode] );
+        cl->GetPointIds()->SetId( lnode, ien_array[10*ii + lnode] );
       
       grid_w->InsertNextCell( cl->GetCellType(), cl->GetPointIds() );
 

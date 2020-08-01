@@ -34,7 +34,8 @@ int main( int argc, char *argv[] )
   //eindex.push_back(2);
   //e2index.push_back(-3);
 
-  TET_T::write_tet_grid_node_elem_index("sample_tet", numpt, numcl, ppt, ien);
+  TET_T::write_tet_grid("sample_tet", numpt, numcl, ppt, ien);
+  // TET_T::write_tet_grid_node_elem_index("sample_tet_idx", numpt, numcl, ppt, ien);
 
   return 0;
 }
