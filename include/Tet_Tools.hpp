@@ -155,6 +155,22 @@ namespace TET_T
   //         file and surface mesh to .vtp file.  
   // ================================================================
   // ----------------------------------------------------------------
+  // ! gen_tet_grid: generate the volumetric mesh described by tet
+  //                 elements, and pass the data to vtkUnstructuredGrid.
+  //   Input: \para grid_w : the vtk object taking the mesh info
+  //          \para numpts : the number of grid points
+  //          \para numcels : the number of tetrahedral elements
+  //          \para pt: xyz coordinates of the linear tets, length 
+  //                    3 x numpts
+  //          \para ien_array : connectivity array, 
+  //                            length 4 or 10 x numcels
+  // ----------------------------------------------------------------
+  void gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
+      const int &numpts, const int &numcels,
+      const std::vector<double> &pt,
+      const std::vector<int> &ien_array );
+
+  // ----------------------------------------------------------------
   // ! write_tet_grid: write the volumetric mesh described by linear 
   //                   or quadratic tetrahedral elements. The routine
   //                   will detect the element type from the length of
@@ -172,21 +188,9 @@ namespace TET_T
       const std::vector<double> &pt, const std::vector<int> &ien_array );
 
   // ----------------------------------------------------------------
-  // ! gen_tet_grid: generate the volumetric mesh described by tet
-  //                 elements, and pass the data to vtkUnstructuredGrid.
-  //   All input parameters are the same as above, but grid_w is to be
-  //   modified by reference. This is convenient for adding additional
-  //   fields to the grid before writing.
-  // ----------------------------------------------------------------
-  void gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
-      const int &numpts, const int &numcels,
-      const std::vector<double> &pt,
-      const std::vector<int> &ien_array );
-
-  // ----------------------------------------------------------------
-  // ! write_tet_grid_node_elem_index : Similar to the above function,
-  //   this routine writes the volumetric mesh with additional data :
-  //   NodalIndex & ElemIndex. If the node_idx & elem_idx is not given
+  // ! write_tet_grid_node_elem_index : write the volumetric mesh with 
+  //   additional data : NodalIndex & ElemIndex. 
+  //   If the node_idx & elem_idx is not given
   //   the function will write based on the natural numbering.
   // ----------------------------------------------------------------
   void write_tet_grid_node_elem_index( const std::string &filename,
