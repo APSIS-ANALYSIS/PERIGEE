@@ -336,10 +336,10 @@ namespace TET_T
   //          \para dataname : the name of the data to be written.
   // ----------------------------------------------------------------
   void add_int_PointData( vtkPointSet * const &grid_w,
-      const std::vector<int> ptdata, const std::string &dataname );
+      const std::vector<int> &ptdata, const std::string &dataname );
 
   void add_double_PointData( vtkPointSet * const &grid_w,
-      const std::vector<double> ptdata, const std::string &dataname );
+      const std::vector<double> &ptdata, const std::string &dataname );
 
 
   // ----------------------------------------------------------------
@@ -353,10 +353,10 @@ namespace TET_T
   //          \para dataname : the name of the data to be written.
   // ----------------------------------------------------------------
   void add_int_CellData( vtkPointSet * const &grid_w, 
-      const std::vector<int> cldata, const std::string &dataname );
+      const std::vector<int> &cldata, const std::string &dataname );
 
   void add_double_CellData( vtkPointSet * const &grid_w, 
-      const std::vector<double> cldata, const std::string &dataname );
+      const std::vector<double> &cldata, const std::string &dataname );
 
 
   // ----------------------------------------------------------------
