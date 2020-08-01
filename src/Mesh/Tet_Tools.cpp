@@ -292,6 +292,24 @@ void TET_T::write_tet_grid( const std::string &filename,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt, const std::vector<int> &ien_array )
 {
+  // Setup the VTK objects
+  vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
+
+  // Generate the mesh and compute aspect ratios
+  gen_tet_grid( grid_w, numpts, numcels, pt, ien_array );
+
+  // write vtu (by default of the writer function)
+  write_vtkPointSet(filename, grid_w);
+
+  grid_w->Delete();
+}
+
+
+void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
+      const int &numpts, const int &numcels,
+      const std::vector<double> &pt,
+      const std::vector<int> &ien_array )
+{
   // Check the input data compatibility
   if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: TET_T::write_tet_grid point vector size does not match the number of points. \n");
 
@@ -303,11 +321,8 @@ void TET_T::write_tet_grid( const std::string &filename,
 
   std::vector<int> temp = ien_array;
   VEC_T::sort_unique_resize(temp);
-  if( int(temp.size()) != numpts ) SYS_T::print_fatal("Error: TET_T::write_tet_grid numpts is more than the point needed for the cells. Please re-organize the input. \n");
-  VEC_T::clean(temp); 
-
-  // Setup the VTK objects
-  vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
+  if( int(temp.size()) != numpts ) SYS_T::print_fatal("Error: TET_T::write_tet_grid numpts does not match the number of unique points in the ien array. Please re-organize the input. \n");
+  VEC_T::clean(temp);
 
   // 1. nodal points coordinates
   vtkPoints * ppt = vtkPoints::New(); 
@@ -336,11 +351,10 @@ void TET_T::write_tet_grid( const std::string &filename,
 
     for(int ii=0; ii<numcels; ++ii)
     {
-      cl->GetPointIds()->SetId( 0, ien_array[4*ii] );
-      cl->GetPointIds()->SetId( 1, ien_array[4*ii+1] );
-      cl->GetPointIds()->SetId( 2, ien_array[4*ii+2] );
-      cl->GetPointIds()->SetId( 3, ien_array[4*ii+3] );
-
+      for(int lnode=0; lnode<4; ++lnode)
+      {
+        cl->GetPointIds()->SetId( ii, ien_array[4*ii + lnode] );
+      }
       grid_w->InsertNextCell( cl->GetCellType(), cl->GetPointIds() );
 
       std::vector<double> cell_node; cell_node.clear();
@@ -362,17 +376,10 @@ void TET_T::write_tet_grid( const std::string &filename,
 
     for(int ii=0; ii<numcels; ++ii)
     {
-      cl->GetPointIds()->SetId( 0, ien_array[10*ii] );
-      cl->GetPointIds()->SetId( 1, ien_array[10*ii+1] );
-      cl->GetPointIds()->SetId( 2, ien_array[10*ii+2] );
-      cl->GetPointIds()->SetId( 3, ien_array[10*ii+3] );
-      cl->GetPointIds()->SetId( 4, ien_array[10*ii+4] );
-      cl->GetPointIds()->SetId( 5, ien_array[10*ii+5] );
-      cl->GetPointIds()->SetId( 6, ien_array[10*ii+6] );
-      cl->GetPointIds()->SetId( 7, ien_array[10*ii+7] );
-      cl->GetPointIds()->SetId( 8, ien_array[10*ii+8] );
-      cl->GetPointIds()->SetId( 9, ien_array[10*ii+9] );
-
+      for(int lnode=0; lnode<10; ++lnode)
+      {
+        cl->GetPointIds()->SetId( ii, ien_array[10*ii + lnode] );
+      }
       grid_w->InsertNextCell( cl->GetCellType(), cl->GetPointIds() );
 
       std::vector<double> cell_node; cell_node.clear();
@@ -392,12 +399,6 @@ void TET_T::write_tet_grid( const std::string &filename,
 
   grid_w -> GetCellData() -> AddArray( edge_aspect_ratio );
   edge_aspect_ratio -> Delete();
-
-  // write vtu
-  const bool isXML = true;
-  write_vtkPointSet(filename, grid_w, isXML);
-
-  grid_w->Delete();
 }
 
 
@@ -958,7 +959,7 @@ void TET_T::write_triangle_grid( const std::string &filename,
   // Setup the VTK objects
   vtkPolyData * grid_w = vtkPolyData::New();
 
-  // Generate the polydata grid_w
+  // Generate the mesh
   gen_triangle_grid( grid_w, numpts, numcels, pt, ien_array );
 
   // nodal indices
@@ -1027,7 +1028,7 @@ void TET_T::write_quadratic_triangle_grid(
   // Setup the VTK objects
   vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
 
-  // Generate the data for grid_w
+  // Generate the mesh
   gen_quadratic_triangle_grid( grid_w, numpts, numcels, pt, ien_array );
 
   // nodal indices
@@ -1100,7 +1101,7 @@ void TET_T::write_triangle_grid( const std::string &filename,
   // Setup the VTK objects
   vtkPolyData * grid_w = vtkPolyData::New();
 
-  // generate geometry info
+  // Generate the mesh
   gen_triangle_grid( grid_w, numpts, numcels, pt, ien_array );
 
   // nodal indices
@@ -1129,7 +1130,7 @@ void TET_T::write_quadratic_triangle_grid( const std::string &filename,
   // Setup the VTK objects
   vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
 
-  // generate geometry info
+  // Generate the mesh
   gen_quadratic_triangle_grid( grid_w, numpts, numcels, pt, ien_array );
 
   // nodal indices

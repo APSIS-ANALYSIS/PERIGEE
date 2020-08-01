@@ -171,6 +171,17 @@ namespace TET_T
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, const std::vector<int> &ien_array );
 
+  // ----------------------------------------------------------------
+  // ! gen_tet_grid: generate the volumetric mesh described by tet
+  //                 elements, and pass the data to vtkUnstructuredGrid.
+  //   All input parameters are the same as above, but grid_w is to be
+  //   modified by reference. This is convenient for adding additional
+  //   fields to the grid before writing.
+  // ----------------------------------------------------------------
+  void gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
+      const int &numpts, const int &numcels,
+      const std::vector<double> &pt,
+      const std::vector<int> &ien_array );
 
   // ----------------------------------------------------------------
   // ! write_tet_grid_node_elem_index : Similar to the above function,
