@@ -219,8 +219,8 @@ namespace TET_T
       const bool &isXML, const int &numpts, const int &numcels,
       const std::vector<double> &pt, const std::vector<int> &ien_array,
       const std::vector<int> &phy_tag,
-      const std::vector<int> &node_index,
-      const std::vector<int> &cell_index );
+      const std::vector<int> &node_idx,
+      const std::vector<int> &elem_idx );
 
   // ----------------------------------------------------------------
   // ! write_triangle_grid: write the surface mesh described by triangle
