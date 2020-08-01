@@ -319,6 +319,7 @@ void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
   else if( int(ien_array.size()) == 10*numcels ) nlocbas = 10;
   else SYS_T::print_fatal("Error: TET_T::write_tet_grid ien array size does not match the number of cells. \n");
 
+  // Check the connectivity array
   std::vector<int> temp = ien_array;
   VEC_T::sort_unique_resize(temp);
   if( int(temp.size()) != numpts ) SYS_T::print_fatal("Error: TET_T::write_tet_grid numpts does not match the number of unique points in the ien array. Please re-organize the input. \n");
@@ -352,9 +353,8 @@ void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
     for(int ii=0; ii<numcels; ++ii)
     {
       for(int lnode=0; lnode<4; ++lnode)
-      {
         cl->GetPointIds()->SetId( ii, ien_array[4*ii + lnode] );
-      }
+      
       grid_w->InsertNextCell( cl->GetCellType(), cl->GetPointIds() );
 
       std::vector<double> cell_node; cell_node.clear();
@@ -377,9 +377,8 @@ void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
     for(int ii=0; ii<numcels; ++ii)
     {
       for(int lnode=0; lnode<10; ++lnode)
-      {
         cl->GetPointIds()->SetId( ii, ien_array[10*ii + lnode] );
-      }
+      
       grid_w->InsertNextCell( cl->GetCellType(), cl->GetPointIds() );
 
       std::vector<double> cell_node; cell_node.clear();
@@ -397,6 +396,7 @@ void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
   }
   else SYS_T::print_fatal("Error: TET_T::write_tet_grid unknown local basis number.\n");
 
+  // Add the asepct-ratio to grid_w
   grid_w -> GetCellData() -> AddArray( edge_aspect_ratio );
   edge_aspect_ratio -> Delete();
 }
