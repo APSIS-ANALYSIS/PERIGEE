@@ -24,18 +24,19 @@ int main( int argc, char *argv[] )
   ien.push_back(0); ien.push_back(1); ien.push_back(2);
   ien.push_back(3); //ien.push_back(4); ien.push_back(5);
 
-  //nindex.push_back(1);
-  //nindex.push_back(2);
-  //nindex.push_back(3);
-  //nindex.push_back(4);
+  nindex.push_back(1);
+  nindex.push_back(2);
+  nindex.push_back(3);
+  nindex.push_back(4);
   //nindex.push_back(5);
   //nindex.push_back(-3);
 
-  //eindex.push_back(2);
+  eindex.push_back(2);
   //e2index.push_back(-3);
 
-  TET_T::write_tet_grid("sample_tet", numpt, numcl, ppt, ien);
+  // TET_T::write_tet_grid("sample_tet", numpt, numcl, ppt, ien);
   // TET_T::write_tet_grid_node_elem_index("sample_tet_idx", numpt, numcl, ppt, ien);
+  TET_T::write_tet_grid_node_elem_index("sample_tet_idx_2", numpt, numcl, ppt, ien, nindex, eindex);
 
   return 0;
 }
