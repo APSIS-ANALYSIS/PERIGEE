@@ -214,54 +214,13 @@ void TET_T::read_vtp_grid( const std::string &filename,
     int &numpts, int &numcels,
     std::vector<double> &pt, std::vector<int> &ien_array,
     std::vector<int> &global_node_index,
-    std::vector<int> &global_ele_index )
+    std::vector<int> &global_elem_index )
 {
-  vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
-  reader -> SetFileName( filename.c_str() );
-  reader -> Update();
+  read_vtp_grid(filename, numpts, numcels, pt, ien_array);
+  
+  read_int_PointData(filename, "GlobalNodeID", global_node_index); 
 
-  vtkPolyData * polydata = reader -> GetOutput();
-  numpts = static_cast<int>( polydata -> GetNumberOfPoints() );
-  numcels = static_cast<int>( polydata -> GetNumberOfPolys() );
-
-  // read the cell data
-  vtkCellData * celldata = polydata->GetCellData();
-  vtkDataArray * cd = celldata->GetScalars("GlobalElementID");
-
-  // read the point nodal data
-  vtkPointData * pointdata = polydata->GetPointData();
-  vtkDataArray * pd = pointdata->GetScalars("GlobalNodeID");
-
-  pt.clear();
-  global_node_index.clear();
-  double pt_xyz[3];
-  for(int ii=0; ii<numpts; ++ii)
-  {
-    polydata -> GetPoint(ii, pt_xyz);
-    pt.push_back(pt_xyz[0]);
-    pt.push_back(pt_xyz[1]);
-    pt.push_back(pt_xyz[2]);
-
-    global_node_index.push_back( static_cast<int>(pd->GetComponent(ii,0)) );
-  }
-
-  ien_array.clear();
-  global_ele_index.clear();
-  for(int ii=0; ii<numcels; ++ii)
-  {
-    vtkCell * cell = polydata -> GetCell(ii);
-
-    if( cell->GetCellType() == 5 )
-    {
-      ien_array.push_back( static_cast<int>( cell->GetPointId(0) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
-
-      global_ele_index.push_back( static_cast<int>( cd->GetComponent(ii, 0)));
-    }
-    else SYS_T::print_fatal("Error: read_vtp_grid read a mesh with non triangle elements. \n");
-  }
-  reader->Delete();
+  read_int_CellData(filename, "GlobalElementID", global_elem_index);
 }
 
 

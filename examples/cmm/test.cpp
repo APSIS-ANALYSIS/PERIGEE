@@ -66,11 +66,11 @@ int main( int argc, char *argv[] )
   delete a;
 
   std::vector<int> nid, eid, nid2, eid2;
-  const std::string fname = "whole_vol.vtu";
+  const std::string fname = "tissue_wall_vol.vtp";
   TET_T::read_int_CellData(fname, "GlobalElementID", eid2);
   TET_T::read_int_PointData(fname, "GlobalNodeID", nid2);
   
-  TET_T::read_vtu_grid(fname, numpt, numcl, ppt, ien, nid, eid);
+  TET_T::read_vtp_grid(fname, numpt, numcl, ppt, ien, nid, eid);
 
   std::cout<<nid.size() - nid2.size()<<'\n';
   std::cout<<eid.size() - eid2.size()<<'\n';
