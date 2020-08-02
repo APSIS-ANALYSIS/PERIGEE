@@ -721,9 +721,9 @@ void Gmsh_FileIO::write_each_vtu() const
 
     // write the sub-volumetric domain's vtk/vtu file
     // the subdomain element index start with the start_eindex
-    TET_T::write_tet_grid( vtu_file_name, true,  num_local_node, 
-        phy_3d_nElem[ ii ], local_coor, domain_IEN, ptag, 
-        local_node_idx, local_cell_idx );
+    TET_T::write_tet_grid( vtu_file_name, num_local_node, 
+        phy_3d_nElem[ ii ], local_coor, domain_IEN, 
+        local_node_idx, local_cell_idx, ptag, true);
 
     mytimer->Stop();
 

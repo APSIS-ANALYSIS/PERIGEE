@@ -419,8 +419,7 @@ void TET_T::write_tet_grid( const std::string &filename,
 }
 
 
-void TET_T::write_tet_grid( 
-    const std::string &filename,
+void TET_T::write_tet_grid( const std::string &filename,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt, const std::vector<int> &ien_array,
     const std::vector<int> &node_idx, const std::vector<int> &elem_idx )
@@ -484,11 +483,10 @@ void TET_T::write_tet_grid( const std::string &filename,
 
 
 void TET_T::write_tet_grid( const std::string &filename,
-    const bool &isXML, const int &numpts, const int &numcels,
+    const int &numpts, const int &numcels,
     const std::vector<double> &pt, const std::vector<int> &ien_array,
-    const std::vector<int> &phytag, 
-    const std::vector<int> &node_idx,
-    const std::vector<int> &elem_idx )
+    const std::vector<int> &node_idx, const std::vector<int> &elem_idx, 
+    const std::vector<int> &phytag, const bool &isXML )
 {
   // Setup the VTK objects
   vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();

@@ -187,6 +187,10 @@ namespace TET_T
   //
   //   If node_idx, elem_idx are not given, a natural numbering will
   //   be generated for nodes and cells.
+  //   Additional argument, 
+  //          \para phy_tag : the tag indicating different physical
+  //                          domains.
+  //          \para isXML : the flag indicate vtk/vtu format
   // ----------------------------------------------------------------
   void write_tet_grid( const std::string &filename,
       const int &numpts, const int &numcels,
@@ -196,6 +200,12 @@ namespace TET_T
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, const std::vector<int> &ien_array,
       const std::vector<int> &node_idx, const std::vector<int> &elem_idx );
+
+  void write_tet_grid( const std::string &filename,
+      const int &numpts, const int &numcels,
+      const std::vector<double> &pt, const std::vector<int> &ien_array,
+      const std::vector<int> &node_idx, const std::vector<int> &elem_idx,
+      const std::vector<int> &phy_tag, const bool &isXML );
 
   // ----------------------------------------------------------------
   // ! write_tet_grid : write a volumetric mesh with 
@@ -213,13 +223,6 @@ namespace TET_T
       const std::vector<int> &phy_tag, const bool &isXML,
       const int &start_cell_index = 0 );
 
-
-  void write_tet_grid( const std::string &filename,
-      const bool &isXML, const int &numpts, const int &numcels,
-      const std::vector<double> &pt, const std::vector<int> &ien_array,
-      const std::vector<int> &phy_tag,
-      const std::vector<int> &node_idx,
-      const std::vector<int> &elem_idx );
 
   // ----------------------------------------------------------------
   // ! write_triangle_grid: write the surface mesh described by triangle
