@@ -82,7 +82,7 @@ int main( int argc, char * argv[] )
   TET_T::tetgenio2vtu( out, "vol" );
 
   // this output file is for debug only
-  TET_T::tetgenio2vtu_windex( out, "vol_index" );
+  TET_T::tetgenio2vtu( out, "vol_index" );
 
   TET_T::tetgenio2vtp( out, "sur", 1);  
   TET_T::tetgenio2vtp( out, "sur", 2);  
