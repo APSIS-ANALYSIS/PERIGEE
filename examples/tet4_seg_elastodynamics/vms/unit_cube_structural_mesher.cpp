@@ -255,8 +255,7 @@ int main( int argc, char * argv[] )
   std::string vol_file("vol");
   clock_t timer_vol_mesh = clock();
   // Write the tetrahedral volume element info on disk in a .vtu file
-  TET_T::write_tet_grid_node_elem_index(vol_file, nFunc, nElem_tet, 
-      tetctrlPts, tetIEN );
+  TET_T::write_tet_grid(vol_file, nFunc, nElem_tet, tetctrlPts, tetIEN );
   timer_vol_mesh = clock() - timer_vol_mesh;
   cout<<(double)timer_vol_mesh/(double)CLOCKS_PER_SEC<<" sec.\n";
 

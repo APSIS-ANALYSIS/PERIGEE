@@ -258,8 +258,7 @@ int main( int argc, char * argv[] )
   //  + "_" + SYS_T::to_string(nElem_y) + "_" + SYS_T::to_string(nElem_z);
 
   // Write the tetrahedral volume element info on disk in a .vtu file
-  TET_T::write_tet_grid_node_elem_index(vol_file, nFunc, nElem_tet, 
-      tetctrlPts, tetIEN );
+  TET_T::write_tet_grid(vol_file, nFunc, nElem_tet, tetctrlPts, tetIEN );
 
   // Prepare for boundary surfaces
   std::vector<double> tripts;

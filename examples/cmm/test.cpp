@@ -47,8 +47,6 @@ int main( int argc, char *argv[] )
   phytag.push_back(1);
 
   //TET_T::write_tet_grid("sample_tet", numpt, numcl, ppt, ien);
-  //TET_T::write_tet_grid_node_elem_index("sample_tet_idx", numpt, numcl, ppt, ien);
-  //TET_T::write_tet_grid_node_elem_index("sample_tet_idx_2", numpt, numcl, ppt, ien, nindex, eindex);
   //TET_T::write_tet_grid("sample_tet_phytag", numpt, numcl, ppt, ien, phytag, true, 1);
   TET_T::write_tet_grid("sample_tet_phytag_2", numpt, numcl, ppt, ien, phytag, false, 22 );
 
