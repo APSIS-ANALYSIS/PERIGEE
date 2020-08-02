@@ -288,23 +288,6 @@ void TET_T::read_vtp_grid( const std::string &filename,
 }
 
 
-void TET_T::write_tet_grid( const std::string &filename,
-    const int &numpts, const int &numcels,
-    const std::vector<double> &pt, const std::vector<int> &ien_array )
-{
-  // Setup the VTK objects
-  vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
-
-  // Generate the mesh and compute aspect ratios
-  gen_tet_grid( grid_w, numpts, numcels, pt, ien_array );
-
-  // write vtu (by default of the writer function)
-  write_vtkPointSet(filename, grid_w);
-
-  grid_w->Delete();
-}
-
-
 void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt,
@@ -399,6 +382,23 @@ void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
   // Add the asepct-ratio to grid_w
   grid_w -> GetCellData() -> AddArray( edge_aspect_ratio );
   edge_aspect_ratio -> Delete();
+}
+
+
+void TET_T::write_tet_grid( const std::string &filename,
+    const int &numpts, const int &numcels,
+    const std::vector<double> &pt, const std::vector<int> &ien_array )
+{
+  // Setup the VTK objects
+  vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
+
+  // Generate the mesh and compute aspect ratios
+  gen_tet_grid( grid_w, numpts, numcels, pt, ien_array );
+
+  // write vtu (by default of the writer function)
+  write_vtkPointSet(filename, grid_w);
+
+  grid_w->Delete();
 }
 
 
