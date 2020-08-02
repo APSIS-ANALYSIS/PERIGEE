@@ -925,30 +925,6 @@ void TET_T::get_out_normal( const std::string &file,
 }
 
 
-void TET_T::get_dist2centerline( vtkPolyData * const &centerlineData,
-    const double &coor_x, const double &coor_y, const double &coor_z,
-    double &line_pt_x, double &line_pt_y, double &line_pt_z,
-    double &dist )
-{
-  vtkPointLocator * locator = vtkPointLocator::New();
-  locator -> Initialize();
-  locator -> SetDataSet(centerlineData);
-  locator -> BuildLocator();
-
-  // Find index of closest centerline point
-  const double pt [] = {coor_x, coor_y, coor_z};
-  const int closest_id = locator -> FindClosestPoint(&pt[0]);
-
-  const double * closest_cl_pt = centerlineData -> GetPoints() -> GetPoint(closest_id);
-  line_pt_x = closest_cl_pt[0];
-  line_pt_y = closest_cl_pt[1];
-  line_pt_z = closest_cl_pt[2];
-
-  dist = MATH_T::norm2(line_pt_x - coor_x, line_pt_y - coor_y, line_pt_z - coor_z);
-  locator -> Delete();
-}
-
-
 void TET_T::tetgenio2vtu( const tetgenio &meshout, const std::string &fName )
 {
   const int index_offset = meshout.firstnumber;
