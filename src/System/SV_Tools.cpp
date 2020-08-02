@@ -45,7 +45,7 @@ void SV_T::update_sv_vtu( const std::string &filename,
   if(fend.compare(".vtu") == 0)
     fname.erase( fname.end()-4, fname.end() );
 
-  TET_T::write_tet_grid_node_elem_index(fname, nFunc, nElem, ctrlPts, vecIEN);
+  TET_T::write_tet_grid(fname, nFunc, nElem, ctrlPts, vecIEN);
 }
 
 
@@ -149,7 +149,7 @@ void SV_T::gen_sv_fsi_vtus( const std::string &filename_f,
   map_s_elem.resize(nElem_s);
   for(int ii=0; ii<nElem_s; ++ii) map_s_elem[ii] = nElem_f + ii;
 
-  TET_T::write_tet_grid_node_elem_index( fname, nFunc_s, nElem_s, 
+  TET_T::write_tet_grid( fname, nFunc_s, nElem_s, 
       ctrlPts_s, vecIEN_s, map_s_node, map_s_elem );
 
   std::cout<<"Status: "<<filename_s<<" is updated to "<<writename_solid<<'\n';
