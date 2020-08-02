@@ -187,17 +187,7 @@ namespace TET_T
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, const std::vector<int> &ien_array );
 
-  // ----------------------------------------------------------------
-  // ! write_tet_grid_node_elem_index : write the volumetric mesh with 
-  //   additional data : NodalIndex & ElemIndex. 
-  //   If the node_idx & elem_idx is not given
-  //   the function will write based on the natural numbering.
-  // ----------------------------------------------------------------
-  void write_tet_grid_node_elem_index( const std::string &filename,
-      const int &numpts, const int &numcels,
-      const std::vector<double> &pt, const std::vector<int> &ien_array );
-  
-  void write_tet_grid_node_elem_index( const std::string &filename,
+  void write_tet_grid( const std::string &filename,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, const std::vector<int> &ien_array,
       const std::vector<int> &node_idx, const std::vector<int> &elem_idx );
@@ -447,16 +437,6 @@ namespace TET_T
   //                     grid.
   // ----------------------------------------------------------------
   void tetgenio2vtu( const tetgenio &meshout, const std::string &fName );
-
-
-  // ----------------------------------------------------------------
-  // This function output the tetgenio volumetric mesh with element 
-  // index and node index. In other words, this function calls the 
-  // write_tet_grid_node_elem_index function
-  // instead of
-  // write_tet_grid funciton.
-  // ----------------------------------------------------------------
-  void tetgenio2vtu_windex( const tetgenio &meshout, const std::string &fName );
 
 
   // ----------------------------------------------------------------  

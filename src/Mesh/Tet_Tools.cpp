@@ -395,24 +395,6 @@ void TET_T::write_tet_grid( const std::string &filename,
   // Generate the mesh and compute aspect ratios
   gen_tet_grid( grid_w, numpts, numcels, pt, ien_array );
 
-  // write vtu (by default of the writer function)
-  write_vtkPointSet(filename, grid_w);
-
-  grid_w->Delete();
-}
-
-
-void TET_T::write_tet_grid_node_elem_index( 
-    const std::string &filename,
-    const int &numpts, const int &numcels,
-    const std::vector<double> &pt, const std::vector<int> &ien_array )
-{
-  // Setup the VTK objects
-  vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
-
-  // Generate the mesh and compute aspect ratios
-  gen_tet_grid( grid_w, numpts, numcels, pt, ien_array );
-
   // nodal indices (natural numbering)
   std::vector<int> node_idx(numpts);
   for(int ii=0; ii<numpts; ++ii)
@@ -437,7 +419,7 @@ void TET_T::write_tet_grid_node_elem_index(
 }
 
 
-void TET_T::write_tet_grid_node_elem_index( 
+void TET_T::write_tet_grid( 
     const std::string &filename,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt, const std::vector<int> &ien_array,
@@ -989,31 +971,6 @@ void TET_T::tetgenio2vtu( const tetgenio &meshout, const std::string &fName )
   for(int ii=0; ii<numcel*4; ++ii) ien[ii] = meshout.tetrahedronlist[ii] - index_offset;
 
   write_tet_grid(fName, numpts, numcel, pt, ien);
-
-  std::cout<<"Volumetric grid file "<<fName<<".vtu has been written on disk. \n";
-}
-
-
-void TET_T::tetgenio2vtu_windex( const tetgenio &meshout, const std::string &fName )
-{
-  const int index_offset = meshout.firstnumber;
-  const int numpts = meshout.numberofpoints;
-  const int numcel = meshout.numberoftetrahedra;
-
-  std::vector<double> pt;
-  pt.resize( numpts * 3 );
-  std::vector<int> ien;
-  ien.resize( numcel * 4 );
-
-  std::cout<<"Preparing for writing .vtu grid file ... \n";
-  std::cout<<"  -- "<<numpts<<" mesh points detected. \n";
-  std::cout<<"  -- "<<numcel<<" mesh tetrahedral cell detected. \n";
-
-  for(int ii=0; ii<numpts*3; ++ii) pt[ii] = meshout.pointlist[ii];
-
-  for(int ii=0; ii<numcel*4; ++ii) ien[ii] = meshout.tetrahedronlist[ii] - index_offset;
-
-  write_tet_grid_node_elem_index(fName, numpts, numcel, pt, ien);
 
   std::cout<<"Volumetric grid file "<<fName<<".vtu has been written on disk. \n";
 }
