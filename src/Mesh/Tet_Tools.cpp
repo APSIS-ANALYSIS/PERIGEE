@@ -175,9 +175,7 @@ void TET_T::read_vtp_grid( const std::string &filename,
 {
   vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
   reader -> SetFileName( filename.c_str() );
-
   reader -> Update();
-
   vtkPolyData * polydata = reader -> GetOutput();
   numpts = static_cast<int>( polydata -> GetNumberOfPoints() );
   numcels = static_cast<int>( polydata -> GetNumberOfPolys() );
