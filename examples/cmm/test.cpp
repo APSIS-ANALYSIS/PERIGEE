@@ -66,7 +66,7 @@ int main( int argc, char *argv[] )
   delete a;
 
   std::vector<int> nid, eid, nid2, eid2;
-  const std::string fname = "wall_cyl.vtu";
+  const std::string fname = "whole_vol.vtu";
   TET_T::read_int_CellData(fname, "GlobalElementID", eid2);
   TET_T::read_int_PointData(fname, "GlobalNodeID", nid2);
   
@@ -80,8 +80,6 @@ int main( int argc, char *argv[] )
 
   for(unsigned int ii=0; ii<eid.size(); ++ii)
     if(eid[ii] != eid2[ii]) cout<<"Error at "<<ii<<'\n';
-
-  VEC_T::print(nid2);
 
   PetscFinalize();
   return 0;
