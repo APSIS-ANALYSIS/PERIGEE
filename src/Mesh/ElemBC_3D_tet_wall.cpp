@@ -105,7 +105,7 @@ void ElemBC_3D_tet_wall::print_info() const
 }
 
 
-void ElemBC_3D_tet_wall::write_wall_prop( const int &ebc_id, const std::string &filename ) const
+void ElemBC_3D_tet_wall::write_vtk( const int &ebc_id, const std::string &filename ) const
 {
   vtkPolyData * grid_w = vtkPolyData::New();
   

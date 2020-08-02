@@ -132,10 +132,10 @@ class ElemBC
     {SYS_T::commPrint("Warning: get_wall_youngsmod is not implemented. \n");}
 
 
-    // write variable wall properties for CMM
-    virtual void write_wall_prop( const int &ebc_id,
-       const std::string &filename="varwallprop" ) const
-    {SYS_T::commPrint("Warning: write_wall_prop is not implemented. \n");}
+    // write the surface to a vtk/vtu file
+    virtual void write_vtk( const int &ebc_id,
+       const std::string &filename="elembc_surface" ) const
+    {SYS_T::commPrint("Warning: write_vtk is not implemented. \n");}
 
 
     // print the information of the ebc object on screen.    

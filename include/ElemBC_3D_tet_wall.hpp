@@ -43,8 +43,8 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     virtual void get_wall_youngsmod( const int &ebc_id, std::vector<double> &E ) const
     {E = youngsmod[ebc_id];}
 
-    virtual void write_wall_prop( const int &ebc_id, 
-        const std::string &filename="varwallprop" ) const;
+    virtual void write_vtk( const int &ebc_id, 
+        const std::string &filename="elembc_surface" ) const;
 
   private:
     // num_ebc times num_node[ii] in size, 0 <= ii <num_ebc

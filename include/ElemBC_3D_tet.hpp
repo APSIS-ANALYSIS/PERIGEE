@@ -78,10 +78,10 @@ class ElemBC_3D_tet : public ElemBC
     virtual void get_wall_youngsmod( const int &ebc_id, std::vector<double> &E ) const
     {SYS_T::commPrint("Warning: get_wall_youngsmod is not implemented. \n");}
 
-    // write variable wall properties from ElemBC_3D_tet_wall for CMM
-    virtual void write_wall_prop( const int &ebc_id,
-       const std::string &filename="varwallprop" ) const
-    {SYS_T::commPrint("Warning: write_wall_prop is not implemented. \n");}
+    // write the boundary surface to a vtk/vtu format for visualization
+    virtual void write_vtk( const int &ebc_id,
+       const std::string &filename="elembc_surface" ) const
+    {SYS_T::commPrint("Warning: write_vtk is not implemented. \n");}
 
   protected:
     const int elem_type;
