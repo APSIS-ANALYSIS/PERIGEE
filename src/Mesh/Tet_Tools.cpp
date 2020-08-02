@@ -1104,7 +1104,6 @@ namespace TET_T
     gindex[2] = 2; gindex[3] = 3;
   }
 
-
   Tet4::Tet4( const std::vector<double> &in_nodes )
   {
     SYS_T::print_exit_if( in_nodes.size() != 12, "Error: input nodal list shall have 4 nodes with xyz-coordinates. \n");
@@ -1114,7 +1113,6 @@ namespace TET_T
     gindex[0] = 0; gindex[1] = 1;
     gindex[2] = 2; gindex[3] = 3;
   }
-
 
   Tet4::Tet4( const std::vector<double> &ctrlPts,
       const int &ien0, const int &ien1,
@@ -1133,11 +1131,9 @@ namespace TET_T
     }
   }
 
-
   Tet4::~Tet4()
   {
   }
-
 
   void Tet4::reset( const std::vector<double> &in_nodes )
   {
@@ -1147,7 +1143,6 @@ namespace TET_T
     gindex[0] = 0; gindex[1] = 1;
     gindex[2] = 2; gindex[3] = 3;
   }
-
 
   void Tet4::reset( const std::vector<double> &ctrlPts,
       const int &ien0, const int &ien1,
@@ -1166,7 +1161,6 @@ namespace TET_T
     }
   }
 
-
   void Tet4::reset( const int &ien0, const int &ien1,
       const int &ien2, const int &ien3 )
   {
@@ -1175,7 +1169,6 @@ namespace TET_T
     gindex[2] = ien2;
     gindex[3] = ien3;
   }
-
 
   void Tet4::reset( const std::vector<double> &ctrlPts,
       const IIEN * const &ien_ptr, const int &ee )
@@ -1193,7 +1186,6 @@ namespace TET_T
     }
   }
 
-
   void Tet4::print_info() const
   {
     std::cout<<"Tet4 object : \n";
@@ -1204,7 +1196,6 @@ namespace TET_T
     std::cout<<" -- pt2 : "<<pts[6]<<'\t'<<pts[7]<<'\t'<<pts[8]<<'\n';
     std::cout<<" -- pt3 : "<<pts[9]<<'\t'<<pts[10]<<'\t'<<pts[11]<<'\n';
   }
-
 
   double Tet4::get_aspect_ratio() const
   {
@@ -1227,7 +1218,6 @@ namespace TET_T
 
     return emax / emin;
   }
-
 
   int Tet4::get_face_id( const int &n0, const int &n1, const int &n2) const
   {
@@ -1257,7 +1247,6 @@ namespace TET_T
     return loc;
   }
 
-
   double Tet4::get_diameter() const
   {
     double x, y, z, r;
@@ -1269,7 +1258,6 @@ namespace TET_T
 
     return 2.0 * r;
   }
-
 
   double Tet4::get_volume() const
   {
@@ -1291,62 +1279,23 @@ namespace TET_T
     return sum / 6.0;
   }
 
-
   void Tet4::write_vtu( const std::string &fileName ) const
   {
     // Setup the VTK objects
     vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
 
-    // 1. four nodal points
-    vtkPoints * ppt = vtkPoints::New(); 
-    double coor[3];
-    for(int ii=0; ii<4; ++ii)
-    {
-      coor[0] = pts[3*ii]; coor[1] = pts[3*ii+1]; coor[2] = pts[3*ii+2];
-      ppt -> InsertPoint(ii, coor);
-    }
+    std::vector<double> input_pt(pts, pts+12);
+    std::vector<int> input_ien{0, 1, 2, 3};
 
-    grid_w -> SetPoints(ppt);
-    ppt -> Delete();
+    gen_tet_grid( grid_w, 4, 1, input_pt, input_ien );
 
-    vtkIntArray * ptindex = vtkIntArray::New();
-    ptindex -> SetNumberOfComponents(1);
-    ptindex -> SetName("GlobalNodeID");
-    for(int ii=0; ii<4; ++ii) ptindex->InsertComponent(ii, 0, gindex[ii]);
+    std::vector<int> input_node_index(gindex, gindex+4);
 
-    grid_w -> GetPointData() -> AddArray( ptindex );
-    ptindex -> Delete();
+    add_int_PointData( grid_w, input_node_index, "GlobalNodeID" );
 
-    // 2. Cell
-    vtkDoubleArray * edge_aspect_ratio = vtkDoubleArray::New();
-    edge_aspect_ratio -> SetName("Aspect_ratio");
-    edge_aspect_ratio -> SetNumberOfComponents(1);
-
-    vtkCell * cl = vtkTetra::New();
-
-    cl->GetPointIds()->SetId( 0, 0 );
-    cl->GetPointIds()->SetId( 1, 1 );
-    cl->GetPointIds()->SetId( 2, 2 );
-    cl->GetPointIds()->SetId( 3, 3 );
-
-    grid_w->InsertNextCell( cl->GetCellType(), cl->GetPointIds() );
-
-    cl -> Delete();
-
-    edge_aspect_ratio -> InsertNextValue( get_aspect_ratio() );
-
-    grid_w -> GetCellData() -> AddArray( edge_aspect_ratio );
-    edge_aspect_ratio -> Delete();
-
-    // write vtk
-    vtkXMLUnstructuredGridWriter * writer = vtkXMLUnstructuredGridWriter::New();
-    std::string name_to_write(fileName);
-    name_to_write.append(".vtu");
-    writer -> SetFileName( name_to_write.c_str() );
-
-    writer->SetInputData(grid_w);
-    writer->Write();
-    writer->Delete();
+    // write vtu
+    write_vtkPointSet( fileName, grid_w, true );
+    
     grid_w->Delete();
   }
 }

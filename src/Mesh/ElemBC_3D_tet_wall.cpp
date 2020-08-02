@@ -73,7 +73,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 
   // Write out vtp's with wall properties
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
-    write_wall_prop(ebc_id, "varwallprop_" + SYS_T::to_string(ebc_id));
+    write_vtk(ebc_id, "varwallprop_" + SYS_T::to_string(ebc_id));
 }
 
 

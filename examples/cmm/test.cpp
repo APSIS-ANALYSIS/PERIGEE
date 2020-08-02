@@ -46,10 +46,22 @@ int main( int argc, char *argv[] )
   
   phytag.push_back(1);
 
-  //TET_T::write_tet_grid("sample_tet", numpt, numcl, ppt, ien);
-  //TET_T::write_tet_grid("sample_tet_phytag", numpt, numcl, ppt, ien, phytag, true, 1);
+  TET_T::write_tet_grid("sample_tet", numpt, numcl, ppt, ien);
+  TET_T::write_tet_grid("sample_tet_phytag", numpt, numcl, ppt, ien, phytag, true, 1);
   TET_T::write_tet_grid("sample_tet_phytag_2", numpt, numcl, ppt, ien, phytag, false, 22 );
+  TET_T::write_tet_grid("sample_tet_phytag_3", numpt, numcl, ppt, ien, nindex, eindex, phytag, false );
+  TET_T::write_tet_grid("sample_tet_phytag_4", numpt, numcl, ppt, ien, nindex, eindex, phytag, true );
 
+  ppt.clear();
+  ppt.push_back(0.0); ppt.push_back(0.0); ppt.push_back(0.0);
+  ppt.push_back(1.1); ppt.push_back(0.0); ppt.push_back(0.0);
+  ppt.push_back(0.5); ppt.push_back(3.0); ppt.push_back(0.0);
+  ppt.push_back(0.0); ppt.push_back(0.0); ppt.push_back(1.0);
+
+  TET_T::Tet4 * a = new TET_T::Tet4(ppt);
+  a -> print_info();
+  a -> write_vtu("hello");
+  delete a;
   return 0;
 }
 
