@@ -44,7 +44,7 @@ int main( int argc, char *argv[] )
 
   eindex.push_back(2);
   
-  phytag.push_back(1);
+  phytag.push_back(-13);
 
   TET_T::write_tet_grid("sample_tet", numpt, numcl, ppt, ien);
   TET_T::write_tet_grid("sample_tet_phytag", numpt, numcl, ppt, ien, phytag, true, 1);
@@ -62,6 +62,11 @@ int main( int argc, char *argv[] )
   a -> print_info();
   a -> write_vtu("hello");
   delete a;
+
+  std::vector<int> data;
+  TET_T::read_int_CellData("whole_vol.vtu", "Physics_tag", data);
+  VEC_T::print(data);
+
   return 0;
 }
 

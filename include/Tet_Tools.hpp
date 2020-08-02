@@ -28,6 +28,7 @@
 #include "vtkXMLUnstructuredGridReader.h"
 #include "vtkXMLPolyDataWriter.h"
 #include "vtkXMLPolyDataReader.h"
+#include "vtkXMLGenericDataObjectReader.h"
 
 #include "tetgen.h"
 
@@ -57,6 +58,9 @@ namespace TET_T
       int &numpts, int &numcels,
       std::vector<double> &pt, std::vector<int> &ien_array );
 
+
+  void read_int_CellData( const std::string &filename, 
+      const std::string &dataname, std::vector<int> &data );
 
   // ----------------------------------------------------------------
   // ! read_vtu_grid: read the mesh info just exactly the same way
