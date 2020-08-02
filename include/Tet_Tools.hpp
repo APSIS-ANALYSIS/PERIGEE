@@ -18,7 +18,6 @@
 #include "vtkCellData.h"
 #include "vtkCellArray.h"
 #include "vtkPointData.h"
-#include "vtkPointLocator.h"
 #include "vtkTriangle.h"
 #include "vtkQuadraticTriangle.h"
 #include "vtkTetra.h"
