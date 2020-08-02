@@ -6,6 +6,8 @@ using namespace std;
 
 int main( int argc, char *argv[] )
 {
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+
   vector<double> ppt;
   vector<int> ien;
   int numpt, numcl;
@@ -63,18 +65,25 @@ int main( int argc, char *argv[] )
   a -> write_vtu("hello");
   delete a;
 
-  std::vector<int> data, data2;
-  TET_T::read_int_CellData("whole_vol.vtu", "Physics_tag", data);
+  std::vector<int> nid, eid, nid2, eid2;
+  const std::string fname = "wall_cyl.vtu";
+  TET_T::read_int_CellData(fname, "GlobalElementID", eid2);
+  TET_T::read_int_PointData(fname, "GlobalNodeID", nid2);
   
-  TET_T::read_vtu_grid("whole_vol.vtu", numpt, numcl, ppt, ien, data2);
+  TET_T::read_vtu_grid(fname, numpt, numcl, ppt, ien, nid, eid);
 
-  std::cout<<data.size() - data2.size()<<'\n';
+  std::cout<<nid.size() - nid2.size()<<'\n';
+  std::cout<<eid.size() - eid2.size()<<'\n';
 
-  for(int ii=0; ii<data.size(); ++ii)
-  {
-    if(data[ii] != data2[ii]) cout<<"Error at "<<ii<<'\n';
-  }
+  for(unsigned int ii=0; ii<nid.size(); ++ii)
+    if(nid[ii] != nid2[ii]) cout<<"Error at "<<ii<<'\n';
 
+  for(unsigned int ii=0; ii<eid.size(); ++ii)
+    if(eid[ii] != eid2[ii]) cout<<"Error at "<<ii<<'\n';
+
+  VEC_T::print(nid2);
+
+  PetscFinalize();
   return 0;
 }
 
