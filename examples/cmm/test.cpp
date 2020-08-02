@@ -63,9 +63,17 @@ int main( int argc, char *argv[] )
   a -> write_vtu("hello");
   delete a;
 
-  std::vector<int> data;
+  std::vector<int> data, data2;
   TET_T::read_int_CellData("whole_vol.vtu", "Physics_tag", data);
-  VEC_T::print(data);
+  
+  TET_T::read_vtu_grid("whole_vol.vtu", numpt, numcl, ppt, ien, data2);
+
+  std::cout<<data.size() - data2.size()<<'\n';
+
+  for(int ii=0; ii<data.size(); ++ii)
+  {
+    if(data[ii] != data2[ii]) cout<<"Error at "<<ii<<'\n';
+  }
 
   return 0;
 }

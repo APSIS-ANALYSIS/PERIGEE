@@ -113,61 +113,9 @@ void TET_T::read_vtu_grid( const std::string &filename,
     std::vector<double> &pt, std::vector<int> &ien_array,
     std::vector<int> &phy_tag )
 {
-  vtkXMLUnstructuredGridReader * reader = vtkXMLUnstructuredGridReader::New();
-  reader -> SetFileName( filename.c_str() );
-  reader -> Update();
-  vtkUnstructuredGrid * vtkugrid = reader -> GetOutput();
-
-  numpts  = static_cast<int>( vtkugrid -> GetNumberOfPoints() );
-  numcels = static_cast<int>( vtkugrid -> GetNumberOfCells() );
-
-  vtkCellData * celldata = vtkugrid->GetCellData();
-  vtkDataArray * cd = celldata->GetScalars("Physics_tag");
-
-  double pt_xyz[3];
-  pt.clear();
-  for(int ii=0; ii<numpts; ++ii)
-  {
-    vtkugrid -> GetPoint(ii, pt_xyz);
-    pt.push_back(pt_xyz[0]);
-    pt.push_back(pt_xyz[1]);
-    pt.push_back(pt_xyz[2]);
-  }
-
-  ien_array.clear();
-  phy_tag.clear();
-  for(int ii=0; ii<numcels; ++ii)
-  {
-    vtkCell * cell = vtkugrid -> GetCell(ii);
-
-    if( cell->GetCellType() == 10 )
-    {
-      ien_array.push_back( static_cast<int>( cell->GetPointId(0) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(3) ) );
-
-      phy_tag.push_back( static_cast<int>( cd->GetComponent(ii, 0) ) );
-    }
-    else if( cell-> GetCellType() == 24 )
-    {
-      ien_array.push_back( static_cast<int>( cell->GetPointId(0) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(3) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(4) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(5) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(6) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(7) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(8) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(9) ) );
-
-      phy_tag.push_back( static_cast<int>( cd->GetComponent(ii, 0) ) );
-    } 
-    else SYS_T::print_fatal("Error: read_vtu_grid read a mesh with non-tet elements. \n"); 
-  }
-
-  reader->Delete();
+  read_vtu_grid(filename, numpts, numcels, pt, ien_array);
+  
+  read_int_CellData(filename, "Physics_tag", phy_tag);
 }
 
 
