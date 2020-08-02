@@ -182,6 +182,11 @@ namespace TET_T
   //                    3 x numpts
   //          \para ien_array : connectivity array, 
   //                            length 4 or 10 x numcels
+  //          \para node_idx : the nodal index associated with nodes
+  //          \para elem_idx : the element index asscoiated with cells
+  //
+  //   If node_idx, elem_idx are not given, a natural numbering will
+  //   be generated for nodes and cells.
   // ----------------------------------------------------------------
   void write_tet_grid( const std::string &filename,
       const int &numpts, const int &numcels,
