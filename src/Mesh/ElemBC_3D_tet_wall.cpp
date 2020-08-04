@@ -1,15 +1,15 @@
 #include "ElemBC_3D_tet_wall.hpp"
 
 ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
-    const std::vector<std::string> &vtkfileList,
-    const std::vector<std::string> &centerlineList,
-    const std::vector<double> &thickness_to_radius,
-    const std::vector<double> &youngsmod_alpha,
-    const std::vector<double> &youngsmod_beta,
+    const std::vector<std::string> &walls_combined,
+    const std::string &centerlines_combined,
+    const double &thickness2radius_combined,
     const double &fluid_density,
     const int &elemtype )
-: ElemBC_3D_tet( vtkfileList, elemtype )
+: ElemBC_3D_tet( walls_combined, elemtype ),
+  fluid_density( fluid_density )
 {
+  /*
   // Check inputs
   SYS_T::print_fatal_if( centerlineList.size() != vtkfileList.size(),
       "Error: centerlineList length does not match that of the vtkfileList.\n");
@@ -74,18 +74,27 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   // Write out vtp's with wall properties
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
     write_vtk(ebc_id, "varwallprop_" + SYS_T::to_string(ebc_id));
+  */
+}
+
+
+ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
+    const std::vector<std::string> &walls_combined,
+    const std::string &centerlines_combined,
+    const double &thickness2radius_combined,
+    const std::vector<std::string> &wallsList,
+    const std::vector<std::string> &centerlinesList,
+    const std::vector<double> &thickness2radiusList,
+    const double &fluid_density,
+    const int &elemtype )
+: ElemBC_3D_tet_wall( walls_combined, centerlines_combined, thickness2radius_combined,
+                      fluid_density, elemtype)
+{
 }
 
 
 ElemBC_3D_tet_wall::~ElemBC_3D_tet_wall()
 {
-  for(int ii=0; ii<num_ebc; ++ii)
-  {
-    VEC_T::clean( radius[ii]    );
-    VEC_T::clean( thickness[ii] );
-    VEC_T::clean( youngsmod[ii] );
-  }
-
   VEC_T::clean( radius    );
   VEC_T::clean( thickness );
   VEC_T::clean( youngsmod );
@@ -96,12 +105,9 @@ void ElemBC_3D_tet_wall::print_info() const
 {
   ElemBC_3D_tet::print_info();
 
-  for(int face=0; face<num_ebc; ++face)
-  {
-    VEC_T::print( radius[face],    "wall_id_" + SYS_T::to_string(face) + "_radius.txt",    '\n');
-    VEC_T::print( thickness[face], "wall_id_" + SYS_T::to_string(face) + "_thickness.txt", '\n');
-    VEC_T::print( youngsmod[face], "wall_id_" + SYS_T::to_string(face) + "_youngsmod.txt", '\n');
-  }
+  VEC_T::print( radius,    "wall_radius.txt",    '\n');
+  VEC_T::print( thickness, "wall_thickness.txt", '\n');
+  VEC_T::print( youngsmod, "wall_youngsmod.txt", '\n');
 }
 
 
@@ -120,10 +126,10 @@ void ElemBC_3D_tet_wall::write_vtk( const int &ebc_id, const std::string &filena
   TET_T::add_int_CellData( grid_w, global_cell[ebc_id], "GlobalElementID");
 
   // Add thickness
-  TET_T::add_double_PointData( grid_w, thickness[ebc_id], "Thickness" );
+  TET_T::add_double_PointData( grid_w, thickness, "Thickness" );
 
   // Add Young's modulus
-  TET_T::add_double_PointData( grid_w, youngsmod[ebc_id], "YoungsModulus" );
+  TET_T::add_double_PointData( grid_w, youngsmod, "YoungsModulus" );
 
   // write vtp
   TET_T::write_vtkPointSet(filename, grid_w);

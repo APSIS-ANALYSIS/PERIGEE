@@ -16,20 +16,35 @@
 class ElemBC_3D_tet_wall : public ElemBC_3D_tet
 {
   public:
-    // Constructing the wall boundary conditions.
-    // \para: vtkfileList stores the set of vtp files of the wall, the
-    //        union of these vtp files is the whole wall surface. Its
-    //        length is num_ebc.
-    // \para: thickness_to_radius has the length num_ebc, which gives
-    //        the thickness ratio to the radius at the corresponding
-    //        wall surface vtp file. For most arteries, the ratio is
-    //        ten percent to the diameter, that is twenty percent to
-    //        the radius.
-    ElemBC_3D_tet_wall( const std::vector<std::string> &vtkfileList,
-        const std::vector<std::string> &centerlineList,
-        const std::vector<double> &thickness_to_radius,
-        const std::vector<double> &youngsmod_alpha,
-        const std::vector<double> &youngsmod_beta,
+    /* Constructing wall properties with a single spatial distribution.
+       \para: walls_combined contains a single vtp with the complete wall surface
+       \para: centerlines_combined is a vtp with the complete set of centerlines 
+       \para: thickness2radius_combined is the thickness-to-radius ratio
+              to be prescribed for the complete wall. For most arteries, 
+              we can assume the thickness is ten percent of the diameter,
+              or twenty percent of the radius.
+    */
+    ElemBC_3D_tet_wall(const std::vector<std::string> &walls_combined,
+        const std::string &centerlines_combined,
+        const double &thickness2radius_combined,
+        const double &fluid_density = 1.065,
+        const int &elemtype = 501 );
+
+    /* Constructing wall properties with multiple spatial distributions.
+       The background wall properties will first be prescribed using the
+       constructor above. Wall properties in wallsList will then be overwritten
+       with the corresponding centerlinesList and thickness2radiusList, so
+       these three lists must have the same length.
+       \para: wallsList is a vector of wall surface vtp's 
+       \para: centerlinesList is a vector of corresponding centerline vtp's
+       \para: thickness2radiusList is a vector of corresponding ratios.
+    */
+    ElemBC_3D_tet_wall(const std::vector<std::string> &walls_combined,
+        const std::string &centerlines_combined,
+        const double &thickness2radius_combined,
+        const std::vector<std::string> &wallsList,
+        const std::vector<std::string> &centerlinesList,
+        const std::vector<double> &thickness2radiusList,
         const double &fluid_density = 1.065,
         const int &elemtype = 501 );
 
@@ -37,24 +52,24 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
 
     virtual void print_info() const;
 
-    virtual void get_wall_thickness( const int &ebc_id, std::vector<double> &th ) const
-    {th = thickness[ebc_id];}
+    virtual void get_wall_thickness( std::vector<double> &th ) const
+    {th = thickness;}
 
-    virtual void get_wall_youngsmod( const int &ebc_id, std::vector<double> &E ) const
-    {E = youngsmod[ebc_id];}
+    virtual void get_wall_youngsmod( std::vector<double> &E ) const
+    {E = youngsmod;}
 
     virtual void write_vtk( const int &ebc_id, 
         const std::string &filename="elembc_surface" ) const;
 
   private:
-    // num_ebc times num_node[ii] in size, 0 <= ii <num_ebc
-    // here num_ebc means the number of different wall regions, which
-    // potentially have different properties (thickness, modulus, etc).
-    std::vector< std::vector<double> > radius;
-    
-    // num_ebc times num_node[ii] in size, 0 <= ii <num_ebc
-    std::vector< std::vector<double> > thickness;
-    std::vector< std::vector<double> > youngsmod;
+
+    // fluid density used to compute the Young's modulus
+    double fluid_density;
+
+    // num_ebc = 1 for the wall, so these properties all have length num_node[0]
+    std::vector<double> radius;
+    std::vector<double> thickness;
+    std::vector<double> youngsmod;
 
 };
 

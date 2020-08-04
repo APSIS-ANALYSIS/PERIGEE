@@ -6,32 +6,22 @@ EBC_Partition_vtp_wall::EBC_Partition_vtp_wall(
     const ElemBC * const &ebc )
 : EBC_Partition_vtp(part, mnindex, ebc)
 {
-  part_thickness.resize(num_ebc);
-  part_youngsmod.resize(num_ebc);
-
-  for(int ii=0; ii<num_ebc; ++ii)
+  const int ebc_id = 0;
+  if( num_local_cell[ebc_id] > 0 )
   {
-    if( num_local_cell[ii] > 0 )
-    {
-      ebc -> get_wall_thickness(ii, part_thickness[ii]);
-      ebc -> get_wall_youngsmod(ii, part_youngsmod[ii]);
-    }
-    else
-    {
-      part_thickness[ii].clear();
-      part_youngsmod[ii].clear();
-    }
+    ebc -> get_wall_thickness( part_thickness );
+    ebc -> get_wall_youngsmod( part_youngsmod );
+  }
+  else
+  {
+    part_thickness.clear();
+    part_youngsmod.clear();
   }
 }
 
 
 EBC_Partition_vtp_wall::~EBC_Partition_vtp_wall()
 {
-  for(int ii=0; ii<num_ebc; ++ii)
-  {
-    VEC_T::clean( part_thickness[ii] );
-    VEC_T::clean( part_youngsmod[ii] );
-  }
   VEC_T::clean( part_thickness );
   VEC_T::clean( part_youngsmod );
 }
@@ -51,19 +41,19 @@ void EBC_Partition_vtp_wall::write_hdf5( const char * FileName ) const
   HDF5_Writer * h5w = new HDF5_Writer( file_id );
 
   const std::string groupbase("ebcid_");
-  for(int ii=0; ii<num_ebc; ++ii)
+
+  // num_ebc = 1 for wall elem bc
+  const int ebc_id = 0;
+  if( num_local_cell[ebc_id] > 0 )
   {
-    if( num_local_cell[ii] > 0 )
-    {
-      std::string subgroup_name(groupbase);
-      subgroup_name.append( SYS_T::to_string(ii) );
-      hid_t subgroup_id = H5Gopen(g_id, subgroup_name.c_str(), H5P_DEFAULT );
+    std::string subgroup_name(groupbase);
+    subgroup_name.append( SYS_T::to_string(ebc_id) );
+    hid_t subgroup_id = H5Gopen(g_id, subgroup_name.c_str(), H5P_DEFAULT );
 
-      h5w->write_doubleVector( subgroup_id, "thickness", part_thickness[ii] );
-      h5w->write_doubleVector( subgroup_id, "youngsmod", part_youngsmod[ii] );
+    h5w->write_doubleVector( subgroup_id, "thickness", part_thickness );
+    h5w->write_doubleVector( subgroup_id, "youngsmod", part_youngsmod );
 
-      H5Gclose( subgroup_id );
-    }
+    H5Gclose( subgroup_id );
   }
 
   delete h5w;
@@ -88,19 +78,18 @@ void EBC_Partition_vtp_wall::write_hdf5( const char * FileName,
 
   const std::string groupbase("ebcid_");
 
-  for(int ii=0; ii<num_ebc; ++ii)
+  // num_ebc = 1 for wall elem bc
+  const int ebc_id = 0;
+  if( num_local_cell[ebc_id] > 0 )
   {
-    if( num_local_cell[ii] > 0 )
-    {
-      std::string subgroup_name(groupbase);
-      subgroup_name.append( SYS_T::to_string(ii) );
-      hid_t subgroup_id = H5Gopen(g_id, subgroup_name.c_str(), H5P_DEFAULT );
+    std::string subgroup_name(groupbase);
+    subgroup_name.append( SYS_T::to_string(ebc_id) );
+    hid_t subgroup_id = H5Gopen(g_id, subgroup_name.c_str(), H5P_DEFAULT );
 
-      h5w->write_doubleVector( subgroup_id, "thickness", part_thickness[ii] );
-      h5w->write_doubleVector( subgroup_id, "youngsmod", part_youngsmod[ii] );
+    h5w->write_doubleVector( subgroup_id, "thickness", part_thickness );
+    h5w->write_doubleVector( subgroup_id, "youngsmod", part_youngsmod );
 
-      H5Gclose( subgroup_id );
-    }
+    H5Gclose( subgroup_id );
   }
 
   delete h5w;

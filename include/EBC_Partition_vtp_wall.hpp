@@ -35,10 +35,10 @@ class EBC_Partition_vtp_wall : public EBC_Partition_vtp
     virtual void write_hdf5( const char * FileName, const char * GroupName ) const;
 
   protected:
-    // Length is num_ebc x [ 0 if this part does not own this bc,
-    // or ebc->get_num_node(ii) if this part owns this bc.] 
-    std::vector< std::vector<double> > part_thickness;
-    std::vector< std::vector<double> > part_youngsmod;
+    // Length is 0 if this part does not own this bc,
+    // or ebc->get_num_node(0) if this part owns this bc. 
+    std::vector<double> part_thickness;
+    std::vector<double> part_youngsmod;
 
 };
 
