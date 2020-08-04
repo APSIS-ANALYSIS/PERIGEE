@@ -58,7 +58,12 @@ namespace TET_T
       int &numpts, int &numcels,
       std::vector<double> &pt, std::vector<int> &ien_array );
 
-
+  // ----------------------------------------------------------------
+  // read integer type cell or point data from file in vtu or vtp format.
+  // Input: \para filename the vtk file name
+  //        \para dataname the data property name
+  // Output: \para data the data associated with cell/point
+  // ----------------------------------------------------------------
   void read_int_CellData( const std::string &filename, 
       const std::string &dataname, std::vector<int> &data );
 

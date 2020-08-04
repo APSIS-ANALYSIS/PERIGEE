@@ -3,11 +3,13 @@
 // ==================================================================
 // Vector_3.hpp
 //
-// This is a 3-component vector clas. The components are stored in
+// This is a 3-component vector class. The components are stored in
 // array: vec[3]:
 //                vec[0]
 //                vec[1]
 //                vec[2]
+// 
+// It is designed primarily for constitutive routines.
 //
 // Author: Ju Liu
 // Date: June 24 2020
