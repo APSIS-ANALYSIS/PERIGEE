@@ -64,6 +64,9 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
 
   private:
 
+    // compute young's modulus for a wall node with the given radius & thickness
+    void compute_youngsmod( const double &r, const double &th, double &E );
+
     // fluid density used to compute the Young's modulus
     double fluid_density;
 

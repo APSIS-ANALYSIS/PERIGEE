@@ -33,9 +33,6 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   locator -> SetDataSet( centerlineData );
   locator -> BuildLocator();
 
-  // const double rho_alpha2 = fluid_density * youngsmod_alpha * youngsmod_alpha;
-  // const double beta_exp   = 2.0 * youngsmod_beta - 1.0;
-
   for(int ii=0; ii<num_node[ebc_id]; ++ii)
   {
     const double pt[3] = {pt_xyz[ebc_id][3*ii], pt_xyz[ebc_id][3*ii+1], pt_xyz[ebc_id][3*ii+2]};
@@ -48,9 +45,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   
     thickness[ii] = radius[ii] * thickness2radius_combined; 
 
-    youngsmod[ii] = 0.0;  // to be changed!
-
-    // youngsmod[ii] = rho_alpha2 / ( thickness[ii] * pow( 2.0*radius[ii], beta_exp ) );
+    compute_youngsmod(radius[ii], thickness[ii], youngsmod[ii]);
   }
  
   // clean memory
@@ -128,4 +123,14 @@ void ElemBC_3D_tet_wall::write_vtk( const int &ebc_id, const std::string &filena
   grid_w->Delete();
 }
 
+
+void ElemBC_3D_tet_wall::compute_youngsmod( const double &r, const double &th, double &E )
+{
+  const double alpha = 13.3, beta = 0.3;
+  const double rho_alpha2 = fluid_density * alpha * alpha;
+  const double beta_exp   = 2.0 * beta - 1.0;
+
+  // Note that r is in mm in Xiao et al. (2013)
+  E = 1.0e3 * rho_alpha2 / ( th * pow( 2.0 * 0.1 * r, beta_exp ) );
+}
 // EOF
