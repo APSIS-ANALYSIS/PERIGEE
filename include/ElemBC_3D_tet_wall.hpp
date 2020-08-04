@@ -58,8 +58,8 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     virtual void write_vtk( const int &ebc_id, 
         const std::string &filename="elembc_surface" ) const;
 
-    double get_fluid_density() const
-    {return fluid_density;}
+    virtual void get_fluid_density( int &fl_density ) const
+    {fl_density = fluid_density;}
 
   private:
     // fluid density used to compute the Young's modulus

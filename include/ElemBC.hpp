@@ -132,6 +132,11 @@ class ElemBC
     {SYS_T::commPrint("Warning: get_wall_youngsmod is not implemented. \n");}
 
 
+    // This returns the fluid density used for the young's modulus in CMM
+    virtual void get_fluid_density( double &fl_density ) const
+    {SYS_T::commPrint("Warning: get_fluid_density is not implemented. \n");}
+ 
+
     // write the surface to a vtk/vtu file
     virtual void write_vtk( const int &ebc_id,
        const std::string &filename="elembc_surface" ) const
