@@ -75,6 +75,66 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 
   SYS_T::print_fatal_if( thickness2radiusList.size() != wallsList.size(),
       "Error: thickness2radiusList length does not match that of wallsList.\n");
+
+  // num_ebc = 1 for wall elem bc
+  const int ebc_id = 0;
+ 
+  const int num_srfs = static_cast<int>( wallsList.size() );
+
+  int numpts, numcels;
+  std::vector<double> pt;
+  std::vector<int> ien_array, global_node_idx, global_elem_idx;
+  for(int ii=0; ii<num_srfs; ++ii)
+  {
+    TET_T::read_vtp_grid( wallsList[ii], numpts, numcels,
+          pt, ien_array, global_node_idx, global_elem_idx ); 
+
+    vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
+    reader -> SetFileName( centerlinesList[ii].c_str() );
+    reader -> Update();
+    vtkPolyData * centerlineData = reader -> GetOutput();
+
+    vtkPointLocator * locator = vtkPointLocator::New();
+    locator -> Initialize();
+    locator -> SetDataSet( centerlineData );
+    locator -> BuildLocator();
+
+    for(int jj=0; jj<numpts; ++jj)
+    {
+      // Search for corresponding global node ID in walls_combined
+      auto it = std::find(global_node[ebc_id].begin(), global_node[ebc_id].end(), global_node_idx[jj]);
+
+      if( it != global_node[ebc_id].end() )
+      {
+        const int idx = std::distance(global_node[ebc_id].begin(), it);
+
+        const double pt[3] = {pt_xyz[ebc_id][3*idx], pt_xyz[ebc_id][3*idx+1], pt_xyz[ebc_id][3*idx+2]};
+
+        const int closest_id = locator -> FindClosestPoint(&pt[0]);
+
+        const double * cl_pt = centerlineData -> GetPoints() -> GetPoint(closest_id);
+
+        radius[idx] = MATH_T::norm2(cl_pt[0] - pt[0], cl_pt[1] - pt[1], cl_pt[2] - pt[2]);
+
+        thickness[idx] = radius[idx] * thickness2radius_combined;
+
+        compute_youngsmod(radius[idx], thickness[idx], youngsmod[idx]);
+      }
+
+      else
+        SYS_T::print_fatal( "Error: wallsList does not contain the same global node IDs as walls_combined.\n" );
+    }
+  
+    // clean memory
+    locator -> Delete();
+    reader -> Delete();
+
+  }
+
+  VEC_T::clean( pt ); VEC_T::clean( ien_array ); VEC_T::clean( global_node_idx ); VEC_T::clean( global_elem_idx );
+
+  // Write out vtp's with wall properties
+  write_vtk(ebc_id, "varwallprop");
 }
 
 

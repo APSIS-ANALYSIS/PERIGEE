@@ -190,11 +190,18 @@ int main( int argc, char * argv[] )
   const std::string centerlines_combined = "centerlines.vtp";
   const double thickness2radius_combined = 0.2;
   walls_combined.push_back( sur_file_wall );
-  // sur_file_wall_list.push_back( "wall_aorta.vtp" );
-  // centerline_list.push_back( "centerlines_aorta.vtp" );
+
+  // Overwrite wall properties in the aorta
+  std::vector< std::string > wallsList; wallsList.clear();
+  std::vector< std::string > centerlinesList; centerlinesList.clear();
+  std::vector< double > thickness2radiusList; thickness2radiusList.clear();
+  wallsList.push_back( "wall_aorta.vtp" );
+  centerlinesList.push_back( "centerlines_aorta.vtp" );
+  thickness2radiusList.push_back( 0.2 );
 
   ElemBC * wall_bc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
-                                             thickness2radius_combined);
+                                             thickness2radius_combined, wallsList,
+                                             centerlinesList, thickness2radiusList);
   wall_bc -> resetTriIEN_outwardnormal( IEN );
 
   // Start partition the mesh for each cpu_rank 
