@@ -9,72 +9,56 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 : ElemBC_3D_tet( walls_combined, elemtype ),
   fluid_density( fluid_density )
 {
-  /*
   // Check inputs
-  SYS_T::print_fatal_if( centerlineList.size() != vtkfileList.size(),
-      "Error: centerlineList length does not match that of the vtkfileList.\n");
-
-  SYS_T::print_fatal_if( thickness_to_radius.size() != vtkfileList.size(),
-      "Error: thickness_to_radius length does not match that of the vtkfileList.\n");
-
-  SYS_T::print_fatal_if( youngsmod_alpha.size() != vtkfileList.size(),
-      "Error: youngsmod_alpha length does not match that of the vtkfileList.\n");
-
-  SYS_T::print_fatal_if( youngsmod_beta.size() != vtkfileList.size(),
-      "Error: youngsmod_beta length does not match that of the vtkfileList.\n");
+  SYS_T::print_fatal_if( walls_combined.size() != 1,
+      "Error: walls_combined does not have a length of 1.\n");
 
   SYS_T::print_fatal_if( elemtype != 501,
       "Error: unsupported element type.\n");
 
-  radius.resize(num_ebc);
-  thickness.resize(num_ebc);
-  youngsmod.resize(num_ebc);
-  for(int ii=0; ii<num_ebc; ++ii) 
+  // num_ebc = 1 for wall elem bc
+  const int ebc_id = 0;
+
+  radius.resize(    num_node[ebc_id] );
+  thickness.resize( num_node[ebc_id] );
+  youngsmod.resize( num_node[ebc_id] );
+
+  vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
+  reader -> SetFileName( centerlines_combined.c_str() );
+  reader -> Update();
+  vtkPolyData * centerlineData = reader -> GetOutput();
+
+  vtkPointLocator * locator = vtkPointLocator::New();
+  locator -> Initialize();
+  locator -> SetDataSet( centerlineData );
+  locator -> BuildLocator();
+
+  // const double rho_alpha2 = fluid_density * youngsmod_alpha * youngsmod_alpha;
+  // const double beta_exp   = 2.0 * youngsmod_beta - 1.0;
+
+  for(int ii=0; ii<num_node[ebc_id]; ++ii)
   {
-    radius[ii].resize( num_node[ii] );
-    thickness[ii].resize( num_node[ii] );
-    youngsmod[ii].resize( num_node[ii] );
+    const double pt[3] = {pt_xyz[ebc_id][3*ii], pt_xyz[ebc_id][3*ii+1], pt_xyz[ebc_id][3*ii+2]};
+
+    const int closest_id = locator -> FindClosestPoint(&pt[0]);
+
+    const double * cl_pt = centerlineData -> GetPoints() -> GetPoint(closest_id);
+
+    radius[ii] = MATH_T::norm2(cl_pt[0] - pt[0], cl_pt[1] - pt[1], cl_pt[2] - pt[2]);
+  
+    thickness[ii] = radius[ii] * thickness2radius_combined; 
+
+    youngsmod[ii] = 0.0;  // to be changed!
+
+    // youngsmod[ii] = rho_alpha2 / ( thickness[ii] * pow( 2.0*radius[ii], beta_exp ) );
   }
-
-  for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
-  {
-    const double rho_alpha2 = fluid_density * youngsmod_alpha[ebc_id] * youngsmod_alpha[ebc_id];
-    const double beta_exp   = 2.0 * youngsmod_beta[ebc_id] - 1.0; 
-
-    vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
-    reader -> SetFileName( centerlineList[ebc_id].c_str() );
-    reader -> Update();
-    vtkPolyData * centerlineData = reader -> GetOutput();
-
-    vtkPointLocator * locator = vtkPointLocator::New();
-    locator -> Initialize();
-    locator -> SetDataSet( centerlineData );
-    locator -> BuildLocator();
-
-    for(int ii=0; ii<num_node[ebc_id]; ++ii)
-    {
-      const double pt[3] = {pt_xyz[ebc_id][3*ii], pt_xyz[ebc_id][3*ii+1], pt_xyz[ebc_id][3*ii+2]};
-
-      const int closest_id = locator -> FindClosestPoint(&pt[0]);
-
-      const double * cl_pt = centerlineData -> GetPoints() -> GetPoint(closest_id);
-
-      radius[ebc_id][ii] = MATH_T::norm2(cl_pt[0] - pt[0], cl_pt[1] - pt[1], cl_pt[2] - pt[2]);
-   
-      thickness[ebc_id][ii] = radius[ebc_id][ii] * thickness_to_radius[ebc_id]; 
-
-      youngsmod[ebc_id][ii] = rho_alpha2 / ( thickness[ebc_id][ii] * pow( 2.0*radius[ebc_id][ii], beta_exp ) );
-    }
-
-    // clean memory
-    locator -> Delete();
-    reader -> Delete();
-  }
+ 
+  // clean memory
+  locator -> Delete();
+  reader -> Delete();
 
   // Write out vtp's with wall properties
-  for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
-    write_vtk(ebc_id, "varwallprop_" + SYS_T::to_string(ebc_id));
-  */
+  write_vtk(ebc_id, "varwallprop");
 }
 
 
@@ -90,6 +74,12 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 : ElemBC_3D_tet_wall( walls_combined, centerlines_combined, thickness2radius_combined,
                       fluid_density, elemtype)
 {
+  // Check inputs
+  SYS_T::print_fatal_if( centerlinesList.size() != wallsList.size(),
+      "Error: centerlinesList length does not match that of wallsList.\n");
+
+  SYS_T::print_fatal_if( thickness2radiusList.size() != wallsList.size(),
+      "Error: thickness2radiusList length does not match that of wallsList.\n");
 }
 
 
