@@ -120,7 +120,6 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 
         compute_youngsmod(radius[idx], thickness[idx], youngsmod[idx]);
       }
-
       else
         SYS_T::print_fatal( "Error: wallsList does not contain the same global node IDs as walls_combined.\n" );
     }
@@ -128,7 +127,6 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     // clean memory
     locator -> Delete();
     reader -> Delete();
-
   }
 
   VEC_T::clean( pt ); VEC_T::clean( ien_array ); 

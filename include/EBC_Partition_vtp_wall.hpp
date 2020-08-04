@@ -39,7 +39,6 @@ class EBC_Partition_vtp_wall : public EBC_Partition_vtp
     // or ebc->get_num_node(0) if this part owns this bc. 
     std::vector<double> part_thickness;
     std::vector<double> part_youngsmod;
-
 };
 
 #endif
