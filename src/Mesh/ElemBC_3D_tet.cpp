@@ -1,7 +1,39 @@
 #include "ElemBC_3D_tet.hpp"
 
+ElemBC_3D_tet::ElemBC_3D_tet( const std::string &vtkfile,
+   const int &elemtype ) : elem_type( elemtype ), num_ebc( 1 )
+{
+  num_node     = new int [num_ebc];
+  num_cell     = new int [num_ebc];
+  cell_nLocBas = new int [num_ebc];
+
+  pt_xyz.resize(num_ebc);
+  tri_ien.resize(num_ebc);
+  global_node.resize(num_ebc);
+  global_cell.resize(num_ebc);
+
+  std::cout<<"===> ElemBC_3D_tet specified by "<<vtkfile<<'\n';
+
+  if(elemtype == 501)
+  {
+    cell_nLocBas[0] = 3; // linear triangle
+    TET_T::read_vtp_grid( vtkfile, num_node[0], num_cell[0],
+        pt_xyz[0], tri_ien[0], global_node[0], global_cell[0] );
+  }
+  else if(elemtype == 502)
+  {
+    cell_nLocBas[0] = 6; // quadratic triangle
+
+    TET_T::read_vtu_grid( vtkfile, num_node[0], num_cell[0],
+        pt_xyz[0], tri_ien[0], global_node[0], global_cell[0] );
+  }
+
+  std::cout<<"     is generated. \n";
+}
+
+
 ElemBC_3D_tet::ElemBC_3D_tet( const std::vector<std::string> &vtkfileList,
-   const int &elemtype ) : elem_type( elemtype )
+    const int &elemtype ) : elem_type( elemtype )
 {
   num_ebc = static_cast<int>( vtkfileList.size() );
 
@@ -171,12 +203,12 @@ void ElemBC_3D_tet::resetTriIEN_outwardnormal( const IIEN * const &VIEN )
         const int cell_gi = get_global_cell(ebcid, ee);
 
         for(int ii=0; ii<10; ++ii) tet_n[ii] = VIEN->get_IEN(cell_gi, ii);
-      
+
         tetcell->reset(tet_n[0], tet_n[1], tet_n[2], tet_n[3]);
 
         const int tet_face_id = tetcell->get_face_id(node_t_gi[0],
             node_t_gi[1], node_t_gi[2]);
-      
+
         int pos0 = -1, pos1 = -1, pos2 = -1, pos3 = -1, pos4 = -1, pos5 = -1;
 
         switch( tet_face_id )

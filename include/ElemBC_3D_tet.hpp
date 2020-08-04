@@ -14,6 +14,8 @@
 class ElemBC_3D_tet : public ElemBC
 {
   public:
+    ElemBC_3D_tet( const std::string &vtkfile, const int &elemtype=501 );
+
     ElemBC_3D_tet( const std::vector<std::string> &vtkfileList,
        const int &elemtype=501 );
 
