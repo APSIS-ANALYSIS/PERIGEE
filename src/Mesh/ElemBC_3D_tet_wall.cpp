@@ -4,10 +4,10 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const std::vector<std::string> &walls_combined,
     const std::string &centerlines_combined,
     const double &thickness2radius_combined,
-    const double &fluid_density,
+    const double &in_fluid_density,
     const int &elemtype )
 : ElemBC_3D_tet( walls_combined, elemtype ),
-  fluid_density( fluid_density )
+  fluid_density( in_fluid_density )
 {
   // Check inputs
   SYS_T::print_fatal_if( walls_combined.size() != 1,
@@ -131,7 +131,8 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 
   }
 
-  VEC_T::clean( pt ); VEC_T::clean( ien_array ); VEC_T::clean( global_node_idx ); VEC_T::clean( global_elem_idx );
+  VEC_T::clean( pt ); VEC_T::clean( ien_array ); 
+  VEC_T::clean( global_node_idx ); VEC_T::clean( global_elem_idx );
 
   // Write out vtp's with wall properties
   write_vtk(ebc_id, "varwallprop");
@@ -193,4 +194,5 @@ void ElemBC_3D_tet_wall::compute_youngsmod( const double &r, const double &th, d
   // Note that r is in mm in Xiao et al. (2013)
   E = 1.0e3 * rho_alpha2 / ( th * pow( 2.0 * 0.1 * r, beta_exp ) );
 }
+
 // EOF
