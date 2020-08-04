@@ -116,7 +116,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 
         radius[idx] = MATH_T::norm2(cl_pt[0] - pt[0], cl_pt[1] - pt[1], cl_pt[2] - pt[2]);
 
-        thickness[idx] = radius[idx] * thickness2radius_combined;
+        thickness[idx] = radius[idx] * thickness2radiusList[ii];
 
         compute_youngsmod(radius[idx], thickness[idx], youngsmod[idx]);
       }
