@@ -68,7 +68,7 @@ void EBC_Partition_vtp_wall::write_hdf5( const char * FileName ) const
 
   h5w -> write_doubleScalar( g_id, "fluid_density", fluid_density );
 
-  const std::string groupbase("wall_");
+  const std::string groupbase("wall_ebc_");
 
   // num_ebc = 1 for wall elem bc
   const int ebc_id = 0;
@@ -106,7 +106,7 @@ void EBC_Partition_vtp_wall::write_hdf5( const char * FileName,
 
   h5w -> write_doubleScalar( g_id, "fluid_density", fluid_density );
 
-  const std::string groupbase("wall_");
+  const std::string groupbase("wall_ebc_");
 
   // num_ebc = 1 for wall elem bc
   const int ebc_id = 0;

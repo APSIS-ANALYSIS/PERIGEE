@@ -242,7 +242,7 @@ int main( int argc, char * argv[] )
 
     // Partition Elemental Wall BC and write it to h5 file
     IEBC_Partition * wbcpart = new EBC_Partition_vtp_wall(part, mnindex, wall_bc );
-    wbcpart -> write_hdf5( part_file.c_str(), "wall_ebc" );
+    wbcpart -> write_hdf5( part_file.c_str(), "wall_ebc_" );
 
     // Collect partition statistics
     list_nlocalnode.push_back(part->get_nlocalnode());
