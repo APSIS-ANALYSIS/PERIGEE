@@ -203,8 +203,6 @@ int main( int argc, char * argv[] )
                                              centerlinesList, thickness2radiusList);
   wall_bc -> resetTriIEN_outwardnormal( IEN );
 
-  wall_bc -> print_info();
-
   // Start partition the mesh for each cpu_rank 
   const bool isPrintPartInfo = true;
 
