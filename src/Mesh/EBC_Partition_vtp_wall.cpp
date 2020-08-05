@@ -56,11 +56,13 @@ EBC_Partition_vtp_wall::~EBC_Partition_vtp_wall()
 void EBC_Partition_vtp_wall::write_hdf5( const char * FileName ) const
 {
   // Call base class writer to write base class data at ebc_wall folder
+  // certain wall info are in ebc_wall/ebc_0 sub-folder
   EBC_Partition_vtp::write_hdf5( FileName, "ebc_wall" );
 
   const std::string input_fName(FileName);
   const std::string fName = SYS_T::gen_partfile_name( input_fName, cpu_rank );
 
+  // re-open the file
   hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
   // open the folder at fName/ebc_wall again to append additional data 
