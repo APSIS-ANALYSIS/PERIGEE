@@ -29,11 +29,11 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
   for(int ii=0; ii<num_ebc; ++ii) 
     cell_nLocBas[ii] = ebc->get_cell_nLocBas(ii);
 
-  // obtain the node belonging to this partition
-  std::vector<int> local_node, local_elem;
-
+  // Loop over each element bc surface
   for(int ii=0; ii<num_ebc; ++ii)
   {
+    // obtain the node belonging to this partition
+    std::vector<int> local_node, local_elem;
     local_node.clear(); local_elem.clear();
 
     const int num_global_bccell = ebc->get_num_cell( ii );
@@ -146,7 +146,7 @@ void EBC_Partition_vtp::write_hdf5( const char * FileName ) const
       h5w->write_intVector( group_id, "local_tri_ien", local_tri_ien[ii] );
 
       h5w->write_intVector( group_id, "local_global_node", local_global_node[ii] );
-      
+
       h5w->write_intVector( group_id, "local_node_pos", local_node_pos[ii] );
 
       h5w->write_intVector( group_id, "local_global_cell", local_global_cell[ii] );
@@ -162,7 +162,7 @@ void EBC_Partition_vtp::write_hdf5( const char * FileName ) const
 
 
 void EBC_Partition_vtp::write_hdf5( const char * FileName,
-   const char * GroupName ) const
+    const char * GroupName ) const
 {
   const std::string input_fName(FileName);
   const std::string fName = SYS_T::gen_partfile_name( input_fName, cpu_rank );
@@ -198,7 +198,7 @@ void EBC_Partition_vtp::write_hdf5( const char * FileName,
       h5w->write_intVector( group_id, "local_tri_ien", local_tri_ien[ii] );
 
       h5w->write_intVector( group_id, "local_global_node", local_global_node[ii] );
-      
+
       h5w->write_intVector( group_id, "local_node_pos", local_node_pos[ii] );
 
       h5w->write_intVector( group_id, "local_global_cell", local_global_cell[ii] );
