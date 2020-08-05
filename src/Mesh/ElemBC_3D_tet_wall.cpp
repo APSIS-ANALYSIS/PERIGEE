@@ -60,10 +60,10 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const std::vector<std::string> &wallsList,
     const std::vector<std::string> &centerlinesList,
     const std::vector<double> &thickness2radiusList,
-    const double &fluid_density,
+    const double &in_fluid_density,
     const int &elemtype )
 : ElemBC_3D_tet_wall( walls_combined, centerlines_combined, thickness2radius_combined,
-                      fluid_density, elemtype)
+                      in_fluid_density, elemtype)
 {
   // Check inputs
   SYS_T::print_fatal_if( centerlinesList.size() != wallsList.size(),
