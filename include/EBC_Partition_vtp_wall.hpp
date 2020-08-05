@@ -22,7 +22,7 @@ class EBC_Partition_vtp_wall : public EBC_Partition_vtp
     // The input ElemBC should be ElemBC_3D_tet_wall
     EBC_Partition_vtp_wall( const IPart * const &part,
         const Map_Node_Index * const &mnindex,
-        const ElemBC * const &ebc);
+        const ElemBC * const &ebc );
 
     virtual ~EBC_Partition_vtp_wall();
 
@@ -38,10 +38,10 @@ class EBC_Partition_vtp_wall : public EBC_Partition_vtp
     // fluid density used in Young's modulus calculation
     const double fluid_density;
 
-    // Length is 0 if this part does not own this bc,
-    // or ebc->get_num_node(0) if this part owns this bc. 
+    // Length is num_local_node[0] 
     std::vector<double> part_thickness;
     std::vector<double> part_youngsmod;
+    std::vector<double> part_radius;
 };
 
 #endif
