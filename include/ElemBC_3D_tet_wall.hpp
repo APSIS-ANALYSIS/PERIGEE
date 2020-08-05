@@ -5,7 +5,8 @@
 //
 // A derived class from the ElemBC_3D_tet.hpp
 //
-// This class has additional information of the wall mesh.
+// This class has additional information of the wall mesh used for
+// thin-wall approximation in FSI simulations.
 //
 // Author: Ju Liu
 // Date: July 12 2020
@@ -15,6 +16,7 @@
 class ElemBC_3D_tet_wall : public ElemBC_3D_tet
 {
   public:
+    // --------------------------------------------------------------
     //  Constructing wall properties with a single spatial distribution.
     //  \para: walls_combined contains a single vtp with the complete wall surface
     //  \para: centerlines_combined is a vtp with the complete set of centerlines 
@@ -22,12 +24,14 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     //         to be prescribed for the complete wall. For most arteries, 
     //         we can assume the thickness is ten percent of the diameter,
     //         or twenty percent of the radius.
+    // --------------------------------------------------------------
     ElemBC_3D_tet_wall(const std::string &walls_combined,
         const std::string &centerlines_combined,
         const double &thickness2radius_combined,
         const double &in_fluid_density = 1.065,
         const int &elemtype = 501 );
 
+    // --------------------------------------------------------------
     //  Constructing wall properties with multiple spatial distributions.
     //  The background wall properties will first be prescribed using the
     //  constructor above. Wall properties in wallsList will then be overwritten
@@ -36,6 +40,7 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     //  \para: wallsList is a vector of wall surface vtp's 
     //  \para: centerlinesList is a vector of corresponding centerline vtp's
     //  \para: thickness2radiusList is a vector of corresponding ratios.
+    // --------------------------------------------------------------
     ElemBC_3D_tet_wall(const std::string &walls_combined,
         const std::string &centerlines_combined,
         const double &thickness2radius_combined,
@@ -62,7 +67,9 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     {fl_density = fluid_density;}
 
   private:
-    // fluid density used to compute the Young's modulus
+    // fluid density used to compute the Young's modulus.
+    // Its value will be passed to the analysis code and will be checked to
+    // make sure consistent value is used in analysis code.
     const double fluid_density;
 
     // num_ebc = 1 for the wall, so these properties all have length num_node[0]
@@ -71,6 +78,8 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     std::vector<double> youngsmod;
     
     // compute young's modulus for a wall node with the given radius & thickness
+    // One may modify this function for different ways of prescribing the 
+    // Young's modulus. The default one is adopted from N. Xiao, JCP, 244:22-40.
     void compute_youngsmod( const double &r, const double &th, double &E );
 };
 
