@@ -26,12 +26,10 @@ class EBC_Partition_vtp_wall : public EBC_Partition_vtp
 
     virtual ~EBC_Partition_vtp_wall();
 
-    // write the data to hdf5 file in group /ebc/ebcid_xxx, 
-    // xxx is the ebc_id
+    // write the data to hdf5 file in folder /ebc/ebc_wall 
     virtual void write_hdf5( const char * FileName ) const;
 
-    // write the data to hdf5 file in group /group-name/ebcid_xxx, 
-    // xxx is the ebc_id
+    // write the data to hdf5 file in folder /GroupName/ebc_wall 
     virtual void write_hdf5( const char * FileName, const char * GroupName ) const;
 
   protected:
@@ -41,7 +39,6 @@ class EBC_Partition_vtp_wall : public EBC_Partition_vtp
     // Length is num_local_node[0] 
     std::vector<double> part_thickness;
     std::vector<double> part_youngsmod;
-    std::vector<double> part_radius;
 };
 
 #endif

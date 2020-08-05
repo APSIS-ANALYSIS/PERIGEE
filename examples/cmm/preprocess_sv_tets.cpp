@@ -203,6 +203,8 @@ int main( int argc, char * argv[] )
                                              centerlinesList, thickness2radiusList);
   wall_bc -> resetTriIEN_outwardnormal( IEN );
 
+  wall_bc -> print_info();
+
   // Start partition the mesh for each cpu_rank 
   const bool isPrintPartInfo = true;
 
@@ -242,7 +244,7 @@ int main( int argc, char * argv[] )
 
     // Partition Elemental Wall BC and write it to h5 file
     IEBC_Partition * wbcpart = new EBC_Partition_vtp_wall(part, mnindex, wall_bc );
-    wbcpart -> write_hdf5( part_file.c_str(), "wall_ebc_" );
+    wbcpart -> write_hdf5( part_file.c_str() );
 
     // Collect partition statistics
     list_nlocalnode.push_back(part->get_nlocalnode());
