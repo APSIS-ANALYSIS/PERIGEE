@@ -76,8 +76,12 @@ void EBC_Partition_vtp_wall::write_hdf5( const char * FileName ) const
   const int ebc_id = 0;
   if( num_local_cell[ebc_id] > 0 )
   {
-    h5w->write_doubleVector( g_id, "thickness", part_thickness );
-    h5w->write_doubleVector( g_id, "youngsmod", part_youngsmod );
+    hid_t group_id = H5Gopen( g_id, "ebcid_0", H5P_DEFAULT );
+
+    h5w->write_doubleVector( group_id, "thickness", part_thickness );
+    h5w->write_doubleVector( group_id, "youngsmod", part_youngsmod );
+  
+    H5Gclose( group_id );
   }
 
   delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
