@@ -7,16 +7,41 @@ EBC_Partition_vtp_wall::EBC_Partition_vtp_wall(
 : EBC_Partition_vtp(part, mnindex, ebc),
   fluid_density( ebc-> get_fluid_density() )
 {
+  part_thickness.clear();
+  part_youngsmod.clear();
+
+  // wall has only one surface as the assumption in wall ebc  
   const int ebc_id = 0;
-  if( num_local_cell[ebc_id] > 0 )
+  if( num_local_node[ebc_id] > 0 )
   {
-    ebc -> get_wall_thickness( part_thickness     );
-    ebc -> get_wall_youngsmod( part_youngsmod     );
-  }
-  else
-  {
-    part_thickness.clear();
-    part_youngsmod.clear();
+    // re-generate local_node index list
+    std::vector<int> local_node; local_node.clear();
+    for(int jj=0; jj<ebc->get_num_cell(ebc_id); ++jj)
+    {
+      const int elem_index = ebc -> get_global_cell(ebc_id, jj);
+      if( part -> get_elemLocIndex( elem_index ) != -1 )
+      {
+        for(int kk=0; kk<ebc->get_cell_nLocBas(ebc_id); ++kk) 
+          local_node.push_back( ebc->get_ien(ebc_id, jj, kk) );
+      }
+    }
+    VEC_T::sort_unique_resize( local_node );
+
+    // Make sure local_node is compatible with existing data
+    SYS_T::print_fatal_if( num_local_node[ebc_id] != static_cast<int>(local_node.size()),
+        "Error: there is an internal error.\n");
+
+    // obtain the wall properties of the whole surface
+    std::vector<double> temp_th, temp_E;
+    ebc -> get_wall_thickness( temp_th );
+    ebc -> get_wall_youngsmod( temp_E );
+
+    // save the wall properties belong to the local node, local to the cpu.
+    for( int ii=0; ii<num_local_node[ebc_id]; ++ii )
+    {
+      part_thickness.push_back( temp_th[ local_node[ii] ] );
+      part_youngsmod.push_back( temp_E[ local_node[ii] ] );
+    }
   }
 }
 
@@ -43,7 +68,7 @@ void EBC_Partition_vtp_wall::write_hdf5( const char * FileName ) const
 
   h5w -> write_doubleScalar( g_id, "fluid_density", fluid_density );
 
-  const std::string groupbase("ebcid_");
+  const std::string groupbase("wall_");
 
   // num_ebc = 1 for wall elem bc
   const int ebc_id = 0;
@@ -81,7 +106,7 @@ void EBC_Partition_vtp_wall::write_hdf5( const char * FileName,
 
   h5w -> write_doubleScalar( g_id, "fluid_density", fluid_density );
 
-  const std::string groupbase("ebcid_");
+  const std::string groupbase("wall_");
 
   // num_ebc = 1 for wall elem bc
   const int ebc_id = 0;
