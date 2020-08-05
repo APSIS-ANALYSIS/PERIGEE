@@ -4,14 +4,14 @@ EBC_Partition_vtp_wall::EBC_Partition_vtp_wall(
     const IPart * const &part,
     const Map_Node_Index * const &mnindex,
     const ElemBC * const &ebc )
-: EBC_Partition_vtp(part, mnindex, ebc)
+: EBC_Partition_vtp(part, mnindex, ebc),
+  fluid_density( ebc-> get_fluid_density() )
 {
   const int ebc_id = 0;
   if( num_local_cell[ebc_id] > 0 )
   {
     ebc -> get_wall_thickness( part_thickness     );
     ebc -> get_wall_youngsmod( part_youngsmod     );
-    ebc -> get_fluid_density(  part_fluid_density );
   }
   else
   {
@@ -41,7 +41,7 @@ void EBC_Partition_vtp_wall::write_hdf5( const char * FileName ) const
 
   HDF5_Writer * h5w = new HDF5_Writer( file_id );
 
-  h5w -> write_doubleScalar( g_id, "fluid_density", part_fluid_density );
+  h5w -> write_doubleScalar( g_id, "fluid_density", fluid_density );
 
   const std::string groupbase("ebcid_");
 
@@ -79,7 +79,7 @@ void EBC_Partition_vtp_wall::write_hdf5( const char * FileName,
 
   HDF5_Writer * h5w = new HDF5_Writer( file_id );
 
-  h5w -> write_doubleScalar( g_id, "fluid_density", part_fluid_density );
+  h5w -> write_doubleScalar( g_id, "fluid_density", fluid_density );
 
   const std::string groupbase("ebcid_");
 

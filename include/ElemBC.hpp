@@ -133,8 +133,8 @@ class ElemBC
 
 
     // This returns the fluid density used for the young's modulus in CMM
-    virtual void get_fluid_density( double &fl_density ) const
-    {SYS_T::commPrint("Warning: get_fluid_density is not implemented. \n");}
+    virtual double get_fluid_density() const
+    {SYS_T::commPrint("Warning: get_fluid_density is not implemented. \n"); return -1.0;}
  
 
     // write the surface to a vtk/vtu file

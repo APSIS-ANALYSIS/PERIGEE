@@ -81,8 +81,8 @@ class ElemBC_3D_tet : public ElemBC
     {SYS_T::commPrint("Warning: get_wall_youngsmod is not implemented. \n");}
 
     // Access the data in ElemBC_3D_tet_wall, fluid density used for CMM young's modulus
-    virtual void get_fluid_density( double &fl_density ) const
-    {SYS_T::commPrint("Warning: get_fluid_density is not implemented. \n");}
+    virtual double get_fluid_density() const
+    {SYS_T::commPrint("Warning: get_fluid_density is not implemented. \n"); return -1.0;}
 
     // write the boundary surface to a vtk/vtu format for visualization
     virtual void write_vtk( const int &ebc_id,
