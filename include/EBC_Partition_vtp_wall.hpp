@@ -26,10 +26,10 @@ class EBC_Partition_vtp_wall : public EBC_Partition_vtp
 
     virtual ~EBC_Partition_vtp_wall();
 
-    // write the data to hdf5 file in folder /ebc/ebc_wall 
+    // write the data to hdf5 file in folder /ebc_wall 
     virtual void write_hdf5( const char * FileName ) const;
 
-    // write the data to hdf5 file in folder /GroupName/ebc_wall 
+    // This function is NOT allowed for wall ebc. 
     virtual void write_hdf5( const char * FileName, const char * GroupName ) const;
 
   protected:
