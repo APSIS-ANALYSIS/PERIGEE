@@ -41,7 +41,7 @@ void EBC_Partition_vtp_wall::write_hdf5( const char * FileName ) const
 
   HDF5_Writer * h5w = new HDF5_Writer( file_id );
 
-  h5w -> write_intScalar( g_id, "fluid_density", part_fluid_density );
+  h5w -> write_doubleScalar( g_id, "fluid_density", part_fluid_density );
 
   const std::string groupbase("ebcid_");
 
@@ -79,7 +79,7 @@ void EBC_Partition_vtp_wall::write_hdf5( const char * FileName,
 
   HDF5_Writer * h5w = new HDF5_Writer( file_id );
 
-  h5w -> write_intScalar( g_id, "fluid_density", part_fluid_density );
+  h5w -> write_doubleScalar( g_id, "fluid_density", part_fluid_density );
 
   const std::string groupbase("ebcid_");
 
