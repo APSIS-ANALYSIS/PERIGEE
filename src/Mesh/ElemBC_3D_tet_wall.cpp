@@ -77,6 +77,8 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
  
   const int num_srfs = static_cast<int>( wallsList.size() );
 
+  // Loop over the surfaces (subsets of the whole wall surface)
+  // to locally modify the wall property
   int numpts, numcels;
   std::vector<double> pt;
   std::vector<int> ien_array, global_node_idx, global_elem_idx;
