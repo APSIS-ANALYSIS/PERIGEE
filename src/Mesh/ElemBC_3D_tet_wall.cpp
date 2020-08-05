@@ -1,7 +1,7 @@
 #include "ElemBC_3D_tet_wall.hpp"
 
 ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
-    const std::vector<std::string> &walls_combined,
+    const std::string &walls_combined,
     const std::string &centerlines_combined,
     const double &thickness2radius_combined,
     const double &in_fluid_density,
@@ -10,11 +10,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   fluid_density( in_fluid_density )
 {
   // Check inputs
-  SYS_T::print_fatal_if( walls_combined.size() != 1,
-      "Error: walls_combined does not have a length of 1.\n");
-
-  SYS_T::print_fatal_if( elemtype != 501,
-      "Error: unsupported element type.\n");
+  SYS_T::print_fatal_if( elemtype != 501, "Error: unsupported element type.\n");
 
   // num_ebc = 1 for wall elem bc
   const int ebc_id = 0;
@@ -58,7 +54,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 
 
 ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
-    const std::vector<std::string> &walls_combined,
+    const std::string &walls_combined,
     const std::string &centerlines_combined,
     const double &thickness2radius_combined,
     const std::vector<std::string> &wallsList,

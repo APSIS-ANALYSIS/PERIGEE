@@ -186,10 +186,9 @@ int main( int argc, char * argv[] )
   ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
 
   // Wall mesh is set as an elemental bc.
-  std::vector< std::string > walls_combined; walls_combined.clear();
+  const std::string walls_combined = sur_file_wall;
   const std::string centerlines_combined = "centerlines.vtp";
   const double thickness2radius_combined = 0.2;
-  walls_combined.push_back( sur_file_wall );
 
   // Overwrite wall properties in the aorta
   std::vector< std::string > wallsList; wallsList.clear();

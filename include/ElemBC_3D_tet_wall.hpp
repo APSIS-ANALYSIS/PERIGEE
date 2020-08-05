@@ -22,7 +22,7 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     //         to be prescribed for the complete wall. For most arteries, 
     //         we can assume the thickness is ten percent of the diameter,
     //         or twenty percent of the radius.
-    ElemBC_3D_tet_wall(const std::vector<std::string> &walls_combined,
+    ElemBC_3D_tet_wall(const std::string &walls_combined,
         const std::string &centerlines_combined,
         const double &thickness2radius_combined,
         const double &in_fluid_density = 1.065,
@@ -36,7 +36,7 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     //  \para: wallsList is a vector of wall surface vtp's 
     //  \para: centerlinesList is a vector of corresponding centerline vtp's
     //  \para: thickness2radiusList is a vector of corresponding ratios.
-    ElemBC_3D_tet_wall(const std::vector<std::string> &walls_combined,
+    ElemBC_3D_tet_wall(const std::string &walls_combined,
         const std::string &centerlines_combined,
         const double &thickness2radius_combined,
         const std::vector<std::string> &wallsList,
