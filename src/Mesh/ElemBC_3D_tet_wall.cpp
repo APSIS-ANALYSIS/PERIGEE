@@ -173,6 +173,9 @@ void ElemBC_3D_tet_wall::write_vtk( const int &ebc_id, const std::string &filena
   // Add Young's modulus
   TET_T::add_double_PointData( grid_w, youngsmod, "YoungsModulus" );
 
+  // Add Radius
+  TET_T::add_double_PointData( grid_w, radius, "Radius" );
+
   // write vtp
   TET_T::write_vtkPointSet(filename, grid_w);
 
