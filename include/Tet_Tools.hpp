@@ -12,6 +12,7 @@
 #include "Math_Tools.hpp"
 #include "IIEN.hpp"
 
+#include "vtkCellLocator.h"
 #include "vtkIntArray.h"
 #include "vtkDoubleArray.h"
 #include "vtkPolyData.h"
@@ -22,6 +23,7 @@
 #include "vtkQuadraticTriangle.h"
 #include "vtkTetra.h"
 #include "vtkQuadraticTetra.h"
+#include "vtkGenericCell.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkUnstructuredGridWriter.h"
 #include "vtkXMLUnstructuredGridWriter.h"

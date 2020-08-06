@@ -24,18 +24,21 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   reader -> Update();
   vtkPolyData * centerlineData = reader -> GetOutput();
 
-  vtkPointLocator * locator = vtkPointLocator::New();
+  // Identify the closest point (not necessarily a cell vertex) on the centerline
+  vtkCellLocator * locator = vtkCellLocator::New();
   locator -> Initialize();
   locator -> SetDataSet( centerlineData );
   locator -> BuildLocator();
 
+  double cl_pt[3];
+  vtkGenericCell * cell = vtkGenericCell::New();
+  vtkIdType cellId; int subId; double dist;
+
   for(int ii=0; ii<num_node[ebc_id]; ++ii)
   {
-    const double pt[3] = {pt_xyz[ebc_id][3*ii], pt_xyz[ebc_id][3*ii+1], pt_xyz[ebc_id][3*ii+2]};
+    double pt[3] = {pt_xyz[ebc_id][3*ii], pt_xyz[ebc_id][3*ii+1], pt_xyz[ebc_id][3*ii+2]};
 
-    const int closest_id = locator -> FindClosestPoint(&pt[0]);
-
-    const double * cl_pt = centerlineData -> GetPoints() -> GetPoint(closest_id);
+    locator -> FindClosestPoint(&pt[0], &cl_pt[0], cell, cellId, subId, dist); 
 
     radius[ii] = MATH_T::norm2(cl_pt[0] - pt[0], cl_pt[1] - pt[1], cl_pt[2] - pt[2]);
   
@@ -46,7 +49,8 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
  
   // clean memory
   locator -> Delete();
-  reader -> Delete();
+  reader  -> Delete();
+  cell    -> Delete();
 
   // Write out vtp's with wall properties
   write_vtk(ebc_id, "varwallprop");
@@ -92,10 +96,15 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     reader -> Update();
     vtkPolyData * centerlineData = reader -> GetOutput();
 
-    vtkPointLocator * locator = vtkPointLocator::New();
+    // Identify the closest point (not necessarily a cell vertex) on the centerline
+    vtkCellLocator * locator = vtkCellLocator::New();
     locator -> Initialize();
     locator -> SetDataSet( centerlineData );
     locator -> BuildLocator();
+
+    double cl_pt[3];
+    vtkGenericCell * cell = vtkGenericCell::New();
+    vtkIdType cellId; int subId; double dist;
 
     for(int jj=0; jj<numpts; ++jj)
     {
@@ -106,11 +115,9 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
       {
         const int idx = std::distance(global_node[ebc_id].begin(), it);
 
-        const double pt[3] = {pt_xyz[ebc_id][3*idx], pt_xyz[ebc_id][3*idx+1], pt_xyz[ebc_id][3*idx+2]};
+        double pt[3] = {pt_xyz[ebc_id][3*idx], pt_xyz[ebc_id][3*idx+1], pt_xyz[ebc_id][3*idx+2]};
 
-        const int closest_id = locator -> FindClosestPoint(&pt[0]);
-
-        const double * cl_pt = centerlineData -> GetPoints() -> GetPoint(closest_id);
+        locator -> FindClosestPoint(&pt[0], &cl_pt[0], cell, cellId, subId, dist);
 
         radius[idx] = MATH_T::norm2(cl_pt[0] - pt[0], cl_pt[1] - pt[1], cl_pt[2] - pt[2]);
 
@@ -124,7 +131,8 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   
     // clean memory
     locator -> Delete();
-    reader -> Delete();
+    reader  -> Delete();
+    cell    -> Delete();
   }
 
   VEC_T::clean( pt ); VEC_T::clean( ien_array ); 

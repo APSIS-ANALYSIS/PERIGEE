@@ -12,9 +12,6 @@
 #include <string>
 #include <vector>
 #include <ctime>
-// Need to put vtkPointLocator before petsc header file to avoid a
-// systen var name conflict
-#include "vtkPointLocator.h"
 #include "petsc.h"
 
 namespace SYS_T
