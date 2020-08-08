@@ -199,7 +199,7 @@ void ElemBC_3D_tet_wall::compute_youngsmod( const double &r, const double &th, d
   const double beta_exp   = 2.0 * beta - 1.0;
 
   // Note that r is in mm in Xiao et al. (2013)
-  E = 1.0e3 * rho_alpha2 / ( th * pow( 2.0 * 0.1 * r, beta_exp ) );
+  E = 1.0e4 * rho_alpha2 / ( th * pow( 2.0 * 0.1 * r, beta_exp ) );
 }
 
 // EOF
