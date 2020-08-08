@@ -186,14 +186,16 @@ int main( int argc, char * argv[] )
   ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
 
   // Wall mesh is set as an elemental bc.
+  // Set the wall region, its corresponding centerline, and the ratio
+  // of thickness-to-radius
   const std::string walls_combined = sur_file_wall;
   const std::string centerlines_combined = "centerlines.vtp";
   const double thickness2radius_combined = 0.2;
 
-  // Overwrite wall properties in the aorta
-  std::vector< std::string > wallsList; wallsList.clear();
-  std::vector< std::string > centerlinesList; centerlinesList.clear();
-  std::vector< double > thickness2radiusList; thickness2radiusList.clear();
+  // Overwrite wall properties in the following selected regions
+  std::vector<std::string> wallsList; wallsList.clear();
+  std::vector<std::string> centerlinesList; centerlinesList.clear();
+  std::vector<double> thickness2radiusList; thickness2radiusList.clear();
   wallsList.push_back( "wall_aorta.vtp" );
   centerlinesList.push_back( "centerlines_aorta.vtp" );
   thickness2radiusList.push_back( 0.2 );
