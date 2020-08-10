@@ -89,7 +89,7 @@ class ALocal_EBC
         const int &eindex, double &coor_x, double &coor_y,
         double &coor_z ) const
     {
-      SYS_T::print_fatal("Error: ALocal_EBC::get_intPts_xyz in not implemented. \n");
+      SYS_T::print_fatal("Error: ALocal_EBC::get_intPts_xyz is not implemented. \n");
     }
 
     // --------------------------------------------------------------
@@ -119,7 +119,7 @@ class ALocal_EBC
     // --------------------------------------------------------------
     virtual int get_num_face_nodes(const int &ii) const
     {
-      SYS_T::print_fatal("Error: ALocal_EBC::get_num_face_nodes in not implemented. \n");
+      SYS_T::print_fatal("Error: ALocal_EBC::get_num_face_nodes is not implemented. \n");
       return -1;
     }
 
@@ -131,7 +131,7 @@ class ALocal_EBC
     // --------------------------------------------------------------
     virtual void get_intNA(const int &ii, std::vector<double> &out) const
     {
-      SYS_T::print_fatal("Error: ALocal_EBC::get_intNA in not implemented. \n");
+      SYS_T::print_fatal("Error: ALocal_EBC::get_intNA is not implemented. \n");
     }
     
     // --------------------------------------------------------------
@@ -143,7 +143,7 @@ class ALocal_EBC
     // --------------------------------------------------------------
     virtual void get_LID(const int &ii, std::vector<int> &out ) const
     {
-      SYS_T::print_fatal("Error: ALocal_EBC::get_LID in not implemented. \n");
+      SYS_T::print_fatal("Error: ALocal_EBC::get_LID is not implemented. \n");
     }
 
     // --------------------------------------------------------------
@@ -154,8 +154,36 @@ class ALocal_EBC
     virtual void get_outvec( const int &ii, double &nx, double &ny,
         double &nz ) const
     {
-      SYS_T::print_fatal("Error: ALocal_EBC::get_outvec in not implemented. \n");
+      SYS_T::print_fatal("Error: ALocal_EBC::get_outvec is not implemented. \n");
     }
+
+    // --------------------------------------------------------------
+    // get_thickness : return the wall thickness, if this partition
+    //                 owns any cell on the wall.
+    // --------------------------------------------------------------
+    virtual void get_thickness(std::vector<double> &out) const
+    {
+      SYS_T::print_fatal("Error: ALocal_EBC::get_thickness is not implemented. \n");
+    }
+
+    // --------------------------------------------------------------
+    // get_youngsmod : return the wall young's modulus, if this partition
+    //                 owns any cell on the wall.
+    // --------------------------------------------------------------
+    virtual void get_younsmod(std::vector<double> &out) const
+    {
+      SYS_T::print_fatal("Error: ALocal_EBC::get_youngsmod is not implemented. \n");
+    }
+
+    // --------------------------------------------------------------
+    // get_fluid_density : return the fluid density used to compute young's modulus 
+    // --------------------------------------------------------------
+    virtual double get_fluid_density() const
+    {
+      SYS_T::print_fatal("Error: ALocal_EBC::get_fluid_density is not implemented. \n");
+      return -1.0;
+    }
+
 
   protected:
     // the number of different ebc domain
