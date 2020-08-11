@@ -4,6 +4,9 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
     const int &cpu_rank, const std::string &gname )
 : ALocal_EBC( fileBaseName, cpu_rank, gname )
 {
+  SYS_T::print_fatal_if(gname != "ebc_wall", 
+      "Error: ALocal_EBC_wall data should be read from group ebc_wall.\n" );
+
   // Read in the fluid density, thickness, and young's modulus
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
   hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
@@ -15,13 +18,10 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
   youngsmod.clear();
 
   // wall has only one surface per the assumption in wall ebc  
-  const int ebc_id = 0;
-
-  if( num_local_cell[ebc_id] > 0 )
+  if( num_local_cell[0] > 0 )
   {
     std::string subgroup_name(gname);
-    subgroup_name.append("/ebcid_");
-    subgroup_name.append( SYS_T::to_string(ebc_id) );
+    subgroup_name.append("/ebcid_0");
 
     h5r -> read_doubleVector( subgroup_name.c_str(), "thickness", thickness );
     h5r -> read_doubleVector( subgroup_name.c_str(), "youngsmod", youngsmod );
