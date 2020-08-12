@@ -134,11 +134,11 @@ class PGAssem_2x2Block_NS_FEM
 
     PetscInt * row_index_v, * row_index_p, * srow_index_v, * srow_index_p;
 
-    double * array_v, * array_p, * array_dot_v, * array_dot_p;
+    double * array_a, * array_b;
 
-    double * local_v, * local_p, * local_dot_v, * local_dot_p;
+    double * local_a, * local_b;
 
-    double * local_vs, * local_ps, * local_dot_vs, * local_dot_ps;
+    double * local_as, * local_bs;
 
     int * IEN_e, * LSIEN;
 

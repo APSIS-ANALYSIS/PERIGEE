@@ -85,15 +85,11 @@ PGAssem_2x2Block_NS_FEM::PGAssem_2x2Block_NS_FEM(
   row_index_v = new PetscInt [nLocBas * dof_mat_v];
   row_index_p = new PetscInt [nLocBas * dof_mat_p];
 
-  array_v = new double [nlgn * dof_mat_v];
-  array_p = new double [nlgn * dof_mat_p];
-  array_dot_v = new double [nlgn * dof_mat_v];
-  array_dot_p = new double [nlgn * dof_mat_p];
+  array_a = new double [nlgn * dof_sol];
+  array_b = new double [nlgn * dof_sol];
 
-  local_v = new double [nLocBas * dof_mat_v];
-  local_p = new double [nLocBas * dof_mat_p];
-  local_dot_v = new double [nLocBas * dof_mat_v];
-  local_dot_p = new double [nLocBas * dof_mat_p];
+  local_a = new double [nLocBas * dof_sol];
+  local_b = new double [nLocBas * dof_sol];
 
   IEN_e = new int [nLocBas];
 
@@ -104,10 +100,8 @@ PGAssem_2x2Block_NS_FEM::PGAssem_2x2Block_NS_FEM(
   if(num_ebc > 0)
   {
     LSIEN = new int [snLocBas];
-    local_vs = new double [snLocBas * dof_mat_v];
-    local_ps = new double [snLocBas * dof_mat_p];
-    local_dot_vs = new double [snLocBas * dof_mat_v];
-    local_dot_ps = new double [snLocBas * dof_mat_p];
+    local_as = new double [dof_sol * snLocBas];
+    local_bs = new double [dof_sol * snLocBas];
     sctrl_x = new double [snLocBas];
     sctrl_y = new double [snLocBas];
     sctrl_z = new double [snLocBas];
@@ -116,16 +110,10 @@ PGAssem_2x2Block_NS_FEM::PGAssem_2x2Block_NS_FEM(
   }
 
   // Initialize values for array
-  for(int ii=0; ii<nlgn*dof_mat_v; ++ii)
+  for(int ii=0; ii<nlgn*dof_sol; ++ii)
   {
-    array_v[ii] = 0.0;
-    array_dot_v[ii] = 0.0;
-  }
-
-  for(int ii=0; ii<nlgn*dof_mat_p; ++ii)
-  {
-    array_p[ii] = 0.0;
-    array_dot_p[ii] = 0.0;
+    array_a[ii] = 0.0;
+    array_b[ii] = 0.0;
   }
 
   // Nonzero pattern assembly
@@ -166,7 +154,7 @@ void PGAssem_2x2Block_NS_FEM::EssBC_KG( const ALocal_NodalBC * const &nbc_part )
       VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
     }
   }
-  
+
   // velocity dofs
   for(int field=1; field<=3; ++field)
   {
@@ -220,7 +208,7 @@ void PGAssem_2x2Block_NS_FEM::EssBC_G( const ALocal_NodalBC * const &nbc_part )
       VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
     }
   }
-  
+
   // velo fields from 1 to 3
   for(int field=1; field<=3; ++field)
   {
