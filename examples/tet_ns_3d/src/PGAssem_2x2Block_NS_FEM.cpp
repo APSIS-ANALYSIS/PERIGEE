@@ -249,5 +249,191 @@ void PGAssem_2x2Block_NS_FEM::Assem_nonzero_estimate(
 
 
 
+double PGAssem_2x2Block_NS_FEM::Assem_surface_flowrate(
+    const PDNSolution * const &vec,
+    IPLocAssem_2x2Block * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const APart_Node * const &pnode_ptr,
+    const ALocal_EBC * const &ebc_part,
+    const int &ebc_id )
+{
+  double * array = new double [vec -> get_nlgn()];
+  double * local = new double [snLocBas * dof_sol];
+
+  vec -> GetLocalArray( array );
+
+  const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+
+  double esum = 0.0;
+
+  for(int ee=0; ee<num_sele; ++ee)
+  {
+    // Obtain the LSIEN array
+    ebc_part -> get_SIEN( ebc_id, ee, LSIEN);
+
+    // Obtain the control points coordinates
+    ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+
+    // Obtain the solution vector in this element
+    GetLocal(array, LSIEN, snLocBas, local);
+
+    esum += lassem_ptr -> get_flowrate( local, element_s, sctrl_x,
+        sctrl_y, sctrl_z, quad_s );
+  }
+
+  delete [] array; array = nullptr;
+  delete [] local; local = nullptr;
+
+  double sum = 0.0;
+  MPI_Allreduce(&esum, &sum, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+
+  return sum;
+}
+
+
+double PGAssem_2x2Block_NS_FEM::Assem_surface_flowrate(
+    const PDNSolution * const &vec,
+    IPLocAssem_2x2Block * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const APart_Node * const &pnode_ptr,
+    const ALocal_Inflow_NodalBC * const &infbc_part )
+{
+  double * array = new double [vec -> get_nlgn()];
+  double * local = new double [snLocBas * dof_sol];
+
+  vec -> GetLocalArray( array );
+
+  const int num_sele = infbc_part -> get_num_local_cell();
+
+  double esum = 0.0;
+
+  for(int ee=0; ee<num_sele; ++ee)
+  {
+    // Obtain the LSIEN array
+    infbc_part -> get_SIEN( ee, LSIEN);
+
+    // Obtain the control points coordinates
+    infbc_part -> get_ctrlPts_xyz( ee, sctrl_x, sctrl_y, sctrl_z);
+
+    // Obtain the solution vector in this element
+    GetLocal(array, LSIEN, snLocBas, local);
+
+    esum += lassem_ptr -> get_flowrate( local, element_s, sctrl_x,
+        sctrl_y, sctrl_z, quad_s );
+  }
+
+  delete [] array; array = nullptr;
+  delete [] local; local = nullptr;
+
+  double sum = 0.0;
+  MPI_Allreduce(&esum, &sum, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+
+  return sum;
+}
+
+
+double PGAssem_2x2Block_NS_FEM::Assem_surface_ave_pressure(
+    const PDNSolution * const &vec,
+    IPLocAssem_2x2Block * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const APart_Node * const &pnode_ptr,
+    const ALocal_EBC * const &ebc_part,
+    const int &ebc_id )
+{
+  double * array = new double [vec -> get_nlgn()];
+  double * local = new double [snLocBas * dof_sol];
+
+  vec -> GetLocalArray( array );
+
+  const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+
+  double val_pres = 0.0, val_area = 0.0;
+
+  for(int ee=0; ee<num_sele; ++ee)
+  {
+    // Obtain the LSIEN array
+    ebc_part -> get_SIEN( ebc_id, ee, LSIEN);
+
+    // Obtain the control points coordinates
+    ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+
+    // Obtain the solution vector in this element
+    GetLocal(array, LSIEN, snLocBas, local);
+
+    double ele_pres, ele_area;
+
+    lassem_ptr-> get_pressure_area( local, element_s, sctrl_x, sctrl_y,
+        sctrl_z, quad_s, ele_pres, ele_area);
+
+    val_pres += ele_pres;
+    val_area += ele_area;
+  }
+
+  delete [] array; array = nullptr;
+  delete [] local; local = nullptr;
+
+  // Summation over CPUs
+  double sum_pres = 0.0, sum_area = 0.0;
+
+  MPI_Allreduce(&val_pres, &sum_pres, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+  MPI_Allreduce(&val_area, &sum_area, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+
+  return sum_pres / sum_area;
+}
+
+
+double PGAssem_2x2Block_NS_FEM::Assem_surface_ave_pressure(
+    const PDNSolution * const &vec,
+    IPLocAssem_2x2Block * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const APart_Node * const &pnode_ptr,
+    const ALocal_Inflow_NodalBC * const &infbc_part )
+{
+  double * array = new double [ vec->get_nlgn() ];
+  double * local = new double [snLocBas * dof_sol];
+
+  vec -> GetLocalArray( array );
+
+  const int num_sele = infbc_part -> get_num_local_cell();
+
+  double val_pres = 0.0, val_area = 0.0;
+
+  for(int ee=0; ee<num_sele; ++ee)
+  {
+    // Obtain the LSIEN array
+    infbc_part -> get_SIEN( ee, LSIEN);
+
+    // Obtain the control points coordinates
+    infbc_part -> get_ctrlPts_xyz( ee, sctrl_x, sctrl_y, sctrl_z);
+
+    // Obtain the solution vector in this element
+    GetLocal(array, LSIEN, snLocBas, local);
+
+    double ele_pres, ele_area;
+
+    lassem_ptr-> get_pressure_area( local, element_s, sctrl_x, sctrl_y,
+        sctrl_z, quad_s, ele_pres, ele_area);
+
+    val_pres += ele_pres;
+    val_area += ele_area;
+  }
+
+  delete [] array; array = nullptr;
+  delete [] local; local = nullptr;
+
+  // Summation over CPUs
+  double sum_pres = 0.0, sum_area = 0.0;
+
+  MPI_Allreduce(&val_pres, &sum_pres, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+  MPI_Allreduce(&val_area, &sum_area, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+
+  return sum_pres / sum_area;
+}
+
+
 
 // EOF

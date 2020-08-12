@@ -119,6 +119,8 @@ class PDNSolution
     //   allocated with length equal to nlocal + nghost.
     //   The user is responsible for freeing the memory allocation 
     //   after the task is done.
+    //   If one uses a dynamic array, one should allocate length
+    //   nlocal + nghost for it.
     // --------------------------------------------------------------
     virtual void GetLocalArray( double * const &local_array ) const;
     
@@ -152,7 +154,14 @@ class PDNSolution
     // --------------------------------------------------------------
     virtual int get_nlocal() const {return nlocal;}
     virtual int get_nghost() const {return nghost;}
-    
+
+    // --------------------------------------------------------------
+    // ! Get the number of local plus ghost entries in the parallel
+    //   vector's local portion. This can be used for allocating the
+    //   array for GetLocalArray.
+    // --------------------------------------------------------------
+    virtual int get_nlgn() const {return nlocal + nghost;}
+
     // --------------------------------------------------------------
     // ! Get the number of degrees of freedom 
     // --------------------------------------------------------------
