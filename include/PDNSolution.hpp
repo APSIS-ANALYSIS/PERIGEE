@@ -119,10 +119,6 @@ class PDNSolution
     //   allocated with length equal to nlocal + nghost.
     //   The user is responsible for freeing the memory allocation 
     //   after the task is done.
-    //   Note: to get the local array, one does NOT need the APart_Node
-    //   class as an input. The GetLocalArray( double * const & ) is
-    //   one that corrects this issue and use safer pointer usage. A
-    //   safer way is to call the function with std::vector as output.
     // --------------------------------------------------------------
     virtual void GetLocalArray( double * const &local_array ) const;
     
@@ -163,7 +159,11 @@ class PDNSolution
     virtual int get_dof_num() const {return dof_num;}
 
   private:
-   int nlocal, nghost, dof_num; 
+    // --------------------------------------------------------------
+    // nlocal := apart_node -> get_nlocalnode * dof_num
+    // nghost := apart_node -> get_nghostnode * dof_num
+    // --------------------------------------------------------------
+    int nlocal, nghost, dof_num; 
 };
 
 #endif
