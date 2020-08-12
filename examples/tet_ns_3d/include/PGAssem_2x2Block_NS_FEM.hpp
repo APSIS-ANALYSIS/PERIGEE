@@ -126,7 +126,7 @@ class PGAssem_2x2Block_NS_FEM
     
     virtual double Assem_surface_flowrate(
         const PDNSolution * const &sol,
-        IPLocAssem * const &lassem_ptr,
+        IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const APart_Node * const &pnode_ptr,
@@ -135,7 +135,7 @@ class PGAssem_2x2Block_NS_FEM
 
     virtual double Assem_surface_flowrate(
         const PDNSolution * const &sol,
-        IPLocAssem * const &lassem_ptr,
+        IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const APart_Node * const &pnode_ptr,
@@ -143,7 +143,7 @@ class PGAssem_2x2Block_NS_FEM
 
     virtual double Assem_surface_ave_pressure(
         const PDNSolution * const &sol,
-        IPLocAssem * const &lassem_ptr,
+        IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const APart_Node * const &pnode_ptr,
@@ -152,7 +152,7 @@ class PGAssem_2x2Block_NS_FEM
 
     virtual double Assem_surface_ave_pressure(
         const PDNSolution * const &sol,
-        IPLocAssem * const &lassem_ptr,
+        IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const APart_Node * const &pnode_ptr,
@@ -196,6 +196,32 @@ class PGAssem_2x2Block_NS_FEM
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
+
+    void GetLocal(const double * const &array, const int * const &IEN,
+        double * const &local_array) const
+    {
+      int offset1, offset2;
+      for(int ii=0; ii<nLocBas; ++ii)
+      {
+        offset1 = ii * dof_sol;
+        offset2 = IEN[ii] * dof_sol;
+        for(int jj=0; jj<dof_sol; ++jj)
+          local_array[offset1 + jj] = array[offset2 + jj];
+      }
+    }
+
+    void GetLocal( const double * const &array, const int * const &IEN,
+        const int &in_locbas, double * const &local_array) const
+    {
+      int offset1, offset2;
+      for(int ii=0; ii<in_locbas; ++ii)
+      {
+        offset1 = ii * dof_sol;
+        offset2 = IEN[ii] * dof_sol;
+        for(int jj=0; jj<dof_sol; ++jj)
+          local_array[offset1 + jj] = array[offset2 + jj];
+      }
+    }
 
 };
 
