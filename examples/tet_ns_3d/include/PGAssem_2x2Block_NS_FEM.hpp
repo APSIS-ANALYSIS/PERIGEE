@@ -143,9 +143,9 @@ class PGAssem_2x2Block_NS_FEM
 
     // --------------------------------------------------------------
     // Functions:
-    void EssBC_KG_v( const ALocal_NodalBC * const &nbc_part );
+    void EssBC_KG( const ALocal_NodalBC * const &nbc_part );
 
-    void EssBC_G_v( const ALocal_NodalBC * const &nbc_part );
+    void EssBC_G( const ALocal_NodalBC * const &nbc_part );
 
 };
 

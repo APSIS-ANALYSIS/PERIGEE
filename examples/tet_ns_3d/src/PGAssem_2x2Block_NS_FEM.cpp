@@ -135,8 +135,35 @@ PGAssem_2x2Block_NS_FEM::~PGAssem_2x2Block_NS_FEM()
 {}
 
 
-void PGAssem_2x2Block_NS_FEM::EssBC_KG_v( const ALocal_NodalBC * const &nbc_part )
+void PGAssem_2x2Block_NS_FEM::EssBC_KG( const ALocal_NodalBC * const &nbc_part )
 {
+  // pressure dof comes from field 0, to be inserted in subK[3] and subG[1]
+  const int local_dir = nbc_part->get_Num_LD(0);
+
+  if(local_dir > 0)
+  {
+    for(int i=0; i<local_dir; ++i)
+    {
+      const int row = nbc_part->get_LDN(0, i) * dof_mat_p;
+      MatSetValue(subK[3], row, row, 1.0, ADD_VALUES);
+      VecSetValue(subG[1], row, 0.0, INSERT_VALUES);
+    }
+  }
+
+  const int local_sla = nbc_part->get_Num_LPS(0);
+  if(local_sla > 0)
+  {
+    for(int i=0; i<local_sla; ++i)
+    {
+      const int row = nbc_part->get_LPSN(0, i) * dof_mat_p;
+      const int col = nbc_part->get_LPMN(0, i) * dof_mat_p;
+      MatSetValue(subK[3], row, col, 1.0, ADD_VALUES);
+      MatSetValue(subK[3], row, row, -1.0, ADD_VALUES);
+      VecSetValue(subG[1], row, 0.0, INSERT_VALUES);
+    }
+  }
+  
+  // velocity dofs
   for(int field=1; field<=3; ++field)
   {
     const int local_dir = nbc_part->get_Num_LD(field);
@@ -146,8 +173,8 @@ void PGAssem_2x2Block_NS_FEM::EssBC_KG_v( const ALocal_NodalBC * const &nbc_part
       for(int i=0; i<local_dir; ++i)
       {
         const int row = nbc_part->get_LDN(field, i) * dof_mat_v + field - 1;
-        VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
         MatSetValue(subK[0], row, row, 1.0, ADD_VALUES);
+        VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
       }
     }
 
@@ -167,8 +194,30 @@ void PGAssem_2x2Block_NS_FEM::EssBC_KG_v( const ALocal_NodalBC * const &nbc_part
 }
 
 
-void PGAssem_2x2Block_NS_FEM::EssBC_G_v( const ALocal_NodalBC * const &nbc_part )
+void PGAssem_2x2Block_NS_FEM::EssBC_G( const ALocal_NodalBC * const &nbc_part )
 {
+  // pres field is 0, to be inserted to subG[1]
+  const int local_dir = nbc_part->get_Num_LD(0);
+  if( local_dir > 0 )
+  {
+    for(int ii=0; ii<local_dir; ++ii)
+    {
+      const int row = nbc_part->get_LDN(0, ii) * dof_mat_p;
+      VecSetValue(subG[1], row, 0.0, INSERT_VALUES);
+    }
+  }
+
+  const int local_sla = nbc_part->get_Num_LPS(0);
+  if( local_sla > 0 )
+  {
+    for(int ii=0; ii<local_sla; ++ii)
+    {
+      const int row = nbc_part->get_LPSN(0, ii) * dof_mat_p;
+      VecSetValue(subG[1], row, 0.0, INSERT_VALUES);
+    }
+  }
+  
+  // velo fields from 1 to 3
   for(int field=1; field<=3; ++field)
   {
     const int local_dir = nbc_part->get_Num_LD(field);
@@ -177,7 +226,7 @@ void PGAssem_2x2Block_NS_FEM::EssBC_G_v( const ALocal_NodalBC * const &nbc_part 
       for(int ii=0; ii<local_dir; ++ii)
       {
         const int row = nbc_part->get_LDN(field, ii) * dof_mat_v + field - 1;
-        VecSetValue(G, row, 0.0, INSERT_VALUES);
+        VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
       }
     }
 
@@ -187,7 +236,7 @@ void PGAssem_2x2Block_NS_FEM::EssBC_G_v( const ALocal_NodalBC * const &nbc_part 
       for(int ii=0; ii<local_sla; ++ii)
       {
         const int row = nbc_part->get_LPSN(field, ii) * dof_mat_v + field - 1;
-        VecSetValue(G, row, 0.0, INSERT_VALUES);
+        VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
       }
     }
   }
