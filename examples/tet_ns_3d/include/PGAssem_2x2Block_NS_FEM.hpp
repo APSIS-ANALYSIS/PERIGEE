@@ -45,6 +45,11 @@ class PGAssem_2x2Block_NS_FEM
 
     virtual ~PGAssem_2x2Block_NS_FEM();
 
+    // ------------------------------------------------------------------------
+    // ! Flag : Fix nonzero structure
+    //          Add or insert in new location is ignored. Set after
+    //         the first MatAssemblyEnd().
+    // ------------------------------------------------------------------------
     void Fix_nonzero_str()
     {
       MatSetOption(subK[0], MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
@@ -53,6 +58,11 @@ class PGAssem_2x2Block_NS_FEM
       MatSetOption(subK[3], MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
     }
 
+    // ------------------------------------------------------------------------
+    // ! Flag : New allocation error
+    //          Add or insert in new locations will generate an error message.
+    //          Supports AIJ and BAIJ formats.
+    // ------------------------------------------------------------------------
     void Fix_nonzero_err_str()
     {
       MatSetOption(subK[0], MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);
@@ -61,6 +71,10 @@ class PGAssem_2x2Block_NS_FEM
       MatSetOption(subK[3], MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);
     }
     
+    // ------------------------------------------------------------------------
+    // ! Flag : Ignore new allocation
+    //          Add or insert in a new allocation will NOT generate error.
+    // ------------------------------------------------------------------------
     void Release_nonzero_err_str()
     {
       MatSetOption(subK[0], MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
@@ -69,6 +83,9 @@ class PGAssem_2x2Block_NS_FEM
       MatSetOption(subK[3], MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
     }
 
+    // ------------------------------------------------------------------------
+    // ! Flag : Keep nonzero pattern of the matrix K
+    // ------------------------------------------------------------------------
     void Keep_nonzero_pattern()
     {
       MatSetOption(subK[0], MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);
@@ -77,12 +94,18 @@ class PGAssem_2x2Block_NS_FEM
       MatSetOption(subK[3], MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);
     }
 
+    // ------------------------------------------------------------------------
+    // ! Clear K and G to be zero
+    // ------------------------------------------------------------------------
     void Clear_KG()
     {
       MatZeroEntries(K);
       VecSet(G, 0.0);
     }
 
+    // ------------------------------------------------------------------------
+    // ! Clear G to be zero
+    // ------------------------------------------------------------------------
     void Clear_G() {VecSet(G, 0.0);}
 
     
