@@ -1,12 +1,11 @@
-#include "PLocAssem_Tet_VMS_NS_GenAlpha.hpp"
+#include "PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha.hpp"
 
-PLocAssem_Tet_VMS_NS_GenAlpha::PLocAssem_Tet_VMS_NS_GenAlpha(
-        const TimeMethod_GenAlpha * const &tm_gAlpha,
-        const int &in_nlocbas, const int &in_nqp,
-        const int &in_snlocbas,
-        const double &in_rho, const double &in_vis_mu,
-        const double &in_beta, const double &in_ctauc, 
-        const int &elemtype )
+PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha(
+    const TimeMethod_GenAlpha * const &tm_gAlpha,
+    const int &in_nlocbas, const int &in_nqp,
+    const int &in_snlocbas, const double &in_rho,
+    const double &in_vis_mu, const double &in_beta,
+    const double &in_ctauc, const int &elemtype )
 : rho0( in_rho ), vis_mu( in_vis_mu ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()), beta(in_beta), nqp(in_nqp),
@@ -26,22 +25,24 @@ PLocAssem_Tet_VMS_NS_GenAlpha::PLocAssem_Tet_VMS_NS_GenAlpha(
   }
   else SYS_T::print_fatal("Error: unknown elem type.\n");
 
-  vec_size = nLocBas * 4; // dof_per_node = 4
-  sur_size = snLocBas * 4;
+  vec_size_v = nLocBas * 3;
+  vec_size_p = nLocBas;
+  sur_size_v = snLocBas * 3;
 
   R.resize(nLocBas);
-  dR_dx.resize(nLocBas);
-  dR_dy.resize(nLocBas);
-  dR_dz.resize(nLocBas);
-  d2R_dxx.resize(nLocBas);
-  d2R_dyy.resize(nLocBas);
-  d2R_dzz.resize(nLocBas);
+  dR_dx.resize(nLocBas); dR_dy.resize(nLocBas); dR_dz.resize(nLocBas);
+  d2R_dxx.resize(nLocBas); d2R_dyy.resize(nLocBas); d2R_dzz.resize(nLocBas);
 
-  Tangent = new PetscScalar[vec_size * vec_size];
-  Residual = new PetscScalar[vec_size];
+  Tangent00 = new PetscScalar[vec_size_p * vec_size_p];
+  Tangent01 = new PetscScalar[vec_size_p * vec_size_v];
+  Tangent10 = new PetscScalar[vec_size_v * vec_size_p];
+  Tangent11 = new PetscScalar[vec_size_v * vec_size_v];
+  
+  Residual0 = new PetscScalar[vec_size_p];
+  Residual1 = new PetscScalar[vec_size_v];
 
-  sur_Tangent = new PetscScalar[sur_size * sur_size];
-  sur_Residual = new PetscScalar[sur_size];
+  sur_Tangent11 = new PetscScalar[sur_size_v * sur_size_v];
+  sur_Residual1 = new PetscScalar[sur_size_v];
 
   Zero_Tangent_Residual();
 
@@ -51,16 +52,23 @@ PLocAssem_Tet_VMS_NS_GenAlpha::PLocAssem_Tet_VMS_NS_GenAlpha(
 }
 
 
-PLocAssem_Tet_VMS_NS_GenAlpha::~PLocAssem_Tet_VMS_NS_GenAlpha()
+PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::~PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha()
 {
-  delete [] Tangent; Tangent = nullptr; 
-  delete [] Residual; Residual = nullptr;
-  delete [] sur_Tangent; sur_Tangent = nullptr;
-  delete [] sur_Residual; sur_Residual = nullptr;
+  delete Tangent00; Tangent00 = nullptr;
+  delete Tangent01; Tangent01 = nullptr;
+  delete Tangent10; Tangent10 = nullptr;
+  delete Tangent11; Tangent11 = nullptr;
+
+  delete sur_Tangent11; sur_Tangent11 = nullptr;
+
+  delete Residual0; Residual0 = nullptr;
+  delete Residual1; Residual1 = nullptr;
+  
+  delete sur_Residual1; sur_Residual1 = nullptr;
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::print_info() const
+void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
   SYS_T::commPrint("  Three-dimensional Incompressible Navier-Stokes equations: \n");
@@ -86,12 +94,10 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::print_info() const
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::get_metric(
-    const double * const &f,
+void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::get_metric( const double * const &f,
     double &G11, double &G12, double &G13,
     double &G22, double &G23, double &G33 ) const
 {
-  // PHASTA definition 
   const double coef = 0.6299605249474365;
   const double diag = 2.0;
   const double offd = 1.0;
@@ -115,12 +121,10 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_metric(
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::get_tau(
-    double &tau_m_qua, double &tau_c_qua,
+void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::get_tau( double &tau_m_qua, double &tau_c_qua,
     const double &dt, const double * const &dxi_dx,
     const double &u, const double &v, const double &w ) const
 {
-  // Use K matrix to correct the metric
   double G11, G12, G13, G22, G23, G33;
   get_metric( dxi_dx, G11, G12, G13, G22, G23, G33 );
 
@@ -144,7 +148,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_tau(
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::get_DC(
+void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::get_DC( 
     double &dc_tau, const double * const &dxi_dx,
     const double &u, const double &v, const double &w ) const
 {
@@ -161,7 +165,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_DC(
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
+void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual(
     const double &time, const double &dt,
     const double * const &dot_sol,
     const double * const &sol,
@@ -173,12 +177,9 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  double f1, f2, f3;
-
-  double tau_m, tau_c, tau_dc;
+  double fx, fy, fz, tau_m, tau_c, tau_dc;
 
   const double two_mu = 2.0 * vis_mu;
-
   const double curr = time + alpha_f * dt;
 
   Zero_Residual();
@@ -252,15 +253,15 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
     // Get the body force
-    get_f(coor_x, coor_y, coor_z, curr, f1, f2, f3);
+    get_f(coor_x, coor_y, coor_z, curr, fx, fy, fz);
 
     const double u_lap = u_xx + u_yy + u_zz;
     const double v_lap = v_xx + v_yy + v_zz;
     const double w_lap = w_xx + w_yy + w_zz;
 
-    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f1 ) + p_x - vis_mu * u_lap;
-    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f2 ) + p_y - vis_mu * v_lap;
-    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f3 ) + p_z - vis_mu * w_lap;
+    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - fx ) + p_x - vis_mu * u_lap;
+    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - fy ) + p_y - vis_mu * v_lap;
+    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - fz ) + p_z - vis_mu * w_lap;
 
     const double div_vel = u_x + v_y + w_z;
 
@@ -271,20 +272,21 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
     const double r_dot_gradu = u_x * rx + u_y * ry + u_z * rz;
     const double r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
     const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
-    
+
     // Get the Discontinuity Capturing tau
     get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
 
     for(int A=0; A<nLocBas; ++A)
     {
       const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
+
       const double velo_dot_gradR = NA_x * u + NA_y * v + NA_z * w;
       const double r_dot_gradR = NA_x * rx + NA_y * ry + NA_z * rz;
       const double velo_prime_dot_gradR = NA_x * u_prime + NA_y * v_prime + NA_z * w_prime;
 
-      Residual[4*A] += gwts * ( NA * div_vel + tau_m * r_dot_gradR );
+      Residual0[A] += gwts * ( NA * div_vel + tau_m * r_dot_gradR );
 
-      Residual[4*A+1] += gwts * ( NA * rho0 * u_t
+      Residual1[3*A] += gwts * ( NA * rho0 * u_t
           + NA * rho0 * (u * u_x + v * u_y + w * u_z)
           - NA_x * p
           + NA_x * two_mu * u_x
@@ -296,9 +298,9 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * rx
           + velo_prime_dot_gradR * tau_dc 
           * (u_prime * u_x + v_prime * u_y + w_prime * u_z)
-          - NA * rho0 * f1 );
+          - NA * rho0 * fx );
 
-      Residual[4*A+2] += gwts * ( NA * rho0 * v_t
+      Residual1[3*A+1] += gwts * ( NA * rho0 * v_t
           + NA * rho0 * (u * v_x + v * v_y + w * v_z)
           - NA_y * p
           + NA_x * vis_mu * (u_y + v_x)
@@ -310,9 +312,9 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * ry
           + velo_prime_dot_gradR * tau_dc
           * (u_prime * v_x + v_prime * v_y + w_prime * v_z)
-          - NA * rho0 * f2 );
+          - NA * rho0 * fy );
 
-      Residual[4*A+3] += gwts * (NA * rho0 * w_t
+      Residual1[3*A+2] += gwts * (NA * rho0 * w_t
           + NA * rho0 * (u * w_x + v * w_y + w * w_z)
           - NA_z * p
           + NA_x * vis_mu * (u_z + w_x)
@@ -324,13 +326,13 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * rz
           + velo_prime_dot_gradR * tau_dc
           * (u_prime * w_x + v_prime * w_y + w_prime * w_z)
-          - NA * rho0 * f3 );
+          - NA * rho0 * fz );
     }
   }
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
+void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual( 
     const double &time, const double &dt,
     const double * const &dot_sol,
     const double * const &sol,
@@ -342,7 +344,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  double f1, f2, f3;
+  double fx, fy, fz;
 
   double tau_m, tau_c, tau_dc;
 
@@ -423,15 +425,15 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua); 
 
-    get_f(coor_x, coor_y, coor_z, curr, f1, f2, f3);
+    get_f(coor_x, coor_y, coor_z, curr, fx, fy, fz);
 
     const double u_lap = u_xx + u_yy + u_zz;
     const double v_lap = v_xx + v_yy + v_zz;
     const double w_lap = w_xx + w_yy + w_zz;
 
-    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f1 ) + p_x - vis_mu * u_lap;
-    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f2 ) + p_y - vis_mu * v_lap ;
-    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f3 ) + p_z - vis_mu * w_lap;
+    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - fx ) + p_x - vis_mu * u_lap;
+    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - fy ) + p_y - vis_mu * v_lap ;
+    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - fz ) + p_z - vis_mu * w_lap;
 
     const double div_vel = u_x + v_y + w_z;
 
@@ -442,7 +444,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     const double r_dot_gradu = u_x * rx + u_y * ry + u_z * rz;
     const double r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
     const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
-    
+
     get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
 
     for(int A=0; A<nLocBas; ++A)
@@ -453,9 +455,9 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
       const double r_dot_gradR = NA_x * rx + NA_y * ry + NA_z * rz;
       const double velo_prime_dot_gradR = NA_x * u_prime + NA_y * v_prime + NA_z * w_prime;
 
-      Residual[4*A] += gwts * ( NA * div_vel + tau_m * r_dot_gradR );
+      Residual0[A] += gwts * ( NA * div_vel + tau_m * r_dot_gradR );
 
-      Residual[4*A+1] += gwts * ( NA * rho0 * u_t
+      Residual1[3*A] += gwts * ( NA * rho0 * u_t
           + NA * rho0 * (u * u_x + v * u_y + w * u_z)
           - NA_x * p
           + NA_x * two_mu * u_x
@@ -467,9 +469,9 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * rx
           + velo_prime_dot_gradR * tau_dc 
           * (u_prime * u_x + v_prime * u_y + w_prime * u_z)
-          - NA * rho0 * f1 );
+          - NA * rho0 * fx );
 
-      Residual[4*A+2] += gwts * ( NA * rho0 * v_t
+      Residual1[3*A+1] += gwts * ( NA * rho0 * v_t
           + NA * rho0 * (u * v_x + v * v_y + w * v_z)
           - NA_y * p
           + NA_x * vis_mu * (u_y + v_x)
@@ -481,9 +483,9 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * ry
           + velo_prime_dot_gradR * tau_dc
           * (u_prime * v_x + v_prime * v_y + w_prime * v_z)
-          - NA * rho0 * f2 );
+          - NA * rho0 * fy );
 
-      Residual[4*A+3] += gwts * (NA * rho0 * w_t
+      Residual1[3*A+2] += gwts * (NA * rho0 * w_t
           + NA * rho0 * (u * w_x + v * w_y + w * w_z)
           - NA_z * p
           + NA_x * vis_mu * (u_z + w_x)
@@ -495,7 +497,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * rz
           + velo_prime_dot_gradR * tau_dc
           * (u_prime * w_x + v_prime * w_y + w_prime * w_z)
-          - NA * rho0 * f3 );
+          - NA * rho0 * fz );
 
       for(int B=0; B<nLocBas; ++B)
       {
@@ -523,29 +525,29 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
         const double drz_dw_B = rho0 * ( w_z * NB + velo_dot_gradNB ) - vis_mu * NB_lap;
 
         // Continuity equation with respect to p, u, v, w
-        Tangent[16*nLocBas*A+4*B] += gwts * dd_dv * tau_m * (NAxNBx + NAyNBy + NAzNBz);
+        Tangent00[nLocBas*A+B] += gwts * dd_dv * tau_m * (NAxNBx + NAyNBy + NAzNBz);
 
-        Tangent[16*nLocBas*A+4*B+1] += gwts * ( alpha_m * tau_m * rho0 * NAxNB
+        Tangent01[3*nLocBas*A+3*B] += gwts * ( alpha_m * tau_m * rho0 * NAxNB
             + dd_dv * ( NANBx + tau_m * NA_x * drx_du_B
               + tau_m * NA_y * dry_du_B + tau_m * NA_z * drz_du_B ) );
 
-        Tangent[16*nLocBas*A+4*B+2] += gwts * ( alpha_m * tau_m * rho0 * NAyNB
+        Tangent01[3*nLocBas*A+3*B+1] += gwts * ( alpha_m * tau_m * rho0 * NAyNB
             + dd_dv * ( NANBy + tau_m * NA_x * drx_dv_B
               + tau_m * NA_y * dry_dv_B + tau_m * NA_z * drz_dv_B ) );
 
-        Tangent[16*nLocBas*A+4*B+3] += gwts * ( alpha_m * tau_m * rho0 * NAzNB
+        Tangent01[3*nLocBas*A+3*B+2] += gwts * ( alpha_m * tau_m * rho0 * NAzNB
             + dd_dv * ( NANBz + tau_m * NA_x * drx_dw_B
               + tau_m * NA_y * dry_dw_B + tau_m * NA_z * drz_dw_B ) );
 
         // Momentum-x with respect to p, u, v, w
-        Tangent[4*nLocBas*(4*A+1)+4*B] += gwts * dd_dv * ((-1.0) * NAxNB
+        Tangent10[nLocBas*(3*A)+B] += gwts * dd_dv * ((-1.0) * NAxNB
             + velo_dot_gradR * tau_m * rho0 * NB_x
             - NA * tau_m * rho0 * (u_x * NB_x + u_y * NB_y + u_z * NB_z)
             - 2.0 * tau_m_2 * rho0 * rx * NAxNBx
             - tau_m_2 * rho0 * NA_y * (rx * NB_y + ry * NB_x)
             - tau_m_2 * rho0 * NA_z * (rx * NB_z + rz * NB_x) );
 
-        Tangent[4*nLocBas*(4*A+1)+4*B+1] += gwts * ( 
+        Tangent11[9*nLocBas*A+3*B] += gwts * ( 
             alpha_m * ( rho0 * NANB + velo_dot_gradR * rho0_2 * tau_m * NB
               - rho0_2 * tau_m * u_x * NANB
               - rho0_2 * tau_m_2 * rx * NAxNB
@@ -565,7 +567,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * rx * NA_z * drz_du_B
               + velo_prime_dot_gradR * tau_dc * velo_prime_dot_gradNB ) );
 
-        Tangent[4*nLocBas*(4*A+1)+4*B+2] += gwts * ( 
+        Tangent11[9*nLocBas*A+3*B+1] += gwts * ( 
             alpha_m * (-1.0) * rho0_2 * (tau_m * u_y * NANB + tau_m_2 * rx * NAyNB)
             + dd_dv * ( NANB * rho0 * u_y + vis_mu * NAyNBx 
               + rho0 * tau_m * rx * NAyNB
@@ -576,7 +578,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_y * (rx * dry_dv_B + ry * drx_dv_B)
               - rho0 * tau_m_2 * NA_z * (rx * drz_dv_B + rz * drx_dv_B) ) );
 
-        Tangent[4*nLocBas*(4*A+1)+4*B+3] += gwts * (
+        Tangent11[9*nLocBas*A+3*B+2] += gwts * (
             alpha_m * (-1.0) * rho0_2 * (tau_m * u_z * NANB + tau_m_2 * rx * NAzNB)
             + dd_dv * ( NANB * rho0 * u_z + vis_mu * NAzNBx 
               + rho0 * tau_m * rx * NAzNB
@@ -588,14 +590,14 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_z * (rx * drz_dw_B + rz * drx_dw_B) ) );
 
         // Momentum-y with respect to p u v w
-        Tangent[4*nLocBas*(4*A+2)+4*B] += gwts * dd_dv * ( (-1.0) * NAyNB
+        Tangent10[nLocBas*(3*A+1)+B] += gwts * dd_dv * ( (-1.0) * NAyNB
             + velo_dot_gradR * tau_m * rho0 * NB_y
             - NA * tau_m * rho0 * (v_x * NB_x + v_y * NB_y + v_z * NB_z)
             - tau_m_2 * rho0 * NA_x * (rx * NB_y + ry * NB_x)
             - 2.0 * tau_m_2 * rho0 * ry * NAyNBy
             - tau_m_2 * rho0 * NA_z * (ry * NB_z + rz * NB_y) );
 
-        Tangent[4*nLocBas*(4*A+2)+4*B+1] += gwts * (
+        Tangent11[3*nLocBas*(3*A+1)+3*B] += gwts * (
             alpha_m * (-1.0) * rho0_2 * (tau_m * v_x * NANB + tau_m_2 * ry * NAxNB)
             + dd_dv * ( NANB * rho0 * v_x + vis_mu * NAxNBy
               + rho0 * tau_m * ry * NAxNB
@@ -606,7 +608,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - 2.0 * rho0 * tau_m_2 * ry * NA_y * dry_du_B
               - rho0 * tau_m_2 * NA_z * (ry * drz_du_B + rz * dry_du_B) ) );
 
-        Tangent[4*nLocBas*(4*A+2)+4*B+2] += gwts * (
+        Tangent11[3*nLocBas*(3*A+1)+3*B+1] += gwts * (
             alpha_m * ( rho0 * NANB + velo_dot_gradR * rho0_2 * tau_m * NB
               - rho0_2 * tau_m * v_y * NANB
               - rho0_2 * tau_m_2 * ry * NAyNB
@@ -623,7 +625,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_z * (ry * drz_dv_B + rz * dry_dv_B)
               + velo_prime_dot_gradR * tau_dc * velo_prime_dot_gradNB ) );
 
-        Tangent[4*nLocBas*(4*A+2)+4*B+3] += gwts * (
+        Tangent11[3*nLocBas*(3*A+1)+3*B+2] += gwts * (
             alpha_m * (-1.0) * rho0_2 * ( tau_m * v_z * NANB + tau_m_2 * ry * NAzNB ) 
             + dd_dv * ( NANB * rho0 * v_z + vis_mu * NAzNBy
               + rho0 * tau_m * ry * NAzNB
@@ -635,14 +637,14 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_z * (ry * drz_dw_B + rz * dry_dw_B) ) );
 
         // Momentum-z with respect to p u v w
-        Tangent[4*nLocBas*(4*A+3)+4*B] += gwts * dd_dv * ( (-1.0) * NAzNB
+        Tangent10[nLocBas*(3*A+2)+B] += gwts * dd_dv * ( (-1.0) * NAzNB
             + velo_dot_gradR * tau_m * rho0 * NB_z
             - NA * tau_m * rho0 * (w_x * NB_x + w_y * NB_y + w_z * NB_z)
             - tau_m_2 * rho0 * NA_x * (rx * NB_z + rz * NB_x)
             - tau_m_2 * rho0 * NA_y * (ry * NB_z + rz * NB_y)
             - 2.0 * tau_m_2 * rho0 * rz * NAzNBz );
 
-        Tangent[4*nLocBas*(4*A+3)+4*B+1] += gwts * (
+        Tangent11[3*nLocBas*(3*A+2)+3*B] += gwts * (
             alpha_m * (-1.0) * rho0_2 * (tau_m * w_x * NANB + tau_m_2 * rz * NAxNB)
             + dd_dv * ( NANB * rho0 * w_x + vis_mu * NAxNBz
               + rho0 * tau_m * rz * NAxNB
@@ -653,7 +655,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_y * (ry * drz_du_B + rz * dry_du_B)
               - 2.0 * rho0 * tau_m_2 * rz * NA_z * drz_du_B ) );
 
-        Tangent[4*nLocBas*(4*A+3)+4*B+2] += gwts * (
+        Tangent11[3*nLocBas*(3*A+2)+3*B+1] += gwts * (
             alpha_m * (-1.0) * rho0_2 * (tau_m * w_y * NANB + tau_m_2 * rz * NAyNB)
             + dd_dv * ( NANB * rho0 * w_y + vis_mu * NAyNBz
               + rho0 * tau_m * rz * NAyNB
@@ -664,7 +666,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_y * (ry * drz_dv_B + rz * dry_dv_B)
               - 2.0 * rho0 * tau_m_2 * rz * NA_z * drz_dv_B ) );
 
-        Tangent[4*nLocBas*(4*A+3)+4*B+3] += gwts * (
+        Tangent11[3*nLocBas*(3*A+2)+3*B+2] += gwts * (
             alpha_m * ( rho0 * NANB + velo_dot_gradR * rho0_2 * tau_m * NB
               - rho0_2 * tau_m * w_z * NANB
               - rho0_2 * tau_m_2 * rz * NAzNB
@@ -693,7 +695,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
+void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
     const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
@@ -703,10 +705,9 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  double f1, f2, f3;
+  double fx, fy, fz;
 
   const double two_mu = 2.0 * vis_mu;
-
   const double curr = 0.0;
 
   Zero_Tangent_Residual();
@@ -748,46 +749,47 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
-    get_f(coor_x, coor_y, coor_z, curr, f1, f2, f3);
+    get_f(coor_x, coor_y, coor_z, curr, fx, fy, fz);
 
     for(int A=0; A<nLocBas; ++A)
     {
       const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
-      Residual[4*A+1] += gwts * ( NA * rho0 * (u*u_x + v*u_y + w*u_z) 
+      Residual1[3*A] += gwts * ( NA * rho0 * (u*u_x + v*u_y + w*u_z) 
           - NA_x * p
           + two_mu * NA_x * u_x
           + vis_mu * NA_y * (u_y + v_x)
           + vis_mu * NA_z * (u_z + w_x)
-          - NA * rho0 * f1 );
+          - NA * rho0 * fx );
 
-      Residual[4*A+2] += gwts * ( NA * rho0 * (u*v_x + v*v_y + w*v_z) 
+      Residual1[3*A+1] += gwts * ( NA * rho0 * (u*v_x + v*v_y + w*v_z) 
           - NA_y * p
           + vis_mu * NA_x * (u_y + v_x)
           + two_mu * NA_y * v_y
           + vis_mu * NA_z * (v_z + w_y)
-          - NA * rho0 * f2 );
+          - NA * rho0 * fy );
 
-      Residual[4*A+3] += gwts * ( NA * rho0 * (u*w_x + v*w_y + w*w_z) 
+      Residual1[3*A+2] += gwts * ( NA * rho0 * (u*w_x + v*w_y + w*w_z) 
           - NA_z * p
           + vis_mu * NA_x * (u_z + w_x)
           + vis_mu * NA_y * (w_y + v_z)
           + two_mu * NA_z * w_z
-          - NA * rho0 * f3 );
+          - NA * rho0 * fz );
 
       for(int B=0; B<nLocBas; ++B)
       {
-        Tangent[4*nLocBas*(4*A) + 4*B] += gwts * rho0 * NA * R[B];
-        Tangent[4*nLocBas*(4*A+1) + 4*B+1] += gwts * rho0 * NA * R[B];
-        Tangent[4*nLocBas*(4*A+2) + 4*B+2] += gwts * rho0 * NA * R[B];
-        Tangent[4*nLocBas*(4*A+3) + 4*B+3] += gwts * rho0 * NA * R[B];
+        Tangent00[nLocBas*A + B] += gwts * rho0 * NA * R[B];
+
+        Tangent11[3*nLocBas*(3*A) + 3*B]     += gwts * rho0 * NA * R[B];
+        Tangent11[3*nLocBas*(3*A+1) + 3*B+1] += gwts * rho0 * NA * R[B];
+        Tangent11[3*nLocBas*(3*A+2) + 3*B+2] += gwts * rho0 * NA * R[B];
       }
     }
   }
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
+void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
     const int &ebc_id,
     const double &time, const double &dt,
     FEAElement * const &element,
@@ -824,15 +826,15 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
 
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * gx;
-      Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * gy;
-      Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * gz;
+      Residual1[3*A]   -= surface_area * quad -> get_qw(qua) * R[A] * gx;
+      Residual1[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * gy;
+      Residual1[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * gz;
     }
   }
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
+void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
     const int &ebc_id,
     const double &val,
     FEAElement * const &element,
@@ -856,15 +858,15 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
 
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual[4*A+1] += surface_area * quad -> get_qw(qua) * R[A] * nx * val;
-      Residual[4*A+2] += surface_area * quad -> get_qw(qua) * R[A] * ny * val;
-      Residual[4*A+3] += surface_area * quad -> get_qw(qua) * R[A] * nz * val;
+      Residual1[3*A]   += surface_area * quad -> get_qw(qua) * R[A] * nx * val;
+      Residual1[3*A+1] += surface_area * quad -> get_qw(qua) * R[A] * ny * val;
+      Residual1[3*A+2] += surface_area * quad -> get_qw(qua) * R[A] * nz * val;
     }
   }
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
+void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
     const double * const &dot_sol,
     const double * const &sol,
     FEAElement * const &element,
@@ -902,15 +904,15 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
 
     for(int A=0; A<snLocBas; ++A)
     {
-      sur_Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * factor * u;
-      sur_Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * factor * v;
-      sur_Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * factor * w;
+      sur_Residual1[3*A]   -= surface_area * quad -> get_qw(qua) * R[A] * factor * u;
+      sur_Residual1[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * factor * v;
+      sur_Residual1[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * factor * w;
     }
   }
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
+void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
     const double &dt,
     const double * const &dot_sol,
     const double * const &sol,
@@ -954,24 +956,24 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
     //            6 for quadratic tri element
     for(int A=0; A<snLocBas; ++A)
     {
-      sur_Residual[4*A+1] -= gwts * R[A] * factor * u;
-      sur_Residual[4*A+2] -= gwts * R[A] * factor * v;
-      sur_Residual[4*A+3] -= gwts * R[A] * factor * w;
+      sur_Residual1[3*A]   -= gwts * R[A] * factor * u;
+      sur_Residual1[3*A+1] -= gwts * R[A] * factor * v;
+      sur_Residual1[3*A+2] -= gwts * R[A] * factor * w;
 
       for(int B=0; B<snLocBas; ++B)
       {
         // index := A *snLocBas+B here ranges from 0 to 8 for linear triangle
         //                        0 to 35 for quadratic triangle
-        sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+1 ] -= gwts * dd_dv * R[A] * factor * R[B];
-        sur_Tangent[ 4*snLocBas*(4*A+2) + 4*B+2 ] -= gwts * dd_dv * R[A] * factor * R[B];
-        sur_Tangent[ 4*snLocBas*(4*A+3) + 4*B+3 ] -= gwts * dd_dv * R[A] * factor * R[B];
+        sur_Tangent11[ 3*snLocBas*(3*A) + 3*B ]     -= gwts * dd_dv * R[A] * factor * R[B];
+        sur_Tangent11[ 3*snLocBas*(3*A+1) + 3*B+1 ] -= gwts * dd_dv * R[A] * factor * R[B];
+        sur_Tangent11[ 3*snLocBas*(3*A+2) + 3*B+2 ] -= gwts * dd_dv * R[A] * factor * R[B];
       }
     }
   }
 }
 
 
-double PLocAssem_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &sol,
+double PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
@@ -1006,7 +1008,7 @@ double PLocAssem_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &sol,
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::get_pressure_area( 
+void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::get_pressure_area( 
     const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
@@ -1021,8 +1023,8 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_pressure_area(
 
   double nx, ny, nz, surface_area;
 
-  // Initialize the two variables to be passed out
-  pres = 0.0; area = 0.0;
+  pres = 0.0;
+  area = 0.0;
 
   for(int qua =0; qua < face_nqp; ++qua)
   {
@@ -1030,7 +1032,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_pressure_area(
     element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
 
     double pp = 0.0;
-    for(int ii=0; ii<snLocBas; ++ii) pp += sol[4*ii+0] * R[ii];
+    for(int ii=0; ii<snLocBas; ++ii) pp += sol[4*ii+0] * R[ii]; 
 
     pres += surface_area * quad->get_qw(qua) * pp;
     area += surface_area * quad->get_qw(qua);
