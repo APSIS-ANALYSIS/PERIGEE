@@ -132,10 +132,8 @@ class IPLocAssem_2x2Block
     // Assembly the Residuals: Residual0 and Residual1. 
     virtual void Assem_Residual(
         const double &time, const double &dt,
-        const double * const &dot_vec_0,
-        const double * const &dot_vec_1,
-        const double * const &vec_0,
-        const double * const &vec_1,
+        const double * const &dot_vec,
+        const double * const &vec,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
