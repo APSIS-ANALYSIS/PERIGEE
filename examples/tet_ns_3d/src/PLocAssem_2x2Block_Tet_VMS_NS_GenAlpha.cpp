@@ -914,7 +914,8 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
 
 void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
     const double &dt,
-    const double * const &velo,
+    const double * const &dot_sol,
+    const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
@@ -939,9 +940,9 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab
     double u = 0.0, v = 0.0, w = 0.0;
     for(int ii=0; ii<snLocBas; ++ii)
     {
-      u += velo[ii*3]   * R[ii];
-      v += velo[ii*3+1] * R[ii];
-      w += velo[ii*3+2] * R[ii];
+      u += sol[ii*4+1] * R[ii];
+      v += sol[ii*4+2] * R[ii];
+      w += sol[ii*4+3] * R[ii];
     }
 
     const double temp = u * nx + v * ny + w * nz;
@@ -972,7 +973,7 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab
 }
 
 
-double PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &velo,
+double PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
@@ -995,9 +996,9 @@ double PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::get_flowrate( const double * cons
     double u = 0.0, v = 0.0, w = 0.0;
     for(int ii=0; ii<snLocBas; ++ii)
     {
-      u += velo[ii*3]   * R[ii];
-      v += velo[ii*3+1] * R[ii];
-      w += velo[ii*3+2] * R[ii];
+      u += sol[ii*4+1] * R[ii];
+      v += sol[ii*4+2] * R[ii];
+      w += sol[ii*4+3] * R[ii];
     }
 
     flrate += surface_area * quad->get_qw(qua) * ( u * nx + v * ny + w * nz );
@@ -1031,7 +1032,7 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::get_pressure_area(
     element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
 
     double pp = 0.0;
-    for(int ii=0; ii<snLocBas; ++ii) pp += sol[ii] * R[ii];
+    for(int ii=0; ii<snLocBas; ++ii) pp += sol[4*ii+0] * R[ii]; 
 
     pres += surface_area * quad->get_qw(qua) * pp;
     area += surface_area * quad->get_qw(qua);

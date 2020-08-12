@@ -108,7 +108,7 @@ class PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
-    virtual double get_flowrate( const double * const &velo,
+    virtual double get_flowrate( const double * const &vec,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -143,7 +143,8 @@ class PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
 
     virtual void Assem_Tangent_Residual_BackFlowStab(
         const double &dt,
-        const double * const &velo,
+        const double * const &dot_sol,
+        const double * const &sol,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
