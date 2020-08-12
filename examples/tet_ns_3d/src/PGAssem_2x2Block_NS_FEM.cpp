@@ -135,6 +135,65 @@ PGAssem_2x2Block_NS_FEM::~PGAssem_2x2Block_NS_FEM()
 {}
 
 
+void PGAssem_2x2Block_NS_FEM::EssBC_KG_v( const ALocal_NodalBC * const &nbc_part )
+{
+  for(int field=1; field<=3; ++field)
+  {
+    const int local_dir = nbc_part->get_Num_LD(field);
+
+    if(local_dir > 0)
+    {
+      for(int i=0; i<local_dir; ++i)
+      {
+        const int row = nbc_part->get_LDN(field, i) * dof_mat_v + field - 1;
+        VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
+        MatSetValue(subK[0], row, row, 1.0, ADD_VALUES);
+      }
+    }
+
+    const int local_sla = nbc_part->get_Num_LPS(field);
+    if(local_sla > 0)
+    {
+      for(int i=0; i<local_sla; ++i)
+      {
+        const int row = nbc_part->get_LPSN(field, i) * dof_mat_v + field - 1;
+        const int col = nbc_part->get_LPMN(field, i) * dof_mat_v + field - 1;
+        MatSetValue(subK[0], row, col, 1.0, ADD_VALUES);
+        MatSetValue(subK[0], row, row, -1.0, ADD_VALUES);
+        VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
+      }
+    }
+  }
+}
+
+
+void PGAssem_2x2Block_NS_FEM::EssBC_G_v( const ALocal_NodalBC * const &nbc_part )
+{
+  for(int field=1; field<=3; ++field)
+  {
+    const int local_dir = nbc_part->get_Num_LD(field);
+    if( local_dir > 0 )
+    {
+      for(int ii=0; ii<local_dir; ++ii)
+      {
+        const int row = nbc_part->get_LDN(field, ii) * dof_mat_v + field - 1;
+        VecSetValue(G, row, 0.0, INSERT_VALUES);
+      }
+    }
+
+    const int local_sla = nbc_part->get_Num_LPS(field);
+    if( local_sla > 0 )
+    {
+      for(int ii=0; ii<local_sla; ++ii)
+      {
+        const int row = nbc_part->get_LPSN(field, ii) * dof_mat_v + field - 1;
+        VecSetValue(G, row, 0.0, INSERT_VALUES);
+      }
+    }
+  }
+}
+
+
 void PGAssem_2x2Block_NS_FEM::Assem_nonzero_estimate(
     const ALocal_Elem * const &alelem_ptr,
     IPLocAssem_2x2Block * const &lassem_ptr,
@@ -146,6 +205,14 @@ void PGAssem_2x2Block_NS_FEM::Assem_nonzero_estimate(
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc )
 {}
+
+
+
+
+
+
+
+
 
 
 // EOF
