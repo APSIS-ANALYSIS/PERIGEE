@@ -73,7 +73,60 @@ PGAssem_2x2Block_NS_FEM::PGAssem_2x2Block_NS_FEM(
   VecSetOption(subG[0], VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
   VecSetOption(subG[1], VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
 
+  // Temporarily ignore new entry allocation
+  SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
+  Release_nonzero_err_str();
 
+  // Allocate containers
+  row_index_v = new PetscInt [nLocBas * dof_mat_v];
+  row_index_p = new PetscInt [nLocBas * dof_mat_p];
+
+  array_v = new double [nlgn * dof_mat_v];
+  array_p = new double [nlgn * dof_mat_p];
+  array_dot_v = new double [nlgn * dof_mat_v];
+  array_dot_p = new double [nlgn * dof_mat_p];
+
+  local_v = new double [nLocBas * dof_mat_v];
+  local_p = new double [nLocBas * dof_mat_p];
+  local_dot_v = new double [nLocBas * dof_mat_v];
+  local_dot_p = new double [nLocBas * dof_mat_p];
+
+  IEN_e = new int [nLocBas];
+
+  ectrl_x = new double [nLocBas];
+  ectrl_y = new double [nLocBas];
+  ectrl_z = new double [nLocBas];
+
+  if(num_ebc > 0)
+  {
+    LSIEN = new int [snLocBas];
+    local_vs = new double [snLocBas * dot_mat_v];
+    local_ps = new double [snLocBas * dot_mat_p];
+    local_dot_vs = new double [snLocBas * dot_mat_v];
+    local_dot_ps = new double [snLocBas * dot_mat_p];
+    sctrl_x = new double [snLocBas];
+    sctrl_y = new double [snLocBas];
+    sctrl_z = new double [snLocBas];
+    srow_index_v = new PetscInt [snLocBas * dof_mat_v];
+    srow_index_p = new PetscInt [snLocBas * dof_mat_p];
+  }
+
+  // Initialize values for array
+  for(int ii=0; ii<nlgn*dof_mat_v; ++ii)
+  {
+    array_v[ii] = 0.0;
+    array_dot_v[ii] = 0.0;
+  }
+
+  for(int ii=0; ii<nlgn*dof_mat_p; ++ii)
+  {
+    array_p[ii] = 0.0;
+    array_dot_p[ii] = 0.0;
+  }
+
+  // Nonzero pattern assembly
+  //Assem_nonzero_estimate( alelem_ptr, locassem_ptr,
+  //    elements, quads, aien_ptr, pnode_ptr, part_nbc, part_ebc, gbc );
 
 }
 
