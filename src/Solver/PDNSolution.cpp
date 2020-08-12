@@ -96,7 +96,7 @@ void PDNSolution::Gen_random()
 
   GhostUpdate();
 
-  delete [] val; val = NULL; delete [] idx; idx = NULL;
+  delete [] val; val = nullptr; delete [] idx; idx = nullptr;
 }
 
 
