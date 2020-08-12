@@ -248,8 +248,8 @@ void PGAssem_NS_FEM::Assem_mass_residual(
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
 
-  sol_a->GetLocalArray( array_a, node_ptr );
-  sol_a->GetLocalArray( array_b, node_ptr );
+  sol_a->GetLocalArray( array_a );
+  sol_a->GetLocalArray( array_b );
 
   for(int ee=0; ee<nElem; ++ee)
   {
@@ -307,8 +307,8 @@ void PGAssem_NS_FEM::Assem_residual(
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
 
-  sol_a->GetLocalArray( array_a, node_ptr );
-  sol_b->GetLocalArray( array_b, node_ptr );
+  sol_a->GetLocalArray( array_a );
+  sol_b->GetLocalArray( array_b );
 
   for( int ee=0; ee<nElem; ++ee )
   {
@@ -369,8 +369,8 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
 
-  sol_a->GetLocalArray( array_a, node_ptr );
-  sol_b->GetLocalArray( array_b, node_ptr );
+  sol_a->GetLocalArray( array_a );
+  sol_b->GetLocalArray( array_b );
 
   for(int ee=0; ee<nElem; ++ee)
   {
@@ -533,7 +533,7 @@ double PGAssem_NS_FEM::Assem_surface_flowrate(
   double * array = new double [nlgn * dof_sol];
   double * local = new double [snLocBas * dof_sol];
 
-  vec -> GetLocalArray( array, pnode_ptr );
+  vec -> GetLocalArray( array );
 
   const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
 
@@ -576,7 +576,7 @@ double PGAssem_NS_FEM::Assem_surface_flowrate(
   double * array = new double [nlgn * dof_sol];
   double * local = new double [snLocBas * dof_sol];
 
-  vec -> GetLocalArray( array, pnode_ptr );
+  vec -> GetLocalArray( array );
 
   const int num_sele = infbc_part -> get_num_local_cell();
 
@@ -620,7 +620,7 @@ double PGAssem_NS_FEM::Assem_surface_ave_pressure(
   double * array = new double [nlgn * dof_sol];
   double * local = new double [snLocBas * dof_sol];
 
-  vec -> GetLocalArray( array, pnode_ptr );
+  vec -> GetLocalArray( array );
 
   const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
 
@@ -671,7 +671,7 @@ double PGAssem_NS_FEM::Assem_surface_ave_pressure(
   double * array = new double [nlgn * dof_sol];
   double * local = new double [snLocBas * dof_sol];
 
-  vec -> GetLocalArray( array, pnode_ptr );
+  vec -> GetLocalArray( array );
 
   const int num_sele = infbc_part -> get_num_local_cell();
 
