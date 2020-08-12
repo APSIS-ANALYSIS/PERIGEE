@@ -334,10 +334,8 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual(
 
 void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual( 
     const double &time, const double &dt,
-    const double * const &dot_velo,
-    const double * const &dot_pres,
-    const double * const &velo,
-    const double * const &pres,
+    const double * const &dot_sol,
+    const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
@@ -378,43 +376,43 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
-      const int ii3 = 3 * ii;
+      const int ii4 = 4 * ii;
 
-      u_t += dot_velo[ii3]   * R[ii];
-      v_t += dot_velo[ii3+1] * R[ii];
-      w_t += dot_velo[ii3+2] * R[ii];
+      u_t += dot_sol[ii4+1] * R[ii];
+      v_t += dot_sol[ii4+2] * R[ii];
+      w_t += dot_sol[ii4+3] * R[ii];
 
-      u += velo[ii3]   * R[ii];
-      v += velo[ii3+1] * R[ii];
-      w += velo[ii3+2] * R[ii];
-      p += pres[ii]    * R[ii];
+      u += sol[ii4+1] * R[ii];
+      v += sol[ii4+2] * R[ii];
+      w += sol[ii4+3] * R[ii];
+      p += sol[ii4+0] * R[ii];
 
-      u_x += velo[ii3]   * dR_dx[ii];
-      v_x += velo[ii3+1] * dR_dx[ii];
-      w_x += velo[ii3+2] * dR_dx[ii];
-      p_x += pres[ii]    * dR_dx[ii];
+      u_x += sol[ii4+1] * dR_dx[ii];
+      v_x += sol[ii4+2] * dR_dx[ii];
+      w_x += sol[ii4+3] * dR_dx[ii];
+      p_x += sol[ii4+0] * dR_dx[ii];
 
-      u_y += velo[ii3]   * dR_dy[ii];
-      v_y += velo[ii3+1] * dR_dy[ii];
-      w_y += velo[ii3+2] * dR_dy[ii];
-      p_y += pres[ii]    * dR_dy[ii];
+      u_y += sol[ii4+1] * dR_dy[ii];
+      v_y += sol[ii4+2] * dR_dy[ii];
+      w_y += sol[ii4+3] * dR_dy[ii];
+      p_y += sol[ii4+0] * dR_dy[ii];
 
-      u_z += velo[ii3]   * dR_dz[ii];
-      v_z += velo[ii3+1] * dR_dz[ii];
-      w_z += velo[ii3+2] * dR_dz[ii];
-      p_z += pres[ii]    * dR_dz[ii];
+      u_z += sol[ii4+1] * dR_dz[ii];
+      v_z += sol[ii4+2] * dR_dz[ii];
+      w_z += sol[ii4+3] * dR_dz[ii];
+      p_z += sol[ii4+0] * dR_dz[ii];
 
-      u_xx += velo[ii3] * d2R_dxx[ii];
-      u_yy += velo[ii3] * d2R_dyy[ii];
-      u_zz += velo[ii3] * d2R_dzz[ii];
+      u_xx += sol[ii4+1] * d2R_dxx[ii];
+      u_yy += sol[ii4+1] * d2R_dyy[ii];
+      u_zz += sol[ii4+1] * d2R_dzz[ii];
 
-      v_xx += velo[ii3+1] * d2R_dxx[ii];
-      v_yy += velo[ii3+1] * d2R_dyy[ii];
-      v_zz += velo[ii3+1] * d2R_dzz[ii];
+      v_xx += sol[ii4+2] * d2R_dxx[ii];
+      v_yy += sol[ii4+2] * d2R_dyy[ii];
+      v_zz += sol[ii4+2] * d2R_dzz[ii];
 
-      w_xx += velo[ii3+2] * d2R_dxx[ii];
-      w_yy += velo[ii3+2] * d2R_dyy[ii];
-      w_zz += velo[ii3+2] * d2R_dzz[ii];
+      w_xx += sol[ii4+3] * d2R_dxx[ii];
+      w_yy += sol[ii4+3] * d2R_dyy[ii];
+      w_zz += sol[ii4+3] * d2R_dzz[ii];
 
       coor_x += eleCtrlPts_x[ii] * R[ii];
       coor_y += eleCtrlPts_y[ii] * R[ii];
@@ -698,8 +696,7 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
 
 void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
-    const double * const &velo,
-    const double * const &pres,
+    const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
@@ -726,24 +723,24 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
-      const int ii3 = ii * 3;
+      const int ii4 = ii * 4;
 
-      u += velo[ii3  ] * R[ii];
-      v += velo[ii3+1] * R[ii];
-      w += velo[ii3+2] * R[ii];
-      p += pres[ii] * R[ii];
+      u += sol[ii4+1] * R[ii];
+      v += sol[ii4+2] * R[ii];
+      w += sol[ii4+3] * R[ii];
+      p += sol[ii4+0] * R[ii];
 
-      u_x += velo[ii3  ] * dR_dx[ii];
-      v_x += velo[ii3+1] * dR_dx[ii];
-      w_x += velo[ii3+2] * dR_dx[ii];
+      u_x += sol[ii4+1] * dR_dx[ii];
+      v_x += sol[ii4+2] * dR_dx[ii];
+      w_x += sol[ii4+3] * dR_dx[ii];
 
-      u_y += velo[ii3  ] * dR_dy[ii];
-      v_y += velo[ii3+1] * dR_dy[ii];
-      w_y += velo[ii3+2] * dR_dy[ii];
+      u_y += sol[ii4+1] * dR_dy[ii];
+      v_y += sol[ii4+2] * dR_dy[ii];
+      w_y += sol[ii4+3] * dR_dy[ii];
 
-      u_z += velo[ii3  ] * dR_dz[ii];
-      v_z += velo[ii3+1] * dR_dz[ii];
-      w_z += velo[ii3+2] * dR_dz[ii];
+      u_z += sol[ii4+1] * dR_dz[ii];
+      v_z += sol[ii4+2] * dR_dz[ii];
+      w_z += sol[ii4+3] * dR_dz[ii];
 
       coor_x += eleCtrlPts_x[ii] * R[ii];
       coor_y += eleCtrlPts_y[ii] * R[ii];

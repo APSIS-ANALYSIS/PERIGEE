@@ -83,10 +83,8 @@ class PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
 
     virtual void Assem_Tangent_Residual(
         const double &time, const double &dt,
-        const double * const &dot_velo,
-        const double * const &dot_pres,
-        const double * const &velo,
-        const double * const &pres,
+        const double * const &dot_sol,
+        const double * const &sol,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -94,8 +92,7 @@ class PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
         const IQuadPts * const &quad );
 
     virtual void Assem_Mass_Residual(
-        const double * const &velo,
-        const double * const &pres,
+        const double * const &sol,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,

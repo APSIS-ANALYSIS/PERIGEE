@@ -159,10 +159,8 @@ class IPLocAssem_2x2Block
     // Assembly the two Residuals and the four matrice blocks.
     virtual void Assem_Tangent_Residual(
         const double &time, const double &dt,
-        const double * const &dot_vec_0,
-        const double * const &dot_vec_1,
-        const double * const &vec_0,
-        const double * const &vec_1,
+        const double * const &dot_vec,
+        const double * const &vec,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -187,8 +185,7 @@ class IPLocAssem_2x2Block
 
     // Assembly the two Residuals and the four matrice blocks for mass matrices.
     virtual void Assem_Mass_Residual(
-        const double * const &vec_0,
-        const double * const &vec_1,
+        const double * const &vec,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
