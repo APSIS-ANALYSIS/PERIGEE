@@ -124,9 +124,6 @@ class PDNSolution
     //   one that corrects this issue and use safer pointer usage. A
     //   safer way is to call the function with std::vector as output.
     // --------------------------------------------------------------
-    virtual void GetLocalArray( double * &local_array,
-        const APart_Node * const &pNode ) const;
-
     virtual void GetLocalArray( double * const &local_array ) const;
     
     virtual void GetLocalArray( std::vector<double> &local_array ) const;

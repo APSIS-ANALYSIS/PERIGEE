@@ -175,18 +175,6 @@ void PDNSolution::ScaleValue(const double &val)
   VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
 }
 
-void PDNSolution::GetLocalArray( double * &local_array,
-    const APart_Node * const &pNode ) const
-{
-  Vec lsol;
-  double * array;
-  VecGhostGetLocalForm(solution, &lsol);
-  VecGetArray(lsol, &array);
-  for( int ii=0; ii<(nlocal + nghost); ++ii )
-    local_array[ii] = array[ii];
-  VecRestoreArray(lsol, &array);
-  VecGhostRestoreLocalForm(solution, &lsol);
-}
 
 void PDNSolution::GetLocalArray( double * const &local_array ) const
 {
