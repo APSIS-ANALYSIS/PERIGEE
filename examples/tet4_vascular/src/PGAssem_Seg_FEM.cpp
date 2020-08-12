@@ -352,10 +352,10 @@ void PGAssem_Seg_FEM::Assem_mass_residual(
   const int loc_dof = dof_mat * nLocBas;
   int loc_index, lrow_index, offset1;
 
-  sol_a->GetLocalArray( array_a, node_ptr );
+  sol_a->GetLocalArray( array_a );
 
   // array_b will be used in NatBC_G function call
-  sol_a->GetLocalArray( array_b, node_ptr );
+  sol_a->GetLocalArray( array_b );
 
   for(int ee=0; ee<nElem; ++ee)
   {
@@ -419,8 +419,8 @@ void PGAssem_Seg_FEM::Assem_residual(
   const int loc_dof = dof_mat * nLocBas;
   int loc_index, lrow_index, offset1;
 
-  sol_a->GetLocalArray( array_a, node_ptr );
-  sol_b->GetLocalArray( array_b, node_ptr );
+  sol_a->GetLocalArray( array_a );
+  sol_b->GetLocalArray( array_b );
 
   for( int ee=0; ee<nElem; ++ee )
   {
@@ -480,8 +480,8 @@ void PGAssem_Seg_FEM::Assem_tangent_residual(
   const int loc_dof = dof_mat * nLocBas;
   int loc_index, lrow_index, offset1;
 
-  sol_a->GetLocalArray( array_a, node_ptr );
-  sol_b->GetLocalArray( array_b, node_ptr );
+  sol_a->GetLocalArray( array_a );
+  sol_b->GetLocalArray( array_b );
 
   for(int ee=0; ee<nElem; ++ee)
   {

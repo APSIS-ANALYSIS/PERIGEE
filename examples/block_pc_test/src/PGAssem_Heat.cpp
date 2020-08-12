@@ -309,8 +309,8 @@ void PGAssem_Heat::Assem_tangent_residual(
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
 
-  sol_a->GetLocalArray( array_a, node_ptr );
-  sol_b->GetLocalArray( array_b, node_ptr );
+  sol_a->GetLocalArray( array_a );
+  sol_b->GetLocalArray( array_b );
 
   for(int ee=0; ee<nElem; ++ee)
   {
