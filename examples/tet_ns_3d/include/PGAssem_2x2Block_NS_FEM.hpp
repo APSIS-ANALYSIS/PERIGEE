@@ -127,7 +127,7 @@ class PGAssem_2x2Block_NS_FEM
     // pressure
     virtual double Assem_surface_flowrate(
         const PDNSolution * const &sol,
-        IPLocAssem * const &lassem_ptr,
+        IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const APart_Node * const &pnode_ptr,
@@ -136,7 +136,7 @@ class PGAssem_2x2Block_NS_FEM
 
     virtual double Assem_surface_flowrate(
         const PDNSolution * const &sol,
-        IPLocAssem * const &lassem_ptr,
+        IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const APart_Node * const &pnode_ptr,
@@ -144,7 +144,7 @@ class PGAssem_2x2Block_NS_FEM
 
     virtual double Assem_surface_ave_pressure(
         const PDNSolution * const &sol,
-        IPLocAssem * const &lassem_ptr,
+        IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const APart_Node * const &pnode_ptr,
@@ -153,7 +153,7 @@ class PGAssem_2x2Block_NS_FEM
 
     virtual double Assem_surface_ave_pressure(
         const PDNSolution * const &sol,
-        IPLocAssem * const &lassem_ptr,
+        IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const APart_Node * const &pnode_ptr,
