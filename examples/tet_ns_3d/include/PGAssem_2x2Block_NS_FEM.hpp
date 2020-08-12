@@ -30,6 +30,8 @@ class PGAssem_2x2Block_NS_FEM
     Vec G;
     Vec subG[2];
 
+    IS is[2];
+
     PGAssem_2x2Block_NS_FEM(
         IPLocAssem_2x2Block * const &locassem_ptr,
         FEAElement * const &elements,

@@ -41,28 +41,32 @@ PGAssem_2x2Block_NS_FEM::PGAssem_2x2Block_NS_FEM(
   const int nlocrow_p  = dof_mat_p * nlocalnode;
 
   // Allocate the block matrices
-  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_v, nlocrow_v, PETSC_DETERMINE,
-      PETSC_DETERMINE, dof_mat_v*in_nz_estimate, NULL, 
-      dof_mat_v*in_nz_estimate, NULL, &subK[0]);
-
-  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_v, nlocrow_p, PETSC_DETERMINE,
-      PETSC_DETERMINE, dof_mat_v*in_nz_estimate, NULL, 
-      dof_mat_p*in_nz_estimate, NULL, &subK[1]);
-
-  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_p, nlocrow_v, PETSC_DETERMINE,
-      PETSC_DETERMINE, dof_mat_p*in_nz_estimate, NULL, 
-      dof_mat_v*in_nz_estimate, NULL, &subK[2]);
-
+  // D matrix
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_p, nlocrow_p, PETSC_DETERMINE,
       PETSC_DETERMINE, dof_mat_p*in_nz_estimate, NULL, 
-      dof_mat_p*in_nz_estimate, NULL, &subK[3]);
+      dof_mat_p*in_nz_estimate, NULL, &subK[0]);
+  
+  // C matrix
+  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_p, nlocrow_v, PETSC_DETERMINE,
+      PETSC_DETERMINE, dof_mat_p*in_nz_estimate, NULL, 
+      dof_mat_v*in_nz_estimate, NULL, &subK[1]);
+
+  // B matrix
+  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_v, nlocrow_p, PETSC_DETERMINE,
+      PETSC_DETERMINE, dof_mat_v*in_nz_estimate, NULL, 
+      dof_mat_p*in_nz_estimate, NULL, &subK[2]);
+
+  // A matrix
+  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_v, nlocrow_v, PETSC_DETERMINE,
+      PETSC_DETERMINE, dof_mat_v*in_nz_estimate, NULL, 
+      dof_mat_v*in_nz_estimate, NULL, &subK[3]);
 
   // Allocate the sub-vectors
   VecCreate(PETSC_COMM_WORLD, &subG[0]);
   VecCreate(PETSC_COMM_WORLD, &subG[1]);
 
-  VecSetSizes(subG[0], nlocrow_v, PETSC_DECIDE);
-  VecSetSizes(subG[1], nlocrow_p, PETSC_DECIDE);
+  VecSetSizes(subG[0], nlocrow_p, PETSC_DECIDE);
+  VecSetSizes(subG[1], nlocrow_v, PETSC_DECIDE);
 
   VecSetFromOptions(subG[0]);
   VecSetFromOptions(subG[1]);
@@ -145,8 +149,8 @@ void PGAssem_2x2Block_NS_FEM::EssBC_KG( const ALocal_NodalBC * const &nbc_part )
     for(int i=0; i<local_dir; ++i)
     {
       const int row = nbc_part->get_LDN(0, i) * dof_mat_p;
-      MatSetValue(subK[3], row, row, 1.0, ADD_VALUES);
-      VecSetValue(subG[1], row, 0.0, INSERT_VALUES);
+      MatSetValue(subK[0], row, row, 1.0, ADD_VALUES);
+      VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
     }
   }
 
@@ -157,9 +161,9 @@ void PGAssem_2x2Block_NS_FEM::EssBC_KG( const ALocal_NodalBC * const &nbc_part )
     {
       const int row = nbc_part->get_LPSN(0, i) * dof_mat_p;
       const int col = nbc_part->get_LPMN(0, i) * dof_mat_p;
-      MatSetValue(subK[3], row, col, 1.0, ADD_VALUES);
-      MatSetValue(subK[3], row, row, -1.0, ADD_VALUES);
-      VecSetValue(subG[1], row, 0.0, INSERT_VALUES);
+      MatSetValue(subK[0], row, col, 1.0, ADD_VALUES);
+      MatSetValue(subK[0], row, row, -1.0, ADD_VALUES);
+      VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
     }
   }
   
@@ -173,8 +177,8 @@ void PGAssem_2x2Block_NS_FEM::EssBC_KG( const ALocal_NodalBC * const &nbc_part )
       for(int i=0; i<local_dir; ++i)
       {
         const int row = nbc_part->get_LDN(field, i) * dof_mat_v + field - 1;
-        MatSetValue(subK[0], row, row, 1.0, ADD_VALUES);
-        VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
+        MatSetValue(subK[3], row, row, 1.0, ADD_VALUES);
+        VecSetValue(subG[1], row, 0.0, INSERT_VALUES);
       }
     }
 
@@ -185,9 +189,9 @@ void PGAssem_2x2Block_NS_FEM::EssBC_KG( const ALocal_NodalBC * const &nbc_part )
       {
         const int row = nbc_part->get_LPSN(field, i) * dof_mat_v + field - 1;
         const int col = nbc_part->get_LPMN(field, i) * dof_mat_v + field - 1;
-        MatSetValue(subK[0], row, col, 1.0, ADD_VALUES);
-        MatSetValue(subK[0], row, row, -1.0, ADD_VALUES);
-        VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
+        MatSetValue(subK[3], row, col, 1.0, ADD_VALUES);
+        MatSetValue(subK[3], row, row, -1.0, ADD_VALUES);
+        VecSetValue(subG[1], row, 0.0, INSERT_VALUES);
       }
     }
   }
@@ -203,7 +207,7 @@ void PGAssem_2x2Block_NS_FEM::EssBC_G( const ALocal_NodalBC * const &nbc_part )
     for(int ii=0; ii<local_dir; ++ii)
     {
       const int row = nbc_part->get_LDN(0, ii) * dof_mat_p;
-      VecSetValue(subG[1], row, 0.0, INSERT_VALUES);
+      VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
     }
   }
 
@@ -213,7 +217,7 @@ void PGAssem_2x2Block_NS_FEM::EssBC_G( const ALocal_NodalBC * const &nbc_part )
     for(int ii=0; ii<local_sla; ++ii)
     {
       const int row = nbc_part->get_LPSN(0, ii) * dof_mat_p;
-      VecSetValue(subG[1], row, 0.0, INSERT_VALUES);
+      VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
     }
   }
   
@@ -226,7 +230,7 @@ void PGAssem_2x2Block_NS_FEM::EssBC_G( const ALocal_NodalBC * const &nbc_part )
       for(int ii=0; ii<local_dir; ++ii)
       {
         const int row = nbc_part->get_LDN(field, ii) * dof_mat_v + field - 1;
-        VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
+        VecSetValue(subG[1], row, 0.0, INSERT_VALUES);
       }
     }
 
@@ -236,7 +240,7 @@ void PGAssem_2x2Block_NS_FEM::EssBC_G( const ALocal_NodalBC * const &nbc_part )
       for(int ii=0; ii<local_sla; ++ii)
       {
         const int row = nbc_part->get_LPSN(field, ii) * dof_mat_v + field - 1;
-        VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
+        VecSetValue(subG[1], row, 0.0, INSERT_VALUES);
       }
     }
   }
