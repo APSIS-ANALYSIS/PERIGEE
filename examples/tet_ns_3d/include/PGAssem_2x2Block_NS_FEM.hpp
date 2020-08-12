@@ -24,8 +24,11 @@
 class PGAssem_2x2Block_NS_FEM
 {
   public:
-    Mat K, K00, K01, K10, K11;
-    Vec G, G0, G1;
+    Mat K;
+    Mat subK[4];
+    
+    Vec G;
+    Vec subG[2];
 
     PGAssem_2x2Block_NS_FEM(
         IPLocAssem_2x2Block * const &locassem_ptr,
@@ -42,6 +45,47 @@ class PGAssem_2x2Block_NS_FEM
 
     virtual ~PGAssem_2x2Block_NS_FEM();
 
+    void Fix_nonzero_str()
+    {
+      MatSetOption(subK[0], MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
+      MatSetOption(subK[1], MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
+      MatSetOption(subK[2], MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
+      MatSetOption(subK[3], MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
+    }
+
+    void Fix_nonzero_err_str()
+    {
+      MatSetOption(subK[0], MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);
+      MatSetOption(subK[1], MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);
+      MatSetOption(subK[2], MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);
+      MatSetOption(subK[3], MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);
+    }
+    
+    void Release_nonzero_err_str()
+    {
+      MatSetOption(subK[0], MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
+      MatSetOption(subK[1], MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
+      MatSetOption(subK[2], MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
+      MatSetOption(subK[3], MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
+    }
+
+    void Keep_nonzero_pattern()
+    {
+      MatSetOption(subK[0], MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);
+      MatSetOption(subK[1], MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);
+      MatSetOption(subK[2], MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);
+      MatSetOption(subK[3], MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);
+    }
+
+    void Clear_KG()
+    {
+      MatZeroEntries(K);
+      VecSet(G, 0.0);
+    }
+
+    void Clear_G() {VecSet(G, 0.0);}
+
+    
     virtual void Assem_nonzero_estimate(
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem_2x2Block * const &lassem_ptr,

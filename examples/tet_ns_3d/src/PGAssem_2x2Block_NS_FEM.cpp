@@ -43,35 +43,35 @@ PGAssem_2x2Block_NS_FEM::PGAssem_2x2Block_NS_FEM(
   // Allocate the block matrices
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_v, nlocrow_v, PETSC_DETERMINE,
       PETSC_DETERMINE, dof_mat_v*in_nz_estimate, NULL, 
-      dof_mat_v*in_nz_estimate, NULL, &K00);
+      dof_mat_v*in_nz_estimate, NULL, &subK[0]);
 
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_v, nlocrow_p, PETSC_DETERMINE,
       PETSC_DETERMINE, dof_mat_v*in_nz_estimate, NULL, 
-      dof_mat_p*in_nz_estimate, NULL, &K01);
+      dof_mat_p*in_nz_estimate, NULL, &subK[1]);
 
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_p, nlocrow_v, PETSC_DETERMINE,
       PETSC_DETERMINE, dof_mat_p*in_nz_estimate, NULL, 
-      dof_mat_v*in_nz_estimate, NULL, &K10);
+      dof_mat_v*in_nz_estimate, NULL, &subK[2]);
 
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_p, nlocrow_p, PETSC_DETERMINE,
       PETSC_DETERMINE, dof_mat_p*in_nz_estimate, NULL, 
-      dof_mat_p*in_nz_estimate, NULL, &K11);
+      dof_mat_p*in_nz_estimate, NULL, &subK[3]);
 
   // Allocate the sub-vectors
-  VecCreate(PETSC_COMM_WORLD, &G0);
-  VecCreate(PETSC_COMM_WORLD, &G1);
+  VecCreate(PETSC_COMM_WORLD, &subG[0]);
+  VecCreate(PETSC_COMM_WORLD, &subG[1]);
 
-  VecSetSizes(G0, nlocrow_v, PETSC_DECIDE);
-  VecSetSizes(G1, nlocrow_p, PETSC_DECIDE);
+  VecSetSizes(subG[0], nlocrow_v, PETSC_DECIDE);
+  VecSetSizes(subG[1], nlocrow_p, PETSC_DECIDE);
 
-  VecSetFromOptions(G0);
-  VecSetFromOptions(G1);
+  VecSetFromOptions(subG[0]);
+  VecSetFromOptions(subG[1]);
 
-  VecSet(G0, 0.0);
-  VecSet(G1, 0.0);
+  VecSet(subG[0], 0.0);
+  VecSet(subG[1], 0.0);
   
-  VecSetOption(G0, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
-  VecSetOption(G1, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
+  VecSetOption(subG[0], VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
+  VecSetOption(subG[1], VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
 
 
 
