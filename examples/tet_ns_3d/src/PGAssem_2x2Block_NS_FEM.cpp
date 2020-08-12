@@ -100,10 +100,10 @@ PGAssem_2x2Block_NS_FEM::PGAssem_2x2Block_NS_FEM(
   if(num_ebc > 0)
   {
     LSIEN = new int [snLocBas];
-    local_vs = new double [snLocBas * dot_mat_v];
-    local_ps = new double [snLocBas * dot_mat_p];
-    local_dot_vs = new double [snLocBas * dot_mat_v];
-    local_dot_ps = new double [snLocBas * dot_mat_p];
+    local_vs = new double [snLocBas * dof_mat_v];
+    local_ps = new double [snLocBas * dof_mat_p];
+    local_dot_vs = new double [snLocBas * dof_mat_v];
+    local_dot_ps = new double [snLocBas * dof_mat_p];
     sctrl_x = new double [snLocBas];
     sctrl_y = new double [snLocBas];
     sctrl_z = new double [snLocBas];
