@@ -249,7 +249,8 @@ class IPLocAssem_2x2Block
     {SYS_T::commPrint("Warning: this Assem_Residual_EBC_Resistance is not implemented.\n");}
 
     virtual void Assem_Residual_BackFlowStab(
-        const double * const &velo,
+        const double * const &dot_sol,
+        const double * const &sol,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,

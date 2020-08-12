@@ -867,7 +867,8 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
 
 
 void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
-    const double * const &velo,
+    const double * const &dot_sol,
+    const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
@@ -890,9 +891,10 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
     double u = 0.0, v = 0.0, w = 0.0;;
     for(int ii=0; ii<snLocBas; ++ii)
     {
-      u += velo[ii*3]   * R[ii];
-      v += velo[ii*3+1] * R[ii];
-      w += velo[ii*3+2] * R[ii];
+      const int ii4 = ii * 4;
+      u += sol[ii4+1] * R[ii];
+      v += sol[ii4+2] * R[ii];
+      w += sol[ii4+3] * R[ii];
     }
 
     const double temp = u * nx + v * ny + w * nz;
