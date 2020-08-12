@@ -272,6 +272,19 @@ class IPLocAssem_2x2Block
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Tangent_Residual_BackFlowStab is not implemented.\n");}
 
+
+    virtual double get_model_para_1() const
+    {
+      SYS_T::commPrint("Warning: get_model_para_1() is not implemented. \n");
+      return 0.0;
+    }
+
+    virtual double get_model_para_2() const
+    {
+      SYS_T::commPrint("Warning: get_model_para_2() is not implemented. \n");
+      return 0.0;
+    }
+
 };
 
 #endif

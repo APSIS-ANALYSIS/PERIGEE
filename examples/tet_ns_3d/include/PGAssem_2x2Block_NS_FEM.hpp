@@ -147,6 +147,17 @@ class PGAssem_2x2Block_NS_FEM
 
     void EssBC_G( const ALocal_NodalBC * const &nbc_part );
 
+    void NatBC_Resis_KG( const double &dt,
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
+        IPLocAssem_2x2Block * const &lassem_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const APart_Node * const &node_ptr,
+        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc );
+
 };
 
 #endif
