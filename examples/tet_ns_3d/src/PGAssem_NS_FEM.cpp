@@ -214,8 +214,7 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
   PDNSolution * temp = new PDNSolution_NS( node_ptr, 0, false );
 
   // 0.1 is an (arbitrarily chosen) nonzero time step size feeding the NatBC_Resis_KG 
-  NatBC_Resis_KG(0.1, temp, temp, lassem_ptr, elements, quad_s, node_ptr,
-      nbc_part, ebc_part, gbc );
+  NatBC_Resis_KG(0.1, temp, temp, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
 
   delete temp;
 
@@ -334,7 +333,7 @@ void PGAssem_NS_FEM::Assem_residual(
   BackFlow_G( lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // Resistance type boundary condition
-  NatBC_Resis_G(dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, node_ptr, nbc_part, ebc_part, gbc );
+  NatBC_Resis_G(dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -399,7 +398,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   BackFlow_KG( dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // Resistance type boundary condition
-  NatBC_Resis_KG( dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, node_ptr, nbc_part, ebc_part, gbc );
+  NatBC_Resis_KG( dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -705,7 +704,6 @@ void PGAssem_NS_FEM::NatBC_Resis_G(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const APart_Node * const &node_ptr,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc )
@@ -768,7 +766,6 @@ void PGAssem_NS_FEM::NatBC_Resis_KG(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const APart_Node * const &node_ptr,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc )

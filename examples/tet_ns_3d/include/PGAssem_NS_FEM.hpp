@@ -195,7 +195,6 @@ class PGAssem_NS_FEM : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const APart_Node * const &node_ptr,
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
@@ -206,7 +205,6 @@ class PGAssem_NS_FEM : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const APart_Node * const &node_ptr,
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
