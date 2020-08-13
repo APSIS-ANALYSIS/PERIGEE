@@ -282,6 +282,39 @@ void PGAssem_2x2Block_NS_FEM::NatBC_G( const double &curr_time, const double &dt
 }
 
 
+void PGAssem_2x2Block_NS_FEM::BackFlow_G( IPLocAssem_2x2Block * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_part )
+{
+  for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
+  {
+    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+
+    for(int ee=0; ee<num_sele; ++ee)
+    {
+      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
+
+      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+
+      GetLocal(array_a, LSIEN, snLocBas, local_as);
+      GetLocal(array_b, LSIEN, snLocBas, local_bs);
+
+      lassem_ptr->Assem_Residual_BackFlowStab( local_as, local_bs,
+          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+
+      for(int ii=0; ii<snLocBas; ++ii)
+      {
+        for(int mm=0; mm<dof_mat_v; ++mm)
+          srow_index_v[dof_mat_v * ii + mm] = dof_mat_v * nbc_part -> get_LID(mm+1, LSIEN[ii]) + mm;
+      }
+
+      VecSetValues(G, dof_mat_v*snLocBas, srow_index_v, lassem_ptr->sur_Residual1, ADD_VALUES);
+    }
+  }
+}
+
 
 double PGAssem_2x2Block_NS_FEM::Assem_surface_flowrate(
     const PDNSolution * const &vec,
