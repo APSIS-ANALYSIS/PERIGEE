@@ -540,5 +540,58 @@ double PGAssem_2x2Block_NS_FEM::Assem_surface_ave_pressure(
 }
 
 
+void PGAssem_2x2Block_NS_FEM::NatBC_Resis_G(
+    const PDNSolution * const &dot_sol,
+    const PDNSolution * const &sol,
+    IPLocAssem_2x2Block * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const APart_Node * const &node_ptr,
+    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_part,
+    const IGenBC * const &gbc )
+{
+  for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
+  {
+    // Calculate dot flow rate for face with ebc_id from solution vector dot_sol
+    const double dot_flrate = Assem_surface_flowrate( dot_sol, lassem_ptr, 
+        element_s, quad_s, node_ptr, ebc_part, ebc_id ); 
+
+    // Calculate flow rate for face with ebc_id from solution vector sol
+    const double flrate = Assem_surface_flowrate( sol, lassem_ptr,
+        element_s, quad_s, node_ptr, ebc_part, ebc_id );
+
+    // Get the (pressure) value on the outlet surface for traction evaluation    
+    const double P_n   = gbc -> get_P0( ebc_id );
+    const double P_np1 = gbc -> get_P( ebc_id, dot_flrate, flrate );
+
+    // P_n+alpha_f
+    // lassem_ptr->get_model_para_1() gives alpha_f 
+    const double val = P_n + lassem_ptr->get_model_para_1() * (P_np1 - P_n);
+
+    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+    for(int ee=0; ee<num_sele; ++ee)
+    {
+      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
+      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+
+      // Here, val is Pressure, and is used as the surface traction h = P I 
+      // to calculate the boundary integral
+      lassem_ptr->Assem_Residual_EBC_Resistance(ebc_id, val,
+          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+
+      for(int ii=0; ii<snLocBas; ++ii)
+      {
+        srow_index_v[3*ii+0] = dof_mat_v * nbc_part->get_LID(1, LSIEN[ii]);
+        srow_index_v[3*ii+1] = dof_mat_v * nbc_part->get_LID(2, LSIEN[ii]) + 1;
+        srow_index_v[3*ii+2] = dof_mat_v * nbc_part->get_LID(3, LSIEN[ii]) + 2;
+      }
+
+      VecSetValues(subG[1], snLocBas*3, srow_index_v, lassem_ptr->Residual1, ADD_VALUES);
+    }
+  }
+}
+
+
 
 // EOF
