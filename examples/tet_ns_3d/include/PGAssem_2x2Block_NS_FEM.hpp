@@ -223,7 +223,6 @@ class PGAssem_2x2Block_NS_FEM
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
-
     void GetLocal(const double * const &array, const int * const &IEN,
         double * const &local_array) const
     {

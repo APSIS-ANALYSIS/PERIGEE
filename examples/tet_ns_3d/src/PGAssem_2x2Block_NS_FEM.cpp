@@ -129,7 +129,7 @@ PGAssem_2x2Block_NS_FEM::~PGAssem_2x2Block_NS_FEM()
 
 void PGAssem_2x2Block_NS_FEM::EssBC_KG( const ALocal_NodalBC * const &nbc_part )
 {
-  // pressure dof comes from field 0, to be inserted in subK[3] and subG[1]
+  // pressure dof comes from field 0, to be inserted in subK[0] and subG[0]
   const int local_dir = nbc_part->get_Num_LD(0);
 
   if(local_dir > 0)
