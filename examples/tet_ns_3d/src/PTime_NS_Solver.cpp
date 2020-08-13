@@ -157,15 +157,15 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     {
       // Calculate the 3D dot flow rate on the outlet
       const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( 
-          cur_dot_sol, lassem_fluid_ptr, elements, quad_s, anode_ptr, ebc_part, face); 
+          cur_dot_sol, lassem_fluid_ptr, elements, quad_s, ebc_part, face); 
 
       // Calculate the 3D flow rate on the outlet
       const double face_flrate = gassem_ptr -> Assem_surface_flowrate( 
-          cur_sol, lassem_fluid_ptr, elements, quad_s, anode_ptr, ebc_part, face); 
+          cur_sol, lassem_fluid_ptr, elements, quad_s, ebc_part, face); 
 
       // Calculate the 3D averaged pressure on the outlet
       const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure( 
-          cur_sol, lassem_fluid_ptr, elements, quad_s, anode_ptr, ebc_part, face);
+          cur_sol, lassem_fluid_ptr, elements, quad_s, ebc_part, face);
 
       // Calculate the 0D pressure from LPN model
       const double dot_lpn_flowrate = dot_face_flrate;
@@ -192,10 +192,10 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
    
     // Calcualte the inlet data
     const double inlet_face_flrate = gassem_ptr -> Assem_surface_flowrate(
-        cur_sol, lassem_fluid_ptr, elements, quad_s, anode_ptr, infnbc_part ); 
+        cur_sol, lassem_fluid_ptr, elements, quad_s, infnbc_part ); 
 
     const double inlet_face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
-        cur_sol, lassem_fluid_ptr, elements, quad_s, anode_ptr, infnbc_part );
+        cur_sol, lassem_fluid_ptr, elements, quad_s, infnbc_part );
 
     PetscMPIInt rank;
     MPI_Comm_rank(PETSC_COMM_WORLD, &rank);

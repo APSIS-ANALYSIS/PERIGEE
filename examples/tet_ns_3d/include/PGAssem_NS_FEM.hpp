@@ -116,7 +116,6 @@ class PGAssem_NS_FEM : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const APart_Node * const &pnode_ptr,
         const ALocal_EBC * const &ebc_part,
         const int &ebc_id );
 
@@ -125,7 +124,6 @@ class PGAssem_NS_FEM : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const APart_Node * const &pnode_ptr,
         const ALocal_Inflow_NodalBC * const &infbc_part );
 
     virtual double Assem_surface_ave_pressure(
@@ -133,7 +131,6 @@ class PGAssem_NS_FEM : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const APart_Node * const &pnode_ptr,
         const ALocal_EBC * const &ebc_part,
         const int &ebc_id );
 
@@ -142,7 +139,6 @@ class PGAssem_NS_FEM : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const APart_Node * const &pnode_ptr,
         const ALocal_Inflow_NodalBC * const &infbc_part );
 
   private:

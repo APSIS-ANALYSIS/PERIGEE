@@ -522,12 +522,10 @@ double PGAssem_NS_FEM::Assem_surface_flowrate(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const APart_Node * const &pnode_ptr,
     const ALocal_EBC * const &ebc_part,
     const int &ebc_id )
 {
-  const int nlgn = pnode_ptr->get_nlocghonode();
-  double * array = new double [nlgn * dof_sol];
+  double * array = new double [vec -> get_nlgn()];
   double * local = new double [snLocBas * dof_sol];
 
   vec -> GetLocalArray( array );
@@ -566,11 +564,9 @@ double PGAssem_NS_FEM::Assem_surface_flowrate(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const APart_Node * const &pnode_ptr,
     const ALocal_Inflow_NodalBC * const &infbc_part )
 {
-  const int nlgn = pnode_ptr->get_nlocghonode();
-  double * array = new double [nlgn * dof_sol];
+  double * array = new double [vec -> get_nlgn()];
   double * local = new double [snLocBas * dof_sol];
 
   vec -> GetLocalArray( array );
@@ -609,12 +605,10 @@ double PGAssem_NS_FEM::Assem_surface_ave_pressure(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const APart_Node * const &pnode_ptr,
     const ALocal_EBC * const &ebc_part,
     const int &ebc_id )
 {
-  const int nlgn = pnode_ptr->get_nlocghonode();
-  double * array = new double [nlgn * dof_sol];
+  double * array = new double [vec -> get_nlgn()];
   double * local = new double [snLocBas * dof_sol];
 
   vec -> GetLocalArray( array );
@@ -661,11 +655,9 @@ double PGAssem_NS_FEM::Assem_surface_ave_pressure(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const APart_Node * const &pnode_ptr,
     const ALocal_Inflow_NodalBC * const &infbc_part )
 {
-  const int nlgn = pnode_ptr->get_nlocghonode();
-  double * array = new double [nlgn * dof_sol];
+  double * array = new double [vec->get_nlgn()];
   double * local = new double [snLocBas * dof_sol];
 
   vec -> GetLocalArray( array );
@@ -725,11 +717,11 @@ void PGAssem_NS_FEM::NatBC_Resis_G(
   {
     // Calculate dot flow rate for face with ebc_id from solution vector dot_sol
     const double dot_flrate = Assem_surface_flowrate( dot_sol, lassem_ptr, 
-        element_s, quad_s, node_ptr, ebc_part, ebc_id ); 
+        element_s, quad_s, ebc_part, ebc_id ); 
 
     // Calculate flow rate for face with ebc_id from solution vector sol
     const double flrate = Assem_surface_flowrate( sol, lassem_ptr,
-        element_s, quad_s, node_ptr, ebc_part, ebc_id );
+        element_s, quad_s, ebc_part, ebc_id );
 
     // Get the (pressure) value on the outlet surface for traction evaluation    
     const double P_n   = gbc -> get_P0( ebc_id );
@@ -800,12 +792,12 @@ void PGAssem_NS_FEM::NatBC_Resis_KG(
     // Calculate dot flow rate for face with ebc_id and MPI_Allreduce them
     // Here, dot_sol is the solution at time step n+1 (not n+alpha_f!)
     const double dot_flrate = Assem_surface_flowrate( dot_sol, lassem_ptr, 
-        element_s, quad_s, node_ptr, ebc_part, ebc_id ); 
+        element_s, quad_s, ebc_part, ebc_id ); 
 
     // Calculate flow rate for face with ebc_id and MPI_Allreduce them
     // Here, sol is the solution at time step n+1 (not n+alpha_f!)
     const double flrate = Assem_surface_flowrate( sol, lassem_ptr,
-        element_s, quad_s, node_ptr, ebc_part, ebc_id );
+        element_s, quad_s, ebc_part, ebc_id );
 
     // Get the (pressure) value on the outlet surface for traction evaluation    
     const double P_n   = gbc -> get_P0( ebc_id );
