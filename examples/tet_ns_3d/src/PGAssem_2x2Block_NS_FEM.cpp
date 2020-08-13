@@ -359,7 +359,6 @@ double PGAssem_2x2Block_NS_FEM::Assem_surface_flowrate(
     IPLocAssem_2x2Block * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const APart_Node * const &pnode_ptr,
     const ALocal_EBC * const &ebc_part,
     const int &ebc_id )
 {
@@ -402,7 +401,6 @@ double PGAssem_2x2Block_NS_FEM::Assem_surface_flowrate(
     IPLocAssem_2x2Block * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const APart_Node * const &pnode_ptr,
     const ALocal_Inflow_NodalBC * const &infbc_part )
 {
   double * array = new double [vec -> get_nlgn()];
@@ -444,7 +442,6 @@ double PGAssem_2x2Block_NS_FEM::Assem_surface_ave_pressure(
     IPLocAssem_2x2Block * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const APart_Node * const &pnode_ptr,
     const ALocal_EBC * const &ebc_part,
     const int &ebc_id )
 {
@@ -495,7 +492,6 @@ double PGAssem_2x2Block_NS_FEM::Assem_surface_ave_pressure(
     IPLocAssem_2x2Block * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const APart_Node * const &pnode_ptr,
     const ALocal_Inflow_NodalBC * const &infbc_part )
 {
   double * array = new double [ vec->get_nlgn() ];
