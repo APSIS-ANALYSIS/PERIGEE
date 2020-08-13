@@ -396,7 +396,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   }
 
   // Backflow stabilization residual & tangent contribution
-  BackFlow_KG( dt, lassem_ptr, elements, dof_mat*snLocBas, quad_s, nbc_part, ebc_part );
+  BackFlow_KG( dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // Resistance type boundary condition
   NatBC_Resis_KG( dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, node_ptr, nbc_part, ebc_part, gbc );
@@ -416,7 +416,6 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
 void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
-    const int &in_loc_dof,
     const IQuadPts * const &quad_s,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
@@ -440,7 +439,7 @@ void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
           srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
       }
 
-      VecSetValues(G, in_loc_dof, srow_index, lassem_ptr->Residual, ADD_VALUES);
+      VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->Residual, ADD_VALUES);
     }
   }
 }
@@ -484,7 +483,6 @@ void PGAssem_NS_FEM::BackFlow_G( IPLocAssem * const &lassem_ptr,
 void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
-    const int &in_loc_dof,
     const IQuadPts * const &quad_s,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
@@ -511,10 +509,10 @@ void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
           srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
       }
 
-      MatSetValues(K, in_loc_dof, srow_index, in_loc_dof, srow_index,
+      MatSetValues(K, dof_mat*snLocBas, srow_index, dof_mat*snLocBas, srow_index,
           lassem_ptr->sur_Tangent, ADD_VALUES);
 
-      VecSetValues(G, in_loc_dof, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
+      VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
     }
   }
 }
