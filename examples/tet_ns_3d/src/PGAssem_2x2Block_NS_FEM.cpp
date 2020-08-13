@@ -670,9 +670,9 @@ void PGAssem_2x2Block_NS_FEM::NatBC_Resis_KG(
       // Residual vector is scaled by the resistance value
       for(int ii=0; ii<snLocBas; ++ii)
       {
-        Res[3*ii+0] = resis_val * lassem_ptr->Residual[4*ii+1];
-        Res[3*ii+1] = resis_val * lassem_ptr->Residual[4*ii+2];
-        Res[3*ii+2] = resis_val * lassem_ptr->Residual[4*ii+3];
+        Res[3*ii+0] = resis_val * lassem_ptr->Residual1[3*ii];
+        Res[3*ii+1] = resis_val * lassem_ptr->Residual1[3*ii+1];
+        Res[3*ii+2] = resis_val * lassem_ptr->Residual1[3*ii+2];
       }
 
       for(int A=0; A<snLocBas; ++A)
