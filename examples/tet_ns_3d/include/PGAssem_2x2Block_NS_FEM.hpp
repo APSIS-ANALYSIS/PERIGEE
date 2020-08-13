@@ -213,6 +213,16 @@ class PGAssem_2x2Block_NS_FEM
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
+    void NatBC_Resis_KG( const double &dt,
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
+        IPLocAssem_2x2Block * const &lassem_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc );
+
 
     void GetLocal(const double * const &array, const int * const &IEN,
         double * const &local_array) const
