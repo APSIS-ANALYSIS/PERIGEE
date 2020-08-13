@@ -63,79 +63,6 @@ int SYS_T::get_genbc_file_type( const char * const &lpn_filename )
 }
 
 
-void SYS_T::checkSHKnots( std::vector<double> &sKnots, const int &sdeg )
-{
-  const int len = sKnots.size();
-
-  const double fr = sKnots[0];
-  const double ba = sKnots[len-1];
-
-  for(int ii=0; ii<sdeg+1; ++ii)
-  {
-    if( sKnots[ii] != fr || sKnots[len-1-ii] != ba )
-    {
-      std::cerr<<"Error: knot vector is incompatible with the poly degree. ";
-      std::cerr<<"There is not enough knot to make open knot vector. \n";
-      exit(1);
-    }
-  }
-
-  if( sKnots[sdeg+1] == fr || sKnots[len-sdeg-2] == ba )
-  {
-    std::cerr<<"Error: knot vector is incompatible with the poly degree ";
-    std::cerr<<" Extra repeated knot found. \n";
-    exit(1);
-  }
-
-  if( fr != 0.0 || ba != 1.0 )
-  {
-    const double invh = 1.0 / ( ba - fr );
-    for(int ii=0; ii<len; ++ii)
-      sKnots[ii] = (sKnots[ii] - fr) * invh ;
-  }
-
-  for(int ii=0; ii<sdeg+1; ++ii)
-  {
-    sKnots[ii] = 0.0;
-    sKnots[len-1-ii] = 1.0;
-  }
-}
-
-
-
-int SYS_T::readKnotVector(std::istringstream& sstrm,
-    std::vector<double>& knots)
-{
-  char x;
-
-  //Discard = and [ characters
-  sstrm >> x;
-  if( x != '=' )
-  {
-    std::cerr << "Bad file format: 2.1" << std::endl;
-    return 1;
-  }
-  sstrm >> x;
-  if( x != '[' )
-  {
-    std::cerr << "Bad file format: 2.2" << std::endl;
-    return 1;
-  }
-
-  sstrm >> x;
-  while( x != ']' && !sstrm.eof() )
-  {
-    sstrm.putback( x );
-    double knot;
-    sstrm >> knot;
-    knots.push_back( knot );
-    sstrm >> x;
-  }
-
-  return 0;
-};
-
-
 double SYS_T::gen_randomD_closed(const double &min, const double &max)
 {
   return ( rand() % 1000001 ) * 1.0e-6 * (max - min) + min;
@@ -168,7 +95,6 @@ void SYS_T::print_MaxMemUsage()
 }
 
 
-
 void SYS_T::print_CurMemUsage()
 {
   PetscLogDouble memo = 0.0, memototal = 0.0;
@@ -197,7 +123,6 @@ void SYS_T::print_MaxMallocUsage()
     print_mem_size(memototal); std::cout<<"\n";
   }
 }
-
 
 
 void SYS_T::print_CurMallocUsage()

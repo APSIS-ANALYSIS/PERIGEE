@@ -69,18 +69,6 @@ namespace SYS_T
 
 
   // ----------------------------------------------------------------
-  // checkSHKnots()
-  // Check the format of the knot vectors and map the knots to (0,1) 
-  // domain
-  // ----------------------------------------------------------------
-  void checkSHKnots( std::vector<double> &sKnots, const int &sdeg );
-
-
-  int readKnotVector(std::istringstream& sstrm,
-      std::vector<double>& knots);
-
-
-  // ----------------------------------------------------------------
   // Check if a file exists. If a file cannot be found, throw an error
   // message and exit code
   // ----------------------------------------------------------------
