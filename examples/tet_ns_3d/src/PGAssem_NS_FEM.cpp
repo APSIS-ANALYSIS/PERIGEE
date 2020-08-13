@@ -331,7 +331,7 @@ void PGAssem_NS_FEM::Assem_residual(
   }
 
   // Backflow stabilization residual contribution
-  BackFlow_G( lassem_ptr, elements, dof_mat*snLocBas, quad_s, nbc_part, ebc_part );
+  BackFlow_G( lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // Resistance type boundary condition
   NatBC_Resis_G(dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, node_ptr, nbc_part, ebc_part, gbc );
@@ -447,7 +447,6 @@ void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
 
 void PGAssem_NS_FEM::BackFlow_G( IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
-    const int &in_loc_dof,
     const IQuadPts * const &quad_s,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
@@ -474,7 +473,7 @@ void PGAssem_NS_FEM::BackFlow_G( IPLocAssem * const &lassem_ptr,
           srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
       }
 
-      VecSetValues(G, in_loc_dof, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
+      VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
     }
   }
 }

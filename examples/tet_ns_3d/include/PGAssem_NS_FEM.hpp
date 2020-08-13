@@ -183,7 +183,6 @@ class PGAssem_NS_FEM : public IPGAssem
 
     void BackFlow_G( IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
-        const int &in_loc_dof,
         const IQuadPts * const &quad_s,
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
