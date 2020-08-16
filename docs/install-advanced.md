@@ -26,6 +26,8 @@ The PETSc package has an official installation guide [page](https://www.mcs.anl.
 
 * `--with-hypre=1 --download-hypre` This flag tells the PETSc installer to install the [Hypre](https://computing.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods) package as well. Several preconditioners in PETSc requires external libraries. We recommend one install at least Hypre and MUMPS in PETSc.
 
+* `--with-hdf5=1 --download-hdf5 --with-metis=1 --download-metis` This tells PETSc to install HDF5 and METIS. With these two installed within PETSc, you will not need to install them separately youself. In the configuration file for PERIGEE, provide the correct path to link to them.
+
 * `--with-debugging=yes` The `--with-debugging` flag is similar to the `CMAKE_BUILD_TYPE` in CMake. It tells the installer if you want to have a debug mode or an optimized mode for the library.
 
 * `--prefix=/home/jliu/lib/petsc-3.11.3-debug` The `--prefix` flag tells the installer where you want to install the PETSc package. It is similar to the `CMAKE_INSTALL_PREFIX` variable in CMAKE.
