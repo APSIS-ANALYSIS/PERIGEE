@@ -15,7 +15,8 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
 : nLocBas( agmi_ptr->get_nLocBas() ),
   dof_sol( pnode_ptr->get_dof() ),
   dof_mat( locassem_ptr->get_dof_mat() ),
-  num_ebc( part_ebc->get_num_ebc() ) 
+  num_ebc( part_ebc->get_num_ebc() ),
+  nlgn( pnode_ptr->get_nlocghonode() ) 
 {
   // Make sure the data structure is compatible
   SYS_T::print_fatal_if(dof_sol != locassem_ptr->get_dof(),
@@ -34,9 +35,7 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
         "Error: in PGAssem_NS_FEM, snLocBas has to be uniform. \n");
   }
 
-  const int nlocalnode = pnode_ptr->get_nlocalnode();
-  const int nlgn       = pnode_ptr->get_nlocghonode();
-  const int nlocrow    = dof_mat * nlocalnode;
+  const int nlocrow    = dof_mat * pnode_ptr->get_nlocalnode();
 
   // Allocate the sparse matrix K
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
@@ -53,19 +52,19 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();
 
-  row_index = new PetscInt [nLocBas * dof_mat];
+  //row_index = new PetscInt [nLocBas * dof_mat];
 
-  array_a = new double [nlgn * dof_sol];
-  array_b = new double [nlgn * dof_sol];
+  //array_a = new double [nlgn * dof_sol];
+  //array_b = new double [nlgn * dof_sol];
 
-  local_a = new double [nLocBas * dof_sol];
-  local_b = new double [nLocBas * dof_sol];
+  //local_a = new double [nLocBas * dof_sol];
+  //local_b = new double [nLocBas * dof_sol];
 
-  IEN_e = new int [nLocBas];
+  //IEN_e = new int [nLocBas];
 
-  ectrl_x = new double [nLocBas];
-  ectrl_y = new double [nLocBas];
-  ectrl_z = new double [nLocBas];
+  //ectrl_x = new double [nLocBas];
+  //ectrl_y = new double [nLocBas];
+  //ectrl_z = new double [nLocBas];
 
   if(num_ebc > 0)
   {
@@ -80,7 +79,7 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
 
   // Now we run a nonzero estimate trial assembly
   // Initialize array_b first
-  for(int ii=0; ii<nlgn*dof_sol; ++ii) array_b[ii] = 0.0;
+  //for(int ii=0; ii<nlgn*dof_sol; ++ii) array_b[ii] = 0.0;
 
   // array_b will be implicitly called in the nonzero assembly
   Assem_nonzero_estimate( alelem_ptr, locassem_ptr, 
@@ -102,15 +101,6 @@ PGAssem_NS_FEM::~PGAssem_NS_FEM()
 {
   VecDestroy(&G);
   MatDestroy(&K);
-  delete [] row_index; row_index = nullptr;
-  delete [] array_a;     array_a = nullptr;
-  delete [] array_b;     array_b = nullptr;
-  delete [] local_a;     local_a = nullptr;
-  delete [] local_b;     local_b = nullptr;
-  delete [] IEN_e;       IEN_e = nullptr;
-  delete [] ectrl_x;     ectrl_x = nullptr;
-  delete [] ectrl_y;     ectrl_y = nullptr;
-  delete [] ectrl_z;     ectrl_z = nullptr;
 
   if(num_ebc > 0)
   {
@@ -196,6 +186,8 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
 
   lassem_ptr->Assem_Estimate();
 
+  PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
+
   for(int e=0; e<nElem; ++e)
   {
     for(int i=0; i<nLocBas; ++i)
@@ -209,6 +201,8 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
     MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
         lassem_ptr->Tangent, ADD_VALUES);
   }
+
+  delete [] row_index; row_index = nullptr;
 
   // Create a temporary zero solution vector to feed Natbc_Resis_KG
   PDNSolution * temp = new PDNSolution_NS( node_ptr, 0, false );
@@ -247,8 +241,15 @@ void PGAssem_NS_FEM::Assem_mass_residual(
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
 
+  double * array_a = new double [nlgn * dof_sol];
+  double * local_a = new double [nLocBas * dof_sol];
+  int * IEN_e = new int [nLocBas];
+  double * ectrl_x = new double [nLocBas];
+  double * ectrl_y = new double [nLocBas];
+  double * ectrl_z = new double [nLocBas];
+  PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
+
   sol_a->GetLocalArray( array_a );
-  sol_a->GetLocalArray( array_b );
 
   for(int ee=0; ee<nElem; ++ee)
   {
@@ -270,6 +271,14 @@ void PGAssem_NS_FEM::Assem_mass_residual(
 
     VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
+
+  delete [] array_a; array_a = nullptr;
+  delete [] local_a; local_a = nullptr;
+  delete [] IEN_e; IEN_e = nullptr;
+  delete [] ectrl_x; ectrl_x = nullptr;
+  delete [] ectrl_y; ectrl_y = nullptr;
+  delete [] ectrl_z; ectrl_z = nullptr;
+  delete [] row_index; row_index = nullptr;
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -305,6 +314,16 @@ void PGAssem_NS_FEM::Assem_residual(
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
+  
+  double * array_a = new double [nlgn * dof_sol];
+  double * array_b = new double [nlgn * dof_sol];
+  double * local_a = new double [nLocBas * dof_sol];
+  double * local_b = new double [nLocBas * dof_sol];
+  int * IEN_e = new int [nLocBas];
+  double * ectrl_x = new double [nLocBas];
+  double * ectrl_y = new double [nLocBas];
+  double * ectrl_z = new double [nLocBas];
+  PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
 
   sol_a->GetLocalArray( array_a );
   sol_b->GetLocalArray( array_b );
@@ -329,8 +348,18 @@ void PGAssem_NS_FEM::Assem_residual(
     VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
 
+  delete [] array_a; array_a = nullptr;
+  delete [] array_b; array_b = nullptr;
+  delete [] local_a; local_a = nullptr;
+  delete [] local_b; local_b = nullptr;
+  delete [] IEN_e; IEN_e = nullptr;
+  delete [] ectrl_x; ectrl_x = nullptr;
+  delete [] ectrl_y; ectrl_y = nullptr;
+  delete [] ectrl_z; ectrl_z = nullptr;
+  delete [] row_index; row_index = nullptr;
+  
   // Backflow stabilization residual contribution
-  BackFlow_G( lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+  BackFlow_G( sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // Resistance type boundary condition
   NatBC_Resis_G( dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
@@ -367,6 +396,16 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
+  
+  double * array_a = new double [nlgn * dof_sol];
+  double * array_b = new double [nlgn * dof_sol];
+  double * local_a = new double [nLocBas * dof_sol];
+  double * local_b = new double [nLocBas * dof_sol];
+  int * IEN_e = new int [nLocBas];
+  double * ectrl_x = new double [nLocBas];
+  double * ectrl_y = new double [nLocBas];
+  double * ectrl_z = new double [nLocBas];
+  PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
 
   sol_a->GetLocalArray( array_a );
   sol_b->GetLocalArray( array_b );
@@ -394,8 +433,18 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
 
+  delete [] array_a; array_a = nullptr;
+  delete [] array_b; array_b = nullptr;
+  delete [] local_a; local_a = nullptr;
+  delete [] local_b; local_b = nullptr;
+  delete [] IEN_e; IEN_e = nullptr;
+  delete [] ectrl_x; ectrl_x = nullptr;
+  delete [] ectrl_y; ectrl_y = nullptr;
+  delete [] ectrl_z; ectrl_z = nullptr;
+  delete [] row_index; row_index = nullptr;
+
   // Backflow stabilization residual & tangent contribution
-  BackFlow_KG( dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+  BackFlow_KG( sol_a, sol_b, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // Resistance type boundary condition
   NatBC_Resis_KG( dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
@@ -444,12 +493,21 @@ void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
 }
 
 
-void PGAssem_NS_FEM::BackFlow_G( IPLocAssem * const &lassem_ptr,
+void PGAssem_NS_FEM::BackFlow_G( 
+    const PDNSolution * const &dot_sol,
+    const PDNSolution * const &sol,
+    IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
+  double * array_a = new double [nlgn * dof_sol];
+  double * array_b = new double [nlgn * dof_sol];
+
+  dot_sol->GetLocalArray( array_a );
+  sol->GetLocalArray( array_b );
+
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
     const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
@@ -475,16 +533,27 @@ void PGAssem_NS_FEM::BackFlow_G( IPLocAssem * const &lassem_ptr,
       VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
     }
   }
+
+  delete [] array_a; array_a = nullptr;
+  delete [] array_b; array_b = nullptr;
 }
 
 
-void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
+void PGAssem_NS_FEM::BackFlow_KG( const PDNSolution * const &dot_sol,
+    const PDNSolution * const &sol,
+    const double &dt,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
+  double * array_a = new double [nlgn * dof_sol];
+  double * array_b = new double [nlgn * dof_sol];
+
+  dot_sol->GetLocalArray( array_a );
+  sol->GetLocalArray( array_b );
+
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
     const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
@@ -513,6 +582,9 @@ void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
       VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
     }
   }
+
+  delete [] array_a; array_a = nullptr;
+  delete [] array_b; array_b = nullptr;
 }
 
 

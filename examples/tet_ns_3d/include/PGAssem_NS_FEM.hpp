@@ -144,22 +144,16 @@ class PGAssem_NS_FEM : public IPGAssem
   private:
     // --------------------------------------------------------------
     // Private data
-    const int nLocBas, dof_sol, dof_mat, num_ebc;
+    const int nLocBas, dof_sol, dof_mat, num_ebc, nlgn;
     
     int snLocBas;
 
-    PetscInt * row_index, * srow_index;
-
-    double * array_a, * array_b; // length: dof_sol x nlocalghonode 
-
-    double * local_a, * local_b; // length: dof_sol x nLocBas
+    PetscInt * srow_index;
 
     double * local_as, * local_bs; // length: dof_sol x snLocBas
 
-    int * IEN_e, * LSIEN;
+    int * LSIEN;
 
-    double * ectrl_x, * ectrl_y, * ectrl_z;
-    
     double * sctrl_x, * sctrl_y, * sctrl_z;
 
     // --------------------------------------------------------------
@@ -177,13 +171,17 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
-    void BackFlow_G( IPLocAssem * const &lassem_ptr,
+    void BackFlow_G( const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
+        IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
-    void BackFlow_KG( const double &dt,
+    void BackFlow_KG( const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
+        const double &dt,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
