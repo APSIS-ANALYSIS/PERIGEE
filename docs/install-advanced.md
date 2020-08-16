@@ -24,7 +24,7 @@ $ make install
 The PETSc package has an official installation guide [page](https://www.mcs.anl.gov/petsc/documentation/installation.html). The package installation is controlled through the `configure` command.
 * `--with-mpi-dir=/home/jliu/lib/mpich-3.2` The `--with-mpi-dir` tells the PETSc that there exists a MPI library installed in the computer, and the PETSc will not have to download and compile a MPICH during installation. My own mpich is installed in `/home/jliu/lib/mpich-3.2`.
 
-* `--with-hypre=1 --download-hypre` This flag tells the PETSc installer to install the [Hypre](https://computing.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods) package as well. 
+* `--with-hypre=1 --download-hypre` This flag tells the PETSc installer to install the [Hypre](https://computing.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods) package as well. Several preconditioners in PETSc requires external libraries. We recommend one install at least Hypre and MUMPS in PETSc.
 
 * `--with-debugging=yes` The `--with-debugging` flag is similar to the `CMAKE_BUILD_TYPE` in CMake. It tells the installer if you want to have a debug mode or an optimized mode for the library.
 
