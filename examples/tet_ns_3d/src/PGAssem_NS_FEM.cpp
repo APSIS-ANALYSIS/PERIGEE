@@ -155,8 +155,8 @@ void PGAssem_NS_FEM::EssBC_KG(
 }
 
 
-void PGAssem_NS_FEM::EssBC_G(
-    const ALocal_NodalBC * const &nbc_part, const int &field )
+void PGAssem_NS_FEM::EssBC_G( const ALocal_NodalBC * const &nbc_part, 
+    const int &field )
 {
   const int local_dir = nbc_part->get_Num_LD(field);
   if( local_dir > 0 )
@@ -333,7 +333,7 @@ void PGAssem_NS_FEM::Assem_residual(
   BackFlow_G( lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // Resistance type boundary condition
-  NatBC_Resis_G(dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
+  NatBC_Resis_G( dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);

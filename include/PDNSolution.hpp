@@ -158,7 +158,7 @@ class PDNSolution
     // --------------------------------------------------------------
     // ! Get the number of local plus ghost entries in the parallel
     //   vector's local portion. This can be used for allocating the
-    //   array for GetLocalArray.
+    //   array size for GetLocalArray.
     // --------------------------------------------------------------
     virtual int get_nlgn() const {return nlocal + nghost;}
 
