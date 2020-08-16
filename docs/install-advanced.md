@@ -32,7 +32,7 @@ The PETSc package has an official installation guide [page](https://www.mcs.anl.
 
 * `--prefix=/home/jliu/lib/petsc-3.11.3-debug` The `--prefix` flag tells the installer where you want to install the PETSc package. It is similar to the `CMAKE_INSTALL_PREFIX` variable in CMAKE.
 
-* Refer to https://www.mcs.anl.gov/petsc/documentation/installation.html#doemachines for the installation details.
+* Refer to [this](https://www.mcs.anl.gov/petsc/documentation/installation.html) for the installation details.
 
 As an example, let me attach the full configuration command here.
 ```sh
