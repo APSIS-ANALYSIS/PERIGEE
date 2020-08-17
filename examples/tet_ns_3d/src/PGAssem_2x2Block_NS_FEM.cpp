@@ -384,7 +384,7 @@ double PGAssem_2x2Block_NS_FEM::Assem_surface_flowrate(
     const ALocal_EBC * const &ebc_part,
     const int &ebc_id )
 {
-  double * array = new double [vec -> get_nlgn()];
+  double * array = new double [nlgn * dof_sol];
   double * local = new double [snLocBas * dof_sol];
   int * LSIEN = new int [snLocBas];
   double * sctrl_x = new double [snLocBas];
@@ -433,7 +433,7 @@ double PGAssem_2x2Block_NS_FEM::Assem_surface_flowrate(
     const IQuadPts * const &quad_s,
     const ALocal_Inflow_NodalBC * const &infbc_part )
 {
-  double * array = new double [vec -> get_nlgn()];
+  double * array = new double [nlgn * dof_sol];
   double * local = new double [snLocBas * dof_sol];
   int * LSIEN = new int [snLocBas];
   double * sctrl_x = new double [snLocBas];
@@ -483,7 +483,7 @@ double PGAssem_2x2Block_NS_FEM::Assem_surface_ave_pressure(
     const ALocal_EBC * const &ebc_part,
     const int &ebc_id )
 {
-  double * array = new double [vec -> get_nlgn()];
+  double * array = new double [nlgn * dof_sol];
   double * local = new double [snLocBas * dof_sol];
   int * LSIEN = new int [snLocBas];
   double * sctrl_x = new double [snLocBas];
@@ -540,7 +540,7 @@ double PGAssem_2x2Block_NS_FEM::Assem_surface_ave_pressure(
     const IQuadPts * const &quad_s,
     const ALocal_Inflow_NodalBC * const &infbc_part )
 {
-  double * array = new double [ vec->get_nlgn() ];
+  double * array = new double [nlgn * dof_sol];
   double * local = new double [snLocBas * dof_sol];
   int * LSIEN = new int [snLocBas];
   double * sctrl_x = new double [snLocBas];
