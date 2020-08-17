@@ -208,9 +208,58 @@ void PGAssem_2x2Block_NS_FEM::Assem_nonzero_estimate(
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc )
-{}
+{
+  const int nElem = alelem_ptr->get_nlocalele();
+  const int loc_dof_v = dof_mat_v * nLocBas;
+  const int loc_dof_p = dof_mat_p * nLocBas;
 
+  lassem_ptr->Assem_Estimate();
 
+  PetscInt * row_idx_v = new PetscInt [nLocBas * dof_mat_v];
+  PetscInt * row_idx_p = new PetscInt [nLocBas * dof_mat_p];
+
+  for(int ee=0; ee<nElem; ++ee)
+  {
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      const int loc_index  = lien_ptr->get_LIEN(ee, ii);
+
+      row_idx_v[3*ii]   = 3 * nbc_part->get_LID( 1, loc_index );
+      row_idx_v[3*ii+1] = 3 * nbc_part->get_LID( 2, loc_index ) + 1;
+      row_idx_v[3*ii+2] = 3 * nbc_part->get_LID( 3, loc_index ) + 2;
+      
+      row_idx_p[ii] = nbc_part->get_LID( 0, loc_index );
+    }
+
+    MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, lassem_ptr->Tangent00, ADD_VALUES);
+    MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, lassem_ptr->Tangent01, ADD_VALUES);
+    MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, lassem_ptr->Tangent10, ADD_VALUES);
+    MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, lassem_ptr->Tangent11, ADD_VALUES);
+  }
+
+  delete [] row_idx_v; row_idx_v = nullptr;
+  delete [] row_idx_p; row_idx_p = nullptr;
+
+  // Create a temporary zero solution vector to feed NatBC_Resis_KG
+  PDNSolution * temp = new PDNSolution_NS( node_ptr, 0, false );
+
+  // 0.1 is an (arbitrarily chosen) nonzero time step size feeding the NatBC_Resis_KG
+  NatBC_Resis_KG(0.1, temp, temp, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
+
+  delete temp;
+
+  VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
+  VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
+
+  EssBC_KG( nbc_part );
+
+  MatAssemblyBegin(subK[0], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[0], MAT_FINAL_ASSEMBLY);
+  MatAssemblyBegin(subK[1], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[1], MAT_FINAL_ASSEMBLY);
+  MatAssemblyBegin(subK[2], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[2], MAT_FINAL_ASSEMBLY);
+  MatAssemblyBegin(subK[3], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[3], MAT_FINAL_ASSEMBLY);
+  VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
+  VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
+}
 
 
 void PGAssem_2x2Block_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
@@ -302,7 +351,7 @@ void PGAssem_2x2Block_NS_FEM::BackFlow_G(
       VecSetValues(subG[1], dof_mat_v*snLocBas, srow_index_v, lassem_ptr->sur_Residual1, ADD_VALUES);
     }
   }
-  
+
   delete [] array_a; array_a = nullptr;
   delete [] array_b; array_b = nullptr;
   delete [] local_as; local_as = nullptr;
@@ -363,7 +412,7 @@ void PGAssem_2x2Block_NS_FEM::BackFlow_KG( const double &dt,
       VecSetValues(subG[1], dof_mat_v*snLocBas, srow_index_v, lassem_ptr->sur_Residual1, ADD_VALUES);
     }
   }
-  
+
   delete [] array_a; array_a = nullptr;
   delete [] array_b; array_b = nullptr;
   delete [] local_as; local_as = nullptr;
@@ -605,7 +654,7 @@ void PGAssem_2x2Block_NS_FEM::NatBC_Resis_G(
   double * sctrl_y = new double [snLocBas];
   double * sctrl_z = new double [snLocBas];
   PetscInt * srow_index_v = new PetscInt [snLocBas * 3];
-  
+
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
     // Calculate dot flow rate for face with ebc_id from solution vector dot_sol

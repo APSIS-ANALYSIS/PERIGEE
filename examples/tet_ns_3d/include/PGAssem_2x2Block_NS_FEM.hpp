@@ -15,7 +15,7 @@
 #include "IAGlobal_Mesh_Info.hpp"
 #include "IPLocAssem_2x2Block.hpp"
 #include "FEANode.hpp"
-#include "PDNSolution.hpp"
+#include "PDNSolution_NS.hpp"
 #include "ALocal_NodalBC.hpp"
 #include "ALocal_Inflow_NodalBC.hpp"
 #include "ALocal_EBC.hpp"
