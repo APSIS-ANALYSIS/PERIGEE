@@ -14,10 +14,8 @@
 #include "ALocal_Elem.hpp"
 #include "IAGlobal_Mesh_Info.hpp"
 #include "IPLocAssem_2x2Block.hpp"
-#include "FEANode.hpp"
 #include "PDNSolution_NS.hpp"
 #include "ALocal_NodalBC.hpp"
-#include "ALocal_Inflow_NodalBC.hpp"
 #include "ALocal_EBC.hpp"
 #include "IGenBC.hpp"
 #include "PETSc_Tools.hpp"
@@ -33,6 +31,7 @@ class PGAssem_2x2Block_NS_FEM
 
     IS is[2];
 
+    // Constructor
     PGAssem_2x2Block_NS_FEM(
         IPLocAssem_2x2Block * const &locassem_ptr,
         FEAElement * const &elements,
@@ -46,6 +45,7 @@ class PGAssem_2x2Block_NS_FEM
         const IGenBC * const &gbc,
         const int &in_nz_estimate=60 );
 
+    // Destructor
     virtual ~PGAssem_2x2Block_NS_FEM();
 
     // ------------------------------------------------------------------------
@@ -111,7 +111,7 @@ class PGAssem_2x2Block_NS_FEM
     // ------------------------------------------------------------------------
     void Clear_G() {VecSet(G, 0.0);}
 
-    
+    // Nonzero pattern for the NS equation    
     virtual void Assem_nonzero_estimate(
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem_2x2Block * const &lassem_ptr,
@@ -123,9 +123,24 @@ class PGAssem_2x2Block_NS_FEM
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
+    
+    // Assembly mass matrix and residual vector
+    virtual void Assem_mass_residual(
+        const PDNSolution * const &sol_a,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem_2x2Block * const &lassem_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const APart_Node * const &node_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part );
 
-    // Assembly routine for the surface integrals of flow rate and
-    // pressure
+
+    // Assembly routine for the surface integrals of flow rate
     virtual double Assem_surface_flowrate(
         const PDNSolution * const &sol,
         IPLocAssem_2x2Block * const &lassem_ptr,
@@ -141,6 +156,7 @@ class PGAssem_2x2Block_NS_FEM
         const IQuadPts * const &quad_s,
         const ALocal_Inflow_NodalBC * const &infbc_part );
 
+    // Assembly routine for the surface averaged pressure
     virtual double Assem_surface_ave_pressure(
         const PDNSolution * const &sol,
         IPLocAssem_2x2Block * const &lassem_ptr,
@@ -155,8 +171,6 @@ class PGAssem_2x2Block_NS_FEM
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const ALocal_Inflow_NodalBC * const &infbc_part );
-
-
 
   private:
     // --------------------------------------------------------------

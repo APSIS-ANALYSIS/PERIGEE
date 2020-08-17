@@ -39,7 +39,7 @@ class PGAssem_NS_FEM : public IPGAssem
 
     virtual ~PGAssem_NS_FEM();
 
-    // Nonzero pattern estimate for the ALE-NS equations
+    // Nonzero pattern estimate for the NS equations
     virtual void Assem_nonzero_estimate(
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
