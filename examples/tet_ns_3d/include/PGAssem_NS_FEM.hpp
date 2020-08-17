@@ -171,9 +171,9 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
-    void BackFlow_KG( const PDNSolution * const &dot_sol,
+    void BackFlow_KG( const double &dt,
+        const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
-        const double &dt,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,

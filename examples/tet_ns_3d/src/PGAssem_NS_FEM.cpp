@@ -403,7 +403,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   delete [] row_index; row_index = nullptr;
 
   // Backflow stabilization residual & tangent contribution
-  BackFlow_KG( sol_a, sol_b, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+  BackFlow_KG( dt, sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // Resistance type boundary condition
   NatBC_Resis_KG( dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
@@ -524,9 +524,9 @@ void PGAssem_NS_FEM::BackFlow_G(
 }
 
 
-void PGAssem_NS_FEM::BackFlow_KG( const PDNSolution * const &dot_sol,
+void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
+    const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
-    const double &dt,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
