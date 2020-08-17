@@ -148,14 +148,6 @@ class PGAssem_NS_FEM : public IPGAssem
     
     int snLocBas;
 
-    PetscInt * srow_index;
-
-    double * local_as, * local_bs; // length: dof_sol x snLocBas
-
-    int * LSIEN;
-
-    double * sctrl_x, * sctrl_y, * sctrl_z;
-
     // --------------------------------------------------------------
     // Private function
     // Essential boundary condition

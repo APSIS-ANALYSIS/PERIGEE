@@ -52,36 +52,6 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();
 
-  //row_index = new PetscInt [nLocBas * dof_mat];
-
-  //array_a = new double [nlgn * dof_sol];
-  //array_b = new double [nlgn * dof_sol];
-
-  //local_a = new double [nLocBas * dof_sol];
-  //local_b = new double [nLocBas * dof_sol];
-
-  //IEN_e = new int [nLocBas];
-
-  //ectrl_x = new double [nLocBas];
-  //ectrl_y = new double [nLocBas];
-  //ectrl_z = new double [nLocBas];
-
-  if(num_ebc > 0)
-  {
-    LSIEN = new int [snLocBas];
-    local_as = new double [dof_sol * snLocBas];
-    local_bs = new double [dof_sol * snLocBas];
-    sctrl_x = new double [snLocBas];
-    sctrl_y = new double [snLocBas];
-    sctrl_z = new double [snLocBas];
-    srow_index = new PetscInt [dof_mat * snLocBas];
-  }
-
-  // Now we run a nonzero estimate trial assembly
-  // Initialize array_b first
-  //for(int ii=0; ii<nlgn*dof_sol; ++ii) array_b[ii] = 0.0;
-
-  // array_b will be implicitly called in the nonzero assembly
   Assem_nonzero_estimate( alelem_ptr, locassem_ptr, 
       elements, quads, aien_ptr, pnode_ptr, part_nbc, part_ebc, gbc );
 
@@ -101,17 +71,6 @@ PGAssem_NS_FEM::~PGAssem_NS_FEM()
 {
   VecDestroy(&G);
   MatDestroy(&K);
-
-  if(num_ebc > 0)
-  {
-    delete [] LSIEN; LSIEN = nullptr;
-    delete [] local_as; local_as = nullptr;
-    delete [] local_bs; local_bs = nullptr;
-    delete [] sctrl_x; sctrl_x = nullptr;
-    delete [] sctrl_y; sctrl_y = nullptr;
-    delete [] sctrl_z; sctrl_z = nullptr;
-    delete [] srow_index; srow_index = nullptr;
-  }
 }
 
 
@@ -468,6 +427,12 @@ void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
+  PetscInt * srow_index = new PetscInt [dof_mat * snLocBas];
+
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
     const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
@@ -490,6 +455,12 @@ void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
       VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->Residual, ADD_VALUES);
     }
   }
+
+  delete [] LSIEN; LSIEN = nullptr;
+  delete [] sctrl_x; sctrl_x = nullptr;
+  delete [] sctrl_y; sctrl_y = nullptr;
+  delete [] sctrl_z; sctrl_z = nullptr;
+  delete [] srow_index; srow_index = nullptr;
 }
 
 
@@ -504,6 +475,13 @@ void PGAssem_NS_FEM::BackFlow_G(
 {
   double * array_a = new double [nlgn * dof_sol];
   double * array_b = new double [nlgn * dof_sol];
+  double * local_as = new double [dof_sol * snLocBas];
+  double * local_bs = new double [dof_sol * snLocBas];
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
+  PetscInt * srow_index = new PetscInt [dof_mat * snLocBas];
 
   dot_sol->GetLocalArray( array_a );
   sol->GetLocalArray( array_b );
@@ -536,6 +514,13 @@ void PGAssem_NS_FEM::BackFlow_G(
 
   delete [] array_a; array_a = nullptr;
   delete [] array_b; array_b = nullptr;
+  delete [] local_as; local_as = nullptr;
+  delete [] local_bs; local_bs = nullptr;
+  delete [] LSIEN; LSIEN = nullptr;
+  delete [] sctrl_x; sctrl_x = nullptr;
+  delete [] sctrl_y; sctrl_y = nullptr;
+  delete [] sctrl_z; sctrl_z = nullptr;
+  delete [] srow_index; srow_index = nullptr;
 }
 
 
@@ -550,6 +535,13 @@ void PGAssem_NS_FEM::BackFlow_KG( const PDNSolution * const &dot_sol,
 {
   double * array_a = new double [nlgn * dof_sol];
   double * array_b = new double [nlgn * dof_sol];
+  double * local_as = new double [dof_sol * snLocBas];
+  double * local_bs = new double [dof_sol * snLocBas];
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
+  PetscInt * srow_index = new PetscInt [dof_mat * snLocBas];
 
   dot_sol->GetLocalArray( array_a );
   sol->GetLocalArray( array_b );
@@ -585,6 +577,13 @@ void PGAssem_NS_FEM::BackFlow_KG( const PDNSolution * const &dot_sol,
 
   delete [] array_a; array_a = nullptr;
   delete [] array_b; array_b = nullptr;
+  delete [] local_as; local_as = nullptr;
+  delete [] local_bs; local_bs = nullptr;
+  delete [] LSIEN; LSIEN = nullptr;
+  delete [] sctrl_x; sctrl_x = nullptr;
+  delete [] sctrl_y; sctrl_y = nullptr;
+  delete [] sctrl_z; sctrl_z = nullptr;
+  delete [] srow_index; srow_index = nullptr;
 }
 
 
@@ -598,6 +597,10 @@ double PGAssem_NS_FEM::Assem_surface_flowrate(
 {
   double * array = new double [vec -> get_nlgn()];
   double * local = new double [snLocBas * dof_sol];
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
 
   vec -> GetLocalArray( array );
 
@@ -622,6 +625,10 @@ double PGAssem_NS_FEM::Assem_surface_flowrate(
 
   delete [] array; array = nullptr;
   delete [] local; local = nullptr;
+  delete [] LSIEN; LSIEN = nullptr;
+  delete [] sctrl_x; sctrl_x = nullptr;
+  delete [] sctrl_y; sctrl_y = nullptr;
+  delete [] sctrl_z; sctrl_z = nullptr;
 
   double sum = 0.0;
   MPI_Allreduce(&esum, &sum, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
@@ -639,6 +646,10 @@ double PGAssem_NS_FEM::Assem_surface_flowrate(
 {
   double * array = new double [vec -> get_nlgn()];
   double * local = new double [snLocBas * dof_sol];
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
 
   vec -> GetLocalArray( array );
 
@@ -663,6 +674,10 @@ double PGAssem_NS_FEM::Assem_surface_flowrate(
 
   delete [] array; array = nullptr;
   delete [] local; local = nullptr;
+  delete [] LSIEN; LSIEN = nullptr;
+  delete [] sctrl_x; sctrl_x = nullptr;
+  delete [] sctrl_y; sctrl_y = nullptr;
+  delete [] sctrl_z; sctrl_z = nullptr;
 
   double sum = 0.0;
   MPI_Allreduce(&esum, &sum, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
@@ -681,6 +696,10 @@ double PGAssem_NS_FEM::Assem_surface_ave_pressure(
 {
   double * array = new double [vec -> get_nlgn()];
   double * local = new double [snLocBas * dof_sol];
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
 
   vec -> GetLocalArray( array );
 
@@ -710,6 +729,10 @@ double PGAssem_NS_FEM::Assem_surface_ave_pressure(
 
   delete [] array; array = nullptr;
   delete [] local; local = nullptr;
+  delete [] LSIEN; LSIEN = nullptr;
+  delete [] sctrl_x; sctrl_x = nullptr;
+  delete [] sctrl_y; sctrl_y = nullptr;
+  delete [] sctrl_z; sctrl_z = nullptr;
 
   // Summation over CPUs
   double sum_pres = 0.0, sum_area = 0.0;
@@ -730,6 +753,10 @@ double PGAssem_NS_FEM::Assem_surface_ave_pressure(
 {
   double * array = new double [vec->get_nlgn()];
   double * local = new double [snLocBas * dof_sol];
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
 
   vec -> GetLocalArray( array );
 
@@ -759,6 +786,10 @@ double PGAssem_NS_FEM::Assem_surface_ave_pressure(
 
   delete [] array; array = nullptr;
   delete [] local; local = nullptr;
+  delete [] LSIEN; LSIEN = nullptr;
+  delete [] sctrl_x; sctrl_x = nullptr;
+  delete [] sctrl_y; sctrl_y = nullptr;
+  delete [] sctrl_z; sctrl_z = nullptr;
 
   // Summation over CPUs
   double sum_pres = 0.0, sum_area = 0.0;
@@ -782,6 +813,10 @@ void PGAssem_NS_FEM::NatBC_Resis_G(
 {
   PetscScalar * Res = new PetscScalar [snLocBas * 3];
   PetscInt * srow_idx = new PetscInt [snLocBas * 3];
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
 
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
@@ -828,6 +863,10 @@ void PGAssem_NS_FEM::NatBC_Resis_G(
   }
 
   delete [] Res; Res = nullptr; delete [] srow_idx; srow_idx = nullptr;
+  delete [] LSIEN; LSIEN = nullptr;
+  delete [] sctrl_x; sctrl_x = nullptr;
+  delete [] sctrl_y; sctrl_y = nullptr;
+  delete [] sctrl_z; sctrl_z = nullptr;
 }
 
 
@@ -856,6 +895,11 @@ void PGAssem_NS_FEM::NatBC_Resis_KG(
   std::vector<double> intNB;
   std::vector<int> map_Bj;
 
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
+  
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
     // Calculate dot flow rate for face with ebc_id and MPI_Allreduce them
@@ -959,6 +1003,10 @@ void PGAssem_NS_FEM::NatBC_Resis_KG(
   }
 
   delete [] Res; Res = nullptr; delete [] srow_idx; srow_idx = nullptr;
+  delete [] LSIEN; LSIEN = nullptr;
+  delete [] sctrl_x; sctrl_x = nullptr;
+  delete [] sctrl_y; sctrl_y = nullptr;
+  delete [] sctrl_z; sctrl_z = nullptr;
 }
 
 // EOF
