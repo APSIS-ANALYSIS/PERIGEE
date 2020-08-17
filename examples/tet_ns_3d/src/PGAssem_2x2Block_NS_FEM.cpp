@@ -16,7 +16,9 @@ PGAssem_2x2Block_NS_FEM::PGAssem_2x2Block_NS_FEM(
   dof_sol( pnode_ptr->get_dof() ),
   dof_mat_v( locassem_ptr->get_dof_mat_0() ), 
   dof_mat_p( locassem_ptr->get_dof_mat_1() ),
-  num_ebc( part_ebc->get_num_ebc() )
+  num_ebc( part_ebc->get_num_ebc() ),
+  nlgn( pnode_ptr->get_nlocghonode() ),
+  snLocBas( 0 )
 {
   // Make sure the data structure is compatible
   SYS_T::print_fatal_if(dof_sol != locassem_ptr->get_dof(),
@@ -28,17 +30,13 @@ PGAssem_2x2Block_NS_FEM::PGAssem_2x2Block_NS_FEM(
   // Make sure that the surface element's number of local basis
   // are the same by the users.
   if(num_ebc>0) snLocBas = part_ebc -> get_cell_nLocBas(0);
-  else snLocBas = 0;
 
-  for(int ebc_id=0; ebc_id < num_ebc; ++ebc_id){
+  for(int ebc_id=0; ebc_id < num_ebc; ++ebc_id)
     SYS_T::print_fatal_if(snLocBas != part_ebc->get_cell_nLocBas(ebc_id),
         "Error: in PGAssem_NS_FEM, snLocBas has to be uniform. \n");
-  }
 
-  const int nlocalnode = pnode_ptr->get_nlocalnode();
-  const int nlgn       = pnode_ptr->get_nlocghonode();
-  const int nlocrow_v  = dof_mat_v * nlocalnode;
-  const int nlocrow_p  = dof_mat_p * nlocalnode;
+  const int nlocrow_v  = dof_mat_v * pnode_ptr->get_nlocalnode(); 
+  const int nlocrow_p  = dof_mat_p * pnode_ptr->get_nlocalnode();
 
   // Allocate the block matrices
   // D matrix
@@ -80,41 +78,6 @@ PGAssem_2x2Block_NS_FEM::PGAssem_2x2Block_NS_FEM(
   // Temporarily ignore new entry allocation
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();
-
-  // Allocate containers
-  row_index_v = new PetscInt [nLocBas * dof_mat_v];
-  row_index_p = new PetscInt [nLocBas * dof_mat_p];
-
-  array_a = new double [nlgn * dof_sol];
-  array_b = new double [nlgn * dof_sol];
-
-  local_a = new double [nLocBas * dof_sol];
-  local_b = new double [nLocBas * dof_sol];
-
-  IEN_e = new int [nLocBas];
-
-  ectrl_x = new double [nLocBas];
-  ectrl_y = new double [nLocBas];
-  ectrl_z = new double [nLocBas];
-
-  if(num_ebc > 0)
-  {
-    LSIEN = new int [snLocBas];
-    local_as = new double [dof_sol * snLocBas];
-    local_bs = new double [dof_sol * snLocBas];
-    sctrl_x = new double [snLocBas];
-    sctrl_y = new double [snLocBas];
-    sctrl_z = new double [snLocBas];
-    srow_index_v = new PetscInt [snLocBas * dof_mat_v];
-    srow_index_p = new PetscInt [snLocBas * dof_mat_p];
-  }
-
-  // Initialize values for array
-  for(int ii=0; ii<nlgn*dof_sol; ++ii)
-  {
-    array_a[ii] = 0.0;
-    array_b[ii] = 0.0;
-  }
 
   // Nonzero pattern assembly
   //Assem_nonzero_estimate( alelem_ptr, locassem_ptr,
@@ -257,6 +220,12 @@ void PGAssem_2x2Block_NS_FEM::NatBC_G( const double &curr_time, const double &dt
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
+  PetscInt * srow_index_v = new PetscInt [snLocBas * dof_mat_v];
+
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
     const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
@@ -279,15 +248,37 @@ void PGAssem_2x2Block_NS_FEM::NatBC_G( const double &curr_time, const double &dt
       VecSetValues(subG[1], dof_mat_v*snLocBas, srow_index_v, lassem_ptr->Residual1, ADD_VALUES);
     }
   }
+
+  delete [] LSIEN; LSIEN = nullptr;
+  delete [] sctrl_x; sctrl_x = nullptr;
+  delete [] sctrl_y; sctrl_y = nullptr;
+  delete [] sctrl_z; sctrl_z = nullptr;
+  delete [] srow_index_v; srow_index_v = nullptr;
 }
 
 
-void PGAssem_2x2Block_NS_FEM::BackFlow_G( IPLocAssem_2x2Block * const &lassem_ptr,
+void PGAssem_2x2Block_NS_FEM::BackFlow_G( 
+    const PDNSolution * const &dot_sol,
+    const PDNSolution * const &sol,
+    IPLocAssem_2x2Block * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
+  double * array_a = new double [nlgn * dof_sol];
+  double * array_b = new double [nlgn * dof_sol];
+  double * local_as = new double [dof_sol * snLocBas];
+  double * local_bs = new double [dof_sol * snLocBas];
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
+  PetscInt * srow_index_v = new PetscInt [snLocBas * dof_mat_v];
+
+  dot_sol->GetLocalArray( array_a );
+  sol->GetLocalArray( array_b );
+
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
     const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
@@ -295,9 +286,7 @@ void PGAssem_2x2Block_NS_FEM::BackFlow_G( IPLocAssem_2x2Block * const &lassem_pt
     for(int ee=0; ee<num_sele; ++ee)
     {
       ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
-
       ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
-
       GetLocal(array_a, LSIEN, snLocBas, local_as);
       GetLocal(array_b, LSIEN, snLocBas, local_bs);
 
@@ -313,16 +302,41 @@ void PGAssem_2x2Block_NS_FEM::BackFlow_G( IPLocAssem_2x2Block * const &lassem_pt
       VecSetValues(subG[1], dof_mat_v*snLocBas, srow_index_v, lassem_ptr->sur_Residual1, ADD_VALUES);
     }
   }
+  
+  delete [] array_a; array_a = nullptr;
+  delete [] array_b; array_b = nullptr;
+  delete [] local_as; local_as = nullptr;
+  delete [] local_bs; local_bs = nullptr;
+  delete [] LSIEN; LSIEN = nullptr;
+  delete [] sctrl_x; sctrl_x = nullptr;
+  delete [] sctrl_y; sctrl_y = nullptr;
+  delete [] sctrl_z; sctrl_z = nullptr;
+  delete [] srow_index_v; srow_index_v = nullptr;
 }
 
 
 void PGAssem_2x2Block_NS_FEM::BackFlow_KG( const double &dt,
+    const PDNSolution * const &dot_sol,
+    const PDNSolution * const &sol,
     IPLocAssem_2x2Block * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
+  double * array_a = new double [nlgn * dof_sol];
+  double * array_b = new double [nlgn * dof_sol];
+  double * local_as = new double [dof_sol * snLocBas];
+  double * local_bs = new double [dof_sol * snLocBas];
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
+  PetscInt * srow_index_v = new PetscInt [snLocBas * dof_mat_v];
+
+  dot_sol->GetLocalArray( array_a );
+  sol->GetLocalArray( array_b );
+
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
     const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
@@ -330,9 +344,7 @@ void PGAssem_2x2Block_NS_FEM::BackFlow_KG( const double &dt,
     for(int ee=0; ee<num_sele; ++ee)
     {
       ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
-
       ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
-
       GetLocal(array_a, LSIEN, snLocBas, local_as);
       GetLocal(array_b, LSIEN, snLocBas, local_bs);
 
@@ -351,6 +363,16 @@ void PGAssem_2x2Block_NS_FEM::BackFlow_KG( const double &dt,
       VecSetValues(subG[1], dof_mat_v*snLocBas, srow_index_v, lassem_ptr->sur_Residual1, ADD_VALUES);
     }
   }
+  
+  delete [] array_a; array_a = nullptr;
+  delete [] array_b; array_b = nullptr;
+  delete [] local_as; local_as = nullptr;
+  delete [] local_bs; local_bs = nullptr;
+  delete [] LSIEN; LSIEN = nullptr;
+  delete [] sctrl_x; sctrl_x = nullptr;
+  delete [] sctrl_y; sctrl_y = nullptr;
+  delete [] sctrl_z; sctrl_z = nullptr;
+  delete [] srow_index_v; srow_index_v = nullptr;
 }
 
 
@@ -364,6 +386,10 @@ double PGAssem_2x2Block_NS_FEM::Assem_surface_flowrate(
 {
   double * array = new double [vec -> get_nlgn()];
   double * local = new double [snLocBas * dof_sol];
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
 
   vec -> GetLocalArray( array );
 
@@ -388,6 +414,10 @@ double PGAssem_2x2Block_NS_FEM::Assem_surface_flowrate(
 
   delete [] array; array = nullptr;
   delete [] local; local = nullptr;
+  delete [] LSIEN; LSIEN = nullptr;
+  delete [] sctrl_x; sctrl_x = nullptr;
+  delete [] sctrl_y; sctrl_y = nullptr;
+  delete [] sctrl_z; sctrl_z = nullptr;
 
   double sum = 0.0;
   MPI_Allreduce(&esum, &sum, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
@@ -405,6 +435,10 @@ double PGAssem_2x2Block_NS_FEM::Assem_surface_flowrate(
 {
   double * array = new double [vec -> get_nlgn()];
   double * local = new double [snLocBas * dof_sol];
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
 
   vec -> GetLocalArray( array );
 
@@ -429,6 +463,10 @@ double PGAssem_2x2Block_NS_FEM::Assem_surface_flowrate(
 
   delete [] array; array = nullptr;
   delete [] local; local = nullptr;
+  delete [] LSIEN; LSIEN = nullptr;
+  delete [] sctrl_x; sctrl_x = nullptr;
+  delete [] sctrl_y; sctrl_y = nullptr;
+  delete [] sctrl_z; sctrl_z = nullptr;
 
   double sum = 0.0;
   MPI_Allreduce(&esum, &sum, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
@@ -447,6 +485,10 @@ double PGAssem_2x2Block_NS_FEM::Assem_surface_ave_pressure(
 {
   double * array = new double [vec -> get_nlgn()];
   double * local = new double [snLocBas * dof_sol];
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
 
   vec -> GetLocalArray( array );
 
@@ -476,6 +518,10 @@ double PGAssem_2x2Block_NS_FEM::Assem_surface_ave_pressure(
 
   delete [] array; array = nullptr;
   delete [] local; local = nullptr;
+  delete [] LSIEN; LSIEN = nullptr;
+  delete [] sctrl_x; sctrl_x = nullptr;
+  delete [] sctrl_y; sctrl_y = nullptr;
+  delete [] sctrl_z; sctrl_z = nullptr;
 
   // Summation over CPUs
   double sum_pres = 0.0, sum_area = 0.0;
@@ -496,6 +542,10 @@ double PGAssem_2x2Block_NS_FEM::Assem_surface_ave_pressure(
 {
   double * array = new double [ vec->get_nlgn() ];
   double * local = new double [snLocBas * dof_sol];
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
 
   vec -> GetLocalArray( array );
 
@@ -525,6 +575,10 @@ double PGAssem_2x2Block_NS_FEM::Assem_surface_ave_pressure(
 
   delete [] array; array = nullptr;
   delete [] local; local = nullptr;
+  delete [] LSIEN; LSIEN = nullptr;
+  delete [] sctrl_x; sctrl_x = nullptr;
+  delete [] sctrl_y; sctrl_y = nullptr;
+  delete [] sctrl_z; sctrl_z = nullptr;
 
   // Summation over CPUs
   double sum_pres = 0.0, sum_area = 0.0;
@@ -546,6 +600,12 @@ void PGAssem_2x2Block_NS_FEM::NatBC_Resis_G(
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc )
 {
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
+  PetscInt * srow_index_v = new PetscInt [snLocBas * 3];
+  
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
     // Calculate dot flow rate for face with ebc_id from solution vector dot_sol
@@ -585,6 +645,12 @@ void PGAssem_2x2Block_NS_FEM::NatBC_Resis_G(
       VecSetValues(subG[1], snLocBas*3, srow_index_v, lassem_ptr->Residual1, ADD_VALUES);
     }
   }
+
+  delete [] LSIEN; LSIEN = nullptr;
+  delete [] sctrl_x; sctrl_x = nullptr;
+  delete [] sctrl_y; sctrl_y = nullptr;
+  delete [] sctrl_z; sctrl_z = nullptr;
+  delete [] srow_index_v; srow_index_v = nullptr;
 }
 
 
@@ -613,6 +679,11 @@ void PGAssem_2x2Block_NS_FEM::NatBC_Resis_KG(
   std::vector<double> intNB;
   std::vector<int> map_Bj;
 
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
+
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
     // Calculate dot flow rate for face with ebc_id and MPI_Allreduce them
@@ -637,7 +708,7 @@ void PGAssem_2x2Block_NS_FEM::NatBC_Resis_KG(
 
     // Get the (potentially approximated) n := dP/d(dot_Q)
     const double n_val = gbc -> get_n( ebc_id, dot_flrate, flrate );
-    
+
     // Define alpha_f * n + alpha_f * gamma * dt * m
     // coef a^t a enters as the consistent tangent for the resistance-type bc
     const double coef = a_f * n_val + dd_dv * m_val;
@@ -716,7 +787,10 @@ void PGAssem_2x2Block_NS_FEM::NatBC_Resis_KG(
   }
 
   delete [] Res; Res = nullptr; delete [] srow_idx; srow_idx = nullptr;
+  delete [] LSIEN; LSIEN = nullptr;
+  delete [] sctrl_x; sctrl_x = nullptr;
+  delete [] sctrl_y; sctrl_y = nullptr;
+  delete [] sctrl_z; sctrl_z = nullptr;
 }
-
 
 // EOF

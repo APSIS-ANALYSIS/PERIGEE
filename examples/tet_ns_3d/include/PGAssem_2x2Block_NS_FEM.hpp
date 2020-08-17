@@ -160,23 +160,9 @@ class PGAssem_2x2Block_NS_FEM
   private:
     // --------------------------------------------------------------
     // Data:
-    const int nLocBas, dof_sol, dof_mat_v, dof_mat_p, num_ebc;
+    const int nLocBas, dof_sol, dof_mat_v, dof_mat_p, num_ebc, nlgn;
 
     int snLocBas;
-
-    PetscInt * row_index_v, * row_index_p, * srow_index_v, * srow_index_p;
-
-    double * array_a, * array_b;
-
-    double * local_a, * local_b;
-
-    double * local_as, * local_bs;
-
-    int * IEN_e, * LSIEN;
-
-    double * ectrl_x, * ectrl_y, * ectrl_z;
-
-    double * sctrl_x, * sctrl_y, * sctrl_z;
 
     // --------------------------------------------------------------
     // Functions:
@@ -191,13 +177,17 @@ class PGAssem_2x2Block_NS_FEM
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
-    void BackFlow_G( IPLocAssem_2x2Block * const &lassem_ptr,
+    void BackFlow_G( const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
+        IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
     void BackFlow_KG( const double &dt,
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
         IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
