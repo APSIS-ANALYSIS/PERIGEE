@@ -75,19 +75,56 @@ PGAssem_2x2Block_NS_FEM::PGAssem_2x2Block_NS_FEM(
   VecSetOption(subG[0], VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
   VecSetOption(subG[1], VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
 
+  // Setup nest vectors
+  VecCreateNest(PETSC_COMM_WORLD, 2, NULL, subG, &G);
+
   // Temporarily ignore new entry allocation
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();
 
   // Nonzero pattern assembly
-  //Assem_nonzero_estimate( alelem_ptr, locassem_ptr,
-  //    elements, quads, aien_ptr, pnode_ptr, part_nbc, part_ebc, gbc );
+  Assem_nonzero_estimate( alelem_ptr, locassem_ptr,
+      elements, quads, aien_ptr, pnode_ptr, part_nbc, part_ebc, gbc );
 
+  // Reallocate matrices with precise preallocation
+  std::vector<int> Kdnz, Konz;
+  
+  PETSc_T::Get_dnz_onz(subK[0], Kdnz, Konz);
+  MatDestroy(&subK[0]);
+  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_p, nlocrow_p, PETSC_DETERMINE,
+      PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &subK[0]);
+  
+  PETSc_T::Get_dnz_onz(subK[1], Kdnz, Konz);
+  MatDestroy(&subK[1]);
+  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_p, nlocrow_v, PETSC_DETERMINE,
+      PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &subK[1]);
+  
+  PETSc_T::Get_dnz_onz(subK[2], Kdnz, Konz);
+  MatDestroy(&subK[2]);
+  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_v, nlocrow_p, PETSC_DETERMINE,
+      PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &subK[2]);
+
+  PETSc_T::Get_dnz_onz(subK[3], Kdnz, Konz);
+  MatDestroy(&subK[3]);
+  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_v, nlocrow_v, PETSC_DETERMINE,
+      PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &subK[3]);
+
+  // Put them together as a nested matrix
+  MatCreateNest(PETSC_COMM_WORLD, 2, NULL, 2, NULL, subK, &K);
+ 
+  // Get the index set for the nest matrix 
+  MatNestGetISs(K, is, NULL);
 }
 
 
 PGAssem_2x2Block_NS_FEM::~PGAssem_2x2Block_NS_FEM()
-{}
+{
+  VecDestroy(&subG[0]); VecDestroy(&subG[1]); 
+  VecDestroy(&G);
+  MatDestroy(&subK[0]); MatDestroy(&subK[1]);
+  MatDestroy(&subK[2]); MatDestroy(&subK[3]);
+  MatDestroy(&K);
+}
 
 
 void PGAssem_2x2Block_NS_FEM::EssBC_KG( const ALocal_NodalBC * const &nbc_part )

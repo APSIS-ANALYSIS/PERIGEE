@@ -20,6 +20,7 @@
 #include "ALocal_Inflow_NodalBC.hpp"
 #include "ALocal_EBC.hpp"
 #include "IGenBC.hpp"
+#include "PETSc_Tools.hpp"
 
 class PGAssem_2x2Block_NS_FEM
 {
