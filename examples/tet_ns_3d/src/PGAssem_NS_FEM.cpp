@@ -16,7 +16,8 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   dof_sol( pnode_ptr->get_dof() ),
   dof_mat( locassem_ptr->get_dof_mat() ),
   num_ebc( part_ebc->get_num_ebc() ),
-  nlgn( pnode_ptr->get_nlocghonode() ) 
+  nlgn( pnode_ptr->get_nlocghonode() ),
+  snLocBas( 0 ) 
 {
   // Make sure the data structure is compatible
   SYS_T::print_fatal_if(dof_sol != locassem_ptr->get_dof(),
@@ -28,14 +29,13 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   // Make sure that the surface element's number of local basis are 
   // the same. This is an assumption in this assembly routine.
   if(num_ebc>0) snLocBas = part_ebc -> get_cell_nLocBas(0);
-  else snLocBas = 0;
   
   for(int ebc_id=0; ebc_id < num_ebc; ++ebc_id){
     SYS_T::print_fatal_if(snLocBas != part_ebc->get_cell_nLocBas(ebc_id),
         "Error: in PGAssem_NS_FEM, snLocBas has to be uniform. \n");
   }
 
-  const int nlocrow    = dof_mat * pnode_ptr->get_nlocalnode();
+  const int nlocrow = dof_mat * pnode_ptr->get_nlocalnode();
 
   // Allocate the sparse matrix K
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
