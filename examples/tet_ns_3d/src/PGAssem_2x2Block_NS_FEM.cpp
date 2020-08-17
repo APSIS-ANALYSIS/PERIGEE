@@ -469,6 +469,103 @@ void PGAssem_2x2Block_NS_FEM::Assem_residual(
 }
 
 
+void PGAssem_2x2Block_NS_FEM::Assem_tangent_residual(
+    const PDNSolution * const &sol_a,
+    const PDNSolution * const &sol_b,
+    const PDNSolution * const &dot_sol_np1,
+    const PDNSolution * const &sol_np1,
+    const double &curr_time,
+    const double &dt,
+    const ALocal_Elem * const &alelem_ptr,
+    IPLocAssem_2x2Block * const &lassem_ptr,
+    FEAElement * const &elementv,
+    FEAElement * const &elements,
+    const IQuadPts * const &quad_v,
+    const IQuadPts * const &quad_s,
+    const ALocal_IEN * const &lien_ptr,
+    const APart_Node * const &node_ptr,
+    const FEANode * const &fnode_ptr,
+    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_part,
+    const IGenBC * const &gbc )
+{
+  const int nElem = alelem_ptr->get_nlocalele();
+  const int loc_dof_v = dof_mat_v * nLocBas;
+  const int loc_dof_p = dof_mat_p * nLocBas;
+
+  double * array_a = new double [nlgn * dof_sol];
+  double * array_b = new double [nlgn * dof_sol];
+  double * local_a = new double [nLocBas * dof_sol];
+  double * local_b = new double [nLocBas * dof_sol];
+  int * IEN_e = new int [nLocBas];
+  double * ectrl_x = new double [nLocBas];
+  double * ectrl_y = new double [nLocBas];
+  double * ectrl_z = new double [nLocBas];
+  PetscInt * row_idx_v = new PetscInt [nLocBas * dof_mat_v];
+  PetscInt * row_idx_p = new PetscInt [nLocBas * dof_mat_p];
+
+  sol_a->GetLocalArray( array_a );
+  sol_b->GetLocalArray( array_b );
+
+  for(int ee=0; ee<nElem; ++ee)
+  {
+    lien_ptr->get_LIEN_e(ee, IEN_e);
+    GetLocal(array_a, IEN_e, local_a);
+    GetLocal(array_b, IEN_e, local_b);
+    fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
+ 
+    lassem_ptr->Assem_Tangent_Residual(curr_time, dt, local_a, local_b,
+        elementv, ectrl_x, ectrl_y, ectrl_z, quad_v); 
+
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      const int loc_index  = lien_ptr->get_LIEN(ee, ii);
+
+      row_idx_v[3*ii]   = 3 * nbc_part->get_LID( 1, loc_index );
+      row_idx_v[3*ii+1] = 3 * nbc_part->get_LID( 2, loc_index ) + 1;
+      row_idx_v[3*ii+2] = 3 * nbc_part->get_LID( 3, loc_index ) + 2;
+
+      row_idx_p[ii] = nbc_part->get_LID( 0, loc_index );
+    }
+
+    MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, lassem_ptr->Tangent00, ADD_VALUES);
+    MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, lassem_ptr->Tangent01, ADD_VALUES);
+    MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, lassem_ptr->Tangent10, ADD_VALUES);
+    MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, lassem_ptr->Tangent11, ADD_VALUES);
+
+    VecSetValues(subG[0], loc_dof_p, row_idx_p, lassem_ptr->Residual0, ADD_VALUES);
+    VecSetValues(subG[1], loc_dof_v, row_idx_v, lassem_ptr->Residual1, ADD_VALUES);
+  }
+
+  delete [] array_a; array_a = nullptr;
+  delete [] array_b; array_b = nullptr;
+  delete [] local_a; local_a = nullptr;
+  delete [] local_b; local_b = nullptr;
+  delete [] IEN_e; IEN_e = nullptr;
+  delete [] ectrl_x; ectrl_x = nullptr;
+  delete [] ectrl_y; ectrl_y = nullptr;
+  delete [] ectrl_z; ectrl_z = nullptr;
+  delete [] row_idx_v; row_idx_v = nullptr;
+  delete [] row_idx_p; row_idx_p = nullptr;
+
+  BackFlow_KG( dt, sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+
+  NatBC_Resis_KG( dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
+
+  VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
+  VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
+
+  EssBC_KG( nbc_part );
+
+  MatAssemblyBegin(subK[0], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[0], MAT_FINAL_ASSEMBLY);
+  MatAssemblyBegin(subK[1], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[1], MAT_FINAL_ASSEMBLY);
+  MatAssemblyBegin(subK[2], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[2], MAT_FINAL_ASSEMBLY);
+  MatAssemblyBegin(subK[3], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[3], MAT_FINAL_ASSEMBLY);
+  VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
+  VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
+}
+
+
 void PGAssem_2x2Block_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
     IPLocAssem_2x2Block * const &lassem_ptr,
     FEAElement * const &element_s,
