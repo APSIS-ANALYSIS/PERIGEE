@@ -37,6 +37,7 @@ class PGAssem_NS_FEM : public IPGAssem
         const IGenBC * const &gbc,
         const int &in_nz_estimate=60 );
 
+    // Destructor
     virtual ~PGAssem_NS_FEM();
 
     // Nonzero pattern estimate for the NS equations
@@ -142,13 +143,11 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_Inflow_NodalBC * const &infbc_part );
 
   private:
-    // --------------------------------------------------------------
     // Private data
     const int nLocBas, dof_sol, dof_mat, num_ebc, nlgn;
     
     int snLocBas;
 
-    // --------------------------------------------------------------
     // Private function
     // Essential boundary condition
     void EssBC_KG( const ALocal_NodalBC * const &nbc_part, const int &field );
@@ -163,6 +162,7 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
+    // Backflow integral on outlet surfaces
     void BackFlow_G( const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
         IPLocAssem * const &lassem_ptr,
@@ -180,6 +180,7 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
+    // Resistance type boundary condition on outlet surfaces
     void NatBC_Resis_G( const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
         IPLocAssem * const &lassem_ptr,
@@ -202,11 +203,10 @@ class PGAssem_NS_FEM : public IPGAssem
     void GetLocal(const double * const &array, const int * const &IEN,
         double * const &local_array) const
     {
-      int offset1, offset2;
       for(int ii=0; ii<nLocBas; ++ii)
       {
-        offset1 = ii * dof_sol;
-        offset2 = IEN[ii] * dof_sol;
+        const int offset1 = ii * dof_sol;
+        const int offset2 = IEN[ii] * dof_sol;
         for(int jj=0; jj<dof_sol; ++jj)
           local_array[offset1 + jj] = array[offset2 + jj];
       }
@@ -215,11 +215,10 @@ class PGAssem_NS_FEM : public IPGAssem
     void GetLocal( const double * const &array, const int * const &IEN,
         const int &in_locbas, double * const &local_array) const
     {
-      int offset1, offset2;
       for(int ii=0; ii<in_locbas; ++ii)
       {
-        offset1 = ii * dof_sol;
-        offset2 = IEN[ii] * dof_sol;
+        const int offset1 = ii * dof_sol;
+        const int offset2 = IEN[ii] * dof_sol;
         for(int jj=0; jj<dof_sol; ++jj)
           local_array[offset1 + jj] = array[offset2 + jj];
       }
