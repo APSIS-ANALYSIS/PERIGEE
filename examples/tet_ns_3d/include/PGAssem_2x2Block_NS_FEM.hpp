@@ -217,13 +217,11 @@ class PGAssem_2x2Block_NS_FEM
         const ALocal_Inflow_NodalBC * const &infbc_part );
 
   private:
-    // --------------------------------------------------------------
     // Data:
     const int nLocBas, dof_sol, dof_mat_v, dof_mat_p, num_ebc, nlgn;
 
     int snLocBas;
 
-    // --------------------------------------------------------------
     // Functions:
     void EssBC_KG( const ALocal_NodalBC * const &nbc_part );
 
@@ -295,7 +293,6 @@ class PGAssem_2x2Block_NS_FEM
           local_array[offset1 + jj] = array[offset2 + jj];
       }
     }
-
 };
 
 #endif
