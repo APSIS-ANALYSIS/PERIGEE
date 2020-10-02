@@ -85,8 +85,8 @@ int main(int argc, char *argv[])
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
-  PetscMPIInt rank = SYS_T::get_MPI_rank();
-  PetscMPIInt size = SYS_T::get_MPI_size();
+  const PetscMPIInt rank = SYS_T::get_MPI_rank();
+  const PetscMPIInt size = SYS_T::get_MPI_size();
 
   SYS_T::print_perigee_art();
 
@@ -412,13 +412,13 @@ int main(int argc, char *argv[])
   for(int ff=0; ff<locebc->get_num_ebc(); ++ff)
   {
     const double dot_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        dot_sol, locAssem_ptr, elements, quads, pNode, locebc, ff );
+        dot_sol, locAssem_ptr, elements, quads, locebc, ff );
 
     const double face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        sol, locAssem_ptr, elements, quads, pNode, locebc, ff );
+        sol, locAssem_ptr, elements, quads, locebc, ff );
 
     const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
-        sol, locAssem_ptr, elements, quads, pNode, locebc, ff );
+        sol, locAssem_ptr, elements, quads, locebc, ff );
 
     // set the gbc initial conditions using the 3D data
     gbc -> reset_initial_sol( ff, face_flrate, face_avepre );
@@ -454,10 +454,10 @@ int main(int argc, char *argv[])
 
   // ===== Inlet data recording files =====
   const double inlet_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-      sol, locAssem_ptr, elements, quads, pNode, locinfnbc );
+      sol, locAssem_ptr, elements, quads, locinfnbc );
 
   const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
-      sol, locAssem_ptr, elements, quads, pNode, locinfnbc );
+      sol, locAssem_ptr, elements, quads, locinfnbc );
 
   if( rank == 0 )
   {
