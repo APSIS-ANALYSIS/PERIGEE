@@ -5,23 +5,23 @@ PLocAssem_Tet_VMS_NS_GenAlpha::PLocAssem_Tet_VMS_NS_GenAlpha(
         const int &in_nlocbas, const int &in_nqp,
         const int &in_snlocbas,
         const double &in_rho, const double &in_vis_mu,
-        const double &in_beta, const double &in_ctauc, 
-        const int &elemtype )
+        const double &in_beta, const double &in_ct, 
+        const double &in_ctauc, const int &elemtype )
 : rho0( in_rho ), vis_mu( in_vis_mu ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()), beta(in_beta), nqp(in_nqp),
-  Ctauc( in_ctauc )
+  CT( in_ct ), Ctauc( in_ctauc )
 {
   if(elemtype == 501)
   {
     // 501 is linear element
-    CI = 36.0; CT = 4.0;
+    CI = 36.0;
     nLocBas = 4; snLocBas = 3;
   }
   else if(elemtype == 502)
   {
     // 502 is quadratic element
-    CI = 60.0; CT = 4.0;
+    CI = 60.0;
     nLocBas = 10; snLocBas = 6;
   }
   else SYS_T::print_fatal("Error: unknown elem type.\n");
