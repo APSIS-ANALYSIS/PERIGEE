@@ -119,6 +119,8 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
     }
   }
 
+  if( num_out_bc_pts == num_node ) SYS_T::print_fatal( "Error: the number of outline points is %d and the number of total points on the surface is %d. This is likely due to an improper wall mesh. \n", num_out_bc_pts, num_node );
+
   inf_active_area = 0.0;
   face_area = 0.0;
 
