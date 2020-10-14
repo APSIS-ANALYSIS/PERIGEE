@@ -119,6 +119,11 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
     }
   }
 
+  // If the number of the surface nodes matches with the num_out_bc_pts, this
+  // means the wall mesh contains the inlet surface. This is a common error
+  // happens from adopting sv files, where the user uses the combined outer
+  // surface as the wall mesh. We will throw an error message if this is
+  // detected.
   if( num_out_bc_pts == num_node ) SYS_T::print_fatal( "Error: the number of outline points is %d and the number of total points on the surface is %d. This is likely due to an improper wall mesh. \n", num_out_bc_pts, num_node );
 
   inf_active_area = 0.0;
