@@ -1,5 +1,4 @@
-#ifndef ALOCAL_INFLOW_NODALBC_HPP
-#define ALOCAL_INFLOW_NODALBC_HPP
+
 // ==================================================================
 // ALocal_Inflow_NodalBC.hpp
 //
@@ -62,9 +61,13 @@ class ALocal_Inflow_NodalBC
     virtual int get_cell_nLocBas() const {return cell_nLocBas;}
 
     // get the coordinates of the nodes
+    // direct access the data array local_pt_xyz by the naive array index
+    // 0 <= ii < 3 x num_local_node
     virtual double get_local_pt_xyz(const int &ii) const {return local_pt_xyz[ii];}
 
     // get the element's IEN array
+    // direct access the data array local_tri_ien by its naive array index
+    // 0 <= ii < cell_nLocBas x num_local_cell
     virtual int get_local_tri_ien(const int &ii) const {return local_tri_ien[ii];}
 
     // --------------------------------------------------------------
