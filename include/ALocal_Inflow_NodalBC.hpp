@@ -1,4 +1,5 @@
-
+#ifndef ALOCAL_INFLOW_NODALBC_HPP
+#define ALOCAL_INFLOW_NODALBC_HPP
 // ==================================================================
 // ALocal_Inflow_NodalBC.hpp
 //
