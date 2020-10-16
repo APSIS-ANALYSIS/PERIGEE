@@ -84,7 +84,7 @@ NBC_Partition_3D_inflow::NBC_Partition_3D_inflow(
 }
 
 
-NBC_Partition_3D_inflow:: ~NBC_Partition_3D_inflow()
+NBC_Partition_3D_inflow::~NBC_Partition_3D_inflow()
 {}
 
 
