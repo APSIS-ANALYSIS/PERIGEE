@@ -7,6 +7,7 @@ void TET_T::read_vtu_grid( const std::string &filename,
   vtkXMLUnstructuredGridReader * reader = vtkXMLUnstructuredGridReader::New();
   reader -> SetFileName( filename.c_str() );
   reader -> Update();
+  reader -> GlobalWarningDisplayOff();
   vtkUnstructuredGrid * vtkugrid = reader -> GetOutput();
 
   // Number of grid points in the mesh

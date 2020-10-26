@@ -28,8 +28,8 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     ElemBC_3D_tet_wall(const std::string &walls_combined,
         const std::string &centerlines_combined,
         const double &thickness2radius_combined,
-        const double &in_fluid_density = 1.065,
-        const int &elemtype = 501 );
+        const int &elemtype = 501,
+        const double &in_fluid_density = 1.065 );
 
     // --------------------------------------------------------------
     //  Constructing wall properties with multiple spatial distributions.
@@ -47,8 +47,8 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
         const std::vector<std::string> &wallsList,
         const std::vector<std::string> &centerlinesList,
         const std::vector<double> &thickness2radiusList,
-        const double &in_fluid_density = 1.065,
-        const int &elemtype = 501 );
+        const int &elemtype = 501,
+        const double &in_fluid_density = 1.065 );
 
     virtual ~ElemBC_3D_tet_wall();
 
@@ -60,8 +60,12 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     virtual void get_wall_youngsmod( std::vector<double> &E ) const
     {E = youngsmod;}
 
-    virtual void write_vtk( const int &ebc_id, 
+    virtual void write_vtk( const int &ebc_id,
+        const int &elemtype, 
         const std::string &filename="elembc_surface" ) const;
+
+    virtual void add_wall_data( vtkPointSet * const &grid_w,
+        const int &ebc_id ) const;
 
     virtual double get_fluid_density() const {return fluid_density;}
 
