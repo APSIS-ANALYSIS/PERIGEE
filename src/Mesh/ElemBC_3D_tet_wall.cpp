@@ -4,14 +4,11 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const std::string &walls_combined,
     const std::string &centerlines_combined,
     const double &thickness2radius_combined,
-    const double &in_fluid_density,
-    const int &elemtype )
+    const int &elemtype,
+    const double &in_fluid_density )
 : ElemBC_3D_tet( walls_combined, elemtype ),
   fluid_density( in_fluid_density )
 {
-  // Check inputs
-  SYS_T::print_fatal_if( elemtype != 501, "Error: unsupported element type.\n");
-
   // num_ebc = 1 for wall elem bc
   const int ebc_id = 0;
 
@@ -53,7 +50,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   cell    -> Delete();
 
   // Write out vtp's with wall properties
-  write_vtk(ebc_id, "varwallprop");
+  write_vtk(ebc_id, elemtype, "varwallprop");
 }
 
 
@@ -64,10 +61,10 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const std::vector<std::string> &wallsList,
     const std::vector<std::string> &centerlinesList,
     const std::vector<double> &thickness2radiusList,
-    const double &in_fluid_density,
-    const int &elemtype )
+    const int &elemtype,
+    const double &in_fluid_density )
 : ElemBC_3D_tet_wall( walls_combined, centerlines_combined, thickness2radius_combined,
-                      in_fluid_density, elemtype)
+                      elemtype, in_fluid_density)
 {
   // Check inputs
   SYS_T::print_fatal_if( centerlinesList.size() != wallsList.size(),
@@ -88,8 +85,16 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   std::vector<int> ien_array, global_node_idx, global_elem_idx;
   for(int ii=0; ii<num_srfs; ++ii)
   {
-    TET_T::read_vtp_grid( wallsList[ii], numpts, numcels,
-          pt, ien_array, global_node_idx, global_elem_idx ); 
+    if(elemtype == 501)
+    {
+      TET_T::read_vtp_grid( wallsList[ii], numpts, numcels,
+            pt, ien_array, global_node_idx, global_elem_idx ); 
+    }
+    else
+    {
+      TET_T::read_vtu_grid( wallsList[ii], numpts, numcels,
+            pt, ien_array, global_node_idx, global_elem_idx );
+    }
 
     vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
     reader -> SetFileName( centerlinesList[ii].c_str() );
@@ -139,7 +144,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   VEC_T::clean( global_node_idx ); VEC_T::clean( global_elem_idx );
 
   // Write out vtp's with wall properties
-  write_vtk(ebc_id, "varwallprop");
+  write_vtk(ebc_id, elemtype, "varwallprop");
 }
 
 
@@ -161,14 +166,38 @@ void ElemBC_3D_tet_wall::print_info() const
 }
 
 
-void ElemBC_3D_tet_wall::write_vtk( const int &ebc_id, const std::string &filename ) const
+void ElemBC_3D_tet_wall::write_vtk( const int &ebc_id, const int &elemtype,
+    const std::string &filename ) const
 {
-  vtkPolyData * grid_w = vtkPolyData::New();
-  
-  TET_T::gen_triangle_grid( grid_w, 
-      num_node[ebc_id], num_cell[ebc_id],
-      pt_xyz[ebc_id], tri_ien[ebc_id] );    
+  if(elemtype == 501)
+  {
+    vtkPolyData * grid_w = vtkPolyData::New();
 
+    TET_T::gen_triangle_grid( grid_w, num_node[ebc_id], num_cell[ebc_id],
+        pt_xyz[ebc_id], tri_ien[ebc_id] );
+
+    add_wall_data(grid_w, ebc_id);
+
+    TET_T::write_vtkPointSet(filename, grid_w);
+    grid_w->Delete();  
+  }
+  else
+  {
+    vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
+
+    TET_T::gen_quadratic_triangle_grid( grid_w, num_node[ebc_id], num_cell[ebc_id],
+        pt_xyz[ebc_id], tri_ien[ebc_id] );
+
+    add_wall_data(grid_w, ebc_id);
+
+    TET_T::write_vtkPointSet(filename, grid_w);
+    grid_w->Delete();
+  }
+}
+
+
+void ElemBC_3D_tet_wall::add_wall_data( vtkPointSet * const &grid_w, const int &ebc_id ) const
+{
   // Add nodal indices
   TET_T::add_int_PointData( grid_w, global_node[ebc_id], "GlobalNodeID" );
 
@@ -181,14 +210,8 @@ void ElemBC_3D_tet_wall::write_vtk( const int &ebc_id, const std::string &filena
   // Add Young's modulus
   TET_T::add_double_PointData( grid_w, youngsmod, "YoungsModulus" );
 
-  // Add Radius
+  // Add radius
   TET_T::add_double_PointData( grid_w, radius, "Radius" );
-
-  // write vtp
-  TET_T::write_vtkPointSet(filename, grid_w);
-
-  // Clean memory
-  grid_w->Delete();
 }
 
 
