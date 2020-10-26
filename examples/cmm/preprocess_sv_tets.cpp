@@ -8,11 +8,14 @@
 // ==================================================================
 #include "Math_Tools.hpp"
 #include "Mesh_Tet4.hpp"
+#include "Mesh_Tet10.hpp"
 #include "IEN_Tetra_P1.hpp"
+#include "IEN_Tetra_P2.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
 #include "Part_Tet.hpp"
 #include "NodalBC_3D_vtp.hpp"
+#include "NodalBC_3D_vtu.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_tet_outflow.hpp"
 #include "ElemBC_3D_tet_wall.hpp"
@@ -36,7 +39,7 @@ int main( int argc, char * argv[] )
   const std::string part_file("part");
   
   // Element options: 501 linear tets, 502 quadratic tets
-  const int elemType = 501;
+  int elemType = 501;
   int num_outlet = 1;
   
   // Default names for input geometry files
@@ -58,13 +61,17 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionInt("-cpu_size", cpu_size);
   SYS_T::GetOptionInt("-in_ncommon", in_ncommon);
   SYS_T::GetOptionInt("-num_outlet", num_outlet);
+  SYS_T::GetOptionInt("-elem_type", elemType);
   SYS_T::GetOptionString("-geo_file", geo_file);
   SYS_T::GetOptionString("-sur_file_in", sur_file_in);
   SYS_T::GetOptionString("-sur_file_wall", sur_file_wall);
   SYS_T::GetOptionString("-sur_file_out_base", sur_file_out_base);
 
+  if( elemType != 501 && elemType !=502 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
+
   // Print the command line arguments
   cout<<"==== Command Line Arguments ===="<<endl;
+  cout<<" -elem_type: "<<elemType<<endl;
   cout<<" -num_outlet: "<<num_outlet<<endl;
   cout<<" -geo_file: "<<geo_file<<endl;
   cout<<" -sur_file_in: "<<sur_file_in<<endl;
@@ -75,7 +82,6 @@ int main( int argc, char * argv[] )
   cout<<" -in_ncommon: "<<in_ncommon<<endl;
   cout<<" -isDualGraph: true \n";
   cout<<"---- Problem definition ----\n";
-  cout<<" elem_type: "<<elemType<<endl;
   cout<<" dofNum: "<<dofNum<<endl;
   cout<<" dofMat: "<<dofMat<<endl;
   cout<<"====  Command Line Arguments/ ===="<<endl;
@@ -83,11 +89,20 @@ int main( int argc, char * argv[] )
   // Check if the vtu geometry files exist on disk
   SYS_T::file_check(geo_file); cout<<geo_file<<" found. \n";
 
+  // If quadratic, all mesh files will be in vtu format
+  if(elemType == 502)
+  {
+    sur_file_in.erase( sur_file_in.end()-4, sur_file_in.end() );
+    sur_file_in += ".vtu";
+    sur_file_wall.erase( sur_file_wall.end()-4, sur_file_wall.end() );
+    sur_file_wall += ".vtu";
+  }
+
   SYS_T::file_check(sur_file_in); cout<<sur_file_in<<" found. \n";
 
   SYS_T::file_check(sur_file_wall); cout<<sur_file_wall<<" found. \n";
 
-  // Generate the outlet file names and check existance
+  // Generate the outlet file names and check existence
   std::vector< std::string > sur_file_out;
   sur_file_out.resize( num_outlet );
 
@@ -98,8 +113,9 @@ int main( int argc, char * argv[] )
     if( ii/10 == 0 ) ss<<"00";
     else if( ii/100 == 0 ) ss<<"0";
 
-    ss<<ii<<".vtp";
-      
+    if(elemType == 501 ) ss<<ii<<".vtp";
+    else ss<<ii<<".vtu";
+ 
     sur_file_out[ii] = ss.str(); // generate the outlet face file name
     
     SYS_T::file_check(sur_file_out[ii]);
@@ -134,10 +150,20 @@ int main( int argc, char * argv[] )
   IIEN * IEN = nullptr;
   IMesh * mesh = nullptr;
 
-  SYS_T::print_fatal_if(vecIEN.size() / nElem != 4, "Error: the mesh connectivity array size does not match with the element type 501. \n");
-
-  IEN = new IEN_Tetra_P1(nElem, vecIEN);
-  mesh = new Mesh_Tet4(nFunc, nElem);
+  if(elemType == 501)
+  {
+    SYS_T::print_fatal_if(vecIEN.size() / nElem != 4, "Error: the mesh connectivity array size does not match with the element type 501. \n");
+    
+    IEN = new IEN_Tetra_P1(nElem, vecIEN);
+    mesh = new Mesh_Tet4(nFunc, nElem);
+  }
+  else
+  {
+    SYS_T::print_fatal_if(vecIEN.size() / nElem != 10, "Error: the mesh connectivity array size does not match with the element type 502. \n");
+    
+    IEN = new IEN_Tetra_P2(nElem, vecIEN);
+    mesh = new Mesh_Tet10(nFunc, nElem);
+  }
 
   VEC_T::clean( vecIEN ); // clean the vector
 
@@ -163,10 +189,20 @@ int main( int argc, char * argv[] )
   std::vector<std::string> dir_list;
   dir_list.push_back( sur_file_in );
 
-  NBC_list[0] = new NodalBC_3D_vtp( nFunc );
-  NBC_list[1] = new NodalBC_3D_vtp( dir_list, nFunc );
-  NBC_list[2] = new NodalBC_3D_vtp( dir_list, nFunc );
-  NBC_list[3] = new NodalBC_3D_vtp( dir_list, nFunc );
+  if(elemType == 501)
+  {
+    NBC_list[0] = new NodalBC_3D_vtp( nFunc );
+    NBC_list[1] = new NodalBC_3D_vtp( dir_list, nFunc );
+    NBC_list[2] = new NodalBC_3D_vtp( dir_list, nFunc );
+    NBC_list[3] = new NodalBC_3D_vtp( dir_list, nFunc );
+  }
+  else
+  {
+    NBC_list[0] = new NodalBC_3D_vtu( nFunc );
+    NBC_list[1] = new NodalBC_3D_vtu( dir_list, nFunc );
+    NBC_list[2] = new NodalBC_3D_vtu( dir_list, nFunc );
+    NBC_list[3] = new NodalBC_3D_vtu( dir_list, nFunc );
+  }
 
   // Inflow BC info
   std::vector<double> inflow_outward_vec;
@@ -196,13 +232,16 @@ int main( int argc, char * argv[] )
   std::vector<std::string> wallsList; wallsList.clear();
   std::vector<std::string> centerlinesList; centerlinesList.clear();
   std::vector<double> thickness2radiusList; thickness2radiusList.clear();
-  wallsList.push_back( "wall_aorta.vtp" );
+
+  if(elemType == 501) wallsList.push_back( "wall_aorta.vtp" );
+  else wallsList.push_back( "wall_aorta.vtu" );
+
   centerlinesList.push_back( "centerlines_aorta.vtp" );
   thickness2radiusList.push_back( 0.2 );
 
   ElemBC * wall_bc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
                                              thickness2radius_combined, wallsList,
-                                             centerlinesList, thickness2radiusList);
+                                             centerlinesList, thickness2radiusList, elemType);
   wall_bc -> resetTriIEN_outwardnormal( IEN );
 
   // Start partition the mesh for each cpu_rank 
