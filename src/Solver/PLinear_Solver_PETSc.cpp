@@ -9,7 +9,6 @@ PLinear_Solver_PETSc::PLinear_Solver_PETSc()
   KSPSetFromOptions(ksp);
 }
 
-
 PLinear_Solver_PETSc::PLinear_Solver_PETSc(
     const double &input_rtol, const double &input_atol,
     const double &input_dtol, const int &input_maxits)
@@ -20,7 +19,6 @@ PLinear_Solver_PETSc::PLinear_Solver_PETSc(
   KSPSetTolerances(ksp, rtol, atol, dtol, maxits);
   KSPSetFromOptions(ksp);
 }
-
 
 PLinear_Solver_PETSc::PLinear_Solver_PETSc(
     const double &input_rtol, const double &input_atol,
@@ -41,14 +39,12 @@ PLinear_Solver_PETSc::PLinear_Solver_PETSc(
   PCSetFromOptions(ksp_pc);
 }
 
-
 PLinear_Solver_PETSc::~PLinear_Solver_PETSc()
 {
   KSPDestroy(&ksp);
 }
 
-
-void PLinear_Solver_PETSc::Solve( const Vec &G, Vec &out_sol )
+void PLinear_Solver_PETSc::Solve( const Vec &G, Vec &out_sol, const bool &isPrint )
 {
 #ifdef PETSC_USE_LOG
   PetscLogEvent solver_gmres;
@@ -64,15 +60,46 @@ void PLinear_Solver_PETSc::Solve( const Vec &G, Vec &out_sol )
   PetscLogEventEnd(solver_gmres,0,0,0,0);
 #endif
 
-  PetscInt its;
-  KSPGetIterationNumber(ksp, &its);
-  PetscReal resnorm;
-  KSPGetResidualNorm(ksp, &resnorm);
-  PetscPrintf(PETSC_COMM_WORLD, "  --- KSP: %d, %e", its, resnorm);
+  if( isPrint )
+  {
+    PetscInt its;
+    KSPGetIterationNumber(ksp, &its);
+    PetscReal resnorm;
+    KSPGetResidualNorm(ksp, &resnorm);
+    PetscPrintf(PETSC_COMM_WORLD, "  --- KSP: %d, %e", its, resnorm);
+  }
 }
 
+void PLinear_Solver_PETSc::Solve( const Mat &K, const Vec &G, Vec &out_sol,
+   const bool &isPrint )
+{
+#ifdef PETSC_USE_LOG
+  PetscLogEvent solver_gmres;
+  PetscClassId classid_ls;
+  PetscClassIdRegister("petsc_ls", &classid_ls);
+  PetscLogEventRegister("petsc solver", classid_ls, &solver_gmres);
+  PetscLogEventBegin(solver_gmres,0,0,0,0);
+#endif
 
-void PLinear_Solver_PETSc::Solve( const Mat &K, const Vec &G, PDNSolution * const &out_sol)
+  KSPSetOperators(ksp, K, K);
+  KSPSolve(ksp, G, out_sol);
+
+#ifdef PETSC_USE_LOG
+  PetscLogEventEnd(solver_gmres,0,0,0,0);
+#endif
+
+  if( isPrint )
+  {
+    PetscInt its;
+    KSPGetIterationNumber(ksp, &its);
+    PetscReal resnorm;
+    KSPGetResidualNorm(ksp, &resnorm);
+    PetscPrintf(PETSC_COMM_WORLD, "  --- KSP: %d, %e", its, resnorm);
+  }
+}
+
+void PLinear_Solver_PETSc::Solve( const Mat &K, const Vec &G, 
+    PDNSolution * const &out_sol, const bool &isPrint )
 {
 #ifdef PETSC_USE_LOG
   PetscLogEvent solver_gmres;
@@ -88,18 +115,22 @@ void PLinear_Solver_PETSc::Solve( const Mat &K, const Vec &G, PDNSolution * cons
 #ifdef PETSC_USE_LOG
   PetscLogEventEnd(solver_gmres,0,0,0,0);
 #endif
-  
-  PetscInt its;
-  KSPGetIterationNumber(ksp, &its);
-  PetscReal resnorm;
-  KSPGetResidualNorm(ksp, &resnorm);
 
-  PetscPrintf(PETSC_COMM_WORLD, "  --- KSP: %d, %e", its, resnorm);
+  if( isPrint )
+  {
+    PetscInt its;
+    KSPGetIterationNumber(ksp, &its);
+    PetscReal resnorm;
+    KSPGetResidualNorm(ksp, &resnorm);
+    PetscPrintf(PETSC_COMM_WORLD, "  --- KSP: %d, %e", its, resnorm);
+  }
+  
+  // Update solution entries on ghost nodes
   out_sol->GhostUpdate();
 }
 
-
-void PLinear_Solver_PETSc::Solve( const Vec &G, PDNSolution * const &out_sol)
+void PLinear_Solver_PETSc::Solve( const Vec &G, PDNSolution * const &out_sol,
+    const bool &isPrint )
 {
 #ifdef PETSC_USE_LOG
   PetscLogEvent solver_gmres;
@@ -115,15 +146,18 @@ void PLinear_Solver_PETSc::Solve( const Vec &G, PDNSolution * const &out_sol)
   PetscLogEventEnd(solver_gmres,0,0,0,0);
 #endif
 
-  PetscInt its;
-  KSPGetIterationNumber(ksp, &its);
-  PetscReal resnorm;
-  KSPGetResidualNorm(ksp, &resnorm);
-
-  PetscPrintf(PETSC_COMM_WORLD, "  --- KSP: %d, %e ", its, resnorm);
+  if( isPrint )
+  {
+    PetscInt its;
+    KSPGetIterationNumber(ksp, &its);
+    PetscReal resnorm;
+    KSPGetResidualNorm(ksp, &resnorm);
+    PetscPrintf(PETSC_COMM_WORLD, "  --- KSP: %d, %e ", its, resnorm);
+  }
+  
+  // Update solution entries on ghost nodes
   out_sol->GhostUpdate();
 }
-
 
 void PLinear_Solver_PETSc::Monitor() const
 {
