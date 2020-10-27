@@ -62,10 +62,25 @@ class ALocal_Inflow_NodalBC
     virtual int get_cell_nLocBas() const {return cell_nLocBas;}
 
     // get the coordinates of the nodes
+    // direct access the data array local_pt_xyz by the naive array index
+    // 0 <= ii < 3 x num_local_node
     virtual double get_local_pt_xyz(const int &ii) const {return local_pt_xyz[ii];}
 
+    // access the point coordinates by the node surface index and dir
+    // 0 <= ii < num_local_node, 0 <= dir < 3
+    virtual double get_local_pt_xyz(const int &ii, const int &dir) const 
+    {return local_pt_xyz[3*ii+dir];}
+
     // get the element's IEN array
+    // direct access the data array local_tri_ien by its naive array index
+    // 0 <= ii < cell_nLocBas x num_local_cell
     virtual int get_local_tri_ien(const int &ii) const {return local_tri_ien[ii];}
+
+    // access the ien array by the local element index and surface element local
+    // node index
+    // 0 <= ee < num_local_cell, 0 <= ii < cell_nLocBas
+    virtual int get_local_tri_ien(const int &ee, const int &ii) const
+    {return local_tri_ien[ee * cell_nLocBas + ii];}
 
     // --------------------------------------------------------------
     // get_ctrlPts_xyz: given element index eindex,

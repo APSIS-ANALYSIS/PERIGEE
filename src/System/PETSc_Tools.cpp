@@ -142,4 +142,16 @@ double PETSc_T::GetValue( const Vec &a, const int ii )
 }
 
 
+void PETSc_T::WriteBinary( const Vec &a, const char * const &file_name )
+{
+  PetscViewer viewer;
+  PetscViewerCreate(PETSC_COMM_WORLD, &viewer);
+  PetscViewerSetType(viewer, PETSCVIEWERBINARY);
+  PetscViewerFileSetMode(viewer, FILE_MODE_WRITE);
+  PetscViewerBinarySkipInfo(viewer);
+  PetscViewerFileSetName(viewer, file_name);
+  VecView(a, viewer);
+  PetscViewerDestroy(&viewer);
+}
+
 // EOF

@@ -25,11 +25,8 @@ int main( int argc, char * argv[] )
   
   std::string sol_bname("SOL_");
   std::string out_bname = sol_bname;
-  int time_start = 0;
-  int time_step = 1;
-  int time_end = 1;
-  bool isXML = true;
-  bool isRestart = false;
+  int time_start = 0, time_step = 1, time_end = 1;
+  bool isXML = true, isRestart = false;
 
   // Read analysis code parameter if the solver_cmd.h5 exists
   hid_t prepcmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);

@@ -48,18 +48,23 @@ class PLinear_Solver_PETSc
     // ! Solve a linear problem K out_sol = G
     //   This out_sol is a plain vector, with no ghost entries.
     // --------------------------------------------------------------
-    void Solve( const Vec &G, Vec &out_sol );
+    void Solve( const Vec &G, Vec &out_sol, const bool &isPrint=true );
 
+    void Solve( const Mat &K, const Vec &G, Vec &out_sol, 
+        const bool &isPrint=true );
+    
     // --------------------------------------------------------------
     // ! Solve a linear problem K out_sol = G
     // --------------------------------------------------------------
-    void Solve( const Mat &K, const Vec &G, PDNSolution * const &out_sol);
+    void Solve( const Mat &K, const Vec &G, PDNSolution * const &out_sol,
+        const bool &isPrint=true );
 
     // --------------------------------------------------------------
     // ! Solve a linear problem with RHS given as G and solution is out_sol
     //   assume the operator has been assigned to KSP
     // --------------------------------------------------------------
-    void Solve( const Vec &G, PDNSolution * const &out_sol);
+    void Solve( const Vec &G, PDNSolution * const &out_sol,
+        const bool &isPrint=true );
 
     // --------------------------------------------------------------
     // ! Link the solver to a preconditioner context
@@ -83,26 +88,11 @@ class PLinear_Solver_PETSc
     }
 
     // --------------------------------------------------------------
-    // ! Set the residual calculation to be un-preconditioned.
-    // --------------------------------------------------------------
-    void set_ksp_normal_unpreconditioned()
-    {KSPSetNormType(ksp, KSP_NORM_UNPRECONDITIONED);}
-    
-    // --------------------------------------------------------------
     // ! Print the ksp info on screen
     // --------------------------------------------------------------
-    void Info() const
-    {
-      SYS_T::commPrint("----------------------------------------------------------- \n");
-      KSPView(ksp, PETSC_VIEWER_STDOUT_WORLD);
-      SYS_T::commPrint("----------------------------------------------------------- \n");
-    }
-
     void print_info() const
     {
-      SYS_T::commPrint("----------------------------------------------------------- \n");
       KSPView(ksp, PETSC_VIEWER_STDOUT_WORLD);
-      SYS_T::commPrint("----------------------------------------------------------- \n");
     }
 
     // --------------------------------------------------------------
