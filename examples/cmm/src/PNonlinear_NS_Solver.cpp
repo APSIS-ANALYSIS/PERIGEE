@@ -94,6 +94,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   dot_sol->Copy(*pre_dot_sol);
   dot_sol->ScaleValue( (gamma-1.0)/gamma );
 
+  // ==== TODO: Implement segregated algorithm for wall displacement ====
+
   // Define the dol_sol at alpha_m: dot_sol_alpha
   PDNSolution dot_sol_alpha(*pre_dot_sol);
   dot_sol_alpha.ScaleValue( 1.0 - alpha_m );
