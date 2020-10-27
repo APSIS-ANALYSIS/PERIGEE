@@ -39,7 +39,16 @@ class NodalBC_3D_vtp : public INodalBC
     // set ID based on the above "no-nodal bc" setting.
     // --------------------------------------------------------------
     NodalBC_3D_vtp( const int &nFunc );
-    
+   
+    // --------------------------------------------------------------
+    // It will specify the Dirichlet nodes for CMM, which includes
+    // all inlet nodes, and the `ring' nodes for the outlet surfaces.
+    // --------------------------------------------------------------
+    NodalBC_3D_vtp( const std::string &inflow_vtp_file,
+        const std::string &wall_vtp_file,
+        const std::vector<std::string> &outflow_vtp_files,
+        const int &nFunc );
+     
     // --------------------------------------------------------------
     // The vtp file specifies the Dirichlet nodes. No periodical BC.
     // --------------------------------------------------------------

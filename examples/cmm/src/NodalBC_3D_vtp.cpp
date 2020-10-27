@@ -14,8 +14,17 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const int &nFunc )
 }
 
 
+NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &inflow_vtp_file,
+    const std::string &wall_vtp_file,
+    const std::vector<std::string> &outflow_vtp_files,
+    const int &nFunc )
+{
+  // TO BE IMPLEMENTED.
+}
+
+
 NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &vtpfileName,
-   const int &nFunc )
+    const int &nFunc )
 {
   SYS_T::file_check( vtpfileName );
 
@@ -38,7 +47,7 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &vtpfileName,
   for(unsigned int ii=0; ii<gnode.size(); ++ii)
   {
     if(gnode[ii]<0) SYS_T::print_fatal("Error: there are negative nodal index! \n");
-  
+
     dir_nodes[ii] = static_cast<unsigned int>( gnode[ii] ); 
   }
 
@@ -68,7 +77,7 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::vector<std::string> &vtpfileList,
     std::vector<int> ien, gnode, gelem;
 
     TET_T::read_vtp_grid( vtpfileList[ii], numpts, numcels, pts, ien, gnode, gelem );
-  
+
     if( numpts != static_cast<int>(gnode.size()) )
       SYS_T::print_fatal("Error: the numpts != global_node.size()! \n");
 
@@ -79,7 +88,7 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::vector<std::string> &vtpfileList,
       dir_nodes.push_back( static_cast<unsigned int>( gnode[jj]) );
     }
   }
-  
+
   VEC_T::sort_unique_resize(dir_nodes);
 
   num_dir_nodes = dir_nodes.size();
@@ -115,7 +124,7 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::vector<std::string> &vtpfileList,
     std::vector<int> ien, gnode, gelem;
 
     TET_T::read_vtp_grid( vtpfileList[ii], numpts, numcels, pts, ien, gnode, gelem );
-  
+
     if( numpts != static_cast<int>(gnode.size()) )
       SYS_T::print_fatal("Error: the numpts != global_node.size()! \n");
 
@@ -150,7 +159,7 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::vector<std::string> &vtpfileList,
     const int &nFunc, const int &type )
 {
   clock_t log_time = clock();
- 
+
   // Clean allocation first 
   dir_nodes.clear();
   per_slave_nodes.clear();
