@@ -213,13 +213,10 @@ int main(int argc, char *argv[])
   APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file, rank);
 
   // Local sub-domain's element indices
-  // ==== TODO: replace with ALocal_Elem_wTag ====
   ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
 
   // Local sub-domain's nodal bc
   ALocal_NodalBC * locnbc = new ALocal_NodalBC(part_file, rank);
-
-  // ==== TODO: wall_locnbc = new ALocal_NodalBC ====
 
   // Local sub-domain's inflow bc
   ALocal_Inflow_NodalBC * locinfnbc = new ALocal_Inflow_NodalBC(part_file, rank);
@@ -230,7 +227,6 @@ int main(int argc, char *argv[])
   // ==== TODO: wall_locebc = new ALocal_EBC_wall ====
 
   // Local sub-domain's nodal indices
-  // ==== TODO: replace with APart_Node_FSI ====
   APart_Node * pNode = new APart_Node(part_file, rank);
 
   SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
@@ -291,8 +287,6 @@ int main(int argc, char *argv[])
 
   pmat->gen_perm_bc(pNode, locnbc);
 
-  // ==== TODO: Sparse matrix for enforcement of wall_locnbc ====
-
   // ===== Generalized-alpha =====
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
 
@@ -308,6 +302,7 @@ int main(int argc, char *argv[])
       fluid_density, fluid_mu, bs_beta, c_tauc, GMIptr->get_elemType() );
 
   // ===== Initial condition =====
+  // ===== TODO: initialize PDNSolution for disp, dot_disp for wall =====
   PDNSolution * base = new PDNSolution_NS( pNode, fNode, locinfnbc, 1 );
 
   PDNSolution * sol = new PDNSolution_NS( pNode, 0 );
@@ -364,7 +359,7 @@ int main(int argc, char *argv[])
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
 
-  // ==== TODO: Pass wall_locnbc & wall_locebc into gloAssem_ptr ====
+  // ==== TODO: Pass wall_locebc into gloAssem_ptr ====
   IPGAssem * gloAssem_ptr = new PGAssem_NS_FEM( locAssem_ptr, elements, quads,
       GMIptr, locElem, locIEN, pNode, locnbc, locebc, gbc, nz_estimate );
 
@@ -392,11 +387,11 @@ int main(int argc, char *argv[])
     PCSetType( preproc, PCHYPRE );
     PCHYPRESetType( preproc, "boomeramg" );
 
-    // ==== TODO: Pass in wall_locnbc & wall_locebc ====
+    // ==== TODO: Pass in wall_locebc ====
     gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_ptr, elementv,
         elements, quadv, quads, locIEN, pNode, fNode, locnbc, locebc );
 
-    // ==== TODO: Initialize & solve for dot_pres_velo solution. Then update dot_sol ====
+    // ==== TODO: Initialize & solve for dot_pres_velo solution. Set dot_disp to velo ====
     lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
 
     dot_sol -> ScaleValue(-1.0);
@@ -501,7 +496,7 @@ int main(int argc, char *argv[])
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-  // ==== TODO: Pass in wall_locnbc & wall_locebc ====
+  // ==== TODO: Pass in wall_locebc ====
   tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol,
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN, pNode, fNode,
       locnbc, locinfnbc, locebc, gbc, pmat, elementv, elements, quadv, quads,

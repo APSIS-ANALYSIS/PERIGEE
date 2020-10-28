@@ -34,7 +34,6 @@ int main( int argc, char * argv[] )
   SYS_T::print_fatal_if(sysret != 0, "Error: system call failed. \n");
 
   // Define basic problem settins
-  // ==== TODO: set dofNum = 7 ====
   const int dofNum = 4; // degree-of-freedom for the physical problem
   const int dofMat = 4; // degree-of-freedom in the matrix problem
   const std::string part_file("part");
@@ -146,8 +145,6 @@ int main( int argc, char * argv[] )
   std::vector<int> vecIEN;
   std::vector<double> ctrlPts;
 
-  // ==== TODO: initialize phy_tag to indicate solid domain ====
-  
   TET_T::read_vtu_grid(geo_file.c_str(), nFunc, nElem, ctrlPts, vecIEN);
   
   IIEN * IEN = nullptr;
@@ -169,8 +166,6 @@ int main( int argc, char * argv[] )
   }
 
   VEC_T::clean( vecIEN ); // clean the vector
-
-  // ==== TODO: Generate list of nodes for fluid & solid (node_f, node_s) ====
 
   mesh -> print_info();
 
@@ -194,6 +189,7 @@ int main( int argc, char * argv[] )
   std::vector<std::string> dir_list;
   dir_list.push_back( sur_file_in );
 
+  // ==== TODO: modify for inlet & outlet clamping  ====
   if(elemType == 501)
   {
     NBC_list[0] = new NodalBC_3D_vtp( nFunc );
@@ -208,8 +204,6 @@ int main( int argc, char * argv[] )
     NBC_list[2] = new NodalBC_3D_vtu( dir_list, nFunc );
     NBC_list[3] = new NodalBC_3D_vtu( dir_list, nFunc );
   }
-
-  // ==== TODO: set up wall_NBC_list for inlet & outlet rings ====
 
   // Inflow BC info
   std::vector<double> inflow_outward_vec;
@@ -246,7 +240,6 @@ int main( int argc, char * argv[] )
   centerlinesList.push_back( "centerlines_aorta.vtp" );
   thickness2radiusList.push_back( 0.2 );
 
-  // ==== TODO: rename to wall_ebc ====
   ElemBC * wall_bc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
                                              thickness2radius_combined, wallsList,
                                              centerlinesList, thickness2radiusList, elemType);
@@ -267,7 +260,6 @@ int main( int argc, char * argv[] )
     mytimer->Reset();
     mytimer->Start();
 
-    // ==== TODO: replace with Part_Tet_FSI (node_f, node_s as args) ====
     IPart * part = new Part_Tet( mesh, global_part, mnindex, IEN,
         ctrlPts, proc_rank, cpu_size, dofNum, dofMat, elemType,
         isPrintPartInfo );
@@ -283,8 +275,6 @@ int main( int argc, char * argv[] )
     INBC_Partition * nbcpart = new NBC_Partition_3D(part, mnindex, NBC_list);
     nbcpart -> write_hdf5( part_file.c_str() );
 
-    // ==== TODO: wnbcpart = Partition wall_NBC_list ====
-
     // Partition Nodal Inflow BC and write to h5 file
     INBC_Partition * infpart = new NBC_Partition_3D_inflow(part, mnindex, InFBC);
     infpart->write_hdf5( part_file.c_str() );
@@ -293,7 +283,6 @@ int main( int argc, char * argv[] )
     IEBC_Partition * ebcpart = new EBC_Partition_vtp_outflow(part, mnindex, ebc, NBC_list);
     ebcpart -> write_hdf5( part_file.c_str() );
 
-    // ==== TODO: Rename to webcpart ====
     // Partition Elemental Wall BC and write it to h5 file
     IEBC_Partition * wbcpart = new EBC_Partition_vtp_wall(part, mnindex, wall_bc );
     wbcpart -> write_hdf5( part_file.c_str() );
