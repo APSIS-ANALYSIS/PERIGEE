@@ -28,9 +28,8 @@ class NodalBC_3D_vtu : public INodalBC
     NodalBC_3D_vtu( const int &nFunc );
 
     // --------------------------------------------------------------
-    // It will specify the Dirichlet nodes for CMM type problems,
-    // in which the inlet nodes and the `ring' nodes on the outlet face
-    // are fixed.
+    // Specify the Dirichlet nodes for CMM. This includes all inlet
+    // nodes and the outline (`ring') nodes for each outlet surface.
     // --------------------------------------------------------------
     NodalBC_3D_vtu( const std::string &inflow_vtu_file,
         const std::string &wall_vtu_file,
