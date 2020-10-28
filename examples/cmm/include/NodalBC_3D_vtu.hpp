@@ -28,11 +28,21 @@ class NodalBC_3D_vtu : public INodalBC
     NodalBC_3D_vtu( const int &nFunc );
 
     // --------------------------------------------------------------
+    // It will specify the Dirichlet nodes for CMM type problems,
+    // in which the inlet nodes and the `ring' nodes on the outlet face
+    // are fixed.
+    // --------------------------------------------------------------
+    NodalBC_3D_vtu( const std::string &inflow_vtu_file,
+        const std::string &wall_vtu_file,
+        const std::vector<std::string> &outflow_vtu_files,
+        const int &nFunc );
+
+    // --------------------------------------------------------------
     // Read in the vtu file that all the nodes in this file will be
     // enforced as essential boundary conditions.
     // --------------------------------------------------------------
     NodalBC_3D_vtu( const std::string &vtufilename, const int &nFunc );
-  
+
     // --------------------------------------------------------------
     // Read a list of vtu files to specify the Dirichlet nodes.
     // No periodic BC nodes.

@@ -13,6 +13,16 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const int &nFunc )
   std::cout<<"===> NodalBC_3D_vtu: No nodal BC is generated. \n";
 }
 
+
+NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &inflow_vtu_file,
+    const std::string &wall_vtu_file,
+    const std::vector<std::string> &outflow_vtu_files,
+    const int &nFunc )
+{
+  // TO BE IMPLEMENTED.
+}
+
+
 NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &vtufilename, 
     const int &nFunc )
 {
@@ -72,7 +82,7 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::vector<std::string> &vtufileList,
     std::vector<int> ien, gnode, gelem;
 
     TET_T::read_vtu_grid( vtufileList[ii], numpts, numcels, pts, ien, gnode, gelem );
-  
+
     for(unsigned int jj=0; jj<gnode.size(); ++jj)
     {
       if(gnode[jj]<0) SYS_T::print_fatal("Error: there are negative nodal index! \n");
