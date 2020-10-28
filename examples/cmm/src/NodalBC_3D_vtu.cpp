@@ -28,38 +28,32 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &vtufilename,
 {
   SYS_T::file_check( vtufilename );
 
-  // ----- Read the vtu file
-  vtkXMLUnstructuredGridReader * reader = vtkXMLUnstructuredGridReader::New();
-  reader -> SetFileName( vtufilename.c_str() );
-  reader -> Update();
-  vtkUnstructuredGrid * vtkugrid = reader -> GetOutput();
+  int numpts, numcels;
+  std::vector<double> pts;
+  std::vector<int> ien, gnode, gelem;
 
-  const int numpts = static_cast<int>( vtkugrid -> GetNumberOfPoints() );
-
-  vtkPointData * pointdata = vtkugrid->GetPointData();
-  vtkDataArray * pd = pointdata->GetScalars("GlobalNodeID");
-
-  std::vector<unsigned int> gnode; gnode.clear();
-
-  for(int ii=0; ii<numpts; ++ii) gnode.push_back( static_cast<unsigned int>(pd->GetComponent(ii,0)) );
-
-  reader->Delete();
-
-  VEC_T::sort_unique_resize( gnode );
-  // ----- Finish the read
+  TET_T::read_vtu_grid( vtufilename, numpts, numcels, pts, ien, gnode, gelem );
 
   dir_nodes.clear();
   per_slave_nodes.clear();
   per_master_nodes.clear();
   num_per_nodes = 0;
-  num_dir_nodes = gnode.size();
+  num_dir_nodes = numpts;
 
-  VEC_T::insert_end(dir_nodes, gnode);
-  VEC_T::sort_unique_resize(dir_nodes);
-  num_dir_nodes = dir_nodes.size();
+  if( numpts != static_cast<int>(gnode.size()) )
+    SYS_T::print_fatal("Error: the numpts != global_node.size()! \n");
+
+  dir_nodes.resize( gnode.size() );
+  for(unsigned int ii=0; ii<gnode.size(); ++ii)
+  {
+    if(gnode[ii]<0) SYS_T::print_fatal("Error: there are negative nodal index! \n");
+
+    dir_nodes[ii] = static_cast<unsigned int>( gnode[ii] ); 
+  }
 
   // Generate the ID array
   Create_ID(nFunc);
+
   std::cout<<"===> NodalBC_3D_vtu specified by "<<vtufilename<<" is generated. \n";
 }
 
@@ -73,6 +67,7 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::vector<std::string> &vtufileList,
   num_per_nodes = 0;
 
   const unsigned int num_file = vtufileList.size();
+
   for(unsigned int ii=0; ii<num_file; ++ii)
   {
     SYS_T::file_check( vtufileList[ii] );
@@ -82,6 +77,9 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::vector<std::string> &vtufileList,
     std::vector<int> ien, gnode, gelem;
 
     TET_T::read_vtu_grid( vtufileList[ii], numpts, numcels, pts, ien, gnode, gelem );
+
+    if( numpts != static_cast<int>(gnode.size()) )
+      SYS_T::print_fatal("Error: the numpts != global_node.size()! \n");
 
     for(unsigned int jj=0; jj<gnode.size(); ++jj)
     {
