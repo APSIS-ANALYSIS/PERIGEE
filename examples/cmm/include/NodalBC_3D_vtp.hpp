@@ -61,64 +61,10 @@ class NodalBC_3D_vtp : public INodalBC
     NodalBC_3D_vtp( const std::vector<std::string> &vtpfileList, 
         const int &nFunc );
 
-    // --------------------------------------------------------------
-    // Set a master-slave constraint relation, nodes in the given
-    // file will follow the given master index. In each vtp file, the
-    // master_idx[ii]-th node will be set as master and the rest nodes
-    // are slave nodes. 
-    // This BC type is useful in the constrained motion on the boundary.
-    // I use this in my tensile test for a adventitial strp to disallow
-    // deformation on the boundary of the loaded surface.
-    // NOTE: Make sure that master_idx[ii] is smaller than the number 
-    // of nodes in the vtpfileList[ii].
-    // --------------------------------------------------------------
-    NodalBC_3D_vtp( const std::vector<std::string> &vtpfileList, 
-        const int &nFunc, const std::vector<int> &master_idx );
-
-    // --------------------------------------------------------------
-    // General NodalBC constructor. The specific implementation of the 
-    // Nodal bc is given by the private funcitons and are chosen by 
-    // the type flag.
-    // --------------------------------------------------------------
-    NodalBC_3D_vtp( const std::vector<std::string> &vtpfileList,
-        const int &nFunc, const int &type );
-
     virtual ~NodalBC_3D_vtp();
 
   private:
     NodalBC_3D_vtp() {};
-
-    // --------------------------------------------------------------
-    // BC_type_1 is a master-slave driven implementation. It is 
-    // identical to the NodalBC_3D_vtp(vtpfilelist, nFunc, master_idx),
-    // with master_idx = [0,0,...,0].
-    // --------------------------------------------------------------
-    void BC_type_1( const std::vector<std::string> &vtpfileList,
-        const int &nFunc  );
-
-
-    // --------------------------------------------------------------
-    // BC_type_2 is a bc that sets Dirichlet on the first vtp surface
-    // and set master-slave on the second vtp surface with master
-    // node the node 0 in that vtp file.
-    // This is used for the tensile test for arterial strips,
-    // the first vtp file specifies the surface where the strip
-    // is fixed; the second file specifies the surface where the
-    // pulling force is applied.
-    // --------------------------------------------------------------
-    void BC_type_2( const std::vector<std::string> &vtpfileList,
-        const int &nFunc  );
-
-
-    // --------------------------------------------------------------
-    // BC_type_3 is a bc that sets Dirichlet on the given vtp file's
-    // first node only. This is useful for Stokes/Navier-Stokes 
-    // pressure boundary condition.
-    // Note: the input vtifileList should have size 1, which means
-    // only one vtp file is provided.
-    // --------------------------------------------------------------
-    void BC_type_3( const std::vector<std::string> &vtpfileList,
-        const int &nFunc  );
 };
 
 #endif
