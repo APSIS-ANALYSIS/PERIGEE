@@ -40,28 +40,6 @@ class NodalBC_3D_vtu : public INodalBC
     NodalBC_3D_vtu( const std::vector<std::string> &vtufileList,
         const int &nFunc );
 
-    // --------------------------------------------------------------
-    // Read in the vtu file and a list of vtp file that all nodes in these
-    // files will be enforced as essential boundary conditions.
-    // It is OK that the vtu and the vtp's have overlapping nodes.
-    // --------------------------------------------------------------
-    NodalBC_3D_vtu( const std::string &vtufilename, 
-        const std::vector<std::string> &vtpfileList, const int &nFunc );
- 
-    // --------------------------------------------------------------
-    // Read in the vtu file and two lists of vtp files.
-    // The nodes in the vtu file extract the nodes
-    // in the second vtp file, together with the nodes in the
-    // vtpfileList will be the essential boundary conditions.
-    // This is used for calculating the preloaded tissue state, while
-    // the vtu file is the fluid domain, the vtpfileList are the inlet
-    // and outlet faces, and the file to be extracted is the inner wall.
-    // --------------------------------------------------------------
-    NodalBC_3D_vtu( const std::string &vtufilename, 
-        const std::vector<std::string> &vtpfileList,
-        const std::vector<std::string> &vtpfileList_tobeextracted, 
-        const int &nFunc );
- 
     virtual ~NodalBC_3D_vtu();
 
   private:
