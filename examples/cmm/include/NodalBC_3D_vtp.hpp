@@ -41,8 +41,8 @@ class NodalBC_3D_vtp : public INodalBC
     NodalBC_3D_vtp( const int &nFunc );
    
     // --------------------------------------------------------------
-    // It will specify the Dirichlet nodes for CMM, which includes
-    // all inlet nodes, and the `ring' nodes for the outlet surfaces.
+    // Specify the Dirichlet nodes for CMM. This includes all inlet
+    // nodes and the outline (`ring') nodes for each outlet surface.
     // --------------------------------------------------------------
     NodalBC_3D_vtp( const std::string &inflow_vtp_file,
         const std::string &wall_vtp_file,
