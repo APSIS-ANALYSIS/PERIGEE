@@ -61,15 +61,13 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     {E = youngsmod;}
 
     virtual void write_vtk( const int &ebc_id,
-        const int &elemtype, 
         const std::string &filename="elembc_surface" ) const;
-
-    virtual void add_wall_data( vtkPointSet * const &grid_w,
-        const int &ebc_id ) const;
 
     virtual double get_fluid_density() const {return fluid_density;}
 
   private:
+    const int elemType;
+
     // fluid density used to compute the Young's modulus.
     // Its value will be passed to the analysis code and will be checked to
     // make sure consistent value is used in analysis code.
@@ -84,6 +82,10 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     // One may modify this function for different ways of prescribing the 
     // Young's modulus. The default one is adopted from N. Xiao, JCP, 244:22-40.
     void compute_youngsmod( const double &r, const double &th, double &E );
+
+    // helper function for write_vtk to add wall properties to vtkPointSet
+    void add_wall_data( vtkPointSet * const &grid_w,
+        const int &ebc_id ) const;
 };
 
 #endif

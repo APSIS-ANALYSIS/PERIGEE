@@ -7,6 +7,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const int &elemtype,
     const double &in_fluid_density )
 : ElemBC_3D_tet( walls_combined, elemtype ),
+  elemType( elemtype ),
   fluid_density( in_fluid_density )
 {
   // num_ebc = 1 for wall elem bc
@@ -50,7 +51,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   cell    -> Delete();
 
   // Write out vtp's with wall properties
-  write_vtk(ebc_id, elemtype, "varwallprop");
+  write_vtk(ebc_id, "varwallprop");
 }
 
 
@@ -144,7 +145,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   VEC_T::clean( global_node_idx ); VEC_T::clean( global_elem_idx );
 
   // Write out vtp's with wall properties
-  write_vtk(ebc_id, elemtype, "varwallprop");
+  write_vtk(ebc_id, "varwallprop");
 }
 
 
@@ -166,10 +167,10 @@ void ElemBC_3D_tet_wall::print_info() const
 }
 
 
-void ElemBC_3D_tet_wall::write_vtk( const int &ebc_id, const int &elemtype,
+void ElemBC_3D_tet_wall::write_vtk( const int &ebc_id,
     const std::string &filename ) const
 {
-  if(elemtype == 501)
+  if(elemType == 501)
   {
     vtkPolyData * grid_w = vtkPolyData::New();
 

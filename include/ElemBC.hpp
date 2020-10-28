@@ -140,14 +140,9 @@ class ElemBC
 
     // write the surface to a vtk/vtu file
     virtual void write_vtk( const int &ebc_id,
-       const int &elemtype,
        const std::string &filename="elembc_surface" ) const
     {SYS_T::commPrint("Warning: write_vtk is not implemented. \n");}
 
-    // Add cell and point data to wall vtkPointSet 
-    virtual void add_wall_data( vtkPointSet * const &grid_w,
-        const int &ebc_id ) const
-    {SYS_T::commPrint("Warning: add_wall_data is not implemented. \n");}
 
     // print the information of the ebc object on screen.    
     virtual void print_info() const
