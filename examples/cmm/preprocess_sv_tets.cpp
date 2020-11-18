@@ -182,27 +182,24 @@ int main( int argc, char * argv[] )
   Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, mesh->get_nFunc());
   mnindex->write_hdf5("node_mapping");
 
-  // Setup Nodal i.e. Dirichlet type Boundary Conditions
+  // Set up Nodal i.e. Dirichlet type Boundary Conditions. For CMM with prescribed inflow
+  // and clamped caps, this includes all inlet nodes and all ring/outline nodes on the outlets.
   std::vector<INodalBC *> NBC_list;
   NBC_list.clear(); NBC_list.resize( dofMat );
 
-  std::vector<std::string> dir_list;
-  dir_list.push_back( sur_file_in );
-
-  // ==== TODO: modify for inlet & outlet clamping  ====
   if(elemType == 501)
   {
     NBC_list[0] = new NodalBC_3D_vtp( nFunc );
-    NBC_list[1] = new NodalBC_3D_vtp( dir_list, nFunc );
-    NBC_list[2] = new NodalBC_3D_vtp( dir_list, nFunc );
-    NBC_list[3] = new NodalBC_3D_vtp( dir_list, nFunc );
+    NBC_list[1] = new NodalBC_3D_vtp( sur_file_in, sur_file_wall, sur_file_out, nFunc );
+    NBC_list[2] = new NodalBC_3D_vtp( sur_file_in, sur_file_wall, sur_file_out, nFunc );
+    NBC_list[3] = new NodalBC_3D_vtp( sur_file_in, sur_file_wall, sur_file_out, nFunc );
   }
   else
   {
     NBC_list[0] = new NodalBC_3D_vtu( nFunc );
-    NBC_list[1] = new NodalBC_3D_vtu( dir_list, nFunc );
-    NBC_list[2] = new NodalBC_3D_vtu( dir_list, nFunc );
-    NBC_list[3] = new NodalBC_3D_vtu( dir_list, nFunc );
+    NBC_list[1] = new NodalBC_3D_vtu( sur_file_in, sur_file_wall, sur_file_out, nFunc );
+    NBC_list[2] = new NodalBC_3D_vtu( sur_file_in, sur_file_wall, sur_file_out, nFunc );
+    NBC_list[3] = new NodalBC_3D_vtu( sur_file_in, sur_file_wall, sur_file_out, nFunc );
   }
 
   // Inflow BC info
@@ -211,7 +208,7 @@ int main( int argc, char * argv[] )
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall,
       nFunc, inflow_outward_vec, elemType );
 
-  // Setup Elemental Boundary Conditions
+  // Set up Elemental i.e. Neumann type Boundary Conditions
   // Obtain the outward normal vector
   std::vector< std::vector<double> > outflow_outward_vec;
   outflow_outward_vec.resize( sur_file_out.size() );
@@ -223,8 +220,7 @@ int main( int argc, char * argv[] )
   ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
 
   // Wall mesh is set as an elemental bc.
-  // Set the wall region, its corresponding centerline, and the ratio
-  // of thickness-to-radius
+  // Set the wall region, its corresponding centerline, and the thickness-to-radius ratio
   const std::string walls_combined = sur_file_wall;
   const std::string centerlines_combined = "centerlines.vtp";
   const double thickness2radius_combined = 0.2;
