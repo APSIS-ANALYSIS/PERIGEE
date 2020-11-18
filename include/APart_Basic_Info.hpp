@@ -4,9 +4,9 @@
 // APart_Basic_Info.hpp
 // This class stores basic mesh partition info:
 // 
-// cpu_rank : the id of the cpu
-// cpu_size : the total number of the cpu for the simulation
-// dual_edge_ncommon : the parameter for mesh partition.
+// cpu_rank : index of the cpu
+// cpu_size : total number of cpu's for the simulation
+// dual_edge_ncommon : parameter for mesh partition.
 //
 // Date: Nov. 8th 2013
 // ==================================================================
@@ -16,8 +16,7 @@ class APart_Basic_Info
 {
   public:
     // --------------------------------------------------------------
-    // Constructor: read from h5 file by giving the part file base name
-    //              and rank
+    // Constructor: read from the h5 file of the given base name and rank
     // --------------------------------------------------------------
     APart_Basic_Info( const std::string &fbasename, const int &in_rank );
 

@@ -26,7 +26,7 @@ class ALocal_NodalBC
     virtual ~ALocal_NodalBC();
 
     // ---------------------------------------------------------------
-    // print infomation
+    // print information
     // ---------------------------------------------------------------
     virtual void print_info() const;
 
@@ -40,56 +40,58 @@ class ALocal_NodalBC
     virtual int get_dofMat() const {return dof;} 
     
     // ---------------------------------------------------------------
-    // get the Dirichlet node indices in local subdomain
+    // get global indices of the Dirichlet nodes in the local subdomain
     // ---------------------------------------------------------------
     virtual int get_LDN(const int &dof_index, const int &node) const
     {return LDN[LD_offset[dof_index] + node];}
 
     // ---------------------------------------------------------------
-    // get the slave node indices in local subdomain
+    // get global indices of the slave nodes in the local subdomain
     // ---------------------------------------------------------------
     virtual int get_LPSN(const int &dof_index, const int &ii) const
     {return LPSN[LPS_offset[dof_index] + ii];}
 
     // ---------------------------------------------------------------
-    // get the subdomain's slave node's master node indices 
+    // get global indices of the master nodes corresponding to the
+    // slave nodes in the local subdomain, i.e. from get_LPSN() 
     // ---------------------------------------------------------------
     virtual int get_LPMN(const int &dof_index, const int &ii) const
     {return LPMN[LPS_offset[dof_index] + ii];}
 
     // ---------------------------------------------------------------
-    // get the master nodes in local subdomain 
+    // get global indices of the master nodes in the local subdomain 
     // ---------------------------------------------------------------
     virtual int get_LocalMaster(const int &dof_index, const int &ii) const
     {return LocalMaster[LPM_offset[dof_index] + ii];}
 
     // ---------------------------------------------------------------
-    // get the corresponding slaves nodes to the get_LocalMaster results
+    // get global indices of the slave nodes corresponding to the
+    // master nodes in the local subdomain, i.e. from get_LocalMaster()
     // ---------------------------------------------------------------
     virtual int get_LocalMasterSlave(const int &dof_index, const int &ii) const
     {return LocalMasterSlave[LPM_offset[dof_index] + ii];}
 
     // ---------------------------------------------------------------
-    // get the number of Dirichlet nodes in local subdomain
+    // get the number of Dirichlet nodes in the local subdomain
     // ---------------------------------------------------------------
     virtual int get_Num_LD(const int &dof_index) const 
     {return Num_LD[dof_index];}
     
     // ---------------------------------------------------------------
-    // get the number of slave nodes in local subdomain
+    // get the number of slave nodes in the local subdomain
     // ---------------------------------------------------------------
     virtual int get_Num_LPS(const int &dof_index) const 
     {return Num_LPS[dof_index];}
 
     // ---------------------------------------------------------------
-    // get the number of master nodes in local subdomain
+    // get the number of master nodes in the local subdomain
     // ---------------------------------------------------------------
     virtual int get_Num_LPM(const int &dof_index) const 
     {return Num_LPM[dof_index];}
 
     // ---------------------------------------------------------------
-    // clean the memory for local master nodes and their slaves, and
-    // corresponding offsets 
+    // Clean the memory for local master nodes and their slaves, and
+    // vice versa 
     // ---------------------------------------------------------------
     virtual void clean_LocalMaster()
     {VEC_T::clean(LocalMaster); VEC_T::clean(LocalMasterSlave);

@@ -3,8 +3,7 @@
 // ==================================================================
 // AGlobal_Mesh_Info_FEM_3D.hpp
 //
-// This is the instantiation of global mesh info class which is used
-// for 3D FEM mesh.
+// This is the global mesh info class used for a 3D FEM mesh.
 //
 // Date Created: Jan 21 2017
 // ==================================================================
@@ -17,9 +16,9 @@ class AGlobal_Mesh_Info_FEM_3D : public IAGlobal_Mesh_Info
     AGlobal_Mesh_Info_FEM_3D( const std::string &fileBaseName,
         const int &cpu_rank );
 
-    // Construct a global mesh info based on a mesh by enriching it
-    // in each cell with additional bubble nodes
-    // Input:  num_enrich_node : the number of enriched nodes
+    // Construct global mesh info by enriching each cell with 
+    // additional bubble nodes
+    // Input:  num_enrich_node : the number of enriched nodes per cell
     // Output: nFunc = original nFunc + nElem * num_enrich_node
     //         nLocBas = nLocBas + num_enrich_node
     //         elemType = elemType + 10
