@@ -1,13 +1,30 @@
 // ==================================================================
 // cmm_driver.cpp
 //
-// Tetrahedral element based finite element code for 3D Coupled-Momentum
+// Tetrahedral element based finite element code for the 3D Coupled-Momentum
 // Method using the Variational Multiscale Formulation and Generalize-
 // alpha time stepping.
 //
 // ==================================================================
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
+#include "ALocal_EBC_outflow.hpp"
+#include "ALocal_EBC_wall.hpp"
+#include "ALocal_Inflow_NodalBC.hpp"
+// #include "QuadPts_Gauss_Triangle.hpp"
+// #include "QuadPts_Gauss_Tet.hpp"
+// #include "FEAElement_Tet4.hpp"
+// #include "FEAElement_Tet10_v2.hpp"
+// #include "FEAElement_Triangle3_3D_der0.hpp"
+// #include "FEAElement_Triangle6_3D_der0.hpp"
+// #include "CVFlowRate_Unsteady.hpp"
+// #include "CVFlowRate_Linear2Steady.hpp"
+// #include "GenBC_Resistance.hpp"
+// #include "GenBC_RCR.hpp"
+// #include "GenBC_Inductance.hpp"
+// #include "PLocAssem_Tet_VMS_NS_GenAlpha.hpp"
+// #include "PGAssem_NS_FEM.hpp"
+#include "PTime_NS_Solver.hpp"
 
 int main( int argc, char *argv[] )
 {
@@ -192,6 +209,43 @@ int main( int argc, char *argv[] )
 
   MPI_Barrier(PETSC_COMM_WORLD);
 
+  // ===== Data from Files =====
+  // Control points' xyz coordinates
+  FEANode * fNode = new FEANode(part_file, rank);
+
+  // Local sub-domain's IEN array
+  ALocal_IEN * locIEN = new ALocal_IEN(part_file, rank);
+
+  // Global mesh info
+  IAGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info_FEM_3D(part_file,rank);
+
+  // Mesh partition info
+  APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file, rank);
+
+  // Local sub-domain's element indices
+  ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
+
+  // Local sub-domain's nodal bc
+  ALocal_NodalBC * locnbc = new ALocal_NodalBC(part_file, rank);
+
+  // Local sub-domain's inflow bc
+  ALocal_Inflow_NodalBC * locinfnbc = new ALocal_Inflow_NodalBC(part_file, rank);
+
+  // Local sub-domain's outflow elemental bc
+  ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
+
+  // Local sub-domain's wall elemental bc for CMM
+  ALocal_EBC * wall_locebc = new ALocal_EBC_wall(part_file, rank, "ebc_wall");
+
+  // Local sub-domain's nodal indices
+  APart_Node * pNode = new APart_Node(part_file, rank);
+
+  SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
+
+  SYS_T::print_fatal_if( size!= PartBasic->get_cpu_size(),
+      "Error: Assigned CPU number does not match the partition. \n");
+
+  SYS_T::commPrint("===> %d processor(s) are assigned for FEM analysis. \n", size);
 
 
   PetscFinalize();
