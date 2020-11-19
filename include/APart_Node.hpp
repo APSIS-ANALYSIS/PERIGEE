@@ -3,12 +3,12 @@
 // ==================================================================
 // APart_Node.hpp
 // Interface for partitioned node indices, including:
-// 1. re-ordered global indeices of nodes;
+// 1. re-ordered global indices of nodes;
 // 2. number of local nodes, ghost nodes, etc.
-// 3. dof : the dof from the dofNum in the preprocessor. The total
-//    degrees of freedom in the physical problem.
+// 3. dof : dofNum in the preprocessor. The total degrees of freedom
+//    in the physical problem.
 // 
-// In local_to_global array, there are 
+// In the local_to_global array, there are 
 //             nlocghonode = nlocalnode + nghostnode
 // entries. The first nlocalnode entries store the node_loc array;
 // the following nghostnode entries store the node_ghost array.
@@ -31,7 +31,7 @@ class APart_Node
     virtual ~APart_Node();
 
     // This returns dofNum in the preprocessor, the total number of dof.
-    // In segregated-type algorithms, this one is different from dofMat,
+    // In segregated-type algorithms, this is different from dofMat,
     // or e.g. ALocal_NodalBC->get_dofMat();
     virtual int get_dof() const {return dof;}
 

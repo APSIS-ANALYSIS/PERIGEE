@@ -36,8 +36,9 @@ class ALocal_EBC_wall : public ALocal_EBC
 
     double fluid_density;
 
-    // Length is num_local_node[0] if this partition owns some part of the wall,
-    // and 0 otherwise.
+    // If this partition owns any part of the wall, the thickness and
+    // youngsmod vectors are each of length num_local_node[0].
+    // Otherwise, these vectors are of length 0.
     std::vector<double> thickness;
     std::vector<double> youngsmod;
 };

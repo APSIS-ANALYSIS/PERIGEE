@@ -3,9 +3,10 @@
 // ==================================================================
 // ALocal_EBC_outflow.hpp
 //
-// Analysis use local subdomain's elemental boundary condition. This
-// is a derived class from ALocal_EBC to add int_NA, the face integral
-// of the basis functions, and outward normal vector of the face.
+// Analysis-use: local subdomain's elemental boundary condition. This
+// is a derived class from ALocal_EBC to add int_NA, the integral
+// of the basis functions over the outlet face, and the outlet's
+// outward normal vector.
 //
 // Author: Ju Liu
 // Date: Mar. 19 2019
@@ -40,22 +41,24 @@ class ALocal_EBC_outflow : public ALocal_EBC
     }
 
   protected:
-    // If this partition owns the face, it will record the number of
-    // face nodes, which is also the length of intNA[xx], xx is the
-    // face id. It times 3 gives the length of LID[xx].
-    // If this partition does not own the face, it will be zero.
+    // Length num_ebc.
+    // If this partition owns any part of face xx, num_face_nodes[xx] records
+    // the *total* number of face nodes, which is also the length of intNA[xx].
+    // This times 3 gives the length of LID[xx]. If this partition does not
+    // own any part of face xx, then num_face_nodes[xx] will be zero.
     std::vector<int> num_face_nodes;
 
-    // local copy of the integral of NA basis on the face
-    // length is num_ebc, and intNA[ii] length is 0 if this partition
-    // does not own the face; or the number of nodes on the whole 
-    // face if it owns any cell on the face.
+    // Length num_ebc.
+    // If this partition owns any part of face xx, intNA[xx] is of length
+    // num_face_nodes[xx] and records the face integral of each basis function NA. 
+    // Otherwise, intNA[xx] is of length 0. 
     std::vector< std::vector<double> > intNA;
 
-    // The corresponding LID value for the nodes associated with intNA.
-    // Length is num_ebc and LID[ii] length is 0 if this partition does
-    // not own the face; or the number of nodes on the whole face x 3
-    // if it owns any cell on the face.
+    // Length num_ebc.
+    // If this partition owns any part of face xx, LID[xx] is of length
+    // 3 * num_face_nodes[xx] and stores each face node's LID values
+    // (new numbering) corresponding to the 3 velocity dofs. Otherwise,
+    // LID[xx] is of length 0.
     std::vector< std::vector<int> > LID;
 
     std::vector< std::vector<double> > outvec;
