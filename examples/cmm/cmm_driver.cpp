@@ -235,7 +235,7 @@ int main( int argc, char *argv[] )
   ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
 
   // Local sub-domain's wall elemental bc for CMM
-  ALocal_EBC * wall_locebc = new ALocal_EBC_wall(part_file, rank, "ebc_wall");
+  ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, "ebc_wall");
 
   // Local sub-domain's nodal indices
   APart_Node * pNode = new APart_Node(part_file, rank);
@@ -247,6 +247,11 @@ int main( int argc, char *argv[] )
 
   SYS_T::commPrint("===> %d processor(s) are assigned for FEM analysis. \n", size);
 
+
+  // ===== Clean Memory =====
+  delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
+  delete locElem; delete locnbc; delete locinfnbc;
+  delete locebc; delete locebc_wall; delete pNode;
 
   PetscFinalize();
   return EXIT_SUCCESS;
