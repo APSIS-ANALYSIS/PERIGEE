@@ -2,20 +2,20 @@
 #define FEAELEMENT_TRIANGLE3_3D_DER0_HPP
 // ==================================================================
 // FEAElement_Triangle3_3D_der0.hpp
-// This is an implementation of the element routine for linear
-// triangle element in three-dimensional space, with basis function 
-// value evaluated only. 
+// Element routine for the linear triangular element in
+// three-dimensional space, with evaluation of the basis functions 
+// only (no derivatives). 
 // 
-// The Triangle3 represents 3-node triangle; _3D means that this
-// element has coordinates in three-dimensions; _der0 means that only
-// the function value is evaluated (this is a function for Natural BC).
+// Triangle3 means 3-node triangle; _3D means the element has
+// coordinates in three-dimensions; _der0 means that only the function
+// itself is evaluated.
 //
-// This class is designed for the purpose of boundary integration for
+// This class is designed for boundary integrations for elemental or
 // natural boundary conditions in 3D problems. Although the element
-// is a 2D element, the coordinates for the geometry has x-y-z 
-// components. The Jacobian of the area is calculated by the cross
+// is a 2D element, the geometry has x-y-z coordinates.
+// The Jacobian determinant is calculated as the norm of the cross
 // product of the two in-plane vectors. Therefore, this is not the
-// classical constatn-strain triangle element.
+// classical constant-strain triangle element.
 //
 // Date Created: Jan. 19 2017
 // ==================================================================
@@ -54,13 +54,13 @@ class FEAElement_Triangle3_3D_der0 : public FEAElement
 
     virtual void get_R( const int &quaindex, double * const &basis ) const;
 
-    // Assuming the triangle points has been orgainzed so that the outward
+    // Assumes the triangle nodes are arranged such that the outward
     // direction is given by dx_dr x dx_ds
     virtual void get_2d_normal_out( const int &quaindex,
         double &nx, double &ny, double &nz, double &area ) const;
 
-    // Assuming the triangle points are NOT organized. Use an interior point
-    // to define the outward direction.
+    // If the triangle nodes are NOT arranged in any particular order,
+    // use an interior node to define the outward direction.
     virtual void get_normal_out( const int &quaindex,
         const double &sur_pt_x, const double &sur_pt_y, const double &sur_pt_z,
         const double &intpt_x, const double &intpt_y, const double &intpt_z,
@@ -84,10 +84,10 @@ class FEAElement_Triangle3_3D_der0 : public FEAElement
     // unit outward normal vector
     double unx, uny, unz;
 
-    // detJac 
+    // Jacobian determinant 
     double detJac;
 
-    // Free the space
+    // deallocate the memory
     virtual void clearBasisCache();
 
     // resize the dynamic arrays R, dx_ds, detJac if the quadrature rule

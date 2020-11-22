@@ -2,10 +2,10 @@
 #define FEAELEMENT_TET4_HPP
 // ==================================================================
 // FEAElement_Tet4.hpp
-// This is an implementation of the element routine for linear
-// tetrahedral element, with derivatives evaluated.
+// Element routine for the linear tetrahedral element, with evaluation
+// of shape functions and their derivatives.
 // 
-// Tet4 means 4-node element, aka, linear tets.
+// Tet4 means 4-node tet, aka linear tets.
 //
 // This class is designed for the volume integration in model assembly.
 //
@@ -43,7 +43,7 @@ class FEAElement_Tet4 : public FEAElement
         const double * const &ctrl_z );
 
     // Returns the element size.
-    // For the linear tets element, we calculate the DIAMETER of the
+    // For the linear tet element, we calculate the DIAMETER of the
     // circumscribing sphere
     virtual double get_h( const double * const &ctrl_x,
         const double * const &ctrl_y,
@@ -98,10 +98,10 @@ class FEAElement_Tet4 : public FEAElement
 
     double detJac;
 
-    // Free the space of dynamic array
+    // Deallocate memory for dynamic array R
     virtual void clearBasisCache();
 
-    // resize the R array if the quadrature rule is changed
+    // Resize the R array if the quadrature rule is changed
     void resize_container();
 };
 

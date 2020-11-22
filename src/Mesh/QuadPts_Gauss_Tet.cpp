@@ -21,17 +21,17 @@ QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( const int &in_num_pts )
       a = 0.5854101966249685;
       b = (1-a)/3.0;
 
-      qp[0] = a; qp[1] = b; qp[2] = b; qp[3] = b; qw[0] = 0.25;
-      qp[4] = b; qp[5] = a; qp[6] = b; qp[7] = b; qw[1] = 0.25;
-      qp[8] = b; qp[9] = b; qp[10] = a; qp[11] = b; qw[2] = 0.25;
+      qp[0]  = a; qp[1]  = b; qp[2] =  b; qp[3] =  b; qw[0] = 0.25;
+      qp[4]  = b; qp[5]  = a; qp[6] =  b; qp[7] =  b; qw[1] = 0.25;
+      qp[8]  = b; qp[9]  = b; qp[10] = a; qp[11] = b; qw[2] = 0.25;
       qp[12] = b; qp[13] = b; qp[14] = b; qp[15] = a; qw[3] = 0.25;
       break;
 
     case 5:
       qp[0] = 0.25; qp[1] = 0.25; qp[2] = 0.25; qp[3] = 0.25; qw[0] = -0.8;
       a = 0.5; b = (1-a) / 3.0;
-      qp[4] = a;  qp[5] = b;  qp[6] = b;  qp[7] = b;  qw[1] = 0.45;
-      qp[8] = b;  qp[9] = a;  qp[10] = b; qp[11] = b; qw[2] = 0.45;
+      qp[4]  = a; qp[5]  = b; qp[6]  = b; qp[7]  = b; qw[1] = 0.45;
+      qp[8]  = b; qp[9]  = a; qp[10] = b; qp[11] = b; qw[2] = 0.45;
       qp[12] = b; qp[13] = b; qp[14] = a; qp[15] = b; qw[3] = 0.45;
       qp[16] = b; qp[17] = b; qp[18] = b; qp[19] = a; qw[4] = 0.45;
       break;
@@ -50,13 +50,13 @@ QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( const int &in_num_pts )
       w = 0.06703858372604275;
 
       offset = 48;
-      qp[offset+0] = a; qp[offset+1] = b; qp[offset+2] = b; qp[offset+3] = b;
+      qp[offset+0]  = a; qp[offset+1]  = b; qp[offset+2]  = b; qp[offset+3]  = b;
       qw[12] = w;
 
-      qp[offset+4] = b; qp[offset+5] = a; qp[offset+6] = b; qp[offset+7] = b;
+      qp[offset+4]  = b; qp[offset+5]  = a; qp[offset+6]  = b; qp[offset+7]  = b;
       qw[13] = w;
 
-      qp[offset+8] = b; qp[offset+9] = b; qp[offset+10] = a; qp[offset+11] = b;
+      qp[offset+8]  = b; qp[offset+9]  = b; qp[offset+10] = a; qp[offset+11] = b;
       qw[14] = w;
 
       qp[offset+12] = b; qp[offset+13] = b; qp[offset+14] = b; qp[offset+15] = a;

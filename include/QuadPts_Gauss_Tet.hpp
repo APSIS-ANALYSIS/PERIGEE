@@ -2,14 +2,14 @@
 #define QUADPTS_GAUSS_TET_HPP
 // ==================================================================
 // QuadPts_Gauss_Tet.hpp
-// The Gaussian quadrature rule for a tetrahedron domain defined by 
+// The Gaussian quadrature rule for a tetrahedral domain defined by 
 // four vertex points:
 // [0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]
 // 
-// num_pts = 4, exact for quad. polynomials, order of prec. 2
-// num_pts = 5, exact for cubic polynomials, order of prec. 3
-// num_pts = 17, exact for quintic polynomials, order of prec. 5
-// num_pts = 29, exact for sextic polynomials, order of prec. 6
+// num_pts =  4, exact for quadratic polynomials, order of prec. 2
+// num_pts =  5, exact for cubic     polynomials, order of prec. 3
+// num_pts = 17, exact for quintic   polynomials, order of prec. 5
+// num_pts = 29, exact for sextic    polynomials, order of prec. 6
 //
 // Reference: T.J.R. Hughes FEM Book p.174
 //            J. Yu Symmetric Gaussian Quadrature Formulae for 
@@ -42,13 +42,14 @@ class QuadPts_Gauss_Tet : public IQuadPts
   private:
     const int num_pts;
 
-    // qp : size 4 * num_pts, it stores the r,s,t,u-coordinates of the 
+    // qp : length 4 * num_pts. Stores the r-s-t-u coordinates of the 
     //      quadrature points.
-    // qw : size num_pts. it stores the weights.
+    //      u = 1 - r - s - t
+    // qw : length num_pts. Stores the quadrature weights.
     std::vector<double> qp, qw;
     
-    // gen_permutations : generate permutation in a vector out will 
-    //                    include the following 12 patterns.
+    // gen_permutations : generate permutations of a, b, c such that the
+    //                    vector out includes the following 12 patterns.
     //                    a b c c; a c b c; a c c b;
     //                    b a c c; b c a c; b c c a;
     //                    c a b c; c b a c;

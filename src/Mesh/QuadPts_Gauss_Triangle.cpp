@@ -290,14 +290,14 @@ QuadPts_Gauss_Triangle::QuadPts_Gauss_Triangle( const int &in_num_pts )
       break;
 
     default:
-      SYS_T::print_fatal("Error: QuadPts_Gauss_Triangle: input number of quadrature points is not implemeneted. \n");
+      SYS_T::print_fatal("Error: QuadPts_Gauss_Triangle: input number of quadrature points is not implemented. \n");
       break;
   }
 
   VEC_T::shrink2fit(qp);
   VEC_T::shrink2fit(qw);
 
-  // Correct the formula by timeing the triangle area 0.5
+  // Correct the formula by scaling all weights by 0.5
   for(int ii=0; ii<num_pts; ++ii) qw[ii] *= 0.5;
 }
 
