@@ -46,15 +46,15 @@ class Matrix_PETSc
 
     // ------------------------------------------------------------------------
     // ! Flag : Fix nonzero structure
-    //          Add or insert in new location is ignored. 
-    //          Set after a correct nonzero structure assembled.
+    //          Adding or inserting in new locations will be ignored. 
+    //          Set after a correct nonzero structure has been assembled.
     // ------------------------------------------------------------------------
     void Fix_nonzero_str()
     {MatSetOption(K, MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);}
 
     // ------------------------------------------------------------------------
     // ! Flag : New allocation error
-    //          Add or insert in new locations will generate an error message.
+    //          Adding or inserting in new locations will generate an error.
     //          Supports AIJ and BAIJ formats.
     //          Typically used for debugging.
     // ------------------------------------------------------------------------
@@ -63,9 +63,9 @@ class Matrix_PETSc
 
     // ------------------------------------------------------------------------
     // ! Flag : Ignore new allocation
-    //          Add or insert in a new allocation will NOT generate error.
-    //          Typically used if the estimate of nonzero structure
-    //          underestimates, this flag is called for a first practical
+    //          Adding or inserting in new locations will NOT generate an error.
+    //          Typically used if the estimate of the nonzero structure is an
+    //          underestimate. This flag is called for a first practical
     //          assembly.
     // ------------------------------------------------------------------------
     void Release_nonzero_err_str()
@@ -88,7 +88,7 @@ class Matrix_PETSc
     void Clear() {MatZeroEntries(K);}
 
     // ------------------------------------------------------------------------
-    // Gen_id : Generate an idnetity matrix that is compatible with the
+    // Gen_id : Generate an identity matrix that is compatible with the
     // mesh partition.
     // ------------------------------------------------------------------------
     void gen_id( const APart_Node * const &pnode_ptr );
@@ -102,10 +102,10 @@ class Matrix_PETSc
 
     // ------------------------------------------------------------------------
     // Gen_extractor_for_Dirichlet_nodes : Generate a matrix that is zero for
-    // all regular rows. On the row corresponding to the Dirichlet dof, make
-    // the diagonal entry in that row to be 1. Applying this matrix to the
-    // initial solution vector with correct Dirichlet description, this matrix
-    // will extract the Dirichlet nodal values; the rest values are zero.
+    // all regular rows. On each row corresponding to a Dirichlet dof, set
+    // the diagonal entry in that row to 1. When applied to the
+    // initial solution vector with a correct Dirichlet description, this matrix
+    // will extract the Dirichlet nodal values; the remaining values are zero.
     // 
     //           [ 1 0 0       [ 3        [ 3
     //             0 0 0    x    2    =     0
@@ -118,7 +118,7 @@ class Matrix_PETSc
     // ------------------------------------------------------------------------
     // MatMultSol : perform a matrix-vector multiplication : sol = K sol
     //              If the matrix partition is incompatible with the vector's,
-    //              a PETSc error from PETSc::MatMult will throw.
+    //              a PETSc error from PETSc::MatMult will be thrown.
     // ------------------------------------------------------------------------
     void MatMultSol( PDNSolution * const &sol ) const;
 
@@ -131,7 +131,7 @@ class Matrix_PETSc
     // Local dimension of K matrix
     int lm, ln;
 
-    // flag indicating if the matrix is assembled    
+    // flag indicating whether the matrix is assembled 
     bool is_set;
 };
 

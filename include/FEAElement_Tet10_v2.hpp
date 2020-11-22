@@ -2,13 +2,12 @@
 #define FEAELEMENT_TET10_V2_HPP
 // ==================================================================
 // FEAElement_Tet10_v2.hpp
-// This is an implementation of the element routine for quadratic 10
-// node tetrahedral element. Version 2 means this is a second version
-// implementation of the Tet10 element to make the node numbering
-// compatible with the vtk format, see the graph below.
+// Element routine for quadratic 10-node tetrahedral element.
+// In this version v2, the node numbering is made compatible
+// compatible with the vtk format -- see the graph below.
 // 
-// Notice that only the node number 8 and 9 are switched. The rest
-// numbering are identical to that of FEAElement_Tet10 class.
+// Notice that only nodes 8 and 9 are switched. The remaining nodes
+// are numbered identically to those in FEAElement_Tet10 class.
 //
 // Tet10 : 10-node tet element, aka, quadratic tet.
 //
@@ -20,14 +19,14 @@
 //                     |   -
 //                  /  |     -
 //                     7        9
-//                /    |           -
-//               8     |             -
-//                     |                - 
-//               /    /0--------6---------2-------> s
-//              /    /                -
-//              /   /              -
-//                 4           -   
-//             /  /        5    
+//                 /   |           -
+//                     |             -
+//                8    |                - 
+//                    /0--------6---------2-------> s
+//               /   /                -
+//                  /              -
+//              /  4           -   
+//                /        5    
 //             / /     -
 //              /  - 
 //             1
@@ -35,8 +34,7 @@
 //           *
 //           r
 //
-// This class is designed for the volumetric integration in model
-// assembly.
+// This class is designed for volumetric integration in model assembly.
 //
 // Date created: Nov. 3 2019
 // ==================================================================
@@ -65,22 +63,22 @@ class FEAElement_Tet10_v2 : public FEAElement
 
     virtual double get_memory_usage() const;
 
-    // Given the quadrature points and nodes' coordinates, evaluate
-    // the basis functions and their derivatives up to second order.
+    // Given the quadrature points and nodal coordinates, evaluate
+    // the basis functions and their derivatives up to second order
     virtual void buildBasis( const IQuadPts * const &quad_rule,
         const double * const &ctrl_x,
         const double * const &ctrl_y,
         const double * const &ctrl_z );
 
     // Return the element size.
-    // Here we adopt the algorithm for Tet4, and use the four vertex
+    // Here we adopt the algorithm for Tet4 and use the four vertex
     // nodes to calculate the element size
     virtual double get_h( const double * const &ctrl_x,
         const double * const &ctrl_y,
         const double * const &ctrl_z ) const;
 
-    // get_xxx functions give access to the basis functions' value
-    // at the corresponding quadrature points
+    // get_xxx functions give access to function evaluations at the
+    // quadrature point corresponding to quaindex
     virtual void get_R( const int &quaindex, double * const &basis ) const;
 
     virtual void get_gradR( const int &quaindex, double * const &basis_x,
@@ -124,9 +122,9 @@ class FEAElement_Tet10_v2 : public FEAElement
     double * d2R_dxx, * d2R_dyy, * d2R_dzz;
     double * d2R_dxy, * d2R_dxz, * d2R_dyz;
 
-    // Container for dR_ds/t/u and second derivative at quad pts.
+    // Container for dR_ds/t/u and second derivatives at quad pts.
     // Length is 10
-    double dR_dr [10], dR_ds [10], dR_dt [10];
+    double dR_dr [10],   dR_ds [10],   dR_dt [10];
     double d2R_drr [10], d2R_dss [10], d2R_dtt [10];
     double d2R_drs [10], d2R_drt [10], d2R_dst [10]; 
 

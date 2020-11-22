@@ -2,9 +2,9 @@
 #define FEAELEMENT_TRIANGLE6_3D_DER0_HPP
 // ==================================================================
 // FEAElement_Triangle6_3D_der0.hpp
-// This is an implementation of the element routine for quadratic
-// triangle element in three-dimensional space, with basis function
-// value evaluated only.
+// Element routine for the quadratic triangular element in 
+// three-dimensional space, with evaluation of the basis functions
+// only (no derivatives).
 //
 //     s
 //     |
@@ -20,10 +20,12 @@
 //     0---------3------- 1 -- r
 //
 //
-// Triangle6 represents 6-node triangle; _3D means that this element
-// has geometrical coordinates in three-dimensions; _der0 means that
-// only function value is evaluated, which is used mainly for Natural
-// BC.
+// Triangle6 means 6-node triangle; _3D means the element has
+// coordinates in three-dimensions; _der0 means that only the function
+// itself is evaluated.
+//
+// This class is designed for boundary integrations for elemental/
+// natural boundary conditions in 3D problems.
 //
 // Author: Ju Liu
 // Date Created: Feb. 17 2018.
@@ -39,6 +41,9 @@ class FEAElement_Triangle6_3D_der0 : public FEAElement
 
     virtual int get_elemDim() const {return 2;}
 
+    // element type : 522
+    // 5: simplicial element
+    // 2: 2D element
     virtual int get_Type() const {return 522;}
 
     virtual int get_numQuapts() const {return numQuapts;}
@@ -58,11 +63,13 @@ class FEAElement_Triangle6_3D_der0 : public FEAElement
 
     virtual void get_R( const int &quaindex, double * const &basis ) const;
 
-    // Assuming the triangle points has been organized so that the outward
+    // Assuming the triangle nodes are arranged such that the outward
     // direction is given by dx_dr x dx_ds
     virtual void get_2d_normal_out( const int &quaindex,
         double &nx, double &ny, double &nz, double &len ) const;
 
+    // If the triangle nodes are NOT arranged in any particular order,
+    // use an interior node to define the outward direction. 
     virtual void get_normal_out( const int &quaindex,
         const double &sur_pt_x, const double &sur_pt_y, const double &sur_pt_z,
         const double &intpt_x, const double &intpt_y, const double &intpt_z,
@@ -78,15 +85,15 @@ class FEAElement_Triangle6_3D_der0 : public FEAElement
     // 0 <= ii < 6 x numQuapts
     double * R;
 
-    // Container for dx_dr, etc., length is 0 <= ii < numQuapts
+    // Container for dx_dr, etc., each of length numQuapts
     double * dx_dr, * dx_ds;
     double * dy_dr, * dy_ds;
     double * dz_dr, * dz_ds;
 
-    // unit normal vector, length is 0 <= ii < numQuapts
+    // unit normal vector components, each of length numQuapts
     double * unx, * uny, * unz;
 
-    // length is 0 <= ii < numQuapts
+    // Jacobian determinant, length numQuapts
     double * detJac; 
 };
 

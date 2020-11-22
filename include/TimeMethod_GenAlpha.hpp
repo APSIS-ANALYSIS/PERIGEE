@@ -8,17 +8,16 @@
 // This class defines the alpha_m, alpha_f, beta, and gamma for the 
 // generalized-alpha method.
 //
-// Chung & Hulbert 1993 showed that the 2nd-order accuracy is attained
-// if
+// Chung & Hulbert 1993 showed that 2nd-order accuracy is attained if
 //                   gamma = 0.5 - alpha_f + alpha_m;
 //                   beta = 0.25 (1 - alpha_f + alpha_m)^2.
 //
 // Unconditional stability requires
 //                   alpha_m >= alpha_f >= 0.5
 //
-// K. Jansen et al 1999 showed the the above is sufficient for 1st-
-// order linear system (beta condition only pertains to 2nd-order case)
-// For 1st-order system, displacement plas no role.
+// K. Jansen et al 1999 showed that the above conditions are sufficient for
+// 1st-order linear systems (beta condition only pertains to 2nd-order case)
+// For 1st-order system, displacement plays no role.
 //
 // To have strict control over high-frequency damping, alpha_m & 
 // alpha_f are parameterized by rho_infty. For 2nd-order system,
@@ -96,10 +95,10 @@ class TimeMethod_GenAlpha
     
     double alpha_m, alpha_f, gamma, beta;
     
-    // indicate if the method is for 1st-order and 2nd-order system
+    // indicate whether the method is for a 1st-or 2nd-order system
     const bool is2nd;
 
-    // indicate if the parameters are set from the rho_infty
+    // indicate whether the parameters are set from rho_infty
     const bool is_rho_set;
 };
 

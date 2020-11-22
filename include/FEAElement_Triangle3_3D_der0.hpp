@@ -10,7 +10,7 @@
 // coordinates in three-dimensions; _der0 means that only the function
 // itself is evaluated.
 //
-// This class is designed for boundary integrations for elemental or
+// This class is designed for boundary integrations for elemental/
 // natural boundary conditions in 3D problems. Although the element
 // is a 2D element, the geometry has x-y-z coordinates.
 // The Jacobian determinant is calculated as the norm of the cross
