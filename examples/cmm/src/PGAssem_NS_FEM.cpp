@@ -320,6 +320,16 @@ void PGAssem_NS_FEM::Assem_residual(
   // Backflow stabilization residual contribution
   BackFlow_G( sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
+  // ==== TODO: call new fcn NatBC_wall_G with the following args: ====
+  //   - sol_a (dot_sol at n+alpha_m) 
+  //   - wall displacement at n+alpha_f 
+  //   - lassem_ptr
+  //   - elements 
+  //   - quad_s
+  //   - nbc_part
+  //   - ebc_wall_part 
+  // ==== This function should assemble the wall contribution to R_m and R_k ====
+ 
   // Resistance type boundary condition
   NatBC_Resis_G( dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
 
@@ -404,6 +414,18 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
 
   // Backflow stabilization residual & tangent contribution
   BackFlow_KG( dt, sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+
+  // ==== TODO: call new fcn NatBC_wall_KG with the following args: ====
+  //   - dt
+  //   - sol_a (dot_sol at n+alpha_m) 
+  //   - wall displacement at n+alpha_f 
+  //   - lassem_ptr
+  //   - elements 
+  //   - quad_s
+  //   - nbc_part
+  //   - ebc_wall_part 
+  // ==== This function should assemble the wall contribution to residuals R_m and R_k
+  //      and tangents K_m,u and K_m,d ====
 
   // Resistance type boundary condition
   NatBC_Resis_KG( dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );

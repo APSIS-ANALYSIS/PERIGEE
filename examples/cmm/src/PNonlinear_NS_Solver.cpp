@@ -94,8 +94,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   dot_sol->Copy(*pre_dot_sol);
   dot_sol->ScaleValue( (gamma-1.0)/gamma );
 
-  // ==== TODO: Implement segregated algorithm for wall displacement ====
-
   // Define the dol_sol at alpha_m: dot_sol_alpha
   PDNSolution dot_sol_alpha(*pre_dot_sol);
   dot_sol_alpha.ScaleValue( 1.0 - alpha_m );
@@ -105,6 +103,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   PDNSolution sol_alpha(*pre_sol);
   sol_alpha.ScaleValue( 1.0 - alpha_f );
   sol_alpha.PlusAX( *sol, alpha_f );
+
+  // ==== TODO: define wall displacement at n+alpha_f ====
 
   // ------------------------------------------------- 
   // Update the inflow boundary values
@@ -122,6 +122,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PetscLogEventBegin(mat_assem_0_event, 0,0,0,0);
 #endif
 
+    // ==== TODO: pass in wall displacement at n+alpha_f ====
     gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol, 
         curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
         quad_v, quad_s, lien_ptr, anode_ptr,
@@ -145,6 +146,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PetscLogEventBegin(vec_assem_0_event, 0,0,0,0);
 #endif
 
+    // ==== TODO: pass in wall displacement at n+alpha_f ====
     gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
         curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
         quad_v, quad_s, lien_ptr, anode_ptr,
@@ -165,6 +167,9 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PetscLogEventBegin(lin_solve_event, 0,0,0,0);
 #endif
     
+    // ==== TODO: modify linear system for the segregated algorithm =====  
+    //      (See eqn 2.58)
+
     // solve the equation K dot_step = G
     lsolver_ptr->Solve( gassem_ptr->G, dot_step );
 
@@ -181,6 +186,9 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
     dot_sol_alpha.PlusAX( dot_step, (-1.0) * alpha_m );
     sol_alpha.PlusAX( dot_step, (-1.0) * alpha_f * gamma * dt );
+
+    // ==== TODO: update wall displacement at n+1 and n+alpha_f ====
+    // This requires the kinematic residual R_k (see eqn 2.59)
 
     // Assembly residual (& tangent if condition satisfied) 
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )
