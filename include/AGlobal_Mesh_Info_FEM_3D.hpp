@@ -27,6 +27,10 @@ class AGlobal_Mesh_Info_FEM_3D : public IAGlobal_Mesh_Info
     
     virtual ~AGlobal_Mesh_Info_FEM_3D();
 
+    // Get the polynomial degree for the discretization method. For
+    // unstructured mesh, the three function should return the same
+    // value since one cannot differentiate the xyz direction in, e.g.,
+    // tet mesh.
     virtual int get_xdegree() const {return xdegree;}
     virtual int get_ydegree() const {return ydegree;}
     virtual int get_zdegree() const {return zdegree;}
@@ -39,15 +43,22 @@ class AGlobal_Mesh_Info_FEM_3D : public IAGlobal_Mesh_Info
 
     virtual double get_max_hz() const
     {SYS_T::print_fatal("Error: AGlobal_Mesh_Info_FEM_3D::get_max_hz is not implemented. \n"); return 0.0;}
-    
+   
+    // Get the total number of element of the whole mesh. 
     virtual int get_nElem() const {return nElem;}
 
+    // Get the total number of nodes of the whole mesh.
     virtual int get_nFunc() const {return nFunc;}
 
+    // Get the number of local basis functions for the element.
+    // Note: this implicitly implies that we use the same type of element
+    //       for the mesh.
     virtual int get_nLocBas() const {return nLocBas;}
 
+    // Get the dimension of the problem.
     virtual int get_probDim() const {return probDim;}
 
+    // Get an integer that indicate the element type.
     virtual int get_elemType() const {return elemType;}
 
     virtual void print_info() const;
