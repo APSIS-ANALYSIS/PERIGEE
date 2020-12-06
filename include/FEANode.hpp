@@ -29,8 +29,10 @@ class FEANode
     // -------------------------------------------------------------- 
     FEANode( const std::string &fileBaseName, const int &cpu_rank );
 
+    // Destructor
     virtual ~FEANode();
 
+    // Access functions of the coordinates (and weights).
     virtual double get_ctrlPts_x(const int &index) const 
     {return ctrlPts_x[index];}
     
@@ -82,6 +84,7 @@ class FEANode
     virtual void get_ctrlPts_xy( const int &num, const int * const &index,
         double * const &ctrl_x, double * const &ctrl_y ) const;
 
+    // Print the info for this class.
     virtual void print_info() const;
 
     // --------------------------------------------------------------
