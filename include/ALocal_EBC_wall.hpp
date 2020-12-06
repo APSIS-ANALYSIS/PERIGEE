@@ -33,7 +33,6 @@ class ALocal_EBC_wall : public ALocal_EBC
     {return fluid_density;}
 
   protected:
-
     double fluid_density;
 
     // If this partition owns any part of the wall, the thickness and

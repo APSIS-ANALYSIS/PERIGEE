@@ -184,7 +184,6 @@ class ALocal_EBC
       return -1.0;
     }
 
-
   protected:
     // the number of different ebc domain
     int num_ebc;
