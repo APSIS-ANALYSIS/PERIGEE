@@ -29,8 +29,7 @@ class ALocal_EBC_wall : public ALocal_EBC
     virtual void get_youngsmod(std::vector<double> &out) const
     {out = youngsmod;}
 
-    virtual double get_fluid_density() const
-    {return fluid_density;}
+    virtual double get_fluid_density() const {return fluid_density;}
 
   protected:
     double fluid_density;
