@@ -29,27 +29,42 @@ class ALocal_EBC
 
     virtual int get_num_ebc() const {return num_ebc;}
 
+    // The following are functions that access the geometrical data of
+    // the ii-th surface that is prescribed with the elemental BC
+    // 0 <= ii < num_ebc
     virtual int get_num_local_node(const int &ii) const 
     {return num_local_node[ii];}
 
+    // 0 <= ii < num_ebc
     virtual int get_num_local_cell(const int &ii) const
     {return num_local_cell[ii];}
 
+    // 0 <= ii < num_ebc
     virtual int get_cell_nLocBas(const int &ii) const
     {return cell_nLocBas[ii];}
 
+    // 0 <= ii < num_ebc
+    // 0 <= jj < 3 x num_local_node[ii]
     virtual double get_local_pt_xyz(const int &ii, const int &jj) const
     {return local_pt_xyz[ii][jj];}
 
+    // 0 <= ii < num_ebc
+    // 0 <= jj < cell_nLocBas[ii] x num_local_cell[ii]
     virtual int get_local_tri_ien(const int &ii, const int &jj) const
     {return local_tri_ien[ii][jj];}
 
+    // 0 <= ii < num_ebc
+    // 0 <= jj < num_local_node[ii]
     virtual int get_local_global_node(const int &ii, const int &jj) const
     {return local_global_node[ii][jj];}
 
+    // 0 <= ii < num_ebc
+    // 0 <= jj < num_local_node[ii] 
     virtual int get_local_node_pos(const int &ii, const int &jj) const
     {return local_node_pos[ii][jj];}
 
+    // 0 <= ii < num_ebc
+    // 0 <= jj < num_local_cell[ii]
     virtual int get_local_global_cell(const int &ii, const int &jj) const
     {return local_global_cell[ii][jj];}
 
@@ -200,7 +215,7 @@ class ALocal_EBC
     std::vector< std::vector<double> > local_pt_xyz;
 
     // local_tri_ien[ii] gives the local cell's IEN array
-    // size: num_ebc x (3 x num_local_cell[ii]) 
+    // size: num_ebc x (cell_nLocBas[ii] x num_local_cell[ii]) 
     std::vector< std::vector<int> > local_tri_ien;
 
     // local nodes' global indices
