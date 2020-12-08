@@ -27,7 +27,8 @@ class APart_Node
     //              rank : the cpu rank
     // --------------------------------------------------------------
     APart_Node( const std::string &fbasename, const int &rank );
-    
+
+    // Destructor    
     virtual ~APart_Node();
 
     // This returns dofNum in the preprocessor, the total number of dof.
@@ -45,21 +46,30 @@ class APart_Node
     
     virtual int get_ntotalnode() const {return ntotalnode;}
 
+    // local_to_global is a mapping that maps from the local node index
+    // to the whole mesh's nodal index
+    // 0 <= index < nlocghonode == nlocalnode + nghostnode
     virtual int get_local_to_global(const int &index) const 
     {return local_to_global[index];}
 
+    // node_ghost maps from [0, nghostnode) to their global mesh index
+    // 0 <= index < nghostnode
     virtual int get_node_ghost(const int &index) const 
     {return node_ghost[index];}
 
+    // node_loc maps from [0, nlocalnode) to their global mesh index
+    // 0 <= index < nlocalnode
     virtual int get_node_loc(const int &index) const 
     {return node_loc[index];}
 
+    // Determine if a global mesh node with index belongs to this subdomain 
     virtual bool is_node_local(const int &index) const
     {
       std::vector<int>::const_iterator it = find(node_loc.begin(), node_loc.end(), index);
       return ( it != node_loc.end() );
     }
 
+    // Return this subdomain rank
     virtual int get_rank() const {return cpu_rank;}
 
     virtual void print_info() const;
@@ -90,8 +100,15 @@ class APart_Node
     }
     
   protected:
+    // rank of the CPU that identifies the subdomain
     const int cpu_rank;
+
+    // nlocghonode = nlocalnode + nghostnode
+    // ntotalnode = nlocghonnode + nbadnode
     int nlocalnode, nghostnode, nbadnode, nlocghonode, ntotalnode, dof;
+    
+    // local_to_global = node_loc appended by node_ghost
+    // and their lengths are nlocghonode, nlocalnode, nghostnode, respectively
     std::vector<int> local_to_global, node_ghost, node_loc;
 };
 

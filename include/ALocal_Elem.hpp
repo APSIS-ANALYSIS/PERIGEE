@@ -16,13 +16,14 @@ class ALocal_Elem
     // Constructor : read the h5 file of the given base name and rank
     ALocal_Elem(const std::string &fbasename, const int &cpu_rank);
 
+    // Destructor
     virtual ~ALocal_Elem();
 
     // Return the element index based on the local element index.
     // 0 <= index < nlocalele
     virtual int get_elem_loc(const int &index) const {return elem_loc[index];}
    
-    // Return the number of elements in this sub-domain. 
+    // Return the number of elements in this sub-domain owned by this CPU. 
     virtual int get_nlocalele() const {return nlocalele;}
 
     // Given the global element index, return its location in the vector
