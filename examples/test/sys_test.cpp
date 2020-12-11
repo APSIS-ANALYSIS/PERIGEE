@@ -9,9 +9,8 @@ class a
 
     void print_info() const;
 
-    const std::vector<double>& get() const;
+    std::vector<double>& get();
 
-  private:
     std::vector<double> av;
 };
 
@@ -20,6 +19,8 @@ int main( int argc, char * argv[] )
   a * example = new a();
   example -> print_info();
   
+  example->get()[1] = -3.0002;
+
   std::cout<<example->get()[0]<<'\n';
   std::cout<<example->get()[1]<<'\n';
   std::cout<<example->get()[2]<<'\n';
@@ -47,7 +48,7 @@ void a::print_info() const
     std::cout<<av[ii]<<'\n';
 }
 
-const std::vector<double>& a::get() const
+std::vector<double>& a::get()
 {
   return av;
 }
