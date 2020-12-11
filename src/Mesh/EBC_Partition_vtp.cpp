@@ -12,6 +12,7 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
   local_pt_xyz.clear();
   local_tri_ien.clear();
   local_global_node.clear();
+  local_node.clear();
   local_node_pos.clear();
   local_global_cell.clear();
 
@@ -22,6 +23,7 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
   local_pt_xyz.resize( num_ebc );
   local_tri_ien.resize( num_ebc );
   local_global_node.resize( num_ebc );
+  local_node.resize( num_ebc );
   local_node_pos.resize( num_ebc );
   local_global_cell.resize( num_ebc );
 
@@ -32,9 +34,12 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
   // Loop over each element bc surface
   for(int ii=0; ii<num_ebc; ++ii)
   {
+    // empty the ii-th surface's local_node array
+    local_node[ii].clear(); 
+    
     // obtain the node belonging to this partition
-    std::vector<int> local_node, local_elem;
-    local_node.clear(); local_elem.clear();
+    std::vector<int> local_elem;
+    local_elem.clear();
 
     const int num_global_bccell = ebc->get_num_cell( ii );
 
@@ -44,26 +49,25 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
     {
       const int elem_index = ebc -> get_global_cell(ii, jj);
 
-      // If the element is in the partitioned subdomain, record it
+      // If the element belongs to the partitioned subdomain, record it
       if( part -> get_elemLocIndex( elem_index ) != -1 )
       {
         local_elem.push_back( jj );
 
-        // If this element is in this partition, add it to the local
-        // cell's global cell index list
+        // record the cell's global (volumetric) element index
         local_global_cell[ii].push_back( elem_index );
 
         // now put this cell's nodes into local_node list
         for(int kk=0; kk<cell_nLocBas[ii]; ++kk)
-          local_node.push_back( ebc->get_ien(ii, jj, kk) );
+          local_node[ii].push_back( ebc->get_ien(ii, jj, kk) );
       }
     }
-    VEC_T::sort_unique_resize( local_node );
+    VEC_T::sort_unique_resize( local_node[ii] );
 
     // local_node now stores all the node that belong to this portion of the
-    // surface; local_global_cell[ii] stores all the cell that belong to the
+    // surface; local_global_cell[ii] stores all the cells that belong to the
     // portion of the surface.
-    num_local_node[ii] = static_cast<int>( local_node.size() );
+    num_local_node[ii] = static_cast<int>( local_node[ii].size() );
     num_local_cell[ii] = static_cast<int>( local_global_cell[ii].size() );
 
     // local_node[jj] gives the node index on the surface domain. We extract
@@ -73,10 +77,10 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
     local_node_pos[ii].resize( num_local_node[ii] );
     for(int jj=0; jj<num_local_node[ii]; ++jj)
     {
-      local_pt_xyz[ii][3*jj]   = ebc->get_pt_xyz( ii, local_node[jj], 0 );
-      local_pt_xyz[ii][3*jj+1] = ebc->get_pt_xyz( ii, local_node[jj], 1 );
-      local_pt_xyz[ii][3*jj+2] = ebc->get_pt_xyz( ii, local_node[jj], 2 );
-      local_global_node[ii][jj] = ebc->get_global_node( ii, local_node[jj] );
+      local_pt_xyz[ii][3*jj]   = ebc->get_pt_xyz( ii, local_node[ii][jj], 0 );
+      local_pt_xyz[ii][3*jj+1] = ebc->get_pt_xyz( ii, local_node[ii][jj], 1 );
+      local_pt_xyz[ii][3*jj+2] = ebc->get_pt_xyz( ii, local_node[ii][jj], 2 );
+      local_global_node[ii][jj] = ebc->get_global_node( ii, local_node[ii][jj] );
       local_node_pos[ii][jj] = part->get_nodeLocGhoIndex( mnindex->get_old2new( local_global_node[ii][jj] ) );
       assert(local_node_pos[ii][jj] >= 0);
     }
@@ -88,7 +92,7 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
       for(int kk=0; kk<cell_nLocBas[ii]; ++kk)
       {
         const int temp_node = ebc->get_ien(ii, local_elem[jj], kk);
-        const int temp_npos = VEC_T::get_pos( local_node, temp_node );
+        const int temp_npos = VEC_T::get_pos( local_node[ii], temp_node );
         SYS_T::print_exit_if( temp_npos < 0, "Error: EBC_Partition_vtp, local_node is incomplete. \n" );
         local_tri_ien[ii][jj*cell_nLocBas[ii] + kk] = temp_npos;
       }
@@ -105,6 +109,7 @@ EBC_Partition_vtp::~EBC_Partition_vtp()
   VEC_T::clean( local_pt_xyz );
   VEC_T::clean( local_tri_ien );
   VEC_T::clean( local_global_node );
+  VEC_T::clean( local_node );
   VEC_T::clean( local_node_pos );
   VEC_T::clean( local_global_cell );
 }
