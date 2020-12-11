@@ -75,8 +75,15 @@ class EBC_Partition_vtp : public IEBC_Partition
 
     // local node's global index, num_ebc x num_local_node[ii] in size
     std::vector< std::vector<int> > local_global_node;
-    
+   
+    // local node's index in the surface wall mesh
+    // note: this data is not stored into the hdf5 file
+    std::vector< std::vector<int> > local_node;
+
     // local node's position in the local_to_global array
+    // note: local_to_global array is generated in the Part_xxx based on IPart
+    // class, which stores the nodal indices of the local nodes followed by the
+    // ghost nodes
     std::vector< std::vector<int> > local_node_pos;
 
     // local cell's global index num_ebc x num_local_cell[ii] in size

@@ -9,7 +9,7 @@ set(PETSC_DIR /Users/juliu/lib/petsc-3.11.3-debug)
 
 set(PETSC_ARCH .)
 
-set(HDF5_ROOT ${PETSC_DIR})
+set(HDF5_ROOT /Users/juliu/lib/hdf5-1.8.16)
 
 # ========================================================
 # Setup the libraries
@@ -36,8 +36,8 @@ message(STATUS "External Libraries: " ${EXTRA_LINK_LIBS})
 # ========================================================
 # Compiler options 
 # ========================================================
-set(CMAKE_C_COMPILER  /Users/juliu/lib/mpich-3.2.1/bin/mpicc)
-set(CMAKE_CXX_COMPILER  /Users/juliu/lib/mpich-3.2.1/bin/mpicxx)
+set(CMAKE_C_COMPILER  /Users/juliu/lib/mpich-3.3.2/bin/mpicc)
+set(CMAKE_CXX_COMPILER  /Users/juliu/lib/mpich-3.3.2/bin/mpicxx)
 set(CMAKE_CXX_FLAGS "-O0 -Wall")
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_MACOSX_RPATH 1)
