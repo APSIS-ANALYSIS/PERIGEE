@@ -10,8 +10,11 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   elemType( elemtype ),
   fluid_density( in_fluid_density )
 {
-  // num_ebc = 1 for wall elem bc
+  // num_ebc = 1 per the assumption for wall elem bc
   const int ebc_id = 0;
+
+  SYS_T::file_check( walls_combined );
+  SYS_T::file_check( centerlines_combined );
 
   radius.resize(    num_node[ebc_id] );
   thickness.resize( num_node[ebc_id] );
@@ -69,15 +72,22 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 {
   // Check inputs
   SYS_T::print_fatal_if( centerlinesList.size() != wallsList.size(),
-      "Error: centerlinesList length does not match that of wallsList.\n");
-
+    "ERROR: wallsList and centerlinesList must be of the same length.\n");
   SYS_T::print_fatal_if( thickness2radiusList.size() != wallsList.size(),
-      "Error: thickness2radiusList length does not match that of wallsList.\n");
+    "ERROR: wallsList and thickness2radiusList must be of the same length.\n");
 
   // num_ebc = 1 for wall elem bc
   const int ebc_id = 0;
  
   const int num_srfs = static_cast<int>( wallsList.size() );
+
+  for(int ii=0; ii<num_srfs; ++ii)
+  {
+    SYS_T::file_check(wallsList[ii]);
+    SYS_T::file_check(centerlinesList[ii]);
+  }
+
+  std::cout << "     ===> Overwriting background wall properties in \n";
 
   // Loop over the surfaces (subsets of the whole wall surface)
   // to locally modify the wall property
@@ -139,6 +149,9 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     locator -> Delete();
     reader  -> Delete();
     cell    -> Delete();
+
+    std::cout << "          " << wallsList[ii] << '\n';
+
   }
 
   VEC_T::clean( pt ); VEC_T::clean( ien_array ); 

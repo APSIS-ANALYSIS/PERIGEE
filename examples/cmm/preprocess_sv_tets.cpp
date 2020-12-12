@@ -225,7 +225,14 @@ int main( int argc, char * argv[] )
   const std::string centerlines_combined = "centerlines.vtp";
   const double thickness2radius_combined = 0.2;
 
-  // Overwrite wall properties in the following selected regions
+  // If constructing wall properties with multiple spatial distributions,
+  // provide three additional vectors of equal length: 
+  //     1. wallsList:            surface vtp's, each a subset of the entire wall
+  //     2. centerlinesList:      corresponding centerline vtp's
+  //     3. thickness2radiusList: corresponding ratios
+  // The background wall properties will first be prescribed to the entire wall
+  // using centerlines_combined and thickness2radius_combined. Wall properties
+  // in wallsList will then be overwritten using the corresponding lists.
   std::vector<std::string> wallsList; wallsList.clear();
   std::vector<std::string> centerlinesList; centerlinesList.clear();
   std::vector<double> thickness2radiusList; thickness2radiusList.clear();
@@ -235,6 +242,19 @@ int main( int argc, char * argv[] )
 
   centerlinesList.push_back( "centerlines_aorta.vtp" );
   thickness2radiusList.push_back( 0.2 );
+
+  SYS_T::print_fatal_if(centerlinesList.size() != wallsList.size(), 
+      "ERROR: wallsList and centerlinesList must be of the same length.\n");
+  SYS_T::print_fatal_if(thickness2radiusList.size() != wallsList.size(), 
+      "ERROR: wallsList and thickness2radiusList must be of the same length.\n");
+
+  const int num_wall_subsets = static_cast<int>( wallsList.size() );
+
+  for(int ii=0; ii<num_wall_subsets; ++ii)
+  {
+    SYS_T::file_check(wallsList[ii]);
+    SYS_T::file_check(centerlinesList[ii]);
+  }
 
   ElemBC * wall_bc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
                                              thickness2radius_combined, wallsList,

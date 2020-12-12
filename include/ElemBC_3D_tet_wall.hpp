@@ -37,7 +37,8 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     //  constructor above. Wall properties in wallsList will then be overwritten
     //  with the corresponding centerlinesList and thickness2radiusList, so
     //  these three lists must have the same length.
-    //  \para: wallsList is a vector of wall surface vtp's 
+    //  \para: wallsList is a vector of wall surface vtp's, each a subset of
+    //         the entire wall 
     //  \para: centerlinesList is a vector of corresponding centerline vtp's
     //  \para: thickness2radiusList is a vector of corresponding ratios.
     // --------------------------------------------------------------
