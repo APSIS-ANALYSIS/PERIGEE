@@ -10,16 +10,16 @@ EBC_Partition_vtp_wall::EBC_Partition_vtp_wall(
   part_thickness.clear();
   part_youngsmod.clear();
 
-  // wall has only one surface as the assumption in wall ebc  
+  // wall has only one surface per the assumption in wall ebc  
   const int ebc_id = 0;
   if( num_local_node[ebc_id] > 0 )
   {
-    // obtain the wall properties of the whole surface
+    // access wall properties of the whole surface
     std::vector<double> temp_th, temp_E;
     ebc -> get_wall_thickness( temp_th );
     ebc -> get_wall_youngsmod( temp_E );
 
-    // save the wall properties belong to the local node, local to the cpu.
+    // save wall properties only belonging to nodes in the partition
     for( int ii=0; ii<num_local_node[ebc_id]; ++ii )
     {
       part_thickness.push_back( temp_th[ local_node[ebc_id][ii] ] );

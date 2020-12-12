@@ -185,7 +185,7 @@ class ALocal_EBC
     // get_youngsmod : return the wall young's modulus, if this partition
     //                 owns any cell on the wall.
     // --------------------------------------------------------------
-    virtual void get_younsmod(std::vector<double> &out) const
+    virtual void get_youngsmod(std::vector<double> &out) const
     {
       SYS_T::print_fatal("Error: ALocal_EBC::get_youngsmod is not implemented. \n");
     }

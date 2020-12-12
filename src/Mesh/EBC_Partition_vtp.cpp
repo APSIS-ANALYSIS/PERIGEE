@@ -64,14 +64,14 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
     }
     VEC_T::sort_unique_resize( local_node[ii] );
 
-    // local_node now stores all the node that belong to this portion of the
-    // surface; local_global_cell[ii] stores all the cells that belong to the
-    // portion of the surface.
+    // local_node[ii] now stores indices (in surface mesh ii) for all nodes
+    // in this partition of the surface; 
+    // local_global_cell[ii] stores all cells in this partition of the surface.
     num_local_node[ii] = static_cast<int>( local_node[ii].size() );
     num_local_cell[ii] = static_cast<int>( local_global_cell[ii].size() );
 
-    // local_node[jj] gives the node index on the surface domain. We extract
-    // their xyz-coordinates and their global volumetric mesh indicies now.
+    // For each local node, extract nodal xyz-coordinates and the global
+    // volumetric mesh index.
     local_pt_xyz[ii].resize(num_local_node[ii] * 3);
     local_global_node[ii].resize( num_local_node[ii] );
     local_node_pos[ii].resize( num_local_node[ii] );
