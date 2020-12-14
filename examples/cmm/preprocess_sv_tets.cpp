@@ -243,19 +243,6 @@ int main( int argc, char * argv[] )
   centerlinesList.push_back( "centerlines_aorta.vtp" );
   thickness2radiusList.push_back( 0.2 );
 
-  SYS_T::print_fatal_if(centerlinesList.size() != wallsList.size(), 
-      "ERROR: wallsList and centerlinesList must be of the same length.\n");
-  SYS_T::print_fatal_if(thickness2radiusList.size() != wallsList.size(), 
-      "ERROR: wallsList and thickness2radiusList must be of the same length.\n");
-
-  const int num_wall_subsets = static_cast<int>( wallsList.size() );
-
-  for(int ii=0; ii<num_wall_subsets; ++ii)
-  {
-    SYS_T::file_check(wallsList[ii]);
-    SYS_T::file_check(centerlinesList[ii]);
-  }
-
   ElemBC * wall_bc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
                                              thickness2radius_combined, wallsList,
                                              centerlinesList, thickness2radiusList, elemType);

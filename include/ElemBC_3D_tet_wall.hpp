@@ -8,7 +8,7 @@
 // This class has additional information of the wall mesh used for
 // thin-wall approximation in FSI simulations.
 //
-// Author: Ju Liu
+// Author: Ju Liu, Ingrid S. Lan
 // Date: July 12 2020
 // ==================================================================
 #include "ElemBC_3D_tet.hpp"
