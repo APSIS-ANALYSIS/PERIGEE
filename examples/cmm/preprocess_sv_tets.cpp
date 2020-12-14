@@ -3,6 +3,13 @@
 //
 // This is a preprocessor code for handling Navier-Stokes equations 
 // discretized by tetradedral elements.
+// 
+// This preprocessor is similiar to that of the NS solver, please
+// refer to the initialization of Elem_3D_tet_wall class for the
+// specification of the wall properties, which will be utilized
+// for FSI type simulations. Notice that the USERS may need to set
+// proper file names for constructing Elem_3D_tet_wall and recompile
+// the code.
 //
 // Date Created: Jan 01 2020
 // ==================================================================
@@ -219,12 +226,14 @@ int main( int argc, char * argv[] )
 
   ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
 
-  // Wall mesh is set as an elemental bc.
+  // ----------------------------------------------------------------
+  // Wall mesh for CMM-type model is set as an elemental bc.
   // Set the wall region, its corresponding centerline, and the thickness-to-radius ratio
   const std::string walls_combined = sur_file_wall;
   const std::string centerlines_combined = "centerlines.vtp";
   const double thickness2radius_combined = 0.2;
 
+  // For variable wall properties:
   // If constructing wall properties with multiple spatial distributions,
   // provide three additional vectors of equal length: 
   //     1. wallsList:            surface vtp's, each a subset of the entire wall
@@ -247,6 +256,7 @@ int main( int argc, char * argv[] )
                                              thickness2radius_combined, wallsList,
                                              centerlinesList, thickness2radiusList, elemType);
   wall_bc -> resetTriIEN_outwardnormal( IEN );
+  // ----------------------------------------------------------------
 
   // Start partition the mesh for each cpu_rank 
   const bool isPrintPartInfo = true;
