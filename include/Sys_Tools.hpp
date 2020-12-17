@@ -291,9 +291,25 @@ namespace SYS_T
     MPI_Abort(PETSC_COMM_WORLD, 1);
   }
 
-  inline void print_fatal_if( bool a, const char output[] )
+  inline void print_fatal_if( bool a, const char output[], ... )
   {
-    if( a ) print_fatal(output);
+    if( a )
+    {
+      PetscMPIInt rank;
+
+      MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
+
+      if(!rank)
+      {
+        va_list Argp;
+        va_start(Argp, output);
+        (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
+        va_end(Argp);
+      }
+
+      MPI_Barrier(PETSC_COMM_WORLD);
+      MPI_Abort(PETSC_COMM_WORLD, 1);
+    }
   }
 
   // exit message printers are used in terminating serial program when 

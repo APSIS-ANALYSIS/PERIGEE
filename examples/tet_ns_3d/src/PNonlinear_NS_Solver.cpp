@@ -221,12 +221,13 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
     VecNorm(gassem_ptr->G, NORM_2, &residual_norm);
     
+    SYS_T::print_fatal_if( residual_norm != residual_norm, "Error: nonlinear solver residual norm is NaN. Job killed.\n" );
+    
     SYS_T::commPrint("  --- nl_res: %e \n", residual_norm);
 
     relative_error = residual_norm / initial_norm;
 
-    if( relative_error >= nd_tol )
-      SYS_T::print_fatal( "Error: nonlinear solver is diverging with error %e. Job killed.\n", relative_error);
+    SYS_T::print_fatal_if( relative_error >= nd_tol, "Error: nonlinear solver is diverging with error %e. Job killed.\n", relative_error);
 
   }while(nl_counter<nmaxits && relative_error > nr_tol && residual_norm > na_tol);
 
