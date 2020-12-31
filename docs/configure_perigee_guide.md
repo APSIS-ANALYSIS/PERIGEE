@@ -7,11 +7,31 @@
 In this guide, we assume the external libraries have been correctly installed, following the steps in the [installation guide](install-external-libs.md). We will essentially tell the PERIGEE code where are those libraries.
 
 ## Table of Contents
-
-- [Name your machine](#Name-your-machine)
+- [Setup the machine](#Setup-the-machine)
+- [Name the machine](#Name-the-machine)
 - [Modify the CMake file](#Modify-the-Cmake-file)
 - [Create another CMake file for a cluster (optional)](#Create-another-CMake-file-for-a-cluster-(optional))
 - [Modify the system_lib_loading.cmake file](#Modify-the-system_lib_loading.cmake-file)
+
+## Setup the machine
+Assuming that you just installed a Ubuntu system. You may want to do the following to setup the system with essiential components.
+```sh
+sudo apt update
+sudo apt upgrade
+sudo apt-get autoremove
+sudo apt install vim
+sudo apt install git-all
+sudo apt install build-essential
+sudo apt install texlive-latex-extra
+sudo apt-get install texlive-publishers
+sudo apt-get install texlive-science
+sudo apt-get install gfortran
+sudo apt install python2
+sudo apt install python3
+sudo apt-get install mesa-utils
+sudo apt-get install mesa-common-dev
+sudo apt-get install libxt-dev
+```
 
 ## Name your machine
 Before you start, I recommend giving a meaningful name for your machine. What I typically do is that I give an environmental variable for my machine to name it. My first office desktop is called Bacon, and I have been using this name since then. To give your machine a name, go back to the home directory and open the .bashrc file, add `export MACHINE_NAME=bacon` to this file. Save it and close the terminal. Reopen the terminal and type
