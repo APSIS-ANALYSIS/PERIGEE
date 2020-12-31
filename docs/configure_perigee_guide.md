@@ -26,6 +26,8 @@ sudo apt install texlive-latex-extra
 sudo apt-get install gfortran
 sudo apt install python2
 sudo apt install python3
+sudo apt-get install mesa-utils
+sudo apt-get install mesa-common-dev
 ```
 
 ## Name your machine
