@@ -23,6 +23,7 @@ sudo apt install vim
 sudo apt install git-all
 sudo apt install build-essential
 sudo apt install texlive-latex-extra
+sudo apt-get install texlive-publishers
 sudo apt-get install gfortran
 sudo apt install python2
 sudo apt install python3
