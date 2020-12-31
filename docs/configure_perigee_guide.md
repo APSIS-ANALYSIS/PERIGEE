@@ -28,6 +28,7 @@ sudo apt install python2
 sudo apt install python3
 sudo apt-get install mesa-utils
 sudo apt-get install mesa-common-dev
+sudo apt-get install libxt-dev
 ```
 
 ## Name your machine
