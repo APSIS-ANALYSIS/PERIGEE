@@ -85,7 +85,8 @@ class FEAElement_Triangle3_membrane : public FEAElement
     // containers for dx_dr, dx_ds, dy_dr, dy_ds, dz_dr, dz_ds 
     double dx_dr, dx_ds, dy_dr, dy_ds, dz_dr, dz_ds;
 
-    // containers for unit vectors used to construct rotation matrix Q 
+    // containers for unit vectors used to construct rotation matrix Q,
+    // each of length 3 
     std::vector<double> e_r, e_s, e_a, e_b, e_l1, e_l2;
 
     // global-to-local 3x3 rotation matrix

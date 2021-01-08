@@ -1,9 +1,9 @@
 #include "FEAElement_Triangle6_membrane.hpp"
 
 FEAElement_Triangle6_membrane::FEAElement_Triangle6_membrane( const int &in_nqua )
-: numQuapts( in_nqua )
+: nLocBas( 6 ), numQuapts( in_nqua )
 {
-  R = new double [6*numQuapts];
+  R = new double [nLocBas * numQuapts];
   
   dx_dr = new double [numQuapts];
   dx_ds = new double [numQuapts];
@@ -19,6 +19,23 @@ FEAElement_Triangle6_membrane::FEAElement_Triangle6_membrane( const int &in_nqua
   unz = new double [numQuapts];
 
   detJac = new double [numQuapts];
+
+  e_r.resize(  numQuapts );
+  e_s.resize(  numQuapts );
+  e_a.resize(  numQuapts );
+  e_b.resize(  numQuapts );
+  e_l1.resize( numQuapts );
+  e_l2.resize( numQuapts );
+
+  for( int qua = 0; qua < numQuapts; ++qua )
+  {
+    e_r[qua].resize(3);
+    e_s[qua].resize(3);
+    e_a[qua].resize(3);
+    e_b[qua].resize(3);
+    e_l1[qua].resize(3);
+    e_l2[qua].resize(3);
+  }
 }
 
 
@@ -45,9 +62,9 @@ FEAElement_Triangle6_membrane::~FEAElement_Triangle6_membrane()
 void FEAElement_Triangle6_membrane::print_info() const
 {
   SYS_T::commPrint("Triangle6_membrane: ");
-  SYS_T::commPrint("6-node triangle element with no derivative evaluated. \n ");
+  SYS_T::commPrint("6-node triangle element in the local lamina coordinate system. \n ");
   PetscPrintf(PETSC_COMM_WORLD, "elemType: %d. \n", get_Type());
-  SYS_T::commPrint("Note: This element is designed for natural BC integrals. \n ");
+  SYS_T::commPrint("Note: This element is designed for the coupled momentum method. \n ");
 }
 
 
@@ -66,8 +83,8 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
   assert(quad->get_dim() == 3);
 
   double qua_r, qua_s, qua_t;
-  double Rr [6];
-  double Rs [6];
+  double Rr [nLocBas];
+  double Rs [nLocBas];
   for( int qua = 0; qua < numQuapts; ++qua )
   {
     qua_r = quad -> get_qp( qua, 0 );
@@ -101,7 +118,7 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
     dy_dr[qua] = 0.0; dy_ds[qua] = 0.0;
     dz_dr[qua] = 0.0; dz_ds[qua] = 0.0;
 
-    for( int ii=0; ii<6; ++ii )
+    for( int ii=0; ii<nLocBas; ++ii )
     {
       dx_dr[qua] += ctrl_x[ii] * Rr[ii];
       dx_ds[qua] += ctrl_x[ii] * Rs[ii];
@@ -118,6 +135,41 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
         unx[qua], uny[qua], unz[qua] );
   
     detJac[qua] = MATH_T::normalize3d( unx[qua], uny[qua], unz[qua] );
+
+    // ======= Global-to-local rotation matrix =======
+    e_r[qua][0] = dx_dr[qua] / MATH_T::norm2( dx_dr[qua], dy_dr[qua], dz_dr[qua] );
+    e_r[qua][1] = dy_dr[qua] / MATH_T::norm2( dx_dr[qua], dy_dr[qua], dz_dr[qua] );
+    e_r[qua][2] = dz_dr[qua] / MATH_T::norm2( dx_dr[qua], dy_dr[qua], dz_dr[qua] );
+
+    e_s[qua][0] = dx_ds[qua] / MATH_T::norm2( dx_ds[qua], dy_ds[qua], dz_ds[qua] );
+    e_s[qua][1] = dy_ds[qua] / MATH_T::norm2( dx_ds[qua], dy_ds[qua], dz_ds[qua] );
+    e_s[qua][2] = dz_ds[qua] / MATH_T::norm2( dx_ds[qua], dy_ds[qua], dz_ds[qua] );
+
+    // e_a = 0.5*(e_r + e_s) / || 0.5*(e_r + e_s) ||
+    for( unsigned int ii = 0; ii < e_r[qua].size(); ++ii )
+    {
+      e_a[qua][ii] = 0.5 * ( e_r[qua][ii] + e_s[qua][ii] );
+    }
+    MATH_T::normalize3d( e_a[qua][0], e_a[qua][1], e_a[qua][2] );
+
+    // e_b = vec(un) x e_a / || vec(un) x e_a ||
+    MATH_T::cross3d(unx[qua], uny[qua], unz[qua], e_a[qua][0], e_a[qua][1], e_a[qua][2],
+        e_b[qua][0], e_b[qua][1], e_b[qua][2]);
+    MATH_T::normalize3d( e_b[qua][0], e_b[qua][1], e_b[qua][2] );
+
+    // e_l1 = sqrt(2)/2 * (e_a - e_b)
+    // e_l2 = sqrt(2)/2 * (e_a + e_b)
+    for( unsigned int ii = 0; ii < e_a[qua].size(); ++ii )
+    {
+      e_l1[qua][ii] = std::sqrt(2.0) / 2.0 * ( e_a[qua][ii] - e_b[qua][ii] );
+      e_l2[qua][ii] = std::sqrt(2.0) / 2.0 * ( e_a[qua][ii] + e_b[qua][ii] );
+    }
+
+    // Q = transpose([ e_l1, e_l2, un ])
+    Q[qua] = Matrix_3x3(e_l1[qua][0], e_l1[qua][1], e_l1[qua][2],
+                        e_l2[qua][0], e_l2[qua][1], e_l2[qua][2],
+                            unx[qua],     uny[qua],     unz[qua] );
+
   }
 }
 
@@ -126,7 +178,7 @@ void FEAElement_Triangle6_membrane::get_R(
     const int &quaindex, double * const &basis ) const
 {
   assert(quaindex>=0 && quaindex < numQuapts);
-  const int offset = quaindex * 6;
+  const int offset = quaindex * nLocBas;
   basis[0] = R[offset];
   basis[1] = R[offset+1];
   basis[2] = R[offset+2];
@@ -159,9 +211,10 @@ void FEAElement_Triangle6_membrane::get_2d_normal_out( const int &qua,
 }
 
 
-void FEAElement_Triangle6_membrane::get_rotationMatrix() const
+void FEAElement_Triangle6_membrane::get_rotationMatrix( const int &quaindex,
+    Matrix_3x3 &rot_mat ) const
 {
-  // TODO
+  rot_mat = Q[quaindex];
 }
 
 

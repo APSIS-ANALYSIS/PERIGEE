@@ -69,7 +69,7 @@ class FEAElement_Triangle6_membrane : public FEAElement
         double * const &basis_x, double * const &basis_y,
         double * const &basis_z ) const;
 
-    virtual void get_rotationMatrix() const;
+    virtual void get_rotationMatrix( const int &quaindex, Matrix_3x3 &rot_mat ) const;
 
     // Assuming the triangle nodes are arranged such that the outward
     // direction is given by dx_dr x dx_ds
@@ -87,16 +87,25 @@ class FEAElement_Triangle6_membrane : public FEAElement
     {return detJac[quaindex];}
 
   private:
+    const int nLocBas;
+
     const int numQuapts;
 
     // Container for R0, R1, R2, R3, R4, R5
     // 0 <= ii < 6 x numQuapts
     double * R;
 
-    // Container for dx_dr, etc., each of length numQuapts
+    // Containers for dx_dr, etc., each of length numQuapts
     double * dx_dr, * dx_ds;
     double * dy_dr, * dy_ds;
     double * dz_dr, * dz_ds;
+
+    // containers for unit vectors used to construct rotation matrix Q,
+    // each of length numQuapts. e_xx[qua] is of length 3. 
+    std::vector< std::vector<double> > e_r, e_s, e_a, e_b, e_l1, e_l2;
+
+    // global-to-local 3x3 rotation matrix, of length numQuapts
+    std::vector< Matrix_3x3 > Q;
 
     // unit normal vector components, each of length numQuapts
     double * unx, * uny, * unz;
