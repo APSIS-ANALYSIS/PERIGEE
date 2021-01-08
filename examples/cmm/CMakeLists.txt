@@ -64,6 +64,8 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Global_Part_Serial.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Triangle3_membrane.cpp
+  ${perigee_source}/Element/FEAElement_Triangle6_membrane.cpp
   )
 
 SET( perigee_analysis_lib_src

@@ -311,6 +311,13 @@ class FEAElement
       const {SYS_T::commPrint("Warning: get_invJacobian is not implemented. \n");} 
 
     // ------------------------------------------------------------------------    
+    // Return the global-to-local rotation matrix for transforming between the
+    // global and local lamina coordinates.
+    virtual void get_rotationMatrix() 
+      const {SYS_T::commPrint("Warning: get_rotationMatrix is not implemented. \n");}
+    // ------------------------------------------------------------------------    
+
+    // ------------------------------------------------------------------------    
     // Unit outward normal vector:
     // The following virtual function returns the unit normal vector on the
     // face of a 2D/3D element. 
