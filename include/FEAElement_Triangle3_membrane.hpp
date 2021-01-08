@@ -56,7 +56,7 @@ class FEAElement_Triangle3_membrane : public FEAElement
         double * const &basis_x, double * const &basis_y,
         double * const &basis_z ) const;
 
-    virtual void get_rotationMatrix() const;
+    virtual void get_rotationMatrix( const int &quaindex, Matrix_3x3 &rot_mat ) const;
 
     // Assumes the triangle nodes are arranged such that the outward
     // direction is given by dx_dr x dx_ds
@@ -82,8 +82,14 @@ class FEAElement_Triangle3_membrane : public FEAElement
     // 0 <= ii < 3 x numQuapts
     double * R;
 
-    // container for dx_dr, dx_ds, dy_dr, dy_ds, dz_dr, dz_ds :
+    // containers for dx_dr, dx_ds, dy_dr, dy_ds, dz_dr, dz_ds 
     double dx_dr, dx_ds, dy_dr, dy_ds, dz_dr, dz_ds;
+
+    // containers for unit vectors used to construct rotation matrix Q 
+    std::vector<double> e_r, e_s, e_a, e_b, e_l1, e_l2;
+
+    // global-to-local 3x3 rotation matrix
+    Matrix_3x3 Q;
 
     // unit outward normal vector
     double unx, uny, unz;

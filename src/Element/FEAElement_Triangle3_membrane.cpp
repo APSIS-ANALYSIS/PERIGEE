@@ -4,7 +4,13 @@ FEAElement_Triangle3_membrane::FEAElement_Triangle3_membrane(
     const int &in_nqua )
 : nLocBas( 3 ), numQuapts( in_nqua )
 {
-  R = new double [ nLocBas * numQuapts ];
+  R   = new double [ nLocBas * numQuapts ];
+  e_r.resize(3);
+  e_s.resize(3);
+  e_a.resize(3);
+  e_b.resize(3);
+  e_l1.resize(3);
+  e_l2.resize(3);
 }
 
 
@@ -85,6 +91,40 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   
   // area = || vec(un) ||
   detJac = MATH_T::normalize3d( unx, uny, unz );
+
+  // Global-to-local rotation matrix
+  e_r[0] = dx_dr / MATH_T::norm2( dx_dr, dy_dr, dz_dr ); 
+  e_r[1] = dy_dr / MATH_T::norm2( dx_dr, dy_dr, dz_dr ); 
+  e_r[2] = dz_dr / MATH_T::norm2( dx_dr, dy_dr, dz_dr ); 
+
+  e_s[0] = dx_ds / MATH_T::norm2( dx_ds, dy_ds, dz_ds ); 
+  e_s[1] = dy_ds / MATH_T::norm2( dx_ds, dy_ds, dz_ds ); 
+  e_s[2] = dz_ds / MATH_T::norm2( dx_ds, dy_ds, dz_ds ); 
+
+  // e_a = 0.5*(e_r + e_s) / || 0.5*(e_r + e_s) ||
+  for( unsigned int ii = 0; ii < e_r.size(); ++ii )
+  {
+    e_a[ii] = 0.5 * ( e_r[ii] + e_s[ii] );
+  }
+  MATH_T::normalize3d( e_a[0], e_a[1], e_a[2] );
+
+  // e_b = vec(un) x e_a / || vec(un) x e_a ||
+  MATH_T::cross3d(unx, uny, unz, e_a[0], e_a[1], e_a[2],
+      e_b[0], e_b[1], e_b[2]);
+  MATH_T::normalize3d( e_b[0], e_b[1], e_b[2] );
+
+  // e_l1 = sqrt(2)/2 * (e_a - e_b)
+  // e_l2 = sqrt(2)/2 * (e_a + e_b)
+  for( unsigned int ii = 0; ii < e_a.size(); ++ii )
+  {
+    e_l1[ii] = std::sqrt(2.0) / 2.0 * ( e_a[ii] - e_b[ii] );
+    e_l2[ii] = std::sqrt(2.0) / 2.0 * ( e_a[ii] + e_b[ii] );
+  } 
+
+  // Q = transpose([ e_l1, e_l2, un ])
+  Q = Matrix_3x3(e_l1[0], e_l1[1], e_l1[2],
+                 e_l2[0], e_l2[1], e_l2[2],
+                     unx,     uny,     unz );
 }
 
 
@@ -92,7 +132,7 @@ void FEAElement_Triangle3_membrane::get_R( const int &quaindex,
     double * const &basis ) const
 {
   assert(quaindex>=0 && quaindex < numQuapts);
-  const int offset = quaindex * 3;
+  const int offset = quaindex * nLocBas;
   basis[0] = R[offset];
   basis[1] = R[offset+1];
   basis[2] = R[offset+2];
@@ -125,9 +165,10 @@ void FEAElement_Triangle3_membrane::get_2d_normal_out( const int &quaindex,
 }
 
 
-void FEAElement_Triangle3_membrane::get_rotationMatrix() const
+void FEAElement_Triangle3_membrane::get_rotationMatrix( const int &quaindex,
+    Matrix_3x3 &rot_mat) const
 {
-  // TODO
+  rot_mat = Q;
 }
 
 

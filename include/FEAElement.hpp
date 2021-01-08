@@ -22,6 +22,7 @@
 #include "IAExtractor.hpp"
 #include "BernsteinBasis_Array.hpp"
 #include "IBernsteinBasis.hpp"
+#include "Matrix_3x3.hpp"
 
 class FEAElement
 {
@@ -313,7 +314,7 @@ class FEAElement
     // ------------------------------------------------------------------------    
     // Return the global-to-local rotation matrix for transforming between the
     // global and local lamina coordinates.
-    virtual void get_rotationMatrix() 
+    virtual void get_rotationMatrix( const int &quaindex, Matrix_3x3 &rot_mat ) 
       const {SYS_T::commPrint("Warning: get_rotationMatrix is not implemented. \n");}
     // ------------------------------------------------------------------------    
 
