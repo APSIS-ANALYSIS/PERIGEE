@@ -3,12 +3,19 @@
 FEAElement_Triangle6_membrane::FEAElement_Triangle6_membrane( const int &in_nqua )
 : nLocBas( 6 ), numQuapts( in_nqua )
 {
-  R = new double [nLocBas * numQuapts];
+  ctrl_xl = new double [nLocBas * numQuapts];
+  ctrl_yl = new double [nLocBas * numQuapts];
+  ctrl_zl = new double [nLocBas * numQuapts];
+
+  R     = new double [nLocBas * numQuapts];
+  dR_dx = new double [nLocBas * numQuapts];
+  dR_dy = new double [nLocBas * numQuapts];
   
   unx = new double [numQuapts];
   uny = new double [numQuapts];
   unz = new double [numQuapts];
 
+  Jac    = new double [8 * numQuapts];
   detJac = new double [numQuapts];
 
   e_r.resize(  numQuapts );
@@ -28,12 +35,19 @@ FEAElement_Triangle6_membrane::FEAElement_Triangle6_membrane( const int &in_nqua
 
 FEAElement_Triangle6_membrane::~FEAElement_Triangle6_membrane()
 {
-  delete [] R; R = nullptr;
+  delete [] ctrl_xl; ctrl_xl = nullptr;
+  delete [] ctrl_yl; ctrl_yl = nullptr;
+  delete [] ctrl_zl; ctrl_zl = nullptr;
+
+  delete []     R;     R = nullptr;
+  delete [] dR_dx; dR_dx = nullptr;
+  delete [] dR_dy; dR_dy = nullptr;
 
   delete [] unx; unx = nullptr; 
   delete [] uny; uny = nullptr; 
   delete [] unz; unz = nullptr;
 
+  delete []    Jac;    Jac = nullptr;
   delete [] detJac; detJac = nullptr;
 }
 
@@ -77,10 +91,7 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
   {
     e_a[qua].resize(3);
     e_b[qua].resize(3);
-  }
 
-  for( int qua = 0; qua < numQuapts; ++qua )
-  {
     qua_r = quad -> get_qp( qua, 0 );
     qua_s = quad -> get_qp( qua, 1 );
     qua_t = quad -> get_qp( qua, 2 );
@@ -124,11 +135,12 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
       dz_ds[qua] += ctrl_z[ii] * Rs[ii];
     }
 
+    // vec(un) = vec(dx_dr) x vec(dx_ds)
     MATH_T::cross3d( dx_dr[qua], dy_dr[qua], dz_dr[qua], 
         dx_ds[qua], dy_ds[qua], dz_ds[qua],
-        unx[qua], uny[qua], unz[qua] );
+          unx[qua],   uny[qua],   unz[qua] );
   
-    detJac[qua] = MATH_T::normalize3d( unx[qua], uny[qua], unz[qua] );
+    MATH_T::normalize3d( unx[qua], uny[qua], unz[qua] );
 
     // ======= Global-to-local rotation matrix =======
     const double inv_len_er = 1.0 / MATH_T::norm2( dx_dr[qua], dy_dr[qua], dz_dr[qua] );
@@ -166,7 +178,53 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
                         e_l2[qua][0], e_l2[qua][1], e_l2[qua][2],
                             unx[qua],     uny[qua],     unz[qua] );
 
-  }
+    // Rotated lamina coordinates
+    for(int ii = 0; ii < nLocBas; ++ii)
+    {
+      double ctrl_xyzl[3];
+      Q[qua].VecMult( ctrl_x[ii], ctrl_y[ii], ctrl_z[ii], ctrl_xyzl);
+      ctrl_xl[offset + ii] = ctrl_xyzl[0];
+      ctrl_yl[offset + ii] = ctrl_xyzl[1];
+      ctrl_zl[offset + ii] = ctrl_xyzl[2];
+    }
+
+    // Rotated lamina 2D Jacobian & inverse Jacobian components
+    double dxl_dr = 0.0, dxl_ds = 0.0, dyl_dr = 0.0, dyl_ds = 0.0;
+    for( int ii=0; ii<nLocBas; ++ii )
+    {
+      dxl_dr += ctrl_xl[offset + ii] * Rr[ii];
+      dxl_ds += ctrl_xl[offset + ii] * Rs[ii];
+
+      dyl_dr += ctrl_yl[offset + ii] * Rr[ii];
+      dyl_ds += ctrl_yl[offset + ii] * Rs[ii];
+    }
+
+    Jac[4*qua+0] = dxl_dr;
+    Jac[4*qua+1] = dxl_ds;
+    Jac[4*qua+2] = dyl_dr;
+    Jac[4*qua+3] = dyl_ds;
+
+    detJac[qua] = dxl_dr * dyl_ds - dxl_ds * dyl_dr;
+
+    const double inv_detJac = 1.0 / detJac[qua];
+
+    const double dr_dxl = Jac[4*qua+3] * inv_detJac;
+    const double dr_dyl = (-1.0) * Jac[4*qua+1] * inv_detJac;
+    const double ds_dxl = (-1.0) * Jac[4*qua+2] * inv_detJac;
+    const double ds_dyl = Jac[4*qua+0] * inv_detJac;
+
+    Jac[4*numQuapts + 4*qua + 0] = dr_dxl;
+    Jac[4*numQuapts + 4*qua + 1] = dr_dyl;
+    Jac[4*numQuapts + 4*qua + 2] = ds_dxl;
+    Jac[4*numQuapts + 4*qua + 3] = ds_dyl;
+
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      dR_dx[offset+ii] = Rr[ii] * dr_dxl + Rs[ii] * ds_dxl;
+      dR_dy[offset+ii] = Rr[ii] * dr_dyl + Rs[ii] * ds_dyl;
+    }
+
+  } // end qua loop
 }
 
 

@@ -26,7 +26,7 @@ void FEAElement_Triangle3_membrane::clearBasisCache()
   delete [] ctrl_yl; ctrl_yl = nullptr;
   delete [] ctrl_zl; ctrl_zl = nullptr;
 
-  delete [] R;         R = nullptr;
+  delete []     R;     R = nullptr;
   delete [] dR_dx; dR_dx = nullptr;
   delete [] dR_dy; dR_dy = nullptr;
 }
@@ -116,7 +116,7 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
                  e_l2[0], e_l2[1], e_l2[2],
                      unx,     uny,     unz );
 
-  // Rotated local coordinates
+  // Rotated lamina coordinates
   for(int ii = 0; ii < nLocBas; ++ii)
   {
     double ctrl_xyzl[3];
@@ -126,7 +126,7 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
     ctrl_zl[ii] = ctrl_xyzl[2];
   }
 
-  // Rotated local 2D Jacobian components
+  // Rotated lamina 2D Jacobian & inverse Jacobian components
   Jac[0] = ctrl_xl[0] * (-1.0) + ctrl_xl[1]; // dxl_dr 
   Jac[1] = ctrl_xl[0] * (-1.0) + ctrl_xl[2]; // dxl_ds
 

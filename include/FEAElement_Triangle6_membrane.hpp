@@ -100,9 +100,18 @@ class FEAElement_Triangle6_membrane : public FEAElement
   private:
     const int nLocBas, numQuapts;
 
+    // Containers for rotated *lamina* coordinates
+    // 0 <= ii < 6 x numQuapts
+    double * ctrl_xl, * ctrl_yl, * ctrl_zl;
+
     // Container for R0, R1, R2, R3, R4, R5
     // 0 <= ii < 6 x numQuapts
     double * R;
+
+    // Containers for gradients of basis functions with respect to
+    // rotated *lamina* coordinates.
+    // 0 <= ii < 6 x numQuapts
+    double * dR_dx, * dR_dy;
 
     // Containers for unit vectors used to construct rotation matrix Q,
     // each of length numQuapts. e_xx[qua] is of length 3. 
@@ -113,6 +122,11 @@ class FEAElement_Triangle6_membrane : public FEAElement
 
     // Unit normal vector components, each of length numQuapts
     double * unx, * uny, * unz;
+
+    // Container for rotated *lamina* 2D Jacobian and its inverse
+    // dx_dr : 0             <= ii < 4 * numQuapts
+    // dr_dx : 4 * numQuapts <= ii < 8 * numQuapts
+    double * Jac;
 
     // Rotated *lamina* Jacobian determinant, of length numQuapts
     double * detJac; 
