@@ -88,7 +88,7 @@ class FEAElement_Triangle3_membrane : public FEAElement
     int numQuapts;
 
     // Containers for rotated *local* coordinates
-    double * ctrl_xl, * ctrl_yl, * ctrl_zl, * ctrl_xyzl;
+    double * ctrl_xl, * ctrl_yl, * ctrl_zl;
 
     // container for R0 = 1 - r - s, R1 = r, R2 = s :
     // 0 <= ii < 3 x numQuapts
@@ -103,7 +103,7 @@ class FEAElement_Triangle3_membrane : public FEAElement
 
     // containers for unit vectors used to construct rotation matrix Q,
     // each of length 3 
-    std::vector<double> e_r, e_s, e_a, e_b, e_l1, e_l2;
+    double e_r[3], e_s[3], e_a[3], e_b[3], e_l1[3], e_l2[3];
 
     // global-to-local 3x3 rotation matrix
     Matrix_3x3 Q;

@@ -7,18 +7,10 @@ FEAElement_Triangle3_membrane::FEAElement_Triangle3_membrane(
   ctrl_xl   = new double [ nLocBas ];
   ctrl_yl   = new double [ nLocBas ];
   ctrl_zl   = new double [ nLocBas ];
-  ctrl_xyzl = new double [ nLocBas ];
 
   R         = new double [ nLocBas * numQuapts ];
   dR_dx     = new double [ nLocBas ];
   dR_dy     = new double [ nLocBas ];
-
-  e_r.resize(3);
-  e_s.resize(3);
-  e_a.resize(3);
-  e_b.resize(3);
-  e_l1.resize(3);
-  e_l2.resize(3);
 }
 
 
@@ -33,7 +25,6 @@ void FEAElement_Triangle3_membrane::clearBasisCache()
   delete [] ctrl_xl;   ctrl_xl   = nullptr;
   delete [] ctrl_yl;   ctrl_yl   = nullptr;
   delete [] ctrl_zl;   ctrl_zl   = nullptr;
-  delete [] ctrl_xyzl; ctrl_xyzl = nullptr;
 
   delete [] R;         R = nullptr;
   delete [] dR_dx; dR_dx = nullptr;
@@ -112,15 +103,15 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   e_r[2] = dz_dr * inv_len_er; 
 
   const double inv_len_es = 1.0 / MATH_T::norm2( dx_ds, dy_ds, dz_ds );
-  e_s[0] = dx_ds * inv_len_er; 
-  e_s[1] = dy_ds * inv_len_er; 
-  e_s[2] = dz_ds * inv_len_er; 
+  e_s[0] = dx_ds * inv_len_es; 
+  e_s[1] = dy_ds * inv_len_es; 
+  e_s[2] = dz_ds * inv_len_es; 
 
   // e_a = 0.5*(e_r + e_s) / || 0.5*(e_r + e_s) ||
-  for( unsigned int ii = 0; ii < e_r.size(); ++ii )
-  {
-    e_a[ii] = 0.5 * ( e_r[ii] + e_s[ii] );
-  }
+  e_a[0] = 0.5 * ( e_r[0] + e_s[0] );
+  e_a[1] = 0.5 * ( e_r[1] + e_s[1] );
+  e_a[2] = 0.5 * ( e_r[2] + e_s[2] );
+  
   MATH_T::normalize3d( e_a[0], e_a[1], e_a[2] );
 
   // e_b = vec(un) x e_a / || vec(un) x e_a ||
@@ -130,11 +121,14 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
 
   // e_l1 = sqrt(2)/2 * (e_a - e_b)
   // e_l2 = sqrt(2)/2 * (e_a + e_b)
-  for( unsigned int ii = 0; ii < e_a.size(); ++ii )
-  {
-    e_l1[ii] = std::sqrt(2.0) / 2.0 * ( e_a[ii] - e_b[ii] );
-    e_l2[ii] = std::sqrt(2.0) / 2.0 * ( e_a[ii] + e_b[ii] );
-  } 
+  e_l1[0] = std::sqrt(2.0) * 0.5 * ( e_a[0] - e_b[0] );
+  e_l2[0] = std::sqrt(2.0) * 0.5 * ( e_a[0] + e_b[0] );
+  
+  e_l1[1] = std::sqrt(2.0) * 0.5 * ( e_a[1] - e_b[1] );
+  e_l2[1] = std::sqrt(2.0) * 0.5 * ( e_a[1] + e_b[1] );
+  
+  e_l1[2] = std::sqrt(2.0) * 0.5 * ( e_a[2] - e_b[2] );
+  e_l2[2] = std::sqrt(2.0) * 0.5 * ( e_a[2] + e_b[2] );
 
   // Q = transpose([ e_l1, e_l2, un ])
   Q = Matrix_3x3(e_l1[0], e_l1[1], e_l1[2],
@@ -144,7 +138,8 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   // Rotated local coordinates
   for(int ii = 0; ii < nLocBas; ++ii)
   {
-    Q.VecMult( ctrl_x[ii], ctrl_y[ii], ctrl_z[ii], ctrl_xyzl);
+    double ctrl_xyzl[3] = {0.0, 0.0, 0.0};
+    Q.VecMult( ctrl_x[ii], ctrl_y[ii], ctrl_z[ii], &ctrl_xyzl[0]);
     ctrl_xl[ii] = ctrl_xyzl[0];
     ctrl_yl[ii] = ctrl_xyzl[1];
     ctrl_zl[ii] = ctrl_xyzl[2];
@@ -173,7 +168,6 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   dR_dy[0] = (-1.0) * Jac[5] - Jac[7];
   dR_dy[1] = Jac[5];
   dR_dy[2] = Jac[7];
-
 }
 
 
