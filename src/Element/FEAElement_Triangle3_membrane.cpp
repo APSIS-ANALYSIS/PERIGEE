@@ -108,6 +108,7 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   e_s[2] = dz_ds * inv_len_es; 
 
   // e_a = 0.5*(e_r + e_s) / || 0.5*(e_r + e_s) ||
+  double e_a[3];
   e_a[0] = 0.5 * ( e_r[0] + e_s[0] );
   e_a[1] = 0.5 * ( e_r[1] + e_s[1] );
   e_a[2] = 0.5 * ( e_r[2] + e_s[2] );
@@ -115,6 +116,7 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   MATH_T::normalize3d( e_a[0], e_a[1], e_a[2] );
 
   // e_b = vec(un) x e_a / || vec(un) x e_a ||
+  double e_b[3];
   MATH_T::cross3d(unx, uny, unz, e_a[0], e_a[1], e_a[2],
       e_b[0], e_b[1], e_b[2]);
   MATH_T::normalize3d( e_b[0], e_b[1], e_b[2] );
