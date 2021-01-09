@@ -87,9 +87,16 @@ class FEAElement_Triangle3_membrane : public FEAElement
 
     int numQuapts;
 
+    // Containers for rotated *local* coordinates
+    double * ctrl_xl, * ctrl_yl, * ctrl_zl, * ctrl_xyzl;
+
     // container for R0 = 1 - r - s, R1 = r, R2 = s :
     // 0 <= ii < 3 x numQuapts
     double * R;
+
+    // containers for gradients of basis functions with respect to
+    // rotated *local* coordinates. Derivatives are constant here.
+    double * dR_dx, * dR_dy;
 
     // containers for dx_dr, dx_ds, dy_dr, dy_ds, dz_dr, dz_ds 
     double dx_dr, dx_ds, dy_dr, dy_ds, dz_dr, dz_ds;
@@ -103,6 +110,11 @@ class FEAElement_Triangle3_membrane : public FEAElement
 
     // unit outward normal vector
     double unx, uny, unz;
+
+    // Container for rotated *local* 2D Jacobian and its inverse
+    // dx_dr : 0 <= ii < 4
+    // dr_dx : 4 <= ii < 8
+    double Jac[8];
 
     // Jacobian determinant 
     double detJac;
