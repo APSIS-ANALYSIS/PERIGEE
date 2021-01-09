@@ -81,9 +81,7 @@ class FEAElement_Triangle3_membrane : public FEAElement
     {return detJac;}
 
   private:
-    const int nLocBas;
-
-    int numQuapts;
+    const int nLocBas, numQuapts;
 
     // Containers for rotated *local* coordinates
     double * ctrl_xl, * ctrl_yl, * ctrl_zl;

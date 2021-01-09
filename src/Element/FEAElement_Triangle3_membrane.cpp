@@ -43,7 +43,7 @@ void FEAElement_Triangle3_membrane::print() const
 
 double FEAElement_Triangle3_membrane::get_memory_usage() const
 {
-  double double_size = nLocBas * numQuapts + 10.0;
+  double double_size = nLocBas * numQuapts + 5*nLocBas + 33;
   double int_size = 2;
   return double_size * 8.0 + int_size * 4.0;
 }
@@ -75,8 +75,7 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   const double dz_ds = ctrl_z[0] * (-1.0) + ctrl_z[2];
 
   // vec(un) = vec(dx_dr) x vec(dx_ds)
-  MATH_T::cross3d(dx_dr, dy_dr, dz_dr, dx_ds, dy_ds, dz_ds,
-      unx, uny, unz);
+  MATH_T::cross3d(dx_dr, dy_dr, dz_dr, dx_ds, dy_ds, dz_ds, unx, uny, unz);
 
   MATH_T::normalize3d( unx, uny, unz );
 
@@ -101,8 +100,7 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
 
   // e_b = vec(un) x e_a / || vec(un) x e_a ||
   double e_b[3];
-  MATH_T::cross3d(unx, uny, unz, e_a[0], e_a[1], e_a[2],
-      e_b[0], e_b[1], e_b[2]);
+  MATH_T::cross3d(unx, uny, unz, e_a[0], e_a[1], e_a[2], e_b[0], e_b[1], e_b[2]);
   MATH_T::normalize3d( e_b[0], e_b[1], e_b[2] );
 
   // e_l1 = sqrt(2)/2 * (e_a - e_b)
@@ -142,10 +140,10 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
 
   double inv_detJac = 1.0 / detJac;
 
-  Jac[4] = Jac[3] * inv_detJac;        // dr_dx
-  Jac[5] = -1.0 * Jac[1] * inv_detJac; // dr_dy
-  Jac[6] = -1.0 * Jac[2] * inv_detJac; // ds_dx
-  Jac[7] = Jac[0] * inv_detJac;        // ds_dy
+  Jac[4] = Jac[3] * inv_detJac;        // dr_dxl
+  Jac[5] = -1.0 * Jac[1] * inv_detJac; // dr_dyl
+  Jac[6] = -1.0 * Jac[2] * inv_detJac; // ds_dxl
+  Jac[7] = Jac[0] * inv_detJac;        // ds_dyl
 
   dR_dx[0] = (-1.0) * Jac[4] - Jac[6];
   dR_dx[1] = Jac[4];
