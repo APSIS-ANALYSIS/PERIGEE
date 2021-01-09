@@ -30,14 +30,14 @@ FEAElement_Triangle3_membrane::~FEAElement_Triangle3_membrane()
 
 void FEAElement_Triangle3_membrane::clearBasisCache()
 {
-  delete [] ctrl_xl;   ctrl_xl   = NULL;
-  delete [] ctrl_yl;   ctrl_yl   = NULL;
-  delete [] ctrl_zl;   ctrl_zl   = NULL;
-  delete [] ctrl_xyzl; ctrl_xyzl = NULL;
+  delete [] ctrl_xl;   ctrl_xl   = nullptr;
+  delete [] ctrl_yl;   ctrl_yl   = nullptr;
+  delete [] ctrl_zl;   ctrl_zl   = nullptr;
+  delete [] ctrl_xyzl; ctrl_xyzl = nullptr;
 
-  delete [] R;         R = NULL;
-  delete [] dR_dx; dR_dx = NULL;
-  delete [] dR_dy; dR_dy = NULL;
+  delete [] R;         R = nullptr;
+  delete [] dR_dx; dR_dx = nullptr;
+  delete [] dR_dy; dR_dy = nullptr;
 }
 
 
@@ -78,11 +78,10 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_y,
     const double * const &ctrl_z )
 {
-  double qua_r, qua_s;
   for( int qua = 0; qua < numQuapts; ++qua )
   {
-    qua_r = quad -> get_qp(qua, 0);
-    qua_s = quad -> get_qp(qua, 1);
+    const double qua_r = quad -> get_qp(qua, 0);
+    const double qua_s = quad -> get_qp(qua, 1);
     R[qua*3 + 0] = 1.0 - qua_r - qua_s;
     R[qua*3 + 1] = qua_r;
     R[qua*3 + 2] = qua_s;
@@ -107,9 +106,10 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   MATH_T::normalize3d( unx, uny, unz );
 
   // ======= Global-to-local rotation matrix =======
-  e_r[0] = dx_dr / MATH_T::norm2( dx_dr, dy_dr, dz_dr ); 
-  e_r[1] = dy_dr / MATH_T::norm2( dx_dr, dy_dr, dz_dr ); 
-  e_r[2] = dz_dr / MATH_T::norm2( dx_dr, dy_dr, dz_dr ); 
+  const double inv_len_er = 1.0 / MATH_T::norm2( dx_dr, dy_dr, dz_dr );
+  e_r[0] = dx_dr * inv_len_er;
+  e_r[1] = dy_dr * inv_len_er; 
+  e_r[2] = dz_dr * inv_len_er; 
 
   e_s[0] = dx_ds / MATH_T::norm2( dx_ds, dy_ds, dz_ds ); 
   e_s[1] = dy_ds / MATH_T::norm2( dx_ds, dy_ds, dz_ds ); 
