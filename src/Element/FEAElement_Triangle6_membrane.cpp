@@ -131,13 +131,15 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
     detJac[qua] = MATH_T::normalize3d( unx[qua], uny[qua], unz[qua] );
 
     // ======= Global-to-local rotation matrix =======
-    e_r[qua][0] = dx_dr[qua] / MATH_T::norm2( dx_dr[qua], dy_dr[qua], dz_dr[qua] );
-    e_r[qua][1] = dy_dr[qua] / MATH_T::norm2( dx_dr[qua], dy_dr[qua], dz_dr[qua] );
-    e_r[qua][2] = dz_dr[qua] / MATH_T::norm2( dx_dr[qua], dy_dr[qua], dz_dr[qua] );
+    const double inv_len_er = 1.0 / MATH_T::norm2( dx_dr[qua], dy_dr[qua], dz_dr[qua] );
+    e_r[qua][0] = dx_dr[qua] * inv_len_er;
+    e_r[qua][1] = dy_dr[qua] * inv_len_er;
+    e_r[qua][2] = dz_dr[qua] * inv_len_er;
 
-    e_s[qua][0] = dx_ds[qua] / MATH_T::norm2( dx_ds[qua], dy_ds[qua], dz_ds[qua] );
-    e_s[qua][1] = dy_ds[qua] / MATH_T::norm2( dx_ds[qua], dy_ds[qua], dz_ds[qua] );
-    e_s[qua][2] = dz_ds[qua] / MATH_T::norm2( dx_ds[qua], dy_ds[qua], dz_ds[qua] );
+    const double inv_len_es = 1.0 / MATH_T::norm2( dx_ds[qua], dy_ds[qua], dz_ds[qua] );
+    e_s[qua][0] = dx_ds[qua] * inv_len_es;
+    e_s[qua][1] = dy_ds[qua] * inv_len_es;
+    e_s[qua][2] = dz_ds[qua] * inv_len_es;
 
     // e_a = 0.5*(e_r + e_s) / || 0.5*(e_r + e_s) ||
     for( unsigned int ii = 0; ii < e_r[qua].size(); ++ii )

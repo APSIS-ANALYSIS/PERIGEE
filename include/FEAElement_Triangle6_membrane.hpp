@@ -98,9 +98,7 @@ class FEAElement_Triangle6_membrane : public FEAElement
     {return detJac[quaindex];}
 
   private:
-    const int nLocBas;
-
-    const int numQuapts;
+    const int nLocBas, numQuapts;
 
     // Container for R0, R1, R2, R3, R4, R5
     // 0 <= ii < 6 x numQuapts
