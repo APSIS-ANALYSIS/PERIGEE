@@ -111,9 +111,10 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   e_r[1] = dy_dr * inv_len_er; 
   e_r[2] = dz_dr * inv_len_er; 
 
-  e_s[0] = dx_ds / MATH_T::norm2( dx_ds, dy_ds, dz_ds ); 
-  e_s[1] = dy_ds / MATH_T::norm2( dx_ds, dy_ds, dz_ds ); 
-  e_s[2] = dz_ds / MATH_T::norm2( dx_ds, dy_ds, dz_ds ); 
+  const double inv_len_es = 1.0 / MATH_T::norm2( dx_ds, dy_ds, dz_ds );
+  e_s[0] = dx_ds * inv_len_er; 
+  e_s[1] = dy_ds * inv_len_er; 
+  e_s[2] = dz_ds * inv_len_er; 
 
   // e_a = 0.5*(e_r + e_s) / || 0.5*(e_r + e_s) ||
   for( unsigned int ii = 0; ii < e_r.size(); ++ii )
