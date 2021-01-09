@@ -6,7 +6,7 @@
 // three-dimensional space for the coupled momentum method. 
 // Evaluates the element Jacobian, basis functions, and their gradients
 // with respect to the local lamina coordinates. Also computes the
-// global-to-local rotation matrix Q.
+// global-to-lamina rotation matrix Q.
 // 
 // Triangle3 means 3-node triangle; _membrane indicates a membrane
 // assumption such that the displacement is only a function of the
@@ -42,14 +42,14 @@ class FEAElement_Triangle3_membrane : public FEAElement
 
     // --------------------------------------------------------------
     // Input: 
-    // \para : quad_rule quadrature points
+    // \para quad_rule  : quadrature points
     // \para ctrl_x/y/z : the control points' coordinates in the global
     //                    system.
     // This function will generate the global-to_lamina rotation matrix Q,
-    // the basis functions, and the basis functions' gradient with respect
-    // to the lamina coorindates at each quadratue point.
-    // Typically, the users are responsilbe for pulling the gradients
-    // back to the global coordinate system by using the rotation matrix.
+    // basis functions, and basis function gradients with respect
+    // to the lamina coordinates at each quadratue point.
+    // Typically, the users are responsible for pulling the gradients
+    // back to the global coordinate system using the rotation matrix.
     // --------------------------------------------------------------
     virtual void buildBasis( const IQuadPts * const &quad_rule,
         const double * const &ctrl_x,
@@ -84,36 +84,36 @@ class FEAElement_Triangle3_membrane : public FEAElement
   private:
     const int nLocBas, numQuapts;
 
-    // Containers for rotated *local* coordinates
+    // Containers for rotated *lamina* coordinates
     double * ctrl_xl, * ctrl_yl, * ctrl_zl;
 
-    // container for R0 = 1 - r - s, R1 = r, R2 = s :
+    // Container for R0 = 1 - r - s, R1 = r, R2 = s :
     // 0 <= ii < 3 x numQuapts
     double * R;
 
-    // containers for gradients of basis functions with respect to
-    // rotated *local* coordinates. Derivatives are constant here.
+    // Containers for gradients of basis functions with respect to
+    // rotated *lamina* coordinates. Derivatives are constant here.
     double * dR_dx, * dR_dy;
 
-    // containers for unit vectors used to construct rotation matrix Q,
+    // Containers for unit vectors used to construct rotation matrix Q,
     // each of length 3 
     double e_r[3], e_s[3], e_l1[3], e_l2[3];
 
-    // global-to-local 3x3 rotation matrix
+    // Global-to-lamina 3x3 rotation matrix
     Matrix_3x3 Q;
 
-    // unit outward normal vector
+    // Unit outward normal vector
     double unx, uny, unz;
 
-    // Container for rotated *local* 2D Jacobian and its inverse
+    // Container for rotated *lamina* 2D Jacobian and its inverse
     // dx_dr : 0 <= ii < 4
     // dr_dx : 4 <= ii < 8
     double Jac[8];
 
-    // Jacobian determinant 
+    // Rotated *lamina* Jacobian determinant 
     double detJac;
 
-    // deallocate the memory
+    // Deallocate the memory
     virtual void clearBasisCache();
 };
 

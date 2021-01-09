@@ -5,15 +5,6 @@ FEAElement_Triangle6_membrane::FEAElement_Triangle6_membrane( const int &in_nqua
 {
   R = new double [nLocBas * numQuapts];
   
-  dx_dr = new double [numQuapts];
-  dx_ds = new double [numQuapts];
-
-  dy_dr = new double [numQuapts];
-  dy_ds = new double [numQuapts];
-  
-  dz_dr = new double [numQuapts];
-  dz_ds = new double [numQuapts];
-
   unx = new double [numQuapts];
   uny = new double [numQuapts];
   unz = new double [numQuapts];
@@ -22,8 +13,6 @@ FEAElement_Triangle6_membrane::FEAElement_Triangle6_membrane( const int &in_nqua
 
   e_r.resize(  numQuapts );
   e_s.resize(  numQuapts );
-  e_a.resize(  numQuapts );
-  e_b.resize(  numQuapts );
   e_l1.resize( numQuapts );
   e_l2.resize( numQuapts );
 
@@ -31,8 +20,6 @@ FEAElement_Triangle6_membrane::FEAElement_Triangle6_membrane( const int &in_nqua
   {
     e_r[qua].resize(3);
     e_s[qua].resize(3);
-    e_a[qua].resize(3);
-    e_b[qua].resize(3);
     e_l1[qua].resize(3);
     e_l2[qua].resize(3);
   }
@@ -41,21 +28,13 @@ FEAElement_Triangle6_membrane::FEAElement_Triangle6_membrane( const int &in_nqua
 
 FEAElement_Triangle6_membrane::~FEAElement_Triangle6_membrane()
 {
-  delete [] R; R = NULL;
-  delete [] dx_dr; dx_dr = NULL;
-  delete [] dx_ds; dx_ds = NULL;
-  
-  delete [] dy_dr; dx_dr = NULL;
-  delete [] dy_ds; dx_ds = NULL;
-  
-  delete [] dz_dr; dx_dr = NULL;
-  delete [] dz_ds; dx_ds = NULL;
+  delete [] R; R = nullptr;
 
-  delete [] unx; unx = NULL; 
-  delete [] uny; uny = NULL; 
-  delete [] unz; unz = NULL;
+  delete [] unx; unx = nullptr; 
+  delete [] uny; uny = nullptr; 
+  delete [] unz; unz = nullptr;
 
-  delete [] detJac; detJac = NULL;
+  delete [] detJac; detJac = nullptr;
 }
 
 
@@ -83,8 +62,23 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
   assert(quad->get_dim() == 3);
 
   double qua_r, qua_s, qua_t;
+
   double Rr [nLocBas];
   double Rs [nLocBas];
+
+  double dx_dr[numQuapts], dx_ds[numQuapts];
+  double dy_dr[numQuapts], dy_ds[numQuapts];
+  double dz_dr[numQuapts], dz_ds[numQuapts];
+
+  std::vector< std::vector<double> > e_a(numQuapts);
+  std::vector< std::vector<double> > e_b(numQuapts);
+
+  for( int qua = 0; qua < numQuapts; ++qua )
+  {
+    e_a[qua].resize(3);
+    e_b[qua].resize(3);
+  }
+
   for( int qua = 0; qua < numQuapts; ++qua )
   {
     qua_r = quad -> get_qp( qua, 0 );

@@ -22,9 +22,9 @@ FEAElement_Triangle3_membrane::~FEAElement_Triangle3_membrane()
 
 void FEAElement_Triangle3_membrane::clearBasisCache()
 {
-  delete [] ctrl_xl;   ctrl_xl   = nullptr;
-  delete [] ctrl_yl;   ctrl_yl   = nullptr;
-  delete [] ctrl_zl;   ctrl_zl   = nullptr;
+  delete [] ctrl_xl; ctrl_xl = nullptr;
+  delete [] ctrl_yl; ctrl_yl = nullptr;
+  delete [] ctrl_zl; ctrl_zl = nullptr;
 
   delete [] R;         R = nullptr;
   delete [] dR_dx; dR_dx = nullptr;
@@ -93,7 +93,6 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   // e_a = 0.5*(e_r + e_s) / || 0.5*(e_r + e_s) ||
   double e_a[3] = { 0.5 * ( e_r[0] + e_s[0] ), 0.5 * ( e_r[1] + e_s[1] ),
     0.5 * ( e_r[2] + e_s[2] ) };
-
   MATH_T::normalize3d( e_a[0], e_a[1], e_a[2] );
 
   // e_b = vec(un) x e_a / || vec(un) x e_a ||
@@ -120,8 +119,8 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   // Rotated local coordinates
   for(int ii = 0; ii < nLocBas; ++ii)
   {
-    double ctrl_xyzl[3] = {0.0, 0.0, 0.0};
-    Q.VecMult( ctrl_x[ii], ctrl_y[ii], ctrl_z[ii], &ctrl_xyzl[0]);
+    double ctrl_xyzl[3];
+    Q.VecMult( ctrl_x[ii], ctrl_y[ii], ctrl_z[ii], ctrl_xyzl);
     ctrl_xl[ii] = ctrl_xyzl[0];
     ctrl_yl[ii] = ctrl_xyzl[1];
     ctrl_zl[ii] = ctrl_xyzl[2];

@@ -6,7 +6,7 @@
 // three-dimensional space for the coupled momentum method.
 // Evaluates the element Jacobian, basis functions, and their gradients
 // with respect to the local lamina coordinates. Also computes the
-// global-to-local rotation matrix Q.
+// global-to-lamina rotation matrix Q.
 //
 //     s
 //     |
@@ -57,14 +57,14 @@ class FEAElement_Triangle6_membrane : public FEAElement
 
     // --------------------------------------------------------------
     // Input: 
-    // \para : quad_rule quadrature points
+    // \para quad_rule  : quadrature points
     // \para ctrl_x/y/z : the control points' coordinates in the global
     //                    system.
     // This function will generate the global-to_lamina rotation matrix Q,
-    // the basis functions, and the basis functions' gradient with respect
-    // to the lamina coorindates at each quadratue point.
-    // Typically, the users are responsilbe for pulling the gradients
-    // back to the global coordinate system by using the rotation matrix.
+    // basis functions, and basis function gradients with respect
+    // to the lamina coordinates at each quadratue point.
+    // Typically, the users are responsible for pulling the gradients
+    // back to the global coordinate system using the rotation matrix.
     // --------------------------------------------------------------
     virtual void buildBasis( const IQuadPts * const &quad_rule,
         const double * const &ctrl_x,
@@ -106,22 +106,17 @@ class FEAElement_Triangle6_membrane : public FEAElement
     // 0 <= ii < 6 x numQuapts
     double * R;
 
-    // Containers for dx_dr, etc., each of length numQuapts
-    double * dx_dr, * dx_ds;
-    double * dy_dr, * dy_ds;
-    double * dz_dr, * dz_ds;
-
-    // containers for unit vectors used to construct rotation matrix Q,
+    // Containers for unit vectors used to construct rotation matrix Q,
     // each of length numQuapts. e_xx[qua] is of length 3. 
-    std::vector< std::vector<double> > e_r, e_s, e_a, e_b, e_l1, e_l2;
+    std::vector< std::vector<double> > e_r, e_s, e_l1, e_l2;
 
-    // global-to-local 3x3 rotation matrix, of length numQuapts
+    // Global-to-lamina 3x3 rotation matrix, of length numQuapts
     std::vector< Matrix_3x3 > Q;
 
-    // unit normal vector components, each of length numQuapts
+    // Unit normal vector components, each of length numQuapts
     double * unx, * uny, * unz;
 
-    // Jacobian determinant, length numQuapts
+    // Rotated *lamina* Jacobian determinant, of length numQuapts
     double * detJac; 
 };
 
