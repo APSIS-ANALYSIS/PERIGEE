@@ -118,10 +118,6 @@ class FEAElement_Triangle3_membrane : public FEAElement
 
     // deallocate the memory
     virtual void clearBasisCache();
-
-    // resize the dynamic arrays R, dx_ds, detJac if the quadrature rule
-    // is changed
-    void resize_container(); 
 };
 
 #endif

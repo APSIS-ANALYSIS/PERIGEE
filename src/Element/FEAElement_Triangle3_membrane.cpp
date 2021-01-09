@@ -32,13 +32,6 @@ void FEAElement_Triangle3_membrane::clearBasisCache()
 }
 
 
-void FEAElement_Triangle3_membrane::resize_container()
-{
-  clearBasisCache();
-  R = new double [ nLocBas * numQuapts ];
-}
-
-
 void FEAElement_Triangle3_membrane::reset_numQuapts( 
     const int &new_num_qua )
 {
