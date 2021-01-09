@@ -63,6 +63,8 @@ class FEAElement_Triangle6_membrane : public FEAElement
     // This function will generate the global-to_lamina rotation matrix Q,
     // the basis functions, and the basis functions' gradient with respect
     // to the lamina coorindates at each quadratue point.
+    // Typically, the users are responsilbe for pulling the gradients
+    // back to the global coordinate system by using the rotation matrix.
     // --------------------------------------------------------------
     virtual void buildBasis( const IQuadPts * const &quad_rule,
         const double * const &ctrl_x,
