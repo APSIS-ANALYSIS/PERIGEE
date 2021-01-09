@@ -42,6 +42,15 @@ class FEAElement_Triangle3_membrane : public FEAElement
 
     virtual double get_memory_usage() const;
 
+    // --------------------------------------------------------------
+    // Input: 
+    // \para : quad_rule quadrature points
+    // \para ctrl_x/y/z : the control points' coordinates in the global
+    //                    system.
+    // This function will generate the global-to_lamina rotation matrix Q,
+    // the basis functions, and the basis functions' gradient with respect
+    // to the lamina coorindates at each quadratue point.
+    // --------------------------------------------------------------
     virtual void buildBasis( const IQuadPts * const &quad_rule,
         const double * const &ctrl_x,
         const double * const &ctrl_y,
