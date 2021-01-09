@@ -4,7 +4,15 @@ FEAElement_Triangle3_membrane::FEAElement_Triangle3_membrane(
     const int &in_nqua )
 : nLocBas( 3 ), numQuapts( in_nqua )
 {
-  R   = new double [ nLocBas * numQuapts ];
+  ctrl_xl   = new double [ nLocBas ];
+  ctrl_yl   = new double [ nLocBas ];
+  ctrl_zl   = new double [ nLocBas ];
+  ctrl_xyzl = new double [ nLocBas ];
+
+  R         = new double [ nLocBas * numQuapts ];
+  dR_dx     = new double [ nLocBas ];
+  dR_dy     = new double [ nLocBas ];
+
   e_r.resize(3);
   e_s.resize(3);
   e_a.resize(3);
@@ -22,7 +30,14 @@ FEAElement_Triangle3_membrane::~FEAElement_Triangle3_membrane()
 
 void FEAElement_Triangle3_membrane::clearBasisCache()
 {
-  delete [] R; R = NULL;
+  delete [] ctrl_xl;   ctrl_xl   = NULL;
+  delete [] ctrl_yl;   ctrl_yl   = NULL;
+  delete [] ctrl_zl;   ctrl_zl   = NULL;
+  delete [] ctrl_xyzl; ctrl_xyzl = NULL;
+
+  delete [] R;         R = NULL;
+  delete [] dR_dx; dR_dx = NULL;
+  delete [] dR_dy; dR_dy = NULL;
 }
 
 
@@ -89,10 +104,9 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   MATH_T::cross3d(dx_dr, dy_dr, dz_dr, dx_ds, dy_ds, dz_ds,
       unx, uny, unz);
   
-  // area = || vec(un) ||
-  detJac = MATH_T::normalize3d( unx, uny, unz );
+  MATH_T::normalize3d( unx, uny, unz );
 
-  // Global-to-local rotation matrix
+  // ======= Global-to-local rotation matrix =======
   e_r[0] = dx_dr / MATH_T::norm2( dx_dr, dy_dr, dz_dr ); 
   e_r[1] = dy_dr / MATH_T::norm2( dx_dr, dy_dr, dz_dr ); 
   e_r[2] = dz_dr / MATH_T::norm2( dx_dr, dy_dr, dz_dr ); 
@@ -125,6 +139,40 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   Q = Matrix_3x3(e_l1[0], e_l1[1], e_l1[2],
                  e_l2[0], e_l2[1], e_l2[2],
                      unx,     uny,     unz );
+
+  // Rotated local coordinates
+  for(int ii = 0; ii < nLocBas; ++ii)
+  {
+    Q.VecMult( ctrl_x[ii], ctrl_y[ii], ctrl_z[ii], ctrl_xyzl);
+    ctrl_xl[ii] = ctrl_xyzl[0];
+    ctrl_yl[ii] = ctrl_xyzl[1];
+    ctrl_zl[ii] = ctrl_xyzl[2];
+  }
+
+  // Rotated local 2D Jacobian components
+  Jac[0] = ctrl_xl[0] * (-1.0) + ctrl_xl[1]; // dxl_dr 
+  Jac[1] = ctrl_xl[0] * (-1.0) + ctrl_xl[2]; // dxl_ds
+
+  Jac[2] = ctrl_yl[0] * (-1.0) + ctrl_yl[1]; // dyl_dr
+  Jac[3] = ctrl_yl[0] * (-1.0) + ctrl_yl[2]; // dyl_ds
+
+  detJac = Jac[0] * Jac[3] - Jac[1] * Jac[2];
+
+  double inv_detJac = 1.0 / detJac;
+
+  Jac[4] = Jac[3] * inv_detJac;        // dr_dx
+  Jac[5] = -1.0 * Jac[1] * inv_detJac; // dr_dy
+  Jac[6] = -1.0 * Jac[2] * inv_detJac; // ds_dx
+  Jac[7] = Jac[0] * inv_detJac;        // ds_dy
+
+  dR_dx[0] = (-1.0) * Jac[4] - Jac[6];
+  dR_dx[1] = Jac[4];
+  dR_dx[2] = Jac[6];
+
+  dR_dy[0] = (-1.0) * Jac[5] - Jac[7];
+  dR_dy[1] = Jac[5];
+  dR_dy[2] = Jac[7];
+
 }
 
 
