@@ -98,9 +98,6 @@ class FEAElement_Triangle3_membrane : public FEAElement
     // rotated *local* coordinates. Derivatives are constant here.
     double * dR_dx, * dR_dy;
 
-    // containers for dx_dr, dx_ds, dy_dr, dy_ds, dz_dr, dz_ds 
-    double dx_dr, dx_ds, dy_dr, dy_ds, dz_dr, dz_ds;
-
     // containers for unit vectors used to construct rotation matrix Q,
     // each of length 3 
     double e_r[3], e_s[3], e_l1[3], e_l2[3];

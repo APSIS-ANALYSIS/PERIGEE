@@ -82,18 +82,17 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   //const double dN1_dr = 1.0;  const double dN1_ds = 0.0;
   //const double dN2_dr = 0.0;  const double dN2_ds = 1.0;
   
-  dx_dr = ctrl_x[0] * (-1.0) + ctrl_x[1];
-  dy_dr = ctrl_y[0] * (-1.0) + ctrl_y[1];
-  dz_dr = ctrl_z[0] * (-1.0) + ctrl_z[1];
-
-  dx_ds = ctrl_x[0] * (-1.0) + ctrl_x[2];
-  dy_ds = ctrl_y[0] * (-1.0) + ctrl_y[2];
-  dz_ds = ctrl_z[0] * (-1.0) + ctrl_z[2];
+  const double dx_dr = ctrl_x[0] * (-1.0) + ctrl_x[1];
+  const double dy_dr = ctrl_y[0] * (-1.0) + ctrl_y[1];
+  const double dz_dr = ctrl_z[0] * (-1.0) + ctrl_z[1];
+  const double dx_ds = ctrl_x[0] * (-1.0) + ctrl_x[2];
+  const double dy_ds = ctrl_y[0] * (-1.0) + ctrl_y[2];
+  const double dz_ds = ctrl_z[0] * (-1.0) + ctrl_z[2];
 
   // vec(un) = vec(dx_dr) x vec(dx_ds)
   MATH_T::cross3d(dx_dr, dy_dr, dz_dr, dx_ds, dy_ds, dz_ds,
       unx, uny, unz);
-  
+
   MATH_T::normalize3d( unx, uny, unz );
 
   // ======= Global-to-local rotation matrix =======
@@ -112,7 +111,7 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   e_a[0] = 0.5 * ( e_r[0] + e_s[0] );
   e_a[1] = 0.5 * ( e_r[1] + e_s[1] );
   e_a[2] = 0.5 * ( e_r[2] + e_s[2] );
-  
+
   MATH_T::normalize3d( e_a[0], e_a[1], e_a[2] );
 
   // e_b = vec(un) x e_a / || vec(un) x e_a ||
@@ -125,10 +124,10 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   // e_l2 = sqrt(2)/2 * (e_a + e_b)
   e_l1[0] = std::sqrt(2.0) * 0.5 * ( e_a[0] - e_b[0] );
   e_l2[0] = std::sqrt(2.0) * 0.5 * ( e_a[0] + e_b[0] );
-  
+
   e_l1[1] = std::sqrt(2.0) * 0.5 * ( e_a[1] - e_b[1] );
   e_l2[1] = std::sqrt(2.0) * 0.5 * ( e_a[1] + e_b[1] );
-  
+
   e_l1[2] = std::sqrt(2.0) * 0.5 * ( e_a[2] - e_b[2] );
   e_l2[2] = std::sqrt(2.0) * 0.5 * ( e_a[2] + e_b[2] );
 
