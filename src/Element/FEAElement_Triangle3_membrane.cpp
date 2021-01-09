@@ -32,14 +32,6 @@ void FEAElement_Triangle3_membrane::clearBasisCache()
 }
 
 
-void FEAElement_Triangle3_membrane::reset_numQuapts( 
-    const int &new_num_qua )
-{
-  numQuapts = new_num_qua;
-  resize_container();
-}
-
-
 void FEAElement_Triangle3_membrane::print() const
 {
   SYS_T::commPrint("Triangle3_membrane: ");

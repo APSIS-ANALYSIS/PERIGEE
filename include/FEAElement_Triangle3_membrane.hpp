@@ -36,8 +36,6 @@ class FEAElement_Triangle3_membrane : public FEAElement
 
     virtual int get_nLocBas() const {return nLocBas;}
 
-    virtual void reset_numQuapts( const int &new_num_qua );
-
     virtual void print() const;
 
     virtual double get_memory_usage() const;
