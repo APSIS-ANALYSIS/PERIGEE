@@ -137,10 +137,10 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
 
   double inv_detJac = 1.0 / detJac;
 
-  Jac[4] = Jac[3] * inv_detJac;        // dr_dxl
-  Jac[5] = -1.0 * Jac[1] * inv_detJac; // dr_dyl
-  Jac[6] = -1.0 * Jac[2] * inv_detJac; // ds_dxl
-  Jac[7] = Jac[0] * inv_detJac;        // ds_dyl
+  Jac[4] = Jac[3] * inv_detJac;              // dr_dxl
+  Jac[5] = -1.0 * Jac[1] * inv_detJac;       // dr_dyl
+  Jac[6] = -1.0 * Jac[2] * inv_detJac;       // ds_dxl
+  Jac[7] = Jac[0] * inv_detJac;              // ds_dyl
 
   dR_dx[0] = (-1.0) * Jac[4] - Jac[6];
   dR_dx[1] = Jac[4];
@@ -155,26 +155,37 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
 void FEAElement_Triangle3_membrane::get_R( const int &quaindex, 
     double * const &basis ) const
 {
-  assert(quaindex>=0 && quaindex < numQuapts);
+  assert( quaindex >= 0 && quaindex < numQuapts );
   const int offset = quaindex * nLocBas;
   basis[0] = R[offset];
-  basis[1] = R[offset+1];
-  basis[2] = R[offset+2];
+  basis[1] = R[offset + 1];
+  basis[2] = R[offset + 2];
 }
 
 
 void FEAElement_Triangle3_membrane::get_gradR( const int &quaindex,
-    double * const &basis_x, double * const &basis_y, double * const &basis_z ) const
+    double * const &basis_x, double * const &basis_y ) const
 {
-  // TODO
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  for( int ii=0; ii<nLocBas; ++ii )
+  {
+    basis_x[ii] = dR_dx[ii];
+    basis_y[ii] = dR_dy[ii];
+  }
 }
 
 
 void FEAElement_Triangle3_membrane::get_R_gradR( const int &quaindex,
-    double * const &basis, double * const &basis_x, double * const &basis_y,
-    double * const &basis_z ) const
+    double * const &basis, double * const &basis_x, double * const &basis_y ) const
 {
-  // TODO
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  const int offset = quaindex * nLocBas;
+  for( int ii=0; ii<nLocBas; ++ii )
+  {
+    basis[ii]   = R[offset + ii];
+    basis_x[ii] = dR_dx[ii];
+    basis_y[ii] = dR_dy[ii];
+  }
 }
 
 
@@ -192,6 +203,7 @@ void FEAElement_Triangle3_membrane::get_2d_normal_out( const int &quaindex,
 void FEAElement_Triangle3_membrane::get_rotationMatrix( const int &quaindex,
     Matrix_3x3 &rot_mat) const
 {
+  assert( quaindex >= 0 && quaindex < numQuapts );
   rot_mat = Q;
 }
 

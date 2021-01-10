@@ -231,29 +231,41 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
 void FEAElement_Triangle6_membrane::get_R( 
     const int &quaindex, double * const &basis ) const
 {
-  assert(quaindex>=0 && quaindex < numQuapts);
+  assert( quaindex >= 0 && quaindex < numQuapts );
   const int offset = quaindex * nLocBas;
   basis[0] = R[offset];
-  basis[1] = R[offset+1];
-  basis[2] = R[offset+2];
-  basis[3] = R[offset+3];
-  basis[4] = R[offset+4];
-  basis[5] = R[offset+5];
+  basis[1] = R[offset + 1];
+  basis[2] = R[offset + 2];
+  basis[3] = R[offset + 3];
+  basis[4] = R[offset + 4];
+  basis[5] = R[offset + 5];
 }
 
 
 void FEAElement_Triangle6_membrane::get_gradR( const int &quaindex,
-    double * const &basis_x, double * const &basis_y, double * const &basis_z ) const
+    double * const &basis_x, double * const &basis_y ) const
 {
-  // TODO
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  const int offset = quaindex * nLocBas;
+  for( int ii=0; ii<nLocBas; ++ii )
+  {
+    basis_x[ii] = dR_dx[offset + ii];
+    basis_y[ii] = dR_dy[offset + ii];
+  }
 }
 
 
 void FEAElement_Triangle6_membrane::get_R_gradR( const int &quaindex, 
-    double * const &basis, double * const &basis_x, double * const &basis_y,
-    double * const &basis_z ) const
+    double * const &basis, double * const &basis_x, double * const &basis_y ) const
 {
-  // TODO
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  const int offset = quaindex * nLocBas;
+  for( int ii=0; ii<nLocBas; ++ii )
+  {
+    basis[ii]   = R[offset + ii];
+    basis_x[ii] = dR_dx[offset + ii];
+    basis_y[ii] = dR_dy[offset + ii];
+  }
 }
 
 
@@ -268,6 +280,7 @@ void FEAElement_Triangle6_membrane::get_2d_normal_out( const int &qua,
 void FEAElement_Triangle6_membrane::get_rotationMatrix( const int &quaindex,
     Matrix_3x3 &rot_mat ) const
 {
+  assert( quaindex >= 0 && quaindex < numQuapts );
   rot_mat = Q[quaindex];
 }
 

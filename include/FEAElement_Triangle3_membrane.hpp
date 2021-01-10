@@ -47,7 +47,7 @@ class FEAElement_Triangle3_membrane : public FEAElement
     //                    system.
     // This function will generate the global-to_lamina rotation matrix Q,
     // basis functions, and basis function gradients with respect
-    // to the lamina coordinates at each quadratue point.
+    // to the lamina coordinates at each quadrature point.
     // Typically, the users are responsible for pulling the gradients
     // back to the global coordinate system using the rotation matrix.
     // --------------------------------------------------------------
@@ -59,11 +59,10 @@ class FEAElement_Triangle3_membrane : public FEAElement
     virtual void get_R( const int &quaindex, double * const &basis ) const;
 
     virtual void get_gradR( const int &quaindex, double * const &basis_x,
-        double * const &basis_y, double * const &basis_z ) const;
+        double * const &basis_y) const;
 
     virtual void get_R_gradR( const int &quaindex, double * const &basis,
-        double * const &basis_x, double * const &basis_y,
-        double * const &basis_z ) const;
+        double * const &basis_x, double * const &basis_y) const;
 
     virtual void get_rotationMatrix( const int &quaindex, Matrix_3x3 &rot_mat ) const;
 
