@@ -75,8 +75,6 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
 {
   assert(quad->get_dim() == 3);
 
-  double qua_r, qua_s, qua_t;
-
   double Rr [nLocBas];
   double Rs [nLocBas];
 
@@ -86,12 +84,9 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
 
   for( int qua = 0; qua < numQuapts; ++qua )
   {
-    e_a[qua].resize(3);
-    e_b[qua].resize(3);
-
-    qua_r = quad -> get_qp( qua, 0 );
-    qua_s = quad -> get_qp( qua, 1 );
-    qua_t = quad -> get_qp( qua, 2 );
+    const double qua_r = quad -> get_qp( qua, 0 );
+    const double qua_s = quad -> get_qp( qua, 1 );
+    const double qua_t = quad -> get_qp( qua, 2 );
 
     const int offset = 6 * qua;
 
@@ -135,8 +130,8 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
     // vec(un) = vec(dx_dr) x vec(dx_ds)
     MATH_T::cross3d( dx_dr[qua], dy_dr[qua], dz_dr[qua], 
         dx_ds[qua], dy_ds[qua], dz_ds[qua],
-          unx[qua],   uny[qua],   unz[qua] );
-  
+        unx[qua],   uny[qua],   unz[qua] );
+
     MATH_T::normalize3d( unx[qua], uny[qua], unz[qua] );
 
     // ======= Global-to-local rotation matrix =======
@@ -153,7 +148,7 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
     // e_a = 0.5*(e_r + e_s) / || 0.5*(e_r + e_s) ||
     double e_a[3] = { 0.5 * ( e_r[qua][0] + e_s[qua][0] ), 
       0.5 * ( e_r[qua][1] + e_s[qua][1] ), 0.5 * ( e_r[qua][2] + e_s[qua][2] ) };
-    
+
     MATH_T::normalize3d( e_a[0], e_a[1], e_a[2] );
 
     // e_b = vec(un) x e_a / || vec(un) x e_a ||
@@ -172,8 +167,8 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
 
     // Q = transpose([ e_l1, e_l2, un ])
     Q[qua] = Matrix_3x3(e_l1[qua][0], e_l1[qua][1], e_l1[qua][2],
-                        e_l2[qua][0], e_l2[qua][1], e_l2[qua][2],
-                            unx[qua],     uny[qua],     unz[qua] );
+        e_l2[qua][0], e_l2[qua][1], e_l2[qua][2],
+        unx[qua],     uny[qua],     unz[qua] );
 
     // Rotated lamina coordinates
     for(int ii = 0; ii < nLocBas; ++ii)
@@ -267,7 +262,7 @@ void FEAElement_Triangle6_membrane::get_R_gradR( const int &quaindex,
 
 
 void FEAElement_Triangle6_membrane::get_2d_normal_out( const int &qua,
-        double &nx, double &ny, double &nz, double &len ) const
+    double &nx, double &ny, double &nz, double &len ) const
 {
   nx = unx[qua]; ny = uny[qua]; nz = unz[qua];
   len = detJac[qua];
