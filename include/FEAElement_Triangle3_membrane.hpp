@@ -83,9 +83,6 @@ class FEAElement_Triangle3_membrane : public FEAElement
   private:
     const int nLocBas, numQuapts;
 
-    // Containers for rotated *lamina* coordinates
-    double * ctrl_xl, * ctrl_yl, * ctrl_zl;
-
     // Container for R0 = 1 - r - s, R1 = r, R2 = s :
     // 0 <= ii < 3 x numQuapts
     double * R;

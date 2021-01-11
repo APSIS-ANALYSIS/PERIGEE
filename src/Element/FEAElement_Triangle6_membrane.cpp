@@ -3,10 +3,6 @@
 FEAElement_Triangle6_membrane::FEAElement_Triangle6_membrane( const int &in_nqua )
 : nLocBas( 6 ), numQuapts( in_nqua )
 {
-  ctrl_xl = new double [nLocBas * numQuapts];
-  ctrl_yl = new double [nLocBas * numQuapts];
-  ctrl_zl = new double [nLocBas * numQuapts];
-
   R     = new double [nLocBas * numQuapts];
   dR_dx = new double [nLocBas * numQuapts];
   dR_dy = new double [nLocBas * numQuapts];
@@ -27,10 +23,6 @@ FEAElement_Triangle6_membrane::FEAElement_Triangle6_membrane( const int &in_nqua
 
 FEAElement_Triangle6_membrane::~FEAElement_Triangle6_membrane()
 {
-  delete [] ctrl_xl; ctrl_xl = nullptr;
-  delete [] ctrl_yl; ctrl_yl = nullptr;
-  delete [] ctrl_zl; ctrl_zl = nullptr;
-
   delete []     R;     R = nullptr;
   delete [] dR_dx; dR_dx = nullptr;
   delete [] dR_dy; dR_dy = nullptr;
@@ -75,9 +67,9 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
   double Rr [nLocBas];
   double Rs [nLocBas];
 
-  double dx_dr[numQuapts], dx_ds[numQuapts];
-  double dy_dr[numQuapts], dy_ds[numQuapts];
-  double dz_dr[numQuapts], dz_ds[numQuapts];
+  double dx_dr [numQuapts], dx_ds [numQuapts];
+  double dy_dr [numQuapts], dy_ds [numQuapts];
+  double dz_dr [numQuapts], dz_ds [numQuapts];
 
   for( int qua = 0; qua < numQuapts; ++qua )
   {
@@ -168,24 +160,28 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
         unx[qua],     uny[qua],     unz[qua] );
 
     // Rotated lamina coordinates
+    double ctrl_xl [nLocBas];
+    double ctrl_yl [nLocBas];
+    double ctrl_zl [nLocBas];
+
     for(int ii = 0; ii < nLocBas; ++ii)
     {
       double ctrl_xyzl[3];
       Q[qua].VecMult( ctrl_x[ii], ctrl_y[ii], ctrl_z[ii], ctrl_xyzl);
-      ctrl_xl[offset + ii] = ctrl_xyzl[0];
-      ctrl_yl[offset + ii] = ctrl_xyzl[1];
-      ctrl_zl[offset + ii] = ctrl_xyzl[2];
+      ctrl_xl[ii] = ctrl_xyzl[0];
+      ctrl_yl[ii] = ctrl_xyzl[1];
+      ctrl_zl[ii] = ctrl_xyzl[2];
     }
 
     // Rotated lamina 2D Jacobian & inverse Jacobian components
     double dxl_dr = 0.0, dxl_ds = 0.0, dyl_dr = 0.0, dyl_ds = 0.0;
-    for( int ii=0; ii<nLocBas; ++ii )
+    for( int ii = 0; ii < nLocBas; ++ii )
     {
-      dxl_dr += ctrl_xl[offset + ii] * Rr[ii];
-      dxl_ds += ctrl_xl[offset + ii] * Rs[ii];
+      dxl_dr += ctrl_xl[ii] * Rr[ii];
+      dxl_ds += ctrl_xl[ii] * Rs[ii];
 
-      dyl_dr += ctrl_yl[offset + ii] * Rr[ii];
-      dyl_ds += ctrl_yl[offset + ii] * Rs[ii];
+      dyl_dr += ctrl_yl[ii] * Rr[ii];
+      dyl_ds += ctrl_yl[ii] * Rs[ii];
     }
 
     Jac[4*qua+0] = dxl_dr;

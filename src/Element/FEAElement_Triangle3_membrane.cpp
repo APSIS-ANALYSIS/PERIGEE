@@ -4,10 +4,6 @@ FEAElement_Triangle3_membrane::FEAElement_Triangle3_membrane(
     const int &in_nqua )
 : nLocBas( 3 ), numQuapts( in_nqua )
 {
-  ctrl_xl   = new double [ nLocBas ];
-  ctrl_yl   = new double [ nLocBas ];
-  ctrl_zl   = new double [ nLocBas ];
-
   R         = new double [ nLocBas * numQuapts ];
   dR_dx     = new double [ nLocBas ];
   dR_dy     = new double [ nLocBas ];
@@ -22,10 +18,6 @@ FEAElement_Triangle3_membrane::~FEAElement_Triangle3_membrane()
 
 void FEAElement_Triangle3_membrane::clearBasisCache()
 {
-  delete [] ctrl_xl; ctrl_xl = nullptr;
-  delete [] ctrl_yl; ctrl_yl = nullptr;
-  delete [] ctrl_zl; ctrl_zl = nullptr;
-
   delete []     R;     R = nullptr;
   delete [] dR_dx; dR_dx = nullptr;
   delete [] dR_dy; dR_dy = nullptr;
@@ -117,6 +109,8 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
                      unx,     uny,     unz );
 
   // Rotated lamina coordinates
+  double ctrl_xl [nLocBas], ctrl_yl [nLocBas], ctrl_zl [nLocBas];
+
   for(int ii = 0; ii < nLocBas; ++ii)
   {
     double ctrl_xyzl[3];
