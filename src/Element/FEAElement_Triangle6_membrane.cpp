@@ -18,18 +18,10 @@ FEAElement_Triangle6_membrane::FEAElement_Triangle6_membrane( const int &in_nqua
   Jac    = new double [8 * numQuapts];
   detJac = new double [numQuapts];
 
-  e_r.resize(  numQuapts );
-  e_s.resize(  numQuapts );
-  e_l1.resize( numQuapts );
-  e_l2.resize( numQuapts );
-
-  for( int qua = 0; qua < numQuapts; ++qua )
-  {
-    e_r[qua].resize(3);
-    e_s[qua].resize(3);
-    e_l1[qua].resize(3);
-    e_l2[qua].resize(3);
-  }
+  e_r = new double [3 * numQuapts];
+  e_s = new double [3 * numQuapts];
+  e_l1 = new double [3 * numQuapts];
+  e_l2 = new double [3 * numQuapts];
 }
 
 
@@ -49,6 +41,11 @@ FEAElement_Triangle6_membrane::~FEAElement_Triangle6_membrane()
 
   delete []    Jac;    Jac = nullptr;
   delete [] detJac; detJac = nullptr;
+
+  delete [] e_r; e_r = nullptr;
+  delete [] e_s; e_s = nullptr;
+  delete [] e_l1; e_l1 = nullptr;
+  delete [] e_l2; e_l2 = nullptr;
 }
 
 
@@ -136,18 +133,18 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
 
     // ======= Global-to-local rotation matrix =======
     const double inv_len_er = 1.0 / MATH_T::norm2( dx_dr[qua], dy_dr[qua], dz_dr[qua] );
-    e_r[qua][0] = dx_dr[qua] * inv_len_er;
-    e_r[qua][1] = dy_dr[qua] * inv_len_er;
-    e_r[qua][2] = dz_dr[qua] * inv_len_er;
+    e_r[3*qua  ] = dx_dr[qua] * inv_len_er;
+    e_r[3*qua+1] = dy_dr[qua] * inv_len_er;
+    e_r[3*qua+2] = dz_dr[qua] * inv_len_er;
 
     const double inv_len_es = 1.0 / MATH_T::norm2( dx_ds[qua], dy_ds[qua], dz_ds[qua] );
-    e_s[qua][0] = dx_ds[qua] * inv_len_es;
-    e_s[qua][1] = dy_ds[qua] * inv_len_es;
-    e_s[qua][2] = dz_ds[qua] * inv_len_es;
+    e_s[3*qua  ] = dx_ds[qua] * inv_len_es;
+    e_s[3*qua+1] = dy_ds[qua] * inv_len_es;
+    e_s[3*qua+2] = dz_ds[qua] * inv_len_es;
 
     // e_a = 0.5*(e_r + e_s) / || 0.5*(e_r + e_s) ||
-    double e_a[3] = { 0.5 * ( e_r[qua][0] + e_s[qua][0] ), 
-      0.5 * ( e_r[qua][1] + e_s[qua][1] ), 0.5 * ( e_r[qua][2] + e_s[qua][2] ) };
+    double e_a[3] = { 0.5 * ( e_r[3*qua] + e_s[3*qua] ), 
+      0.5 * ( e_r[3*qua+1] + e_s[3*qua+1] ), 0.5 * ( e_r[3*qua+2] + e_s[3*qua+2] ) };
 
     MATH_T::normalize3d( e_a[0], e_a[1], e_a[2] );
 
@@ -161,13 +158,13 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
     // e_l2 = sqrt(2)/2 * (e_a + e_b)
     for( unsigned int ii = 0; ii < 3; ++ii )
     {
-      e_l1[qua][ii] = std::sqrt(2.0) * 0.5 * ( e_a[ii] - e_b[ii] );
-      e_l2[qua][ii] = std::sqrt(2.0) * 0.5 * ( e_a[ii] + e_b[ii] );
+      e_l1[3*qua+ii] = std::sqrt(2.0) * 0.5 * ( e_a[ii] - e_b[ii] );
+      e_l2[3*qua+ii] = std::sqrt(2.0) * 0.5 * ( e_a[ii] + e_b[ii] );
     }
 
     // Q = transpose([ e_l1, e_l2, un ])
-    Q[qua] = Matrix_3x3(e_l1[qua][0], e_l1[qua][1], e_l1[qua][2],
-        e_l2[qua][0], e_l2[qua][1], e_l2[qua][2],
+    Q[qua] = Matrix_3x3(e_l1[3*qua], e_l1[3*qua+1], e_l1[3*qua+2],
+        e_l2[3*qua], e_l2[3*qua+1], e_l2[3*qua+2],
         unx[qua],     uny[qua],     unz[qua] );
 
     // Rotated lamina coordinates
