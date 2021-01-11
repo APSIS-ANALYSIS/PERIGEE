@@ -26,7 +26,6 @@
 // assumption such that the displacement is only a function of the
 // in-plane parametric coordinates.
 //
-// Author: Ju Liu
 // Date Created: Jan. 8 2021.
 // ==================================================================
 #include "FEAElement.hpp"
@@ -93,8 +92,7 @@ class FEAElement_Triangle6_membrane : public FEAElement
         const double &intpt_x, const double &intpt_y, const double &intpt_z,
         double &nx, double &ny, double &nz, double &len ) const;
 
-    virtual double get_detJac(const int &quaindex) const
-    {return detJac[quaindex];}
+    virtual double get_detJac(const int &quaindex) const {return detJac[quaindex];}
 
   private:
     const int nLocBas, numQuapts;

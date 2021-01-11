@@ -84,9 +84,6 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
   double dy_dr[numQuapts], dy_ds[numQuapts];
   double dz_dr[numQuapts], dz_ds[numQuapts];
 
-  std::vector< std::vector<double> > e_a(numQuapts);
-  std::vector< std::vector<double> > e_b(numQuapts);
-
   for( int qua = 0; qua < numQuapts; ++qua )
   {
     e_a[qua].resize(3);
@@ -154,23 +151,23 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
     e_s[qua][2] = dz_ds[qua] * inv_len_es;
 
     // e_a = 0.5*(e_r + e_s) / || 0.5*(e_r + e_s) ||
-    for( unsigned int ii = 0; ii < e_r[qua].size(); ++ii )
-    {
-      e_a[qua][ii] = 0.5 * ( e_r[qua][ii] + e_s[qua][ii] );
-    }
-    MATH_T::normalize3d( e_a[qua][0], e_a[qua][1], e_a[qua][2] );
+    double e_a[3] = { 0.5 * ( e_r[qua][0] + e_s[qua][0] ), 
+      0.5 * ( e_r[qua][1] + e_s[qua][1] ), 0.5 * ( e_r[qua][2] + e_s[qua][2] ) };
+    
+    MATH_T::normalize3d( e_a[0], e_a[1], e_a[2] );
 
     // e_b = vec(un) x e_a / || vec(un) x e_a ||
-    MATH_T::cross3d(unx[qua], uny[qua], unz[qua], e_a[qua][0], e_a[qua][1], e_a[qua][2],
-        e_b[qua][0], e_b[qua][1], e_b[qua][2]);
-    MATH_T::normalize3d( e_b[qua][0], e_b[qua][1], e_b[qua][2] );
+    double e_b[3] = {0.0, 0.0, 0.0};
+    MATH_T::cross3d(unx[qua], uny[qua], unz[qua], e_a[0], e_a[1], e_a[2],
+        e_b[0], e_b[1], e_b[2]);
+    MATH_T::normalize3d( e_b[0], e_b[1], e_b[2] );
 
     // e_l1 = sqrt(2)/2 * (e_a - e_b)
     // e_l2 = sqrt(2)/2 * (e_a + e_b)
-    for( unsigned int ii = 0; ii < e_a[qua].size(); ++ii )
+    for( unsigned int ii = 0; ii < 3; ++ii )
     {
-      e_l1[qua][ii] = std::sqrt(2.0) / 2.0 * ( e_a[qua][ii] - e_b[qua][ii] );
-      e_l2[qua][ii] = std::sqrt(2.0) / 2.0 * ( e_a[qua][ii] + e_b[qua][ii] );
+      e_l1[qua][ii] = std::sqrt(2.0) * 0.5 * ( e_a[ii] - e_b[ii] );
+      e_l2[qua][ii] = std::sqrt(2.0) * 0.5 * ( e_a[ii] + e_b[ii] );
     }
 
     // Q = transpose([ e_l1, e_l2, un ])
