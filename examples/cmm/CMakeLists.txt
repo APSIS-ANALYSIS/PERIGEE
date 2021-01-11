@@ -71,6 +71,7 @@ SET( perigee_preprocess_lib_src
 SET( perigee_analysis_lib_src
   ${perigee_source}/System/PETSc_Tools.cpp
   ${perigee_source}/System/Matrix_double_6by6_Array.cpp
+  ${perigee_source}/System/Matrix_3x3.cpp
   ${perigee_source}/System/Matrix_PETSc.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Tet.cpp
   ${perigee_source}/Analysis_Tool/AGlobal_Mesh_Info_FEM_3D.cpp
@@ -107,6 +108,10 @@ SET( perigee_postprocess_lib_src
   ${perigee_source}/Postproc_Tool/Interpolater.cpp
   )
 
+SET( perigee_test_lib_src
+  ${perigee_source}/Mesh/QuadPts_debug.cpp
+  )
+  
 INCLUDE_DIRECTORIES( ./include )
 INCLUDE_DIRECTORIES( ../../include )
 
@@ -124,6 +129,10 @@ TARGET_LINK_LIBRARIES( perigee_analysis ${EXTRA_LINK_LIBS} perigee_preprocess )
 ADD_LIBRARY( perigee_postprocess ${perigee_postprocess_lib_src} )
 TARGET_LINK_LIBRARIES( perigee_postprocess ${EXTRA_LINK_LIBS} perigee_analysis
   perigee_preprocess )
+
+# 4. Test lib
+ADD_LIBRARY( perigee_test ${perigee_test_lib_src} )
+TARGET_LINK_LIBRARIES( perigee_test ${EXTRA_LINK_LIBS} perigee_analysis )
 # -------------------------------------------------------------------
 
 # Print compiler setup
@@ -140,6 +149,7 @@ ADD_EXECUTABLE( cmm_tet_3d cmm_driver.cpp)
 #ADD_EXECUTABLE( vis_p1_wss vis_p1_wss.cpp)
 
 ADD_EXECUTABLE( test test.cpp )
+ADD_EXECUTABLE( test_element test_membrane_element_routine.cpp )
 
 TARGET_LINK_LIBRARIES( gmsh_p1_IO perigee_preprocess )
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
@@ -149,5 +159,6 @@ TARGET_LINK_LIBRARIES( cmm_tet_3d perigee_analysis )
 #TARGET_LINK_LIBRARIES( vis_p1_wss perigee_postprocess )
 
 TARGET_LINK_LIBRARIES( test perigee_preprocess )
+TARGET_LINK_LIBRARIES( test_element perigee_test )
 
 # EOF
