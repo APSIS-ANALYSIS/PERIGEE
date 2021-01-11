@@ -17,11 +17,14 @@ class QuadPts_debug : public IQuadPts
     QuadPts_debug( const int &len, const std::vector<double> &in_qp,
         const std::vector<double> &in_qw );
 
+    QuadPts_debug( const int &in_dim, const int &in_numpt, 
+        const std::vector<double> &in_qp, const std::vector<double> &in_qw );
+
     virtual ~QuadPts_debug();
 
     virtual void print_info() const;
 
-    virtual int get_dim() const {return 1;}
+    virtual int get_dim() const {return dim;}
 
     virtual int get_num_quadPts() const {return num_pts;}
 
@@ -30,7 +33,7 @@ class QuadPts_debug : public IQuadPts
     virtual double get_qw(unsigned int ii) const {return qw[ii];}
 
   private:
-    const int num_pts;
+    const int num_pts, dim;
 
     std::vector<double> qp, qw;
 };
