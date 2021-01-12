@@ -109,7 +109,7 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
                      unx,     uny,     unz );
 
   // Rotated lamina coordinates
-  double ctrl_xl [nLocBas], ctrl_yl [nLocBas], ctrl_zl [nLocBas];
+  double ctrl_xl [nLocBas], ctrl_yl [nLocBas];
 
   for(int ii = 0; ii < nLocBas; ++ii)
   {
@@ -117,7 +117,6 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
     Q.VecMult( ctrl_x[ii], ctrl_y[ii], ctrl_z[ii], ctrl_xyzl);
     ctrl_xl[ii] = ctrl_xyzl[0];
     ctrl_yl[ii] = ctrl_xyzl[1];
-    ctrl_zl[ii] = ctrl_xyzl[2];
   }
 
   // Rotated lamina 2D Jacobian & inverse Jacobian components
