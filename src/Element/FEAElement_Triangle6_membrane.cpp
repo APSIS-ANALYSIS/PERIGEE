@@ -160,8 +160,7 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
         unx[qua],     uny[qua],     unz[qua] );
 
     // Rotated lamina coordinates
-    double ctrl_xl [nLocBas];
-    double ctrl_yl [nLocBas];
+    double ctrl_xl [nLocBas], ctrl_yl [nLocBas];
 
     for(int ii = 0; ii < nLocBas; ++ii)
     {
