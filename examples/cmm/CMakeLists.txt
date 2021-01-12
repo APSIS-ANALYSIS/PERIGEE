@@ -33,7 +33,6 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/System/Sys_Tools.cpp
   ${perigee_source}/System/Vec_Tools.cpp
   ${perigee_source}/System/Vector_3.cpp
-  ${perigee_source}/System/Matrix_3x3.cpp
   ${perigee_source}/System/Matrix_double_3by3_Array.cpp
   ${perigee_source}/System/Math_Tools.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
@@ -65,12 +64,11 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Global_Part_Serial.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
-  ${perigee_source}/Element/FEAElement_Triangle3_membrane.cpp
-  ${perigee_source}/Element/FEAElement_Triangle6_membrane.cpp
   )
 
 SET( perigee_analysis_lib_src
   ${perigee_source}/System/PETSc_Tools.cpp
+  ${perigee_source}/System/Matrix_3x3.cpp
   ${perigee_source}/System/Matrix_double_6by6_Array.cpp
   ${perigee_source}/System/Matrix_PETSc.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Tet.cpp
@@ -87,6 +85,8 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Element/FEANode.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
   ${perigee_source}/Element/FEAElement_Tet10_v2.cpp
+  ${perigee_source}/Element/FEAElement_Triangle3_membrane.cpp
+  ${perigee_source}/Element/FEAElement_Triangle6_membrane.cpp
   ${perigee_source}/Model/GenBC_RCR.cpp
   ${perigee_source}/Model/GenBC_Resistance.cpp
   ${perigee_source}/Model/GenBC_Inductance.cpp
