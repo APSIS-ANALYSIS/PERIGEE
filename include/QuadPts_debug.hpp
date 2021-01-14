@@ -30,6 +30,9 @@ class QuadPts_debug : public IQuadPts
 
     virtual double get_qp(unsigned int ii) const {return qp[ii];}
 
+    virtual double get_qp(unsigned int ii, unsigned int comp) const
+    {return qp[dim*ii + comp];}
+
     virtual double get_qw(unsigned int ii) const {return qw[ii];}
 
   private:
