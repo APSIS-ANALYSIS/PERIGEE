@@ -115,6 +115,9 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   {
     double ctrl_xyzl[3];
     Q.VecMult( ctrl_x[ii], ctrl_y[ii], ctrl_z[ii], ctrl_xyzl);
+
+    std::cout << ctrl_xyzl[0] << "\t" << ctrl_xyzl[1] << "\t" << ctrl_xyzl[2] << std::endl; 
+
     ctrl_xl[ii] = ctrl_xyzl[0];
     ctrl_yl[ii] = ctrl_xyzl[1];
   }
