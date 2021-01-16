@@ -70,6 +70,7 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   MATH_T::cross3d(dx_dr, dy_dr, dz_dr, dx_ds, dy_ds, dz_ds, unx, uny, unz);
 
   MATH_T::normalize3d( unx, uny, unz );
+  std::cout << "un: " << "\t" << unx << "\t" << uny << "\t" << unz << std::endl;
 
   // ======= Global-to-local rotation matrix =======
   const double inv_len_er = 1.0 / MATH_T::norm2( dx_dr, dy_dr, dz_dr );
@@ -88,7 +89,7 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   MATH_T::normalize3d( e_a[0], e_a[1], e_a[2] );
 
   // e_b = vec(un) x e_a / || vec(un) x e_a ||
-  double e_b[3] = {0.0, 0.0, 0.0};
+  double e_b[3] = {0.0};
   MATH_T::cross3d(unx, uny, unz, e_a[0], e_a[1], e_a[2], e_b[0], e_b[1], e_b[2]);
   MATH_T::normalize3d( e_b[0], e_b[1], e_b[2] );
 
@@ -107,9 +108,12 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   Q = Matrix_3x3(e_l1[0], e_l1[1], e_l1[2],
                  e_l2[0], e_l2[1], e_l2[2],
                      unx,     uny,     unz );
+  std::cout << "Q" << std::endl;
+  Q.print();
 
   // Rotated lamina coordinates
   double ctrl_xl [nLocBas], ctrl_yl [nLocBas];
+  std::cout << "lamina coords" << std::endl;
 
   for(int ii = 0; ii < nLocBas; ++ii)
   {
@@ -121,6 +125,16 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
     ctrl_xl[ii] = ctrl_xyzl[0];
     ctrl_yl[ii] = ctrl_xyzl[1];
   }
+
+  const double dist_01 = (ctrl_xl[0] - ctrl_xl[1]) * (ctrl_xl[0] - ctrl_xl[1]) +
+                         (ctrl_yl[0] - ctrl_yl[1]) * (ctrl_yl[0] - ctrl_yl[1]);
+  const double dist_12 = (ctrl_xl[1] - ctrl_xl[2]) * (ctrl_xl[1] - ctrl_xl[2]) +
+                         (ctrl_yl[1] - ctrl_yl[2]) * (ctrl_yl[1] - ctrl_yl[2]);
+  const double dist_02 = (ctrl_xl[0] - ctrl_xl[2]) * (ctrl_xl[0] - ctrl_xl[2]) +
+                         (ctrl_yl[0] - ctrl_yl[2]) * (ctrl_yl[0] - ctrl_yl[2]);
+  std::cout << "dist_01: " << dist_01 << std::endl;
+  std::cout << "dist_12: " << dist_12 << std::endl;
+  std::cout << "dist_02: " << dist_02 << std::endl;
 
   // Rotated lamina 2D Jacobian & inverse Jacobian components
   Jac[0] = ctrl_xl[0] * (-1.0) + ctrl_xl[1]; // dxl_dr 
