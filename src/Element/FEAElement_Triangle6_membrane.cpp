@@ -64,8 +64,7 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
 {
   assert(quad->get_dim() == 3);
 
-  double Rr [nLocBas];
-  double Rs [nLocBas];
+  double Rr [nLocBas], Rs [nLocBas];
 
   double dx_dr [numQuapts], dx_ds [numQuapts];
   double dy_dr [numQuapts], dy_ds [numQuapts];
