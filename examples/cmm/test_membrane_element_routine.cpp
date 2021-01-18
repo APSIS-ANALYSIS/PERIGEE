@@ -10,29 +10,83 @@ void print_2Darray(const double * const arr, const int nrow,
 int main( int argc, char * argv[] )
 {
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+  const int nLocBas = 3;
+  const int dim     = 3;
+  const int numpt   = 4;
 
-  const int dim   = 3;
-  const int numpt = 4;
+  std::vector<double>  in_qp(0.0, numpt * dim);
+  std::vector<double>  in_qw(0.0, numpt);
 
-  std::vector<double> in_qp{ 1.0/3.0, 1.0/3.0, 1.0/3.0,
-                                 0.6,     0.2,     0.2,
-                                 0.2,     0.6,     0.2,
-                                 0.2,     0.2,     0.6 };
-  std::vector<double> in_qw{ -0.5625,
-                             0.520833333333333,
-                             0.520833333333333,
-                             0.520833333333333 };
-  
+  double * ctrl_x = new double [nLocBas];
+  double * ctrl_y = new double [nLocBas];
+  double * ctrl_z = new double [nLocBas];
+
+  if(nLocBas == 3)
+  {
+    in_qp = { 1.0/3.0, 1.0/3.0, 1.0/3.0,
+                  0.6,     0.2,     0.2,
+                  0.2,     0.6,     0.2,
+                  0.2,     0.2,     0.6 };
+    in_qw = { -0.5625,
+              0.520833333333333,
+              0.520833333333333,
+              0.520833333333333 };
+
+    ctrl_x[0] =  0.3971; ctrl_x[1] =  0.4969; ctrl_x[2] = 0.4516;
+    ctrl_y[0] = -1.4233; ctrl_y[1] = -1.2942; ctrl_y[2] = 1.3001;
+    ctrl_z[0] =  9.7337; ctrl_z[1] =  9.6558; ctrl_z[2] = 9.8612;
+
+    
+  }
+  else if(nLocBas == 6)
+  {
+    const double a = 0.638444188569809;
+    const double b = 0.312865496004875;
+    const double c = 1.0 - a - b;
+    const double w = 0.077113760890257;
+    in_qp = {           1.0/3.0,           1.0/3.0,           1.0/3.0,
+              0.479308067841923, 0.260345966079038, 0.260345966079038,
+              0.260345966079038, 0.479308067841923, 0.260345966079038,
+              0.260345966079038, 0.260345966079038, 0.479308067841923,
+              0.869739794195568, 0.065130102902216, 0.065130102902216,
+              0.065130102902216, 0.869739794195568, 0.065130102902216,
+              0.065130102902216, 0.065130102902216, 0.869739794195568,
+                              a,                 b,                 c,
+                              a,                 c,                 b,
+                              b,                 a,                 c,
+                              c,                 a,                 b,
+                              b,                 c,                 a,
+                              c,                 b,                 a };
+    in_qw = {-0.149570044467670,
+              0.175615257433204,
+              0.175615257433204,
+              0.175615257433204,
+              0.053347235608839,
+              0.053347235608839,
+              0.053347235608839,
+                              w,
+                              w,
+                              w,
+                              w,
+                              w,
+                              w };
+
+    ctrl_x[0] =   0.3971; ctrl_x[1] =  0.4969; ctrl_x[2] =  0.4516;
+    ctrl_x[3] =   0.4470; ctrl_x[4] = 0.47425; ctrl_x[5] = 0.42435;
+    ctrl_y[0] =  -1.4233; ctrl_y[1] = -1.2942; ctrl_y[2] =  1.3001;
+    ctrl_y[3] = -1.35875; ctrl_y[4] = 0.00295; ctrl_y[5] = -0.0616;
+    ctrl_z[0] =   9.7337; ctrl_z[1] =  9.6558; ctrl_z[2] =  9.8612;
+    ctrl_z[3] =  9.69475; ctrl_z[4] =  9.7585; ctrl_z[5] = 9.79745;
+  }
+  else SYS_T::print_fatal("Error: unknown elem type.\n");
+ 
   IQuadPts * quad = new QuadPts_debug(dim, numpt, in_qp, in_qw);
 
   quad -> print_info();
 
-  FEAElement * elem = new FEAElement_Triangle3_membrane( numpt );
-  const int nLocBas = elem -> get_nLocBas();
-
-  double ctrl_x[3] = {  0.3971,  0.4969, 0.4516 };
-  double ctrl_y[3] = { -1.4233, -1.2942, 1.3001 };
-  double ctrl_z[3] = {  9.7337,  9.6558, 9.8612 };
+  FEAElement * elem = nullptr;
+  if(nLocBas == 3) elem = new FEAElement_Triangle3_membrane( numpt );
+  else             elem = new FEAElement_Triangle6_membrane( numpt );
 
   elem -> buildBasis( quad, ctrl_x, ctrl_y, ctrl_z );
 
@@ -127,8 +181,8 @@ int main( int argc, char * argv[] )
   std::cout << "\n===== K in global coords =====" << std::endl;
   print_2Darray(Kg, nLocBas*dim, nLocBas*dim);
 
-  delete quad;
-  delete elem;
+  delete ctrl_x; delete ctrl_y; delete ctrl_z;
+  delete quad; delete elem;
 
   PetscFinalize();
   return EXIT_SUCCESS;
