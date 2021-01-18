@@ -10,12 +10,12 @@ void print_2Darray(const double * const arr, const int nrow,
 int main( int argc, char * argv[] )
 {
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-  const int nLocBas = 3;
+  const int nLocBas = 6;
   const int dim     = 3;
-  const int numpt   = 4;
+  int numpt;
 
-  std::vector<double>  in_qp(0.0, numpt * dim);
-  std::vector<double>  in_qw(0.0, numpt);
+  std::vector<double> in_qp;
+  std::vector<double> in_qw;
 
   double * ctrl_x = new double [nLocBas];
   double * ctrl_y = new double [nLocBas];
@@ -23,6 +23,8 @@ int main( int argc, char * argv[] )
 
   if(nLocBas == 3)
   {
+    numpt = 4;
+
     in_qp = { 1.0/3.0, 1.0/3.0, 1.0/3.0,
                   0.6,     0.2,     0.2,
                   0.2,     0.6,     0.2,
@@ -40,6 +42,8 @@ int main( int argc, char * argv[] )
   }
   else if(nLocBas == 6)
   {
+    numpt = 13;
+
     const double a = 0.638444188569809;
     const double b = 0.312865496004875;
     const double c = 1.0 - a - b;
@@ -94,7 +98,10 @@ int main( int argc, char * argv[] )
   double dR_dxl [nLocBas] = {0.0};
   double dR_dyl [nLocBas] = {0.0};
   
-  elem -> get_gradR(0, dR_dxl, dR_dyl);
+  // Test on a single quadrature point
+  const int qua = 0;
+
+  elem -> get_gradR(qua, dR_dxl, dR_dyl);
 
   // Strain displacement matrix B in lamina coords
   // 5 x (nLocBas * dim)
@@ -195,7 +202,7 @@ void print_2Darray(const double * const arr, const int nrow,
   {
     for(int jj = 0; jj < ncol; ++jj)
     {
-      std::cout << std::setw(12) << arr[ii * ncol + jj] << "\t";
+      std::cout << std::scientific << std::setprecision(3) << std::setw(10) << arr[ii * ncol + jj] << " ";
     }
     std::cout << std::endl;
   }

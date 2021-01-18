@@ -18,6 +18,8 @@ FEAElement_Triangle6_membrane::FEAElement_Triangle6_membrane( const int &in_nqua
   e_s = new double [3 * numQuapts];
   e_l1 = new double [3 * numQuapts];
   e_l2 = new double [3 * numQuapts];
+
+  Q.resize(numQuapts);
 }
 
 
