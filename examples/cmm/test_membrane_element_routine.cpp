@@ -3,6 +3,7 @@
 #include "QuadPts_debug.hpp"
 #include "FEAElement_Triangle3_membrane.hpp"
 #include "FEAElement_Triangle6_membrane.hpp"
+#include "FEAElement_Triangle6.hpp"
 
 void print_2Darray(const double * const arr, const int nrow,
   const int ncol);
@@ -75,12 +76,21 @@ int main( int argc, char * argv[] )
                               w,
                               w };
 
-    ctrl_x[0] =   0.3971; ctrl_x[1] =  0.4969; ctrl_x[2] =  0.4516;
-    ctrl_x[3] =   0.4470; ctrl_x[4] = 0.47425; ctrl_x[5] = 0.42435;
-    ctrl_y[0] =  -1.4233; ctrl_y[1] = -1.2942; ctrl_y[2] =  1.3001;
-    ctrl_y[3] = -1.35875; ctrl_y[4] = 0.00295; ctrl_y[5] = -0.0616;
-    ctrl_z[0] =   9.7337; ctrl_z[1] =  9.6558; ctrl_z[2] =  9.8612;
-    ctrl_z[3] =  9.69475; ctrl_z[4] =  9.7585; ctrl_z[5] = 9.79745;
+    // ====== Identical to Triangle3 test geometry with mid-side nodes ======
+    // ctrl_x[0] =   0.3971; ctrl_x[1] =  0.4969; ctrl_x[2] =  0.4516;
+    // ctrl_x[3] =   0.4470; ctrl_x[4] = 0.47425; ctrl_x[5] = 0.42435;
+    // ctrl_y[0] =  -1.4233; ctrl_y[1] = -1.2942; ctrl_y[2] =  1.3001;
+    // ctrl_y[3] = -1.35875; ctrl_y[4] = 0.00295; ctrl_y[5] = -0.0616;
+    // ctrl_z[0] =   9.7337; ctrl_z[1] =  9.6558; ctrl_z[2] =  9.8612;
+    // ctrl_z[3] =  9.69475; ctrl_z[4] =  9.7585; ctrl_z[5] = 9.79745;
+
+    // ====== Curved triangle in xy-plane for comparison with Triangle6 ====== 
+    ctrl_x[0] = 8.1622; ctrl_x[1] = 7.8695; ctrl_x[2] = 7.9049;
+    ctrl_x[3] = 8.0127; ctrl_x[4] = 7.8685; ctrl_x[5] = 8.0386;
+    ctrl_y[0] = 5.0793; ctrl_y[1] = 5.0431; ctrl_y[2] = 5.2765;
+    ctrl_y[3] = 5.0724; ctrl_y[4] = 5.1655; ctrl_y[5] = 5.1846;
+    ctrl_z[0] =    0.0; ctrl_z[1] =    0.0; ctrl_z[2] =    0.0;
+    ctrl_z[3] =    0.0; ctrl_z[4] =    0.0; ctrl_z[5] =    0.0;
   }
   else SYS_T::print_fatal("Error: unknown elem type.\n");
  
@@ -188,8 +198,61 @@ int main( int argc, char * argv[] )
   std::cout << "\n===== K in global coords =====" << std::endl;
   print_2Darray(Kg, nLocBas*dim, nLocBas*dim);
 
-  delete ctrl_x; delete ctrl_y; delete ctrl_z;
+  // Use Triangle6 basis function gradients to verify Triangle6_membrane
+  FEAElement * elem_tri6 = nullptr; 
+  if(nLocBas == 6)
+  {
+    elem_tri6 = new FEAElement_Triangle6( numpt );
+    elem_tri6 -> buildBasis( quad, ctrl_x, ctrl_y );
+
+    double dR_dx [nLocBas] = {0.0};
+    double dR_dy [nLocBas] = {0.0};
+
+    // Test on a single quadrature point
+    const int qua = 0;
+
+    elem_tri6 -> get_gradR(qua, dR_dx, dR_dy);
+
+    // Strain displacement matrix B
+    // 5 x (nLocBas * dim)
+    double B [5 * nLocBas * dim] = {0.0};
+    for(int ii = 0; ii < nLocBas; ++ii)
+    { 
+      B[0*nLocBas*dim + ii*dim]     = dR_dx[ii]; // u1,1
+      B[1*nLocBas*dim + ii*dim + 1] = dR_dy[ii]; // u2,2
+      B[2*nLocBas*dim + ii*dim]     = dR_dy[ii]; // u1,2
+      B[2*nLocBas*dim + ii*dim + 1] = dR_dx[ii]; // u2,1
+      B[3*nLocBas*dim + ii*dim + 2] = dR_dx[ii]; // u3,1
+      B[4*nLocBas*dim + ii*dim + 2] = dR_dy[ii]; // u3,2
+    }
+
+    // Stiffness tensor
+    // B^T * D * B = B_{ki} * D_{kl} * B_{lj}
+    double K [(nLocBas*dim) * (nLocBas*dim)] = {0.0};
+    for(int ii = 0; ii < nLocBas*dim; ++ii)
+    { 
+      for(int jj = 0; jj < nLocBas*dim; ++jj)
+      {
+        for(int kk = 0; kk < 5; ++kk)
+        {
+          for(int ll = 0; ll < 5; ++ll)
+          { 
+            K[ii*(nLocBas*dim) + jj] +=
+              B[kk*(nLocBas*dim)+ii] * D[5*kk+ll] * B[ll*(nLocBas*dim)+jj];
+          }
+        }
+      }
+    }
+    std::cout << "\n===== K for Triangle6 =====" << std::endl;
+    print_2Darray(K, nLocBas*dim, nLocBas*dim);
+  }
+
+
+  delete [] ctrl_x; delete [] ctrl_y; delete [] ctrl_z;
+  ctrl_x = nullptr; ctrl_y = nullptr; ctrl_z = nullptr;
   delete quad; delete elem;
+
+  if(nLocBas == 6) delete elem_tri6;
 
   PetscFinalize();
   return EXIT_SUCCESS;
