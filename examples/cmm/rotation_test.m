@@ -33,3 +33,10 @@ theta = [          Q, zeros(3, 3), zeros(3, 3);
 % Stiffness matrix in global coords
 Kg = theta' * Kl * theta;
 
+ctrl_xyz = [0.3971,  -1.4233, 9.7337;
+            0.4969,  -1.2942  9.6558;
+            0.4516,   1.3001, 9.8612];
+ctrl_xyz = [ctrl_xyz;
+            0.5 * (ctrl_xyz(1,:) + ctrl_xyz(2,:));
+            0.5 * (ctrl_xyz(2,:) + ctrl_xyz(3,:));
+            0.5 * (ctrl_xyz(1,:) + ctrl_xyz(3,:)) ];
