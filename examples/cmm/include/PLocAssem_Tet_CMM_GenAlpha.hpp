@@ -142,6 +142,8 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
+        const double * const &ele_thickness,
+        const double * const &ele_youngsmod,
         const IQuadPts * const &quad );
 
     virtual void Assem_Tangent_Residual_EBC_Wall(
@@ -151,6 +153,8 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
+        const double * const &ele_thickness,
+        const double * const &ele_youngsmod,
         const IQuadPts * const &quad );
 
   private:

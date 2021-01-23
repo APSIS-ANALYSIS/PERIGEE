@@ -837,6 +837,34 @@ class IPLocAssem
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Residual_EBC_Resistance is not implemented.\n");}
 
+
+    // Perform elemental BC surface integration for `lumen' wall formulations,
+    // which can be used in FSI problems where the fluid is coupled with a
+    // thin-walled structure like membrane/shells. 
+    virtual void Assem_Residual_EBC_Wall(
+        const double * const &dot_sol,
+        const double * const &sol_wall_disp,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const double * const &ele_thickness,
+        const double * const &ele_youngsmod,
+        const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: this Assem_Residual_EBC_Wall is not implemented.\n");}
+
+    virtual void Assem_Tangent_Residual_EBC_Wall(
+        const double * const &dot_sol,
+        const double * const &sol_wall_disp,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const double * const &ele_thickness,
+        const double * const &ele_youngsmod,
+        const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: this Assem_Tangent_Residual_EBC_Wall is not implemented.\n");}
+
     // ! Get the model parameter 1
     //   This function is used to pass out the parameters appearing in the weak
     //   form, such as the Reynolds number, Capallarity number, etc.
