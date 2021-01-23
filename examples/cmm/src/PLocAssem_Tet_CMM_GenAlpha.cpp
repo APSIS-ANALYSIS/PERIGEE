@@ -1,6 +1,6 @@
-#include "PLocAssem_Tet_VMS_NS_GenAlpha.hpp"
+#include "PLocAssem_Tet_CMM_GenAlpha.hpp"
 
-PLocAssem_Tet_VMS_NS_GenAlpha::PLocAssem_Tet_VMS_NS_GenAlpha(
+PLocAssem_Tet_CMM_GenAlpha::PLocAssem_Tet_CMM_GenAlpha(
         const TimeMethod_GenAlpha * const &tm_gAlpha,
         const int &in_nlocbas, const int &in_nqp,
         const int &in_snlocbas,
@@ -51,7 +51,7 @@ PLocAssem_Tet_VMS_NS_GenAlpha::PLocAssem_Tet_VMS_NS_GenAlpha(
 }
 
 
-PLocAssem_Tet_VMS_NS_GenAlpha::~PLocAssem_Tet_VMS_NS_GenAlpha()
+PLocAssem_Tet_CMM_GenAlpha::~PLocAssem_Tet_CMM_GenAlpha()
 {
   delete [] Tangent; Tangent = nullptr; 
   delete [] Residual; Residual = nullptr;
@@ -60,7 +60,7 @@ PLocAssem_Tet_VMS_NS_GenAlpha::~PLocAssem_Tet_VMS_NS_GenAlpha()
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::print_info() const
+void PLocAssem_Tet_CMM_GenAlpha::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
   SYS_T::commPrint("  Three-dimensional Incompressible Navier-Stokes equations: \n");
@@ -86,7 +86,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::print_info() const
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::get_metric(
+void PLocAssem_Tet_CMM_GenAlpha::get_metric(
     const double * const &f,
     double &G11, double &G12, double &G13,
     double &G22, double &G23, double &G33 ) const
@@ -115,7 +115,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_metric(
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::get_tau(
+void PLocAssem_Tet_CMM_GenAlpha::get_tau(
     double &tau_m_qua, double &tau_c_qua,
     const double &dt, const double * const &dxi_dx,
     const double &u, const double &v, const double &w ) const
@@ -144,7 +144,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_tau(
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::get_DC(
+void PLocAssem_Tet_CMM_GenAlpha::get_DC(
     double &dc_tau, const double * const &dxi_dx,
     const double &u, const double &v, const double &w ) const
 {
@@ -161,7 +161,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_DC(
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
+void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
     const double &time, const double &dt,
     const double * const &dot_sol,
     const double * const &sol,
@@ -330,7 +330,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
+void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
     const double &time, const double &dt,
     const double * const &dot_sol,
     const double * const &sol,
@@ -693,7 +693,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
+void PLocAssem_Tet_CMM_GenAlpha::Assem_Mass_Residual(
     const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
@@ -787,7 +787,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
+void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC(
     const int &ebc_id,
     const double &time, const double &dt,
     FEAElement * const &element,
@@ -832,7 +832,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
+void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Resistance(
     const int &ebc_id,
     const double &val,
     FEAElement * const &element,
@@ -864,7 +864,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
+void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_BackFlowStab(
     const double * const &dot_sol,
     const double * const &sol,
     FEAElement * const &element,
@@ -910,7 +910,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
+void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
     const double &dt,
     const double * const &dot_sol,
     const double * const &sol,
@@ -971,7 +971,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
 }
 
 
-double PLocAssem_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &sol,
+double PLocAssem_Tet_CMM_GenAlpha::get_flowrate( const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
@@ -1006,7 +1006,7 @@ double PLocAssem_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &sol,
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::get_pressure_area( 
+void PLocAssem_Tet_CMM_GenAlpha::get_pressure_area( 
     const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
