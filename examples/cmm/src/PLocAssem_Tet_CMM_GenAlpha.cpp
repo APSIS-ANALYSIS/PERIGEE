@@ -1037,4 +1037,32 @@ void PLocAssem_Tet_CMM_GenAlpha::get_pressure_area(
   }
 }
 
+
+void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
+    const double * const &dot_sol,
+    const double * const &sol_wall_disp,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
+{
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z ); 
+
+}
+
+
+void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
+    const double * const &dot_sol,
+    const double * const &sol_wall_disp,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
+{
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z ); 
+
+}
+
 // EOF

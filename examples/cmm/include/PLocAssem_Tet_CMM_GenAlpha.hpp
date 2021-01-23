@@ -135,6 +135,24 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
+    virtual void Assem_Residual_EBC_Wall(
+        const double * const &dot_sol,
+        const double * const &sol_wall_disp,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad );
+
+    virtual void Assem_Tangent_Residual_EBC_Wall(
+        const double * const &dot_sol,
+        const double * const &sol_wall_disp,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad );
+
   private:
     // Private data
     const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta;
