@@ -1,28 +1,25 @@
-#ifndef PLOCASSEM_TET_VMS_NS_GENALPHA_HPP
-#define PLOCASSEM_TET_VMS_NS_GENALPHA_HPP
+#ifndef PLOCASSEM_TET_CMM_GENALPHA_HPP
+#define PLOCASSEM_TET_CMM_GENALPHA_HPP
 // ==================================================================
-// PLocAssem_Tet_VMS_NS_GenAlpha.hpp
+// PLocAssem_Tet_CMM_GenAlpha.hpp
 // 
-// Parallel Local Assembly routine for VMS and Gen-alpha based NS
-// solver.
-//
-// Author: Ju Liu
-// Date: Feb. 10 2020
+// Parallel Local Assembly routine for VMS and Gen-alpha based
+// solver for the CMM type FSI problem.
 // ==================================================================
 #include "IPLocAssem.hpp"
 #include "TimeMethod_GenAlpha.hpp"
 
-class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
+class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
 {
   public:
-    PLocAssem_Tet_VMS_NS_GenAlpha(
+    PLocAssem_Tet_CMM_GenAlpha(
         const TimeMethod_GenAlpha * const &tm_gAlpha,
         const int &in_nlocbas, const int &in_nqp,
         const int &in_snlocbas, const double &in_rho, 
         const double &in_vis_mu, const double &in_beta,
         const double &in_ctauc = 1.0, const int &elemtype = 501 );
 
-    virtual ~PLocAssem_Tet_VMS_NS_GenAlpha();
+    virtual ~PLocAssem_Tet_CMM_GenAlpha();
 
     virtual int get_dof() const {return 4;}
 
@@ -187,11 +184,11 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
       gx = p0*nx; gy = p0*ny; gz = p0*nz;
     }
 
-    typedef void ( PLocAssem_Tet_VMS_NS_GenAlpha::*locassem_tet_vms_ns_funs )( const double &x, const double &y, const double &z,
+    typedef void ( PLocAssem_Tet_CMM_GenAlpha::*locassem_tet_cmm_funs )( const double &x, const double &y, const double &z,
         const double &t, const double &nx, const double &ny,
         const double &nz, double &gx, double &gy, double &gz ) const;
 
-    locassem_tet_vms_ns_funs * flist;
+    locassem_tet_cmm_funs * flist;
 
     void get_ebc_fun( const int &ebc_id,
         const double &x, const double &y, const double &z,
