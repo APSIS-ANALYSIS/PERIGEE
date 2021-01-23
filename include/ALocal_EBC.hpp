@@ -176,7 +176,7 @@ class ALocal_EBC
     // get_thickness : return the wall thickness, if this partition
     //                 owns any cell on the wall.
     // --------------------------------------------------------------
-    virtual void get_thickness(std::vector<double> &out) const
+    virtual void get_thickness( const int &eindex, double * const &e_thickness ) const
     {
       SYS_T::print_fatal("Error: ALocal_EBC::get_thickness is not implemented. \n");
     }
@@ -185,7 +185,7 @@ class ALocal_EBC
     // get_youngsmod : return the wall young's modulus, if this partition
     //                 owns any cell on the wall.
     // --------------------------------------------------------------
-    virtual void get_youngsmod(std::vector<double> &out) const
+    virtual void get_youngsmod( const int &eindex, double * const &e_youngsmod ) const
     {
       SYS_T::print_fatal("Error: ALocal_EBC::get_youngsmod is not implemented. \n");
     }

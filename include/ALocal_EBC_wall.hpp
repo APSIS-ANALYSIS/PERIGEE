@@ -23,11 +23,14 @@ class ALocal_EBC_wall : public ALocal_EBC
 
     virtual void print_info() const;
 
-    virtual void get_thickness(std::vector<double> &out) const
+    /*
+    see ALocal_EBC def
+       virtual void get_thickness(std::vector<double> &out) const
     {out = thickness;}
 
     virtual void get_youngsmod(std::vector<double> &out) const
     {out = youngsmod;}
+    */
 
     virtual double get_fluid_density() const {return fluid_density;}
 
