@@ -24,7 +24,7 @@
 // #include "GenBC_Resistance.hpp"
 // #include "GenBC_RCR.hpp"
 // #include "GenBC_Inductance.hpp"
-#include "PLocAssem_Tet_VMS_NS_GenAlpha.hpp"
+#include "PLocAssem_Tet_CMM_GenAlpha.hpp"
 // #include "PGAssem_NS_FEM.hpp"
 #include "PTime_NS_Solver.hpp"
 
@@ -307,7 +307,7 @@ int main( int argc, char *argv[] )
   tm_galpha_ptr->print_info();
 
   // ===== Local assembly routine =====
-  IPLocAssem * locAssem_ptr = new PLocAssem_Tet_VMS_NS_GenAlpha(
+  IPLocAssem * locAssem_ptr = new PLocAssem_Tet_CMM_GenAlpha(
       tm_galpha_ptr, GMIptr->get_nLocBas(),
       quadv->get_num_quadPts(), elements->get_nLocBas(),
       fluid_density, fluid_mu, bs_beta, c_tauc, GMIptr->get_elemType() );
