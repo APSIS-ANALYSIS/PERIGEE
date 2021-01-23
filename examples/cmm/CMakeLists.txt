@@ -87,7 +87,6 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Element/FEAElement_Tet10_v2.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_membrane.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_membrane.cpp
-  ${perigee_source}/Element/FEAElement_Triangle6.cpp
   ${perigee_source}/Model/GenBC_RCR.cpp
   ${perigee_source}/Model/GenBC_Resistance.cpp
   ${perigee_source}/Model/GenBC_Inductance.cpp
@@ -149,8 +148,8 @@ ADD_EXECUTABLE( cmm_tet_3d cmm_driver.cpp)
 #ADD_EXECUTABLE( vis_ns vis_ns.cpp)
 #ADD_EXECUTABLE( vis_p1_wss vis_p1_wss.cpp)
 
-ADD_EXECUTABLE( test test.cpp )
-ADD_EXECUTABLE( test_element test_membrane_element_routine.cpp )
+#ADD_EXECUTABLE( test test.cpp )
+#ADD_EXECUTABLE( test_element test_membrane_element_routine.cpp )
 
 TARGET_LINK_LIBRARIES( gmsh_p1_IO perigee_preprocess )
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
@@ -159,7 +158,7 @@ TARGET_LINK_LIBRARIES( cmm_tet_3d perigee_analysis )
 #TARGET_LINK_LIBRARIES( vis_ns perigee_postprocess )
 #TARGET_LINK_LIBRARIES( vis_p1_wss perigee_postprocess )
 
-TARGET_LINK_LIBRARIES( test perigee_preprocess )
-TARGET_LINK_LIBRARIES( test_element perigee_test )
+#TARGET_LINK_LIBRARIES( test perigee_preprocess )
+#TARGET_LINK_LIBRARIES( test_element perigee_test )
 
 # EOF

@@ -17,6 +17,8 @@
 #include "FEAElement_Tet10_v2.hpp"
 #include "FEAElement_Triangle3_3D_der0.hpp"
 #include "FEAElement_Triangle6_3D_der0.hpp"
+#include "FEAElement_Triangle3_membrane.hpp"
+#include "FEAElement_Triangle6_membrane.hpp"
 #include "CVFlowRate_Unsteady.hpp"
 #include "CVFlowRate_Linear2Steady.hpp"
 // #include "GenBC_Resistance.hpp"
@@ -270,6 +272,7 @@ int main( int argc, char *argv[] )
   SYS_T::commPrint("===> Set up volumetric and surface element containers. \n");
   FEAElement * elementv = nullptr;
   FEAElement * elements = nullptr;
+  FEAElement * elementw = nullptr;
 
   if( GMIptr->get_elemType() == 501 )          // linear tet
   {
@@ -278,6 +281,7 @@ int main( int argc, char *argv[] )
 
     elementv = new FEAElement_Tet4( nqp_tet );
     elements = new FEAElement_Triangle3_3D_der0( nqp_tri );
+    elementw = new FEAElement_Triangle3_membrane( nqp_tri );
   }
   else if( GMIptr->get_elemType() == 502 )     // quadratic tet
   {
@@ -286,6 +290,7 @@ int main( int argc, char *argv[] )
 
     elementv = new FEAElement_Tet10_v2( nqp_tet );
     elements = new FEAElement_Triangle6_3D_der0( nqp_tri );
+    elementw = new FEAElement_Triangle6_membrane( nqp_tri );
   }
   else SYS_T::print_fatal("Error: Element type not supported.\n");
 
@@ -297,8 +302,7 @@ int main( int argc, char *argv[] )
   // ===== Generalized-alpha =====
   SYS_T::commPrint("===> Set up the generalized-alpha time integration scheme.\n");
 
-  TimeMethod_GenAlpha * tm_galpha_ptr = new TimeMethod_GenAlpha(
-      genA_rho_inf, false );
+  TimeMethod_GenAlpha * tm_galpha_ptr = new TimeMethod_GenAlpha( genA_rho_inf, false );
 
   tm_galpha_ptr->print_info();
 
@@ -314,7 +318,7 @@ int main( int argc, char *argv[] )
   delete locElem; delete locnbc; delete locinfnbc;
   delete locebc; delete locebc_wall; delete pNode;
   delete inflow_rate_ptr; delete quadv; delete quads;
-  delete elementv; delete elements; delete pmat;
+  delete elementv; delete elements; delete elementw; delete pmat;
   delete tm_galpha_ptr; delete locAssem_ptr; 
 
   PetscFinalize();
