@@ -4,6 +4,8 @@
 // Sys_Tools.hpp
 // ------------------------------------------------------------------
 // The SYS_T namespace contains a suite of tools at the system level.
+//
+// These functions will be frequently used in the PERIGEE code.
 // ==================================================================
 #include <cstdlib>
 #include <iostream>
@@ -19,6 +21,7 @@ namespace SYS_T
   // Print ASCII art fonts
   void print_perigee_art();
 
+  // Return the rank of the CPU
   inline PetscMPIInt get_MPI_rank()
   {
     PetscMPIInt rank;
@@ -26,6 +29,7 @@ namespace SYS_T
     return rank;
   }
 
+  // Return the number of total number of CPUs
   inline PetscMPIInt get_MPI_size()
   {
     PetscMPIInt size;
@@ -41,7 +45,6 @@ namespace SYS_T
   //   2 for RCR
   // ----------------------------------------------------------------
   int get_genbc_file_type( const char * const &lpn_filename );
-
 
   // ----------------------------------------------------------------
   // gen_partfile_name( baseName, rank )
@@ -67,11 +70,11 @@ namespace SYS_T
     return ss.str();
   }
 
-
   // ----------------------------------------------------------------
   // Check if a file exists. If a file cannot be found, throw an error
   // message and exit code
   // ----------------------------------------------------------------
+  // TO DO : I want to remove this file_check function
   inline void file_check( const std::string &fName )
   {
     if( FILE *ff = fopen(fName.c_str(), "r") ) fclose(ff);
@@ -107,7 +110,6 @@ namespace SYS_T
     ix = ixy % dim_x; iy = (ixy - ix) / dim_x;
   }
 
-
   // ----------------------------------------------------------------
   // get_xy_index()
   // Assume ii = iy * dim_x + ix;
@@ -118,7 +120,6 @@ namespace SYS_T
     ix = ii % dim_x;
     iy = (ii-ix)/dim_x;
   }
-
 
   // ----------------------------------------------------------------
   // gen_random()
@@ -136,7 +137,6 @@ namespace SYS_T
   double gen_randomD_open( const double &min, const double &max );
 
   int gen_randomI_closed( const int &min, const int &max );
-
 
   // ----------------------------------------------------------------
   // print size based on bytes
@@ -166,7 +166,6 @@ namespace SYS_T
       ss<<(double)byte_size<<" B.";
     return ss.str();
   }
-
 
   // ----------------------------------------------------------------
   // to_string functions : convert numeric values to string 
@@ -260,7 +259,6 @@ namespace SYS_T
   inline void cmdPrint(const char * const &dataname, const std::string &datavalue)
   {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, ss.str().c_str());}
 
-
   // 4. Print specific system message
   inline void synPrintElementInfo(int nlocalele, double memspace, 
       double totaltime, PetscMPIInt rank)
@@ -270,7 +268,6 @@ namespace SYS_T
       " secs and "<<memusage<<std::endl;
     synPrint(ss.str(), rank);
   }
-
 
   // 5. Print fatal error message and terminate the MPI process
   inline void print_fatal( const char output[], ... )
@@ -336,7 +333,6 @@ namespace SYS_T
     if( a ) print_exit(mesg);
   }
 
-
   // =================================================================
   // The followings are system function to monitor system memory usages 
   // dynamically.
@@ -349,20 +345,17 @@ namespace SYS_T
   // -----------------------------------------------------------------
   void print_MaxMemUsage();
 
-
   // ----------------------------------------------------------------
   // 2. Print the Current memory used for the program. The usage is 
   //    reduced to CPU 0 by MPI_SUM.  
   // ----------------------------------------------------------------
   void print_CurMemUsage();
 
-
   // ----------------------------------------------------------------
   // 3. Print the Maximum space PETSc has allocated. This function 
   //    should be used with the command line argument -malloc
   // ----------------------------------------------------------------
   void print_MaxMallocUsage();
-
 
   // ----------------------------------------------------------------
   // 4. Print the Current space PETSc has allocated. This function 
@@ -377,12 +370,10 @@ namespace SYS_T
   // ----------------------------------------------------------------
   std::string get_time();
 
-
   // ----------------------------------------------------------------
   // 2. get_date: return the present date as YYYY/MM/DD
   // ----------------------------------------------------------------
   std::string get_date();
-
 
   // ----------------------------------------------------------------
   // 3. Structure that holds information about memory usage in kB.
@@ -397,13 +388,11 @@ namespace SYS_T
     unsigned long int VmRSS; // current resident memory size in kB
   };
 
-
   // ----------------------------------------------------------------
   // 4. get_memory_stats(): fills the MemoryStats structure with info
   //    about the memory consumption of this process. Only for Linux.
   // ----------------------------------------------------------------
   void get_memory_stats( MemoryStats &stats );
-
 
   // ================================================================
   // The folowing are options-get functions that read command-line
