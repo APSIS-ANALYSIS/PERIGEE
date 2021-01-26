@@ -23,6 +23,7 @@
 #include "GenBC_Resistance.hpp"
 #include "GenBC_RCR.hpp"
 #include "GenBC_Inductance.hpp"
+#include "GenBC_Coronary.hpp"
 #include "PLocAssem_Tet_VMS_NS_GenAlpha.hpp"
 #include "PGAssem_NS_FEM.hpp"
 #include "PTime_NS_Solver.hpp"
@@ -339,6 +340,8 @@ int main(int argc, char *argv[])
     gbc = new GenBC_RCR( lpn_file.c_str(), 1000, initial_step );
   else if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 3  )
     gbc = new GenBC_Inductance( lpn_file.c_str() );
+  else if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 4  )
+    gbc = new GenBC_Coronary( lpn_file.c_str(), 1000, initial_step );
   else
     SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
 
