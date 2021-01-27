@@ -2,9 +2,7 @@
 
 HDF5_Reader::HDF5_Reader( const hid_t &in_file_id )
 : file_id(in_file_id)
-{
-}
-
+{}
 
 HDF5_Reader::~HDF5_Reader()
 {}
@@ -13,7 +11,6 @@ bool HDF5_Reader::check_data( const char * const &name ) const
 {
   return H5Lexists(file_id, name, H5P_DEFAULT);
 }
-
 
 void HDF5_Reader::read_intArray(const char * const &group_name,
     const char * const &data_name,
@@ -61,7 +58,6 @@ void HDF5_Reader::read_intArray(const char * const &group_name,
   H5Gclose( group_id );
 }
 
-
 void HDF5_Reader::read_doubleArray(const char * const &group_name,
     const char * const &data_name,
     hid_t &data_rank, hsize_t * &data_dims, double * &data  ) const
@@ -105,7 +101,6 @@ void HDF5_Reader::read_doubleArray(const char * const &group_name,
   H5Gclose( group_id );
 }
 
-
 int HDF5_Reader::read_intScalar( const char * const &group_name,
     const char * const &data_name ) const
 {
@@ -128,7 +123,6 @@ int HDF5_Reader::read_intScalar( const char * const &group_name,
 
   return outdata;
 }
-
 
 double HDF5_Reader::read_doubleScalar( const char * const &group_name,
     const char * const &data_name ) const
@@ -153,7 +147,6 @@ double HDF5_Reader::read_doubleScalar( const char * const &group_name,
   return outdata;
 }
 
-
 void HDF5_Reader::read_intVector( const char * const &group_name,
     const char * const &data_name,
     std::vector<int> &out ) const
@@ -177,7 +170,6 @@ void HDF5_Reader::read_intVector( const char * const &group_name,
   delete [] ddims; delete [] intdata;
 }
 
-
 void HDF5_Reader::read_doubleVector( const char * const &group_name,
     const char * const &data_name,
     std::vector<double> &out ) const
@@ -200,7 +192,6 @@ void HDF5_Reader::read_doubleVector( const char * const &group_name,
 
   delete [] ddims; delete [] ddata;
 }
-
 
 void HDF5_Reader::read_intMatrix( const char * const &group_name,
     const char * const &data_name,
@@ -228,7 +219,6 @@ void HDF5_Reader::read_intMatrix( const char * const &group_name,
   delete [] ddims; delete [] intdata;
 }
 
-
 void HDF5_Reader::read_doubleMatrix( const char * const &group_name,
     const char * const &data_name,
     std::vector<double> &out, int &num_row, int &num_col ) const
@@ -254,7 +244,6 @@ void HDF5_Reader::read_doubleMatrix( const char * const &group_name,
 
   delete [] ddims; delete [] ddata;
 }
-
 
 void HDF5_Reader::read_string( const char * const &group_name,
     const char * const &data_name,
@@ -295,6 +284,5 @@ void HDF5_Reader::read_string( const char * const &group_name,
   H5Dclose( data_id );
   H5Gclose( group_id );
 }
-
 
 // EOF

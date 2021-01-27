@@ -12,7 +12,6 @@ void SYS_T::print_perigee_art()
   PetscPrintf(PETSC_COMM_WORLD, "\\__|      \\________|\\__|  \\__|\\______| \\______/ \\________|\\________| \n \n");
 }
 
-
 int SYS_T::get_genbc_file_type( const char * const &lpn_filename )
 {
   const std::string temp_name( lpn_filename );
@@ -62,12 +61,10 @@ int SYS_T::get_genbc_file_type( const char * const &lpn_filename )
   }
 }
 
-
 double SYS_T::gen_randomD_closed(const double &min, const double &max)
 {
   return ( rand() % 1000001 ) * 1.0e-6 * (max - min) + min;
 }
-
 
 double SYS_T::gen_randomD_open(const double &min, const double &max)
 {
@@ -78,7 +75,6 @@ int SYS_T::gen_randomI_closed(const int &min, const int &max)
 {
   return ( rand() % (max - min + 1)) + min;
 }
-
 
 void SYS_T::print_MaxMemUsage()
 {
@@ -94,7 +90,6 @@ void SYS_T::print_MaxMemUsage()
   }
 }
 
-
 void SYS_T::print_CurMemUsage()
 {
   PetscLogDouble memo = 0.0, memototal = 0.0;
@@ -108,7 +103,6 @@ void SYS_T::print_CurMemUsage()
     print_mem_size(memototal); std::cout<<"\n";
   }
 }
-
 
 void SYS_T::print_MaxMallocUsage()
 {
@@ -124,7 +118,6 @@ void SYS_T::print_MaxMallocUsage()
   }
 }
 
-
 void SYS_T::print_CurMallocUsage()
 {
   PetscLogDouble memo = 0.0, memototal = 0.0;
@@ -139,7 +132,6 @@ void SYS_T::print_CurMallocUsage()
   }
 }
 
-
 std::string SYS_T::get_time()
 {
   std::time_t  time1= std::time (0);
@@ -153,7 +145,6 @@ std::string SYS_T::get_time()
   return o.str();
 }
 
-
 std::string SYS_T::get_date()
 {
   std::time_t  time1= std::time (0);
@@ -166,7 +157,6 @@ std::string SYS_T::get_date()
 
   return o.str();
 }
-
 
 void SYS_T::get_memory_stats (MemoryStats &stats)
 {
@@ -196,7 +186,6 @@ void SYS_T::get_memory_stats (MemoryStats &stats)
 #endif
 }
 
-
 SYS_T::Timer::Timer()
 {
   startedAt = 0;
@@ -211,19 +200,16 @@ void SYS_T::Timer::Start()
   startedAt = clock();
 }
 
-
 void SYS_T::Timer::Stop()
 {
   stoppedAt = clock();
 }
-
 
 void SYS_T::Timer::Reset()
 {
   startedAt = 0;
   stoppedAt = 0;
 }
-
 
 double SYS_T::Timer::get_sec() const
 {
