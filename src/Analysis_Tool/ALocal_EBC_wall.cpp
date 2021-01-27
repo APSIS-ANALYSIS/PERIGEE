@@ -37,6 +37,33 @@ ALocal_EBC_wall::~ALocal_EBC_wall()
   VEC_T::clean(youngsmod);
 }
 
+
+void ALocal_EBC_wall::get_thickness( const int &eindex,
+    double * const &e_thickness ) const
+{
+  // Only one surface per the assumption in wall ebc
+  const int nLocBas = cell_nLocBas[0];
+  for( int ii = 0; ii < nLocBas; ++ii )
+  {
+    const int pos = local_tri_ien[0][nLocBas*eindex + ii]; 
+    e_thickness[ii] = thickness[pos];
+  }
+}
+
+
+void ALocal_EBC_wall::get_youngsmod( const int &eindex,
+    double * const &e_youngsmod ) const
+{
+  // Only one surface per the assumption in wall ebc
+  const int nLocBas = cell_nLocBas[0];
+  for( int ii = 0; ii < nLocBas; ++ii )
+  {
+    const int pos = local_tri_ien[0][nLocBas*eindex + ii]; 
+    e_youngsmod[ii] = youngsmod[pos];
+  }
+}
+
+
 void ALocal_EBC_wall::print_info() const
 {
   SYS_T::commPrint("---- ALocal_EBC_wall: \n");
