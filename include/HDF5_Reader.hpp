@@ -6,6 +6,29 @@
 // This is a set of tools that read in files in .h5 format. This will 
 // ease the input of data from the disk.
 //
+// To construct this class, one should first obtain a hid_t data by
+// calling H5Fopen. After the data are all read, one should call
+// H5Fclose.
+//
+// A typical usage is:
+//
+// hid_t file_id = H5Fopen(name_of_h5_file, mode, H5P_DEFAULT)
+//
+// HDF5_Reader * h5r = new HDF5_Reader( file_id );
+//
+// call read functions
+//
+// delete h5r;
+// H5Fclose(file_id);
+//
+// There are two modes for H5Fopen
+// H5F_ACC_RDONLY: the application will read only the file
+// H5F_ACC_RDWR: the application will read and write the file.
+//
+// Basically, we only use H5F_ACC_RDONLY.
+// For more details, see 
+//      https://support.hdfgroup.org/HDF5/Tutor/crtfile.html
+// 
 // Author: Ju Liu
 // Date: July 2 2015
 // ==================================================================
