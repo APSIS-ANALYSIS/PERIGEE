@@ -252,6 +252,7 @@ int main( int argc, char * argv[] )
   centerlinesList.push_back( "centerlines_aorta.vtp" );
   thickness2radiusList.push_back( 0.2 );
 
+  // Initialized with default fluid density 1.065
   ElemBC * wall_bc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
                                              thickness2radius_combined, wallsList,
                                              centerlinesList, thickness2radiusList, elemType);
