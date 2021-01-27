@@ -14,7 +14,7 @@
 
 namespace VEC_T
 {
-  // print int / double vector on screen.
+  // print int or double vector on screen.
   // By default, the separation of the vector entries is \t. User may
   // switch it to \n.
   template<typename T> void print( const std::vector<T> &vec,
@@ -99,21 +99,6 @@ namespace VEC_T
   {
     auto it = find(vec.begin(), vec.end(), val);
     return it != vec.end();
-  }
-
-  // ----------------------------------------------------------------
-  // ! is_equal
-  //   determine if two given vectors are the same
-  // ----------------------------------------------------------------
-  template<typename T> bool is_equal( const std::vector<T> &vec_a,
-      const std::vector<T> &vec_b )
-  {
-    if(vec_a.size() != vec_b.size() ) return false;
-    for(unsigned int ii=0; ii<vec_a.size(); ++ii)
-    {
-      if(vec_a[ii] != vec_b[ii]) return false;
-    }
-    return true;
   }
 
   // ----------------------------------------------------------------
