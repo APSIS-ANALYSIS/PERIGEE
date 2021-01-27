@@ -2,6 +2,44 @@
 #define GENBC_CORONARY_HPP
 // ==================================================================
 // GenBC_Coronary.hpp
+// This class is used to provide outflow boundary conditions for an
+// open loop coronary lumped parameter model (LPM). The RCR model is also
+// handled by this class in case coronary and RCR BCs are used together.
+// The coronary artery is modeled by an RCRCR circuit with intramyocardial
+// pressures:
+//
+// Ra___Ramicro___Rv___Pd
+//    |         |
+//   Ca        Cim
+//              |
+//             Pim
+//
+// Ra, Ramicro and Rv are resistors for the coronary arteries,
+// coronary microvasculature and coronary veins, respectively.
+// Ca and Cim are capacitors for proximal and distal vascularture respectively.
+// Pd and Pim are the distal and intramyocardial pressures, respectively.
+// Intramyocardial pressure Pim is applied to capacitor Cim to model restricted coronary
+// flow during systole.
+//
+// The GenBC_Coronary input file uses the following format,
+// -----------------------
+// Coronary <num_outlets>
+// <face_id0> <Ra> <Ca> <Ramicro> <Cim> <Rv> <Pd> <num_Pim_data> <Pim_scaling_coef>
+// <t1> <P1>
+// <t2> <P2>
+//   ....
+// <tn> <Pn>
+// <face_id1> <Ra> <Ca> <Ramicro> <Cim> <Rv> <Pd> <num_Pim_data> <Pim_scaling_coef>
+// <t1> <P1>
+// <t2> <P2>
+//   ....
+// <tn> <Pn>
+//-----------------------
+// where n=num_Pim_data. Pim_scaling_coef can be used to scale original pressure Pim.
+// If an RCR is applied to an outlet, set num_Pim_data=0 and ommit Pim data as follows,
+//
+// <outlet_id> <Rp> <C> <Rd> <C> <Rd> <Pd> 0 1.0
+//
 // ==================================================================
 #include "IGenBC.hpp"
 class GenBC_Coronary : public IGenBC
