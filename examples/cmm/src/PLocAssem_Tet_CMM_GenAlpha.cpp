@@ -1051,6 +1051,39 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z ); 
 
+  const int face_nqp = quad -> get_num_quadPts();
+
+  Zero_Residual();
+
+  for(int qua = 0; qua < face_nqp; ++ qua)
+  {
+    element->get_R(qua, &R[0]);
+
+    double u_t = 0.0, v_t = 0.0, w_t = 0.0;
+
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      const int ii4 = 4 * ii;
+
+      u_t += dot_sol[ii4+1] * R[ii];
+      v_t += dot_sol[ii4+2] * R[ii];
+      w_t += dot_sol[ii4+3] * R[ii];
+    }
+
+    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
+
+    // Global-to-local rotation matrix Q
+    Matrix_3x3 Q = Matrix_3x3();
+    element->get_rotationMatrix(0, Q);
+
+    for(int A=0; A<snLocBas; ++A)
+    {
+      Residual[4*A+1] += gwts * ( R[A] * 1.0 * u_t ); 
+      Residual[4*A+2] += gwts * ( R[A] * 1.0 * v_t );
+      Residual[4*A+3] += gwts * ( R[A] * 1.0 * w_t );
+    }
+
+  }
 }
 
 
