@@ -842,6 +842,7 @@ class IPLocAssem
     // which can be used in FSI problems where the fluid is coupled with a
     // thin-walled structure like membrane/shells. 
     virtual void Assem_Residual_EBC_Wall(
+        const double &time, const double &dt,
         const double * const &dot_sol,
         const double * const &sol_wall_disp,
         FEAElement * const &element,
@@ -854,6 +855,7 @@ class IPLocAssem
     {SYS_T::commPrint("Warning: this Assem_Residual_EBC_Wall is not implemented.\n");}
 
     virtual void Assem_Tangent_Residual_EBC_Wall(
+        const double &time, const double &dt,
         const double * const &dot_sol,
         const double * const &sol_wall_disp,
         FEAElement * const &element,

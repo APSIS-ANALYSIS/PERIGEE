@@ -138,6 +138,7 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
         const IQuadPts * const &quad );
 
     virtual void Assem_Residual_EBC_Wall(
+        const double &time, const double &dt,
         const double * const &dot_sol,
         const double * const &sol_wall_disp,
         FEAElement * const &element,
@@ -149,6 +150,7 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
         const IQuadPts * const &quad );
 
     virtual void Assem_Tangent_Residual_EBC_Wall(
+        const double &time, const double &dt,
         const double * const &dot_sol,
         const double * const &sol_wall_disp,
         FEAElement * const &element,
@@ -197,13 +199,21 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
     void get_DC( double &dc_tau, const double * const &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
-    void get_f(const double &x, const double &y, const double &z,
+    // Return body force acting on the fluid domain
+    void get_f( const double &x, const double &y, const double &z,
         const double &t, double &fx, double &fy, double &fz ) const
     {
       fx = 0.0; fy = 0.0; fz = 0.0;
     }
 
-    void get_H1(const double &x, const double &y, const double &z,
+    // Return body force acting on the wall domain
+    void get_fw( const double &x, const double &y, const double &z,
+        const double &t, double &fw_x, double &fw_y, double &fw_z ) const
+    {
+      fw_x = 0.0; fw_y = 0.0; fw_z = 0.0;
+    }
+
+    void get_H1( const double &x, const double &y, const double &z,
         const double &t, const double &nx, const double &ny,
         const double &nz, double &gx, double &gy, double &gz ) const
     {

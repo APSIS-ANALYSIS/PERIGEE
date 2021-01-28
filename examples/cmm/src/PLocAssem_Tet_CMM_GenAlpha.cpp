@@ -1040,6 +1040,7 @@ void PLocAssem_Tet_CMM_GenAlpha::get_pressure_area(
 
 
 void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
+    const double &time, const double &dt,
     const double * const &dot_sol,
     const double * const &sol_wall_disp,
     FEAElement * const &element,
@@ -1052,7 +1053,10 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z ); 
 
+  double f1, f2, f3;
+
   const int face_nqp = quad -> get_num_quadPts();
+  const double curr = time + alpha_f * dt;
 
   Zero_Residual();
 
@@ -1061,6 +1065,8 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     element->get_R(qua, &R[0]);
 
     double u_t = 0.0, v_t = 0.0, w_t = 0.0;
+    double h_w = 0.0, E_w = 0.0;
+    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
 
     for(int ii=0; ii<snLocBas; ++ii)
     {
@@ -1069,9 +1075,19 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
       u_t += dot_sol[ii4+1] * R[ii];
       v_t += dot_sol[ii4+2] * R[ii];
       w_t += dot_sol[ii4+3] * R[ii];
+
+      h_w += ele_thickness[ii] * R[ii];
+      E_w += ele_youngsmod[ii] * R[ii];
+
+      coor_x += eleCtrlPts_x[ii] * R[ii];
+      coor_y += eleCtrlPts_y[ii] * R[ii];
+      coor_z += eleCtrlPts_z[ii] * R[ii];
     }
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
+
+    // Body force acting on the wall
+    get_fw(coor_x, coor_y, coor_z, curr, f1, f2, f3);
 
     // Global-to-local rotation matrix Q
     Matrix_3x3 Q = Matrix_3x3();
@@ -1079,9 +1095,9 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual[4*A+1] += gwts * ( R[A] * 1.0 * u_t ); 
-      Residual[4*A+2] += gwts * ( R[A] * 1.0 * v_t );
-      Residual[4*A+3] += gwts * ( R[A] * 1.0 * w_t );
+      Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * u_t - R[A] * rho_w * f1 ); 
+      Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * v_t - R[A] * rho_w * f2 );
+      Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * w_t - R[A] * rho_w * f3 );
     }
 
   }
@@ -1089,6 +1105,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 
 
 void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
+    const double &time, const double &dt,
     const double * const &dot_sol,
     const double * const &sol_wall_disp,
     FEAElement * const &element,
