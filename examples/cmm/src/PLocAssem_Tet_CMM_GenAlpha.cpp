@@ -1130,18 +1130,57 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
         {
           for(int ll=0; ll<5; ++ll)
           {
-            Kl[ii*(snLocBas*dim) + jj] +=
+            Kl[(snLocBas*dim)*ii + jj] +=
               Bl[kk*(snLocBas*dim)+ii] * D[5*kk+ll] * Bl[ll*(snLocBas*dim)+jj];
           }
         }
       }
     }
 
+    // Stiffness tensor in global coords
+    // theta^T * Kl * theta, where theta = [Q, 0, 0; 0, Q, 0; 0, 0, Q]
+    // or Q^T * Kl_[AB] * Q = Q_{ki} * Kl_[AB]{kl} * Q_{lj}
+    double Kg [(snLocBas*dim) * (snLocBas*dim)] = {0.0};
+    for(int A = 0; A < snLocBas; ++A)
+    {
+      for(int B = 0; B < snLocBas; ++B)
+      {
+        for(int ii = 0; ii < dim; ++ii)
+        {
+          for(int jj = 0; jj < dim; ++jj)
+          {
+            for(int kk = 0; kk < dim; ++kk)
+            {
+              for(int ll = 0; ll < dim; ++ll)
+              {
+                Kg[(snLocBas*dim)*(A*dim+ii) + (B*dim+jj)] +=
+                  Q(kk,ii) * Kl[(A*dim+kk)*(snLocBas*dim) + (B*dim+ll)] * Q(ll, jj);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Multiply by displacements in global coords
+    // Kg_{ij} * u_{j}
+    double lin_elasticity [snLocBas * dim ] = {0.0};
+    for(int ii=0; ii<snLocBas*dim; ++ii)
+    {
+      for(int jj=0; jj<snLocBas*dim; ++jj)
+      {
+        lin_elasticity[ii] += Kg[(snLocBas*dim)*ii + jj] * sol_wall_disp[jj];
+      }
+    } 
+
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * u_t - R[A] * rho_w * f1 ); 
-      Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * v_t - R[A] * rho_w * f2 );
-      Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * w_t - R[A] * rho_w * f3 );
+      Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * u_t - R[A] * rho_w * f1
+          + lin_elasticity[dim*A] ); 
+      Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * v_t - R[A] * rho_w * f2
+          + lin_elasticity[dim*A+1] ); 
+      Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * w_t - R[A] * rho_w * f3
+          + lin_elasticity[dim*A+2] ); 
     }
 
   }
