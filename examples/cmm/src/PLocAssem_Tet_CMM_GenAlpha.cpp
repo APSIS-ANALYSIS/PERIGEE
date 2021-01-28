@@ -1130,8 +1130,8 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
         {
           for(int ll=0; ll<5; ++ll)
           {
-            Kl[(snLocBas*dim)*ii + jj] +=
-              Bl[kk*(snLocBas*dim)+ii] * D[5*kk+ll] * Bl[ll*(snLocBas*dim)+jj];
+            Kl[ (snLocBas*dim)*ii + jj ] +=
+              Bl[ kk*(snLocBas*dim)+ii ] * D[5*kk+ll] * Bl[ ll*(snLocBas*dim)+jj ];
           }
         }
       }
@@ -1153,8 +1153,8 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
             {
               for(int ll = 0; ll < dim; ++ll)
               {
-                Kg[(snLocBas*dim)*(A*dim+ii) + (B*dim+jj)] +=
-                  Q(kk,ii) * Kl[(A*dim+kk)*(snLocBas*dim) + (B*dim+ll)] * Q(ll, jj);
+                Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] +=
+                  Q(kk,ii) * Kl[ (A*dim+kk)*(snLocBas*dim) + (B*dim+ll) ] * Q(ll, jj);
               }
             }
           }
@@ -1169,7 +1169,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     {
       for(int jj=0; jj<snLocBas*dim; ++jj)
       {
-        lin_elasticity[ii] += Kg[(snLocBas*dim)*ii + jj] * sol_wall_disp[jj];
+        lin_elasticity[ii] += Kg[ (snLocBas*dim)*ii + jj ] * sol_wall_disp[jj];
       }
     } 
 
@@ -1205,6 +1205,10 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
   double f1, f2, f3;
 
   const int face_nqp = quad -> get_num_quadPts();
+
+  const double dd_dv = alpha_f * gamma * dt;
+  const double dd_du = dd_dv * dd_dv / alpha_m;
+
   const double curr = time + alpha_f * dt;
 
   Zero_sur_Tangent_Residual();
@@ -1278,8 +1282,8 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
         {
           for(int ll=0; ll<5; ++ll)
           {
-            Kl[(snLocBas*dim)*ii + jj] +=
-              Bl[kk*(snLocBas*dim)+ii] * D[5*kk+ll] * Bl[ll*(snLocBas*dim)+jj];
+            Kl[ (snLocBas*dim)*ii + jj ] +=
+              Bl[ kk*(snLocBas*dim)+ii ] * D[5*kk+ll] * Bl[ ll*(snLocBas*dim)+jj ];
           }
         }
       }
@@ -1301,8 +1305,8 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
             {
               for(int ll = 0; ll < dim; ++ll)
               {
-                Kg[(snLocBas*dim)*(A*dim+ii) + (B*dim+jj)] +=
-                  Q(kk,ii) * Kl[(A*dim+kk)*(snLocBas*dim) + (B*dim+ll)] * Q(ll, jj);
+                Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] +=
+                  Q(kk,ii) * Kl[ (A*dim+kk)*(snLocBas*dim) + (B*dim+ll) ] * Q(ll, jj);
               }
             }
           }
@@ -1332,14 +1336,39 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 
       for(int B=0; B<nLocBas; ++B)
       {
-        // Momentum-x with respect to u
-        sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+1 ] = 0.0;
+        // Momentum-x with respect to u, v, w
+        sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+1 ] += gwts * h_w * (
+            alpha_m * rho_w * R[A] * R[B]
+            + dd_du * Kg[ (snLocBas*dim)*(A*dim) + (B*dim) ] );
 
-        // Momentum-y with respect to v
-        sur_Tangent[ 4*snLocBas*(4*A+2) + 4*B+2 ] = 0.0;
+        sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+2 ] += gwts * h_w * (
+            dd_du * Kg[ (snLocBas*dim)*(A*dim) + (B*dim+1) ] );
 
-        // Momentum-z with respect to w
-        sur_Tangent[ 4*snLocBas*(4*A+3) + 4*B+3 ] = 0.0;
+        sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+3 ] += gwts * h_w * (
+            dd_du * Kg[ (snLocBas*dim)*(A*dim) + (B*dim+2) ] );
+
+        // Momentum-y with respect to u, v, w
+        sur_Tangent[ 4*snLocBas*(4*A+2) + 4*B+1 ] += gwts * h_w * (
+            dd_du * Kg[ (snLocBas*dim)*(A*dim+1) + (B*dim) ] );
+
+        sur_Tangent[ 4*snLocBas*(4*A+2) + 4*B+2 ] += gwts * h_w * (
+            alpha_m * rho_w * R[A] * R[B]
+            + dd_du * Kg[ (snLocBas*dim)*(A*dim+1) + (B*dim+1) ] );
+
+        sur_Tangent[ 4*snLocBas*(4*A+2) + 4*B+3 ] += gwts * h_w * (
+            dd_du * Kg[ (snLocBas*dim)*(A*dim+1) + (B*dim+2) ] );
+
+        // Momentum-z with respect to u, v, w
+        sur_Tangent[ 4*snLocBas*(4*A+3) + 4*B+1 ] += gwts * h_w * (
+            dd_du * Kg[ (snLocBas*dim)*(A*dim+2) + (B*dim) ] );
+
+        sur_Tangent[ 4*snLocBas*(4*A+3) + 4*B+2 ] += gwts * h_w * (
+            dd_du * Kg[ (snLocBas*dim)*(A*dim+2) + (B*dim+1) ] );
+
+        sur_Tangent[ 4*snLocBas*(4*A+3) + 4*B+3 ] += gwts * h_w * (
+            alpha_m * rho_w * R[A] * R[B]
+            + dd_du * Kg[ (snLocBas*dim)*(A*dim+2) + (B*dim+2) ] );
+
 
       } // end B loop
     } // end A loop
