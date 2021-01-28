@@ -1059,7 +1059,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
   const int face_nqp = quad -> get_num_quadPts();
   const double curr = time + alpha_f * dt;
 
-  Zero_Residual();
+  Zero_sur_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
@@ -1175,11 +1175,11 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * u_t - R[A] * rho_w * f1
+      sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * u_t - R[A] * rho_w * f1
           + lin_elasticity[dim*A] ); 
-      Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * v_t - R[A] * rho_w * f2
+      sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * v_t - R[A] * rho_w * f2
           + lin_elasticity[dim*A+1] ); 
-      Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * w_t - R[A] * rho_w * f3
+      sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * w_t - R[A] * rho_w * f3
           + lin_elasticity[dim*A+2] ); 
     }
 
@@ -1207,7 +1207,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
   const int face_nqp = quad -> get_num_quadPts();
   const double curr = time + alpha_f * dt;
 
-  Zero_Tangent_Residual();
+  Zero_sur_Tangent_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
@@ -1323,14 +1323,26 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * u_t - R[A] * rho_w * f1
+      sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * u_t - R[A] * rho_w * f1
           + lin_elasticity[dim*A] ); 
-      Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * v_t - R[A] * rho_w * f2
+      sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * v_t - R[A] * rho_w * f2
           + lin_elasticity[dim*A+1] ); 
-      Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * w_t - R[A] * rho_w * f3
+      sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * w_t - R[A] * rho_w * f3
           + lin_elasticity[dim*A+2] ); 
-    }
 
+      for(int B=0; B<nLocBas; ++B)
+      {
+        // Momentum-x with respect to u
+        sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+1 ] = 0.0;
+
+        // Momentum-y with respect to v
+        sur_Tangent[ 4*snLocBas*(4*A+2) + 4*B+2 ] = 0.0;
+
+        // Momentum-z with respect to w
+        sur_Tangent[ 4*snLocBas*(4*A+3) + 4*B+3 ] = 0.0;
+
+      } // end B loop
+    } // end A loop
   } // end qua loop
 
 }
