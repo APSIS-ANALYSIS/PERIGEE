@@ -5,12 +5,13 @@ PLocAssem_Tet_CMM_GenAlpha::PLocAssem_Tet_CMM_GenAlpha(
         const int &in_nlocbas, const int &in_nqp,
         const int &in_snlocbas,
         const double &in_rho, const double &in_vis_mu,
-        const double &in_beta, const double &in_ctauc, 
-        const int &elemtype )
+        const double &in_beta, const double &in_wall_rho,
+        const double &in_nu, const double &in_kappa,
+        const double &in_ctauc, const int &elemtype )
 : rho0( in_rho ), vis_mu( in_vis_mu ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
-  gamma(tm_gAlpha->get_gamma()), beta(in_beta), nqp(in_nqp),
-  Ctauc( in_ctauc )
+  gamma(tm_gAlpha->get_gamma()), beta(in_beta), rho_w(in_wall_rho),
+  nu_w(in_nu), kappa_w(in_kappa), nqp(in_nqp), Ctauc( in_ctauc )
 {
   if(elemtype == 501)
   {
@@ -1055,7 +1056,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 
   Zero_Residual();
 
-  for(int qua = 0; qua < face_nqp; ++ qua)
+  for(int qua = 0; qua < face_nqp; ++qua)
   {
     element->get_R(qua, &R[0]);
 
