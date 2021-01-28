@@ -1053,6 +1053,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z ); 
 
+  const int dim = 3;
   double f1, f2, f3;
 
   const int face_nqp = quad -> get_num_quadPts();
@@ -1062,7 +1063,9 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
-    element->get_R(qua, &R[0]);
+    // For membrane elements, basis function gradients are computed
+    // with respect to lamina coords
+    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
 
     double u_t = 0.0, v_t = 0.0, w_t = 0.0;
     double h_w = 0.0, E_w = 0.0;
@@ -1091,7 +1094,48 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 
     // Global-to-local rotation matrix Q
     Matrix_3x3 Q = Matrix_3x3();
-    element->get_rotationMatrix(0, Q);
+    element->get_rotationMatrix(qua, Q);
+
+    // Strain displacement matrix B in lamina coords, 5 x (snLocBas * dim)
+    double Bl [5 * snLocBas * dim] = {0.0};
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      Bl[0*snLocBas*dim + ii*dim]     = dR_dx[ii]; // u1,1
+      Bl[1*snLocBas*dim + ii*dim + 1] = dR_dy[ii]; // u2,2
+      Bl[2*snLocBas*dim + ii*dim]     = dR_dy[ii]; // u1,2
+      Bl[2*snLocBas*dim + ii*dim + 1] = dR_dx[ii]; // u2,1
+      Bl[3*snLocBas*dim + ii*dim + 2] = dR_dx[ii]; // u3,1
+      Bl[4*snLocBas*dim + ii*dim + 2] = dR_dy[ii]; // u3,2
+    }
+
+    // Elasticity tensor D
+    const double coef = E_w / (1.0 - nu_w * nu_w);
+    double D[5 * 5] = {0.0};
+    D[0]       = coef * 1.0;
+    D[1]       = coef * nu_w;
+    D[1*5]     = coef * nu_w;
+    D[1*5 + 1] = coef * 1.0;
+    D[2*5 + 2] = coef * (1.0 - nu_w) / 2.0;
+    D[3*5 + 3] = coef * kappa_w * (1.0 - nu_w) / 2.0;
+    D[4*5 + 4] = coef * kappa_w * (1.0 - nu_w) / 2.0;
+
+    // Stiffness tensor in lamina coords
+    // Bl^T * D * Bl = Bl_{ki} * D_{kl} * Bl_{lj}
+    double Kl [(snLocBas*dim) * (snLocBas*dim)] = {0.0};
+    for(int ii=0; ii<snLocBas*dim; ++ii)
+    {
+      for(int jj=0; jj<snLocBas*dim; ++jj)
+      {
+        for(int kk=0; kk<5; ++kk)
+        {
+          for(int ll=0; ll<5; ++ll)
+          {
+            Kl[ii*(snLocBas*dim) + jj] +=
+              Bl[kk*(snLocBas*dim)+ii] * D[5*kk+ll] * Bl[ll*(snLocBas*dim)+jj];
+          }
+        }
+      }
+    }
 
     for(int A=0; A<snLocBas; ++A)
     {
