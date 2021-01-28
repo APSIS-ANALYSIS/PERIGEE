@@ -1183,7 +1183,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
           + lin_elasticity[dim*A+2] ); 
     }
 
-  }
+  } // end qua loop
 }
 
 
@@ -1200,6 +1200,138 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     const IQuadPts * const &quad )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z ); 
+
+  const int dim = 3;
+  double f1, f2, f3;
+
+  const int face_nqp = quad -> get_num_quadPts();
+  const double curr = time + alpha_f * dt;
+
+  Zero_Tangent_Residual();
+
+  for(int qua = 0; qua < face_nqp; ++qua)
+  {
+    // For membrane elements, basis function gradients are computed
+    // with respect to lamina coords
+    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
+
+    double u_t = 0.0, v_t = 0.0, w_t = 0.0;
+    double h_w = 0.0, E_w = 0.0;
+    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      const int ii4 = 4 * ii;
+
+      u_t += dot_sol[ii4+1] * R[ii];
+      v_t += dot_sol[ii4+2] * R[ii];
+      w_t += dot_sol[ii4+3] * R[ii];
+
+      h_w += ele_thickness[ii] * R[ii];
+      E_w += ele_youngsmod[ii] * R[ii];
+
+      coor_x += eleCtrlPts_x[ii] * R[ii];
+      coor_y += eleCtrlPts_y[ii] * R[ii];
+      coor_z += eleCtrlPts_z[ii] * R[ii];
+    }
+
+    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
+
+    // Body force acting on the wall
+    get_fw(coor_x, coor_y, coor_z, curr, f1, f2, f3);
+
+    // Global-to-local rotation matrix Q
+    Matrix_3x3 Q = Matrix_3x3();
+    element->get_rotationMatrix(qua, Q);
+
+    // Strain displacement matrix B in lamina coords, 5 x (snLocBas * dim)
+    double Bl [5 * snLocBas * dim] = {0.0};
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      Bl[0*snLocBas*dim + ii*dim]     = dR_dx[ii]; // u1,1
+      Bl[1*snLocBas*dim + ii*dim + 1] = dR_dy[ii]; // u2,2
+      Bl[2*snLocBas*dim + ii*dim]     = dR_dy[ii]; // u1,2
+      Bl[2*snLocBas*dim + ii*dim + 1] = dR_dx[ii]; // u2,1
+      Bl[3*snLocBas*dim + ii*dim + 2] = dR_dx[ii]; // u3,1
+      Bl[4*snLocBas*dim + ii*dim + 2] = dR_dy[ii]; // u3,2
+    }
+
+    // Elasticity tensor D
+    const double coef = E_w / (1.0 - nu_w * nu_w);
+    double D[5 * 5] = {0.0};
+    D[0]       = coef * 1.0;
+    D[1]       = coef * nu_w;
+    D[1*5]     = coef * nu_w;
+    D[1*5 + 1] = coef * 1.0;
+    D[2*5 + 2] = coef * (1.0 - nu_w) / 2.0;
+    D[3*5 + 3] = coef * kappa_w * (1.0 - nu_w) / 2.0;
+    D[4*5 + 4] = coef * kappa_w * (1.0 - nu_w) / 2.0;
+
+    // Stiffness tensor in lamina coords
+    // Bl^T * D * Bl = Bl_{ki} * D_{kl} * Bl_{lj}
+    double Kl [(snLocBas*dim) * (snLocBas*dim)] = {0.0};
+    for(int ii=0; ii<snLocBas*dim; ++ii)
+    {
+      for(int jj=0; jj<snLocBas*dim; ++jj)
+      {
+        for(int kk=0; kk<5; ++kk)
+        {
+          for(int ll=0; ll<5; ++ll)
+          {
+            Kl[(snLocBas*dim)*ii + jj] +=
+              Bl[kk*(snLocBas*dim)+ii] * D[5*kk+ll] * Bl[ll*(snLocBas*dim)+jj];
+          }
+        }
+      }
+    }
+
+    // Stiffness tensor in global coords
+    // theta^T * Kl * theta, where theta = [Q, 0, 0; 0, Q, 0; 0, 0, Q]
+    // or Q^T * Kl_[AB] * Q = Q_{ki} * Kl_[AB]{kl} * Q_{lj}
+    double Kg [(snLocBas*dim) * (snLocBas*dim)] = {0.0};
+    for(int A = 0; A < snLocBas; ++A)
+    {
+      for(int B = 0; B < snLocBas; ++B)
+      {
+        for(int ii = 0; ii < dim; ++ii)
+        {
+          for(int jj = 0; jj < dim; ++jj)
+          {
+            for(int kk = 0; kk < dim; ++kk)
+            {
+              for(int ll = 0; ll < dim; ++ll)
+              {
+                Kg[(snLocBas*dim)*(A*dim+ii) + (B*dim+jj)] +=
+                  Q(kk,ii) * Kl[(A*dim+kk)*(snLocBas*dim) + (B*dim+ll)] * Q(ll, jj);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Multiply by displacements in global coords
+    // Kg_{ij} * u_{j}
+    double lin_elasticity [snLocBas * dim ] = {0.0};
+    for(int ii=0; ii<snLocBas*dim; ++ii)
+    {
+      for(int jj=0; jj<snLocBas*dim; ++jj)
+      {
+        lin_elasticity[ii] += Kg[(snLocBas*dim)*ii + jj] * sol_wall_disp[jj];
+      }
+    } 
+
+    for(int A=0; A<snLocBas; ++A)
+    {
+      Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * u_t - R[A] * rho_w * f1
+          + lin_elasticity[dim*A] ); 
+      Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * v_t - R[A] * rho_w * f2
+          + lin_elasticity[dim*A+1] ); 
+      Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * w_t - R[A] * rho_w * f3
+          + lin_elasticity[dim*A+2] ); 
+    }
+
+  } // end qua loop
 
 }
 
