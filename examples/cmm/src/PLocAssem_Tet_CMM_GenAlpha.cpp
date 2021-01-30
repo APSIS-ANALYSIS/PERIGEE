@@ -1096,45 +1096,34 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     Matrix_3x3 Q = Matrix_3x3();
     element->get_rotationMatrix(qua, Q);
 
-    // Strain displacement matrix B in lamina coords, 5 rows by snLocBas x dim
-    // columns
-    double Bl [5 * snLocBas * dim] = {0.0};
-    for(int ii=0; ii<snLocBas; ++ii)
-    {
-      Bl[0*snLocBas*dim + ii*dim]     = dR_dx[ii]; // u1,1
-      Bl[1*snLocBas*dim + ii*dim + 1] = dR_dy[ii]; // u2,2
-      Bl[2*snLocBas*dim + ii*dim]     = dR_dy[ii]; // u1,2
-      Bl[2*snLocBas*dim + ii*dim + 1] = dR_dx[ii]; // u2,1
-      Bl[3*snLocBas*dim + ii*dim + 2] = dR_dx[ii]; // u3,1
-      Bl[4*snLocBas*dim + ii*dim + 2] = dR_dy[ii]; // u3,2
-    }
-
-    // Elasticity tensor D
     const double coef = E_w / (1.0 - nu_w * nu_w);
-    double D[5 * 5] = {0.0};
-    D[0]       = coef * 1.0;
-    D[1]       = coef * nu_w;
-    D[1*5]     = coef * nu_w;
-    D[1*5 + 1] = coef * 1.0;
-    D[2*5 + 2] = coef * (1.0 - nu_w) / 2.0;
-    D[3*5 + 3] = coef * kappa_w * (1.0 - nu_w) / 2.0;
-    D[4*5 + 4] = coef * kappa_w * (1.0 - nu_w) / 2.0;
 
     // Stiffness tensor in lamina coords
     // Bl^T * D * Bl = Bl_{ki} * D_{kl} * Bl_{lj}
     double Kl [(snLocBas*dim) * (snLocBas*dim)] = {0.0};
-    for(int ii=0; ii<snLocBas*dim; ++ii)
+    for(int A = 0; A < snLocBas; ++A)
     {
-      for(int jj=0; jj<snLocBas*dim; ++jj)
+      const double NA_xl = dR_dx[A], NA_yl = dR_dy[A];
+
+      for(int B = 0; B < snLocBas; ++B)
       {
-        for(int kk=0; kk<5; ++kk)
-        {
-          for(int ll=0; ll<5; ++ll)
-          {
-            Kl[ (snLocBas*dim)*ii + jj ] +=
-              Bl[ kk*(snLocBas*dim)+ii ] * D[5*kk+ll] * Bl[ ll*(snLocBas*dim)+jj ];
-          }
-        }
+        const double NB_xl = dR_dx[B], NB_yl = dR_dy[B];
+
+        // Momentum-x with respect to u1, u2 
+        Kl[(snLocBas*dim)*(A*dim) + (B*dim)]     += coef * ( NA_xl * NB_xl
+            + 0.5*(1.0-nu_w) * NA_yl * NB_yl );
+        Kl[(snLocBas*dim)*(A*dim) + (B*dim+1)]   += coef * ( nu_w * NA_xl * NB_yl
+            + 0.5*(1.0-nu_w) * NA_yl * NB_xl );
+
+        // Momentum-y with respect to u1, u2 
+        Kl[(snLocBas*dim)*(A*dim+1) + (B*dim)]   += coef * ( nu_w * NA_yl * NB_xl
+            + 0.5*(1.0-nu_w) * NA_xl * NB_yl );
+        Kl[(snLocBas*dim)*(A*dim+1) + (B*dim+1)] += coef * ( NA_yl * NB_yl
+            + 0.5*(1.0-nu_w) * NA_xl * NB_xl );
+
+        // Momentum-z with respect to u3 
+        Kl[(snLocBas*dim)*(A*dim+2) + (B*dim+2)] += coef * 0.5*kappa_w*(1.0-nu_w) * (
+            NA_xl * NB_xl + NA_yl * NB_yl );
       }
     }
 
@@ -1253,44 +1242,34 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     Matrix_3x3 Q = Matrix_3x3();
     element->get_rotationMatrix(qua, Q);
 
-    // Strain displacement matrix B in lamina coords, 5 x (snLocBas * dim)
-    double Bl [5 * snLocBas * dim] = {0.0};
-    for(int ii=0; ii<snLocBas; ++ii)
-    {
-      Bl[0*snLocBas*dim + ii*dim]     = dR_dx[ii]; // u1,1
-      Bl[1*snLocBas*dim + ii*dim + 1] = dR_dy[ii]; // u2,2
-      Bl[2*snLocBas*dim + ii*dim]     = dR_dy[ii]; // u1,2
-      Bl[2*snLocBas*dim + ii*dim + 1] = dR_dx[ii]; // u2,1
-      Bl[3*snLocBas*dim + ii*dim + 2] = dR_dx[ii]; // u3,1
-      Bl[4*snLocBas*dim + ii*dim + 2] = dR_dy[ii]; // u3,2
-    }
-
-    // Elasticity tensor D
     const double coef = E_w / (1.0 - nu_w * nu_w);
-    double D[5 * 5] = {0.0};
-    D[0]       = coef * 1.0;
-    D[1]       = coef * nu_w;
-    D[1*5]     = coef * nu_w;
-    D[1*5 + 1] = coef * 1.0;
-    D[2*5 + 2] = coef * (1.0 - nu_w) / 2.0;
-    D[3*5 + 3] = coef * kappa_w * (1.0 - nu_w) / 2.0;
-    D[4*5 + 4] = coef * kappa_w * (1.0 - nu_w) / 2.0;
 
     // Stiffness tensor in lamina coords
     // Bl^T * D * Bl = Bl_{ki} * D_{kl} * Bl_{lj}
     double Kl [(snLocBas*dim) * (snLocBas*dim)] = {0.0};
-    for(int ii=0; ii<snLocBas*dim; ++ii)
+    for(int A = 0; A < snLocBas; ++A)
     {
-      for(int jj=0; jj<snLocBas*dim; ++jj)
+      const double NA_xl = dR_dx[A], NA_yl = dR_dy[A];
+
+      for(int B = 0; B < snLocBas; ++B)
       {
-        for(int kk=0; kk<5; ++kk)
-        {
-          for(int ll=0; ll<5; ++ll)
-          {
-            Kl[ (snLocBas*dim)*ii + jj ] +=
-              Bl[ kk*(snLocBas*dim)+ii ] * D[5*kk+ll] * Bl[ ll*(snLocBas*dim)+jj ];
-          }
-        }
+        const double NB_xl = dR_dx[B], NB_yl = dR_dy[B];
+
+        // Momentum-x with respect to u1, u2 
+        Kl[(snLocBas*dim)*(A*dim) + (B*dim)]     += coef * ( NA_xl * NB_xl
+            + 0.5*(1.0-nu_w) * NA_yl * NB_yl );
+        Kl[(snLocBas*dim)*(A*dim) + (B*dim+1)]   += coef * ( nu_w * NA_xl * NB_yl
+            + 0.5*(1.0-nu_w) * NA_yl * NB_xl );
+
+        // Momentum-y with respect to u1, u2 
+        Kl[(snLocBas*dim)*(A*dim+1) + (B*dim)]   += coef * ( nu_w * NA_yl * NB_xl
+            + 0.5*(1.0-nu_w) * NA_xl * NB_yl );
+        Kl[(snLocBas*dim)*(A*dim+1) + (B*dim+1)] += coef * ( NA_yl * NB_yl
+            + 0.5*(1.0-nu_w) * NA_xl * NB_xl );
+
+        // Momentum-z with respect to u3 
+        Kl[(snLocBas*dim)*(A*dim+2) + (B*dim+2)] += coef * 0.5*kappa_w*(1.0-nu_w) * (
+            NA_xl * NB_xl + NA_yl * NB_yl );
       }
     }
 
