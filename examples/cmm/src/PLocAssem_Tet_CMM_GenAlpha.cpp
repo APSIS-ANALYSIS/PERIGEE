@@ -1096,8 +1096,8 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     Matrix_3x3 Q = Matrix_3x3();
     element->get_rotationMatrix(qua, Q);
 
-    // --------------------------------------------------------------
-    // Strain displacement matrix B in lamina coords, 5 x (snLocBas * dim)
+    // Strain displacement matrix B in lamina coords, 5 rows by snLocBas x dim
+    // columns
     double Bl [5 * snLocBas * dim] = {0.0};
     for(int ii=0; ii<snLocBas; ++ii)
     {
@@ -1166,8 +1166,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
         }
       }
     }
-    // --------------------------------------------------------------
-
+    
     // Multiply by displacements in global coords
     // Kg_{ij} * u_{j}
     double lin_elasticity [snLocBas * dim ] = {0.0};
