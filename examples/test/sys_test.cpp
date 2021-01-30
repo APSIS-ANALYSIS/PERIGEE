@@ -16,16 +16,9 @@ class a
 
 int main( int argc, char * argv[] )
 {
-  a * example = new a();
-  example -> print_info();
-  
-  example->get()[1] = -3.0002;
-
-  std::cout<<example->get()[0]<<'\n';
-  std::cout<<example->get()[1]<<'\n';
-  std::cout<<example->get()[2]<<'\n';
-
-  delete example;
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+  SYS_T::file_check("test.txt");
+  PetscFinalize();
   return EXIT_SUCCESS;
 }
 

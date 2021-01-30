@@ -71,31 +71,6 @@ namespace SYS_T
   }
 
   // ----------------------------------------------------------------
-  // Check if a file exists. If a file cannot be found, throw an error
-  // message and exit code
-  // ----------------------------------------------------------------
-  inline void file_check( const std::string &fName )
-  {
-    if( FILE *ff = fopen(fName.c_str(), "r") ) fclose(ff);
-    else
-    {
-      PetscPrintf(PETSC_COMM_WORLD, "Error: The file %s does not exist. Job is killed. \n", fName.c_str());
-      MPI_Barrier(PETSC_COMM_WORLD);
-      MPI_Abort(PETSC_COMM_WORLD, 1);
-    }
-  }
-
-  inline bool file_exist( const std::string &fName )
-  {
-    if( FILE *ff = fopen(fName.c_str(), "r") )
-    {
-      fclose(ff);
-      return true;
-    }
-    else return false;
-  }
-
-  // ----------------------------------------------------------------
   // get_xyz_index() 
   // Assume ii = iz * dim_x * dim_y + iy * dim_x + ix
   // this function will return ix iy and iz based on the input ii, 
@@ -168,7 +143,7 @@ namespace SYS_T
 
   // ----------------------------------------------------------------
   // to_string functions : convert numeric values to string 
-  // NOte: std::to_string is implemented in string in C++ 11.
+  // Note: std::to_string is implemented in string in C++ 11.
   // ----------------------------------------------------------------
   inline std::string to_string( const int &a )
   {
@@ -271,9 +246,7 @@ namespace SYS_T
   // 5. Print fatal error message and terminate the MPI process
   inline void print_fatal( const char output[], ... )
   {
-    PetscMPIInt rank;
-
-    MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
+    const PetscMPIInt rank = get_MPI_rank();
 
     if(!rank)
     {
@@ -291,9 +264,7 @@ namespace SYS_T
   {
     if( a )
     {
-      PetscMPIInt rank;
-
-      MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
+      const PetscMPIInt rank = get_MPI_rank();
 
       if(!rank)
       {
@@ -444,6 +415,26 @@ namespace SYS_T
     PetscOptionsGetString(PETSC_NULL, PETSC_NULL, name, char_outdata, PETSC_MAX_PATH_LEN, &flg);
 #endif
     if(flg) outdata = char_outdata;
+  }
+
+  // ----------------------------------------------------------------
+  // Check if a file exists. If a file cannot be found, throw an error
+  // message and exit code
+  // ----------------------------------------------------------------
+  inline bool file_exist( const std::string &fName )
+  {
+    if( FILE *ff = fopen(fName.c_str(), "r") )
+    {
+      fclose(ff);
+      return true;
+    }
+    else return false;
+  }
+
+  inline void file_check( const std::string &fName )
+  {
+    print_fatal_if( !file_exist(fName), 
+        "Error: The file %s does not exist. Job is killed. \n", fName.c_str());
   }
 
   // ================================================================
