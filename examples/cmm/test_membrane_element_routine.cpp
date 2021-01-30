@@ -11,7 +11,7 @@ void print_2Darray(const double * const arr, const int nrow,
 int main( int argc, char * argv[] )
 {
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-  const int nLocBas = 6;
+  const int nLocBas = 3;
   const int dim     = 3;
   int numpt;
 
@@ -211,14 +211,27 @@ int main( int argc, char * argv[] )
       {
         for(int jj = 0; jj < dim; ++jj)
         {
-          for(int kk = 0; kk < dim; ++kk)
-          {
-            for(int ll = 0; ll < dim; ++ll)
-            {
-              Kg[(A*dim+ii)*(nLocBas*dim) + (B*dim+jj)] +=
-                Q(kk,ii) * Kl[(A*dim+kk)*(nLocBas*dim) + (B*dim+ll)] * Q(ll, jj);
-            }
-          }
+          // Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(kk,ii) * Kl[ (A*dim+kk)*(snLocBas*dim) + (B*dim+ll) ] * Q(ll, jj);
+          Kg[ (nLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(0,ii) * Kl[ (A*dim+0)*(nLocBas*dim) + (B*dim+0) ] * Q(0, jj);
+          Kg[ (nLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(0,ii) * Kl[ (A*dim+0)*(nLocBas*dim) + (B*dim+1) ] * Q(1, jj);
+          Kg[ (nLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(0,ii) * Kl[ (A*dim+0)*(nLocBas*dim) + (B*dim+2) ] * Q(2, jj);
+
+          Kg[ (nLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(1,ii) * Kl[ (A*dim+1)*(nLocBas*dim) + (B*dim+0) ] * Q(0, jj);
+          Kg[ (nLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(1,ii) * Kl[ (A*dim+1)*(nLocBas*dim) + (B*dim+1) ] * Q(1, jj);
+          Kg[ (nLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(1,ii) * Kl[ (A*dim+1)*(nLocBas*dim) + (B*dim+2) ] * Q(2, jj);
+          
+          Kg[ (nLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(2,ii) * Kl[ (A*dim+2)*(nLocBas*dim) + (B*dim+0) ] * Q(0, jj);
+          Kg[ (nLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(2,ii) * Kl[ (A*dim+2)*(nLocBas*dim) + (B*dim+1) ] * Q(1, jj);
+          Kg[ (nLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(2,ii) * Kl[ (A*dim+2)*(nLocBas*dim) + (B*dim+2) ] * Q(2, jj);
+
+          // for(int kk = 0; kk < dim; ++kk)
+          // {
+          //   for(int ll = 0; ll < dim; ++ll)
+          //   {
+          //     Kg[(A*dim+ii)*(nLocBas*dim) + (B*dim+jj)] +=
+          //       Q(kk,ii) * Kl[(A*dim+kk)*(nLocBas*dim) + (B*dim+ll)] * Q(ll, jj);
+          //   }
+          // }
         }
       }
     }
