@@ -1,14 +1,14 @@
-#ifndef PGASSEM_NS_FEM_HPP
-#define PGASSEM_NS_FEM_HPP
+#ifndef PGASSEM_TET_CMM_GENALPHA_HPP
+#define PGASSEM_TET_CMM_GENALPHA_HPP
 // ==================================================================
-// PGAssem_NS_FEM.hpp
+// PGAssem_Tet_CMM_GenAlpha.hpp
 //
 // Parallel golbal assembly based on PETSc, using AIJ matrix format.
 // The assembly routine is designed for classical C0 FEM method, which
 // means we do not need extraction operators and local mesh sizes.
 //
-// The assembly is for the NS equations written in VMS formualtion
-// of NS equations. The input solution vectors contains
+// The assembly is for the CMM-type FSI problem written in VMS formualtion
+// for the NS equations. The input solution vectors contains
 //  [ pressure; velocity ],
 // the dot solution contains
 //  [ dot pressure; dot velcoty ].
@@ -20,11 +20,11 @@
 #include "PETSc_Tools.hpp"
 #include "PDNSolution_NS.hpp"
 
-class PGAssem_NS_FEM : public IPGAssem
+class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
 {
   public:
     // Constructor for NS equations
-    PGAssem_NS_FEM( 
+    PGAssem_Tet_CMM_GenAlpha( 
         IPLocAssem * const &locassem_ptr,
         FEAElement * const &elements,
         const IQuadPts * const &quads,
@@ -38,7 +38,7 @@ class PGAssem_NS_FEM : public IPGAssem
         const int &in_nz_estimate=60 );
 
     // Destructor
-    virtual ~PGAssem_NS_FEM();
+    virtual ~PGAssem_Tet_CMM_GenAlpha();
 
     // Nonzero pattern estimate for the NS equations
     virtual void Assem_nonzero_estimate(
