@@ -1054,7 +1054,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z ); 
 
   const int dim = 3;
-  double f1, f2, f3;
 
   const int face_nqp = quad -> get_num_quadPts();
   const double curr = time + alpha_f * dt;
@@ -1090,12 +1089,14 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
     // Body force acting on the wall
+    double f1, f2, f3;
     get_fw(coor_x, coor_y, coor_z, curr, f1, f2, f3);
 
     // Global-to-local rotation matrix Q
     Matrix_3x3 Q = Matrix_3x3();
     element->get_rotationMatrix(qua, Q);
 
+    // --------------------------------------------------------------
     // Strain displacement matrix B in lamina coords, 5 x (snLocBas * dim)
     double Bl [5 * snLocBas * dim] = {0.0};
     for(int ii=0; ii<snLocBas; ++ii)
@@ -1149,18 +1150,23 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
         {
           for(int jj = 0; jj < dim; ++jj)
           {
-            for(int kk = 0; kk < dim; ++kk)
-            {
-              for(int ll = 0; ll < dim; ++ll)
-              {
-                Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] +=
-                  Q(kk,ii) * Kl[ (A*dim+kk)*(snLocBas*dim) + (B*dim+ll) ] * Q(ll, jj);
-              }
-            }
+            //Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(kk,ii) * Kl[ (A*dim+kk)*(snLocBas*dim) + (B*dim+ll) ] * Q(ll, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(0,ii) * Kl[ (A*dim+0)*(snLocBas*dim) + (B*dim+0) ] * Q(0, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(0,ii) * Kl[ (A*dim+0)*(snLocBas*dim) + (B*dim+1) ] * Q(1, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(0,ii) * Kl[ (A*dim+0)*(snLocBas*dim) + (B*dim+2) ] * Q(2, jj);
+
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(1,ii) * Kl[ (A*dim+1)*(snLocBas*dim) + (B*dim+0) ] * Q(0, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(1,ii) * Kl[ (A*dim+1)*(snLocBas*dim) + (B*dim+1) ] * Q(1, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(1,ii) * Kl[ (A*dim+1)*(snLocBas*dim) + (B*dim+2) ] * Q(2, jj);
+
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(2,ii) * Kl[ (A*dim+2)*(snLocBas*dim) + (B*dim+0) ] * Q(0, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(2,ii) * Kl[ (A*dim+2)*(snLocBas*dim) + (B*dim+1) ] * Q(1, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(2,ii) * Kl[ (A*dim+2)*(snLocBas*dim) + (B*dim+2) ] * Q(2, jj);
           }
         }
       }
     }
+    // --------------------------------------------------------------
 
     // Multiply by displacements in global coords
     // Kg_{ij} * u_{j}
@@ -1202,7 +1208,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z ); 
 
   const int dim = 3;
-  double f1, f2, f3;
 
   const int face_nqp = quad -> get_num_quadPts();
 
@@ -1242,6 +1247,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
     // Body force acting on the wall
+    double f1, f2, f3;
     get_fw(coor_x, coor_y, coor_z, curr, f1, f2, f3);
 
     // Global-to-local rotation matrix Q
@@ -1301,14 +1307,18 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
         {
           for(int jj = 0; jj < dim; ++jj)
           {
-            for(int kk = 0; kk < dim; ++kk)
-            {
-              for(int ll = 0; ll < dim; ++ll)
-              {
-                Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] +=
-                  Q(kk,ii) * Kl[ (A*dim+kk)*(snLocBas*dim) + (B*dim+ll) ] * Q(ll, jj);
-              }
-            }
+            //Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(kk,ii) * Kl[ (A*dim+kk)*(snLocBas*dim) + (B*dim+ll) ] * Q(ll, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(0,ii) * Kl[ (A*dim+0)*(snLocBas*dim) + (B*dim+0) ] * Q(0, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(0,ii) * Kl[ (A*dim+0)*(snLocBas*dim) + (B*dim+1) ] * Q(1, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(0,ii) * Kl[ (A*dim+0)*(snLocBas*dim) + (B*dim+2) ] * Q(2, jj);
+
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(1,ii) * Kl[ (A*dim+1)*(snLocBas*dim) + (B*dim+0) ] * Q(0, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(1,ii) * Kl[ (A*dim+1)*(snLocBas*dim) + (B*dim+1) ] * Q(1, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(1,ii) * Kl[ (A*dim+1)*(snLocBas*dim) + (B*dim+2) ] * Q(2, jj);
+
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(2,ii) * Kl[ (A*dim+2)*(snLocBas*dim) + (B*dim+0) ] * Q(0, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(2,ii) * Kl[ (A*dim+2)*(snLocBas*dim) + (B*dim+1) ] * Q(1, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(2,ii) * Kl[ (A*dim+2)*(snLocBas*dim) + (B*dim+2) ] * Q(2, jj);
           }
         }
       }
