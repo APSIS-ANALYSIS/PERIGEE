@@ -1060,7 +1060,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 
   Zero_sur_Residual();
 
-  for(int qua = 0; qua < face_nqp; ++qua)
+  for(int qua=0; qua<face_nqp; ++qua)
   {
     // For membrane elements, basis function gradients are computed
     // with respect to lamina coords
@@ -1101,11 +1101,11 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     // Stiffness tensor in lamina coords
     // Bl^T * D * Bl = Bl_{ki} * D_{kl} * Bl_{lj}
     double Kl [(snLocBas*dim) * (snLocBas*dim)] = {0.0};
-    for(int A = 0; A < snLocBas; ++A)
+    for(int A=0; A<snLocBas; ++A)
     {
       const double NA_xl = dR_dx[A], NA_yl = dR_dy[A];
 
-      for(int B = 0; B < snLocBas; ++B)
+      for(int B=0; B<snLocBas; ++B)
       {
         const double NB_xl = dR_dx[B], NB_yl = dR_dy[B];
 
@@ -1131,13 +1131,13 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     // theta^T * Kl * theta, where theta = [Q, 0, 0; 0, Q, 0; 0, 0, Q]
     // or Q^T * Kl_[AB] * Q = Q_{ki} * Kl_[AB]{kl} * Q_{lj}
     double Kg [(snLocBas*dim) * (snLocBas*dim)] = {0.0};
-    for(int A = 0; A < snLocBas; ++A)
+    for(int A=0; A<snLocBas; ++A)
     {
-      for(int B = 0; B < snLocBas; ++B)
+      for(int B=0; B<snLocBas; ++B)
       {
-        for(int ii = 0; ii < dim; ++ii)
+        for(int ii=0; ii<dim; ++ii)
         {
-          for(int jj = 0; jj < dim; ++jj)
+          for(int jj=0; jj<dim; ++jj)
           {
             //Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(kk,ii) * Kl[ (A*dim+kk)*(snLocBas*dim) + (B*dim+ll) ] * Q(ll, jj);
             Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(0,ii) * Kl[ (A*dim+0)*(snLocBas*dim) + (B*dim+0) ] * Q(0, jj);
@@ -1206,7 +1206,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 
   Zero_sur_Tangent_Residual();
 
-  for(int qua = 0; qua < face_nqp; ++qua)
+  for(int qua=0; qua<face_nqp; ++qua)
   {
     // For membrane elements, basis function gradients are computed
     // with respect to lamina coords
@@ -1247,11 +1247,11 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     // Stiffness tensor in lamina coords
     // Bl^T * D * Bl = Bl_{ki} * D_{kl} * Bl_{lj}
     double Kl [(snLocBas*dim) * (snLocBas*dim)] = {0.0};
-    for(int A = 0; A < snLocBas; ++A)
+    for(int A=0; A<snLocBas; ++A)
     {
       const double NA_xl = dR_dx[A], NA_yl = dR_dy[A];
 
-      for(int B = 0; B < snLocBas; ++B)
+      for(int B=0; B<snLocBas; ++B)
       {
         const double NB_xl = dR_dx[B], NB_yl = dR_dy[B];
 
@@ -1277,13 +1277,13 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     // theta^T * Kl * theta, where theta = [Q, 0, 0; 0, Q, 0; 0, 0, Q]
     // or Q^T * Kl_[AB] * Q = Q_{ki} * Kl_[AB]{kl} * Q_{lj}
     double Kg [(snLocBas*dim) * (snLocBas*dim)] = {0.0};
-    for(int A = 0; A < snLocBas; ++A)
+    for(int A=0; A<snLocBas; ++A)
     {
-      for(int B = 0; B < snLocBas; ++B)
+      for(int B=0; B<snLocBas; ++B)
       {
-        for(int ii = 0; ii < dim; ++ii)
+        for(int ii=0; ii<dim; ++ii)
         {
-          for(int jj = 0; jj < dim; ++jj)
+          for(int jj=0; jj<dim; ++jj)
           {
             //Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(kk,ii) * Kl[ (A*dim+kk)*(snLocBas*dim) + (B*dim+ll) ] * Q(ll, jj);
             Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(0,ii) * Kl[ (A*dim+0)*(snLocBas*dim) + (B*dim+0) ] * Q(0, jj);
