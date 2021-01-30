@@ -74,7 +74,6 @@ namespace SYS_T
   // Check if a file exists. If a file cannot be found, throw an error
   // message and exit code
   // ----------------------------------------------------------------
-  // TO DO : I want to remove this file_check function
   inline void file_check( const std::string &fName )
   {
     if( FILE *ff = fopen(fName.c_str(), "r") ) fclose(ff);
