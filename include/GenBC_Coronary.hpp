@@ -16,7 +16,7 @@
 //
 // Ra, Ramicro and Rv are resistors for the coronary arteries, coronary 
 // microvasculature and coronary veins, respectively.
-// Ca and Cim are capacitors for proximal and distal vascularturei, 
+// Ca and Cim are capacitors for proximal and distal vascularture, 
 // respectively.
 // Pd and Pim are the distal and intramyocardial pressures, respectively.
 // Intramyocardial pressure Pim is applied to capacitor Cim to model 
@@ -37,7 +37,7 @@
 // <tn> <Pn>
 //-----------------------
 // where n=num_Pim_data. Pim_scaling_coef can be used to scale original pressure Pim.
-// If an RCR is applied to an outlet, set num_Pim_data=0 and ommit Pim data as follows,
+// If an RCR is applied to an outlet, set num_Pim_data=0 and omit Pim data as follows,
 //
 // <outlet_id> <Rp> <C> <Rd> <C> <Rd> <Pd> 0 1.0
 //
@@ -71,6 +71,7 @@ class GenBC_Coronary : public IGenBC
 
     // Get initial P for the ii-th outlet face at the begining of 
     // LPM ODE integration.
+    // 0 <= ii < num_ebc
     virtual double get_P0( const int &ii ) const;
 
     // Set initial values for the LPM ODE integration.
@@ -78,41 +79,54 @@ class GenBC_Coronary : public IGenBC
        const double &in_P_0, const double &curr_time );
 
   private:
-    const int N;
+    const int N; // ODE integrator's number of time steps
 
     const double h; // delta t = Nh
 
     // Parameters used to define difference quotient for get_m.
     const double absTol, relTol;
 
+    // Total number of outlet surfaces
     int num_ebc;
 
     // starting and ending time for integrating the coronary LPM
     double tstart, tend;
 
-    // Vectors storing the Ra, Ca, Ra_micro, Cim, Rv, Pd, Pim scaling
-    // values for all coronary outlet faces. The length of the vectors 
-    // is num_ebc
+    // Vectors storing the Ra, Ca, Ra_micro, Cim, Rv, Pd, and alpha_Pim.
+    // alpha_Pim stores the scaling values for all coronary outlet faces. 
+    // The length of the vectors is num_ebc
     std::vector<double> Ra, Ca, Ra_micro, Cim, Rv, Pd, alpha_Pim;
 
     // Number of intramyocardial pressure Pim data points for each outlet face
-    // The vector length is num_ebc, num_Pimdata=0 indicates an RCR outlet.
+    // The vector length is num_ebc.
+    // Note: num_Pimdata=0 indicates an RCR outlet.
     std::vector<int> num_Pimdata;
 
     // tdata and Pimdata for user-provided intramyocardial pressure 
     // waveform (time-pressure) for each coronary outlet face
-    // Pimderdata for the corresponding dPim/dt for each coronary outlet face.
-    std::vector< std::vector<double> > tdata, Pimdata, Pimderdata;
+    // der_Pimdata for the corresponding dPim/dt for each coronary outlet face.
+    // Their sizes are num_ebc x num_Pimdata[ii] with 0 <= ii < num_ebc 
+    std::vector< std::vector<double> > tdata, Pimdata, der_Pimdata;
 
-    // precomputed dPim/dt needed by RK4
+    // precomputed dPim/dt needed by RK4, 
+    // dPimdt_k1 has size num_ebc x N+1
+    //
+    // NEEDS DOUBLE CHECKING
+    // 
+    // dPimdt_k2/3 has size num_ebc x N
     std::vector< std::vector<double> > dPimdt_k1, dPimdt_k2, dPimdt_k3;
 
     // prev_0D_sol records solutions when each ODE integration is completed.
+    // 
+    // NEEDS DOUBLE CHECKING
+    //
     mutable std::vector< std::vector<double> > prev_0D_sol;
 
     // Vectors for outlet initial flow and capacitor pressures (2 capacitors)
+    // The vector length is num_ebc
     std::vector<double> Q0;
 
+    // The size of Pi0 is 2 x num_ebc
     std::vector< std::vector<double> > Pi0;
 
     // Evaluate the coronary LPM (2 first order ODEs) for the ii-th outlet 
@@ -125,24 +139,31 @@ class GenBC_Coronary : public IGenBC
 
     // Pre-compute dPim/dt at the begining of the ODE integration for the 
     // ii-th outlet face
-    void get_dPimdt( const int &ii);
+    void get_dPimdt( const int &ii );
 
     // Evaluate the derivatives of a piecewise cubic hermite interpolating 
-    // polynomial (PCHIP) between points x1 and x2 with values f1, f2 and 
-    // derivatives d1 and d2 for points xe with a size ne. Outputs: fe
-    void  cubic_hermite_derivative( const double &x1, const double &x2, 
+    // polynomial (e.g. PCHIP) between points x1 and x2 with values f1, f2 and 
+    // derivatives d1 and d2 for points xe in [x1, x2] with the number of points
+    // ne. 
+    // Outputs: fe with length ne. It stores the derivatives of the Hermite
+    // interplation at those xe points.
+    void cubic_hermite_derivative( const double &x1, const double &x2, 
         const double &f1, const double &f2, const double &d1, const double &d2, 
-        const int &ne, const std::vector<double> &xe, std::vector<double> &fe );
+        const int &ne, const std::vector<double> &xe, std::vector<double> &fe ) const;
 
     // Set PCHIP for Pim data for the ii-th outlet face.
-    void set_phcip( const int &ii);
+    // void set_pchip( const int &ii );
 
     // Set derivatives for a PCHIP with user provided points and values.
-    void spline_pchip_set( const int &n, const std::vector<double> &x, 
-        const std::vector<double> &f, std::vector<double> &d);
+    // Input: np is the number of points
+    //        xp is the corresponding (time) point valuesi, with length np
+    //        fp is the corresponding (pressure) point values, with length np
+    // Output: dp stores the derivative at xp, with length np
+    void spline_pchip_set( const int &np, const std::vector<double> &xp, 
+        const std::vector<double> &fp, std::vector<double> &dp );
 
-    // PCHIP sign-testing routine.
-    double pchst( const double &arg1, const double &arg2 ) const;
+    // PCHIP sign-testing routine
+    double pch_sign_testing( const double &arg1, const double &arg2 ) const;
 };
 
 #endif
