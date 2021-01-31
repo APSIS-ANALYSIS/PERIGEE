@@ -3,8 +3,8 @@
 // ==================================================================
 // Vec_Tools.hpp
 // ------------------------------------------------------------------
-// VEC_T namespace contains a suite of useful function for
-// the std::vector object.
+// VEC_T namespace contains a suite of useful function for the 
+// std::vector class.
 // ==================================================================
 #include <iomanip>
 #include <algorithm>
@@ -14,7 +14,9 @@
 
 namespace VEC_T
 {
-  // print int / double vector on screen
+  // print int or double vector on screen.
+  // By default, the separation of the vector entries is \t. User may
+  // switch it to \n.
   template<typename T> void print( const std::vector<T> &vec,
      const char &sep = '\t' )
   {
@@ -23,7 +25,6 @@ namespace VEC_T
     std::cout<<'\n';
   }
  
-  
   // Print the vector with given precision pres 
   template<typename T> void print( const std::vector<T> &vec, 
       const unsigned int pres, const char &sep = '\t' )
@@ -35,7 +36,6 @@ namespace VEC_T
     std::cout.precision(ss);
   }
   
-  
   // Print the vector to a file with given file name
   template<typename T> void print( const std::vector<T> &vec,
       const std::string &file_name, const char &sep = '\t'  )
@@ -46,15 +46,13 @@ namespace VEC_T
     efile.close();
   }
 
-
   // trim the capacity of vector
   template<typename T> void shrink2fit( std::vector<T> &vec )
   {
     std::vector<T>(vec.begin(), vec.end()).swap(vec);
   }
 
-
-  // fill array data into a vector
+  // fill the array data into a vector, with array length len
   template<typename T> void fillArray( std::vector<T> &vec,
       const T * const &input, const int &len )
   {
@@ -64,7 +62,6 @@ namespace VEC_T
     shrink2fit(vec);
   }
 
-
   // insert vec_b at the end of vec_a
   template<typename T> void insert_end( std::vector<T> &vec_a,
       const std::vector<T> &vec_b )
@@ -72,37 +69,9 @@ namespace VEC_T
     vec_a.insert(vec_a.end(), vec_b.begin(), vec_b.end());
   } 
 
-  
   // clean the allocation of a vector
   template<typename T> void clean( std::vector<T> &vec )
   {std::vector<T>().swap(vec);} 
-
-
-  // generate a double vector with random entries
-  // default length is 1, random double in [min=0, max=1]
-  inline void gen_random_double( std::vector<double> &vec,
-      const unsigned int &vec_len = 1, const int &min = 0, 
-      const int &max = 1 )
-  {
-    vec.resize(vec_len);
-    srand(time(NULL));
-    for(unsigned int ii=0; ii<vec_len; ++ii) 
-      vec[ii] = SYS_T::gen_randomD_closed(min, max);
-  }
-
-  
-  // generate a integer vector with random entries,
-  // default length is 1, random int in [min=0, max=1]
-  inline void gen_random_int( std::vector<int> &vec,
-      const unsigned int &vec_len = 1, const int &min = 0,
-      const int &max = 1 )
-  {
-    vec.resize(vec_len);
-    srand(time(NULL));
-    for(unsigned int ii=0; ii<vec_len; ++ii) 
-      vec[ii] = SYS_T::gen_randomI_closed(min, max);
-  }
-
 
   // ----------------------------------------------------------------
   // ! sort_unique_resize
@@ -120,10 +89,10 @@ namespace VEC_T
     vec.resize( ite - vec.begin() );
   }
 
-  
   // ---------------------------------------------------------------- 
   // ! is_invec
-  //   determine if a given value val is in the vector vec.
+  //   determine if a given value val is in the vector vec (return true),
+  //   or not (return false).
   // ---------------------------------------------------------------- 
   template<typename T> bool is_invec( const std::vector<T> &vec, 
       const T &val)
@@ -131,23 +100,6 @@ namespace VEC_T
     auto it = find(vec.begin(), vec.end(), val);
     return it != vec.end();
   }
-
-
-  // ----------------------------------------------------------------
-  // ! is_equal
-  //   determine if two given vectors are the same
-  // ----------------------------------------------------------------
-  template<typename T> bool is_equal( const std::vector<T> &vec_a,
-      const std::vector<T> &vec_b )
-  {
-    if(vec_a.size() != vec_b.size() ) return false;
-    for(unsigned int ii=0; ii<vec_a.size(); ++ii)
-    {
-      if(vec_a[ii] != vec_b[ii]) return false;
-    }
-    return true;
-  }
-
 
   // ----------------------------------------------------------------
   // ! get_pos
@@ -164,7 +116,6 @@ namespace VEC_T
     if( it == vec.end() ) return -1;
     else return it - vec.begin();
   }
-
 
   // -----------------------------------------------------------------
   // ! write_txt
@@ -197,7 +148,9 @@ namespace VEC_T
     std::cout.precision(ss);
   }
 
-
+  // TO-DO for Zinan
+  // The following two funtion should be replaced by a fucntion call of hdf5
+  // reader or writer functions
   // -----------------------------------------------------------------
   // ! write_int_h5
   //   Write an int vector to disk as HDF5 file.
@@ -208,7 +161,6 @@ namespace VEC_T
   void write_int_h5( const char * const &file_name, 
       const char * const &dataname,
       const std::vector<int> &value );
-
 
   // -----------------------------------------------------------------
   // ! read_int_h5

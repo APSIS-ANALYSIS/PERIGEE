@@ -4,11 +4,13 @@
 // HDF5_Writer.hpp
 // 
 // Description:
-// This is an interface for writing int/double scalar/vector/tensor 
-// into HDF5 files.
+// This is a collection of functions for writing int/double scalar/
+// vector/tensor into HDF5 files.
 // 
 // The users should generate a file_id first by calling H5Fcreate or
-// H5Fopen. After the output job is done, the user should call H5Fclose.
+// H5Fopen. After the output job is done by calling the HDF5_Writer member
+// functions, the user should call H5Fclose.
+// 
 // A typical usage is:
 // 
 // hid_t file_id = H5Fcreate(name_of_h5_file, mode, H5P_DEFAULT, H5P_DEFAULT)
@@ -30,7 +32,8 @@
 //
 // For more details, see 
 //      https://support.hdfgroup.org/HDF5/Tutor/crtfile.html
-//
+// 
+// Author: Ju Liu
 // Date: Oct. 23 2013
 // ==================================================================
 #include <iostream>
@@ -81,7 +84,6 @@ class HDF5_Writer
     void write_uintScalar( const hid_t &group_id,
         const char * const &data_name, const unsigned int &value ) const;
 
-    
     // --------------------------------------------------------------
     // Array writer
     //      32-bit Integer writer 
@@ -95,7 +97,6 @@ class HDF5_Writer
     // --- write an int array with given length and saved as /data_name
     void write_intVector( const char * const &data_name, 
         const int * const &value, const int &length ) const;
-
 
     // --------------------------------------------------------------
     // Array writer
@@ -112,7 +113,6 @@ class HDF5_Writer
         const int64_t * const &value, 
         const int64_t &length ) const;
 
-
     // --------------------------------------------------------------
     // Array writer
     //      double array writer
@@ -127,35 +127,29 @@ class HDF5_Writer
     void write_doubleVector( const char * const &data_name,
         const double * const &value, const int &length ) const;
 
-
     // --------------------------------------------------------------
     // std::vector
     // --------------------------------------------------------------
     // --- write an int vector at /group_id/data_name
     void write_intVector( const hid_t &group_id,
         const char * const &data_name, const std::vector<int> &value ) const;
-   
 
     // --- write an int vector at /data_name
     void write_intVector( const char * const &data_name, 
         const std::vector<int> &value ) const;
-   
     
     // --- write an unsigned int vector at /group_id/data_name
     void write_uintVector( const hid_t &group_id,
         const char * const &data_name, 
         const std::vector<unsigned int> &value ) const;
-   
 
     // --- write a double vector at /group_id/data_name
     void write_doubleVector( const hid_t &group_id,
         const char * const &data_name, const std::vector<double> &value ) const;
 
-
     // --- write a double vector at /data_name
     void write_doubleVector( const char * const &data_name, 
         const std::vector<double> &value ) const;
-
 
     // --------------------------------------------------------------
     // Matrix writer
@@ -167,7 +161,6 @@ class HDF5_Writer
     void write_doubleMatrix( const hid_t &group_id, 
         const char * const &data_name, const std::vector<double> &value,
         const int &row_num, const int &col_num ) const;
-
 
     // --------------------------------------------------------------
     // String

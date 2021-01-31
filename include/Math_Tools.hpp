@@ -2,7 +2,7 @@
 #define MATH_TOOLS_HPP
 // ============================================================================
 // Math_Tools.hpp
-// This file defines universal mathematical constants and functions.
+// This file defines mathematical constants and functions.
 //
 // Author: Ju Liu
 // Date: Feb. 13 2016
@@ -19,10 +19,8 @@ namespace MATH_T
   // PI = 3.1415926
   const double PI = atan(1.0) * 4.0;
 
-
   // E = 2.71828
   const double E  = exp(1.0);
-
 
   // Compute the binomial coefficient, e.g.
   // n = 0 : 1                  n = 1 : 1 1
@@ -40,19 +38,16 @@ namespace MATH_T
     return c;
   }
 
-
   // --------------------------------------------------------------------------
   // Useful Functions:
   // --------------------------------------------------------------------------
   // This is the tool to calculate if two double data are within tol
   // default tolerance is 1.0x10^-12. 
   // --------------------------------------------------------------------------
-  inline bool equals( const double &a, const double &b, 
-      const double &tol=1.0e-12 )
+  inline bool equals( const double &a, const double &b, const double &tol=1.0e-12 )
   {
     return ( std::abs(a-b)<tol );
   }
-
 
   // --------------------------------------------------------------------------
   // This function is used to determine if two vector object are identical
@@ -69,62 +64,6 @@ namespace MATH_T
     return true;
   }
   
-
-  // --------------------------------------------------------------------------
-  // Projection operator
-  // --------------------------------------------------------------------------
-  // L2-projection of a function to a piecewise constant (DGP0 space)
-  // f : the function f's value evaluated at nqp quadrature points
-  // gwts : gwts = detJac(i) * w(i) the Jacobian for the element and the
-  //        quadrature weights.
-  // nqp : number of quadrature points
-  // return a scalar Prof(f) := int_omega f dx / int_omega 1 dx
-  //                          = sum(f * gwts) / sum(gwts)
-  // --------------------------------------------------------------------------
-  double L2Proj_DGP0( const double * const &f, 
-      const double * const &gwts, const int &nqp );
-
- 
-  // --------------------------------------------------------------------------
-  // L2-projection of a function to a piecewise linear (DGP1 space) in 2D.
-  // f : the function value evaluated at nqp quadrature points
-  // gwts : gwts = detJac(i) * w(i) the Jacobian for the element and the weights
-  // qp_x : the quadrature points x-coordinates
-  // qp_y : the quadrature points y-coordinates
-  // nqp : the number of quadrature points
-  // output: coeff_0, coeff_x, coeff_y.
-  // The projected polynomial is
-  //         coeff_0 + coeff_x x + coeff_y y.
-  // --------------------------------------------------------------------------
-  void L2Proj_DGP1_2D( const double * const &f,
-      const double * const &gwts,
-      const double * const &qp_x,
-      const double * const &qp_y,
-      const int &nqp,
-      double &coeff_0, double &coeff_x, double &coeff_y );
-
- 
-  // --------------------------------------------------------------------------
-  // L2-projection of a function to a piecewise linear (DGP1 space) in 3D.
-  // f : the function value evaluated at nqp quadrature points
-  // gwts : gwts = detJac(i) * w(i) the Jacobian for the element and the weights
-  // qp_x : the quadrature points x-coordinates
-  // qp_y : the quadrature points y-coordinates
-  // qp_z : the quadrature points z-coordinates
-  // nqp : the number of quadrature points
-  // output: coeff_0, coeff_x, coeff_y, coeff_z.
-  // The projected polynomial is
-  //         coeff_0 + coeff_x x + coeff_y y + coeff_z z.
-  // --------------------------------------------------------------------------
-  void L2Proj_DGP1_3D( const double * const &f,
-      const double * const &gwts,
-      const double * const &qp_x,
-      const double * const &qp_y,
-      const double * const &qp_z,
-      const int &nqp,
-      double &coeff_0, double &coeff_x, double &coeff_y, double &coeff_z );
-
-
   // --------------------------------------------------------------------------
   // Cross product of two 3D vectors
   // Input: u = (u1, u2, u3)
@@ -140,7 +79,6 @@ namespace MATH_T
     w3 = u1 * v2 - u2 * v1;
   }
 
-
   // --------------------------------------------------------------------------
   // Dot product of two 3D vectors
   // Input: u = (u1, u2, u3)
@@ -152,7 +90,6 @@ namespace MATH_T
   {
     return u1*v1 + u2*v2 + u3*v3; 
   }
-
 
   // --------------------------------------------------------------------------
   // Normalize 3D vector
@@ -168,7 +105,6 @@ namespace MATH_T
 
     return len;
   }
-
 
   inline double norm2(const double &x, const double &y, const double &z)
   {
@@ -200,7 +136,6 @@ namespace MATH_T
       const double &z0, const double &z1, const double &z2, 
       const double &z3, double &x, double &y, double &z, double &r );
 
-
   // ----------------------------------------------------------------
   // Statistical quantities
   // Mean value
@@ -217,12 +152,10 @@ namespace MATH_T
     return sum / nn;
   }
 
-  
   // ----------------------------------------------------------------
   // Standard deviation
   // ----------------------------------------------------------------
   double get_std_dev( const std::vector<double> &vec );
-  
   
   // ----------------------------------------------------------------
   // Generate a Gaussian distribution vector with length n, mean value
@@ -233,12 +166,62 @@ namespace MATH_T
   void gen_Gaussian( const int &n, const double &mean, const double &std,
       std::vector<double> &val );
 
-  
   // ----------------------------------------------------------------
   // Print Histogram of an array of random vector
   // ----------------------------------------------------------------
   void print_Histogram( const std::vector<double> &val );
 
+  // --------------------------------------------------------------------------
+  // Projection operator
+  // --------------------------------------------------------------------------
+  // L2-projection of a function to a piecewise constant (DGP0 space)
+  // f : the function f's value evaluated at nqp quadrature points
+  // gwts : gwts = detJac(i) * w(i) the Jacobian for the element and the
+  //        quadrature weights.
+  // nqp : number of quadrature points
+  // return a scalar Prof(f) := int_omega f dx / int_omega 1 dx
+  //                          = sum(f * gwts) / sum(gwts)
+  // --------------------------------------------------------------------------
+  double L2Proj_DGP0( const double * const &f, 
+      const double * const &gwts, const int &nqp );
+
+  // --------------------------------------------------------------------------
+  // L2-projection of a function to a piecewise linear (DGP1 space) in 2D.
+  // f : the function value evaluated at nqp quadrature points
+  // gwts : gwts = detJac(i) * w(i) the Jacobian for the element and the weights
+  // qp_x : the quadrature points x-coordinates
+  // qp_y : the quadrature points y-coordinates
+  // nqp : the number of quadrature points
+  // output: coeff_0, coeff_x, coeff_y.
+  // The projected polynomial is
+  //         coeff_0 + coeff_x x + coeff_y y.
+  // --------------------------------------------------------------------------
+  void L2Proj_DGP1_2D( const double * const &f,
+      const double * const &gwts,
+      const double * const &qp_x,
+      const double * const &qp_y,
+      const int &nqp,
+      double &coeff_0, double &coeff_x, double &coeff_y );
+
+  // --------------------------------------------------------------------------
+  // L2-projection of a function to a piecewise linear (DGP1 space) in 3D.
+  // f : the function value evaluated at nqp quadrature points
+  // gwts : gwts = detJac(i) * w(i) the Jacobian for the element and the weights
+  // qp_x : the quadrature points x-coordinates
+  // qp_y : the quadrature points y-coordinates
+  // qp_z : the quadrature points z-coordinates
+  // nqp : the number of quadrature points
+  // output: coeff_0, coeff_x, coeff_y, coeff_z.
+  // The projected polynomial is
+  //         coeff_0 + coeff_x x + coeff_y y + coeff_z z.
+  // --------------------------------------------------------------------------
+  void L2Proj_DGP1_3D( const double * const &f,
+      const double * const &gwts,
+      const double * const &qp_x,
+      const double * const &qp_y,
+      const double * const &qp_z,
+      const int &nqp,
+      double &coeff_0, double &coeff_x, double &coeff_y, double &coeff_z );
 
   // ================================================================
   // Dense Matrix tool
@@ -396,7 +379,6 @@ namespace MATH_T
       virtual void LDLt_solve( double const * const &b, 
           double * const &x ) const;
       // ------------------------------------------------------------
-  
   };
 }
 

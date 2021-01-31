@@ -5,12 +5,13 @@ PLocAssem_Tet_CMM_GenAlpha::PLocAssem_Tet_CMM_GenAlpha(
         const int &in_nlocbas, const int &in_nqp,
         const int &in_snlocbas,
         const double &in_rho, const double &in_vis_mu,
-        const double &in_beta, const double &in_ctauc, 
-        const int &elemtype )
+        const double &in_beta, const double &in_wall_rho,
+        const double &in_nu, const double &in_kappa,
+        const double &in_ctauc, const int &elemtype )
 : rho0( in_rho ), vis_mu( in_vis_mu ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
-  gamma(tm_gAlpha->get_gamma()), beta(in_beta), nqp(in_nqp),
-  Ctauc( in_ctauc )
+  gamma(tm_gAlpha->get_gamma()), beta(in_beta), rho_w(in_wall_rho),
+  nu_w(in_nu), kappa_w(in_kappa), nqp(in_nqp), Ctauc( in_ctauc )
 {
   if(elemtype == 501)
   {
@@ -1039,6 +1040,7 @@ void PLocAssem_Tet_CMM_GenAlpha::get_pressure_area(
 
 
 void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
+    const double &time, const double &dt,
     const double * const &dot_sol,
     const double * const &sol_wall_disp,
     FEAElement * const &element,
@@ -1051,10 +1053,136 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z ); 
 
+  const int dim = 3;
+
+  const int face_nqp = quad -> get_num_quadPts();
+  const double curr = time + alpha_f * dt;
+
+  Zero_sur_Residual();
+
+  for(int qua=0; qua<face_nqp; ++qua)
+  {
+    // For membrane elements, basis function gradients are computed
+    // with respect to lamina coords
+    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
+
+    double u_t = 0.0, v_t = 0.0, w_t = 0.0;
+    double h_w = 0.0, E_w = 0.0;
+    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      const int ii4 = 4 * ii;
+
+      u_t += dot_sol[ii4+1] * R[ii];
+      v_t += dot_sol[ii4+2] * R[ii];
+      w_t += dot_sol[ii4+3] * R[ii];
+
+      h_w += ele_thickness[ii] * R[ii];
+      E_w += ele_youngsmod[ii] * R[ii];
+
+      coor_x += eleCtrlPts_x[ii] * R[ii];
+      coor_y += eleCtrlPts_y[ii] * R[ii];
+      coor_z += eleCtrlPts_z[ii] * R[ii];
+    }
+
+    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
+
+    // Body force acting on the wall
+    double f1, f2, f3;
+    get_fw(coor_x, coor_y, coor_z, curr, f1, f2, f3);
+
+    // Global-to-local rotation matrix Q
+    Matrix_3x3 Q = Matrix_3x3();
+    element->get_rotationMatrix(qua, Q);
+
+    const double coef = E_w / (1.0 - nu_w * nu_w);
+
+    // Stiffness tensor in lamina coords
+    // Bl^T * D * Bl = Bl_{ki} * D_{kl} * Bl_{lj}
+    double Kl [(snLocBas*dim) * (snLocBas*dim)] = {0.0};
+    for(int A=0; A<snLocBas; ++A)
+    {
+      const double NA_xl = dR_dx[A], NA_yl = dR_dy[A];
+
+      for(int B=0; B<snLocBas; ++B)
+      {
+        const double NB_xl = dR_dx[B], NB_yl = dR_dy[B];
+
+        // Momentum-x with respect to u1, u2 
+        Kl[(snLocBas*dim)*(A*dim) + (B*dim)]     += coef * ( NA_xl * NB_xl
+            + 0.5*(1.0-nu_w) * NA_yl * NB_yl );
+        Kl[(snLocBas*dim)*(A*dim) + (B*dim+1)]   += coef * ( nu_w * NA_xl * NB_yl
+            + 0.5*(1.0-nu_w) * NA_yl * NB_xl );
+
+        // Momentum-y with respect to u1, u2 
+        Kl[(snLocBas*dim)*(A*dim+1) + (B*dim)]   += coef * ( nu_w * NA_yl * NB_xl
+            + 0.5*(1.0-nu_w) * NA_xl * NB_yl );
+        Kl[(snLocBas*dim)*(A*dim+1) + (B*dim+1)] += coef * ( NA_yl * NB_yl
+            + 0.5*(1.0-nu_w) * NA_xl * NB_xl );
+
+        // Momentum-z with respect to u3 
+        Kl[(snLocBas*dim)*(A*dim+2) + (B*dim+2)] += coef * 0.5*kappa_w*(1.0-nu_w) * (
+            NA_xl * NB_xl + NA_yl * NB_yl );
+      }
+    }
+
+    // Stiffness tensor in global coords
+    // theta^T * Kl * theta, where theta = [Q, 0, 0; 0, Q, 0; 0, 0, Q]
+    // or Q^T * Kl_[AB] * Q = Q_{ki} * Kl_[AB]{kl} * Q_{lj}
+    double Kg [(snLocBas*dim) * (snLocBas*dim)] = {0.0};
+    for(int A=0; A<snLocBas; ++A)
+    {
+      for(int B=0; B<snLocBas; ++B)
+      {
+        for(int ii=0; ii<dim; ++ii)
+        {
+          for(int jj=0; jj<dim; ++jj)
+          {
+            //Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(kk,ii) * Kl[ (A*dim+kk)*(snLocBas*dim) + (B*dim+ll) ] * Q(ll, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(0,ii) * Kl[ (A*dim+0)*(snLocBas*dim) + (B*dim+0) ] * Q(0, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(0,ii) * Kl[ (A*dim+0)*(snLocBas*dim) + (B*dim+1) ] * Q(1, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(0,ii) * Kl[ (A*dim+0)*(snLocBas*dim) + (B*dim+2) ] * Q(2, jj);
+
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(1,ii) * Kl[ (A*dim+1)*(snLocBas*dim) + (B*dim+0) ] * Q(0, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(1,ii) * Kl[ (A*dim+1)*(snLocBas*dim) + (B*dim+1) ] * Q(1, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(1,ii) * Kl[ (A*dim+1)*(snLocBas*dim) + (B*dim+2) ] * Q(2, jj);
+
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(2,ii) * Kl[ (A*dim+2)*(snLocBas*dim) + (B*dim+0) ] * Q(0, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(2,ii) * Kl[ (A*dim+2)*(snLocBas*dim) + (B*dim+1) ] * Q(1, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(2,ii) * Kl[ (A*dim+2)*(snLocBas*dim) + (B*dim+2) ] * Q(2, jj);
+          }
+        }
+      }
+    }
+    
+    // Multiply by displacements in global coords
+    // Kg_{ij} * u_{j}
+    double lin_elasticity [snLocBas * dim ] = {0.0};
+    for(int ii=0; ii<snLocBas*dim; ++ii)
+    {
+      for(int jj=0; jj<snLocBas*dim; ++jj)
+      {
+        lin_elasticity[ii] += Kg[ (snLocBas*dim)*ii + jj ] * sol_wall_disp[jj];
+      }
+    } 
+
+    for(int A=0; A<snLocBas; ++A)
+    {
+      sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * u_t - R[A] * rho_w * f1
+          + lin_elasticity[dim*A] ); 
+      sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * v_t - R[A] * rho_w * f2
+          + lin_elasticity[dim*A+1] ); 
+      sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * w_t - R[A] * rho_w * f3
+          + lin_elasticity[dim*A+2] ); 
+    }
+
+  } // end qua loop
 }
 
 
 void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
+    const double &time, const double &dt,
     const double * const &dot_sol,
     const double * const &sol_wall_disp,
     FEAElement * const &element,
@@ -1066,6 +1194,173 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     const IQuadPts * const &quad )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z ); 
+
+  const int dim = 3;
+
+  const int face_nqp = quad -> get_num_quadPts();
+
+  const double dd_dv = alpha_f * gamma * dt;
+  const double dd_du = dd_dv * dd_dv / alpha_m;
+
+  const double curr = time + alpha_f * dt;
+
+  Zero_sur_Tangent_Residual();
+
+  for(int qua=0; qua<face_nqp; ++qua)
+  {
+    // For membrane elements, basis function gradients are computed
+    // with respect to lamina coords
+    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
+
+    double u_t = 0.0, v_t = 0.0, w_t = 0.0;
+    double h_w = 0.0, E_w = 0.0;
+    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      const int ii4 = 4 * ii;
+
+      u_t += dot_sol[ii4+1] * R[ii];
+      v_t += dot_sol[ii4+2] * R[ii];
+      w_t += dot_sol[ii4+3] * R[ii];
+
+      h_w += ele_thickness[ii] * R[ii];
+      E_w += ele_youngsmod[ii] * R[ii];
+
+      coor_x += eleCtrlPts_x[ii] * R[ii];
+      coor_y += eleCtrlPts_y[ii] * R[ii];
+      coor_z += eleCtrlPts_z[ii] * R[ii];
+    }
+
+    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
+
+    // Body force acting on the wall
+    double f1, f2, f3;
+    get_fw(coor_x, coor_y, coor_z, curr, f1, f2, f3);
+
+    // Global-to-local rotation matrix Q
+    Matrix_3x3 Q = Matrix_3x3();
+    element->get_rotationMatrix(qua, Q);
+
+    const double coef = E_w / (1.0 - nu_w * nu_w);
+
+    // Stiffness tensor in lamina coords
+    // Bl^T * D * Bl = Bl_{ki} * D_{kl} * Bl_{lj}
+    double Kl [(snLocBas*dim) * (snLocBas*dim)] = {0.0};
+    for(int A=0; A<snLocBas; ++A)
+    {
+      const double NA_xl = dR_dx[A], NA_yl = dR_dy[A];
+
+      for(int B=0; B<snLocBas; ++B)
+      {
+        const double NB_xl = dR_dx[B], NB_yl = dR_dy[B];
+
+        // Momentum-x with respect to u1, u2 
+        Kl[(snLocBas*dim)*(A*dim) + (B*dim)]     += coef * ( NA_xl * NB_xl
+            + 0.5*(1.0-nu_w) * NA_yl * NB_yl );
+        Kl[(snLocBas*dim)*(A*dim) + (B*dim+1)]   += coef * ( nu_w * NA_xl * NB_yl
+            + 0.5*(1.0-nu_w) * NA_yl * NB_xl );
+
+        // Momentum-y with respect to u1, u2 
+        Kl[(snLocBas*dim)*(A*dim+1) + (B*dim)]   += coef * ( nu_w * NA_yl * NB_xl
+            + 0.5*(1.0-nu_w) * NA_xl * NB_yl );
+        Kl[(snLocBas*dim)*(A*dim+1) + (B*dim+1)] += coef * ( NA_yl * NB_yl
+            + 0.5*(1.0-nu_w) * NA_xl * NB_xl );
+
+        // Momentum-z with respect to u3 
+        Kl[(snLocBas*dim)*(A*dim+2) + (B*dim+2)] += coef * 0.5*kappa_w*(1.0-nu_w) * (
+            NA_xl * NB_xl + NA_yl * NB_yl );
+      }
+    }
+
+    // Stiffness tensor in global coords
+    // theta^T * Kl * theta, where theta = [Q, 0, 0; 0, Q, 0; 0, 0, Q]
+    // or Q^T * Kl_[AB] * Q = Q_{ki} * Kl_[AB]{kl} * Q_{lj}
+    double Kg [(snLocBas*dim) * (snLocBas*dim)] = {0.0};
+    for(int A=0; A<snLocBas; ++A)
+    {
+      for(int B=0; B<snLocBas; ++B)
+      {
+        for(int ii=0; ii<dim; ++ii)
+        {
+          for(int jj=0; jj<dim; ++jj)
+          {
+            //Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(kk,ii) * Kl[ (A*dim+kk)*(snLocBas*dim) + (B*dim+ll) ] * Q(ll, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(0,ii) * Kl[ (A*dim+0)*(snLocBas*dim) + (B*dim+0) ] * Q(0, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(0,ii) * Kl[ (A*dim+0)*(snLocBas*dim) + (B*dim+1) ] * Q(1, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(0,ii) * Kl[ (A*dim+0)*(snLocBas*dim) + (B*dim+2) ] * Q(2, jj);
+
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(1,ii) * Kl[ (A*dim+1)*(snLocBas*dim) + (B*dim+0) ] * Q(0, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(1,ii) * Kl[ (A*dim+1)*(snLocBas*dim) + (B*dim+1) ] * Q(1, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(1,ii) * Kl[ (A*dim+1)*(snLocBas*dim) + (B*dim+2) ] * Q(2, jj);
+
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(2,ii) * Kl[ (A*dim+2)*(snLocBas*dim) + (B*dim+0) ] * Q(0, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(2,ii) * Kl[ (A*dim+2)*(snLocBas*dim) + (B*dim+1) ] * Q(1, jj);
+            Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(2,ii) * Kl[ (A*dim+2)*(snLocBas*dim) + (B*dim+2) ] * Q(2, jj);
+          }
+        }
+      }
+    }
+
+    // Multiply by displacements in global coords
+    // Kg_{ij} * u_{j}
+    double lin_elasticity [snLocBas * dim ] = {0.0};
+    for(int ii=0; ii<snLocBas*dim; ++ii)
+    {
+      for(int jj=0; jj<snLocBas*dim; ++jj)
+      {
+        lin_elasticity[ii] += Kg[(snLocBas*dim)*ii + jj] * sol_wall_disp[jj];
+      }
+    } 
+
+    for(int A=0; A<snLocBas; ++A)
+    {
+      sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * u_t - R[A] * rho_w * f1
+          + lin_elasticity[dim*A] ); 
+      sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * v_t - R[A] * rho_w * f2
+          + lin_elasticity[dim*A+1] ); 
+      sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * w_t - R[A] * rho_w * f3
+          + lin_elasticity[dim*A+2] ); 
+
+      for(int B=0; B<nLocBas; ++B)
+      {
+        // Momentum-x with respect to u, v, w
+        sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+1 ] += gwts * h_w * (
+            alpha_m * rho_w * R[A] * R[B]
+            + dd_du * Kg[ (snLocBas*dim)*(A*dim) + (B*dim) ] );
+
+        sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+2 ] += gwts * h_w * (
+            dd_du * Kg[ (snLocBas*dim)*(A*dim) + (B*dim+1) ] );
+
+        sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+3 ] += gwts * h_w * (
+            dd_du * Kg[ (snLocBas*dim)*(A*dim) + (B*dim+2) ] );
+
+        // Momentum-y with respect to u, v, w
+        sur_Tangent[ 4*snLocBas*(4*A+2) + 4*B+1 ] += gwts * h_w * (
+            dd_du * Kg[ (snLocBas*dim)*(A*dim+1) + (B*dim) ] );
+
+        sur_Tangent[ 4*snLocBas*(4*A+2) + 4*B+2 ] += gwts * h_w * (
+            alpha_m * rho_w * R[A] * R[B]
+            + dd_du * Kg[ (snLocBas*dim)*(A*dim+1) + (B*dim+1) ] );
+
+        sur_Tangent[ 4*snLocBas*(4*A+2) + 4*B+3 ] += gwts * h_w * (
+            dd_du * Kg[ (snLocBas*dim)*(A*dim+1) + (B*dim+2) ] );
+
+        // Momentum-z with respect to u, v, w
+        sur_Tangent[ 4*snLocBas*(4*A+3) + 4*B+1 ] += gwts * h_w * (
+            dd_du * Kg[ (snLocBas*dim)*(A*dim+2) + (B*dim) ] );
+
+        sur_Tangent[ 4*snLocBas*(4*A+3) + 4*B+2 ] += gwts * h_w * (
+            dd_du * Kg[ (snLocBas*dim)*(A*dim+2) + (B*dim+1) ] );
+
+        sur_Tangent[ 4*snLocBas*(4*A+3) + 4*B+3 ] += gwts * h_w * (
+            alpha_m * rho_w * R[A] * R[B]
+            + dd_du * Kg[ (snLocBas*dim)*(A*dim+2) + (B*dim+2) ] );
+
+
+      } // end B loop
+    } // end A loop
+  } // end qua loop
 
 }
 

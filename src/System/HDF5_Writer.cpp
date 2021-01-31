@@ -2,8 +2,7 @@
 
 HDF5_Writer::HDF5_Writer( const hid_t &in_file_id )
 : file_id(in_file_id)
-{
-}
+{}
 
 HDF5_Writer::~HDF5_Writer()
 {}
@@ -29,7 +28,6 @@ void HDF5_Writer::write_intScalar( const hid_t &group_id,
   H5Sclose( dataspace );
 }
 
-
 void HDF5_Writer::write_intScalar( const char * const &data_name,
     const int &value ) const
 {
@@ -51,7 +49,6 @@ void HDF5_Writer::write_intScalar( const char * const &data_name,
   H5Sclose( dataspace );
 }
 
-
 void HDF5_Writer::write_int64Scalar( const char * const &data_name,
     const int64_t &value ) const
 {
@@ -72,7 +69,6 @@ void HDF5_Writer::write_int64Scalar( const char * const &data_name,
   H5Dclose( dataset );
   H5Sclose( dataspace );
 }
-
 
 void HDF5_Writer::write_uintScalar( 
     const hid_t &group_id, const char * const &data_name,
@@ -96,7 +92,6 @@ void HDF5_Writer::write_uintScalar(
   H5Sclose( dataspace );
 }
 
-
 void HDF5_Writer::write_doubleScalar( const hid_t &group_id,
     const char * const &data_name, const double &value ) const
 {
@@ -115,7 +110,6 @@ void HDF5_Writer::write_doubleScalar( const hid_t &group_id,
   H5Dclose( dataset );
   H5Sclose( dataspace );
 }
-
 
 void HDF5_Writer::write_doubleScalar( const char * const &data_name,
     const double &value ) const
@@ -158,7 +152,6 @@ void HDF5_Writer::write_intVector( const hid_t & group_id,
   }
 }
 
-
 void HDF5_Writer::write_intVector( const char * const &data_name, 
     const std::vector<int> &value ) const
 {
@@ -181,7 +174,6 @@ void HDF5_Writer::write_intVector( const char * const &data_name,
   }
 }
 
-
 void HDF5_Writer::write_uintVector( const hid_t & group_id,
     const char * const &data_name, const std::vector<unsigned int> &value ) const
 {
@@ -203,7 +195,6 @@ void HDF5_Writer::write_uintVector( const hid_t & group_id,
     H5Sclose( dataspace );
   }
 }
-
 
 void HDF5_Writer::write_intVector( const hid_t & group_id,
     const char * const &data_name, const int * const &value, 
@@ -228,7 +219,6 @@ void HDF5_Writer::write_intVector( const hid_t & group_id,
   }
 }
 
-
 void HDF5_Writer::write_intVector( const char * const &data_name, 
     const int * const  &value,
     const int &length ) const
@@ -252,7 +242,6 @@ void HDF5_Writer::write_intVector( const char * const &data_name,
   }
 }
 
-
 void HDF5_Writer::write_int64Vector( const hid_t & group_id,
     const char * const &data_name, 
     const int64_t * const &value, const int64_t &length ) const
@@ -274,7 +263,6 @@ void HDF5_Writer::write_int64Vector( const hid_t & group_id,
     H5Sclose( dataspace );
   }
 }
-
 
 void HDF5_Writer::write_int64Vector( const char * const &data_name, 
     const int64_t * const  &value,
@@ -299,7 +287,6 @@ void HDF5_Writer::write_int64Vector( const char * const &data_name,
   }
 }
 
-
 void HDF5_Writer::write_doubleVector( const hid_t &group_id,
     const char * const &data_name,
     const double * const &value, const int &length ) const
@@ -322,7 +309,6 @@ void HDF5_Writer::write_doubleVector( const hid_t &group_id,
   }
 }
 
-
 void HDF5_Writer::write_doubleVector( const char * const &data_name,
     const double * const &value, const int &length ) const
 {
@@ -343,7 +329,6 @@ void HDF5_Writer::write_doubleVector( const char * const &data_name,
     H5Sclose( dataspace );
   }
 }
-
 
 void HDF5_Writer::write_doubleVector( const hid_t & group_id,
     const char * const &data_name, const std::vector<double> &value ) const
@@ -367,7 +352,6 @@ void HDF5_Writer::write_doubleVector( const hid_t & group_id,
   }
 }
 
-
 void HDF5_Writer::write_doubleVector( const char * const &data_name, const std::vector<double> &value ) const
 {
   hsize_t dims[1]; dims[0] = value.size();
@@ -388,7 +372,6 @@ void HDF5_Writer::write_doubleVector( const char * const &data_name, const std::
     H5Sclose( dataspace );
   }
 }
-
 
 void HDF5_Writer::write_intMatrix( const hid_t &group_id,
     const char * const &data_name, const std::vector<int> &value,
@@ -447,7 +430,6 @@ void HDF5_Writer::write_doubleMatrix( const hid_t &group_id,
   }
 }
 
-
 void HDF5_Writer::write_string( const char * const &data_name, 
     const std::string &string_input ) const
 {
@@ -469,7 +451,6 @@ void HDF5_Writer::write_string( const char * const &data_name,
   H5Sclose( dataspace );
   H5Tclose( datatype );
 }
-
 
 void HDF5_Writer::write_string( const hid_t &group_id,
     const char * const &data_name, 
@@ -493,6 +474,5 @@ void HDF5_Writer::write_string( const hid_t &group_id,
   H5Sclose( dataspace );
   H5Tclose( datatype );
 }
-
 
 // EOF

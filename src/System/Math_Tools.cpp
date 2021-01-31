@@ -12,7 +12,6 @@ double MATH_T::L2Proj_DGP0( const double * const &f,
   return sum_top / sum_bot;
 }
 
-
 void MATH_T::L2Proj_DGP1_2D( const double * const &f,
     const double * const &gwts,
     const double * const &qp_x,
@@ -45,8 +44,6 @@ void MATH_T::L2Proj_DGP1_2D( const double * const &f,
 
   AA.LU_solve(b[0], b[1], b[2], coeff_0, coeff_x, coeff_y);
 }
-
-
 
 void MATH_T::L2Proj_DGP1_3D( const double * const &f,
     const double * const &gwts,
@@ -93,7 +90,6 @@ void MATH_T::L2Proj_DGP1_3D( const double * const &f,
   coeff_0 = out[0]; coeff_x = out[1]; coeff_y = out[2]; coeff_z = out[3];
 }
 
-
 void MATH_T::get_n_from_t( 
     const double &tx, const double &ty, const double &tz,
     const double &p0_x, const double &p0_y, const double &p0_z,
@@ -118,7 +114,6 @@ void MATH_T::get_n_from_t(
   nz = nz / len;
 }
 
-
 void MATH_T::get_tet_sphere_info( const double &x0, const double &x1,
     const double &x2, const double &x3, const double &y0,
     const double &y1, const double &y2, const double &y3,
@@ -141,7 +136,6 @@ void MATH_T::get_tet_sphere_info( const double &x0, const double &x1,
 
   r = sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0) );
 }
-
 
 double MATH_T::get_std_dev( const std::vector<double> &vec )
 {
@@ -176,7 +170,6 @@ void MATH_T::gen_Gaussian( const int &n, const double &mean,
     val[ii+1] = mean + std * y * f;
   }
 }
-
 
 void MATH_T::print_Histogram( const std::vector<double> &val )
 {
@@ -217,7 +210,6 @@ void MATH_T::print_Histogram( const std::vector<double> &val )
     free(bins);
   }
 }
-
 
 namespace MATH_T
 {
@@ -516,7 +508,6 @@ namespace MATH_T
     }
   }
 
-
   void Matrix_SymPos_dense::copy( const Matrix_SymPos_dense * const &in_mat )
   {
     for(int ii=0; ii<NN; ++ii) mat[ii] = in_mat->get_mat(ii);
@@ -528,7 +519,6 @@ namespace MATH_T
     }
     is_fac = false; 
   }
-
 
   void Matrix_SymPos_dense::LDLt_fac()
   {
@@ -555,7 +545,6 @@ namespace MATH_T
     is_fac = true;
   }
 
-
   void Matrix_SymPos_dense::LDLt_solve( double const * const &b,
       double * const &x ) const
   {
@@ -575,8 +564,6 @@ namespace MATH_T
       for(int jj=ii+1; jj<N; ++jj) x[ii] -= mat[jj*N+ii] * x[jj];
     }
   }
-
 }
-// End of Namespace Math_T::
-
+// End of Namespace Math_T
 // EOF

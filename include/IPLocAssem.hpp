@@ -838,10 +838,16 @@ class IPLocAssem
     {SYS_T::commPrint("Warning: this Assem_Residual_EBC_Resistance is not implemented.\n");}
 
 
-    // Perform elemental BC surface integration for `lumen' wall formulations,
-    // which can be used in FSI problems where the fluid is coupled with a
-    // thin-walled structure like membrane/shells. 
+    // Perform elemental BC surface integration for the coupled momentum FSI method, in which
+    // the fluid is coupled with a thin-walled membrane formulation for the vascular wall. 
+    // \para dot_sol:       dot pressure, dot velocity
+    // \para sol_wall_disp: wall displacement
+    // \para element:       container for membrane element. Only requires nodal x,y,z-coordinates
+    //                      and the surface quadrature rule to generate basis functions.
+    // \para ele_thickness: wall thickness
+    // \para ele_youngsmod: wall youngsmod
     virtual void Assem_Residual_EBC_Wall(
+        const double &time, const double &dt,
         const double * const &dot_sol,
         const double * const &sol_wall_disp,
         FEAElement * const &element,
@@ -854,6 +860,7 @@ class IPLocAssem
     {SYS_T::commPrint("Warning: this Assem_Residual_EBC_Wall is not implemented.\n");}
 
     virtual void Assem_Tangent_Residual_EBC_Wall(
+        const double &time, const double &dt,
         const double * const &dot_sol,
         const double * const &sol_wall_disp,
         FEAElement * const &element,

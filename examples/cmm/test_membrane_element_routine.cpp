@@ -11,7 +11,7 @@ void print_2Darray(const double * const arr, const int nrow,
 int main( int argc, char * argv[] )
 {
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-  const int nLocBas = 6;
+  const int nLocBas = 3;
   const int dim     = 3;
   int numpt;
 
@@ -113,20 +113,20 @@ int main( int argc, char * argv[] )
 
   elem -> get_gradR(qua, dR_dxl, dR_dyl);
 
-  // Strain displacement matrix B in lamina coords
-  // 5 x (nLocBas * dim)
-  double Bl [5 * nLocBas * dim] = {0.0};
-  for(int ii = 0; ii < nLocBas; ++ii)
-  {
-    Bl[0*nLocBas*dim + ii*dim]     = dR_dxl[ii]; // u1,1
-    Bl[1*nLocBas*dim + ii*dim + 1] = dR_dyl[ii]; // u2,2
-    Bl[2*nLocBas*dim + ii*dim]     = dR_dyl[ii]; // u1,2
-    Bl[2*nLocBas*dim + ii*dim + 1] = dR_dxl[ii]; // u2,1
-    Bl[3*nLocBas*dim + ii*dim + 2] = dR_dxl[ii]; // u3,1
-    Bl[4*nLocBas*dim + ii*dim + 2] = dR_dyl[ii]; // u3,2
-  }
-  std::cout << "\n====== B in lamina coords ======" << std::endl;
-  print_2Darray(Bl, 5, nLocBas * dim);
+  // // Strain displacement matrix B in lamina coords
+  // // 5 x (nLocBas * dim)
+  // double Bl [5 * nLocBas * dim] = {0.0};
+  // for(int ii = 0; ii < nLocBas; ++ii)
+  // {
+  //   Bl[0*nLocBas*dim + ii*dim]     = dR_dxl[ii]; // u1,1
+  //   Bl[1*nLocBas*dim + ii*dim + 1] = dR_dyl[ii]; // u2,2
+  //   Bl[2*nLocBas*dim + ii*dim]     = dR_dyl[ii]; // u1,2
+  //   Bl[2*nLocBas*dim + ii*dim + 1] = dR_dxl[ii]; // u2,1
+  //   Bl[3*nLocBas*dim + ii*dim + 2] = dR_dxl[ii]; // u3,1
+  //   Bl[4*nLocBas*dim + ii*dim + 2] = dR_dyl[ii]; // u3,2
+  // }
+  // std::cout << "\n====== B in lamina coords ======" << std::endl;
+  // print_2Darray(Bl, 5, nLocBas * dim);
 
   // Elasticity tensor D
   const double nu    = 0.5;
@@ -134,34 +134,62 @@ int main( int argc, char * argv[] )
   const double E     = 2500000;
   const double coef  = E / (1.0 - nu*nu);
 
-  double D[5 * 5] = {0.0};
-  D[0*5 + 0] = coef * 1.0;
-  D[0*5 + 1] = coef * nu;
-  D[1*5 + 0] = coef * nu;
-  D[1*5 + 1] = coef * 1.0;
-  D[2*5 + 2] = coef * (1.0 - nu) / 2.0;
-  D[3*5 + 3] = coef * kappa * (1.0 - nu) / 2.0;
-  D[4*5 + 4] = coef * kappa * (1.0 - nu) / 2.0;
-  std::cout << "\n===== D =====" << std::endl;
-  print_2Darray(D, 5, 5);
+  // double D[5 * 5] = {0.0};
+  // D[0*5 + 0] = coef * 1.0;
+  // D[0*5 + 1] = coef * nu;
+  // D[1*5 + 0] = coef * nu;
+  // D[1*5 + 1] = coef * 1.0;
+  // D[2*5 + 2] = coef * (1.0 - nu) / 2.0;
+  // D[3*5 + 3] = coef * kappa * (1.0 - nu) / 2.0;
+  // D[4*5 + 4] = coef * kappa * (1.0 - nu) / 2.0;
+  // std::cout << "\n===== D =====" << std::endl;
+  // print_2Darray(D, 5, 5);
 
   // Stiffness tensor in lamina coords
   // Bl^T * D * Bl = Bl_{ki} * D_{kl} * Bl_{lj}
   double Kl [(nLocBas*dim) * (nLocBas*dim)] = {0.0};
-  for(int ii = 0; ii < nLocBas*dim; ++ii)
+
+  // for(int ii = 0; ii < nLocBas*dim; ++ii)
+  // {
+  //   for(int jj = 0; jj < nLocBas*dim; ++jj)
+  //   {
+  //     for(int kk = 0; kk < 5; ++kk)
+  //     {
+  //       for(int ll = 0; ll < 5; ++ll)
+  //       {
+  //         Kl[ii*(nLocBas*dim) + jj] +=
+  //           Bl[kk*(nLocBas*dim)+ii] * D[5*kk+ll] * Bl[ll*(nLocBas*dim)+jj];
+  //       }
+  //     }
+  //   }
+  // }
+
+  for(int A = 0; A < nLocBas; ++A)
   {
-    for(int jj = 0; jj < nLocBas*dim; ++jj)
+    const double NA_xl = dR_dxl[A], NA_yl = dR_dyl[A];
+
+    for(int B = 0; B < nLocBas; ++B)
     {
-      for(int kk = 0; kk < 5; ++kk)
-      {
-        for(int ll = 0; ll < 5; ++ll)
-        {
-          Kl[ii*(nLocBas*dim) + jj] +=
-            Bl[kk*(nLocBas*dim)+ii] * D[5*kk+ll] * Bl[ll*(nLocBas*dim)+jj];
-        }
-      }
-    }
+      const double NB_xl = dR_dxl[B], NB_yl = dR_dyl[B];
+
+      // Momentum-x with respect to u1, u2 
+      Kl[(nLocBas*dim)*(A*dim) + (B*dim)]     += coef * ( NA_xl * NB_xl
+          + 0.5*(1.0-nu) * NA_yl * NB_yl );
+      Kl[(nLocBas*dim)*(A*dim) + (B*dim+1)]   += coef * ( nu * NA_xl * NB_yl
+          + 0.5*(1.0-nu) * NA_yl * NB_xl );
+
+      // Momentum-y with respect to u1, u2 
+      Kl[(nLocBas*dim)*(A*dim+1) + (B*dim)]   += coef * ( nu * NA_yl * NB_xl
+          + 0.5*(1.0-nu) * NA_xl * NB_yl );
+      Kl[(nLocBas*dim)*(A*dim+1) + (B*dim+1)] += coef * ( NA_yl * NB_yl
+          + 0.5*(1.0-nu) * NA_xl * NB_xl );
+
+      // Momentum-z with respect to u3 
+      Kl[(nLocBas*dim)*(A*dim+2) + (B*dim+2)] += coef * 0.5*kappa*(1.0-nu) * (
+          NA_xl * NB_xl + NA_yl * NB_yl );
+    } 
   }
+
   std::cout << "\n===== K in lamina coords =====" << std::endl;
   print_2Darray(Kl, nLocBas*dim, nLocBas*dim);
 
@@ -183,14 +211,27 @@ int main( int argc, char * argv[] )
       {
         for(int jj = 0; jj < dim; ++jj)
         {
-          for(int kk = 0; kk < dim; ++kk)
-          {
-            for(int ll = 0; ll < dim; ++ll)
-            {
-              Kg[(A*dim+ii)*(nLocBas*dim) + (B*dim+jj)] +=
-                Q(kk,ii) * Kl[(A*dim+kk)*(nLocBas*dim) + (B*dim+ll)] * Q(ll, jj);
-            }
-          }
+          // Kg[ (snLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(kk,ii) * Kl[ (A*dim+kk)*(snLocBas*dim) + (B*dim+ll) ] * Q(ll, jj);
+          Kg[ (nLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(0,ii) * Kl[ (A*dim+0)*(nLocBas*dim) + (B*dim+0) ] * Q(0, jj);
+          Kg[ (nLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(0,ii) * Kl[ (A*dim+0)*(nLocBas*dim) + (B*dim+1) ] * Q(1, jj);
+          Kg[ (nLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(0,ii) * Kl[ (A*dim+0)*(nLocBas*dim) + (B*dim+2) ] * Q(2, jj);
+
+          Kg[ (nLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(1,ii) * Kl[ (A*dim+1)*(nLocBas*dim) + (B*dim+0) ] * Q(0, jj);
+          Kg[ (nLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(1,ii) * Kl[ (A*dim+1)*(nLocBas*dim) + (B*dim+1) ] * Q(1, jj);
+          Kg[ (nLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(1,ii) * Kl[ (A*dim+1)*(nLocBas*dim) + (B*dim+2) ] * Q(2, jj);
+          
+          Kg[ (nLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(2,ii) * Kl[ (A*dim+2)*(nLocBas*dim) + (B*dim+0) ] * Q(0, jj);
+          Kg[ (nLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(2,ii) * Kl[ (A*dim+2)*(nLocBas*dim) + (B*dim+1) ] * Q(1, jj);
+          Kg[ (nLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(2,ii) * Kl[ (A*dim+2)*(nLocBas*dim) + (B*dim+2) ] * Q(2, jj);
+
+          // for(int kk = 0; kk < dim; ++kk)
+          // {
+          //   for(int ll = 0; ll < dim; ++ll)
+          //   {
+          //     Kg[(A*dim+ii)*(nLocBas*dim) + (B*dim+jj)] +=
+          //       Q(kk,ii) * Kl[(A*dim+kk)*(nLocBas*dim) + (B*dim+ll)] * Q(ll, jj);
+          //   }
+          // }
         }
       }
     }
@@ -213,36 +254,64 @@ int main( int argc, char * argv[] )
 
     elem_tri6 -> get_gradR(qua, dR_dx, dR_dy);
 
-    // Strain displacement matrix B
-    // 5 x (nLocBas * dim)
-    double B [5 * nLocBas * dim] = {0.0};
-    for(int ii = 0; ii < nLocBas; ++ii)
-    { 
-      B[0*nLocBas*dim + ii*dim]     = dR_dx[ii]; // u1,1
-      B[1*nLocBas*dim + ii*dim + 1] = dR_dy[ii]; // u2,2
-      B[2*nLocBas*dim + ii*dim]     = dR_dy[ii]; // u1,2
-      B[2*nLocBas*dim + ii*dim + 1] = dR_dx[ii]; // u2,1
-      B[3*nLocBas*dim + ii*dim + 2] = dR_dx[ii]; // u3,1
-      B[4*nLocBas*dim + ii*dim + 2] = dR_dy[ii]; // u3,2
-    }
+    // // Strain displacement matrix B
+    // // 5 x (nLocBas * dim)
+    // double B [5 * nLocBas * dim] = {0.0};
+    // for(int ii = 0; ii < nLocBas; ++ii)
+    // { 
+    //   B[0*nLocBas*dim + ii*dim]     = dR_dx[ii]; // u1,1
+    //   B[1*nLocBas*dim + ii*dim + 1] = dR_dy[ii]; // u2,2
+    //   B[2*nLocBas*dim + ii*dim]     = dR_dy[ii]; // u1,2
+    //   B[2*nLocBas*dim + ii*dim + 1] = dR_dx[ii]; // u2,1
+    //   B[3*nLocBas*dim + ii*dim + 2] = dR_dx[ii]; // u3,1
+    //   B[4*nLocBas*dim + ii*dim + 2] = dR_dy[ii]; // u3,2
+    // }
 
     // Stiffness tensor
     // B^T * D * B = B_{ki} * D_{kl} * B_{lj}
     double K [(nLocBas*dim) * (nLocBas*dim)] = {0.0};
-    for(int ii = 0; ii < nLocBas*dim; ++ii)
-    { 
-      for(int jj = 0; jj < nLocBas*dim; ++jj)
+
+    // for(int ii = 0; ii < nLocBas*dim; ++ii)
+    // { 
+    //   for(int jj = 0; jj < nLocBas*dim; ++jj)
+    //   {
+    //     for(int kk = 0; kk < 5; ++kk)
+    //     {
+    //       for(int ll = 0; ll < 5; ++ll)
+    //       { 
+    //         K[ii*(nLocBas*dim) + jj] +=
+    //           B[kk*(nLocBas*dim)+ii] * D[5*kk+ll] * B[ll*(nLocBas*dim)+jj];
+    //       }
+    //     }
+    //   }
+    // }
+
+    for(int A = 0; A < nLocBas; ++A)
+    {
+      const double NA_x = dR_dx[A], NA_y = dR_dy[A];
+
+      for(int B = 0; B < nLocBas; ++B)
       {
-        for(int kk = 0; kk < 5; ++kk)
-        {
-          for(int ll = 0; ll < 5; ++ll)
-          { 
-            K[ii*(nLocBas*dim) + jj] +=
-              B[kk*(nLocBas*dim)+ii] * D[5*kk+ll] * B[ll*(nLocBas*dim)+jj];
-          }
-        }
-      }
+        const double NB_x = dR_dx[B], NB_y = dR_dy[B];
+
+        // Momentum-x with respect to u1, u2 
+        K[(nLocBas*dim)*(A*dim) + (B*dim)]     += coef * ( NA_x * NB_x
+            + 0.5*(1.0-nu) * NA_y * NB_y );
+        K[(nLocBas*dim)*(A*dim) + (B*dim+1)]   += coef * ( nu * NA_x * NB_y
+            + 0.5*(1.0-nu) * NA_y * NB_x );
+
+        // Momentum-y with respect to u1, u2 
+        K[(nLocBas*dim)*(A*dim+1) + (B*dim)]   += coef * ( nu * NA_y * NB_x
+            + 0.5*(1.0-nu) * NA_x * NB_y );
+        K[(nLocBas*dim)*(A*dim+1) + (B*dim+1)] += coef * ( NA_y * NB_y
+            + 0.5*(1.0-nu) * NA_x * NB_x );
+
+        // Momentum-z with respect to u3 
+        K[(nLocBas*dim)*(A*dim+2) + (B*dim+2)] += coef*0.5*kappa*(1.0-nu) * (
+            NA_x * NB_x + NA_y * NB_y );
+      } 
     }
+
     std::cout << "\n===== K for Triangle6 =====" << std::endl;
     print_2Darray(K, nLocBas*dim, nLocBas*dim);
   }

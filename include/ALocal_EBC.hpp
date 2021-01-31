@@ -71,8 +71,8 @@ class ALocal_EBC
     // --------------------------------------------------------------
     // get_ctrlPts_xyz: given the ebc_id ii, the element index eindex,
     // return the control points' geometry.
-    // The users are responsible for allocating the deleting the ctrl_xyz
-    // array.
+    // Users are responsible for allocating & deleting the ctrl_xyz
+    // arrays.
     // ebc_id : 0 <= ii < num_ebc;
     // surface element id: 0 <= eindex < num_local_cell[ii];
     // ctrl_x/y/z : output geometry array, length is 
@@ -175,6 +175,10 @@ class ALocal_EBC
     // --------------------------------------------------------------
     // get_thickness : return the wall thickness, if this partition
     //                 owns any cell on the wall.
+    // Users are responsible for allocating & deleting the e_thickness array.
+    // Only one surface per the assumption in wall ebc.
+    // surface element id: 0 <= eindex < num_local_cell[0]
+    // e_thickness : output thickness array, length is cell_nLocBas[0].
     // --------------------------------------------------------------
     virtual void get_thickness( const int &eindex, double * const &e_thickness ) const
     {
@@ -184,6 +188,10 @@ class ALocal_EBC
     // --------------------------------------------------------------
     // get_youngsmod : return the wall young's modulus, if this partition
     //                 owns any cell on the wall.
+    // Users are responsible for allocating & deleting the e_youngsmod array.
+    // Only one surface per the assumption in wall ebc.
+    // surface element id: 0 <= eindex < num_local_cell[0]
+    // e_youngsmod : output youngsmod array, length is cell_nLocBas[0].
     // --------------------------------------------------------------
     virtual void get_youngsmod( const int &eindex, double * const &e_youngsmod ) const
     {

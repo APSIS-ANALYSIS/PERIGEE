@@ -239,7 +239,9 @@ int main( int argc, char *argv[] )
   // Local sub-domain's wall elemental (Neumann) BC for CMM
   ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, "ebc_wall");
 
-  // Check the fluid density is compatible with the given value here
+  // Cross check fluid densities specified for the solver vs. wall youngsmod calculation
+  SYS_T::print_fatal_if( locebc_wall -> get_fluid_density() != fluid_density,
+      "Error: Assigned fluid density does not match that used to compute wall youngsmod in the preprocessor.\n" );
 
   // Local sub-domain's nodal indices
   APart_Node * pNode = new APart_Node(part_file, rank);
@@ -312,7 +314,9 @@ int main( int argc, char *argv[] )
   IPLocAssem * locAssem_ptr = new PLocAssem_Tet_CMM_GenAlpha(
       tm_galpha_ptr, GMIptr->get_nLocBas(),
       quadv->get_num_quadPts(), elements->get_nLocBas(),
-      fluid_density, fluid_mu, bs_beta, c_tauc, GMIptr->get_elemType() );
+      fluid_density, fluid_mu, bs_beta,
+      wall_density, wall_poisson, wall_kappa,
+      c_tauc, GMIptr->get_elemType() );
 
 
   // ===== Deallocate memory =====

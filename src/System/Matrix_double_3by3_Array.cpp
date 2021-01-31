@@ -11,8 +11,6 @@ Matrix_double_3by3_Array::Matrix_double_3by3_Array()
   invm0 = 1.0; invm1 = 1.0; invm2 = 1.0;
 }
 
-
-
 Matrix_double_3by3_Array::Matrix_double_3by3_Array( const double * const &in_mat )
 {
   for(int ii=0; ii<9; ++ii) mat[ii] = in_mat[ii];
@@ -21,7 +19,6 @@ Matrix_double_3by3_Array::Matrix_double_3by3_Array( const double * const &in_mat
   
   invm0 = 1.0; invm1 = 1.0; invm2 = 1.0;
 }
-
 
 Matrix_double_3by3_Array::Matrix_double_3by3_Array( 
     const double &a11, const double &a12, const double &a13,
@@ -37,7 +34,6 @@ Matrix_double_3by3_Array::Matrix_double_3by3_Array(
   invm0 = 1.0; invm1 = 1.0; invm2 = 1.0;
 }
 
-
 Matrix_double_3by3_Array::Matrix_double_3by3_Array( 
     const Matrix_double_3by3_Array &other )
 {
@@ -52,11 +48,8 @@ Matrix_double_3by3_Array::Matrix_double_3by3_Array(
   invm2 = other.invm2; 
 }
 
-
 Matrix_double_3by3_Array::~Matrix_double_3by3_Array()
 {}
-
-
 
 Matrix_double_3by3_Array& Matrix_double_3by3_Array::operator= (
     const Matrix_double_3by3_Array &input )
@@ -74,7 +67,6 @@ Matrix_double_3by3_Array& Matrix_double_3by3_Array::operator= (
   return *this;
 }
 
-
 void Matrix_double_3by3_Array::gen_id()
 {
   mat[0] = 1.0;  mat[1] = 0.0;  mat[2] = 0.0;
@@ -85,7 +77,6 @@ void Matrix_double_3by3_Array::gen_id()
   
   invm0 = 1.0; invm1 = 1.0; invm2 = 1.0;
 }
-
 
 void Matrix_double_3by3_Array::gen_rand()
 {
@@ -102,7 +93,6 @@ void Matrix_double_3by3_Array::gen_rand()
   invm0 = 1.0; invm1 = 1.0; invm2 = 1.0;
 }
 
-
 void Matrix_double_3by3_Array::gen_hilb()
 {
   for(int ii=0; ii<3; ++ii)
@@ -113,7 +103,6 @@ void Matrix_double_3by3_Array::gen_hilb()
   
   invm0 = 1.0; invm1 = 1.0; invm2 = 1.0;
 }
-
 
 void Matrix_double_3by3_Array::LU_fac()
 {
@@ -205,8 +194,6 @@ void Matrix_double_3by3_Array::LU_fac()
   invm0 = 1.0 / mat[0]; invm1 = 1.0 / mat[4]; invm2 = 1.0 / mat[8];
 }
 
-
-
 void Matrix_double_3by3_Array::LU_solve(const double * const &b, double * const &x) const
 {
   x[0] = b[p[0]];
@@ -220,7 +207,6 @@ void Matrix_double_3by3_Array::LU_solve(const double * const &b, double * const 
   x[1] = (x[1] - mat[5] * x[2]) * invm1;
   x[0] = (x[0] - mat[2] * x[2] - mat[1] * x[1]) * invm0;
 }
-
 
 void Matrix_double_3by3_Array::LU_solve(const double &b1, const double &b2, const double &b3,
             double &x1, double &x2, double &x3) const
@@ -239,7 +225,6 @@ void Matrix_double_3by3_Array::LU_solve(const double &b1, const double &b2, cons
   x1 = (x1 - mat[2] * x3 - mat[1] * x2) * invm0;
 }
 
-
 void Matrix_double_3by3_Array::transpose()
 {
   double temp;
@@ -247,7 +232,6 @@ void Matrix_double_3by3_Array::transpose()
   temp = mat[2]; mat[2] = mat[6]; mat[6] = temp;
   temp = mat[5]; mat[5] = mat[7]; mat[7] = temp; 
 }
-
 
 void Matrix_double_3by3_Array::inverse()
 {
@@ -268,7 +252,6 @@ void Matrix_double_3by3_Array::inverse()
   for(int ii=0; ii<9; ++ii) mat[ii] = temp[ii];
 }
 
-
 double Matrix_double_3by3_Array::det() const
 {
   return mat[0] * mat[4] * mat[8] + mat[1] * mat[5] * mat[6] 
@@ -276,14 +259,12 @@ double Matrix_double_3by3_Array::det() const
     - mat[0] * mat[5] * mat[7] - mat[1] * mat[3] * mat[8];
 }
 
-
 void Matrix_double_3by3_Array::VecMult(const double * const &x, double * const &y) const
 {
   y[0] = mat[0] * x[0] + mat[1] * x[1] + mat[2] * x[2];
   y[1] = mat[3] * x[0] + mat[4] * x[1] + mat[5] * x[2];
   y[2] = mat[6] * x[0] + mat[7] * x[1] + mat[8] * x[2];
 }
-
 
 void Matrix_double_3by3_Array::MatMult( const Matrix_double_3by3_Array &mleft,
     const Matrix_double_3by3_Array &mright )
