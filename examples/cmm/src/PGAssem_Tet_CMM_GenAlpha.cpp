@@ -1,6 +1,6 @@
-#include "PGAssem_NS_FEM.hpp"
+#include "PGAssem_Tet_CMM_GenAlpha.hpp"
 
-PGAssem_NS_FEM::PGAssem_NS_FEM(
+PGAssem_Tet_CMM_GenAlpha::PGAssem_Tet_CMM_GenAlpha(
     IPLocAssem * const &locassem_ptr,
     FEAElement * const &elements,
     const IQuadPts * const &quads,
@@ -67,7 +67,7 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
 }
 
 
-PGAssem_NS_FEM::~PGAssem_NS_FEM()
+PGAssem_Tet_CMM_GenAlpha::~PGAssem_Tet_CMM_GenAlpha()
 {
   VecDestroy(&G);
   MatDestroy(&K);
