@@ -2,8 +2,7 @@
 
 GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename, 
     const int &in_N, const double &dt3d )
-: N( in_N ), h( dt3d/static_cast<double>(N) ),
-  absTol( 1.0e-8 ), relTol( 1.0e-5 )
+: N( in_N ), h( dt3d/static_cast<double>(N) ), absTol( 1.0e-8 ), relTol( 1.0e-5 )
 {
   // Now read the lpn input file for num_ebc and coronary model 
   // parameters (Ra, Ca, Ra_micro, Cim, Rv, Pd and Pim)
@@ -16,11 +15,11 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
   std::istringstream sstrm;
   std::string sline;
   std::string bc_type;
+  
   tstart=0.0;
   tend=N*h;
   
-  // The first non-commented line should be
-  // Coronary num_ebc
+  // The first non-commented line should be Coronary num_ebc
   while( std::getline(reader, sline) )
   {
     if( sline[0] != '#' && !sline.empty() )
@@ -50,20 +49,18 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
     num_Pimdata.resize( num_ebc );
     tdata.resize( num_ebc );
     Pimdata.resize( num_ebc );
-    Pimderdata.resize( num_ebc );
+    der_Pimdata.resize( num_ebc );
     prev_0D_sol.resize( num_ebc );
     dPimdt_k1.resize( num_ebc );
     dPimdt_k2.resize( num_ebc );
     dPimdt_k3.resize( num_ebc );
 
-    for(int ii =0;ii<num_ebc;++ii)
+    for( int ii =0; ii<num_ebc; ++ii )
     {
+      // 2 here means the system has 2 ODEs
       prev_0D_sol[ii].resize(2);
       Pi0[ii].resize(2);
-    }
-
-    for(int ii=0;ii<num_ebc;++ii)
-    {
+      
       dPimdt_k1[ii].resize(N+1);
       dPimdt_k2[ii].resize(N);
       dPimdt_k3[ii].resize(N);
@@ -96,39 +93,35 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
       sstrm >> num_Pimdata[ counter ];
       sstrm >> alpha_Pim[ counter ];
 
-      SYS_T::print_fatal_if(num_Pimdata[counter]<=2 && num_Pimdata[counter]!=0, 
-          "Error: num of Pim data needs to be 0 for RCR or >2 for coronary  \n");
+      SYS_T::print_fatal_if( num_Pimdata[counter] <= 2 && num_Pimdata[counter] != 0, 
+          "Error: number of Pim data needs to be 0 for RCR or greater than 2 for coronary BC. \n");
 
       if(num_Pimdata[counter]>0)
-      {
        data_size=num_Pimdata[counter];
-      }
       else
-      {
        data_size=1;
-      }
 
       tdata[counter].resize(data_size);
       Pimdata[counter].resize(data_size);
-      Pimderdata[counter].resize(data_size);
+      der_Pimdata[counter].resize(data_size);
 
       sstrm.clear();
 
-      for (int ii =0;ii<num_Pimdata[counter];++ii)
+      for(int ii =0; ii<num_Pimdata[counter]; ++ii)
       {
         getline(reader, sline);
         sstrm.str( sline );
         sstrm>>tdata[counter][ii];
-
         sstrm>>Pimdata[counter][ii];
-        Pimdata[counter][ii]=Pimdata[counter][ii]*alpha_Pim[counter];
+        
+        Pimdata[counter][ii] = Pimdata[counter][ii] * alpha_Pim[counter];
         sstrm.clear();
       }
 
       if(num_Pimdata[counter]>0)
       {
-        set_phcip(counter);
-        get_dPimdt(counter);
+        spline_pchip_set( num_Pimdata[ii], tdata[ii], Pimdata[ii], der_Pimdata[ii] );
+        get_dPimdt( counter );
       }
 
       SYS_T::print_fatal_if(tdata[counter][0]>0.0, "Error: Pim data do not start from 0.\n");
@@ -170,6 +163,5 @@ void GenBC_Coronary::print_info() const
   for(int ii=0; ii<num_ebc; ++ii)
     SYS_T::commPrint( "     ebcid = %d, Ra = %e, Ca = %e, Ra_micro = %e,Rim = %e, Rv = %e, Pd = %e \n", ii, Ra[ii], Ca[ii],Ra_micro[ii],Cim[ii], Rv[ii], Pd[ii] );
 }
-
 
 // EOF
