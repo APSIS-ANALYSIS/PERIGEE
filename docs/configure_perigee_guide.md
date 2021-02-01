@@ -30,6 +30,7 @@ sudo apt install python2
 sudo apt install python3
 sudo apt install mesa-utils
 sudo apt install mesa-common-dev
+sudo apt install libgl1-mesa-dev
 sudo apt install libxt-dev
 sudo apt install cmake
 sudo apt install valgrind
