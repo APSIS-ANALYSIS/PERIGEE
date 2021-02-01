@@ -16,7 +16,7 @@ GenBC_RCR::GenBC_RCR( const char * const &lpn_filename, const int &in_N,
   std::string sline;
   std::string bc_type;
 
-  // The first non-commented lien should be
+  // The first non-commented line should be
   // RCR num_ebc
   while( std::getline(reader, sline) )
   {
