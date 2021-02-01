@@ -162,7 +162,6 @@ class Matrix_3x3
     // Matrix multiplication mat = mleft * mright
     void MatMult( const Matrix_3x3 &mleft, const Matrix_3x3 &mright );
 
-  
     // Matrix multiplication as mat = source^T * source
     // This is used for the evaluation of right Cauchy-Green strain tensor:
     //                       C = F^T F
