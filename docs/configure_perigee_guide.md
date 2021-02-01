@@ -18,19 +18,21 @@ Assuming that you just installed a Ubuntu system. You may want to do the followi
 ```sh
 sudo apt update
 sudo apt upgrade
-sudo apt-get autoremove
+sudo apt autoremove
 sudo apt install vim
 sudo apt install git-all
 sudo apt install build-essential
 sudo apt install texlive-latex-extra
-sudo apt-get install texlive-publishers
-sudo apt-get install texlive-science
-sudo apt-get install gfortran
+sudo apt install texlive-publishers
+sudo apt install texlive-science
+sudo apt install gfortran
 sudo apt install python2
 sudo apt install python3
-sudo apt-get install mesa-utils
-sudo apt-get install mesa-common-dev
-sudo apt-get install libxt-dev
+sudo apt install mesa-utils
+sudo apt install mesa-common-dev
+sudo apt install libxt-dev
+sudo apt install cmake
+sudo apt install valgrind
 ```
 
 ## Name your machine
