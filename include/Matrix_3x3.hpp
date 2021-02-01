@@ -162,6 +162,11 @@ class Matrix_3x3
     // Matrix multiplication mat = mleft * mright
     void MatMult( const Matrix_3x3 &mleft, const Matrix_3x3 &mright );
 
+    // Matrix rotation
+    // Let Q be a rotation matrix, the matrix gets updated by
+    // Q M Q^T = Q_ik M_kl Q_jl = output_matrix_ij
+    void MatRot( const Matrix_3x3 &Q );
+
     // Matrix multiplication as mat = source^T * source
     // This is used for the evaluation of right Cauchy-Green strain tensor:
     //                       C = F^T F

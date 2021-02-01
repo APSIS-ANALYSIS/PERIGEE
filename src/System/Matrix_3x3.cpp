@@ -294,6 +294,22 @@ void Matrix_3x3::MatMult( const Matrix_3x3 &mleft, const Matrix_3x3 &mright )
   for(int ii=0; ii<9; ++ii) mat[ii] = temp[ii];
 }
 
+void Matrix_3x3::MatRot( const Matrix_3x3 &Q )
+{
+  double temp[9] = {0};
+  for(int ii=0; ii<3; ++ii)
+  {
+    for(int jj=0; jj<3; ++jj)
+    {
+      temp[ii*3+jj] = ( Q(3*ii) * mat[0] + Q(3*ii+1) * mat[3] + Q(3*ii+2) * mat[6] ) * Q(3*jj)
+        + ( Q(3*ii) * mat[1] + Q(3*ii+1) * mat[4] + Q(3*ii+2) * mat[7] ) * Q(3*jj+1)
+        + ( Q(3*ii) * mat[2] + Q(3*ii+1) * mat[5] + Q(3*ii+2) * mat[8] ) * Q(3*jj+2);
+    }
+  }
+  
+  for(int ii=0; ii<9; ++ii) mat[ii] = temp[ii];
+}
+
 void Matrix_3x3::MatMultTransposeLeft( const Matrix_3x3 &in )
 {
   double temp[9];
