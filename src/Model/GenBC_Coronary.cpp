@@ -2,7 +2,9 @@
 
 GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename, 
     const int &in_N, const double &dt3d )
-: N( in_N ), h( dt3d/static_cast<double>(N) ), absTol( 1.0e-8 ), relTol( 1.0e-5 )
+: N( in_N ), h( dt3d/static_cast<double>(N) ), 
+  absTol( 1.0e-8 ), relTol( 1.0e-5 ),
+  tstart( 0.0 ), tend( dt3d )
 {
   // Now read the lpn input file for num_ebc and coronary model 
   // parameters (Ra, Ca, Ra_micro, Cim, Rv, Pd and Pim)
@@ -15,9 +17,6 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
   std::istringstream sstrm;
   std::string sline;
   std::string bc_type;
-  
-  tstart=0.0;
-  tend=N*h;
   
   // The first non-commented line should be Coronary num_ebc
   while( std::getline(reader, sline) )
@@ -47,8 +46,8 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
     Q0.resize( num_ebc );
     Pi0.resize( num_ebc ); 
     num_Pimdata.resize( num_ebc );
-    tdata.resize( num_ebc );
-    Pimdata.resize( num_ebc );
+    Time_data.resize( num_ebc );
+    Pim_data.resize( num_ebc );
     der_Pimdata.resize( num_ebc );
     prev_0D_sol.resize( num_ebc );
     dPimdt_k1.resize( num_ebc );
@@ -60,7 +59,8 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
       // 2 here means the system has 2 ODEs
       prev_0D_sol[ii].resize(2);
       Pi0[ii].resize(2);
-      
+    
+      // WHY N+1 HERE?  
       dPimdt_k1[ii].resize(N+1);
       dPimdt_k2[ii].resize(N);
       dPimdt_k3[ii].resize(N);
@@ -69,9 +69,8 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
   else SYS_T::print_fatal("Error: the outflow model in %s does not match GenBC_Coronary.\n", lpn_filename);
 
   // Read files for each ebc to set the values of Ra, Ca, Ra_micro, 
-  // Cim,Rv, Pd Pim and alpha_Pim
-  int counter = 0;
-  int data_size=1;
+  // Cim, Rv, Pd, num_Pimdata, and alpha_Pim
+  int counter = 0, data_size=1;
   while( std::getline(reader, sline) )
   {
     if( sline[0] != '#' && !sline.empty() )
@@ -96,13 +95,12 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
       SYS_T::print_fatal_if( num_Pimdata[counter] <= 2 && num_Pimdata[counter] != 0, 
           "Error: number of Pim data needs to be 0 for RCR or greater than 2 for coronary BC. \n");
 
-      if(num_Pimdata[counter]>0)
-       data_size=num_Pimdata[counter];
-      else
-       data_size=1;
+      // ADD COMMENT HERE
+      if(num_Pimdata[counter]>0) data_size=num_Pimdata[counter];
+      else data_size=1;
 
-      tdata[counter].resize(data_size);
-      Pimdata[counter].resize(data_size);
+      Time_data[counter].resize(data_size);
+      Pim_data[counter].resize(data_size);
       der_Pimdata[counter].resize(data_size);
 
       sstrm.clear();
@@ -111,20 +109,20 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
       {
         getline(reader, sline);
         sstrm.str( sline );
-        sstrm>>tdata[counter][ii];
-        sstrm>>Pimdata[counter][ii];
+        sstrm>>Time_data[counter][ii];
+        sstrm>>Pim_data[counter][ii];
         
-        Pimdata[counter][ii] = Pimdata[counter][ii] * alpha_Pim[counter];
+        Pim_data[counter][ii] = Pim_data[counter][ii] * alpha_Pim[counter];
         sstrm.clear();
       }
 
       if(num_Pimdata[counter]>0)
       {
-        spline_pchip_set( num_Pimdata[ii], tdata[ii], Pimdata[ii], der_Pimdata[ii] );
+        spline_pchip_set( num_Pimdata[ii], Time_data[ii], Pim_data[ii], der_Pimdata[ii] );
         get_dPimdt( counter );
       }
 
-      SYS_T::print_fatal_if(tdata[counter][0]>0.0, "Error: Pim data do not start from 0.\n");
+      SYS_T::print_fatal_if(Time_data[counter][0]>0.0, "Error: Pim data do not start from 0.\n");
       counter += 1;
     }
   }
