@@ -2,7 +2,7 @@
 
 GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename, 
     const int &in_N, const double &dt3d )
-: N( in_N ), h( dt3d/static_cast<double>(N) ), 
+: num_odes(2), N( in_N ), h( dt3d/static_cast<double>(N) ), 
   absTol( 1.0e-8 ), relTol( 1.0e-5 ),
   tstart( 0.0 ), tend( dt3d )
 {
@@ -36,6 +36,7 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
       || bc_type.compare("CORONARY") == 0
       || bc_type.compare("coronary") == 0 )
   {
+    // Allocate the containers for model parameters
     Ra.resize( num_ebc ); 
     Ca.resize( num_ebc );
     Ra_micro.resize( num_ebc ); 
@@ -45,10 +46,10 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
     alpha_Pim.resize( num_ebc );
     Q0.resize( num_ebc );
     Pi0.resize( num_ebc ); 
-    num_Pimdata.resize( num_ebc );
+    num_Pim_data.resize( num_ebc );
     Time_data.resize( num_ebc );
     Pim_data.resize( num_ebc );
-    der_Pimdata.resize( num_ebc );
+    der_Pim_data.resize( num_ebc );
     prev_0D_sol.resize( num_ebc );
     dPimdt_k1.resize( num_ebc );
     dPimdt_k2.resize( num_ebc );
@@ -56,11 +57,10 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
 
     for( int ii =0; ii<num_ebc; ++ii )
     {
-      // 2 here means the system has 2 ODEs
-      prev_0D_sol[ii].resize(2);
-      Pi0[ii].resize(2);
+      prev_0D_sol[ii].resize( num_odes );
+      Pi0[ii].resize( num_odes );
     
-      // WHY N+1 HERE?  
+      // !! WHY N+1 HERE?  
       dPimdt_k1[ii].resize(N+1);
       dPimdt_k2[ii].resize(N);
       dPimdt_k3[ii].resize(N);
@@ -69,8 +69,8 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
   else SYS_T::print_fatal("Error: the outflow model in %s does not match GenBC_Coronary.\n", lpn_filename);
 
   // Read files for each ebc to set the values of Ra, Ca, Ra_micro, 
-  // Cim, Rv, Pd, num_Pimdata, and alpha_Pim
-  int counter = 0, data_size=1;
+  // Cim, Rv, Pd, num_Pim_data, and alpha_Pim
+  int counter = 0;
   while( std::getline(reader, sline) )
   {
     if( sline[0] != '#' && !sline.empty() )
@@ -89,23 +89,24 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
       sstrm >> Cim[ counter ];
       sstrm >> Rv[ counter ];
       sstrm >> Pd[ counter ];
-      sstrm >> num_Pimdata[ counter ];
+      sstrm >> num_Pim_data[ counter ];
       sstrm >> alpha_Pim[ counter ];
 
-      SYS_T::print_fatal_if( num_Pimdata[counter] <= 2 && num_Pimdata[counter] != 0, 
+      SYS_T::print_fatal_if( num_Pim_data[counter] <= 2 && num_Pim_data[counter] != 0, 
           "Error: number of Pim data needs to be 0 for RCR or greater than 2 for coronary BC. \n");
 
-      // ADD COMMENT HERE
-      if(num_Pimdata[counter]>0) data_size=num_Pimdata[counter];
+      // !!ADD COMMENT HERE
+      int data_size = 1;
+      if( num_Pim_data[counter]>0 ) data_size = num_Pim_data[counter];
       else data_size=1;
 
       Time_data[counter].resize(data_size);
       Pim_data[counter].resize(data_size);
-      der_Pimdata[counter].resize(data_size);
+      der_Pim_data[counter].resize(data_size);
 
       sstrm.clear();
 
-      for(int ii =0; ii<num_Pimdata[counter]; ++ii)
+      for(int ii =0; ii < num_Pim_data[counter]; ++ii)
       {
         getline(reader, sline);
         sstrm.str( sline );
@@ -116,25 +117,25 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
         sstrm.clear();
       }
 
-      if(num_Pimdata[counter]>0)
+      if(num_Pim_data[counter]>0)
       {
-        spline_pchip_set( num_Pimdata[ii], Time_data[ii], Pim_data[ii], der_Pimdata[ii] );
+        spline_pchip_set( num_Pim_data[ii], Time_data[ii], Pim_data[ii], der_Pim_data[ii] );
         get_dPimdt( counter );
       }
 
-      SYS_T::print_fatal_if(Time_data[counter][0]>0.0, "Error: Pim data do not start from 0.\n");
+      SYS_T::print_fatal_if(Time_data[counter][0]>0.0, "Error: Pim data does not start from 0.\n");
       counter += 1;
     }
   }
 
-  if(counter != num_ebc ) SYS_T::print_fatal("Error: GenBC_Coronary the input file %s does not contain complete data for outlet faces. \n", lpn_filename);
+  if( counter != num_ebc ) SYS_T::print_fatal("Error: GenBC_Coronary the input file %s does not contain complete data for outlet faces.\n", lpn_filename);
 
   reader.close();
 
   SYS_T::commPrint( "===> GenBC_Coronary data are read in from %s.\n", lpn_filename );
 
-  // Set a zero initial value. They should be reset based on the initial
-  // 3D solutions.
+  // Set a zero initial values. 
+  // They should be reset based on the initial 3D solutions.
   for(int ii=0; ii<num_ebc; ++ii)
   {
     Q0[ii] = 0.0;

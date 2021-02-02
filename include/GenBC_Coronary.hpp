@@ -79,6 +79,8 @@ class GenBC_Coronary : public IGenBC
        const double &in_P_0, const double &curr_time );
 
   private:
+    const int num_odes; // Number of ODEs in the model
+
     const int N; // ODE integrator's number of time steps
 
     const double h; // delta t = Nh
@@ -99,15 +101,15 @@ class GenBC_Coronary : public IGenBC
 
     // Number of intramyocardial pressure Pim data points for each outlet face
     // The vector length is num_ebc.
-    // Note: num_Pimdata=0 indicates an RCR outlet.
-    std::vector<int> num_Pimdata;
+    // Note: num_Pim_data=0 indicates an RCR outlet.
+    std::vector<int> num_Pim_data;
 
     // Time_data and Pim_data for user-provided intramyocardial pressure 
     // waveform (time-pressure) for each coronary outlet face
-    // der_Pimdata stands for the corresponding dPim/dt for each coronary 
+    // der_Pim_data stands for the corresponding dPim/dt for each coronary 
     // outlet face.
-    // Their sizes are num_ebc x num_Pimdata[ii] with 0 <= ii < num_ebc 
-    std::vector< std::vector<double> > Time_data, Pim_data, der_Pimdata;
+    // Their sizes are num_ebc x num_Pim_data[ii] with 0 <= ii < num_ebc 
+    std::vector< std::vector<double> > Time_data, Pim_data, der_Pim_data;
 
     // precomputed dPim/dt needed by RK4, 
     // dPimdt_k1 has size num_ebc x N+1
