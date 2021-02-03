@@ -64,7 +64,6 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
   delete h5r; H5Fclose( file_id );
 }
 
-
 ALocal_EBC::~ALocal_EBC()
 {
   VEC_T::clean( num_local_node );
@@ -76,7 +75,6 @@ ALocal_EBC::~ALocal_EBC()
   VEC_T::clean( local_node_pos );
   VEC_T::clean( local_global_cell );
 }
-
 
 void ALocal_EBC::get_ctrlPts_xyz(const int &ii,
     const int &eindex, double * const &ctrl_x,
@@ -92,7 +90,6 @@ void ALocal_EBC::get_ctrlPts_xyz(const int &ii,
   }
 }
 
-
 void ALocal_EBC::get_SIEN( const int &ii,
     const int &eindex, int * const &sien ) const
 {
@@ -103,6 +100,5 @@ void ALocal_EBC::get_SIEN( const int &ii,
     sien[jj] = local_node_pos[ii][pos];
   }
 }
-
 
 // EOF

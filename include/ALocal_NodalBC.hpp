@@ -94,8 +94,12 @@ class ALocal_NodalBC
     // vice versa 
     // ---------------------------------------------------------------
     virtual void clean_LocalMaster()
-    {VEC_T::clean(LocalMaster); VEC_T::clean(LocalMasterSlave);
-     VEC_T::clean(Num_LPM); VEC_T::clean(LPM_offset);}
+    {
+      VEC_T::clean(LocalMaster); 
+      VEC_T::clean(LocalMasterSlave);
+      VEC_T::clean(Num_LPM); 
+      VEC_T::clean(LPM_offset);
+    }
 
   protected:
     int dof, nlocghonode;

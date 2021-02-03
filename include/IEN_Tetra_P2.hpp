@@ -27,9 +27,9 @@ class IEN_Tetra_P2 : public IIEN
     virtual void print_IEN() const;
 
   private:
+    const int nElem;
+    
     int * IEN;
-
-    int nElem;
 };
 
 #endif

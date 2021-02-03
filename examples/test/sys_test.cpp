@@ -1,49 +1,22 @@
 #include "Vec_Tools.hpp"
-
-class a
-{
-  public:
-    a();
-    
-    ~a();
-
-    void print_info() const;
-
-    std::vector<double>& get();
-
-    std::vector<double> av;
-};
+#include "Matrix_3x3.hpp"
 
 int main( int argc, char * argv[] )
 {
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-  SYS_T::file_check("test.txt");
+  
+  Matrix_3x3 A, Q;
+
+  A = { 1,0,1, -1, -2, 0, 0, 1, -1 };
+
+  Q = { -0.120000260381534, -0.809712281592778, 0.574426634607224, 0.901752646908814, 0.153122822484370, 0.404222172854692, -0.415261485453819, 0.566497504206538, 0.711785414592383 };
+
+  A.MatRot(Q);
+
+  A.print();  
+  
   PetscFinalize();
   return EXIT_SUCCESS;
-}
-
-a::a()
-{
-  av.clear();
-  av.push_back(3.14);
-  av.push_back(3.14);
-  av.push_back(0.14);
-}
-
-a::~a()
-{
-  VEC_T::clean(av);
-}
-
-void a::print_info() const
-{
-  for(unsigned int ii=0; ii<av.size(); ++ii)
-    std::cout<<av[ii]<<'\n';
-}
-
-std::vector<double>& a::get()
-{
-  return av;
 }
 
 // EOF

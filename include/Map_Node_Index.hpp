@@ -2,12 +2,18 @@
 #define MAP_NODE_INDEX_HPP
 // ==================================================================
 // Map_Node_Index.hpp
+// 
 // Object:
-// Stores the new indices that are reordered based on node partition.
-// Stores two int vectors:
-// old_2_new( ): map the old global index to new global index;
-// new_2_old( ): map the new global index back to old global index.
+// Stores the new indices that are reordered based on mesh partition.
+// In particular, it stores two integer vectors:
+// old_2_new( ) : map the old global index to new global index;
+// new_2_old( ) : map the new global index to old global index.
+// 
+// old global index refers to the index read from the original mesh;
+// new golbal index refers to the index realigned according to the 
+// mesh partitioning.
 //
+// Author: Ju Liu
 // Date Created: Oct 3 2013
 // ==================================================================
 #include "IGlobal_Part.hpp"
@@ -30,7 +36,7 @@ class Map_Node_Index
     
     virtual void print_info() const;
 
-    // ! write_hdf5(): write the old_2_new and new_2_old mappings as h5 file
+    // write the old_2_new and new_2_old mappings into an hdf5 file
     virtual void write_hdf5( const char * const &fileName ) const;
 
   private:

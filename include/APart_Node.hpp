@@ -105,6 +105,7 @@ class APart_Node
 
     // nlocghonode = nlocalnode + nghostnode
     // ntotalnode = nlocghonnode + nbadnode
+    // dof here reads the dofNum from the Global_Mesh_Info group.
     int nlocalnode, nghostnode, nbadnode, nlocghonode, ntotalnode, dof;
     
     // local_to_global = node_loc appended by node_ghost

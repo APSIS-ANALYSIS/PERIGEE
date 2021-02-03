@@ -10,16 +10,13 @@ Tensor4_3D::Tensor4_3D()
   }
 }
 
-
 Tensor4_3D::Tensor4_3D( const Tensor4_3D &source )
 {
   for(int ii=0; ii<81; ++ii) ten[ii] = source(ii);
 }
 
-
 Tensor4_3D::~Tensor4_3D()
 {}
-
 
 bool Tensor4_3D::is_identical(const Tensor4_3D &source) const
 {
@@ -28,12 +25,10 @@ bool Tensor4_3D::is_identical(const Tensor4_3D &source) const
   return true;
 }
 
-
 void Tensor4_3D::copy( const Tensor4_3D &source )
 {
   for(int ii=0; ii<81; ++ii) ten[ii] = source(ii);
 }
-
 
 void Tensor4_3D::print() const
 {
@@ -57,7 +52,6 @@ void Tensor4_3D::print() const
   }
 }
 
-
 void Tensor4_3D::gen_id()
 {
   for(int ii=0; ii<81; ++ii) ten[ii] = 0.0;
@@ -67,7 +61,6 @@ void Tensor4_3D::gen_id()
     for(int bb=0; bb<3; ++bb) ten[ 27 * aa + 9 * bb + 3 * aa + bb ] = 1.0;
   }
 }
-
 
 void Tensor4_3D::gen_symm_id()
 {
@@ -81,7 +74,6 @@ void Tensor4_3D::gen_symm_id()
     }
   }
 }
-
 
 void Tensor4_3D::gen_proj_dev()
 {
@@ -97,13 +89,11 @@ void Tensor4_3D::gen_proj_dev()
   }
 }
 
-
 void Tensor4_3D::gen_P( const Matrix_3x3 &C, const Matrix_3x3 &invC )
 {
   gen_symm_id();
   add_OutProduct( -1.0 / 3.0, invC, C );
 }
-
 
 void Tensor4_3D::gen_Ptilde( const Matrix_3x3 &invC )
 {
@@ -111,7 +101,6 @@ void Tensor4_3D::gen_Ptilde( const Matrix_3x3 &invC )
   add_SymmProduct(1.0, invC, invC);
   add_OutProduct( -1.0 / 3.0, invC, invC );
 }
-
 
 void Tensor4_3D::gen_rand()
 {
@@ -125,30 +114,25 @@ void Tensor4_3D::gen_rand()
   }
 }
 
-
 void Tensor4_3D::gen_zero()
 {
   for(int ii=0; ii<81; ++ii) ten[ii] = 0.0;
 }
-
 
 void Tensor4_3D::scale( const double &val )
 {
   for(int ii=0; ii<81; ++ii) ten[ii] *= val;
 }
 
-
 void Tensor4_3D::PY( const Tensor4_3D &input )
 {
   for(int ii=0; ii<81; ++ii) ten[ii] += input(ii);
 }
 
-
 void Tensor4_3D::AXPY( const double &val, const Tensor4_3D &input )
 {
   for(int ii=0; ii<81; ++ii) ten[ii] += val * input(ii);
 }
-
 
 void Tensor4_3D::add_OutProduct( const double &val, const Matrix_3x3 &mleft,
     const Matrix_3x3 &mright )
@@ -165,7 +149,6 @@ void Tensor4_3D::add_OutProduct( const double &val, const Matrix_3x3 &mleft,
     }
   }
 }
-
 
 void Tensor4_3D::add_SymmProduct( const double &val, const Matrix_3x3 &mleft,
     const Matrix_3x3 &mright )
@@ -186,7 +169,6 @@ void Tensor4_3D::add_SymmProduct( const double &val, const Matrix_3x3 &mleft,
   }
 }
 
-
 void Tensor4_3D::MatMult_1( const Matrix_3x3 &source )
 {
   double temp[81];
@@ -200,7 +182,6 @@ void Tensor4_3D::MatMult_1( const Matrix_3x3 &source )
 
   for(int ii=0; ii<81; ++ii) ten[ii] = temp[ii];
 }
-
 
 void Tensor4_3D::MatMult_2( const Matrix_3x3 &source )
 {
@@ -225,7 +206,6 @@ void Tensor4_3D::MatMult_2( const Matrix_3x3 &source )
 
   for(int ii=0; ii<81; ++ii) ten[ii] = temp[ii];
 }
-
 
 void Tensor4_3D::MatMult_3( const Matrix_3x3 &source )
 {
@@ -254,8 +234,6 @@ void Tensor4_3D::MatMult_3( const Matrix_3x3 &source )
   for(int ii=0; ii<81; ++ii) ten[ii] = temp[ii];
 }
 
-
-
 void Tensor4_3D::MatMult_4( const Matrix_3x3 &source )
 {
   double temp[81];
@@ -271,7 +249,6 @@ void Tensor4_3D::MatMult_4( const Matrix_3x3 &source )
   for(int ii=0; ii<81; ++ii) ten[ii] = temp[ii];
 }
 
-
 void Tensor4_3D::LeftContraction( const Matrix_3x3 &a, Matrix_3x3 &out ) const
 {
   for(int m=0; m<9; ++m)
@@ -281,7 +258,6 @@ void Tensor4_3D::LeftContraction( const Matrix_3x3 &a, Matrix_3x3 &out ) const
       + a(2) * ten[m+18] + a(5) * ten[m+45] + a(8) * ten[m+72];
   }
 }
-
 
 void Tensor4_3D::RightContraction( const Matrix_3x3 &a, Matrix_3x3 &out ) const
 {
@@ -293,7 +269,6 @@ void Tensor4_3D::RightContraction( const Matrix_3x3 &a, Matrix_3x3 &out ) const
       + ten[loc+6] * a(6) + ten[loc+7] * a(7) + ten[loc+8] * a(8);
   }
 }
-
 
 double Tensor4_3D::LnRContraction( const Matrix_3x3 &Left, const Matrix_3x3 &Right ) const
 {
@@ -308,14 +283,12 @@ double Tensor4_3D::LnRContraction( const Matrix_3x3 &Left, const Matrix_3x3 &Rig
   return sum;
 }
 
-
 double Tensor4_3D::Ten4Contraction( const Tensor4_3D &input ) const
 {
   double sum = 0.0;
   for(int ii=0; ii<81; ++ii) sum += input(ii) * ten[ii];
   return sum;
 }
-
 
 // Ten[27I + 9J + 3K + L] = L[27I + 9J + 3M + N] * R[27M + 9N + 3K + L]
 // Let ii = 3I + J ; jj = 3K + L ; kk = 3M + N
@@ -337,7 +310,6 @@ void Tensor4_3D::TenMult( const Tensor4_3D &tleft, const Tensor4_3D &tright )
   for(int ii=0; ii<81; ++ii) ten[ii] = temp[ii];
 }
 
-
 void Tensor4_3D::TenRMult( const Tensor4_3D &tright )
 {
   double temp[81];
@@ -355,7 +327,6 @@ void Tensor4_3D::TenRMult( const Tensor4_3D &tright )
   for(int ii=0; ii<81; ++ii) ten[ii] = temp[ii];
 }
 
-
 void Tensor4_3D::TenLMult( const Tensor4_3D &tleft )
 {
   double temp[81];
@@ -372,7 +343,6 @@ void Tensor4_3D::TenLMult( const Tensor4_3D &tleft )
 
   for(int ii=0; ii<81; ++ii) ten[ii] = temp[ii];
 }
-
 
 void Tensor4_3D::TenLRMult( const Tensor4_3D &tleft, const Tensor4_3D &tright )
 {
@@ -393,7 +363,6 @@ void Tensor4_3D::TenLRMult( const Tensor4_3D &tleft, const Tensor4_3D &tright )
   
   for(int ii=0; ii<81; ++ii) ten[ii] = temp[ii];
 }
-
 
 void Tensor4_3D::TenPMult( const Tensor4_3D &P )
 {

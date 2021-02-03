@@ -94,7 +94,6 @@ ALocal_NodalBC::ALocal_NodalBC( const std::string &fileBaseName,
   VEC_T::shrink2fit(LPM_offset);
 }
 
-
 ALocal_NodalBC::~ALocal_NodalBC()
 {
   clean_LocalMaster();
@@ -107,8 +106,6 @@ ALocal_NodalBC::~ALocal_NodalBC()
   VEC_T::clean(LD_offset);
   VEC_T::clean(LPS_offset);
 }
-
-
 
 void ALocal_NodalBC::print_info() const
 {

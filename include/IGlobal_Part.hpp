@@ -10,6 +10,7 @@
 // to create the partition for each processor. This helps us avoid 
 // rerunning the same METIS call.
 //
+// Author: Ju Liu
 // Date: Oct. 2 2013
 // ==================================================================
 #include "metis.h"

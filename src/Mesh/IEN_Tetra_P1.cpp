@@ -1,10 +1,8 @@
 #include "IEN_Tetra_P1.hpp"
 
 IEN_Tetra_P1::IEN_Tetra_P1( const int &in_nelem,
-    const std::vector<int> &in_ien )
+    const std::vector<int> &in_ien ) : nElem( in_nelem )
 {
-  nElem = in_nelem;
-
   // Linear tets has four local nodes
   IEN = new int [nElem * 4];
 
@@ -14,7 +12,7 @@ IEN_Tetra_P1::IEN_Tetra_P1( const int &in_nelem,
 
 IEN_Tetra_P1::~IEN_Tetra_P1()
 {
-  delete [] IEN; IEN = NULL;
+  delete [] IEN; IEN = nullptr;
 }
 
 

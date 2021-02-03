@@ -23,22 +23,21 @@ class ALocal_EBC_wall : public ALocal_EBC
 
     virtual void print_info() const;
 
-    virtual void get_thickness(const int &eindex,
-        double * const &e_thickness) const;
+    virtual void get_thickness(const int &eindex, double * const &e_thickness) const;
 
-    virtual void get_youngsmod(const int &eindex,
-        double * const &e_youngsmod) const;
+    virtual void get_youngsmod(const int &eindex, double * const &e_youngsmod) const;
 
     virtual double get_fluid_density() const {return fluid_density;}
 
   protected:
+    // Fluid densities are used to generate the youngs modulus for arteries at
+    // the preprocessing stage.
     double fluid_density;
 
     // If this partition owns any part of the wall, the thickness and
     // youngsmod vectors are each of length num_local_node[0].
     // Otherwise, these vectors are of length 0.
-    std::vector<double> thickness;
-    std::vector<double> youngsmod;
+    std::vector<double> thickness, youngsmod;
 };
 
 #endif

@@ -7,7 +7,6 @@ Matrix_3x3::Matrix_3x3()
   mat[6] = 0.0; mat[7] = 0.0; mat[8] = 1.0;
 }
 
-
 Matrix_3x3::Matrix_3x3( const Matrix_3x3 &source )
 {
   for(int ii=0; ii<9; ++ii) mat[ii] = source(ii);
@@ -23,10 +22,8 @@ Matrix_3x3::Matrix_3x3(
   mat[6] = a31; mat[7] = a32; mat[8] = a33;
 }
 
-
 Matrix_3x3::~Matrix_3x3()
 {}
-
 
 bool Matrix_3x3::is_identical( const Matrix_3x3 source ) const
 {
@@ -35,18 +32,15 @@ bool Matrix_3x3::is_identical( const Matrix_3x3 source ) const
   return true;
 }
 
-
 void Matrix_3x3::copy( const Matrix_3x3 &source )
 {
   for(int ii=0; ii<9; ++ii) mat[ii] = source(ii);
 }
 
-
 void Matrix_3x3::copy( double source[9] )
 {
   for(int ii=0; ii<9; ++ii) mat[ii] = source[ii];
 }
-
 
 Matrix_3x3& Matrix_3x3::operator= (const Matrix_3x3 &source)
 {
@@ -56,7 +50,6 @@ Matrix_3x3& Matrix_3x3::operator= (const Matrix_3x3 &source)
   return *this; 
 }
 
-
 Matrix_3x3 operator+(const Matrix_3x3 &left, const Matrix_3x3 &right)
 {
   Matrix_3x3 result;
@@ -64,7 +57,6 @@ Matrix_3x3 operator+(const Matrix_3x3 &left, const Matrix_3x3 &right)
   
   return result;
 }
-
 
 Matrix_3x3 operator-(const Matrix_3x3 &left, const Matrix_3x3 &right)
 {
@@ -80,13 +72,11 @@ Matrix_3x3& Matrix_3x3::operator+= (const Matrix_3x3 &source)
   return *this;
 }
 
-
 Matrix_3x3& Matrix_3x3::operator-= (const Matrix_3x3 &source)
 {
   for(int ii=0; ii<9; ++ii) mat[ii] -= source(ii);
   return *this;
 }
-
 
 Matrix_3x3& Matrix_3x3::operator*= (const double &val)
 {
@@ -99,14 +89,12 @@ void Matrix_3x3::gen_zero()
   for(int ii=0; ii<9; ++ii) mat[ii] = 0.0; 
 }
 
-
 void Matrix_3x3::gen_id()
 {
   mat[0] = 1.0; mat[1] = 0.0; mat[2] = 0.0;
   mat[3] = 0.0; mat[4] = 1.0; mat[5] = 0.0;
   mat[6] = 0.0; mat[7] = 0.0; mat[8] = 1.0;
 }
-
 
 void Matrix_3x3::gen_rand()
 {
@@ -120,14 +108,12 @@ void Matrix_3x3::gen_rand()
   }
 }
 
-
 void Matrix_3x3::gen_hilb()
 {
   for(int ii=0; ii<3; ++ii)
     for(int jj=0; jj<3; ++jj)
       mat[ii*3+jj] = 1.0 / (ii + jj + 1.0);
 }
-
 
 void Matrix_3x3::gen_outprod( const double * const &a, const double * const &b )
 {
@@ -136,14 +122,12 @@ void Matrix_3x3::gen_outprod( const double * const &a, const double * const &b )
   mat[6] = a[2] * b[0]; mat[7] = a[2] * b[1]; mat[8] = a[2] * b[2];
 }
 
-
 void Matrix_3x3::gen_outprod( const Vector_3 &a, const Vector_3 &b ) 
 {
   mat[0] = a(0) * b(0); mat[1] = a(0) * b(1); mat[2] = a(0) * b(2);
   mat[3] = a(1) * b(0); mat[4] = a(1) * b(1); mat[5] = a(1) * b(2);
   mat[6] = a(2) * b(0); mat[7] = a(2) * b(1); mat[8] = a(2) * b(2);
 }
-
 
 void Matrix_3x3::gen_outprod( const double * const &a )
 {
@@ -152,14 +136,12 @@ void Matrix_3x3::gen_outprod( const double * const &a )
   mat[6] = a[2] * a[0]; mat[7] = a[2] * a[1]; mat[8] = a[2] * a[2];
 }
 
-
 void Matrix_3x3::gen_outprod( const Vector_3 &a )
 {
   mat[0] = a(0) * a(0); mat[1] = a(0) * a(1); mat[2] = a(0) * a(2);
   mat[3] = a(1) * a(0); mat[4] = a(1) * a(1); mat[5] = a(1) * a(2);
   mat[6] = a(2) * a(0); mat[7] = a(2) * a(1); mat[8] = a(2) * a(2);
 }
-
 
 void Matrix_3x3::transpose()
 {
@@ -168,7 +150,6 @@ void Matrix_3x3::transpose()
   temp = mat[2]; mat[2] = mat[6]; mat[6] = temp;
   temp = mat[5]; mat[5] = mat[7]; mat[7] = temp;
 }
-
 
 void Matrix_3x3::inverse()
 {
@@ -189,24 +170,20 @@ void Matrix_3x3::inverse()
   for(int ii=0; ii<9; ++ii) mat[ii] = temp[ii];
 }
 
-
 void Matrix_3x3::scale( const double &val )
 {
   for(int ii=0; ii<9; ++ii) mat[ii] = mat[ii] * val;
 }
-
 
 void Matrix_3x3::AXPY( const double &val, const Matrix_3x3 &source )
 {
   for(int ii=0; ii<9; ++ii) mat[ii] = mat[ii] + val * source(ii);
 }
 
-
 void Matrix_3x3::PY( const Matrix_3x3 &source )
 {
   for(int ii=0; ii<9; ++ii) mat[ii] += source(ii);
 }
-
 
 double Matrix_3x3::det() const
 {
@@ -214,7 +191,6 @@ double Matrix_3x3::det() const
     + mat[2] * mat[3] * mat[7] - mat[2] * mat[4] * mat[6]
     - mat[0] * mat[5] * mat[7] - mat[1] * mat[3] * mat[8];
 }
-
 
 double Matrix_3x3::I2() const
 {
@@ -230,14 +206,12 @@ double Matrix_3x3::VecMatVec( const double * const &x,
     + x[2] * ( mat[6] * y[0] + mat[7] * y[1] + mat[8] * y[2] );    
 }
 
-
 double Matrix_3x3::VecMatVec( const Vector_3 &x, const Vector_3 &y ) const
 {
   return x(0) * ( mat[0] * y(0) + mat[1] * y(1) + mat[2] * y(2) )
     + x(1) * ( mat[3] * y(0) + mat[4] * y(1) + mat[5] * y(2) )
     + x(2) * ( mat[6] * y(0) + mat[7] * y(1) + mat[8] * y(2) );
 }
-
 
 void Matrix_3x3::VecMult( const double * const &x, double * const &y ) const
 {
@@ -246,14 +220,12 @@ void Matrix_3x3::VecMult( const double * const &x, double * const &y ) const
   y[2] = mat[6] * x[0] + mat[7] * x[1] + mat[8] * x[2];
 }
 
-
 void Matrix_3x3::VecMult( const Vector_3 &x, Vector_3 &y ) const
 {
   y(0) = mat[0] * x(0) + mat[1] * x(1) + mat[2] * x(2);
   y(1) = mat[3] * x(0) + mat[4] * x(1) + mat[5] * x(2);
   y(2) = mat[6] * x(0) + mat[7] * x(1) + mat[8] * x(2);
 }
-
 
 void Matrix_3x3::VecMult( const double &x0, const double &x1, const double &x2, 
     double * const &y ) const
@@ -263,14 +235,12 @@ void Matrix_3x3::VecMult( const double &x0, const double &x1, const double &x2,
   y[2] = mat[6] * x0 + mat[7] * x1 + mat[8] * x2;
 }
 
-
 void Matrix_3x3::VecMultT( const double * const &x, double * const &y ) const
 {
   y[0] = mat[0] * x[0] + mat[3] * x[1] + mat[6] * x[2];
   y[1] = mat[1] * x[0] + mat[4] * x[1] + mat[7] * x[2];
   y[2] = mat[2] * x[0] + mat[5] * x[1] + mat[8] * x[2];
 }
-
 
 void Matrix_3x3::VecMultT( const Vector_3 &x, Vector_3 &y ) const
 {
@@ -279,7 +249,6 @@ void Matrix_3x3::VecMultT( const Vector_3 &x, Vector_3 &y ) const
   y(2) = mat[2] * x(0) + mat[5] * x(1) + mat[8] * x(2);
 }
 
-
 void Matrix_3x3::VecMultT(const double &x0, const double &x1, const double &x2,
     double * const &y ) const 
 {
@@ -287,7 +256,6 @@ void Matrix_3x3::VecMultT(const double &x0, const double &x1, const double &x2,
   y[1] = mat[1] * x0 + mat[4] * x1 + mat[7] * x2;
   y[2] = mat[2] * x0 + mat[5] * x1 + mat[8] * x2;
 }
-
 
 void Matrix_3x3::VecMult( double * const &x ) const
 {
@@ -298,7 +266,6 @@ void Matrix_3x3::VecMult( double * const &x ) const
   x[0] = y[0]; x[1] = y[1]; x[2] = y[2];
 }
 
-
 void Matrix_3x3::VecMult( Vector_3 &x ) const
 {
   double y[3] = {0.0, 0.0, 0.0};
@@ -307,7 +274,6 @@ void Matrix_3x3::VecMult( Vector_3 &x ) const
   y[2] = mat[6] * x(0) + mat[7] * x(1) + mat[8] * x(2);
   x(0) = y[0]; x(1) = y[1]; x(2) = y[2];
 }
-
 
 void Matrix_3x3::MatMult( const Matrix_3x3 &mleft, const Matrix_3x3 &mright )
 {
@@ -328,6 +294,21 @@ void Matrix_3x3::MatMult( const Matrix_3x3 &mleft, const Matrix_3x3 &mright )
   for(int ii=0; ii<9; ++ii) mat[ii] = temp[ii];
 }
 
+void Matrix_3x3::MatRot( const Matrix_3x3 &Q )
+{
+  double temp[9] = {0};
+  for(int ii=0; ii<3; ++ii)
+  {
+    for(int jj=0; jj<3; ++jj)
+    {
+      temp[ii*3+jj] = ( Q(3*ii) * mat[0] + Q(3*ii+1) * mat[3] + Q(3*ii+2) * mat[6] ) * Q(3*jj)
+        + ( Q(3*ii) * mat[1] + Q(3*ii+1) * mat[4] + Q(3*ii+2) * mat[7] ) * Q(3*jj+1)
+        + ( Q(3*ii) * mat[2] + Q(3*ii+1) * mat[5] + Q(3*ii+2) * mat[8] ) * Q(3*jj+2);
+    }
+  }
+  
+  for(int ii=0; ii<9; ++ii) mat[ii] = temp[ii];
+}
 
 void Matrix_3x3::MatMultTransposeLeft( const Matrix_3x3 &in )
 {
@@ -344,7 +325,6 @@ void Matrix_3x3::MatMultTransposeLeft( const Matrix_3x3 &in )
 
   for(int ii=0; ii<9; ++ii) mat[ii] = temp[ii];
 }
-
 
 void Matrix_3x3::MatMultTransposeRight( const Matrix_3x3 &in )
 {
@@ -363,14 +343,12 @@ void Matrix_3x3::MatMultTransposeRight( const Matrix_3x3 &in )
   for(int ii=0; ii<9; ++ii) mat[ii] = temp[ii];
 }
 
-
 void Matrix_3x3::print() const
 {
   std::cout<<std::setprecision(9)<<mat[0]<<'\t'<<mat[1]<<'\t'<<mat[2]<<std::endl;
   std::cout<<std::setprecision(9)<<mat[3]<<'\t'<<mat[4]<<'\t'<<mat[5]<<std::endl;
   std::cout<<std::setprecision(9)<<mat[6]<<'\t'<<mat[7]<<'\t'<<mat[8]<<std::endl;
 }
-
 
 double Matrix_3x3::MatContraction( const Matrix_3x3 &in ) const
 {
@@ -379,14 +357,12 @@ double Matrix_3x3::MatContraction( const Matrix_3x3 &in ) const
     + mat[8] * in(8);
 }
 
-
 double Matrix_3x3::MatTContraction( const Matrix_3x3 &in ) const
 {
   return mat[0] * in(0) + mat[1] * in(3) + mat[2] * in(6) + mat[3] * in(1)
     + mat[4] * in(4) + mat[5] * in(7) + mat[6] * in(2) + mat[7] * in(5)
     + mat[8] * in(8);
 }
-
 
 void Matrix_3x3::find_eigen_vector( const double &eta, Vector_3 &v,
     Vector_3 &s1, Vector_3 &s2 ) const
@@ -470,7 +446,6 @@ void Matrix_3x3::find_eigen_vector( const double &eta, Vector_3 &v,
   }
 }
 
-
 double Matrix_3x3::J2() const
 {
   const double a = mat[0] * mat[0] + 2.0 * mat[1] * mat[3] + 2.0 * mat[2] * mat[6]
@@ -480,7 +455,6 @@ double Matrix_3x3::J2() const
 
   return 0.5 * a - b * b / 6.0;
 }
-
 
 double Matrix_3x3::J3() const
 {
@@ -494,7 +468,6 @@ double Matrix_3x3::J3() const
     + mat[2] * mat[3] * mat[7] - mat[2] * m4 * mat[6]
     - m0 * mat[5] * mat[7] - mat[1] * mat[3] * m8;
 }
-
 
 int Matrix_3x3::eigen_decomp( double &eta1, double &eta2, double &eta3,
            Vector_3 &v1, Vector_3 &v2, Vector_3 &v3 ) const

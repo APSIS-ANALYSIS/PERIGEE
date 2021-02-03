@@ -1,13 +1,13 @@
 #include "PLocAssem_Tet_CMM_GenAlpha.hpp"
 
 PLocAssem_Tet_CMM_GenAlpha::PLocAssem_Tet_CMM_GenAlpha(
-        const TimeMethod_GenAlpha * const &tm_gAlpha,
-        const int &in_nlocbas, const int &in_nqp,
-        const int &in_snlocbas,
-        const double &in_rho, const double &in_vis_mu,
-        const double &in_beta, const double &in_wall_rho,
-        const double &in_nu, const double &in_kappa,
-        const double &in_ctauc, const int &elemtype )
+    const TimeMethod_GenAlpha * const &tm_gAlpha,
+    const int &in_nlocbas, const int &in_nqp,
+    const int &in_snlocbas,
+    const double &in_rho, const double &in_vis_mu,
+    const double &in_beta, const double &in_wall_rho,
+    const double &in_nu, const double &in_kappa,
+    const double &in_ctauc, const int &elemtype )
 : rho0( in_rho ), vis_mu( in_vis_mu ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()), beta(in_beta), rho_w(in_wall_rho),
@@ -272,7 +272,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
     const double r_dot_gradu = u_x * rx + u_y * ry + u_z * rz;
     const double r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
     const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
-    
+
     // Get the Discontinuity Capturing tau
     get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
 
@@ -443,7 +443,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
     const double r_dot_gradu = u_x * rx + u_y * ry + u_z * rz;
     const double r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
     const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
-    
+
     get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
 
     for(int A=0; A<nLocBas; ++A)
@@ -1155,26 +1155,19 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
         }
       }
     }
-    
+
     // Multiply by displacements in global coords
     // Kg_{ij} * u_{j}
     double lin_elasticity [snLocBas * dim ] = {0.0};
     for(int ii=0; ii<snLocBas*dim; ++ii)
-    {
       for(int jj=0; jj<snLocBas*dim; ++jj)
-      {
         lin_elasticity[ii] += Kg[ (snLocBas*dim)*ii + jj ] * sol_wall_disp[jj];
-      }
-    } 
 
     for(int A=0; A<snLocBas; ++A)
     {
-      sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * u_t - R[A] * rho_w * f1
-          + lin_elasticity[dim*A] ); 
-      sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * v_t - R[A] * rho_w * f2
-          + lin_elasticity[dim*A+1] ); 
-      sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * w_t - R[A] * rho_w * f3
-          + lin_elasticity[dim*A+2] ); 
+      sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * ( u_t - f1 ) + lin_elasticity[dim*A] ); 
+      sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * ( v_t - f2 ) + lin_elasticity[dim*A+1] ); 
+      sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * ( w_t - f3 ) + lin_elasticity[dim*A+2] ); 
     }
 
   } // end qua loop
@@ -1306,21 +1299,14 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     // Kg_{ij} * u_{j}
     double lin_elasticity [snLocBas * dim ] = {0.0};
     for(int ii=0; ii<snLocBas*dim; ++ii)
-    {
       for(int jj=0; jj<snLocBas*dim; ++jj)
-      {
         lin_elasticity[ii] += Kg[(snLocBas*dim)*ii + jj] * sol_wall_disp[jj];
-      }
-    } 
 
     for(int A=0; A<snLocBas; ++A)
     {
-      sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * u_t - R[A] * rho_w * f1
-          + lin_elasticity[dim*A] ); 
-      sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * v_t - R[A] * rho_w * f2
-          + lin_elasticity[dim*A+1] ); 
-      sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * w_t - R[A] * rho_w * f3
-          + lin_elasticity[dim*A+2] ); 
+      sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * ( u_t - f1 ) + lin_elasticity[dim*A] ); 
+      sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * ( v_t - f2 ) + lin_elasticity[dim*A+1] ); 
+      sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * ( w_t - f3 ) + lin_elasticity[dim*A+2] ); 
 
       for(int B=0; B<nLocBas; ++B)
       {
@@ -1356,7 +1342,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
         sur_Tangent[ 4*snLocBas*(4*A+3) + 4*B+3 ] += gwts * h_w * (
             alpha_m * rho_w * R[A] * R[B]
             + dd_du * Kg[ (snLocBas*dim)*(A*dim+2) + (B*dim+2) ] );
-
 
       } // end B loop
     } // end A loop
