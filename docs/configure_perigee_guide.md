@@ -35,6 +35,15 @@ sudo apt install libxt-dev
 sudo apt install cmake
 sudo apt install valgrind
 ```
+Go to Ubuntu Software and install Texmaker, HDFView, and JabRef.
+
+For Acrobat Reader, you may need to run the following.
+```sh
+sudo apt install gdebi-core libxml2:i386 libcanberra-gtk-module:i386 gtk2-engines-murrine:i386 libatk-adaptor:i386
+wget ftp://ftp.adobe.com/pub/adobe/reader/unix/9.x/9.5.5/enu/AdbeRdr9.5.5-1_i386linux_enu.deb
+sudo gdebi AdbeRdr9.5.5-1_i386linux_enu.deb
+```
+Then clean the .deb file from your disk.
 
 ## Name your machine
 Before you start, I recommend giving a meaningful name for your machine. What I typically do is that I give an environmental variable for my machine to name it. My first office desktop is called Bacon, and I have been using this name since then. To give your machine a name, go back to the home directory and open the .bashrc file, add `export MACHINE_NAME=bacon` to this file. Save it and close the terminal. Reopen the terminal and type
