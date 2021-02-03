@@ -166,8 +166,7 @@ class ALocal_EBC
     //              this partition owns any cell on this surface.
     //              ii : face_id ranging from 0 <= ii < num_ebc,
     // --------------------------------------------------------------
-    virtual void get_outvec( const int &ii, double &nx, double &ny,
-        double &nz ) const
+    virtual void get_outvec( const int &ii, double &nx, double &ny, double &nz ) const
     {
       SYS_T::print_fatal("Error: ALocal_EBC::get_outvec is not implemented. \n");
     }
@@ -208,14 +207,16 @@ class ALocal_EBC
     }
 
   protected:
-    // the number of different ebc domain
+    // the number of different ebc domain on which one may prescribe different
+    // elemental boundary conditions.
     int num_ebc;
 
     // num_local_node[ii] gives the ii-th ebc's local node number
     // num_local_cell[ii] gives the ii-th ebc's local cell number
     // cell_nLocBas[ii] gives the cell's number of node. e.g., 
     //                  triangle surface is 3,
-    //                  quadralaterial surface is 4.
+    //                  quadralaterial surface is 4,
+    //                  quadratic triangle surface is 6.
     std::vector<int> num_local_node, num_local_cell, cell_nLocBas;
 
     // local_pt_xyz[ii] gives a list of local node's coordinates
@@ -230,8 +231,7 @@ class ALocal_EBC
     // size: num_ebc x num_local_node[ii]
     std::vector< std::vector<int> > local_global_node;
 
-    // local node's position in the volumetric local portion's
-    // local_to_global array.
+    // local node's position in the volumetric local portion's local_to_global array.
     // size: num_ebc x num_local_node[ii]
     std::vector< std::vector<int> > local_node_pos;
 
