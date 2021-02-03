@@ -35,7 +35,7 @@ sudo apt install libxt-dev
 sudo apt install cmake
 sudo apt install valgrind
 ```
-Go to Ubuntu Software and install texmaker, HDFView, JabRef.
+Go to Ubuntu Software and install Texmaker, HDFView, and JabRef.
 
 For Acrobat Reader, you may need to run the following.
 ```sh
