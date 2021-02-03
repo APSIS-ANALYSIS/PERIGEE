@@ -44,10 +44,11 @@ class ALocal_Elem
     }
 
   private:
-    // Global indices of elements in the local cpu.
+    // Global indices of elements that belong to the local CPU.
     std::vector<int> elem_loc;
     
-    // Length of the elem_loc vector.
+    // The number of elements that belong to the CPU, which equals
+    // the length of the elem_loc vector.
     int nlocalele;
 };
 
