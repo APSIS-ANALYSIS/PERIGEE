@@ -16,8 +16,8 @@ ALocal_IEN::ALocal_IEN( const std::string &fileBaseName, const int &cpu_rank )
   
   delete h5r; H5Fclose( file_id );
 
-  if(int(LIEN.size()) != nLocBas * nlocalele)
-    SYS_T::print_fatal("Error: ALocal_IEN::LIEN is in wrong format.\n");
+  SYS_T::print_fatal_if( int(LIEN.size()) != nLocBas * nlocalele, 
+    "Error: ALocal_IEN::LIEN is in wrong format.\n" );
 }
 
 ALocal_IEN::~ALocal_IEN()
