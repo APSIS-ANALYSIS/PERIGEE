@@ -135,7 +135,7 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
   SYS_T::commPrint( "===> GenBC_Coronary data are read in from %s.\n", lpn_filename );
 
   // Set a zero initial values. 
-  // They should be reset based on the initial 3D solutions.
+  // They will be reset based on the 3D solutions.
   for(int ii=0; ii<num_ebc; ++ii)
   {
     Q0[ii] = 0.0;
