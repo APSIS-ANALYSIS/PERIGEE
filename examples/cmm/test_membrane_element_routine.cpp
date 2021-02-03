@@ -104,14 +104,15 @@ int main( int argc, char * argv[] )
 
   elem -> buildBasis( quad, ctrl_x, ctrl_y, ctrl_z );
 
-  // Basis function gradients with respect to lamina coords
+  // Basis functions and their gradients with respect to lamina coords
+  double R [nLocBas] = {0.0};
   double dR_dxl [nLocBas] = {0.0};
   double dR_dyl [nLocBas] = {0.0};
   
   // Test on a single quadrature point
   const int qua = 0;
 
-  elem -> get_gradR(qua, dR_dxl, dR_dyl);
+  elem -> get_R_gradR(qua, R, dR_dxl, dR_dyl);
 
   // // Strain displacement matrix B in lamina coords
   // // 5 x (nLocBas * dim)
@@ -239,6 +240,87 @@ int main( int argc, char * argv[] )
   std::cout << "\n===== K in global coords =====" << std::endl;
   print_2Darray(Kg, nLocBas*dim, nLocBas*dim);
 
+  // Multiply by displacements in global coords
+  // Kg_{ij} * u_{j}
+  double sol_wall_disp  [ nLocBas * dim ] = {0.0}; 
+  for(int A=0; A<nLocBas; ++A)
+  {
+    sol_wall_disp[dim*A]   =  1.0;
+    sol_wall_disp[dim*A+1] = -4.0;
+    sol_wall_disp[dim*A+2] =  2.0;
+  }
+
+  std::cout << "\n===== sol_wall_disp =====" << std::endl;
+  print_2Darray(sol_wall_disp, nLocBas*dim, 1);
+
+  double lin_elasticity [ nLocBas * dim ] = {0.0};
+  for(int ii=0; ii<nLocBas*dim; ++ii)
+    for(int jj=0; jj<nLocBas*dim; ++jj)
+      lin_elasticity[ii] += Kg[ (nLocBas*dim)*ii + jj ] * sol_wall_disp[jj];
+
+  std::cout << "\n===== lin_elasticity v1 =====" << std::endl;
+  print_2Darray(lin_elasticity, nLocBas*dim, 1);
+
+  // Generate lin_elasticity without first generating the tangent ===========
+  double sol_wall_disp_l [nLocBas * dim ] = {0.0};
+  for(int ii=0; ii<nLocBas; ++ii)
+  {
+    sol_wall_disp_l[dim*ii]   = sol_wall_disp[dim*ii] * Q(0, 0) 
+      + sol_wall_disp[dim*ii+1] * Q(0, 1) + sol_wall_disp[dim*ii+2] * Q(0, 2); 
+
+    sol_wall_disp_l[dim*ii+1] = sol_wall_disp[dim*ii] * Q(1, 0) 
+      + sol_wall_disp[dim*ii+1] * Q(1, 1) + sol_wall_disp[dim*ii+2] * Q(1, 2); 
+
+    sol_wall_disp_l[dim*ii+2] = sol_wall_disp[dim*ii] * Q(2, 0) 
+      + sol_wall_disp[dim*ii+1] * Q(2, 1) + sol_wall_disp[dim*ii+2] * Q(2, 2); 
+  }
+
+  double u1_xl  = 0.0, u1_yl = 0.0;
+  double u2_xl  = 0.0, u2_yl = 0.0;
+  double u3_xl  = 0.0, u3_yl = 0.0;
+  for(int ii=0; ii<nLocBas; ++ii)
+  {
+    u1_xl += sol_wall_disp_l[dim*ii]   * dR_dxl[ii];
+    u1_yl += sol_wall_disp_l[dim*ii]   * dR_dyl[ii];
+    u2_xl += sol_wall_disp_l[dim*ii+1] * dR_dxl[ii];
+    u2_yl += sol_wall_disp_l[dim*ii+1] * dR_dyl[ii];
+    u3_xl += sol_wall_disp_l[dim*ii+2] * dR_dxl[ii];
+    u3_yl += sol_wall_disp_l[dim*ii+2] * dR_dyl[ii];
+  }
+
+  // Cauchy stress in lamina coords 
+  double sigma_l [ dim * dim ] = {0.0};
+  sigma_l[0] = coef * (u1_xl + nu*u2_yl);              // sigma_11
+  sigma_l[1] = coef * 0.5*(1.0-nu) * (u1_yl + u2_xl);  // sigma_12
+  sigma_l[2] = coef * 0.5*kappa*(1.0-nu) * u3_xl;      // sigma_13
+  sigma_l[3] = coef * 0.5*(1.0-nu) * (u1_yl + u2_xl);  // sigma_21
+  sigma_l[4] = coef * (nu*u1_xl + u2_yl);              // sigma_22
+  sigma_l[5] = coef * 0.5*kappa*(1.0-nu) * u3_yl;      // sigma_23
+  sigma_l[6] = coef * 0.5*kappa*(1.0-nu) * u3_xl;      // sigma_31  
+  sigma_l[7] = coef * 0.5*kappa*(1.0-nu) * u3_yl;      // sigma_32 
+  sigma_l[8] = 0.0;                                    // sigma_33
+
+  // Cauchy stress in global coords
+  // Q^T * sigma_l * Q = Q_{ki} * sigma_l_{kl} * Q_{lj}
+  double sigma_g [ dim * dim ] = {0.0};
+  for(int ii=0; ii<dim; ++ii)
+  {
+    for(int jj=0; jj<dim; ++jj)
+    {
+      sigma_g[dim*ii+jj] += Q(0, ii) * sigma_l[dim*0+0] * Q(0, jj);
+      sigma_g[dim*ii+jj] += Q(0, ii) * sigma_l[dim*0+1] * Q(1, jj);
+      sigma_g[dim*ii+jj] += Q(0, ii) * sigma_l[dim*0+2] * Q(2, jj);
+
+      sigma_g[dim*ii+jj] += Q(1, ii) * sigma_l[dim*1+0] * Q(0, jj);
+      sigma_g[dim*ii+jj] += Q(1, ii) * sigma_l[dim*1+1] * Q(1, jj);
+      sigma_g[dim*ii+jj] += Q(1, ii) * sigma_l[dim*1+2] * Q(2, jj);
+
+      sigma_g[dim*ii+jj] += Q(2, ii) * sigma_l[dim*2+0] * Q(0, jj);
+      sigma_g[dim*ii+jj] += Q(2, ii) * sigma_l[dim*2+1] * Q(1, jj);
+      sigma_g[dim*ii+jj] += Q(2, ii) * sigma_l[dim*2+2] * Q(2, jj);
+    }
+  }
+
   // Use Triangle6 basis function gradients to verify Triangle6_membrane
   FEAElement * elem_tri6 = nullptr; 
   if(nLocBas == 6)
@@ -334,7 +416,7 @@ void print_2Darray(const double * const arr, const int nrow,
   {
     for(int jj = 0; jj < ncol; ++jj)
     {
-      std::cout << std::scientific << std::setprecision(3) << std::setw(10) << arr[ii * ncol + jj] << " ";
+      std::cout << std::scientific << std::setprecision(6) << std::setw(16) << arr[ii * ncol + jj] << " ";
     }
     std::cout << std::endl;
   }
