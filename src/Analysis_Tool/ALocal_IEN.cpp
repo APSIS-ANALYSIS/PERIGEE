@@ -20,10 +20,8 @@ ALocal_IEN::ALocal_IEN( const std::string &fileBaseName, const int &cpu_rank )
     SYS_T::print_fatal("Error: ALocal_IEN::LIEN is in wrong format.\n");
 }
 
-
 ALocal_IEN::~ALocal_IEN()
 {}
-
 
 void ALocal_IEN::print_info() const
 {

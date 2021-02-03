@@ -28,13 +28,11 @@ EBC_Partition_vtp_wall::EBC_Partition_vtp_wall(
   }
 }
 
-
 EBC_Partition_vtp_wall::~EBC_Partition_vtp_wall()
 {
   VEC_T::clean( part_thickness );
   VEC_T::clean( part_youngsmod );
 }
-
 
 void EBC_Partition_vtp_wall::write_hdf5( const char * FileName ) const
 {
@@ -69,7 +67,6 @@ void EBC_Partition_vtp_wall::write_hdf5( const char * FileName ) const
 
   delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
 }
-
 
 void EBC_Partition_vtp_wall::write_hdf5( const char * FileName, 
     const char * GroupName ) const

@@ -27,7 +27,6 @@ AGlobal_Mesh_Info_FEM_3D::AGlobal_Mesh_Info_FEM_3D(
   H5Fclose( file_id );
 }
 
-
 AGlobal_Mesh_Info_FEM_3D::AGlobal_Mesh_Info_FEM_3D( 
     const std::string &fileBaseName,
     const int &cpu_rank, const int &num_enrich_node )
@@ -61,10 +60,8 @@ AGlobal_Mesh_Info_FEM_3D::AGlobal_Mesh_Info_FEM_3D(
   elemType = elemType + 10;
 }
 
-
 AGlobal_Mesh_Info_FEM_3D::~AGlobal_Mesh_Info_FEM_3D()
 {}
-
 
 void AGlobal_Mesh_Info_FEM_3D::print_info() const
 {
@@ -76,6 +73,5 @@ void AGlobal_Mesh_Info_FEM_3D::print_info() const
   std::cout<<"probDim: "<<probDim<<std::endl;
   std::cout<<"elemType: "<<get_elemType()<<std::endl;
 }
-
 
 // EOF
