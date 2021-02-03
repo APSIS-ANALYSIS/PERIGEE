@@ -1064,7 +1064,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
   {
     // For membrane elements, basis function gradients are computed
     // with respect to lamina coords
-    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
+    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0] );
 
     double u_t = 0.0, v_t = 0.0, w_t = 0.0;
     double h_w = 0.0, E_w = 0.0;
@@ -1203,7 +1203,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
   {
     // For membrane elements, basis function gradients are computed
     // with respect to lamina coords
-    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
+    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0] );
 
     double u_t = 0.0, v_t = 0.0, w_t = 0.0;
     double h_w = 0.0, E_w = 0.0;
