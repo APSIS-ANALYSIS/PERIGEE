@@ -63,13 +63,11 @@ Part_Tet::Part_Tet(
   Generate_Partition( mesh, gpart, mnindex, IEN, ctrlPts, isPrintInfo );
 }
 
-
 Part_Tet::~Part_Tet()
 {
   for(int i=0; i<nlocalele; ++i) delete [] LIEN[i];
   delete [] LIEN;
 }
-
 
 void Part_Tet::Generate_Partition( const IMesh * const &mesh,
     const IGlobal_Part * const &gpart,
@@ -238,7 +236,6 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
     std::cout<<"-- proc "<<cpu_rank<<" Local control points generated. \n";
 }
 
-
 int Part_Tet::get_elemLocIndex(const int &gloindex) const
 {
   std::vector<int>::const_iterator findindex;
@@ -248,7 +245,6 @@ int Part_Tet::get_elemLocIndex(const int &gloindex) const
   else
     return (findindex - elem_loc.begin());
 }
-
 
 void Part_Tet::write( const char * inputFileName ) const
 {
@@ -365,7 +361,6 @@ void Part_Tet::write( const char * inputFileName ) const
   H5Fclose(file_id);
 }
 
-
 void Part_Tet::print_part_ele() const
 {
   std::cout<<"Proc: "<<cpu_rank<<" local elements: "<<std::endl;
@@ -373,7 +368,6 @@ void Part_Tet::print_part_ele() const
     std::cout<<elem_loc[e]<<'\t';
   std::cout<<std::endl;
 }
-
 
 void Part_Tet::print_part_node() const
 {
@@ -389,7 +383,6 @@ void Part_Tet::print_part_node() const
   }
 }
 
-
 void Part_Tet::print_part_ghost_node() const
 {
   std::cout<<"Proc: "<<cpu_rank<<" ghost nodes: "<<std::endl;
@@ -398,7 +391,6 @@ void Part_Tet::print_part_ghost_node() const
   std::cout<<std::endl;
 }
 
-
 void Part_Tet::print_part_local_to_global() const
 {
   std::cout<<"Proc: "<<cpu_rank<<" local_to_global array: "<<std::endl;
@@ -406,7 +398,6 @@ void Part_Tet::print_part_local_to_global() const
     std::cout<<local_to_global[n]<<"("<<n<<")"<<'\t';
   std::cout<<std::endl;
 }
-
 
 void Part_Tet::print_part_LIEN() const
 {
@@ -419,7 +410,6 @@ void Part_Tet::print_part_LIEN() const
   }
   std::cout<<std::endl;
 }
-
 
 void Part_Tet::print_part_loadbalance_edgecut() const
 {

@@ -152,12 +152,10 @@ QuadPts_Gauss::QuadPts_Gauss( const int &in_num_pts )
   std::reverse(qw.begin(), qw.end());
 }
 
-
 QuadPts_Gauss::~QuadPts_Gauss()
 {
   VEC_T::clean(qp); VEC_T::clean(qw);
 }
-
 
 void QuadPts_Gauss::print_info() const
 {
@@ -170,7 +168,6 @@ void QuadPts_Gauss::print_info() const
     std::cout<<std::setprecision(16)<<qp[ii]<<'\t'<<qw[ii]<<'\n';
   std::cout<<"=========================="<<std::endl;
 }
-
 
 void QuadPts_Gauss::compute_npts()
 {
