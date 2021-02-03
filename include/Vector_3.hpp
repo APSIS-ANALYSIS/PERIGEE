@@ -14,8 +14,10 @@
 // Author: Ju Liu
 // Date: June 24 2020
 // ==================================================================
+#include <iostream>
+#include <iomanip>
 #include <ctime>
-#include "Math_Tools.hpp"
+#include <cmath>
 
 class Vector_3
 {
@@ -73,7 +75,7 @@ class Vector_3
 
     double sum() const {return vec[0]+vec[1]+vec[2];}
 
-    double norm2() const {return MATH_T::norm2(vec[0],vec[1],vec[2]);}
+    double norm2() const {return sqrt(vec[0]*vec[0]+vec[1]*vec[1]+vec[2]*vec[2]);}
 
     void normalize(); // rescale vec to be norm one
 
