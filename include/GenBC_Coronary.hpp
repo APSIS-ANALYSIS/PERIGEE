@@ -79,6 +79,8 @@ class GenBC_Coronary : public IGenBC
        const double &in_P_0, const double &curr_time );
 
   private:
+    const int num_odes; // Number of ODEs in the model
+
     const int N; // ODE integrator's number of time steps
 
     const double h; // delta t = Nh
@@ -99,14 +101,15 @@ class GenBC_Coronary : public IGenBC
 
     // Number of intramyocardial pressure Pim data points for each outlet face
     // The vector length is num_ebc.
-    // Note: num_Pimdata=0 indicates an RCR outlet.
-    std::vector<int> num_Pimdata;
+    // Note: num_Pim_data=0 indicates an RCR outlet.
+    std::vector<int> num_Pim_data;
 
-    // tdata and Pimdata for user-provided intramyocardial pressure 
+    // Time_data and Pim_data for user-provided intramyocardial pressure 
     // waveform (time-pressure) for each coronary outlet face
-    // der_Pimdata for the corresponding dPim/dt for each coronary outlet face.
-    // Their sizes are num_ebc x num_Pimdata[ii] with 0 <= ii < num_ebc 
-    std::vector< std::vector<double> > tdata, Pimdata, der_Pimdata;
+    // der_Pim_data stands for the corresponding dPim/dt for each coronary 
+    // outlet face.
+    // Their sizes are num_ebc x num_Pim_data[ii] with 0 <= ii < num_ebc 
+    std::vector< std::vector<double> > Time_data, Pim_data, der_Pim_data;
 
     // precomputed dPim/dt needed by RK4, 
     // dPimdt_k1 has size num_ebc x N+1
@@ -129,6 +132,7 @@ class GenBC_Coronary : public IGenBC
     // The size of Pi0 is 2 x num_ebc
     std::vector< std::vector<double> > Pi0;
 
+    // PRIVATE FUNCTIONS:
     // Evaluate the coronary LPM (2 first order ODEs) for the ii-th outlet 
     // face (which is a coronary outlet) and output the ODE derivatives to K.
     void F( const int &ii, const double * const &pi, const double &q, 
