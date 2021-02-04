@@ -263,6 +263,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_residual(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &elementv,
     FEAElement * const &elements,
+    FEAElement * const &elementw,
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
@@ -270,6 +271,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_residual(
     const FEANode * const &fnode_ptr,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
+    const ALocal_EBC * const &ebc_wall_part,
     const IGenBC * const &gbc )
 {
   const int nElem = alelem_ptr->get_nlocalele();
@@ -321,7 +323,8 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_residual(
   // Backflow stabilization residual contribution
   BackFlow_G( sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
-  // Residual contribution from thin-walled linear membrane in CMM
+  // Residual contribution from the thin-walled linear membrane in CMM
+  WallMembrane_G( curr_time, dt, sol_a, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ebc_wall_part );
 
   // Resistance type boundary condition
   NatBC_Resis_G( dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
@@ -348,6 +351,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &elementv,
     FEAElement * const &elements,
+    FEAElement * const &elementw,
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
@@ -355,6 +359,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
     const FEANode * const &fnode_ptr,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
+    const ALocal_EBC * const &ebc_wall_part,
     const IGenBC * const &gbc )
 {
   const int nElem = alelem_ptr->get_nlocalele();
@@ -409,17 +414,8 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
   // Backflow stabilization residual & tangent contribution
   BackFlow_KG( dt, sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
-  // ==== TODO: call new fcn NatBC_wall_KG with the following args: ====
-  //   - dt
-  //   - sol_a (dot_sol at n+alpha_m) 
-  //   - wall displacement at n+alpha_f 
-  //   - lassem_ptr
-  //   - elements 
-  //   - quad_s
-  //   - nbc_part
-  //   - ebc_wall_part 
-  // ==== This function should assemble the wall contribution to residuals R_m and R_k
-  //      and tangents K_m,u and K_m,d ====
+  // Residual & tangent contributions from the thin-walled linear membrane in CMM
+  WallMembrane_KG( curr_time, dt, sol_a, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ebc_wall_part );
 
   // Resistance type boundary condition
   NatBC_Resis_KG( dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );

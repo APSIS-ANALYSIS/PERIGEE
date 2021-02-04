@@ -333,6 +333,7 @@ class IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
+        FEAElement * const &elementw,
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
@@ -340,6 +341,7 @@ class IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
+        const ALocal_EBC * const &ebc_wall_part,
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
@@ -508,6 +510,7 @@ class IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
+        FEAElement * const &elementw,
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
@@ -515,6 +518,7 @@ class IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
+        const ALocal_EBC * const &ebc_wall_part,
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
     

@@ -80,6 +80,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
+        FEAElement * const &elementw,
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
@@ -87,6 +88,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
+        const ALocal_EBC * const &ebc_wall_part,
         const IGenBC * const &gbc );
 
     // Assemble the residual vector and tangent matrix 
@@ -103,6 +105,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
+        FEAElement * const &elementw,
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
@@ -110,6 +113,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
+        const ALocal_EBC * const &ebc_wall_part,
         const IGenBC * const &gbc );
 
     // Assembly routine for the surface integrals of flow rate and
