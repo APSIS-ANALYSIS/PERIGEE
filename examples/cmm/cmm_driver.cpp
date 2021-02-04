@@ -25,7 +25,7 @@
 // #include "GenBC_RCR.hpp"
 // #include "GenBC_Inductance.hpp"
 #include "PLocAssem_Tet_CMM_GenAlpha.hpp"
-// #include "PGAssem_NS_FEM.hpp"
+#include "PGAssem_Tet_CMM_GenAlpha.hpp"
 #include "PTime_NS_Solver.hpp"
 
 int main( int argc, char *argv[] )
@@ -319,6 +319,19 @@ int main( int argc, char *argv[] )
       wall_density, wall_poisson, wall_kappa,
       c_tauc, GMIptr->get_elemType() );
 
+  // ===== Initial condition =====
+
+  // ===== Time step info =====
+
+  // ===== LPN models =====
+  IGenBC * gbc = nullptr;
+
+  // ===== Global assembly =====
+  SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
+
+  // ==== TODO: Pass wall_locebc into gloAssem_ptr ====
+  IPGAssem * gloAssem_ptr = new PGAssem_Tet_CMM_GenAlpha( locAssem_ptr, elements, quads,
+      GMIptr, locElem, locIEN, pNode, locnbc, locebc, gbc, nz_estimate );
 
   // ===== Deallocate memory =====
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic;

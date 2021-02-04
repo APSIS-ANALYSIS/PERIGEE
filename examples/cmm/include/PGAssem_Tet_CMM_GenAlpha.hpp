@@ -11,7 +11,7 @@
 // for the NS equations. The input solution vectors contains
 //  [ pressure; velocity ],
 // the dot solution contains
-//  [ dot pressure; dot velcoty ].
+//  [ dot pressure; dot velocity ].
 //
 // Author: Ju Liu 
 // Date Created: Feb. 10 2020

@@ -21,10 +21,10 @@ PGAssem_Tet_CMM_GenAlpha::PGAssem_Tet_CMM_GenAlpha(
 {
   // Make sure the data structure is compatible
   SYS_T::print_fatal_if(dof_sol != locassem_ptr->get_dof(),
-      "PGAssem_NS_FEM::dof_sol != locassem_ptr->get_dof(). \n");
+      "PGAssem_Tet_CMM_GenAlpha::dof_sol != locassem_ptr->get_dof(). \n");
 
   SYS_T::print_fatal_if(dof_mat != part_nbc->get_dofMat(),
-      "PGAssem_NS_FEM::dof_mat != part_nbc->get_dofMat(). \n");
+      "PGAssem_Tet_CMM_GenAlpha::dof_mat != part_nbc->get_dofMat(). \n");
 
   // Make sure that the surface element's number of local basis are 
   // the same. This is an assumption in this assembly routine.
@@ -32,7 +32,7 @@ PGAssem_Tet_CMM_GenAlpha::PGAssem_Tet_CMM_GenAlpha(
   
   for(int ebc_id=0; ebc_id < num_ebc; ++ebc_id){
     SYS_T::print_fatal_if(snLocBas != part_ebc->get_cell_nLocBas(ebc_id),
-        "Error: in PGAssem_NS_FEM, snLocBas has to be uniform. \n");
+        "Error: in PGAssem_Tet_CMM_GenAlpha, snLocBas has to be uniform. \n");
   }
 
   const int nlocrow = dof_mat * pnode_ptr->get_nlocalnode();
@@ -74,7 +74,7 @@ PGAssem_Tet_CMM_GenAlpha::~PGAssem_Tet_CMM_GenAlpha()
 }
 
 
-void PGAssem_NS_FEM::EssBC_KG(
+void PGAssem_Tet_CMM_GenAlpha::EssBC_KG(
     const ALocal_NodalBC * const &nbc_part, const int &field )
 {
   const int local_dir = nbc_part->get_Num_LD(field);
@@ -104,7 +104,7 @@ void PGAssem_NS_FEM::EssBC_KG(
 }
 
 
-void PGAssem_NS_FEM::EssBC_G( const ALocal_NodalBC * const &nbc_part, 
+void PGAssem_Tet_CMM_GenAlpha::EssBC_G( const ALocal_NodalBC * const &nbc_part, 
     const int &field )
 {
   const int local_dir = nbc_part->get_Num_LD(field);
@@ -129,7 +129,7 @@ void PGAssem_NS_FEM::EssBC_G( const ALocal_NodalBC * const &nbc_part,
 }
 
 
-void PGAssem_NS_FEM::Assem_nonzero_estimate(
+void PGAssem_Tet_CMM_GenAlpha::Assem_nonzero_estimate(
     const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &elements,
@@ -183,7 +183,7 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
 }
 
 
-void PGAssem_NS_FEM::Assem_mass_residual(
+void PGAssem_Tet_CMM_GenAlpha::Assem_mass_residual(
     const PDNSolution * const &sol_a,
     const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
@@ -251,7 +251,7 @@ void PGAssem_NS_FEM::Assem_mass_residual(
 }
 
 
-void PGAssem_NS_FEM::Assem_residual(
+void PGAssem_Tet_CMM_GenAlpha::Assem_residual(
     const PDNSolution * const &sol_a,
     const PDNSolution * const &sol_b,
     const PDNSolution * const &dot_sol_np1,
@@ -343,7 +343,7 @@ void PGAssem_NS_FEM::Assem_residual(
 }
 
 
-void PGAssem_NS_FEM::Assem_tangent_residual(
+void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
     const PDNSolution * const &sol_a,
     const PDNSolution * const &sol_b,
     const PDNSolution * const &dot_sol_np1,
@@ -442,7 +442,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
 }
 
 
-void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
+void PGAssem_Tet_CMM_GenAlpha::NatBC_G( const double &curr_time, const double &dt,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
@@ -486,7 +486,7 @@ void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
 }
 
 
-void PGAssem_NS_FEM::BackFlow_G( 
+void PGAssem_Tet_CMM_GenAlpha::BackFlow_G( 
     const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     IPLocAssem * const &lassem_ptr,
@@ -546,7 +546,7 @@ void PGAssem_NS_FEM::BackFlow_G(
 }
 
 
-void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
+void PGAssem_Tet_CMM_GenAlpha::BackFlow_KG( const double &dt,
     const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     IPLocAssem * const &lassem_ptr,
@@ -609,7 +609,7 @@ void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
 }
 
 
-double PGAssem_NS_FEM::Assem_surface_flowrate(
+double PGAssem_Tet_CMM_GenAlpha::Assem_surface_flowrate(
     const PDNSolution * const &vec,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
@@ -659,7 +659,7 @@ double PGAssem_NS_FEM::Assem_surface_flowrate(
 }
 
 
-double PGAssem_NS_FEM::Assem_surface_flowrate(
+double PGAssem_Tet_CMM_GenAlpha::Assem_surface_flowrate(
     const PDNSolution * const &vec,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
@@ -708,7 +708,7 @@ double PGAssem_NS_FEM::Assem_surface_flowrate(
 }
 
 
-double PGAssem_NS_FEM::Assem_surface_ave_pressure(
+double PGAssem_Tet_CMM_GenAlpha::Assem_surface_ave_pressure(
     const PDNSolution * const &vec,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
@@ -766,7 +766,7 @@ double PGAssem_NS_FEM::Assem_surface_ave_pressure(
 }
 
 
-double PGAssem_NS_FEM::Assem_surface_ave_pressure(
+double PGAssem_Tet_CMM_GenAlpha::Assem_surface_ave_pressure(
     const PDNSolution * const &vec,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
@@ -823,7 +823,7 @@ double PGAssem_NS_FEM::Assem_surface_ave_pressure(
 }
 
 
-void PGAssem_NS_FEM::NatBC_Resis_G(
+void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_G(
     const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     IPLocAssem * const &lassem_ptr,
@@ -892,7 +892,7 @@ void PGAssem_NS_FEM::NatBC_Resis_G(
 }
 
 
-void PGAssem_NS_FEM::NatBC_Resis_KG(
+void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_KG(
     const double &dt,
     const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
