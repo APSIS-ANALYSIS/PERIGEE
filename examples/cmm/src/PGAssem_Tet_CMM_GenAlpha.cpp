@@ -609,6 +609,36 @@ void PGAssem_Tet_CMM_GenAlpha::BackFlow_KG( const double &dt,
 }
 
 
+void PGAssem_Tet_CMM_GenAlpha::WallMembrane_G(
+    const double &curr_time,
+    const double &dt, 
+    const PDNSolution * const &dot_sol,
+    const PDNSolution * const &sol_wall_disp,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_w,
+    const IQuadPts * const &quad_s,
+    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_wall_part )
+{
+  // TODO
+}
+
+
+void PGAssem_Tet_CMM_GenAlpha::WallMembrane_KG(
+    const double &curr_time,
+    const double &dt, 
+    const PDNSolution * const &dot_sol,
+    const PDNSolution * const &sol_wall_disp,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_w,
+    const IQuadPts * const &quad_s,
+    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_wall_part )
+{
+  // TODO
+}
+
+
 double PGAssem_Tet_CMM_GenAlpha::Assem_surface_flowrate(
     const PDNSolution * const &vec,
     IPLocAssem * const &lassem_ptr,

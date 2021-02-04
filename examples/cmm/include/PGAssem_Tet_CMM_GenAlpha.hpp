@@ -3,7 +3,7 @@
 // ==================================================================
 // PGAssem_Tet_CMM_GenAlpha.hpp
 //
-// Parallel golbal assembly based on PETSc, using AIJ matrix format.
+// Parallel global assembly based on PETSc, using AIJ matrix format.
 // The assembly routine is designed for classical C0 FEM method, which
 // means we do not need extraction operators and local mesh sizes.
 //
@@ -23,7 +23,7 @@
 class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
 {
   public:
-    // Constructor for NS equations
+    // Constructor for CMM equations
     PGAssem_Tet_CMM_GenAlpha( 
         IPLocAssem * const &locassem_ptr,
         FEAElement * const &elements,
@@ -40,7 +40,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
     // Destructor
     virtual ~PGAssem_Tet_CMM_GenAlpha();
 
-    // Nonzero pattern estimate for the NS equations
+    // Nonzero pattern estimate for the CMM equations
     virtual void Assem_nonzero_estimate(
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
@@ -67,7 +67,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
-    // Assembly the residual vector for the NS equations
+    // Assembly the residual vector for the CMM equations
     virtual void Assem_residual(
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
@@ -89,7 +89,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const IGenBC * const &gbc );
 
     // Assembly the residual vector and tangent matrix 
-    // for the NS equations
+    // for the CMM equations
     virtual void Assem_tangent_residual(
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
@@ -199,6 +199,27 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
+
+    // Wall integral for thin-walled linear membrane
+    void WallMembrane_G( const double &curr_time,
+        const double &dt, 
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol_wall_disp,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &element_w,
+        const IQuadPts * const &quad_s,
+        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_wall_part );
+
+    void WallMembrane_KG( const double &curr_time,
+        const double &dt, 
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol_wall_disp,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &element_w,
+        const IQuadPts * const &quad_s,
+        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_wall_part );
 
     void GetLocal(const double * const &array, const int * const &IEN,
         double * const &local_array) const

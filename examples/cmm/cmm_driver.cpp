@@ -339,7 +339,7 @@ int main( int argc, char *argv[] )
   delete locebc; delete locebc_wall; delete pNode;
   delete inflow_rate_ptr; delete quadv; delete quads;
   delete elementv; delete elements; delete elementw; delete pmat;
-  delete tm_galpha_ptr; delete locAssem_ptr; 
+  delete tm_galpha_ptr; delete locAssem_ptr; delete gloAssem_ptr; 
 
   PetscFinalize();
   return EXIT_SUCCESS;
