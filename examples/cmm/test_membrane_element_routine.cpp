@@ -11,7 +11,7 @@ void print_2Darray(const double * const arr, const int nrow,
 int main( int argc, char * argv[] )
 {
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-  const int nLocBas = 3;
+  const int nLocBas = 6;
   const int dim     = 3;
   int numpt;
 
@@ -243,12 +243,13 @@ int main( int argc, char * argv[] )
   // Multiply by displacements in global coords
   // Kg_{ij} * u_{j}
   double sol_wall_disp  [ nLocBas * dim ] = {0.0}; 
-  for(int A=0; A<nLocBas; ++A)
-  {
-    sol_wall_disp[dim*A]   =  1.0;
-    sol_wall_disp[dim*A+1] = -4.0;
-    sol_wall_disp[dim*A+2] =  2.0;
-  }
+  std::fill_n(sol_wall_disp, nLocBas * dim, 1.0);
+  // for(int A=0; A<nLocBas; ++A)
+  // {
+  //   sol_wall_disp[dim*A]   =  1.0;
+  //   sol_wall_disp[dim*A+1] = -4.0;
+  //   sol_wall_disp[dim*A+2] =  2.0;
+  // }
 
   std::cout << "\n===== sol_wall_disp =====" << std::endl;
   print_2Darray(sol_wall_disp, nLocBas*dim, 1);
@@ -262,7 +263,7 @@ int main( int argc, char * argv[] )
   print_2Darray(lin_elasticity, nLocBas*dim, 1);
 
   // Generate lin_elasticity without first generating the tangent ===========
-  double sol_wall_disp_l [nLocBas * dim ] = {0.0};
+  double sol_wall_disp_l [ nLocBas * dim ] = {0.0};
   for(int ii=0; ii<nLocBas; ++ii)
   {
     sol_wall_disp_l[dim*ii]   = sol_wall_disp[dim*ii] * Q(0, 0) 
@@ -274,6 +275,9 @@ int main( int argc, char * argv[] )
     sol_wall_disp_l[dim*ii+2] = sol_wall_disp[dim*ii] * Q(2, 0) 
       + sol_wall_disp[dim*ii+1] * Q(2, 1) + sol_wall_disp[dim*ii+2] * Q(2, 2); 
   }
+
+  std::cout << "\n===== sol_wall_disp in lamina coords =====" << std::endl;
+  print_2Darray(sol_wall_disp_l, nLocBas*dim, 1);
 
   double u1_xl  = 0.0, u1_yl = 0.0;
   double u2_xl  = 0.0, u2_yl = 0.0;
@@ -321,6 +325,41 @@ int main( int argc, char * argv[] )
     }
   }
 
+  // Basis function gradients with respect to global coords
+  // dR/dx_{i} = Q_{ji} * dR/dxl_{j}
+  // Note that dR/dzl = 0.0
+  double dR_dx [nLocBas] = {0.0};
+  double dR_dy [nLocBas] = {0.0};
+  double dR_dz [nLocBas] = {0.0};
+
+  for(int ii=0; ii<nLocBas; ++ii)
+  {
+    dR_dx[ii] = Q(0, 0) * dR_dxl[ii] + Q(1, 0) * dR_dyl[ii];
+    dR_dy[ii] = Q(0, 1) * dR_dxl[ii] + Q(1, 1) * dR_dyl[ii];
+    dR_dz[ii] = Q(0, 2) * dR_dxl[ii] + Q(1, 2) * dR_dyl[ii];
+  }
+  
+  std::cout << "\n===== Triangle6_membrane dR_dx =====" << std::endl;
+  print_2Darray(dR_dx, nLocBas, 1);
+
+  double lin_elasticity2 [ nLocBas * dim ] = {0.0};
+  for(int A=0; A<nLocBas; ++A)
+  {
+    const double NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
+
+    lin_elasticity2[dim*A]   = NA_x * sigma_g[dim*0]
+      + NA_y * sigma_g[dim*0+1] + NA_z * sigma_g[dim*0+2];
+
+    lin_elasticity2[dim*A+1] = NA_x * sigma_g[dim*1]
+      + NA_y * sigma_g[dim*1+1] + NA_z * sigma_g[dim*1+2];
+
+    lin_elasticity2[dim*A+2] = NA_x * sigma_g[dim*2]
+      + NA_y * sigma_g[dim*2+1] + NA_z * sigma_g[dim*2+2];
+  }
+
+  std::cout << "\n===== lin_elasticity v2 =====" << std::endl;
+  print_2Darray(lin_elasticity2, nLocBas*dim, 1);
+
   // Use Triangle6 basis function gradients to verify Triangle6_membrane
   FEAElement * elem_tri6 = nullptr; 
   if(nLocBas == 6)
@@ -335,6 +374,9 @@ int main( int argc, char * argv[] )
     const int qua = 0;
 
     elem_tri6 -> get_gradR(qua, dR_dx, dR_dy);
+
+    std::cout << "\n===== Triangle6 dR_dx =====" << std::endl;
+    print_2Darray(dR_dx, nLocBas, 1);
 
     // // Strain displacement matrix B
     // // 5 x (nLocBas * dim)
@@ -416,7 +458,8 @@ void print_2Darray(const double * const arr, const int nrow,
   {
     for(int jj = 0; jj < ncol; ++jj)
     {
-      std::cout << std::scientific << std::setprecision(6) << std::setw(16) << arr[ii * ncol + jj] << " ";
+      std::cout << std::scientific << std::setprecision(3) << std::setw(10) << arr[ii * ncol + jj] << " ";
+      // std::cout << arr[ii * ncol + jj] << " ";
     }
     std::cout << std::endl;
   }
