@@ -692,7 +692,67 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_KG(
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_wall_part )
 {
-  // TODO
+  const int dof_disp = 3; 
+
+  double * array_a    = new double [nlgn * dof_mat ];
+  double * array_b    = new double [nlgn * dof_disp];
+  double * local_as   = new double [snLocBas * dof_mat ];
+  double * local_bs   = new double [snLocBas * dof_disp];
+  int    * LSIEN      = new    int [snLocBas];
+  double * sctrl_x    = new double [snLocBas];
+  double * sctrl_y    = new double [snLocBas];
+  double * sctrl_z    = new double [snLocBas];
+  double * sthickness = new double [snLocBas];
+  double * syoungsmod = new double [snLocBas];
+  PetscInt * srow_index = new PetscInt [dof_mat * snLocBas];
+
+  dot_sol->GetLocalArray( array_a );
+
+  // TBD: This currently uses dof_num != dof_disp
+  sol_wall_disp->GetLocalArray( array_b );
+
+  // wall has only one surface per the assumption in wall ebc
+  const int ebc_id = 0;
+  const int num_sele = ebc_wall_part -> get_num_local_cell(ebc_id);
+
+  for(int ee=0; ee<num_sele; ++ee)
+  {
+    ebc_wall_part -> get_SIEN(ebc_id, ee, LSIEN);
+    ebc_wall_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+    ebc_wall_part -> get_thickness(ee, sthickness);
+    ebc_wall_part -> get_youngsmod(ee, syoungsmod);
+
+    GetLocal(array_a, LSIEN, snLocBas, local_as);
+
+    // TBD: This currently uses dof_sol != dof_disp
+    GetLocal(array_b, LSIEN, snLocBas, local_bs);
+
+    lassem_ptr->Assem_Tangent_Residual_EBC_Wall( curr_time, dt, local_as, local_bs,
+        element_w, sctrl_x, sctrl_y, sctrl_z, sthickness, syoungsmod, quad_s);
+
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      for(int mm=0; mm<dof_mat; ++mm)
+        srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
+    }
+
+    MatSetValues(K, dof_mat*snLocBas, srow_index, dof_mat*snLocBas, srow_index,
+          lassem_ptr->sur_Tangent, ADD_VALUES);
+
+    VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
+  }
+
+  delete [] array_a;  array_a  = nullptr;
+  delete [] array_b;  array_b  = nullptr;
+  delete [] local_as; local_as = nullptr;
+  delete [] local_bs; local_bs = nullptr;
+  delete [] LSIEN;    LSIEN    = nullptr;
+  delete [] sctrl_x;  sctrl_x  = nullptr;
+  delete [] sctrl_y;  sctrl_y  = nullptr;
+  delete [] sctrl_z;  sctrl_z  = nullptr;
+  delete [] sthickness; sthickness = nullptr;
+  delete [] syoungsmod; syoungsmod = nullptr;
+  delete [] srow_index; srow_index = nullptr;
 }
 
 
