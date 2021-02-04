@@ -329,7 +329,6 @@ int main( int argc, char *argv[] )
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
 
-  // ==== TODO: Pass wall_locebc into gloAssem_ptr ====
   IPGAssem * gloAssem_ptr = new PGAssem_Tet_CMM_GenAlpha( locAssem_ptr, elements, quads,
       GMIptr, locElem, locIEN, pNode, locnbc, locebc, gbc, nz_estimate );
 

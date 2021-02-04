@@ -52,7 +52,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
-    // Assem mass matrix and residual vector
+    // Assemble mass matrix and residual vector
     virtual void Assem_mass_residual(
         const PDNSolution * const &sol_a,
         const ALocal_Elem * const &alelem_ptr,
@@ -67,10 +67,11 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
-    // Assembly the residual vector for the CMM equations
+    // Assemble the residual vector for the CMM equations
     virtual void Assem_residual(
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
+        const PDNSolution * const &sol_wall_disp,
         const PDNSolution * const &dot_sol_np1,
         const PDNSolution * const &sol_np1,
         const double &curr_time,
@@ -88,11 +89,12 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
-    // Assembly the residual vector and tangent matrix 
+    // Assemble the residual vector and tangent matrix 
     // for the CMM equations
     virtual void Assem_tangent_residual(
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
+        const PDNSolution * const &sol_wall_disp,
         const PDNSolution * const &dot_sol_np1,
         const PDNSolution * const &sol_np1,
         const double &curr_time,

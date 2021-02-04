@@ -254,6 +254,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_mass_residual(
 void PGAssem_Tet_CMM_GenAlpha::Assem_residual(
     const PDNSolution * const &sol_a,
     const PDNSolution * const &sol_b,
+    const PDNSolution * const &sol_wall_disp,
     const PDNSolution * const &dot_sol_np1,
     const PDNSolution * const &sol_np1,
     const double &curr_time,
@@ -320,16 +321,8 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_residual(
   // Backflow stabilization residual contribution
   BackFlow_G( sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
-  // ==== TODO: call new fcn NatBC_wall_G with the following args: ====
-  //   - sol_a (dot_sol at n+alpha_m) 
-  //   - wall displacement at n+alpha_f 
-  //   - lassem_ptr
-  //   - elements 
-  //   - quad_s
-  //   - nbc_part
-  //   - ebc_wall_part 
-  // ==== This function should assemble the wall contribution to R_m and R_k ====
- 
+  // Residual contribution from thin-walled linear membrane in CMM
+
   // Resistance type boundary condition
   NatBC_Resis_G( dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
 
@@ -346,6 +339,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_residual(
 void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
     const PDNSolution * const &sol_a,
     const PDNSolution * const &sol_b,
+    const PDNSolution * const &sol_wall_disp,
     const PDNSolution * const &dot_sol_np1,
     const PDNSolution * const &sol_np1,
     const double &curr_time,
