@@ -136,10 +136,10 @@ class GenBC_Coronary : public IGenBC
     // Evaluate the coronary LPM (2 first order ODEs) for the ii-th outlet 
     // face (which is a coronary outlet) and output the ODE derivatives to K.
     void F( const int &ii, const double * const &pi, const double &q, 
-        const double &dPimdt, double * const &K) const;
+        const double &dPimdt, double * const &K ) const;
 
     // Evaluate the RCR ODE for the ii-th outlet face and return the result.
-    double F( const int &ii, const double &pi, const double &q) const;
+    double F( const int &ii, const double &pi, const double &q ) const;
 
     // Pre-compute dPim/dt at the begining of the ODE integration for the 
     // ii-th outlet face
@@ -149,11 +149,11 @@ class GenBC_Coronary : public IGenBC
     // polynomial (e.g. PCHIP) between points x1 and x2 with values f1, f2 and 
     // derivatives d1 and d2 for points xe in [x1, x2] with the number of points
     // ne. 
-    // Outputs: fe with length ne. It stores the derivatives of the Hermite
+    // Outputs: de with length ne. It stores the derivatives of the Hermite
     // interplation at those xe points.
     void cubic_hermite_derivative( const double &x1, const double &x2, 
         const double &f1, const double &f2, const double &d1, const double &d2, 
-        const int &ne, const std::vector<double> &xe, std::vector<double> &fe ) const;
+        const int &ne, const std::vector<double> &xe, std::vector<double> &de ) const;
 
     // Set PCHIP for Pim data for the ii-th outlet face.
     // void set_pchip( const int &ii );
