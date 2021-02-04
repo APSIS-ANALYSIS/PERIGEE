@@ -240,8 +240,9 @@ int main( int argc, char *argv[] )
   ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, "ebc_wall");
 
   // Cross check fluid densities specified for the solver vs. wall youngsmod calculation
-  SYS_T::print_fatal_if( locebc_wall -> get_fluid_density() != fluid_density,
-      "Error: Assigned fluid density does not match that used to compute wall youngsmod in the preprocessor.\n" );
+  if( locebc_wall -> get_fluid_density() != fluid_density )
+    SYS_T::commPrint("Warning: Assigned fluid density does not match that used to compute "
+                     "wall youngsmod in the preprocessor.\n");
 
   // Local sub-domain's nodal indices
   APart_Node * pNode = new APart_Node(part_file, rank);
