@@ -59,10 +59,10 @@ class FEAElement_Triangle3_membrane : public FEAElement
     virtual void get_R( const int &quaindex, double * const &basis ) const;
 
     virtual void get_gradR( const int &quaindex, double * const &basis_x,
-        double * const &basis_y) const;
+        double * const &basis_y ) const;
 
     virtual void get_R_gradR( const int &quaindex, double * const &basis,
-        double * const &basis_x, double * const &basis_y) const;
+        double * const &basis_x, double * const &basis_y ) const;
 
     virtual void get_rotationMatrix( const int &quaindex, Matrix_3x3 &rot_mat ) const;
 

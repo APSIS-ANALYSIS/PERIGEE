@@ -21,10 +21,10 @@ PGAssem_Tet_CMM_GenAlpha::PGAssem_Tet_CMM_GenAlpha(
 {
   // Make sure the data structure is compatible
   SYS_T::print_fatal_if(dof_sol != locassem_ptr->get_dof(),
-      "PGAssem_NS_FEM::dof_sol != locassem_ptr->get_dof(). \n");
+      "PGAssem_Tet_CMM_GenAlpha::dof_sol != locassem_ptr->get_dof(). \n");
 
   SYS_T::print_fatal_if(dof_mat != part_nbc->get_dofMat(),
-      "PGAssem_NS_FEM::dof_mat != part_nbc->get_dofMat(). \n");
+      "PGAssem_Tet_CMM_GenAlpha::dof_mat != part_nbc->get_dofMat(). \n");
 
   // Make sure that the surface element's number of local basis are 
   // the same. This is an assumption in this assembly routine.
@@ -32,7 +32,7 @@ PGAssem_Tet_CMM_GenAlpha::PGAssem_Tet_CMM_GenAlpha(
   
   for(int ebc_id=0; ebc_id < num_ebc; ++ebc_id){
     SYS_T::print_fatal_if(snLocBas != part_ebc->get_cell_nLocBas(ebc_id),
-        "Error: in PGAssem_NS_FEM, snLocBas has to be uniform. \n");
+        "Error: in PGAssem_Tet_CMM_GenAlpha, snLocBas has to be uniform. \n");
   }
 
   const int nlocrow = dof_mat * pnode_ptr->get_nlocalnode();
@@ -74,7 +74,7 @@ PGAssem_Tet_CMM_GenAlpha::~PGAssem_Tet_CMM_GenAlpha()
 }
 
 
-void PGAssem_NS_FEM::EssBC_KG(
+void PGAssem_Tet_CMM_GenAlpha::EssBC_KG(
     const ALocal_NodalBC * const &nbc_part, const int &field )
 {
   const int local_dir = nbc_part->get_Num_LD(field);
@@ -104,7 +104,7 @@ void PGAssem_NS_FEM::EssBC_KG(
 }
 
 
-void PGAssem_NS_FEM::EssBC_G( const ALocal_NodalBC * const &nbc_part, 
+void PGAssem_Tet_CMM_GenAlpha::EssBC_G( const ALocal_NodalBC * const &nbc_part, 
     const int &field )
 {
   const int local_dir = nbc_part->get_Num_LD(field);
@@ -129,7 +129,7 @@ void PGAssem_NS_FEM::EssBC_G( const ALocal_NodalBC * const &nbc_part,
 }
 
 
-void PGAssem_NS_FEM::Assem_nonzero_estimate(
+void PGAssem_Tet_CMM_GenAlpha::Assem_nonzero_estimate(
     const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &elements,
@@ -183,7 +183,7 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
 }
 
 
-void PGAssem_NS_FEM::Assem_mass_residual(
+void PGAssem_Tet_CMM_GenAlpha::Assem_mass_residual(
     const PDNSolution * const &sol_a,
     const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
@@ -251,9 +251,10 @@ void PGAssem_NS_FEM::Assem_mass_residual(
 }
 
 
-void PGAssem_NS_FEM::Assem_residual(
+void PGAssem_Tet_CMM_GenAlpha::Assem_residual(
     const PDNSolution * const &sol_a,
     const PDNSolution * const &sol_b,
+    const PDNSolution * const &sol_wall_disp,
     const PDNSolution * const &dot_sol_np1,
     const PDNSolution * const &sol_np1,
     const double &curr_time,
@@ -262,6 +263,7 @@ void PGAssem_NS_FEM::Assem_residual(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &elementv,
     FEAElement * const &elements,
+    FEAElement * const &elementw,
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
@@ -269,6 +271,7 @@ void PGAssem_NS_FEM::Assem_residual(
     const FEANode * const &fnode_ptr,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
+    const ALocal_EBC * const &ebc_wall_part,
     const IGenBC * const &gbc )
 {
   const int nElem = alelem_ptr->get_nlocalele();
@@ -320,16 +323,9 @@ void PGAssem_NS_FEM::Assem_residual(
   // Backflow stabilization residual contribution
   BackFlow_G( sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
-  // ==== TODO: call new fcn NatBC_wall_G with the following args: ====
-  //   - sol_a (dot_sol at n+alpha_m) 
-  //   - wall displacement at n+alpha_f 
-  //   - lassem_ptr
-  //   - elements 
-  //   - quad_s
-  //   - nbc_part
-  //   - ebc_wall_part 
-  // ==== This function should assemble the wall contribution to R_m and R_k ====
- 
+  // Residual contribution from the thin-walled linear membrane in CMM
+  WallMembrane_G( curr_time, dt, sol_a, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ebc_wall_part );
+
   // Resistance type boundary condition
   NatBC_Resis_G( dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
 
@@ -343,9 +339,10 @@ void PGAssem_NS_FEM::Assem_residual(
 }
 
 
-void PGAssem_NS_FEM::Assem_tangent_residual(
+void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
     const PDNSolution * const &sol_a,
     const PDNSolution * const &sol_b,
+    const PDNSolution * const &sol_wall_disp,
     const PDNSolution * const &dot_sol_np1,
     const PDNSolution * const &sol_np1,
     const double &curr_time,
@@ -354,6 +351,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &elementv,
     FEAElement * const &elements,
+    FEAElement * const &elementw,
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
@@ -361,6 +359,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     const FEANode * const &fnode_ptr,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
+    const ALocal_EBC * const &ebc_wall_part,
     const IGenBC * const &gbc )
 {
   const int nElem = alelem_ptr->get_nlocalele();
@@ -415,17 +414,8 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   // Backflow stabilization residual & tangent contribution
   BackFlow_KG( dt, sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
-  // ==== TODO: call new fcn NatBC_wall_KG with the following args: ====
-  //   - dt
-  //   - sol_a (dot_sol at n+alpha_m) 
-  //   - wall displacement at n+alpha_f 
-  //   - lassem_ptr
-  //   - elements 
-  //   - quad_s
-  //   - nbc_part
-  //   - ebc_wall_part 
-  // ==== This function should assemble the wall contribution to residuals R_m and R_k
-  //      and tangents K_m,u and K_m,d ====
+  // Residual & tangent contributions from the thin-walled linear membrane in CMM
+  WallMembrane_KG( curr_time, dt, sol_a, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ebc_wall_part );
 
   // Resistance type boundary condition
   NatBC_Resis_KG( dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
@@ -442,7 +432,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
 }
 
 
-void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
+void PGAssem_Tet_CMM_GenAlpha::NatBC_G( const double &curr_time, const double &dt,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
@@ -486,7 +476,7 @@ void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
 }
 
 
-void PGAssem_NS_FEM::BackFlow_G( 
+void PGAssem_Tet_CMM_GenAlpha::BackFlow_G( 
     const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     IPLocAssem * const &lassem_ptr,
@@ -546,7 +536,7 @@ void PGAssem_NS_FEM::BackFlow_G(
 }
 
 
-void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
+void PGAssem_Tet_CMM_GenAlpha::BackFlow_KG( const double &dt,
     const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     IPLocAssem * const &lassem_ptr,
@@ -609,7 +599,154 @@ void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
 }
 
 
-double PGAssem_NS_FEM::Assem_surface_flowrate(
+void PGAssem_Tet_CMM_GenAlpha::WallMembrane_G(
+    const double &curr_time,
+    const double &dt, 
+    const PDNSolution * const &dot_sol,
+    const PDNSolution * const &sol_wall_disp,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_w,
+    const IQuadPts * const &quad_s,
+    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_wall_part )
+{
+  const int dof_disp = 3; 
+
+  double * array_a    = new double [nlgn * dof_mat ];
+  double * array_b    = new double [nlgn * dof_disp];
+  double * local_as   = new double [snLocBas * dof_mat ];
+  double * local_bs   = new double [snLocBas * dof_disp];
+  int    * LSIEN      = new    int [snLocBas];
+  double * sctrl_x    = new double [snLocBas];
+  double * sctrl_y    = new double [snLocBas];
+  double * sctrl_z    = new double [snLocBas];
+  double * sthickness = new double [snLocBas];
+  double * syoungsmod = new double [snLocBas];
+  PetscInt * srow_index = new PetscInt [dof_mat * snLocBas];
+
+  dot_sol->GetLocalArray( array_a );
+
+  // TBD: This currently uses dof_num != dof_disp
+  sol_wall_disp->GetLocalArray( array_b );
+
+  // wall has only one surface per the assumption in wall ebc
+  const int ebc_id = 0;
+  const int num_sele = ebc_wall_part -> get_num_local_cell(ebc_id);
+
+  for(int ee=0; ee<num_sele; ++ee)
+  {
+    ebc_wall_part -> get_SIEN(ebc_id, ee, LSIEN);
+    ebc_wall_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+    ebc_wall_part -> get_thickness(ee, sthickness);
+    ebc_wall_part -> get_youngsmod(ee, syoungsmod);
+
+    GetLocal(array_a, LSIEN, snLocBas, local_as);
+
+    // TBD: This currently uses dof_sol != dof_disp
+    GetLocal(array_b, LSIEN, snLocBas, local_bs);
+
+    lassem_ptr->Assem_Residual_EBC_Wall( curr_time, dt, local_as, local_bs,
+        element_w, sctrl_x, sctrl_y, sctrl_z, sthickness, syoungsmod, quad_s);
+
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      for(int mm=0; mm<dof_mat; ++mm)
+        srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
+    }
+
+    VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
+  }
+
+  delete [] array_a;  array_a  = nullptr;
+  delete [] array_b;  array_b  = nullptr;
+  delete [] local_as; local_as = nullptr;
+  delete [] local_bs; local_bs = nullptr;
+  delete [] LSIEN;    LSIEN    = nullptr;
+  delete [] sctrl_x;  sctrl_x  = nullptr;
+  delete [] sctrl_y;  sctrl_y  = nullptr;
+  delete [] sctrl_z;  sctrl_z  = nullptr;
+  delete [] sthickness; sthickness = nullptr;
+  delete [] syoungsmod; syoungsmod = nullptr;
+  delete [] srow_index; srow_index = nullptr;
+}
+
+
+void PGAssem_Tet_CMM_GenAlpha::WallMembrane_KG(
+    const double &curr_time,
+    const double &dt, 
+    const PDNSolution * const &dot_sol,
+    const PDNSolution * const &sol_wall_disp,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_w,
+    const IQuadPts * const &quad_s,
+    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_wall_part )
+{
+  const int dof_disp = 3; 
+
+  double * array_a    = new double [nlgn * dof_mat ];
+  double * array_b    = new double [nlgn * dof_disp];
+  double * local_as   = new double [snLocBas * dof_mat ];
+  double * local_bs   = new double [snLocBas * dof_disp];
+  int    * LSIEN      = new    int [snLocBas];
+  double * sctrl_x    = new double [snLocBas];
+  double * sctrl_y    = new double [snLocBas];
+  double * sctrl_z    = new double [snLocBas];
+  double * sthickness = new double [snLocBas];
+  double * syoungsmod = new double [snLocBas];
+  PetscInt * srow_index = new PetscInt [dof_mat * snLocBas];
+
+  dot_sol->GetLocalArray( array_a );
+
+  // TBD: This currently uses dof_num != dof_disp
+  sol_wall_disp->GetLocalArray( array_b );
+
+  // wall has only one surface per the assumption in wall ebc
+  const int ebc_id = 0;
+  const int num_sele = ebc_wall_part -> get_num_local_cell(ebc_id);
+
+  for(int ee=0; ee<num_sele; ++ee)
+  {
+    ebc_wall_part -> get_SIEN(ebc_id, ee, LSIEN);
+    ebc_wall_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+    ebc_wall_part -> get_thickness(ee, sthickness);
+    ebc_wall_part -> get_youngsmod(ee, syoungsmod);
+
+    GetLocal(array_a, LSIEN, snLocBas, local_as);
+
+    // TBD: This currently uses dof_sol != dof_disp
+    GetLocal(array_b, LSIEN, snLocBas, local_bs);
+
+    lassem_ptr->Assem_Tangent_Residual_EBC_Wall( curr_time, dt, local_as, local_bs,
+        element_w, sctrl_x, sctrl_y, sctrl_z, sthickness, syoungsmod, quad_s);
+
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      for(int mm=0; mm<dof_mat; ++mm)
+        srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
+    }
+
+    MatSetValues(K, dof_mat*snLocBas, srow_index, dof_mat*snLocBas, srow_index,
+          lassem_ptr->sur_Tangent, ADD_VALUES);
+
+    VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
+  }
+
+  delete [] array_a;  array_a  = nullptr;
+  delete [] array_b;  array_b  = nullptr;
+  delete [] local_as; local_as = nullptr;
+  delete [] local_bs; local_bs = nullptr;
+  delete [] LSIEN;    LSIEN    = nullptr;
+  delete [] sctrl_x;  sctrl_x  = nullptr;
+  delete [] sctrl_y;  sctrl_y  = nullptr;
+  delete [] sctrl_z;  sctrl_z  = nullptr;
+  delete [] sthickness; sthickness = nullptr;
+  delete [] syoungsmod; syoungsmod = nullptr;
+  delete [] srow_index; srow_index = nullptr;
+}
+
+
+double PGAssem_Tet_CMM_GenAlpha::Assem_surface_flowrate(
     const PDNSolution * const &vec,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
@@ -659,7 +796,7 @@ double PGAssem_NS_FEM::Assem_surface_flowrate(
 }
 
 
-double PGAssem_NS_FEM::Assem_surface_flowrate(
+double PGAssem_Tet_CMM_GenAlpha::Assem_surface_flowrate(
     const PDNSolution * const &vec,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
@@ -708,7 +845,7 @@ double PGAssem_NS_FEM::Assem_surface_flowrate(
 }
 
 
-double PGAssem_NS_FEM::Assem_surface_ave_pressure(
+double PGAssem_Tet_CMM_GenAlpha::Assem_surface_ave_pressure(
     const PDNSolution * const &vec,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
@@ -766,7 +903,7 @@ double PGAssem_NS_FEM::Assem_surface_ave_pressure(
 }
 
 
-double PGAssem_NS_FEM::Assem_surface_ave_pressure(
+double PGAssem_Tet_CMM_GenAlpha::Assem_surface_ave_pressure(
     const PDNSolution * const &vec,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
@@ -823,7 +960,7 @@ double PGAssem_NS_FEM::Assem_surface_ave_pressure(
 }
 
 
-void PGAssem_NS_FEM::NatBC_Resis_G(
+void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_G(
     const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     IPLocAssem * const &lassem_ptr,
@@ -892,7 +1029,7 @@ void PGAssem_NS_FEM::NatBC_Resis_G(
 }
 
 
-void PGAssem_NS_FEM::NatBC_Resis_KG(
+void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_KG(
     const double &dt,
     const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,

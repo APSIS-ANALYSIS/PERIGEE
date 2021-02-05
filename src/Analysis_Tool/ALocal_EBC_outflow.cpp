@@ -41,7 +41,6 @@ ALocal_EBC_outflow::ALocal_EBC_outflow( const std::string &fileBaseName,
   delete h5r; H5Fclose( file_id );
 }
 
-
 ALocal_EBC_outflow::~ALocal_EBC_outflow()
 {
   for(int ii=0; ii<num_ebc; ++ii)

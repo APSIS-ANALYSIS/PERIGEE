@@ -25,7 +25,7 @@
 // #include "GenBC_RCR.hpp"
 // #include "GenBC_Inductance.hpp"
 #include "PLocAssem_Tet_CMM_GenAlpha.hpp"
-// #include "PGAssem_NS_FEM.hpp"
+#include "PGAssem_Tet_CMM_GenAlpha.hpp"
 #include "PTime_NS_Solver.hpp"
 
 int main( int argc, char *argv[] )
@@ -240,8 +240,9 @@ int main( int argc, char *argv[] )
   ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, "ebc_wall");
 
   // Cross check fluid densities specified for the solver vs. wall youngsmod calculation
-  SYS_T::print_fatal_if( locebc_wall -> get_fluid_density() != fluid_density,
-      "Error: Assigned fluid density does not match that used to compute wall youngsmod in the preprocessor.\n" );
+  if( locebc_wall -> get_fluid_density() != fluid_density )
+    SYS_T::commPrint("Warning: Assigned fluid density does not match that used to compute "
+                     "wall youngsmod in the preprocessor.\n");
 
   // Local sub-domain's nodal indices
   APart_Node * pNode = new APart_Node(part_file, rank);
@@ -318,6 +319,19 @@ int main( int argc, char *argv[] )
       wall_density, wall_poisson, wall_kappa,
       c_tauc, GMIptr->get_elemType() );
 
+  // ===== Initial condition =====
+
+  // ===== Time step info =====
+
+  // ===== LPN models =====
+  IGenBC * gbc = nullptr;
+
+
+  // ===== Global assembly =====
+  SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
+
+  IPGAssem * gloAssem_ptr = new PGAssem_Tet_CMM_GenAlpha( locAssem_ptr, elements, quads,
+      GMIptr, locElem, locIEN, pNode, locnbc, locebc, gbc, nz_estimate );
 
   // ===== Deallocate memory =====
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
@@ -325,7 +339,7 @@ int main( int argc, char *argv[] )
   delete locebc; delete locebc_wall; delete pNode;
   delete inflow_rate_ptr; delete quadv; delete quads;
   delete elementv; delete elements; delete elementw; delete pmat;
-  delete tm_galpha_ptr; delete locAssem_ptr; 
+  delete tm_galpha_ptr; delete locAssem_ptr; delete gloAssem_ptr; 
 
   PetscFinalize();
   return EXIT_SUCCESS;

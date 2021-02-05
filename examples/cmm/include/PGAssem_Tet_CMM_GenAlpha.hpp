@@ -3,7 +3,7 @@
 // ==================================================================
 // PGAssem_Tet_CMM_GenAlpha.hpp
 //
-// Parallel golbal assembly based on PETSc, using AIJ matrix format.
+// Parallel global assembly based on PETSc, using AIJ matrix format.
 // The assembly routine is designed for classical C0 FEM method, which
 // means we do not need extraction operators and local mesh sizes.
 //
@@ -11,7 +11,7 @@
 // for the NS equations. The input solution vectors contains
 //  [ pressure; velocity ],
 // the dot solution contains
-//  [ dot pressure; dot velcoty ].
+//  [ dot pressure; dot velocity ].
 //
 // Author: Ju Liu 
 // Date Created: Feb. 10 2020
@@ -23,7 +23,7 @@
 class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
 {
   public:
-    // Constructor for NS equations
+    // Constructor for CMM equations
     PGAssem_Tet_CMM_GenAlpha( 
         IPLocAssem * const &locassem_ptr,
         FEAElement * const &elements,
@@ -40,7 +40,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
     // Destructor
     virtual ~PGAssem_Tet_CMM_GenAlpha();
 
-    // Nonzero pattern estimate for the NS equations
+    // Nonzero pattern estimate for the CMM equations
     virtual void Assem_nonzero_estimate(
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
@@ -52,7 +52,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
-    // Assem mass matrix and residual vector
+    // Assemble mass matrix and residual vector
     virtual void Assem_mass_residual(
         const PDNSolution * const &sol_a,
         const ALocal_Elem * const &alelem_ptr,
@@ -67,10 +67,11 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
-    // Assembly the residual vector for the NS equations
+    // Assemble the residual vector for the CMM equations
     virtual void Assem_residual(
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
+        const PDNSolution * const &sol_wall_disp,
         const PDNSolution * const &dot_sol_np1,
         const PDNSolution * const &sol_np1,
         const double &curr_time,
@@ -79,6 +80,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
+        FEAElement * const &elementw,
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
@@ -86,13 +88,15 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
+        const ALocal_EBC * const &ebc_wall_part,
         const IGenBC * const &gbc );
 
-    // Assembly the residual vector and tangent matrix 
-    // for the NS equations
+    // Assemble the residual vector and tangent matrix 
+    // for the CMM equations
     virtual void Assem_tangent_residual(
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
+        const PDNSolution * const &sol_wall_disp,
         const PDNSolution * const &dot_sol_np1,
         const PDNSolution * const &sol_np1,
         const double &curr_time,
@@ -101,6 +105,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
+        FEAElement * const &elementw,
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
@@ -108,6 +113,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
+        const ALocal_EBC * const &ebc_wall_part,
         const IGenBC * const &gbc );
 
     // Assembly routine for the surface integrals of flow rate and
@@ -199,6 +205,27 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
+
+    // Wall integral for thin-walled linear membrane
+    void WallMembrane_G( const double &curr_time,
+        const double &dt, 
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol_wall_disp,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &element_w,
+        const IQuadPts * const &quad_s,
+        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_wall_part );
+
+    void WallMembrane_KG( const double &curr_time,
+        const double &dt, 
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol_wall_disp,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &element_w,
+        const IQuadPts * const &quad_s,
+        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_wall_part );
 
     void GetLocal(const double * const &array, const int * const &IEN,
         double * const &local_array) const

@@ -1,19 +1,20 @@
 # Configuration setup for machine ladyzhenskaya Linux desktop
+set(HOME_DIR /home/juliu)
 
 # ========================================================
 # Specify the library locations
 # ========================================================
-set(VTK_DIR /home/ju/lib/VTK-8.2.0-debug/lib/cmake/vtk-8.2)
+set(VTK_DIR ${HOME_DIR}/lib/VTK-8.2.0-shared/lib/cmake/vtk-8.2)
 
 if( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
-  set(PETSC_DIR /home/ju/lib/petsc-3.14.2-opt)
+  set(PETSC_DIR ${HOME_DIR}/lib/petsc-3.14.3-opt)
 else( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
-  set(PETSC_DIR /home/ju/lib/petsc-3.14.2-debug)
+  set(PETSC_DIR ${HOME_DIR}/lib/petsc-3.14.3-debug)
 endif( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
 
 set(PETSC_ARCH .)
 
-set(HDF5_ROOT /home/ju/lib/hdf5-1.8.16)
+set(HDF5_ROOT ${HOME_DIR}/lib/hdf5-1.8.16)
 
 # ========================================================
 # Setup the libraries
@@ -40,8 +41,8 @@ message(STATUS "External Libraries: " ${EXTRA_LINK_LIBS})
 # ========================================================
 # Compiler options 
 # ========================================================
-set(CMAKE_C_COMPILER  /home/ju/lib/mpich-3.3.2/bin/mpicc)
-set(CMAKE_CXX_COMPILER  /home/ju/lib/mpich-3.3.2/bin/mpicxx)
+set(CMAKE_C_COMPILER  ${HOME_DIR}/lib/mpich-3.3.2/bin/mpicc)
+set(CMAKE_CXX_COMPILER ${HOME_DIR}/lib/mpich-3.3.2/bin/mpicxx)
 set(CMAKE_CXX_STANDARD 11)
 
 if( ${CMAKE_BUILD_TYPE} MATCHES "Release" )

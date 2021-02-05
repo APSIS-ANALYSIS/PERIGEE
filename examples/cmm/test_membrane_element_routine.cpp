@@ -113,20 +113,48 @@ int main( int argc, char * argv[] )
 
   elem -> get_gradR(qua, dR_dxl, dR_dyl);
 
-  // // Strain displacement matrix B in lamina coords
-  // // 5 x (nLocBas * dim)
-  // double Bl [5 * nLocBas * dim] = {0.0};
-  // for(int ii = 0; ii < nLocBas; ++ii)
-  // {
-  //   Bl[0*nLocBas*dim + ii*dim]     = dR_dxl[ii]; // u1,1
-  //   Bl[1*nLocBas*dim + ii*dim + 1] = dR_dyl[ii]; // u2,2
-  //   Bl[2*nLocBas*dim + ii*dim]     = dR_dyl[ii]; // u1,2
-  //   Bl[2*nLocBas*dim + ii*dim + 1] = dR_dxl[ii]; // u2,1
-  //   Bl[3*nLocBas*dim + ii*dim + 2] = dR_dxl[ii]; // u3,1
-  //   Bl[4*nLocBas*dim + ii*dim + 2] = dR_dyl[ii]; // u3,2
-  // }
-  // std::cout << "\n====== B in lamina coords ======" << std::endl;
-  // print_2Darray(Bl, 5, nLocBas * dim);
+  // Global-to-local rotation matrix Q
+  Matrix_3x3 Q = Matrix_3x3();
+  elem -> get_rotationMatrix(0, Q);
+  std::cout << "\n===== Q =====" << std::endl;
+  Q.print();
+
+  double sol_wall_disp  [ nLocBas * dim ] = {0.0}; 
+  std::fill_n(sol_wall_disp, nLocBas * dim, 1.0);
+
+  std::cout << "\n===== sol_wall_disp =====" << std::endl;
+  print_2Darray(sol_wall_disp, nLocBas*dim, 1);
+
+  double sol_wall_disp_l [ nLocBas * dim ] = {0.0};
+  for(int ii=0; ii<nLocBas; ++ii)
+  {
+    sol_wall_disp_l[dim*ii]   = sol_wall_disp[dim*ii] * Q(0, 0) 
+      + sol_wall_disp[dim*ii+1] * Q(0, 1) + sol_wall_disp[dim*ii+2] * Q(0, 2); 
+
+    sol_wall_disp_l[dim*ii+1] = sol_wall_disp[dim*ii] * Q(1, 0) 
+      + sol_wall_disp[dim*ii+1] * Q(1, 1) + sol_wall_disp[dim*ii+2] * Q(1, 2); 
+
+    sol_wall_disp_l[dim*ii+2] = sol_wall_disp[dim*ii] * Q(2, 0) 
+      + sol_wall_disp[dim*ii+1] * Q(2, 1) + sol_wall_disp[dim*ii+2] * Q(2, 2); 
+  }
+
+  std::cout << "\n===== sol_wall_disp in lamina coords =====" << std::endl;
+  print_2Darray(sol_wall_disp_l, nLocBas*dim, 1);
+
+  // Strain displacement matrix B in lamina coords
+  // 5 x (nLocBas * dim)
+  double Bl [5 * nLocBas * dim] = {0.0};
+  for(int ii = 0; ii < nLocBas; ++ii)
+  {
+    Bl[0*nLocBas*dim + ii*dim]     = dR_dxl[ii]; // u1,1
+    Bl[1*nLocBas*dim + ii*dim + 1] = dR_dyl[ii]; // u2,2
+    Bl[2*nLocBas*dim + ii*dim]     = dR_dyl[ii]; // u1,2
+    Bl[2*nLocBas*dim + ii*dim + 1] = dR_dxl[ii]; // u2,1
+    Bl[3*nLocBas*dim + ii*dim + 2] = dR_dxl[ii]; // u3,1
+    Bl[4*nLocBas*dim + ii*dim + 2] = dR_dyl[ii]; // u3,2
+  }
+  std::cout << "\n====== B in lamina coords ======" << std::endl;
+  print_2Darray(Bl, 5, nLocBas * dim);
 
   // Elasticity tensor D
   const double nu    = 0.5;
@@ -134,35 +162,44 @@ int main( int argc, char * argv[] )
   const double E     = 2500000;
   const double coef  = E / (1.0 - nu*nu);
 
-  // double D[5 * 5] = {0.0};
-  // D[0*5 + 0] = coef * 1.0;
-  // D[0*5 + 1] = coef * nu;
-  // D[1*5 + 0] = coef * nu;
-  // D[1*5 + 1] = coef * 1.0;
-  // D[2*5 + 2] = coef * (1.0 - nu) / 2.0;
-  // D[3*5 + 3] = coef * kappa * (1.0 - nu) / 2.0;
-  // D[4*5 + 4] = coef * kappa * (1.0 - nu) / 2.0;
-  // std::cout << "\n===== D =====" << std::endl;
-  // print_2Darray(D, 5, 5);
+  double D[5 * 5] = {0.0};
+  D[0*5 + 0] = coef * 1.0;
+  D[0*5 + 1] = coef * nu;
+  D[1*5 + 0] = coef * nu;
+  D[1*5 + 1] = coef * 1.0;
+  D[2*5 + 2] = coef * (1.0 - nu) / 2.0;
+  D[3*5 + 3] = coef * kappa * (1.0 - nu) / 2.0;
+  D[4*5 + 4] = coef * kappa * (1.0 - nu) / 2.0;
+  std::cout << "\n===== D =====" << std::endl;
+  print_2Darray(D, 5, 5);
 
   // Stiffness tensor in lamina coords
   // Bl^T * D * Bl = Bl_{ki} * D_{kl} * Bl_{lj}
   double Kl [(nLocBas*dim) * (nLocBas*dim)] = {0.0};
 
-  // for(int ii = 0; ii < nLocBas*dim; ++ii)
-  // {
-  //   for(int jj = 0; jj < nLocBas*dim; ++jj)
-  //   {
-  //     for(int kk = 0; kk < 5; ++kk)
-  //     {
-  //       for(int ll = 0; ll < 5; ++ll)
-  //       {
-  //         Kl[ii*(nLocBas*dim) + jj] +=
-  //           Bl[kk*(nLocBas*dim)+ii] * D[5*kk+ll] * Bl[ll*(nLocBas*dim)+jj];
-  //       }
-  //     }
-  //   }
-  // }
+  // Bl * ul = Bl_{ij} * ul_{j}
+  double Blul [5] = {0.0};
+  for(int ii=0; ii<5; ++ii)
+  {
+    for(int jj=0; jj<nLocBas*dim; ++jj)
+      Blul[ii] += Bl[ii*(nLocBas*dim)+jj] * sol_wall_disp_l[jj];
+  }
+  std::cout << "\n====== Bl * ul in lamina coords ======" << std::endl;
+  print_2Darray(Blul, 5, 1);
+
+
+  // D * Bl * ul = D_{ik} * Bl_{kj} * ul_{j}
+  double DBlul [5] = {0.0};
+  for(int ii=0; ii<5; ++ii)
+  {
+    for(int jj=0; jj<nLocBas*dim; ++jj)
+    {
+      for(int kk=0; kk<5; ++kk)
+        DBlul[ii] += D[5*ii+kk] * Bl[kk*(nLocBas*dim)+jj] * sol_wall_disp_l[jj];
+    }
+  }
+  std::cout << "\n====== D * Bl * ul in lamina coords ======" << std::endl;
+  print_2Darray(DBlul, 5, 1);
 
   for(int A = 0; A < nLocBas; ++A)
   {
@@ -193,12 +230,6 @@ int main( int argc, char * argv[] )
   std::cout << "\n===== K in lamina coords =====" << std::endl;
   print_2Darray(Kl, nLocBas*dim, nLocBas*dim);
 
-  // Global-to-local rotation matrix Q
-  Matrix_3x3 Q = Matrix_3x3();
-  elem -> get_rotationMatrix(0, Q);
-  std::cout << "\n===== Q =====" << std::endl;
-  Q.print();
- 
   // Stiffness tensor in global coords
   // theta^T * Kl * theta, where theta = [Q, 0, 0; 0, Q, 0; 0, 0, Q]
   // or Q^T * Kl_[AB] * Q = Q_{ki} * Kl_[AB]{kl} * Q_{lj}
@@ -223,21 +254,112 @@ int main( int argc, char * argv[] )
           Kg[ (nLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(2,ii) * Kl[ (A*dim+2)*(nLocBas*dim) + (B*dim+0) ] * Q(0, jj);
           Kg[ (nLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(2,ii) * Kl[ (A*dim+2)*(nLocBas*dim) + (B*dim+1) ] * Q(1, jj);
           Kg[ (nLocBas*dim)*(A*dim+ii) + (B*dim+jj) ] += Q(2,ii) * Kl[ (A*dim+2)*(nLocBas*dim) + (B*dim+2) ] * Q(2, jj);
-
-          // for(int kk = 0; kk < dim; ++kk)
-          // {
-          //   for(int ll = 0; ll < dim; ++ll)
-          //   {
-          //     Kg[(A*dim+ii)*(nLocBas*dim) + (B*dim+jj)] +=
-          //       Q(kk,ii) * Kl[(A*dim+kk)*(nLocBas*dim) + (B*dim+ll)] * Q(ll, jj);
-          //   }
-          // }
         }
       }
     }
   }
   std::cout << "\n===== K in global coords =====" << std::endl;
   print_2Darray(Kg, nLocBas*dim, nLocBas*dim);
+
+  // Multiply by displacements in global coords
+  // Kg_{ij} * u_{j}
+  double lin_elasticity [ nLocBas * dim ] = {0.0};
+  for(int ii=0; ii<nLocBas*dim; ++ii)
+    for(int jj=0; jj<nLocBas*dim; ++jj)
+      lin_elasticity[ii] += Kg[ (nLocBas*dim)*ii + jj ] * sol_wall_disp[jj];
+
+  std::cout << "\n===== lin_elasticity v1 =====" << std::endl;
+  print_2Darray(lin_elasticity, nLocBas*dim, 1);
+
+  // Generate lin_elasticity without first generating the tangent ===========
+  double u1l_xl = 0.0, u1l_yl = 0.0;
+  double u2l_xl = 0.0, u2l_yl = 0.0;
+  double u3l_xl = 0.0, u3l_yl = 0.0;
+  for(int ii=0; ii<nLocBas; ++ii)
+  {
+    u1l_xl += sol_wall_disp_l[dim*ii]   * dR_dxl[ii];
+    u1l_yl += sol_wall_disp_l[dim*ii]   * dR_dyl[ii];
+    u2l_xl += sol_wall_disp_l[dim*ii+1] * dR_dxl[ii];
+    u2l_yl += sol_wall_disp_l[dim*ii+1] * dR_dyl[ii];
+    u3l_xl += sol_wall_disp_l[dim*ii+2] * dR_dxl[ii];
+    u3l_yl += sol_wall_disp_l[dim*ii+2] * dR_dyl[ii];
+  }
+
+  double Blul2 [5] = {u1l_xl, u2l_yl, u1l_yl + u2l_xl, u3l_xl, u3l_yl};
+  std::cout << "\n====== Bl * ul in lamina coords V2 ======" << std::endl;
+  print_2Darray(Blul2, 5, 1);
+
+  // Cauchy stress in lamina coords 
+  double sigma_l [ dim * dim ] = {0.0};
+  sigma_l[0] = coef * (u1l_xl + nu*u2l_yl);              // sigma_l_11
+  sigma_l[1] = coef * 0.5*(1.0-nu) * (u1l_yl + u2l_xl);  // sigma_l_12
+  sigma_l[3] = coef * 0.5*(1.0-nu) * (u1l_yl + u2l_xl);  // sigma_l_21
+  sigma_l[2] = coef * 0.5*kappa*(1.0-nu) * u3l_xl;       // sigma_l_13
+  sigma_l[6] = coef * 0.5*kappa*(1.0-nu) * u3l_xl;       // sigma_l_31  
+  sigma_l[4] = coef * (nu*u1l_xl + u2l_yl);              // sigma_l_22
+  sigma_l[5] = coef * 0.5*kappa*(1.0-nu) * u3l_yl;       // sigma_l_23
+  sigma_l[7] = coef * 0.5*kappa*(1.0-nu) * u3l_yl;       // sigma_l_32 
+  sigma_l[8] = 0.0;                                      // sigma_l_33
+
+  std::cout << "\n===== sigma_l =====" << std::endl;
+  print_2Darray(sigma_l, dim, dim);
+
+  // Cauchy stress in global coords
+  // Q^T * sigma_l * Q = Q_{ki} * sigma_l_{kl} * Q_{lj}
+  double sigma_g [ dim * dim ] = {0.0};
+  for(int ii=0; ii<dim; ++ii)
+  {
+    for(int jj=0; jj<dim; ++jj)
+    {
+      sigma_g[dim*ii+jj] += Q(0, ii) * sigma_l[dim*0+0] * Q(0, jj);
+      sigma_g[dim*ii+jj] += Q(0, ii) * sigma_l[dim*0+1] * Q(1, jj);
+      sigma_g[dim*ii+jj] += Q(0, ii) * sigma_l[dim*0+2] * Q(2, jj);
+
+      sigma_g[dim*ii+jj] += Q(1, ii) * sigma_l[dim*1+0] * Q(0, jj);
+      sigma_g[dim*ii+jj] += Q(1, ii) * sigma_l[dim*1+1] * Q(1, jj);
+      sigma_g[dim*ii+jj] += Q(1, ii) * sigma_l[dim*1+2] * Q(2, jj);
+
+      sigma_g[dim*ii+jj] += Q(2, ii) * sigma_l[dim*2+0] * Q(0, jj);
+      sigma_g[dim*ii+jj] += Q(2, ii) * sigma_l[dim*2+1] * Q(1, jj);
+      sigma_g[dim*ii+jj] += Q(2, ii) * sigma_l[dim*2+2] * Q(2, jj);
+    }
+  }
+
+  // Basis function gradients with respect to global coords
+  // dR/dx_{i} = Q_{ji} * dR/dxl_{j}
+  // Note that dR/dzl = 0.0
+  double dR_dx [nLocBas] = {0.0};
+  double dR_dy [nLocBas] = {0.0};
+  double dR_dz [nLocBas] = {0.0};
+
+  for(int ii=0; ii<nLocBas; ++ii)
+  {
+    dR_dx[ii] = Q(0, 0) * dR_dxl[ii] + Q(1, 0) * dR_dyl[ii];
+    dR_dy[ii] = Q(0, 1) * dR_dxl[ii] + Q(1, 1) * dR_dyl[ii];
+    dR_dz[ii] = Q(0, 2) * dR_dxl[ii] + Q(1, 2) * dR_dyl[ii];
+  }
+  
+  std::cout << "\n===== Triangle6_membrane dR_dx =====" << std::endl;
+  print_2Darray(dR_dx, nLocBas, 1);
+
+  double lin_elasticity2 [ nLocBas * dim ] = {0.0};
+  for(int A=0; A<nLocBas; ++A)
+  {
+    const double NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
+    const double NA_xl = dR_dxl[A], NA_yl = dR_dyl[A], NA_zl = 0.0;
+
+    lin_elasticity2[dim*A]   = NA_x * sigma_g[dim*0]
+      + NA_y * sigma_g[dim*0+1] + NA_z * sigma_g[dim*0+2];
+
+    lin_elasticity2[dim*A+1] = NA_x * sigma_g[dim*1]
+      + NA_y * sigma_g[dim*1+1] + NA_z * sigma_g[dim*1+2];
+
+    lin_elasticity2[dim*A+2] = NA_x * sigma_g[dim*2]
+      + NA_y * sigma_g[dim*2+1] + NA_z * sigma_g[dim*2+2];
+  }
+
+  std::cout << "\n===== lin_elasticity v2 =====" << std::endl;
+  print_2Darray(lin_elasticity2, nLocBas*dim, 1);
 
   // Use Triangle6 basis function gradients to verify Triangle6_membrane
   FEAElement * elem_tri6 = nullptr; 
@@ -253,6 +375,9 @@ int main( int argc, char * argv[] )
     const int qua = 0;
 
     elem_tri6 -> get_gradR(qua, dR_dx, dR_dy);
+
+    std::cout << "\n===== Triangle6 dR_dx =====" << std::endl;
+    print_2Darray(dR_dx, nLocBas, 1);
 
     // // Strain displacement matrix B
     // // 5 x (nLocBas * dim)
@@ -270,22 +395,6 @@ int main( int argc, char * argv[] )
     // Stiffness tensor
     // B^T * D * B = B_{ki} * D_{kl} * B_{lj}
     double K [(nLocBas*dim) * (nLocBas*dim)] = {0.0};
-
-    // for(int ii = 0; ii < nLocBas*dim; ++ii)
-    // { 
-    //   for(int jj = 0; jj < nLocBas*dim; ++jj)
-    //   {
-    //     for(int kk = 0; kk < 5; ++kk)
-    //     {
-    //       for(int ll = 0; ll < 5; ++ll)
-    //       { 
-    //         K[ii*(nLocBas*dim) + jj] +=
-    //           B[kk*(nLocBas*dim)+ii] * D[5*kk+ll] * B[ll*(nLocBas*dim)+jj];
-    //       }
-    //     }
-    //   }
-    // }
-
     for(int A = 0; A < nLocBas; ++A)
     {
       const double NA_x = dR_dx[A], NA_y = dR_dy[A];
@@ -335,6 +444,7 @@ void print_2Darray(const double * const arr, const int nrow,
     for(int jj = 0; jj < ncol; ++jj)
     {
       std::cout << std::scientific << std::setprecision(3) << std::setw(10) << arr[ii * ncol + jj] << " ";
+      // std::cout << arr[ii * ncol + jj] << " ";
     }
     std::cout << std::endl;
   }

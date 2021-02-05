@@ -51,7 +51,6 @@ EBC_Partition_vtp_outflow::EBC_Partition_vtp_outflow(
   }
 }
 
-
 EBC_Partition_vtp_outflow::~EBC_Partition_vtp_outflow()
 {
   for(int ii=0; ii<num_ebc; ++ii)
@@ -64,7 +63,6 @@ EBC_Partition_vtp_outflow::~EBC_Partition_vtp_outflow()
   VEC_T::clean( LID_all_face_nodes );
   VEC_T::clean( outvec );
 }
-
 
 void EBC_Partition_vtp_outflow::write_hdf5( const char * FileName ) const
 {
@@ -100,7 +98,6 @@ void EBC_Partition_vtp_outflow::write_hdf5( const char * FileName ) const
   H5Gclose( g_id );
   H5Fclose( file_id );
 }
-
 
 void EBC_Partition_vtp_outflow::write_hdf5( const char * FileName, 
     const char * GroupName ) const
