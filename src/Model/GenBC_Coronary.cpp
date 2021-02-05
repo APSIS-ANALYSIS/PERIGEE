@@ -2,7 +2,7 @@
 
 GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename, 
     const int &in_N, const double &dt3d )
-: num_odes(2), N( in_N ), h( dt3d/static_cast<double>(N) ), 
+  : num_odes(2), N( in_N ), h( dt3d/static_cast<double>(N) ), 
   absTol( 1.0e-8 ), relTol( 1.0e-5 ),
   tstart( 0.0 ), tend( dt3d )
 {
@@ -17,7 +17,7 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
   std::istringstream sstrm;
   std::string sline;
   std::string bc_type;
-  
+
   // The first non-commented line should be Coronary num_ebc
   while( std::getline(reader, sline) )
   {
@@ -59,7 +59,7 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
     {
       prev_0D_sol[ii].resize( num_odes );
       Pi0[ii].resize( num_odes );
-    
+
       // !! WHY N+1 HERE?  
       dPimdt_k1[ii].resize( N+1 );
       dPimdt_k2[ii].resize( N );
@@ -113,7 +113,7 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
         sstrm.str( sline );
         sstrm>>Time_data[counter][ii];
         sstrm>>Pim_data[counter][ii];
-        
+
         Pim_data[counter][ii] = Pim_data[counter][ii] * alpha_Pim[counter];
         sstrm.clear();
       }
@@ -129,7 +129,7 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
     }
   }
 
-  if( counter != num_ebc ) SYS_T::print_fatal("Error: GenBC_Coronary the input file %s does not contain complete data for outlet faces.\n", lpn_filename);
+  SYS_T::print_fatal_if( counter != num_ebc, "Error: GenBC_Coronary the input file %s does not contain complete data for outlet faces.\n", lpn_filename);
 
   reader.close();
 
@@ -153,10 +153,8 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
   }
 }
 
-
 GenBC_Coronary::~GenBC_Coronary()
 {}
-
 
 void GenBC_Coronary::print_info() const
 {
@@ -166,7 +164,6 @@ void GenBC_Coronary::print_info() const
     SYS_T::commPrint( "     ebcid = %d, Ra = %e, Ca = %e, Ra_micro = %e,Rim = %e, Rv = %e, Pd = %e \n", 
         ii, Ra[ii], Ca[ii],Ra_micro[ii],Cim[ii], Rv[ii], Pd[ii] );
 }
-
 
 double GenBC_Coronary::get_m( const int &ii, const double &in_dot_Q,
     const double &in_Q ) const
@@ -180,7 +177,6 @@ double GenBC_Coronary::get_m( const int &ii, const double &in_dot_Q,
 
   return (left - right) / diff;
 }
-
 
 double GenBC_Coronary::get_P( const int &ii, const double &in_dot_Q,
     const double &in_Q ) const
@@ -214,9 +210,9 @@ double GenBC_Coronary::get_P( const int &ii, const double &in_dot_Q,
 
       pi_m = pi_m + fac18 * K1 * h + fac38 * K2 * h + fac38 * K3 * h + fac18 * K4 * h;
     }
-    
+
     prev_0D_sol[ii][0] = pi_m;
-    
+
     return pi_m + Ra[ii] * in_Q ; 
   }
 
@@ -231,7 +227,7 @@ double GenBC_Coronary::get_P( const int &ii, const double &in_dot_Q,
   double K3[2] = {0.0};
   double K4[2] = {0.0};
   double pi_tmp[2] ={0.0};
-  
+
   // in_Q gives Q_N = Q_n+1, and Q0[ii] gives Q_0 = Q_n
   // do Runge-Kutta 4 with the 3/8 rule
   for(int mm=0; mm<N; ++mm)
@@ -243,30 +239,22 @@ double GenBC_Coronary::get_P( const int &ii, const double &in_dot_Q,
     F(ii, pi_m, Q_m, dPimdt_k1[ii][mm], K1);
 
     for(int jj=0; jj<num_odes; ++jj)
-    { 
       pi_tmp[jj] = pi_m[jj] + fac13 * K1[jj] * h;
-    }
-    
+
     F(ii, pi_tmp , fac23 * Q_m + fac13 * Q_mp1, dPimdt_k2[ii][mm], K2);
 
     for(int jj=0; jj<num_odes; ++jj)
-    { 
       pi_tmp[jj] = pi_m[jj] - fac13*K1[jj] * h + K2[jj] * h;
-    }
 
     F(ii, pi_tmp , fac13 * Q_m + fac23 * Q_mp1, dPimdt_k3[ii][mm], K3);
 
     for(int jj=0; jj<num_odes; ++jj)
-    { 
       pi_tmp[jj] = pi_m[jj] + K1[jj] * h - K2[jj] * h + K3[jj] * h;
-    }
 
     F(ii, pi_tmp, Q_mp1, dPimdt_k1[ii][mm+1], K4);
 
     for(int jj=0; jj<2; ++jj)
-    { 
       pi_m[jj] = pi_m[jj] + fac18 * K1[jj] * h + fac38 * K2[jj] * h + fac38 * K3[jj] * h + fac18 * K4[jj] * h;
-    }
   }
 
   // Make a copy of the ODE solutions. 
@@ -277,12 +265,10 @@ double GenBC_Coronary::get_P( const int &ii, const double &in_dot_Q,
   return pi_m[0] + Ra[ii] * in_Q;
 }
 
-
 double GenBC_Coronary::get_P0( const int &ii ) const
 {
   return Q0[ii] * Ra[ii] + Pi0[ii][0];
 }
-
 
 void GenBC_Coronary::reset_initial_sol( const int &ii, const double &in_Q_0,
     const double &in_P_0, const double &curr_time )
@@ -299,7 +285,7 @@ void GenBC_Coronary::reset_initial_sol( const int &ii, const double &in_Q_0,
     tstart=curr_time;
     tend=curr_time+N*h;
   }
-  
+
   // Precalculate dPimdt values needed for integrating Coronary ODEs.
   if( num_Pim_data[ii]>0 ) get_dPimdt(ii);
 }
@@ -308,9 +294,9 @@ void GenBC_Coronary::reset_initial_sol( const int &ii, const double &in_Q_0,
 void GenBC_Coronary:: F( const int &ii, const double * const &pi, const double &q, 
     const double &dPimdt, double * const &K ) const
 {
-   // The Coronary LPM consists of two ODEs. 
-   K[0]=(q-(pi[0]-pi[1])/Ra_micro[ii])/Ca[ii];
-   K[1]=((pi[0]-pi[1])/Ra_micro[ii]-(pi[1]-Pd[ii])/(Rv[ii]))/Cim[ii]+dPimdt;
+  // The Coronary LPM consists of two ODEs. 
+  K[0]=(q-(pi[0]-pi[1])/Ra_micro[ii])/Ca[ii];
+  K[1]=((pi[0]-pi[1])/Ra_micro[ii]-(pi[1]-Pd[ii])/(Rv[ii]))/Cim[ii]+dPimdt;
 }
 
 
@@ -323,45 +309,43 @@ double GenBC_Coronary:: F(const int &ii, const double &pi, const double &q) cons
 
 void GenBC_Coronary:: spline_pchip_set (const int &np, const std::vector<double> &xp, 
     const std::vector<double> &fp, std::vector<double> &dp)
-//=============================================================================
-// This function sets derivatives for a piecewise cubic Hermite interpolant.
-// This function is modified from John Burkardt's C++ version of the original 
-// Fortran program by Fred Fritsch under the GNU LGPL license.
-//
-// Input: np is the number of points
-//        xp is the corresponding (time) point valuesi, with length np
-//        fp is the corresponding (pressure) point values, with length np
-// Output: dp stores the derivative at xp, with length np
-//
-//
-// Reference:
-//
-// Fred Fritsch, Ralph Carlson,
-//    Monotone Piecewise Cubic Interpolation,
-//    SIAM Journal on Numerical Analysis,
-//    Volume 17, Number 2, April 1980, pages 238-246.
-//
-//    Fred Fritsch, Judy Butland,
-//    A Method for Constructing Local Monotone Piecewise
-//    Cubic Interpolants,
-//    SIAM Journal on Scientific and Statistical Computing,
-//    Volume 5, Number 2, 1984, pages 300-304.
-//
+  //=============================================================================
+  // This function sets derivatives for a piecewise cubic Hermite interpolant.
+  // This function is modified from John Burkardt's C++ version of the original 
+  // Fortran program by Fred Fritsch under the GNU LGPL license.
+  //
+  // Input: np is the number of points
+  //        xp is the corresponding (time) point valuesi, with length np
+  //        fp is the corresponding (pressure) point values, with length np
+  // Output: dp stores the derivative at xp, with length np
+  //
+  //
+  // Reference:
+  //
+  // Fred Fritsch, Ralph Carlson,
+  //    Monotone Piecewise Cubic Interpolation,
+  //    SIAM Journal on Numerical Analysis,
+  //    Volume 17, Number 2, April 1980, pages 238-246.
+  //
+  //    Fred Fritsch, Judy Butland,
+  //    A Method for Constructing Local Monotone Piecewise
+  //    Cubic Interpolants,
+  //    SIAM Journal on Scientific and Statistical Computing,
+  //    Volume 5, Number 2, 1984, pages 300-304.
+  //
 {
   SYS_T::print_fatal_if(np<2, "Error: GenBC_Coronary SPLINE_PCHIP_SET: Number of evaluation points is less than 1 \n");
 
   for (int ii=1; ii<np; ++ii)
-  {
-      SYS_T::print_fatal_if(xp[ii] <= xp[ii-1], "Error: GenBC_Coronary SPLINE_PCHIP_SET: X array not strictly increasing. \n");
-  }
-  
+    SYS_T::print_fatal_if(xp[ii] <= xp[ii-1], "Error: GenBC_Coronary SPLINE_PCHIP_SET: X array not strictly increasing. \n");
+
   int ierr = 0;
   int nless1 = np - 1;
   double h1 = xp[1] - xp[0];
   double del1 = ( fp[1] - fp[0] ) / h1;
   double dsave = del1;
 
- //  Special case np = 2, use linear interpolation.
+  //  Special case np = 2, use linear interpolation.
   if ( np == 2 )
   {
     dp[0] = del1;
@@ -370,11 +354,9 @@ void GenBC_Coronary:: spline_pchip_set (const int &np, const std::vector<double>
   }
 
   // Normal case, np >= 3.
-
   double h2 = xp[2] - xp[1];
   double del2 = ( fp[2] - fp[1] ) / h2;
 
-  
   double hsum = h1 + h2;
   double w1 = ( h1 + hsum ) / hsum;
   double w2 = -h1 / hsum;
@@ -389,12 +371,12 @@ void GenBC_Coronary:: spline_pchip_set (const int &np, const std::vector<double>
   // Need do this check only if monotonicity switches.
   else if ( pch_sign_testing ( del1, del2 ) < 0.0 )
   {
-     dmax = 3.0 * del1;
+    dmax = 3.0 * del1;
 
-     if ( fabs ( dmax ) < fabs ( dp[0] ) )
-     {
-       dp[0] = dmax;
-     }
+    if ( fabs ( dmax ) < fabs ( dp[0] ) )
+    {
+      dp[0] = dmax;
+    }
 
   }
 
@@ -402,7 +384,7 @@ void GenBC_Coronary:: spline_pchip_set (const int &np, const std::vector<double>
   double hsumt3;
   double drat1;
   double drat2;
-   // Loop through interior points.
+  // Loop through interior points.
   for (int ii=2; ii<=nless1; ++ii)
   {
     if ( 2 < ii )
@@ -461,9 +443,9 @@ void GenBC_Coronary:: spline_pchip_set (const int &np, const std::vector<double>
   }
   else if ( pch_sign_testing ( del1, del2 ) < 0.0 )
   {
-//
-//  Need do this check only if monotonicity switches.
-//
+    //
+    //  Need do this check only if monotonicity switches.
+    //
     dmax = 3.0 * del2;
 
     if ( fabs ( dmax ) < fabs ( dp[np-1] ) )
@@ -601,7 +583,7 @@ void GenBC_Coronary:: cubic_hermite_derivative( const double &x1, const double &
   SYS_T::print_fatal_if(hh==0.0, "Error: GenBC_Coronary cubic_hermite_derivative: The interval [X1,X2] is of zero length \n");
 
   const double c2 =-6.0 * f1 / hh - 4.0 * d1 + 6.0 * f2 / hh - 2.0 * d2;
-  
+
   const double c3 = 6.0 * f1 / hh + 3.0 * d1 - 6.0 * f2 / hh + 3.0 * d2;
 
   double tt;
