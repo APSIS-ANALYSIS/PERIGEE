@@ -275,23 +275,19 @@ double GenBC_Coronary::get_P( const int &ii, const double &in_dot_Q,
   prev_0D_sol[ii][1]=pi_m[1];
 
   return pi_m[0] + Ra[ii] * in_Q;
-
 }
 
 
 double GenBC_Coronary::get_P0( const int &ii ) const
 {
-  
   return Q0[ii] * Ra[ii] + Pi0[ii][0];
-
 }
 
 
 void GenBC_Coronary::reset_initial_sol( const int &ii, const double &in_Q_0,
     const double &in_P_0, const double &curr_time )
 {
-
-  Q0[ii]  = in_Q_0;
+  Q0[ii] = in_Q_0;
 
   // Use the last 0D solition as initial solutions for the next time integration.
   Pi0[ii][0] = prev_0D_sol[ii][0];
@@ -306,7 +302,6 @@ void GenBC_Coronary::reset_initial_sol( const int &ii, const double &in_Q_0,
   
   // Precalculate dPimdt values needed for integrating Coronary ODEs.
   if( num_Pim_data[ii]>0 ) get_dPimdt(ii);
-  
 }
 
 
@@ -353,7 +348,6 @@ void GenBC_Coronary:: spline_pchip_set (const int &np, const std::vector<double>
 //    Volume 5, Number 2, 1984, pages 300-304.
 //
 {
-  
   SYS_T::print_fatal_if(np<2, "Error: GenBC_Coronary SPLINE_PCHIP_SET: Number of evaluation points is less than 1 \n");
 
   for (int ii=1; ii<np; ++ii)
@@ -539,7 +533,6 @@ double GenBC_Coronary:: pch_sign_testing ( const double &arg1, const double &arg
 
 void GenBC_Coronary:: get_dPimdt(const int &ii)
 {
-
   double x1,x2,f1,f2,d1,d2;
 
   const double fac13 = 1.0 / 3.0;
@@ -585,7 +578,6 @@ void GenBC_Coronary:: get_dPimdt(const int &ii)
   cubic_hermite_derivative ( x1, x2, f1,f2, d1, d2, N, xe_2, dPimdt_k2[ii] );
 
   cubic_hermite_derivative ( x1, x2, f1,f2, d1, d2, N, xe_3, dPimdt_k3[ii] );
-
 }
 
 
@@ -619,7 +611,6 @@ void GenBC_Coronary:: cubic_hermite_derivative( const double &x1, const double &
     tt = (xe[ii] - x1)/hh;
     de[ii] = tt * ( c2 + tt * c3 )+d1 ;
   }
-
 }
 
 // EOF
