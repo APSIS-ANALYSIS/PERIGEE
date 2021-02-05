@@ -326,6 +326,7 @@ int main( int argc, char *argv[] )
   // ===== LPN models =====
   IGenBC * gbc = nullptr;
 
+
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
 
