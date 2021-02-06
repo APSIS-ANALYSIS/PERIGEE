@@ -3,13 +3,13 @@
 PDNSolution_Wall_Disp::PDNSolution_Wall_Disp( 
     const APart_Node * const &pNode,
     const FEANode * const &fNode_ptr,
-    const int &type, const bool &isprint = true )
+    const int &type, const bool &isprint )
 : PDNSolution( pNode, 3 ), is_print( isprint )
 {
   switch( type )
   {
     case 0:
-      Init_zero( pNode, fNode_ptr );
+      Init_zero( pNode );
     default:
       SYS_T::print_fatal("Error: in PDNSolution_Wall_Disp, No such type of initial condition. \n");
       break;

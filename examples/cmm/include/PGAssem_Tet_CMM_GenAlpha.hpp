@@ -19,6 +19,7 @@
 #include "IPGAssem.hpp"
 #include "PETSc_Tools.hpp"
 #include "PDNSolution_NS.hpp"
+#include "PDNSolution_Wall_Disp.hpp"
 
 class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
 {
