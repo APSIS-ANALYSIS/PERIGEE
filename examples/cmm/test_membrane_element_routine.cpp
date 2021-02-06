@@ -21,6 +21,7 @@ int main( int argc, char * argv[] )
   double * ctrl_x = new double [nLocBas];
   double * ctrl_y = new double [nLocBas];
   double * ctrl_z = new double [nLocBas];
+  double * sol_wall_disp = new double [dim * nLocBas];
 
   if(nLocBas == 3)
   {
@@ -39,7 +40,9 @@ int main( int argc, char * argv[] )
     ctrl_y[0] = -1.4233; ctrl_y[1] = -1.2942; ctrl_y[2] = 1.3001;
     ctrl_z[0] =  9.7337; ctrl_z[1] =  9.6558; ctrl_z[2] = 9.8612;
 
-    
+    sol_wall_disp[0] =  1.0; sol_wall_disp[1] = 2.134; sol_wall_disp[2] = -3.14;
+    sol_wall_disp[3] = -1.0; sol_wall_disp[4] = 1.156; sol_wall_disp[5] = -1.56;
+    sol_wall_disp[6] =  2.0; sol_wall_disp[7] =  -3.9; sol_wall_disp[8] = 0.271; 
   }
   else if(nLocBas == 6)
   {
@@ -91,12 +94,22 @@ int main( int argc, char * argv[] )
     ctrl_y[3] = 5.0724; ctrl_y[4] = 5.1655; ctrl_y[5] = 5.1846;
     ctrl_z[0] =    0.0; ctrl_z[1] =    0.0; ctrl_z[2] =    0.0;
     ctrl_z[3] =    0.0; ctrl_z[4] =    0.0; ctrl_z[5] =    0.0;
+
+    sol_wall_disp[0]  =  1.0; sol_wall_disp[1]  = 2.134; sol_wall_disp[2]  = -3.14;
+    sol_wall_disp[3]  = -1.0; sol_wall_disp[4]  = 1.156; sol_wall_disp[5]  = -1.56;
+    sol_wall_disp[6]  =  2.0; sol_wall_disp[7]  =  -3.9; sol_wall_disp[8]  = 0.271; 
+    sol_wall_disp[9]  =  1.0; sol_wall_disp[10] = 2.134; sol_wall_disp[11] = -3.14;
+    sol_wall_disp[12] = -1.0; sol_wall_disp[13] = 1.156; sol_wall_disp[14] = -1.56;
+    sol_wall_disp[15] =  2.0; sol_wall_disp[16] =  -3.9; sol_wall_disp[17] = 0.271; 
   }
   else SYS_T::print_fatal("Error: unknown elem type.\n");
  
   IQuadPts * quad = new QuadPts_debug(dim, numpt, in_qp, in_qw);
 
   quad -> print_info();
+
+  std::cout << "\n===== sol_wall_disp =====" << std::endl;
+  print_2Darray(sol_wall_disp, nLocBas*dim, 1);
 
   FEAElement * elem = nullptr;
   if(nLocBas == 3) elem = new FEAElement_Triangle3_membrane( numpt );
@@ -118,12 +131,6 @@ int main( int argc, char * argv[] )
   elem -> get_rotationMatrix(0, Q);
   std::cout << "\n===== Q =====" << std::endl;
   Q.print();
-
-  double sol_wall_disp  [ nLocBas * dim ] = {0.0}; 
-  std::fill_n(sol_wall_disp, nLocBas * dim, 1.0);
-
-  std::cout << "\n===== sol_wall_disp =====" << std::endl;
-  print_2Darray(sol_wall_disp, nLocBas*dim, 1);
 
   double sol_wall_disp_l [ nLocBas * dim ] = {0.0};
   for(int ii=0; ii<nLocBas; ++ii)
@@ -325,6 +332,9 @@ int main( int argc, char * argv[] )
     }
   }
 
+  std::cout << "\n===== sigma_g =====" << std::endl;
+  print_2Darray(sigma_g, dim, dim);
+
   // Basis function gradients with respect to global coords
   // dR/dx_{i} = Q_{ji} * dR/dxl_{j}
   // Note that dR/dzl = 0.0
@@ -346,7 +356,6 @@ int main( int argc, char * argv[] )
   for(int A=0; A<nLocBas; ++A)
   {
     const double NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
-    const double NA_xl = dR_dxl[A], NA_yl = dR_dyl[A], NA_zl = 0.0;
 
     lin_elasticity2[dim*A]   = NA_x * sigma_g[dim*0]
       + NA_y * sigma_g[dim*0+1] + NA_z * sigma_g[dim*0+2];
@@ -378,19 +387,6 @@ int main( int argc, char * argv[] )
 
     std::cout << "\n===== Triangle6 dR_dx =====" << std::endl;
     print_2Darray(dR_dx, nLocBas, 1);
-
-    // // Strain displacement matrix B
-    // // 5 x (nLocBas * dim)
-    // double B [5 * nLocBas * dim] = {0.0};
-    // for(int ii = 0; ii < nLocBas; ++ii)
-    // { 
-    //   B[0*nLocBas*dim + ii*dim]     = dR_dx[ii]; // u1,1
-    //   B[1*nLocBas*dim + ii*dim + 1] = dR_dy[ii]; // u2,2
-    //   B[2*nLocBas*dim + ii*dim]     = dR_dy[ii]; // u1,2
-    //   B[2*nLocBas*dim + ii*dim + 1] = dR_dx[ii]; // u2,1
-    //   B[3*nLocBas*dim + ii*dim + 2] = dR_dx[ii]; // u3,1
-    //   B[4*nLocBas*dim + ii*dim + 2] = dR_dy[ii]; // u3,2
-    // }
 
     // Stiffness tensor
     // B^T * D * B = B_{ki} * D_{kl} * B_{lj}
@@ -426,8 +422,8 @@ int main( int argc, char * argv[] )
   }
 
 
-  delete [] ctrl_x; delete [] ctrl_y; delete [] ctrl_z;
-  ctrl_x = nullptr; ctrl_y = nullptr; ctrl_z = nullptr;
+  delete [] ctrl_x; delete [] ctrl_y; delete [] ctrl_z; delete [] sol_wall_disp;
+  ctrl_x = nullptr; ctrl_y = nullptr; ctrl_z = nullptr; sol_wall_disp = nullptr;
   delete quad; delete elem;
 
   if(nLocBas == 6) delete elem_tri6;
