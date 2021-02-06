@@ -320,8 +320,24 @@ int main( int argc, char *argv[] )
       c_tauc, GMIptr->get_elemType() );
 
   // ===== Initial condition =====
+  // base solution generate a parabolic flow profile at the inlet with unit flow
+  // rate
+  PDNSolution * base = new PDNSolution_NS( pNode, fNode, locinfnbc, 1 );
+  
+  PDNSolution * sol = new PDNSolution_NS( pNode, 0 );
+
+  PDNSolution * dot_sol = new PDNSolution_NS( pNode, 0 );
+
+  PDNSolution * sol_wall_disp = new PDNSolution_Wall_Disp( pNode, 0 );
+  
+  PDNSolution * dot_sol_wall_disp = new PDNSolution_Wall_Disp( pNode, 0 );
+
+  if( is_restart )
+  {
+  }
 
   // ===== Time step info =====
+  PDNTimeStep * timeinfo = new PDNTimeStep(initial_index, initial_time, initial_step);
 
   // ===== LPN models =====
   IGenBC * gbc = nullptr;
@@ -340,7 +356,9 @@ int main( int argc, char *argv[] )
   delete inflow_rate_ptr; delete quadv; delete quads;
   delete elementv; delete elements; delete elementw; delete pmat;
   delete tm_galpha_ptr; delete locAssem_ptr; delete gloAssem_ptr; 
-
+  delete base; delete sol; delete dot_sol; 
+  delete sol_wall_disp; delete dot_sol_wall_disp;
+  delete timeinfo;
   PetscFinalize();
   return EXIT_SUCCESS;
 }

@@ -100,6 +100,7 @@ SET( perigee_analysis_lib_src
   ${perigee_SOURCE_DIR}/src/PLocAssem_Tet_CMM_GenAlpha.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_Tet_CMM_GenAlpha.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_NS.cpp
+  ${perigee_SOURCE_DIR}/src/PDNSolution_Wall_Disp.cpp
 )
 
 SET( perigee_postprocess_lib_src
