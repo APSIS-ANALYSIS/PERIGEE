@@ -148,6 +148,7 @@ class GenBC_Coronary : public IGenBC
     // ne. 
     // Outputs: de with length ne. It stores the derivatives of the Hermite
     // interplation at those xe points.
+    // get_cubic_hermite_der
     void cubic_hermite_derivative( const double &x1, const double &x2, 
         const double &f1, const double &f2, const double &d1, const double &d2, 
         const int &ne, const std::vector<double> &xe, std::vector<double> &de ) const;
@@ -155,15 +156,18 @@ class GenBC_Coronary : public IGenBC
     // Set PCHIP for Pim data for the ii-th outlet face.
     // void set_pchip( const int &ii );
 
+    // More comments are needed for this function.
     // Set derivatives for a PCHIP with user provided points and values.
     // Input: np is the number of points
     //        xp is the corresponding (time) point valuesi, with length np
     //        fp is the corresponding (pressure) point values, with length np
     // Output: dp stores the derivative at xp, with length np
+    // get_nodal_pchip_der
     void spline_pchip_set( const int &np, const std::vector<double> &xp, 
         const std::vector<double> &fp, std::vector<double> &dp );
 
     // PCHIP sign-testing routine
+    // sign_test
     double pch_sign_testing( const double &arg1, const double &arg2 ) const;
 };
 

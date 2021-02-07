@@ -308,7 +308,7 @@ double GenBC_Coronary::F(const int &ii, const double &pi, const double &q) const
 }
 
 
-void GenBC_Coronary::spline_pchip_set (const int &np, const std::vector<double> &xp, 
+void GenBC_Coronary::spline_pchip_set(const int &np, const std::vector<double> &xp, 
     const std::vector<double> &fp, std::vector<double> &dp)
   //=============================================================================
   // This function sets derivatives for a piecewise cubic Hermite interpolant.
@@ -316,10 +316,9 @@ void GenBC_Coronary::spline_pchip_set (const int &np, const std::vector<double> 
   // Fortran program by Fred Fritsch under the GNU LGPL license.
   //
   // Input: np is the number of points
-  //        xp is the corresponding (time) point valuesi, with length np
+  //        xp is the corresponding (time) point values, with length np
   //        fp is the corresponding (pressure) point values, with length np
   // Output: dp stores the derivative at xp, with length np
-  //
   //
   // Reference:
   //
