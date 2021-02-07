@@ -1062,6 +1062,13 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 
   for(int qua=0; qua<face_nqp; ++qua)
   {
+    // Lamina and global stiffness matrices
+    double * Kl = new double [ (snLocBas*dim) * (snLocBas*dim) ] {};
+    double * Kg = new double [ (snLocBas*dim) * (snLocBas*dim) ] {};
+
+    // Residual contribution from static linear elasticity
+    double * lin_elasticity = new double [ snLocBas * dim ] {};
+
     // For membrane elements, basis function gradients are computed
     // with respect to lamina coords
     element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0] );
@@ -1100,7 +1107,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 
     // Stiffness tensor in lamina coords
     // Bl^T * D * Bl = Bl_{ki} * D_{kl} * Bl_{lj}
-    double Kl [(snLocBas*dim) * (snLocBas*dim)] = {0.0};
     for(int A=0; A<snLocBas; ++A)
     {
       const double NA_xl = dR_dx[A], NA_yl = dR_dy[A];
@@ -1130,7 +1136,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     // Stiffness tensor in global coords
     // theta^T * Kl * theta, where theta = [Q, 0, 0; 0, Q, 0; 0, 0, Q]
     // or Q^T * Kl_[AB] * Q = Q_{ki} * Kl_[AB]{kl} * Q_{lj}
-    double Kg [(snLocBas*dim) * (snLocBas*dim)] = {0.0};
     for(int A=0; A<snLocBas; ++A)
     {
       for(int B=0; B<snLocBas; ++B)
@@ -1158,7 +1163,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 
     // Multiply by displacements in global coords
     // Kg_{ij} * u_{j}
-    double lin_elasticity [snLocBas * dim ] = {0.0};
     for(int ii=0; ii<snLocBas*dim; ++ii)
       for(int jj=0; jj<snLocBas*dim; ++jj)
         lin_elasticity[ii] += Kg[ (snLocBas*dim)*ii + jj ] * sol_wall_disp[jj];
@@ -1169,6 +1173,9 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
       sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * ( v_t - f2 ) + lin_elasticity[dim*A+1] ); 
       sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * ( w_t - f3 ) + lin_elasticity[dim*A+2] ); 
     }
+
+    delete [] Kl; delete [] Kg; delete [] lin_elasticity;
+    Kl = nullptr; Kg = nullptr; lin_elasticity = nullptr;
 
   } // end qua loop
 }
@@ -1201,6 +1208,13 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 
   for(int qua=0; qua<face_nqp; ++qua)
   {
+    // Lamina and global stiffness matrices
+    double * Kl = new double [ (snLocBas*dim) * (snLocBas*dim) ] {};
+    double * Kg = new double [ (snLocBas*dim) * (snLocBas*dim) ] {};
+
+    // Residual contribution from static linear elasticity
+    double * lin_elasticity = new double [ snLocBas * dim ] {};
+
     // For membrane elements, basis function gradients are computed
     // with respect to lamina coords
     element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0] );
@@ -1239,7 +1253,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 
     // Stiffness tensor in lamina coords
     // Bl^T * D * Bl = Bl_{ki} * D_{kl} * Bl_{lj}
-    double Kl [(snLocBas*dim) * (snLocBas*dim)] = {0.0};
     for(int A=0; A<snLocBas; ++A)
     {
       const double NA_xl = dR_dx[A], NA_yl = dR_dy[A];
@@ -1269,7 +1282,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     // Stiffness tensor in global coords
     // theta^T * Kl * theta, where theta = [Q, 0, 0; 0, Q, 0; 0, 0, Q]
     // or Q^T * Kl_[AB] * Q = Q_{ki} * Kl_[AB]{kl} * Q_{lj}
-    double Kg [(snLocBas*dim) * (snLocBas*dim)] = {0.0};
     for(int A=0; A<snLocBas; ++A)
     {
       for(int B=0; B<snLocBas; ++B)
@@ -1297,7 +1309,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 
     // Multiply by displacements in global coords
     // Kg_{ij} * u_{j}
-    double lin_elasticity [snLocBas * dim ] = {0.0};
     for(int ii=0; ii<snLocBas*dim; ++ii)
       for(int jj=0; jj<snLocBas*dim; ++jj)
         lin_elasticity[ii] += Kg[(snLocBas*dim)*ii + jj] * sol_wall_disp[jj];
@@ -1345,6 +1356,10 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 
       } // end B loop
     } // end A loop
+
+    delete [] Kl; delete [] Kg; delete [] lin_elasticity;
+    Kl = nullptr; Kg = nullptr; lin_elasticity = nullptr;
+
   } // end qua loop
 
 }
