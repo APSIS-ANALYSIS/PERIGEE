@@ -60,7 +60,6 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
       prev_0D_sol[ii].resize( num_odes );
       Pi0[ii].resize( num_odes );
 
-      // !! WHY N+1 HERE?  
       dPimdt_k1[ii].resize( N+1 );
       dPimdt_k2[ii].resize( N );
       dPimdt_k3[ii].resize( N );
@@ -286,8 +285,8 @@ void GenBC_Coronary::reset_initial_sol( const int &ii, const double &in_Q_0,
   // Update tstart and tend only once. 
   if( ii == 0 )
   {
-    tstart=curr_time;
-    tend=curr_time+N*h;
+    tstart = curr_time;
+    tend = curr_time + N * h;
   }
 
   // Precalculate dPimdt values needed for integrating Coronary ODEs.
@@ -336,7 +335,7 @@ void GenBC_Coronary::spline_pchip_set (const int &np, const std::vector<double> 
   //    Volume 5, Number 2, 1984, pages 300-304.
   //
 {
-  SYS_T::print_fatal_if(np<2, "Error: GenBC_Coronary SPLINE_PCHIP_SET: Number of evaluation points is less than 1 \n");
+  SYS_T::print_fatal_if( np < 2, "Error: GenBC_Coronary SPLINE_PCHIP_SET: Number of evaluation points is less than 2. \n");
 
   for (int ii=1; ii<np; ++ii)
     SYS_T::print_fatal_if(xp[ii] <= xp[ii-1], "Error: GenBC_Coronary SPLINE_PCHIP_SET: X array not strictly increasing. \n");
@@ -365,6 +364,7 @@ void GenBC_Coronary::spline_pchip_set (const int &np, const std::vector<double> 
     double dmax;
     double dmin;
     dp[0] = w1 * del1 + w2 * del2;
+    
     // Set dp[0] via non-centered three point formula, adjusted to be shape preserving.
     if( pch_sign_testing ( dp[0], del1 ) <= 0.0 )
     {
