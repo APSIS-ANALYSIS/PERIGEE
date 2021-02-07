@@ -352,108 +352,107 @@ void GenBC_Coronary::spline_pchip_set (const int &np, const std::vector<double> 
   {
     dp[0] = del1;
     dp[np-1] = del1;
-    return;
   }
-
-  // Normal case, np >= 3.
-  double h2 = xp[2] - xp[1];
-  double del2 = ( fp[2] - fp[1] ) / h2;
-
-  double hsum = h1 + h2;
-  double w1 = ( h1 + hsum ) / hsum;
-  double w2 = -h1 / hsum;
-  double dmax;
-  double dmin;
-  dp[0] = w1 * del1 + w2 * del2;
-  // Set dp[0] via non-centered three point formula, adjusted to be shape preserving.
-  if( pch_sign_testing ( dp[0], del1 ) <= 0.0 )
+  else
   {
-    dp[0] = 0.0;
-  }
-  // Need do this check only if monotonicity switches.
-  else if( pch_sign_testing ( del1, del2 ) < 0.0 )
-  {
-    dmax = 3.0 * del1;
+    // Normal case, np >= 3.
+    double h2 = xp[2] - xp[1];
+    double del2 = ( fp[2] - fp[1] ) / h2;
 
-    if ( fabs ( dmax ) < fabs ( dp[0] ) )
+    double hsum = h1 + h2;
+    double w1 = ( h1 + hsum ) / hsum;
+    double w2 = -h1 / hsum;
+    double dmax;
+    double dmin;
+    dp[0] = w1 * del1 + w2 * del2;
+    // Set dp[0] via non-centered three point formula, adjusted to be shape preserving.
+    if( pch_sign_testing ( dp[0], del1 ) <= 0.0 )
     {
-      dp[0] = dmax;
+      dp[0] = 0.0;
     }
-  }
-
-  double temp, hsumt3, drat1, drat2;
-
-  // Loop through interior points.
-  for(int ii=2; ii<=nless1; ++ii)
-  {
-    if( 2 < ii )
+    // Need do this check only if monotonicity switches.
+    else if( pch_sign_testing ( del1, del2 ) < 0.0 )
     {
-      h1 = h2;
-      h2 = xp[ii] - xp[ii-1];
-      hsum = h1 + h2;
-      del1 = del2;
-      del2 = ( fp[ii] - fp[ii-1] ) / h2;
-    }
+      dmax = 3.0 * del1;
 
-    // Set dp[ii-1]=0 unless data are strictly monotonic.
-    dp[ii-1] = 0.0;
-
-    temp = pch_sign_testing ( del1, del2 );
-
-    if( temp < 0.0 )
-    {
-      ierr = ierr + 1;
-      dsave = del2;
-    }
-    // Count number of changes in direction of monotonicity.
-    else if( temp == 0.0 )
-    {
-      if ( del2 != 0.0 )
+      if ( fabs ( dmax ) < fabs ( dp[0] ) )
       {
-        if ( pch_sign_testing ( dsave, del2 ) < 0.0 )
-        {
-          ierr = ierr + 1;
-        }
-        dsave = del2;
+        dp[0] = dmax;
       }
     }
-    //  Use Brodlie modification of Butland formula.
-    else
+
+    double temp, hsumt3, drat1, drat2;
+
+    // Loop through interior points.
+    for(int ii=2; ii<=nless1; ++ii)
     {
-      hsumt3 = 3.0 * hsum;
-      w1 = ( hsum + h1 ) / hsumt3;
-      w2 = ( hsum + h2 ) / hsumt3;
-      dmax = fmax ( fabs ( del1 ), fabs ( del2 ) );
-      dmin = fmin ( fabs ( del1 ), fabs ( del2 ) );
-      drat1 = del1 / dmax;
-      drat2 = del2 / dmax;
-      dp[ii-1] = dmin / ( w1 * drat1 + w2 * drat2 );
+      if( 2 < ii )
+      {
+        h1 = h2;
+        h2 = xp[ii] - xp[ii-1];
+        hsum = h1 + h2;
+        del1 = del2;
+        del2 = ( fp[ii] - fp[ii-1] ) / h2;
+      }
+
+      // Set dp[ii-1]=0 unless data are strictly monotonic.
+      dp[ii-1] = 0.0;
+
+      temp = pch_sign_testing ( del1, del2 );
+
+      if( temp < 0.0 )
+      {
+        ierr = ierr + 1;
+        dsave = del2;
+      }
+      // Count number of changes in direction of monotonicity.
+      else if( temp == 0.0 )
+      {
+        if ( del2 != 0.0 )
+        {
+          if ( pch_sign_testing ( dsave, del2 ) < 0.0 )
+          {
+            ierr = ierr + 1;
+          }
+          dsave = del2;
+        }
+      }
+      //  Use Brodlie modification of Butland formula.
+      else
+      {
+        hsumt3 = 3.0 * hsum;
+        w1 = ( hsum + h1 ) / hsumt3;
+        w2 = ( hsum + h2 ) / hsumt3;
+        dmax = fmax ( fabs ( del1 ), fabs ( del2 ) );
+        dmin = fmin ( fabs ( del1 ), fabs ( del2 ) );
+        drat1 = del1 / dmax;
+        drat2 = del2 / dmax;
+        dp[ii-1] = dmin / ( w1 * drat1 + w2 * drat2 );
+      }
     }
-  }
 
-  // Set dp[np-1] via non-centered three point formula, adjusted to be shape preserving.
-  w1 = -h2 / hsum;
-  w2 = ( h2 + hsum ) / hsum;
-  dp[np-1] = w1 * del1 + w2 * del2;
+    // Set dp[np-1] via non-centered three point formula, adjusted to be shape preserving.
+    w1 = -h2 / hsum;
+    w2 = ( h2 + hsum ) / hsum;
+    dp[np-1] = w1 * del1 + w2 * del2;
 
-  if( pch_sign_testing ( dp[np-1], del2 ) <= 0.0 )
-  {
-    dp[np-1] = 0.0;
-  }
-  else if( pch_sign_testing ( del1, del2 ) < 0.0 )
-  {
-    //
-    //  Need do this check only if monotonicity switches.
-    //
-    dmax = 3.0 * del2;
-
-    if( fabs ( dmax ) < fabs ( dp[np-1] ) )
+    if( pch_sign_testing ( dp[np-1], del2 ) <= 0.0 )
     {
-      dp[np-1] = dmax;
+      dp[np-1] = 0.0;
     }
+    else if( pch_sign_testing ( del1, del2 ) < 0.0 )
+    {
+      //
+      //  Need do this check only if monotonicity switches.
+      //
+      dmax = 3.0 * del2;
 
-  }
-  return;
+      if( fabs ( dmax ) < fabs ( dp[np-1] ) )
+      {
+        dp[np-1] = dmax;
+      }
+    }
+  } // End of If-else statement for np
 }
 
 
