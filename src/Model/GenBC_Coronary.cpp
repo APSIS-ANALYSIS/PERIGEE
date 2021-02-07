@@ -96,35 +96,40 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
       SYS_T::print_fatal_if( num_Pim_data[counter] <= 2 && num_Pim_data[counter] != 0, 
           "Error: number of Pim data needs to be 0 for RCR or greater than 2 for coronary BC. \n" );
 
-      // !!ADD COMMENT HERE
-      int data_size = 1;
-      if( num_Pim_data[counter]>0 ) data_size = num_Pim_data[counter];
-      else data_size=1;
-
-      Time_data[counter].resize( data_size );
-      Pim_data[counter].resize( data_size );
-      der_Pim_data[counter].resize( data_size );
-
-      sstrm.clear();
-
-      for(int ii =0; ii < num_Pim_data[counter]; ++ii)
+      // Resize the IntraMyocardial data 
+      if( num_Pim_data[counter] > 0 ) 
       {
-        getline(reader, sline);
-        sstrm.str( sline );
-        sstrm>>Time_data[counter][ii];
-        sstrm>>Pim_data[counter][ii];
+        const int data_size = num_Pim_data[counter];
 
-        Pim_data[counter][ii] = Pim_data[counter][ii] * alpha_Pim[counter];
+        Time_data[counter].resize( data_size );
+        Pim_data[counter].resize( data_size );
+        der_Pim_data[counter].resize( data_size );
+
         sstrm.clear();
-      }
 
-      if(num_Pim_data[counter]>0)
-      {
+        for(int ii =0; ii < num_Pim_data[counter]; ++ii)
+        {
+          getline(reader, sline);
+          sstrm.str( sline );
+          sstrm>>Time_data[counter][ii];
+          sstrm>>Pim_data[counter][ii];
+
+          Pim_data[counter][ii] = Pim_data[counter][ii] * alpha_Pim[counter];
+          sstrm.clear();
+        }
+
         spline_pchip_set( num_Pim_data[counter], Time_data[counter], Pim_data[counter], der_Pim_data[counter] );
         get_dPim_dt( counter );
-      }
 
-      SYS_T::print_fatal_if(Time_data[counter][0]>0.0, "Error: Pim data does not start from 0.\n");
+        SYS_T::print_fatal_if(Time_data[counter][0]>0.0, "Error: Pim data does not start from 0.\n");
+      }
+      else
+      {
+        Time_data[counter].clear();
+        Pim_data[counter].clear();
+        der_Pim_data[counter].clear();
+      }
+      
       counter += 1;
     }
   }
@@ -377,7 +382,7 @@ void GenBC_Coronary::spline_pchip_set (const int &np, const std::vector<double> 
   }
 
   double temp, hsumt3, drat1, drat2;
-  
+
   // Loop through interior points.
   for(int ii=2; ii<=nless1; ++ii)
   {
