@@ -54,16 +54,13 @@ class GenBC_Coronary : public IGenBC
 
     virtual void print_info() const;
 
-    virtual int get_num_ebc() const {return num_ebc;}
+    virtual int get_num_ebc() const { return num_ebc; }
 
-    virtual double get_m( const int &ii, const double &in_dot_Q,
-       const double &in_Q ) const ;
+    virtual double get_m( const int &ii, const double &in_dot_Q, 
+        const double &in_Q ) const ;
 
     virtual double get_n( const int &ii, const double &in_dot_Q,
-       const double &in_Q ) const
-    {
-      return 0.0;
-    }
+       const double &in_Q ) const { return 0.0; }
 
     // Obtain P for the ii-th outlet surface (coronary or RCR).
     virtual double get_P( const int &ii, const double &in_dot_Q,
