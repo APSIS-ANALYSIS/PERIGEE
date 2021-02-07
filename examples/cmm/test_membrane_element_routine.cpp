@@ -297,43 +297,32 @@ int main( int argc, char * argv[] )
   print_2Darray(Blul2, 5, 1);
 
   // Cauchy stress in lamina coords 
-  double sigma_l [ dim * dim ] = {0.0};
-  sigma_l[0] = coef * (u1l_xl + nu*u2l_yl);              // sigma_l_11
-  sigma_l[1] = coef * 0.5*(1.0-nu) * (u1l_yl + u2l_xl);  // sigma_l_12
-  sigma_l[3] = coef * 0.5*(1.0-nu) * (u1l_yl + u2l_xl);  // sigma_l_21
-  sigma_l[2] = coef * 0.5*kappa*(1.0-nu) * u3l_xl;       // sigma_l_13
-  sigma_l[6] = coef * 0.5*kappa*(1.0-nu) * u3l_xl;       // sigma_l_31  
-  sigma_l[4] = coef * (nu*u1l_xl + u2l_yl);              // sigma_l_22
-  sigma_l[5] = coef * 0.5*kappa*(1.0-nu) * u3l_yl;       // sigma_l_23
-  sigma_l[7] = coef * 0.5*kappa*(1.0-nu) * u3l_yl;       // sigma_l_32 
-  sigma_l[8] = 0.0;                                      // sigma_l_33
+  // double sigma_l [ dim * dim ] = {0.0};
+  // sigma_l[0] = coef * (u1l_xl + nu*u2l_yl);              // sigma_l_11
+  // sigma_l[1] = coef * 0.5*(1.0-nu) * (u1l_yl + u2l_xl);  // sigma_l_12
+  // sigma_l[3] = coef * 0.5*(1.0-nu) * (u1l_yl + u2l_xl);  // sigma_l_21
+  // sigma_l[2] = coef * 0.5*kappa*(1.0-nu) * u3l_xl;       // sigma_l_13
+  // sigma_l[6] = coef * 0.5*kappa*(1.0-nu) * u3l_xl;       // sigma_l_31  
+  // sigma_l[4] = coef * (nu*u1l_xl + u2l_yl);              // sigma_l_22
+  // sigma_l[5] = coef * 0.5*kappa*(1.0-nu) * u3l_yl;       // sigma_l_23
+  // sigma_l[7] = coef * 0.5*kappa*(1.0-nu) * u3l_yl;       // sigma_l_32 
+  // sigma_l[8] = 0.0;                                      // sigma_l_33
+
+  Matrix_3x3 sigma = Matrix_3x3(
+      u1l_xl + nu*u2l_yl,               0.5*(1.0-nu) * (u1l_yl + u2l_xl), 0.5*kappa*(1.0-nu) * u3l_xl,
+      0.5*(1.0-nu) * (u1l_yl + u2l_xl), nu*u1l_xl + u2l_yl,               0.5*kappa*(1.0-nu) * u3l_yl,
+      0.5*kappa*(1.0-nu) * u3l_xl,      0.5*kappa*(1.0-nu) * u3l_yl,      0.0 );
+  sigma *= coef;
 
   std::cout << "\n===== sigma_l =====" << std::endl;
-  print_2Darray(sigma_l, dim, dim);
+  sigma.print();
 
   // Cauchy stress in global coords
   // Q^T * sigma_l * Q = Q_{ki} * sigma_l_{kl} * Q_{lj}
-  double sigma_g [ dim * dim ] = {0.0};
-  for(int ii=0; ii<dim; ++ii)
-  {
-    for(int jj=0; jj<dim; ++jj)
-    {
-      sigma_g[dim*ii+jj] += Q(0, ii) * sigma_l[dim*0+0] * Q(0, jj);
-      sigma_g[dim*ii+jj] += Q(0, ii) * sigma_l[dim*0+1] * Q(1, jj);
-      sigma_g[dim*ii+jj] += Q(0, ii) * sigma_l[dim*0+2] * Q(2, jj);
-
-      sigma_g[dim*ii+jj] += Q(1, ii) * sigma_l[dim*1+0] * Q(0, jj);
-      sigma_g[dim*ii+jj] += Q(1, ii) * sigma_l[dim*1+1] * Q(1, jj);
-      sigma_g[dim*ii+jj] += Q(1, ii) * sigma_l[dim*1+2] * Q(2, jj);
-
-      sigma_g[dim*ii+jj] += Q(2, ii) * sigma_l[dim*2+0] * Q(0, jj);
-      sigma_g[dim*ii+jj] += Q(2, ii) * sigma_l[dim*2+1] * Q(1, jj);
-      sigma_g[dim*ii+jj] += Q(2, ii) * sigma_l[dim*2+2] * Q(2, jj);
-    }
-  }
+  sigma.MatRot(Q);
 
   std::cout << "\n===== sigma_g =====" << std::endl;
-  print_2Darray(sigma_g, dim, dim);
+  sigma.print();
 
   // Basis function gradients with respect to global coords
   // dR/dx_{i} = Q_{ji} * dR/dxl_{j}
@@ -357,14 +346,14 @@ int main( int argc, char * argv[] )
   {
     const double NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
-    lin_elasticity2[dim*A]   = NA_x * sigma_g[dim*0]
-      + NA_y * sigma_g[dim*0+1] + NA_z * sigma_g[dim*0+2];
+    lin_elasticity2[dim*A]   = NA_x * sigma(0, 0)
+      + NA_y * sigma(0, 1) + NA_z * sigma(0, 2);
 
-    lin_elasticity2[dim*A+1] = NA_x * sigma_g[dim*1]
-      + NA_y * sigma_g[dim*1+1] + NA_z * sigma_g[dim*1+2];
+    lin_elasticity2[dim*A+1] = NA_x * sigma(1, 0)
+      + NA_y * sigma(1, 1) + NA_z * sigma(1, 2);
 
-    lin_elasticity2[dim*A+2] = NA_x * sigma_g[dim*2]
-      + NA_y * sigma_g[dim*2+1] + NA_z * sigma_g[dim*2+2];
+    lin_elasticity2[dim*A+2] = NA_x * sigma(2, 0)
+      + NA_y * sigma(2, 1) + NA_z * sigma(2, 2);
   }
 
   std::cout << "\n===== lin_elasticity v2 =====" << std::endl;
