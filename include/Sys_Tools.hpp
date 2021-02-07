@@ -38,6 +38,7 @@ namespace SYS_T
   }
 
   // ----------------------------------------------------------------
+  // for Zinan, replace this by GenBC_T::get_genbc_file_type
   // ! get_genbc_file_type : read the genbc file and determine what
   //   type of gen bc the file specifies. It will return   
   //   0 for unknown type

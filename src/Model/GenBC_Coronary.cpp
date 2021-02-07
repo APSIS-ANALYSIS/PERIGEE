@@ -121,7 +121,7 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
       if(num_Pim_data[counter]>0)
       {
         spline_pchip_set( num_Pim_data[counter], Time_data[counter], Pim_data[counter], der_Pim_data[counter] );
-        get_dPimdt( counter );
+        get_dPim_dt( counter );
       }
 
       SYS_T::print_fatal_if(Time_data[counter][0]>0.0, "Error: Pim data does not start from 0.\n");
@@ -287,11 +287,10 @@ void GenBC_Coronary::reset_initial_sol( const int &ii, const double &in_Q_0,
   }
 
   // Precalculate dPimdt values needed for integrating Coronary ODEs.
-  if( num_Pim_data[ii]>0 ) get_dPimdt(ii);
+  if( num_Pim_data[ii]>0 ) get_dPim_dt(ii);
 }
 
-
-void GenBC_Coronary:: F( const int &ii, const double * const &pi, const double &q, 
+void GenBC_Coronary::F( const int &ii, const double * const &pi, const double &q, 
     const double &dPimdt, double * const &K ) const
 {
   // The Coronary LPM consists of two ODEs. 
@@ -299,15 +298,14 @@ void GenBC_Coronary:: F( const int &ii, const double * const &pi, const double &
   K[1]=((pi[0]-pi[1])/Ra_micro[ii]-(pi[1]-Pd[ii])/(Rv[ii]))/Cim[ii]+dPimdt;
 }
 
-
-double GenBC_Coronary:: F(const int &ii, const double &pi, const double &q) const
+double GenBC_Coronary::F(const int &ii, const double &pi, const double &q) const
 {
   // This is an RCR ODE, Ra_micro and Ca are used to store distal resistance and capacitance
   return (q-(pi-Pd[ii])/Ra_micro[ii])/Ca[ii];
 }
 
 
-void GenBC_Coronary:: spline_pchip_set (const int &np, const std::vector<double> &xp, 
+void GenBC_Coronary::spline_pchip_set (const int &np, const std::vector<double> &xp, 
     const std::vector<double> &fp, std::vector<double> &dp)
   //=============================================================================
   // This function sets derivatives for a piecewise cubic Hermite interpolant.
@@ -458,7 +456,7 @@ void GenBC_Coronary:: spline_pchip_set (const int &np, const std::vector<double>
 }
 
 
-double GenBC_Coronary:: pch_sign_testing ( const double &arg1, const double &arg2 ) const
+double GenBC_Coronary::pch_sign_testing ( const double &arg1, const double &arg2 ) const
 //=============================================================================
 // This function performs a sign test.
 // This function is modified from John Burkardt's C++ version of the original 
@@ -512,8 +510,7 @@ double GenBC_Coronary:: pch_sign_testing ( const double &arg1, const double &arg
   return value;
 }
 
-
-void GenBC_Coronary:: get_dPimdt(const int &ii)
+void GenBC_Coronary::get_dPim_dt(const int &ii)
 {
   double x1,x2,f1,f2,d1,d2;
 
@@ -563,7 +560,7 @@ void GenBC_Coronary:: get_dPimdt(const int &ii)
 }
 
 
-void GenBC_Coronary:: cubic_hermite_derivative( const double &x1, const double &x2, 
+void GenBC_Coronary::cubic_hermite_derivative( const double &x1, const double &x2, 
     const double &f1, const double &f2, const double &d1, const double &d2, 
     const int &ne, const std::vector<double> &xe, std::vector<double> &de ) const
 //=============================================================================

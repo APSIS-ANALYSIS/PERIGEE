@@ -143,7 +143,7 @@ class GenBC_Coronary : public IGenBC
 
     // Pre-compute dPim/dt at the begining of the ODE integration for the 
     // ii-th outlet face
-    void get_dPimdt( const int &ii );
+    void get_dPim_dt( const int &ii );
 
     // Evaluate the derivatives of a piecewise cubic hermite interpolating 
     // polynomial (e.g. PCHIP) between points x1 and x2 with values f1, f2 and 
