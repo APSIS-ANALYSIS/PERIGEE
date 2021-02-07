@@ -301,9 +301,9 @@ void Matrix_3x3::MatRot( const Matrix_3x3 &Q )
   {
     for(int jj=0; jj<3; ++jj)
     {
-      temp[ii*3+jj] = ( Q(3*ii) * mat[0] + Q(3*ii+1) * mat[3] + Q(3*ii+2) * mat[6] ) * Q(3*jj)
-        + ( Q(3*ii) * mat[1] + Q(3*ii+1) * mat[4] + Q(3*ii+2) * mat[7] ) * Q(3*jj+1)
-        + ( Q(3*ii) * mat[2] + Q(3*ii+1) * mat[5] + Q(3*ii+2) * mat[8] ) * Q(3*jj+2);
+      temp[ii*3+jj] = Q(0,ii) * ( mat[0]*Q(0,jj) + mat[1]*Q(1,jj) + mat[2]*Q(2,jj) )
+                    + Q(1,ii) * ( mat[3]*Q(0,jj) + mat[4]*Q(1,jj) + mat[5]*Q(2,jj) )
+                    + Q(2,ii) * ( mat[6]*Q(0,jj) + mat[7]*Q(1,jj) + mat[8]*Q(2,jj) );
     }
   }
   
