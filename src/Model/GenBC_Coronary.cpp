@@ -2,7 +2,7 @@
 
 GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename, 
     const int &in_N, const double &dt3d )
-  : num_odes(2), N( in_N ), h( dt3d/static_cast<double>(N) ), 
+: num_odes(2), N( in_N ), h( dt3d/static_cast<double>(N) ), 
   absTol( 1.0e-8 ), relTol( 1.0e-5 ),
   tstart( 0.0 ), tend( dt3d )
 {
@@ -219,14 +219,14 @@ double GenBC_Coronary::get_P( const int &ii, const double &in_dot_Q,
   // Here, we know it is a coronary face.
   // Each coronary face is governed by 2 ODEs.  
   // initial pressures at Ca and Cim
-  double pi_m[num_odes] = {Pi0[ii][0],Pi0[ii][1]};  //Pi_m
+  double pi_m[num_odes] = {Pi0[ii][0], Pi0[ii][1]};  //Pi_m
 
   // auxiliary variables for RK4 
-  double K1[2] = {0.0};
-  double K2[2] = {0.0};
-  double K3[2] = {0.0};
-  double K4[2] = {0.0};
-  double pi_tmp[2] ={0.0};
+  double K1[num_odes] = {0.0, 0.0};
+  double K2[num_odes] = {0.0, 0.0};
+  double K3[num_odes] = {0.0, 0.0};
+  double K4[num_odes] = {0.0, 0.0};
+  double pi_tmp[num_odes] ={0.0, 0.0};
 
   // in_Q gives Q_N = Q_n+1, and Q0[ii] gives Q_0 = Q_n
   // do Runge-Kutta 4 with the 3/8 rule
@@ -259,8 +259,7 @@ double GenBC_Coronary::get_P( const int &ii, const double &in_dot_Q,
 
   // Make a copy of the ODE solutions. 
   // prev_0D_sol will reset initial values Pi0 for future time integration (t=n+1-> t=n+2) 
-  prev_0D_sol[ii][0]=pi_m[0];
-  prev_0D_sol[ii][1]=pi_m[1];
+  for(int jj=0; jj<num_odes; ++jj) prev_0D_sol[ii][jj]=pi_m[jj];
 
   return pi_m[0] + Ra[ii] * in_Q;
 }
@@ -344,7 +343,7 @@ void GenBC_Coronary::spline_pchip_set (const int &np, const std::vector<double> 
   double dsave = del1;
 
   //  Special case np = 2, use linear interpolation.
-  if ( np == 2 )
+  if( np == 2 )
   {
     dp[0] = del1;
     dp[np-1] = del1;
@@ -362,12 +361,12 @@ void GenBC_Coronary::spline_pchip_set (const int &np, const std::vector<double> 
   double dmin;
   dp[0] = w1 * del1 + w2 * del2;
   // Set dp[0] via non-centered three point formula, adjusted to be shape preserving.
-  if ( pch_sign_testing ( dp[0], del1 ) <= 0.0 )
+  if( pch_sign_testing ( dp[0], del1 ) <= 0.0 )
   {
     dp[0] = 0.0;
   }
   // Need do this check only if monotonicity switches.
-  else if ( pch_sign_testing ( del1, del2 ) < 0.0 )
+  else if( pch_sign_testing ( del1, del2 ) < 0.0 )
   {
     dmax = 3.0 * del1;
 
@@ -375,17 +374,14 @@ void GenBC_Coronary::spline_pchip_set (const int &np, const std::vector<double> 
     {
       dp[0] = dmax;
     }
-
   }
 
-  double temp;
-  double hsumt3;
-  double drat1;
-  double drat2;
+  double temp, hsumt3, drat1, drat2;
+  
   // Loop through interior points.
-  for (int ii=2; ii<=nless1; ++ii)
+  for(int ii=2; ii<=nless1; ++ii)
   {
-    if ( 2 < ii )
+    if( 2 < ii )
     {
       h1 = h2;
       h2 = xp[ii] - xp[ii-1];
@@ -399,13 +395,13 @@ void GenBC_Coronary::spline_pchip_set (const int &np, const std::vector<double> 
 
     temp = pch_sign_testing ( del1, del2 );
 
-    if ( temp < 0.0 )
+    if( temp < 0.0 )
     {
       ierr = ierr + 1;
       dsave = del2;
     }
     // Count number of changes in direction of monotonicity.
-    else if ( temp == 0.0 )
+    else if( temp == 0.0 )
     {
       if ( del2 != 0.0 )
       {
@@ -435,18 +431,18 @@ void GenBC_Coronary::spline_pchip_set (const int &np, const std::vector<double> 
   w2 = ( h2 + hsum ) / hsum;
   dp[np-1] = w1 * del1 + w2 * del2;
 
-  if ( pch_sign_testing ( dp[np-1], del2 ) <= 0.0 )
+  if( pch_sign_testing ( dp[np-1], del2 ) <= 0.0 )
   {
     dp[np-1] = 0.0;
   }
-  else if ( pch_sign_testing ( del1, del2 ) < 0.0 )
+  else if( pch_sign_testing ( del1, del2 ) < 0.0 )
   {
     //
     //  Need do this check only if monotonicity switches.
     //
     dmax = 3.0 * del2;
 
-    if ( fabs ( dmax ) < fabs ( dp[np-1] ) )
+    if( fabs ( dmax ) < fabs ( dp[np-1] ) )
     {
       dp[np-1] = dmax;
     }
@@ -583,11 +579,10 @@ void GenBC_Coronary::cubic_hermite_derivative( const double &x1, const double &x
 
   const double c3 = 6.0 * f1 / hh + 3.0 * d1 - 6.0 * f2 / hh + 3.0 * d2;
 
-  double tt;
   // Evaluation loop.
   for (int ii=0; ii<ne; ++ii)
   {
-    tt = (xe[ii] - x1)/hh;
+    const double tt = (xe[ii] - x1)/hh;
     de[ii] = tt * ( c2 + tt * c3 )+d1 ;
   }
 }
