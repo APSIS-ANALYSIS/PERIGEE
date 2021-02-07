@@ -3,8 +3,7 @@
 GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename, 
     const int &in_N, const double &dt3d )
 : num_odes(2), N( in_N ), h( dt3d/static_cast<double>(N) ), 
-  absTol( 1.0e-8 ), relTol( 1.0e-5 ),
-  tstart( 0.0 ), tend( dt3d )
+  absTol( 1.0e-8 ), relTol( 1.0e-5 )
 {
   // Now read the lpn input file for num_ebc and coronary model 
   // parameters (Ra, Ca, Ra_micro, Cim, Rv, Pd and Pim)
@@ -279,18 +278,10 @@ void GenBC_Coronary::reset_initial_sol( const int &ii, const double &in_Q_0,
   Q0[ii] = in_Q_0;
 
   // Use the last 0D solition as initial solutions for the next time integration.
-  Pi0[ii][0] = prev_0D_sol[ii][0];
-  Pi0[ii][1] = prev_0D_sol[ii][1];
-
-  // Update tstart and tend only once. 
-  if( ii == 0 )
-  {
-    tstart = curr_time;
-    tend = curr_time + N * h;
-  }
+  for(int jj=0; jj<num_odes; ++jj) Pi0[ii][jj] = prev_0D_sol[ii][jj];
 
   // Precalculate dPimdt values needed for integrating Coronary ODEs.
-  if( num_Pim_data[ii]>0 ) get_dPim_dt(ii);
+  if( num_Pim_data[ii]>0 ) get_dPim_dt(ii, curr_time, curr_time + N * h);
 }
 
 void GenBC_Coronary::F( const int &ii, const double * const &pi, const double &q, 
@@ -509,14 +500,14 @@ double GenBC_Coronary::pch_sign_testing ( const double &arg1, const double &arg2
   return value;
 }
 
-void GenBC_Coronary::get_dPim_dt(const int &ii)
+void GenBC_Coronary::get_dPim_dt(const int &ii, const double &time_start, const double &time_end)
 {
   double x1,x2,f1,f2,d1,d2;
 
   const double fac13 = 1.0 / 3.0;
   const double fac23 = 2.0 / 3.0;
 
-  double tend_mod = fmod(tend,Time_data[ii][num_Pim_data[ii]-1]);
+  double tend_mod = fmod( time_end, Time_data[ii][num_Pim_data[ii]-1] );
   // Find the interval in Pim that covers current integration time. 
   for(int mm=1; mm<num_Pim_data[ii];++mm)
   {
@@ -538,8 +529,8 @@ void GenBC_Coronary::get_dPim_dt(const int &ii)
   xe_3.resize( N );
 
   // Precalculate dPimdt values at time points evaluated by RK4 
-  // from tstart to tend. 
-  double tmp=tstart;
+  // from time_start to time_end. 
+  double tmp = time_start;
 
   for(int mm=0;mm<N;++mm)
   {

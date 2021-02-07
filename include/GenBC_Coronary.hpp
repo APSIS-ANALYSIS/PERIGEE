@@ -88,9 +88,6 @@ class GenBC_Coronary : public IGenBC
     // Total number of outlet surfaces
     int num_ebc;
 
-    // starting and ending time for integrating the coronary LPM
-    double tstart, tend;
-
     // Vectors storing the Ra, Ca, Ra_micro, Cim, Rv, Pd, and alpha_Pim.
     // alpha_Pim stores the scaling values for all coronary outlet faces. 
     // The length of the vectors is num_ebc
@@ -110,16 +107,10 @@ class GenBC_Coronary : public IGenBC
 
     // precomputed dPim/dt needed by RK4, 
     // dPimdt_k1 has size num_ebc x N+1
-    //
-    // NEEDS DOUBLE CHECKING
-    // 
     // dPimdt_k2/3 has size num_ebc x N
     std::vector< std::vector<double> > dPimdt_k1, dPimdt_k2, dPimdt_k3;
 
     // prev_0D_sol records solutions when each ODE integration is completed.
-    // 
-    // NEEDS DOUBLE CHECKING
-    //
     mutable std::vector< std::vector<double> > prev_0D_sol;
 
     // Vectors for outlet initial flow and capacitor pressures (2 capacitors)
@@ -139,8 +130,8 @@ class GenBC_Coronary : public IGenBC
     double F( const int &ii, const double &pi, const double &q ) const;
 
     // Pre-compute dPim/dt at the begining of the ODE integration for the 
-    // ii-th outlet face
-    void get_dPim_dt( const int &ii );
+    // ii-th outlet face, 0 <= ii < num_ebc
+    void get_dPim_dt( const int &ii, const double &time_start, const double &time_end );
 
     // Evaluate the derivatives of a piecewise cubic hermite interpolating 
     // polynomial (e.g. PCHIP) between points x1 and x2 with values f1, f2 and 
