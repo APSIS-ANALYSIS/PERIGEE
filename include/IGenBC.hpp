@@ -15,7 +15,7 @@
 // hemodynamic simulations.
 // ==================================================================
 #include "Sys_Tools.hpp"
-
+#include "GenBC_Tools.hpp"
 class IGenBC
 {
   public:

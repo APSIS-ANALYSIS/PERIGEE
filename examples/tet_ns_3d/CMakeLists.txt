@@ -85,6 +85,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Model/GenBC_Resistance.cpp
   ${perigee_source}/Model/GenBC_Inductance.cpp
   ${perigee_source}/Model/GenBC_Coronary.cpp
+  ${perigee_source}/Model/GenBC_Tools.cpp
   ${perigee_source}/Model/CVFlowRate_Unsteady.cpp
   ${perigee_source}/Model/CVFlowRate_Linear2Steady.cpp
   ${perigee_source}/Solver/PDNSolution.cpp
