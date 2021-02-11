@@ -1,6 +1,6 @@
 project(perigee)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.14)
 
 IF(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
