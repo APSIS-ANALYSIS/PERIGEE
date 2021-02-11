@@ -1,5 +1,5 @@
 #ifndef GENBC_TOOLS_HPP
-#define GENBC_TOOLS_hpp
+#define GENBC_TOOLS_HPP
 // ==================================================================
 // GenBC_Tools.hpp
 //

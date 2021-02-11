@@ -125,39 +125,18 @@ double GENBC_T::sign_test( const double &arg1, const double &arg2 )
 {
   double value;
 
-  if ( arg1 == 0.0 )
-  {
-    value = 0.0;
-  }
+  if ( arg1 == 0.0 ) value = 0.0;
   else if ( arg1 < 0.0 )
   {
-    if ( arg2 < 0.0 )
-    {
-      value = 1.0;
-    }
-    else if ( arg2 == 0.0 )
-    {
-      value = 0.0;
-    }
-    else if ( 0.0 < arg2 )
-    {
-      value = -1.0;
-    }
+    if ( arg2 < 0.0 ) value = 1.0;
+    else if ( arg2 == 0.0 ) value = 0.0;
+    else value = -1.0;
   }
-  else if ( 0.0 < arg1 )
+  else
   {
-    if ( arg2 < 0.0 )
-    {
-      value = -1.0;
-    }
-    else if ( arg2 == 0.0 )
-    {
-      value = 0.0;
-    }
-    else if ( 0.0 < arg2 )
-    {
-      value = 1.0;
-    }
+    if ( arg2 < 0.0 ) value = -1.0;
+    else if ( arg2 == 0.0 ) value = 0.0;
+    else value = 1.0;
   }
 
   return value;
@@ -182,7 +161,7 @@ void GENBC_T::get_cubic_hermite( const double &x1, const double &x2,
   // Evaluation loop.
   for (int ii=0; ii<ne; ++ii)
   {
-    const double tt = (xe[ii] - x1)/hh;
+    const double tt = (xe[ii] - x1) / hh;
     fe[ii] = f1 + tt * ( c1 + tt * ( c2 + tt * c3 ) ) ;
   }
 }
@@ -191,11 +170,11 @@ void GENBC_T::get_cubic_hermite_der( const double &x1, const double &x2,
     const double &f1, const double &f2, const double &d1, const double &d2, 
     const int &ne, const std::vector<double> &xe, std::vector<double> &de ) 
 {
-  SYS_T::print_fatal_if(ne<1, "Error: GenBC_Tools get_cubic_hermite_der: Number of evaluation points is less than 1 \n");
+  SYS_T::print_fatal_if(ne<1, "Error: GenBC_Tools get_cubic_hermite_der: Number of evaluation points is less than 1. \n");
 
   const double hh = x2 - x1;
 
-  SYS_T::print_fatal_if(hh==0.0, "Error: GenBC_Tools get_cubic_hermite_der: The interval [x1,x2] is of zero length \n");
+  SYS_T::print_fatal_if(hh==0.0, "Error: GenBC_Tools get_cubic_hermite_der: The interval [x1,x2] is of zero length. \n");
 
   const double c2 =-6.0 * f1 / hh - 4.0 * d1 + 6.0 * f2 / hh - 2.0 * d2;
 
@@ -205,7 +184,7 @@ void GENBC_T::get_cubic_hermite_der( const double &x1, const double &x2,
   for (int ii=0; ii<ne; ++ii)
   {
     const double tt = (xe[ii] - x1)/hh;
-    de[ii] = tt * ( c2 + tt * c3 )+d1 ;
+    de[ii] = tt * ( c2 + tt * c3 ) + d1;
   }
 }
 
