@@ -40,19 +40,13 @@ void GENBC_T::set_pchip( const int &np, const std::vector<double> &xp,
     dp[0] = w1 * del1 + w2 * del2;
     
     // Set dp[0] via non-centered three point formula, adjusted to be shape preserving.
-    if( sign_test ( dp[0], del1 ) <= 0.0 )
-    {
-      dp[0] = 0.0;
-    }
-    // Need do this check only if monotonicity switches.
+    if( sign_test ( dp[0], del1 ) <= 0.0 ) dp[0] = 0.0;
     else if( sign_test ( del1, del2 ) < 0.0 )
     {
+      // Need do this check only if monotonicity switches.
       dmax = 3.0 * del1;
 
-      if ( fabs ( dmax ) < fabs ( dp[0] ) )
-      {
-        dp[0] = dmax;
-      }
+      if ( fabs ( dmax ) < fabs ( dp[0] ) ) dp[0] = dmax;
     }
 
     double temp, hsumt3, drat1, drat2;
@@ -84,10 +78,8 @@ void GENBC_T::set_pchip( const int &np, const std::vector<double> &xp,
       {
         if ( del2 != 0.0 )
         {
-          if ( sign_test ( dsave, del2 ) < 0.0 )
-          {
-            ierr = ierr + 1;
-          }
+          if ( sign_test ( dsave, del2 ) < 0.0 ) ierr = ierr + 1;
+          
           dsave = del2;
         }
       }
