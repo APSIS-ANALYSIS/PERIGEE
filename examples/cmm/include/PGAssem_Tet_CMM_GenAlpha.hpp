@@ -251,6 +251,19 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
           local_array[offset1 + jj] = array[offset2 + jj];
       }
     }
+
+    void GetLocal( const double * const &array, const int * const &IEN,
+        const int &in_locbas, const int &in_dof,
+        double * const &local_array) const
+    {
+      for(int ii=0; ii<in_locbas; ++ii)
+      {
+        const int offset1 = ii * in_dof;
+        const int offset2 = IEN[ii] * in_dof;
+        for(int jj=0; jj<in_dof; ++jj)
+          local_array[offset1 + jj] = array[offset2 + jj];
+      }
+    }
 };
 
 #endif

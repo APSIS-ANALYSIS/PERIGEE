@@ -626,7 +626,6 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_G(
 
   dot_sol->GetLocalArray( array_a );
 
-  // TBD: This currently uses dof_num != dof_disp
   sol_wall_disp->GetLocalArray( array_b );
 
   // wall has only one surface per the assumption in wall ebc
@@ -642,8 +641,7 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_G(
 
     GetLocal(array_a, LSIEN, snLocBas, local_as);
 
-    // TBD: This currently uses dof_sol != dof_disp
-    GetLocal(array_b, LSIEN, snLocBas, local_bs);
+    GetLocal(array_b, LSIEN, snLocBas, dof_disp, local_bs);
 
     lassem_ptr->Assem_Residual_EBC_Wall( curr_time, dt, local_as, local_bs,
         element_w, sctrl_x, sctrl_y, sctrl_z, sthickness, syoungsmod, quad_s);
@@ -698,7 +696,6 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_KG(
 
   dot_sol->GetLocalArray( array_a );
 
-  // TBD: This currently uses dof_num != dof_disp
   sol_wall_disp->GetLocalArray( array_b );
 
   // wall has only one surface per the assumption in wall ebc
@@ -714,8 +711,7 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_KG(
 
     GetLocal(array_a, LSIEN, snLocBas, local_as);
 
-    // TBD: This currently uses dof_sol != dof_disp
-    GetLocal(array_b, LSIEN, snLocBas, local_bs);
+    GetLocal(array_b, LSIEN, snLocBas, dof_disp, local_bs);
 
     lassem_ptr->Assem_Tangent_Residual_EBC_Wall( curr_time, dt, local_as, local_bs,
         element_w, sctrl_x, sctrl_y, sctrl_z, sthickness, syoungsmod, quad_s);
