@@ -196,7 +196,11 @@ int main( int argc, char * argv[] )
     delete part; delete nbcpart; delete ebcpart; delete infpart;
   }
 
-  VEC_T::write_int_h5("NumLocalNode","nln", list_nlocalnode);
+  hid_t file_id = H5Fcreate("NumLocalNode.h", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+  HDF5_Writer * h5writer = new HDF5_Writer( file_id );
+  h5writer->write_intVector("nln", list_nlocalnode);
+  delete h5writer; H5Fclose(file_id);
+
 
   cout<<"\n===> Partition Quality: "<<endl;
   cout<<"The largest ghost / local node ratio is: ";

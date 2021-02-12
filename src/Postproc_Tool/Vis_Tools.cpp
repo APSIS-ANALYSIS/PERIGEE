@@ -388,7 +388,34 @@ void VIS_T::read_epart( const std::string &epart_file, const int &esize,
 {
   std::string fname(epart_file);
   fname.erase( fname.end()-3, fname.end() );
-  VEC_T::read_int_h5( fname.c_str(), "/", "part", elem_part );
+  
+  fname.append(".h5");
+  hid_t file_id = H5Fopen(fname.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
+
+  HDF5_Reader * h5reader = new HDF5_Reader( file_id );
+
+  hid_t drank;
+  hsize_t * ddims;
+  int * intarray;
+
+  h5reader->read_intArray( "/","part", drank, ddims, intarray );
+
+  if(drank > 1)
+  {
+    std::stringstream ss; ss<<"Error: "<<"part"<<" at "<<"/"<<" "
+      <<fname.c_str()<<".h5 is not an one-dimensional array. \n";
+    SYS_T::commPrint(ss.str().c_str());
+    MPI_Abort(PETSC_COMM_WORLD, 1);
+  }
+
+  const int length = ddims[0];
+
+  VEC_T::fillArray(elem_part, intarray, length);
+
+  delete [] ddims; delete [] intarray;
+  delete h5reader;
+  H5Fclose( file_id );
+
 
   if( int(elem_part.size()) != esize ) SYS_T::print_fatal( "Error: the epart file's part length does not match given size. \n" );
 }

@@ -338,7 +338,33 @@ void PGAssem::Get_dnz_onz( const int &nElem,
   const int nnode = node_ptr->get_nlocghonode();
 
   std::vector<int> numLocNode;
-  VEC_T::read_int_h5("NumLocalNode", "/", "nln", numLocNode);
+
+  hid_t file_id = H5Fopen("NumLocalNode.h", H5F_ACC_RDONLY, H5P_DEFAULT );
+
+  HDF5_Reader * h5reader = new HDF5_Reader( file_id );
+
+  hid_t drank;
+  hsize_t * ddims;
+  int * intarray;
+
+  h5reader->read_intArray( "/", "nln", drank, ddims, intarray );
+
+  if(drank > 1)
+  {
+    std::stringstream ss; ss<<"Error: "<<"nln"<<" at "<<"/"<<" "
+        <<"NumLocalNode"<<".h5 is not an one-dimensional array. \n";
+    SYS_T::commPrint(ss.str().c_str());
+    MPI_Abort(PETSC_COMM_WORLD, 1);
+  }
+
+  const int length = ddims[0];
+
+  VEC_T::fillArray(numLocNode, intarray, length);
+
+  delete [] ddims; delete [] intarray;
+  delete h5reader;
+  H5Fclose( file_id );
+
 
   std::vector<unsigned int> nlist;
   nlist.clear();
