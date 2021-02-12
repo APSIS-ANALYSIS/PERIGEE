@@ -14,6 +14,7 @@
 #include "PLinear_Solver_PETSc.hpp"
 #include "Matrix_PETSc.hpp"
 #include "PDNSolution_NS.hpp"
+#include "PDNSolution_Wall_Disp.hpp"
 
 class PNonlinear_NS_Solver
 {

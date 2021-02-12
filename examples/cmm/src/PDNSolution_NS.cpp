@@ -21,7 +21,7 @@ PDNSolution_NS::PDNSolution_NS(
       Init_pipe_parabolic( pNode, fNode_ptr );
       break;
     default:
-      SYS_T::print_fatal("Error: PDNSolution_NS: No such type of initional condition.\n");
+      SYS_T::print_fatal("Error: PDNSolution_NS: No such type of initial condition.\n");
       break;
   }
 }
@@ -40,7 +40,7 @@ PDNSolution_NS::PDNSolution_NS(
       Init_zero( pNode );
       break;
     default:
-      SYS_T::print_fatal("Error: PDNSolution_NS : No such type of initional condition.\n");
+      SYS_T::print_fatal("Error: PDNSolution_NS : No such type of initial condition.\n");
       break;
   }
 }

@@ -164,7 +164,7 @@ class Matrix_3x3
 
     // Matrix rotation
     // Let Q be a rotation matrix, the matrix gets updated by
-    // Q M Q^T = Q_ik M_kl Q_jl = output_matrix_ij
+    // Q^T M Q = Q_ki M_kl Q_lj = output_matrix_ij
     void MatRot( const Matrix_3x3 &Q );
 
     // Matrix multiplication as mat = source^T * source
