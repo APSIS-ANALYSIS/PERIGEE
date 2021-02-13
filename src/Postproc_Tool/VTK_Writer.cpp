@@ -736,8 +736,8 @@ void VTK_Writer::writepvdFile( const std::string &baseName,
     pvdname.append(".pvd");
 
     // if baseName.pvd does not exists, write the file with top initialized part
-    fstream fileTest;
-    fileTest.open(pvdname.c_str(), fstream::in);
+    std::fstream fileTest;
+    fileTest.open(pvdname.c_str(), std::fstream::in);
     if( !fileTest.is_open() )
       writepvdFile_Init(pvdname);
 
@@ -745,7 +745,7 @@ void VTK_Writer::writepvdFile( const std::string &baseName,
 
     // now we are sure the pvd file exists, we just need to append the pvtu and
     // time information to it.
-    fstream pvdFile;
+    std::fstream pvdFile;
     pvdFile.open(pvdname.c_str());
     if( !pvdFile.is_open() )
     {
