@@ -6,7 +6,7 @@ void VIS_T::writeVisFile( vtkUnstructuredGrid * gridData,
     const double &sol_time, const bool &isXML )
 {
   // write vtk/vtu files
-  SYS_T::commPrint("-- Write vtu files ... \n");
+  SYS_T::commPrint("-- Write vtu files.\n");
   writeGridObject(gridData, pre_pvtuname, rank, isXML);
 
   // write pvtu file
@@ -14,12 +14,11 @@ void VIS_T::writeVisFile( vtkUnstructuredGrid * gridData,
   MPI_Barrier(PETSC_COMM_WORLD);
 
   // write pvd file
-  SYS_T::commPrint("-- Update pvd file. \n");
+  SYS_T::commPrint("-- Update pvd file.\n");
   writepvdFile(outputBName, pre_pvtuname, rank, size, sol_time, isXML);
 
   MPI_Barrier(PETSC_COMM_WORLD);
 }
-
 
 void VIS_T::writeGridObject( vtkUnstructuredGrid * gridData,
     const std::string &baseName, const int &rank, const bool &isXML )
@@ -76,8 +75,6 @@ void VIS_T::writeGridObject( vtkUnstructuredGrid * gridData,
   }
 }
 
-
-
 void VIS_T::writepvtuFile( vtkUnstructuredGrid * gridData,
     const std::string &baseName, const int &rank, const int &size,
     const bool &isXML)
@@ -109,9 +106,8 @@ void VIS_T::writepvtuFile( vtkUnstructuredGrid * gridData,
     pvtuFile << "<PCellData>" << std::endl;
     
     vtkCellData * cellData = gridData->GetCellData();
-    int ii;
-    int numCellData = cellData->GetNumberOfArrays();
-    for( ii = 0; ii < numCellData; ++ii )
+    const int numCellData = cellData->GetNumberOfArrays();
+    for( int ii = 0; ii < numCellData; ++ii )
     {
       vtkDataArray * cellArray = cellData -> GetArray( ii );
 
@@ -133,11 +129,11 @@ void VIS_T::writepvtuFile( vtkUnstructuredGrid * gridData,
     // Point Data: associated with the gridData object
     vtkPointData* pointData = gridData->GetPointData();
     pvtuFile << "<PPointData>" << std::endl;
-    int numArrays = pointData->GetNumberOfArrays();
+    const int numArrays = pointData->GetNumberOfArrays();
 
-    for( ii = 0; ii < numArrays; ii++ )
+    for( int ii = 0; ii < numArrays; ii++ )
     {
-      vtkDataArray* currArray = pointData->GetArray( ii );
+      vtkDataArray * currArray = pointData->GetArray( ii );
       if( NULL == currArray )
         continue;
       pvtuFile << "<PDataArray type=\"";
@@ -157,7 +153,7 @@ void VIS_T::writepvtuFile( vtkUnstructuredGrid * gridData,
       << "<PDataArray type=\"Float32\" NumberOfComponents=\"3\"/>" << std::endl
       << "</PPoints>" << std::endl;
 
-    for(ii=0; ii<size; ++ii)
+    for( int ii=0; ii<size; ++ii )
     {
       std::string pieceName(baseName);
       pieceName.append("_p");
@@ -180,7 +176,6 @@ void VIS_T::writepvtuFile( vtkUnstructuredGrid * gridData,
     std::cout << "-- Results output writen to file: " << pName << std::endl;
   }
 }
-
 
 void VIS_T::writepvdFile_Init( const std::string &pvdFName )
 {
@@ -259,8 +254,6 @@ void VIS_T::writepvdFile( const std::string &baseName,
   }
 }
 
-
-
 void VIS_T::setHexelem( const int &segs, const int &segt, const int &segu,
     const int &ptoffset, vtkUnstructuredGrid * gridData )
 {
@@ -290,7 +283,6 @@ void VIS_T::setHexelem( const int &segs, const int &segt, const int &segu,
   }
 }
 
-
 void VIS_T::setTetraelem( const int &ptoffset, vtkUnstructuredGrid * gridData )
 {
   vtkCell * cell = vtkTetra::New();
@@ -303,7 +295,6 @@ void VIS_T::setTetraelem( const int &ptoffset, vtkUnstructuredGrid * gridData )
   gridData->InsertNextCell( cell->GetCellType(), cell->GetPointIds() );
   cell->Delete();
 }
-
 
 void VIS_T::setTetraelem( const int &ptid0, const int &ptid1,
     const int &ptid2, const int &ptid3, vtkUnstructuredGrid * gridData )
@@ -318,7 +309,6 @@ void VIS_T::setTetraelem( const int &ptid0, const int &ptid1,
   gridData->InsertNextCell( cell->GetCellType(), cell->GetPointIds() );
   cell->Delete();
 }
-
 
 void VIS_T::setQuadTetraelem( const int &ptoffset, vtkUnstructuredGrid * gridData )
 {
@@ -338,7 +328,6 @@ void VIS_T::setQuadTetraelem( const int &ptoffset, vtkUnstructuredGrid * gridDat
   gridData->InsertNextCell( cell->GetCellType(), cell->GetPointIds() );
   cell->Delete();
 }
-
 
 void VIS_T::setQuadTetraelem( const int &ptid0, const int &ptid1,
     const int &ptid2, const int &ptid3, const int &ptid4, const int &ptid5, 
@@ -362,7 +351,6 @@ void VIS_T::setQuadTetraelem( const int &ptid0, const int &ptid1,
   cell->Delete();
 }
 
-
 void VIS_T::setQuadelem( const int &segs, const int &segt, 
     const int &ptoffset, vtkUnstructuredGrid * gridData )
 {
@@ -382,7 +370,6 @@ void VIS_T::setQuadelem( const int &segs, const int &segt,
   }
 }
 
-
 void VIS_T::read_epart( const std::string &epart_file, const int &esize,
     std::vector<int> &elem_part )
 {
@@ -392,6 +379,5 @@ void VIS_T::read_epart( const std::string &epart_file, const int &esize,
 
   if( int(elem_part.size()) != esize ) SYS_T::print_fatal( "Error: the epart file's part length does not match given size. \n" );
 }
-
 
 // EOF
