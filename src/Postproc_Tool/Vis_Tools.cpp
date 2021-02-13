@@ -87,7 +87,7 @@ void VIS_T::writepvtuFile( vtkUnstructuredGrid * gridData,
     // setup name
     std::string pName(baseName);
     pName.append(".pvtu");
-    ofstream pvtuFile;
+    std::ofstream pvtuFile;
     pvtuFile.open(pName.c_str());
     if( !pvtuFile.is_open() )
     {
@@ -184,7 +184,7 @@ void VIS_T::writepvtuFile( vtkUnstructuredGrid * gridData,
 
 void VIS_T::writepvdFile_Init( const std::string &pvdFName )
 {
-  ofstream pvdFile;
+  std::ofstream pvdFile;
 
   pvdFile.open( pvdFName.c_str(), ios::out | ios::trunc );
 

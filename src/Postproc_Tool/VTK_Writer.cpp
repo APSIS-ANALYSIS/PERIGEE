@@ -7,17 +7,15 @@ VTK_Writer::VTK_Writer( const IAGlobal_Mesh_Info * const &gmesh_ptr )
   R = new double [nLocBas];
 }
 
-
 VTK_Writer::~VTK_Writer()
 {
-  delete [] R; R = NULL;
+  delete [] R; R = nullptr;
 }
-
 
 void VTK_Writer::interpolateNURBS( const double * const &inputVal,
     const FEAElement * const &elem, double * const &output ) const
 {
-  int nqp = elem->get_numQuapts();
+  const int nqp = elem->get_numQuapts();
 
   for(int ii=0; ii<nqp; ++ii)
   {
@@ -28,13 +26,11 @@ void VTK_Writer::interpolateNURBS( const double * const &inputVal,
   }
 }
 
-
-
 void VTK_Writer::interpolateNURBS(const double * const &inputVal_1,
     const double * const &inputVal_2, const FEAElement * const &elem,
     double * const &output_1, double * const &output_2 ) const
 {
-  int nqp = elem->get_numQuapts();
+  const int nqp = elem->get_numQuapts();
 
   for(int ii=0; ii<nqp; ++ii)
   {
@@ -49,13 +45,12 @@ void VTK_Writer::interpolateNURBS(const double * const &inputVal_1,
   }
 }
 
-
 void VTK_Writer::interpolateNURBS(const double * const &inputVal_1,
     const double * const &inputVal_2, const double * const &inputVal_3,
     const FEAElement * const &elem, double * const &output_1, 
     double * const &output_2, double * const &output_3 ) const
 {
-  int nqp = elem->get_numQuapts();
+  const int nqp = elem->get_numQuapts();
 
   for(int ii=0; ii<nqp; ++ii)
   {
@@ -72,13 +67,12 @@ void VTK_Writer::interpolateNURBS(const double * const &inputVal_1,
   }
 }
 
-
 void VTK_Writer::interpolatePts( 
     const int &ptoffset, const double * const &ctrlPts_x,
     const double * const &ctrlPts_y, const double * const &ctrlPts_z,
     const FEAElement * const &elem, vtkPoints * const &vtkpts ) const
 {
-  int nqp = elem->get_numQuapts();
+  const int nqp = elem->get_numQuapts();
   double * out_x = new double [nqp];
   double * out_y = new double [nqp];
   double * out_z = new double [nqp];
@@ -98,13 +92,12 @@ void VTK_Writer::interpolatePts(
   delete [] out_x; delete [] out_y; delete [] out_z;
 }
 
-
 void VTK_Writer::interpolatePts( 
     const int &ptoffset, const double * const &ctrlPts_x,
     const double * const &ctrlPts_y, const FEAElement * const &elem,
     vtkPoints * const &vtkpts ) const
 {
-  int nqp = elem->get_numQuapts();
+  const int nqp = elem->get_numQuapts();
   double * out_x = new double [nqp];
   double * out_y = new double [nqp];
 
@@ -122,12 +115,11 @@ void VTK_Writer::interpolatePts(
   delete [] out_x; delete [] out_y;
 }
 
-
 void VTK_Writer::interpolateData( const int &size, const int &ptoffset,
     const double * const &inputData, const FEAElement * const &elem,
     vtkDoubleArray * const &vtkData ) const
 {
-  int nqp = elem->get_numQuapts();
+  const int nqp = elem->get_numQuapts();
 
   double * compData = new double [nLocBas];
   double * outData  = new double [nqp];
@@ -145,7 +137,6 @@ void VTK_Writer::interpolateData( const int &size, const int &ptoffset,
 
   delete [] compData; delete [] outData;
 }
-
 
 void VTK_Writer::setHexelem( const int &segs, const int &segt, 
     const int &segu, const int &ptoffset, 
@@ -177,7 +168,6 @@ void VTK_Writer::setHexelem( const int &segs, const int &segt,
   }
 }
 
-
 void VTK_Writer::setQuadelem( const int &segs, const int &segt, 
     const int &ptoffset, vtkUnstructuredGrid * gridData ) const
 {
@@ -196,7 +186,6 @@ void VTK_Writer::setQuadelem( const int &segs, const int &segt,
     }
   }
 }
-
 
 void VTK_Writer::read_epart( const std::string &epart_file, const int &esize,
     int * const &elem_part ) const
@@ -235,7 +224,6 @@ void VTK_Writer::read_epart( const std::string &epart_file, const int &esize,
   H5Dclose( data_id );
   H5Fclose( file_id );
 }
-
 
 void VTK_Writer::build3doutput(vtkUnstructuredGrid * const &gridData,
     const std::string &epart_file, const int nElem,
@@ -458,7 +446,6 @@ void VTK_Writer::build2doutput(vtkUnstructuredGrid * const &gridData,
   delete [] epart_map;
 }
 
-
 void VTK_Writer::writeOutput( const std::string &epart_file,
     const IAGlobal_Mesh_Info * const &gmesh_ptr,
     const FEANode * const &fnode_ptr,
@@ -630,7 +617,6 @@ void VTK_Writer::writeGridObject( vtkUnstructuredGrid * gridData,
   }
 }
 
-
 void VTK_Writer::writepvtuFile( vtkUnstructuredGrid * gridData,
     const std::string &baseName, const int &rank, const int &size,
     const bool &isXML) const
@@ -640,7 +626,7 @@ void VTK_Writer::writepvtuFile( vtkUnstructuredGrid * gridData,
     // setup name
     std::string pName(baseName);
     pName.append(".pvtu");
-    ofstream pvtuFile;
+    std::ofstream pvtuFile;
     pvtuFile.open(pName.c_str());
     if( !pvtuFile.is_open() )
     {
@@ -719,10 +705,9 @@ void VTK_Writer::writepvtuFile( vtkUnstructuredGrid * gridData,
   }
 }
 
-
 void VTK_Writer::writepvdFile_Init( const std::string &pvdFName ) const
 {  
-  ofstream pvdFile;
+  std::ofstream pvdFile;
 
   pvdFile.open( pvdFName.c_str(), ios::out | ios::trunc );
 
@@ -740,7 +725,6 @@ void VTK_Writer::writepvdFile_Init( const std::string &pvdFName ) const
 
   pvdFile.close();
 }
-
 
 void VTK_Writer::writepvdFile( const std::string &baseName,  
     const std::string &pre_pvtuname, const int &rank, const int &size,
@@ -796,6 +780,5 @@ void VTK_Writer::writepvdFile( const std::string &baseName,
     pvdFile.close();
   }
 }
-
 
 // EOF
