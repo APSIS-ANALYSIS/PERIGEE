@@ -186,7 +186,7 @@ void VIS_T::writepvdFile_Init( const std::string &pvdFName )
 {
   std::ofstream pvdFile;
 
-  pvdFile.open( pvdFName.c_str(), ios::out | ios::trunc );
+  pvdFile.open( pvdFName.c_str(), std::ios::out | std::ios::trunc );
 
   if( !pvdFile.is_open() )
   {
