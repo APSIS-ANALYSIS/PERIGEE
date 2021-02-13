@@ -167,9 +167,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PetscLogEventBegin(lin_solve_event, 0,0,0,0);
 #endif
     
-    // ==== TODO: modify linear system for the segregated algorithm =====  
-    //      (See eqn 2.58)
-
     // solve the equation K dot_step = G
     lsolver_ptr->Solve( gassem_ptr->G, dot_step );
 
@@ -187,8 +184,9 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     dot_sol_alpha.PlusAX( dot_step, (-1.0) * alpha_m );
     sol_alpha.PlusAX( dot_step, (-1.0) * alpha_f * gamma * dt );
 
+    // ==== TODO: update dot wall displacement at n+1 and n+alpha_m ====
+    
     // ==== TODO: update wall displacement at n+1 and n+alpha_f ====
-    // This requires the kinematic residual R_k (see eqn 2.59)
 
     // Assembly residual (& tangent if condition satisfied) 
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )
