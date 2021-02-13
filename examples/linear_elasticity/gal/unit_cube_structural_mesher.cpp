@@ -95,7 +95,7 @@ int main( int argc, char * argv[] )
   cout<<"====  Command Line Arguments/ ===="<<endl;
   
 
-  ifstream infile( geo_file.c_str(), ifstream::in );
+  std::ifstream infile( geo_file.c_str(), std::ifstream::in );
   if(infile.is_open() == false)
   {
     std::cerr<<"ERROR: Can not find file: "<<geo_file<<endl;
