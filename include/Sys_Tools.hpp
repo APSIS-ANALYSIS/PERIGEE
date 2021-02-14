@@ -38,16 +38,6 @@ namespace SYS_T
   }
 
   // ----------------------------------------------------------------
-  // for Zinan, replace this by GenBC_T::get_genbc_file_type
-  // ! get_genbc_file_type : read the genbc file and determine what
-  //   type of gen bc the file specifies. It will return   
-  //   0 for unknown type
-  //   1 for Resistance
-  //   2 for RCR
-  // ----------------------------------------------------------------
-  int get_genbc_file_type( const char * const &lpn_filename );
-
-  // ----------------------------------------------------------------
   // gen_partfile_name( baseName, rank )
   // Generate a partition file's name (hdf5 file) in the default
   // manner. It will return baseName_pxxxxx.h5.
