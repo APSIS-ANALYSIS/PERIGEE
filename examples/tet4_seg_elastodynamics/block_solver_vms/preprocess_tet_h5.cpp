@@ -263,7 +263,6 @@ int main( int argc, char * argv[] )
     delete part; delete nbcpart; delete ebcpart;
   }
   // ----------------------------------------------------------------
-  //VEC_T::write_int_h5("NumLocalNode","nln", list_nlocalnode);
 
   cout<<"\n===> Partition Quality: "<<endl;
   cout<<"The largest ghost / local node ratio is: ";

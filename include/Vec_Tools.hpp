@@ -147,33 +147,6 @@ namespace VEC_T
     vfile.close();
     std::cout.precision(ss);
   }
-
-  // TO-DO for Zinan
-  // The following two funtion should be replaced by a fucntion call of hdf5
-  // reader or writer functions
-  // -----------------------------------------------------------------
-  // ! write_int_h5
-  //   Write an int vector to disk as HDF5 file.
-  //   \para file_name : the input that will name the .h5 file
-  //   \para dataname : the name of the dataset in the file
-  //   \para value : the vector that is to be written.
-  // -----------------------------------------------------------------
-  void write_int_h5( const char * const &file_name, 
-      const char * const &dataname,
-      const std::vector<int> &value );
-
-  // -----------------------------------------------------------------
-  // ! read_int_h5
-  //   Read an int vector from a HDF5 file on disk
-  //   \para file_name : the file's name
-  //   \para groupname : the group name of the dataset
-  //   \para dataname : the dataset's name in the file
-  //   \para value : the vector that will be filled in.
-  // -----------------------------------------------------------------
-  void read_int_h5( const char * const &file_name, 
-      const char * const &groupname,
-      const char * const &dataname,
-      std::vector<int> &value );
 }
 
 #endif

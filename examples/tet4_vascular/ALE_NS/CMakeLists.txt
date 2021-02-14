@@ -34,7 +34,6 @@ SET( perigee_source ${perigee_SOURCE_DIR}/../../../src )
 # 1. Preprocessor source cpp
 SET( perigee_preprocess_lib_src 
   ${perigee_source}/System/Sys_Tools.cpp
-  ${perigee_source}/System/Vec_Tools.cpp
   ${perigee_source}/System/Matrix_double_3by3_Array.cpp
   ${perigee_source}/System/Math_Tools.cpp
   ${perigee_source}/Mesh/Tet_Tools.cpp
@@ -67,7 +66,6 @@ SET( perigee_preprocess_lib_src
 # 2. Anlysis source cpp
 SET( perigee_analysis_lib_src
   ${perigee_source}/System/Sys_Tools.cpp
-  ${perigee_source}/System/Vec_Tools.cpp
   ${perigee_source}/System/PETSc_Tools.cpp
   ${perigee_source}/System/Matrix_double_3by3_Array.cpp
   ${perigee_source}/System/Matrix_PETSc.cpp
