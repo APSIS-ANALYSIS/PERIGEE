@@ -22,7 +22,7 @@ set(PETSC_DIR /Users/zinanhu/lib/petsc)
 # output. If you forget it, go to your PETSc home director and open
 # configure.log. Go the end of the file, and you shall find the value 
 # of PETSC_ARCH
-set(PETSC_ARCH arch-darwin-c-debug)
+set(PETSC_ARCH arch-darwin-cxx-debug)
 
 # Modify the METIS_DIR.
 # Note: If your PETSc has METIS installed, the conf
@@ -70,8 +70,8 @@ message(STATUS "External Libraries: " ${EXTRA_LINK_LIBS})
 # Specify the MPI compilers. There should be compilers in
 # $PETSC_DIR/$PETSC_ARCH/bin, or the mpich you specified for 
 # PETSc install.
-set(CMAKE_C_COMPILER  /Users/zinanhu/lib/petsc/arch-darwin-c-debug/bin/mpicc)
-set(CMAKE_CXX_COMPILER /Users/zinanhu/lib/petsc/arch-darwin-c-debug/bin/mpicxx)
+set(CMAKE_C_COMPILER  /Users/zinanhu/lib/petsc/arch-darwin-cxx-debug/bin/mpicc)
+set(CMAKE_CXX_COMPILER /Users/zinanhu/lib/petsc/arch-darwin-cxx-debug/bin/mpicxx)
 set(CMAKE_CXX_STANDARD 11)
 if( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
   set(CMAKE_CXX_FLAGS "-O3 -Wall")
