@@ -93,8 +93,7 @@ void PGAssem_v360_noCache_NURBS::Get_dnz_onz( const int &nElem,
   
   hid_t file_id = H5Fopen( "NumLocalNode.h5", H5F_ACC_RDONLY, H5P_DEFAULT );
   HDF5_Reader * h5r = new HDF5_Reader( file_id );
-  const std::string gname("/");
-  h5r->read_intVector( gname.c_str(), "nln", numLocNode );
+  h5r->read_intVector( "/", "nln", numLocNode );
   delete h5r; H5Fclose( file_id );
   
   std::vector<unsigned int> nlist;
