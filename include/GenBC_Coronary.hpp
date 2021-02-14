@@ -43,6 +43,7 @@
 //
 // ==================================================================
 #include "IGenBC.hpp"
+#include "GenBC_Tools.hpp"
 
 class GenBC_Coronary : public IGenBC
 {
