@@ -21,9 +21,9 @@
 #include "FEAElement_Triangle6_membrane.hpp"
 #include "CVFlowRate_Unsteady.hpp"
 #include "CVFlowRate_Linear2Steady.hpp"
-// #include "GenBC_Resistance.hpp"
-// #include "GenBC_RCR.hpp"
-// #include "GenBC_Inductance.hpp"
+#include "GenBC_Resistance.hpp"
+#include "GenBC_RCR.hpp"
+#include "GenBC_Inductance.hpp"
 #include "PLocAssem_Tet_CMM_GenAlpha.hpp"
 #include "PGAssem_Tet_CMM_GenAlpha.hpp"
 #include "PTime_NS_Solver.hpp"
@@ -363,6 +363,20 @@ int main( int argc, char *argv[] )
   // ===== LPN models =====
   IGenBC * gbc = nullptr;
 
+  if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 1  )
+    gbc = new GenBC_Resistance( lpn_file.c_str() );
+  else if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 2  )
+    gbc = new GenBC_RCR( lpn_file.c_str(), 1000, initial_step );
+  else if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 3  )
+    gbc = new GenBC_Inductance( lpn_file.c_str() );
+  else
+    SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
+
+  gbc -> print_info();
+
+  // Make sure the gbc number of faces matches that of ALocal_EBC
+  SYS_T::print_fatal_if(gbc->get_num_ebc() != locebc->get_num_ebc(),
+      "Error: GenBC number of faces does not match with that in ALocal_EBC.\n");
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
@@ -437,8 +451,8 @@ int main( int argc, char *argv[] )
   delete elementv; delete elements; delete elementw; delete pmat;
   delete tm_galpha_ptr; delete locAssem_ptr; delete base;
   delete sol; delete dot_sol; delete sol_wall_disp;
-  delete dot_sol_wall_disp; delete timeinfo; delete gloAssem_ptr; 
-  delete nsolver;
+  delete dot_sol_wall_disp; delete timeinfo; delete gbc;
+  delete gloAssem_ptr; delete nsolver;
 
   PetscFinalize();
   return EXIT_SUCCESS;
