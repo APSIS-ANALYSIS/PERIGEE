@@ -10,6 +10,7 @@ PDNSolution_Wall_Disp::PDNSolution_Wall_Disp(
   {
     case 0:
       Init_zero( pNode );
+      break;
     default:
       SYS_T::print_fatal("Error: in PDNSolution_Wall_Disp, No such type of initial condition. \n");
       break;
