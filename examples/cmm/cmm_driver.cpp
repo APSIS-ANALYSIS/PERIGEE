@@ -282,7 +282,7 @@ int main( int argc, char *argv[] )
   if( GMIptr->get_elemType() == 501 )          // linear tet
   {
     if( nqp_tet > 5 ) SYS_T::commPrint("Warning: Requested > 5 volumetric quadrature points for a linear tet element.\n");
-    if( nqp_tri > 4 ) SYS_T::commPrint("Warning: Reqiested > 4 surface quadrature points for a linear tri element.\n");
+    if( nqp_tri > 4 ) SYS_T::commPrint("Warning: Requested > 4 surface quadrature points for a linear tri element.\n");
 
     elementv = new FEAElement_Tet4( nqp_tet );
     elements = new FEAElement_Triangle3_3D_der0( nqp_tri );
@@ -320,8 +320,7 @@ int main( int argc, char *argv[] )
       c_tauc, GMIptr->get_elemType() );
 
   // ===== Initial condition =====
-  // base solution generate a parabolic flow profile at the inlet with unit flow
-  // rate
+  // base generates a parabolic velocity profile at the inlet with unit flow rate
   PDNSolution * base = new PDNSolution_NS( pNode, fNode, locinfnbc, 1 );
   
   PDNSolution * sol = new PDNSolution_NS( pNode, 0 );
@@ -334,6 +333,28 @@ int main( int argc, char *argv[] )
 
   if( is_restart )
   {
+    initial_index = restart_index;
+    initial_time  = restart_time;
+    initial_step  = restart_step;
+
+    // Read sol file
+    SYS_T::file_check(restart_name.c_str());
+    sol->ReadBinary(restart_name.c_str());
+
+    // generate the corresponding dot_sol file name 
+    std::string restart_dot_name = "dot_";
+    restart_dot_name.append(restart_name);
+
+    // Read dot_sol file
+    SYS_T::file_check(restart_dot_name.c_str());
+    dot_sol->ReadBinary(restart_dot_name.c_str());
+
+    SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
+    SYS_T::commPrint("     restart_name: %s \n", restart_name.c_str());
+    SYS_T::commPrint("     restart_dot_name: %s \n", restart_dot_name.c_str());
+    SYS_T::commPrint("     restart_time: %e \n", restart_time);
+    SYS_T::commPrint("     restart_index: %d \n", restart_index);
+    SYS_T::commPrint("     restart_step: %e \n", restart_step);
   }
 
   // ===== Time step info =====
@@ -349,16 +370,76 @@ int main( int argc, char *argv[] )
   IPGAssem * gloAssem_ptr = new PGAssem_Tet_CMM_GenAlpha( locAssem_ptr, elements, quads,
       GMIptr, locElem, locIEN, pNode, locnbc, locebc, gbc, nz_estimate );
 
+  SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
+  gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_ptr,
+      elements, quads, locIEN, pNode, locnbc, locebc, gbc );
+
+  SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
+  gloAssem_ptr->Fix_nonzero_err_str();
+  gloAssem_ptr->Clear_KG();
+
+  // ===== Initialize the dot_sol vector by solving the mass matrix =====
+  if( is_restart == false )
+  {
+    SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n");
+    PLinear_Solver_PETSc * lsolver_acce = new PLinear_Solver_PETSc(
+        1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
+
+    KSPSetType(lsolver_acce->ksp, KSPGMRES);
+    KSPGMRESSetOrthogonalization(lsolver_acce->ksp,
+        KSPGMRESModifiedGramSchmidtOrthogonalization);
+    KSPGMRESSetRestart(lsolver_acce->ksp, 500);
+
+    PC preproc; lsolver_acce->GetPC(&preproc);
+    PCSetType( preproc, PCHYPRE );
+    PCHYPRESetType( preproc, "boomeramg" );
+
+    gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_ptr, elementv,
+        elements, quadv, quads, locIEN, pNode, fNode, locnbc, locebc );
+
+    lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
+
+    dot_sol -> ScaleValue(-1.0);
+
+    SYS_T::commPrint("\n===> Consistent initial acceleration is obtained. \n");
+    lsolver_acce -> print_info();
+    delete lsolver_acce;
+    SYS_T::commPrint(" The mass matrix lsolver is destroyed. \n\n");
+  }
+
+  // ===== Linear solver context =====
+
+  // ===== Nonlinear solver context =====
+  PNonlinear_NS_Solver * nsolver = new PNonlinear_NS_Solver( pNode, fNode,
+      nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
+
+  nsolver->print_info();
+
+  // ===== Temporal solver context =====
+
+  // ===== Outlet data recording files =====
+
+  MPI_Barrier(PETSC_COMM_WORLD);
+
+  // ===== Inlet data recording files =====
+
+  MPI_Barrier(PETSC_COMM_WORLD);
+
+  // ===== FEM analysis =====
+
+  // ===== Print complete solver info =====
+
   // ===== Deallocate memory =====
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
   delete locElem; delete locnbc; delete locinfnbc;
   delete locebc; delete locebc_wall; delete pNode;
   delete inflow_rate_ptr; delete quadv; delete quads;
   delete elementv; delete elements; delete elementw; delete pmat;
-  delete tm_galpha_ptr; delete locAssem_ptr; delete gloAssem_ptr; 
-  delete base; delete sol; delete dot_sol; 
-  delete sol_wall_disp; delete dot_sol_wall_disp;
-  delete timeinfo;
+  delete tm_galpha_ptr; delete locAssem_ptr; delete base;
+  delete sol; delete dot_sol; delete sol_wall_disp;
+  delete dot_sol_wall_disp; delete timeinfo; delete gloAssem_ptr; 
+  delete nsolver;
+
   PetscFinalize();
   return EXIT_SUCCESS;
 }
