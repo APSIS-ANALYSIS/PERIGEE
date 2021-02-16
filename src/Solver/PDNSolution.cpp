@@ -17,7 +17,7 @@ PDNSolution::PDNSolution( const APart_Node * const &pNode )
   VecCreateGhost(PETSC_COMM_WORLD, nlocal, PETSC_DECIDE, nghost, ifrom,
       &solution);
    
-  delete [] ifrom;
+  delete [] ifrom; iform = nullptr;
 }
 
 PDNSolution::PDNSolution( const APart_Node * const &pNode,
@@ -38,7 +38,7 @@ PDNSolution::PDNSolution( const APart_Node * const &pNode,
   VecCreateGhost(PETSC_COMM_WORLD, nlocal, PETSC_DECIDE, nghost, ifrom,
       &solution);
    
-  delete [] ifrom;
+  delete [] ifrom; iform = nullptr;
 }
 
 

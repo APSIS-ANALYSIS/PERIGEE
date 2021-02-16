@@ -28,7 +28,8 @@ class PDNSolution
     
     // --------------------------------------------------------------
     // Construct a solution vec compatible with the analysis node 
-    // partition
+    // partition, with the solution vector's dof value being equal
+    // to the APart_Node class's dof value.
     // --------------------------------------------------------------
     PDNSolution( const APart_Node * const &pNode );
     
@@ -113,12 +114,11 @@ class PDNSolution
 
     // --------------------------------------------------------------
     // ! Get the part of the solution vector that belongs to the local 
-    //   nodes and ghost nodes. Here the local_array should have been 
-    //   allocated with length equal to nlocal + nghost.
+    //   nodes and ghost nodes.
     //   The user is responsible for freeing the memory allocation 
     //   after the task is done.
-    //   If one uses a dynamic array, one should allocate length
-    //   nlocal + nghost for it.
+    //   If one uses a dynamic array, one should allocate it with the
+    //   size nlocal + nghost.
     // --------------------------------------------------------------
     virtual void GetLocalArray( double * const &local_array ) const;
     
@@ -171,6 +171,7 @@ class PDNSolution
     // --------------------------------------------------------------
     // nlocal := apart_node -> get_nlocalnode * dof_num
     // nghost := apart_node -> get_nghostnode * dof_num
+    // dof_num does not necessarily equal to apart_node -> get_dof
     // --------------------------------------------------------------
     int nlocal, nghost, dof_num; 
 };
