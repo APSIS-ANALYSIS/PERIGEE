@@ -46,6 +46,8 @@ class PNonlinear_NS_Solver
         const PDNSolution * const &sol_base,
         const PDNSolution * const &pre_dot_sol,
         const PDNSolution * const &pre_sol,
+        const PDNSolution * const &pre_dot_sol_wall_disp,
+        const PDNSolution * const &pre_sol_wall_disp,
         const TimeMethod_GenAlpha * const &tmga_ptr,
         const ICVFlowRate * const flr_ptr,
         const ALocal_Elem * const &alelem_ptr,
@@ -66,6 +68,8 @@ class PNonlinear_NS_Solver
         PLinear_Solver_PETSc * const &lsolver_ptr,
         PDNSolution * const &dot_sol,
         PDNSolution * const &sol,
+        PDNSolution * const &dot_sol_wall_disp,
+        PDNSolution * const &sol_wall_disp,
         bool &conv_flag, int &nl_counter ) const;
 
   private:

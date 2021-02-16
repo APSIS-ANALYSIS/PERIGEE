@@ -27,6 +27,8 @@ class PTime_NS_Solver
         const PDNSolution * const &sol_base,
         const PDNSolution * const &init_dot_sol,
         const PDNSolution * const &init_sol,
+        const PDNSolution * const &init_dot_sol_wall_disp,
+        const PDNSolution * const &init_sol_wall_disp,
         const TimeMethod_GenAlpha * const &tmga_ptr,
         PDNTimeStep * const &time_info,
         const ICVFlowRate * const flr_ptr,

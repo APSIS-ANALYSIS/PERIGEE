@@ -65,6 +65,8 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     const PDNSolution * const &sol_base,
     const PDNSolution * const &init_dot_sol,
     const PDNSolution * const &init_sol,
+    const PDNSolution * const &init_dot_sol_wall_disp,
+    const PDNSolution * const &init_sol_wall_disp,
     const TimeMethod_GenAlpha * const &tmga_ptr,
     PDNTimeStep * const &time_info,
     const ICVFlowRate * const flr_ptr,
@@ -86,10 +88,17 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     PLinear_Solver_PETSc * const &lsolver_ptr,
     PNonlinear_NS_Solver * const &nsolver_ptr ) const
 {
+  // Pres & velo
   PDNSolution * pre_sol = new PDNSolution(*init_sol);
   PDNSolution * cur_sol = new PDNSolution(*init_sol);
   PDNSolution * pre_dot_sol = new PDNSolution(*init_dot_sol);
   PDNSolution * cur_dot_sol = new PDNSolution(*init_dot_sol);
+
+  // Wall disp
+  PDNSolution * pre_sol_wall_disp = new PDNSolution(*init_sol_wall_disp);
+  PDNSolution * cur_sol_wall_disp = new PDNSolution(*init_sol_wall_disp);
+  PDNSolution * pre_dot_sol_wall_disp = new PDNSolution(*init_dot_sol_wall_disp);
+  PDNSolution * cur_dot_sol_wall_disp = new PDNSolution(*init_dot_sol_wall_disp);
 
   std::string sol_name ("");
   std::string sol_dot_name ("");
@@ -131,10 +140,11 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     // ==== TODO: Pass in wall_locnbc & wall_locebc  ====
     nsolver_ptr->GenAlpha_Solve_NS( renew_flag, 
         time_info->get_time(), time_info->get_step(), 
-        sol_base, pre_dot_sol, pre_sol, tmga_ptr, flr_ptr,
-        alelem_ptr, lien_ptr, anode_ptr, feanode_ptr, nbc_part, infnbc_part,
+        sol_base, pre_dot_sol, pre_sol, pre_dot_sol_wall_disp, pre_sol_wall_disp,
+        tmga_ptr, flr_ptr, alelem_ptr, lien_ptr, anode_ptr, feanode_ptr, nbc_part, infnbc_part,
         ebc_part, gbc, bc_mat, elementv, elements, quad_v, quad_s, lassem_fluid_ptr,
-        gassem_ptr, lsolver_ptr, cur_dot_sol, cur_sol, conv_flag, nl_counter );
+        gassem_ptr, lsolver_ptr, cur_dot_sol, cur_sol, cur_dot_sol_wall_disp, cur_sol_wall_disp,
+        conv_flag, nl_counter );
 
     // Update the time step information
     time_info->TimeIncrement();
