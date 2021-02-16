@@ -2,7 +2,7 @@
 
 GenBC_Resistance::GenBC_Resistance( const char * const &lpn_filename )
 {
-  // Now read the values of resis_C and resis_p from disk file lpn_filename
+  // Now read the values of resis_R and resis_Pd from disk file lpn_filename
   std::string temp_name( lpn_filename );
   SYS_T::file_check( temp_name ); // make sure the file is on the disk
 
@@ -82,7 +82,7 @@ void GenBC_Resistance::print_info() const
 {
   SYS_T::commPrint("     GenBC_Resistance : \n");
   for(int ii=0; ii<num_ebc; ++ii)
-    SYS_T::commPrint( "     ebcid = %d, C = %e, p = %e \n", ii, resis[ii], pres_offset[ii] );
+    SYS_T::commPrint( "     ebcid = %d, R = %e, Pd = %e \n", ii, resis[ii], pres_offset[ii] );
 }
 
 // EOF
