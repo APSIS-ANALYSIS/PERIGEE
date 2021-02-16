@@ -98,17 +98,27 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   dot_sol->Copy(*pre_dot_sol);
   dot_sol->ScaleValue( (gamma-1.0)/gamma );
 
-  // Define the dol_sol at alpha_m: dot_sol_alpha
+  sol_wall_disp->Copy(*pre_sol_wall_disp);
+  dot_sol_wall_disp->Copy(*pre_dot_sol_wall_disp);
+  dot_sol_wall_disp->ScaleValue( (gamma-1.0)/gamma );
+
+  // Define the dol_sol at alpha_m: dot_sol_alpha, dot_wall_disp_alpha
   PDNSolution dot_sol_alpha(*pre_dot_sol);
   dot_sol_alpha.ScaleValue( 1.0 - alpha_m );
   dot_sol_alpha.PlusAX(*dot_sol, alpha_m);
 
-  // Define the sol at alpha_f: sol_alpha
+  PDNSolution dot_wall_disp_alpha(*pre_dot_sol_wall_disp);
+  dot_wall_disp_alpha.ScaleValue( 1.0 - alpha_m );
+  dot_wall_disp_alpha.PlusAX(*dot_sol_wall_disp, alpha_m);
+
+  // Define the sol at alpha_f: sol_alpha, wall_disp_alpha
   PDNSolution sol_alpha(*pre_sol);
   sol_alpha.ScaleValue( 1.0 - alpha_f );
   sol_alpha.PlusAX( *sol, alpha_f );
 
-  // ==== TODO: define wall displacement at n+alpha_f ====
+  PDNSolution wall_disp_alpha(*pre_sol_wall_disp);
+  wall_disp_alpha.ScaleValue( 1.0 - alpha_f );
+  wall_disp_alpha.PlusAX( *sol_wall_disp, alpha_f );
 
   // ------------------------------------------------- 
   // Update the inflow boundary values
