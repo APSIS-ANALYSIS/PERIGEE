@@ -14,7 +14,7 @@
 //       private: int nlocal, nghost, the number of local and ghost
 //                nodes in the subdomain.
 //                int dof_num, the number of degrees of freedom per
-//                node.
+//                node, which could be different from dof in APart_Node.
 //
 // Author: Ju Liu
 // Date: Nov. 23th 2013
@@ -24,7 +24,7 @@
 class PDNSolution
 {
   public:
-    Vec solution;  
+    Vec solution; 
     
     // --------------------------------------------------------------
     // Construct a solution vec compatible with the analysis node 
@@ -37,11 +37,10 @@ class PDNSolution
     // partition, but with a different dof_num from pNode->dof. 
     // The users specify a dof number for the solution class.
     // --------------------------------------------------------------
-    PDNSolution( const APart_Node * const &pNode,
-       const int &input_dof_num );
+    PDNSolution( const APart_Node * const &pNode, const int &input_dof_num );
     
     // --------------------------------------------------------------
-    // Copy constructor
+    // Copy constructors
     // --------------------------------------------------------------
     PDNSolution( const PDNSolution &INPUT );
 
@@ -70,7 +69,7 @@ class PDNSolution
     virtual void GhostUpdate();
 
     // --------------------------------------------------------------
-    // ! Compute Norms of solution vector 
+    // ! Compute 1-, 2-, and infinity- Norms of the solution vector 
     // --------------------------------------------------------------
 		virtual double Norm_1() const;
 		virtual double Norm_2() const;
@@ -105,13 +104,12 @@ class PDNSolution
     //   setting aa = [a,..., a, b, ..., b].
     //                 na times   nb times
     // -------------------------------------------------------------
-    virtual void PlusAiX( const PDNSolution &xx, 
-        const std::vector<double> &aa );
+    virtual void PlusAiX( const PDNSolution &xx, const std::vector<double> &aa );
 
     // --------------------------------------------------------------
     // ! Perform uniform scaling operation : solution = a * solution
     // --------------------------------------------------------------
-    virtual void ScaleValue(const double &a);
+    virtual void ScaleValue( const double &a );
 
     // --------------------------------------------------------------
     // ! Get the part of the solution vector that belongs to the local 
@@ -137,15 +135,17 @@ class PDNSolution
     virtual void Assembly_GhostUpdate();
 
     // --------------------------------------------------------------
-    // ! Print the vec solution on screen with or without ghost part
+    // ! Print the vec solution on screen with or without the ghost part
     // --------------------------------------------------------------
     virtual void PrintWithGhost() const;
+    
     virtual void PrintNoGhost() const;
 
     // --------------------------------------------------------------
     // ! Write and Read the solution vector in PETSc binary format
     // --------------------------------------------------------------
     virtual void WriteBinary(const char * const &file_name) const;
+    
     virtual void ReadBinary(const char * const &file_name) const;
 
     // --------------------------------------------------------------
@@ -163,7 +163,7 @@ class PDNSolution
     virtual int get_nlgn() const {return nlocal + nghost;}
 
     // --------------------------------------------------------------
-    // ! Get the number of degrees of freedom 
+    // ! Get the number of degrees of freedom of this solution vector
     // --------------------------------------------------------------
     virtual int get_dof_num() const {return dof_num;}
 
