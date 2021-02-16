@@ -169,11 +169,11 @@ class PDNSolution
 
   private:
     // --------------------------------------------------------------
+    // dof_num does not necessarily equal to apart_node -> get_dof
     // nlocal := apart_node -> get_nlocalnode * dof_num
     // nghost := apart_node -> get_nghostnode * dof_num
-    // dof_num does not necessarily equal to apart_node -> get_dof
     // --------------------------------------------------------------
-    int nlocal, nghost, dof_num; 
+    int dof_num, nlocal, nghost; 
 };
 
 #endif

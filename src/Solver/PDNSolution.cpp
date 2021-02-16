@@ -1,11 +1,10 @@
 #include "PDNSolution.hpp"
 
 PDNSolution::PDNSolution( const APart_Node * const &pNode )
+: dof_num( pNode->get_dof() ),
+  nlocal( pNode->get_nlocalnode() * dof_num ),
+  nghost( pNode->get_nghostnode() * dof_num )
 {
-  dof_num = pNode->get_dof();
-  nlocal = pNode->get_nlocalnode() * dof_num;
-  nghost = pNode->get_nghostnode() * dof_num;
-
   PetscInt * ifrom = new PetscInt [nghost];
 
   for(int ii=0; ii<pNode->get_nghostnode(); ++ii)
@@ -17,16 +16,15 @@ PDNSolution::PDNSolution( const APart_Node * const &pNode )
   VecCreateGhost(PETSC_COMM_WORLD, nlocal, PETSC_DECIDE, nghost, ifrom,
       &solution);
    
-  delete [] ifrom; iform = nullptr;
+  delete [] ifrom; ifrom = nullptr;
 }
 
 PDNSolution::PDNSolution( const APart_Node * const &pNode,
    const int &input_dof_num )
+: dof_num( input_dof_num ),
+  nlocal( pNode->get_nlocalnode() * dof_num ),
+  nghost( pNode->get_nghostnode() * dof_num )
 {
-  dof_num = input_dof_num;
-  nlocal = pNode->get_nlocalnode() * dof_num;
-  nghost = pNode->get_nghostnode() * dof_num;
-
   PetscInt * ifrom = new PetscInt [nghost];
 
   for(int ii=0; ii<pNode->get_nghostnode(); ++ii)
@@ -38,7 +36,7 @@ PDNSolution::PDNSolution( const APart_Node * const &pNode,
   VecCreateGhost(PETSC_COMM_WORLD, nlocal, PETSC_DECIDE, nghost, ifrom,
       &solution);
    
-  delete [] ifrom; iform = nullptr;
+  delete [] ifrom; ifrom = nullptr;
 }
 
 
