@@ -91,7 +91,6 @@ void PDNSolution::Gen_random()
   delete [] val; val = nullptr; delete [] idx; idx = nullptr;
 }
 
-
 void PDNSolution::Copy(const PDNSolution &INPUT)
 {
   VecCopy(INPUT.solution, solution);
@@ -115,7 +114,6 @@ void PDNSolution::Copy(const PDNSolution * const &INPUT_ptr)
   VecGhostUpdateBegin(solution, INSERT_VALUES, SCATTER_FORWARD);
   VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
 }
-
 
 void PDNSolution::GhostUpdate()
 {
@@ -151,7 +149,6 @@ void PDNSolution::PlusAX(const PDNSolution &x, const double &a)
   VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
 }
 
-
 void PDNSolution::PlusAX(const PDNSolution * const &x_ptr, const double &a)
 {
   VecAXPY(solution, a, x_ptr->solution);
@@ -159,14 +156,12 @@ void PDNSolution::PlusAX(const PDNSolution * const &x_ptr, const double &a)
   VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
 }
 
-
 void PDNSolution::ScaleValue(const double &val)
 {
   VecScale(solution, val);
   VecGhostUpdateBegin(solution, INSERT_VALUES, SCATTER_FORWARD);
   VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
 }
-
 
 void PDNSolution::GetLocalArray( double * const &local_array ) const
 {
@@ -179,7 +174,6 @@ void PDNSolution::GetLocalArray( double * const &local_array ) const
   VecRestoreArray(lsol, &array);
   VecGhostRestoreLocalForm(solution, &lsol);
 }
-
 
 void PDNSolution::GetLocalArray( std::vector<double> &local_array ) const
 {
@@ -194,7 +188,6 @@ void PDNSolution::GetLocalArray( std::vector<double> &local_array ) const
   VecGhostRestoreLocalForm(solution, &lsol);
 }
 
-
 void PDNSolution::Assembly_GhostUpdate()
 {
   VecAssemblyBegin(solution);
@@ -202,7 +195,6 @@ void PDNSolution::Assembly_GhostUpdate()
   VecGhostUpdateBegin(solution, INSERT_VALUES, SCATTER_FORWARD);
   VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
 }
-
 
 void PDNSolution::PrintWithGhost() const
 {
@@ -290,7 +282,6 @@ void PDNSolution::PlusAiX(PDNSolution &x, const double &a,
   VecGhostUpdateBegin(solution, INSERT_VALUES, SCATTER_FORWARD);
   VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
 }
-
 
 void PDNSolution::PlusAiX( const PDNSolution &xx, const std::vector<double> &aa )
 {
