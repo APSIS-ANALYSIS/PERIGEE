@@ -70,7 +70,6 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   MATH_T::cross3d(dx_dr, dy_dr, dz_dr, dx_ds, dy_ds, dz_ds, unx, uny, unz);
 
   MATH_T::normalize3d( unx, uny, unz );
-  std::cout << "\nun: " << "\t" << unx << "\t" << uny << "\t" << unz << std::endl;
 
   // ======= Global-to-local rotation matrix =======
   const double inv_len_er = 1.0 / MATH_T::norm2( dx_dr, dy_dr, dz_dr );
@@ -110,28 +109,15 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
                      unx,     uny,     unz );
   // Rotated lamina coordinates
   double ctrl_xl [nLocBas], ctrl_yl [nLocBas];
-  std::cout << "\nlamina coords" << std::endl;
 
   for(int ii = 0; ii < nLocBas; ++ii)
   {
     double ctrl_xyzl[3];
     Q.VecMult( ctrl_x[ii], ctrl_y[ii], ctrl_z[ii], ctrl_xyzl);
 
-    std::cout << ctrl_xyzl[0] << "\t" << ctrl_xyzl[1] << "\t" << ctrl_xyzl[2] << std::endl; 
-
     ctrl_xl[ii] = ctrl_xyzl[0];
     ctrl_yl[ii] = ctrl_xyzl[1];
   }
-
-  const double dist_01 = (ctrl_xl[0] - ctrl_xl[1]) * (ctrl_xl[0] - ctrl_xl[1]) +
-                         (ctrl_yl[0] - ctrl_yl[1]) * (ctrl_yl[0] - ctrl_yl[1]);
-  const double dist_12 = (ctrl_xl[1] - ctrl_xl[2]) * (ctrl_xl[1] - ctrl_xl[2]) +
-                         (ctrl_yl[1] - ctrl_yl[2]) * (ctrl_yl[1] - ctrl_yl[2]);
-  const double dist_02 = (ctrl_xl[0] - ctrl_xl[2]) * (ctrl_xl[0] - ctrl_xl[2]) +
-                         (ctrl_yl[0] - ctrl_yl[2]) * (ctrl_yl[0] - ctrl_yl[2]);
-  std::cout << "\ndist_01: " << dist_01 << std::endl;
-  std::cout << "dist_12: " << dist_12 << std::endl;
-  std::cout << "dist_02: " << dist_02 << std::endl;
 
   // Rotated lamina 2D Jacobian & inverse Jacobian components
   Jac[0] = ctrl_xl[0] * (-1.0) + ctrl_xl[1]; // dxl_dr 
