@@ -192,15 +192,25 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
     nl_counter += 1;
 
+    // Update dot_sol, dot_sol_wall_disp
     dot_sol->PlusAX( dot_step, -1.0 );
+    update_wall_U( (-1.0) * alpha_f * gamma * dt / alpha_m,
+        dot_step, dot_sol_wall_disp ); 
+
+    // Update sol, sol_wall_disp
     sol->PlusAX( dot_step, (-1.0) * gamma * dt );
+    update_wall_U( (-1.0) * alpha_f * gamma * gamma * dt * dt / alpha_m,
+        dot_step, sol_wall_disp ); 
 
+    // Update dol_sol at alpha_m: dot_sol_alpha, dot_wall_disp_alpha
     dot_sol_alpha.PlusAX( dot_step, (-1.0) * alpha_m );
-    sol_alpha.PlusAX( dot_step, (-1.0) * alpha_f * gamma * dt );
+    update_wall_U( (-1.0) * alpha_f * gamma * dt,
+        dot_step, &dot_wall_disp_alpha ); 
 
-    // ==== TODO: update dot wall displacement at n+1 and n+alpha_m ====
-    
-    // ==== TODO: update wall displacement at n+1 and n+alpha_f ====
+    // Update sol at alpha_f: sol_alpha, wall_disp_alpha
+    sol_alpha.PlusAX( dot_step, (-1.0) * alpha_f * gamma * dt );
+    update_wall_U( (-1.0) * alpha_f * alpha_f * gamma * gamma * dt * dt / alpha_m,
+        dot_step, &wall_disp_alpha ); 
 
     // Assembly residual (& tangent if condition satisfied) 
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )
@@ -289,6 +299,58 @@ void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
 
   VecAssemblyBegin(sol->solution); VecAssemblyEnd(sol->solution);
   sol->GhostUpdate();
+}
+
+
+void PNonlinear_NS_Solver::update_wall_U( const double &val,
+        const PDNSolution * const &dot_step,
+        PDNSolution * const &wall_U ) const
+{
+  // Verify that the dof of dot_step is 4
+  SYS_T::print_fatal_if(dot_step->get_dof_num() != 4,
+      "Error in PNonlinear_NS_Solver::update_dot_wall_disp: incorrect dimension of dot_step. \n");
+
+  // Verify that the dof of wall_U is 3
+  SYS_T::print_fatal_if(wall_U->get_dof_num() != 3,
+      "Error in PNonlinear_NS_Solver::update_dot_wall_disp: incorrect dimension of wall_U. \n");
+
+  // Verify consistency in the number of local nodes
+  SYS_T::print_fatal_if(dot_step->get_nlocal() / 4 != wall_U->get_nlocal() / 3,
+      "Error in PNonlinear_NS_Solver::update_dot_wall_disp: num local nodes mismatch between "
+      "dot_step and wall_U. \n");
+
+  // Verify consistency in the number of ghost nodes
+  SYS_T::print_fatal_if(dot_step->get_nghost() / 4 != wall_U->get_nghost() / 3,
+      "Error in PNonlinear_NS_Solver::update_dot_wall_disp: num ghost nodes mismatch between "
+      "dot_step and wall_U. \n");
+
+  const int nlocal = dot_step->get_nlocal() / 4;
+
+  Vec ldotstep, lwallU;
+  double * array_dotstep, * array_wallU;
+  
+  VecGhostGetLocalForm(dot_step->solution, &ldotstep);
+  VecGhostGetLocalForm(wall_U->solution,   &lwallU);
+
+  VecGetArray(ldotstep, &array_dotstep);
+  VecGetArray(lwallU,   &array_wallU);
+
+  for(int ii=0; ii<nlocal; ++ii)
+  {
+    const int ii3 = ii * 3;
+    const int ii4 = ii * 4;
+
+    array_wallU[ii3]   += val * array_dotstep[ii4+1];
+    array_wallU[ii3+1] += val * array_dotstep[ii4+2];
+    array_wallU[ii3+2] += val * array_dotstep[ii4+3];
+  }
+
+  VecRestoreArray(ldotstep, &array_dotstep);
+  VecRestoreArray(lwallU,   &array_wallU);
+  VecGhostRestoreLocalForm(dot_step->solution, &ldotstep);
+  VecGhostRestoreLocalForm(wall_U->solution,   &lwallU);
+
+  wall_U->GhostUpdate();
 }
 
 // EOF

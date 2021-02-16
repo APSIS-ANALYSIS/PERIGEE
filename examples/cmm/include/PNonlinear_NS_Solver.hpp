@@ -92,6 +92,18 @@ class PNonlinear_NS_Solver
         const ICVFlowRate * const &flrate,
         const PDNSolution * const &sol_base,
         PDNSolution * const &sol ) const;
+
+    // CMM segregated algorithm: nodal update of sol_wall_disp and 
+    // dot_sol_wall_disp based on the velo increment 
+    // The dot_step vector is assumed to take the following form:
+    //     [dot_pres_step, dot_velo_x_step, dot_velo_y_step, dot_velo_z_step] 
+    // The update will occur in the following manner:
+    //     wall_U_x += val * dot_velo_x_step
+    //     wall_U_y += val * dot_velo_y_step
+    //     wall_U_z += val * dot_velo_z_step
+    void update_wall_U( const double &val,
+        const PDNSolution * const &dot_step,
+        PDNSolution * const &wall_U ) const;
 };
 
 #endif
