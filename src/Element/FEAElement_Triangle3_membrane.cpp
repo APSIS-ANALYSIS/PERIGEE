@@ -56,8 +56,8 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   }
 
   //const double dN0_dr = -1.0; const double dN0_ds = -1.0;
-  //const double dN1_dr = 1.0;  const double dN1_ds = 0.0;
-  //const double dN2_dr = 0.0;  const double dN2_ds = 1.0;
+  //const double dN1_dr =  1.0; const double dN1_ds = 0.0;
+  //const double dN2_dr =  0.0; const double dN2_ds = 1.0;
   
   const double dx_dr = ctrl_x[0] * (-1.0) + ctrl_x[1];
   const double dy_dr = ctrl_y[0] * (-1.0) + ctrl_y[1];
@@ -65,8 +65,6 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   const double dx_ds = ctrl_x[0] * (-1.0) + ctrl_x[2];
   const double dy_ds = ctrl_y[0] * (-1.0) + ctrl_y[2];
   const double dz_ds = ctrl_z[0] * (-1.0) + ctrl_z[2];
-
-  std::cout << "dx_dr[0] " << dx_dr << std::endl;
 
   // vec(un) = vec(dx_dr) x vec(dx_ds)
   MATH_T::cross3d(dx_dr, dy_dr, dz_dr, dx_ds, dy_ds, dz_ds, unx, uny, unz);
@@ -143,7 +141,6 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   Jac[3] = ctrl_yl[0] * (-1.0) + ctrl_yl[2]; // dyl_ds
 
   detJac = Jac[0] * Jac[3] - Jac[1] * Jac[2];
-  std::cout << "detJac " << detJac << std::endl;
 
   double inv_detJac = 1.0 / detJac;
 
