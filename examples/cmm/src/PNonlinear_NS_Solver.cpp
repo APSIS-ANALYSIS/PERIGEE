@@ -316,13 +316,11 @@ void PNonlinear_NS_Solver::update_wall_U( const double &val,
 
   // Verify consistency in the number of local nodes
   SYS_T::print_fatal_if(dot_step->get_nlocal() / 4 != wall_U->get_nlocal() / 3,
-      "Error in PNonlinear_NS_Solver::update_dot_wall_disp: num local nodes mismatch between "
-      "dot_step and wall_U. \n");
+      "Error in PNonlinear_NS_Solver::update_dot_wall_disp: num local nodes mismatch between dot_step and wall_U. \n");
 
   // Verify consistency in the number of ghost nodes
   SYS_T::print_fatal_if(dot_step->get_nghost() / 4 != wall_U->get_nghost() / 3,
-      "Error in PNonlinear_NS_Solver::update_dot_wall_disp: num ghost nodes mismatch between "
-      "dot_step and wall_U. \n");
+      "Error in PNonlinear_NS_Solver::update_dot_wall_disp: num ghost nodes mismatch between dot_step and wall_U. \n");
 
   const int nlocal = dot_step->get_nlocal() / 4;
 
@@ -337,19 +335,18 @@ void PNonlinear_NS_Solver::update_wall_U( const double &val,
 
   for(int ii=0; ii<nlocal; ++ii)
   {
-    const int ii3 = ii * 3;
-    const int ii4 = ii * 4;
-
-    array_wallU[ii3]   += val * array_dotstep[ii4+1];
-    array_wallU[ii3+1] += val * array_dotstep[ii4+2];
-    array_wallU[ii3+2] += val * array_dotstep[ii4+3];
+    array_wallU[ii*3]   += val * array_dotstep[ii*4+1];
+    array_wallU[ii*3+1] += val * array_dotstep[ii*4+2];
+    array_wallU[ii*3+2] += val * array_dotstep[ii*4+3];
   }
-
+  
+  // Deallocation of the local copy
   VecRestoreArray(ldotstep, &array_dotstep);
   VecRestoreArray(lwallU,   &array_wallU);
   VecGhostRestoreLocalForm(dot_step->solution, &ldotstep);
   VecGhostRestoreLocalForm(wall_U->solution,   &lwallU);
 
+  // Update ghost values
   wall_U->GhostUpdate();
 }
 
