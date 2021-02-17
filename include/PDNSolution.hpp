@@ -125,6 +125,14 @@ class PDNSolution
     virtual void ReadBinary(const char * const &file_name) const;
 
     // --------------------------------------------------------------
+    // ! Get the number of local and ghost nodes for the parallel 
+    //   vector's local portion.
+    // --------------------------------------------------------------
+    virtual int get_nlocalnode() const {return nlocalnode;}
+
+    virtual int get_nghostnode() const {return nghostnode;}
+
+    // --------------------------------------------------------------
     // ! Get the number of local and ghost entries in the parallel 
     //   vector's local portion.
     // --------------------------------------------------------------
