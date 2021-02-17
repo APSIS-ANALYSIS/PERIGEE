@@ -23,14 +23,18 @@ namespace GENBC_T
   int get_genbc_file_type( const char * const &lpn_filename );
 
   // ----------------------------------------------------------------
-  // Evaluate a piecewise cubic hermite interpolating polynomial (PCHIP) 
+  // Evaluate a Piecewise Cubic Hermite Interpolating Polynomial (PCHIP) 
   // between points x1 and x2 with values f1, f2 and  
   // derivatives d1 and d2 for points xe in [x1, x2] with the number of points
   // ne. PCHIP is given by 
-  // f(x)=f1*h00(t)+delta*d1*h10(t)+f2*h01(t)+delta*d2*h11(t),
-  // where h00(t)=2*t^3-3*t^2+1,h10(t)=t^3-2*t^2+t,h01(t)=-2*t^3+3*t^2,
-  // h11(t)=t^3-t^2 and delta=x2-x1,t=(x-x1)/delta. 
-  // Outputs: de with length ne. It stores the derivatives of the Hermite
+  // f(x) = f1*h00(t) + delta*d1*h10(t) + f2*h01(t) + delta*d2*h11(t),
+  // where 
+  //   h00(t)=2*t^3-3*t^2+1,
+  //   h10(t)=t^3-2*t^2+t,
+  //   h01(t)=-2*t^3+3*t^2,
+  //   h11(t)=t^3-t^2  
+  //   delta=x2-x1,t=(x-x1)/delta. 
+  // Outputs: fe with length ne. It stores the derivatives of the Hermite
   // interplation at those xe points.
   // ----------------------------------------------------------------
   void get_cubic_hermite( const double &x1, const double &x2, 
@@ -38,10 +42,10 @@ namespace GENBC_T
       const int &ne, const std::vector<double> &xe, std::vector<double> &fe );
   
   // ----------------------------------------------------------------
-  // Evaluate the derivatives of a piecewise cubic hermite interpolating 
-  // polynomial (PCHIP) between points x1 and x2 with values f1, f2 and  
-  // derivatives d1 and d2 for points xe in [x1, x2] with the number of points
-  // ne. 
+  // Evaluate the derivatives of a Piecewise Cubic Hermite Interpolating 
+  // Polynomial (PCHIP) between points x1 and x2 with values f1, f2 and  
+  // derivatives d1 and d2 for points xe in [x1, x2] with the number of 
+  // points ne. 
   // Outputs: de with length ne. It stores the derivatives of the Hermite
   // interplation at those xe points.
   // ----------------------------------------------------------------
