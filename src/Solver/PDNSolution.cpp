@@ -93,11 +93,11 @@ void PDNSolution::Gen_random()
 
 void PDNSolution::Copy(const PDNSolution &INPUT)
 {
+  SYS_T::print_fatal_if( dof_num != INPUT.get_dof_num(), "Error: PDNSolution::Copy, dof_num does not match.\n");
+  SYS_T::print_fatal_if( nlocal != INPUT.get_nlocal(), "Error: PDNSolution::Copy, nlocal does not match.\n");
+  SYS_T::print_fatal_if( nghost != INPUT.get_nghost(), "Error: PDNSolution::Copy, nghost does not match.\n");
+  
   VecCopy(INPUT.solution, solution);
-
-  dof_num = INPUT.get_dof_num();
-  nlocal = INPUT.get_nlocal();
-  nghost = INPUT.get_nghost();
 
   VecGhostUpdateBegin(solution, INSERT_VALUES, SCATTER_FORWARD);
   VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
@@ -105,11 +105,11 @@ void PDNSolution::Copy(const PDNSolution &INPUT)
 
 void PDNSolution::Copy(const PDNSolution * const &INPUT_ptr)
 {
+  SYS_T::print_fatal_if( dof_num != INPUT_ptr->get_dof_num(), "Error: PDNSolution::Copy, dof_num does not match.\n");
+  SYS_T::print_fatal_if( nlocal != INPUT_ptr->get_nlocal(), "Error: PDNSolution::Copy, nlocal does not match.\n");
+  SYS_T::print_fatal_if( nghost != INPUT_ptr->get_nghost(), "Error: PDNSolution::Copy, nghost does not match.\n");
+  
   VecCopy(INPUT_ptr->solution, solution);
-
-  dof_num = INPUT_ptr->get_dof_num();
-  nlocal = INPUT_ptr->get_nlocal();
-  nghost = INPUT_ptr->get_nghost();
 
   VecGhostUpdateBegin(solution, INSERT_VALUES, SCATTER_FORWARD);
   VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
