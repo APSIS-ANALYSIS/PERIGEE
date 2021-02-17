@@ -4,13 +4,13 @@ PDNTimeStep::PDNTimeStep( const int &input_index, const double &input_time,
     const double &input_step ) : time_index( input_index ), 
   time( input_time ), time_step( input_step )
 {
+  index_history.clear();
   time_history.clear();
   time_step_history.clear();
-  index_history.clear();
 
+  index_history.push_back(time_index);
   time_history.push_back(time);
   time_step_history.push_back(time_step);
-  index_history.push_back(time_index);
 }
 
 PDNTimeStep::~PDNTimeStep()

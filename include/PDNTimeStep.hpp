@@ -19,17 +19,20 @@ class PDNTimeStep
 
     ~PDNTimeStep();
 
+    // Functions that give access to the class member data
     double get_time() const {return time;}
 
     double get_step() const {return time_step;}
     
     int get_index() const {return time_index;}
 
+    // Perform time increment with the default time step
     void TimeIncrement();
 
-    // Do time increment withi the given time step
+    // Perform time increment with the given time step
     void TimeIncrement(const double &input_time_step);
 
+    // Change the time step size
     void UpdateTimeStep(const double &new_time_step)
     {time_step = new_time_step;}
 
@@ -43,9 +46,8 @@ class PDNTimeStep
     int time_index;
     double time, time_step;
 
-    std::vector<double> time_history;
-    std::vector<double> time_step_history;
     std::vector<int> index_history;
+    std::vector<double> time_history, time_step_history;
 };
 
 #endif
