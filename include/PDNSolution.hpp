@@ -146,11 +146,14 @@ class PDNSolution
 
   private:
     // --------------------------------------------------------------
-    // dof_num does not necessarily equal to apart_node -> get_dof
+    // dof_num default value is apart_node -> get_dof, but user may
+    // reset its value.
+    // nlocalnode := apart_node -> get_nlocalnode
+    // nghostnode := apart_node -> get_nghostnode
     // nlocal := apart_node -> get_nlocalnode * dof_num
     // nghost := apart_node -> get_nghostnode * dof_num
     // --------------------------------------------------------------
-    const int dof_num, nlocal, nghost; 
+    const int dof_num, nlocalnode, nghostnode, nlocal, nghost; 
 };
 
 #endif
