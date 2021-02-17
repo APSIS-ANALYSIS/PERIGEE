@@ -173,7 +173,7 @@ class PDNSolution
     // nlocal := apart_node -> get_nlocalnode * dof_num
     // nghost := apart_node -> get_nghostnode * dof_num
     // --------------------------------------------------------------
-    int dof_num, nlocal, nghost; 
+    const int dof_num, nlocal, nghost; 
 };
 
 #endif
