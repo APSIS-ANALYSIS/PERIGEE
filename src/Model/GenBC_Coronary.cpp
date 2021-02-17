@@ -221,16 +221,16 @@ double GenBC_Coronary::get_P( const int &ii, const double &in_dot_Q,
   }
 
   // Here, we know it is a coronary face.
-  // Each coronary face is governed by 2 ODEs.  
+  // Each coronary face is governed by num_odes = 2 ODEs.  
   // initial pressures at Ca and Cim
-  double pi_m[num_odes]; // = {Pi0[ii][0], Pi0[ii][1]};  //Pi_m
+  double pi_m[num_odes];
 
   // auxiliary variables for RK4 
-  double K1[num_odes]; // = {0.0, 0.0};
-  double K2[num_odes]; // = {0.0, 0.0};
-  double K3[num_odes]; // = {0.0, 0.0};
-  double K4[num_odes]; // = {0.0, 0.0};
-  double pi_tmp[num_odes]; // = {0.0, 0.0};
+  double K1[num_odes];
+  double K2[num_odes];
+  double K3[num_odes];
+  double K4[num_odes];
+  double pi_tmp[num_odes];
 
   for(int jj=0; jj<num_odes; ++jj)
   {
@@ -311,14 +311,11 @@ double GenBC_Coronary::F( const int &ii, const double &pi, const double &q ) con
 
 void GenBC_Coronary::get_dPim_dt( const int &ii, const double &time_start, const double &time_end )
 {
-  double x1,x2,f1,f2,d1,d2;
-
-  const double fac13 = 1.0 / 3.0;
-  const double fac23 = 2.0 / 3.0;
-
   double tend_mod = fmod( time_end, Time_data[ii][num_Pim_data[ii]-1] );
   if ( tend_mod<absTol ) tend_mod =  Time_data[ii][num_Pim_data[ii]-1];
+  
   // Find the interval in Pim that covers current integration time. 
+  double x1,x2,f1,f2,d1,d2;
   for(int mm=1; mm<num_Pim_data[ii];++mm)
   {
     if ( tend_mod <= Time_data[ii][mm] )
@@ -342,6 +339,9 @@ void GenBC_Coronary::get_dPim_dt( const int &ii, const double &time_start, const
   // from time_start to time_end. 
   double tmp = time_start;
 
+  const double fac13 = 1.0 / 3.0;
+  const double fac23 = 2.0 / 3.0;
+
   for(int mm=0;mm<N;++mm)
   {
     xe_1[mm] = fmod(tmp,Time_data[ii][num_Pim_data[ii]-1]);
@@ -352,10 +352,11 @@ void GenBC_Coronary::get_dPim_dt( const int &ii, const double &time_start, const
 
   xe_1[N] = tend_mod;
 
-  GENBC_T::get_cubic_hermite_der ( x1, x2, f1,f2, d1, d2, N+1, xe_1, dPimdt_k1[ii] );
+  GENBC_T::get_cubic_hermite_der( x1, x2, f1,f2, d1, d2, N+1, xe_1, dPimdt_k1[ii] );
 
-  GENBC_T::get_cubic_hermite_der ( x1, x2, f1,f2, d1, d2, N, xe_2, dPimdt_k2[ii] );
+  GENBC_T::get_cubic_hermite_der( x1, x2, f1,f2, d1, d2, N,   xe_2, dPimdt_k2[ii] );
 
-  GENBC_T::get_cubic_hermite_der ( x1, x2, f1,f2, d1, d2, N, xe_3, dPimdt_k3[ii] );
+  GENBC_T::get_cubic_hermite_der( x1, x2, f1,f2, d1, d2, N,   xe_3, dPimdt_k3[ii] );
 }
+
 // EOF
