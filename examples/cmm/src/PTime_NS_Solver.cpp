@@ -105,6 +105,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
   std::string sol_name ("");
   std::string sol_dot_name ("");
 
+  // **** TODO: wall disp I/O from solution binaries ****
   // If this is a restart run, do not re-write the solution binaries
   if(restart_init_assembly_flag == false)
   {
@@ -154,6 +155,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
         time_info->get_time(), time_info->get_step(), time_info->get_index(),
         SYS_T::get_time().c_str());
 
+    // **** TODO: wall disp I/O from solution binaries ****
     // Record solution if meets criteria
     if( time_info->get_index()%sol_record_freq == 0 )
     {
@@ -223,9 +225,14 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     // Prepare for next time step
     pre_sol->Copy(*cur_sol);
     pre_dot_sol->Copy(*cur_dot_sol);
+
+    pre_sol_wall_disp->Copy(*cur_sol_wall_disp);
+    pre_dot_sol_wall_disp->Copy(*cur_dot_sol_wall_disp);
   }
 
   delete pre_sol; delete cur_sol; delete pre_dot_sol; delete cur_dot_sol;
+  delete pre_sol_wall_disp; delete cur_sol_wall_disp;
+  delete pre_dot_sol_wall_disp; delete cur_dot_sol_wall_disp;
 }
 
 // EOF
