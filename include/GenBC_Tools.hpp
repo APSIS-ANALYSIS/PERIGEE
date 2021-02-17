@@ -34,7 +34,7 @@ namespace GENBC_T
   //   h01(t)=-2*t^3+3*t^2,
   //   h11(t)=t^3-t^2  
   //   delta=x2-x1,t=(x-x1)/delta. 
-  // Outputs: fe with length ne. It stores the derivatives of the Hermite
+  // Outputs: fe with length ne. It stores the values of the Hermite
   // interplation at those xe points.
   // ----------------------------------------------------------------
   void get_cubic_hermite( const double &x1, const double &x2, 
