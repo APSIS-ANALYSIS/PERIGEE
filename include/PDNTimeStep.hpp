@@ -14,19 +14,20 @@
 class PDNTimeStep
 {
   public:
-    PDNTimeStep( const int &input_index, 
-        const double &input_time,
+    PDNTimeStep( const int &input_index, const double &input_time,
         const double &input_step );
 
     ~PDNTimeStep();
 
     double get_time() const {return time;}
+
     double get_step() const {return time_step;}
+    
     int get_index() const {return time_index;}
 
     void TimeIncrement();
 
-    // Do time increment with givne time step
+    // Do time increment withi the given time step
     void TimeIncrement(const double &input_time_step);
 
     void UpdateTimeStep(const double &new_time_step)
@@ -39,9 +40,8 @@ class PDNTimeStep
     void WriteTimeInfo_step() const;
 
   private:
-    double time;
-    double time_step;
     int time_index;
+    double time, time_step;
 
     std::vector<double> time_history;
     std::vector<double> time_step_history;

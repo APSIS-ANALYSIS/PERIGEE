@@ -129,6 +129,7 @@ class PDNSolution
     //   vector's local portion.
     // --------------------------------------------------------------
     virtual int get_nlocal() const {return nlocal;}
+    
     virtual int get_nghost() const {return nghost;}
 
     // --------------------------------------------------------------

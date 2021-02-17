@@ -1,12 +1,9 @@
 #include "PDNTimeStep.hpp"
 
 PDNTimeStep::PDNTimeStep( const int &input_index, const double &input_time,
-    const double &input_step )
+    const double &input_step ) : time_index( input_index ), 
+  time( input_time ), time_step( input_step )
 {
-  time = input_time;
-  time_index = input_index;
-  time_step = input_step;
-
   time_history.clear();
   time_step_history.clear();
   index_history.clear();
@@ -15,7 +12,6 @@ PDNTimeStep::PDNTimeStep( const int &input_index, const double &input_time,
   time_step_history.push_back(time_step);
   index_history.push_back(time_index);
 }
-
 
 PDNTimeStep::~PDNTimeStep()
 {}
@@ -41,7 +37,6 @@ void PDNTimeStep::TimeIncrement(const double &input_time_step)
   index_history.push_back(time_index);
 }
 
-
 void PDNTimeStep::WriteTimeInfo() const
 {
   int rank;
@@ -65,7 +60,6 @@ void PDNTimeStep::WriteTimeInfo() const
   }
 }
 
-
 void PDNTimeStep::WriteTimeInfo_step() const
 {
   int rank;
@@ -85,6 +79,5 @@ void PDNTimeStep::WriteTimeInfo_step() const
       std::cerr<<"Unable to open/create Time_log.txt file. \n";
   }
 }
-
 
 // EOF

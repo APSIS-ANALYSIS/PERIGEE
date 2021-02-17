@@ -48,7 +48,6 @@ class TimeMethod_GenAlpha
     // This constructor shall be used for 1st-order systems.
     // --------------------------------------------------------------
     TimeMethod_GenAlpha( const double &input_spectral );
-   
     
     // --------------------------------------------------------------
     // Constructor for Generalized-alpha method for FIRST-order system
@@ -61,7 +60,6 @@ class TimeMethod_GenAlpha
     // --------------------------------------------------------------
     TimeMethod_GenAlpha( const double &input_alpha_m, 
         const double &input_alpha_f, const double &input_gamma );
-
     
     // --------------------------------------------------------------
     // Constructor for Generalized-alpha method for either 1st or 2nd
@@ -71,7 +69,6 @@ class TimeMethod_GenAlpha
     // --------------------------------------------------------------
     TimeMethod_GenAlpha( const double &input_spectral, 
         const bool &input_is2ndorder );   
-
 
     ~TimeMethod_GenAlpha();
 

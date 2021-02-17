@@ -10,7 +10,6 @@ TimeMethod_GenAlpha::TimeMethod_GenAlpha(const double &input_spectral )
 {
 }
 
-
 TimeMethod_GenAlpha::TimeMethod_GenAlpha( const double &in_alpha_m,
     const double &in_alpha_f, const double &in_gamma )
 : rho_infty(0.0), alpha_m(in_alpha_m), 
@@ -20,10 +19,8 @@ TimeMethod_GenAlpha::TimeMethod_GenAlpha( const double &in_alpha_m,
 {
 }
 
-
 TimeMethod_GenAlpha::~TimeMethod_GenAlpha()
 {}
-
 
 TimeMethod_GenAlpha::TimeMethod_GenAlpha( const double &input_spectral,
     const bool &input_is2ndorder )
@@ -43,8 +40,6 @@ TimeMethod_GenAlpha::TimeMethod_GenAlpha( const double &input_spectral,
   gamma = 0.5 - alpha_f + alpha_m;
   beta = 0.25 * (1.0 - alpha_f + alpha_m) * (1.0 - alpha_f + alpha_m);
 }
-
-
 
 void TimeMethod_GenAlpha::print_info() const
 {
