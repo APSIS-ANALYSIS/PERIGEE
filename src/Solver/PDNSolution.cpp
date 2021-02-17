@@ -45,6 +45,8 @@ PDNSolution::PDNSolution( const APart_Node * const &pNode,
 
 PDNSolution::PDNSolution( const PDNSolution &INPUT )
 : dof_num( INPUT.get_dof_num() ),
+  nlocalnode( INPUT.get_nlocalnode() ),
+  nghostnode( INPUT.get_nghostnode() ),
   nlocal( INPUT.get_nlocal() ),
   nghost( INPUT.get_nghost() )
 {
@@ -57,6 +59,8 @@ PDNSolution::PDNSolution( const PDNSolution &INPUT )
 
 PDNSolution::PDNSolution( const PDNSolution * const &INPUT_ptr )
 : dof_num( INPUT_ptr->get_dof_num() ),
+  nlocalnode( INPUT_ptr->get_nlocalnode() ),
+  nghostnode( INPUT_ptr->get_nghostnode() ),
   nlocal( INPUT_ptr->get_nlocal() ),
   nghost( INPUT_ptr->get_nghost() )
 {
