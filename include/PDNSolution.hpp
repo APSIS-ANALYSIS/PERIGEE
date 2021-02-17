@@ -84,30 +84,6 @@ class PDNSolution
     virtual void PlusAX(const PDNSolution * const &x_ptr, const double &a);
 
     // --------------------------------------------------------------
-    // ! Perform += a_i * x_i.
-    //   x has the same length with the solution, and length of x is
-    //   a multiple of (na + nb);
-    //   a_i = a for (na+nb)*k    <= i < (na + nb)*k + na
-    //   a_i = b for (na+nb)*k+na <= i < (na+nb) * (k+1)
-    //   This function call is useful for the special Generalized-alpha
-    //   time integration used for VMS-NS solver. 
-    //   Refer to CMAME 197(2007), pp 182 for details
-    // --------------------------------------------------------------
-    virtual void PlusAiX(PDNSolution &x, const double &a,
-        const double &b, const int &na, const int &nb );
-
-    // -------------------------------------------------------------
-    // ! Perform solution[ii*dofNum + jj] += a[jj] * x[ii*dofNum + jj].
-    //   This is a generalized version for the PlusAiX( PDNSolution,
-    //   const double, const double, const int, const int ).
-    //   The users should make sure that aa.size() == dofNum of the
-    //   solution vector. The PlusAiX(x,a,b, na,nb) is equivalent to
-    //   setting aa = [a,..., a, b, ..., b].
-    //                 na times   nb times
-    // -------------------------------------------------------------
-    virtual void PlusAiX( const PDNSolution &xx, const std::vector<double> &aa );
-
-    // --------------------------------------------------------------
     // ! Perform uniform scaling operation : solution = a * solution
     // --------------------------------------------------------------
     virtual void ScaleValue( const double &a );
