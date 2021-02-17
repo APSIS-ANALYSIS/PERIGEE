@@ -91,10 +91,9 @@ class PDNSolution
     // --------------------------------------------------------------
     // ! Get the part of the solution vector that belongs to the local 
     //   nodes and ghost nodes.
-    //   The user is responsible for freeing the memory allocation 
-    //   after the task is done.
     //   If one uses a dynamic array, one should allocate it with the
-    //   size nlocal + nghost.
+    //   size nlocal + nghost, and one is also responsible for freeing
+    //   the memory allocation of the local_array pointer.
     // --------------------------------------------------------------
     virtual void GetLocalArray( double * const &local_array ) const;
     
