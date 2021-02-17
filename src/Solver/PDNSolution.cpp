@@ -246,4 +246,9 @@ void PDNSolution::ReadBinary(const char * const &file_name) const
   PetscViewerDestroy(&viewer);
 }
 
+bool is_layout_equal( const PDNSolution &left, const PDNSolution &right )
+{
+  return ( left.nlocalnode == right.nlocalnode && left.nghostnode == right.nghostnode );
+}
+
 // EOF

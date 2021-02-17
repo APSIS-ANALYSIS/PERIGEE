@@ -152,6 +152,14 @@ class PDNSolution
     // --------------------------------------------------------------
     virtual int get_dof_num() const {return dof_num;}
 
+    // --------------------------------------------------------------
+    // ! Compare the layout of the solution vector, that is
+    //   nlocalnode and nghostnode. 
+    //   Return true if the nlocalnode and nghostnode for the two inputs
+    //   are the same; false otherwise. 
+    // --------------------------------------------------------------
+    friend bool is_layout_equal( const PDNSolution &left, const PDNSolution &right );
+
   private:
     // --------------------------------------------------------------
     // dof_num default value is apart_node -> get_dof, but user may
