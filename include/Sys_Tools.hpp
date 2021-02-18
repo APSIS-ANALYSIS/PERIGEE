@@ -18,7 +18,7 @@
 
 namespace SYS_T
 {
-  // Print ASCII art fonts
+  // Print ASCII art
   void print_perigee_art();
 
   // Return the rank of the CPU
