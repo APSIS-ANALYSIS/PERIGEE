@@ -153,13 +153,13 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
     // **** Loop over num_selem:
     //        - call PLocAssem_Tet_CMM_GenAlpha::get_Wall_CauchyStress()
     //        - call ALocal_Wall_Prestress::update_prestress()
-    virtual void Update_Wall_Prestress(
-        const PDNSolution * const &sol_wall_disp,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &element_w,
-        const IQuadPts * const &quad_s,
-        const ALocal_EBC * const &ebc_wall_part,
-        ALocal_Wall_Prestress * const &wall_prestress );
+    // virtual void Update_Wall_Prestress(
+    //     const PDNSolution * const &sol_wall_disp,
+    //     IPLocAssem * const &lassem_ptr,
+    //     FEAElement * const &element_w,
+    //     const IQuadPts * const &quad_s,
+    //     const ALocal_EBC * const &ebc_wall_part,
+    //     ALocal_Wall_Prestress * const &wall_prestress );
 
   private:
     // Private data
