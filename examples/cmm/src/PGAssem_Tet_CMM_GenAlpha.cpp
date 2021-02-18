@@ -639,6 +639,8 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_G(
     ebc_wall_part -> get_thickness(ee, sthickness);
     ebc_wall_part -> get_youngsmod(ee, syoungsmod);
 
+    // **** PRESTRESS TODO: get e_prestress, pass to LocAssem
+
     GetLocal(array_a, LSIEN, snLocBas, local_as);
 
     GetLocal(array_b, LSIEN, snLocBas, dof_disp, local_bs);
@@ -708,6 +710,8 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_KG(
     ebc_wall_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
     ebc_wall_part -> get_thickness(ee, sthickness);
     ebc_wall_part -> get_youngsmod(ee, syoungsmod);
+
+    // **** PRESTRESS TODO: get e_prestress, pass to LocAssem
 
     GetLocal(array_a, LSIEN, snLocBas, local_as);
 

@@ -149,6 +149,18 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const IQuadPts * const &quad_s,
         const ALocal_Inflow_NodalBC * const &infbc_part );
 
+    // **** PRESTRESS TODO:
+    // **** Loop over num_selem:
+    //        - call PLocAssem_Tet_CMM_GenAlpha::get_Wall_CauchyStress()
+    //        - call ALocal_Wall_Prestress::update_prestress()
+    // virtual void Update_Wall_Prestress(
+    //     const PDNSolution * const &sol_wall_disp,
+    //     IPLocAssem * const &lassem_ptr,
+    //     FEAElement * const &element_w,
+    //     const IQuadPts * const &quad_s,
+    //     const ALocal_EBC * const &ebc_wall_part,
+    //     ALocal_Wall_Prestress * const &wall_prestress );
+
   private:
     // Private data
     const int nLocBas, dof_sol, dof_mat, num_ebc, nlgn;
@@ -208,6 +220,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const IGenBC * const &gbc );
 
     // Wall integral for thin-walled linear membrane
+    // **** PRESTRESS TODO: additional arg ALocal_Wall_Prestress
     void WallMembrane_G( const double &curr_time,
         const double &dt, 
         const PDNSolution * const &dot_sol,
@@ -218,6 +231,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_wall_part );
 
+    // **** PRESTRESS TODO: additional arg ALocal_Wall_Prestress
     void WallMembrane_KG( const double &curr_time,
         const double &dt, 
         const PDNSolution * const &dot_sol,
