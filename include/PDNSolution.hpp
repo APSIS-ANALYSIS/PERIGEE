@@ -73,8 +73,10 @@ class PDNSolution
     // ! Compute 1-, 2-, and infinity- Norms of the solution vector 
     // --------------------------------------------------------------
 		virtual double Norm_1() const;
-		virtual double Norm_2() const;
-		virtual double Norm_inf() const;
+		
+    virtual double Norm_2() const;
+		
+    virtual double Norm_inf() const;
 
     // --------------------------------------------------------------
     // ! Perform solution = solution + a * x 
@@ -100,9 +102,9 @@ class PDNSolution
     virtual void GetLocalArray( std::vector<double> &local_array ) const;
 
     // --------------------------------------------------------------
-    // ! Assembly the vector and update the ghost node values. It is
+    // ! Assembly the vector and update its ghost values. It is
     //   just a routine calling the following things. This is called
-    //   after VecSetValues calling to finish the assembly of vector.
+    //   after VecSetValues to finish the assembly of vector.
     //          VecAssemblyBegin(solution);
     //          VecAssenblyEnd(solution);
     //          GhostUpdate();

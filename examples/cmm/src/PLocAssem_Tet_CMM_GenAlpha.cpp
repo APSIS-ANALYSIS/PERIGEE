@@ -1202,10 +1202,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     double * Kl = new double [ (snLocBas*dim) * (snLocBas*dim) ] {};
     double * Kg = new double [ (snLocBas*dim) * (snLocBas*dim) ] {};
 
-    // For membrane elements, basis function gradients are computed
-    // with respect to lamina coords
-    element->get_R_gradR( qua, &R[0], &dR_dxl[0], &dR_dyl[0] );
-
     // Global-to-local rotation matrix Q
     Matrix_3x3 Q = Matrix_3x3();
     element->get_rotationMatrix(qua, Q);

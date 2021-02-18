@@ -128,6 +128,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, flr_ptr, sol_base, &sol_alpha);
   // ------------------------------------------------- 
 
+  // **** PRESTRESS TODO: if (prestress_flag), set wall disp and velo to zero
+
   // If new_tangent_flag == TRUE, update the tangent matrix;
   // otherwise, use the matrix from the previous time step
   if( new_tangent_flag )
@@ -262,6 +264,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
   }while(nl_counter<nmaxits && relative_error > nr_tol && residual_norm > na_tol);
 
+  // **** PRESTRESS TODO: if (prestress_flag), call PGAssem_Tet_CMM_GenAlpha::Update_Wall_Prestress() 
   Print_convergence_info(nl_counter, relative_error, residual_norm);
 
   if(relative_error <= nr_tol || residual_norm <= na_tol) conv_flag = true;
