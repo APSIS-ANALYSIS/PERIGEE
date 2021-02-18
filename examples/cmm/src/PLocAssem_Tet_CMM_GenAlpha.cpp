@@ -1341,7 +1341,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
       sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * ( w_t - f3 )
           + NA_x * sigma(2, 0) + NA_y * sigma(2, 1) + NA_z * sigma(2, 2) ); 
 
-      for(int B=0; B<nLocBas; ++B)
+      for(int B=0; B<snLocBas; ++B)
       {
         // Momentum-x with respect to u, v, w
         sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+1 ] += gwts * h_w * (
@@ -1385,7 +1385,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     Kl = nullptr; Kg = nullptr;
 
   } // end qua loop
-
 }
 
 // EOF
