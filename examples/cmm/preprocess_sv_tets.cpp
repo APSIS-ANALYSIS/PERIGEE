@@ -242,20 +242,25 @@ int main( int argc, char * argv[] )
   // The background wall properties will first be prescribed to the entire wall
   // using centerlines_combined and thickness2radius_combined. Wall properties
   // in wallsList will then be overwritten using the corresponding lists.
-  std::vector<std::string> wallsList; wallsList.clear();
-  std::vector<std::string> centerlinesList; centerlinesList.clear();
-  std::vector<double> thickness2radiusList; thickness2radiusList.clear();
+  // ----------------------------------------------------------------
+  // std::vector<std::string> wallsList; wallsList.clear();
+  // std::vector<std::string> centerlinesList; centerlinesList.clear();
+  // std::vector<double> thickness2radiusList; thickness2radiusList.clear();
 
-  if(elemType == 501) wallsList.push_back( "wall_aorta.vtp" );
-  else wallsList.push_back( "wall_aorta.vtu" );
+  // if(elemType == 501) wallsList.push_back( "wall_aorta.vtp" );
+  // else wallsList.push_back( "wall_aorta.vtu" );
 
-  centerlinesList.push_back( "centerlines_aorta.vtp" );
-  thickness2radiusList.push_back( 0.2 );
+  // centerlinesList.push_back( "centerlines_aorta.vtp" );
+  // thickness2radiusList.push_back( 0.2 );
 
-  // Initialized with default fluid density 1.065
+  // // Initialized with default fluid density 1.065
+  // ElemBC * wall_bc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
+  //                                            thickness2radius_combined, wallsList,
+  //                                            centerlinesList, thickness2radiusList, elemType );
+
   ElemBC * wall_bc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
-                                             thickness2radius_combined, wallsList,
-                                             centerlinesList, thickness2radiusList, elemType);
+                                             thickness2radius_combined, elemType );
+
   wall_bc -> resetTriIEN_outwardnormal( IEN );
   // ----------------------------------------------------------------
 
