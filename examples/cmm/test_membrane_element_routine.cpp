@@ -292,6 +292,9 @@ int main( int argc, char * argv[] )
     u3l_yl += sol_wall_disp_l[dim*ii+2] * dR_dyl[ii];
   }
 
+  std::cout << "\n====== basis fcn gradients in lamina coords V2 ======" << std::endl;
+  std::cout << u1l_xl << " " << u1l_yl << " " << u2l_xl << " " << u2l_yl << " " << u3l_xl << " " << u3l_yl << std::endl;
+
   double Blul2 [5] = {u1l_xl, u2l_yl, u1l_yl + u2l_xl, u3l_xl, u3l_yl};
   std::cout << "\n====== Bl * ul in lamina coords V2 ======" << std::endl;
   print_2Darray(Blul2, 5, 1);
@@ -338,8 +341,10 @@ int main( int argc, char * argv[] )
     dR_dz[ii] = Q(0, 2) * dR_dxl[ii] + Q(1, 2) * dR_dyl[ii];
   }
   
-  std::cout << "\n===== Triangle6_membrane dR_dx =====" << std::endl;
+  std::cout << "\n===== Triangle6_membrane dR_dxyz =====" << std::endl;
   print_2Darray(dR_dx, nLocBas, 1);
+  print_2Darray(dR_dy, nLocBas, 1);
+  print_2Darray(dR_dz, nLocBas, 1);
 
   double lin_elasticity2 [ nLocBas * dim ] = {0.0};
   for(int A=0; A<nLocBas; ++A)
