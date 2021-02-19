@@ -10,7 +10,7 @@
 // calling H5Fopen. After the data are all read, one should call
 // H5Fclose.
 //
-// A typical usage is:
+// A typical way of using this class is:
 //
 // hid_t file_id = H5Fopen(name_of_h5_file, mode, H5P_DEFAULT)
 //

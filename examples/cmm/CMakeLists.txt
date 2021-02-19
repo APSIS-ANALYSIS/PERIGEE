@@ -154,6 +154,7 @@ ADD_EXECUTABLE( cmm_tet_3d cmm_driver.cpp)
 #ADD_EXECUTABLE( vis_p1_wss vis_p1_wss.cpp)
 
 #ADD_EXECUTABLE( test test.cpp )
+ADD_EXECUTABLE( test_sol test_sol.cpp )
 ADD_EXECUTABLE( test_element test_membrane_element_routine.cpp )
 
 TARGET_LINK_LIBRARIES( gmsh_p1_IO perigee_preprocess )
@@ -165,5 +166,6 @@ TARGET_LINK_LIBRARIES( cmm_tet_3d perigee_analysis )
 
 #TARGET_LINK_LIBRARIES( test perigee_preprocess )
 TARGET_LINK_LIBRARIES( test_element perigee_test )
+TARGET_LINK_LIBRARIES( test_sol perigee_analysis )
 
 # EOF
