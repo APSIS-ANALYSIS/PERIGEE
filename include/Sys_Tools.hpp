@@ -47,9 +47,8 @@ namespace SYS_T
   int get_genbc_file_type( const char * const &lpn_filename );
 
   // ----------------------------------------------------------------
-  // gen_partfile_name( baseName, rank )
-  // Generate a partition file's name (hdf5 file) in the default
-  // manner. It will return baseName_pxxxxx.h5.
+  // Generate a partition file's name (hdf5 file) in the default manner.
+  // It will return a std string : baseName_pxxxxx.h5.
   // ----------------------------------------------------------------
   inline std::string gen_partfile_name( const std::string &baseName, 
       const int &rank )
@@ -71,13 +70,12 @@ namespace SYS_T
   }
 
   // ----------------------------------------------------------------
-  // get_xyz_index() 
   // Assume ii = iz * dim_x * dim_y + iy * dim_x + ix
   // this function will return ix iy and iz based on the input ii, 
   // dim_x, dim_y.
   // ----------------------------------------------------------------
-  inline void get_xyz_index( const int &ii, const int &dim_x,
-      const int &dim_y, int &ix, int &iy, int &iz)
+  inline void get_xyz_index( const int &ii, const int &dim_x, const int &dim_y, 
+      int &ix, int &iy, int &iz)
   {
     const int ixy = ii % (dim_x * dim_y);
     iz = (ii - ixy) / (dim_x * dim_y);
@@ -85,7 +83,6 @@ namespace SYS_T
   }
 
   // ----------------------------------------------------------------
-  // get_xy_index()
   // Assume ii = iy * dim_x + ix;
   // this function will return ix and iy based on the input ii and dim_x.
   // ----------------------------------------------------------------
@@ -445,10 +442,13 @@ namespace SYS_T
   {
     public:
       Timer();
+      
       ~Timer();
 
       void Start();
+      
       void Stop();
+      
       void Reset();
 
       double get_sec() const;
