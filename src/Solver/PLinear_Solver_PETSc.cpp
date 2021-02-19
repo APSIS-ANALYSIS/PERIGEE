@@ -1,8 +1,7 @@
 #include "PLinear_Solver_PETSc.hpp"
 
 PLinear_Solver_PETSc::PLinear_Solver_PETSc()
-: rtol( 1.0e-5 ), atol( 1.0e-50 ), dtol( 1.0e50 ),
-  maxits(10000)
+: rtol( 1.0e-5 ), atol( 1.0e-50 ), dtol( 1.0e50 ), maxits(10000)
 {
   KSPCreate(PETSC_COMM_WORLD, &ksp);
   KSPSetTolerances(ksp, rtol, atol, dtol, maxits);
