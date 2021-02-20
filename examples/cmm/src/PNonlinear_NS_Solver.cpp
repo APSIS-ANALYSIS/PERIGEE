@@ -329,7 +329,7 @@ void PNonlinear_NS_Solver::update_wall( const double &val,
   VecGhostGetLocalForm(wall_data->solution, &lwalldata);
 
   VecGetArray(ldotstep, &array_dotstep);
-  VecGetArray(lwalldata,   &array_walldata);
+  VecGetArray(lwalldata, &array_walldata);
 
   const int nlocal = dot_step->get_nlocalnode();
   
@@ -342,7 +342,7 @@ void PNonlinear_NS_Solver::update_wall( const double &val,
 
   // Deallocation of the local copy
   VecRestoreArray(ldotstep, &array_dotstep);
-  VecRestoreArray(lwalldata,   &array_walldata);
+  VecRestoreArray(lwalldata, &array_walldata);
   VecGhostRestoreLocalForm(dot_step->solution, &ldotstep);
   VecGhostRestoreLocalForm(wall_data->solution, &lwalldata);
 
