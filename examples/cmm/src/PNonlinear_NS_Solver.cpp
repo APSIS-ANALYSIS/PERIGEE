@@ -96,10 +96,12 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   const double alpha_f = tmga_ptr->get_alpha_f();
 
   // Same-Y predictor
+  // fluid solution
   sol->Copy(*pre_sol);
   dot_sol->Copy(*pre_dot_sol);
   dot_sol->ScaleValue( (gamma-1.0)/gamma );
 
+  // wall solution
   sol_wall_disp->Copy(*pre_sol_wall_disp);
   dot_sol_wall_disp->Copy(*pre_dot_sol_wall_disp);
   dot_sol_wall_disp->ScaleValue( (gamma-1.0)/gamma );
@@ -196,22 +198,22 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
     // Update dot_sol, dot_sol_wall_disp
     dot_sol->PlusAX( dot_step, -1.0 );
-    update_wall_U( (-1.0) * alpha_f * gamma * dt / alpha_m,
+    update_wall( (-1.0) * alpha_f * gamma * dt / alpha_m,
         dot_step, dot_sol_wall_disp ); 
 
     // Update sol, sol_wall_disp
     sol->PlusAX( dot_step, (-1.0) * gamma * dt );
-    update_wall_U( (-1.0) * alpha_f * gamma * gamma * dt * dt / alpha_m,
+    update_wall( (-1.0) * alpha_f * gamma * gamma * dt * dt / alpha_m,
         dot_step, sol_wall_disp ); 
 
     // Update dol_sol at alpha_m: dot_sol_alpha, dot_wall_disp_alpha
     dot_sol_alpha.PlusAX( dot_step, (-1.0) * alpha_m );
-    update_wall_U( (-1.0) * alpha_f * gamma * dt,
+    update_wall( (-1.0) * alpha_f * gamma * dt,
         dot_step, &dot_wall_disp_alpha ); 
 
     // Update sol at alpha_f: sol_alpha, wall_disp_alpha
     sol_alpha.PlusAX( dot_step, (-1.0) * alpha_f * gamma * dt );
-    update_wall_U( (-1.0) * alpha_f * alpha_f * gamma * gamma * dt * dt / alpha_m,
+    update_wall( (-1.0) * alpha_f * alpha_f * gamma * gamma * dt * dt / alpha_m,
         dot_step, &wall_disp_alpha ); 
 
     // Assembly residual (& tangent if condition satisfied) 
@@ -305,7 +307,7 @@ void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
 }
 
 
-void PNonlinear_NS_Solver::update_wall_U( const double &val,
+void PNonlinear_NS_Solver::update_wall( const double &val,
         const PDNSolution * const &dot_step,
         PDNSolution * const &wall_U ) const
 {
