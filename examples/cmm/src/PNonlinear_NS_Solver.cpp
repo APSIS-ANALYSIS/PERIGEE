@@ -308,32 +308,27 @@ void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
 
 
 void PNonlinear_NS_Solver::update_wall( const double &val,
-        const PDNSolution * const &dot_step,
-        PDNSolution * const &wall_U ) const
+    const PDNSolution * const &dot_step,
+    PDNSolution * const &wall_data ) const
 {
   // Verify that the dof of dot_step is 4
   SYS_T::print_fatal_if(dot_step->get_dof_num() != 4,
       "Error in PNonlinear_NS_Solver::update_dot_wall_disp: incorrect dimension of dot_step. \n");
 
-  // Verify that the dof of wall_U is 3
-  SYS_T::print_fatal_if(wall_U->get_dof_num() != 3,
-      "Error in PNonlinear_NS_Solver::update_dot_wall_disp: incorrect dimension of wall_U. \n");
+  // Verify that the dof of wall_data is 3
+  SYS_T::print_fatal_if(wall_data->get_dof_num() != 3,
+      "Error in PNonlinear_NS_Solver::update_dot_wall_disp: incorrect dimension of wall_data. \n");
 
   // Verify consistency in the number of local nodes
-  SYS_T::print_fatal_if(dot_step->get_nlocal() / 4 != wall_U->get_nlocal() / 3,
-      "Error in PNonlinear_NS_Solver::update_dot_wall_disp: num local nodes mismatch between dot_step and wall_U. \n");
+  SYS_T::print_fatal_if( !is_layout_equal(*dot_step, *wall_data), "Error in PNonlinear_NS_Solver::update_dot_wall_disp: solution vector layout mismatch between dot_step and wall_data. \n");
 
-  // Verify consistency in the number of ghost nodes
-  SYS_T::print_fatal_if(dot_step->get_nghost() / 4 != wall_U->get_nghost() / 3,
-      "Error in PNonlinear_NS_Solver::update_dot_wall_disp: num ghost nodes mismatch between dot_step and wall_U. \n");
-
-  const int nlocal = dot_step->get_nlocal() / 4;
+  const int nlocal = dot_step->get_nlocalnode();
 
   Vec ldotstep, lwallU;
   double * array_dotstep, * array_wallU;
-  
+
   VecGhostGetLocalForm(dot_step->solution, &ldotstep);
-  VecGhostGetLocalForm(wall_U->solution,   &lwallU);
+  VecGhostGetLocalForm(wall_data->solution, &lwallU);
 
   VecGetArray(ldotstep, &array_dotstep);
   VecGetArray(lwallU,   &array_wallU);
@@ -344,15 +339,15 @@ void PNonlinear_NS_Solver::update_wall( const double &val,
     array_wallU[ii*3+1] += val * array_dotstep[ii*4+2];
     array_wallU[ii*3+2] += val * array_dotstep[ii*4+3];
   }
-  
+
   // Deallocation of the local copy
   VecRestoreArray(ldotstep, &array_dotstep);
   VecRestoreArray(lwallU,   &array_wallU);
   VecGhostRestoreLocalForm(dot_step->solution, &ldotstep);
-  VecGhostRestoreLocalForm(wall_U->solution,   &lwallU);
+  VecGhostRestoreLocalForm(wall_data->solution, &lwallU);
 
   // Update ghost values
-  wall_U->GhostUpdate();
+  wall_data->GhostUpdate();
 }
 
 // EOF
