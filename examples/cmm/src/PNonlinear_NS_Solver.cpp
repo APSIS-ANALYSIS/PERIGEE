@@ -322,29 +322,29 @@ void PNonlinear_NS_Solver::update_wall( const double &val,
   // Verify consistency in the number of local nodes
   SYS_T::print_fatal_if( !is_layout_equal(*dot_step, *wall_data), "Error in PNonlinear_NS_Solver::update_dot_wall_disp: solution vector layout mismatch between dot_step and wall_data. \n");
 
-  const int nlocal = dot_step->get_nlocalnode();
-
-  Vec ldotstep, lwallU;
-  double * array_dotstep, * array_wallU;
+  Vec ldotstep, lwalldata;
+  double * array_dotstep, * array_walldata;
 
   VecGhostGetLocalForm(dot_step->solution, &ldotstep);
-  VecGhostGetLocalForm(wall_data->solution, &lwallU);
+  VecGhostGetLocalForm(wall_data->solution, &lwalldata);
 
   VecGetArray(ldotstep, &array_dotstep);
-  VecGetArray(lwallU,   &array_wallU);
+  VecGetArray(lwalldata,   &array_walldata);
 
+  const int nlocal = dot_step->get_nlocalnode();
+  
   for(int ii=0; ii<nlocal; ++ii)
   {
-    array_wallU[ii*3]   += val * array_dotstep[ii*4+1];
-    array_wallU[ii*3+1] += val * array_dotstep[ii*4+2];
-    array_wallU[ii*3+2] += val * array_dotstep[ii*4+3];
+    array_walldata[ii*3]   += val * array_dotstep[ii*4+1];
+    array_walldata[ii*3+1] += val * array_dotstep[ii*4+2];
+    array_walldata[ii*3+2] += val * array_dotstep[ii*4+3];
   }
 
   // Deallocation of the local copy
   VecRestoreArray(ldotstep, &array_dotstep);
-  VecRestoreArray(lwallU,   &array_wallU);
+  VecRestoreArray(lwalldata,   &array_walldata);
   VecGhostRestoreLocalForm(dot_step->solution, &ldotstep);
-  VecGhostRestoreLocalForm(wall_data->solution, &lwallU);
+  VecGhostRestoreLocalForm(wall_data->solution, &lwalldata);
 
   // Update ghost values
   wall_data->GhostUpdate();
