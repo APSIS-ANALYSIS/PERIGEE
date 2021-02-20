@@ -128,6 +128,7 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
         der_Pim_data[counter].clear();
       }
       
+      sstrm.clear();
       counter += 1;
     }
   }
