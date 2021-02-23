@@ -1,9 +1,9 @@
-#ifndef PTIME_NS_SOLVER_HPP
-#define PTIME_NS_SOLVER_HPP
+#ifndef PTIME_CMM_SOLVER_HPP
+#define PTIME_CMM_SOLVER_HPP
 // ==================================================================
-// PTime_NS_Solver.hpp
+// PTime_CMM_Solver.hpp
 //
-// Parallel time solver for NS.
+// Parallel time solver for CMM.
 //
 // Author: Ju Liu
 // Date: May 23 2017
@@ -11,19 +11,19 @@
 #include "PDNTimeStep.hpp"
 #include "PNonlinear_CMM_Solver.hpp"
 
-class PTime_NS_Solver
+class PTime_CMM_Solver
 {
   public:
-    PTime_NS_Solver( const std::string &input_name, 
+    PTime_CMM_Solver( const std::string &input_name, 
         const int &input_record_freq, const int &input_renew_tang_freq, 
         const double &input_final_time );
 
-    ~PTime_NS_Solver();
+    ~PTime_CMM_Solver();
 
     void print_info() const;
 
     // **** PRESTRESS TODO: additional arg ALocal_Wall_Prestress
-    void TM_NS_GenAlpha(
+    void TM_CMM_GenAlpha(
         const bool &restart_init_assembly_flag,
         const PDNSolution * const &sol_base,
         const PDNSolution * const &init_dot_sol,

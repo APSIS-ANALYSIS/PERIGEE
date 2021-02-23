@@ -1,16 +1,16 @@
-#include "PTime_NS_Solver.hpp"
+#include "PTime_CMM_Solver.hpp"
 
-PTime_NS_Solver::PTime_NS_Solver(
+PTime_CMM_Solver::PTime_CMM_Solver(
     const std::string &input_name, const int &input_record_freq,
     const int &input_renew_tang_freq, const double &input_final_time )
 : final_time(input_final_time), sol_record_freq(input_record_freq),
   renew_tang_freq(input_renew_tang_freq), pb_name(input_name)
 {}
 
-PTime_NS_Solver::~PTime_NS_Solver()
+PTime_CMM_Solver::~PTime_CMM_Solver()
 {}
 
-std::string PTime_NS_Solver::Name_Generator(const int &counter,
+std::string PTime_CMM_Solver::Name_Generator(const int &counter,
     const std::string &prefix ) const
 {
   int aux = 900000000 + counter;
@@ -21,7 +21,7 @@ std::string PTime_NS_Solver::Name_Generator(const int &counter,
   return out_name;
 }
 
-std::string PTime_NS_Solver::Name_dot_Generator(const int &counter,
+std::string PTime_CMM_Solver::Name_dot_Generator(const int &counter,
     const std::string &prefix ) const
 {
   int aux = 900000000 + counter;
@@ -32,7 +32,7 @@ std::string PTime_NS_Solver::Name_dot_Generator(const int &counter,
   return out_name;
 }
 
-void PTime_NS_Solver::print_info() const
+void PTime_CMM_Solver::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
   SYS_T::commPrint("Time stepping solver setted up:\n");
@@ -43,7 +43,7 @@ void PTime_NS_Solver::print_info() const
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
-void PTime_NS_Solver::Write_restart_file(const PDNTimeStep * const &timeinfo,
+void PTime_CMM_Solver::Write_restart_file(const PDNTimeStep * const &timeinfo,
     const std::string &solname ) const
 {
   std::ofstream restart_file("restart_file.txt", std::ofstream::out | std::ofstream::trunc);
@@ -59,7 +59,7 @@ void PTime_NS_Solver::Write_restart_file(const PDNTimeStep * const &timeinfo,
     SYS_T::print_fatal("Error: PTimeSolver cannot open restart_file.txt");
 }
 
-void PTime_NS_Solver::TM_NS_GenAlpha( 
+void PTime_CMM_Solver::TM_CMM_GenAlpha( 
     const bool &restart_init_assembly_flag,
     const PDNSolution * const &sol_base,
     const PDNSolution * const &init_dot_sol,

@@ -26,7 +26,7 @@
 #include "GenBC_Inductance.hpp"
 #include "PLocAssem_Tet_CMM_GenAlpha.hpp"
 #include "PGAssem_Tet_CMM_GenAlpha.hpp"
-#include "PTime_NS_Solver.hpp"
+#include "PTime_CMM_Solver.hpp"
 
 int main( int argc, char *argv[] )
 {
@@ -463,7 +463,7 @@ int main( int argc, char *argv[] )
   // ===== Temporal solver context =====
   // **** PRESTRESS TODO: pass in ALocal_Wall_Prestress
   // **** need a separate tsolver initialized for prestressing?
-  PTime_NS_Solver * tsolver = new PTime_NS_Solver( sol_bName,
+  PTime_CMM_Solver * tsolver = new PTime_CMM_Solver( sol_bName,
       sol_record_freq, ttan_renew_freq, final_time );
 
   tsolver->print_info();
@@ -541,7 +541,7 @@ int main( int argc, char *argv[] )
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-  tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol, dot_sol_wall_disp, sol_wall_disp,
+  tsolver->TM_CMM_GenAlpha(is_restart, base, dot_sol, sol, dot_sol_wall_disp, sol_wall_disp,
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN, pNode, fNode,
       locnbc, locinfnbc, locebc, locebc_wall, gbc, pmat, elementv, elements, elementw,
       quadv, quads, locAssem_ptr, gloAssem_ptr, lsolver, nsolver);

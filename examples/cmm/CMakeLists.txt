@@ -101,7 +101,7 @@ SET( perigee_analysis_lib_src
   ${perigee_SOURCE_DIR}/src/PDNSolution_NS.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_Wall_Disp.cpp
   ${perigee_SOURCE_DIR}/src/PNonlinear_CMM_Solver.cpp
-  ${perigee_SOURCE_DIR}/src/PTime_NS_Solver.cpp
+  ${perigee_SOURCE_DIR}/src/PTime_CMM_Solver.cpp
 )
 
 SET( perigee_postprocess_lib_src
