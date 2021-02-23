@@ -1,7 +1,7 @@
-#ifndef VTK_WRITER_NS_HPP
-#define VTK_WRITER_NS_HPP
+#ifndef VTK_WRITER_CMM_HPP
+#define VTK_WRITER_CMM_HPP
 // ==================================================================
-// VTK_Writer_NS.hpp
+// VTK_Writer_CMM.hpp
 // 
 // This is a class that specifically designed for the visualization
 // for fluid mechanics. 
@@ -17,13 +17,13 @@
 
 #include "vtkIntArray.h"
 
-class VTK_Writer_NS
+class VTK_Writer_CMM
 {
   public:
-    VTK_Writer_NS( const int &in_nelem, const int &in_nlocbas, 
+    VTK_Writer_CMM( const int &in_nelem, const int &in_nlocbas, 
         const std::string &epart_file );
 
-    ~VTK_Writer_NS();
+    ~VTK_Writer_CMM();
     
     void writeOutput(
         const FEANode * const &fnode_ptr,

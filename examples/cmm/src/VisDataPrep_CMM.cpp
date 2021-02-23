@@ -1,6 +1,6 @@
-#include "VisDataPrep_NS.hpp"
+#include "VisDataPrep_CMM.hpp"
 
-VisDataPrep_NS::VisDataPrep_NS()
+VisDataPrep_CMM::VisDataPrep_CMM()
 {
   // Data to be written
   arrayCompSize = 3;
@@ -19,10 +19,10 @@ VisDataPrep_NS::VisDataPrep_NS()
   pt_array_len.push_back(3);
 }
 
-VisDataPrep_NS::~VisDataPrep_NS()
+VisDataPrep_CMM::~VisDataPrep_CMM()
 {}
 
-void VisDataPrep_NS::get_pointArray(
+void VisDataPrep_CMM::get_pointArray(
     const std::vector<std::string> solution_file_names,
     const std::string analysis_node_mapping_file,
     const std::string post_node_mapping_file,

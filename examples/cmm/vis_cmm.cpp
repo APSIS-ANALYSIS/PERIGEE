@@ -12,8 +12,8 @@
 #include "QuadPts_vis_tet10_v2.hpp"
 #include "FEAElement_Tet4.hpp"
 #include "FEAElement_Tet10_v2.hpp"
-#include "VisDataPrep_NS.hpp"
-#include "VTK_Writer_NS.hpp"
+#include "VisDataPrep_CMM.hpp"
+#include "VTK_Writer_CMM.hpp"
 
 int main( int argc, char * argv[] )
 {
@@ -112,7 +112,7 @@ int main( int argc, char * argv[] )
   quad -> print_info();
 
   // Create the visualization data object
-  IVisDataPrep * visprep = new VisDataPrep_NS();
+  IVisDataPrep * visprep = new VisDataPrep_CMM();
 
   visprep->print_info();
  
@@ -122,7 +122,7 @@ int main( int argc, char * argv[] )
     solArrays[ii] = new double [pNode->get_nlocghonode() * visprep->get_ptarray_comp_length(ii)];
 
   // VTK writer 
-  VTK_Writer_NS * vtk_w = new VTK_Writer_NS( GMIptr->get_nElem(), 
+  VTK_Writer_CMM * vtk_w = new VTK_Writer_CMM( GMIptr->get_nElem(), 
       GMIptr->get_nLocBas(), element_part_file );
 
   std::ostringstream time_index;

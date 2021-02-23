@@ -1,6 +1,6 @@
-#include "VTK_Writer_NS.hpp"
+#include "VTK_Writer_CMM.hpp"
 
-VTK_Writer_NS::VTK_Writer_NS( const int &in_nelem,
+VTK_Writer_CMM::VTK_Writer_CMM( const int &in_nelem,
     const int &in_nlocbas, const std::string &epart_file )
 : nLocBas( in_nlocbas ), nElem( in_nelem ), 
   intep( nLocBas, true )
@@ -14,7 +14,7 @@ VTK_Writer_NS::VTK_Writer_NS( const int &in_nelem,
 }
 
 
-VTK_Writer_NS::~VTK_Writer_NS()
+VTK_Writer_CMM::~VTK_Writer_CMM()
 {
   VEC_T::clean( epart_map );
   VEC_T::clean( ectrl_x );
@@ -23,7 +23,7 @@ VTK_Writer_NS::~VTK_Writer_NS()
 }
 
 
-void VTK_Writer_NS::writeOutput(
+void VTK_Writer_CMM::writeOutput(
     const FEANode * const &fnode_ptr,
     const ALocal_IEN * const &lien_ptr,
     const ALocal_Elem * const &lelem_ptr,

@@ -1,7 +1,7 @@
-#ifndef VISDATAPREP_NS_HPP
-#define VISDATAPREP_NS_HPP
+#ifndef VISDATAPREP_CMM_HPP
+#define VISDATAPREP_CMM_HPP
 // ==================================================================
-// VisDataPrep_NS.hpp
+// VisDataPrep_CMM.hpp
 //
 // This is the data preparation for visualizing NS problems.
 //
@@ -10,12 +10,12 @@
 // ==================================================================
 #include "IVisDataPrep.hpp"
 
-class VisDataPrep_NS : public IVisDataPrep
+class VisDataPrep_CMM : public IVisDataPrep
 {
   public:
-    VisDataPrep_NS();
+    VisDataPrep_CMM();
 
-    virtual ~VisDataPrep_NS();
+    virtual ~VisDataPrep_CMM();
 
     // Return the number of physical fields to be read from solution
     // vector
