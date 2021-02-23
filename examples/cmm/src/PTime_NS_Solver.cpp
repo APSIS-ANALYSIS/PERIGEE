@@ -10,18 +10,21 @@ PTime_NS_Solver::PTime_NS_Solver(
 PTime_NS_Solver::~PTime_NS_Solver()
 {}
 
-std::string PTime_NS_Solver::Name_Generator(const int &counter) const
+std::string PTime_NS_Solver::Name_Generator(const int &counter,
+    const std::string &prefix ) const
 {
   int aux = 900000000 + counter;
   std::ostringstream temp;
   temp<<aux;
 
   std::string out_name(pb_name);
+  out_name.append(prefix);
   out_name.append(temp.str());
   return out_name;
 }
 
-std::string PTime_NS_Solver::Name_dot_Generator(const int &counter) const
+std::string PTime_NS_Solver::Name_dot_Generator(const int &counter,
+    const std::string &prefix ) const
 {
   int aux = 900000000 + counter;
   std::ostringstream temp;
@@ -29,6 +32,7 @@ std::string PTime_NS_Solver::Name_dot_Generator(const int &counter) const
 
   std::string out_name("dot_");
   out_name.append(pb_name);
+  out_name.append(prefix);
   out_name.append(temp.str());
   return out_name;
 }
@@ -104,16 +108,25 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
 
   std::string sol_name ("");
   std::string sol_dot_name ("");
+  std::string sol_wall_disp_name ("");
+  std::string sol_dot_wall_disp_name ("");
 
-  // **** TODO: wall disp I/O from solution binaries ****
   // If this is a restart run, do not re-write the solution binaries
   if(restart_init_assembly_flag == false)
   {
+    // Write (dot) pres, (dot) velo
     sol_name = Name_Generator(time_info->get_index());
     cur_sol->WriteBinary(sol_name.c_str());
     
     sol_dot_name = Name_dot_Generator(time_info->get_index());
     cur_dot_sol->WriteBinary(sol_dot_name.c_str());
+
+    // Write (dot) wall disp
+    sol_wall_disp_name = Name_Generator(time_info->get_index(), "disp_");
+    cur_sol_wall_disp->WriteBinary(sol_wall_disp_name.c_str());
+
+    sol_dot_wall_disp_name = Name_dot_Generator(time_info->get_index(), "disp_");
+    cur_dot_sol_wall_disp->WriteBinary(sol_dot_wall_disp_name.c_str());
   }
 
   bool conv_flag, renew_flag;
@@ -155,15 +168,22 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
         time_info->get_time(), time_info->get_step(), time_info->get_index(),
         SYS_T::get_time().c_str());
 
-    // **** TODO: wall disp I/O from solution binaries ****
     // Record solution if meets criteria
     if( time_info->get_index()%sol_record_freq == 0 )
     {
+      // Write (dot) pres, (dot) velo
       sol_name = Name_Generator( time_info->get_index() );
       cur_sol->WriteBinary(sol_name.c_str());
 
       sol_dot_name = Name_dot_Generator(time_info->get_index());
       cur_dot_sol->WriteBinary(sol_dot_name.c_str());
+
+      // Write (dot) wall disp
+      sol_wall_disp_name = Name_Generator(time_info->get_index(), "disp_");
+      cur_sol_wall_disp->WriteBinary(sol_wall_disp_name.c_str());
+
+      sol_dot_wall_disp_name = Name_dot_Generator(time_info->get_index(), "disp_");
+      cur_dot_sol_wall_disp->WriteBinary(sol_dot_wall_disp_name.c_str());
     }
 
     // Calculate the flow rate & averaged pressure on all outlets
