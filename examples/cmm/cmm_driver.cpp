@@ -455,7 +455,7 @@ int main( int argc, char *argv[] )
   // ===== Nonlinear solver context =====
   // **** PRESTRESS TODO: pass in prestress_flag, ALocal_Wall_Prestress
   // **** Should prestress flag only be allowed true if !is_restart ?
-  PNonlinear_NS_Solver * nsolver = new PNonlinear_NS_Solver( pNode, fNode,
+  PNonlinear_CMM_Solver * nsolver = new PNonlinear_CMM_Solver( pNode, fNode,
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
   nsolver->print_info();

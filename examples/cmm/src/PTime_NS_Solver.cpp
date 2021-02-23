@@ -87,7 +87,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     IPLocAssem * const &lassem_fluid_ptr,
     IPGAssem * const &gassem_ptr,
     PLinear_Solver_PETSc * const &lsolver_ptr,
-    PNonlinear_NS_Solver * const &nsolver_ptr ) const
+    PNonlinear_CMM_Solver * const &nsolver_ptr ) const
 {
   // Pres & velo
   PDNSolution * pre_sol = new PDNSolution(*init_sol);
@@ -148,7 +148,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     if( nl_counter == 1 ) renew_flag = false;
 
     // Call the nonlinear equation solver
-    nsolver_ptr->GenAlpha_Solve_NS( renew_flag, 
+    nsolver_ptr->GenAlpha_Solve_CMM( renew_flag, 
         time_info->get_time(), time_info->get_step(), 
         sol_base, pre_dot_sol, pre_sol, pre_dot_sol_wall_disp, pre_sol_wall_disp,
         tmga_ptr, flr_ptr, alelem_ptr, lien_ptr, anode_ptr, feanode_ptr, nbc_part, infnbc_part,

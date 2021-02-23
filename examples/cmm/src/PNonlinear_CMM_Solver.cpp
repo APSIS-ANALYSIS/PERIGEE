@@ -1,6 +1,6 @@
-#include "PNonlinear_NS_Solver.hpp"
+#include "PNonlinear_CMM_Solver.hpp"
 
-PNonlinear_NS_Solver::PNonlinear_NS_Solver(
+PNonlinear_CMM_Solver::PNonlinear_CMM_Solver(
     const APart_Node * const &anode_ptr,
     const FEANode * const &feanode_ptr,
     const double &input_nrtol, const double &input_natol,
@@ -18,13 +18,13 @@ PNonlinear_NS_Solver::PNonlinear_NS_Solver(
 }
 
 
-PNonlinear_NS_Solver::~PNonlinear_NS_Solver()
+PNonlinear_CMM_Solver::~PNonlinear_CMM_Solver()
 {
   delete dot_step; dot_step = nullptr;
 }
 
 
-void PNonlinear_NS_Solver::print_info() const
+void PNonlinear_CMM_Solver::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
   SYS_T::commPrint("Nonlinear solver setted up:\n");
@@ -38,7 +38,7 @@ void PNonlinear_NS_Solver::print_info() const
 }
 
 
-void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
+void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
     const bool &new_tangent_flag,
     const double &curr_time,
     const double &dt,
@@ -274,7 +274,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 }
 
 
-void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
+void PNonlinear_CMM_Solver::rescale_inflow_value( const double &stime,
     const ALocal_Inflow_NodalBC * const &infbc,
     const ICVFlowRate * const &flrate,
     const PDNSolution * const &sol_base,
@@ -307,20 +307,20 @@ void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
 }
 
 
-void PNonlinear_NS_Solver::update_wall( const double &val,
+void PNonlinear_CMM_Solver::update_wall( const double &val,
     const PDNSolution * const &dot_step,
     PDNSolution * const &wall_data ) const
 {
   // Verify that the dof of dot_step is 4
   SYS_T::print_fatal_if(dot_step->get_dof_num() != 4,
-      "Error in PNonlinear_NS_Solver::update_dot_wall_disp: incorrect dimension of dot_step. \n");
+      "Error in PNonlinear_CMM_Solver::update_dot_wall_disp: incorrect dimension of dot_step. \n");
 
   // Verify that the dof of wall_data is 3
   SYS_T::print_fatal_if(wall_data->get_dof_num() != 3,
-      "Error in PNonlinear_NS_Solver::update_dot_wall_disp: incorrect dimension of wall_data. \n");
+      "Error in PNonlinear_CMM_Solver::update_dot_wall_disp: incorrect dimension of wall_data. \n");
 
   // Verify consistency in the number of local nodes
-  SYS_T::print_fatal_if( !is_layout_equal(*dot_step, *wall_data), "Error in PNonlinear_NS_Solver::update_dot_wall_disp: solution vector layout mismatch between dot_step and wall_data. \n");
+  SYS_T::print_fatal_if( !is_layout_equal(*dot_step, *wall_data), "Error in PNonlinear_CMM_Solver::update_dot_wall_disp: solution vector layout mismatch between dot_step and wall_data. \n");
 
   Vec ldotstep, lwalldata;
   double * array_dotstep, * array_walldata;

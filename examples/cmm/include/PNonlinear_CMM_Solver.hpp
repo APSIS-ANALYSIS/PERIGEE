@@ -1,7 +1,7 @@
-#ifndef PNONLINEAR_NS_SOLVER_HPP
-#define PNONLINEAR_NS_SOLVER_HPP
+#ifndef PNONLINEAR_CMM_SOLVER_HPP
+#define PNONLINEAR_CMM_SOLVER_HPP
 // ==================================================================
-// PNonlinear_NS_Solver.hpp
+// PNonlinear_CMM_Solver.hpp
 // 
 // Parallel nonlinear solver for Navier-Stokes equations. 
 //
@@ -16,31 +16,29 @@
 #include "PDNSolution_NS.hpp"
 #include "PDNSolution_Wall_Disp.hpp"
 
-class PNonlinear_NS_Solver
+class PNonlinear_CMM_Solver
 {
   public:
-    PNonlinear_NS_Solver( const APart_Node * const &anode_ptr,
+    PNonlinear_CMM_Solver( const APart_Node * const &anode_ptr,
         const FEANode * const &feanode_ptr,
         const double &input_nrtol, const double &input_natol, 
         const double &input_ndtol, const int &input_max_iteration, 
         const int &input_renew_freq, 
         const int &input_renew_threshold = 4 );
 
-    ~PNonlinear_NS_Solver();
+    ~PNonlinear_CMM_Solver();
 
     int get_non_max_its() const {return nmaxits;}
 
     void print_info() const;
 
     // --------------------------------------------------------------
-    // GenAlpha_Solve_NS:
-    // This is a solver for fluid dynamics.
-    //
-    // This solver solves the Navier-Stokes using 2nd-order Generalized
+    // GenAlpha_Solve_CMM:
+    // This is a solver for CMM-FSI using the 2nd-order Generalized.
     // alpha method.
     // --------------------------------------------------------------
     // **** PRESTRESS TODO: additional args prestress_flag, ALocal_Wall_Prestress
-    void GenAlpha_Solve_NS(
+    void GenAlpha_Solve_CMM(
         const bool &new_tangent_flag,
         const double &curr_time,
         const double &dt,
