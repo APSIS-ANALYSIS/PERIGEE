@@ -339,28 +339,41 @@ int main( int argc, char *argv[] )
   
   PDNSolution * dot_sol_wall_disp = new PDNSolution_Wall_Disp( pNode, fNode, 0 );
 
-  // **** TODO: wall disp I/O from solution binaries ****
   if( is_restart )
   {
     initial_index = restart_index;
     initial_time  = restart_time;
     initial_step  = restart_step;
 
-    // Read sol file
+    // Read in pres, velo
     SYS_T::file_check(restart_name.c_str());
     sol->ReadBinary(restart_name.c_str());
 
-    // generate the corresponding dot_sol file name 
-    std::string restart_dot_name = "dot_";
-    restart_dot_name.append(restart_name);
-
-    // Read dot_sol file
+    // Read in dot pres, dot velo
+    std::string restart_dot_name = "dot_" + restart_name;
     SYS_T::file_check(restart_dot_name.c_str());
     dot_sol->ReadBinary(restart_dot_name.c_str());
+
+    // Read in wall disp: may not exist if restart from rigid soln
+    std::string restart_disp_name = restart_name + "_disp";
+    std::string restart_dot_disp_name = "dot_" + restart_name + "_disp";
+    if( SYS_T::file_exist( restart_disp_name ) )
+    {
+      sol_wall_disp->ReadBinary(restart_disp_name.c_str());
+
+      // Read in dot wall disp if wall disp exists
+      SYS_T::file_check(restart_dot_disp_name.c_str());
+      dot_sol_wall_disp->ReadBinary(restart_dot_disp_name.c_str());
+    }
 
     SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
     SYS_T::commPrint("     restart_name: %s \n", restart_name.c_str());
     SYS_T::commPrint("     restart_dot_name: %s \n", restart_dot_name.c_str());
+    if( SYS_T::file_exist( restart_disp_name ) )
+    {
+      SYS_T::commPrint("     restart_disp_name: %s \n", restart_disp_name.c_str());
+      SYS_T::commPrint("     restart_dot_disp_name: %s \n", restart_dot_disp_name.c_str());
+    }
     SYS_T::commPrint("     restart_time: %e \n", restart_time);
     SYS_T::commPrint("     restart_index: %d \n", restart_index);
     SYS_T::commPrint("     restart_step: %e \n", restart_step);
