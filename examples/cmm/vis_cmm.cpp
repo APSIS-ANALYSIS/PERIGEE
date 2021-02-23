@@ -21,7 +21,6 @@ int main( int argc, char * argv[] )
   const std::string anode_mapping_file = "node_mapping.h5";
   const std::string pnode_mapping_file = "post_node_mapping.h5";
   const std::string part_file="postpart";
-  const int dof = 4;
   
   std::string sol_bname("SOL_");
   std::string out_bname = sol_bname;
@@ -130,22 +129,25 @@ int main( int argc, char * argv[] )
 
   for(int time = time_start; time<=time_end; time+= time_step)
   {
-    std::string name_to_read(sol_bname);
-    std::string name_to_write(out_bname);
     time_index.str("");
     time_index<< 900000000 + time;
-    name_to_read.append(time_index.str());
-    name_to_write.append(time_index.str());
+    std::string name_in_sol = sol_bname + time_index.str();
+    std::string name_in_sol_disp = sol_bname + "disp_" + time_index.str();
+    std::string name_out = sol_bname + time_index.str();
 
-    SYS_T::commPrint("Time %d: Read %s and Write %s \n",
-        time, name_to_read.c_str(), name_to_write.c_str() );
+    std::vector<std::string> names_in; names_in.clear();
+    names_in.push_back(name_in_sol);
+    names_in.push_back(name_in_sol_disp);
 
-    visprep->get_pointArray(name_to_read, anode_mapping_file, pnode_mapping_file,
-        pNode, GMIptr, dof, solArrays);
+    SYS_T::commPrint("Time %d: Read %s and %s; Write %s \n",
+        time, name_in_sol.c_str(), name_in_sol_disp.c_str(), name_out.c_str() );
+
+    visprep->get_pointArray(names_in, anode_mapping_file, pnode_mapping_file,
+        pNode, GMIptr->get_nFunc(), solArrays);
 
     vtk_w->writeOutput( fNode, locIEN, locElem,
         visprep, element, quad, solArrays,
-        rank, size, time * dt, sol_bname, out_bname, name_to_write, isXML );
+        rank, size, time * dt, sol_bname, out_bname, name_out, isXML );
   }
 
   MPI_Barrier(PETSC_COMM_WORLD);

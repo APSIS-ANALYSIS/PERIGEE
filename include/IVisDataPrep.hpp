@@ -157,7 +157,7 @@ class IVisDataPrep
       PetscPrintf(PETSC_COMM_WORLD, "-- %d set(s) data to be read, with length: \n", 
           get_ptarray_size());
       for(int ii=0; ii<get_ptarray_size(); ++ii)
-        PetscPrintf(PETSC_COMM_WORLD, "--- %dth : length %d \n", 
+        PetscPrintf(PETSC_COMM_WORLD, "--- Entry %d : length %d \n", 
             ii, get_ptarray_comp_length(ii));
       PetscPrintf(PETSC_COMM_WORLD, "======================================= \n");
     }
