@@ -30,6 +30,10 @@ void VisDataPrep_CMM::get_pointArray(
     const int &in_nfunc,
     double ** &solArrays ) const
 {
+  // Check that solution_file_names contains both pres/velo & disp inputs 
+  if(solution_file_names.size() != 2)
+    SYS_T::print_fatal("VisDataPrep_CMM Error: solution_file_names.size() != 2. \n");
+
   // pres, velo
   PostVectSolution pvsolu(solution_file_names[0], analysis_node_mapping_file,
       post_node_mapping_file, nNode_ptr, in_nfunc, 4);
@@ -54,7 +58,8 @@ void VisDataPrep_CMM::get_pointArray(
   }
 
   // Check to make sure that ptarray_size gives correct output  
-  if(get_ptarray_size() != 3) SYS_T::print_fatal("Error: get_ptarray_size != 3. \n");
+  if(get_ptarray_size() != 3)
+    SYS_T::print_fatal("VisDataPrep_CMM Error: get_ptarray_size != 3. \n");
 }
 
 // EOF
