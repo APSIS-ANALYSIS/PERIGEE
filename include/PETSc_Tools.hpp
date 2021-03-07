@@ -24,6 +24,17 @@ namespace PETSc_T
   inline void print( const Vec &vv )
   {VecView(vv, PETSC_VIEWER_STDOUT_WORLD);}
 
+  // Save the vector to a file
+  inline void write_to_file( const Vec &vv, const std::string &filename ) 
+  { 
+    PetscViewer viewer = PETSC_VIEWER_STDOUT_WORLD; 
+    PetscViewerSetType(viewer, PETSCVIEWERASCII); 
+    PetscViewerFileSetMode(viewer, FILE_MODE_WRITE); 
+    PetscViewerFileSetName(viewer, filename.c_str()); 
+    PetscViewerPushFormat(viewer, PETSC_VIEWER_ASCII_MATLAB); 
+    VecView(vv, viewer); 
+  } 
+
   // Print the index set
   inline void print( const IS &is )
   {ISView(is, PETSC_VIEWER_STDOUT_WORLD);}
