@@ -124,6 +124,10 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
   wall_disp_alpha.ScaleValue( 1.0 - alpha_f );
   wall_disp_alpha.PlusAX( *sol_wall_disp, alpha_f );
 
+  // Compute kinematic residual = dot_wall_disp_alpha - velo_alpha
+  PDNSolution G_kinematic(dot_wall_disp_alpha);
+  update_wall(-1.0, &sol_alpha, &G_kinematic, ebc_wall_part);
+
   // ------------------------------------------------- 
   // Update the inflow boundary values
   rescale_inflow_value(curr_time+dt, infnbc_part, flr_ptr, sol_base, sol);
@@ -200,21 +204,29 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
     dot_sol->PlusAX( dot_step, -1.0 );
     update_wall( (-1.0) * alpha_f * gamma * dt / alpha_m,
         dot_step, dot_sol_wall_disp, ebc_wall_part ); 
+    dot_sol_wall_disp->PlusAX(G_kinematic, (-1.0) / alpha_m );
 
     // Update sol, sol_wall_disp
     sol->PlusAX( dot_step, (-1.0) * gamma * dt );
     update_wall( (-1.0) * alpha_f * gamma * gamma * dt * dt / alpha_m,
         dot_step, sol_wall_disp, ebc_wall_part ); 
+    sol_wall_disp->PlusAX(G_kinematic, (-1.0) * gamma * dt / alpha_m );
 
     // Update dol_sol at alpha_m: dot_sol_alpha, dot_wall_disp_alpha
     dot_sol_alpha.PlusAX( dot_step, (-1.0) * alpha_m );
     update_wall( (-1.0) * alpha_f * gamma * dt,
         dot_step, &dot_wall_disp_alpha, ebc_wall_part ); 
+    dot_wall_disp_alpha.PlusAX(G_kinematic, -1.0 );
 
     // Update sol at alpha_f: sol_alpha, wall_disp_alpha
     sol_alpha.PlusAX( dot_step, (-1.0) * alpha_f * gamma * dt );
     update_wall( (-1.0) * alpha_f * alpha_f * gamma * gamma * dt * dt / alpha_m,
         dot_step, &wall_disp_alpha, ebc_wall_part ); 
+    wall_disp_alpha.PlusAX(G_kinematic, (-1.0) * alpha_f * gamma * dt / alpha_m );
+
+    // Update kinematic residual = dot_wall_disp_alpha - velo_alpha
+    G_kinematic.Copy(dot_wall_disp_alpha);
+    update_wall(-1.0, &sol_alpha, &G_kinematic, ebc_wall_part);
 
     // Assembly residual (& tangent if condition satisfied) 
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )
@@ -258,6 +270,11 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
     VecNorm(gassem_ptr->G, NORM_2, &residual_norm);
     
     SYS_T::commPrint("  --- nl_res: %e \n", residual_norm);
+
+    // DEBUGGING ISL 3/6/2021
+    double kinematic_residual_norm = 0.0;
+    VecNorm(G_kinematic.solution, NORM_2, &kinematic_residual_norm);
+    SYS_T::commPrint("  --- kinematic_res: %e \n", kinematic_residual_norm);
 
     relative_error = residual_norm / initial_norm;
 
