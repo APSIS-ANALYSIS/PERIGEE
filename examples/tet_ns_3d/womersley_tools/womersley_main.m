@@ -37,12 +37,7 @@ flow = [ 33.42, 56.19, 73.697, 96.721, 139.85, 164.46, 177.44, 196.25, ...
 % Plot velocity profiles over time down the length of the tube
 z_steps = 4;        % num intervals in [0, first wavelength]
 t_steps = 4;        % num intervals in [0, T]
-plot_fluid_velo(mu, rho, R, c_n, B_n, Q_n, G_n, T, n_modes, z_steps, t_steps)
+plot_fluid_velo(mu, rho, R, c_n, B_n, Q_n, G_n, T, n_modes, z_steps, t_steps);
 
-
-% % Compute corresponding Fourier coefficients for pressure
-% A_n = fourier_modes_Q2p(B_n, rho, mu, omega, R, n_modes);
-% 
-% % Compute wall shear stress
-% wss = womersley_wss(A_n, nu, T, R, n_modes);
-% tawss = mean(wss);
+% Plot wall displacement over time down the length of the tube
+plot_wall_disp(rho, R, c_n, g_n, B_n, G_n, T, n_modes, t_steps);
