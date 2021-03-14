@@ -1,6 +1,6 @@
 #ifndef GENBC_CORONARY_HPP
 #define GENBC_CORONARY_HPP
-// ==================================================================
+// ============================================================================
 // GenBC_Coronary.hpp
 // This class is used to provide outflow boundary conditions for an
 // open loop coronary lumped parameter model (LPM). The RCR model is also
@@ -41,15 +41,14 @@
 //
 // <outlet_id> <Rp> <C> <Rd> <C> <Rd> <Pd> 0 1.0
 //
-// ==================================================================
+// ============================================================================
 #include "IGenBC.hpp"
 #include "GenBC_Tools.hpp"
 
 class GenBC_Coronary : public IGenBC
 {
   public:
-    GenBC_Coronary( const char * const &lpn_filename, const int &in_N,
-       const double &dt3d );
+    GenBC_Coronary( const char * const &lpn_filename, const int &in_N, const double &dt3d );
 
     virtual ~GenBC_Coronary();
 
@@ -57,15 +56,13 @@ class GenBC_Coronary : public IGenBC
 
     virtual int get_num_ebc() const { return num_ebc; }
 
-    virtual double get_m( const int &ii, const double &in_dot_Q, 
-        const double &in_Q ) const ;
+    virtual double get_m( const int &ii, const double &in_dot_Q, const double &in_Q ) const;
 
-    virtual double get_n( const int &ii, const double &in_dot_Q,
-       const double &in_Q ) const { return 0.0; }
+    virtual double get_n( const int &ii, const double &in_dot_Q, const double &in_Q ) const 
+    { return 0.0; }
 
     // Obtain P for the ii-th outlet surface (coronary or RCR).
-    virtual double get_P( const int &ii, const double &in_dot_Q,
-       const double &in_Q ) const;
+    virtual double get_P( const int &ii, const double &in_dot_Q, const double &in_Q ) const;
 
     // Get initial P for the ii-th outlet face at the begining of 
     // LPM ODE integration.

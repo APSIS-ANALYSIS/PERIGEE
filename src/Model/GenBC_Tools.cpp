@@ -124,9 +124,9 @@ void GENBC_T::set_pchip( const int &np, const std::vector<double> &xp,
         ierr = ierr + 1;
         dsave = del2;
       }
-      // Count number of changes in direction of monotonicity.
       else if( temp == 0.0 )
       {
+        // Count number of changes in direction of monotonicity.
         if ( del2 != 0.0 )
         {
           if ( sign_test ( dsave, del2 ) < 0.0 ) ierr = ierr + 1;
@@ -134,9 +134,9 @@ void GENBC_T::set_pchip( const int &np, const std::vector<double> &xp,
           dsave = del2;
         }
       }
-      //  Use Brodlie modification of Butland formula.
       else
       {
+        // Use Brodlie modification of Butland formula.
         hsumt3 = 3.0 * hsum;
         w1 = ( hsum + h1 ) / hsumt3;
         w2 = ( hsum + h2 ) / hsumt3;
@@ -154,9 +154,7 @@ void GENBC_T::set_pchip( const int &np, const std::vector<double> &xp,
     dp[np-1] = w1 * del1 + w2 * del2;
 
     if( sign_test ( dp[np-1], del2 ) <= 0.0 )
-    {
       dp[np-1] = 0.0;
-    }
     else if( sign_test ( del1, del2 ) < 0.0 )
     {
       //
@@ -165,16 +163,14 @@ void GENBC_T::set_pchip( const int &np, const std::vector<double> &xp,
       dmax = 3.0 * del2;
 
       if( fabs ( dmax ) < fabs ( dp[np-1] ) )
-      {
         dp[np-1] = dmax;
-      }
     }
   } // End of If-else statement for np
 }
 
 double GENBC_T::sign_test( const double &arg1, const double &arg2 ) 
 {
-  double value;
+  double value = 0.0;
 
   if ( arg1 == 0.0 ) value = 0.0;
   else if ( arg1 < 0.0 )

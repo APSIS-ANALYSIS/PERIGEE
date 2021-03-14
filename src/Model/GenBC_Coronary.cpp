@@ -139,7 +139,7 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
 
   SYS_T::commPrint( "===> GenBC_Coronary data are read in from %s.\n", lpn_filename );
 
-  // Set a zero initial values. 
+  // Set zero initial values. 
   // They will be reset based on the 3D solutions.
   for(int ii=0; ii<num_ebc; ++ii)
   {
@@ -170,8 +170,7 @@ void GenBC_Coronary::print_info() const
         ii, Ra[ii], Ca[ii],Ra_micro[ii],Cim[ii], Rv[ii], Pd[ii] );
 }
 
-double GenBC_Coronary::get_m( const int &ii, const double &in_dot_Q,
-    const double &in_Q ) const
+double GenBC_Coronary::get_m( const int &ii, const double &in_dot_Q, const double &in_Q ) const
 {
   double diff = std::abs(in_Q) * relTol;
 
@@ -227,10 +226,7 @@ double GenBC_Coronary::get_P( const int &ii, const double &in_dot_Q,
   double pi_m[num_odes];
 
   // auxiliary variables for RK4 
-  double K1[num_odes];
-  double K2[num_odes];
-  double K3[num_odes];
-  double K4[num_odes];
+  double K1[num_odes], K2[num_odes], K3[num_odes], K4[num_odes];
   double pi_tmp[num_odes];
 
   for(int jj=0; jj<num_odes; ++jj)
@@ -348,7 +344,7 @@ void GenBC_Coronary::get_dPim_dt( const int &ii, const double &time_start, const
     xe_1[mm] = fmod(tmp,Time_data[ii][num_Pim_data[ii]-1]);
     xe_2[mm] = fmod(tmp+fac13*h,Time_data[ii][num_Pim_data[ii]-1]);
     xe_3[mm] = fmod(tmp+fac23*h,Time_data[ii][num_Pim_data[ii]-1]);
-    tmp=tmp+h;
+    tmp = tmp + h;
   }
 
   xe_1[N] = tend_mod;
