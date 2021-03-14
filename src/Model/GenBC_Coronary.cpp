@@ -204,13 +204,13 @@ double GenBC_Coronary::get_P( const int &ii, const double &in_dot_Q,
 
       const double Q_mp1 = Q0[ii] + static_cast<double>(mm+1) * ( in_Q - Q0[ii] ) / static_cast<double>(N);
 
-      const double K1 = F(ii, pi_m, Q_m);
+      const double K1 = F_RCR(ii, pi_m, Q_m);
 
-      const double K2 = F(ii, pi_m + fac13 * K1 * h, fac23 * Q_m + fac13 * Q_mp1);
+      const double K2 = F_RCR(ii, pi_m + fac13 * K1 * h, fac23 * Q_m + fac13 * Q_mp1);
 
-      const double K3 = F(ii, pi_m - fac13 * K1 * h + K2 * h, fac13 * Q_m + fac23 * Q_mp1);
+      const double K3 = F_RCR(ii, pi_m - fac13 * K1 * h + K2 * h, fac13 * Q_m + fac23 * Q_mp1);
 
-      const double K4 = F(ii, pi_m + K1 * h - K2 * h + K3 * h, Q_mp1);
+      const double K4 = F_RCR(ii, pi_m + K1 * h - K2 * h + K3 * h, Q_mp1);
 
       pi_m = pi_m + fac18 * K1 * h + fac38 * K2 * h + fac38 * K3 * h + fac18 * K4 * h;
     }
@@ -247,22 +247,22 @@ double GenBC_Coronary::get_P( const int &ii, const double &in_dot_Q,
 
     const double Q_mp1 = Q0[ii] + static_cast<double>(mm+1) * ( in_Q - Q0[ii] ) / static_cast<double>(N);
 
-    F(ii, pi_m, Q_m, dPimdt_k1[ii][mm], K1);
+    F_coronary(ii, pi_m, Q_m, dPimdt_k1[ii][mm], K1);
 
     for(int jj=0; jj<num_odes; ++jj)
       pi_tmp[jj] = pi_m[jj] + fac13 * K1[jj] * h;
 
-    F(ii, pi_tmp , fac23 * Q_m + fac13 * Q_mp1, dPimdt_k2[ii][mm], K2);
+    F_coronary(ii, pi_tmp , fac23 * Q_m + fac13 * Q_mp1, dPimdt_k2[ii][mm], K2);
 
     for(int jj=0; jj<num_odes; ++jj)
       pi_tmp[jj] = pi_m[jj] - fac13*K1[jj] * h + K2[jj] * h;
 
-    F(ii, pi_tmp , fac13 * Q_m + fac23 * Q_mp1, dPimdt_k3[ii][mm], K3);
+    F_coronary(ii, pi_tmp , fac13 * Q_m + fac23 * Q_mp1, dPimdt_k3[ii][mm], K3);
 
     for(int jj=0; jj<num_odes; ++jj)
       pi_tmp[jj] = pi_m[jj] + K1[jj] * h - K2[jj] * h + K3[jj] * h;
 
-    F(ii, pi_tmp, Q_mp1, dPimdt_k1[ii][mm+1], K4);
+    F_coronary(ii, pi_tmp, Q_mp1, dPimdt_k1[ii][mm+1], K4);
 
     for(int jj=0; jj<2; ++jj)
       pi_m[jj] = pi_m[jj] + fac18 * K1[jj] * h + fac38 * K2[jj] * h + fac38 * K3[jj] * h + fac18 * K4[jj] * h;
@@ -292,7 +292,7 @@ void GenBC_Coronary::reset_initial_sol( const int &ii, const double &in_Q_0,
   if( num_Pim_data[ii]>0 ) get_dPim_dt(ii, curr_time, curr_time + N * h);
 }
 
-void GenBC_Coronary::F( const int &ii, const double * const &pi, const double &q, 
+void GenBC_Coronary::F_coronary( const int &ii, const double * const &pi, const double &q, 
     const double &dPimdt, double * const &K ) const
 {
   // The Coronary LPM consists of two ODEs. 
@@ -300,7 +300,7 @@ void GenBC_Coronary::F( const int &ii, const double * const &pi, const double &q
   K[1]=((pi[0]-pi[1])/Ra_micro[ii]-(pi[1]-Pd[ii])/(Rv[ii]))/Cim[ii]+dPimdt;
 }
 
-double GenBC_Coronary::F( const int &ii, const double &pi, const double &q ) const
+double GenBC_Coronary::F_RCR( const int &ii, const double &pi, const double &q ) const
 {
   // This is an RCR ODE, Ra_micro and Ca are used to store distal resistance and capacitance
   return (q-(pi-Pd[ii])/Ra_micro[ii])/Ca[ii];
