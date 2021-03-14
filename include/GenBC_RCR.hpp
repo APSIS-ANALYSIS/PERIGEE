@@ -44,7 +44,10 @@ class GenBC_RCR : public IGenBC
     }
 
     virtual void reset_initial_sol( const int &ii, const double &in_Q_0,
-        const double &in_P_0 );
+        const double &in_P_0, const double &curr_time )
+    {
+      reset_initial_sol( ii, in_Q_0, in_P_0 );
+    }
 
   private:
     const int N;
@@ -67,6 +70,9 @@ class GenBC_RCR : public IGenBC
     {
       return -1.0 * pi / (Rd[ii] * C[ii]) + q / C[ii]; 
     }
+    
+    virtual void reset_initial_sol( const int &ii, const double &in_Q_0,
+        const double &in_P_0 );
 };
 
 #endif

@@ -80,15 +80,6 @@ class IGenBC
     // implementation.
     // --------------------------------------------------------------
     virtual void reset_initial_sol( const int &ii, const double &in_Q_0,
-        const double &in_P_0 )
-    {
-      SYS_T::print_fatal("Error: IGenBC::reset_initial_sol is not implemented.\n");
-    }
-    
-    // --------------------------------------------------------------
-    // For LPMs that need time information
-    // --------------------------------------------------------------
-    virtual void reset_initial_sol( const int &ii, const double &in_Q_0,
         const double &in_P_0, const double &curr_time )
     {
       SYS_T::print_fatal("Error: IGenBC::reset_initial_sol is not implemented.\n");
