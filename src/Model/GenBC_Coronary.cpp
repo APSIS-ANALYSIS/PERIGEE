@@ -185,6 +185,8 @@ double GenBC_Coronary::get_m( const int &ii, const double &in_dot_Q, const doubl
 double GenBC_Coronary::get_P( const int &ii, const double &in_dot_Q,
     const double &in_Q ) const
 {
+  double output_P = 0.0;
+
   const double fac13 = 1.0 / 3.0;
   const double fac23 = 2.0 / 3.0;
   const double fac18 = 1.0 / 8.0;
@@ -217,62 +219,65 @@ double GenBC_Coronary::get_P( const int &ii, const double &in_dot_Q,
 
     prev_0D_sol[ii][0] = pi_m;
 
-    return pi_m + Ra[ii] * in_Q ; 
+    output_P =  pi_m + Ra[ii] * in_Q ; 
   }
-
-  // Here, we know it is a coronary face.
-  // Each coronary face is governed by num_odes = 2 ODEs.  
-  // initial pressures at Ca and Cim
-  double pi_m[num_odes];
-
-  // auxiliary variables for RK4 
-  double K1[num_odes], K2[num_odes], K3[num_odes], K4[num_odes];
-  double pi_tmp[num_odes];
-
-  for(int jj=0; jj<num_odes; ++jj)
+  else
   {
-    pi_m[jj] = Pi0[ii][jj];
-    K1[jj] = 0.0;
-    K2[jj] = 0.0;
-    K3[jj] = 0.0;
-    K4[jj] = 0.0;
-    pi_tmp[jj] = 0.0;
+    // Here, we know it is a coronary face.
+    // Each coronary face is governed by num_odes = 2 ODEs.  
+    // initial pressures at Ca and Cim
+    double pi_m[num_odes];
+
+    // auxiliary variables for RK4 
+    double K1[num_odes], K2[num_odes], K3[num_odes], K4[num_odes];
+    double pi_tmp[num_odes];
+
+    for(int jj=0; jj<num_odes; ++jj)
+    {
+      pi_m[jj] = Pi0[ii][jj];
+      K1[jj] = 0.0;
+      K2[jj] = 0.0;
+      K3[jj] = 0.0;
+      K4[jj] = 0.0;
+      pi_tmp[jj] = 0.0;
+    }
+
+    // in_Q gives Q_N = Q_n+1, and Q0[ii] gives Q_0 = Q_n
+    // do Runge-Kutta 4 with the 3/8 rule
+    for(int mm=0; mm<N; ++mm)
+    {
+      const double Q_m = Q0[ii] + static_cast<double>(mm) * ( in_Q - Q0[ii] ) / static_cast<double>(N);
+
+      const double Q_mp1 = Q0[ii] + static_cast<double>(mm+1) * ( in_Q - Q0[ii] ) / static_cast<double>(N);
+
+      F_coronary(ii, pi_m, Q_m, dPimdt_k1[ii][mm], K1);
+
+      for(int jj=0; jj<num_odes; ++jj)
+        pi_tmp[jj] = pi_m[jj] + fac13 * K1[jj] * h;
+
+      F_coronary(ii, pi_tmp , fac23 * Q_m + fac13 * Q_mp1, dPimdt_k2[ii][mm], K2);
+
+      for(int jj=0; jj<num_odes; ++jj)
+        pi_tmp[jj] = pi_m[jj] - fac13*K1[jj] * h + K2[jj] * h;
+
+      F_coronary(ii, pi_tmp , fac13 * Q_m + fac23 * Q_mp1, dPimdt_k3[ii][mm], K3);
+
+      for(int jj=0; jj<num_odes; ++jj)
+        pi_tmp[jj] = pi_m[jj] + K1[jj] * h - K2[jj] * h + K3[jj] * h;
+
+      F_coronary(ii, pi_tmp, Q_mp1, dPimdt_k1[ii][mm+1], K4);
+
+      for(int jj=0; jj<2; ++jj)
+        pi_m[jj] = pi_m[jj] + fac18 * K1[jj] * h + fac38 * K2[jj] * h + fac38 * K3[jj] * h + fac18 * K4[jj] * h;
+    }
+
+    // Make a copy of the ODE solutions. 
+    // prev_0D_sol will reset initial values Pi0 for future time integration (t=n+1-> t=n+2) 
+    for(int jj=0; jj<num_odes; ++jj) prev_0D_sol[ii][jj]=pi_m[jj];
+
+    output_P = pi_m[0] + Ra[ii] * in_Q;
   }
-
-  // in_Q gives Q_N = Q_n+1, and Q0[ii] gives Q_0 = Q_n
-  // do Runge-Kutta 4 with the 3/8 rule
-  for(int mm=0; mm<N; ++mm)
-  {
-    const double Q_m = Q0[ii] + static_cast<double>(mm) * ( in_Q - Q0[ii] ) / static_cast<double>(N);
-
-    const double Q_mp1 = Q0[ii] + static_cast<double>(mm+1) * ( in_Q - Q0[ii] ) / static_cast<double>(N);
-
-    F_coronary(ii, pi_m, Q_m, dPimdt_k1[ii][mm], K1);
-
-    for(int jj=0; jj<num_odes; ++jj)
-      pi_tmp[jj] = pi_m[jj] + fac13 * K1[jj] * h;
-
-    F_coronary(ii, pi_tmp , fac23 * Q_m + fac13 * Q_mp1, dPimdt_k2[ii][mm], K2);
-
-    for(int jj=0; jj<num_odes; ++jj)
-      pi_tmp[jj] = pi_m[jj] - fac13*K1[jj] * h + K2[jj] * h;
-
-    F_coronary(ii, pi_tmp , fac13 * Q_m + fac23 * Q_mp1, dPimdt_k3[ii][mm], K3);
-
-    for(int jj=0; jj<num_odes; ++jj)
-      pi_tmp[jj] = pi_m[jj] + K1[jj] * h - K2[jj] * h + K3[jj] * h;
-
-    F_coronary(ii, pi_tmp, Q_mp1, dPimdt_k1[ii][mm+1], K4);
-
-    for(int jj=0; jj<2; ++jj)
-      pi_m[jj] = pi_m[jj] + fac18 * K1[jj] * h + fac38 * K2[jj] * h + fac38 * K3[jj] * h + fac18 * K4[jj] * h;
-  }
-
-  // Make a copy of the ODE solutions. 
-  // prev_0D_sol will reset initial values Pi0 for future time integration (t=n+1-> t=n+2) 
-  for(int jj=0; jj<num_odes; ++jj) prev_0D_sol[ii][jj]=pi_m[jj];
-
-  return pi_m[0] + Ra[ii] * in_Q;
+  return output_P;
 }
 
 double GenBC_Coronary::get_P0( const int &ii ) const
@@ -310,7 +315,7 @@ void GenBC_Coronary::get_dPim_dt( const int &ii, const double &time_start, const
 {
   double tend_mod = fmod( time_end, Time_data[ii][num_Pim_data[ii]-1] );
   if ( tend_mod<absTol ) tend_mod =  Time_data[ii][num_Pim_data[ii]-1];
-  
+
   // Find the interval in Pim that covers current integration time. 
   double x1,x2,f1,f2,d1,d2;
   for(int mm=1; mm<num_Pim_data[ii];++mm)
