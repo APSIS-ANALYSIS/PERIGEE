@@ -309,9 +309,9 @@ int main(int argc, char *argv[])
   // ===== GenBC =====
   IGenBC * gbc = nullptr;
 
-  if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 1  )
+  if( GENBC_T::get_genbc_file_type( lpn_file.c_str() ) == 1  )
     gbc = new GenBC_Resistance( lpn_file.c_str() );
-  else if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 2  )
+  else if( GENBC_T::get_genbc_file_type( lpn_file.c_str() ) == 2  )
     gbc = new GenBC_RCR( lpn_file.c_str(), 1000, initial_step );
   else
     SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );

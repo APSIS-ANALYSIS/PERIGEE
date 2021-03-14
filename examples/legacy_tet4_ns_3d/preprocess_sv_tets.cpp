@@ -226,7 +226,6 @@ int main( int argc, char * argv[] )
   h5writer->write_intVector("nln", list_nlocalnode);
   delete h5writer; H5Fclose(file_id);
 
-
   cout<<"\n===> Partition Quality: "<<endl;
   cout<<"The largest ghost / local node ratio is: ";
   cout<<*std::max_element(&list_ratio_g2l[0], &list_ratio_g2l[cpu_size-1])<<endl;
