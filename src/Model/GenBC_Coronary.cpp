@@ -97,6 +97,8 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
       // Resize the IntraMyocardial data 
       if( num_Pim_data[counter] > 0 ) 
       {
+        is_RCR = false;
+
         const int data_size = num_Pim_data[counter];
 
         Time_data[counter].resize( data_size );
@@ -123,6 +125,8 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
       }
       else
       {
+        is_RCR = true;
+
         Time_data[counter].clear();
         Pim_data[counter].clear();
         der_Pim_data[counter].clear();
@@ -192,8 +196,7 @@ double GenBC_Coronary::get_P( const int &ii, const double &in_dot_Q,
   const double fac18 = 1.0 / 8.0;
   const double fac38 = 3.0 / 8.0;
 
-  // If no Pim data is provided, it is an RCR face. 
-  if( num_Pim_data[ii] == 0 )
+  if( is_RCR )
   {
     // Each RCR face is governed by an ODE only.
     double pi_m = Pi0[ii][0]; // Pi_m

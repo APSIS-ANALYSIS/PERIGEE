@@ -86,6 +86,9 @@ class GenBC_Coronary : public IGenBC
     // Total number of outlet surfaces
     int num_ebc;
 
+    // bool variable tells if the BC is RCR
+    bool is_RCR;
+
     // Vectors storing the Ra, Ca, Ra_micro, Cim, Rv, Pd, and alpha_Pim.
     // alpha_Pim stores the scaling values for all coronary outlet faces. 
     // The length of the vectors is num_ebc
