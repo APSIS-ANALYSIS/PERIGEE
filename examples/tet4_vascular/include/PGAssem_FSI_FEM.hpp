@@ -123,7 +123,6 @@ class PGAssem_FSI_FEM : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const APart_Node * const &pnode_ptr,
         const ALocal_EBC * const &ebc_part,
         const int &ebc_id );
 
@@ -132,13 +131,12 @@ class PGAssem_FSI_FEM : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const APart_Node * const &pnode_ptr,
         const ALocal_EBC * const &ebc_part,
         const int &ebc_id );
 
   private:
     // Private data
-    const int nLocBas, dof_sol, dof_mat, num_ebc;
+    const int nLocBas, dof_sol, dof_mat, num_ebc, nlgn;
     
     int snLocBas;
 
