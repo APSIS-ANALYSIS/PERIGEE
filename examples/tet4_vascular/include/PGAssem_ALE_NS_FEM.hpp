@@ -167,7 +167,6 @@ class PGAssem_ALE_NS_FEM : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const APart_Node * const &pnode_ptr,
         const ALocal_EBC * const &ebc_part,
         const int &ebc_id );
 
@@ -176,12 +175,11 @@ class PGAssem_ALE_NS_FEM : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const APart_Node * const &pnode_ptr,
         const ALocal_EBC * const &ebc_part,
         const int &ebc_id );
 
   private:
-    int nLocBas, snLocBas, dof_sol, dof_mat, num_ebc;
+    int nLocBas, snLocBas, dof_sol, dof_mat, num_ebc, nlgn;
 
     PetscInt * row_index, * srow_index;
 

@@ -20,6 +20,7 @@
 #include "CVFlowRate_Linear2Steady.hpp"
 #include "GenBC_Resistance.hpp"
 #include "GenBC_RCR.hpp"
+#include "GenBC_Tools.hpp"
 #include "PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha.hpp"
 #include "PLocAssem_Tet4_FSI_Mesh_Laplacian.hpp"
 #include "PGAssem_ALE_NS_FEM.hpp"
@@ -231,8 +232,7 @@ int main(int argc, char *argv[])
       quadv->get_num_quadPts(), elements->get_nLocBas(),
       fluid_density, fluid_mu, bs_beta );
 
-  IPLocAssem * locAssem_mesh_ptr = new PLocAssem_Tet4_FSI_Mesh_Laplacian(
-      GMIptr->get_nLocBas(), elements->get_nLocBas() );
+  IPLocAssem * locAssem_mesh_ptr = new PLocAssem_Tet4_FSI_Mesh_Laplacian();
 
   // ===== Initial condition =====
   PDNSolution * base = new PDNSolution_Tet4_ALE_NS_3D( pNode, fNode, locinfnbc, 1 );
@@ -342,7 +342,6 @@ int main(int argc, char *argv[])
 
     SEG_SOL_T::PlusAiPV(0.0, -1.0, -1.0, dot_pres_velo, dot_sol);
 
-    if(is_LS_info) lsolver_acce->Info();
     delete lsolver_acce; delete dot_pres_velo;
     SYS_T::commPrint("\n===> Consistent initial acceleration is obtained.");
     SYS_T::commPrint(" The mass matrix lsolver is destroyed. \n\n");
@@ -392,16 +391,16 @@ int main(int argc, char *argv[])
   for(int ff=0; ff<locebc->get_num_ebc(); ++ff)
   {
     const double dot_face_flrate = gloAssem_ptr -> Assem_surface_flowrate( 
-        dot_sol, locAssem_ptr, elements, quads, pNode, locebc, ff );
+        dot_sol, locAssem_ptr, elements, quads, locebc, ff );
 
     const double face_flrate = gloAssem_ptr -> Assem_surface_flowrate( 
-        sol, locAssem_ptr, elements, quads, pNode, locebc, ff );
+        sol, locAssem_ptr, elements, quads, locebc, ff );
 
     const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure( 
-        sol, locAssem_ptr, elements, quads, pNode, locebc, ff );
+        sol, locAssem_ptr, elements, quads, locebc, ff );
 
     // set the gbc initial conditions using the 3D data
-    gbc -> reset_initial_sol( ff, face_flrate, face_avepre );
+    gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time() );
 
     const double dot_lpn_flowrate = dot_face_flrate;
     const double lpn_flowrate = face_flrate;
@@ -436,9 +435,6 @@ int main(int argc, char *argv[])
       elementv, elements, quadv, quads,
       locAssem_ptr, locAssem_mesh_ptr,
       gloAssem_ptr, gloAssem_mesh_ptr, lsolver, mesh_lsolver, nsolver);
-
-  // Print solver full information if needed
-  if(is_LS_info) lsolver -> Info();
 
   // ===== PETSc Finalize =====
   delete tsolver; delete nsolver; delete lsolver; delete timeinfo;
