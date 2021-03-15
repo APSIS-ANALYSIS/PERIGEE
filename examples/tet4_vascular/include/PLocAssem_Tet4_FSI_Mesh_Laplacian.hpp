@@ -14,8 +14,7 @@
 class PLocAssem_Tet4_FSI_Mesh_Laplacian : public IPLocAssem
 {
   public:
-    PLocAssem_Tet4_FSI_Mesh_Laplacian(
-        const int &in_nlocbas, const int &in_snlocbas );
+    PLocAssem_Tet4_FSI_Mesh_Laplacian();
 
     virtual ~PLocAssem_Tet4_FSI_Mesh_Laplacian();
 
@@ -76,7 +75,7 @@ class PLocAssem_Tet4_FSI_Mesh_Laplacian : public IPLocAssem
   private:
     const int num_ebc_fun;
 
-    const int nLocBas, dof_per_node, vec_size, snLocBas;
+    const int nLocBas, dof_per_node, vec_size;
 
     double R[4];
     double dR_dx[4];
@@ -127,6 +126,5 @@ class PLocAssem_Tet4_FSI_Mesh_Laplacian : public IPLocAssem
     }
 
 };
-
 
 #endif
