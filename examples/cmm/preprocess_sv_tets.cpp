@@ -111,23 +111,32 @@ int main( int argc, char * argv[] )
 
   // Generate the outlet file names and check existence
   std::vector< std::string > sur_file_out;
-  sur_file_out.resize( num_outlet );
+  // sur_file_out.resize( num_outlet );
+
+  // ==== WOMERSLEY CHANGES BEGIN ====
+  if(elemType == 501)
+    sur_file_out = { "inflow_vol.vtp", "outflow_vol_000.vtp" };
+  else
+    sur_file_out = { "inflow_vol.vtu", "outflow_vol_000.vtu" };
+  
+  num_outlet = 2;
 
   for(int ii=0; ii<num_outlet; ++ii)
   {
-    std::ostringstream ss;
-    ss<<sur_file_out_base;
-    if( ii/10 == 0 ) ss<<"00";
-    else if( ii/100 == 0 ) ss<<"0";
+    // std::ostringstream ss;
+    // ss<<sur_file_out_base;
+    // if( ii/10 == 0 ) ss<<"00";
+    // else if( ii/100 == 0 ) ss<<"0";
 
-    if(elemType == 501 ) ss<<ii<<".vtp";
-    else ss<<ii<<".vtu";
+    // if(elemType == 501 ) ss<<ii<<".vtp";
+    // else ss<<ii<<".vtu";
  
-    sur_file_out[ii] = ss.str(); // generate the outlet face file name
+    // sur_file_out[ii] = ss.str(); // generate the outlet face file name
     
     SYS_T::file_check(sur_file_out[ii]);
     cout<<sur_file_out[ii]<<" found. \n";
   }
+  // ==== WOMERSLEY CHANGES END ====
 
   // Record the problem setting into a HDF5 file: preprocessor_cmd.h5
   hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);

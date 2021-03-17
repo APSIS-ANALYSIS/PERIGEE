@@ -28,20 +28,22 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &inflow_vtp_file,
   std::vector<double> pts;
   std::vector<int> ien, gnode, gelem;
 
-  // Assign all inlet nodes
-  SYS_T::file_check( inflow_vtp_file );
+  // ==== WOMERSLEY CHANGES BEGIN ====
+  // // Assign all inlet nodes
+  // SYS_T::file_check( inflow_vtp_file );
 
-  TET_T::read_vtp_grid( inflow_vtp_file, numpts, numcels, pts, ien, gnode, gelem );
+  // TET_T::read_vtp_grid( inflow_vtp_file, numpts, numcels, pts, ien, gnode, gelem );
 
-  if( numpts != static_cast<int>(gnode.size()) )
-    SYS_T::print_fatal("Error: numpts != global_node.size() for the inlet! \n");
+  // if( numpts != static_cast<int>(gnode.size()) )
+  //   SYS_T::print_fatal("Error: numpts != global_node.size() for the inlet! \n");
 
-  for(unsigned int ii=0; ii<gnode.size(); ++ii)
-  {
-    if(gnode[ii]<0) SYS_T::print_fatal("Error: negative nodal index on the inlet! \n");
+  // for(unsigned int ii=0; ii<gnode.size(); ++ii)
+  // {
+  //   if(gnode[ii]<0) SYS_T::print_fatal("Error: negative nodal index on the inlet! \n");
 
-    dir_nodes.push_back( static_cast<unsigned int>( gnode[ii] ) );
-  }
+  //   dir_nodes.push_back( static_cast<unsigned int>( gnode[ii] ) );
+  // }
+  // ==== WOMERSLEY CHANGES END ====
 
   // Assign only outline (ring) nodes on each outlet
   int wall_numpts, wall_numcels;
@@ -94,7 +96,9 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &inflow_vtp_file,
   Create_ID( nFunc );
 
   std::cout<<"===> NodalBC_3D_vtp specified by \n";
-  std::cout<<"     "<<inflow_vtp_file<<std::endl;
+  // ==== WOMERSLEY CHANGES BEGIN ====
+  // std::cout<<"     "<<inflow_vtp_file<<std::endl;
+  // ==== WOMERSLEY CHANGES END ====
   for(unsigned int ii=0; ii<num_outlets; ++ii)
     std::cout<<"     outline of "<<outflow_vtp_files[ii]<<std::endl;
   std::cout<<"     is generated. \n";
