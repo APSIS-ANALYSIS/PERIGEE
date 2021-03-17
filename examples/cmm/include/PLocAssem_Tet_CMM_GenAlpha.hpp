@@ -6,6 +6,7 @@
 // Parallel Local Assembly routine for VMS and Gen-alpha based
 // solver for the CMM type FSI problem.
 // ==================================================================
+#include <complex_bessel.h>
 #include "IPLocAssem.hpp"
 #include "TimeMethod_GenAlpha.hpp"
 
@@ -247,7 +248,46 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
         const double &t, const double &nx, const double &ny,
         const double &nz, double &gx, double &gy, double &gz ) const
     {
-      return ((*this).*(flist[ebc_id]))(x,y,z,t,nx,ny,nz,gx,gy,gz);
+      // ==== WOMERSLEY CHANGES BEGIN ====
+      const double R_pipe = 0.3;                                                 // pipe radius
+      const double omega  = MATH_T::PI * 2.0 / 1.1;                              // freqency
+      const std::complex<double> i1(0.0, 1.0);
+      const std::complex<double> i1_1d5(-0.707106781186547, 0.707106781186547);
+      const auto Omega    = std::sqrt(rho0 * omega / vis_mu) * R_pipe;           // womersley number 
+      const auto Lambda   = i1_1d5 * Omega;
+      const double r      = std::sqrt(x*x+y*y);                                  // radial coord
+      const auto   xi     = Lambda * r / R_pipe;
+
+      const double k0 = -21.0469;                                                // mean pressure gradient
+      const std::complex<double> B1(-4.926286624202966e3, -4.092542965905093e3); // pressure Fourier coeff
+      const std::complex<double> c1(8.863128942479001e2,   2.978553160539686e1); // wave speed
+      const std::complex<double> G1(0.829733473284180,      -0.374935589823809); // elasticity factor
+
+      const auto bes0_xi     = sp_bessel::besselJ(0, xi);
+      const auto bes1_xi     = sp_bessel::besselJ(1, xi);
+      const auto bes2_xi     = sp_bessel::besselJ(2, xi);
+      const auto bes0_Lambda = sp_bessel::besselJ(0, Lambda);
+
+      const double w_x = k0 * x / (2.0*vis_mu) 
+          + std::real( B1 * G1 * i1_1d5 * Omega * x * bes1_xi / (rho0 * c1 * R_pipe * r * bes0_Lambda) * exp(i1*omega*(t-z/c1)) );
+      const double w_y = k0 * y / (2.0*vis_mu)
+          + std::real( B1 * G1 * i1_1d5 * Omega * y * bes1_xi / (rho0 * c1 * R_pipe * r * bes0_Lambda) * exp(i1*omega*(t-z/c1)) );
+      const double w_z = std::real( -i1 * omega * B1 / (rho0 * c1 * c1) * (1.0 - G1 * bes0_xi / bes0_Lambda) * exp(i1*omega*(t-z/c1)) );
+      const double p = k0 * z + std::real( B1 * exp(i1*omega*(t-z/c1)) );
+
+      // u, v are identical and equal to radial velo (axisymmetric)
+      const auto coef = 1.0 - 2.0 * G1 / bes0_Lambda * ( bes1_xi / xi - bes2_xi );
+      const double u_x = std::real( i1 * omega * B1 * x / (2.0 * rho0 * c1 * c1 * r) * coef * exp(i1*omega*(t-z/c1)) );
+      const double u_y = std::real( i1 * omega * B1 * y / (2.0 * rho0 * c1 * c1 * r) * coef * exp(i1*omega*(t-z/c1)) );
+      const double u_z = std::real( B1 * omega * omega * R_pipe / (2.0 * rho0 * c1 * c1 * c1)
+          * ( r / R_pipe - 2.0 * G1 * bes1_xi / (Lambda * bes0_Lambda) ) * exp(i1*omega*(t-z/c1)) );
+
+      gx = MATH_T::dot3d(-p + 2.0*vis_mu * u_x,    vis_mu*(u_y + u_x),    vis_mu*(u_z + w_x), nx, ny, nz); 
+      gy = MATH_T::dot3d(   vis_mu*(u_x + u_y), -p + 2.0*vis_mu * u_y,    vis_mu*(u_z + w_y), nx, ny, nz); 
+      gz = MATH_T::dot3d(   vis_mu*(w_x + u_z),    vis_mu*(w_y + u_z), -p + 2.0*vis_mu * w_z, nx, ny, nz); 
+
+      // return ((*this).*(flist[ebc_id]))(x,y,z,t,nx,ny,nz,gx,gy,gz);
+      // ==== WOMERSLEY CHANGES END ====
     }
 };
 

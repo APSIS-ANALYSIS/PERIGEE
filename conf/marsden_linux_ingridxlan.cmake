@@ -12,6 +12,9 @@ set(METIS_DIR /home/ingridxlan/lib/metis-5.0.3)
 
 set(HDF5_ROOT /home/ingridxlan/lib/hdf5-1.8.16)
 
+set(BESSEL_DIR /home/ingridxlan/lib/complex_bessel)
+MESSAGE(STATUS "Bessel fun Dir = " ${BESSEL_DIR})
+
 # ========================================================
 # Setup the libraries
 # ========================================================
@@ -23,6 +26,12 @@ find_package(HDF5 REQUIRED)
 
 include_directories(${VTK_INCLUDE_DIRS})
 include_directories(${PETSC_INC})
+
+include_directories(${BESSEL_DIR}/include)
+include_directories(${BESSEL_DIR}/include/complex_bessel_bits)
+
+LINK_DIRECTORIES( ${BESSEL_DIR}/lib )
+set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} complex_bessel)
 
 set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${VTK_LIBRARIES})
 set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${PETSC_LIB})
