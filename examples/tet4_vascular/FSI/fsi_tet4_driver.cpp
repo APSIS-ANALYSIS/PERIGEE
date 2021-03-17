@@ -17,6 +17,7 @@
 #include "CVFlowRate_Linear2Steady.hpp"
 #include "GenBC_Resistance.hpp"
 #include "GenBC_RCR.hpp"
+#include "GenBC_Tools.hpp"
 #include "MaterialModel_NeoHookean_M94_Mixed.hpp"
 #include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
 #include "PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha.hpp"
@@ -309,9 +310,9 @@ int main(int argc, char *argv[])
   // ===== GenBC =====
   IGenBC * gbc = nullptr;
 
-  if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 1  )
+  if( GENBC_T::get_genbc_file_type( lpn_file.c_str() ) == 1  )
     gbc = new GenBC_Resistance( lpn_file.c_str() );
-  else if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 2  )
+  else if( GENBC_T::get_genbc_file_type( lpn_file.c_str() ) == 2  )
     gbc = new GenBC_RCR( lpn_file.c_str(), 1000, initial_step );
   else
     SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
@@ -366,7 +367,6 @@ int main(int argc, char *argv[])
     PCSetType( preproc, PCHYPRE );
     PCHYPRESetType( preproc, "boomeramg" );
 
-    lsolver_acce->Info();
     gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_fluid_ptr,
         locAssem_solid_ptr, elementv,
         elements, quadv, quads, locIEN, pNode, fNode, locnbc, locebc );
@@ -406,7 +406,6 @@ int main(int argc, char *argv[])
   PCFieldSplitSetBlockSize( mesh_pc, 3 );
 
   SYS_T::commPrint("===> mesh solver LHS setted up.\n");
-  mesh_lsolver -> Info();
 
   // ===== Nonlinear solver context =====
   PNonlinear_Seg_Solver * nsolver = new PNonlinear_Seg_Solver(
@@ -424,16 +423,16 @@ int main(int argc, char *argv[])
   for(int ff=0; ff<locebc->get_num_ebc(); ++ff)
   {
     const double dot_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        dot_sol, locAssem_fluid_ptr, elements, quads, pNode, locebc, ff );
+        dot_sol, locAssem_fluid_ptr, elements, quads, locebc, ff );
 
     const double face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        sol, locAssem_fluid_ptr, elements, quads, pNode, locebc, ff );
+        sol, locAssem_fluid_ptr, elements, quads, locebc, ff );
 
     const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
-        sol, locAssem_fluid_ptr, elements, quads, pNode, locebc, ff );
+        sol, locAssem_fluid_ptr, elements, quads, locebc, ff );
 
     // set the gbc initial conditions using the 3D data
-    gbc -> reset_initial_sol( ff, face_flrate, face_avepre );
+    gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time() );
 
     const double dot_lpn_flowrate = dot_face_flrate;
     const double lpn_flowrate = face_flrate;
@@ -466,9 +465,6 @@ int main(int argc, char *argv[])
       elementv, elements, quadv, quads, 
       locAssem_fluid_ptr, locAssem_solid_ptr, locAssem_mesh_ptr,
       gloAssem_ptr, gloAssem_mesh_ptr, lsolver, mesh_lsolver, nsolver);
-
-  // ===== Print solver full information =====
-  lsolver -> Info();
 
   // ===== PETSc Finalize =====
   delete tsolver; delete nsolver; delete lsolver; delete mesh_lsolver;

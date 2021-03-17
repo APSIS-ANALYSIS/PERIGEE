@@ -166,15 +166,15 @@ void PTime_Seg_Solver::TM_ALE_NS_GenAlpha(
     {
       // Calculate the 3D dot flow rate on the outlet
       const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( 
-          cur_velo, lassem_fluid_ptr, elements, quad_s, anode_ptr, ebc_part, face); 
+          cur_velo, lassem_fluid_ptr, elements, quad_s, ebc_part, face); 
 
       // Calculate the 3D flow rate on the outlet
       const double face_flrate = gassem_ptr -> Assem_surface_flowrate( 
-          cur_disp, lassem_fluid_ptr, elements, quad_s, anode_ptr, ebc_part, face); 
+          cur_disp, lassem_fluid_ptr, elements, quad_s, ebc_part, face); 
 
       // Calculate the 3D averaged pressure on the outlet
       const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure( 
-          cur_disp, lassem_fluid_ptr, elements, quad_s, anode_ptr, ebc_part, face);
+          cur_disp, lassem_fluid_ptr, elements, quad_s, ebc_part, face);
 
       // Calculate the 0D pressure from LPN model
       const double dot_lpn_flowrate = dot_face_flrate;
@@ -182,7 +182,7 @@ void PTime_Seg_Solver::TM_ALE_NS_GenAlpha(
       const double lpn_pressure = gbc -> get_P( face, dot_lpn_flowrate, lpn_flowrate );
 
       // Update the initial values in genbc
-      gbc -> reset_initial_sol( face, lpn_flowrate, lpn_pressure );
+      gbc -> reset_initial_sol( face, lpn_flowrate, lpn_pressure, time_info->get_time() );
 
       // On the CPU 0, write the time, flow rate, averaged pressure, and 0D
       // calculated pressure into the txt file, which is first generated in the
@@ -301,15 +301,15 @@ void PTime_Seg_Solver::TM_FSI_GenAlpha(
     {
       // Calculate 3D dot flow rate on the outlets
       const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( cur_velo,
-          lassem_fluid_ptr, elements, quad_s, anode_ptr, ebc_part, face); 
+          lassem_fluid_ptr, elements, quad_s, ebc_part, face); 
      
       // Calculate 3D flow rate on the outlets
       const double face_flrate = gassem_ptr -> Assem_surface_flowrate( cur_disp,
-          lassem_fluid_ptr, elements, quad_s, anode_ptr, ebc_part, face); 
+          lassem_fluid_ptr, elements, quad_s, ebc_part, face); 
      
       // Calculate 3D averaged pressure on outlets
       const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
-          cur_disp, lassem_fluid_ptr, elements, quad_s, anode_ptr, ebc_part, face);
+          cur_disp, lassem_fluid_ptr, elements, quad_s, ebc_part, face);
       
       // Calculate 0D pressure from LPN model
       const double dot_lpn_flowrate = dot_face_flrate;
@@ -317,7 +317,7 @@ void PTime_Seg_Solver::TM_FSI_GenAlpha(
       const double lpn_pressure = gbc -> get_P( face, dot_lpn_flowrate, lpn_flowrate );
 
       // Update the initial values in genbc
-      gbc -> reset_initial_sol( face, lpn_flowrate, lpn_pressure );
+      gbc -> reset_initial_sol( face, lpn_flowrate, lpn_pressure, time_info->get_time() );
 
       PetscMPIInt rank;
       MPI_Comm_rank(PETSC_COMM_WORLD, &rank);

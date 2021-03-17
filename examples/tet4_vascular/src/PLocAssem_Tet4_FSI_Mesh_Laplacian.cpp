@@ -1,9 +1,7 @@
 #include "PLocAssem_Tet4_FSI_Mesh_Laplacian.hpp"
 
-PLocAssem_Tet4_FSI_Mesh_Laplacian::PLocAssem_Tet4_FSI_Mesh_Laplacian(
-    const int &in_nlocbas, const int &in_snlocbas )
-: num_ebc_fun(0), nLocBas(4), dof_per_node(7), vec_size(12),
-  snLocBas(in_snlocbas)
+PLocAssem_Tet4_FSI_Mesh_Laplacian::PLocAssem_Tet4_FSI_Mesh_Laplacian()
+: num_ebc_fun(0), nLocBas(4), dof_per_node(7), vec_size(12)
 {
   Tangent = new PetscScalar[vec_size * vec_size];
   Residual = new PetscScalar[vec_size];
@@ -16,13 +14,11 @@ PLocAssem_Tet4_FSI_Mesh_Laplacian::PLocAssem_Tet4_FSI_Mesh_Laplacian(
   print_info();
 }
 
-
 PLocAssem_Tet4_FSI_Mesh_Laplacian::~PLocAssem_Tet4_FSI_Mesh_Laplacian()
 {
   delete [] Tangent; delete [] Residual; Tangent = NULL; Residual = NULL;
   if(num_ebc_fun > 0) delete [] flist;
 }
-
 
 void PLocAssem_Tet4_FSI_Mesh_Laplacian::print_info() const
 {
@@ -33,27 +29,21 @@ void PLocAssem_Tet4_FSI_Mesh_Laplacian::print_info() const
   PetscPrintf(PETSC_COMM_WORLD, "----------------------------------------------------------- \n");
 }
 
-
 void PLocAssem_Tet4_FSI_Mesh_Laplacian::Zero_Tangent_Residual()
 {
   for(int ii=0; ii<vec_size; ++ii) Residual[ii] = 0.0;
   for(int ii=0; ii<vec_size * vec_size; ++ii) Tangent[ii] = 0.0;
 }
 
-
-
 void PLocAssem_Tet4_FSI_Mesh_Laplacian::Zero_Residual()
 {
   for(int ii=0; ii<vec_size; ++ii) Residual[ii] = 0.0;
 }
 
-
-
 void PLocAssem_Tet4_FSI_Mesh_Laplacian::Assem_Estimate()
 {
   for(int ii=0; ii<vec_size * vec_size; ++ii) Tangent[ii] = 1.0;
 }
-
 
 void PLocAssem_Tet4_FSI_Mesh_Laplacian::Assem_Tangent_Residual(
     const double &time, const double &dt,
@@ -144,7 +134,6 @@ void PLocAssem_Tet4_FSI_Mesh_Laplacian::Assem_Tangent_Residual(
     }
   }
 }
-
 
 void PLocAssem_Tet4_FSI_Mesh_Laplacian::Assem_Residual(
     const double &time, const double &dt,

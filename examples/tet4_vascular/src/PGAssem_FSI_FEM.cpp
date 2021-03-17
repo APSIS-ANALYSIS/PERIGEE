@@ -16,7 +16,8 @@ PGAssem_FSI_FEM::PGAssem_FSI_FEM(
 : nLocBas( agmi_ptr->get_nLocBas() ),
   dof_sol( pnode_ptr->get_dof() ),
   dof_mat( locassem_f_ptr->get_dof_mat() ),
-  num_ebc( part_ebc->get_num_ebc() )
+  num_ebc( part_ebc->get_num_ebc() ),
+  nlgn( pnode_ptr -> get_nlocghonode() )
 {
   // Make sure the data structure is compatible
   SYS_T::print_fatal_if(dof_sol != locassem_f_ptr->get_dof(),
@@ -44,7 +45,6 @@ PGAssem_FSI_FEM::PGAssem_FSI_FEM(
   }
 
   const int nlocalnode = pnode_ptr->get_nlocalnode();
-  const int nlgn       = pnode_ptr->get_nlocghonode();
   const int nlocrow    = dof_mat * nlocalnode;
 
   // Allocate the AIJ matrix
@@ -753,11 +753,11 @@ void PGAssem_FSI_FEM::NatBC_Resis_G(
   {
     // Calculate dot flow rate for face with ebc_id
     const double dot_flrate = Assem_surface_flowrate( dot_sol, lassem_f_ptr,
-        element_s, quad_s, node_ptr, ebc_part, ebc_id );
+        element_s, quad_s, ebc_part, ebc_id );
 
     // Calculate flow rate for face with ebc_id
     const double flrate = Assem_surface_flowrate( sol, lassem_f_ptr,
-        element_s, quad_s, node_ptr, ebc_part, ebc_id );
+        element_s, quad_s, ebc_part, ebc_id );
 
     // Get the pressure value on the outlet surfaces
     const double P_n = gbc -> get_P0( ebc_id );
@@ -825,11 +825,11 @@ void PGAssem_FSI_FEM::NatBC_Resis_KG(
   {
     // Calculate dot flow rate for face with ebc_id
     const double dot_flrate = Assem_surface_flowrate( dot_sol, lassem_f_ptr,
-        element_s, quad_s, node_ptr, ebc_part, ebc_id );
+        element_s, quad_s, ebc_part, ebc_id );
 
     // Calculate flow rate for face with ebc_id
     const double flrate = Assem_surface_flowrate( sol, lassem_f_ptr,
-        element_s, quad_s, node_ptr, ebc_part, ebc_id );
+        element_s, quad_s, ebc_part, ebc_id );
 
     // Get the pressure value on the outlet surface
     const double P_n   = gbc -> get_P0( ebc_id );
@@ -931,11 +931,9 @@ double PGAssem_FSI_FEM::Assem_surface_flowrate(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const APart_Node * const &pnode_ptr,
     const ALocal_EBC * const &ebc_part,
     const int &ebc_id )
 {
-  const int nlgn = pnode_ptr -> get_nlocghonode();
   double * array = new double [nlgn * dof_sol];
   double * local = new double [snLocBas * dof_sol];
 
@@ -973,11 +971,9 @@ double PGAssem_FSI_FEM::Assem_surface_ave_pressure(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const APart_Node * const &pnode_ptr,
     const ALocal_EBC * const &ebc_part,
     const int &ebc_id )
 {
-  const int nlgn = pnode_ptr->get_nlocghonode();
   double * array = new double [nlgn * dof_sol];
   double * local = new double [snLocBas * dof_sol];
 

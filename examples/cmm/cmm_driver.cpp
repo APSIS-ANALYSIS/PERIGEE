@@ -24,6 +24,7 @@
 #include "GenBC_Resistance.hpp"
 #include "GenBC_RCR.hpp"
 #include "GenBC_Inductance.hpp"
+#include "GenBC_Coronary.hpp"
 #include "PLocAssem_Tet_CMM_GenAlpha.hpp"
 #include "PGAssem_Tet_CMM_GenAlpha.hpp"
 #include "PTime_CMM_Solver.hpp"
@@ -385,12 +386,14 @@ int main( int argc, char *argv[] )
   // ===== LPN models =====
   IGenBC * gbc = nullptr;
 
-  if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 1  )
+  if( GENBC_T::get_genbc_file_type( lpn_file.c_str() ) == 1  )
     gbc = new GenBC_Resistance( lpn_file.c_str() );
-  else if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 2  )
+  else if( GENBC_T::get_genbc_file_type( lpn_file.c_str() ) == 2  )
     gbc = new GenBC_RCR( lpn_file.c_str(), 1000, initial_step );
-  else if( SYS_T::get_genbc_file_type( lpn_file.c_str() ) == 3  )
+  else if( GENBC_T::get_genbc_file_type( lpn_file.c_str() ) == 3  )
     gbc = new GenBC_Inductance( lpn_file.c_str() );
+  else if( GENBC_T::get_genbc_file_type( lpn_file.c_str() ) == 4  )
+    gbc = new GenBC_Coronary( lpn_file.c_str(), 1000, initial_step );
   else
     SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
 
@@ -481,7 +484,7 @@ int main( int argc, char *argv[] )
         sol, locAssem_ptr, elements, quads, locebc, ff );
 
     // set the gbc initial conditions using the 3D data
-    gbc -> reset_initial_sol( ff, face_flrate, face_avepre );
+    gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time() );
 
     const double dot_lpn_flowrate = dot_face_flrate;
     const double lpn_flowrate = face_flrate;
