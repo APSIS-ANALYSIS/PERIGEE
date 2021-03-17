@@ -128,11 +128,16 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
   PDNSolution G_kinematic(dot_wall_disp_alpha);
   update_wall(-1.0, &sol_alpha, &G_kinematic, ebc_wall_part);
 
+  // ==== WOMERSLEY CHANGES BEGIN ====
+  update_nodal_bc(curr_time + dt, nbc_part, sol);
+  update_nodal_bc(curr_time + alpha_f * dt, nbc_part, &sol_alpha);
+
   // ------------------------------------------------- 
-  // Update the inflow boundary values
-  rescale_inflow_value(curr_time+dt, infnbc_part, flr_ptr, sol_base, sol);
-  rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, flr_ptr, sol_base, &sol_alpha);
-  // ------------------------------------------------- 
+  // // Update the inflow boundary values
+  // rescale_inflow_value(curr_time+dt, infnbc_part, flr_ptr, sol_base, sol);
+  // rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, flr_ptr, sol_base, &sol_alpha);
+  // // ------------------------------------------------- 
+  // ==== WOMERSLEY CHANGES END ====
 
   // **** PRESTRESS TODO: if (prestress_flag), set wall disp and velo to zero
 
@@ -322,6 +327,36 @@ void PNonlinear_CMM_Solver::rescale_inflow_value( const double &stime,
   VecAssemblyBegin(sol->solution); VecAssemblyEnd(sol->solution);
   sol->GhostUpdate();
 }
+
+
+// ==== WOMERSLEY CHANGES BEGIN ====
+void PNonlinear_CMM_Solver::update_nodal_bc( const double &stime,
+        const ALocal_NodalBC * const &nbc_part,
+        PDNSolution * const &sol ) const
+{
+  // Verify that the dof of sol is 4
+  SYS_T::print_fatal_if(sol->get_dof_num() != 4,
+      "Error in PNonlinear_CMM_Solver::update_nodal_bc: incorrect dimension of sol. \n");
+
+  // Update velocities
+  for(int ii=1; ii<4; ++ii)
+  {
+    const int numnode = nbc_part -> get_Num_LD(ii);
+    for(int jj=0; jj<numnode; ++jj)
+    {
+      const int node_index = nbc_part -> get_LDN(ii, jj);
+
+      const int val = 10.0;  // test
+      VecSetValue(sol->solution, node_index*4+1, val, INSERT_VALUES);
+      VecSetValue(sol->solution, node_index*4+2, val, INSERT_VALUES);
+      VecSetValue(sol->solution, node_index*4+3, val, INSERT_VALUES);
+    }
+  }
+
+  VecAssemblyBegin(sol->solution); VecAssemblyEnd(sol->solution);
+  sol->GhostUpdate();
+}
+// ==== WOMERSLEY CHANGES END ====
 
 
 void PNonlinear_CMM_Solver::update_wall( const double &val,

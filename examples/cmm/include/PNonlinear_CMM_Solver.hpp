@@ -92,6 +92,12 @@ class PNonlinear_CMM_Solver
         const PDNSolution * const &sol_base,
         PDNSolution * const &sol ) const;
 
+    // ==== WOMERSLEY CHANGES BEGIN ====
+    void update_nodal_bc( const double &stime,
+        const ALocal_NodalBC * const &nbc_part,
+        PDNSolution * const &sol ) const;
+    // ==== WOMERSLEY CHANGES END ====
+
     // CMM segregated algorithm: nodal update of sol_wall_disp and 
     // dot_sol_wall_disp based on the dot_velo increment 
     // The dot_step vector is assumed to take the following form:
