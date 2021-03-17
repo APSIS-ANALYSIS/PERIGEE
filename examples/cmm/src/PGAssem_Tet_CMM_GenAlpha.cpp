@@ -163,13 +163,15 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_nonzero_estimate(
 
   delete [] row_index; row_index = nullptr;
 
-  // Create a temporary zero solution vector to feed Natbc_Resis_KG
-  PDNSolution * temp = new PDNSolution_NS( node_ptr, 0, false );
+  // ==== WOMERSLEY CHANGES BEGIN ====
+  // // Create a temporary zero solution vector to feed Natbc_Resis_KG
+  // PDNSolution * temp = new PDNSolution_NS( node_ptr, 0, false );
 
-  // 0.1 is an (arbitrarily chosen) nonzero time step size feeding the NatBC_Resis_KG 
-  NatBC_Resis_KG(0.1, temp, temp, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
+  // // 0.1 is an (arbitrarily chosen) nonzero time step size feeding the NatBC_Resis_KG 
+  // NatBC_Resis_KG(0.1, temp, temp, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
 
-  delete temp;
+  // delete temp;
+  // ==== WOMERSLEY CHANGES BEGIN ====
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -320,14 +322,20 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_residual(
   delete [] ectrl_z; ectrl_z = nullptr;
   delete [] row_index; row_index = nullptr;
   
-  // Backflow stabilization residual contribution
-  BackFlow_G( sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+  // ==== WOMERSLEY CHANGES BEGIN ====
+  // // Backflow stabilization residual contribution
+  // BackFlow_G( sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+  // ==== WOMERSLEY CHANGES END ====
 
   // Residual contribution from the thin-walled linear membrane in CMM
   WallMembrane_G( curr_time, dt, sol_a, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ebc_wall_part );
 
-  // Resistance type boundary condition
-  NatBC_Resis_G( dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
+  // ==== WOMERSLEY CHANGES BEGIN ====
+  NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+
+  // // Resistance type boundary condition
+  // NatBC_Resis_G( dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
+  // ==== WOMERSLEY CHANGES END ====
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -411,14 +419,20 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
   delete [] ectrl_z; ectrl_z = nullptr;
   delete [] row_index; row_index = nullptr;
 
-  // Backflow stabilization residual & tangent contribution
-  BackFlow_KG( dt, sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+  // ==== WOMERSLEY CHANGES BEGIN ====
+  // // Backflow stabilization residual & tangent contribution
+  // BackFlow_KG( dt, sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+  // ==== WOMERSLEY CHANGES END ====
 
   // Residual & tangent contributions from the thin-walled linear membrane in CMM
   WallMembrane_KG( curr_time, dt, sol_a, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ebc_wall_part );
 
-  // Resistance type boundary condition
-  NatBC_Resis_KG( dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
+  // ==== WOMERSLEY CHANGES BEGIN ====
+  NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+
+  // // Resistance type boundary condition
+  // NatBC_Resis_KG( dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
+  // ==== WOMERSLEY CHANGES END ====
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
