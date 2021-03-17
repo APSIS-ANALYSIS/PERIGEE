@@ -33,8 +33,9 @@ xlabel('Time (s)'); ylabel('Flow (mL/s)')
 legend('Input', 'Reconstructed');
 set(gca, 'FontSize', 12)
 
-% Elasticity factor
+% Elasticity factor. Only entries starting at index 2 are meaningful
 G_n = ( 2 + gamma_n * (2 * nu_s - 1) ) ./ ( gamma_n .* (2 * nu_s - g_n) );
 
-% Solve for constant B
+% Solve for constant B needed to define the oscillatory flow
+% Only entries starting at index 2 are meaningful
 B_n = Q_n * rho .* c_n ./ ( pi * R^2 * (1 - G_n .* g_n) );

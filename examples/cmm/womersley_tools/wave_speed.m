@@ -6,12 +6,13 @@ function [c_n, gamma_n, g_n] = wave_speed(mu, rho, T, R, n_modes, rho_s, nu_s, h
 omega = 2 * pi / T;                             % base angular frequency
 assignin('base', 'omega', omega);
 
+% Only entries starting at index 2 are meaningful
 c_n = zeros(1, n_modes);                     % (complex) viscous wave speed
 c_R = zeros(1, n_modes);                     % real wave speed (dispersion coefficient)
 c_I = zeros(1, n_modes);                     % imag wave speed (attenuation coefficient)
 
 g_n = zeros(1, n_modes);
-gamma_n = zeros(1, n_modes);                   % solution to frequency eqn
+gamma_n = zeros(1, n_modes);                 % solution to frequency eqn
  
 for k = 2 : n_modes
     n = k - 1;

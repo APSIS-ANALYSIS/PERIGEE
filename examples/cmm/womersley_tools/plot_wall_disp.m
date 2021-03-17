@@ -8,6 +8,7 @@ dt = T / t_steps;
 
 omega = 2 * pi / T;                                 % base angular frequency
 
+% Only entries starting at index 2 are meaningful
 c_R = 1 ./ real(1 ./ c_n);                          % real wave speed (dispersion coefficient)
 L_n = c_R * 2 * pi ./ ((0 : n_modes - 1) * omega);  % wavelengths
 

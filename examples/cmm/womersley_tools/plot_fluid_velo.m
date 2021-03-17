@@ -8,8 +8,10 @@ dt = T / t_steps;
 
 omega = 2 * pi / T;                                 % base angular frequency
 
+% Only entries starting at index 2 are meaningful
 c_R = 1 ./ real(1 ./ c_n);                          % real wave speed (dispersion coefficient)
 L_n = c_R * 2 * pi ./ ((0 : n_modes - 1) * omega);  % wavelengths
+assignin('base', 'L_n', L_n);
 
 dz = L_n(2) / z_steps;
 
@@ -17,11 +19,11 @@ x = -R : 0.01 : R;  % radius vector
 r = abs(x);
 
 w_fig = figure;    v_fig = figure;
-w_lim = [-5, 150]; v_lim = [-0.02, 0.14];
+w_lim = [-10, 150]; v_lim = [-0.01, 0.09];
 
 % Define offset down the tube length
 w_offset = (0 : z_steps) * 30;
-v_offset = (0 : z_steps) * 0.03;
+v_offset = (0 : z_steps) * 0.02;
 
 % Define xticks
 w_xticks = sort( [w_offset + 10,    w_offset + 20  ] );
