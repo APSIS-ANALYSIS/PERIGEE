@@ -282,18 +282,21 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
 
       // radial velo gradient
       const auto coef = 1.0 - 2.0 * G1 / bes0_Lambda * ( bes1_xi / xi - bes2_xi );
-      const double vr_x = std::real( i1 * omega * B1 * x / (2.0 * rho0 * c1 * c1 * r) * coef * exp(i1*omega*(t-z/c1)) );
-      const double vr_y = std::real( i1 * omega * B1 * y / (2.0 * rho0 * c1 * c1 * r) * coef * exp(i1*omega*(t-z/c1)) );
+      const double vr_r = std::real( i1 * omega * B1 / (2.0 * rho0 * c1 * c1) * coef * exp(i1*omega*(t-z/c1)) );
       const double vr_z = std::real( B1 * omega * omega * R_pipe / (2.0 * rho0 * c1 * c1 * c1)
           * ( r / R_pipe - 2.0 * G1 * bes1_xi / (Lambda * bes0_Lambda) ) * exp(i1*omega*(t-z/c1)) );
 
       // polar to cartesian transformation
-      const double u_x = ( 1.0 / r - x*x / (r*r*r) ) * vr + x / r * vr_x;
-      const double u_y = ( -x*y / (r*r*r) ) * vr + x / r * vr_y;
+      const double theta = std::atan(y / x);
+      const double sin_theta = std::sin(theta);
+      const double cos_theta = std::cos(theta);
+
+      const double u_x = cos_theta * cos_theta * vr_r + vr * sin_theta * sin_theta / r;
+      const double u_y = sin_theta * cos_theta * ( vr_r - vr / r );
       const double u_z = x / r * vr_z;
 
-      const double v_x = ( -x*y / (r*r*r) ) * vr + y / r * vr_x;
-      const double v_y = ( 1.0 / r - y*y / (r*r*r) ) * vr + y / r * vr_y;
+      const double v_x = sin_theta * cos_theta * ( vr_r - vr / r );
+      const double v_y = sin_theta * sin_theta * vr_r + vr * cos_theta * cos_theta / r;
       const double v_z = y / r * vr_z;
 
       gx = MATH_T::dot3d(-p + 2.0*vis_mu * u_x,    vis_mu*(u_y + v_x),    vis_mu*(u_z + w_x), nx, ny, nz); 

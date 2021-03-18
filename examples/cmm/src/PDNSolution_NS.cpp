@@ -306,17 +306,20 @@ void PDNSolution_NS::Init_womersley(
     // pressure
     const double pres = k0 * z + std::real( B1 * exp(-i1*omega*z/c1) );
 
-    // radial velo
-    const double vr = std::real( i1 * omega * R * B1 / ( 2.0 * rho * c1 * c1 )
-        * ( r / R - 2.0 * G1 * bes1_xi / (Lambda * bes0_Lambda) ) * exp(-i1*omega*z/c1) );
-
     // axial velocity
     const double w = k0 * (x*x + y*y - R*R) / (4.0*vis_mu)
         + std::real( B1 / (rho * c1) * (1.0 - G1 * bes0_xi / bes0_Lambda) * exp(-i1*omega*z/c1) );
 
+    // radial velo
+    const double vr = std::real( i1 * omega * R * B1 / ( 2.0 * rho * c1 * c1 )
+        * ( r / R - 2.0 * G1 * bes1_xi / (Lambda * bes0_Lambda) ) * exp(-i1*omega*z/c1) );
+
+    // polar to cartesian transformation
+    const double theta = std::atan(y / x);
+
     value[0] = pres;
-    value[1] = vr * x / r;
-    value[2] = vr * y / r;
+    value[1] = vr * std::cos(theta);
+    value[2] = vr * std::sin(theta);
     value[3] = w;
 
     VecSetValues(solution, 4, location, value, INSERT_VALUES);
@@ -380,17 +383,20 @@ void PDNSolution_NS::Init_womersley_dot(
     // dot pressure
     const double dot_pres = std::real( i1 * omega * B1 * exp(-i1*omega*z/c1) );
 
-    // dot radial velocity
-    const double dot_vr = std::real( -omega * omega * R * B1 / ( 2.0 * rho * c1 * c1 )
-        * ( r / R - 2.0 * G1 * bes1_xi / (Lambda * bes0_Lambda) ) * exp(-i1*omega*z/c1) );
-
     // dot axial velocity
     const double dot_w = std::real( i1 * omega * B1 / (rho * c1)
         * (1.0 - G1 * bes0_xi / bes0_Lambda) * exp(-i1*omega*z/c1) );
 
+    // dot radial velocity
+    const double dot_vr = std::real( -omega * omega * R * B1 / ( 2.0 * rho * c1 * c1 )
+        * ( r / R - 2.0 * G1 * bes1_xi / (Lambda * bes0_Lambda) ) * exp(-i1*omega*z/c1) );
+
+    // polar to cartesian transformation
+    const double theta = std::atan(y / x);
+
     value[0] = dot_pres; 
-    value[1] = dot_vr * x / r;
-    value[2] = dot_vr * y / r;
+    value[1] = dot_vr * std::cos(theta);
+    value[2] = dot_vr * std::sin(theta);
     value[3] = dot_w;
 
     VecSetValues(solution, 4, location, value, INSERT_VALUES);
