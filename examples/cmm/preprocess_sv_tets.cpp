@@ -271,8 +271,10 @@ int main( int argc, char * argv[] )
   //                                            thickness2radius_combined, wallsList,
   //                                            centerlinesList, thickness2radiusList, elemType );
 
+  // ==== WOMERSLEY CHANGES BEGIN ====
   ElemBC * wall_bc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
-                                             thickness2radius_combined, elemType );
+                                             thickness2radius_combined, elemType, 1.0 );
+  // ==== WOMERSLEY CHANGES END ====
 
   wall_bc -> resetTriIEN_outwardnormal( IEN );
   // ----------------------------------------------------------------
