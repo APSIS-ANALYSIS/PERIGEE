@@ -185,6 +185,10 @@ int main( int argc, char * argv[] )
 
   mesh -> print_info();
 
+  // ==== WOMERSLEY CHANGES BEGIN ====
+  TET_T::tetmesh_check(ctrlPts, IEN, nElem, 3.5); // print mesh statistics
+  // ==== WOMERSLEY CHANGES END ====
+
   // Call METIS to partition the mesh 
   IGlobal_Part * global_part = nullptr;
   if(cpu_size > 1)
