@@ -268,6 +268,7 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
       const auto bes2_xi     = sp_bessel::besselJ(2, xi);
       const auto bes0_Lambda = sp_bessel::besselJ(0, Lambda);
 
+      // axial velo gradient
       const double w_x = k0 * x / (2.0*vis_mu) 
           + std::real( B1 * G1 * i1_1d5 * Omega * x * bes1_xi / (rho0 * c1 * R_pipe * r * bes0_Lambda) * exp(i1*omega*(t-z/c1)) );
       const double w_y = k0 * y / (2.0*vis_mu)
@@ -275,16 +276,29 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
       const double w_z = std::real( -i1 * omega * B1 / (rho0 * c1 * c1) * (1.0 - G1 * bes0_xi / bes0_Lambda) * exp(i1*omega*(t-z/c1)) );
       const double p = k0 * z + std::real( B1 * exp(i1*omega*(t-z/c1)) );
 
-      // u, v are identical and equal to radial velo (axisymmetric)
-      const auto coef = 1.0 - 2.0 * G1 / bes0_Lambda * ( bes1_xi / xi - bes2_xi );
-      const double u_x = std::real( i1 * omega * B1 * x / (2.0 * rho0 * c1 * c1 * r) * coef * exp(i1*omega*(t-z/c1)) );
-      const double u_y = std::real( i1 * omega * B1 * y / (2.0 * rho0 * c1 * c1 * r) * coef * exp(i1*omega*(t-z/c1)) );
-      const double u_z = std::real( B1 * omega * omega * R_pipe / (2.0 * rho0 * c1 * c1 * c1)
+      // radial velo
+      const double vr = std::real( i1 * omega * R_pipe * B1 / ( 2.0 * rho0 * c1 * c1 )
           * ( r / R_pipe - 2.0 * G1 * bes1_xi / (Lambda * bes0_Lambda) ) * exp(i1*omega*(t-z/c1)) );
 
-      gx = MATH_T::dot3d(-p + 2.0*vis_mu * u_x,    vis_mu*(u_y + u_x),    vis_mu*(u_z + w_x), nx, ny, nz); 
-      gy = MATH_T::dot3d(   vis_mu*(u_x + u_y), -p + 2.0*vis_mu * u_y,    vis_mu*(u_z + w_y), nx, ny, nz); 
-      gz = MATH_T::dot3d(   vis_mu*(w_x + u_z),    vis_mu*(w_y + u_z), -p + 2.0*vis_mu * w_z, nx, ny, nz); 
+      // radial velo gradient
+      const auto coef = 1.0 - 2.0 * G1 / bes0_Lambda * ( bes1_xi / xi - bes2_xi );
+      const double vr_x = std::real( i1 * omega * B1 * x / (2.0 * rho0 * c1 * c1 * r) * coef * exp(i1*omega*(t-z/c1)) );
+      const double vr_y = std::real( i1 * omega * B1 * y / (2.0 * rho0 * c1 * c1 * r) * coef * exp(i1*omega*(t-z/c1)) );
+      const double vr_z = std::real( B1 * omega * omega * R_pipe / (2.0 * rho0 * c1 * c1 * c1)
+          * ( r / R_pipe - 2.0 * G1 * bes1_xi / (Lambda * bes0_Lambda) ) * exp(i1*omega*(t-z/c1)) );
+
+      // polar to cartesian transformation
+      const double u_x = ( 1.0 / r - x*x / (r*r*r) ) * vr + x / r * vr_x;
+      const double u_y = ( -x*y / (r*r*r) ) * vr + x / r * vr_y;
+      const double u_z = x / r * vr_z;
+
+      const double v_x = ( -x*y / (r*r*r) ) * vr + y / r * vr_x;
+      const double v_y = ( 1.0 / r - y*y / (r*r*r) ) * vr + y / r * vr_y;
+      const double v_z = y / r * vr_z;
+
+      gx = MATH_T::dot3d(-p + 2.0*vis_mu * u_x,    vis_mu*(u_y + v_x),    vis_mu*(u_z + w_x), nx, ny, nz); 
+      gy = MATH_T::dot3d(   vis_mu*(v_x + u_y), -p + 2.0*vis_mu * v_y,    vis_mu*(v_z + w_y), nx, ny, nz); 
+      gz = MATH_T::dot3d(   vis_mu*(w_x + u_z),    vis_mu*(w_y + v_z), -p + 2.0*vis_mu * w_z, nx, ny, nz); 
 
       // return ((*this).*(flist[ebc_id]))(x,y,z,t,nx,ny,nz,gx,gy,gz);
       // ==== WOMERSLEY CHANGES END ====

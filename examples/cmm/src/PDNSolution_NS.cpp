@@ -307,7 +307,7 @@ void PDNSolution_NS::Init_womersley(
     const double pres = k0 * z + std::real( B1 * exp(-i1*omega*z/c1) );
 
     // radial velo
-    const double u = std::real( i1 * omega * R * B1 / ( 2.0 * rho * c1 * c1 )
+    const double vr = std::real( i1 * omega * R * B1 / ( 2.0 * rho * c1 * c1 )
         * ( r / R - 2.0 * G1 * bes1_xi / (Lambda * bes0_Lambda) ) * exp(-i1*omega*z/c1) );
 
     // axial velocity
@@ -315,8 +315,8 @@ void PDNSolution_NS::Init_womersley(
         + std::real( B1 / (rho * c1) * (1.0 - G1 * bes0_xi / bes0_Lambda) * exp(-i1*omega*z/c1) );
 
     value[0] = pres;
-    value[1] = u;
-    value[2] = u;
+    value[1] = vr * x / r;
+    value[2] = vr * y / r;
     value[3] = w;
 
     VecSetValues(solution, 4, location, value, INSERT_VALUES);
@@ -381,7 +381,7 @@ void PDNSolution_NS::Init_womersley_dot(
     const double dot_pres = std::real( i1 * omega * B1 * exp(-i1*omega*z/c1) );
 
     // dot radial velocity
-    const double dot_u = std::real( -omega * omega * R * B1 / ( 2.0 * rho * c1 * c1 )
+    const double dot_vr = std::real( -omega * omega * R * B1 / ( 2.0 * rho * c1 * c1 )
         * ( r / R - 2.0 * G1 * bes1_xi / (Lambda * bes0_Lambda) ) * exp(-i1*omega*z/c1) );
 
     // dot axial velocity
@@ -389,8 +389,8 @@ void PDNSolution_NS::Init_womersley_dot(
         * (1.0 - G1 * bes0_xi / bes0_Lambda) * exp(-i1*omega*z/c1) );
 
     value[0] = dot_pres; 
-    value[1] = dot_u;
-    value[2] = dot_u;
+    value[1] = dot_vr * x / r;
+    value[2] = dot_vr * y / r;
     value[3] = dot_w;
 
     VecSetValues(solution, 4, location, value, INSERT_VALUES);

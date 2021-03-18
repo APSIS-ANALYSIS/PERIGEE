@@ -373,15 +373,15 @@ void PNonlinear_CMM_Solver::update_nodal_bc( const double &stime,
       const auto bes0_Lambda = sp_bessel::besselJ(0, Lambda);
 
       // radial velocity
-      const double u = std::real( i1 * omega * R * B1 / ( 2.0 * rho * c1 * c1 )
+      const double vr = std::real( i1 * omega * R * B1 / ( 2.0 * rho * c1 * c1 )
           * ( r / R - 2.0 * G1 * bes1_xi / (Lambda * bes0_Lambda) ) * exp(i1*omega*(stime-z/c1)) );
 
       // axial velocity
       const double w = k0 * (x*x + y*y - R*R) / (4.0*vis_mu)
           + std::real( B1 / (rho * c1) * (1.0 - G1 * bes0_xi / bes0_Lambda) * exp(i1*omega*(stime-z/c1)) );
 
-      VecSetValue(sol->solution, node_index*4+1, u, INSERT_VALUES);
-      VecSetValue(sol->solution, node_index*4+2, u, INSERT_VALUES);
+      VecSetValue(sol->solution, node_index*4+1, vr * x / r, INSERT_VALUES);
+      VecSetValue(sol->solution, node_index*4+2, vr * y / r, INSERT_VALUES);
       VecSetValue(sol->solution, node_index*4+3, w, INSERT_VALUES);
     }
   }
