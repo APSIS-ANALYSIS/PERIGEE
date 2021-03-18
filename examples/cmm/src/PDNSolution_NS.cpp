@@ -221,4 +221,89 @@ void PDNSolution_NS::Init_pipe_parabolic(
   }
 }
 
+
+// ==== WOMERSLEY CHANGES BEGIN ====
+void PDNSolution_NS::Init_womersley(
+    const APart_Node * const &pNode_ptr,
+    const FEANode * const &fNode_ptr,
+    const double &rho,
+    const double &vis_mu )
+{
+  int location[4];
+  double value[4] = {0.0, 0.0, 0.0, 0.0};
+  const int nlocalnode = pNode_ptr->get_nlocalnode();
+
+  // First enforce everything to be zero
+  for(int ii=0; ii<nlocalnode; ++ii)
+  {
+    location[0] = pNode_ptr->get_node_loc(ii) * 4;
+    location[1] = location[0] + 1;
+    location[2] = location[0] + 2;
+    location[3] = location[0] + 3;
+
+    VecSetValues(solution, 4, location, value, INSERT_VALUES);
+  }
+
+  const double R     = 0.3;                                                  // pipe radius
+  const double omega = MATH_T::PI * 2.0 / 1.1;                               // freqency
+  const std::complex<double> i1(0.0, 1.0);
+  const std::complex<double> i1_1d5(-0.707106781186547, 0.707106781186547);
+  const auto Omega   = std::sqrt(rho * omega / vis_mu) * R;                  // womersley number 
+  const auto Lambda  = i1_1d5 * Omega;
+
+  const double k0 = -21.0469;                                                // mean pressure gradient
+  const std::complex<double> B1(-4.926286624202966e3, -4.092542965905093e3); // pressure Fourier coeff
+  const std::complex<double> c1(8.863128942479001e2,   2.978553160539686e1); // wave speed
+  const std::complex<double> G1(0.829733473284180,      -0.374935589823809); // elasticity factor
+
+  for(int ii=0; ii<nlocalnode; ++ii)
+  {
+    location[0] = pNode_ptr->get_node_loc(ii) * 4;
+    location[1] = location[0] + 1;
+    location[2] = location[0] + 2;
+    location[3] = location[0] + 3;
+
+    const double x  = fNode_ptr->get_ctrlPts_x(ii);
+    const double y  = fNode_ptr->get_ctrlPts_y(ii);
+    const double z  = fNode_ptr->get_ctrlPts_z(ii);
+    const double r  = std::sqrt(x*x + y*y);
+    const auto   xi = Lambda * r / R;
+
+    const auto bes0_xi     = sp_bessel::besselJ(0, xi);
+    const auto bes1_xi     = sp_bessel::besselJ(1, xi);
+    const auto bes0_Lambda = sp_bessel::besselJ(0, Lambda);
+
+    // pressure
+    const double pres = k0 * z + std::real( B1 * exp(-i1*omega*z/c1) );
+
+    // radial velo
+    const double u = std::real( i1 * omega * R * B1 / ( 2.0 * rho * c1 * c1 )
+        * ( r / R - 2.0 * G1 * bes1_xi / (Lambda * bes0_Lambda) ) * exp(-i1*omega*z/c1) );
+
+    // axial velocity
+    const double w = k0 * (x*x + y*y - R*R) / (4.0*vis_mu)
+        + std::real( B1 / (rho * c1) * (1.0 - G1 * bes0_xi / bes0_Lambda) * exp(-i1*omega*z/c1)  );
+
+    value[0] = pres;
+    value[1] = u;
+    value[2] = u;
+    value[3] = w;
+
+    VecSetValues(solution, 4, location, value, INSERT_VALUES);
+  }
+
+  VecAssemblyBegin(solution); VecAssemblyEnd(solution);
+  GhostUpdate();
+}
+
+
+void PDNSolution_NS::Init_womersley_dot(
+    const APart_Node * const &pNode_ptr,
+    const FEANode * const &fNode_ptr,
+    const double &rho,
+    const double &vis_mu )
+{
+
+}
+
 // EOF

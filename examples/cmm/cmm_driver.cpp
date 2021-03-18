@@ -332,9 +332,11 @@ int main( int argc, char *argv[] )
   // base generates a parabolic velocity profile at the inlet with unit flow rate
   PDNSolution * base = new PDNSolution_NS( pNode, fNode, locinfnbc, 1 );
   
-  PDNSolution * sol = new PDNSolution_NS( pNode, 0 );
+  // ==== WOMERSLEY CHANGES BEGIN ====
+  PDNSolution * sol = new PDNSolution_NS( pNode, 3 );       // init womersley soln
 
-  PDNSolution * dot_sol = new PDNSolution_NS( pNode, 0 );
+  PDNSolution * dot_sol = new PDNSolution_NS( pNode, 4 );   // init womersley dot soln
+  // ==== WOMERSLEY CHANGES END ====
 
   PDNSolution * sol_wall_disp = new PDNSolution_Wall_Disp( pNode, fNode, 0 );
   
