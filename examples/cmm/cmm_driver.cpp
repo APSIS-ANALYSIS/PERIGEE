@@ -336,9 +336,11 @@ int main( int argc, char *argv[] )
   PDNSolution * base = new PDNSolution_NS( pNode, fNode, locinfnbc, 1 );
   
   // ==== WOMERSLEY CHANGES BEGIN ====
-  PDNSolution * sol = new PDNSolution_NS( pNode, 3 );       // init womersley soln
+  // init womersley soln
+  PDNSolution * sol = new PDNSolution_NS( pNode, fNode, fluid_density, fluid_mu, 3 );
 
-  PDNSolution * dot_sol = new PDNSolution_NS( pNode, 4 );   // init womersley dot soln
+  // init womersley dot soln
+  PDNSolution * dot_sol = new PDNSolution_NS( pNode, fNode, fluid_density, fluid_mu, 4 );
   // ==== WOMERSLEY CHANGES END ====
 
   PDNSolution * sol_wall_disp = new PDNSolution_Wall_Disp( pNode, fNode, 0 );

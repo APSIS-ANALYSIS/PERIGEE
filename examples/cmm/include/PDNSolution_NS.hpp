@@ -26,6 +26,14 @@ class PDNSolution_NS : public PDNSolution
     PDNSolution_NS( const APart_Node * const &pNode, 
         const int &type, const bool &isprint = true );
 
+    // ==== WOMERSLEY CHANGES BEGIN ====
+    PDNSolution_NS( const APart_Node * const &pNode, 
+        const FEANode * const &fNode_ptr,
+        const double &rho,
+        const double &vis_mu,
+        const int &type, const bool &isprint = true );
+    // ==== WOMERSLEY CHANGES END ====
+
     virtual ~PDNSolution_NS();
 
     // case 0 : generate full zero solution
