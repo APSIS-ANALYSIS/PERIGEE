@@ -44,9 +44,14 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 
     radius[ii] = MATH_T::norm2(cl_pt[0] - pt[0], cl_pt[1] - pt[1], cl_pt[2] - pt[2]);
   
-    thickness[ii] = radius[ii] * thickness2radius_combined; 
+    // ==== WOMERSLEY CHANGES BEGIN ====
+    thickness[ii] = 0.06;
+    compute_youngsmod(0.3, 0.06, youngsmod[ii]);
 
-    compute_youngsmod(radius[ii], thickness[ii], youngsmod[ii]);
+    // thickness[ii] = radius[ii] * thickness2radius_combined; 
+
+    // compute_youngsmod(radius[ii], thickness[ii], youngsmod[ii]);
+    // ==== WOMERSLEY CHANGES BEGIN ====
   }
  
   // clean memory
