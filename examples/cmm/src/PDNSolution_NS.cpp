@@ -399,5 +399,6 @@ void PDNSolution_NS::Init_womersley_dot(
   VecAssemblyBegin(solution); VecAssemblyEnd(solution);
   GhostUpdate();
 }
+// ==== WOMERSLEY CHANGES END ====
 
 // EOF
