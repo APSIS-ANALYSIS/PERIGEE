@@ -6,18 +6,15 @@ FEAElement_Tet4::FEAElement_Tet4( const int &in_nqua )
   R = new double [4 * numQuapts];
 }
 
-
 FEAElement_Tet4::~FEAElement_Tet4()
 {
   clearBasisCache();
 }
 
-
 void FEAElement_Tet4::clearBasisCache()
 {
   delete [] R; R = NULL;
 }
-
 
 void FEAElement_Tet4::resize_container()
 {
@@ -25,13 +22,11 @@ void FEAElement_Tet4::resize_container()
   R = new double [ 4 * numQuapts ];
 }
 
-
 void FEAElement_Tet4::reset_numQuapts( const int &new_num_qua )
 {
   numQuapts = new_num_qua;
   resize_container();
 }
-
 
 void FEAElement_Tet4::print() const
 {
@@ -41,11 +36,10 @@ void FEAElement_Tet4::print() const
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
 }
 
-
 double FEAElement_Tet4::get_memory_usage() const
 {
-  double double_size = 4 * numQuapts + 31;
-  double int_size = 1;
+  const double double_size = 4 * numQuapts + 31;
+  const double int_size = 1;
   return double_size * 8.0 + int_size * 4.0;
 }
 
@@ -58,12 +52,11 @@ void FEAElement_Tet4::buildBasis( const IQuadPts * const &quad,
   assert( quad -> get_dim() == 4 );
 
   // area coordinates, the rest one is  qua_u = 1.0 - qua_r - qua_s - qua_t
-  double qua_r, qua_s, qua_t;
   for( int qua = 0; qua < numQuapts; ++qua )
   {
-    qua_r = quad -> get_qp( qua, 0 );
-    qua_s = quad -> get_qp( qua, 1 );
-    qua_t = quad -> get_qp( qua, 2 );
+    const double qua_r = quad -> get_qp( qua, 0 );
+    const double qua_s = quad -> get_qp( qua, 1 );
+    const double qua_t = quad -> get_qp( qua, 2 );
 
     R[qua*4+0] = 1.0 - qua_r - qua_s - qua_t;
     R[qua*4+1] = qua_r;
@@ -117,7 +110,6 @@ void FEAElement_Tet4::buildBasis( const IQuadPts * const &quad,
   dR_dz[3] = Jac[17];
 }
 
-
 void FEAElement_Tet4::get_R( const int &quaindex, double * const &basis ) const
 {
   assert( quaindex >= 0 && quaindex < numQuapts );
@@ -127,7 +119,6 @@ void FEAElement_Tet4::get_R( const int &quaindex, double * const &basis ) const
   basis[2] = R[offset+2];
   basis[3] = R[offset+3];
 }
-
 
 void FEAElement_Tet4::get_gradR( const int &quaindex, double * const &basis_x,
     double * const &basis_y, double * const &basis_z ) const
@@ -140,8 +131,6 @@ void FEAElement_Tet4::get_gradR( const int &quaindex, double * const &basis_x,
     basis_z[ii] = dR_dz[ii];
   }
 }
-
-
 
 void FEAElement_Tet4::get_R_gradR( const int &quaindex, double * const &basis,
     double * const &basis_x, double * const &basis_y,
@@ -157,7 +146,6 @@ void FEAElement_Tet4::get_R_gradR( const int &quaindex, double * const &basis,
     basis_z[ii] = dR_dz[ii];
   }
 }
-
 
 void FEAElement_Tet4::get_3D_R_dR_d2R( const int &quaindex,
     double * const &basis, double * const &basis_x,
@@ -183,7 +171,6 @@ void FEAElement_Tet4::get_3D_R_dR_d2R( const int &quaindex,
   }
 }
 
-
 void FEAElement_Tet4::get_3D_R_gradR_LaplacianR( const int &quaindex,
     double * const &basis, double * const &basis_x,
     double * const &basis_y, double * const &basis_z,
@@ -204,20 +191,17 @@ void FEAElement_Tet4::get_3D_R_gradR_LaplacianR( const int &quaindex,
   }
 }
 
-
 void FEAElement_Tet4::get_Jacobian(const int &quaindex,
     double * const &jac_value) const
 {
   for( int ii=0; ii<9; ++ii ) jac_value[ii] = Jac[ii];
 }
 
-
 void FEAElement_Tet4::get_invJacobian(const int &quaindex,
     double * const &jac_value) const
 {
   for(int ii=0; ii<9; ++ii) jac_value[ii] = Jac[9+ii];
 }
-
 
 double FEAElement_Tet4::get_h( const double * const &ctrl_x,
     const double * const &ctrl_y,
@@ -233,6 +217,5 @@ double FEAElement_Tet4::get_h( const double * const &ctrl_x,
 
   return 2.0 * r;
 }
-
 
 // EOF
