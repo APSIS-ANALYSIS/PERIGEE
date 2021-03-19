@@ -4,17 +4,19 @@ set(HOME_DIR /home/juliu)
 # ========================================================
 # Specify the library locations
 # ========================================================
-set(VTK_DIR ${HOME_DIR}/lib/VTK-8.2.0-shared/lib/cmake/vtk-8.2)
+set(VTK_DIR ${HOME_DIR}/lib/VTK-8.2.0-SHARED/lib/cmake/vtk-8.2)
+
+set(MPI_DIR ${HOME_DIR}/lib/mpich-3.3)
 
 if( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
-  set(PETSC_DIR ${HOME_DIR}/lib/petsc-3.14.3-opt)
+  set(PETSC_DIR ${HOME_DIR}/lib/petsc-3.14.5-opt)
 else( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
-  set(PETSC_DIR ${HOME_DIR}/lib/petsc-3.14.3-debug)
+  set(PETSC_DIR ${HOME_DIR}/lib/petsc-3.14.5-debug)
 endif( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
 
 set(PETSC_ARCH .)
 
-set(HDF5_ROOT ${HOME_DIR}/lib/hdf5-1.8.16)
+set(HDF5_ROOT ${HOME_DIR}/lib/hdf5-1.12.0)
 
 # ========================================================
 # Setup the libraries
@@ -41,8 +43,8 @@ message(STATUS "External Libraries: " ${EXTRA_LINK_LIBS})
 # ========================================================
 # Compiler options 
 # ========================================================
-set(CMAKE_C_COMPILER  ${HOME_DIR}/lib/mpich-3.3.2/bin/mpicc)
-set(CMAKE_CXX_COMPILER ${HOME_DIR}/lib/mpich-3.3.2/bin/mpicxx)
+set(CMAKE_C_COMPILER  ${MPI_DIR}/bin/mpicc)
+set(CMAKE_CXX_COMPILER ${MPI_DIR}/bin/mpicxx)
 set(CMAKE_CXX_STANDARD 11)
 
 if( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
