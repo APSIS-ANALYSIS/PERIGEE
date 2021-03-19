@@ -106,15 +106,14 @@ void FEAElement_Tet10::buildBasis( const IQuadPts * const &quad,
     zst += ctrl_z[ii] * d2R_dst[ii];
   }
 
-  double qua_r, qua_s, qua_t, qua_u;
   for(int qua=0; qua<numQuapts; ++qua)
   {
     const int q10 = qua * 10;
 
-    qua_r = quad -> get_qp( qua, 0 );
-    qua_s = quad -> get_qp( qua, 1 );
-    qua_t = quad -> get_qp( qua, 2 );
-    qua_u = quad -> get_qp( qua, 3 ); 
+    const double qua_r = quad -> get_qp( qua, 0 );
+    const double qua_s = quad -> get_qp( qua, 1 );
+    const double qua_t = quad -> get_qp( qua, 2 );
+    const double qua_u = quad -> get_qp( qua, 3 ); 
 
     R[q10+0] = qua_u * (2.0*qua_u - 1.0);
     R[q10+1] = qua_r * (2.0*qua_r - 1.0);
