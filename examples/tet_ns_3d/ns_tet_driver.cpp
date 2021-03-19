@@ -390,7 +390,7 @@ int main(int argc, char *argv[])
     SYS_T::commPrint("\n===> Consistent initial acceleration is obtained. \n");
     lsolver_acce -> print_info();
     delete lsolver_acce;
-    SYS_T::commPrint(" The mass matrix lsolver is destroyed. \n\n");
+    SYS_T::commPrint(" The mass matrix lsolver is destroyed.\n");
   }
 
   // ===== Linear solver context =====

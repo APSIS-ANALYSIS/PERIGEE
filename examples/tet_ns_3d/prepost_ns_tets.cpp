@@ -21,9 +21,6 @@ int main( int argc, char * argv[] )
   int sysret = system("rm -rf postpart_p*.h5");
   SYS_T::print_fatal_if(sysret != 0, "ERROR: system call failed. \n");
 
-  std::string geo_file;
-  int dofNum, dofMat, elemType, in_ncommon;
-
   const std::string part_file("postpart");
   int cpu_size = 1;
   bool isDualGraph = true;
@@ -37,11 +34,12 @@ int main( int argc, char * argv[] )
 
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
 
+  std::string geo_file;
   cmd_h5r -> read_string("/", "geo_file", geo_file);
-  elemType = cmd_h5r -> read_intScalar("/","elemType");
-  dofNum = cmd_h5r -> read_intScalar("/","dofNum");
-  dofMat   = cmd_h5r -> read_intScalar("/","dofMat");
-  in_ncommon = cmd_h5r -> read_intScalar("/","in_ncommon");
+  const int elemType = cmd_h5r -> read_intScalar("/","elemType");
+  const int dofNum = cmd_h5r -> read_intScalar("/","dofNum");
+  const int dofMat   = cmd_h5r -> read_intScalar("/","dofMat");
+  int in_ncommon = cmd_h5r -> read_intScalar("/","in_ncommon");
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
@@ -60,7 +58,6 @@ int main( int argc, char * argv[] )
   cout<<"geo_file: "<<geo_file<<endl;
   cout<<"dofNum: "<<dofNum<<endl;
   cout<<"elemType: "<<elemType<<endl;
-  cout<<"==== Command Line Arguments ===="<<endl;
 
   // Read the geo_file
   int nFunc, nElem;
