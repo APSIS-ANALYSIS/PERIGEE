@@ -129,8 +129,8 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
   update_wall(-1.0, &sol_alpha, &G_kinematic, ebc_wall_part);
 
   // ==== WOMERSLEY CHANGES BEGIN ====
-  update_nodal_bc(curr_time + dt, nbc_part, feanode_ptr, sol);
-  update_nodal_bc(curr_time + alpha_f * dt, nbc_part, feanode_ptr, &sol_alpha);
+  update_nodal_bc(curr_time + dt, nbc_part, anode_ptr, feanode_ptr, sol);
+  update_nodal_bc(curr_time + alpha_f * dt, nbc_part, anode_ptr, feanode_ptr, &sol_alpha);
 
   // ------------------------------------------------- 
   // // Update the inflow boundary values
@@ -332,6 +332,7 @@ void PNonlinear_CMM_Solver::rescale_inflow_value( const double &stime,
 // ==== WOMERSLEY CHANGES BEGIN ====
 void PNonlinear_CMM_Solver::update_nodal_bc( const double &stime,
     const ALocal_NodalBC * const &nbc_part,
+    const APart_Node * const &anode_ptr,
     const FEANode * const &feanode_ptr,
     PDNSolution * const &sol ) const
 {
@@ -354,39 +355,56 @@ void PNonlinear_CMM_Solver::update_nodal_bc( const double &stime,
   const std::complex<double> c1(8.863128942479001e2,   2.978553160539686e1); // wave speed
   const std::complex<double> G1(0.829733473284180,      -0.374935589823809); // elasticity factor
 
+  const int nlocalnode = anode_ptr->get_nlocalnode();
+
+  std::vector<int> LDN; 
+
   // Update velocities
   for(int ii=1; ii<4; ++ii)
   {
-    const int numnode = nbc_part -> get_Num_LD(ii);
-    for(int jj=0; jj<numnode; ++jj)
+    const int num_LD = nbc_part -> get_Num_LD(ii);
+
+    // Store a copy of LDN
+    LDN.resize(num_LD); 
+
+    for(int jj=0; jj<num_LD; ++jj)
     {
-      const int node_index = nbc_part -> get_LDN(ii, jj);
-
-      const double x  = feanode_ptr->get_ctrlPts_x( node_index );
-      const double y  = feanode_ptr->get_ctrlPts_y( node_index );
-      const double z  = feanode_ptr->get_ctrlPts_z( node_index );
-      const double r  = std::sqrt(x*x + y*y);
-      const auto   xi = Lambda * r / R;
-
-      const auto bes0_xi     = sp_bessel::besselJ(0, xi);
-      const auto bes1_xi     = sp_bessel::besselJ(1, xi);
-      const auto bes0_Lambda = sp_bessel::besselJ(0, Lambda);
-
-      // axial velocity
-      const double w = k0 * (x*x + y*y - R*R) / (4.0*vis_mu)
-          + std::real( B1 / (rho * c1) * (1.0 - G1 * bes0_xi / bes0_Lambda) * exp(i1*omega*(stime-z/c1)) );
-
-      // radial velocity
-      const double vr = std::real( i1 * omega * R * B1 / ( 2.0 * rho * c1 * c1 )
-          * ( r / R - 2.0 * G1 * bes1_xi / (Lambda * bes0_Lambda) ) * exp(i1*omega*(stime-z/c1)) );
-
-      // polar to cartesian transformation
-      const double theta = std::atan(y / x);
-
-      VecSetValue(sol->solution, node_index*4+1, vr * std::cos(theta), INSERT_VALUES);
-      VecSetValue(sol->solution, node_index*4+2, vr * std::sin(theta), INSERT_VALUES);
-      VecSetValue(sol->solution, node_index*4+3, w, INSERT_VALUES);
+      LDN[jj] = nbc_part -> get_LDN(ii, jj);
     }
+
+    for(int jj=0; jj<nlocalnode; ++jj)
+    {
+      const int node_index = anode_ptr->get_node_loc(jj);
+
+      if( VEC_T::is_invec(LDN, node_index) )
+      {
+        const double x = feanode_ptr->get_ctrlPts_x(jj);
+        const double y = feanode_ptr->get_ctrlPts_y(jj);
+        const double z = feanode_ptr->get_ctrlPts_z(jj);
+
+        const double r  = std::sqrt(x*x + y*y);
+        const auto   xi = Lambda * r / R;
+
+        const auto bes0_xi     = sp_bessel::besselJ(0, xi);
+        const auto bes1_xi     = sp_bessel::besselJ(1, xi);
+        const auto bes0_Lambda = sp_bessel::besselJ(0, Lambda);
+
+        // axial velocity
+        const double w = k0 * (x*x + y*y - R*R) / (4.0*vis_mu)
+            + std::real( B1 / (rho * c1) * (1.0 - G1 * bes0_xi / bes0_Lambda) * exp(i1*omega*(stime-z/c1)) );
+
+        // radial velocity
+        const double vr = std::real( i1 * omega * R * B1 / ( 2.0 * rho * c1 * c1 )
+            * ( r / R - 2.0 * G1 * bes1_xi / (Lambda * bes0_Lambda) ) * exp(i1*omega*(stime-z/c1)) );
+
+        // polar to cartesian transformation
+        const double theta = std::atan(y / x);
+
+        VecSetValue(sol->solution, node_index*4+1, vr * std::cos(theta), INSERT_VALUES);
+        VecSetValue(sol->solution, node_index*4+2, vr * std::sin(theta), INSERT_VALUES);
+        VecSetValue(sol->solution, node_index*4+3, w, INSERT_VALUES);
+      }
+    } // end nlocalnode loop
   }
 
   VecAssemblyBegin(sol->solution); VecAssemblyEnd(sol->solution);

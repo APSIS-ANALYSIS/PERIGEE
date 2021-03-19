@@ -95,6 +95,7 @@ class PNonlinear_CMM_Solver
     // ==== WOMERSLEY CHANGES BEGIN ====
     void update_nodal_bc( const double &stime,
         const ALocal_NodalBC * const &nbc_part,
+        const APart_Node * const &anode_ptr,
         const FEANode * const &feanode_ptr,
         PDNSolution * const &sol ) const;
     // ==== WOMERSLEY CHANGES END ====
