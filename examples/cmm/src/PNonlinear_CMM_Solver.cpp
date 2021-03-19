@@ -398,7 +398,7 @@ void PNonlinear_CMM_Solver::update_nodal_bc( const double &stime,
             * ( r / R - 2.0 * G1 * bes1_xi / (Lambda * bes0_Lambda) ) * exp(i1*omega*(stime-z/c1)) );
 
         // polar to cartesian transformation
-        const double theta = std::atan(y / x);
+        const double theta = std::atan2(y, x);
 
         VecSetValue(sol->solution, node_index*4+1, vr * std::cos(theta), INSERT_VALUES);
         VecSetValue(sol->solution, node_index*4+2, vr * std::sin(theta), INSERT_VALUES);

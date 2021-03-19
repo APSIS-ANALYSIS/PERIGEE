@@ -287,7 +287,7 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
           * ( r / R_pipe - 2.0 * G1 * bes1_xi / (Lambda * bes0_Lambda) ) * exp(i1*omega*(t-z/c1)) );
 
       // polar to cartesian transformation
-      const double theta = std::atan(y / x);
+      const double theta = std::atan2(y, x);
       const double sin_theta = std::sin(theta);
       const double cos_theta = std::cos(theta);
 

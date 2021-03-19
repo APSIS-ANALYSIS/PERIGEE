@@ -315,7 +315,7 @@ void PDNSolution_NS::Init_womersley(
         * ( r / R - 2.0 * G1 * bes1_xi / (Lambda * bes0_Lambda) ) * exp(-i1*omega*z/c1) );
 
     // polar to cartesian transformation
-    const double theta = std::atan(y / x);
+    const double theta = std::atan2(y, x);
 
     value[0] = pres;
     value[1] = vr * std::cos(theta);
@@ -392,7 +392,7 @@ void PDNSolution_NS::Init_womersley_dot(
         * ( r / R - 2.0 * G1 * bes1_xi / (Lambda * bes0_Lambda) ) * exp(-i1*omega*z/c1) );
 
     // polar to cartesian transformation
-    const double theta = std::atan(y / x);
+    const double theta = std::atan2(y, x);
 
     value[0] = dot_pres; 
     value[1] = dot_vr * std::cos(theta);
