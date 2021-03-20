@@ -19,7 +19,7 @@ x = -R : 0.01 : R;  % radius vector
 r = abs(x);
 
 w_fig = figure;    v_fig = figure;
-w_lim = [-10, 150]; v_lim = [-0.01, 0.09];
+w_lim = [-10, 180]; v_lim = [-0.01, 0.11];
 
 % Define offset down the tube length
 w_offset = (0 : z_steps) * 30;

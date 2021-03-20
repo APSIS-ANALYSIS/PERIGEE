@@ -31,7 +31,7 @@ for ii = 1 : (t_steps + 1)
     t = (ii - 1) * dt;
     
     % Initialize with Poiseuille solution (0th mode)
-    p = p0 -8 * mu * Q_n(1) / (pi * R^4) * z;
+    p = p0 - 8 * mu * Q_n(1) / (pi * R^4) * z;     % equivalent to p0 + k0*z
     
     for k = 2 : n_modes
         

@@ -37,8 +37,8 @@ flow = [ 33.42, 56.19, 73.697, 96.721, 139.85, 164.46, 177.44, 196.25, ...
 [B_n, Q_n, G_n] = compute_B(flow / 50, rho, nu_s, c_n, gamma_n, g_n, T, R, n_modes);
 
 % Plot velocity profiles over time down the length of the tube
-z_steps = 4;        % num intervals in [0, first wavelength]
-t_steps = 4;        % num intervals in [0, T]
+z_steps = 5;        % num intervals in [0, first wavelength]
+t_steps = 5;        % num intervals in [0, T]
 plot_fluid_velo(mu, rho, R, c_n, B_n, Q_n, G_n, T, n_modes, z_steps, t_steps);
 
 % Plot wall displacement over time down the length of the tube
