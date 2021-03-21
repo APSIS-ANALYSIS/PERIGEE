@@ -320,8 +320,8 @@ void GenBC_Coronary::get_dPim_dt( const int &ii, const double &time_start, const
   if ( tend_mod<absTol ) tend_mod =  Time_data[ii][num_Pim_data[ii]-1];
 
   // Find the interval in Pim that covers current integration time. 
-  double x1,x2,f1,f2,d1,d2;
-  for(int mm=1; mm<num_Pim_data[ii];++mm)
+  double x1, x2, f1, f2, d1, d2;
+  for(int mm=1; mm<num_Pim_data[ii]; ++mm)
   {
     if ( tend_mod <= Time_data[ii][mm] )
     {
