@@ -14,6 +14,7 @@
 #include "IEBC_Partition.hpp"
 #include "IPart.hpp"
 #include "ElemBC.hpp"
+#include "HDF5_Writer.hpp"
 
 class EBC_Partition_vtp : public IEBC_Partition
 {

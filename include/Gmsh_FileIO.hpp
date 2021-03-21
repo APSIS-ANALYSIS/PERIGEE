@@ -9,6 +9,7 @@
 // Author: Ju Liu
 // ==================================================================
 #include "Tet_Tools.hpp"
+#include "HDF5_Writer.hpp"
 
 class Gmsh_FileIO
 {

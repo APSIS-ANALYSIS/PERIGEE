@@ -18,6 +18,7 @@
 // ==================================================================
 #include "IGlobal_Part.hpp"
 #include "Vec_Tools.hpp"
+#include "HDF5_Writer.hpp"
 
 class Map_Node_Index
 {

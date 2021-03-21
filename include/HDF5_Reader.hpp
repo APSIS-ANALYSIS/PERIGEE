@@ -33,6 +33,7 @@
 // Date: July 2 2015
 // ==================================================================
 #include "Vec_Tools.hpp"
+#include "hdf5.h"
 
 class HDF5_Reader
 {

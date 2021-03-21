@@ -312,7 +312,7 @@ void GenBC_Coronary::F_coronary( const int &ii, const double * const &pi, const 
 double GenBC_Coronary::F_RCR( const int &ii, const double &pi, const double &q ) const
 {
   // This is an RCR ODE, Ra_micro and Ca are used to store distal resistance and capacitance
-  return (q-(pi-Pd[ii]) / (Ra_micro[ii] * Ca[ii]);
+  return (q-(pi-Pd[ii])/Ra_micro[ii])/Ca[ii];
 }
 
 void GenBC_Coronary::get_dPim_dt( const int &ii, const double &time_start, const double &time_end )
