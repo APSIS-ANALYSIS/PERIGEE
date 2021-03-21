@@ -13,17 +13,15 @@ FEAElement_Triangle6::FEAElement_Triangle6( const int &in_nqua )
   dR_ds = new double [6*numQuapts];
 }
 
-
 FEAElement_Triangle6::~FEAElement_Triangle6()
 {
-  delete [] R;     R = NULL;
-  delete [] dR_dx; dR_dx = NULL;
-  delete [] dR_dy; dR_dy = NULL;
-  delete [] Jac;   Jac = NULL;
-  delete [] dR_dr; dR_dr = NULL;
-  delete [] dR_ds; dR_ds = NULL;
+  delete [] R;     R = nullptr;
+  delete [] dR_dx; dR_dx = nullptr;
+  delete [] dR_dy; dR_dy = nullptr;
+  delete [] Jac;   Jac = nullptr;
+  delete [] dR_dr; dR_dr = nullptr;
+  delete [] dR_ds; dR_ds = nullptr;
 }
-
 
 void FEAElement_Triangle6::print() const
 {
@@ -33,7 +31,6 @@ void FEAElement_Triangle6::print() const
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
 }
 
-
 double FEAElement_Triangle6::get_memory_usage() const
 {
   double double_size = 39 * numQuapts;
@@ -41,19 +38,17 @@ double FEAElement_Triangle6::get_memory_usage() const
   return double_size * 8.0 + int_size * 4.0;
 }
 
-
 void FEAElement_Triangle6::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_x,
     const double * const &ctrl_y )
 {
   assert(quad->get_dim() == 3);
 
-  double qua_r, qua_s, qua_t;
   for( int qua = 0; qua < numQuapts; ++qua )
   {
-    qua_r = quad -> get_qp( qua, 0 );
-    qua_s = quad -> get_qp( qua, 1 );
-    qua_t = 1.0 - qua_r - qua_s;
+    const double qua_r = quad -> get_qp( qua, 0 );
+    const double qua_s = quad -> get_qp( qua, 1 );
+    const double qua_t = 1.0 - qua_r - qua_s;
 
     const int offset = 6 * qua;
 
@@ -114,7 +109,6 @@ void FEAElement_Triangle6::buildBasis( const IQuadPts * const &quad,
   }
 }
 
-
 double FEAElement_Triangle6::get_h( const double * const &ctrl_x,
     const double * const &ctrl_y ) const
 {
@@ -139,7 +133,6 @@ double FEAElement_Triangle6::get_h( const double * const &ctrl_x,
   return 2.0 * radius;
 }
 
-
 void FEAElement_Triangle6::get_R( const int &quaindex, 
     double * const &basis ) const
 {
@@ -148,7 +141,6 @@ void FEAElement_Triangle6::get_R( const int &quaindex,
   basis[2] = R[offset+2]; basis[3] = R[offset+3];
   basis[4] = R[offset+4]; basis[5] = R[offset+5];
 }
-
 
 void FEAElement_Triangle6::get_gradR( const int &quaindex, 
     double * const &basis_x, double * const &basis_y ) const
@@ -160,7 +152,6 @@ void FEAElement_Triangle6::get_gradR( const int &quaindex,
     basis_y[ii] = dR_dy[offset + ii];
   }
 }
-
 
 void FEAElement_Triangle6::get_R_gradR( const int &quaindex, 
     double * const &basis, double * const &basis_x, 
@@ -175,7 +166,6 @@ void FEAElement_Triangle6::get_R_gradR( const int &quaindex,
   }
 }
 
-
 void FEAElement_Triangle6::get_2D_R_dR_d2R( const int &quaindex,
     double * const &basis,
     double * const &basis_x, double * const &basis_y,
@@ -184,7 +174,6 @@ void FEAElement_Triangle6::get_2D_R_dR_d2R( const int &quaindex,
 {
   SYS_T::print_fatal("Error: FEAElement_Triangle6::get_2D_R_dR_d2R is not implemented. \n");
 }
-
 
 void FEAElement_Triangle6::get_Jacobian(const int &quaindex,
     double * const &jac_value) const
@@ -195,7 +184,6 @@ void FEAElement_Triangle6::get_Jacobian(const int &quaindex,
   jac_value[3] = Jac[4*quaindex+3];
 }
 
-
 void FEAElement_Triangle6::get_invJacobian(const int &quaindex,
     double * const &jac_value) const
 {
@@ -205,6 +193,5 @@ void FEAElement_Triangle6::get_invJacobian(const int &quaindex,
   jac_value[2] = Jac[offset+2];
   jac_value[3] = Jac[offset+3];
 }
-
 
 // EOF
