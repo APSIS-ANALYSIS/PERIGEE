@@ -6,10 +6,9 @@ FEAElement_Triangle3::FEAElement_Triangle3( const int &in_nqua )
   R = new double [3 * numQuapts];
 }
 
-
 FEAElement_Triangle3::~FEAElement_Triangle3()
 {
-  delete [] R; R = NULL;
+  delete [] R; R = nullptr;
 }
 
 void FEAElement_Triangle3::print() const
@@ -27,17 +26,15 @@ double FEAElement_Triangle3::get_memory_usage() const
   return double_size * 8.0 + int_size * 4.0;
 }
 
-
 void FEAElement_Triangle3::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_x, const double * const &ctrl_y )
 {
   assert(quad -> get_dim() == 3);
 
-  double qua_r, qua_s;
   for( int qua = 0; qua < numQuapts; ++qua )
   {
-    qua_r = quad -> get_qp( qua, 0 );
-    qua_s = quad -> get_qp( qua, 1 );
+    const double qua_r = quad -> get_qp( qua, 0 );
+    const double qua_s = quad -> get_qp( qua, 1 );
 
     R[qua * 3 + 0] = 1.0 - qua_r - qua_s;
     R[qua * 3 + 1] = qua_r;
@@ -68,7 +65,6 @@ void FEAElement_Triangle3::buildBasis( const IQuadPts * const &quad,
   dR_dy[2] = Jac[7];
 }
 
-
 double FEAElement_Triangle3::get_h( const double * const &ctrl_x,
     const double * const &ctrl_y ) const
 {
@@ -92,7 +88,6 @@ double FEAElement_Triangle3::get_h( const double * const &ctrl_x,
   return 2.0 * radius;
 }
 
-
 void FEAElement_Triangle3::get_R( const int &quaindex, 
     double * const &basis ) const
 {
@@ -101,7 +96,6 @@ void FEAElement_Triangle3::get_R( const int &quaindex,
   basis[1] = R[offset+1];
   basis[2] = R[offset+2];
 }
-
 
 void FEAElement_Triangle3::get_gradR( const int &quaindex, 
     double * const &basis_x, double * const &basis_y ) const
@@ -112,7 +106,6 @@ void FEAElement_Triangle3::get_gradR( const int &quaindex,
     basis_y[ii] = dR_dy[ii];
   } 
 }
-
 
 void FEAElement_Triangle3::get_R_gradR( const int &quaindex, 
     double * const &basis,
@@ -126,7 +119,6 @@ void FEAElement_Triangle3::get_R_gradR( const int &quaindex,
     basis_y[ii] = dR_dy[ii];
   }
 }
-
 
 void FEAElement_Triangle3::get_2D_R_dR_d2R( const int &quaindex,
     double * const &basis,
@@ -146,13 +138,11 @@ void FEAElement_Triangle3::get_2D_R_dR_d2R( const int &quaindex,
   }
 }
 
-
 void FEAElement_Triangle3::get_Jacobian(const int &quaindex,
     double * const &jac_value) const
 {
   for(int ii=0; ii<4; ++ii) jac_value[ii] = Jac[ii];
 }
-
 
 void FEAElement_Triangle3::get_invJacobian(const int &quaindex,
     double * const &jac_value) const

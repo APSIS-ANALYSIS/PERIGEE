@@ -9,12 +9,10 @@ FEAElement_Triangle3_membrane::FEAElement_Triangle3_membrane(
   dR_dy     = new double [ nLocBas ];
 }
 
-
 FEAElement_Triangle3_membrane::~FEAElement_Triangle3_membrane()
 {
   clearBasisCache();
 }
-
 
 void FEAElement_Triangle3_membrane::clearBasisCache()
 {
@@ -22,7 +20,6 @@ void FEAElement_Triangle3_membrane::clearBasisCache()
   delete [] dR_dx; dR_dx = nullptr;
   delete [] dR_dy; dR_dy = nullptr;
 }
-
 
 void FEAElement_Triangle3_membrane::print() const
 {
@@ -32,14 +29,12 @@ void FEAElement_Triangle3_membrane::print() const
   SYS_T::commPrint("Note: This element is designed for the coupled momentum method. \n ");
 }
 
-
 double FEAElement_Triangle3_membrane::get_memory_usage() const
 {
   double double_size = nLocBas * numQuapts + 5*nLocBas + 33;
   double int_size = 2;
   return double_size * 8.0 + int_size * 4.0;
 }
-
 
 void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_x,
@@ -55,10 +50,6 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
     R[qua*3 + 2] = qua_s;
   }
 
-  //const double dN0_dr = -1.0; const double dN0_ds = -1.0;
-  //const double dN1_dr =  1.0; const double dN1_ds = 0.0;
-  //const double dN2_dr =  0.0; const double dN2_ds = 1.0;
-  
   const double dx_dr = ctrl_x[0] * (-1.0) + ctrl_x[1];
   const double dy_dr = ctrl_y[0] * (-1.0) + ctrl_y[1];
   const double dz_dr = ctrl_z[0] * (-1.0) + ctrl_z[1];
@@ -144,7 +135,6 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   dR_dy[2] = Jac[7];
 }
 
-
 void FEAElement_Triangle3_membrane::get_R( const int &quaindex, 
     double * const &basis ) const
 {
@@ -154,7 +144,6 @@ void FEAElement_Triangle3_membrane::get_R( const int &quaindex,
   basis[1] = R[offset + 1];
   basis[2] = R[offset + 2];
 }
-
 
 void FEAElement_Triangle3_membrane::get_gradR( const int &quaindex,
     double * const &basis_x, double * const &basis_y ) const
@@ -166,7 +155,6 @@ void FEAElement_Triangle3_membrane::get_gradR( const int &quaindex,
     basis_y[ii] = dR_dy[ii];
   }
 }
-
 
 void FEAElement_Triangle3_membrane::get_R_gradR( const int &quaindex,
     double * const &basis, double * const &basis_x, double * const &basis_y ) const
@@ -181,7 +169,6 @@ void FEAElement_Triangle3_membrane::get_R_gradR( const int &quaindex,
   }
 }
 
-
 void FEAElement_Triangle3_membrane::get_2d_normal_out( const int &quaindex,
     double &nx, double &ny, double &nz, double &area ) const
 {
@@ -192,14 +179,12 @@ void FEAElement_Triangle3_membrane::get_2d_normal_out( const int &quaindex,
   area = detJac;
 }
 
-
 void FEAElement_Triangle3_membrane::get_rotationMatrix( const int &quaindex,
     Matrix_3x3 &rot_mat) const
 {
   assert( quaindex >= 0 && quaindex < numQuapts );
   rot_mat = Q;
 }
-
 
 void FEAElement_Triangle3_membrane::get_normal_out( const int &quaindex,
     const double &sur_pt_x, const double &sur_pt_y, const double &sur_pt_z,
