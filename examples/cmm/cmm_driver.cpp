@@ -6,6 +6,7 @@
 // alpha time stepping.
 //
 // ==================================================================
+#include "HDF5_Writer.hpp"
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
 #include "ALocal_EBC_outflow.hpp"
