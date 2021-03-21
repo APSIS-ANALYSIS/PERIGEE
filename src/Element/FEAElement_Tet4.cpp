@@ -13,7 +13,7 @@ FEAElement_Tet4::~FEAElement_Tet4()
 
 void FEAElement_Tet4::clearBasisCache()
 {
-  delete [] R; R = NULL;
+  delete [] R; R = nullptr;
 }
 
 void FEAElement_Tet4::resize_container()
@@ -42,7 +42,6 @@ double FEAElement_Tet4::get_memory_usage() const
   const double int_size = 1;
   return double_size * 8.0 + int_size * 4.0;
 }
-
 
 void FEAElement_Tet4::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_x,

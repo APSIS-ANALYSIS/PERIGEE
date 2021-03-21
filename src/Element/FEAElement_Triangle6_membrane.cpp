@@ -22,7 +22,6 @@ FEAElement_Triangle6_membrane::FEAElement_Triangle6_membrane( const int &in_nqua
   Q.resize(numQuapts);
 }
 
-
 FEAElement_Triangle6_membrane::~FEAElement_Triangle6_membrane()
 {
   delete []     R;     R = nullptr;
@@ -42,7 +41,6 @@ FEAElement_Triangle6_membrane::~FEAElement_Triangle6_membrane()
   delete [] e_l2; e_l2 = nullptr;
 }
 
-
 void FEAElement_Triangle6_membrane::print_info() const
 {
   SYS_T::commPrint("Triangle6_membrane: ");
@@ -51,13 +49,11 @@ void FEAElement_Triangle6_membrane::print_info() const
   SYS_T::commPrint("Note: This element is designed for the coupled momentum method. \n ");
 }
 
-
 double FEAElement_Triangle6_membrane::get_memory_usage() const
 {
   const double dsize = 16 * numQuapts;
   return dsize * 8.0 + 4.0;
 }
-
 
 void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_x,
@@ -210,7 +206,6 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
   } // end qua loop
 }
 
-
 void FEAElement_Triangle6_membrane::get_R( 
     const int &quaindex, double * const &basis ) const
 {
@@ -224,7 +219,6 @@ void FEAElement_Triangle6_membrane::get_R(
   basis[5] = R[offset + 5];
 }
 
-
 void FEAElement_Triangle6_membrane::get_gradR( const int &quaindex,
     double * const &basis_x, double * const &basis_y ) const
 {
@@ -236,7 +230,6 @@ void FEAElement_Triangle6_membrane::get_gradR( const int &quaindex,
     basis_y[ii] = dR_dy[offset + ii];
   }
 }
-
 
 void FEAElement_Triangle6_membrane::get_R_gradR( const int &quaindex, 
     double * const &basis, double * const &basis_x, double * const &basis_y ) const
@@ -251,7 +244,6 @@ void FEAElement_Triangle6_membrane::get_R_gradR( const int &quaindex,
   }
 }
 
-
 void FEAElement_Triangle6_membrane::get_2d_normal_out( const int &qua,
     double &nx, double &ny, double &nz, double &len ) const
 {
@@ -259,14 +251,12 @@ void FEAElement_Triangle6_membrane::get_2d_normal_out( const int &qua,
   len = detJac[qua];
 }
 
-
 void FEAElement_Triangle6_membrane::get_rotationMatrix( const int &quaindex,
     Matrix_3x3 &rot_mat ) const
 {
   assert( quaindex >= 0 && quaindex < numQuapts );
   rot_mat = Q[quaindex];
 }
-
 
 void FEAElement_Triangle6_membrane::get_normal_out( const int &qua,
     const double &sur_pt_x, const double &sur_pt_y, const double &sur_pt_z,
