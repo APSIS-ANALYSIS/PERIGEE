@@ -9,7 +9,9 @@
 // Author: Ju Liu
 // Date: Jan 19 2018
 // ==================================================================
-#include "Vec_Tools.hpp"
+#include <iostream>
+#include <vector>
+#include "petsc.h"
 
 namespace PETSc_T
 {

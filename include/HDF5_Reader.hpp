@@ -32,6 +32,7 @@
 // Author: Ju Liu
 // Date: July 2 2015
 // ==================================================================
+#include "Sys_Tools.hpp"
 #include "Vec_Tools.hpp"
 #include "hdf5.h"
 

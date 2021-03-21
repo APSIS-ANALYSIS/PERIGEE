@@ -37,6 +37,7 @@
 //
 // Date: Sept. 30 2013
 // ==================================================================
+#include "Sys_Tools.hpp"
 #include "Vec_Tools.hpp"
 #include "IGlobal_Part.hpp"
 #include "Map_Node_Index.hpp"

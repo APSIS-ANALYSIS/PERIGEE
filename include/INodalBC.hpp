@@ -11,6 +11,7 @@
 //
 // Date: Aug 16 2015
 // ============================================================================
+#include "Sys_Tools.hpp"
 #include "Vec_Tools.hpp"
 
 class INodalBC
