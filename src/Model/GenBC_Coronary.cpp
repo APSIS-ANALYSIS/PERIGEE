@@ -304,8 +304,9 @@ void GenBC_Coronary::F_coronary( const int &ii, const double * const &pi, const 
     const double &dPimdt, double * const &K ) const
 {
   // The Coronary LPM consists of two ODEs. 
-  K[0] = (q-(pi[0]-pi[1]) / (Ra_micro[ii]*Ca[ii]);
-  K[1] = ((pi[0]-pi[1])/Ra_micro[ii] - (pi[1]-Pd[ii])/Rv[ii]) / Cim[ii] + dPimdt;
+  
+  K[0] = (q-(pi[0]-pi[1])/Ra_micro[ii])/Ca[ii];
+  K[1] = ((pi[0]-pi[1])/Ra_micro[ii]-(pi[1]-Pd[ii])/Rv[ii])/Cim[ii]+dPimdt;
 }
 
 double GenBC_Coronary::F_RCR( const int &ii, const double &pi, const double &q ) const
