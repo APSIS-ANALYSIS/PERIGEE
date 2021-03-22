@@ -15,9 +15,9 @@
 namespace VEC_T
 {
   // --------------------------------------------------------------------------
-  // print int or double vector on screen.
-  // By default, the separation of the vector entries is \t. User may
-  // switch it to \n.
+  // ! print
+  //   print int or double vector on screen. By default, the separation of the 
+  //   vector entries is \t. User may switch it to \n.
   // --------------------------------------------------------------------------
   template<typename T> void print( const std::vector<T> &vec, const char &sep = '\t' )
   {
@@ -27,7 +27,8 @@ namespace VEC_T
   }
  
   // --------------------------------------------------------------------------
-  // Print the vector with given precision pres 
+  // ! print
+  //   print the vector with given precision pres 
   // --------------------------------------------------------------------------
   template<typename T> void print( const std::vector<T> &vec, 
       const unsigned int pres, const char &sep = '\t' )
@@ -40,7 +41,8 @@ namespace VEC_T
   }
   
   // --------------------------------------------------------------------------
-  // Print the vector to a file with given file name
+  // ! print
+  //   print the vector to a file with given file name
   // --------------------------------------------------------------------------
   template<typename T> void print( const std::vector<T> &vec,
       const std::string &file_name, const char &sep = '\t'  )
@@ -52,7 +54,8 @@ namespace VEC_T
   }
 
   // --------------------------------------------------------------------------
-  // trim the capacity of vector
+  // ! shrink2fit  
+  //   trim the capacity of vector
   // --------------------------------------------------------------------------
   template<typename T> void shrink2fit( std::vector<T> &vec )
   {
@@ -60,7 +63,8 @@ namespace VEC_T
   }
 
   // --------------------------------------------------------------------------
-  // fill the array data into a vector, with array length len
+  // ! fillArray
+  //   fill the array data into a vector, with array length len
   // --------------------------------------------------------------------------
   template<typename T> void fillArray( std::vector<T> &vec,
       const T * const &input, const int &len )
@@ -72,7 +76,8 @@ namespace VEC_T
   }
 
   // --------------------------------------------------------------------------
-  // insert vec_b at the end of vec_a
+  // ! insert_end
+  //   insert vec_b at the end of vec_a
   // --------------------------------------------------------------------------
   template<typename T> void insert_end( std::vector<T> &vec_a,
       const std::vector<T> &vec_b )
@@ -81,9 +86,10 @@ namespace VEC_T
   } 
 
   // --------------------------------------------------------------------------
-  // clean the allocation of a vector
+  // ! clean
+  //   clean the allocation of a vector
   // --------------------------------------------------------------------------
-  template<typename T> void clean( std::vector<T> &vec )
+  template<typename T> void clean( std::vector<T> &vec ) 
   {std::vector<T>().swap(vec);} 
 
   // --------------------------------------------------------------------------
