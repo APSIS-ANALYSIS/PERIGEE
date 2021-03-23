@@ -50,3 +50,4 @@ title('Fluid Pressure $P(r, z, t)$', 'interpreter', 'latex');
 
 legend(t_labs, 'interpreter', 'latex');
 
+saveas(gcf, 'exact_fluid-pressure.png');

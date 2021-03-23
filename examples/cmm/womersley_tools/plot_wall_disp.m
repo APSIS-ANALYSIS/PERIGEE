@@ -14,8 +14,10 @@ L_n = c_R * 2 * pi ./ ((0 : n_modes - 1) * omega);  % wavelengths
 
 z = linspace(0, L_n(2), 100);                       % axial coordinate
 
-xi_fig = figure;  xi_ax = axes;  hold on;
-eta_fig = figure; eta_ax = axes; hold on;
+xi_fig  = figure;  xi_ax = axes;  hold on;
+eta_fig = figure; eta_ax = axes;  hold on;
+
+xi_lim  = [-0.8, 0.8]; eta_lim = [-1.6e-3, 1.6e-3];
 
 t_labs = cell(1, t_steps + 1);
 t_labs{1} = '$t$ = $0$';
@@ -47,10 +49,15 @@ for ii = 1 : (t_steps + 1)
     
 end
 
+xi_ax.YLim = xi_lim; eta_ax.YLim = eta_lim;
+
 xlabel(xi_ax,  'z / $\lambda$', 'interpreter', 'latex');
 xlabel(eta_ax, 'z / $\lambda$', 'interpreter', 'latex');
 title(xi_ax,  'Axial Wall Disp $\xi(z, t)$',   'interpreter', 'latex');
 title(eta_ax, 'Radial Wall Disp $\eta(z, t)$', 'interpreter', 'latex');
 
-legend(xi_ax,  t_labs, 'interpreter', 'latex');
-legend(eta_ax, t_labs, 'interpreter', 'latex');
+legend(xi_ax,  t_labs, 'interpreter', 'latex', 'NumColumns', 3);
+legend(eta_ax, t_labs, 'interpreter', 'latex', 'NumColumns', 3);
+
+saveas(xi_fig,  'exact_axial-wall-disp.png');
+saveas(eta_fig, 'exact_radial-wall-disp.png');

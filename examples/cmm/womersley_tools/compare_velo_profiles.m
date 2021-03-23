@@ -1,4 +1,4 @@
-function compare_velo_profiles(sim_dir, z_coord, mu, rho, R, c_n, B_n, Q_n, G_n, T, n_modes, t_steps, start_step, stop_step)
+function compare_velo_profiles(sim_dir, z_coord, mu, rho, R, c_n, B_n, Q_n, G_n, T, n_modes, t_steps, start_step, stop_step, sol_idx)
 
 colors = [     0, 0.4470, 0.7410; 0.8500, 0.3250, 0.0980; ...
           0.4940, 0.1840, 0.5560; 0.4660, 0.6740, 0.1880; ...
@@ -19,7 +19,7 @@ sim_steps = start_step + (0 : t_steps) * (stop_step - start_step) / t_steps;
 for ii = 1 : (t_steps + 1)
     
 
-    % Assemble simulation results
+    % v1: Assemble all nodal solutions on z=7.5 plane ===================================
     filename = [sim_dir, '/SOL_9', sprintf('%08d', sim_steps(ii)), '_velo_z7d5.txt'];
     disp(['Reading ', filename]);
     
@@ -39,7 +39,29 @@ for ii = 1 : (t_steps + 1)
     
     % Cartesian to polar transformation
     vr_numer = cos(theta_numer) .* u_numer + sin(theta_numer) .* v_numer;
+    
+    % Verify angular velocity is ~zero
     vt_numer = -sin(theta_numer) .* u_numer + cos(theta_numer) .* v_numer;
+
+    % v2: Paraview's plot-over-line data on y-axis in z=7.5 plane ===================================
+    filename = [sim_dir, '/pv_plot-over-line_', sprintf('%06d', sol_idx(ii)), '.csv'];
+    disp(['Reading ', filename]);
+    
+    velo_interp = readmatrix(filename);
+    
+    x_interp = velo_interp(:, 13);
+    y_interp = velo_interp(:, 14);
+    theta_interp = atan2(y_interp, x_interp);
+    
+    u_interp = velo_interp(:, 4);
+    v_interp = velo_interp(:, 5);
+    w_interp = velo_interp(:, 6);
+
+    % Cartesian to polar transformation
+    vr_interp = cos(theta_interp) .* u_interp + sin(theta_interp) .* v_interp;
+    
+    % Verify angular velocity is ~zero
+    vt_interp = -sin(theta_interp) .* u_interp + cos(theta_interp) .* v_interp;
     
     t = (ii - 1) * dt;
     w_ax = subplot((t_steps + 1) / 2, 2, ii, 'Parent', w_fig); hold(w_ax, 'on');
@@ -64,17 +86,26 @@ for ii = 1 : (t_steps + 1)
             ( r_exact / R - G_n(k) * 2 * besselj(1, Lambda_n * r_exact / R) / (Lambda_n * besselj(0, Lambda_n)) ) * ...
             exp(1j * n * omega * (t - z_coord / c_n(k)) );
         
-        plot(w_ax, real(w_exact), x / R, 'Color', colors(1, :), 'Linestyle', '-');
-        plot(w_ax, w_numer, r_numer / R, 'Color', colors(2, :), 'Linestyle', 'None', 'Marker', 'o');
-        plot(w_ax, [0, 0], [-1, 1], 'Color', [0.75, 0.75, 0.75] );               % grey
-        
-        plot(v_ax, real(vr_exact), x / R, 'Color', colors(1, :), 'Linestyle', '-' );
-        plot(v_ax, vr_numer, r_numer / R, 'Color', colors(2, :), 'Linestyle', 'None', 'Marker', 'o');
-        plot(v_ax, [0, 0], [-1, 1], 'Color', [0.75, 0.75, 0.75] );               % grey
-        
     end
     
-    w_ax.XLim  = w_lim; v_ax.XLim  = v_lim;
+    plot(w_ax, real(w_exact), x / R, 'Color', colors(1, :), 'Linestyle', '-', 'LineWidth', 1);
+    % plot(w_ax, w_numer, r_numer / R, 'Color', colors(2, :), 'Linestyle', 'None', 'Marker', 'o', 'MarkerSize', 3);
+    plot(w_ax, w_interp, y_interp / R, 'Color', colors(2, :), 'Linestyle', '--', 'LineWidth', 1);
+    plot(w_ax, [0, 0], [-1, 1], 'Color', [0.75, 0.75, 0.75] );               % grey
+
+    plot(v_ax, real(vr_exact), x / R, 'Color', colors(1, :), 'Linestyle', '-', 'LineWidth', 1);
+    % plot(v_ax, vr_numer, r_numer / R, 'Color', colors(2, :), 'Linestyle', 'None', 'Marker', 'o', 'MarkerSize', 3);
+    plot(v_ax, vr_interp, y_interp / R, 'Color', colors(2, :), 'Linestyle', '--', 'LineWidth', 1);
+    plot(v_ax, [0, 0], [-1, 1], 'Color', [0.75, 0.75, 0.75] );               % grey
+        
+    w_ax.XLim  = w_lim;  v_ax.XLim  = v_lim;
+    w_ax.YLim = [-1, 1]; v_ax.YLim = [-1, 1];
+    grid(w_ax, 'minor'); grid(v_ax, 'minor');
+    
+    if ii == 1
+        legend(w_ax, 'Analytical', 'Numerical', 'Location', 'northeast', 'FontSize', 6);
+        legend(v_ax, 'Analytical', 'Numerical', 'Location', 'northwest', 'FontSize', 6);
+    end
     
     for jj = 1 : length(ax_all)
         if ii == 1
@@ -91,3 +122,6 @@ end
 
 sgtitle(w_fig, ['Axial Velocity $w(r, z=',  num2str(z_coord), ', t)$'], 'interpreter', 'latex');
 sgtitle(v_fig, ['Radial Velocity $v(r, z=', num2str(z_coord), ', t)$'], 'interpreter', 'latex');
+
+saveas(w_fig, [sim_dir, '/exact-numer_axial-velo-profiles.png'])
+saveas(v_fig, [sim_dir, '/exact-numer_radial-velo-profiles.png'])

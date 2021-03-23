@@ -2,15 +2,15 @@
 
 close all; clear; clc;
 
-sim_dir = '/home/ingridxlan/Documents/Ingrid/Solvers/CMM_testing/womersley_cylinder/Simulations/R0p3_L15_deformable/P1_axial_ms_7p500e-2';
-
+sim_dir = '/home/ingridxlan/Documents/Ingrid/Solvers/CMM_testing/womersley_cylinder/Simulations/R0p3_L15_deformable/P1_axial_ms_5p000e-2';
+start_step = 4400; incr_step = 40; stop_step = 6600;       % simulation steps
 num_cyc = 3;                        % num cardiac cycles simulated
+
 z_in  = 0;                          % z-coord of inlet face
 z_out = 15;                         % z-coord of outlet face
 z_half = z_out / 2;                 % z-coord halfway down the tube
 
 T = 1.1;                            % period (s)
-
 n_modes = 2;                        % num Fourier modes (including steady 0th mode)
 
 % Fluid properties
@@ -40,10 +40,12 @@ flow = [ 33.42, 56.19, 73.697, 96.721, 139.85, 164.46, 177.44, 196.25, ...
 inlet_data  = readmatrix([sim_dir, '/Outlet_000_data.txt']);
 outlet_data = readmatrix([sim_dir, '/Outlet_001_data.txt']);
 
-compare_flow_pres(num_cyc, z_in, z_out, inlet_data, outlet_data, ...
+compare_flow_pres(sim_dir, num_cyc, z_in, z_out, inlet_data, outlet_data, ...
                   p0, mu, rho, R, c_n, B_n, Q_n, G_n, g_n, T, n_modes);
 
 % Compare velocity profiles halfway down the tube
 t_steps = 5;                                % number of intervals for comparison
-start_step = 440; stop_step = 660;          % simulation steps
-compare_velo_profiles(sim_dir, z_half, mu, rho, R, c_n, B_n, Q_n, G_n, T, n_modes, t_steps, start_step, stop_step);
+sol_idx = ( (num_cyc - 1) / num_cyc * stop_step / incr_step) : (stop_step / incr_step);
+sol_idx = sol_idx(1 : (length(sol_idx) - 1) / t_steps :  end);
+compare_velo_profiles(sim_dir, z_half, mu, rho, R, c_n, B_n, Q_n, G_n, T, ...
+                      n_modes, t_steps, start_step, stop_step, sol_idx);

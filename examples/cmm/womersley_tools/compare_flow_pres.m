@@ -1,4 +1,4 @@
-function compare_flow_pres(num_cyc, z_in, z_out, inlet_data, outlet_data, p0, mu, rho, R, c_n, B_n, Q_n, G_n, g_n, T, n_modes)
+function compare_flow_pres(sim_dir, num_cyc, z_in, z_out, inlet_data, outlet_data, p0, mu, rho, R, c_n, B_n, Q_n, G_n, g_n, T, n_modes)
 
 conversion = 1333.2;
 
@@ -51,6 +51,7 @@ plot(t_numer, q_out_numer, 'Color', colors(2, :), 'Linestyle', '--');
 
 xlabel('Time (s)'); ylabel('Flow (ml/s)'); xlim([0, T]);
 legend('Inlet / Analytical', 'Outlet / Analytical', 'Inlet / Numerical', 'Outlet / Numerical');
+saveas(gcf, [sim_dir, '/exact-numer_cap-flows.png'])
 
 % Plot analytical vs. numerical pressures
 figure; hold on;
@@ -61,6 +62,7 @@ plot(t_numer, p_out_numer / conversion, 'Color', colors(2, :), 'Linestyle', '--'
 
 xlabel('Time (s)'); ylabel('Pressure (mm Hg)'); xlim([0, T]);
 legend('Inlet / Analytical', 'Outlet / Analytical', 'Inlet / Numerical', 'Outlet / Numerical');
+saveas(gcf, [sim_dir, '/exact-numer_cap-pressures.png'])
 
 
 
