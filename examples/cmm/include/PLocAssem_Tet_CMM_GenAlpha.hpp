@@ -268,11 +268,16 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
       const auto bes2_xi     = sp_bessel::besselJ(2, xi);
       const auto bes0_Lambda = sp_bessel::besselJ(0, Lambda);
 
+      // polar to cartesian transformation
+      const double theta = std::atan2(y, x);
+      const double sin_theta = std::sin(theta);
+      const double cos_theta = std::cos(theta);
+
       // axial velo gradient
       const double w_x = k0 * x / (2.0*vis_mu) 
-          + std::real( B1 * G1 * i1_1d5 * Omega * x * bes1_xi / (rho0 * c1 * R_pipe * r * bes0_Lambda) * exp(i1*omega*(t-z/c1)) );
+          + std::real( B1 * G1 * i1_1d5 * Omega * cos_theta * bes1_xi / (rho0 * c1 * R_pipe * bes0_Lambda) * exp(i1*omega*(t-z/c1)) );
       const double w_y = k0 * y / (2.0*vis_mu)
-          + std::real( B1 * G1 * i1_1d5 * Omega * y * bes1_xi / (rho0 * c1 * R_pipe * r * bes0_Lambda) * exp(i1*omega*(t-z/c1)) );
+          + std::real( B1 * G1 * i1_1d5 * Omega * sin_theta * bes1_xi / (rho0 * c1 * R_pipe * bes0_Lambda) * exp(i1*omega*(t-z/c1)) );
       const double w_z = std::real( -i1 * omega * B1 / (rho0 * c1 * c1) * (1.0 - G1 * bes0_xi / bes0_Lambda) * exp(i1*omega*(t-z/c1)) );
       const double p = k0 * z + std::real( B1 * exp(i1*omega*(t-z/c1)) );
 
@@ -285,11 +290,6 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
       const double vr_r = std::real( i1 * omega * B1 / (2.0 * rho0 * c1 * c1) * coef * exp(i1*omega*(t-z/c1)) );
       const double vr_z = std::real( B1 * omega * omega * R_pipe / (2.0 * rho0 * c1 * c1 * c1)
           * ( r / R_pipe - 2.0 * G1 * bes1_xi / (Lambda * bes0_Lambda) ) * exp(i1*omega*(t-z/c1)) );
-
-      // polar to cartesian transformation
-      const double theta = std::atan2(y, x);
-      const double sin_theta = std::sin(theta);
-      const double cos_theta = std::cos(theta);
 
       const double u_x = cos_theta * cos_theta * vr_r + vr * sin_theta * sin_theta / r;
       const double u_y = sin_theta * cos_theta * ( vr_r - vr / r );
