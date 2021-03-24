@@ -18,6 +18,32 @@ PDNSolution_Wall_Disp::PDNSolution_Wall_Disp(
 }
 
 
+PDNSolution_Wall_Disp::PDNSolution_Wall_Disp(
+    const APart_Node * const &pNode,
+    const FEANode * const &fNode_ptr,
+    const ALocal_EBC * const &ebc_wall_part,
+    const double &rho,
+    const int &type, const bool &isprint )
+: PDNSolution( pNode, 3 ), is_print( isprint )
+{
+  switch(type)
+  {
+    case 0:
+      Init_zero( pNode );
+      break;
+    case 1:
+      Init_womersley( ebc_wall_part, rho );
+      break;
+    case 2:
+      Init_womersley_dot( ebc_wall_part, rho );
+      break;
+    default:
+      SYS_T::print_fatal("Error: PDNSolution_Wall_Disp : No such type of initial condition.\n");
+      break;
+  }
+}
+
+
 PDNSolution_Wall_Disp::~PDNSolution_Wall_Disp()
 {}
 
@@ -47,6 +73,24 @@ void PDNSolution_Wall_Disp::Init_zero( const APart_Node * const &pNode_ptr )
     SYS_T::commPrint("                       disp_y = 0.0 \n");
     SYS_T::commPrint("                       disp_z = 0.0 \n");
   }
+}
+
+
+// ==== WOMERSLEY CHANGES BEGIN ====
+void PDNSolution_Wall_Disp::Init_womersley(
+    const ALocal_EBC * const &ebc_wall_part,
+    const double &rho )
+{
+
+}
+
+
+// ==== WOMERSLEY CHANGES BEGIN ====
+void PDNSolution_Wall_Disp::Init_womersley_dot(
+    const ALocal_EBC * const &ebc_wall_part,
+    const double &rho )
+{
+
 }
 
 // EOF
