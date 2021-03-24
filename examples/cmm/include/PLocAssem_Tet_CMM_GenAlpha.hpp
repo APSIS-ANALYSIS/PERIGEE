@@ -293,11 +293,11 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
 
       const double u_x = cos_theta * cos_theta * vr_r + vr * sin_theta * sin_theta / r;
       const double u_y = sin_theta * cos_theta * ( vr_r - vr / r );
-      const double u_z = x / r * vr_z;
+      const double u_z = cos_theta * vr_z;
 
       const double v_x = sin_theta * cos_theta * ( vr_r - vr / r );
       const double v_y = sin_theta * sin_theta * vr_r + vr * cos_theta * cos_theta / r;
-      const double v_z = y / r * vr_z;
+      const double v_z = sin_theta * vr_z;
 
       gx = MATH_T::dot3d(-p + 2.0*vis_mu * u_x,    vis_mu*(u_y + v_x),    vis_mu*(u_z + w_x), nx, ny, nz); 
       gy = MATH_T::dot3d(   vis_mu*(v_x + u_y), -p + 2.0*vis_mu * v_y,    vis_mu*(v_z + w_y), nx, ny, nz); 
