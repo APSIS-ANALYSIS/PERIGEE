@@ -44,7 +44,7 @@ for ii = 1 : (t_steps + 1)
     vt_numer = -sin(theta_numer) .* u_numer + cos(theta_numer) .* v_numer;
 
     % v2: Paraview's plot-over-line data on y-axis in z=7.5 plane ===================================
-    filename = [sim_dir, '/pv_plot-over-line_', sprintf('%06d', sol_idx(ii)), '.csv'];
+    filename = [sim_dir, '/pv_plot-over-Yaxis_', sprintf('%06d', sol_idx(ii)), '.csv'];
     disp(['Reading ', filename]);
     
     velo_interp = readmatrix(filename);

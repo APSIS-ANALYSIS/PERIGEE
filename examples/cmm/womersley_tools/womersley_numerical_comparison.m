@@ -2,8 +2,8 @@
 
 close all; clear; clc;
 
-sim_dir = '/home/ingridxlan/Documents/Ingrid/Solvers/CMM_testing/womersley_cylinder/Simulations/R0p3_L15_deformable/P1_axial_ms_5p000e-2';
-start_step = 4400; incr_step = 40; stop_step = 6600;       % simulation steps
+sim_dir = '/home/ingridxlan/Documents/Ingrid/Solvers/CMM_testing/womersley_cylinder/Simulations/R0p3_L15_deformable/P1_axial_ms_7p500e-2';
+start_step = 440; incr_step = 4; stop_step = 660;       % simulation steps
 num_cyc = 3;                        % num cardiac cycles simulated
 
 z_in  = 0;                          % z-coord of inlet face
@@ -43,9 +43,19 @@ outlet_data = readmatrix([sim_dir, '/Outlet_001_data.txt']);
 compare_flow_pres(sim_dir, num_cyc, z_in, z_out, inlet_data, outlet_data, ...
                   p0, mu, rho, R, c_n, B_n, Q_n, G_n, g_n, T, n_modes);
 
-% Compare velocity profiles halfway down the tube
+
 t_steps = 5;                                % number of intervals for comparison
-sol_idx = ( (num_cyc - 1) / num_cyc * stop_step / incr_step) : (stop_step / incr_step);
-sol_idx = sol_idx(1 : (length(sol_idx) - 1) / t_steps :  end);
+
+% Compare velocity profiles halfway down the tube
+sol_idx_all = ( (num_cyc - 1) / num_cyc * stop_step / incr_step) : (stop_step / incr_step);
+sol_idx = sol_idx_all(1 : (length(sol_idx_all) - 1) / t_steps :  end);
 compare_velo_profiles(sim_dir, z_half, mu, rho, R, c_n, B_n, Q_n, G_n, T, ...
                       n_modes, t_steps, start_step, stop_step, sol_idx);
+
+% Compare pressures down the tube
+compare_fluid_pres(sim_dir, z_in, z_out, p0, mu, R, c_n, B_n, Q_n, T, ...
+                   n_modes, t_steps, start_step, stop_step, sol_idx)
+
+% Compare wall displacements down the tube
+compare_wall_disp(sim_dir, z_in, z_out, rho, R, c_n, g_n, B_n, G_n, T, ...
+                  n_modes, t_steps, start_step, stop_step, sol_idx)

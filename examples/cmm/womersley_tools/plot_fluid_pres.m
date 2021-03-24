@@ -46,7 +46,7 @@ end
 
 xlabel('z / $\lambda$', 'interpreter', 'latex');
 ylabel('mm Hg', 'interpreter', 'latex')
-title('Fluid Pressure $P(r, z, t)$', 'interpreter', 'latex');
+title('Fluid Pressure $P(z, t)$', 'interpreter', 'latex');
 
 legend(t_labs, 'interpreter', 'latex');
 
