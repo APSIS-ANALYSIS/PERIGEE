@@ -336,16 +336,22 @@ int main( int argc, char *argv[] )
   PDNSolution * base = new PDNSolution_NS( pNode, fNode, locinfnbc, 1 );
   
   // ==== WOMERSLEY CHANGES BEGIN ====
+
   // init womersley soln
   PDNSolution * sol = new PDNSolution_NS( pNode, fNode, fluid_density, fluid_mu, 3 );
 
   // init womersley dot soln
   PDNSolution * dot_sol = new PDNSolution_NS( pNode, fNode, fluid_density, fluid_mu, 4 );
-  // ==== WOMERSLEY CHANGES END ====
 
-  PDNSolution * sol_wall_disp = new PDNSolution_Wall_Disp( pNode, fNode, 0 );
+  // init womersley wall disp
+  PDNSolution * sol_wall_disp = new PDNSolution_Wall_Disp( GMIptr, pNode, fNode, locebc_wall, fluid_density, 1 );
+  PETSc_T::write_to_file(sol_wall_disp->solution, "init_wall_disp.txt");
   
-  PDNSolution * dot_sol_wall_disp = new PDNSolution_Wall_Disp( pNode, fNode, 0 );
+  // init womersley dot wall disp
+  PDNSolution * dot_sol_wall_disp = new PDNSolution_Wall_Disp( GMIptr, pNode, fNode, locebc_wall, fluid_density, 2 );
+  PETSc_T::write_to_file(dot_sol_wall_disp->solution, "init_dot_wall_disp.txt");
+
+  // ==== WOMERSLEY CHANGES END ====
 
   if( is_restart )
   {
