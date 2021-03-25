@@ -345,11 +345,9 @@ int main( int argc, char *argv[] )
 
   // init womersley wall disp
   PDNSolution * sol_wall_disp = new PDNSolution_Wall_Disp( GMIptr, pNode, fNode, locebc_wall, fluid_density, 1 );
-  PETSc_T::write_to_file(sol_wall_disp->solution, "init_wall_disp.txt");
   
   // init womersley dot wall disp
   PDNSolution * dot_sol_wall_disp = new PDNSolution_Wall_Disp( GMIptr, pNode, fNode, locebc_wall, fluid_density, 2 );
-  PETSc_T::write_to_file(dot_sol_wall_disp->solution, "init_dot_wall_disp.txt");
 
   // ==== WOMERSLEY CHANGES END ====
 
