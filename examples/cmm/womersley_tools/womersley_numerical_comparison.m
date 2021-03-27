@@ -40,8 +40,9 @@ flow = [ 33.42, 56.19, 73.697, 96.721, 139.85, 164.46, 177.44, 196.25, ...
 inlet_data  = readmatrix([sim_dir, '/Outlet_000_data.txt']);
 outlet_data = readmatrix([sim_dir, '/Outlet_001_data.txt']);
 
+sol_idx = (start_step : stop_step) + 1;
 compare_flow_pres(sim_dir, num_cyc, z_in, z_out, inlet_data, outlet_data, ...
-                  p0, mu, rho, R, c_n, B_n, Q_n, G_n, g_n, T, n_modes);
+                  p0, mu, rho, R, c_n, B_n, Q_n, G_n, g_n, T, n_modes, sol_idx);
 
 
 t_steps = 5;                                % number of intervals for comparison

@@ -1,4 +1,4 @@
-function compare_flow_pres(sim_dir, num_cyc, z_in, z_out, inlet_data, outlet_data, p0, mu, rho, R, c_n, B_n, Q_n, G_n, g_n, T, n_modes)
+function compare_flow_pres(sim_dir, num_cyc, z_in, z_out, inlet_data, outlet_data, p0, mu, rho, R, c_n, B_n, Q_n, G_n, g_n, T, n_modes, sol_idx)
 
 conversion = 1333.2;
 
@@ -28,18 +28,13 @@ for k = 2 : n_modes
     
 end
 
-t_numer = inlet_data(:, 2);
+t_numer = inlet_data(sol_idx, 2);
 
-% first time entry will be 0
-start_idx = 1 + find( abs(t_numer(2 : end) - T * (num_cyc - 1) ) < 1.0e-8, 1);
-end_idx   = 1 + find( abs(t_numer(2 : end) - T * num_cyc ) < 1.0e-8, 1);
-t_numer = t_numer(start_idx : end_idx) - t_numer(start_idx);
+q_in_numer  = -inlet_data(sol_idx, 4); % flip sign for unit normal
+q_out_numer = outlet_data(sol_idx, 4);
 
-q_in_numer  = -inlet_data(start_idx : end_idx, 4); % flip sign for unit normal
-q_out_numer = outlet_data(start_idx : end_idx, 4);
-
-p_in_numer  =  inlet_data(start_idx : end_idx, 5);
-p_out_numer = outlet_data(start_idx : end_idx, 5);
+p_in_numer  =  inlet_data(sol_idx, 5);
+p_out_numer = outlet_data(sol_idx, 5);
 
 
 % Plot analytical vs. numerical flows
