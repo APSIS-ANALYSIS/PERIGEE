@@ -1,4 +1,4 @@
-function compare_wall_disp(sim_dir, z_in, z_out, rho, R, c_n, g_n, B_n, G_n, T, n_modes, t_steps, start_step, stop_step, sol_idx)
+function compare_wall_disp(sim_dir, z_in, z_out, rho, R, c_n, g_n, B_n, G_n, T, n_modes, t_steps, sol_idx)
 
 colors = [     0, 0.4470, 0.7410; 0.8500, 0.3250, 0.0980; ...
           0.4940, 0.1840, 0.5560; 0.4660, 0.6740, 0.1880; ...
@@ -7,8 +7,6 @@ colors = [     0, 0.4470, 0.7410; 0.8500, 0.3250, 0.0980; ...
 dt = T / t_steps;
       
 omega = 2 * pi / T;                                 % base angular frequency
-
-sim_steps = start_step + (0 : t_steps) * (stop_step - start_step) / t_steps;
 
 t_labs = cell(1, t_steps + 1);
 t_labs{1} = '$t$ = $0$';
@@ -43,6 +41,9 @@ for ii = 1 : (t_steps + 1)
        
     % Cartesian to polar transformation
     eta_interp = cos(theta_interp) .* ux_interp + sin(theta_interp) .* uy_interp;
+%     r0_numer = sqrt( x_interp.^2 + y_interp.^2 );
+%     r_numer  = sqrt( (x_interp + ux_interp).^2 + (y_interp + uy_interp).^2 );
+%     eta_interp = r_numer - r0_numer;
     
     % Verify angular displacement is ~zero
     phi_interp = -sin(theta_interp) .* ux_interp + cos(theta_interp) .* uy_interp;

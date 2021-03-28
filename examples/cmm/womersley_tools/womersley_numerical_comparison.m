@@ -55,8 +55,13 @@ compare_velo_profiles(sim_dir, z_half, mu, rho, R, c_n, B_n, Q_n, G_n, T, ...
 
 % Compare pressures down the tube
 compare_fluid_pres(sim_dir, z_in, z_out, p0, mu, R, c_n, B_n, Q_n, T, ...
-                   n_modes, t_steps, start_step, stop_step, sol_idx)
+                   n_modes, t_steps, start_step, stop_step, sol_idx);
 
 % Compare wall displacements down the tube
 compare_wall_disp(sim_dir, z_in, z_out, rho, R, c_n, g_n, B_n, G_n, T, ...
-                  n_modes, t_steps, start_step, stop_step, sol_idx)
+                  n_modes, t_steps, sol_idx);
+
+% Compare wall velocities down the tube
+compare_wall_velo(sim_dir, z_in, z_out, mu, rho, R, c_n, B_n, G_n, T, ...
+                  n_modes, t_steps, sol_idx);
+              
