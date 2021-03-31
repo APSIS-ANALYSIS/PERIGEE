@@ -138,4 +138,4 @@ sgtitle(w_fig, 'Axial Velocity $w(r, z, t)$',  'interpreter', 'latex');
 sgtitle(v_fig, 'Radial Velocity $v(r, z, t)$', 'interpreter', 'latex');
 
 saveas(w_fig, 'exact_axial-velo-profiles.png');
-saveas(w_fig, 'exact_radial-velo-profiles.png');
+saveas(v_fig, 'exact_radial-velo-profiles.png');
