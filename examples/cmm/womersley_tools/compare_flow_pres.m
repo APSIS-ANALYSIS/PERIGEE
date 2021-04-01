@@ -1,10 +1,8 @@
-function compare_flow_pres(sim_dir, num_cyc, z_in, z_out, inlet_data, outlet_data, p0, mu, rho, R, c_n, B_n, Q_n, G_n, g_n, T, n_modes, sol_idx)
+function compare_flow_pres(z_in, z_out, inlet_data, outlet_data, p0, mu, rho, R, c_n, B_n, Q_n, G_n, g_n, T, n_modes, sol_idx)
 
 conversion = 1333.2;
 
-colors = [     0, 0.4470, 0.7410; 0.8500, 0.3250, 0.0980; ...
-          0.4940, 0.1840, 0.5560; 0.4660, 0.6740, 0.1880; ...
-          0.3010, 0.7450, 0.9330; 0.6350, 0.0780, 0.1840];
+colors = [0.918, 0.235, 0.325; 0, 0, 0.545];
       
 omega = 2 * pi / T;                                 % base angular frequency
 
@@ -28,7 +26,7 @@ for k = 2 : n_modes
     
 end
 
-t_numer = inlet_data(sol_idx, 2);
+t_numer = inlet_data(sol_idx, 2) - inlet_data(sol_idx(1), 2);
 
 q_in_numer  = -inlet_data(sol_idx, 4); % flip sign for unit normal
 q_out_numer = outlet_data(sol_idx, 4);
@@ -37,27 +35,60 @@ p_in_numer  =  inlet_data(sol_idx, 5);
 p_out_numer = outlet_data(sol_idx, 5);
 
 
-% Plot analytical vs. numerical flows
-figure; hold on;
+% ================== Plot analytical vs. numerical flows ==================
+figure; 
+subplot(1, 2, 1); hold on;
 plot(t_exact, real(q_in_exact),  'Color', colors(1, :), 'Linestyle', '-');
 plot(t_exact, real(q_out_exact), 'Color', colors(2, :), 'Linestyle', '-');
 plot(t_numer,  q_in_numer, 'Color', colors(1, :), 'Linestyle', '--');
 plot(t_numer, q_out_numer, 'Color', colors(2, :), 'Linestyle', '--');
 
-xlabel('Time (s)'); ylabel('Flow (ml/s)'); xlim([0, T]);
-legend('Inlet / Analytical', 'Outlet / Analytical', 'Inlet / Numerical', 'Outlet / Numerical');
-saveas(gcf, [sim_dir, '/exact-numer_cap-flows.png'])
+hXLabel = xlabel('Time (s)'); hYLabel = ylabel('Flow (mL/s)');
+set([hXLabel, hYLabel], 'FontName', 'Helvetica', 'FontSize', 12, 'FontWeight', 'bold');
 
-% Plot analytical vs. numerical pressures
-figure; hold on;
+set( gca, 'Box', 'on', 'TickDir'     , 'out', ...
+        'TickLength'  , [.02 .02], ...
+        'XMinorTick'  , 'on' , ...
+        'YMinorTick'  , 'on' , ...
+        'YGrid'       , 'on' , ...
+        'XGrid'       , 'on' , ...
+        'XColor'      , [0 0 0 ], ...
+        'YColor'      , [0 0 0 ], ...
+        'LineWidth'   , 1 );
+    
+axis square; grid minor; xlim([0, T]);
+set(gca, 'FontSize', 12, 'fontWeight', 'bold');
+
+
+% ================  Plot analytical vs. numerical pressures ===============
+subplot(1, 2, 2); hold on;
 plot(t_exact, real(p_in_exact)  / conversion, 'Color', colors(1, :), 'Linestyle', '-');
 plot(t_exact, real(p_out_exact) / conversion, 'Color', colors(2, :), 'Linestyle', '-');
 plot(t_numer,  p_in_numer / conversion, 'Color', colors(1, :), 'Linestyle', '--');
 plot(t_numer, p_out_numer / conversion, 'Color', colors(2, :), 'Linestyle', '--');
 
-xlabel('Time (s)'); ylabel('Pressure (mm Hg)'); xlim([0, T]);
-legend('Inlet / Analytical', 'Outlet / Analytical', 'Inlet / Numerical', 'Outlet / Numerical');
-saveas(gcf, [sim_dir, '/exact-numer_cap-pressures.png'])
+hXLabel = xlabel('Time (s)'); hYLabel = ylabel('Pressure (mm Hg)');
+set([hXLabel, hYLabel], 'FontName', 'Helvetica', 'FontSize', 12, 'FontWeight', 'bold');
 
+set(gca, 'Box', 'on', 'TickDir', 'out', ...
+        'TickLength'  , [.02 .02], ...
+        'XMinorTick'  , 'on' , ...
+        'YMinorTick'  , 'on' , ...
+        'YGrid'       , 'on' , ...
+        'XGrid'       , 'on' , ...
+        'XColor'      , [0 0 0 ], ...
+        'YColor'      , [0 0 0 ], ...
+        'LineWidth'   , 1 );
+    
+axis square; grid minor; xlim([0, T]); ylim([-6, 6]);
+set(gca, 'FontSize', 12, 'fontWeight', 'bold');
+
+lg = legend('Inlet / Analytical', 'Outlet / Analytical', 'Inlet / Numerical', 'Outlet / Numerical', ...
+           'NumColumns', 4, 'Box', 'off');
+set(lg, 'Position', [0.4, 0.1, 0.2, 0.2], 'Units', 'normalized');
+
+
+set(gcf, 'WindowState','fullscreen');
+print -dpdf exact-numer_cap-flows-pressures.pdf -r0 -fillpage
 
 
