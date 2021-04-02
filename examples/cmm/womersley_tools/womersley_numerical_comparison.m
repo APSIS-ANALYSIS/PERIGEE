@@ -41,7 +41,7 @@ inlet_data  = readmatrix([sim_dir, '/Outlet_000_data.txt']);
 outlet_data = readmatrix([sim_dir, '/Outlet_001_data.txt']);
 
 sol_idx = (start_step : stop_step) + 1;
-compare_flow_pres(z_in, z_out, inlet_data, outlet_data, ...
+compare_flow_pres(sim_dir, z_in, z_out, inlet_data, outlet_data, ...
                   p0, mu, rho, R, c_n, B_n, Q_n, G_n, g_n, T, n_modes, sol_idx);
 
 
@@ -53,14 +53,14 @@ sol_idx = sol_idx_all(1 : (length(sol_idx_all) - 1) / t_steps :  end);
 compare_velo_profiles(sim_dir, z_half, mu, rho, R, c_n, B_n, Q_n, G_n, T, ...
                       n_modes, t_steps, start_step, stop_step, sol_idx);
 
-% % Compare pressures down the tube
-% compare_fluid_pres(sim_dir, z_in, z_out, p0, mu, R, c_n, B_n, Q_n, T, ...
-%                    n_modes, t_steps, start_step, stop_step, sol_idx);
-% 
-% % Compare wall displacements down the tube
-% compare_wall_disp(sim_dir, z_in, z_out, rho, R, c_n, g_n, B_n, G_n, T, ...
-%                   n_modes, t_steps, sol_idx);
-% 
-% % Compare wall velocities down the tube
-% compare_wall_velo(sim_dir, z_in, z_out, mu, rho, R, c_n, B_n, G_n, T, ...
-%                   n_modes, t_steps, sol_idx);
+% Compare pressures down the tube
+compare_fluid_pres(sim_dir, z_in, z_out, p0, mu, R, c_n, B_n, Q_n, T, ...
+                   n_modes, t_steps, sol_idx);
+
+% Compare wall displacements down the tube
+compare_wall_disp(sim_dir, z_in, z_out, rho, R, c_n, g_n, B_n, G_n, T, ...
+                  n_modes, t_steps, sol_idx);
+
+% Compare wall velocities down the tube
+compare_wall_velo(sim_dir, z_in, z_out, mu, rho, R, c_n, B_n, G_n, T, ...
+                  n_modes, t_steps, sol_idx);

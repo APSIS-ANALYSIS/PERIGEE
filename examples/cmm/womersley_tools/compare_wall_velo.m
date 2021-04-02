@@ -9,18 +9,19 @@ dt = T / t_steps;
 omega = 2 * pi / T;                                 % base angular frequency
 
 t_labs = cell(1, t_steps + 1);
-t_labs{1} = '$t$ = $0$';
-t_labs{2} = ['$t$ = $T$ / ', num2str(t_steps)];
+t_labs{1} = '{\boldmath$t$ = $0$}';
+t_labs{2} = ['{\boldmath$t$ = $T$/}\bf{', num2str(t_steps), '}'];
 for ii = 3 : t_steps
-    t_labs{ii} = ['$t$ = ', num2str(ii-1), ' $T$ / ', num2str(t_steps)];
+    t_labs{ii} = ['{\boldmath$t$ = }\bf{', num2str(ii-1), '}{\boldmath$T$/}\bf{', num2str(t_steps), '}'];
 end
-t_labs{t_steps + 1} = '$t$ = $T$';
+t_labs{t_steps + 1} = '{\boldmath$t$ = $T$}';
 
 z_exact = linspace(z_in, z_out, 100);
 
-w_wall_fig  = figure;  w_wall_ax = axes; hold on;  w_wall_hlines = [];
-vr_wall_fig = figure; vr_wall_ax = axes; hold on; vr_wall_hlines = [];
-
+figure;
+w_wall_ax  = subplot(1, 2, 1); hold(w_wall_ax, 'on');
+vr_wall_ax = subplot(1, 2, 2); hold(vr_wall_ax, 'on');
+w_wall_hlines = []; vr_wall_hlines = [];
 
 for ii = 1 : (t_steps + 1)
     
@@ -75,19 +76,51 @@ for ii = 1 : (t_steps + 1)
     
 end
 
+w_wall_ax.XLim = [z_in, z_out]; vr_wall_ax.XLim = [z_in, z_out];
+w_wall_ax.YLim = [-4, 4];       vr_wall_ax.YLim = [-8e-3, 8e-3];
+
 grid(w_wall_ax, 'minor'); grid(vr_wall_ax, 'minor');
 
-xlabel(w_wall_ax,  'z (cm)', 'interpreter', 'latex');
-xlabel(vr_wall_ax, 'z (cm)', 'interpreter', 'latex');
+xlabel(w_wall_ax,  '{\boldmath$z$} \bf{(cm)}', 'interpreter', 'latex', ...
+       'FontName', 'Helvetica', 'FontSize', 12, 'FontWeight', 'Bold');
+xlabel(vr_wall_ax, '{\boldmath$z$} \bf{(cm)}', 'interpreter', 'latex', ...
+       'FontName', 'Helvetica', 'FontSize', 12, 'FontWeight', 'Bold');
 
-ylabel(w_wall_ax,  'cm', 'interpreter', 'latex');
-ylabel(vr_wall_ax, 'cm', 'interpreter', 'latex');
+ylabel(w_wall_ax,  '{\boldmath$v_z(r=R, z, t)$} \bf{(cm/s)}', 'interpreter', 'latex', ...
+      'FontName', 'Helvetica', 'FontSize', 12, 'FontWeight', 'Bold');
+ylabel(vr_wall_ax, '{\boldmath$v_r(r=R, z, t)$} \bf{(cm/s)}', 'interpreter', 'latex', ...
+       'FontName', 'Helvetica', 'FontSize', 12, 'FontWeight', 'Bold');
 
-title(w_wall_ax,  'Axial Wall Velocity $w(r=R, z, t)$',   'interpreter', 'latex');
-title(vr_wall_ax, 'Radial Wall Velocity $v(r=R, z, t)$', 'interpreter', 'latex');
+set(w_wall_ax, 'Box', 'on', 'TickDir', 'out', ...
+        'TickLength'  , [.02 .02], ...
+        'XMinorTick'  , 'on' , ...
+        'YMinorTick'  , 'on' , ...
+        'YGrid'       , 'on' , ...
+        'XGrid'       , 'on' , ...
+        'XColor'      , [0 0 0 ], ...
+        'YColor'      , [0 0 0 ], ...
+        'LineWidth'   , 1, ...
+        'FontSize', 12, ...
+        'FontWeight', 'Bold');
 
-legend(w_wall_hlines,  t_labs, 'interpreter', 'latex', 'NumColumns', 3, 'Location', 'best');
-legend(vr_wall_hlines, t_labs, 'interpreter', 'latex', 'NumColumns', 3, 'Location', 'best');
+set(vr_wall_ax, 'Box', 'on', 'TickDir', 'out', ...
+        'TickLength'  , [.02 .02], ...
+        'XMinorTick'  , 'on' , ...
+        'YMinorTick'  , 'on' , ...
+        'YGrid'       , 'on' , ...
+        'XGrid'       , 'on' , ...
+        'XColor'      , [0 0 0 ], ...
+        'YColor'      , [0 0 0 ], ...
+        'LineWidth'   , 1, ...
+        'FontSize', 12, ...
+        'FontWeight', 'Bold');
+    
+axis(w_wall_ax, 'square'); axis(vr_wall_ax, 'square');
 
-saveas(w_wall_fig,  [sim_dir, '/exact-numer_axial-wall-velo.png']);
-saveas(vr_wall_fig, [sim_dir, '/exact-numer_radial-wall-velo.png']);
+legend(w_wall_hlines,  t_labs, 'interpreter', 'latex', 'NumColumns', t_steps + 1, 'Box', 'off', ...
+       'Position', [0.4, 0.1, 0.2, 0.2], 'Units', 'normalized');
+legend(vr_wall_hlines, t_labs, 'interpreter', 'latex', 'NumColumns', t_steps + 1, 'Box', 'off', ...
+       'Position', [0.4, 0.1, 0.2, 0.2], 'Units', 'normalized');
+
+set(gcf, 'WindowState', 'fullscreen');
+print(gcf,  [sim_dir, '/exact-numer_wall-velo.pdf'], '-dpdf', '-r0', '-fillpage');

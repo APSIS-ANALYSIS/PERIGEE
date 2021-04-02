@@ -1,4 +1,4 @@
-function compare_flow_pres(z_in, z_out, inlet_data, outlet_data, p0, mu, rho, R, c_n, B_n, Q_n, G_n, g_n, T, n_modes, sol_idx)
+function compare_flow_pres(sim_dir, z_in, z_out, inlet_data, outlet_data, p0, mu, rho, R, c_n, B_n, Q_n, G_n, g_n, T, n_modes, sol_idx)
 
 conversion = 1333.2;
 
@@ -38,12 +38,17 @@ p_out_numer = outlet_data(sol_idx, 5);
 % ================== Plot analytical vs. numerical flows ==================
 figure; 
 subplot(1, 2, 1); hold on;
-plot(t_exact, real(q_in_exact),  'Color', colors(1, :), 'Linestyle', '-');
-plot(t_exact, real(q_out_exact), 'Color', colors(2, :), 'Linestyle', '-');
-plot(t_numer,  q_in_numer, 'Color', colors(1, :), 'Linestyle', '--');
-plot(t_numer, q_out_numer, 'Color', colors(2, :), 'Linestyle', '--');
+plot(t_exact, real(q_in_exact),  'Color', colors(1, :), ...
+     'LineWidth', 1, 'Linestyle', '-');
+plot(t_exact, real(q_out_exact), 'Color', colors(2, :), ...
+     'LineWidth', 1, 'Linestyle', '-');
+plot(t_numer,  q_in_numer, 'Color', colors(1, :), ...
+     'LineWidth', 1, 'Linestyle', '--');
+plot(t_numer, q_out_numer, 'Color', colors(2, :), ...
+     'LineWidth', 1, 'Linestyle', '--');
 
-hXLabel = xlabel('Time (s)'); hYLabel = ylabel('Flow (mL/s)');
+hXLabel = xlabel('{\boldmath$t$} \bf{(s)}', 'Interpreter', 'Latex');
+hYLabel = ylabel('{\boldmath$Q(z, t)$} \bf{ (mL/s)}', 'Interpreter', 'Latex');
 set([hXLabel, hYLabel], 'FontName', 'Helvetica', 'FontSize', 12, 'FontWeight', 'bold');
 
 set( gca, 'Box', 'on', 'TickDir'     , 'out', ...
@@ -54,20 +59,25 @@ set( gca, 'Box', 'on', 'TickDir'     , 'out', ...
         'XGrid'       , 'on' , ...
         'XColor'      , [0 0 0 ], ...
         'YColor'      , [0 0 0 ], ...
-        'LineWidth'   , 1 );
+        'LineWidth'   , 1, ...
+        'FontSize', 12, ...
+        'FontWeight', 'Bold');
     
 axis square; grid minor; xlim([0, T]);
-set(gca, 'FontSize', 12, 'fontWeight', 'bold');
-
 
 % ================  Plot analytical vs. numerical pressures ===============
 subplot(1, 2, 2); hold on;
-plot(t_exact, real(p_in_exact)  / conversion, 'Color', colors(1, :), 'Linestyle', '-');
-plot(t_exact, real(p_out_exact) / conversion, 'Color', colors(2, :), 'Linestyle', '-');
-plot(t_numer,  p_in_numer / conversion, 'Color', colors(1, :), 'Linestyle', '--');
-plot(t_numer, p_out_numer / conversion, 'Color', colors(2, :), 'Linestyle', '--');
+plot(t_exact, real(p_in_exact)  / conversion, 'Color', colors(1, :), ...
+     'LineWidth', 1, 'Linestyle', '-');
+plot(t_exact, real(p_out_exact) / conversion, 'Color', colors(2, :), ...
+     'LineWidth', 1, 'Linestyle', '-');
+plot(t_numer,  p_in_numer / conversion, 'Color', colors(1, :), ...
+     'LineWidth', 1, 'Linestyle', '--');
+plot(t_numer, p_out_numer / conversion, 'Color', colors(2, :), ...
+     'LineWidth', 1, 'Linestyle', '--');
 
-hXLabel = xlabel('Time (s)'); hYLabel = ylabel('Pressure (mm Hg)');
+hXLabel = xlabel('{\boldmath$t$} \bf{(s)}', 'Interpreter', 'Latex');
+hYLabel = ylabel('{\boldmath$P(z, t)$} \bf{ (mm Hg)}', 'Interpreter', 'Latex');
 set([hXLabel, hYLabel], 'FontName', 'Helvetica', 'FontSize', 12, 'FontWeight', 'bold');
 
 set(gca, 'Box', 'on', 'TickDir', 'out', ...
@@ -78,7 +88,9 @@ set(gca, 'Box', 'on', 'TickDir', 'out', ...
         'XGrid'       , 'on' , ...
         'XColor'      , [0 0 0 ], ...
         'YColor'      , [0 0 0 ], ...
-        'LineWidth'   , 1 );
+        'LineWidth'   , 1, ...
+        'FontSize', 12, ...
+        'FontWeight', 'Bold');
     
 axis square; grid minor; xlim([0, T]); ylim([-6, 6]);
 set(gca, 'FontSize', 12, 'fontWeight', 'bold');
@@ -87,8 +99,6 @@ lg = legend('Inlet / Analytical', 'Outlet / Analytical', 'Inlet / Numerical', 'O
            'NumColumns', 4, 'Box', 'off');
 set(lg, 'Position', [0.4, 0.1, 0.2, 0.2], 'Units', 'normalized');
 
-
 set(gcf, 'WindowState','fullscreen');
-print -dpdf exact-numer_cap-flows-pressures.pdf -r0 -fillpage
-
+print(gcf, [sim_dir, '/exact-numer_cap-flows-pressures.pdf'], '-dpdf', '-r0', '-fillpage');
 

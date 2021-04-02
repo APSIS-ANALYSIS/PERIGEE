@@ -9,18 +9,19 @@ dt = T / t_steps;
 omega = 2 * pi / T;                                 % base angular frequency
 
 t_labs = cell(1, t_steps + 1);
-t_labs{1} = '$t$ = $0$';
-t_labs{2} = ['$t$ = $T$ / ', num2str(t_steps)];
+t_labs{1} = '{\boldmath$t$ = $0$}';
+t_labs{2} = ['{\boldmath$t$ = $T$/}\bf{', num2str(t_steps), '}'];
 for ii = 3 : t_steps
-    t_labs{ii} = ['$t$ = ', num2str(ii-1), ' $T$ / ', num2str(t_steps)];
+    t_labs{ii} = ['{\boldmath$t$ = }\bf{', num2str(ii-1), '}{\boldmath$T$/}\bf{', num2str(t_steps), '}'];
 end
-t_labs{t_steps + 1} = '$t$ = $T$';
+t_labs{t_steps + 1} = '{\boldmath$t$ = $T$}';
 
 z_exact = linspace(z_in, z_out, 100);
 
-xi_fig  = figure;  xi_ax = axes;  hold on; xi_hlines  = [];
-eta_fig = figure; eta_ax = axes;  hold on; eta_hlines = [];
-
+figure;
+xi_ax  = subplot(1, 2, 1); hold(xi_ax, 'on');
+eta_ax = subplot(1, 2, 2); hold(eta_ax, 'on');
+xi_hlines = []; eta_hlines = [];
 
 for ii = 1 : (t_steps + 1)
     
@@ -73,19 +74,50 @@ for ii = 1 : (t_steps + 1)
     
 end
 
-grid(xi_ax, 'minor'); grid(eta_ax, 'minor');
+xi_ax.XLim = [z_in, z_out]; eta_ax.XLim = [z_in, z_out];
+xi_ax.YLim = [-0.7, 0.7];   eta_ax.YLim = [-1.5e-3, 1.5e-3];
 
-xlabel(xi_ax,  'z (cm)', 'interpreter', 'latex');
-xlabel(eta_ax, 'z (cm)', 'interpreter', 'latex');
+xlabel(xi_ax,  '{\boldmath$z$} \bf{(cm)}', 'interpreter', 'latex', ...
+       'FontName', 'Helvetica', 'FontSize', 12, 'FontWeight', 'Bold');
+xlabel(eta_ax, '{\boldmath$z$} \bf{(cm)}', 'interpreter', 'latex', ...
+       'FontName', 'Helvetica', 'FontSize', 12, 'FontWeight', 'Bold');
 
-ylabel(xi_ax,  'cm', 'interpreter', 'latex');
-ylabel(eta_ax, 'cm', 'interpreter', 'latex');
+ylabel(xi_ax,  '{\boldmath$u_z(z, t)$} \bf{(cm)}', 'interpreter', 'latex', ...
+      'FontName', 'Helvetica', 'FontSize', 12, 'FontWeight', 'Bold');
+ylabel(eta_ax, '{\boldmath$u_r(z, t)$} \bf{(cm)}', 'interpreter', 'latex', ...
+       'FontName', 'Helvetica', 'FontSize', 12, 'FontWeight', 'Bold');
 
-title(xi_ax,  'Axial Wall Disp $\xi(z, t)$',   'interpreter', 'latex');
-title(eta_ax, 'Radial Wall Disp $\eta(z, t)$', 'interpreter', 'latex');
+set(xi_ax, 'Box', 'on', 'TickDir', 'out', ...
+        'TickLength'  , [.02 .02], ...
+        'XMinorTick'  , 'on' , ...
+        'YMinorTick'  , 'on' , ...
+        'YGrid'       , 'on' , ...
+        'XGrid'       , 'on' , ...
+        'XColor'      , [0 0 0 ], ...
+        'YColor'      , [0 0 0 ], ...
+        'LineWidth'   , 1, ...
+        'FontSize', 12, ...
+        'FontWeight', 'Bold');
 
-legend(xi_hlines,  t_labs, 'interpreter', 'latex', 'NumColumns', 3, 'Location', 'best');
-legend(eta_hlines, t_labs, 'interpreter', 'latex', 'NumColumns', 3, 'Location', 'best');
+set(eta_ax, 'Box', 'on', 'TickDir', 'out', ...
+        'TickLength'  , [.02 .02], ...
+        'XMinorTick'  , 'on' , ...
+        'YMinorTick'  , 'on' , ...
+        'YGrid'       , 'on' , ...
+        'XGrid'       , 'on' , ...
+        'XColor'      , [0 0 0 ], ...
+        'YColor'      , [0 0 0 ], ...
+        'LineWidth'   , 1, ...
+        'FontSize', 12, ...
+        'FontWeight', 'Bold');
+    
+axis(xi_ax, 'square'); axis(eta_ax, 'square');
+grid(xi_ax, 'minor');  grid(eta_ax, 'minor');
 
-saveas(xi_fig,  [sim_dir, '/exact-numer_axial-wall-disp.png']);
-saveas(eta_fig, [sim_dir, '/exact-numer_radial-wall-disp.png']);
+legend(xi_hlines,  t_labs, 'interpreter', 'latex', 'NumColumns', t_steps + 1, 'Box', 'off', ...
+       'Position', [0.4, 0.1, 0.2, 0.2], 'Units', 'normalized');
+legend(eta_hlines, t_labs, 'interpreter', 'latex', 'NumColumns', t_steps + 1, 'Box', 'off', ...
+       'Position', [0.4, 0.1, 0.2, 0.2], 'Units', 'normalized');
+
+set(gcf, 'WindowState', 'fullscreen');
+print(gcf, [sim_dir, '/exact-numer_wall-disp.pdf'], '-dpdf', '-r0', '-fillpage');

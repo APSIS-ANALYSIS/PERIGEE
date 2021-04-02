@@ -10,7 +10,7 @@ x = -R : 0.01 : R;  % radius vector
 r_exact = abs(x);
 
 w_fig = figure;   v_fig = figure;
-w_lim = [-5, 25]; v_lim = [-7e-3, 7e-3];
+w_lim = [-8, 26]; v_lim = [-8e-3, 7e-3];
 
 sim_steps = start_step + (0 : t_steps) * (stop_step - start_step) / t_steps;
 
@@ -99,7 +99,9 @@ for ii = 1 : (t_steps + 1)
         'XGrid'       , 'on' , ...
         'XColor'      , [0 0 0 ], ...
         'YColor'      , [0 0 0 ], ...
-        'LineWidth'   , 1 );
+        'LineWidth'   , 1, ...
+        'FontSize', 12, ...
+        'FontWeight', 'Bold');
 
     plot(v_ax, real(vr_exact), x, 'Color', colors(1, :), 'Linestyle', '-', 'LineWidth', 1);
     % plot(v_ax, vr_numer, r_numer, 'Color', colors(2, :), 'Linestyle', 'None', 'Marker', 'o', 'MarkerSize', 3);
@@ -114,10 +116,13 @@ for ii = 1 : (t_steps + 1)
         'XGrid'       , 'on' , ...
         'XColor'      , [0 0 0 ], ...
         'YColor'      , [0 0 0 ], ...
-        'LineWidth'   , 1 );
+        'LineWidth'   , 1, ...
+        'FontSize', 12, ...
+        'FontWeight', 'Bold');
     
     w_ax.XLim  = w_lim;  v_ax.XLim  = v_lim;
     w_ax.YLim = [-R, R+0.001]; v_ax.YLim = [-R, R+0.001];
+          
     ylabel(w_ax, '{\boldmath$y$} \bf{(cm)}', 'interpreter', 'latex', ...
            'FontName', 'Helvetica', 'FontSize', 12, 'FontWeight', 'Bold');
     ylabel(v_ax, '{\boldmath$y$} \bf{(cm)}', 'interpreter', 'latex', ...
@@ -125,8 +130,6 @@ for ii = 1 : (t_steps + 1)
     
     axis(w_ax, 'square'); axis(v_ax, 'square');
     grid(w_ax, 'minor');  grid(v_ax, 'minor');
-    set(w_ax, 'FontSize', 12, 'FontWeight', 'bold');
-    set(v_ax, 'FontSize', 12, 'FontWeight', 'bold');
     
     if ii == 1
         w_lg = legend(w_ax, 'Analytical', 'Numerical', 'NumColumns', 2, 'Box', 'off');
@@ -166,13 +169,13 @@ end
 set(w_lg, 'Position', [0.4, -0.08, 0.2, 0.2], 'Units', 'normalized');
 set(v_lg, 'Position', [0.4, -0.08, 0.2, 0.2], 'Units', 'normalized');
 
-sgtitle(w_fig, '\bf{Axial Velocity} {\boldmath$v_z(r, z=L/2, t)$}', ...
+sgtitle(w_fig, '{\boldmath$v_z(r, z=L/2, t)$} \bf{(cm/s)}', ...
         'interpreter', 'latex', 'FontName', 'Helvetica', 'FontSize', 12, 'FontWeight', 'bold');
-sgtitle(v_fig, '\bf{Radial Velocity} {\boldmath$v_r(r, z=L/2, t)$}', ...
+sgtitle(v_fig, '{\boldmath$v_r(r, z=L/2, t)$} \bf{(cm/s)}', ...
         'interpreter', 'latex', 'FontName', 'Helvetica', 'FontSize', 12, 'FontWeight', 'bold');
 
 set(w_fig, 'WindowState','fullscreen');
-print(w_fig, 'exact-numer_axial-velo-profiles.pdf', '-dpdf', '-r0', '-fillpage');
+print(w_fig, [sim_dir, '/exact-numer_axial-velo-profiles.pdf'], '-dpdf', '-r0', '-fillpage');
 
 set(v_fig, 'WindowState','fullscreen');
-print(v_fig, 'exact-numer_radial-velo-profiles.pdf', '-dpdf', '-r0', '-fillpage');
+print(v_fig, [sim_dir, '/exact-numer_radial-velo-profiles.pdf'], '-dpdf', '-r0', '-fillpage');
