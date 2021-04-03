@@ -61,6 +61,8 @@ class ALocal_EBC_outflow : public ALocal_EBC
     // LID[xx] is of length 0.
     std::vector< std::vector<int> > LID;
 
+    // Length num_ebc
+    // It has x-y-z components of the unit outward normal vector
     std::vector< std::vector<double> > outvec;
 };
 
