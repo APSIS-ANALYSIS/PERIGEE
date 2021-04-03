@@ -120,6 +120,7 @@ class ALocal_Inflow_NodalBC
     std::vector<int> LDN;
 
     // Outward normal vector
+    // TO DO step 0: replace it by Vector_3
     std::vector<double> outvec;
 
     // Inflow surface active area

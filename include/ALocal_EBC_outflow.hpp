@@ -63,6 +63,7 @@ class ALocal_EBC_outflow : public ALocal_EBC
 
     // Length num_ebc
     // It has x-y-z components of the unit outward normal vector
+    // TO DO step 0 : replace the data structure by std::vector< Vector_3 >.
     std::vector< std::vector<double> > outvec;
 };
 

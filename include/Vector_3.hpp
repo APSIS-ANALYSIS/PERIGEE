@@ -85,6 +85,12 @@ class Vector_3
 
     friend Vector_3 cross_product( const Vector_3 &a, const Vector_3 &b );
 
+    // get_dominant_comp
+    // it will return the location of the component with the largest absolute
+    // value, in [0,1,2]
+    // if all three components are equal, return 0
+    // int get_dominant_comp() const;
+
   private:
     double vec[3];
 };
