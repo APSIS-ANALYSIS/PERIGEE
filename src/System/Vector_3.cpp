@@ -153,4 +153,21 @@ Vector_3 cross_product( const Vector_3 &a, const Vector_3 &b )
   return result;
 }
 
+int Vector_3::get_dominant_comp() const
+{
+  int dominant_comp = 0;
+  double dominant_val = -INFINITY;
+
+  for(int ii=0; ii<3; ++ii)
+  {
+    if( std::abs(vec[ii]) > dominant_val )
+    {
+      dominant_comp = ii;
+      dominant_val  = std::abs(vec[ii]);
+    }
+  }
+
+  return dominant_comp;
+}
+
 // EOF
