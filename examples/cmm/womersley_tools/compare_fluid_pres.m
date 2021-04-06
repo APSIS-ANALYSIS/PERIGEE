@@ -6,6 +6,9 @@ colors = [     0, 0.4470, 0.7410; 0.8500, 0.3250, 0.0980; ...
           0.4940, 0.1840, 0.5560; 0.4660, 0.6740, 0.1880; ...
           0.3010, 0.7450, 0.9330; 0.6350, 0.0780, 0.1840];
 
+linewidths = [1, 1.6];
+linestyles = {'--', ':'};
+
 dt = T / t_steps;
 
 omega = 2 * pi / T;                                 % base angular frequency
@@ -27,13 +30,18 @@ h_lines = [];
 for ii = 1 : (t_steps + 1)
     
     % Paraview's plot-over-line data on z-axis ===================================
-    filename = [sim_dir, '/pv_plot-over-Zaxis_', sprintf('%06d', sol_idx(ii)), '.csv'];
-    disp(['Reading ', filename]);
+    num_sim = length(sim_dir);
+    z_interp = cell(1, num_sim); p_interp = cell(1, num_sim);
     
-    data_interp = readmatrix(filename);
-    
-    z_interp = data_interp(:, 15);
-    p_interp = data_interp(:, 2);
+    for jj = 1 : num_sim
+        filename = [sim_dir{jj}, '/pv_plot-over-Zaxis_', sprintf('%06d', sol_idx{jj}(ii)), '.csv'];
+        disp(['Reading ', filename]);
+
+        data_interp = readmatrix(filename);
+
+        z_interp{jj} = data_interp(:, 15);
+        p_interp{jj} = data_interp(:,  2);
+    end
     
     t = (ii - 1) * dt;
     
@@ -47,9 +55,13 @@ for ii = 1 : (t_steps + 1)
         
     end
     
-    h = plot(z_exact, real(p_exact) / conversion, 'Color', colors(ii, :), 'Linestyle', '-', 'LineWidth', 1);
+    h = plot(z_exact, real(p_exact) / conversion, 'Color', colors(ii, :), 'LineWidth', 1, 'Linestyle', '-');
     h_lines = [h_lines, h];
-    plot(z_interp, p_interp / conversion, 'Color', colors(ii, :), 'Linestyle', '--', 'LineWidth', 1);
+    
+    for jj = 1 : num_sim
+        plot(z_interp{jj}, p_interp{jj} / conversion, 'Color', colors(ii, :), ...
+             'LineWidth', linewidths(jj), 'Linestyle', linestyles{jj});
+    end
 
 end
 
@@ -75,4 +87,9 @@ lg = legend(h_lines, t_labs, 'interpreter', 'latex', 'NumColumns', 3, 'Box', 'of
 set(lg, 'Position', [0.4, 0.1, 0.2, 0.2], 'Units', 'normalized');
 
 set(gcf, 'WindowState', 'fullscreen');
-print(gcf, [sim_dir, '/exact-numer_fluid-pressures.pdf'], '-dpdf', '-r0', '-fillpage');
+
+if num_sim > 1
+    print(gcf, 'exact-numer_fluid-pressures.pdf', '-dpdf', '-r0', '-fillpage');
+else
+    print(gcf, [sim_dir{1}, '/exact-numer_fluid-pressures.pdf'], '-dpdf', '-r0', '-fillpage');
+end

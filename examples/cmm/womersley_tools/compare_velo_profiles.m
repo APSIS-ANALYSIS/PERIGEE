@@ -46,8 +46,8 @@ for ii = 1 : (t_steps + 1)
     % v2: Paraview's plot-over-line data on y-axis in z=7.5 plane ===================================
     num_sim = length(sim_dir); 
     
-    x_interp = cell(1, num_sim); y_interp = cell(1, num_sim); theta_interp = cell(1, num_sim);
-    u_interp = cell(1, num_sim); v_interp = cell(1, num_sim); w_interp = cell(1, num_sim);
+    x_interp  = cell(1, num_sim); y_interp  = cell(1, num_sim); theta_interp = cell(1, num_sim);
+    u_interp  = cell(1, num_sim); v_interp  = cell(1, num_sim); w_interp = cell(1, num_sim);
     vr_interp = cell(1, num_sim); vt_interp = cell(1, num_sim);
     
     for jj = 1 : num_sim
@@ -117,7 +117,7 @@ for ii = 1 : (t_steps + 1)
         'FontSize', 12, ...
         'FontWeight', 'Bold');
 
-    plot(v_ax, real(vr_exact), x, 'Color', colors(1, :), 'Linestyle', '-', 'LineWidth', 1);
+    plot(v_ax, real(vr_exact), x, 'Color', colors(1, :), 'LineWidth', 1, 'Linestyle', '-');
     % plot(v_ax, vr_numer, r_numer, 'Color', colors(2, :), 'Linestyle', 'None', 'Marker', 'o', 'MarkerSize', 3);
     
     for jj = 1 : num_sim
@@ -193,8 +193,6 @@ sgtitle(v_fig, '{\boldmath$v_r(r, z=L/2, t)$} \bf{(cm/s)}', ...
         'interpreter', 'latex', 'FontName', 'Helvetica', 'FontSize', 12, 'FontWeight', 'bold');
 
 set(w_fig, 'WindowState','fullscreen');
-
-
 set(v_fig, 'WindowState','fullscreen');
 
 if num_sim > 1

@@ -4,6 +4,9 @@ colors = [     0, 0.4470, 0.7410; 0.8500, 0.3250, 0.0980; ...
           0.4940, 0.1840, 0.5560; 0.4660, 0.6740, 0.1880; ...
           0.3010, 0.7450, 0.9330; 0.6350, 0.0780, 0.1840];
 
+linewidths = [1, 1.6];
+linestyles = {'--', ':'};
+
 dt = T / t_steps;
       
 omega = 2 * pi / T;                                 % base angular frequency
@@ -26,28 +29,37 @@ xi_hlines = []; eta_hlines = [];
 for ii = 1 : (t_steps + 1)
     
     % Paraview's plot-over-line data on wall-axis (y=R) ===================================
-    filename = [sim_dir, '/pv_plot-over-Wallaxis_', sprintf('%06d', sol_idx(ii)), '.csv'];
-    disp(['Reading ', filename]);
+    num_sim = length(sim_dir);
     
-    data_interp = readmatrix(filename);
+    x_interp     = cell(1, num_sim); y_interp   = cell(1, num_sim); z_interp   = cell(1, num_sim);
+    theta_interp = cell(1, num_sim); ux_interp  = cell(1, num_sim); uy_interp  = cell(1, num_sim);
+    xi_interp    = cell(1, num_sim); eta_interp = cell(1, num_sim); phi_interp = cell(1, num_sim);
     
-    x_interp  = data_interp(:, 13);
-    y_interp  = data_interp(:, 14);
-    z_interp  = data_interp(:, 15);
-    theta_interp = atan2(y_interp, x_interp);
-    
-    ux_interp = data_interp(:, 7);          % x-displacement
-    uy_interp = data_interp(:, 8);          % y-displacement
-    xi_interp = data_interp(:, 9);          % z-displacement
-       
-    % Cartesian to polar transformation
-    eta_interp = cos(theta_interp) .* ux_interp + sin(theta_interp) .* uy_interp;
-%     r0_numer = sqrt( x_interp.^2 + y_interp.^2 );
-%     r_numer  = sqrt( (x_interp + ux_interp).^2 + (y_interp + uy_interp).^2 );
-%     eta_interp = r_numer - r0_numer;
-    
-    % Verify angular displacement is ~zero
-    phi_interp = -sin(theta_interp) .* ux_interp + cos(theta_interp) .* uy_interp;
+    for jj = 1 : num_sim
+        filename = [sim_dir{jj}, '/pv_plot-over-Wallaxis_', sprintf('%06d', sol_idx{jj}(ii)), '.csv'];
+        disp(['Reading ', filename]);
+
+        data_interp = readmatrix(filename);
+
+        x_interp{jj}  = data_interp(:, 13);
+        y_interp{jj}  = data_interp(:, 14);
+        z_interp{jj}  = data_interp(:, 15);
+        theta_interp{jj} = atan2(y_interp{jj}, x_interp{jj});
+
+        ux_interp{jj} = data_interp(:, 7);          % x-displacement
+        uy_interp{jj} = data_interp(:, 8);          % y-displacement
+        xi_interp{jj} = data_interp(:, 9);          % z-displacement
+
+        % Cartesian to polar transformation
+        eta_interp{jj} = cos(theta_interp{jj}) .* ux_interp{jj} + sin(theta_interp{jj}) .* uy_interp{jj};
+        
+    %     r0_numer = sqrt( x_interp{jj}.^2 + y_interp{jj}.^2 );
+    %     r_numer  = sqrt( (x_interp{jj} + ux_interp{jj}).^2 + (y_interp{jj} + uy_interp{jj}).^2 );
+    %     eta_interp{jj} = r_numer - r0_numer;
+
+        % Verify angular displacement is ~zero
+        phi_interp{jj} = -sin(theta_interp{jj}) .* ux_interp{jj} + cos(theta_interp{jj}) .* uy_interp{jj};
+    end
     
     t = (ii - 1) * dt;
     
@@ -66,12 +78,19 @@ for ii = 1 : (t_steps + 1)
     
     h = plot(xi_ax, z_exact, real(xi_exact), 'Color', colors(ii, :), 'Linestyle', '-', 'LineWidth', 1);
     xi_hlines = [xi_hlines, h];
-    plot(xi_ax, z_interp, xi_interp, 'Color', colors(ii, :), 'Linestyle', '--', 'LineWidth', 1);
+    
+    for jj = 1 : num_sim
+        plot(xi_ax, z_interp{jj}, xi_interp{jj}, 'Color', colors(ii, :), ...
+             'LineWidth', linewidths(jj), 'Linestyle', linestyles{jj});
+    end
     
     h = plot(eta_ax, z_exact, real(eta_exact), 'Color', colors(ii, :), 'Linestyle', '-', 'LineWidth', 1);
     eta_hlines = [eta_hlines, h];
-    plot(eta_ax, z_interp, eta_interp, 'Color', colors(ii, :), 'Linestyle', '--', 'LineWidth', 1);
     
+    for jj = 1 : num_sim
+        plot(eta_ax, z_interp{jj}, eta_interp{jj}, 'Color', colors(ii, :), ...
+             'LineWidth', linewidths(jj), 'Linestyle', linestyles{jj});
+    end
 end
 
 xi_ax.XLim = [z_in, z_out]; eta_ax.XLim = [z_in, z_out];
@@ -120,4 +139,9 @@ legend(eta_hlines, t_labs, 'interpreter', 'latex', 'NumColumns', t_steps + 1, 'B
        'Position', [0.4, 0.1, 0.2, 0.2], 'Units', 'normalized');
 
 set(gcf, 'WindowState', 'fullscreen');
-print(gcf, [sim_dir, '/exact-numer_wall-disp.pdf'], '-dpdf', '-r0', '-fillpage');
+
+if num_sim > 1
+    print(gcf, 'exact-numer_wall-disp.pdf', '-dpdf', '-r0', '-fillpage');
+else
+    print(gcf, [sim_dir{1}, '/exact-numer_wall-disp.pdf'], '-dpdf', '-r0', '-fillpage');
+end

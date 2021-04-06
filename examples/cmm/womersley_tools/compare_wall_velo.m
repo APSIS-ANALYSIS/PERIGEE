@@ -3,6 +3,9 @@ function compare_wall_velo(sim_dir, z_in, z_out, mu, rho, R, c_n, B_n, G_n, T, n
 colors = [     0, 0.4470, 0.7410; 0.8500, 0.3250, 0.0980; ...
           0.4940, 0.1840, 0.5560; 0.4660, 0.6740, 0.1880; ...
           0.3010, 0.7450, 0.9330; 0.6350, 0.0780, 0.1840];
+      
+linewidths = [1, 1.6];
+linestyles = {'--', ':'};
 
 dt = T / t_steps;
       
@@ -26,25 +29,33 @@ w_wall_hlines = []; vr_wall_hlines = [];
 for ii = 1 : (t_steps + 1)
     
     % Paraview's plot-over-line data on wall-axis (y=R) ===================================
-    filename = [sim_dir, '/pv_plot-over-Wallaxis_', sprintf('%06d', sol_idx(ii)), '.csv'];
-    disp(['Reading ', filename]);
+    num_sim = length(sim_dir);
     
-    data_interp = readmatrix(filename);
+    x_interp  = cell(1, num_sim); y_interp  = cell(1, num_sim); z_interp = cell(1, num_sim);
+    u_interp  = cell(1, num_sim); v_interp  = cell(1, num_sim); w_interp = cell(1, num_sim);
+    theta_interp = cell(1, num_sim); vr_interp = cell(1, num_sim); vt_interp = cell(1, num_sim);
     
-    x_interp  = data_interp(:, 13);
-    y_interp  = data_interp(:, 14);
-    z_interp  = data_interp(:, 15);
-    theta_interp = atan2(y_interp, x_interp);
-    
-    u_interp = data_interp(:, 4);
-    v_interp = data_interp(:, 5);
-    w_interp = data_interp(:, 6);
-    
-    % Cartesian to polar transformation
-    vr_interp = cos(theta_interp) .* u_interp + sin(theta_interp) .* v_interp;
-    
-    % Verify angular velocity is ~zero
-    vt_interp = -sin(theta_interp) .* u_interp + cos(theta_interp) .* v_interp;
+    for jj = 1 : num_sim
+        filename = [sim_dir{jj}, '/pv_plot-over-Wallaxis_', sprintf('%06d', sol_idx{jj}(ii)), '.csv'];
+        disp(['Reading ', filename]);
+
+        data_interp = readmatrix(filename);
+
+        x_interp{jj}  = data_interp(:, 13);
+        y_interp{jj}  = data_interp(:, 14);
+        z_interp{jj}  = data_interp(:, 15);
+        theta_interp{jj} = atan2(y_interp{jj}, x_interp{jj});
+
+        u_interp{jj} = data_interp(:, 4);
+        v_interp{jj} = data_interp(:, 5);
+        w_interp{jj} = data_interp(:, 6);
+
+        % Cartesian to polar transformation
+        vr_interp{jj} = cos(theta_interp{jj}) .* u_interp{jj} + sin(theta_interp{jj}) .* v_interp{jj};
+
+        % Verify angular velocity is ~zero
+        vt_interp{jj} = -sin(theta_interp{jj}) .* u_interp{jj} + cos(theta_interp{jj}) .* v_interp{jj};
+    end
     
     t = (ii - 1) * dt;
     
@@ -66,14 +77,21 @@ for ii = 1 : (t_steps + 1)
         
     end
     
-    h = plot(w_wall_ax, z_exact, real(w_exact), 'Color', colors(ii, :), 'Linestyle', '-', 'LineWidth', 1);
+    h = plot(w_wall_ax, z_exact, real(w_exact), 'Color', colors(ii, :), 'LineWidth', 1, 'Linestyle', '-');
     w_wall_hlines = [w_wall_hlines, h];
-    plot(w_wall_ax, z_interp, w_interp, 'Color', colors(ii, :), 'Linestyle', '--', 'LineWidth', 1);
     
-    h = plot(vr_wall_ax, z_exact, real(vr_exact), 'Color', colors(ii, :), 'Linestyle', '-', 'LineWidth', 1);
+    for jj = 1 : num_sim
+        plot(w_wall_ax, z_interp{jj}, w_interp{jj}, 'Color', colors(ii, :), ...
+             'LineWidth', linewidths(jj), 'Linestyle', linestyles{jj});
+    end
+    
+    h = plot(vr_wall_ax, z_exact, real(vr_exact), 'Color', colors(ii, :), 'LineWidth', 1, 'Linestyle', '-');
     vr_wall_hlines = [vr_wall_hlines, h];
-    plot(vr_wall_ax, z_interp, vr_interp, 'Color', colors(ii, :), 'Linestyle', '--', 'LineWidth', 1);
     
+    for jj = 1 : num_sim
+        plot(vr_wall_ax, z_interp{jj}, vr_interp{jj}, 'Color', colors(ii, :), ...
+             'LineWidth', linewidths(jj), 'Linestyle', linestyles{jj});
+    end
 end
 
 w_wall_ax.XLim = [z_in, z_out]; vr_wall_ax.XLim = [z_in, z_out];
@@ -123,4 +141,9 @@ legend(vr_wall_hlines, t_labs, 'interpreter', 'latex', 'NumColumns', t_steps + 1
        'Position', [0.4, 0.1, 0.2, 0.2], 'Units', 'normalized');
 
 set(gcf, 'WindowState', 'fullscreen');
-print(gcf,  [sim_dir, '/exact-numer_wall-velo.pdf'], '-dpdf', '-r0', '-fillpage');
+
+if num_sim > 1
+    print(gcf,  'exact-numer_wall-velo.pdf', '-dpdf', '-r0', '-fillpage');
+else
+    print(gcf,  [sim_dir{1}, '/exact-numer_wall-velo.pdf'], '-dpdf', '-r0', '-fillpage');
+end
