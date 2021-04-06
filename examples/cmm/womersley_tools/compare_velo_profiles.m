@@ -1,6 +1,8 @@
-function compare_velo_profiles(sim_dir, z_coord, mu, rho, R, c_n, B_n, Q_n, G_n, T, n_modes, t_steps, start_step, stop_step, sol_idx)
+function compare_velo_profiles(sim_dir, sim_labels, z_coord, mu, rho, R, c_n, B_n, Q_n, G_n, T, n_modes, t_steps, start_step, stop_step, sol_idx)
 
 colors = [0.918, 0.235, 0.325; 0, 0, 0.545];
+linewidths = [1, 1.6];
+linestyles = {'--', ':'};
 
 dt = T / t_steps;
       
@@ -12,7 +14,7 @@ r_exact = abs(x);
 w_fig = figure;   v_fig = figure;
 w_lim = [-8, 26]; v_lim = [-8e-3, 7e-3];
 
-sim_steps = start_step + (0 : t_steps) * (stop_step - start_step) / t_steps;
+% sim_steps = start_step + (0 : t_steps) * (stop_step - start_step) / t_steps;
 
 for ii = 1 : (t_steps + 1)
     
@@ -42,24 +44,32 @@ for ii = 1 : (t_steps + 1)
 %     vt_numer = -sin(theta_numer) .* u_numer + cos(theta_numer) .* v_numer;
 
     % v2: Paraview's plot-over-line data on y-axis in z=7.5 plane ===================================
-    filename = [sim_dir, '/pv_plot-over-Yaxis_', sprintf('%06d', sol_idx(ii)), '.csv'];
-    disp(['Reading ', filename]);
+    num_sim = length(sim_dir); 
     
-    velo_interp = readmatrix(filename);
+    x_interp = cell(1, num_sim); y_interp = cell(1, num_sim); theta_interp = cell(1, num_sim);
+    u_interp = cell(1, num_sim); v_interp = cell(1, num_sim); w_interp = cell(1, num_sim);
+    vr_interp = cell(1, num_sim); vt_interp = cell(1, num_sim);
     
-    x_interp = velo_interp(:, 13);
-    y_interp = velo_interp(:, 14);
-    theta_interp = atan2(y_interp, x_interp);
-    
-    u_interp = velo_interp(:, 4);
-    v_interp = velo_interp(:, 5);
-    w_interp = velo_interp(:, 6);
+    for jj = 1 : num_sim
+        filename = [sim_dir{jj}, '/pv_plot-over-Yaxis_', sprintf('%06d', sol_idx{jj}(ii)), '.csv'];
+        disp(['Reading ', filename]);
 
-    % Cartesian to polar transformation
-    vr_interp = cos(theta_interp) .* u_interp + sin(theta_interp) .* v_interp;
-    
-    % Verify angular velocity is ~zero
-    vt_interp = -sin(theta_interp) .* u_interp + cos(theta_interp) .* v_interp;
+        velo_interp = readmatrix(filename);
+
+        x_interp{jj} = velo_interp(:, 13);
+        y_interp{jj} = velo_interp(:, 14);
+        theta_interp{jj} = atan2(y_interp{jj}, x_interp{jj});
+
+        u_interp{jj} = velo_interp(:, 4);
+        v_interp{jj} = velo_interp(:, 5);
+        w_interp{jj} = velo_interp(:, 6);
+
+        % Cartesian to polar transformation
+        vr_interp{jj} =  cos(theta_interp{jj}) .* u_interp{jj} + sin(theta_interp{jj}) .* v_interp{jj};
+
+        % Verify angular velocity is ~zero
+        vt_interp{jj} = -sin(theta_interp{jj}) .* u_interp{jj} + cos(theta_interp{jj}) .* v_interp{jj};
+    end
     
     t = (ii - 1) * dt;
     w_ax = subplot((t_steps + 1) / 2, 2, ii, 'Parent', w_fig); hold(w_ax, 'on');
@@ -86,9 +96,13 @@ for ii = 1 : (t_steps + 1)
         
     end
     
-    plot(w_ax, real(w_exact), x, 'Color', colors(1, :), 'Linestyle', '-', 'LineWidth', 1);
+    plot(w_ax, real(w_exact), x, 'Color', colors(1, :), 'LineWidth', 1, 'Linestyle', '-');
     % plot(w_ax, w_numer, r_numer, 'Color', colors(2, :), 'Linestyle', 'None', 'Marker', 'o', 'MarkerSize', 3);
-    plot(w_ax, w_interp, y_interp, 'Color', colors(2, :), 'Linestyle', '--', 'LineWidth', 1);
+    
+    for jj = 1 : num_sim
+        plot(w_ax, w_interp{jj}, y_interp{jj}, 'Color', colors(2, :), ...
+             'LineWidth', linewidths(jj), 'Linestyle', linestyles{jj});
+    end
     plot(w_ax, [0, 0], [-R, R], 'Color', [0.75, 0.75, 0.75] );               % grey
     
     set(w_ax, 'Box', 'on', 'TickDir', 'out', ...
@@ -105,7 +119,11 @@ for ii = 1 : (t_steps + 1)
 
     plot(v_ax, real(vr_exact), x, 'Color', colors(1, :), 'Linestyle', '-', 'LineWidth', 1);
     % plot(v_ax, vr_numer, r_numer, 'Color', colors(2, :), 'Linestyle', 'None', 'Marker', 'o', 'MarkerSize', 3);
-    plot(v_ax, vr_interp, y_interp, 'Color', colors(2, :), 'Linestyle', '--', 'LineWidth', 1);
+    
+    for jj = 1 : num_sim
+        plot(v_ax, vr_interp{jj}, y_interp{jj}, 'Color', colors(2, :), ...
+             'LineWidth', linewidths(jj), 'Linestyle', linestyles{jj});
+    end
     plot(v_ax, [0, 0], [-R, R], 'Color', [0.75, 0.75, 0.75] );               % grey
     
     set(v_ax, 'Box', 'on', 'TickDir', 'out', ...
@@ -132,8 +150,8 @@ for ii = 1 : (t_steps + 1)
     grid(w_ax, 'minor');  grid(v_ax, 'minor');
     
     if ii == 1
-        w_lg = legend(w_ax, 'Analytical', 'Numerical', 'NumColumns', 2, 'Box', 'off');
-        v_lg = legend(v_ax, 'Analytical', 'Numerical', 'NumColumns', 2, 'Box', 'off');
+        w_lg = legend(w_ax, ['Analytical', sim_labels], 'NumColumns', num_sim + 1, 'Box', 'off');
+        v_lg = legend(v_ax, ['Analytical', sim_labels], 'NumColumns', num_sim + 1, 'Box', 'off');
     end
     
     for jj = 1 : length(ax_all)
@@ -175,7 +193,14 @@ sgtitle(v_fig, '{\boldmath$v_r(r, z=L/2, t)$} \bf{(cm/s)}', ...
         'interpreter', 'latex', 'FontName', 'Helvetica', 'FontSize', 12, 'FontWeight', 'bold');
 
 set(w_fig, 'WindowState','fullscreen');
-print(w_fig, [sim_dir, '/exact-numer_axial-velo-profiles.pdf'], '-dpdf', '-r0', '-fillpage');
+
 
 set(v_fig, 'WindowState','fullscreen');
-print(v_fig, [sim_dir, '/exact-numer_radial-velo-profiles.pdf'], '-dpdf', '-r0', '-fillpage');
+
+if num_sim > 1
+    print(v_fig, 'exact-numer_radial-velo-profiles.pdf', '-dpdf', '-r0', '-fillpage');
+    print(w_fig, 'exact-numer_axial-velo-profiles.pdf',  '-dpdf', '-r0', '-fillpage');
+else
+    print(v_fig, [sim_dir{1}, '/exact-numer_radial-velo-profiles.pdf'], '-dpdf', '-r0', '-fillpage');
+    print(w_fig, [sim_dir{1}, '/exact-numer_axial-velo-profiles.pdf'],  '-dpdf', '-r0', '-fillpage');
+end

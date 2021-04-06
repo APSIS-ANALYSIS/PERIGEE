@@ -3,6 +3,8 @@ function compare_flow_pres(sim_dir, z_in, z_out, inlet_data, outlet_data, p0, mu
 conversion = 1333.2;
 
 colors = [0.918, 0.235, 0.325; 0, 0, 0.545];
+linewidths = [1, 1.6];
+linestyles = {'--', ':'};
       
 omega = 2 * pi / T;                                 % base angular frequency
 
@@ -26,14 +28,21 @@ for k = 2 : n_modes
     
 end
 
-t_numer = inlet_data(sol_idx, 2) - inlet_data(sol_idx(1), 2);
+num_sim = length(sim_dir); 
+t_numer = cell(1, num_sim); 
+q_in_numer = cell(1, num_sim); q_out_numer = cell(1, num_sim);
+p_in_numer = cell(1, num_sim); p_out_numer = cell(1, num_sim);
 
-q_in_numer  = -inlet_data(sol_idx, 4); % flip sign for unit normal
-q_out_numer = outlet_data(sol_idx, 4);
+for ii = 1 : num_sim
+    t_numer{ii} = inlet_data{ii}(sol_idx{ii}, 2) - inlet_data{ii}(sol_idx{ii}(1), 2);
+    
+    q_in_numer{ii}  = -inlet_data{ii}(sol_idx{ii}, 4); % flip sign for unit normal
+    q_out_numer{ii} = outlet_data{ii}(sol_idx{ii}, 4);
+    
+    p_in_numer{ii}  =  inlet_data{ii}(sol_idx{ii}, 5);
+    p_out_numer{ii} = outlet_data{ii}(sol_idx{ii}, 5);
 
-p_in_numer  =  inlet_data(sol_idx, 5);
-p_out_numer = outlet_data(sol_idx, 5);
-
+end
 
 % ================== Plot analytical vs. numerical flows ==================
 figure; 
@@ -42,10 +51,13 @@ plot(t_exact, real(q_in_exact),  'Color', colors(1, :), ...
      'LineWidth', 1, 'Linestyle', '-');
 plot(t_exact, real(q_out_exact), 'Color', colors(2, :), ...
      'LineWidth', 1, 'Linestyle', '-');
-plot(t_numer,  q_in_numer, 'Color', colors(1, :), ...
-     'LineWidth', 1, 'Linestyle', '--');
-plot(t_numer, q_out_numer, 'Color', colors(2, :), ...
-     'LineWidth', 1, 'Linestyle', '--');
+ 
+for ii = 1 : num_sim
+    plot(t_numer{ii},  q_in_numer{ii}, 'Color', colors(1, :), ...
+         'LineWidth', linewidths(ii), 'Linestyle', linestyles{ii});
+    plot(t_numer{ii}, q_out_numer{ii}, 'Color', colors(2, :), ...
+         'LineWidth', linewidths(ii), 'Linestyle', linestyles{ii});
+end
 
 hXLabel = xlabel('{\boldmath$t$} \bf{(s)}', 'Interpreter', 'Latex');
 hYLabel = ylabel('{\boldmath$Q(z, t)$} \bf{ (mL/s)}', 'Interpreter', 'Latex');
@@ -71,10 +83,13 @@ plot(t_exact, real(p_in_exact)  / conversion, 'Color', colors(1, :), ...
      'LineWidth', 1, 'Linestyle', '-');
 plot(t_exact, real(p_out_exact) / conversion, 'Color', colors(2, :), ...
      'LineWidth', 1, 'Linestyle', '-');
-plot(t_numer,  p_in_numer / conversion, 'Color', colors(1, :), ...
-     'LineWidth', 1, 'Linestyle', '--');
-plot(t_numer, p_out_numer / conversion, 'Color', colors(2, :), ...
-     'LineWidth', 1, 'Linestyle', '--');
+ 
+for ii = 1 : num_sim
+    plot(t_numer{ii},  p_in_numer{ii} / conversion, 'Color', colors(1, :), ...
+         'LineWidth', linewidths(ii), 'Linestyle', linestyles{ii});
+    plot(t_numer{ii}, p_out_numer{ii} / conversion, 'Color', colors(2, :), ...
+         'LineWidth', linewidths(ii), 'Linestyle', linestyles{ii});
+end
 
 hXLabel = xlabel('{\boldmath$t$} \bf{(s)}', 'Interpreter', 'Latex');
 hYLabel = ylabel('{\boldmath$P(z, t)$} \bf{ (mm Hg)}', 'Interpreter', 'Latex');
@@ -100,5 +115,11 @@ lg = legend('Inlet / Analytical', 'Outlet / Analytical', 'Inlet / Numerical', 'O
 set(lg, 'Position', [0.4, 0.1, 0.2, 0.2], 'Units', 'normalized');
 
 set(gcf, 'WindowState','fullscreen');
-print(gcf, [sim_dir, '/exact-numer_cap-flows-pressures.pdf'], '-dpdf', '-r0', '-fillpage');
+
+if num_sim > 1
+    print(gcf, 'exact-numer_cap-flows-pressures.pdf', '-dpdf', '-r0', '-fillpage');
+else
+    print(gcf, [sim_dir{1}, '/exact-numer_cap-flows-pressures.pdf'], '-dpdf', '-r0', '-fillpage');
+end
+
 
