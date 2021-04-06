@@ -12,6 +12,7 @@
 // Date: Mar. 19 2019
 // ==================================================================
 #include "ALocal_EBC.hpp"
+#include "Vector_3.hpp"
 
 class ALocal_EBC_outflow : public ALocal_EBC
 {
@@ -35,9 +36,9 @@ class ALocal_EBC_outflow : public ALocal_EBC
     virtual void get_outvec( const int &ii, double &nx, double &ny,
         double &nz ) const
     {
-      nx = outvec[ii][0];
-      ny = outvec[ii][1];
-      nz = outvec[ii][2];
+      nx = outvec[ii](0);
+      ny = outvec[ii](1);
+      nz = outvec[ii](2);
     }
 
   protected:
@@ -63,8 +64,7 @@ class ALocal_EBC_outflow : public ALocal_EBC
 
     // Length num_ebc
     // It has x-y-z components of the unit outward normal vector
-    // TO DO step 0 : replace the data structure by std::vector< Vector_3 >.
-    std::vector< std::vector<double> > outvec;
+    std::vector< Vector_3 > outvec;
 };
 
 #endif
