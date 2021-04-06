@@ -11,7 +11,9 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
 
   const std::string gname("/inflow");
   
-  h5r -> read_doubleVector( gname.c_str(), "Outward_normal_vector", outvec );
+  std::vector<double> outvec_std; 
+  h5r -> read_doubleVector( gname.c_str(), "Outward_normal_vector", outvec_std );
+  outvec = Vector_3( outvec_std[0], outvec_std[1], outvec_std[2] );
 
   act_area = h5r -> read_doubleScalar( gname.c_str(), "Inflow_active_area");
   ful_area = h5r -> read_doubleScalar( gname.c_str(), "Inflow_full_area");
@@ -57,7 +59,6 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
 ALocal_Inflow_NodalBC::~ALocal_Inflow_NodalBC()
 {
   VEC_T::clean(LDN);
-  VEC_T::clean(outvec);
   VEC_T::clean(centroid);
   VEC_T::clean(outline_pts);
   VEC_T::clean(local_pt_xyz);

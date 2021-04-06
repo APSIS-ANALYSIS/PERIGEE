@@ -10,6 +10,7 @@
 // ==================================================================
 #include "HDF5_Reader.hpp"
 #include "Math_Tools.hpp"
+#include "Vector_3.hpp"
 
 class ALocal_Inflow_NodalBC
 {
@@ -28,7 +29,7 @@ class ALocal_Inflow_NodalBC
 
     // get the outward normal vector components.
     // ii=0 : x-component; ii=1 : y-component; ii=2 : z-component
-    virtual double get_outvec( const int &ii ) const {return outvec[ii];}
+    virtual double get_outvec( const int &ii ) const {return outvec(ii);}
 
     // get the active area of the surface
     virtual double get_actarea() const {return act_area;}
@@ -120,8 +121,7 @@ class ALocal_Inflow_NodalBC
     std::vector<int> LDN;
 
     // Outward normal vector
-    // TO DO step 0: replace it by Vector_3
-    std::vector<double> outvec;
+    Vector_3 outvec;
 
     // Inflow surface active area
     double act_area;
