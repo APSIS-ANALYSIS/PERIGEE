@@ -17,29 +17,29 @@ sim_steps = start_step + (0 : t_steps) * (stop_step - start_step) / t_steps;
 for ii = 1 : (t_steps + 1)
     
 
-    % v1: Assemble all nodal solutions on z=7.5 plane ===================================
-    filename = [sim_dir, '/SOL_9', sprintf('%08d', sim_steps(ii)), '_velo_z7d5.txt'];
-    disp(['Reading ', filename]);
-    
-    velo_numer = readmatrix(filename);
-    
-    x_numer = velo_numer(:, 1);
-    y_numer = velo_numer(:, 2);
-    theta_numer = atan2(y_numer, x_numer);
-    r_numer = sqrt(x_numer.^2 + y_numer.^2);
-    
-    % Flip the radius sign for y < 0
-    r_numer(y_numer < 0) = -r_numer(y_numer < 0);
-    
-    u_numer = velo_numer(:, 4);
-    v_numer = velo_numer(:, 5);
-    w_numer = velo_numer(:, 6);
-    
-    % Cartesian to polar transformation
-    vr_numer = cos(theta_numer) .* u_numer + sin(theta_numer) .* v_numer;
-    
-    % Verify angular velocity is ~zero
-    vt_numer = -sin(theta_numer) .* u_numer + cos(theta_numer) .* v_numer;
+%     % v1: Assemble all nodal solutions on z=7.5 plane ===================================
+%     filename = [sim_dir, '/SOL_9', sprintf('%08d', sim_steps(ii)), '_velo_z7d5.txt'];
+%     disp(['Reading ', filename]);
+%     
+%     velo_numer = readmatrix(filename);
+%     
+%     x_numer = velo_numer(:, 1);
+%     y_numer = velo_numer(:, 2);
+%     theta_numer = atan2(y_numer, x_numer);
+%     r_numer = sqrt(x_numer.^2 + y_numer.^2);
+%     
+%     % Flip the radius sign for y < 0
+%     r_numer(y_numer < 0) = -r_numer(y_numer < 0);
+%     
+%     u_numer = velo_numer(:, 4);
+%     v_numer = velo_numer(:, 5);
+%     w_numer = velo_numer(:, 6);
+%     
+%     % Cartesian to polar transformation
+%     vr_numer = cos(theta_numer) .* u_numer + sin(theta_numer) .* v_numer;
+%     
+%     % Verify angular velocity is ~zero
+%     vt_numer = -sin(theta_numer) .* u_numer + cos(theta_numer) .* v_numer;
 
     % v2: Paraview's plot-over-line data on y-axis in z=7.5 plane ===================================
     filename = [sim_dir, '/pv_plot-over-Yaxis_', sprintf('%06d', sol_idx(ii)), '.csv'];
