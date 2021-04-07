@@ -16,6 +16,7 @@
 // ==================================================================
 #include "INodalBC.hpp"
 #include "Tet_Tools.hpp"
+#include "Vector_3.hpp"
 
 class NodalBC_3D_vtu : public INodalBC
 {
@@ -30,11 +31,26 @@ class NodalBC_3D_vtu : public INodalBC
     // --------------------------------------------------------------
     // Specify the Dirichlet nodes for CMM. This includes all inlet
     // nodes and the outline (`ring') nodes for each outlet surface.
+    // Used for inlet & outlet clamping.
     // --------------------------------------------------------------
     NodalBC_3D_vtu( const std::string &inflow_vtu_file,
         const std::string &wall_vtu_file,
         const std::vector<std::string> &outflow_vtu_files,
         const int &nFunc );
+
+    // --------------------------------------------------------------
+    // Specify the Dirichlet nodes for CMM. This includes all interior
+    // inlet nodes. For each inlet/outlet, ring nodes are also included
+    // for the velocity dof corresponding to the unit normal's dominant
+    // component. Used for inlet & outlet in-plane motion.
+    //     \para comp: velocity component. 0, 1, or 2.
+    // --------------------------------------------------------------
+    NodalBC_3D_vtu( const std::string &inflow_vtu_file,
+        const std::vector<double> &inflow_outward_vec,
+        const std::string &wall_vtu_file,
+        const std::vector<std::string> &outflow_vtu_files,
+        const std::vector< std::vector<double> > &outflow_outward_vec,
+        const int &comp, const int &nFunc );
 
     // --------------------------------------------------------------
     // Read in the vtu file that all the nodes in this file will be
