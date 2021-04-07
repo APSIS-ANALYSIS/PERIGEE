@@ -79,11 +79,11 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &inflow_vtp_file,
         dir_nodes.push_back( static_cast<unsigned int>( gnode[jj] ) );
         num_outline_pts += 1;
       }
-
-      // Detect usage of the sv exterior surface (containing caps) as the wall surface
-      if(num_outline_pts == numpts)
-        SYS_T::print_fatal( "Error: Outlet %d has %d outline nodes and %d total nodes. This is likely due to an improper wall mesh.\n", ii, num_outline_pts, numpts );
     }
+
+    // Detect usage of the sv exterior surface (containing caps) as the wall surface
+    if(num_outline_pts == numpts)
+      SYS_T::print_fatal( "Error: Outlet %d has %d outline nodes and %d total nodes. This is likely due to an improper wall mesh.\n", ii, num_outline_pts, numpts );
 
   } // end loop over outlets
 
