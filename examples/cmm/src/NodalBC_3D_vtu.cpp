@@ -170,32 +170,35 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &inflow_vtu_file,
 
   for(unsigned int ii=0; ii<num_outlets; ++ii)
   {
-    SYS_T::file_check( outflow_vtu_files[ii] );
-
-    TET_T::read_vtu_grid( outflow_vtu_files[ii], numpts, numcels, pts, ien, gnode, gelem );
-
-    if( numpts != static_cast<int>(gnode.size()) )
-      SYS_T::print_fatal("Error: numpts != global_node.size() for outlet %d! \n", ii);
-
     outvec = Vector_3( outflow_outward_vec[ii][0], outflow_outward_vec[ii][1], outflow_outward_vec[ii][2] );
     outflow_dominant_comp[ii] = outvec.get_dominant_comp();
 
-    num_outline_pts = 0;
-    for(unsigned int jj=0; jj<gnode.size(); ++jj)
+    if( outflow_dominant_comp[ii] == comp ) 
     {
-      if(gnode[jj]<0) SYS_T::print_fatal("Error: negative nodal index on outlet %d! \n", ii);
+      SYS_T::file_check( outflow_vtu_files[ii] );
 
-      if( VEC_T::is_invec( wall_gnode, gnode[jj]) )
+      TET_T::read_vtu_grid( outflow_vtu_files[ii], numpts, numcels, pts, ien, gnode, gelem );
+
+      if( numpts != static_cast<int>(gnode.size()) )
+        SYS_T::print_fatal("Error: numpts != global_node.size() for outlet %d! \n", ii);
+
+      num_outline_pts = 0;
+      for(unsigned int jj=0; jj<gnode.size(); ++jj)
       {
-        if( outflow_dominant_comp[ii] == comp ) dir_nodes.push_back( static_cast<unsigned int>( gnode[jj] ) );
-        num_outline_pts += 1;
+        if(gnode[jj]<0) SYS_T::print_fatal("Error: negative nodal index on outlet %d! \n", ii);
+
+        if( VEC_T::is_invec( wall_gnode, gnode[jj]) )
+        {
+          if( outflow_dominant_comp[ii] == comp ) dir_nodes.push_back( static_cast<unsigned int>( gnode[jj] ) );
+          num_outline_pts += 1;
+        }
       }
+
+      // Detect usage of the sv exterior surface (containing caps) as the wall surface
+      if(num_outline_pts == numpts)
+        SYS_T::print_fatal( "Error: Outlet %d has %d outline nodes and %d total nodes. This is likely due to an improper wall mesh.\n", ii, num_outline_pts, numpts );
+
     }
-
-    // Detect usage of the sv exterior surface (containing caps) as the wall surface
-    if(num_outline_pts == numpts)
-      SYS_T::print_fatal( "Error: Outlet %d has %d outline nodes and %d total nodes. This is likely due to an improper wall mesh.\n", ii, num_outline_pts, numpts );
-
   } // end loop over outlets
 
   VEC_T::sort_unique_resize(dir_nodes);
