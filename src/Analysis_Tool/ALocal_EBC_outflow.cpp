@@ -25,10 +25,7 @@ ALocal_EBC_outflow::ALocal_EBC_outflow( const std::string &fileBaseName,
 
       h5r -> read_doubleVector( subgroup_name.c_str(), "intNA", intNA[ii] );
       h5r -> read_intVector( subgroup_name.c_str(), "LID_all_face_nodes", LID[ii] );
-
-      std::vector<double> outvec_std;
-      h5r -> read_doubleVector( subgroup_name.c_str(), "out_normal", outvec_std );
-      outvec[ii] = Vector_3( outvec_std[0], outvec_std[1], outvec_std[2] );
+      h5r -> read_doubleVector( subgroup_name.c_str(), "out_normal", outvec[ii] );
     
       num_face_nodes[ii] = static_cast<int>(intNA[ii].size());
     }
@@ -36,6 +33,7 @@ ALocal_EBC_outflow::ALocal_EBC_outflow( const std::string &fileBaseName,
     {
       intNA[ii].clear();
       LID[ii].clear();
+      outvec[ii].clear();
       num_face_nodes[ii] = 0;
     }
   }
@@ -49,6 +47,7 @@ ALocal_EBC_outflow::~ALocal_EBC_outflow()
   {
     VEC_T::clean( intNA[ii] );
     VEC_T::clean( LID[ii] );
+    VEC_T::clean( outvec[ii] );
   }
   
   VEC_T::clean(intNA);
