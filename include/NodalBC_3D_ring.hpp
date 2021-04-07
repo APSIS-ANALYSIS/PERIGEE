@@ -41,18 +41,30 @@ class NodalBC_3D_ring : public INodalBC
 
     virtual ~NodalBC_3D_ring() {};
 
+    virtual int get_para_3() const { return num_caps; }
+
+    virtual void get_cap_id( std::vector<int> &capid ) const { capid = cap_id; }
+
+    virtual void get_dominant_comp( std::vector<int> &dom_comp ) const { dom_comp = dominant_comp; }
+
+    virtual void get_outnormal( std::vector<double> &outvec ) const { outvec = outnormal; } 
+
   private:
     NodalBC_3D_ring() {};
 
     // Number of caps (inlets, outlets)
     int num_caps;
 
-    // Dominant component of each cap's unit normal vector: 0, 1, or 2
+    // Store corresponding cap ID: [0, num_caps)
+    // length num_dir_nodes
+    std::vector<int> cap_id;
+
+    // Dominant component index of each cap's unit normal vector: 0, 1, or 2
     // length num_caps
     std::vector<int> dominant_comp;
 
-    // Each cap's unit normal vector, length num_caps
-    std::vector< std::vector<double> > outnormal;
+    // Each cap's unit normal vector, length 3 x num_caps
+    std::vector<double> outnormal;
     
 };
 

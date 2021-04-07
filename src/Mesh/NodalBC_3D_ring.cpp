@@ -11,6 +11,7 @@ NodalBC_3D_ring::NodalBC_3D_ring(const int &nFunc)
   Create_ID( nFunc );
   
   num_caps = 0;
+  cap_id.clear();
   dominant_comp.clear();
   outnormal.clear();
 
@@ -34,16 +35,21 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
   std::vector<std::string> cap_files = outflow_files;
   cap_files.insert( cap_files.begin(), inflow_file ); 
 
-  outnormal = outflow_outward_vec;
-  outnormal.insert( outnormal.begin(), inflow_outward_vec );
-
   num_caps = cap_files.size();
   dominant_comp.resize(num_caps);
 
-  for(int ii=0; ii<num_caps; ++ii)
+  outnormal = inflow_outward_vec;
+  Vector_3 outvec = Vector_3( inflow_outward_vec[0], inflow_outward_vec[1], inflow_outward_vec[2] );
+  dominant_comp[0] = outvec.get_dominant_comp();
+
+  for(unsigned int ii=0; ii<outflow_outward_vec.size(); ++ii)
   {
-    Vector_3 outvec = Vector_3( outnormal[ii][0], outnormal[ii][1], outnormal[ii][2] );
-    dominant_comp[ii] = outvec.get_dominant_comp();
+    outnormal.push_back(outflow_outward_vec[ii][0]);
+    outnormal.push_back(outflow_outward_vec[ii][1]);
+    outnormal.push_back(outflow_outward_vec[ii][2]);
+
+    outvec = Vector_3( outflow_outward_vec[ii][0], outflow_outward_vec[ii][1], outflow_outward_vec[ii][2] );
+    dominant_comp[ii + 1] = outvec.get_dominant_comp();
   }
 
   int numpts, numcels;
@@ -81,6 +87,7 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
         if( VEC_T::is_invec( wall_gnode, gnode[jj]) )
         {
           dir_nodes.push_back( static_cast<unsigned int>( gnode[jj] ) );
+          cap_id.push_back(ii);
           num_outline_pts += 1;
         }
       }
@@ -114,6 +121,7 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
         if( VEC_T::is_invec( wall_gnode, gnode[jj]) )
         {
           dir_nodes.push_back( static_cast<unsigned int>( gnode[jj] ) );
+          cap_id.push_back(ii);
           num_outline_pts += 1;
         }
       }

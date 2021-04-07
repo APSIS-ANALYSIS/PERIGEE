@@ -214,6 +214,25 @@ class INodalBC
       SYS_T::commPrint("Warning: get_global_cell is not implemented. \n");
       return -1;
     } 
+
+    // --------------------------------------------------------------
+    // get_cap_id returns the cap id [0, num_caps] of each dir node
+    // --------------------------------------------------------------
+    virtual void get_cap_id( std::vector<int> &capid ) const
+    {SYS_T::commPrint("Warning: get_cap_id is not implemented. \n");}
+
+    // --------------------------------------------------------------
+    // get_dominant_comp returns the dominant comp index of each cap's
+    // unit normal vector
+    // --------------------------------------------------------------
+    virtual void get_dominant_comp( std::vector<int> &dom_comp ) const 
+    {SYS_T::commPrint("Warning: get_dominant_comp is not implemented. \n");}
+
+    // --------------------------------------------------------------
+    // get_outnormal returns each cap's unit normal vector
+    // --------------------------------------------------------------
+    virtual void get_outnormal( std::vector<double> &outvec ) const
+    {SYS_T::commPrint("Warning: get_outnormal is not implemented. \n");}
   
   protected:
     std::vector<unsigned int> dir_nodes;
