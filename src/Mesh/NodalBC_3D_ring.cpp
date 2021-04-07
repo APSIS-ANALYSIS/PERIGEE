@@ -10,8 +10,9 @@ NodalBC_3D_ring::NodalBC_3D_ring(const int &nFunc)
 
   Create_ID( nFunc );
   
-  outnormal.resize(3);
-  outnormal[0] = 0.0; outnormal[1] = 0.0; outnormal[2] = 0.0;
+  num_caps = 0;
+  dominant_comp.clear();
+  outnormal.clear();
 
   std::cout<<"===> NodalBC_3D_ring::empty is generated. \n";
 }
@@ -24,16 +25,26 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
     const std::vector< std::vector<double> > &outflow_outward_vec,
     const int &nFunc, const int &elemtype )
 {
-  // 1. There is no periodic nodes
+  // No periodic nodes
   per_slave_nodes.clear();
   per_master_nodes.clear();
   num_per_nodes = 0;
 
-  // 2. Read in the data
+  // Aggregate inlet & outlet data
   std::vector<std::string> cap_files = outflow_files;
   cap_files.insert( cap_files.begin(), inflow_file ); 
 
-  const unsigned int num_caps = cap_files.size(); 
+  outnormal = outflow_outward_vec;
+  outnormal.insert( outnormal.begin(), inflow_outward_vec );
+
+  num_caps = cap_files.size();
+  dominant_comp.resize(num_caps);
+
+  for(int ii=0; ii<num_caps; ++ii)
+  {
+    Vector_3 outvec = Vector_3( outnormal[ii][0], outnormal[ii][1], outnormal[ii][2] );
+    dominant_comp[ii] = outvec.get_dominant_comp();
+  }
 
   int numpts, numcels;
   std::vector<double> pts;
@@ -53,7 +64,7 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
     TET_T::read_vtp_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
         wall_ien, wall_gnode, wall_gelem );
 
-    for(unsigned int ii=0; ii<num_caps; ++ii)
+    for(int ii=0; ii<num_caps; ++ii)
     {
       SYS_T::file_check( cap_files[ii] );
 
@@ -65,7 +76,7 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
       int num_outline_pts = 0;
       for(unsigned int jj=0; jj<gnode.size(); ++jj)
       {
-        if(gnode[jj]<0) SYS_T::print_fatal("Error: negative nodal index on cap %d! \n", ii);
+        if( gnode[jj]<0 ) SYS_T::print_fatal("Error: negative nodal index on cap %d! \n", ii);
 
         if( VEC_T::is_invec( wall_gnode, gnode[jj]) )
         {
@@ -77,7 +88,6 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
       // Detect usage of the sv exterior surface (containing caps) as the wall surface
       if(num_outline_pts == numpts)
         SYS_T::print_fatal( "Error: Cap %d has %d outline nodes and %d total nodes. This is likely due to an improper wall mesh.\n", ii, num_outline_pts, numpts );
-
     }
   }
   else if( elemtype == 502 )
@@ -87,7 +97,7 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
     TET_T::read_vtu_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
         wall_ien, wall_gnode, wall_gelem );
 
-    for(unsigned int ii=0; ii<num_caps; ++ii)
+    for(int ii=0; ii<num_caps; ++ii)
     {
       SYS_T::file_check( cap_files[ii] );
 
@@ -99,7 +109,7 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
       int num_outline_pts = 0;
       for(unsigned int jj=0; jj<gnode.size(); ++jj)
       {
-        if(gnode[jj]<0) SYS_T::print_fatal("Error: negative nodal index on cap %d! \n", ii);
+        if( gnode[jj]<0 ) SYS_T::print_fatal("Error: negative nodal index on cap %d! \n", ii);
 
         if( VEC_T::is_invec( wall_gnode, gnode[jj]) )
         {
@@ -111,7 +121,6 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
       // Detect usage of the sv exterior surface (containing caps) as the wall surface
       if(num_outline_pts == numpts)
         SYS_T::print_fatal( "Error: Cap %d has %d outline nodes and %d total nodes. This is likely due to an improper wall mesh.\n", ii, num_outline_pts, numpts );
-
     }
   }
   else
@@ -124,7 +133,7 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
 
   // Finish and print info on screen
   std::cout << "===> NodalBC_3D_ring specified by \n";
-  for(unsigned int ii=0; ii<num_caps; ++ii)
+  for(int ii=0; ii<num_caps; ++ii)
     std::cout << "     outline of " << cap_files[ii] << std::endl;
   std::cout<<"     is generated. \n";
 }

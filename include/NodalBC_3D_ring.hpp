@@ -17,6 +17,7 @@
 // ==================================================================
 #include "INodalBC.hpp"
 #include "Tet_Tools.hpp"
+#include "Vector_3.hpp"
 
 class NodalBC_3D_ring : public INodalBC
 {
@@ -42,6 +43,16 @@ class NodalBC_3D_ring : public INodalBC
 
   private:
     NodalBC_3D_ring() {};
+
+    // Number of caps (inlets, outlets)
+    int num_caps;
+
+    // Dominant component of each cap's unit normal vector: 0, 1, or 2
+    // length num_caps
+    std::vector<int> dominant_comp;
+
+    // Each cap's unit normal vector, length num_caps
+    std::vector< std::vector<double> > outnormal;
     
 };
 
