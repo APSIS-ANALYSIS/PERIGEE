@@ -189,26 +189,6 @@ int main( int argc, char * argv[] )
   Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, mesh->get_nFunc());
   mnindex->write_hdf5("node_mapping");
 
-  // Set up Nodal i.e. Dirichlet type Boundary Conditions. For CMM with prescribed inflow
-  // and clamped caps, this includes all inlet nodes and all ring/outline nodes on the outlets.
-  std::vector<INodalBC *> NBC_list;
-  NBC_list.clear(); NBC_list.resize( dofMat );
-
-  if(elemType == 501)
-  {
-    NBC_list[0] = new NodalBC_3D_vtp( nFunc );
-    NBC_list[1] = new NodalBC_3D_vtp( sur_file_in, sur_file_wall, sur_file_out, nFunc );
-    NBC_list[2] = new NodalBC_3D_vtp( sur_file_in, sur_file_wall, sur_file_out, nFunc );
-    NBC_list[3] = new NodalBC_3D_vtp( sur_file_in, sur_file_wall, sur_file_out, nFunc );
-  }
-  else
-  {
-    NBC_list[0] = new NodalBC_3D_vtu( nFunc );
-    NBC_list[1] = new NodalBC_3D_vtu( sur_file_in, sur_file_wall, sur_file_out, nFunc );
-    NBC_list[2] = new NodalBC_3D_vtu( sur_file_in, sur_file_wall, sur_file_out, nFunc );
-    NBC_list[3] = new NodalBC_3D_vtu( sur_file_in, sur_file_wall, sur_file_out, nFunc );
-  }
-
   // Inflow BC info
   std::vector<double> inflow_outward_vec;
   TET_T::get_out_normal( sur_file_in, ctrlPts, IEN, inflow_outward_vec );
@@ -225,6 +205,28 @@ int main( int argc, char * argv[] )
   ElemBC * ebc = new ElemBC_3D_tet_outflow( sur_file_out, outflow_outward_vec, elemType );
 
   ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
+
+  // Set up Nodal i.e. Dirichlet type Boundary Conditions. For CMM with prescribed inflow,
+  // this includes all inlet interior nodes. To enable in-plane motion of the inlet & outlet
+  // ring nodes, these ring nodes are included only for the dominant component of the
+  // corresponding cap's unit normal.
+  std::vector<INodalBC *> NBC_list;
+  NBC_list.clear(); NBC_list.resize( dofMat );
+
+  if(elemType == 501)
+  {
+    NBC_list[0] = new NodalBC_3D_vtp( nFunc );
+    NBC_list[1] = new NodalBC_3D_vtp( sur_file_in, inflow_outward_vec, sur_file_wall, sur_file_out, outflow_outward_vec, 0, nFunc );
+    NBC_list[2] = new NodalBC_3D_vtp( sur_file_in, inflow_outward_vec, sur_file_wall, sur_file_out, outflow_outward_vec, 1, nFunc );
+    NBC_list[3] = new NodalBC_3D_vtp( sur_file_in, inflow_outward_vec, sur_file_wall, sur_file_out, outflow_outward_vec, 2, nFunc );
+  }
+  else
+  {
+    NBC_list[0] = new NodalBC_3D_vtu( nFunc );
+    NBC_list[1] = new NodalBC_3D_vtu( sur_file_in, inflow_outward_vec, sur_file_wall, sur_file_out, outflow_outward_vec, 0, nFunc );
+    NBC_list[2] = new NodalBC_3D_vtu( sur_file_in, inflow_outward_vec, sur_file_wall, sur_file_out, outflow_outward_vec, 1, nFunc );
+    NBC_list[3] = new NodalBC_3D_vtu( sur_file_in, inflow_outward_vec, sur_file_wall, sur_file_out, outflow_outward_vec, 2, nFunc );
+  }
 
   // ----------------------------------------------------------------
   // Wall mesh for CMM-type model is set as an elemental bc.
