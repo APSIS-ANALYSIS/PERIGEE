@@ -24,9 +24,11 @@
 #include "NodalBC_3D_vtp.hpp"
 #include "NodalBC_3D_vtu.hpp"
 #include "NodalBC_3D_inflow.hpp"
+#include "NodalBC_3D_ring.hpp"
 #include "ElemBC_3D_tet_outflow.hpp"
 #include "ElemBC_3D_tet_wall.hpp"
 #include "NBC_Partition_3D_inflow.hpp"
+#include "NBC_Partition_3D_ring.hpp"
 #include "EBC_Partition_vtp_outflow.hpp"
 #include "EBC_Partition_vtp_wall.hpp"
 
@@ -206,6 +208,10 @@ int main( int argc, char * argv[] )
 
   ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
 
+  // Set up ring BC
+  INodalBC * ring_bc = new NodalBC_3D_ring( sur_file_in, inflow_outward_vec,
+       sur_file_wall, sur_file_out, outflow_outward_vec, nFunc, elemType );
+
   // Set up Nodal i.e. Dirichlet type Boundary Conditions. For CMM with prescribed inflow,
   // this includes all inlet interior nodes. To enable in-plane motion of the inlet & outlet
   // ring nodes, these ring nodes are included only for the dominant component of the
@@ -300,6 +306,10 @@ int main( int argc, char * argv[] )
     INBC_Partition * infpart = new NBC_Partition_3D_inflow(part, mnindex, InFBC);
     infpart->write_hdf5( part_file.c_str() );
 
+    // Partition Nodal Ring BC and write to h5 file
+    INBC_Partition * ringpart = new NBC_Partition_3D_ring(part, mnindex, ring_bc);
+    ringpart->write_hdf5( part_file.c_str() );
+
     // Partition Elemental BC and write to h5 file
     IEBC_Partition * ebcpart = new EBC_Partition_vtp_outflow(part, mnindex, ebc, NBC_list);
     ebcpart -> write_hdf5( part_file.c_str() );
@@ -316,7 +326,7 @@ int main( int argc, char * argv[] )
     list_ratio_g2l.push_back((double)part->get_nghostnode()/(double) part->get_nlocalnode());
 
     sum_nghostnode += part->get_nghostnode();
-    delete part; delete nbcpart; delete infpart; delete ebcpart; delete wbcpart; 
+    delete part; delete nbcpart; delete infpart; delete ringpart; delete ebcpart; delete wbcpart; 
   }
 
   cout<<"\n===> Mesh Partition Quality: "<<endl;
@@ -345,7 +355,7 @@ int main( int argc, char * argv[] )
   // Finalize the code and exit
   for(auto it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc) delete *it_nbc;
 
-  delete InFBC; delete ebc; delete mytimer; delete wall_bc;
+  delete InFBC; delete ring_bc; delete ebc; delete mytimer; delete wall_bc;
   delete mnindex; delete global_part; delete mesh; delete IEN;
   PetscFinalize();
   return EXIT_SUCCESS;
