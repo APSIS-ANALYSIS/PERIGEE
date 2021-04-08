@@ -218,6 +218,7 @@ class IPGAssem
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
 
+    // Assemble mass matrix and residual vector for CMM with clamped rings
     virtual void Assem_mass_residual(
         const PDNSolution * const &sol_a,
         const ALocal_Elem * const &alelem_ptr,
@@ -230,6 +231,24 @@ class IPGAssem
         const APart_Node * const &node_ptr,
         const FEANode * const &fnode_ptr,
         const ALocal_NodalBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part )
+    {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
+
+
+    // Assemble mass matrix and residual vector for CMM with in-plane motion ring BC
+    virtual void Assem_mass_residual(
+        const PDNSolution * const &sol_a,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const APart_Node * const &node_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_Ring_NodalBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
@@ -514,6 +533,7 @@ class IPGAssem
     {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
     
 
+    // Assemble the residual vector and tangent matrix for CMM with clamped rings
     virtual void Assem_tangent_residual(
         const PDNSolution * const &sol_a,
         const PDNSolution * const &sol_b,
@@ -533,6 +553,33 @@ class IPGAssem
         const APart_Node * const &node_ptr,
         const FEANode * const &fnode_ptr,
         const ALocal_NodalBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const ALocal_EBC * const &ebc_wall_part,
+        const IGenBC * const &gbc )
+    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
+    
+
+    // Assemble the residual vector and tangent matrix for CMM with in-plane motion ring BC
+    virtual void Assem_tangent_residual(
+        const PDNSolution * const &sol_a,
+        const PDNSolution * const &sol_b,
+        const PDNSolution * const &sol_wall_disp,
+        const PDNSolution * const &dot_sol_np1,
+        const PDNSolution * const &sol_np1,
+        const double &curr_time,
+        const double &dt,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        FEAElement * const &elementw,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const APart_Node * const &node_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_Ring_NodalBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part,
         const ALocal_EBC * const &ebc_wall_part,
         const IGenBC * const &gbc )

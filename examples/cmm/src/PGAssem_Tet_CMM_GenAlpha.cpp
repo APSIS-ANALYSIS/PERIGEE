@@ -76,7 +76,9 @@ PGAssem_Tet_CMM_GenAlpha::~PGAssem_Tet_CMM_GenAlpha()
 
 
 void PGAssem_Tet_CMM_GenAlpha::EssBC_KG(
-    const ALocal_NodalBC * const &nbc_part, const int &field )
+    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const int &field )
 {
   const int local_dir = nbc_part->get_Num_LD(field);
 
@@ -176,7 +178,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_nonzero_estimate(
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 
-  for(int ii=0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
+  for(int ii=0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ringnbc_part, ii );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
@@ -197,6 +199,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_mass_residual(
     const APart_Node * const &node_ptr,
     const FEANode * const &fnode_ptr,
     const ALocal_NodalBC * const &nbc_part,
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();
@@ -244,7 +247,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_mass_residual(
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 
-  for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
+  for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ringnbc_part, ii );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
@@ -360,6 +363,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
     const APart_Node * const &node_ptr,
     const FEANode * const &fnode_ptr,
     const ALocal_NodalBC * const &nbc_part,
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part,
     const ALocal_EBC * const &ebc_wall_part,
     const IGenBC * const &gbc )
@@ -425,7 +429,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 
-  for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
+  for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ringnbc_part, ii );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
