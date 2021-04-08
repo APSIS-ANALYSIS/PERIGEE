@@ -75,6 +75,7 @@ void PTime_CMM_Solver::TM_CMM_GenAlpha(
     const FEANode * const &feanode_ptr,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_Inflow_NodalBC * const &infnbc_part,
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part,
     const ALocal_EBC * const &ebc_wall_part,
     IGenBC * const &gbc,
@@ -151,10 +152,11 @@ void PTime_CMM_Solver::TM_CMM_GenAlpha(
     nsolver_ptr->GenAlpha_Solve_CMM( renew_flag, 
         time_info->get_time(), time_info->get_step(), 
         sol_base, pre_dot_sol, pre_sol, pre_dot_sol_wall_disp, pre_sol_wall_disp,
-        tmga_ptr, flr_ptr, alelem_ptr, lien_ptr, anode_ptr, feanode_ptr, nbc_part, infnbc_part,
-        ebc_part, ebc_wall_part, gbc, bc_mat, elementv, elements, elementw, quad_v, quad_s,
-        lassem_fluid_ptr, gassem_ptr, lsolver_ptr, cur_dot_sol, cur_sol, 
-        cur_dot_sol_wall_disp, cur_sol_wall_disp, conv_flag, nl_counter );
+        tmga_ptr, flr_ptr, alelem_ptr, lien_ptr, anode_ptr, feanode_ptr,
+        nbc_part, infnbc_part, ringnbc_part, ebc_part, ebc_wall_part, gbc, bc_mat,
+        elementv, elements, elementw, quad_v, quad_s, lassem_fluid_ptr, gassem_ptr,
+        lsolver_ptr, cur_dot_sol, cur_sol, cur_dot_sol_wall_disp, cur_sol_wall_disp,
+        conv_flag, nl_counter );
 
     // Update the time step information
     time_info->TimeIncrement();

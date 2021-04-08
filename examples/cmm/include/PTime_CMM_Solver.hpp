@@ -39,6 +39,7 @@ class PTime_CMM_Solver
         const FEANode * const &feanode_ptr,
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_Inflow_NodalBC * const &infnbc_part,
+        const ALocal_Ring_NodalBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part,
         const ALocal_EBC * const &ebc_wall_part,
         IGenBC * const &gbc,

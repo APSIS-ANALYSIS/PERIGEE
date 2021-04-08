@@ -12,6 +12,7 @@
 #include "ALocal_EBC_outflow.hpp"
 #include "ALocal_EBC_wall.hpp"
 #include "ALocal_Inflow_NodalBC.hpp"
+#include "ALocal_Ring_NodalBC.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
 #include "FEAElement_Tet4.hpp"
@@ -234,6 +235,9 @@ int main( int argc, char *argv[] )
 
   // Local sub-domain's inflow (Dirichlet) BC
   ALocal_Inflow_NodalBC * locinfnbc = new ALocal_Inflow_NodalBC(part_file, rank);
+
+  // Local sub-domain's ring (Dirichlet) in-plane motion BC
+  ALocal_Ring_NodalBC * locringnbc = new ALocal_Ring_NodalBC(part_file, rank);
 
   // Local sub-domain's outflow elemental (Neumann) BC
   ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
@@ -547,7 +551,7 @@ int main( int argc, char *argv[] )
 
   tsolver->TM_CMM_GenAlpha(is_restart, base, dot_sol, sol, dot_sol_wall_disp, sol_wall_disp,
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN, pNode, fNode,
-      locnbc, locinfnbc, locebc, locebc_wall, gbc, pmat, elementv, elements, elementw,
+      locnbc, locinfnbc, locringnbc, locebc, locebc_wall, gbc, pmat, elementv, elements, elementw,
       quadv, quads, locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
 
   // ===== Print complete solver info =====
@@ -555,8 +559,8 @@ int main( int argc, char *argv[] )
 
   // ===== Deallocate memory =====
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic; delete locElem;
-  delete locnbc; delete locinfnbc; delete locebc; delete locebc_wall; delete pNode;
-  delete inflow_rate_ptr; delete quadv; delete quads; delete elementv;
+  delete locnbc; delete locinfnbc; delete locringnbc; delete locebc; delete locebc_wall;
+  delete pNode; delete inflow_rate_ptr; delete quadv; delete quads; delete elementv;
   delete elements; delete elementw; delete pmat; delete tm_galpha_ptr;
   delete locAssem_ptr; delete base; delete sol; delete dot_sol;
   delete sol_wall_disp; delete dot_sol_wall_disp; delete timeinfo; delete gbc;

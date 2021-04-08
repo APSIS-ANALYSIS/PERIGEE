@@ -10,6 +10,7 @@
 // Author: Ju Liu
 // ============================================================================
 #include "ALocal_NodalBC.hpp"
+#include "ALocal_Ring_NodalBC.hpp"
 #include "PDNSolution.hpp"
 #include "petscmat.h"
 
