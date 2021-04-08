@@ -1,0 +1,68 @@
+#ifndef ALOCAL_RING_NODALBC_HPP
+#define ALOCAL_RING_NODALBC_HPP
+// ==================================================================
+// ALocal_Ring_NodalBC.hpp
+//
+// Analysis-use, ring nodal indices.
+//
+// Date Created: July 8 2017
+// Author: Ju Liu
+// ==================================================================
+#include "HDF5_Reader.hpp"
+
+class ALocal_Ring_NodalBC
+{
+  public:
+    ALocal_Ring_NodalBC( const std::string &fileBaseName,
+        const int &cpu_rank );
+
+    virtual ~ALocal_Ring_NodalBC();
+
+    // Get global index of a Dirichlet node in the local partition
+    // \para node ranges [ 0 , Num_LD ).
+    virtual int get_LDN( const int &node ) const { return LDN[node]; }
+
+    // Get the number of Dirichlet nodes in the local partition
+    virtual int get_Num_LD() const { return Num_LD; }
+
+    // get the Dirichlet node's dominant component index, where the
+    // dominant component of the unit normal vector is the largest in
+    // absolute value
+    // \para node ranges [ 0, Num_LD )
+    virtual double get_dominant_comp( const int &node ) const
+    { return dominant_comp[ cap_id[node] ]; }
+
+    // get the Dirichlet node's outward normal vector components.
+    // \para node ranges [ 0, Num_LD )
+    // comp=0 : x-component; comp=1 : y-component; comp=2 : z-component
+    virtual double get_outvec( const int &node, const int &comp ) const
+    { return outnormal[ 3*(cap_id[node]) + comp ]; }
+
+    // determine whether a given index belongs to the LDN vector
+    virtual bool is_inLDN( const int &ii) const
+    { return VEC_T::is_invec(LDN, ii); }
+
+  private:
+    // Number of local Dirichlet nodes
+    int Num_LD;
+
+    // Global indices of the local Dirichlet nodes (ring BC)
+    std::vector<int> LDN;
+
+    // Number of caps (inlets, outlets)
+    int num_caps;
+
+    // If Num_LD > 0, store corresponding cap ID: [0, num_caps)
+    // length Num_LD
+    std::vector<int> cap_id;
+
+    // Dominant component index of each cap's unit normal vector: 0, 1, or 2
+    // length num_caps
+    std::vector<int> dominant_comp;
+
+    // Each cap's unit normal vector, length 3 x num_caps
+    std::vector<double> outnormal;
+
+};
+
+#endif

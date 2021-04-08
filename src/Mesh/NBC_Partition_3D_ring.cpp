@@ -10,7 +10,7 @@ NBC_Partition_3D_ring::NBC_Partition_3D_ring(
 
   part_cap_id.clear();
 
-  if( Num_LD[0] > 0 )
+  if( LDN.size() > 0 )
   {
     // Access all (unpartitioned) ring node's cap_ids
     std::vector<int> cap_id; 
