@@ -8,7 +8,24 @@ NBC_Partition_3D_ring::NBC_Partition_3D_ring(
 {
   num_caps  = nbc -> get_para_3();
 
-  nbc -> get_cap_id( cap_id );
+  part_cap_id.clear();
+
+  if( Num_LD[0] > 0 )
+  {
+    // Access all (unpartitioned) ring node's cap_ids
+    std::vector<int> cap_id; 
+    nbc -> get_cap_id( cap_id );
+
+    for(unsigned int ii=0; ii<nbc->get_num_dir_nodes(); ++ii)
+    {
+      unsigned int node_index = nbc -> get_dir_nodes(ii);
+      node_index = mnindex -> get_old2new(node_index);
+
+      if( part->isNodeInPart(node_index) )
+        part_cap_id.push_back( cap_id[ii] );
+    } 
+  }
+
   nbc -> get_dominant_comp( dominant_comp );
   nbc -> get_outnormal( outnormal );
 
@@ -35,7 +52,9 @@ void NBC_Partition_3D_ring::write_hdf5( const char * FileName ) const
 
   h5writer->write_intVector(group_id, "Num_LD", Num_LD);
 
-  h5writer->write_intVector( group_id, "cap_id", cap_id );
+  h5writer->write_intScalar( group_id, "num_caps", num_caps );
+
+  h5writer->write_intVector( group_id, "cap_id", part_cap_id );
 
   h5writer->write_intVector( group_id, "cap_dominant_comp", dominant_comp );
 

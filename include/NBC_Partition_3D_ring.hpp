@@ -33,8 +33,8 @@ class NBC_Partition_3D_ring : public NBC_Partition_3D
     int num_caps; 
 
     // Store corresponding cap ID: [0, num_caps)
-    // length num_dir_nodes
-    std::vector<int> cap_id;
+    // length Num_LD
+    std::vector<int> part_cap_id;
 
     // Dominant component index of each cap's unit normal vector: 0, 1, or 2
     // length num_caps
