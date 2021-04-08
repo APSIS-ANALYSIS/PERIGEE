@@ -9,6 +9,7 @@ PGAssem_Tet_CMM_GenAlpha::PGAssem_Tet_CMM_GenAlpha(
     const ALocal_IEN * const &aien_ptr,
     const APart_Node * const &pnode_ptr,
     const ALocal_NodalBC * const &part_nbc,
+    const ALocal_Ring_NodalBC * const &part_ringnbc,
     const ALocal_EBC * const &part_ebc,
     const IGenBC * const &gbc,
     const int &in_nz_estimate )
@@ -53,7 +54,7 @@ PGAssem_Tet_CMM_GenAlpha::PGAssem_Tet_CMM_GenAlpha(
   Release_nonzero_err_str();
 
   Assem_nonzero_estimate( alelem_ptr, locassem_ptr, 
-      elements, quads, aien_ptr, pnode_ptr, part_nbc, part_ebc, gbc );
+      elements, quads, aien_ptr, pnode_ptr, part_nbc, part_ringnbc, part_ebc, gbc );
 
   // Obtain the precise dnz and onz count
   std::vector<int> Kdnz, Konz;
@@ -137,6 +138,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_nonzero_estimate(
     const ALocal_IEN * const &lien_ptr,
     const APart_Node * const &node_ptr,
     const ALocal_NodalBC * const &nbc_part,
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc )
 {

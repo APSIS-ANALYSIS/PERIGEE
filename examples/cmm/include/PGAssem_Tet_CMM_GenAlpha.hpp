@@ -34,6 +34,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const ALocal_IEN * const &aien_ptr,
         const APart_Node * const &pnode_ptr,
         const ALocal_NodalBC * const &part_nbc,
+        const ALocal_Ring_NodalBC * const &part_ringnbc,
         const ALocal_EBC * const &part_ebc,
         const IGenBC * const &gbc,
         const int &in_nz_estimate=60 );
@@ -50,6 +51,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
         const ALocal_NodalBC * const &nbc_part,
+        const ALocal_Ring_NodalBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 

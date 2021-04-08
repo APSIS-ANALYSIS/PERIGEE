@@ -412,7 +412,7 @@ int main( int argc, char *argv[] )
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
 
   IPGAssem * gloAssem_ptr = new PGAssem_Tet_CMM_GenAlpha( locAssem_ptr, elements, quads,
-      GMIptr, locElem, locIEN, pNode, locnbc, locebc, gbc, nz_estimate );
+      GMIptr, locElem, locIEN, pNode, locnbc, locringnbc, locebc, gbc, nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
   gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_ptr,

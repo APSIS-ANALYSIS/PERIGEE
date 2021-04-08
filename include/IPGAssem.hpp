@@ -24,6 +24,7 @@
 #include "AExtractor_3D_NURBS_xyz.hpp"
 #include "ALocal_NodalBC.hpp"
 #include "ALocal_Inflow_NodalBC.hpp"
+#include "ALocal_Ring_NodalBC.hpp"
 #include "ALocal_EBC.hpp"
 #include "IGenBC.hpp"
 
@@ -134,6 +135,7 @@ class IPGAssem
         const ALocal_EBC * const &ebc_part )
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
 
+    // Nonzero pattern estimate for the CMM equations with clamped rings
     virtual void Assem_nonzero_estimate(
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
@@ -142,6 +144,20 @@ class IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
         const ALocal_NodalBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc )
+    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
+
+    // Nonzero pattern estimate for the CMM equations with in-plane motion ring BC
+    virtual void Assem_nonzero_estimate(
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const APart_Node * const &node_ptr,
+        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_Ring_NodalBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
