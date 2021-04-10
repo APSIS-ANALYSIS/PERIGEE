@@ -26,7 +26,7 @@ ALocal_Ring_NodalBC::ALocal_Ring_NodalBC(
   if( Num_LD > 0 )
   {
     h5r->read_intVector( gname.c_str(), "LDN", LDN );
-    h5r -> read_intVector( gname.c_str(), "cap_id", cap_id );
+    h5r->read_intVector( gname.c_str(), "cap_id", cap_id );
   }
 
   delete h5r; H5Fclose( file_id );

@@ -48,13 +48,14 @@ void NBC_Partition_3D_ring::write_hdf5( const char * FileName ) const
   HDF5_Writer * h5writer = new HDF5_Writer(file_id);
 
   if(LDN.size() > 0)
-    h5writer->write_intVector(group_id, "LDN", LDN);
+  {
+    h5writer->write_intVector( group_id, "LDN", LDN );
+    h5writer->write_intVector( group_id, "cap_id", part_cap_id );
+  }
 
-  h5writer->write_intVector(group_id, "Num_LD", Num_LD);
+  h5writer->write_intVector( group_id, "Num_LD", Num_LD );
 
   h5writer->write_intScalar( group_id, "num_caps", num_caps );
-
-  h5writer->write_intVector( group_id, "cap_id", part_cap_id );
 
   h5writer->write_intVector( group_id, "cap_dominant_comp", dominant_comp );
 
