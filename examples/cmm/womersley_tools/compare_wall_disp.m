@@ -1,4 +1,4 @@
-function compare_wall_disp(sim_dir, z_in, z_out, rho, R, c_n, g_n, B_n, G_n, T, n_modes, t_steps, sol_idx)
+function compare_wall_disp(sim_dir, solver, z_in, z_out, rho, R, c_n, g_n, B_n, G_n, T, n_modes, t_steps, sol_idx)
 
 colors = [     0, 0.4470, 0.7410; 0.8500, 0.3250, 0.0980; ...
           0.4940, 0.1840, 0.5560; 0.4660, 0.6740, 0.1880; ...
@@ -40,15 +40,30 @@ for ii = 1 : (t_steps + 1)
         disp(['Reading ', filename]);
 
         data_interp = readmatrix(filename);
-
-        x_interp{jj}  = data_interp(:, 13);
-        y_interp{jj}  = data_interp(:, 14);
-        z_interp{jj}  = data_interp(:, 15);
+        
+        if strcmp(solver{jj}, 'pg')
+            x_interp{jj}  = data_interp(:, 13);
+            y_interp{jj}  = data_interp(:, 14);
+            z_interp{jj}  = data_interp(:, 15);
+            
+            ux_interp{jj} = data_interp(:, 7);          % x-displacement
+            uy_interp{jj} = data_interp(:, 8);          % y-displacement
+            xi_interp{jj} = data_interp(:, 9);          % z-displacement
+        
+        elseif strcmp(solver{jj}, 'sv')
+            x_interp{jj}  = data_interp(:, 26);
+            y_interp{jj}  = data_interp(:, 27);
+            z_interp{jj}  = data_interp(:, 28);
+            
+            ux_interp{jj} = data_interp(:, 6);          % x-displacement
+            uy_interp{jj} = data_interp(:, 7);          % y-displacement
+            xi_interp{jj} = data_interp(:, 8);          % z-displacement
+            
+        else
+            disp('Unknown solver');
+        end
+        
         theta_interp{jj} = atan2(y_interp{jj}, x_interp{jj});
-
-        ux_interp{jj} = data_interp(:, 7);          % x-displacement
-        uy_interp{jj} = data_interp(:, 8);          % y-displacement
-        xi_interp{jj} = data_interp(:, 9);          % z-displacement
 
         % Cartesian to polar transformation
         eta_interp{jj} = cos(theta_interp{jj}) .* ux_interp{jj} + sin(theta_interp{jj}) .* uy_interp{jj};

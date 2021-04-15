@@ -1,4 +1,4 @@
-function compare_flow_pres(sim_dir, z_in, z_out, inlet_data, outlet_data, p0, mu, rho, R, c_n, B_n, Q_n, G_n, g_n, T, n_modes, sol_idx)
+function compare_flow_pres(sim_dir, solver, z_in, z_out, inlet_data, outlet_data, p0, mu, rho, R, c_n, B_n, Q_n, G_n, g_n, T, n_modes, sol_idx)
 
 conversion = 1333.2;
 
@@ -34,13 +34,28 @@ q_in_numer = cell(1, num_sim); q_out_numer = cell(1, num_sim);
 p_in_numer = cell(1, num_sim); p_out_numer = cell(1, num_sim);
 
 for ii = 1 : num_sim
-    t_numer{ii} = inlet_data{ii}(sol_idx{ii}, 2) - inlet_data{ii}(sol_idx{ii}(1), 2);
     
-    q_in_numer{ii}  = -inlet_data{ii}(sol_idx{ii}, 4); % flip sign for unit normal
-    q_out_numer{ii} = outlet_data{ii}(sol_idx{ii}, 4);
-    
-    p_in_numer{ii}  =  inlet_data{ii}(sol_idx{ii}, 5);
-    p_out_numer{ii} = outlet_data{ii}(sol_idx{ii}, 5);
+    if strcmp(solver{ii}, 'pg')
+        t_numer{ii} = inlet_data{ii}(sol_idx{ii}, 2) - inlet_data{ii}(sol_idx{ii}(1), 2);
+
+        q_in_numer{ii}  = -inlet_data{ii}(sol_idx{ii}, 4); % flip sign for unit normal
+        q_out_numer{ii} = outlet_data{ii}(sol_idx{ii}, 4);
+
+        p_in_numer{ii}  =  inlet_data{ii}(sol_idx{ii}, 5);
+        p_out_numer{ii} = outlet_data{ii}(sol_idx{ii}, 5);
+        
+    elseif strcmp(solver{ii}, 'sv')
+        t_numer{ii} = inlet_data{ii}(sol_idx{ii}, 1) - inlet_data{ii}(sol_idx{ii}(1), 1);
+        
+        q_in_numer{ii}  =  inlet_data{ii}(sol_idx{ii}, 2);
+        q_out_numer{ii} = outlet_data{ii}(sol_idx{ii}, 2);
+        
+        p_in_numer{ii}  =  inlet_data{ii}(sol_idx{ii}, 3);
+        p_out_numer{ii} = outlet_data{ii}(sol_idx{ii}, 3);
+        
+    else
+        disp('Unknown solver');
+    end
 
 end
 

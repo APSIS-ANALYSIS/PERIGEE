@@ -1,4 +1,4 @@
-function compare_fluid_pres(sim_dir, z_in, z_out, p0, mu, R, c_n, B_n, Q_n, T, n_modes, t_steps, sol_idx)
+function compare_fluid_pres(sim_dir, solver, z_in, z_out, p0, mu, R, c_n, B_n, Q_n, T, n_modes, t_steps, sol_idx)
 
 conversion = 1333.2;
 
@@ -38,9 +38,18 @@ for ii = 1 : (t_steps + 1)
         disp(['Reading ', filename]);
 
         data_interp = readmatrix(filename);
-
-        z_interp{jj} = data_interp(:, 15);
-        p_interp{jj} = data_interp(:,  2);
+        
+        if strcmp(solver{jj}, 'pg')
+            z_interp{jj} = data_interp(:, 15);
+            p_interp{jj} = data_interp(:,  2);
+        
+        elseif strcmp(solver{jj}, 'sv')
+            z_interp{jj} = data_interp(:, 28);
+            p_interp{jj} = data_interp(:,  9);
+        else
+            disp('Unknown solver');
+        end
+        
     end
     
     t = (ii - 1) * dt;

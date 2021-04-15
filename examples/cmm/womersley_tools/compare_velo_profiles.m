@@ -1,4 +1,4 @@
-function compare_velo_profiles(sim_dir, sim_labels, z_coord, mu, rho, R, c_n, B_n, Q_n, G_n, T, n_modes, t_steps, start_step, stop_step, sol_idx)
+function compare_velo_profiles(sim_dir, solver, sim_labels, z_coord, mu, rho, R, c_n, B_n, Q_n, G_n, T, n_modes, t_steps, start_step, stop_step, sol_idx)
 
 colors = [0.918, 0.235, 0.325; 0, 0, 0.545];
 linewidths = [1, 1.6];
@@ -55,15 +55,29 @@ for ii = 1 : (t_steps + 1)
         disp(['Reading ', filename]);
 
         velo_interp = readmatrix(filename);
+        
+        if strcmp(solver{jj}, 'pg')
+            x_interp{jj} = velo_interp(:, 13);
+            y_interp{jj} = velo_interp(:, 14);
+            
+            u_interp{jj} = velo_interp(:, 4);
+            v_interp{jj} = velo_interp(:, 5);
+            w_interp{jj} = velo_interp(:, 6);
+        
+        elseif strcmp(solver{jj}, 'sv')
+            x_interp{jj} = velo_interp(:, 26);
+            y_interp{jj} = velo_interp(:, 27);
+            
+            u_interp{jj} = velo_interp(:, 17);
+            v_interp{jj} = velo_interp(:, 18);
+            w_interp{jj} = velo_interp(:, 19);
+            
+        else
+            disp('Unknown solver');
+        end
 
-        x_interp{jj} = velo_interp(:, 13);
-        y_interp{jj} = velo_interp(:, 14);
         theta_interp{jj} = atan2(y_interp{jj}, x_interp{jj});
-
-        u_interp{jj} = velo_interp(:, 4);
-        v_interp{jj} = velo_interp(:, 5);
-        w_interp{jj} = velo_interp(:, 6);
-
+        
         % Cartesian to polar transformation
         vr_interp{jj} =  cos(theta_interp{jj}) .* u_interp{jj} + sin(theta_interp{jj}) .* v_interp{jj};
 
@@ -96,6 +110,7 @@ for ii = 1 : (t_steps + 1)
         
     end
     
+    plot(w_ax, [0, 0], [-R, R], 'Color', [0.75, 0.75, 0.75] );               % grey
     plot(w_ax, real(w_exact), x, 'Color', colors(1, :), 'LineWidth', 1, 'Linestyle', '-');
     % plot(w_ax, w_numer, r_numer, 'Color', colors(2, :), 'Linestyle', 'None', 'Marker', 'o', 'MarkerSize', 3);
     
@@ -103,7 +118,6 @@ for ii = 1 : (t_steps + 1)
         plot(w_ax, w_interp{jj}, y_interp{jj}, 'Color', colors(2, :), ...
              'LineWidth', linewidths(jj), 'Linestyle', linestyles{jj});
     end
-    plot(w_ax, [0, 0], [-R, R], 'Color', [0.75, 0.75, 0.75] );               % grey
     
     set(w_ax, 'Box', 'on', 'TickDir', 'out', ...
         'TickLength'  , [.02 .02], ...
@@ -116,7 +130,8 @@ for ii = 1 : (t_steps + 1)
         'LineWidth'   , 1, ...
         'FontSize', 12, ...
         'FontWeight', 'Bold');
-
+    
+    plot(v_ax, [0, 0], [-R, R], 'Color', [0.75, 0.75, 0.75] );               % grey
     plot(v_ax, real(vr_exact), x, 'Color', colors(1, :), 'LineWidth', 1, 'Linestyle', '-');
     % plot(v_ax, vr_numer, r_numer, 'Color', colors(2, :), 'Linestyle', 'None', 'Marker', 'o', 'MarkerSize', 3);
     
@@ -124,7 +139,6 @@ for ii = 1 : (t_steps + 1)
         plot(v_ax, vr_interp{jj}, y_interp{jj}, 'Color', colors(2, :), ...
              'LineWidth', linewidths(jj), 'Linestyle', linestyles{jj});
     end
-    plot(v_ax, [0, 0], [-R, R], 'Color', [0.75, 0.75, 0.75] );               % grey
     
     set(v_ax, 'Box', 'on', 'TickDir', 'out', ...
         'TickLength'  , [.02 .02], ...
