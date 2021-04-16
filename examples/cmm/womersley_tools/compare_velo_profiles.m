@@ -1,8 +1,9 @@
-function compare_velo_profiles(sim_dir, solver, sim_labels, z_coord, mu, rho, R, c_n, B_n, Q_n, G_n, T, n_modes, t_steps, start_step, stop_step, sol_idx)
+function compare_velo_profiles(sim_dir, solver, sim_labels, z_coord, mu, rho, R, ...
+    c_n, B_n, Q_n, G_n, T, n_modes, t_steps, start_step, stop_step, sol_idx, zoomed_views)
 
 colors = [0.918, 0.235, 0.325; 0, 0, 0.545];
-linewidths = [1, 1.6];
-linestyles = {'--', ':'};
+linewidths = [1, 1.6, 1];
+linestyles = {'--', ':', '-.'};
 
 dt = T / t_steps;
       
@@ -152,8 +153,19 @@ for ii = 1 : (t_steps + 1)
         'FontSize', 12, ...
         'FontWeight', 'Bold');
     
-    w_ax.XLim  = w_lim;  v_ax.XLim  = v_lim;
+    w_ax.XLim = w_lim;         v_ax.XLim  = v_lim;
     w_ax.YLim = [-R, R+0.001]; v_ax.YLim = [-R, R+0.001];
+ 
+    if zoomed_views
+        % @ t = T/5
+        w_ax.XLim = [2.935, 3.07]; v_ax.XLim = [4.36e-3, 4.84e-3];
+        w_ax.YLim = [0.2991, 0.3]; v_ax.YLim = [0.205, 0.3];
+        
+%         % @ t = 3T/5
+%         w_ax.XLim = [13, 13.55];   v_ax.XLim = [-1e-4, 2e-5];
+%         w_ax.YLim = [-6e-2, 6e-2]; v_ax.YLim = [-9e-3, 9e-3];
+        
+    end
           
     ylabel(w_ax, '{\boldmath$y$} \bf{(cm)}', 'interpreter', 'latex', ...
            'FontName', 'Helvetica', 'FontSize', 12, 'FontWeight', 'Bold');
@@ -210,9 +222,21 @@ set(w_fig, 'WindowState','fullscreen');
 set(v_fig, 'WindowState','fullscreen');
 
 if num_sim > 1
-    print(v_fig, 'exact-numer_radial-velo-profiles.pdf', '-dpdf', '-r0', '-fillpage');
-    print(w_fig, 'exact-numer_axial-velo-profiles.pdf',  '-dpdf', '-r0', '-fillpage');
+    if zoomed_views
+        print(v_fig, 'exact-numer_radial-velo-profiles_zoomed.pdf', '-dpdf', '-r0', '-fillpage');
+        print(w_fig, 'exact-numer_axial-velo-profiles_zoomed.pdf',  '-dpdf', '-r0', '-fillpage');
+    else
+        print(v_fig, 'exact-numer_radial-velo-profiles.pdf', '-dpdf', '-r0', '-fillpage');
+        print(w_fig, 'exact-numer_axial-velo-profiles.pdf',  '-dpdf', '-r0', '-fillpage');
+    end
+    
 else
-    print(v_fig, [sim_dir{1}, '/exact-numer_radial-velo-profiles.pdf'], '-dpdf', '-r0', '-fillpage');
-    print(w_fig, [sim_dir{1}, '/exact-numer_axial-velo-profiles.pdf'],  '-dpdf', '-r0', '-fillpage');
+    if zoomed_views
+        print(v_fig, [sim_dir{1}, '/exact-numer_radial-velo-profiles_zoomed.pdf'], '-dpdf', '-r0', '-fillpage');
+        print(w_fig, [sim_dir{1}, '/exact-numer_axial-velo-profiles_zoomed.pdf'],  '-dpdf', '-r0', '-fillpage');
+    else
+        print(v_fig, [sim_dir{1}, '/exact-numer_radial-velo-profiles.pdf'], '-dpdf', '-r0', '-fillpage');
+        print(w_fig, [sim_dir{1}, '/exact-numer_axial-velo-profiles.pdf'],  '-dpdf', '-r0', '-fillpage');
+    end
+    
 end

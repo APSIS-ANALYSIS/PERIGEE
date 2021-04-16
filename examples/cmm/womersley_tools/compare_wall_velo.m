@@ -1,11 +1,12 @@
-function compare_wall_velo(sim_dir, solver, z_in, z_out, mu, rho, R, c_n, B_n, G_n, T, n_modes, t_steps, sol_idx)
+function compare_wall_velo(sim_dir, solver, z_in, z_out, mu, rho, R, ...
+    c_n, B_n, G_n, T, n_modes, t_steps, sol_idx, zoomed_views)
 
 colors = [     0, 0.4470, 0.7410; 0.8500, 0.3250, 0.0980; ...
           0.4940, 0.1840, 0.5560; 0.4660, 0.6740, 0.1880; ...
           0.3010, 0.7450, 0.9330; 0.6350, 0.0780, 0.1840];
       
-linewidths = [1, 1.6];
-linestyles = {'--', ':'};
+linewidths = [1, 1.6, 1];
+linestyles = {'--', ':', '-.'};
 
 dt = T / t_steps;
       
@@ -112,6 +113,11 @@ end
 w_wall_ax.XLim = [z_in, z_out]; vr_wall_ax.XLim = [z_in, z_out];
 w_wall_ax.YLim = [-4, 4];       vr_wall_ax.YLim = [-8e-3, 8e-3];
 
+if zoomed_views
+    w_wall_ax.XLim = [14, 15];        vr_wall_ax.XLim = [14, 15];
+    w_wall_ax.YLim = [2.917, 2.9217]; vr_wall_ax.YLim = [5.220e-3, 5.2820e-3];
+end
+
 grid(w_wall_ax, 'minor'); grid(vr_wall_ax, 'minor');
 
 xlabel(w_wall_ax,  '{\boldmath$z$} \bf{(cm)}', 'interpreter', 'latex', ...
@@ -158,7 +164,17 @@ legend(vr_wall_hlines, t_labs, 'interpreter', 'latex', 'NumColumns', t_steps + 1
 set(gcf, 'WindowState', 'fullscreen');
 
 if num_sim > 1
-    print(gcf,  'exact-numer_wall-velo.pdf', '-dpdf', '-r0', '-fillpage');
+    if zoomed_views
+        print(gcf,  'exact-numer_wall-velo_zoomed.pdf', '-dpdf', '-r0', '-fillpage');
+    else
+        print(gcf,  'exact-numer_wall-velo.pdf', '-dpdf', '-r0', '-fillpage');
+    end
+    
 else
-    print(gcf,  [sim_dir{1}, '/exact-numer_wall-velo.pdf'], '-dpdf', '-r0', '-fillpage');
+    if zoomed_views
+        print(gcf,  [sim_dir{1}, '/exact-numer_wall-velo_zoomed.pdf'], '-dpdf', '-r0', '-fillpage');
+    else
+        print(gcf,  [sim_dir{1}, '/exact-numer_wall-velo.pdf'], '-dpdf', '-r0', '-fillpage');
+    end
+    
 end

@@ -1,4 +1,5 @@
-function compare_fluid_pres(sim_dir, solver, z_in, z_out, p0, mu, R, c_n, B_n, Q_n, T, n_modes, t_steps, sol_idx)
+function compare_fluid_pres(sim_dir, solver, z_in, z_out, p0, mu, R, ...
+    c_n, B_n, Q_n, T, n_modes, t_steps, sol_idx, zoomed_views)
 
 conversion = 1333.2;
 
@@ -6,8 +7,8 @@ colors = [     0, 0.4470, 0.7410; 0.8500, 0.3250, 0.0980; ...
           0.4940, 0.1840, 0.5560; 0.4660, 0.6740, 0.1880; ...
           0.3010, 0.7450, 0.9330; 0.6350, 0.0780, 0.1840];
 
-linewidths = [1, 1.6];
-linestyles = {'--', ':'};
+linewidths = [1, 1.6, 1];
+linestyles = {'--', ':', '-.'};
 
 dt = T / t_steps;
 
@@ -92,13 +93,27 @@ set(gca, 'Box', 'on', 'TickDir', 'out', ...
     
 axis square; grid minor; xlim([z_in, z_out]); ylim([-6, 6]);
 
+if zoomed_views
+    xlim([9.98, 10.03]); ylim([1.3198, 1.3272]);
+end
+
 lg = legend(h_lines, t_labs, 'interpreter', 'latex', 'NumColumns', 3, 'Box', 'off');
 set(lg, 'Position', [0.4, 0.1, 0.2, 0.2], 'Units', 'normalized');
 
 set(gcf, 'WindowState', 'fullscreen');
 
 if num_sim > 1
-    print(gcf, 'exact-numer_fluid-pressures.pdf', '-dpdf', '-r0', '-fillpage');
+    if zoomed_views
+        print(gcf, 'exact-numer_fluid-pressures_zoomed.pdf', '-dpdf', '-r0', '-fillpage');
+    else
+        print(gcf, 'exact-numer_fluid-pressures.pdf', '-dpdf', '-r0', '-fillpage');
+    end
+    
 else
-    print(gcf, [sim_dir{1}, '/exact-numer_fluid-pressures.pdf'], '-dpdf', '-r0', '-fillpage');
+    if zoomed_views
+        print(gcf, [sim_dir{1}, '/exact-numer_fluid-pressures_zoomed.pdf'], '-dpdf', '-r0', '-fillpage');
+    else
+        print(gcf, [sim_dir{1}, '/exact-numer_fluid-pressures.pdf'], '-dpdf', '-r0', '-fillpage');
+    end
+  
 end

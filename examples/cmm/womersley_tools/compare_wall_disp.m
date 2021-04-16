@@ -1,11 +1,12 @@
-function compare_wall_disp(sim_dir, solver, z_in, z_out, rho, R, c_n, g_n, B_n, G_n, T, n_modes, t_steps, sol_idx)
+function compare_wall_disp(sim_dir, solver, z_in, z_out, rho, R, ...
+    c_n, g_n, B_n, G_n, T, n_modes, t_steps, sol_idx, zoomed_views)
 
 colors = [     0, 0.4470, 0.7410; 0.8500, 0.3250, 0.0980; ...
           0.4940, 0.1840, 0.5560; 0.4660, 0.6740, 0.1880; ...
           0.3010, 0.7450, 0.9330; 0.6350, 0.0780, 0.1840];
 
-linewidths = [1, 1.6];
-linestyles = {'--', ':'};
+linewidths = [1, 1.6, 1];
+linestyles = {'--', ':', '-.'};
 
 dt = T / t_steps;
       
@@ -111,6 +112,11 @@ end
 xi_ax.XLim = [z_in, z_out]; eta_ax.XLim = [z_in, z_out];
 xi_ax.YLim = [-0.7, 0.7];   eta_ax.YLim = [-1.5e-3, 1.5e-3];
 
+if zoomed_views
+    xi_ax.XLim = [14, 15];         eta_ax.XLim = [14, 15];
+    xi_ax.YLim = [0.4572, 0.4592]; eta_ax.YLim = [9.46e-4, 10.04e-4];
+end
+
 xlabel(xi_ax,  '{\boldmath$z$} \bf{(cm)}', 'interpreter', 'latex', ...
        'FontName', 'Helvetica', 'FontSize', 12, 'FontWeight', 'Bold');
 xlabel(eta_ax, '{\boldmath$z$} \bf{(cm)}', 'interpreter', 'latex', ...
@@ -156,7 +162,17 @@ legend(eta_hlines, t_labs, 'interpreter', 'latex', 'NumColumns', t_steps + 1, 'B
 set(gcf, 'WindowState', 'fullscreen');
 
 if num_sim > 1
-    print(gcf, 'exact-numer_wall-disp.pdf', '-dpdf', '-r0', '-fillpage');
+    if zoomed_views
+        print(gcf, 'exact-numer_wall-disp_zoomed.pdf', '-dpdf', '-r0', '-fillpage');
+    else
+        print(gcf, 'exact-numer_wall-disp.pdf', '-dpdf', '-r0', '-fillpage');
+    end
+    
 else
-    print(gcf, [sim_dir{1}, '/exact-numer_wall-disp.pdf'], '-dpdf', '-r0', '-fillpage');
+    if zoomed_views
+        print(gcf, [sim_dir{1}, '/exact-numer_wall-disp_zoomed.pdf'], '-dpdf', '-r0', '-fillpage');
+    else
+        print(gcf, [sim_dir{1}, '/exact-numer_wall-disp.pdf'], '-dpdf', '-r0', '-fillpage');
+    end
+    
 end

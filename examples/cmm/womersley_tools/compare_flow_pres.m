@@ -1,10 +1,11 @@
-function compare_flow_pres(sim_dir, solver, z_in, z_out, inlet_data, outlet_data, p0, mu, rho, R, c_n, B_n, Q_n, G_n, g_n, T, n_modes, sol_idx)
+function compare_flow_pres(sim_dir, solver, z_in, z_out, inlet_data, outlet_data, ...
+    p0, mu, rho, R, c_n, B_n, Q_n, G_n, g_n, T, n_modes, sol_idx, zoomed_views)
 
 conversion = 1333.2;
 
 colors = [0.918, 0.235, 0.325; 0, 0, 0.545];
-linewidths = [1, 1.6];
-linestyles = {'--', ':'};
+linewidths = [1, 1.6, 1];
+linestyles = {'--', ':', '-.'};
       
 omega = 2 * pi / T;                                 % base angular frequency
 
@@ -92,6 +93,10 @@ set( gca, 'Box', 'on', 'TickDir'     , 'out', ...
     
 axis square; grid minor; xlim([0, T]);
 
+if zoomed_views
+    xlim([0.53, 0.535]); ylim([2.51, 2.76]);
+end
+
 % ================  Plot analytical vs. numerical pressures ===============
 subplot(1, 2, 2); hold on;
 plot(t_exact, real(p_in_exact)  / conversion, 'Color', colors(1, :), ...
@@ -123,6 +128,11 @@ set(gca, 'Box', 'on', 'TickDir', 'out', ...
         'FontWeight', 'Bold');
     
 axis square; grid minor; xlim([0, T]); ylim([-6, 6]);
+
+if zoomed_views
+    xlim([0.53, 0.535]); ylim([3.93, 4.03]);
+end
+
 set(gca, 'FontSize', 12, 'fontWeight', 'bold');
 
 lg = legend('Inlet / Analytical', 'Outlet / Analytical', 'Inlet / Numerical', 'Outlet / Numerical', ...
@@ -132,9 +142,17 @@ set(lg, 'Position', [0.4, 0.1, 0.2, 0.2], 'Units', 'normalized');
 set(gcf, 'WindowState','fullscreen');
 
 if num_sim > 1
-    print(gcf, 'exact-numer_cap-flows-pressures.pdf', '-dpdf', '-r0', '-fillpage');
+    if zoomed_views
+        print(gcf, 'exact-numer_cap-flows-pressures_zoomed.pdf', '-dpdf', '-r0', '-fillpage');
+    else
+        print(gcf, 'exact-numer_cap-flows-pressures.pdf', '-dpdf', '-r0', '-fillpage');
+    end
 else
-    print(gcf, [sim_dir{1}, '/exact-numer_cap-flows-pressures.pdf'], '-dpdf', '-r0', '-fillpage');
+    if zoomed_views
+        print(gcf, [sim_dir{1}, '/exact-numer_cap-flows-pressures_zoomed.pdf'], '-dpdf', '-r0', '-fillpage');
+    else
+        print(gcf, [sim_dir{1}, '/exact-numer_cap-flows-pressures.pdf'], '-dpdf', '-r0', '-fillpage');
+    end
 end
 
 
