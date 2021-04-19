@@ -85,7 +85,7 @@ int main( int argc, char *argv[] )
   double initial_step = 0.1;         // time step size
   int    initial_index = 0;          // index of initial condition
   double final_time = 1.0;           // end time of simulation
-  std::string sol_bName("SOL_");     // base name of the solution file
+  std::string sol_bName("SOL_ps_");  // base name of the solution file
   int    ttan_renew_freq = 1;        // frequency of tangent matrix renewal
   int    sol_record_freq = 1;        // frequency for recording the solution
 
@@ -94,7 +94,7 @@ int main( int argc, char *argv[] )
   int    restart_index = 0;          // restart solution time index
   double restart_time = 0.0;         // restart time
   double restart_step = 1.0e-3;      // restart simulation time step size
-  std::string restart_name = "SOL_"; // restart solution base name
+  std::string restart_name = "SOL_ps_"; // restart solution base name
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
@@ -287,7 +287,6 @@ int main( int argc, char *argv[] )
 
   inflow_rate_ptr->print_info();
 
-  /*
   // ===== Quadrature rules =====
   SYS_T::commPrint("===> Build quadrature rules. \n");
   IQuadPts * quadv = new QuadPts_Gauss_Tet( nqp_tet );
@@ -571,8 +570,6 @@ int main( int argc, char *argv[] )
   delete locAssem_ptr; delete base; delete sol; delete dot_sol;
   delete sol_wall_disp; delete dot_sol_wall_disp; delete timeinfo; delete gbc;
   delete gloAssem_ptr; delete lsolver; delete nsolver; delete tsolver;
-
-  */
 
   PetscFinalize();
   return EXIT_SUCCESS;
