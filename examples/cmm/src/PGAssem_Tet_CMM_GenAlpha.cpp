@@ -628,6 +628,7 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_G(
   double * sctrl_z    = new double [snLocBas];
   double * sthickness = new double [snLocBas];
   double * syoungsmod = new double [snLocBas];
+  double * quaprestress = new double [ 6 * quad_s->get_num_quadPts() ];
   PetscInt * srow_index = new PetscInt [dof_mat * snLocBas];
 
   dot_sol->GetLocalArray( array_a );
@@ -652,7 +653,7 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_G(
     GetLocal(array_b, LSIEN, snLocBas, dof_disp, local_bs);
 
     lassem_ptr->Assem_Residual_EBC_Wall( curr_time, dt, local_as, local_bs,
-        element_w, sctrl_x, sctrl_y, sctrl_z, sthickness, syoungsmod, quad_s);
+        element_w, sctrl_x, sctrl_y, sctrl_z, sthickness, syoungsmod, quaprestress, quad_s);
 
     for(int ii=0; ii<snLocBas; ++ii)
     {
@@ -700,6 +701,7 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_KG(
   double * sctrl_z    = new double [snLocBas];
   double * sthickness = new double [snLocBas];
   double * syoungsmod = new double [snLocBas];
+  double * quaprestress = new double [ 6 * quad_s->get_num_quadPts() ];
   PetscInt * srow_index = new PetscInt [dof_mat * snLocBas];
 
   dot_sol->GetLocalArray( array_a );
@@ -724,7 +726,7 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_KG(
     GetLocal(array_b, LSIEN, snLocBas, dof_disp, local_bs);
 
     lassem_ptr->Assem_Tangent_Residual_EBC_Wall( curr_time, dt, local_as, local_bs,
-        element_w, sctrl_x, sctrl_y, sctrl_z, sthickness, syoungsmod, quad_s);
+        element_w, sctrl_x, sctrl_y, sctrl_z, sthickness, syoungsmod, quaprestress, quad_s);
 
     for(int ii=0; ii<snLocBas; ++ii)
     {

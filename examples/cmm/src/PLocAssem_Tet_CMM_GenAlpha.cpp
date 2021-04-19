@@ -1049,6 +1049,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     const double * const &eleCtrlPts_z,
     const double * const &ele_thickness,
     const double * const &ele_youngsmod,
+    const double * const &qua_prestress,
     const IQuadPts * const &quad )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z ); 
@@ -1059,6 +1060,8 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
   const double curr = time + alpha_f * dt;
 
   Zero_sur_Residual();
+
+  // Store prestress tensor (in Voigt notation) at each quadrature point
 
   for(int qua=0; qua<face_nqp; ++qua)
   {
@@ -1172,6 +1175,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     const double * const &eleCtrlPts_z,
     const double * const &ele_thickness,
     const double * const &ele_youngsmod,
+    const double * const &qua_prestress,
     const IQuadPts * const &quad )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z ); 

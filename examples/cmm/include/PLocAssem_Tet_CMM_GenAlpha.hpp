@@ -148,6 +148,7 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_z,
         const double * const &ele_thickness,
         const double * const &ele_youngsmod,
+        const double * const &qua_prestress,
         const IQuadPts * const &quad );
 
     // **** PRESTRESS TODO: additional arg ele_prestress
@@ -161,6 +162,7 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_z,
         const double * const &ele_thickness,
         const double * const &ele_youngsmod,
+        const double * const &qua_prestress,
         const IQuadPts * const &quad );
 
     // **** PRESTRESS TODO

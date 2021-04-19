@@ -846,6 +846,7 @@ class IPLocAssem
     //                      and the surface quadrature rule to generate basis functions.
     // \para ele_thickness: wall thickness
     // \para ele_youngsmod: wall youngsmod
+    // \para qua_prestress: prestress tensor at each quadrature point
     virtual void Assem_Residual_EBC_Wall(
         const double &time, const double &dt,
         const double * const &dot_sol,
@@ -856,6 +857,7 @@ class IPLocAssem
         const double * const &eleCtrlPts_z,
         const double * const &ele_thickness,
         const double * const &ele_youngsmod,
+        const double * const &qua_prestress,
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Residual_EBC_Wall is not implemented.\n");}
 
@@ -869,6 +871,7 @@ class IPLocAssem
         const double * const &eleCtrlPts_z,
         const double * const &ele_thickness,
         const double * const &ele_youngsmod,
+        const double * const &qua_prestress,
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Tangent_Residual_EBC_Wall is not implemented.\n");}
 
