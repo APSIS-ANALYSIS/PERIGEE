@@ -17,7 +17,9 @@ class CVFlowRate_Linear2Steady : public ICVFlowRate
   public:
     // From time 0 to in_time, the flow rate = time * flrate / in_time
     // From in_time to infty, flow_rate = flrate
-    CVFlowRate_Linear2Steady(const double &in_time, const double &flrate);
+    CVFlowRate_Linear2Steady(const double &in_time,
+        const double &flrate,
+        const bool &prestress_flag = false);
 
     virtual ~CVFlowRate_Linear2Steady();
 
@@ -26,7 +28,7 @@ class CVFlowRate_Linear2Steady : public ICVFlowRate
     virtual void print_info() const;
 
   private:
-    const double thred_time;
+    double thred_time;
     const double target_flow_rate;
 };
 

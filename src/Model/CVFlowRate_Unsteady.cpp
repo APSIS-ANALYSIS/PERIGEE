@@ -1,6 +1,6 @@
 #include "CVFlowRate_Unsteady.hpp"
 
-CVFlowRate_Unsteady::CVFlowRate_Unsteady( const char * const &filename )
+CVFlowRate_Unsteady::CVFlowRate_Unsteady( const char * const &filename, const bool &prestress_flag )
 {
   SYS_T::commPrint("CVFlowRate_Unsteady: data read from %s \n", filename);
 
@@ -74,6 +74,18 @@ CVFlowRate_Unsteady::CVFlowRate_Unsteady( const char * const &filename )
   // is larger than 0.01, print a warning message
   if( std::abs(2.0 * MATH_T::PI / period - w ) >= 0.01 ) SYS_T::commPrint("\nWARNING: CVFlowRate_Unsteady period and w does not match well: \n2xpi/period = %e and w = %e.\n", 2.0*MATH_T::PI/period, w);
 
+  std::vector<double> flow_waveform; flow_waveform.resize( static_cast<int>(period / 0.001) + 1 );
+  for(unsigned int ii = 0; ii < flow_waveform.size(); ++ii )
+    flow_waveform[ii] = get_flow_rate(ii * 0.001);
+
+  // If solving for prestress, prescribe steady diastolic inflow
+  if(prestress_flag)
+  {
+    coef_a[0] = *std::min_element(flow_waveform.begin(), flow_waveform.end());
+    num_of_mode = 0;
+    std::fill(flow_waveform.begin(), flow_waveform.end(), coef_a[0]);
+  }
+
   // Calculate the flow rate and record them on disk as 
   // Inlet_flowrate.txt with sampling interval 0.001
   PetscMPIInt rank;
@@ -82,8 +94,8 @@ CVFlowRate_Unsteady::CVFlowRate_Unsteady( const char * const &filename )
   {
     std::ofstream ofile;
     ofile.open( "Inlet_flowrate.txt", std::ofstream::out | std::ofstream::trunc );
-    for(double tt=0; tt <= period; tt += 0.001 )
-      ofile<<tt<<'\t'<<get_flow_rate(tt)<<'\n';
+    for(unsigned int ii = 0; ii < flow_waveform.size(); ++ii )
+      ofile << ii * 0.001 << "\t" << flow_waveform[ii] << "\n";
     ofile.close();
   }
 

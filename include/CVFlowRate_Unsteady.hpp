@@ -27,7 +27,8 @@
 class CVFlowRate_Unsteady : public ICVFlowRate
 {
   public:
-    CVFlowRate_Unsteady( const char * const &filename );
+    CVFlowRate_Unsteady( const char * const &filename,
+        const bool &prestress_flag = false );
 
     virtual ~CVFlowRate_Unsteady();
 
