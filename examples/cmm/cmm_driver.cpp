@@ -76,6 +76,9 @@ int main( int argc, char *argv[] )
   int    nl_refreq = 4;              // frequency of tangent matrix renewal
   int    nl_threshold = 4;           // threshold of tangent matrix renewal
 
+  // Prestress solver parameters
+  bool   prestress_flag = false;
+
   // Time stepping parameters
   double initial_time = 0.0;         // time of initial condition
   double initial_step = 0.1;         // time step size
@@ -168,6 +171,10 @@ int main( int argc, char *argv[] )
   SYS_T::cmdPrint(      "-nl_maxits:",       nl_maxits);
   SYS_T::cmdPrint(      "-nl_refreq:",       nl_refreq);
   SYS_T::cmdPrint(      "-nl_threshold:",    nl_threshold);
+
+  if(prestress_flag) SYS_T::commPrint(   "-prestress_flag: true \n");
+  else SYS_T::commPrint("-prestress_flag: false \n");
+
   SYS_T::cmdPrint(      "-init_time:",       initial_time);
   SYS_T::cmdPrint(      "-init_step:",       initial_step);
   SYS_T::cmdPrint(      "-init_index:",      initial_index);
@@ -230,6 +237,37 @@ int main( int argc, char *argv[] )
   // Local sub-domain's element indices
   ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
 
+  // ===== Quadrature rules =====
+  SYS_T::commPrint("===> Build quadrature rules. \n");
+  IQuadPts * quadv = new QuadPts_Gauss_Tet( nqp_tet );
+  IQuadPts * quads = new QuadPts_Gauss_Triangle( nqp_tri );
+
+  // ===== Finite element containers =====
+  SYS_T::commPrint("===> Set up volumetric and surface element containers. \n");
+  FEAElement * elementv = nullptr;
+  FEAElement * elements = nullptr;
+  FEAElement * elementw = nullptr;
+
+  if( GMIptr->get_elemType() == 501 )          // linear tet
+  {
+    if( nqp_tet > 5 ) SYS_T::commPrint("Warning: Requested > 5 volumetric quadrature points for a linear tet element.\n");
+    if( nqp_tri > 4 ) SYS_T::commPrint("Warning: Requested > 4 surface quadrature points for a linear tri element.\n");
+
+    elementv = new FEAElement_Tet4( nqp_tet );
+    elements = new FEAElement_Triangle3_3D_der0( nqp_tri );
+    elementw = new FEAElement_Triangle3_membrane( nqp_tri );
+  }
+  else if( GMIptr->get_elemType() == 502 )     // quadratic tet
+  {
+    SYS_T::print_fatal_if( nqp_tet < 29, "Error: not enough quadrature points for quadratic tet element.\n" );
+    SYS_T::print_fatal_if( nqp_tri < 13, "Error: not enough quadrature points for quadratic tri element.\n" );
+
+    elementv = new FEAElement_Tet10_v2( nqp_tet );
+    elements = new FEAElement_Triangle6_3D_der0( nqp_tri );
+    elementw = new FEAElement_Triangle6_membrane( nqp_tri );
+  }
+  else SYS_T::print_fatal("Error: Element type not supported.\n");
+
   // Local sub-domain's nodal (Dirichlet) BC
   ALocal_NodalBC * locnbc = new ALocal_NodalBC(part_file, rank);
 
@@ -243,7 +281,7 @@ int main( int argc, char *argv[] )
   ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
 
   // Local sub-domain's wall elemental (Neumann) BC for CMM
-  ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, "ebc_wall");
+  ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, quads, "ebc_wall", prestress_flag);
 
   // Cross check fluid densities specified for the solver vs. wall youngsmod calculation
   if( locebc_wall -> get_fluid_density() != fluid_density )
@@ -281,37 +319,6 @@ int main( int argc, char *argv[] )
     inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_tgt_rate );
 
   inflow_rate_ptr->print_info();
-
-  // ===== Quadrature rules =====
-  SYS_T::commPrint("===> Build quadrature rules. \n");
-  IQuadPts * quadv = new QuadPts_Gauss_Tet( nqp_tet );
-  IQuadPts * quads = new QuadPts_Gauss_Triangle( nqp_tri );
-
-  // ===== Finite element containers =====
-  SYS_T::commPrint("===> Set up volumetric and surface element containers. \n");
-  FEAElement * elementv = nullptr;
-  FEAElement * elements = nullptr;
-  FEAElement * elementw = nullptr;
-
-  if( GMIptr->get_elemType() == 501 )          // linear tet
-  {
-    if( nqp_tet > 5 ) SYS_T::commPrint("Warning: Requested > 5 volumetric quadrature points for a linear tet element.\n");
-    if( nqp_tri > 4 ) SYS_T::commPrint("Warning: Requested > 4 surface quadrature points for a linear tri element.\n");
-
-    elementv = new FEAElement_Tet4( nqp_tet );
-    elements = new FEAElement_Triangle3_3D_der0( nqp_tri );
-    elementw = new FEAElement_Triangle3_membrane( nqp_tri );
-  }
-  else if( GMIptr->get_elemType() == 502 )     // quadratic tet
-  {
-    SYS_T::print_fatal_if( nqp_tet < 29, "Error: not enough quadrature points for quadratic tet element.\n" );
-    SYS_T::print_fatal_if( nqp_tri < 13, "Error: not enough quadrature points for quadratic tri element.\n" );
-
-    elementv = new FEAElement_Tet10_v2( nqp_tet );
-    elements = new FEAElement_Triangle6_3D_der0( nqp_tri );
-    elementw = new FEAElement_Triangle6_membrane( nqp_tri );
-  }
-  else SYS_T::print_fatal("Error: Element type not supported.\n");
 
   // ===== Generate a sparse matrix for enforcing nodal BCs ====
   Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);

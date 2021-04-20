@@ -34,7 +34,7 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
      h5r -> read_doubleVector( subgroup_name.c_str(), "prestress", qua_prestress );
 
      SYS_T::print_fatal_if( static_cast<int>( qua_prestress.size() ) != 6 * face_nqp * num_local_cell[0],
-       "ALocal_EBC_wall::size of qua_prestress is inconsistent with face_nqp. \n");
+       "ALocal_EBC_wall: size of qua_prestress is inconsistent with face_nqp. \n");
    }
    else
      qua_prestress.resize( 6 * face_nqp * num_local_cell[0] );

@@ -243,50 +243,6 @@ int main( int argc, char *argv[] )
   // Local sub-domain's element indices
   ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
 
-  // Local sub-domain's nodal (Dirichlet) BC
-  ALocal_NodalBC * locnbc = new ALocal_NodalBC(part_file, rank);
-
-  // Local sub-domain's inflow (Dirichlet) BC
-  ALocal_Inflow_NodalBC * locinfnbc = new ALocal_Inflow_NodalBC(part_file, rank);
-
-  // Local sub-domain's ring (Dirichlet) in-plane motion BC
-  ALocal_Ring_NodalBC * locringnbc = new ALocal_Ring_NodalBC(part_file, rank);
-
-  // Local sub-domain's outflow elemental (Neumann) BC
-  ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
-
-  // Local sub-domain's wall elemental (Neumann) BC for CMM
-  ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, "ebc_wall");
-
-  // Cross check fluid densities specified for the solver vs. wall youngsmod calculation
-  if( locebc_wall -> get_fluid_density() != fluid_density )
-    SYS_T::commPrint("Warning: Assigned fluid density does not match that used to compute "
-                     "wall youngsmod in the preprocessor.\n");
-
-  // Local sub-domain's nodal indices
-  APart_Node * pNode = new APart_Node(part_file, rank);
-
-  SYS_T::commPrint("===> Data from HDF5 files read from disk.\n");
-
-  SYS_T::print_fatal_if( size!= PartBasic->get_cpu_size(),
-      "Error: Assigned CPU number does not match the partition. \n");
-
-  SYS_T::commPrint("===> %d processor(s) assigned for FEM analysis. \n", size);
-
-  // ===== Prescribed inflow =====
-  SYS_T::commPrint("===> Set up inflow. \n");
-
-  ICVFlowRate * inflow_rate_ptr = nullptr;
-
-  // If inflow file exists, prescribe steady flow at the diastolic (min) value.
-  // Otherwise, prescribe steady flow at the target value.
-  if( SYS_T::file_exist( inflow_file ) )
-    inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str(), prestress_flag );
-  else
-    inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_tgt_rate, prestress_flag );
-
-  inflow_rate_ptr->print_info();
-
   // ===== Quadrature rules =====
   SYS_T::commPrint("===> Build quadrature rules. \n");
   IQuadPts * quadv = new QuadPts_Gauss_Tet( nqp_tet );
@@ -317,6 +273,51 @@ int main( int argc, char *argv[] )
     elementw = new FEAElement_Triangle6_membrane( nqp_tri );
   }
   else SYS_T::print_fatal("Error: Element type not supported.\n");
+
+  // ===== Read BC data from partition files =====
+  // Local sub-domain's nodal (Dirichlet) BC
+  ALocal_NodalBC * locnbc = new ALocal_NodalBC(part_file, rank);
+
+  // Local sub-domain's inflow (Dirichlet) BC
+  ALocal_Inflow_NodalBC * locinfnbc = new ALocal_Inflow_NodalBC(part_file, rank);
+
+  // Local sub-domain's ring (Dirichlet) in-plane motion BC
+  ALocal_Ring_NodalBC * locringnbc = new ALocal_Ring_NodalBC(part_file, rank);
+
+  // Local sub-domain's outflow elemental (Neumann) BC
+  ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
+
+  // Local sub-domain's wall elemental (Neumann) BC for CMM
+  ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, quads, "ebc_wall", prestress_flag);
+
+  // Cross check fluid densities specified for the solver vs. wall youngsmod calculation
+  if( locebc_wall -> get_fluid_density() != fluid_density )
+    SYS_T::commPrint("Warning: Assigned fluid density does not match that used to compute "
+                     "wall youngsmod in the preprocessor.\n");
+
+  // Local sub-domain's nodal indices
+  APart_Node * pNode = new APart_Node(part_file, rank);
+
+  SYS_T::commPrint("===> Data from HDF5 files read from disk.\n");
+
+  SYS_T::print_fatal_if( size!= PartBasic->get_cpu_size(),
+      "Error: Assigned CPU number does not match the partition. \n");
+
+  SYS_T::commPrint("===> %d processor(s) assigned for FEM analysis. \n", size);
+
+  // ===== Prescribed inflow =====
+  SYS_T::commPrint("===> Set up inflow. \n");
+
+  ICVFlowRate * inflow_rate_ptr = nullptr;
+
+  // If inflow file exists, prescribe steady flow at the diastolic (min) value.
+  // Otherwise, prescribe steady flow at the target value.
+  if( SYS_T::file_exist( inflow_file ) )
+    inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str(), prestress_flag );
+  else
+    inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_tgt_rate, prestress_flag );
+
+  inflow_rate_ptr->print_info();
 
   // ===== Generate a sparse matrix for enforcing nodal BCs ====
   Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
