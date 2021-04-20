@@ -137,7 +137,6 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
-    // **** PRESTRESS TODO: additional arg ele_prestress
     virtual void Assem_Residual_EBC_Wall(
         const double &time, const double &dt,
         const double * const &dot_sol,
@@ -151,7 +150,6 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
         const double * const &qua_prestress,
         const IQuadPts * const &quad );
 
-    // **** PRESTRESS TODO: additional arg ele_prestress
     virtual void Assem_Tangent_Residual_EBC_Wall(
         const double &time, const double &dt,
         const double * const &dot_sol,
@@ -167,16 +165,15 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
 
     // **** PRESTRESS TODO
     // **** Could replace relevant code in Assem_(Tangent_)Residual_EBC_Wall
-    // virtual void get_Wall_CauchyStress(
-    //     const double * const &sol_wall_disp,
-    //     FEAElement * const &element,
-    //     const double * const &eleCtrlPts_x,
-    //     const double * const &eleCtrlPts_y,
-    //     const double * const &eleCtrlPts_z,
-    //     const double * const &ele_thickness,
-    //     const double * const &ele_youngsmod,
-    //     const IQuadPts * const &quad,
-    //     double * const &stress );
+    virtual void get_Wall_CauchyStress(
+        const int &qua,
+        const double * const &sol_wall_disp,
+        const FEAElement * const &element,
+        const double * const &dR_dxl,
+        const double * const &dR_dyl,
+        const double * const &ele_thickness,
+        const double * const &ele_youngsmod,
+        Matrix_3x3 &stress );
 
   private:
     // Private data
