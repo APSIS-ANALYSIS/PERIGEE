@@ -1096,6 +1096,16 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     get_Wall_CauchyStress(qua, sol_wall_disp, element, dR_dxl, dR_dyl,
         ele_thickness, ele_youngsmod, sigma );
 
+    // Add prestress: convert from Voigt notation (comps 11, 22, 33, 12, 23, 31)
+    const int qua6 = 6 * qua;
+
+    Matrix_3x3 prestress = Matrix_3x3(
+        qua_prestress[qua6],   qua_prestress[qua6+3], qua_prestress[qua6+5],
+        qua_prestress[qua6+3], qua_prestress[qua6+1], qua_prestress[qua6+4],
+        qua_prestress[qua6+5], qua_prestress[qua6+4], qua_prestress[qua6+2] );
+
+    sigma += prestress;
+
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
     // Body force acting on the wall
@@ -1204,6 +1214,16 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     Matrix_3x3 sigma;
     get_Wall_CauchyStress(qua, sol_wall_disp, element, dR_dxl, dR_dyl,
         ele_thickness, ele_youngsmod, sigma );
+
+    // Add prestress: convert from Voigt notation (comps 11, 22, 33, 12, 23, 31)
+    const int qua6 = 6 * qua;
+
+    Matrix_3x3 prestress = Matrix_3x3(
+        qua_prestress[qua6],   qua_prestress[qua6+3], qua_prestress[qua6+5],
+        qua_prestress[qua6+3], qua_prestress[qua6+1], qua_prestress[qua6+4],
+        qua_prestress[qua6+5], qua_prestress[qua6+4], qua_prestress[qua6+2] );
+
+    sigma += prestress;
 
     // Basis function gradients with respect to global coords
     // dR/dx_{i} = Q_{ji} * dR/dxl_{j}. Note that dR/dzl = 0.0
