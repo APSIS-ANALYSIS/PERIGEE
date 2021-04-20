@@ -916,6 +916,21 @@ class IPLocAssem
     {
       SYS_T::commPrint("Warning: get_pressure_area() is not implemented. \n");
     }
+
+    // Computes the Cauchy stress in the wall for the coupled momentum FSI method 
+    virtual void get_Wall_CauchyStress(
+        const int &qua,
+        const double * const &sol_wall_disp,
+        const FEAElement * const &element,
+        const double * const &dR_dxl,
+        const double * const &dR_dyl,
+        const double * const &ele_thickness,
+        const double * const &ele_youngsmod,
+        Matrix_3x3 &stress )
+    {
+      SYS_T::commPrint("Warning: get_Wall_CauchyStress() is not implemented. \n");
+    }
+
 };
 
 #endif
