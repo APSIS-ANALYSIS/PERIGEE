@@ -9,6 +9,7 @@
 // Date: Jan. 16 2017
 // ==================================================================
 #include "HDF5_Reader.hpp"
+#include "QuadPts_Gauss_Triangle.hpp"
 
 class ALocal_EBC
 {
@@ -195,6 +196,26 @@ class ALocal_EBC
     virtual void get_youngsmod( const int &eindex, double * const &e_youngsmod ) const
     {
       SYS_T::print_fatal("Error: ALocal_EBC::get_youngsmod is not implemented. \n");
+    }
+
+    // --------------------------------------------------------------
+    // get_prestress, set_prestress : return / set the wall prestress, if this partition
+    //                                owns any cell on the wall.
+    // Users are responsible for allocating & deleting the e_quaprestress array.
+    // Only one surface per the assumption in wall ebc.
+    // surface element id: 0 <= eindex < num_local_cell[0]
+    // e_quaprestress : output/input prestress array, length is 6 x face_nqp.
+    // --------------------------------------------------------------
+    virtual void get_prestress( const int &eindex,
+        const IQuadPts * const &quad, double * const &e_quaprestress ) const
+    {
+      SYS_T::print_fatal("Error: ALocal_EBC::get_prestress is not implemented. \n");
+    }
+
+    virtual void set_prestress( const int &eindex,
+        const IQuadPts * const &quad, double * const &e_quaprestress ) const
+    {
+      SYS_T::print_fatal("Error: ALocal_EBC::set_prestress is not implemented. \n");
     }
 
     // --------------------------------------------------------------

@@ -30,11 +30,13 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
   delete h5r; H5Fclose( file_id );
 }
 
+
 ALocal_EBC_wall::~ALocal_EBC_wall()
 {
   VEC_T::clean(thickness);
   VEC_T::clean(youngsmod);
 }
+
 
 void ALocal_EBC_wall::get_thickness( const int &eindex,
     double * const &e_thickness ) const
@@ -48,6 +50,7 @@ void ALocal_EBC_wall::get_thickness( const int &eindex,
   }
 }
 
+
 void ALocal_EBC_wall::get_youngsmod( const int &eindex,
     double * const &e_youngsmod ) const
 {
@@ -59,6 +62,31 @@ void ALocal_EBC_wall::get_youngsmod( const int &eindex,
     e_youngsmod[ii] = youngsmod[pos];
   }
 }
+
+
+void ALocal_EBC_wall::get_prestress( const int &eindex,
+    const IQuadPts * const &quad,
+    double * const &e_quaprestress ) const
+{
+  const int face_nqp = quad -> get_num_quadPts(); 
+  const int pos = 6 * eindex * face_nqp; 
+
+  for(int ii = 0; ii < 6 * face_nqp; ++ii)
+    e_quaprestress[ii] = qua_prestress[pos + ii]; 
+}
+
+
+void ALocal_EBC_wall::set_prestress( const int &eindex,
+    const IQuadPts * const &quad,
+    double * const &e_quaprestress )
+{
+  const int face_nqp = quad -> get_num_quadPts(); 
+  const int pos = 6 * eindex * face_nqp; 
+
+  for(int ii = 0; ii < 6 * face_nqp; ++ii)
+    qua_prestress[pos + ii] = e_quaprestress[ii]; 
+}
+
 
 void ALocal_EBC_wall::print_info() const
 {

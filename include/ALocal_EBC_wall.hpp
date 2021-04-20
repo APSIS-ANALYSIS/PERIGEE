@@ -27,10 +27,16 @@ class ALocal_EBC_wall : public ALocal_EBC
 
     virtual void get_youngsmod(const int &eindex, double * const &e_youngsmod) const;
 
+    virtual void get_prestress(const int &eindex, const IQuadPts * const &quad,
+        double * const &e_quaprestress) const;
+
+    virtual void set_prestress(const int &eindex, const IQuadPts * const &quad,
+        double * const &e_quaprestress);
+
     virtual double get_fluid_density() const {return fluid_density;}
 
   protected:
-    // Fluid densities are used to generate the youngs modulus for arteries at
+    // Fluid density used to generate the youngs modulus for arteries at
     // the preprocessing stage.
     double fluid_density;
 
@@ -38,6 +44,10 @@ class ALocal_EBC_wall : public ALocal_EBC
     // youngsmod vectors are each of length num_local_node[0].
     // Otherwise, these vectors are of length 0.
     std::vector<double> thickness, youngsmod;
+
+    // Prestress components (6 in Voigt notation) per quadrature point
+    // Length 6 x face_numqua x num_local_cell[0]
+    std::vector<double> qua_prestress;
 };
 
 #endif
