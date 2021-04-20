@@ -163,8 +163,6 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
         const double * const &qua_prestress,
         const IQuadPts * const &quad );
 
-    // **** PRESTRESS TODO
-    // **** Could replace relevant code in Assem_(Tangent_)Residual_EBC_Wall
     virtual void get_Wall_CauchyStress(
         const int &qua,
         const double * const &sol_wall_disp,
