@@ -150,7 +150,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
     gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, &wall_disp_alpha,
         dot_sol, sol, curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
         elementw, quad_v, quad_s, lien_ptr, anode_ptr,
-        feanode_ptr, nbc_part, ebc_part, ebc_wall_part, gbc );
+        feanode_ptr, nbc_part, ringnbc_part, ebc_part, ebc_wall_part, gbc );
    
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(mat_assem_0_event,0,0,0,0);
@@ -241,7 +241,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
       gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, &wall_disp_alpha,
           dot_sol, sol, curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
           elementw, quad_v, quad_s, lien_ptr, anode_ptr,
-          feanode_ptr, nbc_part, ebc_part, ebc_wall_part, gbc );
+          feanode_ptr, nbc_part, ringnbc_part, ebc_part, ebc_wall_part, gbc );
 
 #ifdef PETSC_USE_LOG
       PetscLogEventEnd(mat_assem_1_event,0,0,0,0);

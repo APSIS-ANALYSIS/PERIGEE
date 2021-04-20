@@ -416,7 +416,7 @@ int main( int argc, char *argv[] )
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
   gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_ptr,
-      elements, quads, locIEN, pNode, locnbc, locebc, gbc );
+      elements, quads, locIEN, pNode, locnbc, locringnbc, locebc, gbc );
 
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
   gloAssem_ptr->Fix_nonzero_err_str();
@@ -439,7 +439,7 @@ int main( int argc, char *argv[] )
     PCHYPRESetType( preproc, "boomeramg" );
 
     gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_ptr, elementv,
-        elements, quadv, quads, locIEN, pNode, fNode, locnbc, locebc );
+        elements, quadv, quads, locIEN, pNode, fNode, locnbc, locringnbc, locebc );
 
     lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
 
