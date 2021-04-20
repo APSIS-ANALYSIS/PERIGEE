@@ -1,8 +1,10 @@
 #include "ALocal_EBC_wall.hpp"
 
 ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
-    const int &cpu_rank, const std::string &gname )
-: ALocal_EBC( fileBaseName, cpu_rank, gname )
+    const int &cpu_rank, const IQuadPts * const &quad, 
+    const std::string &gname, const bool &prestress_flag)
+: ALocal_EBC( fileBaseName, cpu_rank, gname ), face_nqp( quad -> get_num_quadPts() ),
+  solve_prestress( prestress_flag )
 {
   SYS_T::print_fatal_if(gname != "ebc_wall", 
       "Error: ALocal_EBC_wall data should be read from group ebc_wall.\n" );
@@ -16,6 +18,7 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
 
   thickness.clear();
   youngsmod.clear();
+  qua_prestress.clear();
 
   // wall has only one surface per the assumption in wall ebc  
   if( num_local_cell[0] > 0 )
@@ -25,6 +28,16 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
 
     h5r -> read_doubleVector( subgroup_name.c_str(), "thickness", thickness );
     h5r -> read_doubleVector( subgroup_name.c_str(), "youngsmod", youngsmod );
+
+   if( !solve_prestress )
+   {
+     h5r -> read_doubleVector( subgroup_name.c_str(), "prestress", qua_prestress );
+
+     SYS_T::print_fatal_if( static_cast<int>( qua_prestress.size() ) != 6 * face_nqp * num_local_cell[0],
+       "ALocal_EBC_wall::size of qua_prestress is inconsistent with face_nqp. \n");
+   }
+   else
+     qua_prestress.resize( 6 * face_nqp * num_local_cell[0] );
   }
 
   delete h5r; H5Fclose( file_id );
@@ -35,6 +48,7 @@ ALocal_EBC_wall::~ALocal_EBC_wall()
 {
   VEC_T::clean(thickness);
   VEC_T::clean(youngsmod);
+  VEC_T::clean(qua_prestress);
 }
 
 
@@ -65,10 +79,8 @@ void ALocal_EBC_wall::get_youngsmod( const int &eindex,
 
 
 void ALocal_EBC_wall::get_prestress( const int &eindex,
-    const IQuadPts * const &quad,
     double * const &e_quaprestress ) const
 {
-  const int face_nqp = quad -> get_num_quadPts(); 
   const int pos = 6 * eindex * face_nqp; 
 
   for(int ii = 0; ii < 6 * face_nqp; ++ii)
@@ -77,14 +89,17 @@ void ALocal_EBC_wall::get_prestress( const int &eindex,
 
 
 void ALocal_EBC_wall::set_prestress( const int &eindex,
-    const IQuadPts * const &quad,
     double * const &e_quaprestress )
 {
-  const int face_nqp = quad -> get_num_quadPts(); 
-  const int pos = 6 * eindex * face_nqp; 
+  if( solve_prestress )
+  {
+    const int pos = 6 * eindex * face_nqp; 
 
-  for(int ii = 0; ii < 6 * face_nqp; ++ii)
-    qua_prestress[pos + ii] = e_quaprestress[ii]; 
+    for(int ii = 0; ii < 6 * face_nqp; ++ii)
+      qua_prestress[pos + ii] = e_quaprestress[ii]; 
+  }
+  else
+    SYS_T::commPrint("Warning in ALocal_EBC_wall: set_prestress should only be called when solving for prestress. \n"); 
 }
 
 

@@ -17,7 +17,9 @@ class ALocal_EBC_wall : public ALocal_EBC
 {
   public:
     ALocal_EBC_wall( const std::string &fileBaseName,
-        const int &cpu_rank, const std::string &gname="/ebc" );
+        const int &cpu_rank, const IQuadPts * const &quad,
+        const std::string &gname = "/ebc",
+        const bool &prestress_flag = false );
 
     virtual ~ALocal_EBC_wall();
 
@@ -27,15 +29,20 @@ class ALocal_EBC_wall : public ALocal_EBC
 
     virtual void get_youngsmod(const int &eindex, double * const &e_youngsmod) const;
 
-    virtual void get_prestress(const int &eindex, const IQuadPts * const &quad,
-        double * const &e_quaprestress) const;
+    virtual void get_prestress(const int &eindex, double * const &e_quaprestress) const;
 
-    virtual void set_prestress(const int &eindex, const IQuadPts * const &quad,
-        double * const &e_quaprestress);
+    virtual void set_prestress(const int &eindex, double * const &e_quaprestress);
 
     virtual double get_fluid_density() const {return fluid_density;}
 
   protected:
+
+    // num quadrature points for surface element
+    const int face_nqp;
+
+    // flag for whether the wall prestress is being solved for and updated 
+    const bool solve_prestress;
+
     // Fluid density used to generate the youngs modulus for arteries at
     // the preprocessing stage.
     double fluid_density;
@@ -46,7 +53,7 @@ class ALocal_EBC_wall : public ALocal_EBC
     std::vector<double> thickness, youngsmod;
 
     // Prestress components (6 in Voigt notation) per quadrature point
-    // Length 6 x face_numqua x num_local_cell[0]
+    // Length 6 x face_nqp x num_local_cell[0]
     std::vector<double> qua_prestress;
 };
 

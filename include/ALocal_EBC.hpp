@@ -206,14 +206,12 @@ class ALocal_EBC
     // surface element id: 0 <= eindex < num_local_cell[0]
     // e_quaprestress : output/input prestress array, length is 6 x face_nqp.
     // --------------------------------------------------------------
-    virtual void get_prestress( const int &eindex,
-        const IQuadPts * const &quad, double * const &e_quaprestress ) const
+    virtual void get_prestress( const int &eindex, double * const &e_quaprestress ) const
     {
       SYS_T::print_fatal("Error: ALocal_EBC::get_prestress is not implemented. \n");
     }
 
-    virtual void set_prestress( const int &eindex,
-        const IQuadPts * const &quad, double * const &e_quaprestress ) const
+    virtual void set_prestress( const int &eindex, double * const &e_quaprestress ) const
     {
       SYS_T::print_fatal("Error: ALocal_EBC::set_prestress is not implemented. \n");
     }
