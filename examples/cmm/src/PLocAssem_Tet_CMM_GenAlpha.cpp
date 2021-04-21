@@ -1164,6 +1164,11 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 
   const double curr = time + alpha_f * dt;
 
+  // Global Cauchy stress at all quadrature points
+  std::vector<Matrix_3x3> sigma; sigma.resize( face_nqp );
+  get_Wall_CauchyStress(sol_wall_disp, element, ele_thickness, ele_youngsmod,
+      quad, sigma );
+
   Zero_sur_Tangent_Residual();
 
   for(int qua=0; qua<face_nqp; ++qua)
@@ -1210,11 +1215,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 
     const double coef = E_w / (1.0 - nu_w * nu_w);
 
-    // Global Cauchy stress
-    Matrix_3x3 sigma;
-    get_Wall_CauchyStress(qua, sol_wall_disp, element, dR_dxl, dR_dyl,
-        ele_thickness, ele_youngsmod, sigma );
-
     // Add prestress: convert from Voigt notation (comps 11, 22, 33, 12, 23, 31)
     const int qua6 = 6 * qua;
 
@@ -1223,7 +1223,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
         qua_prestress[qua6+3], qua_prestress[qua6+1], qua_prestress[qua6+4],
         qua_prestress[qua6+5], qua_prestress[qua6+4], qua_prestress[qua6+2] );
 
-    sigma += prestress;
+    sigma[qua] += prestress;
 
     // Basis function gradients with respect to global coords
     // dR/dx_{i} = Q_{ji} * dR/dxl_{j}. Note that dR/dzl = 0.0
@@ -1295,11 +1295,11 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
       const double NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
       sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * ( u_t - f1 )
-          + NA_x * sigma(0, 0) + NA_y * sigma(0, 1) + NA_z * sigma(0, 2) ); 
+          + NA_x * sigma[qua](0, 0) + NA_y * sigma[qua](0, 1) + NA_z * sigma[qua](0, 2) ); 
       sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * ( v_t - f2 )
-          + NA_x * sigma(1, 0) + NA_y * sigma(1, 1) + NA_z * sigma(1, 2) ); 
+          + NA_x * sigma[qua](1, 0) + NA_y * sigma[qua](1, 1) + NA_z * sigma[qua](1, 2) ); 
       sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * ( w_t - f3 )
-          + NA_x * sigma(2, 0) + NA_y * sigma(2, 1) + NA_z * sigma(2, 2) ); 
+          + NA_x * sigma[qua](2, 0) + NA_y * sigma[qua](2, 1) + NA_z * sigma[qua](2, 2) ); 
 
       for(int B=0; B<snLocBas; ++B)
       {
@@ -1347,7 +1347,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 
 
 void PLocAssem_Tet_CMM_GenAlpha::get_Wall_CauchyStress(
-    const int &qua,
     const double * const &sol_wall_disp,
     const FEAElement * const &element,
     const double * const &ele_thickness,
