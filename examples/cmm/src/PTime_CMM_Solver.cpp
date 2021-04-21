@@ -127,7 +127,7 @@ void PTime_CMM_Solver::TM_CMM_GenAlpha(
     cur_dot_sol_wall_disp->WriteBinary(sol_dot_wall_disp_name.c_str());
   }
 
-  bool prestress_conv_flag, renew_flag;
+  bool prestress_conv_flag = false, renew_flag;
   int nl_counter = 0;
 
   bool rest_flag = restart_init_assembly_flag;
@@ -137,7 +137,7 @@ void PTime_CMM_Solver::TM_CMM_GenAlpha(
       SYS_T::get_time().c_str());
 
   // Enter into time integration
-  while( time_info->get_time() < final_time )
+  while( time_info->get_time() < final_time && !prestress_conv_flag )
   {
     if(time_info->get_index() % renew_tang_freq == 0 || rest_flag )
     {
