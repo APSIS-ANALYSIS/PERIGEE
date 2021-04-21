@@ -12,12 +12,13 @@
 // Date: Aug. 10 2020
 // ==================================================================
 #include "ALocal_EBC.hpp"
+#include "HDF5_Writer.hpp"
 
 class ALocal_EBC_wall : public ALocal_EBC
 {
   public:
     ALocal_EBC_wall( const std::string &fileBaseName,
-        const int &cpu_rank, const IQuadPts * const &quad,
+        const int &in_cpu_rank, const IQuadPts * const &quad,
         const std::string &gname = "/ebc",
         const bool &prestress_flag = false );
 
@@ -35,7 +36,12 @@ class ALocal_EBC_wall : public ALocal_EBC
 
     virtual double get_fluid_density() const {return fluid_density;}
 
+    virtual void write_prestress_hdf5( const char * FileName ) const;
+
   protected:
+
+    // The rank or id of the subdomain
+    const int cpu_rank;
 
     // num quadrature points for surface element
     const int face_nqp;

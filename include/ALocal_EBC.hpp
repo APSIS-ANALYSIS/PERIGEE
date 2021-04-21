@@ -216,6 +216,14 @@ class ALocal_EBC
       SYS_T::print_fatal("Error: ALocal_EBC::set_prestress is not implemented. \n");
     }
 
+    // write_prestress_hdf5 : appends the wall prestress to the existing ebc_wall/ebcid_0
+    // data in the hdf5 file for the given cpu rank
+    virtual void write_prestress_hdf5( const char * FileName ) const
+    {
+      SYS_T::print_fatal("Error: ALocal_EBC::write_prestress_hdf5 is not implemented. \n");
+    }
+
+
     // --------------------------------------------------------------
     // get_fluid_density : return the fluid density used to compute young's modulus 
     // --------------------------------------------------------------
