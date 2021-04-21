@@ -2,9 +2,11 @@
 
 PTime_CMM_Solver::PTime_CMM_Solver(
     const std::string &input_name, const int &input_record_freq,
-    const int &input_renew_tang_freq, const double &input_final_time )
+    const int &input_renew_tang_freq, const double &input_final_time,
+    const bool &prestress_flag )
 : final_time(input_final_time), sol_record_freq(input_record_freq),
-  renew_tang_freq(input_renew_tang_freq), pb_name(input_name)
+  renew_tang_freq(input_renew_tang_freq), pb_name(input_name),
+  solve_prestress(prestress_flag)
 {}
 
 PTime_CMM_Solver::~PTime_CMM_Solver()
@@ -125,7 +127,7 @@ void PTime_CMM_Solver::TM_CMM_GenAlpha(
     cur_dot_sol_wall_disp->WriteBinary(sol_dot_wall_disp_name.c_str());
   }
 
-  bool conv_flag, renew_flag;
+  bool prestress_conv_flag, renew_flag;
   int nl_counter = 0;
 
   bool rest_flag = restart_init_assembly_flag;
@@ -156,7 +158,7 @@ void PTime_CMM_Solver::TM_CMM_GenAlpha(
         nbc_part, infnbc_part, ringnbc_part, ebc_part, ebc_wall_part, gbc, bc_mat,
         elementv, elements, elementw, quad_v, quad_s, lassem_fluid_ptr, gassem_ptr,
         lsolver_ptr, cur_dot_sol, cur_sol, cur_dot_sol_wall_disp, cur_sol_wall_disp,
-        conv_flag, nl_counter );
+        prestress_conv_flag, nl_counter );
 
     // Update the time step information
     time_info->TimeIncrement();
@@ -221,7 +223,7 @@ void PTime_CMM_Solver::TM_CMM_GenAlpha(
       MPI_Barrier(PETSC_COMM_WORLD);
     }
    
-    // Calcualte the inlet data
+    // Calculate the inlet data
     const double inlet_face_flrate = gassem_ptr -> Assem_surface_flowrate(
         cur_sol, lassem_fluid_ptr, elements, quad_s, infnbc_part ); 
 

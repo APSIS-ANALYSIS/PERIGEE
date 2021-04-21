@@ -314,9 +314,9 @@ int main( int argc, char *argv[] )
   // If inflow file exists, prescribe it. Otherwise, prescribe an inflow that 
   // linearly increases until a steady flow rate.
   if( SYS_T::file_exist( inflow_file ) )
-    inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
+    inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str(), prestress_flag );
   else
-    inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_tgt_rate );
+    inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_tgt_rate, prestress_flag );
 
   inflow_rate_ptr->print_info();
 
@@ -471,7 +471,7 @@ int main( int argc, char *argv[] )
   // **** PRESTRESS TODO: pass in prestress_flag, ALocal_Wall_Prestress
   // **** Should prestress flag only be allowed true if !is_restart ?
   PNonlinear_CMM_Solver * nsolver = new PNonlinear_CMM_Solver( pNode, fNode,
-      nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
+      nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold, prestress_flag );
 
   nsolver->print_info();
 
@@ -479,7 +479,7 @@ int main( int argc, char *argv[] )
   // **** PRESTRESS TODO: pass in ALocal_Wall_Prestress
   // **** need a separate tsolver initialized for prestressing?
   PTime_CMM_Solver * tsolver = new PTime_CMM_Solver( sol_bName,
-      sol_record_freq, ttan_renew_freq, final_time );
+      sol_record_freq, ttan_renew_freq, final_time, prestress_flag );
 
   tsolver->print_info();
 

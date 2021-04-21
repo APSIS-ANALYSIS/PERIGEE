@@ -16,7 +16,7 @@ class PTime_CMM_Solver
   public:
     PTime_CMM_Solver( const std::string &input_name, 
         const int &input_record_freq, const int &input_renew_tang_freq, 
-        const double &input_final_time );
+        const double &input_final_time, const bool &prestress_flag );
 
     ~PTime_CMM_Solver();
 
@@ -59,6 +59,9 @@ class PTime_CMM_Solver
     const int sol_record_freq; // the frequency for writing solutions
     const int renew_tang_freq; // the frequency for renewing tangents
     const std::string pb_name; // the problem base name for the solution
+
+    // flag for whether the wall prestress is being solved for and updated 
+    const bool solve_prestress;
 
     std::string Name_Generator( const int &counter,
         const std::string &prefix = "" ) const;
