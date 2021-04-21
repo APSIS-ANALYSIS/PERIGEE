@@ -755,6 +755,53 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_KG(
 }
 
 
+void PGAssem_Tet_CMM_GenAlpha::Update_Wall_Prestress(
+    const PDNSolution * const &sol_wall_disp,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_w,
+    const IQuadPts * const &quad_s,
+    const ALocal_EBC * const &ebc_wall_part )
+{
+  const int dof_disp = 3;
+
+  double * array_b    = new double [nlgn * dof_disp];
+  double * local_bs   = new double [snLocBas * dof_disp];
+  int    * LSIEN      = new    int [snLocBas];
+
+  double * sthickness = new double [snLocBas];
+  double * syoungsmod = new double [snLocBas];
+
+  const int face_nqp = quad_s -> get_num_quadPts();
+  std::vector<Matrix_3x3> sigma; sigma.resize( face_nqp );
+
+  sol_wall_disp->GetLocalArray( array_b );
+
+  // wall has only one surface per the assumption in wall ebc
+  const int ebc_id = 0;
+  const int num_sele = ebc_wall_part -> get_num_local_cell(ebc_id);
+
+  for(int ee=0; ee<num_sele; ++ee)
+  {
+    ebc_wall_part -> get_thickness(ee, sthickness);
+    ebc_wall_part -> get_youngsmod(ee, syoungsmod);
+
+    GetLocal(array_b, LSIEN, snLocBas, dof_disp, local_bs);
+
+    lassem_ptr->get_Wall_CauchyStress( local_bs, element_w,
+        sthickness, syoungsmod, quad_s, sigma ); 
+
+    // update prestress
+  }
+
+  delete [] array_b;    array_b  = nullptr;
+  delete [] local_bs;   local_bs = nullptr;
+  delete [] LSIEN;      LSIEN    = nullptr;
+  delete [] sthickness; sthickness = nullptr;
+  delete [] syoungsmod; syoungsmod = nullptr;
+
+}
+
+
 double PGAssem_Tet_CMM_GenAlpha::Assem_surface_flowrate(
     const PDNSolution * const &vec,
     IPLocAssem * const &lassem_ptr,
