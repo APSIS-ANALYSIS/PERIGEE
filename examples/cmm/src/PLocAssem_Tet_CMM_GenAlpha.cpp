@@ -1057,6 +1057,11 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
   const int face_nqp = quad -> get_num_quadPts();
   const double curr = time + alpha_f * dt;
 
+  // For membrane elements, basis function gradients are computed
+  // with respect to lamina coords
+  double * dR_dxl = new double [ snLocBas ];
+  double * dR_dyl = new double [ snLocBas ];
+
   // Global Cauchy stress at all quadrature points
   std::vector<Matrix_3x3> sigma; sigma.resize( face_nqp );
   get_Wall_CauchyStress(sol_wall_disp, element, ele_thickness, ele_youngsmod,
@@ -1066,10 +1071,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 
   for(int qua=0; qua<face_nqp; ++qua)
   {
-    // For membrane elements, basis function gradients are computed
-    // with respect to lamina coords
-    double * dR_dxl = new double [ snLocBas ];
-    double * dR_dyl = new double [ snLocBas ];
     element->get_R_gradR( qua, &R[0], &dR_dxl[0], &dR_dyl[0] );
 
     // Global-to-local rotation matrix Q
@@ -1133,10 +1134,10 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
           + NA_x * sigma[qua](2, 0) + NA_y * sigma[qua](2, 1) + NA_z * sigma[qua](2, 2) ); 
     }
 
-    delete [] dR_dxl; delete [] dR_dyl;
-    dR_dxl = nullptr; dR_dyl = nullptr;
-
   } // end qua loop
+
+  delete [] dR_dxl; delete [] dR_dyl;
+  dR_dxl = nullptr; dR_dyl = nullptr;
 }
 
 
@@ -1164,6 +1165,11 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 
   const double curr = time + alpha_f * dt;
 
+  // For membrane elements, basis function gradients are computed
+  // with respect to lamina coords
+  double * dR_dxl = new double [ snLocBas ];
+  double * dR_dyl = new double [ snLocBas ];
+
   // Global Cauchy stress at all quadrature points
   std::vector<Matrix_3x3> sigma; sigma.resize( face_nqp );
   get_Wall_CauchyStress(sol_wall_disp, element, ele_thickness, ele_youngsmod,
@@ -1173,10 +1179,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 
   for(int qua=0; qua<face_nqp; ++qua)
   {
-    // For membrane elements, basis function gradients are computed
-    // with respect to lamina coords
-    double * dR_dxl = new double [ snLocBas ];
-    double * dR_dyl = new double [ snLocBas ];
     element->get_R_gradR( qua, &R[0], &dR_dxl[0], &dR_dyl[0] );
 
     // Lamina and global stiffness matrices
@@ -1339,10 +1341,13 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
       } // end B loop
     } // end A loop
 
-    delete [] dR_dxl; delete [] dR_dyl; delete [] Kl; delete [] Kg;
-    dR_dxl = nullptr; dR_dyl = nullptr; Kl = nullptr; Kg = nullptr;
+    delete [] Kl; delete [] Kg;
+    Kl = nullptr; Kg = nullptr;
 
   } // end qua loop
+
+  delete [] dR_dxl; delete [] dR_dyl;
+  dR_dxl = nullptr; dR_dyl = nullptr;
 }
 
 
@@ -1357,16 +1362,16 @@ void PLocAssem_Tet_CMM_GenAlpha::get_Wall_CauchyStress(
   const int dim = 3;
   const int face_nqp = quad -> get_num_quadPts();
 
+  // For membrane elements, basis function gradients are computed
+  // with respect to lamina coords
+  double * dR_dxl = new double [ snLocBas ];
+  double * dR_dyl = new double [ snLocBas ];
+
+  // Lamina displacements
+  double * sol_wall_disp_l = new double [ snLocBas * dim ];
+
   for(int qua=0; qua<face_nqp; ++qua)
   {
-
-    // Lamina displacements
-    double * sol_wall_disp_l = new double [ snLocBas * dim ];
-
-    // For membrane elements, basis function gradients are computed
-    // with respect to lamina coords
-    double * dR_dxl = new double [ snLocBas ];
-    double * dR_dyl = new double [ snLocBas ];
     element->get_R_gradR( qua, &R[0], &dR_dxl[0], &dR_dyl[0] );
 
     // Global-to-local rotation matrix Q
@@ -1413,10 +1418,10 @@ void PLocAssem_Tet_CMM_GenAlpha::get_Wall_CauchyStress(
 
     // Global Cauchy stress: Q^T * lamina_Cauchy * Q
     sigma[qua].MatRot(Q);
-
-    delete [] sol_wall_disp_l; delete [] dR_dxl; delete [] dR_dyl;
-    sol_wall_disp_l = nullptr; dR_dxl = nullptr; dR_dyl = nullptr;
   }
+
+  delete [] sol_wall_disp_l; delete [] dR_dxl; delete [] dR_dyl;
+  sol_wall_disp_l = nullptr; dR_dxl = nullptr; dR_dyl = nullptr;
 }
 
 // EOF
