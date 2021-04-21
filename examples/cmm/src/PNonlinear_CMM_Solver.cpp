@@ -7,10 +7,13 @@ PNonlinear_CMM_Solver::PNonlinear_CMM_Solver(
     const double &input_ndtol,
     const int &input_max_iteration, 
     const int &input_renew_freq,
-    const int &input_renew_threshold )
+    const int &input_renew_threshold,
+    const bool &prestress_flag,
+    const double &ps_disp_atol )
 : nr_tol(input_nrtol), na_tol(input_natol), nd_tol(input_ndtol),
   nmaxits(input_max_iteration), nrenew_freq(input_renew_freq),
-  nrenew_threshold(input_renew_threshold)
+  nrenew_threshold(input_renew_threshold),
+  solve_prestress(prestress_flag), prestress_tol(ps_disp_atol)
 {
   // Generate the incremental solution vector used for update 
   // the solution of the nonlinear algebraic system 
@@ -72,7 +75,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
     PDNSolution * const &sol,
     PDNSolution * const &dot_sol_wall_disp,
     PDNSolution * const &sol_wall_disp,
-    bool &conv_flag, int &nl_counter ) const
+    bool &prestress_conv_flag, int &nl_counter ) const
 {
 #ifdef PETSC_USE_LOG
   PetscLogEvent mat_assem_0_event, mat_assem_1_event;
@@ -287,8 +290,16 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
   // **** PRESTRESS TODO: if (prestress_flag), call PGAssem_Tet_CMM_GenAlpha::Update_Wall_Prestress() 
   Print_convergence_info(nl_counter, relative_error, residual_norm);
 
-  if(relative_error <= nr_tol || residual_norm <= na_tol) conv_flag = true;
-  else conv_flag = false;
+  // if(relative_error <= nr_tol || residual_norm <= na_tol) conv_flag = true;
+  // else conv_flag = false;
+
+  if( solve_prestress )
+  {
+    double wall_disp_norm = 0.0;
+    VecNorm(sol_wall_disp->solution, NORM_2, &wall_disp_norm);
+
+    if( wall_disp_norm <= prestress_tol ) prestress_conv_flag = true;
+  }
 }
 
 

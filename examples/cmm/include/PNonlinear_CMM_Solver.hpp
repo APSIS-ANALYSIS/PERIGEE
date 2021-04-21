@@ -24,7 +24,9 @@ class PNonlinear_CMM_Solver
         const double &input_nrtol, const double &input_natol, 
         const double &input_ndtol, const int &input_max_iteration, 
         const int &input_renew_freq, 
-        const int &input_renew_threshold = 4 );
+        const int &input_renew_threshold = 4,
+        const bool &prestress_flag = false,
+        const double &ps_disp_atol = 1.0e-6 );
 
     ~PNonlinear_CMM_Solver();
 
@@ -72,11 +74,17 @@ class PNonlinear_CMM_Solver
         PDNSolution * const &sol,
         PDNSolution * const &dot_sol_wall_disp,
         PDNSolution * const &sol_wall_disp,
-        bool &conv_flag, int &nl_counter ) const;
+        bool &prestress_conv_flag, int &nl_counter ) const;
 
   private:
     const double nr_tol, na_tol, nd_tol;
     const int nmaxits, nrenew_freq, nrenew_threshold;
+
+    // flag for whether the wall prestress is being solved for and updated 
+    const bool solve_prestress;
+
+    // tolerance for displacement L2 norm when solving for wall prestress 
+    const double prestress_tol;
 
     // vector container for the step update in the smaller matrix problem
     PDNSolution * dot_step;
