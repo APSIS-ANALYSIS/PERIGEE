@@ -164,14 +164,12 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
         const IQuadPts * const &quad );
 
     virtual void get_Wall_CauchyStress(
-        const int &qua,
         const double * const &sol_wall_disp,
         const FEAElement * const &element,
-        const double * const &dR_dxl,
-        const double * const &dR_dyl,
         const double * const &ele_thickness,
         const double * const &ele_youngsmod,
-        Matrix_3x3 &stress );
+        const IQuadPts * const &quad,
+        std::vector<Matrix_3x3> &stress );
 
   private:
     // Private data

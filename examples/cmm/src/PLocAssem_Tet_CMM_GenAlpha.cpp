@@ -1057,6 +1057,11 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
   const int face_nqp = quad -> get_num_quadPts();
   const double curr = time + alpha_f * dt;
 
+  // Global Cauchy stress at all quadrature points
+  std::vector<Matrix_3x3> sigma; sigma.resize( face_nqp );
+  get_Wall_CauchyStress(sol_wall_disp, element, ele_thickness, ele_youngsmod,
+      quad, sigma );
+
   Zero_sur_Residual();
 
   for(int qua=0; qua<face_nqp; ++qua)
@@ -1091,11 +1096,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
       coor_z += eleCtrlPts_z[ii] * R[ii];
     }
 
-    // Global Cauchy stress
-    Matrix_3x3 sigma;
-    get_Wall_CauchyStress(qua, sol_wall_disp, element, dR_dxl, dR_dyl,
-        ele_thickness, ele_youngsmod, sigma );
-
     // Add prestress: convert from Voigt notation (comps 11, 22, 33, 12, 23, 31)
     const int qua6 = 6 * qua;
 
@@ -1104,7 +1104,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
         qua_prestress[qua6+3], qua_prestress[qua6+1], qua_prestress[qua6+4],
         qua_prestress[qua6+5], qua_prestress[qua6+4], qua_prestress[qua6+2] );
 
-    sigma += prestress;
+    sigma[qua] += prestress;
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
@@ -1126,11 +1126,11 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
       const double NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
       sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * ( u_t - f1 )
-          + NA_x * sigma(0, 0) + NA_y * sigma(0, 1) + NA_z * sigma(0, 2) ); 
+          + NA_x * sigma[qua](0, 0) + NA_y * sigma[qua](0, 1) + NA_z * sigma[qua](0, 2) ); 
       sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * ( v_t - f2 )
-          + NA_x * sigma(1, 0) + NA_y * sigma(1, 1) + NA_z * sigma(1, 2) ); 
+          + NA_x * sigma[qua](1, 0) + NA_y * sigma[qua](1, 1) + NA_z * sigma[qua](1, 2) ); 
       sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * ( w_t - f3 )
-          + NA_x * sigma(2, 0) + NA_y * sigma(2, 1) + NA_z * sigma(2, 2) ); 
+          + NA_x * sigma[qua](2, 0) + NA_y * sigma[qua](2, 1) + NA_z * sigma[qua](2, 2) ); 
     }
 
     delete [] dR_dxl; delete [] dR_dyl;
@@ -1350,63 +1350,74 @@ void PLocAssem_Tet_CMM_GenAlpha::get_Wall_CauchyStress(
     const int &qua,
     const double * const &sol_wall_disp,
     const FEAElement * const &element,
-    const double * const &dR_dxl,
-    const double * const &dR_dyl,
     const double * const &ele_thickness,
     const double * const &ele_youngsmod,
-    Matrix_3x3 &sigma )
+    const IQuadPts * const &quad,
+    std::vector<Matrix_3x3> &sigma )
 {
   const int dim = 3;
+  const int face_nqp = quad -> get_num_quadPts();
 
-  // Global-to-local rotation matrix Q
-  Matrix_3x3 Q = Matrix_3x3();
-  element->get_rotationMatrix(qua, Q);
-
-  // Lamina displacements
-  double * sol_wall_disp_l = new double [ snLocBas * dim ];
-
-  for(int ii=0; ii<snLocBas; ++ii)
+  for(int qua=0; qua<face_nqp; ++qua)
   {
-    sol_wall_disp_l[dim*ii]   = sol_wall_disp[dim*ii] * Q(0, 0) 
-      + sol_wall_disp[dim*ii+1] * Q(0, 1) + sol_wall_disp[dim*ii+2] * Q(0, 2);
 
-    sol_wall_disp_l[dim*ii+1] = sol_wall_disp[dim*ii] * Q(1, 0) 
-      + sol_wall_disp[dim*ii+1] * Q(1, 1) + sol_wall_disp[dim*ii+2] * Q(1, 2);
+    // Lamina displacements
+    double * sol_wall_disp_l = new double [ snLocBas * dim ];
 
-    sol_wall_disp_l[dim*ii+2] = sol_wall_disp[dim*ii] * Q(2, 0) 
-      + sol_wall_disp[dim*ii+1] * Q(2, 1) + sol_wall_disp[dim*ii+2] * Q(2, 2);
+    // For membrane elements, basis function gradients are computed
+    // with respect to lamina coords
+    double * dR_dxl = new double [ snLocBas ];
+    double * dR_dyl = new double [ snLocBas ];
+    element->get_R_gradR( qua, &R[0], &dR_dxl[0], &dR_dyl[0] );
+
+    // Global-to-local rotation matrix Q
+    Matrix_3x3 Q = Matrix_3x3();
+    element->get_rotationMatrix(qua, Q);
+
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      sol_wall_disp_l[dim*ii]   = sol_wall_disp[dim*ii] * Q(0, 0) 
+        + sol_wall_disp[dim*ii+1] * Q(0, 1) + sol_wall_disp[dim*ii+2] * Q(0, 2);
+
+      sol_wall_disp_l[dim*ii+1] = sol_wall_disp[dim*ii] * Q(1, 0) 
+        + sol_wall_disp[dim*ii+1] * Q(1, 1) + sol_wall_disp[dim*ii+2] * Q(1, 2);
+
+      sol_wall_disp_l[dim*ii+2] = sol_wall_disp[dim*ii] * Q(2, 0) 
+        + sol_wall_disp[dim*ii+1] * Q(2, 1) + sol_wall_disp[dim*ii+2] * Q(2, 2);
+    }
+
+    double h_w = 0.0, E_w = 0.0;
+    double u1l_xl = 0.0, u2l_xl = 0.0, u3l_xl = 0.0;
+    double u1l_yl = 0.0, u2l_yl = 0.0, u3l_yl = 0.0;
+
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      h_w += ele_thickness[ii] * R[ii];
+      E_w += ele_youngsmod[ii] * R[ii];
+
+      u1l_xl += sol_wall_disp_l[dim*ii]   * dR_dxl[ii];
+      u1l_yl += sol_wall_disp_l[dim*ii]   * dR_dyl[ii];
+      u2l_xl += sol_wall_disp_l[dim*ii+1] * dR_dxl[ii];
+      u2l_yl += sol_wall_disp_l[dim*ii+1] * dR_dyl[ii];
+      u3l_xl += sol_wall_disp_l[dim*ii+2] * dR_dxl[ii];
+      u3l_yl += sol_wall_disp_l[dim*ii+2] * dR_dyl[ii];
+    }
+
+    const double coef = E_w / (1.0 - nu_w * nu_w);
+
+    // Lamina Cauchy stress
+    sigma[qua] = Matrix_3x3(
+        u1l_xl + nu_w*u2l_yl,               0.5*(1.0-nu_w) * (u1l_yl + u2l_xl), 0.5*kappa_w*(1.0-nu_w) * u3l_xl,
+        0.5*(1.0-nu_w) * (u1l_yl + u2l_xl), nu_w*u1l_xl + u2l_yl,               0.5*kappa_w*(1.0-nu_w) * u3l_yl,
+        0.5*kappa_w*(1.0-nu_w) * u3l_xl,    0.5*kappa_w*(1.0-nu_w) * u3l_yl,    0.0 );
+    sigma[qua] *= coef;
+
+    // Global Cauchy stress: Q^T * lamina_Cauchy * Q
+    sigma[qua].MatRot(Q);
+
+    delete [] sol_wall_disp_l; delete [] dR_dxl; delete [] dR_dyl;
+    sol_wall_disp_l = nullptr; dR_dxl = nullptr; dR_dyl = nullptr;
   }
-
-  double h_w = 0.0, E_w = 0.0;
-  double u1l_xl = 0.0, u2l_xl = 0.0, u3l_xl = 0.0;
-  double u1l_yl = 0.0, u2l_yl = 0.0, u3l_yl = 0.0;
-
-  for(int ii=0; ii<snLocBas; ++ii)
-  {
-    h_w += ele_thickness[ii] * R[ii];
-    E_w += ele_youngsmod[ii] * R[ii];
-
-    u1l_xl += sol_wall_disp_l[dim*ii]   * dR_dxl[ii];
-    u1l_yl += sol_wall_disp_l[dim*ii]   * dR_dyl[ii];
-    u2l_xl += sol_wall_disp_l[dim*ii+1] * dR_dxl[ii];
-    u2l_yl += sol_wall_disp_l[dim*ii+1] * dR_dyl[ii];
-    u3l_xl += sol_wall_disp_l[dim*ii+2] * dR_dxl[ii];
-    u3l_yl += sol_wall_disp_l[dim*ii+2] * dR_dyl[ii];
-  }
-
-  const double coef = E_w / (1.0 - nu_w * nu_w);
-
-  // Lamina Cauchy stress
-  sigma = Matrix_3x3(
-    u1l_xl + nu_w*u2l_yl,               0.5*(1.0-nu_w) * (u1l_yl + u2l_xl), 0.5*kappa_w*(1.0-nu_w) * u3l_xl,
-    0.5*(1.0-nu_w) * (u1l_yl + u2l_xl), nu_w*u1l_xl + u2l_yl,               0.5*kappa_w*(1.0-nu_w) * u3l_yl,
-    0.5*kappa_w*(1.0-nu_w) * u3l_xl,    0.5*kappa_w*(1.0-nu_w) * u3l_yl,    0.0 );
-  sigma *= coef;
-
-  // Global Cauchy stress: Q^T * lamina_Cauchy * Q
-  sigma.MatRot(Q);
-
-  delete [] sol_wall_disp_l; sol_wall_disp_l = nullptr;
 }
 
 // EOF
