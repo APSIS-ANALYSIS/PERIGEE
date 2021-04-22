@@ -22,7 +22,6 @@ class PTime_CMM_Solver
 
     void print_info() const;
 
-    // **** PRESTRESS TODO: additional arg ALocal_Wall_Prestress
     void TM_CMM_GenAlpha(
         const bool &restart_init_assembly_flag,
         const PDNSolution * const &sol_base,
@@ -59,9 +58,6 @@ class PTime_CMM_Solver
     const int sol_record_freq; // the frequency for writing solutions
     const int renew_tang_freq; // the frequency for renewing tangents
     const std::string pb_name; // the problem base name for the solution
-
-    // flag for whether the wall prestress is being solved for and updated 
-    const bool solve_prestress;
 
     std::string Name_Generator( const int &counter,
         const std::string &prefix = "" ) const;

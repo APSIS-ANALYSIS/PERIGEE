@@ -5,8 +5,7 @@ PTime_CMM_Solver::PTime_CMM_Solver(
     const int &input_renew_tang_freq, const double &input_final_time,
     const bool &prestress_flag )
 : final_time(input_final_time), sol_record_freq(input_record_freq),
-  renew_tang_freq(input_renew_tang_freq), pb_name(input_name),
-  solve_prestress(prestress_flag)
+  renew_tang_freq(input_renew_tang_freq), pb_name(input_name)
 {}
 
 PTime_CMM_Solver::~PTime_CMM_Solver()
