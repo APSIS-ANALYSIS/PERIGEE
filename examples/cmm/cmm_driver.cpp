@@ -288,14 +288,6 @@ int main( int argc, char *argv[] )
     SYS_T::commPrint("Warning: Assigned fluid density does not match that used to compute "
                      "wall youngsmod in the preprocessor.\n");
 
-  // **** PRESTRESS TODO: Create new class ALocal_Wall_Prestress & initialize here
-  //   - constructor takes in ebc_wall_part & quad_s, then
-  //                 resizes prestress to nqp x num_sele; initializes to 0 
-  //   - void write_hdf5(FileName) const: writes to /ebc_wall
-  //                 not necessary, unless we want to read in stored prestresses for a restart
-  //   - void get_prestress(eindex, e_prestress) const: returns vals for an element
-  //   - void update_prestress(eindex, e_prestress)   : updates vals for an element
-
   // Local sub-domain's nodal indices
   APart_Node * pNode = new APart_Node(part_file, rank);
 
@@ -468,16 +460,12 @@ int main( int argc, char *argv[] )
   PCFieldSplitSetFields(upc,"p",1,pfield,pfield);
 
   // ===== Nonlinear solver context =====
-  // **** PRESTRESS TODO: pass in prestress_flag, ALocal_Wall_Prestress
-  // **** Should prestress flag only be allowed true if !is_restart ?
   PNonlinear_CMM_Solver * nsolver = new PNonlinear_CMM_Solver( pNode, fNode,
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold, prestress_flag );
 
   nsolver->print_info();
 
   // ===== Temporal solver context =====
-  // **** PRESTRESS TODO: pass in ALocal_Wall_Prestress
-  // **** need a separate tsolver initialized for prestressing?
   PTime_CMM_Solver * tsolver = new PTime_CMM_Solver( sol_bName,
       sol_record_freq, ttan_renew_freq, final_time, prestress_flag );
 

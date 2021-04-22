@@ -467,14 +467,12 @@ int main( int argc, char *argv[] )
   PCFieldSplitSetFields(upc,"p",1,pfield,pfield);
 
   // ===== Nonlinear solver context =====
-  // **** PRESTRESS TODO: pass in prestress_flag, ALocal_Wall_Prestress
   PNonlinear_CMM_Solver * nsolver = new PNonlinear_CMM_Solver( pNode, fNode,
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold, prestress_flag, ps_disp_atol );
 
   nsolver->print_info();
 
   // ===== Temporal solver context =====
-  // **** PRESTRESS TODO: pass in ALocal_Wall_Prestress
   // **** need a separate tsolver initialized for prestressing?
   PTime_CMM_Solver * tsolver = new PTime_CMM_Solver( sol_bName,
       sol_record_freq, ttan_renew_freq, final_time, prestress_flag );

@@ -39,7 +39,6 @@ class PNonlinear_CMM_Solver
     // This is a solver for CMM-FSI using the 2nd-order Generalized.
     // alpha method.
     // --------------------------------------------------------------
-    // **** PRESTRESS TODO: additional args prestress_flag, ALocal_Wall_Prestress
     void GenAlpha_Solve_CMM(
         const bool &new_tangent_flag,
         const double &curr_time,

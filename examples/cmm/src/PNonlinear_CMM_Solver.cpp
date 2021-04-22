@@ -138,8 +138,6 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
   rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, flr_ptr, sol_base, &sol_alpha);
   // ------------------------------------------------- 
 
-  // **** PRESTRESS TODO: if (prestress_flag), set wall disp and velo to zero
-
   // If new_tangent_flag == TRUE, update the tangent matrix;
   // otherwise, use the matrix from the previous time step
   if( new_tangent_flag )
