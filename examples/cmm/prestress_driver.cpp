@@ -559,6 +559,9 @@ int main( int argc, char *argv[] )
       locnbc, locinfnbc, locringnbc, locebc, locebc_wall, gbc, pmat, elementv, elements, elementw,
       quadv, quads, locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
 
+  // ==== Append wall prestress to h5 file ====
+  if( prestress_flag ) locebc_wall -> write_prestress_hdf5( part_file.c_str() );  
+
   // ===== Print complete solver info =====
   lsolver -> print_info();
 
