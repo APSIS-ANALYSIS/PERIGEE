@@ -289,14 +289,14 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
 
   if( solve_prestress )
   {
-
-    gassem_ptr->Update_Wall_Prestress(sol_wall_disp, lassem_ptr, elements, quad_s, ebc_wall_part);
+    gassem_ptr->Update_Wall_Prestress(sol_wall_disp, lassem_ptr, elementw, quad_s, ebc_wall_part);
 
     double wall_disp_norm = 0.0;
     VecNorm(sol_wall_disp->solution, NORM_2, &wall_disp_norm);
 
     if( wall_disp_norm <= prestress_tol ) prestress_conv_flag = true;
   }
+
 }
 
 

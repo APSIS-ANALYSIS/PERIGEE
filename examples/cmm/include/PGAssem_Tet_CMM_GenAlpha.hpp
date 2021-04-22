@@ -159,7 +159,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_w,
         const IQuadPts * const &quad_s,
-        const ALocal_EBC * const &ebc_wall_part );
+        ALocal_EBC * const &ebc_wall_part );
 
   private:
     // Private data

@@ -211,7 +211,7 @@ class ALocal_EBC
       SYS_T::print_fatal("Error: ALocal_EBC::get_prestress is not implemented. \n");
     }
 
-    virtual void set_prestress( const int &eindex, double * const &e_quaprestress ) const
+    virtual void set_prestress( const int &eindex, double * const &e_quaprestress )
     {
       SYS_T::print_fatal("Error: ALocal_EBC::set_prestress is not implemented. \n");
     }

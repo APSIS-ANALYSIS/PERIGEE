@@ -758,7 +758,7 @@ void PGAssem_Tet_CMM_GenAlpha::Update_Wall_Prestress(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_w,
     const IQuadPts * const &quad_s,
-    const ALocal_EBC * const &ebc_wall_part )
+    ALocal_EBC * const &ebc_wall_part )
 {
   const int dof_disp = 3;
   const int face_nqp = quad_s -> get_num_quadPts();
@@ -781,6 +781,7 @@ void PGAssem_Tet_CMM_GenAlpha::Update_Wall_Prestress(
 
   for(int ee=0; ee<num_sele; ++ee)
   {
+    ebc_wall_part -> get_SIEN(ebc_id, ee, LSIEN);
     ebc_wall_part -> get_thickness(ee, sthickness  );
     ebc_wall_part -> get_youngsmod(ee, syoungsmod  );
     ebc_wall_part -> get_prestress(ee, quaprestress);

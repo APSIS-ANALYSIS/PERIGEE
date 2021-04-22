@@ -737,7 +737,7 @@ class IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_w,
         const IQuadPts * const &quad_s,
-        const ALocal_EBC * const &ebc_wall_part )
+        ALocal_EBC * const &ebc_wall_part )
     {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
 };
 
