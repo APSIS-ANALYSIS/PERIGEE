@@ -287,14 +287,13 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
 
   }while(nl_counter<nmaxits && relative_error > nr_tol && residual_norm > na_tol);
 
-  // **** PRESTRESS TODO: if (prestress_flag), call PGAssem_Tet_CMM_GenAlpha::Update_Wall_Prestress() 
   Print_convergence_info(nl_counter, relative_error, residual_norm);
-
-  // if(relative_error <= nr_tol || residual_norm <= na_tol) conv_flag = true;
-  // else conv_flag = false;
 
   if( solve_prestress )
   {
+
+    gassem_ptr->Update_Wall_Prestress(sol_wall_disp, lassem_ptr, elements, quad_s, ebc_wall_part);
+
     double wall_disp_norm = 0.0;
     VecNorm(sol_wall_disp->solution, NORM_2, &wall_disp_norm);
 
