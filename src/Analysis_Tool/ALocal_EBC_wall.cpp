@@ -112,20 +112,19 @@ void ALocal_EBC_wall::write_prestress_hdf5( const char * FileName ) const
   hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
   // open the folder at fName/ebc_wall again to append additional data 
-  hid_t g_id = H5Gopen( file_id, "ebc_wall", H5P_DEFAULT );
-
-  HDF5_Writer * h5w = new HDF5_Writer( file_id );
-
-  // num_ebc = 1 for wall elem bc
-  const int ebc_id = 0;
+  const int ebc_id = 0;              // num_ebc = 1 for wall elem bc
   if( num_local_cell[ebc_id] > 0 )
   {
-    hid_t group_id = H5Gopen( g_id, "ebcid_0", H5P_DEFAULT );
+    hid_t group_id = H5Gopen( file_id, "ebc_wall/ebcid_0", H5P_DEFAULT );
+
+    HDF5_Writer * h5w = new HDF5_Writer( file_id );
+
     h5w->write_doubleVector( group_id, "prestress", qua_prestress );
+
     H5Gclose( group_id );
+    delete h5w; H5Gclose( group_id ); H5Fclose( file_id );
   }
 
-  delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
 }
 
 
