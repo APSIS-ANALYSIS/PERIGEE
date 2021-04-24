@@ -58,12 +58,11 @@ void Matrix_PETSc::gen_id(const APart_Node * const &pnode_ptr)
 
   const int nnode = pnode_ptr->get_nlocalnode();
   const int dof   = pnode_ptr->get_dof();
-  int index;
   for(int ii = 0; ii<nnode; ++ii)
   {
     for(int jj=0; jj<dof; ++jj)
     {
-      index = pnode_ptr->get_node_loc(ii) * dof + jj;
+      const int index = pnode_ptr->get_node_loc(ii) * dof + jj;
       MatSetValue(K, index, index, 1.0, INSERT_VALUES);
     }
   }
@@ -83,13 +82,12 @@ void Matrix_PETSc::gen_perm_bc( const APart_Node * const &pnode_ptr,
   
   const int nnode = pnode_ptr->get_nlocalnode();
   const int dof   = bc_part->get_dofMat();
-  int row, col;
   for(int ii=0; ii<nnode; ++ii)
   {
     for(int jj=0; jj<dof; ++jj)
     {
-      row = pnode_ptr->get_node_loc(ii) * dof + jj;
-      col = bc_part->get_LID(jj, ii) * dof + jj;
+      const int row = pnode_ptr->get_node_loc(ii) * dof + jj;
+      const int col = bc_part->get_LID(jj, ii) * dof + jj;
       MatSetValue(K, row, col, 1.0, INSERT_VALUES);
     }
   }
@@ -110,12 +108,11 @@ void Matrix_PETSc::gen_extractor_for_Dirichlet_nodes(
 
   const int nnode = pnode_ptr->get_nlocalnode();
   const int dof   = pnode_ptr->get_dof();
-  int row;
   for(int ii=0; ii<nnode; ++ii)
   {
     for(int jj=0; jj<dof; ++jj)
     {
-      row = pnode_ptr->get_node_loc(ii) * dof + jj;
+      const int row = pnode_ptr->get_node_loc(ii) * dof + jj;
       if(bc_part->get_LID(jj,ii) == -1)
         MatSetValue(K, row, row, 1.0, INSERT_VALUES);
     }
