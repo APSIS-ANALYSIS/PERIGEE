@@ -4,10 +4,9 @@ NBC_Partition_3D_ring::NBC_Partition_3D_ring(
     const IPart * const &part,
     const Map_Node_Index * const &mnindex,
     const INodalBC * const &nbc ) 
-: NBC_Partition_3D( part, mnindex, nbc )
+: NBC_Partition_3D( part, mnindex, nbc ), 
+  num_caps( nbc -> get_para_3() )
 {
-  num_caps  = nbc -> get_para_3();
-
   part_cap_id.clear();
 
   if( LDN.size() > 0 )
@@ -28,13 +27,10 @@ NBC_Partition_3D_ring::NBC_Partition_3D_ring(
 
   nbc -> get_dominant_comp( dominant_comp );
   nbc -> get_outnormal( outnormal );
-
 }
-
 
 NBC_Partition_3D_ring::~NBC_Partition_3D_ring()
 {}
-
 
 void NBC_Partition_3D_ring::write_hdf5( const char * FileName ) const
 {

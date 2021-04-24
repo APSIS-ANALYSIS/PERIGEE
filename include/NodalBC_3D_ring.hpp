@@ -56,6 +56,7 @@ class NodalBC_3D_ring : public INodalBC
     int num_caps;
 
     // Store corresponding cap ID: [0, num_caps)
+    // Inlet cap surface has ID 0, followed by the outlet caps
     // length num_dir_nodes
     std::vector<int> cap_id;
 
@@ -65,7 +66,6 @@ class NodalBC_3D_ring : public INodalBC
 
     // Each cap's unit normal vector, length 3 x num_caps
     std::vector<double> outnormal;
-    
 };
 
 #endif

@@ -28,9 +28,8 @@ class NBC_Partition_3D_ring : public NBC_Partition_3D
     virtual void write_hdf5( const char * FileName ) const;
 
   private:
-
     // Number of caps (inlets, outlets)
-    int num_caps; 
+    const int num_caps; 
 
     // Store corresponding cap ID: [0, num_caps)
     // length Num_LD
@@ -42,8 +41,6 @@ class NBC_Partition_3D_ring : public NBC_Partition_3D
 
     // Each cap's unit normal vector, length 3 x num_caps
     std::vector<double> outnormal;
-
-
 };
 
 #endif
