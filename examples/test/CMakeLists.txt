@@ -127,9 +127,7 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # BUILD THE MAIN DRIVERS
 # ===================================================================
 ADD_EXECUTABLE( sys_test sys_test.cpp )
-ADD_EXECUTABLE( h5_test   h5_test.cpp )
 
 TARGET_LINK_LIBRARIES( sys_test perigee_preprocess )
-TARGET_LINK_LIBRARIES( h5_test perigee_preprocess )
 
 # EOF
