@@ -1,10 +1,11 @@
 #include "Matrix_PETSc.hpp"
 
-Matrix_PETSc::Matrix_PETSc( const int &loc_row, const int &loc_col )
+Matrix_PETSc::Matrix_PETSc( const int &loc_row, const int &loc_col,
+   const int &dnz, const int &onz )
 {
   SYS_T::commPrint("===> PETSc: MatCreateAIJ called. \n");
   MatCreateAIJ(PETSC_COMM_WORLD, loc_row, loc_col, PETSC_DECIDE, PETSC_DECIDE, 
-      1, PETSC_NULL, 1, PETSC_NULL, &K);
+      dnz, PETSC_NULL, onz, PETSC_NULL, &K);
 
   is_set = false;
 
@@ -14,7 +15,8 @@ Matrix_PETSc::Matrix_PETSc( const int &loc_row, const int &loc_col )
   ln = loc_col;  
 }
 
-Matrix_PETSc::Matrix_PETSc(const APart_Node * const &pnode_ptr)
+Matrix_PETSc::Matrix_PETSc(const APart_Node * const &pnode_ptr,
+    const int &dnz, const int &onz )
 {
   SYS_T::commPrint("===> PETSc: MatCreateAIJ called. \n");
   
@@ -22,7 +24,7 @@ Matrix_PETSc::Matrix_PETSc(const APart_Node * const &pnode_ptr)
   ln = lm;
   
   MatCreateAIJ(PETSC_COMM_WORLD, lm, ln, PETSC_DECIDE, PETSC_DECIDE, 
-      1, PETSC_NULL, 1, PETSC_NULL, &K);
+      dnz, PETSC_NULL, onz, PETSC_NULL, &K);
 
   is_set = false;
 
@@ -30,7 +32,7 @@ Matrix_PETSc::Matrix_PETSc(const APart_Node * const &pnode_ptr)
 }
 
 Matrix_PETSc::Matrix_PETSc(const APart_Node * const &pnode_ptr,
-    const ALocal_NodalBC * const &bc_part )
+    const ALocal_NodalBC * const &bc_part, const int &dnz, const int &onz )
 {
   SYS_T::commPrint("===> PETSc: MatCreateAIJ called. \n");
   
@@ -38,7 +40,7 @@ Matrix_PETSc::Matrix_PETSc(const APart_Node * const &pnode_ptr,
   ln = lm;
   
   MatCreateAIJ(PETSC_COMM_WORLD, lm, ln, PETSC_DECIDE, PETSC_DECIDE, 
-      1, PETSC_NULL, 1, PETSC_NULL, &K);
+      dnz, PETSC_NULL, onz, PETSC_NULL, &K);
 
   is_set = false;
 

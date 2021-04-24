@@ -23,14 +23,16 @@ class Matrix_PETSc
     // are assumbed to be 1 respectively. The purpose is to create a sparse
     // permutation matrix.
     // ------------------------------------------------------------------------
-    Matrix_PETSc( const int &loc_row, const int &loc_col );
+    Matrix_PETSc( const int &loc_row, const int &loc_col, const int &dnz = 1,
+       const int &onz = 0 );
 
     // ------------------------------------------------------------------------
     // Constructor: Generate a sparse square matrix with size defined
     // locally. Local row/column num = pnode_ptr->get_nlocalnode() 
     // * pnode_ptr->get_dof();
     // ------------------------------------------------------------------------
-    Matrix_PETSc( const APart_Node * const &pnode_ptr );
+    Matrix_PETSc( const APart_Node * const &pnode_ptr, const int &dnz = 1,
+       const int &onz = 0 );
 
     // ------------------------------------------------------------------------
     // Constructor: Generate a sparse square matrix with size defined
@@ -38,7 +40,8 @@ class Matrix_PETSc
     // * bc_part->get_dofMat();
     // ------------------------------------------------------------------------
     Matrix_PETSc( const APart_Node * const &pnode_ptr,
-       const ALocal_NodalBC * const &bc_part );
+       const ALocal_NodalBC * const &bc_part,
+       const int &dnz = 1, const int &onz = 0 );
 
     // ------------------------------------------------------------------------
     // Destroyer
