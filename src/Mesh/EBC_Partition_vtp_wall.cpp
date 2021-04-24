@@ -53,7 +53,7 @@ void EBC_Partition_vtp_wall::write_hdf5( const char * FileName ) const
 
   h5w -> write_doubleScalar( g_id, "fluid_density", fluid_density );
 
-  // num_ebc = 1 for wall elem bc
+  // num_ebc = 1 for wall elem bc, and ebc_id is 0
   const int ebc_id = 0;
   if( num_local_cell[ebc_id] > 0 )
   {

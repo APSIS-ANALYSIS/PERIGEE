@@ -87,7 +87,7 @@ void ALocal_EBC_wall::get_prestress( const int &eindex,
 }
 
 void ALocal_EBC_wall::set_prestress( const int &eindex,
-    double * const &e_quaprestress )
+    const double * const &e_quaprestress )
 {
   if( solve_prestress )
   {

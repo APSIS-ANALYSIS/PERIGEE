@@ -26,13 +26,22 @@ class ALocal_EBC_wall : public ALocal_EBC
 
     virtual void print_info() const;
 
-    virtual void get_thickness(const int &eindex, double * const &e_thickness) const;
+    // ee is the local element index, ranges in [ 0, num_local_cell[0] )
+    // elem_thickness is the output with length cell_nLocBas[0], which
+    // represents the thickness for each local node
+    virtual void get_thickness(const int &ee, double * const &elem_thickness) const;
 
-    virtual void get_youngsmod(const int &eindex, double * const &e_youngsmod) const;
+    // elem_youngsmod is the output with length cell_nLocBas[0], which
+    // represents the Young's modulus at each local node
+    virtual void get_youngsmod(const int &ee, double * const &elem_youngsmod) const;
 
-    virtual void get_prestress(const int &eindex, double * const &e_quaprestress) const;
+    // elem_quaprestress is the output with length 6 x num_local_cell[0] x
+    // num_face_nqp, which represents the prestress values at each quadrature
+    // points
+    virtual void get_prestress(const int &ee, double * const &elem_quaprestress) const;
 
-    virtual void set_prestress(const int &eindex, double * const &e_quaprestress);
+    // elem_quaprestress is the input with length 6 x num_face_nqp.
+    virtual void set_prestress(const int &ee, const double * const &elem_quaprestress);
 
     virtual double get_fluid_density() const {return fluid_density;}
 
