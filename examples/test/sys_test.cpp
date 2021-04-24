@@ -3,8 +3,6 @@
 
 int main( int argc, char * argv[] )
 {
-  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-  
   Matrix_3x3 A, Q;
 
   A = { 1,0,1, -1, -2, 0, 0, 1, -1 };
@@ -15,7 +13,6 @@ int main( int argc, char * argv[] )
 
   A.print();  
   
-  PetscFinalize();
   return EXIT_SUCCESS;
 }
 

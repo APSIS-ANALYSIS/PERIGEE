@@ -29,6 +29,9 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
     h5r -> read_doubleVector( subgroup_name.c_str(), "thickness", thickness );
     h5r -> read_doubleVector( subgroup_name.c_str(), "youngsmod", youngsmod );
 
+   // If the prestress is solved, read the prestress data
+   // otherwise, just allocate a container for prestress data at each quadrature
+   // points
    if( !solve_prestress )
    {
      h5r -> read_doubleVector( subgroup_name.c_str(), "prestress", qua_prestress );
@@ -43,14 +46,12 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
   delete h5r; H5Fclose( file_id );
 }
 
-
 ALocal_EBC_wall::~ALocal_EBC_wall()
 {
   VEC_T::clean(thickness);
   VEC_T::clean(youngsmod);
   VEC_T::clean(qua_prestress);
 }
-
 
 void ALocal_EBC_wall::get_thickness( const int &eindex,
     double * const &e_thickness ) const
@@ -64,7 +65,6 @@ void ALocal_EBC_wall::get_thickness( const int &eindex,
   }
 }
 
-
 void ALocal_EBC_wall::get_youngsmod( const int &eindex,
     double * const &e_youngsmod ) const
 {
@@ -77,7 +77,6 @@ void ALocal_EBC_wall::get_youngsmod( const int &eindex,
   }
 }
 
-
 void ALocal_EBC_wall::get_prestress( const int &eindex,
     double * const &e_quaprestress ) const
 {
@@ -86,7 +85,6 @@ void ALocal_EBC_wall::get_prestress( const int &eindex,
   for(int ii = 0; ii < 6 * face_nqp; ++ii)
     e_quaprestress[ii] = qua_prestress[pos + ii]; 
 }
-
 
 void ALocal_EBC_wall::set_prestress( const int &eindex,
     double * const &e_quaprestress )
@@ -102,7 +100,6 @@ void ALocal_EBC_wall::set_prestress( const int &eindex,
     SYS_T::commPrint("Warning in ALocal_EBC_wall: set_prestress should only be called when solving for prestress. \n"); 
 }
 
-
 void ALocal_EBC_wall::write_prestress_hdf5( const char * FileName ) const
 {
   const std::string input_fName(FileName);
@@ -112,7 +109,7 @@ void ALocal_EBC_wall::write_prestress_hdf5( const char * FileName ) const
   hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
   // open the folder at fName/ebc_wall again to append additional data 
-  const int ebc_id = 0;              // num_ebc = 1 for wall elem bc
+  const int ebc_id = 0;              // num_ebc = 1 for wall elem bc and id = 0
   if( num_local_cell[ebc_id] > 0 )
   {
     hid_t group_id = H5Gopen( file_id, "ebc_wall/ebcid_0", H5P_DEFAULT );
@@ -124,9 +121,7 @@ void ALocal_EBC_wall::write_prestress_hdf5( const char * FileName ) const
     H5Gclose( group_id );
     delete h5w; H5Gclose( group_id ); H5Fclose( file_id );
   }
-
 }
-
 
 void ALocal_EBC_wall::print_info() const
 {

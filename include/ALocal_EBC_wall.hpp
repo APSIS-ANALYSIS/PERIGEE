@@ -39,7 +39,6 @@ class ALocal_EBC_wall : public ALocal_EBC
     virtual void write_prestress_hdf5( const char * FileName ) const;
 
   protected:
-
     // The rank or id of the subdomain
     const int cpu_rank;
 
