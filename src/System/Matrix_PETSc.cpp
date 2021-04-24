@@ -14,7 +14,6 @@ Matrix_PETSc::Matrix_PETSc( const int &loc_row, const int &loc_col )
   ln = loc_col;  
 }
 
-
 Matrix_PETSc::Matrix_PETSc(const APart_Node * const &pnode_ptr)
 {
   SYS_T::commPrint("===> PETSc: MatCreateAIJ called. \n");
@@ -29,7 +28,6 @@ Matrix_PETSc::Matrix_PETSc(const APart_Node * const &pnode_ptr)
 
   MatGetSize(K, &m, &n);
 }
-
 
 Matrix_PETSc::Matrix_PETSc(const APart_Node * const &pnode_ptr,
     const ALocal_NodalBC * const &bc_part )
@@ -47,19 +45,16 @@ Matrix_PETSc::Matrix_PETSc(const APart_Node * const &pnode_ptr,
   MatGetSize(K, &m, &n);
 }
 
-
 Matrix_PETSc::~Matrix_PETSc()
 {
   MatDestroy(&K);
 }
 
-
 void Matrix_PETSc::gen_id(const APart_Node * const &pnode_ptr)
 {
   if(is_set) Clear();
 
-  if(m != n)
-    SYS_T::print_fatal("Error: This is not a square matrix. \n");
+  SYS_T::print_fatal_if(m != n, "Error: This is not a square matrix. \n");
 
   const int nnode = pnode_ptr->get_nlocalnode();
   const int dof   = pnode_ptr->get_dof();
@@ -79,14 +74,12 @@ void Matrix_PETSc::gen_id(const APart_Node * const &pnode_ptr)
   is_set = true;
 }
 
-
 void Matrix_PETSc::gen_perm_bc( const APart_Node * const &pnode_ptr,
    const ALocal_NodalBC * const &bc_part )
 {
   if(is_set) Clear();
   
-  if(m != n)
-    SYS_T::print_fatal("Error: This is not a square matrix. \n");
+  SYS_T::print_fatal_if(m != n, "Error: This is not a square matrix. \n");
   
   const int nnode = pnode_ptr->get_nlocalnode();
   const int dof   = bc_part->get_dofMat();
@@ -107,15 +100,13 @@ void Matrix_PETSc::gen_perm_bc( const APart_Node * const &pnode_ptr,
   is_set = true;
 }
 
-
 void Matrix_PETSc::gen_extractor_for_Dirichlet_nodes( 
     const APart_Node * const &pnode_ptr ,
     const ALocal_NodalBC * const &bc_part )
 {
   if(is_set) Clear();
 
-  if(m != n)
-    SYS_T::print_fatal("Error: This is not a square matrix. \n");
+  SYS_T::print_fatal_if(m != n, "Error: This is not a square matrix. \n");
 
   const int nnode = pnode_ptr->get_nlocalnode();
   const int dof   = pnode_ptr->get_dof();
@@ -136,7 +127,6 @@ void Matrix_PETSc::gen_extractor_for_Dirichlet_nodes(
   is_set = true;
 }
 
-
 void Matrix_PETSc::MatMultSol( PDNSolution * const &sol ) const
 {
   // Check the local dimension of mat and vec
@@ -152,7 +142,7 @@ void Matrix_PETSc::MatMultSol( PDNSolution * const &sol ) const
   sol->Copy(*temp);
 
   // Clean up memory
-  delete temp;
+  delete temp; temp = nullptr;
 }
 
 // EOF
