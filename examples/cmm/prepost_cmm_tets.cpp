@@ -17,31 +17,29 @@
 
 int main( int argc, char * argv[] )
 {
-  // Clean the existing part hdf5 files
+  // Clean the existing postpart hdf5 files
   int sysret = system("rm -rf postpart_p*.h5");
   SYS_T::print_fatal_if(sysret != 0, "ERROR: system call failed. \n");
-
-  std::string geo_file;
-  int dofNum, dofMat, elemType, in_ncommon;
 
   const std::string part_file("postpart");
   int cpu_size = 1;
   bool isDualGraph = true;
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-  
   SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: prepost is a serial program! \n");
 
   // Read preprocessor command-line arguements recorded in the .h5 file
+  std::string geo_file;
+  
   hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
 
   cmd_h5r -> read_string("/", "geo_file", geo_file);
-  elemType = cmd_h5r -> read_intScalar("/","elemType");
-  dofNum = cmd_h5r -> read_intScalar("/","dofNum");
-  dofMat   = cmd_h5r -> read_intScalar("/","dofMat");
-  in_ncommon = cmd_h5r -> read_intScalar("/","in_ncommon");
+  const int elemType = cmd_h5r -> read_intScalar("/","elemType");
+  const int dofNum = cmd_h5r -> read_intScalar("/","dofNum");
+  const int dofMat   = cmd_h5r -> read_intScalar("/","dofMat");
+  int in_ncommon = cmd_h5r -> read_intScalar("/","in_ncommon");
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
@@ -62,14 +60,14 @@ int main( int argc, char * argv[] )
   cout<<"elemType: "<<elemType<<endl;
   cout<<"==== Command Line Arguments ===="<<endl;
 
+  // Check if the given geo file exist
+  SYS_T::file_check( geo_file.c_str() );
+
   // Read the geo_file
   int nFunc, nElem;
   std::vector<int> vecIEN;
   std::vector<double> ctrlPts;
-
-  // Check if the given geo file exist
-  SYS_T::file_check( geo_file.c_str() );
-
+  
   TET_T::read_vtu_grid(geo_file.c_str(), nFunc, nElem, ctrlPts, vecIEN);
   
   if(int(ctrlPts.size()) != nFunc * 3) SYS_T::print_fatal("ERROR: the ctrlPts from geo_file does not match the given number of nodes. \n");
