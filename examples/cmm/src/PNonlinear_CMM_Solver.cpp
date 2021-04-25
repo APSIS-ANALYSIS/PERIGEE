@@ -293,6 +293,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
 
     double wall_disp_norm = 0.0;
     VecNorm(sol_wall_disp->solution, NORM_2, &wall_disp_norm);
+    SYS_T::commPrint("  --- wall_disp_norm: %e \n", wall_disp_norm);
 
     if( wall_disp_norm <= prestress_tol ) prestress_conv_flag = true;
   }

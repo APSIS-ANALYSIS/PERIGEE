@@ -77,7 +77,7 @@ int main( int argc, char *argv[] )
   int    nl_threshold = 4;           // threshold of tangent matrix renewal
 
   // Prestress solver parameters
-  bool   prestress_flag = false;
+  const bool   prestress_flag = false;
 
   // Time stepping parameters
   double initial_time = 0.0;         // time of initial condition
