@@ -69,25 +69,25 @@ int main( int argc, char *argv[] )
   std::string part_file("part");
 
   // Nonlinear solver parameters
-  double nl_rtol = 1.0e-3;           // convergence criterion relative tolerance
-  double nl_atol = 1.0e-6;           // convergence criterion absolute tolerance
-  double nl_dtol = 10.0;             // divergence criterion
-  int    nl_maxits = 20;             // maximum number if nonlinear iterations
-  int    nl_refreq = 4;              // frequency of tangent matrix renewal
-  int    nl_threshold = 4;           // threshold of tangent matrix renewal
+  double nl_rtol = 1.0e-3;            // convergence criterion relative tolerance
+  double nl_atol = 1.0e-6;            // convergence criterion absolute tolerance
+  double nl_dtol = 10.0;              // divergence criterion
+  int    nl_maxits = 20;              // maximum number if nonlinear iterations
+  int    nl_refreq = 4;               // frequency of tangent matrix renewal
+  int    nl_threshold = 4;            // threshold of tangent matrix renewal
 
   // Prestress solver parameters
-  bool   prestress_flag = true;
-  double ps_disp_atol   = 1.0e-6;    // convegence criterion absolute disp L2 norm
+  const bool prestress_flag = true;
+  double     ps_disp_atol   = 1.0e-6; // convegence criterion absolute disp L2 norm
 
   // Time stepping parameters
-  double initial_time = 0.0;         // time of initial condition
-  double initial_step = 0.1;         // time step size
-  int    initial_index = 0;          // index of initial condition
-  double final_time = 1.0;           // end time of simulation
-  std::string sol_bName("SOL_ps_");  // base name of the solution file
-  int    ttan_renew_freq = 1;        // frequency of tangent matrix renewal
-  int    sol_record_freq = 1;        // frequency for recording the solution
+  double initial_time = 0.0;          // time of initial condition
+  double initial_step = 0.1;          // time step size
+  int    initial_index = 0;           // index of initial condition
+  double final_time = 1.0;            // end time of simulation
+  std::string sol_bName("SOL_ps_");   // base name of the solution file
+  int    ttan_renew_freq = 1;         // frequency of tangent matrix renewal
+  int    sol_record_freq = 1;         // frequency for recording the solution
 
   // Restart options
   bool   is_restart = false;
@@ -174,12 +174,8 @@ int main( int argc, char *argv[] )
   SYS_T::cmdPrint(      "-nl_refreq:",       nl_refreq);
   SYS_T::cmdPrint(      "-nl_threshold:",    nl_threshold);
 
-  if(prestress_flag)
-  {
-    SYS_T::commPrint(   "-prestress_flag: true \n");
-    SYS_T::cmdPrint(    "-ps_disp_atol:",    ps_disp_atol);
-  }
-  else SYS_T::commPrint("-prestress_flag: false \n");
+  SYS_T::commPrint(     "-prestress_flag: true \n");
+  SYS_T::cmdPrint(      "-ps_disp_atol:",    ps_disp_atol);
 
   SYS_T::cmdPrint(      "-init_time:",       initial_time);
   SYS_T::cmdPrint(      "-init_step:",       initial_step);
