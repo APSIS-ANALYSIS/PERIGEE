@@ -55,8 +55,7 @@ namespace PETSc_T
   // Calculate the dnz and onz number for a matrix.
   // dnz and onz have length of the local number of rows belonging to the
   // matrix.
-  void Get_dnz_onz( const Mat &K, std::vector<int> &dnz, 
-      std::vector<int> &onz );
+  void Get_dnz_onz(const Mat &K, std::vector<int> &dnz, std::vector<int> &onz);
 
   // ----------------------------------------------------------------
   // Set options for a matrix.

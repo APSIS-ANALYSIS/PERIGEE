@@ -34,6 +34,8 @@ int main( int argc, char * argv[] )
 
   double dt = cmd_h5r -> read_doubleScalar("/","init_step");
 
+  const int sol_rec_freq = cmd_h5r -> read_intScalar("/", "sol_record_freq");
+
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
   // ===== Initialize the MPI run =====
@@ -50,7 +52,10 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionString("-out_bname", out_bname);
   SYS_T::GetOptionBool("-xml", isXML);
   SYS_T::GetOptionBool("-restart", isRestart);
-  
+ 
+  // Correct time_step if it does not match with sol_rec_freq
+  if( time_step % sol_rec_freq != 0 ) time_step = sol_rec_freq;
+
   SYS_T::commPrint("=== Command line arguments ===\n");
   SYS_T::cmdPrint("-sol_bname:", sol_bname);
   SYS_T::cmdPrint("-out_bname:", out_bname);

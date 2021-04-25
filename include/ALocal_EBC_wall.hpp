@@ -37,7 +37,9 @@ class ALocal_EBC_wall : public ALocal_EBC
 
     // elem_quaprestress is the output with length 6 x num_local_cell[0] x
     // num_face_nqp, which represents the prestress values at each quadrature
-    // points
+    // points. The data is arranged the following way,
+    // elem_quaprestress[6*ii+jj] is the stress tensor jj-th component in Voigt
+    // notation at the ii-th quadrature point.
     virtual void get_prestress(const int &ee, double * const &elem_quaprestress) const;
 
     // elem_quaprestress is the input with length 6 x num_face_nqp.
