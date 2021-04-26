@@ -908,36 +908,25 @@ void TET_T::get_out_normal( const std::string &file,
   SYS_T::print_fatal_if(node_check!=3, "Error: TET_T::get_out_normal, the associated tet element is incompatible with the triangle element. \n");
 
   // make cross line-0-1 and line-0-2
-  const double l01x = vol_ctrlPts[3*trn[1]] - vol_ctrlPts[3*trn[0]];
-  const double l01y = vol_ctrlPts[3*trn[1]+1] - vol_ctrlPts[3*trn[0]+1];
-  const double l01z = vol_ctrlPts[3*trn[1]+2] - vol_ctrlPts[3*trn[0]+2];
+  const Vector_3 l01( vol_ctrlPts[3*trn[1]] - vol_ctrlPts[3*trn[0]],
+      vol_ctrlPts[3*trn[1]+1] - vol_ctrlPts[3*trn[0]+1],
+      vol_ctrlPts[3*trn[1]+2] - vol_ctrlPts[3*trn[0]+2] );
 
-  const double l02x = vol_ctrlPts[3*trn[2]] - vol_ctrlPts[3*trn[0]];
-  const double l02y = vol_ctrlPts[3*trn[2]+1] - vol_ctrlPts[3*trn[0]+1];
-  const double l02z = vol_ctrlPts[3*trn[2]+2] - vol_ctrlPts[3*trn[0]+2];
+  const Vector_3 l02( vol_ctrlPts[3*trn[2]] - vol_ctrlPts[3*trn[0]],
+      vol_ctrlPts[3*trn[2]+1] - vol_ctrlPts[3*trn[0]+1],
+      vol_ctrlPts[3*trn[2]+2] - vol_ctrlPts[3*trn[0]+2] );
 
-  double oux, ouy, ouz;
+  outVec = cross_product( l01, l02 );
 
-  MATH_T::cross3d( l01x, l01y, l01z, l02x, l02y, l02z, oux, ouy, ouz );
-
-  MATH_T::normalize3d( oux, ouy, ouz );
+  outVec.normalize();
 
   // obtain the line from tri node 0 to the out-of-surface node
-  const double inwx = vol_ctrlPts[inside_node*3] - vol_ctrlPts[3*trn[0]];
-  const double inwy = vol_ctrlPts[inside_node*3+1] - vol_ctrlPts[3*trn[0]+1];
-  const double inwz = vol_ctrlPts[inside_node*3+2] - vol_ctrlPts[3*trn[0]+2];
+  const Vector_3 inw( vol_ctrlPts[inside_node*3] - vol_ctrlPts[3*trn[0]],
+      vol_ctrlPts[inside_node*3+1] - vol_ctrlPts[3*trn[0]+1],
+      vol_ctrlPts[inside_node*3+2] - vol_ctrlPts[3*trn[0]+2] );
 
-  // inner product outward with inward
-  const double out_dot_in = MATH_T::dot3d(oux, ouy, ouz, inwx, inwy, inwz);
-
-  if(out_dot_in > 0)
-  {
-    oux *= -1.0;
-    ouy *= -1.0;
-    ouz *= -1.0;
-  }
-
-  outVec(0) = oux; outVec(1) = ouy; outVec(2) = ouz;
+  // inner product outward with inward, and correct outVec
+  if(inw.dot_product(outVec) > 0.0) outVec.scale(-1.0);
 }
 
 
