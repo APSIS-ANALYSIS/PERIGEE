@@ -119,7 +119,7 @@ void Matrix_PETSc::gen_ring_inplane_bc( const APart_Node * const &pnode_ptr,
     {
       const int row = pnode_ptr->get_node_loc(ii) * dof + jj;
       const int col = bc_part->get_LID(jj, ii) * dof + jj;
-      // For non-essential bc nodes, it's diagonal entry will be assigned 1.0
+      // For non-essential bc nodes, its diagonal entry will be assigned 1.0
       MatSetValue(K, row, col, 1.0, INSERT_VALUES);
     }
   }

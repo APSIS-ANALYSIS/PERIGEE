@@ -111,15 +111,15 @@ class Matrix_PETSc
     // Assumption: the matrix system has 4 degrees-of-freedom per node and the
     //             1st dof is pressure, the next 3 dofs are velocity. 
     // 1. For ring nodes that belong to the ALocal_Ring_NodalBC class, the 
-    // dominant component's row will be modified. Assuming the dominant 
-    // component's corresponding outward normal is Nd,
-    // the two non-dominant components' normal vector entries are Na, Nb. The
-    // two non-dominant components' columns are -Na / Nd and - Nb / Nd,
-    // respectively. The two non-dominant components' rows are assigned to be 1
-    // for the diagonal entries.
-    // 2. For the rest essential BC's nodes, we assign 0 for all entries in all
+    // dominant component's row will be modified. Let the dominant component's
+    // corresponding entry in the outward normal be Nd, and the remaining two 
+    // non-dominant entries be Na, Nb. Then in the dominant component's row, the
+    // diagonal entry will be 0, and entries in the non-dominant components'
+    // columns will be -Na / Nd and - Nb / Nd. For the two non-dominant
+    // components' rows, diagonal entries will be 1.
+    // 2. For the remaining essential BC nodes, we assign 0 to all entries in all
     // components' rows.
-    // 3. For the rest nodes, we assign 1 for the diagonal entries.
+    // 3. For all remaining nodes, we assign 1 to the diagonal entries.
     // ------------------------------------------------------------------------
     void gen_ring_inplane_bc( const APart_Node * const &pnode_ptr,
         const ALocal_NodalBC * const &bc_part,
