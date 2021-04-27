@@ -20,6 +20,8 @@ ALocal_Ring_NodalBC::ALocal_Ring_NodalBC(
   std::vector<double> outnormal_vec;
   h5r -> read_doubleVector( gname.c_str(), "cap_out_normal", outnormal_vec );
 
+  outnormal.resize(num_caps);
+
   for(int ii=0; ii<num_caps; ++ii)
   {
     outnormal[ii](0) = outnormal_vec[3*ii+0];
