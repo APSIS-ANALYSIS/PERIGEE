@@ -5,7 +5,8 @@ PTime_CMM_Solver::PTime_CMM_Solver(
     const int &input_renew_tang_freq, const double &input_final_time,
     const bool &prestress_flag )
 : final_time(input_final_time), sol_record_freq(input_record_freq),
-  renew_tang_freq(input_renew_tang_freq), pb_name(input_name)
+  renew_tang_freq(input_renew_tang_freq), pb_name(input_name),
+  solve_prestress(prestress_flag)
 {}
 
 PTime_CMM_Solver::~PTime_CMM_Solver()
@@ -148,6 +149,13 @@ void PTime_CMM_Solver::TM_CMM_GenAlpha(
     // If the previous step is solved in ONE Newton iteration, we do not update
     // the tangent matrix
     if( nl_counter == 1 ) renew_flag = false;
+
+    // If solving for prestress, set disp and dot disp to zero
+    if( solve_prestress )
+    {
+      pre_sol_wall_disp -> ScaleValue(0.0);
+      pre_dot_sol_wall_disp -> ScaleValue(0.0);
+    }
 
     // Call the nonlinear equation solver
     nsolver_ptr->GenAlpha_Solve_CMM( renew_flag, 

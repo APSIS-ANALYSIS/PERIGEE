@@ -33,9 +33,6 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &inflow_vtp_file,
 
   TET_T::read_vtp_grid( inflow_vtp_file, numpts, numcels, pts, ien, gnode, gelem );
 
-  if( numpts != static_cast<int>(gnode.size()) )
-    SYS_T::print_fatal("Error: numpts != global_node.size() for the inlet! \n");
-
   for(unsigned int ii=0; ii<gnode.size(); ++ii)
   {
     if(gnode[ii]<0) SYS_T::print_fatal("Error: negative nodal index on the inlet! \n");
@@ -53,9 +50,6 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &inflow_vtp_file,
   TET_T::read_vtp_grid( wall_vtp_file, wall_numpts, wall_numcels, wall_pts, 
         wall_ien, wall_gnode, wall_gelem );
 
-  if( wall_numpts != static_cast<int>(wall_gnode.size()) )
-      SYS_T::print_fatal("Error: numpts != global_node.size() for the wall! \n");
-
   for(unsigned int ii=0; ii<wall_gnode.size(); ++ii)
     if(wall_gnode[ii]<0) SYS_T::print_fatal("Error: negative nodal index on the wall! \n");
 
@@ -65,9 +59,6 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &inflow_vtp_file,
     SYS_T::file_check( outflow_vtp_files[ii] );
 
     TET_T::read_vtp_grid( outflow_vtp_files[ii], numpts, numcels, pts, ien, gnode, gelem );
-
-    if( numpts != static_cast<int>(gnode.size()) )
-      SYS_T::print_fatal("Error: numpts != global_node.size() for outlet %d! \n", ii);
 
     int num_outline_pts = 0;
     for(unsigned int jj=0; jj<gnode.size(); ++jj)
@@ -98,9 +89,7 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &inflow_vtp_file,
   for(unsigned int ii=0; ii<num_outlets; ++ii)
     std::cout<<"     outline of "<<outflow_vtp_files[ii]<<std::endl;
   std::cout<<"     is generated. \n";
-
 }
-
 
 NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &inflow_vtp_file,
     const std::vector<double> &inflow_outward_vec,
@@ -123,9 +112,6 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &inflow_vtp_file,
   TET_T::read_vtp_grid( wall_vtp_file, wall_numpts, wall_numcels, wall_pts, 
         wall_ien, wall_gnode, wall_gelem );
 
-  if( wall_numpts != static_cast<int>(wall_gnode.size()) )
-      SYS_T::print_fatal("Error: numpts != global_node.size() for the wall! \n");
-
   for(unsigned int ii=0; ii<wall_gnode.size(); ++ii)
     if(wall_gnode[ii]<0) SYS_T::print_fatal("Error: negative nodal index on the wall! \n");
 
@@ -138,9 +124,6 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &inflow_vtp_file,
   SYS_T::file_check( inflow_vtp_file );
 
   TET_T::read_vtp_grid( inflow_vtp_file, numpts, numcels, pts, ien, gnode, gelem );
-
-  if( numpts != static_cast<int>(gnode.size()) )
-    SYS_T::print_fatal("Error: numpts != global_node.size() for the inlet! \n");
 
   outvec = Vector_3( inflow_outward_vec[0], inflow_outward_vec[1], inflow_outward_vec[2] );
   int inflow_dominant_comp = outvec.get_dominant_comp();
@@ -180,9 +163,6 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &inflow_vtp_file,
 
       TET_T::read_vtp_grid( outflow_vtp_files[ii], numpts, numcels, pts, ien, gnode, gelem );
 
-      if( numpts != static_cast<int>(gnode.size()) )
-        SYS_T::print_fatal("Error: numpts != global_node.size() for outlet %d! \n", ii);
-
       num_outline_pts = 0;
       for(unsigned int jj=0; jj<gnode.size(); ++jj)
       {
@@ -196,9 +176,7 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &inflow_vtp_file,
       }
 
       // Detect usage of the sv exterior surface (containing caps) as the wall surface
-      if(num_outline_pts == numpts)
-        SYS_T::print_fatal( "Error: Outlet %d has %d outline nodes and %d total nodes. This is likely due to an improper wall mesh.\n", ii, num_outline_pts, numpts );
-
+      SYS_T::print_fatal_if( num_outline_pts == numpts, "Error: Outlet %d has %d outline nodes and %d total nodes. This is likely due to an improper wall mesh.\n", ii, num_outline_pts, numpts );
     }
   } // end loop over outlets
 
@@ -218,9 +196,7 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &inflow_vtp_file,
       std::cout<<"     outline of "<<outflow_vtp_files[ii]<<std::endl;
   }
   std::cout<<"     is generated. \n";
-
 }
-
 
 NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &vtpfileName,
     const int &nFunc )
@@ -239,9 +215,6 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &vtpfileName,
   num_per_nodes = 0;
   num_dir_nodes = numpts;
 
-  if( numpts != static_cast<int>(gnode.size()) )
-    SYS_T::print_fatal("Error: the numpts != global_node.size()! \n");
-
   dir_nodes.resize( gnode.size() );
   for(unsigned int ii=0; ii<gnode.size(); ++ii)
   {
@@ -255,7 +228,6 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &vtpfileName,
 
   std::cout<<"===> NodalBC_3D_vtp specified by "<<vtpfileName<<" is generated. \n";
 }
-
 
 NodalBC_3D_vtp::NodalBC_3D_vtp( const std::vector<std::string> &vtpfileList, 
     const int &nFunc )
@@ -277,9 +249,6 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::vector<std::string> &vtpfileList,
 
     TET_T::read_vtp_grid( vtpfileList[ii], numpts, numcels, pts, ien, gnode, gelem );
 
-    if( numpts != static_cast<int>(gnode.size()) )
-      SYS_T::print_fatal("Error: the numpts != global_node.size()! \n");
-
     for(unsigned int jj=0; jj<gnode.size(); ++jj)
     {
       if(gnode[jj]<0) SYS_T::print_fatal("Error: there are negative nodal index! \n");
@@ -299,7 +268,6 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::vector<std::string> &vtpfileList,
     std::cout<<"     "<<vtpfileList[ii]<<std::endl;
   std::cout<<"     is generated. \n";
 }
-
 
 NodalBC_3D_vtp::~NodalBC_3D_vtp()
 {}

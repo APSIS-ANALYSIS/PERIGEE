@@ -77,7 +77,7 @@ int main( int argc, char *argv[] )
   int    nl_threshold = 4;           // threshold of tangent matrix renewal
 
   // Prestress solver parameters
-  bool   prestress_flag = false;
+  const bool   prestress_flag = false;
 
   // Time stepping parameters
   double initial_time = 0.0;         // time of initial condition
@@ -172,8 +172,7 @@ int main( int argc, char *argv[] )
   SYS_T::cmdPrint(      "-nl_refreq:",       nl_refreq);
   SYS_T::cmdPrint(      "-nl_threshold:",    nl_threshold);
 
-  if(prestress_flag) SYS_T::commPrint(   "-prestress_flag: true \n");
-  else SYS_T::commPrint("-prestress_flag: false \n");
+  SYS_T::commPrint(     "-prestress_flag: false \n");
 
   SYS_T::cmdPrint(      "-init_time:",       initial_time);
   SYS_T::cmdPrint(      "-init_step:",       initial_step);

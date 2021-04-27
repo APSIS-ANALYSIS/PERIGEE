@@ -33,9 +33,6 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &inflow_vtu_file,
 
   TET_T::read_vtu_grid( inflow_vtu_file, numpts, numcels, pts, ien, gnode, gelem );
 
-  if( numpts != static_cast<int>(gnode.size()) )
-    SYS_T::print_fatal("Error: numpts != global_node.size() for the inlet! \n");
-
   for(unsigned int ii=0; ii<gnode.size(); ++ii)
   {
     if(gnode[ii]<0) SYS_T::print_fatal("Error: negative nodal index on the inlet! \n");
@@ -53,9 +50,6 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &inflow_vtu_file,
   TET_T::read_vtu_grid( wall_vtu_file, wall_numpts, wall_numcels, wall_pts, 
         wall_ien, wall_gnode, wall_gelem );
 
-  if( wall_numpts != static_cast<int>(wall_gnode.size()) )
-      SYS_T::print_fatal("Error: numpts != global_node.size() for the wall! \n");
-
   for(unsigned int ii=0; ii<wall_gnode.size(); ++ii)
     if(wall_gnode[ii]<0) SYS_T::print_fatal("Error: negative nodal index on the wall! \n");
 
@@ -65,9 +59,6 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &inflow_vtu_file,
     SYS_T::file_check( outflow_vtu_files[ii] );
 
     TET_T::read_vtu_grid( outflow_vtu_files[ii], numpts, numcels, pts, ien, gnode, gelem );
-
-    if( numpts != static_cast<int>(gnode.size()) )
-      SYS_T::print_fatal("Error: numpts != global_node.size() for outlet %d! \n", ii);
 
     int num_outline_pts = 0;
     for(unsigned int jj=0; jj<gnode.size(); ++jj)
@@ -122,9 +113,6 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &inflow_vtu_file,
   TET_T::read_vtu_grid( wall_vtu_file, wall_numpts, wall_numcels, wall_pts, 
         wall_ien, wall_gnode, wall_gelem );
 
-  if( wall_numpts != static_cast<int>(wall_gnode.size()) )
-      SYS_T::print_fatal("Error: numpts != global_node.size() for the wall! \n");
-
   for(unsigned int ii=0; ii<wall_gnode.size(); ++ii)
     if(wall_gnode[ii]<0) SYS_T::print_fatal("Error: negative nodal index on the wall! \n");
 
@@ -137,9 +125,6 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &inflow_vtu_file,
   SYS_T::file_check( inflow_vtu_file );
 
   TET_T::read_vtu_grid( inflow_vtu_file, numpts, numcels, pts, ien, gnode, gelem );
-
-  if( numpts != static_cast<int>(gnode.size()) )
-    SYS_T::print_fatal("Error: numpts != global_node.size() for the inlet! \n");
 
   outvec = Vector_3( inflow_outward_vec[0], inflow_outward_vec[1], inflow_outward_vec[2] );
   int inflow_dominant_comp = outvec.get_dominant_comp();
@@ -178,9 +163,6 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &inflow_vtu_file,
       SYS_T::file_check( outflow_vtu_files[ii] );
 
       TET_T::read_vtu_grid( outflow_vtu_files[ii], numpts, numcels, pts, ien, gnode, gelem );
-
-      if( numpts != static_cast<int>(gnode.size()) )
-        SYS_T::print_fatal("Error: numpts != global_node.size() for outlet %d! \n", ii);
 
       num_outline_pts = 0;
       for(unsigned int jj=0; jj<gnode.size(); ++jj)
@@ -238,9 +220,6 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &vtufilename,
   num_per_nodes = 0;
   num_dir_nodes = numpts;
 
-  if( numpts != static_cast<int>(gnode.size()) )
-    SYS_T::print_fatal("Error: the numpts != global_node.size()! \n");
-
   dir_nodes.resize( gnode.size() );
   for(unsigned int ii=0; ii<gnode.size(); ++ii)
   {
@@ -275,9 +254,6 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::vector<std::string> &vtufileList,
     std::vector<int> ien, gnode, gelem;
 
     TET_T::read_vtu_grid( vtufileList[ii], numpts, numcels, pts, ien, gnode, gelem );
-
-    if( numpts != static_cast<int>(gnode.size()) )
-      SYS_T::print_fatal("Error: the numpts != global_node.size()! \n");
 
     for(unsigned int jj=0; jj<gnode.size(); ++jj)
     {

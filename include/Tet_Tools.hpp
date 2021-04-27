@@ -11,6 +11,7 @@
 #include "Sys_Tools.hpp"
 #include "Vec_Tools.hpp"
 #include "Math_Tools.hpp"
+#include "Vector_3.hpp"
 #include "IIEN.hpp"
 
 #include "vtkCellLocator.h"
@@ -407,7 +408,8 @@ namespace TET_T
   // ----------------------------------------------------------------
   // ! get_out_normal:
   //   This function obtains the unit outward normal vector for a 
-  //   triangle vtp file, assuming that the vtp mesh is a flat surface.
+  //   triangle vtp or vtu file, with the assumption that the file
+  //   describes a flat surface.
   //   The outward normal is calculated based on the first triangle 
   //   element in the vtp file, edge 0-1 and edge 0-2. Making cross
   //   product and compare with the 0-out-of-surface node. If the normal
@@ -425,6 +427,10 @@ namespace TET_T
       const IIEN * const &vol_ien,
       std::vector<double> &outVec );
 
+  void get_out_normal( const std::string &file,
+      const std::vector<double> &vol_ctrlPts,
+      const IIEN * const &vol_ien,
+      Vector_3 &outVec );
   
   // ================================================================
   // 4. TetGen interface

@@ -8,6 +8,7 @@
 // Author: Ingrid S. Lan
 // Date Created: April 15 2021
 // ==================================================================
+#include "Vector_3.hpp"
 #include "HDF5_Reader.hpp"
 
 class ALocal_Ring_NodalBC
@@ -28,24 +29,25 @@ class ALocal_Ring_NodalBC
     // dominant component of the unit normal vector is the largest in
     // absolute value
     // parameter node ranges [ 0, Num_LD )
-    virtual double get_dominant_comp( const int &node ) const
+    // output value is 0, 1, or 2.
+    virtual int get_dominant_comp( const int &node ) const
     { return dominant_comp[ cap_id[node] ]; }
 
     // get the Dirichlet node's outward normal vector components.
     // parameter node ranges [ 0, Num_LD )
     // comp=0 : x-component; comp=1 : y-component; comp=2 : z-component
     virtual double get_outvec( const int &node, const int &comp ) const
-    { return outnormal[ 3 * cap_id[node] + comp ]; }
+    { return outnormal[ cap_id[node] ]( comp ); }
 
     // determine whether a given index belongs to the LDN vector
     virtual bool is_inLDN( const int &ii) const
     { return VEC_T::is_invec(LDN, ii); }
 
   private:
-    // Number of local Dirichlet nodes
+    // Number of local Dirichlet nodes of the ring BC type
     int Num_LD;
 
-    // Global indices of the local Dirichlet nodes (of the ring BC type)
+    // Global indices of the local Dirichlet nodes of the ring BC type
     std::vector<int> LDN;
 
     // Number of caps (equals the number of inlets + the number of outlets)
@@ -60,8 +62,8 @@ class ALocal_Ring_NodalBC
     std::vector<int> dominant_comp;
 
     // Each cap's unit normal vector,
-    // vector length 3 x num_caps
-    std::vector<double> outnormal;
+    // vector length is num_caps
+    std::vector<Vector_3> outnormal;
 };
 
 #endif
