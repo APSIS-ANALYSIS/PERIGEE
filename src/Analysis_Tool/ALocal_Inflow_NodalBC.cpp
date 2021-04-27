@@ -10,8 +10,13 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
   HDF5_Reader * h5r = new HDF5_Reader( file_id );
 
   const std::string gname("/inflow");
-  
+
+  std::vector<double> outvec;  
   h5r -> read_doubleVector( gname.c_str(), "Outward_normal_vector", outvec );
+  
+  outward_normal(0) = outvec[0];
+  outward_normal(1) = outvec[1];
+  outward_normal(2) = outvec[2];
 
   act_area = h5r -> read_doubleScalar( gname.c_str(), "Inflow_active_area");
   ful_area = h5r -> read_doubleScalar( gname.c_str(), "Inflow_full_area");
@@ -57,7 +62,6 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
 ALocal_Inflow_NodalBC::~ALocal_Inflow_NodalBC()
 {
   VEC_T::clean(LDN);
-  VEC_T::clean(outvec);
   VEC_T::clean(centroid);
   VEC_T::clean(outline_pts);
   VEC_T::clean(local_pt_xyz);
