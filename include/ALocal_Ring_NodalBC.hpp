@@ -29,7 +29,8 @@ class ALocal_Ring_NodalBC
     // dominant component of the unit normal vector is the largest in
     // absolute value
     // parameter node ranges [ 0, Num_LD )
-    virtual double get_dominant_comp( const int &node ) const
+    // output value is 0, 1, or 2.
+    virtual int get_dominant_comp( const int &node ) const
     { return dominant_comp[ cap_id[node] ]; }
 
     // get the Dirichlet node's outward normal vector components.
@@ -43,10 +44,10 @@ class ALocal_Ring_NodalBC
     { return VEC_T::is_invec(LDN, ii); }
 
   private:
-    // Number of local Dirichlet nodes
+    // Number of local Dirichlet nodes of the ring BC type
     int Num_LD;
 
-    // Global indices of the local Dirichlet nodes (of the ring BC type)
+    // Global indices of the local Dirichlet nodes of the ring BC type
     std::vector<int> LDN;
 
     // Number of caps (equals the number of inlets + the number of outlets)

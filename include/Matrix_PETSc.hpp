@@ -92,17 +92,38 @@ class Matrix_PETSc
     void Clear() {MatZeroEntries(K);}
 
     // ------------------------------------------------------------------------
-    // Gen_id : Generate an identity matrix that is compatible with the
+    // gen_id : Generate an identity matrix that is compatible with the
     // mesh partition.
     // ------------------------------------------------------------------------
     void gen_id( const APart_Node * const &pnode_ptr );
 
     // ------------------------------------------------------------------------
-    // Gen_perm_bc : Generate a permutation matrix accounting for the essential
+    // gen_perm_bc : Generate a permutation matrix accounting for the essential
     // boundary conditions.
     // ------------------------------------------------------------------------
-    void gen_perm_bc( const APart_Node * const &pnode_ptr , 
-       const ALocal_NodalBC * const &bc_part );
+    void gen_perm_bc( const APart_Node * const &pnode_ptr,
+        const ALocal_NodalBC * const &bc_part );
+
+    // ------------------------------------------------------------------------
+    // gen_ring_inplane_bc : Generate a matrix accounting for the essential
+    // boundary conditions that describe the in plane motion for 4-dof system
+    // like the NS equations.
+    // Assumption: the matrix system has 4 degrees-of-freedom per node and the
+    //             1st dof is pressure, the next 3 dofs are velocity. 
+    // 1. For ring nodes that belong to the ALocal_Ring_NodalBC class, the 
+    // dominant component's row will be modified. Assuming the dominant 
+    // component's corresponding outward normal is Nd,
+    // the two non-dominant components' normal vector entries are Na, Nb. The
+    // two non-dominant components' columns are -Na / Nd and - Nb / Nd,
+    // respectively. The two non-dominant components' rows are assigned to be 1
+    // for the diagonal entries.
+    // 2. For the rest essential BC's nodes, we assign 0 for all entries in all
+    // components' rows.
+    // 3. For the rest nodes, we assign 1 for the diagonal entries.
+    // ------------------------------------------------------------------------
+    void gen_ring_inplane_bc( const APart_Node * const &pnode_ptr,
+        const ALocal_NodalBC * const &bc_part,
+        const ALocal_Ring_NodalBC * const &ring_bc_part );
 
     // ------------------------------------------------------------------------
     // Gen_extractor_for_Dirichlet_nodes : Generate a matrix that is zero for

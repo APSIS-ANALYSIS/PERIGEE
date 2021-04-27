@@ -196,7 +196,6 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &inflow_vtp_file,
       std::cout<<"     outline of "<<outflow_vtp_files[ii]<<std::endl;
   }
   std::cout<<"     is generated. \n";
-
 }
 
 NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &vtpfileName,
