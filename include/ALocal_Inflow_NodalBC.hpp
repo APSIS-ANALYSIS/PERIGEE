@@ -29,7 +29,7 @@ class ALocal_Inflow_NodalBC
 
     // get the outward normal vector components.
     // ii=0 : x-component; ii=1 : y-component; ii=2 : z-component
-    virtual double get_outvec( const int &ii ) const {return outward_normal( ii );}
+    virtual double get_outvec( const int &ii ) const {return outnormal( ii );}
 
     // get the active area of the surface
     virtual double get_actarea() const {return act_area;}
@@ -121,7 +121,7 @@ class ALocal_Inflow_NodalBC
     std::vector<int> LDN;
 
     // Outward normal vector
-    Vector_3 outward_normal;
+    Vector_3 outnormal;
 
     // Inflow surface active area
     double act_area;
