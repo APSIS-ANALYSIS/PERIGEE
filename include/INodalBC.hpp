@@ -234,6 +234,12 @@ class INodalBC
     virtual void get_outnormal( std::vector<double> &outvec ) const
     {SYS_T::commPrint("Warning: get_outnormal is not implemented. \n");}
   
+    // --------------------------------------------------------------
+    // get_centroid returns each cap's centroid x-y-z coordinates
+    // --------------------------------------------------------------
+    virtual void get_centroid( std::vector<double> &outvec ) const
+    {SYS_T::commPrint("Warning: get_centroid is not implemented. \n");}
+  
   protected:
     std::vector<unsigned int> dir_nodes;
     unsigned int num_dir_nodes;
