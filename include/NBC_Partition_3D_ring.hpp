@@ -33,11 +33,11 @@ class NBC_Partition_3D_ring : public NBC_Partition_3D
 
     // Store corresponding cap ID: [0, num_caps)
     // length Num_LD
-    std::vector<int> part_cap_id;
+    std::vector<int> local_cap_id;
 
     // Store local ring nodal x-y-z coordinates 
     // length Num_LD
-    std::vector<double> part_pt_xyz;
+    std::vector<double> local_pt_xyz;
 
     // Dominant component index of each cap's unit normal vector: 0, 1, or 2
     // length num_caps
