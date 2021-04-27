@@ -8,6 +8,7 @@
 // Author: Ingrid S. Lan
 // Date Created: April 15 2021
 // ==================================================================
+#include "Vector_3.hpp"
 #include "HDF5_Reader.hpp"
 
 class ALocal_Ring_NodalBC
@@ -35,7 +36,7 @@ class ALocal_Ring_NodalBC
     // parameter node ranges [ 0, Num_LD )
     // comp=0 : x-component; comp=1 : y-component; comp=2 : z-component
     virtual double get_outvec( const int &node, const int &comp ) const
-    { return outnormal[ 3 * cap_id[node] + comp ]; }
+    { return outnormal[ cap_id[node] ]( comp ); }
 
     // determine whether a given index belongs to the LDN vector
     virtual bool is_inLDN( const int &ii) const
@@ -60,8 +61,8 @@ class ALocal_Ring_NodalBC
     std::vector<int> dominant_comp;
 
     // Each cap's unit normal vector,
-    // vector length 3 x num_caps
-    std::vector<double> outnormal;
+    // vector length is num_caps
+    std::vector<Vector_3> outnormal;
 };
 
 #endif

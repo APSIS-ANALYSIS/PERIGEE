@@ -17,9 +17,15 @@ ALocal_Ring_NodalBC::ALocal_Ring_NodalBC(
 
   h5r -> read_intVector( gname.c_str(), "cap_dominant_comp", dominant_comp );
 
-  h5r -> read_doubleVector( gname.c_str(), "cap_out_normal", outnormal );
+  std::vector<double> outnormal_vec;
+  h5r -> read_doubleVector( gname.c_str(), "cap_out_normal", outnormal_vec );
 
-  cap_id.clear();
+  for(int ii=0; ii<num_caps; ++ii)
+  {
+    outnormal[ii](0) = outnormal_vec[3*ii+0];
+    outnormal[ii](1) = outnormal_vec[3*ii+1];
+    outnormal[ii](2) = outnormal_vec[3*ii+2];
+  }
 
   // If this sub-domain contains local ring bc points,
   // load the LDN array and corresponding cap ids.
