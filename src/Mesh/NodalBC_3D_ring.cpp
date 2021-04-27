@@ -39,6 +39,7 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
 
   num_caps = cap_files.size();
   dominant_comp.resize(num_caps);
+  centroid.resize(3 * num_caps);
 
   outnormal = inflow_outward_vec;
   Vector_3 outvec = Vector_3( inflow_outward_vec[0], inflow_outward_vec[1], inflow_outward_vec[2] );
