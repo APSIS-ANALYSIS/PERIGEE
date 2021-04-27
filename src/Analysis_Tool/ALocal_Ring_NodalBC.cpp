@@ -29,12 +29,15 @@ ALocal_Ring_NodalBC::ALocal_Ring_NodalBC(
     outnormal[ii](2) = outnormal_vec[3*ii+2];
   }
 
+  h5r -> read_doubleVector( gname.c_str(), "cap_centroid", centroid );
+
   // If this sub-domain contains local ring bc points,
   // load the LDN array and corresponding cap ids.
   if( Num_LD > 0 )
   {
     h5r->read_intVector( gname.c_str(), "LDN", LDN );
-    h5r->read_intVector( gname.c_str(), "cap_id", cap_id );
+    h5r->read_intVector( gname.c_str(), "local_cap_id", local_cap_id );
+    h5r->read_doubleVector( gname.c_str(), "local_pt_xyz", local_pt_xyz );
   }
 
   delete h5r; H5Fclose( file_id );
@@ -43,9 +46,11 @@ ALocal_Ring_NodalBC::ALocal_Ring_NodalBC(
 ALocal_Ring_NodalBC::~ALocal_Ring_NodalBC()
 {
   VEC_T::clean(LDN);
-  VEC_T::clean(cap_id);
+  VEC_T::clean(local_cap_id);
+  VEC_T::clean(local_pt_xyz);
   VEC_T::clean(dominant_comp);
   VEC_T::clean(outnormal);
+  VEC_T::clean(centroid);
 }
 
 // EOF
