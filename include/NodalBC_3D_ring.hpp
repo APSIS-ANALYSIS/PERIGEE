@@ -51,10 +51,10 @@ class NodalBC_3D_ring : public INodalBC
 
     virtual void get_centroid( std::vector<double> &outvec ) const { outvec = centroid; } 
 
-    // Access ring nodal coordinates
     // \para node: [0, num_dir_nodes)
     // \para dir : 0, 1, 2.
-    virtual double get_pt_xyz(const int &node, const int &dir) const { return pt_xyz[3*node + dir]; }
+    virtual double get_pt_xyz( const int &node, const int &dir ) const
+    { return pt_xyz[3*node + dir]; }
 
   private:
     NodalBC_3D_ring() {};
