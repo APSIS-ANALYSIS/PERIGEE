@@ -216,8 +216,6 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &vtpfileName,
   num_per_nodes = 0;
   num_dir_nodes = numpts;
 
-  SYS_T::print_fatal_if( numpts != static_cast<int>(gnode.size()), "Error: the numpts != global_node.size()! \n");
-
   dir_nodes.resize( gnode.size() );
   for(unsigned int ii=0; ii<gnode.size(); ++ii)
   {
