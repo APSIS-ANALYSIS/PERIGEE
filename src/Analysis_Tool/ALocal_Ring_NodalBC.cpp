@@ -31,7 +31,7 @@ ALocal_Ring_NodalBC::ALocal_Ring_NodalBC(
 
   h5r -> read_doubleVector( gname.c_str(), "cap_centroid", centroid );
 
-  // If this sub-domain contains local ring bc points,
+  // If this sub-domain contains local ring nodes,
   // load the LDN array and corresponding cap ids.
   if( Num_LD > 0 )
   {
@@ -40,17 +40,32 @@ ALocal_Ring_NodalBC::ALocal_Ring_NodalBC(
     h5r->read_doubleVector( gname.c_str(), "local_pt_xyz", local_pt_xyz );
   }
 
+  // Compute the tangential vector for each local ring node
+  tangential_vec.resize(Num_LD);
+
+  for( int node=0; node<Num_LD; ++node)
+  {
+    // Generate radial vector using nodal & centroidal coordinates
+    Vector_3 radial_vec = Vector_3(
+        local_pt_xyz[3*node]     - centroid[ 3*local_cap_id[node]    ],
+        local_pt_xyz[3*node + 1] - centroid[ 3*local_cap_id[node] + 1],
+        local_pt_xyz[3*node + 2] - centroid[ 3*local_cap_id[node] + 2] );
+
+    tangential_vec[node] = cross_product( outnormal[ local_cap_id[node] ], radial_vec ); 
+  }
+
   delete h5r; H5Fclose( file_id );
 }
 
 ALocal_Ring_NodalBC::~ALocal_Ring_NodalBC()
 {
-  VEC_T::clean(LDN);
-  VEC_T::clean(local_cap_id);
-  VEC_T::clean(local_pt_xyz);
-  VEC_T::clean(dominant_comp);
-  VEC_T::clean(outnormal);
-  VEC_T::clean(centroid);
+  VEC_T::clean( LDN            );
+  VEC_T::clean( local_cap_id   );
+  VEC_T::clean( local_pt_xyz   );
+  VEC_T::clean( tangential_vec );
+  VEC_T::clean( dominant_comp  );
+  VEC_T::clean( outnormal      );
+  VEC_T::clean( centroid       );
 }
 
 // EOF
