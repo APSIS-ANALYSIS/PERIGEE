@@ -49,6 +49,13 @@ class NodalBC_3D_ring : public INodalBC
 
     virtual void get_outnormal( std::vector<double> &outvec ) const { outvec = outnormal; } 
 
+    virtual void get_centroid( std::vector<double> &outvec ) const { outvec = centroid; } 
+
+    // \para node: [0, num_dir_nodes)
+    // \para dir : 0, 1, 2.
+    virtual double get_pt_xyz( const int &node, const int &dir ) const
+    { return pt_xyz[3*node + dir]; }
+
   private:
     NodalBC_3D_ring() {};
 
@@ -66,6 +73,16 @@ class NodalBC_3D_ring : public INodalBC
 
     // Each cap's unit normal vector, length 3 x num_caps
     std::vector<double> outnormal;
+
+    // Each cap's centroid x-y-z coordinates, length 3 x num_caps
+    std::vector<double> centroid;
+
+    // Coordinates of ring nodes, length 3 x num_dir_nodes
+    std::vector<double> pt_xyz;
+
+    // Compute centroid coordinates given a cap's nodal coordinates
+    // \para cap_id: [0, num_caps]
+    void compute_cap_centroid( const int &cap_id, const std::vector<double> &pts );
 };
 
 #endif

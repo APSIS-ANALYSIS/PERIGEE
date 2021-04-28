@@ -14,6 +14,8 @@ NodalBC_3D_ring::NodalBC_3D_ring(const int &nFunc)
   cap_id.clear();
   dominant_comp.clear();
   outnormal.clear();
+  centroid.clear();
+  pt_xyz.clear();
 
   std::cout<<"===> NodalBC_3D_ring::empty is generated. \n";
 }
@@ -37,6 +39,7 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
 
   num_caps = cap_files.size();
   dominant_comp.resize(num_caps);
+  centroid.resize(3 * num_caps);
 
   outnormal = inflow_outward_vec;
   Vector_3 outvec = Vector_3( inflow_outward_vec[0], inflow_outward_vec[1], inflow_outward_vec[2] );
@@ -79,6 +82,8 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
       if( numpts != static_cast<int>(gnode.size()) )
         SYS_T::print_fatal("Error: numpts != global_node.size() for cap %d! \n", ii);
 
+      compute_cap_centroid( ii, pts );
+
       int num_outline_pts = 0;
       for(unsigned int jj=0; jj<gnode.size(); ++jj)
       {
@@ -87,7 +92,10 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
         if( VEC_T::is_invec( wall_gnode, gnode[jj]) )
         {
           dir_nodes.push_back( static_cast<unsigned int>( gnode[jj] ) );
-          cap_id.push_back(ii);
+          cap_id.push_back( ii );
+          pt_xyz.push_back( pts[3*jj]     );
+          pt_xyz.push_back( pts[3*jj + 1] );
+          pt_xyz.push_back( pts[3*jj + 2] );
           num_outline_pts += 1;
         }
       }
@@ -113,6 +121,8 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
       if( numpts != static_cast<int>(gnode.size()) )
         SYS_T::print_fatal("Error: numpts != global_node.size() for cap %d! \n", ii);
 
+      compute_cap_centroid( ii, pts );
+
       int num_outline_pts = 0;
       for(unsigned int jj=0; jj<gnode.size(); ++jj)
       {
@@ -121,7 +131,10 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
         if( VEC_T::is_invec( wall_gnode, gnode[jj]) )
         {
           dir_nodes.push_back( static_cast<unsigned int>( gnode[jj] ) );
-          cap_id.push_back(ii);
+          cap_id.push_back( ii );
+          pt_xyz.push_back( pts[3*jj]     );
+          pt_xyz.push_back( pts[3*jj + 1] );
+          pt_xyz.push_back( pts[3*jj + 2] );
           num_outline_pts += 1;
         }
       }
@@ -144,6 +157,23 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
   for(int ii=0; ii<num_caps; ++ii)
     std::cout << "     outline of " << cap_files[ii] << std::endl;
   std::cout<<"     is generated. \n";
+}
+
+
+void NodalBC_3D_ring::compute_cap_centroid( const int &cap_id, const std::vector<double> &pts )
+{
+  const int num_node = static_cast<int>( pts.size() / 3 );
+
+  for(int ii=0; ii<num_node; ++ii)
+  {
+    centroid[3*cap_id + 0] += pts[3*ii + 0];
+    centroid[3*cap_id + 1] += pts[3*ii + 1];
+    centroid[3*cap_id + 2] += pts[3*ii + 2];
+  }
+
+  centroid[3*cap_id + 0] /= (double) num_node;
+  centroid[3*cap_id + 1] /= (double) num_node;
+  centroid[3*cap_id + 2] /= (double) num_node;
 }
 
 // EOF

@@ -7,7 +7,8 @@ NBC_Partition_3D_ring::NBC_Partition_3D_ring(
 : NBC_Partition_3D( part, mnindex, nbc ), 
   num_caps( nbc -> get_para_3() )
 {
-  part_cap_id.clear();
+  local_cap_id.clear();
+  local_pt_xyz.clear();
 
   if( LDN.size() > 0 )
   {
@@ -21,12 +22,18 @@ NBC_Partition_3D_ring::NBC_Partition_3D_ring(
       node_index = mnindex -> get_old2new(node_index);
 
       if( part->isNodeInPart(node_index) )
-        part_cap_id.push_back( cap_id[ii] );
+      {
+        local_cap_id.push_back( cap_id[ii] );
+        local_pt_xyz.push_back( nbc -> get_pt_xyz(ii, 0) );
+        local_pt_xyz.push_back( nbc -> get_pt_xyz(ii, 1) );
+        local_pt_xyz.push_back( nbc -> get_pt_xyz(ii, 2) );
+      }
     } 
   }
 
   nbc -> get_dominant_comp( dominant_comp );
   nbc -> get_outnormal( outnormal );
+  nbc -> get_centroid( centroid );
 }
 
 NBC_Partition_3D_ring::~NBC_Partition_3D_ring()
@@ -46,7 +53,8 @@ void NBC_Partition_3D_ring::write_hdf5( const char * FileName ) const
   if(LDN.size() > 0)
   {
     h5writer->write_intVector( group_id, "LDN", LDN );
-    h5writer->write_intVector( group_id, "cap_id", part_cap_id );
+    h5writer->write_intVector( group_id, "local_cap_id", local_cap_id );
+    h5writer->write_doubleVector( group_id, "local_pt_xyz", local_pt_xyz );
   }
 
   h5writer->write_intVector( group_id, "Num_LD", Num_LD );
@@ -56,6 +64,8 @@ void NBC_Partition_3D_ring::write_hdf5( const char * FileName ) const
   h5writer->write_intVector( group_id, "cap_dominant_comp", dominant_comp );
 
   h5writer->write_doubleVector( group_id, "cap_out_normal", outnormal );
+
+  h5writer->write_doubleVector( group_id, "cap_centroid", centroid );
 
   delete h5writer; H5Gclose(group_id); H5Fclose(file_id);
 }
