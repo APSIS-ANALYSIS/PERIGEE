@@ -53,7 +53,7 @@ class Matrix_PETSc
     //          Adding or inserting in new locations will be ignored. 
     //          Set after a correct nonzero structure has been assembled.
     // ------------------------------------------------------------------------
-    void Fix_nonzero_str()
+    virtual void Fix_nonzero_str()
     {MatSetOption(K, MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);}
 
     // ------------------------------------------------------------------------
@@ -62,7 +62,7 @@ class Matrix_PETSc
     //          Supports AIJ and BAIJ formats.
     //          Typically used for debugging.
     // ------------------------------------------------------------------------
-    void Fix_nonzero_err_str()
+    virtual void Fix_nonzero_err_str()
     {MatSetOption(K, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);}
 
     // ------------------------------------------------------------------------
@@ -72,36 +72,36 @@ class Matrix_PETSc
     //          underestimate. This flag is called for a first practical
     //          assembly.
     // ------------------------------------------------------------------------
-    void Release_nonzero_err_str()
+    virtual void Release_nonzero_err_str()
     {MatSetOption(K, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);}
 
     // ------------------------------------------------------------------------
     // ! Flag : Keep nonzero pattern of the matrix K
     // ------------------------------------------------------------------------
-    void Keep_nonzero_pattern() 
+    virtual void Keep_nonzero_pattern() 
     {MatSetOption(K, MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);}
 
     // ------------------------------------------------------------------------
     // MatView : print the matrix on screen
     // ------------------------------------------------------------------------
-    void print_matrix() const {MatView(K, PETSC_VIEWER_STDOUT_WORLD);}
+    virtual void print_matrix() const {MatView(K, PETSC_VIEWER_STDOUT_WORLD);}
 
     // ------------------------------------------------------------------------
     // Clear K
     // ------------------------------------------------------------------------
-    void Clear() {MatZeroEntries(K);}
+    virtual void Clear() {MatZeroEntries(K);}
 
     // ------------------------------------------------------------------------
     // gen_id : Generate an identity matrix that is compatible with the
     // mesh partition.
     // ------------------------------------------------------------------------
-    void gen_id( const APart_Node * const &pnode_ptr );
+    virtual void gen_id( const APart_Node * const &pnode_ptr );
 
     // ------------------------------------------------------------------------
     // gen_perm_bc : Generate a permutation matrix accounting for the essential
     // boundary conditions.
     // ------------------------------------------------------------------------
-    void gen_perm_bc( const APart_Node * const &pnode_ptr,
+    virtual void gen_perm_bc( const APart_Node * const &pnode_ptr,
         const ALocal_NodalBC * const &bc_part );
 
     // ------------------------------------------------------------------------
@@ -121,7 +121,7 @@ class Matrix_PETSc
     // components' rows.
     // 3. For all remaining nodes, we assign 1 to the diagonal entries.
     // ------------------------------------------------------------------------
-    void gen_ring_inplane_bc( const APart_Node * const &pnode_ptr,
+    virtual void gen_ring_inplane_bc( const APart_Node * const &pnode_ptr,
         const ALocal_NodalBC * const &bc_part,
         const ALocal_Ring_NodalBC * const &ring_bc_part );
 
@@ -137,7 +137,7 @@ class Matrix_PETSc
     //             0 0 0 ]       1 ]        0 ]
     // 
     // ------------------------------------------------------------------------
-    void gen_extractor_for_Dirichlet_nodes( const APart_Node * const &pnode_ptr ,
+    virtual void gen_extractor_for_Dirichlet_nodes( const APart_Node * const &pnode_ptr ,
         const ALocal_NodalBC * const &bc_part );
 
     // ------------------------------------------------------------------------
@@ -145,9 +145,9 @@ class Matrix_PETSc
     //              If the matrix partition is incompatible with the vector's,
     //              a PETSc error from PETSc::MatMult will be thrown.
     // ------------------------------------------------------------------------
-    void MatMultSol( PDNSolution * const &sol ) const;
+    virtual void MatMultSol( PDNSolution * const &sol ) const;
 
-  private:
+  protected:
     Mat K;
 
     // Global dimension of K matrix
