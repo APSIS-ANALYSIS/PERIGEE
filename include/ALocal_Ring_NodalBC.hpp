@@ -31,7 +31,7 @@ class ALocal_Ring_NodalBC
     // parameter node ranges [ 0, Num_LD )
     // output value is 0, 1, or 2.
     virtual int get_dominant_comp( const int &node ) const
-    { return dominant_comp[ local_cap_id[node] ]; }
+    { return dominant_n_comp[ local_cap_id[node] ]; }
 
     // get the Dirichlet node's outward normal vector components.
     // parameter node ranges [ 0, Num_LD )
@@ -43,45 +43,43 @@ class ALocal_Ring_NodalBC
     // parameter node ranges [ 0, Num_LD )
     // comp=0 : x-component; comp=1 : y-component; comp=2 : z-component
     virtual double get_tanvec( const int &node, const int &comp ) const
-    { return tangential_vec[node]( comp ); }
+    { return tangential[node]( comp ); }
 
     // determine whether a given index belongs to the LDN vector
     virtual bool is_inLDN( const int &ii) const
     { return VEC_T::is_invec(LDN, ii); }
 
   private:
+    // Number of caps (equals the number of inlets + the number of outlets)
+    int num_caps;
+
     // Number of local Dirichlet nodes of the ring BC type
     int Num_LD;
 
-    // Global indices of the local Dirichlet nodes of the ring BC type
+    // If Num_LD > 0, store the global indices of the local Dirichlet nodes 
+    // of the ring BC type
     std::vector<int> LDN;
-
-    // Number of caps (equals the number of inlets + the number of outlets)
-    int num_caps;
 
     // If Num_LD > 0, store corresponding cap ID, which ranges [0, num_caps)
     // vector length is Num_LD
     std::vector<int> local_cap_id;
 
-    // Nodal coordinates of all local nodes
-    // vector length is 3 x Num_LD
-    std::vector<double> local_pt_xyz;
-
-    // Tangential vector for all local nodes
-    // vector length is Num_LD
-    std::vector<Vector_3> tangential_vec;
-
     // Dominant component index of each cap's unit normal vector: 0, 1, or 2
     // vector length is num_caps
-    std::vector<int> dominant_comp;
+    std::vector<int> dominant_n_comp;
+
+    // Dominant component index of each node's unit tangential vector: 0, 1, or
+    // 2.
+    // vector length is Num_LD
+    std::vector<int> dominant_t_comp;
 
     // Each cap's unit normal vector
     // vector length is num_caps
     std::vector<Vector_3> outnormal;
 
-    // Each cap's centroid x-y-z coordinates
-    // vector length is 3 x num_caps
-    std::vector<double> centroid;
+    // Tangential vector for all local nodes
+    // vector length is Num_LD
+    std::vector<Vector_3> tangential;
 };
 
 #endif
