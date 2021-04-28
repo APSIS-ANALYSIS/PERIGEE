@@ -65,6 +65,8 @@ ALocal_Ring_NodalBC::ALocal_Ring_NodalBC(
 
     dominant_t_comp[node] = tangential[node].get_dominant_comp();
 
+    // Ensure dominant component indices in the normal and tangential vectors
+    // aren't equal 
     if( dominant_t_comp[node] == dominant_n_comp[ local_cap_id[node] ] )
     {
       Vector_3 temp( tangential[node] );

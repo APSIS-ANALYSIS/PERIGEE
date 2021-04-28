@@ -28,7 +28,7 @@ class Matrix_PETSc_CMM : public Matrix_PETSc
   private:
     // ------------------------------------------------------------------------
     // Type 0 : Generate a matrix accounting for the essential
-    // boundary conditions that describe the in plane motion for 4-dof system
+    // boundary conditions that describe the in plane motion for a 4-dof system
     // like the NS equations.
     // Assumption: the matrix system has 4 degrees-of-freedom per node and the
     //             1st dof is pressure, the next 3 dofs are velocity.
@@ -48,8 +48,8 @@ class Matrix_PETSc_CMM : public Matrix_PETSc
         const ALocal_Ring_NodalBC * const &ring_bc_part );
 
     // ------------------------------------------------------------------------
-    // Type 1: Generate a matrix accounting for the essentuial boundary
-    // conditions that enforce radial motion only for 4-dof system.
+    // Type 1: Generate a matrix accounting for the essential boundary
+    // conditions that enforce purely radial motion for a 4-dof system.
     // Assumption: the matrix system has 4 degrees-of-freedom per node and the
     //             1st dof is pressure, the next 3 dofs are velocity.
     // The constraint equations are

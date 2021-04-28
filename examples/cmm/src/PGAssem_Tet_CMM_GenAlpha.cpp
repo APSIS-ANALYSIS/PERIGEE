@@ -104,6 +104,49 @@ void PGAssem_Tet_CMM_GenAlpha::EssBC_KG(
       VecSetValue(G, row, 0.0, INSERT_VALUES);
     }
   }
+
+  const int local_ring_dir = ringnbc_part->get_Num_LD();
+  if(field > 0 && local_ring_dir > 0)
+  {
+    for(int ii=0; ii<local_ring_dir; ++ii)
+    {
+      const int dnode  = ringnbc_part -> get_LDN( ii );
+      const int dncomp = ringnbc_part -> get_dominant_n_comp( ii );
+      const int dtcomp = ringnbc_part -> get_dominant_t_comp( ii ); 
+
+      // 3 - dncomp - dtcomp gives the remaining dof index
+      if(dncomp + 1 == field)
+      {
+        const int row_a = dnode * dof_mat + dncomp + 1;
+        const int col_b = dnode * dof_mat + dtcomp + 1;
+        const int col_c = dnode * dof_mat + 4 - dncomp - dtcomp;
+
+        const double na = ringnbc_part -> get_outvec(ii, dncomp);
+        const double nb = ringnbc_part -> get_outvec(ii, dtcomp);
+        const double nc = ringnbc_part -> get_outvec(ii, 3 - dncomp - dtcomp);
+
+        VecSetValue(G, row_a, 0.0, INSERT_VALUES);
+        MatSetValue(K, row_a, row_a, na, ADD_VALUES);
+        MatSetValue(K, row_a, col_b, nb, ADD_VALUES);
+        MatSetValue(K, row_a, col_c, nc, ADD_VALUES);
+      }
+      else if(dtcomp + 1 == field)
+      {
+        const int row_b = dnode * dof_mat + dtcomp + 1;
+        const int col_a = dnode * dof_mat + dncomp + 1;
+        const int col_c = dnode * dof_mat + 4 - dncomp - dtcomp;
+
+        const double ta = ringnbc_part -> get_tanvec(ii, dncomp);
+        const double tb = ringnbc_part -> get_tanvec(ii, dtcomp);
+        const double tc = ringnbc_part -> get_tanvec(ii, 3 - dncomp - dtcomp);
+
+        VecSetValue(G, row_b, 0.0, INSERT_VALUES);
+        MatSetValue(K, row_b, row_b, tb, ADD_VALUES);
+        MatSetValue(K, row_b, col_a, ta, ADD_VALUES);
+        MatSetValue(K, row_b, col_c, tc, ADD_VALUES);
+      }
+    } 
+  }
 }
 
 
