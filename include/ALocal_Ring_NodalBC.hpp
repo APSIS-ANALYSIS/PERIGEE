@@ -1,13 +1,13 @@
 #ifndef ALOCAL_RING_NODALBC_HPP
 #define ALOCAL_RING_NODALBC_HPP
-// ==================================================================
+// ============================================================================
 // ALocal_Ring_NodalBC.hpp
 //
 // Analysis-use, ring nodal indices.
 //
 // Author: Ingrid S. Lan
 // Date Created: April 15 2021
-// ==================================================================
+// ============================================================================
 #include "Vector_3.hpp"
 #include "HDF5_Reader.hpp"
 
@@ -25,13 +25,19 @@ class ALocal_Ring_NodalBC
     // Get the number of Dirichlet nodes in the local partition
     virtual int get_Num_LD() const { return Num_LD; }
 
-    // get the Dirichlet node's dominant component index, where the
-    // dominant component of the unit normal vector is the largest in
-    // absolute value
+    // get the Dirichlet node's dominant component index for the unit outward
+    // normal vector, which is the largest in absolute value in it.
     // parameter node ranges [ 0, Num_LD )
     // output value is 0, 1, or 2.
-    virtual int get_dominant_comp( const int &node ) const
+    virtual int get_dominant_n_comp( const int &node ) const
     { return dominant_n_comp[ local_cap_id[node] ]; }
+
+    // get the Dirichlet node's dominant component index for the tangential
+    // vector, which is the largest in absolute value in it.
+    // parameter node ranges [ 0, Num_LD )
+    // output value is 0, 1, or 2.
+    virtual int get_dominant_t_comp( const int &node ) const
+    { return dominant_t_comp[ node ]; }
 
     // get the Dirichlet node's outward normal vector components.
     // parameter node ranges [ 0, Num_LD )

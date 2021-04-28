@@ -129,7 +129,7 @@ void Matrix_PETSc::gen_ring_inplane_bc( const APart_Node * const &pnode_ptr,
   for(int ii=0; ii<num_ring_node; ++ii)
   {
     const int dnode = ring_bc_part -> get_LDN( ii ); // The ring node's nodal index
-    const int dcomp = ring_bc_part -> get_dominant_comp( ii );
+    const int dcomp = ring_bc_part -> get_dominant_n_comp( ii );
     const int row = dnode * dof + dcomp + 1;
     const double bot = -1.0 * ring_bc_part -> get_outvec(ii, dcomp);
     for(int jj=0; jj<3; ++jj)
