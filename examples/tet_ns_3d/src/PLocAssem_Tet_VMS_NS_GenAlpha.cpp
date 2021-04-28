@@ -148,16 +148,16 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_DC(
     double &dc_tau, const double * const &dxi_dx,
     const double &u, const double &v, const double &w ) const
 {
-  //double G11, G12, G13, G22, G23, G33;
-  //get_metric( dxi_dx, G11, G12, G13, G22, G23, G33 );
+  double G11, G12, G13, G22, G23, G33;
+  get_metric( dxi_dx, G11, G12, G13, G22, G23, G33 );
 
-  //dc_tau = G11 * u * u + 2.0 * G12 * u * v + 2.0 * G13 * u * w + G22 * v * v
-  //  + 2.0 * G23 * v * w + G33 * w * w;
+  dc_tau = G11 * u * u + 2.0 * G12 * u * v + 2.0 * G13 * u * w + G22 * v * v
+    + 2.0 * G23 * v * w + G33 * w * w;
 
-  //if(dc_tau > 1.0e-15) dc_tau = rho0 * std::pow(dc_tau, -0.5);
-  //else dc_tau = 0.0;
+  if(dc_tau > 1.0e-15) dc_tau = rho0 * std::pow(dc_tau, -0.5);
+  else dc_tau = 0.0;
 
-  dc_tau = 0.0;
+  //dc_tau = 0.0;
 }
 
 
