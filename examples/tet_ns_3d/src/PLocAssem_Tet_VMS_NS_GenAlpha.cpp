@@ -293,7 +293,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
           + velo_dot_gradR * tau_m * rho0 * rx
           - NA * tau_m * rho0 * r_dot_gradu
           + NA_x * tau_c * div_vel
-          - r_dot_gradR * tau_m_2 * rho0 * rx
+          // - r_dot_gradR * tau_m_2 * rho0 * rx
           + velo_prime_dot_gradR * tau_dc 
           * (u_prime * u_x + v_prime * u_y + w_prime * u_z)
           - NA * rho0 * f1 );
@@ -307,7 +307,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
           + velo_dot_gradR * tau_m * rho0 * ry
           - NA * tau_m * rho0 * r_dot_gradv
           + NA_y * tau_c * div_vel
-          - r_dot_gradR * tau_m_2 * rho0 * ry
+          // - r_dot_gradR * tau_m_2 * rho0 * ry
           + velo_prime_dot_gradR * tau_dc
           * (u_prime * v_x + v_prime * v_y + w_prime * v_z)
           - NA * rho0 * f2 );
@@ -321,7 +321,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
           + velo_dot_gradR * tau_m * rho0 * rz
           - NA * tau_m * rho0 * r_dot_gradw
           + NA_z * tau_c * div_vel
-          - r_dot_gradR * tau_m_2 * rho0 * rz
+          // - r_dot_gradR * tau_m_2 * rho0 * rz
           + velo_prime_dot_gradR * tau_dc
           * (u_prime * w_x + v_prime * w_y + w_prime * w_z)
           - NA * rho0 * f3 );
@@ -464,7 +464,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
           + velo_dot_gradR * tau_m * rho0 * rx
           - NA * tau_m * rho0 * r_dot_gradu
           + NA_x * tau_c * div_vel
-          - r_dot_gradR * tau_m_2 * rho0 * rx
+          // - r_dot_gradR * tau_m_2 * rho0 * rx
           + velo_prime_dot_gradR * tau_dc 
           * (u_prime * u_x + v_prime * u_y + w_prime * u_z)
           - NA * rho0 * f1 );
@@ -478,7 +478,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
           + velo_dot_gradR * tau_m * rho0 * ry
           - NA * tau_m * rho0 * r_dot_gradv
           + NA_y * tau_c * div_vel
-          - r_dot_gradR * tau_m_2 * rho0 * ry
+          // - r_dot_gradR * tau_m_2 * rho0 * ry
           + velo_prime_dot_gradR * tau_dc
           * (u_prime * v_x + v_prime * v_y + w_prime * v_z)
           - NA * rho0 * f2 );
@@ -492,7 +492,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
           + velo_dot_gradR * tau_m * rho0 * rz
           - NA * tau_m * rho0 * r_dot_gradw
           + NA_z * tau_c * div_vel
-          - r_dot_gradR * tau_m_2 * rho0 * rz
+          // - r_dot_gradR * tau_m_2 * rho0 * rz
           + velo_prime_dot_gradR * tau_dc
           * (u_prime * w_x + v_prime * w_y + w_prime * w_z)
           - NA * rho0 * f3 );
