@@ -65,7 +65,12 @@ ALocal_Ring_NodalBC::ALocal_Ring_NodalBC(
 
     dominant_t_comp[node] = tangential[node].get_dominant_comp();
 
-    SYS_T::print_fatal_if(dominant_t_comp[node] == dominant_n_comp[ local_cap_id[node] ], "Error: ALocal_Ring_NodalBC the tangential and normal vector have the same dominant component.\n");
+    if( dominant_t_comp[node] == dominant_n_comp[ local_cap_id[node] ] )
+    {
+      Vector_3 temp( tangential[node] );
+      temp( dominant_t_comp[node] ) = 0.0;
+      dominant_t_comp[node] = temp.get_dominant_comp();
+    }
   }
 
   VEC_T::clean( local_pt_xyz );
