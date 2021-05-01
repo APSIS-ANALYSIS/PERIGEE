@@ -16,7 +16,6 @@ NodalBC_3D_ring::NodalBC_3D_ring(const int &nFunc)
   dominant_t_comp.clear();
   outnormal.clear();
   tangential.clear();
-  centroid.clear();
   pt_xyz.clear();
 
   std::cout<<"===> NodalBC_3D_ring::empty is generated. \n";
@@ -41,7 +40,6 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
 
   num_caps = cap_files.size();
   dominant_n_comp.resize(num_caps);
-  centroid.resize(3 * num_caps);
 
   outnormal = inflow_outward_vec;
   Vector_3 outvec = Vector_3( inflow_outward_vec[0], inflow_outward_vec[1], inflow_outward_vec[2] );
@@ -84,7 +82,8 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
       if( numpts != static_cast<int>(gnode.size()) )
         SYS_T::print_fatal("Error: numpts != global_node.size() for cap %d! \n", ii);
 
-      compute_cap_centroid( ii, pts );
+      Vector_3 centroid;
+      compute_cap_centroid( pts, centroid );
 
       int num_outline_pts = 0;
       for(unsigned int jj=0; jj<gnode.size(); ++jj)
@@ -123,7 +122,8 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
       if( numpts != static_cast<int>(gnode.size()) )
         SYS_T::print_fatal("Error: numpts != global_node.size() for cap %d! \n", ii);
 
-      compute_cap_centroid( ii, pts );
+      Vector_3 centroid;
+      compute_cap_centroid( pts, centroid );
 
       int num_outline_pts = 0;
       for(unsigned int jj=0; jj<gnode.size(); ++jj)
@@ -162,20 +162,20 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
 }
 
 
-void NodalBC_3D_ring::compute_cap_centroid( const int &cap_id, const std::vector<double> &pts )
+void NodalBC_3D_ring::compute_cap_centroid( const std::vector<double> &pts, Vector_3 &centroid ) const
 {
   const int num_node = static_cast<int>( pts.size() / 3 );
 
   for(int ii=0; ii<num_node; ++ii)
   {
-    centroid[3*cap_id + 0] += pts[3*ii + 0];
-    centroid[3*cap_id + 1] += pts[3*ii + 1];
-    centroid[3*cap_id + 2] += pts[3*ii + 2];
+    centroid(0) += pts[3*ii + 0];
+    centroid(1) += pts[3*ii + 1];
+    centroid(2) += pts[3*ii + 2];
   }
 
-  centroid[3*cap_id + 0] /= (double) num_node;
-  centroid[3*cap_id + 1] /= (double) num_node;
-  centroid[3*cap_id + 2] /= (double) num_node;
+  centroid(0) /= (double) num_node;
+  centroid(1) /= (double) num_node;
+  centroid(2) /= (double) num_node;
 }
 
 
