@@ -12,8 +12,10 @@ NodalBC_3D_ring::NodalBC_3D_ring(const int &nFunc)
   
   num_caps = 0;
   cap_id.clear();
-  dominant_comp.clear();
+  dominant_n_comp.clear();
+  dominant_t_comp.clear();
   outnormal.clear();
+  tangential.clear();
   centroid.clear();
   pt_xyz.clear();
 
@@ -38,12 +40,12 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
   cap_files.insert( cap_files.begin(), inflow_file ); 
 
   num_caps = cap_files.size();
-  dominant_comp.resize(num_caps);
+  dominant_n_comp.resize(num_caps);
   centroid.resize(3 * num_caps);
 
   outnormal = inflow_outward_vec;
   Vector_3 outvec = Vector_3( inflow_outward_vec[0], inflow_outward_vec[1], inflow_outward_vec[2] );
-  dominant_comp[0] = outvec.get_dominant_comp();
+  dominant_n_comp[0] = outvec.get_dominant_comp();
 
   for(unsigned int ii=0; ii<outflow_outward_vec.size(); ++ii)
   {
@@ -52,7 +54,7 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
     outnormal.push_back(outflow_outward_vec[ii][2]);
 
     outvec = Vector_3( outflow_outward_vec[ii][0], outflow_outward_vec[ii][1], outflow_outward_vec[ii][2] );
-    dominant_comp[ii + 1] = outvec.get_dominant_comp();
+    dominant_n_comp[ii + 1] = outvec.get_dominant_comp();
   }
 
   int numpts, numcels;
@@ -174,6 +176,33 @@ void NodalBC_3D_ring::compute_cap_centroid( const int &cap_id, const std::vector
   centroid[3*cap_id + 0] /= (double) num_node;
   centroid[3*cap_id + 1] /= (double) num_node;
   centroid[3*cap_id + 2] /= (double) num_node;
+}
+
+
+void NodalBC_3D_ring::compute_tangential( const int &cap_id, const Vector_3 &centroid,
+    const int &pt_x, const int &pt_y, const int &pt_z )
+{
+  // Generate radial vector using nodal & centroidal coordinates
+  Vector_3 radial_vec = Vector_3( pt_x, pt_y, pt_z );
+  radial_vec -= centroid;
+
+  Vector_3 normal_vec = Vector_3( outnormal[3*cap_id], outnormal[3*cap_id+1], outnormal[3*cap_id+2] );
+  Vector_3 tan_vec    = cross_product( normal_vec, radial_vec );
+  tan_vec.normalize();
+
+  for(int ii=0; ii<3; ++ii)
+    tangential.push_back( tan_vec(ii) );
+
+  // Ensure dominant component indices in the normal and tangential vectors
+  // aren't equal 
+  if( tan_vec.get_dominant_comp() == dominant_n_comp[ cap_id ] )
+  {
+    Vector_3 temp( tan_vec );
+    temp( tan_vec.get_dominant_comp() ) = 0.0;
+    dominant_t_comp.push_back( temp.get_dominant_comp() );
+  }
+  else
+    dominant_t_comp.push_back( tan_vec.get_dominant_comp() );
 }
 
 // EOF

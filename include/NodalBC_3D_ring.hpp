@@ -45,7 +45,7 @@ class NodalBC_3D_ring : public INodalBC
 
     virtual void get_cap_id( std::vector<int> &capid ) const { capid = cap_id; }
 
-    virtual void get_dominant_comp( std::vector<int> &dom_comp ) const { dom_comp = dominant_comp; }
+    virtual void get_dominant_n_comp( std::vector<int> &dom_comp ) const { dom_comp = dominant_n_comp; }
 
     virtual void get_outnormal( std::vector<double> &outvec ) const { outvec = outnormal; } 
 
@@ -69,10 +69,17 @@ class NodalBC_3D_ring : public INodalBC
 
     // Dominant component index of each cap's unit normal vector: 0, 1, or 2
     // length num_caps
-    std::vector<int> dominant_comp;
+    std::vector<int> dominant_n_comp;
+
+    // Dominant component index of each ring node's unit tangential vector: 0, 1, or 2
+    // length num_dir_nodes
+    std::vector<int> dominant_t_comp;
 
     // Each cap's unit normal vector, length 3 x num_caps
     std::vector<double> outnormal;
+
+    // Each ring node's unit tangential vector, length 3 x num_dir_nodes
+    std::vector<double> tangential;
 
     // Each cap's centroid x-y-z coordinates, length 3 x num_caps
     std::vector<double> centroid;
@@ -83,6 +90,10 @@ class NodalBC_3D_ring : public INodalBC
     // Compute centroid coordinates given a cap's nodal coordinates
     // \para cap_id: [0, num_caps]
     void compute_cap_centroid( const int &cap_id, const std::vector<double> &pts );
+
+    // Compute unit tangential vector given nodal coordinates and the corresponding cap centroid
+    void compute_tangential( const int &cap_id, const Vector_3 &centroid,
+        const int &pt_x, const int &pt_y, const int &pt_z );
 };
 
 #endif

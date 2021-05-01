@@ -74,8 +74,7 @@ class ALocal_Ring_NodalBC
     // vector length is num_caps
     std::vector<int> dominant_n_comp;
 
-    // Dominant component index of each node's unit tangential vector: 0, 1, or
-    // 2.
+    // Dominant component index of each node's unit tangential vector: 0, 1, or 2.
     // vector length is Num_LD
     std::vector<int> dominant_t_comp;
 
