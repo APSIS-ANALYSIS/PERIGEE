@@ -19,7 +19,7 @@ class ALocal_EBC_wall : public ALocal_EBC
   public:
     ALocal_EBC_wall( const std::string &fileBaseName,
         const int &in_cpu_rank, const IQuadPts * const &quad,
-        const std::string &gname = "/ebc",
+        const std::string &gname = "ebc_wall",
         const bool &prestress_flag = false );
 
     virtual ~ALocal_EBC_wall();
@@ -61,6 +61,8 @@ class ALocal_EBC_wall : public ALocal_EBC
 
     // Fluid density used to generate the youngs modulus for arteries at
     // the preprocessing stage.
+    // Note: This variable is used to remind the user that a 'fluid density'
+    //       has been definied at the preprocessing stage.
     double fluid_density;
 
     // If this partition owns any part of the wall, the thickness and
