@@ -16,7 +16,6 @@ NodalBC_3D_ring::NodalBC_3D_ring(const int &nFunc)
   dominant_t_comp.clear();
   outnormal.clear();
   tangential.clear();
-  pt_xyz.clear();
 
   std::cout<<"===> NodalBC_3D_ring::empty is generated. \n";
 }
@@ -94,9 +93,7 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
         {
           dir_nodes.push_back( static_cast<unsigned int>( gnode[jj] ) );
           cap_id.push_back( ii );
-          pt_xyz.push_back( pts[3*jj]     );
-          pt_xyz.push_back( pts[3*jj + 1] );
-          pt_xyz.push_back( pts[3*jj + 2] );
+          compute_tangential( ii, centroid, pts[3*jj], pts[3*jj + 1], pts[3*jj + 2]);
           num_outline_pts += 1;
         }
       }
@@ -134,9 +131,7 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
         {
           dir_nodes.push_back( static_cast<unsigned int>( gnode[jj] ) );
           cap_id.push_back( ii );
-          pt_xyz.push_back( pts[3*jj]     );
-          pt_xyz.push_back( pts[3*jj + 1] );
-          pt_xyz.push_back( pts[3*jj + 2] );
+          compute_tangential( ii, centroid, pts[3*jj], pts[3*jj + 1], pts[3*jj + 2]);
           num_outline_pts += 1;
         }
       }

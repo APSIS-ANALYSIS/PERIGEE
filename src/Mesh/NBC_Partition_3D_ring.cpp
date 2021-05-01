@@ -31,9 +31,8 @@ NBC_Partition_3D_ring::NBC_Partition_3D_ring(
     } 
   }
 
-  nbc -> get_dominant_comp( dominant_comp );
+  nbc -> get_dominant_n_comp( dominant_comp );
   nbc -> get_outnormal( outnormal );
-  nbc -> get_centroid( centroid );
 }
 
 NBC_Partition_3D_ring::~NBC_Partition_3D_ring()
@@ -64,8 +63,6 @@ void NBC_Partition_3D_ring::write_hdf5( const char * FileName ) const
   h5writer->write_intVector( group_id, "cap_dominant_comp", dominant_comp );
 
   h5writer->write_doubleVector( group_id, "cap_out_normal", outnormal );
-
-  h5writer->write_doubleVector( group_id, "cap_centroid", centroid );
 
   delete h5writer; H5Gclose(group_id); H5Fclose(file_id);
 }
