@@ -1,6 +1,6 @@
 #include "CVFlowRate_Unsteady.hpp"
 
-CVFlowRate_Unsteady::CVFlowRate_Unsteady( const char * const &filename, const bool &prestress_flag )
+CVFlowRate_Unsteady::CVFlowRate_Unsteady( const char * const &filename )
 {
   SYS_T::commPrint("CVFlowRate_Unsteady: data read from %s \n", filename);
 
@@ -78,19 +78,9 @@ CVFlowRate_Unsteady::CVFlowRate_Unsteady( const char * const &filename, const bo
   for(unsigned int ii = 0; ii < flow_waveform.size(); ++ii )
     flow_waveform[ii] = get_flow_rate(ii * 0.001);
 
-  // If solving for prestress, prescribe steady diastolic inflow
-  if(prestress_flag)
-  {
-    coef_a[0] = *std::min_element(flow_waveform.begin(), flow_waveform.end());
-    num_of_mode = 0;
-    std::fill(flow_waveform.begin(), flow_waveform.end(), coef_a[0]);
-  }
-
   // Calculate the flow rate and record them on disk as 
   // Inlet_flowrate.txt with sampling interval 0.001
-  PetscMPIInt rank;
-  MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
-  if( rank == 0 )
+  if( SYS_T::get_MPI_rank() == 0 )
   {
     std::ofstream ofile;
     ofile.open( "Inlet_flowrate.txt", std::ofstream::out | std::ofstream::trunc );
