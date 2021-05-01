@@ -311,7 +311,7 @@ int main( int argc, char *argv[] )
   if( SYS_T::file_exist( inflow_file ) )
     inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str(), prestress_flag );
   else
-    inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_tgt_rate, prestress_flag );
+    inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_tgt_rate );
 
   inflow_rate_ptr->print_info();
 

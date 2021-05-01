@@ -1,19 +1,11 @@
 #include "CVFlowRate_Linear2Steady.hpp"
 
 CVFlowRate_Linear2Steady::CVFlowRate_Linear2Steady(
-    const double &in_time, const double &flrate,
-    const bool &prestress_flag)
-: target_flow_rate(flrate)
+    const double &in_thred_time, const double &flrate )
+: thred_time(in_thred_time), target_flow_rate(flrate)
 {
-
-  // If solving for prestress, prescribe steady target flowrate
-  if(prestress_flag) thred_time = 0.0;
-  else thred_time = in_time;
-
   // Calculate flow rate and record in txt file 
-  PetscMPIInt rank;
-  MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
-  if( rank == 0 )
+  if( SYS_T::get_MPI_rank() == 0 )
   {
     std::ofstream ofile;
     ofile.open( "Inlet_flowrate.txt", std::ofstream::out | std::ofstream::trunc );
