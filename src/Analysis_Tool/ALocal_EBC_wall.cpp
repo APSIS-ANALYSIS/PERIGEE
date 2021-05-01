@@ -40,7 +40,10 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
        "ALocal_EBC_wall: size of qua_prestress is inconsistent with face_nqp. \n");
    }
    else
+   {
      qua_prestress.resize( 6 * face_nqp * num_local_cell[0] );
+     for(int ii=0; ii< 6 * face_nqp * num_local_cell[0]; ++ii) qua_prestress[ii] = 0.0;
+   }
   }
 
   delete h5r; H5Fclose( file_id );
