@@ -21,7 +21,7 @@
 #include "FEAElement_Triangle6_3D_der0.hpp"
 #include "FEAElement_Triangle3_membrane.hpp"
 #include "FEAElement_Triangle6_membrane.hpp"
-#include "CVFlowRate_Unsteady.hpp"
+#include "CVFlowRate_Steady.hpp"
 #include "CVFlowRate_Linear2Steady.hpp"
 #include "GenBC_Resistance.hpp"
 #include "GenBC_RCR.hpp"
@@ -309,7 +309,7 @@ int main( int argc, char *argv[] )
   // If inflow file exists, prescribe steady flow at the diastolic (min) value.
   // Otherwise, prescribe steady flow at the target value.
   if( SYS_T::file_exist( inflow_file ) )
-    inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str(), prestress_flag );
+    inflow_rate_ptr = new CVFlowRate_Steady( inflow_file.c_str(), prestress_flag );
   else
     inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_tgt_rate );
 
