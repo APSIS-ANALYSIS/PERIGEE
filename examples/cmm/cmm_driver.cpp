@@ -305,7 +305,7 @@ int main( int argc, char *argv[] )
   // If inflow file exists, prescribe it. Otherwise, prescribe an inflow that 
   // linearly increases until a steady flow rate.
   if( SYS_T::file_exist( inflow_file ) )
-    inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str(), prestress_flag );
+    inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
   else
     inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_tgt_rate );
 
