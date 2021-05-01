@@ -229,10 +229,23 @@ class INodalBC
     {SYS_T::commPrint("Warning: get_dominant_n_comp is not implemented. \n");}
 
     // --------------------------------------------------------------
+    // get_dominant_t_comp returns the dominant comp index of each node's
+    // unit tangential vector
+    // --------------------------------------------------------------
+    virtual void get_dominant_t_comp( std::vector<int> &dom_comp ) const 
+    {SYS_T::commPrint("Warning: get_dominant_t_comp is not implemented. \n");}
+
+    // --------------------------------------------------------------
     // get_outnormal returns each cap's unit normal vector
     // --------------------------------------------------------------
     virtual void get_outnormal( std::vector<double> &outvec ) const
     {SYS_T::commPrint("Warning: get_outnormal is not implemented. \n");}
+  
+    // --------------------------------------------------------------
+    // get_tangential returns each node's unit tangential vector
+    // --------------------------------------------------------------
+    virtual void get_tangential( std::vector<double> &outvec ) const
+    {SYS_T::commPrint("Warning: get_tangential is not implemented. \n");}
   
   protected:
     std::vector<unsigned int> dir_nodes;

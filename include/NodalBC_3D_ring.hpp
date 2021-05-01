@@ -47,7 +47,11 @@ class NodalBC_3D_ring : public INodalBC
 
     virtual void get_dominant_n_comp( std::vector<int> &dom_comp ) const { dom_comp = dominant_n_comp; }
 
+    virtual void get_dominant_t_comp( std::vector<int> &dom_comp ) const { dom_comp = dominant_t_comp; }
+
     virtual void get_outnormal( std::vector<double> &outvec ) const { outvec = outnormal; } 
+
+    virtual void get_tangential( std::vector<double> &outvec ) const { outvec = tangential; } 
 
   private:
     NodalBC_3D_ring() {};
