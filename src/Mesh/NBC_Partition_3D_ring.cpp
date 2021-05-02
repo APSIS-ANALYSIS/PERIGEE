@@ -66,7 +66,7 @@ void NBC_Partition_3D_ring::write_hdf5( const char * FileName ) const
 
   h5writer->write_intScalar( group_id, "num_caps", num_caps );
 
-  h5writer->write_intVector( group_id, "cap_dominant_comp", dominant_n_comp );
+  h5writer->write_intVector( group_id, "cap_dominant_n_comp", dominant_n_comp );
 
   h5writer->write_doubleVector( group_id, "cap_out_normal", outnormal );
 

@@ -37,7 +37,7 @@ class ALocal_Ring_NodalBC
     // parameter node ranges [ 0, Num_LD )
     // output value is 0, 1, or 2.
     virtual int get_dominant_t_comp( const int &node ) const
-    { return dominant_t_comp[ node ]; }
+    { return local_dominant_t_comp[ node ]; }
 
     // get the Dirichlet node's outward normal vector components.
     // parameter node ranges [ 0, Num_LD )
@@ -49,7 +49,7 @@ class ALocal_Ring_NodalBC
     // parameter node ranges [ 0, Num_LD )
     // comp=0 : x-component; comp=1 : y-component; comp=2 : z-component
     virtual double get_tanvec( const int &node, const int &comp ) const
-    { return tangential[node]( comp ); }
+    { return local_tangential[node]( comp ); }
 
     // determine whether a given index belongs to the LDN vector
     virtual bool is_inLDN( const int &ii) const
@@ -76,7 +76,7 @@ class ALocal_Ring_NodalBC
 
     // Dominant component index of each node's unit tangential vector: 0, 1, or 2.
     // vector length is Num_LD
-    std::vector<int> dominant_t_comp;
+    std::vector<int> local_dominant_t_comp;
 
     // Each cap's unit normal vector
     // vector length is num_caps
@@ -84,7 +84,7 @@ class ALocal_Ring_NodalBC
 
     // Tangential vector for all local nodes
     // vector length is Num_LD
-    std::vector<Vector_3> tangential;
+    std::vector<Vector_3> local_tangential;
 };
 
 #endif
