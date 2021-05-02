@@ -105,7 +105,7 @@ ElemBC_3D_tet_outflow::ElemBC_3D_tet_outflow(
   }
   else SYS_T::print_fatal("Error: unknown element type.\n");
 
-  std::cout<<"===> ElemBC_3D_tet_outflow intNA vector generated.\n";
+  std::cout<<"     ElemBC_3D_tet_outflow intNA vector generated.\n";
 }
 
 

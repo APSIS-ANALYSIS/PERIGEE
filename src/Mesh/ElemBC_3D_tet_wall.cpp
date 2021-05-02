@@ -31,6 +31,9 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
  
   // Write out vtp's with wall properties
   write_vtk(ebc_id, "varwallprop");
+
+  std::cout<<"     ElemBC_3D_tet_wall thickness is "<<uniform_thickness;
+  std::cout<<" and Young's modulus is "<<uniform_youngsmod<<std::endl;
 }
 
 ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
@@ -89,6 +92,13 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 
   // Write out vtp's with wall properties
   write_vtk(ebc_id, "varwallprop");
+  
+  std::cout<<"     ElemBC_3D_tet_wall generated from "<<walls_combined<<" and ";
+  std::cout<<centerlines_combined<<std::endl;
+  std::cout<<"     thickness ranges in ["<<*std::min_element(thickness.begin(), thickness.end())
+    <<" , "<<*std::max_element(thickness.begin(), thickness.end())<<"] \n";
+  std::cout<<"     Young's modulus ranges in ["<<*std::min_element(youngsmod.begin(), youngsmod.end())
+    <<" , "<<*std::max_element(youngsmod.begin(), youngsmod.end())<<"] \n";
 }
 
 
@@ -192,6 +202,13 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 
   // Write out vtp's with wall properties
   write_vtk(ebc_id, "varwallprop");
+  
+  std::cout<<"     ElemBC_3D_tet_wall generated from "<<walls_combined<<" and ";
+  std::cout<<centerlines_combined<<std::endl;
+  std::cout<<"     thickness ranges in ["<<*std::min_element(thickness.begin(), thickness.end())
+    <<" , "<<*std::max_element(thickness.begin(), thickness.end())<<"] \n";
+  std::cout<<"     Young's modulus ranges in ["<<*std::min_element(youngsmod.begin(), youngsmod.end())
+    <<" , "<<*std::max_element(youngsmod.begin(), youngsmod.end())<<"] \n";
 }
 
 
