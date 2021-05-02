@@ -78,9 +78,6 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
 
       TET_T::read_vtp_grid( cap_files[ii], numpts, numcels, pts, ien, gnode, gelem );
      
-      if( numpts != static_cast<int>(gnode.size()) )
-        SYS_T::print_fatal("Error: numpts != global_node.size() for cap %d! \n", ii);
-
       Vector_3 centroid;
       compute_cap_centroid( pts, centroid );
 
@@ -115,9 +112,6 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
       SYS_T::file_check( cap_files[ii] );
 
       TET_T::read_vtu_grid( cap_files[ii], numpts, numcels, pts, ien, gnode, gelem );
-
-      if( numpts != static_cast<int>(gnode.size()) )
-        SYS_T::print_fatal("Error: numpts != global_node.size() for cap %d! \n", ii);
 
       Vector_3 centroid;
       compute_cap_centroid( pts, centroid );
