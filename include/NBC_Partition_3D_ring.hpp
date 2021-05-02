@@ -35,19 +35,19 @@ class NBC_Partition_3D_ring : public NBC_Partition_3D
     // length Num_LD
     std::vector<int> local_cap_id;
 
-    // Store local ring nodal x-y-z coordinates 
-    // length Num_LD
-    std::vector<double> local_pt_xyz;
-
     // Dominant component index of each cap's unit normal vector: 0, 1, or 2
     // length num_caps
-    std::vector<int> dominant_comp;
+    std::vector<int> dominant_n_comp;
+
+    // Dominant component index of each node's unit tangential vector: 0, 1, or 2
+    // length Num_LD
+    std::vector<int> local_dominant_t_comp;
 
     // Each cap's unit normal vector, length 3 x num_caps
     std::vector<double> outnormal;
 
-    // Each cap's centroid x-y-z coordinates, length 3 x num_caps
-    std::vector<double> centroid;
+    // Each node's unit tangential vector, length 3 x Num_LD
+    std::vector<double> local_tangential;
 };
 
 #endif
