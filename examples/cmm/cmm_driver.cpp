@@ -314,8 +314,6 @@ int main( int argc, char *argv[] )
   // ===== Generate a sparse matrix for enforcing nodal BCs ====
   Matrix_PETSc * pmat = new Matrix_PETSc_CMM(pNode, locnbc, locringnbc, 1);
 
-  pmat->gen_perm_bc(pNode, locnbc);
-
   // ===== Generalized-alpha =====
   SYS_T::commPrint("===> Set up the generalized-alpha time integration scheme.\n");
 

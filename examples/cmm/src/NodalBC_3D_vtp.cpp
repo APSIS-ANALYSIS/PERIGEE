@@ -98,8 +98,8 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &inflow_vtp_file,
     const std::vector< std::vector<double> > &outflow_outward_vec,
     const int &type, const int &comp, const int &nFunc )
 {
-  if( type != 0 && type != 1 )
-    SYS_T::print_fatal("Error: NodalBC_3D_vtp: No such nodal BC type.\n");
+  // type = 0 : in-plane motion, type = 1 radial motion
+  SYS_T::print_fatal_if( type != 0 && type != 1, "Error: NodalBC_3D_vtp: No such nodal BC type.\n");
 
   dir_nodes.clear();
   per_slave_nodes.clear();
