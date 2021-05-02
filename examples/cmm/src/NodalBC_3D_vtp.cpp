@@ -136,8 +136,8 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &inflow_vtp_file,
 
   compute_cap_centroid( pts, centroid );
 
-  std::vector<int> num_dom_n_pts, num_dom_t_pts;
-  num_dom_n_pts.resize( 1 + num_outlets ); num_dom_t_pts.resize( 1 + num_outlets );
+  std::vector<int> num_dom_n_pts( 1 + num_outlets, 0 );
+  std::vector<int> num_dom_t_pts( 1 + num_outlets, 0 );
 
   int num_outline_pts = 0;
   for(unsigned int ii=0; ii<gnode.size(); ++ii)
@@ -233,7 +233,7 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &inflow_vtp_file,
   std::cout<<"     interior of "<<inflow_vtp_file<<std::endl;
   std::cout<<"     outline of "<<inflow_vtp_file<<": "<<num_dom_n_pts[0]<<" dom_n nodes, "<< num_dom_t_pts[0]<<" dom_t nodes"<<std::endl;
   for(unsigned int ii=0; ii<num_outlets; ++ii)
-    std::cout<<"     outline of "<<outflow_vtp_files[ii+1]<<": "<<num_dom_n_pts[ii+1]<<" dom_n nodes, "<< num_dom_t_pts[ii+1]<<" dom_t nodes"<<std::endl;
+    std::cout<<"     outline of "<<outflow_vtp_files[ii]<<": "<<num_dom_n_pts[ii+1]<<" dom_n nodes, "<< num_dom_t_pts[ii+1]<<" dom_t nodes"<<std::endl;
   std::cout<<"     is generated. \n";
 }
 

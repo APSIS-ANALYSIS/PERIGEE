@@ -29,21 +29,21 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
     h5r -> read_doubleVector( subgroup_name.c_str(), "thickness", thickness );
     h5r -> read_doubleVector( subgroup_name.c_str(), "youngsmod", youngsmod );
 
-   // If the prestress is solved, read the prestress data
-   // otherwise, just allocate a container for prestress data at each quadrature
-   // points
-   if( !solve_prestress )
-   {
-     h5r -> read_doubleVector( subgroup_name.c_str(), "prestress", qua_prestress );
+    // If the prestress is solved, read the prestress data
+    // otherwise, just allocate a container for prestress data at each quadrature
+    // points
+    if( !solve_prestress )
+    {
+      h5r -> read_doubleVector( subgroup_name.c_str(), "prestress", qua_prestress );
 
-     SYS_T::print_fatal_if( static_cast<int>( qua_prestress.size() ) != 6 * face_nqp * num_local_cell[0],
-       "ALocal_EBC_wall: size of qua_prestress is inconsistent with face_nqp. \n");
-   }
-   else
-   {
-     qua_prestress.resize( 6 * face_nqp * num_local_cell[0] );
-     for(int ii=0; ii< 6 * face_nqp * num_local_cell[0]; ++ii) qua_prestress[ii] = 0.0;
-   }
+      SYS_T::print_fatal_if( static_cast<int>( qua_prestress.size() ) != 6 * face_nqp * num_local_cell[0],
+        "ALocal_EBC_wall: size of qua_prestress is inconsistent with face_nqp. \n");
+    }
+    else
+    {
+      qua_prestress.resize( 6 * face_nqp * num_local_cell[0] );
+      for(int ii=0; ii< 6 * face_nqp * num_local_cell[0]; ++ii) qua_prestress[ii] = 0.0;
+    }
   }
 
   delete h5r; H5Fclose( file_id );
