@@ -124,8 +124,13 @@ void PGAssem_Tet_CMM_GenAlpha::EssBC_KG(
         const double na = ringnbc_part -> get_outvec(ii, dncomp);
         const double nb = ringnbc_part -> get_outvec(ii, dtcomp);
         const double nc = ringnbc_part -> get_outvec(ii, 3 - dncomp - dtcomp);
-
+        
         VecSetValue(G, row_a, 0.0, INSERT_VALUES);
+        
+        // correct the previously add 1.0 due to Dirichlet BC enforcement
+        MatSetValue(K, row_a, row_a, 1.0, ADD_VALUES);
+        
+        // add the actual constraint equation in the normal direction
         MatSetValue(K, row_a, row_a, na, ADD_VALUES);
         MatSetValue(K, row_a, col_b, nb, ADD_VALUES);
         MatSetValue(K, row_a, col_c, nc, ADD_VALUES);
@@ -140,7 +145,17 @@ void PGAssem_Tet_CMM_GenAlpha::EssBC_KG(
         const double tb = ringnbc_part -> get_tanvec(ii, dtcomp);
         const double tc = ringnbc_part -> get_tanvec(ii, 3 - dncomp - dtcomp);
 
+        if(dnode == 68)
+        {
+          std::cout<<row_b<<'\t'<<ta<<'\t'<<tb<<'\t'<<tc<<'\n';
+        }
+
         VecSetValue(G, row_b, 0.0, INSERT_VALUES);
+
+        // correct the previously add 1.0 due to Dirichlet BC enforcement
+        MatSetValue(K, row_b, row_b, -1.0, ADD_VALUES);
+
+        // add the actual constraint equation in the tangential direction
         MatSetValue(K, row_b, row_b, tb, ADD_VALUES);
         MatSetValue(K, row_b, col_a, ta, ADD_VALUES);
         MatSetValue(K, row_b, col_c, tc, ADD_VALUES);
