@@ -81,7 +81,7 @@ CVFlowRate_Unsteady::CVFlowRate_Unsteady( const char * const &filename )
     std::ofstream ofile;
     ofile.open( "Inlet_flowrate.txt", std::ofstream::out | std::ofstream::trunc );
     for(double tt = 0.0; tt <= period; tt += 0.001 )
-      ofile << tt << "\t" <<get_flow_rate(tt)<< "\n";
+      ofile << tt <<'\t'<<get_flow_rate(tt)<< '\n';
     ofile.close();
   }
 

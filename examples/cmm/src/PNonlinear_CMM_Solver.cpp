@@ -273,7 +273,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
     
     SYS_T::commPrint("  --- nl_res: %e \n", residual_norm);
 
-    // DEBUGGING ISL 3/6/2021
+    // Print the residual norm of the kienmatic equation
     double kinematic_residual_norm = 0.0;
     VecNorm(G_kinematic.solution, NORM_2, &kinematic_residual_norm);
     SYS_T::commPrint("  --- kinematic_res: %e \n", kinematic_residual_norm);

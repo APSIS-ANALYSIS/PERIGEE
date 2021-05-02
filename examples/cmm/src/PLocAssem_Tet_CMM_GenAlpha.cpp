@@ -1100,12 +1100,15 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     // Add prestress: convert from Voigt notation (comps 11, 22, 33, 12, 23, 31)
     const int qua6 = 6 * qua;
 
-    Matrix_3x3 prestress = Matrix_3x3(
-        qua_prestress[qua6],   qua_prestress[qua6+3], qua_prestress[qua6+5],
-        qua_prestress[qua6+3], qua_prestress[qua6+1], qua_prestress[qua6+4],
-        qua_prestress[qua6+5], qua_prestress[qua6+4], qua_prestress[qua6+2] );
-
-    sigma[qua] += prestress;
+    sigma[qua](0,0) += qua_prestress[qua6];
+    sigma[qua](0,1) += qua_prestress[qua6+3];
+    sigma[qua](0,2) += qua_prestress[qua6+5];
+    sigma[qua](1,0) += qua_prestress[qua6+3];
+    sigma[qua](1,1) += qua_prestress[qua6+1];
+    sigma[qua](1,2) += qua_prestress[qua6+4];
+    sigma[qua](2,0) += qua_prestress[qua6+5];
+    sigma[qua](2,1) += qua_prestress[qua6+4];
+    sigma[qua](2,2) += qua_prestress[qua6+2];
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
@@ -1220,12 +1223,15 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     // Add prestress: convert from Voigt notation (comps 11, 22, 33, 12, 23, 31)
     const int qua6 = 6 * qua;
 
-    Matrix_3x3 prestress = Matrix_3x3(
-        qua_prestress[qua6],   qua_prestress[qua6+3], qua_prestress[qua6+5],
-        qua_prestress[qua6+3], qua_prestress[qua6+1], qua_prestress[qua6+4],
-        qua_prestress[qua6+5], qua_prestress[qua6+4], qua_prestress[qua6+2] );
-
-    sigma[qua] += prestress;
+    sigma[qua](0,0) += qua_prestress[qua6];
+    sigma[qua](0,1) += qua_prestress[qua6+3];
+    sigma[qua](0,2) += qua_prestress[qua6+5];
+    sigma[qua](1,0) += qua_prestress[qua6+3];
+    sigma[qua](1,1) += qua_prestress[qua6+1];
+    sigma[qua](1,2) += qua_prestress[qua6+4];
+    sigma[qua](2,0) += qua_prestress[qua6+5];
+    sigma[qua](2,1) += qua_prestress[qua6+4];
+    sigma[qua](2,2) += qua_prestress[qua6+2];
 
     // Basis function gradients with respect to global coords
     // dR/dx_{i} = Q_{ji} * dR/dxl_{j}. Note that dR/dzl = 0.0

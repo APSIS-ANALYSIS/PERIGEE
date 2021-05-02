@@ -67,8 +67,7 @@ class TimeMethod_GenAlpha
     // This constructor gives optimal damping for either 1st or 2nd
     // order systems.
     // --------------------------------------------------------------
-    TimeMethod_GenAlpha( const double &input_spectral, 
-        const bool &input_is2ndorder );   
+    TimeMethod_GenAlpha( const double &input_spectral, const bool &is_2ndorder );   
 
     ~TimeMethod_GenAlpha();
 
