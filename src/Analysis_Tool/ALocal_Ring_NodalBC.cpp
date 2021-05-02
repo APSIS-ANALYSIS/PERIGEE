@@ -15,13 +15,12 @@ ALocal_Ring_NodalBC::ALocal_Ring_NodalBC(
 
   num_caps = h5r -> read_intScalar( gname.c_str(), "num_caps" );
 
-  h5r -> read_intVector( gname.c_str(), "cap_dominant_comp", dominant_n_comp );
+  h5r -> read_intVector( gname.c_str(), "cap_dominant_n_comp", dominant_n_comp );
 
   std::vector<double> outnormal_vec;
   h5r -> read_doubleVector( gname.c_str(), "cap_out_normal", outnormal_vec );
 
   outnormal.resize(num_caps);
-
   for(int ii=0; ii<num_caps; ++ii)
   {
     outnormal[ii](0) = outnormal_vec[3*ii+0];
@@ -29,64 +28,38 @@ ALocal_Ring_NodalBC::ALocal_Ring_NodalBC(
     outnormal[ii](2) = outnormal_vec[3*ii+2];
   }
 
-  // each cap's centroid xyz coordinates
-  std::vector<double> centroid; // length is 3 x num_caps
-
-  h5r -> read_doubleVector( gname.c_str(), "cap_centroid", centroid );
-
   // If this sub-domain contains local ring nodes,
-  // load the LDN array, the corresponding cap ids, and the ring nodes'
-  // coordinates
-  std::vector<double> local_pt_xyz; // length is 3 x Num_LD
+  // load the LDN array, the corresponding cap ids, unit tangential vectors,
+  // and the dominant tangential components 
   if( Num_LD > 0 )
   {
     h5r->read_intVector( gname.c_str(), "LDN", LDN );
     h5r->read_intVector( gname.c_str(), "local_cap_id", local_cap_id );
-    h5r->read_doubleVector( gname.c_str(), "local_pt_xyz", local_pt_xyz );
-  }
+    h5r->read_intVector( gname.c_str(), "local_dominant_t_comp", local_dominant_t_comp );
 
-  delete h5r; H5Fclose( file_id );
-  
-  // Compute the tangential vector for each local ring node
-  tangential.resize(Num_LD);
-  dominant_t_comp.resize(Num_LD);
+    std::vector<double> tangential_vec;
+    h5r->read_doubleVector( gname.c_str(), "local_tangential", tangential_vec );
 
-  for( int node=0; node<Num_LD; ++node)
-  {
-    // Generate radial vector using nodal & centroidal coordinates
-    Vector_3 radial_vec = Vector_3(
-        local_pt_xyz[3*node]     - centroid[ 3*local_cap_id[node]    ],
-        local_pt_xyz[3*node + 1] - centroid[ 3*local_cap_id[node] + 1],
-        local_pt_xyz[3*node + 2] - centroid[ 3*local_cap_id[node] + 2] );
-
-    tangential[node] = cross_product( outnormal[ local_cap_id[node] ], radial_vec ); 
-    
-    tangential[node].normalize();
-
-    dominant_t_comp[node] = tangential[node].get_dominant_comp();
-
-    // Ensure dominant component indices in the normal and tangential vectors
-    // aren't equal 
-    if( dominant_t_comp[node] == dominant_n_comp[ local_cap_id[node] ] )
-    {
-      Vector_3 temp( tangential[node] );
-      temp( dominant_t_comp[node] ) = 0.0;
-      dominant_t_comp[node] = temp.get_dominant_comp();
+    local_tangential.resize(Num_LD);
+    for(int ii=0; ii<Num_LD; ++ii)
+    { 
+      local_tangential[ii](0) = tangential_vec[3*ii+0];
+      local_tangential[ii](1) = tangential_vec[3*ii+1];
+      local_tangential[ii](2) = tangential_vec[3*ii+2];
     }
   }
 
-  VEC_T::clean( local_pt_xyz );
-  VEC_T::clean( centroid     );
+  delete h5r; H5Fclose( file_id );
 }
 
 ALocal_Ring_NodalBC::~ALocal_Ring_NodalBC()
 {
-  VEC_T::clean( LDN             );
-  VEC_T::clean( local_cap_id    );
-  VEC_T::clean( dominant_n_comp );
-  VEC_T::clean( dominant_t_comp );
-  VEC_T::clean( outnormal       );
-  VEC_T::clean( tangential      );
+  VEC_T::clean( LDN                   );
+  VEC_T::clean( local_cap_id          );
+  VEC_T::clean( dominant_n_comp       );
+  VEC_T::clean( local_dominant_t_comp );
+  VEC_T::clean( outnormal             );
+  VEC_T::clean( local_tangential      );
 }
 
 // EOF
