@@ -14,10 +14,11 @@
 // Author: Ju Liu
 // Date: June 24 2020
 // ==================================================================
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 #include <ctime>
 #include <cmath>
+#include <vector>
 
 class Vector_3
 {
@@ -54,6 +55,8 @@ class Vector_3
     Vector_3& operator-=( const Vector_3 &source );
 
     Vector_3& operator*=( const double &val );
+
+    std::vector<double> to_std_vec() const;
 
     void print() const;
 

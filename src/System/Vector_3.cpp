@@ -84,6 +84,18 @@ Vector_3& Vector_3::operator*=( const double &val )
   return *this;
 }
 
+std::vector<double> Vector_3::to_std_vec() const
+{
+  std::vector<double> outvec;
+  
+  outvec.resize(3);
+  for(int ii=0; ii<3; ++ii) outvec[ii] = vec[ii];
+  
+  std::vector<double>(outvec.begin(), outvec.end()).swap(outvec);
+
+  return outvec; 
+}
+
 void Vector_3::print() const
 {
   std::cout<<std::setprecision(12)<<vec[0]<<'\t'<<vec[1]<<'\t'<<vec[2]<<std::endl;
