@@ -158,6 +158,7 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &inflow_vtp_file,
       else if( type == 1 )
       {
         dom_t_comp = compute_tangential( outvec, centroid, pts[3*ii], pts[3*ii + 1], pts[3*ii + 2] );
+        
         if( dom_t_comp == comp )
         {
           dir_nodes.push_back( static_cast<unsigned int>( gnode[ii] ) );
@@ -188,9 +189,11 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &inflow_vtp_file,
     compute_cap_centroid( pts, centroid );
 
     num_outline_pts = 0;
+
     for(unsigned int jj=0; jj<gnode.size(); ++jj)
     {
       if(gnode[jj]<0) SYS_T::print_fatal("Error: negative nodal index on outlet %d! \n", ii);
+
 
       if( VEC_T::is_invec( wall_gnode, gnode[jj]) )
       {
@@ -329,7 +332,7 @@ void NodalBC_3D_vtp::compute_cap_centroid( const std::vector<double> &pts, Vecto
 
 
 int NodalBC_3D_vtp::compute_tangential( const Vector_3 &outvec, const Vector_3 &centroid,
-    const int &pt_x, const int &pt_y, const int &pt_z )
+    const double &pt_x, const double &pt_y, const double &pt_z )
 {
   // Generate radial vector using nodal & centroidal coordinates
   Vector_3 radial_vec = Vector_3( pt_x, pt_y, pt_z );

@@ -334,7 +334,7 @@ void NodalBC_3D_vtu::compute_cap_centroid( const std::vector<double> &pts, Vecto
 
 
 int NodalBC_3D_vtu::compute_tangential( const Vector_3 &outvec, const Vector_3 &centroid,
-    const int &pt_x, const int &pt_y, const int &pt_z )
+    const double &pt_x, const double &pt_y, const double &pt_z )
 {
   // Generate radial vector using nodal & centroidal coordinates
   Vector_3 radial_vec = Vector_3( pt_x, pt_y, pt_z );

@@ -79,7 +79,7 @@ class NodalBC_3D_vtu : public INodalBC
     // \para centroid: corresponding cap's centroidal coordinates
     // \para pt_x, pt_y, pt_z: nodal coordinates
     int compute_tangential( const Vector_3 &outvec, const Vector_3 &centroid,
-        const int &pt_x, const int &pt_y, const int &pt_z );
+        const double &pt_x, const double &pt_y, const double &pt_z );
 };
 
 #endif
