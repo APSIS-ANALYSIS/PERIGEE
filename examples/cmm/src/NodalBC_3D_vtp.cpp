@@ -137,7 +137,7 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &inflow_vtp_file,
   compute_cap_centroid( pts, centroid );
 
   std::vector<int> num_dom_n_pts, num_dom_t_pts;
-  num_dom_n_pts.resize( num_outlets ); num_dom_t_pts.resize( num_outlets );
+  num_dom_n_pts.resize( 1 + num_outlets ); num_dom_t_pts.resize( 1 + num_outlets );
 
   int num_outline_pts = 0;
   for(unsigned int ii=0; ii<gnode.size(); ++ii)
@@ -215,11 +215,12 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &inflow_vtp_file,
 
         num_outline_pts += 1;
       }
-
-      // Detect usage of the sv exterior surface (containing caps) as the wall surface
-      SYS_T::print_fatal_if( num_outline_pts == numpts, "Error: Outlet %d has %d outline nodes and %d total nodes. This is likely due to an improper wall mesh.\n",
-          ii, num_outline_pts, numpts );
     }
+
+    // Detect usage of the sv exterior surface (containing caps) as the wall surface
+    SYS_T::print_fatal_if( num_outline_pts == numpts, "Error: Outlet %d has %d outline nodes and %d total nodes. This is likely due to an improper wall mesh.\n",
+        ii, num_outline_pts, numpts );
+
   } // end loop over outlets
 
   VEC_T::sort_unique_resize(dir_nodes);

@@ -229,9 +229,9 @@ int main( int argc, char * argv[] )
   else
   {
     NBC_list[0] = new NodalBC_3D_vtu( nFunc );
-    NBC_list[1] = new NodalBC_3D_vtu( sur_file_in, inflow_outward_vec, sur_file_wall, sur_file_out, outflow_outward_vec, 0, nFunc );
-    NBC_list[2] = new NodalBC_3D_vtu( sur_file_in, inflow_outward_vec, sur_file_wall, sur_file_out, outflow_outward_vec, 1, nFunc );
-    NBC_list[3] = new NodalBC_3D_vtu( sur_file_in, inflow_outward_vec, sur_file_wall, sur_file_out, outflow_outward_vec, 2, nFunc );
+    NBC_list[1] = new NodalBC_3D_vtu( sur_file_in, inflow_outward_vec, sur_file_wall, sur_file_out, outflow_outward_vec, 1, 0, nFunc );
+    NBC_list[2] = new NodalBC_3D_vtu( sur_file_in, inflow_outward_vec, sur_file_wall, sur_file_out, outflow_outward_vec, 1, 1, nFunc );
+    NBC_list[3] = new NodalBC_3D_vtu( sur_file_in, inflow_outward_vec, sur_file_wall, sur_file_out, outflow_outward_vec, 1, 2, nFunc );
   }
 
   // ----------------------------------------------------------------

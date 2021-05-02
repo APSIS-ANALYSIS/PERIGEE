@@ -42,7 +42,8 @@ class NodalBC_3D_vtu : public INodalBC
     // Specify the Dirichlet nodes for CMM. This includes all interior
     // inlet nodes. For each inlet/outlet, ring nodes are also included
     // for the velocity dof corresponding to the unit normal's dominant
-    // component. Used for inlet & outlet in-plane motion.
+    // component. Used for inlet & outlet in-plane or purely radial motion.
+    //     \para type: 0 for in-plane motion. 1 for purely radial motion.
     //     \para comp: velocity component. 0, 1, or 2.
     // --------------------------------------------------------------
     NodalBC_3D_vtu( const std::string &inflow_vtu_file,
@@ -50,7 +51,7 @@ class NodalBC_3D_vtu : public INodalBC
         const std::string &wall_vtu_file,
         const std::vector<std::string> &outflow_vtu_files,
         const std::vector< std::vector<double> > &outflow_outward_vec,
-        const int &comp, const int &nFunc );
+        const int &type, const int &comp, const int &nFunc );
 
     // --------------------------------------------------------------
     // Read in the vtu file that all the nodes in this file will be
@@ -69,6 +70,16 @@ class NodalBC_3D_vtu : public INodalBC
 
   private:
     NodalBC_3D_vtu() {};
+
+    // Compute centroid coordinates given a cap's nodal coordinates
+    void compute_cap_centroid( const std::vector<double> &pts, Vector_3 &centroid ) const;
+
+    // Return the dominant component index of a ring node's unit tangential vector
+    // \para outvec  : corresponding cap's unit outward normal
+    // \para centroid: corresponding cap's centroidal coordinates
+    // \para pt_x, pt_y, pt_z: nodal coordinates
+    int compute_tangential( const Vector_3 &outvec, const Vector_3 &centroid,
+        const int &pt_x, const int &pt_y, const int &pt_z );
 };
 
 #endif
