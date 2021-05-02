@@ -145,11 +145,6 @@ void PGAssem_Tet_CMM_GenAlpha::EssBC_KG(
         const double tb = ringnbc_part -> get_tanvec(ii, dtcomp);
         const double tc = ringnbc_part -> get_tanvec(ii, 3 - dncomp - dtcomp);
 
-        if(dnode == 68)
-        {
-          std::cout<<row_b<<'\t'<<ta<<'\t'<<tb<<'\t'<<tc<<'\n';
-        }
-
         VecSetValue(G, row_b, 0.0, INSERT_VALUES);
 
         // correct the previously add 1.0 due to Dirichlet BC enforcement
