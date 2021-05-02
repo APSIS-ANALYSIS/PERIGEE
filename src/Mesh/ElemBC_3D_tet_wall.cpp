@@ -2,6 +2,39 @@
 
 ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const std::string &walls_combined,
+    const double &uniform_thickness,
+    const double &uniform_youngsmod,
+    const int &elemtype,
+    const double &in_fluid_density )
+: ElemBC_3D_tet( walls_combined, elemtype ),
+  elemType( elemtype ),
+  fluid_density( in_fluid_density )
+{
+  // num_ebc = 1 per the assumption for wall elem bc
+  const int ebc_id = 0;
+
+  radius.resize(    num_node[ebc_id] );
+  thickness.resize( num_node[ebc_id] );
+  youngsmod.resize( num_node[ebc_id] );
+
+  // Make sure that the files exist
+  SYS_T::file_check( walls_combined );
+
+  for(int ii=0; ii<num_node[ebc_id]; ++ii)
+  {
+    thickness[ii] = uniform_thickness; 
+
+    youngsmod[ii] = uniform_youngsmod;
+
+    radius[ii] = 0.0; // radius is not calculated in this case
+  }
+ 
+  // Write out vtp's with wall properties
+  write_vtk(ebc_id, "varwallprop");
+}
+
+ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
+    const std::string &walls_combined,
     const std::string &centerlines_combined,
     const double &thickness2radius_combined,
     const int &elemtype,

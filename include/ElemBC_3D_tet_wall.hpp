@@ -17,6 +17,21 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
 {
   public:
     // --------------------------------------------------------------
+    // Constructing wall properties with uniform thickness
+    // \para: walls_combined contains a single vtp with the complete wall surface
+    // \para: uniform_thickness is the value of wall thickness
+    // Note: This function is typically used for constructing a simple wall
+    //       model without feeding a centerline vtp file. The input of fluid
+    //       density is logically not needed, but to keep output file
+    //       consistency.
+    // --------------------------------------------------------------
+    ElemBC_3D_tet_wall(const std::string &walls_combined,
+        const double &uniform_thickness,
+        const double &uniform_youngsmod,
+        const int &elemtype = 501,
+        const double &in_fluid_density = 1.065 );
+
+    // --------------------------------------------------------------
     //  Constructing wall properties with a single spatial distribution.
     //  \para: walls_combined contains a single vtp with the complete wall surface
     //  \para: centerlines_combined is a vtp with the complete set of centerlines 

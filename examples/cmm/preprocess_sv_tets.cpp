@@ -266,8 +266,13 @@ int main( int argc, char * argv[] )
   //                                            thickness2radius_combined, wallsList,
   //                                            centerlinesList, thickness2radiusList, elemType );
 
-  ElemBC * wall_bc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
-                                             thickness2radius_combined, elemType );
+  ElemBC * wall_bc = nullptr;
+
+  if( SYS_T::file_exist(centerlines_combined) )
+    wall_bc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
+        thickness2radius_combined, elemType );
+  else
+    wall_bc = new ElemBC_3D_tet_wall( walls_combined, 0.1, 1.0e6, elemType );
 
   wall_bc -> resetTriIEN_outwardnormal( IEN );
   // ----------------------------------------------------------------
