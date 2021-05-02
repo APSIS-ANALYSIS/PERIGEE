@@ -169,7 +169,7 @@ void NodalBC_3D_ring::compute_cap_centroid( const std::vector<double> &pts, Vect
 
 
 void NodalBC_3D_ring::compute_tangential( const int &cap_id, const Vector_3 &centroid,
-    const int &pt_x, const int &pt_y, const int &pt_z )
+    const double &pt_x, const double &pt_y, const double &pt_z )
 {
   // Generate radial vector using nodal & centroidal coordinates
   Vector_3 radial_vec = Vector_3( pt_x, pt_y, pt_z );
@@ -179,8 +179,7 @@ void NodalBC_3D_ring::compute_tangential( const int &cap_id, const Vector_3 &cen
   Vector_3 tan_vec    = cross_product( normal_vec, radial_vec );
   tan_vec.normalize();
 
-  for(int ii=0; ii<3; ++ii)
-    tangential.push_back( tan_vec(ii) );
+  for(int ii=0; ii<3; ++ii) tangential.push_back( tan_vec(ii) );
 
   // Ensure dominant component indices in the normal and tangential vectors
   // aren't equal 

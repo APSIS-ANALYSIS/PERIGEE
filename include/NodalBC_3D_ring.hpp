@@ -83,7 +83,7 @@ class NodalBC_3D_ring : public INodalBC
 
     // Compute unit tangential vector given nodal coordinates and the corresponding cap centroid
     void compute_tangential( const int &cap_id, const Vector_3 &centroid,
-        const int &pt_x, const int &pt_y, const int &pt_z );
+        const double &pt_x, const double &pt_y, const double &pt_z );
 };
 
 #endif

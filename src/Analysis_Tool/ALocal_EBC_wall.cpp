@@ -31,7 +31,7 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
 
     // If the prestress is solved, read the prestress data
     // otherwise, just allocate a container for prestress data at each quadrature point
-    if( !solve_prestress )
+    if( false )
     {
       h5r -> read_doubleVector( subgroup_name.c_str(), "prestress", qua_prestress );
 
