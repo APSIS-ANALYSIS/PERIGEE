@@ -139,8 +139,8 @@ class INodalBC
     // --------------------------------------------------------------
     // get_intNA returns the basis N_A integral on surface
     // --------------------------------------------------------------
-    virtual void get_intNA( std::vector<double> &fintNA ) const
-    {SYS_T::commPrint("Warning: get_intNA is not implemented. \n");}
+    virtual std::vector<double> get_intNA() const
+    {SYS_T::commPrint("Warning: get_intNA is not implemented. \n"); return {};}
 
     // --------------------------------------------------------------
     // get_num_node returns the number of nodes on surface

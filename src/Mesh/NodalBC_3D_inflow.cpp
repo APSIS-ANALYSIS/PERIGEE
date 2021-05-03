@@ -71,8 +71,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   dir_nodes.clear();
   for(unsigned int ii=0; ii<global_node.size(); ++ii)
   {
-    SYS_T::print_fatal_if( global_node[ii]<0,
-        "Error: there are negative nodal index! \n");
+    SYS_T::print_fatal_if( global_node[ii]<0, "Error: there are negative nodal index! \n");
 
     if( !VEC_T::is_invec( wall_gnode, global_node[ii]) )
       dir_nodes.push_back( global_node[ii] );
