@@ -14,9 +14,8 @@ NodalBC_3D_inflow::NodalBC_3D_inflow(const int &nFunc)
 
   centroid[0] = 0.0; centroid[1] = 0.0; centroid[2] = 0.0;
 
-  outnormal.resize(3);
-  outnormal[0] = 0.0; outnormal[1] = 0.0; outnormal[2] = 0.0;
-
+  outnormal.gen_zero();
+  
   num_out_bc_pts = 0;
   VEC_T::clean(outline_pts);
   VEC_T::clean(intNA);
@@ -27,7 +26,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow(const int &nFunc)
 
 NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
     const std::string &wallfile, const int &nFunc,
-    const std::vector<double> &in_outnormal,
+    const Vector_3 &in_outnormal,
     const int &elemtype )
 {
   SYS_T::file_check(inffile);
@@ -293,7 +292,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   std::cout<<"     num_node: "<<num_node<<" num_cell: "<<num_cell<<'\n';
   std::cout<<"     centroid: "<<centroid[0]<<'\t'<<centroid[1]<<'\t'<<centroid[2]<<'\n';
   std::cout<<"     number of outline points is "<<num_out_bc_pts<<'\n';
-  std::cout<<"     outward normal is ["<<outnormal[0]<<'\t'<<outnormal[1]<<'\t'<<outnormal[2]<<"]. \n";
+  std::cout<<"     outward normal is ["<<outnormal(0)<<'\t'<<outnormal(1)<<'\t'<<outnormal(2)<<"]. \n";
   std::cout<<"     area is "<<face_area<<", and active area is "<<inf_active_area<<'\n';
 }
 

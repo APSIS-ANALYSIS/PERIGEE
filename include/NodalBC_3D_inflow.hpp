@@ -33,14 +33,14 @@ class NodalBC_3D_inflow : public INodalBC
     NodalBC_3D_inflow( const std::string &inffile,
         const std::string &wallfile,
         const int &nFunc,
-        const std::vector<double> &in_outnormal,
+        const Vector_3 &in_outnormal,
         const int &elemtype = 501 );
 
     virtual ~NodalBC_3D_inflow() {};
 
     virtual double get_para_1() const {return inf_active_area;}
 
-    virtual double get_para_2(const int &ii) const {return outnormal[ii];}
+    virtual double get_para_2(const int &ii) const {return outnormal(ii);}
 
     // Access to the number of outline boundary points.
     virtual int get_para_3() const {return num_out_bc_pts;}
@@ -99,7 +99,7 @@ class NodalBC_3D_inflow : public INodalBC
     double centroid[3];
 
     // unit outward normal vector for the surface
-    std::vector<double> outnormal;
+    Vector_3 outnormal;
 
     // Number of boundary points, which are defined as the points that
     // on the boundary of the inlet surface, i.e., they also belong to

@@ -194,8 +194,12 @@ int main( int argc, char * argv[] )
   // Inflow BC info
   std::vector<double> inflow_outward_vec;
   TET_T::get_out_normal( sur_file_in, ctrlPts, IEN, inflow_outward_vec );
+  
+  Vector_3 inlet_outvec;
+  TET_T::get_out_normal( sur_file_in, ctrlPts, IEN, inlet_outvec );
+  
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall,
-      nFunc, inflow_outward_vec, elemType );
+      nFunc, inlet_outvec, elemType );
 
   // Set up Elemental i.e. Neumann type Boundary Conditions
   // Obtain the outward normal vector
