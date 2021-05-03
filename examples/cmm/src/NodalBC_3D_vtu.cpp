@@ -93,7 +93,7 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &inflow_vtu_file,
 
 
 NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &inflow_vtu_file,
-        const std::vector<double> &inflow_outward_vec,
+        const Vector_3 &inflow_outward_vec,
         const std::string &wall_vtu_file,
         const std::vector<std::string> &outflow_vtu_files,
         const std::vector< std::vector<double> > &outflow_outward_vec,
@@ -124,17 +124,15 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &inflow_vtu_file,
   int numpts, numcels;
   std::vector<double> pts;
   std::vector<int> ien, gnode, gelem;
-  Vector_3 outvec, centroid;
-  int dom_n_comp, dom_t_comp;
 
   // Inlet: Assign all interior nodes
   SYS_T::file_check( inflow_vtu_file );
 
   TET_T::read_vtu_grid( inflow_vtu_file, numpts, numcels, pts, ien, gnode, gelem );
 
-  outvec = Vector_3( inflow_outward_vec[0], inflow_outward_vec[1], inflow_outward_vec[2] );
-  dom_n_comp = outvec.get_dominant_comp();
+  int dom_n_comp = inflow_outward_vec.get_dominant_comp();
 
+  Vector_3 centroid;
   compute_cap_centroid( pts, centroid );
 
   std::vector<int> num_dom_n_pts( 1 + num_outlets, 0 );
@@ -158,7 +156,7 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &inflow_vtu_file,
       // This is guaranteed by compute_tangential() to be a different index than dom_n_comp. 
       else if( type == 1 )
       {
-        dom_t_comp = compute_tangential( outvec, centroid, pts[3*ii], pts[3*ii + 1], pts[3*ii + 2] );
+        const int dom_t_comp = compute_tangential( inflow_outward_vec, centroid, pts[3*ii], pts[3*ii + 1], pts[3*ii + 2] );
         if( dom_t_comp == comp )
         {
           dir_nodes.push_back( static_cast<unsigned int>( gnode[ii] ) );
@@ -183,7 +181,7 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &inflow_vtu_file,
 
     TET_T::read_vtu_grid( outflow_vtu_files[ii], numpts, numcels, pts, ien, gnode, gelem );
 
-    outvec = Vector_3( outflow_outward_vec[ii][0], outflow_outward_vec[ii][1], outflow_outward_vec[ii][2] );
+    Vector_3 outvec( outflow_outward_vec[ii][0], outflow_outward_vec[ii][1], outflow_outward_vec[ii][2] );
     dom_n_comp = outvec.get_dominant_comp();
 
     compute_cap_centroid( pts, centroid );
@@ -206,7 +204,7 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &inflow_vtu_file,
         // This is guaranteed by compute_tangential() to be a different index than dom_n_comp. 
         else if( type == 1 )
         {
-          dom_t_comp = compute_tangential( outvec, centroid, pts[3*jj], pts[3*jj + 1], pts[3*jj + 2] );
+          const int dom_t_comp = compute_tangential( outvec, centroid, pts[3*jj], pts[3*jj + 1], pts[3*jj + 2] );
           if( dom_t_comp == comp )
           {
             dir_nodes.push_back( static_cast<unsigned int>( gnode[jj] ) );
@@ -345,14 +343,8 @@ int NodalBC_3D_vtu::compute_tangential( const Vector_3 &outvec, const Vector_3 &
 
   // Ensure dominant component indices in the normal and tangential vectors
   // aren't equal 
-  if( tan_vec.get_dominant_comp() == outvec.get_dominant_comp() )
-  {
-    Vector_3 temp( tan_vec );
-    temp( tan_vec.get_dominant_comp() ) = 0.0;
-    return temp.get_dominant_comp();
-  }
-  else
-    return tan_vec.get_dominant_comp();
+  tan_vec( outvec.get_dominant_comp() ) = 0.0;
+  return tan_vec.get_dominant_comp();
 }
 
 // EOF

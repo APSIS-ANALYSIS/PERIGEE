@@ -192,9 +192,6 @@ int main( int argc, char * argv[] )
   mnindex->write_hdf5("node_mapping");
 
   // Inflow BC info
-  std::vector<double> inflow_outward_vec;
-  TET_T::get_out_normal( sur_file_in, ctrlPts, IEN, inflow_outward_vec );
-  
   Vector_3 inlet_outvec;
   TET_T::get_out_normal( sur_file_in, ctrlPts, IEN, inlet_outvec );
   
@@ -233,9 +230,9 @@ int main( int argc, char * argv[] )
   else
   {
     NBC_list[0] = new NodalBC_3D_vtu( nFunc );
-    NBC_list[1] = new NodalBC_3D_vtu( sur_file_in, inflow_outward_vec, sur_file_wall, sur_file_out, outflow_outward_vec, 1, 0, nFunc );
-    NBC_list[2] = new NodalBC_3D_vtu( sur_file_in, inflow_outward_vec, sur_file_wall, sur_file_out, outflow_outward_vec, 1, 1, nFunc );
-    NBC_list[3] = new NodalBC_3D_vtu( sur_file_in, inflow_outward_vec, sur_file_wall, sur_file_out, outflow_outward_vec, 1, 2, nFunc );
+    NBC_list[1] = new NodalBC_3D_vtu( sur_file_in, inlet_outvec, sur_file_wall, sur_file_out, outflow_outward_vec, 1, 0, nFunc );
+    NBC_list[2] = new NodalBC_3D_vtu( sur_file_in, inlet_outvec, sur_file_wall, sur_file_out, outflow_outward_vec, 1, 1, nFunc );
+    NBC_list[3] = new NodalBC_3D_vtu( sur_file_in, inlet_outvec, sur_file_wall, sur_file_out, outflow_outward_vec, 1, 2, nFunc );
   }
 
   // ----------------------------------------------------------------

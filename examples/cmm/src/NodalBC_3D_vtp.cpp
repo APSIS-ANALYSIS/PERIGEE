@@ -182,7 +182,7 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &inflow_vtp_file,
 
     TET_T::read_vtp_grid( outflow_vtp_files[ii], numpts, numcels, pts, ien, gnode, gelem );
 
-    Vector_3 outvec = Vector_3( outflow_outward_vec[ii][0], outflow_outward_vec[ii][1], outflow_outward_vec[ii][2] );
+    Vector_3 outvec( outflow_outward_vec[ii][0], outflow_outward_vec[ii][1], outflow_outward_vec[ii][2] );
     dom_n_comp = outvec.get_dominant_comp();
 
     compute_cap_centroid( pts, centroid );

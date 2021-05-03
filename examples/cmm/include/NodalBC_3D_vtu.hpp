@@ -47,7 +47,7 @@ class NodalBC_3D_vtu : public INodalBC
     //     \para comp: velocity component. 0, 1, or 2.
     // --------------------------------------------------------------
     NodalBC_3D_vtu( const std::string &inflow_vtu_file,
-        const std::vector<double> &inflow_outward_vec,
+        const Vector_3 &inflow_outward_vec,
         const std::string &wall_vtu_file,
         const std::vector<std::string> &outflow_vtu_files,
         const std::vector< std::vector<double> > &outflow_outward_vec,
