@@ -1,6 +1,6 @@
 #ifndef NODALBC_3D_RING_HPP
 #define NODALBC_3D_RING_HPP
-// ==================================================================
+// ============================================================================
 // NodalBC_3D_ring.hpp
 // 
 // This is an instantiation of INodalBC for 3D ring boundary conditions
@@ -14,7 +14,7 @@
 //
 // Author: Ju Liu, Ingrid Lan
 // Date: Apr. 7 2021
-// ==================================================================
+// ============================================================================
 #include "INodalBC.hpp"
 #include "Tet_Tools.hpp"
 #include "Vector_3.hpp"
@@ -22,15 +22,15 @@
 class NodalBC_3D_ring : public INodalBC
 {
   public:
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // Generate an empty ring type boundary condition class
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------------
     NodalBC_3D_ring(const int &nFunc);
     
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // Generate the ring bc given by the inflow and outflow files, 
     // their unit normals, and the wall file.
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------------
     NodalBC_3D_ring( const std::string &inflow_file,
         const std::vector<double> &inflow_outward_vec,
         const std::string &wallfile,
@@ -43,9 +43,9 @@ class NodalBC_3D_ring : public INodalBC
 
     virtual int get_para_3() const { return num_caps; }
 
-    virtual void get_cap_id( std::vector<int> &capid ) const { capid = cap_id; }
+    virtual std::vector<int> get_cap_id() const { return cap_id; }
 
-    virtual void get_dominant_n_comp( std::vector<int> &dom_comp ) const { dom_comp = dominant_n_comp; }
+    virtual std::vector<int> get_dominant_n_comp() const { return dominant_n_comp; }
 
     virtual void get_dominant_t_comp( std::vector<int> &dom_comp ) const { dom_comp = dominant_t_comp; }
 

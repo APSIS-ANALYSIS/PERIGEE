@@ -27,7 +27,6 @@ class INodalBC
     // ------------------------------------------------------------------------
     virtual unsigned int get_dir_nodes(unsigned int ii) const 
     {return dir_nodes[ii];}
-
     
     // ------------------------------------------------------------------------
     // get_per_slave_nodes returns the ii-th master-slave pair's slave node's
@@ -36,7 +35,6 @@ class INodalBC
     virtual unsigned int get_per_slave_nodes(unsigned int ii) const 
     {return per_slave_nodes[ii];}
 
-    
     // ------------------------------------------------------------------------
     // get_per_slave_nodes returns the ii-th master-slave pair's master node's
     // global index. The parameter ii runs as 0 <= ii < get_num_per_nodes().
@@ -44,20 +42,17 @@ class INodalBC
     virtual unsigned int get_per_master_nodes(unsigned int ii) const 
     {return per_master_nodes[ii];}
 
-    
     // ------------------------------------------------------------------------
     // get_num_dir_nodes() gives the total number of Dirichlet nodes that are 
     // strongly enforced.
     // ------------------------------------------------------------------------
     virtual unsigned int get_num_dir_nodes() const {return num_dir_nodes;}
 
-
     // ------------------------------------------------------------------------
     // get_num_per_nodes() gives the total number of Periodic(slave) nodes that 
     // are strongly enforced.
     // ------------------------------------------------------------------------
     virtual unsigned int get_num_per_nodes() const {return num_per_nodes;}
-
 
     // ------------------------------------------------------------------------
     // get_ID returns the ID-index for the ii-th node. For Dirichlet nodes, its
@@ -70,19 +65,16 @@ class INodalBC
     // ------------------------------------------------------------------------
     virtual int get_ID(unsigned int ii) const {return ID[ii];}
  
-
     // ------------------------------------------------------------------------
     // get_num_ID reutrns the length of the ID array.
     // ------------------------------------------------------------------------
     virtual unsigned int get_num_ID() const {return ID.size();}
 
-    
     // ------------------------------------------------------------------------
     // print_info() will print the content of dir_nodes, per_slave_nodes, and
     // per_master_nodes on screen.
     // ------------------------------------------------------------------------
     virtual void print_info() const;
-
     
     // --------------------------------------------------------------
     // get_para_1() passes additional parameters from the specific
@@ -94,7 +86,6 @@ class INodalBC
       return 0.0;
     }
 
-    
     // --------------------------------------------------------------
     // get_para_2() passes additional parameters from the specific
     //              instantiations.
@@ -150,7 +141,6 @@ class INodalBC
     // --------------------------------------------------------------
     virtual void get_intNA( std::vector<double> &fintNA ) const
     {SYS_T::commPrint("Warning: get_intNA is not implemented. \n");}
-
 
     // --------------------------------------------------------------
     // get_num_node returns the number of nodes on surface
@@ -218,15 +208,15 @@ class INodalBC
     // --------------------------------------------------------------
     // get_cap_id returns the cap id [0, num_caps] of each dir node
     // --------------------------------------------------------------
-    virtual void get_cap_id( std::vector<int> &capid ) const
-    {SYS_T::commPrint("Warning: get_cap_id is not implemented. \n");}
+    virtual std::vector<int> get_cap_id() const
+    {SYS_T::commPrint("Warning: get_cap_id is not implemented. \n"); return {};}
 
     // --------------------------------------------------------------
     // get_dominant_n_comp returns the dominant comp index of each cap's
     // unit normal vector
     // --------------------------------------------------------------
-    virtual void get_dominant_n_comp( std::vector<int> &dom_comp ) const 
-    {SYS_T::commPrint("Warning: get_dominant_n_comp is not implemented. \n");}
+    virtual std::vector<int> get_dominant_n_comp() const 
+    {SYS_T::commPrint("Warning: get_dominant_n_comp is not implemented. \n"); return {};}
 
     // --------------------------------------------------------------
     // get_dominant_t_comp returns the dominant comp index of each node's
@@ -261,7 +251,6 @@ class INodalBC
     // per_xxx_nodes.
     // ------------------------------------------------------------------------
     virtual void Create_ID( const unsigned int &num_node );
-
 
     // ------------------------------------------------------------------------
     // Generate_BCNode_2D_A
@@ -299,8 +288,6 @@ class INodalBC
         std::vector<unsigned int> &corner1, std::vector<unsigned int> &corner2,
         std::vector<unsigned int> &corner3, std::vector<unsigned int> &corner4 ) const;
 
-
-
     // -------------------------------------------------------------------------
     // Generate_BCNode_3D_A
     // This may help generate simpler bc specification routine. But this function 
@@ -313,7 +300,6 @@ class INodalBC
         const int &nFunc_z,
         std::vector<int> &front, std::vector<int> &back, std::vector<int> &left,
         std::vector<int> &right, std::vector<int> &top, std::vector<int> &bottom ) const;
-
 
     // -------------------------------------------------------------------------
     // Generate_BCNode_3D_B
@@ -331,7 +317,6 @@ class INodalBC
         std::vector<int> &edge57, std::vector<int> &edge67, std::vector<int> &edge15,
         std::vector<int> &edge37, std::vector<int> &edge04, std::vector<int> &edge26,
         std::vector<int> &corner ) const;
-
 
     // -------------------------------------------------------------------------
     // Generate_BCNode_3D_C
@@ -353,7 +338,6 @@ class INodalBC
         std::vector<int> &edge57, std::vector<int> &edge67, std::vector<int> &edge15,
         std::vector<int> &edge37, std::vector<int> &edge04, std::vector<int> &edge26,
         std::vector<int> &corner ) const;
-
 
     // ------------------------------------------------------------------------
     // Generate_BCNode_3D_D is a fast implementation of the Generate_BCNodes_B
@@ -404,7 +388,6 @@ class INodalBC
         int * &edge02, int &ney,
         int * &edge04, int &nez,
         int * &corner ) const;
-
 };
 
 #endif

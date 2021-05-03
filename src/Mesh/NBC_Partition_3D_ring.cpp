@@ -15,7 +15,7 @@ NBC_Partition_3D_ring::NBC_Partition_3D_ring(
     std::vector<int> cap_id, dominant_t_comp; 
     std::vector<double> tangential; 
 
-    nbc -> get_cap_id( cap_id );
+    cap_id = nbc -> get_cap_id();
     nbc -> get_dominant_t_comp( dominant_t_comp );
     nbc -> get_tangential( tangential );
 
@@ -36,7 +36,7 @@ NBC_Partition_3D_ring::NBC_Partition_3D_ring(
     } 
   }
 
-  nbc -> get_dominant_n_comp( dominant_n_comp );
+  dominant_n_comp = nbc -> get_dominant_n_comp();
   nbc -> get_outnormal( outnormal );
 }
 
