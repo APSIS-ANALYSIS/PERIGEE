@@ -5,7 +5,9 @@ NBC_Partition_3D_ring::NBC_Partition_3D_ring(
     const Map_Node_Index * const &mnindex,
     const INodalBC * const &nbc ) 
 : NBC_Partition_3D( part, mnindex, nbc ), 
-  num_caps( nbc -> get_para_3() )
+  num_caps( nbc -> get_para_3() ),
+  dominant_n_comp( nbc -> get_dominant_n_comp() ),
+  outnormal( nbc -> get_outnormal() )
 {
   local_cap_id.clear();
 
@@ -16,8 +18,8 @@ NBC_Partition_3D_ring::NBC_Partition_3D_ring(
     std::vector<double> tangential; 
 
     cap_id = nbc -> get_cap_id();
-    nbc -> get_dominant_t_comp( dominant_t_comp );
-    nbc -> get_tangential( tangential );
+    dominant_t_comp = nbc -> get_dominant_t_comp();
+    tangential = nbc -> get_tangential();
 
     for(unsigned int ii=0; ii<nbc->get_num_dir_nodes(); ++ii)
     {
@@ -35,9 +37,6 @@ NBC_Partition_3D_ring::NBC_Partition_3D_ring(
       }
     } 
   }
-
-  dominant_n_comp = nbc -> get_dominant_n_comp();
-  nbc -> get_outnormal( outnormal );
 }
 
 NBC_Partition_3D_ring::~NBC_Partition_3D_ring()

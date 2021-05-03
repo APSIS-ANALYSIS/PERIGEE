@@ -209,33 +209,33 @@ class INodalBC
     // get_cap_id returns the cap id [0, num_caps] of each dir node
     // --------------------------------------------------------------
     virtual std::vector<int> get_cap_id() const
-    {SYS_T::commPrint("Warning: get_cap_id is not implemented. \n"); return {};}
+    {SYS_T::commPrint("Warning: get_cap_id is not implemented.\n"); return {};}
 
     // --------------------------------------------------------------
     // get_dominant_n_comp returns the dominant comp index of each cap's
     // unit normal vector
     // --------------------------------------------------------------
     virtual std::vector<int> get_dominant_n_comp() const 
-    {SYS_T::commPrint("Warning: get_dominant_n_comp is not implemented. \n"); return {};}
+    {SYS_T::commPrint("Warning: get_dominant_n_comp is not implemented.\n"); return {};}
 
     // --------------------------------------------------------------
     // get_dominant_t_comp returns the dominant comp index of each node's
     // unit tangential vector
     // --------------------------------------------------------------
-    virtual void get_dominant_t_comp( std::vector<int> &dom_comp ) const 
-    {SYS_T::commPrint("Warning: get_dominant_t_comp is not implemented. \n");}
+    virtual std::vector<int> get_dominant_t_comp() const 
+    {SYS_T::commPrint("Warning: get_dominant_t_comp is not implemented.\n"); return {};}
 
     // --------------------------------------------------------------
     // get_outnormal returns each cap's unit normal vector
     // --------------------------------------------------------------
-    virtual void get_outnormal( std::vector<double> &outvec ) const
-    {SYS_T::commPrint("Warning: get_outnormal is not implemented. \n");}
+    virtual std::vector<double> get_outnormal() const
+    {SYS_T::commPrint("Warning: get_outnormal is not implemented.\n"); return {};}
   
     // --------------------------------------------------------------
     // get_tangential returns each node's unit tangential vector
     // --------------------------------------------------------------
-    virtual void get_tangential( std::vector<double> &outvec ) const
-    {SYS_T::commPrint("Warning: get_tangential is not implemented. \n");}
+    virtual std::vector<double> get_tangential() const
+    {SYS_T::commPrint("Warning: get_tangential is not implemented. \n"); return {};}
   
   protected:
     std::vector<unsigned int> dir_nodes;
