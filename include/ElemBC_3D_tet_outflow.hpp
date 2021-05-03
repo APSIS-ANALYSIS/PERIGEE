@@ -23,7 +23,7 @@ class ElemBC_3D_tet_outflow : public ElemBC_3D_tet
     // \para vtkfileList: the list of the vtp files for the outlet surfaces
     // \para outlet_normal_vec: the outward normal vectors for the surfaces
     ElemBC_3D_tet_outflow( const std::vector<std::string> &vtkfileList,
-       const std::vector< std::vector<double> > &outlet_normal_vec,
+       const std::vector< Vector_3 > &outlet_normal_vec,
        const int &elemtype = 501 );
 
     virtual ~ElemBC_3D_tet_outflow();
@@ -33,9 +33,9 @@ class ElemBC_3D_tet_outflow : public ElemBC_3D_tet
     virtual void get_normal_vec( const int &ebc_id, double &out_nx,
         double &out_ny, double &out_nz ) const
     {
-      out_nx = outNormal[ebc_id][0];
-      out_ny = outNormal[ebc_id][1];
-      out_nz = outNormal[ebc_id][2];
+      out_nx = outNormal[ebc_id](0);
+      out_ny = outNormal[ebc_id](1);
+      out_nz = outNormal[ebc_id](2);
     }
 
     virtual std::vector<double> get_intNA( const int &ebc_id ) const
@@ -43,7 +43,7 @@ class ElemBC_3D_tet_outflow : public ElemBC_3D_tet
 
   private:
     std::vector< std::vector<double> > intNA;
-    std::vector< std::vector<double> > outNormal;
+    std::vector< Vector_3 > outNormal;
 };
 
 #endif

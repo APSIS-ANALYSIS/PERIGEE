@@ -205,13 +205,18 @@ int main( int argc, char * argv[] )
   for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
     TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN, outflow_outward_vec[ii] );
 
-  ElemBC * ebc = new ElemBC_3D_tet_outflow( sur_file_out, outflow_outward_vec, elemType );
+  std::vector< Vector_3 > outlet_outvec;
+  outlet_outvec.resize( sur_file_out.size() );
+  for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
+    TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN, outlet_outvec[ii] );
+
+  ElemBC * ebc = new ElemBC_3D_tet_outflow( sur_file_out, outlet_outvec, elemType );
 
   ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
 
   // Set up ring BC
   INodalBC * ring_bc = new NodalBC_3D_ring( sur_file_in, inlet_outvec,
-       sur_file_wall, sur_file_out, outflow_outward_vec, nFunc, elemType );
+       sur_file_wall, sur_file_out, outlet_outvec, nFunc, elemType );
 
   // Set up Nodal i.e. Dirichlet type Boundary Conditions. For CMM with prescribed inflow,
   // this includes all inlet interior nodes. To enable in-plane motion of the inlet & outlet

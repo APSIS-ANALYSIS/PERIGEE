@@ -25,7 +25,7 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
     const Vector_3 &inlet_outnormal,
     const std::string &wallfile,
     const std::vector<std::string> &outflow_files,
-    const std::vector< std::vector<double> > &outflow_outward_vec,
+    const std::vector< Vector_3 > &outlet_outnormal,
     const int &nFunc, const int &elemtype )
 {
   // No periodic nodes
@@ -43,14 +43,13 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
   outnormal = inlet_outnormal.to_std_vec();
   dominant_n_comp[0] = inlet_outnormal.get_dominant_comp();
 
-  for(unsigned int ii=0; ii<outflow_outward_vec.size(); ++ii)
+  for(unsigned int ii=0; ii<outlet_outnormal.size(); ++ii)
   {
-    outnormal.push_back(outflow_outward_vec[ii][0]);
-    outnormal.push_back(outflow_outward_vec[ii][1]);
-    outnormal.push_back(outflow_outward_vec[ii][2]);
+    outnormal.push_back( outlet_outnormal[ii](0) );
+    outnormal.push_back( outlet_outnormal[ii](1) );
+    outnormal.push_back( outlet_outnormal[ii](2) );
 
-    Vector_3 outvec( outflow_outward_vec[ii][0], outflow_outward_vec[ii][1], outflow_outward_vec[ii][2] );
-    dominant_n_comp[ii + 1] = outvec.get_dominant_comp();
+    dominant_n_comp[ii + 1] = outlet_outnormal[ii].get_dominant_comp();
   }
 
   int numpts, numcels;

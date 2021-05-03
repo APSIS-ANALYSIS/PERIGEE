@@ -35,7 +35,7 @@ class NodalBC_3D_ring : public INodalBC
         const Vector_3 &inlet_outnormal,
         const std::string &wallfile,
         const std::vector<std::string> &outflow_files,
-        const std::vector< std::vector<double> > &outflow_outward_vec,
+        const std::vector< Vector_3 > &outlet_outnormal,
         const int &nFunc,
         const int &elemtype = 501 );
 

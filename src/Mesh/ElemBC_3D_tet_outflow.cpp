@@ -2,10 +2,13 @@
 
 ElemBC_3D_tet_outflow::ElemBC_3D_tet_outflow(
     const std::vector<std::string> &vtkfileList,
-    const std::vector< std::vector<double> > &outlet_normal_vec,
+    const std::vector< Vector_3 > &outlet_normal_vec,
     const int &elemtype )
 : ElemBC_3D_tet( vtkfileList, elemtype )
 {
+  SYS_T::print_fatal_if(outlet_normal_vec.size() != num_ebc,
+      "Error: the input normal vector length does not match the number of outlets.\n");
+
   outNormal.resize( num_ebc );
   for(int ii=0; ii<num_ebc; ++ii) outNormal[ii]= outlet_normal_vec[ii];
 
