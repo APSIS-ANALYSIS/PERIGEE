@@ -15,7 +15,7 @@ EBC_Partition_vtp_outflow::EBC_Partition_vtp_outflow(
   {
     if( num_local_cell[ii] > 0 )
     {
-      ebc -> get_intNA(ii, face_int_NA[ii]);
+      face_int_NA[ii] = ebc -> get_intNA(ii);
     
       // Obtain the old indices of the face nodes 
       std::vector<int> old_node_idx; 

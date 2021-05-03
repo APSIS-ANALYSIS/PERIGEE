@@ -36,9 +36,8 @@ class ElemBC_3D_tet4_outflow : public ElemBC_3D_tet4
       out_nz = outNormal[ebc_id][2];
     }
 
-    virtual void get_intNA( const int &ebc_id, 
-        std::vector<double> &fintNA ) const
-    { fintNA = intNA[ebc_id]; }
+    virtual std::vector<double> get_intNA( const int &ebc_id ) const
+    { return intNA[ebc_id]; }
 
   private:
     // prohibit the default constructor

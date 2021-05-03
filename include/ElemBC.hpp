@@ -119,8 +119,8 @@ class ElemBC
 
 
     // This function returns the integral of basis NA on the faces
-    virtual void get_intNA( const int &ebc_id, std::vector<double> &fintNA ) const
-    {SYS_T::commPrint("Warning: get_intNA is not implemented. \n");}
+    virtual std::vector<double> get_intNA( const int &ebc_id ) const
+    {SYS_T::commPrint("Warning: get_intNA is not implemented.\n"); return {};}
 
 
     // This returns the wall thickness used in CMM

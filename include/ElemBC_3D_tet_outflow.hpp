@@ -38,8 +38,8 @@ class ElemBC_3D_tet_outflow : public ElemBC_3D_tet
       out_nz = outNormal[ebc_id][2];
     }
 
-    virtual void get_intNA( const int &ebc_id, std::vector<double> &fintNA ) const
-    { fintNA = intNA[ebc_id]; }
+    virtual std::vector<double> get_intNA( const int &ebc_id ) const
+    { return intNA[ebc_id]; }
 
   private:
     std::vector< std::vector<double> > intNA;
