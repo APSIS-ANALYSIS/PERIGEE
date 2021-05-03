@@ -32,7 +32,7 @@ class NodalBC_3D_ring : public INodalBC
     // their unit normals, and the wall file.
     // ------------------------------------------------------------------------
     NodalBC_3D_ring( const std::string &inflow_file,
-        const std::vector<double> &inflow_outward_vec,
+        const Vector_3 &inlet_outnormal,
         const std::string &wallfile,
         const std::vector<std::string> &outflow_files,
         const std::vector< std::vector<double> > &outflow_outward_vec,

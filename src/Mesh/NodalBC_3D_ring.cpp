@@ -22,7 +22,7 @@ NodalBC_3D_ring::NodalBC_3D_ring(const int &nFunc)
 
 
 NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
-    const std::vector<double> &inflow_outward_vec,
+    const Vector_3 &inlet_outnormal,
     const std::string &wallfile,
     const std::vector<std::string> &outflow_files,
     const std::vector< std::vector<double> > &outflow_outward_vec,
@@ -40,9 +40,8 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
   num_caps = cap_files.size();
   dominant_n_comp.resize(num_caps);
 
-  outnormal = inflow_outward_vec;
-  Vector_3 outvec = Vector_3( inflow_outward_vec[0], inflow_outward_vec[1], inflow_outward_vec[2] );
-  dominant_n_comp[0] = outvec.get_dominant_comp();
+  outnormal = inlet_outnormal.to_std_vec();
+  dominant_n_comp[0] = inlet_outnormal.get_dominant_comp();
 
   for(unsigned int ii=0; ii<outflow_outward_vec.size(); ++ii)
   {
@@ -50,7 +49,7 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
     outnormal.push_back(outflow_outward_vec[ii][1]);
     outnormal.push_back(outflow_outward_vec[ii][2]);
 
-    outvec = Vector_3( outflow_outward_vec[ii][0], outflow_outward_vec[ii][1], outflow_outward_vec[ii][2] );
+    Vector_3 outvec( outflow_outward_vec[ii][0], outflow_outward_vec[ii][1], outflow_outward_vec[ii][2] );
     dominant_n_comp[ii + 1] = outvec.get_dominant_comp();
   }
 

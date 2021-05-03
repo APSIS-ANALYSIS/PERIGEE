@@ -213,7 +213,7 @@ int main( int argc, char * argv[] )
   ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
 
   // Set up ring BC
-  INodalBC * ring_bc = new NodalBC_3D_ring( sur_file_in, inflow_outward_vec,
+  INodalBC * ring_bc = new NodalBC_3D_ring( sur_file_in, inlet_outvec,
        sur_file_wall, sur_file_out, outflow_outward_vec, nFunc, elemType );
 
   // Set up Nodal i.e. Dirichlet type Boundary Conditions. For CMM with prescribed inflow,
