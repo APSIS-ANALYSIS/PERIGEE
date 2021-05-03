@@ -314,7 +314,8 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::vector<std::string> &vtpfileList,
 NodalBC_3D_vtp::~NodalBC_3D_vtp()
 {}
 
-void NodalBC_3D_vtp::compute_cap_centroid( const std::vector<double> &pts, Vector_3 &centroid ) const
+void NodalBC_3D_vtp::compute_cap_centroid( const std::vector<double> &pts, 
+    Vector_3 &centroid ) const
 {
   const int num_node = static_cast<int>( pts.size() / 3 );
 
@@ -343,14 +344,8 @@ int NodalBC_3D_vtp::compute_tangential( const Vector_3 &outvec, const Vector_3 &
 
   // Ensure dominant component indices in the normal and tangential vectors
   // aren't equal 
-  if( tan_vec.get_dominant_comp() == outvec.get_dominant_comp() )
-  {
-    Vector_3 temp( tan_vec );
-    temp( tan_vec.get_dominant_comp() ) = 0.0;
-    return temp.get_dominant_comp();
-  }
-  else
-    return tan_vec.get_dominant_comp();
+  tan_vec( outvec.get_dominant_comp() ) = 0.0;
+  return tan_vec.get_dominant_comp();
 }
 
 // EOF
