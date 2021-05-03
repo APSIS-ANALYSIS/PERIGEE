@@ -63,7 +63,7 @@ class NodalBC_3D_vtp : public INodalBC
         const Vector_3 &inflow_outward_vec,
         const std::string &wall_vtp_file,
         const std::vector<std::string> &outflow_vtp_files,
-        const std::vector< std::vector<double> > &outflow_outward_vec,
+        const std::vector< Vector_3 > &outflow_outward_vec,
         const int &type, const int &comp, const int &nFunc );
      
     // --------------------------------------------------------------
