@@ -200,11 +200,6 @@ int main( int argc, char * argv[] )
 
   // Set up Elemental i.e. Neumann type Boundary Conditions
   // Obtain the outward normal vector
-  std::vector< std::vector<double> > outflow_outward_vec;
-  outflow_outward_vec.resize( sur_file_out.size() );
-  for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
-    TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN, outflow_outward_vec[ii] );
-
   std::vector< Vector_3 > outlet_outvec;
   outlet_outvec.resize( sur_file_out.size() );
   for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
@@ -235,9 +230,9 @@ int main( int argc, char * argv[] )
   else
   {
     NBC_list[0] = new NodalBC_3D_vtu( nFunc );
-    NBC_list[1] = new NodalBC_3D_vtu( sur_file_in, inlet_outvec, sur_file_wall, sur_file_out, outflow_outward_vec, 1, 0, nFunc );
-    NBC_list[2] = new NodalBC_3D_vtu( sur_file_in, inlet_outvec, sur_file_wall, sur_file_out, outflow_outward_vec, 1, 1, nFunc );
-    NBC_list[3] = new NodalBC_3D_vtu( sur_file_in, inlet_outvec, sur_file_wall, sur_file_out, outflow_outward_vec, 1, 2, nFunc );
+    NBC_list[1] = new NodalBC_3D_vtu( sur_file_in, inlet_outvec, sur_file_wall, sur_file_out, outlet_outvec, 1, 0, nFunc );
+    NBC_list[2] = new NodalBC_3D_vtu( sur_file_in, inlet_outvec, sur_file_wall, sur_file_out, outlet_outvec, 1, 1, nFunc );
+    NBC_list[3] = new NodalBC_3D_vtu( sur_file_in, inlet_outvec, sur_file_wall, sur_file_out, outlet_outvec, 1, 2, nFunc );
   }
 
   // ----------------------------------------------------------------

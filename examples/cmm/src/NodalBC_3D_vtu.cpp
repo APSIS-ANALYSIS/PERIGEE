@@ -96,7 +96,7 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &inflow_vtu_file,
         const Vector_3 &inflow_outward_vec,
         const std::string &wall_vtu_file,
         const std::vector<std::string> &outflow_vtu_files,
-        const std::vector< std::vector<double> > &outflow_outward_vec,
+        const std::vector< Vector_3 > &outflow_outward_vec,
         const int &type, const int &comp, const int &nFunc )
 {
   // type = 0 : in plane motion, type = 1 : radial motion
@@ -181,8 +181,7 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &inflow_vtu_file,
 
     TET_T::read_vtu_grid( outflow_vtu_files[ii], numpts, numcels, pts, ien, gnode, gelem );
 
-    Vector_3 outvec( outflow_outward_vec[ii][0], outflow_outward_vec[ii][1], outflow_outward_vec[ii][2] );
-    dom_n_comp = outvec.get_dominant_comp();
+    dom_n_comp = outflow_outward_vec[ii].get_dominant_comp();
 
     compute_cap_centroid( pts, centroid );
 
@@ -204,7 +203,7 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &inflow_vtu_file,
         // This is guaranteed by compute_tangential() to be a different index than dom_n_comp. 
         else if( type == 1 )
         {
-          const int dom_t_comp = compute_tangential( outvec, centroid, pts[3*jj], pts[3*jj + 1], pts[3*jj + 2] );
+          const int dom_t_comp = compute_tangential( outflow_outward_vec[ii], centroid, pts[3*jj], pts[3*jj + 1], pts[3*jj + 2] );
           if( dom_t_comp == comp )
           {
             dir_nodes.push_back( static_cast<unsigned int>( gnode[jj] ) );
