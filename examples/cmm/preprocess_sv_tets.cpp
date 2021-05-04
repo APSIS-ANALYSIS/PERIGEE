@@ -210,7 +210,7 @@ int main( int argc, char * argv[] )
   ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
 
   // Set up ring BC
-  const int ringBC_type = 0;
+  const int ringBC_type = 2;
   INodalBC * ring_bc = new NodalBC_3D_ring( sur_file_in, inlet_outvec,
        sur_file_wall, sur_file_out, outlet_outvec, nFunc, ringBC_type, elemType );
 
