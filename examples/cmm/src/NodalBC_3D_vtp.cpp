@@ -27,7 +27,6 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const INodalBC * const &nbc_inflow,
   for(unsigned int ii=0; ii<nbc_inflow->get_num_dir_nodes(); ++ii)
     dir_nodes.push_back( nbc_inflow->get_dir_nodes(ii) );
 
-
   // obtain the type of ring nodes' specification
   const int ringbc_type = nbc_ring -> get_ring_bc_type();
   const std::vector<int> cap_id = nbc_ring -> get_cap_id();
