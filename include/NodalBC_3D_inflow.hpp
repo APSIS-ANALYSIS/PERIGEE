@@ -7,8 +7,8 @@
 // conditions.
 //
 // For Inflow boundary conditions, 1. there is no periodic type
-// boundary condition; 2. the node that belong to the wall should be
-// removed from the node list.
+// boundary condition; 2. the nodes that belong to the wall are 
+// excluded from the dir_nodes list.
 //
 // Author: Ju Liu
 // Date: Aug. 6 2017
