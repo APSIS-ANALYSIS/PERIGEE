@@ -93,13 +93,6 @@ class NodalBC_3D_vtp : public INodalBC
   private:
     NodalBC_3D_vtp() {};
 
-    // ------------------------------------------------------------------------ 
-    // clear the dir_nodes, per_slave_nodes, per_master_nodes; 
-    // set num_dir_nodes, num_per_nodes to be zero;
-    // set ID based on the above "no-nodal bc" setting.
-    // ------------------------------------------------------------------------ 
-    void gen_no_nodalBC( const int &nFunc );
-
     // Compute centroid coordinates given a cap's nodal coordinates
     void compute_cap_centroid( const std::vector<double> &pts, Vector_3 &centroid ) const;
 

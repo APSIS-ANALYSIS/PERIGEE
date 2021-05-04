@@ -432,17 +432,4 @@ int NodalBC_3D_vtp::compute_tangential( const Vector_3 &outvec, const Vector_3 &
   return tan_vec.get_dominant_comp();
 }
 
-void NodalBC_3D_vtp::gen_no_nodalBC( const int &nFunc )
-{
-  dir_nodes.clear();
-  per_slave_nodes.clear();
-  per_master_nodes.clear();
-  num_dir_nodes = 0;
-  num_per_nodes = 0;
-
-  Create_ID( nFunc );
-
-  std::cout<<"===> NodalBC_3D_vtp: No nodal BC is generated.\n";
-}
-
 // EOF
