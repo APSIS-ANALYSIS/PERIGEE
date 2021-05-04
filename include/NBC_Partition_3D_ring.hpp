@@ -28,7 +28,10 @@ class NBC_Partition_3D_ring : public NBC_Partition_3D
     virtual void write_hdf5( const char * FileName ) const;
 
   private:
-    // Type of the essential bc on the ring
+    // type = 0 : all dof of ring nodes are set to be essential bc;
+    // type = 1 : the dominant normal components of ring nodes are set to be essential bc;
+    // type = 2 : the dominant normal & tangential components of ring nodes are set to be
+    //            essential bc.
     const int ring_bc_type;
 
     // Number of caps (inlets, outlets)

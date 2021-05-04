@@ -23,7 +23,7 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const INodalBC * const &nbc_inflow,
   per_master_nodes.clear();
   num_per_nodes = 0;
 
-  // Assign the inlet nodes for this type of nodal/essential bc
+  // regardless of comp, assign all interior inlet nodes as nodal/essential bc
   for(unsigned int ii=0; ii<nbc_inflow->get_num_dir_nodes(); ++ii)
     dir_nodes.push_back( nbc_inflow->get_dir_nodes(ii) );
 
@@ -39,7 +39,7 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const INodalBC * const &nbc_inflow,
   switch( ringbc_type )
   {
     case 0:
-      // ring nodes are added as essential bc
+      // regardless of comp, all ring nodes are added as essential bc
       for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
       {
         dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
