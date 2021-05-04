@@ -3,7 +3,7 @@
 NBC_Partition_3D_ring::NBC_Partition_3D_ring(
     const IPart * const &part,
     const Map_Node_Index * const &mnindex,
-    const NodalBC_3D_ring * const &nbc ) 
+    const INodalBC * const &nbc ) 
 : NBC_Partition_3D( part, mnindex, nbc ),
   ring_bc_type( nbc -> get_ring_bc_type() ), 
   num_caps( nbc -> get_num_caps() ),

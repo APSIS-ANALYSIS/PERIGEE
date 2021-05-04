@@ -75,7 +75,7 @@ class INodalBC
     // per_master_nodes on screen.
     // ------------------------------------------------------------------------
     virtual void print_info() const;
-    
+   
     // --------------------------------------------------------------
     // get_para_1() passes additional parameters from the specific
     //              instantiations.
@@ -204,6 +204,24 @@ class INodalBC
       SYS_T::commPrint("Warning: get_global_cell is not implemented. \n");
       return -1;
     } 
+
+    // --------------------------------------------------------------
+    // get_num_caps returns the number of cap surfaces
+    // --------------------------------------------------------------
+    virtual int get_num_caps() const
+    {
+      SYS_T::commPrint("Warning: get_num_caps in not implemented\n");
+      return -1;
+    }
+    
+    // --------------------------------------------------------------
+    // get_ring_bc_type returns essential bc type for ring nodes
+    // --------------------------------------------------------------
+    virtual int get_ring_bc_type() const
+    {
+      SYS_T::commPrint("Warning: get_ring_bc_type in not implemented\n");
+      return -1;
+    }
 
     // --------------------------------------------------------------
     // get_cap_id returns the cap id [0, num_caps] of each dir node

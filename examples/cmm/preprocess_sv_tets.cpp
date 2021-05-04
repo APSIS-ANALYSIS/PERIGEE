@@ -211,7 +211,7 @@ int main( int argc, char * argv[] )
 
   // Set up ring BC
   const int ringBC_type = 0;
-  NodalBC_3D_ring * ring_bc = new NodalBC_3D_ring( sur_file_in, inlet_outvec,
+  INodalBC * ring_bc = new NodalBC_3D_ring( sur_file_in, inlet_outvec,
        sur_file_wall, sur_file_out, outlet_outvec, nFunc, ringBC_type, elemType );
 
   // Set up Nodal i.e. Dirichlet type Boundary Conditions. For CMM with prescribed inflow,

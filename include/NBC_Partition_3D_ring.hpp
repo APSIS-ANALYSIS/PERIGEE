@@ -22,7 +22,7 @@ class NBC_Partition_3D_ring : public NBC_Partition_3D
   public:
     NBC_Partition_3D_ring(const IPart * const &part,
         const Map_Node_Index * const &mnindex,
-        const NodalBC_3D_ring * const &nbc );
+        const INodalBC * const &nbc );
 
     virtual ~NBC_Partition_3D_ring();
 
