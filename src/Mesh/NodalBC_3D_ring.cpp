@@ -186,14 +186,8 @@ void NodalBC_3D_ring::compute_tangential( const int &cap_id, const Vector_3 &cen
 
   // Ensure dominant component indices in the normal and tangential vectors
   // aren't equal 
-  if( tan_vec.get_dominant_comp() == dominant_n_comp[ cap_id ] )
-  {
-    Vector_3 temp( tan_vec );
-    temp( tan_vec.get_dominant_comp() ) = 0.0;
-    dominant_t_comp.push_back( temp.get_dominant_comp() );
-  }
-  else
-    dominant_t_comp.push_back( tan_vec.get_dominant_comp() );
+  tan_vec( dominant_n_comp[ cap_id ] ) = 0.0;
+  dominant_t_comp.push_back( tan_vec.get_dominant_comp() );
 }
 
 // EOF

@@ -60,9 +60,9 @@ class NodalBC_3D_ring : public INodalBC
     NodalBC_3D_ring() : ring_bc_type(0) {};
 
     // Ring node bc type
-    // type = 0 : all dof of the nodes are set to be essential bc;
-    // type = 1 : the normal components of the nodes are set to be essential bc;
-    // type = 2 : the normal & tangential components of the nodes are set to be
+    // type = 0 : all dof of ring nodes are set to be essential bc;
+    // type = 1 : the dominant normal components of ring nodes are set to be essential bc;
+    // type = 2 : the dominant normal & tangential components of ring nodes are set to be
     //            essential bc.
     const int ring_bc_type;
 
