@@ -318,8 +318,6 @@ int main( int argc, char *argv[] )
   // ===== Generate a sparse matrix for enforcing nodal BCs ====
   Matrix_PETSc * pmat = new Matrix_PETSc_CMM(pNode, locnbc, locringnbc);
 
-  pmat->gen_perm_bc(pNode, locnbc);
-
   // ===== Generalized-alpha =====
   SYS_T::commPrint("===> Set up the generalized-alpha time integration scheme.\n");
 
@@ -469,7 +467,6 @@ int main( int argc, char *argv[] )
   nsolver->print_info();
 
   // ===== Temporal solver context =====
-  // **** need a separate tsolver initialized for prestressing?
   PTime_CMM_Solver * tsolver = new PTime_CMM_Solver( sol_bName,
       sol_record_freq, ttan_renew_freq, final_time, prestress_flag );
 
