@@ -11,6 +11,8 @@ ALocal_Ring_NodalBC::ALocal_Ring_NodalBC(
 
   const std::string gname("/ring");
   
+  ringbc_type = h5r -> read_intScalar( gname.c_str(), "ring_bc_type" );
+
   Num_LD = h5r -> read_intScalar( gname.c_str(), "Num_LD" );
 
   num_caps = h5r -> read_intScalar( gname.c_str(), "num_caps" );

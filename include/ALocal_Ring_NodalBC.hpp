@@ -18,6 +18,9 @@ class ALocal_Ring_NodalBC
 
     virtual ~ALocal_Ring_NodalBC();
 
+    // Get the type of ring nodal BC
+    virtual int get_ringbc_type() const { return ringbc_type; }
+
     // Get global index of a Dirichlet node in the local partition
     // para node ranges [ 0 , Num_LD ).
     virtual int get_LDN( const int &node ) const { return LDN[node]; }
@@ -56,6 +59,12 @@ class ALocal_Ring_NodalBC
     { return VEC_T::is_invec(LDN, ii); }
 
   private:
+    // type = 0 : all dof of ring nodes are set to be essential bc;
+    // type = 1 : the dominant normal components of ring nodes are set to be essential bc;
+    // type = 2 : the dominant normal & tangential components of ring nodes are set to be
+    //            essential bc.
+    int ringbc_type;
+
     // Number of caps (equals the number of inlets + the number of outlets)
     int num_caps;
 
