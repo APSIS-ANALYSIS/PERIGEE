@@ -2,15 +2,17 @@
 
 Matrix_PETSc_CMM::Matrix_PETSc_CMM( const APart_Node * const &pnode_ptr,
     const ALocal_NodalBC * const &bc_part,
-    const ALocal_Ring_NodalBC * const &ring_bc_part,
-    const int &type ) : Matrix_PETSc( pnode_ptr, bc_part, 2, 0 )
+    const ALocal_Ring_NodalBC * const &ring_bc_part )
+: Matrix_PETSc( pnode_ptr, bc_part, 2, 0 )
 {
-  switch( type )
+  switch( ring_bc_part -> get_ringbc_type() )
   {
     case 0:
-      gen_ring_inplane_bc( pnode_ptr, bc_part, ring_bc_part );
       break;
     case 1:
+      gen_ring_inplane_bc( pnode_ptr, bc_part, ring_bc_part );
+      break;
+    case 2:
       gen_ring_radial_motion_bc( pnode_ptr, bc_part, ring_bc_part );
       break;
     default:

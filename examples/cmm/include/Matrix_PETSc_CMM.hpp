@@ -20,8 +20,7 @@ class Matrix_PETSc_CMM : public Matrix_PETSc
   public:
     Matrix_PETSc_CMM( const APart_Node * const &pnode_ptr,
         const ALocal_NodalBC * const &bc_part,
-        const ALocal_Ring_NodalBC * const &ring_bc_part,
-        const int &type );
+        const ALocal_Ring_NodalBC * const &ring_bc_part );
 
     virtual ~Matrix_PETSc_CMM();
 

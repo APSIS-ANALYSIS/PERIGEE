@@ -316,7 +316,7 @@ int main( int argc, char *argv[] )
   inflow_rate_ptr->print_info();
 
   // ===== Generate a sparse matrix for enforcing nodal BCs ====
-  Matrix_PETSc * pmat = new Matrix_PETSc_CMM(pNode, locnbc, locringnbc, 1);
+  Matrix_PETSc * pmat = new Matrix_PETSc_CMM(pNode, locnbc, locringnbc);
 
   pmat->gen_perm_bc(pNode, locnbc);
 
