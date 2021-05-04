@@ -103,7 +103,7 @@ class INodalBC
     virtual int get_para_3() const
     {
       SYS_T::print_fatal("Error: INodalBC::get_para_3 is not implemented.\n");
-      return 0.0;
+      return -1;
     }
 
     // --------------------------------------------------------------

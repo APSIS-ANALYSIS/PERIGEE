@@ -210,8 +210,9 @@ int main( int argc, char * argv[] )
   ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
 
   // Set up ring BC
-  INodalBC * ring_bc = new NodalBC_3D_ring( sur_file_in, inlet_outvec,
-       sur_file_wall, sur_file_out, outlet_outvec, nFunc, elemType );
+  const int ringBC_type = 0;
+  NodalBC_3D_ring * ring_bc = new NodalBC_3D_ring( sur_file_in, inlet_outvec,
+       sur_file_wall, sur_file_out, outlet_outvec, nFunc, ringBC_type, elemType );
 
   // Set up Nodal i.e. Dirichlet type Boundary Conditions. For CMM with prescribed inflow,
   // this includes all inlet interior nodes. To enable in-plane motion of the inlet & outlet

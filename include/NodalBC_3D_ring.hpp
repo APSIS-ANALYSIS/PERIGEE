@@ -37,11 +37,14 @@ class NodalBC_3D_ring : public INodalBC
         const std::vector<std::string> &outflow_files,
         const std::vector< Vector_3 > &outlet_outnormal,
         const int &nFunc,
+        const int &in_ring_bc_type,
         const int &elemtype = 501 );
 
     virtual ~NodalBC_3D_ring() {};
 
-    virtual int get_para_3() const { return num_caps; }
+    virtual int get_num_caps() const { return num_caps; }
+
+    virtual int get_ring_bc_type() const { return ring_bc_type; }
 
     virtual std::vector<int> get_cap_id() const { return cap_id; }
 
@@ -54,7 +57,14 @@ class NodalBC_3D_ring : public INodalBC
     virtual std::vector<double> get_tangential() const { return tangential; } 
 
   private:
-    NodalBC_3D_ring() {};
+    NodalBC_3D_ring() : ring_bc_type(0) {};
+
+    // Ring node bc type
+    // type = 0 : all dof of the nodes are set to be essential bc;
+    // type = 1 : the normal components of the nodes are set to be essential bc;
+    // type = 2 : the normal & tangential components of the nodes are set to be
+    //            essential bc.
+    const int ring_bc_type;
 
     // Number of caps (inlets, outlets)
     int num_caps;
@@ -72,10 +82,12 @@ class NodalBC_3D_ring : public INodalBC
     // length num_dir_nodes
     std::vector<int> dominant_t_comp;
 
-    // Each cap's unit normal vector, length 3 x num_caps
+    // Each cap's unit normal vector 
+    // length 3 x num_caps
     std::vector<double> outnormal;
 
-    // Each ring node's unit tangential vector, length 3 x num_dir_nodes
+    // Each ring node's unit tangential vector 
+    // length 3 x num_dir_nodes
     std::vector<double> tangential;
 
     // Compute centroid coordinates given a cap's nodal coordinates

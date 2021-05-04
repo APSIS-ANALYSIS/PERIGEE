@@ -15,19 +15,23 @@
 // Author: Ju Liu, Ingrid Lan
 // ==================================================================
 #include "NBC_Partition_3D.hpp"
+#include "NodalBC_3D_ring.hpp"
 
 class NBC_Partition_3D_ring : public NBC_Partition_3D
 {
   public:
     NBC_Partition_3D_ring(const IPart * const &part,
         const Map_Node_Index * const &mnindex,
-        const INodalBC * const &nbc );
+        const NodalBC_3D_ring * const &nbc );
 
     virtual ~NBC_Partition_3D_ring();
 
     virtual void write_hdf5( const char * FileName ) const;
 
   private:
+    // Type of the essential bc on the ring
+    const int ring_bc_type;
+
     // Number of caps (inlets, outlets)
     const int num_caps; 
 

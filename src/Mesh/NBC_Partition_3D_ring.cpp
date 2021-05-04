@@ -3,9 +3,10 @@
 NBC_Partition_3D_ring::NBC_Partition_3D_ring(
     const IPart * const &part,
     const Map_Node_Index * const &mnindex,
-    const INodalBC * const &nbc ) 
-: NBC_Partition_3D( part, mnindex, nbc ), 
-  num_caps( nbc -> get_para_3() ),
+    const NodalBC_3D_ring * const &nbc ) 
+: NBC_Partition_3D( part, mnindex, nbc ),
+  ring_bc_type( nbc -> get_ring_bc_type() ), 
+  num_caps( nbc -> get_num_caps() ),
   dominant_n_comp( nbc -> get_dominant_n_comp() ),
   outnormal( nbc -> get_outnormal() )
 {
@@ -62,6 +63,8 @@ void NBC_Partition_3D_ring::write_hdf5( const char * FileName ) const
   }
 
   h5writer->write_intVector( group_id, "Num_LD", Num_LD );
+
+  h5writer->write_intScalar( group_id, "ring_bc_type", ring_bc_type );
 
   h5writer->write_intScalar( group_id, "num_caps", num_caps );
 
