@@ -109,10 +109,11 @@ void PGAssem_Tet_CMM_GenAlpha::EssBC_KG(
 void PGAssem_Tet_CMM_GenAlpha::RingBC_KG( const ALocal_Ring_NodalBC * const &ringnbc_part )
 {
   const int ringbc_type = ringnbc_part -> get_ringbc_type();
-  
-  if( ringnbc_part->get_Num_LD() > 0 )
+  const int local_ring_node_num = ringnbc_part->get_Num_LD();
+
+  if( local_ring_node_num > 0 )
   {
-    for(int ii=0; ii<ringnbc_part->get_Num_LD(); ++ii)
+    for(int ii=0; ii < local_ring_node_num; ++ii)
     {
       if(ringbc_type == 1)
       {
@@ -131,8 +132,11 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG( const ALocal_Ring_NodalBC * const &rin
 
         VecSetValue( G, row_n, 0.0, INSERT_VALUES);
 
-        // correct the previously add 1.0 due to Dirichlet BC enforcement
-        MatSetValue(K, row_n, row_n, nn - 1.0, ADD_VALUES);
+        // Clean the row of normal component
+        MatZeroRows( K, 1, &row_n, 0.0, NULL, NULL);
+
+        // add the actual constraint equation in the normal direction
+        MatSetValue(K, row_n, row_n, nn, ADD_VALUES);
         MatSetValue(K, row_n, row_t, nt, ADD_VALUES);
         MatSetValue(K, row_n, row_r, nr, ADD_VALUES);
       }
@@ -158,6 +162,10 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG( const ALocal_Ring_NodalBC * const &rin
         VecSetValue(G, row_n, 0.0, INSERT_VALUES);
         VecSetValue(G, row_t, 0.0, INSERT_VALUES);
 
+        // Clean the row of normal and tangential components
+        MatZeroRows( K, 1, &row_n, 0.0, NULL, NULL);
+        MatZeroRows( K, 1, &row_t, 0.0, NULL, NULL);
+        
         // add the actual constraint equation in the normal direction
         MatSetValue(K, row_n, row_n, nn - 1.0, ADD_VALUES);
         MatSetValue(K, row_n, row_t, nt, ADD_VALUES);
