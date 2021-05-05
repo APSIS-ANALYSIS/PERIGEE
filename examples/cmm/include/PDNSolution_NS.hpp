@@ -41,6 +41,9 @@ class PDNSolution_NS : public PDNSolution
     void Init_pipe_parabolic( const APart_Node * const &pNode_ptr,
         const FEANode * const &fNode_ptr );
 
+    // case 3: generate no flow with prescribed pressure
+    void Init_no_flow_with_pressure( const APart_Node * const &pNode_ptr );
+
   private:
     const bool is_print;
 };
