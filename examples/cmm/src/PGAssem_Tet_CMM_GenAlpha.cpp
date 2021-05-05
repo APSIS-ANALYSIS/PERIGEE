@@ -86,6 +86,7 @@ void PGAssem_Tet_CMM_GenAlpha::EssBC_KG(
     for(int i=0; i<local_dir; ++i)
     {
       const int row = nbc_part->get_LDN(field, i) * dof_mat + field;
+      
       VecSetValue(G, row, 0.0, INSERT_VALUES);
       MatSetValue(K, row, row, 1.0, ADD_VALUES);
     }
@@ -115,7 +116,9 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG( const ALocal_Ring_NodalBC * const &rin
   {
     for(int ii=0; ii < local_ring_node_num; ++ii)
     {
-      if(ringbc_type == 1)
+      if(ringbc_type == 0)
+      {}
+      else if(ringbc_type == 1)
       {
         const int dnode  = ringnbc_part -> get_LDN( ii );
         const int dncomp = ringnbc_part -> get_dominant_n_comp( ii );
