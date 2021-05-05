@@ -77,7 +77,6 @@ PGAssem_Tet_CMM_GenAlpha::~PGAssem_Tet_CMM_GenAlpha()
 
 void PGAssem_Tet_CMM_GenAlpha::EssBC_KG(
     const ALocal_NodalBC * const &nbc_part,
-    const ALocal_Ring_NodalBC * const &ringnbc_part,
     const int &field )
 {
   const int local_dir = nbc_part->get_Num_LD(field);
@@ -104,58 +103,74 @@ void PGAssem_Tet_CMM_GenAlpha::EssBC_KG(
       VecSetValue(G, row, 0.0, INSERT_VALUES);
     }
   }
+}
 
-  const int local_ring_dir = ringnbc_part->get_Num_LD();
-  if(field > 0 && local_ring_dir > 0)
+
+void PGAssem_Tet_CMM_GenAlpha::RingBC_KG( const ALocal_Ring_NodalBC * const &ringnbc_part )
+{
+  const int ringbc_type = ringnbc_part -> get_ringbc_type();
+  
+  if( ringnbc_part->get_Num_LD() > 0 )
   {
     for(int ii=0; ii<local_ring_dir; ++ii)
     {
-      const int dnode  = ringnbc_part -> get_LDN( ii );
-      const int dncomp = ringnbc_part -> get_dominant_n_comp( ii );
-      const int dtcomp = ringnbc_part -> get_dominant_t_comp( ii ); 
-
-      // 3 - dncomp - dtcomp gives the remaining dof index
-      if(dncomp + 1 == field)
+      if(ringbc_type == 1)
       {
-        const int row_a = dnode * dof_mat + dncomp + 1;
-        const int col_b = dnode * dof_mat + dtcomp + 1;
-        const int col_c = dnode * dof_mat + 4 - dncomp - dtcomp;
+        const int dnode  = ringnbc_part -> get_LDN( ii );
+        const int dncomp = ringnbc_part -> get_dominant_n_comp( ii );
+        const int dtcomp = ringnbc_part -> get_dominant_t_comp( ii );
 
-        const double na = ringnbc_part -> get_outvec(ii, dncomp);
-        const double nb = ringnbc_part -> get_outvec(ii, dtcomp);
-        const double nc = ringnbc_part -> get_outvec(ii, 3 - dncomp - dtcomp);
-        
-        VecSetValue(G, row_a, 0.0, INSERT_VALUES);
-        
+        const int row_n = dnode * dof_mat + dncomp + 1;
+        const int row_t = dnode * dof_mat + dtcomp + 1;
+        // 3 - dncomp - dtcomp gives the dof index for radial direction
+        const int row_r = dnode * dof_mat + 4 - dncomp - dtcomp;
+
+        const double nn = ringnbc_part -> get_outvec(ii, dncomp);
+        const double nt = ringnbc_part -> get_outvec(ii, dtcomp);
+        const double nr = ringnbc_part -> get_outvec(ii, 3 - dncomp - dtcomp);
+
+        VecSetValue( G, row_n, 0.0, INSERT_VALUES);
+
         // correct the previously add 1.0 due to Dirichlet BC enforcement
-        MatSetValue(K, row_a, row_a, -1.0, ADD_VALUES);
+        MatSetValue(K, row_n, row_n, nn - 1.0, ADD_VALUES);
+        MatSetValue(K, row_n, row_t, nt, ADD_VALUES);
+        MatSetValue(K, row_n, row_r, nr, ADD_VALUES);
+      }
+      else if(ringbc_type == 2)
+      {
+        const int dnode  = ringnbc_part -> get_LDN( ii );
+        const int dncomp = ringnbc_part -> get_dominant_n_comp( ii );
+        const int dtcomp = ringnbc_part -> get_dominant_t_comp( ii );
         
+        const int row_n = dnode * dof_mat + dncomp + 1;
+        const int row_t = dnode * dof_mat + dtcomp + 1;
+        // 3 - dncomp - dtcomp gives the dof index for radial direction
+        const int row_r = dnode * dof_mat + 4 - dncomp - dtcomp;
+
+        const double nn = ringnbc_part -> get_outvec(ii, dncomp);
+        const double nt = ringnbc_part -> get_outvec(ii, dtcomp);
+        const double nr = ringnbc_part -> get_outvec(ii, 3 - dncomp - dtcomp);
+
+        const double tn = ringnbc_part -> get_tanvec(ii, dncomp);
+        const double tt = ringnbc_part -> get_tanvec(ii, dtcomp);
+        const double tr = ringnbc_part -> get_tanvec(ii, 3 - dncomp - dtcomp);
+
+        VecSetValue(G, row_n, 0.0, INSERT_VALUES);
+        VecSetValue(G, row_t, 0.0, INSERT_VALUES);
+
         // add the actual constraint equation in the normal direction
-        MatSetValue(K, row_a, row_a, na, ADD_VALUES);
-        MatSetValue(K, row_a, col_b, nb, ADD_VALUES);
-        MatSetValue(K, row_a, col_c, nc, ADD_VALUES);
-      }
-      else if(dtcomp + 1 == field)
-      {
-        const int row_b = dnode * dof_mat + dtcomp + 1;
-        const int col_a = dnode * dof_mat + dncomp + 1;
-        const int col_c = dnode * dof_mat + 4 - dncomp - dtcomp;
-
-        const double ta = ringnbc_part -> get_tanvec(ii, dncomp);
-        const double tb = ringnbc_part -> get_tanvec(ii, dtcomp);
-        const double tc = ringnbc_part -> get_tanvec(ii, 3 - dncomp - dtcomp);
-
-        VecSetValue(G, row_b, 0.0, INSERT_VALUES);
-
-        // correct the previously add 1.0 due to Dirichlet BC enforcement
-        MatSetValue(K, row_b, row_b, -1.0, ADD_VALUES);
-
+        MatSetValue(K, row_n, row_n, nn - 1.0, ADD_VALUES);
+        MatSetValue(K, row_n, row_t, nt, ADD_VALUES);
+        MatSetValue(K, row_n, row_r, nr, ADD_VALUES);
+        
         // add the actual constraint equation in the tangential direction
-        MatSetValue(K, row_b, row_b, tb, ADD_VALUES);
-        MatSetValue(K, row_b, col_a, ta, ADD_VALUES);
-        MatSetValue(K, row_b, col_c, tc, ADD_VALUES);
+        MatSetValue(K, row_t, row_n, tn, ADD_VALUES);
+        MatSetValue(K, row_t, row_t, tt - 1.0, ADD_VALUES);
+        MatSetValue(K, row_t, row_r, tr, ADD_VALUES);
       }
-    } 
+      else
+        SYS_T::print_fatal("Error: this ringbc_type is not supported in PGAssem_Tet_CMM_GenAlpha.\n");
+    }
   }
 }
 
@@ -213,7 +228,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_nonzero_estimate(
       for(int m=0; m<dof_mat; ++m)
         row_index[dof_mat * i + m] = dof_mat * nbc_part->get_LID( m, loc_index ) + m;
     }
-    
+
     MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
         lassem_ptr->Tangent, ADD_VALUES);
   }
@@ -282,7 +297,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_mass_residual(
       for(int mm=0; mm<dof_mat; ++mm)
         row_index[dof_mat*ii+mm] = dof_mat * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
     }
-    
+
     MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
         lassem_ptr->Tangent, ADD_VALUES);
 
@@ -334,7 +349,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_residual(
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
-  
+
   double * array_a = new double [nlgn * dof_sol];
   double * array_b = new double [nlgn * dof_sol];
   double * local_a = new double [nLocBas * dof_sol];
@@ -364,7 +379,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_residual(
       for(int mm=0; mm<dof_mat; ++mm)
         row_index[dof_mat*ii+mm] = dof_mat * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
     }
-    
+
     VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
 
@@ -377,7 +392,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_residual(
   delete [] ectrl_y; ectrl_y = nullptr;
   delete [] ectrl_z; ectrl_z = nullptr;
   delete [] row_index; row_index = nullptr;
-  
+
   // Backflow stabilization residual contribution
   BackFlow_G( sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
@@ -423,7 +438,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
-  
+
   double * array_a = new double [nlgn * dof_sol];
   double * array_b = new double [nlgn * dof_sol];
   double * local_a = new double [nLocBas * dof_sol];
@@ -787,7 +802,7 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_KG(
     }
 
     MatSetValues(K, dof_mat*snLocBas, srow_index, dof_mat*snLocBas, srow_index,
-          lassem_ptr->sur_Tangent, ADD_VALUES);
+        lassem_ptr->sur_Tangent, ADD_VALUES);
 
     VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
   }
@@ -1179,7 +1194,7 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_KG(
   double * sctrl_x = new double [snLocBas];
   double * sctrl_y = new double [snLocBas];
   double * sctrl_z = new double [snLocBas];
-  
+
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
     // Calculate dot flow rate for face with ebc_id and MPI_Allreduce them
@@ -1204,7 +1219,7 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_KG(
 
     // Get the (potentially approximated) n := dP/d(dot_Q)
     const double n_val = gbc -> get_n( ebc_id, dot_flrate, flrate );
-    
+
     // Define alpha_f * n + alpha_f * gamma * dt * m
     // coef a^t a enters as the consistent tangent for the resistance-type bc
     const double coef = a_f * n_val + dd_dv * m_val;
