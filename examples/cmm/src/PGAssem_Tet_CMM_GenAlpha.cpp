@@ -112,7 +112,7 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG( const ALocal_Ring_NodalBC * const &rin
   
   if( ringnbc_part->get_Num_LD() > 0 )
   {
-    for(int ii=0; ii<local_ring_dir; ++ii)
+    for(int ii=0; ii<ringnbc_part->get_Num_LD(); ++ii)
     {
       if(ringbc_type == 1)
       {
@@ -246,7 +246,9 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_nonzero_estimate(
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 
-  for(int ii=0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ringnbc_part, ii );
+  for(int ii=0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
+
+  RingBC_KG( ringnbc_part );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
@@ -315,8 +317,10 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_mass_residual(
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 
-  for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ringnbc_part, ii );
+  for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
 
+  RingBC_KG( ringnbc_part );
+  
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
   VecAssemblyBegin(G);
@@ -497,7 +501,9 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 
-  for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ringnbc_part, ii );
+  for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
+  
+  RingBC_KG( ringnbc_part );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
