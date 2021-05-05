@@ -162,18 +162,18 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG( const ALocal_Ring_NodalBC * const &rin
         VecSetValue(G, row_n, 0.0, INSERT_VALUES);
         VecSetValue(G, row_t, 0.0, INSERT_VALUES);
 
-        // Clean the row of normal and tangential components
+        // Clean the rows of normal and tangential components
         MatZeroRows( K, 1, &row_n, 0.0, NULL, NULL);
         MatZeroRows( K, 1, &row_t, 0.0, NULL, NULL);
         
         // add the actual constraint equation in the normal direction
-        MatSetValue(K, row_n, row_n, nn - 1.0, ADD_VALUES);
+        MatSetValue(K, row_n, row_n, nn, ADD_VALUES);
         MatSetValue(K, row_n, row_t, nt, ADD_VALUES);
         MatSetValue(K, row_n, row_r, nr, ADD_VALUES);
         
         // add the actual constraint equation in the tangential direction
         MatSetValue(K, row_t, row_n, tn, ADD_VALUES);
-        MatSetValue(K, row_t, row_t, tt - 1.0, ADD_VALUES);
+        MatSetValue(K, row_t, row_t, tt, ADD_VALUES);
         MatSetValue(K, row_t, row_r, tr, ADD_VALUES);
       }
       else
