@@ -8,6 +8,7 @@ Matrix_PETSc_CMM::Matrix_PETSc_CMM( const APart_Node * const &pnode_ptr,
   switch( ring_bc_part -> get_ringbc_type() )
   {
     case 0:
+      gen_perm_bc( pnode_ptr, bc_part );
       break;
     case 1:
       gen_ring_inplane_bc( pnode_ptr, bc_part, ring_bc_part );
