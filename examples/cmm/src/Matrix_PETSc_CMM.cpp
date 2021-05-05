@@ -9,12 +9,15 @@ Matrix_PETSc_CMM::Matrix_PETSc_CMM( const APart_Node * const &pnode_ptr,
   {
     case 0:
       gen_perm_bc( pnode_ptr, bc_part );
+      SYS_T::commPrint("     Matrix_PETSc_CMM : matrix for clamped rings.\n");
       break;
     case 1:
       gen_ring_inplane_bc( pnode_ptr, bc_part, ring_bc_part );
+      SYS_T::commPrint("     Matrix_PETSc_CMM : matrix for in-plane motion.\n");
       break;
     case 2:
       gen_ring_radial_motion_bc( pnode_ptr, bc_part, ring_bc_part );
+      SYS_T::commPrint("     Matrix_PETSc_CMM : matrix for radial motion.\n");
       break;
     default:
       SYS_T::print_fatal("Error: Matrix_PETSc_CMM has no such matrix type.\n");
