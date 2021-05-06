@@ -392,7 +392,6 @@ void PNonlinear_CMM_Solver::compute_ringbc_constraints(
     const PDNSolution * const &sol_wall_disp,
     const ALocal_Ring_NodalBC * const &ringnbc_part ) const
 {
-  const int ringbc_type  = ringnbc_part -> get_ringbc_type();
   const int num_ringnode = ringnbc_part -> get_Num_LD();
 
   if(num_ringnode > 0)
@@ -412,28 +411,15 @@ void PNonlinear_CMM_Solver::compute_ringbc_constraints(
       VecGetValues(sol->solution, 3, velo_idx, velo_val);
       VecGetValues(sol_wall_disp->solution, 3, disp_idx, disp_val);
 
-      if(ringbc_type == 0)
-      {
-        std::cout << "Ring node " << dnode << " " << velo_val[0] << " " << velo_val[1] << " " << velo_val[2] << " ";  
-        std::cout << disp_val[0] << " " << disp_val[1] << " " << disp_val[2] << std::endl;  
-      }
-      else if(ringbc_type == 1)
-      {
-        const double v_dot_n = velo_val[0] * outvec[0] + velo_val[1] * outvec[1] + velo_val[2] * outvec[2];
-        const double u_dot_n = disp_val[0] * outvec[0] + disp_val[1] * outvec[1] + disp_val[2] * outvec[2];
+      const double v_dot_n = velo_val[0] * outvec[0] + velo_val[1] * outvec[1] + velo_val[2] * outvec[2];
+      const double u_dot_n = disp_val[0] * outvec[0] + disp_val[1] * outvec[1] + disp_val[2] * outvec[2];
+      const double v_dot_t = velo_val[0] * tanvec[0] + velo_val[1] * tanvec[1] + velo_val[2] * tanvec[2];
+      const double u_dot_t = disp_val[0] * tanvec[0] + disp_val[1] * tanvec[1] + disp_val[2] * tanvec[2];
 
-        std::cout << "Ring node " << dnode << ": v_dot_n = " << v_dot_n << ", u_dot_n = " << u_dot_n << std::endl;  
-      }
-      else if(ringbc_type == 2)
-      {
-        const double v_dot_n = velo_val[0] * outvec[0] + velo_val[1] * outvec[1] + velo_val[2] * outvec[2];
-        const double u_dot_n = disp_val[0] * outvec[0] + disp_val[1] * outvec[1] + disp_val[2] * outvec[2];
-        const double v_dot_t = velo_val[0] * tanvec[0] + velo_val[1] * tanvec[1] + velo_val[2] * tanvec[2];
-        const double u_dot_t = disp_val[0] * tanvec[0] + disp_val[1] * tanvec[1] + disp_val[2] * tanvec[2];
-
-        std::cout << "Ring node " << dnode << ": v_dot_n = " << v_dot_n << ", u_dot_n = " << u_dot_n;
-        std::cout << ", v_dot_t = " << v_dot_t << ", u_dot_t = " << u_dot_t << std::endl;  
-      }
+      std::cout << "Ring node " << dnode << " : Velo=[" << velo_val[0] << ", " << velo_val[1] << ", " << velo_val[2] << "], "; 
+      std::cout << "Disp=[" << disp_val[0] << ", " << disp_val[1] << ", " << disp_val[2] << "], ";  
+      std::cout << "v_dot_n = " << v_dot_n << ", u_dot_n = " << u_dot_n << ", ";
+      std::cout << "v_dot_t = " << v_dot_t << ", u_dot_t = " << u_dot_t << std::endl;  
     }
   }
 }
