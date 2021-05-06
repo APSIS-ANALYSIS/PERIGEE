@@ -50,6 +50,7 @@ int main( int argc, char * argv[] )
   // Element options: 501 linear tets, 502 quadratic tets
   int elemType = 501;
   int num_outlet = 1;
+  int ringBC_type = 0;
   
   // Default names for input geometry files
   std::string geo_file("./whole_vol.vtu");
@@ -71,6 +72,7 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionInt("-in_ncommon", in_ncommon);
   SYS_T::GetOptionInt("-num_outlet", num_outlet);
   SYS_T::GetOptionInt("-elem_type", elemType);
+  SYS_T::GetOptionInt("-ringbc_type", ringBC_type);
   SYS_T::GetOptionString("-geo_file", geo_file);
   SYS_T::GetOptionString("-sur_file_in", sur_file_in);
   SYS_T::GetOptionString("-sur_file_wall", sur_file_wall);
@@ -81,6 +83,7 @@ int main( int argc, char * argv[] )
   // Print the command line arguments
   cout<<"==== Command Line Arguments ===="<<endl;
   cout<<" -elem_type: "<<elemType<<endl;
+  cout<<" -ringbc_type: "<<ringBC_type<<endl;
   cout<<" -num_outlet: "<<num_outlet<<endl;
   cout<<" -geo_file: "<<geo_file<<endl;
   cout<<" -sur_file_in: "<<sur_file_in<<endl;
@@ -210,7 +213,6 @@ int main( int argc, char * argv[] )
   ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
 
   // Set up ring BC
-  const int ringBC_type = 2;
   INodalBC * ring_bc = new NodalBC_3D_ring( sur_file_in, inlet_outvec,
        sur_file_wall, sur_file_out, outlet_outvec, nFunc, ringBC_type, elemType );
 
