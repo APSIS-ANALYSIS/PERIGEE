@@ -287,6 +287,9 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
 
   Print_convergence_info(nl_counter, relative_error, residual_norm);
 
+  // Debugging: check ring BC constraints
+  compute_ringbc_constraints(sol, sol_wall_disp, ringnbc_part);
+
   if( solve_prestress )
   {
     gassem_ptr->Update_Wall_Prestress(sol_wall_disp, lassem_ptr, elementw, quad_s, ebc_wall_part);
@@ -379,6 +382,60 @@ void PNonlinear_CMM_Solver::update_wall( const double &val,
 
   // Update ghost values
   wall_data->GhostUpdate();
+}
+
+
+// Check whether the ring BC constraints are properly satisfied
+// by printing their evaluations 
+void PNonlinear_CMM_Solver::compute_ringbc_constraints(
+    const PDNSolution * const &sol,
+    const PDNSolution * const &sol_wall_disp,
+    const ALocal_Ring_NodalBC * const &ringnbc_part ) const
+{
+  const int ringbc_type  = ringnbc_part -> get_ringbc_type();
+  const int num_ringnode = ringnbc_part -> get_Num_LD();
+
+  if(num_ringnode > 0)
+  {
+    for(int ii = 0; ii < num_ringnode; ++ii)
+    {
+      double velo_val[3], disp_val[3];
+
+      const int dnode  = ringnbc_part -> get_LDN( ii );
+
+      const double outvec[3] = {ringnbc_part -> get_outvec(ii, 0), ringnbc_part -> get_outvec(ii, 1), ringnbc_part -> get_outvec(ii, 2)};
+      const double tanvec[3] = {ringnbc_part -> get_tanvec(ii, 0), ringnbc_part -> get_tanvec(ii, 1), ringnbc_part -> get_tanvec(ii, 2)};
+
+      const int velo_idx[3] = {dnode*4 + 1, dnode*4 + 2, dnode*4 + 3};
+      const int disp_idx[3] = {dnode*3 + 0, dnode*3 + 1, dnode*3 + 2};
+
+      VecGetValues(sol->solution, 3, velo_idx, velo_val);
+      VecGetValues(sol_wall_disp->solution, 3, disp_idx, disp_val);
+
+      if(ringbc_type == 0)
+      {
+        std::cout << "Ring node " << dnode << " " << velo_val[0] << " " << velo_val[1] << " " << velo_val[2] << " ";  
+        std::cout << disp_val[0] << " " << disp_val[1] << " " << disp_val[2] << std::endl;  
+      }
+      else if(ringbc_type == 1)
+      {
+        const double v_dot_n = velo_val[0] * outvec[0] + velo_val[1] * outvec[1] + velo_val[2] * outvec[2];
+        const double u_dot_n = disp_val[0] * outvec[0] + disp_val[1] * outvec[1] + disp_val[2] * outvec[2];
+
+        std::cout << "Ring node " << dnode << ": v_dot_n = " << v_dot_n << ", u_dot_n = " << u_dot_n << std::endl;  
+      }
+      else if(ringbc_type == 2)
+      {
+        const double v_dot_n = velo_val[0] * outvec[0] + velo_val[1] * outvec[1] + velo_val[2] * outvec[2];
+        const double u_dot_n = disp_val[0] * outvec[0] + disp_val[1] * outvec[1] + disp_val[2] * outvec[2];
+        const double v_dot_t = velo_val[0] * tanvec[0] + velo_val[1] * tanvec[1] + velo_val[2] * tanvec[2];
+        const double u_dot_t = disp_val[0] * tanvec[0] + disp_val[1] * tanvec[1] + disp_val[2] * tanvec[2];
+
+        std::cout << "Ring node " << dnode << ": v_dot_n = " << v_dot_n << ", u_dot_n = " << u_dot_n;
+        std::cout << ", v_dot_t = " << v_dot_t << ", u_dot_t = " << u_dot_t << std::endl;  
+      }
+    }
+  }
 }
 
 // EOF

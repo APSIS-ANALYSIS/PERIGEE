@@ -115,6 +115,14 @@ class PNonlinear_CMM_Solver
         const PDNSolution * const &dot_step,
         PDNSolution * const &wall_data,
         const ALocal_EBC * const &ebc_wall_part ) const;
+
+
+    // Check whether the ring BC constraints are properly satisfied
+    // by printing their evaluations 
+    void compute_ringbc_constraints(
+        const PDNSolution * const &sol,
+        const PDNSolution * const &sol_wall_disp,
+        const ALocal_Ring_NodalBC * const &ringnbc_part ) const;
 };
 
 #endif
