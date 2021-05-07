@@ -55,16 +55,6 @@ class NodalBC_3D_vtu : public INodalBC
 
   private:
     NodalBC_3D_vtu() {};
-
-    // Compute centroid coordinates given a cap's nodal coordinates
-    void compute_cap_centroid( const std::vector<double> &pts, Vector_3 &centroid ) const;
-
-    // Return the dominant component index of a ring node's unit tangential vector
-    // \para outvec  : corresponding cap's unit outward normal
-    // \para centroid: corresponding cap's centroidal coordinates
-    // \para pt_x, pt_y, pt_z: nodal coordinates
-    int compute_tangential( const Vector_3 &outvec, const Vector_3 &centroid,
-        const double &pt_x, const double &pt_y, const double &pt_z );
 };
 
 #endif

@@ -175,38 +175,4 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::vector<std::string> &vtufileList,
 NodalBC_3D_vtu::~NodalBC_3D_vtu()
 {}
 
-
-void NodalBC_3D_vtu::compute_cap_centroid( const std::vector<double> &pts, Vector_3 &centroid ) const
-{
-  const int num_node = static_cast<int>( pts.size() / 3 );
-
-  for(int ii=0; ii<num_node; ++ii)
-  {
-    centroid(0) += pts[3*ii + 0];
-    centroid(1) += pts[3*ii + 1];
-    centroid(2) += pts[3*ii + 2];
-  }
-
-  centroid(0) /= (double) num_node;
-  centroid(1) /= (double) num_node;
-  centroid(2) /= (double) num_node;
-}
-
-
-int NodalBC_3D_vtu::compute_tangential( const Vector_3 &outvec, const Vector_3 &centroid,
-    const double &pt_x, const double &pt_y, const double &pt_z )
-{
-  // Generate radial vector using nodal & centroidal coordinates
-  Vector_3 radial_vec = Vector_3( pt_x, pt_y, pt_z );
-  radial_vec -= centroid;
-
-  Vector_3 tan_vec = cross_product( outvec, radial_vec );
-  tan_vec.normalize();
-
-  // Ensure dominant component indices in the normal and tangential vectors
-  // aren't equal 
-  tan_vec( outvec.get_dominant_comp() ) = 0.0;
-  return tan_vec.get_dominant_comp();
-}
-
 // EOF
