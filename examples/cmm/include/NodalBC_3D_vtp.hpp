@@ -43,7 +43,7 @@ class NodalBC_3D_vtp : public INodalBC
     // ------------------------------------------------------------------------ 
     // Specify the Dirichlet nodes for CMM-type FSI simulations.
     // \para nbc_inflow : inflow nodes
-    // \para nbc_ring   : ring nodes
+    // \para nbc_ring   : ring nodes. The ring BC type will already be specified.
     // \para comp       : the dof components ranges from 0 to 2 representing
     //                    x-, y-, and z-components.
     // ------------------------------------------------------------------------ 
@@ -51,31 +51,6 @@ class NodalBC_3D_vtp : public INodalBC
         const INodalBC * const &nbc_ring,
         const int &comp, const int &nFunc );
 
-    // ------------------------------------------------------------------------ 
-    // Specify the Dirichlet nodes for CMM. This includes all inlet
-    // nodes and the outline (`ring') nodes for each outlet surface.
-    // Used for inlet & outlet clamping.
-    // ------------------------------------------------------------------------ 
-    NodalBC_3D_vtp( const std::string &inflow_vtp_file,
-        const std::string &wall_vtp_file,
-        const std::vector<std::string> &outflow_vtp_files,
-        const int &nFunc );
-     
-    // ------------------------------------------------------------------------ 
-    // Specify the Dirichlet nodes for CMM. This includes all interior
-    // inlet nodes. For each inlet/outlet, ring nodes are also included
-    // for the velocity dof corresponding to the unit normal's dominant
-    // component. Used for inlet & outlet in-plane or purely radial motion.
-    //     \para type: 0 for in-plane motion. 1 for purely radial motion.
-    //     \para comp: velocity component. 0, 1, or 2.
-    // ------------------------------------------------------------------------ 
-    NodalBC_3D_vtp( const std::string &inflow_vtp_file,
-        const Vector_3 &inflow_outward_vec,
-        const std::string &wall_vtp_file,
-        const std::vector<std::string> &outflow_vtp_files,
-        const std::vector< Vector_3 > &outflow_outward_vec,
-        const int &type, const int &comp, const int &nFunc );
-     
     // ------------------------------------------------------------------------ 
     // The vtp file specifies the Dirichlet nodes. No periodical BC.
     // ------------------------------------------------------------------------ 
