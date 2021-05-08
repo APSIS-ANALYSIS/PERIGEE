@@ -150,6 +150,8 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
   if(ring_bc_type == 0) std::cout<<"for fully clamped case (ring_bc_type = 0).\n";
   else if(ring_bc_type == 1) std::cout<<"for in-plane motion (ring_bc_type = 1).\n";
   else if(ring_bc_type == 2) std::cout<<"for radial motion (ring_bc_type = 2).\n";
+  else if(ring_bc_type == 3) std::cout<<"for inlet clamping & outlet in-plane motion (ring_bc_type = 3).\n";
+  else if(ring_bc_type == 4) std::cout<<"for inlet clamping & outlet tangential motion (ring_bc_type = 4).\n";
   else SYS_T::print_fatal("Error: NodalBC_3D_ring does not allow this ring_bc_type!\n");
 }
 
