@@ -87,7 +87,7 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const INodalBC * const &nbc_inflow,
           num_dom_n_pts[ cap_id[ii] ] += 1;
           num_dom_t_pts[ cap_id[ii] ] += 1;
         }
-        else if ( comp == dom_n_comp[ cap_id[ii] ] )
+        else if( comp == dom_n_comp[ cap_id[ii] ] )
         {
           dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
           num_dom_n_pts[ cap_id[ii] ] += 1;
@@ -106,12 +106,12 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const INodalBC * const &nbc_inflow,
           num_dom_n_pts[ cap_id[ii] ] += 1;
           num_dom_t_pts[ cap_id[ii] ] += 1;
         }
-        else if ( comp == dom_n_comp[ cap_id[ii] ] )
+        else if( comp == dom_n_comp[ cap_id[ii] ] )
         {
           dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
           num_dom_n_pts[ cap_id[ii] ] += 1;
         }
-        else if ( comp == dom_t_comp[ii] )
+        else if( comp == dom_t_comp[ii] )
         {
           dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
           num_dom_t_pts[ cap_id[ii] ] += 1;

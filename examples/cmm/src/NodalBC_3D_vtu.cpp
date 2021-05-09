@@ -77,6 +77,48 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const INodalBC * const &nbc_inflow,
       }
       break;
 
+    case 3:
+      // Add all inlet ring nodes. Only add outlet ring nodes if dom_n_comp equals comp
+      for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
+      {
+        if( cap_id[ii] == 0 )  // Inlet cap_id is 0
+        {
+          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
+          num_dom_n_pts[ cap_id[ii] ] += 1;
+          num_dom_t_pts[ cap_id[ii] ] += 1;
+        }
+        else if( comp == dom_n_comp[ cap_id[ii] ] )
+        {
+          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
+          num_dom_n_pts[ cap_id[ii] ] += 1;
+        }
+      }
+      break;
+
+    case 4:
+      // Add all inlet ring nodes. Only add outlet ring nodes if dom_n_comp equals comp
+      // or dom_t_comp equals comp.
+      for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
+      {
+        if( cap_id[ii] == 0 ) // Inlet cap_id is 0
+        {
+          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
+          num_dom_n_pts[ cap_id[ii] ] += 1;
+          num_dom_t_pts[ cap_id[ii] ] += 1;
+        }
+        else if( comp == dom_n_comp[ cap_id[ii] ] )
+        {
+          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
+          num_dom_n_pts[ cap_id[ii] ] += 1;
+        }
+        else if( comp == dom_t_comp[ii] )
+        {
+          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
+          num_dom_t_pts[ cap_id[ii] ] += 1;
+        }
+      }
+      break;
+
     default:
       SYS_T::print_fatal("Error: there is no such type of essential bc for ring nodes.\n");
       break;
