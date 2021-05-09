@@ -22,11 +22,16 @@ class ALocal_Ring_NodalBC
     virtual int get_ringbc_type() const { return ringbc_type; }
 
     // Get global index of a Dirichlet node in the local partition
-    // para node ranges [ 0 , Num_LD ).
+    // para node ranges [ 0, Num_LD ).
     virtual int get_LDN( const int &node ) const { return LDN[node]; }
 
     // Get the number of Dirichlet nodes in the local partition
     virtual int get_Num_LD() const { return Num_LD; }
+
+    // Get the Dirichlet node's corresponding cap ID
+    // para node ranges [ 0, Num_LD ).
+    // output value is [ 0, num_caps ), where ID 0 corresponds to the inlet.
+    virtual int get_cap_id( const int &node ) const { return local_cap_id[node]; }
 
     // get the Dirichlet node's dominant component index for the unit outward
     // normal vector, which is the largest in absolute value in it.
