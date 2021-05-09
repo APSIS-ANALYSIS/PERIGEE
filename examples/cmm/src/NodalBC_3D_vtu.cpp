@@ -98,39 +98,6 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const INodalBC * const &nbc_inflow,
   std::cout<<"     is generated. \n";
 }
 
-
-NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &vtufilename, 
-    const int &nFunc )
-{
-  SYS_T::file_check( vtufilename );
-
-  int numpts, numcels;
-  std::vector<double> pts;
-  std::vector<int> ien, gnode, gelem;
-
-  TET_T::read_vtu_grid( vtufilename, numpts, numcels, pts, ien, gnode, gelem );
-
-  dir_nodes.clear();
-  per_slave_nodes.clear();
-  per_master_nodes.clear();
-  num_per_nodes = 0;
-  num_dir_nodes = numpts;
-
-  dir_nodes.resize( gnode.size() );
-  for(unsigned int ii=0; ii<gnode.size(); ++ii)
-  {
-    if(gnode[ii]<0) SYS_T::print_fatal("Error: there are negative nodal index! \n");
-
-    dir_nodes[ii] = static_cast<unsigned int>( gnode[ii] ); 
-  }
-
-  // Generate the ID array
-  Create_ID(nFunc);
-
-  std::cout<<"===> NodalBC_3D_vtu specified by "<<vtufilename<<" is generated. \n";
-}
-
-
 NodalBC_3D_vtu::NodalBC_3D_vtu( const std::vector<std::string> &vtufileList,
     const int &nFunc )
 {

@@ -35,21 +35,13 @@ class NodalBC_3D_vtu : public INodalBC
     //                    x-, y-, and z-components.
     // ------------------------------------------------------------------------ 
     NodalBC_3D_vtu( const INodalBC * const &nbc_inflow,
-        const INodalBC * const &nbc_ring,
-        const int &comp, const int &nFunc );
-
-    // ------------------------------------------------------------------------
-    // Read in the vtu file that all the nodes in this file will be
-    // enforced as essential boundary conditions.
-    // ------------------------------------------------------------------------
-    NodalBC_3D_vtu( const std::string &vtufilename, const int &nFunc );
+        const INodalBC * const &nbc_ring, const int &comp, const int &nFunc );
 
     // ------------------------------------------------------------------------
     // Read a list of vtu files to specify the Dirichlet nodes.
     // No periodic BC nodes.
     // ------------------------------------------------------------------------
-    NodalBC_3D_vtu( const std::vector<std::string> &vtufileList,
-        const int &nFunc );
+    NodalBC_3D_vtu( const std::vector<std::string> &vtufileList, const int &nFunc );
 
     virtual ~NodalBC_3D_vtu();
 

@@ -47,21 +47,14 @@ class NodalBC_3D_vtp : public INodalBC
     // \para comp       : the dof components ranges from 0 to 2 representing
     //                    x-, y-, and z-components.
     // ------------------------------------------------------------------------ 
-    NodalBC_3D_vtp( const INodalBC * const &nbc_inflow,
-        const INodalBC * const &nbc_ring,
-        const int &comp, const int &nFunc );
-
-    // ------------------------------------------------------------------------ 
-    // The vtp file specifies the Dirichlet nodes. No periodical BC.
-    // ------------------------------------------------------------------------ 
-    NodalBC_3D_vtp( const std::string &vtpfileName, const int &nFunc );
+    NodalBC_3D_vtp( const INodalBC * const &nbc_inflow, 
+        const INodalBC * const &nbc_ring, const int &comp, const int &nFunc );
 
     // ------------------------------------------------------------------------ 
     // The list of vtp files specifies the Dirichlet nodes. 
     // No periodical type BC nodes.
     // ------------------------------------------------------------------------ 
-    NodalBC_3D_vtp( const std::vector<std::string> &vtpfileList, 
-        const int &nFunc );
+    NodalBC_3D_vtp( const std::vector<std::string> &vtpfileList, const int &nFunc );
 
     virtual ~NodalBC_3D_vtp();
 
