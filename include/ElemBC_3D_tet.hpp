@@ -85,11 +85,12 @@ class ElemBC_3D_tet : public ElemBC
 
   protected:
     // prohibit the default constructor
-    ElemBC_3D_tet() : elem_type(501) {};
+    ElemBC_3D_tet() : elem_type(501), num_ebc(0) {};
 
     const int elem_type;
      
-    int num_ebc;
+    const int num_ebc;
+    
     int * num_node;     // length num_ebc
     int * num_cell;     // length num_ebc
     int * cell_nLocBas; // length num_ebc
