@@ -425,11 +425,6 @@ namespace TET_T
   void get_out_normal( const std::string &file,
       const std::vector<double> &vol_ctrlPts,
       const IIEN * const &vol_ien,
-      std::vector<double> &outVec );
-
-  void get_out_normal( const std::string &file,
-      const std::vector<double> &vol_ctrlPts,
-      const IIEN * const &vol_ien,
       Vector_3 &outVec );
   
   // ================================================================
