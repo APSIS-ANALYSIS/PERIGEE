@@ -1,6 +1,6 @@
 PROJECT(perigee)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
 
 IF(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
@@ -34,6 +34,7 @@ SET( perigee_source ${perigee_SOURCE_DIR}/../../../src )
 # 1. Preprocessor source cpp
 SET( perigee_preprocess_lib_src 
   ${perigee_source}/System/Sys_Tools.cpp
+  ${perigee_source}/System/Vector_3.cpp
   ${perigee_source}/System/Matrix_double_3by3_Array.cpp
   ${perigee_source}/System/Math_Tools.cpp
   ${perigee_source}/Mesh/Tet_Tools.cpp
@@ -47,8 +48,8 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Mesh_Tet4.cpp
   ${perigee_source}/Mesh/IPart.cpp
   ${perigee_source}/Mesh/Part_Tet.cpp
-  ${perigee_source}/Mesh/ElemBC_3D_tet4.cpp
-  ${perigee_source}/Mesh/ElemBC_3D_tet4_outflow.cpp
+  ${perigee_source}/Mesh/ElemBC_3D_tet.cpp
+  ${perigee_source}/Mesh/ElemBC_3D_tet_outflow.cpp
   ${perigee_source}/Mesh/NodalBC_3D_vtp.cpp
   ${perigee_source}/Mesh/NodalBC_3D_inflow.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
@@ -66,6 +67,7 @@ SET( perigee_preprocess_lib_src
 # 2. Anlysis source cpp
 SET( perigee_analysis_lib_src
   ${perigee_source}/System/Sys_Tools.cpp
+  ${perigee_source}/System/Vector_3.cpp
   ${perigee_source}/System/PETSc_Tools.cpp
   ${perigee_source}/System/Matrix_double_3by3_Array.cpp
   ${perigee_source}/System/Matrix_PETSc.cpp

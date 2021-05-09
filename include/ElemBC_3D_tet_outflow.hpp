@@ -1,15 +1,15 @@
 #ifndef ELEMBC_3D_TET_OUTFLOW_HPP
 #define ELEMBC_3D_TET_OUTFLOW_HPP
-// ==================================================================
+// ============================================================================
 // ElemBC_3D_tet_outflow.hpp
 //
 // A derived class from the ElemBC_3D_tet.hpp
 //
-// This class has a vector with length num_node for each ebc id that
-// stores int_{Gamma} N_A dS
+// This class has a vector with length num_node for each ebc id that stores 
+// int_{Gamma} N_A dS
 //
 // Date: Feb. 6 2020
-// ==================================================================
+// ============================================================================
 #include "ElemBC_3D_tet.hpp"
 #include "FEAElement_Triangle3_3D_der0.hpp"
 #include "FEAElement_Triangle6_3D_der0.hpp"
@@ -42,7 +42,16 @@ class ElemBC_3D_tet_outflow : public ElemBC_3D_tet
     { return intNA[ebc_id]; }
 
   private:
+    // Disallow the default constructor
+    ElemBC_3D_tet_outflow() {};
+
+    // It stores the surface integral of each nodal basis function on the 
+    // outlet surfaces.
+    // Dimension is num_ebc x num_node[ii].
     std::vector< std::vector<double> > intNA;
+
+    // It explicitly stores the outlet face normal vector.
+    // Dimension num_ebc
     std::vector< Vector_3 > outNormal;
 };
 

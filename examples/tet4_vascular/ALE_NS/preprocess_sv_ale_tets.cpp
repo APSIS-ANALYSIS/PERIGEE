@@ -23,7 +23,7 @@
 #include "Part_Tet.hpp"
 #include "NodalBC_3D_vtp.hpp"
 #include "NodalBC_3D_inflow.hpp"
-#include "ElemBC_3D_tet4_outflow.hpp"
+#include "ElemBC_3D_tet_outflow.hpp"
 #include "NBC_Partition_3D.hpp"
 #include "NBC_Partition_3D_inflow.hpp"
 #include "EBC_Partition_vtp_outflow.hpp"
@@ -208,18 +208,18 @@ int main( int argc, char * argv[] )
   meshBC_list[2] = new NodalBC_3D_vtp( meshdir_vtp_list, nFunc );
 
   // Genereate the inflow bc info
-  std::vector<double> inflow_outward_vec; // inflow surface outward normal vec
-  TET_T::get_out_normal( sur_file_in, ctrlPts, IEN, inflow_outward_vec );
+  Vector_3 inlet_outvec;
+  TET_T::get_out_normal( sur_file_in, ctrlPts, IEN, inlet_outvec );
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall, 
-      nFunc, inflow_outward_vec );
+      nFunc, inlet_outvec );
 
   // Elemental boundary conditions
-  std::vector< std::vector<double> > outflow_outward_vec;
-  outflow_outward_vec.resize( sur_file_out.size() );
+  std::vector< Vector_3 > outlet_outvec;
+  outlet_outvec.resize( sur_file_out.size() );
   for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
-    TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN, outflow_outward_vec[ii] );
+    TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN, outlet_outvec[ii] );
 
-  ElemBC * ebc = new ElemBC_3D_tet4_outflow( sur_file_out, outflow_outward_vec );
+  ElemBC * ebc = new ElemBC_3D_tet_outflow( sur_file_out, outlet_outvec );
 
   // Correct the triangle's IEN so that we can get the outward normal 
   // direction easily. See the document for this reset function
@@ -228,7 +228,7 @@ int main( int argc, char * argv[] )
   // Elemental BC for the ALE mesh
   std::vector<std::string> mesh_ebclist;
   mesh_ebclist.clear();
-  ElemBC * mesh_ebc = new ElemBC_3D_tet4( mesh_ebclist );
+  ElemBC * mesh_ebc = new ElemBC_3D_tet( mesh_ebclist );
   // ----------------------------------------------------------------
   
   // flag for printing partition statistics

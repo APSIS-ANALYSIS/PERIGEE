@@ -160,10 +160,10 @@ int main( int argc, char * argv[] )
   NBC_list[3] = new NodalBC_3D_vtp( dir_list, nFunc );
 
   // Genereate the inflow bc info
-  std::vector<double> inflow_outward_vec; // inflow surface outward normal vec
-  TET_T::get_out_normal( sur_file_in, ctrlPts, IEN, inflow_outward_vec );
+  Vector_3 inlet_outvec; // inflow surface outward normal vec
+  TET_T::get_out_normal( sur_file_in, ctrlPts, IEN, inlet_outvec );
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall, 
-      nFunc, inflow_outward_vec );
+      nFunc, inlet_outvec );
   
   // Elemental BC
   std::vector<std::string> ebclist;

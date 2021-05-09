@@ -22,21 +22,16 @@ class ElemBC_3D_tet : public ElemBC
 
     virtual int get_num_ebc() const {return num_ebc;}
 
-    virtual int get_num_node(const int &ebc_id) const
-    {return num_node[ebc_id];}
+    virtual int get_num_node(const int &ebc_id) const {return num_node[ebc_id];}
 
-    virtual int get_num_cell(const int &ebc_id) const
-    {return num_cell[ebc_id];}
+    virtual int get_num_cell(const int &ebc_id) const {return num_cell[ebc_id];}
 
-    virtual int get_cell_nLocBas(const int &ebc_id) const
-    {return cell_nLocBas[ebc_id];}
+    virtual int get_cell_nLocBas(const int &ebc_id) const {return cell_nLocBas[ebc_id];}
 
-    virtual double get_pt_xyz(const int &ebc_id, const int &node,
-        const int &dir) const
+    virtual double get_pt_xyz(const int &ebc_id, const int &node, const int &dir) const
     {return pt_xyz[ebc_id][3*node+dir];}
 
-    virtual int get_ien(const int &ebc_id, const int &cell,
-        const int &lnode) const
+    virtual int get_ien(const int &ebc_id, const int &cell, const int &lnode) const
     {return tri_ien[ebc_id][ cell_nLocBas[ebc_id] * cell + lnode ];}
 
     virtual int get_global_node(const int &ebc_id, const int &node_index) const
@@ -84,11 +79,14 @@ class ElemBC_3D_tet : public ElemBC
     {SYS_T::commPrint("Warning: get_fluid_density is not implemented. \n"); return -1.0;}
 
     // write the boundary surface to a vtk/vtu format for visualization
-    virtual void write_vtk( const int &ebc_id,
-       const std::string &filename="elembc_surface" ) const
+    virtual void write_vtk( const int &ebc_id, 
+        const std::string &filename="elembc_surface" ) const
     {SYS_T::commPrint("Warning: write_vtk is not implemented. \n");}
 
   protected:
+    // prohibit the default constructor
+    ElemBC_3D_tet() : elem_type(501) {};
+
     const int elem_type;
      
     int num_ebc;
