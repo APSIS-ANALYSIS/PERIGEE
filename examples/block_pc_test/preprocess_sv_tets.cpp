@@ -203,19 +203,19 @@ int main( int argc, char * argv[] )
     NBC_list[0] = new NodalBC_3D_vtu( dir_list, nFunc );
 
   // Inflow BC info
-  std::vector<double> inflow_outward_vec;
-  TET_T::get_out_normal( sur_file_in, ctrlPts, IEN, inflow_outward_vec );
+  Vector_3 inlet_outvec;
+  TET_T::get_out_normal( sur_file_in, ctrlPts, IEN, inlet_outvec );
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall,
-      nFunc, inflow_outward_vec, elemType );
+      nFunc, inlet_outvec, elemType );
 
   // Setup Elemental Boundary Conditions
   // Obtain the outward normal vector
-  std::vector< std::vector<double> > outflow_outward_vec;
-  outflow_outward_vec.resize( sur_file_out.size() );
+  std::vector< Vector_3 > outlet_outvec;
+  outlet_outvec.resize( sur_file_out.size() );
   for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
-    TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN, outflow_outward_vec[ii] );
+    TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN, outlet_outvec[ii] );
 
-  ElemBC * ebc = new ElemBC_3D_tet_outflow( sur_file_out, outflow_outward_vec, elemType );
+  ElemBC * ebc = new ElemBC_3D_tet_outflow( sur_file_out, outlet_outvec, elemType );
 
   ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
  
