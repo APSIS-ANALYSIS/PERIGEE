@@ -23,7 +23,7 @@
 #include "NodalBC_3D_vtp.hpp"
 #include "NodalBC_3D_vtu.hpp"
 #include "NodalBC_3D_inflow.hpp"
-#include "ElemBC_3D_tet4_outflow.hpp"
+#include "ElemBC_3D_tet_outflow.hpp"
 #include "NBC_Partition_3D.hpp"
 #include "NBC_Partition_3D_inflow.hpp"
 #include "EBC_Partition_vtp_outflow.hpp"
@@ -275,26 +275,26 @@ int main( int argc, char * argv[] )
   meshBC_list[2] = new NodalBC_3D_vtu( geo_s_file, meshdir_vtp_list, nFunc );
 
   // Generate inflow bc info
-  std::vector<double> inflow_outward_vec; // inflow surface outward normal vec
-  TET_T::get_out_normal( sur_f_file_in, ctrlPts, IEN, inflow_outward_vec );
+  Vector_3 inlet_outvec; // inflow surface outward normal vec
+  TET_T::get_out_normal( sur_f_file_in, ctrlPts, IEN, inlet_outvec );
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_f_file_in, sur_f_file_wall,
-      nFunc, inflow_outward_vec ); 
+      nFunc, inlet_outvec ); 
 
   // Elemental BC
   cout<<"Elem boundary for the implicit solver: \n";
-  std::vector< std::vector<double> > outflow_outward_vec;
-  outflow_outward_vec.resize( num_outlet );
+  std::vector< Vector_3 > outlet_outvec;
+  outlet_outvec.resize( num_outlet );
   for(int ii=0; ii<num_outlet; ++ii)
-    TET_T::get_out_normal( sur_f_file_out[ii], ctrlPts, IEN, outflow_outward_vec[ii] );
+    TET_T::get_out_normal( sur_f_file_out[ii], ctrlPts, IEN, outlet_outvec[ii] );
 
-  ElemBC * ebc = new ElemBC_3D_tet4_outflow( sur_f_file_out, outflow_outward_vec );
+  ElemBC * ebc = new ElemBC_3D_tet_outflow( sur_f_file_out, outlet_outvec );
 
   ebc -> resetTriIEN_outwardnormal( IEN );
 
   // Mesh EBC
   std::vector<std::string> mesh_ebclist;
   mesh_ebclist.clear();
-  ElemBC * mesh_ebc = new ElemBC_3D_tet4( mesh_ebclist );
+  ElemBC * mesh_ebc = new ElemBC_3D_tet( mesh_ebclist );
   // ----------------------------------------------------------------
 
   const bool isPrintPartInfo = true;
