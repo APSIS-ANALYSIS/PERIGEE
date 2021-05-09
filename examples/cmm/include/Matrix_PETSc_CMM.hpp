@@ -62,9 +62,9 @@ class Matrix_PETSc_CMM : public Matrix_PETSc
     //             ub = val2 uc
     //             val1 = (nb tc - nc tb) / (na tb - nb ta)
     //             val2 = (ta nc - na tc) / (na tb - nb ta)         
-    // 1. For ring nodes that belong to the ALocal_Ring_NodalBC class, the rows
-    //    for ua and ub with columns at uc are inserted with value val1 & val2,
-    //    respectively.
+    // 1. For ring nodes that belong to the ALocal_Ring_NodalBC class,
+    //    the entries in (row ua, col uc) and (row ub, col uc) will be assigned
+    //    values val1 & val2, respectively.
     // 2. For the remaining essential BC nodes, we assign 0 to all entries in
     //    all components' rows.
     // 3. For all remaining nodes, we assign 1 to the diagonal entries. 
@@ -110,9 +110,9 @@ class Matrix_PETSc_CMM : public Matrix_PETSc
     //             ub = val2 uc
     //             val1 = (nb tc - nc tb) / (na tb - nb ta)
     //             val2 = (ta nc - na tc) / (na tb - nb ta)         
-    // 1. For outlet ring nodes that belong to the ALocal_Ring_NodalBC class, the rows
-    //    for ua and ub with columns at uc are inserted with value val1 & val2,
-    //    respectively.
+    // 1. For outlet ring nodes that belong to the ALocal_Ring_NodalBC class,
+    //    the entries in (row ua, col uc) and (row ub, col uc) will be assigned
+    //    values val1 & val2, respectively.
     // 2. For the remaining essential BC nodes, we assign 0 to all entries in
     //    all components' rows.
     // 3. For all remaining nodes, we assign 1 to the diagonal entries. 
