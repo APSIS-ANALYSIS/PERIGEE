@@ -4,6 +4,7 @@
 // Author: Ju Liu
 // Date: Apr. 4 2019
 // ==================================================================
+#include "HDF5_Writer.hpp"
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
 #include "APart_Node_FSI.hpp"
@@ -166,8 +167,7 @@ int main(int argc, char *argv[])
   // ===== Record important parameters =====
   if(rank == 0)
   {
-    hid_t cmd_file_id = H5Fcreate("solver_cmd.h5",
-      H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+    hid_t cmd_file_id = H5Fcreate("solver_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
     HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
 
     cmdh5w->write_doubleScalar("fl_density", fluid_density);
