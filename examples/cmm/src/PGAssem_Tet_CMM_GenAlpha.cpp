@@ -888,15 +888,15 @@ void PGAssem_Tet_CMM_GenAlpha::Update_Wall_Prestress(
     lassem_ptr->get_Wall_CauchyStress( local_bs, element_w,
         sthickness, syoungsmod, quad_s, sigma ); 
 
-    // update prestress in Voigt notation (comps 11, 22, 33, 12, 23, 31)
+    // update prestress in Voigt notation (comps 11, 22, 33, 23, 13, 12)
     for(int qua=0; qua<face_nqp; ++qua)
     {
       quaprestress[6*qua]   += sigma[qua](0, 0);
       quaprestress[6*qua+1] += sigma[qua](1, 1);
       quaprestress[6*qua+2] += sigma[qua](2, 2);
-      quaprestress[6*qua+3] += sigma[qua](0, 1);
-      quaprestress[6*qua+4] += sigma[qua](1, 2);
-      quaprestress[6*qua+5] += sigma[qua](2, 0);
+      quaprestress[6*qua+3] += sigma[qua](1, 2);
+      quaprestress[6*qua+4] += sigma[qua](0, 2);
+      quaprestress[6*qua+5] += sigma[qua](0, 1);
     }
 
     ebc_wall_part -> set_prestress(ee, quaprestress);
