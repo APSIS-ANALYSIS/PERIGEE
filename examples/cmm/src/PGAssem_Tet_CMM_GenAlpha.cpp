@@ -111,34 +111,58 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG( const ALocal_Ring_NodalBC * const &rin
 {
   const int local_ring_node_num = ringnbc_part->get_Num_LD();
 
-  if( local_ring_node_num > 0 )
+  const int ringbc_type = ringnbc_part -> get_ringbc_type();
+
+  for(int ii=0; ii<local_ring_node_num; ++ii)
   {
-    const int ringbc_type = ringnbc_part -> get_ringbc_type();
+    const int cap_id = ringnbc_part -> get_cap_id( ii );
 
-    for(int ii=0; ii < local_ring_node_num; ++ii)
+    const int dnode  = ringnbc_part -> get_LDN( ii );
+    const int dncomp = ringnbc_part -> get_dominant_n_comp( ii );
+    const int dtcomp = ringnbc_part -> get_dominant_t_comp( ii );
+    
+    const int row_n = dnode * dof_mat + dncomp + 1;
+    const int row_t = dnode * dof_mat + dtcomp + 1;
+    // 3 - dncomp - dtcomp gives the dof index for radial direction
+    const int row_r = dnode * dof_mat + 4 - dncomp - dtcomp;
+
+    const double nn = ringnbc_part -> get_outvec(ii, dncomp);
+    const double nt = ringnbc_part -> get_outvec(ii, dtcomp);
+    const double nr = ringnbc_part -> get_outvec(ii, 3 - dncomp - dtcomp);
+
+    const double tn = ringnbc_part -> get_tanvec(ii, dncomp);
+    const double tt = ringnbc_part -> get_tanvec(ii, dtcomp);
+    const double tr = ringnbc_part -> get_tanvec(ii, 3 - dncomp - dtcomp);
+
+    if(ringbc_type == 0) { break; }
+
+    else if(ringbc_type == 1)
     {
-      const int cap_id = ringnbc_part -> get_cap_id( ii );
+      VecSetValue( G, row_n, 0.0, INSERT_VALUES);
 
-      const int dnode  = ringnbc_part -> get_LDN( ii );
-      const int dncomp = ringnbc_part -> get_dominant_n_comp( ii );
-      const int dtcomp = ringnbc_part -> get_dominant_t_comp( ii );
+      // add the actual constraint equation in the normal direction
+      MatSetValue(K, row_n, row_n, nn - 1.0, ADD_VALUES);
+      MatSetValue(K, row_n, row_t, nt,       ADD_VALUES);
+      MatSetValue(K, row_n, row_r, nr,       ADD_VALUES);
+    }
+    else if(ringbc_type == 2)
+    {
+      VecSetValue(G, row_n, 0.0, INSERT_VALUES);
+      VecSetValue(G, row_t, 0.0, INSERT_VALUES);
+
+      // add the actual constraint equation in the normal direction
+      MatSetValue(K, row_n, row_n, nn - 1.0, ADD_VALUES);
+      MatSetValue(K, row_n, row_t, nt,       ADD_VALUES);
+      MatSetValue(K, row_n, row_r, nr,       ADD_VALUES);
       
-      const int row_n = dnode * dof_mat + dncomp + 1;
-      const int row_t = dnode * dof_mat + dtcomp + 1;
-      // 3 - dncomp - dtcomp gives the dof index for radial direction
-      const int row_r = dnode * dof_mat + 4 - dncomp - dtcomp;
-
-      const double nn = ringnbc_part -> get_outvec(ii, dncomp);
-      const double nt = ringnbc_part -> get_outvec(ii, dtcomp);
-      const double nr = ringnbc_part -> get_outvec(ii, 3 - dncomp - dtcomp);
-
-      const double tn = ringnbc_part -> get_tanvec(ii, dncomp);
-      const double tt = ringnbc_part -> get_tanvec(ii, dtcomp);
-      const double tr = ringnbc_part -> get_tanvec(ii, 3 - dncomp - dtcomp);
-
-      if(ringbc_type == 0) { break; }
-
-      else if(ringbc_type == 1)
+      // add the actual constraint equation in the tangential direction
+      MatSetValue(K, row_t, row_n, tn,       ADD_VALUES);
+      MatSetValue(K, row_t, row_t, tt - 1.0, ADD_VALUES);
+      MatSetValue(K, row_t, row_r, tr,       ADD_VALUES);
+    }
+    else if(ringbc_type == 3)
+    {
+      if( cap_id != 0 )
       {
         VecSetValue( G, row_n, 0.0, INSERT_VALUES);
 
@@ -147,7 +171,10 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG( const ALocal_Ring_NodalBC * const &rin
         MatSetValue(K, row_n, row_t, nt,       ADD_VALUES);
         MatSetValue(K, row_n, row_r, nr,       ADD_VALUES);
       }
-      else if(ringbc_type == 2)
+    }
+    else if(ringbc_type == 4)
+    {
+      if( cap_id != 0 )
       {
         VecSetValue(G, row_n, 0.0, INSERT_VALUES);
         VecSetValue(G, row_t, 0.0, INSERT_VALUES);
@@ -162,39 +189,9 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG( const ALocal_Ring_NodalBC * const &rin
         MatSetValue(K, row_t, row_t, tt - 1.0, ADD_VALUES);
         MatSetValue(K, row_t, row_r, tr,       ADD_VALUES);
       }
-      else if(ringbc_type == 3)
-      {
-        if( cap_id != 0 )
-        {
-          VecSetValue( G, row_n, 0.0, INSERT_VALUES);
-
-          // add the actual constraint equation in the normal direction
-          MatSetValue(K, row_n, row_n, nn - 1.0, ADD_VALUES);
-          MatSetValue(K, row_n, row_t, nt,       ADD_VALUES);
-          MatSetValue(K, row_n, row_r, nr,       ADD_VALUES);
-        }
-      }
-      else if(ringbc_type == 4)
-      {
-        if( cap_id != 0 )
-        {
-          VecSetValue(G, row_n, 0.0, INSERT_VALUES);
-          VecSetValue(G, row_t, 0.0, INSERT_VALUES);
-
-          // add the actual constraint equation in the normal direction
-          MatSetValue(K, row_n, row_n, nn - 1.0, ADD_VALUES);
-          MatSetValue(K, row_n, row_t, nt,       ADD_VALUES);
-          MatSetValue(K, row_n, row_r, nr,       ADD_VALUES);
-          
-          // add the actual constraint equation in the tangential direction
-          MatSetValue(K, row_t, row_n, tn,       ADD_VALUES);
-          MatSetValue(K, row_t, row_t, tt - 1.0, ADD_VALUES);
-          MatSetValue(K, row_t, row_r, tr,       ADD_VALUES);
-        }
-      }
-      else
-        SYS_T::print_fatal("Error: this ringbc_type is not supported in PGAssem_Tet_CMM_GenAlpha.\n");
     }
+    else
+      SYS_T::print_fatal("Error: this ringbc_type is not supported in PGAssem_Tet_CMM_GenAlpha.\n");
   }
 }
 
