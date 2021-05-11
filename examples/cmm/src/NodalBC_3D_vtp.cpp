@@ -36,93 +36,95 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const INodalBC * const &nbc_inflow,
   std::vector<int> num_dom_n_pts( nbc_ring->get_num_caps(), 0 );
   std::vector<int> num_dom_t_pts( nbc_ring->get_num_caps(), 0 );
 
-  switch( ringbc_type )
-  {
-    case 0:
-      // regardless of comp, all ring nodes are added as essential bc
-      for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
-      {
-        dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
-        num_dom_n_pts[ cap_id[ii] ] += 1;
-        num_dom_t_pts[ cap_id[ii] ] += 1;
-      }
-      break;
+  // ================ ISL DEBUGGING ================
+  // switch( ringbc_type )
+  // {
+  //   case 0:
+  //     // regardless of comp, all ring nodes are added as essential bc
+  //     for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
+  //     {
+  //       dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
+  //       num_dom_n_pts[ cap_id[ii] ] += 1;
+  //       num_dom_t_pts[ cap_id[ii] ] += 1;
+  //     }
+  //     break;
 
-    case 1:
-      // if dom_n_comp equals comp, ring node is added to dir_nodes
-      for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
-      {
-        if( comp == dom_n_comp[ cap_id[ii] ] )
-        {
-          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
-          num_dom_n_pts[ cap_id[ii] ] += 1;
-        }
-      }
-      break;
+  //   case 1:
+  //     // if dom_n_comp equals comp, ring node is added to dir_nodes
+  //     for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
+  //     {
+  //       if( comp == dom_n_comp[ cap_id[ii] ] )
+  //       {
+  //         dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
+  //         num_dom_n_pts[ cap_id[ii] ] += 1;
+  //       }
+  //     }
+  //     break;
 
-    case 2:
-      // if dom_n_comp or dom_t_comp equals comp, ring node is added to dir_nodes
-      for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
-      {
-        if( comp == dom_n_comp[ cap_id[ii] ] )
-        {
-          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
-          num_dom_n_pts[ cap_id[ii] ] += 1;
-        }
-        else if( comp == dom_t_comp[ii] )
-        {
-          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
-          num_dom_t_pts[ cap_id[ii] ] += 1;
-        }
-      }
-      break;
+  //   case 2:
+  //     // if dom_n_comp or dom_t_comp equals comp, ring node is added to dir_nodes
+  //     for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
+  //     {
+  //       if( comp == dom_n_comp[ cap_id[ii] ] )
+  //       {
+  //         dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
+  //         num_dom_n_pts[ cap_id[ii] ] += 1;
+  //       }
+  //       else if( comp == dom_t_comp[ii] )
+  //       {
+  //         dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
+  //         num_dom_t_pts[ cap_id[ii] ] += 1;
+  //       }
+  //     }
+  //     break;
 
-    case 3:
-      // Add all inlet ring nodes. Only add outlet ring nodes if dom_n_comp equals comp
-      for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
-      {
-        if( cap_id[ii] == 0 )  // Inlet cap_id is 0
-        {
-          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
-          num_dom_n_pts[ cap_id[ii] ] += 1;
-          num_dom_t_pts[ cap_id[ii] ] += 1;
-        }
-        else if( comp == dom_n_comp[ cap_id[ii] ] )
-        {
-          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
-          num_dom_n_pts[ cap_id[ii] ] += 1;
-        }
-      }
-      break;
+  //   case 3:
+  //     // Add all inlet ring nodes. Only add outlet ring nodes if dom_n_comp equals comp
+  //     for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
+  //     {
+  //       if( cap_id[ii] == 0 )  // Inlet cap_id is 0
+  //       {
+  //         dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
+  //         num_dom_n_pts[ cap_id[ii] ] += 1;
+  //         num_dom_t_pts[ cap_id[ii] ] += 1;
+  //       }
+  //       else if( comp == dom_n_comp[ cap_id[ii] ] )
+  //       {
+  //         dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
+  //         num_dom_n_pts[ cap_id[ii] ] += 1;
+  //       }
+  //     }
+  //     break;
 
-    case 4:
-      // Add all inlet ring nodes. Only add outlet ring nodes if dom_n_comp equals comp
-      // or dom_t_comp equals comp.
-      for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
-      {
-        if( cap_id[ii] == 0 ) // Inlet cap_id is 0
-        {
-          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
-          num_dom_n_pts[ cap_id[ii] ] += 1;
-          num_dom_t_pts[ cap_id[ii] ] += 1;
-        }
-        else if( comp == dom_n_comp[ cap_id[ii] ] )
-        {
-          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
-          num_dom_n_pts[ cap_id[ii] ] += 1;
-        }
-        else if( comp == dom_t_comp[ii] )
-        {
-          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
-          num_dom_t_pts[ cap_id[ii] ] += 1;
-        }
-      }
-      break;
+  //   case 4:
+  //     // Add all inlet ring nodes. Only add outlet ring nodes if dom_n_comp equals comp
+  //     // or dom_t_comp equals comp.
+  //     for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
+  //     {
+  //       if( cap_id[ii] == 0 ) // Inlet cap_id is 0
+  //       {
+  //         dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
+  //         num_dom_n_pts[ cap_id[ii] ] += 1;
+  //         num_dom_t_pts[ cap_id[ii] ] += 1;
+  //       }
+  //       else if( comp == dom_n_comp[ cap_id[ii] ] )
+  //       {
+  //         dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
+  //         num_dom_n_pts[ cap_id[ii] ] += 1;
+  //       }
+  //       else if( comp == dom_t_comp[ii] )
+  //       {
+  //         dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
+  //         num_dom_t_pts[ cap_id[ii] ] += 1;
+  //       }
+  //     }
+  //     break;
 
-    default:
-      SYS_T::print_fatal("Error: there is no such type of essential bc for ring nodes.\n");
-      break;
-  }
+  //   default:
+  //     SYS_T::print_fatal("Error: there is no such type of essential bc for ring nodes.\n");
+  //     break;
+  // }
+  // ================ END ISL DEBUGGING ================
 
   // Clean up the dir_nodes and generate ID array
   VEC_T::sort_unique_resize(dir_nodes);

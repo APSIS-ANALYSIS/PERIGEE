@@ -268,7 +268,8 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_nonzero_estimate(
 
   for(int ii=0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
 
-  RingBC_KG( ringnbc_part );
+  // ==== ISL DEBUGGING!!! ====
+  // RingBC_KG( ringnbc_part );
   
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
@@ -339,7 +340,8 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_mass_residual(
 
   for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
 
-  RingBC_KG( ringnbc_part );
+  // ==== ISL DEBUGGING!!! ====
+  // RingBC_KG( ringnbc_part );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
@@ -523,7 +525,8 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
 
   for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
   
-  RingBC_KG( ringnbc_part );
+  // ==== ISL DEBUGGING!!! ====
+  // RingBC_KG( ringnbc_part );
   
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
