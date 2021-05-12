@@ -75,8 +75,7 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
 
     virtual void print_info() const;
 
-    virtual void get_wall_thickness( std::vector<double> &th ) const
-    {th = thickness;}
+    virtual std::vector<double> get_wall_thickness() const {return thickness;}
 
     virtual void get_wall_youngsmod( std::vector<double> &E ) const
     {E = youngsmod;}

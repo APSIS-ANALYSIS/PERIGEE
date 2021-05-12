@@ -124,8 +124,8 @@ class ElemBC
 
 
     // This returns the wall thickness used in CMM
-    virtual void get_wall_thickness( std::vector<double> &th ) const
-    {SYS_T::commPrint("Warning: get_wall_thickness is not implemented. \n");}
+    virtual std::vector<double> get_wall_thickness() const
+    {SYS_T::commPrint("Warning: get_wall_thickness is not implemented. \n"); return {};}
 
 
     // This returns the wall youngs modulus used in CMM
