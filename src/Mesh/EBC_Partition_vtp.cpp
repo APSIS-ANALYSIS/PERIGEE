@@ -1,8 +1,7 @@
 #include "EBC_Partition_vtp.hpp"
 
 EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
-    const Map_Node_Index * const &mnindex,     
-    const ElemBC * const &ebc )
+    const Map_Node_Index * const &mnindex, const ElemBC * const &ebc )
 : cpu_rank( part->get_cpu_rank() ), num_ebc( ebc->get_num_ebc() )
 {
   // Clean up all the vectors
