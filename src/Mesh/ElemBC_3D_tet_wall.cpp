@@ -7,7 +7,6 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const int &elemtype,
     const double &in_fluid_density )
 : ElemBC_3D_tet( walls_combined, elemtype ),
-  elemType( elemtype ),
   fluid_density( in_fluid_density )
 {
   // num_ebc = 1 per the assumption for wall elem bc
@@ -43,7 +42,6 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const int &elemtype,
     const double &in_fluid_density )
 : ElemBC_3D_tet( walls_combined, elemtype ),
-  elemType( elemtype ),
   fluid_density( in_fluid_density )
 {
   // num_ebc = 1 per the assumption for wall elem bc
@@ -233,7 +231,7 @@ void ElemBC_3D_tet_wall::print_info() const
 void ElemBC_3D_tet_wall::write_vtk( const int &ebc_id,
     const std::string &filename ) const
 {
-  if(elemType == 501)
+  if(elem_type == 501)
   {
     vtkPolyData * grid_w = vtkPolyData::New();
 
