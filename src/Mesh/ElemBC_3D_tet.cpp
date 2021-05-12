@@ -1,5 +1,21 @@
 #include "ElemBC_3D_tet.hpp"
 
+ElemBC_3D_tet::ElemBC_3D_tet( const int &elemtype ) 
+: elem_type( elemtype ), num_ebc( 0 )
+{
+  num_node     = nullptr;
+  num_cell     = nullptr;
+  cell_nLocBas = nullptr;
+
+  pt_xyz.clear();
+  tri_ien.clear();
+  global_node.clear();
+  global_cell.clear();
+
+  std::cout<<"===> ElemBC_3D_tet called by an empty constructor is generated. \n";
+}
+
+
 ElemBC_3D_tet::ElemBC_3D_tet( const std::string &vtkfile,
    const int &elemtype ) : elem_type( elemtype ), num_ebc( 1 )
 {
@@ -81,7 +97,7 @@ void ElemBC_3D_tet::print_info() const
 {
   std::cout<<"========================= \n";
   std::cout<<"ElemBC_3D_tet : ";
-  std::cout<<" elem_type = "<<elem_type<<std::endl;
+  std::cout<<" elem_type = "<<elem_type<<'\t';
   std::cout<<" num_ebc = "<<num_ebc<<std::endl;
   for(int ii=0; ii<num_ebc; ++ii)
   {

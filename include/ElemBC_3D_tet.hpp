@@ -1,18 +1,21 @@
 #ifndef ELEMBC_3D_TET_HPP
 #define ELEMBC_3D_TET_HPP
-// ==================================================================
+// ============================================================================
 // ElemBC_3D_tet.hpp
 //
-// This is an instantiation of ElemBC for 3D problems. It records the
-// elemental bc information for separate surface files.
+// This is an instantiation of ElemBC for 3D problems. It records the elemental 
+// bc information for separate surface files.
 //
 // Date: Feb. 6 2020
-// ==================================================================
+// ============================================================================
 #include "ElemBC.hpp"
 
 class ElemBC_3D_tet : public ElemBC
 {
   public:
+    // Default constructor: prescribe an elembc class with no surface mesh data.
+    ElemBC_3D_tet( const int &elemtype = 501 );
+
     ElemBC_3D_tet( const std::string &vtkfile, const int &elemtype=501 );
 
     ElemBC_3D_tet( const std::vector<std::string> &vtkfileList,
@@ -84,9 +87,6 @@ class ElemBC_3D_tet : public ElemBC
     {SYS_T::commPrint("Warning: write_vtk is not implemented. \n");}
 
   protected:
-    // prohibit the default constructor
-    ElemBC_3D_tet() : elem_type(501), num_ebc(0) {};
-
     const int elem_type;
      
     const int num_ebc;
