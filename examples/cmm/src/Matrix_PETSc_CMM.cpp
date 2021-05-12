@@ -5,61 +5,32 @@ Matrix_PETSc_CMM::Matrix_PETSc_CMM( const APart_Node * const &pnode_ptr,
     const ALocal_Ring_NodalBC * const &ring_bc_part )
 : Matrix_PETSc( pnode_ptr, bc_part, 2, 0 )
 {
-
-  // =================== ISL DEBUGGING ==================
-  if(is_set) Clear();
-  SYS_T::print_fatal_if(m != n, "Error: This is not a square matrix. \n");
-
-  const int nnode = pnode_ptr->get_nlocalnode();
-  const int dof   = bc_part->get_dofMat();
-
-  // We enforce 4 dofs per node
-  SYS_T::print_fatal_if(dof != 4, "Error: Matrix_PETSc::gen_ring_radial_motion_bc assumes 4 dofs per node.\n");
-
-  for(int ii=0; ii<nnode; ++ii)
+  switch( ring_bc_part -> get_ringbc_type() )
   {
-    for(int jj=0; jj<dof; ++jj)
-    {
-      const int row = pnode_ptr->get_node_loc(ii) * dof + jj;
-      const int col = bc_part->get_LID(jj, ii) * dof + jj;
-      // For non-essential bc nodes, its diagonal entry will be assigned 1.0
-      MatSetValue(K, row, col, 1.0, INSERT_VALUES);
-    }
+    case 0:
+      gen_perm_bc( pnode_ptr, bc_part );
+      SYS_T::commPrint("     Matrix_PETSc_CMM : matrix for clamped rings.\n");
+      break;
+    case 1:
+      gen_ring_inplane_bc( pnode_ptr, bc_part, ring_bc_part );
+      SYS_T::commPrint("     Matrix_PETSc_CMM : matrix for in-plane motion.\n");
+      break;
+    case 2:
+      gen_ring_radial_motion_bc( pnode_ptr, bc_part, ring_bc_part );
+      SYS_T::commPrint("     Matrix_PETSc_CMM : matrix for radial motion.\n");
+      break;
+    case 3:
+      gen_outlet_ring_inplane_bc( pnode_ptr, bc_part, ring_bc_part );
+      SYS_T::commPrint("     Matrix_PETSc_CMM : matrix for inlet clamping & outlet in-plane motion.\n");
+      break;
+    case 4:
+      gen_outlet_ring_radial_motion_bc( pnode_ptr, bc_part, ring_bc_part );
+      SYS_T::commPrint("     Matrix_PETSc_CMM : matrix for inlet clamping & outlet radial motion.\n");
+      break;
+    default:
+      SYS_T::print_fatal("Error: Matrix_PETSc_CMM has no such matrix type.\n");
+      break;
   }
-
-  MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
-  MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
-
-  is_set = true;
-
-  // switch( ring_bc_part -> get_ringbc_type() )
-  // {
-  //   case 0:
-  //     gen_perm_bc( pnode_ptr, bc_part );
-  //     SYS_T::commPrint("     Matrix_PETSc_CMM : matrix for clamped rings.\n");
-  //     break;
-  //   case 1:
-  //     gen_ring_inplane_bc( pnode_ptr, bc_part, ring_bc_part );
-  //     SYS_T::commPrint("     Matrix_PETSc_CMM : matrix for in-plane motion.\n");
-  //     break;
-  //   case 2:
-  //     gen_ring_radial_motion_bc( pnode_ptr, bc_part, ring_bc_part );
-  //     SYS_T::commPrint("     Matrix_PETSc_CMM : matrix for radial motion.\n");
-  //     break;
-  //   case 3:
-  //     gen_outlet_ring_inplane_bc( pnode_ptr, bc_part, ring_bc_part );
-  //     SYS_T::commPrint("     Matrix_PETSc_CMM : matrix for inlet clamping & outlet in-plane motion.\n");
-  //     break;
-  //   case 4:
-  //     gen_outlet_ring_radial_motion_bc( pnode_ptr, bc_part, ring_bc_part );
-  //     SYS_T::commPrint("     Matrix_PETSc_CMM : matrix for inlet clamping & outlet radial motion.\n");
-  //     break;
-  //   default:
-  //     SYS_T::print_fatal("Error: Matrix_PETSc_CMM has no such matrix type.\n");
-  //     break;
-  // }
-
-  // =================== END ISL DEBUGGING ==================
 }
 
 
