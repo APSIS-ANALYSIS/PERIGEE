@@ -1,5 +1,15 @@
 #include "ElemBC_3D_tet_wall.hpp"
 
+ElemBC_3D_tet_wall::ElemBC_3D_tet_wall( const int &elemtype, 
+    const double &in_fluid_density )
+: ElemBC_3D_tet( elemtype ), fluid_density( in_fluid_density )
+{
+  radius.clear();
+  thickness.clear();
+  youngsmod.clear();
+}
+
+
 ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const std::string &walls_combined,
     const double &uniform_thickness,

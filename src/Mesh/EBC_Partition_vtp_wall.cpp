@@ -11,21 +11,28 @@ EBC_Partition_vtp_wall::EBC_Partition_vtp_wall(
   part_youngsmod.clear();
 
   // wall has only one surface per the assumption in wall ebc  
-  const int ebc_id = 0;
-  if( num_local_node[ebc_id] > 0 )
+  if(num_ebc == 0)
+  {}
+  else if(num_ebc == 1)
   {
-    // access wall properties of the whole surface
-    std::vector<double> temp_th, temp_E;
-    ebc -> get_wall_thickness( temp_th );
-    ebc -> get_wall_youngsmod( temp_E );
-
-    // save wall properties only belonging to nodes in the partition
-    for( int ii=0; ii<num_local_node[ebc_id]; ++ii )
+    const int ebc_id = 0;
+    if( num_local_node[ebc_id] > 0 )
     {
-      part_thickness.push_back( temp_th[ local_node[ebc_id][ii] ] );
-      part_youngsmod.push_back( temp_E[  local_node[ebc_id][ii] ] );
+      // access wall properties of the whole surface
+      std::vector<double> temp_th, temp_E;
+      ebc -> get_wall_thickness( temp_th );
+      ebc -> get_wall_youngsmod( temp_E );
+
+      // save wall properties only belonging to nodes in the partition
+      for( int ii=0; ii<num_local_node[ebc_id]; ++ii )
+      {
+        part_thickness.push_back( temp_th[ local_node[ebc_id][ii] ] );
+        part_youngsmod.push_back( temp_E[  local_node[ebc_id][ii] ] );
+      }
     }
   }
+  else
+    SYS_T::print_fatal("Error: the num_ebc in EBC_Partition_vtp_wall should be 0 or 1. \n");
 }
 
 EBC_Partition_vtp_wall::~EBC_Partition_vtp_wall()
@@ -53,23 +60,25 @@ void EBC_Partition_vtp_wall::write_hdf5( const char * FileName ) const
 
   h5w -> write_doubleScalar( g_id, "fluid_density", fluid_density );
 
-  // num_ebc = 1 for wall elem bc, and ebc_id is 0
-  const int ebc_id = 0;
-  if( num_local_cell[ebc_id] > 0 )
+  if( num_ebc == 1 )
   {
-    hid_t group_id = H5Gopen( g_id, "ebcid_0", H5P_DEFAULT );
+    // num_ebc = 1 for wall elem bc, and ebc_id is 0
+    const int ebc_id = 0;
+    if( num_local_cell[ebc_id] > 0 )
+    {
+      hid_t group_id = H5Gopen( g_id, "ebcid_0", H5P_DEFAULT );
 
-    h5w->write_doubleVector( group_id, "thickness", part_thickness );
-    h5w->write_doubleVector( group_id, "youngsmod", part_youngsmod );
-  
-    H5Gclose( group_id );
+      h5w->write_doubleVector( group_id, "thickness", part_thickness );
+      h5w->write_doubleVector( group_id, "youngsmod", part_youngsmod );
+
+      H5Gclose( group_id );
+    }
   }
 
   delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
 }
 
-void EBC_Partition_vtp_wall::write_hdf5( const char * FileName, 
-    const char * GroupName ) const
+void EBC_Partition_vtp_wall::write_hdf5( const char * FileName, const char * GroupName ) const
 {
   // This function is NOT allowed. If the user uses the same groupname for the
   // wall and outlets, the wall data and the 0-th outlet data will be mixed.
