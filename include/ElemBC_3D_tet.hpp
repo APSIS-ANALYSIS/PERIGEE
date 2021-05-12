@@ -74,8 +74,8 @@ class ElemBC_3D_tet : public ElemBC
     {SYS_T::commPrint("Warning: get_wall_thickness is not implemented. \n"); return {};}
 
     // Access the data in ElemBC_3D_tet_wall, wall youngs modulus used in CMM
-    virtual void get_wall_youngsmod( std::vector<double> &E ) const
-    {SYS_T::commPrint("Warning: get_wall_youngsmod is not implemented. \n");}
+    virtual std::vector<double> get_wall_youngsmod() const
+    {SYS_T::commPrint("Warning: get_wall_youngsmod is not implemented. \n"); return {};}
 
     // Access the data in ElemBC_3D_tet_wall, fluid density used for CMM young's modulus
     virtual double get_fluid_density() const

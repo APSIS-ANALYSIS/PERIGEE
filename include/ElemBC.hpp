@@ -129,8 +129,8 @@ class ElemBC
 
 
     // This returns the wall youngs modulus used in CMM
-    virtual void get_wall_youngsmod( std::vector<double> &E ) const
-    {SYS_T::commPrint("Warning: get_wall_youngsmod is not implemented. \n");}
+    virtual std::vector<double> get_wall_youngsmod() const
+    {SYS_T::commPrint("Warning: get_wall_youngsmod is not implemented. \n"); return {};}
 
 
     // This returns the fluid density used for the young's modulus in CMM

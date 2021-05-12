@@ -19,9 +19,8 @@ EBC_Partition_vtp_wall::EBC_Partition_vtp_wall(
     if( num_local_node[ebc_id] > 0 )
     {
       // access wall properties of the whole surface
-      std::vector<double> temp_E;
       std::vector<double> temp_th = ebc -> get_wall_thickness();
-      ebc -> get_wall_youngsmod( temp_E );
+      std::vector<double> temp_E  = ebc -> get_wall_youngsmod();
 
       // save wall properties only belonging to nodes in the partition
       for( int ii=0; ii<num_local_node[ebc_id]; ++ii )
