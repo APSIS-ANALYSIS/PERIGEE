@@ -274,9 +274,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
     SYS_T::commPrint("  --- nl_res: %e \n", residual_norm);
 
     // Print the residual norm of the kienmatic equation
-    double kinematic_residual_norm = 0.0;
-    VecNorm(G_kinematic.solution, NORM_2, &kinematic_residual_norm);
-    SYS_T::commPrint("  --- kinematic_res: %e \n", kinematic_residual_norm);
+    SYS_T::commPrint("  --- kinematic_res: %e \n", G_kinematic.Norm_2());
 
     relative_error = residual_norm / initial_norm;
 
@@ -294,9 +292,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
   {
     gassem_ptr->Update_Wall_Prestress(sol_wall_disp, lassem_ptr, elementw, quad_s, ebc_wall_part);
 
-    double wall_disp_norm = 0.0;
-    VecNorm(sol_wall_disp->solution, NORM_2, &wall_disp_norm);
-    SYS_T::commPrint("  --- wall_disp_norm: %e \n", wall_disp_norm);
+    SYS_T::commPrint("  --- wall_disp_norm: %e \n", sol_wall_disp->Norm_2());
 
     if( wall_disp_norm <= prestress_tol ) prestress_conv_flag = true;
   }
