@@ -201,7 +201,7 @@ int main( int argc, char * argv[] )
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall,
       nFunc, inlet_outvec, elemType );
 
-  // Set up Elemental i.e. Neumann type Boundary Conditions
+  // Set up Outflow BC info
   // Obtain the outward normal vector
   std::vector< Vector_3 > outlet_outvec;
   outlet_outvec.resize( sur_file_out.size() );
@@ -212,7 +212,7 @@ int main( int argc, char * argv[] )
 
   ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
 
-  // Set up ring BC
+  // Set up Ring BC
   INodalBC * ring_bc = new NodalBC_3D_ring( sur_file_in, inlet_outvec,
        sur_file_wall, sur_file_out, outlet_outvec, nFunc, ringBC_type, elemType );
 
