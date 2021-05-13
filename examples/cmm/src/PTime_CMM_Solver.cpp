@@ -2,7 +2,7 @@
 
 PTime_CMM_Solver::PTime_CMM_Solver(
     const std::string &input_name, const int &input_record_freq,
-    const int &input_renew_tang_freq, const double &input_final_time,
+    const int &input_renew_tang_freq, const double &input_final_time
     const bool &prestress_flag )
 : final_time(input_final_time), sol_record_freq(input_record_freq),
   renew_tang_freq(input_renew_tang_freq), pb_name(input_name),
@@ -112,14 +112,14 @@ void PTime_CMM_Solver::TM_CMM_GenAlpha(
   // If this is a restart run, do not re-write the solution binaries
   if(restart_init_assembly_flag == false)
   {
-    // Write (dot) pres, (dot) velo
+    // Write [ (dot) pres, (dot) velo ]
     sol_name = Name_Generator(time_info->get_index());
     cur_sol->WriteBinary(sol_name.c_str());
     
     sol_dot_name = Name_dot_Generator(time_info->get_index());
     cur_dot_sol->WriteBinary(sol_dot_name.c_str());
 
-    // Write (dot) wall disp
+    // Write [ (dot) wall disp ]
     sol_wall_disp_name = Name_Generator(time_info->get_index(), "disp_");
     cur_sol_wall_disp->WriteBinary(sol_wall_disp_name.c_str());
 
@@ -218,9 +218,7 @@ void PTime_CMM_Solver::TM_CMM_GenAlpha(
       // On the CPU 0, write the time, flow rate, averaged pressure, and 0D
       // calculated pressure into the txt file, which is first generated in the
       // driver
-      PetscMPIInt rank;
-      MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
-      if( rank == 0 )
+      if( SYS_T::get_MPI_rank() == 0 )
       {
         std::ofstream ofile;
         ofile.open( ebc_part->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
@@ -237,9 +235,7 @@ void PTime_CMM_Solver::TM_CMM_GenAlpha(
     const double inlet_face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
         cur_sol, lassem_fluid_ptr, elements, quad_s, infnbc_part );
 
-    PetscMPIInt rank;
-    MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
-    if( rank == 0 )
+    if( SYS_T::get_MPI_rank() == 0 )
     {
       std::ofstream ofile;
       ofile.open( infnbc_part->gen_flowfile_name().c_str(), std::ofstream::out | std::ofstream::app );

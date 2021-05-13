@@ -198,7 +198,7 @@ int main( int argc, char *argv[] )
   // ===== Record important solver options =====
   if(rank == 0)
   {
-    hid_t cmd_file_id = H5Fcreate("solver_cmd.h5",
+    hid_t cmd_file_id = H5Fcreate("prestress_solver_cmd.h5",
         H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
     HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
 
@@ -231,7 +231,7 @@ int main( int argc, char *argv[] )
   ALocal_IEN * locIEN = new ALocal_IEN(part_file, rank);
 
   // Global mesh info
-  IAGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info_FEM_3D(part_file,rank);
+  IAGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info_FEM_3D(part_file, rank);
 
   // Mesh partition info
   APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file, rank);
