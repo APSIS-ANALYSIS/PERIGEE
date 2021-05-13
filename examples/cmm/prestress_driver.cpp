@@ -85,7 +85,7 @@ int main( int argc, char *argv[] )
   double initial_step = 0.1;          // time step size
   int    initial_index = 0;           // index of initial condition
   double final_time = 1.0;            // end time of simulation
-  std::string sol_bName("SOL_ps_");   // base name of the solution file
+  std::string sol_bName("SOL_");   // base name of the solution file
   int    ttan_renew_freq = 1;         // frequency of tangent matrix renewal
   int    sol_record_freq = 1;         // frequency for recording the solution
 
@@ -94,7 +94,7 @@ int main( int argc, char *argv[] )
   int    restart_index = 0;             // restart solution time index
   double restart_time = 0.0;            // restart time
   double restart_step = 1.0e-3;         // restart simulation time step size
-  std::string restart_name = "SOL_ps_"; // restart solution base name
+  std::string restart_name = "SOL_"; // restart solution base name
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
@@ -198,7 +198,7 @@ int main( int argc, char *argv[] )
   // ===== Record important solver options =====
   if(rank == 0)
   {
-    hid_t cmd_file_id = H5Fcreate("prestress_solver_cmd.h5",
+    hid_t cmd_file_id = H5Fcreate("solver_cmd.h5",
         H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
     HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
 

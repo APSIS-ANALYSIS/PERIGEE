@@ -288,7 +288,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
   Print_convergence_info(nl_counter, relative_error, residual_norm);
 
   // Debugging: check ring BC constraints
-  compute_ringbc_constraints(sol, sol_wall_disp, ringnbc_part);
+  // compute_ringbc_constraints(sol, sol_wall_disp, ringnbc_part);
 
   if( solve_prestress )
   {
@@ -385,8 +385,6 @@ void PNonlinear_CMM_Solver::update_wall( const double &val,
 }
 
 
-// Check whether the ring BC constraints are properly satisfied
-// by printing their evaluations 
 void PNonlinear_CMM_Solver::compute_ringbc_constraints(
     const PDNSolution * const &sol,
     const PDNSolution * const &sol_wall_disp,
@@ -394,6 +392,8 @@ void PNonlinear_CMM_Solver::compute_ringbc_constraints(
 {
   const int num_ringnode = ringnbc_part -> get_Num_LD();
 
+  // Check whether the ring BC constraints are properly satisfied
+  // by printing their evaluations 
   if( SYS_T::get_MPI_rank() == 0 && num_ringnode > 0 )
   {
     for(int ii = 0; ii < num_ringnode; ++ii)

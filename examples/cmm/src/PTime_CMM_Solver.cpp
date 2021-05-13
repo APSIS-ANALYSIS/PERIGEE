@@ -2,7 +2,7 @@
 
 PTime_CMM_Solver::PTime_CMM_Solver(
     const std::string &input_name, const int &input_record_freq,
-    const int &input_renew_tang_freq, const double &input_final_time
+    const int &input_renew_tang_freq, const double &input_final_time,
     const bool &prestress_flag )
 : final_time(input_final_time), sol_record_freq(input_record_freq),
   renew_tang_freq(input_renew_tang_freq), pb_name(input_name),
