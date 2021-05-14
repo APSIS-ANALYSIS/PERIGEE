@@ -21,8 +21,7 @@
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
 #include "Part_Tet.hpp"
-#include "NodalBC_3D_vtp.hpp"
-#include "NodalBC_3D_vtu.hpp"
+#include "NodalBC_3D_CMM.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "NodalBC_3D_ring.hpp"
 #include "NodalBC_3D_wall.hpp"
@@ -228,20 +227,10 @@ int main( int argc, char * argv[] )
   std::vector<INodalBC *> NBC_list;
   NBC_list.clear(); NBC_list.resize( dofMat );
 
-  if(elemType == 501)
-  {
-    NBC_list[0] = new NodalBC_3D_vtp( nFunc );
-    NBC_list[1] = new NodalBC_3D_vtp( InFBC, ring_bc, 0, nFunc );
-    NBC_list[2] = new NodalBC_3D_vtp( InFBC, ring_bc, 1, nFunc );
-    NBC_list[3] = new NodalBC_3D_vtp( InFBC, ring_bc, 2, nFunc );
-  }
-  else
-  {
-    NBC_list[0] = new NodalBC_3D_vtu( nFunc );
-    NBC_list[1] = new NodalBC_3D_vtu( InFBC, ring_bc, 0, nFunc );
-    NBC_list[2] = new NodalBC_3D_vtu( InFBC, ring_bc, 1, nFunc );
-    NBC_list[3] = new NodalBC_3D_vtu( InFBC, ring_bc, 2, nFunc );
-  }
+  NBC_list[0] = new NodalBC_3D_CMM( nFunc );
+  NBC_list[1] = new NodalBC_3D_CMM( InFBC, ring_bc, 0, nFunc );
+  NBC_list[2] = new NodalBC_3D_CMM( InFBC, ring_bc, 1, nFunc );
+  NBC_list[3] = new NodalBC_3D_CMM( InFBC, ring_bc, 2, nFunc );
 
   // ----------------------------------------------------------------
   // Wall mesh for CMM-type model is set as an elemental bc.
