@@ -8,10 +8,12 @@ int main( int argc, char *argv[] )
 {
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
-  ElemBC * wall_bc = new ElemBC_3D_tet_wall( "wall_cyl.vtp",
-     "centerlines.vtp", 0.2 );
+  std::vector<double> a {};
   
-  delete wall_bc;
+  std::cout<<a.size()<<std::endl;
+
+  VEC_T::print(a);
+
   PetscFinalize();
   return 0;
 }
