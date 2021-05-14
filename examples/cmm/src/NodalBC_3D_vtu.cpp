@@ -1,6 +1,6 @@
-#include "NodalBC_3D_vtu.hpp"
+#include "NodalBC_3D_vtp.hpp"
 
-NodalBC_3D_vtu::NodalBC_3D_vtu( const int &nFunc )
+NodalBC_3D_vtp::NodalBC_3D_vtp( const int &nFunc )
 {
   dir_nodes.clear();
   per_slave_nodes.clear();
@@ -9,12 +9,12 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const int &nFunc )
   num_per_nodes = 0;
 
   Create_ID( nFunc );
-
-  std::cout<<"===> NodalBC_3D_vtu: No nodal BC is generated. \n";
+  
+  std::cout<<"===> NodalBC_3D_vtp: No nodal BC is generated. \n";
 }
 
 
-NodalBC_3D_vtu::NodalBC_3D_vtu( const INodalBC * const &nbc_inflow,
+NodalBC_3D_vtp::NodalBC_3D_vtp( const INodalBC * const &nbc_inflow,
     const INodalBC * const &nbc_ring,
     const int &comp, const int &nFunc )
 {
@@ -23,7 +23,7 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const INodalBC * const &nbc_inflow,
   per_master_nodes.clear();
   num_per_nodes = 0;
 
-  // Assign the inlet nodes for this type of nodal/essential bc
+  // regardless of comp, assign all interior inlet nodes as nodal/essential bc
   for(unsigned int ii=0; ii<nbc_inflow->get_num_dir_nodes(); ++ii)
     dir_nodes.push_back( nbc_inflow->get_dir_nodes(ii) );
 
@@ -38,7 +38,7 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const INodalBC * const &nbc_inflow,
   switch( nbc_ring -> get_ring_bc_type() )
   {
     case 0:
-      // ring nodes are added as essential bc
+      // regardless of comp, all ring nodes are added as essential bc
       for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
       {
         dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
@@ -131,7 +131,7 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const INodalBC * const &nbc_inflow,
   Create_ID( nFunc );
 
   // print data on screen
-  std::cout<<"===> NodalBC_3D_vtu specified by \n";
+  std::cout<<"===> NodalBC_3D_vtp specified by \n";
   std::cout<<"     interior of inlet surface"<<std::endl;
   std::cout<<"     outline of inlet surface"<<": "<<num_dom_n_pts[0]<<" dom_n nodes, "<< num_dom_t_pts[0]<<" dom_t nodes"<<std::endl;
   for(int ii=1; ii<nbc_ring -> get_num_caps(); ++ii)
@@ -139,33 +139,28 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const INodalBC * const &nbc_inflow,
   std::cout<<"     is generated. \n";
 }
 
-NodalBC_3D_vtu::NodalBC_3D_vtu( const std::vector<std::string> &vtufileList,
-    const int &nFunc )
+
+NodalBC_3D_vtp::NodalBC_3D_vtp( const INodalBC * const &nbc_inflow,
+        const INodalBC * const &nbc_ring, const INodalBC * const &nbc_wall,
+        const int &nFunc )
 {
-  dir_nodes.clear();
   per_slave_nodes.clear();
   per_master_nodes.clear();
   num_per_nodes = 0;
 
-  const unsigned int num_file = vtufileList.size();
+  dir_nodes.clear();
 
-  for(unsigned int ii=0; ii<num_file; ++ii)
-  {
-    SYS_T::file_check( vtufileList[ii] );
+  // Assign the inlet nodes for this type of nodal/essential bc
+  for(unsigned int ii=0; ii<nbc_inflow->get_num_dir_nodes(); ++ii)
+    dir_nodes.push_back( nbc_inflow->get_dir_nodes(ii) );
 
-    int numpts, numcels;
-    std::vector<double> pts;
-    std::vector<int> ien, gnode, gelem;
+  // Assign the ring nodes for this type of nodal/essential bc
+  for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
+    dir_nodes.push_back( nbc_ring->get_dir_nodes(ii) );
 
-    TET_T::read_vtu_grid( vtufileList[ii], numpts, numcels, pts, ien, gnode, gelem );
-
-    for(unsigned int jj=0; jj<gnode.size(); ++jj)
-    {
-      if(gnode[jj]<0) SYS_T::print_fatal("Error: there are negative nodal index! \n");
-
-      dir_nodes.push_back( static_cast<unsigned int>( gnode[jj]) );
-    }
-  }
+  // Assign the wall nodes for this type of nodal/essential bc
+  for(unsigned int ii=0; ii<nbc_wall->get_num_dir_nodes(); ++ii)
+    dir_nodes.push_back( nbc_wall->get_dir_nodes(ii) );
 
   VEC_T::sort_unique_resize(dir_nodes);
 
@@ -173,14 +168,14 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::vector<std::string> &vtufileList,
 
   Create_ID( nFunc );
 
-  std::cout<<"===> NodalBC_3D_vtu specified by \n";
-  for(unsigned int ii=0; ii<num_file; ++ii)
-    std::cout<<"     "<<vtufileList[ii]<<std::endl;
+  // print data on screen
+  std::cout<<"===> NodalBC_3D_vtp specified by \n";
+  std::cout<<"     interior of inlet surface, ring nodes, as well as the wall nodes\n";
   std::cout<<"     is generated. \n";
 }
 
 
-NodalBC_3D_vtu::~NodalBC_3D_vtu()
+NodalBC_3D_vtp::~NodalBC_3D_vtp()
 {}
 
 // EOF
