@@ -294,7 +294,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
 
     SYS_T::commPrint("  --- wall_disp_norm: %e \n", sol_wall_disp->Norm_2());
 
-    if( wall_disp_norm <= prestress_tol ) prestress_conv_flag = true;
+    if( sol_wall_disp->Norm_2() <= prestress_tol ) prestress_conv_flag = true;
   }
 }
 
