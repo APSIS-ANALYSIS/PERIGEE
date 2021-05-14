@@ -3,7 +3,7 @@
 NodalBC_3D_wall::NodalBC_3D_wall( const std::string &inflow_file,
     const std::string &wall_file,
     const std::vector<std::string> &outflow_files,
-    const int &nFunc, const int &elemtype = 501 )
+    const int &nFunc, const int &elemtype )
 {
   // No periodic nodes
   per_slave_nodes.clear();
@@ -24,30 +24,63 @@ NodalBC_3D_wall::NodalBC_3D_wall( const std::string &inflow_file,
   std::vector<double> wall_pts;
   std::vector<int> wall_ien, wall_gnode, wall_gelem;
 
+  std::vector<int> ring_gnode {};
+
   if( elemtype == 501 )
   {
-    SYS_T::file_check(wallfile);
+    SYS_T::file_check(wall_file);
 
-    TET_T::read_vtp_grid( wallfile, wall_numpts, wall_numcels, wall_pts,
+    TET_T::read_vtp_grid( wall_file, wall_numpts, wall_numcels, wall_pts,
         wall_ien, wall_gnode, wall_gelem );
-
-    std::vector<int> ring_gnode {};
 
     for(unsigned int ii=0; ii<cap_files.size(); ++ii)
     {
       SYS_T::file_check( cap_files[ii] );
 
       TET_T::read_vtp_grid( cap_files[ii], numpts, numcels, pts, ien, gnode, gelem );
+    
+      VEC_T::insert_end( ring_gnode, gnode );
     }
-
   }
   else if( elemtype == 502 )
   {
+    SYS_T::file_check(wall_file);
+
+    TET_T::read_vtu_grid( wall_file, wall_numpts, wall_numcels, wall_pts,
+        wall_ien, wall_gnode, wall_gelem );
+
+    for(unsigned int ii=0; ii<cap_files.size(); ++ii)
+    {
+      SYS_T::file_check( cap_files[ii] );
+
+      TET_T::read_vtu_grid( cap_files[ii], numpts, numcels, pts, ien, gnode, gelem );
+
+      VEC_T::insert_end( ring_gnode, gnode );
+    }
   }
   else
     SYS_T::print_fatal("Error: Nodal_3D_ring unknown file type.\n");
 
+  VEC_T::sort_unique_resize( ring_gnode );
 
+  // exclude the ring nodes
+  for(unsigned int ii=0; ii<wall_gnode.size(); ++ii)
+  {
+    if( !VEC_T::is_invec( ring_gnode, wall_gnode[ii] ) )
+      dir_nodes.push_back( wall_gnode[ii] );
+  }
+
+  num_dir_nodes = dir_nodes.size();
+
+  // Generate the ID array
+  Create_ID( nFunc );
+
+  // Finish and print info on screen
+  std::cout<<"===> NodalBC_3D_wall specified by "<<wall_file;
+  std::cout<<" with ring nodes on\n";
+  for(unsigned int ii=0; ii<cap_files.size(); ++ii)
+    std::cout << "     on the outline of " << cap_files[ii] << std::endl;
+  std::cout<<"     is generated ";
 }
 
 

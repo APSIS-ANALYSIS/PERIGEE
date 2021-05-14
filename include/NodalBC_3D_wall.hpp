@@ -9,6 +9,7 @@
 // Datei Created: May 13 2021
 // ============================================================================
 #include "INodalBC.hpp"
+#include "Tet_Tools.hpp"
 
 class NodalBC_3D_wall : public INodalBC
 {
