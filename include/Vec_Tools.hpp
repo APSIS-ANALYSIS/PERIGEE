@@ -3,8 +3,7 @@
 // ============================================================================
 // Vec_Tools.hpp
 // ----------------------------------------------------------------------------
-// VEC_T namespace contains a suite of useful function for the 
-// std::vector class.
+// VEC_T namespace contains a suite of functions for std::vector object.
 // ============================================================================
 #include <iomanip>
 #include <algorithm>
