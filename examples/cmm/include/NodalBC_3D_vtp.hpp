@@ -51,10 +51,16 @@ class NodalBC_3D_vtp : public INodalBC
         const INodalBC * const &nbc_ring, const int &comp, const int &nFunc );
 
     // ------------------------------------------------------------------------ 
-    // The list of vtp files specifies the Dirichlet nodes. 
-    // No periodical type BC nodes.
+    // Specify the Dirichlet nodes
+    // \para nbc_inflow : inflow nodes
+    // \para nbc_ring   : ring nodes
+    // \para nbc_wall   : wall nodes
+    // The above three set of nodes form an non-overlapping subdivision of the
+    // Dirichlet type boundary.
     // ------------------------------------------------------------------------ 
-    NodalBC_3D_vtp( const std::vector<std::string> &vtpfileList, const int &nFunc );
+    NodalBC_3D_vtp( const INodalBC * const &nbc_inflow,
+        const INodalBC * const &nbc_ring, const INodalBC * const &nbc_wall, 
+        const int &nFunc );
 
     virtual ~NodalBC_3D_vtp();
 

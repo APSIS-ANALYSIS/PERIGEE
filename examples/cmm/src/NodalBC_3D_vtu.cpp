@@ -28,7 +28,6 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const INodalBC * const &nbc_inflow,
     dir_nodes.push_back( nbc_inflow->get_dir_nodes(ii) );
 
   // obtain the type of ring nodes' specification
-  const int ringbc_type = nbc_ring -> get_ring_bc_type();
   const std::vector<int> cap_id = nbc_ring -> get_cap_id();
   const std::vector<int> dom_n_comp = nbc_ring -> get_dominant_n_comp();
   const std::vector<int> dom_t_comp = nbc_ring -> get_dominant_t_comp();
@@ -36,7 +35,7 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const INodalBC * const &nbc_inflow,
   std::vector<int> num_dom_n_pts( nbc_ring->get_num_caps(), 0 );
   std::vector<int> num_dom_t_pts( nbc_ring->get_num_caps(), 0 );
 
-  switch( ringbc_type )
+  switch( nbc_ring -> get_ring_bc_type() )
   {
     case 0:
       // ring nodes are added as essential bc
