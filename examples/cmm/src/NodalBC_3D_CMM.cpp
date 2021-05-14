@@ -1,6 +1,6 @@
-#include "NodalBC_3D_vtp.hpp"
+#include "NodalBC_3D_CMM.hpp"
 
-NodalBC_3D_vtp::NodalBC_3D_vtp( const int &nFunc )
+NodalBC_3D_CMM::NodalBC_3D_CMM( const int &nFunc )
 {
   dir_nodes.clear();
   per_slave_nodes.clear();
@@ -10,13 +10,12 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const int &nFunc )
 
   Create_ID( nFunc );
   
-  std::cout<<"===> NodalBC_3D_vtp: No nodal BC is generated. \n";
+  std::cout<<"===> NodalBC_3D_CMM: No nodal BC is generated. \n";
 }
 
 
-NodalBC_3D_vtp::NodalBC_3D_vtp( const INodalBC * const &nbc_inflow,
-    const INodalBC * const &nbc_ring,
-    const int &comp, const int &nFunc )
+NodalBC_3D_CMM::NodalBC_3D_CMM( const INodalBC * const &nbc_inflow,
+    const INodalBC * const &nbc_ring, const int &comp, const int &nFunc )
 {
   dir_nodes.clear();
   per_slave_nodes.clear();
@@ -131,7 +130,7 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const INodalBC * const &nbc_inflow,
   Create_ID( nFunc );
 
   // print data on screen
-  std::cout<<"===> NodalBC_3D_vtp specified by \n";
+  std::cout<<"===> NodalBC_3D_CMM specified by \n";
   std::cout<<"     interior of inlet surface"<<std::endl;
   std::cout<<"     outline of inlet surface"<<": "<<num_dom_n_pts[0]<<" dom_n nodes, "<< num_dom_t_pts[0]<<" dom_t nodes"<<std::endl;
   for(int ii=1; ii<nbc_ring -> get_num_caps(); ++ii)
@@ -140,7 +139,7 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const INodalBC * const &nbc_inflow,
 }
 
 
-NodalBC_3D_vtp::NodalBC_3D_vtp( const INodalBC * const &nbc_inflow,
+NodalBC_3D_CMM::NodalBC_3D_CMM( const INodalBC * const &nbc_inflow,
         const INodalBC * const &nbc_ring, const INodalBC * const &nbc_wall,
         const int &nFunc )
 {
@@ -169,13 +168,9 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const INodalBC * const &nbc_inflow,
   Create_ID( nFunc );
 
   // print data on screen
-  std::cout<<"===> NodalBC_3D_vtp specified by \n";
+  std::cout<<"===> NodalBC_3D_CMM specified by \n";
   std::cout<<"     interior of inlet surface, ring nodes, as well as the wall nodes\n";
   std::cout<<"     is generated. \n";
 }
-
-
-NodalBC_3D_vtp::~NodalBC_3D_vtp()
-{}
 
 // EOF

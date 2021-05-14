@@ -1,7 +1,7 @@
-#ifndef NODALBC_3D_VTP_HPP
-#define NODALBC_3D_VTP_HPP
+#ifndef NODALBC_3D_CMM_HPP
+#define NODALBC_3D_CMM_HPP
 // ============================================================================
-// NodalBC_3D_vtp.hpp
+// NodalBC_3D_CMM.hpp
 //
 // This is an instantiation of INodalbc for 3D problems by reading the
 // dirichlet nodes from the vtp file.
@@ -30,7 +30,7 @@
 #include "INodalBC.hpp"
 #include "Tet_Tools.hpp"
 
-class NodalBC_3D_vtp : public INodalBC
+class NodalBC_3D_CMM : public INodalBC
 {
   public:
     // ------------------------------------------------------------------------ 
@@ -38,7 +38,7 @@ class NodalBC_3D_vtp : public INodalBC
     // per_master_nodes; set num_dir_nodes, num_per_nodes to be zero;
     // set ID based on the above "no-nodal bc" setting.
     // ------------------------------------------------------------------------ 
-    NodalBC_3D_vtp( const int &nFunc );
+    NodalBC_3D_CMM( const int &nFunc );
  
     // ------------------------------------------------------------------------ 
     // Specify the Dirichlet nodes for CMM-type FSI simulations.
@@ -47,7 +47,7 @@ class NodalBC_3D_vtp : public INodalBC
     // \para comp       : the dof components ranges from 0 to 2 representing
     //                    x-, y-, and z-components.
     // ------------------------------------------------------------------------ 
-    NodalBC_3D_vtp( const INodalBC * const &nbc_inflow, 
+    NodalBC_3D_CMM( const INodalBC * const &nbc_inflow, 
         const INodalBC * const &nbc_ring, const int &comp, const int &nFunc );
 
     // ------------------------------------------------------------------------ 
@@ -58,14 +58,14 @@ class NodalBC_3D_vtp : public INodalBC
     // The above three set of nodes form an non-overlapping subdivision of the
     // Dirichlet type boundary.
     // ------------------------------------------------------------------------ 
-    NodalBC_3D_vtp( const INodalBC * const &nbc_inflow,
+    NodalBC_3D_CMM( const INodalBC * const &nbc_inflow,
         const INodalBC * const &nbc_ring, const INodalBC * const &nbc_wall, 
         const int &nFunc );
 
-    virtual ~NodalBC_3D_vtp();
+    virtual ~NodalBC_3D_CMM() {};
 
   private:
-    NodalBC_3D_vtp() {};
+    NodalBC_3D_CMM() {};
 };
 
 #endif
