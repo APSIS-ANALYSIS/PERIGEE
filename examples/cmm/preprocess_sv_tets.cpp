@@ -25,6 +25,7 @@
 #include "NodalBC_3D_vtu.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "NodalBC_3D_ring.hpp"
+#include "NodalBC_3D_wall.hpp"
 #include "ElemBC_3D_tet_outflow.hpp"
 #include "ElemBC_3D_tet_wall.hpp"
 #include "NBC_Partition_3D_inflow.hpp"
@@ -216,6 +217,10 @@ int main( int argc, char * argv[] )
   INodalBC * ring_bc = new NodalBC_3D_ring( sur_file_in, inlet_outvec,
        sur_file_wall, sur_file_out, outlet_outvec, nFunc, ringBC_type, elemType );
 
+  // Set up Wall nodes (with ring nodes excluded)
+  INodalBC * wall_nbc = new NodalBC_3D_wall( sur_file_in, sur_file_wall, sur_file_out, 
+      nFunc, elemType );
+
   // Set up Nodal i.e. Dirichlet type Boundary Conditions. For CMM with prescribed inflow,
   // this includes all inlet interior nodes. To enable in-plane motion of the inlet & outlet
   // ring nodes, these ring nodes are included only for the dominant component of the
@@ -266,19 +271,19 @@ int main( int argc, char * argv[] )
   // thickness2radiusList.push_back( 0.2 );
 
   // // Initialized with default fluid density 1.065
-  // ElemBC * wall_bc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
+  // ElemBC * wall_ebc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
   //                                            thickness2radius_combined, wallsList,
   //                                            centerlinesList, thickness2radiusList, elemType );
 
-  ElemBC * wall_bc = nullptr;
+  ElemBC * wall_ebc = nullptr;
 
   if( SYS_T::file_exist(centerlines_combined) )
-    wall_bc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
+    wall_ebc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
         thickness2radius_combined, elemType );
   else
-    wall_bc = new ElemBC_3D_tet_wall( walls_combined, 0.1, 1.0e6, elemType );
+    wall_ebc = new ElemBC_3D_tet_wall( walls_combined, 0.1, 1.0e6, elemType );
 
-  wall_bc -> resetTriIEN_outwardnormal( IEN );
+  wall_ebc -> resetTriIEN_outwardnormal( IEN );
   // ----------------------------------------------------------------
 
   // Start partition the mesh for each cpu_rank 
@@ -324,7 +329,7 @@ int main( int argc, char * argv[] )
     ebcpart -> write_hdf5( part_file.c_str() );
 
     // Partition Elemental Wall BC and write it to h5 file
-    IEBC_Partition * wbcpart = new EBC_Partition_vtp_wall(part, mnindex, wall_bc );
+    IEBC_Partition * wbcpart = new EBC_Partition_vtp_wall(part, mnindex, wall_ebc );
     wbcpart -> write_hdf5( part_file.c_str() );
 
     // Collect partition statistics
@@ -364,7 +369,8 @@ int main( int argc, char * argv[] )
   // Finalize the code and exit
   for(auto it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc) delete *it_nbc;
 
-  delete InFBC; delete ring_bc; delete ebc; delete mytimer; delete wall_bc;
+  delete InFBC; delete ring_bc; delete ebc; delete mytimer;
+  delete wall_nbc; delete wall_ebc;
   delete mnindex; delete global_part; delete mesh; delete IEN;
   PetscFinalize();
   return EXIT_SUCCESS;
