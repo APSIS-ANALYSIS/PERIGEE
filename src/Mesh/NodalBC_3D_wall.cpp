@@ -77,10 +77,10 @@ NodalBC_3D_wall::NodalBC_3D_wall( const std::string &inflow_file,
 
   // Finish and print info on screen
   std::cout<<"===> NodalBC_3D_wall specified by "<<wall_file;
-  std::cout<<" with ring nodes on\n";
+  std::cout<<" ,with ring nodes on\n";
   for(unsigned int ii=0; ii<cap_files.size(); ++ii)
     std::cout << "     on the outline of " << cap_files[ii] << std::endl;
-  std::cout<<"     is generated ";
+  std::cout<<"     excluded, is generated.\n";
 }
 
 

@@ -51,7 +51,8 @@ int main( int argc, char * argv[] )
   int elemType = 501;
   int num_outlet = 1;
   int ringBC_type = 0;
-  
+  bool is_rigidwall = false;
+
   // Default names for input geometry files
   std::string geo_file("./whole_vol.vtu");
   std::string sur_file_in("./inflow_vol.vtp");
@@ -73,6 +74,7 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionInt("-num_outlet", num_outlet);
   SYS_T::GetOptionInt("-elem_type", elemType);
   SYS_T::GetOptionInt("-ringbc_type", ringBC_type);
+  SYS_T::GetOptionBool("-is_rigidwall", is_rigidwall);
   SYS_T::GetOptionString("-geo_file", geo_file);
   SYS_T::GetOptionString("-sur_file_in", sur_file_in);
   SYS_T::GetOptionString("-sur_file_wall", sur_file_wall);
@@ -83,7 +85,15 @@ int main( int argc, char * argv[] )
   // Print the command line arguments
   cout<<"==== Command Line Arguments ===="<<endl;
   cout<<" -elem_type: "<<elemType<<endl;
-  cout<<" -ringbc_type: "<<ringBC_type<<endl;
+  if( is_rigidwall )
+  {
+    cout<<" -is_rigidwall: true \n";
+  }
+  else
+  {
+    cout<<" -is_rigidwall: false \n";
+    cout<<" -ringbc_type: "<<ringBC_type<<endl;
+  }
   cout<<" -num_outlet: "<<num_outlet<<endl;
   cout<<" -geo_file: "<<geo_file<<endl;
   cout<<" -sur_file_in: "<<sur_file_in<<endl;
@@ -224,15 +234,24 @@ int main( int argc, char * argv[] )
   // this includes all inlet interior nodes. To enable in-plane motion of the inlet & outlet
   // ring nodes, these ring nodes are included only for the dominant component of the
   // corresponding cap's unit normal.
-  std::vector<INodalBC *> NBC_list;
-  NBC_list.clear(); NBC_list.resize( dofMat );
+  std::vector<INodalBC *> NBC_list( dofMat, nullptr );
 
-  NBC_list[0] = new NodalBC_3D_CMM( nFunc );
-  NBC_list[1] = new NodalBC_3D_CMM( InFBC, ring_bc, 0, nFunc );
-  NBC_list[2] = new NodalBC_3D_CMM( InFBC, ring_bc, 1, nFunc );
-  NBC_list[3] = new NodalBC_3D_CMM( InFBC, ring_bc, 2, nFunc );
+  if( is_rigidwall )
+  {
+    NBC_list[0] = new NodalBC_3D_CMM( nFunc );
+    NBC_list[1] = new NodalBC_3D_CMM( InFBC, ring_bc, wall_nbc, nFunc );
+    NBC_list[2] = new NodalBC_3D_CMM( InFBC, ring_bc, wall_nbc, nFunc );
+    NBC_list[3] = new NodalBC_3D_CMM( InFBC, ring_bc, wall_nbc, nFunc );
+  }
+  else
+  {
+    NBC_list[0] = new NodalBC_3D_CMM( nFunc );
+    NBC_list[1] = new NodalBC_3D_CMM( InFBC, ring_bc, 0, nFunc );
+    NBC_list[2] = new NodalBC_3D_CMM( InFBC, ring_bc, 1, nFunc );
+    NBC_list[3] = new NodalBC_3D_CMM( InFBC, ring_bc, 2, nFunc );
+  }
 
-  // ----------------------------------------------------------------
+  // --------------------------------------------------------------------------
   // Wall mesh for CMM-type model is set as an elemental bc.
   // Set the wall region, its corresponding centerline, and the thickness-to-radius ratio
   const std::string walls_combined = sur_file_wall;
@@ -248,7 +267,7 @@ int main( int argc, char * argv[] )
   // The background wall properties will first be prescribed to the entire wall
   // using centerlines_combined and thickness2radius_combined. Wall properties
   // in wallsList will then be overwritten using the corresponding lists.
-  // ----------------------------------------------------------------
+  // --------------------------------------------------------------------------
   // std::vector<std::string> wallsList; wallsList.clear();
   // std::vector<std::string> centerlinesList; centerlinesList.clear();
   // std::vector<double> thickness2radiusList; thickness2radiusList.clear();
@@ -273,7 +292,7 @@ int main( int argc, char * argv[] )
     wall_ebc = new ElemBC_3D_tet_wall( walls_combined, 0.1, 1.0e6, elemType );
 
   wall_ebc -> resetTriIEN_outwardnormal( IEN );
-  // ----------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
   // Start partition the mesh for each cpu_rank 
   const bool isPrintPartInfo = true;

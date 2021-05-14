@@ -41,7 +41,7 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
     else
     {
       qua_prestress.resize( 6 * face_nqp * num_local_cell[0] );
-      for(int ii=0; ii< 6 * face_nqp * num_local_cell[0]; ++ii) qua_prestress[ii] = 0.0;
+      for(int ii=0; ii < 6 * face_nqp * num_local_cell[0]; ++ii) qua_prestress[ii] = 0.0;
     }
   }
 

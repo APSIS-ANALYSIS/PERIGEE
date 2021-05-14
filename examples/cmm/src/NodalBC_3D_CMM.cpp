@@ -162,7 +162,7 @@ NodalBC_3D_CMM::NodalBC_3D_CMM( const INodalBC * const &nbc_inflow,
     dir_nodes.push_back( nbc_wall->get_dir_nodes(ii) );
 
   VEC_T::sort_unique_resize(dir_nodes);
-
+  
   num_dir_nodes = dir_nodes.size();
 
   Create_ID( nFunc );
