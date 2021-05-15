@@ -362,24 +362,19 @@ int main( int argc, char *argv[] )
 
     // Read in wall disp: may not exist if restart from rigid soln
     std::string restart_disp_name = restart_name + "_disp";
-    std::string restart_dot_disp_name = "dot_" + restart_name + "_disp";
-    if( SYS_T::file_exist( restart_disp_name ) )
-    {
-      sol_wall_disp->ReadBinary(restart_disp_name.c_str());
+    SYS_T::file_check(restart_disp_name.c_str());
+    sol_wall_disp->ReadBinary(restart_disp_name.c_str());
 
-      // Read in dot wall disp if wall disp exists
-      SYS_T::file_check(restart_dot_disp_name.c_str());
-      dot_sol_wall_disp->ReadBinary(restart_dot_disp_name.c_str());
-    }
+    // Read in dot wall disp if wall disp exists
+    std::string restart_dot_disp_name = "dot_" + restart_name + "_disp";
+    SYS_T::file_check(restart_dot_disp_name.c_str());
+    dot_sol_wall_disp->ReadBinary(restart_dot_disp_name.c_str());
 
     SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
     SYS_T::commPrint("     restart_name: %s \n", restart_name.c_str());
     SYS_T::commPrint("     restart_dot_name: %s \n", restart_dot_name.c_str());
-    if( SYS_T::file_exist( restart_disp_name ) )
-    {
-      SYS_T::commPrint("     restart_disp_name: %s \n", restart_disp_name.c_str());
-      SYS_T::commPrint("     restart_dot_disp_name: %s \n", restart_dot_disp_name.c_str());
-    }
+    SYS_T::commPrint("     restart_disp_name: %s \n", restart_disp_name.c_str());
+    SYS_T::commPrint("     restart_dot_disp_name: %s \n", restart_dot_disp_name.c_str());
     SYS_T::commPrint("     restart_time: %e \n", restart_time);
     SYS_T::commPrint("     restart_index: %d \n", restart_index);
     SYS_T::commPrint("     restart_step: %e \n", restart_step);
