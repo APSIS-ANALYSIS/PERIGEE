@@ -33,7 +33,7 @@ NodalBC_3D_wall::NodalBC_3D_wall( const std::string &inflow_file,
     TET_T::read_vtp_grid( wall_file, wall_numpts, wall_numcels, wall_pts,
         wall_ien, wall_gnode, wall_gelem );
 
-    for(auto ii=0; ii<cap_files.size(); ++ii)
+    for(unsigned int ii=0; ii<cap_files.size(); ++ii)
     {
       SYS_T::file_check( cap_files[ii] );
 
@@ -49,7 +49,7 @@ NodalBC_3D_wall::NodalBC_3D_wall( const std::string &inflow_file,
     TET_T::read_vtu_grid( wall_file, wall_numpts, wall_numcels, wall_pts,
         wall_ien, wall_gnode, wall_gelem );
 
-    for(auto ii=0; ii<cap_files.size(); ++ii)
+    for(unsigned int ii=0; ii<cap_files.size(); ++ii)
     {
       SYS_T::file_check( cap_files[ii] );
 
@@ -64,7 +64,7 @@ NodalBC_3D_wall::NodalBC_3D_wall( const std::string &inflow_file,
   VEC_T::sort_unique_resize( ring_gnode );
 
   // exclude the ring nodes
-  for(auto ii=0; ii<wall_gnode.size(); ++ii)
+  for(unsigned int ii=0; ii<wall_gnode.size(); ++ii)
   {
     if( !VEC_T::is_invec( ring_gnode, wall_gnode[ii] ) )
       dir_nodes.push_back( wall_gnode[ii] );
@@ -78,7 +78,7 @@ NodalBC_3D_wall::NodalBC_3D_wall( const std::string &inflow_file,
   // Finish and print info on screen
   std::cout<<"===> NodalBC_3D_wall specified by "<<wall_file;
   std::cout<<" ,with ring nodes on\n";
-  for(auto ii=0; ii<cap_files.size(); ++ii)
+  for(unsigned int ii=0; ii<cap_files.size(); ++ii)
     std::cout << "     on the outline of " << cap_files[ii] << std::endl;
   std::cout<<"     excluded, is generated.\n";
 }

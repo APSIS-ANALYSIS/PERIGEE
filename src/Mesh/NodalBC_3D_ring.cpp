@@ -44,7 +44,7 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
   outnormal = inlet_outnormal.to_std_vec();
   dominant_n_comp[0] = inlet_outnormal.get_dominant_comp();
 
-  for(auto ii=0; ii<outlet_outnormal.size(); ++ii)
+  for(unsigned int ii=0; ii<outlet_outnormal.size(); ++ii)
   {
     outnormal.push_back( outlet_outnormal[ii](0) );
     outnormal.push_back( outlet_outnormal[ii](1) );
@@ -81,7 +81,7 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
       compute_cap_centroid( pts, centroid );
 
       int num_outline_pts = 0;
-      for(auto jj=0; jj<gnode.size(); ++jj)
+      for(unsigned int jj=0; jj<gnode.size(); ++jj)
       {
         if( gnode[jj]<0 ) SYS_T::print_fatal("Error: negative nodal index on cap %d! \n", ii);
 
@@ -116,7 +116,7 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
       compute_cap_centroid( pts, centroid );
 
       int num_outline_pts = 0;
-      for(auto jj=0; jj<gnode.size(); ++jj)
+      for(unsigned int jj=0; jj<gnode.size(); ++jj)
       {
         if( gnode[jj]<0 ) SYS_T::print_fatal("Error: negative nodal index on cap %d! \n", ii);
 
