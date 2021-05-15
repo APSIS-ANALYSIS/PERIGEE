@@ -68,7 +68,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
 
   // Generate the dir-node list. The nodes belonging to the wall are excluded.
   dir_nodes.clear();
-  for(unsigned int ii=0; ii<global_node.size(); ++ii)
+  for(auto ii=0; ii<global_node.size(); ++ii)
   {
     SYS_T::print_fatal_if( global_node[ii]<0, "Error: there are negative nodal index! \n");
 
