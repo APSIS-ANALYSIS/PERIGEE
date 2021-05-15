@@ -235,9 +235,7 @@ namespace SYS_T
   // 5. Print fatal error message and terminate the MPI process
   inline void print_fatal( const char output[], ... )
   {
-    const PetscMPIInt rank = get_MPI_rank();
-
-    if(!rank)
+    if( !get_MPI_rank() )
     {
       va_list Argp;
       va_start(Argp, output);
@@ -253,9 +251,7 @@ namespace SYS_T
   {
     if( a )
     {
-      const PetscMPIInt rank = get_MPI_rank();
-
-      if(!rank)
+      if( !get_MPI_rank() )
       {
         va_list Argp;
         va_start(Argp, output);
