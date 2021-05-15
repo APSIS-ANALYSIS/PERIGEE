@@ -268,6 +268,23 @@ namespace SYS_T
     }
   }
 
+  // 6. Print message (without termination the code) under conditions
+  inline void print_message_if( bool a, const char output[], ... )
+  {
+    if( a )
+    {
+      if( !get_MPI_rank() )
+      {
+        va_list Argp;
+        va_start(Argp, output);
+        (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
+        va_end(Argp);
+      }
+
+      MPI_Barrier(PETSC_COMM_WORLD);
+    }
+  }
+
   // exit message printers are used in terminating serial program when 
   // the communicator for MPI is not available.
   inline void print_exit( const char * const &mesg )
