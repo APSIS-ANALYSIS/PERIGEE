@@ -322,6 +322,7 @@ void GenBC_Coronary::get_dPim_dt( const int &ii, const double &time_start, const
 
   // Find the interval in Pim that covers current integration time. 
   double x1, x2, f1, f2, d1, d2;
+  bool is_interval_found = false;
   for(int mm=1; mm<num_Pim_data[ii]; ++mm)
   {
     if ( tend_mod <= Time_data[ii][mm] )
@@ -332,9 +333,12 @@ void GenBC_Coronary::get_dPim_dt( const int &ii, const double &time_start, const
       x2 = Time_data[ii][mm];
       f2 = Pim_data[ii][mm];
       d2 = der_Pim_data[ii][mm];
+      is_interval_found = true;
       break;
     }
   }
+
+  SYS_T::print_fatal_if( !is_interval_found, "Error: get_dPim_dt the interval is not found.\n" );
 
   std::vector<double> xe_1,xe_2,xe_3;
   xe_1.resize( N+1 );
