@@ -3,16 +3,16 @@
 
 int main( int argc, char * argv[] )
 {
-  Matrix_3x3 A, Q;
+  std::vector<std::string> a;
+  a.push_back("hello a\n");
+  a.push_back("cmame \t");
+  a.push_back("july 31th \n");
+  a.push_back("aug 31th \n");
 
-  A = { 1,0,1, -1, -2, 0, 0, 1, -1 };
+  for(auto &out : a) out = "hello\n";
 
-  Q = { -0.120000260381534, -0.809712281592778, 0.574426634607224, 0.901752646908814, 0.153122822484370, 0.404222172854692, -0.415261485453819, 0.566497504206538, 0.711785414592383 };
+  for(auto out : a) std::cout<<out;
 
-  A.MatRot(Q);
-
-  A.print();  
-  
   return EXIT_SUCCESS;
 }
 

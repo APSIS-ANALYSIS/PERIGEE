@@ -33,11 +33,11 @@ NodalBC_3D_wall::NodalBC_3D_wall( const std::string &inflow_file,
     TET_T::read_vtp_grid( wall_file, wall_numpts, wall_numcels, wall_pts,
         wall_ien, wall_gnode, wall_gelem );
 
-    for(unsigned int ii=0; ii<cap_files.size(); ++ii)
+    for( const auto &capfile : cap_files )
     {
-      SYS_T::file_check( cap_files[ii] );
+      SYS_T::file_check( capfile );
 
-      TET_T::read_vtp_grid( cap_files[ii], numpts, numcels, pts, ien, gnode, gelem );
+      TET_T::read_vtp_grid( capfile, numpts, numcels, pts, ien, gnode, gelem );
     
       VEC_T::insert_end( ring_gnode, gnode );
     }
@@ -49,11 +49,11 @@ NodalBC_3D_wall::NodalBC_3D_wall( const std::string &inflow_file,
     TET_T::read_vtu_grid( wall_file, wall_numpts, wall_numcels, wall_pts,
         wall_ien, wall_gnode, wall_gelem );
 
-    for(unsigned int ii=0; ii<cap_files.size(); ++ii)
+    for( const auto &capfile : cap_files )
     {
-      SYS_T::file_check( cap_files[ii] );
+      SYS_T::file_check( capfile );
 
-      TET_T::read_vtu_grid( cap_files[ii], numpts, numcels, pts, ien, gnode, gelem );
+      TET_T::read_vtu_grid( capfile, numpts, numcels, pts, ien, gnode, gelem );
 
       VEC_T::insert_end( ring_gnode, gnode );
     }
@@ -77,9 +77,9 @@ NodalBC_3D_wall::NodalBC_3D_wall( const std::string &inflow_file,
 
   // Finish and print info on screen
   std::cout<<"===> NodalBC_3D_wall specified by "<<wall_file;
-  std::cout<<" ,with ring nodes on\n";
-  for(unsigned int ii=0; ii<cap_files.size(); ++ii)
-    std::cout << "     on the outline of " << cap_files[ii] << std::endl;
+  std::cout<<", with ring nodes on\n";
+  for( const auto  &capfile : cap_files )
+    std::cout << "     on the outline of " << capfile << std::endl;
   std::cout<<"     excluded, is generated.\n";
 }
 
