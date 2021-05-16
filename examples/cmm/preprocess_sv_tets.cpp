@@ -136,6 +136,11 @@ int main( int argc, char * argv[] )
     cout<<sur_file_out[ii]<<" found. \n";
   }
 
+  // If we can still detect additional files on disk, throw an warning
+  if( SYS_T::file_exist(SYS_T::gen_capfile_name(sur_file_out_base, num_outlet, ".vtp")) ||
+      SYS_T::file_exist(SYS_T::gen_capfile_name(sur_file_out_base, num_outlet, ".vtu")) )
+    cout<<endl<<"Warning: there are additional outlet surface files on disk. Check num_outlet please.\n\n";
+
   // Record the problem setting into a HDF5 file: preprocessor_cmd.h5
   hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
   HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
