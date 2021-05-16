@@ -121,6 +121,15 @@ class Matrix_PETSc_CMM : public Matrix_PETSc
         const ALocal_NodalBC * const &bc_part,
         const ALocal_Ring_NodalBC * const &ring_bc_part );
 
+    // ------------------------------------------------------------------------
+    // Type 5 : Generate a matrix accounting for the essential
+    // boundary conditions that describe in-plane motion with a single clamped
+    // node per cap for a 4-dof system like the NS equations.
+    // ------------------------------------------------------------------------
+    void gen_ring_inplane_bc_partial_clamp( const APart_Node * const &pnode_ptr,
+        const ALocal_NodalBC * const &bc_part,
+        const ALocal_Ring_NodalBC * const &ring_bc_part );
+
 };
 
 #endif
