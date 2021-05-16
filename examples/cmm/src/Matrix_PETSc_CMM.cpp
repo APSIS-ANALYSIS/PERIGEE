@@ -298,7 +298,6 @@ void Matrix_PETSc_CMM::gen_ring_inplane_bc_partial_clamp( const APart_Node * con
   }
 
   const int num_ring_node = ring_bc_part -> get_Num_LD();
-  int num_clamped_ring_node = 0;
 
   for(int ii=0; ii<num_ring_node; ++ii)
   {
@@ -319,12 +318,7 @@ void Matrix_PETSc_CMM::gen_ring_inplane_bc_partial_clamp( const APart_Node * con
         }
       }
     }
-    else
-      num_clamped_ring_node += 1;
   }
-
-  SYS_T::print_fatal_if( num_clamped_ring_node != ring_bc_part->get_num_caps(),
-    "Error: Matrix_PETSc::gen_ring_inplane_bc_partial_clamp mismatch between number of clamped ring nodes and num_caps.\n" );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
