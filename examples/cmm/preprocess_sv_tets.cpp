@@ -127,16 +127,11 @@ int main( int argc, char * argv[] )
 
   for(int ii=0; ii<num_outlet; ++ii)
   {
-    std::ostringstream ss;
-    ss<<sur_file_out_base;
-    if( ii/10 == 0 ) ss<<"00";
-    else if( ii/100 == 0 ) ss<<"0";
-
-    if(elemType == 501 ) ss<<ii<<".vtp";
-    else ss<<ii<<".vtu";
+    if(elemType == 501 )
+      sur_file_out[ii] = SYS_T::gen_capfile_name( sur_file_out_base, ii, ".vtp" ); 
+    else
+      sur_file_out[ii] = SYS_T::gen_capfile_name( sur_file_out_base, ii, ".vtu" ); 
  
-    sur_file_out[ii] = ss.str(); // generate the outlet face file name
-    
     SYS_T::file_check(sur_file_out[ii]);
     cout<<sur_file_out[ii]<<" found. \n";
   }

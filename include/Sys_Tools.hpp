@@ -62,6 +62,25 @@ namespace SYS_T
   }
 
   // ----------------------------------------------------------------
+  // gen_capfile_name
+  // Generate a file (usually for cap surfaces) in the format
+  // baseName_xxx.vtp(vtu)
+  // ----------------------------------------------------------------
+  inline std::string gen_capfile_name( const std::string &baseName,
+      const int &index, const std::string &filename )
+  {
+    std::ostringstream ss;
+    ss<<baseName;
+
+    if( index/10 == 0 ) ss<<"00";
+    else if( index/100 == 0 ) ss<<"0";
+
+    ss<<index<<filename;
+    
+    return ss.str();
+  }
+
+  // ----------------------------------------------------------------
   // Assume ii = iz * dim_x * dim_y + iy * dim_x + ix
   // this function will return ix iy and iz based on the input ii, 
   // dim_x, dim_y.
