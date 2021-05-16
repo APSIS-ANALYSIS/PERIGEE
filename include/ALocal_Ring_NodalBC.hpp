@@ -28,6 +28,9 @@ class ALocal_Ring_NodalBC
     // Get the number of Dirichlet nodes in the local partition
     virtual int get_Num_LD() const { return Num_LD; }
 
+    // Get the number of caps
+    virtual int get_num_caps() const { return num_caps; }
+
     // Get the Dirichlet node's corresponding cap ID
     // para node ranges [ 0, Num_LD ).
     // output value is [ 0, num_caps ), where ID 0 corresponds to the inlet.

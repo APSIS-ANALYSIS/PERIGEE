@@ -107,8 +107,23 @@ void PGAssem_Tet_CMM_GenAlpha::EssBC_KG(
 }
 
 
-void PGAssem_Tet_CMM_GenAlpha::RingBC_KG( const ALocal_Ring_NodalBC * const &ringnbc_part )
+void PGAssem_Tet_CMM_GenAlpha::RingBC_KG( const APart_Node * const &node_ptr,
+    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_Ring_NodalBC * const &ringnbc_part )
 {
+   const int nnode = node_ptr->get_nlocalnode();
+ 
+   std::vector<int> clamped_nodes;
+   for(int ii=0; ii<nnode; ++ii)
+   {
+     int num_ess_velo_dof = 0;
+
+     for(int jj=1; jj<4; ++jj)
+       if( nbc_part->get_LID(jj, ii) < 0 ) num_ess_velo_dof += 1;
+ 
+     if( num_ess_velo_dof == 3 ) clamped_nodes.push_back( node_ptr->get_node_loc(ii) );
+   }
+
   const int local_ring_node_num = ringnbc_part->get_Num_LD();
 
   const int ringbc_type = ringnbc_part -> get_ringbc_type();
@@ -190,6 +205,18 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG( const ALocal_Ring_NodalBC * const &rin
         MatSetValue(K, row_t, row_r, tr,       ADD_VALUES);
       }
     }
+    else if(ringbc_type == 5)
+    {
+      if( !VEC_T::is_invec( clamped_nodes, dnode ) )
+      {
+        VecSetValue( G, row_n, 0.0, INSERT_VALUES);
+
+        // add the actual constraint equation in the normal direction
+        MatSetValue(K, row_n, row_n, nn - 1.0, ADD_VALUES);
+        MatSetValue(K, row_n, row_t, nt,       ADD_VALUES);
+        MatSetValue(K, row_n, row_r, nr,       ADD_VALUES);
+      }
+    }
     else
       SYS_T::print_fatal("Error: this ringbc_type is not supported in PGAssem_Tet_CMM_GenAlpha.\n");
   }
@@ -268,7 +295,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_nonzero_estimate(
 
   for(int ii=0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
 
-  RingBC_KG( ringnbc_part );
+  RingBC_KG( node_ptr, nbc_part, ringnbc_part );
   
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
@@ -339,7 +366,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_mass_residual(
 
   for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
 
-  RingBC_KG( ringnbc_part );
+  RingBC_KG( node_ptr, nbc_part, ringnbc_part );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
@@ -523,7 +550,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
 
   for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
   
-  RingBC_KG( ringnbc_part );
+  RingBC_KG( node_ptr, nbc_part, ringnbc_part );
   
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);

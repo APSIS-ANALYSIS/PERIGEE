@@ -173,7 +173,9 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
    
     void EssBC_G( const ALocal_NodalBC * const &nbc_part, const int &field );
 
-    void RingBC_KG( const ALocal_Ring_NodalBC * const &ringnbc_part );
+    void RingBC_KG( const APart_Node * const &pnode_ptr,
+        const ALocal_NodalBC * const &nbc_part, 
+        const ALocal_Ring_NodalBC * const &ringnbc_part );
     
     // Natural boundary condition
     void NatBC_G( const double &curr_time, const double &dt,
