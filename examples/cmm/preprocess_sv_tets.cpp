@@ -51,7 +51,11 @@ int main( int argc, char * argv[] )
   int elemType = 501;
   int num_outlet = 1;
   int ringBC_type = 0;
-  bool is_rigidwall = false;
+
+  // cmmBC_type : 0 deformable wall, 
+  //              1 rigid wall, 
+  //              2 variables in the fluid subdomain all fixed
+  int cmmBC_type = 0;
 
   // Default names for input geometry files
   std::string geo_file("./whole_vol.vtu");
@@ -74,7 +78,7 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionInt("-num_outlet", num_outlet);
   SYS_T::GetOptionInt("-elem_type", elemType);
   SYS_T::GetOptionInt("-ringbc_type", ringBC_type);
-  SYS_T::GetOptionBool("-is_rigidwall", is_rigidwall);
+  SYS_T::GetOptionInt("-cmmbc_type", cmmBC_type);
   SYS_T::GetOptionString("-geo_file", geo_file);
   SYS_T::GetOptionString("-sur_file_in", sur_file_in);
   SYS_T::GetOptionString("-sur_file_wall", sur_file_wall);
@@ -85,15 +89,8 @@ int main( int argc, char * argv[] )
   // Print the command line arguments
   cout<<"==== Command Line Arguments ===="<<endl;
   cout<<" -elem_type: "<<elemType<<endl;
-  if( is_rigidwall )
-  {
-    cout<<" -is_rigidwall: true \n";
-  }
-  else
-  {
-    cout<<" -is_rigidwall: false \n";
-    cout<<" -ringbc_type: "<<ringBC_type<<endl;
-  }
+  cout<<" -ringbc_type: "<<ringBC_type<<endl;
+  cout<<" -cmmbc_type: "<<cmmBC_type<<endl;
   cout<<" -num_outlet: "<<num_outlet<<endl;
   cout<<" -geo_file: "<<geo_file<<endl;
   cout<<" -sur_file_in: "<<sur_file_in<<endl;
@@ -236,20 +233,24 @@ int main( int argc, char * argv[] )
   // corresponding cap's unit normal.
   std::vector<INodalBC *> NBC_list( dofMat, nullptr );
 
-  if( is_rigidwall )
+  if( cmmBC_type == 0)
   {
+    std::cout<<"===> The Nodal boundary condition for deformable wall (cmmbc_type = 0) is setted up as:\n";
+    NBC_list[0] = new NodalBC_3D_CMM( nFunc );
+    NBC_list[1] = new NodalBC_3D_CMM( InFBC, ring_bc, 0, nFunc );
+    NBC_list[2] = new NodalBC_3D_CMM( InFBC, ring_bc, 1, nFunc );
+    NBC_list[3] = new NodalBC_3D_CMM( InFBC, ring_bc, 2, nFunc );
+  }
+  else if( cmmBC_type == 1 )
+  {
+    std::cout<<"===> The Nodal boundary condition for rigid wall (cmmbc_type = 1) is setted up as:\n";
     NBC_list[0] = new NodalBC_3D_CMM( nFunc );
     NBC_list[1] = new NodalBC_3D_CMM( InFBC, ring_bc, wall_nbc, nFunc );
     NBC_list[2] = new NodalBC_3D_CMM( InFBC, ring_bc, wall_nbc, nFunc );
     NBC_list[3] = new NodalBC_3D_CMM( InFBC, ring_bc, wall_nbc, nFunc );
   }
   else
-  {
-    NBC_list[0] = new NodalBC_3D_CMM( nFunc );
-    NBC_list[1] = new NodalBC_3D_CMM( InFBC, ring_bc, 0, nFunc );
-    NBC_list[2] = new NodalBC_3D_CMM( InFBC, ring_bc, 1, nFunc );
-    NBC_list[3] = new NodalBC_3D_CMM( InFBC, ring_bc, 2, nFunc );
-  }
+    SYS_T::print_fatal("Error: cmmBC_type = %d is not defined.\n", cmmBC_type);
 
   // --------------------------------------------------------------------------
   // Wall mesh for CMM-type model is set as an elemental bc.
