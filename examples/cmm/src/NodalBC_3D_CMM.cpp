@@ -117,8 +117,32 @@ NodalBC_3D_CMM::NodalBC_3D_CMM( const INodalBC * const &nbc_inflow,
       }
       break;
 
+    case 5:
+    {
+      // Add one node per cap. All remaining nodes are only added if dom_n_comp equals comp.
+      int curr_cap_id = 0;
+      for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
+      {
+        if( cap_id[ii] == curr_cap_id )
+        {
+          curr_cap_id += 1;
+          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
+          num_dom_n_pts[ cap_id[ii] ] += 1;
+          num_dom_t_pts[ cap_id[ii] ] += 1;
+        }
+        else if( comp == dom_n_comp[ cap_id[ii] ] )
+        {
+          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
+          num_dom_n_pts[ cap_id[ii] ] += 1;
+        }
+      }
+
+      SYS_T::print_fatal_if( curr_cap_id != nbc_ring->get_num_caps(), "NodalBC_3D_CMM Error: ring nodes aren't ordered by cap_id.\n" );
+      break;
+    } 
+   
     default:
-      SYS_T::print_fatal("Error: there is no such type of essential bc for ring nodes.\n");
+      SYS_T::print_fatal( "NodalBC_3D_CMM Error: there is no such type of essential bc for ring nodes.\n" );
       break;
   }
 

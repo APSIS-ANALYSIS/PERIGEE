@@ -68,6 +68,8 @@ class NodalBC_3D_ring : public INodalBC
     //            normal components of outlet ring nodes are set to be essential bc.
     // type = 4 : all dof of inlet ring nodes are set to be essential bc. Only the dominant
     //            normal & tangential components of outlet ring nodes are set to be essential bc.
+    // type = 5 : all dof of a single ring node on each cap are set as essential bc. For all
+    //            remaining ring nodes, only the dominant normal components are set as essential bc.
     const int ring_bc_type;
 
     // Number of caps (inlets, outlets)
