@@ -227,7 +227,7 @@ NodalBC_3D_CMM::NodalBC_3D_CMM( const INodalBC * const &nbc_wall, const int &nFu
 
   // print data on screen
   std::cout<<"===> NodalBC_3D_CMM specified by \n";
-  std::cout<<"     interior of inlet surface, ring nodes, as well as the wall nodes\n";
+  std::cout<<"     the whole domain, with the wall nodes excluded,\n";
   std::cout<<"     is generated. \n";
 }
 

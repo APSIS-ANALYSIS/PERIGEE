@@ -2,6 +2,7 @@
 
 #include "ElemBC_3D_tet_wall.hpp"
 #include "NodalBC_3D_wall.hpp"
+#include "NodalBC_3D_CMM.hpp"
 
 using namespace std;
 
@@ -18,18 +19,13 @@ int main( int argc, char *argv[] )
 
   std::vector< std::string > sur_file_out;
   sur_file_out.resize( num_outlet );
-  
+
   for(int ii=0; ii<num_outlet; ++ii)
   {
-    std::ostringstream ss;
-    ss<<sur_file_out_base;
-    if( ii/10 == 0 ) ss<<"00";
-    else if( ii/100 == 0 ) ss<<"0";
-
-    if(elemType == 501 ) ss<<ii<<".vtu";
-    else ss<<ii<<".vtu";
-
-    sur_file_out[ii] = ss.str(); // generate the outlet face file name
+    if(elemType == 501 )
+      sur_file_out[ii] = SYS_T::gen_capfile_name( sur_file_out_base, ii, ".vtp" );
+    else
+      sur_file_out[ii] = SYS_T::gen_capfile_name( sur_file_out_base, ii, ".vtu" );
 
     SYS_T::file_check(sur_file_out[ii]);
     cout<<sur_file_out[ii]<<" found. \n";
@@ -47,7 +43,12 @@ int main( int argc, char *argv[] )
 
   wallBC -> print_info();
 
+  INodalBC * nbc = new NodalBC_3D_CMM( wallBC, nFunc );
+
+  nbc -> print_info();
+
   delete wallBC;
+  delete nbc;
   PetscFinalize();
   return 0;
 }
