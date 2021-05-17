@@ -83,8 +83,4 @@ NodalBC_3D_wall::NodalBC_3D_wall( const std::string &inflow_file,
   std::cout<<"     excluded, is generated.\n";
 }
 
-
-NodalBC_3D_wall::~NodalBC_3D_wall()
-{}
-
 // EOF

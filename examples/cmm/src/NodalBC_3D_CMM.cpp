@@ -197,4 +197,38 @@ NodalBC_3D_CMM::NodalBC_3D_CMM( const INodalBC * const &nbc_inflow,
   std::cout<<"     is generated. \n";
 }
 
+
+NodalBC_3D_CMM::NodalBC_3D_CMM( const INodalBC * const &nbc_wall, const int &nFunc )
+{
+  per_slave_nodes.clear();
+  per_master_nodes.clear();
+  num_per_nodes = 0;
+
+  dir_nodes.clear();
+
+  // prepare wall nodes' indices
+  std::vector<unsigned int> wall_gnode;
+  wall_gnode.clear();
+  for(unsigned int ii=0; ii<nbc_wall->get_num_dir_nodes(); ++ii)
+    wall_gnode.push_back( nbc_wall->get_dir_nodes(ii) );
+
+  // get wall nodes excluded
+  for(unsigned int ii=0; ii< static_cast<unsigned int>(nFunc); ++ii)
+  {
+    if( !VEC_T::is_invec( wall_gnode, ii) )
+      dir_nodes.push_back( ii );
+  }
+
+  VEC_T::sort_unique_resize(dir_nodes);
+
+  num_dir_nodes = dir_nodes.size();
+
+  Create_ID( nFunc );
+
+  // print data on screen
+  std::cout<<"===> NodalBC_3D_CMM specified by \n";
+  std::cout<<"     interior of inlet surface, ring nodes, as well as the wall nodes\n";
+  std::cout<<"     is generated. \n";
+}
+
 // EOF

@@ -62,6 +62,13 @@ class NodalBC_3D_CMM : public INodalBC
         const INodalBC * const &nbc_ring, const INodalBC * const &nbc_wall, 
         const int &nFunc );
 
+    // ------------------------------------------------------------------------ 
+    // Specify the Dirichlet nodes for the whole domain with wall nodes
+    // excluded. This is used for generating the prestress in the wall, while
+    // the fluid domain variables are all fixed.
+    // ------------------------------------------------------------------------ 
+    NodalBC_3D_CMM( const INodalBC * const &nbc_wall, const int &nFunc );
+
     virtual ~NodalBC_3D_CMM() {};
 
   private:

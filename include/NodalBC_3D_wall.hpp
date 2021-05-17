@@ -19,7 +19,7 @@ class NodalBC_3D_wall : public INodalBC
         const std::vector<std::string> &outflow_files,
         const int &nFunc, const int &elemtype = 501 );
 
-    virtual ~NodalBC_3D_wall();
+    virtual ~NodalBC_3D_wall() {};
 };
 
 #endif
