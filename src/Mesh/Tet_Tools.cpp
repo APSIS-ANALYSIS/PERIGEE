@@ -777,10 +777,9 @@ double TET_T::get_aspect_ratio( const std::vector<double> &pt )
   return emax / emin;
 }
 
-void TET_T::get_out_normal( const std::string &file,
+Vector_3 TET_T::get_out_normal( const std::string &file,
     const std::vector<double> &vol_ctrlPts,
-    const IIEN * const &vol_ien,
-    Vector_3 &outVec )
+    const IIEN * const &vol_ien )
 {
   int numpts, numcels;
   std::vector<double> pts;
@@ -833,7 +832,7 @@ void TET_T::get_out_normal( const std::string &file,
       vol_ctrlPts[3*trn[2]+1] - vol_ctrlPts[3*trn[0]+1],
       vol_ctrlPts[3*trn[2]+2] - vol_ctrlPts[3*trn[0]+2] );
 
-  outVec = cross_product( l01, l02 );
+  Vector_3 outVec = cross_product( l01, l02 );
 
   outVec.normalize();
 
@@ -844,6 +843,8 @@ void TET_T::get_out_normal( const std::string &file,
 
   // inner product outward with inward, and correct outVec
   if(inw.dot_product(outVec) > 0.0) outVec.scale(-1.0);
+
+  return outVec;
 }
 
 

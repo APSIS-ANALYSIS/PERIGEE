@@ -420,12 +420,11 @@ namespace TET_T
   //   Input: \para file : surface file
   //          \para vol_ctrlPts, the volume mesh control points
   //          \para vol_ien, the volume mesh IEN array
-  //   Output: outVec, the normal vector
+  //   Output: outVec, the outward normal vector
   // ----------------------------------------------------------------
-  void get_out_normal( const std::string &file,
+  Vector_3 get_out_normal( const std::string &file,
       const std::vector<double> &vol_ctrlPts,
-      const IIEN * const &vol_ien,
-      Vector_3 &outVec );
+      const IIEN * const &vol_ien );
   
   // ================================================================
   // 4. TetGen interface

@@ -201,18 +201,17 @@ int main( int argc, char * argv[] )
   mnindex->write_hdf5("node_mapping");
 
   // Inflow BC info
-  Vector_3 inlet_outvec;
-  TET_T::get_out_normal( sur_file_in, ctrlPts, IEN, inlet_outvec );
+  const Vector_3 inlet_outvec = TET_T::get_out_normal( sur_file_in, ctrlPts, IEN );
   
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall,
       nFunc, inlet_outvec, elemType );
 
   // Set up Outflow BC info
   // Obtain the outward normal vector
-  std::vector< Vector_3 > outlet_outvec;
-  outlet_outvec.resize( sur_file_out.size() );
+  std::vector< Vector_3 > outlet_outvec( sur_file_out.size() );
+
   for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
-    TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN, outlet_outvec[ii] );
+    outlet_outvec[ii] = TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN );
 
   ElemBC * ebc = new ElemBC_3D_tet_outflow( sur_file_out, outlet_outvec, elemType );
 
