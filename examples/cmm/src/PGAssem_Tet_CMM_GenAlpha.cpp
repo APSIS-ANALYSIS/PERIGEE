@@ -156,9 +156,9 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG( const APart_Node * const &node_ptr,
       VecSetValue( G, row_n, 0.0, INSERT_VALUES);
 
       // add the actual constraint equation in the normal direction
-      MatSetValue(K, row_n, row_n, nn - 1.0, ADD_VALUES);
-      MatSetValue(K, row_n, row_t, nt,       ADD_VALUES);
-      MatSetValue(K, row_n, row_r, nr,       ADD_VALUES);
+      MatSetValue(K, row_n, row_n, nn, INSERT_VALUES);
+      MatSetValue(K, row_n, row_t, nt, INSERT_VALUES);
+      MatSetValue(K, row_n, row_r, nr, INSERT_VALUES);
     }
     else if(ringbc_type == 2)
     {
@@ -166,14 +166,14 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG( const APart_Node * const &node_ptr,
       VecSetValue(G, row_t, 0.0, INSERT_VALUES);
 
       // add the actual constraint equation in the normal direction
-      MatSetValue(K, row_n, row_n, nn - 1.0, ADD_VALUES);
-      MatSetValue(K, row_n, row_t, nt,       ADD_VALUES);
-      MatSetValue(K, row_n, row_r, nr,       ADD_VALUES);
+      MatSetValue(K, row_n, row_n, nn, INSERT_VALUES);
+      MatSetValue(K, row_n, row_t, nt, INSERT_VALUES);
+      MatSetValue(K, row_n, row_r, nr, INSERT_VALUES);
       
       // add the actual constraint equation in the tangential direction
-      MatSetValue(K, row_t, row_n, tn,       ADD_VALUES);
-      MatSetValue(K, row_t, row_t, tt - 1.0, ADD_VALUES);
-      MatSetValue(K, row_t, row_r, tr,       ADD_VALUES);
+      MatSetValue(K, row_t, row_n, tn, INSERT_VALUES);
+      MatSetValue(K, row_t, row_t, tt, INSERT_VALUES);
+      MatSetValue(K, row_t, row_r, tr, INSERT_VALUES);
     }
     else if(ringbc_type == 3)
     {
@@ -182,9 +182,9 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG( const APart_Node * const &node_ptr,
         VecSetValue( G, row_n, 0.0, INSERT_VALUES);
 
         // add the actual constraint equation in the normal direction
-        MatSetValue(K, row_n, row_n, nn - 1.0, ADD_VALUES);
-        MatSetValue(K, row_n, row_t, nt,       ADD_VALUES);
-        MatSetValue(K, row_n, row_r, nr,       ADD_VALUES);
+        MatSetValue(K, row_n, row_n, nn, INSERT_VALUES);
+        MatSetValue(K, row_n, row_t, nt, INSERT_VALUES);
+        MatSetValue(K, row_n, row_r, nr, INSERT_VALUES);
       }
     }
     else if(ringbc_type == 4)
@@ -195,14 +195,14 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG( const APart_Node * const &node_ptr,
         VecSetValue(G, row_t, 0.0, INSERT_VALUES);
 
         // add the actual constraint equation in the normal direction
-        MatSetValue(K, row_n, row_n, nn - 1.0, ADD_VALUES);
-        MatSetValue(K, row_n, row_t, nt,       ADD_VALUES);
-        MatSetValue(K, row_n, row_r, nr,       ADD_VALUES);
+        MatSetValue(K, row_n, row_n, nn, INSERT_VALUES);
+        MatSetValue(K, row_n, row_t, nt, INSERT_VALUES);
+        MatSetValue(K, row_n, row_r, nr, INSERT_VALUES);
         
         // add the actual constraint equation in the tangential direction
-        MatSetValue(K, row_t, row_n, tn,       ADD_VALUES);
-        MatSetValue(K, row_t, row_t, tt - 1.0, ADD_VALUES);
-        MatSetValue(K, row_t, row_r, tr,       ADD_VALUES);
+        MatSetValue(K, row_t, row_n, tn, INSERT_VALUES);
+        MatSetValue(K, row_t, row_t, tt, INSERT_VALUES);
+        MatSetValue(K, row_t, row_r, tr, INSERT_VALUES);
       }
     }
     else if(ringbc_type == 5)
@@ -212,9 +212,9 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG( const APart_Node * const &node_ptr,
         VecSetValue( G, row_n, 0.0, INSERT_VALUES);
 
         // add the actual constraint equation in the normal direction
-        MatSetValue(K, row_n, row_n, nn - 1.0, ADD_VALUES);
-        MatSetValue(K, row_n, row_t, nt,       ADD_VALUES);
-        MatSetValue(K, row_n, row_r, nr,       ADD_VALUES);
+        MatSetValue(K, row_n, row_n, nn, INSERT_VALUES);
+        MatSetValue(K, row_n, row_t, nt, INSERT_VALUES);
+        MatSetValue(K, row_n, row_r, nr, INSERT_VALUES);
       }
     }
     else
