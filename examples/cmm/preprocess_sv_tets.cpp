@@ -247,6 +247,14 @@ int main( int argc, char * argv[] )
     NBC_list[2] = new NodalBC_3D_CMM( InFBC, ring_bc, wall_nbc, nFunc );
     NBC_list[3] = new NodalBC_3D_CMM( InFBC, ring_bc, wall_nbc, nFunc );
   }
+  else if( cmmBC_type == 2 )
+  {
+    std::cout<<"===> The Nodal boundary condition for prestress generation (cmmbc_type = 2) is setted up as:\n";
+    NBC_list[0] = new NodalBC_3D_CMM( wall_nbc, nFunc );
+    NBC_list[1] = new NodalBC_3D_CMM( wall_nbc, nFunc );
+    NBC_list[2] = new NodalBC_3D_CMM( wall_nbc, nFunc );
+    NBC_list[3] = new NodalBC_3D_CMM( wall_nbc, nFunc );
+  }
   else
     SYS_T::print_fatal("Error: cmmBC_type = %d is not defined.\n", cmmBC_type);
 
