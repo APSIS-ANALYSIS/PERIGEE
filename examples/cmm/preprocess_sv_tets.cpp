@@ -122,8 +122,7 @@ int main( int argc, char * argv[] )
   SYS_T::file_check(sur_file_wall); cout<<sur_file_wall<<" found. \n";
 
   // Generate the outlet file names and check existence
-  std::vector< std::string > sur_file_out;
-  sur_file_out.resize( num_outlet );
+  std::vector< std::string > sur_file_out( num_outlet );
 
   for(int ii=0; ii<num_outlet; ++ii)
   {
