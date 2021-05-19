@@ -316,8 +316,9 @@ class FEAElement
     // global and local lamina coordinates. This routine is used in membrane
     // and shell elements.
     // Reference: TJRH Linear finite element book page 386.
-    virtual void get_rotationMatrix( const int &quaindex, Matrix_3x3 &rot_mat ) 
-      const {SYS_T::commPrint("Warning: get_rotationMatrix is not implemented. \n");}
+    virtual Matrix_3x3 get_rotationMatrix( const int &quaindex ) const 
+    {SYS_T::commPrint("Warning: get_rotationMatrix is not implemented. \n"); 
+      return Matrix_3x3();}
     // ------------------------------------------------------------------------    
 
     // ------------------------------------------------------------------------    

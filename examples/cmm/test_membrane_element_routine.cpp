@@ -127,8 +127,7 @@ int main( int argc, char * argv[] )
   elem -> get_gradR(qua, dR_dxl, dR_dyl);
 
   // Global-to-local rotation matrix Q
-  Matrix_3x3 Q = Matrix_3x3();
-  elem -> get_rotationMatrix(0, Q);
+  const Matrix_3x3 Q = elem -> get_rotationMatrix(0);
   std::cout << "\n===== Q =====" << std::endl;
   Q.print();
 

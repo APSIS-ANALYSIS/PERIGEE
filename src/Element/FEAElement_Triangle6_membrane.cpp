@@ -251,11 +251,10 @@ void FEAElement_Triangle6_membrane::get_2d_normal_out( const int &qua,
   len = detJac[qua];
 }
 
-void FEAElement_Triangle6_membrane::get_rotationMatrix( const int &quaindex,
-    Matrix_3x3 &rot_mat ) const
+Matrix_3x3 FEAElement_Triangle6_membrane::get_rotationMatrix( const int &quaindex ) const
 {
   assert( quaindex >= 0 && quaindex < numQuapts );
-  rot_mat = Q[quaindex];
+  return Q[quaindex];
 }
 
 void FEAElement_Triangle6_membrane::get_normal_out( const int &qua,

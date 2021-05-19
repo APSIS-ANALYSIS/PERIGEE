@@ -64,7 +64,7 @@ class FEAElement_Triangle3_membrane : public FEAElement
     virtual void get_R_gradR( const int &quaindex, double * const &basis,
         double * const &basis_x, double * const &basis_y ) const;
 
-    virtual void get_rotationMatrix( const int &quaindex, Matrix_3x3 &rot_mat ) const;
+    virtual Matrix_3x3 get_rotationMatrix( const int &quaindex ) const;
 
     // Assumes the triangle nodes are arranged such that the outward
     // direction is given by dx_dr x dx_ds

@@ -1074,8 +1074,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     element->get_R_gradR( qua, &R[0], &dR_dxl[0], &dR_dyl[0] );
 
     // Global-to-local rotation matrix Q
-    Matrix_3x3 Q = Matrix_3x3();
-    element->get_rotationMatrix(qua, Q);
+    const Matrix_3x3 Q = element->get_rotationMatrix(qua);
 
     double u_t = 0.0, v_t = 0.0, w_t = 0.0;
     double h_w = 0.0, E_w = 0.0;
@@ -1189,8 +1188,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     double * Kg = new double [ (snLocBas*dim) * (snLocBas*dim) ] {};
 
     // Global-to-local rotation matrix Q
-    Matrix_3x3 Q = Matrix_3x3();
-    element->get_rotationMatrix(qua, Q);
+    const Matrix_3x3 Q = element->get_rotationMatrix(qua);
 
     double u_t = 0.0, v_t = 0.0, w_t = 0.0;
     double h_w = 0.0, E_w = 0.0;
@@ -1381,8 +1379,7 @@ void PLocAssem_Tet_CMM_GenAlpha::get_Wall_CauchyStress(
     element->get_R_gradR( qua, &R[0], &dR_dxl[0], &dR_dyl[0] );
 
     // Global-to-local rotation matrix Q
-    Matrix_3x3 Q = Matrix_3x3();
-    element->get_rotationMatrix(qua, Q);
+    const Matrix_3x3 Q = element->get_rotationMatrix(qua);
 
     for(int ii=0; ii<snLocBas; ++ii)
     {
