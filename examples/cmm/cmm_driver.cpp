@@ -221,6 +221,12 @@ int main( int argc, char *argv[] )
   MPI_Barrier(PETSC_COMM_WORLD);
 
   // ===== Read data from partition files =====
+  // Mesh partition info
+  APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file);
+
+  SYS_T::print_fatal_if( size!= PartBasic->get_cpu_size(),
+      "Error: Assigned CPU number does not match the partition. \n");
+
   // Control points' xyz coordinates
   FEANode * fNode = new FEANode(part_file, rank);
 
@@ -229,9 +235,6 @@ int main( int argc, char *argv[] )
 
   // Global mesh info
   IAGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info_FEM_3D(part_file,rank);
-
-  // Mesh partition info
-  APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file, rank);
 
   // Local sub-domain's element indices
   ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
@@ -291,9 +294,6 @@ int main( int argc, char *argv[] )
   APart_Node * pNode = new APart_Node(part_file, rank);
 
   SYS_T::commPrint("===> Data from HDF5 files read from disk.\n");
-
-  SYS_T::print_fatal_if( size!= PartBasic->get_cpu_size(),
-      "Error: Assigned CPU number does not match the partition. \n");
 
   SYS_T::commPrint("===> %d processor(s) assigned for FEM analysis. \n", size);
 

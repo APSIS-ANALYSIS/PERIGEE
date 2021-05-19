@@ -17,8 +17,11 @@ class APart_Basic_Info
   public:
     // --------------------------------------------------------------
     // Constructor: read from the h5 file of the given base name and rank
+    //              by default, the complete info is stored on cpu 0.
+    //              Therefore, one only needs, and is recommended to,
+    //              read from rank 0.
     // --------------------------------------------------------------
-    APart_Basic_Info( const std::string &fbasename, const int &in_rank );
+    APart_Basic_Info( const std::string &fbasename, const int &in_rank = 0 );
 
     virtual ~APart_Basic_Info();
 
