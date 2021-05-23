@@ -295,7 +295,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_nonzero_estimate(
 
   for(int ii=0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
 
-  RingBC_KG( node_ptr, nbc_part, ringnbc_part );
+  //RingBC_KG( node_ptr, nbc_part, ringnbc_part );
   
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
@@ -366,7 +366,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_mass_residual(
 
   for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
 
-  RingBC_KG( node_ptr, nbc_part, ringnbc_part );
+  //RingBC_KG( node_ptr, nbc_part, ringnbc_part );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
@@ -550,7 +550,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
 
   for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
   
-  RingBC_KG( node_ptr, nbc_part, ringnbc_part );
+  //RingBC_KG( node_ptr, nbc_part, ringnbc_part );
   
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
@@ -782,6 +782,21 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_G(
     }
 
     VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
+ 
+    for(int ii=0; ii<snLocBas; ++ii)
+    { 
+      if( nbc_part -> get_LID(0, LSIEN[ii]) == 4304 )
+      {
+        std::cout<<lassem_ptr->sur_Residual[ii*4]<<'\t'<<lassem_ptr->sur_Residual[ii*4+1]<<'\t'
+          <<lassem_ptr->sur_Residual[ii*4+2]<<'\t'<<lassem_ptr->sur_Residual[ii*4+3]<<'\n';
+      
+        //std::cout<<sctrl_x[ii]<<'\t'<<sctrl_y[ii]<<'\t'<<sctrl_z[ii]<<'\n';
+      
+        //std::cout<<local_as[4*ii+0]<<'\t'<<local_as[4*ii+1]<<'\t'<<local_as[4*ii+2]<<'\t'<<local_as[4*ii+3]<<'\n';
+      }
+    }
+
+
   }
 
   delete [] array_a;  array_a  = nullptr;

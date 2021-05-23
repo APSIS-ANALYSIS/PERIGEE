@@ -231,7 +231,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
     update_wall(-1.0, &sol_alpha, &G_kinematic, ebc_wall_part);
 
     nl_counter += 1;
-    
+   
     // Assembly residual (& tangent if condition satisfied) 
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )
     {
@@ -271,8 +271,12 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
 #endif
     }
 
+    if( nl_counter == 1 ){
+    //  gassem_ptr->Print_G();
+    }
+
     VecNorm(gassem_ptr->G, NORM_2, &residual_norm);
-    
+
     SYS_T::commPrint("  --- nl_res: %e \n", residual_norm);
 
     // Print the residual norm of the kienmatic equation

@@ -1097,7 +1097,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     sigma[qua](2,0) += qua_prestress[qua*6+4];
     sigma[qua](2,1) += qua_prestress[qua*6+3];
     sigma[qua](2,2) += qua_prestress[qua*6+2];
-
+    
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
     // Body force acting on the wall
