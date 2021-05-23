@@ -91,9 +91,7 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     const double fluid_density;
 
     // num_ebc = 1 for the wall, so these properties all have length num_node[0]
-    std::vector<double> radius;
-    std::vector<double> thickness;
-    std::vector<double> youngsmod;
+    std::vector<double> radius, thickness, youngsmod;
     
     // compute young's modulus for a wall node with the given radius & thickness
     // One may modify this function for different ways of prescribing the 

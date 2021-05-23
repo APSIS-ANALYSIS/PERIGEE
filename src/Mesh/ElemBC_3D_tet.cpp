@@ -39,7 +39,6 @@ ElemBC_3D_tet::ElemBC_3D_tet( const std::string &vtkfile,
   else if(elemtype == 502)
   {
     cell_nLocBas[0] = 6; // quadratic triangle
-
     TET_T::read_vtu_grid( vtkfile, num_node[0], num_cell[0],
         pt_xyz[0], tri_ien[0], global_node[0], global_cell[0] );
   }
