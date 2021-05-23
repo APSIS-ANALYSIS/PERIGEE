@@ -27,21 +27,21 @@ class PDNSolution
     Vec solution; 
     
     // ------------------------------------------------------------------------
-    // Construct a solution vec compatible with the analysis node 
-    // partition, with the solution vector's dof value being equal
-    // to the APart_Node class's dof value.
+    // ! Construct a solution vec compatible with the analysis node partition, 
+    //   with the solution vector's dof value being equal to the APart_Node 
+    //   class's dof value.
     // ------------------------------------------------------------------------
     PDNSolution( const APart_Node * const &pNode );
     
     // ------------------------------------------------------------------------
-    // Construct a solution vec compatible with the analysis node 
-    // partition, but with a different dof_num from pNode->dof. 
-    // The users specify a dof number for the solution class.
+    // ! Construct a solution vec compatible with the analysis node partition, 
+    //   but with a different dof_num from pNode->dof. 
+    //   The users specify a dof number for the solution class.
     // ------------------------------------------------------------------------
     PDNSolution( const APart_Node * const &pNode, const int &input_dof_num );
     
     // ------------------------------------------------------------------------
-    // Copy constructors
+    // ! Copy constructors
     // ------------------------------------------------------------------------
     PDNSolution( const PDNSolution &INPUT );
 
@@ -102,12 +102,12 @@ class PDNSolution
     virtual void GetLocalArray( std::vector<double> &local_array ) const;
 
     // ------------------------------------------------------------------------
-    // ! Assembly the vector and update its ghost values. It is
-    //   just a routine calling the following things. This is called
-    //   after VecSetValues to finish the assembly of vector.
+    // ! Assembly the vector and update its ghost values. It is just a routine 
+    //   calling the following things. 
     //          VecAssemblyBegin(solution);
     //          VecAssenblyEnd(solution);
     //          GhostUpdate();
+    //   This is called after VecSetValues to finish the assembly of vector.
     // ------------------------------------------------------------------------
     virtual void Assembly_GhostUpdate();
 
@@ -126,25 +126,25 @@ class PDNSolution
     virtual void ReadBinary(const char * const &file_name) const;
 
     // ------------------------------------------------------------------------
-    // ! Get the number of local and ghost nodes for the parallel 
-    //   vector's local portion.
+    // ! Get the number of local and ghost nodes for the parallel vector's 
+    //   local portion.
     // ------------------------------------------------------------------------
     virtual int get_nlocalnode() const {return nlocalnode;}
 
     virtual int get_nghostnode() const {return nghostnode;}
 
     // ------------------------------------------------------------------------
-    // ! Get the number of local and ghost entries in the parallel 
-    //   vector's local portion.
+    // ! Get the number of local and ghost entries in the parallel vector's 
+    //   local portion.
     // ------------------------------------------------------------------------
     virtual int get_nlocal() const {return nlocal;}
     
     virtual int get_nghost() const {return nghost;}
 
     // ------------------------------------------------------------------------
-    // ! Get the number of local plus ghost entries in the parallel
-    //   vector's local portion. This can be used for allocating the
-    //   array size for GetLocalArray.
+    // ! Get the number of local plus ghost entries in the parallel vector's 
+    //   local portion. This can be used for allocating the array size for 
+    //   GetLocalArray.
     // ------------------------------------------------------------------------
     virtual int get_nlgn() const {return nlocal + nghost;}
 
@@ -154,21 +154,20 @@ class PDNSolution
     virtual int get_dof_num() const {return dof_num;}
 
     // ------------------------------------------------------------------------
-    // ! Compare the layout of the solution vector, that is
-    //   nlocalnode and nghostnode. 
+    // ! Compare the layout of the solution vector, that is,
+    //                 nlocalnode & nghostnode. 
     //   Return true if the nlocalnode and nghostnode for the two inputs
-    //   are the same; false otherwise. 
+    //   are the same; return false otherwise. 
     // ------------------------------------------------------------------------
     friend bool is_layout_equal( const PDNSolution &left, const PDNSolution &right );
 
   private:
     // ------------------------------------------------------------------------
-    // dof_num default value is apart_node -> get_dof, but user may
-    // reset its value.
-    // nlocalnode := apart_node -> get_nlocalnode
-    // nghostnode := apart_node -> get_nghostnode
-    // nlocal := apart_node -> get_nlocalnode * dof_num
-    // nghost := apart_node -> get_nghostnode * dof_num
+    // dof_num default value is apart_node -> get_dof, but user may reset its value.
+    //     nlocalnode := apart_node -> get_nlocalnode
+    //     nghostnode := apart_node -> get_nghostnode
+    //     nlocal     := apart_node -> get_nlocalnode * dof_num
+    //     nghost     := apart_node -> get_nghostnode * dof_num
     // ------------------------------------------------------------------------
     const int dof_num, nlocalnode, nghostnode, nlocal, nghost; 
 };
