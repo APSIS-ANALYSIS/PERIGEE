@@ -1070,17 +1070,14 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     // Global-to-local rotation matrix Q
     const Matrix_3x3 Q = element->get_rotationMatrix(qua);
 
-    double u_t = 0.0, v_t = 0.0, w_t = 0.0;
-    double h_w = 0.0, E_w = 0.0;
+    double u_t = 0.0, v_t = 0.0, w_t = 0.0, h_w = 0.0, E_w = 0.0;
     double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
 
     for(int ii=0; ii<snLocBas; ++ii)
     {
-      const int ii4 = 4 * ii;
-
-      u_t += dot_sol[ii4+1] * R[ii];
-      v_t += dot_sol[ii4+2] * R[ii];
-      w_t += dot_sol[ii4+3] * R[ii];
+      u_t += dot_sol[ii*4+1] * R[ii];
+      v_t += dot_sol[ii*4+2] * R[ii];
+      w_t += dot_sol[ii*4+3] * R[ii];
 
       h_w += ele_thickness[ii] * R[ii];
       E_w += ele_youngsmod[ii] * R[ii];
@@ -1091,17 +1088,15 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     }
 
     // Add prestress: convert from Voigt notation (comps 11, 22, 33, 23, 13, 12)
-    const int qua6 = 6 * qua;
-
-    sigma[qua](0,0) += qua_prestress[qua6];
-    sigma[qua](0,1) += qua_prestress[qua6+5];
-    sigma[qua](0,2) += qua_prestress[qua6+4];
-    sigma[qua](1,0) += qua_prestress[qua6+5];
-    sigma[qua](1,1) += qua_prestress[qua6+1];
-    sigma[qua](1,2) += qua_prestress[qua6+3];
-    sigma[qua](2,0) += qua_prestress[qua6+4];
-    sigma[qua](2,1) += qua_prestress[qua6+3];
-    sigma[qua](2,2) += qua_prestress[qua6+2];
+    sigma[qua](0,0) += qua_prestress[qua*6];
+    sigma[qua](0,1) += qua_prestress[qua*6+5];
+    sigma[qua](0,2) += qua_prestress[qua*6+4];
+    sigma[qua](1,0) += qua_prestress[qua*6+5];
+    sigma[qua](1,1) += qua_prestress[qua*6+1];
+    sigma[qua](1,2) += qua_prestress[qua*6+3];
+    sigma[qua](2,0) += qua_prestress[qua*6+4];
+    sigma[qua](2,1) += qua_prestress[qua*6+3];
+    sigma[qua](2,2) += qua_prestress[qua*6+2];
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
@@ -1185,8 +1180,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     // Global-to-local rotation matrix Q
     const Matrix_3x3 Q = element->get_rotationMatrix(qua);
 
-    double u_t = 0.0, v_t = 0.0, w_t = 0.0;
-    double h_w = 0.0, E_w = 0.0;
+    double u_t = 0.0, v_t = 0.0, w_t = 0.0, h_w = 0.0, E_w = 0.0;
     double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
 
     for(int ii=0; ii<snLocBas; ++ii)
