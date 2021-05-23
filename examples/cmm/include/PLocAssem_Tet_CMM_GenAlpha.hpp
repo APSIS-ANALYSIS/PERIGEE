@@ -219,10 +219,12 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
     }
 
     // Return body force acting on the wall domain
-    void get_fw( const double &x, const double &y, const double &z,
-        const double &t, double &fw_x, double &fw_y, double &fw_z ) const
+    Vector_3 get_fw( const double &x, const double &y, const double &z,
+        const double &t ) const
     {
-      fw_x = 0.0; fw_y = 0.0; fw_z = 0.0;
+      double fw_x = 0.0, fw_y = 0.0, fw_z = 0.0;
+
+      return Vector_3( fw_x, fw_y, fw_z );
     }
 
     void get_H1( const double &x, const double &y, const double &z,

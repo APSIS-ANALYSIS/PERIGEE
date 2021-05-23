@@ -1106,8 +1106,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
     // Body force acting on the wall
-    double f1, f2, f3;
-    get_fw(coor_x, coor_y, coor_z, curr, f1, f2, f3);
+    const Vector_3 fw =  get_fw(coor_x, coor_y, coor_z, curr);
 
     // Basis function gradients with respect to global coords
     // dR/dx_{i} = Q_{ji} * dR/dxl_{j}. Note that dR/dzl = 0.0
@@ -1122,11 +1121,13 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     {
       const double NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
-      sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * ( u_t - f1 )
+      sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * ( u_t - fw.get_x() )
           + NA_x * sigma[qua](0, 0) + NA_y * sigma[qua](0, 1) + NA_z * sigma[qua](0, 2) ); 
-      sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * ( v_t - f2 )
+      
+      sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * ( v_t - fw.get_y() )
           + NA_x * sigma[qua](1, 0) + NA_y * sigma[qua](1, 1) + NA_z * sigma[qua](1, 2) ); 
-      sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * ( w_t - f3 )
+      
+      sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * ( w_t - fw.get_z() )
           + NA_x * sigma[qua](2, 0) + NA_y * sigma[qua](2, 1) + NA_z * sigma[qua](2, 2) ); 
     }
 
@@ -1205,8 +1206,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
     // Body force acting on the wall
-    double f1, f2, f3;
-    get_fw(coor_x, coor_y, coor_z, curr, f1, f2, f3);
+    const Vector_3 fw = get_fw(coor_x, coor_y, coor_z, curr);
 
     const double coef = E_w / (1.0 - nu_w * nu_w);
 
@@ -1290,11 +1290,13 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     {
       const double NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
-      sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * ( u_t - f1 )
-          + NA_x * sigma[qua](0, 0) + NA_y * sigma[qua](0, 1) + NA_z * sigma[qua](0, 2) ); 
-      sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * ( v_t - f2 )
+      sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * ( u_t - fw.get_x() )
+          + NA_x * sigma[qua](0, 0) + NA_y * sigma[qua](0, 1) + NA_z * sigma[qua](0, 2) );
+
+      sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * ( v_t - fw.get_y() )
           + NA_x * sigma[qua](1, 0) + NA_y * sigma[qua](1, 1) + NA_z * sigma[qua](1, 2) ); 
-      sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * ( w_t - f3 )
+      
+      sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * ( w_t - fw.get_z() )
           + NA_x * sigma[qua](2, 0) + NA_y * sigma[qua](2, 1) + NA_z * sigma[qua](2, 2) ); 
 
       for(int B=0; B<snLocBas; ++B)
