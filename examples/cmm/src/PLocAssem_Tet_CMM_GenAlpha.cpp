@@ -174,8 +174,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  double f1, f2, f3;
-
   double tau_m, tau_c, tau_dc;
 
   const double two_mu = 2.0 * vis_mu;
@@ -253,15 +251,15 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
     // Get the body force
-    get_f(coor_x, coor_y, coor_z, curr, f1, f2, f3);
+    const Vector_3 f_body = get_f(coor_x, coor_y, coor_z, curr);
 
     const double u_lap = u_xx + u_yy + u_zz;
     const double v_lap = v_xx + v_yy + v_zz;
     const double w_lap = w_xx + w_yy + w_zz;
 
-    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f1 ) + p_x - vis_mu * u_lap;
-    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f2 ) + p_y - vis_mu * v_lap;
-    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f3 ) + p_z - vis_mu * w_lap;
+    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f_body.get_x() ) + p_x - vis_mu * u_lap;
+    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f_body.get_y() ) + p_y - vis_mu * v_lap;
+    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f_body.get_z() ) + p_z - vis_mu * w_lap;
 
     const double div_vel = u_x + v_y + w_z;
 
@@ -297,7 +295,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * rx
           + velo_prime_dot_gradR * tau_dc 
           * (u_prime * u_x + v_prime * u_y + w_prime * u_z)
-          - NA * rho0 * f1 );
+          - NA * rho0 * f_body.get_x() );
 
       Residual[4*A+2] += gwts * ( NA * rho0 * v_t
           + NA * rho0 * (u * v_x + v * v_y + w * v_z)
@@ -311,7 +309,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * ry
           + velo_prime_dot_gradR * tau_dc
           * (u_prime * v_x + v_prime * v_y + w_prime * v_z)
-          - NA * rho0 * f2 );
+          - NA * rho0 * f_body.get_y() );
 
       Residual[4*A+3] += gwts * (NA * rho0 * w_t
           + NA * rho0 * (u * w_x + v * w_y + w * w_z)
@@ -325,7 +323,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * rz
           + velo_prime_dot_gradR * tau_dc
           * (u_prime * w_x + v_prime * w_y + w_prime * w_z)
-          - NA * rho0 * f3 );
+          - NA * rho0 * f_body.get_z() );
     }
   }
 }
@@ -342,8 +340,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
     const IQuadPts * const &quad )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  double f1, f2, f3;
 
   double tau_m, tau_c, tau_dc;
 
@@ -424,15 +420,15 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua); 
 
-    get_f(coor_x, coor_y, coor_z, curr, f1, f2, f3);
+    const Vector_3 f_body = get_f(coor_x, coor_y, coor_z, curr);
 
     const double u_lap = u_xx + u_yy + u_zz;
     const double v_lap = v_xx + v_yy + v_zz;
     const double w_lap = w_xx + w_yy + w_zz;
 
-    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f1 ) + p_x - vis_mu * u_lap;
-    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f2 ) + p_y - vis_mu * v_lap ;
-    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f3 ) + p_z - vis_mu * w_lap;
+    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f_body.get_x() ) + p_x - vis_mu * u_lap;
+    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f_body.get_y() ) + p_y - vis_mu * v_lap ;
+    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f_body.get_z() ) + p_z - vis_mu * w_lap;
 
     const double div_vel = u_x + v_y + w_z;
 
@@ -468,7 +464,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * rx
           + velo_prime_dot_gradR * tau_dc 
           * (u_prime * u_x + v_prime * u_y + w_prime * u_z)
-          - NA * rho0 * f1 );
+          - NA * rho0 * f_body.get_x() );
 
       Residual[4*A+2] += gwts * ( NA * rho0 * v_t
           + NA * rho0 * (u * v_x + v * v_y + w * v_z)
@@ -482,7 +478,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * ry
           + velo_prime_dot_gradR * tau_dc
           * (u_prime * v_x + v_prime * v_y + w_prime * v_z)
-          - NA * rho0 * f2 );
+          - NA * rho0 * f_body.get_y() );
 
       Residual[4*A+3] += gwts * (NA * rho0 * w_t
           + NA * rho0 * (u * w_x + v * w_y + w * w_z)
@@ -496,7 +492,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * rz
           + velo_prime_dot_gradR * tau_dc
           * (u_prime * w_x + v_prime * w_y + w_prime * w_z)
-          - NA * rho0 * f3 );
+          - NA * rho0 * f_body.get_z() );
 
       for(int B=0; B<nLocBas; ++B)
       {
@@ -704,8 +700,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Mass_Residual(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  double f1, f2, f3;
-
   const double two_mu = 2.0 * vis_mu;
 
   const double curr = 0.0;
@@ -749,7 +743,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Mass_Residual(
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
-    get_f(coor_x, coor_y, coor_z, curr, f1, f2, f3);
+    const Vector_3 f_body = get_f(coor_x, coor_y, coor_z, curr);
 
     for(int A=0; A<nLocBas; ++A)
     {
@@ -760,21 +754,21 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Mass_Residual(
           + two_mu * NA_x * u_x
           + vis_mu * NA_y * (u_y + v_x)
           + vis_mu * NA_z * (u_z + w_x)
-          - NA * rho0 * f1 );
+          - NA * rho0 * f_body.get_x() );
 
       Residual[4*A+2] += gwts * ( NA * rho0 * (u*v_x + v*v_y + w*v_z) 
           - NA_y * p
           + vis_mu * NA_x * (u_y + v_x)
           + two_mu * NA_y * v_y
           + vis_mu * NA_z * (v_z + w_y)
-          - NA * rho0 * f2 );
+          - NA * rho0 * f_body.get_y() );
 
       Residual[4*A+3] += gwts * ( NA * rho0 * (u*w_x + v*w_y + w*w_z) 
           - NA_z * p
           + vis_mu * NA_x * (u_z + w_x)
           + vis_mu * NA_y * (w_y + v_z)
           + two_mu * NA_z * w_z
-          - NA * rho0 * f3 );
+          - NA * rho0 * f_body.get_z() );
 
       for(int B=0; B<nLocBas; ++B)
       {
@@ -1196,11 +1190,9 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 
     for(int ii=0; ii<snLocBas; ++ii)
     {
-      const int ii4 = 4 * ii;
-
-      u_t += dot_sol[ii4+1] * R[ii];
-      v_t += dot_sol[ii4+2] * R[ii];
-      w_t += dot_sol[ii4+3] * R[ii];
+      u_t += dot_sol[ii*4+1] * R[ii];
+      v_t += dot_sol[ii*4+2] * R[ii];
+      w_t += dot_sol[ii*4+3] * R[ii];
 
       h_w += ele_thickness[ii] * R[ii];
       E_w += ele_youngsmod[ii] * R[ii];
@@ -1219,17 +1211,15 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     const double coef = E_w / (1.0 - nu_w * nu_w);
 
     // Add prestress: convert from Voigt notation (comps 11, 22, 33, 23, 13, 12)
-    const int qua6 = 6 * qua;
-
-    sigma[qua](0,0) += qua_prestress[qua6];
-    sigma[qua](0,1) += qua_prestress[qua6+5];
-    sigma[qua](0,2) += qua_prestress[qua6+4];
-    sigma[qua](1,0) += qua_prestress[qua6+5];
-    sigma[qua](1,1) += qua_prestress[qua6+1];
-    sigma[qua](1,2) += qua_prestress[qua6+3];
-    sigma[qua](2,0) += qua_prestress[qua6+4];
-    sigma[qua](2,1) += qua_prestress[qua6+3];
-    sigma[qua](2,2) += qua_prestress[qua6+2];
+    sigma[qua](0,0) += qua_prestress[qua*6];
+    sigma[qua](0,1) += qua_prestress[qua*6+5];
+    sigma[qua](0,2) += qua_prestress[qua*6+4];
+    sigma[qua](1,0) += qua_prestress[qua*6+5];
+    sigma[qua](1,1) += qua_prestress[qua*6+1];
+    sigma[qua](1,2) += qua_prestress[qua*6+3];
+    sigma[qua](2,0) += qua_prestress[qua*6+4];
+    sigma[qua](2,1) += qua_prestress[qua*6+3];
+    sigma[qua](2,2) += qua_prestress[qua*6+2];
 
     // Basis function gradients with respect to global coords
     // dR/dx_{i} = Q_{ji} * dR/dxl_{j}. Note that dR/dzl = 0.0

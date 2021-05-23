@@ -210,10 +210,12 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
         const double &u, const double &v, const double &w ) const;
 
     // Return body force acting on the fluid domain
-    void get_f( const double &x, const double &y, const double &z,
-        const double &t, double &fx, double &fy, double &fz ) const
+    Vector_3 get_f( const double &x, const double &y, const double &z,
+        const double &t ) const
     {
-      fx = 0.0; fy = 0.0; fz = 0.0;
+      double fx = 0.0, fy = 0.0, fz = 0.0;
+
+      return Vector_3(fx, fy, fz);
     }
 
     // Return body force acting on the wall domain
