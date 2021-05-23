@@ -1058,8 +1058,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 
   // Global Cauchy stress at all quadrature points
   std::vector<Matrix_3x3> sigma; sigma.resize( face_nqp );
-  get_Wall_CauchyStress(sol_wall_disp, element, ele_thickness, ele_youngsmod,
-      quad, sigma );
+  get_Wall_CauchyStress(sol_wall_disp, element, ele_youngsmod, quad, sigma );
 
   Zero_sur_Residual();
 
@@ -1164,8 +1163,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 
   // Global Cauchy stress at all quadrature points
   std::vector<Matrix_3x3> sigma; sigma.resize( face_nqp );
-  get_Wall_CauchyStress(sol_wall_disp, element, ele_thickness, ele_youngsmod,
-      quad, sigma );
+  get_Wall_CauchyStress(sol_wall_disp, element, ele_youngsmod, quad, sigma );
 
   Zero_sur_Tangent_Residual();
 
@@ -1344,7 +1342,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 void PLocAssem_Tet_CMM_GenAlpha::get_Wall_CauchyStress(
     const double * const &sol_wall_disp,
     const FEAElement * const &element,
-    const double * const &ele_thickness,
     const double * const &ele_youngsmod,
     const IQuadPts * const &quad,
     std::vector<Matrix_3x3> &sigma )
@@ -1379,13 +1376,12 @@ void PLocAssem_Tet_CMM_GenAlpha::get_Wall_CauchyStress(
         + sol_wall_disp[dim*ii+1] * Q(2, 1) + sol_wall_disp[dim*ii+2] * Q(2, 2);
     }
 
-    double h_w = 0.0, E_w = 0.0;
+    double E_w = 0.0;
     double u1l_xl = 0.0, u2l_xl = 0.0, u3l_xl = 0.0;
     double u1l_yl = 0.0, u2l_yl = 0.0, u3l_yl = 0.0;
 
     for(int ii=0; ii<snLocBas; ++ii)
     {
-      h_w += ele_thickness[ii] * R[ii];
       E_w += ele_youngsmod[ii] * R[ii];
 
       u1l_xl += sol_wall_disp_l[dim*ii]   * dR_dxl[ii];
