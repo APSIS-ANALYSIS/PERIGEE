@@ -72,8 +72,7 @@ class ALocal_EBC
     // ------------------------------------------------------------------------
     // get_ctrlPts_xyz: given the ebc_id ii, the element index eindex,
     // return the control points' geometry.
-    // Users are responsible for allocating & deleting the ctrl_xyz
-    // arrays.
+    // Users are responsible for allocating & deleting the ctrl_xyz arrays.
     // ebc_id : 0 <= ii < num_ebc;
     // surface element id: 0 <= eindex < num_local_cell[ii];
     // ctrl_x/y/z : output geometry array, length is 
@@ -84,8 +83,7 @@ class ALocal_EBC
 
     // ------------------------------------------------------------------------
     // get_SIEN: returns the surface element's IEN.
-    // The users are responsible for allocating and deleting the sien
-    // array.
+    // The users are responsible for allocating and deleting the sien  array.
     // ebc_id : 0 <= ii < num_ebc;
     // eindex : 0 <= eindex < num_local_cell[ii]
     // sien : length cell_nLocBas[ii].
