@@ -97,9 +97,8 @@ class ALocal_EBC
     // eindex : 0 <= eindex < num_local_cell[ii];
     // coor_x/y/z : output interior point coordinates
     // ------------------------------------------------------------------------
-    virtual void get_intPts_xyz(const int &ii,
-        const int &eindex, double &coor_x, double &coor_y,
-        double &coor_z ) const
+    virtual void get_intPts_xyz(const int &ii, const int &eindex, 
+        double &coor_x, double &coor_y, double &coor_z ) const
     {
       SYS_T::print_fatal("Error: ALocal_EBC::get_intPts_xyz is not implemented. \n");
     }
