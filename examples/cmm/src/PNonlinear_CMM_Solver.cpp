@@ -130,6 +130,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
 
   // Compute kinematic residual = dot_wall_disp_alpha - velo_alpha
   PDNSolution G_kinematic(dot_wall_disp_alpha);
+    
   update_wall(-1.0, &sol_alpha, &G_kinematic, ebc_wall_part);
 
   // ------------------------------------------------- 
@@ -190,7 +191,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
 #ifdef PETSC_USE_LOG
     PetscLogEventBegin(lin_solve_event, 0,0,0,0);
 #endif
-    
+   
     // solve the equation K dot_step = G
     lsolver_ptr->Solve( gassem_ptr->G, dot_step );
 
@@ -200,12 +201,11 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
 
     bc_mat->MatMultSol( dot_step );
 
-    nl_counter += 1;
-
     // Update dot_sol, dot_sol_wall_disp
     dot_sol->PlusAX( dot_step, -1.0 );
     update_wall( (-1.0) * alpha_f * gamma * dt / alpha_m,
         dot_step, dot_sol_wall_disp, ebc_wall_part ); 
+
     dot_sol_wall_disp->PlusAX(G_kinematic, (-1.0) / alpha_m );
 
     // Update sol, sol_wall_disp
@@ -230,6 +230,8 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
     G_kinematic.Copy(dot_wall_disp_alpha);
     update_wall(-1.0, &sol_alpha, &G_kinematic, ebc_wall_part);
 
+    nl_counter += 1;
+    
     // Assembly residual (& tangent if condition satisfied) 
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )
     {
@@ -278,8 +280,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
 
     relative_error = residual_norm / initial_norm;
 
-    if( relative_error >= nd_tol )
-      SYS_T::print_fatal( "Error: nonlinear solver is diverging with error %e. Job killed.\n", relative_error);
+    SYS_T::print_fatal_if( relative_error >= nd_tol, "Error: nonlinear solver is diverging with error %e. Job killed.\n", relative_error);
 
   }while(nl_counter<nmaxits && relative_error > nr_tol && residual_norm > na_tol);
 
