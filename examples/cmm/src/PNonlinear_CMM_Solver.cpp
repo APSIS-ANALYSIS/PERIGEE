@@ -272,7 +272,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
     }
 
     if( nl_counter == 1 ){
-    //  gassem_ptr->Print_G();
+      wall_disp_alpha.PrintNoGhost();
     }
 
     VecNorm(gassem_ptr->G, NORM_2, &residual_norm);
@@ -366,13 +366,15 @@ void PNonlinear_CMM_Solver::update_wall( const double &val,
   VecGetArray(ldotstep, &array_dotstep);
   VecGetArray(lwalldata, &array_walldata);
 
-  for(int ii=0; ii<num_snode; ++ii)
+  const int nlocal = dot_step -> get_nlocalnode(); 
+
+  for(int ii=0; ii<nlocal; ++ii)
   {
     const int pos = ebc_wall_part->get_local_node_pos(ebc_id, ii);
 
-    array_walldata[pos*3]   += val * array_dotstep[pos*4+1];
-    array_walldata[pos*3+1] += val * array_dotstep[pos*4+2];
-    array_walldata[pos*3+2] += val * array_dotstep[pos*4+3];
+    array_walldata[ii*3]   += val * array_dotstep[ii*4+1];
+    array_walldata[ii*3+1] += val * array_dotstep[ii*4+2];
+    array_walldata[ii*3+2] += val * array_dotstep[ii*4+3];
   }
 
   // Deallocation of the local copy

@@ -187,6 +187,17 @@ int main( int argc, char * argv[] )
 
   mesh -> print_info();
 
+  std::vector<int> ec; ec.clear();
+  for(int ee=0; ee<nElem; ++ee)
+  {
+    std::vector<int> temp_ien;
+    temp_ien.clear();
+    for(int ii=0; ii<4; ++ii) temp_ien.push_back( IEN->get_IEN(ee, ii) );
+
+    if( VEC_T::is_invec(temp_ien, 1225) ) ec.push_back(ee);
+  }
+
+
   // Call METIS to partition the mesh 
   IGlobal_Part * global_part = nullptr;
   if(cpu_size > 1)
@@ -195,6 +206,10 @@ int main( int argc, char * argv[] )
   else if(cpu_size == 1)
     global_part = new Global_Part_Serial( mesh, "epart", "npart" );
   else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
+
+
+  for(int ii=0; ii<ec.size() ; ++ii) std::cout<<global_part->get_epart(ec[ii])<<'\n';
+
 
   // Generate the new nodal numbering
   Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, mesh->get_nFunc());
