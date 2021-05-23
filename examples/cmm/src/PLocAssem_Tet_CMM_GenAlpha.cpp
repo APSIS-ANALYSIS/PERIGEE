@@ -1128,6 +1128,13 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 
   } // end qua loop
 
+  /*
+  for(int A=0; A<4*snLocBas; ++A)
+  {
+    if(sur_Residual[A] > 400.0) std::cout<<sur_Residual[A]<<'\n';
+  }
+  */
+
   delete [] dR_dxl; delete [] dR_dyl;
   dR_dxl = nullptr; dR_dyl = nullptr;
 }

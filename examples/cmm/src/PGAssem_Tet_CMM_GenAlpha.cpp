@@ -787,8 +787,10 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_G(
     { 
       if( nbc_part -> get_LID(0, LSIEN[ii]) == 4304 )
       {
-        std::cout<<lassem_ptr->sur_Residual[ii*4]<<'\t'<<lassem_ptr->sur_Residual[ii*4+1]<<'\t'
-          <<lassem_ptr->sur_Residual[ii*4+2]<<'\t'<<lassem_ptr->sur_Residual[ii*4+3]<<'\n';
+        //std::cout<<ee<<'\t'<<ebc_wall_part->get_local_global_cell(ebc_id, ee)<<'\n';
+
+        //std::cout<<lassem_ptr->sur_Residual[ii*4]<<'\t'<<lassem_ptr->sur_Residual[ii*4+1]<<'\t'
+        //  <<lassem_ptr->sur_Residual[ii*4+2]<<'\t'<<lassem_ptr->sur_Residual[ii*4+3]<<'\n';
       
         //std::cout<<sctrl_x[ii]<<'\t'<<sctrl_y[ii]<<'\t'<<sctrl_z[ii]<<'\n';
       
