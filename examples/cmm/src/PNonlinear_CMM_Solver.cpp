@@ -131,7 +131,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
   // Compute kinematic residual = dot_wall_disp_alpha - velo_alpha
   PDNSolution G_kinematic(dot_wall_disp_alpha);
     
-  update_wall(-1.0, &sol_alpha, &G_kinematic, ebc_wall_part);
+  update_wall(-1.0, &sol_alpha, ebc_wall_part, &G_kinematic);
 
   // ------------------------------------------------- 
   // Update the inflow boundary values
@@ -204,31 +204,31 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
     // Update dot_sol, dot_sol_wall_disp
     dot_sol->PlusAX( dot_step, -1.0 );
     update_wall( (-1.0) * alpha_f * gamma * dt / alpha_m,
-        dot_step, dot_sol_wall_disp, ebc_wall_part ); 
+        dot_step, ebc_wall_part, dot_sol_wall_disp ); 
 
     dot_sol_wall_disp->PlusAX(G_kinematic, (-1.0) / alpha_m );
 
     // Update sol, sol_wall_disp
     sol->PlusAX( dot_step, (-1.0) * gamma * dt );
     update_wall( (-1.0) * alpha_f * gamma * gamma * dt * dt / alpha_m,
-        dot_step, sol_wall_disp, ebc_wall_part ); 
+        dot_step, ebc_wall_part, sol_wall_disp ); 
     sol_wall_disp->PlusAX(G_kinematic, (-1.0) * gamma * dt / alpha_m );
 
     // Update dol_sol at alpha_m: dot_sol_alpha, dot_wall_disp_alpha
     dot_sol_alpha.PlusAX( dot_step, (-1.0) * alpha_m );
     update_wall( (-1.0) * alpha_f * gamma * dt,
-        dot_step, &dot_wall_disp_alpha, ebc_wall_part ); 
+        dot_step, ebc_wall_part, &dot_wall_disp_alpha ); 
     dot_wall_disp_alpha.PlusAX(G_kinematic, -1.0 );
 
     // Update sol at alpha_f: sol_alpha, wall_disp_alpha
     sol_alpha.PlusAX( dot_step, (-1.0) * alpha_f * gamma * dt );
     update_wall( (-1.0) * alpha_f * alpha_f * gamma * gamma * dt * dt / alpha_m,
-        dot_step, &wall_disp_alpha, ebc_wall_part ); 
+        dot_step, ebc_wall_part, &wall_disp_alpha ); 
     wall_disp_alpha.PlusAX(G_kinematic, (-1.0) * alpha_f * gamma * dt / alpha_m );
 
     // Update kinematic residual = dot_wall_disp_alpha - velo_alpha
     G_kinematic.Copy(dot_wall_disp_alpha);
-    update_wall(-1.0, &sol_alpha, &G_kinematic, ebc_wall_part);
+    update_wall(-1.0, &sol_alpha, ebc_wall_part, &G_kinematic);
 
     nl_counter += 1;
     
@@ -335,8 +335,8 @@ void PNonlinear_CMM_Solver::rescale_inflow_value( const double &stime,
 
 void PNonlinear_CMM_Solver::update_wall( const double &val,
     const PDNSolution * const &dot_step,
-    PDNSolution * const &wall_data,
-    const ALocal_EBC * const &ebc_wall_part ) const
+    const ALocal_EBC * const &ebc_wall_part,
+    PDNSolution * const &wall_data ) const
 {
   // Verify that the dof of dot_step is 4
   SYS_T::print_fatal_if(dot_step->get_dof_num() != 4,
