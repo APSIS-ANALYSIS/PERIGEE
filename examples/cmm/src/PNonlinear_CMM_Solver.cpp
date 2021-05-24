@@ -358,13 +358,19 @@ void PNonlinear_CMM_Solver::update_wall( const double &val,
   VecGetArray(ldotstep, &array_dotstep);
   VecGetArray(lwalldata, &array_walldata);
 
+  // wall has only one surface per the assumption in wall ebc
+  const int ebc_id = 0;
+
   const int nlocalnode = dot_step -> get_nlocalnode();
 
   for(int ii=0; ii<nlocalnode; ++ii)
   {
-    array_walldata[ii*3]   += val * array_dotstep[ii*4+1];
-    array_walldata[ii*3+1] += val * array_dotstep[ii*4+2];
-    array_walldata[ii*3+2] += val * array_dotstep[ii*4+3];
+    if( ebc_wall_part->is_in_local_node_pos(ebc_id, ii) )
+    {
+      array_walldata[ii*3]   += val * array_dotstep[ii*4+1];
+      array_walldata[ii*3+1] += val * array_dotstep[ii*4+2];
+      array_walldata[ii*3+2] += val * array_dotstep[ii*4+3];
+    }
   }
 
   // Deallocation of the local copy
