@@ -185,7 +185,7 @@ void PDNSolution::GetLocalArray( double * const &local_array ) const
 
 std::vector<double> PDNSolution::GetLocalArray() const
 {
-  std::vector<double> local_array(nlocal+nghost);
+  std::vector<double> local_array(nlocal+nghost, 0.0);
   Vec lsol;
   double * array;
   VecGhostGetLocalForm(solution, &lsol);
