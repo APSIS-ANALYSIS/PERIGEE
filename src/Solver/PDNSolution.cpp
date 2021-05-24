@@ -183,17 +183,19 @@ void PDNSolution::GetLocalArray( double * const &local_array ) const
   VecGhostRestoreLocalForm(solution, &lsol);
 }
 
-void PDNSolution::GetLocalArray( std::vector<double> &local_array ) const
+std::vector<double> PDNSolution::GetLocalArray() const
 {
-  local_array.resize(nlocal+nghost);
+  std::vector<double> local_array(nlocal+nghost);
   Vec lsol;
   double * array;
   VecGhostGetLocalForm(solution, &lsol);
   VecGetArray(lsol, &array);
-  for( int ii=0; ii<(nlocal + nghost); ++ii )
+  for( int ii=0; ii<(nlocal + nghost); ++ii ) 
     local_array[ii] = array[ii];
   VecRestoreArray(lsol, &array);
   VecGhostRestoreLocalForm(solution, &lsol);
+
+  return local_array;
 }
 
 void PDNSolution::Assembly_GhostUpdate()
