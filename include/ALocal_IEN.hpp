@@ -50,24 +50,21 @@ class ALocal_IEN
     virtual int get_LIEN(const int &elem, const int &node) const
     { return LIEN[elem*nLocBas + node]; }
     
-    virtual void get_LIEN(const int &elem, std::vector<int> &elem_ien) const
+    virtual std::vector<int> get_LIEN( const int &ee ) const
     {
-      elem_ien.resize(nLocBas);
-      const int offset = elem * nLocBas;
-      for(int ii=0; ii<nLocBas; ++ii)
-        elem_ien[ii] = LIEN[offset + ii];
-      VEC_T::shrink2fit(elem_ien);
+      std::vector<int> elem_ien(nLocBas, 0);
+      for(int ii=0; ii<nLocBas; ++ii) elem_ien[ii] = LIEN[ee * nLocBas + ii];
+    
+      return elem_ien;
     }
 
     // ------------------------------------------------------------------------
     // ! get the element e's ien array in an int array: elem_ien.
     //   User is responsible for allocating and deallocating memory for elem_ien.
     // ------------------------------------------------------------------------
-    virtual void get_LIEN(const int &elem, int * const &elem_ien) const
+    virtual void get_LIEN(const int &ee, int * const &elem_ien) const
     {
-      const int offset = elem * nLocBas;
-      for(int ii=0; ii<nLocBas; ++ii)
-        elem_ien[ii] = LIEN[offset + ii];
+      for(int ii=0; ii<nLocBas; ++ii) elem_ien[ii] = LIEN[ee * nLocBas + ii];
     }
 
     // ------------------------------------------------------------------------
@@ -79,8 +76,7 @@ class ALocal_IEN
     // ------------------------------------------------------------------------
     virtual bool isNode_in_Elem(const int &elem, const int &node) const
     {
-      std::vector<int> eIEN;
-      get_LIEN_e(elem, eIEN);
+      const std::vector<int> eIEN = get_LIEN( elem );
       std::vector<int>::const_iterator it = find(eIEN.begin(), eIEN.end(), node);
       return (it != eIEN.end());
     }
