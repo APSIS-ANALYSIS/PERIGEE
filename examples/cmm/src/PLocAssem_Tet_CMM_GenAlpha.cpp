@@ -1106,9 +1106,9 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     // dR/dx_{i} = Q_{ji} * dR/dxl_{j}. Note that dR/dzl = 0.0
     for(int ii=0; ii<snLocBas; ++ii)
     {
-      dR_dx[ii] = Q(0, 0) * dR_dxl[ii] + Q(1, 0) * dR_dyl[ii];
-      dR_dy[ii] = Q(0, 1) * dR_dxl[ii] + Q(1, 1) * dR_dyl[ii];
-      dR_dz[ii] = Q(0, 2) * dR_dxl[ii] + Q(1, 2) * dR_dyl[ii];
+      dR_dx[ii] = Q.xx() * dR_dxl[ii] + Q.yx() * dR_dyl[ii];
+      dR_dy[ii] = Q.xy() * dR_dxl[ii] + Q.yy() * dR_dyl[ii];
+      dR_dz[ii] = Q.xz() * dR_dxl[ii] + Q.yz() * dR_dyl[ii];
     }
 
     for(int A=0; A<snLocBas; ++A)
@@ -1116,13 +1116,13 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
       const double NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
       sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * ( u_t - fw.x() )
-          + NA_x * sigma[qua](0, 0) + NA_y * sigma[qua](0, 1) + NA_z * sigma[qua](0, 2) ); 
+          + NA_x * sigma[qua].xx() + NA_y * sigma[qua].xy() + NA_z * sigma[qua].xz() ); 
       
       sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * ( v_t - fw.y() )
-          + NA_x * sigma[qua](1, 0) + NA_y * sigma[qua](1, 1) + NA_z * sigma[qua](1, 2) ); 
+          + NA_x * sigma[qua].yx() + NA_y * sigma[qua].yy() + NA_z * sigma[qua].yz() ); 
       
       sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * ( w_t - fw.z() )
-          + NA_x * sigma[qua](2, 0) + NA_y * sigma[qua](2, 1) + NA_z * sigma[qua](2, 2) ); 
+          + NA_x * sigma[qua].zx() + NA_y * sigma[qua].zy() + NA_z * sigma[qua].zz() ); 
     }
 
   } // end qua loop

@@ -61,23 +61,23 @@ class Matrix_3x3
     {return mat[3*ii+jj];}
 
     // Get-functions that access components directly via the get-function's name
-    double get_xx() const {return mat[0];}
+    double xx() const {return mat[0];}
     
-    double get_xy() const {return mat[1];}
+    double xy() const {return mat[1];}
     
-    double get_xz() const {return mat[2];}
+    double xz() const {return mat[2];}
 
-    double get_yx() const {return mat[3];}
+    double yx() const {return mat[3];}
     
-    double get_yy() const {return mat[4];}
+    double yy() const {return mat[4];}
     
-    double get_yz() const {return mat[5];}
+    double yz() const {return mat[5];}
 
-    double get_zx() const {return mat[6];}
+    double zx() const {return mat[6];}
     
-    double get_zy() const {return mat[7];}
+    double zy() const {return mat[7];}
     
-    double get_zz() const {return mat[8];}
+    double zz() const {return mat[8];}
 
     // Addition operator : return left + right
     friend Matrix_3x3 operator+( const Matrix_3x3 &left, const Matrix_3x3 &right);
