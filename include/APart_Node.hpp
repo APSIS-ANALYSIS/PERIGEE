@@ -53,33 +53,32 @@ class APart_Node
 
     // ------------------------------------------------------------------------
     // local_to_global is a mapping that maps from the local node index
-    // to the whole mesh's nodal index
-    // 0 <= index < nlocghonode == nlocalnode + nghostnode
+    // to the global/volumetric mesh's nodal index
+    // Input: local nodal index with ranges 
+    //        0 <= ii < nlocghonode == nlocalnode + nghostnode
     // ------------------------------------------------------------------------
-    virtual int get_local_to_global(const int &index) const 
-    {return local_to_global[index];}
+    virtual int get_local_to_global(const int &ii) const 
+    {return local_to_global[ii];}
 
     // ------------------------------------------------------------------------
-    // node_ghost maps from [0, nghostnode) to their global mesh index
-    // 0 <= index < nghostnode
+    // node_ghost maps from [0, nghostnode) to their global/volume mesh index
+    // 0 <= ii < nghostnode
     // ------------------------------------------------------------------------
-    virtual int get_node_ghost(const int &index) const 
-    {return node_ghost[index];}
+    virtual int get_node_ghost(const int &ii) const {return node_ghost[ii];}
 
     // ------------------------------------------------------------------------
-    // node_loc maps from [0, nlocalnode) to their global mesh index
+    // node_loc maps from [0, nlocalnode) to their global/volume mesh index
     // 0 <= index < nlocalnode
     // ------------------------------------------------------------------------
-    virtual int get_node_loc(const int &index) const 
-    {return node_loc[index];}
+    virtual int get_node_loc(const int &ii) const {return node_loc[ii];}
 
     // ------------------------------------------------------------------------
-    // Determine if a global mesh node with index belongs to this subdomain 
+    // Determine if a global mesh node with index belongs to this subdomain.
+    // Input: ii is a global/volumetric mesh nodal index. 
     // ------------------------------------------------------------------------
-    virtual bool is_node_local(const int &index) const
+    virtual bool is_node_local(const int &ii) const
     {
-      std::vector<int>::const_iterator it = find(node_loc.begin(), node_loc.end(), index);
-      return ( it != node_loc.end() );
+      return ( find(node_loc.begin(), node_loc.end(), ii) != node_loc.end() );
     }
 
     // ------------------------------------------------------------------------
@@ -94,25 +93,25 @@ class APart_Node
     // ------------------------------------------------------------------------
     virtual int get_nlocalnode_solid() const
     {
-      SYS_T::print_fatal("Error: APart_Node::get_nlocalnode_solid is not implemented. \n");
+      SYS_T::print_fatal("Error: APart_Node::get_nlocalnode_solid is not implemented.\n");
       return -1;
     }
 
     virtual int get_node_loc_solid(const int &index) const
     {
-      SYS_T::print_fatal("Error: APart_Node::get_node_loc_solid is not implemented. \n");
+      SYS_T::print_fatal("Error: APart_Node::get_node_loc_solid is not implemented.\n");
       return -1;
     }
 
     virtual int get_nlocalnode_fluid() const
     {
-      SYS_T::print_fatal("Error: APart_Node::get_nlocalnode_fluid is not implemented. \n");
+      SYS_T::print_fatal("Error: APart_Node::get_nlocalnode_fluid is not implemented.\n");
       return -1;
     }
 
     virtual int get_node_loc_fluid(const int &index) const
     {
-      SYS_T::print_fatal("Error: APart_Node::get_node_loc_fluid is not implemented. \n");
+      SYS_T::print_fatal("Error: APart_Node::get_node_loc_fluid is not implemented.\n");
       return -1;
     }
     
@@ -131,7 +130,7 @@ class APart_Node
     
     // ------------------------------------------------------------------------
     // local_to_global = node_loc appended by node_ghost
-    // and their lengths are nlocghonode, nlocalnode, nghostnode, respectively
+    // The three vectors have lengths nlocghonode, nlocalnode, nghostnode, resp.
     // ------------------------------------------------------------------------
     std::vector<int> local_to_global, node_ghost, node_loc;
 };
