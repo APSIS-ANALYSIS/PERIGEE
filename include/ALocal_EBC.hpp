@@ -8,6 +8,7 @@
 // Author: Ju Liu
 // Date: Jan. 16 2017
 // ============================================================================
+#include "Vector_3.hpp"
 #include "HDF5_Reader.hpp"
 
 class ALocal_EBC
@@ -195,9 +196,10 @@ class ALocal_EBC
     //              this partition owns any cell on this surface.
     //              ii : face_id ranging from 0 <= ii < num_ebc,
     // ------------------------------------------------------------------------
-    virtual void get_outvec( const int &ii, double &nx, double &ny, double &nz ) const
+    virtual Vector_3 get_outvec( const int &ii ) const
     {
       SYS_T::print_fatal("Error: ALocal_EBC::get_outvec is not implemented. \n");
+      return Vector_3();
     }
 
     // ------------------------------------------------------------------------

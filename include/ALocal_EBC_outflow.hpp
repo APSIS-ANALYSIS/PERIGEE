@@ -29,12 +29,9 @@ class ALocal_EBC_outflow : public ALocal_EBC
 
     virtual std::vector<int> get_LID(const int &ii) const {return LID[ii];}
 
-    virtual void get_outvec( const int &ii, double &nx, double &ny,
-        double &nz ) const
+    virtual Vector_3 get_outvec( const int &ii ) const
     {
-      nx = outvec[ii][0];
-      ny = outvec[ii][1];
-      nz = outvec[ii][2];
+      return Vector_3( outvec[ii][0], outvec[ii][1], outvec[ii][2] );
     }
 
   protected:
