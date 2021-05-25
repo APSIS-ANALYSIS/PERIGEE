@@ -921,7 +921,6 @@ class IPLocAssem
     virtual void get_Wall_CauchyStress(
         const double * const &sol_wall_disp,
         const FEAElement * const &element,
-        const double * const &ele_thickness,
         const double * const &ele_youngsmod,
         const IQuadPts * const &quad,
         std::vector<Matrix_3x3> &stress )

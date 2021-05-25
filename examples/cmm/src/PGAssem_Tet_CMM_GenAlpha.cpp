@@ -888,7 +888,6 @@ void PGAssem_Tet_CMM_GenAlpha::Update_Wall_Prestress(
   double * local_bs     = new double [snLocBas * dof_disp];
   int    * LSIEN        = new    int [snLocBas];
 
-  double * sthickness   = new double [snLocBas];
   double * syoungsmod   = new double [snLocBas];
   double * quaprestress = new double [6 * face_nqp];
 
@@ -903,24 +902,22 @@ void PGAssem_Tet_CMM_GenAlpha::Update_Wall_Prestress(
   for(int ee=0; ee<num_sele; ++ee)
   {
     ebc_wall_part -> get_SIEN(ebc_id, ee, LSIEN);
-    ebc_wall_part -> get_thickness(ee, sthickness  );
     ebc_wall_part -> get_youngsmod(ee, syoungsmod  );
     ebc_wall_part -> get_prestress(ee, quaprestress);
 
     GetLocal(array_b, LSIEN, snLocBas, dof_disp, local_bs);
 
-    lassem_ptr->get_Wall_CauchyStress( local_bs, element_w,
-        sthickness, syoungsmod, quad_s, sigma ); 
+    lassem_ptr->get_Wall_CauchyStress( local_bs, element_w, syoungsmod, quad_s, sigma ); 
 
     // update prestress in Voigt notation (comps 11, 22, 33, 23, 13, 12)
     for(int qua=0; qua<face_nqp; ++qua)
     {
-      quaprestress[6*qua]   += sigma[qua](0, 0);
-      quaprestress[6*qua+1] += sigma[qua](1, 1);
-      quaprestress[6*qua+2] += sigma[qua](2, 2);
-      quaprestress[6*qua+3] += sigma[qua](1, 2);
-      quaprestress[6*qua+4] += sigma[qua](0, 2);
-      quaprestress[6*qua+5] += sigma[qua](0, 1);
+      quaprestress[6*qua]   += sigma[qua].xx();
+      quaprestress[6*qua+1] += sigma[qua].yy();
+      quaprestress[6*qua+2] += sigma[qua].zz();
+      quaprestress[6*qua+3] += sigma[qua].yz();
+      quaprestress[6*qua+4] += sigma[qua].xz();
+      quaprestress[6*qua+5] += sigma[qua].xy();
     }
 
     ebc_wall_part -> set_prestress(ee, quaprestress);
@@ -929,7 +926,6 @@ void PGAssem_Tet_CMM_GenAlpha::Update_Wall_Prestress(
   delete [] array_b;      array_b      = nullptr;
   delete [] local_bs;     local_bs     = nullptr;
   delete [] LSIEN;        LSIEN        = nullptr;
-  delete [] sthickness;   sthickness   = nullptr;
   delete [] syoungsmod;   syoungsmod   = nullptr;
   delete [] quaprestress; quaprestress = nullptr;
 }
