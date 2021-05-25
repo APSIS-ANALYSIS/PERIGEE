@@ -448,7 +448,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_residual(
   BackFlow_G( sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // Residual contribution from the thin-walled linear membrane in CMM
-  WallMembrane_G( curr_time, dt, sol_a, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ebc_wall_part );
+  WallMembrane_G( curr_time, dt, sol_a, sol_b, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ebc_wall_part );
 
   // Resistance type boundary condition
   NatBC_Resis_G( dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
@@ -540,7 +540,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
   BackFlow_KG( dt, sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // Residual & tangent contributions from the thin-walled linear membrane in CMM
-  WallMembrane_KG( curr_time, dt, sol_a, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ebc_wall_part );
+  WallMembrane_KG( curr_time, dt, sol_a, sol_b, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ebc_wall_part );
 
   // Resistance type boundary condition
   NatBC_Resis_KG( dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
@@ -730,6 +730,7 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_G(
     const double &curr_time,
     const double &dt, 
     const PDNSolution * const &dot_sol,
+    const PDNSolution * const &sol,
     const PDNSolution * const &sol_wall_disp,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_w,
@@ -740,9 +741,11 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_G(
   const int dof_disp = 3; 
 
   double * array_a    = new double [nlgn * dof_mat ];
-  double * array_b    = new double [nlgn * dof_disp];
+  double * array_b    = new double [nlgn * dof_mat];
+  double * array_c    = new double [nlgn * dof_disp];
   double * local_as   = new double [snLocBas * dof_mat ];
-  double * local_bs   = new double [snLocBas * dof_disp];
+  double * local_bs   = new double [snLocBas * dof_mat ];
+  double * local_cs   = new double [snLocBas * dof_disp];
   int    * LSIEN      = new    int [snLocBas];
   double * sctrl_x    = new double [snLocBas];
   double * sctrl_y    = new double [snLocBas];
@@ -753,8 +756,9 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_G(
   PetscInt * srow_index = new PetscInt [dof_mat * snLocBas];
 
   dot_sol->GetLocalArray( array_a );
+  sol->GetLocalArray( array_b );
 
-  sol_wall_disp->GetLocalArray( array_b );
+  sol_wall_disp->GetLocalArray( array_c );
 
   // wall has only one surface per the assumption in wall ebc
   const int ebc_id = 0;
@@ -769,10 +773,11 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_G(
     ebc_wall_part -> get_prestress(ee, quaprestress);
 
     GetLocal(array_a, LSIEN, snLocBas, local_as);
+    GetLocal(array_b, LSIEN, snLocBas, local_bs);
 
-    GetLocal(array_b, LSIEN, snLocBas, dof_disp, local_bs);
+    GetLocal(array_c, LSIEN, snLocBas, dof_disp, local_cs);
 
-    lassem_ptr->Assem_Residual_EBC_Wall( curr_time, dt, local_as, local_bs,
+    lassem_ptr->Assem_Residual_EBC_Wall( curr_time, dt, local_as, local_bs, local_cs,
         element_w, sctrl_x, sctrl_y, sctrl_z, sthickness, syoungsmod, quaprestress, quad_s);
 
     for(int ii=0; ii<snLocBas; ++ii)
@@ -786,8 +791,10 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_G(
 
   delete [] array_a;  array_a  = nullptr;
   delete [] array_b;  array_b  = nullptr;
+  delete [] array_c;  array_c  = nullptr;
   delete [] local_as; local_as = nullptr;
   delete [] local_bs; local_bs = nullptr;
+  delete [] local_cs; local_cs = nullptr;
   delete [] LSIEN;    LSIEN    = nullptr;
   delete [] sctrl_x;  sctrl_x  = nullptr;
   delete [] sctrl_y;  sctrl_y  = nullptr;
@@ -803,6 +810,7 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_KG(
     const double &curr_time,
     const double &dt, 
     const PDNSolution * const &dot_sol,
+    const PDNSolution * const &sol,
     const PDNSolution * const &sol_wall_disp,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_w,
@@ -813,9 +821,11 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_KG(
   const int dof_disp = 3; 
 
   double * array_a    = new double [nlgn * dof_mat ];
-  double * array_b    = new double [nlgn * dof_disp];
+  double * array_b    = new double [nlgn * dof_mat ];
+  double * array_c    = new double [nlgn * dof_disp];
   double * local_as   = new double [snLocBas * dof_mat ];
-  double * local_bs   = new double [snLocBas * dof_disp];
+  double * local_bs   = new double [snLocBas * dof_mat ];
+  double * local_cs   = new double [snLocBas * dof_disp];
   int    * LSIEN      = new    int [snLocBas];
   double * sctrl_x    = new double [snLocBas];
   double * sctrl_y    = new double [snLocBas];
@@ -826,8 +836,9 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_KG(
   PetscInt * srow_index = new PetscInt [dof_mat * snLocBas];
 
   dot_sol->GetLocalArray( array_a );
+  sol->GetLocalArray( array_b );
 
-  sol_wall_disp->GetLocalArray( array_b );
+  sol_wall_disp->GetLocalArray( array_c );
 
   // wall has only one surface per the assumption in wall ebc
   const int ebc_id = 0;
@@ -842,10 +853,11 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_KG(
     ebc_wall_part -> get_prestress(ee, quaprestress);
 
     GetLocal(array_a, LSIEN, snLocBas, local_as);
+    GetLocal(array_b, LSIEN, snLocBas, local_bs);
 
-    GetLocal(array_b, LSIEN, snLocBas, dof_disp, local_bs);
+    GetLocal(array_c, LSIEN, snLocBas, dof_disp, local_cs);
 
-    lassem_ptr->Assem_Tangent_Residual_EBC_Wall( curr_time, dt, local_as, local_bs,
+    lassem_ptr->Assem_Tangent_Residual_EBC_Wall( curr_time, dt, local_as, local_bs, local_cs,
         element_w, sctrl_x, sctrl_y, sctrl_z, sthickness, syoungsmod, quaprestress, quad_s);
 
     for(int ii=0; ii<snLocBas; ++ii)
@@ -862,8 +874,10 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_KG(
 
   delete [] array_a;  array_a  = nullptr;
   delete [] array_b;  array_b  = nullptr;
+  delete [] array_c;  array_c  = nullptr;
   delete [] local_as; local_as = nullptr;
   delete [] local_bs; local_bs = nullptr;
+  delete [] local_cs; local_cs = nullptr;
   delete [] LSIEN;    LSIEN    = nullptr;
   delete [] sctrl_x;  sctrl_x  = nullptr;
   delete [] sctrl_y;  sctrl_y  = nullptr;
