@@ -69,11 +69,6 @@ class ALocal_EBC
     virtual int get_local_global_cell(const int &ii, const int &jj) const
     {return local_global_cell[ii][jj];}
 
-    // 0 <= ii < num_ebc
-    // Determine whether a given index belongs to local_node_pos[ii]
-    virtual bool is_in_local_node_pos(const int &ii, const int &jj) const
-    {return VEC_T::is_invec(local_node_pos[ii], jj);}
-
     // ------------------------------------------------------------------------
     // get_ctrlPts_xyz: given the ebc_id ii, the element index eindex,
     // return the control points' geometry.
