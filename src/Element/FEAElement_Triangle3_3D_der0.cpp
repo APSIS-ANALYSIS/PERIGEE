@@ -87,7 +87,6 @@ void FEAElement_Triangle3_3D_der0::buildBasis( const IQuadPts * const &quad,
   detJac = MATH_T::normalize3d( unx, uny, unz );
 }
 
-
 void FEAElement_Triangle3_3D_der0::get_R( const int &quaindex, 
     double * const &basis ) const
 {
@@ -97,7 +96,6 @@ void FEAElement_Triangle3_3D_der0::get_R( const int &quaindex,
   basis[1] = R[offset+1];
   basis[2] = R[offset+2];
 }
-
 
 void FEAElement_Triangle3_3D_der0::get_2d_normal_out( const int &quaindex,
     double &nx, double &ny, double &nz, double &area ) const
@@ -109,6 +107,13 @@ void FEAElement_Triangle3_3D_der0::get_2d_normal_out( const int &quaindex,
   area = detJac;
 }
 
+Vector_3 FEAElement_Triangle3_3D_der0::get_2d_normal_out( const int &quaindex,
+    double &area ) const
+{
+  assert(quaindex>=0 && quaindex < numQuapts);
+  area = detJac;
+  return Vector_3( unx, uny, unz );
+}
 
 void FEAElement_Triangle3_3D_der0::get_normal_out( const int &quaindex,
     const double &sur_pt_x, const double &sur_pt_y, const double &sur_pt_z,
