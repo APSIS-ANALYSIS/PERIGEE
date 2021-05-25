@@ -936,7 +936,7 @@ void PGAssem_NS_FEM::NatBC_Resis_KG(
       scol_idx = new PetscInt [num_face_nodes * 3];
       ebc_part -> get_outvec( ebc_id, out_nx, out_ny, out_nz );
       intNB = ebc_part -> get_intNA( ebc_id );
-      ebc_part -> get_LID( ebc_id, map_Bj );
+      map_Bj = ebc_part -> get_LID( ebc_id );
     }
     else
     {

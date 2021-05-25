@@ -27,8 +27,7 @@ class ALocal_EBC_outflow : public ALocal_EBC
 
     virtual std::vector<double> get_intNA(const int &ii) const {return intNA[ii];}
 
-    virtual void get_LID(const int &ii, std::vector<int> &out) const
-    {out = LID[ii];}
+    virtual std::vector<int> get_LID(const int &ii) const {return LID[ii];}
 
     virtual void get_outvec( const int &ii, double &nx, double &ny,
         double &nz ) const

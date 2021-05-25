@@ -181,12 +181,13 @@ class ALocal_EBC
     // get_LID : returns the LID for the nodes associated with intNA,
     //           if this partition owns any cell on this surface.
     //           ii : face_id ranging from 0 <= ii < num_ebc,
-    //           out : length is 3 x get_num_face_nodes(ii),
+    //           output is a vector, whose length is 3 x get_num_face_nodes(ii),
     //           and is the LID of node 0 x, y, z, node1 x, y, z, ...
     // ------------------------------------------------------------------------
-    virtual void get_LID(const int &ii, std::vector<int> &out ) const
+    virtual std::vector<int> get_LID( const int &ii ) const
     {
       SYS_T::print_fatal("Error: ALocal_EBC::get_LID is not implemented. \n");
+      return {};
     }
 
     // ------------------------------------------------------------------------
