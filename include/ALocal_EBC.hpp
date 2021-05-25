@@ -14,9 +14,12 @@
 class ALocal_EBC
 {
   public:
-    // Constructor. Read from part file, and the EBC info is
-    // stored in the group /ebc by default. Give a group name if
-    // the data is written to a different groupname.
+    // ------------------------------------------------------------------------
+    // ! Constructor. 
+    //   Read from part file, and the EBC info is stored in the group /ebc by 
+    //   default. User may specify a group name for gname if the data is written
+    //   under a different groupname.
+    // ------------------------------------------------------------------------
     ALocal_EBC( const std::string &fileBaseName,
         const int &cpu_rank, const std::string &gname="/ebc" );
 
@@ -28,44 +31,74 @@ class ALocal_EBC
       SYS_T::commPrint("     num_ebc = %d \n", num_ebc);
     }
 
+    // ------------------------------------------------------------------------
+    // ! Get the number of different elemental surfaces, that may potentially
+    //   be associated with different material properties or boundary tractions.
+    // ------------------------------------------------------------------------
     virtual int get_num_ebc() const {return num_ebc;}
 
+    // ------------------------------------------------------------------------
     // The following are functions that access the geometrical data of
     // the ii-th surface that is prescribed with the elemental BC
     // 0 <= ii < num_ebc
+    // ! get the number of all nodes associated with the surface cells within 
+    //   this partition.
+    // ------------------------------------------------------------------------
     virtual int get_num_local_node(const int &ii) const 
     {return num_local_node[ii];}
 
-    // 0 <= ii < num_ebc
+    // ------------------------------------------------------------------------
+    // ! get the number of surface cells within this partition.
+    //   \para 0 <= ii < num_ebc
+    // ------------------------------------------------------------------------
     virtual int get_num_local_cell(const int &ii) const 
     {return num_local_cell[ii];}
 
-    // 0 <= ii < num_ebc
-    virtual int get_cell_nLocBas(const int &ii) const 
-    {return cell_nLocBas[ii];}
+    // ------------------------------------------------------------------------
+    // ! get the number of local basis functions of the surface cells. This is
+    //   directly associated with the cell element tyep.
+    //   \para 0 <= ii < num_ebc
+    // ------------------------------------------------------------------------
+    virtual int get_cell_nLocBas(const int &ii) const {return cell_nLocBas[ii];}
 
-    // 0 <= ii < num_ebc
-    // 0 <= jj < 3 x num_local_node[ii]
+    // ------------------------------------------------------------------------
+    // ! get the local nodes' spatial coordinates.
+    //   \para 0 <= ii < num_ebc
+    //   \para 0 <= jj < 3 x num_local_node[ii]
+    // ------------------------------------------------------------------------
     virtual double get_local_pt_xyz(const int &ii, const int &jj) const
     {return local_pt_xyz[ii][jj];}
 
-    // 0 <= ii < num_ebc
-    // 0 <= jj < cell_nLocBas[ii] x num_local_cell[ii]
+    // ------------------------------------------------------------------------
+    // ! get the local cell's IEN connectivity array, with ranges in the local
+    //   node array of this class.
+    //   \para 0 <= ii < num_ebc
+    //   \para 0 <= jj < cell_nLocBas[ii] x num_local_cell[ii]
+    // ------------------------------------------------------------------------
     virtual int get_local_tri_ien(const int &ii, const int &jj) const
     {return local_tri_ien[ii][jj];}
 
-    // 0 <= ii < num_ebc
-    // 0 <= jj < num_local_node[ii]
+    // ------------------------------------------------------------------------
+    // ! get the local nodes' volumetric mesh index
+    //   \para 0 <= ii < num_ebc
+    //   \para 0 <= jj < num_local_node[ii]
+    // ------------------------------------------------------------------------
     virtual int get_local_global_node(const int &ii, const int &jj) const
     {return local_global_node[ii][jj];}
 
-    // 0 <= ii < num_ebc
-    // 0 <= jj < num_local_node[ii] 
+    // ------------------------------------------------------------------------
+    // ! get the local nodes' location in the local_to_global array.
+    //   \para 0 <= ii < num_ebc
+    //   \para 0 <= jj < num_local_node[ii] 
+    // ------------------------------------------------------------------------
     virtual int get_local_node_pos(const int &ii, const int &jj) const
     {return local_node_pos[ii][jj];}
 
-    // 0 <= ii < num_ebc
-    // 0 <= jj < num_local_cell[ii]
+    // ------------------------------------------------------------------------
+    // ! get the local cells' volumetric mesh index.
+    //   \para 0 <= ii < num_ebc
+    //   \para 0 <= jj < num_local_cell[ii]
+    // ------------------------------------------------------------------------
     virtual int get_local_global_cell(const int &ii, const int &jj) const
     {return local_global_cell[ii][jj];}
 
