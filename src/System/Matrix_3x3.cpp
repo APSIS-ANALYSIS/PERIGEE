@@ -350,6 +350,19 @@ void Matrix_3x3::print() const
   std::cout<<std::setprecision(9)<<mat[6]<<'\t'<<mat[7]<<'\t'<<mat[8]<<std::endl;
 }
 
+void Matrix_3x3::print_in_row() const
+{
+  std::cout<<std::setprecision(9)<<mat[0]<<'\t'<<mat[1]<<'\t'<<mat[2]<<'\t';
+  std::cout<<std::setprecision(9)<<mat[3]<<'\t'<<mat[4]<<'\t'<<mat[5]<<'\t';
+  std::cout<<std::setprecision(9)<<mat[6]<<'\t'<<mat[7]<<'\t'<<mat[8]<<std::endl;
+}
+
+void Matrix_3x3::print_Voigt() const
+{
+  std::cout<<std::setprecision(9)<<mat[0]<<'\t'<<mat[4]<<'\t'<<mat[8]<<'\t';
+  std::cout<<std::setprecision(9)<<mat[5]<<'\t'<<mat[2]<<'\t'<<mat[1]<<std::endl;
+}
+
 double Matrix_3x3::MatContraction( const Matrix_3x3 &in ) const
 {
   return mat[0] * in(0) + mat[1] * in(1) + mat[2] * in(2) + mat[3] * in(3)
