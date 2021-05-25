@@ -797,14 +797,14 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC(
 
   const double curr = time + alpha_f * dt;
 
-  double gx, gy, gz, nx, ny, nz, surface_area;
+  double gx, gy, gz, surface_area;
 
   Zero_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
     element->get_R(qua, &R[0]);
-    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
     for(int ii=0; ii<snLocBas; ++ii)
@@ -814,8 +814,8 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC(
       coor_z += eleCtrlPts_z[ii] * R[ii];
     }
 
-    get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr, nx, ny, nz,
-        gx, gy, gz );
+    get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr, 
+        n_out.x(), n_out.y(), n_out.z(), gx, gy, gz );
 
     for(int A=0; A<snLocBas; ++A)
     {
@@ -840,20 +840,21 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Resistance(
 
   const int face_nqp = quad -> get_num_quadPts();
 
-  double nx, ny, nz, surface_area;
+  double surface_area;
 
   Zero_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
     element->get_R(qua, &R[0]);
-    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual[4*A+1] += surface_area * quad -> get_qw(qua) * R[A] * nx * val;
-      Residual[4*A+2] += surface_area * quad -> get_qw(qua) * R[A] * ny * val;
-      Residual[4*A+3] += surface_area * quad -> get_qw(qua) * R[A] * nz * val;
+      Residual[4*A+1] += surface_area * quad -> get_qw(qua) * R[A] * n_out.x() * val;
+      Residual[4*A+2] += surface_area * quad -> get_qw(qua) * R[A] * n_out.y() * val;
+      Residual[4*A+3] += surface_area * quad -> get_qw(qua) * R[A] * n_out.z() * val;
     }
   }
 }
@@ -872,14 +873,15 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_BackFlowStab(
 
   const int face_nqp = quad -> get_num_quadPts();
 
-  double nx, ny, nz, surface_area, factor;
+  double surface_area, factor;
 
   Zero_sur_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
     element->get_R(qua, &R[0]);
-    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+    
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     double u = 0.0, v = 0.0, w = 0.0;;
     for(int ii=0; ii<snLocBas; ++ii)
@@ -890,7 +892,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_BackFlowStab(
       w += sol[ii4+3] * R[ii];
     }
 
-    const double temp = u * nx + v * ny + w * nz;
+    const double temp = u * n_out.x() + v * n_out.y() + w * n_out.z();
 
     if(temp < 0.0) factor = temp * rho0 * beta;
     else factor = 0.0;
@@ -921,14 +923,14 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
 
   const double dd_dv = alpha_f * gamma * dt;
 
-  double nx, ny, nz, surface_area, factor;
+  double surface_area, factor;
 
   Zero_sur_Tangent_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
     element->get_R(qua, &R[0]);
-    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     double u = 0.0, v = 0.0, w = 0.0;
     for(int ii=0; ii<snLocBas; ++ii)
@@ -938,7 +940,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
       w += sol[ii*4+3] * R[ii];
     }
 
-    const double temp = u * nx + v * ny + w * nz;
+    const double temp = u * n_out.x() + v * n_out.y() + w * n_out.z();
 
     if(temp < 0.0) factor = temp * rho0 * beta;
     else factor = 0.0;
@@ -977,14 +979,14 @@ double PLocAssem_Tet_CMM_GenAlpha::get_flowrate( const double * const &sol,
 
   const int face_nqp = quad -> get_num_quadPts();
 
-  double nx, ny, nz, surface_area;
+  double surface_area;
 
   double flrate = 0.0;
 
   for(int qua =0; qua< face_nqp; ++qua)
   {
     element->get_R(qua, &R[0]);
-    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     double u = 0.0, v = 0.0, w = 0.0;
     for(int ii=0; ii<snLocBas; ++ii)
@@ -994,7 +996,7 @@ double PLocAssem_Tet_CMM_GenAlpha::get_flowrate( const double * const &sol,
       w += sol[ii*4+3] * R[ii];
     }
 
-    flrate += surface_area * quad->get_qw(qua) * ( u * nx + v * ny + w * nz );
+    flrate += surface_area * quad->get_qw(qua) * ( u * n_out.x() + v * n_out.y() + w * n_out.z() );
   }
 
   return flrate;
@@ -1014,7 +1016,7 @@ void PLocAssem_Tet_CMM_GenAlpha::get_pressure_area(
 
   const int face_nqp = quad -> get_num_quadPts();
 
-  double nx, ny, nz, surface_area;
+  double surface_area;
 
   // Initialize the two variables to be passed out
   pres = 0.0; area = 0.0;
@@ -1022,7 +1024,7 @@ void PLocAssem_Tet_CMM_GenAlpha::get_pressure_area(
   for(int qua =0; qua < face_nqp; ++qua)
   {
     element->get_R(qua, &R[0]);
-    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     double pp = 0.0;
     for(int ii=0; ii<snLocBas; ++ii) pp += sol[4*ii+0] * R[ii];
