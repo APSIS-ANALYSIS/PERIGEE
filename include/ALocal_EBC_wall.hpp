@@ -12,6 +12,7 @@
 // Date: Aug. 10 2020
 // ==================================================================
 #include "ALocal_EBC.hpp"
+#include "QuadPts_Gauss_Triangle.hpp"
 #include "HDF5_Writer.hpp"
 
 class ALocal_EBC_wall : public ALocal_EBC

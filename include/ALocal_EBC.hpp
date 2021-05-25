@@ -9,7 +9,6 @@
 // Date: Jan. 16 2017
 // ============================================================================
 #include "HDF5_Reader.hpp"
-#include "QuadPts_Gauss_Triangle.hpp"
 
 class ALocal_EBC
 {
@@ -20,8 +19,8 @@ class ALocal_EBC
     //   default. User may specify a group name for gname if the data is written
     //   under a different groupname.
     // ------------------------------------------------------------------------
-    ALocal_EBC( const std::string &fileBaseName,
-        const int &cpu_rank, const std::string &gname="/ebc" );
+    ALocal_EBC( const std::string &fileBaseName, const int &cpu_rank, 
+        const std::string &gname="/ebc" );
 
     virtual ~ALocal_EBC();
 
