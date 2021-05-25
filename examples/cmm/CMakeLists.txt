@@ -157,6 +157,7 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # BUILD THE MAIN DRIVERS
 # ===================================================================
 ADD_EXECUTABLE( gmsh_p1_IO    gmsh_p1_process.cpp )
+ADD_EXECUTABLE( gmsh_p2_IO    gmsh_p2_process.cpp )
 ADD_EXECUTABLE( preprocess3d  preprocess_sv_tets.cpp)
 ADD_EXECUTABLE( cmm_tet_3d_ps prestress_driver.cpp)
 ADD_EXECUTABLE( cmm_tet_3d    cmm_driver.cpp)
@@ -169,6 +170,7 @@ ADD_EXECUTABLE( test test.cpp )
 ADD_EXECUTABLE( test_element  test_membrane_element_routine.cpp )
 
 TARGET_LINK_LIBRARIES( gmsh_p1_IO    perigee_preprocess )
+TARGET_LINK_LIBRARIES( gmsh_p2_IO    perigee_preprocess )
 TARGET_LINK_LIBRARIES( preprocess3d  perigee_preprocess )
 TARGET_LINK_LIBRARIES( cmm_tet_3d_ps perigee_analysis )
 TARGET_LINK_LIBRARIES( cmm_tet_3d    perigee_analysis )
