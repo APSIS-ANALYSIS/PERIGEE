@@ -169,11 +169,12 @@ class ALocal_EBC
     // get_intNA : returns the integral of N_A basis of the face,
     //             if this partition owns any cell on this surface.
     //             ii : face_id ranging 0 <= ii < num_ebc.
-    //             out : length is get_num_face_nodes(ii).
+    //             output vector's length is get_num_face_nodes(ii).
     // ------------------------------------------------------------------------
-    virtual void get_intNA(const int &ii, std::vector<double> &out) const
+    virtual std::vector<double> get_intNA( const int &ii ) const
     {
       SYS_T::print_fatal("Error: ALocal_EBC::get_intNA is not implemented. \n");
+      return {};
     }
     
     // ------------------------------------------------------------------------
