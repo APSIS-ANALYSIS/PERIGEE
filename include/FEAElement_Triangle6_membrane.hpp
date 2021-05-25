@@ -85,6 +85,8 @@ class FEAElement_Triangle6_membrane : public FEAElement
     virtual void get_2d_normal_out( const int &quaindex,
         double &nx, double &ny, double &nz, double &len ) const;
 
+    virtual Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const;
+
     // If the triangle nodes are NOT arranged in any particular order,
     // use an interior node to define the outward direction. 
     virtual void get_normal_out( const int &quaindex,

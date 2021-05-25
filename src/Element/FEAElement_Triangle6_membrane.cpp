@@ -251,6 +251,14 @@ void FEAElement_Triangle6_membrane::get_2d_normal_out( const int &qua,
   len = detJac[qua];
 }
 
+Vector_3 FEAElement_Triangle6_membrane::get_2d_normal_out( const int &qua,
+    double &area ) const
+{
+  assert(quaindex>=0 && quaindex < numQuapts);
+  area = detJac[qua];
+  return Vector_3( unx[qua], uny[qua], unz[qua] );
+}
+
 Matrix_3x3 FEAElement_Triangle6_membrane::get_rotationMatrix( const int &quaindex ) const
 {
   assert( quaindex >= 0 && quaindex < numQuapts );
