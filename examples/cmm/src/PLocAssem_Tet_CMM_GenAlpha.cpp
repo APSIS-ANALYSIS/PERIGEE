@@ -1038,6 +1038,7 @@ void PLocAssem_Tet_CMM_GenAlpha::get_pressure_area(
 void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     const double &time, const double &dt,
     const double * const &dot_sol,
+    const double * const &sol,
     const double * const &sol_wall_disp,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
@@ -1071,7 +1072,9 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     // Global-to-local rotation matrix Q
     const Matrix_3x3 Q = element->get_rotationMatrix(qua);
 
-    double u_t = 0.0, v_t = 0.0, w_t = 0.0, h_w = 0.0, E_w = 0.0;
+    double u_t = 0.0, v_t = 0.0, w_t = 0.0, u = 0.0, v = 0.0, w = 0.0;
+    double disp_x = 0.0, disp_y = 0.0, disp_z = 0.0;
+    double h_w = 0.0, E_w = 0.0;
     double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
 
     for(int ii=0; ii<snLocBas; ++ii)
@@ -1079,6 +1082,14 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
       u_t += dot_sol[ii*4+1] * R[ii];
       v_t += dot_sol[ii*4+2] * R[ii];
       w_t += dot_sol[ii*4+3] * R[ii];
+
+      u += sol[ii*4+1] * R[ii];
+      v += sol[ii*4+2] * R[ii];
+      w += sol[ii*4+3] * R[ii];
+
+      disp_x += sol_wall_disp[ii*3+0] * R[ii];
+      disp_y += sol_wall_disp[ii*3+1] * R[ii];
+      disp_z += sol_wall_disp[ii*3+2] * R[ii];
 
       h_w += ele_thickness[ii] * R[ii];
       E_w += ele_youngsmod[ii] * R[ii];
@@ -1113,18 +1124,25 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
       dR_dz[ii] = Q.xz() * dR_dxl[ii] + Q.yz() * dR_dyl[ii];
     }
 
+    // External tissue support (hard-coded test)
+    const double k_s = 1.0e3;
+    const double c_s = 1.0e4;
+
     for(int A=0; A<snLocBas; ++A)
     {
       const double NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
       sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * ( u_t - fw.x() )
-          + NA_x * sigma[qua].xx() + NA_y * sigma[qua].xy() + NA_z * sigma[qua].xz() ); 
+          + NA_x * sigma[qua].xx() + NA_y * sigma[qua].xy() + NA_z * sigma[qua].xz() )
+          + gwts * R[A] * ( k_s * disp_x + c_s * u ); 
       
       sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * ( v_t - fw.y() )
-          + NA_x * sigma[qua].yx() + NA_y * sigma[qua].yy() + NA_z * sigma[qua].yz() ); 
+          + NA_x * sigma[qua].yx() + NA_y * sigma[qua].yy() + NA_z * sigma[qua].yz() )
+          + gwts * R[A] * ( k_s * disp_y + c_s * v ); 
       
       sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * ( w_t - fw.z() )
-          + NA_x * sigma[qua].zx() + NA_y * sigma[qua].zy() + NA_z * sigma[qua].zz() ); 
+          + NA_x * sigma[qua].zx() + NA_y * sigma[qua].zy() + NA_z * sigma[qua].zz() ) 
+          + gwts * R[A] * ( k_s * disp_z + c_s * w ); 
     }
 
   } // end qua loop
@@ -1137,6 +1155,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     const double &time, const double &dt,
     const double * const &dot_sol,
+    const double * const &sol,
     const double * const &sol_wall_disp,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
@@ -1180,7 +1199,8 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     // Global-to-local rotation matrix Q
     const Matrix_3x3 Q = element->get_rotationMatrix(qua);
 
-    double u_t = 0.0, v_t = 0.0, w_t = 0.0, h_w = 0.0, E_w = 0.0;
+    double u_t = 0.0, v_t = 0.0, w_t = 0.0, u = 0.0, v = 0.0, w = 0.0; 
+    double disp_x = 0.0, disp_y = 0.0, disp_z = 0.0, h_w = 0.0, E_w = 0.0;
     double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
 
     for(int ii=0; ii<snLocBas; ++ii)
@@ -1188,6 +1208,14 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
       u_t += dot_sol[ii*4+1] * R[ii];
       v_t += dot_sol[ii*4+2] * R[ii];
       w_t += dot_sol[ii*4+3] * R[ii];
+
+      u += sol[ii*4+1] * R[ii];
+      v += sol[ii*4+2] * R[ii];
+      w += sol[ii*4+3] * R[ii];
+
+      disp_x += sol_wall_disp[ii*3+0] * R[ii];
+      disp_y += sol_wall_disp[ii*3+1] * R[ii];
+      disp_z += sol_wall_disp[ii*3+2] * R[ii];
 
       h_w += ele_thickness[ii] * R[ii];
       E_w += ele_youngsmod[ii] * R[ii];
@@ -1280,25 +1308,33 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
       }
     }
 
+    // External tissue support (hard-coded test)
+    const double k_s = 1.0e3;
+    const double c_s = 1.0e4;
+
     for(int A=0; A<snLocBas; ++A)
     {
       const double NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
       sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * ( u_t - fw.x() )
-          + NA_x * sigma[qua].xx() + NA_y * sigma[qua].xy() + NA_z * sigma[qua].xz() );
+          + NA_x * sigma[qua].xx() + NA_y * sigma[qua].xy() + NA_z * sigma[qua].xz() )
+          + gwts * R[A] * ( k_s * disp_x + c_s * u ); 
 
       sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * ( v_t - fw.y() )
-          + NA_x * sigma[qua].yx() + NA_y * sigma[qua].yy() + NA_z * sigma[qua].yz() ); 
+          + NA_x * sigma[qua].yx() + NA_y * sigma[qua].yy() + NA_z * sigma[qua].yz() ) 
+          + gwts * R[A] * ( k_s * disp_y + c_s * v ); 
       
       sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * ( w_t - fw.z() )
-          + NA_x * sigma[qua].zx() + NA_y * sigma[qua].zy() + NA_z * sigma[qua].zz() ); 
+          + NA_x * sigma[qua].zx() + NA_y * sigma[qua].zy() + NA_z * sigma[qua].zz() ) 
+          + gwts * R[A] * ( k_s * disp_z + c_s * w ); 
 
       for(int B=0; B<snLocBas; ++B)
       {
         // Momentum-x with respect to u, v, w
         sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+1 ] += gwts * h_w * (
             alpha_m * rho_w * R[A] * R[B]
-            + dd_du * Kg[ (snLocBas*dim)*(A*dim) + (B*dim) ] );
+            + dd_du * Kg[ (snLocBas*dim)*(A*dim) + (B*dim) ] )
+            + gwts * R[A] * R[B] * ( dd_du * k_s + dd_dv * c_s );
 
         sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+2 ] += gwts * h_w * (
             dd_du * Kg[ (snLocBas*dim)*(A*dim) + (B*dim+1) ] );
@@ -1312,7 +1348,8 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 
         sur_Tangent[ 4*snLocBas*(4*A+2) + 4*B+2 ] += gwts * h_w * (
             alpha_m * rho_w * R[A] * R[B]
-            + dd_du * Kg[ (snLocBas*dim)*(A*dim+1) + (B*dim+1) ] );
+            + dd_du * Kg[ (snLocBas*dim)*(A*dim+1) + (B*dim+1) ] )
+            + gwts * R[A] * R[B] * ( dd_du * k_s + dd_dv * c_s );
 
         sur_Tangent[ 4*snLocBas*(4*A+2) + 4*B+3 ] += gwts * h_w * (
             dd_du * Kg[ (snLocBas*dim)*(A*dim+1) + (B*dim+2) ] );
@@ -1326,7 +1363,8 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 
         sur_Tangent[ 4*snLocBas*(4*A+3) + 4*B+3 ] += gwts * h_w * (
             alpha_m * rho_w * R[A] * R[B]
-            + dd_du * Kg[ (snLocBas*dim)*(A*dim+2) + (B*dim+2) ] );
+            + dd_du * Kg[ (snLocBas*dim)*(A*dim+2) + (B*dim+2) ] )
+            + gwts * R[A] * R[B] * ( dd_du * k_s + dd_dv * c_s );
 
       } // end B loop
     } // end A loop

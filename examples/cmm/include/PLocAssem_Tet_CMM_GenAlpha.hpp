@@ -140,6 +140,7 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
     virtual void Assem_Residual_EBC_Wall(
         const double &time, const double &dt,
         const double * const &dot_sol,
+        const double * const &sol,
         const double * const &sol_wall_disp,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
@@ -153,6 +154,7 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
     virtual void Assem_Tangent_Residual_EBC_Wall(
         const double &time, const double &dt,
         const double * const &dot_sol,
+        const double * const &sol,
         const double * const &sol_wall_disp,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
