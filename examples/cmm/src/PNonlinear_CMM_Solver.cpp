@@ -231,7 +231,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
     update_wall(-1.0, &sol_alpha, &G_kinematic, ebc_wall_part);
 
     nl_counter += 1;
-   
+    
     // Assembly residual (& tangent if condition satisfied) 
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )
     {
@@ -271,12 +271,8 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
 #endif
     }
 
-    if( nl_counter == 1 ){
-      wall_disp_alpha.PrintNoGhost();
-    }
-
     VecNorm(gassem_ptr->G, NORM_2, &residual_norm);
-
+    
     SYS_T::commPrint("  --- nl_res: %e \n", residual_norm);
 
     // Print the residual norm of the kienmatic equation
@@ -366,15 +362,13 @@ void PNonlinear_CMM_Solver::update_wall( const double &val,
   VecGetArray(ldotstep, &array_dotstep);
   VecGetArray(lwalldata, &array_walldata);
 
-  const int nlocal = dot_step -> get_nlocalnode(); 
-
-  for(int ii=0; ii<nlocal; ++ii)
+  for(int ii=0; ii<num_snode; ++ii)
   {
     const int pos = ebc_wall_part->get_local_node_pos(ebc_id, ii);
 
-    array_walldata[ii*3]   += val * array_dotstep[ii*4+1];
-    array_walldata[ii*3+1] += val * array_dotstep[ii*4+2];
-    array_walldata[ii*3+2] += val * array_dotstep[ii*4+3];
+    array_walldata[pos*3]   += val * array_dotstep[pos*4+1];
+    array_walldata[pos*3+1] += val * array_dotstep[pos*4+2];
+    array_walldata[pos*3+2] += val * array_dotstep[pos*4+3];
   }
 
   // Deallocation of the local copy
