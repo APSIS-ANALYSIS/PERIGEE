@@ -405,10 +405,6 @@ class FEAElement
     // surface.
     // This function is called in FEAElement_Triangle3_3D_der0.
     // ------------------------------------------------------------------------
-    virtual void get_2d_normal_out( const int &quaindex,
-        double &nx, double &ny, double &nz, double &area ) const
-    {SYS_T::commPrint("Warning: get_2d_normal_out is not implemented. \n");}
-
     virtual Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const
     {
       SYS_T::commPrint("Warning: get_2d_normal_out is not implemented. \n");
