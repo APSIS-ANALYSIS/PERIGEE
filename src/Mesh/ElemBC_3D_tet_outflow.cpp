@@ -28,7 +28,6 @@ ElemBC_3D_tet_outflow::ElemBC_3D_tet_outflow(
 
     double ectrl_x[3]; double ectrl_y[3]; double ectrl_z[3];
     int node_idx[3]; double R[3];
-    double jac;
 
     for( int fid=0; fid < num_ebc; ++fid )
     {
@@ -55,9 +54,8 @@ ElemBC_3D_tet_outflow::ElemBC_3D_tet_outflow(
         for(int qua=0; qua<nqp_tri; ++qua)
         {
           elems -> get_R(qua, R);
-          const Vector_3 n_out = elems -> get_2d_normal_out(qua, jac);
 
-          const double gwts = jac * quads -> get_qw( qua );
+          const double gwts = elems -> get_detJac( qua ) * quads -> get_qw( qua );
 
           intNA[fid][node_idx[0]] += gwts * R[0];
           intNA[fid][node_idx[1]] += gwts * R[1];
@@ -76,8 +74,7 @@ ElemBC_3D_tet_outflow::ElemBC_3D_tet_outflow(
   
     double ectrl_x[6]; double ectrl_y[6]; double ectrl_z[6];
     int node_idx[6]; double R[6];
-    double jac;
- 
+    
     for( int fid=0; fid < num_ebc; ++fid )
     {
       for( int ee=0; ee<num_cell[fid]; ++ee )
@@ -95,9 +92,8 @@ ElemBC_3D_tet_outflow::ElemBC_3D_tet_outflow(
         for(int qua=0; qua<nqp_tri; ++qua)
         {
           elems -> get_R(qua, R);
-          const Vector_3 n_out = elems -> get_2d_normal_out(qua, jac);
 
-          const double gwts = jac * quads -> get_qw( qua );
+          const double gwts = elems -> get_detJac(qua) * quads -> get_qw( qua );
 
           for(int ii=0; ii<6; ++ii) intNA[fid][node_idx[ii]] += gwts * R[ii];
         

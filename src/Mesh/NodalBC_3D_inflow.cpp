@@ -130,7 +130,6 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   if( elemtype == 501 )
   {
     double eptx[3]; double epty[3]; double eptz[3]; double R[3];
-    double jac;
 
     QuadPts_Gauss_Triangle quad(3); // quadrature rule
     FEAElement_Triangle3_3D_der0 ele(3); // element
@@ -150,14 +149,13 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
       for(int qua=0; qua<3; ++qua)
       {
         ele.get_R( qua, R );
-        const Vector_3 n_out = ele.get_2d_normal_out(qua, jac);
 
         for(int ii=0; ii<3; ++ii)
         {
-          inf_active_area += jac * quad.get_qw(qua) 
+          inf_active_area += ele.get_detJac(qua) * quad.get_qw(qua) 
             * R[ii] * temp_sol[ tri_ien[3*ee+ii] ];
 
-          face_area += jac * quad.get_qw(qua) * R[ii];
+          face_area += ele.get_detJac(qua) * quad.get_qw(qua) * R[ii];
         }
       }
     }
@@ -165,7 +163,6 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   else if( elemtype == 502 )
   {
     double eptx[6]; double epty[6]; double eptz[6]; double R[6];
-    double jac;
 
     QuadPts_Gauss_Triangle quad(6); // quadrature rule
     FEAElement_Triangle6_3D_der0 ele(6); // element
@@ -185,14 +182,13 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
       for(int qua=0; qua<6; ++qua)
       {
         ele.get_R( qua, R );
-        const Vector_3 n_out = ele.get_2d_normal_out(qua, jac);
 
         for(int ii=0; ii<6; ++ii)
         {
-          inf_active_area += jac * quad.get_qw(qua) 
+          inf_active_area += ele.get_detJac(qua) * quad.get_qw(qua) 
             * R[ii] * temp_sol[ tri_ien[6*ee+ii] ];
 
-          face_area += jac * quad.get_qw(qua) * R[ii];
+          face_area += ele.get_detJac(qua) * quad.get_qw(qua) * R[ii];
         }
       }
     }
@@ -218,7 +214,6 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
 
     double ectrl_x[3]; double ectrl_y[3]; double ectrl_z[3];
     int node_idx[3]; double R[3];
-    double jac;
 
     // Calculate the surface integral of basis functions
     for( int ee = 0; ee<num_cell; ++ee )
@@ -236,9 +231,8 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
       for(int qua=0; qua<nqp_tri; ++qua)
       {
         elems -> get_R(qua, R);
-        const Vector_3 n_out = elems -> get_2d_normal_out(qua, jac);
 
-        const double gwts = jac * quads -> get_qw( qua );
+        const double gwts = elems->get_detJac( qua ) * quads -> get_qw( qua );
 
         for(int ii=0; ii<3; ++ii) intNA[node_idx[ii]] += gwts * R[ii];
 
@@ -255,7 +249,6 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
 
     double ectrl_x[6]; double ectrl_y[6]; double ectrl_z[6];
     int node_idx[6]; double R[6];
-    double jac; 
 
     // Calculate the surface integral for quadratic triangle element
     for( int ee=0; ee<num_cell; ++ee )
@@ -273,9 +266,8 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
       for(int qua=0; qua<nqp_tri; ++qua)
       {
         elems -> get_R(qua, R);
-        const Vector_3 n_out = elems -> get_2d_normal_out(qua, jac);
 
-        const double gwts = jac * quads -> get_qw( qua );
+        const double gwts = elems->get_detJac( qua ) * quads -> get_qw( qua );
 
         for(int ii=0; ii<6; ++ii) intNA[node_idx[ii]] += gwts * R[ii];
 
