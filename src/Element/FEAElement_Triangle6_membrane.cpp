@@ -244,13 +244,6 @@ void FEAElement_Triangle6_membrane::get_R_gradR( const int &quaindex,
   }
 }
 
-void FEAElement_Triangle6_membrane::get_2d_normal_out( const int &qua,
-    double &nx, double &ny, double &nz, double &len ) const
-{
-  nx = unx[qua]; ny = uny[qua]; nz = unz[qua];
-  len = detJac[qua];
-}
-
 Vector_3 FEAElement_Triangle6_membrane::get_2d_normal_out( const int &qua,
     double &area ) const
 {

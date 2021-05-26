@@ -97,16 +97,6 @@ void FEAElement_Triangle3_3D_der0::get_R( const int &quaindex,
   basis[2] = R[offset+2];
 }
 
-void FEAElement_Triangle3_3D_der0::get_2d_normal_out( const int &quaindex,
-    double &nx, double &ny, double &nz, double &area ) const
-{
-  assert(quaindex>=0 && quaindex < numQuapts);
-  nx = unx;
-  ny = uny;
-  nz = unz;
-  area = detJac;
-}
-
 Vector_3 FEAElement_Triangle3_3D_der0::get_2d_normal_out( const int &quaindex,
     double &area ) const
 {

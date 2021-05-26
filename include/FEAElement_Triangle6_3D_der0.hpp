@@ -65,9 +65,6 @@ class FEAElement_Triangle6_3D_der0 : public FEAElement
 
     // Assuming the triangle nodes are arranged such that the outward
     // direction is given by dx_dr x dx_ds
-    virtual void get_2d_normal_out( const int &quaindex,
-        double &nx, double &ny, double &nz, double &len ) const;
-
     virtual Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const;
     
     // If the triangle nodes are NOT arranged in any particular order,

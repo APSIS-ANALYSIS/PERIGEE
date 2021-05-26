@@ -135,14 +135,6 @@ void FEAElement_Triangle6_3D_der0::get_R(
   basis[5] = R[offset+5];
 }
 
-
-void FEAElement_Triangle6_3D_der0::get_2d_normal_out( const int &qua,
-        double &nx, double &ny, double &nz, double &len ) const
-{
-  nx = unx[qua]; ny = uny[qua]; nz = unz[qua];
-  len = detJac[qua];
-}
-
 Vector_3 FEAElement_Triangle6_3D_der0::get_2d_normal_out( const int &qua,
     double &area ) const
 {
