@@ -32,8 +32,7 @@ void ALocal_IEN::print_info() const
 
   for(int ee = 0; ee<nlocalele; ++ee)
   {
-    std::vector<int> temp;
-    get_LIEN_e(ee, temp);
+    const std::vector<int> temp = get_LIEN( ee );
     std::cout<<ee<<" : \t";
     VEC_T::print(temp);
     std::cout<<'\n';

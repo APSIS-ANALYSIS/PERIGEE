@@ -143,6 +143,12 @@ void FEAElement_Triangle6_3D_der0::get_2d_normal_out( const int &qua,
   len = detJac[qua];
 }
 
+Vector_3 FEAElement_Triangle6_3D_der0::get_2d_normal_out( const int &qua,
+    double &area ) const
+{
+  area = detJac[qua];
+  return Vector_3( unx[qua], uny[qua], unz[qua] );
+}
 
 void FEAElement_Triangle6_3D_der0::get_normal_out( const int &qua,
     const double &sur_pt_x, const double &sur_pt_y, const double &sur_pt_z,

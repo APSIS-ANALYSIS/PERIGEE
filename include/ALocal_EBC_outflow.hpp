@@ -1,16 +1,15 @@
 #ifndef ALOCAL_EBC_OUTFLOW_HPP
 #define ALOCAL_EBC_OUTFLOW_HPP
-// ==================================================================
+// ============================================================================
 // ALocal_EBC_outflow.hpp
 //
-// Analysis-use: local subdomain's elemental boundary condition. This
-// is a derived class from ALocal_EBC to add int_NA, the integral
-// of the basis functions over the outlet face, and the outlet's
-// outward normal vector.
+// Analysis-use: local subdomain's elemental boundary condition. This is a 
+// derived class from ALocal_EBC to add int_NA, the integral of the basis 
+// functions over the outlet face, and the outlet's outward normal vector.
 //
 // Author: Ju Liu
 // Date: Mar. 19 2019
-// ==================================================================
+// ============================================================================
 #include "ALocal_EBC.hpp"
 
 class ALocal_EBC_outflow : public ALocal_EBC
@@ -26,18 +25,13 @@ class ALocal_EBC_outflow : public ALocal_EBC
     virtual int get_num_face_nodes(const int &ii) const
     {return num_face_nodes[ii];}
 
-    virtual void get_intNA(const int &ii, std::vector<double> &out) const
-    {out = intNA[ii];}
+    virtual std::vector<double> get_intNA(const int &ii) const {return intNA[ii];}
 
-    virtual void get_LID(const int &ii, std::vector<int> &out) const
-    {out = LID[ii];}
+    virtual std::vector<int> get_LID(const int &ii) const {return LID[ii];}
 
-    virtual void get_outvec( const int &ii, double &nx, double &ny,
-        double &nz ) const
+    virtual Vector_3 get_outvec( const int &ii ) const
     {
-      nx = outvec[ii][0];
-      ny = outvec[ii][1];
-      nz = outvec[ii][2];
+      return Vector_3( outvec[ii][0], outvec[ii][1], outvec[ii][2] );
     }
 
   protected:

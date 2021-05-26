@@ -212,7 +212,7 @@ void PGAssem_NS_FEM::Assem_mass_residual(
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    lien_ptr->get_LIEN_e(ee, IEN_e);
+    lien_ptr->get_LIEN(ee, IEN_e);
     GetLocal(array_a, IEN_e, local_a);
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
@@ -289,7 +289,7 @@ void PGAssem_NS_FEM::Assem_residual(
 
   for( int ee=0; ee<nElem; ++ee )
   {
-    lien_ptr->get_LIEN_e(ee, IEN_e);
+    lien_ptr->get_LIEN(ee, IEN_e);
     GetLocal(array_a, IEN_e, local_a);
     GetLocal(array_b, IEN_e, local_b);
 
@@ -371,7 +371,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    lien_ptr->get_LIEN_e(ee, IEN_e);
+    lien_ptr->get_LIEN(ee, IEN_e);
     GetLocal(array_a, IEN_e, local_a);
     GetLocal(array_b, IEN_e, local_b);
 
@@ -891,7 +891,7 @@ void PGAssem_NS_FEM::NatBC_Resis_KG(
   PetscInt * srow_idx = new PetscInt [snLocBas * 3];
   PetscScalar * Tan;
   PetscInt * scol_idx;
-  double out_nx, out_ny, out_nz;
+  Vector_3 out_n;
   std::vector<double> intNB;
   std::vector<int> map_Bj;
 
@@ -934,9 +934,9 @@ void PGAssem_NS_FEM::NatBC_Resis_KG(
     {
       Tan = new PetscScalar [snLocBas * 3 * num_face_nodes * 3];
       scol_idx = new PetscInt [num_face_nodes * 3];
-      ebc_part -> get_outvec( ebc_id, out_nx, out_ny, out_nz );
-      ebc_part -> get_intNA( ebc_id, intNB );
-      ebc_part -> get_LID( ebc_id, map_Bj );
+      out_n  = ebc_part -> get_outvec( ebc_id );
+      intNB  = ebc_part -> get_intNA( ebc_id );
+      map_Bj = ebc_part -> get_LID( ebc_id );
     }
     else
     {
@@ -970,9 +970,9 @@ void PGAssem_NS_FEM::NatBC_Resis_KG(
           for(int B=0; B<num_face_nodes; ++B)
           {
             // Residual[4*A+ii+1] is intNB[A]*out_n[ii]
-            Tan[temp_row + 3*B + 0] = coef * lassem_ptr->Residual[4*A+ii+1] * intNB[B] * out_nx;
-            Tan[temp_row + 3*B + 1] = coef * lassem_ptr->Residual[4*A+ii+1] * intNB[B] * out_ny;
-            Tan[temp_row + 3*B + 2] = coef * lassem_ptr->Residual[4*A+ii+1] * intNB[B] * out_nz;
+            Tan[temp_row + 3*B + 0] = coef * lassem_ptr->Residual[4*A+ii+1] * intNB[B] * out_n.x();
+            Tan[temp_row + 3*B + 1] = coef * lassem_ptr->Residual[4*A+ii+1] * intNB[B] * out_n.y();
+            Tan[temp_row + 3*B + 2] = coef * lassem_ptr->Residual[4*A+ii+1] * intNB[B] * out_n.z();
           }
         }
       }

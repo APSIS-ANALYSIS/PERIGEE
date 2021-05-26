@@ -334,7 +334,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_mass_residual(
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    lien_ptr->get_LIEN_e(ee, IEN_e);
+    lien_ptr->get_LIEN(ee, IEN_e);
     GetLocal(array_a, IEN_e, local_a);
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
@@ -416,7 +416,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_residual(
 
   for( int ee=0; ee<nElem; ++ee )
   {
-    lien_ptr->get_LIEN_e(ee, IEN_e);
+    lien_ptr->get_LIEN(ee, IEN_e);
     GetLocal(array_a, IEN_e, local_a);
     GetLocal(array_b, IEN_e, local_b);
 
@@ -505,7 +505,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    lien_ptr->get_LIEN_e(ee, IEN_e);
+    lien_ptr->get_LIEN(ee, IEN_e);
     GetLocal(array_a, IEN_e, local_a);
     GetLocal(array_b, IEN_e, local_b);
 
@@ -888,7 +888,6 @@ void PGAssem_Tet_CMM_GenAlpha::Update_Wall_Prestress(
   double * local_bs     = new double [snLocBas * dof_disp];
   int    * LSIEN        = new    int [snLocBas];
 
-  double * sthickness   = new double [snLocBas];
   double * syoungsmod   = new double [snLocBas];
   double * quaprestress = new double [6 * face_nqp];
 
@@ -903,24 +902,22 @@ void PGAssem_Tet_CMM_GenAlpha::Update_Wall_Prestress(
   for(int ee=0; ee<num_sele; ++ee)
   {
     ebc_wall_part -> get_SIEN(ebc_id, ee, LSIEN);
-    ebc_wall_part -> get_thickness(ee, sthickness  );
     ebc_wall_part -> get_youngsmod(ee, syoungsmod  );
     ebc_wall_part -> get_prestress(ee, quaprestress);
 
     GetLocal(array_b, LSIEN, snLocBas, dof_disp, local_bs);
 
-    lassem_ptr->get_Wall_CauchyStress( local_bs, element_w,
-        sthickness, syoungsmod, quad_s, sigma ); 
+    lassem_ptr->get_Wall_CauchyStress( local_bs, element_w, syoungsmod, quad_s, sigma ); 
 
     // update prestress in Voigt notation (comps 11, 22, 33, 23, 13, 12)
     for(int qua=0; qua<face_nqp; ++qua)
     {
-      quaprestress[6*qua]   += sigma[qua](0, 0);
-      quaprestress[6*qua+1] += sigma[qua](1, 1);
-      quaprestress[6*qua+2] += sigma[qua](2, 2);
-      quaprestress[6*qua+3] += sigma[qua](1, 2);
-      quaprestress[6*qua+4] += sigma[qua](0, 2);
-      quaprestress[6*qua+5] += sigma[qua](0, 1);
+      quaprestress[6*qua]   += sigma[qua].xx();
+      quaprestress[6*qua+1] += sigma[qua].yy();
+      quaprestress[6*qua+2] += sigma[qua].zz();
+      quaprestress[6*qua+3] += sigma[qua].yz();
+      quaprestress[6*qua+4] += sigma[qua].xz();
+      quaprestress[6*qua+5] += sigma[qua].xy();
     }
 
     ebc_wall_part -> set_prestress(ee, quaprestress);
@@ -929,7 +926,6 @@ void PGAssem_Tet_CMM_GenAlpha::Update_Wall_Prestress(
   delete [] array_b;      array_b      = nullptr;
   delete [] local_bs;     local_bs     = nullptr;
   delete [] LSIEN;        LSIEN        = nullptr;
-  delete [] sthickness;   sthickness   = nullptr;
   delete [] syoungsmod;   syoungsmod   = nullptr;
   delete [] quaprestress; quaprestress = nullptr;
 }
@@ -1239,7 +1235,7 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_KG(
   PetscInt * srow_idx = new PetscInt [snLocBas * 3];
   PetscScalar * Tan;
   PetscInt * scol_idx;
-  double out_nx, out_ny, out_nz;
+  Vector_3 out_n;
   std::vector<double> intNB;
   std::vector<int> map_Bj;
 
@@ -1282,9 +1278,9 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_KG(
     {
       Tan = new PetscScalar [snLocBas * 3 * num_face_nodes * 3];
       scol_idx = new PetscInt [num_face_nodes * 3];
-      ebc_part -> get_outvec( ebc_id, out_nx, out_ny, out_nz );
-      ebc_part -> get_intNA( ebc_id, intNB );
-      ebc_part -> get_LID( ebc_id, map_Bj );
+      out_n  = ebc_part -> get_outvec( ebc_id );
+      intNB  = ebc_part -> get_intNA( ebc_id );
+      map_Bj = ebc_part -> get_LID( ebc_id );
     }
     else
     {
@@ -1318,9 +1314,9 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_KG(
           for(int B=0; B<num_face_nodes; ++B)
           {
             // Residual[4*A+ii+1] is intNB[A]*out_n[ii]
-            Tan[temp_row + 3*B + 0] = coef * lassem_ptr->Residual[4*A+ii+1] * intNB[B] * out_nx;
-            Tan[temp_row + 3*B + 1] = coef * lassem_ptr->Residual[4*A+ii+1] * intNB[B] * out_ny;
-            Tan[temp_row + 3*B + 2] = coef * lassem_ptr->Residual[4*A+ii+1] * intNB[B] * out_nz;
+            Tan[temp_row + 3*B + 0] = coef * lassem_ptr->Residual[4*A+ii+1] * intNB[B] * out_n.x();
+            Tan[temp_row + 3*B + 1] = coef * lassem_ptr->Residual[4*A+ii+1] * intNB[B] * out_n.y();
+            Tan[temp_row + 3*B + 2] = coef * lassem_ptr->Residual[4*A+ii+1] * intNB[B] * out_n.z();
           }
         }
       }

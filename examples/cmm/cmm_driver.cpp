@@ -64,6 +64,7 @@ int main( int argc, char *argv[] )
 
   // Generalized-alpha rho_inf
   double genA_rho_inf = 0.5;
+  bool is_backward_Euler = false;
 
   // Partition filename prefix
   std::string part_file("part");
@@ -110,6 +111,7 @@ int main( int argc, char *argv[] )
   SYS_T::GetOptionInt(   "-nz_estimate",     nz_estimate);
   SYS_T::GetOptionReal(  "-bs_beta",         bs_beta);
   SYS_T::GetOptionReal(  "-rho_inf",         genA_rho_inf);
+  SYS_T::GetOptionBool(  "-is_backward_Euler", is_backward_Euler);
   SYS_T::GetOptionReal(  "-fl_density",      fluid_density);
   SYS_T::GetOptionReal(  "-fl_mu",           fluid_mu);
   SYS_T::GetOptionReal(  "-c_tauc",          c_tauc);
@@ -145,7 +147,10 @@ int main( int argc, char *argv[] )
   SYS_T::cmdPrint(      "-nqp_tri:",         nqp_tri);
   SYS_T::cmdPrint(      "-nz_estimate:",     nz_estimate);
   SYS_T::cmdPrint(      "-bs_beta:",         bs_beta);
-  SYS_T::cmdPrint(      "-rho_inf:",         genA_rho_inf);
+  if( is_backward_Euler )
+    SYS_T::commPrint(     "-is_backward_Euler: true \n");
+  else
+    SYS_T::cmdPrint(      "-rho_inf:",         genA_rho_inf);
   SYS_T::cmdPrint(      "-fl_density:",      fluid_density);
   SYS_T::cmdPrint(      "-fl_mu:",           fluid_mu);
   SYS_T::cmdPrint(      "-c_tauc:",          c_tauc);
@@ -316,8 +321,12 @@ int main( int argc, char *argv[] )
 
   // ===== Generalized-alpha =====
   SYS_T::commPrint("===> Set up the generalized-alpha time integration scheme.\n");
-
-  TimeMethod_GenAlpha * tm_galpha_ptr = new TimeMethod_GenAlpha( genA_rho_inf, false );
+  TimeMethod_GenAlpha * tm_galpha_ptr = nullptr;
+  
+  if( is_backward_Euler )
+    tm_galpha_ptr = new TimeMethod_GenAlpha( 1.0, 1.0, 1.0 );
+  else
+    tm_galpha_ptr = new TimeMethod_GenAlpha( genA_rho_inf, false );
 
   tm_galpha_ptr->print_info();
 

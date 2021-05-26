@@ -316,10 +316,12 @@ class FEAElement
     // global and local lamina coordinates. This routine is used in membrane
     // and shell elements.
     // Reference: TJRH Linear finite element book page 386.
-    virtual Matrix_3x3 get_rotationMatrix( const int &quaindex ) const 
-    {SYS_T::commPrint("Warning: get_rotationMatrix is not implemented. \n"); 
-      return Matrix_3x3();}
     // ------------------------------------------------------------------------    
+    virtual Matrix_3x3 get_rotationMatrix( const int &quaindex ) const 
+    {
+      SYS_T::commPrint("Warning: get_rotationMatrix is not implemented. \n"); 
+      return Matrix_3x3();
+    }
 
     // ------------------------------------------------------------------------    
     // Unit outward normal vector:
@@ -407,6 +409,11 @@ class FEAElement
         double &nx, double &ny, double &nz, double &area ) const
     {SYS_T::commPrint("Warning: get_2d_normal_out is not implemented. \n");}
 
+    virtual Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const
+    {
+      SYS_T::commPrint("Warning: get_2d_normal_out is not implemented. \n");
+      return Vector_3();
+    }
 
     // ------------------------------------------------------------------------
     // Unit outward normal vector and boundary area measure.

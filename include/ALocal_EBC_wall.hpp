@@ -1,17 +1,17 @@
 #ifndef ALOCAL_EBC_WALL_HPP
 #define ALOCAL_EBC_WALL_HPP
-// ==================================================================
+// ============================================================================
 // ALocal_EBC_wall.hpp
 //
-// Analysis use: local subdomain's elemental boundary condition. This
-// is a derived class from ALocal_EBC to add the wall thickness and
-// young's modulus, as well as the fluid density used to compute the
-// young's modulus.
+// Analysis use: local subdomain's elemental boundary condition. This is a 
+// derived class from ALocal_EBC to add the wall thickness and young's modulus, 
+// as well as the fluid density used to compute the young's modulus.
 //
 // Author: Ju Liu
 // Date: Aug. 10 2020
-// ==================================================================
+// ============================================================================
 #include "ALocal_EBC.hpp"
+#include "QuadPts_Gauss_Triangle.hpp"
 #include "HDF5_Writer.hpp"
 
 class ALocal_EBC_wall : public ALocal_EBC

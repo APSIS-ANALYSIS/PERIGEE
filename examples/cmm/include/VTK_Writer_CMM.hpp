@@ -47,8 +47,6 @@ class VTK_Writer_CMM
 
     std::vector<int> epart_map;
 
-    std::vector<int> IEN_e;
-    
     std::vector<double> ectrl_x, ectrl_y, ectrl_z;
 };
 

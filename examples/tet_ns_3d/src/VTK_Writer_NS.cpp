@@ -7,7 +7,6 @@ VTK_Writer_NS::VTK_Writer_NS( const int &in_nelem,
 {
   VIS_T::read_epart( epart_file, nElem, epart_map );
 
-  IEN_e.resize( nLocBas );
   ectrl_x.resize( nLocBas );
   ectrl_y.resize( nLocBas );
   ectrl_z.resize( nLocBas );
@@ -63,7 +62,7 @@ void VTK_Writer_NS::writeOutput(
 
   for(int ee=0; ee<lelem_ptr->get_nlocalele(); ++ee)
   {
-    lien_ptr -> get_LIEN_e(ee, IEN_e);
+    const std::vector<int> IEN_e = lien_ptr -> get_LIEN( ee );
 
     fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_e[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0]);
 

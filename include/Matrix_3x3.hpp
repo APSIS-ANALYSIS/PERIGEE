@@ -60,6 +60,25 @@ class Matrix_3x3
     const double& operator()(const int &ii, const int &jj) const
     {return mat[3*ii+jj];}
 
+    // Get-functions that access components directly via the get-function's name
+    double xx() const {return mat[0];}
+    
+    double xy() const {return mat[1];}
+    
+    double xz() const {return mat[2];}
+
+    double yx() const {return mat[3];}
+    
+    double yy() const {return mat[4];}
+    
+    double yz() const {return mat[5];}
+
+    double zx() const {return mat[6];}
+    
+    double zy() const {return mat[7];}
+    
+    double zz() const {return mat[8];}
+
     // Addition operator : return left + right
     friend Matrix_3x3 operator+( const Matrix_3x3 &left, const Matrix_3x3 &right);
 
@@ -188,6 +207,12 @@ class Matrix_3x3
 
     // print the matrix
     void print() const;
+
+    // print the matrix in a row
+    void print_in_row() const;
+
+    // print the Voigt components in the order of xx yy zz yz xz xy
+    void print_Voigt() const;
 
     // Eigen decomposition of the matrix M = eta1 v1 v1T + eta2 v2 v2T + eta3 v3
     // v3T. The algorithm is based on CMAME 197 2008 4007-4015 paper by

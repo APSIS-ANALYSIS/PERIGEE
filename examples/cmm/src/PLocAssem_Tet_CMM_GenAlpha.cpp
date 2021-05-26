@@ -257,9 +257,9 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
     const double v_lap = v_xx + v_yy + v_zz;
     const double w_lap = w_xx + w_yy + w_zz;
 
-    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f_body.get_x() ) + p_x - vis_mu * u_lap;
-    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f_body.get_y() ) + p_y - vis_mu * v_lap;
-    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f_body.get_z() ) + p_z - vis_mu * w_lap;
+    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f_body.x() ) + p_x - vis_mu * u_lap;
+    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f_body.y() ) + p_y - vis_mu * v_lap;
+    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f_body.z() ) + p_z - vis_mu * w_lap;
 
     const double div_vel = u_x + v_y + w_z;
 
@@ -295,7 +295,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * rx
           + velo_prime_dot_gradR * tau_dc 
           * (u_prime * u_x + v_prime * u_y + w_prime * u_z)
-          - NA * rho0 * f_body.get_x() );
+          - NA * rho0 * f_body.x() );
 
       Residual[4*A+2] += gwts * ( NA * rho0 * v_t
           + NA * rho0 * (u * v_x + v * v_y + w * v_z)
@@ -309,7 +309,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * ry
           + velo_prime_dot_gradR * tau_dc
           * (u_prime * v_x + v_prime * v_y + w_prime * v_z)
-          - NA * rho0 * f_body.get_y() );
+          - NA * rho0 * f_body.y() );
 
       Residual[4*A+3] += gwts * (NA * rho0 * w_t
           + NA * rho0 * (u * w_x + v * w_y + w * w_z)
@@ -323,7 +323,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * rz
           + velo_prime_dot_gradR * tau_dc
           * (u_prime * w_x + v_prime * w_y + w_prime * w_z)
-          - NA * rho0 * f_body.get_z() );
+          - NA * rho0 * f_body.z() );
     }
   }
 }
@@ -426,9 +426,9 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
     const double v_lap = v_xx + v_yy + v_zz;
     const double w_lap = w_xx + w_yy + w_zz;
 
-    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f_body.get_x() ) + p_x - vis_mu * u_lap;
-    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f_body.get_y() ) + p_y - vis_mu * v_lap ;
-    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f_body.get_z() ) + p_z - vis_mu * w_lap;
+    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f_body.x() ) + p_x - vis_mu * u_lap;
+    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f_body.y() ) + p_y - vis_mu * v_lap ;
+    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f_body.z() ) + p_z - vis_mu * w_lap;
 
     const double div_vel = u_x + v_y + w_z;
 
@@ -464,7 +464,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * rx
           + velo_prime_dot_gradR * tau_dc 
           * (u_prime * u_x + v_prime * u_y + w_prime * u_z)
-          - NA * rho0 * f_body.get_x() );
+          - NA * rho0 * f_body.x() );
 
       Residual[4*A+2] += gwts * ( NA * rho0 * v_t
           + NA * rho0 * (u * v_x + v * v_y + w * v_z)
@@ -478,7 +478,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * ry
           + velo_prime_dot_gradR * tau_dc
           * (u_prime * v_x + v_prime * v_y + w_prime * v_z)
-          - NA * rho0 * f_body.get_y() );
+          - NA * rho0 * f_body.y() );
 
       Residual[4*A+3] += gwts * (NA * rho0 * w_t
           + NA * rho0 * (u * w_x + v * w_y + w * w_z)
@@ -492,7 +492,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * rz
           + velo_prime_dot_gradR * tau_dc
           * (u_prime * w_x + v_prime * w_y + w_prime * w_z)
-          - NA * rho0 * f_body.get_z() );
+          - NA * rho0 * f_body.z() );
 
       for(int B=0; B<nLocBas; ++B)
       {
@@ -754,21 +754,21 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Mass_Residual(
           + two_mu * NA_x * u_x
           + vis_mu * NA_y * (u_y + v_x)
           + vis_mu * NA_z * (u_z + w_x)
-          - NA * rho0 * f_body.get_x() );
+          - NA * rho0 * f_body.x() );
 
       Residual[4*A+2] += gwts * ( NA * rho0 * (u*v_x + v*v_y + w*v_z) 
           - NA_y * p
           + vis_mu * NA_x * (u_y + v_x)
           + two_mu * NA_y * v_y
           + vis_mu * NA_z * (v_z + w_y)
-          - NA * rho0 * f_body.get_y() );
+          - NA * rho0 * f_body.y() );
 
       Residual[4*A+3] += gwts * ( NA * rho0 * (u*w_x + v*w_y + w*w_z) 
           - NA_z * p
           + vis_mu * NA_x * (u_z + w_x)
           + vis_mu * NA_y * (w_y + v_z)
           + two_mu * NA_z * w_z
-          - NA * rho0 * f_body.get_z() );
+          - NA * rho0 * f_body.z() );
 
       for(int B=0; B<nLocBas; ++B)
       {
@@ -797,14 +797,14 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC(
 
   const double curr = time + alpha_f * dt;
 
-  double gx, gy, gz, nx, ny, nz, surface_area;
+  double gx, gy, gz, surface_area;
 
   Zero_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
     element->get_R(qua, &R[0]);
-    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
     for(int ii=0; ii<snLocBas; ++ii)
@@ -814,8 +814,8 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC(
       coor_z += eleCtrlPts_z[ii] * R[ii];
     }
 
-    get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr, nx, ny, nz,
-        gx, gy, gz );
+    get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr, 
+        n_out.x(), n_out.y(), n_out.z(), gx, gy, gz );
 
     for(int A=0; A<snLocBas; ++A)
     {
@@ -840,20 +840,21 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Resistance(
 
   const int face_nqp = quad -> get_num_quadPts();
 
-  double nx, ny, nz, surface_area;
+  double surface_area;
 
   Zero_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
     element->get_R(qua, &R[0]);
-    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual[4*A+1] += surface_area * quad -> get_qw(qua) * R[A] * nx * val;
-      Residual[4*A+2] += surface_area * quad -> get_qw(qua) * R[A] * ny * val;
-      Residual[4*A+3] += surface_area * quad -> get_qw(qua) * R[A] * nz * val;
+      Residual[4*A+1] += surface_area * quad -> get_qw(qua) * R[A] * n_out.x() * val;
+      Residual[4*A+2] += surface_area * quad -> get_qw(qua) * R[A] * n_out.y() * val;
+      Residual[4*A+3] += surface_area * quad -> get_qw(qua) * R[A] * n_out.z() * val;
     }
   }
 }
@@ -872,14 +873,15 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_BackFlowStab(
 
   const int face_nqp = quad -> get_num_quadPts();
 
-  double nx, ny, nz, surface_area, factor;
+  double surface_area, factor;
 
   Zero_sur_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
     element->get_R(qua, &R[0]);
-    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+    
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     double u = 0.0, v = 0.0, w = 0.0;;
     for(int ii=0; ii<snLocBas; ++ii)
@@ -890,7 +892,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_BackFlowStab(
       w += sol[ii4+3] * R[ii];
     }
 
-    const double temp = u * nx + v * ny + w * nz;
+    const double temp = u * n_out.x() + v * n_out.y() + w * n_out.z();
 
     if(temp < 0.0) factor = temp * rho0 * beta;
     else factor = 0.0;
@@ -921,14 +923,14 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
 
   const double dd_dv = alpha_f * gamma * dt;
 
-  double nx, ny, nz, surface_area, factor;
+  double surface_area, factor;
 
   Zero_sur_Tangent_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
     element->get_R(qua, &R[0]);
-    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     double u = 0.0, v = 0.0, w = 0.0;
     for(int ii=0; ii<snLocBas; ++ii)
@@ -938,7 +940,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
       w += sol[ii*4+3] * R[ii];
     }
 
-    const double temp = u * nx + v * ny + w * nz;
+    const double temp = u * n_out.x() + v * n_out.y() + w * n_out.z();
 
     if(temp < 0.0) factor = temp * rho0 * beta;
     else factor = 0.0;
@@ -977,14 +979,14 @@ double PLocAssem_Tet_CMM_GenAlpha::get_flowrate( const double * const &sol,
 
   const int face_nqp = quad -> get_num_quadPts();
 
-  double nx, ny, nz, surface_area;
+  double surface_area;
 
   double flrate = 0.0;
 
   for(int qua =0; qua< face_nqp; ++qua)
   {
     element->get_R(qua, &R[0]);
-    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     double u = 0.0, v = 0.0, w = 0.0;
     for(int ii=0; ii<snLocBas; ++ii)
@@ -994,7 +996,7 @@ double PLocAssem_Tet_CMM_GenAlpha::get_flowrate( const double * const &sol,
       w += sol[ii*4+3] * R[ii];
     }
 
-    flrate += surface_area * quad->get_qw(qua) * ( u * nx + v * ny + w * nz );
+    flrate += surface_area * quad->get_qw(qua) * ( u * n_out.x() + v * n_out.y() + w * n_out.z() );
   }
 
   return flrate;
@@ -1014,7 +1016,7 @@ void PLocAssem_Tet_CMM_GenAlpha::get_pressure_area(
 
   const int face_nqp = quad -> get_num_quadPts();
 
-  double nx, ny, nz, surface_area;
+  double surface_area;
 
   // Initialize the two variables to be passed out
   pres = 0.0; area = 0.0;
@@ -1022,7 +1024,7 @@ void PLocAssem_Tet_CMM_GenAlpha::get_pressure_area(
   for(int qua =0; qua < face_nqp; ++qua)
   {
     element->get_R(qua, &R[0]);
-    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     double pp = 0.0;
     for(int ii=0; ii<snLocBas; ++ii) pp += sol[4*ii+0] * R[ii];
@@ -1058,8 +1060,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 
   // Global Cauchy stress at all quadrature points
   std::vector<Matrix_3x3> sigma; sigma.resize( face_nqp );
-  get_Wall_CauchyStress(sol_wall_disp, element, ele_thickness, ele_youngsmod,
-      quad, sigma );
+  get_Wall_CauchyStress(sol_wall_disp, element, ele_youngsmod, quad, sigma );
 
   Zero_sur_Residual();
 
@@ -1107,23 +1108,23 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     // dR/dx_{i} = Q_{ji} * dR/dxl_{j}. Note that dR/dzl = 0.0
     for(int ii=0; ii<snLocBas; ++ii)
     {
-      dR_dx[ii] = Q(0, 0) * dR_dxl[ii] + Q(1, 0) * dR_dyl[ii];
-      dR_dy[ii] = Q(0, 1) * dR_dxl[ii] + Q(1, 1) * dR_dyl[ii];
-      dR_dz[ii] = Q(0, 2) * dR_dxl[ii] + Q(1, 2) * dR_dyl[ii];
+      dR_dx[ii] = Q.xx() * dR_dxl[ii] + Q.yx() * dR_dyl[ii];
+      dR_dy[ii] = Q.xy() * dR_dxl[ii] + Q.yy() * dR_dyl[ii];
+      dR_dz[ii] = Q.xz() * dR_dxl[ii] + Q.yz() * dR_dyl[ii];
     }
 
     for(int A=0; A<snLocBas; ++A)
     {
       const double NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
-      sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * ( u_t - fw.get_x() )
-          + NA_x * sigma[qua](0, 0) + NA_y * sigma[qua](0, 1) + NA_z * sigma[qua](0, 2) ); 
+      sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * ( u_t - fw.x() )
+          + NA_x * sigma[qua].xx() + NA_y * sigma[qua].xy() + NA_z * sigma[qua].xz() ); 
       
-      sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * ( v_t - fw.get_y() )
-          + NA_x * sigma[qua](1, 0) + NA_y * sigma[qua](1, 1) + NA_z * sigma[qua](1, 2) ); 
+      sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * ( v_t - fw.y() )
+          + NA_x * sigma[qua].yx() + NA_y * sigma[qua].yy() + NA_z * sigma[qua].yz() ); 
       
-      sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * ( w_t - fw.get_z() )
-          + NA_x * sigma[qua](2, 0) + NA_y * sigma[qua](2, 1) + NA_z * sigma[qua](2, 2) ); 
+      sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * ( w_t - fw.z() )
+          + NA_x * sigma[qua].zx() + NA_y * sigma[qua].zy() + NA_z * sigma[qua].zz() ); 
     }
 
   } // end qua loop
@@ -1164,8 +1165,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 
   // Global Cauchy stress at all quadrature points
   std::vector<Matrix_3x3> sigma; sigma.resize( face_nqp );
-  get_Wall_CauchyStress(sol_wall_disp, element, ele_thickness, ele_youngsmod,
-      quad, sigma );
+  get_Wall_CauchyStress(sol_wall_disp, element, ele_youngsmod, quad, sigma );
 
   Zero_sur_Tangent_Residual();
 
@@ -1219,9 +1219,9 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     // dR/dx_{i} = Q_{ji} * dR/dxl_{j}. Note that dR/dzl = 0.0
     for(int ii=0; ii<snLocBas; ++ii)
     {
-      dR_dx[ii] = Q(0, 0) * dR_dxl[ii] + Q(1, 0) * dR_dyl[ii];
-      dR_dy[ii] = Q(0, 1) * dR_dxl[ii] + Q(1, 1) * dR_dyl[ii];
-      dR_dz[ii] = Q(0, 2) * dR_dxl[ii] + Q(1, 2) * dR_dyl[ii];
+      dR_dx[ii] = Q.xx() * dR_dxl[ii] + Q.yx() * dR_dyl[ii];
+      dR_dy[ii] = Q.xy() * dR_dxl[ii] + Q.yy() * dR_dyl[ii];
+      dR_dz[ii] = Q.xz() * dR_dxl[ii] + Q.yz() * dR_dyl[ii];
     }
 
     // Stiffness tensor in lamina coords
@@ -1284,14 +1284,14 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     {
       const double NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
-      sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * ( u_t - fw.get_x() )
-          + NA_x * sigma[qua](0, 0) + NA_y * sigma[qua](0, 1) + NA_z * sigma[qua](0, 2) );
+      sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * ( u_t - fw.x() )
+          + NA_x * sigma[qua].xx() + NA_y * sigma[qua].xy() + NA_z * sigma[qua].xz() );
 
-      sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * ( v_t - fw.get_y() )
-          + NA_x * sigma[qua](1, 0) + NA_y * sigma[qua](1, 1) + NA_z * sigma[qua](1, 2) ); 
+      sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * ( v_t - fw.y() )
+          + NA_x * sigma[qua].yx() + NA_y * sigma[qua].yy() + NA_z * sigma[qua].yz() ); 
       
-      sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * ( w_t - fw.get_z() )
-          + NA_x * sigma[qua](2, 0) + NA_y * sigma[qua](2, 1) + NA_z * sigma[qua](2, 2) ); 
+      sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * ( w_t - fw.z() )
+          + NA_x * sigma[qua].zx() + NA_y * sigma[qua].zy() + NA_z * sigma[qua].zz() ); 
 
       for(int B=0; B<snLocBas; ++B)
       {
@@ -1344,7 +1344,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 void PLocAssem_Tet_CMM_GenAlpha::get_Wall_CauchyStress(
     const double * const &sol_wall_disp,
     const FEAElement * const &element,
-    const double * const &ele_thickness,
     const double * const &ele_youngsmod,
     const IQuadPts * const &quad,
     std::vector<Matrix_3x3> &sigma )
@@ -1369,23 +1368,22 @@ void PLocAssem_Tet_CMM_GenAlpha::get_Wall_CauchyStress(
 
     for(int ii=0; ii<snLocBas; ++ii)
     {
-      sol_wall_disp_l[dim*ii]   = sol_wall_disp[dim*ii] * Q(0, 0) 
-        + sol_wall_disp[dim*ii+1] * Q(0, 1) + sol_wall_disp[dim*ii+2] * Q(0, 2);
+      sol_wall_disp_l[dim*ii]   = sol_wall_disp[dim*ii] * Q.xx() 
+        + sol_wall_disp[dim*ii+1] * Q.xy() + sol_wall_disp[dim*ii+2] * Q.xz();
 
-      sol_wall_disp_l[dim*ii+1] = sol_wall_disp[dim*ii] * Q(1, 0) 
-        + sol_wall_disp[dim*ii+1] * Q(1, 1) + sol_wall_disp[dim*ii+2] * Q(1, 2);
+      sol_wall_disp_l[dim*ii+1] = sol_wall_disp[dim*ii] * Q.yx()
+        + sol_wall_disp[dim*ii+1] * Q.yy() + sol_wall_disp[dim*ii+2] * Q.yz();
 
-      sol_wall_disp_l[dim*ii+2] = sol_wall_disp[dim*ii] * Q(2, 0) 
-        + sol_wall_disp[dim*ii+1] * Q(2, 1) + sol_wall_disp[dim*ii+2] * Q(2, 2);
+      sol_wall_disp_l[dim*ii+2] = sol_wall_disp[dim*ii] * Q.zx()
+        + sol_wall_disp[dim*ii+1] * Q.zy() + sol_wall_disp[dim*ii+2] * Q.zz();
     }
 
-    double h_w = 0.0, E_w = 0.0;
+    double E_w = 0.0;
     double u1l_xl = 0.0, u2l_xl = 0.0, u3l_xl = 0.0;
     double u1l_yl = 0.0, u2l_yl = 0.0, u3l_yl = 0.0;
 
     for(int ii=0; ii<snLocBas; ++ii)
     {
-      h_w += ele_thickness[ii] * R[ii];
       E_w += ele_youngsmod[ii] * R[ii];
 
       u1l_xl += sol_wall_disp_l[dim*ii]   * dR_dxl[ii];

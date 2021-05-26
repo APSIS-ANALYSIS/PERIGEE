@@ -58,11 +58,11 @@ class Vector_3
 
     std::vector<double> to_std_vec() const;
 
-    double get_x() const {return vec[0];}
+    double x() const {return vec[0];}
 
-    double get_y() const {return vec[1];}
+    double y() const {return vec[1];}
 
-    double get_z() const {return vec[2];}
+    double z() const {return vec[2];}
 
     void set_x( const double &input ) {vec[0] = input;}
     

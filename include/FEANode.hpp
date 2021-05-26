@@ -23,78 +23,76 @@ class FEANode
 {
   public:
     // ------------------------------------------------------------------------
-    // Read ctrl_x/y/z directly from the part file with the given base name 
-    // and cpu index. If weights exist in the h5 file, they will also be read; 
-    // otherwise, the ctrlPts_w vector will be empty.
+    // ! Constructor
+    //   Read ctrl_x/y/z directly from the part file with the given base name 
+    //   and cpu index. If weights exist in the h5 file, they will also be read; 
+    //   otherwise, the ctrlPts_w vector will be empty.
     // ------------------------------------------------------------------------
     FEANode( const std::string &fileBaseName, const int &cpu_rank );
 
     // ------------------------------------------------------------------------
-    // Destructor
+    // ! Destructor
     // ------------------------------------------------------------------------
     virtual ~FEANode();
 
     // ------------------------------------------------------------------------
-    // Functions that give access to the coordinates (and weights).
+    // ! Functions that give access to the coordinates (and weights).
+    //   Input: index ranges in [ 0 , nlocghonode )
     // ------------------------------------------------------------------------
-    virtual double get_ctrlPts_x(const int &index) const 
-    {return ctrlPts_x[index];}
+    virtual double get_ctrlPts_x(const int &index) const {return ctrlPts_x[index];}
     
-    virtual double get_ctrlPts_y(const int &index) const 
-    {return ctrlPts_y[index];}
+    virtual double get_ctrlPts_y(const int &index) const {return ctrlPts_y[index];}
     
-    virtual double get_ctrlPts_z(const int &index) const 
-    {return ctrlPts_z[index];}
+    virtual double get_ctrlPts_z(const int &index) const {return ctrlPts_z[index];}
     
-    virtual double get_ctrlPts_w(const int &index) const 
-    {return ctrlPts_w[index];}
+    virtual double get_ctrlPts_w(const int &index) const {return ctrlPts_w[index];}
 
     // ------------------------------------------------------------------------
-    // Get n control points' x-y-z in a batch
-    // \para num: the number of control points (n) to be passed out
-    // \para index: index[0] - index[num-1] ctrlPts_* will be passed 
-    //              out to ctrl_x, ctrl_y, ctrl_z
-    // Usually, num = nLocBas, and index = LIEN[e][]
-    // Note: Users are responsible for allocating and deallocating memory
-    //       for index and ctrl_(x/y/z).
+    // ! Get n control points' x-y-z in a batch
+    //   Input : \para num  : the number of control points (n) to be passed out
+    //           \para index: index[0] - index[num-1] ctrlPts_* will be passed 
+    //                        to ctrl_x, ctrl_y, ctrl_z
+    //   Usually, num = nLocBas, and index = LIEN[e][]
+    //   Note: Users are responsible for allocating and deallocating memory
+    //         for index and ctrl_(x/y/z).
     // ------------------------------------------------------------------------
     virtual void get_ctrlPts_xyz( const int &num, const int * const &index, 
         double * const &ctrl_x, double * const &ctrl_y, 
         double * const &ctrl_z ) const;
     
     // ------------------------------------------------------------------------
-    // Get n control points' x-y-z-w in a batch
-    // Note: Users are responsible for allocating and deallocating memory
-    //       for index and ctrl_(x/y/z/w).
+    // ! Get n control points' x-y-z-w in a batch
+    //   Note: Users are responsible for allocating and deallocating memory
+    //         for index and ctrl_(x/y/z/w).
     // ------------------------------------------------------------------------
     virtual void get_ctrlPts_xyzw( const int &num, const int * const &index, 
         double * const &ctrl_x, double * const &ctrl_y, 
         double * const &ctrl_z, double * const &ctrl_w ) const;
    
     // ------------------------------------------------------------------------
-    // Get n control points' x-y-w in a batch
-    // NOTE: Users are responsible for allocating and deallocating memory
-    //       for index and ctrl_(x/y/w).
+    // ! Get n control points' x-y-w in a batch
+    //   NOTE: Users are responsible for allocating and deallocating memory
+    //         for index and ctrl_(x/y/w).
     // ------------------------------------------------------------------------
     virtual void get_ctrlPts_xyw( const int &num, const int * const &index,
         double * const &ctrl_x, double * const &ctrl_y,
         double * const &ctrl_w ) const;
 
     // ------------------------------------------------------------------------
-    // Get n contrl points' x-y in a batch
-    // NOTE: Users are responsible for allocating and deallocating memory
-    //       for index and ctrl_(x/y).
+    // ! Get n contrl points' x-y in a batch
+    //   NOTE: Users are responsible for allocating and deallocating memory
+    //         for index and ctrl_(x/y).
     // ------------------------------------------------------------------------
     virtual void get_ctrlPts_xy( const int &num, const int * const &index,
         double * const &ctrl_x, double * const &ctrl_y ) const;
 
     // ------------------------------------------------------------------------
-    // Print the info for this class.
+    // ! Print the info for this class.
     // ------------------------------------------------------------------------
     virtual void print_info() const;
 
     // ------------------------------------------------------------------------
-    // Returns the memory usage of the private data in Bytes
+    // ! Returns the memory usage of the private data in Bytes
     // ------------------------------------------------------------------------
     virtual double get_memory_usage() const;
 

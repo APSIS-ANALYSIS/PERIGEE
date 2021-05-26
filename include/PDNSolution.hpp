@@ -64,8 +64,7 @@ class PDNSolution
     virtual void Copy(const PDNSolution * const &INPUT_ptr);
     
     // ------------------------------------------------------------------------
-    // ! Update the ghost part
-    //   This function is often used in initialization
+    // ! Update the solution entries associated with the ghost nodes
     // ------------------------------------------------------------------------
     virtual void GhostUpdate();
 
@@ -99,7 +98,7 @@ class PDNSolution
     // ------------------------------------------------------------------------
     virtual void GetLocalArray( double * const &local_array ) const;
     
-    virtual void GetLocalArray( std::vector<double> &local_array ) const;
+    virtual std::vector<double> GetLocalArray() const;
 
     // ------------------------------------------------------------------------
     // ! Assembly the vector and update its ghost values. It is just a routine 

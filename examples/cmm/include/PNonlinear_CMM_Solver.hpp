@@ -113,8 +113,8 @@ class PNonlinear_CMM_Solver
     //     wall_data_z += val * dot_velo_z_step
     void update_wall( const double &val,
         const PDNSolution * const &dot_step,
-        PDNSolution * const &wall_data,
-        const ALocal_EBC * const &ebc_wall_part ) const;
+        const ALocal_EBC * const &ebc_wall_part, 
+        PDNSolution * const &wall_data ) const;
 
 
     // Check whether the ring BC constraints are properly satisfied
