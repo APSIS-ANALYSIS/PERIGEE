@@ -1016,21 +1016,18 @@ void PLocAssem_Tet_CMM_GenAlpha::get_pressure_area(
 
   const int face_nqp = quad -> get_num_quadPts();
 
-  double surface_area;
-
   // Initialize the two variables to be passed out
   pres = 0.0; area = 0.0;
 
   for(int qua =0; qua < face_nqp; ++qua)
   {
     element->get_R(qua, &R[0]);
-    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     double pp = 0.0;
     for(int ii=0; ii<snLocBas; ++ii) pp += sol[4*ii+0] * R[ii];
 
-    pres += surface_area * quad->get_qw(qua) * pp;
-    area += surface_area * quad->get_qw(qua);
+    pres += element->get_detJac(qua) * quad->get_qw(qua) * pp;
+    area += element->get_detJac(qua) * quad->get_qw(qua);
   }
 }
 
