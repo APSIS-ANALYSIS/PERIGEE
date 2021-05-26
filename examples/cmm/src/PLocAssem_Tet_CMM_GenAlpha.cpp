@@ -1070,8 +1070,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     const Matrix_3x3 Q = element->get_rotationMatrix(qua);
 
     double u_t = 0.0, v_t = 0.0, w_t = 0.0, u = 0.0, v = 0.0, w = 0.0;
-    double disp_x = 0.0, disp_y = 0.0, disp_z = 0.0;
-    double h_w = 0.0, E_w = 0.0;
+    double disp_x = 0.0, disp_y = 0.0, disp_z = 0.0, h_w = 0.0, E_w = 0.0;
     double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
 
     for(int ii=0; ii<snLocBas; ++ii)
