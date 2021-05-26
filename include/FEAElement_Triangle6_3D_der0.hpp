@@ -77,8 +77,7 @@ class FEAElement_Triangle6_3D_der0 : public FEAElement
         const double &intpt_x, const double &intpt_y, const double &intpt_z,
         double &nx, double &ny, double &nz, double &len ) const;
 
-    virtual double get_detJac(const int &quaindex) const
-    {return detJac[quaindex];}
+    virtual double get_detJac(const int &quaindex) const {return detJac[quaindex];}
 
   private:
     const int numQuapts;
