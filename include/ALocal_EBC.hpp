@@ -55,14 +55,22 @@ class ALocal_EBC
     {return num_local_cell[ii];}
 
     // ------------------------------------------------------------------------
+    // ! get the number of nodes in this partition. These may not be associated
+    //   with any surface cell in this partition.
+    //   \para 0 <= ii < num_ebc
+    // ------------------------------------------------------------------------
+    virtual int get_num_part_node(const int &ii) const 
+    {return num_part_node[ii];}
+
+    // ------------------------------------------------------------------------
     // ! get the number of local basis functions of the surface cells. This is
-    //   directly associated with the cell element tyep.
+    //   directly associated with the cell element type.
     //   \para 0 <= ii < num_ebc
     // ------------------------------------------------------------------------
     virtual int get_cell_nLocBas(const int &ii) const {return cell_nLocBas[ii];}
 
     // ------------------------------------------------------------------------
-    // ! get the local nodes' spatial coordinates.
+    // ! get the local node's spatial coordinates.
     //   \para 0 <= ii < num_ebc
     //   \para 0 <= jj < 3 x num_local_node[ii]
     // ------------------------------------------------------------------------
@@ -79,7 +87,7 @@ class ALocal_EBC
     {return local_tri_ien[ii][jj];}
 
     // ------------------------------------------------------------------------
-    // ! get the local nodes' volumetric mesh index
+    // ! get the local node's volumetric mesh index
     //   \para 0 <= ii < num_ebc
     //   \para 0 <= jj < num_local_node[ii]
     // ------------------------------------------------------------------------
@@ -87,7 +95,7 @@ class ALocal_EBC
     {return local_global_node[ii][jj];}
 
     // ------------------------------------------------------------------------
-    // ! get the local nodes' location in the local_to_global array.
+    // ! get the local node's location in the local_to_global array.
     //   \para 0 <= ii < num_ebc
     //   \para 0 <= jj < num_local_node[ii] 
     // ------------------------------------------------------------------------
@@ -95,7 +103,15 @@ class ALocal_EBC
     {return local_node_pos[ii][jj];}
 
     // ------------------------------------------------------------------------
-    // ! get the local cells' volumetric mesh index.
+    // ! get the partition node's location in the local_to_global array.
+    //   \para 0 <= ii < num_ebc
+    //   \para 0 <= jj < num_part_node[ii] 
+    // ------------------------------------------------------------------------
+    virtual int get_part_node_pos(const int &ii, const int &jj) const
+    {return part_node_pos[ii][jj];}
+
+    // ------------------------------------------------------------------------
+    // ! get the local cell's volumetric mesh index.
     //   \para 0 <= ii < num_ebc
     //   \para 0 <= jj < num_local_cell[ii]
     // ------------------------------------------------------------------------

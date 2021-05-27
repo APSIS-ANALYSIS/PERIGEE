@@ -349,31 +349,27 @@ void PNonlinear_CMM_Solver::update_wall( const double &val,
   // Verify consistency in the number of local nodes
   SYS_T::print_fatal_if( !is_layout_equal(*dot_step, *wall_data), "Error in PNonlinear_CMM_Solver::update_dot_wall_disp: solution vector layout mismatch between dot_step and wall_data. \n");
 
-  Vec ldotstep, lwalldata;
-  double * array_dotstep, * array_walldata;
+  double dotstep_vals[3];
+  int    dotstep_idx[3];
 
-  VecGhostGetLocalForm(dot_step->solution, &ldotstep);
-  VecGhostGetLocalForm(wall_data->solution, &lwalldata);
+  // wall has only one surface per the assumption in wall_ebc
+  const int ebc_id = 0;
+  const int nlocalwallnode = ebc_wall_part -> get_num_part_node(ebc_id);
 
-  VecGetArray(ldotstep, &array_dotstep);
-  VecGetArray(lwalldata, &array_walldata);
-
-  const int nlocalnode = dot_step -> get_nlocalnode();
-
-  for(int ii=0; ii<nlocalnode; ++ii)
+  for(int ii=0; ii<nlocalwallnode; ++ii)
   {
-    array_walldata[ii*3]   += val * array_dotstep[ii*4+1];
-    array_walldata[ii*3+1] += val * array_dotstep[ii*4+2];
-    array_walldata[ii*3+2] += val * array_dotstep[ii*4+3];
+    const int pos = ebc_wall_part -> get_part_node_pos(ebc_id, ii);
+
+    for(int jj=0; jj<3; ++jj) dotstep_idx[jj] = pos*4 + jj + 1;
+
+    VecGetValues(dot_step->solution, 3, dotstep_idx, dotstep_vals);
+
+    VecSetValue(wall_data->solution, pos*3,   val * dotstep_vals[0], ADD_VALUES);
+    VecSetValue(wall_data->solution, pos*3+1, val * dotstep_vals[1], ADD_VALUES);
+    VecSetValue(wall_data->solution, pos*3+2, val * dotstep_vals[2], ADD_VALUES);
   }
 
-  // Deallocation of the local copy
-  VecRestoreArray(ldotstep, &array_dotstep);
-  VecRestoreArray(lwalldata, &array_walldata);
-  VecGhostRestoreLocalForm(dot_step->solution, &ldotstep);
-  VecGhostRestoreLocalForm(wall_data->solution, &lwalldata);
-
-  // Update ghost values
+  VecAssemblyBegin(wall_data->solution); VecAssemblyEnd(wall_data->solution);
   wall_data->GhostUpdate();
 }
 
