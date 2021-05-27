@@ -63,6 +63,8 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
 
   // Generate the dir-node list with all ring nodes.
   dir_nodes.clear();
+  cap_id.clear();
+  tangential.clear();
 
   if( elemtype == 501 )
   { 

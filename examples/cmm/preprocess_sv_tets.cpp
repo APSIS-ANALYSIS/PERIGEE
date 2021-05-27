@@ -233,7 +233,7 @@ int main( int argc, char * argv[] )
 
   if( cmmBC_type == 0)
   {
-    std::cout<<"===> The Nodal boundary condition for deformable wall (cmmbc_type = 0) is setted up as:\n";
+    std::cout<<"===> The Nodal boundary condition for deformable wall (cmmbc_type = 0) is set up as:\n";
     NBC_list[0] = new NodalBC_3D_CMM( nFunc );
     NBC_list[1] = new NodalBC_3D_CMM( InFBC, ring_bc, 0, nFunc );
     NBC_list[2] = new NodalBC_3D_CMM( InFBC, ring_bc, 1, nFunc );
@@ -241,7 +241,7 @@ int main( int argc, char * argv[] )
   }
   else if( cmmBC_type == 1 )
   {
-    std::cout<<"===> The Nodal boundary condition for rigid wall (cmmbc_type = 1) is setted up as:\n";
+    std::cout<<"===> The Nodal boundary condition for rigid wall (cmmbc_type = 1) is set up as:\n";
     NBC_list[0] = new NodalBC_3D_CMM( nFunc );
     NBC_list[1] = new NodalBC_3D_CMM( InFBC, ring_bc, wall_nbc, nFunc );
     NBC_list[2] = new NodalBC_3D_CMM( InFBC, ring_bc, wall_nbc, nFunc );
@@ -249,7 +249,7 @@ int main( int argc, char * argv[] )
   }
   else if( cmmBC_type == 2 )
   {
-    std::cout<<"===> The Nodal boundary condition for prestress generation (cmmbc_type = 2) is setted up as:\n";
+    std::cout<<"===> The Nodal boundary condition for prestress generation (cmmbc_type = 2) is set up as:\n";
     NBC_list[0] = new NodalBC_3D_CMM( wall_nbc, nFunc );
     NBC_list[1] = new NodalBC_3D_CMM( wall_nbc, nFunc );
     NBC_list[2] = new NodalBC_3D_CMM( wall_nbc, nFunc );
