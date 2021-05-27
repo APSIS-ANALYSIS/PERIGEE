@@ -41,7 +41,6 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
     local_elem.clear();
 
     const int num_global_bccell = ebc->get_num_cell( ii );
-    const int num_global_bcnode = ebc->get_num_node( ii );
 
     local_global_cell[ii].clear();
 
@@ -62,18 +61,6 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
           local_node[ii].push_back( ebc->get_ien(ii, jj, kk) );
       }
     }
-
-    // Add in all surface nodes belonging to the local partition, which may not be associated
-    // with any cell in the local partition. This allows for nodal update of solutions, 
-    // eg. for (dot) wall disp in PNonlinear_CMM_Solver.
-    for(int jj=0; jj<num_global_bcnode; ++jj)
-    {
-      const int node_index = ebc->get_global_node( ii, jj );
-
-      if( part -> get_nodeLocGhoIndex( mnindex->get_old2new(node_index) ) != -1 ) 
-        local_node[ii].push_back( jj );
-    }
-
     VEC_T::sort_unique_resize( local_node[ii] );
 
     // local_node[ii] now stores indices (in surface mesh ii) for all nodes
