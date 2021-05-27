@@ -267,13 +267,16 @@ class ALocal_EBC
     // elemental boundary conditions.
     int num_ebc;
 
-    // num_local_node[ii] gives the ii-th ebc's local node number
+    // num_local_node[ii] gives the ii-th ebc's local node number. These are
+    //                    nodes associated with local cells.
     // num_local_cell[ii] gives the ii-th ebc's local cell number
     // cell_nLocBas[ii] gives the cell's number of node. e.g., 
     //                  triangle surface is 3,
     //                  quadralaterial surface is 4,
     //                  quadratic triangle surface is 6.
-    std::vector<int> num_local_node, num_local_cell, cell_nLocBas;
+    // num_part_node[ii]  gives the ii-th ebc's partition node number. These may not
+    //                    be associated with any local cell.
+    std::vector<int> num_local_node, num_local_cell, cell_nLocBas, num_part_node;
 
     // local_pt_xyz[ii] gives a list of local node's coordinates
     // size: num_ebc x (3 x num_local_node[ii])
@@ -294,6 +297,11 @@ class ALocal_EBC
     // local cell's corresponding volumetric element indices
     // size: num_ebc x num_local_cell[ii]
     std::vector< std::vector<int> > local_global_cell;
+
+    // partition node's position in the volumetric local portion's local_to_global array.
+    // size: num_ebc x num_part_node[ii]
+    std::vector< std::vector<int> > part_node_pos;
+
 };
 
 #endif

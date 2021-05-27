@@ -116,7 +116,6 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
     }
 
     num_part_node[ii] = static_cast<int>( part_node_pos[ii].size() );
-    std::cout << "num_part_node[" << ii << "]: " << num_part_node[ii] << std::endl;
 
   } // end loop over num_ebc
 }

@@ -18,6 +18,8 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
     h5r -> read_intVector(gname.c_str(), "num_local_cell", num_local_cell );
 
     h5r -> read_intVector(gname.c_str(), "cell_nLocBas", cell_nLocBas );
+
+    h5r -> read_intVector(gname.c_str(), "num_part_node", num_part_node );
   }
 
   std::string groupbase(gname);
@@ -28,14 +30,15 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
   local_global_node.resize(num_ebc);
   local_node_pos.resize(num_ebc);
   local_global_cell.resize(num_ebc);
+  part_node_pos.resize(num_ebc);
 
   for(int ii=0; ii<num_ebc; ++ii)
   {
+    std::string subgroup_name(groupbase);
+    subgroup_name.append( SYS_T::to_string(ii) );
+
     if( num_local_cell[ii] > 0 )
     {
-      std::string subgroup_name(groupbase);
-      subgroup_name.append( SYS_T::to_string(ii) );
-
       h5r -> read_doubleVector( subgroup_name.c_str(), "local_pt_xyz",
           local_pt_xyz[ii] );
 
@@ -59,6 +62,15 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
       local_node_pos[ii].clear();
       local_global_cell[ii].clear();
     }
+
+    if( num_part_node[ii] > 0 )
+    {
+      h5r -> read_intVector( subgroup_name.c_str(), "part_node_pos",
+          part_node_pos[ii] );
+    }
+    else
+      part_node_pos[ii].clear();
+    
   }
 
   delete h5r; H5Fclose( file_id );
@@ -69,11 +81,13 @@ ALocal_EBC::~ALocal_EBC()
   VEC_T::clean( num_local_node );
   VEC_T::clean( num_local_cell );
   VEC_T::clean( cell_nLocBas );
+  VEC_T::clean( num_part_node );
   VEC_T::clean( local_pt_xyz );
   VEC_T::clean( local_tri_ien );
   VEC_T::clean( local_global_node );
   VEC_T::clean( local_node_pos );
   VEC_T::clean( local_global_cell );
+  VEC_T::clean( part_node_pos );
 }
 
 void ALocal_EBC::get_ctrlPts_xyz(const int &ii,
