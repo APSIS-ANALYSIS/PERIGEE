@@ -138,14 +138,14 @@ void EBC_Partition_vtp::write_hdf5( const char * FileName ) const
 
   for(int ii=0; ii<num_ebc; ++ii)
   {
-    std::string subgroup_name(groupbase);
-    subgroup_name.append( SYS_T::to_string(ii) );
-
-    hid_t group_id = H5Gcreate(g_id, subgroup_name.c_str(), 
-        H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-
     if( num_local_cell[ii] > 0 )
     {
+      std::string subgroup_name(groupbase);
+      subgroup_name.append( SYS_T::to_string(ii) );
+
+      hid_t group_id = H5Gcreate(g_id, subgroup_name.c_str(), 
+          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
       h5w->write_doubleVector( group_id, "local_pt_xyz", local_pt_xyz[ii] );
 
       h5w->write_intVector( group_id, "local_tri_ien", local_tri_ien[ii] );
@@ -155,14 +155,12 @@ void EBC_Partition_vtp::write_hdf5( const char * FileName ) const
       h5w->write_intVector( group_id, "local_node_pos", local_node_pos[ii] );
 
       h5w->write_intVector( group_id, "local_global_cell", local_global_cell[ii] );
-    }
 
-    H5Gclose( group_id );
+      H5Gclose( group_id );
+    }
   }
 
-  delete h5w;
-  H5Gclose( g_id );
-  H5Fclose( file_id );
+  delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
 }
 
 
@@ -190,14 +188,14 @@ void EBC_Partition_vtp::write_hdf5( const char * FileName,
 
   for(int ii=0; ii<num_ebc; ++ii)
   {
-    std::string subgroup_name(groupbase);
-    subgroup_name.append( SYS_T::to_string(ii) );
-
-    hid_t group_id = H5Gcreate(g_id, subgroup_name.c_str(), 
-        H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-
     if( num_local_cell[ii] > 0 )
     {
+      std::string subgroup_name(groupbase);
+      subgroup_name.append( SYS_T::to_string(ii) );
+
+      hid_t group_id = H5Gcreate(g_id, subgroup_name.c_str(), 
+          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
       h5w->write_doubleVector( group_id, "local_pt_xyz", local_pt_xyz[ii] );
 
       h5w->write_intVector( group_id, "local_tri_ien", local_tri_ien[ii] );
@@ -207,14 +205,12 @@ void EBC_Partition_vtp::write_hdf5( const char * FileName,
       h5w->write_intVector( group_id, "local_node_pos", local_node_pos[ii] );
 
       h5w->write_intVector( group_id, "local_global_cell", local_global_cell[ii] );
-    }
 
-    H5Gclose( group_id );
+      H5Gclose( group_id );
+    }
   }
 
-  delete h5w;
-  H5Gclose( g_id );
-  H5Fclose( file_id );
+  delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
 }
 
 
