@@ -75,6 +75,46 @@ class PNonlinear_CMM_Solver
         PDNSolution * const &sol_wall_disp,
         bool &prestress_conv_flag, int &nl_counter ) const;
 
+    // --------------------------------------------------------------
+    // GenAlpha_Solve_Prestress:
+    // This is an iterative solver for obtaining the prestress.
+    // --------------------------------------------------------------
+    void GenAlpha_Solve_Prestress(
+        const bool &new_tangent_flag,
+        const double &curr_time,
+        const double &dt,
+        const PDNSolution * const &sol_base,
+        const PDNSolution * const &pre_dot_sol,
+        const PDNSolution * const &pre_sol,
+        const PDNSolution * const &pre_dot_sol_wall_disp,
+        const PDNSolution * const &pre_sol_wall_disp,
+        const TimeMethod_GenAlpha * const &tmga_ptr,
+        const ICVFlowRate * const flr_ptr,
+        const ALocal_Elem * const &alelem_ptr,
+        const ALocal_IEN * const &lien_ptr,
+        const APart_Node * const &anode_ptr,
+        const FEANode * const &feanode_ptr,
+        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_Inflow_NodalBC * const &infnbc_part,
+        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_EBC * const &ebc_part,
+        ALocal_EBC * const &ebc_wall_part,
+        const IGenBC * const &gbc,
+        const Matrix_PETSc * const &bc_mat,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        FEAElement * const &elementw,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        IPLocAssem * const &lassem_ptr,
+        IPGAssem * const &gassem_ptr,
+        PLinear_Solver_PETSc * const &lsolver_ptr,
+        PDNSolution * const &dot_sol,
+        PDNSolution * const &sol,
+        PDNSolution * const &dot_sol_wall_disp,
+        PDNSolution * const &sol_wall_disp,
+        bool &prestress_conv_flag, int &nl_counter ) const;
+  
   private:
     const double nr_tol, na_tol, nd_tol;
     const int nmaxits, nrenew_freq, nrenew_threshold;
@@ -91,8 +131,7 @@ class PNonlinear_CMM_Solver
     void Print_convergence_info( const int &count, const double rel_err,
         const double abs_err ) const
     {PetscPrintf(PETSC_COMM_WORLD,
-        "  === NR ite: %d, r_error: %e, a_error: %e \n",
-        count, rel_err, abs_err);}
+        "  === NR ite: %d, r_error: %e, a_error: %e \n", count, rel_err, abs_err);}
 
     void rescale_inflow_value( const double &stime,
         const ALocal_Inflow_NodalBC * const &infbc,
@@ -115,7 +154,6 @@ class PNonlinear_CMM_Solver
         const PDNSolution * const &dot_step,
         const ALocal_EBC * const &ebc_wall_part, 
         PDNSolution * const &wall_data ) const;
-
 
     // Check whether the ring BC constraints are properly satisfied
     // by printing their evaluations 
