@@ -77,8 +77,7 @@ class HDF5_Reader
     //                   vector<int>.
     // --------------------------------------------------------------
     void read_intVector( const char * const &group_name, 
-        const char * const &data_name,
-        std::vector<int> &out ) const;
+        const char * const &data_name, std::vector<int> &out ) const;
 
     std::vector<int> read_intVector( const char * const &group_name,
         const char * const &data_name ) const
@@ -93,8 +92,7 @@ class HDF5_Reader
     //                      vector<double>.
     // --------------------------------------------------------------
     void read_doubleVector( const char * const &group_name, 
-        const char * const &data_name,
-        std::vector<double> &out ) const;
+        const char * const &data_name, std::vector<double> &out ) const;
 
     std::vector<double> read_doubleVector( const char * const &group_name,
         const char * const &data_name ) const
@@ -179,8 +177,7 @@ class HDF5_Reader
     //   \para string_out : the string data
     // --------------------------------------------------------------
     void read_string( const char * const &group_name,
-        const char * const &data_name,
-        std::string &string_out ) const;
+        const char * const &data_name, std::string &string_out ) const;
 
     std::string read_string( const char * const &group_name,
         const char * const &data_name ) const
