@@ -66,7 +66,7 @@ class EBC_Partition_vtp : public IEBC_Partition
     const int num_ebc; // Number of groups of bc faces that require bc integral
 
     // length is num_ebc
-    std::vector<int> num_local_node, num_local_cell, cell_nLocBas, num_part_node;
+    std::vector<int> num_local_node, num_local_cell, cell_nLocBas;
 
     // local node's coordinates, num_ebc x (3 x num_local_node[ii]) in size
     std::vector< std::vector<double> > local_pt_xyz;
@@ -95,14 +95,6 @@ class EBC_Partition_vtp : public IEBC_Partition
 
     // local cell's global index num_ebc x num_local_cell[ii] in size
     std::vector< std::vector<int> > local_global_cell;
-
-    // partition node's position in the local_to_global array
-    // Here, partition nodes are all nodes belonging to the local partition,
-    // which may not be associated with any cell in the local partition.
-    // This allows for nodal update of surface solutions only.
-    // num_ebc x num_part_node[ii]
-    std::vector< std::vector<int> > part_node_pos;
-
 };
 
 #endif

@@ -8,27 +8,23 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
   num_local_node.clear();
   num_local_cell.clear();
   cell_nLocBas.clear();
-  num_part_node.clear();
   local_pt_xyz.clear();
   local_tri_ien.clear();
   local_global_node.clear();
   local_node.clear();
   local_node_pos.clear();
   local_global_cell.clear();
-  part_node_pos.clear();
 
   // resize the vectors with length equaling to the number of ebc's
   num_local_node.resize( num_ebc );
   num_local_cell.resize( num_ebc );
   cell_nLocBas.resize( num_ebc );
-  num_part_node.resize( num_ebc );
   local_pt_xyz.resize( num_ebc );
   local_tri_ien.resize( num_ebc );
   local_global_node.resize( num_ebc );
   local_node.resize( num_ebc );
   local_node_pos.resize( num_ebc );
   local_global_cell.resize( num_ebc );
-  part_node_pos.resize( num_ebc );
 
   // fill the cell_nLocBas array
   for(int ii=0; ii<num_ebc; ++ii) 
@@ -101,22 +97,6 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
         local_tri_ien[ii][jj*cell_nLocBas[ii] + kk] = temp_npos;
       }
     }
-
-    // part_node_pos[ii] stores the position in the local_to_global array for all nodes 
-    // in the local partition, which may not be associated with any local cell
-    part_node_pos[ii].clear();
-    const int num_global_bcnode = ebc->get_num_node( ii );
-    for(int jj=0; jj<num_global_bcnode; ++jj)
-    {
-      int node_index = ebc->get_global_node( ii, jj );
-      node_index = mnindex->get_old2new(node_index);
-
-      if( part->isNodeInPart(node_index) )
-        part_node_pos[ii].push_back( node_index );
-    }
-
-    num_part_node[ii] = static_cast<int>( part_node_pos[ii].size() );
-
   } // end loop over num_ebc
 }
 
@@ -126,14 +106,12 @@ EBC_Partition_vtp::~EBC_Partition_vtp()
   VEC_T::clean( num_local_node );
   VEC_T::clean( num_local_cell );
   VEC_T::clean( cell_nLocBas );
-  VEC_T::clean( num_part_node );
   VEC_T::clean( local_pt_xyz );
   VEC_T::clean( local_tri_ien );
   VEC_T::clean( local_global_node );
   VEC_T::clean( local_node );
   VEC_T::clean( local_node_pos );
   VEC_T::clean( local_global_cell );
-  VEC_T::clean( part_node_pos );
 }
 
 
@@ -155,8 +133,6 @@ void EBC_Partition_vtp::write_hdf5( const char * FileName ) const
   h5w -> write_intVector( g_id, "num_local_cell", num_local_cell );
 
   h5w -> write_intVector( g_id, "cell_nLocBas", cell_nLocBas );
-
-  h5w -> write_intVector( g_id, "num_part_node", num_part_node );
 
   const std::string groupbase("ebcid_");
 
@@ -181,9 +157,6 @@ void EBC_Partition_vtp::write_hdf5( const char * FileName ) const
       h5w->write_intVector( group_id, "local_global_cell", local_global_cell[ii] );
     }
 
-    if( num_part_node[ii] > 0 )
-      h5w->write_intVector( group_id, "part_node_pos", part_node_pos[ii] );
-    
     H5Gclose( group_id );
   }
 
@@ -213,8 +186,6 @@ void EBC_Partition_vtp::write_hdf5( const char * FileName,
 
   h5w -> write_intVector( g_id, "cell_nLocBas", cell_nLocBas );
 
-  h5w -> write_intVector( g_id, "num_part_node", num_part_node );
-
   const std::string groupbase("ebcid_");
 
   for(int ii=0; ii<num_ebc; ++ii)
@@ -237,9 +208,6 @@ void EBC_Partition_vtp::write_hdf5( const char * FileName,
 
       h5w->write_intVector( group_id, "local_global_cell", local_global_cell[ii] );
     }
-
-    if( num_part_node[ii] > 0 )
-      h5w->write_intVector( group_id, "part_node_pos", part_node_pos[ii] );
 
     H5Gclose( group_id );
   }
