@@ -8,11 +8,9 @@ ALocal_Elem::ALocal_Elem(const std::string &fileBaseName, const int &cpu_rank)
 
   HDF5_Reader * h5r = new HDF5_Reader( file_id );
 
-  const std::string gname("/Local_Elem");
+  elem_loc = h5r->read_intVector( "/Local_Elem", "elem_loc" );
 
-  h5r->read_intVector( gname.c_str(), "elem_loc", elem_loc );
-
-  nlocalele = h5r->read_intScalar( gname.c_str(), "nlocalele" );
+  nlocalele = h5r->read_intScalar( "/Local_Elem", "nlocalele" );
 
   delete h5r; H5Fclose( file_id );
 }

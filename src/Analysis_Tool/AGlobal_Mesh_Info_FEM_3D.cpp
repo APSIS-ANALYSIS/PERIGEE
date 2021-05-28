@@ -10,12 +10,9 @@ AGlobal_Mesh_Info_FEM_3D::AGlobal_Mesh_Info_FEM_3D(
 
   HDF5_Reader * h5r = new HDF5_Reader( file_id );
   
-  std::vector<int> vdeg;
-
-  h5r -> read_intVector("Global_Mesh_Info", "degree", vdeg);
-  xdegree = vdeg[0];
-  ydegree = vdeg[1];
-  zdegree = vdeg[2];
+  std::vector<int> vdeg = h5r -> read_intVector("Global_Mesh_Info", "degree");
+  
+  xdegree = vdeg[0]; ydegree = vdeg[1]; zdegree = vdeg[2];
 
   nElem    = h5r -> read_intScalar("Global_Mesh_Info", "nElem");
   nFunc    = h5r -> read_intScalar("Global_Mesh_Info", "nFunc");
@@ -37,12 +34,9 @@ AGlobal_Mesh_Info_FEM_3D::AGlobal_Mesh_Info_FEM_3D(
 
   HDF5_Reader * h5r = new HDF5_Reader( file_id );
   
-  std::vector<int> vdeg;
-
-  h5r -> read_intVector("Global_Mesh_Info", "degree", vdeg);
-  xdegree = vdeg[0];
-  ydegree = vdeg[1];
-  zdegree = vdeg[2];
+  std::vector<int> vdeg = h5r -> read_intVector("Global_Mesh_Info", "degree");
+  
+  xdegree = vdeg[0]; ydegree = vdeg[1]; zdegree = vdeg[2];
 
   nElem    = h5r -> read_intScalar("Global_Mesh_Info", "nElem");
   nFunc    = h5r -> read_intScalar("Global_Mesh_Info", "nFunc");

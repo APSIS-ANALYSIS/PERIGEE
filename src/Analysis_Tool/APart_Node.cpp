@@ -9,21 +9,20 @@ APart_Node::APart_Node( const std::string &fbasename, const int &rank )
 
   HDF5_Reader * h5r = new HDF5_Reader( file_id );
   
-  const std::string gname("Local_Node");
+  nlocalnode = h5r->read_intScalar("Local_Node", "nlocalnode");
+  nghostnode = h5r->read_intScalar("Local_Node", "nghostnode");
+  nbadnode   = h5r->read_intScalar("Local_Node", "nbadnode");
+  nlocghonode = h5r->read_intScalar("Local_Node", "nlocghonode");
+  ntotalnode = h5r->read_intScalar("Local_Node", "ntotalnode");
 
-  nlocalnode = h5r->read_intScalar(gname.c_str(), "nlocalnode");
-  nghostnode = h5r->read_intScalar(gname.c_str(), "nghostnode");
-  nbadnode   = h5r->read_intScalar(gname.c_str(), "nbadnode");
-  nlocghonode = h5r->read_intScalar(gname.c_str(), "nlocghonode");
-  ntotalnode = h5r->read_intScalar(gname.c_str(), "ntotalnode");
-
-  h5r->read_intVector(gname.c_str(), "local_to_global", local_to_global);
+  local_to_global = h5r->read_intVector("Local_Node", "local_to_global");
+  
   if( nghostnode > 0)
-    h5r->read_intVector(gname.c_str(), "node_ghost", node_ghost);
+    node_ghost = h5r->read_intVector("Local_Node", "node_ghost");
   else
     node_ghost.clear();
   
-  h5r->read_intVector(gname.c_str(), "node_loc", node_loc);
+  node_loc = h5r->read_intVector("Local_Node", "node_loc");
 
   dof = h5r->read_intScalar("Global_Mesh_Info", "dofNum");
 
