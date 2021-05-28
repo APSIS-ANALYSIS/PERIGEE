@@ -336,19 +336,6 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_Prestress(
     PDNSolution * const &sol_wall_disp,
     bool &prestress_conv_flag, int &nl_counter ) const
 {
-#ifdef PETSC_USE_LOG
-  PetscLogEvent mat_assem_0_event, mat_assem_1_event;
-  PetscLogEvent vec_assem_0_event, vec_assem_1_event;
-  PetscLogEvent lin_solve_event;
-  PetscClassId classid_assembly;
-  PetscClassIdRegister("mat_vec_assembly", &classid_assembly);
-  PetscLogEventRegister("assembly mat 0", classid_assembly, &mat_assem_0_event);
-  PetscLogEventRegister("assembly mat 1", classid_assembly, &mat_assem_1_event);
-  PetscLogEventRegister("assembly vec 0", classid_assembly, &vec_assem_0_event);
-  PetscLogEventRegister("assembly vec 1", classid_assembly, &vec_assem_1_event);
-  PetscLogEventRegister("lin_solve", classid_assembly, &lin_solve_event);
-#endif
-
   // Initialize the counter and error
   nl_counter = 0;
   double residual_norm = 0.0, initial_norm = 0.0, relative_error = 0.0;
@@ -404,19 +391,11 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_Prestress(
   {
     gassem_ptr->Clear_KG();
 
-#ifdef PETSC_USE_LOG
-    PetscLogEventBegin(mat_assem_0_event, 0,0,0,0);
-#endif
-
     gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, &wall_disp_alpha,
         dot_sol, sol, curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
         elementw, quad_v, quad_s, lien_ptr, anode_ptr,
         feanode_ptr, nbc_part, ringnbc_part, ebc_part, ebc_wall_part, gbc );
    
-#ifdef PETSC_USE_LOG
-    PetscLogEventEnd(mat_assem_0_event,0,0,0,0);
-#endif
-
     SYS_T::commPrint("  --- M updated");
     
     // SetOperator will pass the tangent matrix to the linear solver and the
@@ -427,18 +406,10 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_Prestress(
   {
     gassem_ptr->Clear_G();
 
-#ifdef PETSC_USE_LOG
-    PetscLogEventBegin(vec_assem_0_event, 0,0,0,0);
-#endif
-
     gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, &wall_disp_alpha,
         dot_sol, sol, curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
         elementw, quad_v, quad_s, lien_ptr, anode_ptr,
         feanode_ptr, nbc_part, ebc_part, ebc_wall_part, gbc );
-
-#ifdef PETSC_USE_LOG
-    PetscLogEventEnd(vec_assem_0_event,0,0,0,0);
-#endif
   }
 
   VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
@@ -447,16 +418,8 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_Prestress(
   // Now do consistent Newton-Raphson iteration
   do
   {
-#ifdef PETSC_USE_LOG
-    PetscLogEventBegin(lin_solve_event, 0,0,0,0);
-#endif
-   
     // solve the equation K dot_step = G
     lsolver_ptr->Solve( gassem_ptr->G, dot_step );
-
-#ifdef PETSC_USE_LOG
-    PetscLogEventEnd(lin_solve_event,0,0,0,0);
-#endif
 
     bc_mat->MatMultSol( dot_step );
 
@@ -496,18 +459,10 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_Prestress(
     {
       gassem_ptr->Clear_KG();
 
-#ifdef PETSC_USE_LOG
-      PetscLogEventBegin(mat_assem_1_event, 0,0,0,0);
-#endif
-
       gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, &wall_disp_alpha,
           dot_sol, sol, curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
           elementw, quad_v, quad_s, lien_ptr, anode_ptr,
           feanode_ptr, nbc_part, ringnbc_part, ebc_part, ebc_wall_part, gbc );
-
-#ifdef PETSC_USE_LOG
-      PetscLogEventEnd(mat_assem_1_event,0,0,0,0);
-#endif
 
       SYS_T::commPrint("  --- M updated");
       lsolver_ptr->SetOperator(gassem_ptr->K);
@@ -516,18 +471,10 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_Prestress(
     {
       gassem_ptr->Clear_G();
 
-#ifdef PETSC_USE_LOG
-      PetscLogEventBegin(vec_assem_1_event, 0,0,0,0);
-#endif
-
       gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, &wall_disp_alpha,
           dot_sol, sol, curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
           elementw, quad_v, quad_s, lien_ptr, anode_ptr,
           feanode_ptr, nbc_part, ebc_part, ebc_wall_part, gbc );
-
-#ifdef PETSC_USE_LOG
-      PetscLogEventEnd(vec_assem_1_event,0,0,0,0);
-#endif
     }
 
     VecNorm(gassem_ptr->G, NORM_2, &residual_norm);
