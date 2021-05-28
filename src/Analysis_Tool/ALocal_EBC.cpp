@@ -31,11 +31,11 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
 
   for(int ii=0; ii<num_ebc; ++ii)
   {
-    std::string subgroup_name(groupbase);
-    subgroup_name.append( SYS_T::to_string(ii) );
-
     if( num_local_cell[ii] > 0 )
     {
+      std::string subgroup_name(groupbase);
+      subgroup_name.append( SYS_T::to_string(ii) );
+
       h5r -> read_doubleVector( subgroup_name.c_str(), "local_pt_xyz",
           local_pt_xyz[ii] );
 
