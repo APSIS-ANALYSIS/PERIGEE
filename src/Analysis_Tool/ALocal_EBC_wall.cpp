@@ -16,6 +16,8 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
   
   fluid_density = h5r -> read_doubleScalar(gname.c_str(), "fluid_density");
 
+  num_sur_node = h5r -> read_intScalar( gname.c_str(), "num_sur_node" );
+
   thickness.clear();
   youngsmod.clear();
   qua_prestress.clear();
@@ -45,6 +47,15 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
     }
   }
 
+  sur_node_pos.clear();
+  if( num_sur_node > 0 )
+  {
+    std::string subgroup_name(gname);
+    subgroup_name.append("/ebcid_0");
+
+    h5r -> read_intVector( subgroup_name.c_str(), "sur_node_pos", sur_node_pos );
+  }
+
   delete h5r; H5Fclose( file_id );
 }
 
@@ -53,6 +64,7 @@ ALocal_EBC_wall::~ALocal_EBC_wall()
   VEC_T::clean(thickness);
   VEC_T::clean(youngsmod);
   VEC_T::clean(qua_prestress);
+  VEC_T::clean(sur_node_pos);
 }
 
 void ALocal_EBC_wall::get_thickness( const int &eindex,
