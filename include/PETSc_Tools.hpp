@@ -26,6 +26,17 @@ namespace PETSc_T
   inline void print( const Vec &vv )
   {VecView(vv, PETSC_VIEWER_STDOUT_WORLD);}
 
+  // Save the sparse matrix to a file
+  inline void write_to_file( const Mat &K, const std::string &filename ) 
+  { 
+    PetscViewer viewer = PETSC_VIEWER_STDOUT_WORLD; 
+    PetscViewerSetType(viewer, PETSCVIEWERASCII); 
+    PetscViewerFileSetMode(viewer, FILE_MODE_WRITE); 
+    PetscViewerFileSetName(viewer, filename.c_str()); 
+    PetscViewerPushFormat(viewer, PETSC_VIEWER_ASCII_MATLAB); 
+    MatView(K, viewer); 
+  } 
+
   // Save the vector to a file
   inline void write_to_file( const Vec &vv, const std::string &filename ) 
   { 
