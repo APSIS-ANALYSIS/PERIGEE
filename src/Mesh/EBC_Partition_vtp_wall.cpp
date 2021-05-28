@@ -7,6 +7,8 @@ EBC_Partition_vtp_wall::EBC_Partition_vtp_wall(
 : EBC_Partition_vtp(part, mnindex, ebc),
   fluid_density( ebc-> get_fluid_density() )
 {
+  const int ebc_id = 0;
+  
   part_thickness.clear();
   part_youngsmod.clear();
 
@@ -15,7 +17,6 @@ EBC_Partition_vtp_wall::EBC_Partition_vtp_wall(
   {}
   else if(num_ebc == 1)
   {
-    const int ebc_id = 0;
     if( num_local_node[ebc_id] > 0 )
     {
       // access wall properties of the whole surface
