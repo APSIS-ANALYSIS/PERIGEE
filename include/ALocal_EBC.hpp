@@ -55,14 +55,6 @@ class ALocal_EBC
     {return num_local_cell[ii];}
 
     // ------------------------------------------------------------------------
-    // ! get the number of nodes in this partition. These may not be associated
-    //   with any surface cell in this partition.
-    //   \para 0 <= ii < num_ebc
-    // ------------------------------------------------------------------------
-    virtual int get_num_part_node(const int &ii) const 
-    {return num_part_node[ii];}
-
-    // ------------------------------------------------------------------------
     // ! get the number of local basis functions of the surface cells. This is
     //   directly associated with the cell element type.
     //   \para 0 <= ii < num_ebc
@@ -101,14 +93,6 @@ class ALocal_EBC
     // ------------------------------------------------------------------------
     virtual int get_local_node_pos(const int &ii, const int &jj) const
     {return local_node_pos[ii][jj];}
-
-    // ------------------------------------------------------------------------
-    // ! get the partition node's location in the local_to_global array.
-    //   \para 0 <= ii < num_ebc
-    //   \para 0 <= jj < num_part_node[ii] 
-    // ------------------------------------------------------------------------
-    virtual int get_part_node_pos(const int &ii, const int &jj) const
-    {return part_node_pos[ii][jj];}
 
     // ------------------------------------------------------------------------
     // ! get the local cell's volumetric mesh index.
@@ -278,6 +262,28 @@ class ALocal_EBC
       return -1.0;
     }
 
+    // ------------------------------------------------------------------------
+    // ! get the number of (wall) surface nodes in this partition. 
+    //   There may be nodes on the surface that are not associated with any surface 
+    //   cell in this partition, which means get_num_sur_node <= get_num_local_node
+    // ------------------------------------------------------------------------
+    virtual int get_num_sur_node() const 
+    {
+      SYS_T::print_fatal("Error: ALocal_EBC::get_num_sur_node is not implemented. \n");
+      return -1;
+    }
+    
+    // ------------------------------------------------------------------------
+    // ! get the location of the partition's (wall) surface node in the 
+    //   local_to_global array.
+    //   \para 0 <= ii < get_num_sur_node()
+    // ------------------------------------------------------------------------
+    virtual int get_sur_node_pos(const int &ii) const
+    {
+      SYS_T::print_fatal("Error: ALocal_EBC::get_sur_node_pos is not implemented. \n");
+      return -1;
+    }
+ 
   protected:
     // the number of different ebc domain on which one may prescribe different
     // elemental boundary conditions.
@@ -285,14 +291,12 @@ class ALocal_EBC
 
     // num_local_node[ii] gives the ii-th ebc's local node number. These are
     //                    nodes associated with local cells.
-    // num_local_cell[ii] gives the ii-th ebc's local cell number
-    // cell_nLocBas[ii] gives the cell's number of node. e.g., 
-    //                  triangle surface is 3,
-    //                  quadralaterial surface is 4,
-    //                  quadratic triangle surface is 6.
-    // num_part_node[ii]  gives the ii-th ebc's partition node number. These may not
-    //                    be associated with any local cell.
-    std::vector<int> num_local_node, num_local_cell, cell_nLocBas, num_part_node;
+    // num_local_cell[ii] gives the ii-th ebc's local cell number.
+    // cell_nLocBas[ii]   gives the cell's number of node. e.g., 
+    //                    triangle surface is 3,
+    //                    quadralaterial surface is 4,
+    //                    quadratic triangle surface is 6.
+    std::vector<int> num_local_node, num_local_cell, cell_nLocBas;
 
     // local_pt_xyz[ii] gives a list of local node's coordinates
     // size: num_ebc x (3 x num_local_node[ii])
@@ -313,11 +317,6 @@ class ALocal_EBC
     // local cell's corresponding volumetric element indices
     // size: num_ebc x num_local_cell[ii]
     std::vector< std::vector<int> > local_global_cell;
-
-    // partition node's position in the volumetric local portion's local_to_global array.
-    // size: num_ebc x num_part_node[ii]
-    std::vector< std::vector<int> > part_node_pos;
-
 };
 
 #endif
