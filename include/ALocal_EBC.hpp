@@ -43,6 +43,9 @@ class ALocal_EBC
     // 0 <= ii < num_ebc
     // ! get the number of all nodes associated with the surface cells within 
     //   this partition.
+    //
+    // Name to be changed to : get_num_local_cell_node
+    //
     // ------------------------------------------------------------------------
     virtual int get_num_local_node(const int &ii) const 
     {return num_local_node[ii];}
@@ -65,6 +68,10 @@ class ALocal_EBC
     // ! get the local node's spatial coordinates.
     //   \para 0 <= ii < num_ebc
     //   \para 0 <= jj < 3 x num_local_node[ii]
+    //
+    //
+    // Name to be changed to get_local_cell_node_xyz
+    //
     // ------------------------------------------------------------------------
     virtual double get_local_pt_xyz(const int &ii, const int &jj) const
     {return local_pt_xyz[ii][jj];}
@@ -82,6 +89,10 @@ class ALocal_EBC
     // ! get the local node's volumetric mesh index
     //   \para 0 <= ii < num_ebc
     //   \para 0 <= jj < num_local_node[ii]
+    //
+    //
+    // Name to be changed to get_local_cell_node_vol_id
+    //
     // ------------------------------------------------------------------------
     virtual int get_local_global_node(const int &ii, const int &jj) const
     {return local_global_node[ii][jj];}
@@ -89,7 +100,11 @@ class ALocal_EBC
     // ------------------------------------------------------------------------
     // ! get the local node's location in the local_to_global array.
     //   \para 0 <= ii < num_ebc
-    //   \para 0 <= jj < num_local_node[ii] 
+    //   \para 0 <= jj < num_local_node[ii]
+    //
+    //
+    // Name to be changed get_local_cell_node_pos
+    //
     // ------------------------------------------------------------------------
     virtual int get_local_node_pos(const int &ii, const int &jj) const
     {return local_node_pos[ii][jj];}
@@ -98,6 +113,9 @@ class ALocal_EBC
     // ! get the local cell's volumetric mesh index.
     //   \para 0 <= ii < num_ebc
     //   \para 0 <= jj < num_local_cell[ii]
+    //
+    // Name to be changed get_local_cell_vol_id
+    //
     // ------------------------------------------------------------------------
     virtual int get_local_global_cell(const int &ii, const int &jj) const
     {return local_global_cell[ii][jj];}
