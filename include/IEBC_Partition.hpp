@@ -52,8 +52,8 @@ class IEBC_Partition
     virtual int get_local_cell_node_vol_id(const int &ii, const int &jj) const
     {SYS_T::print_exit("Error: IEBC_Partition::get_local_cell_node_vol_id is not implemented. \n"); return 0;}
 
-    virtual int get_local_node_pos(const int &ii, const int &jj) const
-    {SYS_T::print_exit("Error: IEBC_Partition::get_local_node_pos is not implemented. \n"); return 0;}
+    virtual int get_local_cell_node_pos(const int &ii, const int &jj) const
+    {SYS_T::print_exit("Error: IEBC_Partition::get_local_cell_node_pos is not implemented. \n"); return 0;}
 
     virtual int get_local_global_cell(const int &ii, const int &jj) const
     {SYS_T::print_exit("Error: IEBC_Partition::get_local_global_cell is not implemented. \n"); return 0;}

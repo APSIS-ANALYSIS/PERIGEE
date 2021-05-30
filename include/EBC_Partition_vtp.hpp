@@ -54,8 +54,8 @@ class EBC_Partition_vtp : public IEBC_Partition
     virtual int get_local_cell_node_vol_id(const int &ii, const int &jj) const
     {return local_cell_node_vol_id[ii][jj];}
 
-    virtual int get_local_node_pos(const int &ii, const int &jj) const
-    {return local_node_pos[ii][jj];}
+    virtual int get_cell_local_node_pos(const int &ii, const int &jj) const
+    {return local_cell_node_pos[ii][jj];}
 
     virtual int get_local_global_cell(const int &ii, const int &jj) const
     {return local_global_cell[ii][jj];}
@@ -91,7 +91,7 @@ class EBC_Partition_vtp : public IEBC_Partition
     // note: local_to_global array is generated in the Part_xxx based on IPart
     // class, which stores the nodal indices of the local nodes followed by the
     // ghost nodes
-    std::vector< std::vector<int> > local_node_pos;
+    std::vector< std::vector<int> > local_cell_node_pos;
 
     // local cell's global index num_ebc x num_local_cell[ii] in size
     std::vector< std::vector<int> > local_global_cell;

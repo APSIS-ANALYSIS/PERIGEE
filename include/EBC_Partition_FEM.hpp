@@ -54,8 +54,8 @@ class EBC_Partition_FEM : public IEBC_Partition
     virtual int get_local_cell_node_vol_id(const int &ii, const int &jj) const
     {return local_cell_node_vol_id[ii][jj];}
 
-    virtual int get_local_node_pos(const int &ii, const int &jj) const
-    {return local_node_pos[ii][jj];}
+    virtual int get_local_cell_node_pos(const int &ii, const int &jj) const
+    {return local_cell_node_pos[ii][jj];}
 
     virtual int get_local_global_cell(const int &ii, const int &jj) const
     {return local_global_cell[ii][jj];}
@@ -64,20 +64,20 @@ class EBC_Partition_FEM : public IEBC_Partition
     const int cpu_rank;
     const int num_ebc;
 
-    std::vector<int> num_local_node, num_local_cell, cell_nLocBas;
+    std::vector<int> num_local_cell_node, num_local_cell, cell_nLocBas;
 
-    // local node's coordinates, num_ebc x (3 x num_local_node[ii]) in size
-    std::vector< std::vector<double> > local_pt_xyz;
+    // local cell node's coordinates, num_ebc x (3 x num_local_cell_node[ii]) in size
+    std::vector< std::vector<double> > local_cell_node_xyz;
 
     // local cell's IEN array, 
     // num_ebc x (cell_nLocBas[ii] x num_local_cell[ii]) in size
     std::vector< std::vector<int> > local_tri_ien;
 
-    // local node's global index, num_ebc x num_local_node[ii] in size
-    std::vector< std::vector<int> > local_global_node;
+    // local cell node's global index, num_ebc x num_local_cell_node[ii] in size
+    std::vector< std::vector<int> > local_cell_node_vol_id;
     
-    // local node's position in the local_to_global array
-    std::vector< std::vector<int> > local_node_pos;
+    // local cell node's position in the local_to_global array
+    std::vector< std::vector<int> > local_cell_node_pos;
 
     // local cell's global index num_ebc x num_local_cell[ii] in size
     std::vector< std::vector<int> > local_global_cell;
