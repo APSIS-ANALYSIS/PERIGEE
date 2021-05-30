@@ -2,7 +2,6 @@
 
 PDNSolution_Wall_Disp::PDNSolution_Wall_Disp( 
     const APart_Node * const &pNode,
-    const FEANode * const &fNode_ptr,
     const int &type, const bool &isprint )
 : PDNSolution( pNode, 3 ), is_print( isprint )
 {

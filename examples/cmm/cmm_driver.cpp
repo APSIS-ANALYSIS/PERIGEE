@@ -348,9 +348,9 @@ int main( int argc, char *argv[] )
 
   PDNSolution * dot_sol = new PDNSolution_NS( pNode, 0 );
 
-  PDNSolution * sol_wall_disp = new PDNSolution_Wall_Disp( pNode, fNode, 0 );
+  PDNSolution * sol_wall_disp = new PDNSolution_Wall_Disp( pNode, 0 );
   
-  PDNSolution * dot_sol_wall_disp = new PDNSolution_Wall_Disp( pNode, fNode, 0 );
+  PDNSolution * dot_sol_wall_disp = new PDNSolution_Wall_Disp( pNode, 0 );
 
   if( is_restart )
   {

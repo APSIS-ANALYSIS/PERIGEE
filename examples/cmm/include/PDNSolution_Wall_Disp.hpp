@@ -8,13 +8,11 @@
 // The solution has 3 dofs, that is the three componenet of displacement.
 // ==================================================================
 #include "PDNSolution.hpp"
-#include "FEANode.hpp"
 
 class PDNSolution_Wall_Disp : public PDNSolution
 {
   public:
     PDNSolution_Wall_Disp( const APart_Node * const &pNode,
-        const FEANode * const &fNode_ptr,
         const int &type, const bool &isprint = true );
 
     ~PDNSolution_Wall_Disp();
