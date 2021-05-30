@@ -277,7 +277,7 @@ class ALocal_EBC
     // ------------------------------------------------------------------------
     // ! get the location of the partition's (wall) surface node in the 
     //   local_to_global array.
-    //   \para 0 <= ii < get_num_local_node_on_pos()
+    //   \para 0 <= ii < get_num_local_node_on_sur_pos()
     // ------------------------------------------------------------------------
     virtual int get_local_node_on_sur_pos(const int &ii) const
     {
