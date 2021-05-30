@@ -165,7 +165,7 @@ void HDF5_Reader::read_intVector( const char * const &group_name,
     SYS_T::print_fatal( oss.str().c_str() );
   }
 
-  VEC_T::fillArray( out, intdata, ddims[0] );
+  out = VEC_T::fillArray( intdata, ddims[0] );
 
   delete [] ddims; delete [] intdata;
 }
@@ -187,8 +187,7 @@ std::vector<int> HDF5_Reader::read_intVector( const char * const &group_name,
     SYS_T::print_fatal( oss.str().c_str() );
   }
 
-  std::vector<int> out;
-  VEC_T::fillArray( out, intdata, ddims[0] );
+  std::vector<int> out = VEC_T::fillArray( intdata, ddims[0] );
 
   delete [] ddims; delete [] intdata;
 
@@ -213,7 +212,7 @@ void HDF5_Reader::read_doubleVector( const char * const &group_name,
     SYS_T::print_fatal( oss.str().c_str() );
   }
 
-  VEC_T::fillArray( out, ddata, ddims[0] );
+  out = VEC_T::fillArray( ddata, ddims[0] );
 
   delete [] ddims; delete [] ddata;
 }
@@ -235,8 +234,7 @@ std::vector<double> HDF5_Reader::read_doubleVector( const char * const &group_na
     SYS_T::print_fatal( oss.str().c_str() );
   }
   
-  std::vector<double> out;
-  VEC_T::fillArray( out, ddata, ddims[0] );
+  std::vector<double> out = VEC_T::fillArray( ddata, ddims[0] );
 
   delete [] ddims; delete [] ddata;
   return out;
@@ -263,7 +261,7 @@ void HDF5_Reader::read_intMatrix( const char * const &group_name,
   num_row = ddims[0];
   num_col = ddims[1];
 
-  VEC_T::fillArray( out, intdata, num_row * num_col );
+  out = VEC_T::fillArray( intdata, num_row * num_col );
 
   delete [] ddims; delete [] intdata;
 }
@@ -289,7 +287,7 @@ void HDF5_Reader::read_doubleMatrix( const char * const &group_name,
   num_row = ddims[0];
   num_col = ddims[1];
 
-  VEC_T::fillArray( out, ddata, num_row * num_col );
+  out = VEC_T::fillArray( ddata, num_row * num_col );
 
   delete [] ddims; delete [] ddata;
 }

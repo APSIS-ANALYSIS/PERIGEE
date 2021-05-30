@@ -65,13 +65,13 @@ namespace VEC_T
   // ! fillArray
   //   fill the array data into a vector, with array length len
   // --------------------------------------------------------------------------
-  template<typename T> void fillArray( std::vector<T> &vec,
-      const T * const &input, const int &len )
+  template<typename T> std::vector<T> fillArray( const T * const &input, const int &len )
   {
-    vec.clear(); vec.resize(len);
+    std::vector<T> vec(len);
     for(int ii=0; ii<len; ++ii) vec[ii] = input[ii];
     
     shrink2fit(vec);
+    return vec;
   }
 
   // --------------------------------------------------------------------------
