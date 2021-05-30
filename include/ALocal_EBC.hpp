@@ -270,7 +270,7 @@ class ALocal_EBC
     // ------------------------------------------------------------------------
     virtual int get_num_local_node_on_sur() const 
     {
-      SYS_T::print_fatal("Error: ALocal_EBC::get_num_local_node_on_pos is not implemented. \n");
+      SYS_T::print_fatal("Error: ALocal_EBC::get_num_local_node_on_sur is not implemented. \n");
       return -1;
     }
     
