@@ -265,22 +265,22 @@ class ALocal_EBC
     // ------------------------------------------------------------------------
     // ! get the number of (wall) surface nodes in this partition. 
     //   There may be nodes on the surface that are not associated with any surface 
-    //   cell in this partition, which means get_num_sur_node <= get_num_local_cell_node
+    //   cell in this partition, which means get_num_local_node <= get_num_local_cell_node
     // ------------------------------------------------------------------------
-    virtual int get_num_sur_node() const 
+    virtual int get_num_local_node() const 
     {
-      SYS_T::print_fatal("Error: ALocal_EBC::get_num_sur_node is not implemented. \n");
+      SYS_T::print_fatal("Error: ALocal_EBC::get_num_local_node is not implemented. \n");
       return -1;
     }
     
     // ------------------------------------------------------------------------
     // ! get the location of the partition's (wall) surface node in the 
     //   local_to_global array.
-    //   \para 0 <= ii < get_num_sur_node()
+    //   \para 0 <= ii < get_num_local_node()
     // ------------------------------------------------------------------------
-    virtual int get_sur_node_pos(const int &ii) const
+    virtual int get_local_node_pos(const int &ii) const
     {
-      SYS_T::print_fatal("Error: ALocal_EBC::get_sur_node_pos is not implemented. \n");
+      SYS_T::print_fatal("Error: ALocal_EBC::get_local_node_pos is not implemented. \n");
       return -1;
     }
  

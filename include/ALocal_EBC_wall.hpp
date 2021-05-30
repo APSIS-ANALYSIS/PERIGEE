@@ -26,7 +26,7 @@ class ALocal_EBC_wall : public ALocal_EBC
 
     virtual void print_info() const;
 
-    virtual int get_num_sur_node() const {return num_sur_node;}
+    virtual int get_num_local_node() const {return num_local_node;}
 
     // ee is the local element index, ranges in [ 0, num_local_cell[0] )
     // elem_thickness is the output with length cell_nLocBas[0], which
@@ -37,7 +37,7 @@ class ALocal_EBC_wall : public ALocal_EBC
     // represents the Young's modulus at each local node
     virtual void get_youngsmod(const int &ee, double * const &elem_youngsmod) const;
 
-    virtual int get_sur_node_pos( const int &ii ) const {return sur_node_pos[ii];}
+    virtual int get_local_node_pos( const int &ii ) const {return local_node_pos[ii];}
 
     // elem_quaprestress is the output with length 6 x num_local_cell[0] x
     // num_face_nqp, which represents the prestress values at each quadrature
@@ -70,17 +70,17 @@ class ALocal_EBC_wall : public ALocal_EBC
     double fluid_density;
 
     // The number of surface nodes belonging to this subdomain
-    int num_sur_node;
+    int num_local_node;
 
     // If this partition owns any part of the wall, the thickness and
     // youngsmod vectors are each of length num_local_node[0].
     // Otherwise, these vectors are of length 0.
     std::vector<double> thickness, youngsmod;
 
-    // If num_sur_node > 0, this partition owns wall surface nodes, and
-    // their position in the local_to_global array is stored in sur_node_pos
-    // Length num_sur_node
-    std::vector<int> sur_node_pos;
+    // If num_local_node > 0, this partition owns wall surface nodes, and
+    // their position in the local_to_global array is stored in local_node_pos
+    // Length num_local_node
+    std::vector<int> local_node_pos;
 
     // Prestress components (6 in Voigt notation) per quadrature point
     // Length 6 x face_nqp x num_local_cell[0]
