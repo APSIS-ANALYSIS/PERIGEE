@@ -43,8 +43,8 @@ class IEBC_Partition
     virtual int get_cell_nLocBas(const int &ii) const
     {SYS_T::print_exit("Error: IEBC_Partition::get_cell_nLocBas is not implemented. \n"); return 0;}
 
-    virtual double get_local_pt_xyz(const int &ii, const int &jj) const
-    {SYS_T::print_exit("Error: IEBC_Partition::get_local_pt_xyz is not implemented. \n"); return 0.0;}
+    virtual double get_local_cell_node_xyz(const int &ii, const int &jj) const
+    {SYS_T::print_exit("Error: IEBC_Partition::get_local_cell_node_xyz is not implemented. \n"); return 0.0;}
 
     virtual int get_local_tri_ien(const int &ii, const int &jj) const
     {SYS_T::print_exit("Error: IEBC_Partition::get_local_tri_ien is not implemented. \n"); return 0;}

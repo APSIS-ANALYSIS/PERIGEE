@@ -45,8 +45,8 @@ class EBC_Partition_vtp : public IEBC_Partition
     virtual int get_cell_nLocBas(const int &ii) const
     {return cell_nLocBas[ii];}
 
-    virtual double get_local_pt_xyz(const int &ii, const int &jj) const
-    {return local_pt_xyz[ii][jj];}
+    virtual double get_local_cell_node_xyz(const int &ii, const int &jj) const
+    {return local_cell_node_xyz[ii][jj];}
 
     virtual int get_local_tri_ien(const int &ii, const int &jj) const
     {return local_tri_ien[ii][jj];}
@@ -69,7 +69,7 @@ class EBC_Partition_vtp : public IEBC_Partition
     std::vector<int> num_local_cell_node, num_local_cell, cell_nLocBas;
 
     // local cell node's coordinates, num_ebc x (3 x num_local_cell_node[ii]) in size
-    std::vector< std::vector<double> > local_pt_xyz;
+    std::vector< std::vector<double> > local_cell_node_xyz;
 
     // local cell's IEN array, 
     // num_ebc x (cell_nLocBas[ii] x num_local_cell[ii]) in size

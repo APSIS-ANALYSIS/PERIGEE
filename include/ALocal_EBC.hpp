@@ -62,16 +62,12 @@ class ALocal_EBC
     virtual int get_cell_nLocBas(const int &ii) const {return cell_nLocBas[ii];}
 
     // ------------------------------------------------------------------------
-    // ! get the local node's spatial coordinates.
+    // ! get the local cell node's spatial coordinates.
     //   \para 0 <= ii < num_ebc
     //   \para 0 <= jj < 3 x num_local_cell_node[ii]
-    //
-    //
-    // Name to be changed to get_local_cell_node_xyz
-    //
     // ------------------------------------------------------------------------
-    virtual double get_local_pt_xyz(const int &ii, const int &jj) const
-    {return local_pt_xyz[ii][jj];}
+    virtual double get_local_cell_node_xyz(const int &ii, const int &jj) const
+    {return local_cell_node_xyz[ii][jj];}
 
     // ------------------------------------------------------------------------
     // ! get the local cell's IEN connectivity array, with ranges in the local
@@ -83,7 +79,7 @@ class ALocal_EBC
     {return local_tri_ien[ii][jj];}
 
     // ------------------------------------------------------------------------
-    // ! get the local node's volumetric mesh index
+    // ! get the local cell node's volumetric mesh index
     //   \para 0 <= ii < num_ebc
     //   \para 0 <= jj < num_local_cell_node[ii]
     //
@@ -313,9 +309,9 @@ class ALocal_EBC
     //                    quadratic triangle surface is 6.
     std::vector<int> num_local_cell_node, num_local_cell, cell_nLocBas;
 
-    // local_pt_xyz[ii] gives a list of local cell node's coordinates
-    // size: num_ebc x (3 x num_local_node[ii])
-    std::vector< std::vector<double> > local_pt_xyz;
+    // local_cell_node_xyz[ii] gives a list of local cell node's coordinates
+    // size: num_ebc x (3 x num_local_cell_node[ii])
+    std::vector< std::vector<double> > local_cell_node_xyz;
 
     // local_tri_ien[ii] gives the local cell's IEN array
     // size: num_ebc x (cell_nLocBas[ii] x num_local_cell[ii]) 
