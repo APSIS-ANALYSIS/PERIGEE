@@ -163,12 +163,8 @@ class HDF5_Reader
     //   This is the read function that will read from the file
     //   specified by file_id.
     //   \para group_name : the name of the group
-    //   \para data_name : the name of the dataset in the group
-    //   \para string_out : the string data
+    //   \para data_name  : the name of the dataset in the group
     // --------------------------------------------------------------
-    void read_string( const char * const &group_name,
-        const char * const &data_name, std::string &string_out ) const;
-
     std::string read_string( const char * const &group_name,
         const char * const &data_name ) const;
 

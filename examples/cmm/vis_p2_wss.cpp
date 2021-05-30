@@ -51,9 +51,6 @@ int main( int argc, char * argv[] )
   int time_step = 1;
   int time_end = 1;
 
-  std::string geo_file, wall_file;
-  int elemType = 502;
-
   const int nLocBas = 6;
   const int v_nLocBas = 10;
 
@@ -70,9 +67,9 @@ int main( int argc, char * argv[] )
   hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
-  cmd_h5r -> read_string("/", "geo_file", geo_file);
-  cmd_h5r -> read_string("/", "sur_file_wall", wall_file);
-  elemType = cmd_h5r -> read_intScalar("/", "elemType");
+  const std::string geo_file = cmd_h5r -> read_string("/", "geo_file");
+  const std::string wall_file = cmd_h5r -> read_string("/", "sur_file_wall");
+  const int elemType = cmd_h5r -> read_intScalar("/", "elemType");
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 

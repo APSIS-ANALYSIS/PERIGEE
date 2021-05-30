@@ -28,14 +28,11 @@ int main( int argc, char * argv[] )
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
   SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: prepost is a serial program! \n");
 
-  // Read preprocessor command-line arguements recorded in the .h5 file
-  std::string geo_file;
-  
   hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
 
-  cmd_h5r -> read_string("/", "geo_file", geo_file);
+  const std::string geo_file = cmd_h5r -> read_string("/", "geo_file");
   const int elemType = cmd_h5r -> read_intScalar("/","elemType");
   const int dofNum = cmd_h5r -> read_intScalar("/","dofNum");
   const int dofMat   = cmd_h5r -> read_intScalar("/","dofMat");

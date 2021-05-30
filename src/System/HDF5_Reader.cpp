@@ -292,46 +292,6 @@ void HDF5_Reader::read_doubleMatrix( const char * const &group_name,
   delete [] ddims; delete [] ddata;
 }
 
-void HDF5_Reader::read_string( const char * const &group_name,
-    const char * const &data_name,
-    std::string &string_out ) const
-{
-  // open group file and data file
-  hid_t group_id = H5Gopen(file_id, group_name, H5P_DEFAULT);
-  hid_t data_id  = H5Dopen(group_id, data_name, H5P_DEFAULT);
-
-  hid_t filetype = H5Dget_type( data_id );
-  size_t sdim = H5Tget_size( filetype );
-  sdim++;
-
-  hid_t data_space = H5Dget_space( data_id );
-
-  hid_t data_rank = H5Sget_simple_extent_ndims( data_space );
-
-  SYS_T::print_fatal_if(data_rank!=1,
-      "Error: HDF5_Reader::read_string file format is wrong.\n");
-
-  hsize_t data_dims[1];
-
-  H5Sget_simple_extent_dims( data_space ,data_dims, NULL );
-
-  char * rdata = new char [sdim * data_dims[0]];
-
-  hid_t memtype = H5Tcopy(H5T_C_S1);
-  H5Tset_size(memtype, sdim);
-
-  H5Dread(data_id, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata);
-
-  string_out.assign(rdata);
-
-  delete [] rdata; rdata = NULL;
-  H5Tclose( memtype );
-  H5Tclose( filetype );
-  H5Sclose( data_space );
-  H5Dclose( data_id );
-  H5Gclose( group_id );
-}
-
 std::string HDF5_Reader::read_string( const char * const &group_name,
     const char * const &data_name ) const
 {
