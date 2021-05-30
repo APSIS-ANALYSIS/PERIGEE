@@ -17,17 +17,17 @@ EBC_Partition_vtp_wall::EBC_Partition_vtp_wall(
   {}
   else if(num_ebc == 1)
   {
-    if( num_local_node[ebc_id] > 0 )
+    if( num_local_cell_node[ebc_id] > 0 )
     {
       // access wall properties of the whole surface
       std::vector<double> temp_th = ebc -> get_wall_thickness();
       std::vector<double> temp_E  = ebc -> get_wall_youngsmod();
 
       // save wall properties only belonging to nodes in the partition
-      for( int ii=0; ii<num_local_node[ebc_id]; ++ii )
+      for( int ii=0; ii<num_local_cell_node[ebc_id]; ++ii )
       {
-        part_thickness.push_back( temp_th[ local_node[ebc_id][ii] ] );
-        part_youngsmod.push_back( temp_E[  local_node[ebc_id][ii] ] );
+        part_thickness.push_back( temp_th[ local_cell_node[ebc_id][ii] ] );
+        part_youngsmod.push_back( temp_E[  local_cell_node[ebc_id][ii] ] );
       }
     }
   }

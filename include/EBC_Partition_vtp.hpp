@@ -36,8 +36,8 @@ class EBC_Partition_vtp : public IEBC_Partition
 
     virtual int get_num_ebc() const {return num_ebc;}
 
-    virtual int get_num_local_node(const int &ii) const
-    {return num_local_node[ii];}
+    virtual int get_num_local_cell_node(const int &ii) const
+    {return num_local_cell_node[ii];}
 
     virtual int get_num_local_cell(const int &ii) const
     {return num_local_cell[ii];}
@@ -66,28 +66,28 @@ class EBC_Partition_vtp : public IEBC_Partition
     const int num_ebc; // Number of groups of bc faces that require bc integral
 
     // length is num_ebc
-    std::vector<int> num_local_node, num_local_cell, cell_nLocBas;
+    std::vector<int> num_local_cell_node, num_local_cell, cell_nLocBas;
 
-    // local node's coordinates, num_ebc x (3 x num_local_node[ii]) in size
+    // local cell node's coordinates, num_ebc x (3 x num_local_cell_node[ii]) in size
     std::vector< std::vector<double> > local_pt_xyz;
 
     // local cell's IEN array, 
     // num_ebc x (cell_nLocBas[ii] x num_local_cell[ii]) in size
     std::vector< std::vector<int> > local_tri_ien;
 
-    // local node's global index, num_ebc x num_local_node[ii] in size
+    // local cell node's global index, num_ebc x num_local_cell_node[ii] in size
     // local means local to the CPU's subdomain
     // global means indices in the volumetric mesh
     std::vector< std::vector<int> > local_global_node;
    
-    // local node's index in the surface wall mesh
-    // here, the local node is defined as all nodes of the local elements,
+    // local cell node's index in the surface wall mesh
+    // here, the local cell node is defined as all nodes of the local elements,
     // which means there could be some ghost nodes for the mesh partitioning
     // num_ebc x num_local_node[ii]
     // note: this data is NOT stored into the hdf5 file
-    std::vector< std::vector<int> > local_node;
+    std::vector< std::vector<int> > local_cell_node;
 
-    // local node's position in the local_to_global array
+    // local cell node's position in the local_to_global array
     // note: local_to_global array is generated in the Part_xxx based on IPart
     // class, which stores the nodal indices of the local nodes followed by the
     // ghost nodes

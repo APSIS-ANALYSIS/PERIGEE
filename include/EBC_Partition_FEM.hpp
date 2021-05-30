@@ -36,8 +36,8 @@ class EBC_Partition_FEM : public IEBC_Partition
 
     virtual int get_num_ebc() const {return num_ebc;}
 
-    virtual int get_num_local_node(const int &ii) const
-    {return num_local_node[ii];}
+    virtual int get_num_local_cell_node(const int &ii) const
+    {return num_local_cell_node[ii];}
 
     virtual int get_num_local_cell(const int &ii) const
     {return num_local_cell[ii];}

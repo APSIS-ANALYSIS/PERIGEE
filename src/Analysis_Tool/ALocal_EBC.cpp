@@ -13,7 +13,7 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
 
   if( num_ebc > 0)
   {
-    h5r -> read_intVector(gname.c_str(), "num_local_node", num_local_node );
+    h5r -> read_intVector(gname.c_str(), "num_local_cell_node", num_local_cell_node );
 
     h5r -> read_intVector(gname.c_str(), "num_local_cell", num_local_cell );
 
@@ -66,7 +66,7 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
 
 ALocal_EBC::~ALocal_EBC()
 {
-  VEC_T::clean( num_local_node );
+  VEC_T::clean( num_local_cell_node );
   VEC_T::clean( num_local_cell );
   VEC_T::clean( cell_nLocBas );
   VEC_T::clean( local_pt_xyz );

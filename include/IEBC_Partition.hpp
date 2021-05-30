@@ -34,8 +34,8 @@ class IEBC_Partition
     virtual int get_num_ebc() const 
     {SYS_T::print_exit("Error: IEBC_Partition::get_num_ebc is not implemented. \n"); return 0;}
 
-    virtual int get_num_local_node(const int &ii) const
-    {SYS_T::print_exit("Error: IEBC_Partition::get_num_local_node is not implemented. \n"); return 0;}
+    virtual int get_num_local_cell_node(const int &ii) const
+    {SYS_T::print_exit("Error: IEBC_Partition::get_num_local_cell_node is not implemented. \n"); return 0;}
 
     virtual int get_num_local_cell(const int &ii) const
     {SYS_T::print_exit("Error: IEBC_Partition::get_num_local_cell is not implemented. \n"); return 0;}
