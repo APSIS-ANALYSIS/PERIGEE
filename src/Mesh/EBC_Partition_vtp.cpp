@@ -10,7 +10,7 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
   cell_nLocBas.clear();
   local_cell_node_xyz.clear();
   local_tri_ien.clear();
-  local_global_node.clear();
+  local_cell_node_vol_id.clear();
   local_cell_node.clear();
   local_node_pos.clear();
   local_global_cell.clear();
@@ -21,7 +21,7 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
   cell_nLocBas.resize( num_ebc );
   local_cell_node_xyz.resize( num_ebc );
   local_tri_ien.resize( num_ebc );
-  local_global_node.resize( num_ebc );
+  local_cell_node_vol_id.resize( num_ebc );
   local_cell_node.resize( num_ebc );
   local_node_pos.resize( num_ebc );
   local_global_cell.resize( num_ebc );
@@ -73,15 +73,15 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
     // For each local cell node, extract nodal xyz-coordinates and the global
     // volumetric mesh index.
     local_cell_node_xyz[ii].resize(num_local_cell_node[ii] * 3);
-    local_global_node[ii].resize( num_local_cell_node[ii] );
+    local_cell_node_vol_id[ii].resize( num_local_cell_node[ii] );
     local_node_pos[ii].resize( num_local_cell_node[ii] );
     for(int jj=0; jj<num_local_cell_node[ii]; ++jj)
     {
       local_cell_node_xyz[ii][3*jj]   = ebc->get_pt_xyz( ii, local_cell_node[ii][jj], 0 );
       local_cell_node_xyz[ii][3*jj+1] = ebc->get_pt_xyz( ii, local_cell_node[ii][jj], 1 );
       local_cell_node_xyz[ii][3*jj+2] = ebc->get_pt_xyz( ii, local_cell_node[ii][jj], 2 );
-      local_global_node[ii][jj] = ebc->get_global_node( ii, local_cell_node[ii][jj] );
-      local_node_pos[ii][jj] = part->get_nodeLocGhoIndex( mnindex->get_old2new( local_global_node[ii][jj] ) );
+      local_cell_node_vol_id[ii][jj] = ebc->get_global_node( ii, local_cell_node[ii][jj] );
+      local_node_pos[ii][jj] = part->get_nodeLocGhoIndex( mnindex->get_old2new( local_cell_node_vol_id[ii][jj] ) );
       assert(local_node_pos[ii][jj] >= 0);
     }
 
@@ -108,7 +108,7 @@ EBC_Partition_vtp::~EBC_Partition_vtp()
   VEC_T::clean( cell_nLocBas );
   VEC_T::clean( local_cell_node_xyz );
   VEC_T::clean( local_tri_ien );
-  VEC_T::clean( local_global_node );
+  VEC_T::clean( local_cell_node_vol_id );
   VEC_T::clean( local_cell_node );
   VEC_T::clean( local_node_pos );
   VEC_T::clean( local_global_cell );
@@ -150,7 +150,7 @@ void EBC_Partition_vtp::write_hdf5( const char * FileName ) const
 
       h5w->write_intVector( group_id, "local_tri_ien", local_tri_ien[ii] );
 
-      h5w->write_intVector( group_id, "local_global_node", local_global_node[ii] );
+      h5w->write_intVector( group_id, "local_cell_node_vol_id", local_cell_node_vol_id[ii] );
 
       h5w->write_intVector( group_id, "local_node_pos", local_node_pos[ii] );
 
@@ -200,7 +200,7 @@ void EBC_Partition_vtp::write_hdf5( const char * FileName,
 
       h5w->write_intVector( group_id, "local_tri_ien", local_tri_ien[ii] );
 
-      h5w->write_intVector( group_id, "local_global_node", local_global_node[ii] );
+      h5w->write_intVector( group_id, "local_cell_node_vol_id", local_cell_node_vol_id[ii] );
 
       h5w->write_intVector( group_id, "local_node_pos", local_node_pos[ii] );
 
@@ -228,8 +228,8 @@ void EBC_Partition_vtp::print_info() const
   for(int ii=0; ii<num_ebc; ++ii)
   {
     std::cout<<"-- ebc_id = "<<ii<<std::endl;
-    std::cout<<"   local_global_node : \n";
-    VEC_T::print( local_global_node[ii] );
+    std::cout<<"   local_cell_node_vol_id : \n";
+    VEC_T::print( local_cell_node_vol_id[ii] );
     std::cout<<"   local_cell_node_xyz : \n";
     VEC_T::print( local_cell_node_xyz[ii] );
     std::cout<<"   local_global_cell : \n";

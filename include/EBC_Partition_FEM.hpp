@@ -51,8 +51,8 @@ class EBC_Partition_FEM : public IEBC_Partition
     virtual int get_local_tri_ien(const int &ii, const int &jj) const
     {return local_tri_ien[ii][jj];}
 
-    virtual int get_local_global_node(const int &ii, const int &jj) const
-    {return local_global_node[ii][jj];}
+    virtual int get_local_cell_node_vol_id(const int &ii, const int &jj) const
+    {return local_cell_node_vol_id[ii][jj];}
 
     virtual int get_local_node_pos(const int &ii, const int &jj) const
     {return local_node_pos[ii][jj];}

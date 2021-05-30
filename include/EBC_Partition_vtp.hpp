@@ -51,8 +51,8 @@ class EBC_Partition_vtp : public IEBC_Partition
     virtual int get_local_tri_ien(const int &ii, const int &jj) const
     {return local_tri_ien[ii][jj];}
 
-    virtual int get_local_global_node(const int &ii, const int &jj) const
-    {return local_global_node[ii][jj];}
+    virtual int get_local_cell_node_vol_id(const int &ii, const int &jj) const
+    {return local_cell_node_vol_id[ii][jj];}
 
     virtual int get_local_node_pos(const int &ii, const int &jj) const
     {return local_node_pos[ii][jj];}
@@ -78,7 +78,7 @@ class EBC_Partition_vtp : public IEBC_Partition
     // local cell node's global index, num_ebc x num_local_cell_node[ii] in size
     // local means local to the CPU's subdomain
     // global means indices in the volumetric mesh
-    std::vector< std::vector<int> > local_global_node;
+    std::vector< std::vector<int> > local_cell_node_vol_id;
    
     // local cell node's index in the surface wall mesh
     // here, the local cell node is defined as all nodes of the local elements,

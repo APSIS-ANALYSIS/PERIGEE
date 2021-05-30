@@ -82,13 +82,9 @@ class ALocal_EBC
     // ! get the local cell node's volumetric mesh index
     //   \para 0 <= ii < num_ebc
     //   \para 0 <= jj < num_local_cell_node[ii]
-    //
-    //
-    // Name to be changed to get_local_cell_node_vol_id
-    //
     // ------------------------------------------------------------------------
-    virtual int get_local_global_node(const int &ii, const int &jj) const
-    {return local_global_node[ii][jj];}
+    virtual int get_local_cell_node_vol_id(const int &ii, const int &jj) const
+    {return local_cell_node_vol_id[ii][jj];}
 
     // ------------------------------------------------------------------------
     // ! get the local node's location in the local_to_global array.
@@ -317,11 +313,11 @@ class ALocal_EBC
     // size: num_ebc x (cell_nLocBas[ii] x num_local_cell[ii]) 
     std::vector< std::vector<int> > local_tri_ien;
 
-    // local nodes' global indices
+    // local cell nodes' global indices
     // size: num_ebc x num_local_cell_node[ii]
-    std::vector< std::vector<int> > local_global_node;
+    std::vector< std::vector<int> > local_cell_node_vol_id;
 
-    // local node's position in the volumetric local portion's local_to_global array.
+    // local cell node's position in the volumetric local portion's local_to_global array.
     // size: num_ebc x num_local_cell_node[ii]
     std::vector< std::vector<int> > local_node_pos;
 
