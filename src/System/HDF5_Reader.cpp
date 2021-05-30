@@ -170,9 +170,8 @@ void HDF5_Reader::read_intVector( const char * const &group_name,
   delete [] ddims; delete [] intdata;
 }
 
-void HDF5_Reader::read_intVector( const char * const &group_name,
-    const char * const &data_name,
-    std::vector<int> &out ) const
+std::vector<int> HDF5_Reader::read_intVector( const char * const &group_name,
+    const char * const &data_name ) const
 {
   hid_t drank;
   hsize_t * ddims;
@@ -188,9 +187,12 @@ void HDF5_Reader::read_intVector( const char * const &group_name,
     SYS_T::print_fatal( oss.str().c_str() );
   }
 
+  std::vector<int> out;
   VEC_T::fillArray( out, intdata, ddims[0] );
 
   delete [] ddims; delete [] intdata;
+
+  return out;
 }
 
 void HDF5_Reader::read_doubleVector( const char * const &group_name,
@@ -216,9 +218,8 @@ void HDF5_Reader::read_doubleVector( const char * const &group_name,
   delete [] ddims; delete [] ddata;
 }
 
-void HDF5_Reader::read_doubleVector( const char * const &group_name,
-    const char * const &data_name,
-    std::vector<double> &out ) const
+std::vector<double> HDF5_Reader::read_doubleVector( const char * const &group_name,
+    const char * const &data_name ) const
 {
   hid_t drank;
   hsize_t * ddims;
@@ -233,10 +234,12 @@ void HDF5_Reader::read_doubleVector( const char * const &group_name,
     oss<<" with name "<<data_name<<" is not a 1D vector! \n";
     SYS_T::print_fatal( oss.str().c_str() );
   }
-
+  
+  std::vector<double> out;
   VEC_T::fillArray( out, ddata, ddims[0] );
 
   delete [] ddims; delete [] ddata;
+  return out;
 }
 
 void HDF5_Reader::read_intMatrix( const char * const &group_name,
@@ -331,9 +334,8 @@ void HDF5_Reader::read_string( const char * const &group_name,
   H5Gclose( group_id );
 }
 
-void HDF5_Reader::read_string( const char * const &group_name,
-    const char * const &data_name,
-    std::string &string_out ) const
+std::string HDF5_Reader::read_string( const char * const &group_name,
+    const char * const &data_name ) const
 {
   // open group file and data file
   hid_t group_id = H5Gopen(file_id, group_name, H5P_DEFAULT);
@@ -361,6 +363,7 @@ void HDF5_Reader::read_string( const char * const &group_name,
 
   H5Dread(data_id, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata);
 
+  std::string string_out;
   string_out.assign(rdata);
 
   delete [] rdata; rdata = NULL;
@@ -369,6 +372,8 @@ void HDF5_Reader::read_string( const char * const &group_name,
   H5Sclose( data_space );
   H5Dclose( data_id );
   H5Gclose( group_id );
+
+  return string_out;
 }
 
 // EOF
