@@ -36,15 +36,15 @@ EBC_Partition_vtp_wall::EBC_Partition_vtp_wall(
 
   // For wall surface, we keep a copy of the nodes belonging to this CPU's
   // subdomain
-  local_node_pos.clear();
+  local_node_on_sur_pos.clear();
   for(int ii=0; ii<ebc->get_num_node(ebc_id); ++ii)
   {
     const int node_id = mnindex -> get_old2new( ebc->get_global_node(ebc_id, ii) );
     if( part -> isNodeInPart( node_id ) )
-      local_node_pos.push_back( part -> get_nodeLocGhoIndex( node_id ) );
+      local_node_on_sur_pos.push_back( part -> get_nodeLocGhoIndex( node_id ) );
   }
 
-  num_local_node = static_cast<int>( local_node_pos.size() );
+  num_local_node_on_sur = static_cast<int>( local_node_on_sur_pos.size() );
 
 }
 
@@ -52,7 +52,7 @@ EBC_Partition_vtp_wall::~EBC_Partition_vtp_wall()
 {
   VEC_T::clean( part_thickness );
   VEC_T::clean( part_youngsmod );
-  VEC_T::clean( local_node_pos );
+  VEC_T::clean( local_node_on_sur_pos );
 }
 
 void EBC_Partition_vtp_wall::write_hdf5( const char * FileName ) const
@@ -74,7 +74,7 @@ void EBC_Partition_vtp_wall::write_hdf5( const char * FileName ) const
 
   h5w -> write_doubleScalar( g_id, "fluid_density", fluid_density );
 
-  h5w -> write_intScalar( g_id, "num_local_node", num_local_node );
+  h5w -> write_intScalar( g_id, "num_local_node_on_sur", num_local_node_on_sur );
 
   // num_ebc = 1 for wall elem bc, and ebc_id is 0
   const int ebc_id = 0;
@@ -88,11 +88,11 @@ void EBC_Partition_vtp_wall::write_hdf5( const char * FileName ) const
     H5Gclose( group_id );
   }
 
-  if( num_local_node > 0 )
+  if( num_local_node_on_sur > 0 )
   {
     hid_t group_id = H5Gopen( g_id, "ebcid_0", H5P_DEFAULT );
 
-    h5w -> write_intVector( group_id, "local_node_pos", local_node_pos );
+    h5w -> write_intVector( group_id, "local_node_on_sur_pos", local_node_on_sur_pos );
 
     H5Gclose( group_id );
   }

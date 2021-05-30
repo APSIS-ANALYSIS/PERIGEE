@@ -357,11 +357,11 @@ void PNonlinear_CMM_Solver::update_wall( const double &val,
   VecGetArray(ldotstep, &array_dotstep);
   VecGetArray(lwalldata, &array_walldata);
 
-  const int num_snode = ebc_wall_part -> get_num_local_node();
+  const int num_snode = ebc_wall_part -> get_num_local_node_on_sur();
 
   for(int ii=0; ii<num_snode; ++ii)
   {
-    const int pos = ebc_wall_part -> get_local_node_pos(ii);
+    const int pos = ebc_wall_part -> get_local_node_on_sur_pos(ii);
 
     array_walldata[pos*3]   += val * array_dotstep[pos*4+1];
     array_walldata[pos*3+1] += val * array_dotstep[pos*4+2];

@@ -41,15 +41,15 @@ class EBC_Partition_vtp_wall : public EBC_Partition_vtp
     std::vector<double> part_youngsmod;
 
     // The number of surface nodes beloging to this subdomain
-    int num_local_node;
+    int num_local_node_on_sur;
 
-    // The position of all surface nodes of this partition in the 
+    // The position of all local nodes on the wall surface in the 
     // local_to_global array ( of the volumetric nodal indices).
     // Here, partition nodes are all surface nodes belonging to the CPU's subdomain,
     // which may not be associated with any cell in the local partition.
-    // This allows for nodal update of surface solutions only.
-    // Length is  num_local_node
-    std::vector<int> local_node_pos;
+    // It is used for nodal update of surface solutions only.
+    // Length is  num_local_node_on_sur
+    std::vector<int> local_node_on_sur_pos;
 };
 
 #endif
