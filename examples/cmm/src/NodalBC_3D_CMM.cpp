@@ -1,6 +1,6 @@
 #include "NodalBC_3D_CMM.hpp"
 
-NodalBC_3D_CMM::NodalBC_3D_CMM( const int &nFunc )
+NodalBC_3D_CMM::NodalBC_3D_CMM( const int &nFunc, const bool &is_all_node )
 {
   dir_nodes.clear();
   per_slave_nodes.clear();
@@ -8,9 +8,22 @@ NodalBC_3D_CMM::NodalBC_3D_CMM( const int &nFunc )
   num_dir_nodes = 0;
   num_per_nodes = 0;
 
+  if( is_all_node )
+  {
+    for(unsigned int ii=0; ii<static_cast<unsigned int>(nFunc); ++ii)
+      dir_nodes.push_back( ii );
+
+    VEC_T::sort_unique_resize(dir_nodes);
+
+    num_dir_nodes = dir_nodes.size();
+  }
+
   Create_ID( nFunc );
-  
-  std::cout<<"===> NodalBC_3D_CMM: No nodal BC is generated. \n";
+
+  if( is_all_node )
+    std::cout<<"===> NodalBC_3D_CMM: All nodal BC is generated. \n";
+  else
+    std::cout<<"===> NodalBC_3D_CMM: No nodal BC is generated. \n";
 }
 
 
@@ -118,29 +131,29 @@ NodalBC_3D_CMM::NodalBC_3D_CMM( const INodalBC * const &nbc_inflow,
       break;
 
     case 5:
-    {
-      // Add one node per cap. All remaining nodes are only added if dom_n_comp equals comp.
-      int curr_cap_id = 0;
-      for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
       {
-        if( cap_id[ii] == curr_cap_id )
+        // Add one node per cap. All remaining nodes are only added if dom_n_comp equals comp.
+        int curr_cap_id = 0;
+        for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
         {
-          curr_cap_id += 1;
-          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
-          num_dom_n_pts[ cap_id[ii] ] += 1;
-          num_dom_t_pts[ cap_id[ii] ] += 1;
+          if( cap_id[ii] == curr_cap_id )
+          {
+            curr_cap_id += 1;
+            dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
+            num_dom_n_pts[ cap_id[ii] ] += 1;
+            num_dom_t_pts[ cap_id[ii] ] += 1;
+          }
+          else if( comp == dom_n_comp[ cap_id[ii] ] )
+          {
+            dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
+            num_dom_n_pts[ cap_id[ii] ] += 1;
+          }
         }
-        else if( comp == dom_n_comp[ cap_id[ii] ] )
-        {
-          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
-          num_dom_n_pts[ cap_id[ii] ] += 1;
-        }
-      }
 
-      SYS_T::print_fatal_if( curr_cap_id != nbc_ring->get_num_caps(), "NodalBC_3D_CMM Error: ring nodes aren't ordered by cap_id.\n" );
-      break;
-    } 
-   
+        SYS_T::print_fatal_if( curr_cap_id != nbc_ring->get_num_caps(), "NodalBC_3D_CMM Error: ring nodes aren't ordered by cap_id.\n" );
+        break;
+      } 
+
     default:
       SYS_T::print_fatal( "NodalBC_3D_CMM Error: there is no such type of essential bc for ring nodes.\n" );
       break;
@@ -164,8 +177,8 @@ NodalBC_3D_CMM::NodalBC_3D_CMM( const INodalBC * const &nbc_inflow,
 
 
 NodalBC_3D_CMM::NodalBC_3D_CMM( const INodalBC * const &nbc_inflow,
-        const INodalBC * const &nbc_ring, const INodalBC * const &nbc_wall,
-        const int &nFunc )
+    const INodalBC * const &nbc_ring, const INodalBC * const &nbc_wall,
+    const int &nFunc )
 {
   per_slave_nodes.clear();
   per_master_nodes.clear();
@@ -186,7 +199,7 @@ NodalBC_3D_CMM::NodalBC_3D_CMM( const INodalBC * const &nbc_inflow,
     dir_nodes.push_back( nbc_wall->get_dir_nodes(ii) );
 
   VEC_T::sort_unique_resize(dir_nodes);
-  
+
   num_dir_nodes = dir_nodes.size();
 
   Create_ID( nFunc );
@@ -213,7 +226,7 @@ NodalBC_3D_CMM::NodalBC_3D_CMM( const INodalBC * const &nbc_wall, const int &nFu
     wall_gnode.push_back( nbc_wall->get_dir_nodes(ii) );
 
   // get wall nodes excluded
-  for(unsigned int ii=0; ii< static_cast<unsigned int>(nFunc); ++ii)
+  for(unsigned int ii=0; ii<static_cast<unsigned int>(nFunc); ++ii)
   {
     if( !VEC_T::is_invec( wall_gnode, ii) )
       dir_nodes.push_back( ii );

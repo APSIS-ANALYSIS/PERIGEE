@@ -38,7 +38,7 @@ class NodalBC_3D_CMM : public INodalBC
     // per_master_nodes; set num_dir_nodes, num_per_nodes to be zero;
     // set ID based on the above "no-nodal bc" setting.
     // ------------------------------------------------------------------------ 
-    NodalBC_3D_CMM( const int &nFunc );
+    NodalBC_3D_CMM( const int &nFunc, const bool &is_all_node = false );
  
     // ------------------------------------------------------------------------ 
     // Specify the Dirichlet nodes for CMM-type FSI simulations.

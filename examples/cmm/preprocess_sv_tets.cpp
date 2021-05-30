@@ -250,7 +250,7 @@ int main( int argc, char * argv[] )
   else if( cmmBC_type == 2 )
   {
     std::cout<<"===> The Nodal boundary condition for prestress generation (cmmbc_type = 2) is set up as:\n";
-    NBC_list[0] = new NodalBC_3D_CMM( wall_nbc, nFunc );
+    NBC_list[0] = new NodalBC_3D_CMM( nFunc, true );
     NBC_list[1] = new NodalBC_3D_CMM( wall_nbc, nFunc );
     NBC_list[2] = new NodalBC_3D_CMM( wall_nbc, nFunc );
     NBC_list[3] = new NodalBC_3D_CMM( wall_nbc, nFunc );
