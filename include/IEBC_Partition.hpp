@@ -34,8 +34,8 @@ class IEBC_Partition
     virtual int get_num_ebc() const 
     {SYS_T::print_exit("Error: IEBC_Partition::get_num_ebc is not implemented. \n"); return 0;}
 
-    virtual int get_num_local_node(const int &ii) const
-    {SYS_T::print_exit("Error: IEBC_Partition::get_num_local_node is not implemented. \n"); return 0;}
+    virtual int get_num_local_cell_node(const int &ii) const
+    {SYS_T::print_exit("Error: IEBC_Partition::get_num_local_cell_node is not implemented. \n"); return 0;}
 
     virtual int get_num_local_cell(const int &ii) const
     {SYS_T::print_exit("Error: IEBC_Partition::get_num_local_cell is not implemented. \n"); return 0;}
@@ -43,20 +43,20 @@ class IEBC_Partition
     virtual int get_cell_nLocBas(const int &ii) const
     {SYS_T::print_exit("Error: IEBC_Partition::get_cell_nLocBas is not implemented. \n"); return 0;}
 
-    virtual double get_local_pt_xyz(const int &ii, const int &jj) const
-    {SYS_T::print_exit("Error: IEBC_Partition::get_local_pt_xyz is not implemented. \n"); return 0.0;}
+    virtual double get_local_cell_node_xyz(const int &ii, const int &jj) const
+    {SYS_T::print_exit("Error: IEBC_Partition::get_local_cell_node_xyz is not implemented. \n"); return 0.0;}
 
     virtual int get_local_tri_ien(const int &ii, const int &jj) const
     {SYS_T::print_exit("Error: IEBC_Partition::get_local_tri_ien is not implemented. \n"); return 0;}
 
-    virtual int get_local_global_node(const int &ii, const int &jj) const
-    {SYS_T::print_exit("Error: IEBC_Partition::get_local_global_node is not implemented. \n"); return 0;}
+    virtual int get_local_cell_node_vol_id(const int &ii, const int &jj) const
+    {SYS_T::print_exit("Error: IEBC_Partition::get_local_cell_node_vol_id is not implemented. \n"); return 0;}
 
-    virtual int get_local_node_pos(const int &ii, const int &jj) const
-    {SYS_T::print_exit("Error: IEBC_Partition::get_local_node_pos is not implemented. \n"); return 0;}
+    virtual int get_local_cell_node_pos(const int &ii, const int &jj) const
+    {SYS_T::print_exit("Error: IEBC_Partition::get_local_cell_node_pos is not implemented. \n"); return 0;}
 
-    virtual int get_local_global_cell(const int &ii, const int &jj) const
-    {SYS_T::print_exit("Error: IEBC_Partition::get_local_global_cell is not implemented. \n"); return 0;}
+    virtual int get_local_cell_vol_id(const int &ii, const int &jj) const
+    {SYS_T::print_exit("Error: IEBC_Partition::get_local_cell_vol_id is not implemented. \n"); return 0;}
 
 };
 
