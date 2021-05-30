@@ -57,8 +57,8 @@ class EBC_Partition_vtp : public IEBC_Partition
     virtual int get_cell_local_node_pos(const int &ii, const int &jj) const
     {return local_cell_node_pos[ii][jj];}
 
-    virtual int get_local_global_cell(const int &ii, const int &jj) const
-    {return local_global_cell[ii][jj];}
+    virtual int get_local_cell_vol_id(const int &ii, const int &jj) const
+    {return local_cell_vol_id[ii][jj];}
 
   protected:
     const int cpu_rank; // The rank or id of the subdomain
@@ -94,7 +94,7 @@ class EBC_Partition_vtp : public IEBC_Partition
     std::vector< std::vector<int> > local_cell_node_pos;
 
     // local cell's global index num_ebc x num_local_cell[ii] in size
-    std::vector< std::vector<int> > local_global_cell;
+    std::vector< std::vector<int> > local_cell_vol_id;
 };
 
 #endif

@@ -98,12 +98,9 @@ class ALocal_EBC
     // ! get the local cell's volumetric mesh index.
     //   \para 0 <= ii < num_ebc
     //   \para 0 <= jj < num_local_cell[ii]
-    //
-    // Name to be changed get_local_cell_vol_id
-    //
     // ------------------------------------------------------------------------
-    virtual int get_local_global_cell(const int &ii, const int &jj) const
-    {return local_global_cell[ii][jj];}
+    virtual int get_local_cell_vol_id(const int &ii, const int &jj) const
+    {return local_cell_vol_id[ii][jj];}
 
     // ------------------------------------------------------------------------
     // get_ctrlPts_xyz: given the ebc_id ii, the element index eindex,
@@ -319,7 +316,7 @@ class ALocal_EBC
 
     // local cell's corresponding volumetric element indices
     // size: num_ebc x num_local_cell[ii]
-    std::vector< std::vector<int> > local_global_cell;
+    std::vector< std::vector<int> > local_cell_vol_id;
 };
 
 #endif

@@ -13,7 +13,7 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
   local_cell_node_vol_id.clear();
   local_cell_node.clear();
   local_cell_node_pos.clear();
-  local_global_cell.clear();
+  local_cell_vol_id.clear();
 
   // resize the vectors with length equaling to the number of ebc's
   num_local_cell_node.resize( num_ebc );
@@ -24,7 +24,7 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
   local_cell_node_vol_id.resize( num_ebc );
   local_cell_node.resize( num_ebc );
   local_cell_node_pos.resize( num_ebc );
-  local_global_cell.resize( num_ebc );
+  local_cell_vol_id.resize( num_ebc );
 
   // fill the cell_nLocBas array
   for(int ii=0; ii<num_ebc; ++ii) 
@@ -42,7 +42,7 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
 
     const int num_global_bccell = ebc->get_num_cell( ii );
 
-    local_global_cell[ii].clear();
+    local_cell_vol_id[ii].clear();
 
     for(int jj=0; jj<num_global_bccell; ++jj)
     {
@@ -54,7 +54,7 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
         local_elem.push_back( jj );
 
         // record the cell's global (volumetric) element index
-        local_global_cell[ii].push_back( elem_index );
+        local_cell_vol_id[ii].push_back( elem_index );
 
         // now put this cell's nodes into local_cell_node list
         for(int kk=0; kk<cell_nLocBas[ii]; ++kk)
@@ -66,9 +66,9 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
 
     // local_cell_node[ii] now stores indices (in surface mesh ii) for all cell nodes
     // in this partition of the surface; 
-    // local_global_cell[ii] stores all cells in this partition of the surface.
+    // local_cell_vol_id[ii] stores all cells in this partition of the surface.
     num_local_cell_node[ii] = static_cast<int>( local_cell_node[ii].size() );
-    num_local_cell[ii] = static_cast<int>( local_global_cell[ii].size() );
+    num_local_cell[ii] = static_cast<int>( local_cell_vol_id[ii].size() );
 
     // For each local cell node, extract nodal xyz-coordinates and the global
     // volumetric mesh index.
@@ -111,7 +111,7 @@ EBC_Partition_vtp::~EBC_Partition_vtp()
   VEC_T::clean( local_cell_node_vol_id );
   VEC_T::clean( local_cell_node );
   VEC_T::clean( local_cell_node_pos );
-  VEC_T::clean( local_global_cell );
+  VEC_T::clean( local_cell_vol_id );
 }
 
 
@@ -154,7 +154,7 @@ void EBC_Partition_vtp::write_hdf5( const char * FileName ) const
 
       h5w->write_intVector( group_id, "local_cell_node_pos", local_cell_node_pos[ii] );
 
-      h5w->write_intVector( group_id, "local_global_cell", local_global_cell[ii] );
+      h5w->write_intVector( group_id, "local_cell_vol_id", local_cell_vol_id[ii] );
 
       H5Gclose( group_id );
     }
@@ -204,7 +204,7 @@ void EBC_Partition_vtp::write_hdf5( const char * FileName,
 
       h5w->write_intVector( group_id, "local_cell_node_pos", local_cell_node_pos[ii] );
 
-      h5w->write_intVector( group_id, "local_global_cell", local_global_cell[ii] );
+      h5w->write_intVector( group_id, "local_cell_vol_id", local_cell_vol_id[ii] );
 
       H5Gclose( group_id );
     }
@@ -232,8 +232,8 @@ void EBC_Partition_vtp::print_info() const
     VEC_T::print( local_cell_node_vol_id[ii] );
     std::cout<<"   local_cell_node_xyz : \n";
     VEC_T::print( local_cell_node_xyz[ii] );
-    std::cout<<"   local_global_cell : \n";
-    VEC_T::print( local_global_cell[ii] );
+    std::cout<<"   local_cell_vol_id : \n";
+    VEC_T::print( local_cell_vol_id[ii] );
     std::cout<<"   local_tri_ien : \n";
     VEC_T::print( local_tri_ien[ii] );
   } 
