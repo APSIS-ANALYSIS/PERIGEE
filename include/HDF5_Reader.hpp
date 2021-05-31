@@ -105,9 +105,8 @@ class HDF5_Reader
     //                       vector<double>, with size num_row x num_col. 
     //                       The matrix is stroed by rows.
     // --------------------------------------------------------------
-    void read_doubleMatrix( const char * const &group_name,
-        const char * const &data_name,
-        std::vector<double> &out, int &num_row, int &num_col ) const;
+    std::vector<double> read_doubleMatrix( const char * const &group_name,
+        const char * const &data_name, int &num_row, int &num_col ) const;
 
     // --------------------------------------------------------------
     // ! read_intArray

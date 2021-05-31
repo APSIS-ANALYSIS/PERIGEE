@@ -267,9 +267,8 @@ std::vector<int> HDF5_Reader::read_intMatrix( const char * const &group_name,
   return out;
 }
 
-void HDF5_Reader::read_doubleMatrix( const char * const &group_name,
-    const char * const &data_name,
-    std::vector<double> &out, int &num_row, int &num_col ) const
+std::vector<double> HDF5_Reader::read_doubleMatrix( const char * const &group_name,
+    const char * const &data_name, int &num_row, int &num_col ) const
 {
   hid_t drank;
   hsize_t * ddims;
@@ -288,9 +287,11 @@ void HDF5_Reader::read_doubleMatrix( const char * const &group_name,
   num_row = ddims[0];
   num_col = ddims[1];
 
-  out = VEC_T::fillArray( ddata, num_row * num_col );
+  std::vector<double> out = VEC_T::fillArray( ddata, num_row * num_col );
 
   delete [] ddims; delete [] ddata; ddims = nullptr; ddata = nullptr;
+
+  return out;
 }
 
 std::string HDF5_Reader::read_string( const char * const &group_name,
