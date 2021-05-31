@@ -189,7 +189,7 @@ std::vector<int> HDF5_Reader::read_intVector( const char * const &group_name,
 
   std::vector<int> out = VEC_T::fillArray( intdata, ddims[0] );
 
-  delete [] ddims; delete [] intdata;
+  delete [] ddims; delete [] intdata; ddims = nullptr; intdata = nullptr;
 
   return out;
 }
@@ -236,7 +236,7 @@ std::vector<double> HDF5_Reader::read_doubleVector( const char * const &group_na
   
   std::vector<double> out = VEC_T::fillArray( ddata, ddims[0] );
 
-  delete [] ddims; delete [] ddata;
+  delete [] ddims; delete [] ddata; ddims = nullptr; ddata = nullptr;
   return out;
 }
 
@@ -263,7 +263,7 @@ void HDF5_Reader::read_intMatrix( const char * const &group_name,
 
   out = VEC_T::fillArray( intdata, num_row * num_col );
 
-  delete [] ddims; delete [] intdata;
+  delete [] ddims; delete [] intdata; ddims = nullptr; intdata = nullptr;
 }
 
 void HDF5_Reader::read_doubleMatrix( const char * const &group_name,
@@ -289,7 +289,7 @@ void HDF5_Reader::read_doubleMatrix( const char * const &group_name,
 
   out = VEC_T::fillArray( ddata, num_row * num_col );
 
-  delete [] ddims; delete [] ddata;
+  delete [] ddims; delete [] ddata; ddims = nullptr; ddata = nullptr;
 }
 
 std::string HDF5_Reader::read_string( const char * const &group_name,
@@ -324,7 +324,7 @@ std::string HDF5_Reader::read_string( const char * const &group_name,
   std::string string_out;
   string_out.assign(rdata);
 
-  delete [] rdata; rdata = NULL;
+  delete [] rdata; rdata = nullptr;
   H5Tclose( memtype );
   H5Tclose( filetype );
   H5Sclose( data_space );
