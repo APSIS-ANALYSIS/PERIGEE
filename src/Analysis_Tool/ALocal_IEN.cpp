@@ -12,12 +12,14 @@ ALocal_IEN::ALocal_IEN( const std::string &fileBaseName, const int &cpu_rank )
 
   nLocBas = h5r -> read_intScalar("Global_Mesh_Info", "nLocBas");
 
-  h5r -> read_intMatrix("LIEN", "LIEN", LIEN, nlocalele, nLocBas);
+  int num_row, num_col;
+  LIEN = h5r -> read_intMatrix("LIEN", "LIEN", num_row, num_col);
   
   delete h5r; H5Fclose( file_id );
 
-  SYS_T::print_fatal_if( int(LIEN.size()) != nLocBas * nlocalele, 
-    "Error: ALocal_IEN::LIEN is in wrong format.\n" );
+  SYS_T::print_fatal_if( num_row != nlocalele, "Error: ALocal_IEN::LIEN size does not match the number of element. \n");
+
+  SYS_T::print_fatal_if( num_col != nLocBas, "Error: ALocal_IEN::LIEN size does not match the value of nLocBas. \n");
 }
 
 ALocal_IEN::~ALocal_IEN()
