@@ -12,6 +12,8 @@
 #include "FEAElement_Triangle3_membrane.hpp"
 #include "FEAElement_Triangle6_membrane.hpp"
 #include "TimeMethod_GenAlpha.hpp"
+#include "PLocAssem_Tet_CMM_GenAlpha.hpp"
+#include "PGAssem_Tet_CMM_GenAlpha.hpp"
 
 int main( int argc, char *argv[] )
 {
@@ -32,6 +34,9 @@ int main( int argc, char *argv[] )
   const double wall_poisson = cmd_h5r -> read_doubleScalar("/", "wall_poisson");
   const double wall_kappa   = cmd_h5r -> read_doubleScalar("/", "wall_kappa");
   const int nqp_tri = cmd_h5r -> read_intScalar("/", "nqp_tri");
+  const int nqp_tet = cmd_h5r -> read_intScalar("/", "nqp_tet");
+  const double fl_density = cmd_h5r -> read_doubleScalar("/", "fl_density");
+  const double fl_mu = cmd_h5r -> read_doubleScalar("/", "fl_mu");
 
   delete cmd_h5r; H5Fclose(solver_cmd_file);
 
@@ -65,6 +70,12 @@ int main( int argc, char *argv[] )
    // Global mesh info
   IAGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info_FEM_3D(part_file, rank);
 
+  // Local sub-domain's element indices
+  ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
+
+  // Local sub-domain's nodal indices
+  APart_Node * pNode = new APart_Node(part_file, rank);
+
   // ===== Quadrature rules =====
   SYS_T::commPrint("===> Build quadrature rules. \n");
   IQuadPts * quads = new QuadPts_Gauss_Triangle( nqp_tri );
@@ -74,14 +85,9 @@ int main( int argc, char *argv[] )
   FEAElement * elementw = nullptr;
 
   if( GMIptr->get_elemType() == 501 )          // linear tet
-  {
-    if( nqp_tri > 4 ) SYS_T::commPrint("Warning: Requested > 4 surface quadrature points for a linear tri element.\n");
     elementw = new FEAElement_Triangle3_membrane( nqp_tri );
-  }
   else if( GMIptr->get_elemType() == 502 )     // quadratic tet
-  {
     elementw = new FEAElement_Triangle6_membrane( nqp_tri );
-  }
   else SYS_T::print_fatal("Error: Element type not supported.\n");
 
   // Local sub-domain's wall elemental (Neumann) BC for CMM
@@ -98,8 +104,52 @@ int main( int argc, char *argv[] )
 
   tm_galpha_ptr->print_info();
 
+  // ===== Local Assembly Routine =====
+  const double bs_beta = 0.0;
+  const double c_tauc = 0.0;
+  IPLocAssem * locAssem_ptr = new PLocAssem_Tet_CMM_GenAlpha(
+      tm_galpha_ptr, nqp_tet, fl_density, fl_mu, bs_beta,
+      wall_density, wall_poisson, wall_kappa,
+      c_tauc, GMIptr->get_elemType() );
 
+  // ===== Solution vector =====
+  PDNSolution * base = new PDNSolution_NS( pNode, 0 );
+
+  PDNSolution * sol = new PDNSolution_NS( pNode, 0 );
+
+  PDNSolution * dot_sol = new PDNSolution_NS( pNode, 0 );
+
+  PDNSolution * sol_wall_disp = new PDNSolution_Wall_Disp( pNode, 0 );
+
+  PDNSolution * dot_sol_wall_disp = new PDNSolution_Wall_Disp( pNode, 0 );
+
+  int    initial_index = 0;          // restart solution time index
+  double initial_time = 0.0;         // restart time
+  double initial_step = 1.0e-3;      // restart simulation time step size
+  std::string restart_name = "SOL_re"; // restart solution base name
+
+  // Read in [pres velo]
+  SYS_T::file_check(restart_name.c_str());
+  sol->ReadBinary(restart_name.c_str());
+
+  // Read in [dot_pres dot_velo]
+  std::string restart_dot_name = "dot_" + restart_name;
+  SYS_T::file_check(restart_dot_name.c_str());
+  dot_sol->ReadBinary(restart_dot_name.c_str());
+
+  // ===== Time step info =====
+  PDNTimeStep * timeinfo = new PDNTimeStep(initial_index, initial_time, initial_step);
+
+
+
+
+
+
+
+  delete locElem;
   delete GMIptr; delete quads; delete elementw; delete locebc_wall; delete tm_galpha_ptr;
+  delete pNode; delete locAssem_ptr; delete base; delete sol; delete dot_sol;
+  delete sol_wall_disp; delete dot_sol_wall_disp; delete timeinfo;
   PetscFinalize();
   return EXIT_SUCCESS;
 }
