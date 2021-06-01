@@ -604,7 +604,6 @@ void PNonlinear_CMM_Solver::compute_ringbc_constraints(
       const int dnode  = ringnbc_part -> get_LDN( ii );
 
       const double outvec[3] = {ringnbc_part -> get_outvec(ii, 0), ringnbc_part -> get_outvec(ii, 1), ringnbc_part -> get_outvec(ii, 2)};
-      const double tanvec[3] = {ringnbc_part -> get_tanvec(ii, 0), ringnbc_part -> get_tanvec(ii, 1), ringnbc_part -> get_tanvec(ii, 2)};
 
       const int velo_idx[3] = {dnode*4 + 1, dnode*4 + 2, dnode*4 + 3};
       const int disp_idx[3] = {dnode*3 + 0, dnode*3 + 1, dnode*3 + 2};
@@ -614,14 +613,11 @@ void PNonlinear_CMM_Solver::compute_ringbc_constraints(
 
       const double v_dot_n = velo_val[0] * outvec[0] + velo_val[1] * outvec[1] + velo_val[2] * outvec[2];
       const double u_dot_n = disp_val[0] * outvec[0] + disp_val[1] * outvec[1] + disp_val[2] * outvec[2];
-      const double v_dot_t = velo_val[0] * tanvec[0] + velo_val[1] * tanvec[1] + velo_val[2] * tanvec[2];
-      const double u_dot_t = disp_val[0] * tanvec[0] + disp_val[1] * tanvec[1] + disp_val[2] * tanvec[2];
 
       std::cout << std::scientific << std::setprecision(3) << "Ring node " << std::setw(8) << dnode << ": ";
       std::cout << "Velo=[" << std::setw(10) << velo_val[0] << ", " << std::setw(10) << velo_val[1] << ", " << std::setw(10) << velo_val[2] << "], "; 
       std::cout << "Disp=[" << std::setw(10) << disp_val[0] << ", " << std::setw(10) << disp_val[1] << ", " << std::setw(10) << disp_val[2] << "], ";  
-      std::cout << "v_dot_n = " << std::setw(10) << v_dot_n << ", u_dot_n = " << std::setw(10) << u_dot_n << ", ";
-      std::cout << "v_dot_t = " << std::setw(10) << v_dot_t << ", u_dot_t = " << std::setw(10) << u_dot_t << std::endl;  
+      std::cout << "v_dot_n = " << std::setw(10) << v_dot_n << ", u_dot_n = " << std::setw(10) << u_dot_n << std::endl;
     }
   }
 }
