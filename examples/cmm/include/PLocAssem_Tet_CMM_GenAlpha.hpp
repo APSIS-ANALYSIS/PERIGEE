@@ -164,6 +164,14 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
         const double * const &qua_prestress,
         const IQuadPts * const &quad );
 
+    virtual void Assem_Residual_EBC_traction(
+        const double * const &sol,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad );
+
     virtual void get_Wall_CauchyStress(
         const double * const &sol_wall_disp,
         const FEAElement * const &element,

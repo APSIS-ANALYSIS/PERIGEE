@@ -1373,6 +1373,40 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
   dR_dxl = nullptr; dR_dyl = nullptr;
 }
 
+void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_traction(
+    const double * const &sol,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
+{
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  const int face_nqp = quad -> get_num_quadPts();
+
+  Zero_sur_Residual();
+
+  for(int qua=0; qua<face_nqp; ++qua)
+  {
+    element -> get_R(qua, &R[0]);
+
+    double pp = 0.0;
+
+    for( int ii=0; ii<snLocBas; ++ii ) pp += sol[ii*4] * R[ii];
+
+    double surface_area;
+
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+
+    for(int A=0; A<snLocBas; ++A)
+    {
+      sur_Residual[4*A+1] += surface_area * quad->get_qw(qua) * R[A] * pp * n_out.x();
+      sur_Residual[4*A+2] += surface_area * quad->get_qw(qua) * R[A] * pp * n_out.y();
+      sur_Residual[4*A+3] += surface_area * quad->get_qw(qua) * R[A] * pp * n_out.z();
+    }
+  }
+}
 
 void PLocAssem_Tet_CMM_GenAlpha::get_Wall_CauchyStress(
     const double * const &sol_wall_disp,
