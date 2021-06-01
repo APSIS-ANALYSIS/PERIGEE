@@ -877,6 +877,19 @@ class IPLocAssem
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Tangent_Residual_EBC_Wall is not implemented.\n");}
 
+    
+    // Perform elemental BC surface integration to obtain the surface traction
+    // It is used in the prestress calculation
+    virtual void Assem_Residual_EBC_traction(
+        const double * const &sol,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: this Assem_Residual_EBC_traction is not implemented.\n");}
+
+
     // ! Get the model parameter 1
     //   This function is used to pass out the parameters appearing in the weak
     //   form, such as the Reynolds number, Capallarity number, etc.
