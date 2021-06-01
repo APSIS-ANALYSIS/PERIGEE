@@ -14,6 +14,7 @@
 #include "TimeMethod_GenAlpha.hpp"
 #include "PLocAssem_Tet_CMM_GenAlpha.hpp"
 #include "PGAssem_Tet_CMM_GenAlpha.hpp"
+#include "PTime_CMM_Solver.hpp"
 
 int main( int argc, char *argv[] )
 {
