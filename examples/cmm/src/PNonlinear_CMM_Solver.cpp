@@ -385,32 +385,18 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_Prestress(
   rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, flr_ptr, sol_base, &sol_alpha);
   // ------------------------------------------------- 
 
-  // If new_tangent_flag == TRUE, update the tangent matrix;
-  // otherwise, use the matrix from the previous time step
-  if( new_tangent_flag )
-  {
-    gassem_ptr->Clear_KG();
+  gassem_ptr->Clear_KG();
 
-    gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, &wall_disp_alpha,
-        dot_sol, sol, curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
-        elementw, quad_v, quad_s, lien_ptr, anode_ptr,
-        feanode_ptr, nbc_part, ringnbc_part, ebc_part, ebc_wall_part, gbc );
-   
-    SYS_T::commPrint("  --- M updated");
-    
-    // SetOperator will pass the tangent matrix to the linear solver and the
-    // linear solver will generate the preconditioner based on the new matrix.
-    lsolver_ptr->SetOperator( gassem_ptr->K );
-  }
-  else
-  {
-    gassem_ptr->Clear_G();
+  gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, &wall_disp_alpha,
+      dot_sol, sol, curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
+      elementw, quad_v, quad_s, lien_ptr, anode_ptr,
+      feanode_ptr, nbc_part, ringnbc_part, ebc_part, ebc_wall_part, gbc );
 
-    gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, &wall_disp_alpha,
-        dot_sol, sol, curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
-        elementw, quad_v, quad_s, lien_ptr, anode_ptr,
-        feanode_ptr, nbc_part, ebc_part, ebc_wall_part, gbc );
-  }
+  SYS_T::commPrint("  --- M updated");
+
+  // SetOperator will pass the tangent matrix to the linear solver and the
+  // linear solver will generate the preconditioner based on the new matrix.
+  lsolver_ptr->SetOperator( gassem_ptr->K );
 
   VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
   SYS_T::commPrint("  Init res 2-norm: %e \n", initial_norm);
@@ -453,32 +439,20 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_Prestress(
     update_wall(-1.0, &sol_alpha, ebc_wall_part, &G_kinematic);
 
     nl_counter += 1;
-    
-    // Assembly residual (& tangent if condition satisfied) 
-    if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )
-    {
-      gassem_ptr->Clear_KG();
 
-      gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, &wall_disp_alpha,
-          dot_sol, sol, curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
-          elementw, quad_v, quad_s, lien_ptr, anode_ptr,
-          feanode_ptr, nbc_part, ringnbc_part, ebc_part, ebc_wall_part, gbc );
+    // Assembly residual & tangent
+    gassem_ptr->Clear_KG();
 
-      SYS_T::commPrint("  --- M updated");
-      lsolver_ptr->SetOperator(gassem_ptr->K);
-    }
-    else
-    {
-      gassem_ptr->Clear_G();
+    gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, &wall_disp_alpha,
+        dot_sol, sol, curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
+        elementw, quad_v, quad_s, lien_ptr, anode_ptr,
+        feanode_ptr, nbc_part, ringnbc_part, ebc_part, ebc_wall_part, gbc );
 
-      gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, &wall_disp_alpha,
-          dot_sol, sol, curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
-          elementw, quad_v, quad_s, lien_ptr, anode_ptr,
-          feanode_ptr, nbc_part, ebc_part, ebc_wall_part, gbc );
-    }
+    SYS_T::commPrint("  --- M updated");
+    lsolver_ptr->SetOperator(gassem_ptr->K);
 
     VecNorm(gassem_ptr->G, NORM_2, &residual_norm);
-    
+
     SYS_T::commPrint("  --- nl_res: %e \n", residual_norm);
 
     // Print the residual norm of the kienmatic equation
@@ -492,17 +466,12 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_Prestress(
 
   Print_convergence_info(nl_counter, relative_error, residual_norm);
 
-  // Debugging: check ring BC constraints
-  // compute_ringbc_constraints(sol, sol_wall_disp, ringnbc_part);
+  // Update the prestress values
+  gassem_ptr->Update_Wall_Prestress(sol_wall_disp, lassem_ptr, elementw, quad_s, ebc_wall_part);
 
-  if( solve_prestress )
-  {
-    gassem_ptr->Update_Wall_Prestress(sol_wall_disp, lassem_ptr, elementw, quad_s, ebc_wall_part);
+  SYS_T::commPrint("  --- wall_disp_norm: %e \n", sol_wall_disp->Norm_2());
 
-    SYS_T::commPrint("  --- wall_disp_norm: %e \n", sol_wall_disp->Norm_2());
-
-    if( sol_wall_disp->Norm_2() <= prestress_tol ) prestress_conv_flag = true;
-  }
+  if( sol_wall_disp->Norm_2() <= prestress_tol ) prestress_conv_flag = true;
 }
 
 void PNonlinear_CMM_Solver::rescale_inflow_value( const double &stime,
