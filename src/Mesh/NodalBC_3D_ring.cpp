@@ -13,8 +13,6 @@ NodalBC_3D_ring::NodalBC_3D_ring(const int &nFunc) : ring_bc_type(0)
   num_caps = 0;
   cap_id.clear();
   Q.clear();
-  dominant_n_comp.clear();
-  dominant_t_comp.clear();
   outnormal.clear();
 
   std::cout<<"===> NodalBC_3D_ring::empty is generated. \n";
@@ -39,19 +37,15 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
   cap_files.insert( cap_files.begin(), inflow_file ); 
 
   num_caps = cap_files.size();
-  dominant_n_comp.resize(num_caps);
   Q.resize(9 * num_caps);
 
   outnormal = inlet_outnormal.to_std_vec();
-  dominant_n_comp[0] = inlet_outnormal.get_dominant_comp();
 
   for(unsigned int ii=0; ii<outlet_outnormal.size(); ++ii)
   {
     outnormal.push_back( outlet_outnormal[ii](0) );
     outnormal.push_back( outlet_outnormal[ii](1) );
     outnormal.push_back( outlet_outnormal[ii](2) );
-
-    dominant_n_comp[ii + 1] = outlet_outnormal[ii].get_dominant_comp();
   }
 
   int numpts, numcels;
@@ -181,10 +175,6 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
   std::cout<<"     is generated ";
   if(ring_bc_type == 0) std::cout<<"for fully clamped case (ring_bc_type = 0).\n";
   else if(ring_bc_type == 1) std::cout<<"for in-plane motion (ring_bc_type = 1).\n";
-  else if(ring_bc_type == 2) std::cout<<"for radial motion (ring_bc_type = 2).\n";
-  else if(ring_bc_type == 3) std::cout<<"for inlet clamping & outlet in-plane motion (ring_bc_type = 3).\n";
-  else if(ring_bc_type == 4) std::cout<<"for inlet clamping & outlet radial motion (ring_bc_type = 4).\n";
-  else if(ring_bc_type == 5) std::cout<<"for in-plane motion with a single clamped node per cap (ring_bc_type = 5).\n";
   else SYS_T::print_fatal("Error: NodalBC_3D_ring does not allow this ring_bc_type!\n");
 }
 
