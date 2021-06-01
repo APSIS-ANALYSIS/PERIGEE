@@ -10,12 +10,9 @@ ALocal_Elem_wTag::ALocal_Elem_wTag( const std::string &fileBaseName,
 
   HDF5_Reader * h5r = new HDF5_Reader( file_id );
 
-  const std::string gname("/Local_Elem");
+  elem_tag = h5r->read_intVector("/Local_Elem", "elem_phy_tag");
 
-  h5r->read_intVector(gname.c_str(), "elem_phy_tag", elem_tag);
-
-  delete h5r;
-  H5Fclose( file_id );
+  delete h5r; H5Fclose( file_id );
 }
 
 
