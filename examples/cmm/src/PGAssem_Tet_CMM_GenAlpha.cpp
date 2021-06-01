@@ -133,10 +133,10 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
       if( ringnbc_part->is_inLDN( IEN_e[ii], pos ) )
       {
         const Matrix_3x3 Q = ringnbc_part->get_rotation_matrix( pos );
-        for( int jj = 0; jj < dof_mat; ++jj )
+        for( int jj = 1; jj < dof_mat; ++jj )
         {
-          for( int kk = 0; kk < dof_mat; ++kk )
-            rotmat_e[ (ii*dof_mat+jj) * ndof_e + (ii*dof_mat+jj) ] = Q(jj, kk);
+          for( int kk = 1; kk < dof_mat; ++kk )
+            rotmat_e[ (ii*dof_mat+jj) * ndof_e + (ii*dof_mat+kk) ] = Q(jj-1, kk-1);
         }
       }
     } 
