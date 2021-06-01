@@ -13,7 +13,7 @@
 #include "FEAElement_Triangle6_membrane.hpp"
 #include "TimeMethod_GenAlpha.hpp"
 #include "PLocAssem_Tet_CMM_GenAlpha.hpp"
-#include "PGAssem_Tet_CMM_GenAlpha.hpp"
+#include "PGAssem_Tet_Wall.hpp"
 #include "PTime_CMM_Solver.hpp"
 
 int main( int argc, char *argv[] )
@@ -24,6 +24,9 @@ int main( int argc, char *argv[] )
   // Generalized-alpha rho_inf
   double genA_rho_inf = 0.5;
   bool is_backward_Euler = false;
+  
+  // Estimate of num nonzeros per row for the sparse tangent matrix
+  int nz_estimate = 300;
 
   // We assume that a 3D solver has been called (to generate the wall traction)
   // and a suite of command line arguments has been saved to disk
@@ -68,18 +71,27 @@ int main( int argc, char *argv[] )
 
   delete PartBasic;
 
+  // ===== Quadrature rules =====
+  SYS_T::commPrint("===> Build quadrature rules. \n");
+  IQuadPts * quads = new QuadPts_Gauss_Triangle( nqp_tri );
+
    // Global mesh info
   IAGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info_FEM_3D(part_file, rank);
 
   // Local sub-domain's element indices
   ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
 
+  // Local sub-domain's IEN array
+  ALocal_IEN * locIEN = new ALocal_IEN(part_file, rank);
+
   // Local sub-domain's nodal indices
   APart_Node * pNode = new APart_Node(part_file, rank);
 
-  // ===== Quadrature rules =====
-  SYS_T::commPrint("===> Build quadrature rules. \n");
-  IQuadPts * quads = new QuadPts_Gauss_Triangle( nqp_tri );
+  // Local sub-domain's nodal (Dirichlet) BC
+  ALocal_NodalBC * locnbc = new ALocal_NodalBC(part_file, rank);
+
+  // Local sub-domain's wall elemental (Neumann) BC for CMM
+  ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, quads, "ebc_wall", prestress_flag);
 
   // ===== Finite element containers =====
   SYS_T::commPrint("===> Set up volumetric and surface element containers. \n");
@@ -90,9 +102,6 @@ int main( int argc, char *argv[] )
   else if( GMIptr->get_elemType() == 502 )     // quadratic tet
     elementw = new FEAElement_Triangle6_membrane( nqp_tri );
   else SYS_T::print_fatal("Error: Element type not supported.\n");
-
-  // Local sub-domain's wall elemental (Neumann) BC for CMM
-  ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, quads, "ebc_wall", prestress_flag);
 
   // ===== Generalized-alpha =====
   SYS_T::commPrint("===> Set up the generalized-alpha time integration scheme.\n");
@@ -141,6 +150,18 @@ int main( int argc, char *argv[] )
   // ===== Time step info =====
   PDNTimeStep * timeinfo = new PDNTimeStep(initial_index, initial_time, initial_step);
 
+  // ===== Global assembly =====
+  SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
+
+  IPGAssem * gloAssem_ptr = new PGAssem_Tet_Wall( locAssem_ptr,
+      GMIptr, locElem, locIEN, pNode, locnbc, locebc_wall, nz_estimate );
+
+  SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
+  gloAssem_ptr->Assem_nonzero_estimate( locElem, locIEN, locnbc );
+
+  SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
+  gloAssem_ptr->Fix_nonzero_err_str();
+  gloAssem_ptr->Clear_KG();
 
 
 
@@ -150,7 +171,7 @@ int main( int argc, char *argv[] )
   delete locElem;
   delete GMIptr; delete quads; delete elementw; delete locebc_wall; delete tm_galpha_ptr;
   delete pNode; delete locAssem_ptr; delete base; delete sol; delete dot_sol;
-  delete sol_wall_disp; delete dot_sol_wall_disp; delete timeinfo;
+  delete sol_wall_disp; delete dot_sol_wall_disp; delete timeinfo; delete gloAssem_ptr;
   PetscFinalize();
   return EXIT_SUCCESS;
 }

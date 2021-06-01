@@ -17,12 +17,12 @@ class PGAssem_Tet_Wall : public IPGAssem
   public:
     PGAssem_Tet_Wall( 
         const IPLocAssem * const &locassem_ptr,
-        const int &in_nlocbas,
-        const int &in_snlocbas,
+        const IAGlobal_Mesh_Info * const &agmi_ptr,
         const ALocal_Elem * const &alelem_ptr,
         const ALocal_IEN * const &aien_ptr,
         const APart_Node * const &pnode_ptr,
         const ALocal_NodalBC * const &part_nbc,
+        const ALocal_EBC * const &part_ebc,
         const int &in_nz_estimate );
 
     virtual ~PGAssem_Tet_Wall();

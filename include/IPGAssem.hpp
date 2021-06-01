@@ -118,9 +118,7 @@ class IPGAssem
 
     virtual void Assem_nonzero_estimate( 
         const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
         const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
         const ALocal_NodalBC * const &nbc_part )
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
 

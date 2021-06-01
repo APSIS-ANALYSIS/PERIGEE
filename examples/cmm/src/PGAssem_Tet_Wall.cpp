@@ -2,18 +2,18 @@
 
 PGAssem_Tet_Wall::PGAssem_Tet_Wall( 
     const IPLocAssem * const &locassem_ptr,
-    const int &in_nlocbas,
-    const int &in_snlocbas,
+    const IAGlobal_Mesh_Info * const &agmi_ptr,
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &aien_ptr,
     const APart_Node * const &pnode_ptr,
     const ALocal_NodalBC * const &part_nbc,
+    const ALocal_EBC * const &part_ebc,
     const int &in_nz_estimate )
-: nLocBas(in_nlocbas),
+: nLocBas( agmi_ptr->get_nLocBas() ),
   dof_sol( pnode_ptr->get_dof() ),
   dof_mat( locassem_ptr->get_dof_mat() ),
   nlgn( pnode_ptr->get_nlocghonode() ),
-  snLocBas( in_snlocbas )
+  snLocBas( part_ebc -> get_cell_nLocBas(0) )
 {
   // Make sure the data structure is compatible
   SYS_T::print_fatal_if(dof_sol != locassem_ptr->get_dof(),
