@@ -9,6 +9,7 @@
 // Date Created: April 15 2021
 // ============================================================================
 #include "Vector_3.hpp"
+#include "Matrix_3x3.hpp"
 #include "HDF5_Reader.hpp"
 
 class ALocal_Ring_NodalBC
@@ -36,31 +37,16 @@ class ALocal_Ring_NodalBC
     // output value is [ 0, num_caps ), where ID 0 corresponds to the inlet.
     virtual int get_cap_id( const int &node ) const { return local_cap_id[node]; }
 
-    // get the Dirichlet node's dominant component index for the unit outward
-    // normal vector, which is the largest in absolute value in it.
-    // parameter node ranges [ 0, Num_LD )
-    // output value is 0, 1, or 2.
-    virtual int get_dominant_n_comp( const int &node ) const
-    { return dominant_n_comp[ local_cap_id[node] ]; }
-
-    // get the Dirichlet node's dominant component index for the tangential
-    // vector, which is the largest in absolute value in it.
-    // parameter node ranges [ 0, Num_LD )
-    // output value is 0, 1, or 2.
-    virtual int get_dominant_t_comp( const int &node ) const
-    { return local_dominant_t_comp[ node ]; }
-
     // get the Dirichlet node's outward normal vector components.
     // parameter node ranges [ 0, Num_LD )
     // comp=0 : x-component; comp=1 : y-component; comp=2 : z-component
     virtual double get_outvec( const int &node, const int &comp ) const
     { return outnormal[ local_cap_id[node] ]( comp ); }
 
-    // get the Dirichlet node's tangential vector components.
+    // get the Dirichlet node's rotation matrix for skew boundary conditions.
     // parameter node ranges [ 0, Num_LD )
-    // comp=0 : x-component; comp=1 : y-component; comp=2 : z-component
-    virtual double get_tanvec( const int &node, const int &comp ) const
-    { return local_tangential[node]( comp ); }
+    virtual Matrix_3x3 get_rotation_matrix( const int &node ) const
+    { return Q[ local_cap_id[node] ]; }
 
     // determine whether a given index belongs to the LDN vector
     virtual bool is_inLDN( const int &ii) const
@@ -87,21 +73,13 @@ class ALocal_Ring_NodalBC
     // vector length is Num_LD
     std::vector<int> local_cap_id;
 
-    // Dominant component index of each cap's unit normal vector: 0, 1, or 2
-    // vector length is num_caps
-    std::vector<int> dominant_n_comp;
-
-    // Dominant component index of each node's unit tangential vector: 0, 1, or 2.
-    // vector length is Num_LD
-    std::vector<int> local_dominant_t_comp;
-
     // Each cap's unit normal vector
     // vector length is num_caps
     std::vector<Vector_3> outnormal;
 
-    // Tangential vector for all local nodes
-    // vector length is Num_LD
-    std::vector<Vector_3> local_tangential;
+    // Each cap's rotation matrix for skew boundary conditions
+    // vector length is num_caps
+    std::vector<Matrix_3x3> Q;
 };
 
 #endif
