@@ -28,120 +28,38 @@ NodalBC_3D_CMM::NodalBC_3D_CMM( const INodalBC * const &nbc_inflow,
 
   // obtain the type of ring nodes' specification
   const std::vector<int> cap_id = nbc_ring -> get_cap_id();
-  const std::vector<int> dom_n_comp = nbc_ring -> get_dominant_n_comp();
-  const std::vector<int> dom_t_comp = nbc_ring -> get_dominant_t_comp();
 
-  std::vector<int> num_dom_n_pts( nbc_ring->get_num_caps(), 0 );
-  std::vector<int> num_dom_t_pts( nbc_ring->get_num_caps(), 0 );
+  // Record the number of nodes assigned as essential bc per dof
+  std::vector<int> cap_num_dir_nodes( nbc_ring->get_num_caps(), 0 );
 
   switch( nbc_ring -> get_ring_bc_type() )
   {
     case 0:
+
       // regardless of comp, all ring nodes are added as essential bc
-      for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
+      for(unsigned int ii = 0; ii < nbc_ring->get_num_dir_nodes(); ++ii)
       {
-        dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
-        num_dom_n_pts[ cap_id[ii] ] += 1;
-        num_dom_t_pts[ cap_id[ii] ] += 1;
+        dir_nodes.push_back( nbc_ring->get_dir_nodes(ii) );
+        cap_num_dir_nodes[ cap_id[ii] ] += 1;
       }
       break;
 
     case 1:
-      // if dom_n_comp equals comp, ring node is added to dir_nodes
-      for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
+
+      // if comp is 0 (rotated x-comp, corresponding to the normal comp),
+      // ring node is added to dir_nodes
+      for(unsigned int ii = 0; ii < nbc_ring->get_num_dir_nodes(); ++ii)
       {
-        if( comp == dom_n_comp[ cap_id[ii] ] )
+        if( comp == 0 )
         {
-          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
-          num_dom_n_pts[ cap_id[ii] ] += 1;
+          dir_nodes.push_back( nbc_ring->get_dir_nodes(ii) );
+          cap_num_dir_nodes[ cap_id[ii] ] += 1;
         }
       }
       break;
-
-    case 2:
-      // if dom_n_comp or dom_t_comp equals comp, ring node is added to dir_nodes
-      for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
-      {
-        if( comp == dom_n_comp[ cap_id[ii] ] )
-        {
-          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
-          num_dom_n_pts[ cap_id[ii] ] += 1;
-        }
-        else if( comp == dom_t_comp[ii] )
-        {
-          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
-          num_dom_t_pts[ cap_id[ii] ] += 1;
-        }
-      }
-      break;
-
-    case 3:
-      // Add all inlet ring nodes. Only add outlet ring nodes if dom_n_comp equals comp
-      for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
-      {
-        if( cap_id[ii] == 0 )  // Inlet cap_id is 0
-        {
-          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
-          num_dom_n_pts[ cap_id[ii] ] += 1;
-          num_dom_t_pts[ cap_id[ii] ] += 1;
-        }
-        else if( comp == dom_n_comp[ cap_id[ii] ] )
-        {
-          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
-          num_dom_n_pts[ cap_id[ii] ] += 1;
-        }
-      }
-      break;
-
-    case 4:
-      // Add all inlet ring nodes. Only add outlet ring nodes if dom_n_comp equals comp
-      // or dom_t_comp equals comp.
-      for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
-      {
-        if( cap_id[ii] == 0 ) // Inlet cap_id is 0
-        {
-          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
-          num_dom_n_pts[ cap_id[ii] ] += 1;
-          num_dom_t_pts[ cap_id[ii] ] += 1;
-        }
-        else if( comp == dom_n_comp[ cap_id[ii] ] )
-        {
-          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
-          num_dom_n_pts[ cap_id[ii] ] += 1;
-        }
-        else if( comp == dom_t_comp[ii] )
-        {
-          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
-          num_dom_t_pts[ cap_id[ii] ] += 1;
-        }
-      }
-      break;
-
-    case 5:
-    {
-      // Add one node per cap. All remaining nodes are only added if dom_n_comp equals comp.
-      int curr_cap_id = 0;
-      for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
-      {
-        if( cap_id[ii] == curr_cap_id )
-        {
-          curr_cap_id += 1;
-          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
-          num_dom_n_pts[ cap_id[ii] ] += 1;
-          num_dom_t_pts[ cap_id[ii] ] += 1;
-        }
-        else if( comp == dom_n_comp[ cap_id[ii] ] )
-        {
-          dir_nodes.push_back( nbc_ring -> get_dir_nodes(ii) );
-          num_dom_n_pts[ cap_id[ii] ] += 1;
-        }
-      }
-
-      SYS_T::print_fatal_if( curr_cap_id != nbc_ring->get_num_caps(), "NodalBC_3D_CMM Error: ring nodes aren't ordered by cap_id.\n" );
-      break;
-    } 
    
     default:
+
       SYS_T::print_fatal( "NodalBC_3D_CMM Error: there is no such type of essential bc for ring nodes.\n" );
       break;
   }
@@ -156,9 +74,9 @@ NodalBC_3D_CMM::NodalBC_3D_CMM( const INodalBC * const &nbc_inflow,
   // print data on screen
   std::cout<<"===> NodalBC_3D_CMM specified by \n";
   std::cout<<"     interior of inlet surface"<<std::endl;
-  std::cout<<"     outline of inlet surface"<<": "<<num_dom_n_pts[0]<<" dom_n nodes, "<< num_dom_t_pts[0]<<" dom_t nodes"<<std::endl;
+  std::cout<<"     outline of inlet surface" << ": " << cap_num_dir_nodes[0] << " nodes" << std::endl;
   for(int ii=1; ii<nbc_ring -> get_num_caps(); ++ii)
-    std::cout<<"     outline of outlet surface "<<ii-1<<": "<<num_dom_n_pts[ii]<<" dom_n nodes, "<< num_dom_t_pts[ii]<<" dom_t nodes"<<std::endl;
+    std::cout<<"     outline of outlet surface " << ii-1 << ": " << cap_num_dir_nodes[ii] << " nodes" << std::endl;
   std::cout<<"     is generated. \n";
 }
 
