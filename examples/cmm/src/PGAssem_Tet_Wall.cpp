@@ -161,7 +161,8 @@ void PGAssem_Tet_Wall::Assem_tangent_residual(
   // Residual & tangent contributions from the thin-walled linear membrane in CMM
   WallMembrane_KG( curr_time, dt, sol_a, sol_b, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ebc_wall_part );
 
-
+  // Add the traction force obtained from the pressure
+  NatBC_G( sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
