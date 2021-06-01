@@ -54,9 +54,8 @@ class ALocal_Ring_NodalBC
 
   private:
     // type = 0 : all dof of ring nodes are set to be essential bc;
-    // type = 1 : the dominant normal components of ring nodes are set to be essential bc;
-    // type = 2 : the dominant normal & tangential components of ring nodes are set to be
-    //            essential bc.
+    // type = 1 : the rotated-x component (corresponding to the radial component)
+    //            of ring nodes are set to be essential bc
     int ringbc_type;
 
     // Number of caps (equals the number of inlets + the number of outlets)
