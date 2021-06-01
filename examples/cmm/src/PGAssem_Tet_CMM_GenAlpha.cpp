@@ -107,119 +107,44 @@ void PGAssem_Tet_CMM_GenAlpha::EssBC_KG(
 }
 
 
-void PGAssem_Tet_CMM_GenAlpha::RingBC_KG( const APart_Node * const &node_ptr,
-    const ALocal_NodalBC * const &nbc_part,
-    const ALocal_Ring_NodalBC * const &ringnbc_part )
+void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const FEAElement * const &element,
+    const std::vector<int> &IEN_e,
+    IPLocAssem * const &lassem_ptr )
 {
-   const int nnode = node_ptr->get_nlocalnode();
- 
-   std::vector<int> clamped_nodes;
-   for(int ii=0; ii<nnode; ++ii)
-   {
-     int num_ess_velo_dof = 0;
-
-     for(int jj=1; jj<4; ++jj)
-       if( nbc_part->get_LID(jj, ii) < 0 ) num_ess_velo_dof += 1;
- 
-     if( num_ess_velo_dof == 3 ) clamped_nodes.push_back( node_ptr->get_node_loc(ii) );
-   }
-
-  const int local_ring_node_num = ringnbc_part->get_Num_LD();
-
   const int ringbc_type = ringnbc_part -> get_ringbc_type();
 
-  for(int ii=0; ii<local_ring_node_num; ++ii)
+  if( ringbc_type == 0 ) {}
+
+  else if( ringbc_type == 1 )
   {
-    const int cap_id = ringnbc_part -> get_cap_id( ii );
+    const int ndof_e = element->get_nLocBas() * dof_mat; 
 
-    const int dnode  = ringnbc_part -> get_LDN( ii );
-    const int dncomp = ringnbc_part -> get_dominant_n_comp( ii );
-    const int dtcomp = ringnbc_part -> get_dominant_t_comp( ii );
-    
-    const int row_n = dnode * dof_mat + dncomp + 1;
-    const int row_t = dnode * dof_mat + dtcomp + 1;
-    // 3 - dncomp - dtcomp gives the dof index for radial direction
-    const int row_r = dnode * dof_mat + 4 - dncomp - dtcomp;
+    // Rotation matrix for all element dofs
+    double * rotmat_e = new double [ndof_e * ndof_e] {};
 
-    const double nn = ringnbc_part -> get_outvec(ii, dncomp);
-    const double nt = ringnbc_part -> get_outvec(ii, dtcomp);
-    const double nr = ringnbc_part -> get_outvec(ii, 3 - dncomp - dtcomp);
+    // Set diagonal entries to 1.0
+    for( int ii = 0; ii < ndof_e; ++ii ) rotmat_e[ ii*ndof_e + ii ] = 1.0;
 
-    const double tn = ringnbc_part -> get_tanvec(ii, dncomp);
-    const double tt = ringnbc_part -> get_tanvec(ii, dtcomp);
-    const double tr = ringnbc_part -> get_tanvec(ii, 3 - dncomp - dtcomp);
-
-    if(ringbc_type == 0) { break; }
-
-    else if(ringbc_type == 1)
+    for( int ii = 0; ii < element->get_nLocBas(); ++ii )
     {
-      VecSetValue( G, row_n, 0.0, INSERT_VALUES);
-
-      // add the actual constraint equation in the normal direction
-      MatSetValue(K, row_n, row_n, nn, INSERT_VALUES);
-      MatSetValue(K, row_n, row_t, nt, INSERT_VALUES);
-      MatSetValue(K, row_n, row_r, nr, INSERT_VALUES);
-    }
-    else if(ringbc_type == 2)
-    {
-      VecSetValue(G, row_n, 0.0, INSERT_VALUES);
-      VecSetValue(G, row_t, 0.0, INSERT_VALUES);
-
-      // add the actual constraint equation in the normal direction
-      MatSetValue(K, row_n, row_n, nn, INSERT_VALUES);
-      MatSetValue(K, row_n, row_t, nt, INSERT_VALUES);
-      MatSetValue(K, row_n, row_r, nr, INSERT_VALUES);
-      
-      // add the actual constraint equation in the tangential direction
-      MatSetValue(K, row_t, row_n, tn, INSERT_VALUES);
-      MatSetValue(K, row_t, row_t, tt, INSERT_VALUES);
-      MatSetValue(K, row_t, row_r, tr, INSERT_VALUES);
-    }
-    else if(ringbc_type == 3)
-    {
-      if( cap_id != 0 )
+      int pos = -1;
+      if( ringnbc_part->is_inLDN( IEN_e[ii], pos ) )
       {
-        VecSetValue( G, row_n, 0.0, INSERT_VALUES);
-
-        // add the actual constraint equation in the normal direction
-        MatSetValue(K, row_n, row_n, nn, INSERT_VALUES);
-        MatSetValue(K, row_n, row_t, nt, INSERT_VALUES);
-        MatSetValue(K, row_n, row_r, nr, INSERT_VALUES);
+        const Matrix_3x3 Q = ringnbc_part->get_rotation_matrix( pos );
+        for( int jj = 0; jj < dof_mat; ++jj )
+        {
+          for( int kk = 0; kk < dof_mat; ++kk )
+            rotmat_e[ (ii*dof_mat+jj) * ndof_e + (ii*dof_mat+jj) ] = Q(jj, kk);
+        }
       }
-    }
-    else if(ringbc_type == 4)
-    {
-      if( cap_id != 0 )
-      {
-        VecSetValue(G, row_n, 0.0, INSERT_VALUES);
-        VecSetValue(G, row_t, 0.0, INSERT_VALUES);
+    } 
 
-        // add the actual constraint equation in the normal direction
-        MatSetValue(K, row_n, row_n, nn, INSERT_VALUES);
-        MatSetValue(K, row_n, row_t, nt, INSERT_VALUES);
-        MatSetValue(K, row_n, row_r, nr, INSERT_VALUES);
-        
-        // add the actual constraint equation in the tangential direction
-        MatSetValue(K, row_t, row_n, tn, INSERT_VALUES);
-        MatSetValue(K, row_t, row_t, tt, INSERT_VALUES);
-        MatSetValue(K, row_t, row_r, tr, INSERT_VALUES);
-      }
-    }
-    else if(ringbc_type == 5)
-    {
-      if( !VEC_T::is_invec( clamped_nodes, dnode ) )
-      {
-        VecSetValue( G, row_n, 0.0, INSERT_VALUES);
-
-        // add the actual constraint equation in the normal direction
-        MatSetValue(K, row_n, row_n, nn, INSERT_VALUES);
-        MatSetValue(K, row_n, row_t, nt, INSERT_VALUES);
-        MatSetValue(K, row_n, row_r, nr, INSERT_VALUES);
-      }
-    }
-    else
-      SYS_T::print_fatal("Error: this ringbc_type is not supported in PGAssem_Tet_CMM_GenAlpha.\n");
+    delete [] rotmat_e; rotmat_e = nullptr;
   }
+  else
+    SYS_T::print_fatal("Error: this ringbc_type is not supported in PGAssem_Tet_CMM_GenAlpha.\n");
 }
 
 void PGAssem_Tet_CMM_GenAlpha::EssBC_G( const ALocal_NodalBC * const &nbc_part, 
@@ -295,7 +220,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_nonzero_estimate(
 
   for(int ii=0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
 
-  RingBC_KG( node_ptr, nbc_part, ringnbc_part );
+  // RingBC_KG( node_ptr, nbc_part, ringnbc_part );
   
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
@@ -366,7 +291,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_mass_residual(
 
   for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
 
-  RingBC_KG( node_ptr, nbc_part, ringnbc_part );
+  // RingBC_KG( node_ptr, nbc_part, ringnbc_part );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
@@ -550,7 +475,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
 
   for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
   
-  RingBC_KG( node_ptr, nbc_part, ringnbc_part );
+  // RingBC_KG( node_ptr, nbc_part, ringnbc_part );
   
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
