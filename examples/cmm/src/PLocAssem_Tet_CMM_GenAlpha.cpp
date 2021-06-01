@@ -1120,25 +1120,25 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
       dR_dz[ii] = Q.xz() * dR_dxl[ii] + Q.yz() * dR_dyl[ii];
     }
 
-    // External tissue support (hard-coded test)
-    const double k_s = 1.0e3;
-    const double c_s = 1.0e4;
+    // // External tissue support (hard-coded test)
+    // const double k_s = 1.0e3;
+    // const double c_s = 1.0e4;
 
     for(int A=0; A<snLocBas; ++A)
     {
       const double NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
       sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * ( u_t - fw.x() )
-          + NA_x * sigma[qua].xx() + NA_y * sigma[qua].xy() + NA_z * sigma[qua].xz() )
-          + gwts * R[A] * ( k_s * disp_x + c_s * u ); 
+          + NA_x * sigma[qua].xx() + NA_y * sigma[qua].xy() + NA_z * sigma[qua].xz() );
+          // + gwts * R[A] * ( k_s * disp_x + c_s * u ); 
       
       sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * ( v_t - fw.y() )
-          + NA_x * sigma[qua].yx() + NA_y * sigma[qua].yy() + NA_z * sigma[qua].yz() )
-          + gwts * R[A] * ( k_s * disp_y + c_s * v ); 
+          + NA_x * sigma[qua].yx() + NA_y * sigma[qua].yy() + NA_z * sigma[qua].yz() );
+          // + gwts * R[A] * ( k_s * disp_y + c_s * v ); 
       
       sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * ( w_t - fw.z() )
-          + NA_x * sigma[qua].zx() + NA_y * sigma[qua].zy() + NA_z * sigma[qua].zz() ) 
-          + gwts * R[A] * ( k_s * disp_z + c_s * w ); 
+          + NA_x * sigma[qua].zx() + NA_y * sigma[qua].zy() + NA_z * sigma[qua].zz() );
+          // + gwts * R[A] * ( k_s * disp_z + c_s * w ); 
     }
 
   } // end qua loop
@@ -1304,33 +1304,33 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
       }
     }
 
-    // External tissue support (hard-coded test)
-    const double k_s = 1.0e3;
-    const double c_s = 1.0e4;
+    // // External tissue support (hard-coded test)
+    // const double k_s = 1.0e3;
+    // const double c_s = 1.0e4;
 
     for(int A=0; A<snLocBas; ++A)
     {
       const double NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
       sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * ( u_t - fw.x() )
-          + NA_x * sigma[qua].xx() + NA_y * sigma[qua].xy() + NA_z * sigma[qua].xz() )
-          + gwts * R[A] * ( k_s * disp_x + c_s * u ); 
+          + NA_x * sigma[qua].xx() + NA_y * sigma[qua].xy() + NA_z * sigma[qua].xz() );
+          // + gwts * R[A] * ( k_s * disp_x + c_s * u ); 
 
       sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * ( v_t - fw.y() )
-          + NA_x * sigma[qua].yx() + NA_y * sigma[qua].yy() + NA_z * sigma[qua].yz() ) 
-          + gwts * R[A] * ( k_s * disp_y + c_s * v ); 
+          + NA_x * sigma[qua].yx() + NA_y * sigma[qua].yy() + NA_z * sigma[qua].yz() );
+          // + gwts * R[A] * ( k_s * disp_y + c_s * v ); 
       
       sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * ( w_t - fw.z() )
-          + NA_x * sigma[qua].zx() + NA_y * sigma[qua].zy() + NA_z * sigma[qua].zz() ) 
-          + gwts * R[A] * ( k_s * disp_z + c_s * w ); 
+          + NA_x * sigma[qua].zx() + NA_y * sigma[qua].zy() + NA_z * sigma[qua].zz() );
+          // + gwts * R[A] * ( k_s * disp_z + c_s * w ); 
 
       for(int B=0; B<snLocBas; ++B)
       {
         // Momentum-x with respect to u, v, w
         sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+1 ] += gwts * h_w * (
             alpha_m * rho_w * R[A] * R[B]
-            + dd_du * Kg[ (snLocBas*dim)*(A*dim) + (B*dim) ] )
-            + gwts * R[A] * R[B] * ( dd_du * k_s + dd_dv * c_s );
+            + dd_du * Kg[ (snLocBas*dim)*(A*dim) + (B*dim) ] );
+            // + gwts * R[A] * R[B] * ( dd_du * k_s + dd_dv * c_s );
 
         sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+2 ] += gwts * h_w * (
             dd_du * Kg[ (snLocBas*dim)*(A*dim) + (B*dim+1) ] );
@@ -1344,8 +1344,8 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 
         sur_Tangent[ 4*snLocBas*(4*A+2) + 4*B+2 ] += gwts * h_w * (
             alpha_m * rho_w * R[A] * R[B]
-            + dd_du * Kg[ (snLocBas*dim)*(A*dim+1) + (B*dim+1) ] )
-            + gwts * R[A] * R[B] * ( dd_du * k_s + dd_dv * c_s );
+            + dd_du * Kg[ (snLocBas*dim)*(A*dim+1) + (B*dim+1) ] );
+            // + gwts * R[A] * R[B] * ( dd_du * k_s + dd_dv * c_s );
 
         sur_Tangent[ 4*snLocBas*(4*A+2) + 4*B+3 ] += gwts * h_w * (
             dd_du * Kg[ (snLocBas*dim)*(A*dim+1) + (B*dim+2) ] );
@@ -1359,8 +1359,8 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 
         sur_Tangent[ 4*snLocBas*(4*A+3) + 4*B+3 ] += gwts * h_w * (
             alpha_m * rho_w * R[A] * R[B]
-            + dd_du * Kg[ (snLocBas*dim)*(A*dim+2) + (B*dim+2) ] )
-            + gwts * R[A] * R[B] * ( dd_du * k_s + dd_dv * c_s );
+            + dd_du * Kg[ (snLocBas*dim)*(A*dim+2) + (B*dim+2) ] );
+            // + gwts * R[A] * R[B] * ( dd_du * k_s + dd_dv * c_s );
 
       } // end B loop
     } // end A loop
