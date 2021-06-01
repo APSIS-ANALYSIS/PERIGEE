@@ -16,7 +16,6 @@ NodalBC_3D_ring::NodalBC_3D_ring(const int &nFunc) : ring_bc_type(0)
   dominant_n_comp.clear();
   dominant_t_comp.clear();
   outnormal.clear();
-  tangential.clear();
 
   std::cout<<"===> NodalBC_3D_ring::empty is generated. \n";
 }
@@ -66,7 +65,6 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
   // Generate the dir-node list with all ring nodes.
   dir_nodes.clear();
   cap_id.clear();
-  tangential.clear();
 
   if( elemtype == 501 )
   { 

@@ -41,6 +41,10 @@ class NBC_Partition_3D_ring : public NBC_Partition_3D
     // length Num_LD
     std::vector<int> local_cap_id;
 
+    // Each cap's 3x3 rotation matrix for skew boundary conditions
+    // length 9 x num_caps. Order of components: 11, 12, 13, 21, 22, 23, 31, 32, 33
+    std::vector<double> Q;
+
     // Dominant component index of each cap's unit normal vector: 0, 1, or 2
     // length num_caps
     std::vector<int> dominant_n_comp;
@@ -51,9 +55,6 @@ class NBC_Partition_3D_ring : public NBC_Partition_3D
 
     // Each cap's unit normal vector, length 3 x num_caps
     std::vector<double> outnormal;
-
-    // Each node's unit tangential vector, length 3 x Num_LD
-    std::vector<double> local_tangential;
 };
 
 #endif

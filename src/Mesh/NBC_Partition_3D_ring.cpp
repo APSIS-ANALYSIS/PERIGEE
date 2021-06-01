@@ -7,6 +7,7 @@ NBC_Partition_3D_ring::NBC_Partition_3D_ring(
 : NBC_Partition_3D( part, mnindex, nbc ),
   ring_bc_type( nbc -> get_ring_bc_type() ), 
   num_caps( nbc -> get_num_caps() ),
+  Q( nbc -> get_rotation_matrix() ),
   dominant_n_comp( nbc -> get_dominant_n_comp() ),
   outnormal( nbc -> get_outnormal() )
 {
@@ -14,13 +15,11 @@ NBC_Partition_3D_ring::NBC_Partition_3D_ring(
 
   if( LDN.size() > 0 )
   {
-    // Access all (unpartitioned) ring node's cap_ids, tangential vectors, and dominant_t_comps
+    // Access all (unpartitioned) ring node's cap_ids and dominant_t_comps
     std::vector<int> cap_id, dominant_t_comp; 
-    std::vector<double> tangential; 
 
     cap_id = nbc -> get_cap_id();
     dominant_t_comp = nbc -> get_dominant_t_comp();
-    tangential = nbc -> get_tangential();
 
     for(unsigned int ii=0; ii<nbc->get_num_dir_nodes(); ++ii)
     {
@@ -31,10 +30,6 @@ NBC_Partition_3D_ring::NBC_Partition_3D_ring(
       {
         local_cap_id.push_back( cap_id[ii] );
         local_dominant_t_comp.push_back( dominant_t_comp[ii] );
-
-        local_tangential.push_back( tangential[3*ii]     );
-        local_tangential.push_back( tangential[3*ii + 1] );
-        local_tangential.push_back( tangential[3*ii + 2] );
       }
     } 
   }
@@ -59,7 +54,6 @@ void NBC_Partition_3D_ring::write_hdf5( const char * FileName ) const
     h5writer->write_intVector( group_id, "LDN", LDN );
     h5writer->write_intVector( group_id, "local_cap_id", local_cap_id );
     h5writer->write_intVector( group_id, "local_dominant_t_comp", local_dominant_t_comp );
-    h5writer->write_doubleVector( group_id, "local_tangential", local_tangential );
   }
 
   h5writer->write_intVector( group_id, "Num_LD", Num_LD );
@@ -67,6 +61,8 @@ void NBC_Partition_3D_ring::write_hdf5( const char * FileName ) const
   h5writer->write_intScalar( group_id, "ring_bc_type", ring_bc_type );
 
   h5writer->write_intScalar( group_id, "num_caps", num_caps );
+
+  h5writer->write_doubleVector( group_id, "cap_rotation_matrix", Q );
 
   h5writer->write_intVector( group_id, "cap_dominant_n_comp", dominant_n_comp );
 
