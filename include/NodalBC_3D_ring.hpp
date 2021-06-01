@@ -54,7 +54,7 @@ class NodalBC_3D_ring : public INodalBC
 
     virtual std::vector<double> get_outnormal() const { return outnormal; } 
 
-    virtual std::vector<double> get_tangential() const { return tangential; } 
+    virtual std::vector<double> get_rotation_matrix() const { return Q; } 
 
   private:
     NodalBC_3D_ring() : ring_bc_type(0) {};
@@ -80,6 +80,10 @@ class NodalBC_3D_ring : public INodalBC
     // length num_dir_nodes
     std::vector<int> cap_id;
 
+    // Each cap's 3x3 global-to-local transformation matrix for skew boundary conditions
+    // 9 components per cap: 11, 12, 13, 21, 22, 23, 31, 32, 33
+    std::vector<double> Q;
+
     // Dominant component index of each cap's unit normal vector: 0, 1, or 2
     // length num_caps
     std::vector<int> dominant_n_comp;
@@ -98,10 +102,6 @@ class NodalBC_3D_ring : public INodalBC
 
     // Compute centroid coordinates given a cap's nodal coordinates
     void compute_cap_centroid( const std::vector<double> &pts, Vector_3 &centroid ) const;
-
-    // Compute unit tangential vector given nodal coordinates and the corresponding cap centroid
-    void compute_tangential( const int &cap_id, const Vector_3 &centroid,
-        const double &pt_x, const double &pt_y, const double &pt_z );
 };
 
 #endif

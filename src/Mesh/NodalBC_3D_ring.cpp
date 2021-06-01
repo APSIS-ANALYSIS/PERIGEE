@@ -12,6 +12,7 @@ NodalBC_3D_ring::NodalBC_3D_ring(const int &nFunc) : ring_bc_type(0)
   
   num_caps = 0;
   cap_id.clear();
+  Q.clear();
   dominant_n_comp.clear();
   dominant_t_comp.clear();
   outnormal.clear();
@@ -40,6 +41,7 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
 
   num_caps = cap_files.size();
   dominant_n_comp.resize(num_caps);
+  Q.resize(9 * num_caps);
 
   outnormal = inlet_outnormal.to_std_vec();
   dominant_n_comp[0] = inlet_outnormal.get_dominant_comp();
@@ -91,13 +93,28 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
         {
           dir_nodes.push_back( static_cast<unsigned int>( gnode[jj] ) );
           cap_id.push_back( ii );
-          compute_tangential( ii, centroid, pts[3*jj], pts[3*jj + 1], pts[3*jj + 2]);
+
+          // Compute the cap's skew bc transformation matrix with the first ring node
+          if( num_outline_pts == 0 )
+          {
+            Vector_3 radial_vec = Vector_3( pts[3*jj], pts[3*jj + 1], pts[3*jj + 2] );
+            radial_vec -= centroid;
+
+            Vector_3 normal_vec = Vector_3( outnormal[3*ii], outnormal[3*ii+1], outnormal[3*ii+2] );
+            Vector_3 tan_vec    = cross_product( normal_vec, radial_vec );
+            tan_vec.normalize();
+
+            Q[9*ii+0] = normal_vec.x(); Q[9*ii+1] = normal_vec.y(); Q[9*ii+2] = normal_vec.z();
+            Q[9*ii+3] = radial_vec.x(); Q[9*ii+4] = radial_vec.y(); Q[9*ii+5] = radial_vec.z();
+            Q[9*ii+6] = tan_vec.x();    Q[9*ii+7] = tan_vec.y();    Q[9*ii+8] = tan_vec.z();
+          }
+
           num_outline_pts += 1;
         }
       }
 
       // Detect usage of the sv exterior surface (containing caps) as the wall surface
-      if(num_outline_pts == numpts)
+      if( num_outline_pts == numpts )
         SYS_T::print_fatal( "Error: Cap %d has %d outline nodes and %d total nodes. This is likely due to an improper wall mesh.\n", ii, num_outline_pts, numpts );
     }
   }
@@ -126,13 +143,28 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
         {
           dir_nodes.push_back( static_cast<unsigned int>( gnode[jj] ) );
           cap_id.push_back( ii );
-          compute_tangential( ii, centroid, pts[3*jj], pts[3*jj + 1], pts[3*jj + 2]);
+
+          // Compute the cap's skew bc transformation matrix with the first ring node
+          if( num_outline_pts == 0 )
+          {
+            Vector_3 radial_vec = Vector_3( pts[3*jj], pts[3*jj + 1], pts[3*jj + 2] );
+            radial_vec -= centroid;
+
+            Vector_3 normal_vec = Vector_3( outnormal[3*ii], outnormal[3*ii+1], outnormal[3*ii+2] );
+            Vector_3 tan_vec    = cross_product( normal_vec, radial_vec );
+            tan_vec.normalize();
+
+            Q[9*ii+0] = normal_vec.x(); Q[9*ii+1] = normal_vec.y(); Q[9*ii+2] = normal_vec.z();
+            Q[9*ii+3] = radial_vec.x(); Q[9*ii+4] = radial_vec.y(); Q[9*ii+5] = radial_vec.z();
+            Q[9*ii+6] = tan_vec.x();    Q[9*ii+7] = tan_vec.y();    Q[9*ii+8] = tan_vec.z();
+          }
+
           num_outline_pts += 1;
         }
       }
 
       // Detect usage of the sv exterior surface (containing caps) as the wall surface
-      if(num_outline_pts == numpts)
+      if( num_outline_pts == numpts )
         SYS_T::print_fatal( "Error: Cap %d has %d outline nodes and %d total nodes. This is likely due to an improper wall mesh.\n", ii, num_outline_pts, numpts );
     }
   }
@@ -173,26 +205,6 @@ void NodalBC_3D_ring::compute_cap_centroid( const std::vector<double> &pts, Vect
   centroid(0) /= (double) num_node;
   centroid(1) /= (double) num_node;
   centroid(2) /= (double) num_node;
-}
-
-
-void NodalBC_3D_ring::compute_tangential( const int &cap_id, const Vector_3 &centroid,
-    const double &pt_x, const double &pt_y, const double &pt_z )
-{
-  // Generate radial vector using nodal & centroidal coordinates
-  Vector_3 radial_vec = Vector_3( pt_x, pt_y, pt_z );
-  radial_vec -= centroid;
-
-  Vector_3 normal_vec = Vector_3( outnormal[3*cap_id], outnormal[3*cap_id+1], outnormal[3*cap_id+2] );
-  Vector_3 tan_vec    = cross_product( normal_vec, radial_vec );
-  tan_vec.normalize();
-
-  for(int ii=0; ii<3; ++ii) tangential.push_back( tan_vec(ii) );
-
-  // Ensure dominant component indices in the normal and tangential vectors
-  // aren't equal 
-  tan_vec( dominant_n_comp[ cap_id ] ) = 0.0;
-  dominant_t_comp.push_back( tan_vec.get_dominant_comp() );
 }
 
 // EOF
