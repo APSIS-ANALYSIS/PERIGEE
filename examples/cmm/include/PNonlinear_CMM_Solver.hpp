@@ -75,6 +75,47 @@ class PNonlinear_CMM_Solver
         PDNSolution * const &sol_wall_disp,
         bool &prestress_conv_flag, int &nl_counter ) const;
 
+    // --------------------------------------------------------------
+    // GenAlpha_Solve_Prestress:
+    // This is a solver for CMM-FSI using the 2nd-order Generalized.
+    // alpha method.
+    // --------------------------------------------------------------
+    void GenAlpha_Solve_Prestress(
+        const bool &new_tangent_flag,
+        const double &curr_time,
+        const double &dt,
+        const PDNSolution * const &sol_base,
+        const PDNSolution * const &pre_dot_sol,
+        const PDNSolution * const &pre_sol,
+        const PDNSolution * const &pre_dot_sol_wall_disp,
+        const PDNSolution * const &pre_sol_wall_disp,
+        const TimeMethod_GenAlpha * const &tmga_ptr,
+        const ICVFlowRate * const flr_ptr,
+        const ALocal_Elem * const &alelem_ptr,
+        const ALocal_IEN * const &lien_ptr,
+        const APart_Node * const &anode_ptr,
+        const FEANode * const &feanode_ptr,
+        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_Inflow_NodalBC * const &infnbc_part,
+        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_EBC * const &ebc_part,
+        ALocal_EBC * const &ebc_wall_part,
+        const IGenBC * const &gbc,
+        const Matrix_PETSc * const &bc_mat,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        FEAElement * const &elementw,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        IPLocAssem * const &lassem_ptr,
+        IPGAssem * const &gassem_ptr,
+        PLinear_Solver_PETSc * const &lsolver_ptr,
+        PDNSolution * const &dot_sol,
+        PDNSolution * const &sol,
+        PDNSolution * const &dot_sol_wall_disp,
+        PDNSolution * const &sol_wall_disp,
+        bool &prestress_conv_flag, int &nl_counter ) const;
+
   private:
     const double nr_tol, na_tol, nd_tol;
     const int nmaxits, nrenew_freq, nrenew_threshold;
