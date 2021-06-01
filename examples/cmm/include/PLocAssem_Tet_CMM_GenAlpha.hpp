@@ -14,8 +14,7 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
   public:
     PLocAssem_Tet_CMM_GenAlpha(
         const TimeMethod_GenAlpha * const &tm_gAlpha,
-        const int &in_nlocbas, const int &in_nqp,
-        const int &in_snlocbas, const double &in_rho, 
+        const int &in_nqp, const double &in_rho, 
         const double &in_vis_mu, const double &in_beta,
         const double &in_wall_rho, const double &in_nu,
         const double &in_kappa, const double &in_ctauc = 1.0,
