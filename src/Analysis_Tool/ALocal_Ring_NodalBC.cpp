@@ -58,4 +58,18 @@ ALocal_Ring_NodalBC::~ALocal_Ring_NodalBC()
   VEC_T::clean( outnormal    );
 }
 
+bool ALocal_Ring_NodalBC::is_inLDN( const int &ii, int &pos ) const
+{
+  if( VEC_T::is_invec(LDN, ii) )
+  {
+    pos = VEC_T::get_pos(LDN, ii);
+    return true;
+  }
+  else
+  {
+    pos = -1;
+    return false;
+  }
+}
+
 // EOF

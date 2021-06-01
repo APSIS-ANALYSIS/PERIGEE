@@ -48,9 +48,9 @@ class ALocal_Ring_NodalBC
     virtual Matrix_3x3 get_rotation_matrix( const int &node ) const
     { return Q[ local_cap_id[node] ]; }
 
-    // determine whether a given index belongs to the LDN vector
-    virtual bool is_inLDN( const int &ii) const
-    { return VEC_T::is_invec(LDN, ii); }
+    // determine whether a given index belongs to the LDN vector.
+    // if so, return the position; else return -1.
+    virtual bool is_inLDN( const int &ii, int &pos ) const;
 
   private:
     // type = 0 : all dof of ring nodes are set to be essential bc;
