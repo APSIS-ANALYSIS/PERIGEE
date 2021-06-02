@@ -53,6 +53,37 @@ class PTime_CMM_Solver
         PLinear_Solver_PETSc * const &lsolver_ptr,
         PNonlinear_CMM_Solver * const &nsolver_ptr ) const;
 
+    void TM_CMM_Prestress(
+        const bool &restart_init_assembly_flag,
+        const PDNSolution * const &sol_base,
+        const PDNSolution * const &init_dot_sol,
+        const PDNSolution * const &init_sol,
+        const PDNSolution * const &init_dot_sol_wall_disp,
+        const PDNSolution * const &init_sol_wall_disp,
+        const TimeMethod_GenAlpha * const &tmga_ptr,
+        PDNTimeStep * const &time_info,
+        const ICVFlowRate * const flr_ptr,
+        const ALocal_Elem * const &alelem_ptr,
+        const ALocal_IEN * const &lien_ptr,
+        const APart_Node * const &anode_ptr,
+        const FEANode * const &feanode_ptr,
+        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_Inflow_NodalBC * const &infnbc_part,
+        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_EBC * const &ebc_part,
+        ALocal_EBC * const &ebc_wall_part,
+        IGenBC * const &gbc,
+        const Matrix_PETSc * const &bc_mat,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        FEAElement * const &elementw,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        IPLocAssem * const &lassem_ptr,
+        IPGAssem * const &gassem_ptr,
+        PLinear_Solver_PETSc * const &lsolver_ptr,
+        PNonlinear_CMM_Solver * const &nsolver_ptr ) const;
+
   private:
 
     const double final_time;
