@@ -73,6 +73,12 @@ int main( int argc, char *argv[] )
   // ===== Read Command Line Arguments =====
   SYS_T::GetOptionString("-part_file",       part_file);
   SYS_T::GetOptionReal(  "-rho_inf",         genA_rho_inf);
+  SYS_T::GetOptionReal(  "-nl_rtol",         nl_rtol);
+  SYS_T::GetOptionReal(  "-nl_atol",         nl_atol);
+  SYS_T::GetOptionReal(  "-nl_dtol",         nl_dtol);
+  SYS_T::GetOptionInt(   "-nl_maxits",       nl_maxits);
+  SYS_T::GetOptionInt(   "-nl_refreq",       nl_refreq);
+  SYS_T::GetOptionInt(   "-nl_threshold",    nl_threshold);
   SYS_T::GetOptionBool(  "-is_backward_Euler", is_backward_Euler);
   SYS_T::GetOptionReal(  "-init_time",       initial_time);
   SYS_T::GetOptionReal(  "-fina_time",       final_time);
@@ -83,6 +89,13 @@ int main( int argc, char *argv[] )
 
   // ===== Print Command Line Arguments =====
   SYS_T::cmdPrint(      "-part_file:",       part_file);
+  SYS_T::cmdPrint(      "-nl_rtol:",         nl_rtol);
+  SYS_T::cmdPrint(      "-nl_atol:",         nl_atol);
+  SYS_T::cmdPrint(      "-nl_dtol:",         nl_dtol);
+  SYS_T::cmdPrint(      "-nl_maxits:",       nl_maxits);
+  SYS_T::cmdPrint(      "-nl_refreq:",       nl_refreq);
+  SYS_T::cmdPrint(      "-nl_threshold:",    nl_threshold);
+  
   if( is_backward_Euler )
     SYS_T::commPrint(     "-is_backward_Euler: true \n");
   else
