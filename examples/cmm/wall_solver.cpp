@@ -74,6 +74,12 @@ int main( int argc, char *argv[] )
   SYS_T::GetOptionString("-part_file",       part_file);
   SYS_T::GetOptionReal(  "-rho_inf",         genA_rho_inf);
   SYS_T::GetOptionBool(  "-is_backward_Euler", is_backward_Euler);
+  SYS_T::GetOptionReal(  "-init_time",       initial_time);
+  SYS_T::GetOptionReal(  "-fina_time",       final_time);
+  SYS_T::GetOptionReal(  "-init_step",       initial_step);
+  SYS_T::GetOptionInt(   "-init_index",      initial_index);
+  SYS_T::GetOptionInt(   "-ttan_freq",       ttan_renew_freq);
+  SYS_T::GetOptionInt(   "-sol_rec_freq",    sol_record_freq);
 
   // ===== Print Command Line Arguments =====
   SYS_T::cmdPrint(      "-part_file:",       part_file);
@@ -81,6 +87,13 @@ int main( int argc, char *argv[] )
     SYS_T::commPrint(     "-is_backward_Euler: true \n");
   else
     SYS_T::cmdPrint(      "-rho_inf:",         genA_rho_inf);
+  
+  SYS_T::cmdPrint(      "-init_time:",       initial_time);
+  SYS_T::cmdPrint(      "-init_step:",       initial_step);
+  SYS_T::cmdPrint(      "-init_index:",      initial_index);
+  SYS_T::cmdPrint(      "-fina_time:",       final_time);
+  SYS_T::cmdPrint(      "-ttan_freq:",       ttan_renew_freq);
+  SYS_T::cmdPrint(      "-sol_rec_freq:",    sol_record_freq);
 
   // ===== Load Analysis Data Structure =====
   APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file);
