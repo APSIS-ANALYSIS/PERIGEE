@@ -91,6 +91,7 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
           {
             Vector_3 radial_vec = Vector_3( pts[3*jj], pts[3*jj + 1], pts[3*jj + 2] );
             radial_vec -= centroid;
+            radial_vec.normalize();
 
             Vector_3 normal_vec = Vector_3( outnormal[3*ii], outnormal[3*ii+1], outnormal[3*ii+2] );
             Vector_3 tan_vec    = cross_product( normal_vec, radial_vec );
