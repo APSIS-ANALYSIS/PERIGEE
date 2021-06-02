@@ -447,7 +447,7 @@ int main( int argc, char *argv[] )
   PCFieldSplitSetFields(upc,"p",1,pfield,pfield);
 
   // ===== Nonlinear solver context =====
-  PNonlinear_CMM_Solver * nsolver = new PNonlinear_CMM_Solver( pNode, fNode,
+  PNonlinear_CMM_Solver * nsolver = new PNonlinear_CMM_Solver( pNode,
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
   nsolver->print_info();

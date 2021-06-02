@@ -2,7 +2,6 @@
 
 PNonlinear_CMM_Solver::PNonlinear_CMM_Solver(
     const APart_Node * const &anode_ptr,
-    const FEANode * const &feanode_ptr,
     const double &input_nrtol, const double &input_natol,
     const double &input_ndtol,
     const int &input_max_iteration, 

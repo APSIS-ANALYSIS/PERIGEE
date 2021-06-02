@@ -26,6 +26,26 @@ int main( int argc, char *argv[] )
   // Estimate of num nonzeros per row for the sparse tangent matrix
   int nz_estimate = 300;
 
+  // Prestress tolerance
+  double prestress_disp_tol = 1.0e-6;
+
+  // Nonlinear solver parameters
+  double nl_rtol = 1.0e-3;           // convergence criterion relative tolerance
+  double nl_atol = 1.0e-6;           // convergence criterion absolute tolerance
+  double nl_dtol = 10.0;             // divergence criterion
+  int    nl_maxits = 20;             // maximum number if nonlinear iterations
+  int    nl_refreq = 4;              // frequency of tangent matrix renewal
+  int    nl_threshold = 4;           // threshold of tangent matrix renewal
+
+  // Time stepping parameters
+  double initial_time = 0.0;         // time of initial condition
+  double initial_step = 0.1;         // time step size
+  int    initial_index = 0;          // index of initial condition
+  double final_time = 1.0;           // end time of simulation
+  std::string sol_bName("SOL_");     // base name of the solution file
+  int    ttan_renew_freq = 1;        // frequency of tangent matrix renewal
+  int    sol_record_freq = 1;        // frequency for recording the solution
+
   // We assume that a 3D solver has been called (to generate the wall traction)
   // and a suite of command line arguments has been saved to disk
   hid_t solver_cmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
@@ -91,8 +111,13 @@ int main( int argc, char *argv[] )
   // Local sub-domain's wall elemental (Neumann) BC for CMM
   ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, quads, "ebc_wall");
 
+  // Control points' xyz coordinates
+  FEANode * fNode = new FEANode(part_file, rank);
+
   // ===== Finite element containers =====
   SYS_T::commPrint("===> Set up volumetric and surface element containers. \n");
+  FEAElement * elementv = nullptr;
+  FEAElement * elements = nullptr;
   FEAElement * elementw = nullptr;
 
   if( GMIptr->get_elemType() == 501 )          // linear tet
@@ -100,6 +125,9 @@ int main( int argc, char *argv[] )
   else if( GMIptr->get_elemType() == 502 )     // quadratic tet
     elementw = new FEAElement_Triangle6_membrane( nqp_tri );
   else SYS_T::print_fatal("Error: Element type not supported.\n");
+
+  // ===== Generate a sparse matrix for enforcing nodal BCs ====
+  Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
 
   // ===== Generalized-alpha =====
   SYS_T::commPrint("===> Set up the generalized-alpha time integration scheme.\n");
@@ -131,9 +159,6 @@ int main( int argc, char *argv[] )
 
   PDNSolution * dot_sol_wall_disp = new PDNSolution_Wall_Disp( pNode, 0 );
 
-  int    initial_index = 0;          // restart solution time index
-  double initial_time = 0.0;         // restart time
-  double initial_step = 1.0e-3;      // restart simulation time step size
   std::string restart_name = "SOL_re"; // restart solution base name
 
   // Read in [pres velo]
@@ -161,15 +186,48 @@ int main( int argc, char *argv[] )
   gloAssem_ptr->Fix_nonzero_err_str();
   gloAssem_ptr->Clear_KG();
 
+  // ===== Linear solver context =====
+  PLinear_Solver_PETSc * lsolver = new PLinear_Solver_PETSc();
 
+  PC upc; lsolver->GetPC(&upc);
+  const PetscInt pfield[1] = {0}, vfields[] = {1,2,3};
+  PCFieldSplitSetBlockSize(upc,4);
+  PCFieldSplitSetFields(upc,"u",3,vfields,vfields);
+  PCFieldSplitSetFields(upc,"p",1,pfield,pfield);
 
+  // ===== Nonlinear solver context =====
+  PNonlinear_CMM_Solver * nsolver = new PNonlinear_CMM_Solver( pNode,
+      nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
+  nsolver->print_info();
+
+  // ===== Temporal solver context =====
+  PTime_CMM_Solver * tsolver = new PTime_CMM_Solver( sol_bName,
+      sol_record_freq, ttan_renew_freq, final_time );
+
+  tsolver->print_info();
+
+  // ===== FEM analysis =====
+  SYS_T::commPrint("===> Start Finite Element Analysis:\n");
+
+  ICVFlowRate * inflow_rate_ptr = nullptr;
+  IGenBC * gbc = nullptr;
+  ALocal_Inflow_NodalBC * locinfnbc = nullptr;
+  ALocal_Ring_NodalBC * locringnbc = nullptr;
+  ALocal_EBC * locebc = nullptr;
+  IQuadPts * quadv = nullptr;
+
+  tsolver->TM_Prestress( prestress_disp_tol, base, dot_sol, sol, dot_sol_wall_disp, sol_wall_disp,
+      tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN, pNode, fNode,
+      locnbc, locinfnbc, locringnbc, locebc, locebc_wall, gbc, pmat, elementv, elements, elementw,
+      quadv, quads, locAssem_ptr, gloAssem_ptr, lsolver, nsolver );
 
 
   delete locElem;
   delete GMIptr; delete quads; delete elementw; delete locebc_wall; delete tm_galpha_ptr;
   delete pNode; delete locAssem_ptr; delete base; delete sol; delete dot_sol;
   delete sol_wall_disp; delete dot_sol_wall_disp; delete timeinfo; delete gloAssem_ptr;
+  delete tsolver; delete nsolver; delete lsolver;
   PetscFinalize();
   return EXIT_SUCCESS;
 }
