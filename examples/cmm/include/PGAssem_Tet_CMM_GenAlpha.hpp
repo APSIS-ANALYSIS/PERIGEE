@@ -176,7 +176,8 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
     void RingBC_KG( const ALocal_Ring_NodalBC * const &ringnbc_part,
         FEAElement * const &element,
         const int * const &IEN_e,
-        IPLocAssem * const &lassem_ptr );
+        PetscScalar * const &Ke,
+        PetscScalar * const &Ge );
     
     // Natural boundary condition
     void NatBC_G( const double &curr_time, const double &dt,
@@ -202,6 +203,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const ALocal_NodalBC * const &nbc_part,
+        const ALocal_Ring_NodalBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part );
 
     // Resistance type boundary condition on outlet surfaces
@@ -221,6 +223,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const ALocal_NodalBC * const &nbc_part,
+        const ALocal_Ring_NodalBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
@@ -245,6 +248,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         FEAElement * const &element_w,
         const IQuadPts * const &quad_s,
         const ALocal_NodalBC * const &nbc_part,
+        const ALocal_Ring_NodalBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_wall_part );
 
     void GetLocal(const double * const &array, const int * const &IEN,

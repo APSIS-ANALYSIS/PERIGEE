@@ -111,7 +111,8 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
     const ALocal_Ring_NodalBC * const &ringnbc_part,
     FEAElement * const &element,
     const int * const &IEN_e,
-    IPLocAssem * const &lassem_ptr )
+    PetscScalar * const &Ke,
+    PetscScalar * const &Ge )
 {
   const int ringbc_type = ringnbc_part -> get_ringbc_type();
 
@@ -148,23 +149,14 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
 
     if( num_ringnode > 0 )
     {
-      double * Ke = new double [ndof_e * ndof_e] {};
-      double * Ge = new double [ndof_e] {};
-      if( element->get_nLocBas() == nLocBas )
-      {
-        Ke = lassem_ptr->Tangent;
-        Ge = lassem_ptr->Residual;
-      }
-      else if( element->get_nLocBas() == snLocBas ) 
-      {
-        Ke = lassem_ptr->sur_Tangent;
-        Ge = lassem_ptr->sur_Residual;
-      }
-      else
-        SYS_T::print_fatal("PGAssem_Tet_CMM_GenAlpha:: incompatible element nLocBas.\n");
-
       // Rotate K: R^T * K * R = R_{ki} * K_{kl} * R_{lj}
-      double * Ke_rot = new double [ndof_e * ndof_e] {};
+      PetscScalar * Ke_temp = new PetscScalar [ndof_e * ndof_e];
+
+      for( int ii = 0; ii < ndof_e * ndof_e; ++ii )
+      {
+        Ke_temp[ii] = Ke[ii];
+        Ke[ii] = 0.0;
+      }
 
       for( int ii = 0; ii < ndof_e; ++ii )
       {
@@ -173,32 +165,27 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
           for( int kk = 0; kk < ndof_e; ++kk )
           {
             for(int ll = 0; ll < ndof_e; ++ll ) 
-              Ke_rot[ii*ndof_e+jj] += rotmat_e[kk*ndof_e+ii] * Ke[kk*ndof_e+ll] * rotmat_e[ll*ndof_e+jj];
+              Ke[ii*ndof_e+jj] += rotmat_e[kk*ndof_e+ii] * Ke_temp[kk*ndof_e+ll] * rotmat_e[ll*ndof_e+jj];
           }
         }
       }
 
       // Rotate G: R^T * G = R_{ji} * G_{j}
-      double * Ge_rot = new double [ndof_e] {};
+      PetscScalar * Ge_temp = new PetscScalar [ndof_e];
+      for( int ii = 0; ii < ndof_e; ++ii )
+      {
+        Ge_temp[ii] = Ke[ii];
+        Ge[ii] = 0.0;
+      }
+
       for(int ii = 0; ii < ndof_e; ++ii )
       {
         for(int jj = 0; jj < ndof_e; ++jj )
-          Ge_rot[ii] += rotmat_e[jj*ndof_e+ii] * Ge[jj];
+          Ge[ii] += rotmat_e[jj*ndof_e+ii] * Ge_temp[jj];
       }
 
-      if( element->get_nLocBas() == nLocBas )
-      {
-        lassem_ptr->Tangent  = Ke_rot; 
-        lassem_ptr->Residual = Ge_rot; 
-      }
-      else
-      {
-        lassem_ptr->sur_Tangent  = Ke_rot; 
-        lassem_ptr->sur_Residual = Ge_rot; 
-      }
-
-      delete [] Ke; delete [] Ke_rot; delete [] Ge; delete [] Ge_rot;
-      Ke = nullptr; Ke_rot = nullptr; Ge = nullptr; Ge_rot = nullptr;
+      delete [] Ke_temp; delete [] Ge_temp;
+      Ke_temp = nullptr; Ge_temp = nullptr;
     }
 
     delete [] rotmat_e; rotmat_e = nullptr;
@@ -271,7 +258,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_nonzero_estimate(
   PDNSolution * temp = new PDNSolution_NS( node_ptr, 0, false );
 
   // 0.1 is an (arbitrarily chosen) nonzero time step size feeding the NatBC_Resis_KG 
-  NatBC_Resis_KG(0.1, temp, temp, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
+  NatBC_Resis_KG(0.1, temp, temp, lassem_ptr, elements, quad_s, nbc_part, ringnbc_part, ebc_part, gbc );
 
   delete temp;
 
@@ -280,8 +267,6 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_nonzero_estimate(
 
   for(int ii=0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
 
-  // RingBC_KG( node_ptr, nbc_part, ringnbc_part );
-  
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
   VecAssemblyBegin(G);
@@ -327,7 +312,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_mass_residual(
         ectrl_x, ectrl_y, ectrl_z, quad_v );
 
     // Skew boundary conditions for in-plane motion of ring nodes
-    RingBC_KG(ringnbc_part, elementv, IEN_e, lassem_ptr);
+    RingBC_KG( ringnbc_part, elementv, IEN_e, lassem_ptr->Tangent, lassem_ptr->Residual );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -501,7 +486,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
         elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
 
     // Skew boundary conditions for in-plane motion of ring nodes
-    RingBC_KG(ringnbc_part, elementv, IEN_e, lassem_ptr);
+    RingBC_KG( ringnbc_part, elementv, IEN_e, lassem_ptr->Tangent, lassem_ptr->Residual );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -526,13 +511,13 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
   delete [] row_index; row_index = nullptr;
 
   // Backflow stabilization residual & tangent contribution
-  BackFlow_KG( dt, sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+  BackFlow_KG( dt, sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ringnbc_part, ebc_part );
 
   // Residual & tangent contributions from the thin-walled linear membrane in CMM
-  WallMembrane_KG( curr_time, dt, sol_a, sol_b, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ebc_wall_part );
+  WallMembrane_KG( curr_time, dt, sol_a, sol_b, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ringnbc_part, ebc_wall_part );
 
   // Resistance type boundary condition
-  NatBC_Resis_KG( dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
+  NatBC_Resis_KG( dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ringnbc_part, ebc_part, gbc );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -657,6 +642,7 @@ void PGAssem_Tet_CMM_GenAlpha::BackFlow_KG( const double &dt,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_NodalBC * const &nbc_part,
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   double * array_a = new double [nlgn * dof_sol];
@@ -687,6 +673,9 @@ void PGAssem_Tet_CMM_GenAlpha::BackFlow_KG( const double &dt,
 
       lassem_ptr->Assem_Tangent_Residual_BackFlowStab( dt, local_as, local_bs,
           element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+
+      // Skew boundary conditions for in-plane motion of ring nodes
+      RingBC_KG( ringnbc_part, element_s, LSIEN, lassem_ptr->sur_Tangent, lassem_ptr->sur_Residual );
 
       for(int ii=0; ii<snLocBas; ++ii)
       {
@@ -803,6 +792,7 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_KG(
     FEAElement * const &element_w,
     const IQuadPts * const &quad_s,
     const ALocal_NodalBC * const &nbc_part,
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_wall_part )
 {
   const int dof_disp = 3; 
@@ -846,6 +836,9 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_KG(
 
     lassem_ptr->Assem_Tangent_Residual_EBC_Wall( curr_time, dt, local_as, local_bs, local_cs,
         element_w, sctrl_x, sctrl_y, sctrl_z, sthickness, syoungsmod, quaprestress, quad_s);
+
+    // Skew boundary conditions for in-plane motion of ring nodes
+    RingBC_KG( ringnbc_part, element_w, LSIEN, lassem_ptr->sur_Tangent, lassem_ptr->sur_Residual );
 
     for(int ii=0; ii<snLocBas; ++ii)
     {
@@ -1223,6 +1216,7 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_KG(
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_NodalBC * const &nbc_part,
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc )
 {
