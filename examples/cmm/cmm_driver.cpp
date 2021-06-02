@@ -77,9 +77,6 @@ int main( int argc, char *argv[] )
   int    nl_refreq = 4;              // frequency of tangent matrix renewal
   int    nl_threshold = 4;           // threshold of tangent matrix renewal
 
-  // Prestress solver parameters
-  const bool   prestress_flag = false;
-
   // Time stepping parameters
   double initial_time = 0.0;         // time of initial condition
   double initial_step = 0.1;         // time step size
@@ -176,8 +173,6 @@ int main( int argc, char *argv[] )
   SYS_T::cmdPrint(      "-nl_maxits:",       nl_maxits);
   SYS_T::cmdPrint(      "-nl_refreq:",       nl_refreq);
   SYS_T::cmdPrint(      "-nl_threshold:",    nl_threshold);
-
-  SYS_T::commPrint(     "-prestress_flag: false \n");
 
   SYS_T::cmdPrint(      "-init_time:",       initial_time);
   SYS_T::cmdPrint(      "-init_step:",       initial_step);
@@ -290,7 +285,7 @@ int main( int argc, char *argv[] )
   ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
 
   // Local sub-domain's wall elemental (Neumann) BC for CMM
-  ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, quads, "ebc_wall", prestress_flag);
+  ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, quads, "ebc_wall");
 
   // Cross check fluid densities specified for the solver vs. wall youngsmod calculation
   if( locebc_wall -> get_fluid_density() != fluid_density )

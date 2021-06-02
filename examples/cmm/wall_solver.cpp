@@ -19,8 +19,6 @@
 int main( int argc, char *argv[] )
 {
   // Prestress solver parameters
-  const bool   prestress_flag = false;
-
   // Generalized-alpha rho_inf
   double genA_rho_inf = 0.5;
   bool is_backward_Euler = false;
@@ -91,7 +89,7 @@ int main( int argc, char *argv[] )
   ALocal_NodalBC * locnbc = new ALocal_NodalBC(part_file, rank);
 
   // Local sub-domain's wall elemental (Neumann) BC for CMM
-  ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, quads, "ebc_wall", prestress_flag);
+  ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, quads, "ebc_wall");
 
   // ===== Finite element containers =====
   SYS_T::commPrint("===> Set up volumetric and surface element containers. \n");

@@ -2,9 +2,9 @@
 
 ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
     const int &in_cpu_rank, const IQuadPts * const &quad, 
-    const std::string &gname, const bool &prestress_flag)
+    const std::string &gname )
 : ALocal_EBC( fileBaseName, in_cpu_rank, gname ), cpu_rank (in_cpu_rank),
-  face_nqp( quad -> get_num_quadPts() ), solve_prestress( prestress_flag )
+  face_nqp( quad -> get_num_quadPts() )
 {
   SYS_T::print_fatal_if(gname != "ebc_wall", 
       "Error: ALocal_EBC_wall data should be read from group ebc_wall.\n" );
@@ -103,15 +103,10 @@ void ALocal_EBC_wall::get_prestress( const int &eindex,
 void ALocal_EBC_wall::set_prestress( const int &eindex,
     const double * const &e_quaprestress )
 {
-  if( solve_prestress )
-  {
-    const int pos = 6 * eindex * face_nqp; 
+  const int pos = 6 * eindex * face_nqp; 
 
-    for(int ii = 0; ii < 6 * face_nqp; ++ii)
-      qua_prestress[pos + ii] = e_quaprestress[ii]; 
-  }
-  else
-    SYS_T::commPrint("Warning in ALocal_EBC_wall: set_prestress should only be called when solving for prestress. \n"); 
+  for(int ii = 0; ii < 6 * face_nqp; ++ii)
+    qua_prestress[pos + ii] = e_quaprestress[ii]; 
 }
 
 void ALocal_EBC_wall::write_prestress_hdf5( const char * FileName ) const

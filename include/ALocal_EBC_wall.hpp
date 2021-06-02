@@ -19,8 +19,7 @@ class ALocal_EBC_wall : public ALocal_EBC
   public:
     ALocal_EBC_wall( const std::string &fileBaseName,
         const int &in_cpu_rank, const IQuadPts * const &quad,
-        const std::string &gname = "ebc_wall",
-        const bool &prestress_flag = false );
+        const std::string &gname = "ebc_wall" );
 
     virtual ~ALocal_EBC_wall();
 
@@ -72,11 +71,6 @@ class ALocal_EBC_wall : public ALocal_EBC
     // num quadrature points for surface element
     // ------------------------------------------------------------------------
     const int face_nqp;
-
-    // ------------------------------------------------------------------------
-    // flag for whether the wall prestress is being solved for and updated 
-    // ------------------------------------------------------------------------
-    const bool solve_prestress;
 
     // ------------------------------------------------------------------------
     // Fluid density used to generate the youngs modulus for arteries at

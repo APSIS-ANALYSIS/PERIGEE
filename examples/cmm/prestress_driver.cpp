@@ -77,7 +77,6 @@ int main( int argc, char *argv[] )
   int    nl_threshold = 4;            // threshold of tangent matrix renewal
 
   // Prestress solver parameters
-  const bool prestress_flag = true;
   double     ps_disp_atol   = 1.0e-6; // convegence criterion absolute disp L2 norm
 
   // Time stepping parameters
@@ -174,7 +173,6 @@ int main( int argc, char *argv[] )
   SYS_T::cmdPrint(      "-nl_refreq:",       nl_refreq);
   SYS_T::cmdPrint(      "-nl_threshold:",    nl_threshold);
 
-  SYS_T::commPrint(     "-prestress_flag: true \n");
   SYS_T::cmdPrint(      "-ps_disp_atol:",    ps_disp_atol);
 
   SYS_T::cmdPrint(      "-init_time:",       initial_time);
@@ -284,7 +282,7 @@ int main( int argc, char *argv[] )
   ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
 
   // Local sub-domain's wall elemental (Neumann) BC for CMM
-  ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, quads, "ebc_wall", prestress_flag);
+  ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, quads, "ebc_wall");
 
   // Cross check fluid densities specified for the solver vs. wall youngsmod calculation
   if( locebc_wall -> get_fluid_density() != fluid_density )
@@ -545,7 +543,7 @@ int main( int argc, char *argv[] )
       quadv, quads, locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
 
   // ==== Append wall prestress to h5 file ====
-  if( prestress_flag ) locebc_wall -> write_prestress_hdf5( part_file.c_str() );  
+  locebc_wall -> write_prestress_hdf5( part_file.c_str() );  
 
   // ===== Print complete solver info =====
   lsolver -> print_info();
