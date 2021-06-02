@@ -22,14 +22,16 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
   youngsmod.clear();
   qua_prestress.clear();
 
+  const int ebc_id = 0;
+
   // wall has only one surface per the assumption in wall ebc  
-  if( num_local_cell[0] > 0 )
+  if( num_local_cell[ebc_id] > 0 )
   {
     std::string subgroup_name(gname);
     subgroup_name.append("/ebcid_0");
 
-    h5r -> read_doubleVector( subgroup_name.c_str(), "thickness", thickness );
-    h5r -> read_doubleVector( subgroup_name.c_str(), "youngsmod", youngsmod );
+    thickness = h5r -> read_doubleVector( subgroup_name.c_str(), "thickness" );
+    youngsmod = h5r -> read_doubleVector( subgroup_name.c_str(), "youngsmod" );
 
     // If the prestress data exist on file, read the prestress data
     // otherwise, just allocate a container for prestress data at each quadrature 
@@ -38,15 +40,16 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
     prestress_data_location.append("/prestress");
     if( h5r -> check_data( prestress_data_location.c_str() ) )
     {
-      h5r -> read_doubleVector( subgroup_name.c_str(), "prestress", qua_prestress );
+      qua_prestress = h5r -> read_doubleVector( subgroup_name.c_str(), "prestress" );
 
-      SYS_T::print_fatal_if( static_cast<int>( qua_prestress.size() ) != 6 * face_nqp * num_local_cell[0],
+      SYS_T::print_fatal_if( static_cast<int>( qua_prestress.size() ) != 6 * face_nqp * num_local_cell[ebc_id],
         "ALocal_EBC_wall: size of qua_prestress is inconsistent with face_nqp. \n");
     }
     else
     {
-      qua_prestress.resize( 6 * face_nqp * num_local_cell[0] );
-      for(int ii=0; ii < 6 * face_nqp * num_local_cell[0]; ++ii) qua_prestress[ii] = 0.0;
+      qua_prestress.resize( 6 * face_nqp * num_local_cell[ebc_id] );
+      for(int ii=0; ii < 6 * face_nqp * num_local_cell[ebc_id]; ++ii) 
+        qua_prestress[ii] = 0.0;
     }
   }
 
@@ -121,7 +124,8 @@ void ALocal_EBC_wall::write_prestress_hdf5( const char * FileName ) const
   hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
   // open the folder at fName/ebc_wall again to append additional data 
-  const int ebc_id = 0;              // num_ebc = 1 for wall elem bc and id = 0
+  // num_ebc = 1 for wall elem bc and id = 0 
+  const int ebc_id = 0;
   if( num_local_cell[ebc_id] > 0 )
   {
     hid_t group_id = H5Gopen( file_id, "ebc_wall/ebcid_0", H5P_DEFAULT );
