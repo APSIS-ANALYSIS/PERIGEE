@@ -295,7 +295,7 @@ void PGAssem_Tet_Wall::NatBC_G( const PDNSolution * const &sol,
         srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
     }
 
-    VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->Residual, ADD_VALUES);
+    VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
   }
 
   delete [] array;   array   = nullptr;
@@ -305,6 +305,62 @@ void PGAssem_Tet_Wall::NatBC_G( const PDNSolution * const &sol,
   delete [] sctrl_y; sctrl_y = nullptr;
   delete [] sctrl_z; sctrl_z = nullptr;
   delete [] srow_index; srow_index = nullptr;
+}
+
+void PGAssem_Tet_Wall::Update_Wall_Prestress(
+    const PDNSolution * const &sol_wall_disp,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_w,
+    const IQuadPts * const &quad_s,
+    ALocal_EBC * const &ebc_wall_part )
+{
+  const int dof_disp = 3;
+  const int face_nqp = quad_s -> get_num_quadPts();
+
+  double * array_b      = new double [nlgn * dof_disp];
+  double * local_bs     = new double [snLocBas * dof_disp];
+  int    * LSIEN        = new    int [snLocBas];
+
+  double * syoungsmod   = new double [snLocBas];
+  double * quaprestress = new double [6 * face_nqp];
+
+  std::vector<Matrix_3x3> sigma; sigma.resize( face_nqp );
+
+  sol_wall_disp->GetLocalArray( array_b );
+
+  // wall has only one surface per the assumption in wall ebc
+  const int ebc_id = 0;
+  const int num_sele = ebc_wall_part -> get_num_local_cell(ebc_id);
+
+  for(int ee=0; ee<num_sele; ++ee)
+  {
+    ebc_wall_part -> get_SIEN(ebc_id, ee, LSIEN);
+    ebc_wall_part -> get_youngsmod(ee, syoungsmod  );
+    ebc_wall_part -> get_prestress(ee, quaprestress);
+
+    GetLocal(array_b, LSIEN, snLocBas, dof_disp, local_bs);
+
+    lassem_ptr->get_Wall_CauchyStress( local_bs, element_w, syoungsmod, quad_s, sigma );
+
+    // update prestress in Voigt notation (comps 11, 22, 33, 23, 13, 12)
+    for(int qua=0; qua<face_nqp; ++qua)
+    {
+      quaprestress[6*qua]   += sigma[qua].xx();
+      quaprestress[6*qua+1] += sigma[qua].yy();
+      quaprestress[6*qua+2] += sigma[qua].zz();
+      quaprestress[6*qua+3] += sigma[qua].yz();
+      quaprestress[6*qua+4] += sigma[qua].xz();
+      quaprestress[6*qua+5] += sigma[qua].xy();
+    }
+
+    ebc_wall_part -> set_prestress(ee, quaprestress);
+  }
+
+  delete [] array_b;      array_b      = nullptr;
+  delete [] local_bs;     local_bs     = nullptr;
+  delete [] LSIEN;        LSIEN        = nullptr;
+  delete [] syoungsmod;   syoungsmod   = nullptr;
+  delete [] quaprestress; quaprestress = nullptr;
 }
 
 // EOF

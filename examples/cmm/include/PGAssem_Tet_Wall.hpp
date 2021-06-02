@@ -56,6 +56,14 @@ class PGAssem_Tet_Wall : public IPGAssem
         const ALocal_EBC * const &ebc_wall_part,
         const IGenBC * const &gbc );
 
+    // Update wall prestress at all surface quadrature points
+    virtual void Update_Wall_Prestress(
+        const PDNSolution * const &sol_wall_disp,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &element_w,
+        const IQuadPts * const &quad_s,
+        ALocal_EBC * const &ebc_wall_part );
+
   private:
     const int nLocBas, dof_sol, dof_mat, nlgn, snLocBas;
 
