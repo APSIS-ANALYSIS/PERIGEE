@@ -173,7 +173,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
    
     void EssBC_G( const ALocal_NodalBC * const &nbc_part, const int &field );
 
-    void RingBC_KG( const ALocal_NodalBC * const &nbc_part,
+    void RingBC_KG(
         const ALocal_Ring_NodalBC * const &ringnbc_part,
         const int &dof, const int &nrow, const int &ncol,
         const PetscInt * const &row_index,
