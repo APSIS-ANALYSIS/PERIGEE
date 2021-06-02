@@ -109,8 +109,8 @@ void PGAssem_Tet_CMM_GenAlpha::EssBC_KG(
 
 void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
     const ALocal_Ring_NodalBC * const &ringnbc_part,
-    const FEAElement * const &element,
-    const std::vector<int> &IEN_e,
+    FEAElement * const &element,
+    const int * const &IEN_e,
     IPLocAssem * const &lassem_ptr )
 {
   const int ringbc_type = ringnbc_part -> get_ringbc_type();
@@ -178,14 +178,23 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
         }
       }
 
-      lassem_ptr->Tangent = Ke_rot; 
-
       // Rotate G: R^T * G = R_{ji} * G_{j}
       double * Ge_rot = new double [ndof_e] {};
       for(int ii = 0; ii < ndof_e; ++ii )
       {
         for(int jj = 0; jj < ndof_e; ++jj )
           Ge_rot[ii] += rotmat_e[jj*ndof_e+ii] * Ge[jj];
+      }
+
+      if( element->get_nLocBas() == nLocBas )
+      {
+        lassem_ptr->Tangent  = Ke_rot; 
+        lassem_ptr->Residual = Ge_rot; 
+      }
+      else
+      {
+        lassem_ptr->sur_Tangent  = Ke_rot; 
+        lassem_ptr->sur_Residual = Ge_rot; 
       }
 
       delete [] Ke; delete [] Ke_rot; delete [] Ge; delete [] Ge_rot;
@@ -317,6 +326,9 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_mass_residual(
     lassem_ptr->Assem_Mass_Residual( local_a, elementv,
         ectrl_x, ectrl_y, ectrl_z, quad_v );
 
+    // Skew boundary conditions for in-plane motion of ring nodes
+    RingBC_KG(ringnbc_part, elementv, IEN_e, lassem_ptr);
+
     for(int ii=0; ii<nLocBas; ++ii)
     {
       for(int mm=0; mm<dof_mat; ++mm)
@@ -341,8 +353,6 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_mass_residual(
   VecAssemblyEnd(G);
 
   for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
-
-  // RingBC_KG( node_ptr, nbc_part, ringnbc_part );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
@@ -490,6 +500,9 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
     lassem_ptr->Assem_Tangent_Residual(curr_time, dt, local_a, local_b,
         elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
 
+    // Skew boundary conditions for in-plane motion of ring nodes
+    RingBC_KG(ringnbc_part, elementv, IEN_e, lassem_ptr);
+
     for(int ii=0; ii<nLocBas; ++ii)
     {
       for(int mm=0; mm<dof_mat; ++mm)
@@ -525,8 +538,6 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
   VecAssemblyEnd(G);
 
   for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
-  
-  // RingBC_KG( node_ptr, nbc_part, ringnbc_part );
   
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
