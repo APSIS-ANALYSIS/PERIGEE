@@ -48,8 +48,8 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
     else
     {
       qua_prestress.resize( 6 * face_nqp * num_local_cell[ebc_id] );
-      for(int ii=0; ii < 6 * face_nqp * num_local_cell[ebc_id]; ++ii) 
-        qua_prestress[ii] = 0.0;
+      
+      for( auto &val : qua_prestress ) val = 0.0;
     }
   }
 
