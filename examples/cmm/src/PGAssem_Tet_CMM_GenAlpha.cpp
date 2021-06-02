@@ -127,19 +127,70 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
     // Set diagonal entries to 1.0
     for( int ii = 0; ii < ndof_e; ++ii ) rotmat_e[ ii*ndof_e + ii ] = 1.0;
 
+    int num_ringnode = 0;
     for( int ii = 0; ii < element->get_nLocBas(); ++ii )
     {
       int pos = -1;
       if( ringnbc_part->is_inLDN( IEN_e[ii], pos ) )
       {
-        const Matrix_3x3 Q = ringnbc_part->get_rotation_matrix( pos );
+        Matrix_3x3 Q = ringnbc_part->get_rotation_matrix( pos );
+        Q.transpose();
+
         for( int jj = 1; jj < dof_mat; ++jj )
         {
           for( int kk = 1; kk < dof_mat; ++kk )
             rotmat_e[ (ii*dof_mat+jj) * ndof_e + (ii*dof_mat+kk) ] = Q(jj-1, kk-1);
         }
+
+        num_ringnode += 1;
       }
     } 
+
+    if( num_ringnode > 0 )
+    {
+      double * Ke = new double [ndof_e * ndof_e] {};
+      double * Ge = new double [ndof_e] {};
+      if( element->get_nLocBas() == nLocBas )
+      {
+        Ke = lassem_ptr->Tangent;
+        Ge = lassem_ptr->Residual;
+      }
+      else if( element->get_nLocBas() == snLocBas ) 
+      {
+        Ke = lassem_ptr->sur_Tangent;
+        Ge = lassem_ptr->sur_Residual;
+      }
+      else
+        SYS_T::print_fatal("PGAssem_Tet_CMM_GenAlpha:: incompatible element nLocBas.\n");
+
+      // Rotate K: R^T * K * R = R_{ki} * K_{kl} * R_{lj}
+      double * Ke_rot = new double [ndof_e * ndof_e] {};
+
+      for( int ii = 0; ii < ndof_e; ++ii )
+      {
+        for( int jj = 0; jj < ndof_e; ++jj )
+        {
+          for( int kk = 0; kk < ndof_e; ++kk )
+          {
+            for(int ll = 0; ll < ndof_e; ++ll ) 
+              Ke_rot[ii*ndof_e+jj] += rotmat_e[kk*ndof_e+ii] * Ke[kk*ndof_e+ll] * rotmat_e[ll*ndof_e+jj];
+          }
+        }
+      }
+
+      lassem_ptr->Tangent = Ke_rot; 
+
+      // Rotate G: R^T * G = R_{ji} * G_{j}
+      double * Ge_rot = new double [ndof_e] {};
+      for(int ii = 0; ii < ndof_e; ++ii )
+      {
+        for(int jj = 0; jj < ndof_e; ++jj )
+          Ge_rot[ii] += rotmat_e[jj*ndof_e+ii] * Ge[jj];
+      }
+
+      delete [] Ke; delete [] Ke_rot; delete [] Ge; delete [] Ge_rot;
+      Ke = nullptr; Ke_rot = nullptr; Ge = nullptr; Ge_rot = nullptr;
+    }
 
     delete [] rotmat_e; rotmat_e = nullptr;
   }
