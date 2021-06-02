@@ -463,13 +463,13 @@ int main( int argc, char *argv[] )
 
   // ===== Nonlinear solver context =====
   PNonlinear_CMM_Solver * nsolver = new PNonlinear_CMM_Solver( pNode, fNode,
-      nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold, prestress_flag );
+      nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
   nsolver->print_info();
 
   // ===== Temporal solver context =====
   PTime_CMM_Solver * tsolver = new PTime_CMM_Solver( sol_bName,
-      sol_record_freq, ttan_renew_freq, final_time, prestress_flag );
+      sol_record_freq, ttan_renew_freq, final_time );
 
   tsolver->print_info();
 

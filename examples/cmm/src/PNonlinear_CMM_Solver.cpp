@@ -8,12 +8,10 @@ PNonlinear_CMM_Solver::PNonlinear_CMM_Solver(
     const int &input_max_iteration, 
     const int &input_renew_freq,
     const int &input_renew_threshold,
-    const bool &prestress_flag,
     const double &ps_disp_atol )
 : nr_tol(input_nrtol), na_tol(input_natol), nd_tol(input_ndtol),
   nmaxits(input_max_iteration), nrenew_freq(input_renew_freq),
-  nrenew_threshold(input_renew_threshold),
-  solve_prestress(prestress_flag), prestress_tol(ps_disp_atol)
+  nrenew_threshold(input_renew_threshold), prestress_tol(ps_disp_atol)
 {
   // Generate the incremental solution vector used for update 
   // the solution of the nonlinear algebraic system 
@@ -288,15 +286,6 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
 
   // Debugging: check ring BC constraints
   // compute_ringbc_constraints(sol, sol_wall_disp, ringnbc_part);
-
-  if( solve_prestress )
-  {
-    gassem_ptr->Update_Wall_Prestress(sol_wall_disp, lassem_ptr, elementw, quad_s, ebc_wall_part);
-
-    SYS_T::commPrint("  --- wall_disp_norm: %e \n", sol_wall_disp->Norm_2());
-
-    if( sol_wall_disp->Norm_2() <= prestress_tol ) prestress_conv_flag = true;
-  }
 }
 
 
