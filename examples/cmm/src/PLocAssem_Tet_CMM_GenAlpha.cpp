@@ -1401,9 +1401,9 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_traction(
 
     for(int A=0; A<snLocBas; ++A)
     {
-      sur_Residual[4*A+1] += surface_area * quad->get_qw(qua) * R[A] * pp * n_out.x();
-      sur_Residual[4*A+2] += surface_area * quad->get_qw(qua) * R[A] * pp * n_out.y();
-      sur_Residual[4*A+3] += surface_area * quad->get_qw(qua) * R[A] * pp * n_out.z();
+      sur_Residual[4*A+1] -= surface_area * quad->get_qw(qua) * R[A] * pp * n_out.x();
+      sur_Residual[4*A+2] -= surface_area * quad->get_qw(qua) * R[A] * pp * n_out.y();
+      sur_Residual[4*A+3] -= surface_area * quad->get_qw(qua) * R[A] * pp * n_out.z();
     }
   }
 }
