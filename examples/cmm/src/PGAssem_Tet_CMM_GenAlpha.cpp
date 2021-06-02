@@ -202,7 +202,7 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
     else if( ring_cols )
     {
       // Rotate K columns: K * R = K_{ik} * R_{kj}
-      PetscScalar * Ke_temp = new PetscScalar [ncol * ncol];
+      PetscScalar * Ke_temp = new PetscScalar [ncol * ncol] {};
       
       for( int ii = 0; ii < nrow * ncol; ++ii )
       {
@@ -345,15 +345,15 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_mass_residual(
     lassem_ptr->Assem_Mass_Residual( local_a, elementv,
         ectrl_x, ectrl_y, ectrl_z, quad_v );
 
-    // Skew boundary conditions for in-plane motion of ring nodes
-    RingBC_KG( ringnbc_part, dof_mat, nLocBas * dof_mat, nLocBas * dof_mat,
-        row_index, row_index, lassem_ptr->Tangent, lassem_ptr->Residual );
-
     for(int ii=0; ii<nLocBas; ++ii)
     {
       for(int mm=0; mm<dof_mat; ++mm)
         row_index[dof_mat*ii+mm] = dof_mat * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
     }
+
+    // Skew boundary conditions for in-plane motion of ring nodes
+    RingBC_KG( ringnbc_part, dof_mat, nLocBas * dof_mat, nLocBas * dof_mat,
+        row_index, row_index, lassem_ptr->Tangent, lassem_ptr->Residual );
 
     MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
         lassem_ptr->Tangent, ADD_VALUES);
@@ -520,15 +520,15 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
     lassem_ptr->Assem_Tangent_Residual(curr_time, dt, local_a, local_b,
         elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
 
-    // Skew boundary conditions for in-plane motion of ring nodes
-    RingBC_KG( ringnbc_part, dof_mat, nLocBas * dof_mat, nLocBas * dof_mat,
-        row_index, row_index, lassem_ptr->Tangent, lassem_ptr->Residual );
-
     for(int ii=0; ii<nLocBas; ++ii)
     {
       for(int mm=0; mm<dof_mat; ++mm)
         row_index[dof_mat*ii + mm] = dof_mat*nbc_part->get_LID(mm, IEN_e[ii])+mm;
     }
+
+    // Skew boundary conditions for in-plane motion of ring nodes
+    RingBC_KG( ringnbc_part, dof_mat, nLocBas * dof_mat, nLocBas * dof_mat,
+        row_index, row_index, lassem_ptr->Tangent, lassem_ptr->Residual );
 
     MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
         lassem_ptr->Tangent, ADD_VALUES);
@@ -710,15 +710,15 @@ void PGAssem_Tet_CMM_GenAlpha::BackFlow_KG( const double &dt,
       lassem_ptr->Assem_Tangent_Residual_BackFlowStab( dt, local_as, local_bs,
           element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
 
-      // Skew boundary conditions for in-plane motion of ring nodes
-      RingBC_KG( ringnbc_part, dof_mat, dof_mat * snLocBas, dof_mat * snLocBas,
-          srow_index, srow_index, lassem_ptr->sur_Tangent, lassem_ptr->sur_Residual );
-
       for(int ii=0; ii<snLocBas; ++ii)
       {
         for(int mm=0; mm<dof_mat; ++mm)
           srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
       }
+
+      // Skew boundary conditions for in-plane motion of ring nodes
+      RingBC_KG( ringnbc_part, dof_mat, dof_mat * snLocBas, dof_mat * snLocBas,
+          srow_index, srow_index, lassem_ptr->sur_Tangent, lassem_ptr->sur_Residual );
 
       MatSetValues(K, dof_mat*snLocBas, srow_index, dof_mat*snLocBas, srow_index,
           lassem_ptr->sur_Tangent, ADD_VALUES);
@@ -874,15 +874,15 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_KG(
     lassem_ptr->Assem_Tangent_Residual_EBC_Wall( curr_time, dt, local_as, local_bs, local_cs,
         element_w, sctrl_x, sctrl_y, sctrl_z, sthickness, syoungsmod, quaprestress, quad_s);
 
-    // Skew boundary conditions for in-plane motion of ring nodes
-    RingBC_KG( ringnbc_part, dof_mat, dof_mat * snLocBas, dof_mat * snLocBas,
-        srow_index, srow_index, lassem_ptr->sur_Tangent, lassem_ptr->sur_Residual );
-
     for(int ii=0; ii<snLocBas; ++ii)
     {
       for(int mm=0; mm<dof_mat; ++mm)
         srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
     }
+
+    // Skew boundary conditions for in-plane motion of ring nodes
+    RingBC_KG( ringnbc_part, dof_mat, dof_mat * snLocBas, dof_mat * snLocBas,
+        srow_index, srow_index, lassem_ptr->sur_Tangent, lassem_ptr->sur_Residual );
 
     MatSetValues(K, dof_mat*snLocBas, srow_index, dof_mat*snLocBas, srow_index,
         lassem_ptr->sur_Tangent, ADD_VALUES);
@@ -1354,9 +1354,6 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_KG(
         }
       }
 
-      // Skew boundary conditions for in-plane motion of ring nodes
-      RingBC_KG( ringnbc_part, 3, nLocBas * 3, nLocBas * 3, srow_idx, scol_idx, Tan, Res );
-
       for(int ii=0; ii<snLocBas; ++ii)
       {
         srow_idx[3*ii+0] = dof_mat * nbc_part->get_LID(1,LSIEN[ii]) + 1;
@@ -1370,6 +1367,9 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_KG(
         scol_idx[ii*3+1] = dof_mat * map_Bj[ii*3+1] + 2;
         scol_idx[ii*3+2] = dof_mat * map_Bj[ii*3+2] + 3;
       }
+
+      // Skew boundary conditions for in-plane motion of ring nodes
+      RingBC_KG( ringnbc_part, 3, nLocBas * 3, nLocBas * 3, srow_idx, scol_idx, Tan, Res );
 
       MatSetValues(K, snLocBas*3, srow_idx, num_face_nodes*3, scol_idx, Tan, ADD_VALUES);
       VecSetValues(G, snLocBas*3, srow_idx, Res, ADD_VALUES);
