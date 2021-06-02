@@ -2,11 +2,9 @@
 
 PTime_CMM_Solver::PTime_CMM_Solver(
     const std::string &input_name, const int &input_record_freq,
-    const int &input_renew_tang_freq, const double &input_final_time,
-    const bool &prestress_flag )
+    const int &input_renew_tang_freq, const double &input_final_time )
 : final_time(input_final_time), sol_record_freq(input_record_freq),
-  renew_tang_freq(input_renew_tang_freq), pb_name(input_name),
-  solve_prestress(prestress_flag)
+  renew_tang_freq(input_renew_tang_freq), pb_name(input_name)
 {}
 
 PTime_CMM_Solver::~PTime_CMM_Solver()
@@ -150,13 +148,6 @@ void PTime_CMM_Solver::TM_CMM_GenAlpha(
     // the tangent matrix
     if( nl_counter == 1 ) renew_flag = false;
 
-    // If solving for prestress, set disp and dot disp to zero
-    if( solve_prestress )
-    {
-      pre_sol_wall_disp -> ScaleValue(0.0);
-      pre_dot_sol_wall_disp -> ScaleValue(0.0);
-    }
-
     // Call the nonlinear equation solver
     nsolver_ptr->GenAlpha_Solve_CMM( renew_flag, 
         time_info->get_time(), time_info->get_step(), 
@@ -258,8 +249,7 @@ void PTime_CMM_Solver::TM_CMM_GenAlpha(
 }
 
 
-void PTime_CMM_Solver::TM_CMM_Prestress( 
-    const bool &restart_init_assembly_flag,
+void PTime_CMM_Solver::TM_Prestress( 
     const PDNSolution * const &sol_base,
     const PDNSolution * const &init_dot_sol,
     const PDNSolution * const &init_sol,
@@ -306,28 +296,10 @@ void PTime_CMM_Solver::TM_CMM_Prestress(
   std::string sol_wall_disp_name ("");
   std::string sol_dot_wall_disp_name ("");
 
-  // If this is a restart run, do not re-write the solution binaries
-  if(restart_init_assembly_flag == false)
-  {
-    // Write [ (dot) pres, (dot) velo ]
-    sol_name = Name_Generator(time_info->get_index());
-    cur_sol->WriteBinary(sol_name.c_str());
-    
-    sol_dot_name = Name_dot_Generator(time_info->get_index());
-    cur_dot_sol->WriteBinary(sol_dot_name.c_str());
-
-    // Write [ (dot) wall disp ]
-    sol_wall_disp_name = Name_Generator(time_info->get_index(), "disp_");
-    cur_sol_wall_disp->WriteBinary(sol_wall_disp_name.c_str());
-
-    sol_dot_wall_disp_name = Name_dot_Generator(time_info->get_index(), "disp_");
-    cur_dot_sol_wall_disp->WriteBinary(sol_dot_wall_disp_name.c_str());
-  }
-
   bool prestress_conv_flag = false, renew_flag;
   int nl_counter = 0;
 
-  bool rest_flag = restart_init_assembly_flag;
+  bool rest_flag = true;
 
   SYS_T::commPrint("Time = %e, dt = %e, index = %d, %s \n",
       time_info->get_time(), time_info->get_step(), time_info->get_index(),
@@ -348,14 +320,11 @@ void PTime_CMM_Solver::TM_CMM_Prestress(
     if( nl_counter == 1 ) renew_flag = false;
 
     // If solving for prestress, set disp and dot disp to zero
-    if( solve_prestress )
-    {
-      pre_sol_wall_disp -> ScaleValue(0.0);
-      pre_dot_sol_wall_disp -> ScaleValue(0.0);
-    }
+    pre_sol_wall_disp -> ScaleValue(0.0);
+    pre_dot_sol_wall_disp -> ScaleValue(0.0);
 
     // Call the nonlinear equation solver
-    nsolver_ptr->GenAlpha_Solve_CMM( renew_flag, 
+    nsolver_ptr->GenAlpha_Solve_Prestress( renew_flag, 
         time_info->get_time(), time_info->get_step(), 
         sol_base, pre_dot_sol, pre_sol, pre_dot_sol_wall_disp, pre_sol_wall_disp,
         tmga_ptr, flr_ptr, alelem_ptr, lien_ptr, anode_ptr, feanode_ptr,
@@ -389,58 +358,6 @@ void PTime_CMM_Solver::TM_CMM_Prestress(
       cur_dot_sol_wall_disp->WriteBinary(sol_dot_wall_disp_name.c_str());
     }
 
-    // Calculate the flow rate & averaged pressure on all outlets
-    for(int face=0; face<ebc_part -> get_num_ebc(); ++face)
-    {
-      // Calculate the 3D dot flow rate on the outlet
-      const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( 
-          cur_dot_sol, lassem_fluid_ptr, elements, quad_s, ebc_part, face); 
-
-      // Calculate the 3D flow rate on the outlet
-      const double face_flrate = gassem_ptr -> Assem_surface_flowrate( 
-          cur_sol, lassem_fluid_ptr, elements, quad_s, ebc_part, face); 
-
-      // Calculate the 3D averaged pressure on the outlet
-      const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure( 
-          cur_sol, lassem_fluid_ptr, elements, quad_s, ebc_part, face);
-
-      // Calculate the 0D pressure from LPN model
-      const double dot_lpn_flowrate = dot_face_flrate;
-      const double lpn_flowrate = face_flrate;
-      const double lpn_pressure = gbc -> get_P( face, dot_lpn_flowrate, lpn_flowrate );
-
-      // Update the initial values in genbc
-      gbc -> reset_initial_sol( face, lpn_flowrate, lpn_pressure, time_info->get_time() );
-
-      // On the CPU 0, write the time, flow rate, averaged pressure, and 0D
-      // calculated pressure into the txt file, which is first generated in the
-      // driver
-      if( SYS_T::get_MPI_rank() == 0 )
-      {
-        std::ofstream ofile;
-        ofile.open( ebc_part->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
-        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<dot_face_flrate<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
-        ofile.close();
-      }
-      MPI_Barrier(PETSC_COMM_WORLD);
-    }
-   
-    // Calculate the inlet data
-    const double inlet_face_flrate = gassem_ptr -> Assem_surface_flowrate(
-        cur_sol, lassem_fluid_ptr, elements, quad_s, infnbc_part ); 
-
-    const double inlet_face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
-        cur_sol, lassem_fluid_ptr, elements, quad_s, infnbc_part );
-
-    if( SYS_T::get_MPI_rank() == 0 )
-    {
-      std::ofstream ofile;
-      ofile.open( infnbc_part->gen_flowfile_name().c_str(), std::ofstream::out | std::ofstream::app );
-      ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
-      ofile.close();
-    } 
-    MPI_Barrier(PETSC_COMM_WORLD);
-    
     // Prepare for next time step
     pre_sol->Copy(*cur_sol);
     pre_dot_sol->Copy(*cur_dot_sol);
