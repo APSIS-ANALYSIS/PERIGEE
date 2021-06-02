@@ -7,11 +7,10 @@ PNonlinear_CMM_Solver::PNonlinear_CMM_Solver(
     const double &input_ndtol,
     const int &input_max_iteration, 
     const int &input_renew_freq,
-    const int &input_renew_threshold,
-    const double &ps_disp_atol )
+    const int &input_renew_threshold )
 : nr_tol(input_nrtol), na_tol(input_natol), nd_tol(input_ndtol),
   nmaxits(input_max_iteration), nrenew_freq(input_renew_freq),
-  nrenew_threshold(input_renew_threshold), prestress_tol(ps_disp_atol)
+  nrenew_threshold(input_renew_threshold)
 {
   // Generate the incremental solution vector used for update 
   // the solution of the nonlinear algebraic system 
@@ -291,6 +290,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
 
 void PNonlinear_CMM_Solver::GenAlpha_Solve_Prestress(
     const bool &new_tangent_flag,
+    const double &prestress_tol,
     const double &curr_time,
     const double &dt,
     const PDNSolution * const &sol_base,

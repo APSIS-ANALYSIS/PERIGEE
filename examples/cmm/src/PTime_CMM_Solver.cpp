@@ -249,7 +249,8 @@ void PTime_CMM_Solver::TM_CMM_GenAlpha(
 }
 
 
-void PTime_CMM_Solver::TM_Prestress( 
+void PTime_CMM_Solver::TM_Prestress(
+    const double &prestress_tol,
     const PDNSolution * const &sol_base,
     const PDNSolution * const &init_dot_sol,
     const PDNSolution * const &init_sol,
@@ -324,7 +325,7 @@ void PTime_CMM_Solver::TM_Prestress(
     pre_dot_sol_wall_disp -> ScaleValue(0.0);
 
     // Call the nonlinear equation solver
-    nsolver_ptr->GenAlpha_Solve_Prestress( renew_flag, 
+    nsolver_ptr->GenAlpha_Solve_Prestress( renew_flag, prestress_tol, 
         time_info->get_time(), time_info->get_step(), 
         sol_base, pre_dot_sol, pre_sol, pre_dot_sol_wall_disp, pre_sol_wall_disp,
         tmga_ptr, flr_ptr, alelem_ptr, lien_ptr, anode_ptr, feanode_ptr,

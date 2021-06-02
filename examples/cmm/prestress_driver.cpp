@@ -76,9 +76,6 @@ int main( int argc, char *argv[] )
   int    nl_refreq = 4;               // frequency of tangent matrix renewal
   int    nl_threshold = 4;            // threshold of tangent matrix renewal
 
-  // Prestress solver parameters
-  double     ps_disp_atol   = 1.0e-6; // convegence criterion absolute disp L2 norm
-
   // Time stepping parameters
   double initial_time = 0.0;          // time of initial condition
   double initial_step = 0.1;          // time step size
@@ -127,7 +124,6 @@ int main( int argc, char *argv[] )
   SYS_T::GetOptionInt(   "-nl_maxits",       nl_maxits);
   SYS_T::GetOptionInt(   "-nl_refreq",       nl_refreq);
   SYS_T::GetOptionInt(   "-nl_threshold",    nl_threshold);
-  SYS_T::GetOptionReal(  "-ps_disp_atol",    ps_disp_atol);
   SYS_T::GetOptionReal(  "-init_time",       initial_time);
   SYS_T::GetOptionReal(  "-fina_time",       final_time);
   SYS_T::GetOptionReal(  "-init_step",       initial_step);
@@ -172,8 +168,6 @@ int main( int argc, char *argv[] )
   SYS_T::cmdPrint(      "-nl_maxits:",       nl_maxits);
   SYS_T::cmdPrint(      "-nl_refreq:",       nl_refreq);
   SYS_T::cmdPrint(      "-nl_threshold:",    nl_threshold);
-
-  SYS_T::cmdPrint(      "-ps_disp_atol:",    ps_disp_atol);
 
   SYS_T::cmdPrint(      "-init_time:",       initial_time);
   SYS_T::cmdPrint(      "-init_step:",       initial_step);
@@ -454,7 +448,7 @@ int main( int argc, char *argv[] )
 
   // ===== Nonlinear solver context =====
   PNonlinear_CMM_Solver * nsolver = new PNonlinear_CMM_Solver( pNode, fNode,
-      nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold, ps_disp_atol );
+      nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
   nsolver->print_info();
 

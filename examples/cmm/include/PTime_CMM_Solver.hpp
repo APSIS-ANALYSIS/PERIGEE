@@ -54,6 +54,7 @@ class PTime_CMM_Solver
         PNonlinear_CMM_Solver * const &nsolver_ptr ) const;
 
     void TM_Prestress(
+        const double &prestress_tol,
         const PDNSolution * const &sol_base,
         const PDNSolution * const &init_dot_sol,
         const PDNSolution * const &init_sol,
