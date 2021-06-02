@@ -31,9 +31,12 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
     h5r -> read_doubleVector( subgroup_name.c_str(), "thickness", thickness );
     h5r -> read_doubleVector( subgroup_name.c_str(), "youngsmod", youngsmod );
 
-    // If the prestress is solved, read the prestress data
-    // otherwise, just allocate a container for prestress data at each quadrature point
-    if( false )
+    // If the prestress data exist on file, read the prestress data
+    // otherwise, just allocate a container for prestress data at each quadrature 
+    // point with zero values
+    std::string prestress_data_location(subgroup_name);
+    prestress_data_location.append("/prestress");
+    if( h5r -> check_data( prestress_data_location.c_str() ) )
     {
       h5r -> read_doubleVector( subgroup_name.c_str(), "prestress", qua_prestress );
 

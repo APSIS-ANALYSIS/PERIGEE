@@ -1,6 +1,7 @@
 #include "Vec_Tools.hpp"
 #include "Vector_3.hpp"
 #include "Matrix_3x3.hpp"
+#include "HDF5_Reader.hpp"
 
 int main( int argc, char * argv[] )
 {
@@ -12,17 +13,20 @@ int main( int argc, char * argv[] )
 
   for(auto &out : a) out = "hello\n";
 
-  for(auto out : a) std::cout<<out;
+  //for(auto out : a) std::cout<<out;
 
-  const Vector_3 vv( 11.01, 222.021, -315.12301);
+  std::string fName = "part_p00000.h5";
 
-  vv.print();
+  hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
-  double vx = vv.x();
-  double vy = vv.y();
-  double vz = vv.z();
+  HDF5_Reader * h5r = new HDF5_Reader( file_id );
 
-  std::cout<<vx<<'\t'<<vy<<'\t'<<vz<<'\n';
+  if( h5r -> check_data("/ebc_wall/ebcid_0/thicks") )
+    std::cout<<"prestress exist\n";
+  else
+    std::cout<<"prestress does not exist\n";
+
+  H5Fclose( file_id ); delete h5r;
 
   return EXIT_SUCCESS;
 }
