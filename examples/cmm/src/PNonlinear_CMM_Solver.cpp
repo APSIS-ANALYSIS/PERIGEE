@@ -367,12 +367,6 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_Prestress(
     
   update_wall(-1.0, &sol_alpha, ebc_wall_part, &G_kinematic);
 
-  // ------------------------------------------------- 
-  // Update the inflow boundary values
-  rescale_inflow_value(curr_time+dt, infnbc_part, flr_ptr, sol_base, sol);
-  rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, flr_ptr, sol_base, &sol_alpha);
-  // ------------------------------------------------- 
-
   gassem_ptr->Clear_KG();
 
   gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, &wall_disp_alpha,
