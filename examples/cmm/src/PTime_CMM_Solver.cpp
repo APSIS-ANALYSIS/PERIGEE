@@ -323,7 +323,9 @@ void PTime_CMM_Solver::TM_Prestress(
     // If solving for prestress, set disp and dot disp to zero
     pre_sol_wall_disp -> ScaleValue(0.0);
     pre_dot_sol_wall_disp -> ScaleValue(0.0);
-
+    Zero_velo_comp( pre_sol );
+    Zero_velo_comp( pre_dot_sol );
+ 
     // Call the nonlinear equation solver
     nsolver_ptr->GenAlpha_Solve_Prestress( renew_flag, prestress_tol, 
         time_info->get_time(), time_info->get_step(), 
@@ -370,6 +372,28 @@ void PTime_CMM_Solver::TM_Prestress(
   delete pre_sol; delete cur_sol; delete pre_dot_sol; delete cur_dot_sol;
   delete pre_sol_wall_disp; delete cur_sol_wall_disp;
   delete pre_dot_sol_wall_disp; delete cur_dot_sol_wall_disp;
+}
+
+void PTime_CMM_Solver::Zero_velo_comp( PDNSolution * const &sol ) const
+{
+  const int nlocalnode = sol -> get_nlocalnode();
+  Vec lsol;
+  VecGhostGetLocalForm( sol->solution, &lsol );
+  
+  double * array_sol;
+  VecGetArray(lsol, &array_sol);
+  
+  for(int ii=0; ii<nlocalnode; ++ii)
+  {
+    array_sol[4*ii+1] = 0.0;
+    array_sol[4*ii+2] = 0.0;
+    array_sol[4*ii+3] = 0.0;
+  }
+
+  VecRestoreArray(lsol, &array_sol);
+  VecGhostRestoreLocalForm(sol->solution, &lsol);
+
+  sol -> GhostUpdate();
 }
 
 // EOF

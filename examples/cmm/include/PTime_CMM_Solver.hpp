@@ -99,6 +99,8 @@ class PTime_CMM_Solver
     
     void Write_restart_file(const PDNTimeStep * const &timeinfo,
         const std::string &solname ) const;
+
+    void Zero_velo_comp( PDNSolution * const &sol ) const;
 };
 
 #endif
