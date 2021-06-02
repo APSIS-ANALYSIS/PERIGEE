@@ -122,7 +122,7 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
   else if( ringbc_type == 1 )
   {
     // Note: element tangent Ke from NatBC_Resis_KG isn't a square matrix,
-    //       ncol >= nrow
+    //       ncol >= nrow. Pad to square ncol x ncol.
     PetscScalar * rotmat_e = new PetscScalar [ncol * ncol] {};
 
     // Set diagonal entries to 1.0
@@ -162,15 +162,15 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
     if( ring_rows && ring_cols )
     {
       // Rotate K: R^T * K * R = R_{ki} * K_{kl} * R_{lj}
-      PetscScalar * Ke_temp = new PetscScalar [ncol * ncol];
+      PetscScalar * Ke_temp = new PetscScalar [ncol * ncol] {};
 
-      for( int ii = 0; ii < ncol * ncol; ++ii )
+      for( int ii = 0; ii < nrow * ncol; ++ii )
       {
         Ke_temp[ii] = Ke[ii];
         Ke[ii] = 0.0;
       }
 
-      for( int ii = 0; ii < ncol; ++ii )
+      for( int ii = 0; ii < nrow; ++ii )
       {
         for( int jj = 0; jj < ncol; ++jj )
         {
@@ -183,14 +183,14 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
       }
 
       // Rotate G: R^T * G = R_{ji} * G_{j}
-      PetscScalar * Ge_temp = new PetscScalar [ncol];
-      for( int ii = 0; ii < ncol; ++ii )
+      PetscScalar * Ge_temp = new PetscScalar [ncol] {};
+      for( int ii = 0; ii < nrow; ++ii )
       {
-        Ge_temp[ii] = Ke[ii];
+        Ge_temp[ii] = Ge[ii];
         Ge[ii] = 0.0;
       }
 
-      for(int ii = 0; ii < ncol; ++ii )
+      for(int ii = 0; ii < nrow; ++ii )
       {
         for(int jj = 0; jj < ncol; ++jj )
           Ge[ii] += rotmat_e[jj*ncol+ii] * Ge_temp[jj];
@@ -204,13 +204,13 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
       // Rotate K columns: K * R = K_{ik} * R_{kj}
       PetscScalar * Ke_temp = new PetscScalar [ncol * ncol];
       
-      for( int ii = 0; ii < ncol * ncol; ++ii )
+      for( int ii = 0; ii < nrow * ncol; ++ii )
       {
         Ke_temp[ii] = Ke[ii];
         Ke[ii] = 0.0;
       }
 
-      for( int ii = 0; ii < ncol; ++ii )
+      for( int ii = 0; ii < nrow; ++ii )
       {
         for( int jj = 0; jj < ncol; ++jj )
         {
