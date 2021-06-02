@@ -108,9 +108,11 @@ void PGAssem_Tet_CMM_GenAlpha::EssBC_KG(
 
 
 void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
+    const ALocal_NodalBC * const &nbc_part,
     const ALocal_Ring_NodalBC * const &ringnbc_part,
-    FEAElement * const &element,
-    const int * const &IEN_e,
+    const int &dof, const int &nrow, const int &ncol,
+    const PetscInt * const &row_index,
+    const PetscInt * const &col_index,
     PetscScalar * const &Ke,
     PetscScalar * const &Ge )
 {
@@ -120,72 +122,105 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
 
   else if( ringbc_type == 1 )
   {
-    const int ndof_e = element->get_nLocBas() * dof_mat; 
-
-    // Rotation matrix for all element dofs
-    double * rotmat_e = new double [ndof_e * ndof_e] {};
+    // Note: element tangent Ke from NatBC_Resis_KG isn't a square matrix,
+    //       ncol >= nrow
+    PetscScalar * rotmat_e = new PetscScalar [ncol * ncol] {};
 
     // Set diagonal entries to 1.0
-    for( int ii = 0; ii < ndof_e; ++ii ) rotmat_e[ ii*ndof_e + ii ] = 1.0;
+    for( int ii = 0; ii < ncol; ++ii ) rotmat_e[ ii*ncol + ii ] = 1.0;
+    
+    bool ring_rows = false, ring_cols = false; 
+    int pos = -1; 
 
-    int num_ringnode = 0;
-    for( int ii = 0; ii < element->get_nLocBas(); ++ii )
+    for( int ii = 0; ii < ncol; ++ii )
     {
-      int pos = -1;
-      if( ringnbc_part->is_inLDN( IEN_e[ii], pos ) )
+      // Use velo-Z dof to determine ring nodes
+      const int dnode = ( col_index[ii] - 3 ) / dof_mat;
+      if( ringnbc_part->is_inLDN( dnode, pos ) )
       {
         Matrix_3x3 Q = ringnbc_part->get_rotation_matrix( pos );
         Q.transpose();
 
-        for( int jj = 1; jj < dof_mat; ++jj )
+        // Only rotate velocity dofs
+        for( int jj = dof-3; jj < dof; ++jj )
         {
-          for( int kk = 1; kk < dof_mat; ++kk )
-            rotmat_e[ (ii*dof_mat+jj) * ndof_e + (ii*dof_mat+kk) ] = Q(jj-1, kk-1);
+          for( int kk = dof-3; kk < dof; ++kk )
+            rotmat_e[ (ii*dof+jj) * ncol + (ii*dof+kk) ] = Q(jj-1, kk-1);
         }
 
-        num_ringnode += 1;
+        ring_cols = true;
       }
-    } 
+    }
 
-    if( num_ringnode > 0 )
+    for( int ii = 0; ii < nrow; ++ii )
+    {
+      // Use velo-Z dof to determine ring nodes
+      const int dnode = ( row_index[ii] - 3 ) / dof_mat;
+      if( ringnbc_part->is_inLDN( dnode, pos ) )
+        ring_rows = true;
+    }    
+
+    if( ring_rows && ring_cols )
     {
       // Rotate K: R^T * K * R = R_{ki} * K_{kl} * R_{lj}
-      PetscScalar * Ke_temp = new PetscScalar [ndof_e * ndof_e];
+      PetscScalar * Ke_temp = new PetscScalar [ncol * ncol];
 
-      for( int ii = 0; ii < ndof_e * ndof_e; ++ii )
+      for( int ii = 0; ii < ncol * ncol; ++ii )
       {
         Ke_temp[ii] = Ke[ii];
         Ke[ii] = 0.0;
       }
 
-      for( int ii = 0; ii < ndof_e; ++ii )
+      for( int ii = 0; ii < ncol; ++ii )
       {
-        for( int jj = 0; jj < ndof_e; ++jj )
+        for( int jj = 0; jj < ncol; ++jj )
         {
-          for( int kk = 0; kk < ndof_e; ++kk )
+          for( int kk = 0; kk < ncol; ++kk )
           {
-            for(int ll = 0; ll < ndof_e; ++ll ) 
-              Ke[ii*ndof_e+jj] += rotmat_e[kk*ndof_e+ii] * Ke_temp[kk*ndof_e+ll] * rotmat_e[ll*ndof_e+jj];
+            for(int ll = 0; ll < ncol; ++ll ) 
+              Ke[ii*ncol+jj] += rotmat_e[kk*ncol+ii] * Ke_temp[kk*ncol+ll] * rotmat_e[ll*ncol+jj];
           }
         }
       }
 
       // Rotate G: R^T * G = R_{ji} * G_{j}
-      PetscScalar * Ge_temp = new PetscScalar [ndof_e];
-      for( int ii = 0; ii < ndof_e; ++ii )
+      PetscScalar * Ge_temp = new PetscScalar [ncol];
+      for( int ii = 0; ii < ncol; ++ii )
       {
         Ge_temp[ii] = Ke[ii];
         Ge[ii] = 0.0;
       }
 
-      for(int ii = 0; ii < ndof_e; ++ii )
+      for(int ii = 0; ii < ncol; ++ii )
       {
-        for(int jj = 0; jj < ndof_e; ++jj )
-          Ge[ii] += rotmat_e[jj*ndof_e+ii] * Ge_temp[jj];
+        for(int jj = 0; jj < ncol; ++jj )
+          Ge[ii] += rotmat_e[jj*ncol+ii] * Ge_temp[jj];
       }
 
       delete [] Ke_temp; delete [] Ge_temp;
       Ke_temp = nullptr; Ge_temp = nullptr;
+    }
+    else if( ring_cols )
+    {
+      // Rotate K columns: K * R = K_{ik} * R_{kj}
+      PetscScalar * Ke_temp = new PetscScalar [ncol * ncol];
+      
+      for( int ii = 0; ii < ncol * ncol; ++ii )
+      {
+        Ke_temp[ii] = Ke[ii];
+        Ke[ii] = 0.0;
+      }
+
+      for( int ii = 0; ii < ncol; ++ii )
+      {
+        for( int jj = 0; jj < ncol; ++jj )
+        {
+          for( int kk = 0; kk < ncol; ++kk )
+            Ke[ii*ncol+jj] += Ke_temp[ii*ncol+kk] * rotmat_e[kk*ncol+jj];
+        }
+      }
+
+      delete [] Ke_temp; Ke_temp = nullptr;
     }
 
     delete [] rotmat_e; rotmat_e = nullptr;
@@ -312,7 +347,8 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_mass_residual(
         ectrl_x, ectrl_y, ectrl_z, quad_v );
 
     // Skew boundary conditions for in-plane motion of ring nodes
-    RingBC_KG( ringnbc_part, elementv, IEN_e, lassem_ptr->Tangent, lassem_ptr->Residual );
+    RingBC_KG( nbc_part, ringnbc_part, dof_mat, nLocBas * dof_mat, nLocBas * dof_mat,
+        row_index, row_index, lassem_ptr->Tangent, lassem_ptr->Residual );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -486,7 +522,8 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
         elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
 
     // Skew boundary conditions for in-plane motion of ring nodes
-    RingBC_KG( ringnbc_part, elementv, IEN_e, lassem_ptr->Tangent, lassem_ptr->Residual );
+    RingBC_KG( nbc_part, ringnbc_part, dof_mat, nLocBas * dof_mat, nLocBas * dof_mat,
+        row_index, row_index, lassem_ptr->Tangent, lassem_ptr->Residual );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -675,7 +712,8 @@ void PGAssem_Tet_CMM_GenAlpha::BackFlow_KG( const double &dt,
           element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
 
       // Skew boundary conditions for in-plane motion of ring nodes
-      RingBC_KG( ringnbc_part, element_s, LSIEN, lassem_ptr->sur_Tangent, lassem_ptr->sur_Residual );
+      RingBC_KG( nbc_part, ringnbc_part, dof_mat, dof_mat * snLocBas, dof_mat * snLocBas,
+          srow_index, srow_index, lassem_ptr->sur_Tangent, lassem_ptr->sur_Residual );
 
       for(int ii=0; ii<snLocBas; ++ii)
       {
@@ -838,7 +876,8 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_KG(
         element_w, sctrl_x, sctrl_y, sctrl_z, sthickness, syoungsmod, quaprestress, quad_s);
 
     // Skew boundary conditions for in-plane motion of ring nodes
-    RingBC_KG( ringnbc_part, element_w, LSIEN, lassem_ptr->sur_Tangent, lassem_ptr->sur_Residual );
+    RingBC_KG( nbc_part, ringnbc_part, dof_mat, dof_mat * snLocBas, dof_mat * snLocBas,
+        srow_index, srow_index, lassem_ptr->sur_Tangent, lassem_ptr->sur_Residual );
 
     for(int ii=0; ii<snLocBas; ++ii)
     {
@@ -1315,6 +1354,9 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_KG(
           }
         }
       }
+
+      // Skew boundary conditions for in-plane motion of ring nodes
+      RingBC_KG( nbc_part, ringnbc_part, 3, nLocBas * 3, nLocBas * 3, srow_idx, scol_idx, Tan, Res );
 
       for(int ii=0; ii<snLocBas; ++ii)
       {
