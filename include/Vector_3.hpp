@@ -1,6 +1,6 @@
 #ifndef VECTOR_3_HPP
 #define VECTOR_3_HPP
-// ==================================================================
+// ============================================================================
 // Vector_3.hpp
 //
 // This is a 3-component vector class. The components are stored in
@@ -13,7 +13,7 @@
 //
 // Author: Ju Liu
 // Date: June 24 2020
-// ==================================================================
+// ============================================================================
 #include <iomanip>
 #include <iostream>
 #include <ctime>
@@ -58,11 +58,14 @@ class Vector_3
 
     std::vector<double> to_std_vec() const;
 
-    double x() const {return vec[0];}
+    const double& x() const {return vec[0];}
+    double& x() {return vec[0];}
 
-    double y() const {return vec[1];}
+    const double& y() const {return vec[1];}
+    double& y() {return vec[1];}
 
-    double z() const {return vec[2];}
+    const double& z() const {return vec[2];}
+    double& z() {return vec[2];}
 
     void set_x( const double &input ) {vec[0] = input;}
     

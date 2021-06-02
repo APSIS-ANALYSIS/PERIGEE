@@ -1,4 +1,5 @@
 #include "Vec_Tools.hpp"
+#include "Vector_3.hpp"
 #include "Matrix_3x3.hpp"
 
 int main( int argc, char * argv[] )
@@ -12,6 +13,16 @@ int main( int argc, char * argv[] )
   for(auto &out : a) out = "hello\n";
 
   for(auto out : a) std::cout<<out;
+
+  const Vector_3 vv( 11.01, 222.021, -315.12301);
+
+  vv.print();
+
+  double vx = vv.x();
+  double vy = vv.y();
+  double vz = vv.z();
+
+  std::cout<<vx<<'\t'<<vy<<'\t'<<vz<<'\n';
 
   return EXIT_SUCCESS;
 }
