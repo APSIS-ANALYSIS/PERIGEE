@@ -320,7 +320,9 @@ void PGAssem_Tet_Wall::Update_Wall_Prestress(
   double * array_b      = new double [nlgn * dof_disp];
   double * local_bs     = new double [snLocBas * dof_disp];
   int    * LSIEN        = new    int [snLocBas];
-
+  double * sctrl_x      = new double [snLocBas];
+  double * sctrl_y      = new double [snLocBas];
+  double * sctrl_z      = new double [snLocBas];
   double * syoungsmod   = new double [snLocBas];
   double * quaprestress = new double [6 * face_nqp];
 
@@ -335,10 +337,13 @@ void PGAssem_Tet_Wall::Update_Wall_Prestress(
   for(int ee=0; ee<num_sele; ++ee)
   {
     ebc_wall_part -> get_SIEN(ebc_id, ee, LSIEN);
+    ebc_wall_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
     ebc_wall_part -> get_youngsmod(ee, syoungsmod  );
     ebc_wall_part -> get_prestress(ee, quaprestress);
 
     GetLocal(array_b, LSIEN, snLocBas, dof_disp, local_bs);
+
+    element_w -> buildBasis( quad_s, sctrl_x, sctrl_y, sctrl_z );
 
     lassem_ptr->get_Wall_CauchyStress( local_bs, element_w, syoungsmod, quad_s, sigma );
 
@@ -361,6 +366,9 @@ void PGAssem_Tet_Wall::Update_Wall_Prestress(
   delete [] LSIEN;        LSIEN        = nullptr;
   delete [] syoungsmod;   syoungsmod   = nullptr;
   delete [] quaprestress; quaprestress = nullptr;
+  delete [] sctrl_x; sctrl_x = nullptr;
+  delete [] sctrl_y; sctrl_y = nullptr;
+  delete [] sctrl_z; sctrl_z = nullptr;
 }
 
 // EOF
