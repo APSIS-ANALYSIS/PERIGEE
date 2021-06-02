@@ -32,7 +32,7 @@ int main( int argc, char *argv[] )
   // Nonlinear solver parameters
   double nl_rtol = 1.0e-3;           // convergence criterion relative tolerance
   double nl_atol = 1.0e-6;           // convergence criterion absolute tolerance
-  double nl_dtol = 10.0;             // divergence criterion
+  double nl_dtol = 1.0e3;             // divergence criterion
   int    nl_maxits = 20;             // maximum number if nonlinear iterations
   int    nl_refreq = 4;              // frequency of tangent matrix renewal
   int    nl_threshold = 4;           // threshold of tangent matrix renewal
