@@ -2,14 +2,14 @@
 
 PLocAssem_Tet_Wall_Prestress::PLocAssem_Tet_Wall_Prestress(
     const TimeMethod_GenAlpha * const &tm_gAlpha,
-    const int &in_nqp, const double &in_rho, 
+    const int &in_face_nqp, const double &in_rho, 
     const double &in_vis_mu, const double &in_wall_rho,
     const double &in_nu, const double &in_kappa,
     const int &elemtype )
 : rho0( in_rho ), vis_mu( in_vis_mu ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()), rho_w(in_wall_rho),
-  nu_w(in_nu), kappa_w(in_kappa), nqp(in_nqp)
+  nu_w(in_nu), kappa_w(in_kappa), face_nqp(in_face_nqp)
 {
   if(elemtype == 501)
   {
@@ -89,8 +89,6 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z ); 
 
   const int dim = 3;
-
-  const int face_nqp = quad -> get_num_quadPts();
 
   const double dd_dv = alpha_f * gamma * dt;
   const double dd_du = dd_dv * dd_dv / alpha_m;
@@ -300,7 +298,6 @@ void PLocAssem_Tet_Wall_Prestress::get_Wall_CauchyStress(
     std::vector<Matrix_3x3> &sigma )
 {
   const int dim = 3;
-  const int face_nqp = quad -> get_num_quadPts();
 
   // For membrane elements, basis function gradients are computed
   // with respect to lamina coords

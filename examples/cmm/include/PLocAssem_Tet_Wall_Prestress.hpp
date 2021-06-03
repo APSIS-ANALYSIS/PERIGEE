@@ -77,7 +77,7 @@ class PLocAssem_Tet_Wall_Prestress : public IPLocAssem
     // wall properties: density, Poisson ratio, shear correction factor (kappa)
     const double rho_w, nu_w, kappa_w; 
 
-    const int nqp; // number of quadrature points
+    const int face_nqp; // number of quadrature points for wall
 
     int nLocBas, snLocBas, vec_size, sur_size;
 

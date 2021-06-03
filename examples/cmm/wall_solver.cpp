@@ -56,7 +56,6 @@ int main( int argc, char *argv[] )
   const double wall_poisson = cmd_h5r -> read_doubleScalar("/", "wall_poisson");
   const double wall_kappa   = cmd_h5r -> read_doubleScalar("/", "wall_kappa");
   const int nqp_tri = cmd_h5r -> read_intScalar("/", "nqp_tri");
-  const int nqp_tet = cmd_h5r -> read_intScalar("/", "nqp_tet");
   const double fl_density = cmd_h5r -> read_doubleScalar("/", "fl_density");
   const double fl_mu = cmd_h5r -> read_doubleScalar("/", "fl_mu");
 
@@ -172,7 +171,7 @@ int main( int argc, char *argv[] )
 
   // ===== Local Assembly Routine =====
   IPLocAssem * locAssem_ptr = new PLocAssem_Tet_Wall_Prestress(
-      tm_galpha_ptr, nqp_tet, fl_density, fl_mu,
+      tm_galpha_ptr, quads->get_num_quadPts(), fl_density, fl_mu,
       wall_density, wall_poisson, wall_kappa, GMIptr->get_elemType() );
 
   // ===== Solution vector =====
