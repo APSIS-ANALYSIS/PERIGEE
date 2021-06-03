@@ -123,16 +123,10 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
   // Skew boundary conditions for in-plane motion of ring nodes
   else if( ringbc_type == 1 )
   {
-    // Note: element tangent Ke from NatBC_Resis_KG isn't a square matrix,
-    //       ncol >= nrow. Pad to square ncol x ncol.
-    PetscScalar * rotmat_e = new PetscScalar [ncol * ncol] {};
-
-    // Set diagonal entries to 1.0
-    for( int ii = 0; ii < ncol; ++ii ) rotmat_e[ ii*ncol + ii ] = 1.0;
-    
-    bool ring_rows = false, ring_cols = false; 
     int pos = -1; 
 
+    // Note: element tangent from NatBC_Resis_KG isn't a square matrix,
+    //       ncol >= nrow.
     for( int ii = dof-1; ii < ncol; ii += dof )
     {
       // Use velo-Z dof to determine ring nodes
@@ -142,14 +136,23 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
         Matrix_3x3 Q = ringnbc_part->get_rotation_matrix( pos );
         Q.transpose(); // Skew-to-global transformation matrix
 
-        // Only rotate velocity dofs
-        for( int jj = 0; jj < 3; ++jj )
+        for( int jj = dof-1; jj < nrow; jj += dof )
         {
-          for( int kk = 0; kk < 3; ++kk )
-            rotmat_e[ (ii-2+jj) * ncol + (ii-2+kk) ] = Q(jj, kk);
+          if( jj != ii )
+          {
+            Matrix_3x3 Ke_AB = Matrix_3x3(
+              Ke[(jj-2)*ncol + (ii-2)], Ke[(jj-2)*ncol + (ii-1)], Ke[(jj-2)*ncol + ii],
+              Ke[(jj-1)*ncol + (ii-2)], Ke[(jj-1)*ncol + (ii-1)], Ke[(jj-1)*ncol + ii],
+              Ke[(jj-0)*ncol + (ii-2)], Ke[(jj-0)*ncol + (ii-1)], Ke[(jj-0)*ncol + ii]  );
+
+            Ke_AB.MatMult(Ke_AB, Q);  // Ke_AB * Q
+
+            // Update Ke
+            Ke[(jj-2)*ncol + (ii-2)] = Ke_AB.xx(); Ke[(jj-2)*ncol + (ii-1)] = Ke_AB.xy(); Ke[(jj-2)*ncol + ii] = Ke_AB.xz(); 
+            Ke[(jj-1)*ncol + (ii-2)] = Ke_AB.yx(); Ke[(jj-1)*ncol + (ii-1)] = Ke_AB.yy(); Ke[(jj-1)*ncol + ii] = Ke_AB.yz(); 
+            Ke[(jj-0)*ncol + (ii-2)] = Ke_AB.zx(); Ke[(jj-0)*ncol + (ii-1)] = Ke_AB.zy(); Ke[(jj-0)*ncol + ii] = Ke_AB.zz(); 
+          } 
         }
- 
-        ring_cols = true;
       }
     }
 
@@ -159,75 +162,37 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
       const int dnode = ( row_index[ii] - 3 ) / dof_mat;
       if( ringnbc_part->is_inLDN( dnode, pos ) )
       {
-        ring_rows = true;
-        break;
-      } 
-    }    
+        // Global-to-skew transformation matrix
+        Matrix_3x3 QT = ringnbc_part->get_rotation_matrix( pos );
 
-    if( ring_rows && ring_cols )
-    {
-      // Rotate K: R^T * K * R = R_{ki} * K_{kl} * R_{lj}
-      PetscScalar * Ke_temp = new PetscScalar [ncol * ncol] {};
+        // Skew-to-global transformation matrix
+        Matrix_3x3 Q( QT );
 
-      for( int ii = 0; ii < nrow * ncol; ++ii )
-      {
-        Ke_temp[ii] = Ke[ii];
-        Ke[ii] = 0.0;
-      }
-
-      for( int ii = 0; ii < nrow; ++ii )
-      {
-        for( int jj = 0; jj < ncol; ++jj )
+        for( int jj = dof-1; jj < ncol; jj += dof )
         {
-          for( int kk = 0; kk < ncol; ++kk )
-          {
-            for(int ll = 0; ll < ncol; ++ll ) 
-              Ke[ii*ncol+jj] += rotmat_e[kk*ncol+ii] * Ke_temp[kk*ncol+ll] * rotmat_e[ll*ncol+jj];
-          }
+          Matrix_3x3 Ke_AB = Matrix_3x3(
+            Ke[(ii-2)*ncol + (jj-2)], Ke[(ii-2)*ncol + (jj-1)], Ke[(ii-2)*ncol + jj],
+            Ke[(ii-1)*ncol + (jj-2)], Ke[(ii-1)*ncol + (jj-1)], Ke[(ii-1)*ncol + jj],
+            Ke[(ii-0)*ncol + (jj-2)], Ke[(ii-0)*ncol + (jj-1)], Ke[(ii-0)*ncol + jj]  );
+
+          // ============ ISL NOTE: revisit for NatBC_Resis_KG face nodes LID ============
+          if( jj != ii ) Ke_AB.MatMult( QT, Ke_AB );  // QT * Ke_AB
+          else           Ke_AB.MatRot( Q );           // QT * Ke_AB * Q
+
+          // Update Ke
+          Ke[(ii-2)*ncol + (jj-2)] = Ke_AB.xx(); Ke[(ii-2)*ncol + (jj-1)] = Ke_AB.xy(); Ke[(ii-2)*ncol + jj] = Ke_AB.xz(); 
+          Ke[(ii-1)*ncol + (jj-2)] = Ke_AB.yx(); Ke[(ii-1)*ncol + (jj-1)] = Ke_AB.yy(); Ke[(ii-1)*ncol + jj] = Ke_AB.yz(); 
+          Ke[(ii-0)*ncol + (jj-2)] = Ke_AB.zx(); Ke[(ii-0)*ncol + (jj-1)] = Ke_AB.zy(); Ke[(ii-0)*ncol + jj] = Ke_AB.zz(); 
         }
-      }
 
-      // Rotate G: R^T * G = R_{ji} * G_{j}
-      PetscScalar * Ge_temp = new PetscScalar [ncol] {};
-      for( int ii = 0; ii < nrow; ++ii )
-      {
-        Ge_temp[ii] = Ge[ii];
-        Ge[ii] = 0.0;
-      }
+        Vector_3 Ge_A = Vector_3( Ge[ii-2], Ge[ii-1], Ge[ii] );
+        Vector_3 rot_Ge_A;
+        QT.VecMult(Ge_A, rot_Ge_A);  // rot_Ge_A = QT * Ge_A
 
-      for(int ii = 0; ii < nrow; ++ii )
-      {
-        for(int jj = 0; jj < ncol; ++jj )
-          Ge[ii] += rotmat_e[jj*ncol+ii] * Ge_temp[jj];
+        // Update Ge
+        Ge[ii-2] = rot_Ge_A.x(); Ge[ii-1] = rot_Ge_A.y(); Ge[ii] = rot_Ge_A.z();
       }
-
-      delete [] Ke_temp; delete [] Ge_temp;
-      Ke_temp = nullptr; Ge_temp = nullptr;
     }
-    else if( ring_cols )
-    {
-      // Rotate K columns: K * R = K_{ik} * R_{kj}
-      PetscScalar * Ke_temp = new PetscScalar [ncol * ncol] {};
-      
-      for( int ii = 0; ii < nrow * ncol; ++ii )
-      {
-        Ke_temp[ii] = Ke[ii];
-        Ke[ii] = 0.0;
-      }
-
-      for( int ii = 0; ii < nrow; ++ii )
-      {
-        for( int jj = 0; jj < ncol; ++jj )
-        {
-          for( int kk = 0; kk < ncol; ++kk )
-            Ke[ii*ncol+jj] += Ke_temp[ii*ncol+kk] * rotmat_e[kk*ncol+jj];
-        }
-      }
-
-      delete [] Ke_temp; Ke_temp = nullptr;
-    }
-
-    delete [] rotmat_e; rotmat_e = nullptr;
   }
   else
     SYS_T::print_fatal("Error: this ringbc_type is not supported in PGAssem_Tet_CMM_GenAlpha.\n");
