@@ -925,7 +925,6 @@ class IPLocAssem
         const double * const &sol_wall_disp,
         const FEAElement * const &element,
         const double * const &ele_youngsmod,
-        const IQuadPts * const &quad,
         std::vector<Matrix_3x3> &stress )
     {
       SYS_T::commPrint("Warning: get_Wall_CauchyStress() is not implemented. \n");

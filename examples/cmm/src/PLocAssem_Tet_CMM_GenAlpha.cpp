@@ -1364,9 +1364,10 @@ void PLocAssem_Tet_CMM_GenAlpha::get_Wall_CauchyStress(
     const double * const &sol_wall_disp,
     const FEAElement * const &element,
     const double * const &ele_youngsmod,
-    const IQuadPts * const &quad,
     std::vector<Matrix_3x3> &sigma )
 {
+  SYS_T::print_fatal_if( element -> get_numQuapts() != face_nqp, "Error: The element's data structure is incompatible with the face_nqp in the local assembly.\n" );
+
   const int dim = 3;
 
   // For membrane elements, basis function gradients are computed

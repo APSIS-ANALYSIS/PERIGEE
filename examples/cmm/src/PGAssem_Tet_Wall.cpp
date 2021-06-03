@@ -294,7 +294,7 @@ void PGAssem_Tet_Wall::Update_Wall_Prestress(
 
     element_w -> buildBasis( quad_s, sctrl_x, sctrl_y, sctrl_z );
 
-    lassem_ptr->get_Wall_CauchyStress( local_bs, element_w, syoungsmod, quad_s, sigma );
+    lassem_ptr->get_Wall_CauchyStress( local_bs, element_w, syoungsmod, sigma );
 
     // update prestress in Voigt notation (comps 11, 22, 33, 23, 13, 12)
     for(int qua=0; qua<face_nqp; ++qua)
