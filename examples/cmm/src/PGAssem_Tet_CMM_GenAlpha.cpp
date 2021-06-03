@@ -290,13 +290,15 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_nonzero_estimate(
 
   delete [] row_index; row_index = nullptr;
 
-  // Create a temporary zero solution vector to feed Natbc_Resis_KG
-  PDNSolution * temp = new PDNSolution_NS( node_ptr, 0, false );
+  // ====== ISL TEST: REPLACE NATBC_RESIS_KG WITH NATBC_G ======
+  // // Create a temporary zero solution vector to feed Natbc_Resis_KG
+  // PDNSolution * temp = new PDNSolution_NS( node_ptr, 0, false );
 
-  // 0.1 is an (arbitrarily chosen) nonzero time step size feeding the NatBC_Resis_KG 
-  NatBC_Resis_KG(0.1, temp, temp, lassem_ptr, elements, quad_s, nbc_part, ringnbc_part, ebc_part, gbc );
+  // // 0.1 is an (arbitrarily chosen) nonzero time step size feeding the NatBC_Resis_KG 
+  // NatBC_Resis_KG(0.1, temp, temp, lassem_ptr, elements, quad_s, nbc_part, ringnbc_part, ebc_part, gbc );
 
-  delete temp;
+  // delete temp;
+  // ===========================================================
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -457,8 +459,12 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_residual(
   // Residual contribution from the thin-walled linear membrane in CMM
   WallMembrane_G( curr_time, dt, sol_a, sol_b, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ebc_wall_part );
 
-  // Resistance type boundary condition
-  NatBC_Resis_G( dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
+  // ====== ISL TEST: REPLACE NATBC_RESIS_KG WITH NATBC_G ======
+  NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+
+  // // Resistance type boundary condition
+  // NatBC_Resis_G( dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
+  // ===========================================================
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -552,8 +558,12 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
   // Residual & tangent contributions from the thin-walled linear membrane in CMM
   WallMembrane_KG( curr_time, dt, sol_a, sol_b, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ringnbc_part, ebc_wall_part );
 
-  // Resistance type boundary condition
-  NatBC_Resis_KG( dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ringnbc_part, ebc_part, gbc );
+  // ====== ISL TEST: REPLACE NATBC_RESIS_KG WITH NATBC_G ======
+  NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+
+  // // Resistance type boundary condition
+  // NatBC_Resis_KG( dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ringnbc_part, ebc_part, gbc );
+  // ===========================================================
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
