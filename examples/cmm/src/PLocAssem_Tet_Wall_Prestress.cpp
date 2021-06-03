@@ -143,13 +143,13 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
       coor_z += eleCtrlPts_z[ii] * R[ii];
     }
 
-    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
-
     // Body force acting on the wall
     const Vector_3 fw = get_fw(coor_x, coor_y, coor_z, curr);
 
     double surface_area;
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+    
+    const double gwts = surface_area * quad->get_qw(qua);
 
     const double coef = E_w / (1.0 - nu_w * nu_w);
 
