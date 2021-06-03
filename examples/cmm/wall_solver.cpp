@@ -244,9 +244,10 @@ int main( int argc, char *argv[] )
       locnbc, locinfnbc, locringnbc, locebc, locebc_wall, gbc, pmat, elementv, elements, elementw,
       quadv, quads, locAssem_ptr, gloAssem_ptr, lsolver, nsolver );
 
-  // ==== Append wall prestress to h5 file ====
-  locebc_wall -> write_prestress_hdf5( part_file.c_str() );
+  // ===== Append wall prestress to h5 file =====
+  locebc_wall -> write_prestress_hdf5( part_file );
 
+  // ===== Clean memory =====
   delete locElem; delete fNode; delete locnbc; delete locIEN; delete pmat;
   delete GMIptr; delete quads; delete elementw; delete locebc_wall; delete tm_galpha_ptr;
   delete pNode; delete locAssem_ptr; delete base; delete sol; delete dot_sol;
