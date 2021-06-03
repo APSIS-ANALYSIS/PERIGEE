@@ -186,6 +186,12 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         PetscScalar * const &Ke,
         PetscScalar * const &Ge );
     
+    void RingBC_G(
+        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const int &dof, const int &nrow,
+        const PetscInt * const &row_index,
+        PetscScalar * const &Ge );
+    
     // Natural boundary condition
     void NatBC_G( const double &curr_time, const double &dt,
         IPLocAssem * const &lassem_ptr,

@@ -158,7 +158,10 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
       // Use velo-Z dof to determine ring nodes
       const int dnode = ( row_index[ii] - 3 ) / dof_mat;
       if( ringnbc_part->is_inLDN( dnode, pos ) )
+      {
         ring_rows = true;
+        break;
+      } 
     }    
 
     if( ring_rows && ring_cols )
@@ -229,6 +232,75 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
   else
     SYS_T::print_fatal("Error: this ringbc_type is not supported in PGAssem_Tet_CMM_GenAlpha.\n");
 }
+
+
+void PGAssem_Tet_CMM_GenAlpha::RingBC_G(
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const int &dof, const int &nrow,
+    const PetscInt * const &row_index,
+    PetscScalar * const &Ge )
+{
+  const int ringbc_type = ringnbc_part -> get_ringbc_type();
+
+  // Clamped rings
+  if( ringbc_type == 0 ) {}
+
+  // Skew boundary conditions for in-plane motion of ring nodes
+  else if( ringbc_type == 1 )
+  {
+    PetscScalar * rotmat_e = new PetscScalar [nrow * nrow] {};
+
+    // Set diagonal entries to 1.0
+    for( int ii = 0; ii < nrow; ++ii ) rotmat_e[ ii*nrow + ii ] = 1.0;  
+
+    bool ring_rows = false;
+    int pos = -1; 
+
+    for( int ii = dof-1; ii < nrow; ii += dof )
+    {
+      // Use velo-Z dof to determine ring nodes
+      const int dnode = ( row_index[ii] - 3 ) / dof_mat;
+      if( ringnbc_part->is_inLDN( dnode, pos ) )
+      {
+        Matrix_3x3 Q = ringnbc_part->get_rotation_matrix( pos );
+        Q.transpose(); // Skew-to-global transformation matrix
+
+        // Only rotate velocity dofs
+        for( int jj = 0; jj < 3; ++jj )
+        {
+          for( int kk = 0; kk < 3; ++kk )
+            rotmat_e[ (ii-2+jj) * nrow + (ii-2+kk) ] = Q(jj, kk);
+        }
+
+        ring_rows = true;
+      }
+    }
+
+    if( ring_rows )
+    {
+      // Rotate G: R^T * G = R_{ji} * G_{j}
+      PetscScalar * Ge_temp = new PetscScalar [nrow] {};
+      for( int ii = 0; ii < nrow; ++ii )
+      {
+        Ge_temp[ii] = Ge[ii];
+        Ge[ii] = 0.0;
+      }
+
+      for(int ii = 0; ii < nrow; ++ii )
+      {
+        for(int jj = 0; jj < nrow; ++jj )
+          Ge[ii] += rotmat_e[jj*nrow+ii] * Ge_temp[jj];
+      }
+
+      delete [] Ge_temp; Ge_temp = nullptr;
+    }
+
+    delete [] rotmat_e; rotmat_e = nullptr;
+  }
+  else
+    SYS_T::print_fatal("Error: this ringbc_type is not supported in PGAssem_Tet_CMM_GenAlpha.\n");
+}
+
 
 void PGAssem_Tet_CMM_GenAlpha::EssBC_G( const ALocal_NodalBC * const &nbc_part, 
     const int &field )
