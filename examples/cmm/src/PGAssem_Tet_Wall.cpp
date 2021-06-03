@@ -255,55 +255,6 @@ void PGAssem_Tet_Wall::WallMembrane_KG(
 }
 
 
-
-void PGAssem_Tet_Wall::NatBC_G( const PDNSolution * const &sol,
-    IPLocAssem * const &lassem_ptr,
-    FEAElement * const &element_s,
-    const IQuadPts * const &quad_s,
-    const ALocal_NodalBC * const &nbc_part,
-    const ALocal_EBC * const &ebc_wall_part )
-{
-  double * array = new double [nlgn * dof_mat];
-  double * local_s = new double [snLocBas * dof_mat];
-  int * LSIEN = new int [snLocBas];
-  double * sctrl_x = new double [snLocBas];
-  double * sctrl_y = new double [snLocBas];
-  double * sctrl_z = new double [snLocBas];
-  PetscInt * srow_index = new PetscInt [dof_mat * snLocBas];
-
-  sol->GetLocalArray( array );
-  
-  const int ebc_id = 0;
-  const int num_sele = ebc_wall_part -> get_num_local_cell(ebc_id);
-
-  for(int ee=0; ee<num_sele; ++ee)
-  {
-    ebc_wall_part -> get_SIEN(ebc_id, ee, LSIEN);
-    ebc_wall_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
-
-    GetLocal(array, LSIEN, snLocBas, local_s);
-
-    lassem_ptr->Assem_Residual_EBC_traction(local_s, element_s, 
-        sctrl_x, sctrl_y, sctrl_z, quad_s);
-
-    for(int ii=0; ii<snLocBas; ++ii)
-    {
-      for(int mm=0; mm<dof_mat; ++mm)
-        srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
-    }
-
-    VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
-  }
-
-  delete [] array;   array   = nullptr;
-  delete [] local_s; local_s = nullptr;
-  delete [] LSIEN;   LSIEN   = nullptr;
-  delete [] sctrl_x; sctrl_x = nullptr;
-  delete [] sctrl_y; sctrl_y = nullptr;
-  delete [] sctrl_z; sctrl_z = nullptr;
-  delete [] srow_index; srow_index = nullptr;
-}
-
 void PGAssem_Tet_Wall::Update_Wall_Prestress(
     const PDNSolution * const &sol_wall_disp,
     IPLocAssem * const &lassem_ptr,
