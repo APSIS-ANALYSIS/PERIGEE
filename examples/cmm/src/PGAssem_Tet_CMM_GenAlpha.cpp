@@ -131,7 +131,7 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
     bool ring_rows = false, ring_cols = false; 
     int pos = -1; 
 
-    for( int ii = 0; ii < ncol; ++ii )
+    for( int ii = dof-1; ii < ncol; ii += dof )
     {
       // Use velo-Z dof to determine ring nodes
       const int dnode = ( col_index[ii] - 3 ) / dof_mat;
@@ -141,17 +141,17 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
         Q.transpose();
 
         // Only rotate velocity dofs
-        for( int jj = dof-3; jj < dof; ++jj )
+        for( int jj = 0; jj < 3; ++jj )
         {
-          for( int kk = dof-3; kk < dof; ++kk )
-            rotmat_e[ (ii*dof+jj) * ncol + (ii*dof+kk) ] = Q(jj-1, kk-1);
+          for( int kk = 0; kk < 3; ++kk )
+            rotmat_e[ (ii-2+jj) * ncol + (ii-2+kk) ] = Q(jj, kk);
         }
-
+ 
         ring_cols = true;
       }
     }
 
-    for( int ii = 0; ii < nrow; ++ii )
+    for( int ii = dof-1; ii < nrow; ii += dof )
     {
       // Use velo-Z dof to determine ring nodes
       const int dnode = ( row_index[ii] - 3 ) / dof_mat;
@@ -1369,7 +1369,7 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_KG(
       }
 
       // Skew boundary conditions for in-plane motion of ring nodes
-      RingBC_KG( ringnbc_part, 3, nLocBas * 3, nLocBas * 3, srow_idx, scol_idx, Tan, Res );
+      RingBC_KG( ringnbc_part, 3, snLocBas * 3, num_face_nodes * 3, srow_idx, scol_idx, Tan, Res );
 
       MatSetValues(K, snLocBas*3, srow_idx, num_face_nodes*3, scol_idx, Tan, ADD_VALUES);
       VecSetValues(G, snLocBas*3, srow_idx, Res, ADD_VALUES);
@@ -1389,4 +1389,17 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_KG(
   delete [] sctrl_z; sctrl_z = nullptr;
 }
 
+void PGAssem_Tet_CMM_GenAlpha::print_2Darray( const double * const arr,
+  const int &nrow, const int &ncol )
+{
+  for(int ii = 0; ii < nrow; ++ii)
+  {
+    for(int jj = 0; jj < ncol; ++jj)
+    {
+      std::cout << std::scientific << std::setprecision(3) << std::setw(10) << arr[ii * ncol + jj] << " ";
+      // std::cout << arr[ii * ncol + jj] << " ";
+    }
+    std::cout << std::endl;
+  }
+}
 // EOF

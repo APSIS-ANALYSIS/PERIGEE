@@ -289,6 +289,9 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
           local_array[offset1 + jj] = array[offset2 + jj];
       }
     }
+
+    void print_2Darray( const double * const arr, const int &nrow, const int &ncol );
+
 };
 
 #endif
