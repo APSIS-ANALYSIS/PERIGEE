@@ -201,6 +201,10 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
 
     bc_mat->MatMultSol( dot_step );
 
+    // Skew boundary conditions for in-plane motion of ring nodes:
+    // Rotate ring node velo dofs back into the global Cartesian frame
+    rotate_ringbc( ringnbc_part, dot_step );
+
     // Update dot_sol, dot_sol_wall_disp
     dot_sol->PlusAX( dot_step, -1.0 );
     update_wall( (-1.0) * alpha_f * gamma * dt / alpha_m,
@@ -583,6 +587,38 @@ void PNonlinear_CMM_Solver::update_wall( const double &val,
 
   // Update ghost values
   wall_data->GhostUpdate();
+}
+
+
+void PNonlinear_CMM_Solver::rotate_ringbc(
+        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        PDNSolution * const &dot_step) const
+{
+  double vals[3], rot_vals[3];
+
+  const int num_ringnode = ringnbc_part -> get_Num_LD();
+
+  for(int ii = 0; ii < num_ringnode; ++ii)
+  {
+    const int dnode = ringnbc_part -> get_LDN( ii );
+
+    const int idx[3] = { dnode*4 + 1, dnode*4 + 2, dnode*4 + 3 };
+
+    VecGetValues(dot_step->solution, 3, idx, vals);
+
+    Matrix_3x3 Q = ringnbc_part->get_rotation_matrix( ii );
+    Q.transpose(); 
+
+    // rot_vals = Q * vals
+    Q.VecMult( vals, rot_vals );
+
+    VecSetValue(dot_step->solution, dnode*4+1, rot_vals[0], INSERT_VALUES);
+    VecSetValue(dot_step->solution, dnode*4+2, rot_vals[1], INSERT_VALUES);
+    VecSetValue(dot_step->solution, dnode*4+3, rot_vals[2], INSERT_VALUES);
+  }
+
+  VecAssemblyBegin(dot_step->solution); VecAssemblyEnd(dot_step->solution);
+  dot_step->GhostUpdate();
 }
 
 
