@@ -285,7 +285,7 @@ int main( int argc, char *argv[] )
   ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
 
   // Local sub-domain's wall elemental (Neumann) BC for CMM
-  ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, quads, "ebc_wall");
+  ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, quads->get_num_quadPts(), "ebc_wall");
 
   // Cross check fluid densities specified for the solver vs. wall youngsmod calculation
   if( locebc_wall -> get_fluid_density() != fluid_density )

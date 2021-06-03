@@ -136,7 +136,7 @@ int main( int argc, char *argv[] )
   ALocal_NodalBC * locnbc = new ALocal_NodalBC(part_file, rank);
 
   // Local sub-domain's wall elemental (Neumann) BC for CMM
-  ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, quads, "ebc_wall");
+  ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, quads->get_num_quadPts(), "ebc_wall");
 
   // Control points' xyz coordinates
   FEANode * fNode = new FEANode(part_file, rank);
@@ -244,6 +244,8 @@ int main( int argc, char *argv[] )
       locnbc, locinfnbc, locringnbc, locebc, locebc_wall, gbc, pmat, elementv, elements, elementw,
       quadv, quads, locAssem_ptr, gloAssem_ptr, lsolver, nsolver );
 
+  // ==== Append wall prestress to h5 file ====
+  locebc_wall -> write_prestress_hdf5( part_file.c_str() );
 
   delete locElem; delete fNode; delete locnbc; delete locIEN; delete pmat;
   delete GMIptr; delete quads; delete elementw; delete locebc_wall; delete tm_galpha_ptr;

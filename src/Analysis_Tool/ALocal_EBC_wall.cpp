@@ -1,10 +1,10 @@
 #include "ALocal_EBC_wall.hpp"
 
 ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
-    const int &in_cpu_rank, const IQuadPts * const &quad, 
+    const int &in_cpu_rank, const int &in_face_nqp, 
     const std::string &gname )
 : ALocal_EBC( fileBaseName, in_cpu_rank, gname ), cpu_rank (in_cpu_rank),
-  face_nqp( quad -> get_num_quadPts() )
+  face_nqp( in_face_nqp )
 {
   SYS_T::print_fatal_if(gname != "ebc_wall", 
       "Error: ALocal_EBC_wall data should be read from group ebc_wall.\n" );
@@ -23,7 +23,6 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
   qua_prestress.clear();
 
   const int ebc_id = 0;
-
   // wall has only one surface per the assumption in wall ebc  
   if( num_local_cell[ebc_id] > 0 )
   {
@@ -44,12 +43,16 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
 
       SYS_T::print_fatal_if( static_cast<int>( qua_prestress.size() ) != 6 * face_nqp * num_local_cell[ebc_id],
         "ALocal_EBC_wall: size of qua_prestress is inconsistent with face_nqp. \n");
+    
+      SYS_T::commPrint("===> ALocal_EBC_wall : qua_prestress loaded from %s.\n", fName.c_str());
     }
     else
     {
       qua_prestress.resize( 6 * face_nqp * num_local_cell[ebc_id] );
       
       for( auto &val : qua_prestress ) val = 0.0;
+      
+      SYS_T::commPrint("===> ALocal_EBC_wall : qua_prestress initialized to be zero.\n");
     }
   }
 
@@ -120,22 +123,21 @@ void ALocal_EBC_wall::write_prestress_hdf5( const char * FileName ) const
   const std::string input_fName(FileName);
   const std::string fName = SYS_T::gen_partfile_name( input_fName, cpu_rank );
 
-  // re-open the file
-  hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
-
   // open the folder at fName/ebc_wall again to append additional data 
   // num_ebc = 1 for wall elem bc and id = 0 
   const int ebc_id = 0;
   if( num_local_cell[ebc_id] > 0 )
   {
-    hid_t group_id = H5Gopen( file_id, "ebc_wall/ebcid_0", H5P_DEFAULT );
+    // re-open the file
+    hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
     HDF5_Writer * h5w = new HDF5_Writer( file_id );
+    
+    hid_t group_id = H5Gopen( file_id, "ebc_wall/ebcid_0", H5P_DEFAULT );
 
     h5w->write_doubleVector( group_id, "prestress", qua_prestress );
 
-    H5Gclose( group_id );
-    delete h5w; H5Gclose( group_id ); H5Fclose( file_id );
+    H5Gclose( group_id ); delete h5w; H5Fclose( file_id );
   }
 }
 

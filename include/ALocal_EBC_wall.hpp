@@ -18,7 +18,7 @@ class ALocal_EBC_wall : public ALocal_EBC
 {
   public:
     ALocal_EBC_wall( const std::string &fileBaseName,
-        const int &in_cpu_rank, const IQuadPts * const &quad,
+        const int &in_cpu_rank, const int &in_face_nqp,
         const std::string &gname = "ebc_wall" );
 
     virtual ~ALocal_EBC_wall();
