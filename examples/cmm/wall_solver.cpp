@@ -71,6 +71,7 @@ int main( int argc, char *argv[] )
   const PetscMPIInt size = SYS_T::get_MPI_size();
   
   // ===== Read Command Line Arguments =====
+  SYS_T::GetOptionReal(  "-prestress_disp_tol", prestress_disp_tol);
   SYS_T::GetOptionString("-part_file",       part_file);
   SYS_T::GetOptionReal(  "-rho_inf",         genA_rho_inf);
   SYS_T::GetOptionReal(  "-nl_rtol",         nl_rtol);
@@ -89,6 +90,7 @@ int main( int argc, char *argv[] )
 
   // ===== Print Command Line Arguments =====
   SYS_T::cmdPrint(      "-part_file:",       part_file);
+  SYS_T::cmdPrint(      "-prestress_disp_tol:", prestress_disp_tol);
   SYS_T::cmdPrint(      "-nl_rtol:",         nl_rtol);
   SYS_T::cmdPrint(      "-nl_atol:",         nl_atol);
   SYS_T::cmdPrint(      "-nl_dtol:",         nl_dtol);
