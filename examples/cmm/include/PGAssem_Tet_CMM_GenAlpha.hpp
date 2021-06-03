@@ -173,6 +173,11 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
    
     void EssBC_G( const ALocal_NodalBC * const &nbc_part, const int &field );
 
+    // Ring nodal BC: 1) clamped, or 2) in-plane motion (skew bc)
+    // References:
+    //   i. Griffiths DV (Computers & Structures 1990) Treatment of skew boundary
+    //      conditions in finite element analysis
+    //  ii. Bathe KJ (1996) Finite element procedures
     void RingBC_KG(
         const ALocal_Ring_NodalBC * const &ringnbc_part,
         const int &dof, const int &nrow, const int &ncol,

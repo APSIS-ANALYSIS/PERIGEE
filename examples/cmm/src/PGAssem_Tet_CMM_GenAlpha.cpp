@@ -117,8 +117,10 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
 {
   const int ringbc_type = ringnbc_part -> get_ringbc_type();
 
+  // Clamped rings
   if( ringbc_type == 0 ) {}
 
+  // Skew boundary conditions for in-plane motion of ring nodes
   else if( ringbc_type == 1 )
   {
     // Note: element tangent Ke from NatBC_Resis_KG isn't a square matrix,
@@ -138,7 +140,7 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
       if( ringnbc_part->is_inLDN( dnode, pos ) )
       {
         Matrix_3x3 Q = ringnbc_part->get_rotation_matrix( pos );
-        Q.transpose();
+        Q.transpose(); // Skew-to-global transformation matrix
 
         // Only rotate velocity dofs
         for( int jj = 0; jj < 3; ++jj )
@@ -351,7 +353,6 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_mass_residual(
         row_index[dof_mat*ii+mm] = dof_mat * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
     }
 
-    // Skew boundary conditions for in-plane motion of ring nodes
     RingBC_KG( ringnbc_part, dof_mat, nLocBas * dof_mat, nLocBas * dof_mat,
         row_index, row_index, lassem_ptr->Tangent, lassem_ptr->Residual );
 
@@ -526,7 +527,6 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
         row_index[dof_mat*ii + mm] = dof_mat*nbc_part->get_LID(mm, IEN_e[ii])+mm;
     }
 
-    // Skew boundary conditions for in-plane motion of ring nodes
     RingBC_KG( ringnbc_part, dof_mat, nLocBas * dof_mat, nLocBas * dof_mat,
         row_index, row_index, lassem_ptr->Tangent, lassem_ptr->Residual );
 
@@ -716,7 +716,6 @@ void PGAssem_Tet_CMM_GenAlpha::BackFlow_KG( const double &dt,
           srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
       }
 
-      // Skew boundary conditions for in-plane motion of ring nodes
       RingBC_KG( ringnbc_part, dof_mat, dof_mat * snLocBas, dof_mat * snLocBas,
           srow_index, srow_index, lassem_ptr->sur_Tangent, lassem_ptr->sur_Residual );
 
@@ -880,7 +879,6 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_KG(
         srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
     }
 
-    // Skew boundary conditions for in-plane motion of ring nodes
     RingBC_KG( ringnbc_part, dof_mat, dof_mat * snLocBas, dof_mat * snLocBas,
         srow_index, srow_index, lassem_ptr->sur_Tangent, lassem_ptr->sur_Residual );
 
@@ -1368,7 +1366,6 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_KG(
         scol_idx[ii*3+2] = dof_mat * map_Bj[ii*3+2] + 3;
       }
 
-      // Skew boundary conditions for in-plane motion of ring nodes
       RingBC_KG( ringnbc_part, 3, snLocBas * 3, num_face_nodes * 3, srow_idx, scol_idx, Tan, Res );
 
       MatSetValues(K, snLocBas*3, srow_idx, num_face_nodes*3, scol_idx, Tan, ADD_VALUES);

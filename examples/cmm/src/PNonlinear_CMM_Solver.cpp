@@ -594,31 +594,42 @@ void PNonlinear_CMM_Solver::rotate_ringbc(
         const ALocal_Ring_NodalBC * const &ringnbc_part,
         PDNSolution * const &dot_step) const
 {
-  double vals[3], rot_vals[3];
+  const int ringbc_type = ringnbc_part -> get_ringbc_type();
 
-  const int num_ringnode = ringnbc_part -> get_Num_LD();
+  // Clamped rings
+  if( ringbc_type == 0 ) {}
 
-  for(int ii = 0; ii < num_ringnode; ++ii)
+  // Skew boundary conditions for in-plane motion of ring nodes
+  else if( ringbc_type == 1)
   {
-    const int dnode = ringnbc_part -> get_LDN( ii );
+    double vals[3], rot_vals[3];
 
-    const int idx[3] = { dnode*4 + 1, dnode*4 + 2, dnode*4 + 3 };
+    const int num_ringnode = ringnbc_part -> get_Num_LD();
 
-    VecGetValues(dot_step->solution, 3, idx, vals);
+    for(int ii = 0; ii < num_ringnode; ++ii)
+    {
+      const int dnode = ringnbc_part -> get_LDN( ii );
 
-    Matrix_3x3 Q = ringnbc_part->get_rotation_matrix( ii );
-    Q.transpose(); 
+      const int idx[3] = { dnode*4 + 1, dnode*4 + 2, dnode*4 + 3 };
 
-    // rot_vals = Q * vals
-    Q.VecMult( vals, rot_vals );
+      VecGetValues(dot_step->solution, 3, idx, vals);
 
-    VecSetValue(dot_step->solution, dnode*4+1, rot_vals[0], INSERT_VALUES);
-    VecSetValue(dot_step->solution, dnode*4+2, rot_vals[1], INSERT_VALUES);
-    VecSetValue(dot_step->solution, dnode*4+3, rot_vals[2], INSERT_VALUES);
+      Matrix_3x3 Q = ringnbc_part->get_rotation_matrix( ii );
+      Q.transpose(); // Skew-to-global transformation matrix 
+
+      // rot_vals = Q * vals
+      Q.VecMult( vals, rot_vals );
+
+      VecSetValue(dot_step->solution, dnode*4+1, rot_vals[0], INSERT_VALUES);
+      VecSetValue(dot_step->solution, dnode*4+2, rot_vals[1], INSERT_VALUES);
+      VecSetValue(dot_step->solution, dnode*4+3, rot_vals[2], INSERT_VALUES);
+    }
+
+    VecAssemblyBegin(dot_step->solution); VecAssemblyEnd(dot_step->solution);
+    dot_step->GhostUpdate();
   }
-
-  VecAssemblyBegin(dot_step->solution); VecAssemblyEnd(dot_step->solution);
-  dot_step->GhostUpdate();
+  else
+    SYS_T::print_fatal("Error: this ringbc_type is not supported in PNonlinear_CMM_Solver.\n");
 }
 
 
