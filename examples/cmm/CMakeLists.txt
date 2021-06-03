@@ -104,6 +104,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_Tet_CMM_GenAlpha.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_Tet_Wall_Prestress.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_Tet_CMM_GenAlpha.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_Tet_Wall.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_NS.cpp
