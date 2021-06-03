@@ -153,14 +153,6 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const IQuadPts * const &quad_s,
         const ALocal_Inflow_NodalBC * const &infbc_part );
 
-    // Update wall prestress at all surface quadrature points
-    virtual void Update_Wall_Prestress(
-        const PDNSolution * const &sol_wall_disp,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &element_w,
-        const IQuadPts * const &quad_s,
-        ALocal_EBC * const &ebc_wall_part );
-
   private:
     // Private data
     const int nLocBas, dof_sol, dof_mat, num_ebc, nlgn;
