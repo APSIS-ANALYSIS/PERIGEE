@@ -1045,7 +1045,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 
   // Global Cauchy stress at all quadrature points
   std::vector<Matrix_3x3> sigma; sigma.resize( face_nqp );
-  get_Wall_CauchyStress(sol_wall_disp, element, ele_youngsmod, quad, sigma );
+  get_Wall_CauchyStress(sol_wall_disp, element, ele_youngsmod, sigma );
 
   Zero_sur_Residual();
 
@@ -1165,7 +1165,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 
   // Global Cauchy stress at all quadrature points
   std::vector<Matrix_3x3> sigma; sigma.resize( face_nqp );
-  get_Wall_CauchyStress(sol_wall_disp, element, ele_youngsmod, quad, sigma );
+  get_Wall_CauchyStress(sol_wall_disp, element, ele_youngsmod, sigma );
 
   Zero_sur_Tangent_Residual();
 
