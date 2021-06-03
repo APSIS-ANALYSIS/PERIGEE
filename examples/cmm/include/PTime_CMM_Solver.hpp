@@ -100,6 +100,8 @@ class PTime_CMM_Solver
     void Write_restart_file(const PDNTimeStep * const &timeinfo,
         const std::string &solname ) const;
 
+    // This function will take a 4-dof solution and zero the 3 velocity
+    // components
     void Zero_velo_comp( PDNSolution * const &sol ) const;
 };
 

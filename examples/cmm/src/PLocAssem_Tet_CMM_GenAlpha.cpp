@@ -1095,15 +1095,15 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     }
 
     // Add prestress: convert from Voigt notation (comps 11, 22, 33, 23, 13, 12)
-    sigma[qua](0,0) += qua_prestress[qua*6];
-    sigma[qua](0,1) += qua_prestress[qua*6+5];
-    sigma[qua](0,2) += qua_prestress[qua*6+4];
-    sigma[qua](1,0) += qua_prestress[qua*6+5];
-    sigma[qua](1,1) += qua_prestress[qua*6+1];
-    sigma[qua](1,2) += qua_prestress[qua*6+3];
-    sigma[qua](2,0) += qua_prestress[qua*6+4];
-    sigma[qua](2,1) += qua_prestress[qua*6+3];
-    sigma[qua](2,2) += qua_prestress[qua*6+2];
+    sigma[qua].xx() += qua_prestress[qua*6];
+    sigma[qua].xy() += qua_prestress[qua*6+5];
+    sigma[qua].xz() += qua_prestress[qua*6+4];
+    sigma[qua].yx() += qua_prestress[qua*6+5];
+    sigma[qua].yy() += qua_prestress[qua*6+1];
+    sigma[qua].yz() += qua_prestress[qua*6+3];
+    sigma[qua].zx() += qua_prestress[qua*6+4];
+    sigma[qua].zy() += qua_prestress[qua*6+3];
+    sigma[qua].zz() += qua_prestress[qua*6+2];
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 

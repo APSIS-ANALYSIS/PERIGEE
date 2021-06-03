@@ -20,8 +20,8 @@ int main( int argc, char *argv[] )
 {
   // Prestress solver parameters
   // Generalized-alpha rho_inf
-  double genA_rho_inf = 0.5;
-  bool is_backward_Euler = false;
+  double genA_rho_inf = 0.0;
+  bool is_backward_Euler = true;
   
   // Estimate of num nonzeros per row for the sparse tangent matrix
   int nz_estimate = 300;
