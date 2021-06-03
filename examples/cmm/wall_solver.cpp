@@ -12,7 +12,7 @@
 #include "FEAElement_Triangle3_membrane.hpp"
 #include "FEAElement_Triangle6_membrane.hpp"
 #include "TimeMethod_GenAlpha.hpp"
-#include "PLocAssem_Tet_CMM_GenAlpha.hpp"
+#include "PLocAssem_Tet_Wall_Prestress.hpp"
 #include "PGAssem_Tet_Wall.hpp"
 #include "PTime_CMM_Solver.hpp"
 
@@ -169,12 +169,9 @@ int main( int argc, char *argv[] )
   tm_galpha_ptr->print_info();
 
   // ===== Local Assembly Routine =====
-  const double bs_beta = 0.0;
-  const double c_tauc = 0.0;
-  IPLocAssem * locAssem_ptr = new PLocAssem_Tet_CMM_GenAlpha(
-      tm_galpha_ptr, nqp_tet, fl_density, fl_mu, bs_beta,
-      wall_density, wall_poisson, wall_kappa,
-      c_tauc, GMIptr->get_elemType() );
+  IPLocAssem * locAssem_ptr = new PLocAssem_Tet_Wall_Prestress(
+      tm_galpha_ptr, nqp_tet, fl_density, fl_mu,
+      wall_density, wall_poisson, wall_kappa, GMIptr->get_elemType() );
 
   // ===== Solution vector =====
   PDNSolution * base = new PDNSolution_NS( pNode, 0 );
