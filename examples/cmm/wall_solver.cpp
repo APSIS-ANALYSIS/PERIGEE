@@ -189,14 +189,10 @@ int main( int argc, char *argv[] )
 
   std::string restart_name = "SOL_re"; // restart solution base name
 
-  // Read in [pres velo]
+  // Read in [pres velo], which is use to provide the pressure traction on wall
+  // surface.
   SYS_T::file_check(restart_name.c_str());
   sol->ReadBinary(restart_name.c_str());
-
-  // Read in [dot_pres dot_velo]
-  std::string restart_dot_name = "dot_" + restart_name;
-  SYS_T::file_check(restart_dot_name.c_str());
-  dot_sol->ReadBinary(restart_dot_name.c_str());
 
   // ===== Time step info =====
   PDNTimeStep * timeinfo = new PDNTimeStep(initial_index, initial_time, initial_step);
