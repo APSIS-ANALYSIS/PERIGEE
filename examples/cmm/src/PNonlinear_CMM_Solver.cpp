@@ -446,14 +446,16 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_Prestress(
 
   }while(nl_counter<nmaxits && relative_error > nr_tol && residual_norm > na_tol);
 
-  Print_convergence_info(nl_counter, relative_error, residual_norm);
-
+  // --------------------------------------------------------------------------
   // Update the prestress values
   gassem_ptr->Update_Wall_Prestress(sol_wall_disp, lassem_ptr, elementw, quad_s, ebc_wall_part);
 
   SYS_T::commPrint("  --- wall_disp_norm: %e \n", sol_wall_disp->Norm_2());
 
   if( sol_wall_disp->Norm_2() <= prestress_tol ) prestress_conv_flag = true;
+  // --------------------------------------------------------------------------
+
+  Print_convergence_info(nl_counter, relative_error, residual_norm);
 }
 
 void PNonlinear_CMM_Solver::rescale_inflow_value( const double &stime,
