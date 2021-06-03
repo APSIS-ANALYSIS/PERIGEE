@@ -199,6 +199,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const ALocal_NodalBC * const &nbc_part,
+        const ALocal_Ring_NodalBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part );
 
     // Backflow integral on outlet surfaces

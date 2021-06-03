@@ -535,7 +535,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_residual(
   WallMembrane_G( curr_time, dt, sol_a, sol_b, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ringnbc_part, ebc_wall_part );
 
   // ====== ISL TEST: REPLACE NATBC_RESIS_KG WITH NATBC_G ======
-  NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+  NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ringnbc_part, ebc_part );
 
   // // Resistance type boundary condition
   // NatBC_Resis_G( dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
@@ -634,7 +634,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
   WallMembrane_KG( curr_time, dt, sol_a, sol_b, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ringnbc_part, ebc_wall_part );
 
   // ====== ISL TEST: REPLACE NATBC_RESIS_KG WITH NATBC_G ======
-  NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+  NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ringnbc_part, ebc_part );
 
   // // Resistance type boundary condition
   // NatBC_Resis_KG( dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ringnbc_part, ebc_part, gbc );
@@ -657,6 +657,7 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_G( const double &curr_time, const double &d
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_NodalBC * const &nbc_part,
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   int * LSIEN = new int [snLocBas];
@@ -683,6 +684,8 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_G( const double &curr_time, const double &d
         for(int mm=0; mm<dof_mat; ++mm)
           srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
       }
+
+      RingBC_G( ringnbc_part, dof_mat, snLocBas * dof_mat, srow_index, lassem_ptr->Residual );
 
       VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->Residual, ADD_VALUES);
     }
