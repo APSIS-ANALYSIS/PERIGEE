@@ -59,7 +59,7 @@ class ALocal_EBC_wall : public ALocal_EBC
 
     virtual double get_fluid_density() const {return fluid_density;}
 
-    virtual void write_prestress_hdf5( const char * FileName ) const;
+    virtual void write_prestress_hdf5( const std::string &fileBaseName ) const;
 
   protected:
     // ------------------------------------------------------------------------

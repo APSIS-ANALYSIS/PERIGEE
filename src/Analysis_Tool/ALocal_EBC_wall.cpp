@@ -118,10 +118,9 @@ void ALocal_EBC_wall::set_prestress( const int &eindex,
     qua_prestress[pos + ii] = e_quaprestress[ii]; 
 }
 
-void ALocal_EBC_wall::write_prestress_hdf5( const char * FileName ) const
+void ALocal_EBC_wall::write_prestress_hdf5( const std::string &fileBaseName ) const
 {
-  const std::string input_fName(FileName);
-  const std::string fName = SYS_T::gen_partfile_name( input_fName, cpu_rank );
+  const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
   // open the folder at fName/ebc_wall again to append additional data 
   // num_ebc = 1 for wall elem bc and id = 0 
