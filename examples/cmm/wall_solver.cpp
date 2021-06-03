@@ -245,7 +245,7 @@ int main( int argc, char *argv[] )
       quadv, quads, locAssem_ptr, gloAssem_ptr, lsolver, nsolver );
 
 
-  delete locElem;
+  delete locElem; delete fNode; delete locnbc; delete locIEN; delete pmat;
   delete GMIptr; delete quads; delete elementw; delete locebc_wall; delete tm_galpha_ptr;
   delete pNode; delete locAssem_ptr; delete base; delete sol; delete dot_sol;
   delete sol_wall_disp; delete dot_sol_wall_disp; delete timeinfo; delete gloAssem_ptr;

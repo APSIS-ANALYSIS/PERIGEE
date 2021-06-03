@@ -251,6 +251,7 @@ void PGAssem_Tet_Wall::WallMembrane_KG(
   delete [] sctrl_z;  sctrl_z  = nullptr;
   delete [] sthickness; sthickness = nullptr;
   delete [] syoungsmod; syoungsmod = nullptr;
+  delete [] quaprestress; quaprestress = nullptr;
   delete [] srow_index; srow_index = nullptr;
 }
 

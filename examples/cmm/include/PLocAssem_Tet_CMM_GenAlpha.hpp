@@ -14,7 +14,8 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
   public:
     PLocAssem_Tet_CMM_GenAlpha(
         const TimeMethod_GenAlpha * const &tm_gAlpha,
-        const int &in_nqp, const double &in_rho, 
+        const int &in_nqp, const int &in_face_nqp, 
+        const double &in_rho, 
         const double &in_vis_mu, const double &in_beta,
         const double &in_wall_rho, const double &in_nu,
         const double &in_kappa, const double &in_ctauc = 1.0,
@@ -178,7 +179,7 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
     // wall properties: density, Poisson ratio, shear correction factor (kappa)
     const double rho_w, nu_w, kappa_w; 
 
-    const int nqp; // number of quadrature points
+    const int nqp, face_nqp; // number of quadrature points
 
     double CI, CT; // Constants for stabilization parameters
 

@@ -2,7 +2,7 @@
 
 PLocAssem_Tet_CMM_GenAlpha::PLocAssem_Tet_CMM_GenAlpha(
     const TimeMethod_GenAlpha * const &tm_gAlpha,
-    const int &in_nqp,
+    const int &in_nqp, const int &in_face_nqp,
     const double &in_rho, const double &in_vis_mu,
     const double &in_beta, const double &in_wall_rho,
     const double &in_nu, const double &in_kappa,
@@ -10,7 +10,8 @@ PLocAssem_Tet_CMM_GenAlpha::PLocAssem_Tet_CMM_GenAlpha(
 : rho0( in_rho ), vis_mu( in_vis_mu ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()), beta(in_beta), rho_w(in_wall_rho),
-  nu_w(in_nu), kappa_w(in_kappa), nqp(in_nqp), Ctauc( in_ctauc )
+  nu_w(in_nu), kappa_w(in_kappa), nqp(in_nqp), face_nqp(in_face_nqp), 
+  Ctauc( in_ctauc )
 {
   if(elemtype == 501)
   {
@@ -792,8 +793,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  const int face_nqp = quad -> get_num_quadPts();
-
   const double curr = time + alpha_f * dt;
 
   double gx, gy, gz, surface_area;
@@ -837,8 +836,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Resistance(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  const int face_nqp = quad -> get_num_quadPts();
-
   double surface_area;
 
   Zero_Residual();
@@ -869,8 +866,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_BackFlowStab(
     const IQuadPts * const &quad )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  const int face_nqp = quad -> get_num_quadPts();
 
   double surface_area, factor;
 
@@ -917,8 +912,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
     const IQuadPts * const &quad )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  const int face_nqp = quad -> get_num_quadPts();
 
   const double dd_dv = alpha_f * gamma * dt;
 
@@ -976,8 +969,6 @@ double PLocAssem_Tet_CMM_GenAlpha::get_flowrate( const double * const &sol,
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  const int face_nqp = quad -> get_num_quadPts();
-
   double surface_area;
 
   double flrate = 0.0;
@@ -1013,8 +1004,6 @@ void PLocAssem_Tet_CMM_GenAlpha::get_pressure_area(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  const int face_nqp = quad -> get_num_quadPts();
-
   // Initialize the two variables to be passed out
   pres = 0.0; area = 0.0;
 
@@ -1047,7 +1036,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z ); 
 
-  const int face_nqp = quad -> get_num_quadPts();
   const double curr = time + alpha_f * dt;
 
   // For membrane elements, basis function gradients are computed
@@ -1164,8 +1152,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z ); 
 
   const int dim = 3;
-
-  const int face_nqp = quad -> get_num_quadPts();
 
   const double dd_dv = alpha_f * gamma * dt;
   const double dd_du = dd_dv * dd_dv / alpha_m;
@@ -1382,7 +1368,6 @@ void PLocAssem_Tet_CMM_GenAlpha::get_Wall_CauchyStress(
     std::vector<Matrix_3x3> &sigma )
 {
   const int dim = 3;
-  const int face_nqp = quad -> get_num_quadPts();
 
   // For membrane elements, basis function gradients are computed
   // with respect to lamina coords
