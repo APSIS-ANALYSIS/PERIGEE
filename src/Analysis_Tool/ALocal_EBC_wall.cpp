@@ -35,16 +35,23 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
     // If the prestress data exist on file, read the prestress data
     // otherwise, just allocate a container for prestress data at each quadrature 
     // point with zero values
-    std::string prestress_data_location(subgroup_name);
-    prestress_data_location.append("/prestress");
-    if( h5r -> check_data( prestress_data_location.c_str() ) )
+    const std::string ps_fName = SYS_T::gen_partfile_name( ps_fileBaseName, cpu_rank );
+    if( SYS_T::file_exist(ps_fName) )
     {
-      qua_prestress = h5r -> read_doubleVector( subgroup_name.c_str(), "prestress" );
+      hid_t ps_file_id = H5Fopen(ps_fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+
+      HDF5_Reader * ps_h5r = new HDF5_Reader( ps_file_id );
+
+      qua_prestress = ps_h5r -> read_doubleVector( "/", "prestress" );
+
+      VEC_T::print(qua_prestress, '\n');
+
+      delete ps_h5r; H5Fclose(ps_file_id);
 
       SYS_T::print_fatal_if( static_cast<int>( qua_prestress.size() ) != 6 * face_nqp * num_local_cell[ebc_id],
         "ALocal_EBC_wall: size of qua_prestress is inconsistent with face_nqp. \n");
     
-      SYS_T::commPrint("===> ALocal_EBC_wall : qua_prestress loaded from %s.\n", fName.c_str());
+      SYS_T::commPrint("===> ALocal_EBC_wall : qua_prestress loaded from %s.\n", ps_fName.c_str());
     }
     else
     {
