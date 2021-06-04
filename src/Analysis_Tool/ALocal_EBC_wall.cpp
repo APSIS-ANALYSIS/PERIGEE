@@ -4,7 +4,7 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
     const int &in_cpu_rank, const int &in_face_nqp, 
     const std::string &gname )
 : ALocal_EBC( fileBaseName, in_cpu_rank, gname ), cpu_rank (in_cpu_rank),
-  face_nqp( in_face_nqp )
+  face_nqp( in_face_nqp ), ps_fileBaseName("prestress")
 {
   SYS_T::print_fatal_if(gname != "ebc_wall", 
       "Error: ALocal_EBC_wall data should be read from group ebc_wall.\n" );
@@ -118,9 +118,9 @@ void ALocal_EBC_wall::set_prestress( const int &eindex,
     qua_prestress[pos + ii] = e_quaprestress[ii]; 
 }
 
-void ALocal_EBC_wall::write_prestress_hdf5( const std::string &fileBaseName ) const
+void ALocal_EBC_wall::write_prestress_hdf5() const
 {
-  const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
+  const std::string fName = SYS_T::gen_partfile_name( ps_fileBaseName, cpu_rank );
 
   // open the folder at fName/ebc_wall again to append additional data 
   // num_ebc = 1 for wall elem bc and id = 0 
@@ -128,15 +128,13 @@ void ALocal_EBC_wall::write_prestress_hdf5( const std::string &fileBaseName ) co
   if( num_local_cell[ebc_id] > 0 )
   {
     // re-open the file
-    hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
+    hid_t file_id = H5Fcreate(fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
     HDF5_Writer * h5w = new HDF5_Writer( file_id );
     
-    hid_t group_id = H5Gopen( file_id, "ebc_wall/ebcid_0", H5P_DEFAULT );
+    h5w->write_doubleVector( file_id, "prestress", qua_prestress );
 
-    h5w->write_doubleVector( group_id, "prestress", qua_prestress );
-
-    H5Gclose( group_id ); delete h5w; H5Fclose( file_id );
+    delete h5w; H5Fclose( file_id );
   }
 }
 

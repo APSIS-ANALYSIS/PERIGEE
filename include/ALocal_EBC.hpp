@@ -248,7 +248,7 @@ class ALocal_EBC
 
     // write_prestress_hdf5 : appends the wall prestress to the existing ebc_wall/ebcid_0
     // data in the hdf5 file for the given cpu rank
-    virtual void write_prestress_hdf5( const std::string &fileBaseName ) const
+    virtual void write_prestress_hdf5() const
     {
       SYS_T::print_fatal("Error: ALocal_EBC::write_prestress_hdf5 is not implemented. \n");
     }

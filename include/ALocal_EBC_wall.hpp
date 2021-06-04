@@ -59,7 +59,7 @@ class ALocal_EBC_wall : public ALocal_EBC
 
     virtual double get_fluid_density() const {return fluid_density;}
 
-    virtual void write_prestress_hdf5( const std::string &fileBaseName ) const;
+    virtual void write_prestress_hdf5() const;
 
   protected:
     // ------------------------------------------------------------------------
@@ -71,6 +71,12 @@ class ALocal_EBC_wall : public ALocal_EBC
     // num quadrature points for surface element
     // ------------------------------------------------------------------------
     const int face_nqp;
+
+    // ------------------------------------------------------------------------
+    // file name for storing the prestress values.
+    // It is used in the write_prestress_hdf5 function
+    // ------------------------------------------------------------------------
+    const std::string ps_fileBaseName;
 
     // ------------------------------------------------------------------------
     // Fluid density used to generate the youngs modulus for arteries at
