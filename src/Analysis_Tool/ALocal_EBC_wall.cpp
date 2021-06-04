@@ -44,8 +44,6 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
 
       qua_prestress = ps_h5r -> read_doubleVector( "/", "prestress" );
 
-      VEC_T::print(qua_prestress, '\n');
-
       delete ps_h5r; H5Fclose(ps_file_id);
 
       SYS_T::print_fatal_if( static_cast<int>( qua_prestress.size() ) != 6 * face_nqp * num_local_cell[ebc_id],
@@ -138,7 +136,7 @@ void ALocal_EBC_wall::write_prestress_hdf5() const
     hid_t file_id = H5Fcreate(fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
     HDF5_Writer * h5w = new HDF5_Writer( file_id );
-    
+      
     h5w->write_doubleVector( file_id, "prestress", qua_prestress );
 
     delete h5w; H5Fclose( file_id );
