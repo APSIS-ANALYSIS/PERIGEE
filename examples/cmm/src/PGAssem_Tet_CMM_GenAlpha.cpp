@@ -138,7 +138,7 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
 
         for( int jj = dof-1; jj < nrow; jj += dof )
         {
-          if( jj != ii )
+          if( dnode != ( row_index[jj] - 3 ) / dof_mat )
           {
             Matrix_3x3 Ke_AB = Matrix_3x3(
               Ke[(jj-2)*ncol + (ii-2)], Ke[(jj-2)*ncol + (ii-1)], Ke[(jj-2)*ncol + ii],
@@ -186,7 +186,7 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
             Ke[(ii-0)*ncol + (jj-2)], Ke[(ii-0)*ncol + (jj-1)], Ke[(ii-0)*ncol + jj]  );
 
           // ============ ISL NOTE: revisit for NatBC_Resis_KG face nodes LID ============
-          if( jj != ii ) Ke_AB.MatMult( QT, Ke_AB );  // QT * Ke_AB
+          if( dnode != ( col_index[jj] - 3 ) / dof_mat ) Ke_AB.MatMult( QT, Ke_AB );  // QT * Ke_AB
           else
           {
             Ke_AB.MatRot( Q );  // QT * Ke_AB * Q
