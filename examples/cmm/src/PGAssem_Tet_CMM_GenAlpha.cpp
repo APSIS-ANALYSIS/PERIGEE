@@ -151,6 +151,16 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
             Ke[(jj-2)*ncol + (ii-2)] = Ke_AB.xx(); Ke[(jj-2)*ncol + (ii-1)] = Ke_AB.xy(); Ke[(jj-2)*ncol + ii] = Ke_AB.xz(); 
             Ke[(jj-1)*ncol + (ii-2)] = Ke_AB.yx(); Ke[(jj-1)*ncol + (ii-1)] = Ke_AB.yy(); Ke[(jj-1)*ncol + ii] = Ke_AB.yz(); 
             Ke[(jj-0)*ncol + (ii-2)] = Ke_AB.zx(); Ke[(jj-0)*ncol + (ii-1)] = Ke_AB.zy(); Ke[(jj-0)*ncol + ii] = Ke_AB.zz(); 
+
+            // Continuity eqn
+            if( dof == dof_mat )
+            {
+              Vector_3 Ke_c = Vector_3( Ke[(jj-3)*ncol + (ii-2)], Ke[(jj-3)*ncol + (ii-1)], Ke[(jj-3)*ncol + ii] );
+              Vector_3 rot_Ke_c;
+              Q.VecMultT( Ke_c, rot_Ke_c );  // rot_Ke_c = Ke_c^T * Q
+
+              Ke[(jj-3)*ncol + (ii-2)] = rot_Ke_c.x(); Ke[(jj-3)*ncol + (ii-1)] = rot_Ke_c.y(); Ke[(jj-3)*ncol + ii] = rot_Ke_c.z(); 
+            } 
           } 
         }
       }
@@ -177,7 +187,32 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
 
           // ============ ISL NOTE: revisit for NatBC_Resis_KG face nodes LID ============
           if( jj != ii ) Ke_AB.MatMult( QT, Ke_AB );  // QT * Ke_AB
-          else           Ke_AB.MatRot( Q );           // QT * Ke_AB * Q
+          else
+          {
+            Ke_AB.MatRot( Q );  // QT * Ke_AB * Q
+
+            // Continuity eqn
+            if( dof == dof_mat )
+            {
+              Vector_3 rot_Ke_c;
+
+              Vector_3 Ke_c = Vector_3( Ke[(ii-3)*ncol + (jj-2)], Ke[(ii-3)*ncol + (jj-1)], Ke[(ii-3)*ncol + jj] );
+              Q.VecMultT( Ke_c, rot_Ke_c );  // rot_Ke_c = Ke_c^T * Q
+
+              Ke[(ii-3)*ncol + (jj-2)] = rot_Ke_c.x(); Ke[(ii-3)*ncol + (jj-1)] = rot_Ke_c.y(); Ke[(ii-3)*ncol + jj] = rot_Ke_c.z(); 
+            }
+          }
+
+          // Momentum eqns corresponding to pressure dof
+          if( dof == dof_mat )
+          {
+            Vector_3 rot_Ke_c;
+
+            Vector_3 Ke_c = Vector_3( Ke[(ii-2)*ncol + (jj-3)], Ke[(ii-1)*ncol + (jj-3)], Ke[ii*ncol + (jj-3)] );
+            QT.VecMult( Ke_c, rot_Ke_c );  // rot_Ke_c = Q^T * Ke_c
+            
+            Ke[(ii-2)*ncol + (jj-3)] = rot_Ke_c.x(); Ke[(ii-1)*ncol + (jj-3)] = rot_Ke_c.y(); Ke[ii*ncol + (jj-3)] = rot_Ke_c.z(); 
+          }
 
           // Update Ke
           Ke[(ii-2)*ncol + (jj-2)] = Ke_AB.xx(); Ke[(ii-2)*ncol + (jj-1)] = Ke_AB.xy(); Ke[(ii-2)*ncol + jj] = Ke_AB.xz(); 
@@ -192,7 +227,7 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
         // Update Ge
         Ge[ii-2] = rot_Ge_A.x(); Ge[ii-1] = rot_Ge_A.y(); Ge[ii] = rot_Ge_A.z();
       }
-    }
+    } // end loop over rows
   }
   else
     SYS_T::print_fatal("Error: this ringbc_type is not supported in PGAssem_Tet_CMM_GenAlpha.\n");
@@ -1431,5 +1466,6 @@ void PGAssem_Tet_CMM_GenAlpha::print_2Darray( const double * const arr,
     }
     std::cout << std::endl;
   }
+  std::cout << std::endl;
 }
 // EOF
