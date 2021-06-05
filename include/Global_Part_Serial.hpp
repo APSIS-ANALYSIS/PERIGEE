@@ -23,10 +23,13 @@ class Global_Part_Serial : public IGlobal_Part
     virtual ~Global_Part_Serial();
 
     virtual idx_t get_epart( const int &ee ) const {return epart[ee];}
+    
     virtual idx_t get_npart( const int &nn ) const {return npart[nn];}
 
     virtual bool get_isMETIS() const {return isMETIS;};
+    
     virtual bool get_isDual() const {return isDual;};
+    
     virtual int get_dual_edge_ncommon() const {return dual_edge_ncommon;}
     
     virtual bool is_serial() const {true;}
