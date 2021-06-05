@@ -32,7 +32,7 @@ class Global_Part_Serial : public IGlobal_Part
     
     virtual int get_dual_edge_ncommon() const {return dual_edge_ncommon;}
     
-    virtual bool is_serial() const {true;}
+    virtual bool is_serial() const {return true;}
 
   private:
     const bool isMETIS, isDual;

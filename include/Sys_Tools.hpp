@@ -458,6 +458,15 @@ namespace SYS_T
         "Error: The file %s does not exist. Job is killed. \n", fName.c_str());
   }
 
+  // --------------------------------------------------------------------------
+  // Execute a system call
+  // --------------------------------------------------------------------------
+  inline void execute( const char * const &command )
+  {
+    int sysret = system( command );
+    print_fatal_if(sysret != 0, "Error: system call %s failed. \n", command);
+  }
+
   // ================================================================
   // SYS_T::Timer class defines a timer tool that one can use to
   // measure the time spent on events
