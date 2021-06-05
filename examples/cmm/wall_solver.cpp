@@ -18,6 +18,9 @@
 
 int main( int argc, char *argv[] )
 {
+  // Clean potentially pre-existing hdf5 files of prestress
+  SYS_T::execute("rm -rf prestress_p*.h5");
+
   // Prestress solver parameters
   // Generalized-alpha rho_inf
   double genA_rho_inf = 0.0;

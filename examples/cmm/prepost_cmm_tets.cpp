@@ -18,8 +18,7 @@
 int main( int argc, char * argv[] )
 {
   // Clean the existing postpart hdf5 files
-  int sysret = system("rm -rf postpart_p*.h5");
-  SYS_T::print_fatal_if(sysret != 0, "ERROR: system call failed. \n");
+  SYS_T::execute("rm -rf postpart_p*.h5");
 
   const std::string part_file("postpart");
   int cpu_size = 1;
