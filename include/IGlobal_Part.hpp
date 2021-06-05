@@ -31,6 +31,8 @@ class IGlobal_Part
     virtual bool get_isDual() const = 0;
     
     virtual int get_dual_edge_ncommon() const = 0;
+
+    virtual bool is_serial() const = 0;
 };
 
 #endif
