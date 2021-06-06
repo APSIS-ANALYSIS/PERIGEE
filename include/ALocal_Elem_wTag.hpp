@@ -25,7 +25,11 @@ class ALocal_Elem_wTag : public ALocal_Elem
 
     virtual ~ALocal_Elem_wTag();
 
-    virtual int get_elem_tag(const int &index) const {return elem_tag[index];}
+    // ------------------------------------------------------------------------
+    // ! get_elem_tag : return the tag for the local element
+    //   \para 0 <= ee < nlocalele
+    // ------------------------------------------------------------------------
+    virtual int get_elem_tag(const int &ee) const {return elem_tag[ee];}
 
     virtual void print_info() const;
 

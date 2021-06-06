@@ -11,7 +11,6 @@
 // ==================================================================
 #include "IMesh.hpp"
 #include "IIEN.hpp"
-#include "Vec_Tools.hpp"
 #include "IGlobal_Part.hpp"
 #include "HDF5_Writer.hpp"
 
