@@ -12,8 +12,7 @@ ALocal_NodalBC::ALocal_NodalBC( const std::string &fileBaseName,
   nlocghonode = h5r->read_intScalar( "Local_Node", "nlocghonode" );
   LID = h5r->read_intVector( gname.c_str(), "LID" );
 
-  if( LID.size() % nlocghonode != 0 )
-    SYS_T::print_fatal("Error:ALocal_NodalBC, LID length is not compatible with local and ghost node number. \n");
+  SYS_T::print_fatal_if( LID.size() % nlocghonode != 0, "Error:ALocal_NodalBC, LID length is not compatible with local and ghost node number. \n");
 
   dof = LID.size() / nlocghonode;
 
@@ -27,8 +26,7 @@ ALocal_NodalBC::ALocal_NodalBC( const std::string &fileBaseName,
 
   if(size_ldn > 0) LDN = h5r->read_intVector( gname.c_str(), "LDN" );
 
-  if( int(LDN.size()) != size_ldn )
-    SYS_T::print_fatal("Error:ALocal_NodalBC, LDN length does not match Num_LD. \n");
+  SYS_T::print_fatal_if( int(LDN.size()) != size_ldn, "Error:ALocal_NodalBC, LDN length does not match Num_LD. \n");
   
   // Read local periodic nodes
   Num_LPS = h5r->read_intVector( gname.c_str(), "Num_LPS" );
@@ -42,11 +40,8 @@ ALocal_NodalBC::ALocal_NodalBC( const std::string &fileBaseName,
     LPMN = h5r->read_intVector( gname.c_str(), "LPMN" );
   }
 
-  if( int(LPSN.size()) != size_lp )
-    SYS_T::print_fatal("Error: ALocal_NodalBC, LPSN length does not match Num_LPS. \n");
-
-  if( int(LPMN.size()) != size_lp )
-    SYS_T::print_fatal("Error: ALocal_NodalBC, LPMN length does not match Num_LPS. \n");
+  SYS_T::print_fatal_if( int(LPSN.size()) != size_lp, "Error: ALocal_NodalBC, LPSN length does not match Num_LPS. \n");
+  SYS_T::print_fatal_if( int(LPMN.size()) != size_lp, "Error: ALocal_NodalBC, LPMN length does not match Num_LPS. \n");
 
   // Read local periodic master nodes
   Num_LPM = h5r->read_intVector( gname.c_str(), "Num_LPM" );
@@ -60,11 +55,8 @@ ALocal_NodalBC::ALocal_NodalBC( const std::string &fileBaseName,
     LocalMasterSlave = h5r->read_intVector( gname.c_str(), "LocalMasterSlave" );
   }
   
-  if( int(LocalMaster.size()) != size_lp )
-    SYS_T::print_fatal("Error: ALocal_NodalBC, LocalMaster length does not match Num_LPM. \n");
-
-  if( int(LocalMasterSlave.size()) != size_lp )
-    SYS_T::print_fatal("Error: ALocal_NodalBC, LocalMasterSlave length does not match Num_LPM. \n");
+  SYS_T::print_fatal_if( int(LocalMaster.size()) != size_lp, "Error: ALocal_NodalBC, LocalMaster length does not match Num_LPM. \n");
+  SYS_T::print_fatal_if( int(LocalMasterSlave.size()) != size_lp, "Error: ALocal_NodalBC, LocalMasterSlave length does not match Num_LPM. \n");
 
   delete h5r; H5Fclose( file_id );
   
