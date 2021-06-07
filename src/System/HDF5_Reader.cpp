@@ -147,29 +147,6 @@ double HDF5_Reader::read_doubleScalar( const char * const &group_name,
   return outdata;
 }
 
-void HDF5_Reader::read_intVector( const char * const &group_name,
-    const char * const &data_name,
-    std::vector<int> &out ) const
-{
-  hid_t drank;
-  hsize_t * ddims;
-  int * intdata;
-
-  read_intArray( group_name, data_name, drank, ddims, intdata );
-
-  if( drank != 1 )
-  {
-    std::ostringstream oss;
-    oss<<"Error: HDF5_Reader::read_intVector read data at "<<group_name;
-    oss<<" with name "<<data_name<<" is not a 1D vector! \n";
-    SYS_T::print_fatal( oss.str().c_str() );
-  }
-
-  out = VEC_T::fillArray( intdata, ddims[0] );
-
-  delete [] ddims; delete [] intdata;
-}
-
 std::vector<int> HDF5_Reader::read_intVector( const char * const &group_name,
     const char * const &data_name ) const
 {

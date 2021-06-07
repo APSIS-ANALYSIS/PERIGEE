@@ -76,9 +76,6 @@ class HDF5_Reader
     // ! read_intVector: output the 1D integer array data into 
     //                   vector<int>.
     // --------------------------------------------------------------
-    void read_intVector( const char * const &group_name, 
-        const char * const &data_name, std::vector<int> &out ) const;
-
     std::vector<int> read_intVector( const char * const &group_name,
         const char * const &data_name ) const;
     
