@@ -11,7 +11,7 @@
 // ==================================================================
 #include "IGlobal_Part.hpp"
 #include "IMesh.hpp"
-#include "hdf5.h"
+#include "HDF5_Writer.hpp"
 
 class Global_Part_Serial : public IGlobal_Part
 {

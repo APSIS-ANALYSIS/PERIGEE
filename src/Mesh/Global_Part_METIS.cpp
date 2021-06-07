@@ -221,9 +221,7 @@ void Global_Part_METIS::write_part_hdf5_64bit( const char * const &fileName,
   std::string fName( fileName );
   fName.append( ".h5" );
 
-  hid_t file_id;
-
-  file_id = H5Fcreate( fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
+  hid_t file_id = H5Fcreate( fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
 
   HDF5_Writer * h5w = new HDF5_Writer(file_id);
 

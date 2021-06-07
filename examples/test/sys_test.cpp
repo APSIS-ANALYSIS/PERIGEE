@@ -15,10 +15,10 @@ int main( int argc, char * argv[] )
 
   //for(auto out : a) std::cout<<out;
 
+  bool flg = false;
 
-
-  SYS_T::execute("ls -al");
-
+  int aa = ( flg ? 1 : 0);
+  std::cout<<aa<<'\n';
 
   return EXIT_SUCCESS;
 }

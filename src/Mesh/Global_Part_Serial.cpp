@@ -41,68 +41,21 @@ void Global_Part_Serial::write_part_hdf5( const char * const &fileName,
   std::string fName( fileName );
   fName.append(".h5");
 
-  hid_t file_id, dataspace_id_n, dataspace_id_1;
-  hsize_t dim_n[1], dim_1[1];
-
   // file creation
-  file_id = H5Fcreate( fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+  hid_t file_id = H5Fcreate( fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
-  // dataspace creation
-  dim_n[0] = part_size; dim_1[0] = 1;
+  HDF5_Writer * h5w = new HDF5_Writer(file_id);
 
-  dataspace_id_n = H5Screate_simple(1, dim_n, NULL);
-  dataspace_id_1 = H5Screate_simple(1, dim_1, NULL);
+  h5w -> write_intScalar("part_size", part_size);
+  h5w -> write_intScalar("cpu_size", cpu_size);
 
-  // dataset
-  hid_t setid_part_size, setid_cpu_size, setid_part_isdual, setid_in_ncommon;
-  hid_t setid_isMETIS, setid_part;
+  h5w->write_intScalar("part_isdual", ( part_isdual ? 1 : 0 ) );
+  h5w->write_intScalar("in_ncommon", in_ncommon);
 
-  setid_part_size = H5Dcreate( file_id, "part_size", H5T_NATIVE_INT, dataspace_id_1,
-     H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-  setid_cpu_size = H5Dcreate( file_id, "cpu_size", H5T_NATIVE_INT, dataspace_id_1,
-     H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-  setid_part_isdual = H5Dcreate( file_id, "part_isdual", H5T_NATIVE_INT, dataspace_id_1,
-     H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-  setid_in_ncommon = H5Dcreate( file_id, "in_ncommon", H5T_NATIVE_INT, dataspace_id_1,
-     H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-  setid_isMETIS = H5Dcreate( file_id, "isMETIS", H5T_NATIVE_INT, dataspace_id_1,
-     H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-  setid_part = H5Dcreate( file_id, "part", H5T_NATIVE_INT, dataspace_id_n,
-     H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+  h5w->write_intScalar("isMETIS", ( isMETIS ? 1 : 0 ) );
+  h5w->write_intVector( "part", part_in, part_size );
 
-
-  H5Dwrite( setid_part_size, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT,
-      &part_size);
-  H5Dwrite( setid_cpu_size, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT,
-      &cpu_size);
-  
-  int intbool;
-  if(part_isdual)
-   intbool = 1;
-  else
-   intbool = 0; 
-  H5Dwrite( setid_part_isdual, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT,
-      &intbool);
-
-  H5Dwrite( setid_in_ncommon, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT,
-      &in_ncommon);
-
-  if(isMETIS)
-   intbool = 1;
-  else
-   intbool = 0; 
-  H5Dwrite( setid_isMETIS, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT,
-      &intbool);
-
-  H5Dwrite( setid_part, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT,
-     part_in );
-
-  H5Dclose( setid_part_size );   H5Dclose( setid_cpu_size );
-  H5Dclose( setid_part_isdual ); H5Dclose( setid_in_ncommon );
-  H5Dclose( setid_isMETIS );     H5Dclose( setid_part );
-  H5Sclose( dataspace_id_n );
-  H5Sclose( dataspace_id_1 );
-  H5Fclose(file_id);
+  delete h5w; H5Fclose(file_id);
 }
 
 // EOF
