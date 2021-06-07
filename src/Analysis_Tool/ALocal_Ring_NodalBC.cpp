@@ -17,7 +17,7 @@ ALocal_Ring_NodalBC::ALocal_Ring_NodalBC(
 
   num_caps = h5r -> read_intScalar( gname.c_str(), "num_caps" );
 
-  h5r -> read_intVector( gname.c_str(), "cap_dominant_n_comp", dominant_n_comp );
+  dominant_n_comp = h5r -> read_intVector( gname.c_str(), "cap_dominant_n_comp" );
 
   const std::vector<double> outnormal_vec = h5r -> read_doubleVector( gname.c_str(), "cap_out_normal" );
 
