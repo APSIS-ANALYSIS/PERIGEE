@@ -11,8 +11,7 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
 
   const std::string gname("/inflow");
 
-  std::vector<double> outnormal_vec;  
-  h5r -> read_doubleVector( gname.c_str(), "Outward_normal_vector", outnormal_vec );
+  const std::vector<double> outnormal_vec = h5r -> read_doubleVector( gname.c_str(), "Outward_normal_vector" );
   
   outnormal(0) = outnormal_vec[0];
   outnormal(1) = outnormal_vec[1];
@@ -27,10 +26,10 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
   // load the LDN array and the additional geometry info.
   if( Num_LD > 0 )
   {
-    h5r->read_intVector( gname.c_str(), "LDN", LDN );
-    num_out_bc_pts = h5r->read_intScalar( gname.c_str(), "num_out_bc_pts");
-    h5r->read_doubleVector( gname.c_str(), "centroid", centroid);
-    h5r->read_doubleVector( gname.c_str(), "outline_pts", outline_pts );
+    LDN = h5r->read_intVector( gname.c_str(), "LDN" );
+    num_out_bc_pts = h5r->read_intScalar( gname.c_str(), "num_out_bc_pts" );
+    centroid = h5r->read_doubleVector( gname.c_str(), "centroid" );
+    outline_pts = h5r->read_doubleVector( gname.c_str(), "outline_pts" );
   }
   else
   {
@@ -45,9 +44,9 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
   // load its geometrical info 
   if(num_local_cell > 0)
   {
-    h5r->read_doubleVector( gname.c_str(), "local_pt_xyz", local_pt_xyz );
-    h5r->read_intVector( gname.c_str(), "local_tri_ien", local_tri_ien );
-    h5r->read_intVector( gname.c_str(), "local_node_pos", local_node_pos );
+    local_pt_xyz = h5r->read_doubleVector( gname.c_str(), "local_pt_xyz" );
+    local_tri_ien = h5r->read_intVector( gname.c_str(), "local_tri_ien" );
+    local_node_pos = h5r->read_intVector( gname.c_str(), "local_node_pos" );
   }
   else
   {
