@@ -180,27 +180,13 @@ void Global_Part_METIS::write_part_hdf5_64bit( const char * const &fileName,
   h5w->write_int64Scalar("part_size", part_size);
   h5w->write_intScalar("cpu_size", cpu_size);
 
-  int intbool;
-  if(part_isdual)
-    intbool = 1;
-  else
-    intbool = 0;
-
-  h5w->write_intScalar("part_isdual", intbool);
+  h5w->write_intScalar("part_isdual", ( part_isdual ? 1 : 0 ) );
   h5w->write_intScalar("in_ncommon", in_ncommon);
 
-  if(isMETIS)
-    intbool = 1;
-  else
-    intbool = 0;
-
-  h5w->write_intScalar("isMETIS", intbool);
-
+  h5w->write_intScalar("isMETIS", ( isMETIS ? 1 : 0 ) );
   h5w->write_int64Vector( "part", part_in, part_size );
 
-  delete h5w;
-
-  H5Fclose(file_id);
+  delete h5w; H5Fclose(file_id);
 }
 
 // EOF
