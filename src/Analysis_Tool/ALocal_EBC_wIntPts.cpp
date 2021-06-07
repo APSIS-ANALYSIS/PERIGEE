@@ -18,8 +18,7 @@ ALocal_EBC_wIntPts::ALocal_EBC_wIntPts( const std::string &fileBaseName,
       subgroup_name.append("/ebcid_");
       subgroup_name.append( SYS_T::to_string(ii) );
 
-      h5r -> read_doubleVector( subgroup_name.c_str(), 
-          "local_intpt_xyz", local_intpts[ii] );
+      local_intpts[ii] = h5r -> read_doubleVector( subgroup_name.c_str(), "local_intpt_xyz" );
     }
     else
       local_intpts[ii].clear();
@@ -27,7 +26,6 @@ ALocal_EBC_wIntPts::ALocal_EBC_wIntPts( const std::string &fileBaseName,
 
   delete h5r; H5Fclose( file_id );
 }
-
 
 ALocal_EBC_wIntPts::~ALocal_EBC_wIntPts()
 {
