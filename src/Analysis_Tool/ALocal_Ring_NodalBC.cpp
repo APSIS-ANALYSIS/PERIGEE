@@ -19,8 +19,7 @@ ALocal_Ring_NodalBC::ALocal_Ring_NodalBC(
 
   h5r -> read_intVector( gname.c_str(), "cap_dominant_n_comp", dominant_n_comp );
 
-  std::vector<double> outnormal_vec;
-  h5r -> read_doubleVector( gname.c_str(), "cap_out_normal", outnormal_vec );
+  const std::vector<double> outnormal_vec = h5r -> read_doubleVector( gname.c_str(), "cap_out_normal" );
 
   outnormal.resize(num_caps);
   for(int ii=0; ii<num_caps; ++ii)
@@ -35,12 +34,11 @@ ALocal_Ring_NodalBC::ALocal_Ring_NodalBC(
   // and the dominant tangential components 
   if( Num_LD > 0 )
   {
-    h5r->read_intVector( gname.c_str(), "LDN", LDN );
-    h5r->read_intVector( gname.c_str(), "local_cap_id", local_cap_id );
-    h5r->read_intVector( gname.c_str(), "local_dominant_t_comp", local_dominant_t_comp );
+    LDN = h5r->read_intVector( gname.c_str(), "LDN" );
+    local_cap_id = h5r->read_intVector( gname.c_str(), "local_cap_id" );
+    local_dominant_t_comp = h5r->read_intVector( gname.c_str(), "local_dominant_t_comp" );
 
-    std::vector<double> tangential_vec;
-    h5r->read_doubleVector( gname.c_str(), "local_tangential", tangential_vec );
+    const std::vector<double> tangential_vec = h5r->read_doubleVector( gname.c_str(), "local_tangential" );
 
     local_tangential.resize(Num_LD);
     for(int ii=0; ii<Num_LD; ++ii)
