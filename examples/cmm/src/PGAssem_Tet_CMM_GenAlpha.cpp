@@ -185,7 +185,6 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
             Ke[(ii-1)*ncol + (jj-2)], Ke[(ii-1)*ncol + (jj-1)], Ke[(ii-1)*ncol + jj],
             Ke[(ii-0)*ncol + (jj-2)], Ke[(ii-0)*ncol + (jj-1)], Ke[(ii-0)*ncol + jj]  );
 
-          // ============ ISL NOTE: revisit for NatBC_Resis_KG face nodes LID ============
           if( dnode != ( col_index[jj] - 3 ) / dof_mat ) Ke_AB.MatMult( QT, Ke_AB );  // QT * Ke_AB
           else
           {
