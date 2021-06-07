@@ -8,13 +8,13 @@ FEANode::FEANode( const std::string &fileBaseName, const int &cpu_rank )
 
   HDF5_Reader * h5r = new HDF5_Reader( file_id );
 
-  h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_x_loc", ctrlPts_x);
-  h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_y_loc", ctrlPts_y);
-  h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_z_loc", ctrlPts_z);
+  ctrlPts_x = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_x_loc");
+  ctrlPts_y = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_y_loc");
+  ctrlPts_z = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_z_loc");
 
   // Detect if the weights is in the h5 file, and read if yes
   if( H5Lexists(file_id, "/ctrlPts_loc/ctrlPts_w_loc", H5P_DEFAULT) )
-    h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_w_loc", ctrlPts_w);
+    ctrlPts_w = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_w_loc");
   else
     VEC_T::clean( ctrlPts_w );
 
