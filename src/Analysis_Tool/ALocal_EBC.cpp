@@ -13,11 +13,11 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
 
   if( num_ebc > 0)
   {
-    h5r -> read_intVector(gname.c_str(), "num_local_cell_node", num_local_cell_node );
+    num_local_cell_node = h5r -> read_intVector(gname.c_str(), "num_local_cell_node" );
 
-    h5r -> read_intVector(gname.c_str(), "num_local_cell", num_local_cell );
+    num_local_cell = h5r -> read_intVector(gname.c_str(), "num_local_cell" );
 
-    h5r -> read_intVector(gname.c_str(), "cell_nLocBas", cell_nLocBas );
+    cell_nLocBas = h5r -> read_intVector(gname.c_str(), "cell_nLocBas" );
   }
 
   std::string groupbase(gname);
@@ -36,20 +36,15 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
       std::string subgroup_name(groupbase);
       subgroup_name.append( SYS_T::to_string(ii) );
 
-      h5r -> read_doubleVector( subgroup_name.c_str(), "local_cell_node_xyz",
-          local_cell_node_xyz[ii] );
+      local_cell_node_xyz[ii] = h5r -> read_doubleVector( subgroup_name.c_str(), "local_cell_node_xyz" );
 
-      h5r -> read_intVector( subgroup_name.c_str(), "local_tri_ien",
-          local_tri_ien[ii] );
+      local_tri_ien[ii] = h5r -> read_intVector( subgroup_name.c_str(), "local_tri_ien" );
 
-      h5r -> read_intVector( subgroup_name.c_str(), "local_cell_node_vol_id",
-          local_cell_node_vol_id[ii] );
+      local_cell_node_vol_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "local_cell_node_vol_id" );
 
-      h5r -> read_intVector( subgroup_name.c_str(), "local_cell_node_pos",
-          local_cell_node_pos[ii] );
+      local_cell_node_pos[ii] = h5r -> read_intVector( subgroup_name.c_str(), "local_cell_node_pos" );
 
-      h5r -> read_intVector( subgroup_name.c_str(), "local_cell_vol_id", 
-          local_cell_vol_id[ii] );
+      local_cell_vol_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "local_cell_vol_id" );
     }
     else
     {
