@@ -10,7 +10,7 @@ ALocal_NodalBC::ALocal_NodalBC( const std::string &fileBaseName,
   HDF5_Reader * h5r = new HDF5_Reader( file_id );
 
   nlocghonode = h5r->read_intScalar( "Local_Node", "nlocghonode" );
-  h5r->read_intVector( gname.c_str(), "LID", LID );
+  LID = h5r->read_intVector( gname.c_str(), "LID" );
 
   if( LID.size() % nlocghonode != 0 )
     SYS_T::print_fatal("Error:ALocal_NodalBC, LID length is not compatible with local and ghost node number. \n");
@@ -18,31 +18,28 @@ ALocal_NodalBC::ALocal_NodalBC( const std::string &fileBaseName,
   dof = LID.size() / nlocghonode;
 
   // Read local dirichlet nodes
-  h5r->read_intVector( gname.c_str(), "Num_LD", Num_LD );
+  Num_LD = h5r->read_intVector( gname.c_str(), "Num_LD" );
 
   int size_ldn = 0;
-  for( unsigned int ii=0; ii<Num_LD.size(); ++ii )
-    size_ldn += Num_LD[ii];
+  for( unsigned int ii=0; ii<Num_LD.size(); ++ii ) size_ldn += Num_LD[ii];
 
   LDN.clear();
 
-  if(size_ldn > 0)
-    h5r->read_intVector( gname.c_str(), "LDN", LDN );
+  if(size_ldn > 0) LDN = h5r->read_intVector( gname.c_str(), "LDN" );
 
   if( int(LDN.size()) != size_ldn )
     SYS_T::print_fatal("Error:ALocal_NodalBC, LDN length does not match Num_LD. \n");
   
   // Read local periodic nodes
-  h5r->read_intVector( gname.c_str(), "Num_LPS", Num_LPS );
+  Num_LPS = h5r->read_intVector( gname.c_str(), "Num_LPS" );
 
   int size_lp = 0;
-  for(unsigned int ii=0; ii<Num_LPS.size(); ++ii)
-    size_lp += Num_LPS[ii];
+  for(unsigned int ii=0; ii<Num_LPS.size(); ++ii) size_lp += Num_LPS[ii];
 
   if( size_lp > 0 )
   {
-    h5r->read_intVector( gname.c_str(), "LPSN", LPSN );
-    h5r->read_intVector( gname.c_str(), "LPMN", LPMN );
+    LPSN = h5r->read_intVector( gname.c_str(), "LPSN" );
+    LPMN = h5r->read_intVector( gname.c_str(), "LPMN" );
   }
 
   if( int(LPSN.size()) != size_lp )
@@ -52,16 +49,15 @@ ALocal_NodalBC::ALocal_NodalBC( const std::string &fileBaseName,
     SYS_T::print_fatal("Error: ALocal_NodalBC, LPMN length does not match Num_LPS. \n");
 
   // Read local periodic master nodes
-  h5r->read_intVector( gname.c_str(), "Num_LPM", Num_LPM );
+  Num_LPM = h5r->read_intVector( gname.c_str(), "Num_LPM" );
 
   size_lp = 0;
-  for(unsigned int ii=0; ii<Num_LPM.size(); ++ii)
-    size_lp += Num_LPM[ii];
+  for(unsigned int ii=0; ii<Num_LPM.size(); ++ii) size_lp += Num_LPM[ii];
 
   if( size_lp > 0 )
   {
-    h5r->read_intVector( gname.c_str(), "LocalMaster", LocalMaster );
-    h5r->read_intVector( gname.c_str(), "LocalMasterSlave", LocalMasterSlave );
+    LocalMaster = h5r->read_intVector( gname.c_str(), "LocalMaster" );
+    LocalMasterSlave = h5r->read_intVector( gname.c_str(), "LocalMasterSlave" );
   }
   
   if( int(LocalMaster.size()) != size_lp )
@@ -70,8 +66,7 @@ ALocal_NodalBC::ALocal_NodalBC( const std::string &fileBaseName,
   if( int(LocalMasterSlave.size()) != size_lp )
     SYS_T::print_fatal("Error: ALocal_NodalBC, LocalMasterSlave length does not match Num_LPM. \n");
 
-  delete h5r;
-  H5Fclose( file_id );
+  delete h5r; H5Fclose( file_id );
   
   // Generate the offsets 
   LD_offset.clear();
