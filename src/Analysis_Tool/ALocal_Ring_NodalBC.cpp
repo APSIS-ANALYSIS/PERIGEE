@@ -27,8 +27,7 @@ ALocal_Ring_NodalBC::ALocal_Ring_NodalBC(
     outnormal[ii](2) = outnormal_vec[3*ii+2];
   }
 
-  std::vector<double> Q_vec;
-  h5r -> read_doubleVector( gname.c_str(), "cap_rotation_matrix", Q_vec );
+  const std::vector<double> Q_vec = h5r -> read_doubleVector( gname.c_str(), "cap_rotation_matrix" );
 
   Q.resize(num_caps);
   for(int ii=0; ii<num_caps; ++ii)
