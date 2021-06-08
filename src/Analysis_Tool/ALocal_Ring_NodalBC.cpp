@@ -17,8 +17,6 @@ ALocal_Ring_NodalBC::ALocal_Ring_NodalBC(
 
   num_caps = h5r -> read_intScalar( gname.c_str(), "num_caps" );
 
-  dominant_n_comp = h5r -> read_intVector( gname.c_str(), "cap_dominant_n_comp" );
-
   const std::vector<double> outnormal_vec = h5r -> read_doubleVector( gname.c_str(), "cap_out_normal" );
 
   outnormal.resize(num_caps);
@@ -29,6 +27,17 @@ ALocal_Ring_NodalBC::ALocal_Ring_NodalBC(
     outnormal[ii](2) = outnormal_vec[3*ii+2];
   }
 
+  std::vector<double> Q_vec;
+  h5r -> read_doubleVector( gname.c_str(), "cap_rotation_matrix", Q_vec );
+
+  Q.resize(num_caps);
+  for(int ii=0; ii<num_caps; ++ii)
+  {
+    Q[ii] = Matrix_3x3( Q_vec[9*ii+0], Q_vec[9*ii+1], Q_vec[9*ii+2],
+                        Q_vec[9*ii+3], Q_vec[9*ii+4], Q_vec[9*ii+5],
+                        Q_vec[9*ii+6], Q_vec[9*ii+7], Q_vec[9*ii+8]  );
+  }
+
   // If this sub-domain contains local ring nodes,
   // load the LDN array, the corresponding cap ids, unit tangential vectors,
   // and the dominant tangential components 
@@ -36,17 +45,6 @@ ALocal_Ring_NodalBC::ALocal_Ring_NodalBC(
   {
     LDN = h5r->read_intVector( gname.c_str(), "LDN" );
     local_cap_id = h5r->read_intVector( gname.c_str(), "local_cap_id" );
-    local_dominant_t_comp = h5r->read_intVector( gname.c_str(), "local_dominant_t_comp" );
-
-    const std::vector<double> tangential_vec = h5r->read_doubleVector( gname.c_str(), "local_tangential" );
-
-    local_tangential.resize(Num_LD);
-    for(int ii=0; ii<Num_LD; ++ii)
-    { 
-      local_tangential[ii](0) = tangential_vec[3*ii+0];
-      local_tangential[ii](1) = tangential_vec[3*ii+1];
-      local_tangential[ii](2) = tangential_vec[3*ii+2];
-    }
   }
 
   delete h5r; H5Fclose( file_id );
@@ -54,12 +52,23 @@ ALocal_Ring_NodalBC::ALocal_Ring_NodalBC(
 
 ALocal_Ring_NodalBC::~ALocal_Ring_NodalBC()
 {
-  VEC_T::clean( LDN                   );
-  VEC_T::clean( local_cap_id          );
-  VEC_T::clean( dominant_n_comp       );
-  VEC_T::clean( local_dominant_t_comp );
-  VEC_T::clean( outnormal             );
-  VEC_T::clean( local_tangential      );
+  VEC_T::clean( LDN          );
+  VEC_T::clean( local_cap_id );
+  VEC_T::clean( outnormal    );
+}
+
+bool ALocal_Ring_NodalBC::is_inLDN( const int &ii, int &pos ) const
+{
+  if( VEC_T::is_invec(LDN, ii) )
+  {
+    pos = VEC_T::get_pos(LDN, ii);
+    return true;
+  }
+  else
+  {
+    pos = -1;
+    return false;
+  }
 }
 
 // EOF

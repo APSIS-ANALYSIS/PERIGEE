@@ -148,6 +148,13 @@ class PNonlinear_CMM_Solver
         const ALocal_EBC * const &ebc_wall_part, 
         PDNSolution * const &wall_data ) const;
 
+    // CMM with skew boundary conditions for in-plane motion of ring nodes.
+    // Each ring node's corresponding velocity dot_steps will be rotated from
+    // the local skew frame back into the global Cartesian frame.
+    void rotate_ringbc(
+        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        PDNSolution * const &dot_step) const; 
+
     // Check whether the ring BC constraints are properly satisfied
     // by printing their evaluations 
     void compute_ringbc_constraints(

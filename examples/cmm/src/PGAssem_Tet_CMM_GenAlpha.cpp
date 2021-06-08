@@ -107,120 +107,170 @@ void PGAssem_Tet_CMM_GenAlpha::EssBC_KG(
 }
 
 
-void PGAssem_Tet_CMM_GenAlpha::RingBC_KG( const APart_Node * const &node_ptr,
-    const ALocal_NodalBC * const &nbc_part,
-    const ALocal_Ring_NodalBC * const &ringnbc_part )
+void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const int &dof, const int &nrow, const int &ncol,
+    const PetscInt * const &row_index,
+    const PetscInt * const &col_index,
+    PetscScalar * const &Ke,
+    PetscScalar * const &Ge )
 {
-   const int nnode = node_ptr->get_nlocalnode();
- 
-   std::vector<int> clamped_nodes;
-   for(int ii=0; ii<nnode; ++ii)
-   {
-     int num_ess_velo_dof = 0;
-
-     for(int jj=1; jj<4; ++jj)
-       if( nbc_part->get_LID(jj, ii) < 0 ) num_ess_velo_dof += 1;
- 
-     if( num_ess_velo_dof == 3 ) clamped_nodes.push_back( node_ptr->get_node_loc(ii) );
-   }
-
-  const int local_ring_node_num = ringnbc_part->get_Num_LD();
-
   const int ringbc_type = ringnbc_part -> get_ringbc_type();
 
-  for(int ii=0; ii<local_ring_node_num; ++ii)
+  // Clamped rings
+  if( ringbc_type == 0 ) {}
+
+  // Skew boundary conditions for in-plane motion of ring nodes
+  else if( ringbc_type == 1 )
   {
-    const int cap_id = ringnbc_part -> get_cap_id( ii );
+    int pos = -1; 
 
-    const int dnode  = ringnbc_part -> get_LDN( ii );
-    const int dncomp = ringnbc_part -> get_dominant_n_comp( ii );
-    const int dtcomp = ringnbc_part -> get_dominant_t_comp( ii );
-    
-    const int row_n = dnode * dof_mat + dncomp + 1;
-    const int row_t = dnode * dof_mat + dtcomp + 1;
-    // 3 - dncomp - dtcomp gives the dof index for radial direction
-    const int row_r = dnode * dof_mat + 4 - dncomp - dtcomp;
-
-    const double nn = ringnbc_part -> get_outvec(ii, dncomp);
-    const double nt = ringnbc_part -> get_outvec(ii, dtcomp);
-    const double nr = ringnbc_part -> get_outvec(ii, 3 - dncomp - dtcomp);
-
-    const double tn = ringnbc_part -> get_tanvec(ii, dncomp);
-    const double tt = ringnbc_part -> get_tanvec(ii, dtcomp);
-    const double tr = ringnbc_part -> get_tanvec(ii, 3 - dncomp - dtcomp);
-
-    if(ringbc_type == 0) { break; }
-
-    else if(ringbc_type == 1)
+    // Note: element tangent from NatBC_Resis_KG isn't a square matrix,
+    //       ncol >= nrow.
+    for( int ii = dof-1; ii < ncol; ii += dof )
     {
-      VecSetValue( G, row_n, 0.0, INSERT_VALUES);
-
-      // add the actual constraint equation in the normal direction
-      MatSetValue(K, row_n, row_n, nn, INSERT_VALUES);
-      MatSetValue(K, row_n, row_t, nt, INSERT_VALUES);
-      MatSetValue(K, row_n, row_r, nr, INSERT_VALUES);
-    }
-    else if(ringbc_type == 2)
-    {
-      VecSetValue(G, row_n, 0.0, INSERT_VALUES);
-      VecSetValue(G, row_t, 0.0, INSERT_VALUES);
-
-      // add the actual constraint equation in the normal direction
-      MatSetValue(K, row_n, row_n, nn, INSERT_VALUES);
-      MatSetValue(K, row_n, row_t, nt, INSERT_VALUES);
-      MatSetValue(K, row_n, row_r, nr, INSERT_VALUES);
-      
-      // add the actual constraint equation in the tangential direction
-      MatSetValue(K, row_t, row_n, tn, INSERT_VALUES);
-      MatSetValue(K, row_t, row_t, tt, INSERT_VALUES);
-      MatSetValue(K, row_t, row_r, tr, INSERT_VALUES);
-    }
-    else if(ringbc_type == 3)
-    {
-      if( cap_id != 0 )
+      // Use velo-Z dof to determine ring nodes
+      const int dnode = ( col_index[ii] - 3 ) / dof_mat;
+      if( ringnbc_part->is_inLDN( dnode, pos ) )
       {
-        VecSetValue( G, row_n, 0.0, INSERT_VALUES);
+        Matrix_3x3 Q = ringnbc_part->get_rotation_matrix( pos );
+        Q.transpose(); // Skew-to-global transformation matrix
 
-        // add the actual constraint equation in the normal direction
-        MatSetValue(K, row_n, row_n, nn, INSERT_VALUES);
-        MatSetValue(K, row_n, row_t, nt, INSERT_VALUES);
-        MatSetValue(K, row_n, row_r, nr, INSERT_VALUES);
+        for( int jj = dof-1; jj < nrow; jj += dof )
+        {
+          if( dnode != ( row_index[jj] - 3 ) / dof_mat )
+          {
+            Matrix_3x3 Ke_AB = Matrix_3x3(
+              Ke[(jj-2)*ncol + (ii-2)], Ke[(jj-2)*ncol + (ii-1)], Ke[(jj-2)*ncol + ii],
+              Ke[(jj-1)*ncol + (ii-2)], Ke[(jj-1)*ncol + (ii-1)], Ke[(jj-1)*ncol + ii],
+              Ke[(jj-0)*ncol + (ii-2)], Ke[(jj-0)*ncol + (ii-1)], Ke[(jj-0)*ncol + ii]  );
+
+            Ke_AB.MatMult(Ke_AB, Q);  // Ke_AB * Q
+
+            // Update Ke
+            Ke[(jj-2)*ncol + (ii-2)] = Ke_AB.xx(); Ke[(jj-2)*ncol + (ii-1)] = Ke_AB.xy(); Ke[(jj-2)*ncol + ii] = Ke_AB.xz(); 
+            Ke[(jj-1)*ncol + (ii-2)] = Ke_AB.yx(); Ke[(jj-1)*ncol + (ii-1)] = Ke_AB.yy(); Ke[(jj-1)*ncol + ii] = Ke_AB.yz(); 
+            Ke[(jj-0)*ncol + (ii-2)] = Ke_AB.zx(); Ke[(jj-0)*ncol + (ii-1)] = Ke_AB.zy(); Ke[(jj-0)*ncol + ii] = Ke_AB.zz(); 
+
+            // Continuity eqn
+            if( dof == dof_mat )
+            {
+              Vector_3 Ke_c = Vector_3( Ke[(jj-3)*ncol + (ii-2)], Ke[(jj-3)*ncol + (ii-1)], Ke[(jj-3)*ncol + ii] );
+              Vector_3 rot_Ke_c;
+              Q.VecMultT( Ke_c, rot_Ke_c );  // rot_Ke_c = Ke_c^T * Q
+
+              Ke[(jj-3)*ncol + (ii-2)] = rot_Ke_c.x(); Ke[(jj-3)*ncol + (ii-1)] = rot_Ke_c.y(); Ke[(jj-3)*ncol + ii] = rot_Ke_c.z(); 
+            } 
+          } 
+        }
       }
     }
-    else if(ringbc_type == 4)
-    {
-      if( cap_id != 0 )
-      {
-        VecSetValue(G, row_n, 0.0, INSERT_VALUES);
-        VecSetValue(G, row_t, 0.0, INSERT_VALUES);
 
-        // add the actual constraint equation in the normal direction
-        MatSetValue(K, row_n, row_n, nn, INSERT_VALUES);
-        MatSetValue(K, row_n, row_t, nt, INSERT_VALUES);
-        MatSetValue(K, row_n, row_r, nr, INSERT_VALUES);
-        
-        // add the actual constraint equation in the tangential direction
-        MatSetValue(K, row_t, row_n, tn, INSERT_VALUES);
-        MatSetValue(K, row_t, row_t, tt, INSERT_VALUES);
-        MatSetValue(K, row_t, row_r, tr, INSERT_VALUES);
-      }
-    }
-    else if(ringbc_type == 5)
+    for( int ii = dof-1; ii < nrow; ii += dof )
     {
-      if( !VEC_T::is_invec( clamped_nodes, dnode ) )
+      // Use velo-Z dof to determine ring nodes
+      const int dnode = ( row_index[ii] - 3 ) / dof_mat;
+      if( ringnbc_part->is_inLDN( dnode, pos ) )
       {
-        VecSetValue( G, row_n, 0.0, INSERT_VALUES);
+        // Global-to-skew transformation matrix
+        Matrix_3x3 QT = ringnbc_part->get_rotation_matrix( pos );
 
-        // add the actual constraint equation in the normal direction
-        MatSetValue(K, row_n, row_n, nn, INSERT_VALUES);
-        MatSetValue(K, row_n, row_t, nt, INSERT_VALUES);
-        MatSetValue(K, row_n, row_r, nr, INSERT_VALUES);
+        // Skew-to-global transformation matrix
+        Matrix_3x3 Q( QT ); Q.transpose();
+
+        for( int jj = dof-1; jj < ncol; jj += dof )
+        {
+          Matrix_3x3 Ke_AB = Matrix_3x3(
+            Ke[(ii-2)*ncol + (jj-2)], Ke[(ii-2)*ncol + (jj-1)], Ke[(ii-2)*ncol + jj],
+            Ke[(ii-1)*ncol + (jj-2)], Ke[(ii-1)*ncol + (jj-1)], Ke[(ii-1)*ncol + jj],
+            Ke[(ii-0)*ncol + (jj-2)], Ke[(ii-0)*ncol + (jj-1)], Ke[(ii-0)*ncol + jj]  );
+
+          if( dnode != ( col_index[jj] - 3 ) / dof_mat ) Ke_AB.MatMult( QT, Ke_AB );  // QT * Ke_AB
+          else
+          {
+            Ke_AB.MatRot( Q );  // QT * Ke_AB * Q
+
+            // Continuity eqn
+            if( dof == dof_mat )
+            {
+              Vector_3 rot_Ke_c;
+
+              Vector_3 Ke_c = Vector_3( Ke[(ii-3)*ncol + (jj-2)], Ke[(ii-3)*ncol + (jj-1)], Ke[(ii-3)*ncol + jj] );
+              Q.VecMultT( Ke_c, rot_Ke_c );  // rot_Ke_c = Ke_c^T * Q
+
+              Ke[(ii-3)*ncol + (jj-2)] = rot_Ke_c.x(); Ke[(ii-3)*ncol + (jj-1)] = rot_Ke_c.y(); Ke[(ii-3)*ncol + jj] = rot_Ke_c.z(); 
+            }
+          }
+
+          // Momentum eqns corresponding to pressure dof
+          if( dof == dof_mat )
+          {
+            Vector_3 rot_Ke_c;
+
+            Vector_3 Ke_c = Vector_3( Ke[(ii-2)*ncol + (jj-3)], Ke[(ii-1)*ncol + (jj-3)], Ke[ii*ncol + (jj-3)] );
+            QT.VecMult( Ke_c, rot_Ke_c );  // rot_Ke_c = Q^T * Ke_c
+            
+            Ke[(ii-2)*ncol + (jj-3)] = rot_Ke_c.x(); Ke[(ii-1)*ncol + (jj-3)] = rot_Ke_c.y(); Ke[ii*ncol + (jj-3)] = rot_Ke_c.z(); 
+          }
+
+          // Update Ke
+          Ke[(ii-2)*ncol + (jj-2)] = Ke_AB.xx(); Ke[(ii-2)*ncol + (jj-1)] = Ke_AB.xy(); Ke[(ii-2)*ncol + jj] = Ke_AB.xz(); 
+          Ke[(ii-1)*ncol + (jj-2)] = Ke_AB.yx(); Ke[(ii-1)*ncol + (jj-1)] = Ke_AB.yy(); Ke[(ii-1)*ncol + jj] = Ke_AB.yz(); 
+          Ke[(ii-0)*ncol + (jj-2)] = Ke_AB.zx(); Ke[(ii-0)*ncol + (jj-1)] = Ke_AB.zy(); Ke[(ii-0)*ncol + jj] = Ke_AB.zz(); 
+        }
+
+        Vector_3 Ge_A = Vector_3( Ge[ii-2], Ge[ii-1], Ge[ii] );
+        Vector_3 rot_Ge_A;
+        QT.VecMult(Ge_A, rot_Ge_A);  // rot_Ge_A = QT * Ge_A
+
+        // Update Ge
+        Ge[ii-2] = rot_Ge_A.x(); Ge[ii-1] = rot_Ge_A.y(); Ge[ii] = rot_Ge_A.z();
       }
-    }
-    else
-      SYS_T::print_fatal("Error: this ringbc_type is not supported in PGAssem_Tet_CMM_GenAlpha.\n");
+    } // end loop over rows
   }
+  else
+    SYS_T::print_fatal("Error: this ringbc_type is not supported in PGAssem_Tet_CMM_GenAlpha.\n");
 }
+
+
+void PGAssem_Tet_CMM_GenAlpha::RingBC_G(
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const int &dof, const int &nrow,
+    const PetscInt * const &row_index,
+    PetscScalar * const &Ge )
+{
+  const int ringbc_type = ringnbc_part -> get_ringbc_type();
+
+  // Clamped rings
+  if( ringbc_type == 0 ) {}
+
+  // Skew boundary conditions for in-plane motion of ring nodes
+  else if( ringbc_type == 1 )
+  {
+    int pos = -1; 
+
+    for( int ii = dof-1; ii < nrow; ii += dof )
+    {
+      // Use velo-Z dof to determine ring nodes
+      const int dnode = ( row_index[ii] - 3 ) / dof_mat;
+      if( ringnbc_part->is_inLDN( dnode, pos ) )
+      {
+        // Global-to-skew transformation matrix
+        Matrix_3x3 QT = ringnbc_part->get_rotation_matrix( pos );
+
+        Vector_3 Ge_A = Vector_3( Ge[ii-2], Ge[ii-1], Ge[ii] );
+        Vector_3 rot_Ge_A;
+        QT.VecMult(Ge_A, rot_Ge_A);  // rot_Ge_A = QT * Ge_A
+
+        // Update Ge
+        Ge[ii-2] = rot_Ge_A.x(); Ge[ii-1] = rot_Ge_A.y(); Ge[ii] = rot_Ge_A.z();
+      }
+    }
+  }
+  else
+    SYS_T::print_fatal("Error: this ringbc_type is not supported in PGAssem_Tet_CMM_GenAlpha.\n");
+}
+
 
 void PGAssem_Tet_CMM_GenAlpha::EssBC_G( const ALocal_NodalBC * const &nbc_part, 
     const int &field )
@@ -286,7 +336,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_nonzero_estimate(
   PDNSolution * temp = new PDNSolution_NS( node_ptr, 0, false );
 
   // 0.1 is an (arbitrarily chosen) nonzero time step size feeding the NatBC_Resis_KG 
-  NatBC_Resis_KG(0.1, temp, temp, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
+  NatBC_Resis_KG(0.1, temp, temp, lassem_ptr, elements, quad_s, nbc_part, ringnbc_part, ebc_part, gbc );
 
   delete temp;
 
@@ -295,8 +345,6 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_nonzero_estimate(
 
   for(int ii=0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
 
-  RingBC_KG( node_ptr, nbc_part, ringnbc_part );
-  
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
   VecAssemblyBegin(G);
@@ -347,6 +395,9 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_mass_residual(
         row_index[dof_mat*ii+mm] = dof_mat * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
     }
 
+    RingBC_KG( ringnbc_part, dof_mat, nLocBas * dof_mat, nLocBas * dof_mat,
+        row_index, row_index, lassem_ptr->Tangent, lassem_ptr->Residual );
+
     MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
         lassem_ptr->Tangent, ADD_VALUES);
 
@@ -365,8 +416,6 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_mass_residual(
   VecAssemblyEnd(G);
 
   for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
-
-  RingBC_KG( node_ptr, nbc_part, ringnbc_part );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
@@ -394,6 +443,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_residual(
     const APart_Node * const &node_ptr,
     const FEANode * const &fnode_ptr,
     const ALocal_NodalBC * const &nbc_part,
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part,
     const ALocal_EBC * const &ebc_wall_part,
     const IGenBC * const &gbc )
@@ -431,6 +481,8 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_residual(
         row_index[dof_mat*ii+mm] = dof_mat * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
     }
 
+    RingBC_G( ringnbc_part, dof_mat, nLocBas * dof_mat, row_index, lassem_ptr->Residual );
+
     VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
 
@@ -445,13 +497,13 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_residual(
   delete [] row_index; row_index = nullptr;
 
   // Backflow stabilization residual contribution
-  BackFlow_G( sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+  BackFlow_G( sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ringnbc_part, ebc_part );
 
   // Residual contribution from the thin-walled linear membrane in CMM
-  WallMembrane_G( curr_time, dt, sol_a, sol_b, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ebc_wall_part );
+  WallMembrane_G( curr_time, dt, sol_a, sol_b, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ringnbc_part, ebc_wall_part );
 
   // Resistance type boundary condition
-  NatBC_Resis_G( dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
+  NatBC_Resis_G( dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ringnbc_part, ebc_part, gbc );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -520,6 +572,9 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
         row_index[dof_mat*ii + mm] = dof_mat*nbc_part->get_LID(mm, IEN_e[ii])+mm;
     }
 
+    RingBC_KG( ringnbc_part, dof_mat, nLocBas * dof_mat, nLocBas * dof_mat,
+        row_index, row_index, lassem_ptr->Tangent, lassem_ptr->Residual );
+
     MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
         lassem_ptr->Tangent, ADD_VALUES);
 
@@ -537,20 +592,18 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
   delete [] row_index; row_index = nullptr;
 
   // Backflow stabilization residual & tangent contribution
-  BackFlow_KG( dt, sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+  BackFlow_KG( dt, sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ringnbc_part, ebc_part );
 
   // Residual & tangent contributions from the thin-walled linear membrane in CMM
-  WallMembrane_KG( curr_time, dt, sol_a, sol_b, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ebc_wall_part );
+  WallMembrane_KG( curr_time, dt, sol_a, sol_b, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ringnbc_part, ebc_wall_part );
 
   // Resistance type boundary condition
-  NatBC_Resis_KG( dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
+  NatBC_Resis_KG( dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ringnbc_part, ebc_part, gbc );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 
   for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
-  
-  RingBC_KG( node_ptr, nbc_part, ringnbc_part );
   
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
@@ -564,6 +617,7 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_G( const double &curr_time, const double &d
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_NodalBC * const &nbc_part,
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   int * LSIEN = new int [snLocBas];
@@ -591,6 +645,8 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_G( const double &curr_time, const double &d
           srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
       }
 
+      RingBC_G( ringnbc_part, dof_mat, snLocBas * dof_mat, srow_index, lassem_ptr->Residual );
+
       VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->Residual, ADD_VALUES);
     }
   }
@@ -610,6 +666,7 @@ void PGAssem_Tet_CMM_GenAlpha::BackFlow_G(
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_NodalBC * const &nbc_part,
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   double * array_a = new double [nlgn * dof_sol];
@@ -647,6 +704,8 @@ void PGAssem_Tet_CMM_GenAlpha::BackFlow_G(
           srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
       }
 
+      RingBC_G( ringnbc_part, dof_mat, dof_mat * snLocBas, srow_index, lassem_ptr->sur_Residual );
+
       VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
     }
   }
@@ -670,6 +729,7 @@ void PGAssem_Tet_CMM_GenAlpha::BackFlow_KG( const double &dt,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_NodalBC * const &nbc_part,
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   double * array_a = new double [nlgn * dof_sol];
@@ -707,6 +767,9 @@ void PGAssem_Tet_CMM_GenAlpha::BackFlow_KG( const double &dt,
           srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
       }
 
+      RingBC_KG( ringnbc_part, dof_mat, dof_mat * snLocBas, dof_mat * snLocBas,
+          srow_index, srow_index, lassem_ptr->sur_Tangent, lassem_ptr->sur_Residual );
+
       MatSetValues(K, dof_mat*snLocBas, srow_index, dof_mat*snLocBas, srow_index,
           lassem_ptr->sur_Tangent, ADD_VALUES);
 
@@ -736,6 +799,7 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_G(
     FEAElement * const &element_w,
     const IQuadPts * const &quad_s,
     const ALocal_NodalBC * const &nbc_part,
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_wall_part )
 {
   const int dof_disp = 3; 
@@ -786,6 +850,8 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_G(
         srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
     }
 
+    RingBC_G( ringnbc_part, dof_mat, dof_mat * snLocBas, srow_index, lassem_ptr->sur_Residual );
+
     VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
   }
 
@@ -816,6 +882,7 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_KG(
     FEAElement * const &element_w,
     const IQuadPts * const &quad_s,
     const ALocal_NodalBC * const &nbc_part,
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_wall_part )
 {
   const int dof_disp = 3; 
@@ -865,6 +932,9 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_KG(
       for(int mm=0; mm<dof_mat; ++mm)
         srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
     }
+
+    RingBC_KG( ringnbc_part, dof_mat, dof_mat * snLocBas, dof_mat * snLocBas,
+        srow_index, srow_index, lassem_ptr->sur_Tangent, lassem_ptr->sur_Residual );
 
     MatSetValues(K, dof_mat*snLocBas, srow_index, dof_mat*snLocBas, srow_index,
         lassem_ptr->sur_Tangent, ADD_VALUES);
@@ -1110,6 +1180,7 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_G(
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_NodalBC * const &nbc_part,
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc )
 {
@@ -1160,6 +1231,8 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_G(
         srow_idx[3*ii+2] = dof_mat * nbc_part->get_LID(3, LSIEN[ii]) + 3;
       }
 
+      RingBC_G( ringnbc_part, 3, snLocBas * 3, srow_idx, Res );
+
       VecSetValues(G, snLocBas*3, srow_idx, Res, ADD_VALUES);
     }
   }
@@ -1180,6 +1253,7 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_KG(
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_NodalBC * const &nbc_part,
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc )
 {
@@ -1292,6 +1366,8 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_KG(
         scol_idx[ii*3+1] = dof_mat * map_Bj[ii*3+1] + 2;
         scol_idx[ii*3+2] = dof_mat * map_Bj[ii*3+2] + 3;
       }
+
+      RingBC_KG( ringnbc_part, 3, snLocBas * 3, num_face_nodes * 3, srow_idx, scol_idx, Tan, Res );
 
       MatSetValues(K, snLocBas*3, srow_idx, num_face_nodes*3, scol_idx, Tan, ADD_VALUES);
       VecSetValues(G, snLocBas*3, srow_idx, Res, ADD_VALUES);

@@ -308,7 +308,8 @@ int main( int argc, char *argv[] )
   inflow_rate_ptr->print_info();
 
   // ===== Generate a sparse matrix for enforcing nodal BCs ====
-  Matrix_PETSc * pmat = new Matrix_PETSc_CMM(pNode, locnbc, locringnbc);
+  Matrix_PETSc * pmat = new Matrix_PETSc( pNode, locnbc );
+  pmat->gen_perm_bc( pNode, locnbc );
 
   // ===== Generalized-alpha =====
   SYS_T::commPrint("===> Set up the generalized-alpha time integration scheme.\n");

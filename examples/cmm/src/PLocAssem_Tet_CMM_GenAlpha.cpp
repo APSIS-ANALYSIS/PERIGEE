@@ -1124,7 +1124,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
           + gwts * R[A] * ( k_s * disp_y + c_s * v ); 
       
       sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * ( w_t - fw.z() )
-          + NA_x * sigma[qua].zx() + NA_y * sigma[qua].zy() + NA_z * sigma[qua].zz() ) 
+          + NA_x * sigma[qua].zx() + NA_y * sigma[qua].zy() + NA_z * sigma[qua].zz() )
           + gwts * R[A] * ( k_s * disp_z + c_s * w ); 
     }
 
@@ -1302,11 +1302,11 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
           + gwts * R[A] * ( k_s * disp_x + c_s * u ); 
 
       sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * ( v_t - fw.y() )
-          + NA_x * sigma[qua].yx() + NA_y * sigma[qua].yy() + NA_z * sigma[qua].yz() ) 
+          + NA_x * sigma[qua].yx() + NA_y * sigma[qua].yy() + NA_z * sigma[qua].yz() )
           + gwts * R[A] * ( k_s * disp_y + c_s * v ); 
       
       sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * ( w_t - fw.z() )
-          + NA_x * sigma[qua].zx() + NA_y * sigma[qua].zy() + NA_z * sigma[qua].zz() ) 
+          + NA_x * sigma[qua].zx() + NA_y * sigma[qua].zy() + NA_z * sigma[qua].zz() )
           + gwts * R[A] * ( k_s * disp_z + c_s * w ); 
 
       for(int B=0; B<snLocBas; ++B)

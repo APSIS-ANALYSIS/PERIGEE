@@ -109,7 +109,6 @@ SET( perigee_analysis_lib_src
   ${perigee_SOURCE_DIR}/src/PGAssem_Tet_Wall.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_NS.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_Wall_Disp.cpp
-  ${perigee_SOURCE_DIR}/src/Matrix_PETSc_CMM.cpp
   ${perigee_SOURCE_DIR}/src/PNonlinear_CMM_Solver.cpp
   ${perigee_SOURCE_DIR}/src/PTime_CMM_Solver.cpp
 )

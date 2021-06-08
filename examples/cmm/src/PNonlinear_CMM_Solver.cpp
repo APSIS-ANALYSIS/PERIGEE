@@ -171,7 +171,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
     gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, &wall_disp_alpha,
         dot_sol, sol, curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
         elementw, quad_v, quad_s, lien_ptr, anode_ptr,
-        feanode_ptr, nbc_part, ebc_part, ebc_wall_part, gbc );
+        feanode_ptr, nbc_part, ringnbc_part, ebc_part, ebc_wall_part, gbc );
 
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(vec_assem_0_event,0,0,0,0);
@@ -196,6 +196,10 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
 #endif
 
     bc_mat->MatMultSol( dot_step );
+
+    // Skew boundary conditions for in-plane motion of ring nodes:
+    // Rotate ring node velo dofs back into the global Cartesian frame
+    rotate_ringbc( ringnbc_part, dot_step );
 
     // Update dot_sol, dot_sol_wall_disp
     dot_sol->PlusAX( dot_step, -1.0 );
@@ -260,7 +264,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
       gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, &wall_disp_alpha,
           dot_sol, sol, curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
           elementw, quad_v, quad_s, lien_ptr, anode_ptr,
-          feanode_ptr, nbc_part, ebc_part, ebc_wall_part, gbc );
+          feanode_ptr, nbc_part, ringnbc_part, ebc_part, ebc_wall_part, gbc );
 
 #ifdef PETSC_USE_LOG
       PetscLogEventEnd(vec_assem_1_event,0,0,0,0);
@@ -538,6 +542,49 @@ void PNonlinear_CMM_Solver::update_wall( const double &val,
 }
 
 
+void PNonlinear_CMM_Solver::rotate_ringbc(
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    PDNSolution * const &dot_step) const
+{
+  const int ringbc_type = ringnbc_part -> get_ringbc_type();
+
+  // Clamped rings
+  if( ringbc_type == 0 ) {}
+
+  // Skew boundary conditions for in-plane motion of ring nodes
+  else if( ringbc_type == 1)
+  {
+    double vals[3], rot_vals[3];
+
+    const int num_ringnode = ringnbc_part -> get_Num_LD();
+
+    for(int ii = 0; ii < num_ringnode; ++ii)
+    {
+      const int dnode = ringnbc_part -> get_LDN( ii );
+
+      const int idx[3] = { dnode*4 + 1, dnode*4 + 2, dnode*4 + 3 };
+
+      VecGetValues(dot_step->solution, 3, idx, vals);
+
+      Matrix_3x3 Q = ringnbc_part->get_rotation_matrix( ii );
+      Q.transpose(); // Skew-to-global transformation matrix 
+
+      // rot_vals = Q * vals
+      Q.VecMult( vals, rot_vals );
+
+      VecSetValue(dot_step->solution, dnode*4+1, rot_vals[0], INSERT_VALUES);
+      VecSetValue(dot_step->solution, dnode*4+2, rot_vals[1], INSERT_VALUES);
+      VecSetValue(dot_step->solution, dnode*4+3, rot_vals[2], INSERT_VALUES);
+    }
+
+    VecAssemblyBegin(dot_step->solution); VecAssemblyEnd(dot_step->solution);
+    dot_step->GhostUpdate();
+  }
+  else
+    SYS_T::print_fatal("Error: this ringbc_type is not supported in PNonlinear_CMM_Solver.\n");
+}
+
+
 void PNonlinear_CMM_Solver::compute_ringbc_constraints(
     const PDNSolution * const &sol,
     const PDNSolution * const &sol_wall_disp,
@@ -556,7 +603,6 @@ void PNonlinear_CMM_Solver::compute_ringbc_constraints(
       const int dnode  = ringnbc_part -> get_LDN( ii );
 
       const double outvec[3] = {ringnbc_part -> get_outvec(ii, 0), ringnbc_part -> get_outvec(ii, 1), ringnbc_part -> get_outvec(ii, 2)};
-      const double tanvec[3] = {ringnbc_part -> get_tanvec(ii, 0), ringnbc_part -> get_tanvec(ii, 1), ringnbc_part -> get_tanvec(ii, 2)};
 
       const int velo_idx[3] = {dnode*4 + 1, dnode*4 + 2, dnode*4 + 3};
       const int disp_idx[3] = {dnode*3 + 0, dnode*3 + 1, dnode*3 + 2};
@@ -566,14 +612,11 @@ void PNonlinear_CMM_Solver::compute_ringbc_constraints(
 
       const double v_dot_n = velo_val[0] * outvec[0] + velo_val[1] * outvec[1] + velo_val[2] * outvec[2];
       const double u_dot_n = disp_val[0] * outvec[0] + disp_val[1] * outvec[1] + disp_val[2] * outvec[2];
-      const double v_dot_t = velo_val[0] * tanvec[0] + velo_val[1] * tanvec[1] + velo_val[2] * tanvec[2];
-      const double u_dot_t = disp_val[0] * tanvec[0] + disp_val[1] * tanvec[1] + disp_val[2] * tanvec[2];
 
       std::cout << std::scientific << std::setprecision(3) << "Ring node " << std::setw(8) << dnode << ": ";
       std::cout << "Velo=[" << std::setw(10) << velo_val[0] << ", " << std::setw(10) << velo_val[1] << ", " << std::setw(10) << velo_val[2] << "], "; 
       std::cout << "Disp=[" << std::setw(10) << disp_val[0] << ", " << std::setw(10) << disp_val[1] << ", " << std::setw(10) << disp_val[2] << "], ";  
-      std::cout << "v_dot_n = " << std::setw(10) << v_dot_n << ", u_dot_n = " << std::setw(10) << u_dot_n << ", ";
-      std::cout << "v_dot_t = " << std::setw(10) << v_dot_t << ", u_dot_t = " << std::setw(10) << u_dot_t << std::endl;  
+      std::cout << "v_dot_n = " << std::setw(10) << v_dot_n << ", u_dot_n = " << std::setw(10) << u_dot_n << std::endl;
     }
   }
 }

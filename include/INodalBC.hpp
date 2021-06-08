@@ -230,30 +230,17 @@ class INodalBC
     {SYS_T::commPrint("Warning: get_cap_id is not implemented.\n"); return {};}
 
     // --------------------------------------------------------------
-    // get_dominant_n_comp returns the dominant comp index of each cap's
-    // unit normal vector
-    // --------------------------------------------------------------
-    virtual std::vector<int> get_dominant_n_comp() const 
-    {SYS_T::commPrint("Warning: get_dominant_n_comp is not implemented.\n"); return {};}
-
-    // --------------------------------------------------------------
-    // get_dominant_t_comp returns the dominant comp index of each node's
-    // unit tangential vector
-    // --------------------------------------------------------------
-    virtual std::vector<int> get_dominant_t_comp() const 
-    {SYS_T::commPrint("Warning: get_dominant_t_comp is not implemented.\n"); return {};}
-
-    // --------------------------------------------------------------
     // get_outnormal returns each cap's unit normal vector
     // --------------------------------------------------------------
     virtual std::vector<double> get_outnormal() const
     {SYS_T::commPrint("Warning: get_outnormal is not implemented.\n"); return {};}
   
     // --------------------------------------------------------------
-    // get_tangential returns each node's unit tangential vector
+    // get_rotation_matrix returns each cap's 3x3 rotation matrix for
+    //                     skew boundary conditions
     // --------------------------------------------------------------
-    virtual std::vector<double> get_tangential() const
-    {SYS_T::commPrint("Warning: get_tangential is not implemented. \n"); return {};}
+    virtual std::vector<double> get_rotation_matrix() const
+    {SYS_T::commPrint("Warning: get_rotation_matrix is not implemented. \n"); return {};}
   
   protected:
     std::vector<unsigned int> dir_nodes;
