@@ -14,6 +14,7 @@
 #include <string>
 #include <vector>
 #include <ctime>
+#include <iomanip>
 #include "petsc.h"
 
 namespace SYS_T
@@ -324,6 +325,20 @@ namespace SYS_T
     if( a ) print_exit(mesg);
   }
 
+  // 7. Print data on screen
+  template<typename T> void print_array_in_2D( const T * const arr, 
+      const int &nrow, const int &ncol )
+  {
+    for(int ii = 0; ii < nrow; ++ii)
+    {
+      for(int jj = 0; jj < ncol; ++jj)
+        std::cout << std::scientific << std::setprecision(3) << std::setw(10) << arr[ii * ncol + jj] << " ";
+      
+      std::cout << std::endl;
+    }
+    std::cout << std::endl;
+  }
+
   // =================================================================
   // The followings are system function to monitor system memory usages 
   // dynamically.
@@ -466,13 +481,13 @@ namespace SYS_T
   {
     public:
       Timer();
-      
+
       ~Timer();
 
       void Start();
-      
+
       void Stop();
-      
+
       void Reset();
 
       double get_sec() const;

@@ -1443,18 +1443,4 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_KG(
   delete [] sctrl_z; sctrl_z = nullptr;
 }
 
-void PGAssem_Tet_CMM_GenAlpha::print_2Darray( const double * const arr,
-  const int &nrow, const int &ncol )
-{
-  for(int ii = 0; ii < nrow; ++ii)
-  {
-    for(int jj = 0; jj < ncol; ++jj)
-    {
-      std::cout << std::scientific << std::setprecision(3) << std::setw(10) << arr[ii * ncol + jj] << " ";
-      // std::cout << arr[ii * ncol + jj] << " ";
-    }
-    std::cout << std::endl;
-  }
-  std::cout << std::endl;
-}
 // EOF
