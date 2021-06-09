@@ -246,12 +246,7 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
         const double &t, const double &nx, const double &ny,
         const double &nz, double &gx, double &gy, double &gz ) const
     {
-      // ====== ISL TEST: REPLACE NATBC_RESIS_KG WITH NATBC_G ====== 
-      const double P = 0.0;
-      gx = -P * nx ; gy = -P * ny; gz = -P * nz; 
-
-      // return ((*this).*(flist[ebc_id]))(x,y,z,t,nx,ny,nz,gx,gy,gz);
-      // ===========================================================
+      return ((*this).*(flist[ebc_id]))(x,y,z,t,nx,ny,nz,gx,gy,gz);
     }
 };
 
