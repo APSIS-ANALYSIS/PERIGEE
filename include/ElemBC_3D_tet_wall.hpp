@@ -38,8 +38,8 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     ElemBC_3D_tet_wall(const std::string &walls_combined,
         const double &uniform_thickness,
         const double &uniform_youngsmod,
-        const double &uniform_ks,
-        const double &uniform_cs,
+        const double &uniform_springconst,
+        const double &uniform_dampingconst,
         const int &elemtype = 501,
         const double &in_fluid_density = 1.065 );
 
@@ -57,8 +57,8 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     ElemBC_3D_tet_wall(const std::string &walls_combined,
         const std::string &centerlines_combined,
         const double &thickness2radius_combined,
-        const double &ks_combined,
-        const double &cs_combined,
+        const double &springconst_combined,
+        const double &dampingconst_combined,
         const int &elemtype = 501,
         const double &in_fluid_density = 1.065 );
 
@@ -78,13 +78,13 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     ElemBC_3D_tet_wall(const std::string &walls_combined,
         const std::string &centerlines_combined,
         const double &thickness2radius_combined,
-        const double &ks_combined,
-        const double &cs_combined,
+        const double &springconst_combined,
+        const double &dampingconst_combined,
         const std::vector<std::string> &wallsList,
         const std::vector<std::string> &centerlinesList,
         const std::vector<double> &thickness2radiusList,
-        const std::vector<double> &ksList,
-        const std::vector<double> &csList,
+        const std::vector<double> &springconstList,
+        const std::vector<double> &dampingconstList,
         const int &elemtype = 501,
         const double &in_fluid_density = 1.065 );
 
@@ -96,9 +96,9 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
 
     virtual std::vector<double> get_wall_youngsmod() const {return youngsmod;}
 
-    virtual std::vector<double> get_wall_ks() const {return ks;}
+    virtual std::vector<double> get_wall_springconst() const {return springconst;}
 
-    virtual std::vector<double> get_wall_cs() const {return cs;}
+    virtual std::vector<double> get_wall_dampingconst() const {return dampingconst;}
 
     virtual void write_vtk( const int &ebc_id,
         const std::string &filename="elembc_surface" ) const;
@@ -112,7 +112,7 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     const double fluid_density;
 
     // num_ebc = 1 for the wall, so these properties all have length num_node[0]
-    std::vector<double> radius, thickness, youngsmod, ks, cs;
+    std::vector<double> radius, thickness, youngsmod, springconst, dampingconst;
     
     // compute young's modulus for a wall node with the given radius & thickness
     // One may modify this function for different ways of prescribing the 

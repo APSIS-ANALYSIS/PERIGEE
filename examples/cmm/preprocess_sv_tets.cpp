@@ -58,8 +58,8 @@ int main( int argc, char * argv[] )
   bool   is_uniform_wall = true;
   double wall_thickness = 0.1;     // only used for uniform properties
   double wall_youngsmod = 1.0e6;   // only used for uniform properties
-  double wall_ks = 0.0;
-  double wall_cs = 0.0;
+  double wall_springconst  = 0.0;
+  double wall_dampingconst = 0.0;
 
   // Default names for input geometry files
   std::string geo_file("./whole_vol.vtu");
@@ -86,8 +86,8 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionBool(  "-is_uniform_wall",   is_uniform_wall);
   SYS_T::GetOptionReal(  "-wall_thickness",    wall_thickness);
   SYS_T::GetOptionReal(  "-wall_youngsmod",    wall_youngsmod);
-  SYS_T::GetOptionReal(  "-wall_ks",           wall_ks);
-  SYS_T::GetOptionReal(  "-wall_cs",           wall_cs);
+  SYS_T::GetOptionReal(  "-wall_springconst",  wall_springconst);
+  SYS_T::GetOptionReal(  "-wall_dampingconst", wall_dampingconst);
   SYS_T::GetOptionString("-geo_file",          geo_file);
   SYS_T::GetOptionString("-sur_file_in",       sur_file_in);
   SYS_T::GetOptionString("-sur_file_wall",     sur_file_wall);
@@ -109,8 +109,8 @@ int main( int argc, char * argv[] )
   }
   else cout << "  -is_uniform_wall: false" << endl;
 
-  cout << "  -wall_ks: "         << wall_ks        << endl;
-  cout << "  -wall_cs: "         << wall_cs        << endl;
+  cout << "  -wall_springconst: "      << wall_springconst  << endl;
+  cout << "  -wall_dampingconst: "     << wall_dampingconst << endl;
 
   cout << " -num_outlet: "       << num_outlet        << endl;
   cout << " -geo_file: "         << geo_file          << endl;
@@ -312,20 +312,20 @@ int main( int argc, char * argv[] )
 
   // // Initialized with default fluid density 1.065
   // ElemBC * wall_ebc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
-  //       thickness2radius_combined, wall_ks, wall_cs, wallsList, centerlinesList,
-  //       thickness2radiusList, ksList, csList, elemType );
+  //       thickness2radius_combined, wall_springconst, wall_dampingconst, wallsList,
+  //       centerlinesList, thickness2radiusList, ksList, csList, elemType );
 
   ElemBC * wall_ebc = nullptr;
 
   if( is_uniform_wall )
     wall_ebc = new ElemBC_3D_tet_wall( walls_combined, wall_thickness, wall_youngsmod,
-        wall_ks, wall_cs, elemType );
+        wall_springconst, wall_dampingconst, elemType );
   else
   {
     SYS_T::file_check( centerlines_combined ); cout << centerlines_combined << " found. \n";
 
     wall_ebc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
-        thickness2radius_combined, wall_ks, wall_cs, elemType );
+        thickness2radius_combined, wall_springconst, wall_dampingconst, elemType );
   }
 
   wall_ebc -> resetTriIEN_outwardnormal( IEN );

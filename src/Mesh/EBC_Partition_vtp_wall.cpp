@@ -11,8 +11,8 @@ EBC_Partition_vtp_wall::EBC_Partition_vtp_wall(
   
   part_thickness.clear();
   part_youngsmod.clear();
-  part_ks.clear();
-  part_cs.clear();
+  part_springconst.clear();
+  part_dampingconst.clear();
 
   // wall has only one surface per the assumption in wall ebc  
   if(num_ebc == 0)
@@ -24,18 +24,18 @@ EBC_Partition_vtp_wall::EBC_Partition_vtp_wall(
       // access wall properties of the whole surface
       std::vector<double> temp_th = ebc -> get_wall_thickness();
       std::vector<double> temp_E  = ebc -> get_wall_youngsmod();
-      std::vector<double> temp_ks = ebc -> get_wall_ks();
-      std::vector<double> temp_cs = ebc -> get_wall_cs();
+      std::vector<double> temp_ks = ebc -> get_wall_springconst();
+      std::vector<double> temp_cs = ebc -> get_wall_dampingconst();
 
       // save wall properties only belonging to nodes in the partition
       for( int ii=0; ii<num_local_cell_node[ebc_id]; ++ii )
       {
         const int idx = local_cell_node[ebc_id][ii]; 
 
-        part_thickness.push_back( temp_th[ idx ] );
-        part_youngsmod.push_back( temp_E[  idx ] );
-        part_ks.push_back(        temp_ks[ idx ] );
-        part_cs.push_back(        temp_cs[ idx ] );
+        part_thickness.push_back(    temp_th[ idx ] );
+        part_youngsmod.push_back(    temp_E[  idx ] );
+        part_springconst.push_back(  temp_ks[ idx ] );
+        part_dampingconst.push_back( temp_cs[ idx ] );
       }
     }
   }
@@ -57,10 +57,10 @@ EBC_Partition_vtp_wall::EBC_Partition_vtp_wall(
 
 EBC_Partition_vtp_wall::~EBC_Partition_vtp_wall()
 {
-  VEC_T::clean( part_thickness );
-  VEC_T::clean( part_youngsmod );
-  VEC_T::clean( part_ks );
-  VEC_T::clean( part_cs );
+  VEC_T::clean( part_thickness    );
+  VEC_T::clean( part_youngsmod    );
+  VEC_T::clean( part_springconst  );
+  VEC_T::clean( part_dampingconst );
   VEC_T::clean( local_node_on_sur_pos );
 }
 
@@ -91,10 +91,10 @@ void EBC_Partition_vtp_wall::write_hdf5( const char * FileName ) const
   {
     hid_t group_id = H5Gopen( g_id, "ebcid_0", H5P_DEFAULT );
 
-    h5w->write_doubleVector( group_id, "thickness",    part_thickness );
-    h5w->write_doubleVector( group_id, "youngsmod",    part_youngsmod );
-    h5w->write_doubleVector( group_id, "springconst",  part_ks        );
-    h5w->write_doubleVector( group_id, "dampingconst", part_cs        );
+    h5w->write_doubleVector( group_id, "thickness",    part_thickness    );
+    h5w->write_doubleVector( group_id, "youngsmod",    part_youngsmod    );
+    h5w->write_doubleVector( group_id, "springconst",  part_springconst  );
+    h5w->write_doubleVector( group_id, "dampingconst", part_dampingconst );
 
     H5Gclose( group_id );
   }

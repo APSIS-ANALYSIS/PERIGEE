@@ -39,8 +39,8 @@ class EBC_Partition_vtp_wall : public EBC_Partition_vtp
     // Length is num_local_node[0] 
     std::vector<double> part_thickness;
     std::vector<double> part_youngsmod;
-    std::vector<double> part_ks;
-    std::vector<double> part_cs;
+    std::vector<double> part_springconst;
+    std::vector<double> part_dampingconst;
 
     // The number of surface nodes beloging to this subdomain
     int num_local_node_on_sur;

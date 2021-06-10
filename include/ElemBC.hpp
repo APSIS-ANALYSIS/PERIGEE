@@ -134,13 +134,13 @@ class ElemBC
 
 
     // This returns the wall spring constant used in CMM
-    virtual std::vector<double> get_wall_ks() const
-    {SYS_T::commPrint("Warning: get_wall_ks is not implemented. \n"); return {};}
+    virtual std::vector<double> get_wall_springconst() const
+    {SYS_T::commPrint("Warning: get_wall_springconst is not implemented. \n"); return {};}
 
 
     // This returns the wall damping constant used in CMM
-    virtual std::vector<double> get_wall_cs() const
-    {SYS_T::commPrint("Warning: get_wall_cs is not implemented. \n"); return {};}
+    virtual std::vector<double> get_wall_dampingconst() const
+    {SYS_T::commPrint("Warning: get_wall_dampingconst is not implemented. \n"); return {};}
 
 
     // This returns the fluid density used for the young's modulus in CMM

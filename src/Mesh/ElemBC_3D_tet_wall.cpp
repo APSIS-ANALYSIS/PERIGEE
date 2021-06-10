@@ -7,8 +7,8 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall( const int &elemtype,
   radius.clear();
   thickness.clear();
   youngsmod.clear();
-  ks.clear();
-  cs.clear();
+  springconst.clear();
+  dampingconst.clear();
 }
 
 
@@ -16,8 +16,8 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const std::string &walls_combined,
     const double &uniform_thickness,
     const double &uniform_youngsmod,
-    const double &uniform_ks,
-    const double &uniform_cs,
+    const double &uniform_springconst,
+    const double &uniform_dampingconst,
     const int &elemtype,
     const double &in_fluid_density )
 : ElemBC_3D_tet( walls_combined, elemtype ),
@@ -30,8 +30,8 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   thickness.resize( num_node[ebc_id] );
   youngsmod.resize( num_node[ebc_id] );
 
-  ks.resize( num_node[ebc_id] );
-  cs.resize( num_node[ebc_id] );
+  springconst.resize(  num_node[ebc_id] );
+  dampingconst.resize( num_node[ebc_id] );
 
   // Make sure that the files exist
   SYS_T::file_check( walls_combined );
@@ -41,8 +41,8 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     thickness[ii] = uniform_thickness; 
     youngsmod[ii] = uniform_youngsmod;
 
-    ks[ii] = uniform_ks;
-    cs[ii] = uniform_cs;
+    springconst[ii]  = uniform_springconst;
+    dampingconst[ii] = uniform_dampingconst;
 
     radius[ii] = 0.0; // radius is not calculated in this case
   }
@@ -52,16 +52,16 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 
   std::cout<<"     thickness h = "       << uniform_thickness << std::endl;
   std::cout<<"     Young's modulus E = " << uniform_youngsmod << std::endl;
-  std::cout<<"     spring constant ks = "  << uniform_ks << std::endl;
-  std::cout<<"     damping constant cs = " << uniform_cs << std::endl;
+  std::cout<<"     spring constant ks = "  << uniform_springconst  << std::endl;
+  std::cout<<"     damping constant cs = " << uniform_dampingconst << std::endl;
 }
 
 ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const std::string &walls_combined,
     const std::string &centerlines_combined,
     const double &thickness2radius_combined,
-    const double &ks_combined,
-    const double &cs_combined,
+    const double &springconst_combined,
+    const double &dampingconst_combined,
     const int &elemtype,
     const double &in_fluid_density )
 : ElemBC_3D_tet( walls_combined, elemtype ),
@@ -74,8 +74,8 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   thickness.resize( num_node[ebc_id] );
   youngsmod.resize( num_node[ebc_id] );
 
-  ks.resize( num_node[ebc_id] );
-  cs.resize( num_node[ebc_id] );
+  springconst.resize(  num_node[ebc_id] );
+  dampingconst.resize( num_node[ebc_id] );
 
   // Make sure that the files exist
   SYS_T::file_check( walls_combined );
@@ -105,8 +105,8 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     radius[ii] = MATH_T::norm2(cl_pt[0] - pt[0], cl_pt[1] - pt[1], cl_pt[2] - pt[2]);
     thickness[ii] = radius[ii] * thickness2radius_combined; 
 
-    ks[ii] = ks_combined;
-    cs[ii] = cs_combined;
+    springconst[ii]  = springconst_combined;
+    dampingconst[ii] = dampingconst_combined;
 
     compute_youngsmod(radius[ii], thickness[ii], youngsmod[ii]);
   }
@@ -125,8 +125,8 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     <<" , "<<*std::max_element(thickness.begin(), thickness.end())<<"] \n";
   std::cout<<"     Young's modulus E ranges in ["<<*std::min_element(youngsmod.begin(), youngsmod.end())
     <<" , "<<*std::max_element(youngsmod.begin(), youngsmod.end())<<"] \n";
-  std::cout<<"     spring constant ks = "  << ks_combined << std::endl;
-  std::cout<<"     damping constant cs = " << cs_combined << std::endl;
+  std::cout<<"     spring constant ks = "  << springconst_combined  << std::endl;
+  std::cout<<"     damping constant cs = " << dampingconst_combined << std::endl;
 }
 
 
@@ -134,27 +134,27 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const std::string &walls_combined,
     const std::string &centerlines_combined,
     const double &thickness2radius_combined,
-    const double &ks_combined,
-    const double &cs_combined,
+    const double &springconst_combined,
+    const double &dampingconst_combined,
     const std::vector<std::string> &wallsList,
     const std::vector<std::string> &centerlinesList,
     const std::vector<double> &thickness2radiusList,
-    const std::vector<double> &ksList,
-    const std::vector<double> &csList,
+    const std::vector<double> &springconstList,
+    const std::vector<double> &dampingconstList,
     const int &elemtype,
     const double &in_fluid_density )
 : ElemBC_3D_tet_wall( walls_combined, centerlines_combined, thickness2radius_combined,
-                      ks_combined, cs_combined, elemtype, in_fluid_density)
+                      springconst_combined, dampingconst_combined, elemtype, in_fluid_density)
 {
   // Check inputs
   SYS_T::print_fatal_if( centerlinesList.size() != wallsList.size(),
     "ERROR: wallsList and centerlinesList must be of the same length.\n");
   SYS_T::print_fatal_if( thickness2radiusList.size() != wallsList.size(),
     "ERROR: wallsList and thickness2radiusList must be of the same length.\n");
-  SYS_T::print_fatal_if( ksList.size() != wallsList.size(),
-    "ERROR: wallsList and ksList must be of the same length.\n");
-  SYS_T::print_fatal_if( csList.size() != wallsList.size(),
-    "ERROR: wallsList and csList must be of the same length.\n");
+  SYS_T::print_fatal_if( springconstList.size() != wallsList.size(),
+    "ERROR: wallsList and springconstList must be of the same length.\n");
+  SYS_T::print_fatal_if( dampingconstList.size() != wallsList.size(),
+    "ERROR: wallsList and dampingconstList must be of the same length.\n");
 
   const int num_srfs = static_cast<int>( wallsList.size() );
 
@@ -218,8 +218,8 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
         radius[idx] = MATH_T::norm2(cl_pt[0] - pt[0], cl_pt[1] - pt[1], cl_pt[2] - pt[2]);
         thickness[idx] = radius[idx] * thickness2radiusList[ii];
 
-        ks[idx] = ksList[ii];
-        cs[idx] = csList[ii];
+        springconst[idx]  = springconstList[ii];
+        dampingconst[idx] = dampingconstList[ii];
 
         compute_youngsmod(radius[idx], thickness[idx], youngsmod[idx]);
       }
@@ -247,10 +247,10 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     <<" , "<<*std::max_element(thickness.begin(), thickness.end())<<"] \n";
   std::cout<<"     Young's modulus E ranges in ["<<*std::min_element(youngsmod.begin(), youngsmod.end())
     <<" , "<<*std::max_element(youngsmod.begin(), youngsmod.end())<<"] \n";
-  std::cout<<"     spring constant ks ranges in ["<<*std::min_element(ks.begin(), ks.end())
-    <<" , "<<*std::max_element(ks.begin(), ks.end())<<"] \n";
-  std::cout<<"     damping constant cs ranges in ["<<*std::min_element(cs.begin(), cs.end())
-    <<" , "<<*std::max_element(cs.begin(), cs.end())<<"] \n";
+  std::cout<<"     spring constant ks ranges in ["<<*std::min_element(springconst.begin(), springconst.end())
+    <<" , "<<*std::max_element(springconst.begin(), springconst.end())<<"] \n";
+  std::cout<<"     damping constant cs ranges in ["<<*std::min_element(dampingconst.begin(), dampingconst.end())
+    <<" , "<<*std::max_element(dampingconst.begin(), dampingconst.end())<<"] \n";
 }
 
 
@@ -259,8 +259,8 @@ ElemBC_3D_tet_wall::~ElemBC_3D_tet_wall()
   VEC_T::clean( radius    );
   VEC_T::clean( thickness );
   VEC_T::clean( youngsmod );
-  VEC_T::clean( ks );
-  VEC_T::clean( cs );
+  VEC_T::clean( springconst  );
+  VEC_T::clean( dampingconst );
 }
 
 
@@ -268,11 +268,11 @@ void ElemBC_3D_tet_wall::print_info() const
 {
   ElemBC_3D_tet::print_info();
 
-  VEC_T::print( radius,    "wall_radius.txt",    '\n');
-  VEC_T::print( thickness, "wall_thickness.txt", '\n');
-  VEC_T::print( youngsmod, "wall_youngsmod.txt", '\n');
-  VEC_T::print( ks,        "wall_ks.txt",        '\n');
-  VEC_T::print( cs,        "wall_cs.txt",        '\n');
+  VEC_T::print( radius,       "wall_radius.txt",       '\n');
+  VEC_T::print( thickness,    "wall_thickness.txt",    '\n');
+  VEC_T::print( youngsmod,    "wall_youngsmod.txt",    '\n');
+  VEC_T::print( springconst,  "wall_springconst.txt",  '\n');
+  VEC_T::print( dampingconst, "wall_dampingconst.txt", '\n');
 }
 
 
@@ -324,10 +324,10 @@ void ElemBC_3D_tet_wall::add_wall_data( vtkPointSet * const &grid_w, const int &
   TET_T::add_double_PointData( grid_w, radius, "Radius" );
 
   // Add spring constant
-  TET_T::add_double_PointData( grid_w, ks, "SpringConstant" );
+  TET_T::add_double_PointData( grid_w, springconst, "SpringConstant" );
 
   // Add damping constant
-  TET_T::add_double_PointData( grid_w, cs, "DampingConstant" );
+  TET_T::add_double_PointData( grid_w, dampingconst, "DampingConstant" );
 }
 
 
