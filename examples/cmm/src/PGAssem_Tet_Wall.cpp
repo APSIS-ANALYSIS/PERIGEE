@@ -119,6 +119,132 @@ void PGAssem_Tet_Wall::EssBC_KG( const ALocal_NodalBC * const &nbc_part,
 }
 
 
+void PGAssem_Tet_Wall::RingBC_KG(
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const int &dof, const int &nrow, const int &ncol,
+    const PetscInt * const &row_index,
+    const PetscInt * const &col_index,
+    PetscScalar * const &Ke, 
+    PetscScalar * const &Ge )
+{
+  const int ringbc_type = ringnbc_part -> get_ringbc_type();
+
+  // Clamped rings
+  if( ringbc_type == 0 ) {} 
+
+  // Skew boundary conditions for in-plane motion of ring nodes
+  else if( ringbc_type == 1 )
+  {
+    int pos = -1;  
+
+    // Note: element tangent from NatBC_Resis_KG isn't a square matrix,
+    //       ncol >= nrow.
+    for( int ii = dof-1; ii < ncol; ii += dof )
+    {    
+      // Use velo-Z dof to determine ring nodes
+      const int dnode = ( col_index[ii] - 3 ) / dof_mat;
+      if( ringnbc_part->is_inLDN( dnode, pos ) )
+      {    
+        Matrix_3x3 Q = ringnbc_part->get_rotation_matrix( pos );
+        Q.transpose(); // Skew-to-global transformation matrix
+
+        for( int jj = dof-1; jj < nrow; jj += dof )
+        {
+          if( dnode != ( row_index[jj] - 3 ) / dof_mat )
+          {
+            Matrix_3x3 Ke_AB = Matrix_3x3(
+              Ke[(jj-2)*ncol + (ii-2)], Ke[(jj-2)*ncol + (ii-1)], Ke[(jj-2)*ncol + ii], 
+              Ke[(jj-1)*ncol + (ii-2)], Ke[(jj-1)*ncol + (ii-1)], Ke[(jj-1)*ncol + ii], 
+              Ke[(jj-0)*ncol + (ii-2)], Ke[(jj-0)*ncol + (ii-1)], Ke[(jj-0)*ncol + ii]  );
+
+            Ke_AB.MatMult(Ke_AB, Q);  // Ke_AB * Q
+
+            // Update Ke
+            Ke[(jj-2)*ncol + (ii-2)] = Ke_AB.xx(); Ke[(jj-2)*ncol + (ii-1)] = Ke_AB.xy(); Ke[(jj-2)*ncol + ii] = Ke_AB.xz(); 
+            Ke[(jj-1)*ncol + (ii-2)] = Ke_AB.yx(); Ke[(jj-1)*ncol + (ii-1)] = Ke_AB.yy(); Ke[(jj-1)*ncol + ii] = Ke_AB.yz(); 
+            Ke[(jj-0)*ncol + (ii-2)] = Ke_AB.zx(); Ke[(jj-0)*ncol + (ii-1)] = Ke_AB.zy(); Ke[(jj-0)*ncol + ii] = Ke_AB.zz(); 
+
+            // Continuity eqn
+            if( dof == dof_mat )
+            {
+              Vector_3 Ke_c = Vector_3( Ke[(jj-3)*ncol + (ii-2)], Ke[(jj-3)*ncol + (ii-1)], Ke[(jj-3)*ncol + ii] );
+              Vector_3 rot_Ke_c;
+              Q.VecMultT( Ke_c, rot_Ke_c );  // rot_Ke_c = Ke_c^T * Q
+
+              Ke[(jj-3)*ncol + (ii-2)] = rot_Ke_c.x(); Ke[(jj-3)*ncol + (ii-1)] = rot_Ke_c.y(); Ke[(jj-3)*ncol + ii] = rot_Ke_c.z(); 
+            }
+          }
+        }
+      }    
+    }    
+
+    for( int ii = dof-1; ii < nrow; ii += dof )
+    {
+      // Use velo-Z dof to determine ring nodes
+      const int dnode = ( row_index[ii] - 3 ) / dof_mat;
+      if( ringnbc_part->is_inLDN( dnode, pos ) )
+      {
+        // Global-to-skew transformation matrix
+        Matrix_3x3 QT = ringnbc_part->get_rotation_matrix( pos );
+
+        // Skew-to-global transformation matrix
+        Matrix_3x3 Q( QT ); Q.transpose();
+
+        for( int jj = dof-1; jj < ncol; jj += dof )
+        {
+          Matrix_3x3 Ke_AB = Matrix_3x3(
+            Ke[(ii-2)*ncol + (jj-2)], Ke[(ii-2)*ncol + (jj-1)], Ke[(ii-2)*ncol + jj],
+            Ke[(ii-1)*ncol + (jj-2)], Ke[(ii-1)*ncol + (jj-1)], Ke[(ii-1)*ncol + jj],
+            Ke[(ii-0)*ncol + (jj-2)], Ke[(ii-0)*ncol + (jj-1)], Ke[(ii-0)*ncol + jj]  );
+
+          if( dnode != ( col_index[jj] - 3 ) / dof_mat ) Ke_AB.MatMult( QT, Ke_AB );  // QT * Ke_AB
+          else
+          {
+            Ke_AB.MatRot( Q );  // QT * Ke_AB * Q
+
+            // Continuity eqn
+            if( dof == dof_mat )
+            {
+              Vector_3 rot_Ke_c;
+
+              Vector_3 Ke_c = Vector_3( Ke[(ii-3)*ncol + (jj-2)], Ke[(ii-3)*ncol + (jj-1)], Ke[(ii-3)*ncol + jj] );
+              Q.VecMultT( Ke_c, rot_Ke_c );  // rot_Ke_c = Ke_c^T * Q
+
+              Ke[(ii-3)*ncol + (jj-2)] = rot_Ke_c.x(); Ke[(ii-3)*ncol + (jj-1)] = rot_Ke_c.y(); Ke[(ii-3)*ncol + jj] = rot_Ke_c.z();
+            }
+          }
+
+          // Momentum eqns corresponding to pressure dof
+          if( dof == dof_mat )
+          {
+            Vector_3 rot_Ke_c;
+
+            Vector_3 Ke_c = Vector_3( Ke[(ii-2)*ncol + (jj-3)], Ke[(ii-1)*ncol + (jj-3)], Ke[ii*ncol + (jj-3)] );
+            QT.VecMult( Ke_c, rot_Ke_c );  // rot_Ke_c = Q^T * Ke_c
+
+            Ke[(ii-2)*ncol + (jj-3)] = rot_Ke_c.x(); Ke[(ii-1)*ncol + (jj-3)] = rot_Ke_c.y(); Ke[ii*ncol + (jj-3)] = rot_Ke_c.z();
+          }
+
+          // Update Ke
+          Ke[(ii-2)*ncol + (jj-2)] = Ke_AB.xx(); Ke[(ii-2)*ncol + (jj-1)] = Ke_AB.xy(); Ke[(ii-2)*ncol + jj] = Ke_AB.xz();
+          Ke[(ii-1)*ncol + (jj-2)] = Ke_AB.yx(); Ke[(ii-1)*ncol + (jj-1)] = Ke_AB.yy(); Ke[(ii-1)*ncol + jj] = Ke_AB.yz();
+          Ke[(ii-0)*ncol + (jj-2)] = Ke_AB.zx(); Ke[(ii-0)*ncol + (jj-1)] = Ke_AB.zy(); Ke[(ii-0)*ncol + jj] = Ke_AB.zz();
+        }
+
+        Vector_3 Ge_A = Vector_3( Ge[ii-2], Ge[ii-1], Ge[ii] );
+        Vector_3 rot_Ge_A;
+        QT.VecMult(Ge_A, rot_Ge_A);  // rot_Ge_A = QT * Ge_A
+
+        // Update Ge
+        Ge[ii-2] = rot_Ge_A.x(); Ge[ii-1] = rot_Ge_A.y(); Ge[ii] = rot_Ge_A.z();
+      }
+    } // end loop over rows
+  }
+  else
+    SYS_T::print_fatal("Error: this ringbc_type is not supported in PGAssem_Tet_CMM_GenAlpha.\n");
+}
+
+
 void PGAssem_Tet_Wall::EssBC_G( const ALocal_NodalBC * const &nbc_part, 
     const int &field )
 {
@@ -159,7 +285,7 @@ void PGAssem_Tet_Wall::Assem_tangent_residual(
     const IGenBC * const &gbc )
 {
   // Residual & tangent contributions from the thin-walled linear membrane in CMM
-  WallMembrane_KG( curr_time, dt, sol_a, sol_b, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ebc_wall_part );
+  WallMembrane_KG( curr_time, dt, sol_a, sol_b, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ringnbc_part, ebc_wall_part );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -183,6 +309,7 @@ void PGAssem_Tet_Wall::WallMembrane_KG(
     FEAElement * const &element_w,
     const IQuadPts * const &quad_s,
     const ALocal_NodalBC * const &nbc_part,
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_wall_part )
 {
   const int dof_disp = 3; 
@@ -237,6 +364,9 @@ void PGAssem_Tet_Wall::WallMembrane_KG(
       for(int mm=0; mm<dof_mat; ++mm)
         srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
     }
+
+    RingBC_KG( ringnbc_part, dof_mat, dof_mat * snLocBas, dof_mat * snLocBas,
+        srow_index, srow_index, lassem_ptr->sur_Tangent, lassem_ptr->sur_Residual );
 
     MatSetValues(K, dof_mat*snLocBas, srow_index, dof_mat*snLocBas, srow_index,
         lassem_ptr->sur_Tangent, ADD_VALUES);

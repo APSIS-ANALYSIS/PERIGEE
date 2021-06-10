@@ -306,6 +306,7 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
   dR_dxl = nullptr; dR_dyl = nullptr;
 }
 
+
 void PLocAssem_Tet_Wall_Prestress::get_Wall_CauchyStress(
     const double * const &sol_wall_disp,
     const FEAElement * const &element,

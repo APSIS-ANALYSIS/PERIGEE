@@ -73,6 +73,19 @@ class PGAssem_Tet_Wall : public IPGAssem
 
     void EssBC_G( const ALocal_NodalBC * const &nbc_part, const int &field );
 
+    // Ring nodal BC: 1) clamped, or 2) in-plane motion (skew bc)
+    // References:
+    //   i. Griffiths DV (Computers & Structures 1990) Treatment of skew boundary
+    //      conditions in finite element analysis
+    //  ii. Bathe KJ (1996) Finite element procedures
+    void RingBC_KG(
+        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const int &dof, const int &nrow, const int &ncol,
+        const PetscInt * const &row_index,
+        const PetscInt * const &col_index,
+        PetscScalar * const &Ke,
+        PetscScalar * const &Ge );
+
     void WallMembrane_KG( const double &curr_time,
         const double &dt,
         const PDNSolution * const &dot_sol,
@@ -82,6 +95,7 @@ class PGAssem_Tet_Wall : public IPGAssem
         FEAElement * const &element_w,
         const IQuadPts * const &quad_s,
         const ALocal_NodalBC * const &nbc_part,
+        const ALocal_Ring_NodalBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_wall_part );
 
     void GetLocal( const double * const &array, const int * const &IEN,
