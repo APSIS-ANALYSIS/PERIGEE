@@ -83,6 +83,8 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
     const double * const &eleCtrlPts_z,
     const double * const &ele_thickness,
     const double * const &ele_youngsmod,
+    const double * const &ele_springconst,
+    const double * const &ele_dampingconst,
     const double * const &qua_prestress,
     const IQuadPts * const &quad )
 {
@@ -117,8 +119,10 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
     // Global-to-local rotation matrix Q
     const Matrix_3x3 Q = element->get_rotationMatrix(qua);
 
-    double u_t = 0.0, v_t = 0.0, w_t = 0.0, pp = 0.0; 
-    double disp_x = 0.0, disp_y = 0.0, disp_z = 0.0, h_w = 0.0, E_w = 0.0;
+    double u_t = 0.0, v_t = 0.0, w_t = 0.0;
+    double u = 0.0, v = 0.0, w = 0.0, pp = 0.0; 
+    double disp_x = 0.0, disp_y = 0.0, disp_z = 0.0;
+    double h_w = 0.0, E_w = 0.0, ks_w = 0.0, cs_w = 0.0;
     double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
 
     for(int ii=0; ii<snLocBas; ++ii)
@@ -128,6 +132,9 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
       w_t += dot_sol[ii*4+3] * R[ii];
 
       pp += sol[ii*4]   * R[ii];
+      u  += sol[ii*4+1] * R[ii];
+      v  += sol[ii*4+2] * R[ii];
+      w  += sol[ii*4+3] * R[ii];
 
       disp_x += sol_wall_disp[ii*3+0] * R[ii];
       disp_y += sol_wall_disp[ii*3+1] * R[ii];
@@ -135,6 +142,9 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
 
       h_w += ele_thickness[ii] * R[ii];
       E_w += ele_youngsmod[ii] * R[ii];
+
+      ks_w += ele_springconst[ii]  * R[ii];
+      cs_w += ele_dampingconst[ii] * R[ii];
 
       coor_x += eleCtrlPts_x[ii] * R[ii];
       coor_y += eleCtrlPts_y[ii] * R[ii];
@@ -233,14 +243,17 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
 
       sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * ( u_t - fw.x() )
           + NA_x * sigma[qua].xx() + NA_y * sigma[qua].xy() + NA_z * sigma[qua].xz() )
+          + gwts * R[A] * ( ks_w * disp_x + cs_w * u )
           - gwts * R[A] * pp * n_out.x(); 
 
       sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * ( v_t - fw.y() )
           + NA_x * sigma[qua].yx() + NA_y * sigma[qua].yy() + NA_z * sigma[qua].yz() ) 
+          + gwts * R[A] * ( ks_w * disp_y + cs_w * v )
           - gwts * R[A] * pp * n_out.y(); 
       
       sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * ( w_t - fw.z() )
           + NA_x * sigma[qua].zx() + NA_y * sigma[qua].zy() + NA_z * sigma[qua].zz() ) 
+          + gwts * R[A] * ( ks_w * disp_z + cs_w * w )
           - gwts * R[A] * pp * n_out.z(); 
 
       for(int B=0; B<snLocBas; ++B)
@@ -248,7 +261,8 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
         // Momentum-x with respect to u, v, w
         sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+1 ] += gwts * h_w * (
             alpha_m * rho_w * R[A] * R[B]
-            + dd_du * Kg[ (snLocBas*dim)*(A*dim) + (B*dim) ] );
+            + dd_du * Kg[ (snLocBas*dim)*(A*dim) + (B*dim) ] )
+            + gwts * R[A] * R[B] * ( dd_du * ks_w + dd_dv * cs_w );
 
         sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+2 ] += gwts * h_w * (
             dd_du * Kg[ (snLocBas*dim)*(A*dim) + (B*dim+1) ] );
@@ -262,7 +276,8 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
 
         sur_Tangent[ 4*snLocBas*(4*A+2) + 4*B+2 ] += gwts * h_w * (
             alpha_m * rho_w * R[A] * R[B]
-            + dd_du * Kg[ (snLocBas*dim)*(A*dim+1) + (B*dim+1) ] );
+            + dd_du * Kg[ (snLocBas*dim)*(A*dim+1) + (B*dim+1) ] )
+            + gwts * R[A] * R[B] * ( dd_du * ks_w + dd_dv * cs_w );
 
         sur_Tangent[ 4*snLocBas*(4*A+2) + 4*B+3 ] += gwts * h_w * (
             dd_du * Kg[ (snLocBas*dim)*(A*dim+1) + (B*dim+2) ] );
@@ -276,7 +291,8 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
 
         sur_Tangent[ 4*snLocBas*(4*A+3) + 4*B+3 ] += gwts * h_w * (
             alpha_m * rho_w * R[A] * R[B]
-            + dd_du * Kg[ (snLocBas*dim)*(A*dim+2) + (B*dim+2) ] );
+            + dd_du * Kg[ (snLocBas*dim)*(A*dim+2) + (B*dim+2) ] )
+            + gwts * R[A] * R[B] * ( dd_du * ks_w + dd_dv * cs_w );
 
       } // end B loop
     } // end A loop
