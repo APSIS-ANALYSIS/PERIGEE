@@ -20,6 +20,8 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
 
   thickness.clear();
   youngsmod.clear();
+  springconst.clear();
+  dampingconst.clear();
   qua_prestress.clear();
 
   const int ebc_id = 0;
@@ -31,6 +33,9 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
 
     thickness = h5r -> read_doubleVector( subgroup_name.c_str(), "thickness" );
     youngsmod = h5r -> read_doubleVector( subgroup_name.c_str(), "youngsmod" );
+
+    springconst  = h5r -> read_doubleVector( subgroup_name.c_str(), "springconst"  );
+    dampingconst = h5r -> read_doubleVector( subgroup_name.c_str(), "dampingconst" );
 
     // If the prestress data exist on file, read the prestress data
     // otherwise, just allocate a container for prestress data at each quadrature 
@@ -75,10 +80,12 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
 
 ALocal_EBC_wall::~ALocal_EBC_wall()
 {
-  VEC_T::clean(thickness);
-  VEC_T::clean(youngsmod);
-  VEC_T::clean(qua_prestress);
-  VEC_T::clean(local_node_on_sur_pos);
+  VEC_T::clean( thickness     );
+  VEC_T::clean( youngsmod     );
+  VEC_T::clean( springconst   );
+  VEC_T::clean( dampingconst  );
+  VEC_T::clean( qua_prestress );
+  VEC_T::clean( local_node_on_sur_pos );
 }
 
 void ALocal_EBC_wall::get_thickness( const int &eindex,
@@ -102,6 +109,30 @@ void ALocal_EBC_wall::get_youngsmod( const int &eindex,
   {
     const int pos = local_tri_ien[0][nLocBas*eindex + ii]; 
     e_youngsmod[ii] = youngsmod[pos];
+  }
+}
+
+void ALocal_EBC_wall::get_springconst( const int &eindex,
+    double * const &e_springconst ) const
+{
+  // Only one surface per the assumption in wall ebc
+  const int nLocBas = cell_nLocBas[0];
+  for( int ii = 0; ii < nLocBas; ++ii )
+  {
+    const int pos = local_tri_ien[0][nLocBas*eindex + ii]; 
+    e_springconst[ii] = springconst[pos];
+  }
+}
+
+void ALocal_EBC_wall::get_dampingconst( const int &eindex,
+    double * const &e_dampingconst ) const
+{
+  // Only one surface per the assumption in wall ebc
+  const int nLocBas = cell_nLocBas[0];
+  for( int ii = 0; ii < nLocBas; ++ii )
+  {
+    const int pos = local_tri_ien[0][nLocBas*eindex + ii]; 
+    e_dampingconst[ii] = dampingconst[pos];
   }
 }
 

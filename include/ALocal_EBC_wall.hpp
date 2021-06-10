@@ -30,7 +30,7 @@ class ALocal_EBC_wall : public ALocal_EBC
     // ------------------------------------------------------------------------
     // ee is the local element index, ranges in [ 0, num_local_cell[0] )
     // elem_thickness is the output with length cell_nLocBas[0], which
-    // represents the thickness for each local node
+    // represents the thickness at each local node
     // ------------------------------------------------------------------------
     virtual void get_thickness(const int &ee, double * const &elem_thickness) const;
 
@@ -39,6 +39,18 @@ class ALocal_EBC_wall : public ALocal_EBC
     // represents the Young's modulus at each local node
     // ------------------------------------------------------------------------
     virtual void get_youngsmod(const int &ee, double * const &elem_youngsmod) const;
+
+    // ------------------------------------------------------------------------
+    // elem_springconst is the output with length cell_nLocBas[0], which
+    // represents the spring constant at each local node
+    // ------------------------------------------------------------------------
+    virtual void get_springconst(const int &ee, double * const &elem_springconst) const;
+
+    // ------------------------------------------------------------------------
+    // elem_dampingconst is the output with length cell_nLocBas[0], which
+    // represents the damping constant at each local node
+    // ------------------------------------------------------------------------
+    virtual void get_dampingconst(const int &ee, double * const &elem_dampingconst) const;
 
     virtual int get_local_node_on_sur_pos( const int &ii ) const 
     {return local_node_on_sur_pos[ii];}
@@ -93,11 +105,11 @@ class ALocal_EBC_wall : public ALocal_EBC
     int num_local_node_on_sur;
 
     // ------------------------------------------------------------------------
-    // If this partition owns any part of the wall, the thickness and
-    // youngsmod vectors are each of length num_local_node[0].
+    // If this partition owns any part of the wall, these wall property
+    // vectors are each of length num_local_node[0].
     // Otherwise, these vectors are of length 0.
     // ------------------------------------------------------------------------
-    std::vector<double> thickness, youngsmod;
+    std::vector<double> thickness, youngsmod, springconst, dampingconst;
 
     // ------------------------------------------------------------------------
     // If num_local_node_on_sur > 0, this partition owns wall surface nodes, and
