@@ -35,7 +35,7 @@ int main( int argc, char *argv[] )
   // Nonlinear solver parameters
   double nl_rtol = 1.0e-3;           // convergence criterion relative tolerance
   double nl_atol = 1.0e-6;           // convergence criterion absolute tolerance
-  double nl_dtol = 1.0e3;             // divergence criterion
+  double nl_dtol = 1.0e3;            // divergence criterion
   int    nl_maxits = 20;             // maximum number if nonlinear iterations
   int    nl_refreq = 4;              // frequency of tangent matrix renewal
   int    nl_threshold = 4;           // threshold of tangent matrix renewal
@@ -73,44 +73,44 @@ int main( int argc, char *argv[] )
   const PetscMPIInt size = SYS_T::get_MPI_size();
   
   // ===== Read Command Line Arguments =====
-  SYS_T::GetOptionReal(  "-prestress_disp_tol", prestress_disp_tol);
-  SYS_T::GetOptionString("-part_file",       part_file);
-  SYS_T::GetOptionReal(  "-rho_inf",         genA_rho_inf);
-  SYS_T::GetOptionReal(  "-nl_rtol",         nl_rtol);
-  SYS_T::GetOptionReal(  "-nl_atol",         nl_atol);
-  SYS_T::GetOptionReal(  "-nl_dtol",         nl_dtol);
-  SYS_T::GetOptionInt(   "-nl_maxits",       nl_maxits);
-  SYS_T::GetOptionInt(   "-nl_refreq",       nl_refreq);
-  SYS_T::GetOptionInt(   "-nl_threshold",    nl_threshold);
-  SYS_T::GetOptionBool(  "-is_backward_Euler", is_backward_Euler);
-  SYS_T::GetOptionReal(  "-init_time",       initial_time);
-  SYS_T::GetOptionReal(  "-fina_time",       final_time);
-  SYS_T::GetOptionReal(  "-init_step",       initial_step);
-  SYS_T::GetOptionInt(   "-init_index",      initial_index);
-  SYS_T::GetOptionInt(   "-ttan_freq",       ttan_renew_freq);
-  SYS_T::GetOptionInt(   "-sol_rec_freq",    sol_record_freq);
+  SYS_T::GetOptionReal(  "-prestress_disp_tol",  prestress_disp_tol);
+  SYS_T::GetOptionString("-part_file",           part_file);
+  SYS_T::GetOptionReal(  "-rho_inf",             genA_rho_inf);
+  SYS_T::GetOptionReal(  "-nl_rtol",             nl_rtol);
+  SYS_T::GetOptionReal(  "-nl_atol",             nl_atol);
+  SYS_T::GetOptionReal(  "-nl_dtol",             nl_dtol);
+  SYS_T::GetOptionInt(   "-nl_maxits",           nl_maxits);
+  SYS_T::GetOptionInt(   "-nl_refreq",           nl_refreq);
+  SYS_T::GetOptionInt(   "-nl_threshold",        nl_threshold);
+  SYS_T::GetOptionBool(  "-is_backward_Euler",   is_backward_Euler);
+  SYS_T::GetOptionReal(  "-init_time",           initial_time);
+  SYS_T::GetOptionReal(  "-fina_time",           final_time);
+  SYS_T::GetOptionReal(  "-init_step",           initial_step);
+  SYS_T::GetOptionInt(   "-init_index",          initial_index);
+  SYS_T::GetOptionInt(   "-ttan_freq",           ttan_renew_freq);
+  SYS_T::GetOptionInt(   "-sol_rec_freq",        sol_record_freq);
 
   // ===== Print Command Line Arguments =====
-  SYS_T::cmdPrint(      "-part_file:",       part_file);
-  SYS_T::cmdPrint(      "-prestress_disp_tol:", prestress_disp_tol);
-  SYS_T::cmdPrint(      "-nl_rtol:",         nl_rtol);
-  SYS_T::cmdPrint(      "-nl_atol:",         nl_atol);
-  SYS_T::cmdPrint(      "-nl_dtol:",         nl_dtol);
-  SYS_T::cmdPrint(      "-nl_maxits:",       nl_maxits);
-  SYS_T::cmdPrint(      "-nl_refreq:",       nl_refreq);
-  SYS_T::cmdPrint(      "-nl_threshold:",    nl_threshold);
+  SYS_T::cmdPrint(       "-part_file:",          part_file);
+  SYS_T::cmdPrint(       "-prestress_disp_tol:", prestress_disp_tol);
+  SYS_T::cmdPrint(       "-nl_rtol:",            nl_rtol);
+  SYS_T::cmdPrint(       "-nl_atol:",            nl_atol);
+  SYS_T::cmdPrint(       "-nl_dtol:",            nl_dtol);
+  SYS_T::cmdPrint(       "-nl_maxits:",          nl_maxits);
+  SYS_T::cmdPrint(       "-nl_refreq:",          nl_refreq);
+  SYS_T::cmdPrint(       "-nl_threshold:",       nl_threshold);
   
   if( is_backward_Euler )
-    SYS_T::commPrint(     "-is_backward_Euler: true \n");
+    SYS_T::commPrint(    "-is_backward_Euler: true \n");
   else
-    SYS_T::cmdPrint(      "-rho_inf:",         genA_rho_inf);
+    SYS_T::cmdPrint(     "-rho_inf:",            genA_rho_inf);
   
-  SYS_T::cmdPrint(      "-init_time:",       initial_time);
-  SYS_T::cmdPrint(      "-init_step:",       initial_step);
-  SYS_T::cmdPrint(      "-init_index:",      initial_index);
-  SYS_T::cmdPrint(      "-fina_time:",       final_time);
-  SYS_T::cmdPrint(      "-ttan_freq:",       ttan_renew_freq);
-  SYS_T::cmdPrint(      "-sol_rec_freq:",    sol_record_freq);
+  SYS_T::cmdPrint(       "-init_time:",          initial_time);
+  SYS_T::cmdPrint(       "-init_step:",          initial_step);
+  SYS_T::cmdPrint(       "-init_index:",         initial_index);
+  SYS_T::cmdPrint(       "-fina_time:",          final_time);
+  SYS_T::cmdPrint(       "-ttan_freq:",          ttan_renew_freq);
+  SYS_T::cmdPrint(       "-sol_rec_freq:",       sol_record_freq);
 
   // ===== Load Analysis Data Structure =====
   APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file);
@@ -190,8 +190,7 @@ int main( int argc, char *argv[] )
 
   std::string restart_name = "SOL_re"; // restart solution base name
 
-  // Read in [pres velo], which is use to provide the pressure traction on wall
-  // surface.
+  // Read in [pres velo] to provide the pressure traction on the wall surface
   SYS_T::file_check(restart_name.c_str());
   sol->ReadBinary(restart_name.c_str());
 
