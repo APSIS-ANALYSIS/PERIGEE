@@ -203,11 +203,14 @@ class ALocal_EBC
     }
 
     // ------------------------------------------------------------------------
-    // get_thickness : return the wall thickness, if this partition
-    //                 owns any cell on the wall.
-    // Users are responsible for allocating & deleting the e_thickness array.
+    // The following functions are in the derived _wall classes and used to
+    // obtain wall properties at a given element's local nodes.
+    // Users are responsible for allocating & deleting the e_xxxxxxx arrays.
     // Only one surface per the assumption in wall ebc.
     // surface element id: 0 <= eindex < num_local_cell[0]
+    // ------------------------------------------------------------------------
+    // get_thickness : return the wall thickness, if this partition
+    //                 owns any cell on the wall.
     // e_thickness : output thickness array, length is cell_nLocBas[0].
     // ------------------------------------------------------------------------
     virtual void get_thickness( const int &eindex, double * const &e_thickness ) const
@@ -218,14 +221,31 @@ class ALocal_EBC
     // ------------------------------------------------------------------------
     // get_youngsmod : return the wall young's modulus, if this partition
     //                 owns any cell on the wall.
-    // Users are responsible for allocating & deleting the e_youngsmod array.
-    // Only one surface per the assumption in wall ebc.
-    // surface element id: 0 <= eindex < num_local_cell[0]
     // e_youngsmod : output youngsmod array, length is cell_nLocBas[0].
     // ------------------------------------------------------------------------
     virtual void get_youngsmod( const int &eindex, double * const &e_youngsmod ) const
     {
       SYS_T::print_fatal("Error: ALocal_EBC::get_youngsmod is not implemented. \n");
+    }
+
+    // ------------------------------------------------------------------------
+    // get_springconst : return the wall spring constant, if this partition
+    //                   owns any cell on the wall.
+    // e_springconst : output springconst array, length is cell_nLocBas[0].
+    // ------------------------------------------------------------------------
+    virtual void get_springconst( const int &eindex, double * const &e_springconst ) const
+    {
+      SYS_T::print_fatal("Error: ALocal_EBC::get_springconst is not implemented. \n");
+    }
+
+    // ------------------------------------------------------------------------
+    // get_dampingconst : return the wall damping constant, if this partition
+    //                    owns any cell on the wall.
+    // e_dampingconst : output dampingconst array, length is cell_nLocBas[0].
+    // ------------------------------------------------------------------------
+    virtual void get_dampingconst( const int &eindex, double * const &e_dampingconst ) const
+    {
+      SYS_T::print_fatal("Error: ALocal_EBC::get_dampingconst is not implemented. \n");
     }
 
     // ------------------------------------------------------------------------
