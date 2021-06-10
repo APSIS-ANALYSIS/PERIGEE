@@ -858,6 +858,8 @@ class IPLocAssem
         const double * const &eleCtrlPts_z,
         const double * const &ele_thickness,
         const double * const &ele_youngsmod,
+        const double * const &ele_springconst,
+        const double * const &ele_dampingconst,
         const double * const &qua_prestress,
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Residual_EBC_Wall is not implemented.\n");}
@@ -873,6 +875,8 @@ class IPLocAssem
         const double * const &eleCtrlPts_z,
         const double * const &ele_thickness,
         const double * const &ele_youngsmod,
+        const double * const &ele_springconst,
+        const double * const &ele_dampingconst,
         const double * const &qua_prestress,
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Tangent_Residual_EBC_Wall is not implemented.\n");}

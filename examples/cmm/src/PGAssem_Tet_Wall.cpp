@@ -199,8 +199,10 @@ void PGAssem_Tet_Wall::WallMembrane_KG(
   double * sctrl_z    = new double [snLocBas];
   double * sthickness = new double [snLocBas];
   double * syoungsmod = new double [snLocBas];
-  double * quaprestress = new double [ 6 * quad_s->get_num_quadPts() ];
-  PetscInt * srow_index = new PetscInt [dof_mat * snLocBas];
+  double * sspringconst  = new double [snLocBas];
+  double * sdampingconst = new double [snLocBas];
+  double * quaprestress  = new double [ 6 * quad_s->get_num_quadPts() ];
+  PetscInt * srow_index  = new PetscInt [dof_mat * snLocBas];
 
   dot_sol->GetLocalArray( array_a );
   sol->GetLocalArray( array_b );
@@ -215,8 +217,10 @@ void PGAssem_Tet_Wall::WallMembrane_KG(
   {
     ebc_wall_part -> get_SIEN(ebc_id, ee, LSIEN);
     ebc_wall_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
-    ebc_wall_part -> get_thickness(ee, sthickness  );
-    ebc_wall_part -> get_youngsmod(ee, syoungsmod  );
+    ebc_wall_part -> get_thickness(ee, sthickness);
+    ebc_wall_part -> get_youngsmod(ee, syoungsmod);
+    ebc_wall_part -> get_springconst( ee, sspringconst );
+    ebc_wall_part -> get_dampingconst(ee, sdampingconst);
     ebc_wall_part -> get_prestress(ee, quaprestress);
 
     GetLocal(array_a, LSIEN, snLocBas, local_as);
@@ -225,7 +229,8 @@ void PGAssem_Tet_Wall::WallMembrane_KG(
     GetLocal(array_c, LSIEN, snLocBas, dof_disp, local_cs);
 
     lassem_ptr->Assem_Tangent_Residual_EBC_Wall( curr_time, dt, local_as, local_bs, local_cs,
-        element_w, sctrl_x, sctrl_y, sctrl_z, sthickness, syoungsmod, quaprestress, quad_s);
+        element_w, sctrl_x, sctrl_y, sctrl_z, sthickness, syoungsmod,
+        sspringconst, sdampingconst, quaprestress, quad_s);
 
     for(int ii=0; ii<snLocBas; ++ii)
     {

@@ -148,6 +148,8 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_z,
         const double * const &ele_thickness,
         const double * const &ele_youngsmod,
+        const double * const &ele_springconst,
+        const double * const &ele_dampingconst,
         const double * const &qua_prestress,
         const IQuadPts * const &quad );
 
@@ -162,6 +164,8 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_z,
         const double * const &ele_thickness,
         const double * const &ele_youngsmod,
+        const double * const &ele_springconst,
+        const double * const &ele_dampingconst,
         const double * const &qua_prestress,
         const IQuadPts * const &quad );
 
