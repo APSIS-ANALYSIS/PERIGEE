@@ -60,6 +60,8 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const std::string &walls_combined,
     const std::string &centerlines_combined,
     const double &thickness2radius_combined,
+    const double &ks_combined,
+    const double &cs_combined,
     const int &elemtype,
     const double &in_fluid_density )
 : ElemBC_3D_tet( walls_combined, elemtype ),
@@ -71,6 +73,9 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   radius.resize(    num_node[ebc_id] );
   thickness.resize( num_node[ebc_id] );
   youngsmod.resize( num_node[ebc_id] );
+
+  ks.resize( num_node[ebc_id] );
+  cs.resize( num_node[ebc_id] );
 
   // Make sure that the files exist
   SYS_T::file_check( walls_combined );
@@ -98,8 +103,10 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     locator -> FindClosestPoint(&pt[0], &cl_pt[0], cell, cellId, subId, dist); 
 
     radius[ii] = MATH_T::norm2(cl_pt[0] - pt[0], cl_pt[1] - pt[1], cl_pt[2] - pt[2]);
-  
     thickness[ii] = radius[ii] * thickness2radius_combined; 
+
+    ks[ii] = ks_combined;
+    cs[ii] = cs_combined;
 
     compute_youngsmod(radius[ii], thickness[ii], youngsmod[ii]);
   }
@@ -114,10 +121,12 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   
   std::cout<<"     ElemBC_3D_tet_wall generated from "<<walls_combined<<" and ";
   std::cout<<centerlines_combined<<std::endl;
-  std::cout<<"     thickness ranges in ["<<*std::min_element(thickness.begin(), thickness.end())
+  std::cout<<"     thickness h ranges in ["<<*std::min_element(thickness.begin(), thickness.end())
     <<" , "<<*std::max_element(thickness.begin(), thickness.end())<<"] \n";
-  std::cout<<"     Young's modulus ranges in ["<<*std::min_element(youngsmod.begin(), youngsmod.end())
+  std::cout<<"     Young's modulus E ranges in ["<<*std::min_element(youngsmod.begin(), youngsmod.end())
     <<" , "<<*std::max_element(youngsmod.begin(), youngsmod.end())<<"] \n";
+  std::cout<<"     spring constant ks = "  << ks_combined << std::endl;
+  std::cout<<"     damping constant cs = " << cs_combined << std::endl;
 }
 
 
@@ -125,19 +134,27 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const std::string &walls_combined,
     const std::string &centerlines_combined,
     const double &thickness2radius_combined,
+    const double &ks_combined,
+    const double &cs_combined,
     const std::vector<std::string> &wallsList,
     const std::vector<std::string> &centerlinesList,
     const std::vector<double> &thickness2radiusList,
+    const std::vector<double> &ksList,
+    const std::vector<double> &csList,
     const int &elemtype,
     const double &in_fluid_density )
 : ElemBC_3D_tet_wall( walls_combined, centerlines_combined, thickness2radius_combined,
-                      elemtype, in_fluid_density)
+                      ks_combined, cs_combined, elemtype, in_fluid_density)
 {
   // Check inputs
   SYS_T::print_fatal_if( centerlinesList.size() != wallsList.size(),
     "ERROR: wallsList and centerlinesList must be of the same length.\n");
   SYS_T::print_fatal_if( thickness2radiusList.size() != wallsList.size(),
     "ERROR: wallsList and thickness2radiusList must be of the same length.\n");
+  SYS_T::print_fatal_if( ksList.size() != wallsList.size(),
+    "ERROR: wallsList and ksList must be of the same length.\n");
+  SYS_T::print_fatal_if( csList.size() != wallsList.size(),
+    "ERROR: wallsList and csList must be of the same length.\n");
 
   const int num_srfs = static_cast<int>( wallsList.size() );
 
@@ -199,8 +216,10 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
         locator -> FindClosestPoint(&pt[0], &cl_pt[0], cell, cellId, subId, dist);
 
         radius[idx] = MATH_T::norm2(cl_pt[0] - pt[0], cl_pt[1] - pt[1], cl_pt[2] - pt[2]);
-
         thickness[idx] = radius[idx] * thickness2radiusList[ii];
+
+        ks[idx] = ksList[ii];
+        cs[idx] = csList[ii];
 
         compute_youngsmod(radius[idx], thickness[idx], youngsmod[idx]);
       }
@@ -224,10 +243,14 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   
   std::cout<<"     ElemBC_3D_tet_wall generated from "<<walls_combined<<" and ";
   std::cout<<centerlines_combined<<std::endl;
-  std::cout<<"     thickness ranges in ["<<*std::min_element(thickness.begin(), thickness.end())
+  std::cout<<"     thickness h ranges in ["<<*std::min_element(thickness.begin(), thickness.end())
     <<" , "<<*std::max_element(thickness.begin(), thickness.end())<<"] \n";
-  std::cout<<"     Young's modulus ranges in ["<<*std::min_element(youngsmod.begin(), youngsmod.end())
+  std::cout<<"     Young's modulus E ranges in ["<<*std::min_element(youngsmod.begin(), youngsmod.end())
     <<" , "<<*std::max_element(youngsmod.begin(), youngsmod.end())<<"] \n";
+  std::cout<<"     spring constant ks ranges in ["<<*std::min_element(ks.begin(), ks.end())
+    <<" , "<<*std::max_element(ks.begin(), ks.end())<<"] \n";
+  std::cout<<"     damping constant cs ranges in ["<<*std::min_element(cs.begin(), cs.end())
+    <<" , "<<*std::max_element(cs.begin(), cs.end())<<"] \n";
 }
 
 
@@ -236,6 +259,8 @@ ElemBC_3D_tet_wall::~ElemBC_3D_tet_wall()
   VEC_T::clean( radius    );
   VEC_T::clean( thickness );
   VEC_T::clean( youngsmod );
+  VEC_T::clean( ks );
+  VEC_T::clean( cs );
 }
 
 
@@ -246,6 +271,8 @@ void ElemBC_3D_tet_wall::print_info() const
   VEC_T::print( radius,    "wall_radius.txt",    '\n');
   VEC_T::print( thickness, "wall_thickness.txt", '\n');
   VEC_T::print( youngsmod, "wall_youngsmod.txt", '\n');
+  VEC_T::print( ks,        "wall_ks.txt",        '\n');
+  VEC_T::print( cs,        "wall_cs.txt",        '\n');
 }
 
 

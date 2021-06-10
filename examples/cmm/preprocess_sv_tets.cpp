@@ -54,10 +54,10 @@ int main( int argc, char * argv[] )
   //              2 variables in the fluid subdomain all fixed
   int cmmBC_type = 0;
 
-  // Uniform wall properties
+  // Wall properties
   bool   is_uniform_wall = true;
-  double wall_thickness = 0.1;
-  double wall_youngsmod = 1.0e6;
+  double wall_thickness = 0.1;     // only used for uniform properties
+  double wall_youngsmod = 1.0e6;   // only used for uniform properties
   double wall_ks = 0.0;
   double wall_cs = 0.0;
 
@@ -106,10 +106,11 @@ int main( int argc, char * argv[] )
     cout << "  -is_uniform_wall: true" << endl;
     cout << "  -wall_thickness: "      << wall_thickness << endl;
     cout << "  -wall_youngsmod: "      << wall_youngsmod << endl;
-    cout << "  -wall_ks: "             << wall_ks        << endl;
-    cout << "  -wall_cs: "             << wall_cs        << endl;
   }
   else cout << "  -is_uniform_wall: false" << endl;
+
+  cout << "  -wall_ks: "         << wall_ks        << endl;
+  cout << "  -wall_cs: "         << wall_cs        << endl;
 
   cout << " -num_outlet: "       << num_outlet        << endl;
   cout << " -geo_file: "         << geo_file          << endl;
@@ -298,28 +299,33 @@ int main( int argc, char * argv[] )
   // std::vector<std::string> wallsList; wallsList.clear();
   // std::vector<std::string> centerlinesList; centerlinesList.clear();
   // std::vector<double> thickness2radiusList; thickness2radiusList.clear();
+  // std::vector<double> ksList; ksList.clear();
+  // std::vector<double> csList; csList.clear();
 
   // if(elemType == 501) wallsList.push_back( "wall_aorta.vtp" );
   // else wallsList.push_back( "wall_aorta.vtu" );
 
   // centerlinesList.push_back( "centerlines_aorta.vtp" );
   // thickness2radiusList.push_back( 0.2 );
+  // ksList.push_back( 1.0e3 );
+  // csList.push_back( 1.0e4 );
 
   // // Initialized with default fluid density 1.065
   // ElemBC * wall_ebc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
-  //                                            thickness2radius_combined, wallsList,
-  //                                            centerlinesList, thickness2radiusList, elemType );
+  //       thickness2radius_combined, wall_ks, wall_cs, wallsList, centerlinesList,
+  //       thickness2radiusList, ksList, csList, elemType );
 
   ElemBC * wall_ebc = nullptr;
 
   if( is_uniform_wall )
-    wall_ebc = new ElemBC_3D_tet_wall( walls_combined, wall_thickness, wall_youngsmod, wall_ks, wall_cs, elemType );
+    wall_ebc = new ElemBC_3D_tet_wall( walls_combined, wall_thickness, wall_youngsmod,
+        wall_ks, wall_cs, elemType );
   else
   {
     SYS_T::file_check( centerlines_combined ); cout << centerlines_combined << " found. \n";
 
     wall_ebc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
-        thickness2radius_combined, elemType );
+        thickness2radius_combined, wall_ks, wall_cs, elemType );
   }
 
   wall_ebc -> resetTriIEN_outwardnormal( IEN );

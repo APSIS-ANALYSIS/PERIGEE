@@ -38,8 +38,8 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     ElemBC_3D_tet_wall(const std::string &walls_combined,
         const double &uniform_thickness,
         const double &uniform_youngsmod,
-        const double &uniform_ks = 0.0,
-        const double &uniform_cs = 0.0,
+        const double &uniform_ks,
+        const double &uniform_cs,
         const int &elemtype = 501,
         const double &in_fluid_density = 1.065 );
 
@@ -51,10 +51,14 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     //         to be prescribed for the complete wall. For most arteries, 
     //         we can assume the thickness is ten percent of the diameter,
     //         or twenty percent of the radius.
+    //  \para: ks_combined is the  spring constant over the entire wall.
+    //  \para: cs_combined is the damping constant over the entire wall.
     // ------------------------------------------------------------------------
     ElemBC_3D_tet_wall(const std::string &walls_combined,
         const std::string &centerlines_combined,
         const double &thickness2radius_combined,
+        const double &ks_combined,
+        const double &cs_combined,
         const int &elemtype = 501,
         const double &in_fluid_density = 1.065 );
 
@@ -62,19 +66,25 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     //  Constructing wall properties with multiple spatial distributions.
     //  The background wall properties will first be prescribed using the
     //  constructor above. Wall properties in wallsList will then be overwritten
-    //  with the corresponding centerlinesList and thickness2radiusList, so
-    //  these three lists must have the same length.
+    //  with the corresponding centerlinesList and lists of properties, so
+    //  all five lists must have the same length.
     //  \para: wallsList is a vector of wall surface vtp's, each a subset of
     //         the entire wall 
     //  \para: centerlinesList is a vector of corresponding centerline vtp's
     //  \para: thickness2radiusList is a vector of corresponding ratios.
+    //  \para: ksList is a vector of corresponding spring constants.
+    //  \para: csList is a vector of corresponding damping constants.
     // ------------------------------------------------------------------------
     ElemBC_3D_tet_wall(const std::string &walls_combined,
         const std::string &centerlines_combined,
         const double &thickness2radius_combined,
+        const double &ks_combined,
+        const double &cs_combined,
         const std::vector<std::string> &wallsList,
         const std::vector<std::string> &centerlinesList,
         const std::vector<double> &thickness2radiusList,
+        const std::vector<double> &ksList,
+        const std::vector<double> &csList,
         const int &elemtype = 501,
         const double &in_fluid_density = 1.065 );
 
