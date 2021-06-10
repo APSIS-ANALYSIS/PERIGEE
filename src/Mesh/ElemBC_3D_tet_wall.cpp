@@ -7,6 +7,8 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall( const int &elemtype,
   radius.clear();
   thickness.clear();
   youngsmod.clear();
+  ks.clear();
+  cs.clear();
 }
 
 
@@ -14,6 +16,8 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const std::string &walls_combined,
     const double &uniform_thickness,
     const double &uniform_youngsmod,
+    const double &uniform_ks,
+    const double &uniform_cs,
     const int &elemtype,
     const double &in_fluid_density )
 : ElemBC_3D_tet( walls_combined, elemtype ),
@@ -26,14 +30,19 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   thickness.resize( num_node[ebc_id] );
   youngsmod.resize( num_node[ebc_id] );
 
+  ks.resize( num_node[ebc_id] );
+  cs.resize( num_node[ebc_id] );
+
   // Make sure that the files exist
   SYS_T::file_check( walls_combined );
 
   for(int ii=0; ii<num_node[ebc_id]; ++ii)
   {
     thickness[ii] = uniform_thickness; 
-
     youngsmod[ii] = uniform_youngsmod;
+
+    ks[ii] = uniform_ks;
+    cs[ii] = uniform_cs;
 
     radius[ii] = 0.0; // radius is not calculated in this case
   }
@@ -41,8 +50,10 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   // Write out vtp's with wall properties
   write_vtk(ebc_id, "varwallprop");
 
-  std::cout<<"     ElemBC_3D_tet_wall thickness is "<<uniform_thickness;
-  std::cout<<" and Young's modulus is "<<uniform_youngsmod<<std::endl;
+  std::cout<<"     thickness h = "       << uniform_thickness << std::endl;
+  std::cout<<"     Young's modulus E = " << uniform_youngsmod << std::endl;
+  std::cout<<"     spring constant ks = "  << uniform_ks << std::endl;
+  std::cout<<"     damping constant cs = " << uniform_cs << std::endl;
 }
 
 ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
@@ -284,6 +295,12 @@ void ElemBC_3D_tet_wall::add_wall_data( vtkPointSet * const &grid_w, const int &
 
   // Add radius
   TET_T::add_double_PointData( grid_w, radius, "Radius" );
+
+  // Add spring constant
+  TET_T::add_double_PointData( grid_w, ks, "SpringConstant" );
+
+  // Add damping constant
+  TET_T::add_double_PointData( grid_w, cs, "DampingConstant" );
 }
 
 

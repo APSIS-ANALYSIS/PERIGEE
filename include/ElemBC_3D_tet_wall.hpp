@@ -24,7 +24,12 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     // ------------------------------------------------------------------------
     // Constructing wall properties with uniform thickness
     // \para: walls_combined contains a single vtp with the complete wall surface
-    // \para: uniform_thickness is the value of wall thickness
+    // \para: uniform_thickness is the wall thickness
+    // \para: uniform_youngsmod is the wall Young's modulus
+    // \para: uniform_ks is the spring constant for external tissue support
+    //        (Kelvin-Voigt viscoelastic model)
+    // \para: uniform_cs is the damping constant for external tissue support
+    //        (Kelvin-Voigt viscoelastic model)
     // Note: This function is typically used for constructing a simple wall
     //       model without feeding a centerline vtp file. The input of fluid
     //       density is logically not needed, but to keep output file
@@ -33,6 +38,8 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     ElemBC_3D_tet_wall(const std::string &walls_combined,
         const double &uniform_thickness,
         const double &uniform_youngsmod,
+        const double &uniform_ks = 0.0,
+        const double &uniform_cs = 0.0,
         const int &elemtype = 501,
         const double &in_fluid_density = 1.065 );
 
@@ -87,11 +94,11 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
   private:
     // fluid density used to compute the Young's modulus.
     // Its value will be passed to the analysis code and will be checked to
-    // make sure consistent value is used in analysis code.
+    // ensure that a consistent value is used in analysis code.
     const double fluid_density;
 
     // num_ebc = 1 for the wall, so these properties all have length num_node[0]
-    std::vector<double> radius, thickness, youngsmod;
+    std::vector<double> radius, thickness, youngsmod, ks, cs;
     
     // compute young's modulus for a wall node with the given radius & thickness
     // One may modify this function for different ways of prescribing the 
