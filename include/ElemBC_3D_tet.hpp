@@ -77,6 +77,14 @@ class ElemBC_3D_tet : public ElemBC
     virtual std::vector<double> get_wall_youngsmod() const
     {SYS_T::commPrint("Warning: get_wall_youngsmod is not implemented. \n"); return {};}
 
+    // Access the data in ElemBC_3D_tet_wall, wall spring constant used in CMM
+    virtual std::vector<double> get_wall_ks() const
+    {SYS_T::commPrint("Warning: get_wall_ks is not implemented. \n"); return {};}
+
+    // Access the data in ElemBC_3D_tet_wall, wall damping constant used in CMM
+    virtual std::vector<double> get_wall_cs() const
+    {SYS_T::commPrint("Warning: get_wall_cs is not implemented. \n"); return {};}
+
     // Access the data in ElemBC_3D_tet_wall, fluid density used for CMM young's modulus
     virtual double get_fluid_density() const
     {SYS_T::commPrint("Warning: get_fluid_density is not implemented. \n"); return -1.0;}
