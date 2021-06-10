@@ -54,6 +54,13 @@ int main( int argc, char * argv[] )
   //              2 variables in the fluid subdomain all fixed
   int cmmBC_type = 0;
 
+  // Uniform wall properties
+  bool   is_uniform_wall = true;
+  double wall_thickness = 0.1;
+  double wall_youngsmod = 1.0e6;
+  double wall_ks = 0.0;
+  double wall_cs = 0.0;
+
   // Default names for input geometry files
   std::string geo_file("./whole_vol.vtu");
   std::string sur_file_in("./inflow_vol.vtp");
@@ -70,37 +77,53 @@ int main( int argc, char * argv[] )
   SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: preprocessor needs to be run in serial.\n");
 
   // Get the command line arguments
-  SYS_T::GetOptionInt("-cpu_size", cpu_size);
-  SYS_T::GetOptionInt("-in_ncommon", in_ncommon);
-  SYS_T::GetOptionInt("-num_outlet", num_outlet);
-  SYS_T::GetOptionInt("-elem_type", elemType);
-  SYS_T::GetOptionInt("-ringbc_type", ringBC_type);
-  SYS_T::GetOptionInt("-cmmbc_type", cmmBC_type);
-  SYS_T::GetOptionString("-geo_file", geo_file);
-  SYS_T::GetOptionString("-sur_file_in", sur_file_in);
-  SYS_T::GetOptionString("-sur_file_wall", sur_file_wall);
+  SYS_T::GetOptionInt(   "-cpu_size",          cpu_size);
+  SYS_T::GetOptionInt(   "-in_ncommon",        in_ncommon);
+  SYS_T::GetOptionInt(   "-num_outlet",        num_outlet);
+  SYS_T::GetOptionInt(   "-elem_type",         elemType);
+  SYS_T::GetOptionInt(   "-ringbc_type",       ringBC_type);
+  SYS_T::GetOptionInt(   "-cmmbc_type",        cmmBC_type);
+  SYS_T::GetOptionBool(  "-is_uniform_wall",   is_uniform_wall);
+  SYS_T::GetOptionReal(  "-wall_thickness",    wall_thickness);
+  SYS_T::GetOptionReal(  "-wall_youngsmod",    wall_youngsmod);
+  SYS_T::GetOptionReal(  "-wall_ks",           wall_ks);
+  SYS_T::GetOptionReal(  "-wall_cs",           wall_cs);
+  SYS_T::GetOptionString("-geo_file",          geo_file);
+  SYS_T::GetOptionString("-sur_file_in",       sur_file_in);
+  SYS_T::GetOptionString("-sur_file_wall",     sur_file_wall);
   SYS_T::GetOptionString("-sur_file_out_base", sur_file_out_base);
 
   if( elemType != 501 && elemType !=502 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
 
   // Print the command line arguments
-  cout<<"==== Command Line Arguments ===="<<endl;
-  cout<<" -elem_type: "<<elemType<<endl;
-  cout<<" -ringbc_type: "<<ringBC_type<<endl;
-  cout<<" -cmmbc_type: "<<cmmBC_type<<endl;
-  cout<<" -num_outlet: "<<num_outlet<<endl;
-  cout<<" -geo_file: "<<geo_file<<endl;
-  cout<<" -sur_file_in: "<<sur_file_in<<endl;
-  cout<<" -sur_file_wall: "<<sur_file_wall<<endl;
-  cout<<" -sur_file_out_base: "<<sur_file_out_base<<endl;
-  cout<<" -part_file: "<<part_file<<endl;
-  cout<<" -cpu_size: "<<cpu_size<<endl;
-  cout<<" -in_ncommon: "<<in_ncommon<<endl;
-  cout<<" -isDualGraph: true \n";
-  cout<<"---- Problem definition ----\n";
-  cout<<" dofNum: "<<dofNum<<endl;
-  cout<<" dofMat: "<<dofMat<<endl;
-  cout<<"====  Command Line Arguments/ ===="<<endl;
+  cout << "==== Command Line Arguments ====" << endl;
+  cout << " -elem_type: "   << elemType      << endl;
+  cout << " -ringbc_type: " << ringBC_type   << endl;
+  cout << " -cmmbc_type: "  << cmmBC_type    << endl;
+
+  if( is_uniform_wall )
+  {
+    cout << "  -is_uniform_wall: true" << endl;
+    cout << "  -wall_thickness: "      << wall_thickness << endl;
+    cout << "  -wall_youngsmod: "      << wall_youngsmod << endl;
+    cout << "  -wall_ks: "             << wall_ks        << endl;
+    cout << "  -wall_cs: "             << wall_cs        << endl;
+  }
+  else cout << "  -is_uniform_wall: false" << endl;
+
+  cout << " -num_outlet: "       << num_outlet        << endl;
+  cout << " -geo_file: "         << geo_file          << endl;
+  cout << " -sur_file_in: "      << sur_file_in       << endl;
+  cout << " -sur_file_wall: "    << sur_file_wall     << endl;
+  cout << " -sur_file_out_base: "<< sur_file_out_base << endl;
+  cout << " -part_file: "        << part_file         << endl;
+  cout << " -cpu_size: "         << cpu_size          << endl;
+  cout << " -in_ncommon: "       << in_ncommon        << endl;
+  cout << " -isDualGraph: true \n";
+  cout << "---- Problem definition ----\n";
+  cout << " dofNum: "            << dofNum            << endl;
+  cout << " dofMat: "            << dofMat            << endl;
+  cout << "====  Command Line Arguments/ ===="<<endl;
 
   // Check if the vtu geometry files exist on disk
   SYS_T::file_check(geo_file); cout<<geo_file<<" found. \n";
@@ -289,11 +312,15 @@ int main( int argc, char * argv[] )
 
   ElemBC * wall_ebc = nullptr;
 
-  if( SYS_T::file_exist(centerlines_combined) )
+  if( is_uniform_wall )
+    wall_ebc = new ElemBC_3D_tet_wall( walls_combined, wall_thickness, wall_youngsmod, wall_ks, wall_cs, elemType );
+  else
+  {
+    SYS_T::file_check( centerlines_combined ); cout << centerlines_combined << " found. \n";
+
     wall_ebc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
         thickness2radius_combined, elemType );
-  else
-    wall_ebc = new ElemBC_3D_tet_wall( walls_combined, 0.1, 1.0e6, elemType );
+  }
 
   wall_ebc -> resetTriIEN_outwardnormal( IEN );
   // --------------------------------------------------------------------------
