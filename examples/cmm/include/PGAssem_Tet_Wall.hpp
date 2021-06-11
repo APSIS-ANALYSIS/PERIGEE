@@ -71,8 +71,6 @@ class PGAssem_Tet_Wall : public IPGAssem
     // Essential boundary condition
     void EssBC_KG( const ALocal_NodalBC * const &nbc_part, const int &field );
 
-    void EssBC_G( const ALocal_NodalBC * const &nbc_part, const int &field );
-
     // Ring nodal BC: 1) clamped, or 2) in-plane motion (skew bc)
     // References:
     //   i. Griffiths DV (Computers & Structures 1990) Treatment of skew boundary

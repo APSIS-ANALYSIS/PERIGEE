@@ -245,21 +245,6 @@ void PGAssem_Tet_Wall::RingBC_KG(
 }
 
 
-void PGAssem_Tet_Wall::EssBC_G( const ALocal_NodalBC * const &nbc_part, 
-    const int &field )
-{
-  const int local_dir = nbc_part->get_Num_LD(field);
-  if( local_dir > 0 )
-  {
-    for(int ii=0; ii<local_dir; ++ii)
-    {
-      const int row = nbc_part->get_LDN(field, ii) * dof_mat + field;
-      VecSetValue(G, row, 0.0, INSERT_VALUES);
-    }
-  }
-}
-
-
 void PGAssem_Tet_Wall::Assem_tangent_residual(
     const PDNSolution * const &sol_a,
     const PDNSolution * const &sol_b,
