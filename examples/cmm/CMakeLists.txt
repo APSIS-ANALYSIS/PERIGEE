@@ -167,7 +167,7 @@ ADD_EXECUTABLE( vis_p1_wss    vis_p1_wss.cpp)
 ADD_EXECUTABLE( vis_p2_wss    vis_p2_wss.cpp)
 ADD_EXECUTABLE( wall_solver   wall_solver.cpp)
 
-ADD_EXECUTABLE( test test.cpp )
+#ADD_EXECUTABLE( test test.cpp )
 ADD_EXECUTABLE( test_element  test_membrane_element_routine.cpp )
 
 TARGET_LINK_LIBRARIES( gmsh_p1_IO    perigee_preprocess )
@@ -181,7 +181,7 @@ TARGET_LINK_LIBRARIES( vis_cmm       perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_p1_wss    perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_p2_wss    perigee_postprocess )
 
-TARGET_LINK_LIBRARIES( test perigee_preprocess )
+#TARGET_LINK_LIBRARIES( test perigee_preprocess )
 TARGET_LINK_LIBRARIES( test_element  perigee_test )
 
 # EOF

@@ -40,34 +40,11 @@ class NodalBC_3D_CMM : public INodalBC
     // ------------------------------------------------------------------------ 
     NodalBC_3D_CMM( const int &nFunc, const bool &is_all_node = false );
  
-    // ------------------------------------------------------------------------ 
-    // Specify the Dirichlet nodes for CMM-type FSI simulations.
-    // \para nbc_inflow : inflow nodes
-    // \para nbc_ring   : ring nodes. The ring BC type will already be specified.
-    // \para comp       : the dof components ranges from 0 to 2 representing
-    //                    x-, y-, and z-components.
-    // ------------------------------------------------------------------------ 
-    NodalBC_3D_CMM( const INodalBC * const &nbc_inflow, 
-        const INodalBC * const &nbc_ring, const int &comp, const int &nFunc );
-
-    // ------------------------------------------------------------------------ 
-    // Specify the Dirichlet nodes
-    // \para nbc_inflow : inflow nodes
-    // \para nbc_ring   : ring nodes
-    // \para nbc_wall   : wall nodes
-    // The above three set of nodes form an non-overlapping subdivision of the
-    // Dirichlet type boundary.
-    // ------------------------------------------------------------------------ 
     NodalBC_3D_CMM( const INodalBC * const &nbc_inflow,
-        const INodalBC * const &nbc_ring, const INodalBC * const &nbc_wall, 
-        const int &nFunc );
-
-    // ------------------------------------------------------------------------ 
-    // Specify the Dirichlet nodes for the whole domain with wall nodes
-    // excluded. This is used for generating the prestress in the wall, while
-    // the fluid domain variables are all fixed.
-    // ------------------------------------------------------------------------ 
-    NodalBC_3D_CMM( const INodalBC * const &nbc_wall, const int &nFunc );
+        const INodalBC * const &nbc_ring,
+        const INodalBC * const &nbc_wall,
+        const int &comp, const int &nFunc,
+        const int &cmm_bc_type );  
 
     virtual ~NodalBC_3D_CMM() {};
 

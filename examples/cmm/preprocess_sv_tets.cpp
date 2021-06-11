@@ -247,37 +247,13 @@ int main( int argc, char * argv[] )
       nFunc, elemType );
 
   // Set up Nodal i.e. Dirichlet type Boundary Conditions. For CMM with prescribed inflow,
-  // this includes all inlet interior nodes. To enable in-plane motion of the inlet & outlet
-  // ring nodes, these ring nodes are included only for the dominant component of the
-  // corresponding cap's unit normal.
+  // this includes all inlet interior nodes.
   std::vector<INodalBC *> NBC_list( dofMat, nullptr );
 
-  if( cmmBC_type == 0)
-  {
-    std::cout<<"===> The Nodal boundary condition for deformable wall (cmmbc_type = 0) is set up as:\n";
-    NBC_list[0] = new NodalBC_3D_CMM( nFunc );
-    NBC_list[1] = new NodalBC_3D_CMM( InFBC, ring_bc, 0, nFunc );
-    NBC_list[2] = new NodalBC_3D_CMM( InFBC, ring_bc, 1, nFunc );
-    NBC_list[3] = new NodalBC_3D_CMM( InFBC, ring_bc, 2, nFunc );
-  }
-  else if( cmmBC_type == 1 )
-  {
-    std::cout<<"===> The Nodal boundary condition for rigid wall (cmmbc_type = 1) is set up as:\n";
-    NBC_list[0] = new NodalBC_3D_CMM( nFunc );
-    NBC_list[1] = new NodalBC_3D_CMM( InFBC, ring_bc, wall_nbc, nFunc );
-    NBC_list[2] = new NodalBC_3D_CMM( InFBC, ring_bc, wall_nbc, nFunc );
-    NBC_list[3] = new NodalBC_3D_CMM( InFBC, ring_bc, wall_nbc, nFunc );
-  }
-  else if( cmmBC_type == 2 )
-  {
-    std::cout<<"===> The Nodal boundary condition for prestress generation (cmmbc_type = 2) is set up as:\n";
-    NBC_list[0] = new NodalBC_3D_CMM( nFunc, true );
-    NBC_list[1] = new NodalBC_3D_CMM( wall_nbc, nFunc );
-    NBC_list[2] = new NodalBC_3D_CMM( wall_nbc, nFunc );
-    NBC_list[3] = new NodalBC_3D_CMM( wall_nbc, nFunc );
-  }
-  else
-    SYS_T::print_fatal("Error: cmmBC_type = %d is not defined.\n", cmmBC_type);
+  NBC_list[0] = new NodalBC_3D_CMM( nFunc );
+  NBC_list[1] = new NodalBC_3D_CMM( InFBC, ring_bc, wall_nbc, 0, nFunc, cmmBC_type );
+  NBC_list[2] = new NodalBC_3D_CMM( InFBC, ring_bc, wall_nbc, 1, nFunc, cmmBC_type );
+  NBC_list[3] = new NodalBC_3D_CMM( InFBC, ring_bc, wall_nbc, 2, nFunc, cmmBC_type );
 
   // --------------------------------------------------------------------------
   // Wall mesh for CMM-type model is set as an elemental bc.
