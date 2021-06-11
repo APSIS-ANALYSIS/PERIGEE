@@ -102,7 +102,8 @@ class PTime_CMM_Solver
 
     // This function will take a 4-dof solution and zero the 3 velocity
     // components
-    void Zero_velo_comp( PDNSolution * const &sol ) const;
+    void Zero_velo_comp( PDNSolution * const &sol,
+        const ALocal_EBC * const &ebc_wall_part ) const;
 };
 
 #endif

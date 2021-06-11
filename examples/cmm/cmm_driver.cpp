@@ -362,12 +362,12 @@ int main( int argc, char *argv[] )
     SYS_T::file_check(restart_dot_name.c_str());
     dot_sol->ReadBinary(restart_dot_name.c_str());
 
-    // Read in wall disp: may not exist if restart from rigid soln
+    // Read in wall disp
     std::string restart_disp_name = restart_name + "_disp";
     SYS_T::file_check(restart_disp_name.c_str());
     sol_wall_disp->ReadBinary(restart_disp_name.c_str());
 
-    // Read in dot wall disp if wall disp exists
+    // Read in dot wall disp
     std::string restart_dot_disp_name = "dot_" + restart_name + "_disp";
     SYS_T::file_check(restart_dot_disp_name.c_str());
     dot_sol_wall_disp->ReadBinary(restart_dot_disp_name.c_str());

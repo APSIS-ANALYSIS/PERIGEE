@@ -320,11 +320,11 @@ void PTime_CMM_Solver::TM_Prestress(
     // the tangent matrix
     if( nl_counter == 1 ) renew_flag = false;
 
-    // If solving for prestress, set disp and dot disp to zero
+    // Set (dot) velo and (dot) wall disp to zero
     pre_sol_wall_disp -> ScaleValue(0.0);
     pre_dot_sol_wall_disp -> ScaleValue(0.0);
-    Zero_velo_comp( pre_sol );
-    Zero_velo_comp( pre_dot_sol );
+    Zero_velo_comp( pre_sol, ebc_wall_part );
+    Zero_velo_comp( pre_dot_sol, ebc_wall_part );
  
     // Call the nonlinear equation solver
     nsolver_ptr->GenAlpha_Solve_Prestress( renew_flag, prestress_tol, 
@@ -374,25 +374,35 @@ void PTime_CMM_Solver::TM_Prestress(
   delete pre_dot_sol_wall_disp; delete cur_dot_sol_wall_disp;
 }
 
-void PTime_CMM_Solver::Zero_velo_comp( PDNSolution * const &sol ) const
+void PTime_CMM_Solver::Zero_velo_comp( PDNSolution * const &sol,
+    const ALocal_EBC * const &ebc_wall_part ) const
 {
-  const int nlocalnode = sol -> get_nlocalnode();
+  SYS_T::print_fatal_if(sol->get_dof_num() != 4,
+      "Error in PTime_CMM_Solver::Zero_velo_comp: incorrect dimension of sol. \n");
+
   Vec lsol;
-  VecGhostGetLocalForm( sol->solution, &lsol );
-  
   double * array_sol;
+
+  VecGhostGetLocalForm(sol->solution, &lsol);
+
   VecGetArray(lsol, &array_sol);
-  
-  for(int ii=0; ii<nlocalnode; ++ii)
+
+  const int num_snode = ebc_wall_part -> get_num_local_node_on_sur();
+
+  for(int ii=0; ii<num_snode; ++ii)
   {
-    array_sol[4*ii+1] = 0.0;
-    array_sol[4*ii+2] = 0.0;
-    array_sol[4*ii+3] = 0.0;
+    const int pos = ebc_wall_part -> get_local_node_on_sur_pos(ii);
+
+    array_sol[4*pos+1] = 0.0;
+    array_sol[4*pos+2] = 0.0;
+    array_sol[4*pos+3] = 0.0;
   }
 
+  // Deallocation of the local copy
   VecRestoreArray(lsol, &array_sol);
   VecGhostRestoreLocalForm(sol->solution, &lsol);
 
+  // Update ghost values
   sol -> GhostUpdate();
 }
 
