@@ -395,6 +395,10 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_Prestress(
 
     bc_mat->MatMultSol( dot_step );
 
+    // Skew boundary conditions for in-plane motion of ring nodes:
+    // Rotate ring node velo dofs back into the global Cartesian frame
+    rotate_ringbc( ringnbc_part, dot_step );
+
     // Update dot_sol, dot_sol_wall_disp
     dot_sol->PlusAX( dot_step, -1.0 );
     update_wall( (-1.0) * alpha_f * gamma * dt / alpha_m,
