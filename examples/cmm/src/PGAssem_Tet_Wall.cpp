@@ -365,8 +365,8 @@ void PGAssem_Tet_Wall::WallMembrane_KG(
         srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
     }
 
-    // RingBC_KG( ringnbc_part, dof_mat, dof_mat * snLocBas, dof_mat * snLocBas,
-    //     srow_index, srow_index, lassem_ptr->sur_Tangent, lassem_ptr->sur_Residual );
+    RingBC_KG( ringnbc_part, dof_mat, dof_mat * snLocBas, dof_mat * snLocBas,
+        srow_index, srow_index, lassem_ptr->sur_Tangent, lassem_ptr->sur_Residual );
 
     MatSetValues(K, dof_mat*snLocBas, srow_index, dof_mat*snLocBas, srow_index,
         lassem_ptr->sur_Tangent, ADD_VALUES);

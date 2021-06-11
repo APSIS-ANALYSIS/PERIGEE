@@ -9,6 +9,7 @@
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
 #include "ALocal_EBC_wall.hpp"
+#include "ALocal_Ring_NodalBC.hpp"
 #include "FEAElement_Triangle3_membrane.hpp"
 #include "FEAElement_Triangle6_membrane.hpp"
 #include "TimeMethod_GenAlpha.hpp"
@@ -138,6 +139,9 @@ int main( int argc, char *argv[] )
   // Local sub-domain's nodal (Dirichlet) BC
   ALocal_NodalBC * locnbc = new ALocal_NodalBC(part_file, rank);
 
+  // Local sub-domain's ring (Dirichlet) in-plane motion BC
+  ALocal_Ring_NodalBC * locringnbc = new ALocal_Ring_NodalBC(part_file, rank);
+
   // Local sub-domain's wall elemental (Neumann) BC for CMM
   ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, quads->get_num_quadPts(), "ebc_wall");
 
@@ -237,7 +241,6 @@ int main( int argc, char *argv[] )
   ICVFlowRate * inflow_rate_ptr = nullptr;
   IGenBC * gbc = nullptr;
   ALocal_Inflow_NodalBC * locinfnbc = nullptr;
-  ALocal_Ring_NodalBC * locringnbc = nullptr;
   ALocal_EBC * locebc = nullptr;
   IQuadPts * quadv = nullptr;
 
@@ -250,7 +253,7 @@ int main( int argc, char *argv[] )
   locebc_wall -> write_prestress_hdf5();
 
   // ===== Clean memory =====
-  delete locElem; delete fNode; delete locnbc; delete locIEN; delete pmat;
+  delete locElem; delete fNode; delete locnbc; delete locringnbc; delete locIEN; delete pmat;
   delete GMIptr; delete quads; delete elementw; delete locebc_wall; delete tm_galpha_ptr;
   delete pNode; delete locAssem_ptr; delete base; delete sol; delete dot_sol;
   delete sol_wall_disp; delete dot_sol_wall_disp; delete timeinfo; delete gloAssem_ptr;
