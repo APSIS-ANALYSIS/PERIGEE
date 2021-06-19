@@ -21,9 +21,9 @@ NodalBC_3D_CMM::NodalBC_3D_CMM( const int &nFunc, const bool &is_all_node )
   Create_ID( nFunc );
 
   if( is_all_node )
-    std::cout<<"===> NodalBC_3D_CMM: All nodal BC is generated. \n";
+    std::cout<<"===> NodalBC_3D_CMM: ALL nodal BC is generated.\n";
   else
-    std::cout<<"===> NodalBC_3D_CMM: No nodal BC is generated. \n";
+    std::cout<<"===> NodalBC_3D_CMM: NO nodal BC is generated.\n";
 }
 
 
