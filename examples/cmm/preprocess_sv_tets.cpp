@@ -250,7 +250,11 @@ int main( int argc, char * argv[] )
   // this includes all inlet interior nodes.
   std::vector<INodalBC *> NBC_list( dofMat, nullptr );
 
-  NBC_list[0] = new NodalBC_3D_CMM( nFunc );
+  if( cmmBC_type == 2 )
+    NBC_list[0] = new NodalBC_3D_CMM( nFunc, true );
+  else
+    NBC_list[0] = new NodalBC_3D_CMM( nFunc );
+
   NBC_list[1] = new NodalBC_3D_CMM( InFBC, ring_bc, wall_nbc, 0, nFunc, cmmBC_type );
   NBC_list[2] = new NodalBC_3D_CMM( InFBC, ring_bc, wall_nbc, 1, nFunc, cmmBC_type );
   NBC_list[3] = new NodalBC_3D_CMM( InFBC, ring_bc, wall_nbc, 2, nFunc, cmmBC_type );
