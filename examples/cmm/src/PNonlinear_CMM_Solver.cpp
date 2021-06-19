@@ -473,29 +473,24 @@ void PNonlinear_CMM_Solver::rescale_inflow_value( const double &stime,
     PDNSolution * const &sol ) const
 {
   const int numnode = infbc -> get_Num_LD();
-
-  const double val = flrate -> get_flow_rate( stime );
-
-  double base_vals[3];
-  int base_idx[3];
+  const double factor = flrate -> get_flow_rate( stime );
 
   for(int ii=0; ii<numnode; ++ii)
   {
     const int node_index = infbc -> get_LDN( ii );
 
-    base_idx[0] = node_index * 4 + 1;
-    base_idx[1] = node_index * 4 + 2;
-    base_idx[2] = node_index * 4 + 3;
+    const int base_idx[3] = { node_index*4+1, node_index*4+2, node_index*4+3 };
 
+    double base_vals[3];
+    
     VecGetValues(sol_base->solution, 3, base_idx, base_vals);
 
-    VecSetValue(sol->solution, node_index*4+1, base_vals[0] * val, INSERT_VALUES);
-    VecSetValue(sol->solution, node_index*4+2, base_vals[1] * val, INSERT_VALUES);
-    VecSetValue(sol->solution, node_index*4+3, base_vals[2] * val, INSERT_VALUES);
+    const double vals[3] = { base_vals[0] * factor, base_vals[1] * factor, base_vals[2] * factor };
+
+    VecSetValues(sol->solution, 3, base_idx, vals, INSERT_VALUES);
   }
 
-  VecAssemblyBegin(sol->solution); VecAssemblyEnd(sol->solution);
-  sol->GhostUpdate();
+  sol->Assembly_GhostUpdate();
 }
 
 
@@ -576,13 +571,10 @@ void PNonlinear_CMM_Solver::rotate_ringbc(
       // rot_vals = Q * vals
       Q.VecMult( vals, rot_vals );
 
-      VecSetValue(dot_step->solution, dnode*4+1, rot_vals[0], INSERT_VALUES);
-      VecSetValue(dot_step->solution, dnode*4+2, rot_vals[1], INSERT_VALUES);
-      VecSetValue(dot_step->solution, dnode*4+3, rot_vals[2], INSERT_VALUES);
+      VecSetValues(dot_step->solution, 3,  idx, rot_vals, INSERT_VALUES);
     }
 
-    VecAssemblyBegin(dot_step->solution); VecAssemblyEnd(dot_step->solution);
-    dot_step->GhostUpdate();
+    dot_step->Assembly_GhostUpdate();
   }
   else
     SYS_T::print_fatal("Error: this ringbc_type is not supported in PNonlinear_CMM_Solver.\n");
