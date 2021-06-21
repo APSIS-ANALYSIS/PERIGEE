@@ -1,8 +1,6 @@
 #include "APart_Node_FSI.hpp"
 
-APart_Node_FSI::APart_Node_FSI(const std::string &fileBaseName, 
-    const int &rank, const ALocal_Elem * const &lelem,
-    const ALocal_IEN * const &lIEN )
+APart_Node_FSI::APart_Node_FSI(const std::string &fileBaseName, const int &rank )
 : APart_Node(fileBaseName, rank)
 {
   std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
@@ -17,21 +15,19 @@ APart_Node_FSI::APart_Node_FSI(const std::string &fileBaseName,
   nlocalnode_solid = h5r -> read_intScalar( gname.c_str(), "nlocalnode_solid" );
 
   if(nlocalnode_fluid > 0)
-    h5r -> read_intVector( gname.c_str(), "node_loc_fluid", node_loc_fluid );
+    node_loc_fluid = h5r -> read_intVector( gname.c_str(), "node_loc_fluid" );
 
   if(nlocalnode_solid > 0)
-    h5r -> read_intVector( gname.c_str(), "node_loc_solid", node_loc_solid );
+    node_loc_solid = h5r -> read_intVector( gname.c_str(), "node_loc_solid" );
 
   delete h5r; H5Fclose( file_id );
 }
-
 
 APart_Node_FSI::~APart_Node_FSI()
 {
   VEC_T::clean(node_loc_solid);
   VEC_T::clean(node_loc_fluid);
 }
-
 
 void APart_Node_FSI::print_info() const
 {

@@ -23,14 +23,11 @@
 // Date: Aug. 10 2017
 // ==================================================================
 #include "APart_Node.hpp"
-#include "ALocal_Elem_wTag.hpp"
-#include "ALocal_IEN.hpp"
 
 class APart_Node_FSI : public APart_Node
 {
   public:
-    APart_Node_FSI(const std::string &fileBaseName, const int &rank,
-        const ALocal_Elem * const &lelem, const ALocal_IEN * const &lIEN );
+    APart_Node_FSI(const std::string &fileBaseName, const int &rank );
 
     virtual ~APart_Node_FSI();
 
@@ -49,11 +46,9 @@ class APart_Node_FSI : public APart_Node
     {return node_loc_fluid[index];}
 
   private:
-    int nlocalnode_solid;
-    std::vector<int> node_loc_solid; 
-
-    int nlocalnode_fluid;
-    std::vector<int> node_loc_fluid;
+    int nlocalnode_solid, nlocalnode_fluid;
+    
+    std::vector<int> node_loc_solid, node_loc_fluid;
 };
 
 #endif
