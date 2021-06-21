@@ -3,7 +3,7 @@
 # ========================================================
 # Specify the library locations
 # ========================================================
-set(VTK_DIR /work/mae-liuj/lib/VTK-8.2.0-shared/lib/cmake/vtk-8.2)
+set(VTK_DIR /work/mae-liuj/lib/VTK-8.2.0-shared/lib64/cmake/vtk-8.2)
 
 set(PETSC_DIR /work/mae-liuj/lib/petsc-3.10.5-opt)
 set(PETSC_ARCH .)
@@ -36,7 +36,7 @@ message(STATUS "External Libraries: " ${EXTRA_LINK_LIBS})
 # ===================================================================
 set(CMAKE_C_COMPILER  /work/mae-liuj/lib/mpich-3.3rc1/bin/mpicc)
 set(CMAKE_CXX_COMPILER  /work/mae-liuj/lib/mpich-3.3rc1/bin/mpicxx)
-set(CMAKE_CXX_FLAGS "-O3 -xhost -Wall")
+set(CMAKE_CXX_FLAGS "-O3 -Wall")
 set(CMAKE_BUILD_TYPE RELEASE)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_VERBOSE_MAKEFILE OFF)
