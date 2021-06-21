@@ -807,35 +807,33 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Residual_EBC(
 
   const int face_nqp = quad -> get_num_quadPts();
 
-  int ii, qua, A;
-  double gwts, coor_x, coor_y, coor_z, gx, gy, gz, nx, ny, nz, surface_area;
+  double gx, gy, gz, surface_area;
   const double curr = time + alpha_f * dt;
 
   Zero_Residual();
 
-  for(qua = 0; qua < face_nqp; ++qua)
+  for(int qua = 0; qua < face_nqp; ++qua)
   {
     element->get_R(qua, R);
-    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
 
-    coor_x = 0.0; coor_y = 0.0; coor_z = 0.0;
-    for(ii=0; ii<snLocBas; ++ii)
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+
+    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    for(int ii=0; ii<snLocBas; ++ii)
     {
       coor_x += eleCtrlPts_x[ii] * R[ii];
       coor_y += eleCtrlPts_y[ii] * R[ii];
       coor_z += eleCtrlPts_z[ii] * R[ii];
     }
 
-    get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr, nx, ny, nz,
-        gx, gy, gz );
+    get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr,
+        n_out.x(), n_out.y(), n_out.z(), gx, gy, gz );
 
-    gwts = surface_area * quad -> get_qw(qua);
-
-    for(A=0; A<snLocBas; ++A)
+    for(int A=0; A<snLocBas; ++A)
     {
-      Residual[4*A+1] -= gwts * R[A] * gx;
-      Residual[4*A+2] -= gwts * R[A] * gy;
-      Residual[4*A+3] -= gwts * R[A] * gz;
+      Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * gx;
+      Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * gy;
+      Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * gz;
     }
   }
 }
