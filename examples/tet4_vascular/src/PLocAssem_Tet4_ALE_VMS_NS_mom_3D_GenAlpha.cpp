@@ -925,21 +925,21 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual_EBC_Resistance(
 
   const int face_nqp = quad -> get_num_quadPts();
 
-  double nx, ny, nz, surface_area;
+  double surface_area;
 
   Zero_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
     element->get_R(qua, R);
-    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
-    const double gwts = surface_area * quad -> get_qw(qua);
+    
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual[4*A+1] += gwts * R[A] * nx * val;
-      Residual[4*A+2] += gwts * R[A] * ny * val;
-      Residual[4*A+3] += gwts * R[A] * nz * val;
+      Residual[4*A+1] += surface_area * quad -> get_qw(qua) * R[A] * nx * val;
+      Residual[4*A+2] += surface_area * quad -> get_qw(qua) * R[A] * ny * val;
+      Residual[4*A+3] += surface_area * quad -> get_qw(qua) * R[A] * nz * val;
     }
   }
 }
