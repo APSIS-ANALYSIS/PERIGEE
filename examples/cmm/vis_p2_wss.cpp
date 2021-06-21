@@ -58,10 +58,9 @@ int main( int argc, char * argv[] )
 
   const int dof = 4; 
 
-  PetscMPIInt size;
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-  MPI_Comm_size(PETSC_COMM_WORLD, &size);
-  SYS_T::print_fatal_if(size!=1, "ERROR: vis_tet10_wss is a serial program! \n");
+  
+  SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: preprocessor needs to be run in serial.\n");
 
   // Read the geometry file name from preprocessor hdf5 file
   hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);

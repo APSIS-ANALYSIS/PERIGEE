@@ -49,10 +49,9 @@ int main( int argc, char * argv[] )
   
   const int dof = 4;
 
-  PetscMPIInt size;
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-  MPI_Comm_size(PETSC_COMM_WORLD, &size);
-  SYS_T::print_fatal_if(size!=1, "ERROR: vis_tet4_wss is a serial program! \n");
+
+  SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: preprocessor needs to be run in serial.\n");
 
   // Directly read in the volumetric and wall file from the file
   // that record the preprocessor command lines.
