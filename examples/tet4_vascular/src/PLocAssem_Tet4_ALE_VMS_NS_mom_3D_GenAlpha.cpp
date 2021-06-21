@@ -830,8 +830,6 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual_EBC(
     get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr, 
         n_out.x(), n_out.y(), n_out.z(), gx, gy, gz );
 
-    const double gwts = surface_area * quad -> get_qw(qua);
-
     for(int A=0; A<snLocBas; ++A)
     {
       Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * gx;
@@ -895,24 +893,18 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::get_pressure_area(
 
   const int face_nqp = quad -> get_num_quadPts();
 
-  double nx, ny, nz, surface_area;
-
   // Initialize the two variables to be passed out
-  pres = 0.0;
-  area = 0.0;
+  pres = 0.0; area = 0.0;
 
   for(int qua =0; qua< face_nqp; ++qua)
   {
     element->get_R(qua, R);
-    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
 
     double pp = 0.0;
     for(int ii=0; ii<snLocBas; ++ii) pp += vec[7*ii+3] * R[ii];
     
-    const double gwts = surface_area * quad->get_qw(qua);
-    
-    pres += gwts * pp; 
-    area += gwts;
+    pres += element->get_detJac(qua) * quad->get_qw(qua) * pp; 
+    area += element->get_detJac(qua) * quad->get_qw(qua);
   }
 }
 
