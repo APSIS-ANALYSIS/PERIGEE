@@ -15,12 +15,10 @@ ALocal_Elem_wTag::ALocal_Elem_wTag( const std::string &fileBaseName,
   delete h5r; H5Fclose( file_id );
 }
 
-
 ALocal_Elem_wTag::~ALocal_Elem_wTag()
 {
   VEC_T::clean(elem_tag);
 }
-
 
 void ALocal_Elem_wTag::print_info() const
 {

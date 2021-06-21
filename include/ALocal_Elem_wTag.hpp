@@ -1,21 +1,19 @@
 #ifndef ALOCAL_ELEM_WTAG_HPP
 #define ALOCAL_ELEM_WTAG_HPP
-// ==================================================================
+// ============================================================================
 // ALocal_Elem_wTag.hpp
 //
-// Analysis-use Local element class with physical tags to identify
-// different sub-domains, where the governing equations are different.
+// Analysis-use Local element class with physical tags to identify different 
+// sub-domains, where the governing equations are different.
 // 
-// The additional data elem_tag is an integer array with length
-// nlocalele. elem_tag[ii] records the elem_loc[ii]'s physical domain
-// tag.
+// The additional data elem_tag is an integer array with length nlocalele. 
+// elem_tag[ii] records the elem_loc[ii]'s physical domain tag.
 //
-// In FSI problems, we assume tag 0 gives fluid element; tag 1 gives
-// solid element.
+// In FSI problems, we assume tag 0 gives fluid element; tag 1 gives solid element.
 //
 // Date: July 28 2017
 // Author: Ju Liu
-// ==================================================================
+// ============================================================================
 #include "ALocal_Elem.hpp"
 
 class ALocal_Elem_wTag : public ALocal_Elem
