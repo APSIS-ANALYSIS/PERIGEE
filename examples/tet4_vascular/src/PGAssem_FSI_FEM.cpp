@@ -406,7 +406,7 @@ void PGAssem_FSI_FEM::Assem_mass_residual(
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    lien_ptr->get_LIEN_e(ee, IEN_e);
+    lien_ptr->get_LIEN(ee, IEN_e);
     GetLocal(array_a, IEN_e, local_a);
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
@@ -480,7 +480,7 @@ void PGAssem_FSI_FEM::Assem_residual(
 
   for( int ee=0; ee<nElem; ++ee )
   {
-    lien_ptr->get_LIEN_e(ee, IEN_e);
+    lien_ptr->get_LIEN(ee, IEN_e);
     GetLocal(array_a, IEN_e, local_a);
     GetLocal(array_b, IEN_e, local_b);
 
@@ -555,7 +555,7 @@ void PGAssem_FSI_FEM::Assem_tangent_residual(
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    lien_ptr->get_LIEN_e(ee, IEN_e);
+    lien_ptr->get_LIEN(ee, IEN_e);
     GetLocal(array_a, IEN_e, local_a);
     GetLocal(array_b, IEN_e, local_b);
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
