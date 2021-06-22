@@ -70,7 +70,7 @@ void VTK_Writer_FSI_Tet4::writeOutput(
 
   for(int ee=0; ee<lelem_ptr->get_nlocalele(); ++ee)
   {
-    lien_ptr -> get_LIEN_e(ee, IEN_e);
+    lien_ptr -> get_LIEN(ee, IEN_e);
     fnode_ptr -> get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
     elemptr->buildBasis( quad, ectrl_x, ectrl_y, ectrl_z );
 
@@ -238,7 +238,7 @@ void VTK_Writer_FSI_Tet4::writeOutput_fluid(
   {
     if( lelem_ptr->get_elem_tag(ee) == 0 )
     {
-      lien_ptr -> get_LIEN_e(ee, IEN_e);
+      lien_ptr -> get_LIEN(ee, IEN_e);
 
       fnode_ptr -> get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
@@ -449,7 +449,7 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid(
   {
     if( lelem_ptr->get_elem_tag(ee) == 1 )
     {
-      lien_ptr -> get_LIEN_e(ee, IEN_e);
+      lien_ptr -> get_LIEN(ee, IEN_e);
 
       fnode_ptr -> get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
@@ -603,7 +603,7 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_ref(
   {
     if( lelem_ptr->get_elem_tag(ee) == 1 )
     {
-      lien_ptr -> get_LIEN_e(ee, IEN_e);
+      lien_ptr -> get_LIEN(ee, IEN_e);
 
       fnode_ptr -> get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 

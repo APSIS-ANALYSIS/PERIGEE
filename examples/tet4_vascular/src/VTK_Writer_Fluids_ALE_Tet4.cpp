@@ -61,7 +61,7 @@ void VTK_Writer_Fluids_ALE_Tet4::writeOutput(
 
   for(int ee=0; ee<lelem_ptr->get_nlocalele(); ++ee)
   {
-    lien_ptr -> get_LIEN_e(ee, IEN_e);
+    lien_ptr -> get_LIEN(ee, IEN_e);
 
     fnode_ptr -> get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 

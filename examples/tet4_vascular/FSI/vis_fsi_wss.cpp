@@ -35,12 +35,9 @@ int main( int argc, char * argv[] )
 
   int time_index = 0;
 
-  std::string geo_file, wall_file;
-
-  PetscMPIInt size;
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-  MPI_Comm_size(PETSC_COMM_WORLD, &size);
-  SYS_T::print_fatal_if(size!=1, "ERROR: preprocessor is a serial program! \n");
+  
+  SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: preprocessor needs to be run in serial.\n");
 
   SYS_T::GetOptionString("-sol_bname", sol_bname);
   SYS_T::GetOptionReal("-fl_mu", fluid_mu);
@@ -53,8 +50,9 @@ int main( int argc, char * argv[] )
   hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
-  cmd_h5r -> read_string("/", "geo_file", geo_file);
-  cmd_h5r -> read_string("/", "sur_f_file_wall", wall_file);
+  
+  const std::string geo_file = cmd_h5r -> read_string("/", "geo_file");
+  const std::string wall_file = cmd_h5r -> read_string("/", "sur_f_file_wall");
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 

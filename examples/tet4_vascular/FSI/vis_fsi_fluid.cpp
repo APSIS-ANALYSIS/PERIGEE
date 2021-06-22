@@ -81,7 +81,7 @@ int main( int argc, char * argv[] )
   IAGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info_FEM_3D(part_file, rank);
   APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file, rank);
   ALocal_Elem * locElem = new ALocal_Elem_wTag(part_file, rank);
-  APart_Node * pNode = new APart_Node_FSI(part_file, rank, locElem, locIEN);
+  APart_Node * pNode = new APart_Node_FSI(part_file, rank);
   SYS_T::commPrint("Done! \n");
 
   SYS_T::print_fatal_if(size != PartBasic->get_cpu_size(),
@@ -103,7 +103,7 @@ int main( int argc, char * argv[] )
   {
     if( locElem -> get_elem_tag(ee) == 0 )
     {
-      locIEN -> get_LIEN_e(ee, eien);
+      eien = locIEN -> get_LIEN(ee);
       VEC_T::insert_end(subdomain_nodes, eien);
     }
   }

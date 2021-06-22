@@ -35,6 +35,7 @@ SET( perigee_source ${perigee_SOURCE_DIR}/../../../src )
 SET( perigee_preprocess_lib_src 
   ${perigee_source}/System/Sys_Tools.cpp
   ${perigee_source}/System/Vector_3.cpp
+  ${perigee_source}/System/Matrix_3x3.cpp
   ${perigee_source}/System/Matrix_double_3by3_Array.cpp
   ${perigee_source}/System/Math_Tools.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
@@ -175,11 +176,10 @@ ADD_EXECUTABLE( vis_fsi_wss vis_fsi_wss.cpp)
 TARGET_LINK_LIBRARIES( gmshIO ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( preprocess_fsi ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( fsi_tet4_3d ${EXTRA_LINK_LIBS} perigee_analysis )
-TARGET_LINK_LIBRARIES( prepostproc ${EXTRA_LINK_LIBS} perigee_analysis 
-    perigee_preprocess )
+TARGET_LINK_LIBRARIES( prepostproc ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( vis_fsi ${EXTRA_LINK_LIBS} perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_fsi_fluid ${EXTRA_LINK_LIBS} perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_fsi_solid ${EXTRA_LINK_LIBS} perigee_postprocess )
-TARGET_LINK_LIBRARIES( vis_fsi_wss ${EXTRA_LINK_LIBS} perigee_preprocess perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_fsi_wss ${EXTRA_LINK_LIBS} perigee_postprocess )
 
 #EOF

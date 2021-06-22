@@ -86,11 +86,10 @@ int main(int argc, char *argv[])
   std::string restart_name = "SOL_";
 
   // ===== Initialization of PETSc =====
-  PetscMPIInt rank, size;
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
-  MPI_Comm_size(PETSC_COMM_WORLD, &size);
-  MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
+  const PetscMPIInt rank = SYS_T::get_MPI_rank();
+  const PetscMPIInt size = SYS_T::get_MPI_size();
   
   // ===== Command Line Argument =====
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
@@ -203,7 +202,7 @@ int main(int argc, char *argv[])
   
   ALocal_EBC * mesh_locebc = new ALocal_EBC(part_file, rank, "mesh_ebc");
   
-  APart_Node * pNode = new APart_Node_FSI(part_file, rank, locElem, locIEN);
+  APart_Node * pNode = new APart_Node_FSI(part_file, rank);
   
   SYS_T::commPrint("===> Mesh HDF5 files are read from disk.\n");
 

@@ -31,12 +31,9 @@
 int main( int argc, char * argv[] )
 {
   // Remove previously existing hdf5 files
-  int sysret = system("rm -rf part_p*.h5");
-  SYS_T::print_fatal_if(sysret != 0, "Error: system call failed. \n");
-  sysret = system("rm -rf preprocessor_cmd.h5");
-  SYS_T::print_fatal_if(sysret != 0, "Error: system call failed. \n");
-  sysret = system("rm -rf NumLocalNode.h5");
-  SYS_T::print_fatal_if(sysret != 0, "Error: system call failed. \n");
+  SYS_T::execute("rm -rf part_p*.h5");
+  SYS_T::execute("rm -rf preprocessor_cmd.h5");
+  SYS_T::execute("rm -rf NumLocalNode.h5");
 
   // Define basic settings
   const int dofNum = 7; // degree-of-freedom for the physical problem
@@ -65,13 +62,9 @@ int main( int argc, char * argv[] )
   int in_ncommon = 2;
   const bool isDualGraph = true;
 
-  PetscMPIInt size;
-
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
-  MPI_Comm_size(PETSC_COMM_WORLD, &size);
-
-  if(size != 1) SYS_T::print_fatal("ERROR: preprocessor is a serial program! \n");
+  SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: preprocessor needs to be run in serial.\n");
 
   SYS_T::GetOptionInt("-cpu_size", cpu_size);
   SYS_T::GetOptionInt("-in_ncommon", in_ncommon);
@@ -122,33 +115,13 @@ int main( int argc, char * argv[] )
 
   SYS_T::file_check(sur_s_file_wall); std::cout<<sur_s_file_wall<<" found. \n";
 
-  std::vector< std::string > sur_f_file_out;
-  std::vector< std::string > sur_s_file_out;
-
-  sur_f_file_out.resize( num_outlet );
-  sur_s_file_out.resize( num_outlet );
+  std::vector< std::string > sur_f_file_out( num_outlet );
+  std::vector< std::string > sur_s_file_out( num_outlet );
 
   for(int ii=0; ii<num_outlet; ++ii)
   {
-    std::ostringstream sf, ss;
-    sf<<sur_f_file_out_base;
-    ss<<sur_s_file_out_base;
-    if( ii/10 == 0 )
-    {
-      sf << "00";
-      ss << "00";
-    }
-    else if( ii/100 == 0 )
-    {
-      sf << "0";
-      ss << "0";
-    }
-
-    sf<<ii<<".vtp";
-    ss<<ii<<".vtp";
-
-    sur_f_file_out[ii] = sf.str();
-    sur_s_file_out[ii] = ss.str();
+    sur_f_file_out[ii] = SYS_T::gen_capfile_name( sur_f_file_out_base, ii, ".vtp" );
+    sur_s_file_out[ii] = SYS_T::gen_capfile_name( sur_s_file_out_base, ii, ".vtp" );
 
     SYS_T::file_check( sur_f_file_out[ii] );
     std::cout<<sur_f_file_out[ii]<<" found. \n";
@@ -156,9 +129,13 @@ int main( int argc, char * argv[] )
     std::cout<<sur_s_file_out[ii]<<" found. \n";
   } 
 
+  // If we can still detect additional files on disk, throw an warning
+  if( SYS_T::file_exist(SYS_T::gen_capfile_name(sur_f_file_out_base, num_outlet, ".vtp")) ||
+      SYS_T::file_exist(SYS_T::gen_capfile_name(sur_s_file_out_base, num_outlet, ".vtp")) )
+    cout<<endl<<"Warning: there are additional outlet surface files on disk. Check num_outlet please.\n\n";
+
   // ----- Write the input argument into a HDF5 file
-  hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5",
-      H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+  hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
   HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
 
   cmdh5w->write_intScalar("num_outlet", num_outlet);
@@ -228,7 +205,7 @@ int main( int argc, char * argv[] )
   mesh -> print_info();
 
   // Partition
-  IGlobal_Part * global_part;
+  IGlobal_Part * global_part = nullptr;
   if(cpu_size > 1)
     global_part = new Global_Part_METIS( cpu_size, in_ncommon,
         isDualGraph, mesh, IEN, "epart", "npart" );
@@ -247,9 +224,7 @@ int main( int argc, char * argv[] )
   // Setup boundary conditions
   // Physics NBC
   std::cout<<"Boundary condition for the implicit solver: \n";
-  std::vector<INodalBC *> NBC_list;
-  NBC_list.clear();
-  NBC_list.resize( dofMat );
+  std::vector<INodalBC *> NBC_list( dofMat, nullptr );
 
   std::vector<std::string> dir_list;
   dir_list.push_back( sur_f_file_in );
@@ -263,29 +238,26 @@ int main( int argc, char * argv[] )
 
   // Mesh NBC
   std::cout<<"Boundary condition for the mesh motion: \n";
-  std::vector<INodalBC *> meshBC_list; meshBC_list.clear();
-  meshBC_list.resize( 3 );
+  std::vector<INodalBC *> meshBC_list( 3, nullptr );
+  
   std::vector<std::string> meshdir_vtp_list; meshdir_vtp_list.clear();
   meshdir_vtp_list.push_back( sur_f_file_in );
-  for(int ii=0; ii<num_outlet; ++ii) 
-    meshdir_vtp_list.push_back( sur_f_file_out[ii] );
+  for(int ii=0; ii<num_outlet; ++ii) meshdir_vtp_list.push_back( sur_f_file_out[ii] );
 
   meshBC_list[0] = new NodalBC_3D_vtu( geo_s_file, meshdir_vtp_list, nFunc );
   meshBC_list[1] = new NodalBC_3D_vtu( geo_s_file, meshdir_vtp_list, nFunc );
   meshBC_list[2] = new NodalBC_3D_vtu( geo_s_file, meshdir_vtp_list, nFunc );
 
   // Generate inflow bc info
-  Vector_3 inlet_outvec; // inflow surface outward normal vec
-  TET_T::get_out_normal( sur_f_file_in, ctrlPts, IEN, inlet_outvec );
-  INodalBC * InFBC = new NodalBC_3D_inflow( sur_f_file_in, sur_f_file_wall,
-      nFunc, inlet_outvec ); 
+  const Vector_3 inlet_outvec = TET_T::get_out_normal( sur_f_file_in, ctrlPts, IEN );
+  INodalBC * InFBC = new NodalBC_3D_inflow( sur_f_file_in, sur_f_file_wall, nFunc, inlet_outvec ); 
 
   // Elemental BC
   cout<<"Elem boundary for the implicit solver: \n";
-  std::vector< Vector_3 > outlet_outvec;
-  outlet_outvec.resize( num_outlet );
+  std::vector< Vector_3 > outlet_outvec( num_outlet );
+  
   for(int ii=0; ii<num_outlet; ++ii)
-    TET_T::get_out_normal( sur_f_file_out[ii], ctrlPts, IEN, outlet_outvec[ii] );
+    outlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_out[ii], ctrlPts, IEN );
 
   ElemBC * ebc = new ElemBC_3D_tet_outflow( sur_f_file_out, outlet_outvec );
 
