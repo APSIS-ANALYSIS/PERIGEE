@@ -15,6 +15,7 @@ Some of the libraries are not required for building the code. Typically, we requ
 - [Create a lib folder](#Create-a-lib-folder)
 - [Install Valgrind](#Install-Valgrind)
 - [Install CMake](#Install-CMake)
+- [Install MPICH](#Install-MPICH)
 - [Install VTK](#Install-VTK)
 - [Install PETSc](#Install-PETSc)
 - [Install HDF5](#Install-HDF5)
@@ -56,6 +57,26 @@ If you are using a cluster, cmake can be loaded by
 ```sh
 $ module load cmake
 ```
+## Install MPICH
+First, download the source file, extract the tar bar, and rename the folder as a source folder:
+```
+$wget https://www.mpich.org/static/downloads/3.3rc1/mpich-3.3rc1.tar.gz
+tar -zxvf mpich-3.3rc1.tar.gz
+mv mpich-3.3rc1 mpich-3.3rc1-src
+```
+Note that you may want to go to https://www.mpich.org/static/downloads/ to select the version of the MPICH implementation. Versions 3.2 and 3.3 are conservative choices. Now you may enter the folder and do the following to install MPICH at the prescribed location.
+```
+./configure --prefix=$HOME/lib/mpich-3.3rc1 2>&1 | tee c.txt
+make 2>&1 | tee m.txt
+make install 2>&1 | tee mi.txt
+```
+You may want to add the bin folder to PATH:
+```
+vi ~/.bashrc
+export PATH=mpich-install/bin:$PATH
+```
+so that the system will call the installed mpich binaries.
+
 
 ## Install VTK
 The PERIGEE code is compatible with VTK-5, VTK-6, and VTK-7. In the following, we demonstrate steps for compiling VTK-7.1.1.
