@@ -112,7 +112,7 @@ class IPGAssem
         IPLocAssem * const &lassem_ptr,
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
-        const IALocal_BC * const &bc_part )
+        const ALocal_NodalBC * const &nbc_part )
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
 
 
