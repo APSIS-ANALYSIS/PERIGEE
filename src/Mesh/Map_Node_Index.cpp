@@ -1,7 +1,7 @@
 #include "Map_Node_Index.hpp"
 
 Map_Node_Index::Map_Node_Index( const IGlobal_Part * const &gpart,
-    const int &cpu_size, const int nFunc )
+    const int &cpu_size, const int &nFunc )
 {
   int newnum = 0;
   old_2_new.resize(nFunc);
