@@ -248,26 +248,10 @@ int Part_Tet::get_elemLocIndex(const int &gloindex) const
 
 void Part_Tet::write( const char * inputFileName ) const
 {
-  std::string fName( inputFileName );
-  fName.append("_p");
+  const std::string input_fName( inputFileName );
+  std::string fName = SYS_T::gen_partfile_name( input_fName, cpu_rank );
 
-  if( cpu_rank / 10 == 0 )
-    fName.append("0000");
-  else if( cpu_rank / 100 == 0 )
-    fName.append("000");
-  else if( cpu_rank / 1000 == 0 )
-    fName.append("00");
-  else if( cpu_rank / 10000 == 0 )
-    fName.append("0");
-
-  std::stringstream sstrm;
-  sstrm<<cpu_rank;
-  fName.append(sstrm.str());
-
-  fName.append(".h5");
-
-  hid_t file_id;
-  file_id = H5Fcreate(fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+  hid_t file_id = H5Fcreate(fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
   
   HDF5_Writer * h5w = new HDF5_Writer(file_id);
 
