@@ -17,16 +17,19 @@
 // Date Created: Oct 3 2013
 // ==================================================================
 #include "IGlobal_Part.hpp"
-#include "Sys_Tools.hpp"
-#include "Vec_Tools.hpp"
 #include "HDF5_Writer.hpp"
+#include "HDF5_Reader.hpp"
 
 class Map_Node_Index
 {
   public:
+    // Construct the index mapping based on the partitioning
     Map_Node_Index( const IGlobal_Part * const &gpart,
         const int &cpu_size, const int &nFunc );
-    
+
+    // Load the index mapping from file on disk
+    Map_Node_Index( const char * const &fileName );
+
     virtual ~Map_Node_Index();
 
     // Map the natural node numbering to the new numbering based on

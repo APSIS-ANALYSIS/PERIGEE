@@ -27,8 +27,27 @@ Map_Node_Index::Map_Node_Index( const IGlobal_Part * const &gpart,
   
   std::cout<<"-- mapping generated. Memory usage: ";
   SYS_T::print_mem_size( double(old_2_new.size())*2.0*sizeof(int) );
-  std::cout<<std::endl;
-  std::cout<<"=== Node index mapping generated.\n";
+  std::cout<<std::endl<<"=== Node index mapping generated.\n";
+}
+
+Map_Node_Index::Map_Node_Index( const char * const &fileName )
+{
+  std::cout<<"-- loading old2new & new2old index mapping from disk. \n";
+  std::string fName( fileName );
+  fName.append(".h5");
+
+  hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
+
+  HDF5_Reader * h5r = new HDF5_Reader( file_id );
+
+  old_2_new = h5r -> read_intVector("/", "old_2_new");
+  new_2_old = h5r -> read_intVector("/", "new_2_old");
+
+  delete h5r; H5Fclose( file_id );
+  
+  std::cout<<"-- mapping generated. Memory usage: ";
+  SYS_T::print_mem_size( double(old_2_new.size())*2.0*sizeof(int) );
+  std::cout<<std::endl<<"=== Node index mapping loaded.\n";
 }
 
 Map_Node_Index::~Map_Node_Index()
