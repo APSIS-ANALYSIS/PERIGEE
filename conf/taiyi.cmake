@@ -34,8 +34,8 @@ message(STATUS "External Libraries: " ${EXTRA_LINK_LIBS})
 # ===================================================================
 # Compiler options
 # ===================================================================
-set(CMAKE_C_COMPILER  /work/mae-liuj/lib/mpich-3.3rc1/bin/mpicc)
-set(CMAKE_CXX_COMPILER  /work/mae-liuj/lib/mpich-3.3rc1/bin/mpicxx)
+set(CMAKE_C_COMPILER /share/intel/2018u4/compilers_and_libraries_2018.5.274/linux/mpi/intel64/bin/mpicc)
+set(CMAKE_CXX_COMPILER /share/intel/2018u4/compilers_and_libraries_2018.5.274/linux/mpi/intel64/bin/mpicxx)
 set(CMAKE_CXX_FLAGS "-O3 -Wall")
 set(CMAKE_BUILD_TYPE RELEASE)
 set(CMAKE_CXX_STANDARD 11)
