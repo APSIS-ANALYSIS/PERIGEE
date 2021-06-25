@@ -54,33 +54,15 @@ void Map_Node_Index::write_hdf5( const char * const &fileName ) const
   std::string fName(fileName);
   fName.append(".h5");
   
-  hid_t file_id, dataspace_id;
-  hsize_t dim[1];
-
   // file creation
-  file_id = H5Fcreate( fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
+  hid_t file_id = H5Fcreate( fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
 
-  // dataspace
-  dim[0] = old_2_new.size();
-  dataspace_id = H5Screate_simple(1, dim, NULL);
+  HDF5_Writer * h5w = new HDF5_Writer(file_id);
 
-  // dataset
-  hid_t setid1;
-  setid1 = H5Dcreate(file_id, "old_2_new", H5T_NATIVE_INT, dataspace_id,
-      H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-  H5Dwrite(setid1, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT,
-      &old_2_new[0]);
-  H5Dclose(setid1);
+  h5w -> write_intVector( "old_2_new", old_2_new );
+  h5w -> write_intVector( "new_2_old", new_2_old );
 
-  hid_t setid2;
-  setid2 = H5Dcreate(file_id, "new_2_old", H5T_NATIVE_INT, dataspace_id,
-      H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-  H5Dwrite(setid2, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT,
-      &new_2_old[0]);
-  H5Dclose(setid2);
-
-  H5Sclose(dataspace_id);
-  H5Fclose(file_id);
+  delete h5w; H5Fclose(file_id);
 }
 
 // EOF
