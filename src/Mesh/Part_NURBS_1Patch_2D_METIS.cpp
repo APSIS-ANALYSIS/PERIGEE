@@ -19,8 +19,6 @@ Part_NURBS_1Patch_2D_METIS::Part_NURBS_1Patch_2D_METIS( const IMesh * const &mes
   elemType = in_elemType;
   probDim  = 2;
 
-  isMETIS = gpart->get_isMETIS();
-  part_isdual = gpart->get_isDual();
   dual_edge_ncommon = gpart->get_dual_edge_ncommon();
 
   if( cpu_size < 1 )
@@ -111,8 +109,6 @@ bool Part_NURBS_1Patch_2D_METIS::isNodeInPart(int gloindex) const
 void Part_NURBS_1Patch_2D_METIS::print_info() const
 {
   std::cout<<"=================================="<<std::endl;
-  std::cout<<"isMETIS: "<<get_isMETIS()<<std::endl;
-  std::cout<<"isDual: "<<get_part_isDual()<<std::endl;
   std::cout<<"dual_dege_ncommon: "<<get_dual_edge_ncommon()<<std::endl;
   std::cout<<"=================================="<<std::endl;
 

@@ -67,8 +67,6 @@ class Part_FEM : public IPart
     virtual int get_nlocghonode() const {return nlocghonode;}
     virtual int get_cpu_rank() const {return cpu_rank;}
     virtual int get_cpu_size() const {return cpu_size;}
-    virtual bool get_part_isDual() const {return part_isdual;}
-    virtual bool get_isMETIS() const {return isMETIS;}
     virtual int get_dual_edge_ncommon() const {return dual_edge_ncommon;}
 
     virtual int get_nElem() const {return nElem;}
@@ -102,7 +100,6 @@ class Part_FEM : public IPart
 
     // 3. CPU info and partition parameters
     const int cpu_rank, cpu_size;
-    const bool isMETIS, part_isdual;
     const int dual_edge_ncommon;
 
     // 4. global mesh info

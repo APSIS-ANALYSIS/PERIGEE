@@ -26,7 +26,7 @@
 //     local_to_global[ LIEN[e][i] ] = IEN[ elem_loc[e] ][ i ].
 // 7. cpu_rank, cpu_size: MPI parameters telling the number of total
 //    processors and the id of this processor.
-// 8. bool isdual, int dual_edge_ncommon, bool isMETIS: parameters that
+// 8. int dual_edge_ncommon: parameters that
 //    deifine the partition.
 // 9. nElem, nElem_x, nElem_y, nElem_z, nFunc, nFunc_x, nFunc_y, nFunc_z
 //    hx_max hy_max, hz_max, hx_min hy_min hz_min nlocbas: global mesh
@@ -166,14 +166,8 @@ class IPart
     virtual int get_cpu_size() const
     {SYS_T::print_exit("Error: get_cpu_size is not implemented. \n"); return 0;}
 
-    virtual bool get_part_isDual() const
-    {SYS_T::print_exit("Error: get_part_isDual is not implemented. \n"); return false;}
-
     virtual int get_dual_edge_ncommon() const
     {SYS_T::print_exit("Error: get_dual_edge_ncommon is not implemented. \n"); return 0;}
-
-    virtual bool get_isMETIS() const
-    {SYS_T::print_exit("Error: get_isMETIS is not implemented. \n"); return false;}
 
     // 3. Global mesh information
     virtual int get_nElem() const

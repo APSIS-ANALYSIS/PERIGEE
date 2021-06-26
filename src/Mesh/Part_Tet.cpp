@@ -18,8 +18,6 @@ Part_Tet::Part_Tet(
   // Initialize group 3 data
   cpu_rank = in_cpu_rank;
   cpu_size = in_cpu_size;
-  isMETIS           = gpart->get_isMETIS();
-  part_isdual       = gpart->get_isDual();
   dual_edge_ncommon = gpart->get_dual_edge_ncommon();
 
   // Check the cpu info
@@ -30,7 +28,6 @@ Part_Tet::Part_Tet(
   // Generate group 1, 2, 5, and 6.
   Generate_Partition( mesh, gpart, mnindex, IEN, ctrlPts, isPrintInfo );
 }
-
 
 Part_Tet::Part_Tet(
     const IMesh * const &mesh,
@@ -50,8 +47,6 @@ Part_Tet::Part_Tet(
   // Initialize group 3 data
   cpu_rank = in_cpu_rank;
   cpu_size = in_cpu_size;
-  isMETIS           = gpart->get_isMETIS();
-  part_isdual       = gpart->get_isDual();
   dual_edge_ncommon = gpart->get_dual_edge_ncommon();
 
   // Check the cpu info
@@ -61,6 +56,79 @@ Part_Tet::Part_Tet(
 
   // Generate group 1, 2, 5, and 6.
   Generate_Partition( mesh, gpart, mnindex, IEN, ctrlPts, isPrintInfo );
+}
+
+Part_Tet::Part_Tet( const char * const &inputfileName, const int &in_cpu_rank )
+{
+  const std::string input_fName( inputfileName );
+  std::string fName = SYS_T::gen_partfile_name( input_fName, in_cpu_rank );
+  
+  hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
+  HDF5_Reader * h5r = new HDF5_Reader( file_id );
+ 
+  // local elements 
+  elem_loc = h5r->read_intVector( "Local_Elem", "elem_loc" );
+  nlocalele = h5r->read_intScalar( "Local_Elem", "nlocalele" );
+  
+  // local node
+  nlocalnode = h5r->read_intScalar("Local_Node", "nlocalnode");
+  nghostnode = h5r->read_intScalar("Local_Node", "nghostnode");
+  nbadnode   = h5r->read_intScalar("Local_Node", "nbadnode");
+  nlocghonode = h5r->read_intScalar("Local_Node", "nlocghonode");
+  ntotalnode = h5r->read_intScalar("Local_Node", "ntotalnode");
+
+  local_to_global = h5r->read_intVector("Local_Node", "local_to_global");
+  if( nghostnode > 0)
+    node_ghost = h5r->read_intVector("Local_Node", "node_ghost");
+  else
+    node_ghost.clear();
+
+  node_loc = h5r->read_intVector("Local_Node", "node_loc");
+  node_loc_original = h5r->read_intVector("Local_Node", "node_loc_original");
+
+  // Part info
+  cpu_rank = h5r->read_intScalar("Part_Info", "cpu_rank");
+  
+  SYS_T::print_fatal_if( cpu_rank != in_cpu_rank, "Error: Part_Tet::cpu_rank is inconsistent.\n");
+  
+  cpu_size = h5r->read_intScalar("Part_Info", "cpu_size");
+  dual_edge_ncommon = h5r->read_intScalar("Part_Info", "dual_edge_ncommon");
+
+  // global mesh info
+  std::vector<int> vdeg = h5r -> read_intVector("Global_Mesh_Info", "degree");
+
+  sDegree = vdeg[0]; tDegree = vdeg[1]; uDegree = vdeg[2];
+
+  nElem    = h5r -> read_intScalar("Global_Mesh_Info", "nElem");
+  nFunc    = h5r -> read_intScalar("Global_Mesh_Info", "nFunc");
+  nLocBas  = h5r -> read_intScalar("Global_Mesh_Info", "nLocBas");
+  probDim  = h5r -> read_intScalar("Global_Mesh_Info", "probDim");
+  elemType = h5r -> read_intScalar("Global_Mesh_Info", "elemType");
+  dofNum   = h5r -> read_intScalar("Global_Mesh_Info", "dofNum");
+  dofMat   = h5r -> read_intScalar("Global_Mesh_Info", "dofMat");
+
+  // LIEN
+  int num_row, num_col;
+  const std::vector<int> LIEN_vec = h5r -> read_intMatrix("LIEN", "LIEN", num_row, num_col);
+
+  SYS_T::print_fatal_if( num_row != nlocalele, "Error: Part_Tet::LIEN size does not match the number of element. \n");
+
+  SYS_T::print_fatal_if( num_col != nLocBas, "Error: Part_Tet::LIEN size does not match the value of nLocBas. \n");
+  
+  LIEN = new int * [nlocalele];
+  for(int ee=0; ee<nlocalele; ++ee) LIEN[ee] = new int [nLocBas];
+
+  for(int ee=0; ee<nlocalele; ++ee)
+  {
+    for(int ii=0; ii<nLocBas; ++ii) LIEN[ee][ii] = LIEN_vec[ee*nLocBas + ii];
+  }
+
+  // control points
+  ctrlPts_x_loc = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_x_loc");
+  ctrlPts_y_loc = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_y_loc");
+  ctrlPts_z_loc = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_z_loc");
+
+  delete h5r; H5Fclose( file_id );
 }
 
 Part_Tet::~Part_Tet()
@@ -252,21 +320,21 @@ void Part_Tet::write( const char * inputFileName ) const
   std::string fName = SYS_T::gen_partfile_name( input_fName, cpu_rank );
 
   hid_t file_id = H5Fcreate(fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-  
+
   HDF5_Writer * h5w = new HDF5_Writer(file_id);
 
   // group 1: local element
   hid_t group_id_1 = H5Gcreate(file_id, "/Local_Elem", H5P_DEFAULT, 
       H5P_DEFAULT, H5P_DEFAULT);
-  
+
   h5w->write_intScalar( group_id_1, "nlocalele", nlocalele );
   h5w->write_intVector( group_id_1, "elem_loc", elem_loc );
-    
+
   H5Gclose( group_id_1 );
 
   // group 2: local node
   hid_t group_id_2 = H5Gcreate( file_id, "/Local_Node", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-  
+
   h5w->write_intScalar( group_id_2, "nlocalnode", nlocalnode );
   h5w->write_intScalar( group_id_2, "nghostnode", nghostnode );
   h5w->write_intScalar( group_id_2, "ntotalnode", ntotalnode );
@@ -278,7 +346,7 @@ void Part_Tet::write( const char * inputFileName ) const
   h5w->write_intVector( group_id_2, "local_to_global", local_to_global );
   if(nghostnode > 0)
     h5w->write_intVector( group_id_2, "node_ghost", node_ghost );
-  
+
   H5Gclose( group_id_2 );
 
   // group 3: global mesh info
@@ -287,14 +355,14 @@ void Part_Tet::write( const char * inputFileName ) const
 
   h5w->write_intScalar( group_id_3, "nElem", nElem );
   h5w->write_intScalar( group_id_3, "nFunc", nFunc );
-  
+
   std::vector<int> vdeg; vdeg.clear();
   vdeg.push_back(sDegree); vdeg.push_back(tDegree); vdeg.push_back(uDegree);
-  
+
   h5w->write_intVector( group_id_3, "degree", vdeg );
 
   h5w->write_intScalar( group_id_3, "nLocBas", nLocBas );
-  
+
   h5w->write_intScalar( group_id_3, "probDim", probDim );
   h5w->write_intScalar( group_id_3, "dofNum", dofNum );
   h5w->write_intScalar( group_id_3, "dofMat", dofMat );
@@ -305,7 +373,7 @@ void Part_Tet::write( const char * inputFileName ) const
   // group 4: part info
   hid_t group_id_4 = H5Gcreate( file_id, "/Part_Info", H5P_DEFAULT, H5P_DEFAULT,
       H5P_DEFAULT ); 
-  
+
   h5w->write_intScalar( group_id_4, "cpu_rank", cpu_rank );
   h5w->write_intScalar( group_id_4, "cpu_size", cpu_size );
   h5w->write_intScalar( group_id_4, "dual_edge_ncommon", dual_edge_ncommon );
@@ -329,7 +397,7 @@ void Part_Tet::write( const char * inputFileName ) const
   h5w -> write_intMatrix( group_id_5, "LIEN", row_LIEN, nlocalele, nLocBas);
 
   H5Gclose( group_id_5 );
-  
+
   // group 6: control points
   hid_t group_id_6 = H5Gcreate(file_id, "/ctrlPts_loc", H5P_DEFAULT, 
       H5P_DEFAULT, H5P_DEFAULT);

@@ -55,8 +55,6 @@ class Part_NURBS_1Patch_3D_METIS : public IPart
     // 3. function that return the partition method parameters
     virtual int get_cpu_rank() const {return cpu_rank;}
     virtual int get_cpu_size() const {return cpu_size;}
-    virtual bool get_part_isDual() const {return part_isdual;}
-    virtual bool get_isMETIS() const {return isMETIS;}
     virtual int get_dual_edge_ncommon() const {return dual_edge_ncommon;}
 
 
@@ -135,7 +133,6 @@ class Part_NURBS_1Patch_3D_METIS : public IPart
     
     // 3. cpu info and partition key parameters
     int cpu_rank, cpu_size;
-    bool isMETIS, part_isdual;
     int dual_edge_ncommon;
 
     // 4. global mesh info

@@ -20,8 +20,6 @@ Part_NURBS_1Patch_3D_METIS::Part_NURBS_1Patch_3D_METIS(
   elemType = in_elemType;
   probDim  = 3;
 
-  isMETIS = gpart->get_isMETIS();
-  part_isdual = gpart->get_isDual();
   dual_edge_ncommon = gpart->get_dual_edge_ncommon();
 
   if( cpu_size < 1 )
@@ -305,8 +303,6 @@ void Part_NURBS_1Patch_3D_METIS::Get_global_meshinfo(
 void Part_NURBS_1Patch_3D_METIS::print_info() const
 {
   std::cout<<"=================================="<<std::endl;
-  std::cout<<"isMETIS: "<<get_isMETIS()<<std::endl;
-  std::cout<<"isDual: "<<get_part_isDual()<<std::endl;
   std::cout<<"dual_dege_ncommon: "<<get_dual_edge_ncommon()<<std::endl;
   std::cout<<"=================================="<<std::endl;
 }

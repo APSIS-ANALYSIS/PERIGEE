@@ -67,7 +67,6 @@ class MeshPart_NURBS_multiPatch_3D : public IMeshPart
 
     int cpu_rank;
     const int cpu_size, dual_edge_ncommon;
-    const bool isMETIS, part_isdual;
 
     const int nElem, nFunc, sDegree, tDegree, uDegree, nLocBas;
     const double hx_max, hy_max, hz_max, hx_min, hy_min, hz_min;

@@ -8,8 +8,6 @@ MeshPart_NURBS_multiPatch_3D::MeshPart_NURBS_multiPatch_3D(
     const int &in_dofNum, const int &in_elemType )
 : numPat(mesh->get_num_patch()),
   cpu_size(in_cpu_size), dual_edge_ncommon(gpart->get_dual_edge_ncommon()),
-  isMETIS(gpart->get_isMETIS()), part_isdual(gpart->get_isDual()),
-  nElem(mesh->get_nElem()), nFunc(mesh->get_nFunc()),
   sDegree(mesh->get_s_degree()), tDegree(mesh->get_t_degree()),
   uDegree(mesh->get_u_degree()), nLocBas(mesh->get_nLocBas()),
   hx_max(mesh->get_hx_max()), hy_max(mesh->get_hy_max()),

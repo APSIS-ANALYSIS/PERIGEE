@@ -1,16 +1,16 @@
 #ifndef PART_TET_HPP
 #define PART_TET_HPP
-// ==================================================================
+// ============================================================================
 // Part_Tet.hpp
 //
-// Object: Partition 3D tetrahedral mesh into subdomains,
-//         and record each subdomain in hdf5 file format.
+// Object: Partition 3D tetrahedral mesh into subdomains, and record each 
+//         subdomain in hdf5 file format.
 //
 // Date: Jan. 12 2017
 // Modified on May 22 2017: I added a new constructor to handle the 
 //         cases for dofNum is not the dof for the matrix problem in
 //         the implicit solver.
-// ==================================================================
+// ============================================================================
 #include "IMesh.hpp"
 #include "IPart.hpp"
 #include "HDF5_Writer.hpp"
@@ -37,6 +37,9 @@ class Part_Tet : public IPart
         const int &in_elemType,
         const bool isPrintInfo );
 
+    // Constructor that load the partition info from h5 file on disk
+    Part_Tet( const char * const &fileName, const int &in_cpu_rank );
+
     virtual ~Part_Tet();
 
     virtual void write( const char * inputFileName ) const;
@@ -50,8 +53,7 @@ class Part_Tet : public IPart
     // Determine the position of a given index in the elem_loc array 
     virtual int get_elemLocIndex(const int &gloindex) const;
 
-    // Determine the position of a given index in the local_to_global
-    // array
+    // Determine the position of a given index in the local_to_global array
     virtual int get_nodeLocGhoIndex(const int &gloindex) const
     {return VEC_T::get_pos(local_to_global, gloindex);}
 
@@ -80,8 +82,6 @@ class Part_Tet : public IPart
     virtual int get_nlocghonode() const {return nlocghonode;}
     virtual int get_cpu_rank() const {return cpu_rank;}
     virtual int get_cpu_size() const {return cpu_size;}
-    virtual bool get_part_isDual() const {return part_isdual;}
-    virtual bool get_isMETIS() const {return isMETIS;}
     virtual int get_dual_edge_ncommon() const {return dual_edge_ncommon;}
 
     virtual int get_nElem() const {return nElem;}
@@ -97,6 +97,8 @@ class Part_Tet : public IPart
     virtual double get_ctrlPts_z_loc(int pos) const {return ctrlPts_z_loc[pos];}
 
   protected:
+    // ------------------------------------------------------------------------
+    // Data
     // 1. local element
     std::vector<int> elem_loc;
     int nlocalele;
@@ -115,12 +117,11 @@ class Part_Tet : public IPart
 
     // 3. CPU info and partition parameters
     int cpu_rank, cpu_size;
-    bool isMETIS, part_isdual;
     int dual_edge_ncommon;
 
     // 4. global mesh info
-    const int nElem, nFunc, sDegree, tDegree, uDegree, nLocBas;
-    const int probDim, dofNum, dofMat, elemType;
+    int nElem, nFunc, sDegree, tDegree, uDegree, nLocBas;
+    int probDim, dofNum, dofMat, elemType;
 
     // 5. LIEN
     int ** LIEN;
@@ -128,6 +129,8 @@ class Part_Tet : public IPart
     // 6. local point coordinates (i.e. control point geometry)
     std::vector<double> ctrlPts_x_loc, ctrlPts_y_loc, ctrlPts_z_loc;
 
+    // ------------------------------------------------------------------------
+    // Function
     void Generate_Partition( const IMesh * const &mesh,
         const IGlobal_Part * const &gpart,
         const Map_Node_Index * const &mnindex,

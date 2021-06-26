@@ -10,8 +10,6 @@ Part_FEM::Part_FEM( const IMesh * const &mesh,
     const int &in_probdim, const int &in_etype, 
     const bool &isPrintInfo )
 : cpu_rank( in_cpu_rank ), cpu_size( in_cpu_size ),
-  isMETIS( gpart->get_isMETIS() ),
-  part_isdual( gpart->get_isDual() ),
   dual_edge_ncommon( gpart->get_dual_edge_ncommon() ),
   nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),
   sDegree( mesh->get_s_degree() ), tDegree( mesh->get_t_degree() ),
