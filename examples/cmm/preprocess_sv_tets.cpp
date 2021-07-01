@@ -103,14 +103,14 @@ int main( int argc, char * argv[] )
 
   if( is_uniform_wall )
   {
-    cout << "  -is_uniform_wall: true" << endl;
-    cout << "  -wall_thickness: "      << wall_thickness << endl;
-    cout << "  -wall_youngsmod: "      << wall_youngsmod << endl;
+    cout << " -is_uniform_wall: true" << endl;
+    cout << " -wall_thickness: "      << wall_thickness << endl;
+    cout << " -wall_youngsmod: "      << wall_youngsmod << endl;
   }
-  else cout << "  -is_uniform_wall: false" << endl;
+  else cout << " -is_uniform_wall: false" << endl;
 
-  cout << "  -wall_springconst: "      << wall_springconst  << endl;
-  cout << "  -wall_dampingconst: "     << wall_dampingconst << endl;
+  cout << " -wall_springconst: "      << wall_springconst  << endl;
+  cout << " -wall_dampingconst: "     << wall_dampingconst << endl;
 
   cout << " -num_outlet: "       << num_outlet        << endl;
   cout << " -geo_file: "         << geo_file          << endl;
