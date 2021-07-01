@@ -259,37 +259,6 @@ int main( int argc, char * argv[] )
   // Wall mesh for CMM-type model is set as an elemental bc.
   // Set the wall region, its corresponding centerline, and the thickness-to-radius ratio
   const std::string walls_combined = sur_file_wall;
-  const std::string centerlines_combined = "centerlines.vtp";
-  const double thickness2radius_combined = 0.2;
-
-  // For variable wall properties:
-  // If constructing wall properties with multiple spatial distributions,
-  // provide three additional vectors of equal length: 
-  //     1. wallsList:            surface vtp's, each a subset of the entire wall
-  //     2. centerlinesList:      corresponding centerline vtp's
-  //     3. thickness2radiusList: corresponding ratios
-  // The background wall properties will first be prescribed to the entire wall
-  // using centerlines_combined and thickness2radius_combined. Wall properties
-  // in wallsList will then be overwritten using the corresponding lists.
-  // --------------------------------------------------------------------------
-  // std::vector<std::string> wallsList; wallsList.clear();
-  // std::vector<std::string> centerlinesList; centerlinesList.clear();
-  // std::vector<double> thickness2radiusList; thickness2radiusList.clear();
-  // std::vector<double> ksList; ksList.clear();
-  // std::vector<double> csList; csList.clear();
-
-  // if(elemType == 501) wallsList.push_back( "wall_aorta.vtp" );
-  // else wallsList.push_back( "wall_aorta.vtu" );
-
-  // centerlinesList.push_back( "centerlines_aorta.vtp" );
-  // thickness2radiusList.push_back( 0.2 );
-  // ksList.push_back( 1.0e3 );
-  // csList.push_back( 1.0e4 );
-
-  // // Initialized with default fluid density 1.065
-  // ElemBC * wall_ebc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
-  //       thickness2radius_combined, wall_springconst, wall_dampingconst, wallsList,
-  //       centerlinesList, thickness2radiusList, ksList, csList, elemType );
 
   ElemBC * wall_ebc = nullptr;
 
@@ -298,10 +267,43 @@ int main( int argc, char * argv[] )
         wall_springconst, wall_dampingconst, elemType );
   else
   {
+    // For variable wall properties, set the centerline and thickness-to-radius ratio
+    const std::string centerlines_combined = "centerlines.vtp";
+    const double thickness2radius_combined = 0.2;
+
     SYS_T::file_check( centerlines_combined ); cout << centerlines_combined << " found. \n";
 
     wall_ebc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
         thickness2radius_combined, wall_springconst, wall_dampingconst, elemType );
+
+    // // --------------------------------------------------------------------------
+    // // If constructing wall properties with multiple spatial distributions,
+    // // provide three additional vectors of equal length: 
+    // //     1. wallsList:            surface vtp's, each a subset of the entire wall
+    // //     2. centerlinesList:      corresponding centerline vtp's
+    // //     3. thickness2radiusList: corresponding ratios
+    // // The background wall properties will first be prescribed to the entire wall
+    // // using centerlines_combined and thickness2radius_combined. Wall properties
+    // // in wallsList will then be overwritten using the corresponding lists.
+    // std::vector<std::string> wallsList; wallsList.clear();
+    // std::vector<std::string> centerlinesList; centerlinesList.clear();
+    // std::vector<double> thickness2radiusList; thickness2radiusList.clear();
+    // std::vector<double> ksList; ksList.clear();
+    // std::vector<double> csList; csList.clear();
+
+    // if(elemType == 501) wallsList.push_back( "wall_aorta.vtp" );
+    // else wallsList.push_back( "wall_aorta.vtu" );
+
+    // centerlinesList.push_back( "centerlines_aorta.vtp" );
+    // thickness2radiusList.push_back( 0.2 );
+    // ksList.push_back( 0.0 );
+    // csList.push_back( 0.0 );
+
+    // // Initialized with default fluid density 1.065
+    // wall_ebc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
+    //     thickness2radius_combined, wall_springconst, wall_dampingconst, wallsList,
+    //     centerlinesList, thickness2radiusList, ksList, csList, elemType, 1.0 );
+    // // --------------------------------------------------------------------------
   }
 
   wall_ebc -> resetTriIEN_outwardnormal( IEN );
