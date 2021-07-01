@@ -64,7 +64,7 @@ PLocAssem_Tet_CMM_GenAlpha::~PLocAssem_Tet_CMM_GenAlpha()
 void PLocAssem_Tet_CMM_GenAlpha::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
-  SYS_T::commPrint("  Three-dimensional Incompressible Navier-Stokes equations: \n");
+  SYS_T::commPrint("  Three-dimensional FSI with membrane wall: \n");
   if(nLocBas == 4)
     SYS_T::commPrint("  FEM: 4-node Tetrahedral element \n");
   else if(nLocBas == 10)
@@ -75,6 +75,9 @@ void PLocAssem_Tet_CMM_GenAlpha::print_info() const
   SYS_T::commPrint("  Density rho = %e \n", rho0);
   SYS_T::commPrint("  Dynamic Viscosity mu = %e \n", vis_mu);
   SYS_T::commPrint("  Kienmatic Viscosity nu = %e \n", vis_mu / rho0);
+  SYS_T::commPrint("  Wall density = %e \n", rho_w);
+  SYS_T::commPrint("  Wall Poisson ratio = %e \n", nu_w);
+  SYS_T::commPrint("  Wall transverse shearing moduli = %e \n", kappa_w);
   SYS_T::commPrint("  Stabilization para CI = %e \n", CI);
   SYS_T::commPrint("  Stabilization para CT = %e \n", CT);
   SYS_T::commPrint("  Scaling factor for tau_C = %e \n", Ctauc);
