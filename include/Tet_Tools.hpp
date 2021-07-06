@@ -63,7 +63,7 @@ namespace TET_T
       std::vector<double> &pt, std::vector<int> &ien_array );
 
   // ----------------------------------------------------------------
-  // read integer type cell or point data from file in vtu or vtp format.
+  // read integer / double cell or point data from file in vtu / vtp format.
   // Input: \para filename the vtk file name
   //        \para dataname the data property name
   // Output: \para data the data associated with cell/point
@@ -71,8 +71,14 @@ namespace TET_T
   void read_int_CellData( const std::string &filename, 
       const std::string &dataname, std::vector<int> &data );
 
+  void read_double_CellData( const std::string &filename, 
+      const std::string &dataname, std::vector<double> &data );
+
   void read_int_PointData( const std::string &filename, 
       const std::string &dataname, std::vector<int> &data );
+
+  void read_double_PointData( const std::string &filename, 
+      const std::string &dataname, std::vector<double> &data );
 
   // ----------------------------------------------------------------
   // ! read_vtu_grid: read the mesh info just exactly the same way

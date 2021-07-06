@@ -109,8 +109,80 @@ void TET_T::read_int_CellData( const std::string &filename,
 }
 
 
+void TET_T::read_double_CellData( const std::string &filename,
+    const std::string &dataname, std::vector<double> &data )
+{
+  vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
+  reader -> SetFileName( filename.c_str() );
+  reader -> Update();
+  
+  vtkCellData * celldata = nullptr;
+  int numcels = -1;
+
+  // Downcasting will return null if fails
+  if(dynamic_cast<vtkPolyData*>(reader->GetOutput()))
+  {
+    vtkPolyData * vtkgrid = reader -> GetPolyDataOutput (); 
+    celldata = vtkgrid->GetCellData();
+    numcels = static_cast<int>( vtkgrid -> GetNumberOfCells() );
+  }
+  else if(dynamic_cast<vtkUnstructuredGrid*>(reader->GetOutput()))
+  {
+    vtkUnstructuredGrid * vtkgrid = reader -> GetUnstructuredGridOutput();
+    celldata = vtkgrid->GetCellData();
+    numcels = static_cast<int>( vtkgrid -> GetNumberOfCells() );
+  }
+  else
+    SYS_T::print_fatal("TET_T::read_int_CellData unknown vtk object type.\n");
+
+  vtkDataArray * cd = celldata->GetScalars( dataname.c_str() );
+
+  data.clear();
+  for(int ii=0; ii<numcels; ++ii)
+    data.push_back( static_cast<int>( cd->GetComponent(ii, 0) ) );
+
+  reader -> Delete();
+}
+
+
 void TET_T::read_int_PointData( const std::string &filename,
     const std::string &dataname, std::vector<int> &data )
+{
+  vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
+  reader -> SetFileName( filename.c_str() );
+  reader -> Update();
+  
+  vtkPointData * pointdata = nullptr;
+  int numpts = -1;
+
+  // Downcasting will return null if fails
+  if(dynamic_cast<vtkPolyData*>(reader->GetOutput()))
+  {
+    vtkPolyData * vtkgrid = reader -> GetPolyDataOutput (); 
+    pointdata = vtkgrid->GetPointData();
+    numpts = static_cast<int>( vtkgrid -> GetNumberOfPoints() );
+  }
+  else if(dynamic_cast<vtkUnstructuredGrid*>(reader->GetOutput()))
+  {
+    vtkUnstructuredGrid * vtkgrid = reader -> GetUnstructuredGridOutput();
+    pointdata = vtkgrid->GetPointData();
+    numpts = static_cast<int>( vtkgrid -> GetNumberOfPoints() );
+  }
+  else
+    SYS_T::print_fatal("TET_T::read_int_PointData unknown vtk object type.\n");
+
+  vtkDataArray * pd = pointdata->GetScalars( dataname.c_str() );
+
+  data.clear();
+  for(int ii=0; ii<numpts; ++ii)
+    data.push_back( static_cast<int>( pd->GetComponent(ii, 0) ) );
+
+  reader -> Delete();
+}
+
+
+void TET_T::read_double_PointData( const std::string &filename,
+    const std::string &dataname, std::vector<double> &data )
 {
   vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
   reader -> SetFileName( filename.c_str() );
