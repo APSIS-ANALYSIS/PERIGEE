@@ -244,13 +244,13 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   std::cout<<"     ElemBC_3D_tet_wall generated from "<<walls_combined<<" and ";
   std::cout<<centerlines_combined<<std::endl;
   std::cout<<"     thickness h ranges in ["<<*std::min_element(thickness.begin(), thickness.end())
-    <<" , "<<*std::max_element(thickness.begin(), thickness.end())<<"] \n";
+    <<", "<<*std::max_element(thickness.begin(), thickness.end())<<"] \n";
   std::cout<<"     Young's modulus E ranges in ["<<*std::min_element(youngsmod.begin(), youngsmod.end())
-    <<" , "<<*std::max_element(youngsmod.begin(), youngsmod.end())<<"] \n";
+    <<", "<<*std::max_element(youngsmod.begin(), youngsmod.end())<<"] \n";
   std::cout<<"     spring constant ks ranges in ["<<*std::min_element(springconst.begin(), springconst.end())
-    <<" , "<<*std::max_element(springconst.begin(), springconst.end())<<"] \n";
+    <<", "<<*std::max_element(springconst.begin(), springconst.end())<<"] \n";
   std::cout<<"     damping constant cs ranges in ["<<*std::min_element(dampingconst.begin(), dampingconst.end())
-    <<" , "<<*std::max_element(dampingconst.begin(), dampingconst.end())<<"] \n";
+    <<", "<<*std::max_element(dampingconst.begin(), dampingconst.end())<<"] \n";
 }
 
 
@@ -298,6 +298,30 @@ void ElemBC_3D_tet_wall::overwrite_from_vtk(
       else
         SYS_T::print_fatal("ERROR: Unknown wallprop type in ElemBC_3D_tet_wall::overwrite_from_vtk().\n");
     }
+  }
+
+  switch( type )
+  {
+    case 0:
+      std::cout << "     ===> Overwriting thickness according to " << wallprop_vtk << std::endl; 
+      std::cout << "          thickness h ranges in ["<<*std::min_element(thickness.begin(), thickness.end())
+        <<", "<<*std::max_element(thickness.begin(), thickness.end())<<"] \n";
+      break;
+    case 1:
+      std::cout << "     ===> Overwriting Young's modulus E according to " << wallprop_vtk << std::endl; 
+      std::cout << "          Young's modulus E ranges in ["<<*std::min_element(youngsmod.begin(), youngsmod.end())
+        <<", "<<*std::max_element(youngsmod.begin(), youngsmod.end())<<"] \n";
+      break;
+    case 2:
+      std::cout << "     ===> Overwriting spring constant ks according to " << wallprop_vtk << std::endl; 
+      std::cout << "          spring constant ks ranges in ["<<*std::min_element(springconst.begin(), springconst.end())
+        <<", "<<*std::max_element(springconst.begin(), springconst.end())<<"] \n";
+      break;
+    case 3:
+      std::cout << "     ===> Overwriting damping constant cs according to " << wallprop_vtk << std::endl; 
+      std::cout << "          damping constant cs ranges in ["<<*std::min_element(dampingconst.begin(), dampingconst.end())
+        <<", "<<*std::max_element(dampingconst.begin(), dampingconst.end())<<"] \n";
+      break;
   }
 
   VEC_T::clean( wallprop ); VEC_T::clean( global_node_idx );
