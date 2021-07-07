@@ -90,6 +90,16 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
 
     virtual ~ElemBC_3D_tet_wall();
 
+    // Overwrite wall properties from a vtp/vtu file by GlobalNodeID. All wall nodes
+    // with GlobalNodeIDs that also exist in wallprop_vtk will be overwritten. 
+    // This can be used to apply wall properties from svPre's Laplacian solver, which
+    // generates a wallprop vtp consisting of all caps in addition to the wall. 
+    // \para: wallprop_vtk is the vtp / vtu file with the property field 
+    // \para: type - 0 (thickness), 1 (youngsmod), 2 (springconst), 3 (dampingconst)
+    // \para: vtk_fieldname is the corresponding field name in wallprop_vtk 
+    virtual void overwrite_from_vtk(const std::string &wallprop_vtk,
+        const int &type, const std::string &vtk_fieldname );
+
     virtual void print_info() const;
 
     virtual std::vector<double> get_wall_thickness() const {return thickness;}

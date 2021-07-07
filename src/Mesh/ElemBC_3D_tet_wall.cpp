@@ -264,6 +264,51 @@ ElemBC_3D_tet_wall::~ElemBC_3D_tet_wall()
 }
 
 
+void ElemBC_3D_tet_wall::overwrite_from_vtk(
+    const std::string &wallprop_vtk,
+    const int &type,
+    const std::string &vtk_fieldname )
+{
+  // varwallprop.vtp from svpre will additionally include all caps, but the global
+  // node ID is assumed to be consistent (converted to zero indexing).
+  SYS_T::file_check( wallprop_vtk );
+
+  std::vector<int> global_node_idx;
+  TET_T::read_int_PointData( wallprop_vtk, "GlobalNodeID", global_node_idx );
+
+  std::vector<double> wallprop;
+  TET_T::read_double_PointData( wallprop_vtk, vtk_fieldname, wallprop );
+
+  const int ebc_id = 0;
+  for( int ii = 0; ii < num_node[ebc_id]; ++ii )
+  {
+    // Search for corresponding global node ID in wallprop_vtk
+    auto it = std::find(global_node_idx.begin(), global_node_idx.end(), global_node[ebc_id][ii]);
+
+    if( it != global_node_idx.end() )
+    {
+      const int idx = std::distance(global_node_idx.begin(), it);
+
+      if( type == 0 )
+        thickness[ii] = wallprop[idx];
+      else if( type == 1 )
+        youngsmod[ii] = wallprop[idx];
+      else if( type == 2 )
+        springconst[ii] = wallprop[idx];
+      else if( type == 3 )
+        dampingconst[ii] = wallprop[idx];
+      else
+        SYS_T::print_fatal("ERROR: Unknown wallprop type in ElemBC_3D_tet_wall::overwrite_from_vtk().\n");
+    }
+  }
+
+  VEC_T::clean( wallprop ); VEC_T::clean( global_node_idx );
+
+  // Write out vtp's with wall properties
+  write_vtk(ebc_id, "varwallprop");
+}
+
+
 void ElemBC_3D_tet_wall::print_info() const
 {
   ElemBC_3D_tet::print_info();
