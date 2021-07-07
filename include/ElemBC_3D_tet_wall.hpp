@@ -94,6 +94,7 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     // with GlobalNodeIDs that also exist in wallprop_vtk will be overwritten. 
     // This can be used to apply wall properties from svPre's Laplacian solver, which
     // generates a wallprop vtp consisting of all caps in addition to the wall. 
+    // NOTE: The GlobalNodeIDs are assumed to be consistent (zero-indexed).
     // \para: wallprop_vtk is the vtp / vtu file with the property field 
     // \para: type - 0 (thickness), 1 (youngsmod), 2 (springconst), 3 (dampingconst)
     // \para: vtk_fieldname is the corresponding field name in wallprop_vtk 

@@ -269,8 +269,6 @@ void ElemBC_3D_tet_wall::overwrite_from_vtk(
     const int &type,
     const std::string &vtk_fieldname )
 {
-  // varwallprop.vtp from svpre will additionally include all caps, but the global
-  // node ID is assumed to be consistent (converted to zero indexing).
   SYS_T::file_check( wallprop_vtk );
 
   std::vector<int> global_node_idx;
