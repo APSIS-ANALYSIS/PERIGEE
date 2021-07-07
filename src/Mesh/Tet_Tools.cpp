@@ -133,13 +133,13 @@ void TET_T::read_double_CellData( const std::string &filename,
     numcels = static_cast<int>( vtkgrid -> GetNumberOfCells() );
   }
   else
-    SYS_T::print_fatal("TET_T::read_int_CellData unknown vtk object type.\n");
+    SYS_T::print_fatal("TET_T::read_double_CellData unknown vtk object type.\n");
 
   vtkDataArray * cd = celldata->GetScalars( dataname.c_str() );
 
   data.clear();
   for(int ii=0; ii<numcels; ++ii)
-    data.push_back( static_cast<int>( cd->GetComponent(ii, 0) ) );
+    data.push_back( static_cast<double>( cd->GetComponent(ii, 0) ) );
 
   reader -> Delete();
 }
@@ -205,13 +205,13 @@ void TET_T::read_double_PointData( const std::string &filename,
     numpts = static_cast<int>( vtkgrid -> GetNumberOfPoints() );
   }
   else
-    SYS_T::print_fatal("TET_T::read_int_PointData unknown vtk object type.\n");
+    SYS_T::print_fatal("TET_T::read_double_PointData unknown vtk object type.\n");
 
   vtkDataArray * pd = pointdata->GetScalars( dataname.c_str() );
 
   data.clear();
   for(int ii=0; ii<numpts; ++ii)
-    data.push_back( static_cast<int>( pd->GetComponent(ii, 0) ) );
+    data.push_back( static_cast<double>( pd->GetComponent(ii, 0) ) );
 
   reader -> Delete();
 }
