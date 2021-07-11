@@ -255,19 +255,19 @@ double GenBC_Coronary::get_P( const int &ii, const double &in_dot_Q,
       for(int jj=0; jj<num_odes; ++jj)
         pi_tmp[jj] = pi_m[jj] + fac13 * K1[jj] * h;
 
-      F_coronary(ii, pi_tmp , fac23 * Q_m + fac13 * Q_mp1, dPimdt_k2[ii][mm], K2);
+      F_coronary(ii, pi_tmp, fac23 * Q_m + fac13 * Q_mp1, dPimdt_k2[ii][mm], K2);
 
       for(int jj=0; jj<num_odes; ++jj)
         pi_tmp[jj] = pi_m[jj] - fac13*K1[jj] * h + K2[jj] * h;
 
-      F_coronary(ii, pi_tmp , fac13 * Q_m + fac23 * Q_mp1, dPimdt_k3[ii][mm], K3);
+      F_coronary(ii, pi_tmp, fac13 * Q_m + fac23 * Q_mp1, dPimdt_k3[ii][mm], K3);
 
       for(int jj=0; jj<num_odes; ++jj)
         pi_tmp[jj] = pi_m[jj] + K1[jj] * h - K2[jj] * h + K3[jj] * h;
 
       F_coronary(ii, pi_tmp, Q_mp1, dPimdt_k1[ii][mm+1], K4);
 
-      for(int jj=0; jj<2; ++jj)
+      for(int jj=0; jj<num_odes; ++jj)
         pi_m[jj] = pi_m[jj] + fac18 * K1[jj] * h + fac38 * K2[jj] * h + fac38 * K3[jj] * h + fac18 * K4[jj] * h;
     }
 
@@ -290,7 +290,7 @@ void GenBC_Coronary::reset_initial_sol( const int &ii, const double &in_Q_0,
 {
   Q0[ii] = in_Q_0;
 
-  // Use the last 0D solition as initial solutions for the next time integration.
+  // Use the last 0D solution as initial solutions for the next time integration.
   for(int jj=0; jj<num_odes; ++jj) Pi0[ii][jj] = prev_0D_sol[ii][jj];
 
   // Precalculate dPimdt values needed for integrating Coronary ODEs.
