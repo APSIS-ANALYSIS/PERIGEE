@@ -1,9 +1,10 @@
 #include "GenBC_Coronary.hpp"
 
 GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename, 
-    const int &in_N, const double &dt3d )
+    const int &in_N, const double &dt3d, const int &in_index,
+    const std::string &in_lpn_sol_file )
 : num_odes(2), N( in_N ), h( dt3d/static_cast<double>(N) ), 
-  absTol( 1.0e-8 ), relTol( 1.0e-5 )
+  lpn_sol_file( in_lpn_sol_file ), absTol( 1.0e-8 ), relTol( 1.0e-5 )
 {
   // Now read the lpn input file for num_ebc and coronary model 
   // parameters (Ra, Ca, Ra_micro, Cim, Rv, Pd and Pim)
@@ -109,8 +110,8 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
         {
           getline(reader, sline);
           sstrm.str( sline );
-          sstrm>>Time_data[counter][ii];
-          sstrm>>Pim_data[counter][ii];
+          sstrm >> Time_data[counter][ii];
+          sstrm >> Pim_data[counter][ii];
 
           Pim_data[counter][ii] = Pim_data[counter][ii] * alpha_Pim[counter];
           sstrm.clear();
@@ -139,7 +140,7 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
 
   SYS_T::commPrint( "===> GenBC_Coronary data are read in from %s.\n", lpn_filename );
 
-  // Set zero initial values. 
+  // Set zero initial values if simulation restart index is 0.
   // They will be reset based on the 3D solutions.
   for(int ii=0; ii<num_ebc; ++ii)
   {
@@ -149,6 +150,40 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
       Pi0[ii][jj] = 0.0;
       prev_0D_sol[ii][jj] = 0.0;
     }  
+
+    if( in_index == 0)
+    {
+      std::ofstream ofile;
+      ofile.open( lpn_sol_file.c_str(), std::ofstream::out | std::ofstream::trunc );
+      ofile<<"# Time index"<<'\t'<<" Time"<<'\t'<<"0D_sol[i][j] 0D_sol[i][j+1] ..."<<'\t'<<"i=0...num_ebc-1, j=0...num_odes-1"<<'\n';
+      ofile.close();
+    }
+    // if restart index > 0, read initial 0D solutions from coronary_sol.txt
+    else
+    {
+      reader.open( lpn_sol_file.c_str(), std::ifstream::in );
+      bool is_0D_sol_found = false;
+
+      while( std::getline(reader, sline) )
+      {
+        if( sline[0] != '#' && !sline.empty() )
+        {
+          sstrm.str(sline);
+          int temp_index;
+          sstrm >> temp_index;
+          if( temp_index == in_index )
+          {
+            is_0D_sol_found = true;
+            for( int ii=0; ii<num_ebc; ++ii )
+              for( int jj=0; jj<num_odes; ++jj ) sstrm >> prev_0D_sol[ii][jj];
+            break;
+          }
+        }
+      }
+
+      reader.close();
+      SYS_T::print_fatal_if(!is_0D_sol_found, "Error: GenBC_Coronary cannot find 0D solutions for restart index = %d .\n", in_index); 
+    }
 
     // Make sure C and R are nonzero
     SYS_T::print_fatal_if( Ca[ii] == 0.0, "Error: GenBC_Coronary Ca cannot be zero.\n" );
@@ -168,6 +203,20 @@ void GenBC_Coronary::print_info() const
   for(int ii=0; ii<num_ebc; ++ii)
     SYS_T::commPrint( "     ebcid = %d, Ra = %e, Ca = %e, Ra_micro = %e,Rim = %e, Rv = %e, Pd = %e \n", 
         ii, Ra[ii], Ca[ii],Ra_micro[ii],Cim[ii], Rv[ii], Pd[ii] );
+}
+
+void GenBC_Coronary::write_0D_sol( const int &curr_index, const double &curr_time ) const
+{
+  std::ofstream ofile;
+  ofile.open( lpn_sol_file.c_str(), std::ofstream::out | std::ofstream::app );
+
+  ofile << curr_index << '\t' << curr_time;
+
+  for( int ii=0; ii<num_ebc; ++ii )
+    for( int jj=0; jj<num_odes; ++jj ) ofile << '\t' << prev_0D_sol[ii][jj];
+
+  ofile << '\n';
+  ofile.close();
 }
 
 double GenBC_Coronary::get_m( const int &ii, const double &in_dot_Q, const double &in_Q ) const

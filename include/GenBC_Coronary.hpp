@@ -16,7 +16,7 @@
 //
 // Ra, Ramicro and Rv are resistors for the coronary arteries, coronary 
 // microvasculature and coronary veins, respectively.
-// Ca and Cim are capacitors for proximal and distal vascularture, 
+// Ca and Cim are capacitors for proximal and distal vasculature, 
 // respectively.
 // Pd and Pim are the distal and intramyocardial pressures, respectively.
 // Intramyocardial pressure Pim is applied to capacitor Cim to model 
@@ -48,7 +48,8 @@
 class GenBC_Coronary : public IGenBC
 {
   public:
-    GenBC_Coronary( const char * const &lpn_filename, const int &in_N, const double &dt3d );
+    GenBC_Coronary( const char * const &lpn_filename, const int &in_N, const double &dt3d,
+        const int &in_index, const std::string &in_lpn_sol_file="coronary_sol.txt" );
 
     virtual ~GenBC_Coronary();
 
@@ -64,8 +65,7 @@ class GenBC_Coronary : public IGenBC
     // Obtain P for the ii-th outlet surface (coronary or RCR).
     virtual double get_P( const int &ii, const double &in_dot_Q, const double &in_Q ) const;
 
-    // Get initial P for the ii-th outlet face at the begining of 
-    // LPM ODE integration.
+    // Get initial P for the ii-th outlet face at the beginninging of LPM ODE integration.
     // 0 <= ii < num_ebc
     virtual double get_P0( const int &ii ) const;
 
@@ -73,12 +73,18 @@ class GenBC_Coronary : public IGenBC
     virtual void reset_initial_sol( const int &ii, const double &in_Q_0,
        const double &in_P_0, const double &curr_time );
 
+    // Write 0D solutions into a file for restart
+    virtual void write_0D_sol( const int &curr_index, const double &curr_time ) const;
+
   private:
     const int num_odes; // Number of ODEs in the model
 
     const int N; // ODE integrator's number of time steps
 
     const double h; // delta t = Nh
+
+    // file to store 0D solutions at each 3D time step
+    const std::string lpn_sol_file;
 
     // Parameters used to define difference quotient for get_m.
     const double absTol, relTol;

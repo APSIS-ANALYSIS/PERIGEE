@@ -84,6 +84,17 @@ class IGenBC
     {
       SYS_T::print_fatal("Error: IGenBC::reset_initial_sol is not implemented.\n");
     }    
+
+    // --------------------------------------------------------------
+    // Write 0D solutions into a file for restarting the simulation from
+    // a previous step. This function is needed by Coronary BC, as not all
+    // 0D solutions can be restored from a previous 3D solution.
+    // For RCR, resistance, and inductance, this function does nothing.
+    // --------------------------------------------------------------
+    virtual void write_0D_sol(const int &curr_index, const double &curr_time) const
+    {
+      SYS_T::print_fatal("Error: IGenBC::reset_write_0D_sol is not implemented.\n");
+    }
 };
 
 #endif
