@@ -206,9 +206,8 @@ void PTime_CMM_Solver::TM_CMM_GenAlpha(
       // Update the initial values in genbc
       gbc -> reset_initial_sol( face, lpn_flowrate, lpn_pressure, time_info->get_time() );
 
-      // On the CPU 0, write the time, flow rate, averaged pressure, and 0D
-      // calculated pressure into the txt file, which is first generated in the
-      // driver
+      // On CPU 0, write the time, flow rate, averaged pressure, and 0D calculated
+      // pressure into the txt file, which is first generated in the driver
       if( SYS_T::get_MPI_rank() == 0 )
       {
         std::ofstream ofile;
@@ -219,6 +218,12 @@ void PTime_CMM_Solver::TM_CMM_GenAlpha(
       MPI_Barrier(PETSC_COMM_WORLD);
     }
    
+    // Write all 0D solutions into a file
+    if( SYS_T::get_MPI_rank() == 0 )
+      gbc -> write_0D_sol ( time_info->get_index(), time_info->get_time() );
+
+    MPI_Barrier(PETSC_COMM_WORLD);
+
     // Calculate the inlet data
     const double inlet_face_flrate = gassem_ptr -> Assem_surface_flowrate(
         cur_sol, lassem_fluid_ptr, elements, quad_s, infnbc_part ); 

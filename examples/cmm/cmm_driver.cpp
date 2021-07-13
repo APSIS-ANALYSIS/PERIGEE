@@ -395,7 +395,7 @@ int main( int argc, char *argv[] )
   else if( GENBC_T::get_genbc_file_type( lpn_file.c_str() ) == 3  )
     gbc = new GenBC_Inductance( lpn_file.c_str() );
   else if( GENBC_T::get_genbc_file_type( lpn_file.c_str() ) == 4  )
-    gbc = new GenBC_Coronary( lpn_file.c_str(), 1000, initial_step );
+    gbc = new GenBC_Coronary( lpn_file.c_str(), 1000, initial_step, initial_index );
   else
     SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
 
@@ -512,6 +512,9 @@ int main( int argc, char *argv[] )
   }
 
   MPI_Barrier(PETSC_COMM_WORLD);
+
+  // Write all 0D solutions into a file
+  if( rank == 0) gbc -> write_0D_sol ( initial_index, initial_time );
 
   // ===== Inlet data recording files =====
   const double inlet_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
