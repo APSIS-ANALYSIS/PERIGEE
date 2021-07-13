@@ -204,7 +204,7 @@ void PTime_CMM_Solver::TM_CMM_GenAlpha(
       const double lpn_pressure = gbc -> get_P( face, dot_lpn_flowrate, lpn_flowrate );
 
       // Update the initial values in genbc
-      gbc -> reset_initial_sol( face, lpn_flowrate, lpn_pressure, time_info->get_time() );
+      gbc -> reset_initial_sol( face, lpn_flowrate, lpn_pressure, time_info->get_time(), false );
 
       // On CPU 0, write the time, flow rate, averaged pressure, and 0D calculated
       // pressure into the txt file, which is first generated in the driver
