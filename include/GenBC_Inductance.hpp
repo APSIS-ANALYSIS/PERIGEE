@@ -55,7 +55,7 @@ class GenBC_Inductance : public IGenBC
     }
 
     virtual void reset_initial_sol( const int &ii, const double &in_Q_0,
-        const double &in_P_0, const double &curr_time )
+        const double &in_P_0, const double &curr_time, const bool &is_restart )
     {
       Q0[ii] = in_Q_0;
       P0[ii] = in_P_0;
