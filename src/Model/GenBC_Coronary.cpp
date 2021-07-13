@@ -159,7 +159,7 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
     SYS_T::print_fatal_if( Ra_micro[ii] == 0.0, "Error: GenBC_Coronary Ra_micro cannot be zero.\n" );
     SYS_T::print_fatal_if( Rv[ii] == 0.0, "Error: GenBC_Coronary Rv cannot be zero.\n" );
 
-    if( in_index == 0)
+    if( in_index == 0 )
     {
       std::ofstream ofile;
       ofile.open( lpn_sol_file.c_str(), std::ofstream::out | std::ofstream::trunc );
