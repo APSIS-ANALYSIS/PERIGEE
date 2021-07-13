@@ -142,8 +142,7 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
 
   SYS_T::commPrint( "===> GenBC_Coronary data are read in from %s.\n", lpn_filename );
 
-  // Set zero initial values if simulation restart index is 0.
-  // They will be reset based on the 3D solutions.
+  // Set zero initial values. These will be reset based on the 3D solutions.
   for(int ii=0; ii<num_ebc; ++ii)
   {
     Q0[ii] = 0.0;
@@ -151,6 +150,7 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
     {
       Pi0[ii][jj] = 0.0;
       prev_0D_sol[ii][jj] = 0.0;
+      restart_0D_sol[ii][jj] = 0.0;
     }  
 
     // Make sure C and R are nonzero
