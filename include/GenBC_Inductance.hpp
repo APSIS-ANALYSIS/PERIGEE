@@ -61,6 +61,8 @@ class GenBC_Inductance : public IGenBC
       P0[ii] = in_P_0;
     }
 
+    virtual void write_0D_sol( const int &curr_index, const double &curr_time ) const {};
+
   private:
     int num_ebc; // number of elemental boundary faces
     

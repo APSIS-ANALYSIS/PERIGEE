@@ -49,6 +49,8 @@ class GenBC_RCR : public IGenBC
       reset_initial_sol( ii, in_Q_0, in_P_0 );
     }
 
+    virtual void write_0D_sol( const int &curr_index, const double &curr_time ) const {};
+
   private:
     const int N;
     
