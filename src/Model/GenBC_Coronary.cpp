@@ -51,6 +51,7 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
     Pim_data.resize( num_ebc );
     der_Pim_data.resize( num_ebc );
     prev_0D_sol.resize( num_ebc );
+    restart_0D_sol.resize( num_ebc );
     dPimdt_k1.resize( num_ebc );
     dPimdt_k2.resize( num_ebc );
     dPimdt_k3.resize( num_ebc );
@@ -58,6 +59,7 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
     for( int ii =0; ii<num_ebc; ++ii )
     {
       prev_0D_sol[ii].resize( num_odes );
+      restart_0D_sol[ii].resize( num_odes );
       Pi0[ii].resize( num_odes );
 
       dPimdt_k1[ii].resize( N+1 );
@@ -151,11 +153,17 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
       prev_0D_sol[ii][jj] = 0.0;
     }  
 
+    // Make sure C and R are nonzero
+    SYS_T::print_fatal_if( Ca[ii] == 0.0, "Error: GenBC_Coronary Ca cannot be zero.\n" );
+    SYS_T::print_fatal_if( Cim[ii] == 0.0, "Error: GenBC_Coronary Cim cannot be zero.\n" );
+    SYS_T::print_fatal_if( Ra_micro[ii] == 0.0, "Error: GenBC_Coronary Ra_micro cannot be zero.\n" );
+    SYS_T::print_fatal_if( Rv[ii] == 0.0, "Error: GenBC_Coronary Rv cannot be zero.\n" );
+
     if( in_index == 0)
     {
       std::ofstream ofile;
       ofile.open( lpn_sol_file.c_str(), std::ofstream::out | std::ofstream::trunc );
-      ofile<<"# Time index"<<'\t'<<" Time"<<'\t'<<"0D_sol[i][j] 0D_sol[i][j+1] ..."<<'\t'<<"i=0...num_ebc-1, j=0...num_odes-1"<<'\n';
+      ofile<<"# Time index"<<'\t'<<"Time"<<'\t'<<"0D_sol[i][j] 0D_sol[i][j+1] ..."<<'\t'<<"i=0...num_ebc-1, j=0...num_odes-1"<<'\n';
       ofile.close();
     }
     // if restart index > 0, read initial 0D solutions from coronary_sol.txt
@@ -170,12 +178,14 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
         {
           sstrm.str(sline);
           int temp_index;
+          double temp_time;
           sstrm >> temp_index;
+          sstrm >> temp_time;
           if( temp_index == in_index )
           {
             is_0D_sol_found = true;
             for( int ii=0; ii<num_ebc; ++ii )
-              for( int jj=0; jj<num_odes; ++jj ) sstrm >> prev_0D_sol[ii][jj];
+              for( int jj=0; jj<num_odes; ++jj ) sstrm >> restart_0D_sol[ii][jj];
             break;
           }
         }
@@ -184,12 +194,6 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
       reader.close();
       SYS_T::print_fatal_if(!is_0D_sol_found, "Error: GenBC_Coronary cannot find 0D solutions for restart index = %d .\n", in_index); 
     }
-
-    // Make sure C and R are nonzero
-    SYS_T::print_fatal_if( Ca[ii] == 0.0, "Error: GenBC_Coronary Ca cannot be zero.\n" );
-    SYS_T::print_fatal_if( Cim[ii] == 0.0, "Error: GenBC_Coronary Cim cannot be zero.\n" );
-    SYS_T::print_fatal_if( Ra_micro[ii] == 0.0, "Error: GenBC_Coronary Ra_micro cannot be zero.\n" );
-    SYS_T::print_fatal_if( Rv[ii] == 0.0, "Error: GenBC_Coronary Rv cannot be zero.\n" );
   }
 }
 
@@ -335,14 +339,19 @@ double GenBC_Coronary::get_P0( const int &ii ) const
 }
 
 void GenBC_Coronary::reset_initial_sol( const int &ii, const double &in_Q_0,
-    const double &in_P_0, const double &curr_time )
+    const double &in_P_0, const double &curr_time, const bool &is_restart )
 {
   Q0[ii] = in_Q_0;
 
-  // Use the last 0D solution as initial solutions for the next time integration.
-  for(int jj=0; jj<num_odes; ++jj) Pi0[ii][jj] = prev_0D_sol[ii][jj];
+  // For a restart job, use 0D solutions from user-defined time step 
+  // as initial solutions for the next time integration. Otherwise, use
+  // the previous 0D solutions as initial solutions.
+  if( is_restart )
+    for( int jj=0; jj<num_odes; ++jj ) Pi0[ii][jj] = restart_0D_sol[ii][jj];
+  else
+    for( int jj=0; jj<num_odes; ++jj ) Pi0[ii][jj] = prev_0D_sol[ii][jj];
 
-  // Precalculate dPimdt values needed for integrating Coronary ODEs.
+  // Precalculate dPimdt values needed for integrating coronary ODEs.
   if( num_Pim_data[ii]>0 ) get_dPim_dt(ii, curr_time, curr_time + N * h);
 }
 
