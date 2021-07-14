@@ -217,7 +217,7 @@ void GenBC_Coronary::write_0D_sol( const int &curr_index, const double &curr_tim
   ofile << curr_index << '\t' << curr_time;
 
   for( int ii=0; ii<num_ebc; ++ii )
-    for( int jj=0; jj<num_odes; ++jj ) ofile << '\t' << prev_0D_sol[ii][jj];
+    for( int jj=0; jj<num_odes; ++jj ) ofile << '\t' << std::scientific << std::setprecision(16) << std::setw(20) << prev_0D_sol[ii][jj];
 
   ofile << '\n';
   ofile.close();
