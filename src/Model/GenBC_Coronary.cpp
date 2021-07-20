@@ -1,12 +1,12 @@
 #include "GenBC_Coronary.hpp"
 
-GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename, 
+GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
     const int &in_N, const double &dt3d, const int &in_index,
     const std::string &in_lpn_sol_file )
-: num_odes(2), N( in_N ), h( dt3d/static_cast<double>(N) ), 
+: num_odes(2), N( in_N ), h( dt3d/static_cast<double>(N) ),
   lpn_sol_file( in_lpn_sol_file ), absTol( 1.0e-8 ), relTol( 1.0e-5 )
 {
-  // Now read the lpn input file for num_ebc and coronary model 
+  // Now read the lpn input file for num_ebc and coronary model
   // parameters (Ra, Ca, Ra_micro, Cim, Rv, Pd and Pim)
   std::string temp_name( lpn_filename );
   SYS_T::file_check( temp_name ); // make sure the file is on the disk
@@ -37,15 +37,15 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
       || bc_type.compare("coronary") == 0 )
   {
     // Allocate the containers for model parameters
-    Ra.resize( num_ebc ); 
+    Ra.resize( num_ebc );
     Ca.resize( num_ebc );
-    Ra_micro.resize( num_ebc ); 
+    Ra_micro.resize( num_ebc );
     Cim.resize( num_ebc );
-    Rv.resize( num_ebc ); 
+    Rv.resize( num_ebc );
     Pd.resize( num_ebc );
     alpha_Pim.resize( num_ebc );
     Q0.resize( num_ebc );
-    Pi0.resize( num_ebc ); 
+    Pi0.resize( num_ebc );
     num_Pim_data.resize( num_ebc );
     Time_data.resize( num_ebc );
     Pim_data.resize( num_ebc );
@@ -69,7 +69,7 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
   }
   else SYS_T::print_fatal("Error: the outflow model in %s does not match GenBC_Coronary.\n", lpn_filename);
 
-  // Read files for each ebc to set the values of Ra, Ca, Ra_micro, 
+  // Read files for each ebc to set the values of Ra, Ca, Ra_micro,
   // Cim, Rv, Pd, num_Pim_data, and alpha_Pim
   int counter = 0;
   while( std::getline(reader, sline) )
@@ -82,7 +82,7 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
 
       // Make sure the face_id, the first column in the file are listed
       // from 0 to ebc_id - 1
-      SYS_T::print_fatal_if( face_id != counter, 
+      SYS_T::print_fatal_if( face_id != counter,
           "Error: GenBC_Coronary the input file %s has wrong format in the face id column (the first column). \n", lpn_filename );
 
       sstrm >> Ra[ counter ];
@@ -94,11 +94,11 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
       sstrm >> num_Pim_data[ counter ];
       sstrm >> alpha_Pim[ counter ];
 
-      SYS_T::print_fatal_if( num_Pim_data[counter] <= 2 && num_Pim_data[counter] != 0, 
+      SYS_T::print_fatal_if( num_Pim_data[counter] <= 2 && num_Pim_data[counter] != 0,
           "Error: number of Pim data needs to be 0 for RCR or greater than 2 for coronary BC. \n" );
 
-      // Resize the IntraMyocardial data 
-      if( num_Pim_data[counter] > 0 ) 
+      // Resize the IntraMyocardial data
+      if( num_Pim_data[counter] > 0 )
       {
         const int data_size = num_Pim_data[counter];
 
@@ -130,7 +130,7 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
         Pim_data[counter].clear();
         der_Pim_data[counter].clear();
       }
-      
+
       sstrm.clear();
       counter += 1;
     }
@@ -151,29 +151,30 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
       Pi0[ii][jj] = 0.0;
       prev_0D_sol[ii][jj] = 0.0;
       restart_0D_sol[ii][jj] = 0.0;
-    }  
+    }
 
     // Make sure C and R are nonzero
     SYS_T::print_fatal_if( Ca[ii] == 0.0, "Error: GenBC_Coronary Ca cannot be zero.\n" );
     SYS_T::print_fatal_if( Cim[ii] == 0.0, "Error: GenBC_Coronary Cim cannot be zero.\n" );
     SYS_T::print_fatal_if( Ra_micro[ii] == 0.0, "Error: GenBC_Coronary Ra_micro cannot be zero.\n" );
     SYS_T::print_fatal_if( Rv[ii] == 0.0, "Error: GenBC_Coronary Rv cannot be zero.\n" );
+  }
 
-    if( in_index == 0 )
-    {
-      std::ofstream ofile;
-      ofile.open( lpn_sol_file.c_str(), std::ofstream::out | std::ofstream::trunc );
-      ofile<<"# Time index"<<'\t'<<"Time"<<'\t'<<"0D_sol[i][j] 0D_sol[i][j+1] ..."<<'\t'<<"i=0...num_ebc-1, j=0...num_odes-1"<<'\n';
-      ofile.close();
-    }
-    // if restart index > 0, read initial 0D solutions from coronary_sol.txt
-    else
-    {
-      reader.open( lpn_sol_file.c_str(), std::ifstream::in );
-      bool is_0D_sol_found = false;
+  if( in_index == 0 )
+  {
+    std::ofstream ofile;
+    ofile.open( lpn_sol_file.c_str(), std::ofstream::out | std::ofstream::trunc );
+    ofile<<"# Time index"<<'\t'<<"Time"<<'\t'<<"0D_sol[i][j] 0D_sol[i][j+1] ..."<<'\t'<<"i=0...num_ebc-1, j=0...num_odes-1"<<'\n';
+    ofile.close();
+  }
+   // if restart index > 0, read initial 0D solutions from coronary_sol.txt
+  else
+  {
+    reader.open( lpn_sol_file.c_str(), std::ifstream::in );
+    bool is_0D_sol_found = false;
 
-      while( std::getline(reader, sline) )
-      {
+    while( std::getline(reader, sline) )
+    {
         if( sline[0] != '#' && !sline.empty() )
         {
           sstrm.str(sline);
@@ -185,16 +186,21 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
           {
             is_0D_sol_found = true;
             for( int ii=0; ii<num_ebc; ++ii )
-              for( int jj=0; jj<num_odes; ++jj ) sstrm >> restart_0D_sol[ii][jj];
+              for( int jj=0; jj<num_odes; ++jj )
+              {
+                sstrm >> restart_0D_sol[ii][jj];
+                Pi0[ii][jj] = restart_0D_sol[ii][jj];
+                if( num_Pim_data[ii]>0 ) get_dPim_dt(ii, temp_time, temp_time + N * h);
+              }
             break;
           }
         }
-      }
-
-      reader.close();
-      SYS_T::print_fatal_if(!is_0D_sol_found, "Error: GenBC_Coronary cannot find 0D solutions for restart index = %d .\n", in_index); 
     }
+
+    reader.close();
+    SYS_T::print_fatal_if(!is_0D_sol_found, "Error: GenBC_Coronary cannot find 0D solutions for restart index = %d .\n", in_index);
   }
+
 }
 
 GenBC_Coronary::~GenBC_Coronary()
@@ -205,7 +211,7 @@ void GenBC_Coronary::print_info() const
   SYS_T::commPrint( "     Coronary model: N = %d, h = %e, num_ebc = %d \n", N, h, num_ebc );
 
   for(int ii=0; ii<num_ebc; ++ii)
-    SYS_T::commPrint( "     ebcid = %d, Ra = %e, Ca = %e, Ra_micro = %e,Rim = %e, Rv = %e, Pd = %e \n", 
+    SYS_T::commPrint( "     ebcid = %d, Ra = %e, Ca = %e, Ra_micro = %e,Rim = %e, Rv = %e, Pd = %e \n",
         ii, Ra[ii], Ca[ii],Ra_micro[ii],Cim[ii], Rv[ii], Pd[ii] );
 }
 
@@ -251,7 +257,7 @@ double GenBC_Coronary::get_P( const int &ii, const double &in_dot_Q,
     // Each RCR face is governed by an ODE only.
     double pi_m = Pi0[ii][0]; // Pi_m
 
-    // in_Q gives Q_N = Q_n+1, and Q0[ii] gives Q_0 = Q_n. 
+    // in_Q gives Q_N = Q_n+1, and Q0[ii] gives Q_0 = Q_n.
     // do Runge-Kutta 4 with the 3/8 rule
     for(int mm=0; mm<N; ++mm)
     {
@@ -272,16 +278,16 @@ double GenBC_Coronary::get_P( const int &ii, const double &in_dot_Q,
 
     prev_0D_sol[ii][0] = pi_m;
 
-    output_P =  pi_m + Ra[ii] * in_Q ; 
+    output_P =  pi_m + Ra[ii] * in_Q ;
   }
   else
   {
     // Here, we know it is a coronary face.
-    // Each coronary face is governed by num_odes = 2 ODEs.  
+    // Each coronary face is governed by num_odes = 2 ODEs.
     // initial pressures at Ca and Cim
     double pi_m[num_odes];
 
-    // auxiliary variables for RK4 
+    // auxiliary variables for RK4
     double K1[num_odes], K2[num_odes], K3[num_odes], K4[num_odes];
     double pi_tmp[num_odes];
 
@@ -324,8 +330,8 @@ double GenBC_Coronary::get_P( const int &ii, const double &in_dot_Q,
         pi_m[jj] = pi_m[jj] + fac18 * K1[jj] * h + fac38 * K2[jj] * h + fac38 * K3[jj] * h + fac18 * K4[jj] * h;
     }
 
-    // Make a copy of the ODE solutions. 
-    // prev_0D_sol will reset initial values Pi0 for future time integration (t=n+1-> t=n+2) 
+    // Make a copy of the ODE solutions.
+    // prev_0D_sol will reset initial values Pi0 for future time integration (t=n+1-> t=n+2)
     for(int jj=0; jj<num_odes; ++jj) prev_0D_sol[ii][jj]=pi_m[jj];
 
     output_P = pi_m[0] + Ra[ii] * in_Q;
@@ -343,7 +349,7 @@ void GenBC_Coronary::reset_initial_sol( const int &ii, const double &in_Q_0,
 {
   Q0[ii] = in_Q_0;
 
-  // For a restart job, use 0D solutions from user-defined time step 
+  // For a restart job, use 0D solutions from user-defined time step
   // as initial solutions for the next time integration. Otherwise, use
   // the previous 0D solutions as initial solutions.
   if( is_restart )
@@ -355,11 +361,11 @@ void GenBC_Coronary::reset_initial_sol( const int &ii, const double &in_Q_0,
   if( num_Pim_data[ii]>0 ) get_dPim_dt(ii, curr_time, curr_time + N * h);
 }
 
-void GenBC_Coronary::F_coronary( const int &ii, const double * const &pi, const double &q, 
+void GenBC_Coronary::F_coronary( const int &ii, const double * const &pi, const double &q,
     const double &dPimdt, double * const &K ) const
 {
-  // The Coronary LPM consists of two ODEs. 
-  
+  // The Coronary LPM consists of two ODEs.
+
   K[0] = (q-(pi[0]-pi[1])/Ra_micro[ii])/Ca[ii];
   K[1] = ((pi[0]-pi[1])/Ra_micro[ii]-(pi[1]-Pd[ii])/Rv[ii])/Cim[ii]+dPimdt;
 }
@@ -375,7 +381,7 @@ void GenBC_Coronary::get_dPim_dt( const int &ii, const double &time_start, const
   double tend_mod = fmod( time_end, Time_data[ii][num_Pim_data[ii]-1] );
   if ( tend_mod<absTol ) tend_mod =  Time_data[ii][num_Pim_data[ii]-1];
 
-  // Find the interval in Pim that covers current integration time. 
+  // Find the interval in Pim that covers current integration time.
   double x1, x2, f1, f2, d1, d2;
   bool is_interval_found = false;
   for(int mm=1; mm<num_Pim_data[ii]; ++mm)
@@ -400,8 +406,8 @@ void GenBC_Coronary::get_dPim_dt( const int &ii, const double &time_start, const
   xe_2.resize( N );
   xe_3.resize( N );
 
-  // Precalculate dPimdt values at time points evaluated by RK4 
-  // from time_start to time_end. 
+  // Precalculate dPimdt values at time points evaluated by RK4
+  // from time_start to time_end.
   double tmp = time_start;
 
   const double fac13 = 1.0 / 3.0;
