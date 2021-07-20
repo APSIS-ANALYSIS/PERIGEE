@@ -92,6 +92,7 @@ int main( int argc, char *argv[] )
   double restart_time = 0.0;         // restart time
   double restart_step = 1.0e-3;      // restart simulation time step size
   std::string restart_name = "SOL_"; // restart solution base name
+  std::string restart_disp_name = "SOL_disp_"; // restart disp solution base name
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
@@ -138,7 +139,8 @@ int main( int argc, char *argv[] )
   SYS_T::GetOptionReal(  "-restart_time",    restart_time);
   SYS_T::GetOptionReal(  "-restart_step",    restart_step);
   SYS_T::GetOptionString("-restart_name",    restart_name);
-
+  SYS_T::GetOptionString("-restart_disp_name",    restart_disp_name);
+  
   // ===== Print Command Line Arguments =====
   SYS_T::cmdPrint(      "-nqp_tet:",         nqp_tet);
   SYS_T::cmdPrint(      "-nqp_tri:",         nqp_tri);
@@ -189,6 +191,7 @@ int main( int argc, char *argv[] )
     SYS_T::cmdPrint(    "-restart_time:",    restart_time);
     SYS_T::cmdPrint(    "-restart_step:",    restart_step);
     SYS_T::cmdPrint(    "-restart_name:",    restart_name);
+    SYS_T::cmdPrint(    "-restart_disp_name:",    restart_disp_name);
   }
   else SYS_T::commPrint("-is_restart: false \n");
 
@@ -358,17 +361,18 @@ int main( int argc, char *argv[] )
     sol->ReadBinary(restart_name.c_str());
 
     // Read in dot pres, dot velo
-    std::string restart_dot_name = "dot_" + restart_name;
+    std::string restart_dot_name = "dot_";
+    restart_dot_name.append(restart_name);
     SYS_T::file_check(restart_dot_name.c_str());
     dot_sol->ReadBinary(restart_dot_name.c_str());
 
     // Read in wall disp
-    std::string restart_disp_name = restart_name + "_disp";
     SYS_T::file_check(restart_disp_name.c_str());
     sol_wall_disp->ReadBinary(restart_disp_name.c_str());
 
     // Read in dot wall disp
-    std::string restart_dot_disp_name = "dot_" + restart_name + "_disp";
+    std::string restart_dot_disp_name = "dot_";
+    restart_dot_disp_name.append(restart_disp_name);
     SYS_T::file_check(restart_dot_disp_name.c_str());
     dot_sol_wall_disp->ReadBinary(restart_dot_disp_name.c_str());
 
