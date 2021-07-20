@@ -32,7 +32,7 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
   }
 
   // Check the file's bc_type matches Coronary
-  if( bc_type.compare("Coronary") ==0
+  if( bc_type.compare("Coronary") == 0
       || bc_type.compare("CORONARY") == 0
       || bc_type.compare("coronary") == 0 )
   {
@@ -167,7 +167,7 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
     ofile<<"# Time index"<<'\t'<<"Time"<<'\t'<<"0D_sol[i][j] 0D_sol[i][j+1] ..."<<'\t'<<"i=0...num_ebc-1, j=0...num_odes-1"<<'\n';
     ofile.close();
   }
-   // if restart index > 0, read initial 0D solutions from coronary_sol.txt
+  // if restart index > 0, read initial 0D solutions from coronary_sol.txt
   else
   {
     reader.open( lpn_sol_file.c_str(), std::ifstream::in );
@@ -175,32 +175,35 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
 
     while( std::getline(reader, sline) )
     {
-        if( sline[0] != '#' && !sline.empty() )
+      if( sline[0] != '#' && !sline.empty() )
+      {
+        sstrm.str(sline);
+        int temp_index;
+        double temp_time;
+        sstrm >> temp_index;
+        sstrm >> temp_time;
+        if( temp_index == in_index )
         {
-          sstrm.str(sline);
-          int temp_index;
-          double temp_time;
-          sstrm >> temp_index;
-          sstrm >> temp_time;
-          if( temp_index == in_index )
+          is_0D_sol_found = true;
+          for( int ii=0; ii<num_ebc; ++ii )
           {
-            is_0D_sol_found = true;
-            for( int ii=0; ii<num_ebc; ++ii )
-              for( int jj=0; jj<num_odes; ++jj )
-              {
-                sstrm >> restart_0D_sol[ii][jj];
-                Pi0[ii][jj] = restart_0D_sol[ii][jj];
-                if( num_Pim_data[ii]>0 ) get_dPim_dt(ii, temp_time, temp_time + N * h);
-              }
-            break;
+            for( int jj=0; jj<num_odes; ++jj )
+            {
+              sstrm >> restart_0D_sol[ii][jj];
+              Pi0[ii][jj] = restart_0D_sol[ii][jj];
+ 
+              // Precalculate dPimdt values needed for integrating coronary ODEs.
+              if( num_Pim_data[ii]>0 ) get_dPim_dt(ii, temp_time, temp_time + N * h);
+            }
           }
+          break;
         }
+      }
     }
 
     reader.close();
     SYS_T::print_fatal_if(!is_0D_sol_found, "Error: GenBC_Coronary cannot find 0D solutions for restart index = %d .\n", in_index);
   }
-
 }
 
 GenBC_Coronary::~GenBC_Coronary()

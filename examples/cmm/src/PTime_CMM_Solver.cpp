@@ -108,7 +108,7 @@ void PTime_CMM_Solver::TM_CMM_GenAlpha(
   std::string sol_dot_wall_disp_name ("");
 
   // If this is a restart run, do not re-write the solution binaries
-  if(restart_init_assembly_flag == false)
+  if( !restart_init_assembly_flag )
   {
     // Write [ (dot) pres, (dot) velo ]
     sol_name = Name_Generator(time_info->get_index());
