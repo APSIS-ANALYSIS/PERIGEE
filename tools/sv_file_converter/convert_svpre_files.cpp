@@ -30,7 +30,10 @@ int main( int argc, char * argv[] )
   std::string wal_out_name("wall_vol.vtp");
   std::string inl_out_name("inflow_vol.vtp");
   std::string out_out_base("outflow_vol_");
-  
+
+  // Element options: 501 linear tets, 502 quadratic tets
+  int elemType = 501;
+
   PetscMPIInt size;
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
@@ -38,10 +41,19 @@ int main( int argc, char * argv[] )
   SYS_T::print_fatal_if(size!=1,"ERROR: converter is a serial routine! \n");
   
   SYS_T::GetOptionString("-svpre_file", svpre_file); 
+  SYS_T::GetOptionInt(   "-elem_type",         elemType);
   SYS_T::GetOptionString("-vol_geo_name", geo_out_name);
   SYS_T::GetOptionString("-inl_geo_name", inl_out_name);
   SYS_T::GetOptionString("-wal_geo_name", wal_out_name);
   SYS_T::GetOptionString("-out_geo_base", out_out_base);
+ 
+  if( elemType != 501 && elemType != 502 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
+
+  if( elemType == 502 )
+  {
+    wal_out_name = "wall_vol.vtu"; 
+    inl_out_name = "inflow_vol.vtu"; 
+  }
 
   std::cout<<"==== Command Line Arguments ===="<<std::endl;
   std::cout<<" -svpre_file:   "<<svpre_file<<std::endl;
@@ -123,7 +135,7 @@ int main( int argc, char * argv[] )
         SYS_T::file_check(column_2); 
       }
       else
-        SYS_T::print_fatal("Error: svpre line should be vtp file.\n");
+        SYS_T::print_fatal("Error: svpre line should be vtu/vtp file.\n");
     }
   }
 
@@ -142,11 +154,13 @@ int main( int argc, char * argv[] )
     if( ii/10 == 0 ) sw<<"00";
     else if( ii/100 == 0 ) sw<<"0";
 
-    sw<<ii<<".vtp";
+    if( elemType == 501 ) sw<<ii<<".vtp";
+    else sw<<ii<<".vtu";
+
     sur_file_out_write[ii] = sw.str();
   }
 
-  // Update teh volumetric mesh file
+  // Update the volumetric mesh file
   int nstart, estart;
   SV_T::update_sv_vtu( geo_file, geo_out_name, nstart, estart );
 
@@ -155,14 +169,21 @@ int main( int argc, char * argv[] )
   std::cout<<"Status: "<<geo_file<< " updated, the starting node index "<<nstart<<" and the starting element index "<<estart<<" are corrected to 0.\n";
 
   // Now use the nstart and estart to correct the vtp files
-  SV_T::update_sv_vtp( sur_file_in, inl_out_name, nstart, estart );
+  if( elemType == 501 ) SV_T::update_sv_vtp( sur_file_in, inl_out_name, nstart, estart );
+  else SV_T::update_sv_sur_vtu( sur_file_in, inl_out_name, nstart, estart );
+
   std::cout<<"Status: inflow wall mesh is updated.\n";
 
-  SV_T::update_sv_vtp( sur_file_wall, wal_out_name, nstart, estart );
-  std::cout<<"Stauts: wall mesh is updated.\n";
+  if( elemType == 501 ) SV_T::update_sv_vtp( sur_file_wall, wal_out_name, nstart, estart );
+  else SV_T::update_sv_sur_vtu( sur_file_wall, wal_out_name, nstart, estart );
+
+  std::cout<<"Status: wall mesh is updated.\n";
 
   for(int ii=0; ii<num_outlet; ++ii)
-    SV_T::update_sv_vtp( sur_file_out[ii], sur_file_out_write[ii], nstart, estart );
+  {
+    if( elemType == 501 ) SV_T::update_sv_vtp( sur_file_out[ii], sur_file_out_write[ii], nstart, estart );
+    else SV_T::update_sv_sur_vtu( sur_file_out[ii], sur_file_out_write[ii], nstart, estart );
+  }
 
   std::cout<<"Status: "<<num_outlet<<" outflow face meshes are updated.\n";
 
