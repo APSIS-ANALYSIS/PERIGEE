@@ -41,7 +41,7 @@ int main( int argc, char * argv[] )
   SYS_T::print_fatal_if(size!=1,"ERROR: converter is a serial routine! \n");
   
   SYS_T::GetOptionString("-svpre_file", svpre_file); 
-  SYS_T::GetOptionInt(   "-elem_type",         elemType);
+  SYS_T::GetOptionInt(   "-elem_type",  elemType);
   SYS_T::GetOptionString("-vol_geo_name", geo_out_name);
   SYS_T::GetOptionString("-inl_geo_name", inl_out_name);
   SYS_T::GetOptionString("-wal_geo_name", wal_out_name);
@@ -57,6 +57,7 @@ int main( int argc, char * argv[] )
 
   std::cout<<"==== Command Line Arguments ===="<<std::endl;
   std::cout<<" -svpre_file:   "<<svpre_file<<std::endl;
+  std::cout<<" -elem_type:    "<<elemType<<std::endl;
   std::cout<<"names to be written: \n";
   std::cout<<" -vol_geo_name: "<<geo_out_name<<std::endl;
   std::cout<<" -wal_geo_name: "<<wal_out_name<<std::endl;
