@@ -47,6 +47,9 @@ int main( int argc, char * argv[] )
   // Element options: 501 linear tets, 502 quadratic tets
   int elemType = 501;
   int num_outlet = 1;
+  
+  // ringBC_type : 0 fully clamped for the ring nodes
+  //               1 in-plane motion allowed for the ring nodes
   int ringBC_type = 0;
 
   // cmmBC_type : 0 deformable wall, 
