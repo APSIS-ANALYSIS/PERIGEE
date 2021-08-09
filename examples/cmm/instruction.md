@@ -11,6 +11,6 @@ In the preprocessor (source code is preprocess_sv_tets.cpp), one needs to prepar
 * `-sur_file_wall` specifies the vtp or vtu file for the wall surface.
 * `-sur_file_out_base` specifies the vtp or vtu file for the outlet surfaces. Together with the number of outlets, the code will load sur_file_out_base + xxx.vtp (vtu) from the disk.
 The following arguments determines the wall properties.
-* `-is_uniform_wall` is a bool argument that determines if we want to have uniform wall properties. If it is true, the following two arguments determien the actual properties.
-- `-wall_thickness` gives the wall thickness.
-- `-wall_youngsmod` gives the Young's modulus of the wall.
+> `-is_uniform_wall` is a bool argument that determines if we want to have uniform wall properties. If it is true, the following two arguments determien the actual properties.
+> `-wall_thickness` gives the wall thickness.
+> `-wall_youngsmod` gives the Young's modulus of the wall.
