@@ -10,7 +10,16 @@ In the preprocessor (source code is preprocess_sv_tets.cpp), one needs to prepar
 * `-sur_file_in` specifies the vtp or vtu file for the inlet surface.
 * `-sur_file_wall` specifies the vtp or vtu file for the wall surface.
 * `-sur_file_out_base` specifies the vtp or vtu file for the outlet surfaces. Together with the number of outlets, the code will load sur_file_out_base + xxx.vtp (vtu) from the disk.
-The following arguments determines the wall properties.
-* `-is_uniform_wall` is a bool argument that determines if we want to have uniform wall properties. If it is true, the following two arguments determien the actual properties.
-    +`-wall_thickness` gives the wall thickness.
-    +`-wall_youngsmod` gives the Young's modulus of the wall.
+
+The following arguments determines part of the wall properties.
+* `-is_uniform_wall` is a bool argument that determines if we want to have uniform wall properties. It determines which constructor is called for ElemBC_3D_tet_wall. If it is false, the wall properties are determined from a centerline file. The file for the centerline should be named as centerlines.vtp and be placed in the preprocessor folder. The wall thickness is 20 percent of the radius. The Young's modulus is calculated from an empirical formula, which is. defined in ElemBC_3D_tet_wall::compute_youngsmod. If it is true, the following two arguments determien the actual properties.
+    * `-wall_thickness` gives the wall thickness.
+    * `-wall_youngsmod` gives the Young's modulus of the wall.
+* `-wall_springconst` defines the supporting tissue model's elastic coefficient.
+* `-wall_dampingconst` defines the supporting tissue model's damping coefficient.
+
+So far, the thickness-to-radius ratio, the formula for the Young's modulus, the supporting tissue's two parameters are assumed to take a uniform value. In a more sophsiticated manner, one may set them with different values in different regions of the wall. To do so, one needs to go over the thrid constructor for the ElemBC_3D_tet_wall class.
+
+The following argument determines the boundary conditions on the inlet and outlets.
+* `-cmmbc_type` is an integer flag that determines NodalBC_3D_CMM. If it is `0` (default value), the wall is set to be deformable; if it is `1`, the wall is set as a homogeneous boundary meaning the wall is rigid; if it is `2`, the variables in the fluid subdomain is fixed so that one can solve the wall mechanics for prestress.
+* `-ringbc_type` is an integer flag that determines NodalBC_3D_ring, which also affects NodalBC_3D_CMM. If it is `0` (default value), the ring nodes are fully clamped; if it is `1`, the ring nodes are allowed to move within their original plane.
