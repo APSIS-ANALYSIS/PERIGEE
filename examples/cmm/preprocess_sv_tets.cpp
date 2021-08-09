@@ -54,7 +54,8 @@ int main( int argc, char * argv[] )
 
   // cmmBC_type : 0 deformable wall, 
   //              1 rigid wall, 
-  //              2 variables in the fluid subdomain all fixed
+  //              2 variables in the fluid subdomain all fixed for prestress
+  //                generation
   int cmmBC_type = 0;
 
   // Wall properties
