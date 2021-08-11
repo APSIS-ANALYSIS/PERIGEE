@@ -37,3 +37,5 @@ In the actual [analysis driver](cmm_driver.cpp), one can perform both deformable
 First, the actual fluid and solid material properties used for the simulation are defined through the following arguments.
 * `-fl_density` and `-fl-mu` defines the fluid density and viscosity.
 * `-wall_density`, `-wall_poisson`, and `-wall_kappa` defines the wall density, Poisson's ratio, and the shear correction factor. We assume they are uniform in the wall.
+* `-nqp_tet` and `-nqp_tri` defines the number of volume and surface quadrature points. Note that if you use quadratic mesh, be sure to set them to be `29` and `13`, respectively, otherwise the code will be killed.
+* There are several parameters that define the inflow information. The arugment `-inflow_file` specifies the inflow fourier series, with default value `inflow_fourier_series.txt`. If this file is placed in the job folder and has correct format, the code will load it to generate a (pulsatile) inflow profile.
