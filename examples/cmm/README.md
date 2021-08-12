@@ -6,6 +6,7 @@ This folder contains a suite of codes for performing patient-specific vascular F
 - [Preprocessor](#Preprocessor)
 - [FSI analysis](#FSI-Analysis)
 - [Wall prestress generation](#Wall-prestress-generation)
+- [Simulation pipeline](#Simulation-pipeline)
 
 ## Preprocessor
 In the [preprocessor](preprocess_sv_tets.cpp), one needs to prepare the mesh, assign proper boundary conditions, and do mesh partitioning. There are a few critical input arugments. The following arguments determine the basic setting of the geometry as well as the mesh partitioning.
@@ -51,4 +52,36 @@ We want to mention a few things about its input arguments.
 * The argument `-prestress_disp_tol` determines the stoping criterion for the fixed-point iteration, with default value being `1.0e-6`.
 * The argument `-init_step` sets the time step size. As we are driving for a steady state solution, it is recommended to make the time step large.
 * The argument `-is_backward_Euler` tells this solver if we want to use Backward Euler or the Generalized-alpha method. It is recommended to use Backward Euler.
+* The argument `-is_record_sol` tells the wall solver if we want to save the solution files.
+
+## Simulation pipeline
+Here we describe a standard pipeline for performing CMM-FSI simulations. First, one may want to prepare the mesh partitioning for a rigid wall CFD simulation. We assume that the geometry mesh `whole_vol.vtu`, `inflow_vol.vtp`, `wall_vol.vtp`, `outflow_vol_xxx`, and `centerlines.vtp` have been placed in the job folder.
+```sh
+./preprocess3d -cmmbc_type 2 -ringbc_type 0 -is_uniform_wall NO -num_outlet 46 -cpu_size 60 -elem_type 501
+```
+With the generated `part_pxxxxx.h5` files as well as the LPN file `lpn_rcr_input.txt`, one may call the flow solver to generate a flow profile at the diastolic phase.
+```sh
+mpirun -np 60 ./cmm_tet_3d \
+  -fl_density 1.00 -fl_mu 4.0e-2 -wall_density 1.0 -wall_poisson 0.5 \
+  -nqp_tet 5 -nqp_tri 4 -init_step 4.055e-3 -fina_time 4.866 -is_backward_Euler YES \
+  -inflow_file inflow_fourier_series_steady.txt -lpn_file lpn_rcr_input.txt \
+  -nl_refreq 1 -nl_rtol 1.0e-6 -nl_atol 1.0e-6 -nl_dtol 1.0e8 -nl_maxits 20 \
+  -ttan_freq 100 -sol_rec_freq 10 \
+  -is_restart NO \
+  -ksp_type gmres -pc_type asm -ksp_rtol 1.0e-2 -ksp_atol 1.0e-50 -ksp_max_it 200 -ksp_gmres_restart 200 \
+  -log_view
+```
+* In the above script, one prepares a file `inflow_fourier_series_steady.txt` that has only one frequency with coefficient `a_0` matches the diastolic inflow.
+* Otherwise, without preparing the above text file, one could also set `-inflow_thd_time` be smaller than the `-fina_time` and `-inflow_tgt_rate` equaling the diastolic inflow rate. The flow will be linearly ramped up to the value.
+
+If the flow solver runs successfully, there will be a steady state solution recorded and we rename it to `SOL_re`. Copy it and `solver_cmd.h5` to the folder for prestress generation. Run the following to generate the `prestress_pxxxxx.h5` files.
+```sh
+mpirun -np 60 ./wall_solver \
+  -is_record_sol NO -is_backward_Euler YES -prestress_disp_tol 1.0e-6 \
+  -nqp_tet 5 -nqp_tri 4 -init_step 1.0e-2 -fina_time 2.433 \
+  -nl_refreq 1 -nl_rtol 1.0e-6 -nl_atol 1.0e-6 -nl_dtol 1.0e8 -nl_maxits 20 \
+  -ttan_freq 100 -sol_rec_freq 1 \
+  -ksp_type gmres -pc_type asm -ksp_rtol 1.0e-2 -ksp_atol 1.0e-50 -ksp_max_it 200 -ksp_gmres_restart 200 \
+  -log_view
+```
 
