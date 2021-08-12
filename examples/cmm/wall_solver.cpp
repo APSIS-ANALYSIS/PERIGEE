@@ -46,7 +46,8 @@ int main( int argc, char *argv[] )
   double initial_step = 0.1;         // time step size
   int    initial_index = 0;          // index of initial condition
   double final_time = 1.0;           // end time of simulation
-  std::string sol_bName("SOL_");     // base name of the solution file
+  bool   is_record_sol = false;      // bool flag to decide if one wants to record the solution
+  std::string sol_bName("PS_");      // base name of the solution file
   int    ttan_renew_freq = 1;        // frequency of tangent matrix renewal
   int    sol_record_freq = 1;        // frequency for recording the solution
 
@@ -89,6 +90,7 @@ int main( int argc, char *argv[] )
   SYS_T::GetOptionReal(  "-init_step",           initial_step);
   SYS_T::GetOptionInt(   "-init_index",          initial_index);
   SYS_T::GetOptionInt(   "-ttan_freq",           ttan_renew_freq);
+  SYS_T::GetOptionBool(  "-is_record_sol",       is_record_sol);
   SYS_T::GetOptionInt(   "-sol_rec_freq",        sol_record_freq);
 
   // ===== Print Command Line Arguments =====
@@ -111,7 +113,11 @@ int main( int argc, char *argv[] )
   SYS_T::cmdPrint(       "-init_index:",         initial_index);
   SYS_T::cmdPrint(       "-fina_time:",          final_time);
   SYS_T::cmdPrint(       "-ttan_freq:",          ttan_renew_freq);
-  SYS_T::cmdPrint(       "-sol_rec_freq:",       sol_record_freq);
+  
+  if( is_record_sol )
+    SYS_T::cmdPrint(     "-sol_rec_freq:",       sol_record_freq);
+  else
+    SYS_T::commPrint(    "-is_record_sol: false \n");
 
   // ===== Load Analysis Data Structure =====
   APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file);
@@ -238,13 +244,15 @@ int main( int argc, char *argv[] )
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
+  // The following objects are not needed in the prestress wall solver
   ICVFlowRate * inflow_rate_ptr = nullptr;
   IGenBC * gbc = nullptr;
   ALocal_Inflow_NodalBC * locinfnbc = nullptr;
   ALocal_EBC * locebc = nullptr;
   IQuadPts * quadv = nullptr;
 
-  tsolver->TM_Prestress( prestress_disp_tol, base, dot_sol, sol, dot_sol_wall_disp, sol_wall_disp,
+  tsolver->TM_Prestress( is_record_sol, prestress_disp_tol, 
+      base, dot_sol, sol, dot_sol_wall_disp, sol_wall_disp,
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN, pNode, fNode,
       locnbc, locinfnbc, locringnbc, locebc, locebc_wall, gbc, pmat, elementv, elements, elementw,
       quadv, quads, locAssem_ptr, gloAssem_ptr, lsolver, nsolver );

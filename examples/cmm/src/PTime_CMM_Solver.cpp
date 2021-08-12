@@ -255,6 +255,7 @@ void PTime_CMM_Solver::TM_CMM_GenAlpha(
 
 
 void PTime_CMM_Solver::TM_Prestress(
+    const bool &is_record_sol_flag,
     const double &prestress_tol,
     const PDNSolution * const &sol_base,
     const PDNSolution * const &init_dot_sol,
@@ -349,7 +350,7 @@ void PTime_CMM_Solver::TM_Prestress(
         SYS_T::get_time().c_str());
 
     // Record solution if meets criteria
-    if( time_info->get_index()%sol_record_freq == 0 )
+    if( is_record_sol_flag && time_info->get_index()%sol_record_freq == 0 )
     {
       // Write (dot) pres, (dot) velo
       sol_name = Name_Generator( time_info->get_index() );
