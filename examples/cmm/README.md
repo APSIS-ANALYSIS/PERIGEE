@@ -55,9 +55,9 @@ We want to mention a few things about its input arguments.
 * The argument `-is_record_sol` tells the wall solver if we want to save the solution files.
 
 ## Simulation pipeline
-Here we describe a standard pipeline for performing CMM-FSI simulations. First, one may want to prepare the mesh partitioning for a rigid wall CFD simulation. We assume that the geometry mesh `whole_vol.vtu`, `inflow_vol.vtp`, `wall_vol.vtp`, `outflow_vol_xxx`, and `centerlines.vtp` have been placed in the job folder.
+Here we describe a standard pipeline for performing CMM-FSI simulations. First, one may want to prepare the mesh partitioning for a rigid wall CFD simulation. We assume that **the geometry mesh whole_vol.vtu, inflow_vol.vtp, wall_vol.vtp, outflow_vol_xxx, and centerlines.vtp have been placed in the job folder**.
 ```sh
-./preprocess3d -cmmbc_type 2 -ringbc_type 0 -is_uniform_wall NO -num_outlet 46 -cpu_size 60 -elem_type 501
+./preprocess3d -cmmbc_type 1 -ringbc_type 0 -is_uniform_wall NO -num_outlet 46 -cpu_size 60 -elem_type 501
 ```
 With the generated `part_pxxxxx.h5` files as well as the LPN file `lpn_rcr_input.txt`, one may call the flow solver to generate a flow profile at the diastolic phase.
 ```sh
@@ -76,6 +76,8 @@ mpirun -np 60 ./cmm_tet_3d \
 
 If the flow solver runs successfully, there will be a steady state solution recorded and we rename it to `SOL_re`. Copy it and `solver_cmd.h5` to the folder for prestress generation. Run the following to generate the `prestress_pxxxxx.h5` files.
 ```sh
+./preprocess3d -cmmbc_type 2 -ringbc_type 0 -is_uniform_wall NO -num_outlet 46 -cpu_size 60 -elem_type 501
+
 mpirun -np 60 ./wall_solver \
   -is_record_sol NO -is_backward_Euler YES -prestress_disp_tol 1.0e-6 \
   -nqp_tet 5 -nqp_tri 4 -init_step 1.0e-2 -fina_time 2.433 \
@@ -84,4 +86,42 @@ mpirun -np 60 ./wall_solver \
   -ksp_type gmres -pc_type asm -ksp_rtol 1.0e-2 -ksp_atol 1.0e-50 -ksp_max_it 200 -ksp_gmres_restart 200 \
   -log_view
 ```
+Now we can rerun the preprocessor to assign boundary conditions for the deformable wall simulation.
+```sh
+./preprocess3d -cmmbc_type 0 -ringbc_type 0 -is_uniform_wall NO -num_outlet 46 -cpu_size 60 -elem_type 501
+```
+Now make sure that the hdf5 files generated from the above preprocessing code, the prestress_pxxxxx.h5 file, the LPN file `lpn_rcr_input.txt`, and the inflow file `inflow_fourier_series.txt` have all been placed in the same job folder. Also, one needs to copy the steady state solution from the previous analysis and name them as dot_SOL_re, SOL_disp_re, and dot_SOL_disp_re, and place them with the SOL_re file in the job folder. Run the following for the CMM simulation.
+```sh
+mpirun -np 60 ./cmm_tet_3d 
+   -nz_estimate 1000 -fl_density 1.00 -fl_mu 4.0e-2 -wall_density 1.0 -wall_poisson 0.5 \
+   -nqp_tet 5 -nqp_tri 4 \
+   -init_step 4.055e-4 -fina_time 2.433 \
+   -lpn_file lpn_rcr_input.txt \
+   -nl_refreq 1 -nl_rtol 1.0e-6 -nl_atol 1.0e-6 -nl_dtol 1.0e8 -nl_maxits 20 \
+   -ttan_freq 100 -sol_rec_freq 40 \
+   -is_restart YES \
+   -restart_index 0 \
+   -restart_time 0.0 \
+   -restart_step 4.055e-4 \
+   -restart_name SOL_re \
+   -restart_disp_name SOL_disp_re \
+   -ksp_type gmres -pc_type asm -ksp_rtol 1.0e-2 -ksp_atol 1.0e-50 -ksp_max_it 200 -ksp_gmres_restart 200 \
+   -log_view
+```
+Notice that we want to run this as a restart run with the restart solution coming from the steady state CFD analysis, since the wall loads the prestress to achieve load balancce with the fluid pressure.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
