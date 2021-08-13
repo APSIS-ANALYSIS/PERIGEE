@@ -37,7 +37,7 @@ In the actual [analysis driver](cmm_driver.cpp), one can perform both deformable
 * `-fl_density` and `-fl-mu` defines the fluid density and viscosity. Notice that the fluid density set in the preprocessor does not affect the analysis solver's definition.
 * `-wall_density`, `-wall_poisson`, and `-wall_kappa` defines the wall density, Poisson's ratio, and the shear correction factor. We assume they are uniform in the wall.
 * `-nqp_tet` and `-nqp_tri` defines the number of volume and surface quadrature points. Note that if you use quadratic mesh, be sure to set them to be `29` and `13`, respectively, otherwise the code will be killed.
-* There are several parameters that define the inflow information. The arugment `-inflow_file` specifies the inflow fourier series, with default value `inflow_fourier_series.txt`. If this file is placed in the job folder and has correct format, the code will load it to generate a (pulsatile) inflow profile. Otherwise, the code will set the initial flow rate to be zero and increase the flow rate with respect to time untill reaching a target flow rate value. The linear incremental rate and the target flow rate can be controlled by `-inflow_thd_time` and `-inflow_tgt_rate`.
+* `-inflow_file` specifies the inflow in terms of fourier series, with the default value `inflow_fourier_series.txt`. If this file is placed in the job folder and has correct format, the code will load it to generate a (pulsatile) inflow profile. Otherwise, the code will set the initial flow rate to be zero and increase the flow rate with respect to time untill reaching a target flow rate value. The linear incremental rate and the target flow rate can be controlled by `-inflow_thd_time` and `-inflow_tgt_rate`.
 * `-lpn_file` defines the LPN data for the outlets. Therefore, one should place the file in the job folder, and the default name for the file is `lpn_rcr_input.txt`.
 
 ## Wall prestress generation
@@ -49,17 +49,19 @@ In the [wall solver](wall_solver.cpp), one can generate the prestress in the art
 Therefore, the user should be copy the `solver_cmd.h5` and `SOL_re` from the CFD analysis and rerun the preprocessor to generate the `part_xxxxx.h5` files for prestress generation. 
 
 We want to mention a few things about its input arguments.
-* The argument `-prestress_disp_tol` determines the stoping criterion for the fixed-point iteration, with default value being `1.0e-6`.
-* The argument `-init_step` sets the time step size. As we are driving for a steady state solution, it is recommended to make the time step large.
-* The argument `-is_backward_Euler` tells this solver if we want to use Backward Euler or the Generalized-alpha method. It is recommended to use Backward Euler.
-* The argument `-is_record_sol` tells the wall solver if we want to save the solution files.
+* `-prestress_disp_tol` determines the stoping criterion for the fixed-point iteration, with default value being `1.0e-6`.
+* `-init_step` sets the time step size. As we are driving for a steady state solution, it is recommended to make the time step large.
+* `-is_backward_Euler` tells this solver if we want to use Backward Euler or the Generalized-alpha method. It is recommended to use Backward Euler.
+* `-is_record_sol` tells the wall solver if we want to save the solution files.
 
 ## Simulation pipeline
-Here we describe a standard pipeline for performing CMM-FSI simulations. First, one may want to prepare the mesh partitioning for a rigid wall CFD simulation. We assume that **the geometry mesh whole_vol.vtu, inflow_vol.vtp, wall_vol.vtp, outflow_vol_xxx, and centerlines.vtp have been placed in the job folder**.
+Here we describe a standard pipeline for performing CMM-FSI simulations. 
+
+1. One may want to prepare the mesh partitioning for a rigid wall CFD simulation. We assume that the mesh files whole_vol.vtu, inflow_vol.vtp, wall_vol.vtp, outflow_vol_xxx, and the centerline file centerlines.vtp have been placed in the job folder.
 ```sh
 ./preprocess3d -cmmbc_type 1 -ringbc_type 0 -is_uniform_wall NO -num_outlet 46 -cpu_size 60 -elem_type 501
 ```
-With the generated `part_pxxxxx.h5` files as well as the LPN file `lpn_rcr_input.txt`, one may call the flow solver to generate a flow profile at the diastolic phase.
+2. With the generated `part_pxxxxx.h5` files as well as the LPN file `lpn_rcr_input.txt`, one may call the flow solver to generate a flow profile at the diastolic phase.
 ```sh
 mpirun -np 60 ./cmm_tet_3d \
   -fl_density 1.00 -fl_mu 4.0e-2 -wall_density 1.0 -wall_poisson 0.5 \
@@ -71,10 +73,11 @@ mpirun -np 60 ./cmm_tet_3d \
   -ksp_type gmres -pc_type asm -ksp_rtol 1.0e-2 -ksp_atol 1.0e-50 -ksp_max_it 200 -ksp_gmres_restart 200 \
   -log_view
 ```
-* In the above script, one prepares a file `inflow_fourier_series_steady.txt` that has only one frequency with coefficient `a_0` matches the diastolic inflow.
-* Otherwise, without preparing the above text file, one could also set `-inflow_thd_time` be smaller than the `-fina_time` and `-inflow_tgt_rate` equaling the diastolic inflow rate. The flow will be linearly ramped up to the value.
+   * In the above script, one prepares a file `inflow_fourier_series_steady.txt` that has only one frequency with coefficient `a_0` matches the diastolic inflow.
+   
+   * Otherwise, without preparing the above text file, one could also set `-inflow_thd_time` be smaller than the `-fina_time` and `-inflow_tgt_rate` equaling the diastolic inflow rate. The flow will be linearly ramped up to the value.
 
-If the flow solver runs successfully, there will be a steady state solution recorded and we rename it to `SOL_re`. Copy it and `solver_cmd.h5` to the folder for prestress generation. Run the following to generate the `prestress_pxxxxx.h5` files.
+3. If the flow solver runs successfully, there will be a steady state solution recorded and we rename it to `SOL_re`. Copy it and `solver_cmd.h5` to the folder for prestress generation. Run the following to generate the `prestress_pxxxxx.h5` files.
 ```sh
 ./preprocess3d -cmmbc_type 2 -ringbc_type 0 -is_uniform_wall NO -num_outlet 46 -cpu_size 60 -elem_type 501
 
@@ -86,11 +89,13 @@ mpirun -np 60 ./wall_solver \
   -ksp_type gmres -pc_type asm -ksp_rtol 1.0e-2 -ksp_atol 1.0e-50 -ksp_max_it 200 -ksp_gmres_restart 200 \
   -log_view
 ```
-Now we can rerun the preprocessor to assign boundary conditions for the deformable wall simulation.
+
+4. Now we can rerun the preprocessor to assign boundary conditions for the deformable wall simulation.
 ```sh
 ./preprocess3d -cmmbc_type 0 -ringbc_type 0 -is_uniform_wall NO -num_outlet 46 -cpu_size 60 -elem_type 501
 ```
-Now make sure that the hdf5 files generated from the above preprocessing code, the prestress_pxxxxx.h5 file, the LPN file `lpn_rcr_input.txt`, and the inflow file `inflow_fourier_series.txt` have all been placed in the same job folder. Also, one needs to copy the steady state solution from the previous analysis and name them as dot_SOL_re, SOL_disp_re, and dot_SOL_disp_re, and place them with the SOL_re file in the job folder. Run the following for the CMM simulation.
+
+5. Now make sure that the hdf5 files generated from the above preprocessing code, the prestress_pxxxxx.h5 file, the LPN file `lpn_rcr_input.txt`, and the inflow file `inflow_fourier_series.txt` have all been placed in the same job folder. Also, one needs to copy the steady state solution from the previous analysis and name them as dot_SOL_re, SOL_disp_re, and dot_SOL_disp_re, and place them with the SOL_re file in the job folder. Run the following for the CMM simulation.
 ```sh
 mpirun -np 60 ./cmm_tet_3d 
    -nz_estimate 1000 -fl_density 1.00 -fl_mu 4.0e-2 -wall_density 1.0 -wall_poisson 0.5 \
