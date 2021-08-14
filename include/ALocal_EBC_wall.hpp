@@ -4,8 +4,7 @@
 // ALocal_EBC_wall.hpp
 //
 // Analysis use: local subdomain's elemental boundary condition. This is a 
-// derived class from ALocal_EBC to add the wall thickness and young's modulus, 
-// as well as the fluid density used to compute the young's modulus.
+// derived class from ALocal_EBC to add the wall thickness and young's modulus. 
 //
 // Author: Ju Liu
 // Date: Aug. 10 2020
@@ -69,8 +68,6 @@ class ALocal_EBC_wall : public ALocal_EBC
     // ------------------------------------------------------------------------
     virtual void set_prestress(const int &ee, const double * const &elem_quaprestress);
 
-    virtual double get_fluid_density() const {return fluid_density;}
-
     virtual void write_prestress_hdf5() const;
 
   protected:
@@ -89,14 +86,6 @@ class ALocal_EBC_wall : public ALocal_EBC
     // It is used in the write_prestress_hdf5 function
     // ------------------------------------------------------------------------
     const std::string ps_fileBaseName;
-
-    // ------------------------------------------------------------------------
-    // Fluid density used to generate the youngs modulus for arteries at
-    // the preprocessing stage.
-    // Note: This variable is used to remind the user that a 'fluid density'
-    //       has been definied at the preprocessing stage.
-    // ------------------------------------------------------------------------
-    double fluid_density;
 
     // ------------------------------------------------------------------------
     // The number of local nodes belonging to this subdomain that is on the

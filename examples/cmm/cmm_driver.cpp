@@ -290,11 +290,6 @@ int main( int argc, char *argv[] )
   // Local sub-domain's wall elemental (Neumann) BC for CMM
   ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, quads->get_num_quadPts(), "ebc_wall");
 
-  // Cross check fluid densities specified for the solver vs. wall youngsmod calculation
-  if( locebc_wall -> get_fluid_density() != fluid_density )
-    SYS_T::commPrint("Warning: Assigned fluid density does not match that used to compute "
-                     "wall youngsmod in the preprocessor.\n");
-
   // Local sub-domain's nodal indices
   APart_Node * pNode = new APart_Node(part_file, rank);
 
