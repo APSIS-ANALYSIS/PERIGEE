@@ -1,8 +1,7 @@
 #include "ElemBC_3D_tet_wall.hpp"
 
-ElemBC_3D_tet_wall::ElemBC_3D_tet_wall( const int &elemtype, 
-    const double &in_fluid_density )
-: ElemBC_3D_tet( elemtype ), fluid_density( in_fluid_density )
+ElemBC_3D_tet_wall::ElemBC_3D_tet_wall( const int &elemtype )
+: ElemBC_3D_tet( elemtype )
 {
   radius.clear();
   thickness.clear();
@@ -18,10 +17,8 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const double &uniform_youngsmod,
     const double &uniform_springconst,
     const double &uniform_dampingconst,
-    const int &elemtype,
-    const double &in_fluid_density )
-: ElemBC_3D_tet( walls_combined, elemtype ),
-  fluid_density( in_fluid_density )
+    const int &elemtype )
+: ElemBC_3D_tet( walls_combined, elemtype )
 {
   // num_ebc = 1 per the assumption for wall elem bc
   const int ebc_id = 0;
@@ -62,10 +59,8 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const double &thickness2radius_combined,
     const double &springconst_combined,
     const double &dampingconst_combined,
-    const int &elemtype,
-    const double &in_fluid_density )
-: ElemBC_3D_tet( walls_combined, elemtype ),
-  fluid_density( in_fluid_density )
+    const int &elemtype )
+: ElemBC_3D_tet( walls_combined, elemtype )
 {
   // num_ebc = 1 per the assumption for wall elem bc
   const int ebc_id = 0;
@@ -108,8 +103,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     springconst[ii]  = springconst_combined;
     dampingconst[ii] = dampingconst_combined;
 
-    //compute_youngsmod(radius[ii], thickness[ii], youngsmod[ii]);
-    youngsmod[ii] = 1.3e7;
+    compute_youngsmod(radius[ii], thickness[ii], youngsmod[ii]);
   }
  
   // clean memory
@@ -142,10 +136,9 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const std::vector<double> &thickness2radiusList,
     const std::vector<double> &springconstList,
     const std::vector<double> &dampingconstList,
-    const int &elemtype,
-    const double &in_fluid_density )
+    const int &elemtype )
 : ElemBC_3D_tet_wall( walls_combined, centerlines_combined, thickness2radius_combined,
-                      springconst_combined, dampingconst_combined, elemtype, in_fluid_density)
+                      springconst_combined, dampingconst_combined, elemtype )
 {
   // Check inputs
   SYS_T::print_fatal_if( centerlinesList.size() != wallsList.size(),
@@ -402,6 +395,7 @@ void ElemBC_3D_tet_wall::add_wall_data( vtkPointSet * const &grid_w, const int &
 void ElemBC_3D_tet_wall::compute_youngsmod( const double &r, const double &th, double &E )
 {
   const double alpha = 13.3, beta = 0.3;
+  const double fluid_density = 1.065;
   const double rho_alpha2 = fluid_density * alpha * alpha;
   const double beta_exp   = 2.0 * beta - 1.0;
 

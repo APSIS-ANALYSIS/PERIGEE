@@ -5,8 +5,8 @@
 //
 // A derived class from the ElemBC_3D_tet.hpp
 //
-// This class has additional information of the wall mesh used for
-// thin-wall approximation in FSI simulations.
+// This class has additional information of the wall mesh used for the thin-wall
+// approximation in FSI simulations.
 //
 // Author: Ju Liu, Ingrid S. Lan
 // Date: July 12 2020
@@ -19,7 +19,7 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     // ------------------------------------------------------------------------
     // Constructing an empty wall
     // ------------------------------------------------------------------------
-    ElemBC_3D_tet_wall( const int &elemtype = 501, const double &in_fluid_density = 1.065 );
+    ElemBC_3D_tet_wall( const int &elemtype = 501 );
     
     // ------------------------------------------------------------------------
     // Constructing wall properties with uniform thickness
@@ -31,17 +31,14 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     // \para: uniform_cs is the damping constant for external tissue support
     //        (Kelvin-Voigt viscoelastic model)
     // Note: This function is typically used for constructing a simple wall
-    //       model without feeding a centerline vtp file. The input of fluid
-    //       density is logically not needed, but to keep output file
-    //       consistency.
+    //       model without feeding a centerline vtp file.
     // ------------------------------------------------------------------------
     ElemBC_3D_tet_wall(const std::string &walls_combined,
         const double &uniform_thickness,
         const double &uniform_youngsmod,
         const double &uniform_springconst,
         const double &uniform_dampingconst,
-        const int &elemtype = 501,
-        const double &in_fluid_density = 1.065 );
+        const int &elemtype = 501 );
 
     // ------------------------------------------------------------------------
     //  Constructing wall properties with a single spatial distribution.
@@ -59,8 +56,7 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
         const double &thickness2radius_combined,
         const double &springconst_combined,
         const double &dampingconst_combined,
-        const int &elemtype = 501,
-        const double &in_fluid_density = 1.065 );
+        const int &elemtype = 501 );
 
     // ------------------------------------------------------------------------
     //  Constructing wall properties with multiple spatial distributions.
@@ -85,8 +81,7 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
         const std::vector<double> &thickness2radiusList,
         const std::vector<double> &springconstList,
         const std::vector<double> &dampingconstList,
-        const int &elemtype = 501,
-        const double &in_fluid_density = 1.065 );
+        const int &elemtype = 501 );
 
     virtual ~ElemBC_3D_tet_wall();
 
@@ -114,14 +109,7 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     virtual void write_vtk( const int &ebc_id,
         const std::string &filename="elembc_surface" ) const;
 
-    virtual double get_fluid_density() const {return fluid_density;}
-
   private:
-    // fluid density used to compute the Young's modulus.
-    // Its value will be passed to the analysis code and will be checked to
-    // ensure that a consistent value is used in analysis code.
-    const double fluid_density;
-
     // num_ebc = 1 for the wall, so these properties all have length num_node[0]
     std::vector<double> radius, thickness, youngsmod, springconst, dampingconst;
     
