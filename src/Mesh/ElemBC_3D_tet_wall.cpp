@@ -108,7 +108,8 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     springconst[ii]  = springconst_combined;
     dampingconst[ii] = dampingconst_combined;
 
-    compute_youngsmod(radius[ii], thickness[ii], youngsmod[ii]);
+    //compute_youngsmod(radius[ii], thickness[ii], youngsmod[ii]);
+    youngsmod[ii] = 1.3e7;
   }
  
   // clean memory
