@@ -66,6 +66,16 @@ int main( int argc, char *argv[] )
 
   delete cmd_h5r; H5Fclose(solver_cmd_file);
 
+  hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
+  HDF5_Reader * pcmd_h5r = new HDF5_Reader( prepcmd_file );
+
+  const int cmmBC_type  = pcmd_h5r -> read_intScalar("/", "cmmBC_type");
+  const int ringBC_type = pcmd_h5r -> read_intScalar("/", "ringBC_type");
+
+  delete pcmd_h5r; H5Fclose(prepcmd_file);
+
+  SYS_T::print_fatal_if( cmmBC_type != 2, "Error: cmmBC_type is NOT 2, please check the preprocessor. \n");
+
   // Partition filename prefix
   std::string part_file("part");
 
@@ -94,6 +104,8 @@ int main( int argc, char *argv[] )
   SYS_T::GetOptionInt(   "-sol_rec_freq",        sol_record_freq);
 
   // ===== Print Command Line Arguments =====
+  SYS_T::cmdPrint(      "cmmBC_type:",       cmmBC_type);
+  SYS_T::cmdPrint(      "ringBC_type:",      ringBC_type);
   SYS_T::cmdPrint(       "-part_file:",          part_file);
   SYS_T::cmdPrint(       "-prestress_disp_tol:", prestress_disp_tol);
   SYS_T::cmdPrint(       "-nl_rtol:",            nl_rtol);
