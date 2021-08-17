@@ -26,6 +26,8 @@ We recommend using `-is_uniform_wall NO`, so that one can generate more physiolo
 
 So far, the thickness-to-radius ratio, the formula for the Young's modulus, the supporting tissue's two parameters are assumed to take a uniform value. In a more sophsiticated manner, one may set them with different values in different regions of the wall. To do so, one needs to go over the thrid constructor for the ElemBC_3D_tet_wall class.
 
+The constructor of ElemBC_3D_tet_wall class will always write `varwallprop.vtp` as a wall surface file, with wall properties as cell or pint attributes. 
+
 The following argument determines the boundary condition type on the inlet and outlets.
 * `-cmmbc_type` is an integer flag that determines NodalBC_3D_CMM. If it is `0` (default value), the wall is set to be deformable; if it is `1`, the wall is set as a homogeneous boundary meaning the wall is rigid; if it is `2`, the variables in the fluid subdomain is fixed so that one can solve the wall mechanics for prestress.
 * `-ringbc_type` is an integer flag that determines NodalBC_3D_ring, which also affects NodalBC_3D_CMM. If it is `0` (default value), the ring nodes are fully clamped; if it is `1`, the ring nodes are allowed to move within their original plane. The ringbc_type only affects the boundary condition when the cmmbc_type = 0 or 2.
