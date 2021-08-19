@@ -1,5 +1,5 @@
 # PERIGEE
-PERIGEE is a nonlinear dynamic finite element / isogeometric analysis code for multiphysics simulations. The code has been developed with the goal of providing an object-oriented framework for parallel implementation of multiphysics problems using different finite element technologies.
+PERIGEE is a nonlinear dynamic finite element / isogeometric analysis code for multiphysics simulations. The code has been developed with the goal of providing an object-oriented framework for parallel implementation of multiphysics problems using different finite element technologies. Copyright and licensing information can be found in files LICENSE.
 
 ## Disclaimer
 If you are looking for something that can generate *pretty pictures* by just clicking the button, please close this page.
@@ -71,4 +71,4 @@ Reference: J. Liu, W. Yang, I.S. Lan, and A.L. Marsden, "Fluid-structure interac
 * [Google C++ Style](https://google.github.io/styleguide/cppguide.html).
 
 ## Contact
-Ju Liu, liujuy@gmail.com, liuju@stanford.edu
+Ju Liu, liujuy@gmail.com, liuj36@sustech.edu.cn
