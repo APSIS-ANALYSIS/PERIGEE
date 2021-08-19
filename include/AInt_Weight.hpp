@@ -1,6 +1,6 @@
 #ifndef AINT_WEIGHT_HPP
 #define AINT_WEIGHT_HPP
-// ==================================================================
+// ============================================================================
 // AInt_Weight.hpp
 // Analysis Tools: Integration Weights.
 // Stores the Integration weights.
@@ -10,7 +10,7 @@
 //       ParentElement class.
 //
 // Date: Nov. 23 2013.
-// ==================================================================
+// ============================================================================
 #include "IQuadPts.hpp"
 
 class AInt_Weight
@@ -20,8 +20,7 @@ class AInt_Weight
         const IQuadPts * const &qua_t,
         const IQuadPts * const &qua_u );
 
-    AInt_Weight( const IQuadPts * const &qua_s,
-        const IQuadPts * const &qua_t );
+    AInt_Weight( const IQuadPts * const &qua_s, const IQuadPts * const &qua_t );
 
     // Obtain the weights from a single quadrature rule.
     // This can be used for initializing a weight object for 1D problem
@@ -39,8 +38,8 @@ class AInt_Weight
     void print_info() const;
 
   private:
-    int num; // number of the quadrature points/weights
-    double * Weight; // dynamic array storing the weights
+    const int num;    // the number of the quadrature points/weights
+    double * Weight;  // dynamic array storing the weights
 };
 
 #endif
