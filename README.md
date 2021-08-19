@@ -71,4 +71,4 @@ Reference: J. Liu, W. Yang, I.S. Lan, and A.L. Marsden, "Fluid-structure interac
 * [Google C++ Style](https://google.github.io/styleguide/cppguide.html).
 
 ## Contact
-Ju Liu, liujuy@gmail.com, liuju@stanford.edu
+Ju Liu, liujuy@gmail.com, liuj36@sustech.edu.cn
