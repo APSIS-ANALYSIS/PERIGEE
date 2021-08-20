@@ -74,12 +74,12 @@ int main( int argc, char *argv[] )
 
   delete pcmd_h5r; H5Fclose(prepcmd_file);
 
-  SYS_T::print_fatal_if( cmmBC_type != 2, "Error: cmmBC_type is NOT 2, please check the preprocessor. \n");
-
   // Partition filename prefix
   std::string part_file("part");
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+  
+  SYS_T::print_fatal_if( cmmBC_type != 2, "Error: cmmBC_type is NOT 2, please check the preprocessor. \n");
   
   const PetscMPIInt rank = SYS_T::get_MPI_rank();
   const PetscMPIInt size = SYS_T::get_MPI_size();
