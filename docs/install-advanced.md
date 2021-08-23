@@ -24,7 +24,9 @@ $ make install
 The PETSc package has an official installation guide [page](https://www.mcs.anl.gov/petsc/documentation/installation.html). The package installation is controlled through the `configure` command.
 * `--with-mpi-dir=/home/jliu/lib/mpich-3.2` The `--with-mpi-dir` tells the PETSc that there exists a MPI library installed in the computer, and the PETSc will not have to download and compile a MPICH during installation. My own mpich is installed in `/home/jliu/lib/mpich-3.2`.
 
-* `--with-hypre=1 --download-hypre` This flag tells the PETSc installer to install the [Hypre](https://computing.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods) package as well. Several preconditioners in PETSc requires external libraries. We recommend one install at least Hypre and MUMPS in PETSc.
+* `--with-hypre=1 --download-hypre` This flag tells the PETSc installer to install the [Hypre](https://computing.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods) package as well. Several preconditioners in PETSc requires external libraries. We recommend one install at least Hypre and MUMPS in PETSc. 
+
+Also, notice that sometimes, PETSc configure command may not have the correct download address for HYPRE. You may have to go to https://github.com/hypre-space/hypre to download the HYPRE source with the correct version manually. And then, add `--download-hypre=some address/hypre-source.tar.gz` in the configure option.
 
 * `--with-hdf5=1 --download-hdf5 --with-metis=1 --download-metis` This tells PETSc to install HDF5 and METIS. With these two installed within PETSc, you will not need to install them separately youself. In the configuration file for PERIGEE, provide the correct path to link to them.
 
