@@ -36,6 +36,7 @@ INCLUDE(../../conf/system_lib_loading.cmake)
 SET( perigee_source ${perigee_SOURCE_DIR}/../../src )
 SET( perigee_lib_src 
   ${perigee_source}/System/Sys_Tools.cpp
+  ${perigee_source}/System/Vector_3.cpp
   ${perigee_source}/System/SV_Tools.cpp
   ${perigee_source}/System/Math_Tools.cpp
   ${perigee_source}/System/Matrix_double_3by3_Array.cpp

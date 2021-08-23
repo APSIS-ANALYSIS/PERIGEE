@@ -4,8 +4,7 @@ EBC_Partition_vtp_wall::EBC_Partition_vtp_wall(
     const IPart * const &part,
     const Map_Node_Index * const &mnindex,
     const ElemBC * const &ebc )
-: EBC_Partition_vtp(part, mnindex, ebc),
-  fluid_density( ebc-> get_fluid_density() )
+: EBC_Partition_vtp(part, mnindex, ebc)
 {
   const int ebc_id = 0;
   
@@ -80,8 +79,6 @@ void EBC_Partition_vtp_wall::write_hdf5( const char * FileName ) const
   hid_t g_id = H5Gopen( file_id, "ebc_wall", H5P_DEFAULT );
 
   HDF5_Writer * h5w = new HDF5_Writer( file_id );
-
-  h5w -> write_doubleScalar( g_id, "fluid_density", fluid_density );
 
   h5w -> write_intScalar( g_id, "num_local_node_on_sur", num_local_node_on_sur );
 

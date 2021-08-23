@@ -33,6 +33,17 @@
 
 int main( int argc, char *argv[] )
 {
+  // ===== Read preprocessor arguments =====
+  hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
+  HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
+  
+  const int cmmBC_type  = cmd_h5r -> read_intScalar("/", "cmmBC_type");
+  const int ringBC_type = cmd_h5r -> read_intScalar("/", "ringBC_type");
+
+  delete cmd_h5r; H5Fclose(prepcmd_file);
+
+  SYS_T::print_fatal_if( cmmBC_type == 2, "Error: cmmBC_type is set to 2, which is designed for prestress generation. \n");
+
   // Number of quadrature points for tets and triangles
   // Suggested values: 5 / 4 for linear, 29 / 13 for quadratic
   int nqp_tet = 5, nqp_tri = 4;
@@ -142,6 +153,8 @@ int main( int argc, char *argv[] )
   SYS_T::GetOptionString("-restart_disp_name",    restart_disp_name);
   
   // ===== Print Command Line Arguments =====
+  SYS_T::cmdPrint(      "cmmBC_type:",       cmmBC_type);
+  SYS_T::cmdPrint(      "ringBC_type:",      ringBC_type);
   SYS_T::cmdPrint(      "-nqp_tet:",         nqp_tet);
   SYS_T::cmdPrint(      "-nqp_tri:",         nqp_tri);
   SYS_T::cmdPrint(      "-nz_estimate:",     nz_estimate);
@@ -289,11 +302,6 @@ int main( int argc, char *argv[] )
 
   // Local sub-domain's wall elemental (Neumann) BC for CMM
   ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, quads->get_num_quadPts(), "ebc_wall");
-
-  // Cross check fluid densities specified for the solver vs. wall youngsmod calculation
-  if( locebc_wall -> get_fluid_density() != fluid_density )
-    SYS_T::commPrint("Warning: Assigned fluid density does not match that used to compute "
-                     "wall youngsmod in the preprocessor.\n");
 
   // Local sub-domain's nodal indices
   APart_Node * pNode = new APart_Node(part_file, rank);

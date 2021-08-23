@@ -9,13 +9,11 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
   SYS_T::print_fatal_if(gname != "ebc_wall", 
       "Error: ALocal_EBC_wall data should be read from group ebc_wall.\n" );
 
-  // Read in the fluid density, thickness, and young's modulus
+  // Read in the thickness, and young's modulus
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
   hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
   HDF5_Reader * h5r = new HDF5_Reader( file_id );
   
-  fluid_density = h5r -> read_doubleScalar(gname.c_str(), "fluid_density");
-
   num_local_node_on_sur = h5r -> read_intScalar( gname.c_str(), "num_local_node_on_sur" );
 
   thickness.clear();

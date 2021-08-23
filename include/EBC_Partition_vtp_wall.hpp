@@ -33,9 +33,6 @@ class EBC_Partition_vtp_wall : public EBC_Partition_vtp
     virtual void write_hdf5( const char * FileName, const char * GroupName ) const;
 
   protected:
-    // fluid density used in Young's modulus calculation
-    const double fluid_density;
-
     // Length is num_local_node[0] 
     std::vector<double> part_thickness;
     std::vector<double> part_youngsmod;

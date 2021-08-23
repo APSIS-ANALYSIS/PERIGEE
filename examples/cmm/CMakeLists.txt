@@ -124,9 +124,9 @@ SET( perigee_postprocess_lib_src
   ${perigee_SOURCE_DIR}/src/VTK_Writer_CMM.cpp
   )
 
-SET( perigee_test_lib_src
-  ${perigee_source}/Mesh/QuadPts_debug.cpp
-  )
+#SET( perigee_test_lib_src
+#  ${perigee_source}/Mesh/QuadPts_debug.cpp
+#  )
   
 INCLUDE_DIRECTORIES( ./include )
 INCLUDE_DIRECTORIES( ../../include )
@@ -147,8 +147,8 @@ TARGET_LINK_LIBRARIES( perigee_postprocess ${EXTRA_LINK_LIBS} perigee_analysis
   perigee_preprocess )
 
 # 4. Test lib
-ADD_LIBRARY( perigee_test ${perigee_test_lib_src} )
-TARGET_LINK_LIBRARIES( perigee_test ${EXTRA_LINK_LIBS} perigee_analysis )
+#ADD_LIBRARY( perigee_test ${perigee_test_lib_src} )
+#TARGET_LINK_LIBRARIES( perigee_test ${EXTRA_LINK_LIBS} perigee_analysis )
 # -------------------------------------------------------------------
 
 # Print compiler setup
@@ -160,15 +160,15 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 ADD_EXECUTABLE( gmsh_p1_IO    gmsh_p1_process.cpp )
 ADD_EXECUTABLE( gmsh_p2_IO    gmsh_p2_process.cpp )
 ADD_EXECUTABLE( preprocess3d  preprocess_sv_tets.cpp)
+ADD_EXECUTABLE( wall_solver   wall_solver.cpp)
 ADD_EXECUTABLE( cmm_tet_3d    cmm_driver.cpp)
 ADD_EXECUTABLE( prepost       prepost_cmm_tets.cpp)
 ADD_EXECUTABLE( vis_cmm       vis_cmm.cpp)
 ADD_EXECUTABLE( vis_p1_wss    vis_p1_wss.cpp)
 ADD_EXECUTABLE( vis_p2_wss    vis_p2_wss.cpp)
-ADD_EXECUTABLE( wall_solver   wall_solver.cpp)
 
 #ADD_EXECUTABLE( test test.cpp )
-ADD_EXECUTABLE( test_element  test_membrane_element_routine.cpp )
+#ADD_EXECUTABLE( test_element  test_membrane_element_routine.cpp )
 
 TARGET_LINK_LIBRARIES( gmsh_p1_IO    perigee_preprocess )
 TARGET_LINK_LIBRARIES( gmsh_p2_IO    perigee_preprocess )
@@ -181,6 +181,6 @@ TARGET_LINK_LIBRARIES( vis_p1_wss    perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_p2_wss    perigee_postprocess )
 
 #TARGET_LINK_LIBRARIES( test perigee_preprocess )
-TARGET_LINK_LIBRARIES( test_element  perigee_test )
+#TARGET_LINK_LIBRARIES( test_element  perigee_test )
 
 # EOF

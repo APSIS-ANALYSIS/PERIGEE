@@ -47,11 +47,15 @@ int main( int argc, char * argv[] )
   // Element options: 501 linear tets, 502 quadratic tets
   int elemType = 501;
   int num_outlet = 1;
+  
+  // ringBC_type : 0 fully clamped for the ring nodes
+  //               1 in-plane motion allowed for the ring nodes
   int ringBC_type = 0;
 
   // cmmBC_type : 0 deformable wall, 
   //              1 rigid wall, 
-  //              2 variables in the fluid subdomain all fixed
+  //              2 variables in the fluid subdomain all fixed for prestress
+  //                generation
   int cmmBC_type = 0;
 
   // Wall properties
@@ -171,6 +175,8 @@ int main( int argc, char * argv[] )
   cmdh5w->write_intScalar("dofNum", dofNum);
   cmdh5w->write_intScalar("dofMat", dofMat);
   cmdh5w->write_intScalar("elemType", elemType);
+  cmdh5w->write_intScalar("ringBC_type", ringBC_type);
+  cmdh5w->write_intScalar("cmmBC_type", cmmBC_type);
   cmdh5w->write_string("geo_file", geo_file);
   cmdh5w->write_string("sur_file_in", sur_file_in);
   cmdh5w->write_string("sur_file_out_base", sur_file_out_base);
