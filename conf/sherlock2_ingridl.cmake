@@ -3,15 +3,18 @@
 # ========================================================
 # Specify the library locations
 # ========================================================
-set(VTK_DIR /home/users/ingridl/lib/VTK-7.1.1-shared-opt/lib/cmake/vtk-7.1)
+set(VTK_DIR /home/groups/amarsden/lib-perigee/VTK-7.1.1-shared/lib/cmake/vtk-7.1)
 
-set(PETSC_DIR /home/users/ingridl/lib/petsc-3.11.3)
+set(PETSC_DIR /home/groups/amarsden/lib-perigee/petsc-3.11.3-opt)
 
-set(PETSC_ARCH arch-linux2-cxx-opt)
+set(PETSC_ARCH .)
 
-set(METIS_DIR /home/users/ingridl/lib/metis-5.0.3)
+set(METIS_DIR /home/groups/amarsden/lib-perigee/metis-5.0.3)
 
-set(HDF5_ROOT /home/users/ingridl/lib/hdf5-1.8.16/)
+set(HDF5_ROOT /home/groups/amarsden/lib-perigee/hdf5-1.8.16/)
+
+set(BESSEL_DIR /home/groups/amarsden/lib-perigee/complex-bessel)
+MESSAGE(STATUS "Bessel fun Dir = " ${BESSEL_DIR})
 
 # ========================================================
 # Setup the libraries
@@ -40,13 +43,19 @@ endif(PETSC_METIS)
 include_directories(${HDF5_INCLUDE_DIRS})
 set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${HDF5_LIBRARIES})
 
+include_directories(${BESSEL_DIR}/include)
+include_directories(${BESSEL_DIR}/include/complex_bessel_bits)
+
+LINK_DIRECTORIES( ${BESSEL_DIR}/lib )
+set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} complex_bessel)
+
 message(STATUS "External Libraries: " ${EXTRA_LINK_LIBS})
 
 # ========================================================
 # Compiler options 
 # ========================================================
-set(CMAKE_C_COMPILER  /home/users/ingridl/lib/petsc-3.11.3/arch-linux2-cxx-opt/bin/mpicc)
-set(CMAKE_CXX_COMPILER /home/users/ingridl/lib/petsc-3.11.3/arch-linux2-cxx-opt/bin/mpicxx)
+set(CMAKE_C_COMPILER  /home/groups/amarsden/lib-perigee/petsc-3.11.3-opt/bin/mpicc)
+set(CMAKE_CXX_COMPILER /home/groups/amarsden/lib-perigee/petsc-3.11.3-opt/bin/mpicxx)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -59,3 +68,4 @@ endif(${CMAKE_BUILD_TYPE} MATCHES "Release")
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 # EOF
+
