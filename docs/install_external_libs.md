@@ -106,6 +106,9 @@ $ cd $HOME
 $ mkdir build_vtk
 $ cd build_vtk
 $ cmake $HOME/VTK-7.1.1-src -DCMAKE_INSTALL_PREFIX=$HOME/lib/VTK-7.1.1-shared -DBUILD_SHARED_LIBS=ON
+```
+At this stage, you may encounter an issue due to the lack of the OpenGL library. Run `sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev`.
+```
 $ make -j 6
 $ make install
 ```
