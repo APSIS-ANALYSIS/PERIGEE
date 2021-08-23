@@ -51,7 +51,7 @@ make 2>&1 | tee m.txtMake sure you have cmake installed in your system. In case 
 $ sudo apt-get install cmake
 ```
 
-If you are an advanced user and wants to build cmake youself, consult this page: https://cmake.org/install/
+If you are an advanced user and wants to build cmake youself, consult this page: https://cmake.org/install/ You may encounter issues like the lack of openssl in the system, which can be conveniently resolved by, e.g., `sudo apt install libssl-dev`. Of course to tell the system to load the correct CMake, you may also want to modify PATH in the .bashrc or .bash_profile file.
 
 If you are using a cluster, cmake can be loaded by
 ```sh
@@ -60,9 +60,9 @@ $ module load cmake
 ## Install MPICH
 First, download the source file, extract the tar bar, and rename the folder as a source folder:
 ```
-wget https://www.mpich.org/static/downloads/3.3rc1/mpich-3.3rc1.tar.gz
-tar -zxvf mpich-3.3rc1.tar.gz
-mv mpich-3.3rc1 mpich-3.3rc1-src
+$ wget https://www.mpich.org/static/downloads/3.3rc1/mpich-3.3rc1.tar.gz
+$ tar -zxvf mpich-3.3rc1.tar.gz
+$ mv mpich-3.3rc1 mpich-3.3rc1-src
 ```
 Note that you may want to go to https://www.mpich.org/static/downloads/ to select the version of the MPICH implementation. Versions 3.2 and 3.3 are conservative choices. Now you may enter the folder and do the following to install MPICH at the prescribed location.
 ```
