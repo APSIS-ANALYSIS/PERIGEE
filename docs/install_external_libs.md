@@ -46,7 +46,7 @@ Of course, for experienced users, you can download the Valgrind source file and 
 
 
 ## Install CMake
-Make sure you have cmake installed in your system. In case you do not have one, do the following.
+make 2>&1 | tee m.txtMake sure you have cmake installed in your system. In case you do not have one, do the following.
 ```sh
 $ sudo apt-get install cmake
 ```
@@ -60,13 +60,20 @@ $ module load cmake
 ## Install MPICH
 First, download the source file, extract the tar bar, and rename the folder as a source folder:
 ```
-$wget https://www.mpich.org/static/downloads/3.3rc1/mpich-3.3rc1.tar.gz
+wget https://www.mpich.org/static/downloads/3.3rc1/mpich-3.3rc1.tar.gz
 tar -zxvf mpich-3.3rc1.tar.gz
 mv mpich-3.3rc1 mpich-3.3rc1-src
 ```
 Note that you may want to go to https://www.mpich.org/static/downloads/ to select the version of the MPICH implementation. Versions 3.2 and 3.3 are conservative choices. Now you may enter the folder and do the following to install MPICH at the prescribed location.
 ```
 ./configure --prefix=$HOME/lib/mpich-3.3rc1 2>&1 | tee c.txt
+```
+At this stage, you may encounter a warning saying you do not have Fortran compilers. You may want to install gfortran by 
+```
+sudo apt-get install gfortran
+```
+and rerun the configure command. Once you see that the system tells the configuration is complete, run the following.
+```
 make 2>&1 | tee m.txt
 make install 2>&1 | tee mi.txt
 ```
