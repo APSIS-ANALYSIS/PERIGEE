@@ -31,11 +31,10 @@ int main( int argc, char * argv[] )
   std::string sol_name("SOL_900000000");
   std::string out_name("NEW_900000000");
   
-  PetscMPIInt size;
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
-  MPI_Comm_size(PETSC_COMM_WORLD, &size);
+  const PetscMPIInt size = SYS_T::get_MPI_size();
   
   SYS_T::print_fatal_if(size!=1,"ERROR: converter is a serial routine! \n");
 
@@ -55,22 +54,20 @@ int main( int argc, char * argv[] )
   SYS_T::file_check(sol_name);
 
   // Obtain the new_to_old vector from the old mapping
-  std::vector<int> old_map;
   hid_t h5id_onm = H5Fopen(old_nmap.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
 
   HDF5_Reader * onm_h5r = new HDF5_Reader( h5id_onm );
 
-  onm_h5r-> read_intVector( "/", "old_2_new", old_map );
+  std::vector<int> old_map = onm_h5r-> read_intVector( "/", "old_2_new" );
 
   delete onm_h5r; H5Fclose(h5id_onm);
 
   // Obtain the old_to_new vector from the new mapping
-  std::vector<int> new_map;
   hid_t h5id_nnm = H5Fopen(new_nmap.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
 
   HDF5_Reader * nnm_h5r = new HDF5_Reader( h5id_nnm );
 
-  nnm_h5r-> read_intVector( "/", "old_2_new", new_map );
+  std::vector<int> new_map = nnm_h5r-> read_intVector( "/", "old_2_new" );
 
   delete nnm_h5r; H5Fclose(h5id_nnm);
 
