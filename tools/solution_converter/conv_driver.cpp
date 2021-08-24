@@ -135,7 +135,7 @@ int main( int argc, char * argv[] )
 
   // new_array is no more needed
   VecDestroy(&sol_new);
-  delete [] sol_array; sol_array = NULL;
+  delete [] sol_array; sol_array = nullptr;
   PetscFinalize();
   return EXIT_SUCCESS;
 }
