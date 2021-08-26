@@ -208,7 +208,7 @@ $ make SLEPC_DIR=/home/juliu/lib/slepc-3.14.2 PETSC_DIR=/home/juliu/lib/petsc-3.
 $ make SLEPC_DIR=/home/juliu/lib/slepc-3.14.2 PETSC_DIR=/home/juliu/lib/petsc-3.14.5-debug install
 $ make SLEPC_DIR=/home/juliu/lib/slepc-3.14.2-debug PETSC_DIR=/home/juliu/lib/petsc-3.14.5-debug PETSC_ARCH="" check
 ```
-Notice that one needs to make the SLPEc version compatible with that of PETSc. Also, one may build an optimized library by setting the PETSC_DIR to the optimized PETSc build.
+Notice that one needs to make the SLPEc's major version compatible with that of PETSc. Also, one may build an optimized library by setting the `PETSC_DIR` to the optimized PETSc build's path.
 
 ## Install ParaView
 If you really want to try, you may download the ParaView source file and do an out-of-source build, just like what we did for VTK. I just directly download the binary file from the [ParaView website](https://www.paraview.org/download/), and extract it in the `$HOME/lib` folder. Note, you do **not** have to install ParaView on a cluster.
