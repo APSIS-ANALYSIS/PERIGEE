@@ -21,7 +21,7 @@ Some of the libraries are not required for building the code. Typically, we requ
 - [Install HDF5](#Install-HDF5)
 - [Install METIS](#Install-METIS)
 - [Install Gmsh](#Install-Gmsh)
-- - [Install Gmsh](#Install-SLEPc)
+- [Install SLEPc](#Install-SLEPc)
 - [Install ParaView](#Install-ParaView)
 
 ## Create a lib folder
