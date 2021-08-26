@@ -193,5 +193,21 @@ $ cd ../..
 $ rm -rf gmsh-3.0.6-source
 ```
 
+## Install SLEPc
+The PERIGEE code in general does **not** depend on the SLEPc library. Yet, oen may occasionally need it to calculate eigenvalues. You may want to consult their [webpage](slepc.upv.es) for more information. Run the following to build the SLEPc library.
+```sh
+$ wget https://slepc.upv.es/download/distrib/slepc-3.14.2.tar.gz
+$ tar -zxvf slepc-3.14.2.tar.gz
+$ mv slepc-3.14.2 slepc-3.14.2-src
+$ cd slepc-3.14.2-src
+$ export PETSC_DIR=/home/juliu/lib/petsc-3.14.5-debug
+$ export SLEPC_DIR=/home/juliu/lib/slepc-3.14.2
+$ ./configure --prefix=/home/juliu/lib/slepc-3.14.2-debug
+$ make SLEPC_DIR=/home/juliu/lib/slepc-3.14.2 PETSC_DIR=/home/juliu/lib/petsc-3.14.5-debug
+$ make SLEPC_DIR=/home/juliu/lib/slepc-3.14.2 PETSC_DIR=/home/juliu/lib/petsc-3.14.5-debug install
+$ make SLEPC_DIR=/home/juliu/lib/slepc-3.14.2-debug PETSC_DIR=/home/juliu/lib/petsc-3.14.5-debug PETSC_ARCH="" check
+```
+Notice that one needs to make the SLPEc version compatible with that of PETSc. Also, one may build an optimized library by setting the PETSC_DIR to the optimized PETSc build.
+
 ## Install ParaView
 If you really want to try, you may download the ParaView source file and do an out-of-source build, just like what we did for VTK. I just directly download the binary file from the [ParaView website](https://www.paraview.org/download/), and extract it in the `$HOME/lib` folder. Note, you do **not** have to install ParaView on a cluster.
