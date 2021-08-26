@@ -18,6 +18,8 @@ set(PETSC_ARCH .)
 
 set(HDF5_ROOT ${HOME_DIR}/lib/hdf5-1.12.0)
 
+set(GMSH_DIR ${HOME_DIR}/lib/gmsh-4.8.4)
+
 # ========================================================
 # Setup the libraries
 # ========================================================
@@ -27,6 +29,7 @@ find_package(VTK COMPONENTS vtkCommonCore vtkCommonSystem
   vtkCommonMisc vtkCommonMath vtkIOCore vtkIOLegacy vtkIOXML REQUIRED)
 find_package(HDF5 REQUIRED)
 find_package(PETSc REQUIRED)
+find_package(Gmsh REQUIRED)
 
 include_directories(${VTK_INCLUDE_DIRS})
 include_directories(${HDF5_INCLUDE_DIRS})
