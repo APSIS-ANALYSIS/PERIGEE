@@ -197,16 +197,16 @@ $ rm -rf gmsh-3.0.6-source
 ## Install SLEPc
 The PERIGEE code in general does **not** depend on the SLEPc library. Yet, oen may occasionally need it to calculate eigenvalues. You may want to consult their [webpage](slepc.upv.es) for more information. Run the following to build the SLEPc library.
 ```sh
-$ wget https://slepc.upv.es/download/distrib/slepc-3.14.2.tar.gz
-$ tar -zxvf slepc-3.14.2.tar.gz
-$ mv slepc-3.14.2 slepc-3.14.2-src
-$ cd slepc-3.14.2-src
-$ export PETSC_DIR=/home/juliu/lib/petsc-3.14.5-debug
-$ export SLEPC_DIR=/home/juliu/lib/slepc-3.14.2
-$ ./configure --prefix=/home/juliu/lib/slepc-3.14.2-debug
-$ make SLEPC_DIR=/home/juliu/lib/slepc-3.14.2 PETSC_DIR=/home/juliu/lib/petsc-3.14.5-debug
-$ make SLEPC_DIR=/home/juliu/lib/slepc-3.14.2 PETSC_DIR=/home/juliu/lib/petsc-3.14.5-debug install
-$ make SLEPC_DIR=/home/juliu/lib/slepc-3.14.2-debug PETSC_DIR=/home/juliu/lib/petsc-3.14.5-debug PETSC_ARCH="" check
+$ wget https://slepc.upv.es/download/distrib/slepc-3.11.3.tar.gz
+$ tar -zxvf slepc-3.11.3.tar.gz
+$ mv slepc-3.11.3 slepc-3.11.3-src
+$ cd slepc-3.11.3-src
+$ export PETSC_DIR=/home/juliu/lib/petsc-3.11.3-debug
+$ export SLEPC_DIR=/home/juliu/lib/slepc-3.11.3
+$ ./configure --prefix=/home/juliu/lib/slepc-3.11.3-debug
+$ make SLEPC_DIR=/home/juliu/lib/slepc-3.11.3 PETSC_DIR=/home/juliu/lib/petsc-3.11.3-debug
+$ make SLEPC_DIR=/home/juliu/lib/slepc-3.11.3 PETSC_DIR=/home/juliu/lib/petsc-3.11.3-debug install
+$ make SLEPC_DIR=/home/juliu/lib/slepc-3.11.3-debug PETSC_DIR=/home/juliu/lib/petsc-3.11.3-debug PETSC_ARCH="" check
 ```
 Notice that one needs to make the SLPEc's major version compatible with that of PETSc. Also, one may build an optimized library by setting the `PETSC_DIR` to the optimized PETSc build's path.
 
