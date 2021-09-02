@@ -110,6 +110,8 @@ int main( int argc, char *argv[] )
   const PetscMPIInt rank = SYS_T::get_MPI_rank();
   const PetscMPIInt size = SYS_T::get_MPI_size();
 
+  SYS_T::commPrint("Job starts at %s %s \n", SYS_T::get_time().c_str(), SYS_T::get_date().c_str());
+  
   SYS_T::print_perigee_art(); 
 
   // ===== Read Command Line Arguments =====
