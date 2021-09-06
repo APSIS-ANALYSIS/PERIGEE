@@ -14,38 +14,58 @@
 class Prestress_solid
 {
   public:
-    Prestress_solid( const ALocal_Elem * const &locelem, const int &in_nqp_tet );
+    Prestress_solid( const ALocal_Elem * const &locelem, const int &in_nqp_tet,
+       const std::string &in_ps_fName = "prestress" );
 
     virtual ~Prestress_solid();
 
+    // ------------------------------------------------------------------------
     // Input: ee the element index
     // Output: esval is the vector holding 6 components of the prestress
-    virtual std::vector<double> get_sval(const int &ee, const int &ii ) const;
+    // ------------------------------------------------------------------------
+    virtual std::vector<double> get_prestress(const int &ee, const int &ii ) const;
 
+    // ------------------------------------------------------------------------
     // Input: ee the element index
-    //        in_esval is the incremental of the element's prestress values.
-    //        sval[ee][ ] += in_esval
-    // Users are responsible for making sure that the vector has lenght
-    // 7*nqp
-    virtual void update_sval(const int &ee, const std::vector<double> &in_esval );
+    //        0 <= ii < nqp is the quadrature point index
+    //        in_esval is the element's prestress value at the quadrature point.
+    // Users are responsible for making sure that the vector has lenght 6*nqp
+    // ------------------------------------------------------------------------
+    virtual void set_prestress(const int &ee, const int &ii, const double * const &in_esval );
+
+    // ------------------------------------------------------------------------
+    // record the prestress values to a h5 file
+    // ------------------------------------------------------------------------
+    virtual void write_prestress_hdf5() const;
+
+    // ------------------------------------------------------------------------
+    // load the prestress values from a h5 file
+    // ------------------------------------------------------------------------
+    virtual void read_prestress_hdf5() const;
 
     virtual void print_info() const;
 
   private:
-    const int nlocalele;
-    const int nqp;
+    // ------------------------------------------------------------------------
+    // The number of local element and the number of volumetric quadrature
+    // points
+    // ------------------------------------------------------------------------
+    const int nlocalele, nqp;
 
-    // sval[ee][nqp*ii+jj] stores the ee-th element's pre-stress ii-th
+    // ------------------------------------------------------------------------
+    // The file name for storing the prestress values.
+    // ------------------------------------------------------------------------
+    const std::string ps_fileBaseName;
+
+    // ------------------------------------------------------------------------
+    // sval[ee][nqp*ii+jj] stores the ee-th solid element's pre-stress ii-th
     // component value at the jj-th quadrature point.
     // ii = 0, ..., 5 correspond to s1 s2 s3 s4 s5 s6
     //               s1  s2  s3
     //               s2  s4  s5
     //               s3  s5  s6
     // 0 <= jj < nqp
-    //
-    // if elem_tag[ee] == 0, then the sval has zero length because fluid
-    // does not need pre-stress;
-    // if elem_tag[ee] == 1, reserve nqp * 7 double slots for the element
+    // ------------------------------------------------------------------------
     std::vector< std::vector<double> > sval;
 };
 
