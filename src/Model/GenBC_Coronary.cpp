@@ -94,8 +94,8 @@ GenBC_Coronary::GenBC_Coronary( const char * const &lpn_filename,
       sstrm >> num_Pim_data[ counter ];
       sstrm >> alpha_Pim[ counter ];
 
-      SYS_T::print_fatal_if( num_Pim_data[counter] <= 2 && num_Pim_data[counter] != 0,
-          "Error: number of Pim data needs to be 0 for RCR or greater than 2 for coronary BC. \n" );
+      SYS_T::print_fatal_if( num_Pim_data[counter] < 2 && num_Pim_data[counter] != 0,
+          "Error: number of Pim data must be either 0 for RCR or >= 2 for coronary BC. \n" );
 
       // Resize the IntraMyocardial data
       if( num_Pim_data[counter] > 0 )
