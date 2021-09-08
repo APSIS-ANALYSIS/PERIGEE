@@ -4,7 +4,7 @@ ALocal_Elem_wTag::ALocal_Elem_wTag( const std::string &fileBaseName,
     const int &cpu_rank )
 : ALocal_Elem( fileBaseName, cpu_rank )
 {
-  std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
+  const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
   hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
 

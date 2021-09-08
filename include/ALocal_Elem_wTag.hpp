@@ -24,14 +24,15 @@ class ALocal_Elem_wTag : public ALocal_Elem
     virtual ~ALocal_Elem_wTag();
 
     // ------------------------------------------------------------------------
-    // ! get_elem_tag : return the tag for the local element
-    //   \para 0 <= ee < nlocalele
+    // get_elem_tag : return the tag for the local element
+    //   0 <= ee < nlocalele
     // ------------------------------------------------------------------------
     virtual int get_elem_tag(const int &ee) const {return elem_tag[ee];}
 
     virtual void print_info() const;
 
   private:
+    // A vector recording the tag of elements. Length is nlocalele.
     std::vector<int> elem_tag;
 };
 

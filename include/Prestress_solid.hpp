@@ -58,15 +58,12 @@ class Prestress_solid
     const std::string ps_fileBaseName;
 
     // ------------------------------------------------------------------------
-    // sval[ee][nqp*ii+jj] stores the ee-th solid element's pre-stress ii-th
-    // component value at the jj-th quadrature point.
-    // ii = 0, ..., 5 correspond to s1 s2 s3 s4 s5 s6
-    //               s1  s2  s3
-    //               s2  s4  s5
-    //               s3  s5  s6
-    // 0 <= jj < nqp
+    // qua_prestress[ee][nqp*ii+jj] stores the ee-th solid element's pre-stress 
+    // jj-th component in Voigt notation at the ii-th quadrature point.
+    // 0 <= ii < nqp
+    // 0 <= jj < 6
     // ------------------------------------------------------------------------
-    std::vector< std::vector<double> > sval;
+    std::vector< std::vector<double> > qua_prestress;
 };
 
 #endif
