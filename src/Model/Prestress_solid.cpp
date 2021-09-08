@@ -2,48 +2,43 @@
 
 Prestress_solid::Prestress_solid( 
     const ALocal_Elem * const &locelem, 
-    const int &in_nqp_tet )
-: nlocelem(locelem->get_nlocalele()), nqp(in_nqp_tet)
+    const int &in_nqp_tet, const std::string &in_ps_fName )
+: nlocalele(locelem->get_nlocalele()), nqp(in_nqp_tet), 
+  ps_fileBaseName( in_ps_fName )
 {
-  sval.resize( nlocelem );
+  sval.resize( nlocalele );
 
-  for(int ee=0; ee<nlocelem; ++ee)
+  for(int ee=0; ee<nlocalele; ++ee)
   {
-    if( locelem->get_elem_tag(ee) == 0 )
-      sval[ee].clear();
-    else if( locelem->get_elem_tag(ee) == 1 )
-      sval[ee].resize(nqp * 7);
+    if( locelem->get_elem_tag(ee) == 0 ) sval[ee].clear();
+    else if( locelem->get_elem_tag(ee) == 1 ) sval[ee].resize(nqp * 6);
     else
       SYS_T::print_fatal("Error: element tag should be 0 (fluid) or 1 (solid).\n");
   }
 }
 
-
 Prestress_solid::~Prestress_solid()
 {
-  for(int ee=0; ee<nlocelem; ++ee) VEC_T::clean(sval[ee]);
+  for(int ee=0; ee<nlocalele; ++ee) VEC_T::clean(sval[ee]);
 
   VEC_T::clean(sval);
 }
 
-
-void Prestress_solid::get_sval(const int &ee, 
-    std::vector<double> &esval ) const
+std::vector<double> Prestress_solid::get_prestress( const int &ee ) const
 {
-  esval = sval[ee];
+  return sval[ee];
 }
 
-
-void Prestress_solid::update_sval(const int &ee,
-    const std::vector<double> &in_esval )
+void Prestress_solid::set_prestress( const int &ee, const int &ii,
+    const double * const &in_esval )
 {
-  for(int ii=0; ii<7*nqp; ++ii) sval[ee][ii] += in_esval[ii];
+  for(int ii=0; ii<6*nqp; ++ii) sval[ee][ii] += in_esval[ii];
 }
 
 
 void Prestress_solid::print_info() const
 {
-  for(int ee=0; ee<nlocelem; ++ee)
+  for(int ee=0; ee<nlocalele; ++ee)
   {
     std::cout<<"ee: "<<ee<<'\t';
     VEC_T::print(sval[ee]);
@@ -51,5 +46,11 @@ void Prestress_solid::print_info() const
   }
 }
 
+void Prestress_solid::write_prestress_hdf5() const
+{}
+
+
+void Prestress_solid::read_prestress_hdf5() const
+{}
 
 // EOF

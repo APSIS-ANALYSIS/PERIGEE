@@ -21,9 +21,9 @@ class Prestress_solid
 
     // ------------------------------------------------------------------------
     // Input: ee the element index
-    // Output: esval is the vector holding 6 components of the prestress
+    // Output: the vector holding 6 components of the prestress at all quad pts
     // ------------------------------------------------------------------------
-    virtual std::vector<double> get_prestress(const int &ee, const int &ii ) const;
+    virtual std::vector<double> get_prestress(const int &ee ) const;
 
     // ------------------------------------------------------------------------
     // Input: ee the element index
