@@ -95,6 +95,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Element/FEAElement_Tet4.cpp
   ${perigee_source}/Model/MaterialModel_NeoHookean_M94_Mixed.cpp
   ${perigee_source}/Model/MaterialModel_NeoHookean_Incompressible_Mixed.cpp
+  ${perigee_source}/Model/Prestress_solid.cpp
   ${perigee_source}/Model/GenBC_RCR.cpp
   ${perigee_source}/Model/GenBC_Resistance.cpp
   ${perigee_source}/Model/GenBC_Tools.cpp

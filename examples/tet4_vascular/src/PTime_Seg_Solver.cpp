@@ -147,7 +147,7 @@ void PTime_Seg_Solver::TM_ALE_NS_GenAlpha(
     // Update the time step information
     time_info->TimeIncrement();
 
-    PetscPrintf(PETSC_COMM_WORLD, "Time = %e, dt = %e, index = %d, %s \n",
+    SYS_T::commPrint("Time = %e, dt = %e, index = %d, %s \n",
         time_info->get_time(), time_info->get_step(), time_info->get_index(),
         SYS_T::get_time().c_str());
 
@@ -182,14 +182,12 @@ void PTime_Seg_Solver::TM_ALE_NS_GenAlpha(
       const double lpn_pressure = gbc -> get_P( face, dot_lpn_flowrate, lpn_flowrate );
 
       // Update the initial values in genbc
-      gbc -> reset_initial_sol( face, lpn_flowrate, lpn_pressure, time_info->get_time() );
+      gbc -> reset_initial_sol( face, lpn_flowrate, lpn_pressure, time_info->get_time(), false );
 
       // On the CPU 0, write the time, flow rate, averaged pressure, and 0D
       // calculated pressure into the txt file, which is first generated in the
       // driver
-      PetscMPIInt rank;
-      MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
-      if( rank == 0 )
+      if( SYS_T::get_MPI_rank() == 0 )
       {
         std::ofstream ofile;
         ofile.open( ebc_part->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
@@ -302,22 +300,22 @@ void PTime_Seg_Solver::TM_FSI_GenAlpha(
       // Calculate 3D dot flow rate on the outlets
       const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( cur_velo,
           lassem_fluid_ptr, elements, quad_s, ebc_part, face); 
-     
+
       // Calculate 3D flow rate on the outlets
       const double face_flrate = gassem_ptr -> Assem_surface_flowrate( cur_disp,
           lassem_fluid_ptr, elements, quad_s, ebc_part, face); 
-     
+
       // Calculate 3D averaged pressure on outlets
       const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
           cur_disp, lassem_fluid_ptr, elements, quad_s, ebc_part, face);
-      
+
       // Calculate 0D pressure from LPN model
       const double dot_lpn_flowrate = dot_face_flrate;
       const double lpn_flowrate = face_flrate;
       const double lpn_pressure = gbc -> get_P( face, dot_lpn_flowrate, lpn_flowrate );
 
       // Update the initial values in genbc
-      gbc -> reset_initial_sol( face, lpn_flowrate, lpn_pressure, time_info->get_time() );
+      gbc -> reset_initial_sol( face, lpn_flowrate, lpn_pressure, time_info->get_time(), false );
 
       PetscMPIInt rank;
       MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
