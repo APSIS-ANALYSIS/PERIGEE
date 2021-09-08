@@ -9,13 +9,14 @@
 // Date: Oct. 10 2017
 // Author: Ju Liu
 // ============================================================================
+#include "HDF5_Writer.hpp"
 #include "ALocal_Elem_wTag.hpp"
 
 class Prestress_solid
 {
   public:
     Prestress_solid( const ALocal_Elem * const &locelem, const int &in_nqp_tet,
-       const std::string &in_ps_fName = "prestress" );
+       const int &in_cpu_rank, const std::string &in_ps_fName = "prestress" );
 
     virtual ~Prestress_solid();
 
@@ -38,14 +39,14 @@ class Prestress_solid
     // ------------------------------------------------------------------------
     virtual void write_prestress_hdf5() const;
 
-    // ------------------------------------------------------------------------
-    // load the prestress values from a h5 file
-    // ------------------------------------------------------------------------
-    virtual void read_prestress_hdf5() const;
-
     virtual void print_info() const;
 
   private:
+    // ------------------------------------------------------------------------
+    // The rank or id of the subdomain
+    // ------------------------------------------------------------------------
+    const int cpu_rank;
+    
     // ------------------------------------------------------------------------
     // The number of local element and the number of volumetric quadrature
     // points
