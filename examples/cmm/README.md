@@ -80,7 +80,7 @@ mpirun -np 60 ./cmm_tet_3d \
    
    * Otherwise, without preparing the above text file, one could also set `-inflow_thd_time` be smaller than the `-fina_time` and `-inflow_tgt_rate` equaling the diastolic inflow rate. The flow will be linearly ramped up to that value.
 
-3. If the flow solver runs successfully, there will be a steady-state solution recorded and we rename them to `SOL_re`, `dot_SOL_re`, `SOL_disp_re`, and `dot_SOL_disp_re`. Copy `SOL_re` and `solver_cmd.h5` to the folder for the prestress generation. Run the following to generate the `prestress_pxxxxx.h5` files.
+3. If the flow solver runs successfully, there will be a steady-state solution recorded and we rename the solution files (for example `SOL_900001000`, `dot_SOL_900001000`, `SOL_disp_900001000`, and `dot_SOL_disp_900001000` if the last step index is 1000) to `SOL_re`, `dot_SOL_re`, `SOL_disp_re`, and `dot_SOL_disp_re`. Copy `SOL_re` and `solver_cmd.h5` to the folder for the prestress generation. Run the following to generate the `prestress_pxxxxx.h5` files.
 ```sh
 ./preprocess3d -cmmbc_type 2 -ringbc_type 0 -is_uniform_wall NO -num_outlet 46 -cpu_size 60 -elem_type 501
 
