@@ -40,6 +40,31 @@ In the actual [analysis driver](cmm_driver.cpp), one can perform both deformable
 * `-nqp_tet` and `-nqp_tri` defines the number of volume and surface quadrature points. Note that if you use quadratic mesh, be sure to set them to be `29` and `13`, respectively, otherwise the code will be killed.
 * `-inflow_file` specifies the inflow in terms of fourier series, with the default value `inflow_fourier_series.txt`. If this file is placed in the job folder and has correct format, the code will load it to generate a (pulsatile) inflow profile. Otherwise, the code will set the initial flow rate to be zero and increase the flow rate with respect to time until reaching a target flow rate value. The linear incremental rate and the target flow rate can be controlled by `-inflow_thd_time` and `-inflow_tgt_rate`.
 * `-lpn_file` defines the LPN data for the outlets. Therefore, one should place the file in the job folder, and the default name for the file is `lpn_rcr_input.txt`.
+* `-nz_estimate` defines the estimation of num nonzeros per row for the sparse tangent matrix.
+* `-bs_beta` defines backflow stabiization parameter.
+* `-rho_inf` defines generalized-alpha parameter.
+* `-is_backward_Euler` defines whether adopts the backward_Euler method.
+* `-c_tauc` defines scaling factor for tau_c：0.0, 0.125, or 1.0.
+* `-inflow_thd_time` defines the time for linearly increasing inflow to reach steady state.
+* `-inflow_tgt_rate` defines the rate for linearly increasing inflow to reach steady state.
+* `-part_file` defines the base mesh partition files from preprocess program.
+* `-nl_rtol` defines the convergence criterion relative tolerance.
+* `nl_atol` defines the convergence criterion absolute tolerance.
+* `-nl_maxits` defines the maximum number of nonlinear iterations
+* `-nl_refreq` defines the frequency of tangent matrix renewal.
+* `-nl_threshold` defines the threshold of tangent matrix renewal.
+* `-init_time` defines the time of initial condition.
+* `-fina_time` defines the end time of simulation.
+* `-init_step` defines the time step.
+* `-init_index` defines the index of initial condition.
+* `-ttan_freq` defines the frequency of tangent matrix renewal.
+* `-sol_rec_freq` defines the frequency for recording the solution.
+* `-sol_name` defines the base name of the solution file.
+* `-is_restart` defines whether run restart process. Restart here means the effect of wall deformation is imposed on the fluid simulation.
+* `-restart_index` defines the restart solution time index.
+* `-restart_time` defines the restart time.
+* `-restart_step` deifnes the restart simulation time step size.
+* `-restart_name` defines the restart solution base name.
 
 Make sure that the HDF5 files, the inflow file, and the LPN file are placed in the analysis job folder.
 
