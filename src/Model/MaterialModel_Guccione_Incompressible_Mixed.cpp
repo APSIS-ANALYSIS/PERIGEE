@@ -70,12 +70,8 @@ void MaterialModel_Guccione_Incompressible_Mixed::write_hdf5( const char * const
     h5w -> write_doubleScalar("b_f", b_f);
     h5w -> write_doubleScalar("b_t", b_t);
     h5w -> write_doubleScalar("b_ft", b_ft);
-    h5w -> write_doubleScalar("fx", fx);
-    h5w -> write_doubleScalar("fy", fy);
-    h5w -> write_doubleScalar("fz", fz);
-    h5w -> write_doubleScalar("sx", sx);
-    h5w -> write_doubleScalar("sy", sy);
-    h5w -> write_doubleScalar("sz", sz);
+    h5w -> write_doubleVector("f",f,3);
+    h5w -> write_doubleVector("s",s,3);
 
     delete h5w; H5Fclose(file_id);
   }
