@@ -23,6 +23,12 @@ class MaterialModel_StVenant_Kirchhoff : public IMaterialModel
 
     virtual void print_info() const;
 
+    virtual std::string get_model_name() const
+    {
+      const std::string mname = "StVenant-Kirchhoff";
+      return mname;
+    }
+
     virtual void get_PK( const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S );
 
     virtual void get_PK_Stiffness( const Matrix_3x3 &F, Matrix_3x3 &P,
