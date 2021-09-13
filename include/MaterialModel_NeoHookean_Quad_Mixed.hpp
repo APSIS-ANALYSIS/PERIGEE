@@ -10,7 +10,7 @@
 // Density : rho = rho_0  /  ( 1 - p/k )
 // Isothermal Compressibility : beta = 1 / ( k - p )
 //
-i// Isochoric strain energy Psi_iso = (mu/2) (tr bar(C) - 3)
+// Isochoric strain energy Psi_iso = (mu/2) (tr bar(C) - 3)
 //                                 = (mu/2) (bar(I_1) - 3).
 //
 // Date: Aug. 22 2016
