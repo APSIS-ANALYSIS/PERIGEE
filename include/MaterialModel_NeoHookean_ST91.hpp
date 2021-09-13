@@ -24,6 +24,14 @@ class MaterialModel_NeoHookean_ST91 : public IMaterialModel
 
     virtual void print_info() const;
 
+    virtual std::string get_model_name() const
+    {
+      const std::string mname = "NeoHookean-ST91";
+      return mname;
+    }
+
+    virtual void write_hdf5( const char * const &fname = "material_model.h5") const;
+
     virtual void get_PK( const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S ); 
 
     virtual void get_PK_Stiffness( const Matrix_3x3 &F, Matrix_3x3 &P,
