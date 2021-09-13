@@ -70,19 +70,13 @@ void MaterialModel_GOH06_ST91_Mixed::write_hdf5( const char * const &fname ) con
     h5w -> write_doubleScalar("lambda", lambda);
     h5w -> write_doubleScalar("mu", mu);
     h5w -> write_doubleScalar("kappa", kappa);
-    h5w -> write_doubleScalar("theta_1(deg)", f1_the*180/pi)
-    h5w -> write_doubleScalar("phi_1(deg)", f1_phi*180/pi)
-    h5w -> write_doubleScalar("theta_1(rad)", f1_the)
-    h5w -> write_doubleScalar("phi_1(rad)", f1_phi)
-    h5w -> write_doubleScalar("theta_2(deg)", f2_the*180/pi)
-    h5w -> write_doubleScalar("phi_2(deg)", f2_phi*180/pi)
-    h5w -> write_doubleScalar("theta_2(rad)", f2_the)
-    h5w -> write_doubleScalar("phi_2(rad)", f2_phi)
-    h5w -> write_doubleScalar("a1", a1[0],a1[1],a1[2])
-    h5w -> write_doubleScalar("a2", a2[0],a2[1],a2[2])
-    h5w -> write_doubleScalar("k1", fk1)
-    h5w -> write_doubleScalar("k2", fk2)
-    h5w -> write_doubleScalar("k_dispersion" fkd)
+    h5w -> write_doubleScalar("f1_the", f1_the);
+    h5w -> write_doubleScalar("f1_phi", f1_phi);
+    h5w -> write_doubleScalar("f2_the", f2_the);
+    h5w -> write_doubleScalar("f2_phi", f2_phi);
+    h5w -> write_doubleScalar("fk1", fk1);
+    h5w -> write_doubleScalar("fk2", fk2);
+    h5w -> write_doubleScalar("fkd" fkd);
 
     delete h5w; H5Fclose(file_id);
   }
