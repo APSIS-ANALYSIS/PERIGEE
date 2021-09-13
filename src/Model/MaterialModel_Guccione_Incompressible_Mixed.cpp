@@ -57,7 +57,7 @@ void MaterialModel_Guccione_Incompressible_Mixed::print_info() const
   PetscPrintf(PETSC_COMM_WORLD, "\t  Third n dir = [%e %e %e] \n", n[0], n[1], n[2]); 
 }
 
-void MaterialModel_GOH06_ST91_Mixed::write_hdf5( const char * const &fname ) const
+void MaterialModel_Guccion_Incompressible_Mixed::write_hdf5( const char * const &fname ) const
 {
   if( SYS_T::get_MPI_rank() == 0 )
   {
@@ -70,9 +70,12 @@ void MaterialModel_GOH06_ST91_Mixed::write_hdf5( const char * const &fname ) con
     h5w -> write_doubleScalar("b_f", b_f);
     h5w -> write_doubleScalar("b_t", b_t);
     h5w -> write_doubleScalar("b_ft", b_ft);
-    h5w -> write_doubleScalar("Fibre_dir", f[0],f[1],f[2]);
-    h5w -> write_doubleScalar("Sheet_normal_dir", s[0],s[1],s[2])
-    h5w -> write_doubleScalar("Third_n_dir", n[0],n[1],n[2])
+    h5w -> write_doubleScalar("fx", fx);
+    h5w -> write_doubleScalar("fy", fy);
+    h5w -> write_doubleScalar("fz", fz);
+    h5w -> write_doubleScalar("sx", sx);
+    h5w -> write_doubleScalar("sy", sy);
+    h5w -> write_doubleScalar("sz", sz);
 
     delete h5w; H5Fclose(file_id);
   }
