@@ -308,7 +308,7 @@ int main( int argc, char * argv[] )
     // // Initialized with default fluid density 1.065
     // wall_ebc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
     //     thickness2radius_combined, wall_springconst, wall_dampingconst, wallsList,
-    //     centerlinesList, thickness2radiusList, ksList, csList, elemType, 1.0 );
+    //     centerlinesList, thickness2radiusList, ksList, csList, elemType );
     // // --------------------------------------------------------------------------
   }
 
