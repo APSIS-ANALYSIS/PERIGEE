@@ -10,7 +10,7 @@
 // Density : rho = rho_0  /  ( 1 - p/k )
 // Isothermal Compressibility : beta = 1 / ( k - p )
 //
-// Isochoric strain energy Psi_iso = (mu/2) (tr bar(C) - 3)
+i// Isochoric strain energy Psi_iso = (mu/2) (tr bar(C) - 3)
 //                                 = (mu/2) (bar(I_1) - 3).
 //
 // Date: Aug. 22 2016
@@ -29,6 +29,14 @@ class MaterialModel_NeoHookean_Quad_Mixed : public IMaterialModel
     virtual ~MaterialModel_NeoHookean_Quad_Mixed();
 
     virtual void print_info() const;
+
+    virtual std::string get_model_name() const
+    {
+      const std::string mname = "NeoHookean-Quad-Mixed";
+      return mname;
+    }
+
+    virtual void write_hdf5( const char * const &fname = "material_model.h5") const;
 
     // Returns the S_iso and P_iso
     virtual void get_PK( const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S );
