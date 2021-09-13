@@ -23,7 +23,7 @@ void MaterialModel_NeoHookean_ST91::print_info() const
   PetscPrintf(PETSC_COMM_WORLD, "\t  Ref. density rho0  = %e \n", rho0);
 }
 
-void MaterialModel_StVenant_Kirchhoff_M94_Mixed::write_hdf5( const char * const &fname ) const
+void MaterialModel_NeoHookean_ST91::write_hdf5( const char * const &fname ) const
 {
   if( SYS_T::get_MPI_rank() == 0 )
   {
