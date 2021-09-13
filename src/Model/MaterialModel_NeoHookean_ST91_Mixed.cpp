@@ -45,7 +45,7 @@ void MaterialModel_StVenant_Kirchhoff_M94_Mixed::write_hdf5( const char * const 
     h5w -> write_doubleScalar("lambda", lambda);
     h5w -> write_doubleScalar("mu", mu);
     h5w -> write_doubleScalar("kappa", kappa);
-
+    h5w -> write_doubleScalar("rho0",rho0);
     delete h5w; H5Fclose(file_id);
   }
 
