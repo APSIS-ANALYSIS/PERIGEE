@@ -41,6 +41,7 @@
 // Contact: liujuy@gmail.com
 // ==================================================================
 #include "Sys_Tools.hpp"
+#include "HDF5_Writer.hpp"
 #include "Tensor4_3D.hpp"
 
 class IMaterialModel
@@ -51,6 +52,18 @@ class IMaterialModel
     virtual ~IMaterialModel(){};
 
     virtual void print_info() const = 0;
+
+    virtual std::string get_model_name() const
+    {
+      const std::string output = "unknown";
+      SYS_T::commPrint("Warning: IMaterialModel::get_model_name() is not implemented. \n");
+      return output;
+    }
+
+    virtual void write_hdf5( const char * const &fname = "material_model.h5") const
+    {
+      SYS_T::commPrint("Warning: IMaterialModel::write_hdf5() is not implemented. \n");
+    }
 
     virtual void get_PK(const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S) = 0;
 

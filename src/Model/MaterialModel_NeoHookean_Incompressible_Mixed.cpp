@@ -26,6 +26,24 @@ void MaterialModel_NeoHookean_Incompressible_Mixed::print_info() const
   PetscPrintf(PETSC_COMM_WORLD, "\t  Shear modulus mu   = %e \n", mu);
 }
 
+void MaterialModel_NeoHookean_Incompressible_Mixed::write_hdf5( const char * const &fname ) const
+{
+  if( SYS_T::get_MPI_rank() == 0 )
+  {
+    hid_t file_id = H5Fcreate(fname, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+    HDF5_Writer * h5w = new HDF5_Writer(file_id);
+
+    h5w -> write_string("model_name", get_model_name());
+    h5w -> write_doubleScalar( "rho0", rho0 );
+    h5w -> write_doubleScalar("E", E);
+    h5w -> write_doubleScalar("nu", nu);
+    h5w -> write_doubleScalar("mu", mu);
+
+    delete h5w; H5Fclose(file_id);
+  }
+
+  MPI_Barrier(PETSC_COMM_WORLD);
+}
 
 void MaterialModel_NeoHookean_Incompressible_Mixed::get_PK(
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S)
