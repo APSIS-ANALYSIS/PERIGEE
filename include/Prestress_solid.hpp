@@ -32,7 +32,8 @@ class Prestress_solid
     //        in_esval is the element's prestress value at the quadrature point.
     // Users are responsible for making sure that the vector has lenght 6*nqp
     // ------------------------------------------------------------------------
-    virtual void set_prestress(const int &ee, const int &ii, const double * const &in_esval );
+    virtual void set_prestress(const int &ee, const int &ii, 
+        const double * const &in_esval );
 
     // ------------------------------------------------------------------------
     // record the prestress values to a h5 file
@@ -61,8 +62,7 @@ class Prestress_solid
     // ------------------------------------------------------------------------
     // qua_prestress[ee][nqp*ii+jj] stores the ee-th solid element's pre-stress 
     // jj-th component in Voigt notation at the ii-th quadrature point.
-    // 0 <= ii < nqp
-    // 0 <= jj < 6
+    // 0 <= ee < nlocalele, 0 <= ii < nqp, 0 <= jj < 6
     // ------------------------------------------------------------------------
     std::vector< std::vector<double> > qua_prestress;
 };
