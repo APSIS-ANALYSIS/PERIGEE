@@ -76,7 +76,7 @@ void MaterialModel_GOH06_ST91_Mixed::write_hdf5( const char * const &fname ) con
     h5w -> write_doubleScalar("f2_phi", f2_phi);
     h5w -> write_doubleScalar("fk1", fk1);
     h5w -> write_doubleScalar("fk2", fk2);
-    h5w -> write_doubleScalar("fkd" fkd);
+    h5w -> write_doubleScalar("fkd", fkd);
 
     delete h5w; H5Fclose(file_id);
   }

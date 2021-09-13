@@ -65,16 +65,14 @@ void MaterialModel_GOH06_Incompressible_Mixed::write_hdf5( const char * const &f
     h5w -> write_doubleScalar( "rho0", rho0 );
     h5w -> write_doubleScalar("E", E);
     h5w -> write_doubleScalar("nu", nu);
-    h5w -> write_doubleScalar("lambda", lambda);
     h5w -> write_doubleScalar("mu", mu);
-    h5w -> write_doubleScalar("kappa", kappa);
     h5w -> write_doubleScalar("f1_the", f1_the);
     h5w -> write_doubleScalar("f1_phi", f1_phi);
     h5w -> write_doubleScalar("f2_the", f2_the);
     h5w -> write_doubleScalar("f2_phi", f2_phi);
     h5w -> write_doubleScalar("fk1", fk1);
     h5w -> write_doubleScalar("fk2", fk2);
-    h5w -> write_doubleScalar("k_dispersion" fkd);
+    h5w -> write_doubleScalar("fkd", fkd);
 
     delete h5w; H5Fclose(file_id);
   }

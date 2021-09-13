@@ -57,7 +57,7 @@ void MaterialModel_Guccione_Incompressible_Mixed::print_info() const
   PetscPrintf(PETSC_COMM_WORLD, "\t  Third n dir = [%e %e %e] \n", n[0], n[1], n[2]); 
 }
 
-void MaterialModel_Guccion_Incompressible_Mixed::write_hdf5( const char * const &fname ) const
+void MaterialModel_Guccione_Incompressible_Mixed::write_hdf5( const char * const &fname ) const
 {
   if( SYS_T::get_MPI_rank() == 0 )
   {
@@ -66,7 +66,7 @@ void MaterialModel_Guccion_Incompressible_Mixed::write_hdf5( const char * const 
 
     h5w -> write_string("model_name", get_model_name());
     h5w -> write_doubleScalar( "rho0", rho0 );
-    h5w -> write_doubleScalar("C", Cp);
+    h5w -> write_doubleScalar("Cq", Cq);
     h5w -> write_doubleScalar("b_f", b_f);
     h5w -> write_doubleScalar("b_t", b_t);
     h5w -> write_doubleScalar("b_ft", b_ft);
