@@ -70,8 +70,8 @@ void MaterialModel_GOH06_ST91_Mixed::write_hdf5( const char * const &fname ) con
     h5w -> write_doubleScalar("b_f", b_f);
     h5w -> write_doubleScalar("b_t", b_t);
     h5w -> write_doubleScalar("b_ft", b_ft);
-    h5w -> write_doubleScalar("Fibre_ttdir", f[0],f[1],f[2]);
-    h5w -> write_doubleScalar("Sheet_normal dir", s[0],s[1],s[2])
+    h5w -> write_doubleScalar("Fibre_dir", f[0],f[1],f[2]);
+    h5w -> write_doubleScalar("Sheet_normal_dir", s[0],s[1],s[2])
     h5w -> write_doubleScalar("Third_n_dir", n[0],n[1],n[2])
 
     delete h5w; H5Fclose(file_id);
