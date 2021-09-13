@@ -21,7 +21,7 @@ void MaterialModel_StVenant_Kirchhoff::print_info() const
   PetscPrintf(PETSC_COMM_WORLD, "\t  Bulk modulus kappa = %e \n", kappa);
 }
 
-void MaterialModel_StVenant_Kirchhoff_M94_Mixed::write_hdf5( const char * const &fname ) const
+void MaterialModel_StVenant_Kirchhoff::write_hdf5( const char * const &fname ) const
 {
   if( SYS_T::get_MPI_rank() == 0 )
   {
