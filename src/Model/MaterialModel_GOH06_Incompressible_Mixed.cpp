@@ -27,10 +27,6 @@ MaterialModel_GOH06_Incompressible_Mixed::MaterialModel_GOH06_Incompressible_Mix
 
 MaterialModel_GOH06_Incompressible_Mixed::MaterialModel_GOH06_Incompressible_Mixed(const char * const &fname)
 : pt33( 1.0 / 3.0 ), mpt67( -2.0 * pt33 ), pi( MATH_T::PI ),
-  rho0( in_rho ), E(3.0 * in_mu), nu(0.5), mu( in_mu ),
-  f1_the( in_f1the*pi/180.0 ), f1_phi( in_f1phi*pi/180.0 ),
-  f2_the( in_f2the*pi/180.0 ), f2_phi( in_f2phi*pi/180.0 ),
-  fk1(in_fk1), fk2(in_fk2), fkd(in_fkd),
   I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
 {
 

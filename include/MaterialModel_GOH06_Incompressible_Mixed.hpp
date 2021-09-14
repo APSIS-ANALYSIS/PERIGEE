@@ -40,7 +40,7 @@ class MaterialModel_GOH06_Incompressible_Mixed : public IMaterialModel
        const double &in_fk1, const double &in_fk2,
        const double &in_fkd );
 
-    MaterialModel_Guccione_Incompressible_Mixed(
+    MaterialModel_GOH06_Incompressible_Mixed(
         const char * const &fname = "material_model.h5" );
     
     virtual ~MaterialModel_GOH06_Incompressible_Mixed();
