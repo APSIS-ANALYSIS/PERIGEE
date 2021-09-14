@@ -6,8 +6,7 @@ MaterialModel_Guccione_Incompressible_Mixed::MaterialModel_Guccione_Incompressib
     const double &fx, const double &fy, const double &fz,
     const double &sx, const double &sy, const double &sz )
 : pt33( 1.0 / 3.0 ), mpt67( -2.0 * pt33 ),
-  rho0( in_rho ), Cq(in_C), b_f(in_bf), b_t(in_bt),
-  b_ft(in_bft),
+  rho0( in_rho ), Cq(in_C), b_f(in_bf), b_t(in_bt), b_ft(in_bft),
   I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
 {
   f[0] = fx; f[1] = fy; f[2] = fz;
@@ -88,13 +87,12 @@ MaterialModel_Guccione_Incompressible_Mixed::MaterialModel_Guccione_Incompressib
   R(1,0) = s[0]; R(1,1) = s[1]; R(1,2) = s[2];
   R(2,0) = n[0]; R(2,1) = n[1]; R(2,2) = n[2];
 
+  // Define the transpose of the rotation matrix R
   Rt.copy(R); Rt.transpose();
 }
 
-
 MaterialModel_Guccione_Incompressible_Mixed::~MaterialModel_Guccione_Incompressible_Mixed()
 {}
-
 
 void MaterialModel_Guccione_Incompressible_Mixed::print_info() const
 {
@@ -117,13 +115,13 @@ void MaterialModel_Guccione_Incompressible_Mixed::write_hdf5( const char * const
     HDF5_Writer * h5w = new HDF5_Writer(file_id);
 
     h5w -> write_string("model_name", get_model_name());
-    h5w -> write_doubleScalar( "rho0", rho0 );
+    h5w -> write_doubleScalar("rho0", rho0);
     h5w -> write_doubleScalar("Cq", Cq);
     h5w -> write_doubleScalar("b_f", b_f);
     h5w -> write_doubleScalar("b_t", b_t);
     h5w -> write_doubleScalar("b_ft", b_ft);
-    h5w -> write_doubleVector("f",f,3);
-    h5w -> write_doubleVector("s",s,3);
+    h5w -> write_doubleVector("f", f, 3);
+    h5w -> write_doubleVector("s", s, 3);
 
     delete h5w; H5Fclose(file_id);
   }
@@ -135,20 +133,24 @@ void MaterialModel_Guccione_Incompressible_Mixed::write_hdf5( const char * const
 void MaterialModel_Guccione_Incompressible_Mixed::get_PK( 
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S )
 {
+  Matrix_3x3 C, Cinv;
   C.MatMultTransposeLeft(F);
   Cinv.copy(C); Cinv.inverse();
-  trC = C.tr();
-  trC2 = C.MatContraction( C );
-  detF = F.det();
-  detFm0d67 = std::pow(detF, mpt67);
+  const double trC = C.tr();
+  const double trC2 = C.MatContraction( C );
+  const double detF = F.det();
+  const double detFm0d67 = std::pow(detF, mpt67);
 
   // E_bar = 0.5 * (J^-2/3 C - I )
+  Matrix_3x3 E_bar;
   E_bar.copy(C); E_bar.scale(0.5 * detFm0d67); E_bar.AXPY(-0.5, I);
 
   // E* = R^T E_bar R
+  Matrix_3x3 E_star;
   E_star.MatMult(Rt, E_bar); E_star.MatMult(E_star, R);
 
   // PxE_bar = E_bar - 1/6 (J^-2/3 C:C  - trC ) C^-1.
+  Matrix_3x3 PxE_bar;
   PxE_bar.copy(E_bar);
   PxE_bar.AXPY(-0.5*pt33*(detFm0d67 * trC2 - trC), Cinv);
 
@@ -179,20 +181,25 @@ void MaterialModel_Guccione_Incompressible_Mixed::get_PK(
 void MaterialModel_Guccione_Incompressible_Mixed::get_PK_Stiffness( 
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &CC )
 {
+  Matrix_3x3 C, Cinv;
   C.MatMultTransposeLeft(F);
   Cinv.copy(C); Cinv.inverse();
-  trC = C.tr();
-  trC2 = C.MatContraction( C );
-  detF = F.det();
-  detFm0d67 = std::pow(detF, mpt67);
+  
+  const double trC = C.tr();
+  const double trC2 = C.MatContraction( C );
+  const double detF = F.det();
+  const double detFm0d67 = std::pow(detF, mpt67);
 
   // E_bar = 0.5 * (J^-2/3 C - I )
+  Matrix_3x3 E_bar;
   E_bar.copy(C); E_bar.scale(0.5 * detFm0d67); E_bar.AXPY(-0.5, I);
 
   // E* = R^T E_bar R
+  Matrix_3x3 E_star;
   E_star.MatMult(Rt, E_bar); E_star.MatMult(E_star, R);
 
   // PxE_bar = E_bar - 1/6 (J^-2/3 C:C  - trC ) C^-1.
+  Matrix_3x3 PxE_bar;
   PxE_bar.copy(E_bar);
   PxE_bar.AXPY(-0.5*pt33*(detFm0d67 * trC2 - trC), Cinv);
 
@@ -254,9 +261,10 @@ void MaterialModel_Guccione_Incompressible_Mixed::get_PK_Stiffness(
 double MaterialModel_Guccione_Incompressible_Mixed::get_strain_energy( 
     const Matrix_3x3 &F )
 {
+  Matrix_3x3 C, E_bar, E_star;
   C.MatMultTransposeLeft(F);
-  detF = F.det();
-  detFm0d67 = std::pow(detF, mpt67);
+  const double detF = F.det();
+  const double detFm0d67 = std::pow(detF, mpt67);
 
   // E_bar = 0.5 * (J^-2/3 C - I )
   E_bar.copy(C); E_bar.scale(0.5 * detFm0d67); E_bar.AXPY(-0.5, I);

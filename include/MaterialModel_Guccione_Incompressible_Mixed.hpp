@@ -91,10 +91,6 @@ class MaterialModel_Guccione_Incompressible_Mixed : public IMaterialModel
 
     // The rotation matrix
     Matrix_3x3 R, Rt;
-
-    Matrix_3x3 C, Cinv, E_bar, E_star, PxE_bar;
-
-    double trC, trC2, detF, detFm0d67;
 };
 
 #endif
