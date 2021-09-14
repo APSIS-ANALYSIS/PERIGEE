@@ -9,18 +9,42 @@ MaterialModel_NeoHookean_ST91::MaterialModel_NeoHookean_ST91(
   I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
 {}
 
+
+MaterialModel_NeoHookean_ST91::MaterialModel_NeoHookean_ST91(
+        const char * const &fname )
+:pt33( 1.0 / 3.0 ), pt67( 2.0 / 3.0 ), mpt67( -1.0 * pt67 ),
+  I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+{
+  hid_t h5file = H5Fopen(fname, H5F_ACC_RDONLY, H5P_DEFAULT);
+
+  HDF5_Reader * h5r = new HDF5_Reader( h5file );
+
+  SYS_T::print_fatal_if( h5r->read_string("/", "model_name") != get_model_name(),
+     "Error: MaterialModel_NeoHookean_ST91 constructor does not match h5 file.\n" );
+
+  rho0   = h5r -> read_doubleScalar("/", "rho0");
+  E      = h5r -> read_doubleScalar("/", "E");
+  nu     = h5r -> read_doubleScalar("/", "nu");
+  lambda = h5r -> read_doubleScalar("/", "lambda");
+  mu     = h5r -> read_doubleScalar("/", "mu");
+  kappa  = h5r -> read_doubleScalar("/", "kappa");
+
+  delete h5r; H5Fclose(h5file);
+}
+
+
 MaterialModel_NeoHookean_ST91::~MaterialModel_NeoHookean_ST91()
 {}
 
 void MaterialModel_NeoHookean_ST91::print_info() const
 {
-  PetscPrintf(PETSC_COMM_WORLD, "\t  MaterialModel_NeoHookean_ST91: \n");
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Young's Modulus E  = %e \n", E);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Possion's ratio nu = %e \n", nu);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Lame coeff lambda  = %e \n", lambda);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Shear modulus mu   = %e \n", mu);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Bulk modulus kappa = %e \n", kappa);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Ref. density rho0  = %e \n", rho0);
+  SYS_T::commPrint("\t  MaterialModel_NeoHookean_ST91: \n");
+  SYS_T::commPrint("\t  Young's Modulus E  = %e \n", E);
+  SYS_T::commPrint("\t  Possion's ratio nu = %e \n", nu);
+  SYS_T::commPrint("\t  Lame coeff lambda  = %e \n", lambda);
+  SYS_T::commPrint("\t  Shear modulus mu   = %e \n", mu);
+  SYS_T::commPrint("\t  Bulk modulus kappa = %e \n", kappa);
+  SYS_T::commPrint("\t  Ref. density rho0  = %e \n", rho0);
 }
 
 void MaterialModel_NeoHookean_ST91::write_hdf5( const char * const &fname ) const
