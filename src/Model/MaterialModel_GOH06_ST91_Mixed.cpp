@@ -26,6 +26,45 @@ MaterialModel_GOH06_ST91_Mixed::MaterialModel_GOH06_ST91_Mixed(
   a2xa2.gen_outprod(a2);
 }
 
+MaterialModel_GOH06_ST91_Mixed::MaterialModel_GOH06_ST91_Mixed(
+		const char * const &fname )
+: pt33( 1.0 / 3.0 ), mpt67( -2.0 * pt33 ), pi( MATH_T::PI ),
+  I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+{
+
+  hid_t h5file = H5Fopen(fname, H5F_ACC_RDONLY, H5P_DEFAULT);
+
+  HDF5_Reader * h5r = new HDF5_Reader( h5file );
+
+  SYS_T::print_fatal_if( h5r->read_string("/", "model_name") != get_model_name(),
+     "Error: MaterialModel_GOH06_ST91_Mixed constructor does not match h5 file.\n" );
+
+  rho0 = h5r -> read_doubleScalar("/", "rho0");
+  E = h5r -> read_doubleScalar("/", "E");
+  nu = h5r -> read_doubleScalar("/", "nu");
+  lambda = h5r -> read_doubleScalar("/", "lambda");
+  mu = h5r -> read_doubleScalar("/", "mu");
+  kappa = h5r -> read_doubleScalar("/", "kappa");
+  f1_the = h5r -> read_doubleScalar("/", "f1_the");
+  f1_phi = h5r -> read_doubleScalar("/", "f1_phi");
+  f2_the = h5r -> read_doubleScalar("/", "f2_the");
+  f2_phi = h5r -> read_doubleScalar("/", "f2_phi");
+  fk1 = h5r -> read_doubleScalar("/", "fk1");
+  fk2 = h5r-> read_doubleScalar("/", "fk2");
+  fkd = h5r -> read_doubleScalar("/", "fkd");
+
+  a1[0] = sin(f1_the) * cos(f1_phi);
+  a1[1] = sin(f1_the) * sin(f1_phi);
+  a1[2] = cos(f1_the);
+
+  a2[0] = sin(f2_the) * cos(f2_phi);
+  a2[1] = sin(f2_the) * sin(f2_phi);
+  a2[2] = cos(f2_the);
+
+  a1xa1.gen_outprod(a1);
+  a2xa2.gen_outprod(a2);
+}
+
 
 MaterialModel_GOH06_ST91_Mixed::~MaterialModel_GOH06_ST91_Mixed()
 {}
@@ -33,27 +72,27 @@ MaterialModel_GOH06_ST91_Mixed::~MaterialModel_GOH06_ST91_Mixed()
 
 void MaterialModel_GOH06_ST91_Mixed::print_info() const
 {
-  PetscPrintf(PETSC_COMM_WORLD, "\t  MaterialModel_GOH06_ST91_Mixed: \n");
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Ground Matrix Neo-Hookean: \n");
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Young's Modulus E  = %e \n", E);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Possion's ratio nu = %e \n", nu);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Shear modulus mu   = %e \n", mu);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Lame coeff lambda  = %e \n", lambda);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Bulk modulus kappa = %e \n", kappa);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Fibre Fung: \n");
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Angle theta_1 (deg)= %e \n", f1_the*180/pi);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Angle phi_1 (deg)  = %e \n", f1_phi*180/pi);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Angle theta_1 (rad)= %e \n", f1_the);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Angle phi_1 (rad)  = %e \n", f1_phi);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Angle theta_2 (deg)= %e \n", f2_the*180/pi);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Angle phi_2 (deg)  = %e \n", f2_phi*180/pi);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Angle theta_2 (rad)= %e \n", f2_the);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Angle phi_2 (rad)  = %e \n", f2_phi);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  a1: [ %e , %e , %e ] \n", a1[0], a1[1], a1[2]);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  a2: [ %e , %e , %e ] \n", a2[0], a2[1], a2[2]);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Fibre k1   = %e \n", fk1);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Fibre k2   = %e \n", fk2);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Fibre k_dispersion = %e \n", fkd);
+  SYS_T::commPrint( "\t  MaterialModel_GOH06_ST91_Mixed: \n");
+  SYS_T::commPrint( "\t  Ground Matrix Neo-Hookean: \n");
+  SYS_T::commPrint( "\t  Young's Modulus E  = %e \n", E);
+  SYS_T::commPrint( "\t  Possion's ratio nu = %e \n", nu);
+  SYS_T::commPrint( "\t  Shear modulus mu   = %e \n", mu);
+  SYS_T::commPrint( "\t  Lame coeff lambda  = %e \n", lambda);
+  SYS_T::commPrint( "\t  Bulk modulus kappa = %e \n", kappa);
+  SYS_T::commPrint( "\t  Fibre Fung: \n");
+  SYS_T::commPrint( "\t  Angle theta_1 (deg)= %e \n", f1_the*180/pi);
+  SYS_T::commPrint( "\t  Angle phi_1 (deg)  = %e \n", f1_phi*180/pi);
+  SYS_T::commPrint( "\t  Angle theta_1 (rad)= %e \n", f1_the);
+  SYS_T::commPrint( "\t  Angle phi_1 (rad)  = %e \n", f1_phi);
+  SYS_T::commPrint( "\t  Angle theta_2 (deg)= %e \n", f2_the*180/pi);
+  SYS_T::commPrint( "\t  Angle phi_2 (deg)  = %e \n", f2_phi*180/pi);
+  SYS_T::commPrint( "\t  Angle theta_2 (rad)= %e \n", f2_the);
+  SYS_T::commPrint( "\t  Angle phi_2 (rad)  = %e \n", f2_phi);
+  SYS_T::commPrint( "\t  a1: [ %e , %e , %e ] \n", a1[0], a1[1], a1[2]);
+  SYS_T::commPrint( "\t  a2: [ %e , %e , %e ] \n", a2[0], a2[1], a2[2]);
+  SYS_T::commPrint( "\t  Fibre k1   = %e \n", fk1);
+  SYS_T::commPrint( "\t  Fibre k2   = %e \n", fk2);
+  SYS_T::commPrint( "\t  Fibre k_dispersion = %e \n", fkd);
 }
 
 void MaterialModel_GOH06_ST91_Mixed::write_hdf5( const char * const &fname ) const

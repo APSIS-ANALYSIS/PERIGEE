@@ -12,6 +12,8 @@
 // ==================================================================
 #include "IMaterialModel.hpp"
 #include "Math_Tools.hpp"
+#include "HDF5_Reader.hpp"
+
 
 class MaterialModel_GOH06_ST91_Mixed : public IMaterialModel
 {
@@ -22,6 +24,9 @@ class MaterialModel_GOH06_ST91_Mixed : public IMaterialModel
         const double &in_f2the, const double &in_f2phi,
         const double &in_fk1, const double &in_fk2,
         const double &in_fkd );
+
+    MaterialModel_GOH06_ST91_Mixed(
+        const char * const &fname = "material_model.h5" );
 
     virtual ~MaterialModel_GOH06_ST91_Mixed();
 
@@ -67,9 +72,9 @@ class MaterialModel_GOH06_ST91_Mixed : public IMaterialModel
 
   private:
     const double pt33, mpt67, pi;
-    const double rho0, E, nu, lambda, mu, kappa;
-    const double f1_the, f1_phi, f2_the, f2_phi;
-    const double fk1, fk2, fkd;
+    double rho0, E, nu, lambda, mu, kappa;
+    double f1_the, f1_phi, f2_the, f2_phi;
+    double fk1, fk2, fkd;
     double a1[3], a2[3];
 
     double trC, detF, detFm0d67;
