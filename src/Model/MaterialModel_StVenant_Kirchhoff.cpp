@@ -7,18 +7,38 @@ MaterialModel_StVenant_Kirchhoff::MaterialModel_StVenant_Kirchhoff(
   I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
 {}
 
+MaterialModel_StVenant_Kirchhoff::MaterialModel_StVenant_Kirchhoff(
+    const char * const &fname):
+  I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+{
+
+  hid_t h5file = H5Fopen(fname, H5F_ACC_RDONLY, H5P_DEFAULT);
+
+  HDF5_Reader * h5r = new HDF5_Reader( h5file );
+
+  SYS_T::print_fatal_if( h5r->read_string("/", "model_name") != get_model_name(),
+     "Error: MaterialModel_StVenant_Kirchhoff constructor does not match h5 file.\n" );
+
+  E      =  h5r -> read_doubleScalar("/", "E");
+  nu     =  h5r -> read_doubleScalar("/", "nu");
+  lambda =  h5r -> read_doubleScalar("/", "lambda");
+  mu     =  h5r -> read_doubleScalar("/", "mu");
+  kappa  =  h5r -> read_doubleScalar("/", "kappa");
+
+}
+
 MaterialModel_StVenant_Kirchhoff::~MaterialModel_StVenant_Kirchhoff()
 {}
 
 
 void MaterialModel_StVenant_Kirchhoff::print_info() const
 {
-  PetscPrintf(PETSC_COMM_WORLD, "\t  MaterialModel_StVenant_Kirchhoff: \n");
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Young's Modulus E  = %e \n", E);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Possion's ratio nu = %e \n", nu);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Lame coeff lambda  = %e \n", lambda);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Shear modulus mu   = %e \n", mu);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Bulk modulus kappa = %e \n", kappa);
+  SYS_T::commPrint( "\t  MaterialModel_StVenant_Kirchhoff: \n");
+  SYS_T::commPrint( "\t  Young's Modulus E  = %e \n", E);
+  SYS_T::commPrint( "\t  Possion's ratio nu = %e \n", nu);
+  SYS_T::commPrint( "\t  Lame coeff lambda  = %e \n", lambda);
+  SYS_T::commPrint( "\t  Shear modulus mu   = %e \n", mu);
+  SYS_T::commPrint( "\t  Bulk modulus kappa = %e \n", kappa);
 }
 
 void MaterialModel_StVenant_Kirchhoff::write_hdf5( const char * const &fname ) const
