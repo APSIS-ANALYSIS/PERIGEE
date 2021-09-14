@@ -28,6 +28,7 @@
 // ==================================================================
 #include "IMaterialModel.hpp"
 #include "Math_Tools.hpp"
+#include "HDF5_Reader.hpp"
 
 class MaterialModel_GOH06_Incompressible_Mixed : public IMaterialModel
 {
@@ -38,6 +39,9 @@ class MaterialModel_GOH06_Incompressible_Mixed : public IMaterialModel
        const double &in_f2the, const double &in_f2phi,
        const double &in_fk1, const double &in_fk2,
        const double &in_fkd );
+
+    MaterialModel_Guccione_Incompressible_Mixed(
+        const char * const &fname = "material_model.h5" );
     
     virtual ~MaterialModel_GOH06_Incompressible_Mixed();
 
@@ -85,17 +89,17 @@ class MaterialModel_GOH06_Incompressible_Mixed : public IMaterialModel
     const double pt33, mpt67, pi;
 
     // density
-    const double rho0;
+    double rho0;
 
     // groud matrix parameters 
-    const double E, nu, mu; // kappa = infty in this model
+    double E, nu, mu; // kappa = infty in this model
 
     // fibre direction: f_theta, f_phi in radians
-    const double f1_the, f1_phi, f2_the, f2_phi; 
+    double f1_the, f1_phi, f2_the, f2_phi; 
 
     // fibre elastic parameter
     // fkd is the dispresion parameter ranging from 0 to 1/3
-    const double fk1, fk2, fkd;
+    double fk1, fk2, fkd;
 
     // unit vector for fibre direction in the ref domain    
     double a1[3], a2[3];
