@@ -7,6 +7,7 @@ This folder contains a suite of codes for performing patient-specific vascular F
 - [FSI analysis](#FSI-Analysis)
 - [Wall prestress generation](#Wall-prestress-generation)
 - [Simulation pipeline](#Simulation-pipeline)
+- [Postprocessing](#Postprocessing)
 
 ## Preprocessor
 In the [preprocessor](preprocess_sv_tets.cpp), one needs to prepare the mesh, assign proper boundary conditions, and do mesh partitioning. The following arguments determine the basic setting of the geometry as well as the mesh partitioning.
@@ -125,7 +126,7 @@ mpirun -np 60 ./wall_solver \
 
 5. Now make sure that the HDF5 files generated from the above script, the prestress_pxxxxx.h5 file, the LPN file `lpn_rcr_input.txt`, and the inflow file `inflow_fourier_series.txt` have all been placed in the same job folder. Also, one needs to copy all the steady-state solutions from the previous CFD analysis and place them with the SOL_re file in the job folder. Run the following for the CMM simulation.
 ```sh
-mpirun -np 60 ./cmm_tet_3d 
+mpirun -np 60 ./cmm_tet_3d \
    -nz_estimate 1000 -fl_density 1.00 -fl_mu 4.0e-2 -wall_density 1.0 -wall_poisson 0.5 \
    -nqp_tet 5 -nqp_tri 4 \
    -init_step 4.055e-4 -fina_time 2.433 \
@@ -142,3 +143,14 @@ mpirun -np 60 ./cmm_tet_3d
    -log_view
 ```
 Notice that we want to run this as a restart run with the restart solution coming from the steady state CFD analysis, since the wall loads the prestress, which is  balancing with the fluid pressure.
+
+## Postprocessing
+To run postprocessing scripts, one has to repartition the mesh. Running this script is fairly similar to the preprocessing. One just needs to specify the number of CPUs for postprocessing. Make sure that the original geometry files (in vtu or vtp format) as well as the `preprocessor_cmd.h5` are in the job folder, and then run the following, which means repartition the mesh into 16 subdomains.
+```sh
+./prepost -cpu_size 16
+```
+Next, as an example of postprocessing, we visualize the data. First, we need to make sure that we have all the necessary data, including `epart.h5`, `node_mapping.h5`, all postprocessing mesh partitioning generated hdf5 files, and solution files (e.g. SOL_900000000). Then run the following to do the visualization.
+```sh
+mpirun -np 16 ./vis_cmm -time_start 1000 -time_step 1000 -time_end 5000
+```
+The above command convert the solution files to vtk files, from time step 1000 to 5000, with incremental step being 1000.
