@@ -13,12 +13,16 @@
 //            CMAME 197 2008: pp 2752.
 // ==================================================================
 #include <cmath>
+#include "HDF5_Reader.hpp"
 #include "IMaterialModel.hpp"
 
 class MaterialModel_NeoHookean_RWR2000 : public IMaterialModel
 {
   public:
     MaterialModel_NeoHookean_RWR2000( const double &in_E, const double &in_nu );
+
+    MaterialModel_NeoHookean_RWR2000(
+        const char * const &fname = "material_model.h5" );
 
     virtual ~MaterialModel_NeoHookean_RWR2000();
 
@@ -50,7 +54,7 @@ class MaterialModel_NeoHookean_RWR2000 : public IMaterialModel
     virtual double get_elastic_kappa() const {return kappa;}
 
   private:
-    const double E, nu, lambda, mu, kappa;
+    double E, nu, lambda, mu, kappa;
     Matrix_3x3 Cinv;
 };
 
