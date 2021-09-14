@@ -13,6 +13,26 @@ MaterialModel_NeoHookean_Incompressible_Mixed::MaterialModel_NeoHookean_Incompre
   I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
 {}
 
+MaterialModel_NeoHookean_Incompressible_Mixed::MaterialModel_NeoHookean_Incompressible_Mixed(
+    const char * const &fname )
+: pt33( 1.0/3.0 ), 
+  I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+{
+  hid_t h5file = H5Fopen(fname, H5F_ACC_RDONLY, H5P_DEFAULT);
+
+  HDF5_Reader * h5r = new HDF5_Reader( h5file );
+
+  SYS_T::print_fatal_if( h5r->read_string("/", "model_name") != get_model_name(),
+     "Error: MaterialModel_NeoHookean_Incompressible_Mixed constructor does not match h5 file.\n" );
+
+  rho0 = h5r -> read_doubleScalar("/", "rho0");
+  E    = h5r -> read_doubleScalar("/", "E");
+  nu   = h5r -> read_doubleScalar("/", "nu");
+  mu   = h5r -> read_doubleScalar("/", "mu");
+
+  delete h5r; H5Fclose(h5file);
+}
+
 
 MaterialModel_NeoHookean_Incompressible_Mixed::~MaterialModel_NeoHookean_Incompressible_Mixed()
 {}
@@ -20,10 +40,11 @@ MaterialModel_NeoHookean_Incompressible_Mixed::~MaterialModel_NeoHookean_Incompr
 
 void MaterialModel_NeoHookean_Incompressible_Mixed::print_info() const
 {
-  PetscPrintf(PETSC_COMM_WORLD, "\t  MaterialModel_NeoHookean_Incompressible_Mixed: \n");
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Young's Modulus E  = %e \n", E);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Possion's ratio nu = %e \n", nu);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Shear modulus mu   = %e \n", mu);
+  SYS_T::commPrint("\t  MaterialModel_NeoHookean_Incompressible_Mixed: \n");
+  SYS_T::commPrint("\t  Density rho  = %e \n", rho0);
+  SYS_T::commPrint("\t  Young's Modulus E  = %e \n", E);
+  SYS_T::commPrint("\t  Possion's ratio nu = %e \n", nu);
+  SYS_T::commPrint("\t  Shear modulus mu   = %e \n", mu);
 }
 
 void MaterialModel_NeoHookean_Incompressible_Mixed::write_hdf5( const char * const &fname ) const
