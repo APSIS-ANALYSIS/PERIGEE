@@ -133,25 +133,22 @@ void MaterialModel_Guccione_Incompressible_Mixed::write_hdf5( const char * const
 void MaterialModel_Guccione_Incompressible_Mixed::get_PK( 
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S )
 {
-  Matrix_3x3 C, Cinv;
-  C.MatMultTransposeLeft(F);
-  Cinv.copy(C); Cinv.inverse();
+  Matrix_3x3 C; C.MatMultTransposeLeft(F);
+  Matrix_3x3 Cinv( C ); Cinv.inverse();
   const double trC = C.tr();
   const double trC2 = C.MatContraction( C );
   const double detF = F.det();
   const double detFm0d67 = std::pow(detF, mpt67);
 
   // E_bar = 0.5 * (J^-2/3 C - I )
-  Matrix_3x3 E_bar;
-  E_bar.copy(C); E_bar.scale(0.5 * detFm0d67); E_bar.AXPY(-0.5, I);
+  Matrix_3x3 E_bar( C );
+  E_bar.scale(0.5 * detFm0d67); E_bar.AXPY(-0.5, I);
 
   // E* = R^T E_bar R
-  Matrix_3x3 E_star;
-  E_star.MatMult(Rt, E_bar); E_star.MatMult(E_star, R);
+  Matrix_3x3 E_star( E_bar ); E_star.MatRot( R );
 
   // PxE_bar = E_bar - 1/6 (J^-2/3 C:C  - trC ) C^-1.
-  Matrix_3x3 PxE_bar;
-  PxE_bar.copy(E_bar);
+  Matrix_3x3 PxE_bar( E_bar );
   PxE_bar.AXPY(-0.5*pt33*(detFm0d67 * trC2 - trC), Cinv);
 
   // Calculate Q
@@ -181,9 +178,8 @@ void MaterialModel_Guccione_Incompressible_Mixed::get_PK(
 void MaterialModel_Guccione_Incompressible_Mixed::get_PK_Stiffness( 
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &CC )
 {
-  Matrix_3x3 C, Cinv;
-  C.MatMultTransposeLeft(F);
-  Cinv.copy(C); Cinv.inverse();
+  Matrix_3x3 C; C.MatMultTransposeLeft(F);
+  Matrix_3x3 Cinv(C); Cinv.inverse();
   
   const double trC = C.tr();
   const double trC2 = C.MatContraction( C );
@@ -191,16 +187,14 @@ void MaterialModel_Guccione_Incompressible_Mixed::get_PK_Stiffness(
   const double detFm0d67 = std::pow(detF, mpt67);
 
   // E_bar = 0.5 * (J^-2/3 C - I )
-  Matrix_3x3 E_bar;
-  E_bar.copy(C); E_bar.scale(0.5 * detFm0d67); E_bar.AXPY(-0.5, I);
+  Matrix_3x3 E_bar( C );
+  E_bar.scale(0.5 * detFm0d67); E_bar.AXPY(-0.5, I);
 
   // E* = R^T E_bar R
-  Matrix_3x3 E_star;
-  E_star.MatMult(Rt, E_bar); E_star.MatMult(E_star, R);
+  Matrix_3x3 E_star( E_bar ); E_star.MatRot( R );
 
   // PxE_bar = E_bar - 1/6 (J^-2/3 C:C  - trC ) C^-1.
-  Matrix_3x3 PxE_bar;
-  PxE_bar.copy(E_bar);
+  Matrix_3x3 PxE_bar( E_bar );
   PxE_bar.AXPY(-0.5*pt33*(detFm0d67 * trC2 - trC), Cinv);
 
   // Calculate Q

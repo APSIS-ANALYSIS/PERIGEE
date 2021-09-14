@@ -17,6 +17,19 @@ int main( int argc, char * argv[] )
 
   model2 -> print_info();
 
+  Matrix_3x3 F, P, S;
+  Tensor4_3D CC;
+
+  F.xx() = 1.0; F.xy() = 0.3; F.xz() = 0.0;
+  F.yx() = 0.0; F.yy() = 1.0; F.yz() = -0.05;
+  F.zx() = 0.0; F.zy() = 0.1; F.zz() = 1.0;
+
+  model2 -> get_PK_Stiffness(F, P, S, CC);
+
+  P.print_in_row();
+  S.print_in_row();
+  CC.print();
+
   delete model2;
 
   PetscFinalize();
