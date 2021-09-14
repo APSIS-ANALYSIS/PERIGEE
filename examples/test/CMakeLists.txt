@@ -68,6 +68,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/System/PETSc_Tools.cpp
   ${perigee_source}/System/Matrix_double_6by6_Array.cpp
   ${perigee_source}/System/Matrix_PETSc.cpp
+  ${perigee_source}/System/Tensor4_3D.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Tet.cpp
   ${perigee_source}/Analysis_Tool/AGlobal_Mesh_Info_FEM_3D.cpp
   ${perigee_source}/Analysis_Tool/APart_Basic_Info.cpp
@@ -139,7 +140,9 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # BUILD THE MAIN DRIVERS
 # ===================================================================
 ADD_EXECUTABLE( sys_test sys_test.cpp )
+ADD_EXECUTABLE( mod_test matmodel_test.cpp )
 
 TARGET_LINK_LIBRARIES( sys_test perigee_preprocess )
+TARGET_LINK_LIBRARIES( mod_test perigee_preprocess perigee_analysis )
 
 # EOF

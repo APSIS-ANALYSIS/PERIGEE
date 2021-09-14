@@ -39,6 +39,58 @@ MaterialModel_Guccione_Incompressible_Mixed::MaterialModel_Guccione_Incompressib
   Rt.copy(R); Rt.transpose();
 }
 
+MaterialModel_Guccione_Incompressible_Mixed::MaterialModel_Guccione_Incompressible_Mixed(
+        const char * const &fname )
+: pt33( 1.0 / 3.0 ), mpt67( -2.0 * pt33 ),
+  I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+{
+  hid_t h5file = H5Fopen(fname, H5F_ACC_RDONLY, H5P_DEFAULT);
+
+  HDF5_Reader * h5r = new HDF5_Reader( h5file );
+  
+  SYS_T::print_fatal_if( h5r->read_string("/", "model_name") != get_model_name(),
+     "Error: MaterialModel_Guccione_Incompressible_Mixed constructor does not match h5 file.\n" );
+
+  rho0 = h5r -> read_doubleScalar("/", "rho0");
+  Cq   = h5r -> read_doubleScalar("/", "Cq");
+  b_f  = h5r -> read_doubleScalar("/", "b_f");
+  b_t  = h5r -> read_doubleScalar("/", "b_t");
+  b_ft = h5r -> read_doubleScalar("/", "b_ft");
+
+  const std::vector<double> temp_f = h5r -> read_doubleVector( "/", "f" );
+  f[0] = temp_f[0]; f[1] = temp_f[1]; f[2] = temp_f[2];
+
+  const std::vector<double> temp_s = h5r -> read_doubleVector( "/", "s" );
+  s[0] = temp_s[0]; s[1] = temp_s[1]; s[2] = temp_s[2];
+
+  delete h5r; H5Fclose(h5file);
+  
+  // Check to make sure f is a unit vector
+  if( !MATH_T::equals( MATH_T::norm2(f[0],f[1],f[2]), 1.0, 1.0e-12) )
+  {
+    SYS_T::commPrint("Guccione model, input f vector is not unit.\n");
+    MATH_T::normalize3d(f[0], f[1], f[2]);
+  }
+
+  // Check to make sure s is a unit vector
+  if( !MATH_T::equals( MATH_T::norm2(s[0], s[1], s[2]), 1.0, 1.0e-12) )
+  {
+    SYS_T::commPrint("Guccione model, input s vector is not unit.\n");
+    MATH_T::normalize3d(s[0], s[1], s[2]);
+  }
+
+  // f x s / || f x s || = n
+  MATH_T::cross3d( f[0], f[1], f[2], s[0], s[1], s[2], n[0], n[1], n[2] );
+  MATH_T::normalize3d( n[0], n[1], n[2] );
+
+  // Define the roatation matrix R
+  R(0,0) = f[0]; R(0,1) = f[1]; R(0,2) = f[2];
+  R(1,0) = s[0]; R(1,1) = s[1]; R(1,2) = s[2];
+  R(2,0) = n[0]; R(2,1) = n[1]; R(2,2) = n[2];
+
+  Rt.copy(R); Rt.transpose();
+}
+
 
 MaterialModel_Guccione_Incompressible_Mixed::~MaterialModel_Guccione_Incompressible_Mixed()
 {}
@@ -46,15 +98,15 @@ MaterialModel_Guccione_Incompressible_Mixed::~MaterialModel_Guccione_Incompressi
 
 void MaterialModel_Guccione_Incompressible_Mixed::print_info() const
 {
-  PetscPrintf(PETSC_COMM_WORLD, "\t  MaterialModel_Guccione_Incompressible_Mixed: \n");
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Density rho  = %e \n", rho0);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Para C  = %e \n", Cq);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Para b_f  = %e \n", b_f);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Para b_t  = %e \n", b_t);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Para b_ft = %e \n", b_ft);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Fibre dir = [%e %e %e] \n", f[0], f[1], f[2]); 
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Sheet normal dir = [%e %e %e] \n", s[0], s[1], s[2]); 
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Third n dir = [%e %e %e] \n", n[0], n[1], n[2]); 
+  SYS_T::commPrint("\t  MaterialModel_Guccione_Incompressible_Mixed: \n");
+  SYS_T::commPrint("\t  Density rho  = %e \n", rho0);
+  SYS_T::commPrint("\t  Para C  = %e \n", Cq);
+  SYS_T::commPrint("\t  Para b_f  = %e \n", b_f);
+  SYS_T::commPrint("\t  Para b_t  = %e \n", b_t);
+  SYS_T::commPrint("\t  Para b_ft = %e \n", b_ft);
+  SYS_T::commPrint("\t  Fibre dir = [%e %e %e] \n", f[0], f[1], f[2]); 
+  SYS_T::commPrint("\t  Sheet normal dir = [%e %e %e] \n", s[0], s[1], s[2]); 
+  SYS_T::commPrint("\t  Third n dir = [%e %e %e] \n", n[0], n[1], n[2]); 
 }
 
 void MaterialModel_Guccione_Incompressible_Mixed::write_hdf5( const char * const &fname ) const

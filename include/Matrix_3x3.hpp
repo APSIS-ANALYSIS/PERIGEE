@@ -1,6 +1,6 @@
 #ifndef MATRIX_3X3_HPP
 #define MATRIX_3X3_HPP
-// ==================================================================
+// ============================================================================
 // Matrix_3x3.hpp
 // This is a 3 x 3 matrix class. The components are stored in a 1-D 
 // array: mat[9]. Logically, the matrix is 
@@ -18,7 +18,7 @@
 //
 // Author: Ju Liu
 // Date: June 21 2016
-// ==================================================================
+// ============================================================================
 #include "Vector_3.hpp"
 
 class Matrix_3x3
@@ -46,16 +46,14 @@ class Matrix_3x3
     // Assignment operator
     Matrix_3x3& operator= (const Matrix_3x3 &source);
 
-    // Parenthesis operator. It allows accessing and assigning the matrix
-    // entries.
+    // Parenthesis operator. It allows accessing and assigning the matrix entries.
     double& operator()(const int &index) {return mat[index];}
 
     const double& operator()(const int &index) const {return mat[index];}
 
     // Parenthesis operator. Access through row and col index: ii jj
     // Note: We do not check that ii , jj = 0, 1, 2.
-    double& operator()(const int &ii, const int &jj)
-    {return mat[3*ii+jj];}
+    double& operator()(const int &ii, const int &jj) {return mat[3*ii+jj];}
 
     const double& operator()(const int &ii, const int &jj) const
     {return mat[3*ii+jj];}

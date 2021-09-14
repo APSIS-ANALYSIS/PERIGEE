@@ -25,8 +25,8 @@
 // Author: Ju Liu
 // Date: March 12 2019
 // ==================================================================
-
 #include "IMaterialModel.hpp"
+#include "HDF5_Reader.hpp"
 #include "Math_Tools.hpp"
 
 class MaterialModel_Guccione_Incompressible_Mixed : public IMaterialModel
@@ -37,6 +37,9 @@ class MaterialModel_Guccione_Incompressible_Mixed : public IMaterialModel
         const double &in_bf, const double &in_bt, const double &in_bft,
         const double &fx, const double &fy, const double &fz,
         const double &sx, const double &sy, const double &sz );
+
+    MaterialModel_Guccione_Incompressible_Mixed( 
+        const char * const &fname = "material_model.h5" );
 
     virtual ~MaterialModel_Guccione_Incompressible_Mixed();
 
@@ -76,10 +79,10 @@ class MaterialModel_Guccione_Incompressible_Mixed : public IMaterialModel
     const double pt33, mpt67;
 
     // Material density
-    const double rho0;
+    double rho0;
 
     // Parameters appearing in front of expQ, and inside Q definition.
-    const double Cq, b_f, b_t, b_ft;
+    double Cq, b_f, b_t, b_ft;
 
     // unit vector for fibre and firbre sheet orientation
     double f[3], s[3], n[3];
