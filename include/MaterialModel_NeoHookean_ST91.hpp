@@ -12,6 +12,7 @@
 // Contact: liujuy@gmail.com
 // ==================================================================
 #include <cmath>
+#include "HDF5_Reader.hpp"
 #include "IMaterialModel.hpp"
 
 class MaterialModel_NeoHookean_ST91 : public IMaterialModel
@@ -19,6 +20,9 @@ class MaterialModel_NeoHookean_ST91 : public IMaterialModel
   public:
     MaterialModel_NeoHookean_ST91( const double &in_rho,
         const double &in_E, const double &in_nu );
+
+    MaterialModel_NeoHookean_ST91(
+        const char * const &fname = "material_model.h5" );
 
     virtual ~MaterialModel_NeoHookean_ST91();
 
@@ -52,7 +56,7 @@ class MaterialModel_NeoHookean_ST91 : public IMaterialModel
     virtual double get_elastic_rho0() const {return rho0;}
 
   private:
-    const double rho0, E, nu, lambda, mu, kappa;
+    double rho0, E, nu, lambda, mu, kappa;
     const double pt33, pt67, mpt67;
     double trC, detF, detF2, detFm0d67;
     
