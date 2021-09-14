@@ -10,6 +10,9 @@
 // Author: Ju Liu
 // ==================================================================
 #include "IMaterialModel.hpp"
+#include "HDF5_Reader.hpp"
+#include "Math_Tools.hpp"
+
 
 class MaterialModel_StVenant_Kirchhoff_M94_Mixed : public IMaterialModel
 {
@@ -19,6 +22,9 @@ class MaterialModel_StVenant_Kirchhoff_M94_Mixed : public IMaterialModel
 
     MaterialModel_StVenant_Kirchhoff_M94_Mixed( const double &in_rho0, 
         const double &in_E, const double &in_nu );
+
+    MaterialModel_StVenant_Kirchhoff_M94_Mixed(
+        const char * const &fname = "material_model.h5" );
 
     virtual ~MaterialModel_StVenant_Kirchhoff_M94_Mixed();
 
@@ -61,8 +67,8 @@ class MaterialModel_StVenant_Kirchhoff_M94_Mixed : public IMaterialModel
     virtual double get_dbeta_dp( const double &p ) const;
 
   private:
-    const double rho0;
-    const double E, nu, lambda, mu, kappa;
+    double rho0;
+    double E, nu, lambda, mu, kappa;
     const double pt33, mpt67;
     double trC, detF, detFm0d67;
 
