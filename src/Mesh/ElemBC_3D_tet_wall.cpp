@@ -215,7 +215,8 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
         springconst[idx]  = springconstList[ii];
         dampingconst[idx] = dampingconstList[ii];
 
-        compute_youngsmod(radius[idx], thickness[idx], youngsmod[idx]);
+        youngsmod[idx] = 7.0e6;
+        //compute_youngsmod(radius[idx], thickness[idx], youngsmod[idx]);
       }
       else
         SYS_T::print_fatal( "Error: wallsList does not contain the same global node IDs as walls_combined.\n" );
@@ -394,13 +395,14 @@ void ElemBC_3D_tet_wall::add_wall_data( vtkPointSet * const &grid_w, const int &
 
 void ElemBC_3D_tet_wall::compute_youngsmod( const double &r, const double &th, double &E )
 {
-  const double alpha = 13.3, beta = 0.3;
-  const double fluid_density = 1.065;
-  const double rho_alpha2 = fluid_density * alpha * alpha;
-  const double beta_exp   = 2.0 * beta - 1.0;
-
+  //const double alpha = 13.3, beta = 0.3;
+  //const double fluid_density = 1.065;
+  //const double rho_alpha2 = fluid_density * alpha * alpha;
+  //const double beta_exp   = 2.0 * beta - 1.0;
   // Note that r is in mm in Xiao et al. (2013)
-  E = 1.0e4 * rho_alpha2 / ( th * pow( 2.0 * 0.1 * r, beta_exp ) );
+  //E = 1.0e4 * rho_alpha2 / ( th * pow( 2.0 * 0.1 * r, beta_exp ) );
+  
+  E = 1.15e7;
 }
 
 // EOF
