@@ -9,6 +9,7 @@
 // Author: Ju Liu, liujuy@gmail.com
 // ==================================================================
 #include "IMaterialModel.hpp"
+#include "HDF5_Reader.hpp"
 #include "Math_Tools.hpp"
 
 class MaterialModel_NeoHookean_Incompressible_Mixed : public IMaterialModel
@@ -20,6 +21,9 @@ class MaterialModel_NeoHookean_Incompressible_Mixed : public IMaterialModel
         const double &in_rho, const double &in_E );
   
     ~MaterialModel_NeoHookean_Incompressible_Mixed();
+
+    MaterialModel_NeoHookean_Incompressible_Mixed(
+        const char * const &fname = "material_model.h5" );
 
     virtual void print_info() const;
 
@@ -57,7 +61,7 @@ class MaterialModel_NeoHookean_Incompressible_Mixed : public IMaterialModel
   private:
     const double pt33;
 
-    const double rho0, E, nu, mu;
+    double rho0, E, nu, mu;
 
     const Matrix_3x3 I;
 
