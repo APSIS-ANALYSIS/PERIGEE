@@ -17,9 +17,6 @@ MaterialModel_StVenant_Kirchhoff_M94_Mixed::MaterialModel_StVenant_Kirchhoff_M94
 
 MaterialModel_StVenant_Kirchhoff_M94_Mixed::MaterialModel_StVenant_Kirchhoff_M94_Mixed(
 	const char * const &fname)
-: pt33( 1.0 / 3.0 ), mpt67( -2.0 * pt33 ),
-  I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
-=======
 : pt33( 1.0 / 3.0 ), mpt67( -2.0 * pt33 ), I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
 {
   hid_t h5file = H5Fopen(fname, H5F_ACC_RDONLY, H5P_DEFAULT);
@@ -77,16 +74,16 @@ void MaterialModel_StVenant_Kirchhoff_M94_Mixed::write_hdf5( const char * const 
 void MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_PK( 
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S )
 {
-  C.MatMultTransposeLeft(F);
-  Cinv.copy(C); Cinv.inverse();
-  trC = C.tr();
-  detF = F.det();
-  detFm0d67 = std::pow(detF, mpt67);
+  Matrix_3x3 C; C.MatMultTransposeLeft(F);
+  Matrix_3x3 Cinv(C); Cinv.inverse();
+  const double trC = C.tr();
+  const double detF = F.det();
+  const double detFm0d67 = std::pow(detF, mpt67);
 
   const double mpt33CdC = (-1.0) * pt33 * C.MatContraction(C);
-  PxC.copy(Cinv); PxC.scale(mpt33CdC); PxC.PY(C);
+  Matrix_3x3 PxC(Cinv); PxC.scale(mpt33CdC); PxC.PY(C);
   
-  PxI.copy(Cinv); PxI.scale( (-1.0) * pt33 * trC ); PxI.PY(I);
+  Matrix_3x3 PxI(Cinv); PxI.scale( (-1.0) * pt33 * trC ); PxI.PY(I);
 
   S.copy(PxC); S.scale(detFm0d67);  S.AXPY( -1.0, PxI );
   S.scale( mu*detFm0d67 );
@@ -97,18 +94,18 @@ void MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_PK(
 void MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_PK_Stiffness( 
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &CC )
 {
-  C.MatMultTransposeLeft(F);
-  Cinv.copy(C); Cinv.inverse();
-  trC = C.tr();
-  detF = F.det();
-  detFm0d67 = std::pow(detF, mpt67);
+  Matrix_3x3 C; C.MatMultTransposeLeft(F);
+  Matrix_3x3 Cinv(C); Cinv.inverse();
+  const double trC = C.tr();
+  const double detF = F.det();
+  const double detFm0d67 = std::pow(detF, mpt67);
 
   const double CdC = C.MatContraction(C);
 
   const double mpt33CdC = (-1.0) * pt33 * CdC;
-  PxC.copy(Cinv); PxC.scale(mpt33CdC); PxC.PY(C);
+  Matrix_3x3 PxC(Cinv); PxC.scale(mpt33CdC); PxC.PY(C);
   
-  PxI.copy(Cinv); PxI.scale( (-1.0) * pt33 * trC ); PxI.PY(I);
+  Matrix_3x3 PxI(Cinv); PxI.scale( (-1.0) * pt33 * trC ); PxI.PY(I);
 
   S.copy(PxC); S.scale(detFm0d67);  S.AXPY( -1.0, PxI );
   S.scale( mu*detFm0d67 );
@@ -138,9 +135,9 @@ void MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_PK_Stiffness(
 double MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_strain_energy( 
     const Matrix_3x3 &F )
 {
-  C.MatMultTransposeLeft(F);
-  detF = F.det();
-  detFm0d67 = std::pow(detF, mpt67);
+  Matrix_3x3 C; C.MatMultTransposeLeft(F);
+  const double detF = F.det();
+  const double detFm0d67 = std::pow(detF, mpt67);
   
   Matrix_3x3 E( C ); E.scale(0.5 * detFm0d67); E.AXPY(-0.5, I);
 
