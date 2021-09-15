@@ -34,8 +34,6 @@ MaterialModel_Guccione_Incompressible_Mixed::MaterialModel_Guccione_Incompressib
   R(0,0) = f[0]; R(0,1) = f[1]; R(0,2) = f[2];
   R(1,0) = s[0]; R(1,1) = s[1]; R(1,2) = s[2];
   R(2,0) = n[0]; R(2,1) = n[1]; R(2,2) = n[2];
-
-  Rt.copy(R); Rt.transpose();
 }
 
 MaterialModel_Guccione_Incompressible_Mixed::MaterialModel_Guccione_Incompressible_Mixed(
@@ -86,9 +84,6 @@ MaterialModel_Guccione_Incompressible_Mixed::MaterialModel_Guccione_Incompressib
   R(0,0) = f[0]; R(0,1) = f[1]; R(0,2) = f[2];
   R(1,0) = s[0]; R(1,1) = s[1]; R(1,2) = s[2];
   R(2,0) = n[0]; R(2,1) = n[1]; R(2,2) = n[2];
-
-  // Define the transpose of the rotation matrix R
-  Rt.copy(R); Rt.transpose();
 }
 
 MaterialModel_Guccione_Incompressible_Mixed::~MaterialModel_Guccione_Incompressible_Mixed()
@@ -255,16 +250,15 @@ void MaterialModel_Guccione_Incompressible_Mixed::get_PK_Stiffness(
 double MaterialModel_Guccione_Incompressible_Mixed::get_strain_energy( 
     const Matrix_3x3 &F )
 {
-  Matrix_3x3 C, E_bar, E_star;
-  C.MatMultTransposeLeft(F);
+  Matrix_3x3 C; C.MatMultTransposeLeft(F);
   const double detF = F.det();
   const double detFm0d67 = std::pow(detF, mpt67);
 
   // E_bar = 0.5 * (J^-2/3 C - I )
-  E_bar.copy(C); E_bar.scale(0.5 * detFm0d67); E_bar.AXPY(-0.5, I);
+  Matrix_3x3 E_bar(C); E_bar.scale(0.5 * detFm0d67); E_bar.AXPY(-0.5, I);
 
   // E* = R^T E_bar R
-  E_star.MatMult(Rt, E_bar); E_star.MatMult(E_star, R);
+  Matrix_3x3 E_star( E_bar ); E_star.MatRot( R );
   
   const double Q = b_f * E_star(0) * E_star(0) + b_t * ( E_star(4) * E_star(4)
       + E_star(8) * E_star(8) + E_star(5) * E_star(5) + E_star(7) * E_star(7) ) 

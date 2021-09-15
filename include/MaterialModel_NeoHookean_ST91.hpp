@@ -12,7 +12,6 @@
 // Contact: liujuy@gmail.com
 // ==================================================================
 #include <cmath>
-#include "HDF5_Reader.hpp"
 #include "IMaterialModel.hpp"
 
 class MaterialModel_NeoHookean_ST91 : public IMaterialModel
@@ -58,10 +57,7 @@ class MaterialModel_NeoHookean_ST91 : public IMaterialModel
   private:
     double rho0, E, nu, lambda, mu, kappa;
     const double pt33, pt67, mpt67;
-    double trC, detF, detF2, detFm0d67;
-    
     const Matrix_3x3 I;
-    Matrix_3x3 C, Cinv;
 };
 
 #endif

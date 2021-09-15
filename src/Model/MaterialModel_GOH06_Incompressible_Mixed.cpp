@@ -64,10 +64,8 @@ MaterialModel_GOH06_Incompressible_Mixed::MaterialModel_GOH06_Incompressible_Mix
   a2xa2.gen_outprod(a2);
 }
 
-
 MaterialModel_GOH06_Incompressible_Mixed::~MaterialModel_GOH06_Incompressible_Mixed()
 {}
-
 
 void MaterialModel_GOH06_Incompressible_Mixed::print_info() const
 {
@@ -163,7 +161,6 @@ void MaterialModel_GOH06_Incompressible_Mixed::get_PK(
   P.MatMult(F,S);
 }
 
-
 void MaterialModel_GOH06_Incompressible_Mixed::get_PK_Stiffness(
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &CC )
 {
@@ -228,8 +225,6 @@ void MaterialModel_GOH06_Incompressible_Mixed::get_PK_Stiffness(
   CC.add_OutProduct(mpt67, S, Cinv);
 }
 
-
-
 double MaterialModel_GOH06_Incompressible_Mixed::get_strain_energy(
     const Matrix_3x3 &F )
 {
@@ -252,7 +247,6 @@ double MaterialModel_GOH06_Incompressible_Mixed::get_strain_energy(
   return PSI_iso + PSI_fi1 + PSI_fi2;
 }
 
-
 void MaterialModel_GOH06_Incompressible_Mixed::get_fibre_dir( const int &dir,
     double &fa1, double &fa2, double &fa3 ) const
 {
@@ -273,6 +267,5 @@ void MaterialModel_GOH06_Incompressible_Mixed::get_fibre_dir( const int &dir,
     SYS_T::print_fatal("Error: MaterialModel_GOH06_Incompressible_Mixed, wrong fibre direction. \n");
   }
 }
-
 
 // EOF

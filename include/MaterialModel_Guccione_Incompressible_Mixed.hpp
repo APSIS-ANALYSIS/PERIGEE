@@ -26,7 +26,6 @@
 // Date: March 12 2019
 // ==================================================================
 #include "IMaterialModel.hpp"
-#include "HDF5_Reader.hpp"
 #include "Math_Tools.hpp"
 
 class MaterialModel_Guccione_Incompressible_Mixed : public IMaterialModel
@@ -90,7 +89,7 @@ class MaterialModel_Guccione_Incompressible_Mixed : public IMaterialModel
     const Matrix_3x3 I;
 
     // The rotation matrix
-    Matrix_3x3 R, Rt;
+    Matrix_3x3 R;
 };
 
 #endif

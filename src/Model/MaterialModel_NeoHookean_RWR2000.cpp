@@ -28,7 +28,6 @@ MaterialModel_NeoHookean_RWR2000::MaterialModel_NeoHookean_RWR2000(
 MaterialModel_NeoHookean_RWR2000::~MaterialModel_NeoHookean_RWR2000()
 {}
 
-
 void MaterialModel_NeoHookean_RWR2000::print_info() const
 {
   SYS_T::commPrint("\t  MaterialModel_NeoHookean_RWR2000: \n");
@@ -70,7 +69,6 @@ void MaterialModel_NeoHookean_RWR2000::get_PK(
   P.MatMult( F, S );
 }
 
-
 void MaterialModel_NeoHookean_RWR2000::get_PK_Stiffness( 
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &CC)
 {
@@ -87,7 +85,6 @@ void MaterialModel_NeoHookean_RWR2000::get_PK_Stiffness(
   CC.add_OutProduct(kappa, Cinv, Cinv);
   CC.add_SymmProduct(val1, Cinv, Cinv);
 }
-
 
 double MaterialModel_NeoHookean_RWR2000::get_strain_energy( const Matrix_3x3 &F )
 {

@@ -1,6 +1,6 @@
 #ifndef IMATERIALMODEL_HPP
 #define IMATERIALMODEL_HPP
-// ==================================================================
+// ============================================================================
 // IMaterialModel.hpp
 //
 // Interface for material constitutive relations.
@@ -39,9 +39,10 @@
 // Date: Sept. 15 2016
 // Author: Ju Liu 
 // Contact: liujuy@gmail.com
-// ==================================================================
+// ============================================================================
 #include "Sys_Tools.hpp"
 #include "HDF5_Writer.hpp"
+#include "HDF5_Reader.hpp"
 #include "Tensor4_3D.hpp"
 
 class IMaterialModel
@@ -70,10 +71,12 @@ class IMaterialModel
     virtual void get_PK_Stiffness(const Matrix_3x3 &F, Matrix_3x3 &P, 
         Matrix_3x3 &S, Tensor4_3D &CC) = 0;
 
+    // ------------------------------------------------------------------------
     // Input: F : deformation gradient
     // Output: P : 1st PK
     //         S : 2nd PK
     //         AA : F_iK F_jL C_KILJ
+    // ------------------------------------------------------------------------
     virtual void get_PK_FFStiffness( const Matrix_3x3 &F, Matrix_3x3 &P, 
         Matrix_3x3 &S, Tensor4_3D &AA )
     {
@@ -82,8 +85,10 @@ class IMaterialModel
       AA.MatMult_3(F);
     }
 
+    // ------------------------------------------------------------------------
     // Input: F : deformation gradient
     // Output: sigma : Cauchy stress tensor
+    // ------------------------------------------------------------------------
     virtual void get_Cauchy_stress( const Matrix_3x3 &F, Matrix_3x3 &sigma )
     {
       Matrix_3x3 P, S;
@@ -93,9 +98,11 @@ class IMaterialModel
       sigma.scale( (1.0/F.det()) );
     }
 
+    // ------------------------------------------------------------------------
     // Input: F : deformation gradient
     // Output: sigma : Cauchy stress tensor
     //         aa : J^{-1} F_iI F_jJ F_kK F_lL C_IJKL
+    // ------------------------------------------------------------------------
     virtual void get_Cauchy_stiffness( const Matrix_3x3 &F, Matrix_3x3 &sigma,
        Tensor4_3D &aa )
     {
@@ -117,7 +124,9 @@ class IMaterialModel
       return 0.0;
     }
     
+    // ------------------------------------------------------------------------
     // Interfaces for getting material property parameters
+    // ------------------------------------------------------------------------
     virtual double get_elastic_E() const
     {
       SYS_T::commPrint("Warning: IMaterialModel::get_elastic_E() is not implemented. \n");
@@ -154,9 +163,10 @@ class IMaterialModel
       return 0.0;
     } 
 
-
+    // ------------------------------------------------------------------------
     // Dialatational properties: density rho, isothermal compressibility beta,
     // and beta's derivative w.r.t. pressure.
+    // ------------------------------------------------------------------------
     virtual double get_rho( const double &p ) const
     {
       SYS_T::commPrint("Warning: IMaterialModel::get_rho(p) is not implemented. \n");
@@ -181,8 +191,7 @@ class IMaterialModel
       return 0.0;
     }
 
-    virtual void get_fibre_dir( const int &dir, 
-        double &fa1, double &fa2, double &fa3 ) const
+    virtual void get_fibre_dir( const int &dir, double &fa1, double &fa2, double &fa3 ) const
     {
       SYS_T::commPrint("Warning: IMaterialModel::get_fibre_dir() is not implemented. \n");
     }

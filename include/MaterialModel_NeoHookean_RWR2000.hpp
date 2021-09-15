@@ -13,7 +13,6 @@
 //            CMAME 197 2008: pp 2752.
 // ==================================================================
 #include <cmath>
-#include "HDF5_Reader.hpp"
 #include "IMaterialModel.hpp"
 
 class MaterialModel_NeoHookean_RWR2000 : public IMaterialModel

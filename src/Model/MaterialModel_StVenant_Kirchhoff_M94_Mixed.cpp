@@ -7,7 +7,6 @@ MaterialModel_StVenant_Kirchhoff_M94_Mixed::MaterialModel_StVenant_Kirchhoff_M94
   I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
 {}
 
-
 MaterialModel_StVenant_Kirchhoff_M94_Mixed::MaterialModel_StVenant_Kirchhoff_M94_Mixed( const double &in_rho0, const double &in_E, const double &in_nu )
 : rho0( in_rho0 ), E( in_E ), nu( in_nu ), 
   lambda( nu * E / ((1+nu) * (1-2.0*nu)) ),
@@ -20,6 +19,8 @@ MaterialModel_StVenant_Kirchhoff_M94_Mixed::MaterialModel_StVenant_Kirchhoff_M94
 	const char * const &fname)
 : pt33( 1.0 / 3.0 ), mpt67( -2.0 * pt33 ),
   I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+=======
+: pt33( 1.0 / 3.0 ), mpt67( -2.0 * pt33 ), I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
 {
   hid_t h5file = H5Fopen(fname, H5F_ACC_RDONLY, H5P_DEFAULT);
 
@@ -38,10 +39,8 @@ MaterialModel_StVenant_Kirchhoff_M94_Mixed::MaterialModel_StVenant_Kirchhoff_M94
   delete h5r; H5Fclose(h5file);
 }
 
-
 MaterialModel_StVenant_Kirchhoff_M94_Mixed::~MaterialModel_StVenant_Kirchhoff_M94_Mixed()
 {}
-
 
 void MaterialModel_StVenant_Kirchhoff_M94_Mixed::print_info() const
 {
@@ -53,7 +52,6 @@ void MaterialModel_StVenant_Kirchhoff_M94_Mixed::print_info() const
   SYS_T::commPrint( "\t  Bulk modulus kappa = %e \n", kappa);
   SYS_T::commPrint( "\t  rho_0              = %e \n", rho0);
 }
-
 
 void MaterialModel_StVenant_Kirchhoff_M94_Mixed::write_hdf5( const char * const &fname ) const
 {
@@ -76,7 +74,6 @@ void MaterialModel_StVenant_Kirchhoff_M94_Mixed::write_hdf5( const char * const 
   MPI_Barrier(PETSC_COMM_WORLD);
 }
 
-
 void MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_PK( 
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S )
 {
@@ -96,7 +93,6 @@ void MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_PK(
 
   P.MatMult(F,S);
 }
-
 
 void MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_PK_Stiffness( 
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &CC )
@@ -139,7 +135,6 @@ void MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_PK_Stiffness(
   CC.add_OutProduct(mpt67, S, Cinv);
 }
 
-
 double MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_strain_energy( 
     const Matrix_3x3 &F )
 {
@@ -154,7 +149,6 @@ double MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_strain_energy(
   return mu * E.tr();
 }
 
-
 double MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_rho( 
     const double &p ) const
 {
@@ -163,13 +157,11 @@ double MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_rho(
   return rho0 * (1.0 + pk);
 }
 
-
 double MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_drho_dp( 
     const double &p ) const
 {
   return rho0 / kappa;
 }
-
 
 double MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_beta( 
     const double &p ) const
@@ -177,12 +169,10 @@ double MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_beta(
   return 1.0 / (p + kappa);
 }
 
-
 double MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_dbeta_dp( 
     const double &p ) const
 {
   return (-1.0) / ( (p+kappa) * (p+kappa) );
 }
-
 
 // EOF

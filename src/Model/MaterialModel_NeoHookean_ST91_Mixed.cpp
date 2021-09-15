@@ -16,7 +16,6 @@ MaterialModel_NeoHookean_ST91_Mixed::MaterialModel_NeoHookean_ST91_Mixed(
   I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
 {}
 
-
 MaterialModel_NeoHookean_ST91_Mixed::MaterialModel_NeoHookean_ST91_Mixed(
         const char * const &fname )
 : pt33( 1.0 / 3.0 ), mpt67( -2.0 * pt33 ),
@@ -39,11 +38,8 @@ MaterialModel_NeoHookean_ST91_Mixed::MaterialModel_NeoHookean_ST91_Mixed(
   delete h5r; H5Fclose(h5file);
 }
 
-
-
 MaterialModel_NeoHookean_ST91_Mixed::~MaterialModel_NeoHookean_ST91_Mixed()
 {}
-
 
 void MaterialModel_NeoHookean_ST91_Mixed::print_info() const
 {
@@ -76,32 +72,32 @@ void MaterialModel_NeoHookean_ST91_Mixed::write_hdf5( const char * const &fname 
   MPI_Barrier(PETSC_COMM_WORLD);
 }
 
-
 void MaterialModel_NeoHookean_ST91_Mixed::get_PK(
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S )
 {
-  C.MatMultTransposeLeft(F);
-  Cinv.copy(C); Cinv.inverse();
+  Matrix_3x3 C; C.MatMultTransposeLeft(F);
 
-  trC = C.tr();
-  detF = F.det();
-  detFm0d67 = std::pow(detF, mpt67);
+  Matrix_3x3 Cinv(C); Cinv.inverse();
+
+  const double trC = C.tr();
+  const double detF = F.det();
+  const double detFm0d67 = std::pow(detF, mpt67);
 
   S.copy(Cinv); S.scale( (-1.0) * mu * detFm0d67 * pt33 * trC );
   S.AXPY( mu * detFm0d67, I);
   P.MatMult(F,S);
 }
 
-
 void MaterialModel_NeoHookean_ST91_Mixed::get_PK_Stiffness(
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &CC )
 {
-  C.MatMultTransposeLeft(F);
-  Cinv.copy(C); Cinv.inverse();
+  Matrix_3x3 C; C.MatMultTransposeLeft(F);
 
-  trC = C.tr();
-  detF = F.det();
-  detFm0d67 = std::pow(detF, mpt67);
+  Matrix_3x3 Cinv(C); Cinv.inverse();
+
+  const double trC = C.tr();
+  const double detF = F.det();
+  const double detFm0d67 = std::pow(detF, mpt67);
 
   S.copy(Cinv); S.scale( (-1.0) * mu * detFm0d67 * pt33 * trC );
   S.AXPY( mu * detFm0d67, I);
@@ -117,18 +113,17 @@ void MaterialModel_NeoHookean_ST91_Mixed::get_PK_Stiffness(
   CC.add_OutProduct(val3, Cinv, I);
 }
 
-
 double MaterialModel_NeoHookean_ST91_Mixed::get_strain_energy( 
     const Matrix_3x3 &F )
 {
-  C.MatMultTransposeLeft(F);
-  trC = C.tr();
-  detF = F.det();
-  detFm0d67 = std::pow(detF, mpt67);
+  Matrix_3x3 C; C.MatMultTransposeLeft(F);
+
+  const double trC = C.tr();
+  const double detF = F.det();
+  const double detFm0d67 = std::pow(detF, mpt67);
 
   return 0.5 * mu * (detFm0d67 * trC - 3.0);
 }
-
 
 double MaterialModel_NeoHookean_ST91_Mixed::get_rho( const double &p ) const
 {
@@ -137,14 +132,12 @@ double MaterialModel_NeoHookean_ST91_Mixed::get_rho( const double &p ) const
   return rho0 * (std::pow(pk*pk+1.0, 0.5) + pk);
 }
 
-
 double MaterialModel_NeoHookean_ST91_Mixed::get_drho_dp( const double &p ) const
 {
   const double pk = p / kappa;
 
   return (rho0 / kappa) * (1 + pk * std::pow(pk*pk+1.0, -0.5)); 
 }
-
 
 double MaterialModel_NeoHookean_ST91_Mixed::get_beta( const double &p ) const
 {
@@ -153,13 +146,11 @@ double MaterialModel_NeoHookean_ST91_Mixed::get_beta( const double &p ) const
   return 1.0 / (kappa * std::pow(pk*pk+1.0, 0.5));
 }
 
-
 double MaterialModel_NeoHookean_ST91_Mixed::get_dbeta_dp( const double &p ) const
 {
   const double pk = p / kappa;
 
   return -pk / ( kappa*kappa*std::pow(pk*pk+1.0, 1.5) );
 }
-
 
 // EOF
