@@ -17,11 +17,10 @@ MaterialModel_StVenant_Kirchhoff_M94_Mixed::MaterialModel_StVenant_Kirchhoff_M94
 {}
 
 MaterialModel_StVenant_Kirchhoff_M94_Mixed::MaterialModel_StVenant_Kirchhoff_M94_Mixed(
-	const char * const &fname):
-  pt33( 1.0 / 3.0 ), mpt67( -2.0 * pt33 ),
+	const char * const &fname)
+: pt33( 1.0 / 3.0 ), mpt67( -2.0 * pt33 ),
   I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
 {
-
   hid_t h5file = H5Fopen(fname, H5F_ACC_RDONLY, H5P_DEFAULT);
 
   HDF5_Reader * h5r = new HDF5_Reader( h5file );
@@ -35,6 +34,8 @@ MaterialModel_StVenant_Kirchhoff_M94_Mixed::MaterialModel_StVenant_Kirchhoff_M94
   lambda =  h5r -> read_doubleScalar("/", "lambda");
   mu     =  h5r -> read_doubleScalar("/", "mu");
   kappa  =  h5r -> read_doubleScalar("/", "kappa");
+
+  delete h5r; H5Fclose(h5file);
 }
 
 

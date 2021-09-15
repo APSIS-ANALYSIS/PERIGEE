@@ -8,10 +8,9 @@ MaterialModel_StVenant_Kirchhoff::MaterialModel_StVenant_Kirchhoff(
 {}
 
 MaterialModel_StVenant_Kirchhoff::MaterialModel_StVenant_Kirchhoff(
-    const char * const &fname):
-  I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+    const char * const &fname)
+: I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
 {
-
   hid_t h5file = H5Fopen(fname, H5F_ACC_RDONLY, H5P_DEFAULT);
 
   HDF5_Reader * h5r = new HDF5_Reader( h5file );
@@ -25,6 +24,7 @@ MaterialModel_StVenant_Kirchhoff::MaterialModel_StVenant_Kirchhoff(
   mu     =  h5r -> read_doubleScalar("/", "mu");
   kappa  =  h5r -> read_doubleScalar("/", "kappa");
 
+  delete h5r; H5Fclose(h5file);
 }
 
 MaterialModel_StVenant_Kirchhoff::~MaterialModel_StVenant_Kirchhoff()

@@ -25,26 +25,32 @@ MaterialModel_GOH06_Incompressible_Mixed::MaterialModel_GOH06_Incompressible_Mix
   a2xa2.gen_outprod(a2);
 }
 
-MaterialModel_GOH06_Incompressible_Mixed::MaterialModel_GOH06_Incompressible_Mixed(const char * const &fname)
+MaterialModel_GOH06_Incompressible_Mixed::MaterialModel_GOH06_Incompressible_Mixed(
+		const char * const &fname)
 : pt33( 1.0 / 3.0 ), mpt67( -2.0 * pt33 ), pi( MATH_T::PI ),
   I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
 {
-
   hid_t h5file = H5Fopen(fname, H5F_ACC_RDONLY, H5P_DEFAULT);
 
   HDF5_Reader * h5r = new HDF5_Reader( h5file );
 
   SYS_T::print_fatal_if( h5r->read_string("/", "model_name") != get_model_name(),
-     "Error: MaterialModel_Guccione_Incompressible_Mixed constructor does not match h5 file.\n" );
+     "Error: MaterialModel_GOH06_Incompressible_Mixed constructor does not match h5 file.\n" );
 
-  rho0 = h5r -> read_doubleScalar("/", "rho0");
-  E   = h5r -> read_doubleScalar("/", "E");
-  nu  = h5r -> read_doubleScalar("/", "nu");
-  mu  = h5r -> read_doubleScalar("/", "mu");
+  rho0   = h5r -> read_doubleScalar("/", "rho0");
+  E      = h5r -> read_doubleScalar("/", "E");
+  nu     = h5r -> read_doubleScalar("/", "nu");
+  mu     = h5r -> read_doubleScalar("/", "mu");
   f1_the = h5r -> read_doubleScalar("/", "f1_the");
   f1_phi = h5r -> read_doubleScalar("/", "f1_phi");
   f2_the = h5r -> read_doubleScalar("/", "f2_the");
   f2_phi = h5r -> read_doubleScalar("/", "f2_phi");
+  fk1    = h5r -> read_doubleScalar("/", "fk1");
+  fk2    = h5r -> read_doubleScalar("/", "fk2");
+  fkd    = h5r -> read_doubleScalar("/", "fkd");
+
+
+  delete h5r; H5Fclose(h5file);
 
   a1[0] = sin(f1_the) * cos(f1_phi);
   a1[1] = sin(f1_the) * sin(f1_phi);

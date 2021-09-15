@@ -9,8 +9,8 @@ MaterialModel_StVenant_Kirchhoff_Simo85::MaterialModel_StVenant_Kirchhoff_Simo85
 }
 
 MaterialModel_StVenant_Kirchhoff_Simo85::MaterialModel_StVenant_Kirchhoff_Simo85(
-    const char * const &fname):
-  I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+    const char * const &fname)
+: I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
 { 
   hid_t h5file = H5Fopen(fname, H5F_ACC_RDONLY, H5P_DEFAULT);
 
@@ -19,9 +19,13 @@ MaterialModel_StVenant_Kirchhoff_Simo85::MaterialModel_StVenant_Kirchhoff_Simo85
   SYS_T::print_fatal_if( h5r->read_string("/", "model_name") != get_model_name(),
      "Error: MaterialModel_StVenant_Kirchhoff_Simo85 constructor does not match h5 file.\n" );
 
-  E  = h5r -> read_doubleScalar("/", "E");
-  nu = h5r -> read_doubleScalar("/", "nu");
+  E      = h5r -> read_doubleScalar("/", "E");
+  nu     = h5r -> read_doubleScalar("/", "nu");
+  lambda = h5r -> read_doubleScalar("/", "lambda");
+  mu     = h5r -> read_doubleScalar("/", "mu");
+  kappa  = h5r -> read_doubleScalar("/", "kappa");
 
+  delete h5r; H5Fclose(h5file);
 }
 
 MaterialModel_StVenant_Kirchhoff_Simo85::~MaterialModel_StVenant_Kirchhoff_Simo85()
@@ -48,6 +52,9 @@ void MaterialModel_StVenant_Kirchhoff_Simo85::write_hdf5( const char * const &fn
     h5w -> write_string("model_name", get_model_name());
     h5w -> write_doubleScalar("E", E);
     h5w -> write_doubleScalar("nu", nu);
+    h5w -> write_doubleScalar("lambda", lambda);
+    h5w -> write_doubleScalar("mu", mu);
+    h5w -> write_doubleScalar("kappa", kappa);
 
     delete h5w; H5Fclose(file_id);
   }
@@ -74,12 +81,13 @@ void MaterialModel_StVenant_Kirchhoff_Simo85::get_PK_Stiffness(
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &CC)
 {
   CC.gen_zero();
-  const double val = -2.0 * kappa * std::log(detF);
   
   C.MatMultTransposeLeft(F);
   detF = F.det();
   S.copy(C);
   S.inverse();
+  
+  const double val = -2.0 * kappa * std::log(detF);
   
   // Use S now because it is still C^-1 now. 
   CC.add_SymmProduct(val, S, S);
