@@ -63,10 +63,6 @@ class MaterialModel_NeoHookean_Incompressible_Mixed : public IMaterialModel
     double rho0, E, nu, mu;
 
     const Matrix_3x3 I;
-
-    Matrix_3x3 C, Cinv;
-
-    double trC;
 };
 
 #endif
