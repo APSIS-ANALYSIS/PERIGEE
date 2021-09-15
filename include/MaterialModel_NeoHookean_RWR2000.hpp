@@ -54,7 +54,6 @@ class MaterialModel_NeoHookean_RWR2000 : public IMaterialModel
 
   private:
     double E, nu, lambda, mu, kappa;
-    Matrix_3x3 Cinv;
 };
 
 #endif
