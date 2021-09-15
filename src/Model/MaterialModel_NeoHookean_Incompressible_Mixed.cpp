@@ -69,8 +69,9 @@ void MaterialModel_NeoHookean_Incompressible_Mixed::write_hdf5( const char * con
 void MaterialModel_NeoHookean_Incompressible_Mixed::get_PK(
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S)
 {
-  C.MatMultTransposeLeft(F); trC = C.tr();
-  Cinv.copy(C); Cinv.inverse();
+  Matrix_3x3 C; C.MatMultTransposeLeft(F);
+  Matrix_3x3 Cinv(C); Cinv.inverse();
+  const double trC = C.tr();
 
   S.copy(Cinv); S.scale( (-1.0) * mu * pt33 * trC );
   S.AXPY( mu , I ); P.MatMult(F,S);
@@ -80,10 +81,10 @@ void MaterialModel_NeoHookean_Incompressible_Mixed::get_PK(
 void MaterialModel_NeoHookean_Incompressible_Mixed::get_PK_Stiffness( 
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &CC )
 {
-  C.MatMultTransposeLeft(F);
-  Cinv.copy(C); Cinv.inverse();
+  Matrix_3x3 C; C.MatMultTransposeLeft(F);
+  Matrix_3x3 Cinv(C); Cinv.inverse();
 
-  trC = C.tr();
+  const double trC = C.tr();
 
   S.copy(Cinv); S.scale( (-1.0) * mu * pt33 * trC );
   S.AXPY( mu , I);
@@ -103,8 +104,8 @@ void MaterialModel_NeoHookean_Incompressible_Mixed::get_PK_Stiffness(
 double MaterialModel_NeoHookean_Incompressible_Mixed::get_strain_energy( 
     const Matrix_3x3 &F )
 {
-  C.MatMultTransposeLeft(F);
-  trC = C.tr();
+  Matrix_3x3 C; C.MatMultTransposeLeft(F);
+  const double trC = C.tr();
   return 0.5 * mu * (trC - 3.0);
 }
 
