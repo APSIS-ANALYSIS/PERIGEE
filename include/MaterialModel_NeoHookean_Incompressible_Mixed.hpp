@@ -9,7 +9,6 @@
 // Author: Ju Liu, liujuy@gmail.com
 // ==================================================================
 #include "IMaterialModel.hpp"
-#include "HDF5_Reader.hpp"
 #include "Math_Tools.hpp"
 
 class MaterialModel_NeoHookean_Incompressible_Mixed : public IMaterialModel

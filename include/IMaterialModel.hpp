@@ -42,6 +42,7 @@
 // ==================================================================
 #include "Sys_Tools.hpp"
 #include "HDF5_Writer.hpp"
+#include "HDF5_Reader.hpp"
 #include "Tensor4_3D.hpp"
 
 class IMaterialModel

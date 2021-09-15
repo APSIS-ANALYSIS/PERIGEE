@@ -10,19 +10,15 @@
 // Author: Ju Liu
 // Contact: liujuy@gmail.com
 // ==================================================================
-
 #include <cmath>
 #include "IMaterialModel.hpp"
-#include "HDF5_Reader.hpp"
-
 
 class MaterialModel_StVenant_Kirchhoff : public IMaterialModel
 {
   public:
     MaterialModel_StVenant_Kirchhoff( const double &in_E, const double &in_nu );
 
-    MaterialModel_StVenant_Kirchhoff(
-        const char * const &fname = "material_model.h5" );
+    MaterialModel_StVenant_Kirchhoff( const char * const &fname = "material_model.h5" );
 
     ~MaterialModel_StVenant_Kirchhoff();
 
@@ -58,6 +54,5 @@ class MaterialModel_StVenant_Kirchhoff : public IMaterialModel
     const Matrix_3x3 I;
     Matrix_3x3 G; // Green-Lagrange strain tensor
 };
-
 
 #endif

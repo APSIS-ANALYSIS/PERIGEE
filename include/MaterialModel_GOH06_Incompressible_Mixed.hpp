@@ -28,7 +28,6 @@
 // ==================================================================
 #include "IMaterialModel.hpp"
 #include "Math_Tools.hpp"
-#include "HDF5_Reader.hpp"
 
 class MaterialModel_GOH06_Incompressible_Mixed : public IMaterialModel
 {

@@ -18,7 +18,6 @@
 // Contact: liujuy@gmail.com
 // ==================================================================
 #include <cmath>
-#include "HDF5_Reader.hpp"
 #include "IMaterialModel.hpp"
 
 class MaterialModel_NeoHookean_Quad_Mixed : public IMaterialModel
