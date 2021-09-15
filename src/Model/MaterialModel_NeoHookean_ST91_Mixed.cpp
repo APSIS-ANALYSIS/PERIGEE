@@ -75,12 +75,13 @@ void MaterialModel_NeoHookean_ST91_Mixed::write_hdf5( const char * const &fname 
 void MaterialModel_NeoHookean_ST91_Mixed::get_PK(
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S )
 {
-  C.MatMultTransposeLeft(F);
-  Cinv.copy(C); Cinv.inverse();
+  Matrix_3x3 C; C.MatMultTransposeLeft(F);
 
-  trC = C.tr();
-  detF = F.det();
-  detFm0d67 = std::pow(detF, mpt67);
+  Matrix_3x3 Cinv(C); Cinv.inverse();
+
+  const double trC = C.tr();
+  const double detF = F.det();
+  const double detFm0d67 = std::pow(detF, mpt67);
 
   S.copy(Cinv); S.scale( (-1.0) * mu * detFm0d67 * pt33 * trC );
   S.AXPY( mu * detFm0d67, I);
@@ -90,12 +91,13 @@ void MaterialModel_NeoHookean_ST91_Mixed::get_PK(
 void MaterialModel_NeoHookean_ST91_Mixed::get_PK_Stiffness(
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &CC )
 {
-  C.MatMultTransposeLeft(F);
-  Cinv.copy(C); Cinv.inverse();
+  Matrix_3x3 C; C.MatMultTransposeLeft(F);
 
-  trC = C.tr();
-  detF = F.det();
-  detFm0d67 = std::pow(detF, mpt67);
+  Matrix_3x3 Cinv(C); Cinv.inverse();
+
+  const double trC = C.tr();
+  const double detF = F.det();
+  const double detFm0d67 = std::pow(detF, mpt67);
 
   S.copy(Cinv); S.scale( (-1.0) * mu * detFm0d67 * pt33 * trC );
   S.AXPY( mu * detFm0d67, I);
@@ -114,10 +116,11 @@ void MaterialModel_NeoHookean_ST91_Mixed::get_PK_Stiffness(
 double MaterialModel_NeoHookean_ST91_Mixed::get_strain_energy( 
     const Matrix_3x3 &F )
 {
-  C.MatMultTransposeLeft(F);
-  trC = C.tr();
-  detF = F.det();
-  detFm0d67 = std::pow(detF, mpt67);
+  Matrix_3x3 C; C.MatMultTransposeLeft(F);
+
+  const double trC = C.tr();
+  const double detF = F.det();
+  const double detFm0d67 = std::pow(detF, mpt67);
 
   return 0.5 * mu * (detFm0d67 * trC - 3.0);
 }
