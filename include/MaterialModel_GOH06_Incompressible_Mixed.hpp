@@ -60,7 +60,6 @@ class MaterialModel_GOH06_Incompressible_Mixed : public IMaterialModel
     virtual void get_PK_Stiffness( const Matrix_3x3 &F, Matrix_3x3 &P,
                 Matrix_3x3 &S, Tensor4_3D &CC );
 
-
     virtual double get_strain_energy(const Matrix_3x3 &F );
 
     // Read access to parameters

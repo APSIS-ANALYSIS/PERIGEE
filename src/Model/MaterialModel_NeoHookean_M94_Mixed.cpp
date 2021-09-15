@@ -32,10 +32,8 @@ hid_t h5file = H5Fopen(fname, H5F_ACC_RDONLY, H5P_DEFAULT);
   delete h5r; H5Fclose(h5file);
 }
 
-
 MaterialModel_NeoHookean_M94_Mixed::~MaterialModel_NeoHookean_M94_Mixed()
 {}
-
 
 void MaterialModel_NeoHookean_M94_Mixed::print_info() const
 {
@@ -84,7 +82,6 @@ void MaterialModel_NeoHookean_M94_Mixed::get_PK(
   P.MatMult(F,S);
 }
 
-
 void MaterialModel_NeoHookean_M94_Mixed::get_PK_Stiffness(
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &CC )
 {
@@ -109,7 +106,6 @@ void MaterialModel_NeoHookean_M94_Mixed::get_PK_Stiffness(
   CC.add_OutProduct(val3, Cinv, I);
 }
 
-
 double MaterialModel_NeoHookean_M94_Mixed::get_strain_energy( 
     const Matrix_3x3 &F )
 {
@@ -121,7 +117,6 @@ double MaterialModel_NeoHookean_M94_Mixed::get_strain_energy(
   return 0.5 * mu * (detFm0d67 * trC - 3.0);
 }
 
-
 double MaterialModel_NeoHookean_M94_Mixed::get_rho( const double &p ) const
 {
   const double pk = p / kappa;
@@ -129,23 +124,19 @@ double MaterialModel_NeoHookean_M94_Mixed::get_rho( const double &p ) const
   return rho0 * (1.0 + pk);
 }
 
-
 double MaterialModel_NeoHookean_M94_Mixed::get_drho_dp( const double &p ) const
 {
   return rho0 / kappa;
 }
-
 
 double MaterialModel_NeoHookean_M94_Mixed::get_beta( const double &p ) const
 {
   return 1.0 / (p + kappa);
 }
 
-
 double MaterialModel_NeoHookean_M94_Mixed::get_dbeta_dp( const double &p ) const
 {
   return (-1.0) / ( (p+kappa) * (p+kappa) );
 }
-
 
 // EOF

@@ -31,7 +31,6 @@ MaterialModel_GOH06_ST91_Mixed::MaterialModel_GOH06_ST91_Mixed(
 : pt33( 1.0 / 3.0 ), mpt67( -2.0 * pt33 ), pi( MATH_T::PI ),
   I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
 {
-
   hid_t h5file = H5Fopen(fname, H5F_ACC_RDONLY, H5P_DEFAULT);
 
   HDF5_Reader * h5r = new HDF5_Reader( h5file );
