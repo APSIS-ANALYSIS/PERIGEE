@@ -82,13 +82,9 @@ class MaterialModel_NeoHookean_Quad_Mixed : public IMaterialModel
         double &fa1, double &fa2, double &fa3 ) const {}
 
   private:
-    double rho0;
-    double E, nu, lambda, mu, kappa;
+    double rho0, E, nu, lambda, mu, kappa;
     const double pt33, mpt67;
-    double trC, detF, detFm0d67;
-
     const Matrix_3x3 I;
-    Matrix_3x3 C, Cinv;
 };
 
 #endif
