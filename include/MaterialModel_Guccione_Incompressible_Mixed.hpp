@@ -89,7 +89,7 @@ class MaterialModel_Guccione_Incompressible_Mixed : public IMaterialModel
     const Matrix_3x3 I;
 
     // The rotation matrix
-    Matrix_3x3 R, Rt;
+    Matrix_3x3 R;
 };
 
 #endif
