@@ -121,8 +121,6 @@ class Matrix_3x3
     void gen_outprod( const Vector_3 &a, const Vector_3 &b );
    
     // mat_ij = a_i a_j 
-    void gen_outprod( const double * const &a );
-    
     void gen_outprod( const Vector_3 &a );
 
     // Transpose the matrix
