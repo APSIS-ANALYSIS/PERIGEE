@@ -21,10 +21,6 @@ MaterialModel_GOH06_ST91_Mixed::MaterialModel_GOH06_ST91_Mixed(
   a2[0] = sin(f2_the) * cos(f2_phi);
   a2[1] = sin(f2_the) * sin(f2_phi);
   a2[2] = cos(f2_the);
-
-  Matrix_3x3 a1xa1; Matrix_3x3 a2xa2;
-  a1xa1.gen_outprod(a1);
-  a2xa2.gen_outprod(a2);
 }
 
 MaterialModel_GOH06_ST91_Mixed::MaterialModel_GOH06_ST91_Mixed(
@@ -50,7 +46,7 @@ MaterialModel_GOH06_ST91_Mixed::MaterialModel_GOH06_ST91_Mixed(
   f2_the = h5r -> read_doubleScalar("/", "f2_the");
   f2_phi = h5r -> read_doubleScalar("/", "f2_phi");
   fk1    = h5r -> read_doubleScalar("/", "fk1");
-  fk2    = h5r-> read_doubleScalar("/", "fk2");
+  fk2    = h5r -> read_doubleScalar("/", "fk2");
   fkd    = h5r -> read_doubleScalar("/", "fkd");
 
   delete h5r; H5Fclose(h5file);
@@ -62,16 +58,10 @@ MaterialModel_GOH06_ST91_Mixed::MaterialModel_GOH06_ST91_Mixed(
   a2[0] = sin(f2_the) * cos(f2_phi);
   a2[1] = sin(f2_the) * sin(f2_phi);
   a2[2] = cos(f2_the);
-
-  Matrix_3x3 a1xa1; Matrix_3x3 a2xa2;
-  a1xa1.gen_outprod(a1);
-  a2xa2.gen_outprod(a2);
 }
-
 
 MaterialModel_GOH06_ST91_Mixed::~MaterialModel_GOH06_ST91_Mixed()
 {}
-
 
 void MaterialModel_GOH06_ST91_Mixed::print_info() const
 {
@@ -132,8 +122,7 @@ void MaterialModel_GOH06_ST91_Mixed::get_PK(
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
   Matrix_3x3 Cinv(C); Cinv.inverse();
   const double trC = C.tr();
-  const double detF = F.det();
-  const double detFm0d67 = std::pow(detF, mpt67);
+  const double detFm0d67 = std::pow(F.det(), mpt67);
 
   const double a1Ca1 = C.VecMatVec(a1, a1);
   const double a2Ca2 = C.VecMatVec(a2, a2);
@@ -154,7 +143,7 @@ void MaterialModel_GOH06_ST91_Mixed::get_PK(
   PxH1.AXPY( fkd, PxI );
   PxH2.AXPY( fkd, PxI );
 
-  Matrix_3x3 a1xa1; Matrix_3x3 a2xa2;
+  Matrix_3x3 a1xa1, a2xa2;
   a1xa1.gen_outprod(a1);
   a2xa2.gen_outprod(a2);
 
@@ -175,15 +164,13 @@ void MaterialModel_GOH06_ST91_Mixed::get_PK(
   P.MatMult(F,S);
 }
 
-
 void MaterialModel_GOH06_ST91_Mixed::get_PK_Stiffness( 
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &CC )
 {
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
   Matrix_3x3 Cinv(C); Cinv.inverse();
   const double trC = C.tr();
-  const double detF = F.det();
-  const double detFm0d67 = std::pow(detF, mpt67);
+  const double detFm0d67 = std::pow(F.det(), mpt67);
 
   const double a1Ca1 = C.VecMatVec(a1, a1);
   const double a2Ca2 = C.VecMatVec(a2, a2);
@@ -204,7 +191,7 @@ void MaterialModel_GOH06_ST91_Mixed::get_PK_Stiffness(
   PxH1.AXPY( fkd, PxI );
   PxH2.AXPY( fkd, PxI );
 
-  Matrix_3x3 a1xa1; Matrix_3x3 a2xa2;
+  Matrix_3x3 a1xa1, a2xa2;
   a1xa1.gen_outprod(a1);
   a2xa2.gen_outprod(a2);
 
@@ -245,14 +232,12 @@ void MaterialModel_GOH06_ST91_Mixed::get_PK_Stiffness(
   CC.add_OutProduct(mpt67, S, Cinv);
 }
 
-
 double MaterialModel_GOH06_ST91_Mixed::get_strain_energy(const Matrix_3x3 &F )
 {
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
   Matrix_3x3 Cinv(C); Cinv.inverse();
   const double trC = C.tr();
-  const double detF = F.det();
-  const double detFm0d67 = std::pow(detF, mpt67);
+  const double detFm0d67 = std::pow(F.det(), mpt67);
 
   const double a1Ca1 = C.VecMatVec(a1, a1);
   const double a2Ca2 = C.VecMatVec(a2, a2);
@@ -266,7 +251,6 @@ double MaterialModel_GOH06_ST91_Mixed::get_strain_energy(const Matrix_3x3 &F )
 
   return PSI_iso + PSI_fi1 + PSI_fi2;
 }
-
 
 void MaterialModel_GOH06_ST91_Mixed::get_fibre_dir( const int &dir,
         double &fa1, double &fa2, double &fa3 ) const
@@ -289,13 +273,11 @@ void MaterialModel_GOH06_ST91_Mixed::get_fibre_dir( const int &dir,
   }
 }
 
-
 double MaterialModel_GOH06_ST91_Mixed::get_rho( const double &p ) const
 {
   const double pk = p / kappa;
   return rho0 * (std::pow(pk*pk+1.0, 0.5) + pk);
 }
-
 
 double MaterialModel_GOH06_ST91_Mixed::get_drho_dp( const double &p ) const
 {
@@ -303,19 +285,16 @@ double MaterialModel_GOH06_ST91_Mixed::get_drho_dp( const double &p ) const
   return (rho0 / kappa) * (1 + pk * std::pow(pk*pk+1.0, -0.5));
 }
 
-
 double MaterialModel_GOH06_ST91_Mixed::get_beta( const double &p ) const
 {
   const double pk = p / kappa;
   return 1.0 / (kappa * std::pow(pk*pk+1.0, 0.5));
 }
 
-
 double MaterialModel_GOH06_ST91_Mixed::get_dbeta_dp( const double &p ) const
 {
   const double pk = p / kappa;
   return -pk / ( kappa*kappa*std::pow(pk*pk+1.0, 1.5) );
 }
-
 
 // EOF

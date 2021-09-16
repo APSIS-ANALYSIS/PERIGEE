@@ -77,5 +77,4 @@ class MaterialModel_GOH06_ST91_Mixed : public IMaterialModel
     const Matrix_3x3 I;
 };
 
-
 #endif
