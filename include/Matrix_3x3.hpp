@@ -164,8 +164,6 @@ class Matrix_3x3
        double * const &y ) const;
 
     // y = x^T A,  in indices: y_i = x_I A_Ii
-    void VecMultT( const double * const &x, double * const &y ) const;
-    
     void VecMultT( const Vector_3 &x, Vector_3 &y ) const;
 
     // y = x^T A, wherein x = [x0; x1; x2]
