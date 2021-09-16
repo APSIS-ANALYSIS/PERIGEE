@@ -31,7 +31,6 @@ MaterialModel_StVenant_Kirchhoff_Simo85::MaterialModel_StVenant_Kirchhoff_Simo85
 MaterialModel_StVenant_Kirchhoff_Simo85::~MaterialModel_StVenant_Kirchhoff_Simo85()
 {}
 
-
 void MaterialModel_StVenant_Kirchhoff_Simo85::print_info() const
 {
   SYS_T::commPrint( "\t  MaterialModel_StVenant_Kirchhoff_Simo85: \n");
@@ -62,20 +61,17 @@ void MaterialModel_StVenant_Kirchhoff_Simo85::write_hdf5( const char * const &fn
   MPI_Barrier(PETSC_COMM_WORLD);
 }
 
-
 void MaterialModel_StVenant_Kirchhoff_Simo85::get_PK( 
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S )
 {
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
-  const double detF = F.det();
   S.copy(C);
   S.inverse();
-  S.scale(kappa * std::log(detF));
+  S.scale( kappa * std::log(F.det()) );
   S.AXPY(mu, C);
   S.AXPY(-1.0 * mu, I);
   P.MatMult(F,S);
 }
-
 
 void MaterialModel_StVenant_Kirchhoff_Simo85::get_PK_Stiffness( 
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &CC)
@@ -100,7 +96,6 @@ void MaterialModel_StVenant_Kirchhoff_Simo85::get_PK_Stiffness(
   P.MatMult(F,S);
 }
 
-
 double MaterialModel_StVenant_Kirchhoff_Simo85::get_strain_energy( 
     const Matrix_3x3 &F )
 {
@@ -109,7 +104,6 @@ double MaterialModel_StVenant_Kirchhoff_Simo85::get_strain_energy(
   C.scale(0.5);
   C.MatMult(C,C);
   const double trE2 = C.tr();
-  
   const double detF = F.det();
 
   return 0.5 * kappa * std::log(detF) * std::log(detF) + mu * trE2;
