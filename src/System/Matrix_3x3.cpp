@@ -115,13 +115,6 @@ void Matrix_3x3::gen_hilb()
       mat[ii*3+jj] = 1.0 / (ii + jj + 1.0);
 }
 
-void Matrix_3x3::gen_outprod( const double * const &a, const double * const &b )
-{
-  mat[0] = a[0] * b[0]; mat[1] = a[0] * b[1]; mat[2] = a[0] * b[2];
-  mat[3] = a[1] * b[0]; mat[4] = a[1] * b[1]; mat[5] = a[1] * b[2];
-  mat[6] = a[2] * b[0]; mat[7] = a[2] * b[1]; mat[8] = a[2] * b[2];
-}
-
 void Matrix_3x3::gen_outprod( const Vector_3 &a, const Vector_3 &b ) 
 {
   mat[0] = a(0) * b(0); mat[1] = a(0) * b(1); mat[2] = a(0) * b(2);

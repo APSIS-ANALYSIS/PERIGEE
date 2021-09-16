@@ -118,8 +118,6 @@ class Matrix_3x3
 
     // Set a matrix from out-product of two vecs with length 3
     // mat_ij = a_i b_j
-    void gen_outprod( const double * const &a, const double * const &b );
-    
     void gen_outprod( const Vector_3 &a, const Vector_3 &b );
    
     // mat_ij = a_i a_j 
