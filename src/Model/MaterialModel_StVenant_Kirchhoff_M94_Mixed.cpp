@@ -76,14 +76,12 @@ void MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_PK(
 {
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
   Matrix_3x3 Cinv(C); Cinv.inverse();
-  const double trC = C.tr();
-  const double detF = F.det();
-  const double detFm0d67 = std::pow(detF, mpt67);
+  const double detFm0d67 = std::pow( F.det(), mpt67 );
 
   const double mpt33CdC = (-1.0) * pt33 * C.MatContraction(C);
   Matrix_3x3 PxC(Cinv); PxC.scale(mpt33CdC); PxC.PY(C);
   
-  Matrix_3x3 PxI(Cinv); PxI.scale( (-1.0) * pt33 * trC ); PxI.PY(I);
+  Matrix_3x3 PxI(Cinv); PxI.scale( (-1.0) * pt33 * C.tr() ); PxI.PY(I);
 
   S.copy(PxC); S.scale(detFm0d67);  S.AXPY( -1.0, PxI );
   S.scale( mu*detFm0d67 );
@@ -96,16 +94,12 @@ void MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_PK_Stiffness(
 {
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
   Matrix_3x3 Cinv(C); Cinv.inverse();
-  const double trC = C.tr();
-  const double detF = F.det();
-  const double detFm0d67 = std::pow(detF, mpt67);
-
+  const double detFm0d67 = std::pow(F.det(), mpt67);
   const double CdC = C.MatContraction(C);
-
   const double mpt33CdC = (-1.0) * pt33 * CdC;
-  Matrix_3x3 PxC(Cinv); PxC.scale(mpt33CdC); PxC.PY(C);
   
-  Matrix_3x3 PxI(Cinv); PxI.scale( (-1.0) * pt33 * trC ); PxI.PY(I);
+  Matrix_3x3 PxC(Cinv); PxC.scale(mpt33CdC); PxC.PY(C);
+  Matrix_3x3 PxI(Cinv); PxI.scale( (-1.0) * pt33 * C.tr() ); PxI.PY(I);
 
   S.copy(PxC); S.scale(detFm0d67);  S.AXPY( -1.0, PxI );
   S.scale( mu*detFm0d67 );
@@ -123,7 +117,7 @@ void MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_PK_Stiffness(
 
   CC.scale( 2.0 * mu * detFm0d67 * detFm0d67 );
 
-  const double val2 = 2.0 * pt33 * detFm0d67 * mu * ( detFm0d67 * CdC - trC );
+  const double val2 = 2.0 * pt33 * detFm0d67 * mu * ( detFm0d67 * CdC - C.tr() );
 
   CC.add_SymmProduct(val2, Cinv, Cinv);
   CC.add_OutProduct((-1.0)*pt33*val2, Cinv, Cinv);
@@ -136,8 +130,7 @@ double MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_strain_energy(
     const Matrix_3x3 &F )
 {
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
-  const double detF = F.det();
-  const double detFm0d67 = std::pow(detF, mpt67);
+  const double detFm0d67 = std::pow(F.det(), mpt67);
   
   Matrix_3x3 E( C ); E.scale(0.5 * detFm0d67); E.AXPY(-0.5, I);
 
