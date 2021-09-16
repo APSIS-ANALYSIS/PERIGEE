@@ -73,14 +73,12 @@ void MaterialModel_NeoHookean_ST91::get_PK( const Matrix_3x3 &F,
   
   Matrix_3x3 Cinv(C); Cinv.inverse();
 
-  const double trC = C.tr();
   const double detF = F.det();
-  const double detF2 = detF * detF;
   const double detFm0d67 = std::pow(detF, mpt67);
 
-  S.copy(Cinv); S.scale( 0.5 * kappa * (detF2 - 1.0) );
+  S.copy(Cinv); S.scale( 0.5 * kappa * (detF*detF - 1.0) );
   S.AXPY( mu * detFm0d67, I);
-  S.AXPY( (-1.0) * mu * detFm0d67 * pt33 * trC , Cinv );
+  S.AXPY( (-1.0) * mu * detFm0d67 * pt33 * C.tr() , Cinv );
   P.MatMult(F,S);
 }
 
@@ -91,19 +89,18 @@ void MaterialModel_NeoHookean_ST91::get_PK_Stiffness( const Matrix_3x3 &F,
   
   Matrix_3x3 Cinv(C); Cinv.inverse();
 
-  const double trC = C.tr();
   const double detF = F.det();
   const double detF2 = detF * detF;
   const double detFm0d67 = pow(detF, mpt67);
 
   S.copy(Cinv); S.scale( 0.5 * kappa * (detF2 - 1.0) );
   S.AXPY( mu * detFm0d67, I);
-  S.AXPY( (-1.0) * mu * detFm0d67 * pt33 * trC , Cinv );
+  S.AXPY( (-1.0) * mu * detFm0d67 * pt33 * C.tr() , Cinv );
   P.MatMult(F,S);
 
   Stiffness.gen_zero();
-  const double val1 = 2.0 * pt33 * pt33 * mu * detFm0d67 * trC + kappa * detF2;
-  const double val2 = 2.0 * pt33 * mu * detFm0d67 * trC - kappa * (detF2 - 1.0);
+  const double val1 = 2.0 * pt33 * pt33 * mu * detFm0d67 * C.tr() + kappa * detF2;
+  const double val2 = 2.0 * pt33 * mu * detFm0d67 * C.tr() - kappa * (detF2 - 1.0);
   const double val3 = (-2.0) * pt33 * mu * detFm0d67;
   Stiffness.add_OutProduct(val1, Cinv, Cinv);
   Stiffness.add_SymmProduct(val2, Cinv, Cinv);
@@ -114,12 +111,11 @@ void MaterialModel_NeoHookean_ST91::get_PK_Stiffness( const Matrix_3x3 &F,
 double MaterialModel_NeoHookean_ST91::get_strain_energy( const Matrix_3x3 &F )
 {
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
-  const double trC = C.tr();
   const double detF = F.det();
   const double detF2 = detF * detF;
   const double detFm0d67 = std::pow(detF, mpt67);
   double lnJ = std::log(detF);
-  return 0.5 * mu * (detFm0d67 * trC - 3.0) + 0.5 * kappa *  (0.5*(detF2-1.0) -lnJ);
+  return 0.5 * mu * (detFm0d67 * C.tr() - 3.0) + 0.5 * kappa *  (0.5*(detF2-1.0) -lnJ);
 }
 
 // EOF
