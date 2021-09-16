@@ -88,10 +88,9 @@ void MaterialModel_NeoHookean_RWR2000::get_PK_Stiffness(
 
 double MaterialModel_NeoHookean_RWR2000::get_strain_energy( const Matrix_3x3 &F )
 {
-  Matrix_3x3 Cinv; Cinv.MatMultTransposeLeft(F);
-  const double trC = Cinv.tr();
+  Matrix_3x3 C; C.MatMultTransposeLeft(F);
   const double lnJ = std::log( F.det() );
-  return 0.5 * mu * (trC - 3.0) - mu * lnJ + 0.5 * kappa * lnJ * lnJ;
+  return 0.5 * mu * (C.tr() - 3.0) - mu * lnJ + 0.5 * kappa * lnJ * lnJ;
 }
 
 // EOF
