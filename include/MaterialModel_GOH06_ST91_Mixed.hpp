@@ -74,16 +74,7 @@ class MaterialModel_GOH06_ST91_Mixed : public IMaterialModel
     double f1_the, f1_phi, f2_the, f2_phi;
     double fk1, fk2, fkd;
     double a1[3], a2[3];
-
-    double trC, detF, detFm0d67;
-
     const Matrix_3x3 I;
-
-    Matrix_3x3 C, Cinv;
-    Matrix_3x3 a1xa1, a2xa2;
-    Matrix_3x3 PxI, PxH1, PxH2;
-
-    double fE1, fE2;
 };
 
 
