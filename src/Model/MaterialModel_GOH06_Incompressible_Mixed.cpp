@@ -21,6 +21,7 @@ MaterialModel_GOH06_Incompressible_Mixed::MaterialModel_GOH06_Incompressible_Mix
   a2[1] = sin(f2_the) * sin(f2_phi);
   a2[2] = cos(f2_the);
 
+  Matrix_3x3 a1xa1; Matrix_3x3 a2xa2;
   a1xa1.gen_outprod(a1);
   a2xa2.gen_outprod(a2);
 }
@@ -49,7 +50,6 @@ MaterialModel_GOH06_Incompressible_Mixed::MaterialModel_GOH06_Incompressible_Mix
   fk2    = h5r -> read_doubleScalar("/", "fk2");
   fkd    = h5r -> read_doubleScalar("/", "fkd");
 
-
   delete h5r; H5Fclose(h5file);
 
   a1[0] = sin(f1_the) * cos(f1_phi);
@@ -60,6 +60,7 @@ MaterialModel_GOH06_Incompressible_Mixed::MaterialModel_GOH06_Incompressible_Mix
   a2[1] = sin(f2_the) * sin(f2_phi);
   a2[2] = cos(f2_the);
 
+  Matrix_3x3 a1xa1; Matrix_3x3 a2xa2;
   a1xa1.gen_outprod(a1);
   a2xa2.gen_outprod(a2);
 }
@@ -120,29 +121,34 @@ void MaterialModel_GOH06_Incompressible_Mixed::write_hdf5( const char * const &f
 void MaterialModel_GOH06_Incompressible_Mixed::get_PK( 
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S)
 {
-  C.MatMultTransposeLeft(F);
-  Cinv.copy(C); Cinv.inverse();
-  trC = C.tr();
-  detF = F.det();
-  detFm0d67 = std::pow(detF, mpt67);
+  Matrix_3x3 C; C.MatMultTransposeLeft(F);
+  Matrix_3x3 Cinv(C); Cinv.inverse();
+  const double trC = C.tr();
+  const double detF = F.det();
+  const double detFm0d67 = std::pow(detF, mpt67);
 
   const double a1Ca1 = C.VecMatVec(a1, a1);
   const double a2Ca2 = C.VecMatVec(a2, a2);
 
-  fE1 = detFm0d67 * (fkd*trC + (1.0-3.0*fkd)*a1Ca1) - 1.0;
-  fE2 = detFm0d67 * (fkd*trC + (1.0-3.0*fkd)*a2Ca2) - 1.0;
+  const double fE1 = detFm0d67 * (fkd*trC + (1.0-3.0*fkd)*a1Ca1) - 1.0;
+  const double fE2 = detFm0d67 * (fkd*trC + (1.0-3.0*fkd)*a2Ca2) - 1.0;
   
   const double dfpsi1 = fk1 * fE1 * std::exp( fk2 * fE1 * fE1 );
   const double dfpsi2 = fk1 * fE2 * std::exp( fk2 * fE2 * fE2 );
 
   // P : I = I - 1/3 trC C^-1
-  PxI.copy(Cinv); PxI.scale( (-1.0) * pt33 * trC );
+  Matrix_3x3 PxI(Cinv); PxI.scale( (-1.0) * pt33 * trC );
   PxI.PY(I);
 
   // P : H = kd PxI + (1-3kd) a x a + (kd - 1/3) (a.Ca) C^-1
+  Matrix_3x3 PxH1; Matrix_3x3 PxH2;
   PxH1.gen_zero(); PxH2.gen_zero();
   PxH1.AXPY( fkd, PxI );
   PxH2.AXPY( fkd, PxI );
+
+  Matrix_3x3 a1xa1; Matrix_3x3 a2xa2;
+  a1xa1.gen_outprod(a1);
+  a2xa2.gen_outprod(a2);
 
   PxH1.AXPY( 1.0-3.0*fkd, a1xa1 );
   PxH2.AXPY( 1.0-3.0*fkd, a2xa2 );
@@ -164,29 +170,34 @@ void MaterialModel_GOH06_Incompressible_Mixed::get_PK(
 void MaterialModel_GOH06_Incompressible_Mixed::get_PK_Stiffness(
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &CC )
 {
-  C.MatMultTransposeLeft(F);
-  Cinv.copy(C); Cinv.inverse();
-  trC = C.tr();
-  detF = F.det();
-  detFm0d67 = std::pow(detF, mpt67);
+  Matrix_3x3 C; C.MatMultTransposeLeft(F);
+  Matrix_3x3 Cinv(C); Cinv.inverse();
+  const double trC = C.tr();
+  const double detF = F.det();
+  const double detFm0d67 = std::pow(detF, mpt67);
 
   const double a1Ca1 = C.VecMatVec(a1, a1);
   const double a2Ca2 = C.VecMatVec(a2, a2);
 
-  fE1 = detFm0d67 * (fkd*trC + (1.0-3.0*fkd)*a1Ca1) - 1.0;
-  fE2 = detFm0d67 * (fkd*trC + (1.0-3.0*fkd)*a2Ca2) - 1.0;
+  const double fE1 = detFm0d67 * (fkd*trC + (1.0-3.0*fkd)*a1Ca1) - 1.0;
+  const double fE2 = detFm0d67 * (fkd*trC + (1.0-3.0*fkd)*a2Ca2) - 1.0;
   
   const double dfpsi1 = fk1 * fE1 * std::exp( fk2 * fE1 * fE1 );
   const double dfpsi2 = fk1 * fE2 * std::exp( fk2 * fE2 * fE2 );
 
   // P : I = I - 1/3 trC C^-1
-  PxI.copy(Cinv); PxI.scale( (-1.0) * pt33 * trC );
+  Matrix_3x3 PxI(Cinv); PxI.scale( (-1.0) * pt33 * trC );
   PxI.PY(I);
 
   // P : H = kd PxI + (1-3kd) a x a + (kd - 1/3) (a.Ca) C^-1
+  Matrix_3x3 PxH1; Matrix_3x3 PxH2;
   PxH1.gen_zero(); PxH2.gen_zero();
   PxH1.AXPY( fkd, PxI );
   PxH2.AXPY( fkd, PxI );
+
+  Matrix_3x3 a1xa1; Matrix_3x3 a2xa2;
+  a1xa1.gen_outprod(a1);
+  a2xa2.gen_outprod(a2);
 
   PxH1.AXPY( 1.0-3.0*fkd, a1xa1 );
   PxH2.AXPY( 1.0-3.0*fkd, a2xa2 );
@@ -228,17 +239,17 @@ void MaterialModel_GOH06_Incompressible_Mixed::get_PK_Stiffness(
 double MaterialModel_GOH06_Incompressible_Mixed::get_strain_energy(
     const Matrix_3x3 &F )
 {
-  C.MatMultTransposeLeft(F);
-  Cinv.copy(C); Cinv.inverse();
-  trC = C.tr();
-  detF = F.det();
-  detFm0d67 = std::pow(detF, mpt67);
+  Matrix_3x3 C; C.MatMultTransposeLeft(F);
+  Matrix_3x3 Cinv(C); Cinv.inverse();
+  const double trC = C.tr();
+  const double detF = F.det();
+  const double detFm0d67 = std::pow(detF, mpt67);
 
   const double a1Ca1 = C.VecMatVec(a1, a1);
   const double a2Ca2 = C.VecMatVec(a2, a2);
 
-  fE1 = detFm0d67 * (fkd*trC + (1.0-3.0*fkd)*a1Ca1) - 1.0;
-  fE2 = detFm0d67 * (fkd*trC + (1.0-3.0*fkd)*a2Ca2) - 1.0;
+  const double fE1 = detFm0d67 * (fkd*trC + (1.0-3.0*fkd)*a1Ca1) - 1.0;
+  const double fE2 = detFm0d67 * (fkd*trC + (1.0-3.0*fkd)*a2Ca2) - 1.0;
 
   const double PSI_iso = 0.5 * mu * (detFm0d67 * trC - 3.0);
   const double PSI_fi1 = 0.5 * (fk1 / fk2) * ( std::exp(fk2*fE1*fE1) - 1.0 );
