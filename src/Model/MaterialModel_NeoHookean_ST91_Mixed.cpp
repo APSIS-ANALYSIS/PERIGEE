@@ -116,10 +116,7 @@ double MaterialModel_NeoHookean_ST91_Mixed::get_strain_energy(
 {
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
 
-  const double trC = C.tr();
-  const double detFm0d67 = std::pow(F.det(), mpt67);
-
-  return 0.5 * mu * (detFm0d67 * C.tr() - 3.0);
+  return 0.5 * mu * ( std::pow(F.det(), mpt67) * C.tr() - 3.0 );
 }
 
 double MaterialModel_NeoHookean_ST91_Mixed::get_rho( const double &p ) const

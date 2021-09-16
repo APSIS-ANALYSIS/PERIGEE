@@ -33,10 +33,8 @@ MaterialModel_NeoHookean_Incompressible_Mixed::MaterialModel_NeoHookean_Incompre
   delete h5r; H5Fclose(h5file);
 }
 
-
 MaterialModel_NeoHookean_Incompressible_Mixed::~MaterialModel_NeoHookean_Incompressible_Mixed()
 {}
-
 
 void MaterialModel_NeoHookean_Incompressible_Mixed::print_info() const
 {
@@ -71,12 +69,10 @@ void MaterialModel_NeoHookean_Incompressible_Mixed::get_PK(
 {
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
   Matrix_3x3 Cinv(C); Cinv.inverse();
-  const double trC = C.tr();
 
-  S.copy(Cinv); S.scale( (-1.0) * mu * pt33 * trC );
+  S.copy(Cinv); S.scale( (-1.0) * mu * pt33 * C.tr() );
   S.AXPY( mu , I ); P.MatMult(F,S);
 }
-
 
 void MaterialModel_NeoHookean_Incompressible_Mixed::get_PK_Stiffness( 
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &CC )
@@ -84,15 +80,13 @@ void MaterialModel_NeoHookean_Incompressible_Mixed::get_PK_Stiffness(
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
   Matrix_3x3 Cinv(C); Cinv.inverse();
 
-  const double trC = C.tr();
-
-  S.copy(Cinv); S.scale( (-1.0) * mu * pt33 * trC );
-  S.AXPY( mu , I);
+  S.copy(Cinv); S.scale( (-1.0) * mu * pt33 * C.tr() );
+  S.AXPY( mu , I );
   P.MatMult(F,S);
 
   CC.gen_zero();
-  const double val1 = 2.0 * pt33 * pt33 * mu * trC;
-  const double val2 = 2.0 * pt33 * mu * trC;
+  const double val1 = 2.0 * pt33 * pt33 * mu * C.tr();
+  const double val2 = 2.0 * pt33 * mu * C.tr();
   const double val3 = -2.0 * mu / 3.0;
   CC.add_OutProduct(val1, Cinv, Cinv);
   CC.add_SymmProduct(val2, Cinv, Cinv);
@@ -100,13 +94,11 @@ void MaterialModel_NeoHookean_Incompressible_Mixed::get_PK_Stiffness(
   CC.add_OutProduct(val3, Cinv, I);
 }
 
-
 double MaterialModel_NeoHookean_Incompressible_Mixed::get_strain_energy( 
     const Matrix_3x3 &F )
 {
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
-  const double trC = C.tr();
-  return 0.5 * mu * (trC - 3.0);
+  return 0.5 * mu * ( C.tr() - 3.0 );
 }
 
 // EOF
