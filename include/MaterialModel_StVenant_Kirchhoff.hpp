@@ -52,7 +52,6 @@ class MaterialModel_StVenant_Kirchhoff : public IMaterialModel
   private:
     double E, nu, lambda, mu, kappa;
     const Matrix_3x3 I;
-    Matrix_3x3 G; // Green-Lagrange strain tensor
 };
 
 #endif
