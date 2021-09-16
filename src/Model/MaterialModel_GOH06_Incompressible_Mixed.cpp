@@ -20,10 +20,6 @@ MaterialModel_GOH06_Incompressible_Mixed::MaterialModel_GOH06_Incompressible_Mix
   a2[0] = sin(f2_the) * cos(f2_phi);
   a2[1] = sin(f2_the) * sin(f2_phi);
   a2[2] = cos(f2_the);
-
-  Matrix_3x3 a1xa1; Matrix_3x3 a2xa2;
-  a1xa1.gen_outprod(a1);
-  a2xa2.gen_outprod(a2);
 }
 
 MaterialModel_GOH06_Incompressible_Mixed::MaterialModel_GOH06_Incompressible_Mixed(
@@ -59,10 +55,6 @@ MaterialModel_GOH06_Incompressible_Mixed::MaterialModel_GOH06_Incompressible_Mix
   a2[0] = sin(f2_the) * cos(f2_phi);
   a2[1] = sin(f2_the) * sin(f2_phi);
   a2[2] = cos(f2_the);
-
-  Matrix_3x3 a1xa1; Matrix_3x3 a2xa2;
-  a1xa1.gen_outprod(a1);
-  a2xa2.gen_outprod(a2);
 }
 
 MaterialModel_GOH06_Incompressible_Mixed::~MaterialModel_GOH06_Incompressible_Mixed()
@@ -124,8 +116,7 @@ void MaterialModel_GOH06_Incompressible_Mixed::get_PK(
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
   Matrix_3x3 Cinv(C); Cinv.inverse();
   const double trC = C.tr();
-  const double detF = F.det();
-  const double detFm0d67 = std::pow(detF, mpt67);
+  const double detFm0d67 = std::pow(F.det(), mpt67);
 
   const double a1Ca1 = C.VecMatVec(a1, a1);
   const double a2Ca2 = C.VecMatVec(a2, a2);
@@ -141,12 +132,12 @@ void MaterialModel_GOH06_Incompressible_Mixed::get_PK(
   PxI.PY(I);
 
   // P : H = kd PxI + (1-3kd) a x a + (kd - 1/3) (a.Ca) C^-1
-  Matrix_3x3 PxH1; Matrix_3x3 PxH2;
+  Matrix_3x3 PxH1, PxH2;
   PxH1.gen_zero(); PxH2.gen_zero();
   PxH1.AXPY( fkd, PxI );
   PxH2.AXPY( fkd, PxI );
 
-  Matrix_3x3 a1xa1; Matrix_3x3 a2xa2;
+  Matrix_3x3 a1xa1, a2xa2;
   a1xa1.gen_outprod(a1);
   a2xa2.gen_outprod(a2);
 
@@ -173,8 +164,7 @@ void MaterialModel_GOH06_Incompressible_Mixed::get_PK_Stiffness(
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
   Matrix_3x3 Cinv(C); Cinv.inverse();
   const double trC = C.tr();
-  const double detF = F.det();
-  const double detFm0d67 = std::pow(detF, mpt67);
+  const double detFm0d67 = std::pow(F.det(), mpt67);
 
   const double a1Ca1 = C.VecMatVec(a1, a1);
   const double a2Ca2 = C.VecMatVec(a2, a2);
@@ -190,12 +180,12 @@ void MaterialModel_GOH06_Incompressible_Mixed::get_PK_Stiffness(
   PxI.PY(I);
 
   // P : H = kd PxI + (1-3kd) a x a + (kd - 1/3) (a.Ca) C^-1
-  Matrix_3x3 PxH1; Matrix_3x3 PxH2;
+  Matrix_3x3 PxH1, PxH2;
   PxH1.gen_zero(); PxH2.gen_zero();
   PxH1.AXPY( fkd, PxI );
   PxH2.AXPY( fkd, PxI );
 
-  Matrix_3x3 a1xa1; Matrix_3x3 a2xa2;
+  Matrix_3x3 a1xa1, a2xa2;
   a1xa1.gen_outprod(a1);
   a2xa2.gen_outprod(a2);
 
@@ -242,8 +232,7 @@ double MaterialModel_GOH06_Incompressible_Mixed::get_strain_energy(
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
   Matrix_3x3 Cinv(C); Cinv.inverse();
   const double trC = C.tr();
-  const double detF = F.det();
-  const double detFm0d67 = std::pow(detF, mpt67);
+  const double detFm0d67 = std::pow(F.det(), mpt67);
 
   const double a1Ca1 = C.VecMatVec(a1, a1);
   const double a2Ca2 = C.VecMatVec(a2, a2);

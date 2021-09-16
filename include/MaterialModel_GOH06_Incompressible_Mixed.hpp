@@ -103,6 +103,7 @@ class MaterialModel_GOH06_Incompressible_Mixed : public IMaterialModel
     double a1[3], a2[3];
 
     const Matrix_3x3 I;
+    
     // outproduct matrix for anisotropy 
     //Matrix_3x3 a1xa1, a2xa2;
     // PxI  = I - 1/3 trC invC
