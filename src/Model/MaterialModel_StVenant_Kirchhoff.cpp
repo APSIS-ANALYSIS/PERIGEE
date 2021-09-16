@@ -30,7 +30,6 @@ MaterialModel_StVenant_Kirchhoff::MaterialModel_StVenant_Kirchhoff(
 MaterialModel_StVenant_Kirchhoff::~MaterialModel_StVenant_Kirchhoff()
 {}
 
-
 void MaterialModel_StVenant_Kirchhoff::print_info() const
 {
   SYS_T::commPrint( "\t  MaterialModel_StVenant_Kirchhoff: \n");
@@ -61,14 +60,12 @@ void MaterialModel_StVenant_Kirchhoff::write_hdf5( const char * const &fname ) c
   MPI_Barrier(PETSC_COMM_WORLD);
 }
 
-
 void MaterialModel_StVenant_Kirchhoff::get_PK( const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S )
 {
   Matrix_3x3 G; G.MatMultTransposeLeft(F); G.AXPY(-1.0, I); G.scale(0.5);
   S.gen_id(); S.scale(lambda * G.tr());
   S.AXPY(2.0 * mu, G); P.MatMult(F, S);
 }
-
 
 void MaterialModel_StVenant_Kirchhoff::get_PK_Stiffness( const Matrix_3x3 &F, Matrix_3x3 &P,
     Matrix_3x3 &S, Tensor4_3D &CC)
@@ -80,15 +77,13 @@ void MaterialModel_StVenant_Kirchhoff::get_PK_Stiffness( const Matrix_3x3 &F, Ma
   CC.add_OutProduct(lambda, I, I);
 }
 
-
 double MaterialModel_StVenant_Kirchhoff::get_strain_energy( const Matrix_3x3 &F )
 {
   Matrix_3x3 G; G.MatMultTransposeLeft(F); G.AXPY(-1.0, I); G.scale(0.5);
   const double trG = G.tr();
   G.MatMult(G,G);
   const double trG2 = G.tr();
-  return 0.5 * lambda * trG + mu * trG2;
+  return 0.5 * lambda * trG*trG + mu * trG2;
 }
-
 
 // EOF
