@@ -73,11 +73,10 @@ void MaterialModel_NeoHookean_M94_Mixed::get_PK(
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
   Matrix_3x3 Cinv(C); Cinv.inverse();
 
-  const double trC = C.tr();
   const double detF = F.det();
   const double detFm0d67 = std::pow(detF, mpt67);
 
-  S.copy(Cinv); S.scale( (-1.0) * mu * detFm0d67 * pt33 * trC );
+  S.copy(Cinv); S.scale( (-1.0) * mu * detFm0d67 * pt33 * C.tr() );
   S.AXPY( mu * detFm0d67, I);
   P.MatMult(F,S);
 }
@@ -88,17 +87,16 @@ void MaterialModel_NeoHookean_M94_Mixed::get_PK_Stiffness(
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
   Matrix_3x3 Cinv(C); Cinv.inverse();
 
-  const double trC = C.tr();
   const double detF = F.det();
   const double detFm0d67 = std::pow(detF, mpt67);
 
-  S.copy(Cinv); S.scale( (-1.0) * mu * detFm0d67 * pt33 * trC );
+  S.copy(Cinv); S.scale( (-1.0) * mu * detFm0d67 * pt33 * C.tr() );
   S.AXPY( mu * detFm0d67, I);
   P.MatMult(F,S);
 
   CC.gen_zero();
-  const double val1 = 2.0 * pt33 * pt33 * mu * detFm0d67 * trC;
-  const double val2 = 2.0 * pt33 * mu * detFm0d67 * trC;
+  const double val1 = 2.0 * pt33 * pt33 * mu * detFm0d67 * C.tr();
+  const double val2 = 2.0 * pt33 * mu * detFm0d67 * C.tr();
   const double val3 = mpt67 * mu * detFm0d67;
   CC.add_OutProduct(val1, Cinv, Cinv);
   CC.add_SymmProduct(val2, Cinv, Cinv);
@@ -110,11 +108,7 @@ double MaterialModel_NeoHookean_M94_Mixed::get_strain_energy(
     const Matrix_3x3 &F )
 {
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
-  const double trC = C.tr();
-  const double detF = F.det();
-  const double detFm0d67 = std::pow(detF, mpt67);
-
-  return 0.5 * mu * (detFm0d67 * trC - 3.0);
+  return 0.5 * mu * ( std::pow(F.det(), mpt67) * C.tr() - 3.0);
 }
 
 double MaterialModel_NeoHookean_M94_Mixed::get_rho( const double &p ) const
