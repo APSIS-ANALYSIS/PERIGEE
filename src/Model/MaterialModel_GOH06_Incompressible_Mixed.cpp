@@ -13,13 +13,13 @@ MaterialModel_GOH06_Incompressible_Mixed::MaterialModel_GOH06_Incompressible_Mix
   fk1(in_fk1), fk2(in_fk2), fkd(in_fkd),
   I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
 {
-  a1[0] = sin(f1_the) * cos(f1_phi);
-  a1[1] = sin(f1_the) * sin(f1_phi);
-  a1[2] = cos(f1_the);
+  a1(0) = sin(f1_the) * cos(f1_phi);
+  a1(1) = sin(f1_the) * sin(f1_phi);
+  a1(2) = cos(f1_the);
 
-  a2[0] = sin(f2_the) * cos(f2_phi);
-  a2[1] = sin(f2_the) * sin(f2_phi);
-  a2[2] = cos(f2_the);
+  a2(0) = sin(f2_the) * cos(f2_phi);
+  a2(1) = sin(f2_the) * sin(f2_phi);
+  a2(2) = cos(f2_the);
 }
 
 MaterialModel_GOH06_Incompressible_Mixed::MaterialModel_GOH06_Incompressible_Mixed(
@@ -48,13 +48,13 @@ MaterialModel_GOH06_Incompressible_Mixed::MaterialModel_GOH06_Incompressible_Mix
 
   delete h5r; H5Fclose(h5file);
 
-  a1[0] = sin(f1_the) * cos(f1_phi);
-  a1[1] = sin(f1_the) * sin(f1_phi);
-  a1[2] = cos(f1_the);
+  a1(0) = sin(f1_the) * cos(f1_phi);
+  a1(1) = sin(f1_the) * sin(f1_phi);
+  a1(2) = cos(f1_the);
 
-  a2[0] = sin(f2_the) * cos(f2_phi);
-  a2[1] = sin(f2_the) * sin(f2_phi);
-  a2[2] = cos(f2_the);
+  a2(0) = sin(f2_the) * cos(f2_phi);
+  a2(1) = sin(f2_the) * sin(f2_phi);
+  a2(2) = cos(f2_the);
 }
 
 MaterialModel_GOH06_Incompressible_Mixed::~MaterialModel_GOH06_Incompressible_Mixed()
@@ -77,8 +77,8 @@ void MaterialModel_GOH06_Incompressible_Mixed::print_info() const
   SYS_T::commPrint("\t  Angle phi_2 (deg)  = %e \n", f2_phi*180/pi);
   SYS_T::commPrint("\t  Angle theta_2 (rad)= %e \n", f2_the);
   SYS_T::commPrint("\t  Angle phi_2 (rad)  = %e \n", f2_phi);
-  SYS_T::commPrint("\t  a1: [ %e , %e , %e ] \n", a1[0], a1[1], a1[2]);
-  SYS_T::commPrint("\t  a2: [ %e , %e , %e ] \n", a2[0], a2[1], a2[2]);
+  SYS_T::commPrint("\t  a1: [ %e , %e , %e ] \n", a1(0), a1(1), a1(2));
+  SYS_T::commPrint("\t  a2: [ %e , %e , %e ] \n", a2(0), a2(1), a2(2));
   SYS_T::commPrint("\t  Fibre k1   = %e \n", fk1);
   SYS_T::commPrint("\t  Fibre k2   = %e \n", fk2);
   SYS_T::commPrint("\t  Fibre k_dispersion = %e \n", fkd);
@@ -252,15 +252,15 @@ void MaterialModel_GOH06_Incompressible_Mixed::get_fibre_dir( const int &dir,
 {
   if(dir == 0)
   {
-    fa1 = a1[0];
-    fa2 = a1[1];
-    fa3 = a1[2];
+    fa1 = a1(0);
+    fa2 = a1(1);
+    fa3 = a1(2);
   }
   else if(dir == 1)
   {
-    fa1 = a2[0];
-    fa2 = a2[1];
-    fa3 = a2[2];
+    fa1 = a2(0);
+    fa2 = a2(1);
+    fa3 = a2(2);
   }
   else
   {
