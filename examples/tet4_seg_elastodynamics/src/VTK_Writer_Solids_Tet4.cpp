@@ -684,10 +684,8 @@ void VTK_Writer_Solids_Tet4::interpolateOrientation( const int &ptoffset,
 
   std::vector<double> ux, uy, uz, vx, vy, vz, wx, wy, wz;
 
-  Vector_3 a, b;
-
-  model -> get_fibre_dir(0, a(0), a(1), a(2));
-  model -> get_fibre_dir(1, b(0), b(1), b(2));
+  const Vector_3 a = model -> get_fibre_dir(0);
+  const Vector_3 b = model -> get_fibre_dir(1);
 
   for(int ii=0; ii<nLocBas; ++ii)
   {

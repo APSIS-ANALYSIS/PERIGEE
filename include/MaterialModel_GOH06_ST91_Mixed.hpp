@@ -65,8 +65,7 @@ class MaterialModel_GOH06_ST91_Mixed : public IMaterialModel
 
     virtual double get_dbeta_dp( const double &p ) const;
 
-    virtual void get_fibre_dir( const int &dir,
-        double &fa1, double &fa2, double &fa3 ) const;
+    virtual Vector_3 get_fibre_dir( const int &dir ) const;
 
   private:
     const double pt33, mpt67, pi;

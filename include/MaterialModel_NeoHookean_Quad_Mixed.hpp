@@ -77,10 +77,6 @@ class MaterialModel_NeoHookean_Quad_Mixed : public IMaterialModel
     // dbeta
     virtual double get_dbeta_dp( const double &p ) const;
 
-    // A empty fibre_dir function
-    virtual void get_fibre_dir( const int &dir,
-        double &fa1, double &fa2, double &fa3 ) const {}
-
   private:
     double rho0, E, nu, lambda, mu, kappa;
     const double pt33, mpt67;

@@ -191,9 +191,10 @@ class IMaterialModel
       return 0.0;
     }
 
-    virtual void get_fibre_dir( const int &dir, double &fa1, double &fa2, double &fa3 ) const
+    virtual Vector_3 get_fibre_dir( const int &dir ) const
     {
       SYS_T::commPrint("Warning: IMaterialModel::get_fibre_dir() is not implemented. \n");
+      return Vector_3();
     }
 
 };

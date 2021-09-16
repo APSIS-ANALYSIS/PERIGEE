@@ -252,24 +252,16 @@ double MaterialModel_GOH06_ST91_Mixed::get_strain_energy(const Matrix_3x3 &F )
   return PSI_iso + PSI_fi1 + PSI_fi2;
 }
 
-void MaterialModel_GOH06_ST91_Mixed::get_fibre_dir( const int &dir,
-        double &fa1, double &fa2, double &fa3 ) const
+Vector_3 MaterialModel_GOH06_ST91_Mixed::get_fibre_dir( const int &dir ) const
 {
   if(dir == 0)
-  {
-    fa1 = a1(0);
-    fa2 = a1(1);
-    fa3 = a1(2);
-  }
+    return a1;
   else if(dir == 1)
-  {
-    fa1 = a2(0);
-    fa2 = a2(1);
-    fa3 = a2(2);
-  }
+    return a2;
   else
   {
     SYS_T::print_fatal("Error: MaterialModel_GOH06_ST91_Mixed, wrong fibre direction. \n");
+    return Vector_3();
   }
 }
 
