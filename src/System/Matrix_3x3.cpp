@@ -184,14 +184,6 @@ double Matrix_3x3::I2() const
      - mat[8] * mat[8] - 2.0 * ( mat[1]*mat[3] + mat[2] * mat[6] + mat[5] * mat[7] ) );
 }
 
-double Matrix_3x3::VecMatVec( const double * const &x,
-    const double * const &y ) const
-{
-  return x[0] * ( mat[0] * y[0] + mat[1] * y[1] + mat[2] * y[2] )
-    + x[1] * ( mat[3] * y[0] + mat[4] * y[1] + mat[5] * y[2] )
-    + x[2] * ( mat[6] * y[0] + mat[7] * y[1] + mat[8] * y[2] );    
-}
-
 double Matrix_3x3::VecMatVec( const Vector_3 &x, const Vector_3 &y ) const
 {
   return x(0) * ( mat[0] * y(0) + mat[1] * y(1) + mat[2] * y(2) )

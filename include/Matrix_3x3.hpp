@@ -154,8 +154,6 @@ class Matrix_3x3
     double I3() const {return det();}
 
     // Return x^T Mat y, assuming x, y are both column vectors of size 3
-    double VecMatVec( const double * const &x, const double * const &y ) const;
-
     double VecMatVec( const Vector_3 &x, const Vector_3 &y ) const;
 
     // Vector multiplication y = Ax, the vectors have to be size 3
