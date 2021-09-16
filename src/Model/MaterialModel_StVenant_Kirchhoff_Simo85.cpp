@@ -66,8 +66,8 @@ void MaterialModel_StVenant_Kirchhoff_Simo85::write_hdf5( const char * const &fn
 void MaterialModel_StVenant_Kirchhoff_Simo85::get_PK( 
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S )
 {
-  C.MatMultTransposeLeft(F);
-  detF = F.det();
+  Matrix_3x3 C; C.MatMultTransposeLeft(F);
+  const double detF = F.det();
   S.copy(C);
   S.inverse();
   S.scale(kappa * std::log(detF));
@@ -82,8 +82,8 @@ void MaterialModel_StVenant_Kirchhoff_Simo85::get_PK_Stiffness(
 {
   CC.gen_zero();
   
-  C.MatMultTransposeLeft(F);
-  detF = F.det();
+  Matrix_3x3 C; C.MatMultTransposeLeft(F);
+  const double detF = F.det();
   S.copy(C);
   S.inverse();
   
@@ -104,13 +104,13 @@ void MaterialModel_StVenant_Kirchhoff_Simo85::get_PK_Stiffness(
 double MaterialModel_StVenant_Kirchhoff_Simo85::get_strain_energy( 
     const Matrix_3x3 &F )
 {
-  C.MatMultTransposeLeft(F);
+  Matrix_3x3 C; C.MatMultTransposeLeft(F);
   C.AXPY(-1.0, I);
   C.scale(0.5);
   C.MatMult(C,C);
   const double trE2 = C.tr();
   
-  detF = F.det();
+  const double detF = F.det();
 
   return 0.5 * kappa * std::log(detF) * std::log(detF) + mu * trE2;
 }
