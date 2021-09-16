@@ -127,11 +127,11 @@ void MaterialModel_GOH06_Incompressible_Mixed::get_PK(
   const double dfpsi1 = fk1 * fE1 * std::exp( fk2 * fE1 * fE1 );
   const double dfpsi2 = fk1 * fE2 * std::exp( fk2 * fE2 * fE2 );
 
-  // P : I = I - 1/3 trC C^-1
+  // PxI = P : I = I - 1/3 trC C^-1
   Matrix_3x3 PxI(Cinv); PxI.scale( (-1.0) * pt33 * trC );
   PxI.PY(I);
 
-  // P : H = kd PxI + (1-3kd) a x a + (kd - 1/3) (a.Ca) C^-1
+  // PxH1(2) = P : H = kd PxI + (1-3kd) a x a + (kd - 1/3) (a.Ca) C^-1
   Matrix_3x3 PxH1, PxH2;
   PxH1.gen_zero(); PxH2.gen_zero();
   PxH1.AXPY( fkd, PxI );
