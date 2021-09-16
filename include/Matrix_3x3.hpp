@@ -157,6 +157,8 @@ class Matrix_3x3
     double VecMatVec( const Vector_3 &x, const Vector_3 &y ) const;
 
     // Vector multiplication y = Ax, the vectors have to be size 3
+    void VecMult( const double * const &x, double * const &y ) const;
+    
     void VecMult( const Vector_3 &x, Vector_3 &y ) const;
 
     // y = Ax, wherein x = [x0; x1; x2]
