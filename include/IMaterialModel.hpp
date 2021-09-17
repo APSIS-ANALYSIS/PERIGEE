@@ -66,10 +66,10 @@ class IMaterialModel
       SYS_T::commPrint("Warning: IMaterialModel::write_hdf5() is not implemented. \n");
     }
 
-    virtual void get_PK(const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S) = 0;
+    virtual void get_PK(const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S) const = 0;
 
     virtual void get_PK_Stiffness(const Matrix_3x3 &F, Matrix_3x3 &P, 
-        Matrix_3x3 &S, Tensor4_3D &CC) = 0;
+        Matrix_3x3 &S, Tensor4_3D &CC) const = 0;
 
     // ------------------------------------------------------------------------
     // Input: F : deformation gradient
@@ -118,7 +118,7 @@ class IMaterialModel
       aa.scale( invJ );
     }
 
-    virtual double get_strain_energy( const Matrix_3x3 &F )
+    virtual double get_strain_energy( const Matrix_3x3 &F ) const
     {
       SYS_T::commPrint("Warning: IMaterialModel::get_strain_energy() is not implemented. \n");
       return 0.0;

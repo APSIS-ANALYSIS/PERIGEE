@@ -52,12 +52,12 @@ class MaterialModel_Guccione_Incompressible_Mixed : public IMaterialModel
 
     virtual void write_hdf5( const char * const &fname = "material_model.h5") const;
 
-    virtual void get_PK( const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S );
+    virtual void get_PK( const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S ) const;
 
     virtual void get_PK_Stiffness( const Matrix_3x3 &F, Matrix_3x3 &P, 
-        Matrix_3x3 &S, Tensor4_3D &CC );
+        Matrix_3x3 &S, Tensor4_3D &CC ) const;
 
-    virtual double get_strain_energy( const Matrix_3x3 &F );
+    virtual double get_strain_energy( const Matrix_3x3 &F ) const;
 
     // Read access to material parameters
     virtual double get_elastic_rho0() const {return rho0;}
