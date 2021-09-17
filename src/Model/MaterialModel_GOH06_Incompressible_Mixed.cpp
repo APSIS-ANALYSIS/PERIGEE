@@ -23,7 +23,7 @@ MaterialModel_GOH06_Incompressible_Mixed::MaterialModel_GOH06_Incompressible_Mix
 }
 
 MaterialModel_GOH06_Incompressible_Mixed::MaterialModel_GOH06_Incompressible_Mixed(
-		const char * const &fname)
+    const char * const &fname)
 : pt33( 1.0 / 3.0 ), mpt67( -2.0 * pt33 ), pi( MATH_T::PI ),
   I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
 {
@@ -111,7 +111,7 @@ void MaterialModel_GOH06_Incompressible_Mixed::write_hdf5( const char * const &f
 }
 
 void MaterialModel_GOH06_Incompressible_Mixed::get_PK( 
-    const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S)
+    const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S ) const
 {
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
   Matrix_3x3 Cinv(C); Cinv.inverse();
@@ -159,7 +159,7 @@ void MaterialModel_GOH06_Incompressible_Mixed::get_PK(
 }
 
 void MaterialModel_GOH06_Incompressible_Mixed::get_PK_Stiffness(
-    const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &CC )
+    const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &CC ) const
 {
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
   Matrix_3x3 Cinv(C); Cinv.inverse();
@@ -227,7 +227,7 @@ void MaterialModel_GOH06_Incompressible_Mixed::get_PK_Stiffness(
 }
 
 double MaterialModel_GOH06_Incompressible_Mixed::get_strain_energy(
-    const Matrix_3x3 &F )
+    const Matrix_3x3 &F ) const
 {
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
   Matrix_3x3 Cinv(C); Cinv.inverse();
