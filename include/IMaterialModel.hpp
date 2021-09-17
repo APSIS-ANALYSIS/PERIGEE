@@ -78,7 +78,7 @@ class IMaterialModel
     //         AA : F_iK F_jL C_KILJ
     // ------------------------------------------------------------------------
     virtual void get_PK_FFStiffness( const Matrix_3x3 &F, Matrix_3x3 &P, 
-        Matrix_3x3 &S, Tensor4_3D &AA )
+        Matrix_3x3 &S, Tensor4_3D &AA ) const
     {
       get_PK_Stiffness(F, P, S, AA);
       AA.MatMult_1(F);
@@ -89,7 +89,7 @@ class IMaterialModel
     // Input: F : deformation gradient
     // Output: sigma : Cauchy stress tensor
     // ------------------------------------------------------------------------
-    virtual void get_Cauchy_stress( const Matrix_3x3 &F, Matrix_3x3 &sigma )
+    virtual void get_Cauchy_stress( const Matrix_3x3 &F, Matrix_3x3 &sigma ) const
     {
       Matrix_3x3 P, S;
       get_PK(F, P, S);
@@ -104,7 +104,7 @@ class IMaterialModel
     //         aa : J^{-1} F_iI F_jJ F_kK F_lL C_IJKL
     // ------------------------------------------------------------------------
     virtual void get_Cauchy_stiffness( const Matrix_3x3 &F, Matrix_3x3 &sigma,
-       Tensor4_3D &aa )
+       Tensor4_3D &aa ) const
     {
       const double invJ = 1.0 / F.det();
       Matrix_3x3 P, S;
