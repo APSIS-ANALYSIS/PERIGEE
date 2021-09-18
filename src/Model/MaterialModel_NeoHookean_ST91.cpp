@@ -67,7 +67,7 @@ void MaterialModel_NeoHookean_ST91::write_hdf5( const char * const &fname ) cons
 }
 
 void MaterialModel_NeoHookean_ST91::get_PK( const Matrix_3x3 &F, 
-    Matrix_3x3 &P, Matrix_3x3 &S )
+    Matrix_3x3 &P, Matrix_3x3 &S ) const
 {
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
   
@@ -83,7 +83,7 @@ void MaterialModel_NeoHookean_ST91::get_PK( const Matrix_3x3 &F,
 }
 
 void MaterialModel_NeoHookean_ST91::get_PK_Stiffness( const Matrix_3x3 &F, 
-    Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &Stiffness ) 
+    Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &Stiffness ) const
 {
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
   
@@ -108,7 +108,7 @@ void MaterialModel_NeoHookean_ST91::get_PK_Stiffness( const Matrix_3x3 &F,
   Stiffness.add_OutProduct(val3, Cinv, I);
 }
 
-double MaterialModel_NeoHookean_ST91::get_strain_energy( const Matrix_3x3 &F )
+double MaterialModel_NeoHookean_ST91::get_strain_energy( const Matrix_3x3 &F ) const
 {
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
   const double detF = F.det();
