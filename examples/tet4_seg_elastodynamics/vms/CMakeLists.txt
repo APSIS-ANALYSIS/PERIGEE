@@ -1,6 +1,6 @@
 PROJECT(perigee)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
 
 IF(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
@@ -52,7 +52,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/IPart.cpp
   ${perigee_source}/Mesh/Part_Tet.cpp
   ${perigee_source}/Mesh/Part_FEM.cpp
-  ${perigee_source}/Mesh/ElemBC_3D_tet4.cpp
+  ${perigee_source}/Mesh/ElemBC_3D_tet.cpp
   ${perigee_source}/Mesh/ElemBC_3D.cpp
   ${perigee_source}/Mesh/NodalBC_3D_vtp.cpp
   ${perigee_source}/Mesh/NodalBC_3D.cpp
@@ -134,16 +134,16 @@ SET( perigee_postprocess_lib_src
   )
 
 # 5. Hex-mesh tools
-SET( perigee_hex_aux_tool_lib_src
-  ${perigee_source}/NURBS_Tool/NURBS_Bezier.cpp
-  ${perigee_source}/NURBS_Tool/NURBS_Tools.cpp
-  ${perigee_source}/NURBS_Tool/NURBS_FileIO.cpp
-  ${perigee_source}/System/Sys_Tools.cpp
-  ${perigee_source}/System/kRefinement.cpp
-  ${perigee_source}/Mesh/Mesh_NURBS_1Patch_3D.cpp
-  ${perigee_source}/Mesh/Mesh_NURBS_1Patch_3D_nze.cpp
-  ${perigee_source}/Mesh/IEN_NURBS_1Patch_3D_wPtr.cpp
-  )
+#SET( perigee_hex_aux_tool_lib_src
+#  ${perigee_source}/NURBS_Tool/NURBS_Bezier.cpp
+#  ${perigee_source}/NURBS_Tool/NURBS_Tools.cpp
+#  ${perigee_source}/NURBS_Tool/NURBS_FileIO.cpp
+#  ${perigee_source}/System/Sys_Tools.cpp
+#  ${perigee_source}/System/kRefinement.cpp
+#  ${perigee_source}/Mesh/Mesh_NURBS_1Patch_3D.cpp
+#  ${perigee_source}/Mesh/Mesh_NURBS_1Patch_3D_nze.cpp
+#  ${perigee_source}/Mesh/IEN_NURBS_1Patch_3D_wPtr.cpp
+#  )
 
 # ===============================================
 # Finish setting my own source code
@@ -169,8 +169,8 @@ TARGET_LINK_LIBRARIES( perigee_postprocess ${EXTRA_LINK_LIBS} perigee_analysis )
 # -------------------------------------------------------------------
 
 # 5. Hex-auxiliary lib
-ADD_LIBRARY( perigee_hexlib ${perigee_hex_aux_tool_lib_src} )
-TARGET_LINK_LIBRARIES( perigee_hexlib ${EXTRA_LINK_LIBS} )
+#ADD_LIBRARY( perigee_hexlib ${perigee_hex_aux_tool_lib_src} )
+#TARGET_LINK_LIBRARIES( perigee_hexlib ${EXTRA_LINK_LIBS} )
 
 # Print compiler setup
 INCLUDE(../../../conf/message_compiler_setup.cmake)
@@ -201,8 +201,8 @@ TARGET_LINK_LIBRARIES( preprocess3d_tet ${EXTRA_LINK_LIBS} perigee_preprocess )
 
 #TARGET_LINK_LIBRARIES( tetmesher ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( polymesher ${EXTRA_LINK_LIBS} perigee_preprocess )
-TARGET_LINK_LIBRARIES( unitcubemesher ${EXTRA_LINK_LIBS} perigee_preprocess
-  perigee_hexlib )
+#TARGET_LINK_LIBRARIES( unitcubemesher ${EXTRA_LINK_LIBS} perigee_preprocess
+#  perigee_hexlib )
 #TARGET_LINK_LIBRARIES( cube6tet ${EXTRA_LINK_LIBS} perigee_preprocess
 #  perigee_hexlib )
 
