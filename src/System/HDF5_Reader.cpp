@@ -194,6 +194,29 @@ std::vector<double> HDF5_Reader::read_doubleVector( const char * const &group_na
   return out;
 }
 
+Vector_3 HDF5_Reader::read_Vector_3( const char * const &group_name,
+    const char * const &data_name ) const
+{
+  hid_t drank;
+  hsize_t * ddims;
+  double * ddata;
+
+  read_doubleArray( group_name, data_name, drank, ddims, ddata );
+
+  if( drank != 1 || ddims[0] != 3 )
+  {
+    std::ostringstream oss;
+    oss<<"Error: HDF5_Reader::read_Vector_3 read data at "<<group_name;
+    oss<<" with name "<<data_name<<" is not a 3-component vector! \n";
+    SYS_T::print_fatal( oss.str().c_str() );
+  }
+
+  Vector_3 out( ddata[0], ddata[1], ddata[2] );
+
+  delete [] ddims; delete [] ddata; ddims = nullptr; ddata = nullptr;
+  return out;
+}
+
 std::vector<int> HDF5_Reader::read_intMatrix( const char * const &group_name,
     const char * const &data_name, int &num_row, int &num_col ) const
 {

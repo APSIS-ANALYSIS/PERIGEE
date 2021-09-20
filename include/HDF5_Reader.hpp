@@ -34,6 +34,7 @@
 // ==================================================================
 #include "Sys_Tools.hpp"
 #include "Vec_Tools.hpp"
+#include "Vector_3.hpp"
 #include "hdf5.h"
 
 class HDF5_Reader
@@ -84,6 +85,12 @@ class HDF5_Reader
     //                      vector<double>.
     // --------------------------------------------------------------
     std::vector<double> read_doubleVector( const char * const &group_name,
+        const char * const &data_name ) const;
+
+    // --------------------------------------------------------------
+    // ! read_Vector_3 : output the Vector_3 object.
+    // --------------------------------------------------------------
+    Vector_3 read_Vector_3( const char * const &group_name,
         const char * const &data_name ) const;
 
     // --------------------------------------------------------------
