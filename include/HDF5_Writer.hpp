@@ -41,6 +41,7 @@
 #include <vector>
 #include <cstdlib>
 #include <climits>
+#include "Vector_3.hpp"
 #include "hdf5.h"
 
 class HDF5_Writer
@@ -150,6 +151,14 @@ class HDF5_Writer
     // --- write a double vector at /data_name
     void write_doubleVector( const char * const &data_name, 
         const std::vector<double> &value ) const;
+
+    // --------------------------------------------------------------
+    // Vector_3
+    // --------------------------------------------------------------
+    void write_Vector_3( const hid_t &group_id, const char * const &data_name,
+        const Vector_3 &value ) const;
+
+    void write_Vector_3( const char * const &data_name, const Vector_3 &value ) const;
 
     // --------------------------------------------------------------
     // Matrix writer

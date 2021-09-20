@@ -10,6 +10,17 @@ int main( int argc, char * argv[] )
   int a = -1;
   h5w -> write_intScalar( "aa", a );
 
+  const Vector_3 vv( -3.11243524, -1.232849813, 3.13242434215925);
+
+  h5w -> write_Vector_3( "vv", vv );
+
+  hid_t group_id = H5Gcreate(file_id, "/GROUP_TEST",
+      H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+  h5w -> write_Vector_3( group_id, "vv", vv );
+
+  H5Gclose( group_id );
+
   delete h5w;
   H5Fclose(file_id);
   return EXIT_SUCCESS;
