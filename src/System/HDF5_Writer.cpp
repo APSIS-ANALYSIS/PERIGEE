@@ -389,7 +389,7 @@ void HDF5_Writer::write_Vector_3( const hid_t &group_id, const char * const &dat
     herr_t status = H5Dwrite( dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
         H5P_DEFAULT, &val[0] );
 
-    check_error(status, "write_doubleVector");
+    check_error(status, "write_Vector_3");
 
     H5Dclose( dataset );
     H5Sclose( dataspace );
@@ -410,7 +410,7 @@ void HDF5_Writer::write_Vector_3( const char * const &data_name, const Vector_3 
     herr_t status = H5Dwrite( dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
         H5P_DEFAULT, &val[0] );
 
-    check_error(status, "write_doubleVector");
+    check_error(status, "write_Vector_3");
 
     H5Dclose( dataset );
     H5Sclose( dataspace );
@@ -432,7 +432,7 @@ void HDF5_Writer::write_Matrix_3x3( const hid_t &group_id, const char * const &d
     herr_t status = H5Dwrite( dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
         H5P_DEFAULT, &val[0] );
 
-    check_error(status, "write_doubleVector");
+    check_error(status, "write_Matrix_3x3");
 
     H5Dclose( dataset );
     H5Sclose( dataspace );
@@ -453,7 +453,7 @@ void HDF5_Writer::write_Matrix_3x3( const char * const &data_name, const Matrix_
     herr_t status = H5Dwrite( dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
         H5P_DEFAULT, &val[0] );
 
-    check_error(status, "write_doubleVector");
+    check_error(status, "write_Matrix_3x3");
 
     H5Dclose( dataset );
     H5Sclose( dataspace );
