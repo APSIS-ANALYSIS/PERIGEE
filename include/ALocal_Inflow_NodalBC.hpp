@@ -1,22 +1,20 @@
 #ifndef ALOCAL_INFLOW_NODALBC_HPP
 #define ALOCAL_INFLOW_NODALBC_HPP
-// ==================================================================
+// ============================================================================
 // ALocal_Inflow_NodalBC.hpp
 //
-// Analysis-use, inflow nodal indices.
+// Analysis-use data that is related to the inflow surface nodes.
 //
 // Date Created: July 8 2017
 // Author: Ju Liu
-// ==================================================================
-#include "Vector_3.hpp"
+// ============================================================================
 #include "HDF5_Reader.hpp"
 #include "Math_Tools.hpp"
 
 class ALocal_Inflow_NodalBC
 {
   public:
-    ALocal_Inflow_NodalBC( const std::string &fileBaseName,
-        const int &cpu_rank );
+    ALocal_Inflow_NodalBC( const std::string &fileBaseName, const int &cpu_rank );
 
     virtual ~ALocal_Inflow_NodalBC();
 
@@ -41,7 +39,7 @@ class ALocal_Inflow_NodalBC
     virtual bool is_inLDN( const int &ii) const
     {return VEC_T::is_invec(LDN, ii); }
 
-    // --------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     // get_radius: return the given point's (estimated) scaled radius for
     //             generating the inflow velocity profile.
     //             Algorithm: Find rc := point dist from centroid;
@@ -49,9 +47,9 @@ class ALocal_Inflow_NodalBC
     //                        return rc / (rc + rb);
     //             If this partition does not contain any inflow bc
     //             nodes, this function will throw an error.
-    // --------------------------------------------------------------    
-    virtual double get_radius( const double &x, const double &y,
-                const double &z ) const;
+    // ------------------------------------------------------------------------
+    virtual double get_radius( const double &x, const double &y, 
+        const double &z ) const;
 
     // get number of nodes beloging to the local partition
     virtual int get_num_local_node() const {return num_local_node;}
@@ -83,33 +81,32 @@ class ALocal_Inflow_NodalBC
     virtual int get_local_tri_ien(const int &ee, const int &ii) const
     {return local_tri_ien[ee * cell_nLocBas + ii];}
 
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // get_ctrlPts_xyz: given surface element index eindex, return the
     // control point coordinates.
     // Users are responsible for allocating/deallocating memory for ctrl_(x/y/z)
     // surface element id: 0 <= eindex < num_local_cell;
     // ctrl_x/y/z : output coordinate arrays, each of length cell_nLocBas.
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------------
     virtual void get_ctrlPts_xyz( const int &eindex, double * const &ctrl_x,
         double * const &ctrl_y, double * const &ctrl_z ) const;
 
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // get_SIEN: given surface element index eindex, return the IEN.
     // Users are responsible for allocating/deallocating memory for sien
     // eindex : 0 <= eindex < num_local_cell
     // sien : length cell_nLocBas.
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------------
     virtual void get_SIEN( const int &eindex, int * const &sien ) const;
 
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // Generate a filename for inlet data
     // Inlet_data.txt
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------------
     virtual std::string gen_flowfile_name() const
     {
       std::ostringstream ss;
       ss<<"Inlet_data.txt";
-
       return ss.str();
     }
 
