@@ -6,20 +6,22 @@ NBC_Partition_3D_inflow::NBC_Partition_3D_inflow(
     const INodalBC * const &nbc ) 
 : NBC_Partition_3D( part, mnindex, nbc )
 {
+  // Area of the cap surface
   actarea  = nbc -> get_para_1();
   facearea = nbc -> get_para_6();
 
+  // Outward normal vector
   outvec.clear();
   outvec.push_back( nbc->get_para_2(0) );
   outvec.push_back( nbc->get_para_2(1) );
   outvec.push_back( nbc->get_para_2(2) );
 
+  // Centroid and outline points
   num_out_bc_pts = nbc->get_para_3();
 
-  centroid.resize(3);
-  centroid[0] = nbc->get_para_4(0);
-  centroid[1] = nbc->get_para_4(1);
-  centroid[2] = nbc->get_para_4(2);
+  centroid(0) = nbc->get_para_4(0);
+  centroid(1) = nbc->get_para_4(1);
+  centroid(2) = nbc->get_para_4(2);
 
   outline_pts.resize( 3*num_out_bc_pts );
   for(int ii=0; ii<3*num_out_bc_pts; ++ii)
@@ -33,7 +35,7 @@ NBC_Partition_3D_inflow::NBC_Partition_3D_inflow(
 
   local_global_cell.clear();
 
-  // Loop over all cells on inlet surface
+  // Loop over all cells on inlet cap surface
   for(int jj=0; jj < nbc -> get_num_cell(); ++jj)
   {
     const int elem_index = nbc -> get_global_cell(jj); // cell vol id
@@ -83,10 +85,8 @@ NBC_Partition_3D_inflow::NBC_Partition_3D_inflow(
   }
 }
 
-
 NBC_Partition_3D_inflow::~NBC_Partition_3D_inflow()
 {}
-
 
 void NBC_Partition_3D_inflow::write_hdf5( const char * FileName ) const
 {
@@ -112,7 +112,7 @@ void NBC_Partition_3D_inflow::write_hdf5( const char * FileName ) const
 
   h5writer->write_intScalar( group_id, "num_out_bc_pts", num_out_bc_pts);
 
-  h5writer->write_doubleVector( group_id, "centroid", centroid);
+  h5writer->write_Vector_3( group_id, "centroid", centroid);
 
   h5writer->write_doubleVector( group_id, "outline_pts", outline_pts);
 

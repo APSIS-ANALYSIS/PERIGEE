@@ -9,6 +9,9 @@
 // This NBC partition code is specifically designed for the class of
 // NodalBC_3D_inflow, which contains two additional information:
 // inflow surface area and the inflow surface outward normal vector.
+// 
+// The data recorded in the HDF5 file by this class will be loaded
+// in the ALocal_Inflow_NodalBC class in the analysis code.
 //
 // Date crated: Aug. 9 2017
 // Author: Ju Liu
@@ -35,8 +38,8 @@ class NBC_Partition_3D_inflow : public NBC_Partition_3D
     // number of boundary points of this surface
     int num_out_bc_pts;
 
-    // coordinate of the centroid
-    std::vector<double> centroid;
+    // spatial coordinates of the centroid
+    Vector_3 centroid;
 
     // coordindates of the boundary points
     std::vector<double> outline_pts;
