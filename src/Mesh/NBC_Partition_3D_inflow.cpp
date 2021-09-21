@@ -19,9 +19,7 @@ NBC_Partition_3D_inflow::NBC_Partition_3D_inflow(
   // Centroid and outline points
   num_out_bc_pts = nbc->get_para_3();
 
-  centroid(0) = nbc->get_para_4(0);
-  centroid(1) = nbc->get_para_4(1);
-  centroid(2) = nbc->get_para_4(2);
+  centroid = nbc->get_para_4();
 
   outline_pts.resize( 3*num_out_bc_pts );
   for(int ii=0; ii<3*num_out_bc_pts; ++ii)

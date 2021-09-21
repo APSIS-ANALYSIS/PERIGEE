@@ -13,6 +13,7 @@
 // ============================================================================
 #include "Sys_Tools.hpp"
 #include "Vec_Tools.hpp"
+#include "Vector_3.hpp"
 
 class INodalBC
 {
@@ -110,10 +111,10 @@ class INodalBC
     // get_para_4() passes additional parameters from the specific
     //              instantiations.
     // --------------------------------------------------------------
-    virtual double get_para_4(const int &ii) const
+    virtual Vector_3 get_para_4() const
     {
       SYS_T::print_fatal("Error: INodalBC::get_para_4 is not implemented.\n");
-      return 0.0;
+      return Vector_3();
     }
     
     // --------------------------------------------------------------
