@@ -11,12 +11,8 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
 
   const std::string gname("/inflow");
 
-  const std::vector<double> outnormal_vec = h5r -> read_doubleVector( gname.c_str(), "Outward_normal_vector" );
+  outnormal = h5r -> read_Vector_3( gname.c_str(), "Outward_normal_vector" );
   
-  outnormal(0) = outnormal_vec[0];
-  outnormal(1) = outnormal_vec[1];
-  outnormal(2) = outnormal_vec[2];
-
   act_area = h5r -> read_doubleScalar( gname.c_str(), "Inflow_active_area");
   ful_area = h5r -> read_doubleScalar( gname.c_str(), "Inflow_full_area");
 
@@ -28,7 +24,7 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
   {
     LDN = h5r->read_intVector( gname.c_str(), "LDN" );
     num_out_bc_pts = h5r->read_intScalar( gname.c_str(), "num_out_bc_pts" );
-    centroid = h5r->read_doubleVector( gname.c_str(), "centroid" );
+    centroid = h5r->read_Vector_3( gname.c_str(), "centroid" );
     outline_pts = h5r->read_doubleVector( gname.c_str(), "outline_pts" );
   }
   else
@@ -61,13 +57,11 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
 ALocal_Inflow_NodalBC::~ALocal_Inflow_NodalBC()
 {
   VEC_T::clean(LDN);
-  VEC_T::clean(centroid);
   VEC_T::clean(outline_pts);
   VEC_T::clean(local_pt_xyz);
   VEC_T::clean(local_tri_ien);
   VEC_T::clean(local_node_pos);
 }
-
 
 double ALocal_Inflow_NodalBC::get_radius( const double &x, const double &y,
     const double &z ) const
@@ -76,7 +70,7 @@ double ALocal_Inflow_NodalBC::get_radius( const double &x, const double &y,
   // inflow boundary points (i.e. Num_LD = 0 ).
   SYS_T::print_fatal_if( num_out_bc_pts == 0, "Error: ALocal_Inflow_NodalBC::get_radius, this function can only be called in sub-domains which contains the inflow boundary node.\n");
 
-  const double rc = MATH_T::norm2(x-centroid[0], y-centroid[1], z-centroid[2]);
+  const double rc = MATH_T::norm2( x-centroid(0), y-centroid(1), z-centroid(2) );
 
   // Now loop over the boundary points to find rb.
   double rb = MATH_T::norm2(x-outline_pts[0], y-outline_pts[1], z-outline_pts[2]);
