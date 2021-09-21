@@ -135,8 +135,8 @@ class ALocal_Inflow_NodalBC
     // Coordinates of the outer boundary points
     std::vector<double> outline_pts;
 
-    // Centroid point
-    std::vector<double> centroid;
+    // Centroid point's coordinates
+    Vector_3 centroid;
 
     // Number of local nodes & cells, and cell's nLocBas
     int num_local_node, num_local_cell, cell_nLocBas;

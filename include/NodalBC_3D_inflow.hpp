@@ -40,13 +40,13 @@ class NodalBC_3D_inflow : public INodalBC
 
     virtual double get_para_1() const {return inf_active_area;}
 
-    virtual double get_para_2(const int &ii) const {return outnormal(ii);}
+    virtual Vector_3 get_para_2() const {return outnormal;}
 
     // Access to the number of outline boundary points.
     virtual int get_para_3() const {return num_out_bc_pts;}
 
     // Access to the centroid coordinates.
-    virtual double get_para_4(const int &comp) const {return centroid[comp];}
+    virtual Vector_3 get_para_4() const {return centroid;}
 
     // Access to the outline points. ii ranges from 0 to 3 x num_out_bc_pts;
     virtual double get_para_5(const int &ii) const {return outline_pts[ii];}
@@ -96,7 +96,7 @@ class NodalBC_3D_inflow : public INodalBC
     double face_area;
 
     // Arithmetic mean of inlet surface points
-    double centroid[3];
+    Vector_3 centroid;
 
     // unit outward normal vector for the surface
     Vector_3 outnormal;

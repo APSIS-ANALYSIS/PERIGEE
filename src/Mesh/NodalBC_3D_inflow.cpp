@@ -12,8 +12,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow(const int &nFunc)
   
   inf_active_area = 0;
 
-  centroid[0] = 0.0; centroid[1] = 0.0; centroid[2] = 0.0;
-
+  centroid.gen_zero();
   outnormal.gen_zero();
   
   num_out_bc_pts = 0;
@@ -82,16 +81,14 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   Create_ID( nFunc );
 
   // Calculate the centroid of the surface
-  centroid[0] = 0.0; centroid[1] = 0.0; centroid[2] = 0.0;
+  centroid.gen_zero();
   for(int ii=0; ii<num_node; ++ii)
   {
-    centroid[0] += pt_xyz[3*ii+0];
-    centroid[1] += pt_xyz[3*ii+1];
-    centroid[2] += pt_xyz[3*ii+2];
+    centroid(0) += pt_xyz[3*ii+0];
+    centroid(1) += pt_xyz[3*ii+1];
+    centroid(2) += pt_xyz[3*ii+2];
   }
-  centroid[0] = centroid[0] / (double) num_node;
-  centroid[1] = centroid[1] / (double) num_node;
-  centroid[2] = centroid[2] / (double) num_node;
+  centroid.scale( 1.0 / (double) num_node );
 
   // Collect the nodes that belong to the wall, and setup a vector that
   // is 1 on the interior nodes and 0 on the wall bc nodes.
@@ -282,7 +279,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   std::cout<<"===> NodalBC_3D_inflow specified by "<<inffile<<", with nodes on \n";
   std::cout<<"     "<<wallfile<<" excluded, is generated. \n";
   std::cout<<"     num_node: "<<num_node<<", num_cell: "<<num_cell<<'\n';
-  std::cout<<"     centroid: "<<centroid[0]<<'\t'<<centroid[1]<<'\t'<<centroid[2]<<'\n';
+  std::cout<<"     centroid: "<<centroid(0)<<'\t'<<centroid(1)<<'\t'<<centroid(2)<<'\n';
   std::cout<<"     number of outline points is "<<num_out_bc_pts<<'\n';
   std::cout<<"     outward normal is ["<<outnormal(0)<<'\t'<<outnormal(1)<<'\t'<<outnormal(2)<<"]. \n";
   std::cout<<"     area is "<<face_area<<", and active area is "<<inf_active_area<<'\n';
