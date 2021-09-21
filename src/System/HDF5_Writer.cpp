@@ -417,6 +417,49 @@ void HDF5_Writer::write_Vector_3( const char * const &data_name, const Vector_3 
   }
 }
 
+void HDF5_Writer::write_Matrix_3x3( const hid_t &group_id, const char * const &data_name,
+    const Matrix_3x3 &value ) const
+{
+  // First convert Matrix_3x3 to a double array
+  const double val[9] = { value(0), value(1), value(2), value(3), value(4), value(5), value(6), value(7), value(8) };
+
+  hsize_t dims[1]; dims[0] = 9;
+  if(dims[0] > 0)
+  {
+    hid_t dataspace = H5Screate_simple(1, dims, NULL);
+    hid_t dataset   = H5Dcreate( group_id, data_name, H5T_NATIVE_DOUBLE,
+        dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+    herr_t status = H5Dwrite( dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
+        H5P_DEFAULT, &val[0] );
+
+    check_error(status, "write_doubleVector");
+
+    H5Dclose( dataset );
+    H5Sclose( dataspace );
+  }
+}
+
+void HDF5_Writer::write_Matrix_3x3( const char * const &data_name, const Matrix_3x3 &value ) const
+{
+  // First convert Matrix_3x3 to a double array
+  const double val[9] = { value(0), value(1), value(2), value(3), value(4), value(5), value(6), value(7), value(8) };
+
+  hsize_t dims[1]; dims[0] = 9;
+  if(dims[0] > 0)
+  {
+    hid_t dataspace = H5Screate_simple(1, dims, NULL);
+    hid_t dataset   = H5Dcreate( file_id, data_name, H5T_NATIVE_DOUBLE,
+        dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+    herr_t status = H5Dwrite( dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
+        H5P_DEFAULT, &val[0] );
+
+    check_error(status, "write_doubleVector");
+
+    H5Dclose( dataset );
+    H5Sclose( dataspace );
+  }
+}
+
 void HDF5_Writer::write_intMatrix( const hid_t &group_id,
     const char * const &data_name, const std::vector<int> &value,
     const int &row_num, const int &col_num ) const

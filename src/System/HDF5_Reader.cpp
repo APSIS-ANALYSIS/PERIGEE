@@ -217,6 +217,29 @@ Vector_3 HDF5_Reader::read_Vector_3( const char * const &group_name,
   return out;
 }
 
+Matrix_3x3 HDF5_Reader::read_Matrix_3x3( const char * const &group_name,
+    const char * const &data_name ) const
+{
+  hid_t drank;
+  hsize_t * ddims;
+  double * ddata;
+
+  read_doubleArray( group_name, data_name, drank, ddims, ddata );
+
+  if( drank != 1 || ddims[0] != 9 )
+  {
+    std::ostringstream oss;
+    oss<<"Error: HDF5_Reader::read_Matrix_3x3 read data at "<<group_name;
+    oss<<" with name "<<data_name<<" is not a 3x3 matrix! \n";
+    SYS_T::print_fatal( oss.str().c_str() );
+  }
+
+  Matrix_3x3 out( ddata[0], ddata[1], ddata[2], ddata[3], ddata[4], ddata[5], ddata[6], ddata[7], ddata[8] );
+
+  delete [] ddims; delete [] ddata; ddims = nullptr; ddata = nullptr;
+  return out;
+}
+
 std::vector<int> HDF5_Reader::read_intMatrix( const char * const &group_name,
     const char * const &data_name, int &num_row, int &num_col ) const
 {
