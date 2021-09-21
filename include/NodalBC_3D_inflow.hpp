@@ -40,7 +40,7 @@ class NodalBC_3D_inflow : public INodalBC
 
     virtual double get_para_1() const {return inf_active_area;}
 
-    virtual double get_para_2(const int &ii) const {return outnormal(ii);}
+    virtual Vector_3 get_para_2() const {return outnormal;}
 
     // Access to the number of outline boundary points.
     virtual int get_para_3() const {return num_out_bc_pts;}

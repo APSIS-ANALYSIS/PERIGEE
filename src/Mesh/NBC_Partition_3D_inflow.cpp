@@ -11,10 +11,7 @@ NBC_Partition_3D_inflow::NBC_Partition_3D_inflow(
   facearea = nbc -> get_para_6();
 
   // Outward normal vector
-  outvec.clear();
-  outvec.push_back( nbc->get_para_2(0) );
-  outvec.push_back( nbc->get_para_2(1) );
-  outvec.push_back( nbc->get_para_2(2) );
+  outvec = nbc->get_para_2();
 
   // Centroid and outline points
   num_out_bc_pts = nbc->get_para_3();
@@ -102,7 +99,7 @@ void NBC_Partition_3D_inflow::write_hdf5( const char * FileName ) const
 
   h5writer->write_intVector(group_id, "Num_LD", Num_LD);
 
-  h5writer->write_doubleVector( group_id, "Outward_normal_vector", outvec );
+  h5writer->write_Vector_3( group_id, "Outward_normal_vector", outvec );
 
   h5writer->write_doubleScalar( group_id, "Inflow_active_area", actarea );
   

@@ -33,7 +33,7 @@ class NBC_Partition_3D_inflow : public NBC_Partition_3D
     double actarea, facearea;
 
     // unit outward normal vector on this surface
-    std::vector<double> outvec;
+    Vector_3 outvec;
 
     // number of boundary points of this surface
     int num_out_bc_pts;

@@ -91,10 +91,10 @@ class INodalBC
     // get_para_2() passes additional parameters from the specific
     //              instantiations.
     // --------------------------------------------------------------
-    virtual double get_para_2(const int &ii) const
+    virtual Vector_3 get_para_2() const
     {
       SYS_T::print_fatal("Error: INodalBC::get_para_2 is not implemented.\n");
-      return 0.0;
+      return Vector_3();
     }
   
     // --------------------------------------------------------------
