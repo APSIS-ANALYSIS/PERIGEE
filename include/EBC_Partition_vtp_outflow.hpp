@@ -50,8 +50,8 @@ class EBC_Partition_vtp_outflow : public EBC_Partition_vtp
     // nodes in the vtp file
     std::vector< std::vector<int> > LID_all_face_nodes;
 
-    // unit normal vector to the faces, if the partition owns the bc.
-    // size is num_ebc x [ 0, if does not own, or 3, if nows ].
+    // unit normal vector to the cap surfaces, if the partition owns the bc.
+    // size is num_ebc x [ 0, if does not own, or 3, if owns ].
     std::vector< std::vector<double> > outvec; 
 };
 

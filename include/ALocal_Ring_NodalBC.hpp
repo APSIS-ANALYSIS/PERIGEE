@@ -8,8 +8,6 @@
 // Author: Ingrid S. Lan
 // Date Created: April 15 2021
 // ============================================================================
-#include "Vector_3.hpp"
-#include "Matrix_3x3.hpp"
 #include "HDF5_Reader.hpp"
 
 class ALocal_Ring_NodalBC

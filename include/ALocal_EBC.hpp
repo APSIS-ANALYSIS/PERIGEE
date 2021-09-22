@@ -8,7 +8,6 @@
 // Author: Ju Liu
 // Date: Jan. 16 2017
 // ============================================================================
-#include "Vector_3.hpp"
 #include "HDF5_Reader.hpp"
 
 class ALocal_EBC
