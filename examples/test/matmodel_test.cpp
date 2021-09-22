@@ -9,14 +9,6 @@ int main( int argc, char * argv[] )
   
   model -> print_info();
 
-  model -> write_hdf5("hello.h5");
-
-  delete model;
-  
-  IMaterialModel * model2 = new MaterialModel_Guccione_Incompressible_Mixed("hello.h5");
-
-  model2 -> print_info();
-
   Matrix_3x3 F, P, S;
   Tensor4_3D CC;
 
@@ -24,14 +16,20 @@ int main( int argc, char * argv[] )
   F.yx() = 0.0; F.yy() = 1.0; F.yz() = -0.05;
   F.zx() = 0.0; F.zy() = 0.1; F.zz() = 1.0;
 
-  model2 -> get_PK_Stiffness(F, P, S, CC);
+  model -> get_PK_Stiffness(F, P, S, CC);
 
   P.print_in_row();
   S.print_in_row();
   CC.print();
 
-  delete model2;
+  model -> get_PK( F, P, S );
 
+  P.print_in_row();
+  S.print_in_row();
+ 
+  std::cout<<model -> get_strain_energy( F )<<std::endl; 
+  
+  delete model;
   PetscFinalize();
   return EXIT_SUCCESS;
 }
