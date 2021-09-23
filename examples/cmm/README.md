@@ -112,7 +112,7 @@ mpirun -np 60 ./cmm_tet_3d \
 
 mpirun -np 60 ./wall_solver \
   -is_record_sol NO -is_backward_Euler YES -prestress_disp_tol 1.0e-6 \
-  -init_step 1.0e-2 -fina_time 2.433 \
+  -init_step 1.0e-2 -fina_time 1.0 \
   -nl_refreq 1 -nl_rtol 1.0e-6 -nl_atol 1.0e-6 -nl_dtol 1.0e8 -nl_maxits 20 \
   -ttan_freq 100 -sol_rec_freq 1 \
   -ksp_type gmres -pc_type asm -ksp_rtol 1.0e-2 -ksp_atol 1.0e-50 -ksp_max_it 200 -ksp_gmres_restart 200 \
@@ -129,7 +129,7 @@ mpirun -np 60 ./wall_solver \
 mpirun -np 60 ./cmm_tet_3d \
    -nz_estimate 1000 -fl_density 1.00 -fl_mu 4.0e-2 -wall_density 1.0 -wall_poisson 0.5 \
    -nqp_tet 5 -nqp_tri 4 \
-   -init_step 4.055e-4 -fina_time 2.433 \
+   -fina_time 2.433 \
    -lpn_file lpn_rcr_input.txt \
    -nl_refreq 1 -nl_rtol 1.0e-6 -nl_atol 1.0e-6 -nl_dtol 1.0e8 -nl_maxits 20 \
    -ttan_freq 100 -sol_rec_freq 40 \
