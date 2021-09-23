@@ -13,12 +13,17 @@ int main( int argc, char * argv[] )
 
   for(auto &out : a) out = "hello\n";
 
-  //for(auto out : a) std::cout<<out;
+  for(auto out : a) std::cout<<out;
 
-  bool flg = false;
+  
+  SYS_T::execute("rm -rf part_cmmbc_0");
+  //SYS_T::execute("mkdir part_cmmbc_0");
 
-  int aa = ( flg ? 1 : 0);
-  std::cout<<aa<<'\n';
+  std::string st( "part_cmmbc_0" );
+
+  st.append("/");
+
+  std::cout<<st<<std::endl;
 
   return EXIT_SUCCESS;
 }
