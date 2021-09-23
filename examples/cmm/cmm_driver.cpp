@@ -78,7 +78,7 @@ int main( int argc, char *argv[] )
   bool is_backward_Euler = false;
 
   // Partition filename prefix
-  std::string part_file("part");
+  std::string part_file("./apart/part");
 
   // Nonlinear solver parameters
   double nl_rtol = 1.0e-3;           // convergence criterion relative tolerance
