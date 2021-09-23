@@ -35,13 +35,14 @@
 int main( int argc, char * argv[] )
 {
   // Clean the potentially pre-existing hdf5 files in the job folder
-  SYS_T::execute("rm -rf part_p*.h5");
   SYS_T::execute("rm -rf preprocessor_cmd.h5");
+  SYS_T::execute("rm -rf apart"); 
+  SYS_T::execute("mkdir apart"); 
 
   // Define basic problem settins
   const int dofNum = 4; // degree-of-freedom for the physical problem
   const int dofMat = 4; // degree-of-freedom in the matrix problem
-  const std::string part_file("part");
+  const std::string part_file("./apart/part");
   
   // Element options: 501 linear tets, 502 quadratic tets
   int elemType = 501;
