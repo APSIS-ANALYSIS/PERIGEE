@@ -19,9 +19,6 @@
 
 int main( int argc, char *argv[] )
 {
-  // Clean potentially pre-existing hdf5 files of prestress
-  SYS_T::execute("rm -rf prestress_p*.h5");
-
   // Prestress solver parameters
   // Generalized-alpha rho_inf
   double genA_rho_inf = 0.0;
@@ -71,11 +68,9 @@ int main( int argc, char *argv[] )
 
   const int cmmBC_type  = pcmd_h5r -> read_intScalar("/", "cmmBC_type");
   const int ringBC_type = pcmd_h5r -> read_intScalar("/", "ringBC_type");
+  const std::string part_file = pcmd_h5r -> read_string( "/", "part_file" ); 
 
   delete pcmd_h5r; H5Fclose(prepcmd_file);
-
-  // Partition filename prefix
-  std::string part_file("part");
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
   
@@ -84,9 +79,16 @@ int main( int argc, char *argv[] )
   const PetscMPIInt rank = SYS_T::get_MPI_rank();
   const PetscMPIInt size = SYS_T::get_MPI_size();
   
+  // Clean potentially pre-existing hdf5 files of prestress saved in the folder
+  // named as prestress
+  if(rank == 0 )
+  {
+    SYS_T::execute("rm -rf prestress");
+    SYS_T::execute("mkdir prestress");
+  }
+
   // ===== Read Command Line Arguments =====
   SYS_T::GetOptionReal(  "-prestress_disp_tol",  prestress_disp_tol);
-  SYS_T::GetOptionString("-part_file",           part_file);
   SYS_T::GetOptionReal(  "-rho_inf",             genA_rho_inf);
   SYS_T::GetOptionReal(  "-nl_rtol",             nl_rtol);
   SYS_T::GetOptionReal(  "-nl_atol",             nl_atol);
@@ -106,7 +108,7 @@ int main( int argc, char *argv[] )
   // ===== Print Command Line Arguments =====
   SYS_T::cmdPrint(      "cmmBC_type:",       cmmBC_type);
   SYS_T::cmdPrint(      "ringBC_type:",      ringBC_type);
-  SYS_T::cmdPrint(       "-part_file:",          part_file);
+  SYS_T::cmdPrint(      "part_file:",          part_file);
   SYS_T::cmdPrint(       "-prestress_disp_tol:", prestress_disp_tol);
   SYS_T::cmdPrint(       "-nl_rtol:",            nl_rtol);
   SYS_T::cmdPrint(       "-nl_atol:",            nl_atol);
@@ -114,18 +116,18 @@ int main( int argc, char *argv[] )
   SYS_T::cmdPrint(       "-nl_maxits:",          nl_maxits);
   SYS_T::cmdPrint(       "-nl_refreq:",          nl_refreq);
   SYS_T::cmdPrint(       "-nl_threshold:",       nl_threshold);
-  
+
   if( is_backward_Euler )
     SYS_T::commPrint(    "-is_backward_Euler: true \n");
   else
     SYS_T::cmdPrint(     "-rho_inf:",            genA_rho_inf);
-  
+
   SYS_T::cmdPrint(       "-init_time:",          initial_time);
   SYS_T::cmdPrint(       "-init_step:",          initial_step);
   SYS_T::cmdPrint(       "-init_index:",         initial_index);
   SYS_T::cmdPrint(       "-fina_time:",          final_time);
   SYS_T::cmdPrint(       "-ttan_freq:",          ttan_renew_freq);
-  
+
   if( is_record_sol )
     SYS_T::cmdPrint(     "-sol_rec_freq:",       sol_record_freq);
   else
@@ -142,7 +144,7 @@ int main( int argc, char *argv[] )
   SYS_T::commPrint("===> Build quadrature rules. \n");
   IQuadPts * quads = new QuadPts_Gauss_Triangle( nqp_tri );
 
-   // Global mesh info
+  // Global mesh info
   IAGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info_FEM_3D(part_file, rank);
 
   // Local sub-domain's element indices

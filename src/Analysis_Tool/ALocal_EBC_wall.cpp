@@ -2,9 +2,9 @@
 
 ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
     const int &in_cpu_rank, const int &in_face_nqp, 
-    const std::string &gname )
+    const std::string &gname, const std::string &input_ps_filebasename )
 : ALocal_EBC( fileBaseName, in_cpu_rank, gname ), cpu_rank (in_cpu_rank),
-  face_nqp( in_face_nqp ), ps_fileBaseName("prestress")
+  face_nqp( in_face_nqp ), ps_fileBaseName( input_ps_filebasename )
 {
   SYS_T::print_fatal_if(gname != "ebc_wall", 
       "Error: ALocal_EBC_wall data should be read from group ebc_wall.\n" );
