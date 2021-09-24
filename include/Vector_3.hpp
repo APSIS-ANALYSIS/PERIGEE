@@ -67,12 +67,6 @@ class Vector_3
     const double& z() const {return vec[2];}
     double& z() {return vec[2];}
 
-    void set_x( const double &input ) {vec[0] = input;}
-    
-    void set_y( const double &input ) {vec[1] = input;}
-    
-    void set_z( const double &input ) {vec[2] = input;}
-
     void print() const;
 
     void gen_zero();
