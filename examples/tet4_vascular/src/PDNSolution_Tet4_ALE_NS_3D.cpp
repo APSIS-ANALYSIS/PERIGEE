@@ -129,11 +129,9 @@ void PDNSolution_Tet4_ALE_NS_3D::Init_flow_parabolic(
         location[5] = location[0] + 5;
         location[6] = location[0] + 6;
 
-        const double x = fNode_ptr->get_ctrlPts_x(ii);
-        const double y = fNode_ptr->get_ctrlPts_y(ii);
-        const double z = fNode_ptr->get_ctrlPts_z(ii);
+        const Vector_3 pt = fNode_ptr -> get_ctrlPts_xyz(ii);
+        const double r =  infbc -> get_radius( pt );
 
-        const double r = infbc->get_radius(x,y,z);
         const double vel = vmax * (1.0 - r*r);
 
         // -1.0 is multiplied to make the flow direction inward

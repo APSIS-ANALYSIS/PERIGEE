@@ -162,7 +162,6 @@ void PDNSolution_Tet4_NS_3D::Init_flow_parabolic(
   int location[4];
   double value[4] = {0.0, 0.0, 0.0, 0.0};
   int nlocalnode = pNode_ptr->get_nlocalnode();
-  double x, y, z, r, vel;
 
   // Maximum speed is 2.0 x flow rate / surface area
   const double vmax = 2.0 * vol_rate_Q / infbc->get_fularea();
@@ -183,9 +182,8 @@ void PDNSolution_Tet4_NS_3D::Init_flow_parabolic(
         location[2] = location[0] + 2;
         location[3] = location[0] + 3;
 
-        x = fNode_ptr->get_ctrlPts_x(ii);
-        y = fNode_ptr->get_ctrlPts_y(ii);
-        z = fNode_ptr->get_ctrlPts_z(ii);
+        const Vector_3 pt = fNode_ptr -> get_ctrlPts_xyz(ii);
+        const double r =  infbc -> get_radius( pt );
 
         // Set zero pressure 
         value[0] = 0.0;
@@ -193,8 +191,7 @@ void PDNSolution_Tet4_NS_3D::Init_flow_parabolic(
         // The infbc class does not contain the boundary points.
         // So we do not need to worry about setting them as zero. They
         // are not touched by this function.
-        r = infbc->get_radius(x,y,z);
-        vel = vmax * (1.0 - r*r);
+        const double vel = vmax * (1.0 - r*r);
 
         // time -1 because out_nx points in the outward direction
         value[1] = vel * (-1.0) * out_nx;

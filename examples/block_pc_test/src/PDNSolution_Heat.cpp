@@ -94,11 +94,9 @@ void PDNSolution_Heat::Init_flow_parabolic(
       {
         location[0] = pNode_ptr->get_node_loc(ii) * 1;
 
-        const double x = fNode_ptr->get_ctrlPts_x(ii);
-        const double y = fNode_ptr->get_ctrlPts_y(ii);
-        const double z = fNode_ptr->get_ctrlPts_z(ii);
+        const Vector_3 pt = fNode_ptr -> get_ctrlPts_xyz(ii);
+        const double r =  infbc -> get_radius( pt );
 
-        const double r = infbc->get_radius(x,y,z);
         const double vmax = 1.0;
         const double vel = vmax * (1.0 - r*r);
 

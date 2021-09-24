@@ -60,9 +60,6 @@ class ALocal_Inflow_NodalBC
     //             If this partition does not contain any inflow bc
     //             nodes, this function will throw an error.
     // ------------------------------------------------------------------------
-    virtual double get_radius( const double &x, const double &y, 
-        const double &z ) const;
-
     virtual double get_radius( const Vector_3 &pt ) const;
 
     // ------------------------------------------------------------------------
