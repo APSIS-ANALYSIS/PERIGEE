@@ -30,9 +30,7 @@ class ALocal_EBC_outflow : public ALocal_EBC
     virtual std::vector<int> get_LID(const int &ii) const {return LID[ii];}
 
     virtual Vector_3 get_outvec( const int &ii ) const
-    {
-      return Vector_3( outvec[ii][0], outvec[ii][1], outvec[ii][2] );
-    }
+    { return Vector_3( outvec[ii][0], outvec[ii][1], outvec[ii][2] ); }
 
   protected:
     // Length num_ebc.
