@@ -39,6 +39,9 @@ class FEANode
     // ! Functions that give access to the coordinates (and weights).
     //   Input: index ranges in [ 0 , nlocghonode )
     // ------------------------------------------------------------------------
+    virtual Vector_3 get_ctrlPts_xyz(const int &index) const
+    { return Vector_3( ctrlPts_x[index], ctrlPts_y[index], ctrlPts_z[index] ); }
+    
     virtual double get_ctrlPts_x(const int &index) const {return ctrlPts_x[index];}
     
     virtual double get_ctrlPts_y(const int &index) const {return ctrlPts_y[index];}
