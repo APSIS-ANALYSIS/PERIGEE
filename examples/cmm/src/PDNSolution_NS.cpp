@@ -111,10 +111,10 @@ void PDNSolution_NS::Init_flow_parabolic(
   // based on the CVFlowRate class.
   const double vmax = 2.0 / infbc->get_fularea();
 
-  const double out_nx = infbc->get_outvec(0);
-  const double out_ny = infbc->get_outvec(1);
-  const double out_nz = infbc->get_outvec(2);
-
+  const double out_nx = infbc->get_outvec().x();
+  const double out_ny = infbc->get_outvec().y();
+  const double out_nz = infbc->get_outvec().z();
+ 
   // If there are inflow nodes, set their value to be parabolic flow
   if( infbc->get_Num_LD() > 0)
   {

@@ -34,6 +34,7 @@ class ALocal_Inflow_NodalBC
     // ii=0 : x-component; ii=1 : y-component; ii=2 : z-component
     // ------------------------------------------------------------------------
     virtual double get_outvec( const int &ii ) const {return outnormal( ii );}
+    virtual Vector_3 get_outvec() const {return outnormal;}
 
     // ------------------------------------------------------------------------
     // get the active area of the surface
