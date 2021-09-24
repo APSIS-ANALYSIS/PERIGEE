@@ -129,9 +129,9 @@ void PDNSolution_Mixed_UPV_3D::Init_flow_parabolic(
 
   const double vmax = 2.0 / infbc->get_fularea();
 
-  const double out_nx = infbc->get_outvec(0);
-  const double out_ny = infbc->get_outvec(1);
-  const double out_nz = infbc->get_outvec(2);
+  const double out_nx = infbc->get_outvec().x();
+  const double out_ny = infbc->get_outvec().y();
+  const double out_nz = infbc->get_outvec().z();
 
   // If this sub-domain contains inflow nodes, set their values based on the
   // parabolic flow profile
