@@ -98,9 +98,9 @@ void PDNSolution_Tet4_NS_3D::Init_inflow_parabolic_2cm(
   const double pi = MATH_T::PI;
   const double vmax = 2.0 * vol_rate_Q / (pi * 4.0);
 
-  const double out_nx = infbc->get_outvec(0);
-  const double out_ny = infbc->get_outvec(1);
-  const double out_nz = infbc->get_outvec(2);
+  const double out_nx = infbc->get_outvec().x();
+  const double out_ny = infbc->get_outvec().y();
+  const double out_nz = infbc->get_outvec().z();
 
   for(int ii=0; ii<nlocalnode; ++ii)
   {
@@ -167,9 +167,9 @@ void PDNSolution_Tet4_NS_3D::Init_flow_parabolic(
   const double vmax = 2.0 * vol_rate_Q / infbc->get_fularea();
 
   // Get the outward normal vector
-  const double out_nx = infbc->get_outvec(0);
-  const double out_ny = infbc->get_outvec(1);
-  const double out_nz = infbc->get_outvec(2);
+  const double out_nx = infbc->get_outvec().x();
+  const double out_ny = infbc->get_outvec().y();
+  const double out_nz = infbc->get_outvec().z();
 
   if( infbc->get_Num_LD() > 0 )
   {
@@ -237,9 +237,9 @@ void PDNSolution_Tet4_NS_3D::Init_flow_plug(
   const double pi = MATH_T::PI;
   const double vel = vol_rate_Q / (pi * 1.95 * 1.95);
 
-  const double out_nx = infbc->get_outvec(0);
-  const double out_ny = infbc->get_outvec(1);
-  const double out_nz = infbc->get_outvec(2);
+  const double out_nx = infbc->get_outvec().x();
+  const double out_ny = infbc->get_outvec().y();
+  const double out_nz = infbc->get_outvec().z();
 
   for(int ii=0; ii<nlocalnode; ++ii)
   {
@@ -298,9 +298,9 @@ void PDNSolution_Tet4_NS_3D::Init_inflow_parabolic_z_0d6cm(
   const double rd = 0.6;
   const double vmax = 2.0 * vol_rate_Q / (pi * rd*rd);
 
-  const double out_nx = infbc->get_outvec(0);
-  const double out_ny = infbc->get_outvec(1);
-  const double out_nz = infbc->get_outvec(2);
+  const double out_nx = infbc->get_outvec().x();
+  const double out_ny = infbc->get_outvec().y();
+  const double out_nz = infbc->get_outvec().z();
 
   for(int ii=0; ii<nlocalnode; ++ii)
   {

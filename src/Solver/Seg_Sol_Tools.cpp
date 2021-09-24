@@ -429,9 +429,9 @@ void SEG_SOL_T::Insert_plug_inflow_UPV(const double &val,
 
   const int numnode = infnbc -> get_Num_LD();
 
-  const double dir_x = infnbc -> get_outvec(0);
-  const double dir_y = infnbc -> get_outvec(1);
-  const double dir_z = infnbc -> get_outvec(2);
+  const double dir_x = infnbc -> get_outvec().x();
+  const double dir_y = infnbc -> get_outvec().y();
+  const double dir_z = infnbc -> get_outvec().z();
 
   for(int ii=0; ii<numnode; ++ii)
   {
