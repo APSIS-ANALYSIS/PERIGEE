@@ -166,6 +166,11 @@ void Matrix_3x3::AXPY( const double &val, const Matrix_3x3 &source )
   for(int ii=0; ii<9; ++ii) mat[ii] = mat[ii] + val * source(ii);
 }
 
+void Matrix_3x3::AXPI( const double &val )
+{
+  mat[0] += val; mat[4] += val; mat[8] += val;
+}
+
 void Matrix_3x3::PY( const Matrix_3x3 &source )
 {
   for(int ii=0; ii<9; ++ii) mat[ii] += source(ii);
