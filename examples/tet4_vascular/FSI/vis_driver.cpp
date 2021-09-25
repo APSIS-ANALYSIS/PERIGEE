@@ -29,12 +29,11 @@ int main( int argc, char * argv[] )
   bool isXML = true;
   bool isClean = true;
 
-  PetscMPIInt rank, size;
-
   // ===== PETSc Initialization =====
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-  MPI_Comm_size(PETSC_COMM_WORLD, &size);
-  MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
+  
+  const PetscMPIInt rank = SYS_T::get_MPI_rank();
+  const PetscMPIInt size = SYS_T::get_MPI_size();
 
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
   SYS_T::GetOptionInt("-time_start", time_start);

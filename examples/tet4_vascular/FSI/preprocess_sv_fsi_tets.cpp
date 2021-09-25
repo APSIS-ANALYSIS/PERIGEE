@@ -33,7 +33,6 @@ int main( int argc, char * argv[] )
   // Remove previously existing hdf5 files
   SYS_T::execute("rm -rf part_p*.h5");
   SYS_T::execute("rm -rf preprocessor_cmd.h5");
-  SYS_T::execute("rm -rf NumLocalNode.h5");
 
   // Define basic settings
   const int dofNum = 7; // degree-of-freedom for the physical problem

@@ -1,5 +1,5 @@
 // ==================================================================
-// vis_ns.cpp
+// vis_cmm.cpp
 //
 // Visualization driver for the NS equation solver.
 // 
