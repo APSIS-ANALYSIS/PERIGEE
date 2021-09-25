@@ -93,6 +93,8 @@ class Vector_3
 
     double dot_product( const Vector_3 &source ) const;
 
+    friend double dist( const Vector_3 &a, const Vector_3 &b );
+
     friend double dot_product( const Vector_3 &a, const Vector_3 &b );
 
     friend Vector_3 cross_product( const Vector_3 &a, const Vector_3 &b );

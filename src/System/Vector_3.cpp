@@ -150,6 +150,14 @@ double Vector_3::dot_product( const Vector_3 &source ) const
   return vec[0]*source(0) + vec[1]*source(1) + vec[2]*source(2);
 }
 
+double dist( const Vector_3 &a, const Vector_3 &b )
+{
+  const double dist_x = a.x() - b.x();
+  const double dist_y = a.y() - b.y();
+  const double dist_z = a.z() - b.z();
+  return sqrt( dist_x*dist_x + dist_y*dist_y + dist_z*dist_z );
+}
+
 double dot_product( const Vector_3 &a, const Vector_3 &b )
 {
   return a(0)*b(0) + a(1)*b(1) + a(2)*b(2);
