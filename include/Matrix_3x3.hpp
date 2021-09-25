@@ -164,9 +164,14 @@ class Matrix_3x3
     
     void VecMult( const Vector_3 &x, Vector_3 &y ) const;
 
+    Vector_3 VecMult( const Vector_3 &x ) const;
+
     // y = Ax, wherein x = [x0; x1; x2]
     void VecMult( const double &x0, const double &x1, const double &x2,
        double * const &y ) const;
+
+    void VecMult( const double &x0, const double &x1, const double &x2,
+       double &y0, double &y1, double &y2 ) const;
 
     // y = x^T A,  in indices: y_i = x_I A_Ii
     void VecMultT( const Vector_3 &x, Vector_3 &y ) const;
