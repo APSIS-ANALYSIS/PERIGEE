@@ -13,23 +13,24 @@ int main( int argc, char * argv[] )
 
   for(auto &out : a) out = "hello\n";
 
-  for(auto out : a) std::cout<<out;
+  //for(auto out : a) std::cout<<out;
 
-  
-  SYS_T::execute("rm -rf part_cmmbc_0");
-  //SYS_T::execute("mkdir part_cmmbc_0");
 
-  std::string st( "part_cmmbc_0" );
+  Vector_3 va, vb, vc;
+  Matrix_3x3 A;
+  A.gen_rand();
 
-  st.append("/");
+  va.gen_rand();
 
-  std::cout<<st<<std::endl;
+  vb = A.VecMultT(va);
 
-  Vector_3 va(1.0, 2.0, 0.0);
-  Vector_3 vb(0.0, 1.0, 0.0);
+  A.VecMultT(va(0), va(1), va(2), vc(0), vc(1), vc(2) );
 
-  std::cout<<dist(va,vb)<<std::endl;
+  A.print();
 
+  va.print();
+
+  std::cout<<dist(vb, vc)<<std::endl;
   return EXIT_SUCCESS;
 }
 

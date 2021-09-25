@@ -210,13 +210,6 @@ void Matrix_3x3::VecMult( const Vector_3 &x, Vector_3 &y ) const
   y(2) = mat[6] * x(0) + mat[7] * x(1) + mat[8] * x(2);
 }
 
-Vector_3 Matrix_3x3::VecMult( const Vector_3 &x ) const
-{
-  return Vector_3( mat[0] * x(0) + mat[1] * x(1) + mat[2] * x(2), 
-      mat[3] * x(0) + mat[4] * x(1) + mat[5] * x(2),
-      mat[6] * x(0) + mat[7] * x(1) + mat[8] * x(2) );
-}
-
 void Matrix_3x3::VecMult( const double &x0, const double &x1, const double &x2, 
     double * const &y ) const
 {
