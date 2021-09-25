@@ -22,9 +22,9 @@ int main( int argc, char * argv[] )
 
   va.gen_rand();
 
-  vb = A.VecMultT(va);
+  vb = A * va;
 
-  A.VecMultT(va(0), va(1), va(2), vc(0), vc(1), vc(2) );
+  A.VecMult(va(0), va(1), va(2), vc(0), vc(1), vc(2) );
 
   A.print();
 

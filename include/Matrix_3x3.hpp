@@ -252,4 +252,6 @@ class Matrix_3x3
     double J3() const;
 };
 
+Vector_3 operator*( const Matrix_3x3 &left, const Vector_3 &right );
+
 #endif

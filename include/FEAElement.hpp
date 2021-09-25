@@ -15,11 +15,11 @@
 // Author: Ju Liu
 // Date created: Nov. 6 2013
 // ==================================================================
+#include <cassert>
 #include "ALocal_IEN.hpp"
 #include "IALocal_IEN.hpp"
 #include "IALocal_meshSize.hpp"
 #include "FEANode.hpp"
-#include "IAExtractor.hpp"
 #include "BernsteinBasis_Array.hpp"
 #include "IBernsteinBasis.hpp"
 #include "Matrix_3x3.hpp"
@@ -115,18 +115,6 @@ class FEAElement
     // --------------------------------------------------------------    
     // Build Basis function quadrature info
     // --------------------------------------------------------------    
-    virtual void buildBasis(
-        const int &ssdp1, const int &ttdp1, const int &uudp1,
-        const int &num_qs, const int &num_qt, const int &num_qu,
-        const IALocal_meshSize * const &mSize,
-        const BernsteinBasis_Array * const &bs,
-        const BernsteinBasis_Array * const &bt,
-        const BernsteinBasis_Array * const &bu,
-        const FEANode * const &feaNode,
-        const IAExtractor * const &extractor,
-        const ALocal_IEN * const &locIEN )
-    {SYS_T::commPrint("Warning: this buildBasis is not implemented. \n");}
-
     // Build basis function values at quadrature points for 3D elements
     // \para bs/t/u : Bernstein polynomial value at quadrature points
     // \para ctrl_x/y/z/w : control points and weights
@@ -173,28 +161,6 @@ class FEAElement
         const double * const &ext_x,
         const double * const &ext_y )
     {SYS_T::commPrint("Warning: this buildBasis is not implemented. \n");}
-
-
-    virtual void buildBasis(
-        const int &ssdp1, const int &ttdp1,
-        const int &num_qs, const int &num_qt,
-        const IALocal_meshSize * const &mSize,
-        const BernsteinBasis_Array * const &bs,
-        const BernsteinBasis_Array * const &bt,
-        const FEANode * const &feaNode,
-        const IAExtractor * const &extractor,
-        const ALocal_IEN * const &locIEN )
-    {SYS_T::commPrint("Warning: this buildBasis is not implemented. \n");}
-
-
-    virtual void buildBasis(const IBernsteinBasis * const &bbasis,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z,
-        const double * const &ctrl_w,
-        const IAExtractor * const &ext_full )
-    {SYS_T::commPrint("Warning: buildBasis(bbasis, ctrl_x/y/z/w, ext_full) is not implemented.\n");}
-
 
     // Build 3D basis -- 3D B-spine case
     virtual void buildBasis( const double &hx, const double &hy, const double &hz,

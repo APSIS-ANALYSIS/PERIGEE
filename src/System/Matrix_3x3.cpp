@@ -564,4 +564,11 @@ int Matrix_3x3::eigen_decomp( double &eta1, double &eta2, double &eta3,
   }
 }
 
+Vector_3 operator*(const Matrix_3x3 &left, const Vector_3 &right)
+{
+  return Vector_3( left.xx() * right.x() + left.xy() * right.y() + left.xz() * right.z(), 
+      left.yx() * right.x() + left.yy() * right.y() + left.yz() * right.z(),
+      left.zx() * right.x() + left.zy() * right.y() + left.zz() * right.z() );
+}
+
 // EOF
