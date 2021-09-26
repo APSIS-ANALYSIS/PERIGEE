@@ -41,6 +41,12 @@ int main( int argc, char * argv[] )
 
   v3.print();
 
+  int nsize = 4;
+
+  std::vector<double> b (nsize, -100.1);
+
+  VEC_T::print(b);
+
   return EXIT_SUCCESS;
 }
 

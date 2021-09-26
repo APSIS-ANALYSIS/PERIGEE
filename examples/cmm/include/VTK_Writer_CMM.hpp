@@ -9,7 +9,6 @@
 // Author: Ju Liu
 // Date Created: Feb. 12 2020
 // ==================================================================
-#include "IAGlobal_Mesh_Info.hpp"
 #include "ALocal_Elem.hpp"
 #include "IVisDataPrep.hpp"
 #include "Interpolater.hpp"
@@ -43,11 +42,7 @@ class VTK_Writer_CMM
   private:
     const int nLocBas, nElem;
 
-    Interpolater intep;
-
     std::vector<int> epart_map;
-
-    std::vector<double> ectrl_x, ectrl_y, ectrl_z;
 };
 
 #endif
