@@ -111,7 +111,7 @@ int main( int argc, char * argv[] )
         time, name_to_read.c_str(), name_to_write.c_str() );
 
     visprep->get_pointArray(name_to_read, anode_mapping_file, pnode_mapping_file,
-        pNode, GMIptr, dof, pointArrays);
+        pNode, GMIptr->get_nFunc(), dof, pointArrays);
 
     vtk_w->writeOutput( fNode, locIEN, locElem,
         visprep, element, quad, pointArrays, rank, size, 

@@ -152,7 +152,7 @@ int main( int argc, char * argv[] )
         time, name_to_read.c_str(), name_to_write.c_str() );
 
     visprep->get_pointArray(name_to_read, anode_mapping_file, pnode_mapping_file,
-        pNode, GMIptr, dof, pointArrays);
+        pNode, GMIptr->get_nFunc(), dof, pointArrays);
 
     if( isRef )
       vtk_w->writeOutput_solid_ref( fNode, locIEN, fIEN, locElem,

@@ -19,22 +19,20 @@ VisDataPrep_Mixed_FSI_3D::VisDataPrep_Mixed_FSI_3D()
   pt_array_len.push_back(3);
 }
 
-
 VisDataPrep_Mixed_FSI_3D::~VisDataPrep_Mixed_FSI_3D()
 {}
-
 
 void VisDataPrep_Mixed_FSI_3D::get_pointArray(
     const std::string solution_file_name,
     const std::string analysis_node_mapping_file,
     const std::string post_node_mapping_file,
     const APart_Node * const &nNode_ptr,
-    const IAGlobal_Mesh_Info * const &gInfo_ptr,
+    const int &input_nfunc,
     const int &input_dof,
     double ** &pointArrays ) const
 {
   PostVectSolution pvsolu(solution_file_name, analysis_node_mapping_file,
-      post_node_mapping_file, nNode_ptr, gInfo_ptr, input_dof);
+      post_node_mapping_file, nNode_ptr, input_nfunc, input_dof);
 
   const int ntotal = nNode_ptr->get_nlocghonode();
   for(int ii=0; ii<ntotal; ++ii)

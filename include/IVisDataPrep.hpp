@@ -47,15 +47,15 @@ class IVisDataPrep
     // \para post_node_mapping_file: the old_2_new & new_2_old mapping
     //                            from the preprocess of postprocessor;
     // \para APart_Node: the node partition info;
-    // \para IAGlobal_Mesh_Info: the global mesh info pointer;
-    // \para input_dof: degree of freedom of this problem;
+    // \para input_nfunc: number of basis functions;
+    // \para input_dof: degree of freedom of this problem.
     // -------------------------------------------------------------------
     virtual void get_pointArray(
         const std::string solution_file_name,
         const std::string analysis_node_mapping_file,
         const std::string post_node_mapping_file,
         const APart_Node * const &nNode_ptr,
-        const IAGlobal_Mesh_Info * const &gInfo_ptr,
+        const int &input_nfunc,
         const int &input_dof,
         double ** &pointArrays ) const
     {

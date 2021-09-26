@@ -4,13 +4,12 @@ PostVectSolution::PostVectSolution( const std::string &solution_file_name,
     const std::string &analysis_node_mapping_file,
     const std::string &post_node_mapping_file,
     const APart_Node * const &aNode_ptr,
-    const int &in_nfunc, const int &input_dof )
+    const int &nFunc, const int &input_dof )
 : dof_per_node( input_dof ), 
   loc_sol_size( aNode_ptr->get_nlocghonode() * dof_per_node )
 {
   loc_solution = new double [loc_sol_size];
 
-  int nFunc = in_nfunc;
   int whole_vec_size = nFunc * dof_per_node;
   double * vec_temp = new double [whole_vec_size];
 
