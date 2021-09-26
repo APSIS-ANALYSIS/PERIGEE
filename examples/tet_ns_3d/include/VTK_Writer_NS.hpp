@@ -43,11 +43,7 @@ class VTK_Writer_NS
   private:
     const int nLocBas, nElem;
 
-    Interpolater intep;
-
     std::vector<int> epart_map;
-
-    std::vector<double> ectrl_x, ectrl_y, ectrl_z;
 };
 
 #endif
