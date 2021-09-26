@@ -100,6 +100,7 @@ class FEANode
     virtual double get_memory_usage() const;
 
   private:
+    // The control points' coordinates and weights if used for NURBS
     std::vector<double> ctrlPts_x, ctrlPts_y, ctrlPts_z, ctrlPts_w;
 };
 

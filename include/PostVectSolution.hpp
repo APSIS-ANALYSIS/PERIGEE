@@ -21,7 +21,6 @@
 // Date: Dec 10 2013
 // ============================================================================
 #include "APart_Node.hpp"
-#include "IAGlobal_Mesh_Info.hpp"
 #include "petscvec.h"
 
 class PostVectSolution
@@ -57,7 +56,7 @@ class PostVectSolution
     void print_info() const;
 
     // ------------------------------------------------------------------------
-    // get_xxx functions that give read permission to private data
+    // get functions that give read permission to private data
     // ------------------------------------------------------------------------
     double get_locsol(const int &pos) const {return loc_solution[pos];}
     
@@ -79,6 +78,9 @@ class PostVectSolution
   private:
     const int dof_per_node; // dof of the solution vector
     const int loc_sol_size; // nlocghonode x dof
+    
+    // loc_solution is the data structure that holds the solution vector of the
+    // local postprocessing partition.
     double * loc_solution;
     
     // ------------------------------------------------------------------------
@@ -93,10 +95,9 @@ class PostVectSolution
         const int &vec_size, double * const &veccopy );
 
     // ------------------------------------------------------------------------
-    // ! ReadNodeMapping: reads the old_2_new or new_2_old array into 
-    //                    the nodemap array. The users are responsible for
-    //                    allocating nFunc length for nodemap and deleting
-    //                    it after use.
+    // ReadNodeMapping: reads the old_2_new or new_2_old array into the nodemap 
+    //                  array. The users are responsible for allocating nFunc 
+    //                  length for nodemap and deleting it after use.
     // \para node_mapping_file: the file that stores the mapping arrays
     // \para mapping_type: data_name in the file: new_2_old / old_2_new
     // \para node_size: the allocated length for nodemap

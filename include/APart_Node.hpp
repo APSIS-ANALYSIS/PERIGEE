@@ -129,7 +129,7 @@ class APart_Node
     int nlocalnode, nghostnode, nbadnode, nlocghonode, ntotalnode, dof;
     
     // ------------------------------------------------------------------------
-    // local_to_global = node_loc appended by node_ghost
+    // local_to_global = [ node_loc ] appended by [ node_ghost ].
     // The three vectors have lengths nlocghonode, nlocalnode, nghostnode, resp.
     // ------------------------------------------------------------------------
     std::vector<int> local_to_global, node_ghost, node_loc;
