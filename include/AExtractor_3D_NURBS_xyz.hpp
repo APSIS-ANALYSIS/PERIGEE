@@ -12,7 +12,6 @@
 #include <iostream>
 #include <vector>
 #include "IAExtractor.hpp"
-#include "HDF5_PartReader.hpp"
 
 class AExtractor_3D_NURBS_xyz : public IAExtractor
 {

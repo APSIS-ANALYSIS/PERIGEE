@@ -17,20 +17,30 @@ int main( int argc, char * argv[] )
 
 
   Vector_3 va, vb, vc;
-  Matrix_3x3 A;
-  A.gen_rand();
+  Matrix_3x3 A(
+      1.0, 5.2, -0.33,
+      5.2, 2.0, 3.0,
+     -0.33, 3.0, -1.0);
 
   va.gen_rand();
 
   vb = A * va;
 
-  A.VecMult(va(0), va(1), va(2), vc(0), vc(1), vc(2) );
+  //A.print();
 
-  A.print();
+  double eta1, eta2, eta3;
+  Vector_3 v1, v2, v3;
 
-  va.print();
+  std::cout<<A.eigen_decomp( eta1, eta2, eta3, v1, v2, v3 )<<std::endl;
 
-  std::cout<<dist(vb, vc)<<std::endl;
+  std::cout<<std::setprecision(16)<<eta1<<'\t'<<eta2<<'\t'<<eta3<<'\n';
+
+  std::cout<<std::setprecision(16)<<v1(0)<<'\t'<<v1(1)<<'\t'<<v1(2)<<'\n';
+
+  v2.print();
+
+  v3.print();
+
   return EXIT_SUCCESS;
 }
 

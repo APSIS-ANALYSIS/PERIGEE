@@ -20,8 +20,6 @@
 #include "IPLocAssem.hpp"
 #include "FEANode.hpp"
 #include "PDNSolution.hpp"
-#include "ALocal_meshSize_3D_NURBS.hpp"
-#include "AExtractor_3D_NURBS_xyz.hpp"
 #include "ALocal_NodalBC.hpp"
 #include "ALocal_Inflow_NodalBC.hpp"
 #include "ALocal_Ring_NodalBC.hpp"
@@ -200,23 +198,6 @@ class IPGAssem
     //                         vector for 3D problems WITHOUT pre-existing 
     //                         cached quadrature info.
     // ------------------------------------------------------------------------
-    virtual void Assem_mass_residual(
-        const PDNSolution * const &sol_a,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr, 
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
-        const FEANode * const &fnode_ptr,
-        const AInt_Weight * const &wei_ptr,
-        const IALocal_meshSize * const &mSize,
-        const BernsteinBasis_Array * const &bs,
-        const BernsteinBasis_Array * const &bt,
-        const BernsteinBasis_Array * const &bu,
-        const IAExtractor * const &extractor,
-        const IALocal_BC * const &bc_part )
-    {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
-
-
     // Assemble mass matrix and residual vector for NS equations
     virtual void Assem_mass_residual(
         const PDNSolution * const &sol_a,
@@ -273,26 +254,6 @@ class IPGAssem
     // ! Assem_residual : assembly residual vector for 3D problem WITHOUT
     //                    pre-existing cached quadrature info.
     // ------------------------------------------------------------------------
-    virtual void Assem_residual(
-        const PDNSolution * const &sol_a,
-        const PDNSolution * const &sol_b,
-        const double &curr_time,
-        const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr, 
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
-        const FEANode * const &fnode_ptr,
-        const AInt_Weight * const &wei_ptr,
-        const IALocal_meshSize * const &mSize,
-        const BernsteinBasis_Array * const &bs,
-        const BernsteinBasis_Array * const &bt,
-        const BernsteinBasis_Array * const &bu,
-        const IAExtractor * const &extractor,
-        const IALocal_BC * const &bc_part )
-    {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
-
-
     virtual void Assem_residual(
         const PDNSolution * const &sol_a,
         const PDNSolution * const &sol_b,
@@ -452,26 +413,6 @@ class IPGAssem
     //                            for 3D problem WITHOUT pre-existing cached 
     //                            quadrature info.
     // ------------------------------------------------------------------------
-    virtual void Assem_tangent_residual(
-        const PDNSolution * const &sol_a,
-        const PDNSolution * const &sol_b,
-        const double &curr_time,
-        const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr, 
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
-        const FEANode * const &fnode_ptr,
-        const AInt_Weight * const &wei_ptr,
-        const IALocal_meshSize * const &mSize,
-        const BernsteinBasis_Array * const &bs,
-        const BernsteinBasis_Array * const &bt,
-        const BernsteinBasis_Array * const &bu,
-        const IAExtractor * const &extractor,
-        const IALocal_BC * const &bc_part )
-    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
-
-
     virtual void Assem_tangent_residual(
         const PDNSolution * const &sol_a,
         const PDNSolution * const &sol_b,
