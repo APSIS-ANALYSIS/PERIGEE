@@ -57,15 +57,12 @@ class PostVectSolution
     void print_info() const;
 
     // ------------------------------------------------------------------------
-    // PlusAX: the loc_solution is updated by adding val * input_sol
-    // ------------------------------------------------------------------------
-    void PlusAX(const PostVectSolution * const &input_sol, const double &val);
-
-    // ------------------------------------------------------------------------
     // get_xxx functions that give read permission to private data
     // ------------------------------------------------------------------------
     double get_locsol(const int &pos) const {return loc_solution[pos];}
+    
     int get_dof() const {return dof_per_node;}
+    
     int get_solsize() const {return loc_sol_size;}
 
     // ------------------------------------------------------------------------

@@ -52,25 +52,6 @@ void PostVectSolution::print_info() const
   std::cout<<std::endl;
 }
 
-void PostVectSolution::PlusAX(const PostVectSolution * const &input_sol, 
-    const double &val)
-{
-  if(input_sol->get_dof() != dof_per_node)
-  {
-    PetscPrintf(PETSC_COMM_SELF, "Error: dof of the two PostVectSolution does not match. \n");
-    MPI_Abort(PETSC_COMM_WORLD, 1);
-  }
-
-  if(input_sol->get_solsize() != loc_sol_size)
-  {
-    PetscPrintf(PETSC_COMM_SELF, "Error: size of the two PostVectSolution does not match. \n");
-    MPI_Abort(PETSC_COMM_WORLD, 1);
-  }
-
-  for(int ii=0; ii<loc_sol_size; ++ii)
-    loc_solution[ii] = loc_solution[ii] + val * input_sol->get_locsol(ii);
-}
-
 void PostVectSolution::get_esol(const int &field, const int &nLocBas,
     const int * const &eien, double * const &esol) const
 {
