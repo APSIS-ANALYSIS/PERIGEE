@@ -69,12 +69,9 @@ int main( int argc, char * argv[] )
   // Clean the visualization files if not restart
   if( !isRestart )
   {
-    int sysret = system("rm -rf *_p*.vtu");
-    SYS_T::print_fatal_if(sysret != 0, "Error: system call failed. \n");
-    sysret = system("rm -rf *.pvtu");
-    SYS_T::print_fatal_if(sysret != 0, "Error: system call failed. \n");
-    sysret = system("rm -rf *_.pvd");
-    SYS_T::print_fatal_if(sysret != 0, "Error: system call failed. \n");
+    SYS_T::execute("rm -rf *_p*.vtu");
+    SYS_T::execute("rm -rf *.pvtu");
+    SYS_T::execute("rm -rf *_.pvd");
   }
   
   FEANode * fNode = new FEANode(part_file, rank);

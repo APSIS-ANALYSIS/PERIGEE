@@ -67,12 +67,9 @@ int main( int argc, char * argv[] )
   // If demand clenaing, remove all previous visualization files
   if( isClean )
   {
-    int sysret = system("rm -rf VIS_F_*_p*.vtu");
-    SYS_T::print_fatal_if(sysret != 0, "Error: system call failed. \n");
-    sysret = system("rm -rf VIS_F_*.pvtu");
-    SYS_T::print_fatal_if(sysret != 0, "Error: system call failed. \n");
-    sysret = system("rm -rf VIS_F_.pvd");
-    SYS_T::print_fatal_if(sysret != 0, "Error: system call failed. \n");
+    SYS_T::execute("rm -rf VIS_F_*_p*.vtu");
+    SYS_T::execute("rm -rf VIS_F_*.pvtu");
+    SYS_T::execute("rm -rf VIS_F_.pvd");
   }
 
   SYS_T::commPrint("===> Reading mesh files ... ");
