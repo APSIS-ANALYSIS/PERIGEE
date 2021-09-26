@@ -256,15 +256,6 @@ void Matrix_3x3::VecMultT(const double &x0, const double &x1, const double &x2,
   y2 = mat[2] * x0 + mat[5] * x1 + mat[8] * x2;
 }
 
-void Matrix_3x3::VecMult( Vector_3 &x ) const
-{
-  double y[3] = {0.0, 0.0, 0.0};
-  y[0] = mat[0] * x(0) + mat[1] * x(1) + mat[2] * x(2);
-  y[1] = mat[3] * x(0) + mat[4] * x(1) + mat[5] * x(2);
-  y[2] = mat[6] * x(0) + mat[7] * x(1) + mat[8] * x(2);
-  x(0) = y[0]; x(1) = y[1]; x(2) = y[2];
-}
-
 void Matrix_3x3::MatMult( const Matrix_3x3 &mleft, const Matrix_3x3 &mright )
 {
   double temp[9];
@@ -372,13 +363,13 @@ void Matrix_3x3::find_eigen_vector( const double &eta, Vector_3 &v,
 {
   const double frac13_tr = tr() / 3.0; // value used to shift the eigenvalue
   
-  Vector_3 a, b, c;
-
-  a.gen_e1(); b.gen_e2(); c.gen_e3();
-
-  VecMult(a); a(0) -= ( eta + frac13_tr );
-  VecMult(b); b(1) -= ( eta + frac13_tr );
-  VecMult(c); c(2) -= ( eta + frac13_tr );
+  Vector_3 a = (*this) * Vector_3(1.0, 0.0, 0.0); 
+  Vector_3 b = (*this) * Vector_3(0.0, 1.0, 0.0); 
+  Vector_3 c = (*this) * Vector_3(0.0, 0.0, 1.0); 
+  
+  a(0) -= ( eta + frac13_tr );
+  b(1) -= ( eta + frac13_tr );
+  c(2) -= ( eta + frac13_tr );
 
   const double len_a = a.norm2();
   const double len_b = b.norm2();
@@ -530,12 +521,13 @@ int Matrix_3x3::eigen_decomp( double &eta1, double &eta2, double &eta3,
       // Now form u1 and u2
       // u1 = (A - 0.333 tr - eta2 ) s1
       // u2 = (A - 0.333 tr - eta2 ) s2
-      Vector_3 temp; temp.copy(v2);
-      VecMult(v2);
+      Vector_3 temp(v2);
+      v2 = (*this) * v2;
       v2.AXPY( -1.0*(frac13_tr + eta2), temp );
 
       temp.copy(v3);
-      VecMult(v3); v3.AXPY( -1.0*(frac13_tr + eta2), temp );
+      v3 = (*this) * v3; 
+      v3.AXPY( -1.0*(frac13_tr + eta2), temp );
 
       if( v2.norm2() >= v3.norm2() )
       {

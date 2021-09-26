@@ -183,9 +183,6 @@ class Matrix_3x3
     void VecMultT( const double &x0, const double &x1, const double &x2,
        double &y0, double &y1, double &y2 ) const;
 
-    // x = Ax, vector x has to be of size 3
-    void VecMult( Vector_3 &x ) const;
-
     // Matrix multiplication mat = mleft * mright
     void MatMult( const Matrix_3x3 &mleft, const Matrix_3x3 &mright );
 
@@ -244,7 +241,7 @@ class Matrix_3x3
         Vector_3 &s1, Vector_3 &s2 ) const;
 
     // Return the deviatoric component's contraction scaled by 0.5.
-    // M' = M - 0.3333 tr(M) I, return 0.5 M : M.
+    // M' = M - 0.3333 tr(M) I, return 0.5 M' : M'.
     double J2() const;
 
     // Return the determinant of the deviatoric component.
