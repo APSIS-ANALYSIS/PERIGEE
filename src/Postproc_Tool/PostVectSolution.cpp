@@ -8,39 +8,39 @@ PostVectSolution::PostVectSolution( const std::string &solution_file_name,
 : dof_per_node( input_dof ), 
   loc_sol_size( aNode_ptr->get_nlocghonode() * dof_per_node )
 {
+  // Allocate the space for the data loc_solution
   loc_solution = new double [loc_sol_size];
 
-  int whole_vec_size = nFunc * dof_per_node;
-  double * vec_temp = new double [whole_vec_size];
+  double * vec_temp = new double [ nFunc * dof_per_node ];
 
   int * analysis_old2new = new int [nFunc];
   int * postproc_new2old = new int [nFunc];
 
-  // Read PETSc solution vector into vec_temp
-  ReadPETSc_vec(solution_file_name, whole_vec_size, vec_temp);
+  // Read the full PETSc solution vector into vec_temp
+  ReadPETSc_vec(solution_file_name, nFunc * dof_per_node, vec_temp);
 
-  // Read new2old and old2new mappings
+  // Read new2old and old2new mappings from HDF5 files
   ReadNodeMapping(analysis_node_mapping_file, "old_2_new", nFunc, analysis_old2new );
   ReadNodeMapping(post_node_mapping_file, "new_2_old", nFunc, postproc_new2old );
 
   for( int ii=0; ii<aNode_ptr->get_nlocghonode(); ++ii )
   {
     int index = aNode_ptr->get_local_to_global(ii); // in postprocess partition's new index
-    index = postproc_new2old[index]; // map back to natural global index
-    index = analysis_old2new[index]; // map forward to analysis partitioned new index
+    index = postproc_new2old[index];                // map back to natural global index
+    index = analysis_old2new[index];                // map forward to analysis partitioned new index
 
     for(int jj=0; jj<dof_per_node; ++jj)
       loc_solution[ii*dof_per_node + jj] = vec_temp[index*dof_per_node + jj];
   }
 
-  delete [] analysis_old2new;
-  delete [] postproc_new2old;
-  delete [] vec_temp;
+  delete [] analysis_old2new; analysis_old2new = nullptr;
+  delete [] postproc_new2old; postproc_new2old = nullptr;
+  delete [] vec_temp;         vec_temp         = nullptr;
 }
 
 PostVectSolution::~PostVectSolution()
 {
-  delete [] loc_solution;
+  delete [] loc_solution; loc_solution = nullptr;
 }
 
 void PostVectSolution::print_info() const
@@ -70,7 +70,6 @@ void PostVectSolution::PlusAX(const PostVectSolution * const &input_sol,
   for(int ii=0; ii<loc_sol_size; ++ii)
     loc_solution[ii] = loc_solution[ii] + val * input_sol->get_locsol(ii);
 }
-
 
 void PostVectSolution::get_esol(const int &field, const int &nLocBas,
     const int * const &eien, double * const &esol) const
