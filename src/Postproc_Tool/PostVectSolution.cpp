@@ -23,10 +23,9 @@ PostVectSolution::PostVectSolution( const std::string &solution_file_name,
   ReadNodeMapping(analysis_node_mapping_file, "old_2_new", nFunc, analysis_old2new );
   ReadNodeMapping(post_node_mapping_file, "new_2_old", nFunc, postproc_new2old );
 
-  int index;
   for( int ii=0; ii<aNode_ptr->get_nlocghonode(); ++ii )
   {
-    index = aNode_ptr->get_local_to_global(ii); // in postprocess partition's new index
+    int index = aNode_ptr->get_local_to_global(ii); // in postprocess partition's new index
     index = postproc_new2old[index]; // map back to natural global index
     index = analysis_old2new[index]; // map forward to analysis partitioned new index
 
@@ -77,17 +76,10 @@ void PostVectSolution::get_esol(const int &field, const int &nLocBas,
     const int * const &eien, double * const &esol) const
 {
   // check the input field index
-  if(field >= dof_per_node)
-  {
-    PetscPrintf(PETSC_COMM_WORLD, "Error: field is out of range. \n");
-    MPI_Abort(PETSC_COMM_WORLD, 1);
-  }
-  int index;
+  SYS_T::print_fatal_if( field >= dof_per_node, "Error: field is out of range. \n" );
+
   for(int ii=0; ii<nLocBas; ++ii)
-  {
-    index = eien[ii];
-    esol[ii] = loc_solution[dof_per_node * index + field];
-  }
+    esol[ii] = loc_solution[dof_per_node * eien[ii] + field];
 }
 
 void PostVectSolution::ReadPETSc_vec( const std::string &solution_file_name,
@@ -98,8 +90,7 @@ void PostVectSolution::ReadPETSc_vec( const std::string &solution_file_name,
   VecSetType(sol_temp, VECSEQ);
 
   PetscViewer viewer;
-  PetscViewerBinaryOpen(PETSC_COMM_SELF, solution_file_name.c_str(),
-      FILE_MODE_READ, &viewer);
+  PetscViewerBinaryOpen(PETSC_COMM_SELF, solution_file_name.c_str(), FILE_MODE_READ, &viewer);
   VecLoad(sol_temp, viewer);
   PetscViewerDestroy(&viewer);
 
