@@ -46,14 +46,7 @@ class VTK_Writer_Fluids_ALE_Tet4
     const int nLocBas;
     const int nElem;
 
-    Interpolater intep;
-
     std::vector<int> epart_map;
-
-    int IEN_e[4];
-    double ectrl_x[4];
-    double ectrl_y[4];
-    double ectrl_z[4];
 };
 
 #endif

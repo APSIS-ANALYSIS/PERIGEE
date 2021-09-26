@@ -3,17 +3,15 @@
 VTK_Writer_Fluids_ALE_Tet4::VTK_Writer_Fluids_ALE_Tet4( 
     const int &in_nelem,
     const std::string &epart_file )
-: nLocBas(4), nElem(in_nelem), intep(nLocBas, true)
+: nLocBas(4), nElem(in_nelem)
 {
   VIS_T::read_epart( epart_file, nElem, epart_map );
 }
-
 
 VTK_Writer_Fluids_ALE_Tet4::~VTK_Writer_Fluids_ALE_Tet4()
 {
   VEC_T::clean(epart_map);
 }
-
 
 void VTK_Writer_Fluids_ALE_Tet4::writeOutput(
     const FEANode * const &fnode_ptr,
@@ -30,6 +28,8 @@ void VTK_Writer_Fluids_ALE_Tet4::writeOutput(
     const std::string &outputName,
     const bool &isXML )
 {
+  Interpolater intep( nLocBas );
+
   // Allocate gridData
   vtkUnstructuredGrid * gridData = vtkUnstructuredGrid::New();
 
@@ -61,11 +61,13 @@ void VTK_Writer_Fluids_ALE_Tet4::writeOutput(
 
   for(int ee=0; ee<lelem_ptr->get_nlocalele(); ++ee)
   {
-    lien_ptr -> get_LIEN(ee, IEN_e);
+    const std::vector<int> IEN_e = lien_ptr -> get_LIEN(ee);
 
-    fnode_ptr -> get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
+    double ectrl_x[4]; double ectrl_y[4]; double ectrl_z[4];
 
-    elemptr->buildBasis( quad, ectrl_x, ectrl_y, ectrl_z );
+    fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
+
+    elemptr -> buildBasis( quad, ectrl_x, ectrl_y, ectrl_z );
 
     // Interpolate data and assign to dataVecs
     int visCompIdx = 0;
@@ -80,11 +82,11 @@ void VTK_Writer_Fluids_ALE_Tet4::writeOutput(
     }
 
     // displacement interpolation
-    intep.interpolateVTKData( asize, IEN_e, &inputInfo[0],
+    intep.interpolateVTKData( asize, &IEN_e[0], &inputInfo[0],
         elemptr, dataVecs[visCompIdx] );
 
     // use displacement to update points
-    intep.interpolateVTKPts(IEN_e, ectrl_x, ectrl_y, ectrl_z,
+    intep.interpolateVTKPts( &IEN_e[0], ectrl_x, ectrl_y, ectrl_z,
         &inputInfo[0], elemptr, points ); 
 
     // Interpolate the pressure scalar
@@ -97,7 +99,7 @@ void VTK_Writer_Fluids_ALE_Tet4::writeOutput(
       for(int kk=0; kk<asize; ++kk)
         inputInfo.push_back( pointArrays[1][pt_index * asize + kk ] );
     }
-    intep.interpolateVTKData( asize, IEN_e, &inputInfo[0],
+    intep.interpolateVTKData( asize, &IEN_e[0], &inputInfo[0],
         elemptr, dataVecs[visCompIdx] );
 
     // Interpolate the velocity vector
@@ -110,7 +112,7 @@ void VTK_Writer_Fluids_ALE_Tet4::writeOutput(
       for(int kk=0; kk<asize; ++kk)
         inputInfo.push_back( pointArrays[2][pt_index * asize + kk ] );
     }
-    intep.interpolateVTKData( asize, IEN_e, &inputInfo[0],
+    intep.interpolateVTKData( asize, &IEN_e[0], &inputInfo[0],
         elemptr, dataVecs[visCompIdx] );
 
     // Set mesh connectivity

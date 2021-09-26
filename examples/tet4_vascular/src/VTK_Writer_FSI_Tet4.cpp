@@ -2,7 +2,7 @@
 
 VTK_Writer_FSI_Tet4::VTK_Writer_FSI_Tet4( const int &in_nelem,
     const std::string &epart_file )
-: nLocBas(4), nElem(in_nelem), intep(nLocBas, true)
+: nLocBas(4), nElem(in_nelem)
 {
   VIS_T::read_epart( epart_file, nElem, epart_map );
 }
@@ -32,6 +32,8 @@ void VTK_Writer_FSI_Tet4::writeOutput(
 {
   // This routine requires nqp = 4
   SYS_T::print_fatal_if(quad->get_num_quadPts() != 4, "Error: VTK_Writer_Tet4 requires 4 quadrature points.\n");
+
+  Interpolater intep( nLocBas );
 
   // Allocate gridData
   vtkUnstructuredGrid * gridData = vtkUnstructuredGrid::New();
@@ -186,7 +188,9 @@ void VTK_Writer_FSI_Tet4::writeOutput_fluid(
 {
   // This routine requires nqp = 4
   SYS_T::print_fatal_if(quad->get_num_quadPts() != 4, "Error: VTK_Writer_Tet4 requires 4 quadrature points.\n");
-
+  
+  Interpolater intep( nLocBas );
+  
   // Allocate gridData
   vtkUnstructuredGrid * gridData = vtkUnstructuredGrid::New();
 
@@ -413,6 +417,8 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid(
   // This routine requires nqp = 4
   SYS_T::print_fatal_if(quad->get_num_quadPts() != 4, "Error: VTK_Writer_Tet4 requires 4 quadrature points.\n");
 
+  Interpolater intep( nLocBas );
+  
   // Allocate gridData
   vtkUnstructuredGrid * gridData = vtkUnstructuredGrid::New();
 
@@ -567,6 +573,8 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_ref(
   // This routine requires nqp = 4
   SYS_T::print_fatal_if(quad->get_num_quadPts() != 4, "Error: VTK_Writer_Tet4 requires 4 quadrature points.\n");
 
+  Interpolater intep( nLocBas );
+  
   // Allocate gridData
   vtkUnstructuredGrid * gridData = vtkUnstructuredGrid::New();
 
@@ -721,6 +729,8 @@ void VTK_Writer_FSI_Tet4::interpolateJ(
     v[ii] = inputData[ii*3+1];
     w[ii] = inputData[ii*3+2];
   }
+  
+  Interpolater intep( nLocBas );
 
   intep.interpolateFE_Grad(u, elem, ux, uy, uz);
   intep.interpolateFE_Grad(v, elem, vx, vy, vz);

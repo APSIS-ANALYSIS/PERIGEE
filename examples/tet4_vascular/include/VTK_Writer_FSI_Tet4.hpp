@@ -15,7 +15,6 @@
 #include "IVisDataPrep.hpp"
 #include "Interpolater.hpp"
 #include "Vis_Tools.hpp"
-#include "Matrix_3x3.hpp"
 
 #include "vtkIntArray.h"
 #include "vtkCellData.h"
@@ -103,8 +102,6 @@ class VTK_Writer_FSI_Tet4
   private:
     const int nLocBas;
     const int nElem;
-
-    Interpolater intep;
 
     std::vector<int> epart_map;
 
