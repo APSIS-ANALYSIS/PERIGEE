@@ -160,10 +160,6 @@ class Matrix_3x3
     double VecMatVec( const Vector_3 &x, const Vector_3 &y ) const;
 
     // Vector multiplication y = Ax, the vectors have to be size 3
-    void VecMult( const double * const &x, double * const &y ) const;
-    
-    void VecMult( const Vector_3 &x, Vector_3 &y ) const;
-    
     Vector_3 VecMult( const Vector_3 &x ) const;
 
     // y = Ax, wherein x = [x0; x1; x2]
@@ -174,8 +170,6 @@ class Matrix_3x3
        double &y0, double &y1, double &y2 ) const;
 
     // y = x^T A,  in indices: y_i = x_I A_Ii
-    void VecMultT( const Vector_3 &x, Vector_3 &y ) const;
-    
     Vector_3 VecMultT( const Vector_3 &x ) const;
 
     // y = x^T A, wherein x = [x0; x1; x2]
