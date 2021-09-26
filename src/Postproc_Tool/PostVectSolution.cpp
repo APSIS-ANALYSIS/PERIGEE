@@ -4,47 +4,6 @@ PostVectSolution::PostVectSolution( const std::string &solution_file_name,
     const std::string &analysis_node_mapping_file,
     const std::string &post_node_mapping_file,
     const APart_Node * const &aNode_ptr,
-    const IAGlobal_Mesh_Info * const &gInfo_ptr,
-    const int &input_dof )
-: dof_per_node( input_dof ), 
-  loc_sol_size( aNode_ptr->get_nlocghonode() * dof_per_node )
-{
-  loc_solution = new double [loc_sol_size];
-
-  int nFunc = gInfo_ptr->get_nFunc();
-  int whole_vec_size = nFunc * dof_per_node;
-  double * vec_temp = new double [whole_vec_size];
-
-  int * analysis_old2new = new int [nFunc];
-  int * postproc_new2old = new int [nFunc];
-
-  // Read PETSc solution vector into vec_temp
-  ReadPETSc_vec(solution_file_name, whole_vec_size, vec_temp);
-
-  // Read new2old and old2new mappings
-  ReadNodeMapping(analysis_node_mapping_file, "old_2_new", nFunc, analysis_old2new );
-  ReadNodeMapping(post_node_mapping_file, "new_2_old", nFunc, postproc_new2old );
-
-  int index;
-  for( int ii=0; ii<aNode_ptr->get_nlocghonode(); ++ii )
-  {
-    index = aNode_ptr->get_local_to_global(ii); // in postprocess partition's new index
-    index = postproc_new2old[index]; // map back to natural global index
-    index = analysis_old2new[index]; // map forward to analysis partitioned new index
-
-    for(int jj=0; jj<dof_per_node; ++jj)
-      loc_solution[ii*dof_per_node + jj] = vec_temp[index*dof_per_node + jj];
-  }
-
-  delete [] analysis_old2new;
-  delete [] postproc_new2old;
-  delete [] vec_temp;
-}
-
-PostVectSolution::PostVectSolution( const std::string &solution_file_name,
-    const std::string &analysis_node_mapping_file,
-    const std::string &post_node_mapping_file,
-    const APart_Node * const &aNode_ptr,
     const int &in_nfunc, const int &input_dof )
 : dof_per_node( input_dof ), 
   loc_sol_size( aNode_ptr->get_nlocghonode() * dof_per_node )

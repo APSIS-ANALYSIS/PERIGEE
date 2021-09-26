@@ -3,20 +3,18 @@
 // ============================================================================
 // PostVectSolution.hpp
 // ----------------------------------------------------------------------------
-// This is a solution class that is used for postprocessing, including
-// calculating solution errors, generating vtk visualization files, 
-// etc. Notice, since the solution vector generated from fem analysis
-// code is usually in PETSc binary format and reordered based on the
-// node partition, this class has to read in the binary solutino and
-// reorder the solution indices in order to make it compatible with 
-// the partition of the postprocessing. Hence, there are three sets
-// of numbering involved: (a) the natural golbal numbering; (b) the
-// analysis code's numbering; (b) the postprocessing code's numbering.
+// This is a solution class that is used for postprocessing, including calculating 
+// solution errors, generating vtk visualization files, etc. Notice, since the 
+// solution vector generated from fem analysis code is usually in PETSc binary 
+// format and reordered based on the node partition, this class has to read the 
+// binary solutino and reorder the solution indices in order to make it compatible 
+// with the partition of the postprocessing. Hence, there are three sets of numbering 
+// involved: (a) the natural golbal numbering; (b) the analysis code's numbering; 
+// (c) the postprocessing code's numbering.
 //
-// To do these, this code should
+// To do these, this code
 // 1. read the PETSc vector into memory as a whole;
-// 2. rearrange the numbering of the vector based on postproce code's
-//    node partition;
+// 2. rearrange the numbering of the vector based on postproce code's node partition;
 // 3. extract local vector for each processor in postprocessing.
 //
 // Author: Ju Liu
@@ -46,21 +44,7 @@ class PostVectSolution
        const std::string &analysis_node_mapping_file,
        const std::string &post_node_mapping_file,
        const APart_Node * const &aNode_ptr,
-       const IAGlobal_Mesh_Info * const &gInfo_ptr,
-       const int &input_dof );
-
-    
-    // ------------------------------------------------------------------------
-    // Constructor.
-    // \para in_nfunc : the number of total number of basis
-    //                  functions for this solution vector.
-    // ------------------------------------------------------------------------
-    PostVectSolution( const std::string &solution_file_name,
-       const std::string &analysis_node_mapping_file,
-       const std::string &post_node_mapping_file,
-       const APart_Node * const &aNode_ptr,
        const int &in_nfunc, const int &input_dof );
-
 
     // ------------------------------------------------------------------------
     // Destructor
