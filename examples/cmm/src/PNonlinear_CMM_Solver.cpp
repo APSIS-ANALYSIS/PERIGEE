@@ -569,8 +569,8 @@ void PNonlinear_CMM_Solver::rotate_ringbc(
       Q.transpose(); // Skew-to-global transformation matrix 
 
       // rot_vals = Q * vals
-      Q.VecMult( vals, rot_vals );
-
+      Q.VecMult( vals[0], vals[1], vals[2], rot_vals[0], rot_vals[1], rot_vals[2] );
+     
       VecSetValues(dot_step->solution, 3,  idx, rot_vals, INSERT_VALUES);
     }
 
