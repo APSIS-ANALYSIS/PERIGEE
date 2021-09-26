@@ -191,7 +191,6 @@ void Interpolater::interpolateVTKPts( const int &ptoffset,
   }
 }
 
-
 void Interpolater::interpolateVTKPts( const int * const &ptid,
     const double * const &ctrlPts_x,
     const double * const &ctrlPts_y,
@@ -239,9 +238,8 @@ void Interpolater::interpolateVTKData( const int &size, const int &ptoffset,
       vtkData->InsertComponent(ptoffset+ii, comp, outData[ii]);
   }
 
-  delete [] compData;
+  delete [] compData; compData = nullptr;
 }
-
 
 void Interpolater::interpolateVTKData( const int &size, 
     const int * const &ptid, const double * const &inputData, 
@@ -265,9 +263,8 @@ void Interpolater::interpolateVTKData( const int &size,
       vtkData->InsertComponent(ptid[ii], comp, outData[ii]);
   }
 
-  delete [] compData;
+  delete [] compData; compData = nullptr;
 }
-
 
 void Interpolater::interpolateData( const int &size,
     const double * const &inputData, const FEAElement * const &elem,
@@ -287,9 +284,8 @@ void Interpolater::interpolateData( const int &size,
     interpolateFE( compData, elem, outData[comp] );
   }
 
-  delete [] compData; compData = NULL;
+  delete [] compData; compData = nullptr;
 }
-
 
 void Interpolater::interpolateVTKPts( const int &ptoffset,
     const double * const &ctrlPts_x,
@@ -318,7 +314,7 @@ void Interpolater::interpolateVTKPts( const int &ptoffset,
   for(int ii=0; ii<nLocBas; ++ii) compData[ii] = disp_vect[ii*3+2];
   interpolateFE(compData, elem, disp_z);
 
-  delete [] compData; compData = NULL;
+  delete [] compData; compData = nullptr;
 
   double xyz[3];
 
@@ -331,7 +327,6 @@ void Interpolater::interpolateVTKPts( const int &ptoffset,
     vtkpts->InsertPoint(ptoffset+ii, xyz);
   }
 }
-
 
 void Interpolater::interpolateVTKPts( const int * const &ptid,
     const double * const &ctrlPts_x,
@@ -360,7 +355,7 @@ void Interpolater::interpolateVTKPts( const int * const &ptid,
   for(int ii=0; ii<nLocBas; ++ii) compData[ii] = disp_vect[ii*3+2];
   interpolateFE(compData, elem, disp_z);
 
-  delete [] compData; compData = NULL;
+  delete [] compData; compData = nullptr;
 
   double xyz[3];
 

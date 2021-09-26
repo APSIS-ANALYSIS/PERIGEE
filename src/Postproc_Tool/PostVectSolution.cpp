@@ -41,7 +41,6 @@ PostVectSolution::PostVectSolution( const std::string &solution_file_name,
   delete [] vec_temp;
 }
 
-
 PostVectSolution::PostVectSolution( const std::string &solution_file_name,
     const std::string &analysis_node_mapping_file,
     const std::string &post_node_mapping_file,
@@ -82,13 +81,10 @@ PostVectSolution::PostVectSolution( const std::string &solution_file_name,
   delete [] vec_temp;
 }
 
-
-
 PostVectSolution::~PostVectSolution()
 {
   delete [] loc_solution;
 }
-
 
 void PostVectSolution::print_info() const
 {
@@ -136,7 +132,6 @@ void PostVectSolution::get_esol(const int &field, const int &nLocBas,
   }
 }
 
-
 void PostVectSolution::ReadPETSc_vec( const std::string &solution_file_name,
     const int &vec_size, double * const &veccopy )
 {
@@ -171,7 +166,6 @@ void PostVectSolution::ReadPETSc_vec( const std::string &solution_file_name,
   VecRestoreArray(sol_temp, &array_temp);
   VecDestroy(&sol_temp);
 }
-
 
 void PostVectSolution::ReadNodeMapping( const std::string &node_mapping_file,
     const char * const &mapping_type, const int &node_size,
