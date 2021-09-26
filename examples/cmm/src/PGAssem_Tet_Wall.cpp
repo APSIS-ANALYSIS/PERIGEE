@@ -168,8 +168,7 @@ void PGAssem_Tet_Wall::RingBC_KG(
             if( dof == dof_mat )
             {
               Vector_3 Ke_c = Vector_3( Ke[(jj-3)*ncol + (ii-2)], Ke[(jj-3)*ncol + (ii-1)], Ke[(jj-3)*ncol + ii] );
-              Vector_3 rot_Ke_c;
-              Q.VecMultT( Ke_c, rot_Ke_c );  // rot_Ke_c = Ke_c^T * Q
+              Vector_3 rot_Ke_c = Q.VecMultT( Ke_c );  // rot_Ke_c = Ke_c^T * Q
 
               Ke[(jj-3)*ncol + (ii-2)] = rot_Ke_c.x(); Ke[(jj-3)*ncol + (ii-1)] = rot_Ke_c.y(); Ke[(jj-3)*ncol + ii] = rot_Ke_c.z(); 
             }
@@ -205,10 +204,8 @@ void PGAssem_Tet_Wall::RingBC_KG(
             // Continuity eqn
             if( dof == dof_mat )
             {
-              Vector_3 rot_Ke_c;
-
               Vector_3 Ke_c = Vector_3( Ke[(ii-3)*ncol + (jj-2)], Ke[(ii-3)*ncol + (jj-1)], Ke[(ii-3)*ncol + jj] );
-              Q.VecMultT( Ke_c, rot_Ke_c );  // rot_Ke_c = Ke_c^T * Q
+              Vector_3 rot_Ke_c = Q.VecMultT( Ke_c );  // rot_Ke_c = Ke_c^T * Q
 
               Ke[(ii-3)*ncol + (jj-2)] = rot_Ke_c.x(); Ke[(ii-3)*ncol + (jj-1)] = rot_Ke_c.y(); Ke[(ii-3)*ncol + jj] = rot_Ke_c.z();
             }
@@ -217,10 +214,8 @@ void PGAssem_Tet_Wall::RingBC_KG(
           // Momentum eqns corresponding to pressure dof
           if( dof == dof_mat )
           {
-            Vector_3 rot_Ke_c;
-
             Vector_3 Ke_c = Vector_3( Ke[(ii-2)*ncol + (jj-3)], Ke[(ii-1)*ncol + (jj-3)], Ke[ii*ncol + (jj-3)] );
-            QT.VecMult( Ke_c, rot_Ke_c );  // rot_Ke_c = Q^T * Ke_c
+            Vector_3 rot_Ke_c = QT.VecMult( Ke_c );  // rot_Ke_c = Q^T * Ke_c
 
             Ke[(ii-2)*ncol + (jj-3)] = rot_Ke_c.x(); Ke[(ii-1)*ncol + (jj-3)] = rot_Ke_c.y(); Ke[ii*ncol + (jj-3)] = rot_Ke_c.z();
           }
@@ -232,8 +227,7 @@ void PGAssem_Tet_Wall::RingBC_KG(
         }
 
         Vector_3 Ge_A = Vector_3( Ge[ii-2], Ge[ii-1], Ge[ii] );
-        Vector_3 rot_Ge_A;
-        QT.VecMult(Ge_A, rot_Ge_A);  // rot_Ge_A = QT * Ge_A
+        Vector_3 rot_Ge_A = QT.VecMult( Ge_A );  // rot_Ge_A = QT * Ge_A
 
         // Update Ge
         Ge[ii-2] = rot_Ge_A.x(); Ge[ii-1] = rot_Ge_A.y(); Ge[ii] = rot_Ge_A.z();
