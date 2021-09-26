@@ -150,7 +150,7 @@ void Interpolater::interpolateVTKPts( const int &ptoffset,
   
   for(int ii=0; ii<nqp; ++ii)
   {
-    double xyz[3] = { out_x[ii], out_y[ii], out_z[ii] };
+    const double xyz[3] = { out_x[ii], out_y[ii], out_z[ii] };
 
     vtkpts->InsertPoint(ptoffset+ii, xyz);
   }
@@ -169,7 +169,7 @@ void Interpolater::interpolateVTKPts( const int &ptoffset,
   
   for(int ii=0; ii<nqp; ++ii)
   {
-    double xyz[2] = { out_x[ii], out_y[ii] };
+    const double xyz[2] = { out_x[ii], out_y[ii] };
 
     vtkpts->InsertPoint(ptoffset+ii, xyz);
   }
@@ -190,7 +190,7 @@ void Interpolater::interpolateVTKPts( const int * const &ptid,
   
   for(int ii=0; ii<nqp; ++ii)
   {
-    double xyz[3] = { out_x[ii], out_y[ii], out_z[ii] };
+    const double xyz[3] = { out_x[ii], out_y[ii], out_z[ii] };
 
     vtkpts->InsertPoint(ptid[ii], xyz);
   }
@@ -298,7 +298,7 @@ void Interpolater::interpolateVTKPts( const int &ptoffset,
 
   for(int ii=0; ii<nqp; ++ii)
   {
-    double xyz[3] = { ref_x[ii] + disp_x[ii], ref_y[ii] + disp_y[ii], ref_z[ii] + disp_z[ii] };
+    const double xyz[3] = { ref_x[ii] + disp_x[ii], ref_y[ii] + disp_y[ii], ref_z[ii] + disp_z[ii] };
 
     vtkpts->InsertPoint(ptoffset+ii, xyz);
   }
@@ -335,7 +335,7 @@ void Interpolater::interpolateVTKPts( const int * const &ptid,
 
   for(int ii=0; ii<nqp; ++ii)
   {
-    double xyz[3] = { ref_x[ii] + disp_x[ii], ref_y[ii] + disp_y[ii], ref_z[ii] + disp_z[ii] };
+    const double xyz[3] = { ref_x[ii] + disp_x[ii], ref_y[ii] + disp_y[ii], ref_z[ii] + disp_z[ii] };
 
     vtkpts->InsertPoint(ptid[ii], xyz);
   }
