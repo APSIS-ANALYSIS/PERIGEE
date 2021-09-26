@@ -27,7 +27,7 @@ class VisDataPrep_ALE_NS_3D : public IVisDataPrep
         const std::string analysis_node_mapping_file,
         const std::string post_node_mapping_file,
         const APart_Node * const &nNode_ptr,
-        const IAGlobal_Mesh_Info * const &gInfo_ptr,
+        const int &in_nfunc,
         const int &input_dof,
         double ** &pointArrays ) const;
 
