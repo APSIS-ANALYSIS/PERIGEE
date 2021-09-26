@@ -36,15 +36,6 @@ void Interpolater::print_info() const
   std::cout<<" -- nLocBas = "<<nLocBas<<std::endl;
   if(isDer) std::cout<<" -- derivatives are needed. \n";
   else std::cout<<" -- derivatives are unneeded. \n";
-
-  std::cout<<"R: \n";
-  VEC_T::print(R);
-  std::cout<<"dR_dx: \n";
-  VEC_T::print(dR_dx);
-  std::cout<<"dR_dy: \n";
-  VEC_T::print(dR_dy);
-  std::cout<<"dR_dz: \n";
-  VEC_T::print(dR_dz);
 }
 
 Interpolater::Interpolater()
@@ -157,13 +148,9 @@ void Interpolater::interpolateVTKPts( const int &ptoffset,
 
   interpolateFE(ctrlPts_x, ctrlPts_y, ctrlPts_z, elem, out_x, out_y, out_z);
   
-  double xyz[3];
-
   for(int ii=0; ii<nqp; ++ii)
   {
-    xyz[0] = out_x[ii];
-    xyz[1] = out_y[ii];
-    xyz[2] = out_z[ii];
+    double xyz[3] = { out_x[ii], out_y[ii], out_z[ii] };
 
     vtkpts->InsertPoint(ptoffset+ii, xyz);
   }
@@ -180,12 +167,9 @@ void Interpolater::interpolateVTKPts( const int &ptoffset,
 
   interpolateFE(ctrlPts_x, ctrlPts_y, elem, out_x, out_y);
   
-  double xyz[2];
-
   for(int ii=0; ii<nqp; ++ii)
   {
-    xyz[0] = out_x[ii];
-    xyz[1] = out_y[ii];
+    double xyz[2] = { out_x[ii], out_y[ii] };
 
     vtkpts->InsertPoint(ptoffset+ii, xyz);
   }
@@ -204,13 +188,9 @@ void Interpolater::interpolateVTKPts( const int * const &ptid,
 
   interpolateFE(ctrlPts_x, ctrlPts_y, ctrlPts_z, elem, out_x, out_y, out_z);
   
-  double xyz[3];
-
   for(int ii=0; ii<nqp; ++ii)
   {
-    xyz[0] = out_x[ii];
-    xyz[1] = out_y[ii];
-    xyz[2] = out_z[ii];
+    double xyz[3] = { out_x[ii], out_y[ii], out_z[ii] };
 
     vtkpts->InsertPoint(ptid[ii], xyz);
   }
@@ -316,13 +296,9 @@ void Interpolater::interpolateVTKPts( const int &ptoffset,
 
   delete [] compData; compData = nullptr;
 
-  double xyz[3];
-
   for(int ii=0; ii<nqp; ++ii)
   {
-    xyz[0] = ref_x[ii] + disp_x[ii];
-    xyz[1] = ref_y[ii] + disp_y[ii];
-    xyz[2] = ref_z[ii] + disp_z[ii];
+    double xyz[3] = { ref_x[ii] + disp_x[ii], ref_y[ii] + disp_y[ii], ref_z[ii] + disp_z[ii] };
 
     vtkpts->InsertPoint(ptoffset+ii, xyz);
   }
@@ -357,13 +333,9 @@ void Interpolater::interpolateVTKPts( const int * const &ptid,
 
   delete [] compData; compData = nullptr;
 
-  double xyz[3];
-
   for(int ii=0; ii<nqp; ++ii)
   {
-    xyz[0] = ref_x[ii] + disp_x[ii];
-    xyz[1] = ref_y[ii] + disp_y[ii];
-    xyz[2] = ref_z[ii] + disp_z[ii];
+    double xyz[3] = { ref_x[ii] + disp_x[ii], ref_y[ii] + disp_y[ii], ref_z[ii] + disp_z[ii] };
 
     vtkpts->InsertPoint(ptid[ii], xyz);
   }
