@@ -72,8 +72,11 @@ void VTK_Writer_FSI_Tet4::writeOutput(
 
   for(int ee=0; ee<lelem_ptr->get_nlocalele(); ++ee)
   {
-    lien_ptr -> get_LIEN(ee, IEN_e);
-    fnode_ptr -> get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
+    const std::vector<int> IEN_e = lien_ptr -> get_LIEN( ee );
+    
+    double ectrl_x[4]; double ectrl_y[4]; double ectrl_z[4];
+
+    fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
     elemptr->buildBasis( quad, ectrl_x, ectrl_y, ectrl_z );
 
     // Interpolate data and assign to dataVecs
@@ -88,14 +91,14 @@ void VTK_Writer_FSI_Tet4::writeOutput(
     }
 
     // displacement interpolation
-    intep.interpolateVTKData( asize, IEN_e, inputInfo, elemptr, dataVecs[0] );
+    intep.interpolateVTKData( asize, &IEN_e[0], inputInfo, elemptr, dataVecs[0] );
 
     // use displacement to update points
-    intep.interpolateVTKPts(IEN_e, ectrl_x, ectrl_y, ectrl_z,
+    intep.interpolateVTKPts( &IEN_e[0], ectrl_x, ectrl_y, ectrl_z,
         inputInfo, elemptr, points); 
 
     // Interpolate detF
-    interpolateJ( IEN_e, inputInfo, elemptr, dataVecs[1] );
+    interpolateJ( &IEN_e[0], inputInfo, elemptr, dataVecs[1] );
 
     // Interpolate the pressure scalar
     inputInfo.clear();
@@ -106,7 +109,7 @@ void VTK_Writer_FSI_Tet4::writeOutput(
       for(int kk=0; kk<asize; ++kk)
         inputInfo.push_back( pointArrays[1][pt_index * asize + kk ] );
     }
-    intep.interpolateVTKData( asize, IEN_e, inputInfo, elemptr, dataVecs[2] );
+    intep.interpolateVTKData( asize, &IEN_e[0], inputInfo, elemptr, dataVecs[2] );
 
     // Interpolate the velocity vector
     inputInfo.clear();
@@ -117,7 +120,7 @@ void VTK_Writer_FSI_Tet4::writeOutput(
       for(int kk=0; kk<asize; ++kk)
         inputInfo.push_back( pointArrays[2][pt_index * asize + kk ] );
     }
-    intep.interpolateVTKData( asize, IEN_e, inputInfo, elemptr, dataVecs[3] );
+    intep.interpolateVTKData( asize, &IEN_e[0], inputInfo, elemptr, dataVecs[3] );
 
     // Set mesh connectivity
     VIS_T::setTetraelem( IEN_e[0], IEN_e[1], IEN_e[2], IEN_e[3], gridData );
@@ -167,7 +170,6 @@ void VTK_Writer_FSI_Tet4::writeOutput(
   PetscPrintf(PETSC_COMM_WORLD, "-- Clean gridData object.\n");
   gridData->Delete();
 }
-
 
 void VTK_Writer_FSI_Tet4::writeOutput_fluid(
     const FEANode * const &fnode_ptr,
@@ -242,9 +244,11 @@ void VTK_Writer_FSI_Tet4::writeOutput_fluid(
   {
     if( lelem_ptr->get_elem_tag(ee) == 0 )
     {
-      lien_ptr -> get_LIEN(ee, IEN_e);
+      const std::vector<int> IEN_e = lien_ptr -> get_LIEN(ee);
 
-      fnode_ptr -> get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
+      double ectrl_x[4]; double ectrl_y[4]; double ectrl_z[4];
+
+      fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
 
       elemptr->buildBasis( quad, ectrl_x, ectrl_y, ectrl_z );
 
@@ -455,9 +459,11 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid(
   {
     if( lelem_ptr->get_elem_tag(ee) == 1 )
     {
-      lien_ptr -> get_LIEN(ee, IEN_e);
+      const std::vector<int> IEN_e = lien_ptr -> get_LIEN(ee);
 
-      fnode_ptr -> get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
+      double ectrl_x[4]; double ectrl_y[4]; double ectrl_z[4];
+
+      fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
 
       elemptr->buildBasis( quad, ectrl_x, ectrl_y, ectrl_z );
 
@@ -611,9 +617,11 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_ref(
   {
     if( lelem_ptr->get_elem_tag(ee) == 1 )
     {
-      lien_ptr -> get_LIEN(ee, IEN_e);
+      const std::vector<int> IEN_e = lien_ptr -> get_LIEN(ee);
 
-      fnode_ptr -> get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
+      double ectrl_x[4]; double ectrl_y[4]; double ectrl_z[4];
+
+      fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
 
       elemptr->buildBasis( quad, ectrl_x, ectrl_y, ectrl_z );
 
@@ -709,19 +717,15 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_ref(
   gridData->Delete();
 }
 
-
-
 void VTK_Writer_FSI_Tet4::interpolateJ(
     const int * const &ptid, const std::vector<double> &inputData,
     const FEAElement * const &elem, vtkDoubleArray * const &vtkData )
 {
   const int nqp = elem->get_numQuapts();
 
-  double * u = new double [nLocBas];
-  double * v = new double [nLocBas];
-  double * w = new double [nLocBas];
-
-  std::vector<double> ux, uy, uz, vx, vy, vz, wx, wy, wz;
+  std::vector<double> u (nLocBas, 0.0);
+  std::vector<double> v (nLocBas, 0.0);
+  std::vector<double> w (nLocBas, 0.0);
 
   for(int ii=0; ii<nLocBas; ++ii)
   {
@@ -732,25 +736,20 @@ void VTK_Writer_FSI_Tet4::interpolateJ(
   
   Interpolater intep( nLocBas );
 
+  std::vector<double> ux, uy, uz, vx, vy, vz, wx, wy, wz;
+
   intep.interpolateFE_Grad(u, elem, ux, uy, uz);
   intep.interpolateFE_Grad(v, elem, vx, vy, vz);
   intep.interpolateFE_Grad(w, elem, wx, wy, wz);
 
-  Matrix_3x3 F;
-  double detF;
-
   for(int ii=0; ii<nqp; ++ii)
   {
-    F(0) = ux[ii] + 1.0; F(1) = uy[ii];       F(2) = uz[ii];
-    F(3) = vx[ii];       F(4) = vy[ii] + 1.0; F(5) = vz[ii];
-    F(6) = wx[ii];       F(7) = wy[ii];       F(8) = wz[ii] + 1.0;
+    Matrix_3x3 F( ux[ii] + 1.0, uy[ii],       uz[ii],
+                  vx[ii],       vy[ii] + 1.0, vz[ii],
+                  wx[ii],       wy[ii],       wz[ii] + 1.0 );
 
-    detF = F.det();
-
-    vtkData->InsertComponent(ptid[ii], 0, detF);
+    vtkData->InsertComponent( ptid[ii], 0, F.det() );
   }
-
-  delete [] u; delete [] v; delete [] w;
 }
 
 // EOF

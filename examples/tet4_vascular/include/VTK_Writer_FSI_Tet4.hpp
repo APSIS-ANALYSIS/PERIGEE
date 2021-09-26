@@ -105,11 +105,6 @@ class VTK_Writer_FSI_Tet4
 
     std::vector<int> epart_map;
 
-    int IEN_e[4];
-    double ectrl_x[4];
-    double ectrl_y[4];
-    double ectrl_z[4];
-
     // --------------------------------------------------------------
     // Interpolate det(F) at sampling points 
     // --------------------------------------------------------------
