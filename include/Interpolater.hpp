@@ -25,7 +25,7 @@ class Interpolater
     // nLocBas : number of basis functions and
     // isDer   : the flag telling if the derivatives are needed
     // --------------------------------------------------------------
-    Interpolater( const int &in_nlocbas, const bool &in_isDer = true );
+    Interpolater( const int &in_nlocbas );
     
     virtual ~Interpolater();
     
@@ -228,15 +228,8 @@ class Interpolater
         std::vector< std::vector<double> > &outData );
 
   private:
-    // falg that tells if the derivatives will be evaluated
-    const bool isDer;
-
     // number of local(elemental) basis functions
     const int nLocBas;
-
-    // container for the FE basis functions and derivatives within 
-    // the element
-    std::vector<double> R, dR_dx, dR_dy, dR_dz;
 
     // Disable empty constructor
     Interpolater();

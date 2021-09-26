@@ -1,45 +1,18 @@
 #include "Interpolater.hpp"
 
-Interpolater::Interpolater( const int &in_nlocbas, const bool &in_isDer )
-: isDer(in_isDer), nLocBas( in_nlocbas )
-{
-  R.resize(nLocBas);
-
-  if(isDer)
-  {
-    dR_dx.resize(nLocBas);
-    dR_dy.resize(nLocBas);
-    dR_dz.resize(nLocBas);
-  }
-  else
-  {
-    VEC_T::clean(dR_dx);
-    VEC_T::clean(dR_dy);
-    VEC_T::clean(dR_dz);
-  }
-}
+Interpolater::Interpolater( const int &in_nlocbas ) : nLocBas( in_nlocbas )
+{}
 
 Interpolater::~Interpolater()
-{
-  VEC_T::clean(R);
-  if(isDer)
-  {
-    VEC_T::clean(dR_dx);
-    VEC_T::clean(dR_dy);
-    VEC_T::clean(dR_dz);
-  }
-}
+{}
 
 void Interpolater::print_info() const
 {
   std::cout<<"Interpolater: \n";
   std::cout<<" -- nLocBas = "<<nLocBas<<std::endl;
-  if(isDer) std::cout<<" -- derivatives are needed. \n";
-  else std::cout<<" -- derivatives are unneeded. \n";
 }
 
-Interpolater::Interpolater()
-: isDer(false), nLocBas(0)
+Interpolater::Interpolater() : nLocBas(0)
 {}
 
 void Interpolater::interpolateFE( const double * const &inputVal,
@@ -47,6 +20,8 @@ void Interpolater::interpolateFE( const double * const &inputVal,
 {
   const int nqp = elem->get_numQuapts();
   output.resize( nqp );
+
+  std::vector<double> R (nLocBas, 0.0);
 
   for(int ii=0; ii<nqp; ++ii)
   {
@@ -65,6 +40,8 @@ void Interpolater::interpolateFE( const double * const &inputVal_1,
 
   output_1.resize( nqp );
   output_2.resize( nqp );
+
+  std::vector<double> R (nLocBas, 0.0);
 
   for(int ii=0; ii<nqp; ++ii)
   {
@@ -92,6 +69,8 @@ void Interpolater::interpolateFE( const double * const &inputVal_1,
   output_2.resize( nqp );
   output_3.resize( nqp );
 
+  std::vector<double> R (nLocBas, 0.0);
+
   for(int ii=0; ii<nqp; ++ii)
   {
     output_1[ii] = 0.0;
@@ -111,13 +90,15 @@ void Interpolater::interpolateFE_Grad( const double * const &inputVal,
     const FEAElement * const &elem, std::vector<double> &output_dx,
     std::vector<double> &output_dy, std::vector<double> &output_dz )
 {
-  if( !isDer ) SYS_T::print_fatal("Interpolater : isDer is false, dR_dx, dR_dy, and dR_dz are not allocated. \n");
-
   const int nqp = elem->get_numQuapts();
 
   output_dx.resize( nqp );
   output_dy.resize( nqp );
   output_dz.resize( nqp );
+
+  std::vector<double> dR_dx (nLocBas, 0.0);
+  std::vector<double> dR_dy (nLocBas, 0.0);
+  std::vector<double> dR_dz (nLocBas, 0.0);
 
   for( int ii=0; ii<nqp; ++ii )
   {
@@ -200,7 +181,7 @@ void Interpolater::interpolateVTKData( const int &size, const int &ptoffset,
     const double * const &inputData, const FEAElement * const &elem,
     vtkDoubleArray * const &vtkData )
 {
-  int nqp = elem->get_numQuapts();
+  const int nqp = elem->get_numQuapts();
 
   double * compData = new double [nLocBas];
   std::vector<double> outData;
@@ -225,7 +206,7 @@ void Interpolater::interpolateVTKData( const int &size,
     const int * const &ptid, const double * const &inputData, 
     const FEAElement * const &elem, vtkDoubleArray * const &vtkData )
 {
-  int nqp = elem->get_numQuapts();
+  const int nqp = elem->get_numQuapts();
 
   double * compData = new double [nLocBas];
   std::vector<double> outData;
