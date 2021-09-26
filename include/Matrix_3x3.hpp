@@ -162,7 +162,7 @@ class Matrix_3x3
     // Vector multiplication y = Ax, the vectors have to be size 3
     Vector_3 VecMult( const Vector_3 &x ) const;
 
-    // y = Ax, wherein x = [x0; x1; x2]
+    // y = Ax, wherein x = [x0; x1; x2] (to be removed)
     void VecMult( const double &x0, const double &x1, const double &x2,
        double * const &y ) const;
 
@@ -172,7 +172,7 @@ class Matrix_3x3
     // y = x^T A,  in indices: y_i = x_I A_Ii
     Vector_3 VecMultT( const Vector_3 &x ) const;
 
-    // y = x^T A, wherein x = [x0; x1; x2]
+    // y = x^T A, wherein x = [x0; x1; x2] (to be removed)
     void VecMultT( const double &x0, const double &x1, const double &x2,
        double * const &y ) const;
 
