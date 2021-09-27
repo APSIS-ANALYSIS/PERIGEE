@@ -194,8 +194,6 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
 
     std::vector<double> d2R_dxx, d2R_dyy, d2R_dzz;
 
-    double dxi_dx[9];
-
     // Private functions
     void print_info() const;
 

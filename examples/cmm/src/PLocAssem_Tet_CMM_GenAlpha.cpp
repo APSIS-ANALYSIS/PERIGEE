@@ -121,12 +121,12 @@ void PLocAssem_Tet_CMM_GenAlpha::get_metric(
 
 void PLocAssem_Tet_CMM_GenAlpha::get_tau(
     double &tau_m_qua, double &tau_c_qua,
-    const double &dt, const double * const &dxi_dx,
+    const double &dt, const double * const &dxidx,
     const double &u, const double &v, const double &w ) const
 {
   // Use K matrix to correct the metric
   double G11, G12, G13, G22, G23, G33;
-  get_metric( dxi_dx, G11, G12, G13, G22, G23, G33 );
+  get_metric( dxidx, G11, G12, G13, G22, G23, G33 );
 
   const double GdG = G11 * G11 + 2.0 * G12 * G12 + 2.0 * G13 * G13
     + G22 * G22 + 2.0 * G23 * G23 + G33 * G33;
@@ -149,11 +149,11 @@ void PLocAssem_Tet_CMM_GenAlpha::get_tau(
 
 
 void PLocAssem_Tet_CMM_GenAlpha::get_DC(
-    double &dc_tau, const double * const &dxi_dx,
+    double &dc_tau, const double * const &dxidx,
     const double &u, const double &v, const double &w ) const
 {
   //double G11, G12, G13, G22, G23, G33;
-  //get_metric( dxi_dx, G11, G12, G13, G22, G23, G33 );
+  //get_metric( dxidx, G11, G12, G13, G22, G23, G33 );
 
   //dc_tau = G11 * u * u + 2.0 * G12 * u * v + 2.0 * G13 * u * w + G22 * v * v
   //  + 2.0 * G23 * v * w + G33 * w * w;
@@ -198,6 +198,8 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
 
     element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
         &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
+
+    double dxi_dx[9];
 
     element->get_invJacobian( qua, dxi_dx );
 
@@ -369,6 +371,8 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
 
     element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
         &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
+
+    double dxi_dx[9];
 
     element->get_invJacobian( qua, dxi_dx );
 
@@ -784,7 +788,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Mass_Residual(
   }
 }
 
-
 void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC(
     const int &ebc_id,
     const double &time, const double &dt,
@@ -798,13 +801,14 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC(
 
   const double curr = time + alpha_f * dt;
 
-  double gx, gy, gz, surface_area;
-
   Zero_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
     element->get_R(qua, &R[0]);
+  
+    double gx, gy, gz, surface_area;
+
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
@@ -827,7 +831,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC(
   }
 }
 
-
 void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Resistance(
     const int &ebc_id,
     const double &val,
@@ -839,13 +842,13 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Resistance(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  double surface_area;
-
   Zero_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
     element->get_R(qua, &R[0]);
+  
+    double surface_area;
 
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
@@ -858,7 +861,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Resistance(
   }
 }
 
-
 void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_BackFlowStab(
     const double * const &dot_sol,
     const double * const &sol,
@@ -870,14 +872,14 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_BackFlowStab(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  double surface_area, factor;
-
   Zero_sur_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
     element->get_R(qua, &R[0]);
     
+    double surface_area, factor;
+
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     double u = 0.0, v = 0.0, w = 0.0;;
@@ -903,7 +905,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_BackFlowStab(
   }
 }
 
-
 void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
     const double &dt,
     const double * const &dot_sol,
@@ -918,13 +919,14 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
 
   const double dd_dv = alpha_f * gamma * dt;
 
-  double surface_area, factor;
-
   Zero_sur_Tangent_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
     element->get_R(qua, &R[0]);
+    
+    double surface_area, factor;
+
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     double u = 0.0, v = 0.0, w = 0.0;
@@ -962,7 +964,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
   }
 }
 
-
 double PLocAssem_Tet_CMM_GenAlpha::get_flowrate( const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
@@ -972,13 +973,14 @@ double PLocAssem_Tet_CMM_GenAlpha::get_flowrate( const double * const &sol,
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  double surface_area;
-
   double flrate = 0.0;
 
   for(int qua =0; qua< face_nqp; ++qua)
   {
     element->get_R(qua, &R[0]);
+  
+    double surface_area;
+
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     double u = 0.0, v = 0.0, w = 0.0;
@@ -994,7 +996,6 @@ double PLocAssem_Tet_CMM_GenAlpha::get_flowrate( const double * const &sol,
 
   return flrate;
 }
-
 
 void PLocAssem_Tet_CMM_GenAlpha::get_pressure_area( 
     const double * const &sol,
