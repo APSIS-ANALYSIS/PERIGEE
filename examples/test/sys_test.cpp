@@ -2,6 +2,7 @@
 #include "Vector_3.hpp"
 #include "Matrix_3x3.hpp"
 #include "HDF5_Reader.hpp"
+#include "PostVectSolution.hpp"
 
 int main( int argc, char * argv[] )
 {
@@ -48,7 +49,6 @@ int main( int argc, char * argv[] )
   VEC_T::print(b);
   VEC_T::print(c);
   VEC_T::print(d);
-
 
   return EXIT_SUCCESS;
 }

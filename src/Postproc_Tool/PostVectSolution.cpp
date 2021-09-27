@@ -101,39 +101,20 @@ void PostVectSolution::ReadNodeMapping( const std::string &node_mapping_file,
     int * const &nodemap ) const
 {
   hid_t file_id = H5Fopen(node_mapping_file.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
-  hid_t data_id = H5Dopen(file_id, mapping_type, H5P_DEFAULT); 
+  HDF5_Reader * h5r = new HDF5_Reader( file_id );
 
-  hid_t data_space = H5Dget_space( data_id );
-  hid_t data_rank = H5Sget_simple_extent_ndims( data_space );
+  const std::vector<int> temp_nodemap = h5r -> read_intVector( "/", mapping_type );
 
-  if( data_rank != 1)
-  {
-    PetscPrintf(PETSC_COMM_SELF, "Error: the node mapping file has wrong format. \n");
-    MPI_Abort(PETSC_COMM_WORLD, 1);
-  }
-
-  hsize_t * data_dims = new hsize_t [1];
-
-  H5Sget_simple_extent_dims( data_space, data_dims, NULL );
-
-  hid_t mem_space = H5Screate_simple(data_rank, data_dims, NULL);
-
-  hsize_t dSize = data_dims[0]; 
-
-  if( int(dSize) != node_size )
+  if( int( temp_nodemap.size() ) != node_size )
   {
     PetscPrintf(PETSC_COMM_SELF, "Error: the allocated array has wrong size! \n");
     MPI_Abort(PETSC_COMM_WORLD, 1);
   }
 
-  H5Dread( data_id, H5T_NATIVE_INT, mem_space, data_space,
-      H5P_DEFAULT, nodemap );
+  for(int ii=0; ii<node_size; ++ii) nodemap[ii] = temp_nodemap[ii];
 
-  delete [] data_dims;
-  H5Sclose( mem_space );
-  H5Sclose(data_space);
-  H5Dclose(data_id);
-  H5Fclose(file_id);
+  delete h5r;
+  H5Fclose( file_id );
 }
 
 // EOF
