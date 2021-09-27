@@ -91,9 +91,7 @@ class PLocAssem_Tet_Wall_Prestress : public IPLocAssem
     Vector_3 get_fw( const double &x, const double &y, const double &z,
         const double &t ) const
     {
-      double fw_x = 0.0, fw_y = 0.0, fw_z = 0.0;
-
-      return Vector_3( fw_x, fw_y, fw_z );
+      return Vector_3( 0.0, 0.0, 0.0 );
     }
 };
 

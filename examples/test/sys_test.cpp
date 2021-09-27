@@ -43,9 +43,12 @@ int main( int argc, char * argv[] )
 
   int nsize = 4;
 
-  std::vector<double> b (nsize, -100.1);
+  std::vector<double> b (nsize, -100.1), c (5, 99.9), d (2, 1.0);
 
   VEC_T::print(b);
+  VEC_T::print(c);
+  VEC_T::print(d);
+
 
   return EXIT_SUCCESS;
 }

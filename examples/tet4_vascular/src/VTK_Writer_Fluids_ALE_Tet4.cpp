@@ -63,7 +63,7 @@ void VTK_Writer_Fluids_ALE_Tet4::writeOutput(
   {
     const std::vector<int> IEN_e = lien_ptr -> get_LIEN(ee);
 
-    double ectrl_x[4]; double ectrl_y[4]; double ectrl_z[4];
+    double ectrl_x[4], ectrl_y[4], ectrl_z[4];
 
     fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
 

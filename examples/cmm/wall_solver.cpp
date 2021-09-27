@@ -1,8 +1,10 @@
 // ============================================================================
 // wall_solver.cpp
 //
-// Triangle element based finite element code for wall mechanics.
+// This is the driver that generate the prestress defined in each quadrature
+// points of each element.
 //
+// Date: May 2021
 // ============================================================================
 #include "HDF5_Reader.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"

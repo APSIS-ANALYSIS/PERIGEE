@@ -74,7 +74,7 @@ void VTK_Writer_FSI_Tet4::writeOutput(
   {
     const std::vector<int> IEN_e = lien_ptr -> get_LIEN( ee );
     
-    double ectrl_x[4]; double ectrl_y[4]; double ectrl_z[4];
+    double ectrl_x[4], ectrl_y[4], ectrl_z[4];
 
     fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
     elemptr->buildBasis( quad, ectrl_x, ectrl_y, ectrl_z );
@@ -126,7 +126,7 @@ void VTK_Writer_FSI_Tet4::writeOutput(
     VIS_T::setTetraelem( IEN_e[0], IEN_e[1], IEN_e[2], IEN_e[3], gridData );
 
     // Analysis mesh partition 
-    int e_global = lelem_ptr->get_elem_loc(ee);
+    const int e_global = lelem_ptr->get_elem_loc(ee);
     anaprocId->InsertNextValue( epart_map[e_global] );
 
     // Physical domain info
@@ -163,8 +163,7 @@ void VTK_Writer_FSI_Tet4::writeOutput(
   }
 
   // Write gridData
-  VIS_T::writeVisFile( gridData, outputBName, outputName,
-      rank, size, sol_time, isXML );
+  VIS_T::writeVisFile( gridData, outputBName, outputName, rank, size, sol_time, isXML );
 
   // Clean gridData
   PetscPrintf(PETSC_COMM_WORLD, "-- Clean gridData object.\n");
@@ -238,22 +237,19 @@ void VTK_Writer_FSI_Tet4::writeOutput_fluid(
     num_adj_cell[ii] = 0.0;
   }
 
-  int IEN_f[4];
-
   for(int ee=0; ee<lelem_ptr->get_nlocalele(); ++ee)
   {
     if( lelem_ptr->get_elem_tag(ee) == 0 )
     {
       const std::vector<int> IEN_e = lien_ptr -> get_LIEN(ee);
 
-      double ectrl_x[4]; double ectrl_y[4]; double ectrl_z[4];
+      double ectrl_x[4], ectrl_y[4], ectrl_z[4];
 
       fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
 
       elemptr->buildBasis( quad, ectrl_x, ectrl_y, ectrl_z );
 
-      IEN_f[0] = fien[ee*4+0]; IEN_f[1] = fien[ee*4+1]; 
-      IEN_f[2] = fien[ee*4+2]; IEN_f[3] = fien[ee*4+3]; 
+      const int IEN_f[4] = { fien[ee*4+0], fien[ee*4+1], fien[ee*4+2], fien[ee*4+3] }; 
 
       // Interpolate data and assign to dataVecs
       std::vector<double> inputInfo; inputInfo.clear();
@@ -335,7 +331,7 @@ void VTK_Writer_FSI_Tet4::writeOutput_fluid(
       VIS_T::setTetraelem( IEN_f[0], IEN_f[1], IEN_f[2], IEN_f[3], gridData );
 
       // Analysis mesh partition 
-      int e_global = lelem_ptr->get_elem_loc(ee);
+      const int e_global = lelem_ptr->get_elem_loc(ee);
       anaprocId->InsertNextValue( epart_map[e_global] );
     }
   }
@@ -453,7 +449,6 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid(
   anaprocId -> SetName("Analysis_Partition");
   anaprocId -> SetNumberOfComponents(1);
 
-  int IEN_f[4];
 
   for(int ee=0; ee<lelem_ptr->get_nlocalele(); ++ee)
   {
@@ -461,14 +456,13 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid(
     {
       const std::vector<int> IEN_e = lien_ptr -> get_LIEN(ee);
 
-      double ectrl_x[4]; double ectrl_y[4]; double ectrl_z[4];
+      double ectrl_x[4], ectrl_y[4], ectrl_z[4];
 
       fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
 
       elemptr->buildBasis( quad, ectrl_x, ectrl_y, ectrl_z );
 
-      IEN_f[0] = fien[ee*4+0]; IEN_f[1] = fien[ee*4+1];
-      IEN_f[2] = fien[ee*4+2]; IEN_f[3] = fien[ee*4+3];
+      const int IEN_f[4] = { fien[ee*4+0],  fien[ee*4+1], fien[ee*4+2], fien[ee*4+3] };
 
       // Interpolate data and assign to dataVecs
       std::vector<double> inputInfo; inputInfo.clear();
@@ -517,7 +511,7 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid(
       VIS_T::setTetraelem( IEN_f[0], IEN_f[1], IEN_f[2], IEN_f[3], gridData );
 
       // Analysis mesh partition 
-      int e_global = lelem_ptr->get_elem_loc(ee);
+      const int e_global = lelem_ptr->get_elem_loc(ee);
       anaprocId->InsertNextValue( epart_map[e_global] );
     }
   }
@@ -611,22 +605,19 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_ref(
   anaprocId -> SetName("Analysis_Partition");
   anaprocId -> SetNumberOfComponents(1);
 
-  int IEN_f[4];
-
   for(int ee=0; ee<lelem_ptr->get_nlocalele(); ++ee)
   {
     if( lelem_ptr->get_elem_tag(ee) == 1 )
     {
       const std::vector<int> IEN_e = lien_ptr -> get_LIEN(ee);
 
-      double ectrl_x[4]; double ectrl_y[4]; double ectrl_z[4];
+      double ectrl_x[4], ectrl_y[4], ectrl_z[4];
 
       fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
 
       elemptr->buildBasis( quad, ectrl_x, ectrl_y, ectrl_z );
 
-      IEN_f[0] = fien[ee*4+0]; IEN_f[1] = fien[ee*4+1];
-      IEN_f[2] = fien[ee*4+2]; IEN_f[3] = fien[ee*4+3];
+      const int IEN_f[4] = { fien[ee*4+0], fien[ee*4+1], fien[ee*4+2], fien[ee*4+3] };
 
       // Interpolate data and assign to dataVecs
       std::vector<double> inputInfo; inputInfo.clear();
@@ -676,7 +667,7 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_ref(
       VIS_T::setTetraelem( IEN_f[0], IEN_f[1], IEN_f[2], IEN_f[3], gridData );
 
       // Analysis mesh partition 
-      int e_global = lelem_ptr->get_elem_loc(ee);
+      const int e_global = lelem_ptr->get_elem_loc(ee);
       anaprocId->InsertNextValue( epart_map[e_global] );
     }
   }
@@ -723,9 +714,7 @@ void VTK_Writer_FSI_Tet4::interpolateJ(
 {
   const int nqp = elem->get_numQuapts();
 
-  std::vector<double> u (nLocBas, 0.0);
-  std::vector<double> v (nLocBas, 0.0);
-  std::vector<double> w (nLocBas, 0.0);
+  std::vector<double> u (nLocBas, 0.0), v (nLocBas, 0.0), w (nLocBas, 0.0);
 
   for(int ii=0; ii<nLocBas; ++ii)
   {
