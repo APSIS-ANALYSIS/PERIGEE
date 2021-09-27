@@ -82,8 +82,6 @@ class PLocAssem_Tet_Wall_Prestress : public IPLocAssem
 
     int nLocBas, snLocBas, vec_size, sur_size;
 
-    std::vector<double> R, dR_dx, dR_dy, dR_dz;
-
     // Private functions
     void print_info() const;
 
