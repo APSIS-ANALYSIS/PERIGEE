@@ -1,8 +1,7 @@
 #include "FEAElement_Triangle3_membrane.hpp"
 
 FEAElement_Triangle3_membrane::FEAElement_Triangle3_membrane( 
-    const int &in_nqua )
-: nLocBas( 3 ), numQuapts( in_nqua )
+    const int &in_nqua ) : nLocBas( 3 ), numQuapts( in_nqua )
 {
   R         = new double [ nLocBas * numQuapts ];
   dR_dx     = new double [ nLocBas ];
@@ -98,16 +97,14 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   Q = Matrix_3x3(e_l1[0], e_l1[1], e_l1[2],
                  e_l2[0], e_l2[1], e_l2[2],
                      unx,     uny,     unz );
+  
   // Rotated lamina coordinates
   double ctrl_xl [nLocBas], ctrl_yl [nLocBas];
 
   for(int ii = 0; ii < nLocBas; ++ii)
   {
-    double ctrl_xyzl[3];
-    Q.VecMult( ctrl_x[ii], ctrl_y[ii], ctrl_z[ii], ctrl_xyzl);
-
-    ctrl_xl[ii] = ctrl_xyzl[0];
-    ctrl_yl[ii] = ctrl_xyzl[1];
+    double temp_val;
+    Q.VecMult( ctrl_x[ii], ctrl_y[ii], ctrl_z[ii], ctrl_xl[ii], ctrl_yl[ii], temp_val );
   }
 
   // Rotated lamina 2D Jacobian & inverse Jacobian components

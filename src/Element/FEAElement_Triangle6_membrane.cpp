@@ -161,10 +161,8 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
 
     for(int ii = 0; ii < nLocBas; ++ii)
     {
-      double ctrl_xyzl[3];
-      Q[qua].VecMult( ctrl_x[ii], ctrl_y[ii], ctrl_z[ii], ctrl_xyzl);
-      ctrl_xl[ii] = ctrl_xyzl[0];
-      ctrl_yl[ii] = ctrl_xyzl[1];
+      double temp_val;
+      Q[qua].VecMult( ctrl_x[ii], ctrl_y[ii], ctrl_z[ii], ctrl_xl[ii], ctrl_yl[ii], temp_val );
     }
 
     // Rotated lamina 2D Jacobian & inverse Jacobian components
