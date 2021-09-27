@@ -102,7 +102,7 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
 
   for(int qua=0; qua<face_nqp; ++qua)
   {
-    std::vector<double> R(nLocBas, 0.0);
+    std::vector<double> R(snLocBas, 0.0);
     element->get_R_gradR( qua, &R[0], &dR_dxl[0], &dR_dyl[0] );
 
     // Lamina and global stiffness matrices
@@ -167,7 +167,7 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
 
     // Basis function gradients with respect to global coords
     // dR/dx_{i} = Q_{ji} * dR/dxl_{j}. Note that dR/dzl = 0.0
-    std::vector<double> dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
+    std::vector<double> dR_dx(snLocBas, 0.0), dR_dy(snLocBas, 0.0), dR_dz(snLocBas, 0.0);
     
     for(int ii=0; ii<snLocBas; ++ii)
     {
@@ -321,7 +321,7 @@ void PLocAssem_Tet_Wall_Prestress::get_Wall_CauchyStress(
 
   for(int qua=0; qua<face_nqp; ++qua)
   {
-    std::vector<double> R(nLocBas, 0.0);
+    std::vector<double> R(snLocBas, 0.0);
     element->get_R_gradR( qua, &R[0], &dR_dxl[0], &dR_dyl[0] );
 
     // Global-to-local rotation matrix Q
