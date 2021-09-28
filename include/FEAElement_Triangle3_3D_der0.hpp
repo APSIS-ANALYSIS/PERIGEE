@@ -39,7 +39,7 @@ class FEAElement_Triangle3_3D_der0 : public FEAElement
 
     virtual int get_numQuapts() const {return numQuapts;}
 
-    virtual int get_nLocBas() const {return nLocBas;}
+    virtual int get_nLocBas() const {return 3;}
 
     virtual void print() const;
 
@@ -51,6 +51,8 @@ class FEAElement_Triangle3_3D_der0 : public FEAElement
         const double * const &ctrl_z );
 
     virtual void get_R( const int &quaindex, double * const &basis ) const;
+
+    virtual std::vector<double> get_R( const int &quaindex ) const;
 
     // Assumes the triangle nodes are arranged such that the outward
     // direction is given by dx_dr x dx_ds
@@ -66,8 +68,6 @@ class FEAElement_Triangle3_3D_der0 : public FEAElement
     virtual double get_detJac(const int &quaindex) const {return detJac;}
 
   private:
-    const int nLocBas;
-
     const int numQuapts;
 
     // container for R0 = 1 - r - s, R1 = r, R2 = s :

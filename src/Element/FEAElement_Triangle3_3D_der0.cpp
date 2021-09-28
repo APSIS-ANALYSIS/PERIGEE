@@ -1,9 +1,9 @@
 #include "FEAElement_Triangle3_3D_der0.hpp"
 
 FEAElement_Triangle3_3D_der0::FEAElement_Triangle3_3D_der0( 
-    const int &in_nqua ) : nLocBas( 3 ), numQuapts( in_nqua )
+    const int &in_nqua ) : numQuapts( in_nqua )
 {
-  R = new double [ nLocBas * numQuapts ];
+  R = new double [ 3 * numQuapts ];
 }
 
 FEAElement_Triangle3_3D_der0::~FEAElement_Triangle3_3D_der0()
@@ -21,7 +21,7 @@ void FEAElement_Triangle3_3D_der0::print() const
 
 double FEAElement_Triangle3_3D_der0::get_memory_usage() const
 {
-  double double_size = nLocBas * numQuapts + 10.0;
+  double double_size = 3 * numQuapts + 10.0;
   double int_size = 2;
   return double_size * 8.0 + int_size * 4.0;
 }
@@ -64,6 +64,13 @@ void FEAElement_Triangle3_3D_der0::get_R( const int &quaindex,
   basis[0] = R[offset];
   basis[1] = R[offset+1];
   basis[2] = R[offset+2];
+}
+
+std::vector<double> FEAElement_Triangle3_3D_der0::get_R( const int &quaindex ) const
+{
+  assert(quaindex>=0 && quaindex < numQuapts);
+  const int offset = quaindex * 3;
+  return { R[offset], R[offset+1], R[offset+2] };
 }
 
 Vector_3 FEAElement_Triangle3_3D_der0::get_2d_normal_out( const int &quaindex,
