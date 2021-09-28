@@ -14,9 +14,6 @@ FEAElement_Triangle6_membrane::FEAElement_Triangle6_membrane( const int &in_nqua
   Jac    = new double [8 * numQuapts];
   detJac = new double [numQuapts];
 
-  e_l1 = new double [3 * numQuapts];
-  e_l2 = new double [3 * numQuapts];
-
   Q.resize(numQuapts);
 }
 
@@ -32,9 +29,6 @@ FEAElement_Triangle6_membrane::~FEAElement_Triangle6_membrane()
 
   delete []    Jac;    Jac = nullptr;
   delete [] detJac; detJac = nullptr;
-
-  delete [] e_l1; e_l1 = nullptr;
-  delete [] e_l2; e_l2 = nullptr;
 }
 
 void FEAElement_Triangle6_membrane::print_info() const
@@ -118,14 +112,12 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
 
     // ======= Global-to-local rotation matrix =======
     const double inv_len_er = 1.0 / MATH_T::norm2( dx_dr[qua], dy_dr[qua], dz_dr[qua] );
-    const double e_r[3] { dx_dr[qua] * inv_len_er,
-      dy_dr[qua] * inv_len_er,
+    const double e_r[3] { dx_dr[qua] * inv_len_er, dy_dr[qua] * inv_len_er,
       dz_dr[qua] * inv_len_er };
 
     const double inv_len_es = 1.0 / MATH_T::norm2( dx_ds[qua], dy_ds[qua], dz_ds[qua] );
-    const double e_s[3] { dx_ds[qua] * inv_len_es,
-     dy_ds[qua] * inv_len_es,
-     dz_ds[qua] * inv_len_es };
+    const double e_s[3] { dx_ds[qua] * inv_len_es, dy_ds[qua] * inv_len_es,
+      dz_ds[qua] * inv_len_es };
 
     // e_a = 0.5*(e_r + e_s) / || 0.5*(e_r + e_s) ||
     double e_a[3] = { 0.5 * ( e_r[0] + e_s[0] ), 
@@ -141,15 +133,17 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
 
     // e_l1 = sqrt(2)/2 * (e_a - e_b)
     // e_l2 = sqrt(2)/2 * (e_a + e_b)
-    for( unsigned int ii = 0; ii < 3; ++ii )
-    {
-      e_l1[3*qua+ii] = std::sqrt(2.0) * 0.5 * ( e_a[ii] - e_b[ii] );
-      e_l2[3*qua+ii] = std::sqrt(2.0) * 0.5 * ( e_a[ii] + e_b[ii] );
-    }
+    const double e_l1[3] { std::sqrt(2.0) * 0.5 * ( e_a[0] - e_b[0] ),
+      std::sqrt(2.0) * 0.5 * ( e_a[1] - e_b[1] ),
+      std::sqrt(2.0) * 0.5 * ( e_a[2] - e_b[2] ) };
+
+    const double e_l2[3] { std::sqrt(2.0) * 0.5 * ( e_a[0] + e_b[0] ),
+      std::sqrt(2.0) * 0.5 * ( e_a[1] + e_b[1] ),
+      std::sqrt(2.0) * 0.5 * ( e_a[2] + e_b[2] ) };
 
     // Q = transpose([ e_l1, e_l2, un ])
-    Q[qua] = Matrix_3x3(e_l1[3*qua], e_l1[3*qua+1], e_l1[3*qua+2],
-        e_l2[3*qua], e_l2[3*qua+1], e_l2[3*qua+2],
+    Q[qua] = Matrix_3x3(e_l1[0], e_l1[1], e_l1[2],
+        e_l2[0], e_l2[1], e_l2[2],
         unx[qua],     uny[qua],     unz[qua] );
 
     // Rotated lamina coordinates
