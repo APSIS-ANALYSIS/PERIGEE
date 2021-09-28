@@ -37,20 +37,20 @@ FEAElement_Tet10::FEAElement_Tet10( const int &in_nqua )
 
 FEAElement_Tet10::~FEAElement_Tet10()
 {
-  delete [] R; R = NULL;
-  delete [] dR_dx; dR_dx = NULL;
-  delete [] dR_dy; dR_dy = NULL;
-  delete [] dR_dz; dR_dz = NULL;
-  delete [] d2R_dxx; d2R_dxx = NULL;
-  delete [] d2R_dyy; d2R_dyy = NULL;
-  delete [] d2R_dzz; d2R_dzz = NULL;
-  delete [] d2R_dxy; d2R_dxy = NULL;
-  delete [] d2R_dxz; d2R_dxz = NULL;
-  delete [] d2R_dyz; d2R_dyz = NULL;
+  delete [] R;             R = nullptr;
+  delete [] dR_dx;     dR_dx = nullptr;
+  delete [] dR_dy;     dR_dy = nullptr;
+  delete [] dR_dz;     dR_dz = nullptr;
+  delete [] d2R_dxx; d2R_dxx = nullptr;
+  delete [] d2R_dyy; d2R_dyy = nullptr;
+  delete [] d2R_dzz; d2R_dzz = nullptr;
+  delete [] d2R_dxy; d2R_dxy = nullptr;
+  delete [] d2R_dxz; d2R_dxz = nullptr;
+  delete [] d2R_dyz; d2R_dyz = nullptr;
 
-  delete [] dx_dr; dx_dr = NULL;
-  delete [] dr_dx; dr_dx = NULL;
-  delete [] detJac; detJac = NULL;
+  delete [] dx_dr;     dx_dr = nullptr;
+  delete [] dr_dx;     dr_dx = nullptr;
+  delete [] detJac;   detJac = nullptr;
 }
 
 void FEAElement_Tet10::print_info() const
@@ -253,7 +253,7 @@ void FEAElement_Tet10::get_R( const int &quaindex, double * const &basis ) const
   for(int ii=0; ii<10; ++ii) basis[ii] = R[offset+ii];
 }
 
-std::vector<double> FEAElement_Tet4::get_R( const int &quaindex ) const
+std::vector<double> FEAElement_Tet10::get_R( const int &quaindex ) const
 {
   assert( quaindex >= 0 && quaindex < numQuapts );
   const int offset = quaindex * 10;
