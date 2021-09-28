@@ -120,6 +120,24 @@ void FEAElement_Tet4::get_gradR( const int &quaindex, double * const &basis_x,
   }
 }
 
+std::vector<double> FEAElement_Tet4::get_dR_dx( const int &quaindex ) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  return { dR_dx[0], dR_dx[1], dR_dx[2], dR_dx[3] };
+}
+
+std::vector<double> FEAElement_Tet4::get_dR_dy( const int &quaindex ) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  return { dR_dy[0], dR_dy[1], dR_dy[2], dR_dy[3] };
+}
+
+std::vector<double> FEAElement_Tet4::get_dR_dz( const int &quaindex ) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  return { dR_dz[0], dR_dz[1], dR_dz[2], dR_dz[3] };
+}
+
 void FEAElement_Tet4::get_R_gradR( const int &quaindex, double * const &basis,
     double * const &basis_x, double * const &basis_y,
     double * const &basis_z ) const

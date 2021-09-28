@@ -47,12 +47,14 @@ int main( int argc, char * argv[] )
   std::vector<double> b (nsize, -100.1), c (5, 99.9), d (2, 1.0);
 
   VEC_T::print(b);
-  VEC_T::print(c);
-  VEC_T::print(d);
 
-  double f[3] {1.1, 2.3, 5.6};
+  b = {0.0, 1.0};
+  
+  std::cout<<b.size()<<std::endl;
 
-  for(int ii=0; ii<3; ++ii) std::cout<<f[ii]<<std::endl;
+  VEC_T::print(b);
+
+  std::cout<<b.size()<<std::endl;
 
   return EXIT_SUCCESS;
 }
