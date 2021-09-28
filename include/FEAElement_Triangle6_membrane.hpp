@@ -108,7 +108,7 @@ class FEAElement_Triangle6_membrane : public FEAElement
     // Containers for unit vectors used to construct rotation matrix Q,
     // length is numQapts x 3, and e_r[at qua pt][ii direction] is 
     // stored as e_r[3*qua + ii], with 0 <= qua < numQuapts, ii = 0, 1, 2
-    double * e_r, * e_s, * e_l1, * e_l2;
+    double * e_l1, * e_l2;
 
     // Global-to-lamina 3x3 rotation matrix, of length numQuapts
     std::vector< Matrix_3x3 > Q;
