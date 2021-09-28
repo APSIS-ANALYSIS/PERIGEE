@@ -3,16 +3,10 @@
 FEAElement_Triangle3_membrane::FEAElement_Triangle3_membrane( 
     const int &in_nqua ) : nLocBas( 3 ), numQuapts( in_nqua )
 {
-  R         = new double [ nLocBas * numQuapts ];
-  dR_dx     = new double [ nLocBas ];
-  dR_dy     = new double [ nLocBas ];
 }
 
 FEAElement_Triangle3_membrane::~FEAElement_Triangle3_membrane()
 {
-  delete []     R;     R = nullptr;
-  delete [] dR_dx; dR_dx = nullptr;
-  delete [] dR_dy; dR_dy = nullptr;
 }
 
 void FEAElement_Triangle3_membrane::print() const
