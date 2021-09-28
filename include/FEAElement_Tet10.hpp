@@ -107,10 +107,6 @@ class FEAElement_Tet10 : public FEAElement
   private:
     const int numQuapts;
 
-    // Auxiliary container for calculating second derivatives
-    double RHS [6];
-    double sol [6];
-
     // R: 0 <= ii < 10 numQuapts
     double * R, * dR_dx, * dR_dy, * dR_dz;
     double * d2R_dxx, * d2R_dyy, * d2R_dzz;
