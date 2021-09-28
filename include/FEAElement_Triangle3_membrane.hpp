@@ -78,8 +78,6 @@ class FEAElement_Triangle3_membrane : public FEAElement
       return { dR_dy[0], dR_dy[1], dR_dy[2] };
     }
     
-    virtual std::vector<double> get_dR_dy( const int &quaindex ) const;
-
     virtual Matrix_3x3 get_rotationMatrix( const int &quaindex ) const;
 
     // Assumes the triangle nodes are arranged such that the outward
@@ -100,11 +98,11 @@ class FEAElement_Triangle3_membrane : public FEAElement
 
     // Container for R0 = 1 - r - s, R1 = r, R2 = s :
     // 0 <= ii < 3 x numQuapts
-    double R [nLocBas * numQuapts];
+    double * R;
 
     // Containers for gradients of basis functions with respect to
     // rotated *lamina* coordinates. Derivatives are constant here.
-    double dR_dx [nLocBas], dR_dy [nLocBas];
+    double dR_dx [3], dR_dy [3];
 
     // Global-to-lamina 3x3 rotation matrix
     Matrix_3x3 Q;

@@ -3,10 +3,12 @@
 FEAElement_Triangle3_membrane::FEAElement_Triangle3_membrane( 
     const int &in_nqua ) : nLocBas( 3 ), numQuapts( in_nqua )
 {
+  R = new double [nLocBas * numQuapts];
 }
 
 FEAElement_Triangle3_membrane::~FEAElement_Triangle3_membrane()
 {
+  delete [] R; R = nullptr;
 }
 
 void FEAElement_Triangle3_membrane::print() const
