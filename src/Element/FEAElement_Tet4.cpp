@@ -1,31 +1,13 @@
 #include "FEAElement_Tet4.hpp"
 
-FEAElement_Tet4::FEAElement_Tet4( const int &in_nqua )
-: numQuapts( in_nqua )
+FEAElement_Tet4::FEAElement_Tet4( const int &in_nqua ) : numQuapts( in_nqua )
 {
   R = new double [4 * numQuapts];
 }
 
 FEAElement_Tet4::~FEAElement_Tet4()
 {
-  clearBasisCache();
-}
-
-void FEAElement_Tet4::clearBasisCache()
-{
   delete [] R; R = nullptr;
-}
-
-void FEAElement_Tet4::resize_container()
-{
-  clearBasisCache();
-  R = new double [ 4 * numQuapts ];
-}
-
-void FEAElement_Tet4::reset_numQuapts( const int &new_num_qua )
-{
-  numQuapts = new_num_qua;
-  resize_container();
 }
 
 void FEAElement_Tet4::print() const

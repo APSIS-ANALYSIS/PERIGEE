@@ -32,8 +32,6 @@ class FEAElement_Tet4 : public FEAElement
 
     virtual int get_nLocBas() const {return 4;}
 
-    virtual void reset_numQuapts( const int &new_num_qua );
-
     virtual void print() const;
 
     virtual double get_memory_usage() const;
@@ -88,15 +86,13 @@ class FEAElement_Tet4 : public FEAElement
     {return detJac;}
 
   private:
-    int numQuapts;
+    const int numQuapts;
 
     // R : 0 <= ii < 4 x numQuapts
     double * R;
 
     // tet4 is linear, the first-order derivatives are constant
-    double dR_dx[4];
-    double dR_dy[4];
-    double dR_dz[4];
+    double dR_dx[4], dR_dy[4], dR_dz[4];
 
     // Container for
     // dx_dr : 0 <= ii < 9
@@ -104,12 +100,6 @@ class FEAElement_Tet4 : public FEAElement
     double Jac[18]; 
 
     double detJac;
-
-    // Deallocate memory for dynamic array R
-    virtual void clearBasisCache();
-
-    // Resize the R array if the quadrature rule is changed
-    void resize_container();
 };
 
 #endif
