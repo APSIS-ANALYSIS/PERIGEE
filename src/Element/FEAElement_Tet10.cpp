@@ -253,6 +253,14 @@ void FEAElement_Tet10::get_R( const int &quaindex, double * const &basis ) const
   for(int ii=0; ii<10; ++ii) basis[ii] = R[offset+ii];
 }
 
+std::vector<double> FEAElement_Tet4::get_R( const int &quaindex ) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  const int offset = quaindex * 10;
+  return { R[offset], R[offset+1], R[offset+2], R[offset+3],
+    R[offset+4], R[offset+5], R[offset+6], R[offset+7], R[offset+8], R[offset+9] };
+}
+
 void FEAElement_Tet10::get_gradR( const int &quaindex, double * const &basis_x,
     double * const &basis_y, double * const &basis_z ) const
 {
