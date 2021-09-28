@@ -10,11 +10,6 @@ FEAElement_Triangle3_membrane::FEAElement_Triangle3_membrane(
 
 FEAElement_Triangle3_membrane::~FEAElement_Triangle3_membrane()
 {
-  clearBasisCache();
-}
-
-void FEAElement_Triangle3_membrane::clearBasisCache()
-{
   delete []     R;     R = nullptr;
   delete [] dR_dx; dR_dx = nullptr;
   delete [] dR_dy; dR_dy = nullptr;
@@ -63,14 +58,14 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
 
   // ======= Global-to-local rotation matrix =======
   const double inv_len_er = 1.0 / MATH_T::norm2( dx_dr, dy_dr, dz_dr );
-  e_r[0] = dx_dr * inv_len_er;
-  e_r[1] = dy_dr * inv_len_er; 
-  e_r[2] = dz_dr * inv_len_er; 
+  const double e_r[3] { dx_dr * inv_len_er,
+   dy_dr * inv_len_er,
+   dz_dr * inv_len_er };
 
   const double inv_len_es = 1.0 / MATH_T::norm2( dx_ds, dy_ds, dz_ds );
-  e_s[0] = dx_ds * inv_len_es; 
-  e_s[1] = dy_ds * inv_len_es; 
-  e_s[2] = dz_ds * inv_len_es; 
+  const double e_s[3] { dx_ds * inv_len_es,
+   dy_ds * inv_len_es,
+   dz_ds * inv_len_es }; 
 
   // e_a = 0.5*(e_r + e_s) / || 0.5*(e_r + e_s) ||
   double e_a[3] = { 0.5 * ( e_r[0] + e_s[0] ), 0.5 * ( e_r[1] + e_s[1] ),
@@ -140,6 +135,13 @@ void FEAElement_Triangle3_membrane::get_R( const int &quaindex,
   basis[0] = R[offset];
   basis[1] = R[offset + 1];
   basis[2] = R[offset + 2];
+}
+
+std::vector<double> FEAElement_Triangle3_membrane::get_R( const int &quaindex ) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  const int offset = quaindex * nLocBas;
+  return { R[offset], R[offset + 1], R[offset + 2] };
 }
 
 void FEAElement_Triangle3_membrane::get_gradR( const int &quaindex,

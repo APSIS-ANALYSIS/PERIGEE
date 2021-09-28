@@ -408,9 +408,6 @@ class FEAElement
     // is beneficial for the memory pool.) The values are recomputed repeatedly
     // during the buildBasis calls. 
     // ------------------------------------------------------------------------
-    virtual void reset_eIndex( const int &new_index )
-    {SYS_T::commPrint("Warning: reset_eIndex is not implemented. \n");}
-
     virtual void reset_degree( const int &new_sdeg, const int &new_tdeg )
     {SYS_T::commPrint("Warning: reset_degree is not implemented. \n");}
 

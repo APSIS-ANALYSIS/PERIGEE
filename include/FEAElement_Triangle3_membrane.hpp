@@ -58,6 +58,8 @@ class FEAElement_Triangle3_membrane : public FEAElement
 
     virtual void get_R( const int &quaindex, double * const &basis ) const;
 
+    virtual std::vector<double> get_R( const int &quaindex ) const;
+
     virtual void get_gradR( const int &quaindex, double * const &basis_x,
         double * const &basis_y ) const;
 
@@ -92,7 +94,7 @@ class FEAElement_Triangle3_membrane : public FEAElement
 
     // Containers for unit vectors used to construct rotation matrix Q,
     // each of length 3 
-    double e_r[3], e_s[3], e_l1[3], e_l2[3];
+    double e_l1[3], e_l2[3];
 
     // Global-to-lamina 3x3 rotation matrix
     Matrix_3x3 Q;
@@ -107,9 +109,6 @@ class FEAElement_Triangle3_membrane : public FEAElement
 
     // Rotated *lamina* Jacobian determinant 
     double detJac;
-
-    // Deallocate the memory
-    virtual void clearBasisCache();
 };
 
 #endif
