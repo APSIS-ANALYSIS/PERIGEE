@@ -40,6 +40,8 @@ class FEAElement_Triangle3 : public FEAElement
         const double * const &ctrl_y ) const;
 
     virtual void get_R( const int &quaindex, double * const &basis ) const;
+    
+    virtual std::vector<double> get_R( const int &quaindex ) const;
 
     virtual void get_gradR( const int &quaindex, double * const &basis_x,
         double * const &basis_y ) const;
@@ -59,8 +61,7 @@ class FEAElement_Triangle3 : public FEAElement
     virtual void get_invJacobian(const int &quaindex,
         double * const &jac_value) const;
 
-    virtual double get_detJac(const int &quaindex) const
-    {return detJac;}
+    virtual double get_detJac(const int &quaindex) const {return detJac;}
 
   private:
     const int numQuapts;
@@ -68,8 +69,7 @@ class FEAElement_Triangle3 : public FEAElement
     double * R;
 
     // tri3 is linear element, hence the derivatives are constant
-    double dR_dx[3];
-    double dR_dy[3];
+    double dR_dx[3], dR_dy[3];
 
     // Container for 
     // dx_dr : 0 <= ii < 4

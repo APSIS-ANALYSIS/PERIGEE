@@ -142,6 +142,12 @@ void FEAElement_Triangle6::get_R( const int &quaindex,
   basis[4] = R[offset+4]; basis[5] = R[offset+5];
 }
 
+std::vector<double> FEAElement_Triangle6::get_R( const int &quaindex ) const
+{
+  const int offset = quaindex * 6;
+  return { R[offset], R[offset+1], R[offset+2], R[offset+3], R[offset+4], R[offset+5] };
+}
+
 void FEAElement_Triangle6::get_gradR( const int &quaindex, 
     double * const &basis_x, double * const &basis_y ) const
 {

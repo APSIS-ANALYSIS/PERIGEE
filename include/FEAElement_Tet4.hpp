@@ -82,8 +82,7 @@ class FEAElement_Tet4 : public FEAElement
     virtual void get_invJacobian(const int &quaindex, 
         double * const &jac_value) const;
 
-    virtual double get_detJac(const int &quaindex) const
-    {return detJac;}
+    virtual double get_detJac(const int &quaindex) const {return detJac;}
 
   private:
     const int numQuapts;

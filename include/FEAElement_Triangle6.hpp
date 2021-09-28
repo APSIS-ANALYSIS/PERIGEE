@@ -41,6 +41,8 @@ class FEAElement_Triangle6 : public FEAElement
 
     virtual void get_R( const int &quaindex, double * const &basis ) const;
 
+    virtual std::vector<double> get_R( const int &quaindex ) const;
+
     virtual void get_gradR( const int &quaindex, double * const &basis_x,
         double * const &basis_y ) const;
 
