@@ -191,14 +191,19 @@ class FEAElement
 
 
     // ------------------------------------------------------------------------
-    // Get_xxx functions
-    //     Obtain the value of basis functions and their derivatives.
+    // Get functions : Obtain the value of basis functions and their derivatives.
     // ------------------------------------------------------------------------
     // Return basis function value using a dynamic double array.
     // Users are responsible for allocating proper memory for basis,
     // and delete the pointer after use.
     virtual void get_R( const int &quaindex, double * const &basis ) const
     {SYS_T::commPrint("Warning: get_R is not implemented. \n");} 
+
+    virtual std::vector<double> get_R( const int &quaindex ) const
+    {
+      SYS_T::commPrint("Warning: get_R is not implemented. \n");
+      return {};
+    } 
 
     // ------------------------------------------------------------------------    
     // Return basis function and all 1st order derivatives value 

@@ -119,6 +119,13 @@ void FEAElement_Tet4::get_R( const int &quaindex, double * const &basis ) const
   basis[3] = R[offset+3];
 }
 
+std::vector<double> FEAElement_Tet4::get_R( const int &quaindex ) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  const int offset = quaindex * 4;
+  return { R[offset], R[offset+1], R[offset+2], R[offset+3] };
+}
+
 void FEAElement_Tet4::get_gradR( const int &quaindex, double * const &basis_x,
     double * const &basis_y, double * const &basis_z ) const
 {
