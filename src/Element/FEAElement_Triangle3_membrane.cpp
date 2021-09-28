@@ -58,14 +58,12 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
 
   // ======= Global-to-local rotation matrix =======
   const double inv_len_er = 1.0 / MATH_T::norm2( dx_dr, dy_dr, dz_dr );
-  const double e_r[3] { dx_dr * inv_len_er,
-   dy_dr * inv_len_er,
-   dz_dr * inv_len_er };
+  const double e_r[3] { dx_dr * inv_len_er, dy_dr * inv_len_er,
+    dz_dr * inv_len_er };
 
   const double inv_len_es = 1.0 / MATH_T::norm2( dx_ds, dy_ds, dz_ds );
-  const double e_s[3] { dx_ds * inv_len_es,
-   dy_ds * inv_len_es,
-   dz_ds * inv_len_es }; 
+  const double e_s[3] { dx_ds * inv_len_es, dy_ds * inv_len_es,
+    dz_ds * inv_len_es }; 
 
   // e_a = 0.5*(e_r + e_s) / || 0.5*(e_r + e_s) ||
   double e_a[3] = { 0.5 * ( e_r[0] + e_s[0] ), 0.5 * ( e_r[1] + e_s[1] ),
@@ -80,12 +78,11 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   // e_l1 = sqrt(2)/2 * (e_a - e_b)
   // e_l2 = sqrt(2)/2 * (e_a + e_b)
   e_l1[0] = std::sqrt(2.0) * 0.5 * ( e_a[0] - e_b[0] );
-  e_l2[0] = std::sqrt(2.0) * 0.5 * ( e_a[0] + e_b[0] );
-
   e_l1[1] = std::sqrt(2.0) * 0.5 * ( e_a[1] - e_b[1] );
-  e_l2[1] = std::sqrt(2.0) * 0.5 * ( e_a[1] + e_b[1] );
-
   e_l1[2] = std::sqrt(2.0) * 0.5 * ( e_a[2] - e_b[2] );
+  
+  e_l2[0] = std::sqrt(2.0) * 0.5 * ( e_a[0] + e_b[0] );
+  e_l2[1] = std::sqrt(2.0) * 0.5 * ( e_a[1] + e_b[1] );
   e_l2[2] = std::sqrt(2.0) * 0.5 * ( e_a[2] + e_b[2] );
 
   // Q = transpose([ e_l1, e_l2, un ])
