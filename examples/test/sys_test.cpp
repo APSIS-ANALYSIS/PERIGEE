@@ -50,6 +50,10 @@ int main( int argc, char * argv[] )
   VEC_T::print(c);
   VEC_T::print(d);
 
+  double f[3] {1.1, 2.3, 5.6};
+
+  for(int ii=0; ii<3; ++ii) std::cout<<f[ii]<<std::endl;
+
   return EXIT_SUCCESS;
 }
 

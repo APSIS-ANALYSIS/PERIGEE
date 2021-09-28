@@ -63,6 +63,8 @@ class FEAElement_Triangle6_3D_der0 : public FEAElement
 
     virtual void get_R( const int &quaindex, double * const &basis ) const;
 
+    virtual std::vector<double> get_R( const int &quaindex ) const;
+
     // Assuming the triangle nodes are arranged such that the outward
     // direction is given by dx_dr x dx_ds
     virtual Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const;

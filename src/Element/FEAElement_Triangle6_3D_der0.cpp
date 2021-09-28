@@ -21,26 +21,24 @@ FEAElement_Triangle6_3D_der0::FEAElement_Triangle6_3D_der0( const int &in_nqua )
   detJac = new double [numQuapts];
 }
 
-
 FEAElement_Triangle6_3D_der0::~FEAElement_Triangle6_3D_der0()
 {
-  delete [] R; R = NULL;
-  delete [] dx_dr; dx_dr = NULL;
-  delete [] dx_ds; dx_ds = NULL;
+  delete [] R;         R = nullptr;
+  delete [] dx_dr; dx_dr = nullptr;
+  delete [] dx_ds; dx_ds = nullptr;
   
-  delete [] dy_dr; dx_dr = NULL;
-  delete [] dy_ds; dx_ds = NULL;
+  delete [] dy_dr; dx_dr = nullptr;
+  delete [] dy_ds; dx_ds = nullptr;
   
-  delete [] dz_dr; dx_dr = NULL;
-  delete [] dz_ds; dx_ds = NULL;
+  delete [] dz_dr; dx_dr = nullptr;
+  delete [] dz_ds; dx_ds = nullptr;
 
-  delete [] unx; unx = NULL; 
-  delete [] uny; uny = NULL; 
-  delete [] unz; unz = NULL;
+  delete [] unx;     unx = nullptr; 
+  delete [] uny;     uny = nullptr;
+  delete [] unz;     unz = nullptr;
 
-  delete [] detJac; detJac = NULL;
+  delete [] detJac; detJac = nullptr;
 }
-
 
 void FEAElement_Triangle6_3D_der0::print_info() const
 {
@@ -50,13 +48,11 @@ void FEAElement_Triangle6_3D_der0::print_info() const
   SYS_T::commPrint("Note: This element is designed for natural BC integrals. \n ");
 }
 
-
 double FEAElement_Triangle6_3D_der0::get_memory_usage() const
 {
   const double dsize = 16 * numQuapts;
   return dsize * 8.0 + 4.0;
 }
-
 
 void FEAElement_Triangle6_3D_der0::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_x,
@@ -65,14 +61,11 @@ void FEAElement_Triangle6_3D_der0::buildBasis( const IQuadPts * const &quad,
 {
   assert(quad->get_dim() == 3);
 
-  double qua_r, qua_s, qua_t;
-  double Rr [6];
-  double Rs [6];
   for( int qua = 0; qua < numQuapts; ++qua )
   {
-    qua_r = quad -> get_qp( qua, 0 );
-    qua_s = quad -> get_qp( qua, 1 );
-    qua_t = quad -> get_qp( qua, 2 );
+    const double qua_r = quad -> get_qp( qua, 0 );
+    const double qua_s = quad -> get_qp( qua, 1 );
+    const double qua_t = quad -> get_qp( qua, 2 );
 
     const int offset = 6 * qua;
 
@@ -83,19 +76,13 @@ void FEAElement_Triangle6_3D_der0::buildBasis( const IQuadPts * const &quad,
     R[offset + 4] = 4.0 * qua_r * qua_s;
     R[offset + 5] = 4.0 * qua_s * qua_t;
  
-    Rr[0] = 4.0 * qua_r + 4.0 * qua_s - 3.0;
-    Rr[1] = 4.0 * qua_r - 1.0;
-    Rr[2] = 0.0;
-    Rr[3] = 4.0 - 8.0 * qua_r - 4.0 * qua_s;
-    Rr[4] = 4.0 * qua_s;
-    Rr[5] = -4.0 * qua_s;
+    const double Rr[6] { 4.0 * qua_r + 4.0 * qua_s - 3.0,
+     4.0 * qua_r - 1.0, 0.0, 4.0 - 8.0 * qua_r - 4.0 * qua_s,
+     4.0 * qua_s, -4.0 * qua_s };
     
-    Rs[0] = 4.0 * qua_r + 4.0 * qua_s - 3.0;
-    Rs[1] = 0.0;
-    Rs[2] = 4.0 * qua_s - 1.0;
-    Rs[3] = -4.0 * qua_r;
-    Rs[4] = 4.0 * qua_r;
-    Rs[5] = 4.0 - 4.0 * qua_r - 8.0 * qua_s;
+    const double Rs[6] { 4.0 * qua_r + 4.0 * qua_s - 3.0,
+      0.0, 4.0 * qua_s - 1.0, -4.0 * qua_r, 4.0 * qua_r,
+      4.0 - 4.0 * qua_r - 8.0 * qua_s };
     
     dx_dr[qua] = 0.0; dx_ds[qua] = 0.0;
     dy_dr[qua] = 0.0; dy_ds[qua] = 0.0;
@@ -121,7 +108,6 @@ void FEAElement_Triangle6_3D_der0::buildBasis( const IQuadPts * const &quad,
   }
 }
 
-
 void FEAElement_Triangle6_3D_der0::get_R( 
     const int &quaindex, double * const &basis ) const
 {
@@ -133,6 +119,14 @@ void FEAElement_Triangle6_3D_der0::get_R(
   basis[3] = R[offset+3];
   basis[4] = R[offset+4];
   basis[5] = R[offset+5];
+}
+
+std::vector<double> FEAElement_Triangle6_3D_der0::get_R( 
+    const int &quaindex ) const
+{
+  assert(quaindex>=0 && quaindex < numQuapts);
+  const int offset = quaindex * 6;
+  return { R[offset], R[offset+1], R[offset+2], R[offset+3], R[offset+4], R[offset+5] };
 }
 
 Vector_3 FEAElement_Triangle6_3D_der0::get_2d_normal_out( const int &qua,
