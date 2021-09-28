@@ -112,5 +112,4 @@ class FEAElement_Tet4 : public FEAElement
     void resize_container();
 };
 
-
 #endif

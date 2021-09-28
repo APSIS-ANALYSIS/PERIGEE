@@ -1,39 +1,15 @@
 #include "FEAElement_Triangle3_3D_der0.hpp"
 
 FEAElement_Triangle3_3D_der0::FEAElement_Triangle3_3D_der0( 
-    const int &in_nqua )
-: nLocBas( 3 ), numQuapts( in_nqua )
+    const int &in_nqua ) : nLocBas( 3 ), numQuapts( in_nqua )
 {
   R = new double [ nLocBas * numQuapts ];
 }
-
 
 FEAElement_Triangle3_3D_der0::~FEAElement_Triangle3_3D_der0()
 {
-  clearBasisCache();
+  delete [] R; R = nullptr;
 }
-
-
-void FEAElement_Triangle3_3D_der0::clearBasisCache()
-{
-  delete [] R; R = NULL;
-}
-
-
-void FEAElement_Triangle3_3D_der0::resize_container()
-{
-  clearBasisCache();
-  R = new double [ nLocBas * numQuapts ];
-}
-
-
-void FEAElement_Triangle3_3D_der0::reset_numQuapts( 
-    const int &new_num_qua )
-{
-  numQuapts = new_num_qua;
-  resize_container();
-}
-
 
 void FEAElement_Triangle3_3D_der0::print() const
 {
@@ -43,7 +19,6 @@ void FEAElement_Triangle3_3D_der0::print() const
   SYS_T::commPrint("Note: This element is designed for natural BC integrals. \n ");
 }
 
-
 double FEAElement_Triangle3_3D_der0::get_memory_usage() const
 {
   double double_size = nLocBas * numQuapts + 10.0;
@@ -51,26 +26,20 @@ double FEAElement_Triangle3_3D_der0::get_memory_usage() const
   return double_size * 8.0 + int_size * 4.0;
 }
 
-
 void FEAElement_Triangle3_3D_der0::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_x,
     const double * const &ctrl_y,
     const double * const &ctrl_z )
 {
-  double qua_r, qua_s;
   for( int qua = 0; qua < numQuapts; ++qua )
   {
-    qua_r = quad -> get_qp(qua, 0);
-    qua_s = quad -> get_qp(qua, 1);
+    const double qua_r = quad -> get_qp(qua, 0);
+    const double qua_s = quad -> get_qp(qua, 1);
     R[qua*3 + 0] = 1.0 - qua_r - qua_s;
     R[qua*3 + 1] = qua_r;
     R[qua*3 + 2] = qua_s;
   }
 
-  //const double dN0_dr = -1.0; const double dN0_ds = -1.0;
-  //const double dN1_dr = 1.0;  const double dN1_ds = 0.0;
-  //const double dN2_dr = 0.0;  const double dN2_ds = 1.0;
-  
   dx_dr = ctrl_x[0] * (-1.0) + ctrl_x[1];
   dy_dr = ctrl_y[0] * (-1.0) + ctrl_y[1];
   dz_dr = ctrl_z[0] * (-1.0) + ctrl_z[1];

@@ -41,8 +41,6 @@ class FEAElement_Triangle3_3D_der0 : public FEAElement
 
     virtual int get_nLocBas() const {return nLocBas;}
 
-    virtual void reset_numQuapts( const int &new_num_qua );
-
     virtual void print() const;
 
     virtual double get_memory_usage() const;
@@ -70,7 +68,7 @@ class FEAElement_Triangle3_3D_der0 : public FEAElement
   private:
     const int nLocBas;
 
-    int numQuapts;
+    const int numQuapts;
 
     // container for R0 = 1 - r - s, R1 = r, R2 = s :
     // 0 <= ii < 3 x numQuapts
@@ -84,13 +82,6 @@ class FEAElement_Triangle3_3D_der0 : public FEAElement
 
     // Jacobian determinant 
     double detJac;
-
-    // deallocate the memory
-    virtual void clearBasisCache();
-
-    // resize the dynamic arrays R, dx_ds, detJac if the quadrature rule
-    // is changed
-    void resize_container(); 
 };
 
 #endif
