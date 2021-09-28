@@ -92,10 +92,6 @@ class FEAElement_Triangle3_membrane : public FEAElement
     // rotated *lamina* coordinates. Derivatives are constant here.
     double * dR_dx, * dR_dy;
 
-    // Containers for unit vectors used to construct rotation matrix Q,
-    // each of length 3 
-    double e_l1[3], e_l2[3];
-
     // Global-to-lamina 3x3 rotation matrix
     Matrix_3x3 Q;
 
