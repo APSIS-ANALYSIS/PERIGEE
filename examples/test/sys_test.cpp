@@ -46,15 +46,15 @@ int main( int argc, char * argv[] )
 
   std::vector<double> b (nsize, -100.1), c (5, 99.9), d (2, 1.0);
 
-  VEC_T::print(b);
-
-  b = {0.0, 1.0};
+  std::cout<<b.size()<<'\t'<<b.capacity()<<std::endl;
   
-  std::cout<<b.size()<<std::endl;
-
   VEC_T::print(b);
 
-  std::cout<<b.size()<<std::endl;
+  b = {0.0, 1.0, 3.0, 5.0, 2232.0};
+  
+  VEC_T::print(b);
+
+  std::cout<<b.size()<<'\t'<<b.capacity()<<std::endl;
 
   return EXIT_SUCCESS;
 }

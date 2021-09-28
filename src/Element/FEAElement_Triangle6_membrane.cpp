@@ -241,6 +241,22 @@ void FEAElement_Triangle6_membrane::get_R_gradR( const int &quaindex,
   }
 }
 
+std::vector<double> FEAElement_Triangle6_membrane::get_dR_dx( const int &quaindex ) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  const int offset = quaindex * nLocBas;
+  return { dR_dx[offset], dR_dx[offset+1], dR_dx[offset+2],
+    dR_dx[offset+3], dR_dx[offset+4], dR_dx[offset+5] }; 
+}
+
+std::vector<double> FEAElement_Triangle6_membrane::get_dR_dy( const int &quaindex ) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  const int offset = quaindex * nLocBas;
+  return { dR_dy[offset], dR_dy[offset+1], dR_dy[offset+2],
+    dR_dy[offset+3], dR_dy[offset+4], dR_dy[offset+5] }; 
+}
+
 Vector_3 FEAElement_Triangle6_membrane::get_2d_normal_out( const int &qua,
     double &area ) const
 {
