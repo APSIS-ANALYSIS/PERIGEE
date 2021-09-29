@@ -128,23 +128,24 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
     // e_b = vec(un) x e_a / || vec(un) x e_a ||
     double e_b[3] = {0.0};
     MATH_T::cross3d(unx[qua], uny[qua], unz[qua], e_a[0], e_a[1], e_a[2],
-        e_b[0], e_b[1], e_b[2]);
+      e_b[0], e_b[1], e_b[2]);
+
     MATH_T::normalize3d( e_b[0], e_b[1], e_b[2] );
 
     // e_l1 = sqrt(2)/2 * (e_a - e_b)
     // e_l2 = sqrt(2)/2 * (e_a + e_b)
     const double e_l1[3] { std::sqrt(2.0) * 0.5 * ( e_a[0] - e_b[0] ),
-      std::sqrt(2.0) * 0.5 * ( e_a[1] - e_b[1] ),
-      std::sqrt(2.0) * 0.5 * ( e_a[2] - e_b[2] ) };
+                           std::sqrt(2.0) * 0.5 * ( e_a[1] - e_b[1] ),
+                           std::sqrt(2.0) * 0.5 * ( e_a[2] - e_b[2] ) };
 
     const double e_l2[3] { std::sqrt(2.0) * 0.5 * ( e_a[0] + e_b[0] ),
-      std::sqrt(2.0) * 0.5 * ( e_a[1] + e_b[1] ),
-      std::sqrt(2.0) * 0.5 * ( e_a[2] + e_b[2] ) };
+                           std::sqrt(2.0) * 0.5 * ( e_a[1] + e_b[1] ),
+                           std::sqrt(2.0) * 0.5 * ( e_a[2] + e_b[2] ) };
 
     // Q = transpose([ e_l1, e_l2, un ])
-    Q[qua] = Matrix_3x3(e_l1[0], e_l1[1], e_l1[2],
-        e_l2[0], e_l2[1], e_l2[2],
-        unx[qua],     uny[qua],     unz[qua] );
+    Q[qua] = Matrix_3x3( e_l1[0],  e_l1[1],  e_l1[2],
+                         e_l2[0],  e_l2[1],  e_l2[2],
+                        unx[qua], uny[qua], unz[qua] );
 
     // Rotated lamina coordinates
     double ctrl_xl [nLocBas], ctrl_yl [nLocBas];
