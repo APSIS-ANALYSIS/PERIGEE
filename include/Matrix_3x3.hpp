@@ -163,8 +163,8 @@ class Matrix_3x3
     Vector_3 VecMult( const Vector_3 &x ) const;
 
     // y = Ax, wherein x = [x0; x1; x2] (to be removed)
-    void VecMult( const double &x0, const double &x1, const double &x2,
-       double * const &y ) const;
+    //void VecMult( const double &x0, const double &x1, const double &x2,
+    //   double * const &y ) const;
 
     void VecMult( const double &x0, const double &x1, const double &x2,
        double &y0, double &y1, double &y2 ) const;
@@ -173,8 +173,8 @@ class Matrix_3x3
     Vector_3 VecMultT( const Vector_3 &x ) const;
 
     // y = x^T A, wherein x = [x0; x1; x2] (to be removed)
-    void VecMultT( const double &x0, const double &x1, const double &x2,
-       double * const &y ) const;
+    //void VecMultT( const double &x0, const double &x1, const double &x2,
+    //   double * const &y ) const;
 
     void VecMultT( const double &x0, const double &x1, const double &x2,
        double &y0, double &y1, double &y2 ) const;
