@@ -18,7 +18,6 @@ int main( int argc, char * argv[] )
   int sysret = system("rm -rf postpart_p*.h5");
   SYS_T::print_fatal_if(sysret != 0, "Error: system call failed. \n");
 
-  std::string geo_file;
   int dofNum, dofMat, elemType, in_ncommon;
 
   const std::string part_file("postpart");
@@ -35,7 +34,7 @@ int main( int argc, char * argv[] )
 
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
 
-  cmd_h5r -> read_string("/", "geo_file", geo_file);
+  const std::string geo_file = cmd_h5r -> read_string("/", "geo_file");
   elemType = cmd_h5r -> read_intScalar("/","elemType");
   dofNum = cmd_h5r -> read_intScalar("/","dofNum");
   dofMat   = cmd_h5r -> read_intScalar("/","dofMat");
