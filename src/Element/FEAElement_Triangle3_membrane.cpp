@@ -74,12 +74,12 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   // e_l1 = sqrt(2)/2 * (e_a - e_b)
   // e_l2 = sqrt(2)/2 * (e_a + e_b)
   const double e_l1[3] { std::sqrt(2.0) * 0.5 * ( e_a[0] - e_b[0] ),
-    std::sqrt(2.0) * 0.5 * ( e_a[1] - e_b[1] ),
-    std::sqrt(2.0) * 0.5 * ( e_a[2] - e_b[2] ) };
+                         std::sqrt(2.0) * 0.5 * ( e_a[1] - e_b[1] ),
+                         std::sqrt(2.0) * 0.5 * ( e_a[2] - e_b[2] ) };
   
   const double e_l2[3] { std::sqrt(2.0) * 0.5 * ( e_a[0] + e_b[0] ),
-    std::sqrt(2.0) * 0.5 * ( e_a[1] + e_b[1] ),
-    std::sqrt(2.0) * 0.5 * ( e_a[2] + e_b[2] ) };
+                         std::sqrt(2.0) * 0.5 * ( e_a[1] + e_b[1] ),
+                         std::sqrt(2.0) * 0.5 * ( e_a[2] + e_b[2] ) };
 
   // Q = transpose([ e_l1, e_l2, un ])
   Q = Matrix_3x3(e_l1[0], e_l1[1], e_l1[2],
