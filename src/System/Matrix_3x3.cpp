@@ -203,16 +203,6 @@ Vector_3 Matrix_3x3::VecMult( const Vector_3 &x ) const
       mat[6] * x(0) + mat[7] * x(1) + mat[8] * x(2) );
 }
 
-/*
-void Matrix_3x3::VecMult( const double &x0, const double &x1, const double &x2, 
-    double * const &y ) const
-{
-  y[0] = mat[0] * x0 + mat[1] * x1 + mat[2] * x2;
-  y[1] = mat[3] * x0 + mat[4] * x1 + mat[5] * x2;
-  y[2] = mat[6] * x0 + mat[7] * x1 + mat[8] * x2;
-}
-*/
-
 void Matrix_3x3::VecMult( const double &x0, const double &x1, const double &x2, 
     double &y0, double &y1, double &y2 ) const
 {
@@ -227,16 +217,6 @@ Vector_3 Matrix_3x3::VecMultT( const Vector_3 &x ) const
       mat[1] * x(0) + mat[4] * x(1) + mat[7] * x(2),
       mat[2] * x(0) + mat[5] * x(1) + mat[8] * x(2) );
 }
-
-/*
-void Matrix_3x3::VecMultT(const double &x0, const double &x1, const double &x2,
-    double * const &y ) const 
-{
-  y[0] = mat[0] * x0 + mat[3] * x1 + mat[6] * x2;
-  y[1] = mat[1] * x0 + mat[4] * x1 + mat[7] * x2;
-  y[2] = mat[2] * x0 + mat[5] * x1 + mat[8] * x2;
-}
-*/
 
 void Matrix_3x3::VecMultT(const double &x0, const double &x1, const double &x2,
     double &y0, double &y1, double &y2 ) const 
