@@ -34,8 +34,7 @@ int main( int argc, char * argv[] )
 
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
 
-  std::string geo_file;
-  cmd_h5r -> read_string("/", "geo_file");
+  std::string geo_file = cmd_h5r -> read_string("/", "geo_file");
   const int elemType = cmd_h5r -> read_intScalar("/","elemType");
   const int dofNum = cmd_h5r -> read_intScalar("/","dofNum");
   const int dofMat   = cmd_h5r -> read_intScalar("/","dofMat");
