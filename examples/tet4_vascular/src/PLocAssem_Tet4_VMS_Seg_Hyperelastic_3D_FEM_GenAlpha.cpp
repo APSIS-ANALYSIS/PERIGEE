@@ -112,7 +112,6 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Residual(
   double Res_Mas;
   double GradNA_invF_ResMom;
   double invFDV_t;
-  double GradNA_invF[3];
   Matrix_3x3 DVelo;
 
   const double curr = time + alpha_f * dt;
@@ -241,7 +240,8 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Residual(
       NA = R[A]; NA_x = dR_dx[A]; NA_y = dR_dy[A]; NA_z = dR_dz[A];
 
       // NA_I invF_Ii 
-      invF.VecMultT( NA_x, NA_y, NA_z, GradNA_invF );
+      double GradNA_invF[3];
+      invF.VecMultT( NA_x, NA_y, NA_z, GradNA_invF[0], GradNA_invF[1], GradNA_invF[2] );
 
       // tau_m stabilization term
       GradNA_invF_ResMom = tau_m * ( GradNA_invF[0] * Res_Mom[0] + GradNA_invF[1] * Res_Mom[1] + GradNA_invF[2] * Res_Mom[2] );
@@ -294,11 +294,8 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Tangent_Residual
   double Res_Mas;
   double GradNA_invF_ResMom;
   double invFDV_t;
-  double GradNA_invF[3];
-  double GradNB_invF[3];
 
   double GradNB_invF_dot_Res_Mom;
-  double GradP_invF[3];
   double GradNA_invF_dot_GradP_invF;
   double GradNA_invF_dot_GradNB_invF;
   double GradNA_invF_dot_part_Mom;
@@ -401,7 +398,8 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Tangent_Residual
 
     Dvelo_invF.MatMult(DVelo, invF); // v_i,I invF_Ij = v_i,j
 
-    invF.VecMultT( p_x, p_y, p_z, GradP_invF ); // p_I invF_ii = p,i
+    double GradP_invF[3];
+    invF.VecMultT( p_x, p_y, p_z, GradP_invF[0], GradP_invF[1], GradP_invF[2] ); // p_I invF_ii = p,i
 
     invFDV_t = invF.MatTContraction(DVelo); // invF_Ii V_i,I
 
@@ -441,7 +439,8 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Tangent_Residual
       NA = R[A]; NA_x = dR_dx[A]; NA_y = dR_dy[A]; NA_z = dR_dz[A];
 
       // NA_I invF_Ii 
-      invF.VecMultT( NA_x, NA_y, NA_z, GradNA_invF );
+      double GradNA_invF[3];
+      invF.VecMultT( NA_x, NA_y, NA_z, GradNA_invF[0], GradNA_invF[1], GradNA_invF[2] );
 
       // tau_m stabilization term
       GradNA_invF_ResMom = tau_m * ( GradNA_invF[0] * Res_Mom[0] + GradNA_invF[1] * Res_Mom[1] + GradNA_invF[2] * Res_Mom[2] );
@@ -473,7 +472,8 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Tangent_Residual
 
         const double NANBJ = detF * NA * NB;
 
-        invF.VecMultT( NB_x, NB_y, NB_z, GradNB_invF );
+        double GradNB_invF[3];
+        invF.VecMultT( NB_x, NB_y, NB_z, GradNB_invF[0], GradNB_invF[1], GradNB_invF[2] );
 
         GradNB_invF_dot_Res_Mom = GradNB_invF[0] * Res_Mom[0]
           + GradNB_invF[1] * Res_Mom[1] + GradNB_invF[2] * Res_Mom[2];
@@ -653,7 +653,6 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Mass_Residual(
 
   double curr = 0.0;
 
-  double GradNA_invF[3];
   double invFDV_t;
 
   Matrix_3x3 DVelo;
@@ -745,7 +744,8 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Mass_Residual(
     {
       NA = R[A]; NA_x = dR_dx[A]; NA_y = dR_dy[A]; NA_z = dR_dz[A];
 
-      invF.VecMultT( NA_x, NA_y, NA_z, GradNA_invF );
+      double GradNA_invF[3];
+      invF.VecMultT( NA_x, NA_y, NA_z, GradNA_invF[0], GradNA_invF[1], GradNA_invF[2] );
 
       Residual[4*A  ] += gwts * NA * detF * invFDV_t;
       
