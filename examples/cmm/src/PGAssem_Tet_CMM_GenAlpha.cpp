@@ -1405,7 +1405,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_matrix_free_K( const Vec &XX,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_Ring_NodalBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part,
-    const IGenBC * const &gbci,
+    const IGenBC * const &gbc,
     Vec &YY )
 {
   const double a_f = lassem_ptr -> get_model_para_1();
