@@ -1453,6 +1453,10 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_matrix_free_K( const Vec &XX,
   
   }
 
+  delete [] LSIEN; LSIEN = nullptr;
+  delete [] sctrl_x; sctrl_x = nullptr;
+  delete [] sctrl_y; sctrl_y = nullptr;
+  delete [] sctrl_z; sctrl_z = nullptr;
 }
 
 

@@ -141,7 +141,6 @@ double PETSc_T::GetValue( const Vec &a, const int ii )
   return val;
 }
 
-
 void PETSc_T::WriteBinary( const Vec &a, const char * const &file_name )
 {
   PetscViewer viewer;
