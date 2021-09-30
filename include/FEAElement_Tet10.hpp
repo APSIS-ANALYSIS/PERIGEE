@@ -82,6 +82,12 @@ class FEAElement_Tet10 : public FEAElement
         double * const &basis_x, double * const &basis_y,
         double * const &basis_z ) const;
 
+    virtual std::vector<double> get_dR_dx( const int &quaindex ) const;
+
+    virtual std::vector<double> get_dR_dy( const int &quaindex ) const;
+
+    virtual std::vector<double> get_dR_dz( const int &quaindex ) const;
+
     virtual void get_3D_R_dR_d2R( const int &quaindex,
         double * const &basis, double * const &basis_x,
         double * const &basis_y, double * const &basis_z,

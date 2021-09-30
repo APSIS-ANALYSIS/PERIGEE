@@ -49,11 +49,33 @@ class FEAElement_Triangle3 : public FEAElement
     virtual void get_R_gradR( const int &quaindex, double * const &basis,
         double * const &basis_x, double * const &basis_y ) const;
 
+    virtual std::vector<double> get_dR_dx( const int &quaindex ) const;
+
+    virtual std::vector<double> get_dR_dy( const int &quaindex ) const;
+
     virtual void get_2D_R_dR_d2R( const int &quaindex, 
         double * const &basis, 
         double * const &basis_x, double * const &basis_y, 
         double * const &basis_xx, double * const &basis_yy, 
         double * const &basis_xy ) const;
+
+    virtual std::vector<double> get_d2R_dxx( const int &quaindex ) const
+    {
+      assert( quaindex >= 0 && quaindex < numQuapts );
+      return { 0.0, 0.0, 0.0 };
+    }
+
+    virtual std::vector<double> get_d2R_dyy( const int &quaindex ) const
+    {
+      assert( quaindex >= 0 && quaindex < numQuapts );
+      return { 0.0, 0.0, 0.0 };
+    }
+
+    virtual std::vector<double> get_d2R_dxy( const int &quaindex ) const
+    {
+      assert( quaindex >= 0 && quaindex < numQuapts );
+      return { 0.0, 0.0, 0.0 };
+    }
 
     virtual void get_Jacobian(const int &quaindex,
         double * const &jac_value) const;
