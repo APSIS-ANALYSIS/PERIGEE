@@ -114,6 +114,18 @@ void FEAElement_Triangle3::get_gradR( const int &quaindex,
   } 
 }
 
+std::vector<double> FEAElement_Triangle3::get_dR_dx( const int &quaindex ) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  return { dR_dx[0], dR_dx[1], dR_dx[2] };
+}
+
+std::vector<double> FEAElement_Triangle3::get_dR_dy( const int &quaindex ) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  return { dR_dy[0], dR_dy[1], dR_dy[2] };
+} 
+
 void FEAElement_Triangle3::get_R_gradR( const int &quaindex, 
     double * const &basis,
     double * const &basis_x, double * const &basis_y ) const
