@@ -21,12 +21,12 @@ void VisDataPrep_Lap::get_pointArray(
     const std::string analysis_node_mapping_file,
     const std::string post_node_mapping_file,
     const APart_Node * const &nNode_ptr,
-    const IAGlobal_Mesh_Info * const &gInfo_ptr,
+    const int &input_nfunc,
     const int &input_dof,
     double ** &solArrays ) const
 {
   PostVectSolution pvsolu(solution_file_name, analysis_node_mapping_file,
-            post_node_mapping_file, nNode_ptr, gInfo_ptr, input_dof);
+            post_node_mapping_file, nNode_ptr, input_nfunc, input_dof);
 
   const int ntotal = nNode_ptr->get_nlocghonode();
 

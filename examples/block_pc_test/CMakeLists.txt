@@ -1,6 +1,6 @@
 project(perigee)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
 
 IF(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
@@ -33,6 +33,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/System/Sys_Tools.cpp
   ${perigee_source}/System/Vector_3.cpp
   ${perigee_source}/System/Matrix_double_3by3_Array.cpp
+  ${perigee_source}/System/Matrix_3x3.cpp
   ${perigee_source}/System/Math_Tools.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
   ${perigee_source}/System/HDF5_Reader.cpp
@@ -67,6 +68,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/System/PETSc_Tools.cpp
   ${perigee_source}/System/Matrix_double_6by6_Array.cpp
   ${perigee_source}/System/Matrix_PETSc.cpp
+  ${perigee_source}/System/Matrix_3x3.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Tet.cpp
   ${perigee_source}/Analysis_Tool/AGlobal_Mesh_Info_FEM_3D.cpp
   ${perigee_source}/Analysis_Tool/APart_Basic_Info.cpp

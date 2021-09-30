@@ -73,7 +73,7 @@ int main( int argc, char * argv[] )
             GMIptr->get_nLocBas(), element_part_file );
 
   visprep->get_pointArray(sol_bname, anode_mapping_file, pnode_mapping_file,
-      pNode, GMIptr, dof, solArrays);
+      pNode, GMIptr->get_nFunc(), dof, solArrays);
 
   vtk_w->writeOutput( fNode, locIEN, locElem,
       visprep, element, quad, solArrays,

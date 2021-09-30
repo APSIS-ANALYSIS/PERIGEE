@@ -2,24 +2,15 @@
 
 VTK_Writer_Lap::VTK_Writer_Lap( const int &in_nelem,
     const int &in_nlocbas, const std::string &epart_file )
-: nLocBas( in_nlocbas ), nElem( in_nelem ),
-  intep( nLocBas, true )
+: nLocBas( in_nlocbas ), nElem( in_nelem )
 {
   VIS_T::read_epart( epart_file, nElem, epart_map );
-
-  IEN_e.resize( nLocBas );
-  ectrl_x.resize( nLocBas );
-  ectrl_y.resize( nLocBas );
-  ectrl_z.resize( nLocBas );
 }
 
 
 VTK_Writer_Lap::~VTK_Writer_Lap()
 {
   VEC_T::clean( epart_map );
-  VEC_T::clean( ectrl_x );
-  VEC_T::clean( ectrl_y );
-  VEC_T::clean( ectrl_z );
 }
 
 void VTK_Writer_Lap::writeOutput(
@@ -37,6 +28,8 @@ void VTK_Writer_Lap::writeOutput(
     const std::string &outputName,
     const bool &isXML )
 {
+  Interpolater intep( nLocBas );
+
   vtkUnstructuredGrid * gridData = vtkUnstructuredGrid::New();
 
   vtkPoints * points = vtkPoints::New();
@@ -58,7 +51,11 @@ void VTK_Writer_Lap::writeOutput(
 
   for(int ee=0; ee<lelem_ptr->get_nlocalele(); ++ee)
   {
-    lien_ptr -> get_LIEN_e(ee, IEN_e);
+    const std::vector<int> IEN_e = lien_ptr -> get_LIEN( ee );
+
+    std::vector<double> ectrl_x ( nLocBas, 0.0 );
+    std::vector<double> ectrl_y ( nLocBas, 0.0 );
+    std::vector<double> ectrl_z ( nLocBas, 0.0 );
 
     fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_e[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0]);
 

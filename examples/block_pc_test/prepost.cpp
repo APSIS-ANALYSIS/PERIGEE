@@ -36,7 +36,7 @@ int main( int argc, char * argv[] )
 
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
 
-  cmd_h5r -> read_string("/", "geo_file", geo_file);
+  geo_file = cmd_h5r -> read_string("/", "geo_file");
   elemType = cmd_h5r -> read_intScalar("/","elemType");
   dofNum = cmd_h5r -> read_intScalar("/","dofNum");
   dofMat   = cmd_h5r -> read_intScalar("/","dofMat");

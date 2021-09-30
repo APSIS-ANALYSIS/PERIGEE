@@ -125,14 +125,15 @@ void PLocAssem_Tet_Heat::Assem_Residual_EBC(
 
   const double curr = time + dt;
 
-  double g, nx, ny, nz, surface_area;
-
   Zero_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua )
   {
     element->get_R(qua, &R[0]);
-    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+    
+    double g, surface_area;
+
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
   
     double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
     for(int ii=0; ii<snLocBas; ++ii)
@@ -142,7 +143,8 @@ void PLocAssem_Tet_Heat::Assem_Residual_EBC(
       coor_z += eleCtrlPts_z[ii] * R[ii];
     }
 
-    get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr, nx, ny, nz, g );
+    get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr, 
+        n_out.x(), n_out.y(), n_out.z(), g );
 
     const double gwts = surface_area * quad -> get_qw( qua );
 
@@ -164,20 +166,18 @@ void PLocAssem_Tet_Heat::Assem_Residual_EBC_Resistance(
 
   const int face_nqp = quad -> get_num_quadPts();
 
-  double nx, ny, nz, surface_area;
-
   Zero_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
     element->get_R(qua, &R[0]);
 
-    element->get_2d_normal_out(qua, nx, ny, nz, surface_area);
+    double surface_area;
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     const double gwts = surface_area * quad -> get_qw(qua);
 
-    for(int A=0; A<snLocBas; ++A)
-      Residual[A] += gwts * R[A] * val;
+    for(int A=0; A<snLocBas; ++A) Residual[A] += gwts * R[A] * val;
   }
 }
 
