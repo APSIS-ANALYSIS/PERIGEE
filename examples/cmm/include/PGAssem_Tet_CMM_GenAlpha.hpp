@@ -154,16 +154,35 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const IQuadPts * const &quad_s,
         const ALocal_Inflow_NodalBC * const &infbc_part );
 
+    // Assembly routine for a matrix-free manner of getting the tangent
+    // stiffness due to the reduced model coupling.
+    // The effective m = dP/dQ will be calculated, and 
+    // n = XX dot int_NA will
+    // be calculated by performing a loop over surface elements. Then
+    // YY will be int_NA scaled by alpha_f gamma dt m n.
+    virtual void Assem_matrix_free_K( const Vec &XX,
+        const double &dt,
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbci,
+        Vec &YY );
+
   private:
     // Private data
     const int nLocBas, dof_sol, dof_mat, num_ebc, nlgn;
-    
+
     int snLocBas;
 
     // Private function
     // Essential boundary condition
     void EssBC_KG( const ALocal_NodalBC * const &nbc_part, const int &field );
-   
+
     void EssBC_G( const ALocal_NodalBC * const &nbc_part, const int &field );
 
     // Ring nodal BC: 1) clamped, or 2) in-plane motion (skew bc)
@@ -178,13 +197,13 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const PetscInt * const &col_index,
         PetscScalar * const &Ke,
         PetscScalar * const &Ge );
-    
+
     void RingBC_G(
         const ALocal_Ring_NodalBC * const &ringnbc_part,
         const int &dof, const int &nrow,
         const PetscInt * const &row_index,
         PetscScalar * const &Ge );
-    
+
     // Natural boundary condition
     void NatBC_G( const double &curr_time, const double &dt,
         IPLocAssem * const &lassem_ptr,
@@ -225,6 +244,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
+    // Note: to be replaced by the SHELL approach
     void NatBC_Resis_KG( const double &dt,
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,

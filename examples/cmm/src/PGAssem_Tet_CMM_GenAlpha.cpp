@@ -250,10 +250,10 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_G(
       if( ringnbc_part->is_inLDN( dnode, pos ) )
       {
         // Global-to-skew transformation matrix
-        Matrix_3x3 QT = ringnbc_part->get_rotation_matrix( pos );
+        const Matrix_3x3 QT = ringnbc_part->get_rotation_matrix( pos );
 
-        Vector_3 Ge_A = Vector_3( Ge[ii-2], Ge[ii-1], Ge[ii] );
-        Vector_3 rot_Ge_A = QT.VecMult( Ge_A );  // rot_Ge_A = QT * Ge_A
+        const Vector_3 Ge_A = Vector_3( Ge[ii-2], Ge[ii-1], Ge[ii] );
+        const Vector_3 rot_Ge_A = QT.VecMult( Ge_A );  // rot_Ge_A = QT * Ge_A
 
         // Update Ge
         Ge[ii-2] = rot_Ge_A.x(); Ge[ii-1] = rot_Ge_A.y(); Ge[ii] = rot_Ge_A.z();
@@ -591,6 +591,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
   WallMembrane_KG( curr_time, dt, sol_a, sol_b, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ringnbc_part, ebc_wall_part );
 
   // Resistance type boundary condition
+  // To be modified by the shell approach
   NatBC_Resis_KG( dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, nbc_part, ringnbc_part, ebc_part, gbc );
 
   VecAssemblyBegin(G);
@@ -1212,7 +1213,7 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_G(
     const double P_n   = gbc -> get_P0( ebc_id );
     const double P_np1 = gbc -> get_P( ebc_id, dot_flrate, flrate );
 
-    // P_n+alpha_f
+    // P_{n+alpha_f}
     // lassem_ptr->get_model_para_1() gives alpha_f 
     const double val = P_n + lassem_ptr->get_model_para_1() * (P_np1 - P_n);
 
@@ -1393,5 +1394,66 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_KG(
   delete [] sctrl_y; sctrl_y = nullptr;
   delete [] sctrl_z; sctrl_z = nullptr;
 }
+
+void PGAssem_Tet_CMM_GenAlpha::Assem_matrix_free_K( const Vec &XX,
+    const double &dt,
+    const PDNSolution * const &dot_sol,
+    const PDNSolution * const &sol,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const ALocal_EBC * const &ebc_part,
+    const IGenBC * const &gbci,
+    Vec &YY )
+{
+  const double a_f = lassem_ptr -> get_model_para_1();
+
+  // dd_dv = dt x alpha_f x gamma
+  const double dd_dv = dt * a_f * lassem_ptr->get_model_para_2();
+
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
+
+  for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
+  {
+    // Calculate dot flow rate for face with ebc_id and MPI_Allreduce them
+    // Here, dot_sol is the solution at time step n+1 (not n+alpha_f!)
+    const double dot_flrate = Assem_surface_flowrate( dot_sol, lassem_ptr,
+        element_s, quad_s, ebc_part, ebc_id );
+
+    // Calculate flow rate for face with ebc_id and MPI_Allreduce them
+    // Here, sol is the solution at time step n+1 (not n+alpha_f!)
+    const double flrate = Assem_surface_flowrate( sol, lassem_ptr,
+        element_s, quad_s, ebc_part, ebc_id );
+
+    // Get the (pressure) value on the outlet surface for traction evaluation
+    const double P_n   = gbc -> get_P0( ebc_id );
+    const double P_np1 = gbc -> get_P( ebc_id, dot_flrate, flrate );
+
+    // P_n+alpha_f
+    const double resis_val = P_n + a_f * (P_np1 - P_n);
+
+    // Get the (potentially approximated) m := dP/dQ
+    const double m_val = gbc -> get_m( ebc_id, dot_flrate, flrate );
+
+    // Get the (potentially approximated) n := dP/d(dot_Q)
+    const double n_val = gbc -> get_n( ebc_id, dot_flrate, flrate );
+
+    // Define alpha_f * n + alpha_f * gamma * dt * m
+    // coef a^t a enters as the consistent tangent for the resistance-type bc
+    const double coef = a_f * n_val + dd_dv * m_val;
+  
+    
+  
+  
+  
+  }
+
+}
+
 
 // EOF
