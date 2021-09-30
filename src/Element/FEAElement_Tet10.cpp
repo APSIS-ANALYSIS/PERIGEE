@@ -276,6 +276,33 @@ void FEAElement_Tet10::get_gradR( const int &quaindex, double * const &basis_x,
   }
 }
 
+std::vector<double> FEAElement_Tet10::get_dR_dx( const int &quaindex ) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );  
+  const int offset = quaindex * 10;
+  return { dR_dx[offest], dR_dx[offset+1], dR_dx[offset+2], dR_dx[offset+3], 
+	  dR_dx[offest+4], dR_dx[offset+5], dR_dx[offset+6], dR_dx[offset+7],
+	  dR_dx[offset+8], dR_dx[offset+9] };
+}
+
+std::vector<double> FEAElement_Tet10::get_dR_dy( const int &quaindex ) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  const int offset = quaindex * 10;
+  return { dR_dy[offest], dR_dy[offset+1], dR_dy[offset+2], dR_dy[offset+3], 
+          dR_dy[offest+4], dR_dy[offset+5], dR_dy[offset+6], dR_dy[offset+7],
+          dR_dy[offset+8], dR_dy[offset+9] };
+}
+
+std::vector<double> FEAElement_Tet10::get_dR_dz( const int &quaindex ) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  const int offset = quaindex * 10;
+  return { dR_dz[offest], dR_dz[offset+1], dR_dz[offset+2], dR_dz[offset+3], 
+          dR_dz[offest+4], dR_dz[offset+5], dR_dz[offset+6], dR_dz[offset+7],
+          dR_dz[offset+8], dR_dz[offset+9] };
+}
+
 void FEAElement_Tet10::get_R_gradR( const int &quaindex, double * const &basis,
     double * const &basis_x, double * const &basis_y,
     double * const &basis_z ) const
@@ -333,6 +360,60 @@ void FEAElement_Tet10::get_3D_R_gradR_LaplacianR( const int &quaindex,
     basis_yy[ii] = d2R_dyy[offset + ii];
     basis_zz[ii] = d2R_dzz[offset + ii];
   }
+}
+
+std::vector<double> FEAElement_Tet10::get_d2R_dxx( const int &quaindex ) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  const int offset = quaindex * 10;
+  return { d2R_dxx[offest], d2R_dxx[offset+1], d2R_dxx[offset+2], d2R_dxx[offset+3],
+          d2R_dxx[offest+4], d2R_dxx[offset+5], d2R_dxx[offset+6], d2R_dxx[offset+7],
+          d2R_dxx[offset+8], d2R_dxx[offset+9] };
+}
+
+std::vector<double> FEAElement_Tet10::get_d2R_dyy( const int &quaindex ) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  const int offset = quaindex * 10;
+  return { d2R_dyy[offest], d2R_dyy[offset+1], d2R_dyy[offset+2], d2R_dyy[offset+3],
+          d2R_dyy[offest+4], d2R_dyy[offset+5], d2R_dyy[offset+6], d2R_dyy[offset+7],
+          d2R_dyy[offset+8], d2R_dyy[offset+9] };
+}
+
+std::vector<double> FEAElement_Tet10::get_d2R_dzz( const int &quaindex ) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  const int offset = quaindex * 10;
+  return { d2R_dzz[offest], d2R_dzz[offset+1], d2R_dzz[offset+2], d2R_dzz[offset+3],
+          d2R_dzz[offest+4], d2R_dzz[offset+5], d2R_dzz[offset+6], d2R_dzz[offset+7],
+          d2R_dzz[offset+8], d2R_dzz[offset+9] };
+}
+
+std::vector<double> FEAElement_Tet10::get_d2R_dxy( const int &quaindex ) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  const int offset = quaindex * 10;
+  return { d2R_dxy[offest], d2R_dxy[offset+1], d2R_dxy[offset+2], d2R_dxy[offset+3],
+          d2R_dxy[offest+4], d2R_dxy[offset+5], d2R_dxy[offset+6], d2R_dxy[offset+7],
+          d2R_dxy[offset+8], d2R_dxy[offset+9] };
+}
+
+std::vector<double> FEAElement_Tet10::get_d2R_dxz( const int &quaindex ) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  const int offset = quaindex * 10;
+  return { d2R_dxz[offest], d2R_dxz[offset+1], d2R_dxz[offset+2], d2R_dxz[offset+3],
+          d2R_dxz[offest+4], d2R_dxz[offset+5], d2R_dxz[offset+6], d2R_dxz[offset+7],
+          d2R_dxz[offset+8], d2R_dxz[offset+9] };
+}
+
+std::vector<double> FEAElement_Tet10::get_d2R_dyz( const int &quaindex ) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  const int offset = quaindex * 10;
+  return { d2R_dyz[offest], d2R_dyz[offset+1], d2R_dyz[offset+2], d2R_dyz[offset+3],
+          d2R_dyz[offest+4], d2R_dyz[offset+5], d2R_dyz[offset+6], d2R_dyz[offset+7],
+          d2R_dyz[offset+8], d2R_dyz[offset+9] };
 }
 
 void FEAElement_Tet10::get_Jacobian(const int &quaindex,
