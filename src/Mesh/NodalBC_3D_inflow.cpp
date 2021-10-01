@@ -29,7 +29,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
     const std::string &wallfile, const int &nFunc,
     const Vector_3 &in_outnormal,
     const int &elemtype )
-: num_nbc( 0 )
+: num_nbc( 1 )
 {
   SYS_T::file_check(inffile);
   SYS_T::file_check(wallfile);
@@ -50,36 +50,47 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   global_node.resize(  num_nbc );
   global_cell.resize(  num_nbc );
 
-  if( elemtype == 501 ) nLocBas[0] = 3;
-  else if( elemtype == 502 ) nLocBas[0] = 6;
-  else SYS_T::print_fatal("Error: unknown element type.\n");
+  dir_nodes.resize(     num_nbc );
+  num_dir_nodes.resize( num_nbc );
+
+  centroid.resize(  num_nbc );
+  outnormal.resize( num_nbc );
+
+  outline_pts.resize(    num_nbc );
+  num_out_bc_pts.resize( num_nbc );
+
+  inf_active_area.resize( num_nbc );
+  face_area.resize(       num_nbc );
+
+  intNA.resize( num_nbc ); 
 
   // Read the files
   int wall_numpts, wall_numcels;
   std::vector<double> wall_pts;
   std::vector<int> wall_ien, wall_gnode, wall_gelem;
 
-  std::string fend; fend.assign( inffile.end()-4 , inffile.end() );
-
-  if( fend.compare(".vtp") == 0 )
+  if( elemtype == 501 )
   { 
+    nLocBas[0] = 3;
+
     TET_T::read_vtp_grid( inffile, num_node[0], num_cell[0], pt_xyz[0], tri_ien[0], global_node[0], global_cell[0] );
 
     TET_T::read_vtp_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
         wall_ien, wall_gnode, wall_gelem );
   }
-  else if( fend.compare(".vtu") == 0 )
+  else if( elemtype == 502 )
   {
+    nLocBas[0] = 6;
+
     TET_T::read_vtu_grid( inffile, num_node[0], num_cell[0], pt_xyz[0], tri_ien[0], global_node[0], global_cell[0] );
 
     TET_T::read_vtu_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
         wall_ien, wall_gnode, wall_gelem );
   }
-  else
-    SYS_T::print_fatal("Error: Nodal_3D_inflow unknown file type.\n");
+  else SYS_T::print_fatal("Error: unknown element type.\n");
 
-  // Generate the dir-node list. The nodes belonging to the wall are excluded.
-  dir_nodes.resize(num_nbc); dir_nodes[0].clear();
+  // Generate the dir-node list. Nodes belonging to the wall are excluded.
+  dir_nodes[0].clear();
   
   for(unsigned int ii=0; ii<global_node[0].size(); ++ii)
   {
@@ -89,14 +100,12 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
       dir_nodes[0].push_back( global_node[0][ii] );
   }
 
-  num_dir_nodes.resize(num_nbc);
   num_dir_nodes[0] = dir_nodes[0].size(); 
 
   // Generate ID array
   Create_ID( nFunc );
 
   // Calculate the centroid of the surface
-  centroid.resize(num_nbc);
   centroid[0].gen_zero();
   for(int ii=0; ii<num_node[0]; ++ii)
   {
@@ -106,24 +115,27 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   }
   centroid[0].scale( 1.0 / (double) num_node[0] );
 
+  // assign outward normal vector from the input
+  outnormal[0] = in_outnormal;
+
   // Collect nodes that belong to the wall, and set up a vector that
   // is 1 on the interior nodes and 0 on the wall bc nodes.
-  outline_pts.resize(num_nbc);
   outline_pts[0].clear();
 
-  num_out_bc_pts.resize(num_nbc);
   num_out_bc_pts[0] = 0;
 
   double * temp_sol = new double [num_node[0]];  
+
   for(int ii=0; ii<num_node[0]; ++ii)
   {
     // If the node is not on the wall, it is an interior node, so set
     // the element to 1.
     if( !VEC_T::is_invec(wall_gnode, global_node[0][ii]) ) 
       temp_sol[ii] = 1.0;
+
+    // otherwise, the node is on the wall surface, so set element to 0.
     else 
     {
-      // otherwise, the node is on the wall surface, so set element to 0.
       temp_sol[ii] = 0.0;
 
       // Also store the point's coordinates in outline points
@@ -134,34 +146,37 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
     }
   }
 
-  // If the number of the surface nodes matches with the num_out_bc_pts, this
-  // means the wall mesh contains the inlet surface. This is a common error
-  // happens from adopting sv files, where the user uses the combined outer
-  // surface as the wall mesh. We will throw an error message if this is
-  // detected.
+  // If the number of surface nodes matches num_out_bc_pts, the wall
+  // mesh contains the inlet surface. This is a common error when
+  // adopting sv files, where the user uses the combined exterior surface
+  // as the wall mesh. We will throw an error message if detected.
   if( num_out_bc_pts[0] == num_node[0] ) SYS_T::print_fatal( "Error: the number of outline points is %d and the number of total points on the surface is %d. This is likely due to an improper wall mesh. \n", num_out_bc_pts[0], num_node[0] );
 
-  inf_active_area.resize(num_nbc);
   inf_active_area[0] = 0.0;
-
-  face_area.resize(num_nbc);
   face_area[0] = 0.0;
+
+  intNA[0].resize( num_node[0] );
+
+  // zero the container
+  for(int ii=0; ii<num_node[0]; ++ii) intNA[0][ii] = 0.0;
 
   if( elemtype == 501 )
   {
-    double eptx[3]; double epty[3]; double eptz[3]; double R[3];
+    double eptx[3]; double epty[3]; double eptz[3];
+    int node_idx[3]; double R[3];
 
-    QuadPts_Gauss_Triangle quad(3); // quadrature rule
-    FEAElement_Triangle3_3D_der0 ele(3); // element
+    const int nqp_tri = 3;                       // num qua points
+    QuadPts_Gauss_Triangle quad( nqp_tri );      // quadrature rule
+    FEAElement_Triangle3_3D_der0 ele( nqp_tri ); // element
 
     for(int ee=0; ee<num_cell[0]; ++ee)
     {
       for(int ii=0; ii<3; ++ii)
       {
-        const int nodidx = tri_ien[0][3*ee+ii];
-        eptx[ii] = pt_xyz[0][ 3*nodidx ];
-        epty[ii] = pt_xyz[0][ 3*nodidx+1 ];
-        eptz[ii] = pt_xyz[0][ 3*nodidx+2 ];
+        node_idx[ii] = tri_ien[0][3*ee+ii];
+        eptx[ii] = pt_xyz[0][ 3*node_idx[ii]+0 ];
+        epty[ii] = pt_xyz[0][ 3*node_idx[ii]+1 ];
+        eptz[ii] = pt_xyz[0][ 3*node_idx[ii]+2 ];
       }
 
       ele.buildBasis(&quad, eptx, epty, eptz);
@@ -170,31 +185,35 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
       {
         ele.get_R( qua, R );
 
+        const double gwts = ele.get_detJac(qua) * quad.get_qw(qua);
+
         for(int ii=0; ii<3; ++ii)
         {
-          inf_active_area[0] += ele.get_detJac(qua) * quad.get_qw(qua) 
-            * R[ii] * temp_sol[ tri_ien[0][3*ee+ii] ];
+          inf_active_area[0] += gwts * R[ii] * temp_sol[ tri_ien[0][3*ee+ii] ];
+          face_area[0] += gwts * R[ii];
 
-          face_area[0] += ele.get_detJac(qua) * quad.get_qw(qua) * R[ii];
+          intNA[0][node_idx[ii]] += gwts * R[ii];
         }
-      }
-    }
+      } // end qua-loop
+    } // end ee-loop
   }
   else if( elemtype == 502 )
   {
-    double eptx[6]; double epty[6]; double eptz[6]; double R[6];
+    double eptx[6]; double epty[6]; double eptz[6];
+    int node_idx[6]; double R[6];
 
-    QuadPts_Gauss_Triangle quad(6); // quadrature rule
-    FEAElement_Triangle6_3D_der0 ele(6); // element
+    const int nqp_tri = 6;                       // num qua points
+    QuadPts_Gauss_Triangle quad( nqp_tri );      // quadrature rule
+    FEAElement_Triangle6_3D_der0 ele( nqp_tri ); // element
 
     for(int ee=0; ee<num_cell[0]; ++ee)
     {
       for(int ii=0; ii<6; ++ii)
       {
-        const int nodidx = tri_ien[0][6*ee+ii];
-        eptx[ii] = pt_xyz[0][ 3*nodidx ];
-        epty[ii] = pt_xyz[0][ 3*nodidx+1 ];
-        eptz[ii] = pt_xyz[0][ 3*nodidx+2 ];
+        node_idx[ii] = tri_ien[0][6*ee+ii];
+        eptx[ii] = pt_xyz[0][ 3*node_idx[ii]+0 ];
+        epty[ii] = pt_xyz[0][ 3*node_idx[ii]+1 ];
+        eptz[ii] = pt_xyz[0][ 3*node_idx[ii]+2 ];
       }
 
       ele.buildBasis(&quad, eptx, epty, eptz);
@@ -203,102 +222,21 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
       {
         ele.get_R( qua, R );
 
+        const double gwts = ele.get_detJac(qua) * quad.get_qw(qua);
+
         for(int ii=0; ii<6; ++ii)
         {
-          inf_active_area[0] += ele.get_detJac(qua) * quad.get_qw(qua) 
-            * R[ii] * temp_sol[ tri_ien[0][6*ee+ii] ];
+          inf_active_area[0] += gwts * R[ii] * temp_sol[ tri_ien[0][6*ee+ii] ];
+          face_area[0] += gwts * R[ii];
 
-          face_area[0] += ele.get_detJac(qua) * quad.get_qw(qua) * R[ii];
+          intNA[0][node_idx[ii]] += gwts * R[ii];
         }
-      }
-    }
+      } // end qua-loop
+    } // end ee-loop
   }
   else SYS_T::print_fatal("Error: unknown element type.\n");
 
   delete [] temp_sol;
-
-  // assign outward normal vector from the input
-  outnormal.resize(num_nbc);
-  outnormal[0] = in_outnormal;
-
-  // Perform surface integral
-  intNA.resize(num_nbc); 
-  intNA[0].resize( num_node[0] );
-
-  // zero the container
-  for(int ii=0; ii<num_node[0]; ++ii) intNA[0][ii] = 0.0;
-
-  if( elemtype == 501 )
-  {
-    const int nqp_tri = 3; // number of quadrature points
-    IQuadPts * quads = new QuadPts_Gauss_Triangle( nqp_tri );
-    FEAElement * elems = new FEAElement_Triangle3_3D_der0( nqp_tri );
-
-    double ectrl_x[3]; double ectrl_y[3]; double ectrl_z[3];
-    int node_idx[3]; double R[3];
-
-    // Calculate the surface integral of basis functions
-    for( int ee = 0; ee<num_cell[0]; ++ee )
-    {
-      for(int ii=0; ii<3; ++ii)
-      {
-        node_idx[ii] = tri_ien[0][3*ee+ii];
-        ectrl_x[ii] = pt_xyz[0][3*node_idx[ii] + 0];
-        ectrl_y[ii] = pt_xyz[0][3*node_idx[ii] + 1];
-        ectrl_z[ii] = pt_xyz[0][3*node_idx[ii] + 2];
-      }
-
-      elems -> buildBasis(quads, ectrl_x, ectrl_y, ectrl_z);
-
-      for(int qua=0; qua<nqp_tri; ++qua)
-      {
-        elems -> get_R(qua, R);
-
-        const double gwts = elems->get_detJac( qua ) * quads -> get_qw( qua );
-
-        for(int ii=0; ii<3; ++ii) intNA[0][node_idx[ii]] += gwts * R[ii];
-
-      } // loop over quadrature points
-    } // loop over linear triangle elements
-
-    delete quads; delete elems;
-  }
-  else if(elemtype == 502 )
-  {
-    const int nqp_tri = 6; // number of quadrature points
-    IQuadPts * quads = new QuadPts_Gauss_Triangle( nqp_tri );
-    FEAElement * elems = new FEAElement_Triangle6_3D_der0( nqp_tri );
-
-    double ectrl_x[6]; double ectrl_y[6]; double ectrl_z[6];
-    int node_idx[6]; double R[6];
-
-    // Calculate the surface integral for quadratic triangle element
-    for( int ee=0; ee<num_cell[0]; ++ee )
-    {
-      for(int ii=0; ii<6; ++ii)
-      {
-        node_idx[ii] = tri_ien[0][6*ee+ii];
-        ectrl_x[ii] = pt_xyz[0][3*node_idx[ii] + 0];
-        ectrl_y[ii] = pt_xyz[0][3*node_idx[ii] + 1];
-        ectrl_z[ii] = pt_xyz[0][3*node_idx[ii] + 2];
-      }
-
-      elems -> buildBasis(quads, ectrl_x, ectrl_y, ectrl_z);
-
-      for(int qua=0; qua<nqp_tri; ++qua)
-      {
-        elems -> get_R(qua, R);
-
-        const double gwts = elems->get_detJac( qua ) * quads -> get_qw( qua );
-
-        for(int ii=0; ii<6; ++ii) intNA[0][node_idx[ii]] += gwts * R[ii];
-
-      } // loop over quadrature points
-    } // loop over quadratic triangle elements
-
-    delete quads; delete elems;
-  }
-  else SYS_T::print_fatal("Error: unknown element type.\n");
 
   // Finish and print info on screen
   std::cout<<"===> NodalBC_3D_inflow specified by "<<inffile<<", with nodes on \n";
@@ -358,7 +296,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileLis
   {
     SYS_T::file_check( inffileList[ii] );
 
-    if(elemtype == 501)
+    if( elemtype == 501 )
     {
       nLocBas[ii] = 3;
 
@@ -369,7 +307,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileLis
         wall_ien, wall_gnode, wall_gelem );
 
     }
-    else if(elemtype == 502)
+    else if( elemtype == 502 )
     {
       nLocBas[ii] = 6;
 
@@ -437,8 +375,8 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileLis
       }
     }
 
-    // If the number of surface nodes matches with num_out_bc_pts, the wall
-    // mesh contains the inlet surface. This is a common error when adopting
+    // If the number of surface nodes matches num_out_bc_pts, the wall
+    // mesh contains the inlet surface. This is a common error when
     // adopting sv files, where the user uses the combined exterior surface
     // as the wall mesh. We will throw an error message if detected.
     if( num_out_bc_pts[ii] == num_node[ii] ) SYS_T::print_fatal( "Error: the number of outline points is %d and the number of total points on the surface is %d. This is likely due to an improper wall mesh. \n", num_out_bc_pts[ii], num_node[ii] );
@@ -451,7 +389,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileLis
     // zero the container
     for(int jj=0; jj<num_node[ii]; ++jj) intNA[ii][jj] = 0.0;
 
-    if(elemtype == 501)
+    if( elemtype == 501 )
     {
       double eptx[3]; double epty[3]; double eptz[3];
       int node_idx[3]; double R[3];
@@ -488,7 +426,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileLis
         } // end qua-loop
       } // end ee-loop
     }
-    else if(elemtype == 502)
+    else if( elemtype == 502 )
     {
       double eptx[6]; double epty[6]; double eptz[6]; 
       int node_idx[6]; double R[6];
@@ -502,7 +440,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileLis
         for(int jj=0; jj<6; ++jj)
         {
           node_idx[jj] = tri_ien[ii][6*ee+jj];
-          eptx[jj] = pt_xyz[ii][ 3*node_idx[jj] ];
+          eptx[jj] = pt_xyz[ii][ 3*node_idx[jj]+0 ];
           epty[jj] = pt_xyz[ii][ 3*node_idx[jj]+1 ];
           eptz[jj] = pt_xyz[ii][ 3*node_idx[jj]+2 ];
         }
