@@ -49,7 +49,6 @@ void PETSc_T::MatInfo_Display_global( const Mat &K )
   }
 }
 
-
 void PETSc_T::Get_dnz_onz( const Mat &K, 
     std::vector<int> &dnz, std::vector<int> &onz )
 {
@@ -79,7 +78,6 @@ void PETSc_T::Get_dnz_onz( const Mat &K,
   }
 }
 
-
 void PETSc_T::MinusSqrtVec(Vec &v, const double &tol)
 {
   PetscInt nn,ii;
@@ -96,7 +94,6 @@ void PETSc_T::MinusSqrtVec(Vec &v, const double &tol)
 
   VecRestoreArray(v, &v1);
 }
-
 
 void PETSc_T::InvAbsVec(Vec &v, const double &tol)
 {
@@ -115,7 +112,6 @@ void PETSc_T::InvAbsVec(Vec &v, const double &tol)
   VecRestoreArray(v, &v1);
 }
 
-
 void PETSc_T::MatCreateId( Mat &K, const PetscInt &lrow )
 {
   MatCreateAIJ(PETSC_COMM_WORLD, lrow, lrow, PETSC_DETERMINE,
@@ -133,12 +129,22 @@ void PETSc_T::MatCreateId( Mat &K, const PetscInt &lrow )
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
 }
 
-
 double PETSc_T::GetValue( const Vec &a, const int ii )
 {
   double val;
   VecGetValues( a, 1, &ii, &val );
   return val;
+}
+
+int PETSc_T::GetLocalGhostSize( const Vec &vv )
+{
+  Vec lsol;
+  VecGhostGetLocalForm(vv, &lsol);
+  PetscInt NN;
+  VecGetSize(lsol, &NN);
+  VecGhostRestoreLocalForm(vv, &lsol);
+
+  return static_cast<int>(NN);
 }
 
 void PETSc_T::WriteBinary( const Vec &a, const char * const &file_name )

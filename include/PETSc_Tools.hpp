@@ -148,6 +148,16 @@ namespace PETSc_T
     return val;
   }
 
+  // Get the vector's local copy's length 
+  inline int GetLocalSize( const Vec &vv )
+  {
+    PetscInt vvsize; VecGetLocalSize( vv, &vvsize ); 
+    return static_cast<int>(vvsize);
+  }
+  
+  // Get the ghost vector's *local plus ghost* length.
+  int GetLocalGhostSize( const Vec &vv );
+
   // Write a vector to disk with file_name
   void WriteBinary( const Vec &a, const char * const &file_name );
 }
