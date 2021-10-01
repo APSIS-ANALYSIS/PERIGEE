@@ -32,8 +32,8 @@ class NodalBC_3D_ring : public INodalBC
     // Generate the ring bc given by the inflow and outflow files, 
     // their unit normals, and the wall file.
     // ------------------------------------------------------------------------
-    NodalBC_3D_ring( const std::string &inflow_file,
-        const Vector_3 &inlet_outnormal,
+    NodalBC_3D_ring( const std::vector<std::string> &inflow_files,
+        const std::vector< Vector_3 > &inlet_outnormal,
         const std::string &wallfile,
         const std::vector<std::string> &outflow_files,
         const std::vector< Vector_3 > &outlet_outnormal,

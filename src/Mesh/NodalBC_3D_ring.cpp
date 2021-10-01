@@ -4,9 +4,9 @@ NodalBC_3D_ring::NodalBC_3D_ring(const int &nFunc) : ring_bc_type(0)
 {
   per_slave_nodes.clear();
   per_master_nodes.clear();
-  num_per_nodes = 0;
+  num_per_nodes.clear();
   dir_nodes.clear();
-  num_dir_nodes = 0;
+  num_dir_nodes.clear();
 
   Create_ID( nFunc );
   
@@ -19,8 +19,9 @@ NodalBC_3D_ring::NodalBC_3D_ring(const int &nFunc) : ring_bc_type(0)
 }
 
 
-NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
-    const Vector_3 &inlet_outnormal,
+NodalBC_3D_ring::NodalBC_3D_ring(
+    const std::vector<std::string> &inflow_files,
+    const std::vector< Vector_3 > &inlet_outnormal,
     const std::string &wallfile,
     const std::vector<std::string> &outflow_files,
     const std::vector< Vector_3 > &outlet_outnormal,
@@ -30,16 +31,30 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
   // No periodic nodes
   per_slave_nodes.clear();
   per_master_nodes.clear();
-  num_per_nodes = 0;
+  num_per_nodes.clear();
+
+  // num_nbc = 1 per the assumption for ring nodal bc
+  const int nbc_id = 0;
+  const int num_nbc = 1;
+  dir_nodes.resize(     num_nbc );
+  num_dir_nodes.resize( num_nbc );
 
   // Aggregate inlet & outlet data
-  std::vector<std::string> cap_files = outflow_files;
-  cap_files.insert( cap_files.begin(), inflow_file ); 
+  std::vector<std::string> cap_files = inflow_files;
+  for(unsigned int ii=0; ii<outflow_files.size(); ++ii)
+    cap_files.push_back( outflow_files[ii] );
 
   num_caps = cap_files.size();
   Q.resize(9 * num_caps);
 
-  outnormal = inlet_outnormal.to_std_vec();
+  outnormal.clear();
+
+  for(unsigned int ii=0; ii<inlet_outnormal.size(); ++ii)
+  {
+    outnormal.push_back( inlet_outnormal[ii](0) );
+    outnormal.push_back( inlet_outnormal[ii](1) );
+    outnormal.push_back( inlet_outnormal[ii](2) );
+  }
 
   for(unsigned int ii=0; ii<outlet_outnormal.size(); ++ii)
   {
@@ -57,7 +72,7 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
   std::vector<int> wall_ien, wall_gnode, wall_gelem;
 
   // Generate the dir-node list with all ring nodes.
-  dir_nodes.clear();
+  dir_nodes[nbc_id].clear();
   cap_id.clear();
 
   if( elemtype == 501 )
@@ -83,7 +98,7 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
 
         if( VEC_T::is_invec( wall_gnode, gnode[jj]) )
         {
-          dir_nodes.push_back( static_cast<unsigned int>( gnode[jj] ) );
+          dir_nodes[nbc_id].push_back( static_cast<unsigned int>( gnode[jj] ) );
           cap_id.push_back( ii );
 
           // Compute the cap's skew bc transformation matrix with the first ring node
@@ -134,7 +149,7 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
 
         if( VEC_T::is_invec( wall_gnode, gnode[jj]) )
         {
-          dir_nodes.push_back( static_cast<unsigned int>( gnode[jj] ) );
+          dir_nodes[nbc_id].push_back( static_cast<unsigned int>( gnode[jj] ) );
           cap_id.push_back( ii );
 
           // Compute the cap's skew bc transformation matrix with the first ring node
@@ -164,7 +179,7 @@ NodalBC_3D_ring::NodalBC_3D_ring( const std::string &inflow_file,
   else
     SYS_T::print_fatal("Error: Nodal_3D_ring unknown file type.\n");
 
-  num_dir_nodes = dir_nodes.size(); 
+  num_dir_nodes[nbc_id] = dir_nodes[nbc_id].size(); 
 
   // Generate ID array
   Create_ID( nFunc );

@@ -11,7 +11,7 @@ NodalBC_3D_wall::NodalBC_3D_wall(
   per_master_nodes.clear();
   num_per_nodes.clear();
 
-  // num_ebc = 1 per the assumption for wall elem bc
+  // num_nbc = 1 per the assumption for wall nodal bc
   const int nbc_id = 0;
   const int num_nbc = 1;
   dir_nodes.resize(     num_nbc );
@@ -70,6 +70,8 @@ NodalBC_3D_wall::NodalBC_3D_wall(
   VEC_T::sort_unique_resize( ring_gnode );
 
   // exclude the ring nodes
+  dir_nodes[nbc_id].clear();
+
   for(unsigned int ii=0; ii<wall_gnode.size(); ++ii)
   {
     if( !VEC_T::is_invec( ring_gnode, wall_gnode[ii] ) )
