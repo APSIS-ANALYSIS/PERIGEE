@@ -8,59 +8,76 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
   const int dof = (int) nbc_list.size();
 
   Num_LD.clear(); Num_LPS.clear(); Num_LPM.clear();
-  LID.clear(); LDN.clear(); LPSN.clear(); LPMN.clear();
+  LID.clear(); LPSN.clear(); LPMN.clear();
   LocalMaster.clear(); LocalMasterSlave.clear();
   
-  Num_LD.resize(dof); Num_LPS.resize(dof); Num_LPM.resize(dof);
+  LDN.resize(dof); Num_LD.resize(dof);
+  Num_LPS.resize(dof); Num_LPM.resize(dof);
 
   // Loop over nbc_list and store the Dirichlet nodes
   for(int ii=0; ii<dof; ++ii)
   {
-    unsigned int node_num = 0;
-    for(unsigned int jj=0; jj<nbc_list[ii]->get_num_dir_nodes(); ++jj)
+    LDN[ii].clear(); LPSN[ii].clear(); LPMN[ii].clear();
+
+    const int num_nbc = nbc_list[ii]->get_num_nbc();
+
+    Num_LD[ii].resize(num_nbc);
+    Num_LPS[ii].resize(num_nbc); Num_LPM[ii].resize(num_nbc);
+
+    for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
     {
-      unsigned int node_index = nbc_list[ii]->get_dir_nodes(jj);
-      node_index = mnindex->get_old2new(node_index);
+      unsigned int node_num = 0;
+      unsigned int ps_num = 0;
+      unsigned int pm_num = 0;
 
-      if(part->isNodeInPart(node_index))
+      for(unsigned int jj=0; jj<nbc_list[ii]->get_num_dir_nodes(nbc_id); ++jj)
       {
-        LDN.push_back(node_index);
-        node_num += 1;
-      }
-    }
-    Num_LD[ii] = node_num;
-  }
+        unsigned int node_index = nbc_list[ii]->get_dir_nodes(nbc_id, jj);
+        node_index = mnindex->get_old2new(node_index);
 
-  for(int ii=0; ii<dof; ++ii)
-  {
-    unsigned int ps_num = 0;
-    unsigned int pm_num = 0;
-    for(unsigned int jj=0; jj<nbc_list[ii]->get_num_per_nodes(); ++jj)
-    {
-      unsigned int node_ps = nbc_list[ii]->get_per_slave_nodes(jj);
-      unsigned int node_pm = nbc_list[ii]->get_per_master_nodes(jj);
-      node_ps = mnindex->get_old2new(node_ps);
-      node_pm = mnindex->get_old2new(node_pm);
-      
-      if(part->isNodeInPart(node_ps))
-      {
-        LPSN.push_back(node_ps);
-        LPMN.push_back(node_pm);
-        ps_num += 1;
-      }
+        if(part->isNodeInPart(node_index))
+        {
+          LDN[ii].push_back(node_index);
+          node_num += 1;
+        }
+      } // end jj-loop
 
-      if(part->isNodeInPart(node_pm))
+      Num_LD[ii][nbc_id] = node_num;
+
+      for(unsigned int jj=0; jj<nbc_list[ii]->get_num_per_nodes(nbc_id); ++jj)
       {
-        LocalMaster.push_back(node_pm);
-        LocalMasterSlave.push_back(node_ps);
-        pm_num += 1;
-      }
-    }
-    
-    Num_LPS[ii] = ps_num;
-    Num_LPM[ii] = pm_num;
-  }
-  
+        unsigned int node_ps = nbc_list[ii]->get_per_slave_nodes( nbc_id, jj);
+        unsigned int node_pm = nbc_list[ii]->get_per_master_nodes(nbc_id, jj);
+
+        node_ps = mnindex->get_old2new(node_ps);
+        node_pm = mnindex->get_old2new(node_pm);
+        
+        if(part->isNodeInPart(node_ps))
+        {
+          LPSN[ii].push_back(node_ps);
+          LPMN[ii].push_back(node_pm);
+          ps_num += 1;
+        }
+
+        if(part->isNodeInPart(node_pm))
+        {
+          LocalMaster[ii].push_back(node_pm);
+          LocalMasterSlave[ii].push_back(node_ps);
+          pm_num += 1;
+        }
+      } // end jj-loop
+
+      Num_LPS[ii][nbc_id] = ps_num;
+      Num_LPM[ii][nbc_id] = pm_num;
+
+    } // end nbc_id-loop
+
+    VEC_T::shrink2fit( LDN[ii] );
+    VEC_T::shrink2fit( LPSN[ii] ); VEC_T::shrink2fit( LPMN[ii] );
+    VEC_T::shrink2fit(LocalMaster); VEC_T::shrink2fit(LocalMasterSlave);
+
+  } // end ii-loop over dof
+
   const int totnode = part->get_nlocghonode();
 
   LID.resize(totnode * dof);
@@ -83,9 +100,7 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
     }
   }
 
-  VEC_T::shrink2fit(LID); VEC_T::shrink2fit(LDN);
-  VEC_T::shrink2fit(LPSN); VEC_T::shrink2fit(LPMN);
-  VEC_T::shrink2fit(LocalMaster); VEC_T::shrink2fit(LocalMasterSlave);
+  VEC_T::shrink2fit(LID);
 }
 
 

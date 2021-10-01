@@ -82,22 +82,28 @@ class NBC_Partition_3D : public INBC_Partition
     std::vector<int> LID;
 
     // Local subdomain's Dirichlet nodes
-    std::vector<int> LDN;
+    // dof times ( num_nbc[ii] x Num_LD[ii][jj] )
+    std::vector< std::vector<int> > LDN;
 
     // Local subdomain's slave nodes and their master nodes
-    std::vector<int> LPSN, LPMN;
+    // dof times ( num_nbc[ii] x Num_LPS/LPM[ii][jj] )
+    std::vector< std::vector<int> > LPSN, LPMN;
 
     // Local subdomain's master nodes and their slaves
-    std::vector<int> LocalMaster, LocalMasterSlave;
+    // dof times ( num_nbc[ii] x Num_LPS/LPM[ii][jj] )
+    std::vector< std::vector<int> > LocalMaster, LocalMasterSlave;
 
     // Number of Local Dirichlet Nodes for each dof
-    std::vector<int> Num_LD;
+    // dof x num_nbc[ii]
+    std::vector< std::vector<int> > Num_LD;
 
     // Number of Local Periodic Slave nodes
-    std::vector<int> Num_LPS;
+    // dof x num_nbc[ii]
+    std::vector< std::vector<int> > Num_LPS;
 
     // Number of Local Periodic Master nodes
-    std::vector<int> Num_LPM;
+    // dof x num_nbc[ii]
+    std::vector< std::vector<int> > Num_LPM;
 };
 
 #endif
