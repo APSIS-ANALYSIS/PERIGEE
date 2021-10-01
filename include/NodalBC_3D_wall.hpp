@@ -20,6 +20,8 @@ class NodalBC_3D_wall : public INodalBC
         const int &nFunc, const int &elemtype = 501 );
 
     virtual ~NodalBC_3D_wall() {};
+
+    virtual int get_num_nbc() const {return 1;}
 };
 
 #endif

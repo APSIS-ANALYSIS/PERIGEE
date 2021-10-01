@@ -43,6 +43,8 @@ class NodalBC_3D_ring : public INodalBC
 
     virtual ~NodalBC_3D_ring() {};
 
+    virtual int get_num_nbc() const {return 1;}
+
     virtual int get_num_caps() const { return num_caps; }
 
     virtual int get_ring_bc_type() const { return ring_bc_type; }
