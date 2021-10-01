@@ -140,6 +140,15 @@ class INodalBC
     }
 
     // --------------------------------------------------------------
+    // get_num_nbc() returns the number of nodal bc sets 
+    // --------------------------------------------------------------
+    virtual int get_num_nbc() const
+    {
+      SYS_T::commPrint("Warning: get_num_nbc is not implemented. \n");
+      return -1;
+    }
+
+    // --------------------------------------------------------------
     // get_intNA returns the basis N_A integral on surface
     // --------------------------------------------------------------
     virtual std::vector<double> get_intNA(const int &nbc_id) const
