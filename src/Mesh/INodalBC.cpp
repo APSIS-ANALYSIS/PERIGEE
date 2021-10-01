@@ -11,8 +11,8 @@ INodalBC::~INodalBC()
   VEC_T::clean(per_master_nodes);
   VEC_T::clean(ID);
 
-  num_dir_nodes = 0;
-  num_per_nodes = 0;
+  VEC_T::clean(num_dir_nodes);
+  VEC_T::clean(num_per_nodes);
 }
 
 
@@ -20,19 +20,27 @@ void INodalBC::print_info() const
 {
   std::cout<<std::endl;
   std::cout<<"======== BC info ======="<<std::endl;
-  if(num_dir_nodes > 0)
+  if(num_dir_nodes.size() > 0)
   {
     std::cout<<"Dirichlet nodes: "<<std::endl;
-    for(unsigned int ii=0; ii<num_dir_nodes; ++ii)
-      std::cout<<dir_nodes[ii]<<'\t';
-    std::cout<<std::endl;
+    for(unsigned int ii=0; ii<num_dir_nodes.size(); ++ii)
+    {
+      std::cout<<"nbc_id " << ii << ": ";
+      for(unsigned int jj=0; jj<num_dir_nodes[ii]; ++jj)
+        std::cout<<dir_nodes[ii][jj]<<'\t';
+      std::cout<<std::endl;
+    }
   }
 
-  if(num_per_nodes>0)
+  if(num_per_nodes.size() > 0)
   {
-    std::cout<<"Periodic master - slvae nodes: "<<std::endl;
-    for(unsigned int ii=0; ii<num_per_nodes; ++ii)
-      std::cout<<per_master_nodes[ii]<<'\t'<<per_slave_nodes[ii]<<std::endl;
+    std::cout<<"Periodic master - slave nodes: "<<std::endl;
+    for(unsigned int ii=0; ii<num_per_nodes.size(); ++ii)
+    {
+      std::cout<<"nbc_id " << ii << ": ";
+      for(unsigned int jj=0; jj<num_per_nodes[ii]; ++jj)
+        std::cout<<per_master_nodes[ii][jj]<<'\t'<<per_slave_nodes[ii][jj]<<std::endl;
+    }
   }
 
   std::cout<<std::endl<<"ID array: "<<std::endl;
@@ -51,10 +59,18 @@ void INodalBC::Create_ID(const unsigned int &num_node)
 
   for(unsigned int ii = 0; ii<ID.size(); ++ii)
     ID[ii] = ii;
+
   for(unsigned int ii = 0; ii<dir_nodes.size(); ++ii)
-    ID[dir_nodes[ii]] = -1;
+  {
+    for(unsigned int jj = 0; jj<dir_nodes[ii].size(); ++jj)
+      ID[ dir_nodes[ii][jj] ] = -1;
+  }
+
   for(unsigned int ii = 0; ii<per_slave_nodes.size(); ++ii)
-    ID[per_slave_nodes[ii]] = per_master_nodes[ii];
+  {
+    for(unsigned int jj = 0; jj<per_slave_nodes[ii].size(); ++jj)
+      ID[ per_slave_nodes[ii][jj] ] = per_master_nodes[ii][jj];
+  }
 }
 
 
