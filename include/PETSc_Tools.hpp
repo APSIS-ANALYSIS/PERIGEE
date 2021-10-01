@@ -158,6 +158,14 @@ namespace PETSc_T
   // Get the ghost vector's *local plus ghost* length.
   int GetLocalGhostSize( const Vec &vv );
 
+  // Get the *ghost* vector's local copy in vv_array. One is responsible for
+  // allocating the vv_array before calling this function and freeing the memory
+  // after usage. The size of the vv_array can be obtained from
+  // PETSc_T::GetLocalGhostSize.
+  void GetLocalArray( const Vec &vv, double * const &vv_array );
+
+  std::vector<double> GetLocalArray( const Vec &vv );
+
   // Write a vector to disk with file_name
   void WriteBinary( const Vec &a, const char * const &file_name );
 }

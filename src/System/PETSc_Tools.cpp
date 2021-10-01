@@ -147,6 +147,35 @@ int PETSc_T::GetLocalGhostSize( const Vec &vv )
   return static_cast<int>(NN);
 }
 
+void PETSc_T::GetLocalArray( const Vec &vv, double * const &vv_array )
+{
+  const int vv_size = PETSc_T::GetLocalGhostSize( vv );
+  
+  Vec lsol;
+  VecGhostGetLocalForm(vv, &lsol);
+  double * array;
+  VecGetArray(lsol, &array);
+  for( int ii=0; ii<vv_size; ++ii ) vv_array[ii] = array[ii];
+  VecRestoreArray(lsol, &array);
+  VecGhostRestoreLocalForm(vv, &lsol);
+}
+
+std::vector<double> PETSc_T::GetLocalArray( const Vec &vv )
+{
+  const int vv_size = PETSc_T::GetLocalGhostSize( vv );
+  std::vector<double> vv_vector( vv_size, 0.0 );
+
+  Vec lsol;
+  VecGhostGetLocalForm(vv, &lsol);
+  double * array;
+  VecGetArray(lsol, &array);
+  for( int ii=0; ii<vv_size; ++ii ) vv_vector[ii] = array[ii];
+  VecRestoreArray(lsol, &array);
+  VecGhostRestoreLocalForm(vv, &lsol);
+
+  return vv_vector;
+}
+
 void PETSc_T::WriteBinary( const Vec &a, const char * const &file_name )
 {
   PetscViewer viewer;
