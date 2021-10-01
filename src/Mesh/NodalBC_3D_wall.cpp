@@ -1,6 +1,7 @@
 #include "NodalBC_3D_wall.hpp"
 
-NodalBC_3D_wall::NodalBC_3D_wall( const std::string &inflow_file,
+NodalBC_3D_wall::NodalBC_3D_wall(
+    const std::vector<std::string> &inflow_files,
     const std::string &wall_file,
     const std::vector<std::string> &outflow_files,
     const int &nFunc, const int &elemtype )
@@ -8,13 +9,18 @@ NodalBC_3D_wall::NodalBC_3D_wall( const std::string &inflow_file,
   // No periodic nodes
   per_slave_nodes.clear();
   per_master_nodes.clear();
-  num_per_nodes = 0;
+  num_per_nodes.clear();
 
-  dir_nodes.clear();
+  // num_ebc = 1 per the assumption for wall elem bc
+  const int nbc_id = 0;
+  const int num_nbc = 1;
+  dir_nodes.resize(     num_nbc );
+  num_dir_nodes.resize( num_nbc );
 
   // Aggregate inlet and outlet data
-  std::vector<std::string> cap_files = outflow_files;
-  cap_files.insert( cap_files.begin(), inflow_file );
+  std::vector<std::string> cap_files = inflow_files;
+  for( unsigned int ii=0; ii<outflow_files.size(); ++ii )
+    cap_files.push_back( outflow_files[ii] );
 
   int numpts, numcels;
   std::vector<double> pts;
@@ -59,7 +65,7 @@ NodalBC_3D_wall::NodalBC_3D_wall( const std::string &inflow_file,
     }
   }
   else
-    SYS_T::print_fatal("Error: Nodal_3D_ring unknown file type.\n");
+    SYS_T::print_fatal("Error: Nodal_3D_wall unknown file type.\n");
 
   VEC_T::sort_unique_resize( ring_gnode );
 
@@ -67,10 +73,10 @@ NodalBC_3D_wall::NodalBC_3D_wall( const std::string &inflow_file,
   for(unsigned int ii=0; ii<wall_gnode.size(); ++ii)
   {
     if( !VEC_T::is_invec( ring_gnode, wall_gnode[ii] ) )
-      dir_nodes.push_back( wall_gnode[ii] );
+      dir_nodes[nbc_id].push_back( wall_gnode[ii] );
   }
 
-  num_dir_nodes = dir_nodes.size();
+  num_dir_nodes[nbc_id] = dir_nodes[nbc_id].size();
 
   // Generate the ID array
   Create_ID( nFunc );

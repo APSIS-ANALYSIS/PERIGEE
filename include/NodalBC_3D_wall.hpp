@@ -14,7 +14,7 @@
 class NodalBC_3D_wall : public INodalBC
 {
   public:
-    NodalBC_3D_wall( const std::string &inflow_file,
+    NodalBC_3D_wall( const std::vector<std::string> &inflow_files,
         const std::string &wall_file,
         const std::vector<std::string> &outflow_files,
         const int &nFunc, const int &elemtype = 501 );
