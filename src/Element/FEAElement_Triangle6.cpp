@@ -172,6 +172,18 @@ void FEAElement_Triangle6::get_R_gradR( const int &quaindex,
   }
 }
 
+std::vector<double> FEAElement_Triangle6::get_dR_dx( const int &quaindex ) const
+{
+  const int offset = quaindex * 6;
+  return { dR_dx[offset], dR_dx[offset+1], dR_dx[offset+2], dR_dx[offset+3], dR_dx[offset+4], dR_dx[offset+5] };
+}
+
+std::vector<double> FEAElement_Triangle6::get_dR_dy( const int &quaindex ) const
+{
+  const int offset = quaindex * 6;
+  return { dR_dy[offset], dR_dy[offset+1], dR_dy[offset+2], dR_dy[offset+3], dR_dy[offset+4], dR_dy[offset+5] };
+}
+
 void FEAElement_Triangle6::get_2D_R_dR_d2R( const int &quaindex,
     double * const &basis,
     double * const &basis_x, double * const &basis_y,
