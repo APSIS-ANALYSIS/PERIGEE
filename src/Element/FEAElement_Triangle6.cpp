@@ -11,16 +11,39 @@ FEAElement_Triangle6::FEAElement_Triangle6( const int &in_nqua )
 
   dR_dr = new double [6*numQuapts];
   dR_ds = new double [6*numQuapts];
+  d2R_drr = new double [6 * numQuapts];
+  d2R_dss = new double [6 * numQuapts];
+  d2R_drs = new double [6 * numQuapts];
+
+  d2R_dxx = new double [6 * numQuapts];
+  d2R_dyy = new double [6 * numQuapts];
+  d2R_dxy = new double [6 * numQuapts];
+
+  // second derivative w.r.t r-s-t is constant
+  for(int ii=0; ii<6; ++ii)
+  {
+    d2R_drr[ii] = 0.0; d2R_dss[ii] = 0.0; d2R_drs[ii] = 0.0;
+  }
+
+  d2R_drr[0] = 4.0; d2R_drr[1] = 4.0; d2R_drr[4] = -8.0;
+  d2R_dss[0] = 4.0; d2R_dss[2] = 4.0; d2R_dss[6] = -8.0;
+  d2R_drs[0] = 4.0; d2R_drs[3] = -4.0; d2R_drs[4] = 4.0; d2R_drs[5] = -4.0;
 }
 
 FEAElement_Triangle6::~FEAElement_Triangle6()
 {
-  delete [] R;     R = nullptr;
-  delete [] dR_dx; dR_dx = nullptr;
-  delete [] dR_dy; dR_dy = nullptr;
-  delete [] Jac;   Jac = nullptr;
-  delete [] dR_dr; dR_dr = nullptr;
-  delete [] dR_ds; dR_ds = nullptr;
+  delete [] R;             R = nullptr;
+  delete [] dR_dx;     dR_dx = nullptr;
+  delete [] dR_dy;     dR_dy = nullptr;
+  delete [] Jac;         Jac = nullptr;
+  delete [] dR_dr;     dR_dr = nullptr;
+  delete [] dR_ds;     dR_ds = nullptr;
+  delete [] d2R_drr; d2R_drr = nullptr;
+  delete [] d2R_dss; d2R_dss = nullptr;
+  delete [] d2R_drs; d2R_drs = nullptr;
+  delete [] d2R_dxx; d2R_dxx = nullptr;
+  delete [] d2R_dyy; d2R_dyy = nullptr;
+  delete [] d2R_dxy; d2R_dxy = nullptr;
 }
 
 void FEAElement_Triangle6::print() const
@@ -43,6 +66,23 @@ void FEAElement_Triangle6::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_y )
 {
   assert(quad->get_dim() == 3);
+
+  // Caclulate second derivative of geometry
+  // Here, second derivatives d2R_drr, etc are constant. We can calculate
+  // xrr, etc. out of the quadrature loop.
+  double xrr = 0.0, xss = 0.0, xrs = 0.0;
+  double yrr = 0.0, yss = 0.0, yrs = 0.0;
+
+  for(int ii=0; ii<6; ++ii)
+  {
+    xrr += ctrl_x[ii] * d2R_drr[ii];
+    xss += ctrl_x[ii] * d2R_dss[ii];
+    xrs += ctrl_x[ii] * d2R_drs[ii];
+
+    yrr += ctrl_y[ii] * d2R_drr[ii];
+    yss += ctrl_y[ii] * d2R_dss[ii];
+    yrs += ctrl_y[ii] * d2R_drs[ii];
+  }
 
   for( int qua = 0; qua < numQuapts; ++qua )
   {
@@ -105,6 +145,37 @@ void FEAElement_Triangle6::buildBasis( const IQuadPts * const &quad,
     {
       dR_dx[offset+ii] = dR_dr[offset+ii] * dr_dx + dR_ds[offset+ii] * ds_dx;
       dR_dy[offset+ii] = dR_dr[offset+ii] * dr_dy + dR_ds[offset+ii] * ds_dy;
+    }
+
+    // Setup the 3x3 matrix
+    const double a11 = dx_dr * dx_dr;
+    const double a12 = dy_dr * dy_dr;
+    const double a13 = 2 * dx_dr * dy_dr;
+    const double a21 = dx_dr * dx_ds;
+    const double a22 = dy_dr * dy_ds;
+    const double a23 = dx_dr * dy_ds + dx_ds * dy_dr;
+    const double a31 = dx_ds * dx_ds;
+    const double a32 = dy_ds * dy_ds;
+    const double a33 = 2 * dx_ds * dy_ds;
+
+    Matrix_double_3by3_Array LHS(a11, a12, a13, a21, a22, a23, a31, a32, a33);
+
+    // LU factorization
+    LHS.LU_fac();
+
+    for(int ii=0; ii<6; ++ii)
+    {
+      const double RHS[3] { d2R_drr[ii] - dR_dx[offset+ii] * xrr - dR_dy[offset+ii] * yrr,
+        d2R_drs[ii] - dR_dx[offset+ii] * xrs - dR_dy[offset+ii] * yrs,
+        d2R_dss[ii] - dR_dx[offset+ii] * xss - dR_dy[offset+ii] * yss };
+
+      double sol[3] {0.0};
+
+      LHS.LU_solve(RHS, sol);
+
+      d2R_dxx[offset+ii] = sol[0];
+      d2R_dyy[offset+ii] = sol[1];
+      d2R_dxy[offset+ii] = sol[3];
     }
   }
 }
@@ -191,6 +262,30 @@ void FEAElement_Triangle6::get_2D_R_dR_d2R( const int &quaindex,
     double * const &basis_xy ) const
 {
   SYS_T::print_fatal("Error: FEAElement_Triangle6::get_2D_R_dR_d2R is not implemented. \n");
+}
+
+std::vector<double> FEAElement_Triangle6::get_d2R_dxx( const int &quaindex ) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  const int offset = quaindex * 6;
+  return { d2R_dxx[offset],  d2R_dxx[offset+1], d2R_dxx[offset+2], 
+           d2R_dxx[offset+3],d2R_dxx[offset+4], d2R_dxx[offset+5] };
+}
+
+std::vector<double> FEAElement_Triangle6::get_d2R_dyy( const int &quaindex ) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  const int offset = quaindex * 6;
+  return { d2R_dyy[offset],  d2R_dyy[offset+1], d2R_dyy[offset+2],
+           d2R_dyy[offset+3],d2R_dyy[offset+4], d2R_dyy[offset+5] };
+}
+
+std::vector<double> FEAElement_Triangle6::get_d2R_dxy( const int &quaindex ) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  const int offset = quaindex * 6;
+  return { d2R_dxy[offset],  d2R_dxy[offset+1], d2R_dxy[offset+2], 
+           d2R_dxy[offset+3],d2R_dxy[offset+4], d2R_dxy[offset+5] };
 }
 
 void FEAElement_Triangle6::get_Jacobian(const int &quaindex,

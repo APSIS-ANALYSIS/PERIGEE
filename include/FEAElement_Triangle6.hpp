@@ -10,6 +10,7 @@
 // Date created: Nov. 28 2017
 // ==================================================================
 #include "FEAElement.hpp"
+#include "Matrix_double_3by3_Array.hpp"
 
 class FEAElement_Triangle6 : public FEAElement
 {
@@ -59,6 +60,12 @@ class FEAElement_Triangle6 : public FEAElement
         double * const &basis_xx, double * const &basis_yy,
         double * const &basis_xy ) const;
 
+    virtual std::vector<double> get_d2R_dxx( const int &quaindex ) const;
+
+    virtual std::vector<double> get_d2R_dyy( const int &quaindex ) const;
+
+    virtual std::vector<double> get_d2R_dxy( const int &quaindex ) const;
+
     virtual void get_Jacobian(const int &quaindex,
         double * const &jac_value) const;
 
@@ -75,6 +82,9 @@ class FEAElement_Triangle6 : public FEAElement
     double * R;
     double * dR_dx;
     double * dR_dy;
+    double * d2R_dxx;
+    double * d2R_dyy;
+    double * d2R_dxy;
 
     // length 9 x numQuapts
     // dx_ds : 0             <= ii < 4 * numQuapts
@@ -85,6 +95,9 @@ class FEAElement_Triangle6 : public FEAElement
     // auxiliary data
     double * dR_dr;
     double * dR_ds;
+    double * d2R_drr;
+    double * d2R_dss;
+    double * d2R_drs;
 };
 
 #endif
