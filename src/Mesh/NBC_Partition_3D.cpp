@@ -3,28 +3,29 @@
 NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
     const Map_Node_Index * const &mnindex,
     const std::vector<INodalBC *> &nbc_list )
-: cpu_rank(part->get_cpu_rank())
+: cpu_rank(part->get_cpu_rank()), num_nbc( nbc_list[0]->get_num_nbc() )
 {
   const int dof = (int) nbc_list.size();
-
-  Num_LD.clear(); Num_LPS.clear(); Num_LPM.clear();
-  LID.clear(); LPSN.clear(); LPMN.clear();
-  LocalMaster.clear(); LocalMasterSlave.clear();
   
-  LDN.resize(dof); Num_LD.resize(dof);
-  Num_LPS.resize(dof); Num_LPM.resize(dof);
+  for(int ii=1; ii<dof; ++ii)
+    SYS_T::print_exit_if( num_nbc != nbc_list[ii]->get_num_nbc(), "Error: NBC_Partition_3D assumes all input INodalBC have the same num_nbc.\n");
 
-  // Loop over nbc_list and store the Dirichlet nodes
-  for(int ii=0; ii<dof; ++ii)
+  LID.clear();
+  
+  LDN.resize(num_nbc);         Num_LD.resize(num_nbc);
+  LPSN.resize(num_nbc);        LPMN.resize(num_nbc);
+  LocalMaster.resize(num_nbc); LocalMasterSlave.resize(num_nbc);
+  Num_LPS.resize(num_nbc);     Num_LPM.resize(num_nbc);
+
+  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
   {
     LDN[ii].clear(); LPSN[ii].clear(); LPMN[ii].clear();
+    LocalMaster[ii].clear(); LocalMasterSlave[ii].clear();
 
-    const int num_nbc = nbc_list[ii]->get_num_nbc();
+    Num_LD[ii].resize(dof);
+    Num_LPS[ii].resize(dof); Num_LPM[ii].resize(dof);
 
-    Num_LD[ii].resize(num_nbc);
-    Num_LPS[ii].resize(num_nbc); Num_LPM[ii].resize(num_nbc);
-
-    for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
+    for(int ii=0; ii<dof; ++ii)
     {
       unsigned int node_num = 0;
       unsigned int ps_num = 0;
@@ -42,7 +43,7 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
         }
       } // end jj-loop
 
-      Num_LD[ii][nbc_id] = node_num;
+      Num_LD[nbc_id][ii] = node_num;
 
       for(unsigned int jj=0; jj<nbc_list[ii]->get_num_per_nodes(nbc_id); ++jj)
       {
@@ -67,16 +68,16 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
         }
       } // end jj-loop
 
-      Num_LPS[ii][nbc_id] = ps_num;
-      Num_LPM[ii][nbc_id] = pm_num;
+      Num_LPS[nbc_id][ii] = ps_num;
+      Num_LPM[nbc_id][ii] = pm_num;
 
-    } // end nbc_id-loop
+    } // end ii-loop over dof
 
-    VEC_T::shrink2fit( LDN[ii] );
-    VEC_T::shrink2fit( LPSN[ii] ); VEC_T::shrink2fit( LPMN[ii] );
-    VEC_T::shrink2fit(LocalMaster); VEC_T::shrink2fit(LocalMasterSlave);
+    VEC_T::shrink2fit( LDN[nbc_id] );
+    VEC_T::shrink2fit( LPSN[nbc_id] ); VEC_T::shrink2fit( LPMN[nbc_id] );
+    VEC_T::shrink2fit( LocalMaster[nbc_id] ); VEC_T::shrink2fit( LocalMasterSlave[nbc_id] );
 
-  } // end ii-loop over dof
+  } // end nbc_id-loop
 
   const int totnode = part->get_nlocghonode();
 
@@ -100,63 +101,80 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
     }
   }
 
-  VEC_T::shrink2fit(LID);
+  VEC_T::shrink2fit( LID );
 }
 
 
 NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
     const Map_Node_Index * const &mnindex,
     const INodalBC * const &nbc )
-: cpu_rank(part->get_cpu_rank())
+: cpu_rank(part->get_cpu_rank()), num_nbc( nbc->get_num_nbc() )
 {
   const int dof = 1;
 
-  Num_LD.clear(); Num_LPS.clear(); Num_LPM.clear();
-  LID.clear(); LDN.clear(); LPSN.clear(); LPMN.clear();
-  LocalMaster.clear(); LocalMasterSlave.clear();
+  LID.clear();
   
-  Num_LD.resize(dof); Num_LPS.resize(dof); Num_LPM.resize(dof);
+  LDN.resize(num_nbc);         Num_LD.resize(num_nbc);
+  LPSN.resize(num_nbc);        LPMN.resize(num_nbc);
+  LocalMaster.resize(num_nbc); LocalMasterSlave.resize(num_nbc);
+  Num_LPS.resize(num_nbc);     Num_LPM.resize(num_nbc);
 
-  // Loop over nbc_list and store the Dirichlet nodes
-  unsigned int node_num = 0;
-  for(unsigned int jj=0; jj<nbc->get_num_dir_nodes(); ++jj)
+  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
   {
-    unsigned int node_index = nbc -> get_dir_nodes(jj);
-    node_index = mnindex -> get_old2new(node_index);
-    if(part->isNodeInPart(node_index))
+    LDN[ii].clear(); LPSN[ii].clear(); LPMN[ii].clear();
+    LocalMaster[ii].clear(); LocalMasterSlave[ii].clear();
+
+    Num_LD[ii].resize(dof);
+    Num_LPS[ii].resize(dof); Num_LPM[ii].resize(dof);
+
+    unsigned int node_num = 0;
+    unsigned int ps_num = 0;
+    unsigned int pm_num = 0;
+
+    for(unsigned int jj=0; jj<nbc->get_num_dir_nodes(nbc_id); ++jj)
     {
-      LDN.push_back(node_index);
-      node_num += 1;
-    }
-  }
-  Num_LD[0] = node_num;
+      unsigned int node_index = nbc -> get_dir_nodes(nbc_id, jj);
+      node_index = mnindex -> get_old2new(node_index);
+      if(part->isNodeInPart(node_index))
+      {
+        LDN.push_back(node_index);
+        node_num += 1;
+      }
+    } // end jj-loop
 
-  unsigned int ps_num = 0;
-  unsigned int pm_num = 0;
-  for(unsigned int jj=0; jj<nbc->get_num_per_nodes(); ++jj)
-  {
-    unsigned int node_ps = nbc -> get_per_slave_nodes(jj);
-    unsigned int node_pm = nbc -> get_per_master_nodes(jj);
-    node_ps = mnindex -> get_old2new(node_ps);
-    node_pm = mnindex -> get_old2new(node_pm);
+    Num_LD[nbc_id][0] = node_num;
 
-    if(part->isNodeInPart(node_ps))
+    for(unsigned int jj=0; jj<nbc->get_num_per_nodes(nbc_id); ++jj)
     {
-      LPSN.push_back(node_ps);
-      LPMN.push_back(node_pm);
-      ps_num += 1;
-    }
+      unsigned int node_ps = nbc -> get_per_slave_nodes( nbc_id, jj);
+      unsigned int node_pm = nbc -> get_per_master_nodes(nbc_id, jj);
 
-    if(part->isNodeInPart(node_pm))
-    {
-      LocalMaster.push_back(node_pm);
-      LocalMasterSlave.push_back(node_ps);
-      pm_num += 1;
-    }
+      node_ps = mnindex -> get_old2new(node_ps);
+      node_pm = mnindex -> get_old2new(node_pm);
 
-  }
-  Num_LPS[0] = ps_num;
-  Num_LPM[0] = pm_num;
+      if(part->isNodeInPart(node_ps))
+      {
+        LPSN[nbc_id].push_back(node_ps);
+        LPMN[nbc_id].push_back(node_pm);
+        ps_num += 1;
+      }
+
+      if(part->isNodeInPart(node_pm))
+      {
+        LocalMaster[nbc_id].push_back(node_pm);
+        LocalMasterSlave[nbc_id].push_back(node_ps);
+        pm_num += 1;
+      }
+    } // end jj-loop
+
+    Num_LPS[nbc_id][0] = ps_num;
+    Num_LPM[nbc_id][0] = pm_num;
+
+    VEC_T::shrink2fit( LDN[nbc_id] );
+    VEC_T::shrink2fit( LPSN[nbc_id] ); VEC_T::shrink2fit( LPMN[nbc_id] );
+    VEC_T::shrink2fit( LocalMaster[nbc_id] ); VEC_T::shrink2fit( LocalMasterSlave[nbc_id] );
+
+  } // end nbc_id-loop
 
   const int totnode = part->get_nlocghonode();
 
@@ -177,9 +195,7 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
     }
   }
 
-  VEC_T::shrink2fit(LID); VEC_T::shrink2fit(LDN);
-  VEC_T::shrink2fit(LPSN); VEC_T::shrink2fit(LPMN);
-  VEC_T::shrink2fit(LocalMaster); VEC_T::shrink2fit(LocalMasterSlave);
+  VEC_T::shrink2fit( LID );
 }
 
 
@@ -204,34 +220,47 @@ void NBC_Partition_3D::write_hdf5(const char * FileName) const
 
   hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
-  hid_t group_id = H5Gcreate(file_id, "/nbc", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  hid_t g_id = H5Gcreate(file_id, "/nbc", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
   HDF5_Writer * h5writer = new HDF5_Writer(file_id);
 
-  h5writer->write_intVector(group_id, "LID", LID);
+  h5writer->write_intScalar( g_id, "num_nbc", num_nbc );
 
-  if(LDN.size() > 0)
-    h5writer->write_intVector(group_id, "LDN", LDN);
+  h5writer->write_intVector( g_id, "LID", LID );
 
-  if(LPSN.size() > 0)
+  const std::string groupbase("nbcid_");
+
+  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
   {
-    h5writer->write_intVector(group_id, "LPSN", LPSN);
-    h5writer->write_intVector(group_id, "LPMN", LPMN);
+    std::string subgroup_name(groupbase);
+      subgroup_name.append( SYS_T::to_string(nbc_id) );
+
+    hid_t group_id = H5Gcreate(g_id, subgroup_name.c_str(),
+          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+    if( LDN[nbc_id].size() > 0 )
+      h5writer->write_intVector( group_id, "LDN", LDN[nbc_id] );
+
+    if( LPSN[nbc_id].size() > 0)
+    {
+      h5writer->write_intVector( group_id, "LPSN", LPSN[nbc_id] );
+      h5writer->write_intVector( group_id, "LPMN", LPMN[nbc_id] );
+    }
+
+    if( LocalMaster[nbc_id].size() > 0 )
+    {
+      h5writer->write_intVector( group_id, "LocalMaster",      LocalMaster[nbc_id] );
+      h5writer->write_intVector( group_id, "LocalMasterSlave", LocalMasterSlave[nbc_id] );
+    }
+
+    h5writer->write_intVector(group_id, "Num_LD",  Num_LD[nbc_id]);
+    h5writer->write_intVector(group_id, "Num_LPS", Num_LPS[nbc_id]);
+    h5writer->write_intVector(group_id, "Num_LPM", Num_LPM[nbc_id]);
+
+    H5Gclose( group_id );
   }
 
-  if(LocalMaster.size() > 0)
-  {
-    h5writer->write_intVector(group_id, "LocalMaster", LocalMaster);
-    h5writer->write_intVector(group_id, "LocalMasterSlave", LocalMasterSlave);
-  }
-
-  h5writer->write_intVector(group_id, "Num_LD", Num_LD);
-  h5writer->write_intVector(group_id, "Num_LPS", Num_LPS);
-  h5writer->write_intVector(group_id, "Num_LPM", Num_LPM);
-
-  delete h5writer;
-  H5Gclose(group_id);
-  H5Fclose(file_id);
+  delete h5writer; H5Gclose(g_id); H5Fclose(file_id);
 }
 
 
@@ -243,35 +272,48 @@ void NBC_Partition_3D::write_hdf5( const char * FileName,
 
   hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
-  hid_t group_id = H5Gcreate(file_id, GroupName, H5P_DEFAULT, H5P_DEFAULT, 
+  hid_t g_id = H5Gcreate(file_id, GroupName, H5P_DEFAULT, H5P_DEFAULT, 
       H5P_DEFAULT);
 
   HDF5_Writer * h5writer = new HDF5_Writer(file_id);
 
-  h5writer->write_intVector(group_id, "LID", LID);
+  h5writer->write_intScalar( g_id, "num_nbc", num_nbc );
 
-  if(LDN.size() > 0)
-    h5writer->write_intVector(group_id, "LDN", LDN);
+  h5writer->write_intVector( g_id, "LID", LID );
 
-  if(LPSN.size() > 0)
+  const std::string groupbase("nbcid_");
+
+  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
   {
-    h5writer->write_intVector(group_id, "LPSN", LPSN);
-    h5writer->write_intVector(group_id, "LPMN", LPMN);
+    std::string subgroup_name(groupbase);
+      subgroup_name.append( SYS_T::to_string(nbc_id) );
+
+    hid_t group_id = H5Gcreate(g_id, subgroup_name.c_str(),
+          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+    if( LDN[nbc_id].size() > 0 )
+      h5writer->write_intVector( group_id, "LDN", LDN[nbc_id] );
+
+    if( LPSN[nbc_id].size() > 0)
+    {
+      h5writer->write_intVector( group_id, "LPSN", LPSN[nbc_id] );
+      h5writer->write_intVector( group_id, "LPMN", LPMN[nbc_id] );
+    }
+
+    if( LocalMaster[nbc_id].size() > 0 )
+    {
+      h5writer->write_intVector( group_id, "LocalMaster",      LocalMaster[nbc_id] );
+      h5writer->write_intVector( group_id, "LocalMasterSlave", LocalMasterSlave[nbc_id] );
+    }
+
+    h5writer->write_intVector(group_id, "Num_LD",  Num_LD[nbc_id]);
+    h5writer->write_intVector(group_id, "Num_LPS", Num_LPS[nbc_id]);
+    h5writer->write_intVector(group_id, "Num_LPM", Num_LPM[nbc_id]);
+
+    H5Gclose( group_id );
   }
 
-  if(LocalMaster.size() > 0)
-  {
-    h5writer->write_intVector(group_id, "LocalMaster", LocalMaster);
-    h5writer->write_intVector(group_id, "LocalMasterSlave", LocalMasterSlave);
-  }
-
-  h5writer->write_intVector(group_id, "Num_LD", Num_LD);
-  h5writer->write_intVector(group_id, "Num_LPS", Num_LPS);
-  h5writer->write_intVector(group_id, "Num_LPM", Num_LPM);
-
-  delete h5writer;
-  H5Gclose(group_id);
-  H5Fclose(file_id);
+  delete h5writer; H5Gclose(g_id); H5Fclose(file_id);
 }
 
 
@@ -279,24 +321,30 @@ void NBC_Partition_3D::print_info() const
 {
   std::cout<<"=========================================== \n";
   std::cout<<"NBC_Partition_3D : \n";
+  std::cout<<"-- num_nbc = "<<num_nbc<<std::endl;
   std::cout<<"--- LID : \n";
   VEC_T::print(LID);
-  std::cout<<"\n--- LDN : \n";
-  VEC_T::print(LDN);
-  std::cout<<"\n--- LPSN : \n";
-  VEC_T::print(LPSN);
-  std::cout<<"\n--- LPMN : \n";
-  VEC_T::print(LPMN);
-  std::cout<<"\n--- LocalMaster : \n";
-  VEC_T::print(LocalMaster);
-  std::cout<<"\n--- LocalMasterSlave : \n";
-  VEC_T::print(LocalMasterSlave);
-  std::cout<<"\n--- Num_LD : \n";
-  VEC_T::print(Num_LD);
-  std::cout<<"\n--- Num_LPS : \n";
-  VEC_T::print(Num_LPS);
-  std::cout<<"\n--- Num_LPM : \n";
-  VEC_T::print(Num_LPM);
+
+  for(int ii=0; ii<num_nbc; ++ii)
+  {
+    std::cout<<"-- nbc_id = "<<ii<<std::endl;
+    std::cout<<"\n   LDN : \n";
+    VEC_T::print(LDN[ii]);
+    std::cout<<"\n   LPSN : \n";
+    VEC_T::print(LPSN[ii]);
+    std::cout<<"\n   LPMN : \n";
+    VEC_T::print(LPMN[ii]);
+    std::cout<<"\n   LocalMaster : \n";
+    VEC_T::print(LocalMaster[ii]);
+    std::cout<<"\n   LocalMasterSlave : \n";
+    VEC_T::print(LocalMasterSlave[ii]);
+    std::cout<<"\n   Num_LD : \n";
+    VEC_T::print(Num_LD[ii]);
+    std::cout<<"\n   Num_LPS : \n";
+    VEC_T::print(Num_LPS[ii]);
+    std::cout<<"\n   Num_LPM : \n";
+    VEC_T::print(Num_LPM[ii]);
+  }
   std::cout<<"=========================================== \n";
 }
 

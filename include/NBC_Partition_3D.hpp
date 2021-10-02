@@ -58,51 +58,60 @@ class NBC_Partition_3D : public INBC_Partition
 
     virtual int get_LID( const int &ii ) const {return LID[ii];}
 
-    virtual int get_LDN( const int &ii ) const {return LDN[ii];}
+    virtual int get_LDN( const int &nbc_id, const int &ii ) const
+    {return LDN[nbc_id][ii];}
 
-    virtual int get_LPSN( const int &ii ) const {return LPSN[ii];}
+    virtual int get_LPSN( const int &nbc_id, const int &ii ) const
+    {return LPSN[nbc_id][ii];}
 
-    virtual int get_LPMN( const int &ii ) const {return LPMN[ii];}
+    virtual int get_LPMN( const int &nbc_id, const int &ii ) const
+    {return LPMN[nbc_id][ii];}
 
-    virtual int get_LocalMaster( const int &ii ) const {return LocalMaster[ii];}
+    virtual int get_LocalMaster( const int &nbc_id, const int &ii ) const
+    {return LocalMaster[nbc_id][ii];}
 
-    virtual int get_LocalMasterSlave( const int &ii ) const 
-    {return LocalMasterSlave[ii];}
+    virtual int get_LocalMasterSlave( const int &nbc_id, const int &ii ) const 
+    {return LocalMasterSlave[nbc_id][ii];}
 
-    virtual int get_Num_LD( const int &ii ) const {return Num_LD[ii];}
+    virtual int get_Num_LD( const int &nbc_id, const int &ii ) const
+    {return Num_LD[nbc_id][ii];}
 
-    virtual int get_Num_LPS( const int &ii ) const {return Num_LPS[ii];}
+    virtual int get_Num_LPS( const int &nbc_id, const int &ii ) const
+    {return Num_LPS[nbc_id][ii];}
 
-    virtual int get_Num_LPM( const int &ii ) const {return Num_LPM[ii];}
+    virtual int get_Num_LPM( const int &nbc_id, const int &ii ) const
+    {return Num_LPM[nbc_id][ii];}
 
   protected:
     const int cpu_rank;
+
+    const int num_nbc;
 
     // The ID array of the Local nodes.
     std::vector<int> LID;
 
     // Local subdomain's Dirichlet nodes
-    // dof times ( num_nbc[ii] x Num_LD[ii][jj] )
+    // num_nbc times ( dof x Num_LD[ii][jj] )
     std::vector< std::vector<int> > LDN;
 
     // Local subdomain's slave nodes and their master nodes
-    // dof times ( num_nbc[ii] x Num_LPS/LPM[ii][jj] )
+    // num_nbc times ( dof x Num_LPS/LPM[ii][jj] )
     std::vector< std::vector<int> > LPSN, LPMN;
 
     // Local subdomain's master nodes and their slaves
-    // dof times ( num_nbc[ii] x Num_LPS/LPM[ii][jj] )
+    // num_nbc times ( dof x Num_LPS/LPM[ii][jj] )
     std::vector< std::vector<int> > LocalMaster, LocalMasterSlave;
 
     // Number of Local Dirichlet Nodes for each dof
-    // dof x num_nbc[ii]
+    // num_nbc x dof
     std::vector< std::vector<int> > Num_LD;
 
     // Number of Local Periodic Slave nodes
-    // dof x num_nbc[ii]
+    // num_nbc x dof
     std::vector< std::vector<int> > Num_LPS;
 
     // Number of Local Periodic Master nodes
-    // dof x num_nbc[ii]
+    // num_nbc x dof
     std::vector< std::vector<int> > Num_LPM;
 };
 
