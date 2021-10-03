@@ -88,8 +88,9 @@ class Vector_3
     double sum() const {return vec[0]+vec[1]+vec[2];}
 
     double norm2() const {return sqrt(vec[0]*vec[0]+vec[1]*vec[1]+vec[2]*vec[2]);}
-
-    void normalize(); // rescale vec to be norm one
+    
+    // rescale vec to be norm one and return its length
+    double normalize();
 
     double dot_product( const Vector_3 &source ) const;
 

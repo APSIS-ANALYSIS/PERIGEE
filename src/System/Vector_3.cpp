@@ -139,10 +139,11 @@ void Vector_3::AXPY( const double &val, const Vector_3 &source )
   vec[2] += val * source(2);
 }
 
-void Vector_3::normalize()
+double Vector_3::normalize()
 {
   const double len = norm2();
   scale(1.0/len);
+  return len;
 }
 
 double Vector_3::dot_product( const Vector_3 &source ) const
