@@ -29,14 +29,6 @@ PLocAssem_Tet_VMS_NS_GenAlpha::PLocAssem_Tet_VMS_NS_GenAlpha(
   vec_size = nLocBas * 4; // dof_per_node = 4
   sur_size = snLocBas * 4;
 
-  R.resize(nLocBas);
-  dR_dx.resize(nLocBas);
-  dR_dy.resize(nLocBas);
-  dR_dz.resize(nLocBas);
-  d2R_dxx.resize(nLocBas);
-  d2R_dyy.resize(nLocBas);
-  d2R_dzz.resize(nLocBas);
-
   Tangent = new PetscScalar[vec_size * vec_size];
   Residual = new PetscScalar[vec_size];
 
@@ -173,8 +165,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  double f1, f2, f3;
-
   double tau_m, tau_c, tau_dc;
 
   const double two_mu = 2.0 * vis_mu;
@@ -182,6 +172,9 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
   const double curr = time + alpha_f * dt;
 
   Zero_Residual();
+
+  std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
+  std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
 
   for(int qua=0; qua<nqp; ++qua)
   {
@@ -252,6 +245,8 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
     // Get the body force
+    double f1, f2, f3;
+
     get_f(coor_x, coor_y, coor_z, curr, f1, f2, f3);
 
     const double u_lap = u_xx + u_yy + u_zz;
@@ -342,8 +337,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  double f1, f2, f3;
-
   double tau_m, tau_c, tau_dc;
 
   const double two_mu = 2.0 * vis_mu;
@@ -355,6 +348,9 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
   const double dd_dv = alpha_f * gamma * dt;
 
   Zero_Tangent_Residual();
+
+  std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
+  std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
 
   for(int qua=0; qua<nqp; ++qua)
   {
@@ -422,6 +418,8 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     const double tau_m_2 = tau_m * tau_m;
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua); 
+
+    double f1, f2, f3;
 
     get_f(coor_x, coor_y, coor_z, curr, f1, f2, f3);
 
@@ -703,13 +701,13 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  double f1, f2, f3;
-
   const double two_mu = 2.0 * vis_mu;
 
   const double curr = 0.0;
 
   Zero_Tangent_Residual();
+
+  std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
   for(int qua=0; qua<nqp; ++qua)
   {
@@ -747,6 +745,8 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
     }
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
+
+    double f1, f2, f3;
 
     get_f(coor_x, coor_y, coor_z, curr, f1, f2, f3);
 
@@ -802,13 +802,13 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
 
   const double curr = time + alpha_f * dt;
 
-  double gx, gy, gz, surface_area;
-
   Zero_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
-    element->get_R(qua, &R[0]);
+    const std::vector<double> R = element->get_R(qua);
+
+    double gx, gy, gz, surface_area;
 
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
@@ -852,7 +852,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
-    element->get_R(qua, &R[0]);
+    const std::vector<double> R = element->get_R(qua);
 
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
@@ -879,13 +879,13 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
 
   const int face_nqp = quad -> get_num_quadPts();
 
-  double surface_area, factor;
-
   Zero_sur_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
-    element->get_R(qua, &R[0]);
+    const std::vector<double> R = element->get_R(qua);
+
+    double surface_area, factor;
 
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
@@ -929,13 +929,13 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
 
   const double dd_dv = alpha_f * gamma * dt;
 
-  double surface_area, factor;
-
   Zero_sur_Tangent_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
-    element->get_R(qua, &R[0]);
+    const std::vector<double> R = element->get_R(qua);
+
+    double surface_area, factor;
 
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
@@ -986,14 +986,13 @@ double PLocAssem_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &sol,
 
   const int face_nqp = quad -> get_num_quadPts();
 
-  double surface_area;
-
   double flrate = 0.0;
 
   for(int qua =0; qua< face_nqp; ++qua)
   {
-    element->get_R(qua, &R[0]);
+    const std::vector<double> R = element->get_R(qua);
 
+    double surface_area;
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     double u = 0.0, v = 0.0, w = 0.0;
@@ -1029,7 +1028,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_pressure_area(
 
   for(int qua =0; qua < face_nqp; ++qua)
   {
-    element->get_R(qua, &R[0]);
+    const std::vector<double> R = element->get_R(qua);
 
     double pp = 0.0;
     for(int ii=0; ii<snLocBas; ++ii) pp += sol[4*ii+0] * R[ii];
