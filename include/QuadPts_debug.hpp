@@ -38,7 +38,7 @@ class QuadPts_debug : public IQuadPts
   private:
     const int num_pts, dim;
 
-    std::vector<double> qp, qw;
+    const std::vector<double> qp, qw;
 };
 
 #endif
