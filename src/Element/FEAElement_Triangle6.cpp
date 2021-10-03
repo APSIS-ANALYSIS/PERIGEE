@@ -25,8 +25,8 @@ FEAElement_Triangle6::FEAElement_Triangle6( const int &in_nqua )
     d2R_drr[ii] = 0.0; d2R_dss[ii] = 0.0; d2R_drs[ii] = 0.0;
   }
 
-  d2R_drr[0] = 4.0; d2R_drr[1] = 4.0; d2R_drr[4] = -8.0;
-  d2R_dss[0] = 4.0; d2R_dss[2] = 4.0; d2R_dss[6] = -8.0;
+  d2R_drr[0] = 4.0; d2R_drr[1] = 4.0; d2R_drr[3] = -8.0;
+  d2R_dss[0] = 4.0; d2R_dss[2] = 4.0; d2R_dss[5] = -8.0;
   d2R_drs[0] = 4.0; d2R_drs[3] = -4.0; d2R_drs[4] = 4.0; d2R_drs[5] = -4.0;
 }
 
@@ -175,7 +175,7 @@ void FEAElement_Triangle6::buildBasis( const IQuadPts * const &quad,
 
       d2R_dxx[offset+ii] = sol[0];
       d2R_dyy[offset+ii] = sol[1];
-      d2R_dxy[offset+ii] = sol[3];
+      d2R_dxy[offset+ii] = sol[2];
     }
   }
 }
