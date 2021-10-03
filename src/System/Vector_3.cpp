@@ -164,16 +164,6 @@ double dot_product( const Vector_3 &a, const Vector_3 &b )
   return a(0)*b(0) + a(1)*b(1) + a(2)*b(2);
 }
 
-Vector_3 cross_product( const Vector_3 &a, const Vector_3 &b )
-{
-  Vector_3 result;
-  result.vec[0] = a(1) * b(2) - a(2) * b(1);
-  result.vec[1] = a(2) * b(0) - a(0) * b(2);
-  result.vec[2] = a(0) * b(1) - a(1) * b(0);
-
-  return result;
-}
-
 int Vector_3::get_dominant_comp() const
 {
   int dominant_comp = 0;
@@ -189,6 +179,12 @@ int Vector_3::get_dominant_comp() const
   }
 
   return dominant_comp;
+}
+
+Vector_3 cross_product( const Vector_3 &a, const Vector_3 &b )
+{
+  return Vector_3( a(1) * b(2) - a(2) * b(1), 
+      a(2) * b(0) - a(0) * b(2), a(0) * b(1) - a(1) * b(0) );
 }
 
 // EOF
