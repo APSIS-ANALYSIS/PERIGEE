@@ -92,11 +92,8 @@ class Vector_3
     // rescale vec to be norm one and return its length
     double normalize();
 
+    // calculate the dot-product with a given vector
     double dot_product( const Vector_3 &source ) const;
-
-    friend double dist( const Vector_3 &a, const Vector_3 &b );
-
-    friend double dot_product( const Vector_3 &a, const Vector_3 &b );
 
     // Return the location of the component with the largest absolute
     // value, in [0,1,2]. Return 0 if all three components are equal.
@@ -106,6 +103,13 @@ class Vector_3
     double vec[3];
 };
 
+// calculate the distance between two vector by L2 norm
+double dist( const Vector_3 &a, const Vector_3 &b );
+
+// calculate the dot product of two vectors
+double dot_product( const Vector_3 &a, const Vector_3 &b );
+
+// calculate the cross product of two vectors
 Vector_3 cross_product( const Vector_3 &a, const Vector_3 &b );
 
 #endif
