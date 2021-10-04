@@ -121,14 +121,15 @@ class FEAElement_Tet10_v2 : public FEAElement
 
     virtual std::vector<double> get_d2R_dyz( const int &quaindex ) const;
 
-    virtual void get_Jacobian(const int &quaindex,
-        double * const &jac_value) const;
+    virtual void get_Jacobian(const int &quaindex, double * const &jac_value) const;
 
-    virtual void get_invJacobian(const int &quaindex,
-        double * const &jac_value) const;
+    virtual std::array<double,9> get_Jacobian( const int &quaindex ) const;
 
-    virtual double get_detJac(const int &quaindex) const
-    {return detJac[quaindex];}
+    virtual void get_invJacobian(const int &quaindex, double * const &jac_value) const;
+
+    virtual std::array<double,9> get_invJacobian( const int &quaindex ) const;
+
+    virtual double get_detJac(const int &quaindex) const {return detJac[quaindex];}
 
   private:
     const int numQuapts;
