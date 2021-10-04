@@ -42,8 +42,6 @@ int main( int argc, char *argv[] )
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
-  SYS_T::print_fatal_if( cmmBC_type == 2, "Error: cmmBC_type is set to 2, which is designed for prestress generation. \n");
-
   // Number of quadrature points for tets and triangles
   // Suggested values: 5 / 4 for linear, 29 / 13 for quadratic
   int nqp_tet = 5, nqp_tri = 4;
@@ -113,6 +111,8 @@ int main( int argc, char *argv[] )
   SYS_T::commPrint("Job starts at %s %s \n", SYS_T::get_time().c_str(), SYS_T::get_date().c_str());
   
   SYS_T::print_perigee_art(); 
+
+  SYS_T::print_fatal_if( cmmBC_type == 2, "Error: cmmBC_type is set to 2, which is designed for prestress generation. \n");
 
   // ===== Read Command Line Arguments =====
   SYS_T::commPrint("===> Reading command line arguments... \n");

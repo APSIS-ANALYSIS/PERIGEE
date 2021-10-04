@@ -30,14 +30,6 @@ PLocAssem_Tet_CMM_GenAlpha::PLocAssem_Tet_CMM_GenAlpha(
   vec_size = nLocBas * 4; // dof_per_node = 4
   sur_size = snLocBas * 4;
 
-  R.resize(nLocBas);
-  dR_dx.resize(nLocBas);
-  dR_dy.resize(nLocBas);
-  dR_dz.resize(nLocBas);
-  d2R_dxx.resize(nLocBas);
-  d2R_dyy.resize(nLocBas);
-  d2R_dzz.resize(nLocBas);
-
   Tangent = new PetscScalar[vec_size * vec_size];
   Residual = new PetscScalar[vec_size];
 
@@ -184,6 +176,9 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
   const double curr = time + alpha_f * dt;
 
   Zero_Residual();
+
+  std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
+  std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
 
   for(int qua=0; qua<nqp; ++qua)
   {
@@ -357,6 +352,9 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
   const double dd_dv = alpha_f * gamma * dt;
 
   Zero_Tangent_Residual();
+
+  std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
+  std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
 
   for(int qua=0; qua<nqp; ++qua)
   {
@@ -713,6 +711,8 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Mass_Residual(
 
   Zero_Tangent_Residual();
 
+  std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
+
   for(int qua=0; qua<nqp; ++qua)
   {
     double u = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
@@ -805,7 +805,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC(
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
-    element->get_R(qua, &R[0]);
+    const std::vector<double> R = element->get_R(qua);
   
     double gx, gy, gz, surface_area;
 
@@ -846,7 +846,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Resistance(
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
-    element->get_R(qua, &R[0]);
+    const std::vector<double> R = element->get_R(qua);
   
     double surface_area;
 
@@ -876,7 +876,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_BackFlowStab(
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
-    element->get_R(qua, &R[0]);
+    const std::vector<double> R = element->get_R(qua);
     
     double surface_area, factor;
 
@@ -923,7 +923,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
-    element->get_R(qua, &R[0]);
+    const std::vector<double> R = element->get_R(qua);
     
     double surface_area, factor;
 
@@ -977,7 +977,7 @@ double PLocAssem_Tet_CMM_GenAlpha::get_flowrate( const double * const &sol,
 
   for(int qua =0; qua< face_nqp; ++qua)
   {
-    element->get_R(qua, &R[0]);
+    const std::vector<double> R = element->get_R(qua);
   
     double surface_area;
 
@@ -1013,7 +1013,7 @@ void PLocAssem_Tet_CMM_GenAlpha::get_pressure_area(
 
   for(int qua =0; qua < face_nqp; ++qua)
   {
-    element->get_R(qua, &R[0]);
+    const std::vector<double> R = element->get_R(qua);
 
     double pp = 0.0;
     for(int ii=0; ii<snLocBas; ++ii) pp += sol[4*ii+0] * R[ii];
@@ -1044,11 +1044,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 
   const double curr = time + alpha_f * dt;
 
-  // For membrane elements, basis function gradients are computed
-  // with respect to lamina coords
-  double * dR_dxl = new double [ snLocBas ];
-  double * dR_dyl = new double [ snLocBas ];
-
   // Global Cauchy stress at all quadrature points
   std::vector<Matrix_3x3> sigma; sigma.resize( face_nqp );
   get_Wall_CauchyStress(sol_wall_disp, element, ele_youngsmod, sigma );
@@ -1057,7 +1052,12 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 
   for(int qua=0; qua<face_nqp; ++qua)
   {
-    element->get_R_gradR( qua, &R[0], &dR_dxl[0], &dR_dyl[0] );
+    const std::vector<double> R = element -> get_R( qua );
+
+    // For membrane elements, basis function gradients are computed
+    // with respect to lamina coords
+    const std::vector<double> dR_dxl = element -> get_dR_dx( qua );
+    const std::vector<double> dR_dyl = element -> get_dR_dy( qua );
 
     // Global-to-local rotation matrix Q
     const Matrix_3x3 Q = element->get_rotationMatrix(qua);
@@ -1110,6 +1110,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 
     // Basis function gradients with respect to global coords
     // dR/dx_{i} = Q_{ji} * dR/dxl_{j}. Note that dR/dzl = 0.0
+    std::vector<double> dR_dx(snLocBas, 0.0), dR_dy(snLocBas, 0.0), dR_dz(snLocBas, 0.0);
     for(int ii=0; ii<snLocBas; ++ii)
     {
       dR_dx[ii] = Q.xx() * dR_dxl[ii] + Q.yx() * dR_dyl[ii];
@@ -1136,8 +1137,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
 
   } // end qua loop
 
-  delete [] dR_dxl; delete [] dR_dyl;
-  dR_dxl = nullptr; dR_dyl = nullptr;
 }
 
 
@@ -1166,11 +1165,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 
   const double curr = time + alpha_f * dt;
 
-  // For membrane elements, basis function gradients are computed
-  // with respect to lamina coords
-  double * dR_dxl = new double [ snLocBas ];
-  double * dR_dyl = new double [ snLocBas ];
-
   // Global Cauchy stress at all quadrature points
   std::vector<Matrix_3x3> sigma; sigma.resize( face_nqp );
   get_Wall_CauchyStress(sol_wall_disp, element, ele_youngsmod, sigma );
@@ -1179,7 +1173,12 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 
   for(int qua=0; qua<face_nqp; ++qua)
   {
-    element->get_R_gradR( qua, &R[0], &dR_dxl[0], &dR_dyl[0] );
+    const std::vector<double> R = element -> get_R( qua );
+
+    // For membrane elements, basis function gradients are computed
+    // with respect to lamina coords
+    const std::vector<double> dR_dxl = element -> get_dR_dx( qua );
+    const std::vector<double> dR_dyl = element -> get_dR_dy( qua );
 
     // Lamina and global stiffness matrices
     double * Kl = new double [ (snLocBas*dim) * (snLocBas*dim) ] {};
@@ -1238,6 +1237,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 
     // Basis function gradients with respect to global coords
     // dR/dx_{i} = Q_{ji} * dR/dxl_{j}. Note that dR/dzl = 0.0
+    std::vector<double> dR_dx(snLocBas, 0.0), dR_dy(snLocBas, 0.0), dR_dz(snLocBas, 0.0);
     for(int ii=0; ii<snLocBas; ++ii)
     {
       dR_dx[ii] = Q.xx() * dR_dxl[ii] + Q.yx() * dR_dyl[ii];
@@ -1363,8 +1363,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
 
   } // end qua loop
 
-  delete [] dR_dxl; delete [] dR_dyl;
-  dR_dxl = nullptr; dR_dyl = nullptr;
 }
 
 
@@ -1378,17 +1376,17 @@ void PLocAssem_Tet_CMM_GenAlpha::get_Wall_CauchyStress(
 
   const int dim = 3;
 
-  // For membrane elements, basis function gradients are computed
-  // with respect to lamina coords
-  double * dR_dxl = new double [ snLocBas ];
-  double * dR_dyl = new double [ snLocBas ];
-
   // Lamina displacements
   double * sol_wall_disp_l = new double [ snLocBas * dim ];
 
   for(int qua=0; qua<face_nqp; ++qua)
   {
-    element->get_R_gradR( qua, &R[0], &dR_dxl[0], &dR_dyl[0] );
+    const std::vector<double> R = element -> get_R( qua );
+
+    // For membrane elements, basis function gradients are computed
+    // with respect to lamina coords
+    const std::vector<double> dR_dxl = element -> get_dR_dx( qua );
+    const std::vector<double> dR_dyl = element -> get_dR_dy( qua );
 
     // Global-to-local rotation matrix Q
     const Matrix_3x3 Q = element->get_rotationMatrix(qua);
@@ -1434,8 +1432,7 @@ void PLocAssem_Tet_CMM_GenAlpha::get_Wall_CauchyStress(
     sigma[qua].MatRot(Q);
   }
 
-  delete [] sol_wall_disp_l; delete [] dR_dxl; delete [] dR_dyl;
-  sol_wall_disp_l = nullptr; dR_dxl = nullptr; dR_dyl = nullptr;
+  delete [] sol_wall_disp_l; sol_wall_disp_l = nullptr;
 }
 
 // EOF

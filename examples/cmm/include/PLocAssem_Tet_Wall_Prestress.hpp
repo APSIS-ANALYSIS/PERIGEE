@@ -24,8 +24,7 @@ class PLocAssem_Tet_Wall_Prestress : public IPLocAssem
 
     virtual void Zero_Tangent_Residual()
     {
-      for(int ii=0; ii<vec_size; ++ii) Residual[ii] = 0.0;
-      for(int ii=0; ii<vec_size*vec_size; ++ii) Tangent[ii] = 0.0;
+      SYS_T::print_fatal("Error: Zero_Tangent_Residual is not implemented.\n");
     }
 
     virtual void Zero_sur_Tangent_Residual()
@@ -36,7 +35,7 @@ class PLocAssem_Tet_Wall_Prestress : public IPLocAssem
 
     virtual void Zero_Residual()
     {
-      for(int ii=0; ii<vec_size; ++ii) Residual[ii] = 0.0;
+      SYS_T::print_fatal("Error: Zero_Residual is not implemented.\n");
     }
 
     virtual void Zero_sur_Residual()
@@ -46,7 +45,7 @@ class PLocAssem_Tet_Wall_Prestress : public IPLocAssem
 
     virtual void Assem_Estimate()
     {
-      for(int ii=0; ii<vec_size*vec_size; ++ii) Tangent[ii] = 1.0;
+      SYS_T::print_fatal("Error: Assem_Estimate is not implemented.\n");
     }
 
     virtual void Assem_Tangent_Residual_EBC_Wall(
@@ -80,7 +79,7 @@ class PLocAssem_Tet_Wall_Prestress : public IPLocAssem
 
     const int face_nqp; // number of quadrature points for wall
 
-    int nLocBas, snLocBas, vec_size, sur_size;
+    int snLocBas, sur_size;
 
     // Private functions
     void print_info() const;

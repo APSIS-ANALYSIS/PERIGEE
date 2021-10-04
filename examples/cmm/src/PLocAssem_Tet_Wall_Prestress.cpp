@@ -14,25 +14,26 @@ PLocAssem_Tet_Wall_Prestress::PLocAssem_Tet_Wall_Prestress(
   if(elemtype == 501)
   {
     // 501 is linear element
-    nLocBas = 4; snLocBas = 3;
+    //nLocBas = 4; 
+    snLocBas = 3;
   }
   else if(elemtype == 502)
   {
     // 502 is quadratic element
-    nLocBas = 10; snLocBas = 6;
+    //nLocBas = 10; 
+    snLocBas = 6;
   }
   else SYS_T::print_fatal("Error: unknown elem type.\n");
 
-  vec_size = nLocBas  * 4; // dof_per_node = 4
-  sur_size = snLocBas * 4;
+  //vec_size = nLocBas  * 4;
+  sur_size = snLocBas * 4; // dof_per_node = 4
 
-  Tangent = new PetscScalar[vec_size * vec_size];
-  Residual = new PetscScalar[vec_size];
+  // We do not need volumetric element matrix or vector
+  Tangent = nullptr;
+  Residual = nullptr;
 
   sur_Tangent = new PetscScalar[sur_size * sur_size];
   sur_Residual = new PetscScalar[sur_size];
-
-  Zero_Tangent_Residual();
 
   Zero_sur_Tangent_Residual();
 
@@ -41,8 +42,6 @@ PLocAssem_Tet_Wall_Prestress::PLocAssem_Tet_Wall_Prestress(
 
 PLocAssem_Tet_Wall_Prestress::~PLocAssem_Tet_Wall_Prestress()
 {
-  delete [] Tangent; Tangent = nullptr; 
-  delete [] Residual; Residual = nullptr;
   delete [] sur_Tangent; sur_Tangent = nullptr;
   delete [] sur_Residual; sur_Residual = nullptr;
 }
@@ -51,10 +50,10 @@ void PLocAssem_Tet_Wall_Prestress::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
   SYS_T::commPrint("  Prestress generation for CMM type wall surface: \n");
-  if(nLocBas == 4)
-    SYS_T::commPrint("  FEM: 4-node Tetrahedral element \n");
-  else if(nLocBas == 10)
-    SYS_T::commPrint("  FEM: 10-node Tetrahedral element \n");
+  if(snLocBas == 3)
+    SYS_T::commPrint("  FEM: linear tetrahedral/triangle element \n");
+  else if(snLocBas == 6)
+    SYS_T::commPrint("  FEM: quadratic tetrahedral/triangle element \n");
   else SYS_T::print_fatal("Error: unknown elem type.\n");
   SYS_T::commPrint("  Density rho = %e \n", rho0);
   SYS_T::commPrint("  Dynamic Viscosity mu = %e \n", vis_mu);
@@ -89,11 +88,6 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
 
   const double curr = time + alpha_f * dt;
 
-  // For membrane elements, basis function gradients are computed
-  // with respect to lamina coords
-  double * dR_dxl = new double [ snLocBas ];
-  double * dR_dyl = new double [ snLocBas ];
-
   // Global Cauchy stress at all quadrature points
   std::vector<Matrix_3x3> sigma; sigma.resize( face_nqp );
   get_Wall_CauchyStress(sol_wall_disp, element, ele_youngsmod, sigma );
@@ -102,8 +96,12 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
 
   for(int qua=0; qua<face_nqp; ++qua)
   {
-    std::vector<double> R(snLocBas, 0.0);
-    element->get_R_gradR( qua, &R[0], &dR_dxl[0], &dR_dyl[0] );
+    const std::vector<double> R = element -> get_R( qua );
+    
+    // For membrane elements, basis function gradients are computed
+    // with respect to lamina coords
+    const std::vector<double> dR_dxl = element -> get_dR_dx( qua );
+    const std::vector<double> dR_dyl = element -> get_dR_dy( qua );
 
     // Lamina and global stiffness matrices
     double * Kl = new double [ (snLocBas*dim) * (snLocBas*dim) ] {};
@@ -149,7 +147,7 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
 
     double surface_area;
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
-    
+
     const double gwts = surface_area * quad->get_qw(qua);
 
     const double coef = E_w / (1.0 - nu_w * nu_w);
@@ -168,7 +166,7 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
     // Basis function gradients with respect to global coords
     // dR/dx_{i} = Q_{ji} * dR/dxl_{j}. Note that dR/dzl = 0.0
     std::vector<double> dR_dx(snLocBas, 0.0), dR_dy(snLocBas, 0.0), dR_dz(snLocBas, 0.0);
-    
+
     for(int ii=0; ii<snLocBas; ++ii)
     {
       dR_dx[ii] = Q.xx() * dR_dxl[ii] + Q.yx() * dR_dyl[ii];
@@ -238,18 +236,18 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
 
       sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * ( u_t - fw.x() )
           + NA_x * sigma[qua].xx() + NA_y * sigma[qua].xy() + NA_z * sigma[qua].xz() )
-          + gwts * R[A] * ( ks_w * disp_x + cs_w * u )
-          - gwts * R[A] * pp * n_out.x(); 
+        + gwts * R[A] * ( ks_w * disp_x + cs_w * u )
+        - gwts * R[A] * pp * n_out.x(); 
 
       sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * ( v_t - fw.y() )
           + NA_x * sigma[qua].yx() + NA_y * sigma[qua].yy() + NA_z * sigma[qua].yz() ) 
-          + gwts * R[A] * ( ks_w * disp_y + cs_w * v )
-          - gwts * R[A] * pp * n_out.y(); 
-      
+        + gwts * R[A] * ( ks_w * disp_y + cs_w * v )
+        - gwts * R[A] * pp * n_out.y(); 
+
       sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * ( w_t - fw.z() )
           + NA_x * sigma[qua].zx() + NA_y * sigma[qua].zy() + NA_z * sigma[qua].zz() ) 
-          + gwts * R[A] * ( ks_w * disp_z + cs_w * w )
-          - gwts * R[A] * pp * n_out.z(); 
+        + gwts * R[A] * ( ks_w * disp_z + cs_w * w )
+        - gwts * R[A] * pp * n_out.z(); 
 
       for(int B=0; B<snLocBas; ++B)
       {
@@ -257,7 +255,7 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
         sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+1 ] += gwts * h_w * (
             alpha_m * rho_w * R[A] * R[B]
             + dd_du * Kg[ (snLocBas*dim)*(A*dim) + (B*dim) ] )
-            + gwts * R[A] * R[B] * ( dd_du * ks_w + dd_dv * cs_w );
+          + gwts * R[A] * R[B] * ( dd_du * ks_w + dd_dv * cs_w );
 
         sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+2 ] += gwts * h_w * (
             dd_du * Kg[ (snLocBas*dim)*(A*dim) + (B*dim+1) ] );
@@ -272,7 +270,7 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
         sur_Tangent[ 4*snLocBas*(4*A+2) + 4*B+2 ] += gwts * h_w * (
             alpha_m * rho_w * R[A] * R[B]
             + dd_du * Kg[ (snLocBas*dim)*(A*dim+1) + (B*dim+1) ] )
-            + gwts * R[A] * R[B] * ( dd_du * ks_w + dd_dv * cs_w );
+          + gwts * R[A] * R[B] * ( dd_du * ks_w + dd_dv * cs_w );
 
         sur_Tangent[ 4*snLocBas*(4*A+2) + 4*B+3 ] += gwts * h_w * (
             dd_du * Kg[ (snLocBas*dim)*(A*dim+1) + (B*dim+2) ] );
@@ -287,7 +285,7 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
         sur_Tangent[ 4*snLocBas*(4*A+3) + 4*B+3 ] += gwts * h_w * (
             alpha_m * rho_w * R[A] * R[B]
             + dd_du * Kg[ (snLocBas*dim)*(A*dim+2) + (B*dim+2) ] )
-            + gwts * R[A] * R[B] * ( dd_du * ks_w + dd_dv * cs_w );
+          + gwts * R[A] * R[B] * ( dd_du * ks_w + dd_dv * cs_w );
 
       } // end B loop
     } // end A loop
@@ -297,8 +295,6 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
 
   } // end qua loop
 
-  delete [] dR_dxl; delete [] dR_dyl;
-  dR_dxl = nullptr; dR_dyl = nullptr;
 }
 
 void PLocAssem_Tet_Wall_Prestress::get_Wall_CauchyStress(
@@ -311,18 +307,17 @@ void PLocAssem_Tet_Wall_Prestress::get_Wall_CauchyStress(
 
   const int dim = 3;
 
-  // For membrane elements, basis function gradients are computed
-  // with respect to lamina coords
-  double * dR_dxl = new double [ snLocBas ];
-  double * dR_dyl = new double [ snLocBas ];
-
   // Lamina displacements
   double * sol_wall_disp_l = new double [ snLocBas * dim ];
 
   for(int qua=0; qua<face_nqp; ++qua)
   {
-    std::vector<double> R(snLocBas, 0.0);
-    element->get_R_gradR( qua, &R[0], &dR_dxl[0], &dR_dyl[0] );
+    const std::vector<double> R = element -> get_R( qua );
+    
+    // For membrane elements, basis function gradients are computed
+    // with respect to lamina coords
+    const std::vector<double> dR_dxl = element -> get_dR_dx( qua );
+    const std::vector<double> dR_dyl = element -> get_dR_dy( qua );
 
     // Global-to-local rotation matrix Q
     const Matrix_3x3 Q = element->get_rotationMatrix(qua);
@@ -368,8 +363,7 @@ void PLocAssem_Tet_Wall_Prestress::get_Wall_CauchyStress(
     sigma[qua].MatRot(Q);
   }
 
-  delete [] sol_wall_disp_l; delete [] dR_dxl; delete [] dR_dyl;
-  sol_wall_disp_l = nullptr; dR_dxl = nullptr; dR_dyl = nullptr;
+  delete [] sol_wall_disp_l; sol_wall_disp_l = nullptr;
 }
 
 // EOF
