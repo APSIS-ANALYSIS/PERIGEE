@@ -84,6 +84,12 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Element/FEAElement_Tet4.cpp
   ${perigee_source}/Element/FEAElement_Tet10.cpp
   ${perigee_source}/Element/FEAElement_Tet10_v2.cpp
+  ${perigee_source}/Element/FEAElement_Triangle3.cpp
+  ${perigee_source}/Element/FEAElement_Triangle6.cpp
+  ${perigee_source}/Element/FEAElement_Triangle3_membrane.cpp
+  ${perigee_source}/Element/FEAElement_Triangle6_membrane.cpp
+  ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
   ${perigee_source}/Model/GenBC_RCR.cpp
   ${perigee_source}/Model/GenBC_Resistance.cpp
   ${perigee_source}/Model/GenBC_Inductance.cpp
