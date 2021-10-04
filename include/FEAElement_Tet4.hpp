@@ -7,8 +7,6 @@
 // 
 // Tet4 means 4-node tet, aka linear tets.
 //
-// This class is designed for volumetric integration in model assembly.
-//
 // Date Created: Jan 19 2017
 // ==================================================================
 #include "FEAElement.hpp"
@@ -36,8 +34,8 @@ class FEAElement_Tet4 : public FEAElement
 
     virtual double get_memory_usage() const;
 
-    // Given the quadrature points and nodal coordinates, evaluate
-    // the basis functions and their derivatives up to second order
+    // Given the quadrature points and nodal coordinates, evaluate the basis 
+    // functions and their derivatives up to second order
     virtual void buildBasis( const IQuadPts * const &quad_rule,
         const double * const &ctrl_x,
         const double * const &ctrl_y,
@@ -50,8 +48,8 @@ class FEAElement_Tet4 : public FEAElement
         const double * const &ctrl_y,
         const double * const &ctrl_z ) const;
 
-    // get_xxx functions give access to function evaluations at the
-    // quadrature point corresponding to quaindex
+    // Get functions give access to function evaluations at the quadrature point 
+    // corresponding to quaindex
     virtual void get_R( const int &quaindex, double * const &basis ) const;
 
     virtual std::vector<double> get_R( const int &quaindex ) const;
@@ -118,21 +116,35 @@ class FEAElement_Tet4 : public FEAElement
       return { 0.0, 0.0, 0.0, 0.0 };
     }
 
-    virtual void get_Jacobian(const int &quaindex, 
-        double * const &jac_value) const;
+    // Get the Jacobian matrix dx/dr
+    virtual void get_Jacobian(const int &quaindex, double * const &jac_value) const;
 
-    virtual void get_invJacobian(const int &quaindex, 
-        double * const &jac_value) const;
+    virtual std::array<double,9> get_Jacobian( const int &quaindex ) const
+    {
+      assert( quaindex >= 0 && quaindex < numQuapts );
+      return {Jac[0], Jac[1], Jac[2], Jac[3], Jac[4], Jac[5], Jac[6], Jac[7], Jac[8]};
+    }
 
+    // Get the inverse Jacobian matrix dr/dx
+    virtual void get_invJacobian(const int &quaindex, double * const &jac_value) const;
+
+    virtual std::array<double,9> get_invJacobian( const int &quaindex ) const
+    {
+      assert( quaindex >= 0 && quaindex < numQuapts );
+      return {Jac[9], Jac[10], Jac[11], Jac[12], Jac[13], Jac[14], Jac[15], Jac[16], Jac[17]};
+    }
+
+    // Get the determinant of the Jacobian matrix
     virtual double get_detJac(const int &quaindex) const {return detJac;}
 
   private:
+    // Number of quadrature points
     const int numQuapts;
 
     // R : 0 <= ii < 4 x numQuapts
     double * R;
 
-    // tet4 is linear, the first-order derivatives are constant
+    // tet4 is linear, thus the first-order derivatives are constant
     double dR_dx[4], dR_dy[4], dR_dz[4];
 
     // Container for
