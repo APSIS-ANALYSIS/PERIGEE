@@ -419,13 +419,31 @@ std::vector<double> FEAElement_Tet10::get_d2R_dyz( const int &quaindex ) const
 void FEAElement_Tet10::get_Jacobian(const int &quaindex,
     double * const &jac_value) const
 {
+  assert( quaindex >= 0 && quaindex < numQuapts );
   for(int ii=0; ii<9; ++ii) jac_value[ii] = dx_dr[9*quaindex + ii];
+}
+
+std::array<double,9> FEAElement_Tet10::get_Jacobian(const int &quaindex) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  return { dx_dr[9*quaindex], dx_dr[9*quaindex+1], dx_dr[9*quaindex+2], 
+    dx_dr[9*quaindex+3], dx_dr[9*quaindex+4], dx_dr[9*quaindex+5], 
+    dx_dr[9*quaindex+6], dx_dr[9*quaindex+7], dx_dr[9*quaindex+8] };
 }
 
 void FEAElement_Tet10::get_invJacobian(const int &quaindex,
     double * const &jac_value) const
 {
+  assert( quaindex >= 0 && quaindex < numQuapts );
   for(int ii=0; ii<9; ++ii) jac_value[ii] = dr_dx[9*quaindex + ii];
+}
+
+std::array<double,9> FEAElement_Tet10::get_invJacobian(const int &quaindex) const
+{
+  assert( quaindex >= 0 && quaindex < numQuapts );
+  return { dr_dx[9*quaindex], dr_dx[9*quaindex+1], dr_dx[9*quaindex+2], 
+    dr_dx[9*quaindex+3], dr_dx[9*quaindex+4], dr_dx[9*quaindex+5], 
+    dr_dx[9*quaindex+6], dr_dx[9*quaindex+7], dr_dx[9*quaindex+8] };
 }
 
 // EOF

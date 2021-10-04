@@ -71,6 +71,7 @@ class FEAElement_Tet10 : public FEAElement
         const double * const &ctrl_y,
         const double * const &ctrl_z ) const;
 
+    // Get functions that give access to basis function values
     virtual void get_R( const int &quaindex, double * const &basis ) const;
 
     virtual std::vector<double> get_R( const int &quaindex ) const;
@@ -113,14 +114,15 @@ class FEAElement_Tet10 : public FEAElement
 
     virtual std::vector<double> get_d2R_dyz( const int &quaindex ) const;
 
-    virtual void get_Jacobian(const int &quaindex,
-        double * const &jac_value) const;
+    virtual void get_Jacobian(const int &quaindex, double * const &jac_value) const;
 
-    virtual void get_invJacobian(const int &quaindex,
-        double * const &jac_value) const;
+    virtual std::array<double,9> get_Jacobian( const int &quaindex ) const;
 
-    virtual double get_detJac(const int &quaindex) const
-    {return detJac[quaindex];}
+    virtual void get_invJacobian(const int &quaindex, double * const &jac_value) const;
+
+    virtual std::array<double,9> get_invJacobian( const int &quaindex ) const;
+    
+    virtual double get_detJac(const int &quaindex) const {return detJac[quaindex];}
 
   private:
     const int numQuapts;
