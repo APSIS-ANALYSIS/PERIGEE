@@ -40,17 +40,16 @@ void FEAElement_Triangle3_3D_der0::buildBasis( const IQuadPts * const &quad,
     R[qua*3 + 2] = qua_s;
   }
 
-  dx_dr = ctrl_x[0] * (-1.0) + ctrl_x[1];
-  dy_dr = ctrl_y[0] * (-1.0) + ctrl_y[1];
-  dz_dr = ctrl_z[0] * (-1.0) + ctrl_z[1];
+  const double dx_dr = ctrl_x[0] * (-1.0) + ctrl_x[1];
+  const double dy_dr = ctrl_y[0] * (-1.0) + ctrl_y[1];
+  const double dz_dr = ctrl_z[0] * (-1.0) + ctrl_z[1];
 
-  dx_ds = ctrl_x[0] * (-1.0) + ctrl_x[2];
-  dy_ds = ctrl_y[0] * (-1.0) + ctrl_y[2];
-  dz_ds = ctrl_z[0] * (-1.0) + ctrl_z[2];
+  const double dx_ds = ctrl_x[0] * (-1.0) + ctrl_x[2];
+  const double dy_ds = ctrl_y[0] * (-1.0) + ctrl_y[2];
+  const double dz_ds = ctrl_z[0] * (-1.0) + ctrl_z[2];
 
   // vec(un) = vec(dx_dr) x vec(dx_ds)
-  MATH_T::cross3d(dx_dr, dy_dr, dz_dr, dx_ds, dy_ds, dz_ds,
-      unx, uny, unz);
+  MATH_T::cross3d(dx_dr, dy_dr, dz_dr, dx_ds, dy_ds, dz_ds, unx, uny, unz);
   
   // area = || vec(un) ||
   detJac = MATH_T::normalize3d( unx, uny, unz );
