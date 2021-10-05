@@ -10,16 +10,18 @@ NBC_Partition_3D_ring::NBC_Partition_3D_ring(
   Q( nbc -> get_rotation_matrix() ),
   outnormal( nbc -> get_outnormal() )
 {
+  const int nbc_id = 0;
+
   local_cap_id.clear();
 
-  if( LDN.size() > 0 )
+  if( LDN[nbc_id].size() > 0 )
   {
     // Access all (unpartitioned) ring node's cap_ids
     std::vector<int> cap_id = nbc -> get_cap_id();
 
-    for(unsigned int ii=0; ii<nbc->get_num_dir_nodes(); ++ii)
+    for(unsigned int ii=0; ii<nbc->get_num_dir_nodes(nbc_id); ++ii)
     {
-      unsigned int node_index = nbc -> get_dir_nodes(ii);
+      unsigned int node_index = nbc -> get_dir_nodes(nbc_id, ii);
       node_index = mnindex -> get_old2new(node_index);
 
       if( part->isNodeInPart(node_index) )
@@ -33,6 +35,8 @@ NBC_Partition_3D_ring::~NBC_Partition_3D_ring()
 
 void NBC_Partition_3D_ring::write_hdf5( const char * FileName ) const
 {
+  const int nbc_id = 0;
+
   std::string filebname(FileName);
   std::string fName = SYS_T::gen_partfile_name( filebname, cpu_rank );
   
@@ -42,13 +46,13 @@ void NBC_Partition_3D_ring::write_hdf5( const char * FileName ) const
 
   HDF5_Writer * h5writer = new HDF5_Writer(file_id);
 
-  if(LDN.size() > 0)
+  if(LDN[nbc_id].size() > 0)
   {
-    h5writer->write_intVector( group_id, "LDN", LDN );
+    h5writer->write_intVector( group_id, "LDN", LDN[nbc_id] );
     h5writer->write_intVector( group_id, "local_cap_id", local_cap_id );
   }
 
-  h5writer->write_intVector( group_id, "Num_LD", Num_LD );
+  h5writer->write_intVector( group_id, "Num_LD", Num_LD[nbc_id] );
 
   h5writer->write_intScalar( group_id, "ring_bc_type", ring_bc_type );
 

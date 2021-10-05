@@ -38,7 +38,7 @@ class NBC_Partition_3D_ring : public NBC_Partition_3D
     const int num_caps; 
 
     // Store corresponding cap ID: [0, num_caps)
-    // length Num_LD
+    // length Num_LD[0]
     std::vector<int> local_cap_id;
 
     // Each cap's 3x3 rotation matrix for skew boundary conditions
