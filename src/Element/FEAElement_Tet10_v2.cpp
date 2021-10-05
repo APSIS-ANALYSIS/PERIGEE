@@ -126,15 +126,15 @@ void FEAElement_Tet10_v2::buildBasis( const IQuadPts * const &quad,
     R[q10+8] = 4.0 * qua_r * qua_t;
     R[q10+9] = 4.0 * qua_s * qua_t;
 
-    const dR_dr[10] { 1.0 - 4.0 * qua_u, 4.0 * qua_r - 1.0, 0.0,
+    const double dR_dr[10] { 1.0 - 4.0 * qua_u, 4.0 * qua_r - 1.0, 0.0,
       0.0, 4.0 * (qua_u - qua_r), 4.0 * qua_s, -4.0 * qua_s,
       -4.0 * qua_t, 4.0 * qua_t, 0.0 };
 
-    const dR_ds[10] { 1.0 - 4.0 * qua_u, 0.0, 4.0 * qua_s - 1.0,
+    const double dR_ds[10] { 1.0 - 4.0 * qua_u, 0.0, 4.0 * qua_s - 1.0,
       0.0, -4.0 * qua_r, 4.0 * qua_r, 4.0 * (qua_u - qua_s),
       -4.0 * qua_t, 0.0, 4.0 * qua_t };
     
-    const dR_dt[10] { 1.0 - 4.0 * qua_u, 0.0, 0.0,
+    const double dR_dt[10] { 1.0 - 4.0 * qua_u, 0.0, 0.0,
     4.0 * qua_t - 1.0, -4.0 * qua_r, 0.0, -4.0 * qua_s,
     4.0 * (qua_u - qua_t), 4.0 * qua_r, 4.0 * qua_s };
     
