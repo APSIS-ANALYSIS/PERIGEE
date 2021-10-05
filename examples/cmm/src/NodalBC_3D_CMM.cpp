@@ -6,22 +6,27 @@ NodalBC_3D_CMM::NodalBC_3D_CMM( const int &nFunc, const bool &is_all_node )
   per_master_nodes.clear();
   num_per_nodes.clear();
 
-  // num_nbc = 1 per the assumption for CMM nodal bc
-  const int nbc_id = 0;
-  const int num_nbc = 1;
-  dir_nodes.resize(     num_nbc );
-  num_dir_nodes.resize( num_nbc );
-
-  dir_nodes[nbc_id].clear();
-
   if( is_all_node )
   {
+    num_nbc = 1;
+    dir_nodes.resize(     num_nbc );
+    num_dir_nodes.resize( num_nbc );
+
+    const int nbc_id = 0;
+    dir_nodes[nbc_id].clear();
+
     for(unsigned int ii=0; ii<static_cast<unsigned int>(nFunc); ++ii)
       dir_nodes[nbc_id].push_back( ii );
 
-    VEC_T::sort_unique_resize(dir_nodes[nbc_id]);
+    VEC_T::sort_unique_resize( dir_nodes[nbc_id] );
 
     num_dir_nodes[nbc_id] = dir_nodes[nbc_id].size();
+  }
+  else
+  {
+    num_nbc = 0;
+    dir_nodes.clear();
+    num_dir_nodes.clear();
   }
 
   Create_ID( nFunc );
@@ -45,9 +50,9 @@ NodalBC_3D_CMM::NodalBC_3D_CMM(
   per_master_nodes.clear();
   num_per_nodes.clear();
   
-  // num_nbc = 1 per the assumption for CMM nodal bc
+  num_nbc = 1;
+
   const int nbc_id = 0;
-  const int num_nbc = 1;
   dir_nodes.resize(     num_nbc );
   num_dir_nodes.resize( num_nbc );
 

@@ -43,7 +43,7 @@ class NodalBC_3D_ring : public INodalBC
 
     virtual ~NodalBC_3D_ring() {};
 
-    virtual int get_num_nbc() const {return 1;}
+    virtual int get_num_nbc() const {return num_nbc;}
 
     virtual int get_num_caps() const { return num_caps; }
 
@@ -56,7 +56,9 @@ class NodalBC_3D_ring : public INodalBC
     virtual std::vector<double> get_rotation_matrix() const { return Q; } 
 
   private:
-    NodalBC_3D_ring() : ring_bc_type(0) {};
+    NodalBC_3D_ring() : num_nbc(0), ring_bc_type(0) {};
+
+    const int num_nbc;
 
     // Ring node bc type
     // type = 0 : all dof of ring nodes are assigned as essential bc (clamped)

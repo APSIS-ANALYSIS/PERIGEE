@@ -21,7 +21,11 @@ class NodalBC_3D_wall : public INodalBC
 
     virtual ~NodalBC_3D_wall() {};
 
-    virtual int get_num_nbc() const {return 1;}
+    virtual int get_num_nbc() const {return num_nbc;}
+
+  private:
+
+    const int num_nbc;
 };
 
 #endif

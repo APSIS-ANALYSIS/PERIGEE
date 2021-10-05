@@ -1,6 +1,7 @@
 #include "NodalBC_3D_ring.hpp"
 
-NodalBC_3D_ring::NodalBC_3D_ring(const int &nFunc) : ring_bc_type(0)
+NodalBC_3D_ring::NodalBC_3D_ring(const int &nFunc)
+: num_nbc(0), ring_bc_type(0)
 {
   per_slave_nodes.clear();
   per_master_nodes.clear();
@@ -26,16 +27,14 @@ NodalBC_3D_ring::NodalBC_3D_ring(
     const std::vector<std::string> &outflow_files,
     const std::vector< Vector_3 > &outlet_outnormal,
     const int &nFunc, const int &in_ring_bc_type,
-    const int &elemtype ) : ring_bc_type(in_ring_bc_type)
+    const int &elemtype )
+: num_nbc(1), ring_bc_type(in_ring_bc_type)
 {
   // No periodic nodes
   per_slave_nodes.clear();
   per_master_nodes.clear();
   num_per_nodes.clear();
 
-  // num_nbc = 1 per the assumption for ring nodal bc
-  const int nbc_id = 0;
-  const int num_nbc = 1;
   dir_nodes.resize(     num_nbc );
   num_dir_nodes.resize( num_nbc );
 
@@ -72,6 +71,7 @@ NodalBC_3D_ring::NodalBC_3D_ring(
   std::vector<int> wall_ien, wall_gnode, wall_gelem;
 
   // Generate the dir-node list with all ring nodes.
+  const int nbc_id = 0;
   dir_nodes[nbc_id].clear();
   cap_id.clear();
 

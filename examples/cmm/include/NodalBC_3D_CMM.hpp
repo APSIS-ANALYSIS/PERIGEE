@@ -46,10 +46,14 @@ class NodalBC_3D_CMM : public INodalBC
         const int &comp, const int &nFunc,
         const int &cmm_bc_type );  
 
+    virtual int get_num_nbc() const {return num_nbc;}
+
     virtual ~NodalBC_3D_CMM() {};
 
   private:
     NodalBC_3D_CMM() {};
+
+    int num_nbc;
 };
 
 #endif
