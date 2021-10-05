@@ -19,11 +19,11 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
 
   for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
   {
-    LDN[ii].clear(); LPSN[ii].clear(); LPMN[ii].clear();
-    LocalMaster[ii].clear(); LocalMasterSlave[ii].clear();
+    LDN[nbc_id].clear(); LPSN[nbc_id].clear(); LPMN[nbc_id].clear();
+    LocalMaster[nbc_id].clear(); LocalMasterSlave[nbc_id].clear();
 
-    Num_LD[ii].resize(dof);
-    Num_LPS[ii].resize(dof); Num_LPM[ii].resize(dof);
+    Num_LD[nbc_id].resize(dof);
+    Num_LPS[nbc_id].resize(dof); Num_LPM[nbc_id].resize(dof);
 
     for(int ii=0; ii<dof; ++ii)
     {
@@ -38,7 +38,7 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
 
         if(part->isNodeInPart(node_index))
         {
-          LDN[ii].push_back(node_index);
+          LDN[nbc_id].push_back(node_index);
           node_num += 1;
         }
       } // end jj-loop
@@ -121,11 +121,11 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
 
   for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
   {
-    LDN[ii].clear(); LPSN[ii].clear(); LPMN[ii].clear();
-    LocalMaster[ii].clear(); LocalMasterSlave[ii].clear();
+    LDN[nbc_id].clear(); LPSN[nbc_id].clear(); LPMN[nbc_id].clear();
+    LocalMaster[nbc_id].clear(); LocalMasterSlave[nbc_id].clear();
 
-    Num_LD[ii].resize(dof);
-    Num_LPS[ii].resize(dof); Num_LPM[ii].resize(dof);
+    Num_LD[nbc_id].resize(dof);
+    Num_LPS[nbc_id].resize(dof); Num_LPM[nbc_id].resize(dof);
 
     unsigned int node_num = 0;
     unsigned int ps_num = 0;
@@ -137,7 +137,7 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
       node_index = mnindex -> get_old2new(node_index);
       if(part->isNodeInPart(node_index))
       {
-        LDN.push_back(node_index);
+        LDN[nbc_id].push_back(node_index);
         node_num += 1;
       }
     } // end jj-loop
