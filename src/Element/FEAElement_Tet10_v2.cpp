@@ -61,7 +61,7 @@ void FEAElement_Tet10_v2::buildBasis( const IQuadPts * const &quad,
 {
   assert( quad -> get_dim() == 4 );
 
-  // second der wrt ref var  0    1    2    3    4    5    6    7    8     9 
+  // second der wrt ref var  0    1    2    3     4    5     6     7    8    9 
   const double d2R_drr[10] { 4.0, 4.0, 0.0, 0.0, -8.0, 0.0,  0.0,  0.0, 0.0, 0.0 };
   const double d2R_dss[10] { 4.0, 0.0, 4.0, 0.0,  0.0, 0.0, -8.0,  0.0, 0.0, 0.0 };
   const double d2R_dtt[10] { 4.0, 0.0, 0.0, 4.0,  0.0, 0.0,  0.0, -8.0, 0.0, 0.0 };
