@@ -139,11 +139,6 @@ class FEAElement_Tet10_v2 : public FEAElement
     double * d2R_dxx, * d2R_dyy, * d2R_dzz;
     double * d2R_dxy, * d2R_dxz, * d2R_dyz;
 
-    // Container for dR_ds/t/u and second derivatives at quad pts.
-    // Length is 10
-    double d2R_drr [10], d2R_dss [10], d2R_dtt [10];
-    double d2R_drs [10], d2R_drt [10], d2R_dst [10]; 
-
     // Container for
     // dx_dr : 0 <= ii < 9 numQuapts
     double * dx_dr;

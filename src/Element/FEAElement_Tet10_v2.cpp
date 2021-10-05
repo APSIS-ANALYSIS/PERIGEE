@@ -19,20 +19,6 @@ FEAElement_Tet10_v2::FEAElement_Tet10_v2( const int &in_nqua )
   dx_dr = new double [9*numQuapts];
   dr_dx = new double [9*numQuapts];
   detJac = new double [numQuapts];
-
-  // second derivative w.r.t r-s-t is constant
-  for(int ii=0; ii<10; ++ii)
-  {
-    d2R_drr[ii] = 0.0; d2R_dss[ii] = 0.0; d2R_dtt[ii] = 0.0;
-    d2R_drs[ii] = 0.0; d2R_drt[ii] = 0.0; d2R_dst[ii] = 0.0;
-  }
-
-  d2R_drr[0] = 4.0; d2R_drr[1] = 4.0; d2R_drr[4] = -8.0;
-  d2R_dss[0] = 4.0; d2R_dss[2] = 4.0; d2R_dss[6] = -8.0;
-  d2R_dtt[0] = 4.0; d2R_dtt[3] = 4.0; d2R_dtt[7] = -8.0;
-  d2R_drs[0] = 4.0; d2R_drs[4] = -4.0; d2R_drs[5] = 4.0; d2R_drs[6] = -4.0;
-  d2R_drt[0] = 4.0; d2R_drt[4] = -4.0; d2R_drt[7] = -4.0; d2R_drt[8] = 4.0;
-  d2R_dst[0] = 4.0; d2R_dst[6] = -4.0; d2R_dst[7] = -4.0; d2R_dst[9] = 4.0;
 }
 
 FEAElement_Tet10_v2::~FEAElement_Tet10_v2()
@@ -75,6 +61,14 @@ void FEAElement_Tet10_v2::buildBasis( const IQuadPts * const &quad,
 {
   assert( quad -> get_dim() == 4 );
 
+  // second der wrt ref var  0    1    2    3    4    5    6    7    8     9 
+  const double d2R_drr[10] { 4.0, 4.0, 0.0, 0.0, -8.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+  const double d2R_dss[10] { 4.0, 0.0, 4.0, 0.0,  0.0, 0.0, -8.0, 0.0, 0.0, 0.0 };
+  const double d2R_dtt[10] { 4.0, 0.0, 0.0, 4.0, 0.0, 0.0, 0.0, -8.0, 0.0, 0.0 };
+  const double d2R_drs[10] { 4.0, 0.0, 0.0, 0.0, -4.0, 4.0, -4.0, 0.0, 0.0, 0.0 };
+  const double d2R_drt[10] { 4.0, 0.0, 0.0, 0.0, -4.0, 0.0, 0.0, -4.0, 4.0, 0.0 };
+  const double d2R_dst[10] { 4.0, 0.0, 0.0, 0.0, 0.0, 0.0, -4.0, -4.0, 0.0, 4.0 };
+  
   // Caclulate second derivative of geometry
   // Here, second derivatives d2R_drr, etc are constant. We can calculate
   // xrr, etc. out of the quadrature loop.
