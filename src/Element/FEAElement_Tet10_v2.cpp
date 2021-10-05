@@ -126,38 +126,17 @@ void FEAElement_Tet10_v2::buildBasis( const IQuadPts * const &quad,
     R[q10+8] = 4.0 * qua_r * qua_t;
     R[q10+9] = 4.0 * qua_s * qua_t;
 
-    dR_dr[0] = 1.0 - 4.0 * qua_u;
-    dR_dr[1] = 4.0 * qua_r - 1.0;
-    dR_dr[2] = 0.0;
-    dR_dr[3] = 0.0;
-    dR_dr[4] = 4.0 * (qua_u - qua_r);
-    dR_dr[5] = 4.0 * qua_s;
-    dR_dr[6] = -4.0 * qua_s;
-    dR_dr[7] = -4.0 * qua_t;
-    dR_dr[8] = 4.0 * qua_t;
-    dR_dr[9] = 0.0; 
+    const dR_dr[10] { 1.0 - 4.0 * qua_u, 4.0 * qua_r - 1.0, 0.0,
+      0.0, 4.0 * (qua_u - qua_r), 4.0 * qua_s, -4.0 * qua_s,
+      -4.0 * qua_t, 4.0 * qua_t, 0.0 };
 
-    dR_ds[0] = 1.0 - 4.0 * qua_u;
-    dR_ds[1] = 0.0;
-    dR_ds[2] = 4.0 * qua_s - 1.0;
-    dR_ds[3] = 0.0;
-    dR_ds[4] = -4.0 * qua_r;
-    dR_ds[5] = 4.0 * qua_r;
-    dR_ds[6] = 4.0 * (qua_u - qua_s);
-    dR_ds[7] = -4.0 * qua_t;
-    dR_ds[8] = 0.0;
-    dR_ds[9] = 4.0 * qua_t;
+    const dR_ds[10] { 1.0 - 4.0 * qua_u, 0.0, 4.0 * qua_s - 1.0,
+      0.0, -4.0 * qua_r, 4.0 * qua_r, 4.0 * (qua_u - qua_s),
+      -4.0 * qua_t, 0.0, 4.0 * qua_t };
     
-    dR_dt[0] = 1.0 - 4.0 * qua_u;
-    dR_dt[1] = 0.0;
-    dR_dt[2] = 0.0;
-    dR_dt[3] = 4.0 * qua_t - 1.0;
-    dR_dt[4] = -4.0 * qua_r;
-    dR_dt[5] = 0.0;
-    dR_dt[6] = -4.0 * qua_s;
-    dR_dt[7] = 4.0 * (qua_u - qua_t);
-    dR_dt[8] = 4.0 * qua_r;
-    dR_dt[9] = 4.0 * qua_s;
+    const dR_dt[10] { 1.0 - 4.0 * qua_u, 0.0, 0.0,
+    4.0 * qua_t - 1.0, -4.0 * qua_r, 0.0, -4.0 * qua_s,
+    4.0 * (qua_u - qua_t), 4.0 * qua_r, 4.0 * qua_s };
     
     double xr = 0.0, xs = 0.0, xt = 0.0;
     double yr = 0.0, ys = 0.0, yt = 0.0;
