@@ -134,7 +134,6 @@ class FEAElement_Tet10 : public FEAElement
 
     // Container for dR_ds/t/u and second derivative at quad pts.
     // Length is 10
-    double dR_dr [10], dR_ds [10], dR_dt [10];
     double d2R_drr [10], d2R_dss [10], d2R_dtt [10];
     double d2R_drs [10], d2R_drt [10], d2R_dst [10]; 
 
