@@ -79,19 +79,7 @@ class FEAElement_Triangle3 : public FEAElement
 
     virtual void get_Jacobian(const int &quaindex, double * const &jac_value) const;
 
-    virtual std::array<double,4> get_Jacobian( const int &quaindex ) const
-    {
-      assert( quaindex >= 0 && quaindex < numQuapts );
-      return {Jac[0], Jac[1], Jacp[2], Jac[3]};
-    }
-
     virtual void get_invJacobian(const int &quaindex, double * const &jac_value) const;
-
-    virtual std::array<double,4> get_invJacobian( const int &quaindex ) const
-    {
-      assert( quaindex >= 0 && quaindex < numQuapts );
-      return {Jac[4], Jac[5], Jacp[6], Jac[7]};
-    }
 
     virtual double get_detJac(const int &quaindex) const {return detJac;}
 
