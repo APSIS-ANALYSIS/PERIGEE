@@ -62,12 +62,12 @@ void FEAElement_Tet10_v2::buildBasis( const IQuadPts * const &quad,
   assert( quad -> get_dim() == 4 );
 
   // second der wrt ref var  0    1    2    3    4    5    6    7    8     9 
-  const double d2R_drr[10] { 4.0, 4.0, 0.0, 0.0, -8.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-  const double d2R_dss[10] { 4.0, 0.0, 4.0, 0.0,  0.0, 0.0, -8.0, 0.0, 0.0, 0.0 };
-  const double d2R_dtt[10] { 4.0, 0.0, 0.0, 4.0, 0.0, 0.0, 0.0, -8.0, 0.0, 0.0 };
-  const double d2R_drs[10] { 4.0, 0.0, 0.0, 0.0, -4.0, 4.0, -4.0, 0.0, 0.0, 0.0 };
-  const double d2R_drt[10] { 4.0, 0.0, 0.0, 0.0, -4.0, 0.0, 0.0, -4.0, 4.0, 0.0 };
-  const double d2R_dst[10] { 4.0, 0.0, 0.0, 0.0, 0.0, 0.0, -4.0, -4.0, 0.0, 4.0 };
+  const double d2R_drr[10] { 4.0, 4.0, 0.0, 0.0, -8.0, 0.0,  0.0,  0.0, 0.0, 0.0 };
+  const double d2R_dss[10] { 4.0, 0.0, 4.0, 0.0,  0.0, 0.0, -8.0,  0.0, 0.0, 0.0 };
+  const double d2R_dtt[10] { 4.0, 0.0, 0.0, 4.0,  0.0, 0.0,  0.0, -8.0, 0.0, 0.0 };
+  const double d2R_drs[10] { 4.0, 0.0, 0.0, 0.0, -4.0, 4.0, -4.0,  0.0, 0.0, 0.0 };
+  const double d2R_drt[10] { 4.0, 0.0, 0.0, 0.0, -4.0, 0.0,  0.0, -4.0, 4.0, 0.0 };
+  const double d2R_dst[10] { 4.0, 0.0, 0.0, 0.0,  0.0, 0.0, -4.0, -4.0, 0.0, 4.0 };
   
   // Caclulate second derivative of geometry
   // Here, second derivatives d2R_drr, etc are constant. We can calculate
@@ -120,17 +120,14 @@ void FEAElement_Tet10_v2::buildBasis( const IQuadPts * const &quad,
     R[q10+8] = 4.0 * qua_r * qua_t;
     R[q10+9] = 4.0 * qua_s * qua_t;
 
-    const double dR_dr[10] { 1.0 - 4.0 * qua_u, 4.0 * qua_r - 1.0, 0.0,
-      0.0, 4.0 * (qua_u - qua_r), 4.0 * qua_s, -4.0 * qua_s,
-      -4.0 * qua_t, 4.0 * qua_t, 0.0 };
+    const double dR_dr[10] { 1.0 - 4.0 * qua_u, 4.0 * qua_r - 1.0, 0.0, 0.0, 
+      4.0 * (qua_u - qua_r), 4.0 * qua_s, -4.0 * qua_s, -4.0 * qua_t, 4.0 * qua_t, 0.0 };
 
-    const double dR_ds[10] { 1.0 - 4.0 * qua_u, 0.0, 4.0 * qua_s - 1.0,
-      0.0, -4.0 * qua_r, 4.0 * qua_r, 4.0 * (qua_u - qua_s),
-      -4.0 * qua_t, 0.0, 4.0 * qua_t };
+    const double dR_ds[10] { 1.0 - 4.0 * qua_u, 0.0, 4.0 * qua_s - 1.0, 0.0, 
+      -4.0 * qua_r, 4.0 * qua_r, 4.0 * (qua_u - qua_s), -4.0 * qua_t, 0.0, 4.0 * qua_t };
     
-    const double dR_dt[10] { 1.0 - 4.0 * qua_u, 0.0, 0.0,
-    4.0 * qua_t - 1.0, -4.0 * qua_r, 0.0, -4.0 * qua_s,
-    4.0 * (qua_u - qua_t), 4.0 * qua_r, 4.0 * qua_s };
+    const double dR_dt[10] { 1.0 - 4.0 * qua_u, 0.0, 0.0, 4.0 * qua_t - 1.0, -4.0 * qua_r, 
+      0.0, -4.0 * qua_s, 4.0 * (qua_u - qua_t), 4.0 * qua_r, 4.0 * qua_s };
     
     double xr = 0.0, xs = 0.0, xt = 0.0;
     double yr = 0.0, ys = 0.0, yt = 0.0;
