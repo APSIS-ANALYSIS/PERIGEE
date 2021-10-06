@@ -85,7 +85,7 @@ class NBC_Partition_3D : public INBC_Partition
   protected:
     const int cpu_rank;
 
-    const int num_nbc;
+    int num_nbc;
 
     // The ID array of the Local nodes.
     std::vector<int> LID;

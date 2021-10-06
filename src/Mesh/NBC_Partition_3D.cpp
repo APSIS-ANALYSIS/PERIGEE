@@ -3,12 +3,17 @@
 NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
     const Map_Node_Index * const &mnindex,
     const std::vector<INodalBC *> &nbc_list )
-: cpu_rank(part->get_cpu_rank()), num_nbc( nbc_list[0]->get_num_nbc() )
+: cpu_rank(part->get_cpu_rank())
 {
   const int dof = (int) nbc_list.size();
-  
+
+  // Set num_nbc to the largest among nbc_list
+  num_nbc = nbc_list[0]->get_num_nbc();
   for(int ii=1; ii<dof; ++ii)
-    SYS_T::print_exit_if( num_nbc != nbc_list[ii]->get_num_nbc(), "Error: NBC_Partition_3D assumes all input INodalBC have the same num_nbc.\n");
+  {
+    if( nbc_list[ii]->get_num_nbc() > num_nbc )
+      num_nbc = nbc_list[ii]->get_num_nbc();
+  }
 
   LID.clear();
   
@@ -31,46 +36,47 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
       unsigned int ps_num = 0;
       unsigned int pm_num = 0;
 
-      for(unsigned int jj=0; jj<nbc_list[ii]->get_num_dir_nodes(nbc_id); ++jj)
+      if(nbc_list[ii]->get_num_nbc() > nbc_id)
       {
-        unsigned int node_index = nbc_list[ii]->get_dir_nodes(nbc_id, jj);
-        node_index = mnindex->get_old2new(node_index);
-
-        if(part->isNodeInPart(node_index))
+        for(unsigned int jj=0; jj<nbc_list[ii]->get_num_dir_nodes(nbc_id); ++jj)
         {
-          LDN[nbc_id].push_back(node_index);
-          node_num += 1;
-        }
-      } // end jj-loop
+          unsigned int node_index = nbc_list[ii]->get_dir_nodes(nbc_id, jj);
+          node_index = mnindex->get_old2new(node_index);
+
+          if(part->isNodeInPart(node_index))
+          {
+            LDN[nbc_id].push_back(node_index);
+            node_num += 1;
+          }
+        } // end jj-loop
+
+        for(unsigned int jj=0; jj<nbc_list[ii]->get_num_per_nodes(nbc_id); ++jj)
+        {
+          unsigned int node_ps = nbc_list[ii]->get_per_slave_nodes( nbc_id, jj);
+          unsigned int node_pm = nbc_list[ii]->get_per_master_nodes(nbc_id, jj);
+
+          node_ps = mnindex->get_old2new(node_ps);
+          node_pm = mnindex->get_old2new(node_pm);
+          
+          if(part->isNodeInPart(node_ps))
+          {
+            LPSN[ii].push_back(node_ps);
+            LPMN[ii].push_back(node_pm);
+            ps_num += 1;
+          }
+
+          if(part->isNodeInPart(node_pm))
+          {
+            LocalMaster[ii].push_back(node_pm);
+            LocalMasterSlave[ii].push_back(node_ps);
+            pm_num += 1;
+          }
+        } // end jj-loop
+      } // end if
 
       Num_LD[nbc_id][ii] = node_num;
-
-      for(unsigned int jj=0; jj<nbc_list[ii]->get_num_per_nodes(nbc_id); ++jj)
-      {
-        unsigned int node_ps = nbc_list[ii]->get_per_slave_nodes( nbc_id, jj);
-        unsigned int node_pm = nbc_list[ii]->get_per_master_nodes(nbc_id, jj);
-
-        node_ps = mnindex->get_old2new(node_ps);
-        node_pm = mnindex->get_old2new(node_pm);
-        
-        if(part->isNodeInPart(node_ps))
-        {
-          LPSN[ii].push_back(node_ps);
-          LPMN[ii].push_back(node_pm);
-          ps_num += 1;
-        }
-
-        if(part->isNodeInPart(node_pm))
-        {
-          LocalMaster[ii].push_back(node_pm);
-          LocalMasterSlave[ii].push_back(node_ps);
-          pm_num += 1;
-        }
-      } // end jj-loop
-
       Num_LPS[nbc_id][ii] = ps_num;
       Num_LPM[nbc_id][ii] = pm_num;
-
     } // end ii-loop over dof
 
     VEC_T::shrink2fit( LDN[nbc_id] );
