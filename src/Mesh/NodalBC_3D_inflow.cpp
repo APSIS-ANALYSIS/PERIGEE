@@ -35,9 +35,14 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   SYS_T::file_check(wallfile);
 
   // 1. No periodic nodes
-  per_slave_nodes.clear();
-  per_master_nodes.clear();
-  num_per_nodes.clear();
+  per_slave_nodes.resize(num_nbc);
+  per_master_nodes.resize(num_nbc);
+  num_per_nodes.resize(num_nbc);
+
+  const int nbc_id = 0;
+  per_slave_nodes[nbc_id].clear();
+  per_master_nodes[nbc_id].clear();
+  num_per_nodes[nbc_id] = 0;
 
   // 2. Analyze the file type and read in the data
   num_node.resize( num_nbc );
@@ -71,18 +76,18 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
 
   if( elemtype == 501 )
   { 
-    nLocBas[0] = 3;
+    nLocBas[nbc_id] = 3;
 
-    TET_T::read_vtp_grid( inffile, num_node[0], num_cell[0], pt_xyz[0], tri_ien[0], global_node[0], global_cell[0] );
+    TET_T::read_vtp_grid( inffile, num_node[nbc_id], num_cell[nbc_id], pt_xyz[nbc_id], tri_ien[nbc_id], global_node[nbc_id], global_cell[nbc_id] );
 
     TET_T::read_vtp_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
         wall_ien, wall_gnode, wall_gelem );
   }
   else if( elemtype == 502 )
   {
-    nLocBas[0] = 6;
+    nLocBas[nbc_id] = 6;
 
-    TET_T::read_vtu_grid( inffile, num_node[0], num_cell[0], pt_xyz[0], tri_ien[0], global_node[0], global_cell[0] );
+    TET_T::read_vtu_grid( inffile, num_node[nbc_id], num_cell[nbc_id], pt_xyz[nbc_id], tri_ien[nbc_id], global_node[nbc_id], global_cell[nbc_id] );
 
     TET_T::read_vtu_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
         wall_ien, wall_gnode, wall_gelem );
@@ -90,47 +95,47 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   else SYS_T::print_fatal("Error: unknown element type.\n");
 
   // Generate the dir-node list. Nodes belonging to the wall are excluded.
-  dir_nodes[0].clear();
+  dir_nodes[nbc_id].clear();
   
-  for(unsigned int ii=0; ii<global_node[0].size(); ++ii)
+  for(unsigned int ii=0; ii<global_node[nbc_id].size(); ++ii)
   {
-    SYS_T::print_fatal_if( global_node[0][ii]<0, "Error: negative nodal index! \n");
+    SYS_T::print_fatal_if( global_node[nbc_id][ii]<0, "Error: negative nodal index! \n");
 
-    if( !VEC_T::is_invec( wall_gnode, global_node[0][ii]) )
-      dir_nodes[0].push_back( global_node[0][ii] );
+    if( !VEC_T::is_invec( wall_gnode, global_node[nbc_id][ii]) )
+      dir_nodes[nbc_id].push_back( global_node[nbc_id][ii] );
   }
 
-  num_dir_nodes[0] = dir_nodes[0].size(); 
+  num_dir_nodes[nbc_id] = dir_nodes[nbc_id].size(); 
 
   // Generate ID array
   Create_ID( nFunc );
 
   // Calculate the centroid of the surface
-  centroid[0].gen_zero();
-  for(int ii=0; ii<num_node[0]; ++ii)
+  centroid[nbc_id].gen_zero();
+  for(int ii=0; ii<num_node[nbc_id]; ++ii)
   {
-    centroid[0](0) += pt_xyz[0][3*ii+0];
-    centroid[0](1) += pt_xyz[0][3*ii+1];
-    centroid[0](2) += pt_xyz[0][3*ii+2];
+    centroid[nbc_id](0) += pt_xyz[nbc_id][3*ii+0];
+    centroid[nbc_id](1) += pt_xyz[nbc_id][3*ii+1];
+    centroid[nbc_id](2) += pt_xyz[nbc_id][3*ii+2];
   }
-  centroid[0].scale( 1.0 / (double) num_node[0] );
+  centroid[nbc_id].scale( 1.0 / (double) num_node[nbc_id] );
 
   // assign outward normal vector from the input
-  outnormal[0] = in_outnormal;
+  outnormal[nbc_id] = in_outnormal;
 
   // Collect nodes that belong to the wall, and set up a vector that
   // is 1 on the interior nodes and 0 on the wall bc nodes.
-  outline_pts[0].clear();
+  outline_pts[nbc_id].clear();
 
-  num_out_bc_pts[0] = 0;
+  num_out_bc_pts[nbc_id] = 0;
 
-  double * temp_sol = new double [num_node[0]];  
+  double * temp_sol = new double [num_node[nbc_id]];  
 
-  for(int ii=0; ii<num_node[0]; ++ii)
+  for(int ii=0; ii<num_node[nbc_id]; ++ii)
   {
     // If the node is not on the wall, it is an interior node, so set
     // the element to 1.
-    if( !VEC_T::is_invec(wall_gnode, global_node[0][ii]) ) 
+    if( !VEC_T::is_invec(wall_gnode, global_node[nbc_id][ii]) ) 
       temp_sol[ii] = 1.0;
 
     // otherwise, the node is on the wall surface, so set element to 0.
@@ -139,10 +144,10 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
       temp_sol[ii] = 0.0;
 
       // Also store the point's coordinates in outline points
-      num_out_bc_pts[0] += 1;
-      outline_pts[0].push_back( pt_xyz[0][3*ii+0] );
-      outline_pts[0].push_back( pt_xyz[0][3*ii+1] );
-      outline_pts[0].push_back( pt_xyz[0][3*ii+2] );
+      num_out_bc_pts[nbc_id] += 1;
+      outline_pts[nbc_id].push_back( pt_xyz[nbc_id][3*ii+0] );
+      outline_pts[nbc_id].push_back( pt_xyz[nbc_id][3*ii+1] );
+      outline_pts[nbc_id].push_back( pt_xyz[nbc_id][3*ii+2] );
     }
   }
 
@@ -150,15 +155,15 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   // mesh contains the inlet surface. This is a common error when
   // adopting sv files, where the user uses the combined exterior surface
   // as the wall mesh. We will throw an error message if detected.
-  if( num_out_bc_pts[0] == num_node[0] ) SYS_T::print_fatal( "Error: the number of outline points is %d and the number of total points on the surface is %d. This is likely due to an improper wall mesh. \n", num_out_bc_pts[0], num_node[0] );
+  if( num_out_bc_pts[nbc_id] == num_node[nbc_id] ) SYS_T::print_fatal( "Error: the number of outline points is %d and the number of total points on the surface is %d. This is likely due to an improper wall mesh. \n", num_out_bc_pts[nbc_id], num_node[nbc_id] );
 
-  inf_active_area[0] = 0.0;
-  face_area[0] = 0.0;
+  inf_active_area[nbc_id] = 0.0;
+  face_area[nbc_id] = 0.0;
 
-  intNA[0].resize( num_node[0] );
+  intNA[nbc_id].resize( num_node[nbc_id] );
 
   // zero the container
-  for(int ii=0; ii<num_node[0]; ++ii) intNA[0][ii] = 0.0;
+  for(int ii=0; ii<num_node[nbc_id]; ++ii) intNA[nbc_id][ii] = 0.0;
 
   if( elemtype == 501 )
   {
@@ -169,14 +174,14 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
     QuadPts_Gauss_Triangle quad( nqp_tri );      // quadrature rule
     FEAElement_Triangle3_3D_der0 ele( nqp_tri ); // element
 
-    for(int ee=0; ee<num_cell[0]; ++ee)
+    for(int ee=0; ee<num_cell[nbc_id]; ++ee)
     {
       for(int ii=0; ii<3; ++ii)
       {
-        node_idx[ii] = tri_ien[0][3*ee+ii];
-        eptx[ii] = pt_xyz[0][ 3*node_idx[ii]+0 ];
-        epty[ii] = pt_xyz[0][ 3*node_idx[ii]+1 ];
-        eptz[ii] = pt_xyz[0][ 3*node_idx[ii]+2 ];
+        node_idx[ii] = tri_ien[nbc_id][3*ee+ii];
+        eptx[ii] = pt_xyz[nbc_id][ 3*node_idx[ii]+0 ];
+        epty[ii] = pt_xyz[nbc_id][ 3*node_idx[ii]+1 ];
+        eptz[ii] = pt_xyz[nbc_id][ 3*node_idx[ii]+2 ];
       }
 
       ele.buildBasis(&quad, eptx, epty, eptz);
@@ -189,10 +194,10 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
 
         for(int ii=0; ii<3; ++ii)
         {
-          inf_active_area[0] += gwts * R[ii] * temp_sol[ tri_ien[0][3*ee+ii] ];
-          face_area[0] += gwts * R[ii];
+          inf_active_area[nbc_id] += gwts * R[ii] * temp_sol[ tri_ien[nbc_id][3*ee+ii] ];
+          face_area[nbc_id] += gwts * R[ii];
 
-          intNA[0][node_idx[ii]] += gwts * R[ii];
+          intNA[nbc_id][node_idx[ii]] += gwts * R[ii];
         }
       } // end qua-loop
     } // end ee-loop
@@ -206,14 +211,14 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
     QuadPts_Gauss_Triangle quad( nqp_tri );      // quadrature rule
     FEAElement_Triangle6_3D_der0 ele( nqp_tri ); // element
 
-    for(int ee=0; ee<num_cell[0]; ++ee)
+    for(int ee=0; ee<num_cell[nbc_id]; ++ee)
     {
       for(int ii=0; ii<6; ++ii)
       {
-        node_idx[ii] = tri_ien[0][6*ee+ii];
-        eptx[ii] = pt_xyz[0][ 3*node_idx[ii]+0 ];
-        epty[ii] = pt_xyz[0][ 3*node_idx[ii]+1 ];
-        eptz[ii] = pt_xyz[0][ 3*node_idx[ii]+2 ];
+        node_idx[ii] = tri_ien[nbc_id][6*ee+ii];
+        eptx[ii] = pt_xyz[nbc_id][ 3*node_idx[ii]+0 ];
+        epty[ii] = pt_xyz[nbc_id][ 3*node_idx[ii]+1 ];
+        eptz[ii] = pt_xyz[nbc_id][ 3*node_idx[ii]+2 ];
       }
 
       ele.buildBasis(&quad, eptx, epty, eptz);
@@ -226,10 +231,10 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
 
         for(int ii=0; ii<6; ++ii)
         {
-          inf_active_area[0] += gwts * R[ii] * temp_sol[ tri_ien[0][6*ee+ii] ];
-          face_area[0] += gwts * R[ii];
+          inf_active_area[nbc_id] += gwts * R[ii] * temp_sol[ tri_ien[nbc_id][6*ee+ii] ];
+          face_area[nbc_id] += gwts * R[ii];
 
-          intNA[0][node_idx[ii]] += gwts * R[ii];
+          intNA[nbc_id][node_idx[ii]] += gwts * R[ii];
         }
       } // end qua-loop
     } // end ee-loop
@@ -241,11 +246,11 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   // Finish and print info on screen
   std::cout<<"===> NodalBC_3D_inflow specified by "<<inffile<<", with nodes on \n";
   std::cout<<"     "<<wallfile<<" excluded, is generated. \n";
-  std::cout<<"     num_node: "<<num_node[0]<<", num_cell: "<<num_cell[0]<<'\n';
-  std::cout<<"     centroid: "<<centroid[0](0)<<'\t'<<centroid[0](1)<<'\t'<<centroid[0](2)<<'\n';
-  std::cout<<"     number of outline points is "<<num_out_bc_pts[0]<<'\n';
-  std::cout<<"     outward normal is ["<<outnormal[0](0)<<'\t'<<outnormal[0](1)<<'\t'<<outnormal[0](2)<<"]. \n";
-  std::cout<<"     area is "<<face_area[0]<<", and active area is "<<inf_active_area[0]<<'\n';
+  std::cout<<"     num_node: "<<num_node[nbc_id]<<", num_cell: "<<num_cell[nbc_id]<<'\n';
+  std::cout<<"     centroid: "<<centroid[nbc_id](0)<<'\t'<<centroid[nbc_id](1)<<'\t'<<centroid[nbc_id](2)<<'\n';
+  std::cout<<"     number of outline points is "<<num_out_bc_pts[nbc_id]<<'\n';
+  std::cout<<"     outward normal is ["<<outnormal[nbc_id](0)<<'\t'<<outnormal[nbc_id](1)<<'\t'<<outnormal[nbc_id](2)<<"]. \n";
+  std::cout<<"     area is "<<face_area[nbc_id]<<", and active area is "<<inf_active_area[nbc_id]<<'\n';
 }
 
 
@@ -257,9 +262,9 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileLis
 : num_nbc( static_cast<int>( inffileList.size() ) )
 {
   // 1. No periodic nodes
-  per_slave_nodes.clear();
-  per_master_nodes.clear();
-  num_per_nodes.clear();
+  per_slave_nodes.resize(num_nbc);
+  per_master_nodes.resize(num_nbc);
+  num_per_nodes.resize(num_nbc);
 
   // 2. Analyze the file type and read in the data
   num_node.resize( num_nbc );
@@ -295,6 +300,10 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileLis
   for( int ii=0; ii<num_nbc; ++ii )
   {
     SYS_T::file_check( inffileList[ii] );
+
+    per_slave_nodes[ii].clear();
+    per_master_nodes[ii].clear();
+    num_per_nodes[ii] = 0;
 
     if( elemtype == 501 )
     {

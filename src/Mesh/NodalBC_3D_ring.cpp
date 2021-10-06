@@ -31,9 +31,14 @@ NodalBC_3D_ring::NodalBC_3D_ring(
 : num_nbc(1), ring_bc_type(in_ring_bc_type)
 {
   // No periodic nodes
-  per_slave_nodes.clear();
-  per_master_nodes.clear();
-  num_per_nodes.clear();
+  per_slave_nodes.resize(num_nbc);
+  per_master_nodes.resize(num_nbc);
+  num_per_nodes.resize(num_nbc);
+
+  const int nbc_id = 0;
+  per_slave_nodes[nbc_id].clear();
+  per_master_nodes[nbc_id].clear();
+  num_per_nodes[nbc_id] = 0;
 
   dir_nodes.resize(     num_nbc );
   num_dir_nodes.resize( num_nbc );
@@ -71,7 +76,6 @@ NodalBC_3D_ring::NodalBC_3D_ring(
   std::vector<int> wall_ien, wall_gnode, wall_gelem;
 
   // Generate the dir-node list with all ring nodes.
-  const int nbc_id = 0;
   dir_nodes[nbc_id].clear();
   cap_id.clear();
 

@@ -2,17 +2,22 @@
 
 NodalBC_3D_CMM::NodalBC_3D_CMM( const int &nFunc, const bool &is_all_node )
 {
-  per_slave_nodes.clear();
-  per_master_nodes.clear();
-  num_per_nodes.clear();
-
   if( is_all_node )
   {
     num_nbc = 1;
+    const int nbc_id = 0;
+
+    per_slave_nodes.resize(num_nbc);
+    per_master_nodes.resize(num_nbc);
+    num_per_nodes.resize(num_nbc);
+
+    per_slave_nodes[nbc_id].clear();
+    per_master_nodes[nbc_id].clear();
+    num_per_nodes[nbc_id] = 0;
+
     dir_nodes.resize(     num_nbc );
     num_dir_nodes.resize( num_nbc );
 
-    const int nbc_id = 0;
     dir_nodes[nbc_id].clear();
 
     for(unsigned int ii=0; ii<static_cast<unsigned int>(nFunc); ++ii)
@@ -25,6 +30,10 @@ NodalBC_3D_CMM::NodalBC_3D_CMM( const int &nFunc, const bool &is_all_node )
   else
   {
     num_nbc = 0;
+    per_slave_nodes.clear();
+    per_master_nodes.clear();
+    num_per_nodes.clear();
+
     dir_nodes.clear();
     num_dir_nodes.clear();
   }
@@ -45,14 +54,17 @@ NodalBC_3D_CMM::NodalBC_3D_CMM(
     const int &comp, const int &nFunc,
     const int &cmm_bc_type )
 {
-  dir_nodes.clear();
-  per_slave_nodes.clear();
-  per_master_nodes.clear();
-  num_per_nodes.clear();
-  
   num_nbc = 1;
-
   const int nbc_id = 0;
+
+  per_slave_nodes.resize(num_nbc);
+  per_master_nodes.resize(num_nbc);
+  num_per_nodes.resize(num_nbc);
+
+  per_slave_nodes[nbc_id].clear();
+  per_master_nodes[nbc_id].clear();
+  num_per_nodes[nbc_id] = 0;
+
   dir_nodes.resize(     num_nbc );
   num_dir_nodes.resize( num_nbc );
 
