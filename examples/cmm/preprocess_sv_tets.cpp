@@ -46,6 +46,7 @@ int main( int argc, char * argv[] )
   
   // Element options: 501 linear tets, 502 quadratic tets
   int elemType = 501;
+  int num_inlet  = 1;
   int num_outlet = 1;
   
   // ringBC_type : 0 fully clamped for the ring nodes
@@ -67,7 +68,7 @@ int main( int argc, char * argv[] )
 
   // Default names for input geometry files
   std::string geo_file("./whole_vol.vtu");
-  std::string sur_file_in("./inflow_vol.vtp");
+  std::string sur_file_in_base("./inflow_vol_");
   std::string sur_file_wall("./wall_vol.vtp");
   std::string sur_file_out_base("./outflow_vol_");
 
@@ -83,6 +84,7 @@ int main( int argc, char * argv[] )
   // Get the command line arguments
   SYS_T::GetOptionInt(   "-cpu_size",          cpu_size);
   SYS_T::GetOptionInt(   "-in_ncommon",        in_ncommon);
+  SYS_T::GetOptionInt(   "-num_inlet",         num_inlet);
   SYS_T::GetOptionInt(   "-num_outlet",        num_outlet);
   SYS_T::GetOptionInt(   "-elem_type",         elemType);
   SYS_T::GetOptionInt(   "-ringbc_type",       ringBC_type);
@@ -93,7 +95,7 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionReal(  "-wall_springconst",  wall_springconst);
   SYS_T::GetOptionReal(  "-wall_dampingconst", wall_dampingconst);
   SYS_T::GetOptionString("-geo_file",          geo_file);
-  SYS_T::GetOptionString("-sur_file_in",       sur_file_in);
+  SYS_T::GetOptionString("-sur_file_in_base",  sur_file_in_base);
   SYS_T::GetOptionString("-sur_file_wall",     sur_file_wall);
   SYS_T::GetOptionString("-sur_file_out_base", sur_file_out_base);
 
@@ -116,9 +118,10 @@ int main( int argc, char * argv[] )
   cout << " -wall_springconst: "      << wall_springconst  << endl;
   cout << " -wall_dampingconst: "     << wall_dampingconst << endl;
 
+  cout << " -num_inlet: "        << num_inlet         << endl;
   cout << " -num_outlet: "       << num_outlet        << endl;
   cout << " -geo_file: "         << geo_file          << endl;
-  cout << " -sur_file_in: "      << sur_file_in       << endl;
+  cout << " -sur_file_in_base: " << sur_file_in_base  << endl;
   cout << " -sur_file_wall: "    << sur_file_wall     << endl;
   cout << " -sur_file_out_base: "<< sur_file_out_base << endl;
   cout << " -part_file: "        << part_file         << endl;
@@ -136,15 +139,25 @@ int main( int argc, char * argv[] )
   // If quadratic, all mesh files will be in vtu format
   if(elemType == 502)
   {
-    sur_file_in.erase( sur_file_in.end()-4, sur_file_in.end() );
-    sur_file_in += ".vtu";
     sur_file_wall.erase( sur_file_wall.end()-4, sur_file_wall.end() );
     sur_file_wall += ".vtu";
   }
 
-  SYS_T::file_check(sur_file_in); cout<<sur_file_in<<" found. \n";
-
   SYS_T::file_check(sur_file_wall); cout<<sur_file_wall<<" found. \n";
+
+  // Generate the inlet file names and check existence
+  std::vector< std::string > sur_file_in( num_inlet );
+
+  for(int ii=0; ii<num_inlet; ++ii)
+  {
+    if(elemType == 501 )
+      sur_file_in[ii] = SYS_T::gen_capfile_name( sur_file_in_base, ii, ".vtp" ); 
+    else
+      sur_file_in[ii] = SYS_T::gen_capfile_name( sur_file_in_base, ii, ".vtu" ); 
+ 
+    SYS_T::file_check(sur_file_in[ii]);
+    cout<<sur_file_in[ii]<<" found. \n";
+  }
 
   // Generate the outlet file names and check existence
   std::vector< std::string > sur_file_out( num_outlet );
@@ -160,7 +173,11 @@ int main( int argc, char * argv[] )
     cout<<sur_file_out[ii]<<" found. \n";
   }
 
-  // If we can still detect additional files on disk, throw an warning
+  // If we can still detect additional files on disk, throw a warning
+  if( SYS_T::file_exist(SYS_T::gen_capfile_name(sur_file_in_base, num_inlet, ".vtp")) ||
+      SYS_T::file_exist(SYS_T::gen_capfile_name(sur_file_in_base, num_inlet, ".vtu")) )
+    cout<<endl<<"Warning: there are additional inlet surface files on disk. Check num_inlet please.\n\n";
+
   if( SYS_T::file_exist(SYS_T::gen_capfile_name(sur_file_out_base, num_outlet, ".vtp")) ||
       SYS_T::file_exist(SYS_T::gen_capfile_name(sur_file_out_base, num_outlet, ".vtu")) )
     cout<<endl<<"Warning: there are additional outlet surface files on disk. Check num_outlet please.\n\n";
@@ -169,19 +186,20 @@ int main( int argc, char * argv[] )
   hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
   HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
 
-  cmdh5w->write_intScalar("num_outlet", num_outlet);
-  cmdh5w->write_intScalar("cpu_size", cpu_size);
-  cmdh5w->write_intScalar("in_ncommon", in_ncommon);
-  cmdh5w->write_intScalar("dofNum", dofNum);
-  cmdh5w->write_intScalar("dofMat", dofMat);
-  cmdh5w->write_intScalar("elemType", elemType);
-  cmdh5w->write_intScalar("ringBC_type", ringBC_type);
-  cmdh5w->write_intScalar("cmmBC_type", cmmBC_type);
-  cmdh5w->write_string("geo_file", geo_file);
-  cmdh5w->write_string("sur_file_in", sur_file_in);
+  cmdh5w->write_intScalar("num_inlet",      num_inlet);
+  cmdh5w->write_intScalar("num_outlet",     num_outlet);
+  cmdh5w->write_intScalar("cpu_size",       cpu_size);
+  cmdh5w->write_intScalar("in_ncommon",     in_ncommon);
+  cmdh5w->write_intScalar("dofNum",         dofNum);
+  cmdh5w->write_intScalar("dofMat",         dofMat);
+  cmdh5w->write_intScalar("elemType",       elemType);
+  cmdh5w->write_intScalar("ringBC_type",    ringBC_type);
+  cmdh5w->write_intScalar("cmmBC_type",     cmmBC_type);
+  cmdh5w->write_string("geo_file",          geo_file);
+  cmdh5w->write_string("sur_file_in_base",  sur_file_in_base);
   cmdh5w->write_string("sur_file_out_base", sur_file_out_base);
-  cmdh5w->write_string("sur_file_wall", sur_file_wall);
-  cmdh5w->write_string("part_file", part_file);
+  cmdh5w->write_string("sur_file_wall",     sur_file_wall);
+  cmdh5w->write_string("part_file",         part_file);
 
   delete cmdh5w; H5Fclose(cmd_file_id);
 
@@ -227,14 +245,16 @@ int main( int argc, char * argv[] )
   Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, mesh->get_nFunc());
   mnindex->write_hdf5("node_mapping");
 
-  // Inflow BC info
-  const Vector_3 inlet_outvec = TET_T::get_out_normal( sur_file_in, ctrlPts, IEN );
+  // Set up Inflow BC info
+  std::vector< Vector_3 > inlet_outvec( sur_file_in.size() );
   
+  for(unsigned int ii=0; ii<sur_file_in.size(); ++ii)
+    inlet_outvec[ii] = TET_T::get_out_normal( sur_file_in[ii], ctrlPts, IEN );
+
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall,
       nFunc, inlet_outvec, elemType );
 
   // Set up Outflow BC info
-  // Obtain the outward normal vector
   std::vector< Vector_3 > outlet_outvec( sur_file_out.size() );
 
   for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
