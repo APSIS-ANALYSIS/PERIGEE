@@ -19,6 +19,11 @@ class ALocal_Inflow_NodalBC
     virtual ~ALocal_Inflow_NodalBC();
 
     // ------------------------------------------------------------------------
+    // Get the number of surfaces with prescribed flow
+    // ------------------------------------------------------------------------
+    virtual int get_num_nbc() const {return num_nbc;};
+
+    // ------------------------------------------------------------------------
     // Get global index of a Dirichlet node in the local partition
     // 0 <= node < Num_LD[nbc_id]
     // ------------------------------------------------------------------------

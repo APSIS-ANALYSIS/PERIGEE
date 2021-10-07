@@ -33,6 +33,11 @@ class ALocal_NodalBC
     {return LID[dof_index * nlocghonode + node];}
 
     // ------------------------------------------------------------------------
+    // get the number of surfaces with prescribed flows
+    // ------------------------------------------------------------------------
+    virtual int get_num_nbc() const {return num_nbc;};
+
+    // ------------------------------------------------------------------------
     // get dofMat: the implicit solver's dof number
     //             LID.size = dofMat * nlocghonode
     // ------------------------------------------------------------------------
