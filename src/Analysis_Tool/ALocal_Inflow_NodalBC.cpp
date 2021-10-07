@@ -63,24 +63,28 @@ ALocal_Inflow_NodalBC::~ALocal_Inflow_NodalBC()
   VEC_T::clean(local_node_pos);
 }
 
-double ALocal_Inflow_NodalBC::get_radius( const Vector_3 &pt ) const
+double ALocal_Inflow_NodalBC::get_radius( const int &nbc_id,
+    const Vector_3 &pt ) const
 {
   // num_out_bc_pts is set to be zero for parition that does not contain
   // inflow boundary points (i.e. Num_LD = 0 ).
-  SYS_T::print_fatal_if( num_out_bc_pts == 0, "Error: ALocal_Inflow_NodalBC::get_radius, this function can only be called in sub-domains which contains the inflow boundary node.\n");
+  SYS_T::print_fatal_if( num_out_bc_pts[nbc_id] == 0, "Error: ALocal_Inflow_NodalBC::get_radius, this function can only be called in sub-domains which contains the inflow boundary node.\n");
 
   const double x = pt.x();
   const double y = pt.y();
   const double z = pt.z();
 
-  const double rc = MATH_T::norm2( x-centroid(0), y-centroid(1), z-centroid(2) );
+  const double rc = MATH_T::norm2( x-centroid[nbc_id](0), y-centroid[nbc_id](1),
+      z-centroid[nbc_id](2) );
 
   // Now loop over the boundary points to find rb.
-  double rb = MATH_T::norm2(x-outline_pts[0], y-outline_pts[1], z-outline_pts[2]);
+  double rb = MATH_T::norm2(x-outline_pts[nbc_id][0], y-outline_pts[nbc_id][1], 
+      z-outline_pts[nbc_id][2]);
 
-  for(int ii=1; ii<num_out_bc_pts; ++ii)
+  for(int ii=1; ii<num_out_bc_pts[nbc_id]; ++ii)
   {
-    double newdist = MATH_T::norm2(x-outline_pts[3*ii], y-outline_pts[3*ii+1], z-outline_pts[3*ii+2]);
+    double newdist = MATH_T::norm2(x-outline_pts[nbc_id][3*ii],
+      y-outline_pts[nbc_id][3*ii+1], z-outline_pts[nbc_id][3*ii+2]);
 
     if(newdist < rb) rb = newdist;
   }
@@ -88,23 +92,27 @@ double ALocal_Inflow_NodalBC::get_radius( const Vector_3 &pt ) const
   return rc / (rb + rc);
 }
 
-void ALocal_Inflow_NodalBC::get_ctrlPts_xyz( const int &eindex, 
-    double * const &ctrl_x, double * const &ctrl_y, 
+void ALocal_Inflow_NodalBC::get_ctrlPts_xyz( const int &nbc_id,
+    const int &eindex, double * const &ctrl_x, double * const &ctrl_y, 
     double * const &ctrl_z ) const
 {
-  for(int jj=0; jj<cell_nLocBas; ++jj)
+  for(int jj=0; jj<cell_nLocBas[nbc_id]; ++jj)
   {
-    const int pos = local_tri_ien[ cell_nLocBas*eindex+jj ];
-    ctrl_x[jj] = local_pt_xyz[3*pos];
-    ctrl_y[jj] = local_pt_xyz[3*pos+1];
-    ctrl_z[jj] = local_pt_xyz[3*pos+2];
+    const int pos = local_tri_ien[nbc_id][ cell_nLocBas[nbc_id]*eindex+jj ];
+    ctrl_x[jj] = local_pt_xyz[nbc_id][3*pos+0];
+    ctrl_y[jj] = local_pt_xyz[nbc_id][3*pos+1];
+    ctrl_z[jj] = local_pt_xyz[nbc_id][3*pos+2];
   }
 }
 
-void ALocal_Inflow_NodalBC::get_SIEN( const int &eindex, int * const &sien ) const
+void ALocal_Inflow_NodalBC::get_SIEN( const int &nbc_id,
+    const int &eindex, int * const &sien ) const
 {
-  for(int jj=0; jj<cell_nLocBas; ++jj)
-    sien[jj] = local_node_pos[ local_tri_ien[cell_nLocBas*eindex+jj] ];
+  for(int jj=0; jj<cell_nLocBas[nbc_id]; ++jj)
+  {
+    const int pos = local_tri_ien[nbc_id][ cell_nLocBas[nbc_id]*eindex+jj ];
+    sien[jj] = local_node_pos[nbc_id][pos];
+  }
 }
 
 // EOF

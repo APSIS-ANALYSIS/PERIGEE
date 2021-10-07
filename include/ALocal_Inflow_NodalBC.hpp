@@ -20,37 +20,43 @@ class ALocal_Inflow_NodalBC
 
     // ------------------------------------------------------------------------
     // Get global index of a Dirichlet node in the local partition
-    // 0 <= node < Num_LD
+    // 0 <= node < Num_LD[nbc_id]
     // ------------------------------------------------------------------------
-    virtual int get_LDN( const int &node ) const {return LDN[node];}
+    virtual int get_LDN( const int &nbc_id, const int &node ) const
+    {return LDN[nbc_id][node];}
 
     // ------------------------------------------------------------------------
     // Get the number of Dirichlet nodes in the local partition
     // ------------------------------------------------------------------------
-    virtual int get_Num_LD() const {return Num_LD;}
+    virtual int get_Num_LD( const int &nbc_id ) const {return Num_LD[nbc_id];}
 
     // ------------------------------------------------------------------------
     // get the outward normal vector components.
     // ii=0 : x-component; ii=1 : y-component; ii=2 : z-component
     // ------------------------------------------------------------------------
-    virtual double get_outvec( const int &ii ) const {return outnormal( ii );}
-    virtual Vector_3 get_outvec() const {return outnormal;}
+    virtual double get_outvec( const int &nbc_id, const int &ii ) const
+    {return outnormal[nbc_id](ii);}
+
+    virtual Vector_3 get_outvec( const int &nbc_id ) const
+    {return outnormal[nbc_id];}
 
     // ------------------------------------------------------------------------
     // get the active area of the surface
     // ------------------------------------------------------------------------
-    virtual double get_actarea() const {return act_area;}
+    virtual double get_actarea( const int &nbc_id ) const
+    {return act_area[nbc_id];}
     
     // ------------------------------------------------------------------------
     // get the full area of the surface
     // ------------------------------------------------------------------------
-    virtual double get_fularea() const {return ful_area;}
+    virtual double get_fularea( const int &nbc_id ) const
+    {return ful_area[nbc_id];}
 
     // ------------------------------------------------------------------------
-    // determine whether a given index belongs to the LDN vector
+    // determine whether a given index belongs to the LDN[nbc_id] vector
     // ------------------------------------------------------------------------
-    virtual bool is_inLDN( const int &ii ) const 
-    { return VEC_T::is_invec(LDN, ii); }
+    virtual bool is_inLDN( const int &nbc_id, const int &ii ) const 
+    { return VEC_T::is_invec(LDN[nbc_id], ii); }
 
     // ------------------------------------------------------------------------
     // get_radius: return the given point's (estimated) scaled radius for
@@ -61,69 +67,78 @@ class ALocal_Inflow_NodalBC
     //             If this partition does not contain any inflow bc
     //             nodes, this function will throw an error.
     // ------------------------------------------------------------------------
-    virtual double get_radius( const Vector_3 &pt ) const;
+    virtual double get_radius( const int &nbc_id, const Vector_3 &pt ) const;
 
     // ------------------------------------------------------------------------
-    // get number of nodes beloging to the local partition
+    // get number of nodes belonging to the local partition
     // ------------------------------------------------------------------------
-    virtual int get_num_local_node() const {return num_local_node;}
+    virtual int get_num_local_node( const int &nbc_id ) const
+    {return num_local_node[nbc_id];}
 
     // ------------------------------------------------------------------------
     // get number of cells belonging to the local partition
     // ------------------------------------------------------------------------
-    virtual int get_num_local_cell() const {return num_local_cell;}
+    virtual int get_num_local_cell( const int &nbc_id ) const
+    {return num_local_cell[nbc_id];}
 
     // ------------------------------------------------------------------------
-    // get the number of nodes per element (nLocBas)
+    // get the number of nodes per element, or nLocBas[nbc_id]
     // ------------------------------------------------------------------------
-    virtual int get_cell_nLocBas() const {return cell_nLocBas;}
+    virtual int get_cell_nLocBas( const int &nbc_id ) const
+    {return cell_nLocBas[nbc_id];}
 
     // ------------------------------------------------------------------------
     // access coordinates of a node in the local partition by indexing
     // the local_pt_xyz array
-    // 0 <= ii < 3 x num_local_node
+    // 0 <= ii < 3 x num_local_node[nbc_id]
     // ------------------------------------------------------------------------
-    virtual double get_local_pt_xyz(const int &ii) const {return local_pt_xyz[ii];}
+    virtual double get_local_pt_xyz( const int &nbc_id, const int &ii) const
+    {return local_pt_xyz[nbc_id][ii];}
 
     // ------------------------------------------------------------------------
     // access coordinates of a node in the local partition using its local index
     // and dir.
-    // 0 <= ii < num_local_node, 0 <= dir < 3
+    // 0 <= ii < num_local_node[nbc_id], 0 <= dir < 3
     // ------------------------------------------------------------------------
-    virtual double get_local_pt_xyz(const int &ii, const int &dir) const 
-    {return local_pt_xyz[3*ii+dir];}
+    virtual double get_local_pt_xyz( const int &nbc_id, const int &ii,
+        const int &dir) const 
+    {return local_pt_xyz[nbc_id][3*ii+dir];}
 
     // ------------------------------------------------------------------------
     // access an element's IEN array by indexing the local_tri_ien array
-    // 0 <= ii < cell_nLocBas x num_local_cell
+    // 0 <= ii < cell_nLocBas[nbc_id] x num_local_cell[nbc_id]
     // ------------------------------------------------------------------------
-    virtual int get_local_tri_ien(const int &ii) const {return local_tri_ien[ii];}
+    virtual int get_local_tri_ien( const int &nbc_id, const int &ii ) const
+    {return local_tri_ien[nbc_id][ii];}
 
     // ------------------------------------------------------------------------
     // access an element's IEN array by its local element index and surface element
     // node index
-    // 0 <= ee < num_local_cell, 0 <= ii < cell_nLocBas
+    // 0 <= ee < num_local_cell[nbc_id], 0 <= ii < cell_nLocBas[nbc_id]
     // ------------------------------------------------------------------------
-    virtual int get_local_tri_ien(const int &ee, const int &ii) const
-    { return local_tri_ien[ee * cell_nLocBas + ii]; }
+    virtual int get_local_tri_ien( const int &nbc_id, const int &ee,
+        const int &ii ) const
+    { return local_tri_ien[nbc_id][ee * cell_nLocBas[nbc_id] + ii]; }
 
     // ------------------------------------------------------------------------
     // get_ctrlPts_xyz: given surface element index eindex, return the
     // control point coordinates.
     // Users are responsible for allocating/deallocating memory for ctrl_(x/y/z)
-    // surface element id: 0 <= eindex < num_local_cell;
-    // ctrl_x/y/z : output coordinate arrays, each of length cell_nLocBas.
+    // surface element id: 0 <= eindex < num_local_cell[nbc_id];
+    // ctrl_x/y/z : output coordinate arrays, each of length cell_nLocBas[nbc_id].
     // ------------------------------------------------------------------------
-    virtual void get_ctrlPts_xyz( const int &eindex, double * const &ctrl_x,
-        double * const &ctrl_y, double * const &ctrl_z ) const;
+    virtual void get_ctrlPts_xyz( const int &nbc_id, const int &eindex,
+        double * const &ctrl_x, double * const &ctrl_y,
+        double * const &ctrl_z ) const;
 
     // ------------------------------------------------------------------------
     // get_SIEN: given surface element index eindex, return the IEN.
     // Users are responsible for allocating/deallocating memory for sien
-    // eindex : 0 <= eindex < num_local_cell
-    // sien : length cell_nLocBas.
+    // eindex : 0 <= eindex < num_local_cell[nbc_id]
+    // sien : length cell_nLocBas[nbc_id].
     // ------------------------------------------------------------------------
-    virtual void get_SIEN( const int &eindex, int * const &sien ) const;
+    virtual void get_SIEN( const int &nbc_id, const int &eindex,
+        int * const &sien ) const;
 
     // ------------------------------------------------------------------------
     // Generate filename Inlet_data.txt for inlet data
@@ -136,41 +151,46 @@ class ALocal_Inflow_NodalBC
     }
 
   private:
-    // Number of local Dirichlet nodes
-    int Num_LD;
+    // Number of local Dirichlet nodes. Length num_nbc
+    std::vector<int> Num_LD;
 
     // Global indices of the local Dirichlet nodes (inflow BC)
-    std::vector<int> LDN;
+    // num_nbc x Num_LD[ii]
+    std::vector< std::vector<int> > LDN;
 
-    // Outward normal vector
-    Vector_3 outnormal;
+    // Outward normal vector. Length num_nbc
+    std::vector<Vector_3> outnormal;
 
-    // Inflow surface active area
-    double act_area;
+    // Inflow surface active area. Length num_nbc
+    std::vector<double> act_area;
 
-    // Inflow surface full area
-    double ful_area;
+    // Inflow surface full area. Length num_nbc
+    std::vector<double> ful_area;
 
-    // Number of outer boundary points
-    int num_out_bc_pts;
+    // Number of outer boundary points. Length num_nbc
+    std::vector<int> num_out_bc_pts;
 
     // Coordinates of the outer boundary points
-    std::vector<double> outline_pts;
+    // num_nbc x num_out_bc_pts[ii]
+    std::vector< std::vector<double> > outline_pts;
 
-    // Centroid point's coordinates
-    Vector_3 centroid;
+    // Centroid point's coordinates. Length num_nbc
+    std::vector<Vector_3> centroid;
 
-    // Number of local nodes & cells, and cell's nLocBas
-    int num_local_node, num_local_cell, cell_nLocBas;
+    // Number of local nodes & cells, and cell's nLocBas. Length num_nbc
+    std::vector<int> num_local_node, num_local_cell, cell_nLocBas;
 
     // Nodal coordinates of all local nodes
-    std::vector<double> local_pt_xyz;
+    // num_nbc times (3 x num_local_node[ii])
+    std::vector< std::vector<double> > local_pt_xyz;
 
     // Surface IEN array of all local elements
-    std::vector<int> local_tri_ien;
+    // num_nbc times (cell_nLocBas[ii] x num_local_cell[ii])
+    std::vector< std::vector<int> > local_tri_ien;
 
     // Indices of all local nodes in the local volumetric partition's
     // local_to_global array
+    // num_nbc x num_local_node[ii]
     std::vector<int> local_node_pos;
 };
 

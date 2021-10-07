@@ -54,7 +54,7 @@ class NBC_Partition_3D_inflow : public NBC_Partition_3D
     std::vector< std::vector<double> > local_pt_xyz;
 
     // local cell IEN array
-    // num_nbc times (size cell_nLocBas[ii] x num_local_cell[ii])
+    // num_nbc times (cell_nLocBas[ii] x num_local_cell[ii])
     std::vector< std::vector<int> > local_tri_ien;
 
     // local node's global index
