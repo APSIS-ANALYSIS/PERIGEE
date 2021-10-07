@@ -79,29 +79,34 @@ void PGAssem_Tet_CMM_GenAlpha::EssBC_KG(
     const ALocal_NodalBC * const &nbc_part,
     const int &field )
 {
-  const int local_dir = nbc_part->get_Num_LD(field);
+  const int num_nbc = nbc_part->get_num_nbc();
 
-  if(local_dir > 0)
+  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
   {
-    for(int i=0; i<local_dir; ++i)
+    const int local_dir = nbc_part->get_Num_LD(nbc_id, field);
+
+    if(local_dir > 0)
     {
-      const int row = nbc_part->get_LDN(field, i) * dof_mat + field;
-      
-      VecSetValue(G, row, 0.0, INSERT_VALUES);
-      MatSetValue(K, row, row, 1.0, ADD_VALUES);
+      for(int ii=0; ii<local_dir; ++ii)
+      {
+        const int row = nbc_part->get_LDN(nbc_id, field, ii) * dof_mat + field;
+        
+        VecSetValue(G, row, 0.0, INSERT_VALUES);
+        MatSetValue(K, row, row, 1.0, ADD_VALUES);
+      }
     }
-  }
 
-  const int local_sla = nbc_part->get_Num_LPS(field);
-  if(local_sla > 0)
-  {
-    for(int i=0; i<local_sla; ++i)
+    const int local_sla = nbc_part->get_Num_LPS(nbc_id, field);
+    if(local_sla > 0)
     {
-      const int row = nbc_part->get_LPSN(field, i) * dof_mat + field;
-      const int col = nbc_part->get_LPMN(field, i) * dof_mat + field;
-      MatSetValue(K, row, col, 1.0, ADD_VALUES);
-      MatSetValue(K, row, row, -1.0, ADD_VALUES);
-      VecSetValue(G, row, 0.0, INSERT_VALUES);
+      for(int ii=0; ii<local_sla; ++ii)
+      {
+        const int row = nbc_part->get_LPSN(nbc_id, field, ii) * dof_mat + field;
+        const int col = nbc_part->get_LPMN(nbc_id, field, ii) * dof_mat + field;
+        MatSetValue(K, row, col, 1.0, ADD_VALUES);
+        MatSetValue(K, row, row, -1.0, ADD_VALUES);
+        VecSetValue(G, row, 0.0, INSERT_VALUES);
+      }
     }
   }
 }
@@ -268,23 +273,28 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_G(
 void PGAssem_Tet_CMM_GenAlpha::EssBC_G( const ALocal_NodalBC * const &nbc_part, 
     const int &field )
 {
-  const int local_dir = nbc_part->get_Num_LD(field);
-  if( local_dir > 0 )
-  {
-    for(int ii=0; ii<local_dir; ++ii)
-    {
-      const int row = nbc_part->get_LDN(field, ii) * dof_mat + field;
-      VecSetValue(G, row, 0.0, INSERT_VALUES);
-    }
-  }
+  const int num_nbc = nbc_part->get_num_nbc();
 
-  const int local_sla = nbc_part->get_Num_LPS(field);
-  if( local_sla > 0 )
+  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
   {
-    for(int ii=0; ii<local_sla; ++ii)
+    const int local_dir = nbc_part->get_Num_LD(nbc_id, field);
+    if( local_dir > 0 )
     {
-      const int row = nbc_part->get_LPSN(field, ii) * dof_mat + field;
-      VecSetValue(G, row, 0.0, INSERT_VALUES);
+      for(int ii=0; ii<local_dir; ++ii)
+      {
+        const int row = nbc_part->get_LDN(nbc_id, field, ii) * dof_mat + field;
+        VecSetValue(G, row, 0.0, INSERT_VALUES);
+      }
+    }
+
+    const int local_sla = nbc_part->get_Num_LPS(nbc_id, field);
+    if( local_sla > 0 )
+    {
+      for(int ii=0; ii<local_sla; ++ii)
+      {
+        const int row = nbc_part->get_LPSN(nbc_id, field, ii) * dof_mat + field;
+        VecSetValue(G, row, 0.0, INSERT_VALUES);
+      }
     }
   }
 }
