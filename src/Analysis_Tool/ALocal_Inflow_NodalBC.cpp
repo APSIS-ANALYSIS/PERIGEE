@@ -48,8 +48,7 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
     {
       num_out_bc_pts[nbc_id] = 0;
 
-      LDN[nbc_id].clear(); num_out_bc_pts[nbc_id].clear();
-      centroid[nbc_id].clear(); outline_pts[nbc_id].clear();
+      LDN[nbc_id].clear(); outline_pts[nbc_id].clear();
     }
  
     // If this partitioned sub-domain contains inlet surface element,

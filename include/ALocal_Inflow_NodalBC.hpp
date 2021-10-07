@@ -151,6 +151,8 @@ class ALocal_Inflow_NodalBC
     }
 
   private:
+    int num_nbc;
+
     // Number of local Dirichlet nodes. Length num_nbc
     std::vector<int> Num_LD;
 
@@ -191,7 +193,7 @@ class ALocal_Inflow_NodalBC
     // Indices of all local nodes in the local volumetric partition's
     // local_to_global array
     // num_nbc x num_local_node[ii]
-    std::vector<int> local_node_pos;
+    std::vector< std::vector<int> > local_node_pos;
 };
 
 #endif
