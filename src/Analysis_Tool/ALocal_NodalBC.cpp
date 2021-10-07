@@ -9,89 +9,109 @@ ALocal_NodalBC::ALocal_NodalBC( const std::string &fileBaseName,
 
   HDF5_Reader * h5r = new HDF5_Reader( file_id );
 
+  num_nbc = h5r -> read_intScalar(gname.c_str(), "num_nbc");
+
   nlocghonode = h5r->read_intScalar( "Local_Node", "nlocghonode" );
+
   LID = h5r->read_intVector( gname.c_str(), "LID" );
 
   SYS_T::print_fatal_if( LID.size() % nlocghonode != 0, "Error:ALocal_NodalBC, LID length is not compatible with local and ghost node number. \n");
 
   dof = LID.size() / nlocghonode;
 
-  // Read local dirichlet nodes
-  Num_LD = h5r->read_intVector( gname.c_str(), "Num_LD" );
+  LDN.resize(num_nbc);         Num_LD.resize(num_nbc);
+  LPSN.resize(num_nbc);        LPMN.resize(num_nbc);
+  LocalMaster.resize(num_nbc); LocalMasterSlave.resize(num_nbc);
+  Num_LPS.resize(num_nbc);     Num_LPM.resize(num_nbc);
 
-  int size_ldn = 0;
-  for( unsigned int ii=0; ii<Num_LD.size(); ++ii ) size_ldn += Num_LD[ii];
+  std::string groupbase(gname);
+  groupbase.append("/nbcid_");
 
-  LDN.clear();
-
-  if(size_ldn > 0) LDN = h5r->read_intVector( gname.c_str(), "LDN" );
-
-  SYS_T::print_fatal_if( int(LDN.size()) != size_ldn, "Error:ALocal_NodalBC, LDN length does not match Num_LD. \n");
-  
-  // Read local periodic nodes
-  Num_LPS = h5r->read_intVector( gname.c_str(), "Num_LPS" );
-
-  int size_lp = 0;
-  for(unsigned int ii=0; ii<Num_LPS.size(); ++ii) size_lp += Num_LPS[ii];
-
-  if( size_lp > 0 )
+  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
   {
-    LPSN = h5r->read_intVector( gname.c_str(), "LPSN" );
-    LPMN = h5r->read_intVector( gname.c_str(), "LPMN" );
-  }
+    std::string subgroup_name(groupbase);
+    subgroup_name.append( SYS_T::to_string(nbc_id) );
 
-  SYS_T::print_fatal_if( int(LPSN.size()) != size_lp, "Error: ALocal_NodalBC, LPSN length does not match Num_LPS. \n");
-  SYS_T::print_fatal_if( int(LPMN.size()) != size_lp, "Error: ALocal_NodalBC, LPMN length does not match Num_LPS. \n");
+    // Read local dirichlet nodes
+    Num_LD[nbc_id] = h5r->read_intVector( subgroup_name.c_str(), "Num_LD" );
 
-  // Read local periodic master nodes
-  Num_LPM = h5r->read_intVector( gname.c_str(), "Num_LPM" );
+    int size_ldn = 0;
+    for( unsigned int ii=0; ii<Num_LD[nbc_id].size(); ++ii )
+      size_ldn += Num_LD[nbc_id][ii];
 
-  size_lp = 0;
-  for(unsigned int ii=0; ii<Num_LPM.size(); ++ii) size_lp += Num_LPM[ii];
+    LDN[nbc_id].clear(); LPSN[nbc_id].clear(); LPMN[nbc_id].clear();
+    LocalMaster[nbc_id].clear(); LocalMasterSlave[nbc_id].clear();
 
-  if( size_lp > 0 )
-  {
-    LocalMaster = h5r->read_intVector( gname.c_str(), "LocalMaster" );
-    LocalMasterSlave = h5r->read_intVector( gname.c_str(), "LocalMasterSlave" );
-  }
-  
-  SYS_T::print_fatal_if( int(LocalMaster.size()) != size_lp, "Error: ALocal_NodalBC, LocalMaster length does not match Num_LPM. \n");
-  SYS_T::print_fatal_if( int(LocalMasterSlave.size()) != size_lp, "Error: ALocal_NodalBC, LocalMasterSlave length does not match Num_LPM. \n");
+    if( size_ldn > 0 )
+      LDN[nbc_id] = h5r->read_intVector( subgroup_name.c_str(), "LDN" );
+
+    SYS_T::print_fatal_if( int(LDN[nbc_id].size()) != size_ldn, "Error:ALocal_NodalBC, LDN length does not match Num_LD. \n" );
+    
+    // Read local periodic nodes
+    Num_LPS[nbc_id] = h5r->read_intVector( subgroup_name.c_str(), "Num_LPS" );
+
+    int size_lp = 0;
+    for(unsigned int ii=0; ii<Num_LPS[nbc_id].size(); ++ii)
+      size_lp += Num_LPS[nbc_id][ii];
+
+    if( size_lp > 0 )
+    {
+      LPSN[nbc_id] = h5r->read_intVector( subgroup_name.c_str(), "LPSN" );
+      LPMN[nbc_id] = h5r->read_intVector( subgroup_name.c_str(), "LPMN" );
+    }
+
+    SYS_T::print_fatal_if( int(LPSN[nbc_id].size()) != size_lp, "Error: ALocal_NodalBC, LPSN length does not match Num_LPS. \n" );
+    SYS_T::print_fatal_if( int(LPMN[nbc_id].size()) != size_lp, "Error: ALocal_NodalBC, LPMN length does not match Num_LPS. \n" );
+
+    // Read local periodic master nodes
+    Num_LPM[nbc_id] = h5r->read_intVector( subgroup_name.c_str(), "Num_LPM" );
+
+    size_lp = 0;
+    for(unsigned int ii=0; ii<Num_LPM[nbc_id].size(); ++ii)
+      size_lp += Num_LPM[nbc_id][ii];
+
+    if( size_lp > 0 )
+    {
+      LocalMaster[nbc_id]      = h5r->read_intVector( subgroup_name.c_str(), "LocalMaster" );
+      LocalMasterSlave[nbc_id] = h5r->read_intVector( subgroup_name.c_str(), "LocalMasterSlave" );
+    }
+    
+    SYS_T::print_fatal_if( int(LocalMaster[nbc_id].size()) != size_lp, "Error: ALocal_NodalBC, LocalMaster length does not match Num_LPM. \n" );
+    SYS_T::print_fatal_if( int(LocalMasterSlave[nbc_id].size()) != size_lp, "Error: ALocal_NodalBC, LocalMasterSlave length does not match Num_LPM. \n" );
+  } // end nbc_id-loop
 
   delete h5r; H5Fclose( file_id );
   
   // Generate the offsets 
-  LD_offset.clear();
-  LPS_offset.clear();
-  LPM_offset.clear();
-
-  LD_offset.push_back(0);
-  LPS_offset.push_back(0);
-  LPM_offset.push_back(0);
-
-  for(int ii=1; ii<dof; ++ii)
+  LD_offset.resize(num_nbc); LPS_offset.resize(num_nbc); LPM_offset.resize(num_nbc);
+  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
   {
-    LD_offset.push_back(LD_offset[ii-1] + Num_LD[ii-1]);
-    LPS_offset.push_back(LPS_offset[ii-1] + Num_LPS[ii-1]);
-    LPM_offset.push_back(LPM_offset[ii-1] + Num_LPM[ii-1]);
-  }
+    LD_offset[nbc_id].clear(); LPS_offset[nbc_id].clear(); LPM_offset[nbc_id].clear();
 
-  VEC_T::shrink2fit(LD_offset);
-  VEC_T::shrink2fit(LPS_offset);
-  VEC_T::shrink2fit(LPM_offset);
+    LD_offset[nbc_id].push_back(0);
+    LPS_offset[nbc_id].push_back(0);
+    LPM_offset[nbc_id].push_back(0);
+
+    for(int ii=1; ii<dof; ++ii)
+    {
+      LD_offset[nbc_id].push_back(  LD_offset[nbc_id][ii-1]  + Num_LD[nbc_id][ii-1]  );
+      LPS_offset[nbc_id].push_back( LPS_offset[nbc_id][ii-1] + Num_LPS[nbc_id][ii-1] );
+      LPM_offset[nbc_id].push_back( LPM_offset[nbc_id][ii-1] + Num_LPM[nbc_id][ii-1] );
+    }
+
+    VEC_T::shrink2fit( LD_offset[nbc_id]  );
+    VEC_T::shrink2fit( LPS_offset[nbc_id] );
+    VEC_T::shrink2fit( LPM_offset[nbc_id] );
+  }
 }
 
 ALocal_NodalBC::~ALocal_NodalBC()
 {
   clean_LocalMaster();
   VEC_T::clean(LID);
-  VEC_T::clean(LDN);
-  VEC_T::clean(LPSN);
-  VEC_T::clean(LPMN);
-  VEC_T::clean(Num_LD);
-  VEC_T::clean(Num_LPS);
-  VEC_T::clean(LD_offset);
-  VEC_T::clean(LPS_offset);
+  VEC_T::clean(LDN); VEC_T::clean(LPSN); VEC_T::clean(LPMN);
+  VEC_T::clean(Num_LD); VEC_T::clean(Num_LPS);
+  VEC_T::clean(LD_offset); VEC_T::clean(LPS_offset);
 }
 
 void ALocal_NodalBC::print_info() const
@@ -108,59 +128,63 @@ void ALocal_NodalBC::print_info() const
     std::cout<<"\n \n";
   }
 
-  std::cout<<"LDN: \n";
-  for(int ii=0; ii<dof; ++ii)
+  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
   {
-    std::cout<<"dof "<<ii<<'\n';
-    for(int jj=0; jj<Num_LD[ii]; ++jj)
-      std::cout<<get_LDN(ii, jj)<<'\t';
-    std::cout<<"\n \n";
-  }
+    std::cout<<"-- nbc_id = " << nbc_id << std::endl;
+    std::cout<<"   LDN: \n";
+    for(int ii=0; ii<dof; ++ii)
+    {
+      std::cout<<"   dof "<<ii<<'\n';
+      for(int jj=0; jj<Num_LD[nbc_id][ii]; ++jj)
+        std::cout<<"   "<<get_LDN(nbc_id, ii, jj)<<'\t';
+      std::cout<<"\n \n";
+    }
 
-  for(int ii=0; ii<dof; ++ii)
-  {
-    std::cout<<"dof: "<<ii<<'\t';
-    std::cout<<"Num_LD: "<<get_Num_LD(ii)<<'\t';
-    std::cout<<"Num_LPS: "<<get_Num_LPS(ii)<<'\t';
-    std::cout<<"Num_LPM: "<<get_Num_LPM(ii)<<'\n';
-  }
+    for(int ii=0; ii<dof; ++ii)
+    {
+      std::cout<<"   dof: "<<ii<<'\t';
+      std::cout<<"   Num_LD: " <<get_Num_LD( nbc_id, ii)<<'\t';
+      std::cout<<"   Num_LPS: "<<get_Num_LPS(nbc_id, ii)<<'\t';
+      std::cout<<"   Num_LPM: "<<get_Num_LPM(nbc_id, ii)<<'\n';
+    }
 
-  std::cout<<std::endl;
+    std::cout<<std::endl;
 
-  std::cout<<"LPSN: \n";
-  for(int ii=0; ii<dof; ++ii)
-  {
-    std::cout<<"dof "<<ii<<'\n';
-    for(int jj=0; jj<Num_LPS[ii]; ++jj)
-      std::cout<<get_LPSN(ii, jj)<<'\t';
-    std::cout<<"\n \n";
-  }
+    std::cout<<"   LPSN: \n";
+    for(int ii=0; ii<dof; ++ii)
+    {
+      std::cout<<"   dof "<<ii<<'\n';
+      for(int jj=0; jj<Num_LPS[nbc_id][ii]; ++jj)
+        std::cout<<"   "<<get_LPSN(nbc_id, ii, jj)<<'\t';
+      std::cout<<"\n \n";
+    }
 
-  std::cout<<"LPMN: \n";
-  for(int ii=0; ii<dof; ++ii)
-  {
-    std::cout<<"dof "<<ii<<'\n';
-    for(int jj=0; jj<Num_LPS[ii]; ++jj)
-      std::cout<<get_LPMN(ii, jj)<<'\t';
-    std::cout<<"\n \n";
-  }
+    std::cout<<"   LPMN: \n";
+    for(int ii=0; ii<dof; ++ii)
+    {
+      std::cout<<"   dof "<<ii<<'\n';
+      for(int jj=0; jj<Num_LPS[nbc_id][ii]; ++jj)
+        std::cout<<"   "<<get_LPMN(nbc_id, ii, jj)<<'\t';
+      std::cout<<"\n \n";
+    }
 
-  std::cout<<"LocalMaster: \n";
-  for(int ii=0; ii<dof; ++ii)
-  {
-    std::cout<<"dof "<<ii<<'\n';
-    for(int jj=0; jj<Num_LPM[ii]; ++jj)
-      std::cout<<get_LocalMaster(ii, jj)<<'\t';
-    std::cout<<"\n \n";
-  }
+    std::cout<<"   LocalMaster: \n";
+    for(int ii=0; ii<dof; ++ii)
+    {
+      std::cout<<"   dof "<<ii<<'\n';
+      for(int jj=0; jj<Num_LPM[nbc_id][ii]; ++jj)
+        std::cout<<get_LocalMaster(nbc_id, ii, jj)<<'\t';
+      std::cout<<"\n \n";
+    }
 
-  std::cout<<"LocalMasterSlave: \n";
-  for(int ii=0; ii<dof; ++ii)
-  {
-    std::cout<<"dof "<<ii<<'\n';
-    for(int jj=0; jj<Num_LPM[ii]; ++jj)
-      std::cout<<get_LocalMasterSlave(ii, jj)<<'\t';
-    std::cout<<"\n \n";
+    std::cout<<"   LocalMasterSlave: \n";
+    for(int ii=0; ii<dof; ++ii)
+    {
+      std::cout<<"   dof "<<ii<<'\n';
+      for(int jj=0; jj<Num_LPM[nbc_id][ii]; ++jj)
+        std::cout<<"   "<<get_LocalMasterSlave(nbc_id, ii, jj)<<'\t';
+      std::cout<<"\n \n";
+    }
   }
 }
 
