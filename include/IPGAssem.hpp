@@ -611,7 +611,8 @@ class IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_Inflow_NodalBC * const &infbc_part )
+        const ALocal_Inflow_NodalBC * const &infbc_part,
+        const int &nbc_id )
     {
       SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
       return 0.0;
@@ -641,7 +642,8 @@ class IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_Inflow_NodalBC * const &infbc_part )
+        const ALocal_Inflow_NodalBC * const &infbc_part,
+        const int &nbc_id )
     {
       SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
       return 0.0;

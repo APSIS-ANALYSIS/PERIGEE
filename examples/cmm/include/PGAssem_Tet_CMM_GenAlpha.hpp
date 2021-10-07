@@ -137,7 +137,8 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_Inflow_NodalBC * const &infbc_part );
+        const ALocal_Inflow_NodalBC * const &infbc_part,
+        const int &nbc_id );
 
     virtual double Assem_surface_ave_pressure(
         const PDNSolution * const &sol,
@@ -152,7 +153,8 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_Inflow_NodalBC * const &infbc_part );
+        const ALocal_Inflow_NodalBC * const &infbc_part,
+        const int &nbc_id );
 
     // Assembly routine for a matrix-free manner of getting the tangent
     // stiffness due to the reduced model coupling.
