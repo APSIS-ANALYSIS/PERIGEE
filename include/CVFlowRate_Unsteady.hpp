@@ -31,16 +31,33 @@ class CVFlowRate_Unsteady : public ICVFlowRate
 
     virtual ~CVFlowRate_Unsteady();
 
-    virtual double get_flow_rate(const double &time) const;
+    virtual double get_flow_rate( const int &nbc_id, const double &time ) const;
 
     virtual void print_info() const;
 
   private:
-    std::vector<double> coef_a, coef_b;
+    int num_nbc;
 
-    int num_of_mode;
+    std::vector< std::vector<double> > coef_a, coef_b;
 
-    double w, period;
+    std::vector<int> num_of_mode;
+
+    std::vector<double> w, period;
+
+    // ------------------------------------------------------------------------
+    // Generate a filename for inlet face nbc_id as Inlet_xxx_flowrate.txt
+    // ------------------------------------------------------------------------
+    virtual std::string gen_flowfile_name(const int &nbc_id) const
+    {
+      std::ostringstream ss;
+      ss << "Inlet_";
+      if( nbc_id/10 == 0 ) ss << "00";
+      else if( nbc_id/100 == 0 ) ss << "0";
+
+      ss << nbc_id << "_flowrate.txt";
+
+      return ss.str();
+    }
 };
 
 #endif

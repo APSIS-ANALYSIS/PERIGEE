@@ -12,77 +12,114 @@ CVFlowRate_Unsteady::CVFlowRate_Unsteady( const char * const &filename )
 
   std::istringstream sstrm;
   std::string sline;
+  std::string bc_type;
 
+  // The first non-commented, non-empty line should be
+  // Inflow num_nbc
   while( std::getline(reader, sline) )
   {
-    // The first non-commented non-empty line records
-    // num-of-mode w period
     if( sline[0] !='#' && !sline.empty() )
     {
       sstrm.str(sline);
-      sstrm >> num_of_mode;
-      sstrm >> w;
-      sstrm >> period;
+      sstrm >> bc_type;
+      sstrm >> num_nbc;
       sstrm.clear();
       break;
     }
   }
-  
-  // Allocate coef_a & coef_b 
-  coef_a.clear(); coef_b.clear();
-  
-  while( std::getline(reader, sline) )
+
+  if( bc_type.compare("Inflow") == 0 || bc_type.compare("INFLOW") == 0 )
   {
-    // The second non-commented non-empty line records coef_a
-    if( sline[0] !='#' && !sline.empty() )
-    {
-      sstrm.str(sline);
-      double temp_coef;
-      while( sstrm >> temp_coef ) coef_a.push_back( temp_coef );
-   
-      sstrm.clear(); 
-      break;
-    }
+    coef_a.resize(num_nbc); coef_b.resize(num_nbc);
+    num_of_mode.resize(num_nbc); w.resize(num_nbc); period.resize(num_nbc);
   }
+  else
+    SYS_T::print_fatal("CVFlowRate_Unsteady Error: inlet BC type in %s should be Inflow.\n", filename);
 
-  VEC_T::shrink2fit(coef_a);
-  
-  if(static_cast<int>(coef_a.size()) != num_of_mode+1) SYS_T::print_fatal("Error: CVFlowRate_Unsteady input file %s, the a-coefficient array is incompatible with the given number of modes.\n", filename);
-
-  while( std::getline(reader, sline) )
+  // Read in num_of_mode, w, period, coef_a, and coef_b per nbc
+  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
   {
-    // The third non-commented non-empty line records coef_b
-    if( sline[0] !='#' && !sline.empty() )
+    while( std::getline(reader, sline) )
     {
-      sstrm.str(sline);
-      double temp_coef;
-      while( sstrm >> temp_coef ) coef_b.push_back( temp_coef );
-   
-      sstrm.clear(); 
-      break;
+      // face_id num_of_mode w period
+      if( sline[0] !='#' && !sline.empty() )
+      {
+        sstrm.str(sline);
+        int face_id;
+        sstrm >> face_id;
+
+        if( face_id != nbc_id ) SYS_T::print_fatal("CVFlowRate_Unsteady Error: nbc in %s should be listed in ascending order.\n", filename);
+
+        sstrm >> num_of_mode[nbc_id];
+        sstrm >> w[nbc_id];
+        sstrm >> period[nbc_id];
+
+        sstrm.clear();
+        break;
+      }
     }
+
+    // Check the compatibility of period and w. If the difference
+    // is larger than 0.01, print a warning message
+    if( std::abs(2.0 * MATH_T::PI / period[nbc_id] - w[nbc_id] ) >= 0.01 )
+      SYS_T::commPrint( "\nCVFlowRate_Unsteady WARNING: nbc_id %d incompatible period and w, \n2xpi/period = %e and w = %e.\n", nbc_id, 2.0*MATH_T::PI/period[nbc_id], w[nbc_id] );
+
+    coef_a[nbc_id].clear(); coef_b[nbc_id].clear(); 
+
+    while( std::getline(reader, sline) )
+    {
+      // coef_a
+      if( sline[0] !='#' && !sline.empty() )
+      {
+        sstrm.str(sline);
+        double temp_coef;
+        while( sstrm >> temp_coef ) coef_a[nbc_id].push_back( temp_coef );
+     
+        sstrm.clear(); 
+        break;
+      }
+    }
+
+    VEC_T::shrink2fit( coef_a[nbc_id] );
+    
+    if( static_cast<int>(coef_a[nbc_id].size()) != num_of_mode[nbc_id]+1 )
+      SYS_T::print_fatal("CVFlowRate_Unsteady Error: nbc_id %d a-coefficients in %s incompatible with the given number of modes.\n", nbc_id, filename);
+
+    while( std::getline(reader, sline) )
+    {
+      // coef_b
+      if( sline[0] !='#' && !sline.empty() )
+      {
+        sstrm.str(sline);
+        double temp_coef;
+        while( sstrm >> temp_coef ) coef_b[nbc_id].push_back( temp_coef );
+     
+        sstrm.clear(); 
+        break;
+      }
+    }
+
+    VEC_T::shrink2fit( coef_b[nbc_id] );
+
+    if( static_cast<int>(coef_b[nbc_id].size()) != num_of_mode[nbc_id]+1 )
+      SYS_T::print_fatal("CVFlowRate_Unsteady Error: nbc_id %d b-coefficients in %s incompatible with the given number of modes.\n", nbc_id, filename);
   }
-
-  VEC_T::shrink2fit(coef_b);
-
-  if(static_cast<int>(coef_b.size()) != num_of_mode+1) SYS_T::print_fatal("Error: CVFlowRate_Unsteady input file %s, the b-coefficient array is incompatible with the given number of modes.\n", filename);
 
   // Finish reading the file and close it
   reader.close();
 
-  // Check the compatibility of period and w, if the difference
-  // is larger than 0.01, print a warning message
-  if( std::abs(2.0 * MATH_T::PI / period - w ) >= 0.01 ) SYS_T::commPrint("\nWARNING: CVFlowRate_Unsteady period and w does not match well: \n2xpi/period = %e and w = %e.\n", 2.0*MATH_T::PI/period, w);
-
   // Calculate the flow rate and record them on disk as 
-  // Inlet_flowrate.txt with sampling interval 0.001
-  if( SYS_T::get_MPI_rank() == 0 )
+  // Inlet_XXX_flowrate.txt with sampling interval 0.001
+  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
   {
-    std::ofstream ofile;
-    ofile.open( "Inlet_flowrate.txt", std::ofstream::out | std::ofstream::trunc );
-    for(double tt = 0.0; tt <= period; tt += 0.001 )
-      ofile << tt <<'\t'<<get_flow_rate(tt)<< '\n';
-    ofile.close();
+    if( SYS_T::get_MPI_rank() == 0 )
+    {
+      std::ofstream ofile;
+      ofile.open( gen_flowfile_name(nbc_id).c_str(), std::ofstream::out | std::ofstream::trunc );
+      for(double tt = 0.0; tt <= period[nbc_id]; tt += 0.001 )
+        ofile << tt <<'\t'<<get_flow_rate(nbc_id, tt)<< '\n';
+      ofile.close();
+    }
   }
 
   MPI_Barrier(PETSC_COMM_WORLD);
@@ -92,17 +129,22 @@ CVFlowRate_Unsteady::CVFlowRate_Unsteady( const char * const &filename )
 CVFlowRate_Unsteady::~CVFlowRate_Unsteady()
 {
   VEC_T::clean(coef_a); VEC_T::clean(coef_b);
+  VEC_T::clean(num_of_mode); VEC_T::clean(w); VEC_T::clean(period);
 }
 
 
-double CVFlowRate_Unsteady::get_flow_rate(const double &time) const
+double CVFlowRate_Unsteady::get_flow_rate( const int &nbc_id,
+    const double &time ) const
 {
-  const int num_of_past_period = time / period;
-  const double local_time = time - num_of_past_period * period;
+  const int num_of_past_period = time / period[nbc_id];
+  const double local_time = time - num_of_past_period * period[nbc_id];
 
-  double sum = coef_a[0];
-  for(int ii=1; ii<=num_of_mode; ++ii)
-    sum += coef_a[ii]*cos( ii*w*local_time ) + coef_b[ii]*sin(ii*w*local_time);
+  double sum = coef_a[nbc_id][0];
+  for( int ii = 1; ii <= num_of_mode[nbc_id]; ++ii )
+  {
+    sum += coef_a[nbc_id][ii] * cos( ii*w[nbc_id]*local_time ) +
+      coef_b[nbc_id][ii] * sin( ii*w[nbc_id]*local_time );
+  }
 
   return sum;
 }
@@ -111,9 +153,16 @@ void CVFlowRate_Unsteady::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
   SYS_T::commPrint("  CVFlowRate_Unsteady:\n");
-  SYS_T::commPrint("  w = %e, period =%e \n", w, period);
-  SYS_T::commPrint("  a[0] + Sum{ a[i] cos(i x w x t) + b[i] sin(i x w x t) }, for i = 1,...,%d. \n", num_of_mode);
-  for(int ii=0; ii<=num_of_mode; ++ii) SYS_T::commPrint("  i = %d, a = %e, b = %e \n", ii, coef_a[ii], coef_b[ii]);
+
+  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
+  {
+    SYS_T::commPrint("  -- nbc_id = %d", nbc_id);
+    SYS_T::commPrint("     w = %e, period =%e \n", w[nbc_id], period[nbc_id]);
+    SYS_T::commPrint("     a[0] + Sum{ a[i] cos(i x w x t) + b[i] sin(i x w x t) }, for i = 1,...,%d. \n", num_of_mode[nbc_id]);
+    for(int ii=0; ii<=num_of_mode[nbc_id]; ++ii)
+      SYS_T::commPrint("     i = %d, a = %e, b = %e \n", ii, coef_a[nbc_id][ii], coef_b[nbc_id][ii]);
+  }
+
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
