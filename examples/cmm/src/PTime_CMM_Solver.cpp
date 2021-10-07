@@ -224,21 +224,24 @@ void PTime_CMM_Solver::TM_CMM_GenAlpha(
 
     MPI_Barrier(PETSC_COMM_WORLD);
 
-    // Calculate the inlet data
-    const double inlet_face_flrate = gassem_ptr -> Assem_surface_flowrate(
-        cur_sol, lassem_fluid_ptr, elements, quad_s, infnbc_part ); 
-
-    const double inlet_face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
-        cur_sol, lassem_fluid_ptr, elements, quad_s, infnbc_part );
-
-    if( SYS_T::get_MPI_rank() == 0 )
+    // Calculate the flow rate & average pressure on all inlets
+    for(int face=0; face<infnbc_part -> get_num_nbc(); ++face)
     {
-      std::ofstream ofile;
-      ofile.open( infnbc_part->gen_flowfile_name().c_str(), std::ofstream::out | std::ofstream::app );
-      ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
-      ofile.close();
-    } 
-    MPI_Barrier(PETSC_COMM_WORLD);
+      const double inlet_face_flrate = gassem_ptr -> Assem_surface_flowrate(
+          cur_sol, lassem_fluid_ptr, elements, quad_s, infnbc_part, face ); 
+
+      const double inlet_face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
+          cur_sol, lassem_fluid_ptr, elements, quad_s, infnbc_part, face );
+
+      if( SYS_T::get_MPI_rank() == 0 )
+      {
+        std::ofstream ofile;
+        ofile.open( infnbc_part->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
+        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
+        ofile.close();
+      } 
+      MPI_Barrier(PETSC_COMM_WORLD);
+    }
     
     // Prepare for next time step
     pre_sol->Copy(*cur_sol);

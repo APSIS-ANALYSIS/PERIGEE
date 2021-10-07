@@ -148,10 +148,15 @@ class ALocal_Inflow_NodalBC
     // ------------------------------------------------------------------------
     // Generate filename Inlet_data.txt for inlet data
     // ------------------------------------------------------------------------
-    virtual std::string gen_flowfile_name() const
+    virtual std::string gen_flowfile_name( const int &nbc_id ) const
     {
       std::ostringstream ss;
-      ss<<"Inlet_data.txt";
+      ss << "Inlet_";
+
+      if( nbc_id/10 == 0 ) ss << "00";
+      else if( nbc_id/100 == 0 ) ss << "0";
+
+      ss << nbc_id << "_data.txt";
       return ss.str();
     }
 
