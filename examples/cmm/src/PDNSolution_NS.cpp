@@ -136,10 +136,19 @@ void PDNSolution_NS::Init_flow_parabolic(
 
           const double vel = vmax * (1.0 - r*r);
 
+          // ==== AORTA3DPRINT CHANGES BEGIN ====
+          value[1] = vel * out_nx;
+          value[2] = vel * out_ny;
+          value[3] = vel * out_nz;
+
           // -1.0 is multiplied to make the flow direction inward
-          value[1] = vel * (-1.0) * out_nx;
-          value[2] = vel * (-1.0) * out_ny;
-          value[3] = vel * (-1.0) * out_nz;
+          if( nbc_id == 0 )
+          {
+            value[1] *= (-1.0);
+            value[2] *= (-1.0);
+            value[3] *= (-1.0);
+          }
+          // ==== AORTA3DPRINT CHANGES BEGIN ====
 
           VecSetValues(solution, 4, location, value, INSERT_VALUES);
         }
