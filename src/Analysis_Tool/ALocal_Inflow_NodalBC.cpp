@@ -13,10 +13,14 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
 
   num_nbc = h5r -> read_intScalar( gname.c_str(), "num_nbc" );
 
-  act_area.resize(num_nbc); ful_area.resize(num_nbc); num_out_bc_pts.resize(num_nbc);
-  num_local_node.resize(num_nbc); num_local_cell.resize(num_nbc);
-  cell_nLocBas.resize(num_nbc); outnormal.resize(num_nbc);
-  Num_LD.resize(num_nbc); LDN.resize(num_nbc);
+  act_area       = h5r->read_doubleVector( gname.c_str(), "Inflow_active_area" );
+  ful_area       = h5r->read_doubleVector( gname.c_str(), "Inflow_full_area" );
+  cell_nLocBas   = h5r->read_intVector(    gname.c_str(), "cell_nLocBas" );
+  num_local_cell = h5r->read_intVector(    gname.c_str(), "num_local_cell" );
+  num_local_node = h5r->read_intVector(    gname.c_str(), "num_local_node" );
+  num_out_bc_pts = h5r->read_intVector(    gname.c_str(), "num_out_bc_pts" );
+
+  outnormal.resize(num_nbc); Num_LD.resize(num_nbc); LDN.resize(num_nbc);
   centroid.resize(num_nbc); outline_pts.resize(num_nbc);
   local_pt_xyz.resize(num_nbc); local_tri_ien.resize(num_nbc); local_node_pos.resize(num_nbc);
 
@@ -28,19 +32,13 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
     std::string subgroup_name(groupbase);
     subgroup_name.append( SYS_T::to_string(nbc_id) );
 
-    act_area[nbc_id]       = h5r->read_doubleScalar( subgroup_name.c_str(), "Inflow_active_area" );
-    ful_area[nbc_id]       = h5r->read_doubleScalar( subgroup_name.c_str(), "Inflow_full_area" );
-    num_local_node[nbc_id] = h5r->read_intScalar(    subgroup_name.c_str(), "num_local_node" );
-    num_local_cell[nbc_id] = h5r->read_intScalar(    subgroup_name.c_str(), "num_local_cell" );
-    cell_nLocBas[nbc_id]   = h5r->read_intScalar(    subgroup_name.c_str(), "cell_nLocBas" );
     outnormal[nbc_id]      = h5r->read_Vector_3(     subgroup_name.c_str(), "Outward_normal_vector" );
-    Num_LD[nbc_id]         = h5r -> read_intScalar(  subgroup_name.c_str(), "Num_LD" );
+    Num_LD[nbc_id]         = h5r->read_intScalar(  subgroup_name.c_str(), "Num_LD" );
 
     // If this sub-domain contains local inflow bc points, load the LDN array.
     if( Num_LD[nbc_id] > 0 )
     {
       LDN[nbc_id]            = h5r->read_intVector( subgroup_name.c_str(), "LDN" );
-      num_out_bc_pts[nbc_id] = h5r->read_intScalar(    subgroup_name.c_str(), "num_out_bc_pts" );
       centroid[nbc_id]       = h5r->read_Vector_3(     subgroup_name.c_str(), "centroid" );
       outline_pts[nbc_id]    = h5r->read_doubleVector( subgroup_name.c_str(), "outline_pts" );
     }
