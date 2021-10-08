@@ -19,7 +19,7 @@ class ICVFlowRate
 
     virtual ~ICVFlowRate(){};
 
-    virtual double get_flow_rate( const double &time ) const = 0;
+    virtual double get_flow_rate( const int &nbc_id, const double &time ) const = 0;
 
     virtual void print_info() const = 0;
 };
