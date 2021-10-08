@@ -18,7 +18,7 @@ class CVFlowRate_Linear2Steady : public ICVFlowRate
   public:
     // From time 0 to in_time, the flow rate = time * flrate / in_thred_time
     // From in_time to infty, flow_rate = flrate
-    CVFlowRate_Linear2Steady( const ALocal_Inflow_NodalBC * const infnbc_part,
+    CVFlowRate_Linear2Steady( const ALocal_Inflow_NodalBC * const &infnbc_part,
         const double &in_thred_time, const double &flrate );
 
     virtual ~CVFlowRate_Linear2Steady();

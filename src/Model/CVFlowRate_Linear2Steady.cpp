@@ -1,7 +1,7 @@
 #include "CVFlowRate_Linear2Steady.hpp"
 
 CVFlowRate_Linear2Steady::CVFlowRate_Linear2Steady(
-    const ALocal_Inflow_NodalBC * const infnbc_part,
+    const ALocal_Inflow_NodalBC * const &infnbc_part,
     const double &in_thred_time, const double &flrate )
 : num_nbc(infnbc_part->get_num_nbc()), thred_time(in_thred_time), target_flow_rate(flrate)
 {
