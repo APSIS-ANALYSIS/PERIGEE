@@ -341,12 +341,14 @@ int main( int argc, char *argv[] )
 
   tm_galpha_ptr->print_info();
 
+  // ==== AORTA3DPRINT CHANGES BEGIN ====
   // ===== Local assembly routine =====
   IPLocAssem * locAssem_ptr = new PLocAssem_Tet_CMM_GenAlpha(
       tm_galpha_ptr, quadv->get_num_quadPts(), quads->get_num_quadPts(),
-      fluid_density, fluid_mu, bs_beta,
+      locebc, fluid_density, fluid_mu, bs_beta,
       wall_density, wall_poisson, wall_kappa,
       c_tauc, GMIptr->get_elemType() );
+  // ==== AORTA3DPRINT CHANGES END ====
 
   // ===== Initial condition =====
   // base generates a parabolic velocity profile at the inlet with unit flow rate

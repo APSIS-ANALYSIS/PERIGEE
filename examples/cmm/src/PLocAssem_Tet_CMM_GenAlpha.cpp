@@ -133,7 +133,6 @@ PLocAssem_Tet_CMM_GenAlpha::PLocAssem_Tet_CMM_GenAlpha(
 
   // Finish reading the file and close it
   reader.close();
-
   // ==== AORTA3DPRINT CHANGES END ====
 
   vec_size = nLocBas * 4; // dof_per_node = 4
@@ -195,6 +194,17 @@ void PLocAssem_Tet_CMM_GenAlpha::print_info() const
   SYS_T::commPrint("  1. Consistent tangent matrix used. \n");
   SYS_T::commPrint("  2. Nonlinear quadratic term is in advective form. \n");
   SYS_T::commPrint("  3. Pressure is evaluated at n+alpha_f rather than n+1. \n");
+
+  // ==== AORTA3DPRINT CHANGES BEGIN ====
+  for(int ebc_id=0; ebc_id<num_ebc; ++ebc_id)
+  {
+    SYS_T::commPrint("  -- ebc_id = %d", ebc_id);
+    SYS_T::commPrint("     w = %e, period =%e \n", w[ebc_id], period[ebc_id]);
+    SYS_T::commPrint("     a[0] + Sum{ a[i] cos(i x w x t) + b[i] sin(i x w x t) }, for i = 1,...,%d. \n", num_of_mode[ebc_id]);
+    for(int ii=0; ii<=num_of_mode[ebc_id]; ++ii)
+      SYS_T::commPrint("     i = %d, a = %e, b = %e \n", ii, coef_a[ebc_id][ii], coef_b[ebc_id][ii]);
+  }
+  // ==== AORTA3DPRINT CHANGES END ====
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
