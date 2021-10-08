@@ -8,6 +8,7 @@
 // ==================================================================
 #include "IPLocAssem.hpp"
 #include "TimeMethod_GenAlpha.hpp"
+#include "ALocal_EBC.hpp"
 
 class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
 {
@@ -15,6 +16,7 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
     PLocAssem_Tet_CMM_GenAlpha(
         const TimeMethod_GenAlpha * const &tm_gAlpha,
         const int &in_nqp, const int &in_face_nqp, 
+        const ALocal_EBC * const &part_ebc,
         const double &in_rho, 
         const double &in_vis_mu, const double &in_beta,
         const double &in_wall_rho, const double &in_nu,
@@ -194,6 +196,16 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
 
     std::vector<double> d2R_dxx, d2R_dyy, d2R_dzz;
 
+    // ==== AORTA3DPRINT CHANGES BEGIN ====
+    int num_ebc;
+
+    std::vector< std::vector<double> > coef_a, coef_b;
+
+    std::vector<int> num_of_mode;
+
+    std::vector<double> w, period;
+    // ==== AORTA3DPRINT CHANGES END ====
+
     // Private functions
     void print_info() const;
 
@@ -244,7 +256,17 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
         const double &t, const double &nx, const double &ny,
         const double &nz, double &gx, double &gy, double &gz ) const
     {
-      return ((*this).*(flist[ebc_id]))(x,y,z,t,nx,ny,nz,gx,gy,gz);
+      double P = coef_a[ebc_id][0]; 
+
+      for( int ii = 1; ii <= num_of_mode[ebc_id]; ++ii )
+      {
+        P += coef_a[ebc_id][ii] * cos( ii*w[ebc_id]*t ) +
+             coef_b[ebc_id][ii] * sin( ii*w[ebc_id]*t );
+      }
+
+      gx = -P * nx; gy = -P * ny; gz = -P * nz;
+
+      // return ((*this).*(flist[ebc_id]))(x,y,z,t,nx,ny,nz,gx,gy,gz);
     }
 };
 
