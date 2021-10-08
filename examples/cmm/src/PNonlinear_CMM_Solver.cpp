@@ -477,7 +477,7 @@ void PNonlinear_CMM_Solver::rescale_inflow_value( const double &stime,
   for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
   {
     const int numnode = infbc -> get_Num_LD( nbc_id );
-    const double factor = flrate -> get_flow_rate( stime );
+    const double factor = flrate -> get_flow_rate( nbc_id, stime );
 
     for(int ii=0; ii<numnode; ++ii)
     {

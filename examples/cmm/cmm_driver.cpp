@@ -322,7 +322,7 @@ int main( int argc, char *argv[] )
   if( SYS_T::file_exist( inflow_file ) )
     inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
   else
-    inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_tgt_rate );
+    inflow_rate_ptr = new CVFlowRate_Linear2Steady( locinfnbc, inflow_thd_time, inflow_tgt_rate );
 
   inflow_rate_ptr->print_info();
 
@@ -531,27 +531,30 @@ int main( int argc, char *argv[] )
   if( rank == 0) gbc -> write_0D_sol ( initial_index, initial_time );
 
   // ===== Inlet data recording files =====
-  const double inlet_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-      sol, locAssem_ptr, elements, quads, locinfnbc );
-
-  const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
-      sol, locAssem_ptr, elements, quads, locinfnbc );
-
-  if( rank == 0 )
+  for(int ff=0; ff<locinfnbc->get_num_nbc(); ++ff)
   {
-    std::ofstream ofile;
-    if( !is_restart )
-      ofile.open( locinfnbc->gen_flowfile_name().c_str(), std::ofstream::out | std::ofstream::trunc );
-    else
-      ofile.open( locinfnbc->gen_flowfile_name().c_str(), std::ofstream::out | std::ofstream::app );
+    const double inlet_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
+        sol, locAssem_ptr, elements, quads, locinfnbc, ff );
 
-    if( !is_restart )
+    const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
+        sol, locAssem_ptr, elements, quads, locinfnbc, ff );
+
+    if( rank == 0 )
     {
-      ofile<<"Time index"<<'\t'<<"Time"<<'\t'<<"Flow rate"<<'\t'<<"Face averaged pressure"<<'\n';
-      ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
-    }
+      std::ofstream ofile;
+      if( !is_restart )
+        ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
+      else
+        ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
 
-    ofile.close();
+      if( !is_restart )
+      {
+        ofile<<"Time index"<<'\t'<<"Time"<<'\t'<<"Flow rate"<<'\t'<<"Face averaged pressure"<<'\n';
+        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
+      }
+
+      ofile.close();
+    }
   }
 
   MPI_Barrier(PETSC_COMM_WORLD);
