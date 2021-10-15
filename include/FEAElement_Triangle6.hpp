@@ -79,25 +79,14 @@ class FEAElement_Triangle6 : public FEAElement
     const int numQuapts;
 
     // length 6 x numQuapts
-    double * R;
-    double * dR_dx;
-    double * dR_dy;
-    double * d2R_dxx;
-    double * d2R_dyy;
-    double * d2R_dxy;
+    double * R, * dR_dx, * dR_dy;
+    double * d2R_dxx, * d2R_dyy, * d2R_dxy;
 
     // length 9 x numQuapts
     // dx_ds : 0             <= ii < 4 * numQuapts
     // ds_dx : 4 * numQuapts <= ii < 8 * numQuapts
     // detJac: 8 * numQuapts <= ii < 9 * numQuapts
     double * Jac;
-  
-    // auxiliary data
-    double * dR_dr;
-    double * dR_ds;
-    double * d2R_drr;
-    double * d2R_dss;
-    double * d2R_drs;
 };
 
 #endif

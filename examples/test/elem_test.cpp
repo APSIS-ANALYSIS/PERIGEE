@@ -6,8 +6,8 @@ int main( int argc, char * argv[] )
 {
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
-  const double r = 0.2;
-  const double s = 0.1;
+  const double r = 0.237;
+  const double s = 0.15;
   IQuadPts * quadv = new QuadPts_debug( 4, 1, {r, s, 0.0, 1.0-r-s-0.0}, {1.0} );
   IQuadPts * quads = new QuadPts_debug( 3, 1, {r, s, 1.0-r-s}, {1.0});
 
