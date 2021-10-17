@@ -37,6 +37,7 @@
 // ==================================================================
 #include "FEAElement.hpp"
 #include "Matrix_double_6by6_Array.hpp"
+#include "Matrix_double_3by3_Array.hpp"
 
 class FEAElement_Tet10 : public FEAElement
 {
