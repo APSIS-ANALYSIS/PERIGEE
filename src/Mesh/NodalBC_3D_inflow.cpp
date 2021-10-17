@@ -241,7 +241,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   }
   else SYS_T::print_fatal("Error: unknown element type.\n");
 
-  delete [] temp_sol;
+  delete [] temp_sol; temp_sol = nullptr;
 
   // Finish and print info on screen
   std::cout<<"===> NodalBC_3D_inflow specified by "<<inffile<<", with nodes on \n";
@@ -474,7 +474,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileLis
     }
     else SYS_T::print_fatal("Error: unknown element type.\n");
 
-    delete [] temp_sol;
+    delete [] temp_sol; temp_sol = nullptr;
 
   } // end ii-loop
 
