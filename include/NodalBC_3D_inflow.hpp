@@ -47,38 +47,38 @@ class NodalBC_3D_inflow : public INodalBC
 
     virtual ~NodalBC_3D_inflow() {};
 
-    virtual double get_para_1(const int &nbc_id) const {return inf_active_area[nbc_id];}
+    virtual double get_para_1(const int &nbc_id = 0) const {return inf_active_area[nbc_id];}
 
-    virtual Vector_3 get_para_2(const int &nbc_id) const {return outnormal[nbc_id];}
+    virtual Vector_3 get_para_2(const int &nbc_id = 0) const {return outnormal[nbc_id];}
 
     // Access to the number of outline boundary points.
-    virtual int get_para_3(const int &nbc_id) const {return num_out_bc_pts[nbc_id];}
+    virtual int get_para_3(const int &nbc_id = 0) const {return num_out_bc_pts[nbc_id];}
 
     // Access to the centroid coordinates.
-    virtual Vector_3 get_para_4(const int &nbc_id) const {return centroid[nbc_id];}
+    virtual Vector_3 get_para_4(const int &nbc_id = 0) const {return centroid[nbc_id];}
 
     // Access to the outline points. ii ranges from 0 to 3 x num_out_bc_pts[nbc_id];
     virtual double get_para_5(const int &nbc_id, const int &ii) const
     {return outline_pts[nbc_id][ii];}
 
     // Access to the face area
-    virtual double get_para_6(const int &nbc_id) const {return face_area[nbc_id];}
+    virtual double get_para_6(const int &nbc_id = 0) const {return face_area[nbc_id];}
 
     // Access to the integral of NA
-    virtual std::vector<double> get_intNA(const int &nbc_id) const
+    virtual std::vector<double> get_intNA(const int &nbc_id = 0) const
     {return intNA[nbc_id];}
 
     // Access to num_nbc
     virtual int get_num_nbc() const {return num_nbc;}
 
     // Access to num_node
-    virtual int get_num_node(const int &nbc_id) const {return num_node[nbc_id];}
+    virtual int get_num_node(const int &nbc_id = 0) const {return num_node[nbc_id];}
 
     // Access to num_cell
-    virtual int get_num_cell(const int &nbc_id) const {return num_cell[nbc_id];}
+    virtual int get_num_cell(const int &nbc_id = 0) const {return num_cell[nbc_id];}
 
     // Access to (surface) nLocBas
-    virtual int get_nLocBas(const int &nbc_id) const {return nLocBas[nbc_id];}
+    virtual int get_nLocBas(const int &nbc_id = 0) const {return nLocBas[nbc_id];}
 
     // Access to (surface) ien
     virtual int get_ien(const int &nbc_id, const int &cell, const int &lnode) const
@@ -101,6 +101,7 @@ class NodalBC_3D_inflow : public INodalBC
   private:
     NodalBC_3D_inflow() : num_nbc(0) {};
 
+    // number of inlet surfaces
     const int num_nbc;
     
     // This is the area calculated by setting the wall nodes to be zero.
