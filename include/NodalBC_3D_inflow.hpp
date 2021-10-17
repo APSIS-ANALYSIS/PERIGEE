@@ -61,6 +61,8 @@ class NodalBC_3D_inflow : public INodalBC
     virtual double get_para_5(const int &nbc_id, const int &ii) const
     {return outline_pts[nbc_id][ii];}
 
+    virtual double get_para_5(const int &ii) const {return outline_pts[0][ii];}
+
     // Access to the face area
     virtual double get_para_6(const int &nbc_id = 0) const {return face_area[nbc_id];}
 
@@ -84,19 +86,31 @@ class NodalBC_3D_inflow : public INodalBC
     virtual int get_ien(const int &nbc_id, const int &cell, const int &lnode) const
     {return tri_ien[nbc_id][ nLocBas[nbc_id] * cell + lnode ];}
 
+    virtual int get_ien(const int &cell, const int &lnode) const
+    {return tri_ien[0][ nLocBas[0] * cell + lnode ];}
+
     // Access to point coordinates, 
     // node = 0, ..., num_node-1.
     // dir  = 0, 1, 2.
     virtual double get_pt_xyz(const int &nbc_id, const int &node, const int &dir) const
     {return pt_xyz[nbc_id][3*node+dir];}
 
+    virtual double get_pt_xyz(const int &node, const int &dir) const
+    {return pt_xyz[0][3*node+dir];}
+
     // Access to volumetric nodal index
     virtual int get_global_node(const int &nbc_id, const int &node_idx) const
     {return global_node[nbc_id][node_idx];}
 
+    virtual int get_global_node(const int &node_idx) const
+    {return global_node[0][node_idx];}
+
     // Access to volumetric cell index
     virtual int get_global_cell(const int &nbc_id, const int &cell_idx) const
     {return global_cell[nbc_id][cell_idx];}
+
+    virtual int get_global_cell(const int &cell_idx) const
+    {return global_cell[0][cell_idx];}
 
   private:
     NodalBC_3D_inflow() : num_nbc(0) {};

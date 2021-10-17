@@ -129,6 +129,12 @@ class INodalBC
       return 0.0;
     }
     
+    virtual double get_para_5(const int &ii) const
+    {
+      SYS_T::print_fatal("Error: INodalBC::get_para_5 is not implemented.\n");
+      return 0.0;
+    }
+
     // --------------------------------------------------------------
     // get_para_6() passes additional parameters from the specific
     //              instantiations.
@@ -190,10 +196,22 @@ class INodalBC
       return -1;
     }
 
+    virtual int get_ien(const int &cell, const int &lnode) const
+    {
+      SYS_T::commPrint("Warning: get_ien is not implemented. \n");
+      return -1;
+    }
+
     // --------------------------------------------------------------
     // get_pt_xyz returns the points' coordinates
     // --------------------------------------------------------------
     virtual double get_pt_xyz(const int &nbc_id, const int &node, const int &dir) const
+    {
+      SYS_T::commPrint("Warning: get_pt_xyz is not implemented. \n");
+      return -1.0;
+    }
+
+    virtual double get_pt_xyz(const int &node, const int &dir) const
     {
       SYS_T::commPrint("Warning: get_pt_xyz is not implemented. \n");
       return -1.0;
@@ -208,10 +226,22 @@ class INodalBC
       return -1;
     }
 
+    virtual int get_global_node(const int &node_idx) const
+    {
+      SYS_T::commPrint("Warning: get_global_node is not implemented. \n");
+      return -1;
+    }
+
     // --------------------------------------------------------------
     // get_global_cell returns the cell's global volumetric index
     // --------------------------------------------------------------
     virtual int get_global_cell(const int &nbc_id, const int &cell_idx) const
+    {
+      SYS_T::commPrint("Warning: get_global_cell is not implemented. \n");
+      return -1;
+    } 
+
+    virtual int get_global_cell(const int &cell_idx) const
     {
       SYS_T::commPrint("Warning: get_global_cell is not implemented. \n");
       return -1;
