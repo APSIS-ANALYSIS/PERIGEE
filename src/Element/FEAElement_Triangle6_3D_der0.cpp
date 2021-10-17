@@ -5,15 +5,6 @@ FEAElement_Triangle6_3D_der0::FEAElement_Triangle6_3D_der0( const int &in_nqua )
 {
   R = new double [6*numQuapts];
   
-  dx_dr = new double [numQuapts];
-  dx_ds = new double [numQuapts];
-
-  dy_dr = new double [numQuapts];
-  dy_ds = new double [numQuapts];
-  
-  dz_dr = new double [numQuapts];
-  dz_ds = new double [numQuapts];
-
   unx = new double [numQuapts];
   uny = new double [numQuapts];
   unz = new double [numQuapts];
@@ -24,19 +15,9 @@ FEAElement_Triangle6_3D_der0::FEAElement_Triangle6_3D_der0( const int &in_nqua )
 FEAElement_Triangle6_3D_der0::~FEAElement_Triangle6_3D_der0()
 {
   delete [] R;         R = nullptr;
-  delete [] dx_dr; dx_dr = nullptr;
-  delete [] dx_ds; dx_ds = nullptr;
-  
-  delete [] dy_dr; dx_dr = nullptr;
-  delete [] dy_ds; dx_ds = nullptr;
-  
-  delete [] dz_dr; dx_dr = nullptr;
-  delete [] dz_ds; dx_ds = nullptr;
-
   delete [] unx;     unx = nullptr; 
   delete [] uny;     uny = nullptr;
   delete [] unz;     unz = nullptr;
-
   delete [] detJac; detJac = nullptr;
 }
 
@@ -84,24 +65,21 @@ void FEAElement_Triangle6_3D_der0::buildBasis( const IQuadPts * const &quad,
       0.0, 4.0 * qua_s - 1.0, -4.0 * qua_r, 4.0 * qua_r,
       4.0 - 4.0 * qua_r - 8.0 * qua_s };
     
-    dx_dr[qua] = 0.0; dx_ds[qua] = 0.0;
-    dy_dr[qua] = 0.0; dy_ds[qua] = 0.0;
-    dz_dr[qua] = 0.0; dz_ds[qua] = 0.0;
+    double dx_dr = 0.0, dx_ds = 0.0, dy_dr = 0.0, dy_ds = 0.0, dz_dr = 0.0, dz_ds = 0.0;
 
     for( int ii=0; ii<6; ++ii )
     {
-      dx_dr[qua] += ctrl_x[ii] * Rr[ii];
-      dx_ds[qua] += ctrl_x[ii] * Rs[ii];
+      dx_dr += ctrl_x[ii] * Rr[ii];
+      dx_ds += ctrl_x[ii] * Rs[ii];
       
-      dy_dr[qua] += ctrl_y[ii] * Rr[ii];
-      dy_ds[qua] += ctrl_y[ii] * Rs[ii];
+      dy_dr += ctrl_y[ii] * Rr[ii];
+      dy_ds += ctrl_y[ii] * Rs[ii];
       
-      dz_dr[qua] += ctrl_z[ii] * Rr[ii];
-      dz_ds[qua] += ctrl_z[ii] * Rs[ii];
+      dz_dr += ctrl_z[ii] * Rr[ii];
+      dz_ds += ctrl_z[ii] * Rs[ii];
     }
 
-    MATH_T::cross3d( dx_dr[qua], dy_dr[qua], dz_dr[qua], 
-        dx_ds[qua], dy_ds[qua], dz_ds[qua],
+    MATH_T::cross3d( dx_dr, dy_dr, dz_dr, dx_ds, dy_ds, dz_ds,
         unx[qua], uny[qua], unz[qua] );
   
     detJac[qua] = MATH_T::normalize3d( unx[qua], uny[qua], unz[qua] );
@@ -132,6 +110,7 @@ std::vector<double> FEAElement_Triangle6_3D_der0::get_R(
 Vector_3 FEAElement_Triangle6_3D_der0::get_2d_normal_out( const int &qua,
     double &area ) const
 {
+  assert(qua >= 0 && qua < numQuapts);
   area = detJac[qua];
   return Vector_3( unx[qua], uny[qua], unz[qua] );
 }

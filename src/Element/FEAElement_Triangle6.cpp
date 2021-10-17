@@ -9,25 +9,9 @@ FEAElement_Triangle6::FEAElement_Triangle6( const int &in_nqua )
   
   Jac = new double [9*numQuapts];
 
-  dR_dr = new double [6*numQuapts];
-  dR_ds = new double [6*numQuapts];
-  d2R_drr = new double [6 * numQuapts];
-  d2R_dss = new double [6 * numQuapts];
-  d2R_drs = new double [6 * numQuapts];
-
   d2R_dxx = new double [6 * numQuapts];
   d2R_dyy = new double [6 * numQuapts];
   d2R_dxy = new double [6 * numQuapts];
-
-  // second derivative w.r.t r-s-t is constant
-  for(int ii=0; ii<6; ++ii)
-  {
-    d2R_drr[ii] = 0.0; d2R_dss[ii] = 0.0; d2R_drs[ii] = 0.0;
-  }
-
-  d2R_drr[0] = 4.0; d2R_drr[1] = 4.0; d2R_drr[3] = -8.0;
-  d2R_dss[0] = 4.0; d2R_dss[2] = 4.0; d2R_dss[5] = -8.0;
-  d2R_drs[0] = 4.0; d2R_drs[3] = -4.0; d2R_drs[4] = 4.0; d2R_drs[5] = -4.0;
 }
 
 FEAElement_Triangle6::~FEAElement_Triangle6()
@@ -36,11 +20,6 @@ FEAElement_Triangle6::~FEAElement_Triangle6()
   delete [] dR_dx;     dR_dx = nullptr;
   delete [] dR_dy;     dR_dy = nullptr;
   delete [] Jac;         Jac = nullptr;
-  delete [] dR_dr;     dR_dr = nullptr;
-  delete [] dR_ds;     dR_ds = nullptr;
-  delete [] d2R_drr; d2R_drr = nullptr;
-  delete [] d2R_dss; d2R_dss = nullptr;
-  delete [] d2R_drs; d2R_drs = nullptr;
   delete [] d2R_dxx; d2R_dxx = nullptr;
   delete [] d2R_dyy; d2R_dyy = nullptr;
   delete [] d2R_dxy; d2R_dxy = nullptr;
@@ -66,6 +45,10 @@ void FEAElement_Triangle6::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_y )
 {
   assert(quad->get_dim() == 3);
+
+  const double d2R_drr[6] { 4.0, 4.0, 0.0, -8.0, 0.0,  0.0 };
+  const double d2R_dss[6] { 4.0, 0.0, 4.0,  0.0, 0.0, -8.0 };
+  const double d2R_drs[6] { 4.0, 0.0, 0.0, -4.0, 4.0, -4.0 };
 
   // Caclulate second derivative of geometry
   // Here, second derivatives d2R_drr, etc are constant. We can calculate
@@ -99,27 +82,21 @@ void FEAElement_Triangle6::buildBasis( const IQuadPts * const &quad,
     R[offset + 4] = 4.0 * qua_r * qua_s;
     R[offset + 5] = 4.0 * qua_s * qua_t;
 
-    dR_dr[offset+0] = 4.0 * qua_r + 4.0 * qua_s - 3.0;
-    dR_dr[offset+1] = 4.0 * qua_r - 1.0;
-    dR_dr[offset+2] = 0.0;
-    dR_dr[offset+3] = 4.0 - 8.0 * qua_r - 4.0 * qua_s;
-    dR_dr[offset+4] = 4.0 * qua_s;
-    dR_dr[offset+5] = -4.0 * qua_s;
+    const double dR_dr[6] { 4.0 * qua_r + 4.0 * qua_s - 3.0,
+      4.0 * qua_r - 1.0, 0.0, 4.0 - 8.0 * qua_r - 4.0 * qua_s,
+      4.0 * qua_s, -4.0 * qua_s };
     
-    dR_ds[offset+0] = 4.0 * qua_r + 4.0 * qua_s - 3.0;
-    dR_ds[offset+1] = 0.0;
-    dR_ds[offset+2] = 4.0 * qua_s - 1.0;
-    dR_ds[offset+3] = -4.0 * qua_r;
-    dR_ds[offset+4] = 4.0 * qua_r;
-    dR_ds[offset+5] = 4.0 - 4.0 * qua_r - 8.0 * qua_s;  
+    const double dR_ds[6] { 4.0 * qua_r + 4.0 * qua_s - 3.0,
+      0.0, 4.0 * qua_s - 1.0, -4.0 * qua_r, 4.0 * qua_r,
+      4.0 - 4.0 * qua_r - 8.0 * qua_s };  
     
     double dx_dr = 0.0, dx_ds = 0.0, dy_dr = 0.0, dy_ds = 0.0;
     for(int ii=0; ii<6; ++ii)
     {
-      dx_dr += ctrl_x[ii] * dR_dr[offset+ii];
-      dx_ds += ctrl_x[ii] * dR_ds[offset+ii];
-      dy_dr += ctrl_y[ii] * dR_dr[offset+ii];
-      dy_ds += ctrl_y[ii] * dR_ds[offset+ii];
+      dx_dr += ctrl_x[ii] * dR_dr[ii];
+      dx_ds += ctrl_x[ii] * dR_ds[ii];
+      dy_dr += ctrl_y[ii] * dR_dr[ii];
+      dy_ds += ctrl_y[ii] * dR_ds[ii];
     }
     
     Jac[4*qua+0] = dx_dr;
@@ -143,8 +120,8 @@ void FEAElement_Triangle6::buildBasis( const IQuadPts * const &quad,
   
     for(int ii=0; ii<6; ++ii)
     {
-      dR_dx[offset+ii] = dR_dr[offset+ii] * dr_dx + dR_ds[offset+ii] * ds_dx;
-      dR_dy[offset+ii] = dR_dr[offset+ii] * dr_dy + dR_ds[offset+ii] * ds_dy;
+      dR_dx[offset+ii] = dR_dr[ii] * dr_dx + dR_ds[ii] * ds_dx;
+      dR_dy[offset+ii] = dR_dr[ii] * dr_dy + dR_ds[ii] * ds_dy;
     }
 
     // Setup the 3x3 matrix

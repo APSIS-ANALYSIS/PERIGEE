@@ -77,11 +77,9 @@ class FEAElement_Triangle3 : public FEAElement
       return { 0.0, 0.0, 0.0 };
     }
 
-    virtual void get_Jacobian(const int &quaindex,
-        double * const &jac_value) const;
+    virtual void get_Jacobian(const int &quaindex, double * const &jac_value) const;
 
-    virtual void get_invJacobian(const int &quaindex,
-        double * const &jac_value) const;
+    virtual void get_invJacobian(const int &quaindex, double * const &jac_value) const;
 
     virtual double get_detJac(const int &quaindex) const {return detJac;}
 

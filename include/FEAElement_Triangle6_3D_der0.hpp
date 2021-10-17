@@ -85,11 +85,6 @@ class FEAElement_Triangle6_3D_der0 : public FEAElement
     // 0 <= ii < 6 x numQuapts
     double * R;
 
-    // Container for dx_dr, etc., each of length numQuapts
-    double * dx_dr, * dx_ds;
-    double * dy_dr, * dy_ds;
-    double * dz_dr, * dz_ds;
-
     // unit normal vector components, each of length numQuapts
     double * unx, * uny, * unz;
 
