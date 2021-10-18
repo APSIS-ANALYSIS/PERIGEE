@@ -29,12 +29,17 @@ class INodalBC
     virtual unsigned int get_dir_nodes(const int &nbc_id, unsigned int ii) const 
     {return dir_nodes[nbc_id][ii];}
     
+    virtual unsigned int get_dir_nodes(unsigned int ii) const {return dir_nodes[0][ii];}
+    
     // ------------------------------------------------------------------------
     // get_per_slave_nodes returns the ii-th master-slave pair's slave node's
     // global index. The parameter ii runs as 0 <= ii < get_num_per_nodes(nbc_id).
     // ------------------------------------------------------------------------
     virtual unsigned int get_per_slave_nodes(const int &nbc_id, unsigned int ii) const 
     {return per_slave_nodes[nbc_id][ii];}
+
+    virtual unsigned int get_per_slave_nodes(unsigned int ii) const 
+    {return per_slave_nodes[0][ii];}
 
     // ------------------------------------------------------------------------
     // get_per_slave_nodes returns the ii-th master-slave pair's master node's
@@ -43,18 +48,21 @@ class INodalBC
     virtual unsigned int get_per_master_nodes(const int &nbc_id, unsigned int ii) const 
     {return per_master_nodes[nbc_id][ii];}
 
+    virtual unsigned int get_per_master_nodes(unsigned int ii) const 
+    {return per_master_nodes[0][ii];}
+
     // ------------------------------------------------------------------------
     // get_num_dir_nodes() gives the total number of Dirichlet nodes that are 
     // strongly enforced.
     // ------------------------------------------------------------------------
-    virtual unsigned int get_num_dir_nodes(const int &nbc_id) const
+    virtual unsigned int get_num_dir_nodes(const int &nbc_id = 0) const
     {return num_dir_nodes[nbc_id];}
 
     // ------------------------------------------------------------------------
     // get_num_per_nodes() gives the total number of Periodic(slave) nodes that 
     // are strongly enforced.
     // ------------------------------------------------------------------------
-    virtual unsigned int get_num_per_nodes(const int &nbc_id) const
+    virtual unsigned int get_num_per_nodes(const int &nbc_id = 0) const
     {return num_per_nodes[nbc_id];}
 
     // ------------------------------------------------------------------------
