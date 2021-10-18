@@ -63,6 +63,10 @@ class FEAElement
     virtual int get_Type() const
     {SYS_T::commPrint("Warning: get_Type is not implemented. \n"); return -1;}
 
+    // Return the element's type name
+    virtual std::string get_TypeName() const
+    {SYS_T::commPrint("Warning: get_TypeName is not implemented. \n"); return "undetermined";}
+
     // Return the number of different basis functions defined on this element.
     // H1 NURBS: 1
     // H-div 2D: 2
