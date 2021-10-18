@@ -125,11 +125,10 @@ NodalBC_3D_CMM::NodalBC_3D_CMM(
       Create_ID( nFunc );
 
       std::cout<<"===> NodalBC_3D_CMM for deformable wall (cmmbc_type = 0) specified by \n";
-      std::cout<<"     interior of inlet surface"<<std::endl;
-      std::cout<<"     outline of inlet surface" << ": " << cap_num_dir_nodes[0] << " nodes" << std::endl;
+      std::cout<<"     interior of inlet surface(s)"<<std::endl;
 
-      for(int ii=1; ii<nbc_ring -> get_num_caps(); ++ii)
-        std::cout<<"     outline of outlet surface " << ii-1 << ": " << cap_num_dir_nodes[ii] << " nodes" << std::endl;
+      for(int ii=0; ii<nbc_ring -> get_num_caps(); ++ii)
+        std::cout<<"     outline of cap surface " << ii << ": " << cap_num_dir_nodes[ii] << " nodes" << std::endl;
       std::cout<<"     is generated. \n";
 
       break;
