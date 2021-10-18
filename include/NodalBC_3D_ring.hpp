@@ -58,6 +58,8 @@ class NodalBC_3D_ring : public INodalBC
   private:
     NodalBC_3D_ring() : num_nbc(0), ring_bc_type(0) {};
 
+    // fixed to be 1 as we only need one list of dir_nodes saving the clamped
+    // nodal indices.
     const int num_nbc;
 
     // Ring node bc type

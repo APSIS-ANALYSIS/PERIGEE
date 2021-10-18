@@ -16,7 +16,7 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
   }
 
   LID.clear();
-  
+
   LDN.resize(num_nbc);         Num_LD.resize(num_nbc);
   LPSN.resize(num_nbc);        LPMN.resize(num_nbc);
   LocalMaster.resize(num_nbc); LocalMasterSlave.resize(num_nbc);
@@ -57,7 +57,7 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
 
           node_ps = mnindex->get_old2new(node_ps);
           node_pm = mnindex->get_old2new(node_pm);
-          
+
           if(part->isNodeInPart(node_ps))
           {
             LPSN[ii].push_back(node_ps);
@@ -119,7 +119,7 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
   const int dof = 1;
 
   LID.clear();
-  
+
   LDN.resize(num_nbc);         Num_LD.resize(num_nbc);
   LPSN.resize(num_nbc);        LPMN.resize(num_nbc);
   LocalMaster.resize(num_nbc); LocalMasterSlave.resize(num_nbc);
@@ -239,10 +239,10 @@ void NBC_Partition_3D::write_hdf5(const char * FileName) const
   for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
   {
     std::string subgroup_name(groupbase);
-      subgroup_name.append( SYS_T::to_string(nbc_id) );
+    subgroup_name.append( SYS_T::to_string(nbc_id) );
 
     hid_t group_id = H5Gcreate(g_id, subgroup_name.c_str(),
-          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+        H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
     if( LDN[nbc_id].size() > 0 )
       h5writer->write_intVector( group_id, "LDN", LDN[nbc_id] );
@@ -292,10 +292,10 @@ void NBC_Partition_3D::write_hdf5( const char * FileName,
   for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
   {
     std::string subgroup_name(groupbase);
-      subgroup_name.append( SYS_T::to_string(nbc_id) );
+    subgroup_name.append( SYS_T::to_string(nbc_id) );
 
     hid_t group_id = H5Gcreate(g_id, subgroup_name.c_str(),
-          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+        H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
     if( LDN[nbc_id].size() > 0 )
       h5writer->write_intVector( group_id, "LDN", LDN[nbc_id] );

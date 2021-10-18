@@ -101,6 +101,7 @@ class NodalBC_3D_inflow : public INodalBC
   private:
     NodalBC_3D_inflow() : num_nbc(0) {};
 
+    // number of inlet surfaces
     const int num_nbc;
     
     // This is the area calculated by setting the wall nodes to be zero.

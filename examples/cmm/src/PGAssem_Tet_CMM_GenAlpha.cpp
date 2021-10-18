@@ -1430,56 +1430,6 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_matrix_free_K( const Vec &XX,
     const IGenBC * const &gbc,
     Vec &YY )
 {
-  const double a_f = lassem_ptr -> get_model_para_1();
-
-  // dd_dv = dt x alpha_f x gamma
-  const double dd_dv = dt * a_f * lassem_ptr->get_model_para_2();
-
-  int * LSIEN = new int [snLocBas];
-  double * sctrl_x = new double [snLocBas];
-  double * sctrl_y = new double [snLocBas];
-  double * sctrl_z = new double [snLocBas];
-
-  for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
-  {
-    // Calculate dot flow rate for face with ebc_id and MPI_Allreduce them
-    // Here, dot_sol is the solution at time step n+1 (not n+alpha_f!)
-    const double dot_flrate = Assem_surface_flowrate( dot_sol, lassem_ptr,
-        element_s, quad_s, ebc_part, ebc_id );
-
-    // Calculate flow rate for face with ebc_id and MPI_Allreduce them
-    // Here, sol is the solution at time step n+1 (not n+alpha_f!)
-    const double flrate = Assem_surface_flowrate( sol, lassem_ptr,
-        element_s, quad_s, ebc_part, ebc_id );
-
-    // Get the (pressure) value on the outlet surface for traction evaluation
-    const double P_n   = gbc -> get_P0( ebc_id );
-    const double P_np1 = gbc -> get_P( ebc_id, dot_flrate, flrate );
-
-    // P_n+alpha_f
-    const double resis_val = P_n + a_f * (P_np1 - P_n);
-
-    // Get the (potentially approximated) m := dP/dQ
-    const double m_val = gbc -> get_m( ebc_id, dot_flrate, flrate );
-
-    // Get the (potentially approximated) n := dP/d(dot_Q)
-    const double n_val = gbc -> get_n( ebc_id, dot_flrate, flrate );
-
-    // Define alpha_f * n + alpha_f * gamma * dt * m
-    // coef a^t a enters as the consistent tangent for the resistance-type bc
-    const double coef = a_f * n_val + dd_dv * m_val;
-  
-    
-  
-  
-  
-  }
-
-  delete [] LSIEN; LSIEN = nullptr;
-  delete [] sctrl_x; sctrl_x = nullptr;
-  delete [] sctrl_y; sctrl_y = nullptr;
-  delete [] sctrl_z; sctrl_z = nullptr;
 }
-
 
 // EOF
