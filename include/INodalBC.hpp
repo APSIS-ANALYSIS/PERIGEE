@@ -29,17 +29,12 @@ class INodalBC
     virtual unsigned int get_dir_nodes(const int &nbc_id, unsigned int ii) const 
     {return dir_nodes[nbc_id][ii];}
     
-    virtual unsigned int get_dir_nodes(unsigned int ii) const {return dir_nodes[0][ii];}
-    
     // ------------------------------------------------------------------------
     // get_per_slave_nodes returns the ii-th master-slave pair's slave node's
     // global index. The parameter ii runs as 0 <= ii < get_num_per_nodes(nbc_id).
     // ------------------------------------------------------------------------
     virtual unsigned int get_per_slave_nodes(const int &nbc_id, unsigned int ii) const 
     {return per_slave_nodes[nbc_id][ii];}
-
-    virtual unsigned int get_per_slave_nodes(unsigned int ii) const 
-    {return per_slave_nodes[0][ii];}
 
     // ------------------------------------------------------------------------
     // get_per_slave_nodes returns the ii-th master-slave pair's master node's
@@ -48,21 +43,18 @@ class INodalBC
     virtual unsigned int get_per_master_nodes(const int &nbc_id, unsigned int ii) const 
     {return per_master_nodes[nbc_id][ii];}
 
-    virtual unsigned int get_per_master_nodes(unsigned int ii) const 
-    {return per_master_nodes[0][ii];}
-
     // ------------------------------------------------------------------------
     // get_num_dir_nodes() gives the total number of Dirichlet nodes that are 
     // strongly enforced.
     // ------------------------------------------------------------------------
-    virtual unsigned int get_num_dir_nodes(const int &nbc_id = 0) const
+    virtual unsigned int get_num_dir_nodes(const int &nbc_id) const
     {return num_dir_nodes[nbc_id];}
 
     // ------------------------------------------------------------------------
     // get_num_per_nodes() gives the total number of Periodic(slave) nodes that 
     // are strongly enforced.
     // ------------------------------------------------------------------------
-    virtual unsigned int get_num_per_nodes(const int &nbc_id = 0) const
+    virtual unsigned int get_num_per_nodes(const int &nbc_id) const
     {return num_per_nodes[nbc_id];}
 
     // ------------------------------------------------------------------------
@@ -137,12 +129,6 @@ class INodalBC
       return 0.0;
     }
     
-    virtual double get_para_5(const int &ii) const
-    {
-      SYS_T::print_fatal("Error: INodalBC::get_para_5 is not implemented.\n");
-      return 0.0;
-    }
-
     // --------------------------------------------------------------
     // get_para_6() passes additional parameters from the specific
     //              instantiations.
@@ -204,22 +190,10 @@ class INodalBC
       return -1;
     }
 
-    virtual int get_ien(const int &cell, const int &lnode) const
-    {
-      SYS_T::commPrint("Warning: get_ien is not implemented. \n");
-      return -1;
-    }
-
     // --------------------------------------------------------------
     // get_pt_xyz returns the points' coordinates
     // --------------------------------------------------------------
     virtual double get_pt_xyz(const int &nbc_id, const int &node, const int &dir) const
-    {
-      SYS_T::commPrint("Warning: get_pt_xyz is not implemented. \n");
-      return -1.0;
-    }
-
-    virtual double get_pt_xyz(const int &node, const int &dir) const
     {
       SYS_T::commPrint("Warning: get_pt_xyz is not implemented. \n");
       return -1.0;
@@ -234,22 +208,10 @@ class INodalBC
       return -1;
     }
 
-    virtual int get_global_node(const int &node_idx) const
-    {
-      SYS_T::commPrint("Warning: get_global_node is not implemented. \n");
-      return -1;
-    }
-
     // --------------------------------------------------------------
     // get_global_cell returns the cell's global volumetric index
     // --------------------------------------------------------------
     virtual int get_global_cell(const int &nbc_id, const int &cell_idx) const
-    {
-      SYS_T::commPrint("Warning: get_global_cell is not implemented. \n");
-      return -1;
-    } 
-
-    virtual int get_global_cell(const int &cell_idx) const
     {
       SYS_T::commPrint("Warning: get_global_cell is not implemented. \n");
       return -1;

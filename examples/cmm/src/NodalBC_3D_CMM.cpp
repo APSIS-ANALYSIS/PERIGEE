@@ -52,9 +52,8 @@ NodalBC_3D_CMM::NodalBC_3D_CMM(
     const INodalBC * const &nbc_ring,
     const INodalBC * const &nbc_wall,
     const int &comp, const int &nFunc,
-    const int &cmm_bc_type )
+    const int &cmm_bc_type ) : num_nbc( 1 )
 {
-  num_nbc = 1;
   const int nbc_id = 0;
 
   per_slave_nodes.resize(num_nbc);
