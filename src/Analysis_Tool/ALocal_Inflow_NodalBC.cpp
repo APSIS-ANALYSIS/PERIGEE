@@ -13,11 +13,23 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
 
   num_nbc = h5r -> read_intScalar( gname.c_str(), "num_nbc" );
 
+  // active area of all inlet caps, length is num_nbc
   act_area       = h5r->read_doubleVector( gname.c_str(), "Inflow_active_area" );
+
+  // full area of all inlet caps, length is num_nbc
   ful_area       = h5r->read_doubleVector( gname.c_str(), "Inflow_full_area" );
+
+  // surface mesh's nLocBas, length is num_nbc
   cell_nLocBas   = h5r->read_intVector(    gname.c_str(), "cell_nLocBas" );
+
+  // number of surface cell belonging to this partition, length is num_nbc
   num_local_cell = h5r->read_intVector(    gname.c_str(), "num_local_cell" );
+
+  // number of nodes owned by local surface cells that belong to this partition,
+  // length is num_nbc
   num_local_node = h5r->read_intVector(    gname.c_str(), "num_local_node" );
+  
+  // number of outline points of all inlet surfaces, length is num_nbc
   num_out_bc_pts = h5r->read_intVector(    gname.c_str(), "num_out_bc_pts" );
 
   outnormal.resize(num_nbc); Num_LD.resize(num_nbc); LDN.resize(num_nbc);
@@ -32,13 +44,16 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
     std::string subgroup_name(groupbase);
     subgroup_name.append( SYS_T::to_string(nbc_id) );
 
-    outnormal[nbc_id]      = h5r->read_Vector_3(     subgroup_name.c_str(), "Outward_normal_vector" );
+    // outward normal vector of inlet cap nbc_id
+    outnormal[nbc_id]      = h5r->read_Vector_3(   subgroup_name.c_str(), "Outward_normal_vector" );
+    
+    // number of local dirichlet nodes, local to the partitioned subdomain
     Num_LD[nbc_id]         = h5r->read_intScalar(  subgroup_name.c_str(), "Num_LD" );
 
-    // If this sub-domain contains local inflow bc points, load the LDN array.
+    // If this sub-domain of this CPU contains local inflow bc points, load the LDN array.
     if( Num_LD[nbc_id] > 0 )
     {
-      LDN[nbc_id]            = h5r->read_intVector( subgroup_name.c_str(), "LDN" );
+      LDN[nbc_id]            = h5r->read_intVector(    subgroup_name.c_str(), "LDN" );
       centroid[nbc_id]       = h5r->read_Vector_3(     subgroup_name.c_str(), "centroid" );
       outline_pts[nbc_id]    = h5r->read_doubleVector( subgroup_name.c_str(), "outline_pts" );
     }
