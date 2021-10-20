@@ -64,11 +64,6 @@ class INodalBC
     virtual int get_ID(unsigned int ii) const {return ID[ii];}
  
     // ------------------------------------------------------------------------
-    // get_num_ID reutrns the length of the ID array.
-    // ------------------------------------------------------------------------
-    virtual unsigned int get_num_ID() const {return ID.size();}
-
-    // ------------------------------------------------------------------------
     // print_info() will print the content of dir_nodes, per_slave_nodes, and
     // per_master_nodes on screen.
     // ------------------------------------------------------------------------
