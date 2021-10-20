@@ -1,7 +1,6 @@
 #include "NodalBC_3D_ring.hpp"
 
-NodalBC_3D_ring::NodalBC_3D_ring(const int &nFunc)
-: ring_bc_type(0)
+NodalBC_3D_ring::NodalBC_3D_ring(const int &nFunc) : ring_bc_type(0)
 {
   per_slave_nodes.clear();
   per_master_nodes.clear();
@@ -27,8 +26,7 @@ NodalBC_3D_ring::NodalBC_3D_ring(
     const std::vector<std::string> &outflow_files,
     const std::vector< Vector_3 > &outlet_outnormal,
     const int &nFunc, const int &in_ring_bc_type,
-    const int &elemtype )
-: ring_bc_type(in_ring_bc_type)
+    const int &elemtype ) : ring_bc_type(in_ring_bc_type)
 {
   // No periodic nodes
   per_slave_nodes.clear();
