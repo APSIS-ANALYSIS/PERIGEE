@@ -5,9 +5,9 @@ NodalBC_3D_ring::NodalBC_3D_ring(const int &nFunc)
 {
   per_slave_nodes.clear();
   per_master_nodes.clear();
-  num_per_nodes.clear();
+  num_per_nodes = 0;
   dir_nodes.clear();
-  num_dir_nodes.clear();
+  num_dir_nodes = 0;
 
   Create_ID( nFunc );
   
@@ -175,7 +175,7 @@ NodalBC_3D_ring::NodalBC_3D_ring(
   else
     SYS_T::print_fatal("Error: Nodal_3D_ring unknown file type.\n");
 
-  num_dir_nodes = dir_nodes[nbc_id].size(); 
+  num_dir_nodes = dir_nodes.size(); 
 
   // Generate ID array
   Create_ID( nFunc );
