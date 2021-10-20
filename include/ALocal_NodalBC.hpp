@@ -33,7 +33,8 @@ class ALocal_NodalBC
     {return LID[dof_index * nlocghonode + node];}
 
     // ------------------------------------------------------------------------
-    // get the number of surfaces with prescribed flows
+    // get the number of surfaces, each surface is associated with different
+    // properties.
     // ------------------------------------------------------------------------
     virtual int get_num_nbc() const {return num_nbc;};
 
