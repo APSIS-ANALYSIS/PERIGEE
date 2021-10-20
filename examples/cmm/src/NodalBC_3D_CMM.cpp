@@ -4,32 +4,21 @@ NodalBC_3D_CMM::NodalBC_3D_CMM( const int &nFunc, const bool &is_all_node )
 {
   if( is_all_node )
   {
-    num_nbc = 1;
-    const int nbc_id = 0;
+    per_slave_nodes.clear();
+    per_master_nodes.clear();
+    num_per_nodes = 0;
 
-    per_slave_nodes.resize(num_nbc);
-    per_master_nodes.resize(num_nbc);
-    num_per_nodes.resize(num_nbc);
-
-    per_slave_nodes[nbc_id].clear();
-    per_master_nodes[nbc_id].clear();
-    num_per_nodes[nbc_id] = 0;
-
-    dir_nodes.resize(     num_nbc );
-    num_dir_nodes.resize( num_nbc );
-
-    dir_nodes[nbc_id].clear();
+    dir_nodes.clear();
 
     for(unsigned int ii=0; ii<static_cast<unsigned int>(nFunc); ++ii)
-      dir_nodes[nbc_id].push_back( ii );
+      dir_nodes.push_back( ii );
 
-    VEC_T::sort_unique_resize( dir_nodes[nbc_id] );
+    VEC_T::sort_unique_resize( dir_nodes );
 
-    num_dir_nodes[nbc_id] = dir_nodes[nbc_id].size();
+    num_dir_nodes = dir_nodes.size();
   }
   else
   {
-    num_nbc = 0;
     per_slave_nodes.clear();
     per_master_nodes.clear();
     num_per_nodes.clear();
@@ -52,22 +41,13 @@ NodalBC_3D_CMM::NodalBC_3D_CMM(
     const INodalBC * const &nbc_ring,
     const INodalBC * const &nbc_wall,
     const int &comp, const int &nFunc,
-    const int &cmm_bc_type ) : num_nbc( 1 )
+    const int &cmm_bc_type )
 {
-  const int nbc_id = 0;
+  per_slave_nodes.clear();
+  per_master_nodes.clear();
+  num_per_nodes = 0;
 
-  per_slave_nodes.resize(num_nbc);
-  per_master_nodes.resize(num_nbc);
-  num_per_nodes.resize(num_nbc);
-
-  per_slave_nodes[nbc_id].clear();
-  per_master_nodes[nbc_id].clear();
-  num_per_nodes[nbc_id] = 0;
-
-  dir_nodes.resize(     num_nbc );
-  num_dir_nodes.resize( num_nbc );
-
-  dir_nodes[nbc_id].clear();
+  dir_nodes.clear();
 
   const int ringbc_type = nbc_ring -> get_ring_bc_type();
 
@@ -81,7 +61,7 @@ NodalBC_3D_CMM::NodalBC_3D_CMM(
       for(int nbc_id_inflow = 0; nbc_id_inflow < num_nbc_inflow; ++nbc_id_inflow)
       {
         for(unsigned int ii=0; ii<nbc_inflow->get_num_dir_nodes(nbc_id_inflow); ++ii)
-          dir_nodes[nbc_id].push_back( nbc_inflow->get_dir_nodes(nbc_id_inflow, ii) );
+          dir_nodes.push_back( nbc_inflow->get_dir_nodes(nbc_id_inflow, ii) );
       }
 
       // obtain the type of ring nodes' specification
@@ -97,7 +77,7 @@ NodalBC_3D_CMM::NodalBC_3D_CMM(
         // regardless of comp, all ring nodes are added as essential bc
         for(unsigned int ii = 0; ii < nbc_ring->get_num_dir_nodes(nbc_id_ring); ++ii)
         {
-          dir_nodes[nbc_id].push_back( nbc_ring->get_dir_nodes(nbc_id_ring, ii) );
+          dir_nodes.push_back( nbc_ring->get_dir_nodes(nbc_id_ring, ii) );
           cap_num_dir_nodes[ cap_id[ii] ] += 1;
         }
       }
@@ -109,7 +89,7 @@ NodalBC_3D_CMM::NodalBC_3D_CMM(
         {
           if( comp == 0 )
           {
-            dir_nodes[nbc_id].push_back( nbc_ring->get_dir_nodes(nbc_id_ring, ii) );
+            dir_nodes.push_back( nbc_ring->get_dir_nodes(nbc_id_ring, ii) );
             cap_num_dir_nodes[ cap_id[ii] ] += 1;
           }
         }
@@ -117,9 +97,9 @@ NodalBC_3D_CMM::NodalBC_3D_CMM(
       else SYS_T::print_fatal( "NodalBC_3D_CMM Error: No such type of essential bc for ring nodes.\n" );
 
       // Clean up the dir_nodes and generate ID array
-      VEC_T::sort_unique_resize( dir_nodes[nbc_id] );
+      VEC_T::sort_unique_resize( dir_nodes );
 
-      num_dir_nodes[nbc_id] = dir_nodes[nbc_id].size();
+      num_dir_nodes = dir_nodes.size();
 
       Create_ID( nFunc );
 
@@ -141,25 +121,25 @@ NodalBC_3D_CMM::NodalBC_3D_CMM(
       for(int nbc_id_inflow = 0; nbc_id_inflow < num_nbc_inflow; ++nbc_id_inflow)
       {
         for(unsigned int ii=0; ii<nbc_inflow->get_num_dir_nodes(nbc_id_inflow); ++ii)
-          dir_nodes[nbc_id].push_back( nbc_inflow->get_dir_nodes(nbc_id_inflow, ii) );
+          dir_nodes.push_back( nbc_inflow->get_dir_nodes(nbc_id_inflow, ii) );
       }
 
       const int nbc_id_ring = 0; 
 
       // Assign the ring nodes for this type of nodal/essential bc
       for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(nbc_id_ring); ++ii)
-        dir_nodes[nbc_id].push_back( nbc_ring->get_dir_nodes(nbc_id_ring, ii) );
+        dir_nodes.push_back( nbc_ring->get_dir_nodes(nbc_id_ring, ii) );
 
       const int nbc_id_wall = 0; 
 
       // Assign the wall nodes for this type of nodal/essential bc
       for(unsigned int ii=0; ii<nbc_wall->get_num_dir_nodes(nbc_id_wall); ++ii)
-        dir_nodes[nbc_id].push_back( nbc_wall->get_dir_nodes(nbc_id_wall, ii) );
+        dir_nodes.push_back( nbc_wall->get_dir_nodes(nbc_id_wall, ii) );
       
       // Clean up the dir_nodes and generate ID array
-      VEC_T::sort_unique_resize( dir_nodes[nbc_id] );
+      VEC_T::sort_unique_resize( dir_nodes );
 
-      num_dir_nodes[nbc_id] = dir_nodes[nbc_id].size();
+      num_dir_nodes = dir_nodes.size();
 
       Create_ID( nFunc );
 
@@ -195,24 +175,24 @@ NodalBC_3D_CMM::NodalBC_3D_CMM(
       {
         if( VEC_T::is_invec(ring_gnode, ii) )
         {
-          if( ringbc_type == 0 ) dir_nodes[nbc_id].push_back( ii );
+          if( ringbc_type == 0 ) dir_nodes.push_back( ii );
           else if( ringbc_type == 1 )
           {
             // if comp is 0 (rotated x-comp, corresponding to the normal comp),
             // ring node is added to dir_nodes
-            if( comp == 0 ) dir_nodes[nbc_id].push_back( ii ); 
+            if( comp == 0 ) dir_nodes.push_back( ii ); 
           }
           else SYS_T::print_fatal( "NodalBC_3D_CMM Error: No such type of essential bc for ring nodes.\n" );
    
         }
         else if( !VEC_T::is_invec( wall_gnode, ii) )
-          dir_nodes[nbc_id].push_back( ii );
+          dir_nodes.push_back( ii );
       }
 
       // Clean up the dir_nodes and generate ID array
-      VEC_T::sort_unique_resize( dir_nodes[nbc_id] );
+      VEC_T::sort_unique_resize( dir_nodes );
 
-      num_dir_nodes[nbc_id] = dir_nodes[nbc_id].size();
+      num_dir_nodes = dir_nodes.size();
 
       Create_ID( nFunc );
 
