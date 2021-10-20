@@ -28,40 +28,30 @@ class INodalBC
     // ------------------------------------------------------------------------
     virtual unsigned int get_dir_nodes(unsigned int &ii) const = 0;
     
-    //{return dir_nodes[nbc_id][ii];}
-    
     // ------------------------------------------------------------------------
     // get_per_slave_nodes returns the ii-th master-slave pair's slave node's
     // global index. The parameter ii runs as 0 <= ii < get_num_per_nodes(nbc_id).
     // ------------------------------------------------------------------------
     virtual unsigned int get_per_slave_nodes(unsigned int &ii) const = 0;
     
-    //{return per_slave_nodes[nbc_id][ii];}
-
     // ------------------------------------------------------------------------
     // get_per_slave_nodes returns the ii-th master-slave pair's master node's
     // global index. The parameter ii runs as 0 <= ii < get_num_per_nodes(nbc_id).
     // ------------------------------------------------------------------------
     virtual unsigned int get_per_master_nodes(unsigned int &ii) const = 0;
     
-    //{return per_master_nodes[nbc_id][ii];}
-
     // ------------------------------------------------------------------------
     // get_num_dir_nodes() gives the total number of Dirichlet nodes that are 
     // strongly enforced.
     // ------------------------------------------------------------------------
     virtual unsigned int get_num_dir_nodes() const = 0;
     
-    //{return num_dir_nodes[nbc_id];}
-
     // ------------------------------------------------------------------------
     // get_num_per_nodes() gives the total number of Periodic(slave) nodes that 
     // are strongly enforced.
     // ------------------------------------------------------------------------
     virtual unsigned int get_num_per_nodes() const = 0;
     
-    //{return num_per_nodes[nbc_id];}
-
     // ------------------------------------------------------------------------
     // get_ID returns the ID-index for the ii-th node. For Dirichlet nodes, its
     // ID-index is -1 (and -1-index will be automatically ignored in FEM
