@@ -116,11 +116,9 @@ NodalBC_3D_CMM::NodalBC_3D_CMM(
       for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)
         dir_nodes.push_back( nbc_ring->get_dir_nodes(ii) );
 
-      const int nbc_id_wall = 0; 
-
       // Assign the wall nodes for this type of nodal/essential bc
-      for(unsigned int ii=0; ii<nbc_wall->get_num_dir_nodes(nbc_id_wall); ++ii)
-        dir_nodes.push_back( nbc_wall->get_dir_nodes(nbc_id_wall, ii) );
+      for(unsigned int ii=0; ii<nbc_wall->get_num_dir_nodes(); ++ii)
+        dir_nodes.push_back( nbc_wall->get_dir_nodes(ii) );
       
       // Clean up the dir_nodes and generate ID array
       VEC_T::sort_unique_resize( dir_nodes );
@@ -150,10 +148,8 @@ NodalBC_3D_CMM::NodalBC_3D_CMM(
       std::vector<unsigned int> wall_gnode;
       wall_gnode.clear();
 
-      const int nbc_id_wall = 0; 
-
-      for(unsigned int ii=0; ii<nbc_wall->get_num_dir_nodes(nbc_id_wall); ++ii)
-        wall_gnode.push_back( nbc_wall->get_dir_nodes(nbc_id_wall, ii) );
+      for(unsigned int ii=0; ii<nbc_wall->get_num_dir_nodes(); ++ii)
+        wall_gnode.push_back( nbc_wall->get_dir_nodes(ii) );
    
       for(unsigned int ii=0; ii<static_cast<unsigned int>(nFunc); ++ii)
       {
