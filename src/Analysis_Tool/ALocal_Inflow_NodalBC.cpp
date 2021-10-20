@@ -61,7 +61,9 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
     {
       num_out_bc_pts[nbc_id] = 0;
 
-      LDN[nbc_id].clear(); outline_pts[nbc_id].clear();
+      LDN[nbc_id].clear();
+      centroid[nbc_id] = Vector_3(0.0, 0.0, 0.0); 
+      outline_pts[nbc_id].clear();
     }
  
     // If this partitioned sub-domain contains inlet surface element,
@@ -75,7 +77,8 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
     }
     else
     {
-      local_pt_xyz[nbc_id].clear();   local_tri_ien[nbc_id].clear();
+      local_pt_xyz[nbc_id].clear();
+      local_tri_ien[nbc_id].clear();
       local_node_pos[nbc_id].clear();
     }
   } // end nbc_id-loop
