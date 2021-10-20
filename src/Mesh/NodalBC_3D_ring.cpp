@@ -35,9 +35,6 @@ NodalBC_3D_ring::NodalBC_3D_ring(
   per_master_nodes.clear();
   num_per_nodes = 0;
 
-  dir_nodes.resize(     num_nbc );
-  num_dir_nodes.resize( num_nbc );
-
   // Aggregate inlet & outlet data
   std::vector<std::string> cap_files = inflow_files;
   for(unsigned int ii=0; ii<outflow_files.size(); ++ii)
@@ -71,7 +68,7 @@ NodalBC_3D_ring::NodalBC_3D_ring(
   std::vector<int> wall_ien, wall_gnode, wall_gelem;
 
   // Generate the dir-node list with all ring nodes.
-  dir_nodes[nbc_id].clear();
+  dir_nodes.clear();
   cap_id.clear();
 
   if( elemtype == 501 )
@@ -97,7 +94,7 @@ NodalBC_3D_ring::NodalBC_3D_ring(
 
         if( VEC_T::is_invec( wall_gnode, gnode[jj]) )
         {
-          dir_nodes[nbc_id].push_back( static_cast<unsigned int>( gnode[jj] ) );
+          dir_nodes.push_back( static_cast<unsigned int>( gnode[jj] ) );
           cap_id.push_back( ii );
 
           // Compute the cap's skew bc transformation matrix with the first ring node
@@ -148,7 +145,7 @@ NodalBC_3D_ring::NodalBC_3D_ring(
 
         if( VEC_T::is_invec( wall_gnode, gnode[jj]) )
         {
-          dir_nodes[nbc_id].push_back( static_cast<unsigned int>( gnode[jj] ) );
+          dir_nodes.push_back( static_cast<unsigned int>( gnode[jj] ) );
           cap_id.push_back( ii );
 
           // Compute the cap's skew bc transformation matrix with the first ring node
@@ -178,7 +175,7 @@ NodalBC_3D_ring::NodalBC_3D_ring(
   else
     SYS_T::print_fatal("Error: Nodal_3D_ring unknown file type.\n");
 
-  num_dir_nodes[nbc_id] = dir_nodes[nbc_id].size(); 
+  num_dir_nodes = dir_nodes[nbc_id].size(); 
 
   // Generate ID array
   Create_ID( nFunc );
@@ -192,7 +189,6 @@ NodalBC_3D_ring::NodalBC_3D_ring(
   else if(ring_bc_type == 1) std::cout<<"for in-plane motion (ring_bc_type = 1).\n";
   else SYS_T::print_fatal("Error: NodalBC_3D_ring does not allow this ring_bc_type!\n");
 }
-
 
 void NodalBC_3D_ring::compute_cap_centroid( const std::vector<double> &pts, Vector_3 &centroid ) const
 {

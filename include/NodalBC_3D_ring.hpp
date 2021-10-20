@@ -75,7 +75,7 @@ class NodalBC_3D_ring : public INodalBC
     std::vector<unsigned int> per_slave_nodes, per_master_nodes;
     unsigned int num_per_nodes;
 
-    NodalBC_3D_ring() : num_nbc(0), ring_bc_type(0) {};
+    NodalBC_3D_ring() : ring_bc_type(0) {};
 
     // Ring node bc type
     // type = 0 : all dof of ring nodes are assigned as essential bc (clamped)
