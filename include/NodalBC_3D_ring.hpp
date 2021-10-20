@@ -43,6 +43,19 @@ class NodalBC_3D_ring : public INodalBC
 
     virtual ~NodalBC_3D_ring() {};
 
+    virtual unsigned int get_dir_nodes(unsigned int &ii) const
+    {return dir_nodes[ii];}
+
+    virtual unsigned int get_per_slave_nodes(unsigned int &ii) const
+    {return per_slave_nodes[ii];}
+
+    virtual unsigned int get_per_master_nodes(unsigned int &ii) const
+    {return per_master_nodes[ii];}
+
+    virtual unsigned int get_num_dir_nodes() const {return num_dir_nodes;}
+
+    virtual unsigned int get_num_per_nodes() const {return num_per_nodes;}
+
     virtual int get_num_nbc() const {return num_nbc;}
 
     virtual int get_num_caps() const { return num_caps; }
@@ -56,11 +69,13 @@ class NodalBC_3D_ring : public INodalBC
     virtual std::vector<double> get_rotation_matrix() const { return Q; } 
 
   private:
-    NodalBC_3D_ring() : num_nbc(0), ring_bc_type(0) {};
+    std::vector<unsigned int> dir_nodes;
+    unsigned int num_dir_nodes;
 
-    // fixed to be 1 as we only need one list of dir_nodes saving the clamped
-    // nodal indices.
-    const int num_nbc;
+    std::vector<unsigned int> per_slave_nodes, per_master_nodes;
+    unsigned int num_per_nodes;
+
+    NodalBC_3D_ring() : num_nbc(0), ring_bc_type(0) {};
 
     // Ring node bc type
     // type = 0 : all dof of ring nodes are assigned as essential bc (clamped)

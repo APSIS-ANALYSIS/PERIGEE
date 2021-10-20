@@ -106,7 +106,6 @@ class NodalBC_3D_vtp : public INodalBC
     void BC_type_1( const std::vector<std::string> &vtpfileList,
         const int &nFunc  );
 
-
     // --------------------------------------------------------------
     // BC_type_2 is a bc that sets Dirichlet on the first vtp surface
     // and set master-slave on the second vtp surface with master
@@ -118,7 +117,6 @@ class NodalBC_3D_vtp : public INodalBC
     // --------------------------------------------------------------
     void BC_type_2( const std::vector<std::string> &vtpfileList,
         const int &nFunc  );
-
 
     // --------------------------------------------------------------
     // BC_type_3 is a bc that sets Dirichlet on the given vtp file's
