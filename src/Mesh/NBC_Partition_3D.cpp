@@ -173,15 +173,14 @@ NBC_Partition_3D::~NBC_Partition_3D()
   VEC_T::clean(Num_LPM);
 }
 
-
-void NBC_Partition_3D::write_hdf5(const char * FileName) const
+void NBC_Partition_3D::write_hdf5( const std::string &FileName, 
+    const std::string &GroupName ) const
 {
-  const std::string input_fName(FileName);
-  const std::string fName = SYS_T::gen_partfile_name( input_fName, cpu_rank );
+  const std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
 
   hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
-  hid_t g_id = H5Gcreate(file_id, "/nbc", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  hid_t g_id = H5Gcreate(file_id, GroupName.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
   HDF5_Writer * h5writer = new HDF5_Writer(file_id);
 
@@ -189,7 +188,7 @@ void NBC_Partition_3D::write_hdf5(const char * FileName) const
 
   if( LDN.size() > 0 ) h5writer->write_intVector( g_id, "LDN", LDN );
 
-  if( LPSN.size() > 0)
+  if( LPSN.size() > 0 )
   {
     h5writer->write_intVector( g_id, "LPSN", LPSN );
     h5writer->write_intVector( g_id, "LPMN", LPMN );
@@ -207,42 +206,6 @@ void NBC_Partition_3D::write_hdf5(const char * FileName) const
 
   delete h5writer; H5Gclose(g_id); H5Fclose(file_id);
 }
-
-
-void NBC_Partition_3D::write_hdf5( const char * FileName, const char * GroupName ) const
-{
-  const std::string input_fName(FileName);
-  const std::string fName = SYS_T::gen_partfile_name( input_fName, cpu_rank );
-
-  hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
-
-  hid_t g_id = H5Gcreate(file_id, GroupName, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-
-  HDF5_Writer * h5writer = new HDF5_Writer(file_id);
-
-  h5writer->write_intVector( g_id, "LID", LID );
-
-  if( LDN.size() > 0 ) h5writer->write_intVector( g_id, "LDN", LDN );
-
-  if( LPSN.size() > 0)
-  {
-    h5writer->write_intVector( g_id, "LPSN", LPSN );
-    h5writer->write_intVector( g_id, "LPMN", LPMN );
-  }
-
-  if( LocalMaster.size() > 0 )
-  {
-    h5writer->write_intVector( g_id, "LocalMaster",      LocalMaster );
-    h5writer->write_intVector( g_id, "LocalMasterSlave", LocalMasterSlave );
-  }
-
-  h5writer->write_intVector(g_id, "Num_LD",  Num_LD);
-  h5writer->write_intVector(g_id, "Num_LPS", Num_LPS);
-  h5writer->write_intVector(g_id, "Num_LPM", Num_LPM);
-
-  delete h5writer; H5Gclose(g_id); H5Fclose(file_id);
-}
-
 
 void NBC_Partition_3D::print_info() const
 {

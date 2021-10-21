@@ -363,7 +363,7 @@ int main( int argc, char * argv[] )
 
     // Partition Nodal BC and write to h5 file
     INBC_Partition * nbcpart = new NBC_Partition_3D(part, mnindex, NBC_list);
-    nbcpart -> write_hdf5( part_file.c_str() );
+    nbcpart -> write_hdf5( part_file );
 
     // Partition Nodal Inflow BC and write to h5 file
     INBC_Partition * infpart = new NBC_Partition_3D_inflow(part, mnindex, InFBC);
