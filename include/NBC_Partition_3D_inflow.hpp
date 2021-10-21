@@ -69,7 +69,8 @@ class NBC_Partition_3D_inflow : public NBC_Partition_3D
     // num_nbc x num_local_cell[ii]
     std::vector< std::vector<int> > local_global_cell;
   
-    // This function is NOT allowed for wall ebc. 
+    // ------------------------------------------------------------------------
+    // This function is NOT allowed for inflow nbc 
     virtual void write_hdf5( const std::string &FileName,
         const std::string &GroupName ) const;
 };
