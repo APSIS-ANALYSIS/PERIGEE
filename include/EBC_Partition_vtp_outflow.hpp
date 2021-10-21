@@ -30,11 +30,8 @@ class EBC_Partition_vtp_outflow : public EBC_Partition_vtp
 
     // write the data to hdf5 file in group /ebc/ebcid_xxx, 
     // xxx is the ebc_id
-    virtual void write_hdf5( const char * FileName ) const;
-
-    // write the data to hdf5 file in group /group-name/ebcid_xxx, 
-    // xxx is the ebc_id
-    virtual void write_hdf5( const char * FileName, const char * GroupName ) const;
+    virtual void write_hdf5( const std::string &FileName ) const
+    { write_hdf5(FileName, "/ebc"); }
 
   protected:
     // Length is num_ebc x [ 0 if this part does not own this bc,
@@ -53,6 +50,13 @@ class EBC_Partition_vtp_outflow : public EBC_Partition_vtp
     // unit normal vector to the cap surfaces, if the partition owns the bc.
     // size is num_ebc x [ 0, if does not own, or 3, if owns ].
     std::vector< std::vector<double> > outvec; 
+    
+    // write the data to hdf5 file in group /group-name/ebcid_xxx, 
+    // xxx is the ebc_id
+    // We do not give users the access to this function out of the class
+    virtual void write_hdf5( const std::string &FileName, 
+        const std::string &GroupName ) const;
+
 };
 
 #endif

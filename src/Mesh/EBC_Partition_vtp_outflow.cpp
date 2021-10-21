@@ -64,62 +64,24 @@ EBC_Partition_vtp_outflow::~EBC_Partition_vtp_outflow()
   VEC_T::clean( outvec );
 }
 
-void EBC_Partition_vtp_outflow::write_hdf5( const char * FileName ) const
-{
-  // Call base class writer to write base class data
-  EBC_Partition_vtp::write_hdf5( FileName );
-
-  const std::string input_fName(FileName);
-  const std::string fName = SYS_T::gen_partfile_name( input_fName, cpu_rank );
-
-  hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
-  hid_t g_id = H5Gopen( file_id, "/ebc", H5P_DEFAULT );
-
-  HDF5_Writer * h5w = new HDF5_Writer( file_id );
-
-  const std::string groupbase("ebcid_");
-  for(int ii=0; ii<num_ebc; ++ii)
-  {
-    if( num_local_cell[ii] > 0 )
-    {
-      std::string subgroup_name(groupbase);
-      subgroup_name.append( SYS_T::to_string(ii) );
-      hid_t subgroup_id = H5Gopen(g_id, subgroup_name.c_str(), H5P_DEFAULT );
-
-      h5w->write_doubleVector( subgroup_id, "intNA", face_int_NA[ii] );
-      h5w->write_intVector( subgroup_id, "LID_all_face_nodes", LID_all_face_nodes[ii] );
-      h5w->write_doubleVector( subgroup_id, "out_normal", outvec[ii] );
-
-      H5Gclose( subgroup_id );
-    }
-  }
-
-  delete h5w;
-  H5Gclose( g_id );
-  H5Fclose( file_id );
-}
-
-void EBC_Partition_vtp_outflow::write_hdf5( const char * FileName, 
-    const char * GroupName ) const
+void EBC_Partition_vtp_outflow::write_hdf5( const std::string &FileName, 
+    const std::string &GroupName ) const 
 {
   // Call the base class writer to write the base class data
   EBC_Partition_vtp::write_hdf5( FileName, GroupName );
 
-  const std::string input_fName(FileName);
-  const std::string fName = SYS_T::gen_partfile_name( input_fName, cpu_rank );
+  const std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
 
   hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
-  hid_t g_id = H5Gopen( file_id, GroupName, H5P_DEFAULT );
+  hid_t g_id = H5Gopen( file_id, GroupName.c_str(), H5P_DEFAULT );
 
   HDF5_Writer * h5w = new HDF5_Writer( file_id );
-
-  const std::string groupbase("ebcid_");
 
   for(int ii=0; ii<num_ebc; ++ii)
   {
     if( num_local_cell[ii] > 0 )
     {
-      std::string subgroup_name(groupbase);
+      std::string subgroup_name( "ebcid_" );
       subgroup_name.append( SYS_T::to_string(ii) );
       hid_t subgroup_id = H5Gopen(g_id, subgroup_name.c_str(), H5P_DEFAULT );
 
@@ -131,9 +93,7 @@ void EBC_Partition_vtp_outflow::write_hdf5( const char * FileName,
     }
   }
 
-  delete h5w;
-  H5Gclose( g_id );
-  H5Fclose( file_id );
+  delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
 }
 
 // EOF
