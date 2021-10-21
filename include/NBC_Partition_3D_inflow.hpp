@@ -27,7 +27,7 @@ class NBC_Partition_3D_inflow : public NBC_Partition_3D
 
     virtual ~NBC_Partition_3D_inflow();
 
-    virtual void write_hdf5( const char * FileName ) const;
+    virtual void write_hdf5( const std::string &FileName ) const;
 
   private:
     // active area & full area. Length num_nbc

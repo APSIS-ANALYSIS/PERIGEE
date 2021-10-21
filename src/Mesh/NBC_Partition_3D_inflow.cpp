@@ -94,10 +94,9 @@ NBC_Partition_3D_inflow::NBC_Partition_3D_inflow(
 NBC_Partition_3D_inflow::~NBC_Partition_3D_inflow()
 {}
 
-void NBC_Partition_3D_inflow::write_hdf5( const char * FileName ) const
+void NBC_Partition_3D_inflow::write_hdf5( const std::string &FileName ) const
 {
-  std::string filebname(FileName);
-  std::string fName = SYS_T::gen_partfile_name( filebname, cpu_rank );
+  std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
   
   hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
@@ -119,11 +118,9 @@ void NBC_Partition_3D_inflow::write_hdf5( const char * FileName ) const
   
   h5w->write_intVector( g_id, "cell_nLocBas", cell_nLocBas );
 
-  const std::string groupbase("nbcid_");
-
   for(int ii=0; ii<num_nbc; ++ii)
   {
-    std::string subgroup_name(groupbase);
+    std::string subgroup_name( "nbcid_" );
     subgroup_name.append( SYS_T::to_string(ii) );
 
     hid_t group_id = H5Gcreate(g_id, subgroup_name.c_str(),
