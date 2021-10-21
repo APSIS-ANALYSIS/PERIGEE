@@ -2,13 +2,11 @@
 
 NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
     const Map_Node_Index * const &mnindex,
-    const std::vector<INodalBC *> &nbc_list )
-: cpu_rank(part->get_cpu_rank())
+    const std::vector<INodalBC *> &nbc_list ) : cpu_rank(part->get_cpu_rank())
 {
   const int dof = (int) nbc_list.size();
 
-  LID.clear();
-  LDN.clear(); LPSN.clear(); LPMN.clear();
+  LID.clear(); LDN.clear(); LPSN.clear(); LPMN.clear();
   LocalMaster.clear(); LocalMasterSlave.clear();
 
   Num_LD.resize(dof); Num_LPS.resize(dof); Num_LPM.resize(dof);
@@ -59,8 +57,7 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
     Num_LPM[ii] = pm_num;
   } // end ii-loop over dof
 
-  VEC_T::shrink2fit( LDN );
-  VEC_T::shrink2fit( LPSN ); VEC_T::shrink2fit( LPMN );
+  VEC_T::shrink2fit( LDN ); VEC_T::shrink2fit( LPSN ); VEC_T::shrink2fit( LPMN );
   VEC_T::shrink2fit( LocalMaster ); VEC_T::shrink2fit( LocalMasterSlave );
 
   const int totnode = part->get_nlocghonode();
@@ -79,10 +76,7 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
 
   for(int ii=0; ii<dof*totnode; ++ii)
   {
-    if(LID[ii] != -1)
-    {
-      LID[ii] = mnindex->get_old2new(LID[ii]);
-    }
+    if(LID[ii] != -1) LID[ii] = mnindex->get_old2new(LID[ii]);
   }
 
   VEC_T::shrink2fit( LID );
@@ -95,9 +89,7 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
 {
   const int dof = 1;
 
-  LID.clear();
-
-  LDN.clear(); LPSN.clear(); LPMN.clear();
+  LID.clear(); LDN.clear(); LPSN.clear(); LPMN.clear();
   LocalMaster.clear(); LocalMasterSlave.clear();
 
   Num_LD.resize(dof); Num_LPS.resize(dof); Num_LPM.resize(dof);
@@ -145,8 +137,7 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
   Num_LPS[0] = ps_num;
   Num_LPM[0] = pm_num;
 
-  VEC_T::shrink2fit( LDN );
-  VEC_T::shrink2fit( LPSN ); VEC_T::shrink2fit( LPMN );
+  VEC_T::shrink2fit( LDN ); VEC_T::shrink2fit( LPSN ); VEC_T::shrink2fit( LPMN );
   VEC_T::shrink2fit( LocalMaster ); VEC_T::shrink2fit( LocalMasterSlave );
 
   const int totnode = part->get_nlocghonode();
@@ -162,10 +153,7 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
 
   for(int ii=0; ii<dof*totnode; ++ii)
   {
-    if(LID[ii] != -1)
-    {
-      LID[ii] = mnindex->get_old2new(LID[ii]);
-    }
+    if(LID[ii] != -1) LID[ii] = mnindex->get_old2new(LID[ii]);
   }
 
   VEC_T::shrink2fit( LID );
@@ -199,8 +187,7 @@ void NBC_Partition_3D::write_hdf5(const char * FileName) const
 
   h5writer->write_intVector( g_id, "LID", LID );
 
-  if( LDN.size() > 0 )
-    h5writer->write_intVector( g_id, "LDN", LDN );
+  if( LDN.size() > 0 ) h5writer->write_intVector( g_id, "LDN", LDN );
 
   if( LPSN.size() > 0)
   {
@@ -222,23 +209,20 @@ void NBC_Partition_3D::write_hdf5(const char * FileName) const
 }
 
 
-void NBC_Partition_3D::write_hdf5( const char * FileName,
-    const char * GroupName ) const
+void NBC_Partition_3D::write_hdf5( const char * FileName, const char * GroupName ) const
 {
   const std::string input_fName(FileName);
   const std::string fName = SYS_T::gen_partfile_name( input_fName, cpu_rank );
 
   hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
-  hid_t g_id = H5Gcreate(file_id, GroupName, H5P_DEFAULT, H5P_DEFAULT, 
-      H5P_DEFAULT);
+  hid_t g_id = H5Gcreate(file_id, GroupName, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
   HDF5_Writer * h5writer = new HDF5_Writer(file_id);
 
   h5writer->write_intVector( g_id, "LID", LID );
 
-  if( LDN.size() > 0 )
-    h5writer->write_intVector( g_id, "LDN", LDN );
+  if( LDN.size() > 0 ) h5writer->write_intVector( g_id, "LDN", LDN );
 
   if( LPSN.size() > 0)
   {
