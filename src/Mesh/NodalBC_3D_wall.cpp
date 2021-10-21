@@ -5,20 +5,11 @@ NodalBC_3D_wall::NodalBC_3D_wall(
     const std::string &wall_file,
     const std::vector<std::string> &outflow_files,
     const int &nFunc, const int &elemtype )
-: num_nbc(1)
 {
   // No periodic nodes
-  per_slave_nodes.resize(num_nbc);
-  per_master_nodes.resize(num_nbc);
-  num_per_nodes.resize(num_nbc);
-
-  const int nbc_id = 0;
-  per_slave_nodes[nbc_id].clear();
-  per_master_nodes[nbc_id].clear();
-  num_per_nodes[nbc_id] = 0;
-
-  dir_nodes.resize(     num_nbc );
-  num_dir_nodes.resize( num_nbc );
+  per_slave_nodes.clear();
+  per_master_nodes.clear();
+  num_per_nodes = 0;
 
   // Aggregate inlet and outlet data
   std::vector<std::string> cap_files = inflow_files;
@@ -72,16 +63,16 @@ NodalBC_3D_wall::NodalBC_3D_wall(
 
   VEC_T::sort_unique_resize( ring_gnode );
 
-  dir_nodes[nbc_id].clear();
+  dir_nodes.clear();
 
   // exclude the ring nodes
   for(unsigned int ii=0; ii<wall_gnode.size(); ++ii)
   {
     if( !VEC_T::is_invec( ring_gnode, wall_gnode[ii] ) )
-      dir_nodes[nbc_id].push_back( wall_gnode[ii] );
+      dir_nodes.push_back( wall_gnode[ii] );
   }
 
-  num_dir_nodes[nbc_id] = dir_nodes[nbc_id].size();
+  num_dir_nodes = dir_nodes[nbc_id].size();
 
   // Generate the ID array
   Create_ID( nFunc );

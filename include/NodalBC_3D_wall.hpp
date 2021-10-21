@@ -21,10 +21,25 @@ class NodalBC_3D_wall : public INodalBC
 
     virtual ~NodalBC_3D_wall() {};
 
-    virtual int get_num_nbc() const {return num_nbc;}
+    virtual unsigned int get_dir_nodes(unsigned int &ii) const
+    {return dir_nodes[ii];}
+
+    virtual unsigned int get_per_slave_nodes(unsigned int &ii) const
+    {return per_slave_nodes[ii];}
+
+    virtual unsigned int get_per_master_nodes(unsigned int &ii) const
+    {return per_master_nodes[ii];}
+
+    virtual unsigned int get_num_dir_nodes() const {return num_dir_nodes;}
+
+    virtual unsigned int get_num_per_nodes() const {return num_per_nodes;}
 
   private:
-    const int num_nbc;
+    std::vector<unsigned int> dir_nodes;
+    unsigned int num_dir_nodes;
+
+    std::vector<unsigned int> per_slave_nodes, per_master_nodes;
+    unsigned int num_per_nodes;
 };
 
 #endif
