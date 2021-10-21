@@ -41,15 +41,15 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
 
       if(part->isNodeInPart(node_ps))
       {
-        LPSN[ii].push_back(node_ps);
-        LPMN[ii].push_back(node_pm);
+        LPSN.push_back(node_ps);
+        LPMN.push_back(node_pm);
         ps_num += 1;
       }
 
       if(part->isNodeInPart(node_pm))
       {
-        LocalMaster[ii].push_back(node_pm);
-        LocalMasterSlave[ii].push_back(node_ps);
+        LocalMaster.push_back(node_pm);
+        LocalMasterSlave.push_back(node_ps);
         pm_num += 1;
       }
     } // end jj-loop
