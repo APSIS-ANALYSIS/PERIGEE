@@ -22,8 +22,7 @@ NBC_Partition_3D_ring::NBC_Partition_3D_ring(
       unsigned int node_index = nbc -> get_dir_nodes(ii);
       node_index = mnindex -> get_old2new(node_index);
 
-      if( part->isNodeInPart(node_index) )
-        local_cap_id.push_back( cap_id[ii] );
+      if( part->isNodeInPart(node_index) ) local_cap_id.push_back( cap_id[ii] );
     } 
   }
 }
