@@ -47,12 +47,8 @@ NodalBC_3D_CMM::NodalBC_3D_CMM(
     case 0:
     {
       // regardless of comp, assign all interior inlet nodes as nodal/essential bc
-      const int num_nbc_inflow = nbc_inflow -> get_num_nbc(); 
-      for(int nbc_id_inflow = 0; nbc_id_inflow < num_nbc_inflow; ++nbc_id_inflow)
-      {
-        for(unsigned int ii=0; ii<nbc_inflow->get_num_dir_nodes(nbc_id_inflow); ++ii)
-          dir_nodes.push_back( nbc_inflow->get_dir_nodes(nbc_id_inflow, ii) );
-      }
+      for(unsigned int ii=0; ii<nbc_inflow->get_num_dir_nodes(); ++ii)
+        dir_nodes.push_back( nbc_inflow->get_dir_nodes(ii) );
 
       // obtain the type of ring nodes' specification
       const std::vector<int> cap_id = nbc_ring -> get_cap_id();
@@ -105,12 +101,8 @@ NodalBC_3D_CMM::NodalBC_3D_CMM(
     case 1:
     {
       // regardless of comp, assign all interior inlet nodes as nodal/essential bc
-      const int num_nbc_inflow = nbc_inflow -> get_num_nbc(); 
-      for(int nbc_id_inflow = 0; nbc_id_inflow < num_nbc_inflow; ++nbc_id_inflow)
-      {
-        for(unsigned int ii=0; ii<nbc_inflow->get_num_dir_nodes(nbc_id_inflow); ++ii)
-          dir_nodes.push_back( nbc_inflow->get_dir_nodes(nbc_id_inflow, ii) );
-      }
+      for(unsigned int ii=0; ii<nbc_inflow->get_num_dir_nodes(); ++ii)
+        dir_nodes.push_back( nbc_inflow->get_dir_nodes(ii) );
 
       // Assign the ring nodes for this type of nodal/essential bc
       for(unsigned int ii=0; ii<nbc_ring->get_num_dir_nodes(); ++ii)

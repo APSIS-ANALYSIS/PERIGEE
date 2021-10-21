@@ -5,10 +5,10 @@ NodalBC_3D_inflow::NodalBC_3D_inflow(const int &nFunc)
 {
   per_slave_nodes.clear();
   per_master_nodes.clear();
-  num_per_nodes.clear();
+  num_per_nodes = 0;
 
   dir_nodes.clear();
-  num_dir_nodes.clear();
+  num_dir_nodes = 0;
 
   Create_ID( nFunc );
   
@@ -35,14 +35,10 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   SYS_T::file_check(wallfile);
 
   // 1. No periodic nodes
-  per_slave_nodes.resize(num_nbc);
-  per_master_nodes.resize(num_nbc);
-  num_per_nodes.resize(num_nbc);
-
   const int nbc_id = 0;
-  per_slave_nodes[nbc_id].clear();
-  per_master_nodes[nbc_id].clear();
-  num_per_nodes[nbc_id] = 0;
+  per_slave_nodes.clear();
+  per_master_nodes.clear();
+  num_per_nodes = 0;
 
   // 2. Analyze the file type and read in the data
   num_node.resize( num_nbc );
@@ -55,8 +51,8 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   global_node.resize(  num_nbc );
   global_cell.resize(  num_nbc );
 
-  dir_nodes.resize(     num_nbc );
-  num_dir_nodes.resize( num_nbc );
+  dir_nodes.clear();
+  num_dir_nodes = 0;
 
   centroid.resize(  num_nbc );
   outnormal.resize( num_nbc );
@@ -95,17 +91,15 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   else SYS_T::print_fatal("Error: unknown element type.\n");
 
   // Generate the dir-node list. Nodes belonging to the wall are excluded.
-  dir_nodes[nbc_id].clear();
-  
   for(unsigned int ii=0; ii<global_node[nbc_id].size(); ++ii)
   {
     SYS_T::print_fatal_if( global_node[nbc_id][ii]<0, "Error: negative nodal index! \n");
 
     if( !VEC_T::is_invec( wall_gnode, global_node[nbc_id][ii]) )
-      dir_nodes[nbc_id].push_back( global_node[nbc_id][ii] );
+      dir_nodes.push_back( global_node[nbc_id][ii] );
   }
 
-  num_dir_nodes[nbc_id] = dir_nodes[nbc_id].size(); 
+  num_dir_nodes = dir_nodes.size(); 
 
   // Generate ID array
   Create_ID( nFunc );
@@ -262,9 +256,9 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileLis
 : num_nbc( static_cast<int>( inffileList.size() ) )
 {
   // 1. No periodic nodes
-  per_slave_nodes.resize(num_nbc);
-  per_master_nodes.resize(num_nbc);
-  num_per_nodes.resize(num_nbc);
+  per_slave_nodes.clear();
+  per_master_nodes.clear();
+  num_per_nodes = 0;
 
   // 2. Analyze the file type and read in the data
   num_node.resize( num_nbc );
@@ -277,8 +271,8 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileLis
   global_node.resize(  num_nbc );
   global_cell.resize(  num_nbc );
 
-  dir_nodes.resize(     num_nbc );
-  num_dir_nodes.resize( num_nbc );
+  dir_nodes.clear();
+  num_dir_nodes = 0;
 
   centroid.resize(  num_nbc );
   outnormal.resize( num_nbc );
@@ -300,10 +294,6 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileLis
   for( int ii=0; ii<num_nbc; ++ii )
   {
     SYS_T::file_check( inffileList[ii] );
-
-    per_slave_nodes[ii].clear();
-    per_master_nodes[ii].clear();
-    num_per_nodes[ii] = 0;
 
     if( elemtype == 501 )
     {
@@ -331,17 +321,13 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileLis
     else SYS_T::print_fatal("Error: unknown element type.\n");
 
     // Generate the dir-node list. Nodes belonging to the wall are excluded.
-    dir_nodes[ii].clear();
-    
     for(unsigned int jj=0; jj<global_node[ii].size(); ++jj)
     {
       SYS_T::print_fatal_if( global_node[ii][jj]<0, "Error: negative nodal index! \n");
 
       if( !VEC_T::is_invec( wall_gnode, global_node[ii][jj]) )
-        dir_nodes[ii].push_back( global_node[ii][jj] );
+        dir_nodes.push_back( global_node[ii][jj] );
     }
-
-    num_dir_nodes[ii] = dir_nodes[ii].size(); 
 
     // Calculate the centroid of the surface
     centroid[ii].gen_zero();
@@ -477,6 +463,8 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileLis
     delete [] temp_sol; temp_sol = nullptr;
 
   } // end ii-loop
+  
+  num_dir_nodes = dir_nodes.size();
 
   // Generate ID array
   Create_ID( nFunc );
