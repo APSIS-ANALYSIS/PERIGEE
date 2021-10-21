@@ -47,6 +47,11 @@ class NBC_Partition_3D_ring : public NBC_Partition_3D
 
     // Each cap's unit normal vector, length 3 x num_caps
     std::vector<double> outnormal;
+
+    // ------------------------------------------------------------------------
+    // This function is NOT allowed for ring nbc
+    virtual void write_hdf5( const std::string &FileName,
+        const std::string &GroupName ) const;
 };
 
 #endif
