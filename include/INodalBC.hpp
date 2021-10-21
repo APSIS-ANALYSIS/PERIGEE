@@ -245,15 +245,6 @@ class INodalBC
     {SYS_T::commPrint("Warning: get_rotation_matrix is not implemented. \n"); return {};}
   
   protected:
-
-    // num_nbc x num_dir_nodes[ii] in dimension
-    //std::vector< std::vector<unsigned int> > dir_nodes;
-    //std::vector<unsigned int> num_dir_nodes;
-
-    // num_nbc x num_per_nodes[ii] in dimension
-    //std::vector< std::vector<unsigned int> > per_slave_nodes, per_master_nodes;
-    //std::vector<unsigned int> num_per_nodes;
-
     std::vector<int> ID;
 
     // ------------------------------------------------------------------------
