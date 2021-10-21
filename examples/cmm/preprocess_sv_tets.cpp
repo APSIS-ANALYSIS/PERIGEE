@@ -371,7 +371,7 @@ int main( int argc, char * argv[] )
 
     // Partition Nodal Ring BC and write to h5 file
     INBC_Partition * ringpart = new NBC_Partition_3D_ring(part, mnindex, ring_bc);
-    ringpart->write_hdf5( part_file.c_str() );
+    ringpart->write_hdf5( part_file );
 
     // Partition Elemental BC and write to h5 file
     IEBC_Partition * ebcpart = new EBC_Partition_vtp_outflow(part, mnindex, ebc, NBC_list);

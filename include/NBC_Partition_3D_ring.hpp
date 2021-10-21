@@ -25,7 +25,7 @@ class NBC_Partition_3D_ring : public NBC_Partition_3D
 
     virtual ~NBC_Partition_3D_ring();
 
-    virtual void write_hdf5( const char * FileName ) const;
+    virtual void write_hdf5( const std::string &FileName ) const;
 
   private:
     // type = 0 : all dof of ring nodes are set to be essential bc;

@@ -30,10 +30,9 @@ NBC_Partition_3D_ring::NBC_Partition_3D_ring(
 NBC_Partition_3D_ring::~NBC_Partition_3D_ring()
 {}
 
-void NBC_Partition_3D_ring::write_hdf5( const char * FileName ) const
+void NBC_Partition_3D_ring::write_hdf5( const std::string &FileName ) const
 {
-  std::string filebname(FileName);
-  std::string fName = SYS_T::gen_partfile_name( filebname, cpu_rank );
+  std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
   
   hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
