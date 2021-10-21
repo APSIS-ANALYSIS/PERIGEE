@@ -63,14 +63,13 @@ EBC_Partition_vtp_wall::~EBC_Partition_vtp_wall()
   VEC_T::clean( local_node_on_sur_pos );
 }
 
-void EBC_Partition_vtp_wall::write_hdf5( const char * FileName ) const
+void EBC_Partition_vtp_wall::write_hdf5( const std::string &FileName ) const
 {
   // Call base class writer to write base class data at ebc_wall folder
   // certain wall info are in ebc_wall/ebc_0 sub-folder
   EBC_Partition_vtp::write_hdf5( FileName, "ebc_wall" );
 
-  const std::string input_fName(FileName);
-  const std::string fName = SYS_T::gen_partfile_name( input_fName, cpu_rank );
+  const std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
 
   // re-open the file
   hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
@@ -108,7 +107,8 @@ void EBC_Partition_vtp_wall::write_hdf5( const char * FileName ) const
   delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
 }
 
-void EBC_Partition_vtp_wall::write_hdf5( const char * FileName, const char * GroupName ) const
+void EBC_Partition_vtp_wall::write_hdf5( const std::string &FileName,
+    const std::string &GroupName ) const 
 {
   // This function is NOT allowed. If the user uses the same groupname for the
   // wall and outlets, the wall data and the 0-th outlet data will be mixed.

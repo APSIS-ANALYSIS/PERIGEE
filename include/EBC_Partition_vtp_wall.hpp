@@ -27,10 +27,7 @@ class EBC_Partition_vtp_wall : public EBC_Partition_vtp
     virtual ~EBC_Partition_vtp_wall();
 
     // write the data to hdf5 file in folder /ebc_wall 
-    virtual void write_hdf5( const char * FileName ) const;
-
-    // This function is NOT allowed for wall ebc. 
-    virtual void write_hdf5( const char * FileName, const char * GroupName ) const;
+    virtual void write_hdf5( const std::string &FileName ) const;
 
   protected:
     // Length is num_local_node[0] 
@@ -49,6 +46,10 @@ class EBC_Partition_vtp_wall : public EBC_Partition_vtp
     // It is used for nodal update of surface solutions only.
     // Length is  num_local_node_on_sur
     std::vector<int> local_node_on_sur_pos;
+    
+    // This function is NOT allowed for wall ebc. 
+    virtual void write_hdf5( const std::string &FileName, 
+        const std::string &GroupName ) const;
 };
 
 #endif

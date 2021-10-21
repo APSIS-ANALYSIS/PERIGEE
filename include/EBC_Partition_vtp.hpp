@@ -27,7 +27,10 @@ class EBC_Partition_vtp : public IEBC_Partition
 
     // Write the data to hdf5 file in group /GroupName
     virtual void write_hdf5( const std::string &FileName,
-       const std::string &GroupName = "/ebc" ) const;
+       const std::string &GroupName ) const;
+
+    virtual void write_hdf5( const std::string &FileName ) const
+    { write_hdf5( FileName, "/ebc" ); }
 
     virtual void print_info() const;
 
