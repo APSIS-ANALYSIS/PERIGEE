@@ -72,7 +72,7 @@ NodalBC_3D_wall::NodalBC_3D_wall(
       dir_nodes.push_back( wall_gnode[ii] );
   }
 
-  num_dir_nodes = dir_nodes[nbc_id].size();
+  num_dir_nodes = dir_nodes.size();
 
   // Generate the ID array
   Create_ID( nFunc );
