@@ -44,7 +44,10 @@ class NBC_Partition_3D : public INBC_Partition
     // \para GroupName : the group name
     // ------------------------------------------------------------------------
     virtual void write_hdf5( const std::string &FileName, 
-        const std::string &GroupName = "/nbc" ) const;
+        const std::string &GroupName ) const;
+
+    virtual void write_hdf5( const std::string &FileName ) const
+    { write_hdf5(FileName, "/nbc"); }
 
     virtual void print_info() const;
 
