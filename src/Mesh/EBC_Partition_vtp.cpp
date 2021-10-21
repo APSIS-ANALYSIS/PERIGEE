@@ -114,15 +114,14 @@ EBC_Partition_vtp::~EBC_Partition_vtp()
   VEC_T::clean( local_cell_vol_id );
 }
 
-
-void EBC_Partition_vtp::write_hdf5( const char * FileName ) const
+void EBC_Partition_vtp::write_hdf5( const std::string &FileName, 
+    const std::string &GroupName ) const
 {
-  const std::string input_fName(FileName);
-  const std::string fName = SYS_T::gen_partfile_name( input_fName, cpu_rank );
+  const std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
 
   hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
-  hid_t g_id = H5Gcreate(file_id, "/ebc", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT); 
+  hid_t g_id = H5Gcreate(file_id, GroupName.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT); 
 
   HDF5_Writer * h5w = new HDF5_Writer( file_id );
 
@@ -162,57 +161,6 @@ void EBC_Partition_vtp::write_hdf5( const char * FileName ) const
 
   delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
 }
-
-
-void EBC_Partition_vtp::write_hdf5( const char * FileName,
-    const char * GroupName ) const
-{
-  const std::string input_fName(FileName);
-  const std::string fName = SYS_T::gen_partfile_name( input_fName, cpu_rank );
-
-  hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
-
-  hid_t g_id = H5Gcreate(file_id, GroupName, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT); 
-
-  HDF5_Writer * h5w = new HDF5_Writer( file_id );
-
-  h5w -> write_intScalar( g_id, "num_ebc", num_ebc );
-
-  h5w -> write_intVector( g_id, "num_local_cell_node", num_local_cell_node );
-
-  h5w -> write_intVector( g_id, "num_local_cell", num_local_cell );
-
-  h5w -> write_intVector( g_id, "cell_nLocBas", cell_nLocBas );
-
-  const std::string groupbase("ebcid_");
-
-  for(int ii=0; ii<num_ebc; ++ii)
-  {
-    if( num_local_cell[ii] > 0 )
-    {
-      std::string subgroup_name(groupbase);
-      subgroup_name.append( SYS_T::to_string(ii) );
-
-      hid_t group_id = H5Gcreate(g_id, subgroup_name.c_str(), 
-          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-
-      h5w->write_doubleVector( group_id, "local_cell_node_xyz", local_cell_node_xyz[ii] );
-
-      h5w->write_intVector( group_id, "local_tri_ien", local_tri_ien[ii] );
-
-      h5w->write_intVector( group_id, "local_cell_node_vol_id", local_cell_node_vol_id[ii] );
-
-      h5w->write_intVector( group_id, "local_cell_node_pos", local_cell_node_pos[ii] );
-
-      h5w->write_intVector( group_id, "local_cell_vol_id", local_cell_vol_id[ii] );
-
-      H5Gclose( group_id );
-    }
-  }
-
-  delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
-}
-
 
 void EBC_Partition_vtp::print_info() const
 {
