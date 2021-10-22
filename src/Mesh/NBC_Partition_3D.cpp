@@ -211,7 +211,6 @@ void NBC_Partition_3D::print_info() const
 {
   std::cout<<"=========================================== \n";
   std::cout<<"NBC_Partition_3D : \n";
-  std::cout<<"-- num_nbc = "<<num_nbc<<std::endl;
   std::cout<<"--- LID : \n";
   VEC_T::print(LID);
   std::cout<<"\n   LDN : \n";

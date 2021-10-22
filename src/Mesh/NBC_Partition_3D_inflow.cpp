@@ -119,18 +119,17 @@ void NBC_Partition_3D_inflow::write_hdf5( const std::string &FileName ) const
   
   h5w->write_intVector( g_id, "cell_nLocBas", cell_nLocBas );
 
+  if( LDN.size() > 0 ) h5w->write_intVector( g_id, "LDN", LDN );
+
+  h5w->write_intVector( g_id, "Num_LD", Num_LD );
+  
   for(int ii=0; ii<num_nbc; ++ii)
   {
     std::string subgroup_name( "nbcid_" );
     subgroup_name.append( SYS_T::to_string(ii) );
 
     hid_t group_id = H5Gcreate(g_id, subgroup_name.c_str(),
-          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-
-    if( LDN[ii].size() > 0 )
-      h5w->write_intVector( group_id, "LDN", LDN[ii] );
-
-    h5w->write_intVector( group_id, "Num_LD", Num_LD[ii] );
+        H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
     h5w->write_Vector_3( group_id, "Outward_normal_vector", outvec[ii] );
 
@@ -155,7 +154,7 @@ void NBC_Partition_3D_inflow::write_hdf5( const std::string &FileName ) const
 }
 
 void NBC_Partition_3D_inflow::write_hdf5( const std::string &FileName,
-        const std::string &GroupName ) const
+    const std::string &GroupName ) const
 {
   // This function is NOT allowed.
   SYS_T::print_fatal("Error: NBC_Partition_inflow, write_hdf5 with groupname is not allowed.\n");

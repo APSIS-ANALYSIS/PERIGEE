@@ -11,12 +11,11 @@
 // Date: Jan. 15 2017
 // ==================================================================
 #include <cassert>
-#include "IEBC_Partition.hpp"
 #include "IPart.hpp"
 #include "ElemBC.hpp"
 #include "HDF5_Writer.hpp"
 
-class EBC_Partition_vtp : public IEBC_Partition
+class EBC_Partition_vtp
 {
   public:
     EBC_Partition_vtp( const IPart * const &part, 

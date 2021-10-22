@@ -9,13 +9,12 @@
 // Date: March 24 2016
 // Author: Ju Liu
 // ============================================================================
-#include "INBC_Partition.hpp"
 #include "IPart.hpp"
 #include "Map_Node_Index.hpp"
 #include "INodalBC.hpp"
 #include "HDF5_Writer.hpp"
 
-class NBC_Partition_3D : public INBC_Partition
+class NBC_Partition_3D
 {
   public:
     NBC_Partition_3D( const IPart * const &part,

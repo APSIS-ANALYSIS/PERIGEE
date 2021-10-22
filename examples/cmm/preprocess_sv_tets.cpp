@@ -362,24 +362,24 @@ int main( int argc, char * argv[] )
     part -> print_part_loadbalance_edgecut();
 
     // Partition Nodal BC and write to h5 file
-    INBC_Partition * nbcpart = new NBC_Partition_3D(part, mnindex, NBC_list);
+    NBC_Partition_3D * nbcpart = new NBC_Partition_3D(part, mnindex, NBC_list);
     nbcpart -> write_hdf5( part_file );
 
     // Partition Nodal Inflow BC and write to h5 file
-    INBC_Partition * infpart = new NBC_Partition_3D_inflow(part, mnindex, InFBC);
-    infpart->write_hdf5( part_file.c_str() );
+    NBC_Partition_3D_inflow * infpart = new NBC_Partition_3D_inflow(part, mnindex, InFBC);
+    infpart->write_hdf5( part_file );
 
     // Partition Nodal Ring BC and write to h5 file
-    INBC_Partition * ringpart = new NBC_Partition_3D_ring(part, mnindex, ring_bc);
+    NBC_Partition_3D_ring * ringpart = new NBC_Partition_3D_ring(part, mnindex, ring_bc);
     ringpart->write_hdf5( part_file );
 
     // Partition Elemental BC and write to h5 file
-    IEBC_Partition * ebcpart = new EBC_Partition_vtp_outflow(part, mnindex, ebc, NBC_list);
-    ebcpart -> write_hdf5( part_file.c_str() );
+    EBC_Partition_vtp_outflow * ebcpart = new EBC_Partition_vtp_outflow(part, mnindex, ebc, NBC_list);
+    ebcpart -> write_hdf5( part_file );
 
     // Partition Elemental Wall BC and write it to h5 file
-    IEBC_Partition * wbcpart = new EBC_Partition_vtp_wall(part, mnindex, wall_ebc );
-    wbcpart -> write_hdf5( part_file.c_str() );
+    EBC_Partition_vtp_wall * wbcpart = new EBC_Partition_vtp_wall(part, mnindex, wall_ebc );
+    wbcpart -> write_hdf5( part_file );
 
     // Collect partition statistics
     list_nlocalnode.push_back(part->get_nlocalnode());
