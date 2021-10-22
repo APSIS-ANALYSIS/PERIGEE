@@ -1,10 +1,8 @@
 #include "NodalBC_3D_inflow.hpp"
 
-NodalBC_3D_inflow::NodalBC_3D_inflow(const int &nFunc)
-: num_nbc( 0 )
+NodalBC_3D_inflow::NodalBC_3D_inflow(const int &nFunc) : num_nbc( 0 )
 {
-  per_slave_nodes.clear();
-  per_master_nodes.clear();
+  per_slave_nodes.clear(); per_master_nodes.clear();
   num_per_nodes = 0;
 
   dir_nodes.clear();
@@ -12,24 +10,22 @@ NodalBC_3D_inflow::NodalBC_3D_inflow(const int &nFunc)
 
   Create_ID( nFunc );
   
-  inf_active_area.clear();
+  inf_active_area.clear(); face_area.clear();
 
-  centroid.clear();
-  outnormal.clear();
-  
-  num_out_bc_pts.clear();
-  outline_pts.clear();
+  centroid.clear(); outnormal.clear();
+  num_out_bc_pts.clear(); outline_pts.clear();
   intNA.clear();
+
+  num_node.clear(); num_cell.clear(); nLocBas.clear();
+  tri_ien.clear(); pt_xyz.clear(); global_node.clear(); global_cell.clear();
 
   std::cout<<"===> NodalBC_3D_inflow::empty is generated. \n";
 }
 
-
 NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
     const std::string &wallfile, const int &nFunc,
     const Vector_3 &in_outnormal,
-    const int &elemtype )
-: num_nbc( 1 )
+    const int &elemtype ) : num_nbc( 1 )
 {
   SYS_T::file_check(inffile);
   SYS_T::file_check(wallfile);
@@ -40,7 +36,11 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   per_master_nodes.clear();
   num_per_nodes = 0;
 
-  // 2. Analyze the file type and read in the data
+  // 2. Clear the container for Dirichlet nodes
+  dir_nodes.clear();
+  num_dir_nodes = 0;
+
+  // 3. Analyze the file type and read in the data
   num_node.resize( num_nbc );
   num_cell.resize( num_nbc );
   nLocBas.resize(  num_nbc );
@@ -50,9 +50,6 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
 
   global_node.resize(  num_nbc );
   global_cell.resize(  num_nbc );
-
-  dir_nodes.clear();
-  num_dir_nodes = 0;
 
   centroid.resize(  num_nbc );
   outnormal.resize( num_nbc );
@@ -99,7 +96,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
       dir_nodes.push_back( global_node[nbc_id][ii] );
   }
 
-  num_dir_nodes = dir_nodes.size(); 
+  num_dir_nodes = dir_nodes.size(); // Now assign the value of the number of Dirichlet nodes 
 
   // Generate ID array
   Create_ID( nFunc );
@@ -252,15 +249,18 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileLis
     const std::string &wallfile,
     const int &nFunc,
     const std::vector<Vector_3> &in_outnormal,
-    const int &elemtype )
-: num_nbc( static_cast<int>( inffileList.size() ) )
+    const int &elemtype ) : num_nbc( static_cast<int>( inffileList.size() ) )
 {
   // 1. No periodic nodes
   per_slave_nodes.clear();
   per_master_nodes.clear();
   num_per_nodes = 0;
 
-  // 2. Analyze the file type and read in the data
+  // 2. Clear the container for Dirichlet nodes
+  dir_nodes.clear();
+  num_dir_nodes = 0;
+
+  // 3. Analyze the file type and read in the data
   num_node.resize( num_nbc );
   num_cell.resize( num_nbc );
   nLocBas.resize(  num_nbc );
@@ -270,9 +270,6 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileLis
 
   global_node.resize(  num_nbc );
   global_cell.resize(  num_nbc );
-
-  dir_nodes.clear();
-  num_dir_nodes = 0;
 
   centroid.resize(  num_nbc );
   outnormal.resize( num_nbc );
