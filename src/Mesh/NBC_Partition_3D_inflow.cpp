@@ -22,7 +22,7 @@ NBC_Partition_3D_inflow::NBC_Partition_3D_inflow(
     facearea[ii] = nbc -> get_para_6(ii);
 
     // Outward normal vector
-    outvec[ii] = nbc->get_para_2(ii);
+    outvec[ii] = nbc->get_outnormal(ii);
 
     // Centroid and outline points
     num_out_bc_pts[ii] = nbc->get_para_3(ii);

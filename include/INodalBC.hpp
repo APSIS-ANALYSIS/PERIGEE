@@ -78,13 +78,12 @@ class INodalBC
       return 0.0;
     }
 
-    // --------------------------------------------------------------
-    // get_para_2() passes additional parameters from the specific
-    //              instantiations.
-    // --------------------------------------------------------------
-    virtual Vector_3 get_para_2(const int &nbc_id) const
+    // ------------------------------------------------------------------------
+    // get_outnormal() return inflow cap surface outward normal
+    // ------------------------------------------------------------------------
+    virtual Vector_3 get_outnormal(const int &nbc_id) const
     {
-      SYS_T::print_fatal("Error: INodalBC::get_para_2 is not implemented.\n");
+      SYS_T::print_fatal("Error: INodalBC::get_outnormal is not implemented.\n");
       return Vector_3();
     }
   
