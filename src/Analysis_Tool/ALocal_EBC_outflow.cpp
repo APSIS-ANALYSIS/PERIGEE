@@ -10,10 +10,8 @@ ALocal_EBC_outflow::ALocal_EBC_outflow( const std::string &fileBaseName,
   hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
   HDF5_Reader * h5r = new HDF5_Reader( file_id );
   
-  intNA.resize( num_ebc );
-  LID.resize( num_ebc );
-  outvec.resize( num_ebc );
-  num_face_nodes.resize( num_ebc );
+  intNA.resize(  num_ebc ); LID.resize( num_ebc );
+  outvec.resize( num_ebc ); num_face_nodes.resize( num_ebc );
 
   for(int ii=0; ii<num_ebc; ++ii)
   {
@@ -23,9 +21,9 @@ ALocal_EBC_outflow::ALocal_EBC_outflow( const std::string &fileBaseName,
       subgroup_name.append("/ebcid_");
       subgroup_name.append( SYS_T::to_string(ii) );
 
-      intNA[ii] = h5r -> read_doubleVector( subgroup_name.c_str(), "intNA" );
-      LID[ii] = h5r -> read_intVector( subgroup_name.c_str(), "LID_all_face_nodes" );
-      outvec[ii] = h5r -> read_doubleVector( subgroup_name.c_str(), "out_normal" );
+      intNA[ii]  = h5r -> read_doubleVector( subgroup_name.c_str(), "intNA" );
+      LID[ii]    = h5r -> read_intVector(    subgroup_name.c_str(), "LID_all_face_nodes" );
+      outvec[ii] = h5r -> read_Vector_3(     subgroup_name.c_str(), "out_normal" );
     
       num_face_nodes[ii] = static_cast<int>(intNA[ii].size());
     }
@@ -33,7 +31,7 @@ ALocal_EBC_outflow::ALocal_EBC_outflow( const std::string &fileBaseName,
     {
       intNA[ii].clear();
       LID[ii].clear();
-      outvec[ii].clear();
+      outvec[ii] = Vector_3( 0.0, 0.0, 0.0 );
       num_face_nodes[ii] = 0;
     }
   }
@@ -47,7 +45,6 @@ ALocal_EBC_outflow::~ALocal_EBC_outflow()
   {
     VEC_T::clean( intNA[ii] );
     VEC_T::clean( LID[ii] );
-    VEC_T::clean( outvec[ii] );
   }
   
   VEC_T::clean(intNA);

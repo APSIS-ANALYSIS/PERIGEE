@@ -39,14 +39,13 @@ EBC_Partition_vtp_outflow::EBC_Partition_vtp_outflow(
       }
 
       // Outward normal vector
-      outvec[ii].resize(3);
-      ebc -> get_normal_vec(ii, outvec[ii][0], outvec[ii][1], outvec[ii][2]);
+      ebc -> get_normal_vec(ii, outvec[ii].x(), outvec[ii].y(), outvec[ii].z());
     }
     else
     {
       face_int_NA[ii].clear();
       LID_all_face_nodes[ii].clear();
-      outvec[ii].clear();
+      outvec[ii] = Vector_3( 0.0, 0.0, 0.0 );
     }
   }
 }
@@ -57,7 +56,6 @@ EBC_Partition_vtp_outflow::~EBC_Partition_vtp_outflow()
   {
     VEC_T::clean( face_int_NA[ii] );
     VEC_T::clean( LID_all_face_nodes[ii] );
-    VEC_T::clean( outvec[ii] );
   }
   VEC_T::clean( face_int_NA );
   VEC_T::clean( LID_all_face_nodes );
@@ -67,8 +65,10 @@ EBC_Partition_vtp_outflow::~EBC_Partition_vtp_outflow()
 void EBC_Partition_vtp_outflow::write_hdf5( const std::string &FileName, 
     const std::string &GroupName ) const 
 {
+  // --------------------------------------------------------------------------
   // Call the base class writer to write the base class data
   EBC_Partition_vtp::write_hdf5( FileName, GroupName );
+  // --------------------------------------------------------------------------
 
   const std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
 
@@ -87,7 +87,7 @@ void EBC_Partition_vtp_outflow::write_hdf5( const std::string &FileName,
 
       h5w->write_doubleVector( subgroup_id, "intNA", face_int_NA[ii] );
       h5w->write_intVector( subgroup_id, "LID_all_face_nodes", LID_all_face_nodes[ii] );
-      h5w->write_doubleVector( subgroup_id, "out_normal", outvec[ii] );
+      h5w->write_Vector_3( subgroup_id, "out_normal", outvec[ii] );
 
       H5Gclose( subgroup_id );
     }

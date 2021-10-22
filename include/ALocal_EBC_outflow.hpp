@@ -22,6 +22,10 @@ class ALocal_EBC_outflow : public ALocal_EBC
 
     virtual void print_info() const;
 
+    // The following get functions will give meaningful data if the
+    // num_local_cell[ii] > 0, that is, the partition owns the ii-th outlet
+    // surface
+    // Note, the get functions do not perform a check on the ii index
     virtual int get_num_face_nodes(const int &ii) const
     {return num_face_nodes[ii];}
 
@@ -29,8 +33,7 @@ class ALocal_EBC_outflow : public ALocal_EBC
 
     virtual std::vector<int> get_LID(const int &ii) const {return LID[ii];}
 
-    virtual Vector_3 get_outvec( const int &ii ) const
-    { return Vector_3( outvec[ii][0], outvec[ii][1], outvec[ii][2] ); }
+    virtual Vector_3 get_outvec( const int &ii ) const { return outvec[ii]; }
 
   protected:
     // Length num_ebc.
@@ -55,7 +58,7 @@ class ALocal_EBC_outflow : public ALocal_EBC
 
     // Length num_ebc
     // It has x-y-z components of the unit outward normal vector
-    std::vector< std::vector<double> > outvec;
+    std::vector< Vector_3 > outvec;
 };
 
 #endif

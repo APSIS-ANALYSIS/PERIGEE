@@ -49,7 +49,7 @@ class EBC_Partition_vtp_outflow : public EBC_Partition_vtp
 
     // unit normal vector to the cap surfaces, if the partition owns the bc.
     // size is num_ebc x [ 0, if does not own, or 3, if owns ].
-    std::vector< std::vector<double> > outvec; 
+    std::vector< Vector_3 > outvec; 
     
     // write the data to hdf5 file in group /group-name/ebcid_xxx, 
     // xxx is the ebc_id
