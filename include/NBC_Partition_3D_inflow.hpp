@@ -30,6 +30,8 @@ class NBC_Partition_3D_inflow : public NBC_Partition_3D
     virtual void write_hdf5( const std::string &FileName ) const;
 
   private:
+    const int num_nbc;
+
     // active area & full area. Length num_nbc
     std::vector<double> actarea, facearea;
 

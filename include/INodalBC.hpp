@@ -69,13 +69,12 @@ class INodalBC
     // ------------------------------------------------------------------------
     virtual void print_info() const;
    
-    // --------------------------------------------------------------
-    // get_para_1() passes additional parameters from the specific
-    //              instantiations.
-    // --------------------------------------------------------------
-    virtual double get_para_1(const int &nbc_id) const
+    // ------------------------------------------------------------------------
+    // get_inf_active_area() return inflow cap surface active area
+    // ------------------------------------------------------------------------
+    virtual double get_inf_active_area(const int &nbc_id) const
     {
-      SYS_T::print_fatal("Error: INodalBC::get_para_1 is not implemented.\n");
+      SYS_T::print_fatal("Error: INodalBC::get_inf_active_area is not implemented.\n");
       return 0.0;
     }
 

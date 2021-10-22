@@ -4,7 +4,8 @@ NBC_Partition_3D_inflow::NBC_Partition_3D_inflow(
     const IPart * const &part,
     const Map_Node_Index * const &mnindex,
     const INodalBC * const &nbc ) 
-: NBC_Partition_3D( part, mnindex, nbc )
+: NBC_Partition_3D( part, mnindex, nbc ), 
+  num_nbc( nbc -> get_num_nbc() )
 {
   actarea.resize(num_nbc); facearea.resize(num_nbc);
   outvec.resize(num_nbc);  centroid.resize(num_nbc);
@@ -17,7 +18,7 @@ NBC_Partition_3D_inflow::NBC_Partition_3D_inflow(
   for(int ii=0; ii<num_nbc; ++ii)
   {
     // Area of the cap surface
-    actarea[ii]  = nbc -> get_para_1(ii);
+    actarea[ii]  = nbc -> get_inf_active_area(ii);
     facearea[ii] = nbc -> get_para_6(ii);
 
     // Outward normal vector
