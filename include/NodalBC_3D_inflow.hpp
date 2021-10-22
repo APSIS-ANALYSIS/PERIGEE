@@ -65,7 +65,7 @@ class NodalBC_3D_inflow : public INodalBC
     virtual Vector_3 get_outnormal(const int &nbc_id) const {return outnormal[nbc_id];}
 
     // Access to the number of outline boundary points.
-    virtual int get_para_3(const int &nbc_id) const {return num_out_bc_pts[nbc_id];}
+    virtual int get_num_out_bc_pts(const int &nbc_id) const {return num_out_bc_pts[nbc_id];}
 
     // Access to the centroid coordinates.
     virtual Vector_3 get_para_4(const int &nbc_id) const {return centroid[nbc_id];}

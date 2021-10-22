@@ -79,7 +79,7 @@ class INodalBC
     }
 
     // ------------------------------------------------------------------------
-    // get_outnormal() return inflow cap surface outward normal
+    // get_outnormal() return inflow cap surface outward normal vector
     // ------------------------------------------------------------------------
     virtual Vector_3 get_outnormal(const int &nbc_id) const
     {
@@ -87,13 +87,12 @@ class INodalBC
       return Vector_3();
     }
   
-    // --------------------------------------------------------------
-    // get_para_3() passes additional parameters from the specific
-    //              instantiations.
-    // --------------------------------------------------------------
-    virtual int get_para_3(const int &nbc_id) const
+    // ------------------------------------------------------------------------
+    // get_num_out_bc_pts() return the number of outline boundary points
+    // ------------------------------------------------------------------------
+    virtual int get_num_out_bc_pts(const int &nbc_id) const
     {
-      SYS_T::print_fatal("Error: INodalBC::get_para_3 is not implemented.\n");
+      SYS_T::print_fatal("Error: INodalBC::get_num_out_bc_pts is not implemented.\n");
       return -1;
     }
 

@@ -25,7 +25,7 @@ NBC_Partition_3D_inflow::NBC_Partition_3D_inflow(
     outvec[ii] = nbc->get_outnormal(ii);
 
     // Centroid and outline points
-    num_out_bc_pts[ii] = nbc->get_para_3(ii);
+    num_out_bc_pts[ii] = nbc->get_num_out_bc_pts(ii);
 
     centroid[ii] = nbc->get_para_4(ii);
 
