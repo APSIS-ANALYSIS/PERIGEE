@@ -19,7 +19,7 @@ NBC_Partition_3D_inflow::NBC_Partition_3D_inflow(
   {
     // Area of the cap surface
     actarea[ii]  = nbc -> get_inf_active_area(ii);
-    facearea[ii] = nbc -> get_para_6(ii);
+    facearea[ii] = nbc -> get_face_area(ii);
 
     // Outward normal vector
     outvec[ii] = nbc->get_outnormal(ii);
@@ -27,11 +27,11 @@ NBC_Partition_3D_inflow::NBC_Partition_3D_inflow(
     // Centroid and outline points
     num_out_bc_pts[ii] = nbc->get_num_out_bc_pts(ii);
 
-    centroid[ii] = nbc->get_para_4(ii);
+    centroid[ii] = nbc->get_centroid(ii);
 
     outline_pts[ii].resize( 3*num_out_bc_pts[ii] );
     for(int jj=0; jj<3*num_out_bc_pts[ii]; ++jj)
-      outline_pts[ii][jj] = nbc->get_para_5(ii, jj);
+      outline_pts[ii][jj] = nbc->get_outline_pts(ii, jj);
 
     // Record the geometrical info of the inlet in this CPU
     cell_nLocBas[ii] = nbc -> get_nLocBas(ii);

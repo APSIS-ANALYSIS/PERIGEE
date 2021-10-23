@@ -68,14 +68,14 @@ class NodalBC_3D_inflow : public INodalBC
     virtual int get_num_out_bc_pts(const int &nbc_id) const {return num_out_bc_pts[nbc_id];}
 
     // Access to the centroid coordinates.
-    virtual Vector_3 get_para_4(const int &nbc_id) const {return centroid[nbc_id];}
+    virtual Vector_3 get_centroid(const int &nbc_id) const {return centroid[nbc_id];}
 
     // Access to the outline points. ii ranges from 0 to 3 x num_out_bc_pts[nbc_id];
-    virtual double get_para_5(const int &nbc_id, const int &ii) const
+    virtual double get_outline_pts(const int &nbc_id, const int &ii) const
     {return outline_pts[nbc_id][ii];}
 
     // Access to the face area
-    virtual double get_para_6(const int &nbc_id) const {return face_area[nbc_id];}
+    virtual double get_face_area(const int &nbc_id) const {return face_area[nbc_id];}
 
     // Access to the integral of NA
     virtual std::vector<double> get_intNA(const int &nbc_id) const

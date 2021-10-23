@@ -96,33 +96,31 @@ class INodalBC
       return -1;
     }
 
-    // --------------------------------------------------------------
-    // get_para_4() passes additional parameters from the specific
-    //              instantiations.
-    // --------------------------------------------------------------
-    virtual Vector_3 get_para_4(const int &nbc_id) const
+    // ------------------------------------------------------------------------
+    // get_centroid() return inflow cap surface centroid coordinates
+    // ------------------------------------------------------------------------
+    virtual Vector_3 get_centroid(const int &nbc_id) const
     {
-      SYS_T::print_fatal("Error: INodalBC::get_para_4 is not implemented.\n");
+      SYS_T::print_fatal("Error: INodalBC::get_centroid is not implemented.\n");
       return Vector_3();
     }
     
-    // --------------------------------------------------------------
-    // get_para_5() passes additional parameters from the specific
-    //              instantiations.
-    // --------------------------------------------------------------
-    virtual double get_para_5(const int &nbc_id, const int &ii) const
+    // ------------------------------------------------------------------------
+    // get_outline_pts() return the outline points. ii ranges from 0 to 3 x
+    // num_out_bc_pts[nbc_id]
+    // ------------------------------------------------------------------------
+    virtual double get_outline_pts(const int &nbc_id, const int &ii) const
     {
-      SYS_T::print_fatal("Error: INodalBC::get_para_5 is not implemented.\n");
+      SYS_T::print_fatal("Error: INodalBC::get_outline_pts is not implemented.\n");
       return 0.0;
     }
     
-    // --------------------------------------------------------------
-    // get_para_6() passes additional parameters from the specific
-    //              instantiations.
-    // --------------------------------------------------------------
-    virtual double get_para_6(const int &nbc_id) const
+    // ------------------------------------------------------------------------
+    // get_face_area() return inflow cap surface face area
+    // ------------------------------------------------------------------------
+    virtual double get_face_area(const int &nbc_id) const
     {
-      SYS_T::print_fatal("Error: INodalBC::get_para_6 is not implemented.\n");
+      SYS_T::print_fatal("Error: INodalBC::get_face_area is not implemented.\n");
       return 0.0;
     }
 
