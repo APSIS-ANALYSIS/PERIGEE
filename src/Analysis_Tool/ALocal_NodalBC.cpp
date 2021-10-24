@@ -26,20 +26,20 @@ ALocal_NodalBC::ALocal_NodalBC( const std::string &fileBaseName,
   LDN.clear(); LPSN.clear(); LPMN.clear();
   LocalMaster.clear(); LocalMasterSlave.clear();
 
-  LDN = h5r->read_intVector( subgroup_name.c_str(), "LDN" );
+  if(size_ldn > 0) LDN = h5r->read_intVector( gname.c_str(), "LDN" );
 
   SYS_T::print_fatal_if( int(LDN.size()) != size_ldn, "Error:ALocal_NodalBC, LDN length does not match Num_LD. \n" );
 
   // Read local periodic nodes
-  Num_LPS = h5r->read_intVector( subgroup_name.c_str(), "Num_LPS" );
+  Num_LPS = h5r->read_intVector( gname.c_str(), "Num_LPS" );
 
   int size_lp = 0;
   for(unsigned int ii=0; ii<Num_LPS.size(); ++ii) size_lp += Num_LPS[ii];
 
   if( size_lp > 0 )
   {
-    LPSN = h5r->read_intVector( subgroup_name.c_str(), "LPSN" );
-    LPMN = h5r->read_intVector( subgroup_name.c_str(), "LPMN" );
+    LPSN = h5r->read_intVector( gname.c_str(), "LPSN" );
+    LPMN = h5r->read_intVector( gname.c_str(), "LPMN" );
   }
 
   SYS_T::print_fatal_if( int(LPSN.size()) != size_lp, "Error: ALocal_NodalBC, LPSN length does not match Num_LPS. \n" );
@@ -53,8 +53,8 @@ ALocal_NodalBC::ALocal_NodalBC( const std::string &fileBaseName,
 
   if( size_lp > 0 )
   {
-    LocalMaster      = h5r->read_intVector( subgroup_name.c_str(), "LocalMaster" );
-    LocalMasterSlave = h5r->read_intVector( subgroup_name.c_str(), "LocalMasterSlave" );
+    LocalMaster      = h5r->read_intVector( gname.c_str(), "LocalMaster" );
+    LocalMasterSlave = h5r->read_intVector( gname.c_str(), "LocalMasterSlave" );
   }
 
   SYS_T::print_fatal_if( int(LocalMaster.size()) != size_lp, "Error: ALocal_NodalBC, LocalMaster length does not match Num_LPM. \n" );
