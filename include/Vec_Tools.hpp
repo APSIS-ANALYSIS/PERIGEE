@@ -75,6 +75,17 @@ namespace VEC_T
   }
 
   // --------------------------------------------------------------------------
+  // ! sum
+  //   return the summation of all entries in the vector
+  // --------------------------------------------------------------------------
+  template<typename T> T sum( std::vector<T> &vec )
+  {
+    T counter = 0;
+    for( const auto &entry : vec ) counter += entry;
+    return counter;
+  }
+
+  // --------------------------------------------------------------------------
   // ! insert_end
   //   insert vec_b at the end of vec_a
   // --------------------------------------------------------------------------

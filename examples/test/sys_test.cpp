@@ -44,17 +44,17 @@ int main( int argc, char * argv[] )
 
   int nsize = 4;
 
-  std::vector<double> b (nsize, -100.1), c (5, 99.9), d (2, 1.0);
+  std::vector<int> b (nsize, -100), c (5, 99), d (2, 1);
 
   std::cout<<b.size()<<'\t'<<b.capacity()<<std::endl;
   
   VEC_T::print(b);
 
-  b = {0.0, 1.0, 3.0, 5.0, 2232.0};
+  b = {1, 3, 5, -1, -2, -3, -5};
   
   VEC_T::print(b);
 
-  std::cout<<b.size()<<'\t'<<b.capacity()<<std::endl;
+  std::cout<<b.size()<<'\t'<<b.capacity()<<'\t'<<VEC_T::sum(b)<<std::endl;
 
   return EXIT_SUCCESS;
 }
