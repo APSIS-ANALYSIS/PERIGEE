@@ -101,60 +101,59 @@ void ALocal_NodalBC::print_info() const
     std::cout<<"\n \n";
   }
 
-  std::cout<<"   LDN: \n";
+  std::cout<<"LDN: \n";
   for(int ii=0; ii<dof; ++ii)
   {
-    std::cout<<"   dof "<<ii<<'\n';
+    std::cout<<"dof "<<ii<<'\n';
     for(int jj=0; jj<Num_LD[ii]; ++jj)
-      std::cout<<"   "<<get_LDN(ii, jj)<<'\t';
+      std::cout<<get_LDN(ii, jj)<<'\t';
     std::cout<<"\n \n";
   }
 
   for(int ii=0; ii<dof; ++ii)
   {
-    std::cout<<"   dof: "<<ii<<'\t';
-    std::cout<<"   Num_LD: " <<get_Num_LD(ii)<<'\t';
-    std::cout<<"   Num_LPS: "<<get_Num_LPS(ii)<<'\t';
-    std::cout<<"   Num_LPM: "<<get_Num_LPM(ii)<<'\n';
+    std::cout<<"dof: "<<ii<<'\t';
+    std::cout<<"Num_LD: "<<get_Num_LD(ii)<<'\t';
+    std::cout<<"Num_LPS: "<<get_Num_LPS(ii)<<'\t';
+    std::cout<<"Num_LPM: "<<get_Num_LPM(ii)<<'\n';
   }
 
   std::cout<<std::endl;
 
-  std::cout<<"   LPSN: \n";
+  std::cout<<"LPSN: \n";
   for(int ii=0; ii<dof; ++ii)
   {
-    std::cout<<"   dof "<<ii<<'\n';
+    std::cout<<"dof "<<ii<<'\n';
     for(int jj=0; jj<Num_LPS[ii]; ++jj)
-      std::cout<<"   "<<get_LPSN(ii, jj)<<'\t';
+      std::cout<<get_LPSN(ii, jj)<<'\t';
     std::cout<<"\n \n";
   }
 
-  std::cout<<"   LPMN: \n";
+  std::cout<<"LPMN: \n";
   for(int ii=0; ii<dof; ++ii)
   {
-    std::cout<<"   dof "<<ii<<'\n';
+    std::cout<<"dof "<<ii<<'\n';
     for(int jj=0; jj<Num_LPS[ii]; ++jj)
-      std::cout<<"   "<<get_LPMN(ii, jj)<<'\t';
+      std::cout<<get_LPMN(ii, jj)<<'\t';
     std::cout<<"\n \n";
   }
 
-  std::cout<<"   LocalMaster: \n";
+  std::cout<<"LocalMaster: \n";
   for(int ii=0; ii<dof; ++ii)
   {
-    std::cout<<"   dof "<<ii<<'\n';
+    std::cout<<"dof "<<ii<<'\n';
     for(int jj=0; jj<Num_LPM[ii]; ++jj)
       std::cout<<get_LocalMaster(ii, jj)<<'\t';
     std::cout<<"\n \n";
   }
 
-  std::cout<<"   LocalMasterSlave: \n";
+  std::cout<<"LocalMasterSlave: \n";
   for(int ii=0; ii<dof; ++ii)
   {
-    std::cout<<"   dof "<<ii<<'\n';
+    std::cout<<"dof "<<ii<<'\n';
     for(int jj=0; jj<Num_LPM[ii]; ++jj)
-      std::cout<<"   "<<get_LocalMasterSlave(ii, jj)<<'\t';
+      std::cout<<get_LocalMasterSlave(ii, jj)<<'\t';
     std::cout<<"\n \n";
   }
 }
-
 // EOF
