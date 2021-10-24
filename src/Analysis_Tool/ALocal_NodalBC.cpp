@@ -19,11 +19,6 @@ ALocal_NodalBC::ALocal_NodalBC( const std::string &fileBaseName,
 
   dof = LID.size() / nlocghonode;
 
-  LDN.resize(num_nbc);         Num_LD.resize(num_nbc);
-  LPSN.resize(num_nbc);        LPMN.resize(num_nbc);
-  LocalMaster.resize(num_nbc); LocalMasterSlave.resize(num_nbc);
-  Num_LPS.resize(num_nbc);     Num_LPM.resize(num_nbc);
-
   std::string groupbase(gname);
   groupbase.append("/nbcid_");
 
