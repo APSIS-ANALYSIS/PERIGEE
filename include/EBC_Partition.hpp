@@ -1,7 +1,7 @@
-#ifndef EBC_PARTITION_VTP_HPP
-#define EBC_PARTITION_VTP_HPP
+#ifndef EBC_PARTITION_HPP
+#define EBC_PARTITION_HPP
 // ==================================================================
-// EBC_Partition_vtp.hpp
+// EBC_Partition.hpp
 //
 // Elemental boundary condition partition implementation for data 
 // structures readed from .vtp files. This is used mainly for
@@ -15,14 +15,14 @@
 #include "ElemBC.hpp"
 #include "HDF5_Writer.hpp"
 
-class EBC_Partition_vtp
+class EBC_Partition
 {
   public:
-    EBC_Partition_vtp( const IPart * const &part, 
+    EBC_Partition( const IPart * const &part, 
         const Map_Node_Index * const &mnindex,
         const ElemBC * const &ebc );
 
-    virtual ~EBC_Partition_vtp();
+    virtual ~EBC_Partition();
 
     // Write the data to hdf5 file in group /GroupName
     virtual void write_hdf5( const std::string &FileName,

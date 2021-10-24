@@ -27,8 +27,8 @@
 #include "NodalBC_3D_wall.hpp"
 #include "ElemBC_3D_tet_outflow.hpp"
 #include "ElemBC_3D_tet_wall.hpp"
-#include "NBC_Partition_3D_inflow.hpp"
-#include "NBC_Partition_3D_ring.hpp"
+#include "NBC_Partition_inflow.hpp"
+#include "NBC_Partition_ring.hpp"
 #include "EBC_Partition_vtp_outflow.hpp"
 #include "EBC_Partition_vtp_wall.hpp"
 
@@ -366,11 +366,11 @@ int main( int argc, char * argv[] )
     nbcpart -> write_hdf5( part_file );
 
     // Partition Nodal Inflow BC and write to h5 file
-    NBC_Partition_3D * infpart = new NBC_Partition_3D_inflow(part, mnindex, InFBC);
+    NBC_Partition * infpart = new NBC_Partition_inflow(part, mnindex, InFBC);
     infpart->write_hdf5( part_file );
 
     // Partition Nodal Ring BC and write to h5 file
-    NBC_Partition_3D * ringpart = new NBC_Partition_3D_ring(part, mnindex, ring_bc);
+    NBC_Partition * ringpart = new NBC_Partition_ring(part, mnindex, ring_bc);
     ringpart->write_hdf5( part_file );
 
     // Partition Elemental BC and write to h5 file

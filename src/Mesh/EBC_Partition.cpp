@@ -1,6 +1,6 @@
-#include "EBC_Partition_vtp.hpp"
+#include "EBC_Partition.hpp"
 
-EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
+EBC_Partition::EBC_Partition( const IPart * const &part,
     const Map_Node_Index * const &mnindex, const ElemBC * const &ebc )
 : cpu_rank( part->get_cpu_rank() ), num_ebc( ebc->get_num_ebc() )
 {
@@ -93,7 +93,7 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
       {
         const int temp_node = ebc->get_ien(ii, local_elem[jj], kk);
         const int temp_npos = VEC_T::get_pos( local_cell_node[ii], temp_node );
-        SYS_T::print_exit_if( temp_npos < 0, "Error: EBC_Partition_vtp, local_cell_node is incomplete. \n" );
+        SYS_T::print_exit_if( temp_npos < 0, "Error: EBC_Partition, local_cell_node is incomplete. \n" );
         local_tri_ien[ii][jj*cell_nLocBas[ii] + kk] = temp_npos;
       }
     }
@@ -101,7 +101,7 @@ EBC_Partition_vtp::EBC_Partition_vtp( const IPart * const &part,
 }
 
 
-EBC_Partition_vtp::~EBC_Partition_vtp()
+EBC_Partition::~EBC_Partition()
 {
   VEC_T::clean( num_local_cell_node );
   VEC_T::clean( num_local_cell );
@@ -114,7 +114,7 @@ EBC_Partition_vtp::~EBC_Partition_vtp()
   VEC_T::clean( local_cell_vol_id );
 }
 
-void EBC_Partition_vtp::write_hdf5( const std::string &FileName, 
+void EBC_Partition::write_hdf5( const std::string &FileName, 
     const std::string &GroupName ) const
 {
   const std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
@@ -162,10 +162,10 @@ void EBC_Partition_vtp::write_hdf5( const std::string &FileName,
   delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
 }
 
-void EBC_Partition_vtp::print_info() const
+void EBC_Partition::print_info() const
 {
   std::cout<<"=========================================== \n";
-  std::cout<<"EBC_Partition_vtp : \n";
+  std::cout<<"EBC_Partition : \n";
   std::cout<<"-- num_ebc = "<<num_ebc<<std::endl;
   std::cout<<"-- num_local_cell_node : ";
   VEC_T::print(num_local_cell_node);
