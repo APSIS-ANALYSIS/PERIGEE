@@ -1,7 +1,7 @@
-#ifndef NBC_PARTITION_3D_INFLOW_HPP
-#define NBC_PARTITION_3D_INFLOW_HPP
+#ifndef NBC_PARTITION_INFLOW_HPP
+#define NBC_PARTITION_INFLOW_HPP
 // ==================================================================
-// NBC_Partition_3D_inflow.hpp
+// NBC_Partition_inflow.hpp
 //
 // Inflow Nodal Boundary condition partition implementation for 3D
 // meshes. 
@@ -16,16 +16,16 @@
 // Date crated: Aug. 9 2017
 // Author: Ju Liu
 // ==================================================================
-#include "NBC_Partition_3D.hpp"
+#include "NBC_Partition.hpp"
 
-class NBC_Partition_3D_inflow : public NBC_Partition_3D
+class NBC_Partition_inflow : public NBC_Partition
 {
   public:
-    NBC_Partition_3D_inflow(const IPart * const &part,
+    NBC_Partition_inflow(const IPart * const &part,
         const Map_Node_Index * const &mnindex,
         const INodalBC * const &nbc );
 
-    virtual ~NBC_Partition_3D_inflow();
+    virtual ~NBC_Partition_inflow();
 
     virtual void write_hdf5( const std::string &FileName ) const;
 

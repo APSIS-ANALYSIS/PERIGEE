@@ -1,10 +1,10 @@
-#include "NBC_Partition_3D_inflow.hpp"
+#include "NBC_Partition_inflow.hpp"
 
-NBC_Partition_3D_inflow::NBC_Partition_3D_inflow(
+NBC_Partition_inflow::NBC_Partition_inflow(
     const IPart * const &part,
     const Map_Node_Index * const &mnindex,
     const INodalBC * const &nbc ) 
-: NBC_Partition_3D( part, mnindex, nbc ), 
+: NBC_Partition( part, mnindex, nbc ), 
   num_nbc( nbc -> get_num_nbc() )
 {
   actarea.resize(num_nbc); facearea.resize(num_nbc);
@@ -92,10 +92,10 @@ NBC_Partition_3D_inflow::NBC_Partition_3D_inflow(
   } // end ii-loop over num_nbc
 }
 
-NBC_Partition_3D_inflow::~NBC_Partition_3D_inflow()
+NBC_Partition_inflow::~NBC_Partition_inflow()
 {}
 
-void NBC_Partition_3D_inflow::write_hdf5( const std::string &FileName ) const
+void NBC_Partition_inflow::write_hdf5( const std::string &FileName ) const
 {
   std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
   
@@ -153,7 +153,7 @@ void NBC_Partition_3D_inflow::write_hdf5( const std::string &FileName ) const
   delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
 }
 
-void NBC_Partition_3D_inflow::write_hdf5( const std::string &FileName,
+void NBC_Partition_inflow::write_hdf5( const std::string &FileName,
     const std::string &GroupName ) const
 {
   // This function is NOT allowed.

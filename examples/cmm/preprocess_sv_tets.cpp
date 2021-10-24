@@ -362,7 +362,7 @@ int main( int argc, char * argv[] )
     part -> print_part_loadbalance_edgecut();
 
     // Partition Nodal BC and write to h5 file
-    NBC_Partition_3D * nbcpart = new NBC_Partition_3D(part, mnindex, NBC_list);
+    NBC_Partition * nbcpart = new NBC_Partition(part, mnindex, NBC_list);
     nbcpart -> write_hdf5( part_file );
 
     // Partition Nodal Inflow BC and write to h5 file
