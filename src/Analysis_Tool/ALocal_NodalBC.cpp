@@ -10,7 +10,6 @@ ALocal_NodalBC::ALocal_NodalBC( const std::string &fileBaseName,
   HDF5_Reader * h5r = new HDF5_Reader( file_id );
 
   nlocghonode = h5r->read_intScalar( "Local_Node", "nlocghonode" );
-
   LID = h5r->read_intVector( gname.c_str(), "LID" );
 
   SYS_T::print_fatal_if( LID.size() % nlocghonode != 0, "Error:ALocal_NodalBC, LID length is not compatible with local and ghost node number. \n");
