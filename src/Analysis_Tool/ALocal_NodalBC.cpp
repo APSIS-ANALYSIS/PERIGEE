@@ -46,7 +46,7 @@ ALocal_NodalBC::ALocal_NodalBC( const std::string &fileBaseName,
   SYS_T::print_fatal_if( int(LPMN.size()) != size_lp, "Error: ALocal_NodalBC, LPMN length does not match Num_LPS. \n" );
 
   // Read local periodic master nodes
-  Num_LPM = h5r->read_intVector( subgroup_name.c_str(), "Num_LPM" );
+  Num_LPM = h5r->read_intVector( gname.c_str(), "Num_LPM" );
 
   size_lp = 0;
   for(unsigned int ii=0; ii<Num_LPM.size(); ++ii) size_lp += Num_LPM[ii];
