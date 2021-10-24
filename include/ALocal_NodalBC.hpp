@@ -42,33 +42,33 @@ class ALocal_NodalBC
     // get global indices of the Dirichlet nodes in the local subdomain
     // ------------------------------------------------------------------------
     virtual int get_LDN(const int &dof_index, const int &node) const
-    {return LDN[LD_offset[nbc_id][dof_index] + node];}
+    {return LDN[LD_offset[dof_index] + node];}
 
     // ------------------------------------------------------------------------
     // get global indices of the slave nodes in the local subdomain
     // ------------------------------------------------------------------------
     virtual int get_LPSN(const int &dof_index, const int &ii) const
-    {return LPSN[LPS_offset[nbc_id][dof_index] + ii];}
+    {return LPSN[LPS_offset[dof_index] + ii];}
 
     // ------------------------------------------------------------------------
     // get global indices of the master nodes corresponding to the
     // slave nodes in the local subdomain, i.e. from get_LPSN() 
     // ------------------------------------------------------------------------
     virtual int get_LPMN(const int &dof_index, const int &ii) const
-    {return LPMN[LPS_offset[nbc_id][dof_index] + ii];}
+    {return LPMN[LPS_offset[dof_index] + ii];}
 
     // ------------------------------------------------------------------------
     // get global indices of the master nodes in the local subdomain 
     // ------------------------------------------------------------------------
     virtual int get_LocalMaster(const int &dof_index, const int &ii) const
-    {return LocalMaster[LPM_offset[nbc_id][dof_index] + ii];}
+    {return LocalMaster[LPM_offset[dof_index] + ii];}
 
     // ------------------------------------------------------------------------
     // get global indices of the slave nodes corresponding to the
     // master nodes in the local subdomain, i.e. from get_LocalMaster()
     // ------------------------------------------------------------------------
     virtual int get_LocalMasterSlave(const int &dof_index, const int &ii) const
-    {return LocalMasterSlave[LPM_offset[nbc_id][dof_index] + ii];}
+    {return LocalMasterSlave[LPM_offset[dof_index] + ii];}
 
     // ------------------------------------------------------------------------
     // get the number of Dirichlet nodes in the local subdomain
