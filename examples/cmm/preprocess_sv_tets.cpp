@@ -29,8 +29,8 @@
 #include "ElemBC_3D_tet_wall.hpp"
 #include "NBC_Partition_inflow.hpp"
 #include "NBC_Partition_ring.hpp"
-#include "EBC_Partition_vtp_outflow.hpp"
-#include "EBC_Partition_vtp_wall.hpp"
+#include "EBC_Partition_outflow.hpp"
+#include "EBC_Partition_wall.hpp"
 
 int main( int argc, char * argv[] )
 {
@@ -374,11 +374,11 @@ int main( int argc, char * argv[] )
     ringpart->write_hdf5( part_file );
 
     // Partition Elemental BC and write to h5 file
-    EBC_Partition_vtp * ebcpart = new EBC_Partition_vtp_outflow(part, mnindex, ebc, NBC_list);
+    EBC_Partition * ebcpart = new EBC_Partition_outflow(part, mnindex, ebc, NBC_list);
     ebcpart -> write_hdf5( part_file );
 
     // Partition Elemental Wall BC and write it to h5 file
-    EBC_Partition_vtp * wbcpart = new EBC_Partition_vtp_wall(part, mnindex, wall_ebc );
+    EBC_Partition * wbcpart = new EBC_Partition_wall(part, mnindex, wall_ebc );
     wbcpart -> write_hdf5( part_file );
 
     // Collect partition statistics
