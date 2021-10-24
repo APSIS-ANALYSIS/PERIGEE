@@ -1,6 +1,6 @@
-#include "NBC_Partition_3D.hpp"
+#include "NBC_Partition.hpp"
 
-NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
+NBC_Partition::NBC_Partition( const IPart * const &part,
     const Map_Node_Index * const &mnindex,
     const std::vector<INodalBC *> &nbc_list ) : cpu_rank(part->get_cpu_rank())
 {
@@ -83,7 +83,7 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
 }
 
 
-NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
+NBC_Partition::NBC_Partition( const IPart * const &part,
     const Map_Node_Index * const &mnindex,
     const INodalBC * const &nbc ) : cpu_rank(part->get_cpu_rank())
 {
@@ -160,7 +160,7 @@ NBC_Partition_3D::NBC_Partition_3D( const IPart * const &part,
 }
 
 
-NBC_Partition_3D::~NBC_Partition_3D()
+NBC_Partition::~NBC_Partition()
 {
   VEC_T::clean(LID);
   VEC_T::clean(LDN);
@@ -173,7 +173,7 @@ NBC_Partition_3D::~NBC_Partition_3D()
   VEC_T::clean(Num_LPM);
 }
 
-void NBC_Partition_3D::write_hdf5( const std::string &FileName, 
+void NBC_Partition::write_hdf5( const std::string &FileName, 
     const std::string &GroupName ) const
 {
   const std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
@@ -207,10 +207,10 @@ void NBC_Partition_3D::write_hdf5( const std::string &FileName,
   delete h5writer; H5Gclose(g_id); H5Fclose(file_id);
 }
 
-void NBC_Partition_3D::print_info() const
+void NBC_Partition::print_info() const
 {
   std::cout<<"=========================================== \n";
-  std::cout<<"NBC_Partition_3D : \n";
+  std::cout<<"NBC_Partition : \n";
   std::cout<<"--- LID : \n";
   VEC_T::print(LID);
   std::cout<<"\n   LDN : \n";

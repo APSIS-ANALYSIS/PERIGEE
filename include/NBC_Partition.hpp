@@ -12,7 +12,6 @@
 #include "IPart.hpp"
 #include "Map_Node_Index.hpp"
 #include "INodalBC.hpp"
-#include "HDF5_Writer.hpp"
 
 class NBC_Partition
 {
