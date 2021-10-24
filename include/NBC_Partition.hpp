@@ -1,7 +1,7 @@
-#ifndef NBC_PARTITION_3D_HPP
-#define NBC_PARTITION_3D_HPP
+#ifndef NBC_PARTITION_HPP
+#define NBC_PARTITION_HPP
 // ============================================================================
-// NBC_Partition_3D.hpp
+// NBC_Partition.hpp
 //
 // Nodal Boundary Condition Partition implementation for 
 // three-dimensional meshes.
@@ -14,10 +14,10 @@
 #include "INodalBC.hpp"
 #include "HDF5_Writer.hpp"
 
-class NBC_Partition_3D
+class NBC_Partition
 {
   public:
-    NBC_Partition_3D( const IPart * const &part,
+    NBC_Partition( const IPart * const &part,
        const Map_Node_Index * const &mnindex,
        const std::vector<INodalBC *> &nbc_list );
 
@@ -28,11 +28,11 @@ class NBC_Partition_3D
     // input INodalBC structure, this one will write a partitioned
     // nbc file for analysis use. 
     // ------------------------------------------------------------------------
-    NBC_Partition_3D( const IPart * const &part,
+    NBC_Partition( const IPart * const &part,
        const Map_Node_Index * const &mnindex,
        const INodalBC * const &nbc );
 
-    virtual ~NBC_Partition_3D();
+    virtual ~NBC_Partition();
 
     // ------------------------------------------------------------------------
     // write_hdf5 : write the nodal bc info into the part file, under
