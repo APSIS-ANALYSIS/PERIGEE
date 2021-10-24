@@ -1,10 +1,10 @@
-#include "NBC_Partition_3D_ring.hpp"
+#include "NBC_Partition_ring.hpp"
 
-NBC_Partition_3D_ring::NBC_Partition_3D_ring(
+NBC_Partition_ring::NBC_Partition_ring(
     const IPart * const &part,
     const Map_Node_Index * const &mnindex,
     const INodalBC * const &nbc ) 
-: NBC_Partition_3D( part, mnindex, nbc ),
+: NBC_Partition( part, mnindex, nbc ),
   ring_bc_type( nbc -> get_ring_bc_type() ), 
   num_caps( nbc -> get_num_caps() ),
   Q( nbc -> get_rotation_matrix() ),
@@ -27,10 +27,10 @@ NBC_Partition_3D_ring::NBC_Partition_3D_ring(
   }
 }
 
-NBC_Partition_3D_ring::~NBC_Partition_3D_ring()
+NBC_Partition_ring::~NBC_Partition_ring()
 {}
 
-void NBC_Partition_3D_ring::write_hdf5( const std::string &FileName ) const
+void NBC_Partition_ring::write_hdf5( const std::string &FileName ) const
 {
   std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
   
@@ -59,7 +59,7 @@ void NBC_Partition_3D_ring::write_hdf5( const std::string &FileName ) const
   delete h5writer; H5Gclose(group_id); H5Fclose(file_id);
 }
 
-void NBC_Partition_3D_ring::write_hdf5( const std::string &FileName,
+void NBC_Partition_ring::write_hdf5( const std::string &FileName,
     const std::string &GroupName ) const
 {
   // This function is NOT allowed.

@@ -1,7 +1,7 @@
-#ifndef NBC_PARTITION_3D_RING_HPP
-#define NBC_PARTITION_3D_RING_HPP
+#ifndef NBC_PARTITION_RING_HPP
+#define NBC_PARTITION_RING_HPP
 // ==================================================================
-// NBC_Partition_3D_ring.hpp
+// NBC_Partition_ring.hpp
 //
 // Ring Nodal Boundary condition partition implementation for 3D
 // meshes. 
@@ -14,16 +14,16 @@
 // Date crated: Apr. 7 2021
 // Author: Ju Liu, Ingrid Lan
 // ==================================================================
-#include "NBC_Partition_3D.hpp"
+#include "NBC_Partition.hpp"
 
-class NBC_Partition_3D_ring : public NBC_Partition_3D
+class NBC_Partition_ring : public NBC_Partition
 {
   public:
-    NBC_Partition_3D_ring(const IPart * const &part,
+    NBC_Partition_ring( const IPart * const &part,
         const Map_Node_Index * const &mnindex,
         const INodalBC * const &nbc );
 
-    virtual ~NBC_Partition_3D_ring();
+    virtual ~NBC_Partition_ring();
 
     virtual void write_hdf5( const std::string &FileName ) const;
 
