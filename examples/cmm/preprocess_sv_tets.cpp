@@ -366,19 +366,19 @@ int main( int argc, char * argv[] )
     nbcpart -> write_hdf5( part_file );
 
     // Partition Nodal Inflow BC and write to h5 file
-    NBC_Partition_3D_inflow * infpart = new NBC_Partition_3D_inflow(part, mnindex, InFBC);
+    NBC_Partition_3D * infpart = new NBC_Partition_3D_inflow(part, mnindex, InFBC);
     infpart->write_hdf5( part_file );
 
     // Partition Nodal Ring BC and write to h5 file
-    NBC_Partition_3D_ring * ringpart = new NBC_Partition_3D_ring(part, mnindex, ring_bc);
+    NBC_Partition_3D * ringpart = new NBC_Partition_3D_ring(part, mnindex, ring_bc);
     ringpart->write_hdf5( part_file );
 
     // Partition Elemental BC and write to h5 file
-    EBC_Partition_vtp_outflow * ebcpart = new EBC_Partition_vtp_outflow(part, mnindex, ebc, NBC_list);
+    EBC_Partition_vtp * ebcpart = new EBC_Partition_vtp_outflow(part, mnindex, ebc, NBC_list);
     ebcpart -> write_hdf5( part_file );
 
     // Partition Elemental Wall BC and write it to h5 file
-    EBC_Partition_vtp_wall * wbcpart = new EBC_Partition_vtp_wall(part, mnindex, wall_ebc );
+    EBC_Partition_vtp * wbcpart = new EBC_Partition_vtp_wall(part, mnindex, wall_ebc );
     wbcpart -> write_hdf5( part_file );
 
     // Collect partition statistics

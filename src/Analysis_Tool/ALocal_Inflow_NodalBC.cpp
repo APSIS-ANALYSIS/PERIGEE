@@ -51,6 +51,8 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
     Num_LD[nbc_id]         = h5r->read_intScalar(  subgroup_name.c_str(), "Num_LD" );
 
     // If this sub-domain of this CPU contains local inflow bc points, load the LDN array.
+    // Also load the centroid and outline_pts as they three will be used for
+    // generating the flow profile on the inlet at the nodes.
     if( Num_LD[nbc_id] > 0 )
     {
       LDN[nbc_id]            = h5r->read_intVector(    subgroup_name.c_str(), "LDN" );
