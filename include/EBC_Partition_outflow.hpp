@@ -1,7 +1,7 @@
-#ifndef EBC_PARTITION_VTP_OUTFLOW_HPP
-#define EBC_PARTITION_VTP_OUTFLOW_HPP
+#ifndef EBC_PARTITION_OUTFLOW_HPP
+#define EBC_PARTITION_OUTFLOW_HPP
 // ==================================================================
-// EBC_Partition_vtp_outflow.hpp
+// EBC_Partition_outflow.hpp
 //
 // Element boundary condition partition for outflow type boundary
 // conditions.
@@ -14,19 +14,19 @@
 // Author: Ju Liu
 // Date: Mar. 18 2019
 // ==================================================================
-#include "EBC_Partition_vtp.hpp"
+#include "EBC_Partition.hpp"
 #include "INodalBC.hpp"
 
-class EBC_Partition_vtp_outflow : public EBC_Partition_vtp
+class EBC_Partition_outflow : public EBC_Partition
 {
   public:
     // The input ElemBC should be ElemBC_3D_tet4_outflow
-    EBC_Partition_vtp_outflow( const IPart * const &part,
+    EBC_Partition_outflow( const IPart * const &part,
         const Map_Node_Index * const &mnindex,
         const ElemBC * const &ebc,
         const std::vector<INodalBC *> &nbc_list );
 
-    virtual ~EBC_Partition_vtp_outflow();
+    virtual ~EBC_Partition_outflow();
 
     // write the data to hdf5 file in group /ebc/ebcid_xxx, 
     // xxx is the ebc_id

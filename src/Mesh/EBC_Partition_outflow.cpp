@@ -1,11 +1,11 @@
-#include "EBC_Partition_vtp_outflow.hpp"
+#include "EBC_Partition_outflow.hpp"
 
-EBC_Partition_vtp_outflow::EBC_Partition_vtp_outflow( 
+EBC_Partition_outflow::EBC_Partition_outflow( 
     const IPart * const &part,
     const Map_Node_Index * const &mnindex,
     const ElemBC * const &ebc,
     const std::vector<INodalBC *> &nbc_list )
-: EBC_Partition_vtp(part, mnindex, ebc)
+: EBC_Partition(part, mnindex, ebc)
 {
   face_int_NA.resize(num_ebc);
   LID_all_face_nodes.resize(num_ebc);
@@ -50,7 +50,7 @@ EBC_Partition_vtp_outflow::EBC_Partition_vtp_outflow(
   }
 }
 
-EBC_Partition_vtp_outflow::~EBC_Partition_vtp_outflow()
+EBC_Partition_outflow::~EBC_Partition_outflow()
 {
   for(int ii=0; ii<num_ebc; ++ii)
   {
@@ -62,12 +62,12 @@ EBC_Partition_vtp_outflow::~EBC_Partition_vtp_outflow()
   VEC_T::clean( outvec );
 }
 
-void EBC_Partition_vtp_outflow::write_hdf5( const std::string &FileName, 
+void EBC_Partition_outflow::write_hdf5( const std::string &FileName, 
     const std::string &GroupName ) const 
 {
   // --------------------------------------------------------------------------
   // Call the base class writer to write the base class data
-  EBC_Partition_vtp::write_hdf5( FileName, GroupName );
+  EBC_Partition::write_hdf5( FileName, GroupName );
   // --------------------------------------------------------------------------
 
   const std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
