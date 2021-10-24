@@ -1,7 +1,7 @@
-#ifndef EBC_PARTITION_VTP_WALL_HPP
-#define EBC_PARTITION_VTP_WALL_HPP
+#ifndef EBC_PARTITION_WALL_HPP
+#define EBC_PARTITION_WALL_HPP
 // ==================================================================
-// EBC_Partition_vtp_wall.hpp
+// EBC_Partition_wall.hpp
 //
 // Element boundary condition partition for the vessel wall
 // in the coupled momentum method (CMM).
@@ -14,17 +14,17 @@
 // Author: Ju Liu
 // Date: Jul. 25 2020
 // ==================================================================
-#include "EBC_Partition_vtp.hpp"
+#include "EBC_Partition.hpp"
 
-class EBC_Partition_vtp_wall : public EBC_Partition_vtp
+class EBC_Partition_wall : public EBC_Partition
 {
   public:
     // The input ElemBC should be ElemBC_3D_tet_wall
-    EBC_Partition_vtp_wall( const IPart * const &part,
+    EBC_Partition_wall( const IPart * const &part,
         const Map_Node_Index * const &mnindex,
         const ElemBC * const &ebc );
 
-    virtual ~EBC_Partition_vtp_wall();
+    virtual ~EBC_Partition_wall();
 
     // write the data to hdf5 file in folder /ebc_wall 
     virtual void write_hdf5( const std::string &FileName ) const;

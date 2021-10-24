@@ -1,10 +1,10 @@
-#include "EBC_Partition_vtp_wall.hpp"
+#include "EBC_Partition_wall.hpp"
 
-EBC_Partition_vtp_wall::EBC_Partition_vtp_wall( 
+EBC_Partition_wall::EBC_Partition_wall( 
     const IPart * const &part,
     const Map_Node_Index * const &mnindex,
     const ElemBC * const &ebc )
-: EBC_Partition_vtp(part, mnindex, ebc)
+: EBC_Partition(part, mnindex, ebc)
 {
   const int ebc_id = 0;
   
@@ -39,7 +39,7 @@ EBC_Partition_vtp_wall::EBC_Partition_vtp_wall(
     }
   }
   else
-    SYS_T::print_fatal("Error: the num_ebc in EBC_Partition_vtp_wall should be 0 or 1. \n");
+    SYS_T::print_fatal("Error: the num_ebc in EBC_Partition_wall should be 0 or 1. \n");
 
   // For wall surface, we keep a copy of the nodes belonging to this CPU's
   // subdomain
@@ -54,7 +54,7 @@ EBC_Partition_vtp_wall::EBC_Partition_vtp_wall(
   num_local_node_on_sur = static_cast<int>( local_node_on_sur_pos.size() );
 }
 
-EBC_Partition_vtp_wall::~EBC_Partition_vtp_wall()
+EBC_Partition_wall::~EBC_Partition_wall()
 {
   VEC_T::clean( part_thickness    );
   VEC_T::clean( part_youngsmod    );
@@ -63,11 +63,11 @@ EBC_Partition_vtp_wall::~EBC_Partition_vtp_wall()
   VEC_T::clean( local_node_on_sur_pos );
 }
 
-void EBC_Partition_vtp_wall::write_hdf5( const std::string &FileName ) const
+void EBC_Partition_wall::write_hdf5( const std::string &FileName ) const
 {
   // Call base class writer to write base class data at ebc_wall folder
   // certain wall info are in ebc_wall/ebc_0 sub-folder
-  EBC_Partition_vtp::write_hdf5( FileName, "ebc_wall" );
+  EBC_Partition::write_hdf5( FileName, "ebc_wall" );
 
   const std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
 
@@ -107,14 +107,14 @@ void EBC_Partition_vtp_wall::write_hdf5( const std::string &FileName ) const
   delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
 }
 
-void EBC_Partition_vtp_wall::write_hdf5( const std::string &FileName,
+void EBC_Partition_wall::write_hdf5( const std::string &FileName,
     const std::string &GroupName ) const 
 {
   // This function is NOT allowed. If the user uses the same groupname for the
   // wall and outlets, the wall data and the 0-th outlet data will be mixed.
   // We enforce the users to call the default write_hdf5, where the groupname
   // for the wall is fixed to be ebc_wall.
-  SYS_T::print_fatal("Error: EBC_Partition_vtp_wall, write_hdf5 with groupname is not allowed.\n");
+  SYS_T::print_fatal("Error: EBC_Partition_wall, write_hdf5 with groupname is not allowed.\n");
 }
 
 // EOF
