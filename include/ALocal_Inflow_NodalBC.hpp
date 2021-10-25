@@ -163,12 +163,12 @@ class ALocal_Inflow_NodalBC
   private:
     int num_nbc;
 
-    // Number of local Dirichlet nodes.
-    int Num_LD;
+    // Number of local Dirichlet nodes. Length num_nbc
+    std::vector<int> Num_LD;
 
     // Global indices of the local Dirichlet nodes (inflow BC)
-    // Length is Num_LD
-    std::vector<int> LDN;
+    // Length is num_nbc x Num_LD[ii] for 0<= ii < num_nbc
+    std::vector< std::vector<int> > LDN;
 
     // Outward normal vector. Length num_nbc
     std::vector<Vector_3> outnormal;

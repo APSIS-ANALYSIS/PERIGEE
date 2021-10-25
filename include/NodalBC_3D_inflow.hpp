@@ -125,6 +125,8 @@ class NodalBC_3D_inflow : public INodalBC
     std::vector< std::vector<unsigned int> > dir_nodes_on_inlet;
     std::vector<unsigned int> num_dir_nodes_on_inlet;
 
+    // All dirichlet nodes stored in a row and the total number of dirichlet
+    // nodes
     std::vector<unsigned int> dir_nodes;
     unsigned int num_dir_nodes;
 
