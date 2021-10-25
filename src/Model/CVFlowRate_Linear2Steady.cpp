@@ -1,9 +1,9 @@
 #include "CVFlowRate_Linear2Steady.hpp"
 
 CVFlowRate_Linear2Steady::CVFlowRate_Linear2Steady(
-    const ALocal_Inflow_NodalBC * const &infnbc_part,
+    const int &input_num_nbc,
     const double &in_thred_time, const double &flrate )
-: num_nbc(infnbc_part->get_num_nbc()), thred_time(in_thred_time), target_flow_rate(flrate)
+: num_nbc(input_num_nbc), thred_time(in_thred_time), target_flow_rate(flrate)
 {
   // Calculate flow rate and record in txt file 
   for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
