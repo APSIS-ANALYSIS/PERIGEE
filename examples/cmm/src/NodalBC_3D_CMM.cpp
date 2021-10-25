@@ -3,10 +3,7 @@
 NodalBC_3D_CMM::NodalBC_3D_CMM( const int &nFunc, const bool &is_all_node )
 {
   dir_nodes.clear();
-  per_slave_nodes.clear();
-  per_master_nodes.clear();
   num_dir_nodes = 0;
-  num_per_nodes = 0;
   
   if( is_all_node )
   {
@@ -35,9 +32,6 @@ NodalBC_3D_CMM::NodalBC_3D_CMM(
     const int &cmm_bc_type )
 {
   dir_nodes.clear();
-  per_slave_nodes.clear();
-  per_master_nodes.clear();
-  num_per_nodes = 0;
 
   const int ringbc_type = nbc_ring -> get_ring_bc_type();
 
