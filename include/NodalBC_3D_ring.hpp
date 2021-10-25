@@ -47,14 +47,20 @@ class NodalBC_3D_ring : public INodalBC
     {return dir_nodes[ii];}
 
     virtual unsigned int get_per_slave_nodes(const unsigned int &ii) const
-    {return per_slave_nodes[ii];}
+    {
+      SYS_T::print_fatal("Error: periodic nodes are not defined in NodalBC_3D_ring.\n");
+      return 0;
+    }
 
     virtual unsigned int get_per_master_nodes(const unsigned int &ii) const
-    {return per_master_nodes[ii];}
+    {
+      SYS_T::print_fatal("Error: periodic nodes are not defined in NodalBC_3D_ring.\n");
+      return 0;
+    }
 
     virtual unsigned int get_num_dir_nodes() const {return num_dir_nodes;}
 
-    virtual unsigned int get_num_per_nodes() const {return num_per_nodes;}
+    virtual unsigned int get_num_per_nodes() const {return 0;}
 
     virtual int get_num_caps() const { return num_caps; }
 
@@ -69,9 +75,6 @@ class NodalBC_3D_ring : public INodalBC
   private:
     std::vector<unsigned int> dir_nodes;
     unsigned int num_dir_nodes;
-
-    std::vector<unsigned int> per_slave_nodes, per_master_nodes;
-    unsigned int num_per_nodes;
 
     NodalBC_3D_ring() : ring_bc_type(0) {};
 

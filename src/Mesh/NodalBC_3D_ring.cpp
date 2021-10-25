@@ -2,9 +2,6 @@
 
 NodalBC_3D_ring::NodalBC_3D_ring(const int &nFunc) : ring_bc_type(0)
 {
-  per_slave_nodes.clear();
-  per_master_nodes.clear();
-  num_per_nodes = 0;
   dir_nodes.clear();
   num_dir_nodes = 0;
 
@@ -28,11 +25,6 @@ NodalBC_3D_ring::NodalBC_3D_ring(
     const int &nFunc, const int &in_ring_bc_type,
     const int &elemtype ) : ring_bc_type(in_ring_bc_type)
 {
-  // No periodic nodes
-  per_slave_nodes.clear();
-  per_master_nodes.clear();
-  num_per_nodes = 0;
-
   // Aggregate inlet & outlet data
   std::vector<std::string> cap_files = inflow_files;
   for(unsigned int ii=0; ii<outflow_files.size(); ++ii)
