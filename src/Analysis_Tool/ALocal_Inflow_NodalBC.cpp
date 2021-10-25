@@ -14,11 +14,20 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
   num_nbc = h5r -> read_intScalar( gname.c_str(), "num_nbc" );
     
   // Allocate the size of the member data
-  outnormal.resize(num_nbc); Num_LD.resize(num_nbc); LDN.resize(num_nbc);
-  act_area.resize(num_nbc); ful_area.resize(num_nbc); num_out_bc_pts.resize(num_nbc);
-  centroid.resize(num_nbc); outline_pts.resize(num_nbc);
-  num_local_node.resize(num_nbc); num_local_cell.resize(num_nbc); cell_nLocBas(num_nbc);
-  local_pt_xyz.resize(num_nbc); local_tri_ien.resize(num_nbc); local_node_pos.resize(num_nbc);
+  Num_LD.resize(num_nbc); 
+  LDN.resize(num_nbc);
+  outnormal.resize(num_nbc); 
+  act_area.resize(num_nbc); 
+  ful_area.resize(num_nbc); 
+  num_out_bc_pts.resize(num_nbc);
+  outline_pts.resize(num_nbc);
+  centroid.resize(num_nbc); 
+  num_local_node.resize(num_nbc); 
+  num_local_cell.resize(num_nbc); 
+  cell_nLocBas.resize(num_nbc);
+  local_pt_xyz.resize(num_nbc); 
+  local_tri_ien.resize(num_nbc); 
+  local_node_pos.resize(num_nbc);
 
   std::string groupbase(gname);
   groupbase.append("/nbcid_");

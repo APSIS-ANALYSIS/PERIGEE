@@ -4,7 +4,7 @@ NBC_Partition_inflow::NBC_Partition_inflow(
     const IPart * const &part,
     const Map_Node_Index * const &mnindex,
     const INodalBC * const &nbc ) 
-: num_nbc( nbc -> get_num_nbc() )
+: cpu_rank(part->get_cpu_rank()), num_nbc( nbc -> get_num_nbc() )
 {
   LDN.resize(num_nbc);
   for(int ii=0; ii<num_nbc; ++ii) LDN[ii].clear();
@@ -132,9 +132,9 @@ void NBC_Partition_inflow::write_hdf5( const std::string &FileName ) const
     hid_t group_id = H5Gcreate(g_id, subgroup_name.c_str(),
         H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-    h5w->Write_intScalar( group_id, "Num_LD", Num_LD[ii] );
+    h5w->write_intScalar( group_id, "Num_LD", Num_LD[ii] );
     
-    h5w->Write_intVector( group_id, "LDN", LDN[ii] );
+    h5w->write_intVector( group_id, "LDN", LDN[ii] );
 
     h5w->write_doubleScalar( group_id, "Inflow_active_area", actarea[ii] );
 

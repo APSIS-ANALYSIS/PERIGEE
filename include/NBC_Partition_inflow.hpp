@@ -32,6 +32,7 @@ class NBC_Partition_inflow
     virtual void write_hdf5( const std::string &FileName ) const;
 
   private:
+    const int cpu_rank;
     const int num_nbc;
 
     // Local Dirichlet nodes that belong to different inlet surfaces
