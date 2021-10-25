@@ -76,13 +76,13 @@ class NodalBC_3D_vtp : public INodalBC
 
     virtual ~NodalBC_3D_vtp();
 
-    virtual unsigned int get_dir_nodes(unsigned int &ii) const
+    virtual unsigned int get_dir_nodes(const unsigned int &ii) const
     {return dir_nodes[ii];}
 
-    virtual unsigned int get_per_slave_nodes(unsigned int &ii) const
+    virtual unsigned int get_per_slave_nodes(const unsigned int &ii) const
     {return per_slave_nodes[ii];}
 
-    virtual unsigned int get_per_master_nodes(unsigned int &ii) const
+    virtual unsigned int get_per_master_nodes(const unsigned int &ii) const
     {return per_master_nodes[ii];}
 
     virtual unsigned int get_num_dir_nodes() const {return num_dir_nodes;}
