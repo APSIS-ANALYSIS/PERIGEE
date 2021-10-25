@@ -8,6 +8,9 @@ NodalBC_3D_inflow::NodalBC_3D_inflow(const int &nFunc) : num_nbc( 0 )
   dir_nodes.clear();
   num_dir_nodes = 0;
 
+  dir_nodes_on_inlet.clear();
+  num_dir_nodes_on_inlet.clear();
+
   Create_ID( nFunc );
   
   inf_active_area.clear(); face_area.clear();
@@ -39,6 +42,11 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   // 2. Clear the container for Dirichlet nodes
   dir_nodes.clear();
   num_dir_nodes = 0;
+
+  dir_nodes_on_inlet.resize( num_nbc );
+  for(int ii=0; ii<num_nbc; ++ii) dir_nodes_on_inlet[ii].clear();
+
+  num_dir_nodes_on_inlet.clear();
 
   // 3. Analyze the file type and read in the data
   num_node.resize( num_nbc );
@@ -323,8 +331,13 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileLis
       SYS_T::print_fatal_if( global_node[ii][jj]<0, "Error: negative nodal index! \n");
 
       if( !VEC_T::is_invec( wall_gnode, global_node[ii][jj]) )
+      {
         dir_nodes.push_back( global_node[ii][jj] );
+        dir_nodes_on_inlet[ii].push_back( global_node[ii][jj] );
+      }
     }
+
+    num_dir_nodes_on_inlet[ii] = dir_nodes_on_inlet[ii].size();
 
     // Calculate the centroid of the surface
     centroid[ii].gen_zero();

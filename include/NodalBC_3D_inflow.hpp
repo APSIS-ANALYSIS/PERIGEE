@@ -60,6 +60,9 @@ class NodalBC_3D_inflow : public INodalBC
 
     virtual unsigned int get_num_per_nodes() const {return num_per_nodes;}
 
+    virtual unsigned int get_dir_nodes_on_inlet( const int &nbc_id, const unsigned int &ii ) const
+    { return dir_nodes_on_inlet[nbc_id][ii]; }
+
     virtual double get_inf_active_area(const int &nbc_id) const {return inf_active_area[nbc_id];}
 
     virtual Vector_3 get_outnormal(const int &nbc_id) const {return outnormal[nbc_id];}
@@ -113,6 +116,11 @@ class NodalBC_3D_inflow : public INodalBC
 
   private:
     NodalBC_3D_inflow() : num_nbc(0) {};
+
+    // The dirichlet nodes on each inlet surface
+    // length num_nbc x num_dir_nodes_on_inlet[ii]
+    std::vector< std::vector<unsigned int> > dir_nodes_on_inlet;
+    std::vector<unsigned int> num_dir_nodes_on_inlet;
 
     std::vector<unsigned int> dir_nodes;
     unsigned int num_dir_nodes;
