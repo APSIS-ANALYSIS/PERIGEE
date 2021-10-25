@@ -4,9 +4,13 @@ NBC_Partition_inflow::NBC_Partition_inflow(
     const IPart * const &part,
     const Map_Node_Index * const &mnindex,
     const INodalBC * const &nbc ) 
-: NBC_Partition( part, mnindex, nbc ), 
-  num_nbc( nbc -> get_num_nbc() )
+: num_nbc( nbc -> get_num_nbc() )
 {
+  LDN.resize(num_nbc);
+  for(int ii=0; ii<num_nbc; ++ii) LDN[ii].clear();
+
+  Num_LD.resize(num_nbc);
+
   actarea.resize(num_nbc); facearea.resize(num_nbc);
   outvec.resize(num_nbc);  centroid.resize(num_nbc);
   num_out_bc_pts.resize(num_nbc); outline_pts.resize(num_nbc);
@@ -17,6 +21,19 @@ NBC_Partition_inflow::NBC_Partition_inflow(
 
   for(int ii=0; ii<num_nbc; ++ii)
   {
+    // Collect the Dirichlet nodes on the ii-th inlet surface
+    Num_LD[ii] = 0;
+    for(unsigned int jj=0; jj<nbc->get_num_dir_nodes_on_inlet(ii); ++jj)
+    {
+      unsigned int node_index = nbc -> get_dir_nodes_on_inlet(ii, jj);
+      node_index = mnindex -> get_old2new(node_index);
+      if(part->isNodeInPart(node_index))
+      {
+        LDN[ii].push_back(node_index);
+        Num_LD[ii] += 1;
+      }
+    }
+
     // Area of the cap surface
     actarea[ii]  = nbc -> get_inf_active_area(ii);
     facearea[ii] = nbc -> get_face_area(ii);
@@ -98,7 +115,7 @@ NBC_Partition_inflow::~NBC_Partition_inflow()
 void NBC_Partition_inflow::write_hdf5( const std::string &FileName ) const
 {
   std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
-  
+
   hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
   hid_t g_id = H5Gcreate(file_id, "/inflow", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
@@ -107,22 +124,10 @@ void NBC_Partition_inflow::write_hdf5( const std::string &FileName ) const
 
   h5w -> write_intScalar( g_id, "num_nbc", num_nbc );
 
-  h5w->write_doubleVector( g_id, "Inflow_active_area", actarea );
-  
-  h5w->write_doubleVector( g_id, "Inflow_full_area", facearea );
-
-  h5w->write_intVector( g_id, "num_out_bc_pts", num_out_bc_pts);
-
-  h5w->write_intVector( g_id, "num_local_node", num_local_node );
-  
-  h5w->write_intVector( g_id, "num_local_cell", num_local_cell );
-  
-  h5w->write_intVector( g_id, "cell_nLocBas", cell_nLocBas );
-
   if( LDN.size() > 0 ) h5w->write_intVector( g_id, "LDN", LDN );
 
   h5w->write_intVector( g_id, "Num_LD", Num_LD );
-  
+
   for(int ii=0; ii<num_nbc; ++ii)
   {
     std::string subgroup_name( "nbcid_" );
@@ -130,6 +135,18 @@ void NBC_Partition_inflow::write_hdf5( const std::string &FileName ) const
 
     hid_t group_id = H5Gcreate(g_id, subgroup_name.c_str(),
         H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+    h5w->write_doubleScalar( group_id, "Inflow_active_area", actarea[ii] );
+
+    h5w->write_doubleScalar( group_id, "Inflow_full_area", facearea[ii] );
+
+    h5w->write_intScalar( group_id, "num_out_bc_pts", num_out_bc_pts[ii] );
+
+    h5w->write_intScalar( group_id, "num_local_node", num_local_node[ii] );
+
+    h5w->write_intScalar( group_id, "num_local_cell", num_local_cell[ii] );
+
+    h5w->write_intScalar( group_id, "cell_nLocBas", cell_nLocBas[ii] );
 
     h5w->write_Vector_3( group_id, "Outward_normal_vector", outvec[ii] );
 

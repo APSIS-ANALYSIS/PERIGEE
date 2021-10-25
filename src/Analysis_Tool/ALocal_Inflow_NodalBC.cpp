@@ -12,25 +12,34 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
   const std::string gname("/inflow");
 
   num_nbc = h5r -> read_intScalar( gname.c_str(), "num_nbc" );
+    
+  // number of local dirichlet nodes, local to the partitioned subdomain
+  const std::vector<int> temp_num_ld = h5r->read_intVector( gname.c_str(), "Num_LD" );
+  Num_LD = temp_num_ld[0];
+
+  LDN.clear();
+  if( Num_LD > 0 ) LDN = h5r->read_intVector( gname.c_str(), "LDN" );
+
+  SYS_T::print_fatal_if( Num_LD != static_cast<int>( LDN.size() ), "Error: the LDN vector size does not match with the value of Num_LD.\n" );
 
   // active area of all inlet caps, length is num_nbc
-  act_area       = h5r->read_doubleVector( gname.c_str(), "Inflow_active_area" );
+  //act_area       = h5r->read_doubleVector( gname.c_str(), "Inflow_active_area" );
 
   // full area of all inlet caps, length is num_nbc
-  ful_area       = h5r->read_doubleVector( gname.c_str(), "Inflow_full_area" );
+  //ful_area       = h5r->read_doubleVector( gname.c_str(), "Inflow_full_area" );
 
   // surface mesh's nLocBas, length is num_nbc
-  cell_nLocBas   = h5r->read_intVector(    gname.c_str(), "cell_nLocBas" );
+  //cell_nLocBas   = h5r->read_intVector(    gname.c_str(), "cell_nLocBas" );
 
   // number of surface cell belonging to this partition, length is num_nbc
-  num_local_cell = h5r->read_intVector(    gname.c_str(), "num_local_cell" );
+  //num_local_cell = h5r->read_intVector(    gname.c_str(), "num_local_cell" );
 
   // number of nodes owned by local surface cells that belong to this partition,
   // length is num_nbc
-  num_local_node = h5r->read_intVector(    gname.c_str(), "num_local_node" );
-  
+  //num_local_node = h5r->read_intVector(    gname.c_str(), "num_local_node" );
+
   // number of outline points of all inlet surfaces, length is num_nbc
-  num_out_bc_pts = h5r->read_intVector(    gname.c_str(), "num_out_bc_pts" );
+  //num_out_bc_pts = h5r->read_intVector(    gname.c_str(), "num_out_bc_pts" );
 
   outnormal.resize(num_nbc); Num_LD.resize(num_nbc); LDN.resize(num_nbc);
   centroid.resize(num_nbc); outline_pts.resize(num_nbc);
@@ -46,16 +55,13 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
 
     // outward normal vector of inlet cap nbc_id
     outnormal[nbc_id]      = h5r->read_Vector_3(   subgroup_name.c_str(), "Outward_normal_vector" );
-    
-    // number of local dirichlet nodes, local to the partitioned subdomain
-    Num_LD[nbc_id]         = h5r->read_intScalar(  subgroup_name.c_str(), "Num_LD" );
+
 
     // If this sub-domain of this CPU contains local inflow bc points, load the LDN array.
     // Also load the centroid and outline_pts as they three will be used for
     // generating the flow profile on the inlet at the nodes.
     if( Num_LD[nbc_id] > 0 )
     {
-      LDN[nbc_id]            = h5r->read_intVector(    subgroup_name.c_str(), "LDN" );
       centroid[nbc_id]       = h5r->read_Vector_3(     subgroup_name.c_str(), "centroid" );
       outline_pts[nbc_id]    = h5r->read_doubleVector( subgroup_name.c_str(), "outline_pts" );
     }
@@ -67,7 +73,7 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
       centroid[nbc_id] = Vector_3(0.0, 0.0, 0.0); 
       outline_pts[nbc_id].clear();
     }
- 
+
     // If this partitioned sub-domain contains inlet surface element,
     // load its geometrical info 
     if(num_local_cell[nbc_id] > 0)
@@ -84,7 +90,7 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
       local_node_pos[nbc_id].clear();
     }
   } // end nbc_id-loop
-  
+
   delete h5r; H5Fclose( file_id );
 }
 
@@ -118,7 +124,7 @@ double ALocal_Inflow_NodalBC::get_radius( const int &nbc_id,
   for(int ii=1; ii<num_out_bc_pts[nbc_id]; ++ii)
   {
     double newdist = MATH_T::norm2(x-outline_pts[nbc_id][3*ii],
-      y-outline_pts[nbc_id][3*ii+1], z-outline_pts[nbc_id][3*ii+2]);
+        y-outline_pts[nbc_id][3*ii+1], z-outline_pts[nbc_id][3*ii+2]);
 
     if(newdist < rb) rb = newdist;
   }

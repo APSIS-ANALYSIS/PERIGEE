@@ -63,6 +63,9 @@ class NodalBC_3D_inflow : public INodalBC
     virtual unsigned int get_dir_nodes_on_inlet( const int &nbc_id, const unsigned int &ii ) const
     { return dir_nodes_on_inlet[nbc_id][ii]; }
 
+    virtual unsigned int get_num_dir_nodes_on_inlet( const int &nbc_id ) const
+    { return num_dir_nodes_on_inlet[nbc_id]; }
+
     virtual double get_inf_active_area(const int &nbc_id) const {return inf_active_area[nbc_id];}
 
     virtual Vector_3 get_outnormal(const int &nbc_id) const {return outnormal[nbc_id];}

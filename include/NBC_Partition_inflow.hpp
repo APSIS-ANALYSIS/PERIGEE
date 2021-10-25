@@ -16,9 +16,11 @@
 // Date crated: Aug. 9 2017
 // Author: Ju Liu
 // ==================================================================
-#include "NBC_Partition.hpp"
+#include "IPart.hpp"
+#include "Map_Node_Index.hpp"
+#include "INodalBC.hpp"
 
-class NBC_Partition_inflow : public NBC_Partition
+class NBC_Partition_inflow
 {
   public:
     NBC_Partition_inflow(const IPart * const &part,
@@ -31,6 +33,14 @@ class NBC_Partition_inflow : public NBC_Partition
 
   private:
     const int num_nbc;
+
+    // Local Dirichlet nodes that belong to different inlet surfaces
+    // Length: num_nbc x NumLD[ii], for 0 <= ii < num_nbc
+    std::vector< std::vector<int> > LDN;
+
+    // Number of Local Dirichlet nodes for each inlet surface
+    // Length: num_nbc
+    std::vector<int> Num_LD;
 
     // active area & full area. Length num_nbc
     std::vector<double> actarea, facearea;
