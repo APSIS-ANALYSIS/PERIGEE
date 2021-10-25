@@ -13,10 +13,11 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
 
   num_nbc = h5r -> read_intScalar( gname.c_str(), "num_nbc" );
     
-  // number of outline points of all inlet surfaces, length is num_nbc
-
+  // Allocate the size of the member data
   outnormal.resize(num_nbc); Num_LD.resize(num_nbc); LDN.resize(num_nbc);
+  act_area.resize(num_nbc); ful_area.resize(num_nbc); num_out_bc_pts.resize(num_nbc);
   centroid.resize(num_nbc); outline_pts.resize(num_nbc);
+  num_local_node.resize(num_nbc); num_local_cell.resize(num_nbc); cell_nLocBas(num_nbc);
   local_pt_xyz.resize(num_nbc); local_tri_ien.resize(num_nbc); local_node_pos.resize(num_nbc);
 
   std::string groupbase(gname);
@@ -35,35 +36,32 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
     if( Num_LD[nbc_id] > 0 )
     {
       LDN[nbc_id]            = h5r -> read_intVector(    subgroup_name.c_str(), "LDN" );
-      num_out_bc_pts[nbc_id] = h5r -> read_intScalar(    subgroup_name.c_str(), "num_out_bc_pts" );
-      centroid[nbc_id]       = h5r -> read_Vector_3(     subgroup_name.c_str(), "centroid" );
       outline_pts[nbc_id]    = h5r -> read_doubleVector( subgroup_name.c_str(), "outline_pts" );
     }
     else
     {
       LDN[nbc_id].clear();
-      num_out_bc_pts[nbc_id] = 0;
-      centroid[nbc_id] = Vector_3(0.0, 0.0, 0.0); 
       outline_pts[nbc_id].clear();
     }
     
     SYS_T::print_fatal_if( Num_LD[nbc_id] != static_cast<int>( LDN[nbc_id].size() ), "Error: the LDN vector size does not match with the value of Num_LD.\n" );
 
-    act_area[nbc_id] = h5r->read_doubleScalar( subgroup_name.c_str(), "Inflow_active_area" );
-    ful_area[nbc_id] = h5r->read_doubleScalar( subgroup_name.c_str(), "Inflow_full_area" );
+    // Basic geometrical quantities of the nbc_id-th inlet surface
+    act_area[nbc_id]       = h5r -> read_doubleScalar( subgroup_name.c_str(), "Inflow_active_area" );
+    ful_area[nbc_id]       = h5r -> read_doubleScalar( subgroup_name.c_str(), "Inflow_full_area" );
+    num_out_bc_pts[nbc_id] = h5r -> read_intScalar(    subgroup_name.c_str(), "num_out_bc_pts" );
+    centroid[nbc_id]       = h5r -> read_Vector_3(     subgroup_name.c_str(), "centroid" );
+    outnormal[nbc_id]      = h5r -> read_Vector_3(     subgroup_name.c_str(), "Outward_normal_vector" );
 
-    cell_nLocBas[nbc_id] = h5r->read_intScalar( subgroup_name.c_str(), "cell_nLocBas" );
+    // Cell-related data
+    cell_nLocBas[nbc_id]   = h5r->read_intScalar( subgroup_name.c_str(), "cell_nLocBas" );
     num_local_cell[nbc_id] = h5r->read_intScalar( subgroup_name.c_str(), "num_local_cell" );
     num_local_node[nbc_id] = h5r->read_intScalar( subgroup_name.c_str(), "num_local_node" );
-
-    // outward normal vector of inlet cap nbc_id
-    outnormal[nbc_id]      = h5r->read_Vector_3(   subgroup_name.c_str(), "Outward_normal_vector" );
 
     // If this partitioned sub-domain contains inlet surface element,
     // load its geometrical info 
     if(num_local_cell[nbc_id] > 0)
     {
-
       local_pt_xyz[nbc_id]   = h5r->read_doubleVector( subgroup_name.c_str(), "local_pt_xyz" );
       local_tri_ien[nbc_id]  = h5r->read_intVector(    subgroup_name.c_str(), "local_tri_ien" );
       local_node_pos[nbc_id] = h5r->read_intVector(    subgroup_name.c_str(), "local_node_pos" );
@@ -81,8 +79,17 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
 
 ALocal_Inflow_NodalBC::~ALocal_Inflow_NodalBC()
 {
+  VEC_T::clean(Num_LD); 
   VEC_T::clean(LDN);
+  VEC_T::clean(outnormal); 
+  VEC_T::clean(act_area); 
+  VEC_T::clean(ful_area);
+  VEC_T::clean(num_out_bc_pts); 
   VEC_T::clean(outline_pts);
+  VEC_T::clean(centroid);
+  VEC_T::clean(num_local_node); 
+  VEC_T::clean(num_local_cell);
+  VEC_T::clean(cell_nLocBas);
   VEC_T::clean(local_pt_xyz);
   VEC_T::clean(local_tri_ien);
   VEC_T::clean(local_node_pos);
