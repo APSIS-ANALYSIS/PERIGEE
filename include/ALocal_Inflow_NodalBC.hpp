@@ -26,6 +26,7 @@ class ALocal_Inflow_NodalBC
     // ------------------------------------------------------------------------
     // Get global index of a Dirichlet node in the local partition
     // 0 <= node < Num_LD[nbc_id]
+    // Note: make sure that Num_LD[nbc_id] > 0 before calling this get function
     // ------------------------------------------------------------------------
     virtual int get_LDN( const int &nbc_id, const int &node ) const
     {return LDN[nbc_id][node];}
@@ -96,6 +97,7 @@ class ALocal_Inflow_NodalBC
     // access coordinates of a node in the local partition by indexing
     // the local_pt_xyz array
     // 0 <= ii < 3 x num_local_node[nbc_id]
+    // Note: make sure num_local_cell[nbc_id] > 0 before using this get function
     // ------------------------------------------------------------------------
     virtual double get_local_pt_xyz( const int &nbc_id, const int &ii) const
     {return local_pt_xyz[nbc_id][ii];}
@@ -104,6 +106,7 @@ class ALocal_Inflow_NodalBC
     // access coordinates of a node in the local partition using its local index
     // and dir.
     // 0 <= ii < num_local_node[nbc_id], 0 <= dir < 3
+    // Note: make sure num_local_cell[nbc_id] > 0 before using this get function
     // ------------------------------------------------------------------------
     virtual double get_local_pt_xyz( const int &nbc_id, const int &ii,
         const int &dir) const 
@@ -112,6 +115,7 @@ class ALocal_Inflow_NodalBC
     // ------------------------------------------------------------------------
     // access an element's IEN array by indexing the local_tri_ien array
     // 0 <= ii < cell_nLocBas[nbc_id] x num_local_cell[nbc_id]
+    // Note: make sure num_local_cell[nbc_id] > 0 before using this get function
     // ------------------------------------------------------------------------
     virtual int get_local_tri_ien( const int &nbc_id, const int &ii ) const
     {return local_tri_ien[nbc_id][ii];}
@@ -120,8 +124,9 @@ class ALocal_Inflow_NodalBC
     // access an element's IEN array by its local element index and surface element
     // node index
     // 0 <= ee < num_local_cell[nbc_id], 0 <= ii < cell_nLocBas[nbc_id]
+    // Note: make sure num_local_cell[nbc_id] > 0 before using this get function
     // ------------------------------------------------------------------------
-    virtual int get_local_tri_ien( const int &nbc_id, const int &ee,
+    virtual int get_local_tri_ien( const int &nbc_id, const int &ee, 
         const int &ii ) const
     { return local_tri_ien[nbc_id][ee * cell_nLocBas[nbc_id] + ii]; }
 
@@ -131,6 +136,7 @@ class ALocal_Inflow_NodalBC
     // Users are responsible for allocating/deallocating memory for ctrl_(x/y/z)
     // surface element id: 0 <= eindex < num_local_cell[nbc_id];
     // ctrl_x/y/z : output coordinate arrays, each of length cell_nLocBas[nbc_id].
+    // Note: make sure num_local_cell[nbc_id] > 0 before using this get function
     // ------------------------------------------------------------------------
     virtual void get_ctrlPts_xyz( const int &nbc_id, const int &eindex,
         double * const &ctrl_x, double * const &ctrl_y,
@@ -141,6 +147,7 @@ class ALocal_Inflow_NodalBC
     // Users are responsible for allocating/deallocating memory for sien
     // eindex : 0 <= eindex < num_local_cell[nbc_id]
     // sien : length cell_nLocBas[nbc_id].
+    // Note: make sure num_local_cell[nbc_id] > 0 before using this get function
     // ------------------------------------------------------------------------
     virtual void get_SIEN( const int &nbc_id, const int &eindex,
         int * const &sien ) const;
