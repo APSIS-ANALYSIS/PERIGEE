@@ -25,7 +25,7 @@ NBC_Partition_inflow::NBC_Partition_inflow(
     Num_LD[ii] = 0;
     for(unsigned int jj=0; jj<nbc->get_num_dir_nodes_on_inlet(ii); ++jj)
     {
-      unsigned int node_index = nbc -> get_dir_nodes_on_inlet(ii, jj);
+      int node_index = static_cast<int>( nbc -> get_dir_nodes_on_inlet(ii, jj) );
       node_index = mnindex -> get_old2new(node_index);
       if(part->isNodeInPart(node_index))
       {
@@ -124,10 +124,6 @@ void NBC_Partition_inflow::write_hdf5( const std::string &FileName ) const
 
   h5w -> write_intScalar( g_id, "num_nbc", num_nbc );
 
-  if( LDN.size() > 0 ) h5w->write_intVector( g_id, "LDN", LDN );
-
-  h5w->write_intVector( g_id, "Num_LD", Num_LD );
-
   for(int ii=0; ii<num_nbc; ++ii)
   {
     std::string subgroup_name( "nbcid_" );
@@ -135,6 +131,10 @@ void NBC_Partition_inflow::write_hdf5( const std::string &FileName ) const
 
     hid_t group_id = H5Gcreate(g_id, subgroup_name.c_str(),
         H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+    h5w->Write_intScalar( group_id, "Num_LD", Num_LD[ii] );
+    
+    h5w->Write_intVector( group_id, "LDN", LDN[ii] );
 
     h5w->write_doubleScalar( group_id, "Inflow_active_area", actarea[ii] );
 
