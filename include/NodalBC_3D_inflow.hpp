@@ -47,18 +47,24 @@ class NodalBC_3D_inflow : public INodalBC
 
     virtual ~NodalBC_3D_inflow() {};
 
-    virtual unsigned int get_dir_nodes(unsigned int &ii) const
+    virtual unsigned int get_dir_nodes(const unsigned int &ii) const
     {return dir_nodes[ii];}
 
-    virtual unsigned int get_per_slave_nodes(unsigned int &ii) const
-    {return per_slave_nodes[ii];}
+    virtual unsigned int get_per_slave_nodes(const unsigned int &ii) const
+    {
+      SYS_T::print_fatal("Error: periodic nodes are not defined in NodalBC_3D_inflow.\n");
+      return 0;
+    }
 
-    virtual unsigned int get_per_master_nodes(unsigned int &ii) const
-    {return per_master_nodes[ii];}
+    virtual unsigned int get_per_master_nodes(const unsigned int &ii) const
+    {
+      SYS_T::print_fatal("Error: periodic nodes are not defined in NodalBC_3D_inflow.\n");
+      return 0;
+    }
 
     virtual unsigned int get_num_dir_nodes() const {return num_dir_nodes;}
 
-    virtual unsigned int get_num_per_nodes() const {return num_per_nodes;}
+    virtual unsigned int get_num_per_nodes() const {return 0;}
 
     virtual unsigned int get_dir_nodes_on_inlet( const int &nbc_id, const unsigned int &ii ) const
     { return dir_nodes_on_inlet[nbc_id][ii]; }
@@ -129,9 +135,6 @@ class NodalBC_3D_inflow : public INodalBC
     // nodes
     std::vector<unsigned int> dir_nodes;
     unsigned int num_dir_nodes;
-
-    std::vector<unsigned int> per_slave_nodes, per_master_nodes;
-    unsigned int num_per_nodes;
 
     // number of inlet surfaces
     const int num_nbc;

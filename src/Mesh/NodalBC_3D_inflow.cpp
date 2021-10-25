@@ -2,9 +2,6 @@
 
 NodalBC_3D_inflow::NodalBC_3D_inflow(const int &nFunc) : num_nbc( 0 )
 {
-  per_slave_nodes.clear(); per_master_nodes.clear();
-  num_per_nodes = 0;
-
   dir_nodes.clear();
   num_dir_nodes = 0;
 
@@ -33,13 +30,9 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   SYS_T::file_check(inffile);
   SYS_T::file_check(wallfile);
 
-  // 1. No periodic nodes
   const int nbc_id = 0;
-  per_slave_nodes.clear();
-  per_master_nodes.clear();
-  num_per_nodes = 0;
 
-  // 2. Clear the container for Dirichlet nodes
+  // 1. Clear the container for Dirichlet nodes
   dir_nodes.clear();
   num_dir_nodes = 0;
 
@@ -48,7 +41,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
 
   num_dir_nodes_on_inlet.clear();
 
-  // 3. Analyze the file type and read in the data
+  // 2. Analyze the file type and read in the data
   num_node.resize( num_nbc );
   num_cell.resize( num_nbc );
   nLocBas.resize(  num_nbc );
@@ -259,16 +252,11 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileLis
     const std::vector<Vector_3> &in_outnormal,
     const int &elemtype ) : num_nbc( static_cast<int>( inffileList.size() ) )
 {
-  // 1. No periodic nodes
-  per_slave_nodes.clear();
-  per_master_nodes.clear();
-  num_per_nodes = 0;
-
-  // 2. Clear the container for Dirichlet nodes
+  // 1. Clear the container for Dirichlet nodes
   dir_nodes.clear();
   num_dir_nodes = 0;
 
-  // 3. Analyze the file type and read in the data
+  // 2. Analyze the file type and read in the data
   num_node.resize( num_nbc );
   num_cell.resize( num_nbc );
   nLocBas.resize(  num_nbc );
