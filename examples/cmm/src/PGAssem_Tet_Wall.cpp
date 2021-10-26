@@ -104,21 +104,16 @@ void PGAssem_Tet_Wall::Assem_nonzero_estimate(
 void PGAssem_Tet_Wall::EssBC_KG( const ALocal_NodalBC * const &nbc_part, 
     const int &field )
 {
-  const int num_nbc = nbc_part->get_num_nbc();
+  const int local_dir = nbc_part->get_Num_LD(field);
 
-  for(int nbc_id; nbc_id<num_nbc; ++nbc_id)
+  if(local_dir > 0)
   {
-    const int local_dir = nbc_part->get_Num_LD(nbc_id, field);
-
-    if(local_dir > 0)
+    for(int ii=0; ii<local_dir; ++ii)
     {
-      for(int ii=0; ii<local_dir; ++ii)
-      {
-        const int row = nbc_part->get_LDN(nbc_id, field, ii) * dof_mat + field;
+      const int row = nbc_part->get_LDN(field, ii) * dof_mat + field;
 
-        VecSetValue(G, row, 0.0, INSERT_VALUES);
-        MatSetValue(K, row, row, 1.0, ADD_VALUES);
-      }
+      VecSetValue(G, row, 0.0, INSERT_VALUES);
+      MatSetValue(K, row, row, 1.0, ADD_VALUES);
     }
   }
 }
