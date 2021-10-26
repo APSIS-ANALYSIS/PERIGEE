@@ -366,7 +366,7 @@ int main( int argc, char * argv[] )
     nbcpart -> write_hdf5( part_file );
 
     // Partition Nodal Inflow BC and write to h5 file
-    NBC_Partition * infpart = new NBC_Partition_inflow(part, mnindex, InFBC);
+    NBC_Partition_inflow * infpart = new NBC_Partition_inflow(part, mnindex, InFBC);
     infpart->write_hdf5( part_file );
 
     // Partition Nodal Ring BC and write to h5 file
