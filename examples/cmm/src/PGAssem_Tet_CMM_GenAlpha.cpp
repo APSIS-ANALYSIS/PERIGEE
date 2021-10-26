@@ -79,34 +79,29 @@ void PGAssem_Tet_CMM_GenAlpha::EssBC_KG(
     const ALocal_NodalBC * const &nbc_part,
     const int &field )
 {
-  const int num_nbc = nbc_part->get_num_nbc();
+  const int local_dir = nbc_part->get_Num_LD(field);
 
-  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
+  if(local_dir > 0)
   {
-    const int local_dir = nbc_part->get_Num_LD(nbc_id, field);
-
-    if(local_dir > 0)
+    for(int ii=0; ii<local_dir; ++ii)
     {
-      for(int ii=0; ii<local_dir; ++ii)
-      {
-        const int row = nbc_part->get_LDN(nbc_id, field, ii) * dof_mat + field;
-        
-        VecSetValue(G, row, 0.0, INSERT_VALUES);
-        MatSetValue(K, row, row, 1.0, ADD_VALUES);
-      }
+      const int row = nbc_part->get_LDN(field, ii) * dof_mat + field;
+
+      VecSetValue(G, row, 0.0, INSERT_VALUES);
+      MatSetValue(K, row, row, 1.0, ADD_VALUES);
     }
+  }
 
-    const int local_sla = nbc_part->get_Num_LPS(nbc_id, field);
-    if(local_sla > 0)
+  const int local_sla = nbc_part->get_Num_LPS(field);
+  if(local_sla > 0)
+  {
+    for(int ii=0; ii<local_sla; ++ii)
     {
-      for(int ii=0; ii<local_sla; ++ii)
-      {
-        const int row = nbc_part->get_LPSN(nbc_id, field, ii) * dof_mat + field;
-        const int col = nbc_part->get_LPMN(nbc_id, field, ii) * dof_mat + field;
-        MatSetValue(K, row, col, 1.0, ADD_VALUES);
-        MatSetValue(K, row, row, -1.0, ADD_VALUES);
-        VecSetValue(G, row, 0.0, INSERT_VALUES);
-      }
+      const int row = nbc_part->get_LPSN(field, ii) * dof_mat + field;
+      const int col = nbc_part->get_LPMN(field, ii) * dof_mat + field;
+      MatSetValue(K, row, col, 1.0, ADD_VALUES);
+      MatSetValue(K, row, row, -1.0, ADD_VALUES);
+      VecSetValue(G, row, 0.0, INSERT_VALUES);
     }
   }
 }
@@ -146,9 +141,9 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
           if( dnode != ( row_index[jj] - 3 ) / dof_mat )
           {
             Matrix_3x3 Ke_AB = Matrix_3x3(
-              Ke[(jj-2)*ncol + (ii-2)], Ke[(jj-2)*ncol + (ii-1)], Ke[(jj-2)*ncol + ii],
-              Ke[(jj-1)*ncol + (ii-2)], Ke[(jj-1)*ncol + (ii-1)], Ke[(jj-1)*ncol + ii],
-              Ke[(jj-0)*ncol + (ii-2)], Ke[(jj-0)*ncol + (ii-1)], Ke[(jj-0)*ncol + ii]  );
+                Ke[(jj-2)*ncol + (ii-2)], Ke[(jj-2)*ncol + (ii-1)], Ke[(jj-2)*ncol + ii],
+                Ke[(jj-1)*ncol + (ii-2)], Ke[(jj-1)*ncol + (ii-1)], Ke[(jj-1)*ncol + ii],
+                Ke[(jj-0)*ncol + (ii-2)], Ke[(jj-0)*ncol + (ii-1)], Ke[(jj-0)*ncol + ii]  );
 
             Ke_AB.MatMult(Ke_AB, Q);  // Ke_AB * Q
 
@@ -185,9 +180,9 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
         for( int jj = dof-1; jj < ncol; jj += dof )
         {
           Matrix_3x3 Ke_AB = Matrix_3x3(
-            Ke[(ii-2)*ncol + (jj-2)], Ke[(ii-2)*ncol + (jj-1)], Ke[(ii-2)*ncol + jj],
-            Ke[(ii-1)*ncol + (jj-2)], Ke[(ii-1)*ncol + (jj-1)], Ke[(ii-1)*ncol + jj],
-            Ke[(ii-0)*ncol + (jj-2)], Ke[(ii-0)*ncol + (jj-1)], Ke[(ii-0)*ncol + jj]  );
+              Ke[(ii-2)*ncol + (jj-2)], Ke[(ii-2)*ncol + (jj-1)], Ke[(ii-2)*ncol + jj],
+              Ke[(ii-1)*ncol + (jj-2)], Ke[(ii-1)*ncol + (jj-1)], Ke[(ii-1)*ncol + jj],
+              Ke[(ii-0)*ncol + (jj-2)], Ke[(ii-0)*ncol + (jj-1)], Ke[(ii-0)*ncol + jj]  );
 
           if( dnode != ( col_index[jj] - 3 ) / dof_mat ) Ke_AB.MatMult( QT, Ke_AB );  // QT * Ke_AB
           else
@@ -209,7 +204,7 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
           {
             Vector_3 Ke_c = Vector_3( Ke[(ii-2)*ncol + (jj-3)], Ke[(ii-1)*ncol + (jj-3)], Ke[ii*ncol + (jj-3)] );
             Vector_3 rot_Ke_c = QT.VecMult( Ke_c );  // rot_Ke_c = Q^T * Ke_c
-            
+
             Ke[(ii-2)*ncol + (jj-3)] = rot_Ke_c.x(); Ke[(ii-1)*ncol + (jj-3)] = rot_Ke_c.y(); Ke[ii*ncol + (jj-3)] = rot_Ke_c.z(); 
           }
 
@@ -273,28 +268,23 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_G(
 void PGAssem_Tet_CMM_GenAlpha::EssBC_G( const ALocal_NodalBC * const &nbc_part, 
     const int &field )
 {
-  const int num_nbc = nbc_part->get_num_nbc();
-
-  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
+  const int local_dir = nbc_part->get_Num_LD(field);
+  if( local_dir > 0 )
   {
-    const int local_dir = nbc_part->get_Num_LD(nbc_id, field);
-    if( local_dir > 0 )
+    for(int ii=0; ii<local_dir; ++ii)
     {
-      for(int ii=0; ii<local_dir; ++ii)
-      {
-        const int row = nbc_part->get_LDN(nbc_id, field, ii) * dof_mat + field;
-        VecSetValue(G, row, 0.0, INSERT_VALUES);
-      }
+      const int row = nbc_part->get_LDN(field, ii) * dof_mat + field;
+      VecSetValue(G, row, 0.0, INSERT_VALUES);
     }
+  }
 
-    const int local_sla = nbc_part->get_Num_LPS(nbc_id, field);
-    if( local_sla > 0 )
+  const int local_sla = nbc_part->get_Num_LPS(field);
+  if( local_sla > 0 )
+  {
+    for(int ii=0; ii<local_sla; ++ii)
     {
-      for(int ii=0; ii<local_sla; ++ii)
-      {
-        const int row = nbc_part->get_LPSN(nbc_id, field, ii) * dof_mat + field;
-        VecSetValue(G, row, 0.0, INSERT_VALUES);
-      }
+      const int row = nbc_part->get_LPSN(field, ii) * dof_mat + field;
+      VecSetValue(G, row, 0.0, INSERT_VALUES);
     }
   }
 }
@@ -618,7 +608,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
   VecAssemblyEnd(G);
 
   for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
-  
+
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
   VecAssemblyBegin(G);
