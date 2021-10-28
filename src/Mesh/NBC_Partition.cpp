@@ -13,7 +13,7 @@ NBC_Partition::NBC_Partition( const IPart * const &part,
 
   for(int ii=0; ii<dof; ++ii)
   {
-    unsigned int node_num = 0;
+    Num_LD[ii] = 0;
     
     for(unsigned int jj=0; jj<nbc_list[ii]->get_num_dir_nodes(); ++jj)
     {
@@ -23,11 +23,11 @@ NBC_Partition::NBC_Partition( const IPart * const &part,
       if(part->isNodeInPart(node_index))
       {
         LDN.push_back(node_index);
-        node_num += 1;
+        Num_LD[ii] += 1;
       }
     } // end jj-loop
 
-    unsigned int ps_num = 0, pm_num = 0;
+    Num_LPS[ii] = 0; Num_LPM[ii] = 0;
 
     for(unsigned int jj=0; jj<nbc_list[ii]->get_num_per_nodes(); ++jj)
     {
@@ -41,20 +41,16 @@ NBC_Partition::NBC_Partition( const IPart * const &part,
       {
         LPSN.push_back(node_ps);
         LPMN.push_back(node_pm);
-        ps_num += 1;
+        Num_LPS[ii] += 1;
       }
 
       if(part->isNodeInPart(node_pm))
       {
         LocalMaster.push_back(node_pm);
         LocalMasterSlave.push_back(node_ps);
-        pm_num += 1;
+        Num_LPM[ii] += 1;
       }
     } // end jj-loop
-
-    Num_LD[ii]  = node_num;
-    Num_LPS[ii] = ps_num;
-    Num_LPM[ii] = pm_num;
   } // end ii-loop over dof
 
   VEC_T::shrink2fit( LDN ); VEC_T::shrink2fit( LPSN ); VEC_T::shrink2fit( LPMN );
