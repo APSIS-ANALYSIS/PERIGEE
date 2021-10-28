@@ -4,12 +4,26 @@ NBC_Partition_ring::NBC_Partition_ring(
     const IPart * const &part,
     const Map_Node_Index * const &mnindex,
     const INodalBC * const &nbc ) 
-: NBC_Partition( part, mnindex, nbc ),
-  ring_bc_type( nbc -> get_ring_bc_type() ), 
+: ring_bc_type( nbc -> get_ring_bc_type() ), 
   num_caps( nbc -> get_num_caps() ),
   Q( nbc -> get_rotation_matrix() ),
   outnormal( nbc -> get_outnormal() )
 {
+  // Generate LDN and Num_LD
+  LDN.clear(); Num_LD = 0;
+
+  for(unsigned int jj=0; jj<nbc->get_num_dir_nodes(); ++jj)
+  {
+    unsigned int node_index = nbc -> get_dir_nodes(jj);
+    node_index = mnindex -> get_old2new(node_index);
+    if( part->isNodeInPart(node_index) )
+    {
+      LDN.push_back(node_index);
+      Num_LD += 1;
+    }
+  }
+
+  // Generate local_cap_id
   local_cap_id.clear();
 
   if( LDN.size() > 0 )
@@ -46,7 +60,7 @@ void NBC_Partition_ring::write_hdf5( const std::string &FileName ) const
     h5writer->write_intVector( group_id, "local_cap_id", local_cap_id );
   }
 
-  h5writer->write_intVector( group_id, "Num_LD", Num_LD );
+  h5writer->write_intScalar( group_id, "Num_LD", Num_LD );
 
   h5writer->write_intScalar( group_id, "ring_bc_type", ring_bc_type );
 

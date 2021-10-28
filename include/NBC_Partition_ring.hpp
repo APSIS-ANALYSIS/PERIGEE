@@ -14,9 +14,10 @@
 // Date crated: Apr. 7 2021
 // Author: Ju Liu, Ingrid Lan
 // ==================================================================
-#include "NBC_Partition.hpp"
+#include "IPart.hpp"
+#include "INodalBC.hpp"
 
-class NBC_Partition_ring : public NBC_Partition
+class NBC_Partition_ring
 {
   public:
     NBC_Partition_ring( const IPart * const &part,
@@ -36,6 +37,13 @@ class NBC_Partition_ring : public NBC_Partition
 
     // Number of caps (inlets, outlets)
     const int num_caps; 
+
+    // The number of ring nodes that belong to this partition.
+    // Length is Num_LD
+    std::vector<int> LDN;
+
+    // The number of Dirichlet nodes that belong to this partition.
+    int Num_LD;
 
     // Store corresponding cap ID: [0, num_caps)
     // length Num_LD
