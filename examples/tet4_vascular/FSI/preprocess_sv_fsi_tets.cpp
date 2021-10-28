@@ -24,9 +24,9 @@
 #include "NodalBC_3D_vtu.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_tet_outflow.hpp"
-#include "NBC_Partition_3D.hpp"
-#include "NBC_Partition_3D_inflow.hpp"
-#include "EBC_Partition_vtp_outflow.hpp"
+#include "NBC_Partition.hpp"
+#include "NBC_Partition_inflow.hpp"
+#include "EBC_Partition_outflow.hpp"
 
 int main( int argc, char * argv[] )
 {
@@ -292,19 +292,19 @@ int main( int argc, char * argv[] )
     part -> write( part_file.c_str() );
     part -> print_part_loadbalance_edgecut();
 
-    INBC_Partition * nbcpart = new NBC_Partition_3D(part, mnindex, NBC_list);
+    NBC_Partition * nbcpart = new NBC_Partition(part, mnindex, NBC_list);
     nbcpart -> write_hdf5(part_file.c_str()); 
 
-    INBC_Partition * mbcpart = new NBC_Partition_3D(part, mnindex, meshBC_list);
+    NBC_Partition * mbcpart = new NBC_Partition(part, mnindex, meshBC_list);
     mbcpart -> write_hdf5(part_file.c_str(), "/mesh_nbc"); 
 
-    INBC_Partition * infpart = new NBC_Partition_3D_inflow(part, mnindex, InFBC);
+    NBC_Partition_inflow * infpart = new NBC_Partition_inflow(part, mnindex, InFBC);
     infpart->write_hdf5( part_file.c_str() );
 
-    IEBC_Partition * ebcpart = new EBC_Partition_vtp_outflow(part, mnindex, ebc, NBC_list);
+    EBC_Partition_outflow * ebcpart = new EBC_Partition_outflow(part, mnindex, ebc, NBC_list);
     ebcpart -> write_hdf5(part_file.c_str());
 
-    IEBC_Partition * mebcpart = new EBC_Partition_vtp(part, mnindex, mesh_ebc);
+    EBC_Partition * mebcpart = new EBC_Partition(part, mnindex, mesh_ebc);
     mebcpart-> write_hdf5(part_file.c_str(), "/mesh_ebc");
 
     list_nlocalnode.push_back(part->get_nlocalnode());

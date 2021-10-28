@@ -38,6 +38,17 @@ class NBC_Partition
     virtual void write_hdf5( const std::string &FileName ) const
     { write_hdf5(FileName, "/nbc"); }
 
+    // ------------------------------------------------------------------------
+    // write_hdf5 : write the nodal bc info into the part file, under
+    //              the given groupname : GroupName.
+    //              This function requires that the part_pxxxxx.h5
+    //              file has been created.
+    // \para FileName : the base name for the partition file (default part)
+    // \para GroupName : the group name
+    // ------------------------------------------------------------------------
+    virtual void write_hdf5( const std::string &FileName, 
+        const std::string &GroupName ) const;
+    
     virtual void print_info() const;
 
     virtual int get_LID( const int &ii ) const {return LID[ii];}
@@ -90,17 +101,6 @@ class NBC_Partition
     // Number of Local Periodic Master nodes
     // Length is dof
     std::vector<int> Num_LPM;
-    
-    // ------------------------------------------------------------------------
-    // write_hdf5 : write the nodal bc info into the part file, under
-    //              the given groupname : GroupName.
-    //              This function requires that the part_pxxxxx.h5
-    //              file has been created.
-    // \para FileName : the base name for the partition file (default part)
-    // \para GroupName : the group name
-    // ------------------------------------------------------------------------
-    virtual void write_hdf5( const std::string &FileName, 
-        const std::string &GroupName ) const;
 };
 
 #endif
