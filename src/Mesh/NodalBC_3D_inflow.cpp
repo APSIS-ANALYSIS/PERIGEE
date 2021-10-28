@@ -1,27 +1,5 @@
 #include "NodalBC_3D_inflow.hpp"
 
-NodalBC_3D_inflow::NodalBC_3D_inflow(const int &nFunc) : num_nbc( 0 )
-{
-  dir_nodes.clear();
-  num_dir_nodes = 0;
-
-  dir_nodes_on_inlet.clear();
-  num_dir_nodes_on_inlet.clear();
-
-  Create_ID( nFunc );
-
-  inf_active_area.clear(); face_area.clear();
-
-  centroid.clear(); outnormal.clear();
-  num_out_bc_pts.clear(); outline_pts.clear();
-  intNA.clear();
-
-  num_node.clear(); num_cell.clear(); nLocBas.clear();
-  tri_ien.clear(); pt_xyz.clear(); global_node.clear(); global_cell.clear();
-
-  std::cout<<"===> NodalBC_3D_inflow::empty is generated. \n";
-}
-
 NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
     const std::string &wallfile, const int &nFunc,
     const Vector_3 &in_outnormal,
@@ -32,7 +10,6 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
 
   init( inffileList, wallfile, nFunc, outnormalList, elemtype );
 }
-
 
 NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileList,
     const std::string &wallfile,

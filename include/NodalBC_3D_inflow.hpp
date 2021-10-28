@@ -22,11 +22,6 @@ class NodalBC_3D_inflow : public INodalBC
 {
   public:
     // ------------------------------------------------------------------------
-    // Generate an empty inflow type boundary condition class
-    // ------------------------------------------------------------------------
-    NodalBC_3D_inflow(const int &nFunc);
-    
-    // ------------------------------------------------------------------------
     // Generate the inflow bc given by the inffile.
     // ------------------------------------------------------------------------
     NodalBC_3D_inflow( const std::string &inffile,
