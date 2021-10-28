@@ -1,18 +1,17 @@
 #ifndef NODALBC_3D_INFLOW_HPP
 #define NODALBC_3D_INFLOW_HPP
-// ==================================================================
+// ============================================================================
 // NodalBC_3D_inflow.hpp
 // 
-// This is an instantiation of INodalBC for 3D Inflow type boundary
-// conditions.
+// This is an instantiation of INodalBC for 3D Inflow type boundary conditions.
 //
-// For Inflow boundary conditions, 1. there is no periodic type
-// boundary condition; 2. the nodes that belong to the wall are 
-// excluded from the dir_nodes list.
+// For Inflow boundary conditions, 1. there is no periodic type boundary 
+// condition; 2. the nodes that belong to the wall are excluded from the 
+// dir_nodes list.
 //
 // Author: Ju Liu
 // Date: Aug. 6 2017
-// ==================================================================
+// ============================================================================
 #include "INodalBC.hpp"
 #include "Tet_Tools.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
@@ -22,23 +21,23 @@
 class NodalBC_3D_inflow : public INodalBC
 {
   public:
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // Generate an empty inflow type boundary condition class
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------------
     NodalBC_3D_inflow(const int &nFunc);
     
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // Generate the inflow bc given by the inffile.
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------------
     NodalBC_3D_inflow( const std::string &inffile,
         const std::string &wallfile,
         const int &nFunc,
         const Vector_3 &in_outnormal,
         const int &elemtype = 501 );
 
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // Generate the inflow bc given by a list of inffiles.
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------------
     NodalBC_3D_inflow( const std::vector<std::string> &inffileList,
         const std::string &wallfile,
         const int &nFunc,
@@ -66,8 +65,9 @@ class NodalBC_3D_inflow : public INodalBC
 
     virtual unsigned int get_num_per_nodes() const {return 0;}
 
-    virtual unsigned int get_dir_nodes_on_inlet( const int &nbc_id, const unsigned int &ii ) const
-    { return dir_nodes_on_inlet[nbc_id][ii]; }
+    // get the dirichlet-type nodal index on different nbc_id surfaces
+    virtual unsigned int get_dir_nodes_on_inlet( const int &nbc_id, 
+        const unsigned int &ii ) const { return dir_nodes_on_inlet[nbc_id][ii]; }
 
     virtual unsigned int get_num_dir_nodes_on_inlet( const int &nbc_id ) const
     { return num_dir_nodes_on_inlet[nbc_id]; }
@@ -90,8 +90,7 @@ class NodalBC_3D_inflow : public INodalBC
     virtual double get_face_area(const int &nbc_id) const {return face_area[nbc_id];}
 
     // Access to the integral of NA
-    virtual std::vector<double> get_intNA(const int &nbc_id) const
-    {return intNA[nbc_id];}
+    virtual std::vector<double> get_intNA(const int &nbc_id) const {return intNA[nbc_id];}
 
     // Access to num_nbc
     virtual int get_num_nbc() const {return num_nbc;}
@@ -187,6 +186,15 @@ class NodalBC_3D_inflow : public INodalBC
     // Surface cell's volumetric mesh ID
     // num_nbc times num_cell[ii] in size.
     std::vector< std::vector<int> > global_cell;
+
+    // ------------------------------------------------------------------------
+    // initialization function designed to simplify different constructor
+    // implementations.
+    virtual void init( const std::vector<std::string> &inffileList,
+        const std::string &wallfile,
+        const int &nFunc,
+        const std::vector<Vector_3> &in_outnormal,
+        const int &elemtype = 501 );
 };
 
 #endif
