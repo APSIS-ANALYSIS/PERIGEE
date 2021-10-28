@@ -49,8 +49,6 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
     const std::vector<Vector_3> &in_outnormal,
     const int &elemtype )
 { 
-  SYS_T::file_check(wallfile);
-
   // 1. Clear the container for Dirichlet nodes
   dir_nodes.clear();
   num_dir_nodes = 0;
@@ -82,11 +80,27 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
 
   intNA.resize( num_nbc ); 
 
-  // Read the files
+  // Read the wall file
+  SYS_T::file_check(wallfile);
+
   int wall_numpts, wall_numcels;
   std::vector<double> wall_pts;
   std::vector<int> wall_ien, wall_gnode, wall_gelem;
 
+  if( elemtype == 501 )
+  {
+    TET_T::read_vtp_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
+        wall_ien, wall_gnode, wall_gelem );
+
+  }
+  else if( elemtype == 502 )
+  {
+    TET_T::read_vtu_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
+        wall_ien, wall_gnode, wall_gelem );
+  }
+  else SYS_T::print_fatal("Error: unknown element type.\n");
+
+  // Loop over each surface with id ii
   for( int ii=0; ii<num_nbc; ++ii )
   {
     SYS_T::file_check( inffileList[ii] );
@@ -97,10 +111,6 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
 
       TET_T::read_vtp_grid( inffileList[ii], num_node[ii], num_cell[ii],
           pt_xyz[ii], tri_ien[ii], global_node[ii], global_cell[ii] );
-
-      TET_T::read_vtp_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
-          wall_ien, wall_gnode, wall_gelem );
-
     }
     else if( elemtype == 502 )
     {
@@ -108,9 +118,6 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
 
       TET_T::read_vtu_grid( inffileList[ii], num_node[ii], num_cell[ii],
           pt_xyz[ii], tri_ien[ii], global_node[ii], global_cell[ii] );
-
-      TET_T::read_vtu_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
-          wall_ien, wall_gnode, wall_gelem );
     }
     else SYS_T::print_fatal("Error: unknown element type.\n");
 
