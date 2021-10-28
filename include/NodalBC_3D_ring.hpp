@@ -24,11 +24,6 @@ class NodalBC_3D_ring : public INodalBC
 {
   public:
     // ------------------------------------------------------------------------
-    // Generate an empty ring type boundary condition class
-    // ------------------------------------------------------------------------
-    NodalBC_3D_ring(const int &nFunc);
-    
-    // ------------------------------------------------------------------------
     // Generate the ring bc given by the inflow and outflow files, 
     // their unit normals, and the wall file.
     // ------------------------------------------------------------------------

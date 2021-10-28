@@ -1,21 +1,5 @@
 #include "NodalBC_3D_ring.hpp"
 
-NodalBC_3D_ring::NodalBC_3D_ring(const int &nFunc) : ring_bc_type(0)
-{
-  dir_nodes.clear();
-  num_dir_nodes = 0;
-
-  Create_ID( nFunc );
-  
-  num_caps = 0;
-  cap_id.clear();
-  Q.clear();
-  outnormal.clear();
-
-  std::cout<<"===> NodalBC_3D_ring::empty is generated. \n";
-}
-
-
 NodalBC_3D_ring::NodalBC_3D_ring(
     const std::vector<std::string> &inflow_files,
     const std::vector< Vector_3 > &inlet_outnormal,
