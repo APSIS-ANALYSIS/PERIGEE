@@ -10,7 +10,6 @@
 // Author: Ju Liu
 // ============================================================================
 #include "IPart.hpp"
-#include "Map_Node_Index.hpp"
 #include "INodalBC.hpp"
 
 class NBC_Partition
