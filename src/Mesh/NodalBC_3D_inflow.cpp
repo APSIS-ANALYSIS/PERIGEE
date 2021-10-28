@@ -39,7 +39,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
   dir_nodes_on_inlet.resize( num_nbc );
   for(int ii=0; ii<num_nbc; ++ii) dir_nodes_on_inlet[ii].clear();
 
-  num_dir_nodes_on_inlet.clear();
+  num_dir_nodes_on_inlet.resize( num_nbc );
 
   // 2. Analyze the file type and read in the data
   num_node.resize( num_nbc );
@@ -252,9 +252,16 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileLis
     const std::vector<Vector_3> &in_outnormal,
     const int &elemtype ) : num_nbc( static_cast<int>( inffileList.size() ) )
 {
+  SYS_T::file_check(wallfile);
+
   // 1. Clear the container for Dirichlet nodes
   dir_nodes.clear();
   num_dir_nodes = 0;
+
+  dir_nodes_on_inlet.resize( num_nbc );
+  for(int ii=0; ii<num_nbc; ++ii) dir_nodes_on_inlet[ii].clear();
+
+  num_dir_nodes_on_inlet.resize( num_nbc );
 
   // 2. Analyze the file type and read in the data
   num_node.resize( num_nbc );
@@ -278,8 +285,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileLis
 
   intNA.resize( num_nbc ); 
 
-  SYS_T::file_check(wallfile);
-
+  // Read the files
   int wall_numpts, wall_numcels;
   std::vector<double> wall_pts;
   std::vector<int> wall_ien, wall_gnode, wall_gelem;
@@ -308,9 +314,7 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileLis
 
       TET_T::read_vtu_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
         wall_ien, wall_gnode, wall_gelem );
-
     }
-
     else SYS_T::print_fatal("Error: unknown element type.\n");
 
     // Generate the dir-node list. Nodes belonging to the wall are excluded.
