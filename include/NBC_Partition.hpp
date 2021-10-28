@@ -15,10 +15,6 @@
 class NBC_Partition
 {
   public:
-    NBC_Partition( const IPart * const &part,
-       const Map_Node_Index * const &mnindex,
-       const std::vector<INodalBC *> &nbc_list );
-
     // ------------------------------------------------------------------------
     // Generate partition for a single nodal bc file.
     // The purpose of this one is to generate a nodal file for inflow
@@ -28,7 +24,7 @@ class NBC_Partition
     // ------------------------------------------------------------------------
     NBC_Partition( const IPart * const &part,
        const Map_Node_Index * const &mnindex,
-       const INodalBC * const &nbc );
+       const std::vector<INodalBC *> &nbc_list );
 
     virtual ~NBC_Partition();
 
