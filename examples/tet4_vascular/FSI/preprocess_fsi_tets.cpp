@@ -243,8 +243,6 @@ int main( int argc, char * argv[] )
   VEC_T::insert_end(dir_list, sur_s_file_in );
   VEC_T::insert_end(dir_list, sur_s_file_out );
 
-  VEC_T::print(dir_list);
-
   NBC_list[0] = new NodalBC_3D_vtp( nFunc );
   NBC_list[1] = new NodalBC_3D_vtp( dir_list, nFunc );
   NBC_list[2] = new NodalBC_3D_vtp( dir_list, nFunc );
@@ -293,7 +291,7 @@ int main( int argc, char * argv[] )
   int sum_nghostnode = 0;
 
   SYS_T::Timer * mytimer = new SYS_T::Timer();
-
+  
   for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
   {
     mytimer->Reset();
@@ -308,7 +306,7 @@ int main( int argc, char * argv[] )
 
     part -> write( part_file.c_str() );
     part -> print_part_loadbalance_edgecut();
-
+    
     NBC_Partition * nbcpart = new NBC_Partition(part, mnindex, NBC_list);
     nbcpart -> write_hdf5( part_file ); 
 
@@ -323,7 +321,7 @@ int main( int argc, char * argv[] )
 
     EBC_Partition * mebcpart = new EBC_Partition(part, mnindex, mesh_ebc);
     mebcpart-> write_hdf5( part_file, "/mesh_ebc");
-
+    
     list_nlocalnode.push_back(part->get_nlocalnode());
     list_nghostnode.push_back(part->get_nghostnode());
     list_ntotalnode.push_back(part->get_ntotalnode());

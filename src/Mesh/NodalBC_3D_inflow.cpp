@@ -244,8 +244,9 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
     else SYS_T::print_fatal("Error: unknown element type.\n");
 
     delete [] temp_sol; temp_sol = nullptr;
-
   } // end ii-loop
+
+  //VEC_T::sort_unique_resize(dir_nodes);
 
   num_dir_nodes = dir_nodes.size();
 
