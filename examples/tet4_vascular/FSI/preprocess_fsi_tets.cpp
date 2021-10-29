@@ -45,15 +45,15 @@ int main( int argc, char * argv[] )
   std::string geo_f_file("./lumen_vol.vtu");
   std::string geo_s_file("./tissue_vol.vtu");
 
-  std::string sur_f_file_in("./lumen_inlet_vol.vtp");
   std::string sur_f_file_wall("./lumen_wall_vol.vtp");
+  std::string sur_f_file_in_base( "./lumen_inlet_vol_" );
   std::string sur_f_file_out_base("./lumen_outlet_vol_");
 
-  std::string sur_s_file_in("./tissue_inlet_vol.vtp");
   std::string sur_s_file_wall("./tissue_wall_vol.vtp");
+  std::string sur_s_file_in_base( "./tissue_inlet_vol_" );
   std::string sur_s_file_out_base("./tissue_outlet_vol_");
 
-  int num_outlet = 1;
+  int num_outlet = 1, num_inlet = 1;
 
   const std::string part_file("part");
 
@@ -68,30 +68,32 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionInt("-cpu_size", cpu_size);
   SYS_T::GetOptionInt("-in_ncommon", in_ncommon);
   SYS_T::GetOptionInt("-num_outlet", num_outlet);
+  SYS_T::GetOptionInt("-num_inlet",  num_inlet);
   SYS_T::GetOptionString("-geo_file", geo_file);
   SYS_T::GetOptionString("-geo_f_file", geo_f_file);
   SYS_T::GetOptionString("-geo_s_file", geo_s_file);
-  SYS_T::GetOptionString("-sur_f_file_in", sur_f_file_in);
   SYS_T::GetOptionString("-sur_f_file_wall", sur_f_file_wall);
-  SYS_T::GetOptionString("-sur_f_file_out_base", sur_f_file_out_base);
-  SYS_T::GetOptionString("-sur_s_file_in", sur_s_file_in);
   SYS_T::GetOptionString("-sur_s_file_wall", sur_s_file_wall);
+  SYS_T::GetOptionString("-sur_f_file_in_base",  sur_f_file_in_base);
+  SYS_T::GetOptionString("-sur_f_file_out_base", sur_f_file_out_base);
+  SYS_T::GetOptionString("-sur_s_file_in_base",  sur_s_file_in_base);
   SYS_T::GetOptionString("-sur_s_file_out_base", sur_s_file_out_base);
 
   std::cout<<"==== /Command Line Arguments ===="<<std::endl;
-  std::cout<<" -num_outlet: "<<num_outlet<<std::endl;
-  std::cout<<" -geo_file: "<<geo_file<<std::endl;
-  std::cout<<" -geo_f_file: "<<geo_f_file<<std::endl;
-  std::cout<<" -geo_s_file: "<<geo_s_file<<std::endl;
-  std::cout<<" -sur_f_file_in: "<<sur_f_file_in<<std::endl;
-  std::cout<<" -sur_f_file_wall: "<<sur_f_file_wall<<std::endl;
+  std::cout<<" -num_outlet: "         <<num_outlet         <<std::endl;
+  std::cout<<" -num_inlet: "          <<num_inlet          <<std::endl;
+  std::cout<<" -geo_file: "           <<geo_file           <<std::endl;
+  std::cout<<" -geo_f_file: "         <<geo_f_file         <<std::endl;
+  std::cout<<" -geo_s_file: "         <<geo_s_file         <<std::endl;
+  std::cout<<" -sur_f_file_in_base: " <<sur_f_file_in_base <<std::endl;
+  std::cout<<" -sur_f_file_wall: "    <<sur_f_file_wall    <<std::endl;
   std::cout<<" -sur_f_file_out_base: "<<sur_f_file_out_base<<std::endl;
-  std::cout<<" -sur_s_file_in: "<<sur_s_file_in<<std::endl;
-  std::cout<<" -sur_s_file_wall: "<<sur_s_file_wall<<std::endl;
+  std::cout<<" -sur_s_file_in_base: " <<sur_s_file_in_base <<std::endl;
+  std::cout<<" -sur_s_file_wall: "    <<sur_s_file_wall    <<std::endl;
   std::cout<<" -sur_s_file_out_base: "<<sur_s_file_out_base<<std::endl;
-  std::cout<<" -part_file: "<<part_file<<std::endl;
-  std::cout<<" -cpu_size: "<<cpu_size<<std::endl;
-  std::cout<<" -in_ncommon: "<<in_ncommon<<std::endl;
+  std::cout<<" -part_file: "          <<part_file          <<std::endl;
+  std::cout<<" -cpu_size: "           <<cpu_size           <<std::endl;
+  std::cout<<" -in_ncommon: "         <<in_ncommon         <<std::endl;
   std::cout<<" -isDualGraph: true \n";
   std::cout<<"----------------------------------\n";
   std::cout<<" dofNum: "<<dofNum<<std::endl;
@@ -106,16 +108,23 @@ int main( int argc, char * argv[] )
 
   SYS_T::file_check(geo_s_file); std::cout<<geo_s_file<<" found. \n";
 
-  SYS_T::file_check(sur_f_file_in); std::cout<<sur_f_file_in<<" found. \n";
-
-  SYS_T::file_check(sur_s_file_in); std::cout<<sur_s_file_in<<" found. \n";
-
   SYS_T::file_check(sur_f_file_wall); std::cout<<sur_f_file_wall<<" found. \n";
 
   SYS_T::file_check(sur_s_file_wall); std::cout<<sur_s_file_wall<<" found. \n";
 
-  std::vector< std::string > sur_f_file_out( num_outlet );
-  std::vector< std::string > sur_s_file_out( num_outlet );
+  std::vector< std::string > sur_f_file_in(  num_inlet ) , sur_s_file_in(  num_inlet );
+  std::vector< std::string > sur_f_file_out( num_outlet ), sur_s_file_out( num_outlet );
+
+  for(int ii=0; ii<num_inlet; ++ii)
+  {
+    sur_f_file_in[ii] = SYS_T::gen_capfile_name( sur_f_file_in_base, ii, ".vtp" );
+    sur_s_file_in[ii] = SYS_T::gen_capfile_name( sur_s_file_in_base, ii, ".vtp" );
+
+    SYS_T::file_check( sur_f_file_in[ii] );
+    std::cout<<sur_f_file_in[ii]<<" found. \n";
+    SYS_T::file_check( sur_s_file_in[ii] );
+    std::cout<<sur_s_file_in[ii]<<" found. \n";
+  }
 
   for(int ii=0; ii<num_outlet; ++ii)
   {
@@ -129,6 +138,10 @@ int main( int argc, char * argv[] )
   } 
 
   // If we can still detect additional files on disk, throw an warning
+  if( SYS_T::file_exist(SYS_T::gen_capfile_name(sur_f_file_in_base, num_outlet, ".vtp")) ||
+      SYS_T::file_exist(SYS_T::gen_capfile_name(sur_s_file_in_base, num_outlet, ".vtp")) )
+    cout<<endl<<"Warning: there are additional inlet surface files on disk. Check num_inlet please.\n\n";
+
   if( SYS_T::file_exist(SYS_T::gen_capfile_name(sur_f_file_out_base, num_outlet, ".vtp")) ||
       SYS_T::file_exist(SYS_T::gen_capfile_name(sur_s_file_out_base, num_outlet, ".vtp")) )
     cout<<endl<<"Warning: there are additional outlet surface files on disk. Check num_outlet please.\n\n";
