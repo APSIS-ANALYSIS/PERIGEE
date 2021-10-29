@@ -7,7 +7,8 @@ NBC_Partition_ring::NBC_Partition_ring(
 : ring_bc_type( nbc -> get_ring_bc_type() ), 
   num_caps( nbc -> get_num_caps() ),
   Q( nbc -> get_rotation_matrix() ),
-  outnormal( nbc -> get_outnormal() )
+  outnormal( nbc -> get_outnormal() ),
+  cpu_rank(part->get_cpu_rank())
 {
   // Generate LDN and Num_LD
   LDN.clear(); Num_LD = 0;

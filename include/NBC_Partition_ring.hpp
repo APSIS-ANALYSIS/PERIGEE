@@ -35,6 +35,8 @@ class NBC_Partition_ring
     //            essential bc.
     const int ring_bc_type;
 
+    const int cpu_rank;
+
     // Number of caps (inlets, outlets)
     const int num_caps; 
 

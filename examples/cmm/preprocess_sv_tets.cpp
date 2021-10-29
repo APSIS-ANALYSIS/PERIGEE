@@ -27,6 +27,7 @@
 #include "NodalBC_3D_wall.hpp"
 #include "ElemBC_3D_tet_outflow.hpp"
 #include "ElemBC_3D_tet_wall.hpp"
+#include "NBC_Partition.hpp"
 #include "NBC_Partition_inflow.hpp"
 #include "NBC_Partition_ring.hpp"
 #include "EBC_Partition_outflow.hpp"
