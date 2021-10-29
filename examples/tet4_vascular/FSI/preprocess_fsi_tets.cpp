@@ -239,9 +239,13 @@ int main( int argc, char * argv[] )
   std::cout<<"Boundary condition for the implicit solver: \n";
   std::vector<INodalBC *> NBC_list( dofMat, nullptr );
 
-  std::vector<std::string> dir_list;
-  dir_list.push_back( sur_f_file_in );
-  dir_list.push_back( sur_s_file_in );
+  std::vector<std::string> dir_list; dir_list.clear();
+  for(int ii=0; ii<num_inlet; ++ii) 
+  {
+    dir_list.push_back( sur_f_file_in[ii] );
+    dir_list.push_back( sur_s_file_in[ii] );
+  }
+
   for(int ii=0; ii<num_outlet; ++ii) dir_list.push_back( sur_s_file_out[ii] );
 
   NBC_list[0] = new NodalBC_3D_vtp( nFunc );
@@ -254,7 +258,7 @@ int main( int argc, char * argv[] )
   std::vector<INodalBC *> meshBC_list( 3, nullptr );
   
   std::vector<std::string> meshdir_vtp_list; meshdir_vtp_list.clear();
-  meshdir_vtp_list.push_back( sur_f_file_in );
+  for(int ii=0; ii<num_inlet; ++ii) meshdir_vtp_list.push_back( sur_f_file_in[ii] );
   for(int ii=0; ii<num_outlet; ++ii) meshdir_vtp_list.push_back( sur_f_file_out[ii] );
 
   meshBC_list[0] = new NodalBC_3D_vtu( geo_s_file, meshdir_vtp_list, nFunc );
@@ -262,7 +266,10 @@ int main( int argc, char * argv[] )
   meshBC_list[2] = new NodalBC_3D_vtu( geo_s_file, meshdir_vtp_list, nFunc );
 
   // Generate inflow bc info
-  const Vector_3 inlet_outvec = TET_T::get_out_normal( sur_f_file_in, ctrlPts, IEN );
+  std::vector<Vector_3> inlet_outvec( num_inlet );
+  for(int ii=0; ii<num_inlet; ++ii)
+    inlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_in[ii], ctrlPts, IEN );
+  
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_f_file_in, sur_f_file_wall, nFunc, inlet_outvec ); 
 
   // Elemental BC
@@ -274,7 +281,7 @@ int main( int argc, char * argv[] )
 
   ElemBC * ebc = new ElemBC_3D_tet_outflow( sur_f_file_out, outlet_outvec );
 
-  ebc -> resetTriIEN_outwardnormal( IEN );
+  ebc -> resetTriIEN_outwardnormal( IEN ); // assign orientation
 
   // Mesh EBC
   std::vector<std::string> mesh_ebclist;
@@ -356,11 +363,9 @@ int main( int argc, char * argv[] )
   cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<endl;
 
   // Clean memory
-  for(auto it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc)
-    delete *it_nbc;
+  for(auto it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc) delete *it_nbc;
 
-  for(auto it_nbc=meshBC_list.begin(); it_nbc != meshBC_list.end(); ++it_nbc)
-    delete *it_nbc;
+  for(auto it_nbc=meshBC_list.begin(); it_nbc != meshBC_list.end(); ++it_nbc) delete *it_nbc;
 
   delete ebc; delete InFBC; delete mesh_ebc; delete mnindex; 
   delete global_part; delete mesh; delete IEN; delete mytimer;
