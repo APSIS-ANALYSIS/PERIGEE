@@ -4,11 +4,11 @@ NBC_Partition_ring::NBC_Partition_ring(
     const IPart * const &part,
     const Map_Node_Index * const &mnindex,
     const INodalBC * const &nbc ) 
-: ring_bc_type( nbc -> get_ring_bc_type() ), 
+: cpu_rank(part->get_cpu_rank()),
+  ring_bc_type( nbc -> get_ring_bc_type() ), 
   num_caps( nbc -> get_num_caps() ),
   Q( nbc -> get_rotation_matrix() ),
-  outnormal( nbc -> get_outnormal() ),
-  cpu_rank(part->get_cpu_rank())
+  outnormal( nbc -> get_outnormal() )
 {
   // Generate LDN and Num_LD
   LDN.clear(); Num_LD = 0;

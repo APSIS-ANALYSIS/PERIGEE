@@ -65,15 +65,15 @@ int main( int argc, char * argv[] )
 
   SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: preprocessor needs to be run in serial.\n");
 
-  SYS_T::GetOptionInt("-cpu_size", cpu_size);
-  SYS_T::GetOptionInt("-in_ncommon", in_ncommon);
-  SYS_T::GetOptionInt("-num_outlet", num_outlet);
-  SYS_T::GetOptionInt("-num_inlet",  num_inlet);
-  SYS_T::GetOptionString("-geo_file", geo_file);
-  SYS_T::GetOptionString("-geo_f_file", geo_f_file);
-  SYS_T::GetOptionString("-geo_s_file", geo_s_file);
-  SYS_T::GetOptionString("-sur_f_file_wall", sur_f_file_wall);
-  SYS_T::GetOptionString("-sur_s_file_wall", sur_s_file_wall);
+  SYS_T::GetOptionInt("-cpu_size",               cpu_size);
+  SYS_T::GetOptionInt("-in_ncommon",             in_ncommon);
+  SYS_T::GetOptionInt("-num_outlet",             num_outlet);
+  SYS_T::GetOptionInt("-num_inlet",              num_inlet);
+  SYS_T::GetOptionString("-geo_file",            geo_file);
+  SYS_T::GetOptionString("-geo_f_file",          geo_f_file);
+  SYS_T::GetOptionString("-geo_s_file",          geo_s_file);
+  SYS_T::GetOptionString("-sur_f_file_wall",     sur_f_file_wall);
+  SYS_T::GetOptionString("-sur_s_file_wall",     sur_s_file_wall);
   SYS_T::GetOptionString("-sur_f_file_in_base",  sur_f_file_in_base);
   SYS_T::GetOptionString("-sur_f_file_out_base", sur_f_file_out_base);
   SYS_T::GetOptionString("-sur_s_file_in_base",  sur_s_file_in_base);
@@ -85,11 +85,11 @@ int main( int argc, char * argv[] )
   std::cout<<" -geo_file: "           <<geo_file           <<std::endl;
   std::cout<<" -geo_f_file: "         <<geo_f_file         <<std::endl;
   std::cout<<" -geo_s_file: "         <<geo_s_file         <<std::endl;
-  std::cout<<" -sur_f_file_in_base: " <<sur_f_file_in_base <<std::endl;
   std::cout<<" -sur_f_file_wall: "    <<sur_f_file_wall    <<std::endl;
+  std::cout<<" -sur_s_file_wall: "    <<sur_s_file_wall    <<std::endl;
+  std::cout<<" -sur_f_file_in_base: " <<sur_f_file_in_base <<std::endl;
   std::cout<<" -sur_f_file_out_base: "<<sur_f_file_out_base<<std::endl;
   std::cout<<" -sur_s_file_in_base: " <<sur_s_file_in_base <<std::endl;
-  std::cout<<" -sur_s_file_wall: "    <<sur_s_file_wall    <<std::endl;
   std::cout<<" -sur_s_file_out_base: "<<sur_s_file_out_base<<std::endl;
   std::cout<<" -part_file: "          <<part_file          <<std::endl;
   std::cout<<" -cpu_size: "           <<cpu_size           <<std::endl;
@@ -138,8 +138,8 @@ int main( int argc, char * argv[] )
   } 
 
   // If we can still detect additional files on disk, throw an warning
-  if( SYS_T::file_exist(SYS_T::gen_capfile_name(sur_f_file_in_base, num_outlet, ".vtp")) ||
-      SYS_T::file_exist(SYS_T::gen_capfile_name(sur_s_file_in_base, num_outlet, ".vtp")) )
+  if( SYS_T::file_exist(SYS_T::gen_capfile_name(sur_f_file_in_base, num_inlet, ".vtp")) ||
+      SYS_T::file_exist(SYS_T::gen_capfile_name(sur_s_file_in_base, num_inlet, ".vtp")) )
     cout<<endl<<"Warning: there are additional inlet surface files on disk. Check num_inlet please.\n\n";
 
   if( SYS_T::file_exist(SYS_T::gen_capfile_name(sur_f_file_out_base, num_outlet, ".vtp")) ||
@@ -151,6 +151,7 @@ int main( int argc, char * argv[] )
   HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
 
   cmdh5w->write_intScalar("num_outlet", num_outlet);
+  cmdh5w->write_intScalar("num_inlet", num_inlet);
   cmdh5w->write_intScalar("cpu_size", cpu_size);
   cmdh5w->write_intScalar("in_ncommon", in_ncommon);
   cmdh5w->write_intScalar("dofNum", dofNum);
@@ -159,12 +160,12 @@ int main( int argc, char * argv[] )
   cmdh5w->write_string("geo_file", geo_file);
   cmdh5w->write_string("geo_f_file", geo_f_file);
   cmdh5w->write_string("geo_s_file", geo_s_file);
-  cmdh5w->write_string("sur_f_file_in", sur_f_file_in);
+  cmdh5w->write_string("sur_f_file_in_base",  sur_f_file_in_base);
   cmdh5w->write_string("sur_f_file_out_base", sur_f_file_out_base);
-  cmdh5w->write_string("sur_f_file_wall", sur_f_file_wall);
-  cmdh5w->write_string("sur_s_file_in", sur_s_file_in);
+  cmdh5w->write_string("sur_f_file_wall",     sur_f_file_wall);
+  cmdh5w->write_string("sur_s_file_in_base",  sur_s_file_in_base);
   cmdh5w->write_string("sur_s_file_out_base", sur_s_file_out_base);
-  cmdh5w->write_string("sur_s_file_wall", sur_s_file_wall);
+  cmdh5w->write_string("sur_s_file_wall",     sur_s_file_wall);
   cmdh5w->write_string("part_file", part_file);
 
   delete cmdh5w; H5Fclose(cmd_file_id);

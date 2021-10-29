@@ -29,13 +29,13 @@ class NBC_Partition_ring
     virtual void write_hdf5( const std::string &FileName ) const;
 
   private:
+    const int cpu_rank;
+
     // type = 0 : all dof of ring nodes are set to be essential bc;
     // type = 1 : the dominant normal components of ring nodes are set to be essential bc;
     // type = 2 : the dominant normal & tangential components of ring nodes are set to be
     //            essential bc.
     const int ring_bc_type;
-
-    const int cpu_rank;
 
     // Number of caps (inlets, outlets)
     const int num_caps; 
