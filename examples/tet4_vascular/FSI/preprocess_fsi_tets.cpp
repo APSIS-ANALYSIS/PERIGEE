@@ -79,9 +79,9 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionString("-sur_s_file_in_base",  sur_s_file_in_base);
   SYS_T::GetOptionString("-sur_s_file_out_base", sur_s_file_out_base);
 
-  std::cout<<"==== /Command Line Arguments ===="<<std::endl;
-  std::cout<<" -num_outlet: "         <<num_outlet         <<std::endl;
+  std::cout<<"===== Command Line Arguments ====="<<std::endl;
   std::cout<<" -num_inlet: "          <<num_inlet          <<std::endl;
+  std::cout<<" -num_outlet: "         <<num_outlet         <<std::endl;
   std::cout<<" -geo_file: "           <<geo_file           <<std::endl;
   std::cout<<" -geo_f_file: "         <<geo_f_file         <<std::endl;
   std::cout<<" -geo_s_file: "         <<geo_s_file         <<std::endl;
@@ -99,7 +99,7 @@ int main( int argc, char * argv[] )
   std::cout<<" dofNum: "<<dofNum<<std::endl;
   std::cout<<" dofMat: "<<dofMat<<std::endl;
   std::cout<<" elemType: "<<elemType<<std::endl;
-  std::cout<<"====  Command Line Arguments/ ===="<<std::endl;
+  std::cout<<"===== Command Line Arguments ====="<<std::endl;
 
   // Check if the geometrical file exist on disk
   SYS_T::file_check(geo_file); std::cout<<geo_file<<" found. \n";
@@ -150,23 +150,23 @@ int main( int argc, char * argv[] )
   hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
   HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
 
-  cmdh5w->write_intScalar("num_outlet", num_outlet);
-  cmdh5w->write_intScalar("num_inlet", num_inlet);
-  cmdh5w->write_intScalar("cpu_size", cpu_size);
-  cmdh5w->write_intScalar("in_ncommon", in_ncommon);
-  cmdh5w->write_intScalar("dofNum", dofNum);
-  cmdh5w->write_intScalar("dofMat", dofMat);
-  cmdh5w->write_intScalar("elemType", elemType);
-  cmdh5w->write_string("geo_file", geo_file);
-  cmdh5w->write_string("geo_f_file", geo_f_file);
-  cmdh5w->write_string("geo_s_file", geo_s_file);
+  cmdh5w->write_intScalar("num_outlet",       num_outlet);
+  cmdh5w->write_intScalar("num_inlet",        num_inlet);
+  cmdh5w->write_intScalar("cpu_size",         cpu_size);
+  cmdh5w->write_intScalar("in_ncommon",       in_ncommon);
+  cmdh5w->write_intScalar("dofNum",           dofNum);
+  cmdh5w->write_intScalar("dofMat",           dofMat);
+  cmdh5w->write_intScalar("elemType",         elemType);
+  cmdh5w->write_string("geo_file",            geo_file);
+  cmdh5w->write_string("geo_f_file",          geo_f_file);
+  cmdh5w->write_string("geo_s_file",          geo_s_file);
   cmdh5w->write_string("sur_f_file_in_base",  sur_f_file_in_base);
   cmdh5w->write_string("sur_f_file_out_base", sur_f_file_out_base);
   cmdh5w->write_string("sur_f_file_wall",     sur_f_file_wall);
   cmdh5w->write_string("sur_s_file_in_base",  sur_s_file_in_base);
   cmdh5w->write_string("sur_s_file_out_base", sur_s_file_out_base);
   cmdh5w->write_string("sur_s_file_wall",     sur_s_file_wall);
-  cmdh5w->write_string("part_file", part_file);
+  cmdh5w->write_string("part_file",           part_file);
 
   delete cmdh5w; H5Fclose(cmd_file_id);
   // ----- Finish writing
@@ -239,14 +239,11 @@ int main( int argc, char * argv[] )
   std::cout<<"Boundary condition for the implicit solver: \n";
   std::vector<INodalBC *> NBC_list( dofMat, nullptr );
 
-  std::vector<std::string> dir_list; dir_list.clear();
-  for(int ii=0; ii<num_inlet; ++ii) 
-  {
-    dir_list.push_back( sur_f_file_in[ii] );
-    dir_list.push_back( sur_s_file_in[ii] );
-  }
+  std::vector<std::string> dir_list = sur_f_file_in;
+  VEC_T::insert_end(dir_list, sur_s_file_in );
+  VEC_T::insert_end(dir_list, sur_s_file_out );
 
-  for(int ii=0; ii<num_outlet; ++ii) dir_list.push_back( sur_s_file_out[ii] );
+  VEC_T::print(dir_list);
 
   NBC_list[0] = new NodalBC_3D_vtp( nFunc );
   NBC_list[1] = new NodalBC_3D_vtp( dir_list, nFunc );
@@ -257,10 +254,9 @@ int main( int argc, char * argv[] )
   std::cout<<"Boundary condition for the mesh motion: \n";
   std::vector<INodalBC *> meshBC_list( 3, nullptr );
   
-  std::vector<std::string> meshdir_vtp_list; meshdir_vtp_list.clear();
-  for(int ii=0; ii<num_inlet; ++ii) meshdir_vtp_list.push_back( sur_f_file_in[ii] );
-  for(int ii=0; ii<num_outlet; ++ii) meshdir_vtp_list.push_back( sur_f_file_out[ii] );
-
+  std::vector<std::string> meshdir_vtp_list = sur_f_file_in;
+  VEC_T::insert_end( meshdir_vtp_list, sur_f_file_out );
+  
   meshBC_list[0] = new NodalBC_3D_vtu( geo_s_file, meshdir_vtp_list, nFunc );
   meshBC_list[1] = new NodalBC_3D_vtu( geo_s_file, meshdir_vtp_list, nFunc );
   meshBC_list[2] = new NodalBC_3D_vtu( geo_s_file, meshdir_vtp_list, nFunc );
@@ -314,19 +310,19 @@ int main( int argc, char * argv[] )
     part -> print_part_loadbalance_edgecut();
 
     NBC_Partition * nbcpart = new NBC_Partition(part, mnindex, NBC_list);
-    nbcpart -> write_hdf5(part_file.c_str()); 
+    nbcpart -> write_hdf5( part_file ); 
 
     NBC_Partition * mbcpart = new NBC_Partition(part, mnindex, meshBC_list);
-    mbcpart -> write_hdf5(part_file.c_str(), "/mesh_nbc"); 
+    mbcpart -> write_hdf5( part_file, "/mesh_nbc" ); 
 
     NBC_Partition_inflow * infpart = new NBC_Partition_inflow(part, mnindex, InFBC);
-    infpart->write_hdf5( part_file.c_str() );
+    infpart->write_hdf5( part_file );
 
     EBC_Partition_outflow * ebcpart = new EBC_Partition_outflow(part, mnindex, ebc, NBC_list);
-    ebcpart -> write_hdf5(part_file.c_str());
+    ebcpart -> write_hdf5( part_file );
 
     EBC_Partition * mebcpart = new EBC_Partition(part, mnindex, mesh_ebc);
-    mebcpart-> write_hdf5(part_file.c_str(), "/mesh_ebc");
+    mebcpart-> write_hdf5( part_file, "/mesh_ebc");
 
     list_nlocalnode.push_back(part->get_nlocalnode());
     list_nghostnode.push_back(part->get_nghostnode());

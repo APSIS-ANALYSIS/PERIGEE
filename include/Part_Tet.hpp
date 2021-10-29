@@ -13,7 +13,6 @@
 // ============================================================================
 #include "IMesh.hpp"
 #include "IPart.hpp"
-#include "HDF5_Writer.hpp"
 
 class Part_Tet : public IPart
 {
