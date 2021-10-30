@@ -494,9 +494,9 @@ void PNonlinear_CMM_Solver::rescale_inflow_value( const double &stime,
 
       VecSetValues(sol->solution, 3, base_idx, vals, INSERT_VALUES);
     }
-
-    sol->Assembly_GhostUpdate();
   }
+
+  sol->Assembly_GhostUpdate();
 }
 
 
