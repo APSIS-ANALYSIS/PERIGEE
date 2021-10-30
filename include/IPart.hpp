@@ -111,6 +111,9 @@ class IPart
     // Pure virtual function: Write the partition into HDF5 files
     virtual void write( const char * inputFileName ) const = 0;
 
+    virtual void write( const std::string &inputFileName ) const
+    { write( inputFileName.c_str() ); }
+
     // 1. function access element partition.
     virtual int get_elem_loc(int pos) const
     {SYS_T::print_exit("Error: get_elem_loc is not implemented. \n"); return 0;}

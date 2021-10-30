@@ -357,7 +357,7 @@ int main( int argc, char * argv[] )
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
     // write the part hdf5 file
-    part -> write( part_file.c_str() );
+    part -> write( part_file );
 
     part -> print_part_loadbalance_edgecut();
 
