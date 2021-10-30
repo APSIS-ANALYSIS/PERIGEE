@@ -34,19 +34,33 @@ class GenBC_Pressure : public IGenBC
     virtual double get_P( const int &ii, const double &dot_Q, const double &Q,
        const double &time ) const;
 
-    virtual double get_P0( const int &ii ) const;
+    virtual double get_P0( const int &ii ) const
+    {
+      return P0[ii];
+    }
 
     virtual void reset_initial_sol( const int &ii, const double &in_Q_0,
-        const double &in_P_0, const double &curr_time, const bool &is_restart );
+        const double &in_P_0, const double &curr_time, const bool &is_restart )
+    {
+      P0[ii] = in_P_0;
+    }
 
   private:
     int num_ebc;
 
+    // length num_ebc x num_of_mode[ii], 0 <= ii < num_ebc
     std::vector< std::vector<double> > coef_a, coef_b;
 
+    // length num_ebc
     std::vector<int> num_of_mode;
 
+    // length num_ebc
     std::vector<double> w, period;
+
+    // Vectors storing the P0 on each outlet surface, or physically the pressure
+    // in the previous time step
+    // length num_ebc
+    std::vector<double> P0;
 };
 
 #endif

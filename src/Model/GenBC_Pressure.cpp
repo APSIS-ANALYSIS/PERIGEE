@@ -104,6 +104,10 @@ GenBC_Pressure::GenBC_Pressure( const std::string &lpn_filename )
 
   // Finish reading the file and close it
   reader.close();
+
+  // Initialize P0 by setting it to be get_P at time = 0.0
+  for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
+    P0[ebc_id] = get_P( ebc_id, 0.0, 0.0, 0.0 );
 }
 
 GenBC_Pressure::~GenBC_Pressure()
@@ -113,17 +117,27 @@ GenBC_Pressure::~GenBC_Pressure()
 }
 
 void GenBC_Pressure::print_info() const
-{}
+{
+  SYS_T::commPrint("     GenBC_Pressure : \n");
 
-double GenBC_Pressure::get_P( const int &ii, const double &dot_Q, const double &Q,
+  for(int ii=0; ii<num_ebc; ++ii)
+  {
+    SYS_T::commPrint("  -- ebc_id = %d", ii);
+    SYS_T::commPrint("     w = %e, period =%e \n", w[ii], period[ii]);
+    SYS_T::commPrint("     a[0] + Sum{ a[i] cos(i x w x t) + b[i] sin(i x w x t) }, for i = 1,...,%d. \n", num_of_mode[ii]);
+    for(int jj=0; jj<=num_of_mode[ii]; ++jj)
+      SYS_T::commPrint("     i = %d, a = %e, b = %e \n", jj, coef_a[ii][jj], coef_b[ii][jj]);
+  }
+}
+
+double GenBC_Pressure::get_P( const int &ebc_id, const double &dot_Q, const double &Q,
        const double &time ) const
-{}
+{
+  double PP = coef_a[ebc_id][0];
+  for( int ii = 1; ii <= num_of_mode[ebc_id]; ++ii )
+    PP += coef_a[ebc_id][ii] * cos( ii*w[ebc_id]*time ) + coef_b[ebc_id][ii] * sin( ii*w[ebc_id]*time );
 
-double GenBC_Pressure::get_P0( const int &ii ) const
-{}
-
-void GenBC_Pressure::reset_initial_sol( const int &ii, const double &in_Q_0,
-        const double &in_P_0, const double &curr_time, const bool &is_restart )
-{}
+  return PP;
+}
 
 // EOF
