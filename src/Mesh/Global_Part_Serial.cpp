@@ -28,7 +28,6 @@ Global_Part_Serial::~Global_Part_Serial()
 {
   delete [] epart; epart = nullptr;
   delete [] npart; npart = nullptr;
-  std::cout<<"-- Global_Part_Serial deleted. \n";
 }
 
 

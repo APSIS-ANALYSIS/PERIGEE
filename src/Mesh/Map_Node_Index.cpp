@@ -53,7 +53,6 @@ Map_Node_Index::Map_Node_Index( const char * const &fileName )
 Map_Node_Index::~Map_Node_Index()
 {
   VEC_T::clean(old_2_new); VEC_T::clean(new_2_old);
-  std::cout<<"-- Map_Node_Index deleted. \n";
 }
 
 void Map_Node_Index::print_info() const

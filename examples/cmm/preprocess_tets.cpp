@@ -394,27 +394,13 @@ int main( int argc, char * argv[] )
   }
 
   cout<<"\n===> Mesh Partition Quality: "<<endl;
-  cout<<"The largest ghost / local node ratio is: ";
-  cout<<*std::max_element(list_ratio_g2l.begin(), list_ratio_g2l.end())<<endl;
-
-  cout<<"The smallest ghost / local node ratio is: ";
-  cout<<*std::min_element(list_ratio_g2l.begin(), list_ratio_g2l.end())<<endl;
-
-  cout<<"The summation of the number of ghost nodes is: "<<sum_nghostnode<<endl;
-
-  cout<<"The maximum badnode number is: ";
-  cout<<*std::max_element(list_nbadnode.begin(), list_nbadnode.end())<<endl;
-
-  const int maxpart_nlocalnode = *std::max_element(list_nlocalnode.begin(),
-      list_nlocalnode.end());
-  const int minpart_nlocalnode = *std::min_element(list_nlocalnode.begin(),
-      list_nlocalnode.end());
-
-  cout<<"The maximum and minimum local node numbers are ";
-  cout<<maxpart_nlocalnode<<"\t";
-  cout<<minpart_nlocalnode<<endl;
-  cout<<"The maximum / minimum of local node is: ";
-  cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<endl;
+  cout<<" --- The largest ghost / local node ratio is: "<<VEC_T::max( list_ratio_g2l )<<'\n';
+  cout<<" --- The smallest ghost / local node ratio is: "<<VEC_T::min( list_ratio_g2l )<<'\n';
+  cout<<" --- The summation of the number of ghost nodes is: "<<sum_nghostnode<<endl;
+  cout<<" --- The maximum badnode number is: "<<VEC_T::max( list_nbadnode )<<'\n';
+  cout<<" --- The maximum and minimum local node numbers are "<<VEC_T::max( list_nlocalnode )<<" and "<<VEC_T::min( list_nlocalnode )<<'\n';
+  cout<<" --- The maximum / minimum ratio of local node is: ";
+  cout<<(double) VEC_T::max( list_nlocalnode ) / (double) VEC_T::min( list_nlocalnode ) <<endl;
 
   // Finalize the code and exit
   for(auto it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc) delete *it_nbc;
@@ -423,6 +409,7 @@ int main( int argc, char * argv[] )
   delete wall_nbc; delete wall_ebc;
   delete mnindex; delete global_part; delete mesh; delete IEN;
   PetscFinalize();
+  cout<<"===> Preprocessing completes successfully!\n";
   return EXIT_SUCCESS;
 }
 

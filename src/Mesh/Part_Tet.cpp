@@ -133,7 +133,7 @@ Part_Tet::Part_Tet( const char * const &inputfileName, const int &in_cpu_rank )
 
 Part_Tet::~Part_Tet()
 {
-  for(int i=0; i<nlocalele; ++i) delete [] LIEN[i];
+  for(int ii=0; ii<nlocalele; ++ii) delete [] LIEN[ii];
   delete [] LIEN;
 }
 

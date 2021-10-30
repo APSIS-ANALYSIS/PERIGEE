@@ -135,7 +135,6 @@ Global_Part_METIS::Global_Part_METIS( const int &cpu_size,
 Global_Part_METIS::~Global_Part_METIS()
 {
   delete [] epart; delete [] npart; epart = nullptr; npart = nullptr;
-  std::cout<<"-- Global_Part_METIS deleted. \n";
 }
 
 void Global_Part_METIS::write_part_hdf5( const char * const &fileName,
