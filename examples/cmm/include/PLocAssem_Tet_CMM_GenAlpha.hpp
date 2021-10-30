@@ -8,7 +8,6 @@
 // ==================================================================
 #include "IPLocAssem.hpp"
 #include "TimeMethod_GenAlpha.hpp"
-#include "ALocal_EBC.hpp"
 
 class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
 {

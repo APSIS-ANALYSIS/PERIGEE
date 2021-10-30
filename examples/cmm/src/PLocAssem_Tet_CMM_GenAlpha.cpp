@@ -3,7 +3,6 @@
 PLocAssem_Tet_CMM_GenAlpha::PLocAssem_Tet_CMM_GenAlpha(
     const TimeMethod_GenAlpha * const &tm_gAlpha,
     const int &in_nqp, const int &in_face_nqp,
-    const ALocal_EBC * const &part_ebc,
     const double &in_rho, const double &in_vis_mu,
     const double &in_beta, const double &in_wall_rho,
     const double &in_nu, const double &in_kappa,
@@ -27,113 +26,6 @@ PLocAssem_Tet_CMM_GenAlpha::PLocAssem_Tet_CMM_GenAlpha(
     nLocBas = 10; snLocBas = 6;
   }
   else SYS_T::print_fatal("Error: unknown elem type.\n");
-
-  // ==== AORTA3DPRINT CHANGES BEGIN ====
-  std::ifstream reader;
-  reader.open( "pressure_fourier_series.txt", std::ifstream::in );
-
-  std::istringstream sstrm;
-  std::string sline;
-  std::string bc_type;
-
-  // The first non-commented, non-empty line should be
-  // Pressure num_ebc
-  while( std::getline(reader, sline) )
-  {
-    if( sline[0] !='#' && !sline.empty() )
-    {
-      sstrm.str(sline);
-      sstrm >> bc_type;
-      sstrm >> num_ebc;
-      sstrm.clear();
-      break;
-    }
-  }
-
-  if( num_ebc != part_ebc->get_num_ebc() )
-    SYS_T::print_fatal( "PLocAssem_Tet_CMM_GenAlpha Error: num_ebc in %s is incompatible with ALocal_EBC", "pressure_fourier_series.txt" );
-
-  if( bc_type.compare("Pressure") == 0 || bc_type.compare("PRESSURE") == 0 )
-  {
-    coef_a.resize(num_ebc); coef_b.resize(num_ebc);
-    num_of_mode.resize(num_ebc); w.resize(num_ebc); period.resize(num_ebc);
-  }
-  else
-    SYS_T::print_fatal( "PLocAssem_Tet_CMM_GenAlpha Error: inlet BC type in %s should be Pressure.\n", "pressure_fourier_series.txt" );
-
-  // Read in num_of_mode, w, period, coef_a, and coef_b per ebc
-  for(int ebc_id=0; ebc_id<num_ebc; ++ebc_id)
-  {
-    while( std::getline(reader, sline) )
-    {
-      // face_id num_of_mode w period
-      if( sline[0] !='#' && !sline.empty() )
-      {
-        sstrm.str(sline);
-        int face_id;
-        sstrm >> face_id;
-
-        if( face_id != ebc_id )
-          SYS_T::print_fatal( "PLocAssem_Tet_CMM_GenAlpha Error: ebc in %s should be listed in ascending order.\n", "pressure_fourier_series.txt" );
-
-        sstrm >> num_of_mode[ebc_id];
-        sstrm >> w[ebc_id];
-        sstrm >> period[ebc_id];
-
-        sstrm.clear();
-        break;
-      }
-    }
-
-    // Check the compatibility of period and w. If the difference
-    // is larger than 0.01, print a warning message
-    if( std::abs(2.0 * MATH_T::PI / period[ebc_id] - w[ebc_id] ) >= 0.01 )
-      SYS_T::commPrint( "\nPLocAssem_Tet_CMM_GenAlpha WARNING: ebc_id %d incompatible period and w, \n2xpi/period = %e and w = %e.\n", ebc_id, 2.0*MATH_T::PI/period[ebc_id], w[ebc_id] );
-
-    coef_a[ebc_id].clear(); coef_b[ebc_id].clear();
-
-    while( std::getline(reader, sline) )
-    {
-      // coef_a
-      if( sline[0] !='#' && !sline.empty() )
-      {
-        sstrm.str(sline);
-        double temp_coef;
-        while( sstrm >> temp_coef ) coef_a[ebc_id].push_back( temp_coef );
-
-        sstrm.clear();
-        break;
-      }
-    }
-
-    VEC_T::shrink2fit( coef_a[ebc_id] );
-
-    if( static_cast<int>(coef_a[ebc_id].size()) != num_of_mode[ebc_id]+1 )
-      SYS_T::print_fatal( "PLocAssem_Tet_CMM_GenAlpha Error: ebc_id %d a-coefficients in %s incompatible with the given number of modes.\n", ebc_id, "pressure_fourier_series.txt" );
-
-    while( std::getline(reader, sline) )
-    {
-      // coef_b
-      if( sline[0] !='#' && !sline.empty() )
-      {
-        sstrm.str(sline);
-        double temp_coef;
-        while( sstrm >> temp_coef ) coef_b[ebc_id].push_back( temp_coef );
-
-        sstrm.clear();
-        break;
-      }
-    }
-
-    VEC_T::shrink2fit( coef_b[ebc_id] );
-
-    if( static_cast<int>(coef_b[ebc_id].size()) != num_of_mode[ebc_id]+1 )
-      SYS_T::print_fatal( "PLocAssem_Tet_CMM_GenAlpha Error: ebc_id %d b-coefficients in %s incompatible with the given number of modes.\n", ebc_id, "pressure_fourier_series.txt" );
-  }
-
-  // Finish reading the file and close it
-  reader.close();
-  // ==== AORTA3DPRINT CHANGES END ====
 
   vec_size = nLocBas * 4; // dof_per_node = 4
   sur_size = snLocBas * 4;
@@ -194,17 +86,6 @@ void PLocAssem_Tet_CMM_GenAlpha::print_info() const
   SYS_T::commPrint("  1. Consistent tangent matrix used. \n");
   SYS_T::commPrint("  2. Nonlinear quadratic term is in advective form. \n");
   SYS_T::commPrint("  3. Pressure is evaluated at n+alpha_f rather than n+1. \n");
-
-  // ==== AORTA3DPRINT CHANGES BEGIN ====
-  for(int ebc_id=0; ebc_id<num_ebc; ++ebc_id)
-  {
-    SYS_T::commPrint("  -- ebc_id = %d", ebc_id);
-    SYS_T::commPrint("     w = %e, period =%e \n", w[ebc_id], period[ebc_id]);
-    SYS_T::commPrint("     a[0] + Sum{ a[i] cos(i x w x t) + b[i] sin(i x w x t) }, for i = 1,...,%d. \n", num_of_mode[ebc_id]);
-    for(int ii=0; ii<=num_of_mode[ebc_id]; ++ii)
-      SYS_T::commPrint("     i = %d, a = %e, b = %e \n", ii, coef_a[ebc_id][ii], coef_b[ebc_id][ii]);
-  }
-  // ==== AORTA3DPRINT CHANGES END ====
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
