@@ -92,9 +92,7 @@ class IGenBC
     // For RCR, resistance, and inductance, this function does nothing.
     // --------------------------------------------------------------
     virtual void write_0D_sol( const int &curr_index, const double &curr_time ) const
-    {
-      SYS_T::print_fatal("Error: IGenBC::write_0D_sol is not implemented.\n");
-    }
+    {}
 };
 
 #endif

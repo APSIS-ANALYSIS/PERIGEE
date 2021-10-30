@@ -13,7 +13,7 @@
 class GenBC_Pressure : public IGenBC
 {
   public:
-    GenBC_Pressure( const char * const &pres_file_name );
+    GenBC_Pressure( const std::string &pres_file_name );
 
     virtual ~GenBC_Pressure();
 
@@ -38,8 +38,6 @@ class GenBC_Pressure : public IGenBC
 
     virtual void reset_initial_sol( const int &ii, const double &in_Q_0,
         const double &in_P_0, const double &curr_time, const bool &is_restart );
-
-    virtual void write_0D_sol( const int &curr_index, const double &curr_time ) const {};
 
   private:
     int num_ebc;
