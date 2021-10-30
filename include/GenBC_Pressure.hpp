@@ -58,8 +58,7 @@ class GenBC_Pressure : public IGenBC
     std::vector<double> w, period;
 
     // Vectors storing the P0 on each outlet surface, or physically the pressure
-    // in the previous time step
-    // length num_ebc
+    // in the previous time step. length num_ebc
     std::vector<double> P0;
 };
 
