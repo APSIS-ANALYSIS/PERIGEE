@@ -75,6 +75,24 @@ namespace VEC_T
   }
 
   // --------------------------------------------------------------------------
+  // ! max
+  //   return the maximum value in the vector
+  // --------------------------------------------------------------------------
+  template<typename T> T max( const std::vector<T> &vec )
+  {
+    return *std::max_element( vec.begin(), vec.end() );
+  }
+
+  // --------------------------------------------------------------------------
+  // ! min
+  //   return the minimum value in the vector
+  // --------------------------------------------------------------------------
+  template<typename T> T min( const std::vector<T> &vec )
+  {
+    return *std::min_element( vec.begin(), vec.end() );
+  }
+
+  // --------------------------------------------------------------------------
   // ! sum
   //   return the summation of all entries in the vector
   // --------------------------------------------------------------------------
