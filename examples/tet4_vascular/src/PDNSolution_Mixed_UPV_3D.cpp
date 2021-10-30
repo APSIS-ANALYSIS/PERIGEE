@@ -127,38 +127,44 @@ void PDNSolution_Mixed_UPV_3D::Init_flow_parabolic(
     VecSetValues(solution, 7, location, value, INSERT_VALUES);
   }
 
-  const double vmax = 2.0 / infbc->get_fularea();
+  const int num_nbc = infbc -> get_num_nbc();
 
-  const double out_nx = infbc->get_outvec().x();
-  const double out_ny = infbc->get_outvec().y();
-  const double out_nz = infbc->get_outvec().z();
-
-  // If this sub-domain contains inflow nodes, set their values based on the
-  // parabolic flow profile
-  if( infbc->get_Num_LD() > 0)
+  for(int nbc_id = 0; nbc_id < num_nbc; ++nbc_id)
   {
-    for(int ii=0; ii<nlocalnode; ++ii)
+
+    const double vmax = 2.0 / infbc->get_fularea( nbc_id );
+
+    const double out_nx = infbc->get_outvec( nbc_id ).x();
+    const double out_ny = infbc->get_outvec( nbc_id ).y();
+    const double out_nz = infbc->get_outvec( nbc_id ).z();
+
+    // If this sub-domain contains inflow nodes, set their values based on the
+    // parabolic flow profile
+    if( infbc->get_Num_LD( nbc_id ) > 0)
     {
-      if( infbc->is_inLDN(pNode_ptr->get_node_loc(ii)) )
+      for(int ii=0; ii<nlocalnode; ++ii)
       {
-        location[0] = pNode_ptr->get_node_loc(ii) * 7;
-        location[1] = location[0] + 1;
-        location[2] = location[0] + 2;
-        location[3] = location[0] + 3;
-        location[4] = location[0] + 4;
-        location[5] = location[0] + 5;
-        location[6] = location[0] + 6;
+        if( infbc->is_inLDN( nbc_id, pNode_ptr->get_node_loc(ii) ) )
+        {
+          location[0] = pNode_ptr->get_node_loc(ii) * 7;
+          location[1] = location[0] + 1;
+          location[2] = location[0] + 2;
+          location[3] = location[0] + 3;
+          location[4] = location[0] + 4;
+          location[5] = location[0] + 5;
+          location[6] = location[0] + 6;
 
-        const Vector_3 pt = fNode_ptr -> get_ctrlPts_xyz(ii);
-        const double r =  infbc -> get_radius( pt );
+          const Vector_3 pt = fNode_ptr -> get_ctrlPts_xyz(ii);
+          const double r =  infbc -> get_radius( nbc_id, pt );
 
-        const double vel = vmax * (1.0 - r*r);
+          const double vel = vmax * (1.0 - r*r);
 
-        value[4] = vel * (-1.0) * out_nx;
-        value[5] = vel * (-1.0) * out_ny;
-        value[6] = vel * (-1.0) * out_nz;
+          value[4] = vel * (-1.0) * out_nx;
+          value[5] = vel * (-1.0) * out_ny;
+          value[6] = vel * (-1.0) * out_nz;
 
-        VecSetValues(solution, 7, location, value, INSERT_VALUES);
+          VecSetValues(solution, 7, location, value, INSERT_VALUES);
+        }
       }
     }
   }
@@ -173,10 +179,6 @@ void PDNSolution_Mixed_UPV_3D::Init_flow_parabolic(
     SYS_T::commPrint("                       velo_y = parabolic \n");
     SYS_T::commPrint("                       velo_z = parabolic \n");
     SYS_T::commPrint("                       flow rate 1.0 .\n");
-    SYS_T::commPrint("                       max speed %e.\n", vmax);
-    SYS_T::commPrint("                       active area is %e.\n", infbc->get_actarea() );
-    SYS_T::commPrint("                       full area is %e.\n", infbc->get_fularea() );
-    SYS_T::commPrint("                       direction [%e %e %e].\n", out_nx, out_ny, out_nz);
   }
 }
 
