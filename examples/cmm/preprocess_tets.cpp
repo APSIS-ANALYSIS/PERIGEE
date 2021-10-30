@@ -236,10 +236,9 @@ int main( int argc, char * argv[] )
   // Call METIS to partition the mesh 
   IGlobal_Part * global_part = nullptr;
   if(cpu_size > 1)
-    global_part = new Global_Part_METIS( cpu_size, in_ncommon,
-        isDualGraph, mesh, IEN, "epart", "npart" );
+    global_part = new Global_Part_METIS( cpu_size, in_ncommon, isDualGraph, mesh, IEN );
   else if(cpu_size == 1)
-    global_part = new Global_Part_Serial( mesh, "epart", "npart" );
+    global_part = new Global_Part_Serial( mesh );
   else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
 
   // Generate the new nodal numbering

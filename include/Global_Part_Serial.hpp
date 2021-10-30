@@ -17,8 +17,8 @@ class Global_Part_Serial : public IGlobal_Part
 {
   public:
     Global_Part_Serial( const IMesh * const &mesh,
-       const char * const &element_part_name,
-       const char * const &node_part_name );
+       const std::string &element_part_name = "epart",
+       const std::string &node_part_name = "npart" );
 
     virtual ~Global_Part_Serial();
 
@@ -41,7 +41,7 @@ class Global_Part_Serial : public IGlobal_Part
     idx_t * epart;
     idx_t * npart;
 
-    virtual void write_part_hdf5( const char * const &fileName, 
+    virtual void write_part_hdf5( const std::string &fileName, 
         const idx_t * const &part_in,
         const int &part_size, const int &cpu_size,
         const bool &part_isdual, const int &in_ncommon,

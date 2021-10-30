@@ -1,7 +1,7 @@
 #include "Global_Part_Serial.hpp"
 
 Global_Part_Serial::Global_Part_Serial( const class IMesh * const &mesh,
-   const char * const &element_part_name, const char * const &node_part_name )
+   const std::string &element_part_name, const std::string &node_part_name )
 : isMETIS(false), isDual(false), dual_edge_ncommon(0)
 {
   const int nElem = mesh->get_nElem();
@@ -31,14 +31,13 @@ Global_Part_Serial::~Global_Part_Serial()
 }
 
 
-void Global_Part_Serial::write_part_hdf5( const char * const &fileName,
+void Global_Part_Serial::write_part_hdf5( const std::string &fileName,
     const idx_t * const &part_in,
     const int &part_size, const int &cpu_size,
     const bool &part_isdual, const int &in_ncommon,
     const bool &isMETIS ) const
 {
-  std::string fName( fileName );
-  fName.append(".h5");
+  std::string fName( fileName ); fName.append(".h5");
 
   // file creation
   hid_t file_id = H5Fcreate( fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
