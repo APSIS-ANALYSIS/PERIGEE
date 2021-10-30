@@ -418,24 +418,26 @@ void SEG_SOL_T::PlusAiVPV(const double &aa,
   sol->GhostUpdate(); // update the ghost slots
 }
 
-
 void SEG_SOL_T::Insert_plug_inflow_UPV(const double &val,
     const ALocal_Inflow_NodalBC * const &infnbc, 
     PDNSolution * const &sol )
 {
   // Make sure the dof of the sol vector is 7
-  SYS_T::print_fatal_if(sol->get_dof_num() != 7,
-      "Error: SEG_SOL_T::Insert_plug_inflow_UPV the sol vector dimension is wrong. \n");
+  SYS_T::print_fatal_if(sol->get_dof_num() != 7, "Error: SEG_SOL_T::Insert_plug_inflow_UPV the sol vector dimension is wrong. \n");
 
-  const int numnode = infnbc -> get_Num_LD();
+  SYS_T::print_fatal_if(infnbc->get_num_nbc() != 1, "Error: SEG_SOL_T::Insert_plug_inflow_UPV currently only supports single inlet.\n");
 
-  const double dir_x = infnbc -> get_outvec().x();
-  const double dir_y = infnbc -> get_outvec().y();
-  const double dir_z = infnbc -> get_outvec().z();
+  const int nbc_id = 0;
+
+  const int numnode = infnbc -> get_Num_LD( nbc_id );
+
+  const double dir_x = infnbc -> get_outvec( nbc_id ).x();
+  const double dir_y = infnbc -> get_outvec( nbc_id ).y();
+  const double dir_z = infnbc -> get_outvec( nbc_id ).z();
 
   for(int ii=0; ii<numnode; ++ii)
   {
-    int node_index = infnbc -> get_LDN(ii);
+    const int node_index = infnbc -> get_LDN(nbc_id, ii);
     
     VecSetValue(sol->solution, node_index*7+4, dir_x * val, INSERT_VALUES);
     VecSetValue(sol->solution, node_index*7+5, dir_y * val, INSERT_VALUES);
@@ -445,7 +447,6 @@ void SEG_SOL_T::Insert_plug_inflow_UPV(const double &val,
   VecAssemblyBegin(sol->solution); VecAssemblyEnd(sol->solution);
   sol->GhostUpdate();
 }
-
 
 void SEG_SOL_T::CheckUV(const PDNSolution * const &dotU,
     const PDNSolution * const &V )
@@ -474,7 +475,6 @@ void SEG_SOL_T::CheckUV(const PDNSolution * const &dotU,
 
   delete [] array_U; delete [] array_V;
 }
-
 
 void SEG_SOL_T::Check_dotSol_Sol( const double &dt, const double &gamma,
     const PDNSolution * const &dotSol_n,
@@ -514,6 +514,5 @@ void SEG_SOL_T::Check_dotSol_Sol( const double &dt, const double &gamma,
   delete [] array_ds_n; delete [] array_ds_m;
   delete [] array_s_n; delete [] array_s_m;
 }
-
 
 // EOF
