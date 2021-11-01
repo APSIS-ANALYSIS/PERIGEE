@@ -463,10 +463,10 @@ int main(int argc, char *argv[])
   for(int ff=0; ff<locinfnbc->get_num_nbc(); ++ff)
   {
     const double inlet_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        sol, locAssem_ptr, elements, quads, locinfnbc, ff );
+        sol, locAssem_fluid_ptr, elements, quads, locinfnbc, ff );
 
     const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
-        sol, locAssem_ptr, elements, quads, locinfnbc, ff );
+        sol, locAssem_fluid_ptr, elements, quads, locinfnbc, ff );
 
     if( rank == 0 )
     {

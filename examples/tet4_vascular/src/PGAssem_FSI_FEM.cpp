@@ -1011,4 +1011,90 @@ double PGAssem_FSI_FEM::Assem_surface_ave_pressure(
   return sum_pres / sum_area;
 }
 
+
+double PGAssem_FSI_FEM::Assem_surface_flowrate(
+    const PDNSolution * const &vec,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const ALocal_Inflow_NodalBC * const &infbc_part,
+    const int &nbc_id )
+{
+  double * array = new double [nlgn * dof_sol];
+  double * local = new double [snLocBas * dof_sol];
+
+  vec -> GetLocalArray( array );
+
+  const int num_sele = infbc_part -> get_num_local_cell(nbc_id);
+
+  double esum = 0.0;
+
+  for(int ee=0; ee<num_sele; ++ee)
+  {
+    infbc_part -> get_SIEN( nbc_id, ee, LSIEN );
+
+    infbc_part -> get_ctrlPts_xyz( nbc_id, ee, sctrl_x, sctrl_y, sctrl_z );
+
+    GetLocal( array, LSIEN, snLocBas, local );
+
+    esum += lassem_ptr -> get_flowrate( local, element_s, sctrl_x,
+        sctrl_y, sctrl_z, quad_s );
+  }
+
+  delete [] array; array = nullptr;
+  delete [] local; local = nullptr;
+
+  double sum = 0.0;
+
+  MPI_Allreduce(&esum, &sum, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+
+  return sum;
+}
+
+
+double PGAssem_FSI_FEM::Assem_surface_ave_pressure(
+    const PDNSolution * const &vec,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const ALocal_Inflow_NodalBC * const &infbc_part,
+    const int &nbc_id )
+{
+  double * array = new double [nlgn * dof_sol];
+  double * local = new double [snLocBas * dof_sol];
+
+  vec -> GetLocalArray( array );
+
+  const int num_sele = infbc_part -> get_num_local_cell(nbc_id);
+
+  double val_pres = 0.0, val_area = 0.0;
+
+  for(int ee=0; ee<num_sele; ++ee)
+  {
+    infbc_part -> get_SIEN( nbc_id, ee, LSIEN);
+
+    infbc_part -> get_ctrlPts_xyz(nbc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+
+    GetLocal(array, LSIEN, snLocBas, local);
+
+    double ele_pres, ele_area;
+
+    lassem_ptr-> get_pressure_area( local, element_s, sctrl_x, sctrl_y,
+        sctrl_z, quad_s, ele_pres, ele_area );
+
+    val_pres += ele_pres;
+    val_area += ele_area;
+  }
+
+  delete [] array; array = nullptr;
+  delete [] local; local = nullptr;
+
+  double sum_pres = 0.0, sum_area = 0.0;
+
+  MPI_Allreduce(&val_pres, &sum_pres, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+  MPI_Allreduce(&val_area, &sum_area, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+
+  return sum_pres / sum_area;
+}
+
 // EOF

@@ -338,10 +338,10 @@ void PTime_Seg_Solver::TM_FSI_GenAlpha(
     for(int face=0; face<infnbc_part -> get_num_nbc(); ++face)
     {
       const double inlet_face_flrate = gassem_ptr -> Assem_surface_flowrate(
-          cur_sol, lassem_fluid_ptr, elements, quad_s, infnbc_part, face );
+          cur_disp, lassem_fluid_ptr, elements, quad_s, infnbc_part, face );
 
       const double inlet_face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
-          cur_sol, lassem_fluid_ptr, elements, quad_s, infnbc_part, face );
+          cur_disp, lassem_fluid_ptr, elements, quad_s, infnbc_part, face );
 
       if( SYS_T::get_MPI_rank() == 0 )
       {
