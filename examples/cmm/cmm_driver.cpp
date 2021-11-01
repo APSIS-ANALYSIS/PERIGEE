@@ -528,7 +528,7 @@ int main( int argc, char *argv[] )
   MPI_Barrier(PETSC_COMM_WORLD);
 
   // Write all 0D solutions into a file
-  if( rank == 0) gbc -> write_0D_sol ( initial_index, initial_time );
+  if( rank == 0 ) gbc -> write_0D_sol ( initial_index, initial_time );
 
   // ===== Inlet data recording files =====
   for(int ff=0; ff<locinfnbc->get_num_nbc(); ++ff)

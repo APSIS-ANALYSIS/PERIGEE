@@ -456,6 +456,38 @@ int main(int argc, char *argv[])
     }
   }
 
+  // Write all 0D solutions into a file
+  if( rank == 0 ) gbc -> write_0D_sol ( initial_index, initial_time );
+
+  // ===== Inlet data recording files =====
+  for(int ff=0; ff<locinfnbc->get_num_nbc(); ++ff)
+  {
+    const double inlet_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
+        sol, locAssem_ptr, elements, quads, locinfnbc, ff );
+
+    const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
+        sol, locAssem_ptr, elements, quads, locinfnbc, ff );
+
+    if( rank == 0 )
+    {
+      std::ofstream ofile;
+      if( !is_restart )
+        ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
+      else
+        ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
+
+      if( !is_restart )
+      {
+        ofile<<"Time index"<<'\t'<<"Time"<<'\t'<<"Flow rate"<<'\t'<<"Face averaged pressure"<<'\n';
+        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
+      }
+
+      ofile.close();
+    }
+  }
+
+  MPI_Barrier(PETSC_COMM_WORLD);
+
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
   tsolver->TM_FSI_GenAlpha(is_restart, base, dot_sol, sol, tm_galpha_ptr,
