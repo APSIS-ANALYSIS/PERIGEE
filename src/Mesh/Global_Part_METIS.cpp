@@ -31,9 +31,8 @@ Global_Part_METIS::Global_Part_METIS( const int &cpu_size,
   METIS_SetDefaultOptions(options);
   options[METIS_OPTION_NUMBERING] = 0;
 
-  idx_t nparts = cpu_size;
-  idx_t objval;
-  idx_t ncommon = in_ncommon;
+  const idx_t nparts = cpu_size;
+  const idx_t ncommon = in_ncommon;
 
   std::cout<<"-- allocating eptr and eind arrays... \n";
 
@@ -71,11 +70,12 @@ Global_Part_METIS::Global_Part_METIS( const int &cpu_size,
   npart = new idx_t [nFunc];
   std::cout<<"---- epart and npart vector has been allocated. \n";
 
-  idx_t ne = nElem;
-  idx_t nn = nFunc;
-
-  time_tracker = clock();
+  const idx_t ne = nElem;
+  const idx_t nn = nFunc;
   int metis_result;
+  idx_t objval;
+  
+  time_tracker = clock();
   if( isDualGraph )
   {
     std::cout<<"---- calling METIS_PartMeshDual ... \n";
