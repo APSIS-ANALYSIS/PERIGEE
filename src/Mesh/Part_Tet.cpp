@@ -174,10 +174,10 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
   }
 
   // 2. Reorder node_loc
-  for( int ii=0; ii<nlocalnode; ++ii )
+  for( int ii=0; ii<nlocalnode; ++ii ) 
     node_loc[ii] = mnindex->get_old2new( node_loc[ii] );
 
-  // 3. Generate node_tot, which stores the nodes needed by the subdomain
+  // 3. Generate node_tot, which stores the nodes needed by the elements in the subdomain
   std::vector<int> node_tot;
   node_tot.clear();
   for( int e=0; e<nlocalele; ++e )
@@ -189,9 +189,8 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
       node_tot.push_back( temp_node );
     }
   }
-  sort(node_tot.begin(), node_tot.end());
-  std::vector<int>::iterator it = unique(node_tot.begin(), node_tot.end());
-  node_tot.resize( it - node_tot.begin() );
+  
+  VEC_T::sort_unique_resize( node_tot );
 
   ntotalnode = (int) node_tot.size();
 
@@ -199,8 +198,7 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
   node_ghost.clear();
   for( int ii = 0; ii<ntotalnode; ++ii )
   {
-    it = find(node_loc.begin(), node_loc.end(), node_tot[ii]);
-    if( it == node_loc.end() )
+    if( !VEC_T::is_invec(node_loc, node_tot[ii]) )
       node_ghost.push_back(node_tot[ii]);
   }
 
@@ -211,11 +209,9 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
   if( nghostnode + nlocalnode != ntotalnode )
   {
     std::vector<int> badnode;
-    std::vector<int>::iterator badnode_it;
     for( int n=0; n<nlocalnode; ++n )
     {
-      badnode_it = find( node_tot.begin(), node_tot.end(), node_loc[n] );
-      if(badnode_it == node_tot.end())
+      if( !VEC_T::is_invec(node_tot, node_loc[n]) )
         badnode.push_back( node_loc[n] );
     }
     nbadnode = (int) badnode.size();
@@ -250,24 +246,20 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
   VEC_T::shrink2fit(local_to_global);
   nlocghonode = (int) local_to_global.size();
 
-  if( isPrintInfo )
-    std::cout<<"-- proc "<<cpu_rank<<" local_to_global generated. \n";
+  if( isPrintInfo ) std::cout<<"-- proc "<<cpu_rank<<" local_to_global generated. \n";
 
   // 6. LIEN
   LIEN = new int * [nlocalele];
-  for(int e=0; e<nlocalele; ++e)
-    LIEN[e] = new int [nLocBas];
+  for(int e=0; e<nlocalele; ++e) LIEN[e] = new int [nLocBas];
 
-  std::vector<int>::iterator lien_ptr;
-  int global_index;
   for(int e=0; e<nlocalele; ++e)
   {
     for(int i=0; i<nLocBas; ++i)
     {
-      global_index = IEN->get_IEN(elem_loc[e], i);
+      int global_index = IEN->get_IEN(elem_loc[e], i);
       global_index = mnindex->get_old2new(global_index);
-      lien_ptr = find( local_to_global.begin(), local_to_global.end(),
-          global_index);
+      const auto lien_ptr = find( local_to_global.begin(), local_to_global.end(),
+          global_index );
 
       if(lien_ptr == local_to_global.end())
       {
@@ -279,8 +271,7 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
     }
   }
 
-  if(isPrintInfo)
-    std::cout<<"-- proc "<<cpu_rank<<" LIEN generated. \n";
+  if(isPrintInfo) std::cout<<"-- proc "<<cpu_rank<<" LIEN generated. \n";
 
   // 7. local copy of control points
   ctrlPts_x_loc.resize(nlocghonode);
@@ -300,8 +291,7 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
   VEC_T::shrink2fit(ctrlPts_y_loc);
   VEC_T::shrink2fit(ctrlPts_z_loc);
 
-  if(isPrintInfo)
-    std::cout<<"-- proc "<<cpu_rank<<" Local control points generated. \n";
+  if(isPrintInfo) std::cout<<"-- proc "<<cpu_rank<<" Local control points generated. \n";
 }
 
 int Part_Tet::get_elemLocIndex(const int &gloindex) const
