@@ -132,7 +132,7 @@ namespace VEC_T
   template<typename T> void sort_unique_resize( std::vector<T> &vec )
   {
     sort(vec.begin(), vec.end());
-    auto ite = unique(vec.begin(), vec.end());
+    const auto ite = unique(vec.begin(), vec.end());
     vec.resize( ite - vec.begin() );
   }
 
@@ -143,8 +143,7 @@ namespace VEC_T
   // --------------------------------------------------------------------------
   template<typename T> bool is_invec( const std::vector<T> &vec, const T &val )
   {
-    auto it = find(vec.begin(), vec.end(), val);
-    return it != vec.end();
+    return find(vec.begin(), vec.end(), val) != vec.end();
   }
 
   // --------------------------------------------------------------------------
