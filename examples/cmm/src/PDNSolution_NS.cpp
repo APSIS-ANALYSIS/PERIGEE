@@ -84,7 +84,6 @@ void PDNSolution_NS::Init_zero(const APart_Node * const &pNode_ptr)
   }
 }
 
-
 void PDNSolution_NS::Init_flow_parabolic(
     const APart_Node * const &pNode_ptr,
     const FEANode * const &fNode_ptr,
@@ -132,23 +131,13 @@ void PDNSolution_NS::Init_flow_parabolic(
           location[3] = location[0] + 3;
 
           const Vector_3 pt = fNode_ptr -> get_ctrlPts_xyz(ii);
-          const double r =  infbc -> get_radius( nbc_id, pt );
+          const double r = infbc -> get_radius( nbc_id, pt );
 
           const double vel = vmax * (1.0 - r*r);
 
-          // ==== AORTA3DPRINT CHANGES BEGIN ====
-          value[1] = vel * out_nx;
-          value[2] = vel * out_ny;
-          value[3] = vel * out_nz;
-
-          // -1.0 is multiplied to make the flow direction inward
-          if( nbc_id == 0 )
-          {
-            value[1] *= (-1.0);
-            value[2] *= (-1.0);
-            value[3] *= (-1.0);
-          }
-          // ==== AORTA3DPRINT CHANGES BEGIN ====
+          value[1] = (-1.0) * vel * out_nx;
+          value[2] = (-1.0) * vel * out_ny;
+          value[3] = (-1.0) * vel * out_nz;
 
           VecSetValues(solution, 4, location, value, INSERT_VALUES);
         }
@@ -173,7 +162,6 @@ void PDNSolution_NS::Init_flow_parabolic(
     }
   }
 }
-
 
 void PDNSolution_NS::Init_pipe_parabolic(
     const APart_Node * const &pNode_ptr,
