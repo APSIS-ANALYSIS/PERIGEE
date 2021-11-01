@@ -132,8 +132,7 @@ namespace VEC_T
   template<typename T> void sort_unique_resize( std::vector<T> &vec )
   {
     sort(vec.begin(), vec.end());
-    const auto ite = unique(vec.begin(), vec.end());
-    vec.resize( ite - vec.begin() );
+    vec.resize( unique(vec.begin(), vec.end()) - vec.begin() );
   }
 
   // --------------------------------------------------------------------------
