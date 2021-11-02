@@ -56,6 +56,9 @@ int main(int argc, char *argv[])
   // LPN file
   std::string lpn_file("lpn_rcr_input.txt");
 
+  double inflow_thd_time = 1.0;      // time for linearly increasing inflow to reach steady state
+  double inflow_tgt_rate = 1.0;      // inflow upon reaching steady state
+
   // back flow stabilization
   double bs_beta = 0.2;
   
@@ -106,6 +109,8 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-mesh_E", mesh_E);
   SYS_T::GetOptionReal("-mesh_nu", mesh_nu);
   SYS_T::GetOptionString("-inflow_file", inflow_file);
+  SYS_T::GetOptionReal(  "-inflow_thd_time", inflow_thd_time);
+  SYS_T::GetOptionReal(  "-inflow_tgt_rate", inflow_tgt_rate);
   SYS_T::GetOptionString("-lpn_file", lpn_file);
   SYS_T::GetOptionString("-part_file", part_file);
   SYS_T::GetOptionReal("-nl_rtol", nl_rtol);
@@ -138,7 +143,17 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-sl_nu:", solid_nu);
   SYS_T::cmdPrint("-mesh_E:", mesh_E);
   SYS_T::cmdPrint("-mesh_nu:", mesh_nu);
-  SYS_T::cmdPrint("-inflow_file:", inflow_file);
+  
+  // If the inflow file exists, print its filename.
+  // Otherwise, print parameters for linear2steady inflow setting. 
+  if( SYS_T::file_exist( inflow_file ) )
+    SYS_T::cmdPrint(    "-inflow_file:",     inflow_file);
+  else
+  {
+    SYS_T::cmdPrint(    "-inflow_thd_time:", inflow_thd_time);
+    SYS_T::cmdPrint(    "-inflow_tgt_rate:", inflow_tgt_rate);
+  }
+
   SYS_T::cmdPrint("-lpn_file:", lpn_file);
   SYS_T::cmdPrint("-part_file:", part_file);
   SYS_T::cmdPrint("-nl_rtol:", nl_rtol);
@@ -177,9 +192,21 @@ int main(int argc, char *argv[])
     cmdh5w->write_doubleScalar("mesh_E", mesh_E);
     cmdh5w->write_doubleScalar("mesh_nu", mesh_nu);
     cmdh5w->write_doubleScalar("init_step", initial_step);
+    
+    cmdh5w->write_string(        "lpn_file",        lpn_file);
+
+    if( SYS_T::file_exist( inflow_file ) )
+      cmdh5w->write_string(      "inflow_file",     inflow_file);
+    else
+    {
+      cmdh5w->write_doubleScalar("inflow_thd_time", inflow_thd_time );
+      cmdh5w->write_doubleScalar("inflow_tgt_rate", inflow_tgt_rate );
+    }
 
     delete cmdh5w; H5Fclose(cmd_file_id);
   }
+
+  MPI_Barrier(PETSC_COMM_WORLD);
 
   // ===== Main Data Strucutre =====
   FEANode * fNode = new FEANode(part_file, rank);
@@ -215,7 +242,14 @@ int main(int argc, char *argv[])
   // ===== Inflow rate function =====
   SYS_T::commPrint("===> Setup inflow flow rate. \n");
   
-  ICVFlowRate * inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
+  ICVFlowRate * inflow_rate_ptr = nullptr;
+ 
+  // If inflow file exists, prescribe it. Otherwise, prescribe an inflow that 
+  // linearly increases until a steady flow rate.
+  if( SYS_T::file_exist( inflow_file ) )
+    inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
+  else
+    inflow_rate_ptr = new CVFlowRate_Linear2Steady( locinfnbc->get_num_nbc(), inflow_thd_time, inflow_tgt_rate );
 
   inflow_rate_ptr->print_info();
 
