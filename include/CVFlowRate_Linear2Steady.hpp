@@ -10,28 +10,38 @@
 // Date Created: Oct. 1 2017
 // ==================================================================
 #include "Sys_Tools.hpp"
+#include "Vec_Tools.hpp"
+#include "Math_Tools.hpp"
 #include "ICVFlowRate.hpp"
-#include "ALocal_Inflow_NodalBC.hpp"
 
 class CVFlowRate_Linear2Steady : public ICVFlowRate
 {
   public:
     // From time 0 to in_time, the flow rate = time * flrate / in_thred_time
     // From in_time to infty, flow_rate = flrate
+    // This constructor will set a uniform thred_time and flrate for all inlets.
     CVFlowRate_Linear2Steady( const int &input_num_nbc,
         const double &in_thred_time, const double &flrate );
 
+    // This constructor will set a uniform thred_time for all inlets, and the
+    // target flow rate are determined from the file and set to be the flow rate
+    // at the initial time (i.e. time = 0.0) by setting target_flow_rate to be
+    // the sum of coef_a.
+    CVFlowRate_Linear2Steady( const double &in_thred_time, 
+        const std::string &filename );
+
     virtual ~CVFlowRate_Linear2Steady();
 
-    // nbc_id is unused. The same inflow profile is prescribed for all inlets.
     virtual double get_flow_rate( const int &nbc_id, const double &time ) const;
 
     virtual void print_info() const;
 
   private:
-    const int num_nbc;
+    const double thred_time;
+    
+    int num_nbc;
 
-    const double thred_time, target_flow_rate;
+    std::vector<double> target_flow_rate;
 
     // ------------------------------------------------------------------------
     // Generate a filename for inlet face nbc_id as Inlet_xxx_flowrate.txt
