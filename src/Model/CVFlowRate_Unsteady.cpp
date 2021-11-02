@@ -1,14 +1,13 @@
 #include "CVFlowRate_Unsteady.hpp"
 
-CVFlowRate_Unsteady::CVFlowRate_Unsteady( const char * const &filename )
+CVFlowRate_Unsteady::CVFlowRate_Unsteady( const std::string &filename )
 {
-  SYS_T::commPrint("CVFlowRate_Unsteady: data read from %s \n", filename);
+  SYS_T::commPrint("CVFlowRate_Unsteady: data read from %s \n", filename.c_str());
 
-  const std::string temp_name(filename);
-  SYS_T::file_check( temp_name );
+  SYS_T::file_check( filename );
   
   std::ifstream reader;
-  reader.open( filename, std::ifstream::in );
+  reader.open( filename.c_str(), std::ifstream::in );
 
   std::istringstream sstrm;
   std::string sline;
@@ -34,7 +33,7 @@ CVFlowRate_Unsteady::CVFlowRate_Unsteady( const char * const &filename )
     num_of_mode.resize(num_nbc); w.resize(num_nbc); period.resize(num_nbc);
   }
   else
-    SYS_T::print_fatal("CVFlowRate_Unsteady Error: inlet BC type in %s should be Inflow.\n", filename);
+    SYS_T::print_fatal("CVFlowRate_Unsteady Error: inlet BC type in %s should be Inflow.\n", filename.c_str());
 
   // Read in num_of_mode, w, period, coef_a, and coef_b per nbc
   for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
@@ -48,7 +47,7 @@ CVFlowRate_Unsteady::CVFlowRate_Unsteady( const char * const &filename )
         int face_id;
         sstrm >> face_id;
 
-        if( face_id != nbc_id ) SYS_T::print_fatal("CVFlowRate_Unsteady Error: nbc in %s should be listed in ascending order.\n", filename);
+        if( face_id != nbc_id ) SYS_T::print_fatal("CVFlowRate_Unsteady Error: nbc in %s should be listed in ascending order.\n", filename.c_str());
 
         sstrm >> num_of_mode[nbc_id];
         sstrm >> w[nbc_id];
@@ -83,7 +82,7 @@ CVFlowRate_Unsteady::CVFlowRate_Unsteady( const char * const &filename )
     VEC_T::shrink2fit( coef_a[nbc_id] );
     
     if( static_cast<int>(coef_a[nbc_id].size()) != num_of_mode[nbc_id]+1 )
-      SYS_T::print_fatal("CVFlowRate_Unsteady Error: nbc_id %d a-coefficients in %s incompatible with the given number of modes.\n", nbc_id, filename);
+      SYS_T::print_fatal("CVFlowRate_Unsteady Error: nbc_id %d a-coefficients in %s incompatible with the given number of modes.\n", nbc_id, filename.c_str());
 
     while( std::getline(reader, sline) )
     {
@@ -102,7 +101,7 @@ CVFlowRate_Unsteady::CVFlowRate_Unsteady( const char * const &filename )
     VEC_T::shrink2fit( coef_b[nbc_id] );
 
     if( static_cast<int>(coef_b[nbc_id].size()) != num_of_mode[nbc_id]+1 )
-      SYS_T::print_fatal("CVFlowRate_Unsteady Error: nbc_id %d b-coefficients in %s incompatible with the given number of modes.\n", nbc_id, filename);
+      SYS_T::print_fatal("CVFlowRate_Unsteady Error: nbc_id %d b-coefficients in %s incompatible with the given number of modes.\n", nbc_id, filename.c_str());
   }
 
   // Finish reading the file and close it

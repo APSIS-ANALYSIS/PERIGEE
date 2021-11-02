@@ -27,7 +27,7 @@
 class CVFlowRate_Unsteady : public ICVFlowRate
 {
   public:
-    CVFlowRate_Unsteady( const char * const &filename );
+    CVFlowRate_Unsteady( const std::string &filename );
 
     virtual ~CVFlowRate_Unsteady();
 
