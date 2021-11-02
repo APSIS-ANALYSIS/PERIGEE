@@ -65,7 +65,8 @@ int main( int argc, char *argv[] )
   std::string inflow_file("inflow_fourier_series.txt");
 
   double inflow_thd_time = 1.0;      // time for linearly increasing inflow to reach steady state
-  double inflow_tgt_rate = 1.0;      // inflow upon reaching steady state
+
+  bool is_pulsatile = true;          // flag for determining if the run is for pulsatile flow
 
   // LPN file
   std::string lpn_file("lpn_rcr_input.txt");
@@ -131,7 +132,7 @@ int main( int argc, char *argv[] )
   SYS_T::GetOptionReal(  "-wall_kappa",      wall_kappa);
   SYS_T::GetOptionString("-inflow_file",     inflow_file);
   SYS_T::GetOptionReal(  "-inflow_thd_time", inflow_thd_time);
-  SYS_T::GetOptionReal(  "-inflow_tgt_rate", inflow_tgt_rate);
+  SYS_T::GetOptionBool(  "-is_pulsatile",    is_pulsatile);
   SYS_T::GetOptionString("-lpn_file",        lpn_file);
   SYS_T::GetOptionString("-part_file",       part_file);
   SYS_T::GetOptionReal(  "-nl_rtol",         nl_rtol);
@@ -174,12 +175,12 @@ int main( int argc, char *argv[] )
 
   // If the inflow file exists, print its filename.
   // Otherwise, print parameters for linear2steady inflow setting. 
-  if( SYS_T::file_exist( inflow_file ) )
+  if( is_pulsatile )
     SYS_T::cmdPrint(    "-inflow_file:",     inflow_file);
   else
   {
+    SYS_T::cmdPrint(    "-inflow_file:",     inflow_file);
     SYS_T::cmdPrint(    "-inflow_thd_time:", inflow_thd_time);
-    SYS_T::cmdPrint(    "-inflow_tgt_rate:", inflow_tgt_rate);
   }
 
   SYS_T::cmdPrint(      "-lpn_file:",        lpn_file);
@@ -228,12 +229,12 @@ int main( int argc, char *argv[] )
     cmdh5w->write_intScalar(     "nqp_tri",         nqp_tri);
     cmdh5w->write_string(        "lpn_file",        lpn_file);
 
-    if( SYS_T::file_exist( inflow_file ) )
+    if( is_pulsatile )
       cmdh5w->write_string(      "inflow_file",     inflow_file);
     else
     {
       cmdh5w->write_doubleScalar("inflow_thd_time", inflow_thd_time );
-      cmdh5w->write_doubleScalar("inflow_tgt_rate", inflow_tgt_rate );
+      cmdh5w->write_string(      "inflow_file",     inflow_file);
     }
     delete cmdh5w; H5Fclose(cmd_file_id);
   }
@@ -319,10 +320,10 @@ int main( int argc, char *argv[] )
 
   // If inflow file exists, prescribe it. Otherwise, prescribe an inflow that 
   // linearly increases until a steady flow rate.
-  if( SYS_T::file_exist( inflow_file ) )
+  if( is_pulsatile )
     inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
   else
-    inflow_rate_ptr = new CVFlowRate_Linear2Steady( locinfnbc->get_num_nbc(), inflow_thd_time, inflow_tgt_rate );
+    inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_file.c_str() );
 
   inflow_rate_ptr->print_info();
 
