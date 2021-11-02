@@ -16,18 +16,19 @@
 class CVFlowRate_Steady : public ICVFlowRate
 {
   public:
-    CVFlowRate_Steady( const char * const &filename );
+    CVFlowRate_Steady( const std::string &filename );
 
-    CVFlowRate_Steady( const double &in_flowrate );
+    CVFlowRate_Steady( const int &input_num_nbc, const double &in_flowrate );
 
     virtual ~CVFlowRate_Steady();
 
-    virtual double get_flow_rate(const double &time) const;
+    virtual double get_flow_rate(const int &nbc_id, const double &time) const;
 
     virtual void print_info() const;
 
   private:
-    double flowrate;
+    int num_nbc;
+    std::vector<double> flowrate;
 };
 
 #endif

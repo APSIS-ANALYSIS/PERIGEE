@@ -42,21 +42,6 @@ class CVFlowRate_Linear2Steady : public ICVFlowRate
     int num_nbc;
 
     std::vector<double> target_flow_rate;
-
-    // ------------------------------------------------------------------------
-    // Generate a filename for inlet face nbc_id as Inlet_xxx_flowrate.txt
-    // ------------------------------------------------------------------------
-    virtual std::string gen_flowfile_name(const int &nbc_id) const
-    {
-      std::ostringstream ss;
-      ss << "Inlet_";
-      if( nbc_id/10 == 0 ) ss << "00";
-      else if( nbc_id/100 == 0 ) ss << "0";
-
-      ss << nbc_id << "_flowrate.txt";
-
-      return ss.str();
-    }
 };
 
 #endif

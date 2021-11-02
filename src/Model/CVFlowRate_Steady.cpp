@@ -1,115 +1,155 @@
 #include "CVFlowRate_Steady.hpp"
 
-CVFlowRate_Steady::CVFlowRate_Steady( const char * const &filename )
+CVFlowRate_Steady::CVFlowRate_Steady( const std::string &filename )
 {
-  SYS_T::commPrint("CVFlowRate_Steady: data read from %s \n", filename);
+  SYS_T::commPrint("CVFlowRate_Steady: data read from %s \n", filename.c_str() );
 
-  const std::string temp_name(filename);
-  SYS_T::file_check( temp_name );
-
+  SYS_T::file_check( filename );
+  
   std::ifstream reader;
-  reader.open( filename, std::ifstream::in );
+  reader.open( filename.c_str(), std::ifstream::in );
 
   std::istringstream sstrm;
   std::string sline;
+  std::string bc_type;
 
-  int num_of_mode;
-  double w, period;
+  // The first non-commented, non-empty line should be
+  // Inflow num_nbc
   while( std::getline(reader, sline) )
   {
-    // The first non-commented non-empty line records num-of-mode & w & period
     if( sline[0] !='#' && !sline.empty() )
     {
       sstrm.str(sline);
-      sstrm >> num_of_mode;
-      sstrm >> w;
-      sstrm >> period;
+      sstrm >> bc_type;
+      sstrm >> num_nbc;
       sstrm.clear();
       break;
     }
   }
 
-  std::vector<double> coef_a, coef_b;
-  // Allocate coef_a & coef_b
-  coef_a.clear(); coef_b.clear();
+  std::vector< std::vector<double> > coef_a, coef_b;
+  std::vector<int> num_of_mode;
+  std::vector<double> w, period;
 
-  while( std::getline(reader, sline) )
+  if( bc_type.compare("Inflow") == 0 || bc_type.compare("INFLOW") == 0 )
   {
-    // The second non-commented non-empty line records coef_a
-    if( sline[0] !='#' && !sline.empty() )
-    {
-      sstrm.str(sline);
-      double temp_coef;
-      while( sstrm >> temp_coef ) coef_a.push_back( temp_coef );
-
-      sstrm.clear();
-      break;
-    }
+    coef_a.resize(num_nbc); coef_b.resize(num_nbc);
+    num_of_mode.resize(num_nbc); w.resize(num_nbc); period.resize(num_nbc);
   }
+  else
+    SYS_T::print_fatal("CVFlowRate_Steady Error: inlet BC type in %s should be Inflow.\n", filename.c_str());
 
-  VEC_T::shrink2fit(coef_a);
-
-  if(static_cast<int>(coef_a.size()) != num_of_mode+1) SYS_T::print_fatal("Error: CVFlowRate_Steady input file %s, the a-coefficient array is incompatible with the given number of modes.\n", filename);
-
-  while( std::getline(reader, sline) )
+  // Read in num_of_mode, w, period, coef_a, and coef_b per nbc
+  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
   {
-    // The third non-commented non-empty line records coef_b
-    if( sline[0] !='#' && !sline.empty() )
+    while( std::getline(reader, sline) )
     {
-      sstrm.str(sline);
-      double temp_coef;
-      while( sstrm >> temp_coef ) coef_b.push_back( temp_coef );
+      // face_id num_of_mode w period
+      if( sline[0] !='#' && !sline.empty() )
+      {
+        sstrm.str(sline);
+        int face_id;
+        sstrm >> face_id;
 
-      sstrm.clear();
-      break;
+        if( face_id != nbc_id ) SYS_T::print_fatal("CVFlowRate_Steady Error: nbc in %s should be listed in ascending order.\n", filename.c_str());
+
+        sstrm >> num_of_mode[nbc_id];
+        sstrm >> w[nbc_id];
+        sstrm >> period[nbc_id];
+
+        sstrm.clear();
+        break;
+      }
     }
+
+    // Check the compatibility of period and w. If the difference
+    // is larger than 0.01, print a warning message
+    if( std::abs(2.0 * MATH_T::PI / period[nbc_id] - w[nbc_id] ) >= 0.01 )
+      SYS_T::commPrint( "\nCVFlowRate_Steady WARNING: nbc_id %d incompatible period and w, \n2xpi/period = %e and w = %e.\n", nbc_id, 2.0*MATH_T::PI/period[nbc_id], w[nbc_id] );
+
+    coef_a[nbc_id].clear(); coef_b[nbc_id].clear(); 
+
+    while( std::getline(reader, sline) )
+    {
+      // coef_a
+      if( sline[0] !='#' && !sline.empty() )
+      {
+        sstrm.str(sline);
+        double temp_coef;
+        while( sstrm >> temp_coef ) coef_a[nbc_id].push_back( temp_coef );
+     
+        sstrm.clear(); 
+        break;
+      }
+    }
+
+    VEC_T::shrink2fit( coef_a[nbc_id] );
+    
+    if( static_cast<int>(coef_a[nbc_id].size()) != num_of_mode[nbc_id]+1 )
+      SYS_T::print_fatal("CVFlowRate_Steady Error: nbc_id %d a-coefficients in %s incompatible with the given number of modes.\n", nbc_id, filename.c_str());
+
+    while( std::getline(reader, sline) )
+    {
+      // coef_b
+      if( sline[0] !='#' && !sline.empty() )
+      {
+        sstrm.str(sline);
+        double temp_coef;
+        while( sstrm >> temp_coef ) coef_b[nbc_id].push_back( temp_coef );
+     
+        sstrm.clear(); 
+        break;
+      }
+    }
+
+    VEC_T::shrink2fit( coef_b[nbc_id] );
+
+    if( static_cast<int>(coef_b[nbc_id].size()) != num_of_mode[nbc_id]+1 )
+      SYS_T::print_fatal("CVFlowRate_Steady Error: nbc_id %d b-coefficients in %s incompatible with the given number of modes.\n", nbc_id, filename.c_str());
   }
-
-  VEC_T::shrink2fit(coef_b);
-
-  if(static_cast<int>(coef_b.size()) != num_of_mode+1) SYS_T::print_fatal("Error: CVFlowRate_Steady input file %s, the b-coefficient array is incompatible with the given number of modes.\n", filename);
 
   // Finish reading the file and close it
   reader.close();
 
-  // Check the compatibility of period and w, if the difference
-  // is larger than 0.01, print a warning message
-  if( std::abs(2.0 * MATH_T::PI / period - w ) >= 0.01 ) SYS_T::commPrint("\nWARNING: CVFlowRate_Steady period and w does not match well: \n2xpi/period = %e and w = %e.\n", 2.0*MATH_T::PI/period, w);
-
-  std::vector<double> flow_waveform; flow_waveform.resize( static_cast<int>(period / 0.001) + 1 );
-  for(unsigned int ii = 0; ii < flow_waveform.size(); ++ii )
-  {
-    flow_waveform[ii] = coef_a[0];
-    
-    for(int jj=1; jj<=num_of_mode; ++jj)
-      flow_waveform[ii] += coef_a[jj]*cos(jj*w*ii*0.001) + coef_b[jj]*sin(jj*w*ii*0.001);
-  }
-
   // Define flow rate to be the smallest value in flow_waveform
-  flowrate = *std::min_element(flow_waveform.begin(), flow_waveform.end());
-  
-  // Calculate the flow rate and record them on disk as
-  // Inlet_flowrate.txt with sampling interval 0.001
-  if( SYS_T::get_MPI_rank() == 0 )
+  flowrate.resize( num_nbc );
+
+  for(int ii=0; ii<num_nbc; ++ii) flowrate[ii] = VEC_T::sum( coef_a[ii] );
+
+  // Calculate the flow rate and record them on disk as 
+  // Inlet_XXX_flowrate.txt with sampling interval 0.001
+  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
   {
-    std::ofstream ofile;
-    ofile.open( "Inlet_flowrate.txt", std::ofstream::out | std::ofstream::trunc );
-    for(unsigned int ii = 0; ii < flow_waveform.size(); ++ii )
-      ofile << ii * 0.001 << "\t" << flowrate << "\n";
-    ofile.close();
+    if( SYS_T::get_MPI_rank() == 0 )
+    {
+      std::ofstream ofile;
+      ofile.open( gen_flowfile_name(nbc_id).c_str(), std::ofstream::out | std::ofstream::trunc );
+      const double tt = 0.0;
+      ofile << tt <<'\t'<<get_flow_rate(nbc_id, tt)<< '\n';
+      ofile.close();
+    }
   }
 
   MPI_Barrier(PETSC_COMM_WORLD);
 }
 
-CVFlowRate_Steady::CVFlowRate_Steady( const double &in_flowrate ) : flowrate( in_flowrate )
+CVFlowRate_Steady::CVFlowRate_Steady( const int &in_num_nbc, const double &in_flowrate ) 
+: num_nbc(in_num_nbc)
 {
-  if( SYS_T::get_MPI_rank() == 0 )
+  flowrate.resize( num_nbc );
+
+  for(int ii=0; ii<num_nbc; ++ii) flowrate[ii] = in_flowrate;
+  
+  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
   {
-    std::ofstream ofile;
-    ofile.open( "Inlet_flowrate.txt", std::ofstream::out | std::ofstream::trunc );
-    ofile <<"constant flow rate is "<< flowrate << "\n";
-    ofile.close();
+    if( SYS_T::get_MPI_rank() == 0 )
+    {
+      std::ofstream ofile;
+      ofile.open( gen_flowfile_name(nbc_id).c_str(), std::ofstream::out | std::ofstream::trunc );
+      const double tt = 0.0;
+      ofile << tt <<'\t'<<get_flow_rate(nbc_id, tt)<< '\n';
+      ofile.close();
+    }
   }
 
   MPI_Barrier(PETSC_COMM_WORLD);
@@ -119,16 +159,20 @@ CVFlowRate_Steady::~CVFlowRate_Steady()
 {
 }
 
-double CVFlowRate_Steady::get_flow_rate(const double &time) const
+double CVFlowRate_Steady::get_flow_rate(const int &nbc_id , const double &time) const
 {
-  return flowrate;
+  return flowrate[nbc_id];
 }
 
 void CVFlowRate_Steady::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
   SYS_T::commPrint("  CVFlowRate_Steady:\n");
-  SYS_T::commPrint("  flowrate = %e \n", flowrate);
+  for(int nbc_id = 0; nbc_id < num_nbc; ++nbc_id)
+  {
+    SYS_T::commPrint("  -- nbc_id = %d", nbc_id);
+    SYS_T::commPrint("     flow rate =%e \n", flowrate[nbc_id]);
+  }
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 

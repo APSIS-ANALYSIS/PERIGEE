@@ -11,6 +11,8 @@
 // Author: Ju Liu
 // Date created: Aug. 6 2017
 // ==================================================================
+#include <sstream>
+#include <string>
 
 class ICVFlowRate
 {
@@ -22,6 +24,22 @@ class ICVFlowRate
     virtual double get_flow_rate( const int &nbc_id, const double &time ) const = 0;
 
     virtual void print_info() const = 0;
+
+  protected:
+    // ------------------------------------------------------------------------
+    // Generate a filename for inlet face nbc_id as Inlet_xxx_flowrate.txt
+    // ------------------------------------------------------------------------
+    virtual std::string gen_flowfile_name(const int &nbc_id) const
+    {
+      std::ostringstream ss;
+      ss << "Inlet_";
+      if( nbc_id/10 == 0 ) ss << "00";
+      else if( nbc_id/100 == 0 ) ss << "0";
+
+      ss << nbc_id << "_flowrate.txt";
+
+      return ss.str();
+    }
 };
 
 #endif
