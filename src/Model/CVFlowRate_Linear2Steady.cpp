@@ -149,7 +149,7 @@ CVFlowRate_Linear2Steady::CVFlowRate_Linear2Steady( const double &in_thred_time,
     {
       std::ofstream ofile;
       ofile.open( gen_flowfile_name(nbc_id).c_str(), std::ofstream::out | std::ofstream::trunc );
-      for(double tt = 0.0; tt <= period[nbc_id]; tt += 0.001 )
+      for( double tt = 0; tt <= thred_time * 2.0; tt += 0.001 )
         ofile << tt <<'\t'<<get_flow_rate(nbc_id, tt)<< '\n';
       ofile.close();
     }
