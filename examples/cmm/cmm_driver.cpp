@@ -27,6 +27,7 @@
 #include "GenBC_RCR.hpp"
 #include "GenBC_Inductance.hpp"
 #include "GenBC_Coronary.hpp"
+#include "GenBC_Pressure.hpp"
 #include "PLocAssem_Tet_CMM_GenAlpha.hpp"
 #include "PGAssem_Tet_CMM_GenAlpha.hpp"
 #include "PTime_CMM_Solver.hpp"
@@ -411,6 +412,8 @@ int main( int argc, char *argv[] )
     gbc = new GenBC_Inductance( lpn_file.c_str() );
   else if( GENBC_T::get_genbc_file_type( lpn_file.c_str() ) == 4  )
     gbc = new GenBC_Coronary( lpn_file.c_str(), 1000, initial_step, initial_index );
+  else if( GENBC_T::get_genbc_file_type( lpn_file.c_str() ) == 5  )
+    gbc = new GenBC_Pressure( lpn_file );
   else
     SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
 

@@ -19,6 +19,7 @@ namespace GENBC_T
   //   2 for RCR
   //   3 for Inductance
   //   4 for Coronary (including RCR)
+  //   5 for Pressure in Fourier modes
   // ----------------------------------------------------------------
   int get_genbc_file_type( const char * const &lpn_filename );
 

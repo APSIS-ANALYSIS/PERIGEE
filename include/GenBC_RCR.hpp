@@ -36,7 +36,7 @@ class GenBC_RCR : public IGenBC
     // Obtain P in order to the define the outlet traction for the ii-th 
     // outlet surface
     virtual double get_P( const int &ii, const double &in_dot_Q,
-       const double &in_Q ) const;
+       const double &in_Q, const double &time = 0.0 ) const;
 
     virtual double get_P0( const int &ii ) const
     {

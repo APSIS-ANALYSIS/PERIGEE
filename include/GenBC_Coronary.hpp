@@ -63,7 +63,8 @@ class GenBC_Coronary : public IGenBC
     { return 0.0; }
 
     // Obtain P for the ii-th outlet surface (coronary or RCR).
-    virtual double get_P( const int &ii, const double &in_dot_Q, const double &in_Q ) const;
+    virtual double get_P( const int &ii, const double &in_dot_Q, const double &in_Q,
+       const double &time = 0.0 ) const;
 
     // Get initial P for the ii-th outlet face at the beginninging of LPM ODE integration.
     // 0 <= ii < num_ebc

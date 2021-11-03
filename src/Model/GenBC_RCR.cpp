@@ -110,7 +110,7 @@ double GenBC_RCR::get_m( const int &ii, const double &in_dot_Q,
 
 
 double GenBC_RCR::get_P( const int &ii, const double &in_dot_Q,
-   const double &in_Q ) const
+   const double &in_Q, const double &time ) const
 {
   const double fac13 = 1.0 / 3.0;
   const double fac23 = 2.0 / 3.0;

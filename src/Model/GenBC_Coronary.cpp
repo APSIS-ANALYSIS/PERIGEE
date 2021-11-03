@@ -245,7 +245,7 @@ double GenBC_Coronary::get_m( const int &ii, const double &in_dot_Q, const doubl
 }
 
 double GenBC_Coronary::get_P( const int &ii, const double &in_dot_Q,
-    const double &in_Q ) const
+    const double &in_Q, const double &time ) const
 {
   double output_P = 0.0;
 

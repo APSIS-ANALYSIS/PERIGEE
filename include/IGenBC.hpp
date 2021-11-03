@@ -58,7 +58,7 @@ class IGenBC
     // Resistance x Q + P_offset
     // --------------------------------------------------------------
     virtual double get_P( const int &ii, const double &dot_Q,
-       const double &Q ) const = 0;
+       const double &Q, const double &time ) const = 0;
 
     // --------------------------------------------------------------
     // Return the pressure at the time step n, which is used as the

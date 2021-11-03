@@ -181,7 +181,8 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_EBC * const &ebc_part );
 
     // Resistance type boundary condition on outlet surfaces
-    void NatBC_Resis_G( const PDNSolution * const &dot_sol,
+    void NatBC_Resis_G( const double &curr_time, const double &dt,
+        const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
@@ -190,7 +191,7 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
-    void NatBC_Resis_KG( const double &dt,
+    void NatBC_Resis_KG( const double &curr_time, const double &dt,
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
         IPLocAssem * const &lassem_ptr,
