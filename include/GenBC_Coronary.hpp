@@ -48,7 +48,7 @@
 class GenBC_Coronary : public IGenBC
 {
   public:
-    GenBC_Coronary( const char * const &lpn_filename, const int &in_N, const double &dt3d,
+    GenBC_Coronary( const std::string &lpn_filename, const int &in_N, const double &dt3d,
         const int &in_index, const std::string &in_lpn_sol_file="lpn_coronary_sol.txt" );
 
     virtual ~GenBC_Coronary();

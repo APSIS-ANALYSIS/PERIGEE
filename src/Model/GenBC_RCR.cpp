@@ -1,16 +1,15 @@
 #include "GenBC_RCR.hpp"
 
-GenBC_RCR::GenBC_RCR( const char * const &lpn_filename, const int &in_N,
+GenBC_RCR::GenBC_RCR( const std::string &lpn_filename, const int &in_N,
     const double &dt3d )
 : N( in_N ), h( dt3d/static_cast<double>(N) ),
   absTol( 1.0e-8 ), relTol( 1.0e-5 )
 {
   // Now read the lpn files for num_ebc, Rd, C, and Rp
-  std::string temp_name( lpn_filename );
-  SYS_T::file_check( temp_name ); // make sure the file is on the disk
+  SYS_T::file_check( lpn_filename ); // make sure the file is on the disk
 
   std::ifstream reader;
-  reader.open( lpn_filename, std::ifstream::in );
+  reader.open( lpn_filename.c_str(), std::ifstream::in );
 
   std::istringstream sstrm;
   std::string sline;
@@ -39,7 +38,7 @@ GenBC_RCR::GenBC_RCR( const char * const &lpn_filename, const int &in_N,
     Rp.resize( num_ebc ); Pd.resize( num_ebc );
     Q0.resize( num_ebc ); Pi0.resize( num_ebc );
   }
-  else SYS_T::print_fatal("Error: the outflow model in %s does not match GenBC_Resistance.\n", lpn_filename);
+  else SYS_T::print_fatal("Error: the outflow model in %s does not match GenBC_Resistance.\n", lpn_filename.c_str());
 
   // Read files for each ebc to set the values of Rp, C, and Rd
   int counter = 0;
@@ -53,7 +52,7 @@ GenBC_RCR::GenBC_RCR( const char * const &lpn_filename, const int &in_N,
 
       // Make sure the face_id, the first column in the file are listed
       // from 0 to ebc_id - 1
-      if(face_id != counter) SYS_T::print_fatal("Error: GenBC_RCR the input file %s has wrong format in the face id column (the first column). \n", lpn_filename);
+      if(face_id != counter) SYS_T::print_fatal("Error: GenBC_RCR the input file %s has wrong format in the face id column (the first column). \n", lpn_filename.c_str());
 
       sstrm >> Rp[ counter ];
       sstrm >> C[ counter ];
@@ -65,11 +64,11 @@ GenBC_RCR::GenBC_RCR( const char * const &lpn_filename, const int &in_N,
     }
   }
 
-  if(counter != num_ebc ) SYS_T::print_fatal("Error: GenBC_RCR the input file %s does not contain complete data for outlet faces. \n", lpn_filename);
+  if(counter != num_ebc ) SYS_T::print_fatal("Error: GenBC_RCR the input file %s does not contain complete data for outlet faces. \n", lpn_filename.c_str());
 
   reader.close();
 
-  SYS_T::commPrint( "===> GenBC_RCR data are read in from %s.\n", lpn_filename );
+  SYS_T::commPrint( "===> GenBC_RCR data are read in from %s.\n", lpn_filename.c_str() );
 
   // Set a zero initial value. They should be reset based on the initial
   // 3D solutions.

@@ -407,11 +407,11 @@ int main( int argc, char *argv[] )
   if( GENBC_T::get_genbc_file_type( lpn_file.c_str() ) == 1  )
     gbc = new GenBC_Resistance( lpn_file );
   else if( GENBC_T::get_genbc_file_type( lpn_file.c_str() ) == 2  )
-    gbc = new GenBC_RCR( lpn_file.c_str(), 1000, initial_step );
+    gbc = new GenBC_RCR( lpn_file, 1000, initial_step );
   else if( GENBC_T::get_genbc_file_type( lpn_file.c_str() ) == 3  )
-    gbc = new GenBC_Inductance( lpn_file.c_str() );
+    gbc = new GenBC_Inductance( lpn_file );
   else if( GENBC_T::get_genbc_file_type( lpn_file.c_str() ) == 4  )
-    gbc = new GenBC_Coronary( lpn_file.c_str(), 1000, initial_step, initial_index );
+    gbc = new GenBC_Coronary( lpn_file, 1000, initial_step, initial_index );
   else if( GENBC_T::get_genbc_file_type( lpn_file.c_str() ) == 5  )
     gbc = new GenBC_Pressure( lpn_file );
   else

@@ -17,7 +17,7 @@
 class GenBC_Inductance : public IGenBC
 {
   public:
-    GenBC_Inductance( const char * const &lpn_filename );
+    GenBC_Inductance( const std::string &lpn_filename );
 
     virtual ~GenBC_Inductance();
 

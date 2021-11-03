@@ -15,8 +15,8 @@
 class GenBC_RCR : public IGenBC
 {
   public:
-    GenBC_RCR( const char * const &lpn_filename, const int &in_N,
-       const double &dt3d );
+    GenBC_RCR( const std::string &lpn_filename, const int &in_N, 
+        const double &dt3d );
 
     virtual ~GenBC_RCR(); 
 
