@@ -404,7 +404,7 @@ int main(int argc, char *argv[])
 
     const double dot_lpn_flowrate = dot_face_flrate;
     const double lpn_flowrate = face_flrate;
-    const double lpn_pressure = gbc -> get_P( ff, dot_lpn_flowrate, lpn_flowrate );
+    const double lpn_pressure = gbc -> get_P( ff, dot_lpn_flowrate, lpn_flowrate, timeinfo->get_time() );
 
     // Create the txt files and write the initial flow rates
     if(rank == 0)
