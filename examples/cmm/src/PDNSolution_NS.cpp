@@ -146,17 +146,13 @@ void PDNSolution_NS::Init_flow_parabolic(
 
     VecAssemblyBegin(solution); VecAssemblyEnd(solution);
     GhostUpdate();
-  }
-
-  if(is_print)
-  {
-    SYS_T::commPrint("     Initial solution: pres   = 0.0 \n");
-    SYS_T::commPrint("                       velo_x = parabolic \n");
-    SYS_T::commPrint("                       velo_y = parabolic \n");
-    SYS_T::commPrint("                       velo_z = parabolic \n");
-    SYS_T::commPrint("                       flow rate 1.0 .\n");
-    for(nbc_id=0; nbc_id<num_nbc; ++nbc_id)
+    if(is_print)
     {
+      SYS_T::commPrint("     Initial solution: pres   = 0.0 \n");
+      SYS_T::commPrint("                       velo_x = parabolic \n");
+      SYS_T::commPrint("                       velo_y = parabolic \n");
+      SYS_T::commPrint("                       velo_z = parabolic \n");
+      SYS_T::commPrint("                       flow rate 1.0 .\n");
       SYS_T::commPrint("                       -- nbc_id = %d \n", nbc_id);
       SYS_T::commPrint("                          max speed %e.\n", vmax);
       SYS_T::commPrint("                          active area is %e.\n", infbc->get_actarea(nbc_id) );
@@ -164,6 +160,7 @@ void PDNSolution_NS::Init_flow_parabolic(
       SYS_T::commPrint("                          out normal direction [%e %e %e].\n", out_nx, out_ny, out_nz);
     }
   }
+
 }
 
 void PDNSolution_NS::Init_pipe_parabolic(
