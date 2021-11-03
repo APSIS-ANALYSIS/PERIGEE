@@ -344,7 +344,7 @@ int main(int argc, char *argv[])
   IGenBC * gbc = nullptr;
 
   if( GENBC_T::get_genbc_file_type( lpn_file.c_str() ) == 1  )
-    gbc = new GenBC_Resistance( lpn_file.c_str() );
+    gbc = new GenBC_Resistance( lpn_file );
   else if( GENBC_T::get_genbc_file_type( lpn_file.c_str() ) == 2  )
     gbc = new GenBC_RCR( lpn_file.c_str(), 1000, initial_step );
   else

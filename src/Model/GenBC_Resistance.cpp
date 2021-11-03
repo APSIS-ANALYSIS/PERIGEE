@@ -1,13 +1,12 @@
 #include "GenBC_Resistance.hpp"
 
-GenBC_Resistance::GenBC_Resistance( const char * const &lpn_filename )
+GenBC_Resistance::GenBC_Resistance( const std::string &lpn_filename )
 {
   // Now read the values of resis_R and resis_Pd from disk file lpn_filename
-  std::string temp_name( lpn_filename );
-  SYS_T::file_check( temp_name ); // make sure the file is on the disk
+  SYS_T::file_check( lpn_filename ); // make sure the file is on the disk
 
   std::ifstream reader;
-  reader.open( lpn_filename, std::ifstream::in );
+  reader.open( lpn_filename.c_str(), std::ifstream::in );
 
   std::istringstream sstrm;
   std::string sline;
@@ -36,7 +35,7 @@ GenBC_Resistance::GenBC_Resistance( const char * const &lpn_filename )
     resis.resize( num_ebc ); pres_offset.resize( num_ebc );
     Q0.resize( num_ebc ); P0.resize( num_ebc );
   }
-  else SYS_T::print_fatal("Error: the outflow model in %s does not match GenBC_Resistance.\n", lpn_filename);
+  else SYS_T::print_fatal("Error: the outflow model in %s does not match GenBC_Resistance.\n", lpn_filename.c_str());
  
   // Read files for each ebc to define the parameters for LPN
   int counter = 0;
@@ -48,7 +47,7 @@ GenBC_Resistance::GenBC_Resistance( const char * const &lpn_filename )
       int face_id;
       sstrm >> face_id;
       
-      if(face_id != counter) SYS_T::print_fatal("Error: GenBC_Resistance the input file %s has wrong format in the face id column (the first column). \n", lpn_filename);
+      if(face_id != counter) SYS_T::print_fatal("Error: GenBC_Resistance the input file %s has wrong format in the face id column (the first column). \n", lpn_filename.c_str());
       
       sstrm >> resis[ counter ];
       sstrm >> pres_offset[ counter ];
@@ -59,11 +58,11 @@ GenBC_Resistance::GenBC_Resistance( const char * const &lpn_filename )
     }
   }
 
-  if(counter != num_ebc ) SYS_T::print_fatal("Error: GenBC_Resistance the input file %s does not contain complete data for outlet faces. \n", lpn_filename);
+  if(counter != num_ebc ) SYS_T::print_fatal("Error: GenBC_Resistance the input file %s does not contain complete data for outlet faces. \n", lpn_filename.c_str());
 
   reader.close();
 
-  SYS_T::commPrint( "===> GenBC_Resistance data are read in from %s.\n", lpn_filename );
+  SYS_T::commPrint( "===> GenBC_Resistance data are read in from %s.\n", lpn_filename.c_str() );
 
   // Set zero initial value.
   for(int ii=0; ii<num_ebc; ++ii)
@@ -73,10 +72,8 @@ GenBC_Resistance::GenBC_Resistance( const char * const &lpn_filename )
   }
 }
 
-
 GenBC_Resistance::~GenBC_Resistance()
 {}
-
 
 void GenBC_Resistance::print_info() const
 {

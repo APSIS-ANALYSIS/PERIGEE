@@ -16,7 +16,7 @@
 class GenBC_Resistance : public IGenBC
 {
   public:
-    GenBC_Resistance( const char * const &lpn_filename );
+    GenBC_Resistance( const std::string &lpn_filename );
 
     virtual ~GenBC_Resistance();
 
