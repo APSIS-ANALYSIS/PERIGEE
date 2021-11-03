@@ -23,6 +23,7 @@
 #include "FEAElement_Triangle6_membrane.hpp"
 #include "CVFlowRate_Unsteady.hpp"
 #include "CVFlowRate_Linear2Steady.hpp"
+#include "CVFlowRate_Steady.hpp"
 #include "GenBC_Resistance.hpp"
 #include "GenBC_RCR.hpp"
 #include "GenBC_Inductance.hpp"
