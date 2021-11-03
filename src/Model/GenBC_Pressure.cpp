@@ -58,8 +58,7 @@ GenBC_Pressure::GenBC_Pressure( const std::string &lpn_filename )
 
     // Check the compatibility of period and w. If the difference
     // is larger than 0.01, print a warning message
-    if( std::abs(2.0 * MATH_T::PI / period[ebc_id] - w[ebc_id] ) >= 0.01 )
-      SYS_T::commPrint( "\nGenBC_Pressure WARNING: ebc_id %d incompatible period and w, \n2xpi/period = %e and w = %e.\n", ebc_id, 2.0*MATH_T::PI/period[ebc_id], w[ebc_id] );
+    if( std::abs(2.0 * MATH_T::PI / period[ebc_id] - w[ebc_id] ) >= 0.01 ) SYS_T::commPrint( "\nGenBC_Pressure WARNING: ebc_id %d incompatible period and w, \n2xpi/period = %e and w = %e.\n", ebc_id, 2.0*MATH_T::PI/period[ebc_id], w[ebc_id] );
 
     coef_a[ebc_id].clear(); coef_b[ebc_id].clear();
 
@@ -79,8 +78,7 @@ GenBC_Pressure::GenBC_Pressure( const std::string &lpn_filename )
 
     VEC_T::shrink2fit( coef_a[ebc_id] );
 
-    if( static_cast<int>(coef_a[ebc_id].size()) != num_of_mode[ebc_id]+1 )
-      SYS_T::print_fatal( "GenBC_Pressure Error: ebc_id %d a-coefficients in %s incompatible with the given number of modes.\n", ebc_id, lpn_filename.c_str() );
+    if( static_cast<int>(coef_a[ebc_id].size()) != num_of_mode[ebc_id]+1 ) SYS_T::print_fatal( "GenBC_Pressure Error: ebc_id %d a-coefficients in %s incompatible with the given number of modes.\n", ebc_id, lpn_filename.c_str() );
 
     while( std::getline(reader, sline) )
     {
@@ -98,14 +96,14 @@ GenBC_Pressure::GenBC_Pressure( const std::string &lpn_filename )
 
     VEC_T::shrink2fit( coef_b[ebc_id] );
 
-    if( static_cast<int>(coef_b[ebc_id].size()) != num_of_mode[ebc_id]+1 )
-      SYS_T::print_fatal( "GenBC_Pressure Error: ebc_id %d b-coefficients in %s incompatible with the given number of modes.\n", ebc_id, lpn_filename.c_str() );
+    if( static_cast<int>(coef_b[ebc_id].size()) != num_of_mode[ebc_id]+1 ) SYS_T::print_fatal( "GenBC_Pressure Error: ebc_id %d b-coefficients in %s incompatible with the given number of modes.\n", ebc_id, lpn_filename.c_str() );
   }
 
   // Finish reading the file and close it
   reader.close();
 
   // Initialize P0 by setting it to be get_P at time = 0.0
+  P0.resize( num_ebc );
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
     P0[ebc_id] = get_P( ebc_id, 0.0, 0.0, 0.0 );
 }
