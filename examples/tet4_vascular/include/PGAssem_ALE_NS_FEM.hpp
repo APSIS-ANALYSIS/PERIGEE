@@ -220,7 +220,8 @@ class PGAssem_ALE_NS_FEM : public IPGAssem
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
-    void NatBC_Resis_G( const PDNSolution * const &dot_sol,
+    void NatBC_Resis_G( const double &curr_time, const double &dt,
+        const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
@@ -230,7 +231,7 @@ class PGAssem_ALE_NS_FEM : public IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
-    void NatBC_Resis_KG( const double &dt,
+    void NatBC_Resis_KG( const double &curr_time, const double &dt,
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
         IPLocAssem * const &lassem_ptr,

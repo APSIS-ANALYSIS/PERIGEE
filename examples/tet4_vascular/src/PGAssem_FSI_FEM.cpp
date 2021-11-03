@@ -363,7 +363,7 @@ void PGAssem_FSI_FEM::Assem_nonzero_estimate(
   PDNSolution * temp = new PDNSolution_Mixed_UPV_3D( node_ptr, 0, false );
 
   // choose an arbitrary (0.1) time step size just to get the nonzero pattern
-  NatBC_Resis_KG(0.1, temp, temp, lassem_f_ptr, elements, quad_s, node_ptr, 
+  NatBC_Resis_KG(0.0, 0.1, temp, temp, lassem_f_ptr, elements, quad_s, node_ptr, 
       nbc_part, ebc_part, gbc );
 
   delete temp;
@@ -513,7 +513,7 @@ void PGAssem_FSI_FEM::Assem_residual(
   BackFlow_G( lassem_f_ptr, elements, dof_mat*snLocBas, quad_s, nbc_part, ebc_part );
 
   // Resistance BC for G
-  NatBC_Resis_G( dot_sol_np1, sol_np1, lassem_f_ptr, elements, quad_s, node_ptr, 
+  NatBC_Resis_G( curr_time, dt, dot_sol_np1, sol_np1, lassem_f_ptr, elements, quad_s, node_ptr, 
       nbc_part, ebc_part, gbc );
 
   VecAssemblyBegin(G);
@@ -595,7 +595,7 @@ void PGAssem_FSI_FEM::Assem_tangent_residual(
       nbc_part, ebc_part );
 
   // Resistance BC for K and G
-  NatBC_Resis_KG( dt, dot_sol_np1, sol_np1, lassem_f_ptr, elements, quad_s, node_ptr,
+  NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_f_ptr, elements, quad_s, node_ptr,
       nbc_part, ebc_part, gbc );
 
   VecAssemblyBegin(G);
@@ -736,6 +736,7 @@ void PGAssem_FSI_FEM::BackFlow_KG( const double &dt,
 
 
 void PGAssem_FSI_FEM::NatBC_Resis_G(
+    const double &curr_time, const double &dt,
     const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     IPLocAssem * const &lassem_f_ptr,
@@ -761,7 +762,7 @@ void PGAssem_FSI_FEM::NatBC_Resis_G(
 
     // Get the pressure value on the outlet surfaces
     const double P_n = gbc -> get_P0( ebc_id );
-    const double P_np1 = gbc -> get_P( ebc_id, dot_flrate, flrate );
+    const double P_np1 = gbc -> get_P( ebc_id, dot_flrate, flrate, curr_time + dt );
 
     // P_n+alpha_f
     const double val = P_n + lassem_f_ptr->get_model_para_1() * (P_np1 - P_n);
@@ -797,7 +798,7 @@ void PGAssem_FSI_FEM::NatBC_Resis_G(
 }
 
 void PGAssem_FSI_FEM::NatBC_Resis_KG(
-    const double &dt,
+    const double &curr_time, const double &dt,
     const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     IPLocAssem * const &lassem_f_ptr,
@@ -833,7 +834,7 @@ void PGAssem_FSI_FEM::NatBC_Resis_KG(
 
     // Get the pressure value on the outlet surface
     const double P_n   = gbc -> get_P0( ebc_id );
-    const double P_np1 = gbc -> get_P( ebc_id, dot_flrate, flrate );
+    const double P_np1 = gbc -> get_P( ebc_id, dot_flrate, flrate, curr_time + dt );
 
     // P_n+alpha_f
     const double resis_val = P_n + a_f * (P_np1 - P_n);
