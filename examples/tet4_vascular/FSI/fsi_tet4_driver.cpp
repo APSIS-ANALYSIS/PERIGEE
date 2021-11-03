@@ -343,10 +343,16 @@ int main(int argc, char *argv[])
   // ===== GenBC =====
   IGenBC * gbc = nullptr;
 
-  if( GENBC_T::get_genbc_file_type( lpn_file.c_str() ) == 1  )
+  if( GENBC_T::get_genbc_file_type( lpn_file ) == 1  )
     gbc = new GenBC_Resistance( lpn_file );
-  else if( GENBC_T::get_genbc_file_type( lpn_file.c_str() ) == 2  )
-    gbc = new GenBC_RCR( lpn_file.c_str(), 1000, initial_step );
+  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 2  )
+    gbc = new GenBC_RCR( lpn_file, 1000, initial_step );
+  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 3  )
+    gbc = new GenBC_Inductance( lpn_file );
+  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 4  )
+    gbc = new GenBC_Coronary( lpn_file, 1000, initial_step, initial_index );
+  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 5  )
+    gbc = new GenBC_Pressure( lpn_file );
   else
     SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
 

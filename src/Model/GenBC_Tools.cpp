@@ -1,13 +1,12 @@
 #include "GenBC_Tools.hpp"
 
-int GENBC_T::get_genbc_file_type( const char * const &lpn_filename )
+int GENBC_T::get_genbc_file_type( const std::string &lpn_filename )
 {
   // open the file
-  const std::string temp_name( lpn_filename );
-  SYS_T::file_check( temp_name );
+  SYS_T::file_check( lpn_filename );
 
   std::ifstream reader;
-  reader.open( lpn_filename, std::ifstream::in );
+  reader.open( lpn_filename.c_str(), std::ifstream::in );
 
   // Read the fist non-comment line of the file
   std::istringstream sstrm;

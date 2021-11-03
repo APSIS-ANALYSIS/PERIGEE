@@ -21,7 +21,7 @@ namespace GENBC_T
   //   4 for Coronary (including RCR)
   //   5 for Pressure in Fourier modes
   // ----------------------------------------------------------------
-  int get_genbc_file_type( const char * const &lpn_filename );
+  int get_genbc_file_type( const std::string &lpn_filename );
 
   // ----------------------------------------------------------------
   // Evaluate a Piecewise Cubic Hermite Interpolating Polynomial (PCHIP) 
