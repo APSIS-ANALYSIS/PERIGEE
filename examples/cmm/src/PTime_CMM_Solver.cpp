@@ -201,7 +201,8 @@ void PTime_CMM_Solver::TM_CMM_GenAlpha(
       // Calculate the 0D pressure from LPN model
       const double dot_lpn_flowrate = dot_face_flrate;
       const double lpn_flowrate = face_flrate;
-      const double lpn_pressure = gbc -> get_P( face, dot_lpn_flowrate, lpn_flowrate );
+      const double lpn_pressure = gbc -> get_P( face, dot_lpn_flowrate, lpn_flowrate, 
+          time_info->get_time() );
 
       // Update the initial values in genbc
       gbc -> reset_initial_sol( face, lpn_flowrate, lpn_pressure, time_info->get_time(), false );
