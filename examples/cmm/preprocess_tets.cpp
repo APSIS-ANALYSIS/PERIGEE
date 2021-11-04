@@ -392,7 +392,7 @@ int main( int argc, char * argv[] )
     delete part; delete nbcpart; delete infpart; delete ringpart; delete ebcpart; delete wbcpart; 
   }
 
-  cout<<"\n===> Mesh Partition Quality: "<<endl;
+  cout<<"===> Mesh Partition Quality: "<<endl;
   cout<<" --- The largest ghost / local node ratio is: "<<VEC_T::max( list_ratio_g2l )<<'\n';
   cout<<" --- The smallest ghost / local node ratio is: "<<VEC_T::min( list_ratio_g2l )<<'\n';
   cout<<" --- The summation of the number of ghost nodes is: "<<sum_nghostnode<<endl;
