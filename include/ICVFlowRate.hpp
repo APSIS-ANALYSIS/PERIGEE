@@ -36,7 +36,7 @@ class ICVFlowRate
       if( nbc_id/10 == 0 ) ss << "00";
       else if( nbc_id/100 == 0 ) ss << "0";
 
-      ss << nbc_id << "_flowrate.txt";
+      ss << nbc_id << "_precalculated_flowrate.txt";
 
       return ss.str();
     }
