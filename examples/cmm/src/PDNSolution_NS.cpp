@@ -105,7 +105,7 @@ void PDNSolution_NS::Init_flow_parabolic(
 
   if(is_print)
   {
-    SYS_T::commPrint("     Initial solution: pres   = 0.0 \n");
+    SYS_T::commPrint("===> Initial solution: pres   = 0.0 \n");
     SYS_T::commPrint("                       velo_x = parabolic \n");
     SYS_T::commPrint("                       velo_y = parabolic \n");
     SYS_T::commPrint("                       velo_z = parabolic \n");
