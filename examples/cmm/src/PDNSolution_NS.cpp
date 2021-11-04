@@ -72,8 +72,7 @@ void PDNSolution_NS::Init_zero(const APart_Node * const &pNode_ptr)
     VecSetValues(solution, 4, location, value, INSERT_VALUES);
   }
 
-  VecAssemblyBegin(solution); VecAssemblyEnd(solution);
-  GhostUpdate();
+  Assembly_GhostUpdate();
 
   if( is_print )
   {
@@ -104,6 +103,15 @@ void PDNSolution_NS::Init_flow_parabolic(
     VecSetValues(solution, 4, location, value, INSERT_VALUES);
   }
 
+  if(is_print)
+  {
+    SYS_T::commPrint("     Initial solution: pres   = 0.0 \n");
+    SYS_T::commPrint("                       velo_x = parabolic \n");
+    SYS_T::commPrint("                       velo_y = parabolic \n");
+    SYS_T::commPrint("                       velo_z = parabolic \n");
+    SYS_T::commPrint("                       flow rate 1.0 .\n");
+  }
+  
   const int num_nbc = infbc->get_num_nbc();
 
   for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
@@ -117,7 +125,7 @@ void PDNSolution_NS::Init_flow_parabolic(
     const double out_nx = infbc->get_outvec(nbc_id).x();
     const double out_ny = infbc->get_outvec(nbc_id).y();
     const double out_nz = infbc->get_outvec(nbc_id).z();
- 
+
     // If there are inflow nodes, set their value to be parabolic flow
     if( infbc->get_Num_LD(nbc_id) > 0)
     {
@@ -143,16 +151,9 @@ void PDNSolution_NS::Init_flow_parabolic(
         }
       }
     }
-
-    VecAssemblyBegin(solution); VecAssemblyEnd(solution);
-    GhostUpdate();
+    
     if(is_print)
     {
-      SYS_T::commPrint("     Initial solution: pres   = 0.0 \n");
-      SYS_T::commPrint("                       velo_x = parabolic \n");
-      SYS_T::commPrint("                       velo_y = parabolic \n");
-      SYS_T::commPrint("                       velo_z = parabolic \n");
-      SYS_T::commPrint("                       flow rate 1.0 .\n");
       SYS_T::commPrint("                       -- nbc_id = %d \n", nbc_id);
       SYS_T::commPrint("                          max speed %e.\n", vmax);
       SYS_T::commPrint("                          active area is %e.\n", infbc->get_actarea(nbc_id) );
@@ -161,6 +162,7 @@ void PDNSolution_NS::Init_flow_parabolic(
     }
   }
 
+  Assembly_GhostUpdate();
 }
 
 void PDNSolution_NS::Init_pipe_parabolic(
@@ -213,9 +215,8 @@ void PDNSolution_NS::Init_pipe_parabolic(
 
     VecSetValues(solution, 4, location, value, INSERT_VALUES);
   }
-
-  VecAssemblyBegin(solution); VecAssemblyEnd(solution);
-  GhostUpdate();
+  
+  Assembly_GhostUpdate();
 
   if(is_print)
   {
@@ -245,8 +246,7 @@ void PDNSolution_NS::Init_no_flow_with_pressure( const APart_Node * const &pNode
     VecSetValues(solution, 4, location, value, INSERT_VALUES);
   }
 
-  VecAssemblyBegin(solution); VecAssemblyEnd(solution);
-  GhostUpdate();
+  Assembly_GhostUpdate();
 
   if(is_print)
   {
