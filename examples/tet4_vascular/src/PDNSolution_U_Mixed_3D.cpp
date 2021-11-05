@@ -25,10 +25,8 @@ PDNSolution_U_Mixed_3D::PDNSolution_U_Mixed_3D(
   }
 }
 
-
 PDNSolution_U_Mixed_3D::~PDNSolution_U_Mixed_3D()
 {}
-
 
 void PDNSolution_U_Mixed_3D::Init_test_1(
     const APart_Node * const &pNode_ptr,
@@ -51,10 +49,7 @@ void PDNSolution_U_Mixed_3D::Init_test_1(
     VecSetValues(solution, 3, location, value, INSERT_VALUES);
   }
 
-  VecAssemblyBegin(solution);
-  VecAssemblyEnd(solution);
-
-  GhostUpdate();
+  Assembly_GhostUpdate();
 
   if(is_print)
   {
@@ -63,7 +58,6 @@ void PDNSolution_U_Mixed_3D::Init_test_1(
     SYS_T::commPrint("                       disp_z = test \n");
   }
 }
-
 
 void PDNSolution_U_Mixed_3D::Init_test_2(
     const APart_Node * const &pNode_ptr,
@@ -87,10 +81,7 @@ void PDNSolution_U_Mixed_3D::Init_test_2(
     VecSetValues(solution, 3, location, value, INSERT_VALUES);
   }
 
-  VecAssemblyBegin(solution);
-  VecAssemblyEnd(solution);
-
-  GhostUpdate();
+  Assembly_GhostUpdate();
 
   if( is_print )
   {
@@ -99,7 +90,6 @@ void PDNSolution_U_Mixed_3D::Init_test_2(
     SYS_T::commPrint("                       disp_z = random \n");
   }
 }
-
 
 void PDNSolution_U_Mixed_3D::Init_zero(
     const APart_Node * const &pNode_ptr,
@@ -118,9 +108,7 @@ void PDNSolution_U_Mixed_3D::Init_zero(
     VecSetValues(solution, 3, location, value, INSERT_VALUES);
   }
 
-  VecAssemblyBegin(solution); VecAssemblyEnd(solution);
-
-  GhostUpdate();
+  Assembly_GhostUpdate();
 
   if(is_print)
   {

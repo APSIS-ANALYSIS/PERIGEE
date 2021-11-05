@@ -53,10 +53,7 @@ void PDNSolution_P_V_Mixed_3D::Init_test_1(
     VecSetValues(solution, 4, location, value, INSERT_VALUES);
   }
 
-  VecAssemblyBegin(solution);
-  VecAssemblyEnd(solution);
-
-  GhostUpdate();
+  Assembly_GhostUpdate();
 
   if(is_print)
   {
@@ -92,10 +89,7 @@ void PDNSolution_P_V_Mixed_3D::Init_test_2(
     VecSetValues(solution, 4, location, value, INSERT_VALUES);
   }
 
-  VecAssemblyBegin(solution);
-  VecAssemblyEnd(solution);
-
-  GhostUpdate();
+  Assembly_GhostUpdate();
 
   if(is_print)
   {
@@ -124,10 +118,7 @@ void PDNSolution_P_V_Mixed_3D::Init_zero(
     VecSetValues(solution, 4, location, value, INSERT_VALUES);
   }
 
-  VecAssemblyBegin(solution);
-  VecAssemblyEnd(solution);
-
-  GhostUpdate();
+  Assembly_GhostUpdate();
 
   if(is_print)
   {

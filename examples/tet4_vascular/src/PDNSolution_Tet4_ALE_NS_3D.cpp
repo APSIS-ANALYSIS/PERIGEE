@@ -23,7 +23,6 @@ PDNSolution_Tet4_ALE_NS_3D::PDNSolution_Tet4_ALE_NS_3D(
   }
 }
 
-
 PDNSolution_Tet4_ALE_NS_3D::PDNSolution_Tet4_ALE_NS_3D( 
     const APart_Node * const &pNode,
     const int &type, const bool &isprint ) 
@@ -42,10 +41,8 @@ PDNSolution_Tet4_ALE_NS_3D::PDNSolution_Tet4_ALE_NS_3D(
   }
 }
 
-
 PDNSolution_Tet4_ALE_NS_3D::~PDNSolution_Tet4_ALE_NS_3D()
 {}
-
 
 void PDNSolution_Tet4_ALE_NS_3D::Init_zero(const APart_Node * const &pNode_ptr)
 {
@@ -66,8 +63,7 @@ void PDNSolution_Tet4_ALE_NS_3D::Init_zero(const APart_Node * const &pNode_ptr)
     VecSetValues(solution, 7, location, value, INSERT_VALUES);
   }
 
-  VecAssemblyBegin(solution); VecAssemblyEnd(solution);
-  GhostUpdate();
+  Assembly_GhostUpdate();
 
   if( is_print )
   {
@@ -80,7 +76,6 @@ void PDNSolution_Tet4_ALE_NS_3D::Init_zero(const APart_Node * const &pNode_ptr)
     SYS_T::commPrint("                       velo_z = 0.0 \n");
   }
 }
-
 
 void PDNSolution_Tet4_ALE_NS_3D::Init_flow_parabolic(
     const APart_Node * const &pNode_ptr,
@@ -135,17 +130,16 @@ void PDNSolution_Tet4_ALE_NS_3D::Init_flow_parabolic(
         const double vel = vmax * (1.0 - r*r);
 
         // -1.0 is multiplied to make the flow direction inward
-        value[4] = vel * (-1.0) * out_nx;
-        value[5] = vel * (-1.0) * out_ny;
-        value[6] = vel * (-1.0) * out_nz;
+        value[4] = vel * out_nx;
+        value[5] = vel * out_ny;
+        value[6] = vel * out_nz;
 
         VecSetValues(solution, 7, location, value, INSERT_VALUES);
       }
     }
   }
 
-  VecAssemblyBegin(solution); VecAssemblyEnd(solution);
-  GhostUpdate();
+  Assembly_GhostUpdate();
 
   if(is_print)
   {

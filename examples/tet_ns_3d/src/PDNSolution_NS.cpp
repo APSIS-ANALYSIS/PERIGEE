@@ -26,7 +26,6 @@ PDNSolution_NS::PDNSolution_NS(
   }
 }
 
-
 PDNSolution_NS::PDNSolution_NS( 
     const APart_Node * const &pNode,
     const int &type, const bool &isprint ) 
@@ -45,10 +44,8 @@ PDNSolution_NS::PDNSolution_NS(
   }
 }
 
-
 PDNSolution_NS::~PDNSolution_NS()
 {}
-
 
 void PDNSolution_NS::Init_zero(const APart_Node * const &pNode_ptr)
 {
@@ -66,8 +63,7 @@ void PDNSolution_NS::Init_zero(const APart_Node * const &pNode_ptr)
     VecSetValues(solution, 4, location, value, INSERT_VALUES);
   }
 
-  VecAssemblyBegin(solution); VecAssemblyEnd(solution);
-  GhostUpdate();
+  Assembly_GhostUpdate();
 
   if( is_print )
   {
@@ -77,7 +73,6 @@ void PDNSolution_NS::Init_zero(const APart_Node * const &pNode_ptr)
     SYS_T::commPrint("                       velo_z = 0.0 \n");
   }
 }
-
 
 void PDNSolution_NS::Init_flow_parabolic(
     const APart_Node * const &pNode_ptr,
@@ -127,17 +122,16 @@ void PDNSolution_NS::Init_flow_parabolic(
         const double vel = vmax * (1.0 - r*r);
 
         // -1.0 is multiplied to make the flow direction inward
-        value[1] = vel * (-1.0) * out_nx;
-        value[2] = vel * (-1.0) * out_ny;
-        value[3] = vel * (-1.0) * out_nz;
+        value[1] = vel * out_nx;
+        value[2] = vel * out_ny;
+        value[3] = vel * out_nz;
 
         VecSetValues(solution, 4, location, value, INSERT_VALUES);
       }
     }
   }
 
-  VecAssemblyBegin(solution); VecAssemblyEnd(solution);
-  GhostUpdate();
+  Assembly_GhostUpdate();
 
   if(is_print)
   {
@@ -152,7 +146,6 @@ void PDNSolution_NS::Init_flow_parabolic(
     SYS_T::commPrint("                       direction [%e %e %e].\n", out_nx, out_ny, out_nz);
   }
 }
-
 
 void PDNSolution_NS::Init_pipe_parabolic(
     const APart_Node * const &pNode_ptr,
@@ -198,15 +191,14 @@ void PDNSolution_NS::Init_pipe_parabolic(
     const double vel = vmax * (1.0 - r*r);
 
     // -1.0 is multiplied to make the flow direction inward
-    value[1] = vel * (-1.0) * out_nx;
-    value[2] = vel * (-1.0) * out_ny;
-    value[3] = vel * (-1.0) * out_nz;
+    value[1] = vel * out_nx;
+    value[2] = vel * out_ny;
+    value[3] = vel * out_nz;
 
     VecSetValues(solution, 4, location, value, INSERT_VALUES);
   }
 
-  VecAssemblyBegin(solution); VecAssemblyEnd(solution);
-  GhostUpdate();
+  Assembly_GhostUpdate();
 
   if(is_print)
   {

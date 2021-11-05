@@ -87,9 +87,7 @@ void PDNSolution_Mixed_UPV_3D::Init_zero(
     VecSetValues(solution, 7, location, value, INSERT_VALUES);
   }
 
-  VecAssemblyBegin(solution); VecAssemblyEnd(solution);
-
-  GhostUpdate();
+  Assembly_GhostUpdate();
 
   if( is_print )
   {
@@ -159,9 +157,9 @@ void PDNSolution_Mixed_UPV_3D::Init_flow_parabolic(
 
           const double vel = vmax * (1.0 - r*r);
 
-          value[4] = vel * (-1.0) * out_nx;
-          value[5] = vel * (-1.0) * out_ny;
-          value[6] = vel * (-1.0) * out_nz;
+          value[4] = vel * out_nx;
+          value[5] = vel * out_ny;
+          value[6] = vel * out_nz;
 
           VecSetValues(solution, 7, location, value, INSERT_VALUES);
         }
@@ -169,8 +167,7 @@ void PDNSolution_Mixed_UPV_3D::Init_flow_parabolic(
     }
   }
 
-  VecAssemblyBegin(solution); VecAssemblyEnd(solution);
-  GhostUpdate();
+  Assembly_GhostUpdate();
 
   if( is_print )
   {
@@ -207,8 +204,7 @@ void PDNSolution_Mixed_UPV_3D::Init_pressure(
     VecSetValues(solution, 7, location, value, INSERT_VALUES);
   }
 
-  VecAssemblyBegin(solution); VecAssemblyEnd(solution);
-  GhostUpdate();
+  Assembly_GhostUpdate();
 
   if( is_print )
   {
