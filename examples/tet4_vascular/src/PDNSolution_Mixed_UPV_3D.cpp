@@ -22,7 +22,6 @@ PDNSolution_Mixed_UPV_3D::PDNSolution_Mixed_UPV_3D(
   }
 }
 
-
 PDNSolution_Mixed_UPV_3D::PDNSolution_Mixed_UPV_3D(
     const APart_Node * const &pNode,
     const FEANode * const &fNode_ptr,
@@ -43,7 +42,6 @@ PDNSolution_Mixed_UPV_3D::PDNSolution_Mixed_UPV_3D(
   }
 }
 
-
 PDNSolution_Mixed_UPV_3D::PDNSolution_Mixed_UPV_3D(
     const APart_Node * const &pNode,
     const int &type, const bool &isprint ) 
@@ -62,10 +60,8 @@ PDNSolution_Mixed_UPV_3D::PDNSolution_Mixed_UPV_3D(
   }
 }
 
-
 PDNSolution_Mixed_UPV_3D::~PDNSolution_Mixed_UPV_3D()
 {}
-
 
 void PDNSolution_Mixed_UPV_3D::Init_zero(
     const APart_Node * const &pNode_ptr )
@@ -94,7 +90,6 @@ void PDNSolution_Mixed_UPV_3D::Init_zero(
   }
 }
 
-
 void PDNSolution_Mixed_UPV_3D::Init_flow_parabolic( 
     const APart_Node * const &pNode_ptr,
     const FEANode * const &fNode_ptr,
@@ -112,6 +107,15 @@ void PDNSolution_Mixed_UPV_3D::Init_flow_parabolic(
     VecSetValues(solution, 7, location, value, INSERT_VALUES);
   }
 
+  if( is_print )
+  {
+    SYS_T::commPrint("===> Initial solution: pres   = 0.0 \n");
+    SYS_T::commPrint("                       velo_x = parabolic \n");
+    SYS_T::commPrint("                       velo_y = parabolic \n");
+    SYS_T::commPrint("                       velo_z = parabolic \n");
+    SYS_T::commPrint("                       flow rate 1.0 .\n");
+  }
+  
   const int num_nbc = infbc -> get_num_nbc();
 
   for(int nbc_id = 0; nbc_id < num_nbc; ++nbc_id)
@@ -136,7 +140,6 @@ void PDNSolution_Mixed_UPV_3D::Init_flow_parabolic(
 
           const Vector_3 pt = fNode_ptr -> get_ctrlPts_xyz(ii);
           const double r =  infbc -> get_radius( nbc_id, pt );
-
           const double vel = vmax * (1.0 - r*r);
 
           value[4] = vel * out_nx;
@@ -147,20 +150,19 @@ void PDNSolution_Mixed_UPV_3D::Init_flow_parabolic(
         }
       }
     }
+
+    if(is_print)
+    {
+      SYS_T::commPrint("                       -- nbc_id = %d \n", nbc_id);
+      SYS_T::commPrint("                          max speed %e.\n", vmax);
+      SYS_T::commPrint("                          active area is %e.\n", infbc->get_actarea(nbc_id) );
+      SYS_T::commPrint("                          full area is %e.\n", infbc->get_fularea(nbc_id) );
+      SYS_T::commPrint("                          outward normal direction [%e %e %e].\n", out_nx, out_ny, out_nz);
+    }
   }
 
   Assembly_GhostUpdate();
-
-  if( is_print )
-  {
-    SYS_T::commPrint("===> Initial solution: pres   = 0.0 \n");
-    SYS_T::commPrint("                       velo_x = parabolic \n");
-    SYS_T::commPrint("                       velo_y = parabolic \n");
-    SYS_T::commPrint("                       velo_z = parabolic \n");
-    SYS_T::commPrint("                       flow rate 1.0 .\n");
-  }
 }
-
 
 void PDNSolution_Mixed_UPV_3D::Init_pressure(
     const APart_Node * const &pNode_ptr,

@@ -127,7 +127,6 @@ void PDNSolution_NS::Init_flow_parabolic(
 
           const Vector_3 pt = fNode_ptr -> get_ctrlPts_xyz(ii);
           const double r = infbc -> get_radius( nbc_id, pt );
-
           const double vel = vmax * (1.0 - r*r);
 
           value[1] = vel * out_nx;
@@ -145,7 +144,7 @@ void PDNSolution_NS::Init_flow_parabolic(
       SYS_T::commPrint("                          max speed %e.\n", vmax);
       SYS_T::commPrint("                          active area is %e.\n", infbc->get_actarea(nbc_id) );
       SYS_T::commPrint("                          full area is %e.\n", infbc->get_fularea(nbc_id) );
-      SYS_T::commPrint("                          out normal direction [%e %e %e].\n", out_nx, out_ny, out_nz);
+      SYS_T::commPrint("                          outward normal direction [%e %e %e].\n", out_nx, out_ny, out_nz);
     }
   }
 
