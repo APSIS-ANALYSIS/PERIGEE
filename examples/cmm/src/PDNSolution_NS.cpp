@@ -55,17 +55,13 @@ PDNSolution_NS::~PDNSolution_NS()
 
 void PDNSolution_NS::Init_zero(const APart_Node * const &pNode_ptr)
 {
-  int location[4];
   const double value[4] = {0.0, 0.0, 0.0, 0.0};
   const int nlocalnode = pNode_ptr->get_nlocalnode();
 
   for(int ii=0; ii<nlocalnode; ++ii)
   {
-    location[0] = pNode_ptr->get_node_loc(ii) * 4;
-    location[1] = location[0] + 1;
-    location[2] = location[0] + 2;
-    location[3] = location[0] + 3;
-
+    const int pos = pNode_ptr->get_node_loc(ii) * 4;
+    const int location[4] = { pos, pos + 1, pos +2, pos + 3 };
     VecSetValues(solution, 4, location, value, INSERT_VALUES);
   }
 
@@ -85,18 +81,14 @@ void PDNSolution_NS::Init_flow_parabolic(
     const FEANode * const &fNode_ptr,
     const ALocal_Inflow_NodalBC * const &infbc )
 {
-  int location[4];
   double value[4] = {0.0, 0.0, 0.0, 0.0};
   const int nlocalnode = pNode_ptr->get_nlocalnode();
 
   // First enforce everything to be zero
   for(int ii=0; ii<nlocalnode; ++ii)
   {
-    location[0] = pNode_ptr->get_node_loc(ii) * 4;
-    location[1] = location[0] + 1;
-    location[2] = location[0] + 2;
-    location[3] = location[0] + 3;
-
+    const int pos = pNode_ptr->get_node_loc(ii) * 4;
+    const int location[4] = { pos, pos + 1, pos +2, pos + 3 };
     VecSetValues(solution, 4, location, value, INSERT_VALUES);
   }
 
@@ -130,10 +122,8 @@ void PDNSolution_NS::Init_flow_parabolic(
       {
         if( infbc->is_inLDN(nbc_id, pNode_ptr->get_node_loc(ii)) )
         {
-          location[0] = pNode_ptr->get_node_loc(ii) * 4;
-          location[1] = location[0] + 1;
-          location[2] = location[0] + 2;
-          location[3] = location[0] + 3;
+          const int pos = pNode_ptr->get_node_loc(ii) * 4;
+          const int location[4] = { pos, pos + 1, pos +2, pos + 3 };
 
           const Vector_3 pt = fNode_ptr -> get_ctrlPts_xyz(ii);
           const double r = infbc -> get_radius( nbc_id, pt );
@@ -148,7 +138,7 @@ void PDNSolution_NS::Init_flow_parabolic(
         }
       }
     }
-    
+
     if(is_print)
     {
       SYS_T::commPrint("                       -- nbc_id = %d \n", nbc_id);
@@ -166,17 +156,14 @@ void PDNSolution_NS::Init_pipe_parabolic(
     const APart_Node * const &pNode_ptr,
     const FEANode * const &fNode_ptr )
 {
-  int location[4];
   double value[4] = {0.0, 0.0, 0.0, 0.0};
   const int nlocalnode = pNode_ptr->get_nlocalnode();
 
   // First enforce everything to be zero
   for(int ii=0; ii<nlocalnode; ++ii)
   {
-    location[0] = pNode_ptr->get_node_loc(ii) * 4;
-    location[1] = location[0] + 1;
-    location[2] = location[0] + 2;
-    location[3] = location[0] + 3;
+    const int pos = pNode_ptr->get_node_loc(ii) * 4;
+    const int location[4] = { pos, pos + 1, pos +2, pos + 3 };
 
     VecSetValues(solution, 4, location, value, INSERT_VALUES);
   }
@@ -193,10 +180,8 @@ void PDNSolution_NS::Init_pipe_parabolic(
 
   for(int ii=0; ii<nlocalnode; ++ii)
   {
-    location[0] = pNode_ptr->get_node_loc(ii) * 4;
-    location[1] = location[0] + 1;
-    location[2] = location[0] + 2;
-    location[3] = location[0] + 3;
+    const int pos = pNode_ptr->get_node_loc(ii) * 4;
+    const int location[4] = { pos, pos + 1, pos +2, pos + 3 };
 
     const double x = fNode_ptr->get_ctrlPts_x(ii);
     const double y = fNode_ptr->get_ctrlPts_y(ii);
@@ -212,7 +197,7 @@ void PDNSolution_NS::Init_pipe_parabolic(
 
     VecSetValues(solution, 4, location, value, INSERT_VALUES);
   }
-  
+
   Assembly_GhostUpdate();
 
   if(is_print)
@@ -229,17 +214,13 @@ void PDNSolution_NS::Init_pipe_parabolic(
 void PDNSolution_NS::Init_no_flow_with_pressure( const APart_Node * const &pNode_ptr )
 {
   const double pres = 1500.0;
-  int location[4];
-  double value[4] = {pres, 0.0, 0.0, 0.0};
+  const double value[4] = {pres, 0.0, 0.0, 0.0};
   const int nlocalnode = pNode_ptr->get_nlocalnode();
 
   for(int ii=0; ii<nlocalnode; ++ii)
   {
-    location[0] = pNode_ptr->get_node_loc(ii) * 4;
-    location[1] = location[0] + 1;
-    location[2] = location[0] + 2;
-    location[3] = location[0] + 3;
-
+    const int pos = pNode_ptr->get_node_loc(ii) * 4;
+    const int location[4] = { pos, pos + 1, pos +2, pos + 3 };
     VecSetValues(solution, 4, location, value, INSERT_VALUES);
   }
 
