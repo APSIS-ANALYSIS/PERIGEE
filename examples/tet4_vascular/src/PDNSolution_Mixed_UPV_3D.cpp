@@ -70,20 +70,13 @@ PDNSolution_Mixed_UPV_3D::~PDNSolution_Mixed_UPV_3D()
 void PDNSolution_Mixed_UPV_3D::Init_zero(
     const APart_Node * const &pNode_ptr )
 {
-  int location[7];
   double value[7] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   const int nlocalnode = pNode_ptr->get_nlocalnode();
 
   for(int ii=0; ii<nlocalnode; ++ii)
   {
-    location[0] = pNode_ptr->get_node_loc(ii) * 7;
-    location[1] = location[0] + 1;
-    location[2] = location[0] + 2;
-    location[3] = location[0] + 3;
-    location[4] = location[0] + 4;
-    location[5] = location[0] + 5;
-    location[6] = location[0] + 6;
-
+    const int pos = pNode_ptr->get_node_loc(ii) * 7;
+    const int location[7] = { pos, pos + 1, pos + 2, pos + 3, pos + 4, pos + 5, pos + 6 };
     VecSetValues(solution, 7, location, value, INSERT_VALUES);
   }
 
@@ -107,20 +100,14 @@ void PDNSolution_Mixed_UPV_3D::Init_flow_parabolic(
     const FEANode * const &fNode_ptr,
     const ALocal_Inflow_NodalBC * const &infbc )
 {
-  int location[7];
   double value[7] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   const int nlocalnode = pNode_ptr->get_nlocalnode();
 
   // First enforce everything to be zero
   for(int ii=0; ii<nlocalnode; ++ii)
   {
-    location[0] = pNode_ptr->get_node_loc(ii) * 7;
-    location[1] = location[0] + 1;
-    location[2] = location[0] + 2;
-    location[3] = location[0] + 3;
-    location[4] = location[0] + 4;
-    location[5] = location[0] + 5;
-    location[6] = location[0] + 6;
+    const int pos = pNode_ptr->get_node_loc(ii) * 7;
+    const int location[7] = { pos, pos + 1, pos + 2, pos + 3, pos + 4, pos + 5, pos + 6 };
 
     VecSetValues(solution, 7, location, value, INSERT_VALUES);
   }
@@ -144,13 +131,8 @@ void PDNSolution_Mixed_UPV_3D::Init_flow_parabolic(
       {
         if( infbc->is_inLDN( nbc_id, pNode_ptr->get_node_loc(ii) ) )
         {
-          location[0] = pNode_ptr->get_node_loc(ii) * 7;
-          location[1] = location[0] + 1;
-          location[2] = location[0] + 2;
-          location[3] = location[0] + 3;
-          location[4] = location[0] + 4;
-          location[5] = location[0] + 5;
-          location[6] = location[0] + 6;
+          const int pos = pNode_ptr->get_node_loc(ii) * 7;
+          const int location[7] = { pos, pos + 1, pos + 2, pos + 3, pos + 4, pos + 5, pos + 6 };
 
           const Vector_3 pt = fNode_ptr -> get_ctrlPts_xyz(ii);
           const double r =  infbc -> get_radius( nbc_id, pt );
@@ -184,7 +166,6 @@ void PDNSolution_Mixed_UPV_3D::Init_pressure(
     const APart_Node * const &pNode_ptr,
     const FEANode * const &fNode_ptr )
 {
-  int location[7];
   double value[7] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   const int nlocalnode = pNode_ptr->get_nlocalnode_fluid();
 
@@ -193,13 +174,8 @@ void PDNSolution_Mixed_UPV_3D::Init_pressure(
   for(int ii=0; ii<nlocalnode; ++ii)
   {
     const int loc_node = pNode_ptr->get_node_loc_fluid(ii);
-    location[0] = pNode_ptr->get_node_loc( loc_node ) * 7;
-    location[1] = location[0] + 1;
-    location[2] = location[0] + 2;
-    location[3] = location[0] + 3;
-    location[4] = location[0] + 4;
-    location[5] = location[0] + 5;
-    location[6] = location[0] + 6;
+    const int pos = pNode_ptr->get_node_loc( loc_node ) * 7;
+    const int location[7] = { pos, pos + 1, pos + 2, pos + 3, pos + 4, pos + 5, pos + 6 };
 
     VecSetValues(solution, 7, location, value, INSERT_VALUES);
   }
