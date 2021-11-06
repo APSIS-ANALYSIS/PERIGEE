@@ -329,8 +329,6 @@ int main( int argc, char *argv[] )
 
   ICVFlowRate * inflow_rate_ptr = nullptr;
 
-  // If inflow file exists, prescribe it. Otherwise, prescribe an inflow that 
-  // linearly increases until a steady flow rate.
   if( inflow_type == 0 )
     inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file );
   else if( inflow_type == 1 )

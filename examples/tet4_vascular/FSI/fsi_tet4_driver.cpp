@@ -54,17 +54,24 @@ int main(int argc, char *argv[])
   double mesh_nu = 0.3;
 
   // inflow file
+  int inflow_type = 0;               // flag for determining inflow type 0 pulsatile flow; 
+                                     //                                  1 linear-to-steady; 
+                                     //                                  2 steady.
+
   std::string inflow_file("inflow_fourier_series.txt");
+
+  double inflow_thd_time = 1.0;      // time for linearly increasing inflow to reach steady state
 
   // LPN file
   std::string lpn_file("lpn_rcr_input.txt");
 
-  double inflow_thd_time = 1.0;      // time for linearly increasing inflow to reach steady state
-  double inflow_tgt_rate = 1.0;      // inflow upon reaching steady state
-
   // back flow stabilization
   double bs_beta = 0.2;
-  
+
+  // Generalized-alpha method
+  double genA_rho_inf = 0.5;
+  bool is_backward_Euler = false;
+
   // part file location
   std::string part_file("part");
 
@@ -96,7 +103,11 @@ int main(int argc, char *argv[])
 
   const PetscMPIInt rank = SYS_T::get_MPI_rank();
   const PetscMPIInt size = SYS_T::get_MPI_size();
-  
+ 
+  SYS_T::commPrint("Job starts at %s %s \n", SYS_T::get_time().c_str(), SYS_T::get_date().c_str());
+
+  SYS_T::print_perigee_art();
+
   // ===== Command Line Argument =====
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
 
@@ -104,6 +115,8 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionInt("-nqp_tri", nqp_tri);
   SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
   SYS_T::GetOptionReal("-bs_beta", bs_beta);
+  SYS_T::GetOptionReal(  "-rho_inf",         genA_rho_inf);
+  SYS_T::GetOptionBool(  "-is_backward_Euler", is_backward_Euler);
   SYS_T::GetOptionReal("-fl_density", fluid_density);
   SYS_T::GetOptionReal("-fl_mu", fluid_mu);
   SYS_T::GetOptionReal("-sl_density", solid_density);
@@ -111,9 +124,9 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-sl_nu", solid_nu);
   SYS_T::GetOptionReal("-mesh_E", mesh_E);
   SYS_T::GetOptionReal("-mesh_nu", mesh_nu);
+  SYS_T::GetOptionInt(   "-inflow_type",     inflow_type);
   SYS_T::GetOptionString("-inflow_file", inflow_file);
   SYS_T::GetOptionReal(  "-inflow_thd_time", inflow_thd_time);
-  SYS_T::GetOptionReal(  "-inflow_tgt_rate", inflow_tgt_rate);
   SYS_T::GetOptionString("-lpn_file", lpn_file);
   SYS_T::GetOptionString("-part_file", part_file);
   SYS_T::GetOptionReal("-nl_rtol", nl_rtol);
@@ -147,15 +160,29 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-mesh_E:", mesh_E);
   SYS_T::cmdPrint("-mesh_nu:", mesh_nu);
   
-  // If the inflow file exists, print its filename.
-  // Otherwise, print parameters for linear2steady inflow setting. 
-  if( SYS_T::file_exist( inflow_file ) )
-    SYS_T::cmdPrint(    "-inflow_file:",     inflow_file);
+  if( is_backward_Euler )
+    SYS_T::commPrint(     "-is_backward_Euler: true \n");
   else
+    SYS_T::cmdPrint(      "-rho_inf:",         genA_rho_inf);
+   
+  if( inflow_type == 0 )
   {
-    SYS_T::cmdPrint(    "-inflow_thd_time:", inflow_thd_time);
-    SYS_T::cmdPrint(    "-inflow_tgt_rate:", inflow_tgt_rate);
+    SYS_T::commPrint(   "-inflow_type: 0 (pulsatile flow) \n");
+    SYS_T::cmdPrint(    "-inflow_file:",     inflow_file);
   }
+  else if( inflow_type == 1 )
+  {
+    SYS_T::commPrint(   "-inflow_type: 1 (linear-to-steady flow) \n");
+    SYS_T::cmdPrint(    "-inflow_file:",     inflow_file);
+    SYS_T::cmdPrint(    "-inflow_thd_time:", inflow_thd_time);
+  }
+  else if( inflow_type == 2 )
+  {
+    SYS_T::commPrint(   "-inflow_type: 2 (steady flow) \n");
+    SYS_T::cmdPrint(    "-inflow_file:",     inflow_file);
+  }
+  else
+    SYS_T::print_fatal("Error: unrecognized inflow_type = %d. \n", inflow_type);  
 
   SYS_T::cmdPrint("-lpn_file:", lpn_file);
   SYS_T::cmdPrint("-part_file:", part_file);
@@ -198,13 +225,10 @@ int main(int argc, char *argv[])
     
     cmdh5w->write_string(        "lpn_file",        lpn_file);
 
-    if( SYS_T::file_exist( inflow_file ) )
-      cmdh5w->write_string(      "inflow_file",     inflow_file);
-    else
-    {
+    cmdh5w->write_intScalar(     "inflow_type",     inflow_type);
+    cmdh5w->write_string(        "inflow_file",     inflow_file);
+    if( inflow_type == 1 )
       cmdh5w->write_doubleScalar("inflow_thd_time", inflow_thd_time );
-      cmdh5w->write_doubleScalar("inflow_tgt_rate", inflow_tgt_rate );
-    }
 
     delete cmdh5w; H5Fclose(cmd_file_id);
   }
@@ -247,13 +271,15 @@ int main(int argc, char *argv[])
   
   ICVFlowRate * inflow_rate_ptr = nullptr;
  
-  // If inflow file exists, prescribe it. Otherwise, prescribe an inflow that 
-  // linearly increases until a steady flow rate.
-  if( SYS_T::file_exist( inflow_file ) )
-    inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
+  if( inflow_type == 0 )
+    inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file );
+  else if( inflow_type == 1 )
+    inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_file );
+  else if( inflow_type == 2 )
+    inflow_rate_ptr = new CVFlowRate_Steady( inflow_file );
   else
-    inflow_rate_ptr = new CVFlowRate_Linear2Steady( locinfnbc->get_num_nbc(), inflow_thd_time, inflow_tgt_rate );
-
+    SYS_T::print_fatal("Error: unrecognized inflow_type = %d. \n", inflow_type);
+  
   inflow_rate_ptr->print_info();
 
   // ===== Quadrature rules and FEM container =====
@@ -274,10 +300,14 @@ int main(int argc, char *argv[])
 
   // ===== Generate the generalized-alpha method
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
-  const double genA_spectrium = 0.5;
-  const bool genA_is2ndSystem = false;
-  TimeMethod_GenAlpha * tm_galpha_ptr = new TimeMethod_GenAlpha(
-      genA_spectrium, genA_is2ndSystem);
+  
+  TimeMethod_GenAlpha * tm_galpha_ptr = nullptr;
+
+  if( is_backward_Euler )
+    tm_galpha_ptr = new TimeMethod_GenAlpha( 1.0, 1.0, 1.0 );
+  else
+    tm_galpha_ptr = new TimeMethod_GenAlpha( genA_rho_inf, false );
+  
   tm_galpha_ptr->print_info();
 
   // ===== Local assembly =====
