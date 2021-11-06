@@ -219,11 +219,7 @@ namespace SYS_T
   //    PetscPrintf() with PETSC_COMM_WORLD is used.
   inline void commPrint(const char output[], ...)
   {
-    PetscMPIInt rank;
-
-    MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
-
-    if(!rank)
+    if( !get_MPI_rank() )
     {
       va_list Argp;
       va_start(Argp, output);

@@ -149,8 +149,8 @@ namespace VEC_T
   // ! get_pos
   //   find the position (pos) of the given val such that 
   //                 vec[pos] = val
-  //   if there are multiple same values in vector, it will return the
-  //   first appearance of the givne val.
+  //   if there are multiple same values in vector, it will return the first 
+  //   appearance of the given val.
   //   if the val is not found, return -1.
   // --------------------------------------------------------------------------
   template<typename T> int get_pos( const std::vector<T> &vec, const T &val )
