@@ -118,6 +118,7 @@ mpirun -np 60 ./wall_solver \
   -ksp_type gmres -pc_type asm -ksp_rtol 1.0e-2 -ksp_atol 1.0e-50 -ksp_max_it 200 -ksp_gmres_restart 200 \
   -log_view
 ```
+Note, in the generation of prestress, it is recommended to clamp the ring (-ringbc_type 0), and not prescribing any supporting tissue boundary condition. This can be critical for quick convergence of the prestress solver.
 
 4. Now we can rerun the preprocessor to assign boundary conditions for the deformable wall simulation.
 ```sh
