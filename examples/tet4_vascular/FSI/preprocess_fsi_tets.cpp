@@ -177,7 +177,7 @@ int main( int argc, char * argv[] )
   std::vector<int> phy_tag;
   std::vector<double> ctrlPts;
 
-  TET_T::read_vtu_grid(geo_file.c_str(), nFunc, nElem, ctrlPts, vecIEN, phy_tag);
+  TET_T::read_vtu_grid( geo_file, nFunc, nElem, ctrlPts, vecIEN, phy_tag );
 
   for(unsigned int ii=0; ii<phy_tag.size(); ++ii)
   {
@@ -220,10 +220,9 @@ int main( int argc, char * argv[] )
   // Partition
   IGlobal_Part * global_part = nullptr;
   if(cpu_size > 1)
-    global_part = new Global_Part_METIS( cpu_size, in_ncommon,
-        isDualGraph, mesh, IEN, "epart", "npart" );
+    global_part = new Global_Part_METIS( cpu_size, in_ncommon, isDualGraph, mesh, IEN );
   else if(cpu_size == 1)
-    global_part = new Global_Part_Serial( mesh, "epart", "npart" );
+    global_part = new Global_Part_Serial( mesh );
   else
   {
     std::cerr<<"ERROR: wrong cpu_size: "<<cpu_size<<std::endl;
