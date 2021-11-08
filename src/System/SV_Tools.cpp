@@ -271,6 +271,7 @@ void SV_T::update_sv_sur_vtu( const std::string &filename,
 
 void SV_T::update_sv_vtp( const std::string &filename,
     const std::string &writename,
+    const int &nstart, const int &estart,
     const std::vector<int> &nmap, const std::vector<int> &emap )
 {
   vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
@@ -278,8 +279,8 @@ void SV_T::update_sv_vtp( const std::string &filename,
   reader -> Update();
 
   vtkPolyData * polydata = reader -> GetOutput();
-  int numpts = static_cast<int>( polydata -> GetNumberOfPoints() );
-  int numcels = static_cast<int>( polydata -> GetNumberOfPolys() );
+  const int numpts = static_cast<int>( polydata -> GetNumberOfPoints() );
+  const int numcels = static_cast<int>( polydata -> GetNumberOfPolys() );
 
   vtkCellData * celldata = polydata->GetCellData();
   vtkDataArray * cd = celldata->GetScalars("GlobalElementID");
@@ -291,9 +292,9 @@ void SV_T::update_sv_vtp( const std::string &filename,
   pt.clear();
   std::vector<int> global_node_index; 
   global_node_index.clear();
-  double pt_xyz[3];
   for(int ii=0; ii<numpts; ++ii)
   {
+    double pt_xyz[3];
     polydata -> GetPoint(ii, pt_xyz);
     pt.push_back(pt_xyz[0]);
     pt.push_back(pt_xyz[1]);
@@ -322,10 +323,10 @@ void SV_T::update_sv_vtp( const std::string &filename,
   // Update the nodal and elemental indices
   // minus 1 because the files are from SimVascular
   for(unsigned int ii=0; ii<global_node_index.size(); ++ii)
-    global_node_index[ii] = nmap[ global_node_index[ii] - 1 ];
+    global_node_index[ii] = nmap[ global_node_index[ii] - nstart ];
 
   for(unsigned int ii=0; ii<global_ele_index.size(); ++ii)
-    global_ele_index[ii] = emap[ global_ele_index[ii] - 1 ];
+    global_ele_index[ii] = emap[ global_ele_index[ii] - estart ];
 
   // File name generate
   std::string fname(writename);
