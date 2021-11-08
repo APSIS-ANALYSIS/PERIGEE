@@ -17,10 +17,10 @@ void TET_T::read_vtu_grid( const std::string &filename,
   numcels = static_cast<int>( vtkugrid -> GetNumberOfCells() );
 
   // xyz coordinates of the points
-  double pt_xyz[3];
   pt.clear();
   for(int ii=0; ii<numpts; ++ii)
   {
+    double pt_xyz[3];
     vtkugrid -> GetPoint(ii, pt_xyz);
     pt.push_back(pt_xyz[0]);
     pt.push_back(pt_xyz[1]);
@@ -254,9 +254,9 @@ void TET_T::read_vtp_grid( const std::string &filename,
   numcels = static_cast<int>( polydata -> GetNumberOfPolys() );
 
   pt.clear();
-  double pt_xyz[3];
   for(int ii=0; ii<numpts; ++ii)
   {
+    double pt_xyz[3];
     polydata -> GetPoint(ii, pt_xyz);
     pt.push_back(pt_xyz[0]);
     pt.push_back(pt_xyz[1]);
@@ -318,12 +318,9 @@ void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
   // 1. nodal points coordinates
   vtkPoints * ppt = vtkPoints::New(); 
   ppt->SetDataTypeToDouble();
-  double coor[3];
   for(int ii=0; ii<numpts; ++ii)
   {
-    coor[0] = pt[3*ii];
-    coor[1] = pt[3*ii+1];
-    coor[2] = pt[3*ii+2];
+    const double coor[3] = { pt[3*ii], pt[3*ii+1], pt[3*ii+2] };
     ppt -> InsertPoint(ii, coor);
   }
 
@@ -556,12 +553,9 @@ void TET_T::gen_triangle_grid( vtkPolyData * const &grid_w,
   // 1. nodal points
   vtkPoints * ppt = vtkPoints::New();
   ppt->SetDataTypeToDouble();
-  double coor[3];
   for(int ii=0; ii<numpts; ++ii)
   {
-    coor[0] = pt[3*ii];
-    coor[1] = pt[3*ii+1];
-    coor[2] = pt[3*ii+2];
+    const double coor[3] = { pt[3*ii], pt[3*ii+1], pt[3*ii+2] };
     ppt -> InsertPoint(ii, coor);
   }
 
@@ -625,12 +619,9 @@ void TET_T::gen_quadratic_triangle_grid( vtkUnstructuredGrid * const &grid_w,
   // 1. nodal points
   vtkPoints * ppt = vtkPoints::New(); 
   ppt->SetDataTypeToDouble();
-  double coor[3];
   for(int ii=0; ii<numpts; ++ii)
   {
-    coor[0] = pt[3*ii];
-    coor[1] = pt[3*ii+1];
-    coor[2] = pt[3*ii+2];
+    const double coor[3] = { pt[3*ii], pt[3*ii+1], pt[3*ii+2] };
     ppt -> InsertPoint(ii, coor);
   }
 
