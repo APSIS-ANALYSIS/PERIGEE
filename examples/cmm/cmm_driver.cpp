@@ -216,11 +216,11 @@ int main( int argc, char *argv[] )
   if(is_restart)
   {
     SYS_T::commPrint(   "-is_restart: true \n");
-    SYS_T::cmdPrint(    "-restart_index:",   restart_index);
-    SYS_T::cmdPrint(    "-restart_time:",    restart_time);
-    SYS_T::cmdPrint(    "-restart_step:",    restart_step);
-    SYS_T::cmdPrint(    "-restart_name:",    restart_name);
-    SYS_T::cmdPrint(    "-restart_disp_name:",    restart_disp_name);
+    SYS_T::cmdPrint(    "-restart_index:",     restart_index);
+    SYS_T::cmdPrint(    "-restart_time:",      restart_time);
+    SYS_T::cmdPrint(    "-restart_step:",      restart_step);
+    SYS_T::cmdPrint(    "-restart_name:",      restart_name);
+    SYS_T::cmdPrint(    "-restart_disp_name:", restart_disp_name);
   }
   else SYS_T::commPrint("-is_restart: false \n");
 

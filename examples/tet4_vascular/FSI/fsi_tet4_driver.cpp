@@ -111,41 +111,41 @@ int main(int argc, char *argv[])
   // ===== Command Line Argument =====
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
 
-  SYS_T::GetOptionInt("-nqp_tet", nqp_tet);
-  SYS_T::GetOptionInt("-nqp_tri", nqp_tri);
-  SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
-  SYS_T::GetOptionReal("-bs_beta", bs_beta);
-  SYS_T::GetOptionReal(  "-rho_inf",         genA_rho_inf);
+  SYS_T::GetOptionInt(   "-nqp_tet",           nqp_tet);
+  SYS_T::GetOptionInt(   "-nqp_tri",           nqp_tri);
+  SYS_T::GetOptionInt(   "-nz_estimate",       nz_estimate);
+  SYS_T::GetOptionReal(  "-bs_beta",           bs_beta);
+  SYS_T::GetOptionReal(  "-rho_inf",           genA_rho_inf);
   SYS_T::GetOptionBool(  "-is_backward_Euler", is_backward_Euler);
-  SYS_T::GetOptionReal("-fl_density", fluid_density);
-  SYS_T::GetOptionReal("-fl_mu", fluid_mu);
-  SYS_T::GetOptionReal("-sl_density", solid_density);
-  SYS_T::GetOptionReal("-sl_E", solid_E);
-  SYS_T::GetOptionReal("-sl_nu", solid_nu);
-  SYS_T::GetOptionReal("-mesh_E", mesh_E);
-  SYS_T::GetOptionReal("-mesh_nu", mesh_nu);
-  SYS_T::GetOptionInt(   "-inflow_type",     inflow_type);
-  SYS_T::GetOptionString("-inflow_file", inflow_file);
-  SYS_T::GetOptionReal(  "-inflow_thd_time", inflow_thd_time);
-  SYS_T::GetOptionString("-lpn_file", lpn_file);
-  SYS_T::GetOptionString("-part_file", part_file);
-  SYS_T::GetOptionReal("-nl_rtol", nl_rtol);
-  SYS_T::GetOptionReal("-nl_atol", nl_atol);
-  SYS_T::GetOptionReal("-nl_dtol", nl_dtol);
-  SYS_T::GetOptionInt("-nl_maxits", nl_maxits);
-  SYS_T::GetOptionInt("-nl_refreq", nl_refreq);
-  SYS_T::GetOptionReal("-init_time", initial_time);
-  SYS_T::GetOptionReal("-fina_time", final_time);
-  SYS_T::GetOptionReal("-init_step", initial_step);
-  SYS_T::GetOptionInt("-init_index", initial_index);
-  SYS_T::GetOptionInt("-ttan_freq", ttan_renew_freq);
-  SYS_T::GetOptionInt("-sol_rec_freq", sol_record_freq);
-  SYS_T::GetOptionString("-sol_name", sol_bName);
-  SYS_T::GetOptionBool("-is_restart", is_restart);
-  SYS_T::GetOptionInt("-restart_index", restart_index);
-  SYS_T::GetOptionReal("-restart_time", restart_time);
-  SYS_T::GetOptionReal("-restart_step", restart_step);
-  SYS_T::GetOptionString("-restart_name", restart_name);
+  SYS_T::GetOptionReal(  "-fl_density",        fluid_density);
+  SYS_T::GetOptionReal(  "-fl_mu",             fluid_mu);
+  SYS_T::GetOptionReal(  "-sl_density",        solid_density);
+  SYS_T::GetOptionReal(  "-sl_E",              solid_E);
+  SYS_T::GetOptionReal(  "-sl_nu",             solid_nu);
+  SYS_T::GetOptionReal(  "-mesh_E",            mesh_E);
+  SYS_T::GetOptionReal(  "-mesh_nu",           mesh_nu);
+  SYS_T::GetOptionInt(   "-inflow_type",       inflow_type);
+  SYS_T::GetOptionString("-inflow_file",       inflow_file);
+  SYS_T::GetOptionReal(  "-inflow_thd_time",   inflow_thd_time);
+  SYS_T::GetOptionString("-lpn_file",          lpn_file);
+  SYS_T::GetOptionString("-part_file",         part_file);
+  SYS_T::GetOptionReal(  "-nl_rtol",           nl_rtol);
+  SYS_T::GetOptionReal(  "-nl_atol",           nl_atol);
+  SYS_T::GetOptionReal(  "-nl_dtol",           nl_dtol);
+  SYS_T::GetOptionInt(   "-nl_maxits",         nl_maxits);
+  SYS_T::GetOptionInt(   "-nl_refreq",         nl_refreq);
+  SYS_T::GetOptionReal(  "-init_time",         initial_time);
+  SYS_T::GetOptionReal(  "-fina_time",         final_time);
+  SYS_T::GetOptionReal(  "-init_step",         initial_step);
+  SYS_T::GetOptionInt(   "-init_index",        initial_index);
+  SYS_T::GetOptionInt(   "-ttan_freq",         ttan_renew_freq);
+  SYS_T::GetOptionInt(   "-sol_rec_freq",      sol_record_freq);
+  SYS_T::GetOptionString("-sol_name",          sol_bName);
+  SYS_T::GetOptionBool(  "-is_restart",        is_restart);
+  SYS_T::GetOptionInt(   "-restart_index",     restart_index);
+  SYS_T::GetOptionReal(  "-restart_time",      restart_time);
+  SYS_T::GetOptionReal(  "-restart_step",      restart_step);
+  SYS_T::GetOptionString("-restart_name",      restart_name);
 
   // ===== Print the command line argumetn on screen =====
   SYS_T::cmdPrint("-nqp_tet:", nqp_tet);
@@ -200,13 +200,13 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-sol_name:", sol_bName);
   if(is_restart)
   {
-    PetscPrintf(PETSC_COMM_WORLD, "-is_restart: true \n");
+    SYS_T::commPrint("-is_restart: true \n");
     SYS_T::cmdPrint("-restart_index:", restart_index);
     SYS_T::cmdPrint("-restart_time:", restart_time);
     SYS_T::cmdPrint("-restart_step:", restart_step);
     SYS_T::cmdPrint("-restart_name:", restart_name);
   }
-  else PetscPrintf(PETSC_COMM_WORLD, "-is_restart: false \n");
+  else SYS_T::commPrint("-is_restart: false \n"); 
 
   // ===== Record important parameters =====
   if(rank == 0)
@@ -214,14 +214,14 @@ int main(int argc, char *argv[])
     hid_t cmd_file_id = H5Fcreate("solver_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
     HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
 
-    cmdh5w->write_doubleScalar("fl_density", fluid_density);
-    cmdh5w->write_doubleScalar("fl_mu", fluid_mu);
-    cmdh5w->write_doubleScalar("sl_density", solid_density);
-    cmdh5w->write_doubleScalar("sl_E", solid_E);
-    cmdh5w->write_doubleScalar("sl_nu", solid_nu);
-    cmdh5w->write_doubleScalar("mesh_E", mesh_E);
-    cmdh5w->write_doubleScalar("mesh_nu", mesh_nu);
-    cmdh5w->write_doubleScalar("init_step", initial_step);
+    cmdh5w->write_doubleScalar(  "fl_density",      fluid_density);
+    cmdh5w->write_doubleScalar(  "fl_mu",           fluid_mu);
+    cmdh5w->write_doubleScalar(  "sl_density",      solid_density);
+    cmdh5w->write_doubleScalar(  "sl_E",            solid_E);
+    cmdh5w->write_doubleScalar(  "sl_nu",           solid_nu);
+    cmdh5w->write_doubleScalar(  "mesh_E",          mesh_E);
+    cmdh5w->write_doubleScalar(  "mesh_nu",         mesh_nu);
+    cmdh5w->write_doubleScalar(  "init_step",       initial_step);
     
     cmdh5w->write_string(        "lpn_file",        lpn_file);
 
@@ -262,7 +262,7 @@ int main(int argc, char *argv[])
 
   // ===== Basic Checking =====
   SYS_T::print_fatal_if( size!= PartBasic->get_cpu_size(),
-            "Error: Assigned CPU number does not match the partition. \n");
+      "Error: Assigned CPU number does not match the partition. \n");
 
   SYS_T::commPrint("===> %d processor(s) are assigned for FEM analysis. \n", size);
 
