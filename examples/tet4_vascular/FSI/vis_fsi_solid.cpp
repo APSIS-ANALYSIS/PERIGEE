@@ -21,8 +21,8 @@ int main( int argc, char * argv[] )
   const std::string element_part_file = "epart.h5";
   const std::string anode_mapping_file = "node_mapping.h5";
   const std::string pnode_mapping_file = "post_node_mapping.h5";
-  
-  const std::string part_file("postpart");
+
+  const std::string part_file="./ppart/postpart";
 
   std::string sol_bname("SOL_");
   std::string out_bname("VIS_S_");

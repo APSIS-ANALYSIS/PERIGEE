@@ -18,7 +18,6 @@
 int main( int argc, char * argv[] )
 {
   // Clean the existing postpart hdf5 files
-  SYS_T::execute("rm -rf postpart_p*.h5");
   SYS_T::execute("rm -rf ppart");
   SYS_T::execute("mkdir ppart");
 

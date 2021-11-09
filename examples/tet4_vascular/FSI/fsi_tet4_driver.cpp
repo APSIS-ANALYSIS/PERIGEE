@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
   bool is_backward_Euler = false;
 
   // part file location
-  std::string part_file("part");
+  const std::string part_file("./apart/part");
 
   // Nonlinear solver parameters
   double nl_rtol = 1.0e-3;
@@ -128,7 +128,6 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionString("-inflow_file",       inflow_file);
   SYS_T::GetOptionReal(  "-inflow_thd_time",   inflow_thd_time);
   SYS_T::GetOptionString("-lpn_file",          lpn_file);
-  SYS_T::GetOptionString("-part_file",         part_file);
   SYS_T::GetOptionReal(  "-nl_rtol",           nl_rtol);
   SYS_T::GetOptionReal(  "-nl_atol",           nl_atol);
   SYS_T::GetOptionReal(  "-nl_dtol",           nl_dtol);
@@ -185,7 +184,6 @@ int main(int argc, char *argv[])
     SYS_T::print_fatal("Error: unrecognized inflow_type = %d. \n", inflow_type);  
 
   SYS_T::cmdPrint("-lpn_file:", lpn_file);
-  SYS_T::cmdPrint("-part_file:", part_file);
   SYS_T::cmdPrint("-nl_rtol:", nl_rtol);
   SYS_T::cmdPrint("-nl_atol:", nl_atol);
   SYS_T::cmdPrint("-nl_dtol:", nl_dtol);

@@ -31,8 +31,9 @@
 int main( int argc, char * argv[] )
 {
   // Remove previously existing hdf5 files
-  SYS_T::execute("rm -rf part_p*.h5");
   SYS_T::execute("rm -rf preprocessor_cmd.h5");
+  SYS_T::execute("rm -rf apart");
+  SYS_T::execute("mkdir apart");
 
   // Define basic settings
   const int dofNum = 7; // degree-of-freedom for the physical problem
@@ -55,7 +56,7 @@ int main( int argc, char * argv[] )
 
   int num_outlet = 1, num_inlet = 1;
 
-  const std::string part_file("part");
+  const std::string part_file("./apart/part");
 
   int cpu_size = 1;
   int in_ncommon = 2;
