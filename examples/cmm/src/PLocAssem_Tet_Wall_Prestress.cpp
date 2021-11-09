@@ -14,18 +14,15 @@ PLocAssem_Tet_Wall_Prestress::PLocAssem_Tet_Wall_Prestress(
   if(elemtype == 501)
   {
     // 501 is linear element
-    //nLocBas = 4; 
     snLocBas = 3;
   }
   else if(elemtype == 502)
   {
     // 502 is quadratic element
-    //nLocBas = 10; 
     snLocBas = 6;
   }
   else SYS_T::print_fatal("Error: unknown elem type.\n");
 
-  //vec_size = nLocBas  * 4;
   sur_size = snLocBas * 4; // dof_per_node = 4
 
   // We do not need volumetric element matrix or vector
@@ -236,18 +233,18 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
 
       sur_Residual[4*A+1] += gwts * h_w * ( R[A] * rho_w * ( u_t - fw.x() )
           + NA_x * sigma[qua].xx() + NA_y * sigma[qua].xy() + NA_z * sigma[qua].xz() )
-        + gwts * R[A] * ( ks_w * disp_x + cs_w * u )
-        - gwts * R[A] * pp * n_out.x(); 
+          + gwts * R[A] * ( ks_w * disp_x + cs_w * u )
+          - gwts * R[A] * pp * n_out.x(); 
 
       sur_Residual[4*A+2] += gwts * h_w * ( R[A] * rho_w * ( v_t - fw.y() )
           + NA_x * sigma[qua].yx() + NA_y * sigma[qua].yy() + NA_z * sigma[qua].yz() ) 
-        + gwts * R[A] * ( ks_w * disp_y + cs_w * v )
-        - gwts * R[A] * pp * n_out.y(); 
+          + gwts * R[A] * ( ks_w * disp_y + cs_w * v )
+          - gwts * R[A] * pp * n_out.y(); 
 
       sur_Residual[4*A+3] += gwts * h_w * ( R[A] * rho_w * ( w_t - fw.z() )
           + NA_x * sigma[qua].zx() + NA_y * sigma[qua].zy() + NA_z * sigma[qua].zz() ) 
-        + gwts * R[A] * ( ks_w * disp_z + cs_w * w )
-        - gwts * R[A] * pp * n_out.z(); 
+          + gwts * R[A] * ( ks_w * disp_z + cs_w * w )
+          - gwts * R[A] * pp * n_out.z(); 
 
       for(int B=0; B<snLocBas; ++B)
       {
@@ -255,7 +252,7 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
         sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+1 ] += gwts * h_w * (
             alpha_m * rho_w * R[A] * R[B]
             + dd_du * Kg[ (snLocBas*dim)*(A*dim) + (B*dim) ] )
-          + gwts * R[A] * R[B] * ( dd_du * ks_w + dd_dv * cs_w );
+            + gwts * R[A] * R[B] * ( dd_du * ks_w + dd_dv * cs_w );
 
         sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+2 ] += gwts * h_w * (
             dd_du * Kg[ (snLocBas*dim)*(A*dim) + (B*dim+1) ] );
@@ -270,7 +267,7 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
         sur_Tangent[ 4*snLocBas*(4*A+2) + 4*B+2 ] += gwts * h_w * (
             alpha_m * rho_w * R[A] * R[B]
             + dd_du * Kg[ (snLocBas*dim)*(A*dim+1) + (B*dim+1) ] )
-          + gwts * R[A] * R[B] * ( dd_du * ks_w + dd_dv * cs_w );
+            + gwts * R[A] * R[B] * ( dd_du * ks_w + dd_dv * cs_w );
 
         sur_Tangent[ 4*snLocBas*(4*A+2) + 4*B+3 ] += gwts * h_w * (
             dd_du * Kg[ (snLocBas*dim)*(A*dim+1) + (B*dim+2) ] );
@@ -285,13 +282,12 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
         sur_Tangent[ 4*snLocBas*(4*A+3) + 4*B+3 ] += gwts * h_w * (
             alpha_m * rho_w * R[A] * R[B]
             + dd_du * Kg[ (snLocBas*dim)*(A*dim+2) + (B*dim+2) ] )
-          + gwts * R[A] * R[B] * ( dd_du * ks_w + dd_dv * cs_w );
+            + gwts * R[A] * R[B] * ( dd_du * ks_w + dd_dv * cs_w );
 
       } // end B loop
     } // end A loop
 
-    delete [] Kl; delete [] Kg;
-    Kl = nullptr; Kg = nullptr;
+    delete [] Kl; delete [] Kg; Kl = nullptr; Kg = nullptr;
 
   } // end qua loop
 
