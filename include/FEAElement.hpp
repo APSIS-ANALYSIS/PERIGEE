@@ -16,6 +16,7 @@
 // Date created: Nov. 6 2013
 // ==================================================================
 #include <cassert>
+#include <array>
 #include "ALocal_IEN.hpp"
 #include "IALocal_IEN.hpp"
 #include "IALocal_meshSize.hpp"
@@ -327,6 +328,12 @@ class FEAElement
     virtual void get_Jacobian(const int &quaindex, double * const &jac_value) 
       const {SYS_T::commPrint("Warning: get_Jacobian is not implemented. \n");} 
 
+    virtual std::array<double,9> get_Jacobian( const int &quaindex ) const
+    {
+      SYS_T::commPrint("Warning: get_Jacobian is not implemented. \n");
+      return {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    }
+
     // ------------------------------------------------------------------------    
     // Return the inversion of the Jacobian matrix, the 9(4) components are
     // given. The output array dxi_dx is a 9 or 4 component array for 3D / 2D
@@ -334,6 +341,12 @@ class FEAElement
     // ------------------------------------------------------------------------    
     virtual void get_invJacobian(const int &quaindex, double * const &dxi_dx)
       const {SYS_T::commPrint("Warning: get_invJacobian is not implemented. \n");} 
+
+    virtual std::array<double,9> get_invJacobian( const int &quaindex ) const
+    {
+      SYS_T::commPrint("Warning: get_Jacobian is not implemented. \n");
+      return {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    }
 
     // ------------------------------------------------------------------------    
     // Return the global-to-lamina rotation matrix for transforming between the

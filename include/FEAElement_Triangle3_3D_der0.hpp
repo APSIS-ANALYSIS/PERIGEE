@@ -74,9 +74,6 @@ class FEAElement_Triangle3_3D_der0 : public FEAElement
     // 0 <= ii < 3 x numQuapts
     double * R;
 
-    // container for dx_dr, dx_ds, dy_dr, dy_ds, dz_dr, dz_ds :
-    double dx_dr, dx_ds, dy_dr, dy_ds, dz_dr, dz_ds;
-
     // unit outward normal vector
     double unx, uny, unz;
 

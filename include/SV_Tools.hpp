@@ -97,6 +97,7 @@ namespace SV_T
   // ---------------------------------------------------------------- 
   void update_sv_vtp( const std::string &filename,
       const std::string &writename,
+      const int &nstart, const int &estart,
       const std::vector<int> &nmap, const std::vector<int> &emap );
 
   // ----------------------------------------------------------------

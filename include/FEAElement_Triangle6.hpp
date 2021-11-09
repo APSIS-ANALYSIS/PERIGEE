@@ -10,6 +10,7 @@
 // Date created: Nov. 28 2017
 // ==================================================================
 #include "FEAElement.hpp"
+#include "Matrix_double_3by3_Array.hpp"
 
 class FEAElement_Triangle6 : public FEAElement
 {
@@ -49,11 +50,21 @@ class FEAElement_Triangle6 : public FEAElement
     virtual void get_R_gradR( const int &quaindex, double * const &basis,
         double * const &basis_x, double * const &basis_y ) const;
 
+    virtual std::vector<double> get_dR_dx( const int &quaindex ) const;
+
+    virtual std::vector<double> get_dR_dy( const int &quaindex ) const;
+
     virtual void get_2D_R_dR_d2R( const int &quaindex,
         double * const &basis,
         double * const &basis_x, double * const &basis_y,
         double * const &basis_xx, double * const &basis_yy,
         double * const &basis_xy ) const;
+
+    virtual std::vector<double> get_d2R_dxx( const int &quaindex ) const;
+
+    virtual std::vector<double> get_d2R_dyy( const int &quaindex ) const;
+
+    virtual std::vector<double> get_d2R_dxy( const int &quaindex ) const;
 
     virtual void get_Jacobian(const int &quaindex,
         double * const &jac_value) const;
@@ -68,19 +79,14 @@ class FEAElement_Triangle6 : public FEAElement
     const int numQuapts;
 
     // length 6 x numQuapts
-    double * R;
-    double * dR_dx;
-    double * dR_dy;
+    double * R, * dR_dx, * dR_dy;
+    double * d2R_dxx, * d2R_dyy, * d2R_dxy;
 
     // length 9 x numQuapts
     // dx_ds : 0             <= ii < 4 * numQuapts
     // ds_dx : 4 * numQuapts <= ii < 8 * numQuapts
     // detJac: 8 * numQuapts <= ii < 9 * numQuapts
     double * Jac;
-  
-    // auxiliary data
-    double * dR_dr;
-    double * dR_ds;
 };
 
 #endif

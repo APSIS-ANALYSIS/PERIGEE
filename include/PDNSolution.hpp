@@ -51,7 +51,6 @@ class PDNSolution
 
     // ------------------------------------------------------------------------
     // ! Generate a random solution vector.
-    //   This is used mainly for debugging.
     // ------------------------------------------------------------------------
     virtual void Gen_random();
 

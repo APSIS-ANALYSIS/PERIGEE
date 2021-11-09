@@ -153,10 +153,6 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
 
     int nLocBas, snLocBas, vec_size, sur_size;
 
-    std::vector<double> R, dR_dx, dR_dy, dR_dz;
-
-    std::vector<double> d2R_dxx, d2R_dyy, d2R_dzz;
-
     double dxi_dx[9];
 
     // Private functions

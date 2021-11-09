@@ -90,6 +90,12 @@ class FEAElement_Tet10_v2 : public FEAElement
         double * const &basis_x, double * const &basis_y,
         double * const &basis_z ) const;
 
+    virtual std::vector<double> get_dR_dx( const int &quaindex ) const;
+
+    virtual std::vector<double> get_dR_dy( const int &quaindex ) const;
+
+    virtual std::vector<double> get_dR_dz( const int &quaindex ) const;
+
     virtual void get_3D_R_dR_d2R( const int &quaindex,
         double * const &basis, double * const &basis_x,
         double * const &basis_y, double * const &basis_z,
@@ -103,14 +109,27 @@ class FEAElement_Tet10_v2 : public FEAElement
         double * const &basis_xx, double * const &basis_yy,
         double * const &basis_zz ) const;
 
-    virtual void get_Jacobian(const int &quaindex,
-        double * const &jac_value) const;
+    virtual std::vector<double> get_d2R_dxx( const int &quaindex ) const;
 
-    virtual void get_invJacobian(const int &quaindex,
-        double * const &jac_value) const;
+    virtual std::vector<double> get_d2R_dyy( const int &quaindex ) const;
 
-    virtual double get_detJac(const int &quaindex) const
-    {return detJac[quaindex];}
+    virtual std::vector<double> get_d2R_dzz( const int &quaindex ) const;
+
+    virtual std::vector<double> get_d2R_dxy( const int &quaindex ) const;
+
+    virtual std::vector<double> get_d2R_dxz( const int &quaindex ) const;
+
+    virtual std::vector<double> get_d2R_dyz( const int &quaindex ) const;
+
+    virtual void get_Jacobian(const int &quaindex, double * const &jac_value) const;
+
+    virtual std::array<double,9> get_Jacobian( const int &quaindex ) const;
+
+    virtual void get_invJacobian(const int &quaindex, double * const &jac_value) const;
+
+    virtual std::array<double,9> get_invJacobian( const int &quaindex ) const;
+
+    virtual double get_detJac(const int &quaindex) const {return detJac[quaindex];}
 
   private:
     const int numQuapts;
@@ -119,12 +138,6 @@ class FEAElement_Tet10_v2 : public FEAElement
     double * R, * dR_dx, * dR_dy, * dR_dz;
     double * d2R_dxx, * d2R_dyy, * d2R_dzz;
     double * d2R_dxy, * d2R_dxz, * d2R_dyz;
-
-    // Container for dR_ds/t/u and second derivatives at quad pts.
-    // Length is 10
-    double dR_dr [10],   dR_ds [10],   dR_dt [10];
-    double d2R_drr [10], d2R_dss [10], d2R_dtt [10];
-    double d2R_drs [10], d2R_drt [10], d2R_dst [10]; 
 
     // Container for
     // dx_dr : 0 <= ii < 9 numQuapts
