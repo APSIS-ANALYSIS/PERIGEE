@@ -1,4 +1,3 @@
-#include <array>
 #include "Vec_Tools.hpp"
 #include "Vector_3.hpp"
 #include "Matrix_3x3.hpp"
@@ -39,17 +38,23 @@ int main( int argc, char * argv[] )
 
   std::cout<<std::setprecision(16)<<v1(0)<<'\t'<<v1(1)<<'\t'<<v1(2)<<'\n';
 
+  v2.print();
 
-  std::array<int,3> vv {};
+  v3.print();
 
-  for(int ii=0; ii<3; ++ii) std::cout<<vv[ii]<<'\n';
+  int nsize = 4;
 
+  std::vector<int> b (nsize, -100), c (5, 99), d (2, 1);
 
-
+  std::cout<<b.size()<<'\t'<<b.capacity()<<std::endl;
   
+  VEC_T::print(b);
 
+  b = {1, 3, 5, -1, -2, -3, -5};
   
+  VEC_T::print(b);
 
+  std::cout<<b.size()<<'\t'<<b.capacity()<<'\t'<<VEC_T::sum(b)<<std::endl;
 
   return EXIT_SUCCESS;
 }
