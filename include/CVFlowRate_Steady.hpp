@@ -24,6 +24,8 @@ class CVFlowRate_Steady : public ICVFlowRate
 
     virtual double get_flow_rate(const int &nbc_id, const double &time) const;
 
+    virtual int get_num_nbc() const { return num_nbc; }
+
     virtual void print_info() const;
 
   private:

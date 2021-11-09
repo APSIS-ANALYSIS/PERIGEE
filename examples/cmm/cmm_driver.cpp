@@ -338,6 +338,9 @@ int main( int argc, char *argv[] )
 
   inflow_rate_ptr->print_info();
 
+  SYS_T::print_fatal_if(locinfnbc->get_num_nbc() != inflow_rate_ptr->get_num_nbc(),
+      "Error: ALocal_Inflow_NodalBC number of faces does not match with that in ICVFlowRate.\n");
+
   // ===== Generate a sparse matrix for enforcing nodal BCs ====
   Matrix_PETSc * pmat = new Matrix_PETSc( pNode, locnbc );
   pmat->gen_perm_bc( pNode, locnbc );

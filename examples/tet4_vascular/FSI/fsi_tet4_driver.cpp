@@ -280,6 +280,9 @@ int main(int argc, char *argv[])
   
   inflow_rate_ptr->print_info();
 
+  SYS_T::print_fatal_if(locinfnbc->get_num_nbc() != inflow_rate_ptr->get_num_nbc(),
+      "Error: ALocal_Inflow_NodalBC number of faces does not match with that in ICVFlowRate.\n");
+
   // ===== Quadrature rules and FEM container =====
   SYS_T::commPrint("===> Build quadrature rules. \n");
   IQuadPts * quadv = new QuadPts_Gauss_Tet( nqp_tet );
@@ -307,7 +310,7 @@ int main(int argc, char *argv[])
     tm_galpha_ptr = new TimeMethod_GenAlpha( genA_rho_inf, false );
   
   tm_galpha_ptr->print_info();
-
+  
   // ===== Local assembly =====
   IPLocAssem * locAssem_fluid_ptr = new PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha(
       tm_galpha_ptr, GMIptr->get_nLocBas(),

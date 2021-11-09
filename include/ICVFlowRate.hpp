@@ -23,6 +23,8 @@ class ICVFlowRate
 
     virtual double get_flow_rate( const int &nbc_id, const double &time ) const = 0;
 
+    virtual int get_num_nbc() const = 0;
+
     virtual void print_info() const = 0;
 
   protected:

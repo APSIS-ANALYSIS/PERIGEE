@@ -153,11 +153,11 @@ void PDNSolution_Mixed_UPV_3D::Init_flow_parabolic(
 
     if(is_print)
     {
-      SYS_T::commPrint("                       -- nbc_id = %d \n", nbc_id);
-      SYS_T::commPrint("                          max speed %e.\n", vmax);
-      SYS_T::commPrint("                          active area is %e.\n", infbc->get_actarea(nbc_id) );
-      SYS_T::commPrint("                          full area is %e.\n", infbc->get_fularea(nbc_id) );
-      SYS_T::commPrint("                          outward normal direction [%e %e %e].\n", out_nx, out_ny, out_nz);
+      SYS_T::commPrint("                     -- nbc_id = %d \n", nbc_id);
+      SYS_T::commPrint("                        max speed %e.\n", vmax);
+      SYS_T::commPrint("                        active area is %e.\n", infbc->get_actarea(nbc_id) );
+      SYS_T::commPrint("                        full area is %e.\n", infbc->get_fularea(nbc_id) );
+      SYS_T::commPrint("                        outward normal direction [%e %e %e].\n", out_nx, out_ny, out_nz);
     }
   }
 
