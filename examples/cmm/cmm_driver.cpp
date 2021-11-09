@@ -165,9 +165,9 @@ int main( int argc, char *argv[] )
   SYS_T::cmdPrint(      "-nz_estimate:",     nz_estimate);
   SYS_T::cmdPrint(      "-bs_beta:",         bs_beta);
   if( is_backward_Euler )
-    SYS_T::commPrint(     "-is_backward_Euler: true \n");
+    SYS_T::commPrint(   "-is_backward_Euler: true \n");
   else
-    SYS_T::cmdPrint(      "-rho_inf:",         genA_rho_inf);
+    SYS_T::cmdPrint(    "-rho_inf:",         genA_rho_inf);
   SYS_T::cmdPrint(      "-fl_density:",      fluid_density);
   SYS_T::cmdPrint(      "-fl_mu:",           fluid_mu);
   SYS_T::cmdPrint(      "-c_tauc:",          c_tauc);

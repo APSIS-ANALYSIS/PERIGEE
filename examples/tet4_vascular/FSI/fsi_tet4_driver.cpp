@@ -53,11 +53,11 @@ int main(int argc, char *argv[])
   double mesh_E  = 1.0;
   double mesh_nu = 0.3;
 
-  // inflow file
-  int inflow_type = 0;               // flag for determining inflow type 0 pulsatile flow; 
-                                     //                                  1 linear-to-steady; 
-                                     //                                  2 steady.
+  // flag for determining inflow type 0 pulsatile flow;
+  // 1 linear-to-steady; 2 steady
+  int inflow_type = 0;
 
+  // inflow file
   std::string inflow_file("inflow_fourier_series.txt");
 
   double inflow_thd_time = 1.0;      // time for linearly increasing inflow to reach steady state
