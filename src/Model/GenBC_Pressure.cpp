@@ -116,12 +116,12 @@ GenBC_Pressure::~GenBC_Pressure()
 
 void GenBC_Pressure::print_info() const
 {
-  SYS_T::commPrint("     GenBC_Pressure : \n");
+  SYS_T::commPrint("===> GenBC_Pressure: \n");
 
   for(int ii=0; ii<num_ebc; ++ii)
   {
-    SYS_T::commPrint("  -- ebc_id = %d", ii);
-    SYS_T::commPrint("     w = %e, period =%e \n", w[ii], period[ii]);
+    SYS_T::commPrint("     ebc_id = %d", ii);
+    SYS_T::commPrint(" w = %e, period =%e \n", w[ii], period[ii]);
     SYS_T::commPrint("     a[0] + Sum{ a[i] cos(i x w x t) + b[i] sin(i x w x t) }, for i = 1,...,%d. \n", num_of_mode[ii]);
     for(int jj=0; jj<=num_of_mode[ii]; ++jj)
       SYS_T::commPrint("     i = %d, a = %e, b = %e \n", jj, coef_a[ii][jj], coef_b[ii][jj]);
