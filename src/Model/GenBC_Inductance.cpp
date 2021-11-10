@@ -79,7 +79,7 @@ GenBC_Inductance::~GenBC_Inductance()
 
 void GenBC_Inductance::print_info() const
 {
-  SYS_T::commPrint("     GenBC_Inductance : \n");
+  SYS_T::commPrint("===> GenBC_Inductance : \n");
   for(int ii=0; ii<num_ebc; ++ii)
     SYS_T::commPrint( "     ebcid = %d, L = %e, p = %e \n", ii, induct[ii], pres_offset[ii] );
 }

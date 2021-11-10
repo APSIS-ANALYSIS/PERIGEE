@@ -77,7 +77,7 @@ GenBC_Resistance::~GenBC_Resistance()
 
 void GenBC_Resistance::print_info() const
 {
-  SYS_T::commPrint("     GenBC_Resistance : \n");
+  SYS_T::commPrint("===> GenBC_Resistance : \n");
   for(int ii=0; ii<num_ebc; ++ii)
     SYS_T::commPrint( "     ebcid = %d, R = %e, Pd = %e \n", ii, resis[ii], pres_offset[ii] );
 }

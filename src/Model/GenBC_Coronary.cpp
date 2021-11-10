@@ -210,7 +210,7 @@ GenBC_Coronary::~GenBC_Coronary()
 
 void GenBC_Coronary::print_info() const
 {
-  SYS_T::commPrint( "     Coronary model: N = %d, h = %e, num_ebc = %d \n", N, h, num_ebc );
+  SYS_T::commPrint( "===> Coronary model: N = %d, h = %e, num_ebc = %d \n", N, h, num_ebc );
 
   for(int ii=0; ii<num_ebc; ++ii)
     SYS_T::commPrint( "     ebcid = %d, Ra = %e, Ca = %e, Ra_micro = %e,Rim = %e, Rv = %e, Pd = %e \n",
