@@ -140,8 +140,8 @@ void PLocAssem_Tet_CMM_GenAlpha::get_tau(
 }
 
 
-void PLocAssem_Tet_CMM_GenAlpha::get_DC(
-    double &dc_tau, const double * const &dxidx,
+double PLocAssem_Tet_CMM_GenAlpha::get_DC(
+    const double * const &dxidx,
     const double &u, const double &v, const double &w ) const
 {
   //double G11, G12, G13, G22, G23, G33;
@@ -153,7 +153,9 @@ void PLocAssem_Tet_CMM_GenAlpha::get_DC(
   //if(dc_tau > 1.0e-15) dc_tau = rho0 * std::pow(dc_tau, -0.5);
   //else dc_tau = 0.0;
 
-  dc_tau = 0.0;
+  // return dc_tau;
+
+  return 0.0;
 }
 
 
@@ -169,7 +171,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  double tau_m, tau_c, tau_dc;
+  double tau_m, tau_c;
 
   const double two_mu = 2.0 * vis_mu;
 
@@ -272,7 +274,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
     const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
 
     // Get the Discontinuity Capturing tau
-    get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
+    const double tau_dc = get_DC( dxi_dx, u_prime, v_prime, w_prime );
 
     for(int A=0; A<nLocBas; ++A)
     {
@@ -341,7 +343,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  double tau_m, tau_c, tau_dc;
+  double tau_m, tau_c;
 
   const double two_mu = 2.0 * vis_mu;
 
@@ -445,7 +447,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
     const double r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
     const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
 
-    get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
+    const double tau_dc = get_DC( dxi_dx, u_prime, v_prime, w_prime );
 
     for(int A=0; A<nLocBas; ++A)
     {

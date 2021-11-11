@@ -204,7 +204,7 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
 
     // Return tau_bar := (v' G v')^-0.5 x rho0, 
     //        which scales like Time x Density
-    void get_DC( double &dc_tau, const double * const &dxi_dx,
+    double get_DC( const double * const &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
     // Return body force acting on the fluid domain
