@@ -21,8 +21,7 @@ class PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha : public IPLocAssem
   public:
     PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha(
         const TimeMethod_GenAlpha * const &tm_gAlpha,
-        const int &in_nlocbas, const int &in_nqp,
-        const int &in_snlocbas,
+        const int &in_nqp,
         const double &in_rho, const double &in_vis_mu,
         const double &in_beta );
 
@@ -165,12 +164,6 @@ class PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha : public IPLocAssem
     const int snLocBas;
 
     const double CI, CT;
-
-    double R[4];
-    double dR_dx[4];
-    double dR_dy[4];
-    double dR_dz[4];
-    double dxi_dx[9];
 
     double curPt_x[4];
     double curPt_y[4];

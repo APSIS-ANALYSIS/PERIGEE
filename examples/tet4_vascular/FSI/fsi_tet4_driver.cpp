@@ -313,9 +313,7 @@ int main(int argc, char *argv[])
   
   // ===== Local assembly =====
   IPLocAssem * locAssem_fluid_ptr = new PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha(
-      tm_galpha_ptr, GMIptr->get_nLocBas(),
-      quadv->get_num_quadPts(), elements->get_nLocBas(),
-      fluid_density, fluid_mu, bs_beta );
+      tm_galpha_ptr, quadv->get_num_quadPts(), fluid_density, fluid_mu, bs_beta );
 
   IMaterialModel * matmodel = nullptr;
   IPLocAssem * locAssem_solid_ptr = nullptr;
