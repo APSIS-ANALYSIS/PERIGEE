@@ -490,8 +490,7 @@ void PNonlinear_Seg_Solver::rescale_inflow_value( const double &stime,
     }
   }
   
-  VecAssemblyBegin(sol->solution); VecAssemblyEnd(sol->solution);
-  sol->GhostUpdate();
+  sol -> Assembly_GhostUpdate();
 }
 
 // EOF
