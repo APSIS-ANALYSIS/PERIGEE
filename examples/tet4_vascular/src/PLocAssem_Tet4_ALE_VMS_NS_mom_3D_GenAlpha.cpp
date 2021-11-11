@@ -55,35 +55,6 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::print_info() const
 }
 
 
-void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::get_currPts( 
-    const double * const &ept_x,
-    const double * const &ept_y,
-    const double * const &ept_z,
-    const double * const &sol )
-{
-  for(int ii=0; ii<nLocBas; ++ii)
-  {
-    curPt_x[ii] = ept_x[ii] + sol[7*ii];
-    curPt_y[ii] = ept_y[ii] + sol[7*ii+1];
-    curPt_z[ii] = ept_z[ii] + sol[7*ii+2];
-  }
-}
-
-
-void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::get_currBCPts( 
-    const double * const &ept_x,
-    const double * const &ept_y,
-    const double * const &ept_z,
-    const double * const &sol )
-{
-  for(int ii=0; ii<snLocBas; ++ii)
-  {
-    curPt_x[ii] = ept_x[ii] + sol[7*ii];
-    curPt_y[ii] = ept_y[ii] + sol[7*ii+1];
-    curPt_z[ii] = ept_z[ii] + sol[7*ii+2];
-  }
-}
-
 void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::get_metric(
     const double * const &f,
     double &G11, double &G12, double &G13,
@@ -169,11 +140,12 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp);
+  double R[4], dR_dx[4], dR_dy[4], dR_dz[4], dxi_dx[9];
+  double curPt_x[4], curPt_y[4], curPt_z[4];
+  
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, nLocBas, curPt_x, curPt_y, curPt_z);
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
-
-  double R[4], dR_dx[4], dR_dy[4], dR_dz[4], dxi_dx[9];
 
   double tau_m, tau_c, tau_dc;
 
@@ -326,12 +298,13 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp);
+  double R[4], dR_dx[4], dR_dy[4], dR_dz[4], dxi_dx[9];
+  double curPt_x[4], curPt_y[4], curPt_z[4];
+  
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, nLocBas, curPt_x, curPt_y, curPt_z);
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
-  double R[4], dR_dx[4], dR_dy[4], dR_dz[4], dxi_dx[9];
-  
   double tau_m, tau_c, tau_dc;
 
   const double two_mu = 2.0 * vis_mu;
@@ -685,12 +658,13 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Mass_Residual(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp);
+  double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
+  double curPt_x[4], curPt_y[4], curPt_z[4];
+  
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, nLocBas, curPt_x, curPt_y, curPt_z);
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
   
-  double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
-
   const double two_mu = 2.0 * vis_mu;
 
   const double curr = 0.0;
@@ -800,7 +774,9 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual_EBC(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  get_currBCPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, vec_b);
+  double curPt_x[3], curPt_y[3], curPt_z[3];
+  
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, vec_b, snLocBas, curPt_x, curPt_y, curPt_z);
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
@@ -846,7 +822,9 @@ double PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::get_flowrate(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  get_currBCPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, vec);
+  double curPt_x[3], curPt_y[3], curPt_z[3];
+  
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, vec, snLocBas, curPt_x, curPt_y, curPt_z);
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
@@ -886,7 +864,9 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::get_pressure_area(
     const IQuadPts * const &quad,
     double &pres, double &area )
 {
-  get_currBCPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, vec);
+  double curPt_x[3], curPt_y[3], curPt_z[3];
+  
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, vec, snLocBas, curPt_x, curPt_y, curPt_z);
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
@@ -918,7 +898,9 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual_EBC_Resistance(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  get_currBCPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, vec_b);
+  double curPt_x[3], curPt_y[3], curPt_z[3];
+  
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, vec_b, snLocBas, curPt_x, curPt_y, curPt_z);
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
@@ -953,7 +935,9 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual_BackFlowStab(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  get_currBCPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp);
+  double curPt_x[3], curPt_y[3], curPt_z[3];
+  
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas, curPt_x, curPt_y, curPt_z);
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
@@ -1010,7 +994,9 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual_BackFlowS
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  get_currBCPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp);
+  double curPt_x[3], curPt_y[3], curPt_z[3];
+  
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas, curPt_x, curPt_y, curPt_z);
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 

@@ -165,10 +165,6 @@ class PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha : public IPLocAssem
 
     const double CI, CT;
 
-    double curPt_x[4];
-    double curPt_y[4];
-    double curPt_z[4];
-
     double Sub_Tan[16][16];
 
     double Sub_sur_Tan[16][9];
@@ -243,12 +239,20 @@ class PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha : public IPLocAssem
     void get_currPts( const double * const &ept_x,
         const double * const &ept_y,
         const double * const &ept_z,
-        const double * const &sol );
+        const double * const &sol,
+        const int &len,
+        double * const &currPt_x,
+        double * const &currPt_y,
+        double * const &currPt_z ) const
+    {
+      for(int ii=0; ii<len; ++ii)
+      {
+        currPt_x[ii] = ept_x[ii] + sol[7*ii];
+        currPt_y[ii] = ept_y[ii] + sol[7*ii+1];
+        currPt_z[ii] = ept_z[ii] + sol[7*ii+2];
+      }
+    }
 
-    void get_currBCPts( const double * const &ept_x,
-        const double * const &ept_y,
-        const double * const &ept_z,
-        const double * const &sol );
 };
 
 #endif
