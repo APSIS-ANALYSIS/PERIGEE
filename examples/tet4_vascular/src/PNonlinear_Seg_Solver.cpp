@@ -114,7 +114,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_ALE_NS(
 
   // ------------------------------------------------- 
   // Update the inflow boundary values
-  rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, flr_ptr, sol_base, sol);
+  rescale_inflow_value(curr_time+dt,         infnbc_part, flr_ptr, sol_base, sol);
   rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, flr_ptr, sol_base, &sol_alpha);
   // ------------------------------------------------- 
 
@@ -349,7 +349,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_FSI(
 
   // ------------------------------------------------- 
   // Update the inflow boundary values
-  rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, flr_ptr, sol_base, sol);
+  rescale_inflow_value(curr_time+dt,         infnbc_part, flr_ptr, sol_base, sol);
   rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, flr_ptr, sol_base, &sol_alpha);
   // ------------------------------------------------- 
 

@@ -223,7 +223,7 @@ void PNonlinear_Tet4_NS_3D_Solver::GenAlpha_VMS_solve(
 
   // -------------------------------------
   // Update the infow boundary value here
-  rescale_inflow_value(curr_time + alpha_f * dt, infnbc_part, sol_base, sol); 
+  rescale_inflow_value(curr_time + dt,           infnbc_part, sol_base, sol); 
   rescale_inflow_value(curr_time + alpha_f * dt, infnbc_part, sol_base, sol_alpha); 
   // -------------------------------------
 
