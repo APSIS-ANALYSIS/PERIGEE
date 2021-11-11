@@ -524,7 +524,10 @@ int main(int argc, char *argv[])
 
       // if this is NOT a restart run, record the initial values
       if( !is_restart )
+      {
+        ofile<<"Time-index"<<'\t'<<"Time"<<'\t'<<"Flow-rate"<<'\t'<<"Face-averaged-pressure"<<'\t'<<"Reduced-model-pressure"<<'\n';
         ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
+      }
 
       ofile.close();
     }
@@ -552,7 +555,7 @@ int main(int argc, char *argv[])
 
       if( !is_restart )
       {
-        ofile<<"Time index"<<'\t'<<"Time"<<'\t'<<"Flow rate"<<'\t'<<"Face averaged pressure"<<'\n';
+        ofile<<"Time-index"<<'\t'<<"Time"<<'\t'<<"Flow-rate"<<'\t'<<"Face-averaged-pressure"<<'\n';
         ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
       }
 

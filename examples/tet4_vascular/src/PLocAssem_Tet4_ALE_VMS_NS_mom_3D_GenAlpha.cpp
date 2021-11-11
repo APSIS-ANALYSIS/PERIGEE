@@ -175,8 +175,6 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual(
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
-  double f1, f2, f3;
-
   double tau_m, tau_c, tau_dc;
 
   const double two_mu = 2.0 * vis_mu;
@@ -245,11 +243,11 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual(
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
-    get_f(coor_x, coor_y, coor_z, curr, f1, f2, f3);
+    const Vector_3 f_body = get_f(coor_x, coor_y, coor_z, curr);
 
-    const double rx = rho0 * ( u_t + u_x * cu + u_y * cv + u_z * cw - f1 ) + p_x;
-    const double ry = rho0 * ( v_t + v_x * cu + v_y * cv + v_z * cw - f2 ) + p_y;
-    const double rz = rho0 * ( w_t + w_x * cu + w_y * cv + w_z * cw - f3 ) + p_z;
+    const double rx = rho0 * ( u_t + u_x * cu + u_y * cv + u_z * cw - f_body.x() ) + p_x;
+    const double ry = rho0 * ( v_t + v_x * cu + v_y * cv + v_z * cw - f_body.y() ) + p_y;
+    const double rz = rho0 * ( w_t + w_x * cu + w_y * cv + w_z * cw - f_body.z() ) + p_z;
 
     const double div_vel = u_x + v_y + w_z;
 
@@ -284,7 +282,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * rx
           + velo_prime_dot_gradR * tau_dc 
           * (u_prime * u_x + v_prime * u_y + w_prime * u_z)
-          - NA * rho0 * f1 );
+          - NA * rho0 * f_body.x() );
 
       Residual[4*A+2] += gwts * ( NA * rho0 * v_t
           + NA * rho0 * (cu * v_x + cv * v_y + cw * v_z)
@@ -298,7 +296,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * ry
           + velo_prime_dot_gradR * tau_dc 
           * (u_prime * v_x + v_prime * v_y + w_prime * v_z)
-          - NA * rho0 * f2 );
+          - NA * rho0 * f_body.y() );
 
       Residual[4*A+3] += gwts * (NA * rho0 * w_t
           + NA * rho0 * (cu * w_x + cv * w_y + cw * w_z)
@@ -312,7 +310,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * rz
           + velo_prime_dot_gradR * tau_dc
           * (u_prime * w_x + v_prime * w_y + w_prime * w_z)
-          - NA * rho0 * f3 );
+          - NA * rho0 * f_body.z() );
     }
   }
 }
@@ -331,8 +329,6 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp);
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
-
-  double f1, f2, f3;
 
   double tau_m, tau_c, tau_dc;
 
@@ -407,11 +403,11 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua); 
 
-    get_f(coor_x, coor_y, coor_z, curr, f1, f2, f3);
+    const Vector_3 f_body = get_f(coor_x, coor_y, coor_z, curr);
 
-    const double rx = rho0 * ( u_t + u_x * cu + u_y * cv + u_z * cw - f1 ) + p_x;
-    const double ry = rho0 * ( v_t + v_x * cu + v_y * cv + v_z * cw - f2 ) + p_y;
-    const double rz = rho0 * ( w_t + w_x * cu + w_y * cv + w_z * cw - f3 ) + p_z;
+    const double rx = rho0 * ( u_t + u_x * cu + u_y * cv + u_z * cw - f_body.x() ) + p_x;
+    const double ry = rho0 * ( v_t + v_x * cu + v_y * cv + v_z * cw - f_body.y() ) + p_y;
+    const double rz = rho0 * ( w_t + w_x * cu + w_y * cv + w_z * cw - f_body.z() ) + p_z;
 
     const double div_vel = u_x + v_y + w_z;
 
@@ -446,7 +442,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * rx
           + velo_prime_dot_gradR * tau_dc 
           * (u_prime * u_x + v_prime * u_y + w_prime * u_z)
-          - NA * rho0 * f1 );
+          - NA * rho0 * f_body.x() );
 
       Residual[4*A+2] += gwts * ( NA * rho0 * v_t
           + NA * rho0 * (cu * v_x + cv * v_y + cw * v_z)
@@ -460,7 +456,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * ry
           + velo_prime_dot_gradR * tau_dc 
           * (u_prime * v_x + v_prime * v_y + w_prime * v_z)
-          - NA * rho0 * f2 );
+          - NA * rho0 * f_body.y() );
 
       Residual[4*A+3] += gwts * (NA * rho0 * w_t
           + NA * rho0 * (cu * w_x + cv * w_y + cw * w_z)
@@ -474,7 +470,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * rz
           + velo_prime_dot_gradR * tau_dc
           * (u_prime * w_x + v_prime * w_y + w_prime * w_z)
-          - NA * rho0 * f3 );
+          - NA * rho0 * f_body.z() );
 
       for(int B=0; B<nLocBas; ++B)
       {
@@ -691,8 +687,6 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Mass_Residual(
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
-  double f1, f2, f3;
-
   const double two_mu = 2.0 * vis_mu;
 
   const double curr = 0.0;
@@ -736,7 +730,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Mass_Residual(
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
-    get_f(coor_x, coor_y, coor_z, curr, f1, f2, f3);
+    const Vector_3 f_body = get_f(coor_x, coor_y, coor_z, curr);
 
     for(int A=0; A<nLocBas; ++A)
     {
@@ -747,21 +741,21 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Mass_Residual(
           + two_mu * NA_x * u_x
           + vis_mu * NA_y * (u_y + v_x)
           + vis_mu * NA_z * (u_z + w_x)
-          - NA * rho0 * f1 );
+          - NA * rho0 * f_body.x() );
 
       Residual[4*A+2] += gwts * ( NA * rho0 * (u*v_x + v*v_y + w*v_z) 
           - NA_y * p
           + vis_mu * NA_x * (u_y + v_x)
           + two_mu * NA_y * v_y
           + vis_mu * NA_z * (v_z + w_y)
-          - NA * rho0 * f2 );
+          - NA * rho0 * f_body.y() );
 
       Residual[4*A+3] += gwts * ( NA * rho0 * (u*w_x + v*w_y + w*w_z) 
           - NA_z * p
           + vis_mu * NA_x * (u_z + w_x)
           + vis_mu * NA_y * (w_y + v_z)
           + two_mu * NA_z * w_z
-          - NA * rho0 * f3 );
+          - NA * rho0 * f_body.z() );
 
       for(int B=0; B<nLocBas; ++B)
       {
@@ -854,13 +848,14 @@ double PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::get_flowrate(
 
   const int face_nqp = quad -> get_num_quadPts();
 
-  double surface_area;
-
   double flrate = 0.0;
 
   for(int qua =0; qua< face_nqp; ++qua)
   {
     element->get_R(qua, R);
+    
+    double surface_area;
+
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     double u = 0.0, v = 0.0, w = 0.0;

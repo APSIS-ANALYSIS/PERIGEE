@@ -200,10 +200,9 @@ class PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha : public IPLocAssem
     void get_DC( double &dc_tau, const double * const &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
-    void get_f(const double &x, const double &y, const double &z,
-        const double &t, double &fx, double &fy, double &fz ) const
+    Vector_3 get_f(const double &x, const double &y, const double &z, const double &t ) const
     {
-      fx = 0.0; fy = 0.0; fz = 0.0;
+      return Vector_3( 0.0, 0.0, 0.0 );
     }
 
     void get_H1(const double &x, const double &y, const double &z,
