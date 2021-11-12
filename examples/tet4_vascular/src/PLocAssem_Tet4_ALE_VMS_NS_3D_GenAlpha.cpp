@@ -13,18 +13,16 @@ PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha(
   Tangent = new PetscScalar[vec_size * vec_size];
   Residual = new PetscScalar[vec_size];
 
-  // Set up the surface assembly residual and tangent
+  Zero_Tangent_Residual();
+  
   sur_Tangent = new PetscScalar[sur_size * sur_size];
   sur_Residual = new PetscScalar[sur_size];
 
-  Zero_Tangent_Residual();
-  
   Zero_sur_Tangent_Residual();
 
   // Print the infomation on screen
   print_info();
 }
-
 
 PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::~PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha()
 {
@@ -33,7 +31,6 @@ PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::~PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha()
   delete [] sur_Tangent; sur_Tangent = nullptr;
   delete [] sur_Residual; sur_Residual = nullptr;
 }
-
 
 void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::print_info() const
 {
@@ -55,7 +52,6 @@ void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::print_info() const
   SYS_T::commPrint("  Density rho is in front of the du/dt and the dimension of the equations is momentum time rate. \n");
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
-
 
 void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::get_metric(
     const double * const &f,
@@ -85,7 +81,6 @@ void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::get_metric(
   G33 = coef * ( fk6 * f[2] + fk7 * f[5] + fk8 * f[8] );
 }
 
-
 void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::get_tau( 
     double &tau_m_qua, double &tau_c_qua,
     const double &dt, const double * const &dxi_dx,
@@ -114,7 +109,6 @@ void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::get_tau(
   tau_c_qua = 1.0 / denom_c;
 }
 
-
 double PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::get_DC( 
     const double * const &dxi_dx,
     const double &u, const double &v, const double &w ) const
@@ -132,7 +126,6 @@ double PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::get_DC(
   return 0.0;
 }
 
-
 void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::Assem_Residual(
     const double &time, const double &dt,
     const double * const &velo,
@@ -149,8 +142,6 @@ void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::Assem_Residual(
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, nLocBas, curPt_x, curPt_y, curPt_z);
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
-
-  double tau_m, tau_c;
 
   const double two_mu = 2.0 * vis_mu;
 
@@ -212,6 +203,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::Assem_Residual(
     const double cv = v - mv;
     const double cw = w - mw;
 
+    double tau_m, tau_c;
     get_tau(tau_m, tau_c, dt, dxi_dx, cu, cv, cw);
 
     const double tau_m_2 = tau_m * tau_m;
@@ -290,7 +282,6 @@ void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::Assem_Residual(
   }
 }
 
-
 void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::Assem_Tangent_Residual(
     const double &time, const double &dt,
     const double * const &velo,
@@ -307,8 +298,6 @@ void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::Assem_Tangent_Residual(
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, nLocBas, curPt_x, curPt_y, curPt_z);
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
-
-  double tau_m, tau_c;
 
   const double two_mu = 2.0 * vis_mu;
   
@@ -373,6 +362,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::Assem_Tangent_Residual(
     const double cv = v - mv;
     const double cw = w - mw;
 
+    double tau_m, tau_c;
     get_tau(tau_m, tau_c, dt, dxi_dx, cu, cv, cw);
 
     const double tau_m_2 = tau_m * tau_m;
