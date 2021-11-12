@@ -26,8 +26,7 @@ class PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha : public IPLocAssem
     PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha(
         IMaterialModel * const &in_matmodel,
         const TimeMethod_GenAlpha * const &tm_gAlpha,
-        const int &in_nlocbas, const int &in_nqp,
-        const int &in_snlocbas );
+        const int &in_nqp );
 
     virtual ~PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha();
 

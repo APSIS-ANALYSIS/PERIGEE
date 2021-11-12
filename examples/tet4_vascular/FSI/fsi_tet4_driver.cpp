@@ -323,16 +323,14 @@ int main(int argc, char *argv[])
     matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( solid_density, solid_E );
 
     locAssem_solid_ptr = new PLocAssem_Tet4_VMS_Seg_Incompressible(
-        matmodel, tm_galpha_ptr, GMIptr->get_nLocBas(),
-        quadv->get_num_quadPts(), elements->get_nLocBas() );
+        matmodel, tm_galpha_ptr, quadv->get_num_quadPts() );
   }
   else
   {
     matmodel = new MaterialModel_NeoHookean_M94_Mixed( solid_density, solid_E, solid_nu );
 
     locAssem_solid_ptr = new PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha(
-        matmodel, tm_galpha_ptr, GMIptr->get_nLocBas(),
-        quadv->get_num_quadPts(), elements->get_nLocBas() );
+        matmodel, tm_galpha_ptr, quadv->get_num_quadPts() );
   }
 
   // Pseudo elastic mesh motion

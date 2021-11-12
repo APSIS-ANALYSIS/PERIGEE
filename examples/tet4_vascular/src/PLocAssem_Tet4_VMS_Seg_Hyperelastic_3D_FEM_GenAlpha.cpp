@@ -3,13 +3,12 @@
 PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha(
     IMaterialModel * const &in_matmodel,
     const TimeMethod_GenAlpha * const &tm_gAlpha,
-    const int &in_nlocbas, const int &in_nqp,
-    const int &in_snlocbas )
+    const int &in_nqp )
 : rho0( in_matmodel->get_elastic_rho0() ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()),
   num_ebc_fun(0), nLocBas(4), dof_per_node(7), vec_size(16),
-  nqp(in_nqp), snLocBas(in_snlocbas)
+  nqp(in_nqp), snLocBas(3)
 {
   matmodel = in_matmodel;
 
@@ -18,15 +17,8 @@ PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::PLocAssem_Tet4_VMS_Seg_Hype
   
   Zero_Tangent_Residual();
 
-  if( num_ebc_fun == 0 ) flist = NULL;
+  if( num_ebc_fun == 0 ) flist = nullptr;
   else flist = new locassem_vms_seg_ela_fem_funs [num_ebc_fun];
-
-  //flist[0] = &PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::get_bot_H;
-  //flist[1] = &PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::get_top_H;
-  //flist[2] = &PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::get_bac_H;
-  //flist[3] = &PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::get_fro_H;
-  //flist[4] = &PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::get_lef_H;
-  //flist[5] = &PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::get_rig_H;
 
   print_info();
 }
@@ -34,7 +26,7 @@ PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::PLocAssem_Tet4_VMS_Seg_Hype
 
 PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::~PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha()
 {
-  delete [] Tangent; delete [] Residual; Tangent = NULL; Residual = NULL;
+  delete [] Tangent; delete [] Residual; Tangent = nullptr; Residual = nullptr;
   if(num_ebc_fun > 0) delete [] flist;
 }
 
@@ -96,8 +88,7 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Residual(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  const double h_e = element->get_h( eleCtrlPts_x,
-      eleCtrlPts_y, eleCtrlPts_z );
+  const double h_e = element->get_h( eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   int ii, qua, A, ii7;
   double p, p_t, p_x, p_y, p_z;
@@ -213,8 +204,6 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Residual(
     dmbeta = matmodel->get_dbeta_dp(p); 
 
     detF = F.det();
-
-    //element->get_invJacobian(qua, dxi_dx);
 
     // Get stabilization parameters
     get_tau(tau_m, tau_c, dt, detF, h_e);
@@ -412,8 +401,6 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Tangent_Residual
     dmbeta = matmodel->get_dbeta_dp(p); 
 
     detF = F.det();
-
-    //element->get_invJacobian(qua, dxi_dx);
 
     // Get stabilization parameters
     get_tau(tau_m, tau_c, dt, detF, h_e);

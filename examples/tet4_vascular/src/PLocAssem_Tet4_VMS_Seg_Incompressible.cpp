@@ -3,13 +3,12 @@
 PLocAssem_Tet4_VMS_Seg_Incompressible::PLocAssem_Tet4_VMS_Seg_Incompressible(
     IMaterialModel * const &in_matmodel,
     const TimeMethod_GenAlpha * const &tm_gAlpha,
-    const int &in_nlocbas, const int &in_nqp,
-    const int &in_snlocbas )
+    const int &in_nqp )
 : rho0( in_matmodel->get_elastic_rho0() ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()),
   num_ebc_fun(0), nLocBas(4), dof_per_node(7), vec_size(16),
-  nqp(in_nqp), snLocBas(in_snlocbas)
+  nqp(in_nqp), snLocBas(3)
 {
   matmodel = in_matmodel;
 
