@@ -68,8 +68,8 @@ namespace TET_T
   //        \para dataname the data property name
   // Output: \para data the data associated with cell/point
   // ----------------------------------------------------------------
-  void read_int_CellData( const std::string &filename, 
-      const std::string &dataname, std::vector<int> &data );
+  std::vector<int> read_int_CellData( const std::string &filename, 
+      const std::string &dataname );
 
   void read_double_CellData( const std::string &filename, 
       const std::string &dataname, std::vector<double> &data );

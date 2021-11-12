@@ -73,8 +73,8 @@ void TET_T::read_vtu_grid( const std::string &filename,
 }
 
 
-void TET_T::read_int_CellData( const std::string &filename,
-    const std::string &dataname, std::vector<int> &data )
+std::vector<int> TET_T::read_int_CellData( const std::string &filename,
+    const std::string &dataname )
 {
   vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
   reader -> SetFileName( filename.c_str() );
@@ -101,11 +101,13 @@ void TET_T::read_int_CellData( const std::string &filename,
 
   vtkDataArray * cd = celldata->GetScalars( dataname.c_str() );
 
-  data.clear();
+  std::vector<int> data( numcels );
   for(int ii=0; ii<numcels; ++ii)
-    data.push_back( static_cast<int>( cd->GetComponent(ii, 0) ) );
+    data[ii] = static_cast<int>( cd->GetComponent(ii, 0) );
 
   reader -> Delete();
+
+  return data;
 }
 
 
@@ -224,7 +226,7 @@ void TET_T::read_vtu_grid( const std::string &filename,
 {
   read_vtu_grid(filename, numpts, numcels, pt, ien_array);
   
-  read_int_CellData(filename, "Physics_tag", phy_tag);
+  phy_tag = read_int_CellData(filename, "Physics_tag");
 }
 
 
@@ -238,7 +240,7 @@ void TET_T::read_vtu_grid( const std::string &filename,
   
   read_int_PointData(filename, "GlobalNodeID", global_node_index); 
 
-  read_int_CellData(filename, "GlobalElementID", global_elem_index);
+  global_elem_index = read_int_CellData(filename, "GlobalElementID");
 }
 
 
@@ -291,7 +293,7 @@ void TET_T::read_vtp_grid( const std::string &filename,
   
   read_int_PointData(filename, "GlobalNodeID", global_node_index); 
 
-  read_int_CellData(filename, "GlobalElementID", global_elem_index);
+  global_elem_index = read_int_CellData(filename, "GlobalElementID");
 }
 
 
