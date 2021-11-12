@@ -1,7 +1,7 @@
-#ifndef PLOCASSEM_TET4_ALE_VMS_NS_MOM_3D_GENALPHA_HPP
-#define PLOCASSEM_TET4_ALE_VMS_NS_MOM_3D_GENALPHA_HPP
+#ifndef PLOCASSEM_TET4_ALE_VMS_NS_3D_GENALPHA_HPP
+#define PLOCASSEM_TET4_ALE_VMS_NS_3D_GENALPHA_HPP
 // ==================================================================
-// PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha.hpp
+// PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha.hpp
 // 
 // This is the local assembly routine for ALE-VMS formulation of the
 // 3D Navier-Stokes equations with Generalized-alpha for time stepping.
@@ -16,16 +16,16 @@
 #include "IPLocAssem.hpp"
 #include "TimeMethod_GenAlpha.hpp"
 
-class PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha : public IPLocAssem
+class PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha : public IPLocAssem
 {
   public:
-    PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha(
+    PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha(
         const TimeMethod_GenAlpha * const &tm_gAlpha,
         const int &in_nqp,
         const double &in_rho, const double &in_vis_mu,
         const double &in_beta );
 
-    virtual ~PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha();
+    virtual ~PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha();
 
     virtual int get_dof() const {return dof_per_node;}
 
@@ -165,10 +165,6 @@ class PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha : public IPLocAssem
 
     const double CI, CT;
 
-    double Sub_Tan[16][16];
-
-    double Sub_sur_Tan[16][9];
-
     // Functions
     void print_info() const;
 
@@ -215,24 +211,6 @@ class PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha : public IPLocAssem
         const double &nz, double &gx, double &gy, double &gz ) const
     {
       return ((*this).*(flist[ebc_id]))(x,y,z,t,nx,ny,nz,gx,gy,gz);
-    }
-
-    // Generate zero Sub_Tan holder
-    void Zero_Sub_Tan()
-    {
-      for(int ii=0; ii<16; ++ii)
-      {
-        for(int jj=0; jj<nLocBas * nLocBas; ++jj) Sub_Tan[ii][jj] = 0.0;
-      }
-    }
-
-    // Generate zero Sub_sur_Tan holder
-    void Zero_Sub_sur_Tan()
-    {
-      for(int ii=0; ii<16; ++ii)
-      {
-        for(int jj=0; jj<snLocBas * snLocBas; ++jj) Sub_sur_Tan[ii][jj] = 0.0;
-      }
     }
 
     // Get the current point coordinates

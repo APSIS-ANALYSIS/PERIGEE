@@ -1,6 +1,6 @@
-#include "PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha.hpp"
+#include "PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha.hpp"
 
-PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha(
+PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha(
     const TimeMethod_GenAlpha * const &tm_gAlpha,
     const int &in_nqp, const double &in_rho, const double &in_vis_mu,
     const double &in_beta )
@@ -26,7 +26,7 @@ PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenA
 }
 
 
-PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::~PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha()
+PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::~PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha()
 {
   delete [] Tangent; Tangent = nullptr; 
   delete [] Residual; Residual = nullptr;
@@ -35,10 +35,10 @@ PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::~PLocAssem_Tet4_ALE_VMS_NS_mom_3D_Gen
 }
 
 
-void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::print_info() const
+void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
-  SYS_T::commPrint("  Three-dimensional Incompressible Navier-Stokes with rho in momentum equations: \n");
+  SYS_T::commPrint("  Three-dimensional Incompressible Navier-Stokes equations: \n");
   SYS_T::commPrint("  FEM: 4-node Tetrahedral \n");
   SYS_T::commPrint("  Spatial: ALE-VMS \n");
   SYS_T::commPrint("  Temporal: Generalized-alpha Method \n");
@@ -52,11 +52,12 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::print_info() const
   SYS_T::commPrint("  Nonlinear quadratic term is in advective form. \n");
   SYS_T::commPrint("  Pressure is evaluated at n+alpha_f rather than n+1. \n");
   SYS_T::commPrint("  Input solution vector should have 7 dofs including the mesh motion information in the first three slots. \n");
+  SYS_T::commPrint("  Density rho is in front of the du/dt and the dimension of the equations is momentum time rate. \n");
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
 
-void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::get_metric(
+void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::get_metric(
     const double * const &f,
     double &G11, double &G12, double &G13,
     double &G22, double &G23, double &G33 ) const
@@ -85,7 +86,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::get_metric(
 }
 
 
-void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::get_tau( 
+void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::get_tau( 
     double &tau_m_qua, double &tau_c_qua,
     const double &dt, const double * const &dxi_dx,
     const double &u, const double &v, const double &w ) const
@@ -114,7 +115,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::get_tau(
 }
 
 
-double PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::get_DC( 
+double PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::get_DC( 
     const double * const &dxi_dx,
     const double &u, const double &v, const double &w ) const
 {
@@ -132,7 +133,7 @@ double PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::get_DC(
 }
 
 
-void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual(
+void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::Assem_Residual(
     const double &time, const double &dt,
     const double * const &velo,
     const double * const &disp,
@@ -290,7 +291,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual(
 }
 
 
-void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
+void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::Assem_Tangent_Residual(
     const double &time, const double &dt,
     const double * const &velo,
     const double * const &disp,
@@ -318,8 +319,6 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
   const double dd_dv = alpha_f * gamma * dt;
 
   Zero_Tangent_Residual();
-
-  Zero_Sub_Tan();
 
   for(int qua=0; qua<nqp; ++qua)
   {
@@ -451,7 +450,6 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
 
       for(int B=0; B<nLocBas; ++B)
       {
-        const int index = B + A * nLocBas;
         const double NB = R[B], NB_x = dR_dx[B], NB_y = dR_dy[B], NB_z = dR_dz[B];
         const double velo_dot_gradNB = cu * NB_x + cv * NB_y + cw * NB_z;
         const double velo_prime_dot_gradNB = u_prime * NB_x + v_prime * NB_y + w_prime * NB_z;
@@ -474,29 +472,29 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
         const double drz_dw_B = rho0 * (w_z * NB + velo_dot_gradNB);
 
         // Continuity equation with respect to p, u, v, w
-        Sub_Tan[0][index] += gwts * dd_dv * tau_m * (NAxNBx + NAyNBy + NAzNBz);
+        Tangent[16*nLocBas*A+4*B] += gwts * dd_dv * tau_m * (NAxNBx + NAyNBy + NAzNBz);
 
-        Sub_Tan[1][index] += gwts * ( alpha_m * tau_m * rho0 * NAxNB
+        Tangent[16*nLocBas*A+4*B+1] += gwts * ( alpha_m * tau_m * rho0 * NAxNB
             + dd_dv * ( NANBx + tau_m * NA_x * drx_du_B
               + tau_m * NA_y * dry_du_B + tau_m * NA_z * drz_du_B ) );
 
-        Sub_Tan[2][index] += gwts * ( alpha_m * tau_m * rho0 * NAyNB
+        Tangent[16*nLocBas*A+4*B+2] += gwts * ( alpha_m * tau_m * rho0 * NAyNB
             + dd_dv * ( NANBy + tau_m * NA_x * drx_dv_B
               + tau_m * NA_y * dry_dv_B + tau_m * NA_z * drz_dv_B ) );
 
-        Sub_Tan[3][index] += gwts * ( alpha_m * tau_m * rho0 * NAzNB
+        Tangent[16*nLocBas*A+4*B+3] += gwts * ( alpha_m * tau_m * rho0 * NAzNB
             + dd_dv * ( NANBz + tau_m * NA_x * drx_dw_B
               + tau_m * NA_y * dry_dw_B + tau_m * NA_z * drz_dw_B ) );
 
         // Momentum-x with respect to p, u, v, w
-        Sub_Tan[4][index] += gwts * dd_dv * ((-1.0) * NAxNB
+        Tangent[4*nLocBas*(4*A+1)+4*B] += gwts * dd_dv * ((-1.0) * NAxNB
             + velo_dot_gradR * tau_m * rho0 * NB_x
             - NA * tau_m * rho0 * (u_x * NB_x + u_y * NB_y + u_z * NB_z)
             - 2.0 * tau_m_2 * rho0 * rx * NAxNBx
             - tau_m_2 * rho0 * NA_y * (rx * NB_y + ry * NB_x)
             - tau_m_2 * rho0 * NA_z * (rx * NB_z + rz * NB_x) );
 
-        Sub_Tan[5][index] += gwts * ( 
+        Tangent[4*nLocBas*(4*A+1)+4*B+1] += gwts * ( 
             alpha_m * ( rho0 * NANB + velo_dot_gradR * rho0_2 * tau_m * NB
               - rho0_2 * tau_m * u_x * NANB
               - rho0_2 * tau_m_2 * rx * NAxNB
@@ -516,7 +514,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * rx * NA_z * drz_du_B
               + velo_prime_dot_gradR * tau_dc * velo_prime_dot_gradNB ) );
 
-        Sub_Tan[6][index] += gwts * ( 
+        Tangent[4*nLocBas*(4*A+1)+4*B+2] += gwts * ( 
             alpha_m * (-1.0) * rho0_2 * (tau_m * u_y * NANB + tau_m_2 * rx * NAyNB)
             + dd_dv * ( NANB * rho0 * u_y + vis_mu * NAyNBx 
               + rho0 * tau_m * rx * NAyNB
@@ -527,7 +525,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_y * (rx * dry_dv_B + ry * drx_dv_B)
               - rho0 * tau_m_2 * NA_z * (rx * drz_dv_B + rz * drx_dv_B) ) );
 
-        Sub_Tan[7][index] += gwts * (
+        Tangent[4*nLocBas*(4*A+1)+4*B+3] += gwts * (
             alpha_m * (-1.0) * rho0_2 * (tau_m * u_z * NANB + tau_m_2 * rx * NAzNB)
             + dd_dv * ( NANB * rho0 * u_z + vis_mu * NAzNBx 
               + rho0 * tau_m * rx * NAzNB
@@ -539,14 +537,14 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_z * (rx * drz_dw_B + rz * drx_dw_B) ) );
 
         // Momentum-y with respect to p u v w
-        Sub_Tan[8][index] += gwts * dd_dv * ( (-1.0) * NAyNB
+        Tangent[4*nLocBas*(4*A+2)+4*B] += gwts * dd_dv * ( (-1.0) * NAyNB
             + velo_dot_gradR * tau_m * rho0 * NB_y
             - NA * tau_m * rho0 * (v_x * NB_x + v_y * NB_y + v_z * NB_z)
             - tau_m_2 * rho0 * NA_x * (rx * NB_y + ry * NB_x)
             - 2.0 * tau_m_2 * rho0 * ry * NAyNBy
             - tau_m_2 * rho0 * NA_z * (ry * NB_z + rz * NB_y) );
 
-        Sub_Tan[9][index] += gwts * (
+        Tangent[4*nLocBas*(4*A+2)+4*B+1] += gwts * (
             alpha_m * (-1.0) * rho0_2 * (tau_m * v_x * NANB + tau_m_2 * ry * NAxNB)
             + dd_dv * ( NANB * rho0 * v_x + vis_mu * NAxNBy
               + rho0 * tau_m * ry * NAxNB
@@ -557,7 +555,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
               - 2.0 * rho0 * tau_m_2 * ry * NA_y * dry_du_B
               - rho0 * tau_m_2 * NA_z * (ry * drz_du_B + rz * dry_du_B) ) );
 
-        Sub_Tan[10][index] += gwts * (
+        Tangent[4*nLocBas*(4*A+2)+4*B+2] += gwts * (
             alpha_m * ( rho0 * NANB + velo_dot_gradR * rho0_2 * tau_m * NB
               - rho0_2 * tau_m * v_y * NANB
               - rho0_2 * tau_m_2 * ry * NAyNB
@@ -574,7 +572,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_z * (ry * drz_dv_B + rz * dry_dv_B)
               + velo_prime_dot_gradR * tau_dc * velo_prime_dot_gradNB ) );
 
-        Sub_Tan[11][index] += gwts * (
+        Tangent[4*nLocBas*(4*A+2)+4*B+3] += gwts * (
             alpha_m * (-1.0) * rho0_2 * ( tau_m * v_z * NANB + tau_m_2 * ry * NAzNB ) 
             + dd_dv * ( NANB * rho0 * v_z + vis_mu * NAzNBy
               + rho0 * tau_m * ry * NAzNB
@@ -586,14 +584,14 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_z * (ry * drz_dw_B + rz * dry_dw_B) ) );
 
         // Momentum-z with respect to p u v w
-        Sub_Tan[12][index] += gwts * dd_dv * ( (-1.0) * NAzNB
+        Tangent[4*nLocBas*(4*A+3)+4*B] += gwts * dd_dv * ( (-1.0) * NAzNB
             + velo_dot_gradR * tau_m * rho0 * NB_z
             - NA * tau_m * rho0 * (w_x * NB_x + w_y * NB_y + w_z * NB_z)
             - tau_m_2 * rho0 * NA_x * (rx * NB_z + rz * NB_x)
             - tau_m_2 * rho0 * NA_y * (ry * NB_z + rz * NB_y)
             - 2.0 * tau_m_2 * rho0 * rz * NAzNBz );
 
-        Sub_Tan[13][index] += gwts * (
+        Tangent[4*nLocBas*(4*A+3)+4*B+1] += gwts * (
             alpha_m * (-1.0) * rho0_2 * (tau_m * w_x * NANB + tau_m_2 * rz * NAxNB)
             + dd_dv * ( NANB * rho0 * w_x + vis_mu * NAxNBz
               + rho0 * tau_m * rz * NAxNB
@@ -604,7 +602,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_y * (ry * drz_du_B + rz * dry_du_B)
               - 2.0 * rho0 * tau_m_2 * rz * NA_z * drz_du_B ) );
 
-        Sub_Tan[14][index] += gwts * (
+        Tangent[4*nLocBas*(4*A+3)+4*B+2] += gwts * (
             alpha_m * (-1.0) * rho0_2 * (tau_m * w_y * NANB + tau_m_2 * rz * NAyNB)
             + dd_dv * ( NANB * rho0 * w_y + vis_mu * NAyNBz
               + rho0 * tau_m * rz * NAyNB
@@ -615,7 +613,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_y * (ry * drz_dv_B + rz * dry_dv_B)
               - 2.0 * rho0 * tau_m_2 * rz * NA_z * drz_dv_B ) );
 
-        Sub_Tan[15][index] += gwts * (
+        Tangent[4*nLocBas*(4*A+3)+4*B+3] += gwts * (
             alpha_m * ( rho0 * NANB + velo_dot_gradR * rho0_2 * tau_m * NB
               - rho0_2 * tau_m * w_z * NANB
               - rho0_2 * tau_m_2 * rz * NAzNB
@@ -634,25 +632,10 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
       } // B-loop
     } // A-loop
   } // qua-loop
-
-  for(int ii=0; ii<4; ++ii)
-  {
-    for(int jj=0; jj<4; ++jj)
-    {
-      for(int A=0; A<nLocBas; ++A)
-      {
-        for(int B=0; B<nLocBas; ++B)
-        {
-          Tangent[ 4*nLocBas*(4*A+ii) + 4*B + jj  ] =
-            Sub_Tan[ii*4+jj][A*nLocBas + B];
-        }
-      }
-    }
-  }
 }
 
 
-void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Mass_Residual(
+void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::Assem_Mass_Residual(
     const double * const &disp,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
@@ -672,8 +655,6 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Mass_Residual(
   const double curr = 0.0;
 
   Zero_Tangent_Residual();
-
-  Zero_Sub_Tan();
 
   for(int qua=0; qua<nqp; ++qua)
   {
@@ -739,33 +720,17 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Mass_Residual(
 
       for(int B=0; B<nLocBas; ++B)
       {
-        const int index = A * nLocBas + B;
-        Sub_Tan[0][index]  += gwts * rho0 * NA * R[B];
-        Sub_Tan[5][index]  += gwts * rho0 * NA * R[B];
-        Sub_Tan[10][index] += gwts * rho0 * NA * R[B];
-        Sub_Tan[15][index] += gwts * rho0 * NA * R[B];
-      }
-    }
-  }
-
-  for(int ii=0; ii<4; ++ii)
-  {
-    for(int jj=0; jj<4; ++jj)
-    {
-      for(int A=0; A<nLocBas; ++A)
-      {
-        for(int B=0; B<nLocBas; ++B)
-        {
-          Tangent[ 4*nLocBas*(4*A+ii) + 4*B + jj ] =
-            Sub_Tan[ii*4+jj][A*nLocBas + B];
-        }
+        Tangent[4*nLocBas*(4*A)   + 4*B]   += gwts * rho0 * NA * R[B];
+        Tangent[4*nLocBas*(4*A+1) + 4*B+1] += gwts * rho0 * NA * R[B];
+        Tangent[4*nLocBas*(4*A+2) + 4*B+2] += gwts * rho0 * NA * R[B];
+        Tangent[4*nLocBas*(4*A+3) + 4*B+3] += gwts * rho0 * NA * R[B];
       }
     }
   }
 }
 
 
-void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual_EBC(
+void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::Assem_Residual_EBC(
     const int &ebc_id,
     const double &time, const double &dt,
     const double * const &vec_a,
@@ -816,7 +781,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual_EBC(
 }
 
 
-double PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::get_flowrate( 
+double PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::get_flowrate( 
     const double * const &vec,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
@@ -857,7 +822,7 @@ double PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::get_flowrate(
 }
 
 
-void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::get_pressure_area( 
+void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::get_pressure_area( 
     const double * const &vec,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
@@ -890,7 +855,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::get_pressure_area(
 }
 
 
-void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual_EBC_Resistance(
+void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::Assem_Residual_EBC_Resistance(
     const int &ebc_id,
     const double &val,
     const double * const &vec_b,
@@ -928,7 +893,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual_EBC_Resistance(
 }
 
 
-void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual_BackFlowStab(
+void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::Assem_Residual_BackFlowStab(
     const double * const &velo,
     const double * const &disp,
     FEAElement * const &element,
@@ -986,7 +951,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual_BackFlowStab(
 }
 
 
-void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
+void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
     const double &dt,
     const double * const &velo,
     const double * const &disp,
@@ -1009,8 +974,6 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual_BackFlowS
   const double dd_dv = alpha_f * gamma * dt;
 
   Zero_sur_Tangent_Residual();
-
-  Zero_Sub_sur_Tan();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
@@ -1050,27 +1013,10 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual_BackFlowS
 
       for(int B=0; B<snLocBas; ++B)
       {
-        const int index = B + A * snLocBas; // index here ranges 0 to 8
-
-        Sub_sur_Tan[5][index]  -= gwts * dd_dv * R[A] * factor * R[B];
-        Sub_sur_Tan[10][index] -= gwts * dd_dv * R[A] * factor * R[B];
-        Sub_sur_Tan[15][index] -= gwts * dd_dv * R[A] * factor * R[B];
+        sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+1 ] -= gwts * dd_dv * R[A] * factor * R[B];
+        sur_Tangent[ 4*snLocBas*(4*A+2) + 4*B+2 ] -= gwts * dd_dv * R[A] * factor * R[B];
+        sur_Tangent[ 4*snLocBas*(4*A+3) + 4*B+3 ] -= gwts * dd_dv * R[A] * factor * R[B];
       }
-    }
-  }
-  
-  for(int A=0; A<snLocBas; ++A)
-  {
-    for(int B=0; B<snLocBas; ++B)
-    {
-      // ii = jj = 1
-      sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+1 ] = Sub_sur_Tan[5][A*snLocBas + B];
-
-      // ii = jj = 2
-      sur_Tangent[ 4*snLocBas*(4*A+2) + 4*B+2 ] = Sub_sur_Tan[10][A*snLocBas + B];
-      
-      // ii = jj = 3
-      sur_Tangent[ 4*snLocBas*(4*A+3) + 4*B+3 ] = Sub_sur_Tan[15][A*snLocBas + B];
     }
   }
 }
