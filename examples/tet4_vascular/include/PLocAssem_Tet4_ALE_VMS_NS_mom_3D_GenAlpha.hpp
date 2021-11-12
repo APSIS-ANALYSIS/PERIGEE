@@ -186,7 +186,7 @@ class PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha : public IPLocAssem
 
     // Tau_DC is different from the kinematic definition with
     // a rho in the definition. It scales like Time * Density
-    void get_DC( double &dc_tau, const double * const &dxi_dx,
+    double get_DC( const double * const &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
     Vector_3 get_f(const double &x, const double &y, const double &z, const double &t ) const

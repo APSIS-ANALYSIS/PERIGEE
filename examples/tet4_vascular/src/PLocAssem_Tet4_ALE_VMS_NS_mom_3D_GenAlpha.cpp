@@ -28,9 +28,10 @@ PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenA
 
 PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::~PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha()
 {
-  delete [] Tangent; Tangent = NULL; delete [] Residual; Residual = NULL;
-  delete [] sur_Tangent; sur_Tangent = NULL; 
-  delete [] sur_Residual; sur_Residual = NULL;
+  delete [] Tangent; Tangent = nullptr; 
+  delete [] Residual; Residual = nullptr;
+  delete [] sur_Tangent; sur_Tangent = nullptr;
+  delete [] sur_Residual; sur_Residual = nullptr;
 }
 
 
@@ -113,8 +114,8 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::get_tau(
 }
 
 
-void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::get_DC( 
-    double &dc_tau, const double * const &dxi_dx,
+double PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::get_DC( 
+    const double * const &dxi_dx,
     const double &u, const double &v, const double &w ) const
 {
   //double G11, G12, G13, G22, G23, G33;
@@ -125,8 +126,9 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::get_DC(
 
   //if(dc_tau > 1.0e-15) dc_tau = rho0 * std::pow(dc_tau, -0.5);
   //else dc_tau = 0.0;
+  // return dc_tau;
 
-  dc_tau = 0.0;
+  return 0.0;
 }
 
 
@@ -147,7 +149,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual(
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
-  double tau_m, tau_c, tau_dc;
+  double tau_m, tau_c;
 
   const double two_mu = 2.0 * vis_mu;
 
@@ -227,7 +229,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Residual(
     const double v_prime = -1.0 * tau_m * ry;
     const double w_prime = -1.0 * tau_m * rz;
 
-    get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
+    const double tau_dc = get_DC( dxi_dx, u_prime, v_prime, w_prime );
 
     for(int A=0; A<nLocBas; ++A)
     {
@@ -305,7 +307,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
-  double tau_m, tau_c, tau_dc;
+  double tau_m, tau_c;
 
   const double two_mu = 2.0 * vis_mu;
   
@@ -390,7 +392,7 @@ void PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::Assem_Tangent_Residual(
     const double v_prime = -1.0 * tau_m * ry;
     const double w_prime = -1.0 * tau_m * rz;
 
-    get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
+    const double tau_dc = get_DC( dxi_dx, u_prime, v_prime, w_prime );
 
     for(int A=0; A<nLocBas; ++A)
     {
