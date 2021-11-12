@@ -266,11 +266,9 @@ void ElemBC_3D_tet_wall::overwrite_from_vtk(
 {
   SYS_T::file_check( wallprop_vtk );
 
-  std::vector<int> global_node_idx;
-  TET_T::read_int_PointData( wallprop_vtk, "GlobalNodeID", global_node_idx );
+  std::vector<int> global_node_idx = TET_T::read_int_PointData( wallprop_vtk, "GlobalNodeID");
 
-  std::vector<double> wallprop;
-  TET_T::read_double_PointData( wallprop_vtk, vtk_fieldname, wallprop );
+  std::vector<double> wallprop = TET_T::read_double_PointData( wallprop_vtk, vtk_fieldname );
 
   const int ebc_id = 0;
   for( int ii = 0; ii < num_node[ebc_id]; ++ii )
