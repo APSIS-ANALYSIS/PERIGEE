@@ -71,14 +71,14 @@ namespace TET_T
   std::vector<int> read_int_CellData( const std::string &filename, 
       const std::string &dataname );
 
-  void read_double_CellData( const std::string &filename, 
-      const std::string &dataname, std::vector<double> &data );
+  std::vector<double> read_double_CellData( const std::string &filename, 
+      const std::string &dataname );
 
-  void read_int_PointData( const std::string &filename, 
-      const std::string &dataname, std::vector<int> &data );
+  std::vector<int> read_int_PointData( const std::string &filename, 
+      const std::string &dataname );
 
-  void read_double_PointData( const std::string &filename, 
-      const std::string &dataname, std::vector<double> &data );
+  std::vector<double> read_double_PointData( const std::string &filename, 
+      const std::string &dataname );
 
   // ----------------------------------------------------------------
   // ! read_vtu_grid: read the mesh info just exactly the same way
