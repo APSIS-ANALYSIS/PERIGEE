@@ -199,7 +199,7 @@ class PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha : public IPLocAssem
     }
 
     // Define Natural BC functions
-    typedef void ( PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha::*locassem_tet4_ale_vms_ns_funs )( const double &x, const double &y, const double &z,
+    typedef void ( PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::*locassem_tet4_ale_vms_ns_funs )( const double &x, const double &y, const double &z,
         const double &t, const double &nx, const double &ny,
         const double &nz, double &gx, double &gy, double &gz ) const;
 

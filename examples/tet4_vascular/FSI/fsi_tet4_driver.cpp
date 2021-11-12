@@ -24,7 +24,7 @@
 #include "GenBC_Pressure.hpp"
 #include "MaterialModel_NeoHookean_M94_Mixed.hpp"
 #include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
-#include "PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha.hpp"
+#include "PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha.hpp"
 #include "PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha.hpp"
 #include "PLocAssem_Tet4_VMS_Seg_Incompressible.hpp"
 #include "PLocAssem_Tet4_FSI_Mesh_Elastostatic.hpp"
@@ -312,7 +312,7 @@ int main(int argc, char *argv[])
   tm_galpha_ptr->print_info();
   
   // ===== Local assembly =====
-  IPLocAssem * locAssem_fluid_ptr = new PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha(
+  IPLocAssem * locAssem_fluid_ptr = new PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha(
       tm_galpha_ptr, quadv->get_num_quadPts(), fluid_density, fluid_mu, bs_beta );
 
   IMaterialModel * matmodel = nullptr;
