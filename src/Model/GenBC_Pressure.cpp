@@ -1,6 +1,6 @@
 #include "GenBC_Pressure.hpp"
 
-GenBC_Pressure::GenBC_Pressure( const std::string &lpn_filename )
+GenBC_Pressure::GenBC_Pressure( const std::string &lpn_filename, const double &init_time )
 {
   SYS_T::file_check( lpn_filename ); // make sure the file is on the disk
 
@@ -105,7 +105,7 @@ GenBC_Pressure::GenBC_Pressure( const std::string &lpn_filename )
   // Initialize P0 by setting it to be get_P at time = 0.0
   P0.resize( num_ebc );
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
-    P0[ebc_id] = get_P( ebc_id, 0.0, 0.0, 0.0 );
+    P0[ebc_id] = get_P( ebc_id, 0.0, 0.0, init_time );
 }
 
 GenBC_Pressure::~GenBC_Pressure()
