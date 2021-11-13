@@ -549,11 +549,11 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Tangent_Residual
 
         Tangent[4*nLocBas*(4*A+3)+4*B+3] += geo_stiff;
 
-        for(ii=1; ii<4; ++ii)
+        for(ii=0; ii<3; ++ii)
         {
-          for(jj=1; jj<4; ++jj)
+          for(jj=0; jj<3; ++jj)
           {
-            Tangent[ 4*nLocBas*(4*A + ii) + 4*B + jj ] += gwts * ddvm * (
+            Tangent[ 4*nLocBas*(4*A + ii + 1) + 4*B + jj + 1 ] += gwts * ddvm * (
                 NA_x * (AA_iso(ii,0,jj,0) * NB_x + AA_iso(ii,0,jj,1) * NB_y
                   + AA_iso(ii,0,jj,2) * NB_z)
                 + NA_y * (AA_iso(ii,1,jj,0) * NB_x + AA_iso(ii,1,jj,1) * NB_y
