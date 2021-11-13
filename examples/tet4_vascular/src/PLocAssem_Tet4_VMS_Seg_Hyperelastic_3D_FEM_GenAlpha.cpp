@@ -165,8 +165,7 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Residual(
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
-    double fx, fy, fz;
-    get_f(coor_x, coor_y, coor_z, curr, fx, fy, fz);
+    const Vector_3 f_body = get_f(coor_x, coor_y, coor_z, curr);
 
     const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
@@ -190,9 +189,9 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Residual(
     get_tau(tau_m, tau_c, dt, detF, h_e);
 
     // Residual of momentum equation
-    const double Res_Mom[3] { rho * detF * ( vx_t - fx ) + detF * ( invF(0) * p_x + invF(3) * p_y + invF(6) * p_z ), 
-                              rho * detF * ( vy_t - fy ) + detF * ( invF(1) * p_x + invF(4) * p_y + invF(7) * p_z ),
-                              rho * detF * ( vz_t - fz ) + detF * ( invF(2) * p_x + invF(5) * p_y + invF(8) * p_z ) };
+    const double Res_Mom[3] { rho * detF * ( vx_t - f_body.x() ) + detF * ( invF(0) * p_x + invF(3) * p_y + invF(6) * p_z ), 
+                              rho * detF * ( vy_t - f_body.y() ) + detF * ( invF(1) * p_x + invF(4) * p_y + invF(7) * p_z ),
+                              rho * detF * ( vz_t - f_body.z() ) + detF * ( invF(2) * p_x + invF(5) * p_y + invF(8) * p_z ) };
 
     // Residual of mass equation
     const double Res_Mas = detF * ( mbeta * p_t + invFDV_t );
@@ -209,15 +208,15 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Residual(
 
       Residual[4*A  ] += gwts * ( NA * Res_Mas + gradNA_ResMom );
 
-      Residual[4*A+1] += gwts * ( NA * rho * detF * (vx_t - fx)
+      Residual[4*A+1] += gwts * ( NA * rho * detF * (vx_t - f_body.x())
           + NA_x * P_iso(0) + NA_y * P_iso(1) + NA_z * P_iso(2)
           - gradNA.x() * (detF * p - tau_c * Res_Mas) );
 
-      Residual[4*A+2] += gwts * ( NA * rho * detF * (vy_t - fy)
+      Residual[4*A+2] += gwts * ( NA * rho * detF * (vy_t - f_body.y())
           + NA_x * P_iso(3) + NA_y * P_iso(4) + NA_z * P_iso(5)
           - gradNA.y() * (detF * p - tau_c * Res_Mas) );
 
-      Residual[4*A+3] += gwts * ( NA * rho * detF * (vz_t - fz)
+      Residual[4*A+3] += gwts * ( NA * rho * detF * (vz_t - f_body.z())
           + NA_x * P_iso(6) + NA_y * P_iso(7) + NA_z * P_iso(8)
           - gradNA.z() * (detF * p - tau_c * Res_Mas) );
     }
@@ -319,8 +318,7 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Tangent_Residual
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
-    double fx, fy, fz;
-    get_f(coor_x, coor_y, coor_z, curr, fx, fy, fz);
+    const Vector_3 f_body = get_f(coor_x, coor_y, coor_z, curr);
 
     const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
@@ -354,10 +352,9 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Tangent_Residual
     get_tau(tau_m, tau_c, dt, detF, h_e);
 
     // Residual of momentum equation
-    const double Res_Mom[3] { rho * detF * ( vx_t - fx ) + detF * ( invF(0) * p_x + invF(3) * p_y + invF(6) * p_z ), 
-                              rho * detF * ( vy_t - fy ) + detF * ( invF(1) * p_x + invF(4) * p_y + invF(7) * p_z ),
-                              rho * detF * ( vz_t - fz ) + detF * ( invF(2) * p_x + invF(5) * p_y + invF(8) * p_z ) };
-
+    const double Res_Mom[3] { rho * detF * ( vx_t - f_body.x() ) + detF * ( invF(0) * p_x + invF(3) * p_y + invF(6) * p_z ), 
+                              rho * detF * ( vy_t - f_body.y() ) + detF * ( invF(1) * p_x + invF(4) * p_y + invF(7) * p_z ),
+                              rho * detF * ( vz_t - f_body.z() ) + detF * ( invF(2) * p_x + invF(5) * p_y + invF(8) * p_z ) };
 
     // Residual of mass equation
     const double Res_Mas = detF * ( mbeta * p_t + invFDV_t );
@@ -376,20 +373,20 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Tangent_Residual
       const double GradNA_invF_dot_GradP_invF = GradNA_invF[0] * GradP_invF[0] +
         GradNA_invF[1] * GradP_invF[1] + GradNA_invF[2] * GradP_invF[2];
 
-      const double GradNA_invF_dot_part_Mom = GradNA_invF[0] * (vx_t - fx) 
-        + GradNA_invF[1] * (vy_t - fy) + GradNA_invF[2] * (vz_t - fz);
+      const double GradNA_invF_dot_part_Mom = GradNA_invF[0] * (vx_t - f_body.x()) 
+        + GradNA_invF[1] * (vy_t - f_body.y()) + GradNA_invF[2] * (vz_t - f_body.z());
 
       Residual[4*A  ] += gwts * ( NA * Res_Mas + GradNA_invF_ResMom );
 
-      Residual[4*A+1] += gwts * ( NA * rho * detF * (vx_t - fx)
+      Residual[4*A+1] += gwts * ( NA * rho * detF * (vx_t - f_body.x())
           + NA_x * P_iso(0) + NA_y * P_iso(1) + NA_z * P_iso(2)
           - GradNA_invF[0] * (detF * p - tau_c * Res_Mas) );
 
-      Residual[4*A+2] += gwts * ( NA * rho * detF * (vy_t - fy)
+      Residual[4*A+2] += gwts * ( NA * rho * detF * (vy_t - f_body.y())
           + NA_x * P_iso(3) + NA_y * P_iso(4) + NA_z * P_iso(5)
           - GradNA_invF[1] * (detF * p - tau_c * Res_Mas) );
 
-      Residual[4*A+3] += gwts * ( NA * rho * detF * (vz_t - fz)
+      Residual[4*A+3] += gwts * ( NA * rho * detF * (vz_t - f_body.z())
           + NA_x * P_iso(6) + NA_y * P_iso(7) + NA_z * P_iso(8)
           - GradNA_invF[2] * (detF * p - tau_c * Res_Mas) );
 
@@ -520,25 +517,16 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Tangent_Residual
           }
         }
 
-        /* 
-           Sub_Tan[5][index] += gwts * ddvm * NA * rho * detF * (vx_t - fx) * GradNB_invF[0];
-
-           Sub_Tan[6][index] += gwts * ddvm * NA * rho * detF * (vx_t - fx) * GradNB_invF[1];
-
-           Sub_Tan[7][index] += gwts * ddvm * NA * rho * detF * (vx_t - fx) * GradNB_invF[2];
-
-           Sub_Tan[9][index] += gwts * ddvm * NA * rho * detF * (vy_t - fy) * GradNB_invF[0];
-
-           Sub_Tan[10][index] += gwts * ddvm * NA * rho * detF * (vy_t - fy) * GradNB_invF[1];
-
-           Sub_Tan[11][index] += gwts * ddvm * NA * rho * detF * (vy_t - fy) * GradNB_invF[2];
-
-           Sub_Tan[13][index] += gwts * ddvm * NA * rho * detF * (vz_t - fz) * GradNB_invF[0];
-
-           Sub_Tan[14][index] += gwts * ddvm * NA * rho * detF * (vz_t - fz) * GradNB_invF[1];
-
-           Sub_Tan[15][index] += gwts * ddvm * NA * rho * detF * (vz_t - fz) * GradNB_invF[2];
-           */
+        //Sub_Tan[5][index] += gwts * ddvm * NA * rho * detF * (vx_t - fx) * GradNB_invF[0];
+        //Sub_Tan[6][index] += gwts * ddvm * NA * rho * detF * (vx_t - fx) * GradNB_invF[1];
+        //Sub_Tan[7][index] += gwts * ddvm * NA * rho * detF * (vx_t - fx) * GradNB_invF[2];
+        //Sub_Tan[9][index] += gwts * ddvm * NA * rho * detF * (vy_t - fy) * GradNB_invF[0];
+        //Sub_Tan[10][index] += gwts * ddvm * NA * rho * detF * (vy_t - fy) * GradNB_invF[1];
+        //Sub_Tan[11][index] += gwts * ddvm * NA * rho * detF * (vy_t - fy) * GradNB_invF[2];
+        //Sub_Tan[13][index] += gwts * ddvm * NA * rho * detF * (vz_t - fz) * GradNB_invF[0];
+        //Sub_Tan[14][index] += gwts * ddvm * NA * rho * detF * (vz_t - fz) * GradNB_invF[1];
+        //Sub_Tan[15][index] += gwts * ddvm * NA * rho * detF * (vz_t - fz) * GradNB_invF[2];
+      
       } // Finish Loop-B
     } // Finish Loop-A
   } // Finish Loop-qua
@@ -613,9 +601,8 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Mass_Residual(
     }
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
-    
-    double fx, fy, fz;
-    get_f(coor_x, coor_y, coor_z, curr, fx, fy, fz);
+
+    const Vector_3 f_body = get_f(coor_x, coor_y, coor_z, curr);
 
     const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
@@ -628,7 +615,7 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Mass_Residual(
 
     Matrix_3x3 P_iso, S_iso;
     matmodel->get_PK(F, P_iso, S_iso);
-    
+
     double mbeta = matmodel->get_beta(p);
 
     // use 1.0 in case of fully incompressible. 
@@ -642,20 +629,20 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Mass_Residual(
       const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
       const Vector_3 gradNA = invF.VecMultT( Vector_3(NA_x, NA_y, NA_z) );
-      
+
       Residual[4*A  ] += gwts * NA * detF * invFDV_t;
-      
+
       Residual[4*A+1] += gwts * ( NA_x * P_iso(0) + NA_y * P_iso(1) 
           + NA_z * P_iso(2) - gradNA.x() * detF * p 
-          - NA * rho * detF * fx );
+          - NA * rho * detF * f_body.x() );
 
       Residual[4*A+2] += gwts * ( NA_x * P_iso(3) + NA_y * P_iso(4) 
           + NA_z * P_iso(5) - gradNA.y() * detF * p 
-          - NA * rho * detF * fy );
+          - NA * rho * detF * f_body.y() );
 
       Residual[4*A+3] += gwts * ( NA_x * P_iso(6) + NA_y * P_iso(7) 
           + NA_z * P_iso(8) - gradNA.z() * detF * p 
-          - NA * rho * detF * fz );
+          - NA * rho * detF * f_body.z() );
 
       for(int B=0; B<nLocBas; ++B)
       {
