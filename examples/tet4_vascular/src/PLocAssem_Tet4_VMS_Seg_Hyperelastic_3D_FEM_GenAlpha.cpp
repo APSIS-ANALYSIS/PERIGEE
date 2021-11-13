@@ -86,101 +86,86 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Residual(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
-
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   const double h_e = element->get_h( eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  int ii, qua, A, ii7;
-  double p, p_t, p_x, p_y, p_z;
-  double ux_t, uy_t, uz_t, vx, vy, vz;
-  double vx_t, vy_t, vz_t;
-  double ux_x, uy_x, uz_x, ux_y, uy_y, uz_y, ux_z, uy_z, uz_z;
-  double vx_x, vy_x, vz_x, vx_y, vy_y, vz_y, vx_z, vy_z, vz_z;
-  double fx, fy, fz, gwts, coor_x, coor_y, coor_z;
-  double NA, NA_x, NA_y, NA_z;
-
-  double Res_Mom[3];
-  double Res_Mas;
-  double GradNA_invF_ResMom;
-  double invFDV_t;
-
   const double curr = time + alpha_f * dt;
 
   Zero_Residual();
 
-  for(qua=0; qua < nqp; ++qua)
+  for(int qua=0; qua < nqp; ++qua)
   {
-    p = 0.0; p_t = 0.0; p_x = 0.0; p_y = 0.0; p_z = 0.0;
+    double p = 0.0, p_t = 0.0, p_x = 0.0, p_y = 0.0, p_z = 0.0;
 
-    ux_t = 0.0; uy_t = 0.0; uz_t = 0.0;
-    vx   = 0.0; vy   = 0.0; vz   = 0.0;
-    vx_t = 0.0; vy_t = 0.0; vz_t = 0.0;
+    double ux_t = 0.0, uy_t = 0.0, uz_t = 0.0;
+    double vx   = 0.0, vy   = 0.0, vz   = 0.0;
+    double vx_t = 0.0, vy_t = 0.0, vz_t = 0.0;
 
-    ux_x = 0.0; uy_x = 0.0; uz_x = 0.0;
-    ux_y = 0.0; uy_y = 0.0; uz_y = 0.0;
-    ux_z = 0.0; uy_z = 0.0; uz_z = 0.0;
+    double ux_x = 0.0, uy_x = 0.0, uz_x = 0.0;
+    double ux_y = 0.0, uy_y = 0.0, uz_y = 0.0;
+    double ux_z = 0.0, uy_z = 0.0, uz_z = 0.0;
 
-    vx_x = 0.0; vy_x = 0.0; vz_x = 0.0;
-    vx_y = 0.0; vy_y = 0.0; vz_y = 0.0;
-    vx_z = 0.0; vy_z = 0.0; vz_z = 0.0;
+    double vx_x = 0.0, vy_x = 0.0, vz_x = 0.0;
+    double vx_y = 0.0, vy_y = 0.0, vz_y = 0.0;
+    double vx_z = 0.0, vy_z = 0.0, vz_z = 0.0;
 
-    coor_x = 0.0; coor_y = 0.0; coor_z = 0.0;
+    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+
+    double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
 
     element->get_R_gradR( qua, R, dR_dx, dR_dy, dR_dz );
 
-    for(ii=0; ii<nLocBas; ++ii)
+    for(int ii=0; ii<nLocBas; ++ii)
     {
-      ii7 = 7*ii;
-      p   += disp[ii7+3] * R[ii];
-      p_x += disp[ii7+3] * dR_dx[ii];
-      p_y += disp[ii7+3] * dR_dy[ii];
-      p_z += disp[ii7+3] * dR_dz[ii];
+      p    += disp[ii*7+3] * R[ii];
+      p_x  += disp[ii*7+3] * dR_dx[ii];
+      p_y  += disp[ii*7+3] * dR_dy[ii];
+      p_z  += disp[ii*7+3] * dR_dz[ii];
 
-      ux_t += velo[ii7  ] * R[ii];
-      uy_t += velo[ii7+1] * R[ii];
-      uz_t += velo[ii7+2] * R[ii];
-      p_t  += velo[ii7+3] * R[ii];
-      vx_t += velo[ii7+4] * R[ii];
-      vy_t += velo[ii7+5] * R[ii];
-      vz_t += velo[ii7+6] * R[ii];
+      ux_t += velo[ii*7  ] * R[ii];
+      uy_t += velo[ii*7+1] * R[ii];
+      uz_t += velo[ii*7+2] * R[ii];
+      p_t  += velo[ii*7+3] * R[ii];
+      vx_t += velo[ii*7+4] * R[ii];
+      vy_t += velo[ii*7+5] * R[ii];
+      vz_t += velo[ii*7+6] * R[ii];
 
-      vx   += disp[ii7+4] * R[ii];
-      vy   += disp[ii7+5] * R[ii];
-      vz   += disp[ii7+6] * R[ii];
+      vx   += disp[ii*7+4] * R[ii];
+      vy   += disp[ii*7+5] * R[ii];
+      vz   += disp[ii*7+6] * R[ii];
 
-      ux_x += disp[ii7+0] * dR_dx[ii];
-      uy_x += disp[ii7+1] * dR_dx[ii];
-      uz_x += disp[ii7+2] * dR_dx[ii];
+      ux_x += disp[ii*7+0] * dR_dx[ii];
+      uy_x += disp[ii*7+1] * dR_dx[ii];
+      uz_x += disp[ii*7+2] * dR_dx[ii];
 
-      ux_y += disp[ii7+0] * dR_dy[ii];
-      uy_y += disp[ii7+1] * dR_dy[ii];
-      uz_y += disp[ii7+2] * dR_dy[ii];
+      ux_y += disp[ii*7+0] * dR_dy[ii];
+      uy_y += disp[ii*7+1] * dR_dy[ii];
+      uz_y += disp[ii*7+2] * dR_dy[ii];
 
-      ux_z += disp[ii7+0] * dR_dz[ii];
-      uy_z += disp[ii7+1] * dR_dz[ii];
-      uz_z += disp[ii7+2] * dR_dz[ii];
+      ux_z += disp[ii*7+0] * dR_dz[ii];
+      uy_z += disp[ii*7+1] * dR_dz[ii];
+      uz_z += disp[ii*7+2] * dR_dz[ii];
 
-      vx_x += disp[ii7+4] * dR_dx[ii];
-      vy_x += disp[ii7+5] * dR_dx[ii];
-      vz_x += disp[ii7+6] * dR_dx[ii];
+      vx_x += disp[ii*7+4] * dR_dx[ii];
+      vy_x += disp[ii*7+5] * dR_dx[ii];
+      vz_x += disp[ii*7+6] * dR_dx[ii];
 
-      vx_y += disp[ii7+4] * dR_dy[ii];
-      vy_y += disp[ii7+5] * dR_dy[ii];
-      vz_y += disp[ii7+6] * dR_dy[ii];
+      vx_y += disp[ii*7+4] * dR_dy[ii];
+      vy_y += disp[ii*7+5] * dR_dy[ii];
+      vz_y += disp[ii*7+6] * dR_dy[ii];
 
-      vx_z += disp[ii7+4] * dR_dz[ii];
-      vy_z += disp[ii7+5] * dR_dz[ii];
-      vz_z += disp[ii7+6] * dR_dz[ii];
+      vx_z += disp[ii*7+4] * dR_dz[ii];
+      vy_z += disp[ii*7+5] * dR_dz[ii];
+      vz_z += disp[ii*7+6] * dR_dz[ii];
 
       coor_x += eleCtrlPts_x[ii] * R[ii];
       coor_y += eleCtrlPts_y[ii] * R[ii];
       coor_z += eleCtrlPts_z[ii] * R[ii];
     }
 
-    gwts = element->get_detJac(qua) * quad->get_qw(qua);
+    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
+    double fx, fy, fz;
     get_f(coor_x, coor_y, coor_z, curr, fx, fy, fz);
 
     const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
@@ -189,7 +174,7 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Residual(
 
     const Matrix_3x3 DVelo( vx_x, vx_y, vx_z, vy_x, vy_y, vy_z, vz_x, vz_y, vz_z );
 
-    invFDV_t = invF.MatTContraction(DVelo); // invF_Ii V_i,I
+    const double invFDV_t = invF.MatTContraction(DVelo); // invF_Ii V_i,I
 
     Matrix_3x3 P_iso, S_iso;
     Tensor4_3D AA_iso;
@@ -205,9 +190,7 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Residual(
     get_tau(tau_m, tau_c, dt, detF, h_e);
 
     // Residual of momentum equation
-    Res_Mom[0] = rho * detF * vx_t;
-    Res_Mom[1] = rho * detF * vy_t;
-    Res_Mom[2] = rho * detF * vz_t;
+    double Res_Mom[3] { rho * detF * vx_t, rho * detF * vy_t, rho * detF * vz_t };
 
     Res_Mom[0] += detF * ( invF(0) * p_x + invF(3) * p_y + invF(6) * p_z );
     Res_Mom[1] += detF * ( invF(1) * p_x + invF(4) * p_y + invF(7) * p_z );
@@ -218,32 +201,31 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Residual(
     Res_Mom[2] -= rho * detF * fz;
 
     // Residual of mass equation
-    Res_Mas = detF * ( mbeta * p_t + invFDV_t );
+    const double Res_Mas = detF * ( mbeta * p_t + invFDV_t );
 
-    for(A=0; A<nLocBas; ++A)
+    for(int A=0; A<nLocBas; ++A)
     {
-      NA = R[A]; NA_x = dR_dx[A]; NA_y = dR_dy[A]; NA_z = dR_dz[A];
+      const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
       // NA_I invF_Ii 
-      double GradNA_invF[3];
-      invF.VecMultT( NA_x, NA_y, NA_z, GradNA_invF[0], GradNA_invF[1], GradNA_invF[2] );
+      const Vector_3 gradNA = invF.VecMultT( Vector_3(NA_x, NA_y, NA_z) );
 
       // tau_m stabilization term
-      GradNA_invF_ResMom = tau_m * ( GradNA_invF[0] * Res_Mom[0] + GradNA_invF[1] * Res_Mom[1] + GradNA_invF[2] * Res_Mom[2] );
+      const double gradNA_ResMom = tau_m * ( gradNA.x() * Res_Mom[0] + gradNA.y() * Res_Mom[1] + gradNA.z() * Res_Mom[2] );
 
-      Residual[4*A  ] += gwts * ( NA * Res_Mas + GradNA_invF_ResMom );
+      Residual[4*A  ] += gwts * ( NA * Res_Mas + gradNA_ResMom );
 
       Residual[4*A+1] += gwts * ( NA * rho * detF * (vx_t - fx)
           + NA_x * P_iso(0) + NA_y * P_iso(1) + NA_z * P_iso(2)
-          - GradNA_invF[0] * (detF * p - tau_c * Res_Mas) );
+          - gradNA.x() * (detF * p - tau_c * Res_Mas) );
 
       Residual[4*A+2] += gwts * ( NA * rho * detF * (vy_t - fy)
           + NA_x * P_iso(3) + NA_y * P_iso(4) + NA_z * P_iso(5)
-          - GradNA_invF[1] * (detF * p - tau_c * Res_Mas) );
+          - gradNA.y() * (detF * p - tau_c * Res_Mas) );
 
       Residual[4*A+3] += gwts * ( NA * rho * detF * (vz_t - fz)
           + NA_x * P_iso(6) + NA_y * P_iso(7) + NA_z * P_iso(8)
-          - GradNA_invF[2] * (detF * p - tau_c * Res_Mas) );
+          - gradNA.z() * (detF * p - tau_c * Res_Mas) );
     }
   }
 }
