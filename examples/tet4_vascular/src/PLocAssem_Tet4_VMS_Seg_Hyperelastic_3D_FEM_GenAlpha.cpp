@@ -190,15 +190,9 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Residual(
     get_tau(tau_m, tau_c, dt, detF, h_e);
 
     // Residual of momentum equation
-    double Res_Mom[3] { rho * detF * vx_t, rho * detF * vy_t, rho * detF * vz_t };
-
-    Res_Mom[0] += detF * ( invF(0) * p_x + invF(3) * p_y + invF(6) * p_z );
-    Res_Mom[1] += detF * ( invF(1) * p_x + invF(4) * p_y + invF(7) * p_z );
-    Res_Mom[2] += detF * ( invF(2) * p_x + invF(5) * p_y + invF(8) * p_z );
-
-    Res_Mom[0] -= rho * detF * fx;
-    Res_Mom[1] -= rho * detF * fy;
-    Res_Mom[2] -= rho * detF * fz;
+    double Res_Mom[3] { rho * detF * ( vx_t - fx ) + detF * ( invF(0) * p_x + invF(3) * p_y + invF(6) * p_z ), 
+      rho * detF * ( vy_t - fy ) + detF * ( invF(1) * p_x + invF(4) * p_y + invF(7) * p_z ),
+      rho * detF * ( vz_t - fz ) + detF * ( invF(2) * p_x + invF(5) * p_y + invF(8) * p_z ) };
 
     // Residual of mass equation
     const double Res_Mas = detF * ( mbeta * p_t + invFDV_t );
