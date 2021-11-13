@@ -101,24 +101,6 @@ class PLocAssem_Tet4_VMS_Seg_Incompressible : public IPLocAssem
     // useful tensors for the material model
     IMaterialModel * matmodel;
 
-
-    // ----------------- to be moved inside of functions ----------------
-    double rho, mbeta, detF;
-    Matrix_3x3 F, invF, P_iso, S_iso;
-
-    Tensor4_3D AA_iso;
-
-    double tau_m, tau_c;
-    
-    // basis function allocations
-    double R[4];
-    double dR_dx[4];
-    double dR_dy[4];
-    double dR_dz[4];
-
-    double Sub_Tan[16][16];
-    // -------------------------------------------------------------------
-
     void print_info() const;
 
     void get_tau( double &tau_m_qua, double &tau_c_qua,
@@ -149,14 +131,6 @@ class PLocAssem_Tet4_VMS_Seg_Incompressible : public IPLocAssem
       return ((*this).*(flist[ebc_id]))(x,y,z,t,nx,ny,nz,gx,gy,gz);
     }
 
-
-    void Zero_Sub_Tan()
-    {
-      for(int ii=0; ii<16; ++ii)
-      {
-        for(int jj=0; jj<nLocBas * nLocBas; ++jj) Sub_Tan[ii][jj] = 0.0;
-      }
-    }
 };
 
 #endif
