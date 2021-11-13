@@ -33,13 +33,13 @@ PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::~PLocAssem_Tet4_VMS_Seg_Hyp
 
 void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::print_info() const
 {
-  PetscPrintf(PETSC_COMM_WORLD, "----------------------------------------------------------- \n");
-  PetscPrintf(PETSC_COMM_WORLD, "  Three-dimensional Hyper-elastic solid model with VMS mixed formulation, U-kinematic relation, Segregated, FEM formulation: \n");
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Spatial: Finite element with VMS stabilization \n");
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Temporal: Generalized-alpha method \n");
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Solid density rho0 = %e g/cm3\n\n", rho0);
+  SYS_T::commPrint("----------------------------------------------------------- \n");
+  SYS_T::commPrint("  Three-dimensional Hyper-elastic solid model with VMS mixed formulation, U-kinematic relation, Segregated, FEM formulation: \n");
+  SYS_T::commPrint("\t  Spatial: Finite element with VMS stabilization \n");
+  SYS_T::commPrint("\t  Temporal: Generalized-alpha method \n");
+  SYS_T::commPrint("\t  Solid density rho0 = %e g/cm3\n\n", rho0);
   matmodel->print_info();
-  PetscPrintf(PETSC_COMM_WORLD, "----------------------------------------------------------- \n");
+  SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
 
@@ -86,6 +86,8 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Residual(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
+  double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
+
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   const double h_e = element->get_h( eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
@@ -103,7 +105,6 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Residual(
   double Res_Mas;
   double GradNA_invF_ResMom;
   double invFDV_t;
-  Matrix_3x3 DVelo;
 
   const double curr = time + alpha_f * dt;
 
@@ -182,30 +183,25 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Residual(
 
     get_f(coor_x, coor_y, coor_z, curr, fx, fy, fz);
 
-    F(0) = ux_x + 1.0; F(1) = ux_y; F(2) = ux_z;
-    F(3) = uy_x; F(4) = uy_y + 1.0; F(5) = uy_z;
-    F(6) = uz_x; F(7) = uz_y; F(8) = uz_z + 1.0;
+    const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
-    invF.copy(F);
-    invF.inverse();
+    Matrix_3x3 invF( F ); invF.inverse();
 
-    DVelo(0) = vx_x; DVelo(1) = vx_y; DVelo(2) = vx_z;
-    DVelo(3) = vy_x; DVelo(4) = vy_y; DVelo(5) = vy_z;
-    DVelo(6) = vz_x; DVelo(7) = vz_y; DVelo(8) = vz_z;
+    const Matrix_3x3 DVelo( vx_x, vx_y, vx_z, vy_x, vy_y, vy_z, vz_x, vz_y, vz_z );
 
     invFDV_t = invF.MatTContraction(DVelo); // invF_Ii V_i,I
 
+    Matrix_3x3 P_iso, S_iso;
+    Tensor4_3D AA_iso;
+
     matmodel->get_PK_FFStiffness(F, P_iso, S_iso, AA_iso);
 
-    rho = matmodel->get_rho(p);
-    drho = matmodel->get_drho_dp(p);
-
-    mbeta = matmodel->get_beta(p);
-    dmbeta = matmodel->get_dbeta_dp(p); 
-
-    detF = F.det();
+    const double rho = matmodel->get_rho(p);
+    const double mbeta = matmodel->get_beta(p);
+    const double detF = F.det();
 
     // Get stabilization parameters
+    double tau_m, tau_c;
     get_tau(tau_m, tau_c, dt, detF, h_e);
 
     // Residual of momentum equation
@@ -263,13 +259,13 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Tangent_Residual
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y,
-      eleCtrlPts_z );
+  double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
+  
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  const double h_e = element->get_h( eleCtrlPts_x,
-      eleCtrlPts_y, eleCtrlPts_z );
+  const double h_e = element->get_h( eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  int ii, jj, qua, A, B, index, ii7;
+  int ii, jj, qua, A, B, ii7;
   double p, p_t, p_x, p_y, p_z;
   double ux_t, uy_t, uz_t, vx, vy, vz;
   double vx_t, vy_t, vz_t;
@@ -289,7 +285,7 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Tangent_Residual
   double GradNA_invF_dot_GradNB_invF;
   double GradNA_invF_dot_part_Mom;
 
-  Matrix_3x3 DVelo, Dvelo_invF;
+  Matrix_3x3 Dvelo_invF;
 
   const double curr = time + alpha_f * dt;
 
@@ -298,8 +294,6 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Tangent_Residual
   const double ddvm = dd_dv * dd_dv / alpha_m;
 
   Zero_Tangent_Residual();
-
-  Zero_Sub_Tan();
 
   for(qua=0; qua < nqp; ++qua)
   {
@@ -374,16 +368,11 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Tangent_Residual
 
     get_f(coor_x, coor_y, coor_z, curr, fx, fy, fz);
 
-    F(0) = ux_x + 1.0; F(1) = ux_y; F(2) = ux_z;
-    F(3) = uy_x; F(4) = uy_y + 1.0; F(5) = uy_z;
-    F(6) = uz_x; F(7) = uz_y; F(8) = uz_z + 1.0;
+    const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
-    invF.copy(F);
-    invF.inverse();
+    Matrix_3x3 invF( F ); invF.inverse();
 
-    DVelo(0) = vx_x; DVelo(1) = vx_y; DVelo(2) = vx_z;
-    DVelo(3) = vy_x; DVelo(4) = vy_y; DVelo(5) = vy_z;
-    DVelo(6) = vz_x; DVelo(7) = vz_y; DVelo(8) = vz_z;
+    const Matrix_3x3 DVelo( vx_x, vx_y, vx_z, vy_x, vy_y, vy_z, vz_x, vz_y, vz_z );
 
     Dvelo_invF.MatMult(DVelo, invF); // v_i,I invF_Ij = v_i,j
 
@@ -392,17 +381,20 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Tangent_Residual
 
     invFDV_t = invF.MatTContraction(DVelo); // invF_Ii V_i,I
 
+    Matrix_3x3 P_iso, S_iso;
+    Tensor4_3D AA_iso;
     matmodel->get_PK_FFStiffness(F, P_iso, S_iso, AA_iso);
 
-    rho = matmodel->get_rho(p);
-    drho = matmodel->get_drho_dp(p);
+    const double rho = matmodel->get_rho(p);
+    const double drho = matmodel->get_drho_dp(p);
 
-    mbeta = matmodel->get_beta(p);
-    dmbeta = matmodel->get_dbeta_dp(p); 
+    const double mbeta = matmodel->get_beta(p);
+    const double dmbeta = matmodel->get_dbeta_dp(p); 
 
-    detF = F.det();
+    const double detF = F.det();
 
     // Get stabilization parameters
+    double tau_m, tau_c;
     get_tau(tau_m, tau_c, dt, detF, h_e);
 
     // Residual of momentum equation
@@ -454,7 +446,6 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Tangent_Residual
 
       for(B=0; B<nLocBas; ++B)
       {
-        index = A * nLocBas + B;
         NB = R[B]; NB_x = dR_dx[B]; NB_y = dR_dy[B]; NB_z = dR_dz[B];
 
         const double NANBJ = detF * NA * NB;
@@ -468,12 +459,12 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Tangent_Residual
         GradNA_invF_dot_GradNB_invF = GradNA_invF[0] * GradNB_invF[0] +
           GradNA_invF[1] * GradNB_invF[1] + GradNA_invF[2] * GradNB_invF[2];
 
-        Sub_Tan[0][index] += gwts * (alpha_m * mbeta * NANBJ
+        Tangent[ 16*nLocBas*A + 4*B ] += gwts * (alpha_m * mbeta * NANBJ
             + dd_dv * ( dmbeta * p_t * NANBJ 
               + GradNA_invF_dot_GradNB_invF * tau_m * detF 
               + tau_m * drho * detF * NB * GradNA_invF_dot_part_Mom ) );
 
-        Sub_Tan[1][index] += gwts * ( 
+        Tangent[ 16*nLocBas*A + 4*B + 1 ] += gwts * ( 
             alpha_m * GradNA_invF[0] * tau_m * rho * detF * NB
             + dd_dv * NA * detF * GradNB_invF[0]
             + ddvm * ( NA * detF * mbeta * p_t * GradNB_invF[0]
@@ -487,7 +478,7 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Tangent_Residual
               + tau_m * rho * detF * GradNA_invF_dot_part_Mom * GradNB_invF[0]
               ) );
 
-        Sub_Tan[2][index] += gwts * (
+        Tangent[ 16*nLocBas*A + 4*B + 2 ] += gwts * (
             alpha_m * GradNA_invF[1] * tau_m * rho * detF * NB
             + dd_dv * NA * detF * GradNB_invF[1]
             + ddvm * ( NA * detF * mbeta * p_t * GradNB_invF[1]
@@ -501,7 +492,7 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Tangent_Residual
               + tau_m * rho * detF * GradNA_invF_dot_part_Mom * GradNB_invF[1]
               ) );
 
-        Sub_Tan[3][index] += gwts * (
+        Tangent[ 16*nLocBas*A + 4*B + 3 ] += gwts * (
             alpha_m * GradNA_invF[2] * tau_m * rho * detF * NB
             + dd_dv * NA * detF * GradNB_invF[2]
             + ddvm * ( NA * detF * mbeta * p_t * GradNB_invF[2]
@@ -515,36 +506,36 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Tangent_Residual
               + tau_m * rho * detF * GradNA_invF_dot_part_Mom * GradNB_invF[2]
               ) );
 
-        Sub_Tan[4][index] += gwts * GradNA_invF[0] * detF * NB *
+        Tangent[4*nLocBas*(4*A+1)+4*B] += gwts * GradNA_invF[0] * detF * NB *
           (alpha_m * tau_c * mbeta - dd_dv*(1.0 - tau_c*dmbeta*p_t));
 
-        Sub_Tan[8][index] += gwts * GradNA_invF[1] * detF * NB *
+        Tangent[4*nLocBas*(4*A+2)+4*B] += gwts * GradNA_invF[1] * detF * NB *
           (alpha_m * tau_c * mbeta - dd_dv*(1.0 - tau_c*dmbeta*p_t));
 
-        Sub_Tan[12][index] += gwts * GradNA_invF[2] * detF * NB *
+        Tangent[4*nLocBas*(4*A+3)+4*B] += gwts * GradNA_invF[2] * detF * NB *
           (alpha_m * tau_c * mbeta - dd_dv*(1.0 - tau_c*dmbeta*p_t));
 
         const double mass_entry = gwts * NA * rho * detF * NB * alpha_m;
 
-        Sub_Tan[5][index] += mass_entry 
+        Tangent[4*nLocBas*(4*A+1)+4*B+1] += mass_entry 
           + gwts * dd_dv * tau_c * detF * GradNA_invF[0] * GradNB_invF[0];
 
-        Sub_Tan[6][index] += gwts * dd_dv * tau_c * detF * GradNA_invF[0] * GradNB_invF[1];
+        Tangent[4*nLocBas*(4*A+1)+4*B+2] += gwts * dd_dv * tau_c * detF * GradNA_invF[0] * GradNB_invF[1];
 
-        Sub_Tan[7][index] += gwts * dd_dv * tau_c * detF * GradNA_invF[0] * GradNB_invF[2];
+        Tangent[4*nLocBas*(4*A+1)+4*B+3] += gwts * dd_dv * tau_c * detF * GradNA_invF[0] * GradNB_invF[2];
 
-        Sub_Tan[9][index] += gwts * dd_dv * tau_c * detF * GradNA_invF[1] * GradNB_invF[0];
+        Tangent[4*nLocBas*(4*A+2)+4*B+1] += gwts * dd_dv * tau_c * detF * GradNA_invF[1] * GradNB_invF[0];
 
-        Sub_Tan[10][index] += mass_entry
+        Tangent[4*nLocBas*(4*A+2)+4*B+2] += mass_entry
           + gwts * dd_dv * tau_c * detF * GradNA_invF[1] * GradNB_invF[1];
 
-        Sub_Tan[11][index] += gwts * dd_dv * tau_c * detF * GradNA_invF[1] * GradNB_invF[2];
+        Tangent[4*nLocBas*(4*A+2)+4*B+3] += gwts * dd_dv * tau_c * detF * GradNA_invF[1] * GradNB_invF[2];
 
-        Sub_Tan[13][index] += gwts * dd_dv * tau_c * detF * GradNA_invF[2] * GradNB_invF[0];
+        Tangent[4*nLocBas*(4*A+3)+4*B+1] += gwts * dd_dv * tau_c * detF * GradNA_invF[2] * GradNB_invF[0];
 
-        Sub_Tan[14][index] += gwts * dd_dv * tau_c * detF * GradNA_invF[2] * GradNB_invF[1];
+        Tangent[4*nLocBas*(4*A+3)+4*B+2] += gwts * dd_dv * tau_c * detF * GradNA_invF[2] * GradNB_invF[1];
 
-        Sub_Tan[15][index] += mass_entry
+        Tangent[4*nLocBas*(4*A+3)+4*B+3] += mass_entry
           + gwts * dd_dv * tau_c * detF * GradNA_invF[2] * GradNB_invF[2];
 
         const double geo_stiff = gwts * ddvm * (
@@ -552,17 +543,17 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Tangent_Residual
             + NA_y * ( S_iso(3) * NB_x + S_iso(4) * NB_y + S_iso(5) * NB_z )
             + NA_z * ( S_iso(6) * NB_x + S_iso(7) * NB_y + S_iso(8) * NB_z) );
 
-        Sub_Tan[5][index]  += geo_stiff;
+        Tangent[4*nLocBas*(4*A+1)+4*B+1] += geo_stiff;
 
-        Sub_Tan[10][index] += geo_stiff;
+        Tangent[4*nLocBas*(4*A+2)+4*B+2] += geo_stiff;
 
-        Sub_Tan[15][index] += geo_stiff;
+        Tangent[4*nLocBas*(4*A+3)+4*B+3] += geo_stiff;
 
-        for(ii=0; ii<3; ++ii)
+        for(ii=1; ii<4; ++ii)
         {
-          for(jj=0; jj<3; ++jj)
+          for(jj=1; jj<4; ++jj)
           {
-            Sub_Tan[4*ii+jj+5][index] += gwts * ddvm * (
+            Tangent[ 4*nLocBas*(4*A + ii) + 4*B + jj ] += gwts * ddvm * (
                 NA_x * (AA_iso(ii,0,jj,0) * NB_x + AA_iso(ii,0,jj,1) * NB_y
                   + AA_iso(ii,0,jj,2) * NB_z)
                 + NA_y * (AA_iso(ii,1,jj,0) * NB_x + AA_iso(ii,1,jj,1) * NB_y
@@ -602,21 +593,6 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Tangent_Residual
       } // Finish Loop-B
     } // Finish Loop-A
   } // Finish Loop-qua
-
-  for(ii=0; ii<4; ++ii)
-  {
-    for(jj=0; jj<4; ++jj)
-    {
-      for(A=0; A<nLocBas; ++A)
-      {
-        for(B=0; B<nLocBas; ++B)
-        {
-          Tangent[ 4*nLocBas*(4*A + ii) + 4*B + jj ]
-            = Sub_Tan[ii*4+jj][A*nLocBas + B];
-        }
-      }
-    }
-  }
 }
 
 
@@ -628,10 +604,10 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Mass_Residual(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y,
-      eleCtrlPts_z );
+  double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  int ii, jj, qua, A, B, index, ii7;
+  int ii, qua, A, B, ii7;
   double p, ux_x, uy_x, uz_x, ux_y, uy_y, uz_y, ux_z, uy_z, uz_z;
   double vx_x, vy_x, vz_x, vx_y, vy_y, vz_y, vx_z, vy_z, vz_z;
   double vx, vy, vz;
@@ -642,11 +618,7 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Mass_Residual(
 
   double invFDV_t;
 
-  Matrix_3x3 DVelo;
-
   Zero_Tangent_Residual();
-
-  Zero_Sub_Tan();
 
   for(qua=0; qua<nqp; ++qua)
   {
@@ -704,28 +676,25 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Mass_Residual(
     gwts = element->get_detJac(qua) * quad->get_qw(qua);
     get_f(coor_x, coor_y, coor_z, curr, fx, fy, fz);
 
-    F(0) = ux_x + 1.0; F(1) = ux_y; F(2) = ux_z;
-    F(3) = uy_x; F(4) = uy_y + 1.0; F(5) = uy_z;
-    F(6) = uz_x; F(7) = uz_y; F(8) = uz_z + 1.0;
+    const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
-    invF.copy(F);
-    invF.inverse();
+    Matrix_3x3 invF( F ); invF.inverse();
 
-    DVelo(0) = vx_x; DVelo(1) = vx_y; DVelo(2) = vx_z;
-    DVelo(3) = vy_x; DVelo(4) = vy_y; DVelo(5) = vy_z;
-    DVelo(6) = vz_x; DVelo(7) = vz_y; DVelo(8) = vz_z;
+    const Matrix_3x3 DVelo( vx_x, vx_y, vx_z, vy_x, vy_y, vy_z, vz_x, vz_y, vz_z );
 
     // invF_Ii DV_i,I = v_i,i = div v
     invFDV_t = invF.MatTContraction(DVelo);
 
+    Matrix_3x3 P_iso, S_iso;
     matmodel->get_PK(F, P_iso, S_iso);
-    mbeta = matmodel->get_beta(p);
+    
+    double mbeta = matmodel->get_beta(p);
 
     // use 1.0 in case of fully incompressible. 
     if( mbeta < 1.0e-5 ) mbeta = 1.0;
 
-    rho = matmodel->get_rho(p);
-    detF = F.det();
+    const double rho = matmodel->get_rho(p);
+    const double detF = F.det();
 
     for(A=0; A<nLocBas; ++A)
     {
@@ -750,32 +719,15 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Mass_Residual(
 
       for(B=0; B<nLocBas; ++B)
       {
-        index = A * nLocBas + B;
-
         NB = R[B];
 
-        Sub_Tan[0][index]  += gwts * NA * detF * mbeta * NB;
-        Sub_Tan[5][index]  += gwts * NA * rho * detF * NB;
-        Sub_Tan[10][index] += gwts * NA * rho * detF * NB;
-        Sub_Tan[15][index] += gwts * NA * rho * detF * NB;
+        Tangent[4*nLocBas*(4*A)   + 4*B]   += gwts * NA * detF * mbeta * NB;
+        Tangent[4*nLocBas*(4*A+1) + 4*B+1] += gwts * NA * rho * detF * NB;
+        Tangent[4*nLocBas*(4*A+2) + 4*B+2] += gwts * NA * rho * detF * NB;
+        Tangent[4*nLocBas*(4*A+3) + 4*B+3] += gwts * NA * rho * detF * NB;
       } // Finish loop-B
     } // Finish loop-A
   } // Finish loop-qua
-
-  for(ii=0; ii<4; ++ii)
-  {
-    for(jj=0; jj<4; ++jj)
-    {
-      for(A=0; A<nLocBas; ++A)
-      {
-        for(B=0; B<nLocBas; ++B)
-        {
-          Tangent[ 4*nLocBas*(4*A + ii) + 4*B + jj ]
-            = Sub_Tan[ii*4+jj][A*nLocBas + B];
-        }
-      }
-    }
-  }
 }
 
 
@@ -801,7 +753,7 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Residual_EBC(
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
-    element->get_R(qua, R);
+    const std::vector<double> R = element->get_R(qua);
 
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 

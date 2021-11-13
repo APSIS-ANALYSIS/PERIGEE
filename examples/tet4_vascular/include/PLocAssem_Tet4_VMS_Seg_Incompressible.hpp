@@ -93,22 +93,23 @@ class PLocAssem_Tet4_VMS_Seg_Incompressible : public IPLocAssem
 
     const int num_ebc_fun;
 
-    double tau_m, tau_c;
-
     // memory layout
     // dof_per_node = 7 to make it compatible with the problem setting
     // vec_size = 4 * nLocBas, which defines the local matrix/vector length
-    const int nLocBas, dof_per_node, vec_size;
-    const int nqp;
-    const int snLocBas;
+    const int nLocBas, dof_per_node, vec_size, nqp, snLocBas;
 
     // useful tensors for the material model
     IMaterialModel * matmodel;
+
+
+    // ----------------- to be moved inside of functions ----------------
     double rho, mbeta, detF;
     Matrix_3x3 F, invF, P_iso, S_iso;
 
     Tensor4_3D AA_iso;
 
+    double tau_m, tau_c;
+    
     // basis function allocations
     double R[4];
     double dR_dx[4];
@@ -116,6 +117,7 @@ class PLocAssem_Tet4_VMS_Seg_Incompressible : public IPLocAssem
     double dR_dz[4];
 
     double Sub_Tan[16][16];
+    // -------------------------------------------------------------------
 
     void print_info() const;
 
