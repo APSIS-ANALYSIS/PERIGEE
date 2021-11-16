@@ -20,8 +20,10 @@
 #include "CVFlowRate_Linear2Steady.hpp"
 #include "GenBC_Resistance.hpp"
 #include "GenBC_RCR.hpp"
-#include "GenBC_Tools.hpp"
-#include "PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha.hpp"
+#include "GenBC_Inductance.hpp"
+#include "GenBC_Coronary.hpp"
+#include "GenBC_Pressure.hpp"
+#include "PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha.hpp"
 #include "PLocAssem_Tet4_FSI_Mesh_Laplacian.hpp"
 #include "PGAssem_ALE_NS_FEM.hpp"
 #include "PDNSolution_Tet4_ALE_NS_3D.hpp"
@@ -227,10 +229,8 @@ int main(int argc, char *argv[])
   tm_galpha_ptr->print_info();
 
   // ===== Local assembly initialization =====
-  IPLocAssem * locAssem_ptr = new PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha(
-      tm_galpha_ptr, GMIptr->get_nLocBas(),
-      quadv->get_num_quadPts(), elements->get_nLocBas(),
-      fluid_density, fluid_mu, bs_beta );
+  IPLocAssem * locAssem_ptr = new PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha(
+      tm_galpha_ptr, quadv->get_num_quadPts(), fluid_density, fluid_mu, bs_beta );
 
   IPLocAssem * locAssem_mesh_ptr = new PLocAssem_Tet4_FSI_Mesh_Laplacian();
 
@@ -282,7 +282,7 @@ int main(int argc, char *argv[])
   else if( GENBC_T::get_genbc_file_type( lpn_file ) == 4  )
     gbc = new GenBC_Coronary( lpn_file, 1000, initial_step, initial_index );
   else if( GENBC_T::get_genbc_file_type( lpn_file ) == 5  )
-    gbc = new GenBC_Pressure( lpn_file );
+    gbc = new GenBC_Pressure( lpn_file, initial_time );
   else
     SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
 

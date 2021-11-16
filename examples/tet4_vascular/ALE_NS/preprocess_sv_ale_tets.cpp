@@ -24,9 +24,9 @@
 #include "NodalBC_3D_vtp.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_tet_outflow.hpp"
-#include "NBC_Partition_3D.hpp"
-#include "NBC_Partition_3D_inflow.hpp"
-#include "EBC_Partition_vtp_outflow.hpp"
+#include "NBC_Partition.hpp"
+#include "NBC_Partition_inflow.hpp"
+#include "EBC_Partition_outflow.hpp"
 
 int main( int argc, char * argv[] )
 {
@@ -254,24 +254,24 @@ int main( int argc, char * argv[] )
     part -> print_part_loadbalance_edgecut();
 
     // Partition Nodal BC
-    INBC_Partition * nbcpart = new NBC_Partition_3D(part, mnindex, NBC_list);
+    NBC_Partition * nbcpart = new NBC_Partition(part, mnindex, NBC_list);
     nbcpart -> write_hdf5(part_file.c_str());
 
     // Partition Nodal Inflow BC
-    INBC_Partition * infpart = new NBC_Partition_3D_inflow(part, mnindex, InFBC);
+    NBC_Partition_inflow * infpart = new NBC_Partition_inflow(part, mnindex, InFBC);
     infpart->write_hdf5( part_file.c_str() );
 
     // Partition Elem BC
-    IEBC_Partition * ebcpart = new EBC_Partition_vtp_outflow(part, mnindex, ebc, NBC_list);
+    EBC_Partition_outflow * ebcpart = new EBC_Partition_outflow(part, mnindex, ebc, NBC_list);
 
     ebcpart -> write_hdf5(part_file.c_str());
 
     // Partition Mesh Nodal BC
-    INBC_Partition * mbcpart = new NBC_Partition_3D(part, mnindex, meshBC_list);
+    NBC_Partition * mbcpart = new NBC_Partition(part, mnindex, meshBC_list);
     mbcpart -> write_hdf5(part_file.c_str(), "/mesh_nbc");
 
     // Partition Mesh Elem BC
-    IEBC_Partition * mebcpart = new EBC_Partition_vtp(part, mnindex, mesh_ebc);
+    EBC_Partition * mebcpart = new EBC_Partition(part, mnindex, mesh_ebc);
     mebcpart-> write_hdf5(part_file.c_str(), "/mesh_ebc");
 
     list_nlocalnode.push_back(part->get_nlocalnode());
@@ -285,40 +285,25 @@ int main( int argc, char * argv[] )
     delete mbcpart; delete mebcpart;
   }
 
+  // Print mesh partition statistics
   cout<<"\n===> Mesh Partition Quality: "<<endl;
-  cout<<"The largest ghost / local node ratio is: ";
-  cout<<*std::max_element(list_ratio_g2l.begin(), list_ratio_g2l.end())<<endl;
-
-  cout<<"The smallest ghost / local node ratio is: ";
-  cout<<*std::min_element(list_ratio_g2l.begin(), list_ratio_g2l.end())<<endl;
-
-  cout<<"The summation of the number of ghost nodes is: "<<sum_nghostnode<<endl;
-
-  cout<<"The maximum badnode number is: ";
-  cout<<*std::max_element(list_nbadnode.begin(), list_nbadnode.end())<<endl;
-
-  const int maxpart_nlocalnode = *std::max_element(list_nlocalnode.begin(),
-      list_nlocalnode.end());
-  const int minpart_nlocalnode = *std::min_element(list_nlocalnode.begin(),
-      list_nlocalnode.end());
-
-  cout<<"The maximum and minimum local node numbers are ";
-  cout<<maxpart_nlocalnode<<"\t";
-  cout<<minpart_nlocalnode<<endl;
-  cout<<"The maximum / minimum of local node is: ";
-  cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<endl;
+  cout<<" --- The largest ghost / local node ratio is: "<<VEC_T::max( list_ratio_g2l )<<'\n';
+  cout<<" --- The smallest ghost / local node ratio is: "<<VEC_T::min( list_ratio_g2l )<<'\n';
+  cout<<" --- The summation of the number of ghost nodes is: "<<sum_nghostnode<<endl;
+  cout<<" --- The maximum badnode number is: "<<VEC_T::max( list_nbadnode )<<'\n';
+  cout<<" --- The maximum and minimum local node numbers are "<<VEC_T::max( list_nlocalnode )<<" and "<<VEC_T::min( list_nlocalnode )<<'\n';
+  cout<<" --- The maximum / minimum ratio of local node is: ";
+  cout<<(double) VEC_T::max( list_nlocalnode ) / (double) VEC_T::min( list_nlocalnode ) <<endl;
 
   // Free memory
-  delete ebc; delete InFBC; delete mesh_ebc;
-  std::vector<INodalBC *>::iterator it_nbc;
-  for(it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc) 
-    delete *it_nbc;
+  for(auto it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc) delete *it_nbc;
 
-  for(it_nbc=meshBC_list.begin(); it_nbc != meshBC_list.end(); ++it_nbc) 
-    delete *it_nbc;
+  for(auto it_nbc=meshBC_list.begin(); it_nbc != meshBC_list.end(); ++it_nbc) delete *it_nbc;
 
   delete mnindex; delete global_part; delete mesh; delete IEN; delete mytimer;
+  delete ebc; delete InFBC; delete mesh_ebc;
   PetscFinalize();
+  cout<<"===> Preprocessing completes successfully!\n";
   return EXIT_SUCCESS;
 }
 

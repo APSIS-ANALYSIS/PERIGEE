@@ -56,10 +56,10 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
-  ${perigee_source}/Mesh/NBC_Partition_3D.cpp
-  ${perigee_source}/Mesh/NBC_Partition_3D_inflow.cpp
-  ${perigee_source}/Mesh/EBC_Partition_vtp.cpp
-  ${perigee_source}/Mesh/EBC_Partition_vtp_outflow.cpp
+  ${perigee_source}/Mesh/NBC_Partition.cpp
+  ${perigee_source}/Mesh/NBC_Partition_inflow.cpp
+  ${perigee_source}/Mesh/EBC_Partition.cpp
+  ${perigee_source}/Mesh/EBC_Partition_outflow.cpp
   ${perigee_source}/Mesh/Map_Node_Index.cpp
   ${perigee_source}/Mesh/Global_Part_METIS.cpp
   ${perigee_source}/Mesh/Global_Part_Serial.cpp
@@ -94,6 +94,9 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Element/FEAElement_Tet4.cpp
   ${perigee_source}/Model/GenBC_RCR.cpp
   ${perigee_source}/Model/GenBC_Resistance.cpp
+  ${perigee_source}/Model/GenBC_Inductance.cpp
+  ${perigee_source}/Model/GenBC_Coronary.cpp
+  ${perigee_source}/Model/GenBC_Pressure.cpp
   ${perigee_source}/Model/GenBC_Tools.cpp
   ${perigee_source}/Model/CVFlowRate_Unsteady.cpp
   ${perigee_source}/Model/CVFlowRate_Linear2Steady.cpp
@@ -102,7 +105,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/Seg_Sol_Tools.cpp
   ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
-  ${perigee_SOURCE_DIR}/../src/PLocAssem_Tet4_ALE_VMS_NS_mom_3D_GenAlpha.cpp
+  ${perigee_SOURCE_DIR}/../src/PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha.cpp
   ${perigee_SOURCE_DIR}/../src/PLocAssem_Tet4_FSI_Mesh_Laplacian.cpp
   ${perigee_SOURCE_DIR}/../src/PGAssem_ALE_NS_FEM.cpp
   ${perigee_SOURCE_DIR}/../src/PDNSolution_Tet4_ALE_NS_3D.cpp
