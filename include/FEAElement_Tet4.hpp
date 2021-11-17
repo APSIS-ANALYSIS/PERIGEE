@@ -24,6 +24,8 @@ class FEAElement_Tet4 : public FEAElement
     // A unique number for this element.
     virtual int get_Type() const {return 501;}
 
+    virtual std::string get_TypeName() const { return "Tet-4"; }
+
     virtual int get_numType() const {return 1;}
 
     virtual int get_numQuapts() const {return numQuapts;}
