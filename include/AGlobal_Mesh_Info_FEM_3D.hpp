@@ -35,15 +35,6 @@ class AGlobal_Mesh_Info_FEM_3D : public IAGlobal_Mesh_Info
     virtual int get_ydegree() const {return ydegree;}
     virtual int get_zdegree() const {return zdegree;}
 
-    virtual double get_max_hx() const
-    {SYS_T::print_fatal("Error: AGlobal_Mesh_Info_FEM_3D::get_max_hx is not implemented. \n"); return 0.0;}
-
-    virtual double get_max_hy() const
-    {SYS_T::print_fatal("Error: AGlobal_Mesh_Info_FEM_3D::get_max_hy is not implemented. \n"); return 0.0;}
-
-    virtual double get_max_hz() const
-    {SYS_T::print_fatal("Error: AGlobal_Mesh_Info_FEM_3D::get_max_hz is not implemented. \n"); return 0.0;}
-   
     // Get the total number of element of the whole mesh. 
     virtual int get_nElem() const {return nElem;}
 

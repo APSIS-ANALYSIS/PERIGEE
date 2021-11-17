@@ -46,8 +46,7 @@ AGlobal_Mesh_Info_FEM_3D::AGlobal_Mesh_Info_FEM_3D(
 
   delete h5r; H5Fclose( file_id );
   
-  if(num_enrich_node < 0)
-    SYS_T::print_fatal("Error: AGlobal_Mesh_Info_FEM_3D::AGlobal_Mesh_Info_FEM_3D input number of enrichment nodes is negative. \n");
+  SYS_T::print_fatal_if( num_enrich_node < 0, "Error: AGlobal_Mesh_Info_FEM_3D::AGlobal_Mesh_Info_FEM_3D input number of enrichment nodes is negative. \n");
 
   nFunc = nFunc + nElem * num_enrich_node;
   nLocBas = nLocBas + num_enrich_node;
