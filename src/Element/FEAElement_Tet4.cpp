@@ -14,7 +14,7 @@ void FEAElement_Tet4::print() const
 {
   SYS_T::commPrint("Tet4: ");
   SYS_T::commPrint("4-node tetrahedral element with up to 2nd derivatives. \n");
-  PetscPrintf(PETSC_COMM_WORLD, "elemType: %d \n", get_Type());
+  SYS_T::commPrint("elemType: %d \n", get_Type());
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
 }
 
