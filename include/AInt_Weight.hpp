@@ -16,8 +16,7 @@
 class AInt_Weight
 {
   public:
-    AInt_Weight( const IQuadPts * const &qua_s,
-        const IQuadPts * const &qua_t,
+    AInt_Weight( const IQuadPts * const &qua_s, const IQuadPts * const &qua_t,
         const IQuadPts * const &qua_u );
 
     AInt_Weight( const IQuadPts * const &qua_s, const IQuadPts * const &qua_t );

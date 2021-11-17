@@ -37,10 +37,10 @@ class ALocal_Elem
     // is attached to each element to denote different physical domains,
     // such as fluid vs. solid subdomains. For a single domain problem,
     // this function is NOT needed, and returns a default value of 0.
-    virtual int get_elem_tag(const int &index) const
+    virtual int get_elem_tag(const int &ee) const
     {
-      SYS_T::print_fatal("Warning: ALocal_Elem::get_elem_tag is not implemented.\n");
-      return 0;
+      if( isTagged ) return elem_tag[ee];
+      else return 0;
     }
 
   private:
@@ -50,6 +50,14 @@ class ALocal_Elem
     // The number of elements that belong to the CPU, which equals
     // the length of the elem_loc vector.
     int nlocalele;
+
+    // Flag that determine if the element has an additional tag
+    bool isTagged;
+
+    // A vector recording the tag of elements. Length is nlocalele.
+    // In FSI problems, we assume tag 0 gives fluid element; 
+    //                            tag 1 gives solid element.
+    std::vector<int> elem_tag;
 };
 
 #endif

@@ -8,7 +8,7 @@
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
 #include "APart_Node_FSI.hpp"
-#include "ALocal_Elem_wTag.hpp"
+#include "ALocal_Elem.hpp"
 #include "ALocal_EBC_outflow.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
@@ -242,7 +242,7 @@ int main(int argc, char *argv[])
   
   APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file, rank);
   
-  ALocal_Elem * locElem = new ALocal_Elem_wTag(part_file, rank);
+  ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
   
   ALocal_NodalBC * locnbc = new ALocal_NodalBC(part_file, rank);
  

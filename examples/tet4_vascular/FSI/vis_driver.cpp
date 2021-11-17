@@ -5,7 +5,7 @@
 // ==================================================================
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
-#include "ALocal_Elem_wTag.hpp"
+#include "ALocal_Elem.hpp"
 #include "QuadPts_vis_tet4.hpp"
 #include "FEAElement_Tet4.hpp"
 #include "VisDataPrep_Mixed_FSI_3D.hpp"
@@ -69,7 +69,7 @@ int main( int argc, char * argv[] )
   ALocal_IEN * locIEN = new ALocal_IEN(part_file, rank);
   IAGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info_FEM_3D(part_file, rank);
   APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file, rank);
-  ALocal_Elem * locElem = new ALocal_Elem_wTag(part_file, rank);
+  ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
   APart_Node * pNode = new APart_Node(part_file, rank);
   
   SYS_T::print_fatal_if(size != PartBasic->get_cpu_size(), "Error: number of processors does not match with prepost! \n");

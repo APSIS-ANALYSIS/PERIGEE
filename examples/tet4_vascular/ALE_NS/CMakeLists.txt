@@ -81,7 +81,6 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/AGlobal_Mesh_Info_FEM_3D.cpp
   ${perigee_source}/Analysis_Tool/APart_Basic_Info.cpp
   ${perigee_source}/Analysis_Tool/ALocal_Elem.cpp
-  ${perigee_source}/Analysis_Tool/ALocal_Elem_wTag.cpp
   ${perigee_source}/Analysis_Tool/ALocal_IEN.cpp
   ${perigee_source}/Analysis_Tool/ALocal_NodalBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_Inflow_NodalBC.cpp
