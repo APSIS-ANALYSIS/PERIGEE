@@ -60,7 +60,7 @@ class Prestress_solid
     const std::string ps_fileBaseName;
 
     // ------------------------------------------------------------------------
-    // qua_prestress[ee][nqp*ii+jj] stores the ee-th solid element's pre-stress 
+    // qua_prestress[ee][6*ii+jj] stores the ee-th solid element's pre-stress 
     // jj-th component in Voigt notation at the ii-th quadrature point.
     // 0 <= ee < nlocalele, 0 <= ii < nqp, 0 <= jj < 6
     // ------------------------------------------------------------------------
