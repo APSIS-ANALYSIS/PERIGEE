@@ -176,7 +176,7 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Residual(
 
     const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
-    Matrix_3x3 invF(F); invF.inverse();
+    const Matrix_3x3 invF = inverse(F);
 
     const Matrix_3x3 DVelo( vx_x, vx_y, vx_z, vy_x, vy_y, vy_z, vz_x, vz_y, vz_z );
 
@@ -330,7 +330,7 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Tangent_Residual(
 
     const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
-    Matrix_3x3 invF(F); invF.inverse();
+    const Matrix_3x3 invF = inverse(F);
 
     const Matrix_3x3 DVelo( vx_x, vx_y, vx_z, vy_x, vy_y, vy_z, vz_x, vz_y, vz_z );
 
@@ -589,7 +589,7 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Mass_Residual(
 
     const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
-    Matrix_3x3 invF(F); invF.inverse();
+    const Matrix_3x3 invF = inverse(F);
 
     const Matrix_3x3 DVelo(  vx_x, vx_y, vx_z, vy_x, vy_y, vy_z, vz_x, vz_y, vz_z );
 
