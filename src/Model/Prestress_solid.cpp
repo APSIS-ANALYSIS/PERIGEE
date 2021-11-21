@@ -27,7 +27,7 @@ Prestress_solid::Prestress_solid(
     // Assign the qua_prestress to be all zero.
     std::vector<double> qua_ps_array( counter_elem_s * nqp * 6, 0.0 );
 
-    // If the prestress data exist on disk, read thee prestress data;
+    // If the prestress data exist on disk, read the prestress data;
     const std::string ps_fName = SYS_T::gen_partfile_name( ps_fileBaseName, cpu_rank );
     if( SYS_T::file_exist(ps_fName) )
     {
