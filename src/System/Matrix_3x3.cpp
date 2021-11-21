@@ -533,4 +533,19 @@ Vector_3 operator*(const Matrix_3x3 &left, const Vector_3 &right)
       left.zx() * right.x() + left.zy() * right.y() + left.zz() * right.z() );
 }
 
+Matrix_3x3 inverse( const Matrix_3x3 &input )
+{
+  const double invdet = 1.0 / input.det();
+
+  return Matrix_3x3( invdet * (input(4) * input(8) - input(5) * input(7)),
+    invdet * (input(2) * input(7) - input(1) * input(8)),
+    invdet * (input(1) * input(5) - input(2) * input(4)),
+    invdet * (input(5) * input(6) - input(3) * input(8)),
+    invdet * (input(0) * input(8) - input(2) * input(6)),
+    invdet * (input(2) * input(3) - input(0) * input(5)),
+    invdet * (input(3) * input(7) - input(4) * input(6)),
+    invdet * (input(1) * input(6) - input(0) * input(7)),
+    invdet * (input(0) * input(4) - input(1) * input(3)) );
+}
+
 // EOF

@@ -23,11 +23,16 @@ int main( int argc, char * argv[] )
       5.2, 2.0, 3.0,
      -0.33, 3.0, -1.0);
 
-  va.gen_rand();
+  A.gen_rand();
 
-  vb = A * va;
+  Matrix_3x3 invA( A ); invA.inverse();
 
-  //A.print();
+  Matrix_3x3 B = inverse(A);
+
+  B -= invA;
+
+  B.print();
+  invA.print();
 
   double eta1, eta2, eta3;
   Vector_3 v1, v2, v3;
