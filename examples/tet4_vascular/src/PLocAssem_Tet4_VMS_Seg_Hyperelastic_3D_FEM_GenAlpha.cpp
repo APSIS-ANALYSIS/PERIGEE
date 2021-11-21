@@ -176,9 +176,8 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Residual(
     const double invFDV_t = invF.MatTContraction(DVelo); // invF_Ii V_i,I
 
     Matrix_3x3 P_iso, S_iso;
-    Tensor4_3D AA_iso;
 
-    matmodel->get_PK_FFStiffness(F, P_iso, S_iso, AA_iso);
+    matmodel->get_PK(F, P_iso, S_iso);
 
     const double rho = matmodel->get_rho(p);
     const double mbeta = matmodel->get_beta(p);
