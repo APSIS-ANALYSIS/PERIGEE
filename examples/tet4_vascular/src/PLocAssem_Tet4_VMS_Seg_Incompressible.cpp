@@ -331,9 +331,7 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Tangent_Residual(
 
     const Matrix_3x3 DVelo( vx_x, vx_y, vx_z, vy_x, vy_y, vy_z, vz_x, vz_y, vz_z );
 
-    Matrix_3x3 Dvelo_invF;
-
-    Dvelo_invF.MatMult(DVelo, invF); // v_i,I invF_Ij = v_i,j
+    const Matrix_3x3 Dvelo_invF = DVelo * invF;  // v_i,I invF_Ij = v_i,j
 
     double GradP_invF[3];
     invF.VecMultT( p_x, p_y, p_z, GradP_invF[0], GradP_invF[1], GradP_invF[2] ); // p_I invF_ii = p,i
