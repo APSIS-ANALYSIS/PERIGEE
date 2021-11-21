@@ -107,12 +107,10 @@ class PLocAssem_Tet4_VMS_Seg_Incompressible : public IPLocAssem
         const double &dt, const double &Jin,
         const double &dx ) const;
 
-    void get_f(const double &x, const double &y, const double &z,
-        const double &t, double &fx, double &fy, double &fz ) const
+    Vector_3 get_f(const double &x, const double &y, const double &z,
+        const double &t ) const
     {
-      fx = 0.0; 
-      fy = 0.0; 
-      fz = 0.0; 
+      return Vector_3( 0.0, 0.0, 0.0 );
     }
 
     // Use pointers to the member functions to facilitate the automatic
