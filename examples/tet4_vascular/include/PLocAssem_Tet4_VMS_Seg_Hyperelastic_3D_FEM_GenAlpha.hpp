@@ -113,63 +113,26 @@ class PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha : public IPLocAssem
       return Vector_3( 0.0, 0.0, 0.0 );
     }
 
-    void get_top_H(const double &x, const double &y, const double &z,
-        const double &t, const double &nx, const double &ny,
-        const double &nz, double &gx, double &gy, double &gz ) const
+    Vector_3 get_top_H(const double &x, const double &y, const double &z,
+        const double &t, const double &nx, const double &ny, const double &nz ) const
     {
-      gx = 0.0; gy = 0.0; gz = 0.0;
+      return Vector_3( 0.0, 0.0, 0.0 );
     }
-
-    void get_bot_H(const double &x, const double &y, const double &z,
-        const double &t, const double &nx, const double &ny,
-        const double &nz, double &gx, double &gy, double &gz ) const
-    {
-      gx = 0.0; gy = 0.0; gz = 0.0;
-    }
-
-    void get_lef_H(const double &x, const double &y, const double &z,
-        const double &t, const double &nx, const double &ny,
-        const double &nz, double &gx, double &gy, double &gz ) const
-    {
-      gx = 0.0; gy = 0.0; gz = 0.0;
-    }
-
-    void get_rig_H(const double &x, const double &y, const double &z,
-        const double &t, const double &nx, const double &ny,
-        const double &nz, double &gx, double &gy, double &gz ) const
-    {
-      gx = 0.0; gy = 0.0; gz = 0.0;
-    }
-
-    void get_fro_H(const double &x, const double &y, const double &z,
-        const double &t, const double &nx, const double &ny,
-        const double &nz, double &gx, double &gy, double &gz ) const
-    {
-      gx = 0.0; gy = 0.0; gz = 0.0;
-    }
-
-    void get_bac_H(const double &x, const double &y, const double &z,
-        const double &t, const double &nx, const double &ny,
-        const double &nz, double &gx, double &gy, double &gz ) const
-    {
-      gx = 0.0; gy = 0.0; gz = 0.0;
-    }
-
 
     // Use pointers to the member functions to facilitate the automatic
     // treatment of ebc surface integration.
-    typedef void ( PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::*locassem_vms_seg_ela_fem_funs )( const double &x, const double &y, const double &z,
+    typedef Vector_3 ( PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::*locassem_vms_seg_ela_fem_funs )( const double &x, const double &y, const double &z,
         const double &t, const double &nx, const double &ny,
-        const double &nz, double &gx, double &gy, double &gz ) const;
+        const double &nz ) const;
 
     locassem_vms_seg_ela_fem_funs * flist;
 
-    void get_ebc_fun( const int &ebc_id,
+    Vector_3 get_ebc_fun( const int &ebc_id,
         const double &x, const double &y, const double &z,
         const double &t, const double &nx, const double &ny,
-        const double &nz, double &gx, double &gy, double &gz ) const
+        const double &nz ) const
     {
-      return ((*this).*(flist[ebc_id]))(x,y,z,t,nx,ny,nz,gx,gy,gz);
+      return ((*this).*(flist[ebc_id]))(x,y,z,t,nx,ny,nz);
     }
 };
 

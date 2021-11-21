@@ -687,15 +687,14 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Residual_EBC(
       coor_z += eleCtrlPts_z[ii] * R[ii];
     }
 
-    double gx, gy, gz;
-    get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr,
-        n_out.x(), n_out.y(), n_out.z(), gx, gy, gz );
+    const Vector_3 gg = get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr,
+        n_out.x(), n_out.y(), n_out.z() );
 
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * gx;
-      Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * gy;
-      Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * gz;
+      Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * gg.x();
+      Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * gg.y();
+      Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * gg.z();
     }
   }
 }
