@@ -26,13 +26,22 @@ class Prestress_solid
     // ------------------------------------------------------------------------
     virtual std::vector<double> get_prestress( const int &ee ) const;
 
+    virtual std::array<double,6> get_prestress( const int &ee, const int &qua ) const;
+
     // ------------------------------------------------------------------------
     // Input: ee the element index
-    //        0 <= ii < nqp is the quadrature point index
     //        in_esval is the element's prestress value at the quadrature point.
     // Users are responsible for making sure that the vector has lenght 6*nqp
     // ------------------------------------------------------------------------
-    virtual void set_prestress( const int &ee, const int &ii, 
+    virtual void update_prestress( const int &ee, const double * const &in_esval );
+
+    // ------------------------------------------------------------------------
+    // Input: ee the element index 0 <= ee < nlocalele
+    //        qua the quadrature point index 0 <= qua < nqp
+    //        in_esval the element's qua-th quadrature point's stress components
+    //        with length being 6.
+    // ------------------------------------------------------------------------
+    virtual void update_prestress( const int &ee, const int &qua,
         const double * const &in_esval );
 
     // ------------------------------------------------------------------------
