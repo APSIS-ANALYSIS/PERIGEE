@@ -17,7 +17,7 @@ PLocAssem_Tet4_VMS_Seg_Incompressible::PLocAssem_Tet4_VMS_Seg_Incompressible(
   
   Zero_Tangent_Residual();
 
-  if( num_ebc_fun == 0 ) flist = NULL;
+  if( num_ebc_fun == 0 ) flist = nullptr;
   else flist = new locassem_vms_seg_ela_fem_funs [num_ebc_fun];
 
   print_info();
@@ -26,7 +26,7 @@ PLocAssem_Tet4_VMS_Seg_Incompressible::PLocAssem_Tet4_VMS_Seg_Incompressible(
 
 PLocAssem_Tet4_VMS_Seg_Incompressible::~PLocAssem_Tet4_VMS_Seg_Incompressible()
 {
-  delete [] Tangent; delete [] Residual; Tangent = NULL; Residual = NULL;
+  delete [] Tangent; delete [] Residual; Tangent = nullptr; Residual = nullptr;
   if(num_ebc_fun > 0) delete [] flist;
 }
 
@@ -93,8 +93,7 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Residual(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  const double h_e = element->get_h( eleCtrlPts_x,
-      eleCtrlPts_y, eleCtrlPts_z );
+  const double h_e = element->get_h( eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   const double curr = time + alpha_f * dt;
 
@@ -240,11 +239,9 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Tangent_Residual(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y,
-      eleCtrlPts_z );
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  const double h_e = element->get_h( eleCtrlPts_x,
-      eleCtrlPts_y, eleCtrlPts_z );
+  const double h_e = element->get_h( eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   const double curr = time + alpha_f * dt;
 
@@ -522,10 +519,9 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Mass_Residual(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y,
-      eleCtrlPts_z );
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  double curr = 0.0;
+  const double curr = 0.0;
 
   Zero_Tangent_Residual();
 

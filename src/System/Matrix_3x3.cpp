@@ -533,6 +533,19 @@ Vector_3 operator*(const Matrix_3x3 &left, const Vector_3 &right)
       left.zx() * right.x() + left.zy() * right.y() + left.zz() * right.z() );
 }
 
+Matrix_3x3 operator*(const Matrix_3x3 &mleft, const Matrix_3x3 &mright)
+{
+  return Matrix_3x3( mleft(0) * mright(0) + mleft(1) * mright(3) + mleft(2) * mright(6),
+   mleft(0) * mright(1) + mleft(1) * mright(4) + mleft(2) * mright(7),
+   mleft(0) * mright(2) + mleft(1) * mright(5) + mleft(2) * mright(8),
+   mleft(3) * mright(0) + mleft(4) * mright(3) + mleft(5) * mright(6),
+   mleft(3) * mright(1) + mleft(4) * mright(4) + mleft(5) * mright(7),
+   mleft(3) * mright(2) + mleft(4) * mright(5) + mleft(5) * mright(8),
+   mleft(6) * mright(0) + mleft(7) * mright(3) + mleft(8) * mright(6),
+   mleft(6) * mright(1) + mleft(7) * mright(4) + mleft(8) * mright(7),
+   mleft(6) * mright(2) + mleft(7) * mright(5) + mleft(8) * mright(8) );
+}
+
 Matrix_3x3 inverse( const Matrix_3x3 &input )
 {
   const double invdet = 1.0 / input.det();
