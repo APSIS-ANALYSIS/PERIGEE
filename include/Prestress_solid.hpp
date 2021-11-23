@@ -32,6 +32,7 @@ class Prestress_solid
     // Input: ee the element index
     //        in_esval is the element's prestress value at the quadrature point.
     // Users are responsible for making sure that the vector has lenght 6*nqp
+    // The value of in_esval is ADDED into the data
     // ------------------------------------------------------------------------
     virtual void update_prestress( const int &ee, const double * const &in_esval );
 
@@ -40,12 +41,13 @@ class Prestress_solid
     //        qua the quadrature point index 0 <= qua < nqp
     //        in_esval the element's qua-th quadrature point's stress components
     //        with length being 6.
+    // The value of in_esval is ADDED into the data
     // ------------------------------------------------------------------------
     virtual void update_prestress( const int &ee, const int &qua,
         const double * const &in_esval );
 
     // ------------------------------------------------------------------------
-    // record the prestress values to a h5 file
+    // record the prestress values to a h5 file as a row data
     // ------------------------------------------------------------------------
     virtual void write_prestress_hdf5() const;
 

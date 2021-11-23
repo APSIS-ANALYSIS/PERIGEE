@@ -2,7 +2,8 @@
 
 Prestress_solid::Prestress_solid( 
     const ALocal_Elem * const &locelem, const int &in_nqp_tet, 
-    const int &in_cpu_rank, const std::string &in_ps_fName )
+    const int &in_cpu_rank, const bool &load_from_file,
+    const std::string &in_ps_fName )
 : cpu_rank( in_cpu_rank ), nlocalele(locelem->get_nlocalele()), nqp(in_nqp_tet),
   ps_fileBaseName( in_ps_fName )
 {
@@ -27,42 +28,46 @@ Prestress_solid::Prestress_solid(
     // Assign the qua_prestress to be all zero.
     std::vector<double> qua_ps_array( counter_elem_s * nqp * 6, 0.0 );
 
-    // If the prestress data exist on disk, read the prestress data;
-    const std::string ps_fName = SYS_T::gen_partfile_name( ps_fileBaseName, cpu_rank );
-    if( SYS_T::file_exist(ps_fName) )
+    if( load_from_file == true )
     {
-      hid_t ps_file_id = H5Fopen(ps_fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
-
-      HDF5_Reader * ps_h5r = new HDF5_Reader( ps_file_id );
-
-      const int ps_size = ps_h5r -> read_intScalar("/", "ps_array_size"); 
-
-      SYS_T::print_fatal_if(ps_size != counter_elem_s * nqp * 6, "Error: Prestress_solid the HDF5 file for prestress is incompatible with the local solid element.\n");
-
-      qua_ps_array = ps_h5r -> read_doubleVector("/", "prestress");
-
-      delete ps_h5r; H5Fclose(ps_file_id);
-    }
-   
-    // Load the qua_ps_array to the proper location of qua_prestress 
-    int offset = 0;
-    for(int ee=0; ee<nlocalele; ++ee)
-    {
-      if( locelem -> get_elem_tag(ee) == 1 )
+      // If the prestress data exist on disk, read the prestress data;
+      const std::string ps_fName = SYS_T::gen_partfile_name( ps_fileBaseName, cpu_rank );
+      if( SYS_T::file_exist(ps_fName) )
       {
-        for(int ii=0; ii<6*nqp; ++ii)
-          qua_prestress[ee][ii] = qua_ps_array[ offset + ii ];
-      
-        offset += nqp * 6;
+        hid_t ps_file_id = H5Fopen(ps_fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+
+        HDF5_Reader * ps_h5r = new HDF5_Reader( ps_file_id );
+
+        const int ps_size = ps_h5r -> read_intScalar("/", "ps_array_size"); 
+
+        SYS_T::print_fatal_if(ps_size != counter_elem_s * nqp * 6, "Error: Prestress_solid the HDF5 file for prestress is incompatible with the local solid element number.\n");
+
+        qua_ps_array = ps_h5r -> read_doubleVector("/", "prestress");
+
+        delete ps_h5r; H5Fclose(ps_file_id);
       }
-    }
-  }
+      else
+        SYS_T::print_fatal("Error: prestress file %s cannot be found.\n", ps_fName.c_str());
+
+      // Load the qua_ps_array to the proper location of qua_prestress 
+      int offset = 0;
+      for(int ee=0; ee<nlocalele; ++ee)
+      {
+        if( locelem -> get_elem_tag(ee) == 1 )
+        {
+          for(int ii=0; ii<6*nqp; ++ii)
+            qua_prestress[ee][ii] = qua_ps_array[ offset + ii ];
+
+          offset += nqp * 6;
+        }
+      }
+    } // Finish loading prestress from disk file
+  }// Finish initializing the prestress data structure
 }
 
 Prestress_solid::~Prestress_solid()
 {
-  for(int ee=0; ee<nlocalele; ++ee) 
-    VEC_T::clean( qua_prestress[ee] );
+  for(int ee=0; ee<nlocalele; ++ee) VEC_T::clean( qua_prestress[ee] );
 
   VEC_T::clean( qua_prestress );
 }
