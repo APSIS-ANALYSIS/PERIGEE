@@ -169,16 +169,15 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Residual(
 
     const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
-    Matrix_3x3 invF( F ); invF.inverse();
+    const Matrix_3x3 invF = inverse( F );
 
     const Matrix_3x3 DVelo( vx_x, vx_y, vx_z, vy_x, vy_y, vy_z, vz_x, vz_y, vz_z );
 
     const double invFDV_t = invF.MatTContraction(DVelo); // invF_Ii V_i,I
 
     Matrix_3x3 P_iso, S_iso;
-    Tensor4_3D AA_iso;
 
-    matmodel->get_PK_FFStiffness(F, P_iso, S_iso, AA_iso);
+    matmodel->get_PK(F, P_iso, S_iso);
 
     const double rho = matmodel->get_rho(p);
     const double mbeta = matmodel->get_beta(p);
@@ -322,13 +321,11 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Tangent_Residual
 
     const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
-    Matrix_3x3 invF( F ); invF.inverse();
+    const Matrix_3x3 invF = inverse( F );
 
     const Matrix_3x3 DVelo( vx_x, vx_y, vx_z, vy_x, vy_y, vy_z, vz_x, vz_y, vz_z );
 
-    Matrix_3x3 Dvelo_invF;
-
-    Dvelo_invF.MatMult(DVelo, invF); // v_i,I invF_Ij = v_i,j
+    const Matrix_3x3 Dvelo_invF = DVelo * invF; // v_i,I invF_Ij = v_i,j
 
     double GradP_invF[3];
     invF.VecMultT( p_x, p_y, p_z, GradP_invF[0], GradP_invF[1], GradP_invF[2] ); // p_I invF_ii = p,i
@@ -606,7 +603,7 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Mass_Residual(
 
     const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
-    Matrix_3x3 invF( F ); invF.inverse();
+    const Matrix_3x3 invF = inverse( F );
 
     const Matrix_3x3 DVelo( vx_x, vx_y, vx_z, vy_x, vy_y, vy_z, vz_x, vz_y, vz_z );
 
@@ -690,15 +687,14 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Residual_EBC(
       coor_z += eleCtrlPts_z[ii] * R[ii];
     }
 
-    double gx, gy, gz;
-    get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr,
-        n_out.x(), n_out.y(), n_out.z(), gx, gy, gz );
+    const Vector_3 gg = get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr,
+        n_out.x(), n_out.y(), n_out.z() );
 
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * gx;
-      Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * gy;
-      Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * gz;
+      Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * gg.x();
+      Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * gg.y();
+      Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * gg.z();
     }
   }
 }

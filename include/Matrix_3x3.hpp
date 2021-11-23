@@ -239,4 +239,8 @@ class Matrix_3x3
 
 Vector_3 operator*( const Matrix_3x3 &left, const Vector_3 &right );
 
+Matrix_3x3 operator*( const Matrix_3x3 &left, const Matrix_3x3 &right );
+
+Matrix_3x3 inverse( const Matrix_3x3 &input );
+
 #endif

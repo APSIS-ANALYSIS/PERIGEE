@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include "Vec_Tools.hpp"
 #include "Vector_3.hpp"
 #include "Matrix_3x3.hpp"
@@ -23,38 +24,24 @@ int main( int argc, char * argv[] )
       5.2, 2.0, 3.0,
      -0.33, 3.0, -1.0);
 
-  va.gen_rand();
+  A.gen_rand();
 
-  vb = A * va;
+  sleep(1);
 
-  //A.print();
-
-  double eta1, eta2, eta3;
-  Vector_3 v1, v2, v3;
-
-  std::cout<<A.eigen_decomp( eta1, eta2, eta3, v1, v2, v3 )<<std::endl;
-
-  std::cout<<std::setprecision(16)<<eta1<<'\t'<<eta2<<'\t'<<eta3<<'\n';
-
-  std::cout<<std::setprecision(16)<<v1(0)<<'\t'<<v1(1)<<'\t'<<v1(2)<<'\n';
-
-  v2.print();
-
-  v3.print();
-
-  int nsize = 4;
-
-  std::vector<int> b (nsize, -100), c (5, 99), d (2, 1);
-
-  std::cout<<b.size()<<'\t'<<b.capacity()<<std::endl;
+  Matrix_3x3 B;
+  B.gen_rand();
   
-  VEC_T::print(b);
+  A.print();
+  B.print();
 
-  b = {1, 3, 5, -1, -2, -3, -5};
-  
-  VEC_T::print(b);
+  Matrix_3x3 C,D;
+  C.MatMult(A,B);
 
-  std::cout<<b.size()<<'\t'<<b.capacity()<<'\t'<<VEC_T::sum(b)<<std::endl;
+  D = A * B;
+
+  D -= C;
+
+  D.print();
 
   return EXIT_SUCCESS;
 }
