@@ -644,9 +644,9 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Mass_Residual(
       for(int B=0; B<nLocBas; ++B)
       {
         Tangent[4*nLocBas*(4*A)   + 4*B]   += gwts * NA * detF * mbeta * R[B];
-        Tangent[4*nLocBas*(4*A+1) + 4*B+1] += gwts * NA * rho * detF * R[B];
-        Tangent[4*nLocBas*(4*A+2) + 4*B+2] += gwts * NA * rho * detF * R[B];
-        Tangent[4*nLocBas*(4*A+3) + 4*B+3] += gwts * NA * rho * detF * R[B];
+        Tangent[4*nLocBas*(4*A+1) + 4*B+1] += gwts * NA * detF * rho * R[B];
+        Tangent[4*nLocBas*(4*A+2) + 4*B+2] += gwts * NA * detF * rho * R[B];
+        Tangent[4*nLocBas*(4*A+3) + 4*B+3] += gwts * NA * detF * rho * R[B];
       } // Finish loop-B
     } // Finish loop-A
   } // Finish loop-qua
