@@ -16,7 +16,8 @@ class Prestress_solid
 {
   public:
     Prestress_solid( const ALocal_Elem * const &locelem, const int &in_nqp_tet,
-       const int &in_cpu_rank, const std::string &in_ps_fName = "prestress" );
+       const int &in_cpu_rank, const bool &load_from_file,
+       const std::string &in_ps_fName = "prestress" );
 
     virtual ~Prestress_solid();
 
