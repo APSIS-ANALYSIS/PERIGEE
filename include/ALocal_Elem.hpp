@@ -26,6 +26,10 @@ class ALocal_Elem
     // Return the number of elements in this sub-domain owned by this CPU. 
     virtual int get_nlocalele() const {return nlocalele;}
 
+    // Return the number of elements with tag value being the input tag_val.
+    // This function can only be called when isTagged = true.
+    virtual int get_nlocalele( const int &tag_val ) const;
+
     // Given the global element index, return its location in the vector
     // elem_loc. If it does not belong to this sub-domain, it will return -1
     virtual int get_pos(const int &global_e_index) const 
