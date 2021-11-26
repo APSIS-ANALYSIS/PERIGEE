@@ -35,7 +35,7 @@ class Prestress_solid
     // Users are responsible for making sure that the vector has lenght 6*nqp
     // The value of in_esval is ADDED into the data
     // ------------------------------------------------------------------------
-    virtual void update_prestress( const int &ee, const double * const &in_esval );
+    virtual void add_prestress( const int &ee, const double * const &in_esval );
 
     // ------------------------------------------------------------------------
     // Input: ee the element index 0 <= ee < nlocalele
@@ -44,7 +44,7 @@ class Prestress_solid
     //        with length being 6.
     // The value of in_esval is ADDED into the data
     // ------------------------------------------------------------------------
-    virtual void update_prestress( const int &ee, const int &qua,
+    virtual void add_prestress( const int &ee, const int &qua,
         const double * const &in_esval );
 
     // ------------------------------------------------------------------------

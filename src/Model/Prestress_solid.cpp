@@ -83,12 +83,12 @@ std::array<double,6> Prestress_solid::get_prestress( const int &ee, const int &q
     qua_prestress[ee][6*qua+3], qua_prestress[ee][6*qua+4], qua_prestress[ee][6*qua+5] };
 }
 
-void Prestress_solid::update_prestress( const int &ee, const double * const &in_psval )
+void Prestress_solid::add_prestress( const int &ee, const double * const &in_psval )
 {
   for(int ii=0; ii<6*nqp; ++ii) qua_prestress[ee][ii] += in_psval[ii];
 }
 
-void Prestress_solid::update_prestress( const int &ee, const int &qua, 
+void Prestress_solid::add_prestress( const int &ee, const int &qua, 
     const double * const &in_psval )
 {
   qua_prestress[ee][qua*6  ] += in_psval[0];
