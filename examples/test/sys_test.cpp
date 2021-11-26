@@ -17,31 +17,21 @@ int main( int argc, char * argv[] )
 
   //for(auto out : a) std::cout<<out;
 
-
-  Vector_3 va, vb, vc;
-  Matrix_3x3 A(
-      1.0, 5.2, -0.33,
-      5.2, 2.0, 3.0,
-     -0.33, 3.0, -1.0);
+  Matrix_3x3 A;
 
   A.gen_rand();
 
-  sleep(1);
+  Matrix_3x3 B = cofactor(A);
 
-  Matrix_3x3 B;
-  B.gen_rand();
-  
-  A.print();
-  B.print();
+  Matrix_3x3 C( A );
 
-  Matrix_3x3 C,D;
-  C.MatMult(A,B);
+  C.inverse();
+  C.transpose();
+  C.scale(A.det());
 
-  D = A * B;
+  C -= B;
 
-  D -= C;
-
-  D.print();
+  C.print_in_row();
 
   return EXIT_SUCCESS;
 }

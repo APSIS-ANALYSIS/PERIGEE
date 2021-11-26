@@ -561,4 +561,17 @@ Matrix_3x3 inverse( const Matrix_3x3 &input )
     invdet * (input(0) * input(4) - input(1) * input(3)) );
 }
 
+Matrix_3x3 cofactor( const Matrix_3x3 &input )
+{
+  return Matrix_3x3( (input(4) * input(8) - input(5) * input(7)),
+      (input(5) * input(6) - input(3) * input(8)),
+      (input(3) * input(7) - input(4) * input(6)),
+      (input(2) * input(7) - input(1) * input(8)),
+      (input(0) * input(8) - input(2) * input(6)),
+      (input(1) * input(6) - input(0) * input(7)),
+      (input(1) * input(5) - input(2) * input(4)),
+      (input(2) * input(3) - input(0) * input(5)),
+      (input(0) * input(4) - input(1) * input(3)) );
+}
+
 // EOF
