@@ -257,7 +257,7 @@ int main( int argc, char * argv[] )
   }
   else if( fsiBC_type == 1 )
   {
-    NBC_list[0] = new NodalBC_3D_vtu( geo_s_file, nFunc );
+    NBC_list[0] = new NodalBC_3D_vtu( nFunc );
     NBC_list[1] = new NodalBC_3D_vtu( geo_s_file, dir_list, nFunc );
     NBC_list[2] = new NodalBC_3D_vtu( geo_s_file, dir_list, nFunc );
     NBC_list[3] = new NodalBC_3D_vtu( geo_s_file, dir_list, nFunc );
