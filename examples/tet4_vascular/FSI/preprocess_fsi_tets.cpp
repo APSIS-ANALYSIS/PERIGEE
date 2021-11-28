@@ -36,8 +36,8 @@ int main( int argc, char * argv[] )
   SYS_T::execute("mkdir apart");
 
   // Define basic settings
-  const int dofNum = 7; // degree-of-freedom for the physical problem
-  const int dofMat = 4; // degree-of-freedom in the matrix problem
+  const int dofNum = 7;     // degree-of-freedom for the physical problem
+  const int dofMat = 4;     // degree-of-freedom in the matrix problem
   const int elemType = 501; // first order simplicial element
 
   // Input files
@@ -58,6 +58,10 @@ int main( int argc, char * argv[] )
 
   const std::string part_file("./apart/part");
 
+  // fsiBC_type : 0 deformable wall, 1 rigid wall
+  int fsiBC_type = 0;
+
+  // Mesh partition setting
   int cpu_size = 1;
   int in_ncommon = 2;
   const bool isDualGraph = true;
@@ -66,10 +70,11 @@ int main( int argc, char * argv[] )
 
   SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: preprocessor needs to be run in serial.\n");
 
-  SYS_T::GetOptionInt("-cpu_size",               cpu_size);
-  SYS_T::GetOptionInt("-in_ncommon",             in_ncommon);
-  SYS_T::GetOptionInt("-num_outlet",             num_outlet);
-  SYS_T::GetOptionInt("-num_inlet",              num_inlet);
+  SYS_T::GetOptionInt(   "-cpu_size",            cpu_size);
+  SYS_T::GetOptionInt(   "-in_ncommon",          in_ncommon);
+  SYS_T::GetOptionInt(   "-fsiBC_type",          fsiBC_type);
+  SYS_T::GetOptionInt(   "-num_outlet",          num_outlet);
+  SYS_T::GetOptionInt(   "-num_inlet",           num_inlet);
   SYS_T::GetOptionString("-geo_file",            geo_file);
   SYS_T::GetOptionString("-geo_f_file",          geo_f_file);
   SYS_T::GetOptionString("-geo_s_file",          geo_s_file);
@@ -80,7 +85,10 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionString("-sur_s_file_in_base",  sur_s_file_in_base);
   SYS_T::GetOptionString("-sur_s_file_out_base", sur_s_file_out_base);
 
+  SYS_T::print_fatal_if( fsiBC_type != 0 && fsiBC_type != 1, "Error: fsiBC_type should be 1 or 0.\n" );
+
   std::cout<<"===== Command Line Arguments ====="<<std::endl;
+  std::cout<<" -fsiBC_type: "         <<fsiBC_type         <<std::endl;
   std::cout<<" -num_inlet: "          <<num_inlet          <<std::endl;
   std::cout<<" -num_outlet: "         <<num_outlet         <<std::endl;
   std::cout<<" -geo_file: "           <<geo_file           <<std::endl;
@@ -224,18 +232,15 @@ int main( int argc, char * argv[] )
     global_part = new Global_Part_METIS( cpu_size, in_ncommon, isDualGraph, mesh, IEN );
   else if(cpu_size == 1)
     global_part = new Global_Part_Serial( mesh );
-  else
-  {
-    std::cerr<<"ERROR: wrong cpu_size: "<<cpu_size<<std::endl;
-    exit(EXIT_FAILURE);
-  }
+  else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
 
+  // Generate the new nodal numbering based on the partitioning
   Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, mesh->get_nFunc());
   mnindex->write_hdf5("node_mapping");
 
   // ----------------------------------------------------------------
   // Setup boundary conditions
-  // Physics NBC
+  // Physical NodalBC
   std::cout<<"Boundary condition for the implicit solver: \n";
   std::vector<INodalBC *> NBC_list( dofMat, nullptr );
 
@@ -243,33 +248,44 @@ int main( int argc, char * argv[] )
   VEC_T::insert_end(dir_list, sur_s_file_in );
   VEC_T::insert_end(dir_list, sur_s_file_out );
 
-  NBC_list[0] = new NodalBC_3D_vtp( nFunc );
-  NBC_list[1] = new NodalBC_3D_vtp( dir_list, nFunc );
-  NBC_list[2] = new NodalBC_3D_vtp( dir_list, nFunc );
-  NBC_list[3] = new NodalBC_3D_vtp( dir_list, nFunc );
+  if( fsiBC_type == 0 )
+  {
+    NBC_list[0] = new NodalBC_3D_vtp( nFunc );
+    NBC_list[1] = new NodalBC_3D_vtp( dir_list, nFunc );
+    NBC_list[2] = new NodalBC_3D_vtp( dir_list, nFunc );
+    NBC_list[3] = new NodalBC_3D_vtp( dir_list, nFunc );
+  }
+  else if( fsiBC_type == 1 )
+  {
+    NBC_list[0] = new NodalBC_3D_vtu( geo_s_file, nFunc );
+    NBC_list[1] = new NodalBC_3D_vtu( geo_s_file, dir_list, nFunc );
+    NBC_list[2] = new NodalBC_3D_vtu( geo_s_file, dir_list, nFunc );
+    NBC_list[3] = new NodalBC_3D_vtu( geo_s_file, dir_list, nFunc );
+  }
 
-  // Mesh NBC
+  // Mesh solver NodalBC
   std::cout<<"Boundary condition for the mesh motion: \n";
   std::vector<INodalBC *> meshBC_list( 3, nullptr );
-  
+
   std::vector<std::string> meshdir_vtp_list = sur_f_file_in;
   VEC_T::insert_end( meshdir_vtp_list, sur_f_file_out );
-  
+
   meshBC_list[0] = new NodalBC_3D_vtu( geo_s_file, meshdir_vtp_list, nFunc );
   meshBC_list[1] = new NodalBC_3D_vtu( geo_s_file, meshdir_vtp_list, nFunc );
   meshBC_list[2] = new NodalBC_3D_vtu( geo_s_file, meshdir_vtp_list, nFunc );
 
-  // Generate inflow bc info
+  // InflowBC info
+  std::cout<<"Inflow cap surfaces: \n";
   std::vector<Vector_3> inlet_outvec( num_inlet );
   for(int ii=0; ii<num_inlet; ++ii)
     inlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_in[ii], ctrlPts, IEN );
-  
+
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_f_file_in, sur_f_file_wall, nFunc, inlet_outvec ); 
 
-  // Elemental BC
+  // Physical ElemBC
   cout<<"Elem boundary for the implicit solver: \n";
   std::vector< Vector_3 > outlet_outvec( num_outlet );
-  
+
   for(int ii=0; ii<num_outlet; ++ii)
     outlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_out[ii], ctrlPts, IEN );
 
@@ -277,7 +293,8 @@ int main( int argc, char * argv[] )
 
   ebc -> resetTriIEN_outwardnormal( IEN ); // assign orientation
 
-  // Mesh EBC
+  // Mesh solver ElemBC
+  cout<<"Elem boundary for the mesh solver: \n";
   std::vector<std::string> mesh_ebclist;
   mesh_ebclist.clear();
   ElemBC * mesh_ebc = new ElemBC_3D_tet( mesh_ebclist );
@@ -291,7 +308,7 @@ int main( int argc, char * argv[] )
   int sum_nghostnode = 0;
 
   SYS_T::Timer * mytimer = new SYS_T::Timer();
-  
+
   for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
   {
     mytimer->Reset();
@@ -306,7 +323,7 @@ int main( int argc, char * argv[] )
 
     part -> write( part_file.c_str() );
     part -> print_part_loadbalance_edgecut();
-    
+
     NBC_Partition * nbcpart = new NBC_Partition(part, mnindex, NBC_list);
     nbcpart -> write_hdf5( part_file ); 
 
@@ -321,7 +338,7 @@ int main( int argc, char * argv[] )
 
     EBC_Partition * mebcpart = new EBC_Partition(part, mnindex, mesh_ebc);
     mebcpart-> write_hdf5( part_file, "/mesh_ebc");
-    
+
     list_nlocalnode.push_back(part->get_nlocalnode());
     list_nghostnode.push_back(part->get_nghostnode());
     list_ntotalnode.push_back(part->get_ntotalnode());
