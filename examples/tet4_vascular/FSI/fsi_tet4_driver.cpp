@@ -228,6 +228,9 @@ int main(int argc, char *argv[])
     if( inflow_type == 1 )
       cmdh5w->write_doubleScalar("inflow_thd_time", inflow_thd_time );
 
+    cmdh5w->write_string("date",              SYS_T::get_date() );
+    cmdh5w->write_string("time",              SYS_T::get_time() );
+
     delete cmdh5w; H5Fclose(cmd_file_id);
   }
 

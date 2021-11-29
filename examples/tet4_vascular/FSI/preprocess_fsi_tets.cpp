@@ -168,6 +168,8 @@ int main( int argc, char * argv[] )
   cmdh5w->write_string("sur_s_file_out_base", sur_s_file_out_base);
   cmdh5w->write_string("sur_s_file_wall",     sur_s_file_wall);
   cmdh5w->write_string("part_file",           part_file);
+  cmdh5w->write_string("date",                SYS_T::get_date() );
+  cmdh5w->write_string("time",                SYS_T::get_time() );
 
   delete cmdh5w; H5Fclose(cmd_file_id);
   // ----- Finish writing
