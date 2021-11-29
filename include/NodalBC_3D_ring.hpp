@@ -96,7 +96,7 @@ class NodalBC_3D_ring : public INodalBC
     std::vector<double> outnormal;
 
     // Compute centroid coordinates given a cap's nodal coordinates
-    void compute_cap_centroid( const std::vector<double> &pts, Vector_3 &centroid ) const;
+    Vector_3 compute_cap_centroid( const std::vector<double> &pts ) const;
 };
 
 #endif
