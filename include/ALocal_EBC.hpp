@@ -50,8 +50,7 @@ class ALocal_EBC
     // ! get the number of surface cells within this partition.
     //   \para 0 <= ii < num_ebc
     // ------------------------------------------------------------------------
-    virtual int get_num_local_cell(const int &ii) const 
-    {return num_local_cell[ii];}
+    virtual int get_num_local_cell(const int &ii) const {return num_local_cell[ii];}
 
     // ------------------------------------------------------------------------
     // ! get the number of local basis functions of the surface cells. This is
