@@ -6,6 +6,25 @@
 // Date: Sep. 13 2021
 // ============================================================================
 #include "HDF5_Reader.hpp"
+#include "AGlobal_Mesh_Info_FEM_3D.hpp"
+#include "APart_Basic_Info.hpp"
+#include "APart_Node_FSI.hpp"
+#include "ALocal_Elem.hpp"
+#include "ALocal_EBC_outflow.hpp"
+#include "QuadPts_Gauss_Triangle.hpp"
+#include "QuadPts_Gauss_Tet.hpp"
+#include "FEAElement_Triangle3_3D_der0.hpp"
+#include "FEAElement_Tet4.hpp"
+#include "MaterialModel_NeoHookean_M94_Mixed.hpp"
+#include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
+#include "PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha.hpp"
+#include "PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha.hpp"
+#include "PLocAssem_Tet4_VMS_Seg_Incompressible.hpp"
+#include "PLocAssem_Tet4_FSI_Mesh_Elastostatic.hpp"
+#include "PGAssem_FSI_FEM.hpp"
+#include "PGAssem_Seg_FEM.hpp"
+#include "PDNSolution_Mixed_UPV_3D.hpp"
+#include "PTime_Seg_Solver.hpp"
 
 int main( int argc, char *argv[] )
 {
@@ -113,8 +132,19 @@ int main( int argc, char *argv[] )
   else
     SYS_T::commPrint(    "-is_record_sol: false \n");
 
+  // ====== Data for Analysis ======
+  FEANode * fNode = new FEANode(part_file, rank);
 
+  ALocal_IEN * locIEN = new ALocal_IEN(part_file, rank);
 
+  IAGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info_FEM_3D(part_file,rank);
+
+  APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file, rank);
+
+  ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
+
+  // ====== Finalization ======
+  delete fNode; delete locIEN;
   PetscFinalize();
   return EXIT_SUCCESS;
 }
