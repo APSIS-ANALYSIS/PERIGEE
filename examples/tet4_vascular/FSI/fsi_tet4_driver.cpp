@@ -336,6 +336,8 @@ int main(int argc, char *argv[])
         matmodel, tm_galpha_ptr, quadv->get_num_quadPts() );
   }
 
+  matmodel -> write_hdf5(); // record model parameter on disk
+
   // Pseudo elastic mesh motion
   IPLocAssem * locAssem_mesh_ptr = new PLocAssem_Tet4_FSI_Mesh_Elastostatic( mesh_E, mesh_nu );
 
