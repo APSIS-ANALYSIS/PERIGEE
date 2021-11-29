@@ -66,6 +66,7 @@ int main( int argc, char *argv[] )
   const int nqp_tri = cmd_h5r -> read_intScalar("/", "nqp_tri");
   const double fl_density = cmd_h5r -> read_doubleScalar("/", "fl_density");
   const double fl_mu = cmd_h5r -> read_doubleScalar("/", "fl_mu");
+  const double fl_bs_beta = 0.0; // backflow stabilization parameter
 
   delete cmd_h5r; H5Fclose(solver_cmd_file);
 
@@ -142,6 +143,84 @@ int main( int argc, char *argv[] )
   APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file, rank);
 
   ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
+
+  ALocal_NodalBC * locnbc = new ALocal_NodalBC(part_file, rank);
+
+  ALocal_Inflow_NodalBC * locinfnbc = new ALocal_Inflow_NodalBC(part_file, rank);
+
+  ALocal_NodalBC * mesh_locnbc = new ALocal_NodalBC(part_file, rank, "mesh_nbc");
+
+  ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
+
+  ALocal_EBC * mesh_locebc = new ALocal_EBC(part_file, rank, "mesh_ebc");
+
+  APart_Node * pNode = new APart_Node_FSI(part_file, rank);
+
+  SYS_T::commPrint("===> Mesh HDF5 files are read from disk.\n");
+
+  // ===== Basic Checking =====
+  SYS_T::print_fatal_if( size!= PartBasic->get_cpu_size(),
+      "Error: Assigned CPU number does not match the partition. \n");
+
+  SYS_T::commPrint("===> %d processor(s) are assigned for FEM analysis. \n", size);
+
+  // ===== Quadrature rules and FEM container =====
+  SYS_T::commPrint("===> Build quadrature rules. \n");
+  IQuadPts * quadv = new QuadPts_Gauss_Tet( nqp_tet );
+  IQuadPts * quads = new QuadPts_Gauss_Triangle( nqp_tri );
+
+  SYS_T::commPrint("===> Setup element container. \n");
+  FEAElement * elementv = new FEAElement_Tet4( nqp_tet );
+  FEAElement * elements = new FEAElement_Triangle3_3D_der0( nqp_tri );
+
+  // ===== Generate the generalized-alpha method
+  SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
+
+  TimeMethod_GenAlpha * tm_galpha_ptr = nullptr;
+
+  if( is_backward_Euler )
+    tm_galpha_ptr = new TimeMethod_GenAlpha( 1.0, 1.0, 1.0 );
+  else
+    tm_galpha_ptr = new TimeMethod_GenAlpha( genA_rho_inf, false );
+
+  tm_galpha_ptr->print_info();
+
+
+  // ===== Local assembly =====
+  IPLocAssem * locAssem_fluid_ptr = new PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha(
+      tm_galpha_ptr, quadv->get_num_quadPts(), fl_density, fl_mu, fl_bs_beta );
+
+  IMaterialModel * matmodel = nullptr;
+  IPLocAssem * locAssem_solid_ptr = nullptr;
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // ====== Finalization ======
   delete fNode; delete locIEN;
