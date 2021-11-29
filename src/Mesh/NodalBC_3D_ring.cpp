@@ -58,8 +58,7 @@ NodalBC_3D_ring::NodalBC_3D_ring(
 
       TET_T::read_vtp_grid( cap_files[ii], numpts, numcels, pts, ien, gnode, gelem );
      
-      Vector_3 centroid;
-      compute_cap_centroid( pts, centroid );
+      const Vector_3 centroid = compute_cap_centroid( pts );
 
       int num_outline_pts = 0;
       for(unsigned int jj=0; jj<gnode.size(); ++jj)
@@ -109,8 +108,7 @@ NodalBC_3D_ring::NodalBC_3D_ring(
 
       TET_T::read_vtu_grid( cap_files[ii], numpts, numcels, pts, ien, gnode, gelem );
 
-      Vector_3 centroid;
-      compute_cap_centroid( pts, centroid );
+      const Vector_3 centroid = compute_cap_centroid( pts );
 
       int num_outline_pts = 0;
       for(unsigned int jj=0; jj<gnode.size(); ++jj)
@@ -164,20 +162,22 @@ NodalBC_3D_ring::NodalBC_3D_ring(
   else SYS_T::print_fatal("Error: NodalBC_3D_ring does not allow this ring_bc_type!\n");
 }
 
-void NodalBC_3D_ring::compute_cap_centroid( const std::vector<double> &pts, Vector_3 &centroid ) const
+Vector_3 NodalBC_3D_ring::compute_cap_centroid( const std::vector<double> &pts ) const
 {
   const int num_node = static_cast<int>( pts.size() / 3 );
 
+  Vector_3 centroid(0.0, 0.0, 0.0);
+
   for(int ii=0; ii<num_node; ++ii)
   {
-    centroid(0) += pts[3*ii + 0];
-    centroid(1) += pts[3*ii + 1];
-    centroid(2) += pts[3*ii + 2];
+    centroid.x() += pts[3*ii + 0];
+    centroid.y() += pts[3*ii + 1];
+    centroid.z() += pts[3*ii + 2];
   }
 
-  centroid(0) /= (double) num_node;
-  centroid(1) /= (double) num_node;
-  centroid(2) /= (double) num_node;
+  centroid.scale( 1.0 / static_cast<double>( num_node ) );
+
+  return centroid;
 }
 
 // EOF
