@@ -104,9 +104,10 @@ int main(int argc, char *argv[])
   const PetscMPIInt rank = SYS_T::get_MPI_rank();
   const PetscMPIInt size = SYS_T::get_MPI_size();
  
-  SYS_T::commPrint("Job starts at %s %s \n", SYS_T::get_time().c_str(), SYS_T::get_date().c_str());
-
   SYS_T::print_perigee_art();
+
+  SYS_T::commPrint("Job starts at %s %s \n", SYS_T::get_time().c_str(), SYS_T::get_date().c_str());
+  SYS_T::commPrint("PETSc version: %s \n", PETSc_T::get_version().c_str());
 
   // ===== Command Line Argument =====
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
@@ -233,6 +234,7 @@ int main(int argc, char *argv[])
 
     cmdh5w->write_string("date",              SYS_T::get_date() );
     cmdh5w->write_string("time",              SYS_T::get_time() );
+    cmdh5w->write_string("petsc-version",     PETSc_T::get_version() );
 
     delete cmdh5w; H5Fclose(cmd_file_id);
   }
