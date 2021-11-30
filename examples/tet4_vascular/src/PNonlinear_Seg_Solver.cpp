@@ -26,13 +26,13 @@ PNonlinear_Seg_Solver::~PNonlinear_Seg_Solver()
 
 void PNonlinear_Seg_Solver::print_info() const
 {
-  PetscPrintf(PETSC_COMM_WORLD, "----------------------------------------------------------- \n");
-  PetscPrintf(PETSC_COMM_WORLD, "relative tolerance: %e \n", nr_tol);
-  PetscPrintf(PETSC_COMM_WORLD, "absolute tolerance: %e \n", na_tol);
-  PetscPrintf(PETSC_COMM_WORLD, "divergence tolerance: %e \n", nd_tol);
-  PetscPrintf(PETSC_COMM_WORLD, "maximum iteration: %d \n", nmaxits);
-  PetscPrintf(PETSC_COMM_WORLD, "tangent matrix renew frequency: %d \n", nrenew_freq);
-  PetscPrintf(PETSC_COMM_WORLD, "----------------------------------------------------------- \n");
+  SYS_T::commPrint("----------------------------------------------------------- \n");
+  SYS_T::commPrint("relative tolerance: %e \n", nr_tol);
+  SYS_T::commPrint("absolute tolerance: %e \n", na_tol);
+  SYS_T::commPrint("divergence tolerance: %e \n", nd_tol);
+  SYS_T::commPrint("maximum iteration: %d \n", nmaxits);
+  SYS_T::commPrint("tangent matrix renew frequency: %d \n", nrenew_freq);
+  SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
 
@@ -137,7 +137,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_ALE_NS(
     PetscLogEventEnd(mat_assem_0_event,0,0,0,0);
 #endif
 
-    PetscPrintf(PETSC_COMM_WORLD, "  --- M updated");
+    SYS_T::commPrint("  --- M updated");
     lsolver_ptr->SetOperator(gassem_ptr->K);
   }
   else
@@ -159,7 +159,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_ALE_NS(
   }
 
   VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
-  PetscPrintf(PETSC_COMM_WORLD, "  Init res 2-norm: %e \n", initial_norm);
+  SYS_T::commPrint("  Init res 2-norm: %e \n", initial_norm);
 
   // Now do consistent Newton-Raphson iteration
   do
@@ -226,7 +226,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_ALE_NS(
       PetscLogEventEnd(mat_assem_1_event,0,0,0,0);
 #endif
 
-      PetscPrintf(PETSC_COMM_WORLD, "  --- M updated");
+      SYS_T::commPrint("  --- M updated");
       lsolver_ptr->SetOperator(gassem_ptr->K);
     }
     else
@@ -248,13 +248,13 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_ALE_NS(
     }
 
     VecNorm(gassem_ptr->G, NORM_2, &residual_norm);
-    PetscPrintf(PETSC_COMM_WORLD, "  --- nl_res: %e \n", residual_norm);
+    SYS_T::commPrint("  --- nl_res: %e \n", residual_norm);
 
     relative_error = residual_norm / initial_norm;
 
     if( relative_error >= nd_tol )
     {
-      PetscPrintf(PETSC_COMM_WORLD,
+      SYS_T::commPrint(
           "Warning: nonlinear solver is diverging with error %e \n",
           relative_error);
       break;
@@ -362,7 +362,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_FSI(
         curr_time, dt, alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr,
         elementv, elements, quad_v, quad_s, lien_ptr, anode_ptr,
         feanode_ptr, nbc_part, ebc_part, gbc );
-    PetscPrintf(PETSC_COMM_WORLD, "  --- M updated");
+    SYS_T::commPrint("  --- M updated");
     lsolver_ptr->SetOperator(gassem_ptr->K);
   }
   else
@@ -375,7 +375,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_FSI(
   }
 
   VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
-  PetscPrintf(PETSC_COMM_WORLD, "  Init res 2-norm: %e \n", initial_norm);
+  SYS_T::commPrint("  Init res 2-norm: %e \n", initial_norm);
 
   // Now do consistent Newton-Raphson iteration
   do
@@ -427,7 +427,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_FSI(
           curr_time, dt, alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr, 
           elementv, elements, quad_v, quad_s, lien_ptr, anode_ptr,
           feanode_ptr, nbc_part, ebc_part, gbc );
-      PetscPrintf(PETSC_COMM_WORLD, "  - M");
+      SYS_T::commPrint("  - M");
       lsolver_ptr->SetOperator(gassem_ptr->K);
     }
     else
@@ -440,13 +440,13 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_FSI(
     }
 
     VecNorm(gassem_ptr->G, NORM_2, &residual_norm);
-    PetscPrintf(PETSC_COMM_WORLD, "  --- nl_res: %e \n", residual_norm);
+    SYS_T::commPrint("  --- nl_res: %e \n", residual_norm);
 
     relative_error = residual_norm / initial_norm;
 
     if( relative_error >= nd_tol )
     {
-      PetscPrintf(PETSC_COMM_WORLD,
+      SYS_T::commPrint(
           "Warning: nonlinear solver is diverging with error %e \n",
           relative_error);
       break;
