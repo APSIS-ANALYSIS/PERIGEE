@@ -207,6 +207,67 @@ void SEG_SOL_T::PlusAiPV(const double &aa,
   sol->GhostUpdate(); // update the ghost slots
 }
 
+void SEG_SOL_T::Insert_zero_solid_UPV( const APart_Node * const &pnode,
+    PDNSolution * const &sol )
+{
+  // Make sure the dof for sol that 7.
+  SYS_T::print_fatal_if(sol->get_dof_num() != 7,
+      "Error: SEG_SOL_T::Insert_zero_solid_UPV the solution vector dimension is wrong. \n");
+
+  SYS_T::print_fatal_if(sol->get_dof_num() != pnode->get_dof(),
+      "Error: SEG_SOL_T::Insert_zero_solid_UPV the solution vector dof number does not match that of APart_Node. \n");
+
+  SYS_T::print_fatal_if(sol->get_nlocal() != pnode->get_nlocalnode() * 7,
+      "Error: SEG_SOL_T::Insert_zero_solid_UPV the solution vector dimension does not match that of APart_Node. \n");
+
+  Vec lsol;
+  double * array_sol;
+
+  VecGhostGetLocalForm(sol->solution, &lsol);
+  VecGetArray(lsol, &array_sol);
+
+  const int nlocal = pnode->get_nlocalnode();
+
+  double * temp = new double [7*nlocal];
+
+  for(int ii=0; ii<nlocal*7; ++ii) temp[ii] = array_sol[ii];
+
+  // Obtain the number of local nodes
+  const int nlocal_solid = pnode->get_nlocalnode_solid();
+
+  for(int ii=0; ii<nlocal_solid; ++ii)
+  {
+    const int ii7 = pnode->get_node_loc_solid(ii) * 7;
+    array_sol[ii7]   = 0.0; 
+    array_sol[ii7+1] = 0.0;
+    array_sol[ii7+2] = 0.0;
+    array_sol[ii7+3] = 0.0;
+    array_sol[ii7+4] = 0.0;
+    array_sol[ii7+5] = 0.0;
+    array_sol[ii7+6] = 0.0;
+  }
+
+  const int nlocal_fluid = pnode->get_nlocalnode_fluid();
+  
+  for(int ii=0; ii<nlocal_fluid; ++ii)
+  {
+    const int ii7 = pnode->get_node_loc_fluid(ii) * 7;
+    array_sol[ii7]   = temp[ii7];
+    array_sol[ii7+1] = temp[ii7+1];
+    array_sol[ii7+2] = temp[ii7+2];
+    array_sol[ii7+3] = temp[ii7+3];
+    array_sol[ii7+4] = temp[ii7+4];
+    array_sol[ii7+5] = temp[ii7+5];
+    array_sol[ii7+6] = temp[ii7+6];
+  }
+
+  VecRestoreArray(lsol, &array_sol);
+  VecGhostRestoreLocalForm(sol->solution, &lsol);
+
+  sol->GhostUpdate(); // update the ghost slots
+
+  delete [] temp; temp = nullptr;
+}
 
 void SEG_SOL_T::PlusAiUPV(const double &aa, 
     const double &bb, const double &cc,

@@ -129,7 +129,6 @@ namespace SEG_SOL_T
   void PlusAiVPV( const double &aa, const double &bb, const double &cc,
       const APart_Node * const &pnode,
       const PDNSolution * const &step, PDNSolution * const &sol );
- 
 
   // ================================================================
   // Part 2: Insert Inflow values
@@ -148,6 +147,8 @@ namespace SEG_SOL_T
      const ALocal_Inflow_NodalBC * const &infnbc,
      PDNSolution * const &sol );
 
+  void Insert_zero_solid_UPV( const APart_Node * const &pnode,
+      PDNSolution * const &sol );
 
   // ================================================================
   // Part 3: Check solution
