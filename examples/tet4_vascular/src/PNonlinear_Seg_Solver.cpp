@@ -254,9 +254,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_ALE_NS(
 
     if( relative_error >= nd_tol )
     {
-      SYS_T::commPrint(
-          "Warning: nonlinear solver is diverging with error %e \n",
-          relative_error);
+      SYS_T::commPrint("Warning: nonlinear solver is diverging with error %e. \n", relative_error);
       break;
     }
   }while(nl_counter<nmaxits && relative_error > nr_tol && residual_norm > na_tol);
@@ -446,9 +444,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_FSI(
 
     if( relative_error >= nd_tol )
     {
-      SYS_T::commPrint(
-          "Warning: nonlinear solver is diverging with error %e \n",
-          relative_error);
+      SYS_T::commPrint("Warning: nonlinear solver is diverging with error %e. \n", relative_error);
       break;
     }
   }while(nl_counter<nmaxits && relative_error > nr_tol && residual_norm > na_tol);
