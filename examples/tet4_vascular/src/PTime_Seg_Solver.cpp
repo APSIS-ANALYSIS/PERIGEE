@@ -38,12 +38,12 @@ std::string PTime_Seg_Solver::Name_dot_Generator(const int &counter) const
 
 void PTime_Seg_Solver::print_info() const
 {
-  PetscPrintf(PETSC_COMM_WORLD, "----------------------------------------------------------- \n");
-  PetscPrintf(PETSC_COMM_WORLD, "final time: %e \n", final_time);
-  PetscPrintf(PETSC_COMM_WORLD, "solution record frequency : %d \n", sol_record_freq);
-  PetscPrintf(PETSC_COMM_WORLD, "tangent update frequency over time steps: %d \n", renew_tang_freq);
-  PetscPrintf(PETSC_COMM_WORLD, "solution base name: %s \n", pb_name.c_str());
-  PetscPrintf(PETSC_COMM_WORLD, "----------------------------------------------------------- \n");
+  SYS_T::commPrint( "----------------------------------------------------------- \n");
+  SYS_T::commPrint( "final time: %e \n", final_time);
+  SYS_T::commPrint( "solution record frequency : %d \n", sol_record_freq);
+  SYS_T::commPrint( "tangent update frequency over time steps: %d \n", renew_tang_freq);
+  SYS_T::commPrint( "solution base name: %s \n", pb_name.c_str());
+  SYS_T::commPrint( "----------------------------------------------------------- \n");
 }
 
 
@@ -120,7 +120,7 @@ void PTime_Seg_Solver::TM_ALE_NS_GenAlpha(
 
   bool rest_flag = restart_init_assembly_flag;
 
-  PetscPrintf(PETSC_COMM_WORLD, "Time = %e, dt = %e, index = %d, %s \n",
+  SYS_T::commPrint( "Time = %e, dt = %e, index = %d, %s \n",
       time_info->get_time(), time_info->get_step(), time_info->get_index(),
       SYS_T::get_time().c_str());
 
@@ -261,6 +261,10 @@ void PTime_Seg_Solver::TM_FSI_GenAlpha(
 
   bool rest_flag = restart_init_assembly_flag;
 
+  SYS_T::commPrint( "Time = %e, dt = %e, index = %d, %s \n",
+      time_info->get_time(), time_info->get_step(), time_info->get_index(),
+      SYS_T::get_time().c_str() );
+
   while( time_info->get_time() < final_time )
   {
     if(time_info->get_index() % renew_tang_freq == 0 || rest_flag)
@@ -269,6 +273,10 @@ void PTime_Seg_Solver::TM_FSI_GenAlpha(
       rest_flag = false;
     }
     else renew_flag = false;
+
+    // If the previous step is solved in ONE Newton iteration, we do not update
+    // the tangent matrix
+    if( nl_counter == 1 ) renew_flag = false;
 
     nsolver_ptr->GenAlpha_Seg_solve_FSI( renew_flag, time_info->get_time(),
         time_info->get_step(), sol_base, pre_velo, pre_disp, tmga_ptr, flr_ptr,
@@ -281,7 +289,7 @@ void PTime_Seg_Solver::TM_FSI_GenAlpha(
 
     time_info->TimeIncrement();
 
-    PetscPrintf(PETSC_COMM_WORLD, "Time = %e, dt = %e, index = %d, %s \n",
+    SYS_T::commPrint( "Time = %e, dt = %e, index = %d, %s \n",
         time_info->get_time(), time_info->get_step(), time_info->get_index(),
         SYS_T::get_time().c_str() );
 
