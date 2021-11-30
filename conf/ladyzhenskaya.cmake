@@ -1,7 +1,6 @@
 # Configuration setup for machine ladyzhenskaya Linux desktop
 set(HOME_DIR /home/juliu)
 
-
 # ========================================================
 # Specify the library locations
 # ========================================================

@@ -9,12 +9,13 @@
 // Author: Ju Liu
 // Date: Jan 19 2018
 // ==================================================================
-#include <iostream>
-#include <vector>
+#include "Sys_Tools.hpp"
 #include "petsc.h"
 
 namespace PETSc_T
 {
+  std::string get_version();
+
   // ----------------------------------------------------------------
   // Display PETSc object
   // ----------------------------------------------------------------
