@@ -143,11 +143,11 @@ class PNonlinear_Seg_Solver
     // vector container for the mesh motion solution
     PDNSolution * mesh_disp;
 
-    void Print_convergence_info( const int &count, const double rel_err,
-        const double abs_err ) const
-    {PetscPrintf(PETSC_COMM_WORLD,
-        "  === NR ite: %d, r_error: %e, a_error: %e \n",
-        count, rel_err, abs_err);}
+    void Print_convergence_info( const int &count, const double &rel_err,
+        const double &abs_err ) const
+    {
+      SYS_T::commPrint( "  === NR ite: %d, r_error: %e, a_error: %e \n", count, rel_err, abs_err);
+    }
 
     void rescale_inflow_value( const double &stime,
         const ALocal_Inflow_NodalBC * const &infbc,

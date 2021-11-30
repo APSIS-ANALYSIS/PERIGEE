@@ -19,8 +19,8 @@ PNonlinear_Seg_Solver::PNonlinear_Seg_Solver(
 
 PNonlinear_Seg_Solver::~PNonlinear_Seg_Solver()
 {
-  delete dot_P_V_step; dot_P_V_step = NULL;
-  delete mesh_disp;    mesh_disp = NULL;
+  delete dot_P_V_step; dot_P_V_step = nullptr;
+  delete mesh_disp;    mesh_disp    = nullptr;
 }
 
 
