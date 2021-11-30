@@ -166,6 +166,7 @@ int main( int argc, char * argv[] )
   cmdh5w->write_intScalar("dofNum",           dofNum);
   cmdh5w->write_intScalar("dofMat",           dofMat);
   cmdh5w->write_intScalar("elemType",         elemType);
+  cmdh5w->write_intScalar("fsiBC_type",       fsiBC_type);
   cmdh5w->write_string("geo_file",            geo_file);
   cmdh5w->write_string("geo_f_file",          geo_f_file);
   cmdh5w->write_string("geo_s_file",          geo_s_file);

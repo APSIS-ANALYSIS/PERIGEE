@@ -215,6 +215,7 @@ int main(int argc, char *argv[])
 
     cmdh5w->write_doubleScalar(  "fl_density",      fluid_density);
     cmdh5w->write_doubleScalar(  "fl_mu",           fluid_mu);
+    cmdh5w->write_doubleScalar(  "fl_bs_beta",      bs_beta);
     cmdh5w->write_doubleScalar(  "sl_density",      solid_density);
     cmdh5w->write_doubleScalar(  "sl_E",            solid_E);
     cmdh5w->write_doubleScalar(  "sl_nu",           solid_nu);

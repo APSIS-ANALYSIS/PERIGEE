@@ -15,6 +15,11 @@
 #include "QuadPts_Gauss_Tet.hpp"
 #include "FEAElement_Triangle3_3D_der0.hpp"
 #include "FEAElement_Tet4.hpp"
+#include "GenBC_Resistance.hpp"
+#include "GenBC_RCR.hpp"
+#include "GenBC_Inductance.hpp"
+#include "GenBC_Coronary.hpp"
+#include "GenBC_Pressure.hpp"
 #include "MaterialModel_NeoHookean_M94_Mixed.hpp"
 #include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
 #include "PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha.hpp"
@@ -65,21 +70,23 @@ int main( int argc, char *argv[] )
 
   HDF5_Reader * cmd_h5r = new HDF5_Reader( solver_cmd_file );
 
-  const int nqp_tet = cmd_h5r -> read_intScalar("/", "nqp_tet");
-  const int nqp_tri = cmd_h5r -> read_intScalar("/", "nqp_tri");
-  const double fl_density = cmd_h5r -> read_doubleScalar("/", "fl_density");
-  const double fl_mu = cmd_h5r -> read_doubleScalar("/", "fl_mu");
-  const double fl_bs_beta = 0.0; // backflow stabilization parameter
-  const double sl_nu = cmd_h5r -> read_doubleScalar("/", "sl_nu");
-  const double mesh_E = cmd_h5r -> read_doubleScalar("/", "mesh_E");
-  const double mesh_nu = cmd_h5r -> read_doubleScalar("/", "mesh_nu");
+  const int nqp_tet       = cmd_h5r -> read_intScalar(    "/", "nqp_tet");
+  const int nqp_tri       = cmd_h5r -> read_intScalar(    "/", "nqp_tri");
+  const double fl_density = cmd_h5r -> read_doubleScalar( "/", "fl_density");
+  const double fl_mu      = cmd_h5r -> read_doubleScalar( "/", "fl_mu");
+  const double fl_bs_beta = cmd_h5r -> read_doubleScalar( "/", "fl_bs_beta"); 
+  const double sl_nu      = cmd_h5r -> read_doubleScalar( "/", "sl_nu");
+  const double mesh_E     = cmd_h5r -> read_doubleScalar( "/", "mesh_E");
+  const double mesh_nu    = cmd_h5r -> read_doubleScalar( "/", "mesh_nu");
+  const std::string lpn_file = cmd_h5r -> read_string( "/", "lpn_file" );
 
   delete cmd_h5r; H5Fclose(solver_cmd_file);
 
   hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
   HDF5_Reader * pcmd_h5r = new HDF5_Reader( prepcmd_file );
 
-  const std::string part_file = pcmd_h5r -> read_string( "/", "part_file" );
+  const std::string part_file = pcmd_h5r -> read_string(    "/", "part_file" );
+  const int fsiBC_type        = pcmd_h5r -> read_intScalar( "/", "fsiBC_type" );
 
   delete pcmd_h5r; H5Fclose(prepcmd_file);
 
@@ -88,6 +95,8 @@ int main( int argc, char *argv[] )
 
   const PetscMPIInt rank = SYS_T::get_MPI_rank();
   const PetscMPIInt size = SYS_T::get_MPI_size();
+
+  SYS_T::print_fatal_if( fsiBC_type != 0, "Error: fsiBC_type should be 0.\n" );
 
   // Clean potentially pre-existing hdf5 files of prestress saved in the folder
   // named as prestress
@@ -182,6 +191,13 @@ int main( int argc, char *argv[] )
   FEAElement * elementv = new FEAElement_Tet4( nqp_tet );
   FEAElement * elements = new FEAElement_Triangle3_3D_der0( nqp_tri );
 
+  // ===== Generate a sparse matrix for strong enforcement of essential BC
+  Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
+  pmat->gen_perm_bc(pNode, locnbc);
+
+  Matrix_PETSc * mmat = new Matrix_PETSc(pNode, mesh_locnbc);
+  mmat->gen_perm_bc(pNode, mesh_locnbc);
+
   // ===== Generate the generalized-alpha method
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
 
@@ -206,8 +222,9 @@ int main( int argc, char *argv[] )
   {
     IMaterialModel * matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( "material_model.h5" );
 
-    IPLocAssem * locAssem_solid_ptr = new PLocAssem_Tet4_VMS_Seg_Incompressible(
+    locAssem_solid_ptr = new PLocAssem_Tet4_VMS_Seg_Incompressible(
         matmodel, tm_galpha_ptr, quadv->get_num_quadPts() );
+  
   }
   else
   {
@@ -244,6 +261,24 @@ int main( int argc, char *argv[] )
   // ===== GenBC =====
   IGenBC * gbc = nullptr;
 
+  if( GENBC_T::get_genbc_file_type( lpn_file ) == 1  )
+    gbc = new GenBC_Resistance( lpn_file );
+  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 2  )
+    gbc = new GenBC_RCR( lpn_file, 1000, initial_step );
+  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 3  )
+    gbc = new GenBC_Inductance( lpn_file );
+  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 4  )
+    gbc = new GenBC_Coronary( lpn_file, 1000, initial_step, initial_index );
+  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 5  )
+    gbc = new GenBC_Pressure( lpn_file, initial_time );
+  else
+    SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
+
+  gbc -> print_info();
+
+  SYS_T::print_fatal_if(gbc->get_num_ebc() != locebc->get_num_ebc(),
+      "Error: GenBC number of faces does not match with that in ALocal_EBC.\n");
+
   // ===== Global assembly routine =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
   IPGAssem * gloAssem_ptr = new PGAssem_FSI_FEM( locAssem_fluid_ptr,
@@ -257,7 +292,7 @@ int main( int argc, char *argv[] )
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
   gloAssem_ptr->Fix_nonzero_err_str();
   gloAssem_ptr->Clear_KG();
-
+  
   // ===== Global assembly for mesh motion =====
   SYS_T::commPrint("===> Initializing Mat K_mesh and Vec G_mesh ... \n");
   IPGAssem * gloAssem_mesh_ptr = new PGAssem_Seg_FEM( locAssem_mesh_ptr,
