@@ -70,7 +70,7 @@ class PNonlinear_CMM_Solver
         PDNSolution * const &sol,
         PDNSolution * const &dot_sol_wall_disp,
         PDNSolution * const &sol_wall_disp,
-        bool &prestress_conv_flag, int &nl_counter ) const;
+        int &nl_counter ) const;
 
     // --------------------------------------------------------------
     // GenAlpha_Solve_Prestress:
