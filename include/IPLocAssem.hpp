@@ -934,6 +934,20 @@ class IPLocAssem
       SYS_T::commPrint("Warning: get_Wall_CauchyStress() is not implemented. \n");
     }
 
+    // Calculate the Cauchy stress at every quadrature points
+    // within this element. The output stress has length quad -> get_num_quadPts()
+    virtual void get_Wall_CauchyStress(
+        const double * const &disp,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad,
+        std::vector<Matrix_3x3> &stress ) const
+    {
+      SYS_T::commPrint("Warning: get_CauchyStress() is not implemented. \n");
+    }
+
 };
 
 #endif

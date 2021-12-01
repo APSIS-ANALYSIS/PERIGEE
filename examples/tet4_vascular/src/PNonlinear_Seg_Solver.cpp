@@ -639,6 +639,11 @@ void PNonlinear_Seg_Solver::GenAlpha_Solve_Prestress(
     }
   }while(nl_counter<nmaxits && relative_error > nr_tol && residual_norm > na_tol);
 
+  // --------------------------------------------------------------------------
+  // Calculate the Cauchy stress in the solid element and update the prestress
+  
+  // --------------------------------------------------------------------------
+
   Print_convergence_info(nl_counter, relative_error, residual_norm);
 
   if(relative_error <= nr_tol || residual_norm <= na_tol) conv_flag = true;

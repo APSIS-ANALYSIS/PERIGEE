@@ -699,4 +699,49 @@ void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Residual_EBC(
   }
 }
 
+
+void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::get_Wall_CauchyStress(
+    const double * const &disp,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad,
+    std::vector<Matrix_3x3> &stress ) const
+{
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  stress.resize( nqp );
+
+  for( int qua = 0; qua < nqp; ++qua )
+  {
+    double dR_dx[4], dR_dy[4], dR_dz[4];
+
+    element->get_gradR( qua, dR_dx, dR_dy, dR_dz );
+
+    double ux_x = 0.0, uy_x = 0.0, uz_x = 0.0;
+    double ux_y = 0.0, uy_y = 0.0, uz_y = 0.0;
+    double ux_z = 0.0, uy_z = 0.0, uz_z = 0.0;
+
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      ux_x += disp[ii*7+0] * dR_dx[ii];
+      uy_x += disp[ii*7+1] * dR_dx[ii];
+      uz_x += disp[ii*7+2] * dR_dx[ii];
+
+      ux_y += disp[ii*7+0] * dR_dy[ii];
+      uy_y += disp[ii*7+1] * dR_dy[ii];
+      uz_y += disp[ii*7+2] * dR_dy[ii];
+
+      ux_z += disp[ii*7+0] * dR_dz[ii];
+      uy_z += disp[ii*7+1] * dR_dz[ii];
+      uz_z += disp[ii*7+2] * dR_dz[ii];
+    }
+
+    const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
+    
+    stress[qua] = matmodel -> get_Cauchy_stress( F );
+  }
+}
+
 // EOF
