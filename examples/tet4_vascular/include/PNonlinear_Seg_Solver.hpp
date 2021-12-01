@@ -130,12 +130,49 @@ class PNonlinear_Seg_Solver
         PDNSolution * const &sol,
         bool &conv_flag, int &nl_counter ) const;
 
+    // ------------------------------------------------------------------------
+    // GenAlpha_Solve_Prestress:
+    // This is a solver for generating the prestress in ALE-FSI simulations
+    // ------------------------------------------------------------------------
+    void GenAlpha_Solve_Prestress(
+        const bool &new_tangent_flag,
+        const double &curr_time,
+        const double &dt,
+        const PDNSolution * const &sol_base,
+        const PDNSolution * const &pre_dot_sol,
+        const PDNSolution * const &pre_sol,
+        const TimeMethod_GenAlpha * const &tmga_ptr,
+        const ICVFlowRate * const flr_ptr,
+        const ALocal_Elem * const &alelem_ptr,
+        const ALocal_IEN * const &lien_ptr,
+        const APart_Node * const &anode_ptr,
+        const FEANode * const &feanode_ptr,
+        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_Inflow_NodalBC * const &infnbc_part,
+        const ALocal_NodalBC * const &nbc_mesh_part,
+        const ALocal_EBC * const &ebc_part,
+        const ALocal_EBC * const &ebc_mesh_part,
+        const IGenBC * const &gbc,
+        const Matrix_PETSc * const &bc_mat,
+        const Matrix_PETSc * const &bc_mesh_mat,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        IPLocAssem * const &lassem_fluid_ptr,
+        IPLocAssem * const &lassem_solid_ptr,
+        IPLocAssem * const &lassem_mesh_ptr,
+        IPGAssem * const &gassem_ptr,
+        IPGAssem * const &gassem_mesh_ptr,
+        PLinear_Solver_PETSc * const &lsolver_ptr,
+        PLinear_Solver_PETSc * const &lsolver_mesh_ptr,
+        PDNSolution * const &dot_sol,
+        PDNSolution * const &sol,
+        bool &prestress_conv_flag, int &nl_counter ) const;
+
   private:
-    const double nr_tol;
-    const double na_tol;
-    const double nd_tol;
-    const int nmaxits;
-    const int nrenew_freq;
+    const double nr_tol, na_tol, nd_tol;
+    const int nmaxits, nrenew_freq;
 
     // vector container for the step update in the smaller matrix problem
     PDNSolution * dot_P_V_step;
