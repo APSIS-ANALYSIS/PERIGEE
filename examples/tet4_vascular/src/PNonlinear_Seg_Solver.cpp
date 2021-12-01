@@ -291,6 +291,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_FSI(
     FEAElement * const &elements,
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
+    const Prestress_solid * const &ps_ptr,
     IPLocAssem * const &lassem_fluid_ptr,
     IPLocAssem * const &lassem_solid_ptr,
     IPLocAssem * const &lassem_mesh_ptr,
@@ -359,7 +360,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_FSI(
     gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
         curr_time, dt, alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr,
         elementv, elements, quad_v, quad_s, lien_ptr, anode_ptr,
-        feanode_ptr, nbc_part, ebc_part, gbc );
+        feanode_ptr, nbc_part, ebc_part, gbc, ps_ptr );
     SYS_T::commPrint("  --- M updated");
     lsolver_ptr->SetOperator(gassem_ptr->K);
   }
@@ -369,7 +370,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_FSI(
     gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
         curr_time, dt, alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr, 
         elementv, elements, quad_v, quad_s, lien_ptr, anode_ptr,
-        feanode_ptr, nbc_part, ebc_part, gbc );
+        feanode_ptr, nbc_part, ebc_part, gbc, ps_ptr );
   }
 
   VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
@@ -424,7 +425,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_FSI(
       gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
           curr_time, dt, alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr, 
           elementv, elements, quad_v, quad_s, lien_ptr, anode_ptr,
-          feanode_ptr, nbc_part, ebc_part, gbc );
+          feanode_ptr, nbc_part, ebc_part, gbc, ps_ptr );
       SYS_T::commPrint("  - M");
       lsolver_ptr->SetOperator(gassem_ptr->K);
     }
@@ -434,7 +435,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_FSI(
       gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
           curr_time, dt, alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr, 
           elementv, elements, quad_v, quad_s, lien_ptr, anode_ptr,
-          feanode_ptr, nbc_part, ebc_part, gbc );
+          feanode_ptr, nbc_part, ebc_part, gbc, ps_ptr );
     }
 
     VecNorm(gassem_ptr->G, NORM_2, &residual_norm);
@@ -482,6 +483,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Solve_Prestress(
     FEAElement * const &elements,
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
+    Prestress_solid * const &ps_ptr,
     IPLocAssem * const &lassem_fluid_ptr,
     IPLocAssem * const &lassem_solid_ptr,
     IPLocAssem * const &lassem_mesh_ptr,
@@ -491,7 +493,6 @@ void PNonlinear_Seg_Solver::GenAlpha_Solve_Prestress(
     PLinear_Solver_PETSc * const &lsolver_mesh_ptr,
     PDNSolution * const &dot_sol,
     PDNSolution * const &sol,
-    Prestress_solid * const &ps_ptr,
     bool &prestress_conv_flag, int &nl_counter ) const
 {
   // Initialize the counter and error
@@ -551,7 +552,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Solve_Prestress(
     gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
         curr_time, dt, alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr,
         elementv, elements, quad_v, quad_s, lien_ptr, anode_ptr,
-        feanode_ptr, nbc_part, ebc_part, gbc );
+        feanode_ptr, nbc_part, ebc_part, gbc, ps_ptr );
     SYS_T::commPrint("  --- M updated");
     lsolver_ptr->SetOperator(gassem_ptr->K);
   }
@@ -561,7 +562,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Solve_Prestress(
     gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
         curr_time, dt, alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr, 
         elementv, elements, quad_v, quad_s, lien_ptr, anode_ptr,
-        feanode_ptr, nbc_part, ebc_part, gbc );
+        feanode_ptr, nbc_part, ebc_part, gbc, ps_ptr );
   }
 
   VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
@@ -616,7 +617,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Solve_Prestress(
       gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
           curr_time, dt, alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr, 
           elementv, elements, quad_v, quad_s, lien_ptr, anode_ptr,
-          feanode_ptr, nbc_part, ebc_part, gbc );
+          feanode_ptr, nbc_part, ebc_part, gbc, ps_ptr );
       SYS_T::commPrint("  - M");
       lsolver_ptr->SetOperator(gassem_ptr->K);
     }
@@ -626,7 +627,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Solve_Prestress(
       gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
           curr_time, dt, alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr, 
           elementv, elements, quad_v, quad_s, lien_ptr, anode_ptr,
-          feanode_ptr, nbc_part, ebc_part, gbc );
+          feanode_ptr, nbc_part, ebc_part, gbc, ps_ptr );
     }
 
     VecNorm(gassem_ptr->G, NORM_2, &residual_norm);
