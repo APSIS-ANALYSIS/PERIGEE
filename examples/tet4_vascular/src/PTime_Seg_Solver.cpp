@@ -229,6 +229,7 @@ void PTime_Seg_Solver::TM_FSI_GenAlpha(
     FEAElement * const &elements,
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
+    const Prestress_solid * const &ps_ptr,
     IPLocAssem * const &lassem_fluid_ptr,
     IPLocAssem * const &lassem_solid_ptr,
     IPLocAssem * const &lassem_mesh_ptr,
@@ -282,7 +283,7 @@ void PTime_Seg_Solver::TM_FSI_GenAlpha(
         time_info->get_step(), sol_base, pre_velo, pre_disp, tmga_ptr, flr_ptr,
         alelem_ptr, lien_ptr, anode_ptr, feanode_ptr, nbc_part, infnbc_part,
         nbc_mesh_part, ebc_part, ebc_mesh_part, gbc, bc_mat, bc_mesh_mat, 
-        elementv, elements, quad_v, quad_s, lassem_fluid_ptr,
+        elementv, elements, quad_v, quad_s, ps_ptr, lassem_fluid_ptr,
         lassem_solid_ptr, lassem_mesh_ptr,
         gassem_ptr, gassem_mesh_ptr, lsolver_ptr, lsolver_mesh_ptr,
         cur_velo, cur_disp, conv_flag, nl_counter );

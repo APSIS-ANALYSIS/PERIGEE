@@ -79,6 +79,7 @@ class PTime_Seg_Solver
         FEAElement * const &elements,
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
+        const Prestress_solid * const &ps_ptr,
         IPLocAssem * const &lassem_fluid_ptr,
         IPLocAssem * const &lassem_solid_ptr,
         IPLocAssem * const &lassem_mesh_ptr,

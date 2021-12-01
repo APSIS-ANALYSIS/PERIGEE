@@ -72,7 +72,6 @@ class PNonlinear_Seg_Solver
         FEAElement * const &elements,
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
-        const Prestress_solid * const &ps_ptr,
         IPLocAssem * const &lassem_solid_ptr,
         IPLocAssem * const &lassem_mesh_ptr,
         IPGAssem * const &gassem_ptr,
@@ -120,7 +119,7 @@ class PNonlinear_Seg_Solver
         FEAElement * const &elements,
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
-        Prestress_solid * const &ps_ptr,
+        const Prestress_solid * const &ps_ptr,
         IPLocAssem * const &lassem_fluid_ptr,
         IPLocAssem * const &lassem_solid_ptr,
         IPLocAssem * const &lassem_mesh_ptr,
@@ -162,6 +161,7 @@ class PNonlinear_Seg_Solver
         FEAElement * const &elements,
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
+        Prestress_solid * const &ps_ptr,
         IPLocAssem * const &lassem_fluid_ptr,
         IPLocAssem * const &lassem_solid_ptr,
         IPLocAssem * const &lassem_mesh_ptr,
@@ -171,7 +171,6 @@ class PNonlinear_Seg_Solver
         PLinear_Solver_PETSc * const &lsolver_mesh_ptr,
         PDNSolution * const &dot_sol,
         PDNSolution * const &sol,
-        Prestress_solid * const &ps_ptr,
         bool &prestress_conv_flag, int &nl_counter ) const;
 
   private:
