@@ -106,6 +106,7 @@ int main( int argc, char *argv[] )
     SYS_T::execute("mkdir prestress");
   }
 
+  SYS_T::GetOptionInt(   "-nz_estimate",         nz_estimate);
   SYS_T::GetOptionReal(  "-prestress_disp_tol",  prestress_disp_tol);
   SYS_T::GetOptionReal(  "-rho_inf",             genA_rho_inf);
   SYS_T::GetOptionReal(  "-nl_rtol",             nl_rtol);
