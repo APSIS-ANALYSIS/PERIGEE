@@ -77,7 +77,7 @@ void PTime_CMM_Solver::TM_CMM_GenAlpha(
     const ALocal_Inflow_NodalBC * const &infnbc_part,
     const ALocal_Ring_NodalBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part,
-    ALocal_EBC * const &ebc_wall_part,
+    const ALocal_EBC * const &ebc_wall_part,
     IGenBC * const &gbc,
     const Matrix_PETSc * const &bc_mat,
     FEAElement * const &elementv,
