@@ -244,7 +244,10 @@ Matrix_3x3 operator*( const Matrix_3x3 &left, const Matrix_3x3 &right );
 // Return the inverse of the input matrix
 Matrix_3x3 inverse( const Matrix_3x3 &input );
 
-// Return the cofactor of input matrix which is J input^(-T)
+// Return the cofactor of input matrix, which is J input^(-T)
 Matrix_3x3 cofactor( const Matrix_3x3 &input );
+
+// Return the transpose of input matrix
+Matrix_3x3 transpose( const Matrix_3x3 &input );
 
 #endif

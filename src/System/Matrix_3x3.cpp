@@ -574,4 +574,11 @@ Matrix_3x3 cofactor( const Matrix_3x3 &input )
       (input(0) * input(4) - input(1) * input(3)) );
 }
 
+Matrix_3x3 transpose( const Matrix_3x3 &input )
+{
+  return Matrix_3x3( input(0), input(3), input(6),
+      input(1), input(4), input(7),
+      input(2), input(5), input(8) );
+}
+
 // EOF
