@@ -393,7 +393,8 @@ void PGAssem_FSI_FEM::Assem_mass_residual(
     const APart_Node * const &node_ptr,
     const FEANode * const &fnode_ptr,
     const ALocal_NodalBC * const &nbc_part,
-    const ALocal_EBC * const &ebc_part )
+    const ALocal_EBC * const &ebc_part,
+    const Prestress_solid * const &ps_ptr )
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
@@ -429,8 +430,12 @@ void PGAssem_FSI_FEM::Assem_mass_residual(
     }
     else
     {
+      // For solid element, quaprestress will return a vector of length nqp x 6
+      // for the prestress values at the quadrature points
+      const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
+      
       lassem_s_ptr->Assem_Mass_Residual( local_a, elementv,
-          ectrl_x, ectrl_y, ectrl_z, quad_v );
+          ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v );
     
       MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
           lassem_s_ptr->Tangent, ADD_VALUES);
@@ -470,7 +475,8 @@ void PGAssem_FSI_FEM::Assem_residual(
     const FEANode * const &fnode_ptr,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
-    const IGenBC * const &gbc )
+    const IGenBC * const &gbc,
+    const Prestress_solid * const &ps_ptr )
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
@@ -502,8 +508,12 @@ void PGAssem_FSI_FEM::Assem_residual(
     }
     else
     {
+      // For solid element, quaprestress will return a vector of length nqp x 6
+      // for the prestress values at the quadrature points
+      const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
+      
       lassem_s_ptr->Assem_Residual(curr_time, dt, local_a, local_b,
-          elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
+          elementv, ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v);
 
       VecSetValues(G, loc_dof, row_index, lassem_s_ptr->Residual, ADD_VALUES);
     }
@@ -545,7 +555,8 @@ void PGAssem_FSI_FEM::Assem_tangent_residual(
     const FEANode * const &fnode_ptr,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
-    const IGenBC * const &gbc )
+    const IGenBC * const &gbc,
+    const Prestress_solid * const &ps_ptr )
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
@@ -580,8 +591,12 @@ void PGAssem_FSI_FEM::Assem_tangent_residual(
     }
     else
     {
+      // For solid element, quaprestress will return a vector of length nqp x 6
+      // for the prestress values at the quadrature points
+      const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
+      
       lassem_s_ptr->Assem_Tangent_Residual(curr_time, dt, local_a, local_b,
-          elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
+          elementv, ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v);
       
       MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
           lassem_s_ptr->Tangent, ADD_VALUES);
