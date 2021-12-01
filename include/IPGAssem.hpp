@@ -25,6 +25,7 @@
 #include "ALocal_Ring_NodalBC.hpp"
 #include "ALocal_EBC.hpp"
 #include "IGenBC.hpp"
+#include "Prestress_solid.hpp"
 
 class IPGAssem
 {
@@ -656,7 +657,23 @@ class IPGAssem
         FEAElement * const &element_w,
         const IQuadPts * const &quad_s,
         ALocal_EBC * const &ebc_wall_part )
-    {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
+    {
+      SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");
+    }
+
+    // Update solid prestress at all volumetric quadrature points    
+    virtual void Update_Wall_Prestress(
+        const PDNSolution * const &sol,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &element,
+        const IQuadPts * const &quad,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        Prestress_solid * const &ps_ptr ) const
+    {
+      SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");
+    }
 };
 
 #endif
