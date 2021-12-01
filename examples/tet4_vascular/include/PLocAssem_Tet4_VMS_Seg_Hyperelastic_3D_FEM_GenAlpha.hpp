@@ -54,6 +54,7 @@ class PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
+        const double * const &qua_prestress,
         const IQuadPts * const &quad );
 
     virtual void Assem_Tangent_Residual(
@@ -64,6 +65,7 @@ class PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
+        const double * const &qua_prestress,
         const IQuadPts * const &quad );
 
     virtual void Assem_Mass_Residual(
@@ -72,6 +74,7 @@ class PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
+        const double * const &qua_prestress,
         const IQuadPts * const &quad );
 
     virtual void Assem_Residual_EBC(

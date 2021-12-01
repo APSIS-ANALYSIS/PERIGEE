@@ -89,6 +89,7 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Residual(
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
+    const double * const &qua_prestress,
     const IQuadPts * const &quad )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
@@ -184,6 +185,15 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Residual(
     Matrix_3x3 P_iso, S_iso;
     matmodel->get_PK(F, P_iso, S_iso);
 
+    // ------------------------------------------------------------------------
+    // 1st PK stress corrected by prestress
+    const Matrix_3x3 prestress( qua_prestress[qua*6+0], qua_prestress[qua*6+5], qua_prestress[qua*6+4],
+        qua_prestress[qua*6+5], qua_prestress[qua*6+1], qua_prestress[qua*6+3],
+        qua_prestress[qua*6+4], qua_prestress[qua*6+3], qua_prestress[qua*6+2] );
+
+    P_iso += prestress * cofactor( F );
+    // ------------------------------------------------------------------------
+
     const double rho = matmodel->get_rho(p);
 
     const double detF = F.det();
@@ -236,6 +246,7 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Tangent_Residual(
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
+    const double * const &qua_prestress,
     const IQuadPts * const &quad )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
@@ -341,6 +352,15 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Tangent_Residual(
     Tensor4_3D AA_iso;
     matmodel->get_PK_FFStiffness(F, P_iso, S_iso, AA_iso);
 
+    // ------------------------------------------------------------------------
+    // 1st PK stress corrected by prestress
+    const Matrix_3x3 prestress( qua_prestress[qua*6+0], qua_prestress[qua*6+5], qua_prestress[qua*6+4],
+        qua_prestress[qua*6+5], qua_prestress[qua*6+1], qua_prestress[qua*6+3],
+        qua_prestress[qua*6+4], qua_prestress[qua*6+3], qua_prestress[qua*6+2] );
+
+    P_iso += prestress * cofactor( F );
+    // ------------------------------------------------------------------------
+    
     const double rho = matmodel->get_rho(p);
     const double detF = F.det();
 
@@ -514,6 +534,7 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Mass_Residual(
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
+    const double * const &qua_prestress,
     const IQuadPts * const &quad )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
@@ -592,6 +613,15 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Mass_Residual(
     Matrix_3x3 P_iso, S_iso;
     matmodel->get_PK(F, P_iso, S_iso);
 
+    // ------------------------------------------------------------------------
+    // 1st PK stress corrected by prestress
+    const Matrix_3x3 prestress( qua_prestress[qua*6+0], qua_prestress[qua*6+5], qua_prestress[qua*6+4],
+        qua_prestress[qua*6+5], qua_prestress[qua*6+1], qua_prestress[qua*6+3],
+        qua_prestress[qua*6+4], qua_prestress[qua*6+3], qua_prestress[qua*6+2] );
+
+    P_iso += prestress * cofactor( F );
+    // ------------------------------------------------------------------------
+    
     double mbeta = matmodel->get_beta(p);
 
     // use 1.0 in case of fully incompressible. 
@@ -694,13 +724,14 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::get_Wall_CauchyStress(
 
   for( int qua = 0; qua < nqp; ++qua )
   {
-    double dR_dx[4], dR_dy[4], dR_dz[4];
+    double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
 
-    element->get_gradR( qua, dR_dx, dR_dy, dR_dz );
+    element->get_R_gradR( qua, R, dR_dx, dR_dy, dR_dz );
 
     double ux_x = 0.0, uy_x = 0.0, uz_x = 0.0;
     double ux_y = 0.0, uy_y = 0.0, uz_y = 0.0;
     double ux_z = 0.0, uy_z = 0.0, uz_z = 0.0;
+    double pp = 0.0;
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -715,11 +746,14 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::get_Wall_CauchyStress(
       ux_z += disp[ii*7+0] * dR_dz[ii];
       uy_z += disp[ii*7+1] * dR_dz[ii];
       uz_z += disp[ii*7+2] * dR_dz[ii];
+
+      pp   += disp[ii*7+3] * R[ii];
     }
 
     const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
     stress[qua] = matmodel -> get_Cauchy_stress( F );
+    stress[qua].AXPI( -1.0 * pp );
   }
 }
 
