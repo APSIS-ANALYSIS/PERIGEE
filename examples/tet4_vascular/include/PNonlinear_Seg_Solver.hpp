@@ -168,6 +168,7 @@ class PNonlinear_Seg_Solver
         PLinear_Solver_PETSc * const &lsolver_mesh_ptr,
         PDNSolution * const &dot_sol,
         PDNSolution * const &sol,
+        Prestress_solid * const &ps_ptr,
         bool &prestress_conv_flag, int &nl_counter ) const;
 
   private:

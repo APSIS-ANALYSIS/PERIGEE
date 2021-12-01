@@ -490,6 +490,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Solve_Prestress(
     PLinear_Solver_PETSc * const &lsolver_mesh_ptr,
     PDNSolution * const &dot_sol,
     PDNSolution * const &sol,
+    Prestress_solid * const &ps_ptr,
     bool &conv_flag, int &nl_counter ) const
 {
   // Initialize the counter and error
@@ -641,7 +642,11 @@ void PNonlinear_Seg_Solver::GenAlpha_Solve_Prestress(
 
   // --------------------------------------------------------------------------
   // Calculate the Cauchy stress in the solid element and update the prestress
-  
+  gassem_ptr -> Update_Wall_Prestress( sol, alelem_ptr, lassem_solid_ptr,
+      elementv, quad_v, lien_ptr, feanode_ptr, ps_ptr );
+
+  //SYS_T::commPrint("  --- wall_disp_norm: %e \n", sol_wall_disp->Norm_2());
+
   // --------------------------------------------------------------------------
 
   Print_convergence_info(nl_counter, relative_error, residual_norm);
