@@ -220,15 +220,14 @@ int main( int argc, char *argv[] )
 
   if( sl_nu == 0.5 )
   {
-    IMaterialModel * matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( "material_model.h5" );
+    matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( "material_model.h5" );
 
     locAssem_solid_ptr = new PLocAssem_Tet4_VMS_Seg_Incompressible(
         matmodel, tm_galpha_ptr, quadv->get_num_quadPts() );
-  
   }
   else
   {
-    IMaterialModel * matmodel = new MaterialModel_NeoHookean_M94_Mixed( "material_model.h5" );
+    matmodel = new MaterialModel_NeoHookean_M94_Mixed( "material_model.h5" );
 
     locAssem_solid_ptr = new PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha(
         matmodel, tm_galpha_ptr, quadv->get_num_quadPts() );
