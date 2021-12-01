@@ -174,6 +174,8 @@ int main( int argc, char *argv[] )
 
   APart_Node * pNode = new APart_Node_FSI(part_file, rank);
 
+  Prestress_solid * ps_data = new Prestress_solid( locElem, nqp_tet, rank, false, "prestress" );
+
   SYS_T::commPrint("===> Mesh HDF5 files are read from disk.\n");
 
   // ===== Basic Checking =====
@@ -209,7 +211,6 @@ int main( int argc, char *argv[] )
     tm_galpha_ptr = new TimeMethod_GenAlpha( genA_rho_inf, false );
 
   tm_galpha_ptr->print_info();
-
 
   // ===== Local assembly =====
   IPLocAssem * locAssem_fluid_ptr = new PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha(
@@ -328,10 +329,29 @@ int main( int argc, char *argv[] )
 
   SYS_T::commPrint("===> mesh solver LHS setted up.\n");
 
+  // ===== Nonlinear solver context =====
+  PNonlinear_Seg_Solver * nsolver = new PNonlinear_Seg_Solver(
+      pNode, fNode, nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq);
+  SYS_T::commPrint("===> Nonlinear solver setted up:\n");
+  nsolver->print_info();
 
-  // Prestress generation nonlinear solver and time solver to be filled
+  // ===== Temporal solver context =====
+  PTime_Seg_Solver * tsolver = new PTime_Seg_Solver( sol_bName,
+      sol_record_freq, ttan_renew_freq, final_time );
+  SYS_T::commPrint("===> Time marching solver setted up:\n");
+  tsolver->print_info();
 
+  // ===== FEM analysis =====
+  PDNSolution * base = nullptr;
+  ICVFlowRate * inflow_rate_ptr = nullptr;
 
+  SYS_T::commPrint("===> Start Finite Element Analysis:\n");
+  tsolver->TM_FSI_Prestress( is_record_sol, prestress_disp_tol, base, dot_sol, sol, tm_galpha_ptr,
+      timeinfo, inflow_rate_ptr, locElem, locIEN, pNode, fNode, locnbc,
+      locinfnbc, mesh_locnbc, locebc, mesh_locebc, gbc, pmat, mmat,
+      elementv, elements, quadv, quads, ps_data,
+      locAssem_fluid_ptr, locAssem_solid_ptr, locAssem_mesh_ptr,
+      gloAssem_ptr, gloAssem_mesh_ptr, lsolver, mesh_lsolver, nsolver);
 
   // ====== Finalization ======
   delete fNode; delete locIEN;
