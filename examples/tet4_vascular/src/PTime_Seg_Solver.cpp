@@ -439,6 +439,8 @@ void PTime_Seg_Solver::TM_FSI_Prestress(
     // nullify the solid solution
     SEG_SOL_T::Insert_zero_solid_UPV( anode_ptr, pre_velo ); 
     SEG_SOL_T::Insert_zero_solid_UPV( anode_ptr, pre_disp ); 
+    SEG_SOL_T::Insert_zero_solid_UPV( anode_ptr, cur_velo ); 
+    SEG_SOL_T::Insert_zero_solid_UPV( anode_ptr, cur_disp ); 
 
     nsolver_ptr->GenAlpha_Solve_Prestress( renew_flag, prestress_tol, time_info->get_time(),
         time_info->get_step(), sol_base, pre_velo, pre_disp, tmga_ptr, flr_ptr,
@@ -463,10 +465,6 @@ void PTime_Seg_Solver::TM_FSI_Prestress(
       sol_dot_name = Name_dot_Generator(time_info->get_index());
       cur_velo->WriteBinary(sol_dot_name.c_str());
     }
-
-    // Prepare for the next time step
-    pre_disp->Copy(*cur_disp);
-    pre_velo->Copy(*cur_velo);
   }
 
   delete pre_disp; delete cur_disp; delete pre_velo; delete cur_velo;

@@ -85,7 +85,7 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionString("-sur_s_file_in_base",  sur_s_file_in_base);
   SYS_T::GetOptionString("-sur_s_file_out_base", sur_s_file_out_base);
 
-  SYS_T::print_fatal_if( fsiBC_type != 0 && fsiBC_type != 1, "Error: fsiBC_type should be 1 or 0.\n" );
+  SYS_T::print_fatal_if( fsiBC_type != 0 && fsiBC_type != 1 && fsiBC_type != 2, "Error: fsiBC_type should be 0, 1, or 2.\n" );
 
   std::cout<<"===== Command Line Arguments ====="<<std::endl;
   std::cout<<" -fsiBC_type: "         <<fsiBC_type         <<std::endl;
@@ -264,6 +264,13 @@ int main( int argc, char * argv[] )
     NBC_list[1] = new NodalBC_3D_vtu( geo_s_file, dir_list, nFunc );
     NBC_list[2] = new NodalBC_3D_vtu( geo_s_file, dir_list, nFunc );
     NBC_list[3] = new NodalBC_3D_vtu( geo_s_file, dir_list, nFunc );
+  }
+  else if( fsiBC_type == 2 )
+  {
+    NBC_list[0] = new NodalBC_3D_vtu( nFunc );
+    NBC_list[1] = new NodalBC_3D_vtu( geo_f_file, dir_list, nFunc );
+    NBC_list[2] = new NodalBC_3D_vtu( geo_f_file, dir_list, nFunc );
+    NBC_list[3] = new NodalBC_3D_vtu( geo_f_file, dir_list, nFunc );
   }
 
   // Mesh solver NodalBC

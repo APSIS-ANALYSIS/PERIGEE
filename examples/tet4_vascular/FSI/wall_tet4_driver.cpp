@@ -96,7 +96,7 @@ int main( int argc, char *argv[] )
   const PetscMPIInt rank = SYS_T::get_MPI_rank();
   const PetscMPIInt size = SYS_T::get_MPI_size();
 
-  SYS_T::print_fatal_if( fsiBC_type != 0, "Error: fsiBC_type should be 0.\n" );
+  SYS_T::print_fatal_if( fsiBC_type != 2, "Error: fsiBC_type should be 2.\n" );
 
   // Clean potentially pre-existing hdf5 files of prestress saved in the folder
   // named as prestress
