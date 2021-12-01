@@ -184,10 +184,10 @@ void PGAssem_Tet_Wall::RingBC_KG(
       if( ringnbc_part->is_inLDN( dnode, pos ) )
       {
         // Global-to-skew transformation matrix
-        Matrix_3x3 QT = ringnbc_part->get_rotation_matrix( pos );
+        const Matrix_3x3 QT = ringnbc_part->get_rotation_matrix( pos );
 
         // Skew-to-global transformation matrix
-        Matrix_3x3 Q( QT ); Q.transpose();
+        const Matrix_3x3 Q = transpose( QT );
 
         for( int jj = dof-1; jj < ncol; jj += dof )
         {
