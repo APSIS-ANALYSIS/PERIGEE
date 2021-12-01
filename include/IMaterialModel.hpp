@@ -93,7 +93,7 @@ class IMaterialModel
     {
       Matrix_3x3 P, S;
       get_PK(F, P, S);
-      Matrix_3x3 Ft(F); Ft.transpose();
+      const Matrix_3x3 Ft = transpose( F );
       Matrix_3x3 sigma = P * Ft;
       sigma.scale( (1.0/F.det()) );
       return sigma;
