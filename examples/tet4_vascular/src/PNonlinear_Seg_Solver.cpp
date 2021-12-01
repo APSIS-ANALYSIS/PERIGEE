@@ -458,6 +458,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_FSI(
 
 void PNonlinear_Seg_Solver::GenAlpha_Solve_Prestress(
     const bool &new_tangent_flag,
+    const double &prestress_tol,
     const double &curr_time,
     const double &dt,
     const PDNSolution * const &sol_base,
@@ -491,7 +492,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Solve_Prestress(
     PDNSolution * const &dot_sol,
     PDNSolution * const &sol,
     Prestress_solid * const &ps_ptr,
-    bool &conv_flag, int &nl_counter ) const
+    bool &prestress_conv_flag, int &nl_counter ) const
 {
   // Initialize the counter and error
   nl_counter = 0;
@@ -645,14 +646,20 @@ void PNonlinear_Seg_Solver::GenAlpha_Solve_Prestress(
   gassem_ptr -> Update_Wall_Prestress( sol, alelem_ptr, lassem_solid_ptr,
       elementv, quad_v, lien_ptr, feanode_ptr, ps_ptr );
 
-  //SYS_T::commPrint("  --- wall_disp_norm: %e \n", sol_wall_disp->Norm_2());
-
+  PDNSolution * solid_disp = new PDNSolution( anode_ptr, 3 ); 
+  PDNSolution * solid_pres = new PDNSolution( anode_ptr, 1 ); 
+  
+  SEG_SOL_T::Extract_solid_U( anode_ptr, sol, solid_disp );
+  SEG_SOL_T::Extract_solid_P( anode_ptr, sol, solid_pres );
+  
+  SYS_T::commPrint("  --- solid_disp_norm: %e , solid_pres_norm: %e. \n", solid_disp->Norm_2(), solid_pres->Norm_2() );
+ 
+  if( solid_disp->Norm_2() < prestress_tol && solid_pres->Norm_2() < prestress_tol ) prestress_conv_flag = true;
+  delete solid_disp; solid_disp = nullptr;
+  delete solid_pres; solid_pres = nullptr;
   // --------------------------------------------------------------------------
 
   Print_convergence_info(nl_counter, relative_error, residual_norm);
-
-  if(relative_error <= nr_tol || residual_norm <= na_tol) conv_flag = true;
-  else conv_flag = false;
 }
 
 

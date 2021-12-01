@@ -136,6 +136,7 @@ class PNonlinear_Seg_Solver
     // ------------------------------------------------------------------------
     void GenAlpha_Solve_Prestress(
         const bool &new_tangent_flag,
+        const double &prestress_tol,
         const double &curr_time,
         const double &dt,
         const PDNSolution * const &sol_base,
