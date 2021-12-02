@@ -38,6 +38,8 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
           dir_nodes = TET_T::read_int_PointData( solid_file, "GlobalNodeID" );
 
           VEC_T::insert_end( dir_nodes, get_vtp_nodal_id( fluid_inlet_files ) );
+        
+          VEC_T::sort_unique_resize( dir_nodes );
         }
         else SYS_T::print_fatal( "Error: NodalBC_3D_FSI has no such type of component index.\n" );
 
