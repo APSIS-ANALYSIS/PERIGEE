@@ -31,6 +31,9 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
             VEC_T::sort_unique_resize( dir_nodes );
           }
           else SYS_T::print_fatal( "Error: NodalBC_3D_FSI has no such type of component index.\n" );
+        
+          std::cout<<"===> NodalBC_3D_FSI for deformable wall (fsiBC_type = 0) with cap surface fully clamped (ringBC_type = 0) is generated. \n";
+
         }
         else if(ringBC_type == 1)
         {
@@ -40,7 +43,7 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
 
         break;
       }
-    
+
       // ====== Rigid wall ======
     case 1:
       {
@@ -50,11 +53,12 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
           dir_nodes = VEC_T::cast_to_unsigned_int( TET_T::read_int_PointData( solid_file, "GlobalNodeID" ) );
 
           VEC_T::insert_end( dir_nodes, get_vtp_nodal_id( fluid_inlet_files ) );
-        
+
           VEC_T::sort_unique_resize( dir_nodes );
         }
         else SYS_T::print_fatal( "Error: NodalBC_3D_FSI has no such type of component index.\n" );
 
+        std::cout<<"===> NodalBC_3D_FSI for rigid wall (fsiBC_type = 1) is generated. \n";
         break;
       }
 
@@ -78,6 +82,7 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
           }
           else SYS_T::print_fatal( "Error: NodalBC_3D_FSI has no such type of component index.\n" );
 
+          std::cout<<"===> NodalBC_3D_FSI for wall prestressing (fsiBC_type = 2) with cap surface fully clamped (ringBC_type = 0) is generated. \n";
         }
         else if(ringBC_type == 1)
         {
@@ -96,9 +101,8 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
   // count the number of dirichlet nodes
   num_dir_nodes = dir_nodes.size();
 
+  // generate the ID array
   Create_ID( nFunc );
-
-  // Print info
 }
 
 std::vector<unsigned int> NodalBC_3D_FSI::get_vtp_nodal_id( const std::vector<std::string> &vtpfileList ) const
