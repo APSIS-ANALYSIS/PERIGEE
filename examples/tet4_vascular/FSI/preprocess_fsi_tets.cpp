@@ -76,6 +76,7 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionInt(   "-cpu_size",            cpu_size);
   SYS_T::GetOptionInt(   "-in_ncommon",          in_ncommon);
   SYS_T::GetOptionInt(   "-fsiBC_type",          fsiBC_type);
+  SYS_T::GetOptionInt(   "-ringBC_type",         ringBC_type);
   SYS_T::GetOptionInt(   "-num_outlet",          num_outlet);
   SYS_T::GetOptionInt(   "-num_inlet",           num_inlet);
   SYS_T::GetOptionString("-geo_file",            geo_file);
@@ -89,9 +90,11 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionString("-sur_s_file_out_base", sur_s_file_out_base);
 
   SYS_T::print_fatal_if( fsiBC_type != 0 && fsiBC_type != 1 && fsiBC_type != 2, "Error: fsiBC_type should be 0, 1, or 2.\n" );
+  SYS_T::print_fatal_if( ringBC_type != 0 && ringBC_type != 1, "Error: ringBC_type should be 0 or 1.\n" );
 
   std::cout<<"===== Command Line Arguments ====="<<std::endl;
   std::cout<<" -fsiBC_type: "         <<fsiBC_type         <<std::endl;
+  std::cout<<" -ringBC_type: "        <<ringBC_type        <<std::endl;
   std::cout<<" -num_inlet: "          <<num_inlet          <<std::endl;
   std::cout<<" -num_outlet: "         <<num_outlet         <<std::endl;
   std::cout<<" -geo_file: "           <<geo_file           <<std::endl;
@@ -170,6 +173,7 @@ int main( int argc, char * argv[] )
   cmdh5w->write_intScalar("dofMat",           dofMat);
   cmdh5w->write_intScalar("elemType",         elemType);
   cmdh5w->write_intScalar("fsiBC_type",       fsiBC_type);
+  cmdh5w->write_intScalar("ringBC_type",      ringBC_type);
   cmdh5w->write_string("geo_file",            geo_file);
   cmdh5w->write_string("geo_f_file",          geo_f_file);
   cmdh5w->write_string("geo_s_file",          geo_s_file);
