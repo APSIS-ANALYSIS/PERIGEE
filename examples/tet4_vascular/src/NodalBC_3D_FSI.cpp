@@ -21,9 +21,21 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
     case 0:
       {
         if(ringBC_type == 0)
-        {}
+        {
+          if( comp == 0 ) dir_nodes.clear();
+          else if( comp == 1 || comp == 2 || comp == 3 )
+          {
+            dir_nodes = get_vtp_nodal_id( fluid_inlet_files );
+            VEC_T::insert_end( dir_nodes, get_vtp_nodal_id( solid_inlet_files ) );
+            VEC_T::insert_end( dir_nodes, get_vtp_nodal_id( solid_outlet_files ) );
+            VEC_T::sort_unique_resize( dir_nodes );
+          }
+          else SYS_T::print_fatal( "Error: NodalBC_3D_FSI has no such type of component index.\n" );
+        }
         else if(ringBC_type == 1)
-        {}
+        {
+          // TO BE FILLED
+        }
         else SYS_T::print_fatal( "Error: NodalBC_3D_FSI has no such type of essential bc for ring nodes.\n" );
 
         break;
@@ -55,13 +67,21 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
             dir_nodes = TET_T::read_int_PointData( fluid_file, "GlobalNodeID" );
           else if( comp == 1 || comp == 2 || comp == 3 )
           {
+            const std::vector<int> f_node = TET_T::read_int_PointData( fluid_file, "GlobalNodeID" );
+            const std::vector<int> fwall_node = TET_T::read_int_PointData( fluid_wall_file, "GlobalNodeID" );
+
+            dir_nodes = VEC_T::set_diff( f_node, fwall_node );
+
+            VEC_T::insert_end( dir_nodes, get_vtp_nodal_id( solid_inlet_files ) );
+            VEC_T::insert_end( dir_nodes, get_vtp_nodal_id( solid_outlet_files ) );
+            VEC_T::sort_unique_resize( dir_nodes );
           }
           else SYS_T::print_fatal( "Error: NodalBC_3D_FSI has no such type of component index.\n" );
 
         }
         else if(ringBC_type == 1)
         {
-        
+          // TO BE FILLED
         }
         else SYS_T::print_fatal( "Error: NodalBC_3D_FSI has no such type of essential bc for ring nodes.\n" );
 
