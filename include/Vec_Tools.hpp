@@ -183,6 +183,20 @@ namespace VEC_T
   }
 
   // --------------------------------------------------------------------------
+  // ! castt_to_unsigned_int
+  //   This function is used to convert a std::vector<int> to std::vector<unsigned int>.
+  // --------------------------------------------------------------------------
+  inline std::vector<unsigned int> cast_to_unsigned_int( const std::vector<int> &vec )
+  {
+    std::vector<unsigned int> output( vec.size() );
+
+    for(unsigned int ii=0; ii<vec.size(); ++ii)
+      output[ii] = static_cast<unsigned int>( vec[ii] );
+    
+    return output;
+  }
+
+  // --------------------------------------------------------------------------
   // ! write_txt
   //   write a vector to disk in .txt format.
   //   \para file_name : file_name.vec.txt will be the name for the file
