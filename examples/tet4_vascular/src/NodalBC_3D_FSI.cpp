@@ -47,7 +47,7 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
         if( comp == 0 ) dir_nodes.clear();
         else if( comp == 1 || comp == 2 || comp == 3 )
         {
-          dir_nodes = TET_T::read_int_PointData( solid_file, "GlobalNodeID" );
+          dir_nodes = VEC_T::cast_to_unsigned_int( TET_T::read_int_PointData( solid_file, "GlobalNodeID" ) );
 
           VEC_T::insert_end( dir_nodes, get_vtp_nodal_id( fluid_inlet_files ) );
         
@@ -64,13 +64,13 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
         if(ringBC_type == 0)
         {
           if( comp == 0 )
-            dir_nodes = TET_T::read_int_PointData( fluid_file, "GlobalNodeID" );
+            dir_nodes = VEC_T::cast_to_unsigned_int( TET_T::read_int_PointData( fluid_file, "GlobalNodeID" ) );
           else if( comp == 1 || comp == 2 || comp == 3 )
           {
             const std::vector<int> f_node = TET_T::read_int_PointData( fluid_file, "GlobalNodeID" );
             const std::vector<int> fwall_node = TET_T::read_int_PointData( fluid_wall_file, "GlobalNodeID" );
 
-            dir_nodes = VEC_T::set_diff( f_node, fwall_node );
+            dir_nodes = VEC_T::cast_to_unsigned_int( VEC_T::set_diff( f_node, fwall_node ) );
 
             VEC_T::insert_end( dir_nodes, get_vtp_nodal_id( solid_inlet_files ) );
             VEC_T::insert_end( dir_nodes, get_vtp_nodal_id( solid_outlet_files ) );
@@ -111,7 +111,7 @@ std::vector<unsigned int> NodalBC_3D_FSI::get_vtp_nodal_id( const std::vector<st
   {
     SYS_T::file_check( vtpfileList[ii] );
 
-    VEC_T::insert_end( output, TET_T::read_int_PointData( vtpfileList[ii], "GlobalNodeID" ) );
+    VEC_T::insert_end( output, VEC_T::cast_to_unsigned_int( TET_T::read_int_PointData( vtpfileList[ii], "GlobalNodeID" ) ) );
   }
 
   return output;
