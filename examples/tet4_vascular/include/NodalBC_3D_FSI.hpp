@@ -22,6 +22,7 @@ class NodalBC_3D_FSI : public INodalBC
         const std::vector<std::string> &solid_outlet_files,
         const int &nFunc,
         const int &comp,
+        const int &ringBC_type,
         const int &fsiBC_type );
 
     virtual ~NodalBC_3D_FSI() {};
@@ -50,6 +51,9 @@ class NodalBC_3D_FSI : public INodalBC
     unsigned int num_dir_nodes;
 
     NodalBC_3D_FSI() {};
+
+    std::vector<int> get_vtp_nodal_id( const std::vector<std::string> &vtp_file_list_name ) const;
+
 };
 
 #endif
