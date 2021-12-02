@@ -101,9 +101,9 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
   // Print info
 }
 
-std::vector<int> NodalBC_3D_FSI::get_vtp_nodal_id( const std::vector<std::string> &vtpfileList ) const
+std::vector<unsigned int> NodalBC_3D_FSI::get_vtp_nodal_id( const std::vector<std::string> &vtpfileList ) const
 {
-  std::vector<int> output; output.clear();
+  std::vector<unsigned int> output; output.clear();
 
   const unsigned int num_file = vtpfileList.size();
 
@@ -117,4 +117,4 @@ std::vector<int> NodalBC_3D_FSI::get_vtp_nodal_id( const std::vector<std::string
   return output;
 }
 
-]// EOF
+// EOF
