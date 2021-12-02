@@ -20,7 +20,7 @@
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
 #include "Part_Tet_FSI.hpp"
-#include "NodalBC_3D_vtp.hpp"
+#include "NodalBC_3D_FSI.hpp"
 #include "NodalBC_3D_vtu.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_tet_outflow.hpp"
@@ -60,6 +60,9 @@ int main( int argc, char * argv[] )
 
   // fsiBC_type : 0 deformable wall, 1 rigid wall
   int fsiBC_type = 0;
+
+  // ringBC_type : 0 fully clamped, 1 in-plane motion allowed
+  int ringBC_type = 0;
 
   // Mesh partition setting
   int cpu_size = 1;
@@ -247,31 +250,9 @@ int main( int argc, char * argv[] )
   std::cout<<"Boundary condition for the implicit solver: \n";
   std::vector<INodalBC *> NBC_list( dofMat, nullptr );
 
-  std::vector<std::string> dir_list = sur_f_file_in;
-  VEC_T::insert_end(dir_list, sur_s_file_in );
-  VEC_T::insert_end(dir_list, sur_s_file_out );
-
-  if( fsiBC_type == 0 )
-  {
-    NBC_list[0] = new NodalBC_3D_vtp( nFunc );
-    NBC_list[1] = new NodalBC_3D_vtp( dir_list, nFunc );
-    NBC_list[2] = new NodalBC_3D_vtp( dir_list, nFunc );
-    NBC_list[3] = new NodalBC_3D_vtp( dir_list, nFunc );
-  }
-  else if( fsiBC_type == 1 )
-  {
-    NBC_list[0] = new NodalBC_3D_vtu( nFunc );
-    NBC_list[1] = new NodalBC_3D_vtu( geo_s_file, dir_list, nFunc );
-    NBC_list[2] = new NodalBC_3D_vtu( geo_s_file, dir_list, nFunc );
-    NBC_list[3] = new NodalBC_3D_vtu( geo_s_file, dir_list, nFunc );
-  }
-  else if( fsiBC_type == 2 )
-  {
-    NBC_list[0] = new NodalBC_3D_vtu( nFunc );
-    NBC_list[1] = new NodalBC_3D_vtu( geo_f_file, dir_list, nFunc );
-    NBC_list[2] = new NodalBC_3D_vtu( geo_f_file, dir_list, nFunc );
-    NBC_list[3] = new NodalBC_3D_vtu( geo_f_file, dir_list, nFunc );
-  }
+  for( int ii=0; ii<dofMat; ++ii )
+    NBC_list[ii] = new NodalBC_3D_FSI( geo_f_file, geo_s_file, sur_f_file_wall, sur_s_file_wall,
+        sur_f_file_in, sur_f_file_out, sur_s_file_in, sur_s_file_out, nFunc, ii, ringBC_type, fsiBC_type );
 
   // Mesh solver NodalBC
   std::cout<<"Boundary condition for the mesh motion: \n";
