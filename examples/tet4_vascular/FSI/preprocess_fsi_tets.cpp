@@ -50,6 +50,8 @@ int main( int argc, char * argv[] )
   std::string sur_f_file_in_base( "./lumen_inlet_vol_" );
   std::string sur_f_file_out_base("./lumen_outlet_vol_");
 
+  std::string sur_s_file_interior_wall("./tissue_interior_wall_vol.vtp");
+
   std::string sur_s_file_wall("./tissue_wall_vol.vtp");
   std::string sur_s_file_in_base( "./tissue_inlet_vol_" );
   std::string sur_s_file_out_base("./tissue_outlet_vol_");
@@ -284,9 +286,14 @@ int main( int argc, char * argv[] )
   for(int ii=0; ii<num_outlet; ++ii)
     outlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_out[ii], ctrlPts, IEN );
 
-  ElemBC * ebc = new ElemBC_3D_tet_outflow( sur_f_file_out, outlet_outvec );
+  ElemBC * ebc = nullptr; 
+  if( fsiBC_type == 0 || fsiBC_type == 1 )
+    ebc = new ElemBC_3D_tet_outflow( sur_f_file_out, outlet_outvec );
+  else if( fsiBC_type == 2 )
+    ebc = new ElemBC_3D_tet( sur_s_file_interior_wall ); // use this file to assign outward normal to solid domain
+  else SYS_T::print_fatal("ERROR: uncognized fsiBC type. \n");
 
-  ebc -> resetTriIEN_outwardnormal( IEN ); // assign orientation
+  ebc -> resetTriIEN_outwardnormal( IEN ); // assign outward orientation for triangles
 
   // Mesh solver ElemBC
   cout<<"Elem boundary for the mesh solver: \n";
