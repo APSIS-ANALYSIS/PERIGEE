@@ -754,4 +754,36 @@ std::vector<Matrix_3x3> PLocAssem_Tet4_VMS_Seg_Incompressible::get_Wall_CauchySt
   return stress;
 }
 
+
+void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Residual_EBC(
+    const double * const &vec,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
+{
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  Zero_Residual();
+
+  for(int qua = 0; qua < quad -> get_num_quadPts(); ++qua)
+  {
+    const std::vector<double> R = element->get_R(qua);
+
+    double surface_area;
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+
+    double pp = 0.0;
+    for(int ii=0; ii<snLocBas; ++ii) pp += vec[ii*7+3] * R[ii];
+
+    for(int A=0; A<snLocBas; ++A)
+    {
+      Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * pp * n_out.x();
+      Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * pp * n_out.y();
+      Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * pp * n_out.z();
+    }
+  }
+}
+
 // EOF

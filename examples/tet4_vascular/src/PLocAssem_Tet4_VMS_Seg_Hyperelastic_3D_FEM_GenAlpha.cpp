@@ -777,7 +777,6 @@ std::vector<Matrix_3x3> PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::get
 
 
 void PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha::Assem_Residual_EBC(
-    const int &ebc_id,
     const double * const &vec,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
