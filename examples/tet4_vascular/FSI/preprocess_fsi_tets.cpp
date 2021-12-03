@@ -341,7 +341,7 @@ int main( int argc, char * argv[] )
     ebcpart -> write_hdf5( part_file );
 
     EBC_Partition * mebcpart = new EBC_Partition(part, mnindex, mesh_ebc);
-    mebcpart-> write_hdf5( part_file, "/mesh_ebc");
+    mebcpart-> write_hdf5( part_file, "/mesh_ebc" );
 
     list_nlocalnode.push_back(part->get_nlocalnode());
     list_nghostnode.push_back(part->get_nghostnode());
