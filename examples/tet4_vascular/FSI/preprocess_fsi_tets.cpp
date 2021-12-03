@@ -337,8 +337,19 @@ int main( int argc, char * argv[] )
     NBC_Partition_inflow * infpart = new NBC_Partition_inflow(part, mnindex, InFBC);
     infpart->write_hdf5( part_file );
 
-    EBC_Partition_outflow * ebcpart = new EBC_Partition_outflow(part, mnindex, ebc, NBC_list);
-    ebcpart -> write_hdf5( part_file );
+    if( fsiBC_type == 0 || fsiBC_type == 1 )
+    {
+      EBC_Partition_outflow * ebcpart = new EBC_Partition_outflow(part, mnindex, ebc, NBC_list);
+      ebcpart -> write_hdf5( part_file );
+      delete ebcpart;
+    }
+    else if( fsiBC_type == 2 )
+    {
+      EBC_Partition * ebcpart = new EBC_Partition( part, mnindex, ebc );
+      ebcpart -> write_hdf5( part_file );
+      delete ebcpart;
+    }
+    else SYS_T::print_fatal("ERROR: uncognized fsiBC type. \n");
 
     EBC_Partition * mebcpart = new EBC_Partition(part, mnindex, mesh_ebc);
     mebcpart-> write_hdf5( part_file, "/mesh_ebc" );
@@ -350,7 +361,7 @@ int main( int argc, char * argv[] )
     list_ratio_g2l.push_back((double)part->get_nghostnode()/(double) part->get_nlocalnode());
 
     sum_nghostnode += part->get_nghostnode();
-    delete part; delete nbcpart; delete infpart; delete ebcpart;
+    delete part; delete nbcpart; delete infpart;
     delete mbcpart; delete mebcpart;
   }
 
