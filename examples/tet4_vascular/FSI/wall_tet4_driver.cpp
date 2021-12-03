@@ -39,6 +39,7 @@ int main( int argc, char *argv[] )
   // (Pseudo-) time integration parameters
   double genA_rho_inf = 0.0;
   bool is_backward_Euler = true;
+  const bool is_load_ps = false;
 
   // Estimate of num nonzeros per row for the sparse tangent matrix
   int nz_estimate = 300;
@@ -175,7 +176,7 @@ int main( int argc, char *argv[] )
 
   APart_Node * pNode = new APart_Node_FSI(part_file, rank);
 
-  Prestress_solid * ps_data = new Prestress_solid( locElem, nqp_tet, rank, false, "prestress" );
+  Prestress_solid * ps_data = new Prestress_solid( locElem, nqp_tet, rank, is_load_ps, "prestress" );
 
   SYS_T::commPrint("===> Mesh HDF5 files are read from disk.\n");
 
