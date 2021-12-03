@@ -244,16 +244,13 @@ void PTime_Seg_Solver::TM_FSI_GenAlpha(
   PDNSolution * pre_velo = new PDNSolution(*init_velo);
   PDNSolution * cur_velo = new PDNSolution(*init_velo);
 
-  std::string sol_name ("");
-  std::string sol_dot_name (""); 
-
   // Do not overwrite solution if this is a restart 
   if( restart_init_assembly_flag == false )
   {
-    sol_name = Name_Generator(time_info->get_index());
+    const std::string sol_name = Name_Generator(time_info->get_index());
     cur_disp->WriteBinary(sol_name.c_str());
 
-    sol_dot_name = Name_dot_Generator(time_info->get_index());
+    const std::string sol_dot_name = Name_dot_Generator(time_info->get_index());
     cur_velo->WriteBinary(sol_dot_name.c_str());
   }
 
@@ -296,10 +293,10 @@ void PTime_Seg_Solver::TM_FSI_GenAlpha(
 
     if( time_info->get_index()%sol_record_freq == 0)
     {
-      sol_name = Name_Generator( time_info->get_index() );
+      const std::string sol_name = Name_Generator( time_info->get_index() );
       cur_disp->WriteBinary(sol_name.c_str());
 
-      sol_dot_name = Name_dot_Generator(time_info->get_index());
+      const std::string sol_dot_name = Name_dot_Generator(time_info->get_index());
       cur_velo->WriteBinary(sol_dot_name.c_str());
     }
 
@@ -411,13 +408,8 @@ void PTime_Seg_Solver::TM_FSI_Prestress(
   PDNSolution * pre_velo = new PDNSolution(*init_velo);
   PDNSolution * cur_velo = new PDNSolution(*init_velo);
 
-  std::string sol_name ("");
-  std::string sol_dot_name (""); 
-
   bool prestress_conv_flag = false, renew_flag;
-  int nl_counter;
-
-  bool rest_flag = true;
+  int nl_counter = nsolver_ptr -> get_non_max_its();
 
   SYS_T::commPrint( "Time = %e, dt = %e, index = %d, %s \n",
       time_info->get_time(), time_info->get_step(), time_info->get_index(),
@@ -425,11 +417,7 @@ void PTime_Seg_Solver::TM_FSI_Prestress(
 
   while( time_info->get_time() < final_time && !prestress_conv_flag )
   {
-    if(time_info->get_index() % renew_tang_freq == 0 || rest_flag)
-    {
-      renew_flag = true;
-      rest_flag = false;
-    }
+    if(time_info->get_index() % renew_tang_freq == 0) renew_flag = true;
     else renew_flag = false;
 
     // If the previous step is solved in ONE Newton iteration, we do not update
@@ -437,10 +425,10 @@ void PTime_Seg_Solver::TM_FSI_Prestress(
     if( nl_counter == 1 ) renew_flag = false;
 
     // nullify the solid solution
-    SEG_SOL_T::Insert_zero_solid_UPV( anode_ptr, pre_velo ); 
-    SEG_SOL_T::Insert_zero_solid_UPV( anode_ptr, pre_disp ); 
-    SEG_SOL_T::Insert_zero_solid_UPV( anode_ptr, cur_velo ); 
-    SEG_SOL_T::Insert_zero_solid_UPV( anode_ptr, cur_disp ); 
+    SEG_SOL_T::Insert_zero_solid_UV( anode_ptr, pre_velo ); 
+    SEG_SOL_T::Insert_zero_solid_UV( anode_ptr, pre_disp ); 
+    SEG_SOL_T::Insert_zero_solid_UV( anode_ptr, cur_velo ); 
+    SEG_SOL_T::Insert_zero_solid_UV( anode_ptr, cur_disp ); 
 
     nsolver_ptr->GenAlpha_Solve_Prestress( renew_flag, prestress_tol, time_info->get_time(),
         time_info->get_step(), sol_base, pre_velo, pre_disp, tmga_ptr, flr_ptr,
@@ -459,12 +447,15 @@ void PTime_Seg_Solver::TM_FSI_Prestress(
 
     if( is_record_sol_flag && time_info->get_index()%sol_record_freq == 0)
     {
-      sol_name = Name_Generator( time_info->get_index() );
+      const std::string sol_name = Name_Generator( time_info->get_index() );
       cur_disp->WriteBinary(sol_name.c_str());
 
-      sol_dot_name = Name_dot_Generator(time_info->get_index());
+      const std::string sol_dot_name = Name_dot_Generator(time_info->get_index());
       cur_velo->WriteBinary(sol_dot_name.c_str());
     }
+
+    // Prepare for the next time step
+    pre_disp->Copy(*cur_disp); pre_velo->Copy(*cur_velo);
   }
 
   delete pre_disp; delete cur_disp; delete pre_velo; delete cur_velo;
