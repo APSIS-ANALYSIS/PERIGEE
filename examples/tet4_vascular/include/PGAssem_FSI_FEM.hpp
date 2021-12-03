@@ -153,17 +153,6 @@ class PGAssem_FSI_FEM : public IPGAssem
         const ALocal_Inflow_NodalBC * const &infbc_part,
         const int &nbc_id );
 
-    // Update the solid prestress at quadrature points
-    virtual void Update_Wall_Prestress(
-        const PDNSolution * const &sol,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &element,
-        const IQuadPts * const &quad,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        Prestress_solid * const &ps_ptr ) const;
-
   private:
     // Private data
     const int nLocBas, dof_sol, dof_mat, num_ebc, nlgn;
