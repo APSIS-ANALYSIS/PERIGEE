@@ -71,7 +71,7 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
             dir_nodes = VEC_T::cast_to_unsigned_int( TET_T::read_int_PointData( fluid_file, "GlobalNodeID" ) );
 
             std::cout<<"===> NodalBC_3D_FSI for wall prestressing (fsiBC_type = 2) with cap surface \n";
-            std::cout<<"     fully clamped (ringBC_type = 0) is generated for pressure". \n";
+            std::cout<<"     fully clamped (ringBC_type = 0) is generated for pressure. \n";
           }
           else if( comp == 1 || comp == 2 || comp == 3 )
           {
