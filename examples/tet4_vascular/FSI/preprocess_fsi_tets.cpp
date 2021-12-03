@@ -228,9 +228,6 @@ int main( int argc, char * argv[] )
   VEC_T::sort_unique_resize( node_f );
   VEC_T::sort_unique_resize( node_s );
 
-  std::cout<<'\n'<<"Fluid domain number of nodes: "<<node_f.size()<<'\n';
-  std::cout<<"Solid domain number of nodes: "<<node_s.size()<<'\n';
-  
   // Check the mesh
   TET_T::tetmesh_check(ctrlPts, IEN, nElem, 3.5);
 
@@ -238,6 +235,9 @@ int main( int argc, char * argv[] )
   IMesh * mesh = new Mesh_Tet4(nFunc, nElem);
   mesh -> print_info();
 
+  std::cout<<"Fluid domain: "<<node_f.size()<<" nodes."<<'\n';
+  std::cout<<"Solid domain: "<<node_s.size()<<" nodes."<<'\n';
+  
   // Partition
   IGlobal_Part * global_part = nullptr;
   if(cpu_size > 1)
@@ -253,7 +253,8 @@ int main( int argc, char * argv[] )
   // ----------------------------------------------------------------
   // Setup boundary conditions
   // Physical NodalBC
-  std::cout<<"Boundary condition for the implicit solver: \n";
+  std::cout<<"===== Boundary Conditions =====\n";
+  std::cout<<"1. Nodal boundary condition for the implicit solver: \n";
   std::vector<INodalBC *> NBC_list( dofMat, nullptr );
 
   for( int ii=0; ii<dofMat; ++ii )
@@ -261,7 +262,7 @@ int main( int argc, char * argv[] )
         sur_f_file_in, sur_f_file_out, sur_s_file_in, sur_s_file_out, nFunc, ii, ringBC_type, fsiBC_type );
 
   // Mesh solver NodalBC
-  std::cout<<"Boundary condition for the mesh motion: \n";
+  std::cout<<"2. Nodal boundary condition for the mesh motion: \n";
   std::vector<INodalBC *> meshBC_list( 3, nullptr );
 
   std::vector<std::string> meshdir_vtp_list = sur_f_file_in;
@@ -272,7 +273,7 @@ int main( int argc, char * argv[] )
   meshBC_list[2] = new NodalBC_3D_vtu( geo_s_file, meshdir_vtp_list, nFunc );
 
   // InflowBC info
-  std::cout<<"Inflow cap surfaces: \n";
+  std::cout<<"3. Inflow cap surfaces: \n";
   std::vector<Vector_3> inlet_outvec( num_inlet );
   for(int ii=0; ii<num_inlet; ++ii)
     inlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_in[ii], ctrlPts, IEN );
@@ -280,7 +281,7 @@ int main( int argc, char * argv[] )
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_f_file_in, sur_f_file_wall, nFunc, inlet_outvec ); 
 
   // Physical ElemBC
-  cout<<"Elem boundary for the implicit solver: \n";
+  cout<<"4. Elem boundary for the implicit solver: \n";
   std::vector< Vector_3 > outlet_outvec( num_outlet );
 
   for(int ii=0; ii<num_outlet; ++ii)
@@ -290,16 +291,17 @@ int main( int argc, char * argv[] )
   if( fsiBC_type == 0 || fsiBC_type == 1 )
     ebc = new ElemBC_3D_tet_outflow( sur_f_file_out, outlet_outvec );
   else if( fsiBC_type == 2 )
-    ebc = new ElemBC_3D_tet( sur_s_file_interior_wall ); // use this file to assign outward normal to solid domain
+    ebc = new ElemBC_3D_tet( sur_s_file_interior_wall ); 
   else SYS_T::print_fatal("ERROR: uncognized fsiBC type. \n");
 
   ebc -> resetTriIEN_outwardnormal( IEN ); // assign outward orientation for triangles
 
   // Mesh solver ElemBC
-  cout<<"Elem boundary for the mesh solver: \n";
+  cout<<"5. Elem boundary for the mesh solver: \n";
   std::vector<std::string> mesh_ebclist;
   mesh_ebclist.clear();
   ElemBC * mesh_ebc = new ElemBC_3D_tet( mesh_ebclist );
+  std::cout<<"=================================\n";
   // ----------------------------------------------------------------
 
   const bool isPrintPartInfo = true;
