@@ -147,7 +147,7 @@ namespace SEG_SOL_T
      const ALocal_Inflow_NodalBC * const &infnbc,
      PDNSolution * const &sol );
 
-  void Insert_zero_solid_UPV( const APart_Node * const &pnode,
+  void Insert_zero_solid_UV( const APart_Node * const &pnode,
       PDNSolution * const &sol );
 
   // ================================================================
