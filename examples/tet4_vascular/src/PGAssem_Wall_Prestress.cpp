@@ -359,15 +359,6 @@ void PGAssem_Wall_Prestress::Assem_nonzero_estimate(
     }
   }
 
-  // Resis BC for K and G
-  PDNSolution * temp = new PDNSolution_Mixed_UPV_3D( node_ptr, 0, false );
-
-  // choose an arbitrary (0.1) time step size just to get the nonzero pattern
-  NatBC_Resis_KG(0.0, 0.1, temp, temp, lassem_f_ptr, elements, quad_s, node_ptr, 
-      nbc_part, ebc_part, gbc );
-
-  delete temp;
-
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
   
@@ -442,12 +433,8 @@ void PGAssem_Wall_Prestress::Assem_residual(
     }
   }
 
-  // Backflow stabilization
-  BackFlow_G( lassem_f_ptr, elements, dof_mat*snLocBas, quad_s, nbc_part, ebc_part );
-
-  // Resistance BC for G
-  NatBC_Resis_G( curr_time, dt, dot_sol_np1, sol_np1, lassem_f_ptr, elements, quad_s, node_ptr, 
-      nbc_part, ebc_part, gbc );
+  // Natural BC for G
+  NatBC_G( lassem_s_ptr, elements, quad_s, lien_ptr, nbc_part, ebc_part );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -527,13 +514,8 @@ void PGAssem_Wall_Prestress::Assem_tangent_residual(
     }
   }
 
-  // Backflow stabilization
-  BackFlow_KG( dt, lassem_f_ptr, elements, dof_mat*snLocBas, quad_s, 
-      nbc_part, ebc_part );
-
-  // Resistance BC for K and G
-  NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_f_ptr, elements, quad_s, node_ptr,
-      nbc_part, ebc_part, gbc );
+  // Natural BC for G
+  NatBC_G( lassem_s_ptr, elements, quad_s, lien_ptr, nbc_part, ebc_part );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -547,55 +529,51 @@ void PGAssem_Wall_Prestress::Assem_tangent_residual(
 }
 
 
-void PGAssem_Wall_Prestress::NatBC_G( const double &curr_time, const double &dt,
-    IPLocAssem * const &lassem_f_ptr,
+void PGAssem_Wall_Prestress::NatBC_G( IPLocAssem * const &lassem_s_ptr,
     FEAElement * const &element_s,
-    const int &in_loc_dof,
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const lien_ptr,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
-  for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
+  SYS_T::print_fatal_if( num_ebc > 1, "Error: there are more than 1 ebc surfaces.\n");
+
+  const int ebc_id = 0;
+
+  const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+
+  for(int ee=0; ee<num_sele; ++ee)
   {
-    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+    ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
+    ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
-    for(int ee=0; ee<num_sele; ++ee)
+    GetLocal(array_b, LSIEN, snLocBas, local_bs);
+
+    lassem_s_ptr->Assem_Residual_EBC(local_bs, element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+
+    for(int ii=0; ii<snLocBas; ++ii)
     {
-      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
-      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
-
-      GetLocal(array_a, LSIEN, snLocBas, local_as);
-      GetLocal(array_b, LSIEN, snLocBas, local_bs);
-
-      lassem_f_ptr->Assem_Residual_EBC(ebc_id, curr_time, dt,
-          local_as, local_bs, element_s, sctrl_x, sctrl_y, sctrl_z,
-          quad_s);
-
-      for(int ii=0; ii<snLocBas; ++ii)
+      int loc_index = LSIEN[ii];
+      int offset1 = dof_mat * ii;
+      for(int mm=0; mm<dof_mat; ++mm)
       {
-        int loc_index = LSIEN[ii];
-        int offset1 = dof_mat * ii;
-        for(int mm=0; mm<dof_mat; ++mm)
-        {
-          int lrow_index = nbc_part -> get_LID(mm, loc_index);
-          srow_index[offset1 + mm] = dof_mat * lrow_index + mm;
-        }
+        int lrow_index = nbc_part -> get_LID(mm, loc_index);
+        srow_index[offset1 + mm] = dof_mat * lrow_index + mm;
       }
-      VecSetValues(G, in_loc_dof, srow_index, lassem_f_ptr->Residual, ADD_VALUES);
     }
+    VecSetValues(G, dof_mat * snLocBas, srow_index, lassem_s_ptr->Residual, ADD_VALUES);
   }
 }
 
 void PGAssem_Wall_Prestress::Update_Wall_Prestress(
-        const PDNSolution * const &sol,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &element,
-        const IQuadPts * const &quad,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        Prestress_solid * const &ps_ptr ) const
+    const PDNSolution * const &sol,
+    const ALocal_Elem * const &alelem_ptr,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element,
+    const IQuadPts * const &quad,
+    const ALocal_IEN * const &lien_ptr,
+    const FEANode * const &fnode_ptr,
+    Prestress_solid * const &ps_ptr ) const
 {
   double * array = new double [nlgn * dof_sol];
   double * local = new double [nLocBas * dof_sol];

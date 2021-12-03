@@ -115,6 +115,7 @@ SET( perigee_analysis_lib_src
   ${perigee_SOURCE_DIR}/../src/PLocAssem_Tet4_FSI_Mesh_Elastostatic.cpp
   ${perigee_SOURCE_DIR}/../src/PGAssem_FSI_FEM.cpp
   ${perigee_SOURCE_DIR}/../src/PGAssem_Seg_FEM.cpp
+  ${perigee_SOURCE_DIR}/../src/PGAssem_Wall_Prestress.cpp
   ${perigee_SOURCE_DIR}/../src/PDNSolution_Mixed_UPV_3D.cpp
   ${perigee_SOURCE_DIR}/../src/PDNSolution_P_V_Mixed_3D.cpp
   ${perigee_SOURCE_DIR}/../src/PDNSolution_U_Mixed_3D.cpp
