@@ -642,16 +642,13 @@ void PNonlinear_Seg_Solver::GenAlpha_Solve_Prestress(
       elementv, quad_v, lien_ptr, feanode_ptr, ps_ptr );
 
   PDNSolution * solid_disp = new PDNSolution( anode_ptr, 3 ); 
-  PDNSolution * solid_pres = new PDNSolution( anode_ptr, 1 ); 
   
   SEG_SOL_T::Extract_solid_U( anode_ptr, sol, solid_disp );
-  SEG_SOL_T::Extract_solid_P( anode_ptr, sol, solid_pres );
   
-  SYS_T::commPrint("  --- solid_disp_norm: %e , solid_pres_norm: %e. \n", solid_disp->Norm_2(), solid_pres->Norm_2() );
+  SYS_T::commPrint("  --- solid_disp_norm: %e. \n", solid_disp->Norm_2() );
  
-  if( solid_disp->Norm_2() < prestress_tol && solid_pres->Norm_2() < prestress_tol ) prestress_conv_flag = true;
+  if( solid_disp->Norm_2() < prestress_tol ) prestress_conv_flag = true;
   delete solid_disp; solid_disp = nullptr;
-  delete solid_pres; solid_pres = nullptr;
   // --------------------------------------------------------------------------
 
   Print_convergence_info(nl_counter, relative_error, residual_norm);

@@ -26,7 +26,7 @@
 #include "PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha.hpp"
 #include "PLocAssem_Tet4_VMS_Seg_Incompressible.hpp"
 #include "PLocAssem_Tet4_FSI_Mesh_Elastostatic.hpp"
-#include "PGAssem_FSI_FEM.hpp"
+#include "PGAssem_Wall_Prestress.hpp"
 #include "PGAssem_Seg_FEM.hpp"
 #include "PDNSolution_Mixed_UPV_3D.hpp"
 #include "PTime_Seg_Solver.hpp"
@@ -283,7 +283,7 @@ int main( int argc, char *argv[] )
 
   // ===== Global assembly routine =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
-  IPGAssem * gloAssem_ptr = new PGAssem_FSI_FEM( locAssem_fluid_ptr,
+  IPGAssem * gloAssem_ptr = new PGAssem_Wall_Prestress( locAssem_fluid_ptr,
       locAssem_solid_ptr, elements, quads, GMIptr, locElem, locIEN,
       pNode, locnbc, locebc, gbc, nz_estimate );
 
