@@ -634,6 +634,17 @@ void PNonlinear_Seg_Solver::GenAlpha_Solve_Prestress(
       SYS_T::commPrint("Warning: nonlinear solver is diverging with error %e. \n", relative_error);
       break;
     }
+
+    // ------------------------------------------------------------------------
+    // Monitor pressure incremental
+    PDNSolution * solid_pres = new PDNSolution( anode_ptr, 1 );
+
+    SEG_SOL_T::Extract_solid_P( anode_ptr, &dot_step, solid_pres );
+
+    SYS_T::commPrint("  --- solid pressure incremental norm: %e. \n", solid_pres->Norm_2() );
+    delete solid_pres; solid_pres = nullptr;
+    // ------------------------------------------------------------------------
+
   }while(nl_counter<nmaxits && relative_error > nr_tol && residual_norm > na_tol);
 
   // --------------------------------------------------------------------------
