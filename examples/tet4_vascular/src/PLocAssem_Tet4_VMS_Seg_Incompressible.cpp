@@ -709,18 +709,17 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Residual_EBC(
 }
 
 
-void PLocAssem_Tet4_VMS_Seg_Incompressible::get_Wall_CauchyStress(
+std::vector<Matrix_3x3> PLocAssem_Tet4_VMS_Seg_Incompressible::get_Wall_CauchyStress(
     const double * const &disp,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad,
-    std::vector<Matrix_3x3> &stress ) const
+    const IQuadPts * const &quad ) const
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  stress.resize( nqp );
+  std::vector<Matrix_3x3> stress( nqp );
 
   for( int qua = 0; qua < nqp; ++qua )
   {
@@ -751,6 +750,8 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::get_Wall_CauchyStress(
 
     stress[qua] = matmodel -> get_Cauchy_stress( F );
   }
+
+  return stress;
 }
 
 // EOF

@@ -1145,8 +1145,7 @@ void PGAssem_FSI_FEM::Update_Wall_Prestress(
 
       fnode_ptr->get_ctrlPts_xyz(nLocBas, e_IEN, e_ctrlx, e_ctrly, e_ctrlz);
 
-      std::vector<Matrix_3x3> sigma;
-      lassem_ptr -> get_Wall_CauchyStress( local, element, e_ctrlx, e_ctrly, e_ctrlz, quad, sigma );
+      const std::vector<Matrix_3x3> sigma = lassem_ptr -> get_Wall_CauchyStress( local, element, e_ctrlx, e_ctrly, e_ctrlz, quad );
 
       for( int qua = 0; qua < nqp; ++qua )
       {

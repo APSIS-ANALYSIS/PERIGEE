@@ -93,14 +93,13 @@ class PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha : public IPLocAssem
     // within this element. The output stress has length nqp, which should equal 
     // quad -> get_num_quadPts() 
     // ------------------------------------------------------------------------
-    virtual void get_Wall_CauchyStress(
+    virtual std::vector<Matrix_3x3> get_Wall_CauchyStress(
         const double * const &disp,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad,
-        std::vector<Matrix_3x3> &stress ) const;
+        const IQuadPts * const &quad ) const;
 
   private:
     const double rho0, alpha_f, alpha_m, gamma;
@@ -114,7 +113,7 @@ class PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha : public IPLocAssem
 
     // useful tensors for the material model
     IMaterialModel * matmodel;
-    
+
     void print_info() const;
 
     void get_tau( double &tau_m_qua, double &tau_c_qua,
