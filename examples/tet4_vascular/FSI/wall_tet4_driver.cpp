@@ -170,7 +170,7 @@ int main( int argc, char *argv[] )
 
   ALocal_NodalBC * mesh_locnbc = new ALocal_NodalBC(part_file, rank, "mesh_nbc");
 
-  ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
+  ALocal_EBC * locebc = new ALocal_EBC(part_file, rank);
 
   ALocal_EBC * mesh_locebc = new ALocal_EBC(part_file, rank, "mesh_ebc");
 
@@ -262,24 +262,6 @@ int main( int argc, char *argv[] )
 
   // ===== GenBC =====
   IGenBC * gbc = nullptr;
-
-  if( GENBC_T::get_genbc_file_type( lpn_file ) == 1  )
-    gbc = new GenBC_Resistance( lpn_file );
-  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 2  )
-    gbc = new GenBC_RCR( lpn_file, 1000, initial_step );
-  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 3  )
-    gbc = new GenBC_Inductance( lpn_file );
-  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 4  )
-    gbc = new GenBC_Coronary( lpn_file, 1000, initial_step, initial_index );
-  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 5  )
-    gbc = new GenBC_Pressure( lpn_file, initial_time );
-  else
-    SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
-
-  gbc -> print_info();
-
-  SYS_T::print_fatal_if(gbc->get_num_ebc() != locebc->get_num_ebc(),
-      "Error: GenBC number of faces does not match with that in ALocal_EBC.\n");
 
   // ===== Global assembly routine =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
