@@ -119,18 +119,6 @@ namespace SYS_T
   // ----------------------------------------------------------------
   // print size based on bytes
   // ----------------------------------------------------------------
-  template<typename T> void print_mem_size( const T &byte_size )
-  {
-    if(byte_size > 1.0e9)
-      std::cout<<double(byte_size)/1.0e9<<" GB.";
-    else if(byte_size > 1.0e6)
-      std::cout<<double(byte_size)/1.0e6<<" MB.";
-    else if(byte_size > 1.0e3)
-      std::cout<<double(byte_size)/1.0e3<<" KB";
-    else
-      std::cout<<byte_size<<" Bytes.";
-  }
-
   template<typename T> std::string get_string_mem_size( const T &byte_size )
   {
     std::ostringstream ss;
@@ -145,24 +133,11 @@ namespace SYS_T
     return ss.str();
   }
 
-  // ----------------------------------------------------------------
-  // to_string functions : convert numeric values to string 
-  // Note: std::to_string is implemented in string in C++ 11.
-  // ----------------------------------------------------------------
-  inline std::string to_string( const int &a )
+  template<typename T> void print_mem_size( const T &byte_size )
   {
-    std::ostringstream ss;
-    ss<<a;
-    return ss.str();
+    std::cout<<get_string_mem_size( byte_size );
   }
-
-  inline std::string to_string( const double &a )
-  {
-    std::ostringstream ss;
-    ss<<a;
-    return ss.str();
-  }
-
+  
   // to get a non-constant (i.e. writable) char array from a string, 
   // use &b[0]. Note: string.c_str() returns a const char array.
   inline void to_char( const std::string &a, std::vector<char> &b )

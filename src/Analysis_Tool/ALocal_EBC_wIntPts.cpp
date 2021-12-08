@@ -16,7 +16,7 @@ ALocal_EBC_wIntPts::ALocal_EBC_wIntPts( const std::string &fileBaseName,
     {
       std::string subgroup_name(gname);
       subgroup_name.append("/ebcid_");
-      subgroup_name.append( SYS_T::to_string(ii) );
+      subgroup_name.append( std::to_string(ii) );
 
       local_intpts[ii] = h5r -> read_doubleVector( subgroup_name.c_str(), "local_intpt_xyz" );
     }
