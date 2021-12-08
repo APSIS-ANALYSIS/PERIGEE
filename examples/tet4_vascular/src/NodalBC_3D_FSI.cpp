@@ -29,18 +29,17 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
             VEC_T::insert_end( dir_nodes, get_vtp_nodal_id( solid_inlet_files ) );
             VEC_T::insert_end( dir_nodes, get_vtp_nodal_id( solid_outlet_files ) );
             VEC_T::sort_unique_resize( dir_nodes );
+
+            std::cout<<"===> NodalBC_3D_FSI for deformable wall (fsiBC_type = 0) with cap surface \n";
+            std::cout<<"     fully clamped (ringBC_type = 0) is generated for displacement component ["<<comp<<"]. \n";
           }
           else SYS_T::print_fatal( "Error: NodalBC_3D_FSI has no such type of component index.\n" );
-        
-          std::cout<<"===> NodalBC_3D_FSI for deformable wall (fsiBC_type = 0) with cap surface fully clamped (ringBC_type = 0) is generated. \n";
-
         }
         else if(ringBC_type == 1)
         {
           // TO BE FILLED
         }
         else SYS_T::print_fatal( "Error: NodalBC_3D_FSI has no such type of essential bc for ring nodes.\n" );
-
         break;
       }
 
@@ -55,10 +54,10 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
           VEC_T::insert_end( dir_nodes, get_vtp_nodal_id( fluid_inlet_files ) );
 
           VEC_T::sort_unique_resize( dir_nodes );
+
+          std::cout<<"===> NodalBC_3D_FSI for rigid wall (fsiBC_type = 1) is generated for displacement component ["<<comp<<"]. \n";
         }
         else SYS_T::print_fatal( "Error: NodalBC_3D_FSI has no such type of component index.\n" );
-
-        std::cout<<"===> NodalBC_3D_FSI for rigid wall (fsiBC_type = 1) is generated. \n";
         break;
       }
 
@@ -68,7 +67,12 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
         if(ringBC_type == 0)
         {
           if( comp == 0 )
+          { 
             dir_nodes = VEC_T::cast_to_unsigned_int( TET_T::read_int_PointData( fluid_file, "GlobalNodeID" ) );
+
+            std::cout<<"===> NodalBC_3D_FSI for wall prestressing (fsiBC_type = 2) with cap surface \n";
+            std::cout<<"     fully clamped (ringBC_type = 0) is generated for pressure. \n";
+          }
           else if( comp == 1 || comp == 2 || comp == 3 )
           {
             const std::vector<int> f_node = TET_T::read_int_PointData( fluid_file, "GlobalNodeID" );
@@ -79,10 +83,12 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
             VEC_T::insert_end( dir_nodes, get_vtp_nodal_id( solid_inlet_files ) );
             VEC_T::insert_end( dir_nodes, get_vtp_nodal_id( solid_outlet_files ) );
             VEC_T::sort_unique_resize( dir_nodes );
+          
+            std::cout<<"===> NodalBC_3D_FSI for wall prestressing (fsiBC_type = 2) with cap surface \n";
+            std::cout<<"     fully clamped (ringBC_type = 0) is generated for displacement component ["<<comp<<"]. \n";
           }
           else SYS_T::print_fatal( "Error: NodalBC_3D_FSI has no such type of component index.\n" );
 
-          std::cout<<"===> NodalBC_3D_FSI for wall prestressing (fsiBC_type = 2) with cap surface fully clamped (ringBC_type = 0) is generated. \n";
         }
         else if(ringBC_type == 1)
         {
