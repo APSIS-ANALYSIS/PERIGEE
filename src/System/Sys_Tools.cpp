@@ -15,61 +15,6 @@ int SYS_T::gen_randomI_closed(const int &min, const int &max)
   return ( rand() % (max - min + 1)) + min;
 }
 
-void SYS_T::print_MaxMemUsage()
-{
-  PetscLogDouble memo = 0.0, memototal = 0.0;
-  PetscMemoryGetMaximumUsage(&memo);
-  MPI_Reduce(&memo, &memototal, 1, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
-  PetscMPIInt rank;
-  MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
-  if(rank == 0)
-  {
-    std::cout<<"\n Maximum Memeory usage : ";
-    print_mem_size(memototal); std::cout<<"\n";
-  }
-}
-
-void SYS_T::print_CurMemUsage()
-{
-  PetscLogDouble memo = 0.0, memototal = 0.0;
-  PetscMemoryGetCurrentUsage(&memo);
-  MPI_Reduce(&memo, &memototal, 1, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
-  PetscMPIInt rank;
-  MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
-  if(rank == 0)
-  {
-    std::cout<<"\n Current Memeory usage : ";
-    print_mem_size(memototal); std::cout<<"\n";
-  }
-}
-
-void SYS_T::print_MaxMallocUsage()
-{
-  PetscLogDouble memo = 0.0, memototal = 0.0;
-  PetscMallocGetMaximumUsage(&memo);
-  MPI_Reduce(&memo, &memototal, 1, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
-  PetscMPIInt rank;
-  MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
-  if(rank == 0)
-  {
-    std::cout<<"\n Maximum PETSc malloced : ";
-    print_mem_size(memototal); std::cout<<"\n";
-  }
-}
-
-void SYS_T::print_CurMallocUsage()
-{
-  PetscLogDouble memo = 0.0, memototal = 0.0;
-  PetscMallocGetCurrentUsage(&memo);
-  MPI_Reduce(&memo, &memototal, 1, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
-  PetscMPIInt rank;
-  MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
-  if(rank == 0)
-  {
-    std::cout<<"\n Current PETSc malloced : ";
-    print_mem_size(memototal); std::cout<<"\n";
-  }
-}
 
 void SYS_T::get_memory_stats (MemoryStats &stats)
 {

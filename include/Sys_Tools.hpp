@@ -329,25 +329,65 @@ namespace SYS_T
   // 1. Print the Maximum memory used for the program. The usage is
   //    reduced to CPU 0 by MPI_SUM.
   // -----------------------------------------------------------------
-  void print_MaxMemUsage();
+  inline void print_MaxMemUsage()
+  {
+    PetscLogDouble memo = 0.0, memototal = 0.0;
+    PetscMemoryGetMaximumUsage(&memo);
+    MPI_Reduce(&memo, &memototal, 1, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
+    if( !get_MPI_rank() )
+    {
+      std::cout<<"\n Maximum Memeory usage : ";
+      print_mem_size(memototal); std::cout<<"\n";
+    }
+  }
 
   // ----------------------------------------------------------------
   // 2. Print the Current memory used for the program. The usage is 
   //    reduced to CPU 0 by MPI_SUM.  
   // ----------------------------------------------------------------
-  void print_CurMemUsage();
+  inline void print_CurMemUsage()
+  {
+    PetscLogDouble memo = 0.0, memototal = 0.0;
+    PetscMemoryGetCurrentUsage(&memo);
+    MPI_Reduce(&memo, &memototal, 1, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
+    if( !get_MPI_rank() )
+    {
+      std::cout<<"\n Current Memeory usage : ";
+      print_mem_size(memototal); std::cout<<"\n";
+    }
+  }
 
   // ----------------------------------------------------------------
   // 3. Print the Maximum space PETSc has allocated. This function 
   //    should be used with the command line argument -malloc
   // ----------------------------------------------------------------
-  void print_MaxMallocUsage();
+  inline void print_MaxMallocUsage()
+  {
+    PetscLogDouble memo = 0.0, memototal = 0.0;
+    PetscMallocGetMaximumUsage(&memo);
+    MPI_Reduce(&memo, &memototal, 1, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
+    if( !get_MPI_rank())
+    {
+      std::cout<<"\n Maximum PETSc malloced : ";
+      print_mem_size(memototal); std::cout<<"\n";
+    }
+  }
 
   // ----------------------------------------------------------------
   // 4. Print the Current space PETSc has allocated. This function 
   //    should be used with the command line argument -malloc
   // ----------------------------------------------------------------
-  void print_CurMallocUsage();
+  inline void print_CurMallocUsage()
+  {
+    PetscLogDouble memo = 0.0, memototal = 0.0;
+    PetscMallocGetCurrentUsage(&memo);
+    MPI_Reduce(&memo, &memototal, 1, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
+    if( !get_MPI_rank() )
+    {
+      std::cout<<"\n Current PETSc malloced : ";
+      print_mem_size(memototal); std::cout<<"\n";
+    }
+  }
 
   // ================================================================
   // The following are system functions that access the system info.
