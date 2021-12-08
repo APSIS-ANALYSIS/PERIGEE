@@ -76,32 +76,9 @@ namespace SYS_T
     return ss.str();
   }
 
-  // ----------------------------------------------------------------
-  // Assume ii = iz * dim_x * dim_y + iy * dim_x + ix
-  // this function will return ix iy and iz based on the input ii, 
-  // dim_x, dim_y.
-  // ----------------------------------------------------------------
-  inline void get_xyz_index( const int &ii, const int &dim_x, const int &dim_y, 
-      int &ix, int &iy, int &iz)
-  {
-    const int ixy = ii % (dim_x * dim_y);
-    iz = (ii - ixy) / (dim_x * dim_y);
-    ix = ixy % dim_x; iy = (ixy - ix) / dim_x;
-  }
-
-  // ----------------------------------------------------------------
-  // Assume ii = iy * dim_x + ix;
-  // this function will return ix and iy based on the input ii and dim_x.
-  // ----------------------------------------------------------------
-  inline void get_xy_index( const int &ii, const int &dim_x, int &ix, int &iy)
-  {
-    ix = ii % dim_x;
-    iy = (ii-ix)/dim_x;
-  }
-
-  // ----------------------------------------------------------------
+  // --------------------------------------------------------------------------
   // print size based on bytes
-  // ----------------------------------------------------------------
+  // --------------------------------------------------------------------------
   template<typename T> std::string get_string_mem_size( const T &byte_size )
   {
     std::ostringstream ss;
