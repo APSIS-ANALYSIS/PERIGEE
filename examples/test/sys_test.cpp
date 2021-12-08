@@ -1,5 +1,4 @@
 #include <unistd.h>
-#include "PETSc_Tools.hpp"
 #include "Vec_Tools.hpp"
 #include "Vector_3.hpp"
 #include "Matrix_3x3.hpp"
@@ -33,8 +32,6 @@ int main( int argc, char * argv[] )
   C -= B;
 
   C.print_in_row();
-
-  std::cout<<PETSc_T::get_version()<<std::endl;
 
   return EXIT_SUCCESS;
 }
