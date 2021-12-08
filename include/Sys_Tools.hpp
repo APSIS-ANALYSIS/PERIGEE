@@ -19,19 +19,6 @@
 
 namespace SYS_T
 {
-  // Print ASCII art text for the code
-  inline void print_perigee_art()
-  {
-    SYS_T::commPrint("$$$$$$$\\  $$$$$$$$\\ $$$$$$$\\  $$$$$$\\  $$$$$$\\  $$$$$$$$\\ $$$$$$$$\\ \n");
-    SYS_T::commPrint("$$  __$$\\ $$  _____|$$  __$$\\ \\_$$  _|$$  __$$\\ $$  _____|$$  _____| \n");
-    SYS_T::commPrint("$$ |  $$ |$$ |      $$ |  $$ |  $$ |  $$ /  \\__|$$ |      $$ | \n");
-    SYS_T::commPrint("$$$$$$$  |$$$$$\\    $$$$$$$  |  $$ |  $$ |$$$$\\ $$$$$\\    $$$$$\\ \n");
-    SYS_T::commPrint("$$  ____/ $$  __|   $$  __$$<   $$ |  $$ |\\_$$ |$$  __|   $$  __| \n");
-    SYS_T::commPrint("$$ |      $$ |      $$ |  $$ |  $$ |  $$ |  $$ |$$ |      $$ | \n");
-    SYS_T::commPrint("$$ |      $$$$$$$$\\ $$ |  $$ |$$$$$$\\ \\$$$$$$  |$$$$$$$$\\ $$$$$$$$\\ \n");
-    SYS_T::commPrint("\\__|      \\________|\\__|  \\__|\\______| \\______/ \\________|\\________| \n \n");
-  }
-
   // Return the rank of the CPU
   inline PetscMPIInt get_MPI_rank()
   {
@@ -319,76 +306,6 @@ namespace SYS_T
     if( a ) print_exit(mesg);
   }
 
-  // =================================================================
-  // The followings are system function to monitor system memory usages 
-  // dynamically.
-  // Note: Before calling the following four functions, the user need to call 
-  // PetscMemorySetGetMaximumUsage() immediately after PetscInitialize.
-  // =================================================================
-  // -----------------------------------------------------------------
-  // 1. Print the Maximum memory used for the program. The usage is
-  //    reduced to CPU 0 by MPI_SUM.
-  // -----------------------------------------------------------------
-  inline void print_MaxMemUsage()
-  {
-    PetscLogDouble memo = 0.0, memototal = 0.0;
-    PetscMemoryGetMaximumUsage(&memo);
-    MPI_Reduce(&memo, &memototal, 1, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
-    if( !get_MPI_rank() )
-    {
-      std::cout<<"\n Maximum Memeory usage : ";
-      print_mem_size(memototal); std::cout<<"\n";
-    }
-  }
-
-  // ----------------------------------------------------------------
-  // 2. Print the Current memory used for the program. The usage is 
-  //    reduced to CPU 0 by MPI_SUM.  
-  // ----------------------------------------------------------------
-  inline void print_CurMemUsage()
-  {
-    PetscLogDouble memo = 0.0, memototal = 0.0;
-    PetscMemoryGetCurrentUsage(&memo);
-    MPI_Reduce(&memo, &memototal, 1, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
-    if( !get_MPI_rank() )
-    {
-      std::cout<<"\n Current Memeory usage : ";
-      print_mem_size(memototal); std::cout<<"\n";
-    }
-  }
-
-  // ----------------------------------------------------------------
-  // 3. Print the Maximum space PETSc has allocated. This function 
-  //    should be used with the command line argument -malloc
-  // ----------------------------------------------------------------
-  inline void print_MaxMallocUsage()
-  {
-    PetscLogDouble memo = 0.0, memototal = 0.0;
-    PetscMallocGetMaximumUsage(&memo);
-    MPI_Reduce(&memo, &memototal, 1, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
-    if( !get_MPI_rank())
-    {
-      std::cout<<"\n Maximum PETSc malloced : ";
-      print_mem_size(memototal); std::cout<<"\n";
-    }
-  }
-
-  // ----------------------------------------------------------------
-  // 4. Print the Current space PETSc has allocated. This function 
-  //    should be used with the command line argument -malloc
-  // ----------------------------------------------------------------
-  inline void print_CurMallocUsage()
-  {
-    PetscLogDouble memo = 0.0, memototal = 0.0;
-    PetscMallocGetCurrentUsage(&memo);
-    MPI_Reduce(&memo, &memototal, 1, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
-    if( !get_MPI_rank() )
-    {
-      std::cout<<"\n Current PETSc malloced : ";
-      print_mem_size(memototal); std::cout<<"\n";
-    }
-  }
-
   // ================================================================
   // The following are system functions that access the system info.
   // ================================================================
@@ -548,6 +465,18 @@ namespace SYS_T
       clock_t stoppedAt;
   };
 
+  // Print ASCII art text for the code
+  inline void print_perigee_art()
+  {
+    commPrint("$$$$$$$\\  $$$$$$$$\\ $$$$$$$\\  $$$$$$\\  $$$$$$\\  $$$$$$$$\\ $$$$$$$$\\ \n");
+    commPrint("$$  __$$\\ $$  _____|$$  __$$\\ \\_$$  _|$$  __$$\\ $$  _____|$$  _____| \n");
+    commPrint("$$ |  $$ |$$ |      $$ |  $$ |  $$ |  $$ /  \\__|$$ |      $$ | \n");
+    commPrint("$$$$$$$  |$$$$$\\    $$$$$$$  |  $$ |  $$ |$$$$\\ $$$$$\\    $$$$$\\ \n");
+    commPrint("$$  ____/ $$  __|   $$  __$$<   $$ |  $$ |\\_$$ |$$  __|   $$  __| \n");
+    commPrint("$$ |      $$ |      $$ |  $$ |  $$ |  $$ |  $$ |$$ |      $$ | \n");
+    commPrint("$$ |      $$$$$$$$\\ $$ |  $$ |$$$$$$\\ \\$$$$$$  |$$$$$$$$\\ $$$$$$$$\\ \n");
+    commPrint("\\__|      \\________|\\__|  \\__|\\______| \\______/ \\________|\\________| \n \n");
+  }
 }
 
 #endif
