@@ -332,7 +332,33 @@ namespace SYS_T
   // 4. get_memory_stats(): fills the MemoryStats structure with info
   //    about the memory consumption of this process. Only for Linux.
   // ----------------------------------------------------------------
-  void get_memory_stats( MemoryStats &stats );
+  inline void get_memory_stats( MemoryStats &stats )
+  {
+    stats.VmPeak = stats.VmSize = stats.VmHWM = stats.VmRSS = 0;
+
+#if defined(__linux__)
+    std::ifstream file("/proc/self/status");
+    std::string line;
+    std::string name;
+    while (!file.eof())
+    {
+      file >> name;
+      if (name == "VmPeak:")
+        file >> stats.VmPeak;
+      else if (name == "VmSize:")
+        file >> stats.VmSize;
+      else if (name == "VmHWM:")
+        file >> stats.VmHWM;
+      else if (name == "VmRSS:")
+      {
+        file >> stats.VmRSS;
+        break; //this is always the last entry
+      }
+
+      getline(file, line);
+    }
+#endif
+  }
 
   // ================================================================
   // The folowing are options-get functions that read command-line
@@ -423,21 +449,23 @@ namespace SYS_T
   class Timer
   {
     public:
-      Timer();
+      Timer() { startedAt = 0; stoppedAt = 0; }
 
-      ~Timer();
+      ~Timer() {};
 
-      void Start();
+      void Start() {startedAt = clock();}
 
-      void Stop();
+      void Stop() {stoppedAt = clock();}
 
-      void Reset();
+      void Reset() { startedAt = 0; stoppedAt = 0; }
 
-      double get_sec() const;
+      double get_sec() const
+      {
+        return (double)(stoppedAt - startedAt)/(double)CLOCKS_PER_SEC;
+      }
 
     private:
-      clock_t startedAt;
-      clock_t stoppedAt;
+      clock_t startedAt, stoppedAt;
   };
 
   // Print ASCII art text for the code
