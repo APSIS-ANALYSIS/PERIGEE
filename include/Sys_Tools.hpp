@@ -1,12 +1,12 @@
 #ifndef SYS_TOOLS_HPP
 #define SYS_TOOLS_HPP
-// ==================================================================
+// ============================================================================
 // Sys_Tools.hpp
-// ------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // The SYS_T namespace contains a suite of tools at the system level.
 //
-// These functions will be frequently used in the PERIGEE code.
-// ==================================================================
+// Author: Ju Liu
+// ============================================================================
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
@@ -19,8 +19,18 @@
 
 namespace SYS_T
 {
-  // Print ASCII art
-  void print_perigee_art();
+  // Print ASCII art text for the code
+  inline void print_perigee_art()
+  {
+    SYS_T::commPrint("$$$$$$$\\  $$$$$$$$\\ $$$$$$$\\  $$$$$$\\  $$$$$$\\  $$$$$$$$\\ $$$$$$$$\\ \n");
+    SYS_T::commPrint("$$  __$$\\ $$  _____|$$  __$$\\ \\_$$  _|$$  __$$\\ $$  _____|$$  _____| \n");
+    SYS_T::commPrint("$$ |  $$ |$$ |      $$ |  $$ |  $$ |  $$ /  \\__|$$ |      $$ | \n");
+    SYS_T::commPrint("$$$$$$$  |$$$$$\\    $$$$$$$  |  $$ |  $$ |$$$$\\ $$$$$\\    $$$$$\\ \n");
+    SYS_T::commPrint("$$  ____/ $$  __|   $$  __$$<   $$ |  $$ |\\_$$ |$$  __|   $$  __| \n");
+    SYS_T::commPrint("$$ |      $$ |      $$ |  $$ |  $$ |  $$ |  $$ |$$ |      $$ | \n");
+    SYS_T::commPrint("$$ |      $$$$$$$$\\ $$ |  $$ |$$$$$$\\ \\$$$$$$  |$$$$$$$$\\ $$$$$$$$\\ \n");
+    SYS_T::commPrint("\\__|      \\________|\\__|  \\__|\\______| \\______/ \\________|\\________| \n \n");
+  }
 
   // Return the rank of the CPU
   inline PetscMPIInt get_MPI_rank()
@@ -38,11 +48,10 @@ namespace SYS_T
     return size;
   }
 
-  // ----------------------------------------------------------------
-  // gen_partfile_name( baseName, rank )
-  // Generate a partition file's name (hdf5 file) in the default
-  // manner. It will return baseName_pxxxxx.h5.
-  // ----------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  // ! gen_partfile_name( baseName, rank )
+  //   Generate a partition file's name (hdf5 file) in the form baseName_pxxxxx.h5.
+  // --------------------------------------------------------------------------
   inline std::string gen_partfile_name( const std::string &baseName, 
       const int &rank )
   {
@@ -62,11 +71,10 @@ namespace SYS_T
     return ss.str();
   }
 
-  // ----------------------------------------------------------------
-  // gen_capfile_name
-  // Generate a file (usually for cap surfaces) in the format
-  // baseName_xxx.vtp(vtu)
-  // ----------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  // ! gen_capfile_name
+  //   Generate a file (usually for cap surfaces) in the form baseName_xxx.vtp(vtu)
+  // --------------------------------------------------------------------------
   inline std::string gen_capfile_name( const std::string &baseName,
       const int &index, const std::string &filename )
   {
@@ -77,7 +85,7 @@ namespace SYS_T
     else if( index/100 == 0 ) ss<<"0";
 
     ss<<index<<filename;
-    
+
     return ss.str();
   }
 
@@ -238,17 +246,7 @@ namespace SYS_T
   inline void cmdPrint(const char * const &dataname, const std::string &datavalue)
   {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, ss.str().c_str());}
 
-  // 4. Print specific system message
-  inline void synPrintElementInfo(int nlocalele, double memspace, 
-      double totaltime, PetscMPIInt rank)
-  {
-    std::string memusage = get_string_mem_size(memspace);
-    std::ostringstream ss; ss<<nlocalele<<" elements cached, "<<totaltime<<
-      " secs and "<<memusage<<std::endl;
-    synPrint(ss.str(), rank);
-  }
-
-  // 5. Print fatal error message and terminate the MPI process
+  // 4. Print fatal error message and terminate the MPI process
   inline void print_fatal( const char output[], ... )
   {
     if( !get_MPI_rank() )
@@ -280,7 +278,7 @@ namespace SYS_T
     }
   }
 
-  // 6. Print message (without termination the code) under conditions
+  // 5. Print message (without termination the code) under conditions
   inline void print_message_if( bool a, const char output[], ... )
   {
     if( a )
@@ -297,8 +295,8 @@ namespace SYS_T
     }
   }
 
-  // exit message printers are used in terminating serial program when 
-  // the communicator for MPI is not available.
+  // 6. Print exit message printers are used in terminating serial 
+  //    program when the communicator for MPI is not available.
   inline void print_exit( const char * const &mesg )
   {
     std::cout<<mesg<<std::endl;
@@ -319,20 +317,6 @@ namespace SYS_T
   inline void print_exit_if( bool a, const std::string &mesg )
   {
     if( a ) print_exit(mesg);
-  }
-
-  // 7. Print data on screen
-  template<typename T> void print_array_in_2D( const T * const arr, 
-      const int &nrow, const int &ncol )
-  {
-    for(int ii = 0; ii < nrow; ++ii)
-    {
-      for(int jj = 0; jj < ncol; ++jj)
-        std::cout << std::scientific << std::setprecision(3) << std::setw(10) << arr[ii * ncol + jj] << " ";
-      
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
   }
 
   // =================================================================
@@ -370,12 +354,34 @@ namespace SYS_T
   // ================================================================
   // 1. get_time: return the present time as HH:MM:SS
   // ----------------------------------------------------------------
-  std::string get_time();
+  inline std::string get_time()
+  {
+    std::time_t  time1= std::time (0);
+    std::tm     *time = std::localtime(&time1);
+
+    std::ostringstream o;
+    o << time->tm_hour << ":"
+      << (time->tm_min < 10 ? "0" : "") << time->tm_min << ":"
+      << (time->tm_sec < 10 ? "0" : "") << time->tm_sec;
+
+    return o.str();
+  }
 
   // ----------------------------------------------------------------
   // 2. get_date: return the present date as YYYY/MM/DD
   // ----------------------------------------------------------------
-  std::string get_date();
+  inline std::string get_date()
+  {
+    std::time_t  time1= std::time (0);
+    std::tm     *time = std::localtime(&time1);
+
+    std::ostringstream o;
+    o << time->tm_year + 1900 << "/"
+      << time->tm_mon + 1 << "/"
+      << time->tm_mday;
+
+    return o.str();
+  }
 
   // ----------------------------------------------------------------
   // 3. Structure that holds information about memory usage in kB.

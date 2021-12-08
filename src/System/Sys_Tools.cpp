@@ -1,17 +1,5 @@
 #include "Sys_Tools.hpp"
 
-void SYS_T::print_perigee_art()
-{
-  PetscPrintf(PETSC_COMM_WORLD, "$$$$$$$\\  $$$$$$$$\\ $$$$$$$\\  $$$$$$\\  $$$$$$\\  $$$$$$$$\\ $$$$$$$$\\ \n");
-  PetscPrintf(PETSC_COMM_WORLD, "$$  __$$\\ $$  _____|$$  __$$\\ \\_$$  _|$$  __$$\\ $$  _____|$$  _____| \n");
-  PetscPrintf(PETSC_COMM_WORLD, "$$ |  $$ |$$ |      $$ |  $$ |  $$ |  $$ /  \\__|$$ |      $$ | \n");
-  PetscPrintf(PETSC_COMM_WORLD, "$$$$$$$  |$$$$$\\    $$$$$$$  |  $$ |  $$ |$$$$\\ $$$$$\\    $$$$$\\ \n");
-  PetscPrintf(PETSC_COMM_WORLD, "$$  ____/ $$  __|   $$  __$$<   $$ |  $$ |\\_$$ |$$  __|   $$  __| \n");
-  PetscPrintf(PETSC_COMM_WORLD, "$$ |      $$ |      $$ |  $$ |  $$ |  $$ |  $$ |$$ |      $$ | \n");
-  PetscPrintf(PETSC_COMM_WORLD, "$$ |      $$$$$$$$\\ $$ |  $$ |$$$$$$\\ \\$$$$$$  |$$$$$$$$\\ $$$$$$$$\\ \n");
-  PetscPrintf(PETSC_COMM_WORLD, "\\__|      \\________|\\__|  \\__|\\______| \\______/ \\________|\\________| \n \n");
-}
-
 double SYS_T::gen_randomD_closed(const double &min, const double &max)
 {
   return ( rand() % 1000001 ) * 1.0e-6 * (max - min) + min;
@@ -81,32 +69,6 @@ void SYS_T::print_CurMallocUsage()
     std::cout<<"\n Current PETSc malloced : ";
     print_mem_size(memototal); std::cout<<"\n";
   }
-}
-
-std::string SYS_T::get_time()
-{
-  std::time_t  time1= std::time (0);
-  std::tm     *time = std::localtime(&time1);
-
-  std::ostringstream o;
-  o << time->tm_hour << ":"
-    << (time->tm_min < 10 ? "0" : "") << time->tm_min << ":"
-    << (time->tm_sec < 10 ? "0" : "") << time->tm_sec;
-
-  return o.str();
-}
-
-std::string SYS_T::get_date()
-{
-  std::time_t  time1= std::time (0);
-  std::tm     *time = std::localtime(&time1);
-
-  std::ostringstream o;
-  o << time->tm_year + 1900 << "/"
-    << time->tm_mon + 1 << "/"
-    << time->tm_mday;
-
-  return o.str();
 }
 
 void SYS_T::get_memory_stats (MemoryStats &stats)
