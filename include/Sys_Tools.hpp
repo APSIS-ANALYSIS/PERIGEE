@@ -100,23 +100,6 @@ namespace SYS_T
   }
 
   // ----------------------------------------------------------------
-  // gen_random()
-  // Generate a random double in [min, max] domain for _closed; 
-  // (min, max) for open.
-  // Gernerate a random int in [min, max] domain.
-  // NOTE: Users have to call srand(time(NULL)) before calling the 
-  //       following three gen functions.
-  // E.G.: srand(time(NULL));
-  //       for-loop
-  //       {gen_randomD_xxx(...); ...}
-  // ----------------------------------------------------------------
-  double gen_randomD_closed( const double &min, const double &max );
-
-  double gen_randomD_open( const double &min, const double &max );
-
-  int gen_randomI_closed( const int &min, const int &max );
-
-  // ----------------------------------------------------------------
   // print size based on bytes
   // ----------------------------------------------------------------
   template<typename T> std::string get_string_mem_size( const T &byte_size )
