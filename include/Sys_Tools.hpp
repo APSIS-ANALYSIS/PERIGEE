@@ -15,6 +15,7 @@
 #include <vector>
 #include <ctime>
 #include <iomanip>
+#include <sys/stat.h>
 #include "petsc.h"
 
 namespace SYS_T
@@ -385,6 +386,18 @@ namespace SYS_T
       return true;
     }
     else return false;
+  }
+
+  inline bool directory_exist( const std::string &dName )
+  {
+    if (dName.empty() || dName == "" || dName == "/0")
+      return true;
+    
+    struct stat info;
+    if (stat(dName.c_str(), &info) == 0)
+      return true;
+
+    return false;
   }
 
   inline void file_check( const std::string &fName )
