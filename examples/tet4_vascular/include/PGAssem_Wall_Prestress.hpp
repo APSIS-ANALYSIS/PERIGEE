@@ -138,7 +138,8 @@ class PGAssem_Wall_Prestress : public IPGAssem
     void EssBC_G( const ALocal_NodalBC * const &nbc_part, const int &field );
 
     // For prestress, we only do ebc boundary integration for solids
-    void NatBC_G( IPLocAssem * const &lassem_s_ptr,
+    void NatBC_G( const double &time,
+        IPLocAssem * const &lassem_s_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const lien_ptr,

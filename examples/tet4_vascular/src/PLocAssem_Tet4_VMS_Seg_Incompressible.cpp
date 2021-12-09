@@ -756,6 +756,7 @@ std::vector<Matrix_3x3> PLocAssem_Tet4_VMS_Seg_Incompressible::get_Wall_CauchySt
 
 
 void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Residual_EBC(
+    const double &time,
     const double * const &vec,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
@@ -763,6 +764,9 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Residual_EBC(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
+  //const double factor = time >= 1.0 ? 1.0 : time;
+  const double factor = 0.0;
+
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   Zero_Residual();
@@ -779,9 +783,9 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Residual_EBC(
 
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * pp * n_out.x();
-      Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * pp * n_out.y();
-      Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * pp * n_out.z();
+      Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * factor * pp * n_out.x();
+      Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * factor * pp * n_out.y();
+      Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * factor * pp * n_out.z();
     }
   }
 }

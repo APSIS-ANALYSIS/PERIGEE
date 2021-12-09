@@ -845,6 +845,7 @@ class IPLocAssem
     // Perform elemental BC surface integration for pressure-induced surface
     // traction. This is used in wall prestressing generation.
     virtual void Assem_Residual_EBC(
+        const double &time,
         const double * const &vec,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,

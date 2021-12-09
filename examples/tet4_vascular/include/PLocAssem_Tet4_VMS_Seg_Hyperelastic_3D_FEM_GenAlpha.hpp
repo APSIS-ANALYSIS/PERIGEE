@@ -102,6 +102,7 @@ class PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha : public IPLocAssem
         const IQuadPts * const &quad ) const;
 
     virtual void Assem_Residual_EBC(
+        const double &time,
         const double * const &vec,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,

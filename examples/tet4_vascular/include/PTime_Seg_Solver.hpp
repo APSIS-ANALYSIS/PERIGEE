@@ -92,12 +92,10 @@ class PTime_Seg_Solver
     void TM_FSI_Prestress(
         const bool &is_record_sol_flag,
         const double &prestress_tol,
-        const PDNSolution * const &sol_base,
         const PDNSolution * const &init_velo,
         const PDNSolution * const &init_disp,
         const TimeMethod_GenAlpha * const &tmga_ptr,
         PDNTimeStep * const &time_info,
-        const ICVFlowRate * const flr_ptr,
         const ALocal_Elem * const &alelem_ptr,
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &anode_ptr,

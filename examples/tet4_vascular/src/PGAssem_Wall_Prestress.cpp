@@ -434,7 +434,7 @@ void PGAssem_Wall_Prestress::Assem_residual(
   }
 
   // Natural BC for G
-  NatBC_G( lassem_s_ptr, elements, quad_s, lien_ptr, nbc_part, ebc_part );
+  NatBC_G( curr_time, lassem_s_ptr, elements, quad_s, lien_ptr, nbc_part, ebc_part );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -515,7 +515,7 @@ void PGAssem_Wall_Prestress::Assem_tangent_residual(
   }
 
   // Natural BC for G
-  NatBC_G( lassem_s_ptr, elements, quad_s, lien_ptr, nbc_part, ebc_part );
+  NatBC_G( curr_time, lassem_s_ptr, elements, quad_s, lien_ptr, nbc_part, ebc_part );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -529,7 +529,8 @@ void PGAssem_Wall_Prestress::Assem_tangent_residual(
 }
 
 
-void PGAssem_Wall_Prestress::NatBC_G( IPLocAssem * const &lassem_s_ptr,
+void PGAssem_Wall_Prestress::NatBC_G( const double &time,
+    IPLocAssem * const &lassem_s_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const lien_ptr,
@@ -549,7 +550,7 @@ void PGAssem_Wall_Prestress::NatBC_G( IPLocAssem * const &lassem_s_ptr,
 
     GetLocal(array_b, LSIEN, snLocBas, local_bs);
 
-    lassem_s_ptr->Assem_Residual_EBC(local_bs, element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+    lassem_s_ptr->Assem_Residual_EBC(time, local_bs, element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
 
     for(int ii=0; ii<snLocBas; ++ii)
     {

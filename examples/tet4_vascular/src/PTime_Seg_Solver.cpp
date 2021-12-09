@@ -371,12 +371,10 @@ void PTime_Seg_Solver::TM_FSI_GenAlpha(
 void PTime_Seg_Solver::TM_FSI_Prestress(
     const bool &is_record_sol_flag,
     const double &prestress_tol, 
-    const PDNSolution * const &sol_base,
     const PDNSolution * const &init_velo,
     const PDNSolution * const &init_disp,
     const TimeMethod_GenAlpha * const &tmga_ptr,
     PDNTimeStep * const &time_info,
-    const ICVFlowRate * const flr_ptr,
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &lien_ptr,
     const APart_Node * const &anode_ptr,
@@ -429,16 +427,16 @@ void PTime_Seg_Solver::TM_FSI_Prestress(
     SEG_SOL_T::Insert_zero_solid_UV( anode_ptr, pre_disp ); 
     SEG_SOL_T::Insert_zero_solid_UV( anode_ptr, cur_velo ); 
     SEG_SOL_T::Insert_zero_solid_UV( anode_ptr, cur_disp ); 
-
+    
     nsolver_ptr->GenAlpha_Solve_Prestress( renew_flag, prestress_tol, time_info->get_time(),
-        time_info->get_step(), sol_base, pre_velo, pre_disp, tmga_ptr, flr_ptr,
+        time_info->get_step(), pre_velo, pre_disp, tmga_ptr,
         alelem_ptr, lien_ptr, anode_ptr, feanode_ptr, nbc_part, infnbc_part,
         nbc_mesh_part, ebc_part, ebc_mesh_part, gbc, bc_mat, bc_mesh_mat, 
         elementv, elements, quad_v, quad_s, ps_ptr, lassem_fluid_ptr,
         lassem_solid_ptr, lassem_mesh_ptr,
         gassem_ptr, gassem_mesh_ptr, lsolver_ptr, lsolver_mesh_ptr,
         cur_velo, cur_disp, prestress_conv_flag, nl_counter );
-
+    
     time_info->TimeIncrement();
 
     SYS_T::commPrint( "Time = %e, dt = %e, index = %d, %s \n",

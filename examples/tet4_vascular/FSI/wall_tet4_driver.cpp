@@ -326,12 +326,9 @@ int main( int argc, char *argv[] )
   tsolver->print_info();
 
   // ===== FEM analysis =====
-  PDNSolution * base = nullptr;
-  ICVFlowRate * inflow_rate_ptr = nullptr;
-
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
-  tsolver->TM_FSI_Prestress( is_record_sol, prestress_disp_tol, base, dot_sol, sol, tm_galpha_ptr,
-      timeinfo, inflow_rate_ptr, locElem, locIEN, pNode, fNode, locnbc,
+  tsolver->TM_FSI_Prestress( is_record_sol, prestress_disp_tol, dot_sol, sol, tm_galpha_ptr,
+      timeinfo, locElem, locIEN, pNode, fNode, locnbc,
       locinfnbc, mesh_locnbc, locebc, mesh_locebc, gbc, pmat, mmat,
       elementv, elements, quadv, quads, ps_data,
       locAssem_fluid_ptr, locAssem_solid_ptr, locAssem_mesh_ptr,
