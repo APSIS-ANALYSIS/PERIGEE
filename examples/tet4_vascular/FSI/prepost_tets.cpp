@@ -127,7 +127,7 @@ int main( int argc, char * argv[] )
     delete part;
   }
 
-  std::cout<<"\n=== Clean memory. \n";
+  std::cout<<"=== Clean memory. \n";
   delete mytimer; delete mnindex; delete global_part; delete mesh; delete IEN;
   PetscFinalize();
   return EXIT_SUCCESS;
