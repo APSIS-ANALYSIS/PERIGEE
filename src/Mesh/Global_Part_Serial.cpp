@@ -53,6 +53,8 @@ void Global_Part_Serial::write_part_hdf5( const std::string &fileName,
   h5w->write_intScalar("isMETIS", ( isMETIS ? 1 : 0 ) );
   h5w->write_intVector( "part", part_in, part_size );
 
+  h5w->write_intScalar("isSerial", ( is_serial() ? 1 : 0 ) );
+
   delete h5w; H5Fclose(file_id);
 }
 

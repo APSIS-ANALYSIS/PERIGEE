@@ -19,6 +19,7 @@
 #include "IEN_Tetra_P1.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
+#include "Global_Part_Reload.hpp"
 #include "Part_Tet_FSI.hpp"
 #include "NodalBC_3D_FSI.hpp"
 #include "NodalBC_3D_vtu.hpp"
@@ -31,7 +32,6 @@
 int main( int argc, char * argv[] )
 {
   // Remove previously existing hdf5 files
-  SYS_T::execute("rm -rf preprocessor_cmd.h5");
   SYS_T::execute("rm -rf apart");
   SYS_T::execute("mkdir apart");
 
@@ -71,6 +71,8 @@ int main( int argc, char * argv[] )
   int in_ncommon = 2;
   const bool isDualGraph = true;
 
+  bool isReload = false;
+
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
   SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: preprocessor needs to be run in serial.\n");
@@ -90,6 +92,7 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionString("-sur_f_file_out_base", sur_f_file_out_base);
   SYS_T::GetOptionString("-sur_s_file_in_base",  sur_s_file_in_base);
   SYS_T::GetOptionString("-sur_s_file_out_base", sur_s_file_out_base);
+  SYS_T::GetOptionBool("-isReload",              isReload);
 
   SYS_T::print_fatal_if( fsiBC_type != 0 && fsiBC_type != 1 && fsiBC_type != 2, "Error: fsiBC_type should be 0, 1, or 2.\n" );
   SYS_T::print_fatal_if( ringBC_type != 0 && ringBC_type != 1, "Error: ringBC_type should be 0 or 1.\n" );
@@ -112,6 +115,8 @@ int main( int argc, char * argv[] )
   std::cout<<" -cpu_size: "           <<cpu_size           <<std::endl;
   std::cout<<" -in_ncommon: "         <<in_ncommon         <<std::endl;
   std::cout<<" -isDualGraph: true \n";
+  if(isReload) std::cout<<" -isReload : true \n";
+  else std::cout<<" -isReload : false \n";
   std::cout<<"----------------------------------\n";
   std::cout<<" dofNum: "<<dofNum<<std::endl;
   std::cout<<" dofMat: "<<dofMat<<std::endl;
@@ -164,6 +169,7 @@ int main( int argc, char * argv[] )
     cout<<endl<<"Warning: there are additional outlet surface files on disk. Check num_outlet please.\n\n";
 
   // ----- Write the input argument into a HDF5 file
+  SYS_T::execute("rm -rf preprocessor_cmd.h5");
   hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
   HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
 
@@ -207,12 +213,12 @@ int main( int argc, char * argv[] )
 
   // Generate IEN
   IIEN * IEN = new IEN_Tetra_P1(nElem, vecIEN);
-  
+
   VEC_T::clean( vecIEN );
 
   // Generate the list of nodes for fluid and solid
   std::vector<int> node_f, node_s; node_f.clear(); node_s.clear();
-  
+
   for(int ee=0; ee<nElem; ++ee)
   {
     if( phy_tag[ee] == 0 )
@@ -224,7 +230,7 @@ int main( int argc, char * argv[] )
       for(int ii=0; ii<4; ++ii) node_s.push_back( IEN->get_IEN(ee, ii) );
     }
   }
-  
+
   VEC_T::sort_unique_resize( node_f );
   VEC_T::sort_unique_resize( node_s );
 
@@ -240,11 +246,19 @@ int main( int argc, char * argv[] )
   
   // Partition
   IGlobal_Part * global_part = nullptr;
-  if(cpu_size > 1)
-    global_part = new Global_Part_METIS( cpu_size, in_ncommon, isDualGraph, mesh, IEN );
-  else if(cpu_size == 1)
-    global_part = new Global_Part_Serial( mesh );
-  else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
+  if( isReload ) global_part = new Global_Part_Reload( cpu_size, in_ncommon, isDualGraph );
+  else
+  {
+    if(cpu_size > 1)
+      global_part = new Global_Part_METIS( cpu_size, in_ncommon, isDualGraph, mesh, IEN );
+    else if(cpu_size == 1)
+      global_part = new Global_Part_Serial( mesh );
+    else
+    {
+      std::cerr<<"ERROR: wrong cpu_size: "<<cpu_size<<std::endl;
+      exit(EXIT_FAILURE);
+    }
+  }
 
   // Generate the new nodal numbering based on the partitioning
   Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, mesh->get_nFunc());
@@ -352,6 +366,7 @@ int main( int argc, char * argv[] )
     else SYS_T::print_fatal("ERROR: uncognized fsiBC type. \n");
 
     EBC_Partition * mebcpart = new EBC_Partition(part, mnindex, mesh_ebc);
+    
     mebcpart-> write_hdf5( part_file, "/mesh_ebc" );
 
     list_nlocalnode.push_back(part->get_nlocalnode());
