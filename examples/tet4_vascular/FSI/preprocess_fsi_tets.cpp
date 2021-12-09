@@ -19,6 +19,7 @@
 #include "IEN_Tetra_P1.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
+#include "Global_Part_Reload.hpp"
 #include "Part_Tet_FSI.hpp"
 #include "NodalBC_3D_vtp.hpp"
 #include "NodalBC_3D_vtu.hpp"
@@ -31,7 +32,6 @@
 int main( int argc, char * argv[] )
 {
   // Remove previously existing hdf5 files
-  SYS_T::execute("rm -rf preprocessor_cmd.h5");
   SYS_T::execute("rm -rf apart");
   SYS_T::execute("mkdir apart");
 
@@ -62,6 +62,8 @@ int main( int argc, char * argv[] )
   int in_ncommon = 2;
   const bool isDualGraph = true;
 
+  bool isReload = false;
+
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
   SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: preprocessor needs to be run in serial.\n");
@@ -79,6 +81,7 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionString("-sur_f_file_out_base", sur_f_file_out_base);
   SYS_T::GetOptionString("-sur_s_file_in_base",  sur_s_file_in_base);
   SYS_T::GetOptionString("-sur_s_file_out_base", sur_s_file_out_base);
+  SYS_T::GetOptionBool("-isReload",              isReload);
 
   std::cout<<"===== Command Line Arguments ====="<<std::endl;
   std::cout<<" -num_inlet: "          <<num_inlet          <<std::endl;
@@ -96,6 +99,8 @@ int main( int argc, char * argv[] )
   std::cout<<" -cpu_size: "           <<cpu_size           <<std::endl;
   std::cout<<" -in_ncommon: "         <<in_ncommon         <<std::endl;
   std::cout<<" -isDualGraph: true \n";
+  if(isReload) std::cout<<" -isReload : true \n";
+  else std::cout<<" -isReload : false \n";
   std::cout<<"----------------------------------\n";
   std::cout<<" dofNum: "<<dofNum<<std::endl;
   std::cout<<" dofMat: "<<dofMat<<std::endl;
@@ -148,30 +153,34 @@ int main( int argc, char * argv[] )
     cout<<endl<<"Warning: there are additional outlet surface files on disk. Check num_outlet please.\n\n";
 
   // ----- Write the input argument into a HDF5 file
-  hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-  HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
+  if( !isReload )
+  {
+    SYS_T::execute("rm -rf preprocessor_cmd.h5");
+    hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+    HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
 
-  cmdh5w->write_intScalar("num_outlet",       num_outlet);
-  cmdh5w->write_intScalar("num_inlet",        num_inlet);
-  cmdh5w->write_intScalar("cpu_size",         cpu_size);
-  cmdh5w->write_intScalar("in_ncommon",       in_ncommon);
-  cmdh5w->write_intScalar("dofNum",           dofNum);
-  cmdh5w->write_intScalar("dofMat",           dofMat);
-  cmdh5w->write_intScalar("elemType",         elemType);
-  cmdh5w->write_string("geo_file",            geo_file);
-  cmdh5w->write_string("geo_f_file",          geo_f_file);
-  cmdh5w->write_string("geo_s_file",          geo_s_file);
-  cmdh5w->write_string("sur_f_file_in_base",  sur_f_file_in_base);
-  cmdh5w->write_string("sur_f_file_out_base", sur_f_file_out_base);
-  cmdh5w->write_string("sur_f_file_wall",     sur_f_file_wall);
-  cmdh5w->write_string("sur_s_file_in_base",  sur_s_file_in_base);
-  cmdh5w->write_string("sur_s_file_out_base", sur_s_file_out_base);
-  cmdh5w->write_string("sur_s_file_wall",     sur_s_file_wall);
-  cmdh5w->write_string("part_file",           part_file);
-  cmdh5w->write_string("date",                SYS_T::get_date() );
-  cmdh5w->write_string("time",                SYS_T::get_time() );
+    cmdh5w->write_intScalar("num_outlet",       num_outlet);
+    cmdh5w->write_intScalar("num_inlet",        num_inlet);
+    cmdh5w->write_intScalar("cpu_size",         cpu_size);
+    cmdh5w->write_intScalar("in_ncommon",       in_ncommon);
+    cmdh5w->write_intScalar("dofNum",           dofNum);
+    cmdh5w->write_intScalar("dofMat",           dofMat);
+    cmdh5w->write_intScalar("elemType",         elemType);
+    cmdh5w->write_string("geo_file",            geo_file);
+    cmdh5w->write_string("geo_f_file",          geo_f_file);
+    cmdh5w->write_string("geo_s_file",          geo_s_file);
+    cmdh5w->write_string("sur_f_file_in_base",  sur_f_file_in_base);
+    cmdh5w->write_string("sur_f_file_out_base", sur_f_file_out_base);
+    cmdh5w->write_string("sur_f_file_wall",     sur_f_file_wall);
+    cmdh5w->write_string("sur_s_file_in_base",  sur_s_file_in_base);
+    cmdh5w->write_string("sur_s_file_out_base", sur_s_file_out_base);
+    cmdh5w->write_string("sur_s_file_wall",     sur_s_file_wall);
+    cmdh5w->write_string("part_file",           part_file);
+    cmdh5w->write_string("date",                SYS_T::get_date() );
+    cmdh5w->write_string("time",                SYS_T::get_time() );
 
-  delete cmdh5w; H5Fclose(cmd_file_id);
+    delete cmdh5w; H5Fclose(cmd_file_id);
+  }
   // ----- Finish writing
 
   // Read the geometry file for the whole FSI domain
@@ -189,12 +198,12 @@ int main( int argc, char * argv[] )
 
   // Generate IEN
   IIEN * IEN = new IEN_Tetra_P1(nElem, vecIEN);
-  
+
   VEC_T::clean( vecIEN );
 
   // Generate the list of nodes for fluid and solid
   std::vector<int> node_f, node_s; node_f.clear(); node_s.clear();
-  
+
   for(int ee=0; ee<nElem; ++ee)
   {
     if( phy_tag[ee] == 0 )
@@ -206,13 +215,13 @@ int main( int argc, char * argv[] )
       for(int ii=0; ii<4; ++ii) node_s.push_back( IEN->get_IEN(ee, ii) );
     }
   }
-  
+
   VEC_T::sort_unique_resize( node_f );
   VEC_T::sort_unique_resize( node_s );
 
   std::cout<<'\n'<<"Fluid domain number of nodes: "<<node_f.size()<<'\n';
   std::cout<<"Solid domain number of nodes: "<<node_s.size()<<'\n';
-  
+
   // Check the mesh
   TET_T::tetmesh_check(ctrlPts, IEN, nElem, 3.5);
 
@@ -222,14 +231,18 @@ int main( int argc, char * argv[] )
 
   // Partition
   IGlobal_Part * global_part = nullptr;
-  if(cpu_size > 1)
-    global_part = new Global_Part_METIS( cpu_size, in_ncommon, isDualGraph, mesh, IEN );
-  else if(cpu_size == 1)
-    global_part = new Global_Part_Serial( mesh );
+  if( isReload ) global_part = new Global_Part_Reload( cpu_size, in_ncommon, isDualGraph );
   else
   {
-    std::cerr<<"ERROR: wrong cpu_size: "<<cpu_size<<std::endl;
-    exit(EXIT_FAILURE);
+    if(cpu_size > 1)
+      global_part = new Global_Part_METIS( cpu_size, in_ncommon, isDualGraph, mesh, IEN );
+    else if(cpu_size == 1)
+      global_part = new Global_Part_Serial( mesh );
+    else
+    {
+      std::cerr<<"ERROR: wrong cpu_size: "<<cpu_size<<std::endl;
+      exit(EXIT_FAILURE);
+    }
   }
 
   Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, mesh->get_nFunc());
@@ -253,10 +266,10 @@ int main( int argc, char * argv[] )
   // Mesh NBC
   std::cout<<"Boundary condition for the mesh motion: \n";
   std::vector<INodalBC *> meshBC_list( 3, nullptr );
-  
+
   std::vector<std::string> meshdir_vtp_list = sur_f_file_in;
   VEC_T::insert_end( meshdir_vtp_list, sur_f_file_out );
-  
+
   meshBC_list[0] = new NodalBC_3D_vtu( geo_s_file, meshdir_vtp_list, nFunc );
   meshBC_list[1] = new NodalBC_3D_vtu( geo_s_file, meshdir_vtp_list, nFunc );
   meshBC_list[2] = new NodalBC_3D_vtu( geo_s_file, meshdir_vtp_list, nFunc );
@@ -265,13 +278,13 @@ int main( int argc, char * argv[] )
   std::vector<Vector_3> inlet_outvec( num_inlet );
   for(int ii=0; ii<num_inlet; ++ii)
     inlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_in[ii], ctrlPts, IEN );
-  
+
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_f_file_in, sur_f_file_wall, nFunc, inlet_outvec ); 
 
   // Elemental BC
   cout<<"Elem boundary for the implicit solver: \n";
   std::vector< Vector_3 > outlet_outvec( num_outlet );
-  
+
   for(int ii=0; ii<num_outlet; ++ii)
     outlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_out[ii], ctrlPts, IEN );
 
@@ -293,7 +306,7 @@ int main( int argc, char * argv[] )
   int sum_nghostnode = 0;
 
   SYS_T::Timer * mytimer = new SYS_T::Timer();
-  
+
   for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
   {
     mytimer->Reset();
@@ -308,7 +321,7 @@ int main( int argc, char * argv[] )
 
     part -> write( part_file.c_str() );
     part -> print_part_loadbalance_edgecut();
-    
+
     NBC_Partition * nbcpart = new NBC_Partition(part, mnindex, NBC_list);
     nbcpart -> write_hdf5( part_file ); 
 
@@ -323,7 +336,7 @@ int main( int argc, char * argv[] )
 
     EBC_Partition * mebcpart = new EBC_Partition(part, mnindex, mesh_ebc);
     mebcpart-> write_hdf5( part_file, "/mesh_ebc");
-    
+
     list_nlocalnode.push_back(part->get_nlocalnode());
     list_nghostnode.push_back(part->get_nghostnode());
     list_ntotalnode.push_back(part->get_ntotalnode());

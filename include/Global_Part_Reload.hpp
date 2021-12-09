@@ -13,7 +13,8 @@
 class Global_Part_Reload : public IGlobal_Part
 {
   public:
-    Global_Part_Reload( const std::string &element_part_name = "epart",
+    Global_Part_Reload(  const int &cpu_size, const int &in_ncommon, 
+        const bool &isDualGraph, const std::string &element_part_name = "epart",
         const std::string &node_part_name = "npart" );
 
     virtual ~Global_Part_Reload();
