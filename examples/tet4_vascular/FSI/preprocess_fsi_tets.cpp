@@ -153,34 +153,31 @@ int main( int argc, char * argv[] )
     cout<<endl<<"Warning: there are additional outlet surface files on disk. Check num_outlet please.\n\n";
 
   // ----- Write the input argument into a HDF5 file
-  if( !isReload )
-  {
-    SYS_T::execute("rm -rf preprocessor_cmd.h5");
-    hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-    HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
+  SYS_T::execute("rm -rf preprocessor_cmd.h5");
+  hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+  HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
 
-    cmdh5w->write_intScalar("num_outlet",       num_outlet);
-    cmdh5w->write_intScalar("num_inlet",        num_inlet);
-    cmdh5w->write_intScalar("cpu_size",         cpu_size);
-    cmdh5w->write_intScalar("in_ncommon",       in_ncommon);
-    cmdh5w->write_intScalar("dofNum",           dofNum);
-    cmdh5w->write_intScalar("dofMat",           dofMat);
-    cmdh5w->write_intScalar("elemType",         elemType);
-    cmdh5w->write_string("geo_file",            geo_file);
-    cmdh5w->write_string("geo_f_file",          geo_f_file);
-    cmdh5w->write_string("geo_s_file",          geo_s_file);
-    cmdh5w->write_string("sur_f_file_in_base",  sur_f_file_in_base);
-    cmdh5w->write_string("sur_f_file_out_base", sur_f_file_out_base);
-    cmdh5w->write_string("sur_f_file_wall",     sur_f_file_wall);
-    cmdh5w->write_string("sur_s_file_in_base",  sur_s_file_in_base);
-    cmdh5w->write_string("sur_s_file_out_base", sur_s_file_out_base);
-    cmdh5w->write_string("sur_s_file_wall",     sur_s_file_wall);
-    cmdh5w->write_string("part_file",           part_file);
-    cmdh5w->write_string("date",                SYS_T::get_date() );
-    cmdh5w->write_string("time",                SYS_T::get_time() );
+  cmdh5w->write_intScalar("num_outlet",       num_outlet);
+  cmdh5w->write_intScalar("num_inlet",        num_inlet);
+  cmdh5w->write_intScalar("cpu_size",         cpu_size);
+  cmdh5w->write_intScalar("in_ncommon",       in_ncommon);
+  cmdh5w->write_intScalar("dofNum",           dofNum);
+  cmdh5w->write_intScalar("dofMat",           dofMat);
+  cmdh5w->write_intScalar("elemType",         elemType);
+  cmdh5w->write_string("geo_file",            geo_file);
+  cmdh5w->write_string("geo_f_file",          geo_f_file);
+  cmdh5w->write_string("geo_s_file",          geo_s_file);
+  cmdh5w->write_string("sur_f_file_in_base",  sur_f_file_in_base);
+  cmdh5w->write_string("sur_f_file_out_base", sur_f_file_out_base);
+  cmdh5w->write_string("sur_f_file_wall",     sur_f_file_wall);
+  cmdh5w->write_string("sur_s_file_in_base",  sur_s_file_in_base);
+  cmdh5w->write_string("sur_s_file_out_base", sur_s_file_out_base);
+  cmdh5w->write_string("sur_s_file_wall",     sur_s_file_wall);
+  cmdh5w->write_string("part_file",           part_file);
+  cmdh5w->write_string("date",                SYS_T::get_date() );
+  cmdh5w->write_string("time",                SYS_T::get_time() );
 
-    delete cmdh5w; H5Fclose(cmd_file_id);
-  }
+  delete cmdh5w; H5Fclose(cmd_file_id);
   // ----- Finish writing
 
   // Read the geometry file for the whole FSI domain
