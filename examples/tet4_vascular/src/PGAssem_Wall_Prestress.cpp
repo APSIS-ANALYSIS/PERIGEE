@@ -487,18 +487,7 @@ void PGAssem_Wall_Prestress::Assem_tangent_residual(
         row_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
     }
     
-    // If elem tag is zero, do fluid assembly; else do solid assembly
-    if(alelem_ptr->get_elem_tag(ee) == 0)
-    {
-      lassem_f_ptr->Assem_Tangent_Residual(curr_time, dt, local_a, local_b,
-          elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
-      
-      MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
-          lassem_f_ptr->Tangent, ADD_VALUES);
-
-      VecSetValues(G, loc_dof, row_index, lassem_f_ptr->Residual, ADD_VALUES);
-    }
-    else
+    if(alelem_ptr->get_elem_tag(ee) == 1)
     {
       // For solid element, quaprestress will return a vector of length nqp x 6
       // for the prestress values at the quadrature points
