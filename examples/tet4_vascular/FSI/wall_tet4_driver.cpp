@@ -73,13 +73,7 @@ int main( int argc, char *argv[] )
 
   const int nqp_tet       = cmd_h5r -> read_intScalar(    "/", "nqp_tet");
   const int nqp_tri       = cmd_h5r -> read_intScalar(    "/", "nqp_tri");
-  const double fl_density = cmd_h5r -> read_doubleScalar( "/", "fl_density");
-  const double fl_mu      = cmd_h5r -> read_doubleScalar( "/", "fl_mu");
-  const double fl_bs_beta = cmd_h5r -> read_doubleScalar( "/", "fl_bs_beta"); 
   const double sl_nu      = cmd_h5r -> read_doubleScalar( "/", "sl_nu");
-  const double mesh_E     = cmd_h5r -> read_doubleScalar( "/", "mesh_E");
-  const double mesh_nu    = cmd_h5r -> read_doubleScalar( "/", "mesh_nu");
-  const std::string lpn_file = cmd_h5r -> read_string( "/", "lpn_file" );
 
   delete cmd_h5r; H5Fclose(solver_cmd_file);
 
@@ -166,13 +160,7 @@ int main( int argc, char *argv[] )
 
   ALocal_NodalBC * locnbc = new ALocal_NodalBC(part_file, rank);
 
-  ALocal_Inflow_NodalBC * locinfnbc = new ALocal_Inflow_NodalBC(part_file, rank);
-
-  ALocal_NodalBC * mesh_locnbc = new ALocal_NodalBC(part_file, rank, "mesh_nbc");
-
   ALocal_EBC * locebc = new ALocal_EBC(part_file, rank);
-
-  ALocal_EBC * mesh_locebc = new ALocal_EBC(part_file, rank, "mesh_ebc");
 
   APart_Node * pNode = new APart_Node_FSI(part_file, rank);
 
@@ -199,9 +187,6 @@ int main( int argc, char *argv[] )
   Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
   pmat->gen_perm_bc(pNode, locnbc);
 
-  Matrix_PETSc * mmat = new Matrix_PETSc(pNode, mesh_locnbc);
-  mmat->gen_perm_bc(pNode, mesh_locnbc);
-
   // ===== Generate the generalized-alpha method
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
 
@@ -215,9 +200,6 @@ int main( int argc, char *argv[] )
   tm_galpha_ptr->print_info();
 
   // ===== Local assembly =====
-  IPLocAssem * locAssem_fluid_ptr = new PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha(
-      tm_galpha_ptr, quadv->get_num_quadPts(), fl_density, fl_mu, fl_bs_beta );
-
   IMaterialModel * matmodel       = nullptr;
   IPLocAssem * locAssem_solid_ptr = nullptr;
 
@@ -235,8 +217,6 @@ int main( int argc, char *argv[] )
     locAssem_solid_ptr = new PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha(
         matmodel, tm_galpha_ptr, quadv->get_num_quadPts() );
   }
-
-  IPLocAssem * locAssem_mesh_ptr = new PLocAssem_Tet4_FSI_Mesh_Elastostatic( mesh_E, mesh_nu );
 
   // ===== Initial condition =====
   PDNSolution * sol = new PDNSolution_Mixed_UPV_3D( pNode, fNode, 0 );
@@ -260,14 +240,11 @@ int main( int argc, char *argv[] )
   // ===== Time step info =====
   PDNTimeStep * timeinfo = new PDNTimeStep(initial_index, initial_time, initial_step);
 
-  // ===== GenBC =====
-  IGenBC * gbc = nullptr;
-
   // ===== Global assembly routine =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
-  IPGAssem * gloAssem_ptr = new PGAssem_Wall_Prestress( locAssem_fluid_ptr,
-      locAssem_solid_ptr, elements, quads, GMIptr, locElem, locIEN,
-      pNode, locnbc, locebc, gbc, nz_estimate );
+  IPGAssem * gloAssem_ptr = new PGAssem_Wall_Prestress( locAssem_solid_ptr, 
+      elements, quads, GMIptr, locElem, locIEN,
+      pNode, locnbc, locebc, nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
   gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_fluid_ptr,
@@ -277,19 +254,6 @@ int main( int argc, char *argv[] )
   gloAssem_ptr->Fix_nonzero_err_str();
   gloAssem_ptr->Clear_KG();
   
-  // ===== Global assembly for mesh motion =====
-  SYS_T::commPrint("===> Initializing Mat K_mesh and Vec G_mesh ... \n");
-  IPGAssem * gloAssem_mesh_ptr = new PGAssem_Seg_FEM( locAssem_mesh_ptr,
-      GMIptr, locElem, locIEN, pNode, mesh_locnbc, mesh_locebc );
-
-  SYS_T::commPrint("===> Assembly nonzero estimate for K_mesh ... \n");
-  gloAssem_mesh_ptr->Assem_nonzero_estimate( locElem, locAssem_mesh_ptr, locIEN,
-      pNode, mesh_locnbc );
-
-  SYS_T::commPrint("===> Matrix K_mesh nonzero structure fixed. \n");
-  gloAssem_mesh_ptr->Fix_nonzero_err_str();
-  gloAssem_mesh_ptr->Clear_KG();
-
   // ===== Linear and nonlinear solver context =====
   PLinear_Solver_PETSc * lsolver = new PLinear_Solver_PETSc();
 
@@ -298,20 +262,6 @@ int main( int argc, char *argv[] )
   PCFieldSplitSetBlockSize(upc,4);
   PCFieldSplitSetFields(upc,"u",3,vfields,vfields);
   PCFieldSplitSetFields(upc,"p",1,pfield,pfield);
-
-  PLinear_Solver_PETSc * mesh_lsolver = new PLinear_Solver_PETSc(
-      1.0e-12, 1.0e-55, 1.0e30, 500, "mesh_", "mesh_" );
-
-  gloAssem_mesh_ptr->Assem_tangent_residual( sol, sol, 0.0,
-      timeinfo->get_step(), locElem, locAssem_mesh_ptr, elementv,
-      elements, quadv, quads, locIEN, pNode, fNode, mesh_locnbc,
-      mesh_locebc );
-
-  mesh_lsolver -> SetOperator( gloAssem_mesh_ptr->K );
-  PC mesh_pc; mesh_lsolver->GetPC(&mesh_pc);
-  PCFieldSplitSetBlockSize( mesh_pc, 3 );
-
-  SYS_T::commPrint("===> mesh solver LHS setted up.\n");
 
   // ===== Nonlinear solver context =====
   PNonlinear_Seg_Solver * nsolver = new PNonlinear_Seg_Solver(
@@ -329,10 +279,8 @@ int main( int argc, char *argv[] )
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
   tsolver->TM_FSI_Prestress( is_record_sol, prestress_disp_tol, dot_sol, sol, tm_galpha_ptr,
       timeinfo, locElem, locIEN, pNode, fNode, locnbc,
-      locinfnbc, mesh_locnbc, locebc, mesh_locebc, gbc, pmat, mmat,
-      elementv, elements, quadv, quads, ps_data,
-      locAssem_fluid_ptr, locAssem_solid_ptr, locAssem_mesh_ptr,
-      gloAssem_ptr, gloAssem_mesh_ptr, lsolver, mesh_lsolver, nsolver);
+      locebc, pmat, elementv, elements, quadv, quads, ps_data,
+      locAssem_solid_ptr, gloAssem_ptr, lsolver, nsolver);
 
   // ====== Finalization ======
   delete fNode; delete locIEN;
