@@ -511,9 +511,6 @@ void PNonlinear_Seg_Solver::GenAlpha_Solve_Prestress(
   dot_sol->Copy(*pre_dot_sol);
   dot_sol->ScaleValue( (gamma-1.0)/gamma );
 
-  // Generate the U-P-V step update: dot_step
-  PDNSolution dot_step(*dot_sol);
-
   // Define the dol_sol at alpha_m: dot_sol_alpha
   PDNSolution dot_sol_alpha(*pre_dot_sol);
   dot_sol_alpha.ScaleValue( 1.0 - alpha_m );
@@ -523,6 +520,9 @@ void PNonlinear_Seg_Solver::GenAlpha_Solve_Prestress(
   PDNSolution sol_alpha(*pre_sol);
   sol_alpha.ScaleValue( 1.0 - alpha_f );
   sol_alpha.PlusAX( *sol, alpha_f );
+
+  // Allocate the U-P-V step update: dot_step
+  PDNSolution dot_step(*dot_sol);
 
   // Get the dot_step from the dot_P_V_step only for the solid sub-domain
   dot_step.ScaleValue(0.0);
@@ -574,33 +574,13 @@ void PNonlinear_Seg_Solver::GenAlpha_Solve_Prestress(
     // In fluid we do not need to update the mesh disp by velocity
     // the val_1 * -1.0 is only applied for the solid sub-domain.
     SEG_SOL_T::PlusAiPV( 0.0, -1.0, -1.0, dot_P_V_step, &dot_step );
-    SEG_SOL_T::PlusAiPV( val_1 * (-1.0), 0.0, 0.0, anode_ptr, 
-        dot_P_V_step, &dot_step );
+    SEG_SOL_T::PlusAiPV( val_1 * (-1.0), 0.0, 0.0, anode_ptr, dot_P_V_step, &dot_step );
 
     dot_sol->PlusAX( dot_step, 1.0 );
     sol->PlusAX( dot_step, gamma * dt );
 
     dot_sol_alpha.PlusAX( dot_step, alpha_m );
     sol_alpha.PlusAX( dot_step, alpha_f * gamma * dt );
-
-    // --------------------------------------------------------------
-    // --- (elastic) mesh equation solve
-    gassem_mesh_ptr->Clear_KG();
-    gassem_mesh_ptr->Assem_tangent_residual( pre_sol, sol,
-        curr_time, dt, alelem_ptr, lassem_mesh_ptr, elementv, elements,
-        quad_v, quad_s, lien_ptr, anode_ptr,
-        feanode_ptr, nbc_mesh_part, ebc_mesh_part );
-    lsolver_mesh_ptr->Solve( gassem_mesh_ptr->K, gassem_mesh_ptr->G, mesh_disp ); 
-    bc_mesh_mat -> MatMultSol( mesh_disp );
-
-    // Use mesh disp to update the disp slots in the fluid domain 
-    SEG_SOL_T::UpdateU( -1.0, mesh_disp, sol );
-    SEG_SOL_T::UpdateU( -1.0 * alpha_f, mesh_disp, &sol_alpha );
-    // Update the first three slots of the dot_sol vector in the fluid domain
-    SEG_SOL_T::UpdateV( dt, gamma, pre_dot_sol, pre_sol, sol, dot_sol);
-    SEG_SOL_T::UpdateV( dt, gamma/alpha_m, pre_dot_sol, pre_sol, sol, &dot_sol_alpha);
-    // --- Finish mesh update
-    // --------------------------------------------------------------
 
     // Assembly residual (& tangent) 
     if( nl_counter % nrenew_freq == 0 || nl_counter >= 4 )
