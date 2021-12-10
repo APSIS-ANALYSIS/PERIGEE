@@ -32,7 +32,7 @@
 class PGAssem_Wall_Prestress : public IPGAssem
 {
   public:
-    PGAssem_Wall_Prestress( IPLocAssem * const &locassem_f_ptr,
+    PGAssem_Wall_Prestress(
         IPLocAssem * const &locassem_s_ptr,
         FEAElement * const &elements,
         const IQuadPts * const &quads,
@@ -42,22 +42,19 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const APart_Node * const &pnode_ptr,
         const ALocal_NodalBC * const &part_nbc,
         const ALocal_EBC * const &part_ebc,
-        const IGenBC * const &gbc,
         const int &in_nz_estimate = 60 );
 
     virtual ~PGAssem_Wall_Prestress();
 
     virtual void Assem_nonzero_estimate(
         const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_f_ptr,
         IPLocAssem * const &lassem_s_ptr,
         FEAElement * const &elements,
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
         const ALocal_NodalBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc );
+        const ALocal_EBC * const &ebc_part );
 
     virtual void Assem_residual(
         const PDNSolution * const &dot_sol,
@@ -67,7 +64,6 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const double &curr_time,
         const double &dt,
         const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_f_ptr,
         IPLocAssem * const &lassem_s_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
@@ -78,7 +74,6 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc,
         const Prestress_solid * const &ps_ptr );
 
     virtual void Assem_tangent_residual(
@@ -89,7 +84,6 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const double &curr_time,
         const double &dt,
         const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_f_ptr,
         IPLocAssem * const &lassem_s_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
@@ -100,7 +94,6 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc,
         const Prestress_solid * const &ps_ptr );
 
     // Update the solid prestress at quadrature points
@@ -117,7 +110,7 @@ class PGAssem_Wall_Prestress : public IPGAssem
   private:
     // Private data
     const int nLocBas, dof_sol, dof_mat, num_ebc, nlgn;
-    
+
     int snLocBas;
 
     PetscInt * row_index, * srow_index;

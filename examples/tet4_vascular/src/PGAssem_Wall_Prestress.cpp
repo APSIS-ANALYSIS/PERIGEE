@@ -1,7 +1,6 @@
 #include "PGAssem_Wall_Prestress.hpp"
 
 PGAssem_Wall_Prestress::PGAssem_Wall_Prestress( 
-    IPLocAssem * const &locassem_f_ptr,
     IPLocAssem * const &locassem_s_ptr,
     FEAElement * const &elements,
     const IQuadPts * const &quads,
@@ -11,20 +10,16 @@ PGAssem_Wall_Prestress::PGAssem_Wall_Prestress(
     const APart_Node * const &pnode_ptr,
     const ALocal_NodalBC * const &part_nbc,
     const ALocal_EBC * const &part_ebc,
-    const IGenBC * const &gbc,
     const int &in_nz_estimate )
 : nLocBas( agmi_ptr->get_nLocBas() ),
   dof_sol( pnode_ptr->get_dof() ),
-  dof_mat( locassem_f_ptr->get_dof_mat() ),
+  dof_mat( locassem_s_ptr->get_dof_mat() ),
   num_ebc( part_ebc->get_num_ebc() ),
   nlgn( pnode_ptr -> get_nlocghonode() )
 {
   // Make sure the data structure is compatible
-  SYS_T::print_fatal_if(dof_sol != locassem_f_ptr->get_dof(),
-      "PGAssem_Wall_Prestress::dof_sol != locassem_f_ptr->get_dof(). \n");
-
   SYS_T::print_fatal_if(dof_sol != locassem_s_ptr->get_dof(),
-      "PGAssem_Wall_Prestress::dof_sol != locassem_f_ptr->get_dof(). \n");
+      "PGAssem_Wall_Prestress::dof_sol != locassem_s_ptr->get_dof(). \n");
 
   SYS_T::print_fatal_if(dof_mat != part_nbc->get_dofMat(),
       "PGAssem_Wall_Prestress::dof_mat != part_nbc->get_dofMat(). \n");
@@ -105,8 +100,8 @@ PGAssem_Wall_Prestress::PGAssem_Wall_Prestress(
   }
 
   // Now we run a nonzero estimate trial assembly
-  Assem_nonzero_estimate( alelem_ptr, locassem_f_ptr, locassem_s_ptr, 
-      elements, quads, aien_ptr, pnode_ptr, part_nbc, part_ebc, gbc );
+  Assem_nonzero_estimate( alelem_ptr, locassem_s_ptr, 
+      elements, quads, aien_ptr, pnode_ptr, part_nbc, part_ebc );
 
   // Obtain the precise dnz and onz count
   std::vector<int> Kdnz, Konz;
@@ -312,21 +307,18 @@ void PGAssem_Wall_Prestress::EssBC_G(
 
 void PGAssem_Wall_Prestress::Assem_nonzero_estimate(
     const ALocal_Elem * const &alelem_ptr,
-    IPLocAssem * const &lassem_f_ptr,
     IPLocAssem * const &lassem_s_ptr,
     FEAElement * const &elements,
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
     const APart_Node * const &node_ptr,
     const ALocal_NodalBC * const &nbc_part,
-    const ALocal_EBC * const &ebc_part,
-    const IGenBC * const &gbc )
+    const ALocal_EBC * const &ebc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
   int loc_index, lrow_index, offset1;
 
-  lassem_f_ptr->Assem_Estimate();
   lassem_s_ptr->Assem_Estimate();
 
   for(int e=0; e<nElem; ++e)
@@ -345,14 +337,7 @@ void PGAssem_Wall_Prestress::Assem_nonzero_estimate(
       }
     }
 
-    // If the element is fluid, call fluid local assembly;
-    // otherwise, call solid local assembly
-    if(alelem_ptr->get_elem_tag(e) == 0)
-    {
-      MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
-          lassem_f_ptr->Tangent, ADD_VALUES);
-    }
-    else
+    if(alelem_ptr->get_elem_tag(e) == 1)
     {
       MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
           lassem_s_ptr->Tangent, ADD_VALUES);
@@ -378,7 +363,6 @@ void PGAssem_Wall_Prestress::Assem_residual(
     const double &curr_time,
     const double &dt,
     const ALocal_Elem * const &alelem_ptr,
-    IPLocAssem * const &lassem_f_ptr,
     IPLocAssem * const &lassem_s_ptr,
     FEAElement * const &elementv,
     FEAElement * const &elements,
@@ -389,7 +373,6 @@ void PGAssem_Wall_Prestress::Assem_residual(
     const FEANode * const &fnode_ptr,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
-    const IGenBC * const &gbc,
     const Prestress_solid * const &ps_ptr )
 {
   const int nElem = alelem_ptr->get_nlocalele();
@@ -412,15 +395,8 @@ void PGAssem_Wall_Prestress::Assem_residual(
         row_index[dof_mat*ii+mm] = dof_mat * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
     }
 
-    // If elem tag is zero, do fluid, otherwise, do solid
-    if(alelem_ptr->get_elem_tag(ee) == 0)
-    {
-      lassem_f_ptr->Assem_Residual(curr_time, dt, local_a, local_b,
-          elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
-    
-      VecSetValues(G, loc_dof, row_index, lassem_f_ptr->Residual, ADD_VALUES);
-    }
-    else
+    // If elem tag is one, do solid
+    if(alelem_ptr->get_elem_tag(ee) == 1)
     {
       // For solid element, quaprestress will return a vector of length nqp x 6
       // for the prestress values at the quadrature points
@@ -453,7 +429,6 @@ void PGAssem_Wall_Prestress::Assem_tangent_residual(
     const double &curr_time,
     const double &dt,
     const ALocal_Elem * const &alelem_ptr,
-    IPLocAssem * const &lassem_f_ptr,
     IPLocAssem * const &lassem_s_ptr,
     FEAElement * const &elementv,
     FEAElement * const &elements,
@@ -464,7 +439,6 @@ void PGAssem_Wall_Prestress::Assem_tangent_residual(
     const FEANode * const &fnode_ptr,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
-    const IGenBC * const &gbc,
     const Prestress_solid * const &ps_ptr )
 {
   const int nElem = alelem_ptr->get_nlocalele();
