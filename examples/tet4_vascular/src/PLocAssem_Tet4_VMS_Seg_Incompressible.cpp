@@ -764,8 +764,7 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Residual_EBC(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  //const double factor = time >= 1.0 ? 1.0 : time;
-  const double factor = 0.0;
+  const double factor = 1.0; //time >= 1.0 ? 1.0 : time;
 
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 

@@ -247,8 +247,8 @@ int main( int argc, char *argv[] )
       pNode, locnbc, locebc, nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
-  gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_fluid_ptr,
-      locAssem_solid_ptr, elements, quads, locIEN, pNode, locnbc, locebc, gbc );
+  gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_solid_ptr, elements, 
+      quads, locIEN, pNode, locnbc, locebc );
 
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
   gloAssem_ptr->Fix_nonzero_err_str();
