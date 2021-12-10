@@ -411,6 +411,28 @@ class IPGAssem
     {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
 
+    virtual void Assem_residual(
+        const PDNSolution * const &sol_a,
+        const PDNSolution * const &sol_b,
+        const PDNSolution * const &dot_sol_np1,
+        const PDNSolution * const &sol_np1,
+        const double &curr_time,
+        const double &dt,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_s_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const APart_Node * const &node_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const Prestress_solid * const &ps_ptr )
+    {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
+
+
     // ------------------------------------------------------------------------
     // ! Assem_tangent_residual : assembly tangent matrix and residual vector 
     //                            for 3D problem WITHOUT pre-existing cached 
@@ -584,6 +606,28 @@ class IPGAssem
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
+        const Prestress_solid * const &ps_ptr )
+    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
+
+
+    virtual void Assem_tangent_residual(
+        const PDNSolution * const &sol_a,
+        const PDNSolution * const &sol_b,
+        const PDNSolution * const &dot_sol_np1,
+        const PDNSolution * const &sol_np1,
+        const double &curr_time,
+        const double &dt,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_s_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const APart_Node * const &node_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
         const Prestress_solid * const &ps_ptr )
     {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
