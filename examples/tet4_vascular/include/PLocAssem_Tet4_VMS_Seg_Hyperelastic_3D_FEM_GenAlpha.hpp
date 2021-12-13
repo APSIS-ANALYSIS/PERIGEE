@@ -54,9 +54,9 @@ class PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
+        const double * const &qua_prestress,
         const IQuadPts * const &quad );
 
-    
     virtual void Assem_Tangent_Residual(
         const double &time, const double &dt,
         const double * const &vec_a,
@@ -65,10 +65,22 @@ class PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
+        const double * const &qua_prestress,
         const IQuadPts * const &quad );
 
-    
     virtual void Assem_Mass_Residual(
+        const double * const &vec_b,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const double * const &qua_prestress,
+        const IQuadPts * const &quad );
+
+    virtual void Assem_Residual_EBC(
+        const int &ebc_id,
+        const double &time, const double &dt,
+        const double * const &vec_a,
         const double * const &vec_b,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
@@ -76,12 +88,22 @@ class PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
+    // ------------------------------------------------------------------------
+    // This function will calculate the Cauchy stress at every quadrature points
+    // within this element. The output stress has length nqp, which should equal 
+    // quad -> get_num_quadPts() 
+    // ------------------------------------------------------------------------
+    virtual std::vector<Matrix_3x3> get_Wall_CauchyStress(
+        const double * const &disp,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad ) const;
 
     virtual void Assem_Residual_EBC(
-        const int &ebc_id,
-        const double &time, const double &dt,
-        const double * const &vec_a,
-        const double * const &vec_b,
+        const double &time,
+        const double * const &vec,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -100,7 +122,7 @@ class PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha : public IPLocAssem
 
     // useful tensors for the material model
     IMaterialModel * matmodel;
-    
+
     void print_info() const;
 
     void get_tau( double &tau_m_qua, double &tau_c_qua,

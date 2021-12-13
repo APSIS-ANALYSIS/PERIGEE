@@ -74,9 +74,9 @@ void PDNSolution_U_Mixed_3D::Init_test_2(
     location[1] = location[0] + 1;
     location[2] = location[0] + 2;
 
-    value[0] = SYS_T::gen_randomD_open(0.0, 1.0); 
-    value[1] = SYS_T::gen_randomD_open(0.0, 1.0); 
-    value[2] = SYS_T::gen_randomD_open(0.0, 1.0); 
+    value[0] = MATH_T::gen_randomD_open(0.0, 1.0); 
+    value[1] = MATH_T::gen_randomD_open(0.0, 1.0); 
+    value[2] = MATH_T::gen_randomD_open(0.0, 1.0); 
 
     VecSetValues(solution, 3, location, value, INSERT_VALUES);
   }

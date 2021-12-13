@@ -25,13 +25,9 @@ Part_Tet_FSI::Part_Tet_FSI( const IMesh * const &mesh,
   
   for(int ii=0; ii<nlocalnode; ++ii)
   {
-    const int pos_f = VEC_T::get_pos(node_f, node_loc_original[ii]);
+    if( VEC_T::is_invec(node_f, node_loc_original[ii]) ) node_loc_fluid.push_back(ii);
     
-    if( pos_f >= 0 ) node_loc_fluid.push_back(ii);
-    
-    const int pos_s = VEC_T::get_pos(node_s, node_loc_original[ii]);
-    
-    if( pos_s >= 0 ) node_loc_solid.push_back(ii);
+    if( VEC_T::is_invec(node_s, node_loc_original[ii]) ) node_loc_solid.push_back(ii);
   } 
 
   nlocalnode_fluid = static_cast<int>( node_loc_fluid.size() );

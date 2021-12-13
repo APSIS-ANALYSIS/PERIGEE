@@ -33,7 +33,6 @@ INCLUDE(../../../conf/system_lib_loading.cmake)
 SET( perigee_source ${perigee_SOURCE_DIR}/../../../src )
 # 1. Preprocessor source cpp
 SET( perigee_preprocess_lib_src 
-  ${perigee_source}/System/Sys_Tools.cpp
   ${perigee_source}/System/Vector_3.cpp
   ${perigee_source}/System/Matrix_3x3.cpp
   ${perigee_source}/System/Matrix_double_3by3_Array.cpp
@@ -51,7 +50,6 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Part_Tet_FSI.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet_outflow.cpp
-  ${perigee_source}/Mesh/NodalBC_3D_vtp.cpp
   ${perigee_source}/Mesh/NodalBC_3D_vtu.cpp
   ${perigee_source}/Mesh/NodalBC_3D_inflow.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
@@ -65,11 +63,11 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Global_Part_Reload.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
+  ${perigee_SOURCE_DIR}/../src/NodalBC_3D_FSI.cpp
   )
 
 # 2. Anlysis source cpp
 SET( perigee_analysis_lib_src
-  ${perigee_source}/System/Sys_Tools.cpp
   ${perigee_source}/System/PETSc_Tools.cpp
   ${perigee_source}/System/Matrix_double_3by3_Array.cpp
   ${perigee_source}/System/Matrix_PETSc.cpp
@@ -116,6 +114,7 @@ SET( perigee_analysis_lib_src
   ${perigee_SOURCE_DIR}/../src/PLocAssem_Tet4_FSI_Mesh_Elastostatic.cpp
   ${perigee_SOURCE_DIR}/../src/PGAssem_FSI_FEM.cpp
   ${perigee_SOURCE_DIR}/../src/PGAssem_Seg_FEM.cpp
+  ${perigee_SOURCE_DIR}/../src/PGAssem_Wall_Prestress.cpp
   ${perigee_SOURCE_DIR}/../src/PDNSolution_Mixed_UPV_3D.cpp
   ${perigee_SOURCE_DIR}/../src/PDNSolution_P_V_Mixed_3D.cpp
   ${perigee_SOURCE_DIR}/../src/PDNSolution_U_Mixed_3D.cpp
@@ -167,6 +166,7 @@ INCLUDE(../../../conf/message_compiler_setup.cmake)
 # ===================================================================
 ADD_EXECUTABLE( gmshIO gmsh_process.cpp )
 ADD_EXECUTABLE( preprocess_fsi preprocess_fsi_tets.cpp)
+ADD_EXECUTABLE( wall_tet4_3d wall_tet4_driver.cpp)
 ADD_EXECUTABLE( fsi_tet4_3d fsi_tet4_driver.cpp)
 ADD_EXECUTABLE( prepostproc prepost_tets.cpp)
 
@@ -178,6 +178,7 @@ ADD_EXECUTABLE( vis_fsi_wss vis_fsi_wss.cpp)
 # Link libraries
 TARGET_LINK_LIBRARIES( gmshIO ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( preprocess_fsi ${EXTRA_LINK_LIBS} perigee_preprocess )
+TARGET_LINK_LIBRARIES( wall_tet4_3d ${EXTRA_LINK_LIBS} perigee_analysis )
 TARGET_LINK_LIBRARIES( fsi_tet4_3d ${EXTRA_LINK_LIBS} perigee_analysis )
 TARGET_LINK_LIBRARIES( prepostproc ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( vis_fsi ${EXTRA_LINK_LIBS} perigee_postprocess )

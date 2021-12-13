@@ -85,7 +85,7 @@ void PDNSolution::Gen_random()
   
   for(int ii=0; ii<nlocal; ++ii) 
   {
-    val[ii] = SYS_T::gen_randomD_open(0.0, 1.0);
+    val[ii] = MATH_T::gen_randomD_open(0.0, 1.0);
     idx[ii] = ii;
   }
 

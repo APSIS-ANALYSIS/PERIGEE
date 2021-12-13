@@ -38,12 +38,12 @@ std::string PTime_Seg_Solver::Name_dot_Generator(const int &counter) const
 
 void PTime_Seg_Solver::print_info() const
 {
-  PetscPrintf(PETSC_COMM_WORLD, "----------------------------------------------------------- \n");
-  PetscPrintf(PETSC_COMM_WORLD, "final time: %e \n", final_time);
-  PetscPrintf(PETSC_COMM_WORLD, "solution record frequency : %d \n", sol_record_freq);
-  PetscPrintf(PETSC_COMM_WORLD, "tangent update frequency over time steps: %d \n", renew_tang_freq);
-  PetscPrintf(PETSC_COMM_WORLD, "solution base name: %s \n", pb_name.c_str());
-  PetscPrintf(PETSC_COMM_WORLD, "----------------------------------------------------------- \n");
+  SYS_T::commPrint( "----------------------------------------------------------- \n");
+  SYS_T::commPrint( "final time: %e \n", final_time);
+  SYS_T::commPrint( "solution record frequency : %d \n", sol_record_freq);
+  SYS_T::commPrint( "tangent update frequency over time steps: %d \n", renew_tang_freq);
+  SYS_T::commPrint( "solution base name: %s \n", pb_name.c_str());
+  SYS_T::commPrint( "----------------------------------------------------------- \n");
 }
 
 
@@ -120,7 +120,7 @@ void PTime_Seg_Solver::TM_ALE_NS_GenAlpha(
 
   bool rest_flag = restart_init_assembly_flag;
 
-  PetscPrintf(PETSC_COMM_WORLD, "Time = %e, dt = %e, index = %d, %s \n",
+  SYS_T::commPrint( "Time = %e, dt = %e, index = %d, %s \n",
       time_info->get_time(), time_info->get_step(), time_info->get_index(),
       SYS_T::get_time().c_str());
 
@@ -229,6 +229,7 @@ void PTime_Seg_Solver::TM_FSI_GenAlpha(
     FEAElement * const &elements,
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
+    const Prestress_solid * const &ps_ptr,
     IPLocAssem * const &lassem_fluid_ptr,
     IPLocAssem * const &lassem_solid_ptr,
     IPLocAssem * const &lassem_mesh_ptr,
@@ -243,16 +244,13 @@ void PTime_Seg_Solver::TM_FSI_GenAlpha(
   PDNSolution * pre_velo = new PDNSolution(*init_velo);
   PDNSolution * cur_velo = new PDNSolution(*init_velo);
 
-  std::string sol_name ("");
-  std::string sol_dot_name (""); 
-
   // Do not overwrite solution if this is a restart 
   if( restart_init_assembly_flag == false )
   {
-    sol_name = Name_Generator(time_info->get_index());
+    const std::string sol_name = Name_Generator(time_info->get_index());
     cur_disp->WriteBinary(sol_name.c_str());
 
-    sol_dot_name = Name_dot_Generator(time_info->get_index());
+    const std::string sol_dot_name = Name_dot_Generator(time_info->get_index());
     cur_velo->WriteBinary(sol_dot_name.c_str());
   }
 
@@ -260,6 +258,10 @@ void PTime_Seg_Solver::TM_FSI_GenAlpha(
   int nl_counter;
 
   bool rest_flag = restart_init_assembly_flag;
+
+  SYS_T::commPrint( "Time = %e, dt = %e, index = %d, %s \n",
+      time_info->get_time(), time_info->get_step(), time_info->get_index(),
+      SYS_T::get_time().c_str() );
 
   while( time_info->get_time() < final_time )
   {
@@ -270,27 +272,31 @@ void PTime_Seg_Solver::TM_FSI_GenAlpha(
     }
     else renew_flag = false;
 
+    // If the previous step is solved in ONE Newton iteration, we do not update
+    // the tangent matrix
+    if( nl_counter == 1 ) renew_flag = false;
+
     nsolver_ptr->GenAlpha_Seg_solve_FSI( renew_flag, time_info->get_time(),
         time_info->get_step(), sol_base, pre_velo, pre_disp, tmga_ptr, flr_ptr,
         alelem_ptr, lien_ptr, anode_ptr, feanode_ptr, nbc_part, infnbc_part,
         nbc_mesh_part, ebc_part, ebc_mesh_part, gbc, bc_mat, bc_mesh_mat, 
-        elementv, elements, quad_v, quad_s, lassem_fluid_ptr,
+        elementv, elements, quad_v, quad_s, ps_ptr, lassem_fluid_ptr,
         lassem_solid_ptr, lassem_mesh_ptr,
         gassem_ptr, gassem_mesh_ptr, lsolver_ptr, lsolver_mesh_ptr,
         cur_velo, cur_disp, conv_flag, nl_counter );
 
     time_info->TimeIncrement();
 
-    PetscPrintf(PETSC_COMM_WORLD, "Time = %e, dt = %e, index = %d, %s \n",
+    SYS_T::commPrint( "Time = %e, dt = %e, index = %d, %s \n",
         time_info->get_time(), time_info->get_step(), time_info->get_index(),
         SYS_T::get_time().c_str() );
 
     if( time_info->get_index()%sol_record_freq == 0)
     {
-      sol_name = Name_Generator( time_info->get_index() );
+      const std::string sol_name = Name_Generator( time_info->get_index() );
       cur_disp->WriteBinary(sol_name.c_str());
 
-      sol_dot_name = Name_dot_Generator(time_info->get_index());
+      const std::string sol_dot_name = Name_dot_Generator(time_info->get_index());
       cur_velo->WriteBinary(sol_dot_name.c_str());
     }
 
@@ -356,6 +362,87 @@ void PTime_Seg_Solver::TM_FSI_GenAlpha(
     // Prepare for the next time step
     pre_disp->Copy(*cur_disp);
     pre_velo->Copy(*cur_velo);
+  }
+
+  delete pre_disp; delete cur_disp; delete pre_velo; delete cur_velo;
+}
+
+
+void PTime_Seg_Solver::TM_FSI_Prestress(
+    const bool &is_record_sol_flag,
+    const double &prestress_tol, 
+    const PDNSolution * const &init_velo,
+    const PDNSolution * const &init_disp,
+    const TimeMethod_GenAlpha * const &tmga_ptr,
+    PDNTimeStep * const &time_info,
+    const ALocal_Elem * const &alelem_ptr,
+    const ALocal_IEN * const &lien_ptr,
+    const APart_Node * const &anode_ptr,
+    const FEANode * const &feanode_ptr,
+    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_part,
+    const Matrix_PETSc * const &bc_mat,
+    FEAElement * const &elementv,
+    FEAElement * const &elements,
+    const IQuadPts * const &quad_v,
+    const IQuadPts * const &quad_s,
+    Prestress_solid * const &ps_ptr,
+    IPLocAssem * const &lassem_solid_ptr,
+    IPGAssem * const &gassem_ptr,
+    PLinear_Solver_PETSc * const &lsolver_ptr,
+    PNonlinear_Seg_Solver * const &nsolver_ptr ) const
+{
+  PDNSolution * pre_disp = new PDNSolution(*init_disp);
+  PDNSolution * cur_disp = new PDNSolution(*init_disp);
+  PDNSolution * pre_velo = new PDNSolution(*init_velo);
+  PDNSolution * cur_velo = new PDNSolution(*init_velo);
+
+  bool prestress_conv_flag = false, renew_flag;
+  int nl_counter = nsolver_ptr -> get_non_max_its();
+
+  SYS_T::commPrint( "Time = %e, dt = %e, index = %d, %s \n",
+      time_info->get_time(), time_info->get_step(), time_info->get_index(),
+      SYS_T::get_time().c_str() );
+
+  while( time_info->get_time() < final_time && !prestress_conv_flag )
+  {
+    if(time_info->get_index() % renew_tang_freq == 0) renew_flag = true;
+    else renew_flag = false;
+
+    // If the previous step is solved in ONE Newton iteration, we do not update
+    // the tangent matrix
+    if( nl_counter == 1 ) renew_flag = false;
+
+    // nullify the solid solution
+    SEG_SOL_T::Insert_zero_solid_UV( anode_ptr, pre_velo ); 
+    SEG_SOL_T::Insert_zero_solid_UV( anode_ptr, pre_disp ); 
+    SEG_SOL_T::Insert_zero_solid_UV( anode_ptr, cur_velo ); 
+    SEG_SOL_T::Insert_zero_solid_UV( anode_ptr, cur_disp ); 
+    
+    nsolver_ptr->GenAlpha_Solve_Prestress( renew_flag, prestress_tol, time_info->get_time(),
+        time_info->get_step(), pre_velo, pre_disp, tmga_ptr,
+        alelem_ptr, lien_ptr, anode_ptr, feanode_ptr, nbc_part,
+        ebc_part, bc_mat, elementv, elements, quad_v, quad_s, ps_ptr,
+        lassem_solid_ptr, gassem_ptr, lsolver_ptr,
+        cur_velo, cur_disp, prestress_conv_flag, nl_counter );
+    
+    time_info->TimeIncrement();
+
+    SYS_T::commPrint( "Time = %e, dt = %e, index = %d, %s \n",
+        time_info->get_time(), time_info->get_step(), time_info->get_index(),
+        SYS_T::get_time().c_str() );
+
+    if( is_record_sol_flag && time_info->get_index()%sol_record_freq == 0)
+    {
+      const std::string sol_name = Name_Generator( time_info->get_index() );
+      cur_disp->WriteBinary(sol_name.c_str());
+
+      const std::string sol_dot_name = Name_dot_Generator(time_info->get_index());
+      cur_velo->WriteBinary(sol_dot_name.c_str());
+    }
+
+    // Prepare for the next time step
+    pre_disp->Copy(*cur_disp); pre_velo->Copy(*cur_velo);
   }
 
   delete pre_disp; delete cur_disp; delete pre_velo; delete cur_velo;

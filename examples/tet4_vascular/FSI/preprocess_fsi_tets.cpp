@@ -21,7 +21,7 @@
 #include "Global_Part_Serial.hpp"
 #include "Global_Part_Reload.hpp"
 #include "Part_Tet_FSI.hpp"
-#include "NodalBC_3D_vtp.hpp"
+#include "NodalBC_3D_FSI.hpp"
 #include "NodalBC_3D_vtu.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_tet_outflow.hpp"
@@ -36,8 +36,8 @@ int main( int argc, char * argv[] )
   SYS_T::execute("mkdir apart");
 
   // Define basic settings
-  const int dofNum = 7; // degree-of-freedom for the physical problem
-  const int dofMat = 4; // degree-of-freedom in the matrix problem
+  const int dofNum = 7;     // degree-of-freedom for the physical problem
+  const int dofMat = 4;     // degree-of-freedom in the matrix problem
   const int elemType = 501; // first order simplicial element
 
   // Input files
@@ -50,6 +50,8 @@ int main( int argc, char * argv[] )
   std::string sur_f_file_in_base( "./lumen_inlet_vol_" );
   std::string sur_f_file_out_base("./lumen_outlet_vol_");
 
+  std::string sur_s_file_interior_wall("./tissue_interior_wall_vol.vtp");
+
   std::string sur_s_file_wall("./tissue_wall_vol.vtp");
   std::string sur_s_file_in_base( "./tissue_inlet_vol_" );
   std::string sur_s_file_out_base("./tissue_outlet_vol_");
@@ -58,6 +60,13 @@ int main( int argc, char * argv[] )
 
   const std::string part_file("./apart/part");
 
+  // fsiBC_type : 0 deformable wall, 1 rigid wall
+  int fsiBC_type = 0;
+
+  // ringBC_type : 0 fully clamped, 1 in-plane motion allowed
+  int ringBC_type = 0;
+
+  // Mesh partition setting
   int cpu_size = 1;
   int in_ncommon = 2;
   const bool isDualGraph = true;
@@ -68,10 +77,12 @@ int main( int argc, char * argv[] )
 
   SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: preprocessor needs to be run in serial.\n");
 
-  SYS_T::GetOptionInt("-cpu_size",               cpu_size);
-  SYS_T::GetOptionInt("-in_ncommon",             in_ncommon);
-  SYS_T::GetOptionInt("-num_outlet",             num_outlet);
-  SYS_T::GetOptionInt("-num_inlet",              num_inlet);
+  SYS_T::GetOptionInt(   "-cpu_size",            cpu_size);
+  SYS_T::GetOptionInt(   "-in_ncommon",          in_ncommon);
+  SYS_T::GetOptionInt(   "-fsiBC_type",          fsiBC_type);
+  SYS_T::GetOptionInt(   "-ringBC_type",         ringBC_type);
+  SYS_T::GetOptionInt(   "-num_outlet",          num_outlet);
+  SYS_T::GetOptionInt(   "-num_inlet",           num_inlet);
   SYS_T::GetOptionString("-geo_file",            geo_file);
   SYS_T::GetOptionString("-geo_f_file",          geo_f_file);
   SYS_T::GetOptionString("-geo_s_file",          geo_s_file);
@@ -83,7 +94,12 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionString("-sur_s_file_out_base", sur_s_file_out_base);
   SYS_T::GetOptionBool("-isReload",              isReload);
 
+  SYS_T::print_fatal_if( fsiBC_type != 0 && fsiBC_type != 1 && fsiBC_type != 2, "Error: fsiBC_type should be 0, 1, or 2.\n" );
+  SYS_T::print_fatal_if( ringBC_type != 0 && ringBC_type != 1, "Error: ringBC_type should be 0 or 1.\n" );
+
   std::cout<<"===== Command Line Arguments ====="<<std::endl;
+  std::cout<<" -fsiBC_type: "         <<fsiBC_type         <<std::endl;
+  std::cout<<" -ringBC_type: "        <<ringBC_type        <<std::endl;
   std::cout<<" -num_inlet: "          <<num_inlet          <<std::endl;
   std::cout<<" -num_outlet: "         <<num_outlet         <<std::endl;
   std::cout<<" -geo_file: "           <<geo_file           <<std::endl;
@@ -164,6 +180,8 @@ int main( int argc, char * argv[] )
   cmdh5w->write_intScalar("dofNum",           dofNum);
   cmdh5w->write_intScalar("dofMat",           dofMat);
   cmdh5w->write_intScalar("elemType",         elemType);
+  cmdh5w->write_intScalar("fsiBC_type",       fsiBC_type);
+  cmdh5w->write_intScalar("ringBC_type",      ringBC_type);
   cmdh5w->write_string("geo_file",            geo_file);
   cmdh5w->write_string("geo_f_file",          geo_f_file);
   cmdh5w->write_string("geo_s_file",          geo_s_file);
@@ -182,8 +200,7 @@ int main( int argc, char * argv[] )
 
   // Read the geometry file for the whole FSI domain
   int nFunc, nElem;
-  std::vector<int> vecIEN;
-  std::vector<int> phy_tag;
+  std::vector<int> vecIEN, phy_tag;
   std::vector<double> ctrlPts;
 
   TET_T::read_vtu_grid( geo_file, nFunc, nElem, ctrlPts, vecIEN, phy_tag );
@@ -216,9 +233,6 @@ int main( int argc, char * argv[] )
   VEC_T::sort_unique_resize( node_f );
   VEC_T::sort_unique_resize( node_s );
 
-  std::cout<<'\n'<<"Fluid domain number of nodes: "<<node_f.size()<<'\n';
-  std::cout<<"Solid domain number of nodes: "<<node_s.size()<<'\n';
-
   // Check the mesh
   TET_T::tetmesh_check(ctrlPts, IEN, nElem, 3.5);
 
@@ -226,6 +240,9 @@ int main( int argc, char * argv[] )
   IMesh * mesh = new Mesh_Tet4(nFunc, nElem);
   mesh -> print_info();
 
+  std::cout<<"Fluid domain: "<<node_f.size()<<" nodes."<<'\n';
+  std::cout<<"Solid domain: "<<node_s.size()<<" nodes."<<'\n';
+  
   // Partition
   IGlobal_Part * global_part = nullptr;
   if( isReload ) global_part = new Global_Part_Reload( cpu_size, in_ncommon, isDualGraph );
@@ -235,33 +252,26 @@ int main( int argc, char * argv[] )
       global_part = new Global_Part_METIS( cpu_size, in_ncommon, isDualGraph, mesh, IEN );
     else if(cpu_size == 1)
       global_part = new Global_Part_Serial( mesh );
-    else
-    {
-      std::cerr<<"ERROR: wrong cpu_size: "<<cpu_size<<std::endl;
-      exit(EXIT_FAILURE);
-    }
+    else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
   }
 
-  Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, mesh->get_nFunc());
+  // Generate the new nodal numbering based on the partitioning
+  Map_Node_Index * mnindex = new Map_Node_Index( global_part, cpu_size, mesh->get_nFunc() );
   mnindex->write_hdf5("node_mapping");
 
   // ----------------------------------------------------------------
   // Setup boundary conditions
-  // Physics NBC
-  std::cout<<"Boundary condition for the implicit solver: \n";
+  // Physical NodalBC
+  std::cout<<"===== Boundary Conditions =====\n";
+  std::cout<<"1. Nodal boundary condition for the implicit solver: \n";
   std::vector<INodalBC *> NBC_list( dofMat, nullptr );
 
-  std::vector<std::string> dir_list = sur_f_file_in;
-  VEC_T::insert_end(dir_list, sur_s_file_in );
-  VEC_T::insert_end(dir_list, sur_s_file_out );
+  for( int ii=0; ii<dofMat; ++ii )
+    NBC_list[ii] = new NodalBC_3D_FSI( geo_f_file, geo_s_file, sur_f_file_wall, sur_s_file_wall,
+        sur_f_file_in, sur_f_file_out, sur_s_file_in, sur_s_file_out, nFunc, ii, ringBC_type, fsiBC_type );
 
-  NBC_list[0] = new NodalBC_3D_vtp( nFunc );
-  NBC_list[1] = new NodalBC_3D_vtp( dir_list, nFunc );
-  NBC_list[2] = new NodalBC_3D_vtp( dir_list, nFunc );
-  NBC_list[3] = new NodalBC_3D_vtp( dir_list, nFunc );
-
-  // Mesh NBC
-  std::cout<<"Boundary condition for the mesh motion: \n";
+  // Mesh solver NodalBC
+  std::cout<<"2. Nodal boundary condition for the mesh motion: \n";
   std::vector<INodalBC *> meshBC_list( 3, nullptr );
 
   std::vector<std::string> meshdir_vtp_list = sur_f_file_in;
@@ -271,28 +281,36 @@ int main( int argc, char * argv[] )
   meshBC_list[1] = new NodalBC_3D_vtu( geo_s_file, meshdir_vtp_list, nFunc );
   meshBC_list[2] = new NodalBC_3D_vtu( geo_s_file, meshdir_vtp_list, nFunc );
 
-  // Generate inflow bc info
+  // InflowBC info
+  std::cout<<"3. Inflow cap surfaces: \n";
   std::vector<Vector_3> inlet_outvec( num_inlet );
   for(int ii=0; ii<num_inlet; ++ii)
     inlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_in[ii], ctrlPts, IEN );
 
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_f_file_in, sur_f_file_wall, nFunc, inlet_outvec ); 
 
-  // Elemental BC
-  cout<<"Elem boundary for the implicit solver: \n";
+  // Physical ElemBC
+  cout<<"4. Elem boundary for the implicit solver: \n";
   std::vector< Vector_3 > outlet_outvec( num_outlet );
 
   for(int ii=0; ii<num_outlet; ++ii)
     outlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_out[ii], ctrlPts, IEN );
 
-  ElemBC * ebc = new ElemBC_3D_tet_outflow( sur_f_file_out, outlet_outvec );
+  ElemBC * ebc = nullptr; 
+  if( fsiBC_type == 0 || fsiBC_type == 1 )
+    ebc = new ElemBC_3D_tet_outflow( sur_f_file_out, outlet_outvec );
+  else if( fsiBC_type == 2 )
+    ebc = new ElemBC_3D_tet( sur_s_file_interior_wall ); 
+  else SYS_T::print_fatal("ERROR: uncognized fsiBC type. \n");
 
-  ebc -> resetTriIEN_outwardnormal( IEN ); // assign orientation
+  ebc -> resetTriIEN_outwardnormal( IEN ); // assign outward orientation for triangles
 
-  // Mesh EBC
+  // Mesh solver ElemBC
+  cout<<"5. Elem boundary for the mesh solver: \n";
   std::vector<std::string> mesh_ebclist;
   mesh_ebclist.clear();
   ElemBC * mesh_ebc = new ElemBC_3D_tet( mesh_ebclist );
+  std::cout<<"=================================\n";
   // ----------------------------------------------------------------
 
   const bool isPrintPartInfo = true;
@@ -328,11 +346,23 @@ int main( int argc, char * argv[] )
     NBC_Partition_inflow * infpart = new NBC_Partition_inflow(part, mnindex, InFBC);
     infpart->write_hdf5( part_file );
 
-    EBC_Partition_outflow * ebcpart = new EBC_Partition_outflow(part, mnindex, ebc, NBC_list);
-    ebcpart -> write_hdf5( part_file );
+    if( fsiBC_type == 0 || fsiBC_type == 1 )
+    {
+      EBC_Partition_outflow * ebcpart = new EBC_Partition_outflow(part, mnindex, ebc, NBC_list);
+      ebcpart -> write_hdf5( part_file );
+      delete ebcpart;
+    }
+    else if( fsiBC_type == 2 )
+    {
+      EBC_Partition * ebcpart = new EBC_Partition( part, mnindex, ebc );
+      ebcpart -> write_hdf5( part_file );
+      delete ebcpart;
+    }
+    else SYS_T::print_fatal("ERROR: uncognized fsiBC type. \n");
 
     EBC_Partition * mebcpart = new EBC_Partition(part, mnindex, mesh_ebc);
-    mebcpart-> write_hdf5( part_file, "/mesh_ebc");
+    
+    mebcpart-> write_hdf5( part_file, "/mesh_ebc" );
 
     list_nlocalnode.push_back(part->get_nlocalnode());
     list_nghostnode.push_back(part->get_nghostnode());
@@ -341,7 +371,7 @@ int main( int argc, char * argv[] )
     list_ratio_g2l.push_back((double)part->get_nghostnode()/(double) part->get_nlocalnode());
 
     sum_nghostnode += part->get_nghostnode();
-    delete part; delete nbcpart; delete infpart; delete ebcpart;
+    delete part; delete nbcpart; delete infpart;
     delete mbcpart; delete mebcpart;
   }
 

@@ -24,8 +24,9 @@ int main( int argc, char * argv[] )
 
   GIO -> write_vtp(0,0,true);
   GIO -> write_vtp(1,0,true);
-  GIO -> write_vtp(2,0);
-  
+  GIO -> write_vtp(2,0,true);
+
+  GIO -> write_vtp(2,1,true);
   GIO -> write_vtp(3,1);
   GIO -> write_vtp(4,1);
   GIO -> write_vtp(5,1);

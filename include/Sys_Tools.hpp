@@ -1,12 +1,12 @@
 #ifndef SYS_TOOLS_HPP
 #define SYS_TOOLS_HPP
-// ==================================================================
+// ============================================================================
 // Sys_Tools.hpp
-// ------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // The SYS_T namespace contains a suite of tools at the system level.
 //
-// These functions will be frequently used in the PERIGEE code.
-// ==================================================================
+// Author: Ju Liu
+// ============================================================================
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
@@ -15,13 +15,11 @@
 #include <vector>
 #include <ctime>
 #include <iomanip>
+#include <sys/stat.h>
 #include "petsc.h"
 
 namespace SYS_T
 {
-  // Print ASCII art
-  void print_perigee_art();
-
   // Return the rank of the CPU
   inline PetscMPIInt get_MPI_rank()
   {
@@ -38,11 +36,10 @@ namespace SYS_T
     return size;
   }
 
-  // ----------------------------------------------------------------
-  // gen_partfile_name( baseName, rank )
-  // Generate a partition file's name (hdf5 file) in the default
-  // manner. It will return baseName_pxxxxx.h5.
-  // ----------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  // ! gen_partfile_name( baseName, rank )
+  //   Generate a partition file's name (hdf5 file) in the form baseName_pxxxxx.h5.
+  // --------------------------------------------------------------------------
   inline std::string gen_partfile_name( const std::string &baseName, 
       const int &rank )
   {
@@ -62,11 +59,10 @@ namespace SYS_T
     return ss.str();
   }
 
-  // ----------------------------------------------------------------
-  // gen_capfile_name
-  // Generate a file (usually for cap surfaces) in the format
-  // baseName_xxx.vtp(vtu)
-  // ----------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  // ! gen_capfile_name
+  //   Generate a file (usually for cap surfaces) in the form baseName_xxx.vtp(vtu)
+  // --------------------------------------------------------------------------
   inline std::string gen_capfile_name( const std::string &baseName,
       const int &index, const std::string &filename )
   {
@@ -77,65 +73,13 @@ namespace SYS_T
     else if( index/100 == 0 ) ss<<"0";
 
     ss<<index<<filename;
-    
+
     return ss.str();
   }
 
-  // ----------------------------------------------------------------
-  // Assume ii = iz * dim_x * dim_y + iy * dim_x + ix
-  // this function will return ix iy and iz based on the input ii, 
-  // dim_x, dim_y.
-  // ----------------------------------------------------------------
-  inline void get_xyz_index( const int &ii, const int &dim_x, const int &dim_y, 
-      int &ix, int &iy, int &iz)
-  {
-    const int ixy = ii % (dim_x * dim_y);
-    iz = (ii - ixy) / (dim_x * dim_y);
-    ix = ixy % dim_x; iy = (ixy - ix) / dim_x;
-  }
-
-  // ----------------------------------------------------------------
-  // Assume ii = iy * dim_x + ix;
-  // this function will return ix and iy based on the input ii and dim_x.
-  // ----------------------------------------------------------------
-  inline void get_xy_index( const int &ii, const int &dim_x, int &ix, int &iy)
-  {
-    ix = ii % dim_x;
-    iy = (ii-ix)/dim_x;
-  }
-
-  // ----------------------------------------------------------------
-  // gen_random()
-  // Generate a random double in [min, max] domain for _closed; 
-  // (min, max) for open.
-  // Gernerate a random int in [min, max] domain.
-  // NOTE: Users have to call srand(time(NULL)) before calling the 
-  //       following three gen functions.
-  // E.G.: srand(time(NULL));
-  //       for-loop
-  //       {gen_randomD_xxx(...); ...}
-  // ----------------------------------------------------------------
-  double gen_randomD_closed( const double &min, const double &max );
-
-  double gen_randomD_open( const double &min, const double &max );
-
-  int gen_randomI_closed( const int &min, const int &max );
-
-  // ----------------------------------------------------------------
+  // --------------------------------------------------------------------------
   // print size based on bytes
-  // ----------------------------------------------------------------
-  template<typename T> void print_mem_size( const T &byte_size )
-  {
-    if(byte_size > 1.0e9)
-      std::cout<<double(byte_size)/1.0e9<<" GB.";
-    else if(byte_size > 1.0e6)
-      std::cout<<double(byte_size)/1.0e6<<" MB.";
-    else if(byte_size > 1.0e3)
-      std::cout<<double(byte_size)/1.0e3<<" KB";
-    else
-      std::cout<<byte_size<<" Bytes.";
-  }
-
+  // --------------------------------------------------------------------------
   template<typename T> std::string get_string_mem_size( const T &byte_size )
   {
     std::ostringstream ss;
@@ -150,24 +94,11 @@ namespace SYS_T
     return ss.str();
   }
 
-  // ----------------------------------------------------------------
-  // to_string functions : convert numeric values to string 
-  // Note: std::to_string is implemented in string in C++ 11.
-  // ----------------------------------------------------------------
-  inline std::string to_string( const int &a )
+  template<typename T> void print_mem_size( const T &byte_size )
   {
-    std::ostringstream ss;
-    ss<<a;
-    return ss.str();
+    std::cout<<get_string_mem_size( byte_size );
   }
-
-  inline std::string to_string( const double &a )
-  {
-    std::ostringstream ss;
-    ss<<a;
-    return ss.str();
-  }
-
+  
   // to get a non-constant (i.e. writable) char array from a string, 
   // use &b[0]. Note: string.c_str() returns a const char array.
   inline void to_char( const std::string &a, std::vector<char> &b )
@@ -238,17 +169,7 @@ namespace SYS_T
   inline void cmdPrint(const char * const &dataname, const std::string &datavalue)
   {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, ss.str().c_str());}
 
-  // 4. Print specific system message
-  inline void synPrintElementInfo(int nlocalele, double memspace, 
-      double totaltime, PetscMPIInt rank)
-  {
-    std::string memusage = get_string_mem_size(memspace);
-    std::ostringstream ss; ss<<nlocalele<<" elements cached, "<<totaltime<<
-      " secs and "<<memusage<<std::endl;
-    synPrint(ss.str(), rank);
-  }
-
-  // 5. Print fatal error message and terminate the MPI process
+  // 4. Print fatal error message and terminate the MPI process
   inline void print_fatal( const char output[], ... )
   {
     if( !get_MPI_rank() )
@@ -280,7 +201,7 @@ namespace SYS_T
     }
   }
 
-  // 6. Print message (without termination the code) under conditions
+  // 5. Print message (without termination the code) under conditions
   inline void print_message_if( bool a, const char output[], ... )
   {
     if( a )
@@ -297,8 +218,8 @@ namespace SYS_T
     }
   }
 
-  // exit message printers are used in terminating serial program when 
-  // the communicator for MPI is not available.
+  // 6. Print exit message printers are used in terminating serial 
+  //    program when the communicator for MPI is not available.
   inline void print_exit( const char * const &mesg )
   {
     std::cout<<mesg<<std::endl;
@@ -321,61 +242,39 @@ namespace SYS_T
     if( a ) print_exit(mesg);
   }
 
-  // 7. Print data on screen
-  template<typename T> void print_array_in_2D( const T * const arr, 
-      const int &nrow, const int &ncol )
-  {
-    for(int ii = 0; ii < nrow; ++ii)
-    {
-      for(int jj = 0; jj < ncol; ++jj)
-        std::cout << std::scientific << std::setprecision(3) << std::setw(10) << arr[ii * ncol + jj] << " ";
-      
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
-  }
-
-  // =================================================================
-  // The followings are system function to monitor system memory usages 
-  // dynamically.
-  // Note: Before calling the following four functions, the user need to call 
-  // PetscMemorySetGetMaximumUsage() immediately after PetscInitialize.
-  // =================================================================
-  // -----------------------------------------------------------------
-  // 1. Print the Maximum memory used for the program. The usage is
-  //    reduced to CPU 0 by MPI_SUM.
-  // -----------------------------------------------------------------
-  void print_MaxMemUsage();
-
-  // ----------------------------------------------------------------
-  // 2. Print the Current memory used for the program. The usage is 
-  //    reduced to CPU 0 by MPI_SUM.  
-  // ----------------------------------------------------------------
-  void print_CurMemUsage();
-
-  // ----------------------------------------------------------------
-  // 3. Print the Maximum space PETSc has allocated. This function 
-  //    should be used with the command line argument -malloc
-  // ----------------------------------------------------------------
-  void print_MaxMallocUsage();
-
-  // ----------------------------------------------------------------
-  // 4. Print the Current space PETSc has allocated. This function 
-  //    should be used with the command line argument -malloc
-  // ----------------------------------------------------------------
-  void print_CurMallocUsage();
-
   // ================================================================
   // The following are system functions that access the system info.
   // ================================================================
   // 1. get_time: return the present time as HH:MM:SS
   // ----------------------------------------------------------------
-  std::string get_time();
+  inline std::string get_time()
+  {
+    std::time_t  time1= std::time (0);
+    std::tm     *time = std::localtime(&time1);
+
+    std::ostringstream o;
+    o << time->tm_hour << ":"
+      << (time->tm_min < 10 ? "0" : "") << time->tm_min << ":"
+      << (time->tm_sec < 10 ? "0" : "") << time->tm_sec;
+
+    return o.str();
+  }
 
   // ----------------------------------------------------------------
   // 2. get_date: return the present date as YYYY/MM/DD
   // ----------------------------------------------------------------
-  std::string get_date();
+  inline std::string get_date()
+  {
+    std::time_t  time1= std::time (0);
+    std::tm     *time = std::localtime(&time1);
+
+    std::ostringstream o;
+    o << time->tm_year + 1900 << "/"
+      << time->tm_mon + 1 << "/"
+      << time->tm_mday;
+
+    return o.str();
+  }
 
   // ----------------------------------------------------------------
   // 3. Structure that holds information about memory usage in kB.
@@ -394,7 +293,33 @@ namespace SYS_T
   // 4. get_memory_stats(): fills the MemoryStats structure with info
   //    about the memory consumption of this process. Only for Linux.
   // ----------------------------------------------------------------
-  void get_memory_stats( MemoryStats &stats );
+  inline void get_memory_stats( MemoryStats &stats )
+  {
+    stats.VmPeak = stats.VmSize = stats.VmHWM = stats.VmRSS = 0;
+
+#if defined(__linux__)
+    std::ifstream file("/proc/self/status");
+    std::string line;
+    std::string name;
+    while (!file.eof())
+    {
+      file >> name;
+      if (name == "VmPeak:")
+        file >> stats.VmPeak;
+      else if (name == "VmSize:")
+        file >> stats.VmSize;
+      else if (name == "VmHWM:")
+        file >> stats.VmHWM;
+      else if (name == "VmRSS:")
+      {
+        file >> stats.VmRSS;
+        break; //this is always the last entry
+      }
+
+      getline(file, line);
+    }
+#endif
+  }
 
   // ================================================================
   // The folowing are options-get functions that read command-line
@@ -463,6 +388,18 @@ namespace SYS_T
     else return false;
   }
 
+  inline bool directory_exist( const std::string &dName )
+  {
+    if (dName.empty() || dName == "" || dName == "/0")
+      return true;
+    
+    struct stat info;
+    if (stat(dName.c_str(), &info) == 0)
+      return true;
+
+    return false;
+  }
+
   inline void file_check( const std::string &fName )
   {
     print_fatal_if( !file_exist(fName), 
@@ -485,23 +422,47 @@ namespace SYS_T
   class Timer
   {
     public:
-      Timer();
+      Timer() { startedAt = 0; stoppedAt = 0; }
 
-      ~Timer();
+      ~Timer() {};
 
-      void Start();
+      void Start() {startedAt = clock();}
 
-      void Stop();
+      void Stop() {stoppedAt = clock();}
 
-      void Reset();
+      void Reset() { startedAt = 0; stoppedAt = 0; }
 
-      double get_sec() const;
+      double get_sec() const
+      {
+        return (double)(stoppedAt - startedAt)/(double)CLOCKS_PER_SEC;
+      }
 
     private:
-      clock_t startedAt;
-      clock_t stoppedAt;
+      clock_t startedAt, stoppedAt;
   };
 
+  // Print ASCII art text for the code
+  inline void print_perigee_art()
+  {
+    commPrint("$$$$$$$\\  $$$$$$$$\\ $$$$$$$\\  $$$$$$\\  $$$$$$\\  $$$$$$$$\\ $$$$$$$$\\ \n");
+    commPrint("$$  __$$\\ $$  _____|$$  __$$\\ \\_$$  _|$$  __$$\\ $$  _____|$$  _____| \n");
+    commPrint("$$ |  $$ |$$ |      $$ |  $$ |  $$ |  $$ /  \\__|$$ |      $$ | \n");
+    commPrint("$$$$$$$  |$$$$$\\    $$$$$$$  |  $$ |  $$ |$$$$\\ $$$$$\\    $$$$$\\ \n");
+    commPrint("$$  ____/ $$  __|   $$  __$$<   $$ |  $$ |\\_$$ |$$  __|   $$  __| \n");
+    commPrint("$$ |      $$ |      $$ |  $$ |  $$ |  $$ |  $$ |$$ |      $$ | \n");
+    commPrint("$$ |      $$$$$$$$\\ $$ |  $$ |$$$$$$\\ \\$$$$$$  |$$$$$$$$\\ $$$$$$$$\\ \n");
+    commPrint("\\__|      \\________|\\__|  \\__|\\______| \\______/ \\________|\\________| \n \n");
+  }
+
+  inline void print_sep_line()
+  {
+    commPrint("----------------------------------------------------------------------\n");
+  }
+  
+  inline void print_sep_double_line()
+  {
+    commPrint("======================================================================\n");
+  }
 }
 
 #endif

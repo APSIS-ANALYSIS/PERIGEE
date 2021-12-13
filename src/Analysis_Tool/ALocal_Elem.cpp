@@ -28,6 +28,24 @@ ALocal_Elem::~ALocal_Elem()
   VEC_T::clean(elem_tag);
 }
 
+int ALocal_Elem::get_nlocalele( const int &tag_val ) const
+{
+  if( isTagged )
+  {
+    int counter = 0;
+    for(int ee=0; ee<nlocalele; ++ee)
+    {
+      if( elem_tag[ee] == tag_val) counter += 1;
+    }
+    return counter;
+  }
+  else
+  {
+    SYS_T::print_fatal("Error: ALocal_Elem::get_nlocalele with input tag value should be called when isTagged = true. \n");
+    return -1;
+  }
+}
+
 void ALocal_Elem::print_info() const
 {
   std::cout<<"nlocalelem: "<<nlocalele<<std::endl;

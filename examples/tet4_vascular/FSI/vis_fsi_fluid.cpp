@@ -31,16 +31,25 @@ int main( int argc, char * argv[] )
   int time_start = 0;
   int time_step = 1;
   int time_end = 1;
-  double dt = 0.01;
   bool isXML = true;
   bool isClean = true;
 
-  PetscMPIInt rank, size;
+  // Load analysis code parameter from solver_cmd.h5 file
+  hid_t prepcmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
+
+  HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
+
+  double dt = cmd_h5r -> read_doubleScalar("/","init_step");
+
+  const int sol_rec_freq = cmd_h5r -> read_intScalar("/", "sol_record_freq");
+
+  delete cmd_h5r; H5Fclose(prepcmd_file);
 
   // ===== PETSc Initialization =====
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-  MPI_Comm_size(PETSC_COMM_WORLD, &size);
-  MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
+  
+  const PetscMPIInt rank = SYS_T::get_MPI_rank();
+  const PetscMPIInt size = SYS_T::get_MPI_size();
 
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
   SYS_T::GetOptionInt("-time_start", time_start);
@@ -51,6 +60,9 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionString("-out_bname", out_bname);
   SYS_T::GetOptionBool("-xml", isXML);
   SYS_T::GetOptionBool("-clean", isClean);
+
+  // Correct time_step if it does not match with sol_rec_freq
+  if( time_step % sol_rec_freq != 0 ) time_step = sol_rec_freq;
 
   SYS_T::cmdPrint("-sol_bname:", sol_bname);
   SYS_T::cmdPrint("-out_bname:", out_bname);

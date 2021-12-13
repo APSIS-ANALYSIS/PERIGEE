@@ -1,5 +1,16 @@
 #include "PETSc_Tools.hpp"
 
+std::string PETSc_T::get_version()
+{
+  int major, minor, subminor;
+  PetscGetVersionNumber(&major,&minor,&subminor, NULL);
+
+  std::string output = "petsc-" + std::to_string( major) + "." + std::to_string( minor)
+    + "." + std::to_string( subminor);
+
+  return output;
+}
+
 void PETSc_T::MatInfo_Display_local( const Mat &K, 
     const PetscMPIInt &rank )
 {

@@ -9,12 +9,13 @@
 // Author: Ju Liu
 // Date: Jan 19 2018
 // ==================================================================
-#include <iostream>
-#include <vector>
+#include "Sys_Tools.hpp"
 #include "petsc.h"
 
 namespace PETSc_T
 {
+  std::string get_version();
+
   // ----------------------------------------------------------------
   // Display PETSc object
   // ----------------------------------------------------------------
@@ -168,6 +169,76 @@ namespace PETSc_T
 
   // Write a vector to disk with file_name
   void WriteBinary( const Vec &a, const char * const &file_name );
+
+  // ==========================================================================
+  // The followings are system function to monitor system memory usages
+  // dynamically.
+  // Note: Before calling the following four functions, the user need to call
+  // PetscMemorySetGetMaximumUsage() immediately after PetscInitialize.
+  // ==========================================================================
+  // --------------------------------------------------------------------------
+  // 1. Print the Maximum memory used for the program. The usage is
+  //    reduced to CPU 0 by MPI_SUM.
+  // --------------------------------------------------------------------------
+  inline void print_MaxMemUsage()
+  {
+    PetscLogDouble memo = 0.0, memototal = 0.0;
+    PetscMemoryGetMaximumUsage(&memo);
+    MPI_Reduce(&memo, &memototal, 1, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
+    if( !SYS_T::get_MPI_rank() )
+    {
+      std::cout<<"\n Maximum Memeory usage : ";
+      SYS_T::print_mem_size(memototal); std::cout<<"\n";
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // 2. Print the Current memory used for the program. The usage is
+  //    reduced to CPU 0 by MPI_SUM.
+  // --------------------------------------------------------------------------
+  inline void print_CurMemUsage()
+  {
+    PetscLogDouble memo = 0.0, memototal = 0.0;
+    PetscMemoryGetCurrentUsage(&memo);
+    MPI_Reduce(&memo, &memototal, 1, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
+    if( !SYS_T::get_MPI_rank() )
+    {
+      std::cout<<"\n Current Memeory usage : ";
+      SYS_T::print_mem_size(memototal); std::cout<<"\n";
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // 3. Print the Maximum space PETSc has allocated. This function
+  //    should be used with the command line argument -malloc
+  // --------------------------------------------------------------------------
+  inline void print_MaxMallocUsage()
+  {
+    PetscLogDouble memo = 0.0, memototal = 0.0;
+    PetscMallocGetMaximumUsage(&memo);
+    MPI_Reduce(&memo, &memototal, 1, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
+    if( !SYS_T::get_MPI_rank())
+    {
+      std::cout<<"\n Maximum PETSc malloced : ";
+      SYS_T::print_mem_size(memototal); std::cout<<"\n";
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // 4. Print the Current space PETSc has allocated. This function
+  //    should be used with the command line argument -malloc
+  // --------------------------------------------------------------------------
+  inline void print_CurMallocUsage()
+  {
+    PetscLogDouble memo = 0.0, memototal = 0.0;
+    PetscMallocGetCurrentUsage(&memo);
+    MPI_Reduce(&memo, &memototal, 1, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
+    if( !SYS_T::get_MPI_rank() )
+    {
+      std::cout<<"\n Current PETSc malloced : ";
+      SYS_T::print_mem_size(memototal); std::cout<<"\n";
+    }
+  }
 }
 
 #endif

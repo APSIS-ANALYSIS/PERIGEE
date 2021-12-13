@@ -19,7 +19,7 @@ ALocal_EBC_outflow::ALocal_EBC_outflow( const std::string &fileBaseName,
     {
       std::string subgroup_name(gname);
       subgroup_name.append("/ebcid_");
-      subgroup_name.append( SYS_T::to_string(ii) );
+      subgroup_name.append( std::to_string(ii) );
 
       intNA[ii]  = h5r -> read_doubleVector( subgroup_name.c_str(), "intNA" );
       LID[ii]    = h5r -> read_intVector(    subgroup_name.c_str(), "LID_all_face_nodes" );

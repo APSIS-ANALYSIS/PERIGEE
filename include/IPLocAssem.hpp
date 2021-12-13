@@ -205,6 +205,18 @@ class IPLocAssem
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Residual(...) is not implemented. \n");}
 
+    virtual void Assem_Residual(
+        const double &time, const double &dt,
+        const double * const &vec_a,
+        const double * const &vec_b,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const double * const &qua_prestress,
+        const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: this Assem_Residual(...) is not implemented. \n");}
+
     
     virtual void Assem_Residual(
         const double &time, const double &dt,
@@ -342,6 +354,18 @@ class IPLocAssem
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: this Assem_Tangent_Residual(...) is not implemented. \n");}
+
+    virtual void Assem_Tangent_Residual(
+        const double &time, const double &dt,
+        const double * const &vec_a,
+        const double * const &vec_b,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const double * const &qua_prestress,
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Tangent_Residual(...) is not implemented. \n");}
 
@@ -715,6 +739,16 @@ class IPLocAssem
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Mass_Residual(...) is not implemented. \n");}
 
+    virtual void Assem_Mass_Residual(
+        const double * const &vec_b,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const double * const &qua_prestress,
+        const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: this Assem_Mass_Residual(...) is not implemented. \n");}
+
 
     // \para element: the container for classical element routine. It only
     //                requires the x-y-z coordinates for the nodes and the 
@@ -808,6 +842,17 @@ class IPLocAssem
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Residual_EBC is not implemented.\n");}
 
+    // Perform elemental BC surface integration for pressure-induced surface
+    // traction. This is used in wall prestressing generation.
+    virtual void Assem_Residual_EBC(
+        const double &time,
+        const double * const &vec,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: this Assem_Residual_EBC is not implemented.\n");}
 
     // Perform Elemental BC surface integration for elemental BC id ebc_id and
     // for resistance type BC.
@@ -881,7 +926,7 @@ class IPLocAssem
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Tangent_Residual_EBC_Wall is not implemented.\n");}
 
-    
+
     // ! Get the model parameter 1
     //   This function is used to pass out the parameters appearing in the weak
     //   form, such as the Reynolds number, Capallarity number, etc.
@@ -932,6 +977,21 @@ class IPLocAssem
         std::vector<Matrix_3x3> &stress )
     {
       SYS_T::commPrint("Warning: get_Wall_CauchyStress() is not implemented. \n");
+    }
+
+    // Calculate the Cauchy stress at every quadrature points
+    // within this element. The output stress has length quad -> get_num_quadPts()
+    virtual std::vector<Matrix_3x3> get_Wall_CauchyStress(
+        const double * const &disp,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad ) const
+    {
+      SYS_T::commPrint("Warning: get_CauchyStress() is not implemented. \n");
+      std::vector<Matrix_3x3> output; output.clear(); 
+      return output;
     }
 
 };

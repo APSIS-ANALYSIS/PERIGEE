@@ -207,6 +207,54 @@ void SEG_SOL_T::PlusAiPV(const double &aa,
   sol->GhostUpdate(); // update the ghost slots
 }
 
+void SEG_SOL_T::Insert_zero_solid_UV( const APart_Node * const &pnode,
+    PDNSolution * const &sol )
+{
+  // Make sure the dof for sol that 7.
+  SYS_T::print_fatal_if(sol->get_dof_num() != 7,
+      "Error: SEG_SOL_T::Insert_zero_solid_UPV the solution vector dimension is wrong. \n");
+
+  SYS_T::print_fatal_if(sol->get_dof_num() != pnode->get_dof(),
+      "Error: SEG_SOL_T::Insert_zero_solid_UPV the solution vector dof number does not match that of APart_Node. \n");
+
+  SYS_T::print_fatal_if(sol->get_nlocal() != pnode->get_nlocalnode() * 7,
+      "Error: SEG_SOL_T::Insert_zero_solid_UPV the solution vector dimension does not match that of APart_Node. \n");
+
+  Vec lsol;
+  double * array_sol;
+
+  VecGhostGetLocalForm(sol->solution, &lsol);
+  VecGetArray(lsol, &array_sol);
+
+  // Obtain the number of local nodes
+  const int nlocal_solid = pnode->get_nlocalnode_solid();
+
+  for(int ii=0; ii<nlocal_solid; ++ii)
+  {
+    const int ii7 = pnode->get_node_loc_solid(ii) * 7;
+    array_sol[ii7]   = 0.0; 
+    array_sol[ii7+1] = 0.0;
+    array_sol[ii7+2] = 0.0;
+     
+    array_sol[ii7+4] = 0.0;
+    array_sol[ii7+5] = 0.0;
+    array_sol[ii7+6] = 0.0;
+  }
+  
+  const int nlocal_fluid = pnode->get_nlocalnode_fluid();
+  
+  for(int ii=0; ii<nlocal_fluid; ++ii)
+  {
+    const int ii7 = pnode->get_node_loc_fluid(ii) * 7;
+    array_sol[ii7]   = 0.0;
+    array_sol[ii7+1] = 0.0;
+    array_sol[ii7+2] = 0.0;
+  }
+  VecRestoreArray(lsol, &array_sol);
+  VecGhostRestoreLocalForm(sol->solution, &lsol);
+
+  sol->GhostUpdate(); // update the ghost slots
+}
 
 void SEG_SOL_T::PlusAiUPV(const double &aa, 
     const double &bb, const double &cc,
@@ -446,6 +494,81 @@ void SEG_SOL_T::Insert_plug_inflow_UPV(const double &val,
 
   VecAssemblyBegin(sol->solution); VecAssemblyEnd(sol->solution);
   sol->GhostUpdate();
+}
+
+void SEG_SOL_T::Extract_solid_U( const APart_Node * const &pnode,
+    const PDNSolution * const &sol, PDNSolution * const &output )
+{
+  SYS_T::print_fatal_if(sol->get_dof_num() != 7,
+      "Error: SEG_SOL_T::Extract_solid_U the solution vector dimension is wrong. \n");
+
+  SYS_T::print_fatal_if(output->get_dof_num() != 3,
+      "Error: SEG_SOL_T::Extract_solid_U the output vector dimension is wrong. \n");
+
+  Vec lsol;           VecGhostGetLocalForm(sol->solution, &lsol);
+  double * array_sol; VecGetArray(lsol, &array_sol);
+
+  Vec lout;           VecGhostGetLocalForm(output->solution, &lout);
+  double * array_out; VecGetArray(lout, &array_out);
+
+  const int nlocal_solid = pnode->get_nlocalnode_solid();
+
+  for(int ii=0; ii<nlocal_solid; ++ii)
+  {
+    const int ii7 = pnode->get_node_loc_solid(ii) * 7;
+    const int ii3 = pnode->get_node_loc_solid(ii) * 3;
+    array_out[ii3]   = array_sol[ii7];
+    array_out[ii3+1] = array_sol[ii7+1];
+    array_out[ii3+2] = array_sol[ii7+2];
+  }
+
+  VecRestoreArray(lsol, &array_sol);
+  VecGhostRestoreLocalForm(sol->solution, &lsol);
+
+  VecRestoreArray(lout, &array_out);
+  VecGhostRestoreLocalForm(output->solution, &lout);
+
+  output -> GhostUpdate(); // update the ghost slots
+}
+
+void SEG_SOL_T::Extract_solid_P( const APart_Node * const &pnode,
+    const PDNSolution * const &sol, PDNSolution * const &output ) 
+{ 
+  SYS_T::print_fatal_if(sol->get_dof_num() != 7,
+      "Error: SEG_SOL_T::Extract_solid_U the solution vector dimension is wrong. \n");
+
+  SYS_T::print_fatal_if(output->get_dof_num() != 1,
+      "Error: SEG_SOL_T::Extract_solid_U the output vector dimension is wrong. \n");
+  
+  Vec lsol;           VecGhostGetLocalForm(sol->solution, &lsol);
+  double * array_sol; VecGetArray(lsol, &array_sol);
+
+  Vec lout;           VecGhostGetLocalForm(output->solution, &lout);
+  double * array_out; VecGetArray(lout, &array_out);
+
+  const int nlocal_solid = pnode->get_nlocalnode_solid();
+
+  for(int ii=0; ii<nlocal_solid; ++ii)
+  { 
+    const int jj = pnode->get_node_loc_solid(ii);
+    array_out[jj] = array_sol[jj*7 + 3];
+  }
+
+  const int nlocal_fluid = pnode->get_nlocalnode_fluid();
+
+  for(int ii=0; ii<nlocal_fluid; ++ii)
+  {
+    const int jj = pnode->get_node_loc_fluid(ii);
+    array_out[jj] = 0.0;
+  }
+
+  VecRestoreArray(lsol, &array_sol);
+  VecGhostRestoreLocalForm(sol->solution, &lsol);
+
+  VecRestoreArray(lout, &array_out);
+  VecGhostRestoreLocalForm(output->solution, &lout);
+  
+  output -> GhostUpdate(); // update the ghost slots
 }
 
 void SEG_SOL_T::CheckUV(const PDNSolution * const &dotU,

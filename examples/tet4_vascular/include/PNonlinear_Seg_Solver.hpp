@@ -119,6 +119,7 @@ class PNonlinear_Seg_Solver
         FEAElement * const &elements,
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
+        const Prestress_solid * const &ps_ptr,
         IPLocAssem * const &lassem_fluid_ptr,
         IPLocAssem * const &lassem_solid_ptr,
         IPLocAssem * const &lassem_mesh_ptr,
@@ -130,12 +131,40 @@ class PNonlinear_Seg_Solver
         PDNSolution * const &sol,
         bool &conv_flag, int &nl_counter ) const;
 
+    // ------------------------------------------------------------------------
+    // GenAlpha_Solve_Prestress:
+    // This is a solver for generating the prestress in ALE-FSI simulations
+    // ------------------------------------------------------------------------
+    void GenAlpha_Solve_Prestress(
+        const bool &new_tangent_flag,
+        const double &prestress_tol,
+        const double &curr_time,
+        const double &dt,
+        const PDNSolution * const &pre_dot_sol,
+        const PDNSolution * const &pre_sol,
+        const TimeMethod_GenAlpha * const &tmga_ptr,
+        const ALocal_Elem * const &alelem_ptr,
+        const ALocal_IEN * const &lien_ptr,
+        const APart_Node * const &anode_ptr,
+        const FEANode * const &feanode_ptr,
+        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const Matrix_PETSc * const &bc_mat,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        Prestress_solid * const &ps_ptr,
+        IPLocAssem * const &lassem_solid_ptr,
+        IPGAssem * const &gassem_ptr,
+        PLinear_Solver_PETSc * const &lsolver_ptr,
+        PDNSolution * const &dot_sol,
+        PDNSolution * const &sol,
+        bool &prestress_conv_flag, int &nl_counter ) const;
+
   private:
-    const double nr_tol;
-    const double na_tol;
-    const double nd_tol;
-    const int nmaxits;
-    const int nrenew_freq;
+    const double nr_tol, na_tol, nd_tol;
+    const int nmaxits, nrenew_freq;
 
     // vector container for the step update in the smaller matrix problem
     PDNSolution * dot_P_V_step;
@@ -143,11 +172,11 @@ class PNonlinear_Seg_Solver
     // vector container for the mesh motion solution
     PDNSolution * mesh_disp;
 
-    void Print_convergence_info( const int &count, const double rel_err,
-        const double abs_err ) const
-    {PetscPrintf(PETSC_COMM_WORLD,
-        "  === NR ite: %d, r_error: %e, a_error: %e \n",
-        count, rel_err, abs_err);}
+    void Print_convergence_info( const int &count, const double &rel_err,
+        const double &abs_err ) const
+    {
+      SYS_T::commPrint( "  === NR ite: %d, r_error: %e, a_error: %e \n", count, rel_err, abs_err);
+    }
 
     void rescale_inflow_value( const double &stime,
         const ALocal_Inflow_NodalBC * const &infbc,

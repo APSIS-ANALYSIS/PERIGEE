@@ -16,7 +16,8 @@ class Prestress_solid
 {
   public:
     Prestress_solid( const ALocal_Elem * const &locelem, const int &in_nqp_tet,
-       const int &in_cpu_rank, const std::string &in_ps_fName = "prestress" );
+       const int &in_cpu_rank, const bool &load_from_file,
+       const std::string &in_ps_fName = "prestress" );
 
     virtual ~Prestress_solid();
 
@@ -24,19 +25,30 @@ class Prestress_solid
     // Input: ee the element index
     // Output: the vector holding 6 components of the prestress at all quad pts
     // ------------------------------------------------------------------------
-    virtual std::vector<double> get_prestress(const int &ee ) const;
+    virtual std::vector<double> get_prestress( const int &ee ) const;
+
+    virtual std::array<double,6> get_prestress( const int &ee, const int &qua ) const;
 
     // ------------------------------------------------------------------------
     // Input: ee the element index
-    //        0 <= ii < nqp is the quadrature point index
     //        in_esval is the element's prestress value at the quadrature point.
     // Users are responsible for making sure that the vector has lenght 6*nqp
+    // The value of in_esval is ADDED into the data
     // ------------------------------------------------------------------------
-    virtual void set_prestress(const int &ee, const int &ii, 
+    virtual void add_prestress( const int &ee, const double * const &in_esval );
+
+    // ------------------------------------------------------------------------
+    // Input: ee the element index 0 <= ee < nlocalele
+    //        qua the quadrature point index 0 <= qua < nqp
+    //        in_esval the element's qua-th quadrature point's stress components
+    //        with length being 6.
+    // The value of in_esval is ADDED into the data
+    // ------------------------------------------------------------------------
+    virtual void add_prestress( const int &ee, const int &qua,
         const double * const &in_esval );
 
     // ------------------------------------------------------------------------
-    // record the prestress values to a h5 file
+    // record the prestress values to a h5 file as a row data
     // ------------------------------------------------------------------------
     virtual void write_prestress_hdf5() const;
 
@@ -60,9 +72,12 @@ class Prestress_solid
     const std::string ps_fileBaseName;
 
     // ------------------------------------------------------------------------
-    // qua_prestress[ee][nqp*ii+jj] stores the ee-th solid element's pre-stress 
+    // qua_prestress[ee][6*ii+jj] stores the ee-th element's pre-stress 
     // jj-th component in Voigt notation at the ii-th quadrature point.
-    // 0 <= ee < nlocalele, 0 <= ii < nqp, 0 <= jj < 6
+    // 0 <= ee < nlocalele, 0 <= ii < nqp, 0 <= jj < 6 if the element is a solid
+    // element; otherwise, qua_prestress[ee] is cleared for a fluid element.
+    // 
+    // Size is nlocalele x (nqp x 6)
     // ------------------------------------------------------------------------
     std::vector< std::vector<double> > qua_prestress;
 };

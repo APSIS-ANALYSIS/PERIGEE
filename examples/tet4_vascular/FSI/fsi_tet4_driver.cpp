@@ -68,6 +68,9 @@ int main(int argc, char *argv[])
   // back flow stabilization
   double bs_beta = 0.2;
 
+  // flag that determines if the prestress data to be loaded
+  bool is_load_ps = true;
+
   // Generalized-alpha method
   double genA_rho_inf = 0.5;
   bool is_backward_Euler = false;
@@ -104,9 +107,10 @@ int main(int argc, char *argv[])
   const PetscMPIInt rank = SYS_T::get_MPI_rank();
   const PetscMPIInt size = SYS_T::get_MPI_size();
  
-  SYS_T::commPrint("Job starts at %s %s \n", SYS_T::get_time().c_str(), SYS_T::get_date().c_str());
-
   SYS_T::print_perigee_art();
+
+  SYS_T::commPrint("Job starts at %s %s \n", SYS_T::get_time().c_str(), SYS_T::get_date().c_str());
+  SYS_T::commPrint("PETSc version: %s \n", PETSc_T::get_version().c_str());
 
   // ===== Command Line Argument =====
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
@@ -117,6 +121,7 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal(  "-bs_beta",           bs_beta);
   SYS_T::GetOptionReal(  "-rho_inf",           genA_rho_inf);
   SYS_T::GetOptionBool(  "-is_backward_Euler", is_backward_Euler);
+  SYS_T::GetOptionBool(  "-is_load_ps",        is_load_ps);
   SYS_T::GetOptionReal(  "-fl_density",        fluid_density);
   SYS_T::GetOptionReal(  "-fl_mu",             fluid_mu);
   SYS_T::GetOptionReal(  "-sl_density",        solid_density);
@@ -163,7 +168,12 @@ int main(int argc, char *argv[])
     SYS_T::commPrint(     "-is_backward_Euler: true \n");
   else
     SYS_T::cmdPrint(      "-rho_inf:",         genA_rho_inf);
-   
+ 
+  if( is_load_ps ) 
+    SYS_T::commPrint(     "-is_load_ps: true \n");
+  else
+    SYS_T::commPrint(     "-is_load_ps: false \n");
+
   if( inflow_type == 0 )
   {
     SYS_T::commPrint(   "-inflow_type: 0 (pulsatile flow) \n");
@@ -214,13 +224,17 @@ int main(int argc, char *argv[])
 
     cmdh5w->write_doubleScalar(  "fl_density",      fluid_density);
     cmdh5w->write_doubleScalar(  "fl_mu",           fluid_mu);
+    cmdh5w->write_doubleScalar(  "fl_bs_beta",      bs_beta);
     cmdh5w->write_doubleScalar(  "sl_density",      solid_density);
     cmdh5w->write_doubleScalar(  "sl_E",            solid_E);
     cmdh5w->write_doubleScalar(  "sl_nu",           solid_nu);
     cmdh5w->write_doubleScalar(  "mesh_E",          mesh_E);
     cmdh5w->write_doubleScalar(  "mesh_nu",         mesh_nu);
     cmdh5w->write_doubleScalar(  "init_step",       initial_step);
-    
+    cmdh5w->write_intScalar(     "sol_record_freq", sol_record_freq);
+    cmdh5w->write_intScalar(     "nqp_tri",         nqp_tri);
+    cmdh5w->write_intScalar(     "nqp_tet",         nqp_tet);
+
     cmdh5w->write_string(        "lpn_file",        lpn_file);
 
     cmdh5w->write_intScalar(     "inflow_type",     inflow_type);
@@ -230,6 +244,7 @@ int main(int argc, char *argv[])
 
     cmdh5w->write_string("date",              SYS_T::get_date() );
     cmdh5w->write_string("time",              SYS_T::get_time() );
+    cmdh5w->write_string("petsc-version",     PETSc_T::get_version() );
 
     delete cmdh5w; H5Fclose(cmd_file_id);
   }
@@ -258,7 +273,9 @@ int main(int argc, char *argv[])
   ALocal_EBC * mesh_locebc = new ALocal_EBC(part_file, rank, "mesh_ebc");
   
   APart_Node * pNode = new APart_Node_FSI(part_file, rank);
-  
+ 
+  Prestress_solid * ps_data = new Prestress_solid( locElem, nqp_tet, rank, is_load_ps, "prestress" ); 
+   
   SYS_T::commPrint("===> Mesh HDF5 files are read from disk.\n");
 
   // ===== Basic Checking =====
@@ -335,6 +352,8 @@ int main(int argc, char *argv[])
     locAssem_solid_ptr = new PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha(
         matmodel, tm_galpha_ptr, quadv->get_num_quadPts() );
   }
+
+  matmodel -> write_hdf5(); // record model parameter on disk
 
   // Pseudo elastic mesh motion
   IPLocAssem * locAssem_mesh_ptr = new PLocAssem_Tet4_FSI_Mesh_Elastostatic( mesh_E, mesh_nu );
@@ -441,7 +460,7 @@ int main(int argc, char *argv[])
 
     gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_fluid_ptr,
         locAssem_solid_ptr, elementv,
-        elements, quadv, quads, locIEN, pNode, fNode, locnbc, locebc );
+        elements, quadv, quads, locIEN, pNode, fNode, locnbc, locebc, ps_data );
 
     PDNSolution * dot_pres_velo = new PDNSolution_P_V_Mixed_3D( pNode, fNode, 0, false );
 
@@ -569,7 +588,7 @@ int main(int argc, char *argv[])
   tsolver->TM_FSI_GenAlpha(is_restart, base, dot_sol, sol, tm_galpha_ptr,
       timeinfo, inflow_rate_ptr, locElem, locIEN, pNode, fNode, locnbc,
       locinfnbc, mesh_locnbc, locebc, mesh_locebc, gbc, pmat, mmat, 
-      elementv, elements, quadv, quads, 
+      elementv, elements, quadv, quads, ps_data, 
       locAssem_fluid_ptr, locAssem_solid_ptr, locAssem_mesh_ptr,
       gloAssem_ptr, gloAssem_mesh_ptr, lsolver, mesh_lsolver, nsolver);
 
@@ -580,7 +599,7 @@ int main(int argc, char *argv[])
   delete locAssem_solid_ptr; delete locAssem_fluid_ptr; delete locAssem_mesh_ptr;
   delete matmodel; delete inflow_rate_ptr;
   delete elementv; delete elements; delete quadv; delete quads;
-  delete pmat; delete mmat; delete tm_galpha_ptr;
+  delete pmat; delete mmat; delete tm_galpha_ptr; delete ps_data;
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
   delete locElem; delete locnbc; delete locinfnbc; delete mesh_locnbc;
   delete locebc; delete pNode; delete mesh_locebc; delete gbc;

@@ -89,6 +89,7 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Residual(
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
+    const double * const &qua_prestress,
     const IQuadPts * const &quad )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
@@ -184,6 +185,15 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Residual(
     Matrix_3x3 P_iso, S_iso;
     matmodel->get_PK(F, P_iso, S_iso);
 
+    // ------------------------------------------------------------------------
+    // 1st PK stress corrected by prestress
+    const Matrix_3x3 prestress( qua_prestress[qua*6+0], qua_prestress[qua*6+5], qua_prestress[qua*6+4],
+        qua_prestress[qua*6+5], qua_prestress[qua*6+1], qua_prestress[qua*6+3],
+        qua_prestress[qua*6+4], qua_prestress[qua*6+3], qua_prestress[qua*6+2] );
+
+    P_iso += prestress * cofactor( F );
+    // ------------------------------------------------------------------------
+
     const double rho = matmodel->get_rho(p);
 
     const double detF = F.det();
@@ -236,6 +246,7 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Tangent_Residual(
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
+    const double * const &qua_prestress,
     const IQuadPts * const &quad )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
@@ -341,6 +352,15 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Tangent_Residual(
     Tensor4_3D AA_iso;
     matmodel->get_PK_FFStiffness(F, P_iso, S_iso, AA_iso);
 
+    // ------------------------------------------------------------------------
+    // 1st PK stress corrected by prestress
+    const Matrix_3x3 prestress( qua_prestress[qua*6+0], qua_prestress[qua*6+5], qua_prestress[qua*6+4],
+        qua_prestress[qua*6+5], qua_prestress[qua*6+1], qua_prestress[qua*6+3],
+        qua_prestress[qua*6+4], qua_prestress[qua*6+3], qua_prestress[qua*6+2] );
+
+    P_iso += prestress * cofactor( F );
+    // ------------------------------------------------------------------------
+    
     const double rho = matmodel->get_rho(p);
     const double detF = F.det();
 
@@ -514,6 +534,7 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Mass_Residual(
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
+    const double * const &qua_prestress,
     const IQuadPts * const &quad )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
@@ -592,6 +613,15 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Mass_Residual(
     Matrix_3x3 P_iso, S_iso;
     matmodel->get_PK(F, P_iso, S_iso);
 
+    // ------------------------------------------------------------------------
+    // 1st PK stress corrected by prestress
+    const Matrix_3x3 prestress( qua_prestress[qua*6+0], qua_prestress[qua*6+5], qua_prestress[qua*6+4],
+        qua_prestress[qua*6+5], qua_prestress[qua*6+1], qua_prestress[qua*6+3],
+        qua_prestress[qua*6+4], qua_prestress[qua*6+3], qua_prestress[qua*6+2] );
+
+    P_iso += prestress * cofactor( F );
+    // ------------------------------------------------------------------------
+    
     double mbeta = matmodel->get_beta(p);
 
     // use 1.0 in case of fully incompressible. 
@@ -674,6 +704,87 @@ void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Residual_EBC(
       Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * gg.x();
       Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * gg.y();
       Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * gg.z();
+    }
+  }
+}
+
+
+std::vector<Matrix_3x3> PLocAssem_Tet4_VMS_Seg_Incompressible::get_Wall_CauchyStress(
+    const double * const &disp,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad ) const
+{
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  std::vector<Matrix_3x3> stress( nqp );
+
+  for( int qua = 0; qua < nqp; ++qua )
+  {
+    double dR_dx[4], dR_dy[4], dR_dz[4];
+
+    element->get_gradR( qua, dR_dx, dR_dy, dR_dz );
+
+    double ux_x = 0.0, uy_x = 0.0, uz_x = 0.0;
+    double ux_y = 0.0, uy_y = 0.0, uz_y = 0.0;
+    double ux_z = 0.0, uy_z = 0.0, uz_z = 0.0;
+
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      ux_x += disp[ii*7+0] * dR_dx[ii];
+      uy_x += disp[ii*7+1] * dR_dx[ii];
+      uz_x += disp[ii*7+2] * dR_dx[ii];
+
+      ux_y += disp[ii*7+0] * dR_dy[ii];
+      uy_y += disp[ii*7+1] * dR_dy[ii];
+      uz_y += disp[ii*7+2] * dR_dy[ii];
+
+      ux_z += disp[ii*7+0] * dR_dz[ii];
+      uy_z += disp[ii*7+1] * dR_dz[ii];
+      uz_z += disp[ii*7+2] * dR_dz[ii];
+    }
+
+    const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
+
+    stress[qua] = matmodel -> get_Cauchy_stress( F );
+  }
+
+  return stress;
+}
+
+
+void PLocAssem_Tet4_VMS_Seg_Incompressible::Assem_Residual_EBC(
+    const double &time,
+    const double * const &vec,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
+{
+  const double factor = 1.0; //time >= 1.0 ? 1.0 : time;
+
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  Zero_Residual();
+
+  for(int qua = 0; qua < quad -> get_num_quadPts(); ++qua)
+  {
+    const std::vector<double> R = element->get_R(qua);
+
+    double surface_area;
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+
+    double pp = 0.0;
+    for(int ii=0; ii<snLocBas; ++ii) pp += vec[ii*7+3] * R[ii];
+
+    for(int A=0; A<snLocBas; ++A)
+    {
+      Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * factor * pp * n_out.x();
+      Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * factor * pp * n_out.y();
+      Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * factor * pp * n_out.z();
     }
   }
 }

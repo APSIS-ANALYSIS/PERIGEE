@@ -26,6 +26,10 @@ class ALocal_Elem
     // Return the number of elements in this sub-domain owned by this CPU. 
     virtual int get_nlocalele() const {return nlocalele;}
 
+    // Return the number of elements with tag value being the input tag_val.
+    // This function can only be called when isTagged = true.
+    virtual int get_nlocalele( const int &tag_val ) const;
+
     // Given the global element index, return its location in the vector
     // elem_loc. If it does not belong to this sub-domain, it will return -1
     virtual int get_pos(const int &global_e_index) const 
@@ -44,19 +48,20 @@ class ALocal_Elem
     }
 
   private:
-    // Global indices of elements that belong to the local CPU.
-    std::vector<int> elem_loc;
-    
     // The number of elements that belong to the CPU, which equals
     // the length of the elem_loc vector.
     int nlocalele;
 
+    // Global indices of elements that belong to the local CPU.
+    std::vector<int> elem_loc;
+    
     // Flag that determine if the element has an additional tag
     bool isTagged;
 
     // A vector recording the tag of elements. Length is nlocalele.
     // In FSI problems, we assume tag 0 gives fluid element; 
     //                            tag 1 gives solid element.
+    // elem_tag is cleared if isTagged = false
     std::vector<int> elem_tag;
 };
 

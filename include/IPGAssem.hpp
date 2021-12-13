@@ -25,6 +25,7 @@
 #include "ALocal_Ring_NodalBC.hpp"
 #include "ALocal_EBC.hpp"
 #include "IGenBC.hpp"
+#include "Prestress_solid.hpp"
 
 class IPGAssem
 {
@@ -246,7 +247,8 @@ class IPGAssem
         const APart_Node * const &node_ptr,
         const FEANode * const &fnode_ptr,
         const ALocal_NodalBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part )
+        const ALocal_EBC * const &ebc_part,
+        const Prestress_solid * const &ps_ptr )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
 
@@ -404,7 +406,30 @@ class IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc )
+        const IGenBC * const &gbc,
+        const Prestress_solid * const &ps_ptr )
+    {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
+
+
+    virtual void Assem_residual(
+        const PDNSolution * const &sol_a,
+        const PDNSolution * const &sol_b,
+        const PDNSolution * const &dot_sol_np1,
+        const PDNSolution * const &sol_np1,
+        const double &curr_time,
+        const double &dt,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_s_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const APart_Node * const &node_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const Prestress_solid * const &ps_ptr )
     {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
 
@@ -580,7 +605,30 @@ class IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc )
+        const IGenBC * const &gbc,
+        const Prestress_solid * const &ps_ptr )
+    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
+
+
+    virtual void Assem_tangent_residual(
+        const PDNSolution * const &sol_a,
+        const PDNSolution * const &sol_b,
+        const PDNSolution * const &dot_sol_np1,
+        const PDNSolution * const &sol_np1,
+        const double &curr_time,
+        const double &dt,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_s_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const APart_Node * const &node_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const Prestress_solid * const &ps_ptr )
     {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
 
@@ -656,7 +704,23 @@ class IPGAssem
         FEAElement * const &element_w,
         const IQuadPts * const &quad_s,
         ALocal_EBC * const &ebc_wall_part )
-    {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
+    {
+      SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");
+    }
+
+    // Update solid prestress at all volumetric quadrature points    
+    virtual void Update_Wall_Prestress(
+        const PDNSolution * const &sol,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &element,
+        const IQuadPts * const &quad,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        Prestress_solid * const &ps_ptr ) const
+    {
+      SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");
+    }
 };
 
 #endif
