@@ -200,8 +200,7 @@ int main( int argc, char * argv[] )
 
   // Read the geometry file for the whole FSI domain
   int nFunc, nElem;
-  std::vector<int> vecIEN;
-  std::vector<int> phy_tag;
+  std::vector<int> vecIEN, phy_tag;
   std::vector<double> ctrlPts;
 
   TET_T::read_vtu_grid( geo_file, nFunc, nElem, ctrlPts, vecIEN, phy_tag );
@@ -253,15 +252,11 @@ int main( int argc, char * argv[] )
       global_part = new Global_Part_METIS( cpu_size, in_ncommon, isDualGraph, mesh, IEN );
     else if(cpu_size == 1)
       global_part = new Global_Part_Serial( mesh );
-    else
-    {
-      std::cerr<<"ERROR: wrong cpu_size: "<<cpu_size<<std::endl;
-      exit(EXIT_FAILURE);
-    }
+    else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
   }
 
   // Generate the new nodal numbering based on the partitioning
-  Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, mesh->get_nFunc());
+  Map_Node_Index * mnindex = new Map_Node_Index( global_part, cpu_size, mesh->get_nFunc() );
   mnindex->write_hdf5("node_mapping");
 
   // ----------------------------------------------------------------
