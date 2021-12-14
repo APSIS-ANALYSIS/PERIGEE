@@ -31,6 +31,7 @@ int main( int argc, char * argv[] )
   const int dofNum = 7;     // degree-of-freedom for the physical problem
   const int dofMat = 4;     // degree-of-freedom in the matrix problem
   const int elemType = 501; // first order simplicial element
+  const int num_fields = 2; // Two fields : pressure + velocity/displacement
 
   // Input files
   std::string geo_file("./whole_vol.vtu");
@@ -269,15 +270,37 @@ int main( int argc, char * argv[] )
 
   // Generate the mesh
   IMesh * mesh = new Mesh_Tet4(nFunc, nElem);
-  mesh -> print_info();
+
+  // Generate the mesh for pressure
+  IMesh * mesh_p = new Mesh_Tet4(nFunc_p, nElem);
+  
+  std::vector<IMesh const *> mlist;
+  mlist.push_back(mesh_p); mlist.push_back(mesh);
+
+  mlist[0]->print_info();
+  mlist[1]->print_info();
 
   std::cout<<"Fluid domain: "<<node_f.size()<<" nodes.\n";
   std::cout<<"Solid domain: "<<node_s.size()<<" nodes.\n";
   std::cout<<"Fluid-Solid interface: "<<nFunc_interface<<" nodes.\n";
+  
+  std::vector<IIEN const *> ienlist;
+  ienlist.push_back(IEN_p); ienlist.push_back(IEN);
 
-
-
-
+  // Partition the mesh
+  IGlobal_Part * global_part = nullptr;
+  if( isReload ) global_part = new Global_Part_Reload( cpu_size, in_ncommon, isDualGraph );
+  else
+  {
+    if(cpu_size > 1)
+    {
+      global_part = new Global_Part_METIS( num_fields, cpu_size, in_ncommon, isDualGraph, 
+          mlist, ienlist );
+    }
+    else if(cpu_size == 1)
+      global_part = new Global_Part_Serial( num_fields, mlist );
+    else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
+  }
 
 
 
