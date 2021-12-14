@@ -27,16 +27,25 @@ class Global_Part_METIS : public IGlobal_Part
         const std::string &element_part_name = "epart",
         const std::string &node_part_name = "npart" );
 
+    // It will call METIS to partition a multi-field mesh. An assumption is that
+    // the nElem in all meshes are the same.
+    Global_Part_METIS( const int &num_fields, const int &cpu_size,
+        const int &in_ncommon, const bool &isDualGraph,
+        const std::vector<IMesh const *> &mesh_list,
+        const std::vector<IIEN const *> &IEN_list,
+        const std::string &element_part_name = "epart",
+        const std::string &node_part_name = "npart" );
+
     virtual ~Global_Part_METIS();
 
     virtual idx_t get_epart( const int &ee ) const {return epart[ee];}
-    
+
     virtual idx_t get_npart( const int &nn ) const {return npart[nn];}
 
     virtual bool get_isMETIS() const {return isMETIS;};
-    
+
     virtual bool get_isDual() const {return isDual;};
-    
+
     virtual int get_dual_edge_ncommon() const {return dual_edge_ncommon;}
 
     virtual bool is_serial() const {return false;}
