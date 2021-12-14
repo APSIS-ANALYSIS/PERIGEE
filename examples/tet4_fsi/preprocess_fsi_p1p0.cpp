@@ -192,11 +192,11 @@ int main( int argc, char * argv[] )
   // ----- Finish writing
 
   // Read the geometry file for the whole FSI domain
-  int nFunc, nElem;
+  int nFunc_v, nElem;
   std::vector<int> vecIEN, phy_tag;
   std::vector<double> ctrlPts;
 
-  TET_T::read_vtu_grid( geo_file, nFunc, nElem, ctrlPts, vecIEN, phy_tag );
+  TET_T::read_vtu_grid( geo_file, nFunc_v, nElem, ctrlPts, vecIEN, phy_tag );
 
   for(unsigned int ii=0; ii<phy_tag.size(); ++ii)
   {
@@ -204,7 +204,7 @@ int main( int argc, char * argv[] )
   }
 
   // Generate IEN
-  IIEN * IEN = new IEN_Tetra_P1( nElem, vecIEN );
+  IIEN * IEN_v = new IEN_Tetra_P1( nElem, vecIEN );
 
   // --------------------------------------------------------------------------
   // The fluid-solid interface file will be read and the nodal index will be
@@ -216,7 +216,7 @@ int main( int argc, char * argv[] )
   VEC_T::print(wall_node_id);
   
   const int nFunc_interface = static_cast<int>( wall_node_id.size() );
-  const int nFunc_p = nFunc + nFunc_interface;
+  const int nFunc_p = nFunc_v + nFunc_interface;
 
   // We will generate a new IEN array for the pressure variable by updating the
   // IEN for the solid element. If the solid element has node on the fluid-solid
@@ -234,7 +234,7 @@ int main( int argc, char * argv[] )
       for(int ii=0; ii<4; ++ii)
       {
         const int pos = VEC_T::get_pos( wall_node_id, vecIEN_p[ee*4 +ii] );
-        if( pos >=0 ) vecIEN_p[ee*4+ii] = nFunc + pos;     
+        if( pos >=0 ) vecIEN_p[ee*4+ii] = nFunc_v + pos;     
       }
       
       //std::cout<<"ee = "<<ee<<'\t'<<vecIEN_p[ee*4]<<'\t'<<vecIEN_p[ee*4+1]<<'\t'<<vecIEN_p[ee*4+2]<<'\t'<<vecIEN_p[ee*4+3]<<'\n';
@@ -253,11 +253,11 @@ int main( int argc, char * argv[] )
   {
     if( phy_tag[ee] == 0 )
     {
-      for(int ii=0; ii<4; ++ii) node_f.push_back( IEN->get_IEN(ee, ii) );
+      for(int ii=0; ii<4; ++ii) node_f.push_back( IEN_v->get_IEN(ee, ii) );
     }
     else
     {
-      for(int ii=0; ii<4; ++ii) node_s.push_back( IEN->get_IEN(ee, ii) );
+      for(int ii=0; ii<4; ++ii) node_s.push_back( IEN_v->get_IEN(ee, ii) );
     }
   }
 
@@ -266,16 +266,16 @@ int main( int argc, char * argv[] )
 
   // Check the mesh
   const double critical_val_aspect_ratio = 3.5;
-  TET_T::tetmesh_check( ctrlPts, IEN, nElem, critical_val_aspect_ratio );
+  TET_T::tetmesh_check( ctrlPts, IEN_v, nElem, critical_val_aspect_ratio );
 
   // Generate the mesh
-  IMesh * mesh = new Mesh_Tet4(nFunc, nElem);
+  IMesh * mesh_v = new Mesh_Tet4(nFunc_v, nElem);
 
   // Generate the mesh for pressure
   IMesh * mesh_p = new Mesh_Tet4(nFunc_p, nElem);
   
   std::vector<IMesh const *> mlist;
-  mlist.push_back(mesh_p); mlist.push_back(mesh);
+  mlist.push_back(mesh_p); mlist.push_back(mesh_v);
 
   mlist[0]->print_info();
   mlist[1]->print_info();
@@ -284,8 +284,10 @@ int main( int argc, char * argv[] )
   std::cout<<"Solid domain: "<<node_s.size()<<" nodes.\n";
   std::cout<<"Fluid-Solid interface: "<<nFunc_interface<<" nodes.\n";
   
+  VEC_T::clean( node_f ); VEC_T::clean( node_s );
+
   std::vector<IIEN const *> ienlist;
-  ienlist.push_back(IEN_p); ienlist.push_back(IEN);
+  ienlist.push_back(IEN_p); ienlist.push_back(IEN_v);
 
   // Partition the mesh
   IGlobal_Part * global_part = nullptr;
@@ -302,6 +304,70 @@ int main( int argc, char * argv[] )
     else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
   }
 
+  // Re-ordering nodal indices
+  const int nFunc_total = nFunc_p + nFunc_v;
+
+  Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, nFunc_total);
+
+  mnindex->write_hdf5("node_mapping");
+
+  Map_Node_Index * mnindex_p = new Map_Node_Index(global_part, cpu_size, 0, nFunc_p);
+  Map_Node_Index * mnindex_v = new Map_Node_Index(global_part, cpu_size, nFunc_p, nFunc_total);
+
+  mnindex_p -> write_hdf5("node_mapping_p");
+  mnindex_v -> write_hdf5("node_mapping_v");
+
+  // Generate a list of local node number
+  std::vector<int> list_nn_v(cpu_size), list_nn_p(cpu_size);
+  for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
+  {
+    int num_node_v = 0, num_node_p = 0;
+    for(int nn=0; nn<mesh_p -> get_nFunc(); ++nn)
+    {
+      if(global_part->get_npart(nn) == proc_rank) num_node_p += 1;
+    }
+
+    for(int nn=0; nn<mesh_v -> get_nFunc(); ++nn)
+    {
+      if(global_part->get_npart(nn+nFunc_p) == proc_rank) num_node_v += 1;
+    }
+
+    // list stores the number of velo/pres nodes in each cpu
+    list_nn_v[proc_rank] = num_node_v;
+    list_nn_p[proc_rank] = num_node_p;
+  }
+
+  // Now generate the mappings from the gird pt idx to the matrix row idx
+  // This is needed because will have a matrix that has a special structure
+  // due to the use of mix fem.
+  std::vector<int> start_idx_v(cpu_size), start_idx_p(cpu_size);
+  start_idx_v[0] = 0;
+  start_idx_p[0] = 3 * list_nn_v[0];
+  for(int ii = 1; ii < cpu_size; ++ii )
+  {
+    start_idx_v[ii] = start_idx_v[ii-1] + list_nn_v[ii-1]*3 + list_nn_p[ii-1];
+    start_idx_p[ii] = start_idx_v[ii  ] + list_nn_v[ii  ]*3;
+  }
+
+  // mapper maps from the new grid point index to the matrix row index
+  std::vector< std::vector<int> > mapper_v;
+  std::vector<int> mapper_p;
+  mapper_v.resize(3);
+
+  for(int ii=0; ii<cpu_size; ++ii)
+  {
+    for(int jj=0; jj<list_nn_v[ii]; ++jj)
+    {
+      mapper_v[0].push_back( start_idx_v[ii] + jj * 3 );
+      mapper_v[1].push_back( start_idx_v[ii] + jj * 3 + 1 );
+      mapper_v[2].push_back( start_idx_v[ii] + jj * 3 + 2 );
+    }
+
+    for(int jj=0; jj<list_nn_p[ii]; ++jj)
+      mapper_p.push_back( start_idx_p[ii] + jj );
+  }
+
+  // Partition the mesh
 
 
 
