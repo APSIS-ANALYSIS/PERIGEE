@@ -145,9 +145,11 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 # BUILD THE MAIN DRIVERS
 # ===================================================================
+ADD_EXECUTABLE( gmshIO gmsh_process.cpp )
 ADD_EXECUTABLE( preprocess_fsi preprocess_fsi_p1p0.cpp)
 
 # Link libraries
 TARGET_LINK_LIBRARIES( preprocess_fsi ${EXTRA_LINK_LIBS} perigee_preprocess )
+TARGET_LINK_LIBRARIES( gmshIO ${EXTRA_LINK_LIBS} perigee_preprocess )
 
 #EOF
