@@ -1,11 +1,11 @@
 #include "Global_Part_METIS.hpp"
 
 Global_Part_METIS::Global_Part_METIS( const int &cpu_size,
-        const int &in_ncommon, const bool &isDualGraph,
-        const IMesh * const &mesh,
-        const IIEN * const &IEN,
-        const std::string &element_part_name,
-        const std::string &node_part_name )
+    const int &in_ncommon, const bool &isDualGraph,
+    const IMesh * const &mesh,
+    const IIEN * const &IEN,
+    const std::string &element_part_name,
+    const std::string &node_part_name )
 : isMETIS(true), isDual(isDualGraph), dual_edge_ncommon(in_ncommon)
 {
   const idx_t nElem = mesh->get_nElem();

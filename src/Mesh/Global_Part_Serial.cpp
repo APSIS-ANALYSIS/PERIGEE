@@ -24,12 +24,54 @@ Global_Part_Serial::Global_Part_Serial( const class IMesh * const &mesh,
   std::cout<<"=== Global partition generated. \n";
 }
 
+Global_Part_Serial::Global_Part_Serial( const int &num_fields,
+    const std::vector<IMesh const *> &mesh_list,
+    const std::string &element_part_name, const std::string &node_part_name )
+: isMETIS( false ), isDual( false ), dual_edge_ncommon( 0 )
+{
+  if(num_fields != static_cast<int>( mesh_list.size() ) )
+  {
+    std::cerr<<"ERROR: input num_fields is incompatible with mesh list.\n";
+    exit(1);
+  }
+
+  const idx_t nElem = mesh_list[0]->get_nElem();
+  idx_t nFunc = 0;
+  idx_t nLocBas = 0;
+
+  for(int ii=0; ii<num_fields; ++ii)
+  {
+    if( nElem != static_cast<idx_t>( mesh_list[ii]->get_nElem() ) )
+    {
+      std::cerr<<"ERROR: mesh list objects are incompatible with nElem.\n";
+      exit(1);
+    }
+    nFunc   += mesh_list[ii] -> get_nFunc();
+    nLocBas += mesh_list[ii] -> get_nLocBas();
+  }
+
+  epart = new idx_t [nElem];
+  npart = new idx_t [nFunc];
+
+  for(int ee=0; ee<nElem; ++ee) epart[ee] = 0;
+
+  for(int nn=0; nn<nFunc; ++nn) npart[nn] = 0;
+
+  int cpu_size = 1;
+  bool isDualGraph = true;
+  int in_ncommon = 1;
+
+  write_part_hdf5(element_part_name, epart, nElem, cpu_size, isDualGraph, in_ncommon, isMETIS );
+  write_part_hdf5(node_part_name, npart, nFunc, cpu_size, isDualGraph, in_ncommon, isMETIS );
+
+  std::cout<<"=== Global partition generated. \n";
+}
+
 Global_Part_Serial::~Global_Part_Serial()
 {
   delete [] epart; epart = nullptr;
   delete [] npart; npart = nullptr;
 }
-
 
 void Global_Part_Serial::write_part_hdf5( const std::string &fileName,
     const idx_t * const &part_in,
