@@ -247,22 +247,37 @@ int main( int argc, char * argv[] )
   // --------------------------------------------------------------------------
 
   // Generate the list of nodes for fluid and solid
-  std::vector<int> node_f, node_s; node_f.clear(); node_s.clear();
+  std::vector<int> v_node_f, v_node_s; v_node_f.clear(); v_node_s.clear();
 
   for(int ee=0; ee<nElem; ++ee)
   {
     if( phy_tag[ee] == 0 )
     {
-      for(int ii=0; ii<4; ++ii) node_f.push_back( IEN_v->get_IEN(ee, ii) );
+      for(int ii=0; ii<4; ++ii) v_node_f.push_back( IEN_v->get_IEN(ee, ii) );
     }
     else
     {
-      for(int ii=0; ii<4; ++ii) node_s.push_back( IEN_v->get_IEN(ee, ii) );
+      for(int ii=0; ii<4; ++ii) v_node_s.push_back( IEN_v->get_IEN(ee, ii) );
     }
   }
 
-  VEC_T::sort_unique_resize( node_f );
-  VEC_T::sort_unique_resize( node_s );
+  VEC_T::sort_unique_resize( v_node_f ); VEC_T::sort_unique_resize( v_node_s );
+
+  std::vector<int> p_node_f, p_node_s; p_node_f.clear(); p_node_s.clear();
+  
+  for(int ee=0; ee<nElem; ++ee)
+  {
+    if( phy_tag[ee] == 0 )
+    {
+      for(int ii=0; ii<4; ++ii) p_node_f.push_back( IEN_p->get_IEN(ee, ii) );
+    }
+    else
+    {
+      for(int ii=0; ii<4; ++ii) p_node_s.push_back( IEN_p->get_IEN(ee, ii) );
+    }
+  }
+  
+  VEC_T::sort_unique_resize( p_node_f ); VEC_T::sort_unique_resize( p_node_s );
 
   // Check the mesh
   const double critical_val_aspect_ratio = 3.5;
@@ -280,8 +295,8 @@ int main( int argc, char * argv[] )
   mlist[0]->print_info();
   mlist[1]->print_info();
 
-  std::cout<<"Fluid domain: "<<node_f.size()<<" nodes.\n";
-  std::cout<<"Solid domain: "<<node_s.size()<<" nodes.\n";
+  std::cout<<"Fluid domain: "<<v_node_f.size()<<" nodes.\n";
+  std::cout<<"Solid domain: "<<v_node_s.size()<<" nodes.\n";
   std::cout<<"Fluid-Solid interface: "<<nFunc_interface<<" nodes.\n";
   
   std::vector<IIEN const *> ienlist;
@@ -380,15 +395,15 @@ int main( int argc, char * argv[] )
     mytimer->Reset();
     mytimer->Start();
 
-    Part_FSI_PV * part = new Part_FSI_PV( mesh_p, mesh_v, global_part, mnindex,
-        mnindex_p, mnindex_v, IEN_p, IEN_v, ctrlPts, phy_tag, node_f, node_s,
+    Part_FSI_PV * part = new Part_FSI_PV( mesh_p, mesh_v, global_part,
+        mnindex_p, mnindex_v, IEN_p, IEN_v, ctrlPts, phy_tag, 
+        p_node_f, p_node_s, v_node_f, v_node_s,
         start_idx_p[proc_rank], start_idx_v[proc_rank],
         proc_rank, cpu_size, elemType, isPrintPartInfo );
 
     mytimer -> Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
   }
-
 
 
 

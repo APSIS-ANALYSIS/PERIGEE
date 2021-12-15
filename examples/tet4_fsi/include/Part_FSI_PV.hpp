@@ -16,15 +16,16 @@ class Part_FSI_PV
     Part_FSI_PV( const IMesh * const &mesh_p,
     const IMesh * const &mesh_v,
     const IGlobal_Part * const &gpart,
-    const Map_Node_Index * const &mnindex,
     const Map_Node_Index * const &mnindex_p,
     const Map_Node_Index * const &mnindex_v,
     const IIEN * const &IEN_p,
     const IIEN * const &IEN_v,
     const std::vector<double> &ctrlPts,
     const std::vector<int> &phytag,
-    const std::vector<int> &node_f,
-    const std::vector<int> &node_s,
+    const std::vector<int> &p_node_f,
+    const std::vector<int> &p_node_s,
+    const std::vector<int> &v_node_f,
+    const std::vector<int> &v_node_s,
     const int &in_start_idx_p, const int &in_start_idx_v,
     const int &in_cpu_rank, const int &in_cpu_size,
     const int &in_elemType,
@@ -46,7 +47,6 @@ class Part_FSI_PV
     int nlocalnode_p, nlocalnode_v;
     int nghostnode_p, nghostnode_v;
     int ntotalnode_p, ntotalnode_v;
-    int nbadnode_p, nbadnode_v;
     int nlocghonode_p, nlocghonode_v;
 
     // The location in the node_loc for the local fluid/solid nodes

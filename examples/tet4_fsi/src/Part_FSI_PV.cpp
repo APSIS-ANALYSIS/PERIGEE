@@ -3,15 +3,16 @@
 Part_FSI_PV::Part_FSI_PV( const IMesh * const &mesh_p,
     const IMesh * const &mesh_v,
     const IGlobal_Part * const &gpart,
-    const Map_Node_Index * const &mnindex,
     const Map_Node_Index * const &mnindex_p,
     const Map_Node_Index * const &mnindex_v,
     const IIEN * const &IEN_p,
     const IIEN * const &IEN_v,
     const std::vector<double> &ctrlPts,
     const std::vector<int> &phytag,
-    const std::vector<int> &node_f,
-    const std::vector<int> &node_s,
+    const std::vector<int> &p_node_f,
+    const std::vector<int> &p_node_s,
+    const std::vector<int> &v_node_f,
+    const std::vector<int> &v_node_s,
     const int &in_start_idx_p, const int &in_start_idx_v,
     const int &in_cpu_rank, const int &in_cpu_size,
     const int &in_elemType,
@@ -70,9 +71,8 @@ Part_FSI_PV::Part_FSI_PV( const IMesh * const &mesh_p,
 
   if(isPrintInfo)
   {
-    std::cout<<"-- proc "<<cpu_rank<<" -- elem_loc & node_loc arrays generated. \n";
+    std::cout<<"-- proc "<<cpu_rank<<" elem_loc & node_loc arrays generated. \n";
     std::cout<<"-- proc "<<cpu_rank<<" local element number: "<<elem_loc.size()<<std::endl;
-    std::cout<<"-- proc "<<cpu_rank<<" nlocalnode_p "<<nlocalnode_p<<" nlocalnode_v "<<nlocalnode_v<<std::endl;
   }
 
   for(int ii=0; ii<nlocalnode_p; ++ii)
@@ -119,6 +119,111 @@ Part_FSI_PV::Part_FSI_PV( const IMesh * const &mesh_p,
   nghostnode_p = static_cast<int>( node_ghost_p.size() );
   nghostnode_v = static_cast<int>( node_ghost_v.size() );
 
+  SYS_T::print_fatal_if( nghostnode_p + nlocalnode_p != ntotalnode_p,
+      "Error: the pressure node partition may contain bad node. \n");
+
+  SYS_T::print_fatal_if( nghostnode_v + nlocalnode_v != ntotalnode_v,
+      "Error: the velocity node partition may contain bad node. \n");
+
+  if( isPrintInfo )
+  {
+    std::cout<<"-- proc "<<cpu_rank<<" ntotalnode_p "<<ntotalnode_p<<" ntotalnode_v "<<ntotalnode_v<<std::endl;
+    std::cout<<"-- proc "<<cpu_rank<<" nlocalnode_p "<<nlocalnode_p<<" nlocalnode_v "<<nlocalnode_v<<std::endl;
+    std::cout<<"-- proc "<<cpu_rank<<" nghostnode_p "<<nghostnode_p<<" nghostnode_v "<<nghostnode_v<<std::endl;
+  }
+
+  // collect pressure and velocity nodes in local node vector
+  node_loc_p_fluid.clear(); node_loc_p_solid.clear();
+  
+  for(int ii=0; ii<nlocalnode_p; ++ii)
+  {
+    if( VEC_T::is_invec(p_node_f, node_loc_original_p[ii]) ) node_loc_p_fluid.push_back(ii);
+
+    if( VEC_T::is_invec(p_node_s, node_loc_original_p[ii]) ) node_loc_p_solid.push_back(ii);
+  }
+  
+  nlocalnode_p_fluid = static_cast<int>( node_loc_p_fluid.size() );
+  nlocalnode_p_solid = static_cast<int>( node_loc_p_solid.size() );
+
+  node_loc_v_fluid.clear(); node_loc_v_solid.clear();
+
+  for(int ii=0; ii<nlocalnode_v; ++ii)
+  {
+    if( VEC_T::is_invec(v_node_f, node_loc_original_v[ii]) ) node_loc_v_fluid.push_back(ii);
+
+    if( VEC_T::is_invec(v_node_s, node_loc_original_v[ii]) ) node_loc_v_solid.push_back(ii);
+  }
+
+  nlocalnode_v_fluid = static_cast<int>( node_loc_v_fluid.size() );
+  nlocalnode_v_solid = static_cast<int>( node_loc_v_solid.size() );
+
+  // local to global mapping
+  local_to_global_p = node_loc_p;
+  VEC_T::insert_end(local_to_global_p, node_ghost_p);
+
+  local_to_global_v = node_loc_v;
+  VEC_T::insert_end(local_to_global_v, node_ghost_v);
+
+  VEC_T::shrink2fit(local_to_global_p);
+  VEC_T::shrink2fit(local_to_global_v);
+
+  nlocghonode_p = static_cast<int>( local_to_global_p.size() );
+  nlocghonode_v = static_cast<int>( local_to_global_v.size() );
+
+  if( isPrintInfo ) std::cout<<"-- proc "<<cpu_rank<<" local_to_global generated. \n";
+
+  // LIEN
+  pLIEN.resize(nlocalele * nLocBas_p);
+  vLIEN.resize(nlocalele * nLocBas_v);
+
+  for(int ee=0; ee<nlocalele; ++ee)
+  {
+    for(int ii=0; ii<nLocBas_p; ++ii)
+    {
+      int global_index = IEN_p -> get_IEN( elem_loc[ee], ii );
+      global_index = mnindex_p -> get_old2new( global_index );
+      const auto lien_ptr = find( local_to_global_p.begin(),local_to_global_p.end(),
+          global_index );
+      
+      SYS_T::print_fatal_if( lien_ptr == local_to_global_p.end(), "Error: unable to locate an index.\n");
+      
+      pLIEN[ee*nLocBas_p + ii] = lien_ptr - local_to_global_p.begin();
+    }
+
+    for(int ii=0; ii<nLocBas_v; ++ii)
+    {
+      int global_index = IEN_v -> get_IEN( elem_loc[ee], ii );
+      global_index = mnindex_v -> get_old2new(global_index);
+      const auto lien_ptr = find( local_to_global_v.begin(), local_to_global_v.end(),
+          global_index );
+      
+      SYS_T::print_fatal_if( lien_ptr == local_to_global_p.end(), "Error: unable to locate an index.\n");
+      
+      vLIEN[ee*nLocBas_v + ii] = lien_ptr - local_to_global_v.begin();
+    }
+  }
+
+  if(isPrintInfo) std::cout<<"-- proc "<<cpu_rank<<" LIEN generated. \n";
+
+  // 7. local copy of control points based on velocity mesh partition
+  ctrlPts_x_loc.resize(nlocghonode_v);
+  ctrlPts_y_loc.resize(nlocghonode_v);
+  ctrlPts_z_loc.resize(nlocghonode_v);
+
+  for(int ii=0; ii<nlocghonode_v; ++ii)
+  {
+    int aux_index = local_to_global_v[ii]; // new global index
+    aux_index = mnindex_v->get_new2old(aux_index); // back to old global index
+    ctrlPts_x_loc[ii] = ctrlPts[3*aux_index + 0];
+    ctrlPts_y_loc[ii] = ctrlPts[3*aux_index + 1];
+    ctrlPts_z_loc[ii] = ctrlPts[3*aux_index + 2];
+  }
+
+  VEC_T::shrink2fit(ctrlPts_x_loc);
+  VEC_T::shrink2fit(ctrlPts_y_loc);
+  VEC_T::shrink2fit(ctrlPts_z_loc);
+
+  if(isPrintInfo) std::cout<<"-- proc "<<cpu_rank<<" Local control points generated. \n";
 }
 
 
