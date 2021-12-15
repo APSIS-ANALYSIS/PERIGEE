@@ -14,6 +14,7 @@
 #include "Global_Part_Serial.hpp"
 #include "Global_Part_Reload.hpp"
 #include "Part_FSI_PV.hpp"
+#include "NodalBC_3D_FSI.hpp"
 #include "NodalBC_3D_vtu.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_tet_outflow.hpp"
@@ -374,6 +375,62 @@ int main( int argc, char * argv[] )
     for(int jj=0; jj<list_nn_p[ii]; ++jj)
       mapper_p.push_back( start_idx_p[ii] + jj );
   }
+
+  // ----------------------------------------------------------------
+  // Setup boundary conditions
+  // Physical NodalBC
+  std::cout<<"===== Boundary Conditions =====\n";
+  std::cout<<"1. Nodal boundary condition for the implicit solver: \n";
+  std::vector<INodalBC *> NBC_list( 4, nullptr );
+
+  NBC_list[0] = new NodalBC_3D_FSI( geo_f_file, nFunc_p, fsiBC_type );
+
+  for( int ii=1; ii<4; ++ii )
+    NBC_list[ii] = new NodalBC_3D_FSI( geo_f_file, geo_s_file, sur_f_file_wall, sur_s_file_wall,
+        sur_f_file_in, sur_f_file_out, sur_s_file_in, sur_s_file_out, nFunc_v, ii, ringBC_type, fsiBC_type );
+
+  // Mesh solver NodalBC
+  std::cout<<"2. Nodal boundary condition for the mesh motion: \n";
+  std::vector<INodalBC *> meshBC_list( 3, nullptr );
+
+  std::vector<std::string> meshdir_vtp_list = sur_f_file_in;
+  VEC_T::insert_end( meshdir_vtp_list, sur_f_file_out );
+
+  meshBC_list[0] = new NodalBC_3D_vtu( geo_s_file, meshdir_vtp_list, nFunc_v );
+  meshBC_list[1] = new NodalBC_3D_vtu( geo_s_file, meshdir_vtp_list, nFunc_v );
+  meshBC_list[2] = new NodalBC_3D_vtu( geo_s_file, meshdir_vtp_list, nFunc_v );
+
+  // InflowBC info
+  std::cout<<"3. Inflow cap surfaces: \n";
+  std::vector<Vector_3> inlet_outvec( num_inlet );
+  for(int ii=0; ii<num_inlet; ++ii)
+    inlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_in[ii], ctrlPts, IEN_v );
+
+  INodalBC * InFBC = new NodalBC_3D_inflow( sur_f_file_in, sur_f_file_wall, nFunc_v, inlet_outvec );
+
+  // Physical ElemBC
+  cout<<"4. Elem boundary for the implicit solver: \n";
+  std::vector< Vector_3 > outlet_outvec( num_outlet );
+
+  for(int ii=0; ii<num_outlet; ++ii)
+    outlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_out[ii], ctrlPts, IEN_v );
+
+  ElemBC * ebc = nullptr;
+  if( fsiBC_type == 0 || fsiBC_type == 1 )
+    ebc = new ElemBC_3D_tet_outflow( sur_f_file_out, outlet_outvec );
+  else if( fsiBC_type == 2 )
+    ebc = new ElemBC_3D_tet( sur_s_file_interior_wall );
+  else SYS_T::print_fatal("ERROR: uncognized fsiBC type. \n");
+
+  ebc -> resetTriIEN_outwardnormal( IEN_v ); // assign outward orientation for triangles
+
+  // Mesh solver ElemBC
+  cout<<"5. Elem boundary for the mesh solver: \n";
+  std::vector<std::string> mesh_ebclist;
+  mesh_ebclist.clear();
+  ElemBC * mesh_ebc = new ElemBC_3D_tet( mesh_ebclist );
+  std::cout<<"=================================\n";
+  // ----------------------------------------------------------------
 
   // Partition the mesh
   const bool isPrintPartInfo = true;

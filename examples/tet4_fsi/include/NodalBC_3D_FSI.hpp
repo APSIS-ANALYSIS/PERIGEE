@@ -25,6 +25,10 @@ class NodalBC_3D_FSI : public INodalBC
         const int &ringBC_type,
         const int &fsiBC_type );
 
+    NodalBC_3D_FSI( const std::string &fluid_file,
+        const int &nFunc,
+        const int &fsiBC_type );
+
     virtual ~NodalBC_3D_FSI() {};
 
     virtual unsigned int get_dir_nodes(const unsigned int &ii) const

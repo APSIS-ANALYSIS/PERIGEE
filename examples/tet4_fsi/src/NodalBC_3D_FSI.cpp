@@ -22,7 +22,7 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
       {
         if(ringBC_type == 0)
         {
-          if( comp == 0 ) dir_nodes.clear();
+          if( comp == 0 ) SYS_T::print_fatal( "Error: comp = 0 BC specification should call a different constructor.\n" );
           else if( comp == 1 || comp == 2 || comp == 3 )
           {
             dir_nodes = get_vtp_nodal_id( fluid_inlet_files );
@@ -46,7 +46,7 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
       // ====== Rigid wall ======
     case 1:
       {
-        if( comp == 0 ) dir_nodes.clear();
+        if( comp == 0 ) SYS_T::print_fatal( "Error: comp = 0 BC specification should call a different constructor.\n" );
         else if( comp == 1 || comp == 2 || comp == 3 )
         {
           dir_nodes = VEC_T::cast_to_unsigned_int( TET_T::read_int_PointData( solid_file, "GlobalNodeID" ) );
@@ -66,13 +66,7 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
       {
         if(ringBC_type == 0)
         {
-          if( comp == 0 )
-          { 
-            dir_nodes = VEC_T::cast_to_unsigned_int( TET_T::read_int_PointData( fluid_file, "GlobalNodeID" ) );
-
-            std::cout<<"===> NodalBC_3D_FSI for wall prestressing (fsiBC_type = 2) with cap surface \n";
-            std::cout<<"     fully clamped (ringBC_type = 0) is generated for pressure. \n";
-          }
+          if( comp == 0 ) SYS_T::print_fatal( "Error: comp = 0 BC specification should call a different constructor.\n" );
           else if( comp == 1 || comp == 2 || comp == 3 )
           {
             const std::vector<int> f_node = TET_T::read_int_PointData( fluid_file, "GlobalNodeID" );
@@ -99,6 +93,38 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
         break;
       }
 
+    default:
+      SYS_T::print_fatal( "NodalBC_3D_FSI Error: No such type of FSI BC.\n" );
+      break;
+  }
+
+  // count the number of dirichlet nodes
+  num_dir_nodes = dir_nodes.size();
+
+  // generate the ID array
+  Create_ID( nFunc );
+}
+
+NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
+    const int &nFunc,
+    const int &fsiBC_type )
+{
+  dir_nodes.clear();
+
+  switch( fsiBC_type )
+  {
+    // ====== deformable FSI ======
+    case 0:
+      dir_nodes.clear();
+      break;
+      // ====== Rigid wall ======
+    case 1:
+      dir_nodes.clear();
+      break;
+      // ====== Wall prestress solver =====
+    case 2:
+      dir_nodes = VEC_T::cast_to_unsigned_int( TET_T::read_int_PointData( fluid_file, "GlobalNodeID" ) );
+      break;
     default:
       SYS_T::print_fatal( "NodalBC_3D_FSI Error: No such type of FSI BC.\n" );
       break;
