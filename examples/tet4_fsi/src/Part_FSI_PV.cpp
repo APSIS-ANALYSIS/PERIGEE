@@ -230,6 +230,141 @@ Part_FSI_PV::Part_FSI_PV( const IMesh * const &mesh_p,
 Part_FSI_PV::~Part_FSI_PV()
 {}
 
+void Part_FSI_PV::write( const std::string &inputFileName ) const
+{
+  std::string fName = SYS_T::gen_partfile_name( inputFileName, cpu_rank );
 
+  hid_t file_id = H5Fcreate(fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+
+  HDF5_Writer * h5w = new HDF5_Writer(file_id);
+  
+  hid_t group_p = H5Gcreate(file_id, "/pres", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  hid_t group_v = H5Gcreate(file_id, "/velo", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+  // group 1 : local element
+  hid_t group_id_1 = H5Gcreate(file_id, "/Local_Elem", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+  h5w->write_intScalar( group_id_1, "nlocalele", nlocalele );
+  h5w->write_intVector( group_id_1, "elem_loc", elem_loc );
+  h5w->write_intVector( group_id_1, "elem_phy_tag", elem_phy_tag );
+
+  H5Gclose( group_id_1 );
+
+  // group 2 : local node
+  hid_t group_id_2p = H5Gcreate( file_id, "/pres/Local_Node", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+  h5w->write_intScalar( group_id_2p, "nlocalnode", nlocalnode_p );
+  h5w->write_intScalar( group_id_2p, "nghostnode", nghostnode_p );
+  h5w->write_intScalar( group_id_2p, "ntotalnode", ntotalnode_p );
+  h5w->write_intScalar( group_id_2p, "nlocghonode", nlocghonode_p );
+
+  h5w->write_intVector( group_id_2p, "node_loc", node_loc_p );
+  h5w->write_intVector( group_id_2p, "node_loc_original", node_loc_original_p );
+  h5w->write_intVector( group_id_2p, "local_to_global", local_to_global_p );
+  if(nghostnode_p > 0) h5w->write_intVector( group_id_2p, "node_ghost", node_ghost_p ); 
+  
+  h5w->write_intScalar( group_id_2p, "nlocalnode_fluid", nlocalnode_p_fluid );
+  h5w->write_intScalar( group_id_2p, "nlocalnode_solid", nlocalnode_p_solid );
+
+  if( nlocalnode_p_fluid > 0 )
+    h5w->write_intVector( group_id_2p, "node_loc_fluid", node_loc_p_fluid );
+
+  if( nlocalnode_p_solid > 0 )
+    h5w->write_intVector( group_id_2p, "node_loc_solid", node_loc_p_solid );
+  
+  H5Gclose( group_id_2p );
+
+  hid_t group_id_2v = H5Gcreate( file_id, "/velo/Local_Node", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+  h5w->write_intScalar( group_id_2v, "nlocalnode", nlocalnode_v );
+  h5w->write_intScalar( group_id_2v, "nghostnode", nghostnode_v );
+  h5w->write_intScalar( group_id_2v, "ntotalnode", ntotalnode_v );
+  h5w->write_intScalar( group_id_2v, "nlocghonode", nlocghonode_v );
+
+  h5w->write_intVector( group_id_2v, "node_loc", node_loc_v );
+  h5w->write_intVector( group_id_2v, "node_loc_original", node_loc_original_v );
+  h5w->write_intVector( group_id_2v, "local_to_global", local_to_global_v );
+  if(nghostnode_v > 0) h5w->write_intVector( group_id_2v, "node_ghost", node_ghost_v ); 
+  
+  h5w->write_intScalar( group_id_2v, "nlocalnode_fluid", nlocalnode_v_fluid );
+  h5w->write_intScalar( group_id_2v, "nlocalnode_solid", nlocalnode_v_solid );
+
+  if( nlocalnode_p_fluid > 0 )
+    h5w->write_intVector( group_id_2v, "node_loc_fluid", node_loc_v_fluid );
+
+  if( nlocalnode_p_solid > 0 )
+    h5w->write_intVector( group_id_2v, "node_loc_solid", node_loc_v_solid );
+  
+  H5Gclose( group_id_2v );
+
+  // group 3 : global mesh info
+  hid_t group_id_3p = H5Gcreate(file_id, "/pres/Global_Mesh_Info",
+      H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+  hid_t group_id_3v = H5Gcreate(file_id, "/velo/Global_Mesh_Info",
+      H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+  h5w->write_intScalar( group_id_3p, "nElem", nElem );
+  h5w->write_intScalar( group_id_3v, "nElem", nElem );
+
+  h5w->write_intScalar( group_id_3p, "nFunc", nFunc_p );
+  h5w->write_intScalar( group_id_3v, "nFunc", nFunc_v );
+
+  std::vector<int> deg = { sDegree_p, tDegree_p, uDegree_p };
+  h5w->write_intVector( group_id_3p, "degree", deg );
+
+  deg = { sDegree_v, tDegree_v, uDegree_v };
+  h5w->write_intVector( group_id_3v, "degree", deg );
+  
+  h5w->write_intScalar( group_id_3p, "nLocBas", nLocBas_p );
+  h5w->write_intScalar( group_id_3v, "nLocBas", nLocBas_v );
+
+  h5w->write_intScalar( group_id_3p, "probDim", probDim );
+  h5w->write_intScalar( group_id_3v, "probDim", probDim );
+  
+  h5w->write_intScalar( group_id_3p, "elemType", elemType );
+  h5w->write_intScalar( group_id_3v, "elemType", elemType );
+
+  H5Gclose( group_id_3p ); H5Gclose( group_id_3v );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // Finish writing, clean up
+  H5Gclose( group_p ); H5Gclose( group_v );
+  delete h5w;
+  H5Fclose(file_id);
+}
 
 // EOF

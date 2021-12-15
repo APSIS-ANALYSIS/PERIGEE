@@ -33,6 +33,8 @@ class Part_FSI_PV
 
     virtual ~Part_FSI_PV();
 
+    virtual void write( const std::string &inputFileName ) const;
+
   protected:
     // 1. local element (===> ALocal_Elem)
     std::vector<int> elem_loc, elem_phy_tag;

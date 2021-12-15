@@ -403,6 +403,9 @@ int main( int argc, char * argv[] )
 
     mytimer -> Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
+    
+    part -> write( part_file );
+    
   }
 
 
