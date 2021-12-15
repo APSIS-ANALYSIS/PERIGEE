@@ -28,8 +28,6 @@ int main( int argc, char * argv[] )
   SYS_T::execute("mkdir apart");
 
   // Define basic settings
-  const int dofNum = 7;     // degree-of-freedom for the physical problem
-  const int dofMat = 4;     // degree-of-freedom in the matrix problem
   const int elemType = 501; // first order simplicial element
   const int num_fields = 2; // Two fields : pressure + velocity/displacement
 
@@ -111,8 +109,6 @@ int main( int argc, char * argv[] )
   if(isReload) std::cout<<" -isReload : true \n";
   else std::cout<<" -isReload : false \n";
   std::cout<<"----------------------------------\n";
-  std::cout<<" dofNum: "<<dofNum<<std::endl;
-  std::cout<<" dofMat: "<<dofMat<<std::endl;
   std::cout<<" elemType: "<<elemType<<std::endl;
   std::cout<<"===== Command Line Arguments ====="<<std::endl;
 
@@ -170,8 +166,6 @@ int main( int argc, char * argv[] )
   cmdh5w->write_intScalar("num_inlet",        num_inlet);
   cmdh5w->write_intScalar("cpu_size",         cpu_size);
   cmdh5w->write_intScalar("in_ncommon",       in_ncommon);
-  cmdh5w->write_intScalar("dofNum",           dofNum);
-  cmdh5w->write_intScalar("dofMat",           dofMat);
   cmdh5w->write_intScalar("elemType",         elemType);
   cmdh5w->write_intScalar("fsiBC_type",       fsiBC_type);
   cmdh5w->write_intScalar("ringBC_type",      ringBC_type);
@@ -191,7 +185,8 @@ int main( int argc, char * argv[] )
   delete cmdh5w; H5Fclose(cmd_file_id);
   // ----- Finish writing
 
-  // Read the geometry file for the whole FSI domain
+  // Read the geometry file for the whole FSI domain for the velocity /
+  // displacement field
   int nFunc_v, nElem;
   std::vector<int> vecIEN, phy_tag;
   std::vector<double> ctrlPts;
@@ -209,7 +204,7 @@ int main( int argc, char * argv[] )
   // --------------------------------------------------------------------------
   // The fluid-solid interface file will be read and the nodal index will be
   // mapped to a new value by the following rule. The ii-th node in the
-  // interface wall node will be assgiend nFunc + ii. 
+  // interface wall node will be assgiend to nFunc_v + ii. 
   // Read the F-S interface vtp file
   const std::vector<int> wall_node_id = TET_T::read_int_PointData( sur_s_file_interior_wall, "GlobalNodeID" );
 

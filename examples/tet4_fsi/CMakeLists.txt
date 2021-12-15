@@ -61,6 +61,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
   ${perigee_SOURCE_DIR}/src/Part_FSI_PV.cpp
+  ${perigee_SOURCE_DIR}/src/NodalBC_3D_FSI.cpp
   )
 
 # 2. Anlysis source cpp
