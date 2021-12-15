@@ -1,7 +1,7 @@
-#ifndef PART_TET_FSI_HPP
-#define PART_TET_FSI_HPP
+#ifndef PART_FSI_PV_HPP
+#define PART_FSI_PV_HPP
 // ============================================================================
-// Part_Tet_FSI.hpp
+// Part_FSI_PV.hpp
 //
 // Date: Dec. 14 2021
 // ============================================================================
@@ -10,20 +10,27 @@
 #include "Map_Node_Index.hpp"
 #include "IIEN.hpp"
 
-class Part_Tet_FSI
+class Part_FSI_PV
 {
   public:
-    Part_Tet_FSI( const IMesh * const &mesh,
-        const IGlobal_Part * const &gpart,
-        const Map_Node_Index * const &mnindex,
-        const IIEN * const &IEN,
-        const std::vector<double> &ctrlPts,
-        const int &in_cpu_rank, const int &in_cpu_size,
-        const int &in_dofNum, const int &in_dofMat,
-        const int &in_elemType,
-        const bool isPrintInfo );
+    Part_FSI_PV( const IMesh * const &mesh_p,
+    const IMesh * const &mesh_v,
+    const IGlobal_Part * const &gpart,
+    const Map_Node_Index * const &mnindex,
+    const Map_Node_Index * const &mnindex_p,
+    const Map_Node_Index * const &mnindex_v,
+    const IIEN * const &IEN_p,
+    const IIEN * const &IEN_v,
+    const std::vector<double> &ctrlPts,
+    const std::vector<int> &phytag,
+    const std::vector<int> &node_f,
+    const std::vector<int> &node_s,
+    const int &in_start_idx_p, const int &in_start_idx_v,
+    const int &in_cpu_rank, const int &in_cpu_size,
+    const int &in_elemType,
+    const bool isPrintInfo );
 
-    virtual ~Part_Tet_FSI();
+    virtual ~Part_FSI_PV();
 
   protected:
     // 1. local element (===> ALocal_Elem)
@@ -56,14 +63,16 @@ class Part_Tet_FSI
     int nlocalnode_v_fluid, nlocalnode_v_solid;
 
     // 3 CPU info and partition parameters (===> APart_Basic_Info)
-    int cpu_rank, cpu_size, dual_edge_ncommon;
-    
+    const int cpu_rank, cpu_size, dual_edge_ncommon;
+
     // 4. global mesh info (===> AGlobal_Mesh_Info)
-    int nElem, nFunc, sDegree, tDegree, uDegree, nLocBas, probDim, dofNum, dofMat, elemType;
+    const int nElem, probDim, elemType;
+    const int nFunc_p, sDegree_p, tDegree_p, uDegree_p, nLocBas_p;
+    const int nFunc_v, sDegree_v, tDegree_v, uDegree_v, nLocBas_v;
 
     // 5. LIEN (===> ALocal_IEN)
     std::vector<int> pLIEN, vLIEN; // LIEN for separate fields
-    
+
     // 6. control points
     std::vector<double> ctrlPts_x_loc, ctrlPts_y_loc, ctrlPts_z_loc;
 };

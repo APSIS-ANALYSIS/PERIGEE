@@ -13,7 +13,7 @@
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
 #include "Global_Part_Reload.hpp"
-#include "Part_Tet_FSI.hpp"
+#include "Part_FSI_PV.hpp"
 #include "NodalBC_3D_vtu.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_tet_outflow.hpp"
@@ -284,8 +284,6 @@ int main( int argc, char * argv[] )
   std::cout<<"Solid domain: "<<node_s.size()<<" nodes.\n";
   std::cout<<"Fluid-Solid interface: "<<nFunc_interface<<" nodes.\n";
   
-  VEC_T::clean( node_f ); VEC_T::clean( node_s );
-
   std::vector<IIEN const *> ienlist;
   ienlist.push_back(IEN_p); ienlist.push_back(IEN_v);
 
@@ -382,9 +380,10 @@ int main( int argc, char * argv[] )
     mytimer->Reset();
     mytimer->Start();
 
-    IPart * part = new Part_Tet_FSI( mesh, global_part, mnindex, IEN,
-        ctrlPts, phy_tag, node_f, node_s,
-        proc_rank, cpu_size, dofNum, dofMat, elemType, isPrintPartInfo );
+    Part_FSI_PV * part = new Part_FSI_PV( mesh_p, mesh_v, global_part, mnindex,
+        mnindex_p, mnindex_v, IEN_p, IEN_v, ctrlPts, phy_tag, node_f, node_s,
+        start_idx_p[proc_rank], start_idx_v[proc_rank],
+        proc_rank, cpu_size, elemType, isPrintPartInfo );
 
     mytimer -> Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
