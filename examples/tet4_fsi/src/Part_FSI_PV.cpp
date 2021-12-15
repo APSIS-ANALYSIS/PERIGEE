@@ -25,7 +25,8 @@ Part_FSI_PV::Part_FSI_PV( const IMesh * const &mesh_p,
   uDegree_p( mesh_p->get_u_degree() ), nLocBas_p( mesh_p->get_nLocBas() ),
   nFunc_v( mesh_v->get_nFunc() ), 
   sDegree_v( mesh_v->get_s_degree() ), tDegree_v( mesh_v->get_t_degree() ),
-  uDegree_v( mesh_v->get_u_degree() ), nLocBas_v( mesh_v->get_nLocBas() )
+  uDegree_v( mesh_v->get_u_degree() ), nLocBas_v( mesh_v->get_nLocBas() ),
+  start_idx_p( in_start_idx_p ), start_idx_v( in_start_idx_v )
 {
   SYS_T::print_fatal_if( nElem != mesh_v -> get_nElem(), "Error: nElem in pressure mesh and velocity mesh should be the same.\n" );
   
@@ -325,41 +326,40 @@ void Part_FSI_PV::write( const std::string &inputFileName ) const
 
   H5Gclose( group_id_3p ); H5Gclose( group_id_3v );
 
+  // group 4 : part info
+  hid_t group_id_4 = H5Gcreate( file_id, "/Part_Info", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 
+  h5w->write_intScalar( group_id_4, "cpu_rank", cpu_rank );
+  h5w->write_intScalar( group_id_4, "cpu_size", cpu_size );
+  h5w->write_intScalar( group_id_4, "dual_edge_ncommon", dual_edge_ncommon );
 
+  H5Gclose( group_id_4 );
 
+  // group 5 : LIEN
+  hid_t group_id_5p = H5Gcreate(file_id, "/pres/LIEN", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  hid_t group_id_5v = H5Gcreate(file_id, "/velo/LIEN", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
+  h5w->write_intMatrix( group_id_5p, "LIEN", pLIEN, nlocalele, nLocBas_p);
+  h5w->write_intMatrix( group_id_5v, "LIEN", vLIEN, nlocalele, nLocBas_v);
 
+  H5Gclose( group_id_5p ); H5Gclose( group_id_5v );
 
+  // group 6 : control points
+  hid_t group_id_6 = H5Gcreate(file_id, "/ctrlPts_loc", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
+  h5w->write_doubleVector( group_id_6, "ctrlPts_x_loc", ctrlPts_x_loc );
+  h5w->write_doubleVector( group_id_6, "ctrlPts_y_loc", ctrlPts_y_loc );
+  h5w->write_doubleVector( group_id_6, "ctrlPts_z_loc", ctrlPts_z_loc );
 
+  H5Gclose( group_id_6 );
 
+  // group 7 : DOF mapper
+  hid_t group_id_7 = H5Gcreate(file_id, "/DOF_mapper", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
+  h5w -> write_intScalar( group_id_7, "start_idx_p", start_idx_p );
+  h5w -> write_intScalar( group_id_7, "start_idx_v", start_idx_v );
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  H5Gclose( group_id_7 );
 
   // Finish writing, clean up
   H5Gclose( group_p ); H5Gclose( group_v );

@@ -77,6 +77,9 @@ class Part_FSI_PV
 
     // 6. control points
     std::vector<double> ctrlPts_x_loc, ctrlPts_y_loc, ctrlPts_z_loc;
+    
+    // 7. DOF mapper : the matrix starting index for the two fields 
+    const int start_idx_p, start_idx_v;
 };
 
 #endif
