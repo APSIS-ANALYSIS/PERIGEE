@@ -35,6 +35,8 @@ class Part_FSI_PV
 
     virtual void write( const std::string &inputFileName ) const;
 
+    virtual void print_part_loadbalance_edgecut() const;
+
   protected:
     // 1. local element (===> ALocal_Elem)
     std::vector<int> elem_loc, elem_phy_tag;

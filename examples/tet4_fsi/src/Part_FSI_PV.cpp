@@ -367,4 +367,12 @@ void Part_FSI_PV::write( const std::string &inputFileName ) const
   H5Fclose(file_id);
 }
 
+void Part_FSI_PV::print_part_loadbalance_edgecut() const
+{
+  std::cout<<"Proc:"<<" "<<cpu_rank;
+  std::cout<<" "<<"element ratio:"<<" "<<(double) nlocalele / (double) nElem;
+  std::cout<<" "<<"node ratio:"<<" "<<(double) (nlocalnode_p + nlocalnode_v) / (double) (nFunc_p+nFunc_v);
+  std::cout<<" "<<"gho/loc ratio:"<<" "<<(double) (nghostnode_p + nghostnode_v) / (double) (nlocalnode_p+nlocalnode_v)<<std::endl;
+}
+
 // EOF
