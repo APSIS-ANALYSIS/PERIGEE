@@ -381,11 +381,11 @@ int main( int argc, char * argv[] )
   // Physical NodalBC
   std::cout<<"===== Boundary Conditions =====\n";
   std::cout<<"1. Nodal boundary condition for the implicit solver: \n";
-  std::vector<INodalBC *> NBC_list( 4, nullptr );
+  std::vector<INodalBC *> NBC_list( 3, nullptr );
 
-  NBC_list[0] = new NodalBC_3D_FSI( geo_f_file, nFunc_p, fsiBC_type );
+  INodalBC * NBC_pres = new NodalBC_3D_FSI( geo_f_file, nFunc_p, fsiBC_type );
 
-  for( int ii=1; ii<4; ++ii )
+  for( int ii=0; ii<3; ++ii )
     NBC_list[ii] = new NodalBC_3D_FSI( geo_f_file, geo_s_file, sur_f_file_wall, sur_s_file_wall,
         sur_f_file_in, sur_f_file_out, sur_s_file_in, sur_s_file_out, nFunc_v, ii, ringBC_type, fsiBC_type );
 
