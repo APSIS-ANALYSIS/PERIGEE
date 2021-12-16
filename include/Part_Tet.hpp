@@ -17,6 +17,10 @@
 class Part_Tet : public IPart
 {
   public:
+    // Default constructor
+    // The actual construction is in the derived class.
+    Part_Tet(){};
+    
     Part_Tet( const IMesh * const &mesh,
         const IGlobal_Part * const &gpart,
         const Map_Node_Index * const &mnindex,
@@ -106,15 +110,10 @@ class Part_Tet : public IPart
     std::vector<int> node_ghost;
     std::vector<int> local_to_global;
 
-    int nlocalnode;
-    int nghostnode;
-    int ntotalnode;
-    int nbadnode;
-    int nlocghonode;
+    int nlocalnode, nghostnode, ntotalnode, nbadnode, nlocghonode;
 
     // 3. CPU info and partition parameters
-    int cpu_rank, cpu_size;
-    int dual_edge_ncommon;
+    int cpu_rank, cpu_size, dual_edge_ncommon;
 
     // 4. global mesh info
     int nElem, nFunc, sDegree, tDegree, uDegree, nLocBas;
@@ -128,13 +127,6 @@ class Part_Tet : public IPart
 
     // ------------------------------------------------------------------------
     // Function
-    void Generate_Partition( const IMesh * const &mesh,
-        const IGlobal_Part * const &gpart,
-        const Map_Node_Index * const &mnindex,
-        const IIEN * const &IEN,
-        const std::vector<double> &ctrlPts,
-        const int &field = 0 );
-    
     void Generate_Partition( const IMesh * const &mesh,
         const IGlobal_Part * const &gpart,
         const Map_Node_Index * const &mnindex,

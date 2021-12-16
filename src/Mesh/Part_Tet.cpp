@@ -24,8 +24,29 @@ Part_Tet::Part_Tet(
   SYS_T::print_exit_if(cpu_rank >= cpu_size, "Error: Part_Tet input cpu_rank is wrong! \n");
   SYS_T::print_exit_if(cpu_rank < 0, "Error: Part_Tet input cpu_rank is wrong! \n");
 
-  // Generate group 1, 2, 5, and 6.
+  // Generate group 1, 2, and 5.
   Generate_Partition( mesh, gpart, mnindex, IEN, ctrlPts );
+
+  // Generate group 6
+  // local copy of control points
+  ctrlPts_x_loc.resize(nlocghonode);
+  ctrlPts_y_loc.resize(nlocghonode);
+  ctrlPts_z_loc.resize(nlocghonode);
+
+  for(int ii=0; ii<nlocghonode; ++ii)
+  {
+    int aux_index = local_to_global[ii]; // new global index
+    aux_index = mnindex->get_new2old(aux_index); // back to old global index
+    ctrlPts_x_loc[ii] = ctrlPts[3*aux_index + 0];
+    ctrlPts_y_loc[ii] = ctrlPts[3*aux_index + 1];
+    ctrlPts_z_loc[ii] = ctrlPts[3*aux_index + 2];
+  }
+
+  VEC_T::shrink2fit(ctrlPts_x_loc);
+  VEC_T::shrink2fit(ctrlPts_y_loc);
+  VEC_T::shrink2fit(ctrlPts_z_loc);
+
+  std::cout<<"-- proc "<<cpu_rank<<" Local control points generated. \n";
 }
 
 Part_Tet::Part_Tet(
@@ -53,8 +74,29 @@ Part_Tet::Part_Tet(
   SYS_T::print_exit_if(cpu_rank >= cpu_size, "Error: Part_Tet input cpu_rank is wrong! \n");
   SYS_T::print_exit_if(cpu_rank < 0, "Error: Part_Tet input cpu_rank is wrong! \n");
 
-  // Generate group 1, 2, 5, and 6.
+  // Generate group 1, 2, and 5.
   Generate_Partition( mesh, gpart, mnindex, IEN, ctrlPts );
+
+  // Generate group 6
+  // local copy of control points
+  ctrlPts_x_loc.resize(nlocghonode);
+  ctrlPts_y_loc.resize(nlocghonode);
+  ctrlPts_z_loc.resize(nlocghonode);
+
+  for(int ii=0; ii<nlocghonode; ++ii)
+  {
+    int aux_index = local_to_global[ii]; // new global index
+    aux_index = mnindex->get_new2old(aux_index); // back to old global index
+    ctrlPts_x_loc[ii] = ctrlPts[3*aux_index + 0];
+    ctrlPts_y_loc[ii] = ctrlPts[3*aux_index + 1];
+    ctrlPts_z_loc[ii] = ctrlPts[3*aux_index + 2];
+  }
+
+  VEC_T::shrink2fit(ctrlPts_x_loc);
+  VEC_T::shrink2fit(ctrlPts_y_loc);
+  VEC_T::shrink2fit(ctrlPts_z_loc);
+
+  std::cout<<"-- proc "<<cpu_rank<<" Local control points generated. \n";
 }
 
 Part_Tet::Part_Tet( const char * const &inputfileName, const int &in_cpu_rank )
@@ -135,38 +177,6 @@ Part_Tet::~Part_Tet()
   for(int ii=0; ii<nlocalele; ++ii) delete [] LIEN[ii];
   delete [] LIEN;
 }
-
-void Part_Tet::Generate_Partition( const IMesh * const &mesh,
-    const IGlobal_Part * const &gpart,
-    const Map_Node_Index * const &mnindex,
-    const IIEN * const &IEN,
-    const std::vector<double> &ctrlPts,
-    const int &field )
-{
-  // The local element, local node, and LIEN get generated
-  Generate_Partition(mesh, gpart, mnindex, IEN, field);
-
-  // local copy of control points
-  ctrlPts_x_loc.resize(nlocghonode);
-  ctrlPts_y_loc.resize(nlocghonode);
-  ctrlPts_z_loc.resize(nlocghonode);
-
-  for(int ii=0; ii<nlocghonode; ++ii)
-  {
-    int aux_index = local_to_global[ii]; // new global index
-    aux_index = mnindex->get_new2old(aux_index); // back to old global index
-    ctrlPts_x_loc[ii] = ctrlPts[3*aux_index + 0];
-    ctrlPts_y_loc[ii] = ctrlPts[3*aux_index + 1];
-    ctrlPts_z_loc[ii] = ctrlPts[3*aux_index + 2];
-  }
-
-  VEC_T::shrink2fit(ctrlPts_x_loc);
-  VEC_T::shrink2fit(ctrlPts_y_loc);
-  VEC_T::shrink2fit(ctrlPts_z_loc);
-
-  std::cout<<"-- proc "<<cpu_rank<<" Local control points generated. \n";
-}
-
 
 void Part_Tet::Generate_Partition( const IMesh * const &mesh,
     const IGlobal_Part * const &gpart,
