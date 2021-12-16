@@ -29,8 +29,6 @@ class APart_Basic_Info
     
     virtual int get_cpu_size() const {return cpu_size;}
     
-    virtual int get_dual_edge_ncommon() const {return dual_edge_ncommon;}
-
     virtual void print_info() const;
   
   private:
@@ -39,7 +37,7 @@ class APart_Basic_Info
     // --------------------------------------------------------------
     APart_Basic_Info(){};  
 
-    int cpu_rank, cpu_size, dual_edge_ncommon;
+    int cpu_rank, cpu_size;
 };
 
 #endif
