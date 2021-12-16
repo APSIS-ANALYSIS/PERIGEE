@@ -314,10 +314,8 @@ int main( int argc, char * argv[] )
   }
 
   // Re-ordering nodal indices
-  const int nFunc_total = nFunc_p + nFunc_v;
-
-  Map_Node_Index * mnindex_p = new Map_Node_Index(global_part, cpu_size, 0, nFunc_p);
-  Map_Node_Index * mnindex_v = new Map_Node_Index(global_part, cpu_size, nFunc_p, nFunc_total);
+  Map_Node_Index * mnindex_p = new Map_Node_Index(global_part, cpu_size, nFunc_p, 0);
+  Map_Node_Index * mnindex_v = new Map_Node_Index(global_part, cpu_size, nFunc_v, 1);
 
   mnindex_p -> write_hdf5("node_mapping_p");
   mnindex_v -> write_hdf5("node_mapping_v");
