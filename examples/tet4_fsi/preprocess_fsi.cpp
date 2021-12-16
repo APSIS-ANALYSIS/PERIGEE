@@ -470,7 +470,13 @@ int main( int argc, char * argv[] )
 
 
 
+  for(auto it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc) delete *it_nbc;
 
+  for(auto it_nbc=meshBC_list.begin(); it_nbc != meshBC_list.end(); ++it_nbc) delete *it_nbc;
+
+  delete NBC_pres; delete ebc; delete InFBC; delete mesh_ebc; 
+  delete mnindex_p; delete mnindex_v; delete mesh_p; delete mesh_v; 
+  delete IEN_p; delete IEN_v; delete mytimer; delete global_part; 
   PetscFinalize();
   cout<<"===> Preprocessing completes successfully!\n";
   return EXIT_SUCCESS;
