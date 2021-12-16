@@ -114,7 +114,7 @@ class Part_Tet : public IPart
     int nlocalnode, nghostnode, ntotalnode, nbadnode, nlocghonode;
 
     // 3. CPU info and partition parameters
-    int cpu_rank, cpu_size, dual_edge_ncommon;
+    int cpu_rank, cpu_size;
 
     // 4. global mesh info
     int nElem, nFunc, sDegree, tDegree, uDegree, nLocBas;

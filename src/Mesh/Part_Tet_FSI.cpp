@@ -8,23 +8,29 @@ Part_Tet_FSI::Part_Tet_FSI( const IMesh * const &mesh,
     const std::vector<int> &phytag,
     const std::vector<int> &node_f,
     const std::vector<int> &node_s,
-    const int &field,
-    const int &in_start_idx,
     const int &in_cpu_rank, 
     const int &in_cpu_size,
     const int &in_elemType,
+    const int &field,
+    const int &in_start_idx,
     const bool &in_is_geo_field ) 
-: Part_Tet(), nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),
-  sDegree( mesh->get_s_degree() ), tDegree( mesh->get_t_degree() ),
-  uDegree( mesh->get_u_degree() ), nLocBas( mesh->get_nLocBas() ),
-  probDim(3), elemType(in_elemType), cpu_rank( in_cpu_rank ),
-  cpu_size( in_cpu_size ),
-  dual_edge_ncommon( gpart->get_dual_edge_ncommon() ),
-  start_idx( in_start_idx ), is_geo_field(in_is_geo_field)
+: Part_Tet(), start_idx( in_start_idx ), is_geo_field(in_is_geo_field)
 {
+  nElem = mesh->get_nElem(); 
+  nFunc = mesh->get_nFunc();
+  sDegree = mesh->get_s_degree(); 
+  tDegree = mesh->get_t_degree();
+  uDegree = mesh->get_u_degree(); 
+  nLocBas = mesh->get_nLocBas();
+  probDim = 3; 
+  elemType = in_elemType;
+  cpu_rank = in_cpu_rank;
+  cpu_size = in_cpu_size;
+
   // We set dofMat and dofNum to negative numbers, as they are not needed
   dofMat = -1;
   dofNum = -1;
+  dual_edge_ncommon = -1;
 
   // Check the cpu info
   SYS_T::print_exit_if(cpu_size < 1, "Error: Part_Tet input cpu_size is wrong! \n");
@@ -154,7 +160,6 @@ void Part_Tet_FSI::write( const char * inputFileName ) const
 
   h5w->write_intScalar( group_id_4, "cpu_rank", cpu_rank );
   h5w->write_intScalar( group_id_4, "cpu_size", cpu_size );
-  h5w->write_intScalar( group_id_4, "dual_edge_ncommon", dual_edge_ncommon );
 
   H5Gclose( group_id_4 );
 

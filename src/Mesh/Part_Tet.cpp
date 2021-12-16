@@ -368,7 +368,6 @@ void Part_Tet::write( const char * inputFileName ) const
 
   h5w->write_intScalar( group_id_4, "cpu_rank", cpu_rank );
   h5w->write_intScalar( group_id_4, "cpu_size", cpu_size );
-  h5w->write_intScalar( group_id_4, "dual_edge_ncommon", dual_edge_ncommon );
 
   H5Gclose( group_id_4 );
 

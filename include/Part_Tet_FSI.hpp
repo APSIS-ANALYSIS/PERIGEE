@@ -24,11 +24,11 @@ class Part_Tet_FSI : public Part_Tet
         const std::vector<int> &phytag,
         const std::vector<int> &node_f,
         const std::vector<int> &node_s,
-        const int &field,
-        const int &in_start_idx,
         const int &in_cpu_rank, 
         const int &in_cpu_size,
         const int &in_elemType,
+        const int &field,
+        const int &in_start_idx,
         const bool &in_is_geo_field );
 
     virtual ~Part_Tet_FSI();
