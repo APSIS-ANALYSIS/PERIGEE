@@ -1,20 +1,19 @@
 #include "Map_Node_Index.hpp"
 
 Map_Node_Index::Map_Node_Index( const IGlobal_Part * const &gpart,
-    const int &cpu_size, const int &nFunc )
+    const int &cpu_size, const int &nFunc, const int &field )
 {
-  int newnum = 0;
-  old_2_new.resize(nFunc);
-  new_2_old.resize(nFunc);
+  old_2_new.resize(nFunc); new_2_old.resize(nFunc);
   
   std::cout<<"-- generating old2new & new2old index mapping. \n";
 
   // old to new mapping
+  int newnum = 0;
   for(int proc = 0; proc<cpu_size; ++proc)
   {
     for( int nn=0; nn<nFunc; ++nn )
     {
-      if( (int) gpart->get_npart(nn) == proc )
+      if( (int) gpart->get_npart(nn, field) == proc )
       {
         old_2_new[nn] = newnum;
         new_2_old[newnum] = nn;
@@ -22,44 +21,11 @@ Map_Node_Index::Map_Node_Index( const IGlobal_Part * const &gpart,
       }
     }
   }
-  VEC_T::shrink2fit(old_2_new);
-  VEC_T::shrink2fit(new_2_old);
+  VEC_T::shrink2fit(old_2_new); VEC_T::shrink2fit(new_2_old);
   
   std::cout<<"-- mapping generated. Memory usage: ";
   SYS_T::print_mem_size( double(old_2_new.size())*2.0*sizeof(int) );
   std::cout<<std::endl<<"=== Node index mapping generated.\n";
-}
-
-Map_Node_Index::Map_Node_Index( const IGlobal_Part * const &gpart,
-    const int &cpu_size, const int &n_start, const int &n_end )
-{
-  int newnum = 0;
-  const int nfunc = n_end - n_start;
-  old_2_new.resize(nfunc);
-  new_2_old.resize(nfunc);
-
-  std::cout<<"\n-- generating old2new & new2old index mapping. \n";
-
-  // old to new mapping
-  for(int proc = 0; proc<cpu_size; ++proc)
-  {
-    for( int nn=0; nn<nfunc; ++nn )
-    {
-      if( (int) gpart->get_npart(nn+n_start) == proc )
-      {
-        old_2_new[nn] = newnum;
-        new_2_old[newnum] = nn;
-        newnum += 1;
-      }
-    }
-  }
-  VEC_T::shrink2fit(old_2_new);
-  VEC_T::shrink2fit(new_2_old);
-
-  std::cout<<"-- mapping generated. Memory usage: ";
-  SYS_T::print_mem_size( double(old_2_new.size())*2.0*sizeof(int) );
-  std::cout<<std::endl;
-  std::cout<<"=== Node index mapping generated.\n";
 }
 
 Map_Node_Index::Map_Node_Index( const char * const &fileName )

@@ -23,16 +23,9 @@
 class Map_Node_Index
 {
   public:
-    // Construct the index mapping based on the partitioning
+    // Construct the index mapping based on the partitioning for field 0
     Map_Node_Index( const IGlobal_Part * const &gpart,
-        const int &cpu_size, const int &nFunc );
-
-    // Read npart from node_start to node_end-1 and record the node
-    // with cpu index equaling to cpu_rank.
-    // e.g., n_start = 0, n_end = nFunc_p for pressure field
-    //       n_start = nFunc_p, n_end = nFunc_p + nFunc_v for velo field
-    Map_Node_Index( const IGlobal_Part * const &gpart,
-        const int &cpu_size, const int &n_start, const int &n_end );
+        const int &cpu_size, const int &nFunc, const int &field = 0 );
 
     // Load the index mapping from file on disk
     Map_Node_Index( const char * const &fileName );
