@@ -17,8 +17,7 @@ Part_Tet::Part_Tet(
   // Initialize group 3 data
   cpu_rank = in_cpu_rank;
   cpu_size = in_cpu_size;
-  dual_edge_ncommon = gpart->get_dual_edge_ncommon();
-
+  
   // Check the cpu info
   SYS_T::print_exit_if(cpu_size < 1, "Error: Part_Tet input cpu_size is wrong! \n");
   SYS_T::print_exit_if(cpu_rank >= cpu_size, "Error: Part_Tet input cpu_rank is wrong! \n");
@@ -67,7 +66,6 @@ Part_Tet::Part_Tet(
   // Initialize group 3 data
   cpu_rank = in_cpu_rank;
   cpu_size = in_cpu_size;
-  dual_edge_ncommon = gpart->get_dual_edge_ncommon();
 
   // Check the cpu info
   SYS_T::print_exit_if(cpu_size < 1, "Error: Part_Tet input cpu_size is wrong! \n");
@@ -133,8 +131,7 @@ Part_Tet::Part_Tet( const char * const &inputfileName, const int &in_cpu_rank )
   SYS_T::print_fatal_if( cpu_rank != in_cpu_rank, "Error: Part_Tet::cpu_rank is inconsistent.\n");
   
   cpu_size = h5r->read_intScalar("Part_Info", "cpu_size");
-  dual_edge_ncommon = h5r->read_intScalar("Part_Info", "dual_edge_ncommon");
-
+  
   // global mesh info
   std::vector<int> vdeg = h5r -> read_intVector("Global_Mesh_Info", "degree");
 

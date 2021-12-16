@@ -30,7 +30,6 @@ Part_Tet_FSI::Part_Tet_FSI( const IMesh * const &mesh,
   // We set dofMat and dofNum to negative numbers, as they are not needed
   dofMat = -1;
   dofNum = -1;
-  dual_edge_ncommon = -1;
 
   // Check the cpu info
   SYS_T::print_exit_if(cpu_size < 1, "Error: Part_Tet input cpu_size is wrong! \n");

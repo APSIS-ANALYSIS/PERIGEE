@@ -84,7 +84,6 @@ class Part_Tet : public IPart
     virtual int get_nlocghonode() const {return nlocghonode;}
     virtual int get_cpu_rank() const {return cpu_rank;}
     virtual int get_cpu_size() const {return cpu_size;}
-    virtual int get_dual_edge_ncommon() const {return dual_edge_ncommon;}
 
     virtual int get_nElem() const {return nElem;}
     virtual int get_nFunc() const {return nFunc;}
