@@ -162,11 +162,12 @@ Global_Part_METIS::Global_Part_METIS( const int &num_fields,
     exit(1);
   }
 
+  // Generate field_offset
   field_offset.resize( num_fields );
   field_offset[0] = 0;
 
   for(int ii=1; ii<num_fields; ++ii) 
-    field_offset[ii] = field_offset[ii-1] + mesh_list[ii] -> get_nFunc();
+    field_offset[ii] = field_offset[ii-1] + mesh_list[ii-1] -> get_nFunc();
 
   // This is a partition code for mixed element over the whole domain.
   // The number of elements for an mesh object should be the same.
