@@ -40,7 +40,8 @@ class Global_Part_METIS : public IGlobal_Part
 
     virtual idx_t get_epart( const int &ee ) const {return epart[ee];}
 
-    virtual idx_t get_npart( const int &nn ) const {return npart[nn];}
+    virtual idx_t get_npart( const int &nn, const int &field = 0 ) const 
+    {return npart[nn + field_offset[field]];}
 
     virtual bool get_isMETIS() const {return true;};
 
