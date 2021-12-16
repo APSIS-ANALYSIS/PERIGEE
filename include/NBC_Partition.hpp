@@ -26,6 +26,17 @@ class NBC_Partition
        const Map_Node_Index * const &mnindex,
        const std::vector<INodalBC *> &nbc_list );
 
+    // ------------------------------------------------------------------------
+    // Generate partition for a list of nbc objects.
+    // The input includes a DOF handler grid2id, that maps the grid nodal index
+    // and the dof index to the row or column index in the matrix problem.
+    //
+    // This is a more general way as we often need to handle problems that has a
+    // 'mixed' type of element, rather than the equal-order interpolation.
+    //
+    // Notice that the data constructed here can be directly used to represent
+    // the matrix entries ( without the need to calculate based on dof index.)
+    // ------------------------------------------------------------------------
     NBC_Partition( const IPart * const &part,
         const Map_Node_Index * const &mnindex,
         const std::vector<INodalBC *> &nbc_list,
