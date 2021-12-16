@@ -8,6 +8,10 @@ Global_Part_METIS::Global_Part_METIS( const int &cpu_size,
     const std::string &node_part_name )
 : isMETIS(true), isDual(isDualGraph), dual_edge_ncommon(in_ncommon)
 {
+  // This is a partition for a single mesh (field)
+  field_offset.resize(1);
+  field_offset[0] = 0;
+
   const idx_t nElem = mesh->get_nElem();
   const idx_t nFunc = mesh->get_nFunc();
   const idx_t nLocBas = mesh->get_nLocBas();
@@ -119,13 +123,13 @@ Global_Part_METIS::Global_Part_METIS( const int &cpu_size,
  
   time_tracker = clock();
   std::cout<<"-- writing epart file takes "; 
-  write_part_hdf5(element_part_name, epart, nElem, cpu_size, isDualGraph, in_ncommon, true );
+  write_part_hdf5(element_part_name, epart, nElem, cpu_size );
   time_tracker = clock() - time_tracker;
   std::cout<<((double) time_tracker)/CLOCKS_PER_SEC<<" seconds. \n";
   
   time_tracker = clock();
   std::cout<<"-- writing npart file takes "; 
-  write_part_hdf5(node_part_name, npart, nFunc, cpu_size, isDualGraph, in_ncommon, true );
+  write_part_hdf5(node_part_name, npart, nFunc, cpu_size );
   time_tracker = clock() - time_tracker;
   std::cout<<((double) time_tracker)/CLOCKS_PER_SEC<<" seconds. \n";
 
@@ -158,6 +162,12 @@ Global_Part_METIS::Global_Part_METIS( const int &num_fields,
     std::cerr<<"ERROR: METIS cannot handle partition with cpu_size <= 1.\n";
     exit(1);
   }
+
+  field_offset.resize( num_fields );
+  field_offset[0] = 0;
+
+  for(int ii=1; ii<num_fields; ++ii) 
+    field_offset[ii] = field_offset[ii-1] + mesh_list[ii] -> get_nFunc();
 
   // This is a partition code for mixed element over the whole domain.
   // The number of elements for an mesh object should be the same.
@@ -288,13 +298,13 @@ Global_Part_METIS::Global_Part_METIS( const int &num_fields,
 
   time_tracker = clock();
   std::cout<<"-- writing epart file takes ";
-  write_part_hdf5(element_part_name, epart, nElem, cpu_size, isDualGraph, in_ncommon, true );
+  write_part_hdf5(element_part_name, epart, nElem, cpu_size );
   time_tracker = clock() - time_tracker;
   std::cout<<((double) time_tracker)/CLOCKS_PER_SEC<<" seconds. \n";
 
   time_tracker = clock();
   std::cout<<"-- writing npart file takes ";
-  write_part_hdf5(node_part_name, npart, nFunc, cpu_size, isDualGraph, in_ncommon, true );
+  write_part_hdf5(node_part_name, npart, nFunc, cpu_size );
   time_tracker = clock() - time_tracker;
   std::cout<<((double) time_tracker)/CLOCKS_PER_SEC<<" seconds. \n";
 
@@ -308,9 +318,7 @@ Global_Part_METIS::~Global_Part_METIS()
 
 void Global_Part_METIS::write_part_hdf5( const std::string &fileName,
     const idx_t * const &part_in,
-    const int &part_size, const int &cpu_size,
-    const bool &part_isdual, const int &in_ncommon,
-    const bool &isMETIS ) const
+    const int &part_size, const int &cpu_size ) const
 {
   std::string fName( fileName ); fName.append(".h5");
 
@@ -322,11 +330,13 @@ void Global_Part_METIS::write_part_hdf5( const std::string &fileName,
   h5w -> write_intScalar("part_size", part_size);
   h5w -> write_intScalar("cpu_size", cpu_size);
 
-  h5w->write_intScalar("part_isdual", ( part_isdual ? 1 : 0 ) );
-  h5w->write_intScalar("in_ncommon", in_ncommon);
+  h5w->write_intScalar("part_isdual", ( isDual ? 1 : 0 ) );
+  h5w->write_intScalar("in_ncommon", dual_edge_ncommon);
 
   h5w->write_intScalar("isMETIS", ( isMETIS ? 1 : 0 ) );
-  h5w->write_intVector( "part", part_in, part_size );
+  h5w->write_intVector("part", part_in, part_size );
+  
+  h5w->write_intVector("field_offset", field_offset );
 
   h5w->write_intScalar("isSerial", ( is_serial() ? 1 : 0 ) );
 
@@ -335,9 +345,7 @@ void Global_Part_METIS::write_part_hdf5( const std::string &fileName,
 
 void Global_Part_METIS::write_part_hdf5_64bit( const std::string &fileName,
     const int64_t * const &part_in,
-    const int64_t &part_size, const int &cpu_size,
-    const bool &part_isdual, const int &in_ncommon,
-    const bool &isMETIS ) const
+    const int64_t &part_size, const int &cpu_size ) const
 {
   std::string fName( fileName ); fName.append( ".h5" );
 
@@ -348,11 +356,13 @@ void Global_Part_METIS::write_part_hdf5_64bit( const std::string &fileName,
   h5w->write_int64Scalar("part_size", part_size);
   h5w->write_intScalar("cpu_size", cpu_size);
 
-  h5w->write_intScalar("part_isdual", ( part_isdual ? 1 : 0 ) );
-  h5w->write_intScalar("in_ncommon", in_ncommon);
+  h5w->write_intScalar("part_isdual", ( isDual ? 1 : 0 ) );
+  h5w->write_intScalar("in_ncommon", dual_edge_ncommon);
 
   h5w->write_intScalar("isMETIS", ( isMETIS ? 1 : 0 ) );
-  h5w->write_int64Vector( "part", part_in, part_size );
+  h5w->write_int64Vector("part", part_in, part_size );
+  
+  h5w->write_intVector("field_offset", field_offset );
 
   h5w->write_intScalar("isSerial", ( is_serial() ? 1 : 0 ) );
 

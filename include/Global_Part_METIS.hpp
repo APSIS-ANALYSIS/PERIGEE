@@ -56,11 +56,20 @@ class Global_Part_METIS : public IGlobal_Part
 
     idx_t * epart, * npart;
 
+    // ------------------------------------------------------------------------
+    // For multi-field partition, we may list different field's mesh nodal index
+    // in a single list of long nodal indices, starting from the first field's
+    // indices. The IEN for METIS partitioning will be augmented by thinking of
+    // an IEN that connect different fields' indices. The partitioined npart
+    // will have the length equaling the sum of nFunc of all fields (or meshes).
+    // To obtain each separate fields npart value (aka the CPU it belongs), we
+    // store the field offset as the starting index in that field.
+    // ------------------------------------------------------------------------
+    std::vector<int> field_offset;
+
     virtual void write_part_hdf5( const std::string &fileName, 
         const idx_t * const &part_in,
-        const int &part_size, const int &cpu_size,
-        const bool &part_isdual, const int &in_ncommon,
-        const bool &isMETIS ) const;
+        const int &part_size, const int &cpu_size ) const;
 
     // --------------------------------------------------------------
     // This function will write the data of part_in in 64bit HDF5 format. 
@@ -68,9 +77,7 @@ class Global_Part_METIS : public IGlobal_Part
     // --------------------------------------------------------------
     virtual void write_part_hdf5_64bit( const std::string &fileName, 
         const int64_t * const &part_in,
-        const int64_t &part_size, const int &cpu_size,
-        const bool &part_isdual, const int &in_ncommon,
-        const bool &isMETIS ) const;
+        const int64_t &part_size, const int &cpu_size ) const;
 };
 
 #endif

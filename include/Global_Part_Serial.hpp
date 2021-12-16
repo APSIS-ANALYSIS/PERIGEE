@@ -45,11 +45,11 @@ class Global_Part_Serial : public IGlobal_Part
 
     idx_t * epart, * npart;
 
+    std::vector<int> field_offset;
+
     virtual void write_part_hdf5( const std::string &fileName, 
         const idx_t * const &part_in,
-        const int &part_size, const int &cpu_size,
-        const bool &part_isdual, const int &in_ncommon,
-        const bool &isMETIS ) const;
+        const int &part_size, const int &cpu_size ) const;
 };
 
 #endif
