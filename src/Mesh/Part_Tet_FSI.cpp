@@ -191,6 +191,13 @@ void Part_Tet_FSI::write( const char * inputFileName ) const
     H5Gclose( group_id_6 );
   }
 
+  // group 7: DOF mapper
+  hid_t group_id_7 = H5Gcreate(file_id, "/DOF_mapper", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+  h5w -> write_intScalar( group_id_7, "start_idx", start_idx );
+
+  H5Gclose( group_id_7 );
+
   // Finish writing, clean up
   delete h5w;
   H5Fclose(file_id);

@@ -37,7 +37,7 @@ Global_Part_Serial::Global_Part_Serial( const int &num_fields,
   field_offset[0] = 0;
 
   for(int ii=1; ii<num_fields; ++ii)
-    field_offset[ii] = field_offset[ii-1] + mesh_list[ii] -> get_nFunc();
+    field_offset[ii] = field_offset[ii-1] + mesh_list[ii-1] -> get_nFunc();
 
   const idx_t nElem = mesh_list[0]->get_nElem();
   idx_t nFunc = 0;

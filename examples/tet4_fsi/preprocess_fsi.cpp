@@ -1,5 +1,5 @@
 // ============================================================================
-// preprocess_fsi_p1p0.cpp
+// preprocess_fsi.cpp
 // ----------------------------------------------------------------------------
 // This is the preprocess code for handling FSI 3D meshes that uses tet for the
 // geometry and discontinuous pressure space.
