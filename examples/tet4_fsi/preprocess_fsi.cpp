@@ -14,6 +14,7 @@
 #include "Global_Part_Serial.hpp"
 #include "Global_Part_Reload.hpp"
 #include "Part_FSI_PV.hpp"
+#include "Part_Tet_FSI.hpp"
 #include "NodalBC_3D_FSI.hpp"
 #include "NodalBC_3D_vtu.hpp"
 #include "NodalBC_3D_inflow.hpp"
@@ -449,6 +450,14 @@ int main( int argc, char * argv[] )
         p_node_f, p_node_s, v_node_f, v_node_s,
         start_idx_p[proc_rank], start_idx_v[proc_rank],
         proc_rank, cpu_size, elemType, isPrintPartInfo );
+
+    IPart * part_p = new Part_Tet_FSI( mesh_p, global_part, mnindex_p, IEN_p,
+        ctrlPts, phy_tag, p_node_f, p_node_s,
+        proc_rank, cpu_size, elemType, 0, start_idx_p[proc_rank], false );
+
+    IPart * part_v = new Part_Tet_FSI( mesh_v, global_part, mnindex_v, IEN_v,
+        ctrlPts, phy_tag, v_node_f, v_node_s,
+        proc_rank, cpu_size, elemType, 1, start_idx_v[proc_rank], true );
 
     mytimer -> Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";

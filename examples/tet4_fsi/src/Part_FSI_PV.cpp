@@ -49,7 +49,7 @@ Part_FSI_PV::Part_FSI_PV( const IMesh * const &mesh_p,
   node_loc_original_p.clear(); node_loc_original_v.clear();
   for(int nn=0; nn<nFunc_p; ++nn)
   {
-    if( gpart->get_npart(nn) == cpu_rank )
+    if( gpart->get_npart(nn, 0) == cpu_rank )
     {
       node_loc_p.push_back(nn);
       node_loc_original_p.push_back(nn);
@@ -61,7 +61,7 @@ Part_FSI_PV::Part_FSI_PV( const IMesh * const &mesh_p,
 
   for(int nn=0; nn<nFunc_v; ++nn)
   {
-    if( gpart->get_npart(nn + nFunc_p) == cpu_rank )
+    if( gpart->get_npart(nn, 1) == cpu_rank )
     {
       node_loc_v.push_back(nn);
       node_loc_original_v.push_back(nn);
