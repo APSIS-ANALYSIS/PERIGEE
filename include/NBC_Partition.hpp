@@ -26,6 +26,11 @@ class NBC_Partition
        const Map_Node_Index * const &mnindex,
        const std::vector<INodalBC *> &nbc_list );
 
+    NBC_Partition( const IPart * const &part,
+        const Map_Node_Index * const &mnindex,
+        const std::vector<INodalBC *> &nbc_list,
+        const std::vector< std::vector<int> > &grid2id );
+
     virtual ~NBC_Partition();
 
     // ------------------------------------------------------------------------
@@ -48,7 +53,7 @@ class NBC_Partition
     // ------------------------------------------------------------------------
     virtual void write_hdf5( const std::string &FileName, 
         const std::string &GroupName ) const;
-    
+
     virtual void print_info() const;
 
     virtual int get_LID( const int &ii ) const {return LID[ii];}

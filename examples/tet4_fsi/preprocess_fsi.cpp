@@ -374,7 +374,8 @@ int main( int argc, char * argv[] )
   }
 
   // ----------------------------------------------------------------
-  // Setup boundary conditions
+  // Setup boundary conditions. Nodal BC is specified by the original nodal
+  // indices
   // Physical NodalBC
   std::cout<<"===== Boundary Conditions =====\n";
   std::cout<<"1. Nodal boundary condition for the implicit solver: \n";
@@ -452,6 +453,8 @@ int main( int argc, char * argv[] )
         proc_rank, cpu_size, elemType, 0, start_idx_p[proc_rank], false );
 
     part_p -> print_part_loadbalance_edgecut();
+    
+    part_p -> write( part_file_p );
 
     IPart * part_v = new Part_Tet_FSI( mesh_v, global_part, mnindex_v, IEN_v,
         ctrlPts, phy_tag, v_node_f, v_node_s,
@@ -459,11 +462,10 @@ int main( int argc, char * argv[] )
 
     part_v -> print_part_loadbalance_edgecut();
 
+    part_v -> write( part_file_v );
+
     mytimer -> Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
-
-    part_p -> write( part_file_p );
-    part_v -> write( part_file_v );
 
     delete part_p; delete part_v; 
   }

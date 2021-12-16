@@ -78,6 +78,86 @@ NBC_Partition::NBC_Partition( const IPart * const &part,
   VEC_T::shrink2fit( LID );
 }
 
+NBC_Partition:: NBC_Partition( const IPart * const &part,
+    const Map_Node_Index * const &mnindex,
+    const std::vector<INodalBC *> &nbc_list,
+    const std::vector< std::vector<int> > &grid2id )
+{
+  const int dof = (int) nbc_list.size();
+
+  SYS_T::print_fatal_if( grid2id.size() != dof, "Error: NBC_Partition, the grid2id array size should be math that of nbc list.\n" );
+
+  for(int ii=0; ii<dof; ++ii)
+  {
+    Num_LD[ii] = 0;
+
+    for(unsigned int jj=0; jj<nbc_list[ii]->get_num_dir_nodes(); ++jj)
+    {
+      unsigned int node_index = nbc_list[ii]->get_dir_nodes(jj);
+      node_index = mnindex->get_old2new(node_index);
+
+      if(part->isNodeInPart(node_index))
+      {
+        LDN.push_back( grid2id[ii][node_index] );
+        Num_LD[ii] += 1;
+      }
+    } // end jj-loop
+
+    Num_LPS[ii] = 0; Num_LPM[ii] = 0;
+
+    for(unsigned int jj=0; jj<nbc_list[ii]->get_num_per_nodes(); ++jj)
+    {
+      unsigned int node_ps = nbc_list[ii]->get_per_slave_nodes(jj);
+      unsigned int node_pm = nbc_list[ii]->get_per_master_nodes(jj);
+
+      node_ps = mnindex->get_old2new(node_ps);
+      node_pm = mnindex->get_old2new(node_pm);
+
+      if(part->isNodeInPart(node_ps))
+      {
+        LPSN.push_back(grid2id[ii][node_ps]);
+        LPMN.push_back(grid2id[ii][node_pm]);
+        Num_LPS[ii] += 1;
+      }
+
+      if(part->isNodeInPart(node_pm))
+      {
+        LocalMaster.push_back(grid2id[ii][node_pm]);
+        LocalMasterSlave.push_back(grid2id[ii][node_ps]);
+        Num_LPM[ii] += 1;
+      }
+    } // end jj-loop
+  } // end ii-loop over dof
+
+  VEC_T::shrink2fit( LDN ); VEC_T::shrink2fit( LPSN ); VEC_T::shrink2fit( LPMN );
+  VEC_T::shrink2fit( LocalMaster ); VEC_T::shrink2fit( LocalMasterSlave );
+
+  const int totnode = part->get_nlocghonode();
+
+  LID.resize(totnode * dof);
+
+  for(int ii=0; ii<dof; ++ii)
+  {
+    for(int jj=0; jj<totnode; ++jj)
+    {
+      const int new_index = part->get_local_to_global(jj);
+      const int old_index = mnindex->get_new2old(new_index);
+      LID[ii*totnode + jj] = nbc_list[ii]->get_ID(old_index);
+    }
+  }
+
+  for(int ii=0; ii<dof; ++ii)
+  {
+    for(int jj=0; jj<totnode; ++jj)
+    {
+      const int loc = ii * totnode + jj;
+      if(LID[loc] != -1) LID[loc] = grid2id[ii][ mnindex->get_old2new(LID[loc]) ];
+    }
+  }
+
+  VEC_T::shrink2fit( LID );
+}
+
 NBC_Partition::~NBC_Partition()
 {
   VEC_T::clean(LID);
