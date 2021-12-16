@@ -31,25 +31,21 @@ class Global_Part_Serial : public IGlobal_Part
 
     virtual idx_t get_npart( const int &nn ) const {return npart[nn];}
 
-    virtual bool get_isMETIS() const {return isMETIS;};
+    virtual bool get_isMETIS() const {return false;};
 
-    virtual bool get_isDual() const {return isDual;};
+    virtual bool get_isDual() const {return false;};
 
-    virtual int get_dual_edge_ncommon() const {return dual_edge_ncommon;}
+    virtual int get_dual_edge_ncommon() const {return 0;}
 
     virtual bool is_serial() const {return true;}
 
   private:
-    const bool isMETIS, isDual;
-    const int dual_edge_ncommon;
-
     idx_t * epart, * npart;
 
     std::vector<int> field_offset;
 
     virtual void write_part_hdf5( const std::string &fileName, 
-        const idx_t * const &part_in,
-        const int &part_size, const int &cpu_size ) const;
+        const idx_t * const &part_in, const int &part_size ) const;
 };
 
 #endif
