@@ -42,7 +42,7 @@ class Global_Part_METIS : public IGlobal_Part
 
     virtual idx_t get_npart( const int &nn ) const {return npart[nn];}
 
-    virtual bool get_isMETIS() const {return isMETIS;};
+    virtual bool get_isMETIS() const {return true;};
 
     virtual bool get_isDual() const {return isDual;};
 
@@ -51,7 +51,7 @@ class Global_Part_METIS : public IGlobal_Part
     virtual bool is_serial() const {return false;}
 
   private:
-    const bool isMETIS, isDual;
+    const bool isDual;
     const int dual_edge_ncommon;
 
     idx_t * epart, * npart;

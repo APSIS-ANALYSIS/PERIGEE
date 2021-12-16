@@ -6,7 +6,7 @@ Global_Part_METIS::Global_Part_METIS( const int &cpu_size,
     const IIEN * const &IEN,
     const std::string &element_part_name,
     const std::string &node_part_name )
-: isMETIS(true), isDual(isDualGraph), dual_edge_ncommon(in_ncommon)
+: isDual(isDualGraph), dual_edge_ncommon(in_ncommon)
 {
   // This is a partition for a single mesh (field)
   field_offset.resize(1);
@@ -136,14 +136,13 @@ Global_Part_METIS::Global_Part_METIS( const int &cpu_size,
   std::cout<<"=== Global partition generated. \n";
 }
 
-
 Global_Part_METIS::Global_Part_METIS( const int &num_fields,
     const int &cpu_size, const int &in_ncommon, const bool &isDualGraph,
     const std::vector<IMesh const *> &mesh_list,
     const std::vector<IIEN const *>  &IEN_list,
     const std::string &element_part_name,
-    const std::string &node_part_name ) : isMETIS(true), 
-  isDual( isDualGraph ), dual_edge_ncommon( in_ncommon )
+    const std::string &node_part_name ) : isDual( isDualGraph ), 
+  dual_edge_ncommon( in_ncommon )
 {
   if(num_fields != static_cast<int>( mesh_list.size() ) )
   {
@@ -333,7 +332,7 @@ void Global_Part_METIS::write_part_hdf5( const std::string &fileName,
   h5w->write_intScalar("part_isdual", ( isDual ? 1 : 0 ) );
   h5w->write_intScalar("in_ncommon", dual_edge_ncommon);
 
-  h5w->write_intScalar("isMETIS", ( isMETIS ? 1 : 0 ) );
+  h5w->write_intScalar("isMETIS", ( get_isMETIS() ? 1 : 0 ) );
   h5w->write_intVector("part", part_in, part_size );
   
   h5w->write_intVector("field_offset", field_offset );
@@ -359,7 +358,7 @@ void Global_Part_METIS::write_part_hdf5_64bit( const std::string &fileName,
   h5w->write_intScalar("part_isdual", ( isDual ? 1 : 0 ) );
   h5w->write_intScalar("in_ncommon", dual_edge_ncommon);
 
-  h5w->write_intScalar("isMETIS", ( isMETIS ? 1 : 0 ) );
+  h5w->write_intScalar("isMETIS", ( get_isMETIS() ? 1 : 0 ) );
   h5w->write_int64Vector("part", part_in, part_size );
   
   h5w->write_intVector("field_offset", field_offset );
