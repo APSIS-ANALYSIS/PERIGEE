@@ -149,10 +149,10 @@ class IPart
     virtual int get_nlocghonode() const
     {SYS_T::print_exit("Error: get_nlocghonode is not implemented. \n"); return 0;}
 
-    virtual bool isElemInPart(int gloindex) const
+    virtual bool isElemInPart(const int &gloindex) const
     {SYS_T::print_exit("Error: isElemInPart is not implemented. \n"); return false;}
 
-    virtual bool isNodeInPart(int gloindex) const
+    virtual bool isNodeInPart(const int &gloindex) const
     {SYS_T::print_exit("Error: isNodeInPart is not implemented. \n"); return false;}
 
     virtual int get_elemLocIndex(const int &gloindex) const

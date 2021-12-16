@@ -41,10 +41,10 @@ class Part_Tet : public IPart
 
     virtual void write( const char * inputFileName ) const;
     
-    virtual bool isElemInPart(int gloindex) const
+    virtual bool isElemInPart(const int &gloindex) const
     {return VEC_T::is_invec(elem_loc, gloindex);}
     
-    virtual bool isNodeInPart(int gloindex) const
+    virtual bool isNodeInPart(const int &gloindex) const
     {return VEC_T::is_invec(node_loc, gloindex);}
    
     // Determine the position of a given index in the elem_loc array 
