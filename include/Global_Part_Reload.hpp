@@ -35,6 +35,7 @@ class Global_Part_Reload : public IGlobal_Part
     bool isMETIS, isDual, isSerial;
     int dual_edge_ncommon;
 
+    std::vector<int> field_offset;
     std::vector<int> epart, npart;
 };
 

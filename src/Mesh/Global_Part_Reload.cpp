@@ -40,6 +40,8 @@ Global_Part_Reload::Global_Part_Reload( const int &cpu_size,
   HDF5_Reader * nh5r = new HDF5_Reader( nfile_id );
 
   npart = nh5r -> read_intVector("/", "part");
+  
+  field_offset = nh5r -> read_intVector("/", "field_offset");
 
   delete nh5r; H5Fclose( nfile_id );
   // --------------------------------------------------------------------------
@@ -53,7 +55,7 @@ Global_Part_Reload::Global_Part_Reload( const int &cpu_size,
 
 Global_Part_Reload::~Global_Part_Reload()
 {
-  VEC_T::clean(epart); VEC_T::clean(npart);
+  VEC_T::clean(epart); VEC_T::clean(npart); VEC_T::clean(field_offset);
 }
 
 // EOF
