@@ -288,10 +288,10 @@ void Part_FSI_PV::write( const std::string &inputFileName ) const
   h5w->write_intScalar( group_id_2v, "nlocalnode_fluid", nlocalnode_v_fluid );
   h5w->write_intScalar( group_id_2v, "nlocalnode_solid", nlocalnode_v_solid );
 
-  if( nlocalnode_p_fluid > 0 )
+  if( nlocalnode_v_fluid > 0 )
     h5w->write_intVector( group_id_2v, "node_loc_fluid", node_loc_v_fluid );
 
-  if( nlocalnode_p_solid > 0 )
+  if( nlocalnode_v_solid > 0 )
     h5w->write_intVector( group_id_2v, "node_loc_solid", node_loc_v_solid );
   
   H5Gclose( group_id_2v );

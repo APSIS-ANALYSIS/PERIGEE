@@ -13,7 +13,6 @@
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
 #include "Global_Part_Reload.hpp"
-#include "Part_FSI_PV.hpp"
 #include "Part_Tet_FSI.hpp"
 #include "NodalBC_3D_FSI.hpp"
 #include "NodalBC_3D_vtu.hpp"
@@ -224,8 +223,6 @@ int main( int argc, char * argv[] )
   {
     if( phy_tag[ee] == 1 )
     {
-      //std::cout<<"ee = "<<ee<<'\t'<<vecIEN_p[ee*4]<<'\t'<<vecIEN_p[ee*4+1]<<'\t'<<vecIEN_p[ee*4+2]<<'\t'<<vecIEN_p[ee*4+3]<<'\n';
-
       // In solid element, loop over its IEN and correct if the node is on the
       // interface
       for(int ii=0; ii<4; ++ii)
@@ -233,8 +230,6 @@ int main( int argc, char * argv[] )
         const int pos = VEC_T::get_pos( wall_node_id, vecIEN_p[ee*4 +ii] );
         if( pos >=0 ) vecIEN_p[ee*4+ii] = nFunc_v + pos;     
       }
-      
-      //std::cout<<"ee = "<<ee<<'\t'<<vecIEN_p[ee*4]<<'\t'<<vecIEN_p[ee*4+1]<<'\t'<<vecIEN_p[ee*4+2]<<'\t'<<vecIEN_p[ee*4+3]<<'\n';
     }
   }
   
@@ -445,27 +440,26 @@ int main( int argc, char * argv[] )
     mytimer->Reset();
     mytimer->Start();
 
-    Part_FSI_PV * part = new Part_FSI_PV( mesh_p, mesh_v, global_part,
-        mnindex_p, mnindex_v, IEN_p, IEN_v, ctrlPts, phy_tag, 
-        p_node_f, p_node_s, v_node_f, v_node_s,
-        start_idx_p[proc_rank], start_idx_v[proc_rank],
-        proc_rank, cpu_size, elemType, isPrintPartInfo );
-
     IPart * part_p = new Part_Tet_FSI( mesh_p, global_part, mnindex_p, IEN_p,
         ctrlPts, phy_tag, p_node_f, p_node_s,
         proc_rank, cpu_size, elemType, 0, start_idx_p[proc_rank], false );
 
+    part_p -> print_part_loadbalance_edgecut();
+    
     IPart * part_v = new Part_Tet_FSI( mesh_v, global_part, mnindex_v, IEN_v,
         ctrlPts, phy_tag, v_node_f, v_node_s,
         proc_rank, cpu_size, elemType, 1, start_idx_v[proc_rank], true );
 
+    part_v -> print_part_loadbalance_edgecut();
+    
     mytimer -> Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
     
-    part -> write( part_file );
-    part -> print_part_loadbalance_edgecut();
 
-    delete part; 
+    part_p -> write("./apart/part_p" );
+    part_v -> write("./apart/part_v" );
+
+    delete part_p; delete part_v; 
   }
 
 
