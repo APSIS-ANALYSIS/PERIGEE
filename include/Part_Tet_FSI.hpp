@@ -24,9 +24,12 @@ class Part_Tet_FSI : public Part_Tet
         const std::vector<int> &phytag,
         const std::vector<int> &node_f,
         const std::vector<int> &node_s,
-        const int &in_cpu_rank, const int &in_cpu_size,
-        const int &in_dofNum, const int &in_dofMat,
-        const int &in_elemType );
+        const int &field,
+        const int &in_start_idx,
+        const int &in_cpu_rank, 
+        const int &in_cpu_size,
+        const int &in_elemType,
+        const bool &in_is_geo_field );
 
     virtual ~Part_Tet_FSI();
 
@@ -45,6 +48,12 @@ class Part_Tet_FSI : public Part_Tet
     std::vector<int> node_loc_fluid, node_loc_solid; 
 
     int nlocalnode_fluid, nlocalnode_solid;
+
+    // DOF mapper
+    const int start_idx;
+
+    // Flag that determines if the field is a geometry field
+    const bool is_geo_field;
 };
 
 #endif

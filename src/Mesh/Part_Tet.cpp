@@ -25,7 +25,7 @@ Part_Tet::Part_Tet(
   SYS_T::print_exit_if(cpu_rank < 0, "Error: Part_Tet input cpu_rank is wrong! \n");
 
   // Generate group 1, 2, and 5.
-  Generate_Partition( mesh, gpart, mnindex, IEN, ctrlPts );
+  Generate_Partition( mesh, gpart, mnindex, IEN );
 
   // Generate group 6
   // local copy of control points
@@ -75,7 +75,7 @@ Part_Tet::Part_Tet(
   SYS_T::print_exit_if(cpu_rank < 0, "Error: Part_Tet input cpu_rank is wrong! \n");
 
   // Generate group 1, 2, and 5.
-  Generate_Partition( mesh, gpart, mnindex, IEN, ctrlPts );
+  Generate_Partition( mesh, gpart, mnindex, IEN );
 
   // Generate group 6
   // local copy of control points
