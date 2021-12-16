@@ -43,8 +43,7 @@ class Global_Part_Serial : public IGlobal_Part
     const bool isMETIS, isDual;
     const int dual_edge_ncommon;
 
-    idx_t * epart;
-    idx_t * npart;
+    idx_t * epart, * npart;
 
     virtual void write_part_hdf5( const std::string &fileName, 
         const idx_t * const &part_in,

@@ -383,11 +383,14 @@ int main( int argc, char * argv[] )
   std::cout<<"1. Nodal boundary condition for the implicit solver: \n";
   std::vector<INodalBC *> NBC_list( 3, nullptr );
 
+  // Here we assumed that the pressure mesh fluid nodal indices are identical to
+  // that in the velocity mesh.
   INodalBC * NBC_pres = new NodalBC_3D_FSI( geo_f_file, nFunc_p, fsiBC_type );
 
   for( int ii=0; ii<3; ++ii )
-    NBC_list[ii] = new NodalBC_3D_FSI( geo_f_file, geo_s_file, sur_f_file_wall, sur_s_file_wall,
-        sur_f_file_in, sur_f_file_out, sur_s_file_in, sur_s_file_out, nFunc_v, ii, ringBC_type, fsiBC_type );
+    NBC_list[ii] = new NodalBC_3D_FSI( geo_f_file, geo_s_file, sur_f_file_wall, 
+        sur_s_file_wall, sur_f_file_in, sur_f_file_out, sur_s_file_in, sur_s_file_out, 
+        nFunc_v, ii, ringBC_type, fsiBC_type );
 
   // Mesh solver NodalBC
   std::cout<<"2. Nodal boundary condition for the mesh motion: \n";
