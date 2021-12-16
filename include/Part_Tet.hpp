@@ -134,6 +134,12 @@ class Part_Tet : public IPart
         const IIEN * const &IEN,
         const std::vector<double> &ctrlPts,
         const int &field = 0 );
+    
+    void Generate_Partition( const IMesh * const &mesh,
+        const IGlobal_Part * const &gpart,
+        const Map_Node_Index * const &mnindex,
+        const IIEN * const &IEN,
+        const int &field = 0 );
 };
 
 #endif

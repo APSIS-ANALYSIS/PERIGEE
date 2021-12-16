@@ -143,13 +143,43 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
     const std::vector<double> &ctrlPts,
     const int &field )
 {
+  // The local element, local node, and LIEN get generated
+  Generate_Partition(mesh, gpart, mnindex, IEN, field);
+
+  // local copy of control points
+  ctrlPts_x_loc.resize(nlocghonode);
+  ctrlPts_y_loc.resize(nlocghonode);
+  ctrlPts_z_loc.resize(nlocghonode);
+
+  for(int ii=0; ii<nlocghonode; ++ii)
+  {
+    int aux_index = local_to_global[ii]; // new global index
+    aux_index = mnindex->get_new2old(aux_index); // back to old global index
+    ctrlPts_x_loc[ii] = ctrlPts[3*aux_index + 0];
+    ctrlPts_y_loc[ii] = ctrlPts[3*aux_index + 1];
+    ctrlPts_z_loc[ii] = ctrlPts[3*aux_index + 2];
+  }
+
+  VEC_T::shrink2fit(ctrlPts_x_loc);
+  VEC_T::shrink2fit(ctrlPts_y_loc);
+  VEC_T::shrink2fit(ctrlPts_z_loc);
+
+  std::cout<<"-- proc "<<cpu_rank<<" Local control points generated. \n";
+}
+
+
+void Part_Tet::Generate_Partition( const IMesh * const &mesh,
+    const IGlobal_Part * const &gpart,
+    const Map_Node_Index * const &mnindex,
+    const IIEN * const &IEN,
+    const int &field )
+{
   // 1. Create local partition based on the epart & npart info
   elem_loc.clear(); node_loc.clear();
 
   for( int e=0; e<nElem; ++e )
   {
-    if( gpart->get_epart(e) == cpu_rank )
-      elem_loc.push_back(e);
+    if( gpart->get_epart(e) == cpu_rank ) elem_loc.push_back(e);
   }
   VEC_T::shrink2fit(elem_loc);
   nlocalele = (int) elem_loc.size();
@@ -162,8 +192,7 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
       node_loc_original.push_back(n);
     }
   }
-  VEC_T::shrink2fit(node_loc);
-  VEC_T::shrink2fit(node_loc_original);
+  VEC_T::shrink2fit(node_loc); VEC_T::shrink2fit(node_loc_original);
   nlocalnode = (int) node_loc.size();
 
   std::cout<<"-- proc "<<cpu_rank<<" -- elem_loc & node_loc arrays generated. \n";
@@ -265,32 +294,11 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
   }
 
   std::cout<<"-- proc "<<cpu_rank<<" LIEN generated. \n";
-
-  // 7. local copy of control points
-  ctrlPts_x_loc.resize(nlocghonode);
-  ctrlPts_y_loc.resize(nlocghonode);
-  ctrlPts_z_loc.resize(nlocghonode);
-
-  for(int ii=0; ii<nlocghonode; ++ii)
-  {
-    int aux_index = local_to_global[ii]; // new global index
-    aux_index = mnindex->get_new2old(aux_index); // back to old global index
-    ctrlPts_x_loc[ii] = ctrlPts[3*aux_index + 0];
-    ctrlPts_y_loc[ii] = ctrlPts[3*aux_index + 1];
-    ctrlPts_z_loc[ii] = ctrlPts[3*aux_index + 2];
-  }
-
-  VEC_T::shrink2fit(ctrlPts_x_loc);
-  VEC_T::shrink2fit(ctrlPts_y_loc);
-  VEC_T::shrink2fit(ctrlPts_z_loc);
-
-  std::cout<<"-- proc "<<cpu_rank<<" Local control points generated. \n";
 }
 
 int Part_Tet::get_elemLocIndex(const int &gloindex) const
 {
-  std::vector<int>::const_iterator findindex;
-  findindex = find(elem_loc.begin(), elem_loc.end(), gloindex);
+  auto findindex = find(elem_loc.begin(), elem_loc.end(), gloindex);
   if(findindex == elem_loc.end())
     return -1;
   else
