@@ -25,7 +25,11 @@
 int main( int argc, char * argv[] )
 {
   // Remove previously existing hdf5 files
-  SYS_T::execute("rm -rf apart");
+  if( SYS_T::directory_exist("apart") )
+  {
+    std::cout<<"Clean the folder apart.\n";
+    SYS_T::execute("rm -rf apart");
+  }
   SYS_T::execute("mkdir apart");
 
   // Define basic settings
@@ -50,7 +54,8 @@ int main( int argc, char * argv[] )
 
   int num_outlet = 1, num_inlet = 1;
 
-  const std::string part_file("./apart/part");
+  const std::string part_file_p("./apart/part_p");
+  const std::string part_file_v("./apart/part_v");
 
   // fsiBC_type : 0 deformable wall, 1 rigid wall
   int fsiBC_type = 0;
@@ -103,7 +108,6 @@ int main( int argc, char * argv[] )
   std::cout<<" -sur_f_file_out_base: "<<sur_f_file_out_base<<std::endl;
   std::cout<<" -sur_s_file_in_base: " <<sur_s_file_in_base <<std::endl;
   std::cout<<" -sur_s_file_out_base: "<<sur_s_file_out_base<<std::endl;
-  std::cout<<" -part_file: "          <<part_file          <<std::endl;
   std::cout<<" -cpu_size: "           <<cpu_size           <<std::endl;
   std::cout<<" -in_ncommon: "         <<in_ncommon         <<std::endl;
   std::cout<<" -isDualGraph: true \n";
@@ -111,6 +115,8 @@ int main( int argc, char * argv[] )
   else std::cout<<" -isReload : false \n";
   std::cout<<"----------------------------------\n";
   std::cout<<" elemType: "<<elemType<<std::endl;
+  std::cout<<" part_file_p: "<<part_file_p<<std::endl;
+  std::cout<<" part_file_v: "<<part_file_v<<std::endl;
   std::cout<<"===== Command Line Arguments ====="<<std::endl;
 
   // Check if the geometrical file exist on disk
@@ -179,7 +185,8 @@ int main( int argc, char * argv[] )
   cmdh5w->write_string("sur_s_file_in_base",  sur_s_file_in_base);
   cmdh5w->write_string("sur_s_file_out_base", sur_s_file_out_base);
   cmdh5w->write_string("sur_s_file_wall",     sur_s_file_wall);
-  cmdh5w->write_string("part_file",           part_file);
+  cmdh5w->write_string("part_file_p",         part_file_p);
+  cmdh5w->write_string("part_file_v",         part_file_v);
   cmdh5w->write_string("date",                SYS_T::get_date() );
   cmdh5w->write_string("time",                SYS_T::get_time() );
 
@@ -210,7 +217,7 @@ int main( int argc, char * argv[] )
   const std::vector<int> wall_node_id = TET_T::read_int_PointData( sur_s_file_interior_wall, "GlobalNodeID" );
 
   VEC_T::print(wall_node_id);
-  
+
   const int nFunc_interface = static_cast<int>( wall_node_id.size() );
   const int nFunc_p = nFunc_v + nFunc_interface;
 
@@ -218,7 +225,7 @@ int main( int argc, char * argv[] )
   // IEN for the solid element. If the solid element has node on the fluid-solid
   // interface, it will be mapped to the new index, that is nFunc + ii.
   std::vector<int> vecIEN_p ( vecIEN );
-  
+
   for(int ee=0; ee<nElem; ++ee)
   {
     if( phy_tag[ee] == 1 )
@@ -232,7 +239,7 @@ int main( int argc, char * argv[] )
       }
     }
   }
-  
+
   IIEN * IEN_p = new IEN_Tetra_P1( nElem, vecIEN_p );
 
   VEC_T::clean( vecIEN ); VEC_T::clean( vecIEN_p );
@@ -256,7 +263,7 @@ int main( int argc, char * argv[] )
   VEC_T::sort_unique_resize( v_node_f ); VEC_T::sort_unique_resize( v_node_s );
 
   std::vector<int> p_node_f, p_node_s; p_node_f.clear(); p_node_s.clear();
-  
+
   for(int ee=0; ee<nElem; ++ee)
   {
     if( phy_tag[ee] == 0 )
@@ -268,7 +275,7 @@ int main( int argc, char * argv[] )
       for(int ii=0; ii<4; ++ii) p_node_s.push_back( IEN_p->get_IEN(ee, ii) );
     }
   }
-  
+
   VEC_T::sort_unique_resize( p_node_f ); VEC_T::sort_unique_resize( p_node_s );
 
   // Check the mesh
@@ -280,7 +287,7 @@ int main( int argc, char * argv[] )
 
   // Generate the mesh for pressure
   IMesh * mesh_p = new Mesh_Tet4(nFunc_p, nElem);
-  
+
   std::vector<IMesh const *> mlist;
   mlist.push_back(mesh_p); mlist.push_back(mesh_v);
 
@@ -290,7 +297,7 @@ int main( int argc, char * argv[] )
   std::cout<<"Fluid domain: "<<v_node_f.size()<<" nodes.\n";
   std::cout<<"Solid domain: "<<v_node_s.size()<<" nodes.\n";
   std::cout<<"Fluid-Solid interface: "<<nFunc_interface<<" nodes.\n";
-  
+
   std::vector<IIEN const *> ienlist;
   ienlist.push_back(IEN_p); ienlist.push_back(IEN_v);
 
@@ -445,19 +452,18 @@ int main( int argc, char * argv[] )
         proc_rank, cpu_size, elemType, 0, start_idx_p[proc_rank], false );
 
     part_p -> print_part_loadbalance_edgecut();
-    
+
     IPart * part_v = new Part_Tet_FSI( mesh_v, global_part, mnindex_v, IEN_v,
         ctrlPts, phy_tag, v_node_f, v_node_s,
         proc_rank, cpu_size, elemType, 1, start_idx_v[proc_rank], true );
 
     part_v -> print_part_loadbalance_edgecut();
-    
+
     mytimer -> Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
-    
 
-    part_p -> write("./apart/part_p" );
-    part_v -> write("./apart/part_v" );
+    part_p -> write( part_file_p );
+    part_v -> write( part_file_v );
 
     delete part_p; delete part_v; 
   }
@@ -469,7 +475,7 @@ int main( int argc, char * argv[] )
 
 
 
-
+  // Clean up the memory
   for(auto it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc) delete *it_nbc;
 
   for(auto it_nbc=meshBC_list.begin(); it_nbc != meshBC_list.end(); ++it_nbc) delete *it_nbc;
