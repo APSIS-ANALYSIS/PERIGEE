@@ -10,10 +10,9 @@ Part_Tet_FSI::Part_Tet_FSI( const IMesh * const &mesh,
     const std::vector<int> &node_s,
     const int &in_cpu_rank, const int &in_cpu_size,
     const int &in_dofNum, const int &in_dofMat,
-    const int &in_elemType,
-    const bool isPrintInfo )
+    const int &in_elemType )
 : Part_Tet( mesh, gpart, mnindex, IEN, ctrlPts, in_cpu_rank,
-    in_cpu_size, in_dofNum, in_dofMat, in_elemType, isPrintInfo )
+    in_cpu_size, in_dofNum, in_dofMat, in_elemType )
 {
   // Generate the local array tagging the element's property.
   elem_phy_tag.resize( nlocalele );
@@ -34,10 +33,8 @@ Part_Tet_FSI::Part_Tet_FSI( const IMesh * const &mesh,
   nlocalnode_solid = static_cast<int>( node_loc_solid.size() );
 }
 
-
 Part_Tet_FSI::~Part_Tet_FSI()
 {}
-
 
 void Part_Tet_FSI::write( const char * inputFileName ) const
 {

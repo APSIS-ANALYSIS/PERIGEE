@@ -7,8 +7,7 @@ Part_Tet::Part_Tet(
     const IIEN * const &IEN,
     const std::vector<double> &ctrlPts,
     const int &in_cpu_rank, const int &in_cpu_size,
-    const int &in_dofNum, const int &in_elemType,
-    const bool isPrintInfo )
+    const int &in_dofNum, const int &in_elemType )
 : nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),
   sDegree( mesh->get_s_degree() ), tDegree( mesh->get_t_degree() ),
   uDegree( mesh->get_u_degree() ), nLocBas( mesh->get_nLocBas() ),
@@ -37,7 +36,7 @@ Part_Tet::Part_Tet(
     const std::vector<double> &ctrlPts,
     const int &in_cpu_rank, const int &in_cpu_size,
     const int &in_dofNum, const int &in_dofMat,
-    const int &in_elemType, const bool isPrintInfo )
+    const int &in_elemType )
 : nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),
   sDegree( mesh->get_s_degree() ), tDegree( mesh->get_t_degree() ),
   uDegree( mesh->get_u_degree() ), nLocBas( mesh->get_nLocBas() ),

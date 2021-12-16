@@ -26,8 +26,7 @@ class Part_Tet_FSI : public Part_Tet
         const std::vector<int> &node_s,
         const int &in_cpu_rank, const int &in_cpu_size,
         const int &in_dofNum, const int &in_dofMat,
-        const int &in_elemType,
-        const bool isPrintInfo );
+        const int &in_elemType );
 
     virtual ~Part_Tet_FSI();
 

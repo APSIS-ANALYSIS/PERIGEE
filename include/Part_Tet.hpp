@@ -23,8 +23,7 @@ class Part_Tet : public IPart
         const IIEN * const &IEN,
         const std::vector<double> &ctrlPts,
         const int &in_cpu_rank, const int &in_cpu_size,
-        const int &in_dofNum, const int &in_elemType,
-        const bool isPrintInfo );
+        const int &in_dofNum, const int &in_elemType );
 
     Part_Tet( const IMesh * const &mesh,
         const IGlobal_Part * const &gpart,
@@ -33,8 +32,7 @@ class Part_Tet : public IPart
         const std::vector<double> &ctrlPts,
         const int &in_cpu_rank, const int &in_cpu_size,
         const int &in_dofNum, const int &in_dofMat,
-        const int &in_elemType,
-        const bool isPrintInfo );
+        const int &in_elemType );
 
     // Constructor that load the partition info from h5 file on disk
     Part_Tet( const char * const &fileName, const int &in_cpu_rank );
