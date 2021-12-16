@@ -40,6 +40,9 @@ class Global_Part_METIS : public IGlobal_Part
 
     virtual idx_t get_epart( const int &ee ) const {return epart[ee];}
 
+    // For multifield partition, we allow the access of partition results by
+    // specifiying the field index, and nn ranges in 
+    // [ 0 , mesh[field]->get_nFunc )
     virtual idx_t get_npart( const int &nn, const int &field = 0 ) const 
     {return npart[nn + field_offset[field]];}
 
