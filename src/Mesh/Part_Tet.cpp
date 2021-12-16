@@ -306,15 +306,6 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
   std::cout<<"-- proc "<<cpu_rank<<" LIEN generated. \n";
 }
 
-int Part_Tet::get_elemLocIndex(const int &gloindex) const
-{
-  auto findindex = find(elem_loc.begin(), elem_loc.end(), gloindex);
-  if(findindex == elem_loc.end())
-    return -1;
-  else
-    return (findindex - elem_loc.begin());
-}
-
 void Part_Tet::write( const char * inputFileName ) const
 {
   const std::string input_fName( inputFileName );

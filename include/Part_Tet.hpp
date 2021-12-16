@@ -52,7 +52,8 @@ class Part_Tet : public IPart
     {return VEC_T::is_invec(node_loc, gloindex);}
    
     // Determine the position of a given index in the elem_loc array 
-    virtual int get_elemLocIndex(const int &gloindex) const;
+    virtual int get_elemLocIndex(const int &gloindex) const
+    {return VEC_T::get_pos(elem_loc, gloindex);}
 
     // Determine the position of a given index in the local_to_global array
     virtual int get_nodeLocGhoIndex(const int &gloindex) const
