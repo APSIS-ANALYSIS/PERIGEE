@@ -135,7 +135,7 @@ class Part_Tet : public IPart
         const Map_Node_Index * const &mnindex,
         const IIEN * const &IEN,
         const std::vector<double> &ctrlPts,
-        const bool &isPrintinfo );
+        const int &field = 0 );
 };
 
 #endif

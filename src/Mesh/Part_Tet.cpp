@@ -26,7 +26,7 @@ Part_Tet::Part_Tet(
   SYS_T::print_exit_if(cpu_rank < 0, "Error: Part_Tet input cpu_rank is wrong! \n");
 
   // Generate group 1, 2, 5, and 6.
-  Generate_Partition( mesh, gpart, mnindex, IEN, ctrlPts, isPrintInfo );
+  Generate_Partition( mesh, gpart, mnindex, IEN, ctrlPts );
 }
 
 Part_Tet::Part_Tet(
@@ -55,7 +55,7 @@ Part_Tet::Part_Tet(
   SYS_T::print_exit_if(cpu_rank < 0, "Error: Part_Tet input cpu_rank is wrong! \n");
 
   // Generate group 1, 2, 5, and 6.
-  Generate_Partition( mesh, gpart, mnindex, IEN, ctrlPts, isPrintInfo );
+  Generate_Partition( mesh, gpart, mnindex, IEN, ctrlPts );
 }
 
 Part_Tet::Part_Tet( const char * const &inputfileName, const int &in_cpu_rank )
@@ -142,7 +142,7 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
     const Map_Node_Index * const &mnindex,
     const IIEN * const &IEN,
     const std::vector<double> &ctrlPts,
-    const bool &isPrintInfo )
+    const int &field )
 {
   // 1. Create local partition based on the epart & npart info
   elem_loc.clear(); node_loc.clear();
@@ -157,7 +157,7 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
 
   for( int n=0; n<nFunc; ++n )
   {
-    if( gpart->get_npart(n) == cpu_rank )
+    if( gpart->get_npart(n, field) == cpu_rank )
     {
       node_loc.push_back(n);
       node_loc_original.push_back(n);
@@ -167,11 +167,8 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
   VEC_T::shrink2fit(node_loc_original);
   nlocalnode = (int) node_loc.size();
 
-  if(isPrintInfo)
-  {
-    std::cout<<"-- proc "<<cpu_rank<<" -- elem_loc & node_loc arrays generated. \n";
-    std::cout<<"-- proc "<<cpu_rank<<" local element number: "<<elem_loc.size()<<std::endl;
-  }
+  std::cout<<"-- proc "<<cpu_rank<<" -- elem_loc & node_loc arrays generated. \n";
+  std::cout<<"-- proc "<<cpu_rank<<" local element number: "<<elem_loc.size()<<std::endl;
 
   // 2. Reorder node_loc
   for( int ii=0; ii<nlocalnode; ++ii ) 
@@ -189,7 +186,7 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
       node_tot.push_back( temp_node );
     }
   }
-  
+
   VEC_T::sort_unique_resize( node_tot );
 
   ntotalnode = (int) node_tot.size();
@@ -227,14 +224,11 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
     std::cout<<"WARNING: The partition is poor for proecssor: "<<cpu_rank<<std::endl;
   }
 
-  if( isPrintInfo )
-  {
-    std::cout<<"-- proc "<<cpu_rank;
-    std::cout<<" -- ntotalnode: "<<ntotalnode;
-    std::cout<<" -- nlocalnode: "<<nlocalnode;
-    std::cout<<" -- nghostnode: "<<nghostnode;
-    std::cout<<" -- nbadnode: "<<nbadnode<<std::endl;
-  }
+  std::cout<<"-- proc "<<cpu_rank;
+  std::cout<<" -- ntotalnode: "<<ntotalnode;
+  std::cout<<" -- nlocalnode: "<<nlocalnode;
+  std::cout<<" -- nghostnode: "<<nghostnode;
+  std::cout<<" -- nbadnode: "<<nbadnode<<std::endl;
 
   // 5. local_to_global mapping
   local_to_global.clear();
@@ -246,7 +240,7 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
   VEC_T::shrink2fit(local_to_global);
   nlocghonode = (int) local_to_global.size();
 
-  if( isPrintInfo ) std::cout<<"-- proc "<<cpu_rank<<" local_to_global generated. \n";
+  std::cout<<"-- proc "<<cpu_rank<<" local_to_global generated. \n";
 
   // 6. LIEN
   LIEN = new int * [nlocalele];
@@ -271,7 +265,7 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
     }
   }
 
-  if(isPrintInfo) std::cout<<"-- proc "<<cpu_rank<<" LIEN generated. \n";
+  std::cout<<"-- proc "<<cpu_rank<<" LIEN generated. \n";
 
   // 7. local copy of control points
   ctrlPts_x_loc.resize(nlocghonode);
@@ -291,7 +285,7 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
   VEC_T::shrink2fit(ctrlPts_y_loc);
   VEC_T::shrink2fit(ctrlPts_z_loc);
 
-  if(isPrintInfo) std::cout<<"-- proc "<<cpu_rank<<" Local control points generated. \n";
+  std::cout<<"-- proc "<<cpu_rank<<" Local control points generated. \n";
 }
 
 int Part_Tet::get_elemLocIndex(const int &gloindex) const
