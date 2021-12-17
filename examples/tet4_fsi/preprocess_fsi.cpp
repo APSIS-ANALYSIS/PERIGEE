@@ -19,6 +19,7 @@
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_tet_outflow.hpp"
 #include "NBC_Partition.hpp"
+#include "NBC_Partition_MF.hpp"
 #include "NBC_Partition_inflow.hpp"
 #include "EBC_Partition_outflow.hpp"
 
@@ -464,7 +465,7 @@ int main( int argc, char * argv[] )
     mytimer -> Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
-    NBC_Partition * nbcpart = new NBC_Partition(part_v, mnindex_v, NBC_list, mapper_v);
+    NBC_Partition * nbcpart = new NBC_Partition(part_v, mnindex_v, NBC_list);
     nbcpart -> write_hdf5( part_file_v );
 
     NBC_Partition * mbcpart = new NBC_Partition(part_v, mnindex_v, meshBC_list);
