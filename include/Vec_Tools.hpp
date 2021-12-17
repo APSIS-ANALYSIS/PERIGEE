@@ -52,6 +52,11 @@ namespace VEC_T
     efile.close();
   }
 
+  template<typename T> int get_size( const std::vector<T> &vec )
+  {
+    return static_cast<int>(vec.size());
+  }
+
   // --------------------------------------------------------------------------
   // ! shrink2fit  
   //   trim the capacity of vector

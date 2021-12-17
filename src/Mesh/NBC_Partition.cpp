@@ -81,11 +81,11 @@ NBC_Partition::NBC_Partition( const IPart * const &part,
 NBC_Partition:: NBC_Partition( const IPart * const &part,
     const Map_Node_Index * const &mnindex,
     const std::vector<INodalBC *> &nbc_list,
-    const std::vector< std::vector<int> > &grid2id )
+    const std::vector< std::vector<int> > &grid2id ) : cpu_rank(part->get_cpu_rank())
 {
   const int dof = (int) nbc_list.size();
 
-  SYS_T::print_fatal_if( grid2id.size() != dof, "Error: NBC_Partition, the grid2id array size should be math that of nbc list.\n" );
+  SYS_T::print_fatal_if( VEC_T::get_size(grid2id) != dof, "Error: NBC_Partition, the grid2id array size should be math that of nbc list.\n" );
 
   for(int ii=0; ii<dof; ++ii)
   {
