@@ -23,6 +23,12 @@ class NBC_Partition_MF : public NBC_Partition
 
     virtual ~NBC_Partition_MF();
 
+    virtual void write_hdf5( const std::string &FileName ) const
+    { write_hdf5(FileName, "/nbc"); }
+
+    virtual void write_hdf5( const std::string &FileName,
+        const std::string &GroupName ) const;
+
   protected:
     // LID mapped to the MF value.
     std::vector<int> LID_MF;

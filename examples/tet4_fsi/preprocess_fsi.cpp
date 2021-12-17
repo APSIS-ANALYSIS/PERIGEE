@@ -465,7 +465,7 @@ int main( int argc, char * argv[] )
     mytimer -> Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
-    NBC_Partition * nbcpart = new NBC_Partition(part_v, mnindex_v, NBC_list);
+    NBC_Partition * nbcpart = new NBC_Partition_MF(part_v, mnindex_v, NBC_list, mapper_v);
     nbcpart -> write_hdf5( part_file_v );
 
     NBC_Partition * mbcpart = new NBC_Partition(part_v, mnindex_v, meshBC_list);

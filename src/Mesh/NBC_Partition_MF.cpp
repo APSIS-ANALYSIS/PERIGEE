@@ -75,4 +75,39 @@ NBC_Partition_MF::~NBC_Partition_MF()
   VEC_T::clean( LID_MF );
 }
 
+void NBC_Partition_MF::write_hdf5( const std::string &FileName,
+    const std::string &GroupName ) const
+{
+  // --------------------------------------------------------------------------
+  // Call the base class writer to write the base class data
+  NBC_Partition::write_hdf5( FileName, GroupName );
+  // --------------------------------------------------------------------------
+  
+  const std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
+
+  hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
+
+  HDF5_Writer * h5writer = new HDF5_Writer(file_id);
+
+  hid_t g_id = H5Gopen(file_id, GroupName.c_str(), H5P_DEFAULT);
+
+  h5writer->write_intVector( g_id, "LID_MF", LID_MF );
+
+  if( LDN_MF.size() > 0 ) h5writer->write_intVector( g_id, "LDN_MF", LDN_MF );
+
+  if( LPSN_MF.size() > 0 )
+  {
+    h5writer->write_intVector( g_id, "LPSN_MF", LPSN_MF );
+    h5writer->write_intVector( g_id, "LPMN_MF", LPMN_MF );
+  }
+
+  if( LocalMaster_MF.size() > 0 )
+  {
+    h5writer->write_intVector( g_id, "LocalMaster_MF",      LocalMaster_MF );
+    h5writer->write_intVector( g_id, "LocalMasterSlave_MF", LocalMasterSlave_MF );
+  }
+
+  delete h5writer; H5Gclose(g_id); H5Fclose(file_id);
+}
+
 // EOF
