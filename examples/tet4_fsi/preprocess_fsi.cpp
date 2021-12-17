@@ -379,14 +379,15 @@ int main( int argc, char * argv[] )
   // Physical NodalBC
   std::cout<<"===== Boundary Conditions =====\n";
   std::cout<<"1. Nodal boundary condition for the implicit solver: \n";
-  std::vector<INodalBC *> NBC_list( 3, nullptr );
+  std::vector<INodalBC *> NBC_list_p( 1, nullptr );
+  std::vector<INodalBC *> NBC_list_v( 3, nullptr );
 
   // Here we assumed that the pressure mesh fluid nodal indices are identical to
   // that in the velocity mesh.
-  INodalBC * NBC_pres = new NodalBC_3D_FSI( geo_f_file, nFunc_p, fsiBC_type );
+  NBC_list_p[0] = new NodalBC_3D_FSI( geo_f_file, nFunc_p, fsiBC_type );
 
   for( int ii=0; ii<3; ++ii )
-    NBC_list[ii] = new NodalBC_3D_FSI( geo_f_file, geo_s_file, sur_f_file_wall, 
+    NBC_list_v[ii] = new NodalBC_3D_FSI( geo_f_file, geo_s_file, sur_f_file_wall, 
         sur_s_file_wall, sur_f_file_in, sur_f_file_out, sur_s_file_in, sur_s_file_out, 
         nFunc_v, ii, ringBC_type, fsiBC_type );
 
@@ -465,8 +466,11 @@ int main( int argc, char * argv[] )
     mytimer -> Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
-    NBC_Partition * nbcpart = new NBC_Partition_MF(part_v, mnindex_v, NBC_list, mapper_v);
-    nbcpart -> write_hdf5( part_file_v );
+    NBC_Partition * nbcpart_p = new NBC_Partition_MF(part_p, mnindex_p, NBC_list_p, mapper_p);
+    nbcpart_p -> write_hdf5( part_file_p );
+
+    NBC_Partition * nbcpart_v = new NBC_Partition_MF(part_v, mnindex_v, NBC_list_v, mapper_v);
+    nbcpart_v -> write_hdf5( part_file_v );
 
     NBC_Partition * mbcpart = new NBC_Partition(part_v, mnindex_v, meshBC_list);
     mbcpart -> write_hdf5( part_file_v, "/mesh_nbc" );
@@ -479,11 +483,13 @@ int main( int argc, char * argv[] )
 
 
   // Clean up the memory
-  for(auto it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc) delete *it_nbc;
+  for(auto it_nbc=NBC_list_v.begin(); it_nbc != NBC_list_v.end(); ++it_nbc) delete *it_nbc;
+  
+  for(auto it_nbc=NBC_list_p.begin(); it_nbc != NBC_list_p.end(); ++it_nbc) delete *it_nbc;
 
   for(auto it_nbc=meshBC_list.begin(); it_nbc != meshBC_list.end(); ++it_nbc) delete *it_nbc;
 
-  delete NBC_pres; delete ebc; delete InFBC; delete mesh_ebc; 
+  delete ebc; delete InFBC; delete mesh_ebc; 
   delete mnindex_p; delete mnindex_v; delete mesh_p; delete mesh_v; 
   delete IEN_p; delete IEN_v; delete mytimer; delete global_part; 
   PetscFinalize();
