@@ -18,9 +18,8 @@
 #include "NodalBC_3D_vtu.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_tet_outflow.hpp"
-#include "NBC_Partition.hpp"
 #include "NBC_Partition_MF.hpp"
-#include "NBC_Partition_inflow.hpp"
+#include "NBC_Partition_inflow_MF.hpp"
 #include "EBC_Partition_outflow.hpp"
 
 int main( int argc, char * argv[] )
@@ -475,6 +474,8 @@ int main( int argc, char * argv[] )
     NBC_Partition * mbcpart = new NBC_Partition(part_v, mnindex_v, meshBC_list);
     mbcpart -> write_hdf5( part_file_v, "/mesh_nbc" );
 
+    NBC_Partition_inflow * infpart = new NBC_Partition_inflow_MF(part_v, mnindex_v, InFBC, mapper_v);
+    infpart->write_hdf5( part_file_v );
 
     delete part_p; delete part_v; 
   }
