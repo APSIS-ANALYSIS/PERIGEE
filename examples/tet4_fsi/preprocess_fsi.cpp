@@ -356,9 +356,8 @@ int main( int argc, char * argv[] )
   }
 
   // mapper maps from the new grid point index to the matrix row index
-  std::vector< std::vector<int> > mapper_v;
-  std::vector<int> mapper_p;
-  mapper_v.resize(3);
+  std::vector< std::vector<int> > mapper_p, mapper_v;
+  mapper_p.resize(1); mapper_v.resize(3);
 
   for(int ii=0; ii<cpu_size; ++ii)
   {
@@ -370,7 +369,7 @@ int main( int argc, char * argv[] )
     }
 
     for(int jj=0; jj<list_nn_p[ii]; ++jj)
-      mapper_p.push_back( start_idx_p[ii] + jj );
+      mapper_p[0].push_back( start_idx_p[ii] + jj );
   }
 
   // ----------------------------------------------------------------
@@ -434,8 +433,6 @@ int main( int argc, char * argv[] )
   // ----------------------------------------------------------------
 
   // Partition the mesh
-  const bool isPrintPartInfo = true;
-
   std::vector<int> list_nlocalnode, list_nghostnode, list_ntotalnode, list_nbadnode;
   std::vector<double> list_ratio_g2l;
 
@@ -467,12 +464,15 @@ int main( int argc, char * argv[] )
     mytimer -> Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
+    NBC_Partition * nbcpart = new NBC_Partition(part_v, mnindex_v, NBC_list, mapper_v);
+    nbcpart -> write_hdf5( part_file_v );
+
+    NBC_Partition * mbcpart = new NBC_Partition(part_v, mnindex_v, meshBC_list);
+    mbcpart -> write_hdf5( part_file_v, "/mesh_nbc" );
+
+
     delete part_p; delete part_v; 
   }
-
-
-
-
 
 
 
