@@ -17,7 +17,6 @@
 // Author: Ju Liu
 // ==================================================================
 #include "IPart.hpp"
-#include "Map_Node_Index.hpp"
 #include "INodalBC.hpp"
 
 class NBC_Partition_inflow
@@ -80,11 +79,6 @@ class NBC_Partition_inflow
     // local cell's global index
     // num_nbc x num_local_cell[ii]
     std::vector< std::vector<int> > local_global_cell;
-  
-    // ------------------------------------------------------------------------
-    // This function is NOT allowed for inflow nbc 
-    virtual void write_hdf5( const std::string &FileName,
-        const std::string &GroupName ) const;
 };
 
 #endif

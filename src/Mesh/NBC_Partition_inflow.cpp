@@ -170,11 +170,4 @@ void NBC_Partition_inflow::write_hdf5( const std::string &FileName ) const
   delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
 }
 
-void NBC_Partition_inflow::write_hdf5( const std::string &FileName,
-    const std::string &GroupName ) const
-{
-  // This function is NOT allowed.
-  SYS_T::print_fatal("Error: NBC_Partition_inflow, write_hdf5 with groupname is not allowed.\n");
-}
-
 // EOF
