@@ -42,7 +42,7 @@ class Map_Node_Index
     virtual void print_info() const;
 
     // write the old_2_new and new_2_old mappings into an hdf5 file
-    virtual void write_hdf5( const char * const &fileName ) const;
+    virtual void write_hdf5( const std::string &fileName ) const;
 
   private:
     std::vector<int> old_2_new, new_2_old;

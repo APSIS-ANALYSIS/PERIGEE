@@ -65,7 +65,7 @@ void Map_Node_Index::print_info() const
   std::cout<<"========================== "<<std::endl;
 }
 
-void Map_Node_Index::write_hdf5( const char * const &fileName ) const
+void Map_Node_Index::write_hdf5( const std::string &fileName ) const
 {
   std::string fName(fileName);
   fName.append(".h5");
