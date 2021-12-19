@@ -433,12 +433,6 @@ int main( int argc, char * argv[] )
   std::cout<<"=================================\n";
   // ----------------------------------------------------------------
 
-  // Partition the mesh
-  std::vector<int> list_nlocalnode, list_nghostnode, list_ntotalnode, list_nbadnode;
-  std::vector<double> list_ratio_g2l;
-
-  int sum_nghostnode = 0;
-
   SYS_T::Timer * mytimer = new SYS_T::Timer();
 
   for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
@@ -491,11 +485,13 @@ int main( int argc, char * argv[] )
     }
     else SYS_T::print_fatal("ERROR: uncognized fsiBC type. \n");
 
-    delete part_p; delete part_v; 
+    EBC_Partition * mebcpart = new EBC_Partition(part_v, mnindex_v, mesh_ebc);
+
+    mebcpart-> write_hdf5( part_file_v, "/mesh_ebc" );
+
+    delete part_p; delete part_v; delete nbcpart_p; delete nbcpart_v;
+    delete mbcpart; delete infpart; delete mebcpart; 
   }
-
-
-
 
   // Clean up the memory
   for(auto it_nbc=NBC_list_v.begin(); it_nbc != NBC_list_v.end(); ++it_nbc) delete *it_nbc;

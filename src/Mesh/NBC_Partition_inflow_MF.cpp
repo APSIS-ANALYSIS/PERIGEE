@@ -31,6 +31,11 @@ NBC_Partition_inflow_MF::~NBC_Partition_inflow_MF()
 
 void NBC_Partition_inflow_MF::write_hdf5( const std::string &FileName ) const
 {
+  // --------------------------------------------------------------------------
+  // Call the base class writer to write the base class data
+  NBC_Partition_inflow::write_hdf5( FileName );
+  // --------------------------------------------------------------------------
+
   std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
 
   hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
