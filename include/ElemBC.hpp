@@ -101,6 +101,9 @@ class ElemBC
     virtual void get_global_node(const int &ebc_id,std::vector<int> &out) const
     {SYS_T::commPrint("Warning: get_global_node is not implemented. \n");}
 
+    virtual std::vector<int> get_global_node(const int &ebc_id) const
+    {SYS_T::commPrint("Warning: get_global_node is not implemented. \n"); return {};}
+
     // This returns the global volumetric element index for the surface cells.
     virtual int get_global_cell(const int &ebc_id, const int &cell_index) const
     {SYS_T::commPrint("Warning: get_global_cell is not implemented. \n"); return 0;}

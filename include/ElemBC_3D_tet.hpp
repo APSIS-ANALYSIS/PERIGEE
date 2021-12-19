@@ -43,6 +43,9 @@ class ElemBC_3D_tet : public ElemBC
     virtual void get_global_node(const int &ebc_id, std::vector<int> &out) const
     {out = global_node[ebc_id];}
 
+    virtual std::vector<int> get_global_node(const int &ebc_id) const
+    {return global_node[ebc_id];}
+
     virtual int get_global_cell(const int &ebc_id, const int &cell_index) const
     {return global_cell[ebc_id][cell_index];}
 
