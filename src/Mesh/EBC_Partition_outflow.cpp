@@ -18,8 +18,7 @@ EBC_Partition_outflow::EBC_Partition_outflow(
       face_int_NA[ii] = ebc -> get_intNA(ii);
     
       // Obtain the old indices of the face nodes 
-      std::vector<int> old_node_idx; 
-      ebc -> get_global_node(ii, old_node_idx);
+      const std::vector<int> old_node_idx = ebc -> get_global_node(ii);
       
       LID_all_face_nodes[ii].resize( old_node_idx.size() * 3 );
       for(unsigned int jj=0; jj<old_node_idx.size(); ++jj)
