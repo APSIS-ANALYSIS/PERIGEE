@@ -20,7 +20,7 @@
 #include "ElemBC_3D_tet_outflow.hpp"
 #include "NBC_Partition_MF.hpp"
 #include "NBC_Partition_inflow_MF.hpp"
-#include "EBC_Partition_outflow.hpp"
+#include "EBC_Partition_outflow_MF.hpp"
 
 int main( int argc, char * argv[] )
 {
@@ -476,6 +476,20 @@ int main( int argc, char * argv[] )
 
     NBC_Partition_inflow * infpart = new NBC_Partition_inflow_MF(part_v, mnindex_v, InFBC, mapper_v);
     infpart->write_hdf5( part_file_v );
+
+    if( fsiBC_type == 0 || fsiBC_type == 1 )
+    {
+      EBC_Partition_outflow_MF * ebcpart = new EBC_Partition_outflow_MF(part_v, mnindex_v, ebc, NBC_list_v, mapper_v);
+      ebcpart -> write_hdf5( part_file_v );
+      delete ebcpart;
+    }
+    else if( fsiBC_type == 2 )
+    {
+      EBC_Partition * ebcpart = new EBC_Partition( part_v, mnindex_v, ebc );
+      ebcpart -> write_hdf5( part_file_v );
+      delete ebcpart;
+    }
+    else SYS_T::print_fatal("ERROR: uncognized fsiBC type. \n");
 
     delete part_p; delete part_v; 
   }
