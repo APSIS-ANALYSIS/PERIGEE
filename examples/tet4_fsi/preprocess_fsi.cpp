@@ -216,8 +216,6 @@ int main( int argc, char * argv[] )
   // Read the F-S interface vtp file
   const std::vector<int> wall_node_id = TET_T::read_int_PointData( sur_s_file_interior_wall, "GlobalNodeID" );
 
-  VEC_T::print(wall_node_id);
-
   const int nFunc_interface = static_cast<int>( wall_node_id.size() );
   const int nFunc_p = nFunc_v + nFunc_interface;
 
@@ -278,14 +276,14 @@ int main( int argc, char * argv[] )
 
   VEC_T::sort_unique_resize( p_node_f ); VEC_T::sort_unique_resize( p_node_s );
 
-  // Check the mesh
+  // Check the mesh of kinematics
   const double critical_val_aspect_ratio = 3.5;
   TET_T::tetmesh_check( ctrlPts, IEN_v, nElem, critical_val_aspect_ratio );
 
-  // Generate the mesh
+  // Generate the mesh for kinematics
   IMesh * mesh_v = new Mesh_Tet4(nFunc_v, nElem);
 
-  // Generate the mesh for pressure
+  // Generate the mesh for pressure (discontinuous over interface)
   IMesh * mesh_p = new Mesh_Tet4(nFunc_p, nElem);
 
   std::vector<IMesh const *> mlist;
