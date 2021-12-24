@@ -78,10 +78,13 @@ and rerun the configure command. Once you see that the system tells the configur
 make 2>&1 | tee m.txt
 make install 2>&1 | tee mi.txt
 ```
-You may want to add the bin folder to PATH:
+You may want to add the bin directory to the system variable PATH. First, open the .bashrc file by vi.
 ```
 vi ~/.bashrc
-export PATH=mpich-install/bin:$PATH
+```
+Add the following statement to .bashrc
+```
+export PATH=$HOME/lib/mpich-3.3rc1/bin:$PATH
 ```
 so that the system will call the installed mpich binaries.
 
