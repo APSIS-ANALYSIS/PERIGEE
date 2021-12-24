@@ -370,10 +370,7 @@ void SV_T::compare_sv_vtp( const std::string &filename_1,
 
   const int numpts = numpts_1;
 
-  std::vector<double> pt2_x, pt2_y, pt2_z;
-  pt2_x.resize(numpts);
-  pt2_y.resize(numpts);
-  pt2_z.resize(numpts);
+  std::vector<double> pt2_x(numpts), pt2_y(numpts), pt2_z(numpts);
   for(int ii=0; ii<numpts; ++ii)
   {
     pt2_x[ii] = pt_2[3*ii];
@@ -385,11 +382,7 @@ void SV_T::compare_sv_vtp( const std::string &filename_1,
   std::vector<int> map_idx; map_idx.resize(numpts);
   for(int ii=0; ii<numpts; ++ii)
   {
-    const double coor_x = pt_1[3*ii+0];
-    const double coor_y = pt_1[3*ii+1];
-    const double coor_z = pt_1[3*ii+2];
-
-    const int loc = find_idx( pt_1, numpts, coor_x, coor_y, coor_z, 1.0e-15 );
+    const int loc = find_idx( pt_1, numpts, pt2_x[ii], pt2_y[ii], pt2_z[ii], 1.0e-15 );
     SYS_T::print_fatal_if( loc == -1, "Error: SV_T::compare_sv_vtp, There are points not found in the vtp file.\n" );
     map_idx[ii] = loc;
   }
