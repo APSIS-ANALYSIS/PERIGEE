@@ -36,7 +36,11 @@ Also, notice that sometimes, PETSc configure command may not have the correct do
 
 * Refer to [this](https://www.mcs.anl.gov/petsc/documentation/installation.html) for the installation details.
 
-As an example, let me attach the full configuration command here.
+As an example, let me attach the full configuration command for debug build here.
+```sh
+ ./configure -with-pic --with-make-np=12 --with-mpi-compilers=1 --with-mpi-dir=/home/juliu/lib/mpich-3.2/ --with-scalar-type=real --with-precision=double --with-chaco=1 --download-chaco --with-hypre=1 --download-hypre=/home/juliu/lib/hypre-2.11.1.tar.gz --with-mumps=1 --download-mumps --with-scalapack=1 --download-scalapack --download-fblaslapack --download-metis --download-parmetis --with-debugging=yes --prefix=/home/juliu/lib/petsc-xx.yy.zz-debug
+```
+Let me attach the full configuration command for optimized build here.
 ```sh
 $ ./configure --with-x=0 -with-pic --with-make-np=12 --with-mpi-compilers=1 --with-mpi-dir=${HOME}/lib/mpich-3.3.2/ --with-scalar-type=real --with-precision=double --with-chaco=1 --download-chaco --with-hypre=1 --download-hypre --with-spai=1 --download-spai --with-sundials=1 --download-sundials --with-mumps=1 --download-mumps --with-scalapack=1 --download-scalapack --with-blacs=1 --download-blacs --with-spooles=1 --download-spooles --with-superlu_dist=1 --download-superlu_dist --with-superlu=1 --download-superlu --download-fblaslapack --download-metis --download-parmetis --with-ml=1 --download-ml --with-eigen=1 --download-eigen --with-debugging=no COPTFLAGS="-O3 -march=native -mtune=native" CXXOPTFLAGS="-O3 -march=native -mtune=native" FOPTFLAGS="-O3 -march=native -mtune=native" --prefix=${HOME}/lib/petsc-xx.yy.zz-opt
 ```
