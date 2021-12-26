@@ -4,7 +4,7 @@
 // Author: Ju Liu
 // Date: Dec. 26 2021
 // ============================================================================
-#include "HDF5_Writer.hpp"
+#include "HDF5_Tools.hpp"
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
 #include "ALocal_Elem.hpp"
@@ -312,27 +312,25 @@ int main(int argc, char *argv[])
   FEAElement * elements = new FEAElement_Triangle3_3D_der0( nqp_tri );
 
   // ===== Generate the IS for pres and velo =====
-  hid_t fv_id = H5Fopen( SYS_T::gen_partfile_name(part_v_file, rank).c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
-  HDF5_Reader * h5r_v = new HDF5_Reader( fv_id );
+  const int idx_v_start = HDF5_T::read_intScalar( SYS_T::gen_partfile_name(part_v_file, rank).c_str(), "/DOF_mapper", "start_idx" );
+  const int idx_p_start = HDF5_T::read_intScalar( SYS_T::gen_partfile_name(part_p_file, rank).c_str(), "/DOF_mapper", "start_idx" );
 
-  const int idx_v_start = h5r_v -> read_intScalar( "/DOF_mapper", "start_idx" );
+  const int idx_v_len = pNode_v->get_dof() * pNode_v -> get_nlocalnode();
+  const int idx_p_len = pNode_p->get_dof() * pNode_p -> get_nlocalnode();
 
-  delete h5r_v; H5Fclose( fv_id );
+  PetscInt * is_array_velo = new PetscInt[ idx_v_len ];
+  for(int ii=0; ii<idx_v_len; ++ii) is_array_velo[ii] = idx_v_start + ii;
 
-  hid_t fp_id = H5Fopen( SYS_T::gen_partfile_name(part_p_file, rank).c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
-  HDF5_Reader * h5r_p = new HDF5_Reader( fp_id );
+  PetscInt * is_array_pres = new PetscInt[ idx_p_len ];
+  for(int ii=0; ii<idx_p_len; ++ii) is_array_pres[ii] = idx_p_start + ii;
+  
+  IS is_velo, is_pres;
+  ISCreateGeneral(PETSC_COMM_WORLD, idx_v_len, is_array_velo, PETSC_COPY_VALUES, &is_velo);
+  ISCreateGeneral(PETSC_COMM_WORLD, idx_p_len, is_array_pres, PETSC_COPY_VALUES, &is_pres);
 
-  const int idx_p_start = h5r_p -> read_intScalar( "/DOF_mapper", "start_idx_p" );
-
-  delete h5r_p; H5Fclose( fp_id );
-
-
-
-
-
-
-
-
+  delete [] is_array_velo; is_array_velo = nullptr;
+  delete [] is_array_pres; is_array_pres = nullptr;
+  // ================================================================
 
 
 
@@ -352,9 +350,8 @@ int main(int argc, char *argv[])
 
 
 
-
-
-
+  ISDestroy(&is_velo); ISDestroy(&is_pres);
+  delete elements; delete elementv; delete quadv; delete quads; delete inflow_rate_ptr;
   delete GMIptr; delete PartBasic; delete locElem; delete fNode; delete pNode_v; delete pNode_p;
   delete locinfnbc; delete locnbc_v; delete locnbc_p; delete mesh_locnbc; delete locebc;
   delete mesh_locebc;
