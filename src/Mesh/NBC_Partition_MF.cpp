@@ -54,6 +54,7 @@ NBC_Partition_MF::NBC_Partition_MF( const IPart * const &part,
     {
       const int loc = ii * totnode + jj;
       if(LID[loc] != -1) LID_MF[loc] = grid2id[ii][ LID[loc] ];
+      else LID_MF[loc] = -1;
     }
   } // end ii-loop over dof
   
@@ -151,25 +152,32 @@ void NBC_Partition_MF::write_hdf5( const std::string &FileName,
 
   HDF5_Writer * h5writer = new HDF5_Writer(file_id);
 
-  hid_t g_id = H5Gopen(file_id, GroupName.c_str(), H5P_DEFAULT);
+  hid_t g_nbc_id = H5Gopen(file_id, GroupName.c_str(), H5P_DEFAULT);
 
-  h5writer->write_intVector( g_id, "LID_MF", LID_MF );
+  hid_t g_id = H5Gcreate(g_nbc_id, "MF", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-  if( LDN_MF.size() > 0 ) h5writer->write_intVector( g_id, "LDN_MF", LDN_MF );
+  h5writer->write_intVector( g_id, "LID", LID_MF );
+
+  if( LDN_MF.size() > 0 ) h5writer->write_intVector( g_id, "LDN", LDN_MF );
 
   if( LPSN_MF.size() > 0 )
   {
-    h5writer->write_intVector( g_id, "LPSN_MF", LPSN_MF );
-    h5writer->write_intVector( g_id, "LPMN_MF", LPMN_MF );
+    h5writer->write_intVector( g_id, "LPSN", LPSN_MF );
+    h5writer->write_intVector( g_id, "LPMN", LPMN_MF );
   }
 
   if( LocalMaster_MF.size() > 0 )
   {
-    h5writer->write_intVector( g_id, "LocalMaster_MF",      LocalMaster_MF );
-    h5writer->write_intVector( g_id, "LocalMasterSlave_MF", LocalMasterSlave_MF );
+    h5writer->write_intVector( g_id, "LocalMaster",      LocalMaster_MF );
+    h5writer->write_intVector( g_id, "LocalMasterSlave", LocalMasterSlave_MF );
   }
 
-  delete h5writer; H5Gclose(g_id); H5Fclose(file_id);
+  h5writer->write_intVector(g_id, "Num_LD",  Num_LD);
+  h5writer->write_intVector(g_id, "Num_LPS", Num_LPS);
+  h5writer->write_intVector(g_id, "Num_LPM", Num_LPM);
+
+  delete h5writer;
+  H5Gclose(g_id); H5Gclose(g_nbc_id); H5Fclose(file_id);
 }
 
 // EOF

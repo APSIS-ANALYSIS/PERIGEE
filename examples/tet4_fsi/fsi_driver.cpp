@@ -8,6 +8,7 @@
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
 #include "ALocal_Elem.hpp"
+#include "ALocal_EBC_outflow.hpp"
 
 #include "PETSc_Tools.hpp"
 #include "FEANode.hpp"
@@ -251,16 +252,21 @@ int main(int argc, char *argv[])
 
   ALocal_Inflow_NodalBC * locinfnbc = new ALocal_Inflow_NodalBC(part_v_file, rank);
 
-  ALocal_NodalBC * locnbc_v = new ALocal_NodalBC(part_v_file, rank);
+  ALocal_NodalBC * locnbc_v = new ALocal_NodalBC(part_v_file, rank, "/nbc/MF");
+  
+  ALocal_NodalBC * locnbc_p = new ALocal_NodalBC(part_p_file, rank, "/nbc/MF");
 
+  ALocal_NodalBC * mesh_locnbc = new ALocal_NodalBC(part_v_file, rank, "/mesh_nbc/MF");
 
-
-
-
+  ALocal_EBC * locebc = new ALocal_EBC_outflow(part_v_file, rank);
+  
+  ALocal_EBC * mesh_locebc = new ALocal_EBC(part_v_file, rank, "/mesh_ebc");
 
 
 
   delete GMIptr; delete PartBasic; delete locElem; delete fNode; delete pNode_v; delete pNode_p;
+  delete locinfnbc; delete locnbc_v; delete locnbc_p; delete mesh_locnbc; delete locebc;
+  delete mesh_locebc;
   PetscFinalize();
   return EXIT_SUCCESS;
 }
