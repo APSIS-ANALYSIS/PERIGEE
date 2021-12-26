@@ -21,6 +21,13 @@ class NBC_Partition_MF : public NBC_Partition
         const std::vector<INodalBC *> &nbc_list,
         const std::vector< std::vector<int> > &grid2id );
 
+    // If the grid2id mapper is not provided for the constructor, we assume that
+    // the row/col index is given by the dof x node_new_numbering + mm,
+    // for 0 <= mm < dof
+    NBC_Partition_MF( const IPart * const &part,
+        const Map_Node_Index * const &mnindex,
+        const std::vector<INodalBC *> &nbc_list );
+
     virtual ~NBC_Partition_MF();
 
     virtual void write_hdf5( const std::string &FileName ) const

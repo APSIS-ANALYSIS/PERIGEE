@@ -460,7 +460,7 @@ int main( int argc, char * argv[] )
     NBC_Partition * nbcpart_v = new NBC_Partition_MF(part_v, mnindex_v, NBC_list_v, mapper_v);
     nbcpart_v -> write_hdf5( part_file_v );
 
-    NBC_Partition * mbcpart = new NBC_Partition(part_v, mnindex_v, meshBC_list);
+    NBC_Partition * mbcpart = new NBC_Partition_MF(part_v, mnindex_v, meshBC_list);
     mbcpart -> write_hdf5( part_file_v, "/mesh_nbc" );
 
     NBC_Partition_inflow * infpart = new NBC_Partition_inflow_MF(part_v, mnindex_v, InFBC, mapper_v);
