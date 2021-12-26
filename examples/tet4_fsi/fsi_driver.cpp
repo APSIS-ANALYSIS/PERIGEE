@@ -312,14 +312,19 @@ int main(int argc, char *argv[])
   FEAElement * elements = new FEAElement_Triangle3_3D_der0( nqp_tri );
 
   // ===== Generate the IS for pres and velo =====
-  hid_t file_id = H5Fopen( SYS_T::gen_partfile_name(part_v_file, rank).c_str(),
-      H5F_ACC_RDONLY, H5P_DEFAULT );
-  HDF5_Reader * h5r = new HDF5_Reader( file_id );
+  hid_t fv_id = H5Fopen( SYS_T::gen_partfile_name(part_v_file, rank).c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
+  HDF5_Reader * h5r_v = new HDF5_Reader( fv_id );
 
-  const int idx_v_start = h5r -> read_intScalar( "/DOF_mapper", "start_idx" );
-  //const int idx_p_start = h5r -> read_intScalar( "/DOF_mapper", "start_idx_p" );
+  const int idx_v_start = h5r_v -> read_intScalar( "/DOF_mapper", "start_idx" );
 
+  delete h5r_v; H5Fclose( fv_id );
 
+  hid_t fp_id = H5Fopen( SYS_T::gen_partfile_name(part_p_file, rank).c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
+  HDF5_Reader * h5r_p = new HDF5_Reader( fp_id );
+
+  const int idx_p_start = h5r_p -> read_intScalar( "/DOF_mapper", "start_idx_p" );
+
+  delete h5r_p; H5Fclose( fp_id );
 
 
 
