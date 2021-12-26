@@ -325,24 +325,21 @@ int main( int argc, char * argv[] )
   std::vector<int> list_nn_v(cpu_size), list_nn_p(cpu_size);
   for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
   {
-    int num_node_v = 0, num_node_p = 0;
+    // list stores the number of velo/pres nodes in each cpu
+    list_nn_p[proc_rank] = 0; list_nn_v[proc_rank] = 0;
     for(int nn=0; nn<mesh_p -> get_nFunc(); ++nn)
     {
-      if(global_part->get_npart(nn) == proc_rank) num_node_p += 1;
+      if(global_part->get_npart(nn,0) == proc_rank) list_nn_p[proc_rank] += 1;
     }
 
     for(int nn=0; nn<mesh_v -> get_nFunc(); ++nn)
     {
-      if(global_part->get_npart(nn+nFunc_p) == proc_rank) num_node_v += 1;
+      if(global_part->get_npart(nn,1) == proc_rank) list_nn_v[proc_rank] += 1;
     }
-
-    // list stores the number of velo/pres nodes in each cpu
-    list_nn_v[proc_rank] = num_node_v;
-    list_nn_p[proc_rank] = num_node_p;
   }
 
   // Now generate the mappings from the gird pt idx to the matrix row idx
-  // This is needed because will have a matrix that has a special structure
+  // This is needed because we will have a matrix that has a special structure
   // due to the use of mix fem.
   std::vector<int> start_idx_v(cpu_size), start_idx_p(cpu_size);
   start_idx_v[0] = 0;
@@ -481,7 +478,7 @@ int main( int argc, char * argv[] )
       ebcpart -> write_hdf5( part_file_v );
       delete ebcpart;
     }
-    else SYS_T::print_fatal("ERROR: uncognized fsiBC type. \n");
+    else SYS_T::print_fatal("ERROR: unrecognized fsiBC_type. \n");
 
     EBC_Partition * mebcpart = new EBC_Partition(part_v, mnindex_v, mesh_ebc);
 

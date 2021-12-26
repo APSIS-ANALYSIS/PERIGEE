@@ -30,7 +30,8 @@ class NBC_Partition_MF : public NBC_Partition
         const std::string &GroupName ) const;
 
   protected:
-    // LID mapped to the MF value.
+    // LID mapped to the MF value, which means the actual row/col index in the
+    // matrix problem.
     std::vector<int> LID_MF;
 
     // LDN, LPSN, LPMN, LocalMaster, LocalMasterSlave mapped to MF value
