@@ -12,7 +12,8 @@
 #include "PETSc_Tools.hpp"
 #include "FEANode.hpp"
 #include "APart_Node_FSI.hpp"
-
+#include "ALocal_Inflow_NodalBC.hpp"
+#include "ALocal_NodalBC.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -248,7 +249,9 @@ int main(int argc, char *argv[])
   
   APart_Node * pNode_p = new APart_Node_FSI(part_p_file, rank);
 
+  ALocal_Inflow_NodalBC * locinfnbc = new ALocal_Inflow_NodalBC(part_v_file, rank);
 
+  ALocal_NodalBC * locnbc_v = new ALocal_NodalBC(part_v_file, rank);
 
 
 
