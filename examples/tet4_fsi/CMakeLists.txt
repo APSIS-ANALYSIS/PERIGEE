@@ -150,9 +150,11 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 ADD_EXECUTABLE( gmshIO gmsh_process.cpp )
 ADD_EXECUTABLE( preprocess_fsi preprocess_fsi.cpp)
+ADD_EXECUTABLE( fsi_tet4_3d fsi_driver.cpp)
 
 # Link libraries
-TARGET_LINK_LIBRARIES( preprocess_fsi ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( gmshIO ${EXTRA_LINK_LIBS} perigee_preprocess )
+TARGET_LINK_LIBRARIES( preprocess_fsi ${EXTRA_LINK_LIBS} perigee_preprocess )
+TARGET_LINK_LIBRARIES( fsi_tet4_3d ${EXTRA_LINK_LIBS} perigee_analysis )
 
 #EOF
