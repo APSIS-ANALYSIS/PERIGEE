@@ -12,6 +12,7 @@ Part_Tet_FSI::Part_Tet_FSI( const IMesh * const &mesh,
     const int &in_cpu_size,
     const int &in_elemType,
     const int &field,
+    const int &in_dof,
     const int &in_start_idx,
     const bool &in_is_geo_field ) 
 : Part_Tet(), start_idx( in_start_idx ), is_geo_field(in_is_geo_field)
@@ -29,7 +30,7 @@ Part_Tet_FSI::Part_Tet_FSI( const IMesh * const &mesh,
 
   // We set dofMat and dofNum to negative numbers, as they are not needed
   dofMat = -1;
-  dofNum = -1;
+  dofNum = in_dof;
 
   // Check the cpu info
   SYS_T::print_exit_if(cpu_size < 1, "Error: Part_Tet input cpu_size is wrong! \n");
@@ -149,6 +150,7 @@ void Part_Tet_FSI::write( const char * inputFileName ) const
   h5w->write_intScalar( group_id_3, "nLocBas", nLocBas );
 
   h5w->write_intScalar( group_id_3, "probDim", probDim );
+  h5w->write_intScalar( group_id_3, "dofNum",  dofNum );
   h5w->write_intScalar( group_id_3, "elemType", elemType );
 
   H5Gclose( group_id_3 );

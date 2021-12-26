@@ -28,6 +28,7 @@ class Part_Tet_FSI : public Part_Tet
         const int &in_cpu_size,
         const int &in_elemType,
         const int &field,
+        const int &in_dof,
         const int &in_start_idx,
         const bool &in_is_geo_field );
 

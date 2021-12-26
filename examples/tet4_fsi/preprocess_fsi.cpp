@@ -35,6 +35,7 @@ int main( int argc, char * argv[] )
   // Define basic settings
   const int elemType = 501; // first order simplicial element
   const int num_fields = 2; // Two fields : pressure + velocity/displacement
+  const std::vector<int> dof_fields {1, 3}; // pressure 1 ; velocity/displacement 3
 
   // Input files
   std::string geo_file("./whole_vol.vtu");
@@ -437,7 +438,7 @@ int main( int argc, char * argv[] )
 
     IPart * part_p = new Part_Tet_FSI( mesh_p, global_part, mnindex_p, IEN_p,
         ctrlPts, phy_tag, p_node_f, p_node_s,
-        proc_rank, cpu_size, elemType, 0, start_idx_p[proc_rank], false );
+        proc_rank, cpu_size, elemType, 0, dof_fields[0], start_idx_p[proc_rank], false );
 
     part_p -> print_part_loadbalance_edgecut();
     
@@ -445,7 +446,7 @@ int main( int argc, char * argv[] )
 
     IPart * part_v = new Part_Tet_FSI( mesh_v, global_part, mnindex_v, IEN_v,
         ctrlPts, phy_tag, v_node_f, v_node_s,
-        proc_rank, cpu_size, elemType, 1, start_idx_v[proc_rank], true );
+        proc_rank, cpu_size, elemType, 1, dof_fields[1], start_idx_v[proc_rank], true );
 
     part_v -> print_part_loadbalance_edgecut();
 
