@@ -166,14 +166,14 @@ double CVFlowRate_Steady::get_flow_rate(const int &nbc_id , const double &time) 
 
 void CVFlowRate_Steady::print_info() const
 {
-  SYS_T::commPrint("----------------------------------------------------------- \n");
+  SYS_T::print_sep_line();
   SYS_T::commPrint("  CVFlowRate_Steady:\n");
   for(int nbc_id = 0; nbc_id < num_nbc; ++nbc_id)
   {
     SYS_T::commPrint("  -- nbc_id = %d", nbc_id);
     SYS_T::commPrint("     flow rate =%e \n", flowrate[nbc_id]);
   }
-  SYS_T::commPrint("----------------------------------------------------------- \n");
+  SYS_T::print_sep_line();
 }
 
 // EOF
