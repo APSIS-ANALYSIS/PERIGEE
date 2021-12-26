@@ -9,6 +9,21 @@
 #include "APart_Basic_Info.hpp"
 #include "ALocal_Elem.hpp"
 #include "ALocal_EBC_outflow.hpp"
+#include "QuadPts_Gauss_Triangle.hpp"
+#include "QuadPts_Gauss_Tet.hpp"
+#include "FEAElement_Triangle3_3D_der0.hpp"
+#include "FEAElement_Tet4.hpp"
+#include "CVFlowRate_Unsteady.hpp"
+#include "CVFlowRate_Linear2Steady.hpp"
+#include "CVFlowRate_Steady.hpp"
+#include "GenBC_Resistance.hpp"
+#include "GenBC_RCR.hpp"
+#include "GenBC_Inductance.hpp"
+#include "GenBC_Coronary.hpp"
+#include "GenBC_Pressure.hpp"
+#include "MaterialModel_NeoHookean_M94_Mixed.hpp"
+#include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
+
 
 #include "PETSc_Tools.hpp"
 #include "FEANode.hpp"
@@ -261,6 +276,77 @@ int main(int argc, char *argv[])
   ALocal_EBC * locebc = new ALocal_EBC_outflow(part_v_file, rank);
   
   ALocal_EBC * mesh_locebc = new ALocal_EBC(part_v_file, rank, "/mesh_ebc");
+
+  // ===== Basic Checking =====
+  SYS_T::print_fatal_if( size!= PartBasic->get_cpu_size(),
+      "Error: Assigned CPU number does not match the partition. \n");
+
+  SYS_T::commPrint("===> %d processor(s) are assigned for FEM analysis. \n", size);
+
+  // ===== Inflow rate function =====
+  SYS_T::commPrint("===> Setup inflow flow rate. \n");
+
+  ICVFlowRate * inflow_rate_ptr = nullptr;
+
+  if( inflow_type == 0 )
+    inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file );
+  else if( inflow_type == 1 )
+    inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_file );
+  else if( inflow_type == 2 )
+    inflow_rate_ptr = new CVFlowRate_Steady( inflow_file );
+  else
+    SYS_T::print_fatal("Error: unrecognized inflow_type = %d. \n", inflow_type);
+
+  inflow_rate_ptr->print_info();
+
+  SYS_T::print_fatal_if(locinfnbc->get_num_nbc() != inflow_rate_ptr->get_num_nbc(),
+      "Error: ALocal_Inflow_NodalBC number of faces does not match with that in ICVFlowRate.\n");
+
+  // ===== Quadrature rules and FEM container =====
+  SYS_T::commPrint("===> Build quadrature rules. \n");
+  IQuadPts * quadv = new QuadPts_Gauss_Tet( nqp_tet );
+  IQuadPts * quads = new QuadPts_Gauss_Triangle( nqp_tri );
+
+  SYS_T::commPrint("===> Setup element container. \n");
+  FEAElement * elementv = new FEAElement_Tet4( nqp_tet );
+  FEAElement * elements = new FEAElement_Triangle3_3D_der0( nqp_tri );
+
+  // ===== Generate the IS for pres and velo =====
+  hid_t file_id = H5Fopen( SYS_T::gen_partfile_name(part_v_file, rank).c_str(),
+      H5F_ACC_RDONLY, H5P_DEFAULT );
+  HDF5_Reader * h5r = new HDF5_Reader( file_id );
+
+  const int idx_v_start = h5r -> read_intScalar( "/DOF_mapper", "start_idx" );
+  //const int idx_p_start = h5r -> read_intScalar( "/DOF_mapper", "start_idx_p" );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
