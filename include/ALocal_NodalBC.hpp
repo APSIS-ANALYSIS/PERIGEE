@@ -29,6 +29,10 @@ class ALocal_NodalBC
     // ------------------------------------------------------------------------
     virtual void print_info() const;
 
+    // ------------------------------------------------------------------------
+    // get the Local ID value for the node's dof-th degree-of-freedom.
+    // 0 <= dof_index < dof , 0 <= node < nlocghonode
+    // ------------------------------------------------------------------------
     virtual int get_LID(const int &dof_index, const int &node) const
     {return LID[dof_index * nlocghonode + node];}
 
@@ -100,6 +104,7 @@ class ALocal_NodalBC
     }
 
   protected:
+    // dof := LID.size() / nlocghonode
     int dof, nlocghonode;
 
     std::vector<int> LID;
