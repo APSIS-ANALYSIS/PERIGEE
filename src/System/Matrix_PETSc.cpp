@@ -50,7 +50,7 @@ Matrix_PETSc::Matrix_PETSc(const APart_Node * const &pnode_ptr,
 {
   SYS_T::commPrint("===> PETSc: MatCreateAIJ called. \n");
   
-  lm = pnode_ptr->get_nlocalnode() * bc_part->get_dofMat();
+  lm = pnode_ptr->get_nlocalnode() * bc_part->get_dof_LID();
   ln = lm;
   
   MatCreateAIJ(PETSC_COMM_WORLD, lm, ln, PETSC_DECIDE, PETSC_DECIDE, 
@@ -97,7 +97,7 @@ void Matrix_PETSc::gen_perm_bc( const APart_Node * const &pnode_ptr,
   SYS_T::print_fatal_if(m != n, "Error: This is not a square matrix. \n");
   
   const int nnode = pnode_ptr->get_nlocalnode();
-  const int dof   = bc_part->get_dofMat();
+  const int dof   = bc_part->get_dof_LID();
   for(int ii=0; ii<nnode; ++ii)
   {
     for(int jj=0; jj<dof; ++jj)

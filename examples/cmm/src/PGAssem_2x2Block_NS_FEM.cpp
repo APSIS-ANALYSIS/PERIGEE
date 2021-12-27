@@ -24,8 +24,8 @@ PGAssem_2x2Block_NS_FEM::PGAssem_2x2Block_NS_FEM(
   SYS_T::print_fatal_if(dof_sol != locassem_ptr->get_dof(),
       "PGAssem_NS_FEM::dof_sol != locassem_ptr->get_dof(). \n");
 
-  SYS_T::print_fatal_if(dof_mat_v + dof_mat_p != part_nbc->get_dofMat(),
-      "PGAssem_NS_FEM::dof_mat != part_nbc->get_dofMat(). \n");
+  SYS_T::print_fatal_if(dof_mat_v + dof_mat_p != part_nbc->get_dof_LID(),
+      "PGAssem_NS_FEM::dof_mat != part_nbc->get_dof_LID(). \n");
 
   // Make sure that the surface element's number of local basis
   // are the same by the users.

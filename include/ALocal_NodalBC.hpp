@@ -37,10 +37,10 @@ class ALocal_NodalBC
     {return LID[dof_index * nlocghonode + node];}
 
     // ------------------------------------------------------------------------
-    // get dofMat: the implicit solver's dof number
-    //             LID.size = dofMat * nlocghonode
+    // get_dof_LID: the Local ID array's dof number
+    //              LID.size = dofMat * nlocghonode
     // ------------------------------------------------------------------------
-    virtual int get_dofMat() const {return dof;} 
+    virtual int get_dof_LID() const {return dof;} 
     
     // ------------------------------------------------------------------------
     // get global indices of the Dirichlet nodes in the local subdomain

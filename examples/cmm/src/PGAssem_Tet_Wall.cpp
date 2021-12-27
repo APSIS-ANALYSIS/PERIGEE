@@ -19,8 +19,8 @@ PGAssem_Tet_Wall::PGAssem_Tet_Wall(
   SYS_T::print_fatal_if(dof_sol != locassem_ptr->get_dof(),
       "PGAssem_Tet_CMM_GenAlpha::dof_sol != locassem_ptr->get_dof(). \n");
 
-  SYS_T::print_fatal_if(dof_mat != part_nbc->get_dofMat(),
-      "PGAssem_Tet_CMM_GenAlpha::dof_mat != part_nbc->get_dofMat(). \n");
+  SYS_T::print_fatal_if(dof_mat != part_nbc->get_dof_LID(),
+      "PGAssem_Tet_CMM_GenAlpha::dof_mat != part_nbc->get_dof_LID(). \n");
 
   const int nlocrow = dof_mat * pnode_ptr->get_nlocalnode();
 
