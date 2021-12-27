@@ -26,6 +26,9 @@ class Matrix_PETSc
     Matrix_PETSc( const int &loc_row, const int &loc_col, const int &dnz = 1,
        const int &onz = 0 );
 
+    // loc_col = loc_row
+    Matrix_PETSc( const int &loc_row, const int &dnz = 1, const int &onz = 0 );
+
     // ------------------------------------------------------------------------
     // Constructor: Generate a sparse square matrix with size defined
     // locally. Local row/column num = pnode_ptr->get_nlocalnode() 
