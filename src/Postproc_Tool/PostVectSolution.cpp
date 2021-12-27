@@ -105,11 +105,7 @@ void PostVectSolution::ReadNodeMapping( const std::string &node_mapping_file,
 
   const std::vector<int> temp_nodemap = h5r -> read_intVector( "/", mapping_type );
 
-  if( int( temp_nodemap.size() ) != node_size )
-  {
-    PetscPrintf(PETSC_COMM_SELF, "Error: the allocated array has wrong size! \n");
-    MPI_Abort(PETSC_COMM_WORLD, 1);
-  }
+  SYS_T::print_fatal_if(int( temp_nodemap.size() ) != node_size, "Error: PostVectSolution the allocated array has wrong size! \n");
 
   for(int ii=0; ii<node_size; ++ii) nodemap[ii] = temp_nodemap[ii];
 
