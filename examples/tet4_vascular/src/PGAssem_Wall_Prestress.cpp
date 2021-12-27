@@ -21,8 +21,8 @@ PGAssem_Wall_Prestress::PGAssem_Wall_Prestress(
   SYS_T::print_fatal_if(dof_sol != locassem_s_ptr->get_dof(),
       "PGAssem_Wall_Prestress::dof_sol != locassem_s_ptr->get_dof(). \n");
 
-  SYS_T::print_fatal_if(dof_mat != part_nbc->get_dofMat(),
-      "PGAssem_Wall_Prestress::dof_mat != part_nbc->get_dofMat(). \n");
+  SYS_T::print_fatal_if(dof_mat != part_nbc->get_dof_LID(),
+      "PGAssem_Wall_Prestress::dof_mat != part_nbc->get_dof_LID(). \n");
 
   SYS_T::print_fatal_if(dof_mat !=  locassem_s_ptr->get_dof_mat() ,
       "PGAssem_Wall_Prestress::dof_mat != locassem_s_ptr->get_dof_mat. \n");

@@ -26,8 +26,8 @@ PGAssem_FSI_FEM::PGAssem_FSI_FEM(
   SYS_T::print_fatal_if(dof_sol != locassem_s_ptr->get_dof(),
       "PGAssem_FSI_FEM::dof_sol != locassem_f_ptr->get_dof(). \n");
 
-  SYS_T::print_fatal_if(dof_mat != part_nbc->get_dofMat(),
-      "PGAssem_FSI_FEM::dof_mat != part_nbc->get_dofMat(). \n");
+  SYS_T::print_fatal_if(dof_mat != part_nbc->get_dof_LID(),
+      "PGAssem_FSI_FEM::dof_mat != part_nbc->get_dof_LID(). \n");
 
   SYS_T::print_fatal_if(dof_mat !=  locassem_s_ptr->get_dof_mat() ,
       "PGAssem_FSI_FEM::dof_mat != locassem_s_ptr->get_dof_mat. \n");
