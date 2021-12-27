@@ -15,6 +15,20 @@ Matrix_PETSc::Matrix_PETSc( const int &loc_row, const int &loc_col,
   ln = loc_col;  
 }
 
+Matrix_PETSc::Matrix_PETSc( const int &loc_row, const int &dnz, const int &onz )
+{
+  SYS_T::commPrint("===> PETSc: MatCreateAIJ called. \n");
+  MatCreateAIJ(PETSC_COMM_WORLD, loc_row, loc_row, PETSC_DECIDE, PETSC_DECIDE, 
+      dnz, PETSC_NULL, onz, PETSC_NULL, &K);
+
+  is_set = false;
+
+  MatGetSize(K, &m, &n);
+
+  lm = loc_row;
+  ln = loc_row; 
+}
+
 Matrix_PETSc::Matrix_PETSc(const APart_Node * const &pnode_ptr,
     const int &dnz, const int &onz )
 {
