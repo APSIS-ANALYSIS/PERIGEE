@@ -40,7 +40,7 @@ class Matrix_PETSc
     // ------------------------------------------------------------------------
     // Constructor: Generate a sparse square matrix with size defined
     // locally. Local row/column num = pnode_ptr->get_nlocalnode()
-    // * bc_part->get_dofMat();
+    // * bc_part->get_dof_LID();
     // ------------------------------------------------------------------------
     Matrix_PETSc( const APart_Node * const &pnode_ptr,
        const ALocal_NodalBC * const &bc_part,

@@ -23,8 +23,8 @@ PGAssem_ALE_NS_FEM::PGAssem_ALE_NS_FEM(
   SYS_T::print_fatal_if(dof_sol != locassem_ptr->get_dof(),
       "PGAssem_ALE_NS_FEM::dof_sol != locassem_ptr->get_dof(). \n");
 
-  SYS_T::print_fatal_if(dof_mat != part_nbc->get_dofMat(),
-      "PGAssem_ALE_NS_FEM::dof_mat != part_nbc->get_dofMat(). \n");
+  SYS_T::print_fatal_if(dof_mat != part_nbc->get_dof_LID(),
+      "PGAssem_ALE_NS_FEM::dof_mat != part_nbc->get_dof_LID(). \n");
 
   // Make sure that the surface element's number of local basis are 
   // the same. This is an assumption in this assembly routine.
@@ -129,8 +129,8 @@ PGAssem_ALE_NS_FEM::PGAssem_ALE_NS_FEM(
   SYS_T::print_fatal_if(dof_sol != locassem_ptr->get_dof(),
       "PGAssem_ALE_NS_FEM::dof_sol != locassem_ptr->get_dof(). \n");
 
-  SYS_T::print_fatal_if(dof_mat != part_nbc->get_dofMat(),
-      "PGAssem_ALE_NS_FEM::dof_mat != part_nbc->get_dofMat(). \n");
+  SYS_T::print_fatal_if(dof_mat != part_nbc->get_dof_LID(),
+      "PGAssem_ALE_NS_FEM::dof_mat != part_nbc->get_dof_LID(). \n");
 
   SYS_T::print_fatal_if(num_ebc != locassem_ptr->get_num_ebc_fun(), "Error: The number of ebc does not match with the number of functions implemented in the local assembly routine. \n");
 

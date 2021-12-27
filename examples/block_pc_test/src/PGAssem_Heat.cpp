@@ -19,8 +19,8 @@ PGAssem_Heat::PGAssem_Heat(
   SYS_T::print_fatal_if(dof_sol != locassem_ptr->get_dof(),
       "PGAssem_HEAT::dof_sol != locassem_ptr->get_dof(). \n");
 
-  SYS_T::print_fatal_if(dof_mat != part_nbc->get_dofMat(),
-      "PGAssem_HEAT::dof_mat != part_nbc->get_dofMat(). \n");
+  SYS_T::print_fatal_if(dof_mat != part_nbc->get_dof_LID(),
+      "PGAssem_HEAT::dof_mat != part_nbc->get_dof_LID(). \n");
 
   if(num_ebc>0) snLocBas = part_ebc -> get_cell_nLocBas(0);
   else snLocBas = 0;

@@ -29,14 +29,18 @@ class ALocal_NodalBC
     // ------------------------------------------------------------------------
     virtual void print_info() const;
 
+    // ------------------------------------------------------------------------
+    // get the Local ID value for the node's dof-th degree-of-freedom.
+    // 0 <= dof_index < dof , 0 <= node < nlocghonode
+    // ------------------------------------------------------------------------
     virtual int get_LID(const int &dof_index, const int &node) const
     {return LID[dof_index * nlocghonode + node];}
 
     // ------------------------------------------------------------------------
-    // get dofMat: the implicit solver's dof number
-    //             LID.size = dofMat * nlocghonode
+    // get_dof_LID: the Local ID array's dof number
+    //              LID.size = dofMat * nlocghonode
     // ------------------------------------------------------------------------
-    virtual int get_dofMat() const {return dof;} 
+    virtual int get_dof_LID() const {return dof;} 
     
     // ------------------------------------------------------------------------
     // get global indices of the Dirichlet nodes in the local subdomain
@@ -100,6 +104,7 @@ class ALocal_NodalBC
     }
 
   protected:
+    // dof := LID.size() / nlocghonode
     int dof, nlocghonode;
 
     std::vector<int> LID;

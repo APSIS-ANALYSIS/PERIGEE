@@ -22,10 +22,10 @@ PGAssem_Tet_CMM_GenAlpha::PGAssem_Tet_CMM_GenAlpha(
 {
   // Make sure the data structure is compatible
   SYS_T::print_fatal_if(dof_sol != locassem_ptr->get_dof(),
-      "PGAssem_Tet_CMM_GenAlpha::dof_sol != locassem_ptr->get_dof(). \n");
+      "PGAssem_Tet_CMM_GenAlpha::dof_sol != locassem_ptr->get_dof().\n");
 
-  SYS_T::print_fatal_if(dof_mat != part_nbc->get_dofMat(),
-      "PGAssem_Tet_CMM_GenAlpha::dof_mat != part_nbc->get_dofMat(). \n");
+  SYS_T::print_fatal_if(dof_mat != part_nbc->get_dof_LID(),
+      "PGAssem_Tet_CMM_GenAlpha::dof_mat != part_nbc->get_dof_LID().\n");
 
   // Make sure that the surface element's number of local basis are 
   // the same. This is an assumption in this assembly routine.
@@ -33,7 +33,7 @@ PGAssem_Tet_CMM_GenAlpha::PGAssem_Tet_CMM_GenAlpha(
   
   for(int ebc_id=0; ebc_id < num_ebc; ++ebc_id){
     SYS_T::print_fatal_if(snLocBas != part_ebc->get_cell_nLocBas(ebc_id),
-        "Error: in PGAssem_Tet_CMM_GenAlpha, snLocBas has to be uniform. \n");
+        "Error: in PGAssem_Tet_CMM_GenAlpha, snLocBas has to be uniform.\n");
   }
 
   const int nlocrow = dof_mat * pnode_ptr->get_nlocalnode();

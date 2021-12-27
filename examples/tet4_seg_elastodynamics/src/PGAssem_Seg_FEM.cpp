@@ -13,8 +13,8 @@ PGAssem_Seg_FEM::PGAssem_Seg_FEM( IPLocAssem const * const &locassem_ptr,
   dof_mat = locassem_ptr->get_dof_mat(); // locassem_ptr defines the matrix size
   num_ebc = part_ebc->get_num_ebc();
 
-  SYS_T::print_fatal_if(dof_mat != part_nbc->get_dofMat(),
-      "PGAssem_Seg_FEM::dof_mat != part_nbc->get_dofMat(). \n");
+  SYS_T::print_fatal_if(dof_mat != part_nbc->get_dof_LID(),
+      "PGAssem_Seg_FEM::dof_mat != part_nbc->get_dof_LID(). \n");
 
   SYS_T::print_fatal_if(num_ebc != locassem_ptr->get_num_ebc_fun(), "Error: The number of ebc does not match with the number of functions implemented in the local assembly routine. \n");
 

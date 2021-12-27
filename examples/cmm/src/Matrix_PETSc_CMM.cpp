@@ -50,7 +50,7 @@ void Matrix_PETSc_CMM::gen_ring_inplane_bc( const APart_Node * const &pnode_ptr,
   SYS_T::print_fatal_if(m != n, "Error: This is not a square matrix. \n");
 
   const int nnode = pnode_ptr->get_nlocalnode();
-  const int dof   = bc_part->get_dofMat();
+  const int dof   = bc_part->get_dof_LID();
 
   // We enforce 4 dofs per node
   SYS_T::print_fatal_if(dof != 4, "Error: Matrix_PETSc::gen_ring_inplane_bc assumes 4 dofs per node.\n");
@@ -99,7 +99,7 @@ void Matrix_PETSc_CMM::gen_ring_radial_motion_bc( const APart_Node * const &pnod
   SYS_T::print_fatal_if(m != n, "Error: This is not a square matrix. \n");
 
   const int nnode = pnode_ptr->get_nlocalnode();
-  const int dof   = bc_part->get_dofMat();
+  const int dof   = bc_part->get_dof_LID();
 
   // We enforce 4 dofs per node
   SYS_T::print_fatal_if(dof != 4, "Error: Matrix_PETSc::gen_ring_radial_motion_bc assumes 4 dofs per node.\n");
@@ -157,7 +157,7 @@ void Matrix_PETSc_CMM::gen_outlet_ring_inplane_bc( const APart_Node * const &pno
   SYS_T::print_fatal_if(m != n, "Error: This is not a square matrix. \n");
 
   const int nnode = pnode_ptr->get_nlocalnode();
-  const int dof   = bc_part->get_dofMat();
+  const int dof   = bc_part->get_dof_LID();
 
   // We enforce 4 dofs per node
   SYS_T::print_fatal_if(dof != 4, "Error: Matrix_PETSc::gen_outlet_ring_inplane_bc assumes 4 dofs per node.\n");
@@ -211,7 +211,7 @@ void Matrix_PETSc_CMM::gen_outlet_ring_radial_motion_bc( const APart_Node * cons
   SYS_T::print_fatal_if(m != n, "Error: This is not a square matrix. \n");
 
   const int nnode = pnode_ptr->get_nlocalnode();
-  const int dof   = bc_part->get_dofMat();
+  const int dof   = bc_part->get_dof_LID();
 
   // We enforce 4 dofs per node
   SYS_T::print_fatal_if(dof != 4, "Error: Matrix_PETSc::gen_outlet_ring_radial_motion_bc assumes 4 dofs per node.\n");
@@ -274,7 +274,7 @@ void Matrix_PETSc_CMM::gen_ring_inplane_bc_partial_clamp( const APart_Node * con
   SYS_T::print_fatal_if(m != n, "Error: This is not a square matrix. \n");
 
   const int nnode = pnode_ptr->get_nlocalnode();
-  const int dof   = bc_part->get_dofMat();
+  const int dof   = bc_part->get_dof_LID();
 
   // We enforce 4 dofs per node
   SYS_T::print_fatal_if(dof != 4, "Error: Matrix_PETSc::gen_ring_inplane_bc_partial_clamp assumes 4 dofs per node.\n");
