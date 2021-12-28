@@ -114,6 +114,36 @@ void Matrix_PETSc::gen_perm_bc( const APart_Node * const &pnode_ptr,
   is_set = true;
 }
 
+void Matrix_PETSc::gen_perm_bc( const std::vector<APart_Node *> &pnode_list,
+    const std::vector<ALocal_NodalBC *> &bc_part_list )
+{
+  if(is_set) Clear();
+
+  SYS_T::print_fatal_if( pnode_list.size() != bc_part_list.size(), "Error: the input apart_node and alocal_nodalbc should have the same length. \n");
+  SYS_T::print_fatal_if(m != n, "Error: This is not a square matrix. \n");
+
+  const int nfield = VEC_T::get_size(pnode_list);
+  
+  for(int ff=0; ff<nfield; ++ff)
+  {
+    const int dof   = pnode_list[ff] -> get_dof();
+    const int nnode = pnode_list[ff] -> get_nlocalnode();
+    for(int ii=0; ii<nnode; ++ii)
+    {
+      for(int jj=0; jj<dof; ++jj)
+      {
+        const int row = bc_part_list[ff] -> get_LID(jj, ii);
+        MatSetValue(K, row, row, 1.0, INSERT_VALUES);
+      }
+    }
+  }
+
+  MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
+  MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
+
+  is_set = true;
+}
+
 void Matrix_PETSc::gen_extractor_for_Dirichlet_nodes( 
     const APart_Node * const &pnode_ptr ,
     const ALocal_NodalBC * const &bc_part )

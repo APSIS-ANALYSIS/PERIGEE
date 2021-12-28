@@ -107,6 +107,9 @@ class Matrix_PETSc
     virtual void gen_perm_bc( const APart_Node * const &pnode_ptr,
         const ALocal_NodalBC * const &bc_part );
 
+    virtual void gen_perm_bc( const std::vector<APart_Node *> &pnode_list,
+        const std::vector<ALocal_NodalBC *> &bc_part_list );
+
     // ------------------------------------------------------------------------
     // Gen_extractor_for_Dirichlet_nodes : Generate a matrix that is zero for
     // all regular rows. On each row corresponding to a Dirichlet dof, set
