@@ -117,6 +117,7 @@ NBC_Partition_MF::NBC_Partition_MF( const IPart * const &part,
     {
       const int loc = ii * totnode + jj;
       if(LID[loc] != -1) LID_MF[loc] = dof * LID[loc] + ii;
+      else LID_MF[loc] = -1;
     }
   } // end ii-loop over dof
   

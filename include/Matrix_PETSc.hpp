@@ -87,7 +87,7 @@ class Matrix_PETSc
     // ------------------------------------------------------------------------
     // MatView : print the matrix on screen
     // ------------------------------------------------------------------------
-    virtual void print_matrix() const {MatView(K, PETSC_VIEWER_STDOUT_WORLD);}
+    virtual void print_info() const {MatView(K, PETSC_VIEWER_STDOUT_WORLD);}
 
     // ------------------------------------------------------------------------
     // Clear K
@@ -107,6 +107,11 @@ class Matrix_PETSc
     virtual void gen_perm_bc( const APart_Node * const &pnode_ptr,
         const ALocal_NodalBC * const &bc_part );
 
+    // ------------------------------------------------------------------------
+    // gen_perm_bc : Generate a permutation matrix for essential boundary
+    // conditions for Multi-Field problems.
+    // NOTE: LID from the ALocal_NodalBC here should give the matrix row/col id
+    // ------------------------------------------------------------------------
     virtual void gen_perm_bc( const std::vector<APart_Node *> &pnode_list,
         const std::vector<ALocal_NodalBC *> &bc_part_list );
 

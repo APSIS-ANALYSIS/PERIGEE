@@ -25,6 +25,7 @@
 #include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
 
 
+#include "Matrix_PETSc.hpp"
 #include "PETSc_Tools.hpp"
 #include "FEANode.hpp"
 #include "APart_Node_FSI.hpp"
@@ -277,6 +278,15 @@ int main(int argc, char *argv[])
   
   ALocal_EBC * mesh_locebc = new ALocal_EBC(part_v_file, rank, "/mesh_ebc");
 
+  // Group APart_Node and ALocal_NodalBC into a vector
+  std::vector<APart_Node *> pNode_list { pNode_v, pNode_p };
+
+  std::vector<ALocal_NodalBC *> locnbc_list { locnbc_v, locnbc_p };
+
+  std::vector<APart_Node *> pNode_m_list { pNode_v };
+
+  std::vector<ALocal_NodalBC *> locnbc_m_list { mesh_locnbc };
+
   // ===== Basic Checking =====
   SYS_T::print_fatal_if( size!= PartBasic->get_cpu_size(),
       "Error: Assigned CPU number does not match the partition. \n");
@@ -332,6 +342,12 @@ int main(int argc, char *argv[])
   delete [] is_array_pres; is_array_pres = nullptr;
   // ================================================================
 
+  // ===== Generate a sparse matrix for strong enforcement of essential BC
+  Matrix_PETSc * pmat = new Matrix_PETSc( idx_v_len + idx_p_len );
+  pmat -> gen_perm_bc( pNode_list, locnbc_list );
+  
+  Matrix_PETSc * mmat = new Matrix_PETSc( pNode_v -> get_nlocalnode() * pNode_v -> get_dof() );
+  mmat -> gen_perm_bc( pNode_m_list, locnbc_m_list );
 
 
 
@@ -342,14 +358,7 @@ int main(int argc, char *argv[])
 
 
 
-
-
-
-
-
-
-
-
+  delete pmat; delete mmat;
   ISDestroy(&is_velo); ISDestroy(&is_pres);
   delete elements; delete elementv; delete quadv; delete quads; delete inflow_rate_ptr;
   delete GMIptr; delete PartBasic; delete locElem; delete fNode; delete pNode_v; delete pNode_p;
