@@ -21,6 +21,7 @@
 // Date: Dec 10 2013
 // ============================================================================
 #include "APart_Node.hpp"
+#include "HDF5_Tools.hpp"
 #include "petscvec.h"
 
 class PostVectSolution
