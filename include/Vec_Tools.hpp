@@ -52,6 +52,10 @@ namespace VEC_T
     efile.close();
   }
 
+  // --------------------------------------------------------------------------
+  // ! get_size
+  //   return the length of a std::vector in integer (rather than unsigned int).
+  // --------------------------------------------------------------------------
   template<typename T> int get_size( const std::vector<T> &vec )
   {
     return static_cast<int>(vec.size());
@@ -189,7 +193,7 @@ namespace VEC_T
   }
 
   // --------------------------------------------------------------------------
-  // ! castt_to_unsigned_int
+  // ! cast_to_unsigned_int
   //   This function is used to convert a std::vector<int> to std::vector<unsigned int>.
   // --------------------------------------------------------------------------
   inline std::vector<unsigned int> cast_to_unsigned_int( const std::vector<int> &vec )
