@@ -35,6 +35,8 @@ namespace HDF5_T
 
     std::vector<int> output = h5r -> read_intVector( groupname.c_str(), dataname.c_str() );
 
+    VEC_T::shrink2fit( output );
+
     delete h5r; H5Fclose( file_id );
 
     return output;

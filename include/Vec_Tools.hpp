@@ -59,7 +59,8 @@ namespace VEC_T
 
   // --------------------------------------------------------------------------
   // ! shrink2fit  
-  //   trim the capacity of vector
+  //   trim the capacity of vector.
+  //   See Item 17 in Effective STL by Scott Meyers
   // --------------------------------------------------------------------------
   template<typename T> void shrink2fit( std::vector<T> &vec )
   {
