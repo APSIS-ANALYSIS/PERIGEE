@@ -106,7 +106,9 @@ int main(int argc, char *argv[])
   int restart_index = 0;
   double restart_time = 0.0;
   double restart_step = 1.0e-3;
-  std::string restart_name = "SOL_";
+  std::string restart_u_name = "SOL_U_";
+  std::string restart_v_name = "SOL_V_";
+  std::string restart_p_name = "SOL_P_";
 
   // ===== Initialization of PETSc =====
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
@@ -156,7 +158,9 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionInt(   "-restart_index",     restart_index);
   SYS_T::GetOptionReal(  "-restart_time",      restart_time);
   SYS_T::GetOptionReal(  "-restart_step",      restart_step);
-  SYS_T::GetOptionString("-restart_name",      restart_name);
+  SYS_T::GetOptionString("-restart_u_name",    restart_u_name);
+  SYS_T::GetOptionString("-restart_v_name",    restart_v_name);
+  SYS_T::GetOptionString("-restart_p_name",    restart_p_name);
 
   // ===== Print the command line argumetn on screen =====
   SYS_T::cmdPrint("-nqp_tet:", nqp_tet);
@@ -219,7 +223,9 @@ int main(int argc, char *argv[])
     SYS_T::cmdPrint("-restart_index:", restart_index);
     SYS_T::cmdPrint("-restart_time:", restart_time);
     SYS_T::cmdPrint("-restart_step:", restart_step);
-    SYS_T::cmdPrint("-restart_name:", restart_name);
+    SYS_T::cmdPrint("-restart_u_name:", restart_u_name);
+    SYS_T::cmdPrint("-restart_v_name:", restart_v_name);
+    SYS_T::cmdPrint("-restart_p_name:", restart_p_name);
   }
   else SYS_T::commPrint("-is_restart: false \n");
 
@@ -405,6 +411,78 @@ int main(int argc, char *argv[])
   PDNSolution * dot_velo = new PDNSolution_V(pNode_v, 0, true, "dot_velo");
   PDNSolution * dot_disp = new PDNSolution_V(pNode_v, 0, true, "dot_disp");
   PDNSolution * dot_pres = new PDNSolution_P(pNode_p, 0, true, "dot_pres");
+  
+  if( is_restart )
+  {
+    initial_index = restart_index;
+    initial_time  = restart_time;
+    initial_step  = restart_step;
+
+    // Read sol file
+    SYS_T::file_check(restart_u_name.c_str());
+    SYS_T::file_check(restart_v_name.c_str());
+    SYS_T::file_check(restart_p_name.c_str());
+    
+    disp->ReadBinary(restart_u_name.c_str());
+    velo->ReadBinary(restart_v_name.c_str());
+    pres->ReadBinary(restart_p_name.c_str());
+    
+    // Read dot_sol file
+    std::string restart_dot_u_name = "dot_";
+    restart_dot_u_name.append(restart_u_name);
+    SYS_T::file_check(restart_dot_u_name.c_str());
+    dot_disp->ReadBinary(restart_dot_u_name.c_str());
+
+    std::string restart_dot_v_name = "dot_";
+    restart_dot_u_name.append(restart_v_name);
+    SYS_T::file_check(restart_dot_v_name.c_str());
+    dot_velo->ReadBinary(restart_dot_v_name.c_str());
+
+    std::string restart_dot_p_name = "dot_";
+    restart_dot_u_name.append(restart_p_name);
+    SYS_T::file_check(restart_dot_p_name.c_str());
+    dot_pres->ReadBinary(restart_dot_p_name.c_str());
+
+    SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
+    SYS_T::commPrint("     restart_u_name: %s \n", restart_u_name.c_str());
+    SYS_T::commPrint("     restart_v_name: %s \n", restart_v_name.c_str());
+    SYS_T::commPrint("     restart_p_name: %s \n", restart_p_name.c_str());
+    SYS_T::commPrint("     restart_dot_u_name: %s \n", restart_dot_u_name.c_str());
+    SYS_T::commPrint("     restart_dot_v_name: %s \n", restart_dot_v_name.c_str());
+    SYS_T::commPrint("     restart_dot_p_name: %s \n", restart_dot_p_name.c_str());
+    SYS_T::commPrint("     restart_time: %e \n", restart_time);
+    SYS_T::commPrint("     restart_index: %d \n", restart_index);
+    SYS_T::commPrint("     restart_step: %e \n", restart_step);
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   delete pres; delete dot_pres;
   delete base; delete dot_velo; delete dot_disp; delete velo; delete disp;
