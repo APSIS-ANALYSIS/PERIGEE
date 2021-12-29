@@ -43,7 +43,7 @@ TimeMethod_GenAlpha::TimeMethod_GenAlpha( const double &input_spectral,
 
 void TimeMethod_GenAlpha::print_info() const
 {
-  SYS_T::commPrint("----------------------------------------------------------- \n");
+  SYS_T::print_sep_line();
   SYS_T::commPrint("Generalized-alpha method ");
   if(is2nd) SYS_T::commPrint("for 2nd-order system: \n");
   else SYS_T::commPrint("for 1st-order system: \n");
@@ -54,7 +54,7 @@ void TimeMethod_GenAlpha::print_info() const
   SYS_T::commPrint("  --- Gamma  : %e \n", gamma);
   if(is2nd) SYS_T::commPrint("  --- Beta   : %e \n", beta);
   else SYS_T::commPrint("  --- Beta   : %e (unused) \n", beta);
-  SYS_T::commPrint("----------------------------------------------------------- \n");
+  SYS_T::print_sep_line();
 }
 
 // EOF
