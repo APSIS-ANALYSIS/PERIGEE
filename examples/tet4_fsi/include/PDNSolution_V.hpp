@@ -21,6 +21,12 @@ class PDNSolution_V : public PDNSolution
         const int &type, const bool &isprint = false,
         const std::string &in_name = "solution_kinematics" );
 
+    PDNSolution_V( const APart_Node * const &pNode,
+        const FEANode * const &fNode,
+        const ALocal_Inflow_NodalBC * const &infbc,
+        const int &type, const bool &isprint = false,
+        const std::string &in_name = "solution_kinematics" );
+
     virtual ~PDNSolution_V() {};
 
   private:
@@ -31,6 +37,16 @@ class PDNSolution_V : public PDNSolution
     // case 0: generate full zero vector 
     // --------------------------------------------------------------
     void Init_zero( const APart_Node * const &pNode );
+
+    // --------------------------------------------------------------
+    // case 1: generate flow parabolic for an arbitrary inlet
+    //         face with unit flow rate. This solution is used as the
+    //         base solution and will be scaled by the flow rate to
+    //         adjust the inlet Dirichlet nodal values.
+    // --------------------------------------------------------------
+    void Init_flow_parabolic( const APart_Node * const &pNode_ptr,
+        const FEANode * const &fNode_ptr,
+        const ALocal_Inflow_NodalBC * const &infbc );
 };
 
 #endif
