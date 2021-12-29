@@ -36,6 +36,7 @@
 #include "APart_Node_FSI.hpp"
 #include "ALocal_Inflow_NodalBC.hpp"
 #include "ALocal_NodalBC.hpp"
+#include "PDNSolution_V.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -393,10 +394,15 @@ int main(int argc, char *argv[])
   // Pseudo elastic mesh motion
   IPLocAssem * locAssem_mesh_ptr = new PLocAssem_Tet4_FSI_Mesh_Elastostatic( mesh_E, mesh_nu );
   
+  // ===== Initial condition =====
+  PDNSolution * velo = new PDNSolution_V(pNode_v, 0, true, "velo");
+  PDNSolution * disp = new PDNSolution_V(pNode_v, 0, true, "disp");
+
+  PDNSolution * dot_velo = new PDNSolution_V(pNode_v, 0, true, "dot_velo");
+  PDNSolution * dot_disp = new PDNSolution_V(pNode_v, 0, true, "dot_disp");
 
 
-
-
+  delete dot_velo; delete dot_disp; delete velo; delete disp;
   delete locAssem_mesh_ptr; delete matmodel; delete locAssem_fluid_ptr;
   delete locAssem_solid_ptr; delete pmat; delete mmat;
   ISDestroy(&is_velo); ISDestroy(&is_pres);
