@@ -24,7 +24,7 @@
 #include "MaterialModel_NeoHookean_M94_Mixed.hpp"
 #include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
 
-
+#include "TimeMethod_GenAlpha.hpp"
 #include "Matrix_PETSc.hpp"
 #include "PETSc_Tools.hpp"
 #include "FEANode.hpp"
@@ -349,7 +349,17 @@ int main(int argc, char *argv[])
   Matrix_PETSc * mmat = new Matrix_PETSc( pNode_v -> get_nlocalnode() * pNode_v -> get_dof() );
   mmat -> gen_perm_bc( pNode_m_list, locnbc_m_list );
 
+  // ===== Generate the generalized-alpha method
+  SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
 
+  TimeMethod_GenAlpha * tm_galpha_ptr = nullptr;
+
+  if( is_backward_Euler )
+    tm_galpha_ptr = new TimeMethod_GenAlpha( 1.0, 1.0, 1.0 );
+  else
+    tm_galpha_ptr = new TimeMethod_GenAlpha( genA_rho_inf, false );
+
+  tm_galpha_ptr->print_info();
 
 
 
