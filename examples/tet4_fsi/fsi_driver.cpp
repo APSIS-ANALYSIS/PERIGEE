@@ -23,6 +23,11 @@
 #include "GenBC_Pressure.hpp"
 #include "MaterialModel_NeoHookean_M94_Mixed.hpp"
 #include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
+#include "PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha.hpp"
+#include "PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha.hpp"
+#include "PLocAssem_Tet4_VMS_Seg_Incompressible.hpp"
+#include "PLocAssem_Tet4_FSI_Mesh_Elastostatic.hpp"
+#include "PLocAssem_Tet4_FSI_Mesh_Laplacian.hpp"
 
 #include "TimeMethod_GenAlpha.hpp"
 #include "Matrix_PETSc.hpp"
@@ -361,14 +366,39 @@ int main(int argc, char *argv[])
 
   tm_galpha_ptr->print_info();
 
+  // ===== Local assembly =====
+  IPLocAssem * locAssem_fluid_ptr = new PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha(
+      tm_galpha_ptr, quadv->get_num_quadPts(), fluid_density, fluid_mu, bs_beta );
+
+  IMaterialModel * matmodel = nullptr;
+  IPLocAssem * locAssem_solid_ptr = nullptr;
+
+  if( solid_nu == 0.5 )
+  {
+    matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( solid_density, solid_E );
+
+    locAssem_solid_ptr = new PLocAssem_Tet4_VMS_Seg_Incompressible(
+        matmodel, tm_galpha_ptr, quadv->get_num_quadPts() );
+  }
+  else
+  {
+    matmodel = new MaterialModel_NeoHookean_M94_Mixed( solid_density, solid_E, solid_nu );
+
+    locAssem_solid_ptr = new PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha(
+        matmodel, tm_galpha_ptr, quadv->get_num_quadPts() );
+  }
+
+  matmodel -> write_hdf5(); // record model parameter on disk
+
+  // Pseudo elastic mesh motion
+  IPLocAssem * locAssem_mesh_ptr = new PLocAssem_Tet4_FSI_Mesh_Elastostatic( mesh_E, mesh_nu );
+  
 
 
 
 
-
-
-
-  delete pmat; delete mmat;
+  delete locAssem_mesh_ptr; delete matmodel; delete locAssem_fluid_ptr;
+  delete locAssem_solid_ptr; delete pmat; delete mmat;
   ISDestroy(&is_velo); ISDestroy(&is_pres);
   delete elements; delete elementv; delete quadv; delete quads; delete inflow_rate_ptr;
   delete GMIptr; delete PartBasic; delete locElem; delete fNode; delete pNode_v; delete pNode_p;

@@ -22,11 +22,11 @@ PLocAssem_Tet4_FSI_Mesh_Laplacian::~PLocAssem_Tet4_FSI_Mesh_Laplacian()
 
 void PLocAssem_Tet4_FSI_Mesh_Laplacian::print_info() const
 {
-  PetscPrintf(PETSC_COMM_WORLD, "----------------------------------------------------------- \n");
-  PetscPrintf(PETSC_COMM_WORLD, " Three-dimensional Laplacian equation: \n");
-  PetscPrintf(PETSC_COMM_WORLD, "\t Spatial: Galerkin Finite element \n");
-  PetscPrintf(PETSC_COMM_WORLD, "\t This solver is for mesh motion in the fluid sub-domain for FSI problems.\n");
-  PetscPrintf(PETSC_COMM_WORLD, "----------------------------------------------------------- \n");
+  SYS_T::print_sep_line();
+  PetscPrintf(PETSC_COMM_WORLD, "  Three-dimensional Laplacian equation: \n");
+  PetscPrintf(PETSC_COMM_WORLD, "  Spatial: Galerkin Finite element \n");
+  PetscPrintf(PETSC_COMM_WORLD, "  This solver is for the fluid sub-domain mesh motion in FSI problems.\n");
+  SYS_T::print_sep_line();
 }
 
 void PLocAssem_Tet4_FSI_Mesh_Laplacian::Zero_Tangent_Residual()

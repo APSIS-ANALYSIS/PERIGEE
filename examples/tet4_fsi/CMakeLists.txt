@@ -110,6 +110,11 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/Seg_Sol_Tools.cpp
   ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_Tet4_VMS_Seg_Incompressible.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_Tet4_FSI_Mesh_Elastostatic.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_Tet4_FSI_Mesh_Laplacian.cpp
   )
 
 # 3. Postprocess cpp

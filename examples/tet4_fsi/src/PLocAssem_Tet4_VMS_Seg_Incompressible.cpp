@@ -33,13 +33,13 @@ PLocAssem_Tet4_VMS_Seg_Incompressible::~PLocAssem_Tet4_VMS_Seg_Incompressible()
 
 void PLocAssem_Tet4_VMS_Seg_Incompressible::print_info() const
 {
-  SYS_T::commPrint("----------------------------------------------------------- \n");
-  SYS_T::commPrint("  Three-dimensional Hyper-elastic solid model with VMS mixed formulation, U-kinematic relation, Segregated, FEM formulation: \n");
-  SYS_T::commPrint("\t  Spatial: Finite element with VMS stabilization \n");
-  SYS_T::commPrint("\t  Temporal: Generalized-alpha method \n");
-  SYS_T::commPrint("\t  Solid density rho0 = %e g/cm3\n\n", rho0);
+  SYS_T::print_sep_line();
+  SYS_T::commPrint("  Three-dimensional Hyper-elastic solid model:\n");
+  SYS_T::commPrint("  Spatial: Finite element with VMS stabilization \n");
+  SYS_T::commPrint("  Temporal: Generalized-alpha method \n");
+  SYS_T::commPrint("  Solid density rho0 = %e g/cm3\n", rho0);
   matmodel->print_info();
-  SYS_T::commPrint("----------------------------------------------------------- \n");
+  SYS_T::print_sep_line();
 }
 
 

@@ -34,7 +34,7 @@ PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::~PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha()
 
 void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::print_info() const
 {
-  SYS_T::commPrint("----------------------------------------------------------- \n");
+  SYS_T::print_sep_line();
   SYS_T::commPrint("  Three-dimensional Incompressible Navier-Stokes equations: \n");
   SYS_T::commPrint("  FEM: 4-node Tetrahedral \n");
   SYS_T::commPrint("  Spatial: ALE-VMS \n");
@@ -48,9 +48,9 @@ void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::print_info() const
   SYS_T::commPrint("  Consistent tangent matrix used. \n");
   SYS_T::commPrint("  Nonlinear quadratic term is in advective form. \n");
   SYS_T::commPrint("  Pressure is evaluated at n+alpha_f rather than n+1. \n");
-  SYS_T::commPrint("  Input solution vector should have 7 dofs including the mesh motion information in the first three slots. \n");
-  SYS_T::commPrint("  Density rho is in front of the du/dt and the dimension of the equations is momentum time rate. \n");
-  SYS_T::commPrint("----------------------------------------------------------- \n");
+  SYS_T::commPrint("  Input solution vector should have 7 dofs including the mesh motion\n      information in the first three slots. \n");
+  SYS_T::commPrint("  Density rho is in front of the du/dt and the dimension of the\n      equations is momentum time rate. \n");
+  SYS_T::print_sep_line();
 }
 
 void PLocAssem_Tet4_ALE_VMS_NS_3D_GenAlpha::get_metric(
