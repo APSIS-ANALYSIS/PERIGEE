@@ -98,24 +98,16 @@ class PGAssem_Mesh : public IPGAssem
         double * const &local_array) const
     {
       for(int ii=0; ii<nLocBas; ++ii)
-      {
-        const int offset1 = ii * dof;
-        const int offset2 = IEN[ii] * dof;
         for(int jj=0; jj<dof; ++jj)
-          local_array[offset1 + jj] = array[offset2 + jj];
-      }
+          local_array[ii*dof + jj] = array[IEN[ii] * dof + jj];
     }
 
     void GetLocal( const double * const &array, const int * const &IEN,
         const int &in_locbas, double * const &local_array) const
     {
       for(int ii=0; ii<in_locbas; ++ii)
-      {
-        const int offset1 = ii * dof;
-        const int offset2 = IEN[ii] * dof;
         for(int jj=0; jj<dof; ++jj)
-          local_array[offset1 + jj] = array[offset2 + jj];
-      }
+          local_array[ii*dof + jj] = array[IEN[ii] * dof + jj];
     }
 };
 
