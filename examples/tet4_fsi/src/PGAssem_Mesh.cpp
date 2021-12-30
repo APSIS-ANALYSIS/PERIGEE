@@ -140,11 +140,42 @@ void PGAssem_Mesh::EssBC_G( const ALocal_NodalBC * const &nbc_part, const int &f
 void PGAssem_Mesh::NatBC_G( const double &curr_time, const double &dt,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
-    const int &in_loc_dof,
     const IQuadPts * const &quad_s,
-    const ALocal_IEN * const lien_ptr,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
-{}
+{
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
+  PetscInt * srow_index = new PetscInt [dof * snLocBas];
+
+  for(int ebc_id=0; ebc_id < num_ebc; ++ebc_id)
+  {
+    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+
+    for(int ee=0; ee<num_sele; ++ee)
+    {
+      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
+
+      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+      
+      lassem_ptr->Assem_Residual_EBC(ebc_id, curr_time, dt,
+          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+
+      for(int ii=0; ii<snLocBas; ++ii)
+        for(int mm=0; mm<dof; ++mm)
+          srow_index[dof * ii + mm] =  nbc_part -> get_LID(mm, LSIEN[ii]);
+  
+      VecSetValues(G, dof*snLocBas, srow_index, lassem_ptr->Residual, ADD_VALUES);  
+    }
+  }
+
+  delete [] LSIEN;      LSIEN = nullptr;
+  delete [] sctrl_x;    sctrl_x = nullptr;
+  delete [] sctrl_y;    sctrl_y = nullptr;
+  delete [] sctrl_z;    sctrl_z = nullptr;
+  delete [] srow_index; srow_index = nullptr;
+}
 
 // EOF
