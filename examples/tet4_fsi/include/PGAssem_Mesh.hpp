@@ -119,11 +119,6 @@ class PGAssem_Mesh : public IPGAssem
           local_array[offset1 + jj] = array[offset2 + jj];
       }
     }
-
-    void Get_dnz_onz( const int &nlocnode,
-        const int &empirical_neighbor_node_number,
-        const ALocal_NodalBC * const &nbc_ptr,
-        PetscInt * const &dnz, PetscInt * const &onz ) const;
 };
 
 #endif
