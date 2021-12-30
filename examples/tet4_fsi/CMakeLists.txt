@@ -117,6 +117,7 @@ SET( perigee_analysis_lib_src
   ${perigee_SOURCE_DIR}/src/PLocAssem_Tet4_FSI_Mesh_Laplacian.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_V.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_P.cpp
+  ${perigee_SOURCE_DIR}/src/PGAssem_Mesh.cpp
   )
 
 # 3. Postprocess cpp
