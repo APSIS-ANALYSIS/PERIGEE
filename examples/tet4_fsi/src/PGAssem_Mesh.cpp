@@ -6,12 +6,51 @@ PGAssem_Mesh::PGAssem_Mesh( IPLocAssem * const &locassem_ptr,
     ALocal_IEN const * const &aien_ptr,
     APart_Node const * const &pnode_ptr,
     ALocal_NodalBC const * const &part_nbc,
-    ALocal_EBC const * const &part_ebc )
-{}
+    ALocal_EBC const * const &part_ebc,
+    const int &in_nz_estimate )
+: nLocBas( agmi_ptr->get_nLocBas() ),
+  snLocBas( part_ebc -> get_cell_nLocBas(0) ),
+  dof( pnode_ptr -> get_dof() ),
+  num_ebc( part_ebc->get_num_ebc() )
+{
+  SYS_T::print_fatal_if(num_ebc != locassem_ptr->get_num_ebc_fun(), "Error: The number of ebc does not match with the number of functions implemented in the local assembly routine. \n");
+
+  const int nlocrow = dof * pnode_ptr->get_nlocalnode();
+
+  // Allocate the sparse matrix K
+  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
+      PETSC_DETERMINE, dof*in_nz_estimate, NULL, dof*in_nz_estimate, NULL, &K);
+
+  // Allocate the vector G
+  VecCreate(PETSC_COMM_WORLD, &G);
+  VecSetSizes(G, nlocrow, PETSC_DECIDE);
+
+  VecSetFromOptions(G);
+  VecSet(G, 0.0);
+  VecSetOption(G, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
+
+  SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
+  Release_nonzero_err_str();
+
+  Assem_nonzero_estimate( alelem_ptr, locassem_ptr, aien_ptr, pnode_ptr, part_nbc );
+  
+  // Obtain the precise dnz and onz count
+  std::vector<int> Kdnz, Konz;
+  PETSc_T::Get_dnz_onz(K, Kdnz, Konz);
+
+  MatDestroy(&K); // Destroy the K with rough preallocation
+
+  // Create Mat with precise preallocation
+  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
+      PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &K);
+}
 
 
 PGAssem_Mesh::~PGAssem_Mesh()
-{}
+{
+  VecDestroy(&G);
+  MatDestroy(&K);
+}
 
 
 void PGAssem_Mesh::Assem_nonzero_estimate(
@@ -24,9 +63,9 @@ void PGAssem_Mesh::Assem_nonzero_estimate(
   const int nElem = alelem_ptr -> get_nlocalele();
 
   lassem_ptr->Assem_Estimate();
- 
+
   PetscInt * row_index = new PetscInt [nLocBas * dof];
-   
+
   for(int ee=0; ee<nElem; ++ee)
   {
     for(int ii=0; ii<nLocBas; ++ii)
@@ -40,7 +79,7 @@ void PGAssem_Mesh::Assem_nonzero_estimate(
     MatSetValues(K, dof*nLocBas, row_index, dof*nLocBas, row_index,
         lassem_ptr->Tangent, ADD_VALUES);
   }
-  
+
   delete [] row_index; row_index = nullptr;
 
   for(int mm=0; mm<dof; ++mm) EssBC_KG( nbc_part, mm );
@@ -112,7 +151,7 @@ void PGAssem_Mesh::EssBC_KG(
 {
   // Number of local dirichlet nodes for this field
   const int local_dir = nbc_part -> get_Num_LD(field);
-  
+
   if(local_dir > 0)
   {
     for(int ii=0; ii<local_dir; ++ii)
@@ -122,7 +161,7 @@ void PGAssem_Mesh::EssBC_KG(
       MatSetValue(K, row, row, 1.0, ADD_VALUES);
     }
   }
-  
+
   // Number of slave nodes for this field
   const int local_sla = nbc_part->get_Num_LPS(field);
   if(local_sla > 0)
@@ -188,14 +227,14 @@ void PGAssem_Mesh::NatBC_G( const double &curr_time, const double &dt,
       ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
 
       ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
-      
+
       lassem_ptr->Assem_Residual_EBC(ebc_id, curr_time, dt,
           element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
 
       for(int ii=0; ii<snLocBas; ++ii)
         for(int mm=0; mm<dof; ++mm)
           srow_index[dof * ii + mm] =  nbc_part -> get_LID(mm, LSIEN[ii]);
-  
+
       VecSetValues(G, dof*snLocBas, srow_index, lassem_ptr->Residual, ADD_VALUES);  
     }
   }

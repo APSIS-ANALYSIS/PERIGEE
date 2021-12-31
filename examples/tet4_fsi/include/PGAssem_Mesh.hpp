@@ -9,6 +9,7 @@
 // Date: Dec. 30 2021
 // ============================================================================
 #include "IPGAssem.hpp"
+#include "PETSc_Tools.hpp"
 
 class PGAssem_Mesh : public IPGAssem
 {
@@ -19,7 +20,8 @@ class PGAssem_Mesh : public IPGAssem
         ALocal_IEN const * const &aien_ptr,
         APart_Node const * const &pnode_ptr,
         ALocal_NodalBC const * const &part_nbc,
-        ALocal_EBC const * const &part_ebc );
+        ALocal_EBC const * const &part_ebc,
+        const int &in_nz_estimate );
 
     virtual ~PGAssem_Mesh();
 
@@ -81,7 +83,7 @@ class PGAssem_Mesh : public IPGAssem
         const ALocal_EBC * const &ebc_part );
 
   private:
-    int nLocBas, snLocBas, dof, num_ebc;
+    const int nLocBas, snLocBas, dof, num_ebc;
     
     void EssBC_KG( const ALocal_NodalBC * const &nbc_part, const int &field );
     void EssBC_G(  const ALocal_NodalBC * const &nbc_part, const int &field );
