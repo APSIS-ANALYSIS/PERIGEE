@@ -20,7 +20,36 @@ void PGAssem_Mesh::Assem_nonzero_estimate(
     const ALocal_IEN * const &lien_ptr,
     const APart_Node * const &node_ptr,
     const ALocal_NodalBC * const &nbc_part )
-{}
+{
+  const int nElem = alelem_ptr -> get_nlocalele();
+
+  lassem_ptr->Assem_Estimate();
+ 
+  PetscInt * row_index = new PetscInt [nLocBas * dof];
+   
+  for(int ee=0; ee<nElem; ++ee)
+  {
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      const int loc_index = lien_ptr -> get_LIEN(ee, ii);
+
+      for(int mm=0; mm<dof; ++mm)
+        row_index[dof*ii+mm] = nbc_part -> get_LID(mm, loc_index);
+    }
+
+    MatSetValues(K, dof*nLocBas, row_index, dof*nLocBas, row_index,
+        lassem_ptr->Tangent, ADD_VALUES);
+  }
+  
+  delete [] row_index; row_index = nullptr;
+
+  for(int mm=0; mm<dof; ++mm) EssBC_KG( nbc_part, mm );
+
+  MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
+  MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
+  VecAssemblyBegin(G);
+  VecAssemblyEnd(G);
+}
 
 
 void PGAssem_Mesh::Assem_mass_residual(
