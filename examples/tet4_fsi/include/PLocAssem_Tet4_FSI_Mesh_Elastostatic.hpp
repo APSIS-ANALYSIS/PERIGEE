@@ -31,7 +31,7 @@ class PLocAssem_Tet4_FSI_Mesh_Elastostatic : public IPLocAssem
 
     virtual ~PLocAssem_Tet4_FSI_Mesh_Elastostatic();
 
-    virtual int get_dof() const {return dof_per_node;}
+    virtual int get_dof() const {return 3;}
 
     virtual int get_dof_mat() const {return 3;}
 
@@ -87,33 +87,17 @@ class PLocAssem_Tet4_FSI_Mesh_Elastostatic : public IPLocAssem
 
   private:
     const double E, nu, lambda, mu, kappa;
-    const int nLocBas, dof_per_node, vec_size;
-
-    double dR_dx[4];
-    double dR_dy[4];
-    double dR_dz[4];
-
-    // Store the previous time step element geometry coordinates
-    double curPt_x[4];
-    double curPt_y[4];
-    double curPt_z[4];
-
-    double Sub_Tan[9][16];
+    const int nLocBas, vec_size;
 
     void print_info() const;
 
     void get_currPts( const double * const &ept_x,
         const double * const &ept_y,
         const double * const &ept_z,
-        const double * const &sol );
-
-    void Zero_Sub_Tan()
-    {
-      for(int ii=0; ii<9; ++ii)
-      {
-        for(int jj=0; jj<nLocBas*nLocBas; ++jj) Sub_Tan[ii][jj] = 0.0;
-      }
-    }
+        const double * const &sol,
+        double * const &cur_x,
+        double * const &cur_y,
+        double * const &cur_z );
 };
 
 #endif
