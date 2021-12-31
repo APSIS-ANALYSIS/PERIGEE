@@ -83,7 +83,7 @@ class PGAssem_Mesh : public IPGAssem
         const ALocal_EBC * const &ebc_part );
 
   private:
-    const int nLocBas, snLocBas, dof, num_ebc;
+    const int nLocBas, snLocBas, dof, num_ebc, nlgn;
     
     void EssBC_KG( const ALocal_NodalBC * const &nbc_part, const int &field );
     void EssBC_G(  const ALocal_NodalBC * const &nbc_part, const int &field );

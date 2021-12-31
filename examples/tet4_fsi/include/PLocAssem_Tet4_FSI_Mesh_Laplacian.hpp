@@ -18,7 +18,7 @@ class PLocAssem_Tet4_FSI_Mesh_Laplacian : public IPLocAssem
 
     virtual ~PLocAssem_Tet4_FSI_Mesh_Laplacian();
 
-    virtual int get_dof() const {return dof_per_node;}
+    virtual int get_dof() const {return 3;}
 
     virtual int get_dof_mat() const {return 3;}
 
@@ -73,16 +73,7 @@ class PLocAssem_Tet4_FSI_Mesh_Laplacian : public IPLocAssem
     {SYS_T::print_fatal("Error: PLocAssem_Tet4_FSI_Mesh_Laplacian::Assem_Residual_EBC is not implemented. \n");}
 
   private:
-    const int num_ebc_fun;
-
-    const int nLocBas, dof_per_node, vec_size;
-
-    double R[4];
-    double dR_dx[4];
-    double dR_dy[4];
-    double dR_dz[4];
-
-    double Sub_Tan[9][16];
+    const int num_ebc_fun, nLocBas, vec_size;
 
     void print_info() const;
 
@@ -90,9 +81,7 @@ class PLocAssem_Tet4_FSI_Mesh_Laplacian : public IPLocAssem
         const double &t, double &fx, double &fy, double &fz ) const
     {
       fx = 0.0;
-
       fy = 0.0;
-
       fz = 0.0;
     }
 
@@ -116,15 +105,6 @@ class PLocAssem_Tet4_FSI_Mesh_Laplacian : public IPLocAssem
     {
       return ((*this).*(flist[ebc_id]))(x,y,z,t,nx,ny,nz,gx,gy,gz);
     }
-
-    void Zero_Sub_Tan()
-    {
-      for(int ii=0; ii<9; ++ii)
-      {
-        for(int jj=0; jj<nLocBas*nLocBas; ++jj) Sub_Tan[ii][jj] = 0.0;
-      }
-    }
-
 };
 
 #endif
