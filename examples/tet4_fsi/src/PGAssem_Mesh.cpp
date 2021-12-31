@@ -216,6 +216,8 @@ void PGAssem_Mesh::Assem_residual(
   delete [] ectrl_z; ectrl_z = nullptr;
   delete [] row_index; row_index = nullptr;
 
+  NatBC_G(curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 
@@ -241,7 +243,64 @@ void PGAssem_Mesh::Assem_tangent_residual(
     const FEANode * const &fnode_ptr,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
-{}
+{
+  const int nElem = alelem_ptr->get_nlocalele();
+  const int loc_dof = dof * nLocBas;
+
+  double * array_a = new double [nlgn * dof];
+  double * array_b = new double [nlgn * dof];
+  double * local_a = new double [nLocBas * dof];
+  double * local_b = new double [nLocBas * dof];
+  int * IEN_e = new int [nLocBas];
+  double * ectrl_x = new double [nLocBas];
+  double * ectrl_y = new double [nLocBas];
+  double * ectrl_z = new double [nLocBas];
+  PetscInt * row_index = new PetscInt [nLocBas * dof];
+
+  sol_a->GetLocalArray( array_a );
+  sol_b->GetLocalArray( array_b );
+  
+  for( int ee=0; ee<nElem; ++ee )
+  {
+    lien_ptr->get_LIEN(ee, IEN_e);
+    GetLocal(array_a, IEN_e, local_a);
+    GetLocal(array_b, IEN_e, local_b);
+
+    fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
+
+    lassem_ptr->Assem_Tangent_Residual(curr_time, dt, local_a, local_b,
+        elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
+
+    for(int ii=0; ii<nLocBas; ++ii)
+      for(int mm=0; mm<dof; ++mm)
+        row_index[dof*ii+mm] = nbc_part -> get_LID(mm, IEN_e[ii]);
+
+    MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
+        lassem_ptr->Tangent, ADD_VALUES);
+
+    VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+  }
+
+  delete [] array_a; array_a = nullptr;
+  delete [] array_b; array_b = nullptr;
+  delete [] local_a; local_a = nullptr;
+  delete [] local_b; local_b = nullptr;
+  delete [] IEN_e; IEN_e = nullptr;
+  delete [] ectrl_x; ectrl_x = nullptr;
+  delete [] ectrl_y; ectrl_y = nullptr;
+  delete [] ectrl_z; ectrl_z = nullptr;
+  delete [] row_index; row_index = nullptr;
+
+  NatBC_G(curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+
+  VecAssemblyBegin(G);
+  VecAssemblyEnd(G);
+
+  for(int ii = 0; ii<dof; ++ii) EssBC_G( nbc_part, ii );
+
+  VecAssemblyBegin(G);
+  VecAssemblyEnd(G);
+}
 
 void PGAssem_Mesh::EssBC_KG(
     const ALocal_NodalBC * const &nbc_part, 
