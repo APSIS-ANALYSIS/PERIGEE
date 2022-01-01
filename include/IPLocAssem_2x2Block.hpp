@@ -75,13 +75,6 @@ class IPLocAssem_2x2Block
     PetscScalar * sur_Residual1; // sur_R1
     
     // -------------------------------------------------------------- 
-    // Get the degree-of-freedom of this problem. For segregated 
-    // algorithms this returns the fully-coupled multiphysics 
-    // problem's dof.
-    // -------------------------------------------------------------- 
-    virtual int get_dof() const = 0;
-
-    // -------------------------------------------------------------- 
     // Get the degree of freedom of the full matrix (i.e. n0 + n1).
     // In most problems, this value is the same as the get_dof value;
     // In the solid dynamics with kinematic segregated, this returns 4
