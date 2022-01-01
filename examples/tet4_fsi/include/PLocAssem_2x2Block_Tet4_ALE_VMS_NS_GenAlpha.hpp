@@ -65,6 +65,23 @@ class PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
     const int vec_size_0, vec_size_1, sur_size_0, sur_size_1, nqp;
 
     void print_info() const;
+
+    // The metric tensor for tetrahedron needs to be modified.
+    // See Pauli dissertation and Whiting, C.H. RPI dissertation
+    void get_metric( const double * const &dxi_dx,
+        double &G11, double &G12, double &G13,
+        double &G22, double &G23, double &G33 ) const;
+
+    // Tau is different from the kinematic tau with rho come
+    // into the definition of tau's
+    void get_tau( double &tau_m_qua, double &tau_c_qua,
+        const double &dt, const double * const &dxi_dx,
+        const double &u, const double &v, const double &w ) const;
+
+    // Tau_DC is different from the kinematic definition with
+    // a rho in the definition. It scales like Time * Density
+    double get_DC( const double * const &dxi_dx,
+        const double &u, const double &v, const double &w ) const;
 };
 
 #endif
