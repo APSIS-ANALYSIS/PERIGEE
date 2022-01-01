@@ -734,7 +734,54 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Mass_Residual(
   }
 }
 
+void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC(
+        const int &ebc_id,
+        const double &time, const double &dt,
+        const double * const &disp,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+{
+  double curPt_x[3], curPt_y[3], curPt_z[3];
+  
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas_v, curPt_x, curPt_y, curPt_z);
 
+  element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
+
+  const int face_nqp = quad -> get_num_quadPts();
+
+  double gx, gy, gz, surface_area;
+  
+  const double curr = time + alpha_f * dt;
+
+  Zero_Residual();
+
+  for(int qua = 0; qua < face_nqp; ++qua)
+  {
+    const std::vector<double> R = element->get_R(qua);
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+
+    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    for(int ii=0; ii<snLocBas_v; ++ii)
+    {
+      coor_x += curPt_x[ii] * R[ii];
+      coor_y += curPt_y[ii] * R[ii];
+      coor_z += curPt_z[ii] * R[ii];
+    }
+
+    get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr, 
+        n_out.x(), n_out.y(), n_out.z(), gx, gy, gz );
+
+    for(int A=0; A<snLocBas_v; ++A)
+    {
+      Residual0[3*A+0] -= surface_area * quad -> get_qw(qua) * R[A] * gx;
+      Residual0[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * gy;
+      Residual0[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * gz;
+    }
+  }
+}
 
 
 
