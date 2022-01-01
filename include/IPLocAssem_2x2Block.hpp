@@ -75,15 +75,6 @@ class IPLocAssem_2x2Block
     PetscScalar * sur_Residual1; // sur_R1
     
     // -------------------------------------------------------------- 
-    // Get the degree of freedom of the full matrix (i.e. n0 + n1).
-    // In most problems, this value is the same as the get_dof value;
-    // In the solid dynamics with kinematic segregated, this returns 4
-    // (3 for velocity plus 1 for pressure); while get_dof returns 7 with
-    // 3 additional displacement variables.
-    // -------------------------------------------------------------- 
-    virtual int get_dof_mat() const = 0;
-
-    // -------------------------------------------------------------- 
     // Return the first variable's dof.
     // -------------------------------------------------------------- 
     virtual int get_dof_mat_0() const = 0;
@@ -201,6 +192,7 @@ class IPLocAssem_2x2Block
     virtual void Assem_Residual_EBC(
         const int &ebc_id,
         const double &time, const double &dt,
+        const double * const &disp,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -209,7 +201,9 @@ class IPLocAssem_2x2Block
     {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Residual_EBC is not implemented.\n");}
 
 
-    virtual double get_flowrate( const double * const &vec,
+    virtual double get_flowrate(
+        const double * const &disp,
+        const double * const &velo,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -220,20 +214,22 @@ class IPLocAssem_2x2Block
       return 0.0;
     }
 
-    virtual void get_pressure_area( const double * const &vec,
+    virtual void get_pressure_area( 
+        const double * const &disp,
+        const double * const &pres,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad,
-        double &pres, double &area )
+        double &pressure, double &area )
     {
       SYS_T::commPrint("Warning: get_pressure_area() is not implemented. \n");
     }
 
     virtual void Assem_Residual_EBC_Resistance(
-        const int &ebc_id,
         const double &val,
+        const double * const &disp,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -242,8 +238,9 @@ class IPLocAssem_2x2Block
     {SYS_T::commPrint("Warning: this Assem_Residual_EBC_Resistance is not implemented.\n");}
 
     virtual void Assem_Residual_BackFlowStab(
-        const double * const &dot_sol,
-        const double * const &sol,
+        const double * const &dot_disp,
+        const double * const &disp,
+        const double * const &velo,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -253,8 +250,9 @@ class IPLocAssem_2x2Block
 
     virtual void Assem_Tangent_Residual_BackFlowStab(
         const double &dt,
-        const double * const &dot_sol,
-        const double * const &sol,
+        const double * const &dot_disp,
+        const double * const &disp,
+        const double * const &velo,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
