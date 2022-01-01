@@ -6,9 +6,9 @@ PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::PLocAssem_2x2Block_Tet4_ALE_VMS_NS_
 : rho0( in_rho ), vis_mu( in_vis_mu ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()), beta(in_beta), CI(36.0), CT(4.0),
-  nLocBas_v(4), nLocBas_p(4), snLocBas_v(3), snLocBas_p(3),
-  vec_size_0( nLocBas_v * 3 ), vec_size_1( nLocBas_p ), 
-  sur_size_0( snLocBas_v * 3 ), sur_size_1( snLocBas_p ), nqp( in_nqp )
+  nLocBas(4), snLocBas(3),
+  vec_size_0( nLocBas * 3 ), vec_size_1( nLocBas ), 
+  sur_size_0( snLocBas * 3 ), sur_size_1( snLocBas ), nqp( in_nqp )
 {
   Tangent00 = new PetscScalar[vec_size_0 * vec_size_0];
   Tangent01 = new PetscScalar[vec_size_0 * vec_size_1];
@@ -157,7 +157,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual(
   double R[4], dR_dx[4], dR_dy[4], dR_dz[4], dxi_dx[9];
   double curPt_x[4], curPt_y[4], curPt_z[4];
 
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, nLocBas_v, curPt_x, curPt_y, curPt_z);
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, nLocBas, curPt_x, curPt_y, curPt_z);
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
@@ -179,7 +179,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual(
     element->get_R_gradR( qua, R, dR_dx, dR_dy, dR_dz );
     element->get_invJacobian( qua, dxi_dx );
 
-    for(int ii=0; ii<nLocBas_v; ++ii)
+    for(int ii=0; ii<nLocBas; ++ii)
     {
       mu += dot_disp[ii*3+0] * R[ii];
       mv += dot_disp[ii*3+1] * R[ii];
@@ -240,7 +240,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual(
 
     const double tau_dc = get_DC( dxi_dx, u_prime, v_prime, w_prime );
 
-    for(int A=0; A<nLocBas_v; ++A)
+    for(int A=0; A<nLocBas; ++A)
     {
       const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
@@ -315,7 +315,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
   double R[4], dR_dx[4], dR_dy[4], dR_dz[4], dxi_dx[9];
   double curPt_x[4], curPt_y[4], curPt_z[4];
   
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, nLocBas_v, curPt_x, curPt_y, curPt_z);
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, nLocBas, curPt_x, curPt_y, curPt_z);
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
@@ -341,7 +341,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     element->get_R_gradR( qua, R, dR_dx, dR_dy, dR_dz );
     element->get_invJacobian( qua, dxi_dx );
 
-    for(int ii=0; ii<nLocBas_v; ++ii)
+    for(int ii=0; ii<nLocBas; ++ii)
     {
       mu += dot_disp[ii*3+0] * R[ii];
       mv += dot_disp[ii*3+1] * R[ii];
@@ -401,7 +401,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
     const double tau_dc = get_DC( dxi_dx, u_prime, v_prime, w_prime );
 
-    for(int A=0; A<nLocBas_v; ++A)
+    for(int A=0; A<nLocBas; ++A)
     {
       const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
@@ -456,7 +456,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
           * (u_prime * w_x + v_prime * w_y + w_prime * w_z)
           - NA * rho0 * f_body.z() );
 
-      for(int B=0; B<nLocBas_v; ++B)
+      for(int B=0; B<nLocBas; ++B)
       {
         const double NB = R[B], NB_x = dR_dx[B], NB_y = dR_dy[B], NB_z = dR_dz[B];
         const double velo_dot_gradNB = cu * NB_x + cv * NB_y + cw * NB_z;
@@ -480,29 +480,29 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
         const double drz_dw_B = rho0 * (w_z * NB + velo_dot_gradNB);
 
         // Continuity equation with respect to p, u, v, w
-        Tangent11[nLocBas_p*A+B] += gwts * dd_dv * tau_m * (NAxNBx + NAyNBy + NAzNBz);
+        Tangent11[nLocBas*A+B] += gwts * dd_dv * tau_m * (NAxNBx + NAyNBy + NAzNBz);
 
-        Tangent10[3*nLocBas_v*A+3*B+0] += gwts * ( alpha_m * tau_m * rho0 * NAxNB
+        Tangent10[3*nLocBas*A+3*B+0] += gwts * ( alpha_m * tau_m * rho0 * NAxNB
             + dd_dv * ( NANBx + tau_m * NA_x * drx_du_B
               + tau_m * NA_y * dry_du_B + tau_m * NA_z * drz_du_B ) );
 
-        Tangent10[3*nLocBas_v*A+3*B+1] += gwts * ( alpha_m * tau_m * rho0 * NAyNB
+        Tangent10[3*nLocBas*A+3*B+1] += gwts * ( alpha_m * tau_m * rho0 * NAyNB
             + dd_dv * ( NANBy + tau_m * NA_x * drx_dv_B
               + tau_m * NA_y * dry_dv_B + tau_m * NA_z * drz_dv_B ) );
 
-        Tangent10[3*nLocBas_v*A+3*B+2] += gwts * ( alpha_m * tau_m * rho0 * NAzNB
+        Tangent10[3*nLocBas*A+3*B+2] += gwts * ( alpha_m * tau_m * rho0 * NAzNB
             + dd_dv * ( NANBz + tau_m * NA_x * drx_dw_B
               + tau_m * NA_y * dry_dw_B + tau_m * NA_z * drz_dw_B ) );
 
         // Momentum-x with respect to p, u, v, w
-        Tangent01[nLocBas_p*(3*A+0)+B] += gwts * dd_dv * ((-1.0) * NAxNB
+        Tangent01[nLocBas*(3*A+0)+B] += gwts * dd_dv * ((-1.0) * NAxNB
             + velo_dot_gradR * tau_m * rho0 * NB_x
             - NA * tau_m * rho0 * (u_x * NB_x + u_y * NB_y + u_z * NB_z)
             - 2.0 * tau_m_2 * rho0 * rx * NAxNBx
             - tau_m_2 * rho0 * NA_y * (rx * NB_y + ry * NB_x)
             - tau_m_2 * rho0 * NA_z * (rx * NB_z + rz * NB_x) );
 
-        Tangent00[3*nLocBas_v*(3*A+0)+3*B+0] += gwts * ( 
+        Tangent00[3*nLocBas*(3*A+0)+3*B+0] += gwts * ( 
             alpha_m * ( rho0 * NANB + velo_dot_gradR * rho0_2 * tau_m * NB
               - rho0_2 * tau_m * u_x * NANB
               - rho0_2 * tau_m_2 * rx * NAxNB
@@ -522,7 +522,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * rx * NA_z * drz_du_B
               + velo_prime_dot_gradR * tau_dc * velo_prime_dot_gradNB ) );
 
-        Tangent00[3*nLocBas_v*(3*A+0)+3*B+1] += gwts * ( 
+        Tangent00[3*nLocBas*(3*A+0)+3*B+1] += gwts * ( 
             alpha_m * (-1.0) * rho0_2 * (tau_m * u_y * NANB + tau_m_2 * rx * NAyNB)
             + dd_dv * ( NANB * rho0 * u_y + vis_mu * NAyNBx 
               + rho0 * tau_m * rx * NAyNB
@@ -533,7 +533,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_y * (rx * dry_dv_B + ry * drx_dv_B)
               - rho0 * tau_m_2 * NA_z * (rx * drz_dv_B + rz * drx_dv_B) ) );
 
-        Tangent00[3*nLocBas_v*(3*A+0)+3*B+2] += gwts * (
+        Tangent00[3*nLocBas*(3*A+0)+3*B+2] += gwts * (
             alpha_m * (-1.0) * rho0_2 * (tau_m * u_z * NANB + tau_m_2 * rx * NAzNB)
             + dd_dv * ( NANB * rho0 * u_z + vis_mu * NAzNBx 
               + rho0 * tau_m * rx * NAzNB
@@ -545,14 +545,14 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_z * (rx * drz_dw_B + rz * drx_dw_B) ) );
 
         // Momentum-y with respect to p u v w
-        Tangent01[nLocBas_p*(3*A+1)+B] += gwts * dd_dv * ( (-1.0) * NAyNB
+        Tangent01[nLocBas*(3*A+1)+B] += gwts * dd_dv * ( (-1.0) * NAyNB
             + velo_dot_gradR * tau_m * rho0 * NB_y
             - NA * tau_m * rho0 * (v_x * NB_x + v_y * NB_y + v_z * NB_z)
             - tau_m_2 * rho0 * NA_x * (rx * NB_y + ry * NB_x)
             - 2.0 * tau_m_2 * rho0 * ry * NAyNBy
             - tau_m_2 * rho0 * NA_z * (ry * NB_z + rz * NB_y) );
 
-        Tangent00[3*nLocBas_v*(3*A+1)+3*B+0] += gwts * (
+        Tangent00[3*nLocBas*(3*A+1)+3*B+0] += gwts * (
             alpha_m * (-1.0) * rho0_2 * (tau_m * v_x * NANB + tau_m_2 * ry * NAxNB)
             + dd_dv * ( NANB * rho0 * v_x + vis_mu * NAxNBy
               + rho0 * tau_m * ry * NAxNB
@@ -563,7 +563,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - 2.0 * rho0 * tau_m_2 * ry * NA_y * dry_du_B
               - rho0 * tau_m_2 * NA_z * (ry * drz_du_B + rz * dry_du_B) ) );
 
-        Tangent00[3*nLocBas_v*(3*A+1)+3*B+1] += gwts * (
+        Tangent00[3*nLocBas*(3*A+1)+3*B+1] += gwts * (
             alpha_m * ( rho0 * NANB + velo_dot_gradR * rho0_2 * tau_m * NB
               - rho0_2 * tau_m * v_y * NANB
               - rho0_2 * tau_m_2 * ry * NAyNB
@@ -580,7 +580,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_z * (ry * drz_dv_B + rz * dry_dv_B)
               + velo_prime_dot_gradR * tau_dc * velo_prime_dot_gradNB ) );
 
-        Tangent00[3*nLocBas_v*(3*A+1)+3*B+2] += gwts * (
+        Tangent00[3*nLocBas*(3*A+1)+3*B+2] += gwts * (
             alpha_m * (-1.0) * rho0_2 * ( tau_m * v_z * NANB + tau_m_2 * ry * NAzNB ) 
             + dd_dv * ( NANB * rho0 * v_z + vis_mu * NAzNBy
               + rho0 * tau_m * ry * NAzNB
@@ -592,14 +592,14 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_z * (ry * drz_dw_B + rz * dry_dw_B) ) );
 
         // Momentum-z with respect to p u v w
-        Tangent01[nLocBas_p*(3*A+2)+B] += gwts * dd_dv * ( (-1.0) * NAzNB
+        Tangent01[nLocBas*(3*A+2)+B] += gwts * dd_dv * ( (-1.0) * NAzNB
             + velo_dot_gradR * tau_m * rho0 * NB_z
             - NA * tau_m * rho0 * (w_x * NB_x + w_y * NB_y + w_z * NB_z)
             - tau_m_2 * rho0 * NA_x * (rx * NB_z + rz * NB_x)
             - tau_m_2 * rho0 * NA_y * (ry * NB_z + rz * NB_y)
             - 2.0 * tau_m_2 * rho0 * rz * NAzNBz );
 
-        Tangent00[3*nLocBas_v*(3*A+2)+3*B+0] += gwts * (
+        Tangent00[3*nLocBas*(3*A+2)+3*B+0] += gwts * (
             alpha_m * (-1.0) * rho0_2 * (tau_m * w_x * NANB + tau_m_2 * rz * NAxNB)
             + dd_dv * ( NANB * rho0 * w_x + vis_mu * NAxNBz
               + rho0 * tau_m * rz * NAxNB
@@ -610,7 +610,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_y * (ry * drz_du_B + rz * dry_du_B)
               - 2.0 * rho0 * tau_m_2 * rz * NA_z * drz_du_B ) );
 
-        Tangent00[3*nLocBas_v*(3*A+2)+3*B+1] += gwts * (
+        Tangent00[3*nLocBas*(3*A+2)+3*B+1] += gwts * (
             alpha_m * (-1.0) * rho0_2 * (tau_m * w_y * NANB + tau_m_2 * rz * NAyNB)
             + dd_dv * ( NANB * rho0 * w_y + vis_mu * NAyNBz
               + rho0 * tau_m * rz * NAyNB
@@ -621,7 +621,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_y * (ry * drz_dv_B + rz * dry_dv_B)
               - 2.0 * rho0 * tau_m_2 * rz * NA_z * drz_dv_B ) );
 
-        Tangent00[3*nLocBas_v*(3*A+2)+3*B+2] += gwts * (
+        Tangent00[3*nLocBas*(3*A+2)+3*B+2] += gwts * (
             alpha_m * ( rho0 * NANB + velo_dot_gradR * rho0_2 * tau_m * NB
               - rho0_2 * tau_m * w_z * NANB
               - rho0_2 * tau_m_2 * rz * NAzNB
@@ -652,12 +652,10 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Mass_Residual(
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad )
 {
-  const int nLocBas = nLocBas_v;
-
   double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
   double curPt_x[4], curPt_y[4], curPt_z[4];
   
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, nLocBas_v, curPt_x, curPt_y, curPt_z);
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, nLocBas, curPt_x, curPt_y, curPt_z);
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
   
@@ -753,7 +751,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC(
 {
   double curPt_x[3], curPt_y[3], curPt_z[3];
   
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas_v, curPt_x, curPt_y, curPt_z);
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas, curPt_x, curPt_y, curPt_z);
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
@@ -771,7 +769,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC(
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
-    for(int ii=0; ii<snLocBas_v; ++ii)
+    for(int ii=0; ii<snLocBas; ++ii)
     {
       coor_x += curPt_x[ii] * R[ii];
       coor_y += curPt_y[ii] * R[ii];
@@ -781,7 +779,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC(
     get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr, 
         n_out.x(), n_out.y(), n_out.z(), gx, gy, gz );
 
-    for(int A=0; A<snLocBas_v; ++A)
+    for(int A=0; A<snLocBas; ++A)
     {
       Residual0[3*A+0] -= surface_area * quad -> get_qw(qua) * R[A] * gx;
       Residual0[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * gy;
@@ -801,7 +799,7 @@ double PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::get_flowrate(
 {
   double curPt_x[3], curPt_y[3], curPt_z[3];
 
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas_v, curPt_x, curPt_y, curPt_z);
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas, curPt_x, curPt_y, curPt_z);
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
@@ -818,7 +816,7 @@ double PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::get_flowrate(
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     double u = 0.0, v = 0.0, w = 0.0;
-    for(int ii=0; ii<snLocBas_v; ++ii)
+    for(int ii=0; ii<snLocBas; ++ii)
     {
       u += velo[3*ii+0] * R[ii];
       v += velo[3*ii+1] * R[ii];
@@ -843,7 +841,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::get_pressure_area(
 {
   double curPt_x[3], curPt_y[3], curPt_z[3];
 
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas_v, curPt_x, curPt_y, curPt_z);
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas, curPt_x, curPt_y, curPt_z);
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
@@ -857,7 +855,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::get_pressure_area(
     const std::vector<double> R = element->get_R(qua);
 
     double pp = 0.0;
-    for(int ii=0; ii<snLocBas_p; ++ii) pp += pres[ii] * R[ii];
+    for(int ii=0; ii<snLocBas; ++ii) pp += pres[ii] * R[ii];
 
     pressure += element->get_detJac(qua) * quad->get_qw(qua) * pp;
     area     += element->get_detJac(qua) * quad->get_qw(qua);
@@ -875,7 +873,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
 {
   double curPt_x[3], curPt_y[3], curPt_z[3];
 
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas_v, curPt_x, curPt_y, curPt_z);
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas, curPt_x, curPt_y, curPt_z);
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
@@ -891,7 +889,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
 
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
-    for(int A=0; A<snLocBas_v; ++A)
+    for(int A=0; A<snLocBas; ++A)
     {
       Residual0[3*A+0] += surface_area * quad -> get_qw(qua) * R[A] * n_out.x() * val;
       Residual0[3*A+1] += surface_area * quad -> get_qw(qua) * R[A] * n_out.y() * val;
@@ -912,7 +910,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
 {
   double curPt_x[3], curPt_y[3], curPt_z[3];
 
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas_v, curPt_x, curPt_y, curPt_z);
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas, curPt_x, curPt_y, curPt_z);
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
@@ -929,7 +927,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     double u = 0.0, v = 0.0, w = 0.0, mu = 0.0, mv = 0.0, mw = 0.0;
-    for(int ii=0; ii<snLocBas_v; ++ii)
+    for(int ii=0; ii<snLocBas; ++ii)
     {
       mu += dot_disp[ii*3+0] * R[ii];
       mv += dot_disp[ii*3+1] * R[ii];
@@ -949,7 +947,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
     if(temp < 0.0) factor = temp * rho0 * beta;
     else factor = 0.0;
 
-    for(int A=0; A<snLocBas_v; ++A)
+    for(int A=0; A<snLocBas; ++A)
     {
       sur_Residual0[3*A+0] -= surface_area * quad -> get_qw(qua) * R[A] * factor * u;
       sur_Residual0[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * factor * v;
@@ -971,7 +969,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlo
 {
   double curPt_x[3], curPt_y[3], curPt_z[3];
 
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas_v, curPt_x, curPt_y, curPt_z);
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas, curPt_x, curPt_y, curPt_z);
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
@@ -990,7 +988,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlo
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     double u = 0.0, v = 0.0, w = 0.0, mu = 0.0, mv = 0.0, mw = 0.0;
-    for(int ii=0; ii<snLocBas_v; ++ii)
+    for(int ii=0; ii<snLocBas; ++ii)
     {
       mu += dot_disp[ii*3+0] * R[ii];
       mv += dot_disp[ii*3+1] * R[ii];
@@ -1013,17 +1011,17 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlo
     const double gwts = surface_area * quad -> get_qw(qua);
 
     // snLocBas = 3 for linear tet/tri element
-    for(int A=0; A<snLocBas_v; ++A)
+    for(int A=0; A<snLocBas; ++A)
     {
       sur_Residual0[3*A+0] -= gwts * R[A] * factor * u;
       sur_Residual0[3*A+1] -= gwts * R[A] * factor * v;
       sur_Residual0[3*A+2] -= gwts * R[A] * factor * w;
 
-      for(int B=0; B<snLocBas_v; ++B)
+      for(int B=0; B<snLocBas; ++B)
       {
-        sur_Tangent00[ 3*snLocBas_v*(3*A+0) + 3*B+0 ] -= gwts * dd_dv * R[A] * factor * R[B];
-        sur_Tangent00[ 3*snLocBas_v*(3*A+1) + 3*B+1 ] -= gwts * dd_dv * R[A] * factor * R[B];
-        sur_Tangent00[ 3*snLocBas_v*(3*A+2) + 3*B+2 ] -= gwts * dd_dv * R[A] * factor * R[B];
+        sur_Tangent00[ 3*snLocBas*(3*A+0) + 3*B+0 ] -= gwts * dd_dv * R[A] * factor * R[B];
+        sur_Tangent00[ 3*snLocBas*(3*A+1) + 3*B+1 ] -= gwts * dd_dv * R[A] * factor * R[B];
+        sur_Tangent00[ 3*snLocBas*(3*A+2) + 3*B+2 ] -= gwts * dd_dv * R[A] * factor * R[B];
       }
     }
   }

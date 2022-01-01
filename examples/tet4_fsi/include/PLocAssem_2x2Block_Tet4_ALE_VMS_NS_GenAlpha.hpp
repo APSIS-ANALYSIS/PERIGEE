@@ -167,7 +167,7 @@ class PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
   private:
     const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta, CI, CT;
 
-    const int nLocBas_v, nLocBas_p, snLocBas_v, snLocBas_p;
+    const int nLocBas, snLocBas;
     const int vec_size_0, vec_size_1, sur_size_0, sur_size_1, nqp;
 
     void print_info() const;
