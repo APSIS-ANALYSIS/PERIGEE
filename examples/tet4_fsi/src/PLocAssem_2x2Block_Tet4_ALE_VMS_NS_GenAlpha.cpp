@@ -19,12 +19,7 @@ PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::PLocAssem_2x2Block_Tet4_ALE_VMS_NS_
   Residual1 = new PetscScalar[vec_size_1];
   
   sur_Tangent00 = new PetscScalar[sur_size_0 * sur_size_0];
-  sur_Tangent01 = new PetscScalar[sur_size_0 * sur_size_1];
-  sur_Tangent10 = new PetscScalar[sur_size_1 * sur_size_0];
-  sur_Tangent11 = new PetscScalar[sur_size_1 * sur_size_1];
-
   sur_Residual0 = new PetscScalar[sur_size_0];
-  sur_Residual1 = new PetscScalar[sur_size_1];
 
   Zero_Tangent_Residual();
   Zero_sur_Tangent_Residual();
@@ -35,7 +30,19 @@ PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::PLocAssem_2x2Block_Tet4_ALE_VMS_NS_
 
 
 PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::~PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha()
-{}
+{
+  delete [] Tangent00; Tangent00 = nullptr;
+  delete [] Tangent01; Tangent01 = nullptr;
+  delete [] Tangent10; Tangent10 = nullptr;
+  delete [] Tangent11; Tangent11 = nullptr;
+
+  delete [] Residual0; Residual0 = nullptr;
+  delete [] Residual1; Residual1 = nullptr;
+
+  delete [] sur_Tangent00; sur_Tangent00 = nullptr;
+
+  delete [] sur_Residual0; sur_Residual0 = nullptr;
+}
 
 
 void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::print_info() const

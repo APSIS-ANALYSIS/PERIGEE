@@ -37,12 +37,7 @@ class PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
     virtual void Zero_sur_Tangent_Residual()
     {
       for(int ii=0; ii<sur_size_0; ++ii) sur_Residual0[ii] = 0.0;
-      for(int ii=0; ii<sur_size_1; ++ii) sur_Residual1[ii] = 0.0;
-
       for(int ii=0; ii<sur_size_0 * sur_size_0; ++ii) sur_Tangent00[ii] = 0.0;
-      for(int ii=0; ii<sur_size_0 * sur_size_1; ++ii) sur_Tangent01[ii] = 0.0;
-      for(int ii=0; ii<sur_size_1 * sur_size_0; ++ii) sur_Tangent10[ii] = 0.0;
-      for(int ii=0; ii<sur_size_1 * sur_size_1; ++ii) sur_Tangent11[ii] = 0.0;
     }
 
     virtual void Zero_Residual()
@@ -54,7 +49,6 @@ class PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
     virtual void Zero_sur_Residual()
     {
       for(int ii=0; ii<sur_size_0; ++ii) sur_Residual0[ii] = 0.0;
-      for(int ii=0; ii<sur_size_1; ++ii) sur_Residual1[ii] = 0.0;
     }
 
     virtual void Assem_Residual(
