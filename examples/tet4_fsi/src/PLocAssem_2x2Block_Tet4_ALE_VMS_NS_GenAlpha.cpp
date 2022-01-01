@@ -783,7 +783,46 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC(
   }
 }
 
+double PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::get_flowrate( 
+    const double * const &disp,
+    const double * const &velo,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
+{
+  double curPt_x[3], curPt_y[3], curPt_z[3];
 
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas_v, curPt_x, curPt_y, curPt_z);
+
+  element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
+
+  const int face_nqp = quad -> get_num_quadPts();
+
+  double flrate = 0.0;
+
+  for(int qua =0; qua< face_nqp; ++qua)
+  {
+    const std::vector<double> R = element->get_R(qua);
+
+    double surface_area;
+
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+
+    double u = 0.0, v = 0.0, w = 0.0;
+    for(int ii=0; ii<snLocBas_v; ++ii)
+    {
+      u += velo[3*ii+0] * R[ii];
+      v += velo[3*ii+1] * R[ii];
+      w += velo[3*ii+2] * R[ii];
+    }
+
+    flrate += surface_area * quad->get_qw(qua) * ( u * n_out.x() + v * n_out.y() + w * n_out.z() );
+  }
+
+  return flrate;
+}
 
 
 

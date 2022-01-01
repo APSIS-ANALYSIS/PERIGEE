@@ -105,6 +105,19 @@ class PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
+    // Calculate the flow rate Q := int_Omega^e v dot n dA
+    virtual double get_flowrate( 
+        const double * const &disp,
+        const double * const &velo,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad );
+
+
+
+
   private:
     const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta, CI, CT;
 
