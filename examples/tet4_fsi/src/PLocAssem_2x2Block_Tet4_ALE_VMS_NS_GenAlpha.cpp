@@ -635,7 +635,104 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
   } // qua-loop
 }
 
+void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Mass_Residual(
+        const double * const &disp,
+        const double * const &velo,
+        const double * const &pres,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+{
+  const int nLocBas = nLocBas_v;
 
+  double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
+  double curPt_x[4], curPt_y[4], curPt_z[4];
+  
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, nLocBas_v, curPt_x, curPt_y, curPt_z);
+
+  element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
+  
+  const double two_mu = 2.0 * vis_mu;
+
+  const double curr = 0.0;
+
+  Zero_Tangent_Residual();
+
+  for(int qua=0; qua<nqp; ++qua)
+  {
+    double u = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
+    double v = 0.0, v_x = 0.0, v_y = 0.0, v_z = 0.0;
+    double w = 0.0, w_x = 0.0, w_y = 0.0, w_z = 0.0;
+    double p = 0.0, coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+
+    element->get_R_gradR( qua, R, dR_dx, dR_dy, dR_dz );
+
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      u += velo[ii*3+0] * R[ii];
+      v += velo[ii*3+1] * R[ii];
+      w += velo[ii*3+2] * R[ii];
+      p += pres[ii]     * R[ii];
+
+      u_x += velo[ii*3+0] * dR_dx[ii];
+      v_x += velo[ii*3+1] * dR_dx[ii];
+      w_x += velo[ii*3+2] * dR_dx[ii];
+
+      u_y += velo[ii*3+0] * dR_dy[ii];
+      v_y += velo[ii*3+1] * dR_dy[ii];
+      w_y += velo[ii*3+2] * dR_dy[ii];
+
+      u_z += velo[ii*3+0] * dR_dz[ii];
+      v_z += velo[ii*3+1] * dR_dz[ii];
+      w_z += velo[ii*3+2] * dR_dz[ii];
+
+      coor_x += curPt_x[ii] * R[ii];
+      coor_y += curPt_y[ii] * R[ii];
+      coor_z += curPt_z[ii] * R[ii];
+    }
+
+    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
+
+    const Vector_3 f_body = get_f(coor_x, coor_y, coor_z, curr);
+
+    for(int A=0; A<nLocBas; ++A)
+    {
+      const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
+
+      Residual0[3*A+0] += gwts * ( NA * rho0 * (u*u_x + v*u_y + w*u_z) 
+          - NA_x * p
+          + two_mu * NA_x * u_x
+          + vis_mu * NA_y * (u_y + v_x)
+          + vis_mu * NA_z * (u_z + w_x)
+          - NA * rho0 * f_body.x() );
+
+      Residual0[3*A+1] += gwts * ( NA * rho0 * (u*v_x + v*v_y + w*v_z) 
+          - NA_y * p
+          + vis_mu * NA_x * (u_y + v_x)
+          + two_mu * NA_y * v_y
+          + vis_mu * NA_z * (v_z + w_y)
+          - NA * rho0 * f_body.y() );
+
+      Residual0[3*A+2] += gwts * ( NA * rho0 * (u*w_x + v*w_y + w*w_z) 
+          - NA_z * p
+          + vis_mu * NA_x * (u_z + w_x)
+          + vis_mu * NA_y * (w_y + v_z)
+          + two_mu * NA_z * w_z
+          - NA * rho0 * f_body.z() );
+
+      for(int B=0; B<nLocBas; ++B)
+      {
+        Tangent11[nLocBas*A + B] += gwts * rho0 * NA * R[B];
+        
+        Tangent00[3*nLocBas*(3*A+0) + 3*B+0] += gwts * rho0 * NA * R[B];
+        Tangent00[3*nLocBas*(3*A+1) + 3*B+1] += gwts * rho0 * NA * R[B];
+        Tangent00[3*nLocBas*(3*A+2) + 3*B+2] += gwts * rho0 * NA * R[B];
+      }
+    }
+  }
+}
 
 
 

@@ -85,6 +85,15 @@ class PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
+    virtual void Assem_Mass_Residual(
+        const double * const &disp,
+        const double * const &velo,
+        const double * const &pres,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad );
 
   private:
     const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta, CI, CT;
