@@ -203,11 +203,11 @@ class PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
     }
 
     // Define Natural BC functions
-    typedef void ( PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::*locassem_tet4_ale_vms_ns_funs )( const double &x, const double &y, const double &z,
+    typedef void ( PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::*locassem_2x2block_tet4_ale_vms_ns_funs )( const double &x, const double &y, const double &z,
         const double &t, const double &nx, const double &ny,
         const double &nz, double &gx, double &gy, double &gz ) const;
 
-    locassem_tet4_ale_vms_ns_funs * flist;
+    locassem_2x2block_tet4_ale_vms_ns_funs * flist;
 
     void get_ebc_fun( const int &ebc_id,
         const double &x, const double &y, const double &z,
