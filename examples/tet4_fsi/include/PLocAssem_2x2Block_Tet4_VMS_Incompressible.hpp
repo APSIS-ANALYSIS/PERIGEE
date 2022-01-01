@@ -23,13 +23,17 @@ class PLocAssem_2x2Block_Tet4_VMS_Incompressible : public IPLocAssem_2x2Block
 
     virtual ~PLocAssem_2x2Block_Tet4_VMS_Incompressible();
     
+    virtual void Zero_Tangent_Residual();
+
+    virtual void Zero_Residual(); 
+
   private:
     const double rho0, alpha_f, alpha_m, gamma;
 
     // memory layout
     // dof_per_node = 7 to make it compatible with the problem setting
     // vec_size = 4 * nLocBas, which defines the local matrix/vector length
-    const int nLocBas, vec_size, nqp, snLocBas;
+    const int nLocBas, vec_size_0, vec_size_1, nqp, snLocBas;
 
     // useful tensors for the material model
     IMaterialModel * matmodel;
