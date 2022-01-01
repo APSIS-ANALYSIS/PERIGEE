@@ -23,6 +23,16 @@ class PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
 
     virtual ~PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha();
 
+    virtual int get_dof_mat() const {return 4;}
+
+    virtual int get_dof_mat_0() const {return 3;}
+
+    virtual int get_dof_mat_1() const {return 1;}
+
+    virtual double get_model_para_1() const {return alpha_f;}
+
+    virtual double get_model_para_2() const {return gamma;}
+
     virtual void Zero_Tangent_Residual()
     {
       for(int ii=0; ii<vec_size_0; ++ii) Residual0[ii] = 0.0;
