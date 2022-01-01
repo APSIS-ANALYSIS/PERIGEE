@@ -57,6 +57,15 @@ class PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
       for(int ii=0; ii<sur_size_1; ++ii) sur_Residual1[ii] = 0.0;
     }
 
+    virtual void Assem_Residual(
+        const double &time, const double &dt,
+        const double * const &vec_a,
+        const double * const &vec_b,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad );
 
   private:
     const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta, CI, CT;
