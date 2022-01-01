@@ -115,8 +115,52 @@ class PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
+    // Calculate the pressure integrated over the element
+    // as well as the area of the element.
+    virtual void get_pressure_area( 
+        const double * const &disp,
+        const double * const &pres,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad,
+        double &pressure, double &area );
 
+    // Assembly the elemental boundary condition
+    // val is the value scaling the int w . n dA, and for resistance
+    // boundary condition, it is flow_rate x C_resis + p_resis
+    virtual void Assem_Residual_EBC_Resistance(
+        const double &val,
+        const double * const &disp,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad );
 
+    // Assembly the residual due to the back flow stabilization
+    virtual void Assem_Residual_BackFlowStab(
+        const double * const &dot_disp,
+        const double * const &disp,
+        const double * const &velo,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad );
+
+    // Assembly the residual and tangent due to the back flow stabilization
+    virtual void Assem_Tangent_Residual_BackFlowStab(
+        const double &dt,
+        const double * const &dot_disp,
+        const double * const &disp,
+        const double * const &velo,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad );
 
   private:
     const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta, CI, CT;

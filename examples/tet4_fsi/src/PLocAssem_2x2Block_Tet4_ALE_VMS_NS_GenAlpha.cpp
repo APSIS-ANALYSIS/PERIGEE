@@ -824,24 +824,202 @@ double PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::get_flowrate(
   return flrate;
 }
 
+void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::get_pressure_area( 
+        const double * const &disp,
+        const double * const &pres,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad,
+        double &pressure, double &area )
+{
+  double curPt_x[3], curPt_y[3], curPt_z[3];
 
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas_v, curPt_x, curPt_y, curPt_z);
 
+  element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
+  const int face_nqp = quad -> get_num_quadPts();
 
+  // Initialize the two variables to be passed out
+  pressure = 0.0; area = 0.0;
 
+  for(int qua =0; qua< face_nqp; ++qua)
+  {
+    const std::vector<double> R = element->get_R(qua);
 
+    double pp = 0.0;
+    for(int ii=0; ii<snLocBas_p; ++ii) pp += pres[ii] * R[ii];
 
+    pressure += element->get_detJac(qua) * quad->get_qw(qua) * pp;
+    area     += element->get_detJac(qua) * quad->get_qw(qua);
+  }
+}
 
+void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
+    const double &val,
+    const double * const &disp,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
+{
+  double curPt_x[3], curPt_y[3], curPt_z[3];
 
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas_v, curPt_x, curPt_y, curPt_z);
 
+  element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
+  const int face_nqp = quad -> get_num_quadPts();
 
+  double surface_area;
 
+  Zero_Residual();
 
+  for(int qua = 0; qua < face_nqp; ++qua)
+  {
+    const std::vector<double> R = element->get_R(qua);
 
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
+    for(int A=0; A<snLocBas_v; ++A)
+    {
+      Residual0[3*A+0] += surface_area * quad -> get_qw(qua) * R[A] * n_out.x() * val;
+      Residual0[3*A+1] += surface_area * quad -> get_qw(qua) * R[A] * n_out.y() * val;
+      Residual0[3*A+2] += surface_area * quad -> get_qw(qua) * R[A] * n_out.z() * val;
+    }
+  }
+}
 
+void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
+    const double * const &dot_disp,
+    const double * const &disp,
+    const double * const &velo,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
+{
+  double curPt_x[3], curPt_y[3], curPt_z[3];
 
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas_v, curPt_x, curPt_y, curPt_z);
 
+  element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
+
+  const int face_nqp = quad -> get_num_quadPts();
+
+  double surface_area, factor;
+
+  Zero_sur_Residual();
+
+  for(int qua = 0; qua < face_nqp; ++qua)
+  {
+    const std::vector<double> R = element->get_R(qua);
+
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+
+    double u = 0.0, v = 0.0, w = 0.0, mu = 0.0, mv = 0.0, mw = 0.0;
+    for(int ii=0; ii<snLocBas_v; ++ii)
+    {
+      mu += dot_disp[ii*3+0] * R[ii];
+      mv += dot_disp[ii*3+1] * R[ii];
+      mw += dot_disp[ii*3+2] * R[ii];
+
+      u += velo[ii*3+0] * R[ii];
+      v += velo[ii*3+1] * R[ii];
+      w += velo[ii*3+2] * R[ii];
+    }
+
+    const double cu = u - mu;
+    const double cv = v - mv;
+    const double cw = w - mw;
+
+    const double temp = cu * n_out.x() + cv * n_out.y() + cw * n_out.z();
+
+    if(temp < 0.0) factor = temp * rho0 * beta;
+    else factor = 0.0;
+
+    for(int A=0; A<snLocBas_v; ++A)
+    {
+      sur_Residual0[3*A+0] -= surface_area * quad -> get_qw(qua) * R[A] * factor * u;
+      sur_Residual0[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * factor * v;
+      sur_Residual0[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * factor * w;
+    }
+  }
+}
+
+void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
+    const double &dt,
+    const double * const &dot_disp,
+    const double * const &disp,
+    const double * const &velo,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
+{
+  double curPt_x[3], curPt_y[3], curPt_z[3];
+
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas_v, curPt_x, curPt_y, curPt_z);
+
+  element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
+
+  const int face_nqp = quad -> get_num_quadPts();
+
+  double surface_area, factor;
+
+  const double dd_dv = alpha_f * gamma * dt;
+
+  Zero_sur_Tangent_Residual();
+
+  for(int qua = 0; qua < face_nqp; ++qua)
+  {
+    const std::vector<double> R = element->get_R(qua);
+
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+
+    double u = 0.0, v = 0.0, w = 0.0, mu = 0.0, mv = 0.0, mw = 0.0;
+    for(int ii=0; ii<snLocBas_v; ++ii)
+    {
+      mu += dot_disp[ii*3+0] * R[ii];
+      mv += dot_disp[ii*3+1] * R[ii];
+      mw += dot_disp[ii*3+2] * R[ii];
+
+      u += velo[ii*3+0] * R[ii];
+      v += velo[ii*3+1] * R[ii];
+      w += velo[ii*3+2] * R[ii];
+    }
+
+    const double cu = u - mu;
+    const double cv = v - mv;
+    const double cw = w - mw;
+
+    const double temp = cu * n_out.x() + cv * n_out.y() + cw * n_out.z();
+
+    if(temp < 0.0) factor = temp * rho0 * beta;
+    else factor = 0.0;
+
+    const double gwts = surface_area * quad -> get_qw(qua);
+
+    // snLocBas = 3 for linear tet/tri element
+    for(int A=0; A<snLocBas_v; ++A)
+    {
+      sur_Residual0[3*A+0] -= gwts * R[A] * factor * u;
+      sur_Residual0[3*A+1] -= gwts * R[A] * factor * v;
+      sur_Residual0[3*A+2] -= gwts * R[A] * factor * w;
+
+      for(int B=0; B<snLocBas_v; ++B)
+      {
+        sur_Tangent00[ 3*snLocBas_v*(3*A+0) + 3*B+0 ] -= gwts * dd_dv * R[A] * factor * R[B];
+        sur_Tangent00[ 3*snLocBas_v*(3*A+1) + 3*B+1 ] -= gwts * dd_dv * R[A] * factor * R[B];
+        sur_Tangent00[ 3*snLocBas_v*(3*A+2) + 3*B+2 ] -= gwts * dd_dv * R[A] * factor * R[B];
+      }
+    }
+  }
+}
 
 // EOF
