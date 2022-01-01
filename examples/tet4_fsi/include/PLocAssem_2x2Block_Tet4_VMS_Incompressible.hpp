@@ -23,9 +23,30 @@ class PLocAssem_2x2Block_Tet4_VMS_Incompressible : public IPLocAssem_2x2Block
 
     virtual ~PLocAssem_2x2Block_Tet4_VMS_Incompressible();
     
+    virtual int get_dof_mat_0() const {return 3;}
+
+    virtual int get_dof_mat_1() const {return 1;}
+
     virtual void Zero_Tangent_Residual();
 
     virtual void Zero_Residual(); 
+    
+    virtual void Assem_Estimate();
+
+    virtual void Assem_Residual(
+        const double &time, const double &dt,
+        const double * const &dot_disp,
+        const double * const &dot_velo,
+        const double * const &dot_pres,
+        const double * const &disp,
+        const double * const &velo,
+        const double * const &pres,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const double * const &qua_prestress,
+        const IQuadPts * const &quad );
 
   private:
     const double rho0, alpha_f, alpha_m, gamma;

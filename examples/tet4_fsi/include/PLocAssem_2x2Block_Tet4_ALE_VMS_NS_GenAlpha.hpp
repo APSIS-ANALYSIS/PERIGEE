@@ -59,6 +59,14 @@ class PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
       for(int ii=0; ii<sur_size_0; ++ii) sur_Residual0[ii] = 0.0;
     }
 
+    virtual void Assem_Estimate()
+    {
+      for(int ii=0; ii<vec_size_0 * vec_size_0; ++ii) Tangent00[ii] = 1.0;
+      for(int ii=0; ii<vec_size_0 * vec_size_1; ++ii) Tangent01[ii] = 1.0;
+      for(int ii=0; ii<vec_size_1 * vec_size_0; ++ii) Tangent10[ii] = 1.0;
+      for(int ii=0; ii<vec_size_1 * vec_size_1; ++ii) Tangent11[ii] = 1.0;
+    }
+
     virtual void Assem_Residual(
         const double &time, const double &dt,
         const double * const &dot_disp,
