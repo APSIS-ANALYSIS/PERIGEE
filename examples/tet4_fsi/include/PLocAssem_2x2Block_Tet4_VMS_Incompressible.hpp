@@ -74,6 +74,24 @@ class PLocAssem_2x2Block_Tet4_VMS_Incompressible : public IPLocAssem_2x2Block
         const double * const &qua_prestress,
         const IQuadPts * const &quad );
 
+    virtual void Assem_Residual_EBC(
+        const int &ebc_id,
+        const double &time, const double &dt,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad );
+
+    virtual void Assem_Residual_EBC(
+        const double &time,
+        const double * const &pres,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad );
+
   private:
     const double rho0, alpha_f, alpha_m, gamma;
 
