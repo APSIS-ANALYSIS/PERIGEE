@@ -761,7 +761,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC(
   
   const double curr = time + alpha_f * dt;
 
-  Zero_Residual();
+  Zero_sur_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
@@ -781,9 +781,9 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC(
 
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual0[3*A+0] -= surface_area * quad -> get_qw(qua) * R[A] * gx;
-      Residual0[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * gy;
-      Residual0[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * gz;
+      sur_Residual0[3*A+0] -= surface_area * quad -> get_qw(qua) * R[A] * gx;
+      sur_Residual0[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * gy;
+      sur_Residual0[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * gz;
     }
   }
 }
@@ -881,7 +881,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
 
   double surface_area;
 
-  Zero_Residual();
+  Zero_sur_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
@@ -891,9 +891,9 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
 
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual0[3*A+0] += surface_area * quad -> get_qw(qua) * R[A] * n_out.x() * val;
-      Residual0[3*A+1] += surface_area * quad -> get_qw(qua) * R[A] * n_out.y() * val;
-      Residual0[3*A+2] += surface_area * quad -> get_qw(qua) * R[A] * n_out.z() * val;
+      sur_Residual0[3*A+0] += surface_area * quad -> get_qw(qua) * R[A] * n_out.x() * val;
+      sur_Residual0[3*A+1] += surface_area * quad -> get_qw(qua) * R[A] * n_out.y() * val;
+      sur_Residual0[3*A+2] += surface_area * quad -> get_qw(qua) * R[A] * n_out.z() * val;
     }
   }
 }

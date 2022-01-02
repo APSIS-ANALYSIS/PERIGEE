@@ -717,7 +717,7 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Residual_EBC(
 
   const double curr = time + alpha_f * dt;
 
-  Zero_Residual();
+  Zero_sur_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
@@ -739,9 +739,9 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Residual_EBC(
 
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual0[3*A  ] -= surface_area * quad -> get_qw(qua) * R[A] * gg.x();
-      Residual0[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * gg.y();
-      Residual0[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * gg.z();
+      sur_Residual0[3*A  ] -= surface_area * quad -> get_qw(qua) * R[A] * gg.x();
+      sur_Residual0[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * gg.y();
+      sur_Residual0[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * gg.z();
     }
   }
 }
@@ -759,7 +759,7 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Residual_EBC(
 
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  Zero_Residual();
+  Zero_sur_Residual();
 
   for(int qua = 0; qua < quad -> get_num_quadPts(); ++qua)
   {
@@ -773,9 +773,9 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Residual_EBC(
 
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual0[3*A  ] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * factor * pp * n_out.x();
-      Residual0[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * factor * pp * n_out.y();
-      Residual0[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * factor * pp * n_out.z();
+      sur_Residual0[3*A  ] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * factor * pp * n_out.x();
+      sur_Residual0[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * factor * pp * n_out.y();
+      sur_Residual0[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * factor * pp * n_out.z();
     }
   }
 }
