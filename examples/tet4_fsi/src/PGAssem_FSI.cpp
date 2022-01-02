@@ -224,6 +224,58 @@ double PGAssem_FSI::Assem_surface_flowrate(
   return sum;
 }
 
+double PGAssem_FSI::Assem_surface_flowrate(
+    const PDNSolution * const &disp,
+    const PDNSolution * const &velo,
+    IPLocAssem_2x2Block * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const ALocal_Inflow_NodalBC * const &infbc_part,
+    const int &nbc_id )
+{
+  double * array_v = new double [nlgn_v * 3];
+  double * array_d = new double [nlgn_v * 3];
+  double * local_v = new double [snLocBas * 3];
+  double * local_d = new double [snLocBas * 3];
+
+  disp -> GetLocalArray( array_d );
+  velo -> GetLocalArray( array_v );
+
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
+
+  const int num_sele = infbc_part -> get_num_local_cell(nbc_id);
+
+  double esum = 0.0;
+
+  for(int ee=0; ee<num_sele; ++ee)
+  {
+    infbc_part -> get_SIEN( nbc_id, ee, LSIEN );
+
+    infbc_part -> get_ctrlPts_xyz( nbc_id, ee, sctrl_x, sctrl_y, sctrl_z );
+
+    GetLocal( array_d, LSIEN, snLocBas, 3, local_d );
+    GetLocal( array_v, LSIEN, snLocBas, 3, local_v );
+
+    esum += lassem_ptr -> get_flowrate( local_d, local_v, element_s, sctrl_x,
+        sctrl_y, sctrl_z, quad_s );
+  }
+
+  delete [] array_v; delete [] array_d; delete [] local_v; delete [] local_d;
+  array_v = nullptr; array_d = nullptr; local_v = nullptr; local_d = nullptr;
+
+  delete [] LSIEN; delete [] sctrl_x; delete [] sctrl_y; delete [] sctrl_z;
+  LSIEN = nullptr; sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
+
+  double sum = 0.0;
+
+  MPI_Allreduce(&esum, &sum, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+
+  return sum;
+}
+
 double PGAssem_FSI::Assem_surface_ave_pressure(
     const PDNSolution * const &disp,
     const PDNSolution * const &pres,
@@ -237,10 +289,10 @@ double PGAssem_FSI::Assem_surface_ave_pressure(
   double * array_p = new double [nlgn_v];
   double * local_d = new double [snLocBas * 3];
   double * local_p = new double [snLocBas];
-  
+
   disp -> GetLocalArray( array_d );
   pres -> GetLocalArray( array_p );
-  
+
   int * LSIEN = new int [snLocBas];
   double * sctrl_x = new double [snLocBas];
   double * sctrl_y = new double [snLocBas];
@@ -249,7 +301,7 @@ double PGAssem_FSI::Assem_surface_ave_pressure(
   const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
 
   double val_pres = 0.0, val_area = 0.0;
-  
+
   for(int ee=0; ee<num_sele; ++ee)
   {
     ebc_part -> get_SIEN( ebc_id, ee, LSIEN );
@@ -263,7 +315,7 @@ double PGAssem_FSI::Assem_surface_ave_pressure(
 
     lassem_ptr-> get_pressure_area( local_d, local_p, element_s, sctrl_x, sctrl_y,
         sctrl_z, quad_s, ele_pres, ele_area);
-    
+
     val_pres += ele_pres;
     val_area += ele_area; 
   }
@@ -282,7 +334,63 @@ double PGAssem_FSI::Assem_surface_ave_pressure(
   return sum_pres / sum_area;
 }
 
+double PGAssem_FSI::Assem_surface_ave_pressure(
+    const PDNSolution * const &disp,
+    const PDNSolution * const &pres,
+    IPLocAssem_2x2Block * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const ALocal_Inflow_NodalBC * const &infbc_part,
+    const int &nbc_id )
+{
+  double * array_d = new double [nlgn_v * 3];
+  double * array_p = new double [nlgn_v];
+  double * local_d = new double [snLocBas * 3];
+  double * local_p = new double [snLocBas];
 
+  disp -> GetLocalArray( array_d );
+  pres -> GetLocalArray( array_p );
+
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
+
+  const int num_sele = infbc_part -> get_num_local_cell(nbc_id);
+
+  double val_pres = 0.0, val_area = 0.0;
+
+  for(int ee=0; ee<num_sele; ++ee)
+  {
+    infbc_part -> get_SIEN( nbc_id, ee, LSIEN );
+
+    infbc_part -> get_ctrlPts_xyz( nbc_id, ee, sctrl_x, sctrl_y, sctrl_z );
+
+    GetLocal( array_d, LSIEN, snLocBas, 3, local_d );
+    GetLocal( array_p, LSIEN, snLocBas, 1, local_p );
+
+    double ele_pres, ele_area;
+
+    lassem_ptr-> get_pressure_area( local_d, local_p, element_s, sctrl_x, sctrl_y,
+        sctrl_z, quad_s, ele_pres, ele_area);
+
+    val_pres += ele_pres;
+    val_area += ele_area;
+  }
+
+  delete [] array_p; delete [] array_d; delete [] local_p; delete [] local_d;
+  array_p = nullptr; array_d = nullptr; local_p = nullptr; local_d = nullptr;
+
+  delete [] LSIEN; delete [] sctrl_x; delete [] sctrl_y; delete [] sctrl_z;
+  LSIEN = nullptr; sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
+
+  double sum_pres = 0.0, sum_area = 0.0;
+
+  MPI_Allreduce(&val_pres, &sum_pres, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+  MPI_Allreduce(&val_area, &sum_area, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+
+  return sum_pres / sum_area;
+}
 
 
 
