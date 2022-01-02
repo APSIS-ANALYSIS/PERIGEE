@@ -224,5 +224,88 @@ double PGAssem_FSI::Assem_surface_flowrate(
   return sum;
 }
 
+double PGAssem_FSI::Assem_surface_ave_pressure(
+    const PDNSolution * const &disp,
+    const PDNSolution * const &pres,
+    IPLocAssem_2x2Block * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const ALocal_EBC * const &ebc_part,
+    const int &ebc_id )
+{
+  double * array_d = new double [nlgn_v * 3];
+  double * array_p = new double [nlgn_v];
+  double * local_d = new double [snLocBas * 3];
+  double * local_p = new double [snLocBas];
+  
+  disp -> GetLocalArray( array_d );
+  pres -> GetLocalArray( array_p );
+  
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
+
+  const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+
+  double val_pres = 0.0, val_area = 0.0;
+  
+  for(int ee=0; ee<num_sele; ++ee)
+  {
+    ebc_part -> get_SIEN( ebc_id, ee, LSIEN );
+
+    ebc_part -> get_ctrlPts_xyz( ebc_id, ee, sctrl_x, sctrl_y, sctrl_z );
+
+    GetLocal( array_d, LSIEN, snLocBas, 3, local_d );
+    GetLocal( array_p, LSIEN, snLocBas, 1, local_p );
+
+    double ele_pres, ele_area;
+
+    lassem_ptr-> get_pressure_area( local_d, local_p, element_s, sctrl_x, sctrl_y,
+        sctrl_z, quad_s, ele_pres, ele_area);
+    
+    val_pres += ele_pres;
+    val_area += ele_area; 
+  }
+
+  delete [] array_p; delete [] array_d; delete [] local_p; delete [] local_d;
+  array_p = nullptr; array_d = nullptr; local_p = nullptr; local_d = nullptr;
+
+  delete [] LSIEN; delete [] sctrl_x; delete [] sctrl_y; delete [] sctrl_z;
+  LSIEN = nullptr; sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
+
+  double sum_pres = 0.0, sum_area = 0.0;
+
+  MPI_Allreduce(&val_pres, &sum_pres, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+  MPI_Allreduce(&val_area, &sum_area, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+
+  return sum_pres / sum_area;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // EOF
