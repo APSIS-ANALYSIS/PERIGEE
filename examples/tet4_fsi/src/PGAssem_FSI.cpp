@@ -428,11 +428,12 @@ void PGAssem_FSI::NatBC_G( const double &curr_time, const double &dt,
 
       for(int ii=0; ii<snLocBas; ++ii)
       {
-        for(int mm=0; mm<3; ++mm)
-          srow_index[3*ii+mm] = nbc_v -> get_LID(mm, LSIEN[ii]);
+        srow_index[3*ii+0] = nbc_v -> get_LID(0, LSIEN[ii]);
+        srow_index[3*ii+1] = nbc_v -> get_LID(1, LSIEN[ii]);
+        srow_index[3*ii+2] = nbc_v -> get_LID(2, LSIEN[ii]);
       }
 
-      VecSetValues(G, 3*snLocBas, srow_index, lassem_f_ptr->Residual0, ADD_VALUES); 
+      VecSetValues(G, 3*snLocBas, srow_index, lassem_f_ptr->sur_Residual0, ADD_VALUES); 
     }
   }
 
@@ -442,7 +443,71 @@ void PGAssem_FSI::NatBC_G( const double &curr_time, const double &dt,
   LSIEN = nullptr; sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
 }
 
+void PGAssem_FSI::NatBC_Resis_G( const double &curr_time, const double &dt,
+    const PDNSolution * const &disp,
+    const PDNSolution * const &dot_velo,
+    const PDNSolution * const &velo,
+    IPLocAssem_2x2Block * const &lassem_f_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const ALocal_NodalBC * const &nbc_v,
+    const ALocal_EBC * const &ebc_part,
+    const IGenBC * const &gbc )
+{
+  double * array_d = new double [nlgn_v * 3];
+  double * local_d = new double [snLocBas * 3];
 
+  disp -> GetLocalArray( array_d );
+
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
+
+  PetscInt * srow_index = new PetscInt [3*snLocBas];
+
+  for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
+  {
+    // Calculate dot flow rate for face with ebc_id
+    const double dot_flrate = Assem_surface_flowrate( disp, dot_velo, lassem_f_ptr,
+        element_s, quad_s, ebc_part, ebc_id );
+
+    // Calculate flow rate for face with ebc_id
+    const double flrate = Assem_surface_flowrate( disp, velo, lassem_f_ptr,
+        element_s, quad_s, ebc_part, ebc_id );
+
+    // Get the pressure value on the outlet surfaces
+    const double P_n   = gbc -> get_P0( ebc_id );
+    const double P_np1 = gbc -> get_P( ebc_id, dot_flrate, flrate, curr_time + dt );
+
+    // P_n+alpha_f
+    const double val = P_n + lassem_f_ptr->get_model_para_1() * (P_np1 - P_n);
+
+    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+    for(int ee=0; ee<num_sele; ++ee)
+    {
+      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
+      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+
+      lassem_f_ptr->Assem_Residual_EBC_Resistance( val, local_d,
+          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+
+      for(int ii=0; ii<snLocBas; ++ii)
+      {
+        srow_index[3*ii+0] = nbc_v -> get_LID(0, LSIEN[ii]);
+        srow_index[3*ii+1] = nbc_v -> get_LID(1, LSIEN[ii]);
+        srow_index[3*ii+2] = nbc_v -> get_LID(2, LSIEN[ii]);
+      }
+
+      VecSetValues(G, 3*snLocBas, srow_index, lassem_f_ptr->sur_Residual0, ADD_VALUES); 
+    }
+  }
+
+  delete [] srow_index; srow_index = nullptr;
+  delete [] LSIEN; delete [] sctrl_x; delete [] sctrl_y; delete [] sctrl_z;
+  LSIEN = nullptr; sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
+  delete [] array_d; delete [] local_d; array_d = nullptr; local_d = nullptr;
+}
 
 
 

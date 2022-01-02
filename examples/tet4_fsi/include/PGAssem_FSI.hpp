@@ -89,6 +89,19 @@ class PGAssem_FSI : public IPGAssem
         const ALocal_NodalBC * const &nbc_v,
         const ALocal_EBC * const &ebc_part );
 
+    // Resistance BC for fluid
+    void NatBC_Resis_G( const double &curr_time, const double &dt,
+        const PDNSolution * const &disp,
+        const PDNSolution * const &dot_velo,
+        const PDNSolution * const &velo,
+        IPLocAssem_2x2Block * const &lassem_f_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const ALocal_NodalBC * const &nbc_v,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc );
+
+
     void GetLocal( const double * const &array, const int * const &IEN,
         const int &in_locbas, const int &in_dof, double * const &local_array) const
     {
