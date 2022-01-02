@@ -77,12 +77,12 @@ class IPLocAssem_2x2Block
     // -------------------------------------------------------------- 
     // Return the first variable's dof.
     // -------------------------------------------------------------- 
-    virtual int get_dof_mat_0() const = 0;
+    virtual int get_dof_0() const = 0;
     
     // -------------------------------------------------------------- 
     // Return the second variable's dof.
     // -------------------------------------------------------------- 
-    virtual int get_dof_mat_1() const = 0;
+    virtual int get_dof_1() const = 0;
 
     // -------------------------------------------------------------- 
     // Return the number of ebc functions implemented inside this local

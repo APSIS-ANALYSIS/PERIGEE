@@ -23,9 +23,9 @@ class PLocAssem_2x2Block_Tet4_VMS_Incompressible : public IPLocAssem_2x2Block
 
     virtual ~PLocAssem_2x2Block_Tet4_VMS_Incompressible();
     
-    virtual int get_dof_mat_0() const {return 3;}
+    virtual int get_dof_0() const {return 3;}
 
-    virtual int get_dof_mat_1() const {return 1;}
+    virtual int get_dof_1() const {return 1;}
 
     virtual void Zero_Tangent_Residual();
 
@@ -108,7 +108,6 @@ class PLocAssem_2x2Block_Tet4_VMS_Incompressible : public IPLocAssem_2x2Block
     const double rho0, alpha_f, alpha_m, gamma;
 
     // memory layout
-    // dof_per_node = 7 to make it compatible with the problem setting
     // vec_size = 4 * nLocBas, which defines the local matrix/vector length
     const int nLocBas, vec_size_0, vec_size_1, nqp, snLocBas;
 
