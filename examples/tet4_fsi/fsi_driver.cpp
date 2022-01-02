@@ -273,6 +273,10 @@ int main(int argc, char *argv[])
   APart_Basic_Info * PartBasic = new APart_Basic_Info(part_v_file, rank);
 
   ALocal_Elem * locElem = new ALocal_Elem(part_v_file, rank);
+  
+  ALocal_IEN * locIEN_v = new ALocal_IEN(part_v_file, rank);
+  
+  ALocal_IEN * locIEN_p = new ALocal_IEN(part_p_file, rank);
 
   FEANode * fNode = new FEANode(part_v_file, rank);
 
@@ -516,7 +520,7 @@ int main(int argc, char *argv[])
   delete elements; delete elementv; delete quadv; delete quads; delete inflow_rate_ptr;
   delete GMIptr; delete PartBasic; delete locElem; delete fNode; delete pNode_v; delete pNode_p;
   delete locinfnbc; delete locnbc_v; delete locnbc_p; delete mesh_locnbc; delete locebc;
-  delete mesh_locebc;
+  delete mesh_locebc; delete locIEN_v; delete locIEN_p;
   PetscFinalize();
   return EXIT_SUCCESS;
 }
