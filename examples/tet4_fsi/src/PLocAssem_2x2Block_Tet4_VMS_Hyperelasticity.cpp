@@ -568,29 +568,261 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Tangent_Residual(
   } // Finish Loop-qua
 }
 
+void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Mass_Residual(
+    const double * const &disp,
+    const double * const &velo,
+    const double * const &pres,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const double * const &qua_prestress,
+    const IQuadPts * const &quad )
+{
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
+  const double curr = 0.0;
 
+  Zero_Tangent_Residual();
 
+  for(int qua=0; qua<nqp; ++qua)
+  {
+    double p = 0.0, vx = 0.0, vy = 0.0, vz = 0.0;
+    double ux_x = 0.0, uy_x = 0.0, uz_x = 0.0;
+    double ux_y = 0.0, uy_y = 0.0, uz_y = 0.0;
+    double ux_z = 0.0, uy_z = 0.0, uz_z = 0.0;
 
+    double vx_x = 0.0, vy_x = 0.0, vz_x = 0.0;
+    double vx_y = 0.0, vy_y = 0.0, vz_y = 0.0;
+    double vx_z = 0.0, vy_z = 0.0, vz_z = 0.0;
 
+    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
 
+    double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
+    element->get_R_gradR(qua, R, dR_dx, dR_dy, dR_dz);
 
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      p   += pres[ii] * R[ii];
 
+      vx   += velo[ii*3  ] * R[ii];
+      vy   += velo[ii*3+1] * R[ii];
+      vz   += velo[ii*3+2] * R[ii];
 
+      ux_x += disp[ii*3  ] * dR_dx[ii];
+      uy_x += disp[ii*3+1] * dR_dx[ii];
+      uz_x += disp[ii*3+2] * dR_dx[ii];
 
+      ux_y += disp[ii*3  ] * dR_dy[ii];
+      uy_y += disp[ii*3+1] * dR_dy[ii];
+      uz_y += disp[ii*3+2] * dR_dy[ii];
 
+      ux_z += disp[ii*3  ] * dR_dz[ii];
+      uy_z += disp[ii*3+1] * dR_dz[ii];
+      uz_z += disp[ii*3+2] * dR_dz[ii];
 
+      vx_x += velo[ii*3  ] * dR_dx[ii];
+      vy_x += velo[ii*3+1] * dR_dx[ii];
+      vz_x += velo[ii*3+2] * dR_dx[ii];
 
+      vx_y += velo[ii*3  ] * dR_dy[ii];
+      vy_y += velo[ii*3+1] * dR_dy[ii];
+      vz_y += velo[ii*3+2] * dR_dy[ii];
 
+      vx_z += velo[ii*3  ] * dR_dz[ii];
+      vy_z += velo[ii*3+1] * dR_dz[ii];
+      vz_z += velo[ii*3+2] * dR_dz[ii];
 
+      coor_x += eleCtrlPts_x[ii] * R[ii];
+      coor_y += eleCtrlPts_y[ii] * R[ii];
+      coor_z += eleCtrlPts_z[ii] * R[ii];
+    }
 
+    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
+    const Vector_3 f_body = get_f(coor_x, coor_y, coor_z, curr);
 
+    const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
+    const Matrix_3x3 invF = inverse( F );
 
+    const Matrix_3x3 DVelo( vx_x, vx_y, vx_z, vy_x, vy_y, vy_z, vz_x, vz_y, vz_z );
 
+    // invF_Ii DV_i,I = v_i,i = div v
+    const double invFDV_t = invF.MatTContraction(DVelo);
 
+    Matrix_3x3 P_iso, S_iso;
+    matmodel->get_PK(F, P_iso, S_iso);
+    
+    // ------------------------------------------------------------------------
+    // 1st PK stress corrected by prestress
+    const Matrix_3x3 prestress( qua_prestress[qua*6+0], qua_prestress[qua*6+5], qua_prestress[qua*6+4],
+        qua_prestress[qua*6+5], qua_prestress[qua*6+1], qua_prestress[qua*6+3],
+        qua_prestress[qua*6+4], qua_prestress[qua*6+3], qua_prestress[qua*6+2] );
 
+    P_iso += prestress * cofactor( F );
+    // ------------------------------------------------------------------------
 
+    double mbeta = matmodel->get_beta(p);
+
+    // use 1.0 in case of fully incompressible. 
+    if( mbeta < 1.0e-5 ) mbeta = 1.0;
+
+    const double rho = matmodel->get_rho(p);
+    const double detF = F.det();
+
+    for(int A=0; A<nLocBas; ++A)
+    {
+      const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
+
+      const Vector_3 gradNA = invF.VecMultT( Vector_3(NA_x, NA_y, NA_z) );
+
+      Residual1[A] += gwts * NA * detF * invFDV_t;
+
+      Residual0[3*A] += gwts * ( NA_x * P_iso(0) + NA_y * P_iso(1) 
+          + NA_z * P_iso(2) - gradNA.x() * detF * p 
+          - NA * rho * detF * f_body.x() );
+
+      Residual0[3*A+1] += gwts * ( NA_x * P_iso(3) + NA_y * P_iso(4) 
+          + NA_z * P_iso(5) - gradNA.y() * detF * p 
+          - NA * rho * detF * f_body.y() );
+
+      Residual0[3*A+2] += gwts * ( NA_x * P_iso(6) + NA_y * P_iso(7) 
+          + NA_z * P_iso(8) - gradNA.z() * detF * p 
+          - NA * rho * detF * f_body.z() );
+
+      for(int B=0; B<nLocBas; ++B)
+      {
+        Tangent11[nLocBas*A + B]   += gwts * NA * detF * mbeta * R[B];
+        Tangent00[3*nLocBas*(3*A+0) + 3*B+0] += gwts * NA * detF * rho * R[B];
+        Tangent00[3*nLocBas*(3*A+1) + 3*B+1] += gwts * NA * detF * rho * R[B];
+        Tangent00[3*nLocBas*(3*A+2) + 3*B+2] += gwts * NA * detF * rho * R[B];
+      } // Finish loop-B
+    } // Finish loop-A
+  } // Finish loop-qua
+}
+
+void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Residual_EBC(
+    const int &ebc_id,
+    const double &time, const double &dt,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
+{
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  const int face_nqp = quad -> get_num_quadPts();
+
+  const double curr = time + alpha_f * dt;
+
+  Zero_Residual();
+
+  for(int qua = 0; qua < face_nqp; ++qua)
+  {
+    const std::vector<double> R = element->get_R(qua);
+
+    double surface_area;
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+
+    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      coor_x += eleCtrlPts_x[ii] * R[ii];
+      coor_y += eleCtrlPts_y[ii] * R[ii];
+      coor_z += eleCtrlPts_z[ii] * R[ii];
+    }
+
+    const Vector_3 gg = get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr,
+        n_out.x(), n_out.y(), n_out.z() );
+
+    for(int A=0; A<snLocBas; ++A)
+    {
+      Residual0[3*A  ] -= surface_area * quad -> get_qw(qua) * R[A] * gg.x();
+      Residual0[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * gg.y();
+      Residual0[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * gg.z();
+    }
+  }
+}
+
+void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Residual_EBC(
+    const double &time,
+    const double * const &pres,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
+{
+  const double factor = 1.0; //time >= 1.0 ? 1.0 : time;
+
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  Zero_Residual();
+
+  for(int qua = 0; qua < quad -> get_num_quadPts(); ++qua)
+  {
+    const std::vector<double> R = element->get_R(qua);
+
+    double surface_area;
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+
+    double pp = 0.0;
+    for(int ii=0; ii<snLocBas; ++ii) pp += pres[ii] * R[ii];
+
+    for(int A=0; A<snLocBas; ++A)
+    {
+      Residual0[3*A  ] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * factor * pp * n_out.x();
+      Residual0[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * factor * pp * n_out.y();
+      Residual0[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * factor * pp * n_out.z();
+    }
+  }
+}
+
+std::vector<Matrix_3x3> PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::get_Wall_CauchyStress(
+    const double * const &disp,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad ) const
+{
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  std::vector<Matrix_3x3> stress( nqp );
+
+  for( int qua = 0; qua < nqp; ++qua )
+  {
+    double dR_dx[4], dR_dy[4], dR_dz[4];
+
+    element->get_gradR( qua, dR_dx, dR_dy, dR_dz );
+
+    double ux_x = 0.0, uy_x = 0.0, uz_x = 0.0;
+    double ux_y = 0.0, uy_y = 0.0, uz_y = 0.0;
+    double ux_z = 0.0, uy_z = 0.0, uz_z = 0.0;
+
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      ux_x += disp[ii*3+0] * dR_dx[ii];
+      uy_x += disp[ii*3+1] * dR_dx[ii];
+      uz_x += disp[ii*3+2] * dR_dx[ii];
+
+      ux_y += disp[ii*3+0] * dR_dy[ii];
+      uy_y += disp[ii*3+1] * dR_dy[ii];
+      uz_y += disp[ii*3+2] * dR_dy[ii];
+
+      ux_z += disp[ii*3+0] * dR_dz[ii];
+      uy_z += disp[ii*3+1] * dR_dz[ii];
+      uz_z += disp[ii*3+2] * dR_dz[ii];
+    }
+
+    const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
+
+    stress[qua] = matmodel -> get_Cauchy_stress( F );
+  }
+
+  return stress;
+}
 
 // EOF

@@ -62,7 +62,48 @@ class PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity : public IPLocAssem_2x2Block
         const double * const &eleCtrlPts_z,
         const double * const &qua_prestress,
         const IQuadPts * const &quad );
-  
+ 
+    virtual void Assem_Mass_Residual(
+        const double * const &disp,
+        const double * const &velo,
+        const double * const &pres,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const double * const &qua_prestress,
+        const IQuadPts * const &quad );
+
+    virtual void Assem_Residual_EBC(
+        const int &ebc_id,
+        const double &time, const double &dt,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad );
+
+    virtual void Assem_Residual_EBC(
+        const double &time,
+        const double * const &pres,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad );
+
+    // ------------------------------------------------------------------------
+    // This function will calculate the Cauchy stress at every quadrature points
+    // within this element. The output stress has length quad -> get_num_quadPts()
+    // ------------------------------------------------------------------------
+    virtual std::vector<Matrix_3x3> get_Wall_CauchyStress(
+        const double * const &disp,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad ) const;
+
   private:
     const double rho0, alpha_f, alpha_m, gamma;
 
