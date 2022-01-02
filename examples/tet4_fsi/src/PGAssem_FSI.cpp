@@ -392,7 +392,55 @@ double PGAssem_FSI::Assem_surface_ave_pressure(
   return sum_pres / sum_area;
 }
 
+void PGAssem_FSI::NatBC_G( const double &curr_time, const double &dt,
+    const PDNSolution * const &disp,
+    IPLocAssem_2x2Block * const &lassem_f_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const ALocal_NodalBC * const &nbc_v,
+    const ALocal_EBC * const &ebc_part )
+{
+  double * array_d = new double [nlgn_v * 3];
+  double * local_d = new double [snLocBas * 3];
 
+  disp -> GetLocalArray( array_d );
+
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
+
+  PetscInt * srow_index = new PetscInt [3*snLocBas];
+
+  for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
+  {
+    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+    
+    for(int ee=0; ee<num_sele; ++ee)
+    {
+      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
+      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+      
+      GetLocal( array_d, LSIEN, snLocBas, 3, local_d );
+      
+      lassem_f_ptr -> Assem_Residual_EBC( ebc_id, curr_time, dt, local_d, element_s,
+          sctrl_x, sctrl_y, sctrl_z, quad_s );
+
+      for(int ii=0; ii<snLocBas; ++ii)
+      {
+        for(int mm=0; mm<3; ++mm)
+          srow_index[3*ii+mm] = nbc_v -> get_LID(mm, LSIEN[ii]);
+      }
+
+      VecSetValues(G, 3*snLocBas, srow_index, lassem_f_ptr->Residual0, ADD_VALUES); 
+    }
+  }
+
+  delete [] srow_index; srow_index = nullptr;
+  delete [] array_d; delete [] local_d; array_d = nullptr; local_d = nullptr;
+  delete [] LSIEN; delete [] sctrl_x; delete [] sctrl_y; delete [] sctrl_z;
+  LSIEN = nullptr; sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
+}
 
 
 

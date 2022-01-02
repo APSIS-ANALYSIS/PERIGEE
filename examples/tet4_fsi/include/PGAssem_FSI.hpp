@@ -80,6 +80,14 @@ class PGAssem_FSI : public IPGAssem
     void EssBC_KG( const ALocal_NodalBC * const &nbc_v, const ALocal_NodalBC * const &nbc_p );
 
     void EssBC_G( const ALocal_NodalBC * const &nbc_v, const ALocal_NodalBC * const &nbc_p );
+    
+    void NatBC_G( const double &curr_time, const double &dt,
+        const PDNSolution * const &disp,
+        IPLocAssem_2x2Block * const &lassem_f_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const ALocal_NodalBC * const &nbc_v,
+        const ALocal_EBC * const &ebc_part );
 
     void GetLocal( const double * const &array, const int * const &IEN,
         const int &in_locbas, const int &in_dof, double * const &local_array) const
