@@ -53,8 +53,18 @@ PGAssem_FSI::PGAssem_FSI(
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();
   
-  //Assem_nonzero_estimate( alelem_ptr, locassem_ptr, aien_ptr, pnode_ptr, part_nbc );
+  Assem_nonzero_estimate( alelem_ptr, locassem_f_ptr, locassem_s_ptr, elements, quads,
+     aien_v, aien_p, pnode_v, part_nbc_v, part_nbc_p, part_ebc, gbc );
 
+  // Obtain the precise dnz and onz count
+  std::vector<int> Kdnz, Konz;
+  PETSc_T::Get_dnz_onz(K, Kdnz, Konz);
+
+  MatDestroy(&K); // Destroy the K with rough preallocation
+
+  // Create Mat with precise preallocation
+  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
+      PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &K);
 }
 
 
@@ -65,8 +75,78 @@ PGAssem_FSI::~PGAssem_FSI()
 }
 
 
+void PGAssem_FSI::Assem_nonzero_estimate(
+    const ALocal_Elem * const &alelem_ptr,
+    IPLocAssem_2x2Block * const &lassem_f_ptr,
+    IPLocAssem_2x2Block * const &lassem_s_ptr,
+    FEAElement * const &elements,
+    const IQuadPts * const &quad_s,
+    const ALocal_IEN * const &lien_v,
+    const ALocal_IEN * const &lien_p,
+    const APart_Node * const &pnode_v,
+    const ALocal_NodalBC * const &nbc_v,
+    const ALocal_NodalBC * const &nbc_p,
+    const ALocal_EBC * const &ebc_part,
+    const IGenBC * const &gbc )
+{
+  const int nElem = alelem_ptr->get_nlocalele();
+
+  lassem_f_ptr->Assem_Estimate();
+  lassem_s_ptr->Assem_Estimate();
+
+  PetscInt * row_id_v = new PetscInt [3*nLocBas];
+  PetscInt * row_id_p = new PetscInt [nLocBas];
+  
+  for(int ee=0; ee<nElem; ++ee)
+  {
+    for(int ii=0; ii<nLocBas; ++ii)
+      for(int mm=0; mm<3; ++mm)
+        row_id_v[3*ii+mm] = nbc_v -> get_LID( mm, lien_v -> get_LIEN(ee, ii) );
+  
+    for(int ii=0; ii<nLocBas; ++ii)
+      row_id_p[ii] = nbc_p -> get_LID( 0, lien_p -> get_LIEN(ee,ii) );
+  
+    if( alelem_ptr->get_elem_tag(ee) == 0 )
+    {
+      MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_f_ptr->Tangent00, ADD_VALUES);
+
+      MatSetValues(K, 3*nLocBas, row_id_v,   nLocBas, row_id_p, lassem_f_ptr->Tangent01, ADD_VALUES);
+
+      MatSetValues(K,   nLocBas, row_id_p, 3*nLocBas, row_id_v, lassem_f_ptr->Tangent10, ADD_VALUES);
+
+      MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, lassem_f_ptr->Tangent11, ADD_VALUES);
+    }
+    else
+    {
+      MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_s_ptr->Tangent00, ADD_VALUES);
+
+      MatSetValues(K, 3*nLocBas, row_id_v,   nLocBas, row_id_p, lassem_s_ptr->Tangent01, ADD_VALUES);
+
+      MatSetValues(K,   nLocBas, row_id_p, 3*nLocBas, row_id_v, lassem_s_ptr->Tangent10, ADD_VALUES);
+
+      MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, lassem_s_ptr->Tangent11, ADD_VALUES);
+    }
+  }
+
+  delete [] row_id_v; row_id_v = nullptr; delete [] row_id_p; row_id_p = nullptr;
+
+  // Resis BC for K and G
+  PDNSolution * temp = new PDNSolution_V( pnode_v, 0, false, "aux" );
+
+  NatBC_Resis_KG( 0.1, 0.1, temp, temp, temp, lassem_f_ptr, elements, quad_s,nbc_v, ebc_part, gbc );
+
+  delete temp; temp = nullptr;
+  
+  VecAssemblyBegin(G); VecAssemblyEnd(G);
+
+  EssBC_KG( nbc_v, nbc_p );
+
+  MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY); MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
+  VecAssemblyBegin(G); VecAssemblyEnd(G);
+}
+
 void PGAssem_FSI::EssBC_KG( const ALocal_NodalBC * const &nbc_v,
-  const ALocal_NodalBC * const &nbc_p )
+    const ALocal_NodalBC * const &nbc_p )
 {
   // For three velocity fields
   for(int field=0; field<3; ++field)
@@ -81,7 +161,7 @@ void PGAssem_FSI::EssBC_KG( const ALocal_NodalBC * const &nbc_v,
         MatSetValue(K, row, row, 1.0, ADD_VALUES);
       }
     }
-    
+
     const int local_sla = nbc_v -> get_Num_LPS(field);
     if( local_sla > 0 )
     {
@@ -95,7 +175,7 @@ void PGAssem_FSI::EssBC_KG( const ALocal_NodalBC * const &nbc_v,
       }
     }
   }
-  
+
   // For pressure field
   const int local_dir = nbc_p -> get_Num_LD(0);
   if(local_dir > 0)
@@ -107,7 +187,7 @@ void PGAssem_FSI::EssBC_KG( const ALocal_NodalBC * const &nbc_v,
       MatSetValue(K, row, row, 1.0, ADD_VALUES);
     }
   } 
-  
+
   const int local_sla = nbc_p -> get_Num_LPS(0);
   if(local_sla > 0)
   {
@@ -415,14 +495,14 @@ void PGAssem_FSI::NatBC_G( const double &curr_time, const double &dt,
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
     const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
-    
+
     for(int ee=0; ee<num_sele; ++ee)
     {
       ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
       ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
-      
+
       GetLocal( array_d, LSIEN, snLocBas, 3, local_d );
-      
+
       lassem_f_ptr -> Assem_Residual_EBC( ebc_id, curr_time, dt, local_d, element_s,
           sctrl_x, sctrl_y, sctrl_z, quad_s );
 
@@ -490,7 +570,7 @@ void PGAssem_FSI::NatBC_Resis_G( const double &curr_time, const double &dt,
       ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
       GetLocal( array_d, LSIEN, snLocBas, 3, local_d );
-      
+
       lassem_f_ptr->Assem_Residual_EBC_Resistance( val, local_d,
           element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
 
@@ -533,7 +613,7 @@ void PGAssem_FSI::NatBC_Resis_KG( const double &curr_time, const double &dt,
   const double a_gamma = lassem_f_ptr->get_model_para_2();
 
   const double dd_dv = dt * a_f * a_gamma;
-  
+
   double * array_d = new double [nlgn_v * 3];
   double * local_d = new double [snLocBas * 3];
 
@@ -563,13 +643,13 @@ void PGAssem_FSI::NatBC_Resis_KG( const double &curr_time, const double &dt,
 
     // P_n+alpha_f
     const double resis_val = P_n + a_f * (P_np1 - P_n);
-    
+
     // Get m := dP/dQ
     const double m_val = gbc -> get_m( ebc_id, dot_flrate, flrate );
 
     // Get n := dP/d(dot_Q)
     const double n_val = gbc -> get_n( ebc_id, dot_flrate, flrate );
-    
+
     // Define alpha_f x n + alpha_f x gamma x dt x m
     const double coef = a_f * n_val + dd_dv * m_val;
 
@@ -597,10 +677,10 @@ void PGAssem_FSI::NatBC_Resis_KG( const double &curr_time, const double &dt,
       ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
       GetLocal( array_d, LSIEN, snLocBas, 3, local_d );
-      
+
       lassem_f_ptr->Assem_Residual_EBC_Resistance( 1.0, local_d,
           element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
-      
+
       for(int ii=0; ii<snLocBas; ++ii)
       {
         Res[3*ii  ] = resis_val * lassem_f_ptr->sur_Residual0[3*ii];
@@ -667,12 +747,12 @@ void PGAssem_FSI::BackFlow_G(
 
   double * array_dot_d = new double [nlgn_v * 3];
   double * local_dot_d = new double [snLocBas * 3];
-  
+
   dot_disp -> GetLocalArray( array_dot_d );
-  
+
   double * array_v = new double [nlgn_v * 3];
   double * local_v = new double [snLocBas * 3];
-  
+
   velo -> GetLocalArray( array_v );
 
   int * LSIEN = new int [snLocBas];
@@ -681,7 +761,7 @@ void PGAssem_FSI::BackFlow_G(
   double * sctrl_z = new double [snLocBas];
 
   PetscInt * srow_index = new PetscInt [3*snLocBas];
-  
+
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
     const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
@@ -698,7 +778,7 @@ void PGAssem_FSI::BackFlow_G(
 
       lassem_f_ptr->Assem_Residual_BackFlowStab( local_dot_d, local_d, local_v,
           element_s, sctrl_x, sctrl_y, sctrl_z, quad_s );
-      
+
       for(int ii=0; ii<snLocBas; ++ii)
       {
         srow_index[3*ii+0] = nbc_v -> get_LID(0, LSIEN[ii]);
@@ -709,7 +789,7 @@ void PGAssem_FSI::BackFlow_G(
       VecSetValues(G, 3*snLocBas, srow_index, lassem_f_ptr->sur_Residual0, ADD_VALUES); 
     }
   }
-  
+
   delete [] srow_index; srow_index = nullptr;
   delete [] LSIEN; delete [] sctrl_x; delete [] sctrl_y; delete [] sctrl_z;
   LSIEN = nullptr; sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
@@ -766,7 +846,7 @@ void PGAssem_FSI::BackFlow_KG( const double &dt,
 
       lassem_f_ptr->Assem_Tangent_Residual_BackFlowStab( dt, local_dot_d, local_d, 
           local_v, element_s, sctrl_x, sctrl_y, sctrl_z, quad_s );
-      
+
       for(int ii=0; ii<snLocBas; ++ii)
       {
         srow_index[3*ii+0] = nbc_v -> get_LID(0, LSIEN[ii]);

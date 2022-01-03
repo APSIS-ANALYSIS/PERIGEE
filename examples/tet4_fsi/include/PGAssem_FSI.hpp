@@ -10,7 +10,7 @@
 // Date: Jan 2 2022
 // ============================================================================
 #include "IPGAssem.hpp"
-#include "IPLocAssem_2x2Block.hpp"
+#include "PDNSolution_V.hpp"
 
 class PGAssem_FSI : public IPGAssem
 {
@@ -35,6 +35,19 @@ class PGAssem_FSI : public IPGAssem
 
     virtual ~PGAssem_FSI();
 
+    virtual void Assem_nonzero_estimate(
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem_2x2Block * const &lassem_f_ptr,
+        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_v,
+        const ALocal_IEN * const &lien_p,
+        const APart_Node * const &pnode_v,
+        const ALocal_NodalBC * const &nbc_v,
+        const ALocal_NodalBC * const &nbc_p,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc );
 
     // Assembly routine for the surface integrals for flow rates
     // and averaged pressure
@@ -46,7 +59,7 @@ class PGAssem_FSI : public IPGAssem
         const IQuadPts * const &quad_s,
         const ALocal_EBC * const &ebc_part,
         const int &ebc_id );
-    
+
     virtual double Assem_surface_ave_pressure(
         const PDNSolution * const &disp,
         const PDNSolution * const &pres,
@@ -73,14 +86,14 @@ class PGAssem_FSI : public IPGAssem
         const IQuadPts * const &quad_s,
         const ALocal_Inflow_NodalBC * const &infbc_part,
         const int &nbc_id );
-  
+
   private:
     const int nLocBas, snLocBas, num_ebc, nlgn_v, nlgn_p;
 
     void EssBC_KG( const ALocal_NodalBC * const &nbc_v, const ALocal_NodalBC * const &nbc_p );
 
     void EssBC_G( const ALocal_NodalBC * const &nbc_v, const ALocal_NodalBC * const &nbc_p );
-    
+
     void NatBC_G( const double &curr_time, const double &dt,
         const PDNSolution * const &disp,
         IPLocAssem_2x2Block * const &lassem_f_ptr,
