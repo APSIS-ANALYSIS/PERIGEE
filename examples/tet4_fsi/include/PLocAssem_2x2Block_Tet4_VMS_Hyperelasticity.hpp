@@ -19,13 +19,21 @@ class PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity : public IPLocAssem_2x2Block
     PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity(
         IMaterialModel * const &in_matmodel,
         const TimeMethod_GenAlpha * const &tm_gAlpha,
-        const int &in_nqp );
+        const int &in_nlocbas, const int &in_snlocbas );
 
     virtual ~PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity();
 
     virtual int get_dof_0() const {return 3;}
 
     virtual int get_dof_1() const {return 1;}
+
+    virtual int get_nLocBas_0() const {return nLocBas;}
+
+    virtual int get_nLocBas_1() const {return nLocBas;}
+
+    virtual int get_snLocBas_0() const {return snLocBas;}
+
+    virtual int get_snLocBas_1() const {return snLocBas;}
 
     virtual void Zero_Tangent_Residual();
 
@@ -107,10 +115,10 @@ class PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity : public IPLocAssem_2x2Block
   private:
     const double rho0, alpha_f, alpha_m, gamma;
 
-    const int nLocBas, vec_size_0, vec_size_1, nqp, snLocBas;
+    const int nLocBas, snLocBas, vec_size_0, vec_size_1;
     
     // useful tensors for the material model
-    IMaterialModel * matmodel;
+    const IMaterialModel * const matmodel;
 
     void print_info() const;
 

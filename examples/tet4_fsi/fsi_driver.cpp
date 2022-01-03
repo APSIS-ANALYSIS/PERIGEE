@@ -25,6 +25,7 @@
 #include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
 #include "PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha.hpp"
 #include "PLocAssem_2x2Block_Tet4_VMS_Incompressible.hpp"
+#include "PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity.hpp"
 #include "PLocAssem_Tet4_FSI_Mesh_Elastostatic.hpp"
 #include "PLocAssem_Tet4_FSI_Mesh_Laplacian.hpp"
 
@@ -397,8 +398,8 @@ int main(int argc, char *argv[])
   {
     matmodel = new MaterialModel_NeoHookean_M94_Mixed( solid_density, solid_E, solid_nu );
 
-    //locAssem_solid_ptr = new PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha(
-    //    matmodel, tm_galpha_ptr, quadv->get_num_quadPts() );
+    locAssem_solid_ptr = new PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity(
+        matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
   }
 
   matmodel -> write_hdf5(); // record model parameter on disk

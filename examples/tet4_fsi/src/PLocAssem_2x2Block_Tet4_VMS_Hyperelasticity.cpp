@@ -3,12 +3,13 @@
 PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity(
     IMaterialModel * const &in_matmodel,
     const TimeMethod_GenAlpha * const &tm_gAlpha,
-    const int &in_nqp )
+    const int &in_nlocbas, const int &in_snlocbas )
 : rho0( in_matmodel->get_elastic_rho0() ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()),
-  nLocBas(4), vec_size_0( nLocBas * 3 ), vec_size_1( nLocBas ),
-  nqp(in_nqp), snLocBas(3), matmodel( in_matmodel )
+  nLocBas( in_nlocbas ), snLocBas( in_snlocbas ), 
+  vec_size_0( nLocBas * 3 ), vec_size_1( nLocBas ),
+  matmodel( in_matmodel )
 {
   Tangent00 = new PetscScalar[vec_size_0 * vec_size_0];
   Tangent01 = new PetscScalar[vec_size_0 * vec_size_1];
@@ -109,6 +110,8 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Residual(
   const double curr = time + alpha_f * dt;
 
   Zero_Residual();
+
+  const int nqp = quad -> get_num_quadPts();
 
   for(int qua=0; qua < nqp; ++qua)
   {
@@ -274,6 +277,8 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Tangent_Residual(
   const double ddvm = dd_dv * dd_dv / alpha_m;
 
   Zero_Tangent_Residual();
+
+  const int nqp = quad -> get_num_quadPts();
 
   for(int qua=0; qua < nqp; ++qua)
   {
@@ -585,6 +590,8 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Mass_Residual(
 
   Zero_Tangent_Residual();
 
+  const int nqp = quad -> get_num_quadPts();
+
   for(int qua=0; qua<nqp; ++qua)
   {
     double p = 0.0, vx = 0.0, vy = 0.0, vz = 0.0;
@@ -789,6 +796,8 @@ std::vector<Matrix_3x3> PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::get_Wall_Ca
     const IQuadPts * const &quad ) const
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  const int nqp = quad -> get_num_quadPts();
 
   std::vector<Matrix_3x3> stress( nqp );
 
