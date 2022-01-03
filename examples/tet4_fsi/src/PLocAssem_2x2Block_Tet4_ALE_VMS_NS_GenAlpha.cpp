@@ -2,11 +2,12 @@
 
 PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha(
     const TimeMethod_GenAlpha * const &tm_gAlpha,
+    const int &in_nlocbas, const int &in_snlocbas,
     const double &in_rho, const double &in_vis_mu, const double &in_beta )
 : rho0( in_rho ), vis_mu( in_vis_mu ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()), beta(in_beta), CI(36.0), CT(4.0),
-  nLocBas(4), snLocBas(3),
+  nLocBas(in_nlocbas), snLocBas(in_snlocbas),
   vec_size_0( nLocBas * 3 ), vec_size_1( nLocBas ), 
   sur_size_0( snLocBas * 3 ), sur_size_1( snLocBas )
 {

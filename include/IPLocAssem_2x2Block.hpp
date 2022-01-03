@@ -84,6 +84,20 @@ class IPLocAssem_2x2Block
     // -------------------------------------------------------------- 
     virtual int get_dof_1() const = 0;
 
+    // --------------------------------------------------------------
+    // Return the number of local basis associated with field 0
+    // --------------------------------------------------------------
+    virtual int get_nLocBas_0() const = 0;
+
+    virtual int get_snLocBas_0() const = 0;
+
+    // --------------------------------------------------------------
+    // Return the number of local basis associated with field 1
+    // --------------------------------------------------------------
+    virtual int get_nLocBas_1() const = 0;
+
+    virtual int get_snLocBas_1() const = 0;
+
     // -------------------------------------------------------------- 
     // Return the number of ebc functions implemented inside this local
     // assembly routine.

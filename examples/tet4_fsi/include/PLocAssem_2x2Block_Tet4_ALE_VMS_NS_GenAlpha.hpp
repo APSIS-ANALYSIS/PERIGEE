@@ -17,6 +17,7 @@ class PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
   public:
     PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha(
         const TimeMethod_GenAlpha * const &tm_gAlpha,
+        const int &in_nlocbas, const int &in_snlocbas,
         const double &in_rho, const double &in_vis_mu,
         const double &in_beta );
 
@@ -25,6 +26,14 @@ class PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
     virtual int get_dof_0() const {return 3;}
 
     virtual int get_dof_1() const {return 1;}
+
+    virtual int get_nLocBas_0() const {return nLocBas;}
+    
+    virtual int get_nLocBas_1() const {return nLocBas;}
+    
+    virtual int get_snLocBas_0() const {return snLocBas;}
+    
+    virtual int get_snLocBas_1() const {return snLocBas;}
 
     virtual double get_model_para_1() const {return alpha_f;}
 

@@ -24,8 +24,7 @@
 #include "MaterialModel_NeoHookean_M94_Mixed.hpp"
 #include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
 #include "PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha.hpp"
-#include "PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha.hpp"
-#include "PLocAssem_Tet4_VMS_Seg_Incompressible.hpp"
+#include "PLocAssem_2x2Block_Tet4_VMS_Incompressible.hpp"
 #include "PLocAssem_Tet4_FSI_Mesh_Elastostatic.hpp"
 #include "PLocAssem_Tet4_FSI_Mesh_Laplacian.hpp"
 
@@ -381,24 +380,25 @@ int main(int argc, char *argv[])
 
   // ===== Local assembly =====
   IPLocAssem_2x2Block * locAssem_fluid_ptr = new PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha(
-      tm_galpha_ptr, fluid_density, fluid_mu, bs_beta );
+      tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas(), 
+      fluid_density, fluid_mu, bs_beta );
 
   IMaterialModel * matmodel = nullptr;
-  IPLocAssem * locAssem_solid_ptr = nullptr;
+  IPLocAssem_2x2Block * locAssem_solid_ptr = nullptr;
 
   if( solid_nu == 0.5 )
   {
     matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( solid_density, solid_E );
 
-    locAssem_solid_ptr = new PLocAssem_Tet4_VMS_Seg_Incompressible(
-        matmodel, tm_galpha_ptr, quadv->get_num_quadPts() );
+    locAssem_solid_ptr = new PLocAssem_2x2Block_Tet4_VMS_Incompressible(
+        matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
   }
   else
   {
     matmodel = new MaterialModel_NeoHookean_M94_Mixed( solid_density, solid_E, solid_nu );
 
-    locAssem_solid_ptr = new PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha(
-        matmodel, tm_galpha_ptr, quadv->get_num_quadPts() );
+    //locAssem_solid_ptr = new PLocAssem_Tet4_VMS_Seg_Hyperelastic_3D_FEM_GenAlpha(
+    //    matmodel, tm_galpha_ptr, quadv->get_num_quadPts() );
   }
 
   matmodel -> write_hdf5(); // record model parameter on disk
