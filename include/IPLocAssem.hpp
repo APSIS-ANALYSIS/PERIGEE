@@ -57,9 +57,17 @@ class IPLocAssem
     // --------------------------------------------------------------
     // Return the number of local basis
     // --------------------------------------------------------------
-    virtual int get_nLocBas() const = 0;
+    virtual int get_nLocBas() const
+    {
+      SYS_T::commPrint("Warning: IPLocAssem::get_nLocBas is not implemented. \n");
+      return -1;
+    }
 
-    virtual int get_snLocBas() const = 0;
+    virtual int get_snLocBas() const
+    {
+      SYS_T::commPrint("Warning: IPLocAssem::get_snLocBas is not implemented. \n");
+      return -1;
+    }
 
     // -------------------------------------------------------------- 
     // ! Get the number of ebc functions implemented inside this 
