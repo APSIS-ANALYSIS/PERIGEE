@@ -385,6 +385,147 @@ void PGAssem_FSI::Assem_Residual(
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 }
 
+void PGAssem_FSI::Assem_Tangent_Residual(
+    const double &curr_time, const double &dt,
+    const PDNSolution * const &dot_disp,
+    const PDNSolution * const &dot_velo,
+    const PDNSolution * const &dot_pres,
+    const PDNSolution * const &disp,
+    const PDNSolution * const &velo,
+    const PDNSolution * const &pres,
+    const PDNSolution * const &dot_velo_np1,
+    const PDNSolution * const &velo_np1,
+    const PDNSolution * const &disp_np1,
+    const ALocal_Elem * const &alelem_ptr,
+    IPLocAssem_2x2Block * const &lassem_f_ptr,
+    IPLocAssem_2x2Block * const &lassem_s_ptr,
+    FEAElement * const &elementv,
+    FEAElement * const &elements,
+    const IQuadPts * const &quad_v,
+    const IQuadPts * const &quad_s,
+    const ALocal_IEN * const &lien_v,
+    const ALocal_IEN * const &lien_p,
+    const FEANode * const &fnode_ptr,
+    const ALocal_NodalBC * const &nbc_v,
+    const ALocal_NodalBC * const &nbc_p,
+    const ALocal_EBC * const &ebc_part,
+    const IGenBC * const &gbc,
+    const Prestress_solid * const &ps_ptr )
+{
+  const int nElem = alelem_ptr->get_nlocalele();
+
+  const std::vector<double> array_dot_d = dot_disp -> GetLocalArray();
+  const std::vector<double> array_dot_v = dot_velo -> GetLocalArray();
+  const std::vector<double> array_dot_p = dot_pres -> GetLocalArray();
+
+  const std::vector<double> array_d = disp -> GetLocalArray();
+  const std::vector<double> array_v = velo -> GetLocalArray();
+  const std::vector<double> array_p = pres -> GetLocalArray();
+
+  const std::vector<double> array_dot_v_np1 = dot_velo_np1 -> GetLocalArray();
+  const std::vector<double> array_v_np1 = velo_np1 -> GetLocalArray();
+  const std::vector<double> array_u_np1 = disp_np1 -> GetLocalArray();
+
+  std::vector<double> local_dot_d(nLocBas * 3), local_dot_v(nLocBas * 3), local_dot_p(nLocBas);
+  std::vector<double> local_d(nLocBas * 3), local_v(nLocBas * 3), local_p(nLocBas);
+  std::vector<double> local_dot_v_np1(nLocBas * 3), local_v_np1(nLocBas * 3), local_u_np1(nLocBas * 3);
+
+  int * IEN_v = new int [nLocBas];
+  int * IEN_p = new int [nLocBas];
+
+  double * ectrl_x = new double [nLocBas];
+  double * ectrl_y = new double [nLocBas];
+  double * ectrl_z = new double [nLocBas];
+
+  PetscInt * row_id_v = new PetscInt [3*nLocBas];
+  PetscInt * row_id_p = new PetscInt [nLocBas];
+
+  for(int ee=0; ee<nElem; ++ee)
+  {
+    lien_v -> get_LIEN( ee, IEN_v );
+    lien_p -> get_LIEN( ee, IEN_p );
+
+    fnode_ptr -> get_ctrlPts_xyz(nLocBas, IEN_v, ectrl_x, ectrl_y, ectrl_z);
+
+    GetLocal(&array_dot_d[0], IEN_v, nLocBas, 3, &local_dot_d[0]);
+    GetLocal(&array_dot_v[0], IEN_v, nLocBas, 3, &local_dot_v[0]);
+    GetLocal(&array_dot_p[0], IEN_p, nLocBas, 1, &local_dot_p[0]);
+
+    GetLocal(&array_d[0], IEN_v, nLocBas, 3, &local_d[0]);
+    GetLocal(&array_v[0], IEN_v, nLocBas, 3, &local_v[0]);
+    GetLocal(&array_p[0], IEN_p, nLocBas, 1, &local_p[0]);
+
+    GetLocal(&array_dot_v_np1[0], IEN_v, nLocBas, 3, &local_dot_v_np1[0]);
+    GetLocal(&array_v_np1[0],     IEN_v, nLocBas, 3, &local_v_np1[0]);
+    GetLocal(&array_u_np1[0],     IEN_v, nLocBas, 3, &local_u_np1[0]);
+
+    for(int ii=0; ii<nLocBas; ++ii)
+      for(int mm=0; mm<3; ++mm)
+        row_id_v[3*ii+mm] = nbc_v -> get_LID(mm, IEN_v[ii]);
+
+    for(int ii=0; ii<nLocBas; ++ii)
+      row_id_p[ii] = nbc_p -> get_LID( IEN_p[ii] );
+
+    if( alelem_ptr->get_elem_tag(ee) == 0 )
+    {
+      lassem_f_ptr -> Assem_Tangent_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], &local_dot_p[0],
+          &local_d[0], &local_v[0], &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, quad_v );
+
+      MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_f_ptr->Tangent00, ADD_VALUES);
+
+      MatSetValues(K, 3*nLocBas, row_id_v,   nLocBas, row_id_p, lassem_f_ptr->Tangent01, ADD_VALUES);
+
+      MatSetValues(K,   nLocBas, row_id_p, 3*nLocBas, row_id_v, lassem_f_ptr->Tangent10, ADD_VALUES);
+
+      MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, lassem_f_ptr->Tangent11, ADD_VALUES);
+      
+      VecSetValues(G, 3*nLocBas, row_id_v, lassem_f_ptr->Residual0, ADD_VALUES);
+      VecSetValues(G,   nLocBas, row_id_p, lassem_f_ptr->Residual1, ADD_VALUES);
+    }
+    else
+    {
+      // For solid element, quaprestress will return a vector of length nqp x 6
+      // for the prestress values at the quadrature points
+      const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
+
+      lassem_s_ptr -> Assem_Tangent_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], &local_dot_p[0],
+           &local_d[0], &local_v[0], &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v );
+
+      MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_s_ptr->Tangent00, ADD_VALUES);
+
+      MatSetValues(K, 3*nLocBas, row_id_v,   nLocBas, row_id_p, lassem_s_ptr->Tangent01, ADD_VALUES);
+
+      MatSetValues(K,   nLocBas, row_id_p, 3*nLocBas, row_id_v, lassem_s_ptr->Tangent10, ADD_VALUES);
+
+      MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, lassem_s_ptr->Tangent11, ADD_VALUES);
+
+      VecSetValues(G, 3*nLocBas, row_id_v, lassem_s_ptr->Residual0, ADD_VALUES);
+      VecSetValues(G,   nLocBas, row_id_p, lassem_s_ptr->Residual1, ADD_VALUES);
+    }
+  }
+  
+  delete [] IEN_v; IEN_v = nullptr; delete [] IEN_p; IEN_p = nullptr;
+  delete [] ectrl_x; delete [] ectrl_y; delete [] ectrl_z;
+  ectrl_x = nullptr; ectrl_y = nullptr; ectrl_z = nullptr;
+  delete [] row_id_v; delete [] row_id_p;
+  row_id_v = nullptr; row_id_p = nullptr;
+
+  // Backflow stabilization
+  BackFlow_KG( dt, dot_disp, disp, velo, lassem_f_ptr, elements, quad_s, nbc_v, ebc_part );
+
+  // Resistance BC for G
+  NatBC_Resis_KG( curr_time, dt, disp, dot_velo, velo, lassem_f_ptr, elements, quad_s,
+      nbc_v, ebc_part, gbc );
+
+  VecAssemblyBegin(G); VecAssemblyEnd(G);
+
+  EssBC_KG( nbc_v, nbc_p );
+
+  MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
+  MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
+  VecAssemblyBegin(G); VecAssemblyEnd(G);
+}
+
 void PGAssem_FSI::EssBC_KG( const ALocal_NodalBC * const &nbc_v,
     const ALocal_NodalBC * const &nbc_p )
 {
