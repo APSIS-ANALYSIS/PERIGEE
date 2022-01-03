@@ -28,15 +28,14 @@
 #include "PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity.hpp"
 #include "PLocAssem_Tet4_FSI_Mesh_Elastostatic.hpp"
 #include "PLocAssem_Tet4_FSI_Mesh_Laplacian.hpp"
+#include "PGAssem_FSI.hpp"
+#include "PGAssem_Mesh.hpp"
 
 #include "PDNTimeStep.hpp"
 #include "TimeMethod_GenAlpha.hpp"
 #include "Matrix_PETSc.hpp"
 #include "PETSc_Tools.hpp"
-#include "FEANode.hpp"
 #include "APart_Node_FSI.hpp"
-#include "ALocal_Inflow_NodalBC.hpp"
-#include "ALocal_NodalBC.hpp"
 #include "PDNSolution_V.hpp"
 #include "PDNSolution_P.hpp"
 
@@ -485,6 +484,32 @@ int main(int argc, char *argv[])
   SYS_T::print_fatal_if(gbc->get_num_ebc() != locebc->get_num_ebc(),
       "Error: GenBC number of faces does not match with that in ALocal_EBC.\n");
 
+  // ===== Global assembly routine =====
+  SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
+  IPGAssem * gloAssem_ptr = new PGAssem_FSI( locAssem_fluid_ptr,
+      locAssem_solid_ptr, elements, quads, locElem, locIEN_v, locIEN_p,
+      pNode_v, pNode_p, locnbc_v, locnbc_p, locebc, gbc, nz_estimate );
+
+  SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
+  gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_fluid_ptr,
+      locAssem_solid_ptr, elements, quads, locIEN_v, locIEN_p, pNode_v, 
+      locnbc_v, locnbc_p, locebc, gbc );
+
+  SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
+  gloAssem_ptr->Fix_nonzero_err_str();
+  gloAssem_ptr->Clear_KG();
+
+  // ===== Global assembly for mesh motion =====
+  SYS_T::commPrint("===> Initializing Mat K_mesh and Vec G_mesh ... \n");
+  IPGAssem * gloAssem_mesh_ptr = new PGAssem_Mesh( locAssem_mesh_ptr,
+      locElem, locIEN_v, pNode_v, mesh_locnbc, mesh_locebc, nz_estimate );
+
+  SYS_T::commPrint("===> Assembly nonzero estimate for K_mesh ... \n");
+  gloAssem_mesh_ptr->Assem_nonzero_estimate( locElem, locAssem_mesh_ptr, locIEN_v, mesh_locnbc );
+
+  SYS_T::commPrint("===> Matrix K_mesh nonzero structure fixed. \n");
+  gloAssem_mesh_ptr->Fix_nonzero_err_str();
+  gloAssem_mesh_ptr->Clear_KG();
 
 
 
@@ -509,9 +534,7 @@ int main(int argc, char *argv[])
 
 
 
-
-
-
+  delete gloAssem_ptr; delete gloAssem_mesh_ptr;
   delete timeinfo; delete gbc;
   delete pres; delete dot_pres;
   delete base; delete dot_velo; delete dot_disp; delete velo; delete disp;

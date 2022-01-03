@@ -115,6 +115,12 @@ class IPGAssem
         const ALocal_NodalBC * const &nbc_part )
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
 
+    virtual void Assem_nonzero_estimate( 
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        const ALocal_IEN * const &lien_ptr,
+        const ALocal_NodalBC * const &nbc_part )
+    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
 
     virtual void Assem_nonzero_estimate( 
         const ALocal_Elem * const &alelem_ptr,
@@ -195,6 +201,21 @@ class IPGAssem
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
 
+    virtual void Assem_nonzero_estimate(
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem_2x2Block * const &lassem_f_ptr,
+        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_v,
+        const ALocal_IEN * const &lien_p,
+        const APart_Node * const &pnode_v,
+        const ALocal_NodalBC * const &nbc_v,
+        const ALocal_NodalBC * const &nbc_p,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc )
+    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
+
     // ------------------------------------------------------------------------
     // ! Assem_mass_residual : assembly mass matrix and corresponding residual 
     //                         vector for 3D problems WITHOUT pre-existing 
@@ -252,6 +273,25 @@ class IPGAssem
         const Prestress_solid * const &ps_ptr )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
+    virtual void Assem_mass_residual(
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
+        const PDNSolution * const &pres,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem_2x2Block * const &lassem_f_ptr,
+        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_v,
+        const ALocal_IEN * const &lien_p,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NodalBC * const &nbc_v,
+        const ALocal_NodalBC * const &nbc_p,
+        const ALocal_EBC * const &ebc_part,
+        const Prestress_solid * const &ps_ptr )
+    {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
     // ------------------------------------------------------------------------
     // ! Assem_residual : assembly residual vector for 3D problem WITHOUT
@@ -433,6 +473,33 @@ class IPGAssem
         const Prestress_solid * const &ps_ptr )
     {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
+    virtual void Assem_Residual(
+        const double &curr_time, const double &dt,
+        const PDNSolution * const &dot_disp,
+        const PDNSolution * const &dot_velo,
+        const PDNSolution * const &dot_pres,
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
+        const PDNSolution * const &pres,
+        const PDNSolution * const &dot_velo_np1,
+        const PDNSolution * const &velo_np1,
+        const PDNSolution * const &disp_np1,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem_2x2Block * const &lassem_f_ptr,
+        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_v,
+        const ALocal_IEN * const &lien_p,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NodalBC * const &nbc_v,
+        const ALocal_NodalBC * const &nbc_p,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc,
+        const Prestress_solid * const &ps_ptr )
+    {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
     // ------------------------------------------------------------------------
     // ! Assem_tangent_residual : assembly tangent matrix and residual vector 
@@ -632,6 +699,33 @@ class IPGAssem
         const Prestress_solid * const &ps_ptr )
     {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
+    virtual void Assem_Tangent_Residual(
+        const double &curr_time, const double &dt,
+        const PDNSolution * const &dot_disp,
+        const PDNSolution * const &dot_velo,
+        const PDNSolution * const &dot_pres,
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
+        const PDNSolution * const &pres,
+        const PDNSolution * const &dot_velo_np1,
+        const PDNSolution * const &velo_np1,
+        const PDNSolution * const &disp_np1,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem_2x2Block * const &lassem_f_ptr,
+        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_v,
+        const ALocal_IEN * const &lien_p,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NodalBC * const &nbc_v,
+        const ALocal_NodalBC * const &nbc_p,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc,
+        const Prestress_solid * const &ps_ptr )
+    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
     // --------------------------------------------------------------
     // Assembly boundary integrals
@@ -667,6 +761,33 @@ class IPGAssem
       return 0.0;
     }
 
+    virtual double Assem_surface_flowrate(
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
+        IPLocAssem_2x2Block * const &lassem_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const ALocal_EBC * const &ebc_part,
+        const int &ebc_id )
+    {
+      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
+      return 0.0;
+    }
+
+    virtual double Assem_surface_flowrate(
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
+        IPLocAssem_2x2Block * const &lassem_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const ALocal_Inflow_NodalBC * const &infbc_part,
+        const int &nbc_id )
+    {
+      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
+      return 0.0;
+    }
+
+
     // Assem_surface_ave_pressure
     // Performs surface integral to calculated the pressure integrated
     // over the surface as well as the surface area. Return the
@@ -685,7 +806,7 @@ class IPGAssem
       SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
       return 0.0;
     }
-    
+
     virtual double Assem_surface_ave_pressure(
         const PDNSolution * const &vec,
         IPLocAssem * const &lassem_ptr,
@@ -697,6 +818,33 @@ class IPGAssem
       SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
       return 0.0;
     }
+
+    virtual double Assem_surface_ave_pressure(
+        const PDNSolution * const &disp,
+        const PDNSolution * const &pres,
+        IPLocAssem_2x2Block * const &lassem_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const ALocal_EBC * const &ebc_part,
+        const int &ebc_id )
+    {
+      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
+      return 0.0;
+    }
+
+    virtual double Assem_surface_ave_pressure(
+        const PDNSolution * const &disp,
+        const PDNSolution * const &pres,
+        IPLocAssem_2x2Block * const &lassem_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const ALocal_Inflow_NodalBC * const &infbc_part,
+        const int &nbc_id )
+    {
+      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
+      return 0.0;
+    }
+
 
     // Update wall prestress at all surface quadrature points
     virtual void Update_Wall_Prestress(

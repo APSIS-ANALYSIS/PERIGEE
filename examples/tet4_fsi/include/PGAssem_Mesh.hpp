@@ -15,7 +15,6 @@ class PGAssem_Mesh : public IPGAssem
 {
   public:
     PGAssem_Mesh( IPLocAssem * const &locassem_ptr,
-        IAGlobal_Mesh_Info const * const &agmi_ptr,
         ALocal_Elem const * const &alelem_ptr,
         ALocal_IEN const * const &aien_ptr,
         APart_Node const * const &pnode_ptr,
@@ -29,7 +28,6 @@ class PGAssem_Mesh : public IPGAssem
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
         const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
         const ALocal_NodalBC * const &nbc_part );
 
     virtual void Assem_mass_residual(

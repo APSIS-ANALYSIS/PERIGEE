@@ -1,16 +1,13 @@
 #include "PGAssem_Mesh.hpp"
 
 PGAssem_Mesh::PGAssem_Mesh( IPLocAssem * const &locassem_ptr,
-    IAGlobal_Mesh_Info const * const &agmi_ptr,
     ALocal_Elem const * const &alelem_ptr,
     ALocal_IEN const * const &aien_ptr,
     APart_Node const * const &pnode_ptr,
     ALocal_NodalBC const * const &part_nbc,
     ALocal_EBC const * const &part_ebc,
     const int &in_nz_estimate )
-: nLocBas( agmi_ptr->get_nLocBas() ),
-  snLocBas( part_ebc -> get_cell_nLocBas(0) ),
-  dof( pnode_ptr -> get_dof() ),
+: nLocBas( 4 ), snLocBas( 3 ), dof(3),
   num_ebc( part_ebc->get_num_ebc() ),
   nlgn( pnode_ptr->get_nlocghonode() )
 {
@@ -35,7 +32,7 @@ PGAssem_Mesh::PGAssem_Mesh( IPLocAssem * const &locassem_ptr,
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();
 
-  Assem_nonzero_estimate( alelem_ptr, locassem_ptr, aien_ptr, pnode_ptr, part_nbc );
+  Assem_nonzero_estimate( alelem_ptr, locassem_ptr, aien_ptr, part_nbc );
   
   // Obtain the precise dnz and onz count
   std::vector<int> Kdnz, Konz;
@@ -58,7 +55,6 @@ void PGAssem_Mesh::Assem_nonzero_estimate(
     const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
     const ALocal_IEN * const &lien_ptr,
-    const APart_Node * const &node_ptr,
     const ALocal_NodalBC * const &nbc_part )
 {
   const int nElem = alelem_ptr -> get_nlocalele();
