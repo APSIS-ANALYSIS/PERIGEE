@@ -5,8 +5,6 @@ PGAssem_FSI::PGAssem_FSI(
     IPLocAssem_2x2Block * const &locassem_s_ptr,
     FEAElement * const &elements,
     const IQuadPts * const &quads,
-    const IAGlobal_Mesh_Info * const &agmi_v,
-    const IAGlobal_Mesh_Info * const &agmi_p,
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &aien_v,
     const ALocal_IEN * const &aien_p,
@@ -17,12 +15,17 @@ PGAssem_FSI::PGAssem_FSI(
     const ALocal_EBC * const &part_ebc,
     const IGenBC * const &gbc,
     const int &in_nz_estimate )
-: nLocBas( agmi_v -> get_nLocBas() ),
-  snLocBas(3),
+: nLocBas(4), snLocBas(3),
   num_ebc( part_ebc->get_num_ebc() ),
   nlgn_v( pnode_v -> get_nlocghonode() ),
   nlgn_p( pnode_p -> get_nlocghonode() )
 {
+  SYS_T::print_fatal_if( nLocBas != locassem_f_ptr->get_nLocBas_0(),
+      "Error: PGAssem_FSI::nLocBas does not match that in local assembly of fluid.\n");
+
+  SYS_T::print_fatal_if( nLocBas != locassem_s_ptr->get_nLocBas_0(),
+      "Error: PGAssem_FSI::nLocBas does not match that in local assembly of solid.\n");
+
   // Make sure the data structure is compatible
   for(int ebc_id=0; ebc_id < num_ebc; ++ebc_id)
   {

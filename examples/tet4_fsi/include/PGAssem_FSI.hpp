@@ -21,8 +21,6 @@ class PGAssem_FSI : public IPGAssem
         IPLocAssem_2x2Block * const &locassem_s_ptr,
         FEAElement * const &elements,
         const IQuadPts * const &quads,
-        const IAGlobal_Mesh_Info * const &agmi_v,
-        const IAGlobal_Mesh_Info * const &agmi_p,
         const ALocal_Elem * const &alelem_ptr,
         const ALocal_IEN * const &aien_v,
         const ALocal_IEN * const &aien_p,
