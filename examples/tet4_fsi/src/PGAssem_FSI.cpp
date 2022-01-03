@@ -104,7 +104,7 @@ void PGAssem_FSI::Assem_nonzero_estimate(
         row_id_v[3*ii+mm] = nbc_v -> get_LID( mm, lien_v -> get_LIEN(ee, ii) );
   
     for(int ii=0; ii<nLocBas; ++ii)
-      row_id_p[ii] = nbc_p -> get_LID( 0, lien_p -> get_LIEN(ee,ii) );
+      row_id_p[ii] = nbc_p -> get_LID( lien_p -> get_LIEN(ee,ii) );
   
     if( alelem_ptr->get_elem_tag(ee) == 0 )
     {
@@ -139,6 +139,114 @@ void PGAssem_FSI::Assem_nonzero_estimate(
   
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 
+  EssBC_KG( nbc_v, nbc_p );
+
+  MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY); MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
+  VecAssemblyBegin(G); VecAssemblyEnd(G);
+}
+
+void PGAssem_FSI::Assem_mass_residual(
+    const PDNSolution * const &disp,
+    const PDNSolution * const &velo,
+    const PDNSolution * const &pres,
+    const ALocal_Elem * const &alelem_ptr,
+    IPLocAssem_2x2Block * const &lassem_f_ptr,
+    IPLocAssem_2x2Block * const &lassem_s_ptr,
+    FEAElement * const &elementv,
+    FEAElement * const &elements,
+    const IQuadPts * const &quad_v,
+    const IQuadPts * const &quad_s,
+    const ALocal_IEN * const &lien_v,
+    const ALocal_IEN * const &lien_p,
+    const FEANode * const &fnode_ptr,
+    const ALocal_NodalBC * const &nbc_v,
+    const ALocal_NodalBC * const &nbc_p,
+    const ALocal_EBC * const &ebc_part,
+    const Prestress_solid * const &ps_ptr )
+{
+  const int nElem = alelem_ptr->get_nlocalele();
+  
+  double * array_d = new double [nlgn_v * 3];
+  double * array_v = new double [nlgn_v * 3];
+  double * array_p = new double [nlgn_p];
+  
+  double * local_d = new double [nLocBas * 3];
+  double * local_v = new double [nLocBas * 3];
+  double * local_p = new double [nLocBas];
+  
+  int * IEN_v = new int [nLocBas];
+  int * IEN_p = new int [nLocBas];
+
+  double * ectrl_x = new double [nLocBas];
+  double * ectrl_y = new double [nLocBas];
+  double * ectrl_z = new double [nLocBas];
+
+  PetscInt * row_id_v = new PetscInt [3*nLocBas];
+  PetscInt * row_id_p = new PetscInt [nLocBas];
+
+  for(int ee=0; ee<nElem; ++ee)
+  {
+    lien_v -> get_LIEN( ee, IEN_v );
+    lien_p -> get_LIEN( ee, IEN_p );
+
+    fnode_ptr -> get_ctrlPts_xyz(nLocBas, IEN_v, ectrl_x, ectrl_y, ectrl_z);
+
+    for(int ii=0; ii<nLocBas; ++ii)
+      for(int mm=0; mm<3; ++mm)
+        row_id_v[3*ii+mm] = nbc_v -> get_LID(mm, IEN_v[ii]);
+
+    for(int ii=0; ii<nLocBas; ++ii) 
+      row_id_p[ii] = nbc_p -> get_LID( IEN_p[ii] );
+   
+    GetLocal(array_d, IEN_v, nLocBas, 3, local_d);
+    GetLocal(array_v, IEN_v, nLocBas, 3, local_v);
+    GetLocal(array_p, IEN_p, nLocBas, 1, local_p);
+
+    if( alelem_ptr->get_elem_tag(ee) == 0 )
+    {
+      lassem_f_ptr->Assem_Mass_Residual(local_d, local_v, local_p, elementv, 
+          ectrl_x, ectrl_y, ectrl_z, quad_v);
+      
+      MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_f_ptr->Tangent00, ADD_VALUES);
+
+      MatSetValues(K, 3*nLocBas, row_id_v,   nLocBas, row_id_p, lassem_f_ptr->Tangent01, ADD_VALUES);
+
+      MatSetValues(K,   nLocBas, row_id_p, 3*nLocBas, row_id_v, lassem_f_ptr->Tangent10, ADD_VALUES);
+
+      MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, lassem_f_ptr->Tangent11, ADD_VALUES);
+    }
+    else
+    {
+      // For solid element, quaprestress will return a vector of length nqp x 6
+      // for the prestress values at the quadrature points
+      const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
+
+      lassem_s_ptr->Assem_Mass_Residual(local_d, local_v, local_p, elementv, 
+          ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v);
+      
+      MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_s_ptr->Tangent00, ADD_VALUES);
+
+      MatSetValues(K, 3*nLocBas, row_id_v,   nLocBas, row_id_p, lassem_s_ptr->Tangent01, ADD_VALUES);
+
+      MatSetValues(K,   nLocBas, row_id_p, 3*nLocBas, row_id_v, lassem_s_ptr->Tangent10, ADD_VALUES);
+
+      MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, lassem_s_ptr->Tangent11, ADD_VALUES);
+    } 
+
+  }
+
+  delete [] array_d; delete [] array_v; delete [] array_p;
+  array_d = nullptr; array_v = nullptr; array_p = nullptr; 
+  delete [] local_d; delete [] local_v; delete [] local_p;
+  local_d = nullptr; local_v = nullptr; local_p = nullptr;
+  delete [] IEN_v; IEN_v = nullptr; delete [] IEN_p; IEN_p = nullptr;
+  delete [] ectrl_x; delete [] ectrl_y; delete [] ectrl_z;
+  ectrl_x = nullptr; ectrl_y = nullptr; ectrl_z = nullptr;
+  delete [] row_id_v; delete [] row_id_p;
+  row_id_v = nullptr; row_id_p = nullptr;
+
+  VecAssemblyBegin(G); VecAssemblyEnd(G);
+  
   EssBC_KG( nbc_v, nbc_p );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY); MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);

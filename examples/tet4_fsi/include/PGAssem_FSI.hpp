@@ -10,6 +10,7 @@
 // Date: Jan 2 2022
 // ============================================================================
 #include "IPGAssem.hpp"
+#include "PETSc_Tools.hpp"
 #include "PDNSolution_V.hpp"
 
 class PGAssem_FSI : public IPGAssem
@@ -48,6 +49,25 @@ class PGAssem_FSI : public IPGAssem
         const ALocal_NodalBC * const &nbc_p,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
+
+    virtual void Assem_mass_residual(
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
+        const PDNSolution * const &pres,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem_2x2Block * const &lassem_f_ptr,
+        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_v,
+        const ALocal_IEN * const &lien_p,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NodalBC * const &nbc_v,
+        const ALocal_NodalBC * const &nbc_p,
+        const ALocal_EBC * const &ebc_part,
+        const Prestress_solid * const &ps_ptr );
 
     // Assembly routine for the surface integrals for flow rates
     // and averaged pressure
