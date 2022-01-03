@@ -17,7 +17,6 @@ class PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
   public:
     PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha(
         const TimeMethod_GenAlpha * const &tm_gAlpha,
-        const int &in_nqp,
         const double &in_rho, const double &in_vis_mu,
         const double &in_beta );
 
@@ -176,7 +175,7 @@ class PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
     const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta, CI, CT;
 
     const int nLocBas, snLocBas;
-    const int vec_size_0, vec_size_1, sur_size_0, sur_size_1, nqp;
+    const int vec_size_0, vec_size_1, sur_size_0, sur_size_1;
 
     void print_info() const;
 

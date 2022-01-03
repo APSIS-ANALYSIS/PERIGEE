@@ -1,14 +1,14 @@
 #include "PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha.hpp"
 
 PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha(
-    const TimeMethod_GenAlpha * const &tm_gAlpha, const int &in_nqp, 
+    const TimeMethod_GenAlpha * const &tm_gAlpha,
     const double &in_rho, const double &in_vis_mu, const double &in_beta )
 : rho0( in_rho ), vis_mu( in_vis_mu ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()), beta(in_beta), CI(36.0), CT(4.0),
   nLocBas(4), snLocBas(3),
   vec_size_0( nLocBas * 3 ), vec_size_1( nLocBas ), 
-  sur_size_0( snLocBas * 3 ), sur_size_1( snLocBas ), nqp( in_nqp )
+  sur_size_0( snLocBas * 3 ), sur_size_1( snLocBas )
 {
   Tangent00 = new PetscScalar[vec_size_0 * vec_size_0];
   Tangent01 = new PetscScalar[vec_size_0 * vec_size_1];
@@ -27,7 +27,6 @@ PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::PLocAssem_2x2Block_Tet4_ALE_VMS_NS_
   // print info of this assembly routine
   print_info();
 }
-
 
 PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::~PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha()
 {
@@ -122,7 +121,6 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::get_tau(
   tau_c_qua = 1.0 / denom_c;
 }
 
-
 double PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::get_DC(
     const double * const &dxi_dx,
     const double &u, const double &v, const double &w ) const
@@ -166,6 +164,8 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual(
   const double curr = time + alpha_f * dt;
 
   Zero_Residual();
+
+  const int nqp = quad -> get_num_quadPts();
 
   for(int qua=0; qua<nqp; ++qua)
   {
@@ -328,6 +328,8 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
   const double dd_dv = alpha_f * gamma * dt;
 
   Zero_Tangent_Residual();
+
+  const int nqp = quad -> get_num_quadPts();
 
   for(int qua=0; qua<nqp; ++qua)
   {
@@ -664,6 +666,8 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Mass_Residual(
   const double curr = 0.0;
 
   Zero_Tangent_Residual();
+
+  const int nqp = quad -> get_num_quadPts();
 
   for(int qua=0; qua<nqp; ++qua)
   {
