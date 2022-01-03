@@ -535,6 +535,16 @@ int main(int argc, char *argv[])
         locAssem_solid_ptr, elementv, elements, quadv, quads, locIEN_v, locIEN_p, 
         fNode, locnbc_v, locnbc_p, locebc, ps_data );
 
+    Vec proj_vp, proj_v, proj_p;
+    VecDuplicate( gloAssem_ptr->G, &proj_vp );
+    lsolver_acce -> Solve( gloAssem_ptr->K, gloAssem_ptr->G, proj_vp );
+
+    VecGetSubVector(proj_vp, is_velo, &proj_v);
+    VecGetSubVector(proj_vp, is_pres, &proj_p);
+
+    VecRestoreSubVector(proj_vp, is_velo, &proj_v);
+    VecRestoreSubVector(proj_vp, is_pres, &proj_p);
+    VecDestroy(&proj_vp);
     delete lsolver_acce;
   }
 
