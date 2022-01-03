@@ -26,6 +26,12 @@ PGAssem_FSI::PGAssem_FSI(
   SYS_T::print_fatal_if( nLocBas != locassem_s_ptr->get_nLocBas_0(),
       "Error: PGAssem_FSI::nLocBas does not match that in local assembly of solid.\n");
 
+  SYS_T::print_fatal_if( snLocBas != locassem_f_ptr->get_snLocBas_0(),
+      "Error: PGAssem_FSI::nLocBas does not match that in local assembly of fluid.\n");
+
+  SYS_T::print_fatal_if( snLocBas != locassem_s_ptr->get_snLocBas_0(),
+      "Error: PGAssem_FSI::nLocBas does not match that in local assembly of solid.\n");
+
   // Make sure the data structure is compatible
   for(int ebc_id=0; ebc_id < num_ebc; ++ebc_id)
   {
@@ -70,13 +76,11 @@ PGAssem_FSI::PGAssem_FSI(
       PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &K);
 }
 
-
 PGAssem_FSI::~PGAssem_FSI()
 {
   VecDestroy(&G);
   MatDestroy(&K);
 }
-
 
 void PGAssem_FSI::Assem_nonzero_estimate(
     const ALocal_Elem * const &alelem_ptr,

@@ -37,6 +37,10 @@ class PLocAssem_Tet4_FSI_Mesh_Elastostatic : public IPLocAssem
 
     virtual int get_num_ebc_fun() const {return 0;}
 
+    virtual int get_nLocBas() const {return nLocBas;}
+
+    virtual int get_snLocBas() const {return 3;}
+
     virtual void Zero_Tangent_Residual();
 
     virtual void Zero_Residual();

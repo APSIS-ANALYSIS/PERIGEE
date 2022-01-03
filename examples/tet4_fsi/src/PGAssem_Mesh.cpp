@@ -7,7 +7,9 @@ PGAssem_Mesh::PGAssem_Mesh( IPLocAssem * const &locassem_ptr,
     ALocal_NodalBC const * const &part_nbc,
     ALocal_EBC const * const &part_ebc,
     const int &in_nz_estimate )
-: nLocBas( 4 ), snLocBas( 3 ), dof(3),
+: nLocBas(  locassem_ptr->get_nLocBas() ), 
+  snLocBas( locassem_ptr->get_snLocBas() ), 
+  dof(3),
   num_ebc( part_ebc->get_num_ebc() ),
   nlgn( pnode_ptr->get_nlocghonode() )
 {

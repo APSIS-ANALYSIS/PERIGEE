@@ -54,6 +54,13 @@ class IPLocAssem
     // -------------------------------------------------------------- 
     virtual int get_dof_mat() const {return get_dof();}
 
+    // --------------------------------------------------------------
+    // Return the number of local basis
+    // --------------------------------------------------------------
+    virtual int get_nLocBas() const = 0;
+
+    virtual int get_snLocBas() const = 0;
+
     // -------------------------------------------------------------- 
     // ! Get the number of ebc functions implemented inside this 
     //   local assembly routine
