@@ -650,22 +650,140 @@ void PGAssem_FSI::NatBC_Resis_KG( const double &curr_time, const double &dt,
   delete [] array_d; delete [] local_d; array_d = nullptr; local_d = nullptr;
 }
 
+void PGAssem_FSI::BackFlow_G( 
+    const PDNSolution * const &dot_disp,
+    const PDNSolution * const &disp,
+    const PDNSolution * const &velo,
+    IPLocAssem_2x2Block * const &lassem_f_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const ALocal_NodalBC * const &nbc_v,
+    const ALocal_EBC * const &ebc_part )
+{
+  double * array_d = new double [nlgn_v * 3];
+  double * local_d = new double [snLocBas * 3];
 
+  disp -> GetLocalArray( array_d );
 
+  double * array_dot_d = new double [nlgn_v * 3];
+  double * local_dot_d = new double [snLocBas * 3];
+  
+  dot_disp -> GetLocalArray( array_dot_d );
+  
+  double * array_v = new double [nlgn_v * 3];
+  double * local_v = new double [snLocBas * 3];
+  
+  velo -> GetLocalArray( array_v );
 
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
 
+  PetscInt * srow_index = new PetscInt [3*snLocBas];
+  
+  for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
+  {
+    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
 
+    for(int ee=0; ee<num_sele; ++ee)
+    {
+      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
 
+      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
+      GetLocal( array_d, LSIEN, snLocBas, 3, local_d );
+      GetLocal( array_dot_d, LSIEN, snLocBas, 3, local_dot_d );
+      GetLocal( array_v, LSIEN, snLocBas, 3, local_v );
 
+      lassem_f_ptr->Assem_Residual_BackFlowStab( local_dot_d, local_d, local_v,
+          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s );
+      
+      for(int ii=0; ii<snLocBas; ++ii)
+      {
+        srow_index[3*ii+0] = nbc_v -> get_LID(0, LSIEN[ii]);
+        srow_index[3*ii+1] = nbc_v -> get_LID(1, LSIEN[ii]);
+        srow_index[3*ii+2] = nbc_v -> get_LID(2, LSIEN[ii]);
+      }
 
+      VecSetValues(G, 3*snLocBas, srow_index, lassem_f_ptr->sur_Residual0, ADD_VALUES); 
+    }
+  }
+  
+  delete [] srow_index; srow_index = nullptr;
+  delete [] LSIEN; delete [] sctrl_x; delete [] sctrl_y; delete [] sctrl_z;
+  LSIEN = nullptr; sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
+  delete [] array_dot_d; delete [] local_dot_d; array_dot_d = nullptr; local_dot_d = nullptr;
+  delete [] array_d; delete [] local_d; array_d = nullptr; local_d = nullptr;
+  delete [] array_v; delete [] local_v; array_v = nullptr; local_v = nullptr;
+}
 
+void PGAssem_FSI::BackFlow_KG( const double &dt,
+    const PDNSolution * const &dot_disp,
+    const PDNSolution * const &disp,
+    const PDNSolution * const &velo,
+    IPLocAssem_2x2Block * const &lassem_f_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const ALocal_NodalBC * const &nbc_v,
+    const ALocal_EBC * const &ebc_part )
+{
+  double * array_d = new double [nlgn_v * 3];
+  double * local_d = new double [snLocBas * 3];
 
+  disp -> GetLocalArray( array_d );
 
+  double * array_dot_d = new double [nlgn_v * 3];
+  double * local_dot_d = new double [snLocBas * 3];
 
+  dot_disp -> GetLocalArray( array_dot_d );
 
+  double * array_v = new double [nlgn_v * 3];
+  double * local_v = new double [snLocBas * 3];
 
+  velo -> GetLocalArray( array_v );
 
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
 
+  PetscInt * srow_index = new PetscInt [3*snLocBas];
+
+  for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
+  {
+    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+
+    for(int ee=0; ee<num_sele; ++ee)
+    {
+      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
+
+      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+
+      GetLocal( array_d, LSIEN, snLocBas, 3, local_d );
+      GetLocal( array_dot_d, LSIEN, snLocBas, 3, local_dot_d );
+      GetLocal( array_v, LSIEN, snLocBas, 3, local_v );
+
+      lassem_f_ptr->Assem_Tangent_Residual_BackFlowStab( dt, local_dot_d, local_d, 
+          local_v, element_s, sctrl_x, sctrl_y, sctrl_z, quad_s );
+      
+      for(int ii=0; ii<snLocBas; ++ii)
+      {
+        srow_index[3*ii+0] = nbc_v -> get_LID(0, LSIEN[ii]);
+        srow_index[3*ii+1] = nbc_v -> get_LID(1, LSIEN[ii]);
+        srow_index[3*ii+2] = nbc_v -> get_LID(2, LSIEN[ii]);
+      }
+
+      VecSetValues(G, 3*snLocBas, srow_index, lassem_f_ptr->sur_Residual0, ADD_VALUES);
+    }
+  }
+
+  delete [] srow_index; srow_index = nullptr;
+  delete [] LSIEN; delete [] sctrl_x; delete [] sctrl_y; delete [] sctrl_z;
+  LSIEN = nullptr; sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
+  delete [] array_dot_d; delete [] local_dot_d; array_dot_d = nullptr; local_dot_d = nullptr;
+  delete [] array_d; delete [] local_d; array_d = nullptr; local_d = nullptr;
+  delete [] array_v; delete [] local_v; array_v = nullptr; local_v = nullptr;
+}
 
 // EOF
