@@ -173,13 +173,11 @@ void PGAssem_FSI::Assem_mass_residual(
 {
   const int nElem = alelem_ptr->get_nlocalele();
   
-  double * array_d = new double [nlgn_v * 3];
-  double * array_v = new double [nlgn_v * 3];
-  double * array_p = new double [nlgn_p];
+  const std::vector<double> array_d = disp -> GetLocalArray();
+  const std::vector<double> array_v = velo -> GetLocalArray();
+  const std::vector<double> array_p = pres -> GetLocalArray();
   
-  double * local_d = new double [nLocBas * 3];
-  double * local_v = new double [nLocBas * 3];
-  double * local_p = new double [nLocBas];
+  std::vector<double> local_d(nLocBas * 3), local_v(nLocBas * 3), local_p(nLocBas);
   
   int * IEN_v = new int [nLocBas];
   int * IEN_p = new int [nLocBas];
@@ -205,25 +203,20 @@ void PGAssem_FSI::Assem_mass_residual(
     for(int ii=0; ii<nLocBas; ++ii) 
       row_id_p[ii] = nbc_p -> get_LID( IEN_p[ii] );
    
-    GetLocal(array_d, IEN_v, nLocBas, 3, local_d);
-    GetLocal(array_v, IEN_v, nLocBas, 3, local_v);
-    GetLocal(array_p, IEN_p, nLocBas, 1, local_p);
+    GetLocal(&array_d[0], IEN_v, nLocBas, 3, &local_d[0]);
+    GetLocal(&array_v[0], IEN_v, nLocBas, 3, &local_v[0]);
+    GetLocal(&array_p[0], IEN_p, nLocBas, 1, &local_p[0]);
 
     if( alelem_ptr->get_elem_tag(ee) == 0 )
     {
-      lassem_f_ptr->Assem_Mass_Residual(local_d, local_v, local_p, elementv, 
+      lassem_f_ptr->Assem_Mass_Residual(&local_d[0], &local_v[0], &local_p[0], elementv, 
           ectrl_x, ectrl_y, ectrl_z, quad_v);
-      
+
       MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_f_ptr->Tangent00, ADD_VALUES);
-
-      MatSetValues(K, 3*nLocBas, row_id_v,   nLocBas, row_id_p, lassem_f_ptr->Tangent01, ADD_VALUES);
-
-      MatSetValues(K,   nLocBas, row_id_p, 3*nLocBas, row_id_v, lassem_f_ptr->Tangent10, ADD_VALUES);
 
       MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, lassem_f_ptr->Tangent11, ADD_VALUES);
 
       VecSetValues(G, 3*nLocBas, row_id_v, lassem_f_ptr->Residual0, ADD_VALUES);
-      VecSetValues(G,   nLocBas, row_id_p, lassem_f_ptr->Residual1, ADD_VALUES);
     }
     else
     {
@@ -231,27 +224,18 @@ void PGAssem_FSI::Assem_mass_residual(
       // for the prestress values at the quadrature points
       const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
 
-      lassem_s_ptr->Assem_Mass_Residual(local_d, local_v, local_p, elementv, 
+      lassem_s_ptr->Assem_Mass_Residual(&local_d[0], &local_v[0], &local_p[0], elementv, 
           ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v);
       
       MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_s_ptr->Tangent00, ADD_VALUES);
 
-      MatSetValues(K, 3*nLocBas, row_id_v,   nLocBas, row_id_p, lassem_s_ptr->Tangent01, ADD_VALUES);
-
-      MatSetValues(K,   nLocBas, row_id_p, 3*nLocBas, row_id_v, lassem_s_ptr->Tangent10, ADD_VALUES);
-
       MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, lassem_s_ptr->Tangent11, ADD_VALUES);
 
       VecSetValues(G, 3*nLocBas, row_id_v, lassem_s_ptr->Residual0, ADD_VALUES);
-      VecSetValues(G,   nLocBas, row_id_p, lassem_s_ptr->Residual1, ADD_VALUES);
     } 
 
   }
 
-  delete [] array_d; delete [] array_v; delete [] array_p;
-  array_d = nullptr; array_v = nullptr; array_p = nullptr; 
-  delete [] local_d; delete [] local_v; delete [] local_p;
-  local_d = nullptr; local_v = nullptr; local_p = nullptr;
   delete [] IEN_v; IEN_v = nullptr; delete [] IEN_p; IEN_p = nullptr;
   delete [] ectrl_x; delete [] ectrl_y; delete [] ectrl_z;
   ectrl_x = nullptr; ectrl_y = nullptr; ectrl_z = nullptr;

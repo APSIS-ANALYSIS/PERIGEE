@@ -31,6 +31,7 @@
 #include "PGAssem_FSI.hpp"
 #include "PGAssem_Mesh.hpp"
 
+#include "PLinear_Solver_PETSc.hpp"
 #include "PDNTimeStep.hpp"
 #include "TimeMethod_GenAlpha.hpp"
 #include "Matrix_PETSc.hpp"
@@ -75,7 +76,7 @@ int main(int argc, char *argv[])
   double bs_beta = 0.2;
 
   // flag that determines if the prestress data to be loaded
-  bool is_load_ps = true;
+  bool is_load_ps = false;
 
   // Generalized-alpha method
   double genA_rho_inf = 0.5;
@@ -295,6 +296,8 @@ int main(int argc, char *argv[])
   
   ALocal_EBC * mesh_locebc = new ALocal_EBC(part_v_file, rank, "/mesh_ebc");
 
+  Prestress_solid * ps_data = new Prestress_solid(locElem, nqp_tet, rank, is_load_ps, "prestress");
+
   // Group APart_Node and ALocal_NodalBC into a vector
   std::vector<APart_Node *> pNode_list { pNode_v, pNode_p };
 
@@ -511,6 +514,29 @@ int main(int argc, char *argv[])
   gloAssem_mesh_ptr->Fix_nonzero_err_str();
   gloAssem_mesh_ptr->Clear_KG();
 
+  // ===== Initialize dot sol =====
+  if( is_restart == false )
+  {
+    SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n");
+    PLinear_Solver_PETSc * lsolver_acce = new PLinear_Solver_PETSc(
+        1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
+
+    KSPSetType(lsolver_acce->ksp, KSPGMRES);
+    KSPGMRESSetOrthogonalization(lsolver_acce->ksp, KSPGMRESModifiedGramSchmidtOrthogonalization);
+    KSPGMRESSetRestart(lsolver_acce->ksp, 500);
+
+    lsolver_acce->Monitor();
+
+    PC preproc; lsolver_acce->GetPC(&preproc);
+    PCSetType( preproc, PCHYPRE );
+    PCHYPRESetType( preproc, "boomeramg" );
+
+    gloAssem_ptr->Assem_mass_residual( disp, velo, pres, locElem, locAssem_fluid_ptr,
+        locAssem_solid_ptr, elementv, elements, quadv, quads, locIEN_v, locIEN_p, 
+        fNode, locnbc_v, locnbc_p, locebc, ps_data );
+
+    delete lsolver_acce;
+  }
 
 
 
@@ -544,7 +570,7 @@ int main(int argc, char *argv[])
   delete elements; delete elementv; delete quadv; delete quads; delete inflow_rate_ptr;
   delete GMIptr; delete PartBasic; delete locElem; delete fNode; delete pNode_v; delete pNode_p;
   delete locinfnbc; delete locnbc_v; delete locnbc_p; delete mesh_locnbc; delete locebc;
-  delete mesh_locebc; delete locIEN_v; delete locIEN_p;
+  delete mesh_locebc; delete locIEN_v; delete locIEN_p; delete ps_data;
   PetscFinalize();
   return EXIT_SUCCESS;
 }
