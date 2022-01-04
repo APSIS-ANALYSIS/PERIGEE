@@ -188,4 +188,16 @@ void Matrix_PETSc::MatMultSol( PDNSolution * const &sol ) const
   delete temp; temp = nullptr;
 }
 
+void Matrix_PETSc::MatMultSol( Vec &sol ) const
+{
+  Vec temp;
+  VecDuplicate(sol, &temp);
+
+  MatMult(K, sol, temp);
+
+  VecCopy(temp, sol);
+
+  VecDestroy(&temp);
+}
+
 // EOF

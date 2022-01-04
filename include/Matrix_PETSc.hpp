@@ -136,6 +136,8 @@ class Matrix_PETSc
     //              a PETSc error from PETSc::MatMult will be thrown.
     // ------------------------------------------------------------------------
     virtual void MatMultSol( PDNSolution * const &sol ) const;
+    
+    virtual void MatMultSol( Vec &sol ) const;
 
   protected:
     Mat K;
