@@ -559,6 +559,26 @@ int main(int argc, char *argv[])
     SYS_T::commPrint("===> The mass matrix lsolver is destroyed.\n");
   }
 
+  // ===== Linear and nonlinear solver context =====
+  PLinear_Solver_PETSc * lsolver = new PLinear_Solver_PETSc();
+
+  PC upc; lsolver->GetPC(&upc);
+  PCFieldSplitSetIS(upc, "u", is_velo);
+  PCFieldSplitSetIS(upc, "p", is_pres);
+
+  PLinear_Solver_PETSc * mesh_lsolver = new PLinear_Solver_PETSc(
+      1.0e-12, 1.0e-55, 1.0e30, 500, "mesh_", "mesh_" );
+
+  gloAssem_mesh_ptr->Assem_tangent_residual( disp, disp, 0.0,
+      timeinfo->get_step(), locElem, locAssem_mesh_ptr, elementv,
+      elements, quadv, quads, locIEN_v, pNode_v, fNode, mesh_locnbc,
+      mesh_locebc );
+
+  mesh_lsolver -> SetOperator( gloAssem_mesh_ptr->K );
+  PC mesh_pc; mesh_lsolver->GetPC(&mesh_pc);
+  PCFieldSplitSetBlockSize( mesh_pc, 3 );
+
+  SYS_T::commPrint("===> mesh solver LHS setted up.\n");
 
 
 
@@ -580,7 +600,7 @@ int main(int argc, char *argv[])
 
 
 
-
+  delete lsolver; delete mesh_lsolver;
   delete gloAssem_ptr; delete gloAssem_mesh_ptr;
   delete timeinfo; delete gbc;
   delete pres; delete dot_pres;
