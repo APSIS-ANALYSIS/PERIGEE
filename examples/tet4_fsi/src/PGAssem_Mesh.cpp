@@ -291,13 +291,13 @@ void PGAssem_Mesh::Assem_tangent_residual(
 
   NatBC_G(curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
-  VecAssemblyBegin(G);
-  VecAssemblyEnd(G);
+  VecAssemblyBegin(G); VecAssemblyEnd(G);
 
   for(int ii = 0; ii<dof; ++ii) EssBC_G( nbc_part, ii );
 
-  VecAssemblyBegin(G);
-  VecAssemblyEnd(G);
+  MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
+  MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
+  VecAssemblyBegin(G); VecAssemblyEnd(G);
 }
 
 void PGAssem_Mesh::EssBC_KG(
