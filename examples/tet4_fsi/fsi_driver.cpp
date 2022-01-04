@@ -539,13 +539,24 @@ int main(int argc, char *argv[])
     VecDuplicate( gloAssem_ptr->G, &proj_vp );
     lsolver_acce -> Solve( gloAssem_ptr->K, gloAssem_ptr->G, proj_vp );
 
+    SYS_T::commPrint("\n===> Consistent initial acceleration is obtained.\n");
+    lsolver_acce -> print_info();
+
     VecGetSubVector(proj_vp, is_velo, &proj_v);
     VecGetSubVector(proj_vp, is_pres, &proj_p);
+
+    // [dot_v, dot_p] = -M^-1 [Res_v, Res_p]
+    dot_velo -> PlusAX(proj_v, -1.0);
+    dot_pres -> PlusAX(proj_p, -1.0);
+
+    // dot_u = v
+    dot_disp -> Copy( velo ); 
 
     VecRestoreSubVector(proj_vp, is_velo, &proj_v);
     VecRestoreSubVector(proj_vp, is_pres, &proj_p);
     VecDestroy(&proj_vp);
     delete lsolver_acce;
+    SYS_T::commPrint("===> The mass matrix lsolver is destroyed.\n");
   }
 
 
