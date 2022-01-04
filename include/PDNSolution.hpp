@@ -84,6 +84,8 @@ class PDNSolution
     
     virtual void PlusAX(const PDNSolution * const &x_ptr, const double &a);
 
+    virtual void PlusAX(const Vec &x, const double &a);
+
     // ------------------------------------------------------------------------
     // ! Perform uniform scaling operation : solution = a * solution
     // ------------------------------------------------------------------------

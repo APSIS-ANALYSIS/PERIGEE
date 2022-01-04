@@ -164,6 +164,13 @@ void PDNSolution::PlusAX(const PDNSolution * const &x_ptr, const double &a)
   VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
 }
 
+void PDNSolution::PlusAX(const Vec &x, const double &a)
+{
+  VecAXPY(solution, a, x);
+  VecGhostUpdateBegin(solution, INSERT_VALUES, SCATTER_FORWARD);
+  VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
+}
+
 void PDNSolution::ScaleValue(const double &val)
 {
   VecScale(solution, val);
