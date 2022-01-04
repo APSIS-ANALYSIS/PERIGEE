@@ -119,6 +119,7 @@ SET( perigee_analysis_lib_src
   ${perigee_SOURCE_DIR}/src/PDNSolution_P.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_Mesh.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_FSI.cpp
+  ${perigee_SOURCE_DIR}/src/PNonlinear_FSI_Solver.cpp
   )
 
 # 3. Postprocess cpp
