@@ -10,6 +10,7 @@
 // ============================================================================
 #include "ICVFlowRate.hpp"
 #include "TimeMethod_GenAlpha.hpp"
+#include "IPGAssem.hpp"
 #include "PLinear_Solver_PETSc.hpp"
 #include "Matrix_PETSc.hpp"
 #include "PDNSolution_V.hpp"
@@ -28,6 +29,56 @@ class PNonlinear_FSI_Solver
 
     void print_info() const;
 
+    void GenAlpha_Seg_solve_FSI(
+        const bool &new_tangent_flag,
+    const double &curr_time,
+    const double &dt,
+    const IS &is_v,
+    const IS &is_p,
+    const PDNSolution * const &sol_base,
+    const PDNSolution * const &pre_dot_disp,
+    const PDNSolution * const &pre_dot_velo,
+    const PDNSolution * const &pre_dot_pres,
+    const PDNSolution * const &pre_disp,
+    const PDNSolution * const &pre_velo,
+    const PDNSolution * const &pre_pres,
+    const TimeMethod_GenAlpha * const &tmga_ptr,
+    const ICVFlowRate * const flr_ptr,
+    const ALocal_Elem * const &alelem_ptr,
+    const ALocal_IEN * const &lien_v,
+    const ALocal_IEN * const &lien_p,
+    const FEANode * const &feanode_ptr,
+    const APart_Node * const &pnode_v,
+    const APart_Node * const &pnode_p,
+    const ALocal_NodalBC * const &nbc_v,
+    const ALocal_NodalBC * const &nbc_p,
+    const ALocal_Inflow_NodalBC * const &infnbc_part,
+    const ALocal_NodalBC * const &nbc_mesh,
+    const ALocal_EBC * const &ebc_part,
+    const ALocal_EBC * const &ebc_mesh_part,
+    const IGenBC * const &gbc,
+    const Matrix_PETSc * const &bc_mat,
+    const Matrix_PETSc * const &bc_mesh_mat,
+    FEAElement * const &elementv,
+    FEAElement * const &elements,
+    const IQuadPts * const &quad_v,
+    const IQuadPts * const &quad_s,
+    const Prestress_solid * const &ps_ptr,
+    IPLocAssem_2x2Block * const &lassem_fluid_ptr,
+    IPLocAssem_2x2Block * const &lassem_solid_ptr,
+    IPLocAssem * const &lassem_mesh_ptr,
+    IPGAssem * const &gassem_ptr,
+    IPGAssem * const &gassem_mesh_ptr,
+    PLinear_Solver_PETSc * const &lsolver_ptr,
+    PLinear_Solver_PETSc * const &lsolver_mesh_ptr,
+    PDNSolution * const &dot_disp,
+    PDNSolution * const &dot_velo,
+    PDNSolution * const &dot_pres,
+    PDNSolution * const &disp,
+    PDNSolution * const &velo,
+    PDNSolution * const &pres,
+    bool &conv_flag, int &nl_counter ) const;
+
   private:
     const double nr_tol, na_tol, nd_tol;
     const int nmaxits, nrenew_freq;
@@ -37,6 +88,15 @@ class PNonlinear_FSI_Solver
     {
       SYS_T::commPrint( "  === NR ite: %d, r_error: %e, a_error: %e \n", count, rel_err, abs_err);
     }
+
+    // This function will add input * val to the solution vector in output, and
+    // the ghost values in output will be updated.
+    // User is responsible for making sure that the layouts of input and
+    // output->solution are identical.
+    void update_solid_kinematics( const double &val,
+        const APart_Node * const &pnode,
+        const Vec &input, 
+        PDNSolution * const &output ) const;
 
     void rescale_inflow_value( const double &stime,
         const ALocal_Inflow_NodalBC * const &infbc,
