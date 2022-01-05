@@ -221,7 +221,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     velo_alpha.PlusAX( sol_v, -1.0 * gamma * alpha_f * dt );
 
     dot_pres -> PlusAX( sol_p, -1.0 );
-    dot_pres_alphaPlusAX( sol_p, -1.0 * alpha_m );
+    dot_pres_alpha.PlusAX( sol_p, -1.0 * alpha_m );
     pres -> PlusAX( sol_p, -1.0 * gamma * dt );
     pres_alpha.PlusAX( sol_p, -1.0 * gamma * alpha_f * dt );
 
