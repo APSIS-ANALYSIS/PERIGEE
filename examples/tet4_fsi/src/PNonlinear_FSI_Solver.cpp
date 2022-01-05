@@ -167,27 +167,77 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
   rescale_inflow_value( curr_time + dt,           infnbc_part, flr_ptr, sol_base, velo );
   rescale_inflow_value( curr_time + alpha_f * dt, infnbc_part, flr_ptr, sol_base, &velo_alpha );
 
+  // If new_tangent_flag == TRUE, update the tangent matrix;
+  // otherwise, use the matrix from the previous time step
+  if( new_tangent_flag )
+  {
+    gassem_ptr -> Clear_KG();
+
+    gassem_ptr->Assem_Tangent_Residual( curr_time, dt, 
+        &dot_disp_alpha, &dot_velo_alpha, &dot_pres_alpha,
+        &disp_alpha, &velo_alpha, &pres_alpha,
+        dot_velo, velo, disp,
+        alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr,
+        elementv, elements, quad_v, quad_s, lien_v, lien_p,
+        feanode_ptr, nbc_v, nbc_p, ebc_part, gbc, ps_ptr );
+
+    SYS_T::commPrint("  --- M updated");
+    lsolver_ptr->SetOperator(gassem_ptr->K);
+  }
+  else
+  {
+    gassem_ptr -> Clear_G();
+    
+    gassem_ptr->Assem_Residual( curr_time, dt, 
+        &dot_disp_alpha, &dot_velo_alpha, &dot_pres_alpha,
+        &disp_alpha, &velo_alpha, &pres_alpha,
+        dot_velo, velo, disp,
+        alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr,
+        elementv, elements, quad_v, quad_s, lien_v, lien_p,
+        feanode_ptr, nbc_v, nbc_p, ebc_part, gbc, ps_ptr );
+  }
+
+  VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
+  SYS_T::commPrint("  Init res 2-norm: %e \n", initial_norm);
+
+  Vec sol_vp, sol_v, sol_p;
+  VecDuplicate( gassem_ptr->G, &sol_vp );
+
+  // Now we do consistent Newton-Raphson iteration
+  do
+  {
+    lsolver_ptr->Solve( gassem_ptr->G, sol_vp );
+
+    bc_mat -> MatMultSol( sol_vp );
+
+    nl_counter += 1;
+
+    VecGetSubVector(sol_vp, is_v, &sol_v);
+    VecGetSubVector(sol_vp, is_p, &sol_p);
+
+    dot_velo -> PlusAX( sol_v, -1.0 );
+    dot_velo_alpha.PlusAX( sol_v, -1.0 * alpha_m );
+    velo -> PlusAX( sol_v, -1.0 * gamma * dt );
+    velo_alpha.PlusAX( sol_v, -1.0 * gamma * alpha_f * dt );
+
+    dot_pres -> PlusAX( sol_p, -1.0 );
+    dot_pres_alphaPlusAX( sol_p, -1.0 * alpha_m );
+    pres -> PlusAX( sol_p, -1.0 * gamma * dt );
+    pres_alpha.PlusAX( sol_p, -1.0 * gamma * alpha_f * dt );
+
+
+    VecRestoreSubVector(sol_vp, is_v, &sol_v);
+    VecRestoreSubVector(sol_vp, is_p, &sol_p);
 
 
 
 
+  }while(nl_counter<nmaxits && relative_error > nr_tol && residual_norm > na_tol);
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+  VecDestroy(&sol_vp);
   delete Delta_dot_disp;
 }
 
