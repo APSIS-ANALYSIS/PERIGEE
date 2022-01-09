@@ -22,6 +22,40 @@ void PNonlinear_FSI_Solver::print_info() const
   SYS_T::print_sep_line();
 }
 
+void PNonlinear_FSI_Solver::update_solid_kinematics( 
+    const double &val, const APart_Node * const &pnode,
+    const Vec &input, PDNSolution * const &output ) const
+{
+  const int nlocal = pnode -> get_nlocalnode_solid();
+  
+  Vec local_input, local_output;
+
+  VecGhostGetLocalForm(input,            &local_input);
+  VecGhostGetLocalForm(output->solution, &local_output);
+
+  double * array_input, * array_output;
+
+  VecGetArray(local_input,  &array_input);
+  VecGetArray(local_output, &array_output);
+
+  for(int ii=0; ii<nlocal; ++ii)
+  {
+    const int ii3 = pnode->get_node_loc_solid(ii) * 3;
+
+    array_output[ii3  ] += val * array_input[ii3  ];
+    array_output[ii3+1] += val * array_input[ii3+1];
+    array_output[ii3+2] += val * array_input[ii3+2];
+  }
+
+  VecRestoreArray(local_input,  &array_input);
+  VecRestoreArray(local_output, &array_output);
+
+  VecGhostRestoreLocalForm(input,            &local_input);
+  VecGhostRestoreLocalForm(output->solution, &local_output);
+
+  output->GhostUpdate(); // update the ghost slots
+}
+
 void PNonlinear_FSI_Solver::rescale_inflow_value( const double &stime,
     const ALocal_Inflow_NodalBC * const &infbc,
     const ICVFlowRate * const &flrate,
@@ -239,40 +273,6 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
 
   VecDestroy(&sol_vp);
   delete Delta_dot_disp;
-}
-
-void PNonlinear_FSI_Solver::update_solid_kinematics( 
-    const double &val, const APart_Node * const &pnode,
-    const Vec &input, PDNSolution * const &output ) const
-{
-  const int nlocal = pnode -> get_nlocalnode_solid();
-  
-  Vec local_input, local_output;
-
-  VecGhostGetLocalForm(input,  &local_input);
-  VecGhostGetLocalForm(output->solution, &local_output);
-
-  double * array_input, * array_output;
-
-  VecGetArray(local_input, &array_input);
-  VecGetArray(local_output, &array_output);
-
-  for(int ii=0; ii<nlocal; ++ii)
-  {
-    const int ii3 = pnode->get_node_loc_solid(ii) * 3;
-
-    array_output[ii3  ] += val * array_input[ii3  ];
-    array_output[ii3+1] += val * array_input[ii3+1];
-    array_output[ii3+2] += val * array_input[ii3+2];
-  }
-
-  VecRestoreArray(local_input, &array_input);
-  VecRestoreArray(local_output, &array_output);
-
-  VecGhostRestoreLocalForm(input, &local_input);
-  VecGhostRestoreLocalForm(output->solution, &local_output);
-
-  output->GhostUpdate(); // update the ghost slots
 }
 
 
