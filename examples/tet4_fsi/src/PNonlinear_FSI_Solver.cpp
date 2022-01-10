@@ -161,45 +161,45 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
   pres -> Copy( pre_pres );
 
   // Define intermediate solutions
-  PDNSolution dot_disp_alpha( pre_dot_disp ); 
-  dot_disp_alpha.ScaleValue( 1.0 - alpha_m );
-  dot_disp_alpha.PlusAX( dot_disp, alpha_m );
+  PDNSolution * dot_disp_alpha = new PDNSolution( pre_dot_disp ); 
+  dot_disp_alpha -> ScaleValue( 1.0 - alpha_m );
+  dot_disp_alpha -> PlusAX( dot_disp, alpha_m );
 
-  PDNSolution dot_velo_alpha( pre_dot_velo );
-  dot_velo_alpha.ScaleValue( 1.0 - alpha_m );
-  dot_velo_alpha.PlusAX( dot_velo, alpha_m );
+  PDNSolution * dot_velo_alpha = new PDNSolution( pre_dot_velo );
+  dot_velo_alpha -> ScaleValue( 1.0 - alpha_m );
+  dot_velo_alpha -> PlusAX( dot_velo, alpha_m );
 
-  PDNSolution dot_pres_alpha( pre_dot_pres );
-  dot_pres_alpha.ScaleValue( 1.0 - alpha_m );
-  dot_pres_alpha.PlusAX( dot_pres, alpha_m );
+  PDNSolution * dot_pres_alpha = new PDNSolution( pre_dot_pres );
+  dot_pres_alpha -> ScaleValue( 1.0 - alpha_m );
+  dot_pres_alpha -> PlusAX( dot_pres, alpha_m );
 
-  PDNSolution disp_alpha( pre_disp );
-  disp_alpha.ScaleValue( 1.0 - alpha_f );
-  disp_alpha.PlusAX( disp, alpha_f );
+  PDNSolution * disp_alpha = new PDNSolution( pre_disp );
+  disp_alpha -> ScaleValue( 1.0 - alpha_f );
+  disp_alpha -> PlusAX( disp, alpha_f );
 
-  PDNSolution velo_alpha( pre_velo );
-  velo_alpha.ScaleValue( 1.0 - alpha_f );
-  velo_alpha.PlusAX( velo, alpha_f );
+  PDNSolution * velo_alpha = new PDNSolution( pre_velo );
+  velo_alpha -> ScaleValue( 1.0 - alpha_f );
+  velo_alpha -> PlusAX( velo, alpha_f );
 
-  PDNSolution pres_alpha( pre_pres );
-  pres_alpha.ScaleValue( 1.0 - alpha_f );
-  pres_alpha.PlusAX( pres, alpha_f );
+  PDNSolution * pres_alpha = new PDNSolution( pre_pres );
+  pres_alpha -> ScaleValue( 1.0 - alpha_f );
+  pres_alpha -> PlusAX( pres, alpha_f );
 
   // Get Delta_dot_disp by assuming Delta_v is zero
   PDNSolution * Delta_dot_disp = new PDNSolution_V( pnode_v, 0, false, "delta_dot_disp" );
 
-  update_solid_kinematics( -1.0 * val_3, pnode_v, dot_disp_alpha.solution, Delta_dot_disp );
-  update_solid_kinematics(        val_3, pnode_v,     velo_alpha.solution, Delta_dot_disp );
+  update_solid_kinematics( -1.0 * val_3, pnode_v, dot_disp_alpha->solution, Delta_dot_disp );
+  update_solid_kinematics(        val_3, pnode_v,     velo_alpha->solution, Delta_dot_disp );
 
   // Now update displacement solutions
-  dot_disp->PlusAX( Delta_dot_disp, 1.0 );
-  disp    ->PlusAX( Delta_dot_disp, gamma * dt );
-  dot_disp_alpha.PlusAX( Delta_dot_disp, alpha_m );
-  disp_alpha.PlusAX(     Delta_dot_disp, alpha_f * gamma * dt );
+  dot_disp       -> PlusAX( Delta_dot_disp, 1.0 );
+  disp           -> PlusAX( Delta_dot_disp, gamma * dt );
+  dot_disp_alpha -> PlusAX( Delta_dot_disp, alpha_m );
+  disp_alpha     -> PlusAX( Delta_dot_disp, alpha_f * gamma * dt );
   
   // Update inflow boundary values
   rescale_inflow_value( curr_time + dt,           infnbc_part, flr_ptr, sol_base, velo );
-  rescale_inflow_value( curr_time + alpha_f * dt, infnbc_part, flr_ptr, sol_base, &velo_alpha );
+  rescale_inflow_value( curr_time + alpha_f * dt, infnbc_part, flr_ptr, sol_base, velo_alpha );
 
   // If new_tangent_flag == TRUE, update the tangent matrix;
   // otherwise, use the matrix from the previous time step
@@ -208,8 +208,8 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     gassem_ptr -> Clear_KG();
 
     gassem_ptr->Assem_Tangent_Residual( curr_time, dt, 
-        &dot_disp_alpha, &dot_velo_alpha, &dot_pres_alpha,
-        &disp_alpha, &velo_alpha, &pres_alpha,
+        dot_disp_alpha, dot_velo_alpha, dot_pres_alpha,
+        disp_alpha, velo_alpha, pres_alpha,
         dot_velo, velo, disp,
         alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr,
         elementv, elements, quad_v, quad_s, lien_v, lien_p,
@@ -223,8 +223,8 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     gassem_ptr -> Clear_G();
     
     gassem_ptr->Assem_Residual( curr_time, dt, 
-        &dot_disp_alpha, &dot_velo_alpha, &dot_pres_alpha,
-        &disp_alpha, &velo_alpha, &pres_alpha,
+        dot_disp_alpha, dot_velo_alpha, dot_pres_alpha,
+        disp_alpha, velo_alpha, pres_alpha,
         dot_velo, velo, disp,
         alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr,
         elementv, elements, quad_v, quad_s, lien_v, lien_p,
@@ -249,16 +249,15 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     VecGetSubVector(sol_vp, is_v, &sol_v);
     VecGetSubVector(sol_vp, is_p, &sol_p);
 
-    dot_velo -> PlusAX( sol_v, -1.0 );
-    dot_velo_alpha.PlusAX( sol_v, -1.0 * alpha_m );
-    velo -> PlusAX( sol_v, -1.0 * gamma * dt );
-    velo_alpha.PlusAX( sol_v, -1.0 * gamma * alpha_f * dt );
+    dot_velo       -> PlusAX( sol_v, -1.0 );
+    dot_velo_alpha -> PlusAX( sol_v, -1.0 * alpha_m );
+    velo           -> PlusAX( sol_v, -1.0 * gamma * dt );
+    velo_alpha     -> PlusAX( sol_v, -1.0 * gamma * alpha_f * dt );
 
-    dot_pres -> PlusAX( sol_p, -1.0 );
-    dot_pres_alpha.PlusAX( sol_p, -1.0 * alpha_m );
-    pres -> PlusAX( sol_p, -1.0 * gamma * dt );
-    pres_alpha.PlusAX( sol_p, -1.0 * gamma * alpha_f * dt );
-
+    dot_pres       -> PlusAX( sol_p, -1.0 );
+    dot_pres_alpha -> PlusAX( sol_p, -1.0 * alpha_m );
+    pres           -> PlusAX( sol_p, -1.0 * gamma * dt );
+    pres_alpha     -> PlusAX( sol_p, -1.0 * gamma * alpha_f * dt );
 
     VecRestoreSubVector(sol_vp, is_v, &sol_v);
     VecRestoreSubVector(sol_vp, is_p, &sol_p);
