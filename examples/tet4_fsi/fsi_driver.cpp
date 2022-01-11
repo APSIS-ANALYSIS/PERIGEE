@@ -30,15 +30,11 @@
 #include "PLocAssem_Tet4_FSI_Mesh_Laplacian.hpp"
 #include "PGAssem_FSI.hpp"
 #include "PGAssem_Mesh.hpp"
+#include "PNonlinear_FSI_Solver.hpp"
 
-#include "PLinear_Solver_PETSc.hpp"
 #include "PDNTimeStep.hpp"
-#include "TimeMethod_GenAlpha.hpp"
-#include "Matrix_PETSc.hpp"
 #include "PETSc_Tools.hpp"
 #include "APart_Node_FSI.hpp"
-#include "PDNSolution_V.hpp"
-#include "PDNSolution_P.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -90,8 +86,9 @@ int main(int argc, char *argv[])
   double nl_rtol = 1.0e-3;
   double nl_atol = 1.0e-6;
   double nl_dtol = 10.0;
-  int nl_maxits = 20;
-  int nl_refreq = 4;
+  int nl_maxits  = 20;
+  int nl_refreq  = 4;
+  int nl_rethred = 4;
 
   // Time stepping parameters
   double initial_time = 0.0;
@@ -148,6 +145,7 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal(  "-nl_dtol",           nl_dtol);
   SYS_T::GetOptionInt(   "-nl_maxits",         nl_maxits);
   SYS_T::GetOptionInt(   "-nl_refreq",         nl_refreq);
+  SYS_T::GetOptionInt(   "-nl_rethred",        nl_rethred);
   SYS_T::GetOptionReal(  "-init_time",         initial_time);
   SYS_T::GetOptionReal(  "-fina_time",         final_time);
   SYS_T::GetOptionReal(  "-init_step",         initial_step);
@@ -580,6 +578,11 @@ int main(int argc, char *argv[])
 
   SYS_T::commPrint("===> mesh solver LHS setted up.\n");
 
+  // ===== Nonlinear solver context =====
+  PNonlinear_FSI_Solver * nsolver = new PNonlinear_FSI_Solver(
+      nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_rethred);
+  SYS_T::commPrint("===> Nonlinear solver setted up:\n");
+  nsolver->print_info();
 
 
 
@@ -598,9 +601,7 @@ int main(int argc, char *argv[])
 
 
 
-
-
-  delete lsolver; delete mesh_lsolver;
+  delete nsolver; delete lsolver; delete mesh_lsolver;
   delete gloAssem_ptr; delete gloAssem_mesh_ptr;
   delete timeinfo; delete gbc;
   delete pres; delete dot_pres;

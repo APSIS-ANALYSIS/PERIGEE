@@ -21,7 +21,7 @@ class PNonlinear_FSI_Solver
   public:
     PNonlinear_FSI_Solver( const double &input_nrtol, const double &input_natol,
         const double &input_ndtol, const int &input_max_iteration,
-        const int &input_renew_freq );
+        const int &input_renew_freq, const int &input_renew_thred );
 
     ~PNonlinear_FSI_Solver();
 
@@ -81,7 +81,7 @@ class PNonlinear_FSI_Solver
 
   private:
     const double nr_tol, na_tol, nd_tol;
-    const int nmaxits, nrenew_freq;
+    const int nmaxits, nrenew_freq, nrenew_thred;
 
     void Print_convergence_info( const int &count, const double &rel_err,
         const double &abs_err ) const

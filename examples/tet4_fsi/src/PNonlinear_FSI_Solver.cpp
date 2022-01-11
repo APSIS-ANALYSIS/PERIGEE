@@ -3,9 +3,10 @@
 PNonlinear_FSI_Solver::PNonlinear_FSI_Solver(
     const double &input_nrtol, const double &input_natol,
     const double &input_ndtol, const int &input_max_iteration,
-    const int &input_renew_freq )
+    const int &input_renew_freq, const int &input_renew_thred )
 : nr_tol(input_nrtol), na_tol(input_natol), nd_tol(input_ndtol),
-  nmaxits(input_max_iteration), nrenew_freq(input_renew_freq)
+  nmaxits(input_max_iteration), nrenew_freq(input_renew_freq),
+  nrenew_thred(input_renew_thred)
 {}
 
 PNonlinear_FSI_Solver::~PNonlinear_FSI_Solver()
@@ -19,6 +20,7 @@ void PNonlinear_FSI_Solver::print_info() const
   SYS_T::commPrint("divergence tolerance: %e \n", nd_tol);
   SYS_T::commPrint("maximum iteration: %d \n", nmaxits);
   SYS_T::commPrint("tangent matrix renew frequency: %d \n", nrenew_freq);
+  SYS_T::commPrint("tangent matrix renew threshold: %d \n", nrenew_thred);
   SYS_T::print_sep_line();
 }
 
