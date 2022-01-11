@@ -95,18 +95,17 @@ void PLocAssem_Tet4_FSI_Mesh_Laplacian::Assem_Tangent_Residual(
     
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
     
-    double fx, fy, fz;
-    get_f(coor_x, coor_y, coor_z, curr, fx, fy, fz);
+    const Vector_3 f_body = get_f(coor_x, coor_y, coor_z, curr);
 
     for(int A=0; A<nLocBas; ++A)
     {
       const double NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
-      Residual[3*A]   += gwts * ( NA_x * ux + NA_y * uy + NA_z * uz - R[A] * fx );
+      Residual[3*A]   += gwts * ( NA_x * ux + NA_y * uy + NA_z * uz - R[A] * f_body.x() );
       
-      Residual[3*A+1] += gwts * ( NA_x * vx + NA_y * vy + NA_z * vz - R[A] * fy );
+      Residual[3*A+1] += gwts * ( NA_x * vx + NA_y * vy + NA_z * vz - R[A] * f_body.y() );
 
-      Residual[3*A+2] += gwts * ( NA_x * wx + NA_y * wy + NA_z * wz - R[A] * fz );
+      Residual[3*A+2] += gwts * ( NA_x * wx + NA_y * wy + NA_z * wz - R[A] * f_body.z() );
 
       for(int B=0; B<nLocBas; ++B)
       {
@@ -173,18 +172,17 @@ void PLocAssem_Tet4_FSI_Mesh_Laplacian::Assem_Residual(
     
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
-    double fx, fy, fz;
-    get_f(coor_x, coor_y, coor_z, curr, fx, fy, fz);
+    const Vector_3 f_body = get_f(coor_x, coor_y, coor_z, curr);
 
     for(int A=0; A<nLocBas; ++A)
     {
       const double NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
-      Residual[3*A  ] += gwts * ( NA_x * ux + NA_y * uy + NA_z * uz - R[A] * fx );
+      Residual[3*A  ] += gwts * ( NA_x * ux + NA_y * uy + NA_z * uz - R[A] * f_body.x() );
       
-      Residual[3*A+1] += gwts * ( NA_x * vx + NA_y * vy + NA_z * vz - R[A] * fy );
+      Residual[3*A+1] += gwts * ( NA_x * vx + NA_y * vy + NA_z * vz - R[A] * f_body.y() );
 
-      Residual[3*A+2] += gwts * ( NA_x * wx + NA_y * wy + NA_z * wz - R[A] * fz );
+      Residual[3*A+2] += gwts * ( NA_x * wx + NA_y * wy + NA_z * wz - R[A] * f_body.z() );
     }
   }
 }
