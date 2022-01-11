@@ -115,7 +115,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     const ALocal_Inflow_NodalBC * const &infnbc_part,
     const ALocal_NodalBC * const &nbc_mesh,
     const ALocal_EBC * const &ebc_part,
-    const ALocal_EBC * const &ebc_mesh_part,
+    const ALocal_EBC * const &ebc_mesh,
     const IGenBC * const &gbc,
     const Matrix_PETSc * const &bc_mat,
     const Matrix_PETSc * const &bc_mesh_mat,
@@ -148,8 +148,6 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
   const double alpha_f = tmga_ptr->get_alpha_f();
 
   const double val_1 = alpha_f * gamma * dt / alpha_m;
-  const double val_2 = (1.0/gamma) - (1.0/alpha_m);
-  const double val_3 = 1.0 / alpha_m;
 
   // Same-Y predictor
   dot_disp -> Copy( pre_dot_disp ); dot_disp -> ScaleValue( (gamma-1.0)/gamma );
@@ -188,10 +186,10 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
   // Get Delta_dot_disp by assuming Delta_v is zero
   PDNSolution * Delta_dot_disp = new PDNSolution_V( pnode_v, 0, false, "delta_dot_disp" );
 
-  update_solid_kinematics( -1.0 * val_3, pnode_v, dot_disp_alpha->solution, Delta_dot_disp );
-  update_solid_kinematics(        val_3, pnode_v,     velo_alpha->solution, Delta_dot_disp );
+  update_solid_kinematics( -1.0 / alpha_m, pnode_v, dot_disp_alpha->solution, Delta_dot_disp );
+  update_solid_kinematics(  1.0 / alpha_m, pnode_v,     velo_alpha->solution, Delta_dot_disp );
 
-  // Now update displacement solutions
+  // Now update displacement solutions for solid sub-domain
   dot_disp       -> PlusAX( Delta_dot_disp, 1.0 );
   disp           -> PlusAX( Delta_dot_disp, gamma * dt );
   dot_disp_alpha -> PlusAX( Delta_dot_disp, alpha_m );
@@ -209,8 +207,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
 
     gassem_ptr->Assem_Tangent_Residual( curr_time, dt, 
         dot_disp_alpha, dot_velo_alpha, dot_pres_alpha,
-        disp_alpha, velo_alpha, pres_alpha,
-        dot_velo, velo, disp,
+        disp_alpha, velo_alpha, pres_alpha, dot_velo, velo, disp,
         alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr,
         elementv, elements, quad_v, quad_s, lien_v, lien_p,
         feanode_ptr, nbc_v, nbc_p, ebc_part, gbc, ps_ptr );
@@ -224,8 +221,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     
     gassem_ptr->Assem_Residual( curr_time, dt, 
         dot_disp_alpha, dot_velo_alpha, dot_pres_alpha,
-        disp_alpha, velo_alpha, pres_alpha,
-        dot_velo, velo, disp,
+        disp_alpha, velo_alpha, pres_alpha, dot_velo, velo, disp,
         alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr,
         elementv, elements, quad_v, quad_s, lien_v, lien_p,
         feanode_ptr, nbc_v, nbc_p, ebc_part, gbc, ps_ptr );
@@ -236,6 +232,9 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
 
   Vec sol_vp, sol_v, sol_p;
   VecDuplicate( gassem_ptr->G, &sol_vp );
+
+  Vec sol_mesh;
+  VecDuplicate( gassem_mesh_ptr->G, &sol_mesh );
 
   // Now we do consistent Newton-Raphson iteration
   do
@@ -259,24 +258,88 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     pres           -> PlusAX( sol_p, -1.0 * gamma * dt );
     pres_alpha     -> PlusAX( sol_p, -1.0 * gamma * alpha_f * dt );
 
+    update_solid_kinematics( -1.0 * val_1, pnode_v, sol_v, dot_disp );
+    update_solid_kinematics( -1.0 * val_1 * gamma * dt, pnode_v, sol_v, disp );
+    update_solid_kinematics( -1.0 * val_1 * alpha_m, pnode_v, sol_v, dot_disp_alpha );
+    update_solid_kinematics( -1.0 * val_1 * alpha_f * gamma * dt, pnode_v, sol_v, disp_alpha );
+
     VecRestoreSubVector(sol_vp, is_v, &sol_v);
     VecRestoreSubVector(sol_vp, is_p, &sol_p);
 
+    // Solve for mesh motion
+    gassem_mesh_ptr -> Clear_G();
 
+    gassem_mesh_ptr -> Assem_residual( pre_disp, disp, curr_time, dt, 
+        alelem_ptr, lassem_mesh_ptr, elementv, elements,
+        quad_v, quad_s, lien_v, pnode_v,
+        feanode_ptr, nbc_mesh, ebc_mesh );
 
+    lsolver_mesh_ptr -> Solve( gassem_mesh_ptr -> G, sol_mesh );
+
+    bc_mesh_mat -> MatMultSol( sol_mesh );
+
+    // update the mesh displacement
+    disp       -> PlusAX( sol_mesh, -1.0 );
+    disp_alpha -> PlusAX( sol_mesh, -1.0 * alpha_f );
+
+    // update the mesh velocity
+    dot_disp -> Copy( pre_dot_disp );
+    dot_disp -> ScaleValue( (1.0 - gamma) / gamma );
+    dot_disp -> PlusAX( pre_disp, 1.0 / (gamma * dt) );
+    dot_disp -> PlusAX( disp,    -1.0 / (gamma * dt) );
+
+    dot_disp_alpha -> Copy( pre_dot_disp );
+    dot_disp_alpha -> ScaleValue( 1.0 - alpha_m );
+    dot_disp_alpha -> PlusAX( dot_disp, alpha_m );
+
+    // Assemble residual & tangent
+    if( nl_counter % nrenew_freq == 0 || nl_counter >= 4 )
+    {
+      gassem_ptr -> Clear_KG();
+
+      gassem_ptr->Assem_Tangent_Residual( curr_time, dt,
+          dot_disp_alpha, dot_velo_alpha, dot_pres_alpha,
+          disp_alpha, velo_alpha, pres_alpha, dot_velo, velo, disp,
+          alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr,
+          elementv, elements, quad_v, quad_s, lien_v, lien_p,
+          feanode_ptr, nbc_v, nbc_p, ebc_part, gbc, ps_ptr );
+
+      SYS_T::commPrint("  --- M updated");
+      lsolver_ptr->SetOperator(gassem_ptr->K);
+    }
+    else
+    {
+      gassem_ptr -> Clear_G();
+
+      gassem_ptr->Assem_Residual( curr_time, dt,
+          dot_disp_alpha, dot_velo_alpha, dot_pres_alpha,
+          disp_alpha, velo_alpha, pres_alpha, dot_velo, velo, disp,
+          alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr,
+          elementv, elements, quad_v, quad_s, lien_v, lien_p,
+          feanode_ptr, nbc_v, nbc_p, ebc_part, gbc, ps_ptr );
+    }
+   
+    VecNorm(gassem_ptr->G, NORM_2, &residual_norm);
+    SYS_T::commPrint("  --- nl_res: %e \n", residual_norm);
+
+    relative_error = residual_norm / initial_norm;
+
+    if( relative_error >= nd_tol )
+    {
+      SYS_T::commPrint("Warning: nonlinear solver is diverging with error %e. \n", relative_error);
+      break;
+    }
 
   }while(nl_counter<nmaxits && relative_error > nr_tol && residual_norm > na_tol);
 
+  Print_convergence_info(nl_counter, relative_error, residual_norm);
 
-
+  if(relative_error <= nr_tol || residual_norm <= na_tol) conv_flag = true;
+  else conv_flag = false;
 
   VecDestroy(&sol_vp);
+  VecDestroy(&sol_mesh);
   delete Delta_dot_disp;
 }
-
-
-
-
-
 
 // EOF
