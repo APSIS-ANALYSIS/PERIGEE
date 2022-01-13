@@ -30,7 +30,7 @@
 #include "PLocAssem_Tet4_FSI_Mesh_Laplacian.hpp"
 #include "PGAssem_FSI.hpp"
 #include "PGAssem_Mesh.hpp"
-#include "PNonlinear_FSI_Solver.hpp"
+#include "PTime_FSI_Solver.hpp"
 
 #include "PDNTimeStep.hpp"
 #include "PETSc_Tools.hpp"
@@ -584,6 +584,11 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("===> Nonlinear solver setted up:\n");
   nsolver->print_info();
 
+  // ===== Temporal solver context =====
+  PTime_FSI_Solver * tsolver = new PTime_FSI_Solver( sol_bName,
+      sol_record_freq, ttan_renew_freq, final_time );
+  SYS_T::commPrint("===> Time marching solver setted up:\n");
+  tsolver->print_info();
 
 
 
@@ -600,8 +605,7 @@ int main(int argc, char *argv[])
 
 
 
-
-  delete nsolver; delete lsolver; delete mesh_lsolver;
+  delete tsolver; delete nsolver; delete lsolver; delete mesh_lsolver;
   delete gloAssem_ptr; delete gloAssem_mesh_ptr;
   delete timeinfo; delete gbc;
   delete pres; delete dot_pres;
