@@ -622,13 +622,11 @@ double PGAssem_FSI::Assem_surface_flowrate(
     const ALocal_EBC * const &ebc_part,
     const int &ebc_id )
 {
-  double * array_v = new double [nlgn_v * 3];
-  double * array_d = new double [nlgn_v * 3];
+  const std::vector<double> array_d = disp -> GetLocalArray();
+  const std::vector<double> array_v = velo -> GetLocalArray();
+  
   double * local_v = new double [snLocBas * 3];
   double * local_d = new double [snLocBas * 3];
-
-  disp -> GetLocalArray( array_d );
-  velo -> GetLocalArray( array_v ); 
 
   int * LSIEN = new int [snLocBas];
   double * sctrl_x = new double [snLocBas];
@@ -645,15 +643,14 @@ double PGAssem_FSI::Assem_surface_flowrate(
 
     ebc_part -> get_ctrlPts_xyz( ebc_id, ee, sctrl_x, sctrl_y, sctrl_z );
 
-    GetLocal( array_d, LSIEN, snLocBas, 3, local_d );
-    GetLocal( array_v, LSIEN, snLocBas, 3, local_v );  
+    GetLocal( &array_d[0], LSIEN, snLocBas, 3, local_d );
+    GetLocal( &array_v[0], LSIEN, snLocBas, 3, local_v );  
 
     esum += lassem_ptr -> get_flowrate( local_d, local_v, element_s, sctrl_x,
         sctrl_y, sctrl_z, quad_s );
   }
 
-  delete [] array_v; delete [] array_d; delete [] local_v; delete [] local_d;
-  array_v = nullptr; array_d = nullptr; local_v = nullptr; local_d = nullptr;
+  delete [] local_v; delete [] local_d; local_v = nullptr; local_d = nullptr;
 
   delete [] LSIEN; delete [] sctrl_x; delete [] sctrl_y; delete [] sctrl_z;
   LSIEN = nullptr; sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
@@ -674,13 +671,11 @@ double PGAssem_FSI::Assem_surface_flowrate(
     const ALocal_Inflow_NodalBC * const &infbc_part,
     const int &nbc_id )
 {
-  double * array_v = new double [nlgn_v * 3];
-  double * array_d = new double [nlgn_v * 3];
+  const std::vector<double> array_d = disp -> GetLocalArray();
+  const std::vector<double> array_v = velo -> GetLocalArray();
+  
   double * local_v = new double [snLocBas * 3];
   double * local_d = new double [snLocBas * 3];
-
-  disp -> GetLocalArray( array_d );
-  velo -> GetLocalArray( array_v );
 
   int * LSIEN = new int [snLocBas];
   double * sctrl_x = new double [snLocBas];
@@ -697,15 +692,14 @@ double PGAssem_FSI::Assem_surface_flowrate(
 
     infbc_part -> get_ctrlPts_xyz( nbc_id, ee, sctrl_x, sctrl_y, sctrl_z );
 
-    GetLocal( array_d, LSIEN, snLocBas, 3, local_d );
-    GetLocal( array_v, LSIEN, snLocBas, 3, local_v );
+    GetLocal( &array_d[0], LSIEN, snLocBas, 3, local_d );
+    GetLocal( &array_v[0], LSIEN, snLocBas, 3, local_v );
 
     esum += lassem_ptr -> get_flowrate( local_d, local_v, element_s, sctrl_x,
         sctrl_y, sctrl_z, quad_s );
   }
 
-  delete [] array_v; delete [] array_d; delete [] local_v; delete [] local_d;
-  array_v = nullptr; array_d = nullptr; local_v = nullptr; local_d = nullptr;
+  delete [] local_v; delete [] local_d; local_v = nullptr; local_d = nullptr;
 
   delete [] LSIEN; delete [] sctrl_x; delete [] sctrl_y; delete [] sctrl_z;
   LSIEN = nullptr; sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
@@ -726,13 +720,11 @@ double PGAssem_FSI::Assem_surface_ave_pressure(
     const ALocal_EBC * const &ebc_part,
     const int &ebc_id )
 {
-  double * array_d = new double [nlgn_v * 3];
-  double * array_p = new double [nlgn_v];
+  const std::vector<double> array_d = disp -> GetLocalArray();
+  const std::vector<double> array_p = pres -> GetLocalArray();
+  
   double * local_d = new double [snLocBas * 3];
   double * local_p = new double [snLocBas];
-
-  disp -> GetLocalArray( array_d );
-  pres -> GetLocalArray( array_p );
 
   int * LSIEN = new int [snLocBas];
   double * sctrl_x = new double [snLocBas];
@@ -749,8 +741,8 @@ double PGAssem_FSI::Assem_surface_ave_pressure(
 
     ebc_part -> get_ctrlPts_xyz( ebc_id, ee, sctrl_x, sctrl_y, sctrl_z );
 
-    GetLocal( array_d, LSIEN, snLocBas, 3, local_d );
-    GetLocal( array_p, LSIEN, snLocBas, 1, local_p );
+    GetLocal( &array_d[0], LSIEN, snLocBas, 3, local_d );
+    GetLocal( &array_p[0], LSIEN, snLocBas, 1, local_p );
 
     double ele_pres, ele_area;
 
@@ -761,8 +753,7 @@ double PGAssem_FSI::Assem_surface_ave_pressure(
     val_area += ele_area; 
   }
 
-  delete [] array_p; delete [] array_d; delete [] local_p; delete [] local_d;
-  array_p = nullptr; array_d = nullptr; local_p = nullptr; local_d = nullptr;
+  delete [] local_p; delete [] local_d; local_p = nullptr; local_d = nullptr;
 
   delete [] LSIEN; delete [] sctrl_x; delete [] sctrl_y; delete [] sctrl_z;
   LSIEN = nullptr; sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
@@ -784,13 +775,11 @@ double PGAssem_FSI::Assem_surface_ave_pressure(
     const ALocal_Inflow_NodalBC * const &infbc_part,
     const int &nbc_id )
 {
-  double * array_d = new double [nlgn_v * 3];
-  double * array_p = new double [nlgn_v];
+  const std::vector<double> array_d = disp -> GetLocalArray();
+  const std::vector<double> array_p = pres -> GetLocalArray();
+  
   double * local_d = new double [snLocBas * 3];
   double * local_p = new double [snLocBas];
-
-  disp -> GetLocalArray( array_d );
-  pres -> GetLocalArray( array_p );
 
   int * LSIEN = new int [snLocBas];
   double * sctrl_x = new double [snLocBas];
@@ -807,8 +796,8 @@ double PGAssem_FSI::Assem_surface_ave_pressure(
 
     infbc_part -> get_ctrlPts_xyz( nbc_id, ee, sctrl_x, sctrl_y, sctrl_z );
 
-    GetLocal( array_d, LSIEN, snLocBas, 3, local_d );
-    GetLocal( array_p, LSIEN, snLocBas, 1, local_p );
+    GetLocal( &array_d[0], LSIEN, snLocBas, 3, local_d );
+    GetLocal( &array_p[0], LSIEN, snLocBas, 1, local_p );
 
     double ele_pres, ele_area;
 
@@ -819,8 +808,7 @@ double PGAssem_FSI::Assem_surface_ave_pressure(
     val_area += ele_area;
   }
 
-  delete [] array_p; delete [] array_d; delete [] local_p; delete [] local_d;
-  array_p = nullptr; array_d = nullptr; local_p = nullptr; local_d = nullptr;
+  delete [] local_p; delete [] local_d; local_p = nullptr; local_d = nullptr;
 
   delete [] LSIEN; delete [] sctrl_x; delete [] sctrl_y; delete [] sctrl_z;
   LSIEN = nullptr; sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
