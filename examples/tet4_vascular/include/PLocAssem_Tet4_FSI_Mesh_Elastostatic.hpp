@@ -52,7 +52,7 @@ class PLocAssem_Tet4_FSI_Mesh_Elastostatic : public IPLocAssem
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad )
-    {SYS_T::print_fatal("Error: PLocAssem_Tet4_FSI_Mesh_Laplacian::Assem_Residual is not implemented. \n");}
+    {SYS_T::print_fatal("Error: PLocAssem_Tet4_FSI_Mesh_Elastostatic::Assem_Residual is not implemented. \n");}
 
     virtual void Assem_Tangent_Residual(
         const double &time, const double &dt,
@@ -71,7 +71,7 @@ class PLocAssem_Tet4_FSI_Mesh_Elastostatic : public IPLocAssem
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad )
-    {SYS_T::print_fatal("Error: PLocAssem_Tet4_FSI_Mesh_Laplacian::Assem_Mass_Residual is not implemented. \n");}
+    {SYS_T::print_fatal("Error: PLocAssem_Tet4_FSI_Mesh_Elastostatic::Assem_Mass_Residual is not implemented. \n");}
 
     virtual void Assem_Residual_EBC(
         const int &ebc_id,
@@ -83,7 +83,7 @@ class PLocAssem_Tet4_FSI_Mesh_Elastostatic : public IPLocAssem
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad )
-    {SYS_T::print_fatal("Error: PLocAssem_Tet4_FSI_Mesh_Laplacian::Assem_Residual_EBC is not implemented. \n");}
+    {SYS_T::print_fatal("Error: PLocAssem_Tet4_FSI_Mesh_Elastostatic::Assem_Residual_EBC is not implemented. \n");}
 
   private:
     const double E, nu, lambda, mu, kappa;

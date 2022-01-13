@@ -405,7 +405,7 @@ int main(int argc, char *argv[])
   matmodel -> write_hdf5(); // record model parameter on disk
 
   // Pseudo elastic mesh motion
-  IPLocAssem * locAssem_mesh_ptr = new PLocAssem_Tet4_FSI_Mesh_Elastostatic( mesh_E, mesh_nu );
+  IPLocAssem * locAssem_mesh_ptr = new PLocAssem_Tet4_FSI_Mesh_Laplacian();
   
   // ===== Initial condition =====
   PDNSolution * base = new PDNSolution_V( pNode_v, fNode, locinfnbc, 1, true, "base" ); 
