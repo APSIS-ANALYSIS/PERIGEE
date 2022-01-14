@@ -576,6 +576,8 @@ int main(int argc, char *argv[])
   PC mesh_pc; mesh_lsolver->GetPC(&mesh_pc);
   PCFieldSplitSetBlockSize( mesh_pc, 3 );
 
+  mesh_lsolver -> print_info();
+
   SYS_T::commPrint("===> mesh solver LHS setted up.\n");
 
   // ===== Nonlinear solver context =====
