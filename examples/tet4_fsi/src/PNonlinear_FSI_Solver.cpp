@@ -30,14 +30,13 @@ void PNonlinear_FSI_Solver::update_solid_kinematics(
 {
   const int nlocal = pnode -> get_nlocalnode_solid();
   
-  Vec local_input, local_output;
+  Vec local_output;
 
-  VecGhostGetLocalForm(input,            &local_input);
   VecGhostGetLocalForm(output->solution, &local_output);
 
   double * array_input, * array_output;
 
-  VecGetArray(local_input,  &array_input);
+  VecGetArray(input,        &array_input);
   VecGetArray(local_output, &array_output);
 
   for(int ii=0; ii<nlocal; ++ii)
@@ -49,10 +48,8 @@ void PNonlinear_FSI_Solver::update_solid_kinematics(
     array_output[ii3+2] += val * array_input[ii3+2];
   }
 
-  VecRestoreArray(local_input,  &array_input);
+  VecRestoreArray(input,        &array_input);
   VecRestoreArray(local_output, &array_output);
-
-  VecGhostRestoreLocalForm(input,            &local_input);
   VecGhostRestoreLocalForm(output->solution, &local_output);
 
   output->GhostUpdate(); // update the ghost slots
