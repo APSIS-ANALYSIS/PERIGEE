@@ -293,7 +293,7 @@ void PGAssem_Mesh::Assem_tangent_residual(
 
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 
-  for(int ii = 0; ii<dof; ++ii) EssBC_G( nbc_part, ii );
+  for(int ii = 0; ii<dof; ++ii) EssBC_KG( nbc_part, ii );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
