@@ -290,8 +290,10 @@ int main(int argc, char *argv[])
 
   ALocal_NodalBC * mesh_locnbc = new ALocal_NodalBC(part_v_file, rank, "/mesh_nbc/MF");
 
-  ALocal_EBC * locebc = new ALocal_EBC_outflow(part_v_file, rank);
+  ALocal_EBC * locebc_v = new ALocal_EBC_outflow(part_v_file, rank);
   
+  ALocal_EBC * locebc_p = new ALocal_EBC( part_p_file, rank );
+
   ALocal_EBC * mesh_locebc = new ALocal_EBC(part_v_file, rank, "/mesh_ebc");
 
   Prestress_solid * ps_data = new Prestress_solid(locElem, nqp_tet, rank, is_load_ps, "prestress");
@@ -482,19 +484,19 @@ int main(int argc, char *argv[])
 
   gbc -> print_info();
 
-  SYS_T::print_fatal_if(gbc->get_num_ebc() != locebc->get_num_ebc(),
+  SYS_T::print_fatal_if(gbc->get_num_ebc() != locebc_v->get_num_ebc(),
       "Error: GenBC number of faces does not match with that in ALocal_EBC.\n");
 
   // ===== Global assembly routine =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
   IPGAssem * gloAssem_ptr = new PGAssem_FSI( locAssem_fluid_ptr,
       locAssem_solid_ptr, elements, quads, locElem, locIEN_v, locIEN_p,
-      pNode_v, pNode_p, locnbc_v, locnbc_p, locebc, gbc, nz_estimate );
+      pNode_v, pNode_p, locnbc_v, locnbc_p, locebc_v, gbc, nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
   gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_fluid_ptr,
       locAssem_solid_ptr, elements, quads, locIEN_v, locIEN_p, pNode_v, 
-      locnbc_v, locnbc_p, locebc, gbc );
+      locnbc_v, locnbc_p, locebc_v, gbc );
 
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
   gloAssem_ptr->Fix_nonzero_err_str();
@@ -531,7 +533,7 @@ int main(int argc, char *argv[])
 
     gloAssem_ptr->Assem_mass_residual( disp, velo, pres, locElem, locAssem_fluid_ptr,
         locAssem_solid_ptr, elementv, elements, quadv, quads, locIEN_v, locIEN_p, 
-        fNode, locnbc_v, locnbc_p, locebc, ps_data );
+        fNode, locnbc_v, locnbc_p, locebc_v, ps_data );
 
     Vec proj_vp, proj_v, proj_p;
     VecDuplicate( gloAssem_ptr->G, &proj_vp );
@@ -593,16 +595,16 @@ int main(int argc, char *argv[])
   tsolver->print_info();
 
   // ===== Outlet flowrate recording files =====
-  for(int ff=0; ff<locebc->get_num_ebc(); ++ff)
+  for(int ff=0; ff<locebc_v->get_num_ebc(); ++ff)
   {
     const double dot_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        disp, dot_velo, locAssem_fluid_ptr, elements, quads, locebc, ff );
+        disp, dot_velo, locAssem_fluid_ptr, elements, quads, locebc_v, ff );
 
     const double face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        disp, velo, locAssem_fluid_ptr, elements, quads, locebc, ff );
+        disp, velo, locAssem_fluid_ptr, elements, quads, locebc_v, ff );
 
     const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
-        disp, pres, locAssem_fluid_ptr, elements, quads, locebc, ff );
+        disp, pres, locAssem_fluid_ptr, elements, quads, locebc_v, ff );
 
     // set the gbc initial conditions using the 3D data
     gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
@@ -618,9 +620,9 @@ int main(int argc, char *argv[])
       // If this is NOT a restart run, generate a new file, otherwise append to
       // a existing file
       if( !is_restart )
-        ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
+        ofile.open( locebc_v->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
       else
-        ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
+        ofile.open( locebc_v->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
 
       // if this is NOT a restart run, record the initial values
       if( !is_restart )
@@ -670,7 +672,7 @@ int main(int argc, char *argv[])
   tsolver->TM_FSI_GenAlpha(is_restart, is_velo, is_pres, base, 
       dot_disp, dot_velo, dot_pres, disp, velo, pres, 
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN_v, locIEN_p, 
-      pNode_v, pNode_p, fNode, locnbc_v, locnbc_p, locinfnbc, mesh_locnbc, locebc, mesh_locebc, 
+      pNode_v, pNode_p, fNode, locnbc_v, locnbc_p, locinfnbc, mesh_locnbc, locebc_v, mesh_locebc, 
       gbc, pmat, mmat, elementv, elements, quadv, quads, ps_data,
       locAssem_fluid_ptr, locAssem_solid_ptr, locAssem_mesh_ptr,
       gloAssem_ptr, gloAssem_mesh_ptr, lsolver, mesh_lsolver, nsolver);
@@ -686,7 +688,7 @@ int main(int argc, char *argv[])
   ISDestroy(&is_velo); ISDestroy(&is_pres);
   delete elements; delete elementv; delete quadv; delete quads; delete inflow_rate_ptr;
   delete GMIptr; delete PartBasic; delete locElem; delete fNode; delete pNode_v; delete pNode_p;
-  delete locinfnbc; delete locnbc_v; delete locnbc_p; delete mesh_locnbc; delete locebc;
+  delete locinfnbc; delete locnbc_v; delete locnbc_p; delete mesh_locnbc; delete locebc_v;
   delete mesh_locebc; delete locIEN_v; delete locIEN_p; delete ps_data;
   PetscFinalize();
   return EXIT_SUCCESS;

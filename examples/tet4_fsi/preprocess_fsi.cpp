@@ -482,6 +482,9 @@ int main( int argc, char * argv[] )
     }
     else SYS_T::print_fatal("ERROR: unrecognized fsiBC_type. \n");
 
+    EBC_Partition * ebcpart_p = new EBC_Partition( part_p, mnindex_p, ebc );
+    ebcpart_p -> write_hdf5( part_file_p );
+
     EBC_Partition * mebcpart = new EBC_Partition(part_v, mnindex_v, mesh_ebc);
 
     mebcpart-> write_hdf5( part_file_v, "/mesh_ebc" );
