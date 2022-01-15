@@ -1204,6 +1204,9 @@ void PGAssem_FSI::BackFlow_KG( const double &dt,
       }
 
       VecSetValues(G, 3*snLocBas, srow_index, lassem_f_ptr->sur_Residual0, ADD_VALUES);
+    
+      MatSetValues(K, 3*snLocBas, srow_index, 3*snLocBas, srow_index,
+          lassem_f_ptr->sur_Tangent00, ADD_VALUES);
     }
   }
 
