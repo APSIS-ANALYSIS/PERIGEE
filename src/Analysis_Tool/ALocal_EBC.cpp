@@ -96,4 +96,16 @@ void ALocal_EBC::get_SIEN( const int &ii,
   }
 }
 
+std::vector<int> ALocal_EBC::get_SIEN( const int &ii, const int &eindex ) const
+{
+  const int len = cell_nLocBas[ii];
+  std::vector<int> out (len, 0);
+  for(int jj=0; jj<len; ++jj)
+  {
+    const int pos = local_tri_ien[ii][len*eindex+jj];
+    out[jj] = local_cell_node_pos[ii][pos];
+  }
+  return out;
+}
+
 // EOF

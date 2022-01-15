@@ -121,6 +121,8 @@ class ALocal_EBC
     // ------------------------------------------------------------------------
     virtual void get_SIEN( const int &ii, const int &eindex, int * const &sien ) const;
 
+    virtual std::vector<int> get_SIEN( const int &ii, const int &eindex ) const;
+
     // ------------------------------------------------------------------------
     // get_intPts_xyz: returns the surface element's interior point
     // coordinates.
