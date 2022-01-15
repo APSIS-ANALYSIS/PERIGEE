@@ -825,7 +825,8 @@ class IPGAssem
         IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_EBC * const &ebc_part,
+        const ALocal_EBC * const &ebc_v,
+        const ALocal_EBC * const &ebc_p,
         const int &ebc_id )
     {
       SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");

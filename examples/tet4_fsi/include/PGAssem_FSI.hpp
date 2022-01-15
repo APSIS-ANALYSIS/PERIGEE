@@ -138,7 +138,8 @@ class PGAssem_FSI : public IPGAssem
         IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_EBC * const &ebc_part,
+        const ALocal_EBC * const &ebc_v,
+        const ALocal_EBC * const &ebc_p,
         const int &ebc_id );
 
     virtual double Assem_surface_flowrate(

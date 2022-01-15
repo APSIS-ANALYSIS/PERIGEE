@@ -717,7 +717,8 @@ double PGAssem_FSI::Assem_surface_ave_pressure(
     IPLocAssem_2x2Block * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const ALocal_EBC * const &ebc_part,
+    const ALocal_EBC * const &ebc_v,
+    const ALocal_EBC * const &ebc_p,
     const int &ebc_id )
 {
   const std::vector<double> array_d = disp -> GetLocalArray();
@@ -726,23 +727,25 @@ double PGAssem_FSI::Assem_surface_ave_pressure(
   double * local_d = new double [snLocBas * 3];
   double * local_p = new double [snLocBas];
 
-  int * LSIEN = new int [snLocBas];
+  int * LSIEN_v = new int [snLocBas];
+  int * LSIEN_p = new int [snLocBas];
   double * sctrl_x = new double [snLocBas];
   double * sctrl_y = new double [snLocBas];
   double * sctrl_z = new double [snLocBas];
 
-  const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+  const int num_sele = ebc_v -> get_num_local_cell(ebc_id);
 
   double val_pres = 0.0, val_area = 0.0;
 
   for(int ee=0; ee<num_sele; ++ee)
   {
-    ebc_part -> get_SIEN( ebc_id, ee, LSIEN );
+    ebc_v -> get_SIEN( ebc_id, ee, LSIEN_v );
+    ebc_p -> get_SIEN( ebc_id, ee, LSIEN_p );
 
-    ebc_part -> get_ctrlPts_xyz( ebc_id, ee, sctrl_x, sctrl_y, sctrl_z );
+    ebc_v -> get_ctrlPts_xyz( ebc_id, ee, sctrl_x, sctrl_y, sctrl_z );
 
-    GetLocal( &array_d[0], LSIEN, snLocBas, 3, local_d );
-    GetLocal( &array_p[0], LSIEN, snLocBas, 1, local_p );
+    GetLocal( &array_d[0], LSIEN_v, snLocBas, 3, local_d );
+    GetLocal( &array_p[0], LSIEN_p, snLocBas, 1, local_p );
 
     double ele_pres, ele_area;
 
@@ -755,8 +758,9 @@ double PGAssem_FSI::Assem_surface_ave_pressure(
 
   delete [] local_p; delete [] local_d; local_p = nullptr; local_d = nullptr;
 
-  delete [] LSIEN; delete [] sctrl_x; delete [] sctrl_y; delete [] sctrl_z;
-  LSIEN = nullptr; sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
+  delete [] LSIEN_v; delete [] LSIEN_p; LSIEN_v = nullptr; LSIEN_p = nullptr; 
+  delete [] sctrl_x; delete [] sctrl_y; delete [] sctrl_z;
+  sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
 
   double sum_pres = 0.0, sum_area = 0.0;
 

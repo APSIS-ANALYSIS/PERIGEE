@@ -604,7 +604,7 @@ int main(int argc, char *argv[])
         disp, velo, locAssem_fluid_ptr, elements, quads, locebc_v, ff );
 
     const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
-        disp, pres, locAssem_fluid_ptr, elements, quads, locebc_v, ff );
+        disp, pres, locAssem_fluid_ptr, elements, quads, locebc_v, locebc_p, ff );
 
     // set the gbc initial conditions using the 3D data
     gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
@@ -672,7 +672,8 @@ int main(int argc, char *argv[])
   tsolver->TM_FSI_GenAlpha(is_restart, is_velo, is_pres, base, 
       dot_disp, dot_velo, dot_pres, disp, velo, pres, 
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN_v, locIEN_p, 
-      pNode_v, pNode_p, fNode, locnbc_v, locnbc_p, locinfnbc, mesh_locnbc, locebc_v, mesh_locebc, 
+      pNode_v, pNode_p, fNode, locnbc_v, locnbc_p, locinfnbc, mesh_locnbc, 
+      locebc_v, locebc_p, mesh_locebc, 
       gbc, pmat, mmat, elementv, elements, quadv, quads, ps_data,
       locAssem_fluid_ptr, locAssem_solid_ptr, locAssem_mesh_ptr,
       gloAssem_ptr, gloAssem_mesh_ptr, lsolver, mesh_lsolver, nsolver);
@@ -688,8 +689,9 @@ int main(int argc, char *argv[])
   ISDestroy(&is_velo); ISDestroy(&is_pres);
   delete elements; delete elementv; delete quadv; delete quads; delete inflow_rate_ptr;
   delete GMIptr; delete PartBasic; delete locElem; delete fNode; delete pNode_v; delete pNode_p;
-  delete locinfnbc; delete locnbc_v; delete locnbc_p; delete mesh_locnbc; delete locebc_v;
-  delete mesh_locebc; delete locIEN_v; delete locIEN_p; delete ps_data;
+  delete locinfnbc; delete locnbc_v; delete locnbc_p; delete mesh_locnbc; 
+  delete locebc_v; delete locebc_p; delete mesh_locebc; 
+  delete locIEN_v; delete locIEN_p; delete ps_data;
   PetscFinalize();
   return EXIT_SUCCESS;
 }

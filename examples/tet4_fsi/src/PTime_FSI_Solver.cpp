@@ -88,7 +88,8 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
         const ALocal_NodalBC * const &nbc_p,
         const ALocal_Inflow_NodalBC * const &infnbc,
         const ALocal_NodalBC * const &nbc_mesh,
-        const ALocal_EBC * const &ebc,
+        const ALocal_EBC * const &ebc_v,
+        const ALocal_EBC * const &ebc_p,
         const ALocal_EBC * const &ebc_mesh,
         IGenBC * const &gbc,
         const Matrix_PETSc * const &bc_mat,
@@ -161,7 +162,7 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
         pre_dot_disp, pre_dot_velo, pre_dot_pres, pre_disp, pre_velo, pre_pres, 
         tmga_ptr, flr_ptr, alelem_ptr, lien_v, lien_p, feanode_ptr, pnode_v, pnode_p, 
         nbc_v, nbc_p, infnbc,
-        nbc_mesh, ebc, ebc_mesh, gbc, bc_mat, bc_mesh_mat,
+        nbc_mesh, ebc_v, ebc_mesh, gbc, bc_mat, bc_mesh_mat,
         elementv, elements, quad_v, quad_s, ps_ptr, 
         lassem_fluid_ptr, lassem_solid_ptr, lassem_mesh_ptr,
         gassem_ptr, gassem_mesh_ptr, lsolver_ptr, lsolver_mesh_ptr,
@@ -184,19 +185,19 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     }
 
     // Calculate the flow rate on all outlets
-    for(int face=0; face<ebc -> get_num_ebc(); ++face)
+    for(int face=0; face<ebc_v -> get_num_ebc(); ++face)
     {
       // Calculate 3D dot flow rate on the outlets
       const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( cur_disp,
-          cur_dot_velo, lassem_fluid_ptr, elements, quad_s, ebc, face );
+          cur_dot_velo, lassem_fluid_ptr, elements, quad_s, ebc_v, face );
 
       // Calculate 3D flow rate on the outlets
       const double face_flrate = gassem_ptr -> Assem_surface_flowrate( cur_disp,
-          cur_velo, lassem_fluid_ptr, elements, quad_s, ebc, face);
+          cur_velo, lassem_fluid_ptr, elements, quad_s, ebc_v, face);
 
       // Calculate 3D averaged pressure on outlets
       const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
-          cur_disp, cur_pres, lassem_fluid_ptr, elements, quad_s, ebc, face);
+          cur_disp, cur_pres, lassem_fluid_ptr, elements, quad_s, ebc_v, ebc_p, face);
 
       // Calculate 0D pressure from LPN model
       const double dot_lpn_flowrate = dot_face_flrate;
@@ -209,7 +210,7 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
       if( SYS_T::get_MPI_rank() == 0 )
       {
         std::ofstream ofile;
-        ofile.open( ebc->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
+        ofile.open( ebc_v->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
         ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
         ofile.close();
       }
