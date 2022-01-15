@@ -973,7 +973,7 @@ void PGAssem_FSI::NatBC_Resis_KG( const double &curr_time, const double &dt,
   double * sctrl_y = new double [snLocBas];
   double * sctrl_z = new double [snLocBas];
 
-  PetscScalar * Res = new PetscScalar [snLocBas * 3];
+  PetscScalar * Res = new PetscScalar [3*snLocBas];
   PetscInt * srow_idx = new PetscInt [3*snLocBas];
 
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)

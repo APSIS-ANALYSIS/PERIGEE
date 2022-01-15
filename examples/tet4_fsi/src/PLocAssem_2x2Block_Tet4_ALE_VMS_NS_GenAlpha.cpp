@@ -884,13 +884,13 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
 
   const int face_nqp = quad -> get_num_quadPts();
 
-  double surface_area;
-
   Zero_sur_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
     const std::vector<double> R = element->get_R(qua);
+
+    double surface_area;
 
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
