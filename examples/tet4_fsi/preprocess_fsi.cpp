@@ -360,7 +360,7 @@ int main( int argc, char * argv[] )
   {
     for(int jj=0; jj<list_nn_v[ii]; ++jj)
     {
-      mapper_v[0].push_back( start_idx_v[ii] + jj * 3 );
+      mapper_v[0].push_back( start_idx_v[ii] + jj * 3     );
       mapper_v[1].push_back( start_idx_v[ii] + jj * 3 + 1 );
       mapper_v[2].push_back( start_idx_v[ii] + jj * 3 + 2 );
     }
