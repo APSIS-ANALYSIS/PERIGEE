@@ -396,9 +396,6 @@ void PGAssem_FSI::Assem_Tangent_Residual(
   std::vector<double> local_dot_d(nLocBas * 3), local_dot_v(nLocBas * 3), local_dot_p(nLocBas);
   std::vector<double> local_d(nLocBas * 3), local_v(nLocBas * 3), local_p(nLocBas);
 
-  int * IEN_v = new int [nLocBas];
-  int * IEN_p = new int [nLocBas];
-
   double * ectrl_x = new double [nLocBas];
   double * ectrl_y = new double [nLocBas];
   double * ectrl_z = new double [nLocBas];
@@ -408,18 +405,18 @@ void PGAssem_FSI::Assem_Tangent_Residual(
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    lien_v -> get_LIEN( ee, IEN_v );
-    lien_p -> get_LIEN( ee, IEN_p );
+    const std::vector<int> IEN_v = lien_v -> get_LIEN( ee );
+    const std::vector<int> IEN_p = lien_p -> get_LIEN( ee );
 
-    fnode_ptr -> get_ctrlPts_xyz(nLocBas, IEN_v, ectrl_x, ectrl_y, ectrl_z);
+    fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
 
-    GetLocal(&array_dot_d[0], IEN_v, nLocBas, 3, &local_dot_d[0]);
-    GetLocal(&array_dot_v[0], IEN_v, nLocBas, 3, &local_dot_v[0]);
-    GetLocal(&array_dot_p[0], IEN_p, nLocBas, 1, &local_dot_p[0]);
+    GetLocal(&array_dot_d[0], &IEN_v[0], nLocBas, 3, &local_dot_d[0]);
+    GetLocal(&array_dot_v[0], &IEN_v[0], nLocBas, 3, &local_dot_v[0]);
+    GetLocal(&array_dot_p[0], &IEN_p[0], nLocBas, 1, &local_dot_p[0]);
 
-    GetLocal(&array_d[0], IEN_v, nLocBas, 3, &local_d[0]);
-    GetLocal(&array_v[0], IEN_v, nLocBas, 3, &local_v[0]);
-    GetLocal(&array_p[0], IEN_p, nLocBas, 1, &local_p[0]);
+    GetLocal(&array_d[0], &IEN_v[0], nLocBas, 3, &local_d[0]);
+    GetLocal(&array_v[0], &IEN_v[0], nLocBas, 3, &local_v[0]);
+    GetLocal(&array_p[0], &IEN_p[0], nLocBas, 1, &local_p[0]);
 
     for(int ii=0; ii<nLocBas; ++ii)
       for(int mm=0; mm<3; ++mm)
@@ -466,7 +463,6 @@ void PGAssem_FSI::Assem_Tangent_Residual(
     }
   }
   
-  delete [] IEN_v; IEN_v = nullptr; delete [] IEN_p; IEN_p = nullptr;
   delete [] ectrl_x; delete [] ectrl_y; delete [] ectrl_z;
   ectrl_x = nullptr; ectrl_y = nullptr; ectrl_z = nullptr;
   delete [] row_id_v; delete [] row_id_p;
