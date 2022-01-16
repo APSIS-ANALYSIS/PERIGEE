@@ -218,8 +218,7 @@ int main( int argc, char * argv[] )
   const std::vector<int> wall_node_id = TET_T::read_int_PointData( sur_s_file_interior_wall, "GlobalNodeID" );
 
   const int nFunc_interface = static_cast<int>( wall_node_id.size() );
-  //const int nFunc_p = nFunc_v + nFunc_interface;
-  const int nFunc_p = nFunc_v;
+  const int nFunc_p = nFunc_v + nFunc_interface;
 
   // We will generate a new IEN array for the pressure variable by updating the
   // IEN for the solid element. If the solid element has node on the fluid-solid
@@ -234,8 +233,8 @@ int main( int argc, char * argv[] )
       // interface
       for(int ii=0; ii<4; ++ii)
       {
-        //const int pos = VEC_T::get_pos( wall_node_id, vecIEN_p[ee*4 +ii] );
-        //if( pos >=0 ) vecIEN_p[ee*4+ii] = nFunc_v + pos;     
+        const int pos = VEC_T::get_pos( wall_node_id, vecIEN_p[ee*4 +ii] );
+        if( pos >=0 ) vecIEN_p[ee*4+ii] = nFunc_v + pos;     
       }
     }
   }
