@@ -283,9 +283,9 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
 
     // update the mesh velocity
     dot_disp -> Copy( pre_dot_disp );
-    dot_disp -> ScaleValue( (1.0 - gamma) / gamma );
-    dot_disp -> PlusAX( pre_disp, 1.0 / (gamma * dt) );
-    dot_disp -> PlusAX( disp,    -1.0 / (gamma * dt) );
+    dot_disp -> ScaleValue( (gamma-1.0) / gamma );
+    dot_disp -> PlusAX( pre_disp, -1.0 / (gamma * dt) );
+    dot_disp -> PlusAX( disp,      1.0 / (gamma * dt) );
 
     dot_disp_alpha -> Copy( pre_dot_disp );
     dot_disp_alpha -> ScaleValue( 1.0 - alpha_m );
