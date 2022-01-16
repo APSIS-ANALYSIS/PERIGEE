@@ -46,8 +46,7 @@ int main( int argc, char * argv[] )
   const int elemType = cmd_h5r -> read_intScalar("/","elemType");
   int in_ncommon = cmd_h5r -> read_intScalar("/","in_ncommon");
 
-  delete cmd_h5r;
-  H5Fclose(prepcmd_file);
+  delete cmd_h5r; H5Fclose(prepcmd_file);
 
   SYS_T::GetOptionInt("-cpu_size", cpu_size);
   SYS_T::GetOptionInt("-in_ncommon", in_ncommon);
@@ -240,16 +239,17 @@ int main( int argc, char * argv[] )
         proc_rank, cpu_size, elemType, 0, dof_fields[0], start_idx_p[proc_rank], false );
 
     part_p -> write( part_file_p );
+    delete part_p;
 
     IPart * part_v = new Part_Tet_FSI( mesh_v, global_part, mnindex_v, IEN_v,
         ctrlPts, phy_tag, v_node_f, v_node_s,
         proc_rank, cpu_size, elemType, 1, dof_fields[1], start_idx_v[proc_rank], true );
 
     part_v -> write( part_file_v );
+    delete part_v;
 
     mytimer -> Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
-
   }
 
   // Clean up Memory
