@@ -283,13 +283,8 @@ void PGAssem_FSI::Assem_Residual(
   const std::vector<double> array_v = velo -> GetLocalArray();
   const std::vector<double> array_p = pres -> GetLocalArray();
 
-  const std::vector<double> array_dot_v_np1 = dot_velo_np1 -> GetLocalArray();
-  const std::vector<double> array_v_np1 = velo_np1 -> GetLocalArray();
-  const std::vector<double> array_u_np1 = disp_np1 -> GetLocalArray();
-
   std::vector<double> local_dot_d(nLocBas * 3), local_dot_v(nLocBas * 3), local_dot_p(nLocBas);
   std::vector<double> local_d(nLocBas * 3), local_v(nLocBas * 3), local_p(nLocBas);
-  std::vector<double> local_dot_v_np1(nLocBas * 3), local_v_np1(nLocBas * 3), local_u_np1(nLocBas * 3);
 
   double * ectrl_x = new double [nLocBas];
   double * ectrl_y = new double [nLocBas];
@@ -312,10 +307,6 @@ void PGAssem_FSI::Assem_Residual(
     GetLocal(&array_d[0], &IEN_v[0], nLocBas, 3, &local_d[0]);
     GetLocal(&array_v[0], &IEN_v[0], nLocBas, 3, &local_v[0]);
     GetLocal(&array_p[0], &IEN_p[0], nLocBas, 1, &local_p[0]);
-
-    GetLocal(&array_dot_v_np1[0], &IEN_v[0], nLocBas, 3, &local_dot_v_np1[0]);
-    GetLocal(&array_v_np1[0],     &IEN_v[0], nLocBas, 3, &local_v_np1[0]);
-    GetLocal(&array_u_np1[0],     &IEN_v[0], nLocBas, 3, &local_u_np1[0]);
 
     for(int ii=0; ii<nLocBas; ++ii)
       for(int mm=0; mm<3; ++mm)
@@ -355,7 +346,7 @@ void PGAssem_FSI::Assem_Residual(
   BackFlow_G( dot_disp, disp, velo, lassem_f_ptr, elements, quad_s, nbc_v, ebc_part );
 
   // Resistance BC for G
-  NatBC_Resis_G( curr_time, dt, disp, dot_velo, velo, lassem_f_ptr, elements, quad_s,
+  NatBC_Resis_G( curr_time, dt, disp_np1, dot_velo_np1, velo_np1, lassem_f_ptr, elements, quad_s,
       nbc_v, ebc_part, gbc );
 
   VecAssemblyBegin(G); VecAssemblyEnd(G);
@@ -402,13 +393,8 @@ void PGAssem_FSI::Assem_Tangent_Residual(
   const std::vector<double> array_v = velo -> GetLocalArray();
   const std::vector<double> array_p = pres -> GetLocalArray();
 
-  const std::vector<double> array_dot_v_np1 = dot_velo_np1 -> GetLocalArray();
-  const std::vector<double> array_v_np1 = velo_np1 -> GetLocalArray();
-  const std::vector<double> array_u_np1 = disp_np1 -> GetLocalArray();
-
   std::vector<double> local_dot_d(nLocBas * 3), local_dot_v(nLocBas * 3), local_dot_p(nLocBas);
   std::vector<double> local_d(nLocBas * 3), local_v(nLocBas * 3), local_p(nLocBas);
-  std::vector<double> local_dot_v_np1(nLocBas * 3), local_v_np1(nLocBas * 3), local_u_np1(nLocBas * 3);
 
   int * IEN_v = new int [nLocBas];
   int * IEN_p = new int [nLocBas];
@@ -434,10 +420,6 @@ void PGAssem_FSI::Assem_Tangent_Residual(
     GetLocal(&array_d[0], IEN_v, nLocBas, 3, &local_d[0]);
     GetLocal(&array_v[0], IEN_v, nLocBas, 3, &local_v[0]);
     GetLocal(&array_p[0], IEN_p, nLocBas, 1, &local_p[0]);
-
-    GetLocal(&array_dot_v_np1[0], IEN_v, nLocBas, 3, &local_dot_v_np1[0]);
-    GetLocal(&array_v_np1[0],     IEN_v, nLocBas, 3, &local_v_np1[0]);
-    GetLocal(&array_u_np1[0],     IEN_v, nLocBas, 3, &local_u_np1[0]);
 
     for(int ii=0; ii<nLocBas; ++ii)
       for(int mm=0; mm<3; ++mm)
@@ -494,7 +476,7 @@ void PGAssem_FSI::Assem_Tangent_Residual(
   BackFlow_KG( dt, dot_disp, disp, velo, lassem_f_ptr, elements, quad_s, nbc_v, ebc_part );
 
   // Resistance BC for G
-  NatBC_Resis_KG( curr_time, dt, disp, dot_velo, velo, lassem_f_ptr, elements, quad_s,
+  NatBC_Resis_KG( curr_time, dt, disp_np1, dot_velo_np1, velo_np1, lassem_f_ptr, elements, quad_s,
       nbc_v, ebc_part, gbc );
 
   VecAssemblyBegin(G); VecAssemblyEnd(G);
