@@ -24,7 +24,8 @@ int main( int argc, char * argv[] )
 
   SYS_T::execute("mkdir ppart");
 
-  const std::string part_file("./ppart/postpart");
+  const std::string part_file_p("./ppart/postpart_p");
+  const std::string part_file_v("./ppart/postpart_v");
 
   const int num_fields = 2; // Two fields : pressure + velocity/displacement
   const std::vector<int> dof_fields {1, 3}; // pressure 1 ; velocity/displacement 3
@@ -53,7 +54,8 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionBool("-METIS_isDualGraph", isDualGraph);
 
   cout<<"==== Command Line Arguments ===="<<endl;
-  cout<<" -part_file: "<<part_file<<endl;
+  cout<<" -part_file_v: "<<part_file_v<<endl;
+  cout<<" -part_file_p: "<<part_file_p<<endl;
   cout<<" -cpu_size: "<<cpu_size<<endl;
   cout<<" -in_ncommon: "<<in_ncommon<<endl;
   if(isDualGraph) cout<<" -METIS_isDualGraph: true \n";
@@ -179,25 +181,80 @@ int main( int argc, char * argv[] )
   mnindex_p -> write_hdf5("post_node_mapping_p");
   mnindex_v -> write_hdf5("post_node_mapping_v");
 
+  // Generate a list of local node number
+  std::vector<int> list_nn_v(cpu_size), list_nn_p(cpu_size);
+  for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
+  {
+    // list stores the number of velo/pres nodes in each cpu
+    list_nn_p[proc_rank] = 0; list_nn_v[proc_rank] = 0;
+    for(int nn=0; nn<mesh_p -> get_nFunc(); ++nn)
+    {
+      if(global_part->get_npart(nn,0) == proc_rank) list_nn_p[proc_rank] += 1;
+    }
 
+    for(int nn=0; nn<mesh_v -> get_nFunc(); ++nn)
+    {
+      if(global_part->get_npart(nn,1) == proc_rank) list_nn_v[proc_rank] += 1;
+    }
+  }
 
+  // Now generate the mappings from the gird pt idx to the matrix row idx
+  // This is needed because we will have a matrix that has a special structure
+  // due to the use of mix fem.
+  std::vector<int> start_idx_v(cpu_size), start_idx_p(cpu_size);
+  start_idx_v[0] = 0;
+  start_idx_p[0] = 3 * list_nn_v[0];
+  for(int ii = 1; ii < cpu_size; ++ii )
+  {
+    start_idx_v[ii] = start_idx_v[ii-1] + list_nn_v[ii-1]*3 + list_nn_p[ii-1];
+    start_idx_p[ii] = start_idx_v[ii  ] + list_nn_v[ii  ]*3;
+  }
 
+  // mapper maps from the new grid point index to the matrix row index
+  std::vector< std::vector<int> > mapper_p, mapper_v;
+  mapper_p.resize(1); mapper_v.resize(3);
 
+  for(int ii=0; ii<cpu_size; ++ii)
+  {
+    for(int jj=0; jj<list_nn_v[ii]; ++jj)
+    {
+      mapper_v[0].push_back( start_idx_v[ii] + jj * 3     );
+      mapper_v[1].push_back( start_idx_v[ii] + jj * 3 + 1 );
+      mapper_v[2].push_back( start_idx_v[ii] + jj * 3 + 2 );
+    }
 
+    for(int jj=0; jj<list_nn_p[ii]; ++jj)
+      mapper_p[0].push_back( start_idx_p[ii] + jj );
+  }
 
+  // Start partition
+  SYS_T::Timer * mytimer = new SYS_T::Timer();
 
+  for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
+  {
+    mytimer->Reset();
+    mytimer->Start();
+    
+    IPart * part_p = new Part_Tet_FSI( mesh_p, global_part, mnindex_p, IEN_p,
+        ctrlPts, phy_tag, p_node_f, p_node_s,
+        proc_rank, cpu_size, elemType, 0, dof_fields[0], start_idx_p[proc_rank], false );
 
+    part_p -> write( part_file_p );
 
+    IPart * part_v = new Part_Tet_FSI( mesh_v, global_part, mnindex_v, IEN_v,
+        ctrlPts, phy_tag, v_node_f, v_node_s,
+        proc_rank, cpu_size, elemType, 1, dof_fields[1], start_idx_v[proc_rank], true );
 
+    part_v -> write( part_file_v );
 
+    mytimer -> Stop();
+    cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
+  }
 
-
-
-
-
-
-
+  // Clean up Memory
+  delete mnindex_p; delete mnindex_v; delete mesh_p; delete mesh_v;
+  delete IEN_p; delete IEN_v; delete mytimer; delete global_part;
   PetscFinalize();
   return EXIT_SUCCESS;
 }
