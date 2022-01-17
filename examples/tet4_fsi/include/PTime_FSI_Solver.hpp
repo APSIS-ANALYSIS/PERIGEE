@@ -71,9 +71,11 @@ class PTime_FSI_Solver
     const int renew_tang_freq; // the frequency for renewing tangents
     const std::string pb_name; // the problem base name for the solution
 
-    std::string Name_Generator( const int &counter ) const;
+    std::string Name_Generator( const std::string &middle_name, 
+        const int &counter ) const;
 
-    std::string Name_dot_Generator( const int &counter ) const;
+    std::string Name_dot_Generator( const std::string &middle_name, 
+        const int &counter ) const;
 
     void Write_restart_file(const PDNTimeStep * const &timeinfo,
         const std::string &solname ) const;

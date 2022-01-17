@@ -23,19 +23,22 @@ void PTime_FSI_Solver::print_info() const
 }
 
 
-std::string PTime_FSI_Solver::Name_Generator( const int &counter ) const
+std::string PTime_FSI_Solver::Name_Generator( const std::string &middle_name,
+    const int &counter ) const
 {
   const int aux = 900000000 + counter;
   std::ostringstream temp;
   temp<<aux;
 
   std::string out_name(pb_name);
+  out_name.append(middle_name);
   out_name.append(temp.str());
   return out_name;
 }
 
 
-std::string PTime_FSI_Solver::Name_dot_Generator( const int &counter ) const
+std::string PTime_FSI_Solver::Name_dot_Generator( const std::string &middle_name,
+    const int &counter ) const
 {
   const int aux = 900000000 + counter;
   std::ostringstream temp;
@@ -43,6 +46,7 @@ std::string PTime_FSI_Solver::Name_dot_Generator( const int &counter ) const
 
   std::string out_name("dot_");
   out_name.append(pb_name);
+  out_name.append(middle_name);
   out_name.append(temp.str());
   return out_name;
 }
@@ -127,11 +131,23 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
   // Do NOT overwrite solution if this is a restart
   if( restart_init_assembly_flag == false )
   {
-    const std::string sol_name = Name_Generator(time_info->get_index());
+    std::string sol_name = Name_Generator("disp_", time_info->get_index());
     cur_disp->WriteBinary(sol_name.c_str());
 
-    const std::string sol_dot_name = Name_dot_Generator(time_info->get_index());
-    cur_velo->WriteBinary(sol_dot_name.c_str());
+    sol_name = Name_Generator("velo_", time_info->get_index());
+    cur_velo->WriteBinary(sol_name.c_str());
+
+    sol_name = Name_Generator("pres_", time_info->get_index());
+    cur_pres->WriteBinary(sol_name.c_str());
+
+    std::string sol_dot_name = Name_dot_Generator("disp_", time_info->get_index());
+    cur_dot_disp->WriteBinary(sol_dot_name.c_str());
+
+    sol_dot_name = Name_dot_Generator("velo_", time_info->get_index());
+    cur_dot_velo->WriteBinary(sol_dot_name.c_str());
+
+    sol_dot_name = Name_dot_Generator("pres_", time_info->get_index());
+    cur_dot_pres->WriteBinary(sol_dot_name.c_str());
   }
 
   int nl_counter = 100;
@@ -177,11 +193,23 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
 
     if( time_info->get_index()%sol_record_freq == 0)
     {
-      const std::string sol_name = Name_Generator( time_info->get_index() );
+      std::string sol_name = Name_Generator("disp_", time_info->get_index());
       cur_disp->WriteBinary(sol_name.c_str());
 
-      const std::string sol_dot_name = Name_dot_Generator(time_info->get_index());
-      cur_velo->WriteBinary(sol_dot_name.c_str());
+      sol_name = Name_Generator("velo_", time_info->get_index());
+      cur_velo->WriteBinary(sol_name.c_str());
+
+      sol_name = Name_Generator("pres_", time_info->get_index());
+      cur_pres->WriteBinary(sol_name.c_str());
+
+      std::string sol_dot_name = Name_dot_Generator("disp_", time_info->get_index());
+      cur_dot_disp->WriteBinary(sol_dot_name.c_str());
+
+      sol_dot_name = Name_dot_Generator("velo_", time_info->get_index());
+      cur_dot_velo->WriteBinary(sol_dot_name.c_str());
+
+      sol_dot_name = Name_dot_Generator("pres_", time_info->get_index());
+      cur_dot_pres->WriteBinary(sol_dot_name.c_str());
     }
 
     // Calculate the flow rate on all outlets
