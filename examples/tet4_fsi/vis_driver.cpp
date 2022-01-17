@@ -11,18 +11,22 @@
 #include "QuadPts_vis_tet4.hpp"
 #include "FEAElement_Tet4.hpp"
 #include "VisDataPrep_FSI.hpp"
-
+#include "VTK_Writer_FSI_Tet4.hpp"
 #include "APart_Node.hpp"
 
 int main( int argc, char * argv[] )
 {
   const std::string element_part_file = "epart.h5";
-  const std::string anode_mapping_file = "node_mapping.h5";
-  const std::string pnode_mapping_file = "post_node_mapping.h5";
+  const std::string an_v_mapping_file = "node_mapping_v.h5";
+  const std::string an_p_mapping_file = "node_mapping_p.h5";
+  const std::string pn_v_mapping_file = "post_node_mapping_v.h5";
+  const std::string pn_p_mapping_file = "post_node_mapping_p.h5";
   const std::string part_v_file="./ppart/postpart_v";
   const std::string part_p_file="./ppart/postpart_p";
 
-  std::string sol_bname("SOL_");
+  std::string disp_sol_bname("SOL_disp_");
+  std::string velo_sol_bname("SOL_velo_");
+  std::string pres_sol_bname("SOL_pres_");
   std::string out_bname("VIS_FSI_");
   
   int time_start = 0;
@@ -53,7 +57,9 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionInt("-time_step", time_step);
   SYS_T::GetOptionInt("-time_end", time_end);
   SYS_T::GetOptionReal("-dt", dt);
-  SYS_T::GetOptionString("-sol_bname", sol_bname);
+  SYS_T::GetOptionString("-disp_sol_bname", disp_sol_bname);
+  SYS_T::GetOptionString("-velo_sol_bname", velo_sol_bname);
+  SYS_T::GetOptionString("-pres_sol_bname", pres_sol_bname);
   SYS_T::GetOptionString("-out_bname", out_bname);
   SYS_T::GetOptionBool("-xml", isXML);
   SYS_T::GetOptionBool("-clean", isClean);
@@ -61,7 +67,9 @@ int main( int argc, char * argv[] )
   // Correct time_step if it does not match with sol_rec_freq
   if( time_step % sol_rec_freq != 0 ) time_step = sol_rec_freq;
 
-  SYS_T::cmdPrint("-sol_bname:", sol_bname);
+  SYS_T::cmdPrint("-disp_sol_bname:", disp_sol_bname);
+  SYS_T::cmdPrint("-velo_sol_bname:", velo_sol_bname);
+  SYS_T::cmdPrint("-pres_sol_bname:", pres_sol_bname);
   SYS_T::cmdPrint("-out_bname:", out_bname);
   SYS_T::cmdPrint("-time_start:", time_start);
   SYS_T::cmdPrint("-time_step:", time_step);
@@ -115,20 +123,48 @@ int main( int argc, char * argv[] )
   pointArrays[1] = new double [pNode_p->get_nlocghonode() * 1];
   pointArrays[2] = new double [pNode_v->get_nlocghonode() * 3];
 
+  VTK_Writer_FSI_Tet4 * vtk_w = new VTK_Writer_FSI_Tet4(
+      GMIptr_v->get_nElem(), element_part_file );
 
+  std::ostringstream time_index;
 
+  for(int time = time_start; time<=time_end; time += time_step)
+  {
+    std::string disp_name_to_read(disp_sol_bname);
+    std::string velo_name_to_read(velo_sol_bname);
+    std::string pres_name_to_read(pres_sol_bname);
+    std::string name_to_write(out_bname);
+    time_index.str("");
+    time_index<< 900000000 + time;
+    disp_name_to_read.append(time_index.str());
+    velo_name_to_read.append(time_index.str());
+    pres_name_to_read.append(time_index.str());
+    name_to_write.append(time_index.str());
 
+    SYS_T::commPrint("Time %d: Read %s %s %s and Write %s \n",
+        time, disp_name_to_read.c_str(), pres_name_to_read.c_str(), 
+        velo_name_to_read.c_str(), name_to_write.c_str() );
+  
+    visprep->get_pointArray(disp_name_to_read, pres_name_to_read,
+        velo_name_to_read, an_v_mapping_file, an_p_mapping_file,
+        pn_v_mapping_file, pn_p_mapping_file,
+        pNode_v, pNode_p, GMIptr_v->get_nFunc(), GMIptr_p->get_nFunc(),
+        pointArrays);
 
+    vtk_w->writeOutput( fNode, locIEN_v, locIEN_p, locElem,
+        visprep, element, quad, pointArrays, rank, size,
+        pNode_p -> get_ntotalnode(),
+        time * dt, out_bname, name_to_write, isXML );
+  }
 
+  MPI_Barrier(PETSC_COMM_WORLD);
 
-
-
-
+  // Clean up memory
   delete quad; delete element; delete visprep;
   delete fNode; delete locIEN_v; delete locIEN_p; delete GMIptr_v; delete GMIptr_p; 
   delete PartBasic; delete locElem; delete pNode_v; delete pNode_p;  
   delete [] pointArrays[0]; delete [] pointArrays[1]; delete [] pointArrays[2];
-  delete [] pointArrays;
+  delete [] pointArrays; delete vtk_w;
   PetscFinalize();
   return EXIT_SUCCESS;
 }

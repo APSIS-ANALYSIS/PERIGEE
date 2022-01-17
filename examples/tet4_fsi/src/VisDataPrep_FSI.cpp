@@ -46,7 +46,7 @@ void VisDataPrep_FSI::get_pointArray(
   
   // Read local pres vector
   PostVectSolution pvsolu_pres(pres_sol_file_name, an_p_mapping_file,
-      pn_p_mapping_file, pNode_p, input_nfunc_p, 3);
+      pn_p_mapping_file, pNode_p, input_nfunc_p, 1);
 
   const int ntotal_v = pNode_v -> get_nlocghonode();
   const int ntotal_p = pNode_p -> get_nlocghonode();

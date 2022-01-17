@@ -58,7 +58,6 @@ void VTK_Writer_FSI_Tet4::writeOutput(
         const int &rank, const int &size,
         const int &num_of_nodes,
         const double &sol_time,
-        const std::string &basename,
         const std::string &outputBName,
         const std::string &outputName,
         const bool &isXML )
