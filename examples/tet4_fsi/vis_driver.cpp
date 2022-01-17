@@ -92,7 +92,8 @@ int main( int argc, char * argv[] )
   ALocal_IEN * locIEN_v = new ALocal_IEN(part_v_file, rank);
   ALocal_IEN * locIEN_p = new ALocal_IEN(part_p_file, rank);
   
-  IAGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info_FEM_3D(part_v_file, rank);
+  IAGlobal_Mesh_Info * GMIptr_v = new AGlobal_Mesh_Info_FEM_3D(part_v_file, rank);
+  IAGlobal_Mesh_Info * GMIptr_p = new AGlobal_Mesh_Info_FEM_3D(part_p_file, rank);
   
   ALocal_Elem * locElem = new ALocal_Elem(part_v_file, rank);
   
@@ -109,6 +110,10 @@ int main( int argc, char * argv[] )
 
   visprep->print_info();
 
+  double ** pointArrays = new double * [3];
+  pointArrays[0] = new double [pNode_v->get_nlocghonode() * 3];
+  pointArrays[1] = new double [pNode_p->get_nlocghonode() * 1];
+  pointArrays[2] = new double [pNode_v->get_nlocghonode() * 3];
 
 
 
@@ -120,8 +125,10 @@ int main( int argc, char * argv[] )
 
 
   delete quad; delete element; delete visprep;
-  delete fNode; delete locIEN_v; delete locIEN_p; delete GMIptr; delete PartBasic;
-  delete locElem; delete pNode_v; delete pNode_p;  
+  delete fNode; delete locIEN_v; delete locIEN_p; delete GMIptr_v; delete GMIptr_p; 
+  delete PartBasic; delete locElem; delete pNode_v; delete pNode_p;  
+  delete [] pointArrays[0]; delete [] pointArrays[1]; delete [] pointArrays[2];
+  delete [] pointArrays;
   PetscFinalize();
   return EXIT_SUCCESS;
 }
