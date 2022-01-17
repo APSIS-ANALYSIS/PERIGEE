@@ -130,6 +130,7 @@ SET( perigee_postprocess_lib_src
   ${perigee_source}/Postproc_Tool/Interpolater.cpp
   ${perigee_source}/Mesh/QuadPts_vis_tet4.cpp
   ${perigee_SOURCE_DIR}/src/VisDataPrep_FSI.cpp
+  ${perigee_SOURCE_DIR}/src/VisDataPrep_ALE_NS.cpp
   ${perigee_SOURCE_DIR}/src/VTK_Writer_FSI_Tet4.cpp
   )
 
@@ -166,6 +167,7 @@ ADD_EXECUTABLE( preprocess_fsi preprocess_fsi.cpp)
 ADD_EXECUTABLE( fsi_tet4_3d fsi_driver.cpp)
 ADD_EXECUTABLE( prepostproc prepost.cpp)
 ADD_EXECUTABLE( vis_fsi vis_driver.cpp )
+ADD_EXECUTABLE( vis_fluid vis_fluid.cpp )
 
 # Link libraries
 TARGET_LINK_LIBRARIES( gmshIO ${EXTRA_LINK_LIBS} perigee_preprocess )
@@ -173,5 +175,6 @@ TARGET_LINK_LIBRARIES( preprocess_fsi ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( fsi_tet4_3d ${EXTRA_LINK_LIBS} perigee_analysis )
 TARGET_LINK_LIBRARIES( prepostproc ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( vis_fsi ${EXTRA_LINK_LIBS} perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_fluid ${EXTRA_LINK_LIBS} perigee_postprocess )
 
 #EOF
