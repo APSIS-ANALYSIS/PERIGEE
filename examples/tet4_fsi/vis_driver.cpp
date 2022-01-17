@@ -10,7 +10,7 @@
 #include "ALocal_Elem.hpp"
 #include "QuadPts_vis_tet4.hpp"
 #include "FEAElement_Tet4.hpp"
-
+#include "VisDataPrep_FSI.hpp"
 
 #include "APart_Node.hpp"
 
@@ -105,6 +105,9 @@ int main( int argc, char * argv[] )
 
   FEAElement * element = new FEAElement_Tet4( quad-> get_num_quadPts() );
 
+  IVisDataPrep * visprep = new VisDataPrep_FSI();
+
+  visprep->print_info();
 
 
 
@@ -116,7 +119,7 @@ int main( int argc, char * argv[] )
 
 
 
-  delete quad; delete element;
+  delete quad; delete element; delete visprep;
   delete fNode; delete locIEN_v; delete locIEN_p; delete GMIptr; delete PartBasic;
   delete locElem; delete pNode_v; delete pNode_p;  
   PetscFinalize();

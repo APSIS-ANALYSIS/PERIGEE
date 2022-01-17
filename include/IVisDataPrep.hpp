@@ -78,7 +78,30 @@ class IVisDataPrep
     {
       SYS_T::print_fatal("Warning: get_pointArray is not implemented.\n");
     }
-    
+
+    // ------------------------------------------------------------------------
+    // ! input gives three solution names for the disp, pres, and velo
+    // respectively. The kinematic variables (i.e. disp and velo) were
+    // partitioned in a different manner from that of the pressure variable.
+    // Thus, there are two sets of node mapping files.
+    // ------------------------------------------------------------------------
+    virtual void get_pointArray(
+        const std::string &disp_solution_file_name,
+        const std::string &pres_solution_file_name,
+        const std::string &velo_solution_file_name,
+        const std::string &an_v_node_mapping_file,
+        const std::string &an_p_node_mapping_file,
+        const std::string &pn_v_node_mapping_file,
+        const std::string &pn_p_node_mapping_file,
+        const APart_Node * const &pNode_v,
+        const APart_Node * const &pNode_p,
+        const int &input_nfunc_v,
+        const int &input_nfunc_p,
+        double ** &pointArrays ) const
+    {
+      SYS_T::print_fatal("Warning: get_pointArray is not implemented.\n");
+    }
+
     // -------------------------------------------------------------------
     // ! give read permission for the private data: arrayCompSize
     //   i.e. the number of quantities to be visualized.

@@ -129,6 +129,7 @@ SET( perigee_postprocess_lib_src
   ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   ${perigee_source}/Postproc_Tool/Interpolater.cpp
   ${perigee_source}/Mesh/QuadPts_vis_tet4.cpp
+  ${perigee_SOURCE_DIR}/src/VisDataPrep_FSI.cpp
   )
 
 # ===============================================
