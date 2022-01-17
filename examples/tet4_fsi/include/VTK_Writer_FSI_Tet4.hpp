@@ -41,6 +41,25 @@ class VTK_Writer_FSI_Tet4
         const std::string &outputName,
         const bool &isXML );
 
+    void writeOutput_fluid(
+        const FEANode * const &fnode_ptr,
+        const ALocal_IEN * const &lien_v,
+        const ALocal_IEN * const &lien_p,
+        const std::vector<int> &fien,
+        const ALocal_Elem * const &lelem_ptr,
+        const IVisDataPrep * const &vdata_ptr,
+        FEAElement * const &elemptr,
+        const IQuadPts * const &quad,
+        const double * const * const &pointArrays,
+        const int &rank, const int &size,
+        const int &num_of_nodes,
+        const double &sol_time,
+        const std::string &outputBName,
+        const std::string &outputName,
+        const bool &isXML );
+
+
+
   private:
     const int nLocBas, nElem;
 

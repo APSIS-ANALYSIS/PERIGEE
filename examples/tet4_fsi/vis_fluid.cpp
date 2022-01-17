@@ -11,6 +11,8 @@
 #include "APart_Node_FSI.hpp"
 #include "QuadPts_vis_tet4.hpp"
 #include "FEAElement_Tet4.hpp"
+#include "VisDataPrep_ALE_NS.hpp"
+#include "VTK_Writer_FSI_Tet4.hpp"
 
 int main( int argc, char * argv[] )
 {
@@ -130,56 +132,58 @@ int main( int argc, char * argv[] )
     for(int ii=0; ii<nlocbas; ++ii)
       fIEN[ee*nlocbas+ii] = VEC_T::get_pos( subdomain_nodes, locIEN_v->get_LIEN(ee, ii) );
 
+  // Visualization prepration
+  IVisDataPrep * visprep = new VisDataPrep_ALE_NS();
+  visprep->print_info();
+
+  double ** pointArrays = new double * [3];
+  pointArrays[0] = new double [pNode_v->get_nlocghonode() * 3];
+  pointArrays[1] = new double [pNode_p->get_nlocghonode() * 1];
+  pointArrays[2] = new double [pNode_v->get_nlocghonode() * 3];
+
+  VTK_Writer_FSI_Tet4 * vtk_w = new VTK_Writer_FSI_Tet4(
+      GMIptr_v->get_nElem(), element_part_file );
+
+  std::ostringstream time_index;
+
+  for(int time = time_start; time<=time_end; time += time_step)
+  {
+    std::string disp_name_to_read(disp_sol_bname);
+    std::string velo_name_to_read(velo_sol_bname);
+    std::string pres_name_to_read(pres_sol_bname);
+    std::string name_to_write(out_bname);
+    time_index.str("");
+    time_index<< 900000000 + time;
+    disp_name_to_read.append(time_index.str());
+    velo_name_to_read.append(time_index.str());
+    pres_name_to_read.append(time_index.str());
+    name_to_write.append(time_index.str());
+
+    SYS_T::commPrint("Time %d: Read %s %s %s and Write %s \n",
+        time, disp_name_to_read.c_str(), pres_name_to_read.c_str(),
+        velo_name_to_read.c_str(), name_to_write.c_str() );
+
+    visprep->get_pointArray(disp_name_to_read, pres_name_to_read,
+        velo_name_to_read, an_v_mapping_file, an_p_mapping_file,
+        pn_v_mapping_file, pn_p_mapping_file,
+        pNode_v, pNode_p, GMIptr_v->get_nFunc(), GMIptr_p->get_nFunc(),
+        pointArrays);
+
+    vtk_w->writeOutput_fluid( fNode, locIEN_v, locIEN_p, fIEN, locElem,
+        visprep, element, quad, pointArrays, rank, size,
+        num_subdomain_nodes,
+        time * dt, out_bname, name_to_write, isXML );
+  }
 
 
+  MPI_Barrier(PETSC_COMM_WORLD);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  // Clean up memory
+  delete quad; delete element; delete visprep;
+  delete fNode; delete locIEN_v; delete locIEN_p; delete GMIptr_v; delete GMIptr_p;
+  delete PartBasic; delete locElem; delete pNode_v; delete pNode_p;
+  delete [] pointArrays[0]; delete [] pointArrays[1]; delete [] pointArrays[2];
+  delete [] pointArrays; delete vtk_w;
   PetscFinalize();
   return EXIT_SUCCESS;
 }
