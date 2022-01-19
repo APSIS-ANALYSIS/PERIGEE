@@ -2,18 +2,18 @@
 // preprocess_tet.cpp
 //
 // ============================================================================
-#include "Math_Tools.hpp"
 #include "Mesh_Tet4.hpp"
 #include "Mesh_Tet10.hpp"
 #include "IEN_Tetra_P1.hpp"
 #include "IEN_Tetra_P2.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
-#include "Map_Node_Index.hpp"
 #include "Tet_Tools.hpp"
 #include "NodalBC_3D_vtp.hpp"
 #include "ElemBC_3D_tet.hpp"
 #include "Part_Tet.hpp"
+#include "NBC_Partition.hpp"
+#include "EBC_Partition.hpp"
 
 int main( int argc, char * argv[] )
 {
@@ -119,6 +119,10 @@ int main( int argc, char * argv[] )
   dir_list.push_back("bot_vol.vtp");
 
   INodalBC * nbc = new NodalBC_3D_vtp( dir_list, nFunc );
+  
+  std::vector<INodalBC *> NBC_list;
+  NBC_list.clear();
+  NBC_list.push_back( nbc );
 
   // Setup Elemental (Neumann type) boundary condition(s)
   std::vector<std::string> neu_list;
@@ -130,6 +134,11 @@ int main( int argc, char * argv[] )
   // Start partition the mesh for each cpu_rank
   SYS_T::Timer * mytimer = new SYS_T::Timer();
 
+  std::vector<int> list_nlocalnode, list_nghostnode, list_ntotalnode, list_nbadnode;
+  std::vector<double> list_ratio_g2l;
+
+  int sum_nghostnode = 0; // total number of ghost nodes
+
   for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
   {
     mytimer->Reset();
@@ -139,42 +148,64 @@ int main( int argc, char * argv[] )
         ctrlPts, proc_rank, cpu_size, 1, 1, elemType,
         true );
 
+    part -> print_part_loadbalance_edgecut();
+
     mytimer->Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
+    // write the part hdf5 file
+    part -> write( part_file.c_str() );
 
+    // Partition Nodal BC and write to h5 file
+    NBC_Partition * nbcpart = new NBC_Partition(part, mnindex, NBC_list);
+
+    nbcpart -> write_hdf5( part_file.c_str() );
+
+    // Partition Elemental BC and write to h5 file
+    EBC_Partition * ebcpart = new EBC_Partition(part, mnindex, ebc);
+
+    ebcpart -> write_hdf5( part_file.c_str() );
+
+    // Collect partition statistics
+    list_nlocalnode.push_back(part->get_nlocalnode());
+    list_nghostnode.push_back(part->get_nghostnode());
+    list_ntotalnode.push_back(part->get_ntotalnode());
+    list_nbadnode.push_back(part->get_nbadnode());
+    list_ratio_g2l.push_back((double)part->get_nghostnode()/(double) part->get_nlocalnode());
+
+    sum_nghostnode += part->get_nghostnode();
+
+    delete part; delete ebcpart; delete nbcpart;
   }
+  
+  cout<<"\n===> Mesh Partition Quality: "<<endl;
+  cout<<"The largest ghost / local node ratio is: ";
+  cout<<*std::max_element(list_ratio_g2l.begin(), list_ratio_g2l.end())<<endl;
 
+  cout<<"The smallest ghost / local node ratio is: ";
+  cout<<*std::min_element(list_ratio_g2l.begin(), list_ratio_g2l.end())<<endl;
 
+  cout<<"The summation of the number of ghost nodes is: "<<sum_nghostnode<<endl;
 
+  cout<<"The maximum badnode number is: ";
+  cout<<*std::max_element(list_nbadnode.begin(), list_nbadnode.end())<<endl;
 
+  const int maxpart_nlocalnode = *std::max_element(list_nlocalnode.begin(),
+      list_nlocalnode.end());
+  const int minpart_nlocalnode = *std::min_element(list_nlocalnode.begin(),
+      list_nlocalnode.end());
 
+  cout<<"The maximum and minimum local node numbers are ";
+  cout<<maxpart_nlocalnode<<"\t";
+  cout<<minpart_nlocalnode<<endl;
+  cout<<"The maximum / minimum of local node is: ";
+  cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<endl;
 
+  // Finalize the code and exit
+  for(auto it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc) delete *it_nbc;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  delete IEN; delete mesh;
+  delete mytimer;
+  delete ebc; delete global_part; delete mnindex; delete IEN; delete mesh;
   PetscFinalize();
   return EXIT_SUCCESS;
 }
