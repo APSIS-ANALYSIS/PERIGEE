@@ -17,12 +17,8 @@
 // ==================================================================
 #include <cassert>
 #include <array>
-#include "ALocal_IEN.hpp"
-#include "IALocal_IEN.hpp"
-#include "IALocal_meshSize.hpp"
+#include "IQuadPts.hpp"
 #include "FEANode.hpp"
-#include "BernsteinBasis_Array.hpp"
-#include "IBernsteinBasis.hpp"
 #include "Matrix_3x3.hpp"
 
 class FEAElement
@@ -120,67 +116,6 @@ class FEAElement
     // --------------------------------------------------------------    
     // Build Basis function quadrature info
     // --------------------------------------------------------------    
-    // Build basis function values at quadrature points for 3D elements
-    // \para bs/t/u : Bernstein polynomial value at quadrature points
-    // \para ctrl_x/y/z/w : control points and weights
-    // \para ext_x/y/z : Bezier extraction operator in x/y/z direction
-    virtual void buildBasis(
-        const double &hx, const double &hy, const double &hz,
-        const BernsteinBasis_Array * const &bs,
-        const BernsteinBasis_Array * const &bt,
-        const BernsteinBasis_Array * const &bu,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z,
-        const double * const &ctrl_w,
-        const double * const &ext_x,
-        const double * const &ext_y,
-        const double * const &ext_z )
-    {SYS_T::commPrint("Warning: this buildBasis is not implemented. \n");}
-
-
-    // Build basis function values at quadrature points for 2D elements
-    // \para hx, hy : parametric element size
-    // \para bs, bt : Bezier elements
-    // \para ctrl_x/y/w : control points' x-y-w value
-    // \para ext_x/y : extraction operator
-    virtual void buildBasis(
-        const double &hx, const double &hy,
-        const BernsteinBasis_Array * const &bs,
-        const BernsteinBasis_Array * const &bt,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_w,
-        const double * const &ext_x,
-        const double * const &ext_y )
-    {SYS_T::commPrint("Warning: this buildBasis is not implemented. \n");}
-
-    // Build basis funtion values at quadrature points for 2D elements.
-    // This is for irrational cases where weights can be ignored. 
-    virtual void buildBasis(
-        const double &hx, const double &hy,
-        const BernsteinBasis_Array * const &bs,
-        const BernsteinBasis_Array * const &bt,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ext_x,
-        const double * const &ext_y )
-    {SYS_T::commPrint("Warning: this buildBasis is not implemented. \n");}
-
-    // Build 3D basis -- 3D B-spine case
-    virtual void buildBasis( const double &hx, const double &hy, const double &hz,
-        const BernsteinBasis_Array * const &bs,
-        const BernsteinBasis_Array * const &bt,
-        const BernsteinBasis_Array * const &bu,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z,
-        const double * const &ext_x,
-        const double * const &ext_y,
-        const double * const &ext_z )
-    {SYS_T::commPrint("Warning: buildBasis() is not implemented. \n");}
-
-
     // Build 3D basis -- FEM
     virtual void buildBasis( const IQuadPts * const &quad_rule,
         const double * const &ctrl_x,
