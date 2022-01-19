@@ -126,8 +126,7 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # BUILD THE MAIN DRIVERS
 # ===================================================================
 ADD_EXECUTABLE( gmsh_IO gmsh_process.cpp )
-#ADD_EXECUTABLE( gmsh_p2_IO gmsh_p2_process.cpp )
-#ADD_EXECUTABLE( preprocess3d preprocess_sv_tets.cpp)
+ADD_EXECUTABLE( preprocess3d preprocess_tet.cpp)
 #ADD_EXECUTABLE( ns_tet_3d ns_tet_driver.cpp)
 #ADD_EXECUTABLE( prepost prepost_ns_tets.cpp)
 #ADD_EXECUTABLE( vis_ns vis_ns.cpp)
@@ -136,7 +135,7 @@ ADD_EXECUTABLE( gmsh_IO gmsh_process.cpp )
 
 TARGET_LINK_LIBRARIES( gmsh_IO perigee_preprocess )
 #TARGET_LINK_LIBRARIES( gmsh_p2_IO perigee_preprocess )
-#TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
+TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
 #TARGET_LINK_LIBRARIES( ns_tet_3d perigee_analysis )
 #TARGET_LINK_LIBRARIES( prepost perigee_preprocess )
 #TARGET_LINK_LIBRARIES( vis_ns perigee_postprocess )
