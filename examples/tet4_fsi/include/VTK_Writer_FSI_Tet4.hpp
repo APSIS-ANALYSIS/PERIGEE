@@ -9,6 +9,7 @@
 // Date: Jan 17 2022
 // ============================================================================
 #include "ALocal_Elem.hpp"
+#include "ALocal_IEN.hpp"
 #include "IVisDataPrep.hpp"
 #include "Interpolater.hpp"
 #include "Vis_Tools.hpp"

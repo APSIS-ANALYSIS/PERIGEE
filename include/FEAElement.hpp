@@ -17,13 +17,8 @@
 // ==================================================================
 #include <cassert>
 #include <array>
-#include "ALocal_IEN.hpp"
-#include "IALocal_IEN.hpp"
-#include "IALocal_meshSize.hpp"
+#include "IQuadPts.hpp"
 #include "FEANode.hpp"
-#include "BernsteinBasis_Array.hpp"
-#include "IBernsteinBasis.hpp"
-#include "Matrix_3x3.hpp"
 
 class FEAElement
 {
@@ -33,10 +28,6 @@ class FEAElement
     
     // Destructor
     virtual ~FEAElement(){};
-
-    // Return this element's local ordering index
-    virtual int get_elemIndex() const
-    {SYS_T::commPrint("Warning: get_elemIndex is not implemented. \n"); return 0;}
 
     // Return this element's dimension
     virtual int get_elemDim() const = 0;
@@ -79,13 +70,6 @@ class FEAElement
     // Return the quadrature info
     virtual int get_numQuapts() const = 0;
 
-    // Return true if element size is non-zero
-    virtual bool is_sizeNonzero() const
-    {
-      SYS_T::commPrint("Warning: is_sizeNonzero is not implemented. \n"); 
-      return false;
-    }
-  
     // Clear memory of basis function quadrature
     virtual void clearBasisCache()
     {SYS_T::commPrint("Warning: clearBasisCache is not implemented. \n");}
@@ -116,71 +100,9 @@ class FEAElement
         const double * const &ctrl_y ) const
     {SYS_T::commPrint("Warning: get_h is not implemented. \n"); return 0.0;}
 
-
     // --------------------------------------------------------------    
     // Build Basis function quadrature info
     // --------------------------------------------------------------    
-    // Build basis function values at quadrature points for 3D elements
-    // \para bs/t/u : Bernstein polynomial value at quadrature points
-    // \para ctrl_x/y/z/w : control points and weights
-    // \para ext_x/y/z : Bezier extraction operator in x/y/z direction
-    virtual void buildBasis(
-        const double &hx, const double &hy, const double &hz,
-        const BernsteinBasis_Array * const &bs,
-        const BernsteinBasis_Array * const &bt,
-        const BernsteinBasis_Array * const &bu,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z,
-        const double * const &ctrl_w,
-        const double * const &ext_x,
-        const double * const &ext_y,
-        const double * const &ext_z )
-    {SYS_T::commPrint("Warning: this buildBasis is not implemented. \n");}
-
-
-    // Build basis function values at quadrature points for 2D elements
-    // \para hx, hy : parametric element size
-    // \para bs, bt : Bezier elements
-    // \para ctrl_x/y/w : control points' x-y-w value
-    // \para ext_x/y : extraction operator
-    virtual void buildBasis(
-        const double &hx, const double &hy,
-        const BernsteinBasis_Array * const &bs,
-        const BernsteinBasis_Array * const &bt,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_w,
-        const double * const &ext_x,
-        const double * const &ext_y )
-    {SYS_T::commPrint("Warning: this buildBasis is not implemented. \n");}
-
-    // Build basis funtion values at quadrature points for 2D elements.
-    // This is for irrational cases where weights can be ignored. 
-    virtual void buildBasis(
-        const double &hx, const double &hy,
-        const BernsteinBasis_Array * const &bs,
-        const BernsteinBasis_Array * const &bt,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ext_x,
-        const double * const &ext_y )
-    {SYS_T::commPrint("Warning: this buildBasis is not implemented. \n");}
-
-    // Build 3D basis -- 3D B-spine case
-    virtual void buildBasis( const double &hx, const double &hy, const double &hz,
-        const BernsteinBasis_Array * const &bs,
-        const BernsteinBasis_Array * const &bt,
-        const BernsteinBasis_Array * const &bu,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z,
-        const double * const &ext_x,
-        const double * const &ext_y,
-        const double * const &ext_z )
-    {SYS_T::commPrint("Warning: buildBasis() is not implemented. \n");}
-
-
     // Build 3D basis -- FEM
     virtual void buildBasis( const IQuadPts * const &quad_rule,
         const double * const &ctrl_x,
@@ -188,12 +110,10 @@ class FEAElement
         const double * const &ctrl_z )
     {SYS_T::commPrint("Warning: buildBasis() is not implemented. \n");}
 
-
     // Build 2D basis -- FEM
     virtual void buildBasis( const IQuadPts * const &quad_rule,
         const double * const &ctrl_x, const double * const &ctrl_y )
     {SYS_T::commPrint("Warning: buildBasis() is not implemented. \n");}
-
 
     // ------------------------------------------------------------------------
     // Get functions : Obtain the value of basis functions and their derivatives.
@@ -364,75 +284,6 @@ class FEAElement
       return Matrix_3x3();
     }
 
-    // ------------------------------------------------------------------------    
-    // Unit outward normal vector:
-    // The following virtual function returns the unit normal vector on the
-    // face of a 2D/3D element. 
-    // In a 3D hexahedron-shaped element, there are six faces. In its
-    //    reference coordinate (s,t,u), the six faces are
-    //      bottom   (s,t,0)     top      (s,t,1)
-    //      left     (s,0,u)     right    (s,1,u)
-    //      front    (1,t,u)     back     (0,t,u)
-    // The unit outward normal vector on each face is calculated by taking
-    // curl of the Jacobian matrix dx_ds evaluated at the quadrature point.
-    // Unit outward normal vector and its norm
-    // This group of get-functions will return the unit normal vector as well as
-    // the norm of r_s x r_t (r_s x r_u, r_t x r_u ...). The returned norm give 
-    // the measure of the surface element, which is necessary for boundary
-    // integral.
-    //    Input: the quadrature point index.
-    //    Output: Cartesian components of the 3D normal vector.
-    // ------------------------------------------------------------------------
-    virtual void get_3d_normal_bottom( const int &quaindex,
-        double &nx, double &ny, double &nz, double &surfaceArea ) const
-    {SYS_T::commPrint("Warning: get_3d_normal_bottom is not implemented. \n");}
-
-    virtual void get_3d_normal_top( const int &quaindex,
-        double &nx, double &ny, double &nz, double &surfaceArea ) const
-    {SYS_T::commPrint("Warning: get_3d_normal_top is not implemented. \n");}
-
-    virtual void get_3d_normal_left( const int &quaindex,
-        double &nx, double &ny, double &nz, double &surfaceArea ) const
-    {SYS_T::commPrint("Warning: get_3d_normal_left is not implemented. \n");}
-
-    virtual void get_3d_normal_right( const int &quaindex,
-        double &nx, double &ny, double &nz, double &surfaceArea ) const
-    {SYS_T::commPrint("Warning: get_3d_normal_right is not implemented. \n");}
-
-    virtual void get_3d_normal_front( const int &quaindex,
-        double &nx, double &ny, double &nz, double &surfaceArea ) const
-    {SYS_T::commPrint("Warning: get_3d_normal_front is not implemented. \n");}
-
-    virtual void get_3d_normal_back( const int &quaindex,
-        double &nx, double &ny, double &nz, double &surfaceArea ) const
-    {SYS_T::commPrint("Warning: get_3d_normal_back is not implemented. \n");}
-
-    // ------------------------------------------------------------------------
-    // Unit outward normal vector and boundary line measure for 2D
-    // In a 2D quad element, there are four faces:
-    //              left (s, 0)     right (s, 1)
-    //              back (0, t)     front (1, t)
-    // in a (s,t) in [0,1]^2 square.
-    // The ourward normal are calculated and the boundary line length is
-    // calculated.
-    // ------------------------------------------------------------------------
-    virtual void get_2d_normal_front( const int &quaindex,
-        double &nx, double &ny, double &line ) const
-    {SYS_T::commPrint("Warning: get_2d_normal_front is not implemented. \n");}
-
-    virtual void get_2d_normal_back( const int &quaindex,
-        double &nx, double &ny, double &line ) const
-    {SYS_T::commPrint("Warning: get_2d_normal_back is not implemented. \n");}
-
-    virtual void get_2d_normal_left( const int &quaindex,
-        double &nx, double &ny, double &line ) const
-    {SYS_T::commPrint("Warning: get_2d_normal_left is not implemented. \n");}
-
-    virtual void get_2d_normal_right( const int &quaindex,
-        double &nx, double &ny, double &line ) const
-    {SYS_T::commPrint("Warning: get_2d_normal_right is not implemented. \n");}
-
-
     // ------------------------------------------------------------------------
     // Unit outward normal vector and boundary area measure.
     // In a oriented surface, the outward normal direction and the area
@@ -467,37 +318,6 @@ class FEAElement
         const double &intpt_y, const double &intpt_z,
         double &nx, double &ny, double &nz, double &length ) const
     {SYS_T::commPrint("Warning: get_normal_out is not implemented. \n");}
-
-
-    // ------------------------------------------------------------------------
-    // Reset function
-    // Reset the parameters of the element object. 
-    // These functions are utilized when one construct the element class once
-    // and reset the element properties over the element loop. In this way, the
-    // container are never destructed during the element loop (potentially this
-    // is beneficial for the memory pool.) The values are recomputed repeatedly
-    // during the buildBasis calls. 
-    // ------------------------------------------------------------------------
-    virtual void reset_degree( const int &new_sdeg, const int &new_tdeg )
-    {SYS_T::commPrint("Warning: reset_degree is not implemented. \n");}
-
-    virtual void reset_degree( const int &new_sdeg, const int &new_tdeg, const int &new_udeg )
-    {SYS_T::commPrint("Warning: reset_degree is not implemented. \n");}
-
-    virtual void reset_nLocBas( const int &new_nlocbas )
-    {SYS_T::commPrint("Warning: reset_nLocBas is not implemented. \n");}
-
-    virtual void reset_numQua( const int &new_squa, const int &new_tqua )
-    {SYS_T::commPrint("Warning: reset_numQua is not implemented. \n");}
-
-    virtual void reset_numQua( const int &new_squa, const int &new_tqua, const int &new_uqua )
-    {SYS_T::commPrint("Warning: reset_numQua is not implemented. \n");}
-
-    virtual void reset_numQuapts( const int &new_numQuapts )
-    {SYS_T::commPrint("Warning: reset_numQuapts is not implemented. \n");}
-
-    virtual void resize_container()
-    {SYS_T::commPrint("Warning: resize_container() is not implemented. \n");}
 
 };
 
