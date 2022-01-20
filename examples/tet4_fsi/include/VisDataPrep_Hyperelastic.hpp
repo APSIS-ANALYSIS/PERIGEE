@@ -1,7 +1,7 @@
 #ifndef VISDATAPREP_HYPERELASTIC_HPP
 #define VISDATAPREP_HYPERELASTIC_HPP
 // ============================================================================
-// VisDataPrep_HYPERELASTIC.hpp
+// VisDataPrep_Hyperelastic.hpp
 //
 // This is the data preparation routine for HYPERELASTIC equations.
 //
@@ -9,12 +9,12 @@
 // ============================================================================
 #include "IVisDataPrep.hpp"
 
-class VisDataPrep_HYPERELASTIC : public IVisDataPrep
+class VisDataPrep_Hyperelastic : public IVisDataPrep
 {
   public:
-    VisDataPrep_HYPERELASTIC( const bool &is_ref );
+    VisDataPrep_Hyperelastic( const bool &is_ref );
 
-    virtual ~VisDataPrep_HYPERELASTIC();
+    virtual ~VisDataPrep_Hyperelastic();
 
     virtual int get_ptarray_size() const {return 3;}
 

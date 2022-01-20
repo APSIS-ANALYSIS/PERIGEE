@@ -1,6 +1,6 @@
-#include "VisDataPrep_HYPERELASTIC.hpp"
+#include "VisDataPrep_Hyperelastic.hpp"
 
-VisDataPrep_HYPERELASTIC::VisDataPrep_HYPERELASTIC( const bool &is_ref )
+VisDataPrep_Hyperelastic::VisDataPrep_Hyperelastic( const bool &is_ref )
 {
   if(is_ref)
   {
@@ -34,10 +34,10 @@ VisDataPrep_HYPERELASTIC::VisDataPrep_HYPERELASTIC( const bool &is_ref )
 
 }
 
-VisDataPrep_HYPERELASTIC::~VisDataPrep_HYPERELASTIC()
+VisDataPrep_Hyperelastic::~VisDataPrep_Hyperelastic()
 {}
 
-void VisDataPrep_HYPERELASTIC::get_pointArray(
+void VisDataPrep_Hyperelastic::get_pointArray(
     const std::string &disp_sol_file_name,
     const std::string &pres_sol_file_name,
     const std::string &velo_sol_file_name,
