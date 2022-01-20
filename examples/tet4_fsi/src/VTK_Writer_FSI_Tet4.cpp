@@ -525,6 +525,7 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_cur(
           inputInfo.push_back( pointArrays[1][pt_index * asize + kk ] );
       }
       intep.interpolateVTKData( asize, IEN_s, inputInfo, elemptr, dataVecs[2] ); 
+      
       // Interpolate the velocity vector
       inputInfo.clear();
       asize = vdata_ptr->get_arraySizes( 3 );  
@@ -579,7 +580,6 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_cur(
   gridData->Delete();
 }
 
-
 void VTK_Writer_FSI_Tet4::writeOutput_solid_ref(
     const FEANode * const &fnode_ptr,
     const ALocal_IEN * const &lien_v,
@@ -631,7 +631,6 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_ref(
   anaprocId -> SetName("Analysis_Partition");
   anaprocId -> SetNumberOfComponents(1);
 
-
   for(int ee=0; ee<lelem_ptr->get_nlocalele(); ++ee)
   {
     if( lelem_ptr->get_elem_tag(ee) == 1 )
@@ -661,8 +660,8 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_ref(
       // displacement interpolation
       intep.interpolateVTKData( asize, IEN_s, inputInfo, elemptr, dataVecs[0] );
 
-      // use displacement to update points
-      intep.interpolateVTKPts( IEN_s, ectrl_x, ectrl_y, ectrl_z, inputInfo, elemptr, points );
+      // interpolate the coordinates of the points
+      intep.interpolateVTKPts( IEN_s, ectrl_x, ectrl_y, ectrl_z, elemptr, points );
 
       // Interpolate the pressure scalar
       inputInfo.clear();
@@ -674,6 +673,7 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_ref(
           inputInfo.push_back( pointArrays[1][pt_index * asize + kk ] );
       }
       intep.interpolateVTKData( asize, IEN_s, inputInfo, elemptr, dataVecs[1] ); 
+     
       // Interpolate the velocity vector
       inputInfo.clear();
       asize = vdata_ptr->get_arraySizes( 2 );  
@@ -685,7 +685,6 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_ref(
       }
       intep.interpolateVTKData( asize, IEN_s, inputInfo, elemptr, dataVecs[2] );
       
-
       // Set mesh connectivity
       VIS_T::setTetraelem( IEN_s[0], IEN_s[1], IEN_s[2], IEN_s[3], gridData );
 
