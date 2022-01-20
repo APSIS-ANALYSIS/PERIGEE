@@ -429,7 +429,7 @@ void VTK_Writer_FSI_Tet4::writeOutput_fluid(
 }
 
 
-void VTK_Writer_FSI_Tet4::writeOutput_solid(
+void VTK_Writer_FSI_Tet4::writeOutput_solid_cur(
     const FEANode * const &fnode_ptr,
     const ALocal_IEN * const &lien_v,
     const ALocal_IEN * const &lien_p,

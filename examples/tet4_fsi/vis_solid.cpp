@@ -175,16 +175,15 @@ int main ( int argc , char * argv[] )
         pointArrays);
 
     if( isRef )
-    vtk_w->writeOutput_solid_ref( fNode, locIEN_v, locIEN_p, sIEN, locElem,
-        visprep, element, quad, pointArrays, rank, size,
-        num_subdomain_nodes,
-        time * dt, out_bname, name_to_write, isXML );
-
+      vtk_w->writeOutput_solid_ref( fNode, locIEN_v, locIEN_p, sIEN, locElem,
+          visprep, element, quad, pointArrays, rank, size,
+          num_subdomain_nodes,
+          time * dt, out_bname, name_to_write, isXML );
     else
-    vtk_w->writeOutput_solid( fNode, locIEN_v, locIEN_p, sIEN, locElem,
-        visprep, element, quad, pointArrays, rank, size,
-        num_subdomain_nodes,
-        time * dt, out_bname, name_to_write, isXML );    
+      vtk_w->writeOutput_solid_cur( fNode, locIEN_v, locIEN_p, sIEN, locElem,
+          visprep, element, quad, pointArrays, rank, size,
+          num_subdomain_nodes,
+          time * dt, out_bname, name_to_write, isXML );    
 
   }
 

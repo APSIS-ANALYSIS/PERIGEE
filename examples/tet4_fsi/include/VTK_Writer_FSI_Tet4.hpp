@@ -59,7 +59,7 @@ class VTK_Writer_FSI_Tet4
         const std::string &outputName,
         const bool &isXML );
 
-    void writeOutput_solid(
+    void writeOutput_solid_cur(
     	const FEANode * const &fnode_ptr,
     	const ALocal_IEN * const &lien_v,
     	const ALocal_IEN * const &lien_p,
@@ -92,7 +92,6 @@ class VTK_Writer_FSI_Tet4
     	const std::string &outputBName,
     	const std::string &outputName,
     	const bool &isXML );
-
 
   private:
     const int nLocBas, nElem;
