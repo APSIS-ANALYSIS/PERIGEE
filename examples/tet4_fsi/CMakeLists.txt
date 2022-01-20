@@ -131,7 +131,7 @@ SET( perigee_postprocess_lib_src
   ${perigee_source}/Mesh/QuadPts_vis_tet4.cpp
   ${perigee_SOURCE_DIR}/src/VisDataPrep_FSI.cpp
   ${perigee_SOURCE_DIR}/src/VisDataPrep_ALE_NS.cpp
-  ${perigee_SOURCE_DIR}/src/VisDataPrep_HYPERELASTIC.cpp
+  ${perigee_SOURCE_DIR}/src/VisDataPrep_Hyperelastic.cpp
   ${perigee_SOURCE_DIR}/src/VTK_Writer_FSI_Tet4.cpp
   )
 

@@ -11,7 +11,7 @@
 #include "APart_Node_FSI.hpp"
 #include "QuadPts_vis_tet4.hpp"
 #include "FEAElement_Tet4.hpp"
-#include "VisDataPrep_HYPERELASTIC.hpp"  
+#include "VisDataPrep_Hyperelastic.hpp"  
 #include "VTK_Writer_FSI_Tet4.hpp"   
 
 int main ( int argc , char * argv[] )
@@ -138,7 +138,7 @@ int main ( int argc , char * argv[] )
       sIEN[ee*nlocbas+ii] = VEC_T::get_pos( subdomain_nodes, locIEN_v->get_LIEN(ee, ii) );
 
   // Visualization prepration
-  IVisDataPrep * visprep = new VisDataPrep_HYPERELASTIC( isRef );
+  IVisDataPrep * visprep = new VisDataPrep_Hyperelastic( isRef );
   visprep->print_info();
 
   double ** pointArrays = new double * [3];
