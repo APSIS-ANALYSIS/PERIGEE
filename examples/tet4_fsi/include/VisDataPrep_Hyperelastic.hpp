@@ -39,7 +39,5 @@ class VisDataPrep_HYPERELASTIC : public IVisDataPrep
     std::vector<int> pt_array_len;
 };
 
-
-
 #endif
 
