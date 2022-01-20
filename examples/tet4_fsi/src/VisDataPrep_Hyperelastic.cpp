@@ -31,7 +31,6 @@ VisDataPrep_Hyperelastic::VisDataPrep_Hyperelastic( const bool &is_ref )
   pt_array_len.push_back(3);
   pt_array_len.push_back(1);
   pt_array_len.push_back(3);
-
 }
 
 VisDataPrep_Hyperelastic::~VisDataPrep_Hyperelastic()
@@ -81,6 +80,4 @@ void VisDataPrep_Hyperelastic::get_pointArray(
     pointArrays[1][ii]     = pvsolu_pres.get_locsol(ii);
 }
 
-
 // EOF
-
