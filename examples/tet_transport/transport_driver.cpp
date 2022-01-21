@@ -14,6 +14,7 @@
 #include "FEAElement_Triangle3_3D_der0.hpp"
 #include "FEAElement_Triangle6_3D_der0.hpp"
 #include "PLocAssem_Tet_Transport_GenAlpha.hpp"
+#include "PDNSolution_Transport.hpp"
 
 #include "Matrix_PETSc.hpp"
 #include "TimeMethod_GenAlpha.hpp"
@@ -210,43 +211,15 @@ int main(int argc, char *argv[])
       elementv->get_nLocBas(), elements->get_nLocBas(), 
       locebc -> get_num_ebc(), GMIptr->get_elemType() );
 
+  // ===== Initial condition =====
+  PDNSolution * sol = new PDNSolution_Transport( pNode, 0 );
+  
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  delete fNode; delete locIEN; delete GMIptr; delete locElem; delete pNode; delete PartBasic;
+  delete locnbc; delete locebc; delete quadv; delete quads; delete elementv; delete elements;
+  delete pmat; delete tm_galpha_ptr; delete locAssem_ptr; delete sol;
   PetscFinalize();
   return EXIT_SUCCESS;
 }

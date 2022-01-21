@@ -91,6 +91,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_Tet_Transport_GenAlpha.cpp
+  ${perigee_SOURCE_DIR}/src/PDNSolution_Transport.cpp
   )
 
 SET( perigee_postprocess_lib_src
