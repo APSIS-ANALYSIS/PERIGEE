@@ -14,7 +14,8 @@
 #include "FEAElement_Triangle3_3D_der0.hpp"
 #include "FEAElement_Triangle6_3D_der0.hpp"
 #include "PLocAssem_Tet_Transport_GenAlpha.hpp"
-#include "PDNSolution_Transport.hpp"
+#include "PGAssem_Tet_Transport_GenAlpha.hpp"
+#include "PDNTimeStep.hpp"
 
 #include "Matrix_PETSc.hpp"
 #include "TimeMethod_GenAlpha.hpp"
@@ -214,9 +215,51 @@ int main(int argc, char *argv[])
   // ===== Initial condition =====
   PDNSolution * sol = new PDNSolution_Transport( pNode, 0 );
   
+  PDNSolution * dot_sol = new PDNSolution_Transport( pNode, 0 );
+  
+  if( is_restart )
+  {
+    initial_index = restart_index;
+    initial_time  = restart_time;
+    initial_step  = restart_step;
+
+    // Read sol file
+    SYS_T::file_check(restart_name.c_str());
+    sol->ReadBinary(restart_name.c_str());
+
+    // generate the corresponding dot_sol file name
+    std::string restart_dot_name = "dot_";
+    restart_dot_name.append(restart_name);
+
+    // Read dot_sol file
+    SYS_T::file_check(restart_dot_name.c_str());
+    dot_sol->ReadBinary(restart_dot_name.c_str());
+
+    SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
+    SYS_T::commPrint("     restart_name: %s \n", restart_name.c_str());
+    SYS_T::commPrint("     restart_dot_name: %s \n", restart_dot_name.c_str());
+    SYS_T::commPrint("     restart_time: %e \n", restart_time);
+    SYS_T::commPrint("     restart_index: %d \n", restart_index);
+    SYS_T::commPrint("     restart_step: %e \n", restart_step);
+  }
+
+  // ===== Time step info =====
+  PDNTimeStep * timeinfo = new PDNTimeStep(initial_index, initial_time, initial_step);
+
+  // ===== Global assembly =====
+  SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
+  IPGAssem * gloAssem_ptr = new PGAssem_Tet_Transport_GenAlpha( locAssem_ptr,
+      GMIptr, locElem, locIEN, pNode, locnbc, locebc, nz_estimate );  
+
+  SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
+  gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_ptr, locIEN, locnbc );
+
+  SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
+  gloAssem_ptr->Fix_nonzero_err_str();
+  gloAssem_ptr->Clear_KG();
 
 
-
+  delete gloAssem_ptr; delete dot_sol; delete timeinfo;
   delete fNode; delete locIEN; delete GMIptr; delete locElem; delete pNode; delete PartBasic;
   delete locnbc; delete locebc; delete quadv; delete quads; delete elementv; delete elements;
   delete pmat; delete tm_galpha_ptr; delete locAssem_ptr; delete sol;

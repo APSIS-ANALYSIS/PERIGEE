@@ -10,7 +10,6 @@ PGAssem_Tet_Transport_GenAlpha::PGAssem_Tet_Transport_GenAlpha(
     const ALocal_EBC * const &part_ebc,
     const int &in_nz_estimate )
 : nLocBas( agmi_ptr->get_nLocBas() ),
-  dof_sol( pnode_ptr->get_dof() ),
   dof_mat( locassem_ptr->get_dof_mat() ),
   num_ebc( part_ebc->get_num_ebc() ),
   nlgn( pnode_ptr->get_nlocghonode() ),
@@ -397,18 +396,5 @@ void PGAssem_Tet_Transport_GenAlpha::Assem_mass_residual(
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // EOF

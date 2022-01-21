@@ -80,7 +80,7 @@ class PGAssem_Tet_Transport_GenAlpha : public IPGAssem
 
   private:
     // Private data
-    const int nLocBas, dof_sol, dof_mat, num_ebc, nlgn;
+    const int nLocBas, dof_mat, num_ebc, nlgn;
 
     int snLocBas;
 
