@@ -235,8 +235,6 @@ void PLocAssem_Tet_Transport_GenAlpha::Assem_Mass_Residual(
 void PLocAssem_Tet_Transport_GenAlpha::Assem_Residual_EBC(
         const int &ebc_id,
         const double &time, const double &dt,
-        const double * const &dot_sol,
-        const double * const &sol,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
