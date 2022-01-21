@@ -15,11 +15,8 @@
 #include "FEAElement_Triangle6_3D_der0.hpp"
 #include "PLocAssem_Tet_Transport_GenAlpha.hpp"
 #include "PGAssem_Tet_Transport_GenAlpha.hpp"
-#include "PDNTimeStep.hpp"
-
-#include "PLinear_Solver_PETSc.hpp"
-#include "Matrix_PETSc.hpp"
-#include "TimeMethod_GenAlpha.hpp"
+#include "PNonlinear_Transport_Solver.hpp"
+#include "PTime_Transport_Solver.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -290,15 +287,31 @@ int main(int argc, char *argv[])
   // ===== Linear solver context =====
   PLinear_Solver_PETSc * lsolver = new PLinear_Solver_PETSc();
   
+  // ===== Nonlinear solver context =====
+  PNonlinear_Transport_Solver * nsolver = new PNonlinear_Transport_Solver(
+      nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
+  nsolver->print_info();
 
+  // ===== Temporal solver context =====
+  PTime_Transport_Solver * tsolver = new PTime_Transport_Solver( sol_bName,
+      sol_record_freq, ttan_renew_freq, final_time );
 
+  tsolver->print_info();
 
+  
+  // ===== FEM analysis =====
+  SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
+  tsolver->TM_GenAlpha(is_restart, dot_sol, sol,
+      tm_galpha_ptr, timeinfo, locElem, locIEN, pNode, fNode,
+      locnbc, locebc, pmat, elementv, elements, quadv, quads,
+      locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
 
+  // ===== Print complete solver info =====
+  lsolver -> print_info();
 
-
-
+  delete tsolver; delete nsolver;
   delete lsolver; delete gloAssem_ptr; delete dot_sol; delete timeinfo;
   delete fNode; delete locIEN; delete GMIptr; delete locElem; delete pNode; delete PartBasic;
   delete locnbc; delete locebc; delete quadv; delete quads; delete elementv; delete elements;

@@ -94,6 +94,7 @@ SET( perigee_analysis_lib_src
   ${perigee_SOURCE_DIR}/src/PDNSolution_Transport.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_Tet_Transport_GenAlpha.cpp
   ${perigee_SOURCE_DIR}/src/PNonlinear_Transport_Solver.cpp
+  ${perigee_SOURCE_DIR}/src/PTime_Transport_Solver.cpp
   )
 
 SET( perigee_postprocess_lib_src
