@@ -4,10 +4,11 @@ PLocAssem_Tet_Transport_GenAlpha::PLocAssem_Tet_Transport_GenAlpha(
     const double &in_rho, const double &in_cap, const double &in_kappa,
     const TimeMethod_GenAlpha * const &tm_gAlpha,
     const int &in_nlocbas, const int &in_nqp,
-    const int &in_snlocbas, const int &elemtype )
+    const int &in_snlocbas, const int &in_num_ebc_fun,
+    const int &elemtype )
 : rho( in_rho ), cap( in_cap ), kappa( in_kappa ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
-  gamma(tm_gAlpha->get_gamma()), nqp( in_nqp )
+  gamma(tm_gAlpha->get_gamma()), nqp( in_nqp ), num_ebc_fun( in_num_ebc_fun )
 {
   if(elemtype == 501)
   {
@@ -34,6 +35,12 @@ PLocAssem_Tet_Transport_GenAlpha::PLocAssem_Tet_Transport_GenAlpha(
 
   Zero_sur_Tangent_Residual();
 
+  if( num_ebc_fun == 0 ) flist = nullptr;
+  else flist = new locassem_transport_funs [num_ebc_fun];
+
+  flist[0] = &PLocAssem_Tet_Transport_GenAlpha::get_g_0;
+  flist[1] = &PLocAssem_Tet_Transport_GenAlpha::get_g_1;
+ 
   print_info();
 }
 
@@ -43,6 +50,8 @@ PLocAssem_Tet_Transport_GenAlpha::~PLocAssem_Tet_Transport_GenAlpha()
   delete [] Residual; Residual = nullptr;
   delete [] sur_Tangent; sur_Tangent = nullptr;
   delete [] sur_Residual; sur_Residual = nullptr;
+
+  if(num_ebc_fun > 0) delete [] flist;
 }
 
 void PLocAssem_Tet_Transport_GenAlpha::print_info() const
@@ -220,5 +229,48 @@ void PLocAssem_Tet_Transport_GenAlpha::Assem_Mass_Residual(
   } // End-of-quadrature-loop
 }
 
+void PLocAssem_Tet_Transport_GenAlpha::Assem_Residual_EBC(
+        const int &ebc_id,
+        const double &time, const double &dt,
+        const double * const &dot_sol,
+        const double * const &sol,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+{
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  const int face_nqp = quad -> get_num_quadPts();
+
+  Zero_sur_Residual();
+  
+  const double curr = time + alpha_f * dt;
+
+  for(int qua=0; qua < face_nqp; ++qua)
+  {
+    const std::vector<double> R = element->get_R(qua);
+
+    double surface_area;
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+    
+    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      coor_x += eleCtrlPts_x[ii] * R[ii];
+      coor_y += eleCtrlPts_y[ii] * R[ii];
+      coor_z += eleCtrlPts_z[ii] * R[ii];
+    }
+
+   const double gg = get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr );
+
+    const double gwts = surface_area * quad -> get_qw( qua );
+    
+    for(int A=0; A<snLocBas; ++A)
+      sur_Residual[A] -= gwts * R[A] * gg;
+  }
+}
 
 // EOF

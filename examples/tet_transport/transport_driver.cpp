@@ -13,6 +13,7 @@
 #include "FEAElement_Tet10_v2.hpp"
 #include "FEAElement_Triangle3_3D_der0.hpp"
 #include "FEAElement_Triangle6_3D_der0.hpp"
+#include "PLocAssem_Tet_Transport_GenAlpha.hpp"
 
 #include "Matrix_PETSc.hpp"
 #include "TimeMethod_GenAlpha.hpp"
@@ -200,6 +201,16 @@ int main(int argc, char *argv[])
 
   tm_galpha_ptr->print_info();
 
+  // ===== Local Assembly Routine =====
+  const double rho = 1.0;
+  const double cap = 1.0;
+  const double kap = 1.0;
+  IPLocAssem * locAssem_ptr = new PLocAssem_Tet_Transport_GenAlpha(
+        rho, cap, kap,
+        tm_galpha_ptr,
+        elementv->get_nLocBas(), quadv -> get_num_quadPts(),
+        elements->get_nLocBas(), locebc -> get_num_ebc(),
+        GMIptr->get_elemType() );
 
 
 
