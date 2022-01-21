@@ -10,13 +10,21 @@
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
 #include "FEAElement_Tet4.hpp"
+#include "FEAElement_Tet10_v2.hpp"
+#include "FEAElement_Triangle3_3D_der0.hpp"
+#include "FEAElement_Triangle6_3D_der0.hpp"
 
+#include "Matrix_PETSc.hpp"
+#include "TimeMethod_GenAlpha.hpp"
 
 int main(int argc, char *argv[])
 {
   // Number of quadrature points for tets and triangles
   // Suggested values: 5 / 4 for linear, 17 / 13 for quadratic
   int nqp_tet = 5, nqp_tri = 4;
+
+  // generalized-alpha rho_inf
+  double genA_rho_inf = 0.5;
 
   // Estimate of the nonzero per row for the sparse matrix
   int nz_estimate = 300;
@@ -60,6 +68,7 @@ int main(int argc, char *argv[])
 
   SYS_T::GetOptionInt("-nqp_tet", nqp_tet);
   SYS_T::GetOptionInt("-nqp_tri", nqp_tri);
+  SYS_T::GetOptionReal("-rho_inf", genA_rho_inf);
   SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
   SYS_T::GetOptionString("-part_file", part_file);
   SYS_T::GetOptionReal("-nl_rtol", nl_rtol);
@@ -84,6 +93,7 @@ int main(int argc, char *argv[])
   // ===== Print Command Line Arguments =====
   SYS_T::cmdPrint("-nqp_tet:", nqp_tet);
   SYS_T::cmdPrint("-nqp_tri:", nqp_tri);
+  SYS_T::cmdPrint("-rho_inf:", genA_rho_inf);
   SYS_T::cmdPrint("-nz_estimate:", nz_estimate);
   SYS_T::cmdPrint("-part_file:", part_file);
   SYS_T::cmdPrint("-nl_rtol:", nl_rtol);
@@ -137,6 +147,8 @@ int main(int argc, char *argv[])
 
   ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
 
+  APart_Node * pNode = new APart_Node(part_file, rank);
+
   ALocal_NodalBC * locnbc = new ALocal_NodalBC(part_file, rank);
 
   ALocal_EBC * locebc = new ALocal_EBC(part_file, rank);
@@ -147,9 +159,46 @@ int main(int argc, char *argv[])
       "Error: Assigned CPU number does not match the partition. \n");
 
   SYS_T::commPrint("===> %d processor(s) are assigned for FEM analysis.\n", size);
+  
+  // ===== Quadrature rules =====
+  SYS_T::commPrint("===> Build quadrature rules. \n");
+  IQuadPts * quadv = new QuadPts_Gauss_Tet( nqp_tet );
+  IQuadPts * quads = new QuadPts_Gauss_Triangle( nqp_tri );
 
+  // ===== Finite Element Container =====
+  SYS_T::commPrint("===> Setup element container. \n");
+  FEAElement * elementv = nullptr;
+  FEAElement * elements = nullptr;
 
+  if( GMIptr->get_elemType() == 501 )
+  {
+    if( nqp_tet > 5 ) SYS_T::commPrint("Warning: the tet element is linear and you are using more than 5 quadrature points.\n");
+    if( nqp_tri > 4 ) SYS_T::commPrint("Warning: the tri element is linear and you are using more than 4 quadrature points.\n");
 
+    elementv = new FEAElement_Tet4( nqp_tet ); // elem type 501
+    elements = new FEAElement_Triangle3_3D_der0( nqp_tri );
+  }
+  else if( GMIptr->get_elemType() == 502 )
+  {
+    SYS_T::print_fatal_if( nqp_tet < 29, "Error: not enough quadrature points for tets.\n" );
+    SYS_T::print_fatal_if( nqp_tri < 13, "Error: not enough quadrature points for triangles.\n" );
+
+    elementv = new FEAElement_Tet10_v2( nqp_tet ); // elem type 502
+    elements = new FEAElement_Triangle6_3D_der0( nqp_tri );
+  }
+  else SYS_T::print_fatal("Error: Element type not supported.\n");
+
+  // ===== Generate a sparse matrix for the enforcement of essential BCs
+  Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
+
+  pmat->gen_perm_bc(pNode, locnbc);
+
+  // ===== Generalized-alpha =====
+  SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
+
+  TimeMethod_GenAlpha * tm_galpha_ptr = new TimeMethod_GenAlpha( genA_rho_inf, false );
+
+  tm_galpha_ptr->print_info();
 
 
 
