@@ -14,9 +14,8 @@ class PLocAssem_Tet_Transport_GenAlpha : public IPLocAssem
     PLocAssem_Tet_Transport_GenAlpha( 
         const double &in_rho, const double &in_cap, const double &in_kappa,
         const TimeMethod_GenAlpha * const &tm_gAlpha,
-        const int &in_nlocbas, const int &in_nqp,
-        const int &in_snlocbas, const int &in_num_ebc_fun,
-        const int &elemtype = 501 );
+        const int &in_nlocbas, const int &in_snlocbas,
+        const int &in_num_ebc_fun, const int &elemtype = 501 );
 
     virtual ~PLocAssem_Tet_Transport_GenAlpha();
 
@@ -28,12 +27,6 @@ class PLocAssem_Tet_Transport_GenAlpha : public IPLocAssem
     {
       for(int ii=0; ii<vec_size; ++ii) Residual[ii] = 0.0;
       for(int ii=0; ii<vec_size*vec_size; ++ii) Tangent[ii] = 0.0;
-    }
-
-    virtual void Zero_sur_Tangent_Residual()
-    {
-      for(int ii=0; ii<sur_size; ++ii) sur_Residual[ii] = 0.0;
-      for(int ii=0; ii<sur_size*sur_size; ++ii) sur_Tangent[ii] = 0.0;
     }
 
     virtual void Zero_Residual()
@@ -94,10 +87,10 @@ class PLocAssem_Tet_Transport_GenAlpha : public IPLocAssem
     // Private data
     const double rho, cap, kappa;
     const double alpha_f, alpha_m, gamma;
+    
+    const int num_ebc_fun;
 
-    const int nqp; // number of quadrature points
-
-    int nLocBas, snLocBas, vec_size, sur_size, num_ebc_fun;
+    int nLocBas, snLocBas, vec_size, sur_size;
 
     void print_info() const;
 

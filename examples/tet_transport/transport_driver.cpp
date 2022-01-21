@@ -206,11 +206,9 @@ int main(int argc, char *argv[])
   const double cap = 1.0;
   const double kap = 1.0;
   IPLocAssem * locAssem_ptr = new PLocAssem_Tet_Transport_GenAlpha(
-        rho, cap, kap,
-        tm_galpha_ptr,
-        elementv->get_nLocBas(), quadv -> get_num_quadPts(),
-        elements->get_nLocBas(), locebc -> get_num_ebc(),
-        GMIptr->get_elemType() );
+      rho, cap, kap, tm_galpha_ptr,
+      elementv->get_nLocBas(), elements->get_nLocBas(), 
+      locebc -> get_num_ebc(), GMIptr->get_elemType() );
 
 
 
