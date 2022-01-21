@@ -287,8 +287,19 @@ int main(int argc, char *argv[])
     SYS_T::commPrint(" The mass matrix lsolver is destroyed.\n");
   }
 
+  // ===== Linear solver context =====
+  PLinear_Solver_PETSc * lsolver = new PLinear_Solver_PETSc();
+  
 
-  delete gloAssem_ptr; delete dot_sol; delete timeinfo;
+
+
+
+
+
+
+
+
+  delete lsolver; delete gloAssem_ptr; delete dot_sol; delete timeinfo;
   delete fNode; delete locIEN; delete GMIptr; delete locElem; delete pNode; delete PartBasic;
   delete locnbc; delete locebc; delete quadv; delete quads; delete elementv; delete elements;
   delete pmat; delete tm_galpha_ptr; delete locAssem_ptr; delete sol;
