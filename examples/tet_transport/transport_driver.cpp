@@ -26,6 +26,7 @@ int main(int argc, char *argv[])
 
   // generalized-alpha rho_inf
   double genA_rho_inf = 0.5;
+  bool is_backward_Euler = false;
 
   // Estimate of the nonzero per row for the sparse matrix
   int nz_estimate = 300;
@@ -70,6 +71,7 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionInt("-nqp_tet", nqp_tet);
   SYS_T::GetOptionInt("-nqp_tri", nqp_tri);
   SYS_T::GetOptionReal("-rho_inf", genA_rho_inf);
+  SYS_T::GetOptionBool(  "-is_backward_Euler", is_backward_Euler);
   SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
   SYS_T::GetOptionString("-part_file", part_file);
   SYS_T::GetOptionReal("-nl_rtol", nl_rtol);
@@ -94,7 +96,11 @@ int main(int argc, char *argv[])
   // ===== Print Command Line Arguments =====
   SYS_T::cmdPrint("-nqp_tet:", nqp_tet);
   SYS_T::cmdPrint("-nqp_tri:", nqp_tri);
-  SYS_T::cmdPrint("-rho_inf:", genA_rho_inf);
+  if( is_backward_Euler )
+    SYS_T::commPrint(   "-is_backward_Euler: true \n");
+  else
+    SYS_T::cmdPrint(    "-rho_inf:",         genA_rho_inf);
+  
   SYS_T::cmdPrint("-nz_estimate:", nz_estimate);
   SYS_T::cmdPrint("-part_file:", part_file);
   SYS_T::cmdPrint("-nl_rtol:", nl_rtol);
@@ -197,14 +203,19 @@ int main(int argc, char *argv[])
   // ===== Generalized-alpha =====
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
 
-  TimeMethod_GenAlpha * tm_galpha_ptr = new TimeMethod_GenAlpha( genA_rho_inf, false );
+  TimeMethod_GenAlpha * tm_galpha_ptr = nullptr;
+
+  if( is_backward_Euler )
+    tm_galpha_ptr = new TimeMethod_GenAlpha( 1.0, 1.0, 1.0 );
+  else
+    tm_galpha_ptr = new TimeMethod_GenAlpha( genA_rho_inf, false );
 
   tm_galpha_ptr->print_info();
 
   // ===== Local Assembly Routine =====
-  const double rho = 1.0;
-  const double cap = 1.0;
-  const double kap = 1.0;
+  // material parameters
+  const double rho = 1.0, cap = 1.0, kap = 1.0;
+  
   IPLocAssem * locAssem_ptr = new PLocAssem_Tet_Transport_GenAlpha(
       rho, cap, kap, tm_galpha_ptr,
       elementv->get_nLocBas(), elements->get_nLocBas(), 
