@@ -32,12 +32,15 @@ class ALocal_NodalBC
     // ------------------------------------------------------------------------
     // get the Local ID value for the node's dof-th degree-of-freedom.
     // 0 <= dof_index < dof , 0 <= node < nlocghonode
-    // for single dof problem, one can ignore the dof_index argument by passing
-    // just the node index.
     // ------------------------------------------------------------------------
     virtual int get_LID(const int &dof_index, const int &node) const
     {return LID[dof_index * nlocghonode + node];}
 
+    // ------------------------------------------------------------------------
+    // get the Local ID value for the node assuming there is a single dof
+    // attached to this node.
+    // 0 <= node < nlocghonode
+    // ------------------------------------------------------------------------
     virtual int get_LID( const int &node ) const {return LID[node];}
 
     // ------------------------------------------------------------------------

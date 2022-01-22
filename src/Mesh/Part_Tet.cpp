@@ -34,7 +34,7 @@ Part_Tet::Part_Tet(
 
   for(int ii=0; ii<nlocghonode; ++ii)
   {
-    int aux_index = local_to_global[ii]; // new global index
+    int aux_index = local_to_global[ii];         // new global index
     aux_index = mnindex->get_new2old(aux_index); // back to old global index
     ctrlPts_x_loc[ii] = ctrlPts[3*aux_index + 0];
     ctrlPts_y_loc[ii] = ctrlPts[3*aux_index + 1];
