@@ -2,7 +2,8 @@
 
 double POST_ERROR_T::exact_sol( const double &x, const double &y, const double &z, const double &time )
 {
-  return 0.0;
+  const double pi = MATH_T::PI;
+  return time * time * sin(pi*x) * sin(pi*y) * sin(pi*z);
 }
 
 

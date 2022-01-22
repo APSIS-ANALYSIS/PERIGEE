@@ -13,8 +13,8 @@ int main( int argc, char * argv[] )
 {
   int nqp_tet = 29; // 4 (2), 5 (3), 17 (5), or 29 (6)
 
-  double sol_time = 0.0;
-  std::string sol_name("SOL_900000000");
+  double sol_time = 1.0;
+  std::string sol_name("SOL_900000100");
   std::string part_file("./ppart/part");
   const int dof = 1;
 
