@@ -20,6 +20,12 @@ int main( int argc, char * argv[] )
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
+  SYS_T::GetOptionString("-sol_name", sol_name);
+  SYS_T::GetOptionReal("-sol_time",   sol_time);
+
+  SYS_T::cmdPrint("-sol_name:", sol_name);
+  SYS_T::cmdPrint("-sol_time:", sol_time);
+
   const PetscMPIInt rank = SYS_T::get_MPI_rank();
   const PetscMPIInt size = SYS_T::get_MPI_size();
 
@@ -34,6 +40,9 @@ int main( int argc, char * argv[] )
   ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
 
   APart_Node * pNode = new APart_Node(part_file, rank);
+
+  SYS_T::print_fatal_if( size != PartBasic->get_cpu_size(),
+      "Error: Assigned CPU number does not match the partition. \n");
 
   SYS_T::commPrint("\n===> %d processor(s) are assigned for:", size);
   SYS_T::commPrint("Postprocessing - compute error from manufactured solutions.\n");
