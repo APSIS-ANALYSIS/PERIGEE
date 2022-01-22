@@ -246,9 +246,7 @@ int main(int argc, char *argv[])
     cmdh5w->write_intScalar(     "sol_record_freq", sol_record_freq);
     cmdh5w->write_intScalar(     "nqp_tri",         nqp_tri);
     cmdh5w->write_intScalar(     "nqp_tet",         nqp_tet);
-
     cmdh5w->write_string(        "lpn_file",        lpn_file);
-
     cmdh5w->write_intScalar(     "inflow_type",     inflow_type);
     cmdh5w->write_string(        "inflow_file",     inflow_file);
     if( inflow_type == 1 )
