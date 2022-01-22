@@ -31,12 +31,15 @@ class IPLocAssem
     
     virtual ~IPLocAssem(){};
 
+    // -------------------------------------------------------------- 
+    // Tangent and Residual of volumetric elements 
+    // -------------------------------------------------------------- 
     PetscScalar * Tangent;
     
     PetscScalar * Residual;
 
     // -------------------------------------------------------------- 
-    // Tangent and Residual on surface elements 
+    // Tangent and Residual of surface elements 
     // -------------------------------------------------------------- 
     PetscScalar * sur_Tangent;
 

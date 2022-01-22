@@ -393,9 +393,6 @@ void PGAssem_FSI::Assem_Tangent_Residual(
   const std::vector<double> array_v = velo -> GetLocalArray();
   const std::vector<double> array_p = pres -> GetLocalArray();
 
-  std::vector<double> local_dot_d(nLocBas * 3), local_dot_v(nLocBas * 3), local_dot_p(nLocBas);
-  std::vector<double> local_d(nLocBas * 3), local_v(nLocBas * 3), local_p(nLocBas);
-
   double * ectrl_x = new double [nLocBas];
   double * ectrl_y = new double [nLocBas];
   double * ectrl_z = new double [nLocBas];
@@ -410,17 +407,20 @@ void PGAssem_FSI::Assem_Tangent_Residual(
 
     fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
 
-    GetLocal(&array_dot_d[0], &IEN_v[0], nLocBas, 3, &local_dot_d[0]);
-    GetLocal(&array_dot_v[0], &IEN_v[0], nLocBas, 3, &local_dot_v[0]);
-    GetLocal(&array_dot_p[0], &IEN_p[0], nLocBas, 1, &local_dot_p[0]);
+    const std::vector<double> local_dot_d = GetLocal( array_dot_d, IEN_v, nLocBas, 3 );
+    const std::vector<double> local_dot_v = GetLocal( array_dot_v, IEN_v, nLocBas, 3 );
+    const std::vector<double> local_dot_p = GetLocal( array_dot_p, IEN_p, nLocBas, 1 );
 
-    GetLocal(&array_d[0], &IEN_v[0], nLocBas, 3, &local_d[0]);
-    GetLocal(&array_v[0], &IEN_v[0], nLocBas, 3, &local_v[0]);
-    GetLocal(&array_p[0], &IEN_p[0], nLocBas, 1, &local_p[0]);
+    const std::vector<double> local_d = GetLocal( array_d, IEN_v, nLocBas, 3 );
+    const std::vector<double> local_v = GetLocal( array_v, IEN_v, nLocBas, 3 );
+    const std::vector<double> local_p = GetLocal( array_p, IEN_p, nLocBas, 1 );
 
     for(int ii=0; ii<nLocBas; ++ii)
-      for(int mm=0; mm<3; ++mm)
-        row_id_v[3*ii+mm] = nbc_v -> get_LID(mm, IEN_v[ii]);
+    {
+      row_id_v[3*ii  ] = nbc_v -> get_LID(0, IEN_v[ii]);
+      row_id_v[3*ii+1] = nbc_v -> get_LID(1, IEN_v[ii]);
+      row_id_v[3*ii+2] = nbc_v -> get_LID(2, IEN_v[ii]);
+    }
 
     for(int ii=0; ii<nLocBas; ++ii)
       row_id_p[ii] = nbc_p -> get_LID( IEN_p[ii] );

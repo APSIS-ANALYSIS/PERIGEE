@@ -227,6 +227,18 @@ class PGAssem_FSI : public IPGAssem
         for(int jj=0; jj<in_dof; ++jj)
           local_array[ii * in_dof + jj] = array[IEN[ii] * in_dof + jj];
     }
+
+    std::vector<double> GetLocal( const std::vector<double> &array,
+        const std::vector<int> &IEN, const int &in_locbas, const int &in_dof ) const
+    {
+      std::vector<double> out( in_locbas * in_dof, 0.0 );
+      for(int ii=0; ii<in_locbas; ++ii)
+        for(int jj=0; jj<in_dof; ++jj)
+          out[ii * in_dof + jj] = array[IEN[ii] * in_dof + jj];
+    
+      return out;
+    }
+
 };
 
 #endif
