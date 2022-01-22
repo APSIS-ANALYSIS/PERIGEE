@@ -14,7 +14,7 @@ int main( int argc, char * argv[] )
   int nqp_tet = 29; // 4 (2), 5 (3), 17 (5), or 29 (6)
 
   double sol_time = 1.0;
-  std::string sol_name("SOL_900000100");
+  std::string sol_name("SOL_900000000");
   std::string part_file("./ppart/part");
   const int dof = 1;
 
@@ -25,6 +25,8 @@ int main( int argc, char * argv[] )
 
   SYS_T::cmdPrint("-sol_name:", sol_name);
   SYS_T::cmdPrint("-sol_time:", sol_time);
+
+  SYS_T::file_check(sol_name.c_str());
 
   const PetscMPIInt rank = SYS_T::get_MPI_rank();
   const PetscMPIInt size = SYS_T::get_MPI_size();
@@ -44,7 +46,7 @@ int main( int argc, char * argv[] )
   SYS_T::print_fatal_if( size != PartBasic->get_cpu_size(),
       "Error: Assigned CPU number does not match the partition. \n");
 
-  SYS_T::commPrint("\n===> %d processor(s) are assigned for:", size);
+  SYS_T::commPrint("===> %d processor(s) are assigned for:", size);
   SYS_T::commPrint("Postprocessing - compute error from manufactured solutions.\n");
 
   IQuadPts * quadv = new QuadPts_Gauss_Tet( nqp_tet );
