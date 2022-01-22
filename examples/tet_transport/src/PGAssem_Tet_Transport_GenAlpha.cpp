@@ -13,8 +13,12 @@ PGAssem_Tet_Transport_GenAlpha::PGAssem_Tet_Transport_GenAlpha(
   dof_mat( locassem_ptr->get_dof_mat() ),
   num_ebc( part_ebc->get_num_ebc() ),
   nlgn( pnode_ptr->get_nlocghonode() ),
-  snLocBas( part_ebc -> get_cell_nLocBas(0) )
+  snLocBas( 0 )
 {
+  // Make sure that the surface element's number of local basis are
+  // the same. This is an assumption in this assembly routine.
+  if(num_ebc>0) snLocBas = part_ebc -> get_cell_nLocBas(0);
+
   const int nlocrow = 1 * pnode_ptr -> get_nlocalnode();
 
   // Allocate the sparse matrix K

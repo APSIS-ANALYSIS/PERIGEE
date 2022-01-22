@@ -36,7 +36,7 @@ PLocAssem_Tet_Transport_GenAlpha::PLocAssem_Tet_Transport_GenAlpha(
   if( num_ebc_fun == 0 ) flist = nullptr;
   else flist = new locassem_transport_funs [num_ebc_fun];
 
-  flist[0] = &PLocAssem_Tet_Transport_GenAlpha::get_g_0;
+  //flist[0] = &PLocAssem_Tet_Transport_GenAlpha::get_g_0;
   //flist[1] = &PLocAssem_Tet_Transport_GenAlpha::get_g_1;
  
   print_info();

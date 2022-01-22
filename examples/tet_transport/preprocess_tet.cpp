@@ -116,7 +116,12 @@ int main( int argc, char * argv[] )
 
   // Setup Nodal (Dirichlet type) boundary condition(s)
   std::vector<std::string> dir_list;
+  dir_list.push_back("top_vol.vtp");
   dir_list.push_back("bot_vol.vtp");
+  dir_list.push_back("lef_vol.vtp");
+  dir_list.push_back("rig_vol.vtp");
+  dir_list.push_back("fro_vol.vtp");
+  dir_list.push_back("bac_vol.vtp");
 
   INodalBC * nbc = new NodalBC_3D_vtp( dir_list, nFunc );
   
@@ -125,8 +130,7 @@ int main( int argc, char * argv[] )
   NBC_list.push_back( nbc );
 
   // Setup Elemental (Neumann type) boundary condition(s)
-  std::vector<std::string> neu_list;
-  neu_list.push_back("top_vol.vtp");
+  std::vector<std::string> neu_list; neu_list.clear();
   ElemBC * ebc = new ElemBC_3D_tet( neu_list, elemType );
   
   ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations

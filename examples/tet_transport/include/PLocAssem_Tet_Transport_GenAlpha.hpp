@@ -95,7 +95,8 @@ class PLocAssem_Tet_Transport_GenAlpha : public IPLocAssem
     double get_f( const double &x, const double &y, const double &z, 
         const double &time ) const
     {
-      return 0.0;
+      const double pi = MATH_T::PI;
+      return time*sin(pi*x)*sin(pi*y)*sin(pi*z)*( 3*kappa*time*pi*pi + 2*cap*rho );
     }
 
     typedef double ( PLocAssem_Tet_Transport_GenAlpha::*locassem_transport_funs )( const double &x, const double &y, const double &z, const double &t ) const;
