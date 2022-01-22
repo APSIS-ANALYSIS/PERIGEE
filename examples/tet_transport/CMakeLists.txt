@@ -104,6 +104,7 @@ SET( perigee_postprocess_lib_src
   ${perigee_source}/Postproc_Tool/PostVectSolution.cpp
   ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   ${perigee_source}/Postproc_Tool/Interpolater.cpp
+  ${perigee_SOURCE_DIR}/src/Post_error_transport.cpp
   )
 
 INCLUDE_DIRECTORIES( ../../include )

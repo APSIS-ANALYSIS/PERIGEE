@@ -7,11 +7,13 @@
 #include "QuadPts_Gauss_Tet.hpp"
 #include "FEAElement_Tet4.hpp"
 #include "PostVectSolution.hpp"
+#include "Post_error_transport.hpp"
 
 int main( int argc, char * argv[] )
 {
   int nqp_tet = 29; // 4 (2), 5 (3), 17 (5), or 29 (6)
 
+  double sol_time = 0.0;
   std::string sol_name("SOL_900000000");
   std::string part_file("./ppart/part");
   const int dof = 1;
@@ -44,8 +46,6 @@ int main( int argc, char * argv[] )
       "node_mapping.h5", "post_node_mapping.h5", pNode, GMIptr->get_nFunc(), dof );
 
   // There are four local basis functions in tet element
-  double R[4]; double Rx[4]; double Ry[4]; double Rz[4];
-
   int IEN_e[4];
   double ectrl_x[4], ectrl_y[4], ectrl_z[4], loc_sol[4];
   double subdomain_l2 = 0.0;
@@ -60,7 +60,8 @@ int main( int argc, char * argv[] )
     pSolu -> get_esol( 0, 4, IEN_e, loc_sol );
 
     // Calculate the error
-    // subdomain_l2 += ...
+    subdomain_l2 += POST_ERROR_T::get_manu_sol_error(
+      sol_time, loc_sol, elementv, ectrl_x, ectrl_y, ectrl_z, quadv );
   }
   
   double l2_error = 0.0;
