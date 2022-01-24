@@ -55,8 +55,7 @@ class FEAElement
     // ------------------------------------------------------------------------
     // Calculate the element size
     // ------------------------------------------------------------------------
-    virtual double get_h( const double * const &ctrl_x,
-        const double * const &ctrl_y,
+    virtual double get_h( const double * const &ctrl_x, const double * const &ctrl_y,
         const double * const &ctrl_z ) const
     {SYS_T::commPrint("Warning: get_h is not implemented. \n"); return 0.0;}
 
@@ -69,8 +68,7 @@ class FEAElement
     // ------------------------------------------------------------------------
     // Build 3D basis -- FEM
     virtual void buildBasis( const IQuadPts * const &quad_rule,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
+        const double * const &ctrl_x, const double * const &ctrl_y,
         const double * const &ctrl_z )
     {SYS_T::commPrint("Warning: buildBasis() is not implemented. \n");}
 
@@ -90,10 +88,7 @@ class FEAElement
     {SYS_T::commPrint("Warning: get_R is not implemented. \n");} 
 
     virtual std::vector<double> get_R( const int &quaindex ) const
-    {
-      SYS_T::commPrint("Warning: get_R is not implemented. \n");
-      return {};
-    } 
+    {SYS_T::commPrint("Warning: get_R is not implemented. \n"); return {};} 
 
     // ------------------------------------------------------------------------    
     // Return basis function and all 1st order derivatives value using a dynamic
@@ -122,22 +117,13 @@ class FEAElement
     {SYS_T::commPrint("Warning: get_R_gradR is not implemented. \n");}
 
     virtual std::vector<double> get_dR_dx( const int &quaindex ) const
-    {
-      SYS_T::commPrint("Warning: get_dR_dx is not implemented. \n");
-      return {};
-    }
+    {SYS_T::commPrint("Warning: get_dR_dx is not implemented. \n");return {};}
 
     virtual std::vector<double> get_dR_dy( const int &quaindex ) const
-    {
-      SYS_T::commPrint("Warning: get_dR_dy is not implemented. \n");
-      return {};
-    }
+    {SYS_T::commPrint("Warning: get_dR_dy is not implemented. \n");return {};}
 
     virtual std::vector<double> get_dR_dz( const int &quaindex ) const
-    {
-      SYS_T::commPrint("Warning: get_dR_dz is not implemented. \n");
-      return {};
-    }
+    {SYS_T::commPrint("Warning: get_dR_dz is not implemented. \n");return {};}
 
     // ------------------------------------------------------------------------    
     // R, gradR, and Laplacian R
@@ -168,40 +154,22 @@ class FEAElement
       const {SYS_T::commPrint("Warning: get_3D_R_dR_d2R is not implemented. \n");}
 
     virtual std::vector<double> get_d2R_dxx( const int &quaindex ) const
-    {
-      SYS_T::commPrint("Warning: get_d2R_dxx is not implemented. \n");
-      return {};
-    }
+    {SYS_T::commPrint("Warning: get_d2R_dxx is not implemented. \n");return {};}
 
     virtual std::vector<double> get_d2R_dyy( const int &quaindex ) const
-    {
-      SYS_T::commPrint("Warning: get_d2R_dyy is not implemented. \n");
-      return {};
-    }
+    {SYS_T::commPrint("Warning: get_d2R_dyy is not implemented. \n");return {};}
 
     virtual std::vector<double> get_d2R_dzz( const int &quaindex ) const
-    {
-      SYS_T::commPrint("Warning: get_d2R_dzz is not implemented. \n");
-      return {};
-    }
+    {SYS_T::commPrint("Warning: get_d2R_dzz is not implemented. \n");return {};}
 
     virtual std::vector<double> get_d2R_dxy( const int &quaindex ) const
-    {
-      SYS_T::commPrint("Warning: get_d2R_dxy is not implemented. \n");
-      return {};
-    }
+    {SYS_T::commPrint("Warning: get_d2R_dxy is not implemented. \n");return {};}
 
     virtual std::vector<double> get_d2R_dxz( const int &quaindex ) const
-    {
-      SYS_T::commPrint("Warning: get_d2R_dxz is not implemented. \n");
-      return {};
-    }
+    {SYS_T::commPrint("Warning: get_d2R_dxz is not implemented. \n");return {};}
 
     virtual std::vector<double> get_d2R_dyz( const int &quaindex ) const
-    {
-      SYS_T::commPrint("Warning: get_d2R_dyz is not implemented. \n");
-      return {};
-    }
+    {SYS_T::commPrint("Warning: get_d2R_dyz is not implemented. \n");return {};}
 
     // ------------------------------------------------------------------------    
     // Return the Jacobian determinant
