@@ -303,7 +303,7 @@ void PGAssem_FSI::Assem_Residual(
 
     const std::vector<double> local_d = GetLocal( array_d, IEN_v, nLocBas, 3 ); 
     const std::vector<double> local_v = GetLocal( array_v, IEN_v, nLocBas, 3 );
-    const std::vector<double> local_p = GetLocal( array_p, IEN_p, nLocBas, 3 );
+    const std::vector<double> local_p = GetLocal( array_p, IEN_p, nLocBas, 1 );
     
     for(int ii=0; ii<nLocBas; ++ii)
       for(int mm=0; mm<3; ++mm)
