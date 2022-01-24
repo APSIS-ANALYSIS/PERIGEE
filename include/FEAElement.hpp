@@ -1,20 +1,16 @@
 #ifndef FEAELEMENT_HPP
 #define FEAELEMENT_HPP
-// ==================================================================
+// ============================================================================
 // FEAElement.hpp
 // Object: This is the interface for Finite Element classes.
 // It records:
 // 1. Element basic indices;
 // 2. Element nodes through the IEN array;
 // 3. reference element position / hx hy hz; 
-// 4. extraction operators.
-//
-// It should be capable of representing H1, H-div, H-curl, L2 conforming
-// elements.
 //
 // Author: Ju Liu
 // Date created: Nov. 6 2013
-// ==================================================================
+// ============================================================================
 #include <cassert>
 #include <array>
 #include "IQuadPts.hpp"
@@ -34,8 +30,6 @@ class FEAElement
 
     // Return this element's Type, which defines the type of different 
     // elements defined on this single element domain.
-    // Tet-4  : 501
-    // Tet-10 : 502
     virtual int get_Type() const
     {SYS_T::commPrint("Warning: get_Type is not implemented. \n"); return -1;}
 
@@ -49,18 +43,18 @@ class FEAElement
     // Return the quadrature info
     virtual int get_numQuapts() const = 0;
 
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // print function
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------------
     virtual void print_info() const 
     {SYS_T::commPrint("Warning: print is not implemented. \n");}
 
     // Return the memory usage of this class in bytes
     virtual double get_memory_usage() const = 0; 
 
-    // --------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     // Calculate the element size
-    // --------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     virtual double get_h( const double * const &ctrl_x,
         const double * const &ctrl_y,
         const double * const &ctrl_z ) const
@@ -70,9 +64,9 @@ class FEAElement
         const double * const &ctrl_y ) const
     {SYS_T::commPrint("Warning: get_h is not implemented. \n"); return 0.0;}
 
-    // --------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     // Build Basis function quadrature info
-    // --------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     // Build 3D basis -- FEM
     virtual void buildBasis( const IQuadPts * const &quad_rule,
         const double * const &ctrl_x,
@@ -89,8 +83,9 @@ class FEAElement
     // Get functions : Obtain the value of basis functions and their derivatives.
     // ------------------------------------------------------------------------
     // Return basis function value using a dynamic double array.
-    // Users are responsible for allocating proper memory for basis,
-    // and delete the pointer after use.
+    // Users are responsible for allocating proper memory for basis, and delete 
+    // the pointer after use.
+    // ------------------------------------------------------------------------
     virtual void get_R( const int &quaindex, double * const &basis ) const
     {SYS_T::commPrint("Warning: get_R is not implemented. \n");} 
 
@@ -101,30 +96,30 @@ class FEAElement
     } 
 
     // ------------------------------------------------------------------------    
-    // Return basis function and all 1st order derivatives value 
-    // using a dynamic double array.
-    // Users are responsible for allocating proper memory for basis,
-    // and delete the pointer after use.
+    // Return basis function and all 1st order derivatives value using a dynamic
+    // array.
+    // Users are responsible for allocating proper memory for basis, and delete
+    // the pointer after use.
     // ------------------------------------------------------------------------    
     // 3D case
     virtual void get_gradR( const int &quaindex, double * const &basis_x,
-        double * const &basis_y, double * const &basis_z )
-      const {SYS_T::commPrint("Warning: get_gradR is not implemented. \n");} 
+        double * const &basis_y, double * const &basis_z ) const 
+    {SYS_T::commPrint("Warning: get_gradR is not implemented. \n");} 
 
     // 2D case
     virtual void get_gradR( const int &quaindex, double * const &basis_x,
-        double * const &basis_y )
-      const {SYS_T::commPrint("Warning: get_gradR is not implemented. \n");} 
+        double * const &basis_y ) const 
+    {SYS_T::commPrint("Warning: get_gradR is not implemented. \n");} 
 
     // 2D case:
     virtual void get_R_gradR( const int &quaindex, double * const &basis, 
-        double * const &basis_x, double * const &basis_y )
-      const {SYS_T::commPrint("Warning: get_R_gradR is not implemented. \n");} 
+        double * const &basis_x, double * const &basis_y ) const 
+    {SYS_T::commPrint("Warning: get_R_gradR is not implemented. \n");} 
 
     // 3D case:
     virtual void get_R_gradR( const int &quaindex, double * const &basis,
-        double * const &basis_x, double * const &basis_y, double * const &basis_z ) 
-      const {SYS_T::commPrint("Warning: get_R_gradR is not implemented. \n");}
+        double * const &basis_x, double * const &basis_y, double * const &basis_z ) const 
+    {SYS_T::commPrint("Warning: get_R_gradR is not implemented. \n");}
 
     virtual std::vector<double> get_dR_dx( const int &quaindex ) const
     {
@@ -149,22 +144,21 @@ class FEAElement
     // ------------------------------------------------------------------------    
     virtual void get_3D_R_gradR_LaplacianR( const int &quaindex,
         double * const &basis, double * const &basis_x, double * const &basis_y,
-        double * const &basis_z, double * const &basis_xx,
-        double * const &basis_yy, double * const &basis_zz )
-      const {SYS_T::commPrint("Warning: get_3DLaplacianR is not implemented. \n");}
+        double * const &basis_z, double * const &basis_xx, double * const &basis_yy, 
+        double * const &basis_zz ) const 
+    {SYS_T::commPrint("Warning: get_3DLaplacianR is not implemented. \n");}
 
     virtual void get_2D_R_gradR_LaplacianR( const int &quaindex,
         double * const &basis, double * const &basis_x, double * const &basis_y,
-        double * const &basis_xx, double * const &basis_yy )
-      const {SYS_T::commPrint("Warning: get_2DLaplacianR is not implemented. \n");}
+        double * const &basis_xx, double * const &basis_yy ) const 
+    {SYS_T::commPrint("Warning: get_2DLaplacianR is not implemented. \n");}
 
     // ------------------------------------------------------------------------    
     // R, gradR, and grad gradR
     // ------------------------------------------------------------------------    
     virtual void get_2D_R_dR_d2R( const int &quaindex, double * const &basis,
-        double * const &basis_x, double * const &basis_y,
-        double * const &basis_xx, double * const &basis_yy, double * const &basis_xy
-        ) const
+        double * const &basis_x, double * const &basis_y, double * const &basis_xx, 
+        double * const &basis_yy, double * const &basis_xy ) const
     {SYS_T::commPrint("Warning: get_2D_R_dR_d2R is not implemented. \n");}
 
     virtual void get_3D_R_dR_d2R( const int &quaindex, double * const &basis,
