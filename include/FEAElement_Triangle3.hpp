@@ -26,7 +26,7 @@ class FEAElement_Triangle3 : public FEAElement
 
     virtual int get_nLocBas() const {return 3;}
 
-    virtual void print() const;
+    virtual void print_info() const;
 
     virtual double get_memory_usage() const;
 

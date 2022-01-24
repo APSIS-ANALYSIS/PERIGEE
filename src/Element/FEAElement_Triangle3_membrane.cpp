@@ -11,7 +11,7 @@ FEAElement_Triangle3_membrane::~FEAElement_Triangle3_membrane()
   delete [] R; R = nullptr;
 }
 
-void FEAElement_Triangle3_membrane::print() const
+void FEAElement_Triangle3_membrane::print_info() const
 {
   SYS_T::commPrint("Triangle3_membrane: ");
   SYS_T::commPrint("3-node triangle element in the local lamina coordinate system. \n ");

@@ -11,7 +11,7 @@ FEAElement_Triangle3_3D_der0::~FEAElement_Triangle3_3D_der0()
   delete [] R; R = nullptr;
 }
 
-void FEAElement_Triangle3_3D_der0::print() const
+void FEAElement_Triangle3_3D_der0::print_info() const
 {
   SYS_T::commPrint("Triangle3_3D_der0: ");
   SYS_T::commPrint("3-node triangle element with no derivative evaluated. \n ");

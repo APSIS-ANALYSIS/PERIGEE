@@ -7,14 +7,12 @@ FEAElement_Line2_3D_der0::FEAElement_Line2_3D_der0(
   R = new double [2 * numQuapts];
 }
 
-
 FEAElement_Line2_3D_der0::~FEAElement_Line2_3D_der0()
 {
   delete [] R; R = NULL;
 }
 
-
-void FEAElement_Line2_3D_der0::print() const
+void FEAElement_Line2_3D_der0::print_info() const
 {
   SYS_T::commPrint("Line2_3D_der0: ");
   SYS_T::commPrint("P1 line element in 3D with no derivative evaluation. \n");
@@ -22,14 +20,12 @@ void FEAElement_Line2_3D_der0::print() const
   SYS_T::commPrint("Note: This element is designed for natural BC integrals. \n ");
 }
 
-
 double FEAElement_Line2_3D_der0::get_memory_usage() const
 {
   double double_size = 2 * numQuapts + 4;
   double int_size = 2;
   return double_size * 8.0 + int_size * 4.0;
 }
-
 
 void FEAElement_Line2_3D_der0::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_x, const double * const &ctrl_y,
@@ -50,14 +46,12 @@ void FEAElement_Line2_3D_der0::buildBasis( const IQuadPts * const &quad,
   detJac = std::sqrt(dx_dr*dx_dr + dy_dr*dy_dr + dz_dr*dz_dr);
 }
 
-
 void FEAElement_Line2_3D_der0::get_R( const int &quaindex, 
     double * const &basis ) const
 {
   basis[0] = R[quaindex*2];
   basis[1] = R[quaindex*2+1];
 }
-
 
 void FEAElement_Line2_3D_der0::get_normal_out( const int &quaindex,
     const double * const &ctrl_x, const double * const &ctrl_y,
@@ -75,6 +69,5 @@ void FEAElement_Line2_3D_der0::get_normal_out( const int &quaindex,
 
   len = detJac;
 }
-
 
 // EOF

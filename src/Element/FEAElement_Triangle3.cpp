@@ -11,7 +11,7 @@ FEAElement_Triangle3::~FEAElement_Triangle3()
   delete [] R; R = nullptr;
 }
 
-void FEAElement_Triangle3::print() const
+void FEAElement_Triangle3::print_info() const
 {
   SYS_T::commPrint("Tri3: ");
   SYS_T::commPrint("3-node triangle element with up to 2nd derivatives. \n");

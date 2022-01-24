@@ -21,7 +21,7 @@ FEAElement_Line3_3D_der0::~FEAElement_Line3_3D_der0()
 }
 
 
-void FEAElement_Line3_3D_der0::print() const
+void FEAElement_Line3_3D_der0::print_info() const
 {
   SYS_T::commPrint("Line3_3D_der0: ");
   SYS_T::commPrint("P2 line element in 3D with no derivative evaluation. \n");

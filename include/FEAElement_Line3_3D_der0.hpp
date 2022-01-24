@@ -34,7 +34,7 @@ class FEAElement_Line3_3D_der0 : public FEAElement
 
     virtual int get_nLocBas() const {return nLocBas;}
 
-    virtual void print() const;
+    virtual void print_info() const;
 
     virtual double get_memory_usage() const;
 

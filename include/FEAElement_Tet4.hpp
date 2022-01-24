@@ -29,7 +29,7 @@ class FEAElement_Tet4 : public FEAElement
 
     virtual int get_nLocBas() const {return 4;}
 
-    virtual void print() const;
+    virtual void print_info() const;
 
     virtual double get_memory_usage() const;
 

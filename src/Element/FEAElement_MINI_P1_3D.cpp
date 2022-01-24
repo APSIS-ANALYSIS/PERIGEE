@@ -17,7 +17,7 @@ FEAElement_MINI_P1_3D::~FEAElement_MINI_P1_3D()
   delete [] dB_dz; dB_dz = nullptr;
 }
 
-void FEAElement_MINI_P1_3D::print() const
+void FEAElement_MINI_P1_3D::print_info() const
 {
   SYS_T::commPrint("MINI_P1: ");
   SYS_T::commPrint("4-node tet element with quartic bubble. \n");

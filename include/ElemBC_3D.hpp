@@ -30,7 +30,6 @@
 //
 // Date created: Nov. 17 2017
 // ==================================================================
-#include "Vec_Tools.hpp"
 #include "ElemBC.hpp"
 
 class ElemBC_3D : public ElemBC

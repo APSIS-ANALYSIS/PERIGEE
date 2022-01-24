@@ -51,12 +51,7 @@ class FEAElement
 
     // --------------------------------------------------------------
     // print function
-    // -- note: in the old implementation, I use print(). In newer
-    //          implementations, I use print_info().
     // --------------------------------------------------------------
-    virtual void print() const 
-    {SYS_T::commPrint("Warning: print is not implemented. \n");}
-    
     virtual void print_info() const 
     {SYS_T::commPrint("Warning: print is not implemented. \n");}
 
@@ -224,8 +219,8 @@ class FEAElement
     // dy_dxi, ... dz_deta, dz_dzeta. The size of teh return vector is 9 for 3d,
     // and 4 for 2d, for exampel. 
     // ------------------------------------------------------------------------    
-    virtual void get_Jacobian(const int &quaindex, double * const &jac_value) 
-      const {SYS_T::commPrint("Warning: get_Jacobian is not implemented. \n");} 
+    virtual void get_Jacobian(const int &quaindex, double * const &jac_value) const 
+    {SYS_T::commPrint("Warning: get_Jacobian is not implemented. \n");} 
 
     virtual std::array<double,9> get_Jacobian( const int &quaindex ) const
     {
@@ -238,8 +233,8 @@ class FEAElement
     // given. The output array dxi_dx is a 9 or 4 component array for 3D / 2D
     // case.
     // ------------------------------------------------------------------------    
-    virtual void get_invJacobian(const int &quaindex, double * const &dxi_dx)
-      const {SYS_T::commPrint("Warning: get_invJacobian is not implemented. \n");} 
+    virtual void get_invJacobian(const int &quaindex, double * const &dxi_dx) const 
+    {SYS_T::commPrint("Warning: get_invJacobian is not implemented. \n");} 
 
     virtual std::array<double,9> get_invJacobian( const int &quaindex ) const
     {

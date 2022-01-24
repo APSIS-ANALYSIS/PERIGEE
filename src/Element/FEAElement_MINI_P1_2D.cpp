@@ -16,7 +16,7 @@ FEAElement_MINI_P1_2D::~FEAElement_MINI_P1_2D()
   delete [] dB_dy; dB_dy = NULL;
 }
 
-void FEAElement_MINI_P1_2D::print() const
+void FEAElement_MINI_P1_2D::print_info() const
 {
   SYS_T::commPrint("MINI_P1: ");
   SYS_T::commPrint("4-node triangle element with cubic bubble. \n");
