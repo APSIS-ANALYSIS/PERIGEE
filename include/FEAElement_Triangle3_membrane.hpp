@@ -30,8 +30,6 @@ class FEAElement_Triangle3_membrane : public FEAElement
     // 2: 2D element
     virtual int get_Type() const {return 523;}
 
-    virtual int get_numType() const {return 1;}
-
     virtual int get_numQuapts() const {return numQuapts;}
 
     virtual int get_nLocBas() const {return nLocBas;}

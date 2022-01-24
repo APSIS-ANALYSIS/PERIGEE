@@ -25,8 +25,6 @@ class FEAElement_Line2_3D_der0 : public FEAElement
 
     virtual int get_Type() const {return 510;}
 
-    virtual int get_numType() const {return 1;}
-
     virtual int get_numQuapts() const {return numQuapts;}
 
     virtual int get_nLocBas() const {return nLocBas;}

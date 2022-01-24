@@ -24,8 +24,6 @@ class FEAElement_MINI_P1_3D : public FEAElement
 
     virtual int get_Type() const {return 571;}
 
-    virtual int get_numType() const {return 1;}
-
     virtual int get_numQuapts() const {return numQuapts;}
 
     virtual int get_nLocBas() const {return 5;}
@@ -84,9 +82,6 @@ class FEAElement_MINI_P1_3D : public FEAElement
     double Jac[18];
 
     double detJac;
-
-    // Free the space of dynamic array
-    virtual void clearBasisCache();
 };
 
 #endif

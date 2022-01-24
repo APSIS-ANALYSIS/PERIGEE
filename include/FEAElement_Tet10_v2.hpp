@@ -53,8 +53,6 @@ class FEAElement_Tet10_v2 : public FEAElement
     // A unique number for this element. 
     virtual int get_Type() const {return 502;}
 
-    virtual int get_numType() const {return 1;}
-
     virtual int get_numQuapts() const {return numQuapts;}
 
     virtual int get_nLocBas() const {return 10;}

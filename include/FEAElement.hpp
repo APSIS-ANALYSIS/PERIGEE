@@ -34,23 +34,8 @@ class FEAElement
 
     // Return this element's Type, which defines the type of different 
     // elements defined on this single element domain.
-    // H1 2D NURBS der0:      Type = 120
-    // H1 2D NURBS der1:      Type = 121
-    // H1 2D NURBS     :      Type = 122
-    // H1 3D NURBS der0:      Type = 130
-    // H1 3D NURBS der1:      Type = 131
-    // H1 3D NURBS der2:      Type = 132
-    // H1 3D NURBS der1_wJac: Type = 133
-    // H1 3D NURBS der2_vms:  Type = 134
-    // H-div B-spline:        Type = 220
-    // H1 2D T-splines der 0: Type = 520
-    // H1 2D T-splines der 1: Type = 521
-    // H1 2D T-splines der 2: Type = 522
-    // H1 2D T-splines der 1 lap: Type = 523
-    // H1 2D B-splines der 0: Type = 620
-    // H1 2D B-splines der 1: Type = 621
-    // H1 2D B-splines der 2: Type = 622
-    // H1 3D B-splines der 2: type = 632
+    // Tet-4  : 501
+    // Tet-10 : 502
     virtual int get_Type() const
     {SYS_T::commPrint("Warning: get_Type is not implemented. \n"); return -1;}
 
@@ -58,22 +43,12 @@ class FEAElement
     virtual std::string get_TypeName() const
     {SYS_T::commPrint("Warning: get_TypeName is not implemented. \n"); return "undetermined";}
 
-    // Return the number of different basis functions defined on this element.
-    // H1 NURBS: 1
-    // H-div 2D: 2
-    // H-div 3D: 3
-    virtual int get_numType() const = 0;
-
     // Return the number of nodes for each type elements
     virtual int get_nLocBas() const = 0;
     
     // Return the quadrature info
     virtual int get_numQuapts() const = 0;
 
-    // Clear memory of basis function quadrature
-    virtual void clearBasisCache()
-    {SYS_T::commPrint("Warning: clearBasisCache is not implemented. \n");}
-    
     // --------------------------------------------------------------
     // print function
     // -- note: in the old implementation, I use print(). In newer
