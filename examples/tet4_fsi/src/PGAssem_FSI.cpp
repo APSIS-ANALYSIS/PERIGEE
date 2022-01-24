@@ -283,7 +283,7 @@ void PGAssem_FSI::Assem_Residual(
   const std::vector<double> array_v = velo -> GetLocalArray();
   const std::vector<double> array_p = pres -> GetLocalArray();
 
-  std::vector<double> local_dot_d(nLocBas * 3), local_dot_v(nLocBas * 3), local_dot_p(nLocBas);
+  std::vector<double> local_dot_p(nLocBas);
   std::vector<double> local_d(nLocBas * 3), local_v(nLocBas * 3), local_p(nLocBas);
 
   double * ectrl_x = new double [nLocBas];
@@ -300,8 +300,8 @@ void PGAssem_FSI::Assem_Residual(
 
     fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
 
-    GetLocal(&array_dot_d[0], &IEN_v[0], nLocBas, 3, &local_dot_d[0]);
-    GetLocal(&array_dot_v[0], &IEN_v[0], nLocBas, 3, &local_dot_v[0]);
+    const std::vector<double> local_dot_d = GetLocal( array_dot_d, IEN_v, nLocBas, 3 );
+    const std::vector<double> local_dot_v = GetLocal( array_dot_v, IEN_v, nLocBas, 3 );
     GetLocal(&array_dot_p[0], &IEN_p[0], nLocBas, 1, &local_dot_p[0]);
 
     GetLocal(&array_d[0], &IEN_v[0], nLocBas, 3, &local_d[0]);
