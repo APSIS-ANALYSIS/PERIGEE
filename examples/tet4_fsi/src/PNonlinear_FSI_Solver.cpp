@@ -270,8 +270,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
 
     gassem_mesh_ptr -> Assem_residual( pre_disp, disp, curr_time, dt, 
         alelem_ptr, lassem_mesh_ptr, elementv, elements,
-        quad_v, quad_s, lien_v, pnode_v,
-        feanode_ptr, nbc_mesh, ebc_mesh );
+        quad_v, quad_s, lien_v, feanode_ptr, nbc_mesh, ebc_mesh );
 
     lsolver_mesh_ptr -> Solve( gassem_mesh_ptr -> G, sol_mesh );
 

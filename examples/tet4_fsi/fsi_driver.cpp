@@ -569,7 +569,7 @@ int main(int argc, char *argv[])
 
   gloAssem_mesh_ptr->Assem_tangent_residual( disp, disp, 0.0,
       timeinfo->get_step(), locElem, locAssem_mesh_ptr, elementv,
-      elements, quadv, quads, locIEN_v, pNode_v, fNode, mesh_locnbc,
+      elements, quadv, quads, locIEN_v, fNode, mesh_locnbc,
       mesh_locebc );
 
   mesh_lsolver -> SetOperator( gloAssem_mesh_ptr->K );
