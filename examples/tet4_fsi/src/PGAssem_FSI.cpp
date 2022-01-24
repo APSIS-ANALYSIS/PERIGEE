@@ -176,9 +176,7 @@ void PGAssem_FSI::Assem_mass_residual(
   const std::vector<double> array_d = disp -> GetLocalArray();
   const std::vector<double> array_v = velo -> GetLocalArray();
   const std::vector<double> array_p = pres -> GetLocalArray();
-  
-  std::vector<double> local_d(nLocBas * 3), local_v(nLocBas * 3), local_p(nLocBas);
-  
+   
   double * ectrl_x = new double [nLocBas];
   double * ectrl_y = new double [nLocBas];
   double * ectrl_z = new double [nLocBas];
@@ -200,10 +198,10 @@ void PGAssem_FSI::Assem_mass_residual(
     for(int ii=0; ii<nLocBas; ++ii) 
       row_id_p[ii] = nbc_p -> get_LID( IEN_p[ii] );
    
-    GetLocal(&array_d[0], &IEN_v[0], nLocBas, 3, &local_d[0]);
-    GetLocal(&array_v[0], &IEN_v[0], nLocBas, 3, &local_v[0]);
-    GetLocal(&array_p[0], &IEN_p[0], nLocBas, 1, &local_p[0]);
-
+    const std::vector<double> local_d = GetLocal( array_d, IEN_v, nLocBas, 3 ); 
+    const std::vector<double> local_v = GetLocal( array_v, IEN_v, nLocBas, 3 );
+    const std::vector<double> local_p = GetLocal( array_p, IEN_p, nLocBas, 1 );
+    
     if( alelem_ptr->get_elem_tag(ee) == 0 )
     {
       lassem_f_ptr->Assem_Mass_Residual(&local_d[0], &local_v[0], &local_p[0], elementv, 
