@@ -156,4 +156,16 @@ void ALocal_Inflow_NodalBC::get_SIEN( const int &nbc_id,
   }
 }
 
+std::vector<int> ALocal_Inflow_NodalBC::get_SIEN( const int &nbc_id,
+    const int &eindex ) const
+{
+  std::vector<int> out( cell_nLocBas[nbc_id], 0 );
+  for(int jj=0; jj<cell_nLocBas[nbc_id]; ++jj)
+  {
+    const int pos = local_tri_ien[nbc_id][ cell_nLocBas[nbc_id]*eindex+jj ];
+    out[jj] = local_node_pos[nbc_id][pos];
+  }
+  return out;
+}
+
 // EOF

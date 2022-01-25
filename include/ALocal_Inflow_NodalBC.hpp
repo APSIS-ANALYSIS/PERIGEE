@@ -152,6 +152,8 @@ class ALocal_Inflow_NodalBC
     virtual void get_SIEN( const int &nbc_id, const int &eindex,
         int * const &sien ) const;
 
+    virtual std::vector<int> get_SIEN( const int &nbc_id, const int &eindex ) const;
+
     // ------------------------------------------------------------------------
     // Generate filename Inlet_data.txt for inlet data
     // ------------------------------------------------------------------------
