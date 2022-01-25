@@ -107,12 +107,15 @@ void PGAssem_FSI::Assem_nonzero_estimate(
   for(int ee=0; ee<nElem; ++ee)
   {
     for(int ii=0; ii<nLocBas; ++ii)
-      for(int mm=0; mm<3; ++mm)
-        row_id_v[3*ii+mm] = nbc_v -> get_LID( mm, lien_v -> get_LIEN(ee, ii) );
-  
+    {  
+      row_id_v[3*ii  ] = nbc_v -> get_LID( 0, lien_v -> get_LIEN(ee, ii) );
+      row_id_v[3*ii+1] = nbc_v -> get_LID( 1, lien_v -> get_LIEN(ee, ii) );
+      row_id_v[3*ii+2] = nbc_v -> get_LID( 2, lien_v -> get_LIEN(ee, ii) );
+    }
+
     for(int ii=0; ii<nLocBas; ++ii)
       row_id_p[ii] = nbc_p -> get_LID( lien_p -> get_LIEN(ee,ii) );
-  
+
     if( alelem_ptr->get_elem_tag(ee) == 0 )
     {
       MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_f_ptr->Tangent00, ADD_VALUES);
@@ -143,7 +146,7 @@ void PGAssem_FSI::Assem_nonzero_estimate(
   NatBC_Resis_KG( 0.1, 0.1, temp, temp, temp, lassem_f_ptr, elements, quad_s,nbc_v, ebc_part, gbc );
 
   delete temp; temp = nullptr;
-  
+
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 
   EssBC_KG( nbc_v, nbc_p );
@@ -172,11 +175,11 @@ void PGAssem_FSI::Assem_mass_residual(
     const Prestress_solid * const &ps_ptr )
 {
   const int nElem = alelem_ptr->get_nlocalele();
-  
+
   const std::vector<double> array_d = disp -> GetLocalArray();
   const std::vector<double> array_v = velo -> GetLocalArray();
   const std::vector<double> array_p = pres -> GetLocalArray();
-   
+
   double * ectrl_x = new double [nLocBas];
   double * ectrl_y = new double [nLocBas];
   double * ectrl_z = new double [nLocBas];
@@ -192,16 +195,19 @@ void PGAssem_FSI::Assem_mass_residual(
     fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
 
     for(int ii=0; ii<nLocBas; ++ii)
-      for(int mm=0; mm<3; ++mm)
-        row_id_v[3*ii+mm] = nbc_v -> get_LID(mm, IEN_v[ii]);
+    {  
+      row_id_v[3*ii  ] = nbc_v -> get_LID(0, IEN_v[ii]);
+      row_id_v[3*ii+1] = nbc_v -> get_LID(1, IEN_v[ii]);
+      row_id_v[3*ii+2] = nbc_v -> get_LID(2, IEN_v[ii]);
+    }
 
     for(int ii=0; ii<nLocBas; ++ii) 
       row_id_p[ii] = nbc_p -> get_LID( IEN_p[ii] );
-   
+
     const std::vector<double> local_d = GetLocal( array_d, IEN_v, nLocBas, 3 ); 
     const std::vector<double> local_v = GetLocal( array_v, IEN_v, nLocBas, 3 );
     const std::vector<double> local_p = GetLocal( array_p, IEN_p, nLocBas, 1 );
-    
+
     if( alelem_ptr->get_elem_tag(ee) == 0 )
     {
       lassem_f_ptr->Assem_Mass_Residual(&local_d[0], &local_v[0], &local_p[0], elementv, 
@@ -221,7 +227,7 @@ void PGAssem_FSI::Assem_mass_residual(
 
       lassem_s_ptr->Assem_Mass_Residual(&local_d[0], &local_v[0], &local_p[0], elementv, 
           ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v);
-      
+
       MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_s_ptr->Tangent00, ADD_VALUES);
 
       MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, lassem_s_ptr->Tangent11, ADD_VALUES);
@@ -237,7 +243,7 @@ void PGAssem_FSI::Assem_mass_residual(
   row_id_v = nullptr; row_id_p = nullptr;
 
   VecAssemblyBegin(G); VecAssemblyEnd(G);
-  
+
   EssBC_KG( nbc_v, nbc_p );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY); MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
@@ -302,10 +308,13 @@ void PGAssem_FSI::Assem_Residual(
     const std::vector<double> local_d = GetLocal( array_d, IEN_v, nLocBas, 3 ); 
     const std::vector<double> local_v = GetLocal( array_v, IEN_v, nLocBas, 3 );
     const std::vector<double> local_p = GetLocal( array_p, IEN_p, nLocBas, 1 );
-    
+
     for(int ii=0; ii<nLocBas; ++ii)
-      for(int mm=0; mm<3; ++mm)
-        row_id_v[3*ii+mm] = nbc_v -> get_LID(mm, IEN_v[ii]);
+    {  
+      row_id_v[3*ii  ] = nbc_v -> get_LID(0, IEN_v[ii]);
+      row_id_v[3*ii+1] = nbc_v -> get_LID(1, IEN_v[ii]);
+      row_id_v[3*ii+2] = nbc_v -> get_LID(2, IEN_v[ii]);
+    }
 
     for(int ii=0; ii<nLocBas; ++ii)
       row_id_p[ii] = nbc_p -> get_LID( IEN_p[ii] );
@@ -325,13 +334,13 @@ void PGAssem_FSI::Assem_Residual(
       const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
 
       lassem_s_ptr -> Assem_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], &local_dot_p[0],
-           &local_d[0], &local_v[0], &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v );
+          &local_d[0], &local_v[0], &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v );
 
       VecSetValues(G, 3*nLocBas, row_id_v, lassem_s_ptr->Residual0, ADD_VALUES);
       VecSetValues(G,   nLocBas, row_id_p, lassem_s_ptr->Residual1, ADD_VALUES);
     }
   }
-  
+
   delete [] ectrl_x; delete [] ectrl_y; delete [] ectrl_z;
   ectrl_x = nullptr; ectrl_y = nullptr; ectrl_z = nullptr;
   delete [] row_id_v; delete [] row_id_p;
@@ -432,7 +441,7 @@ void PGAssem_FSI::Assem_Tangent_Residual(
       MatSetValues(K,   nLocBas, row_id_p, 3*nLocBas, row_id_v, lassem_f_ptr->Tangent10, ADD_VALUES);
 
       MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, lassem_f_ptr->Tangent11, ADD_VALUES);
-      
+
       VecSetValues(G, 3*nLocBas, row_id_v, lassem_f_ptr->Residual0, ADD_VALUES);
       VecSetValues(G,   nLocBas, row_id_p, lassem_f_ptr->Residual1, ADD_VALUES);
     }
@@ -441,9 +450,9 @@ void PGAssem_FSI::Assem_Tangent_Residual(
       // For solid element, quaprestress will return a vector of length nqp x 6
       // for the prestress values at the quadrature points
       const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
-      
+
       lassem_s_ptr -> Assem_Tangent_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], &local_dot_p[0],
-           &local_d[0], &local_v[0], &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v );
+          &local_d[0], &local_v[0], &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v );
 
       MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_s_ptr->Tangent00, ADD_VALUES);
 
@@ -452,12 +461,12 @@ void PGAssem_FSI::Assem_Tangent_Residual(
       MatSetValues(K,   nLocBas, row_id_p, 3*nLocBas, row_id_v, lassem_s_ptr->Tangent10, ADD_VALUES);
 
       MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, lassem_s_ptr->Tangent11, ADD_VALUES);
-      
+
       VecSetValues(G, 3*nLocBas, row_id_v, lassem_s_ptr->Residual0, ADD_VALUES);
       VecSetValues(G,   nLocBas, row_id_p, lassem_s_ptr->Residual1, ADD_VALUES);
     }
   }
-  
+
   delete [] ectrl_x; delete [] ectrl_y; delete [] ectrl_z;
   ectrl_x = nullptr; ectrl_y = nullptr; ectrl_z = nullptr;
   delete [] row_id_v; delete [] row_id_p;
@@ -597,7 +606,7 @@ double PGAssem_FSI::Assem_surface_flowrate(
 {
   const std::vector<double> array_d = disp -> GetLocalArray();
   const std::vector<double> array_v = velo -> GetLocalArray();
-  
+
   double * local_v = new double [snLocBas * 3];
   double * local_d = new double [snLocBas * 3];
 
@@ -646,7 +655,7 @@ double PGAssem_FSI::Assem_surface_flowrate(
 {
   const std::vector<double> array_d = disp -> GetLocalArray();
   const std::vector<double> array_v = velo -> GetLocalArray();
-  
+
   double * local_v = new double [snLocBas * 3];
   double * local_d = new double [snLocBas * 3];
 
@@ -696,7 +705,7 @@ double PGAssem_FSI::Assem_surface_ave_pressure(
 {
   const std::vector<double> array_d = disp -> GetLocalArray();
   const std::vector<double> array_p = pres -> GetLocalArray();
-  
+
   double * local_d = new double [snLocBas * 3];
   double * local_p = new double [snLocBas];
 
@@ -754,7 +763,7 @@ double PGAssem_FSI::Assem_surface_ave_pressure(
 {
   const std::vector<double> array_d = disp -> GetLocalArray();
   const std::vector<double> array_p = pres -> GetLocalArray();
-  
+
   double * local_d = new double [snLocBas * 3];
   double * local_p = new double [snLocBas];
 
@@ -1181,7 +1190,7 @@ void PGAssem_FSI::BackFlow_KG( const double &dt,
       }
 
       VecSetValues(G, 3*snLocBas, srow_index, lassem_f_ptr->sur_Residual0, ADD_VALUES);
-    
+
       MatSetValues(K, 3*snLocBas, srow_index, 3*snLocBas, srow_index,
           lassem_f_ptr->sur_Tangent00, ADD_VALUES);
     }
