@@ -839,12 +839,8 @@ void PGAssem_FSI::NatBC_Resis_G( const double &curr_time, const double &dt,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc )
 {
-  double * array_d = new double [nlgn_v * 3];
-  double * local_d = new double [snLocBas * 3];
+  const std::vector<double> array_d = disp -> GetLocalArray();
 
-  disp -> GetLocalArray( array_d );
-
-  int * LSIEN = new int [snLocBas];
   double * sctrl_x = new double [snLocBas];
   double * sctrl_y = new double [snLocBas];
   double * sctrl_z = new double [snLocBas];
@@ -871,12 +867,13 @@ void PGAssem_FSI::NatBC_Resis_G( const double &curr_time, const double &dt,
     const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
     for(int ee=0; ee<num_sele; ++ee)
     {
-      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
+      const std::vector<int> LSIEN = ebc_part -> get_SIEN( ebc_id, ee );
+
       ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
-      GetLocal( array_d, LSIEN, snLocBas, 3, local_d );
+      const std::vector<double> local_d = GetLocal( array_d, LSIEN, snLocBas, 3 );
 
-      lassem_f_ptr->Assem_Residual_EBC_Resistance( val, local_d,
+      lassem_f_ptr->Assem_Residual_EBC_Resistance( val, &local_d[0],
           element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
 
       for(int ii=0; ii<snLocBas; ++ii)
@@ -891,9 +888,8 @@ void PGAssem_FSI::NatBC_Resis_G( const double &curr_time, const double &dt,
   }
 
   delete [] srow_index; srow_index = nullptr;
-  delete [] LSIEN; delete [] sctrl_x; delete [] sctrl_y; delete [] sctrl_z;
-  LSIEN = nullptr; sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
-  delete [] array_d; delete [] local_d; array_d = nullptr; local_d = nullptr;
+  delete [] sctrl_x; delete [] sctrl_y; delete [] sctrl_z;
+  sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
 }
 
 void PGAssem_FSI::NatBC_Resis_KG( const double &curr_time, const double &dt,
