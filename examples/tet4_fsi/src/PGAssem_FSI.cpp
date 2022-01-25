@@ -607,10 +607,6 @@ double PGAssem_FSI::Assem_surface_flowrate(
   const std::vector<double> array_d = disp -> GetLocalArray();
   const std::vector<double> array_v = velo -> GetLocalArray();
 
-  //double * local_v = new double [snLocBas * 3];
-  //double * local_d = new double [snLocBas * 3];
-
-  //int * LSIEN = new int [snLocBas];
   double * sctrl_x = new double [snLocBas];
   double * sctrl_y = new double [snLocBas];
   double * sctrl_z = new double [snLocBas];
@@ -621,21 +617,16 @@ double PGAssem_FSI::Assem_surface_flowrate(
 
   for(int ee=0; ee<num_sele; ++ee)
   {
-   // ebc_part -> get_SIEN( ebc_id, ee, LSIEN );
     const std::vector<int> LSIEN = ebc_part -> get_SIEN( ebc_id, ee );
 
     ebc_part -> get_ctrlPts_xyz( ebc_id, ee, sctrl_x, sctrl_y, sctrl_z );
-
-    //GetLocal( &array_d[0], LSIEN, snLocBas, 3, local_d );
-    //GetLocal( &array_v[0], LSIEN, snLocBas, 3, local_v );  
+    
     const std::vector<double> local_d = GetLocal( array_d, LSIEN, snLocBas, 3 );
     const std::vector<double> local_v = GetLocal( array_v, LSIEN, snLocBas, 3 );
    
     esum += lassem_ptr -> get_flowrate( &local_d[0], &local_v[0], element_s, sctrl_x,
         sctrl_y, sctrl_z, quad_s );
   }
-
- // delete [] local_v; delete [] local_d; local_v = nullptr; local_d = nullptr;
 
   delete [] sctrl_x; delete [] sctrl_y; delete [] sctrl_z;
   sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
