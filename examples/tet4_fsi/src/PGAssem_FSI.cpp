@@ -706,11 +706,6 @@ double PGAssem_FSI::Assem_surface_ave_pressure(
   const std::vector<double> array_d = disp -> GetLocalArray();
   const std::vector<double> array_p = pres -> GetLocalArray();
 
-  double * local_d = new double [snLocBas * 3];
-  double * local_p = new double [snLocBas];
-
-  int * LSIEN_v = new int [snLocBas];
-  int * LSIEN_p = new int [snLocBas];
   double * sctrl_x = new double [snLocBas];
   double * sctrl_y = new double [snLocBas];
   double * sctrl_z = new double [snLocBas];
@@ -721,26 +716,24 @@ double PGAssem_FSI::Assem_surface_ave_pressure(
 
   for(int ee=0; ee<num_sele; ++ee)
   {
-    ebc_v -> get_SIEN( ebc_id, ee, LSIEN_v );
-    ebc_p -> get_SIEN( ebc_id, ee, LSIEN_p );
+
+    const std::vector<int> LSIEN_v = ebc_v -> get_SIEN( ebc_id, ee );
+    const std::vector<int> LSIEN_p = ebc_p -> get_SIEN( ebc_id, ee );
 
     ebc_v -> get_ctrlPts_xyz( ebc_id, ee, sctrl_x, sctrl_y, sctrl_z );
 
-    GetLocal( &array_d[0], LSIEN_v, snLocBas, 3, local_d );
-    GetLocal( &array_p[0], LSIEN_p, snLocBas, 1, local_p );
+    const std::vector<double> local_d = GetLocal( array_d, LSIEN_v, snLocBas, 3 );
+    const std::vector<double> local_p = GetLocal( array_p, LSIEN_p, snLocBas, 1 );
 
     double ele_pres, ele_area;
 
-    lassem_ptr-> get_pressure_area( local_d, local_p, element_s, sctrl_x, sctrl_y,
+    lassem_ptr-> get_pressure_area( &local_d[0], &local_p[0], element_s, sctrl_x, sctrl_y,
         sctrl_z, quad_s, ele_pres, ele_area);
-
+    
     val_pres += ele_pres;
     val_area += ele_area; 
   }
 
-  delete [] local_p; delete [] local_d; local_p = nullptr; local_d = nullptr;
-
-  delete [] LSIEN_v; delete [] LSIEN_p; LSIEN_v = nullptr; LSIEN_p = nullptr; 
   delete [] sctrl_x; delete [] sctrl_y; delete [] sctrl_z;
   sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
 
