@@ -1143,22 +1143,10 @@ void PGAssem_FSI::BackFlow_KG( const double &dt,
     const ALocal_NodalBC * const &nbc_v,
     const ALocal_EBC * const &ebc_part )
 {
-  double * array_d = new double [nlgn_v * 3];
-  double * local_d = new double [snLocBas * 3];
+  const std::vector<double> array_d = disp -> GetLocalArray();
+  const std::vector<double> array_dot_d = dot_disp -> GetLocalArray();
+  const std::vector<double> array_v = velo -> GetLocalArray();
 
-  disp -> GetLocalArray( array_d );
-
-  double * array_dot_d = new double [nlgn_v * 3];
-  double * local_dot_d = new double [snLocBas * 3];
-
-  dot_disp -> GetLocalArray( array_dot_d );
-
-  double * array_v = new double [nlgn_v * 3];
-  double * local_v = new double [snLocBas * 3];
-
-  velo -> GetLocalArray( array_v );
-
-  int * LSIEN = new int [snLocBas];
   double * sctrl_x = new double [snLocBas];
   double * sctrl_y = new double [snLocBas];
   double * sctrl_z = new double [snLocBas];
@@ -1171,16 +1159,16 @@ void PGAssem_FSI::BackFlow_KG( const double &dt,
 
     for(int ee=0; ee<num_sele; ++ee)
     {
-      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
+      const std::vector<int> LSIEN = ebc_part -> get_SIEN(ebc_id, ee);
 
       ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
-      GetLocal( array_d, LSIEN, snLocBas, 3, local_d );
-      GetLocal( array_dot_d, LSIEN, snLocBas, 3, local_dot_d );
-      GetLocal( array_v, LSIEN, snLocBas, 3, local_v );
+      const std::vector<double> local_d     = GetLocal( array_d,     LSIEN, snLocBas, 3 );
+      const std::vector<double> local_dot_d = GetLocal( array_dot_d, LSIEN, snLocBas, 3 );
+      const std::vector<double> local_v     = GetLocal( array_v,     LSIEN, snLocBas, 3 );
 
-      lassem_f_ptr->Assem_Tangent_Residual_BackFlowStab( dt, local_dot_d, local_d, 
-          local_v, element_s, sctrl_x, sctrl_y, sctrl_z, quad_s );
+      lassem_f_ptr->Assem_Tangent_Residual_BackFlowStab( dt, &local_dot_d[0], &local_d[0], 
+          &local_v[0], element_s, sctrl_x, sctrl_y, sctrl_z, quad_s );
 
       for(int ii=0; ii<snLocBas; ++ii)
       {
@@ -1197,11 +1185,8 @@ void PGAssem_FSI::BackFlow_KG( const double &dt,
   }
 
   delete [] srow_index; srow_index = nullptr;
-  delete [] LSIEN; delete [] sctrl_x; delete [] sctrl_y; delete [] sctrl_z;
-  LSIEN = nullptr; sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
-  delete [] array_dot_d; delete [] local_dot_d; array_dot_d = nullptr; local_dot_d = nullptr;
-  delete [] array_d; delete [] local_d; array_d = nullptr; local_d = nullptr;
-  delete [] array_v; delete [] local_v; array_v = nullptr; local_v = nullptr;
+  delete [] sctrl_x; delete [] sctrl_y; delete [] sctrl_z;
+  sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
 }
 
 // EOF
