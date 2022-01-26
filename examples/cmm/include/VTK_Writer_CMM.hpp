@@ -10,6 +10,7 @@
 // Date Created: Feb. 12 2020
 // ==================================================================
 #include "ALocal_Elem.hpp"
+#include "ALocal_IEN.hpp"
 #include "IVisDataPrep.hpp"
 #include "Interpolater.hpp"
 #include "Vis_Tools.hpp"

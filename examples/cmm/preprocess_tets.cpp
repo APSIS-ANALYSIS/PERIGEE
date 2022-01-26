@@ -338,8 +338,6 @@ int main( int argc, char * argv[] )
   // --------------------------------------------------------------------------
 
   // Start partition the mesh for each cpu_rank 
-  const bool isPrintPartInfo = true;
-
   std::vector<int> list_nlocalnode, list_nghostnode, list_ntotalnode, list_nbadnode;
   std::vector<double> list_ratio_g2l;
 
@@ -353,8 +351,7 @@ int main( int argc, char * argv[] )
     mytimer->Start();
 
     IPart * part = new Part_Tet( mesh, global_part, mnindex, IEN,
-        ctrlPts, proc_rank, cpu_size, dofNum, dofMat, elemType,
-        isPrintPartInfo );
+        ctrlPts, proc_rank, cpu_size, dofNum, dofMat, elemType );
     mytimer->Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
