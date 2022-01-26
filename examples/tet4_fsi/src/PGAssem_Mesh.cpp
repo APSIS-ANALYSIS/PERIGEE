@@ -81,7 +81,7 @@ void PGAssem_Mesh::Assem_nonzero_estimate(
 
   delete [] row_index; row_index = nullptr;
 
-  for(int mm=0; mm<dof; ++mm) EssBC_KG( nbc_part, mm );
+  EssBC_KG( nbc_part );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
@@ -143,7 +143,7 @@ void PGAssem_Mesh::Assem_mass_residual(
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 
-  for(int ii = 0; ii<dof; ++ii) EssBC_KG( nbc_part, ii );
+  EssBC_KG( nbc_part );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
@@ -217,7 +217,7 @@ void PGAssem_Mesh::Assem_residual(
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 
-  for(int ii = 0; ii<dof; ++ii) EssBC_G( nbc_part, ii );
+  EssBC_G( nbc_part );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -290,67 +290,71 @@ void PGAssem_Mesh::Assem_tangent_residual(
 
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 
-  for(int ii = 0; ii<dof; ++ii) EssBC_KG( nbc_part, ii );
+  EssBC_KG( nbc_part );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 }
 
-void PGAssem_Mesh::EssBC_KG(
-    const ALocal_NodalBC * const &nbc_part, 
-    const int &field )
+void PGAssem_Mesh::EssBC_KG( const ALocal_NodalBC * const &nbc_part )
 {
-  // Number of local dirichlet nodes for this field
-  const int local_dir = nbc_part -> get_Num_LD(field);
-
-  if(local_dir > 0)
+  for(int field=0; field<dof; ++field)
   {
-    for(int ii=0; ii<local_dir; ++ii)
+    // Number of local dirichlet nodes for this field
+    const int local_dir = nbc_part -> get_Num_LD(field);
+
+    if(local_dir > 0)
     {
-      const int row = nbc_part->get_LDN(field, ii);
-      VecSetValue(G, row, 0.0, INSERT_VALUES);
-      MatSetValue(K, row, row, 1.0, ADD_VALUES);
+      for(int ii=0; ii<local_dir; ++ii)
+      {
+        const int row = nbc_part->get_LDN(field, ii);
+        VecSetValue(G, row, 0.0, INSERT_VALUES);
+        MatSetValue(K, row, row, 1.0, ADD_VALUES);
+      }
     }
-  }
 
-  // Number of slave nodes for this field
-  const int local_sla = nbc_part->get_Num_LPS(field);
-  if(local_sla > 0)
-  {
-    for(int ii=0; ii<local_sla; ++ii)
+    // Number of slave nodes for this field
+    const int local_sla = nbc_part->get_Num_LPS(field);
+    if(local_sla > 0)
     {
-      const int row = nbc_part->get_LPSN(field, ii);
-      const int col = nbc_part->get_LPMN(field, ii);
-      MatSetValue(K, row, col, 1.0, ADD_VALUES);
-      MatSetValue(K, row, row, -1.0, ADD_VALUES);
-      VecSetValue(G, row, 0.0, INSERT_VALUES);
+      for(int ii=0; ii<local_sla; ++ii)
+      {
+        const int row = nbc_part->get_LPSN(field, ii);
+        const int col = nbc_part->get_LPMN(field, ii);
+        MatSetValue(K, row, col, 1.0, ADD_VALUES);
+        MatSetValue(K, row, row, -1.0, ADD_VALUES);
+        VecSetValue(G, row, 0.0, INSERT_VALUES);
+      }
     }
   }
 }
 
-void PGAssem_Mesh::EssBC_G( const ALocal_NodalBC * const &nbc_part, const int &field )
+void PGAssem_Mesh::EssBC_G( const ALocal_NodalBC * const &nbc_part )
 {
-  // Number of local dirichlet nodes for this field
-  const int local_dir = nbc_part -> get_Num_LD(field);
-
-  if(local_dir > 0)
+  for(int field=0; field<dof; ++field)
   {
-    for(int ii=0; ii<local_dir; ++ii)
+    // Number of local dirichlet nodes for this field
+    const int local_dir = nbc_part -> get_Num_LD(field);
+
+    if(local_dir > 0)
     {
-      const int row = nbc_part->get_LDN(field, ii);
-      VecSetValue(G, row, 0.0, INSERT_VALUES);
+      for(int ii=0; ii<local_dir; ++ii)
+      {
+        const int row = nbc_part->get_LDN(field, ii);
+        VecSetValue(G, row, 0.0, INSERT_VALUES);
+      }
     }
-  }
 
-  // Number of slave nodes for this field
-  const int local_sla = nbc_part->get_Num_LPS(field);
-  if(local_sla > 0)
-  {
-    for(int ii=0; ii<local_sla; ++ii)
+    // Number of slave nodes for this field
+    const int local_sla = nbc_part->get_Num_LPS(field);
+    if(local_sla > 0)
     {
-      const int row = nbc_part->get_LPSN(field, ii);
-      VecSetValue(G, row, 0.0, INSERT_VALUES);
+      for(int ii=0; ii<local_sla; ++ii)
+      {
+        const int row = nbc_part->get_LPSN(field, ii);
+        VecSetValue(G, row, 0.0, INSERT_VALUES);
+      }
     }
   }
 }

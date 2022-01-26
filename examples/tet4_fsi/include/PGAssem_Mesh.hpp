@@ -80,8 +80,9 @@ class PGAssem_Mesh : public IPGAssem
   private:
     const int nLocBas, snLocBas, dof, num_ebc, nlgn;
     
-    void EssBC_KG( const ALocal_NodalBC * const &nbc_part, const int &field );
-    void EssBC_G(  const ALocal_NodalBC * const &nbc_part, const int &field );
+    void EssBC_KG( const ALocal_NodalBC * const &nbc_part );
+
+    void EssBC_G(  const ALocal_NodalBC * const &nbc_part );
 
     void NatBC_G( const double &curr_time, const double &dt,
         IPLocAssem * const &lassem_ptr,
