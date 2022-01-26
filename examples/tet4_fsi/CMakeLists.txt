@@ -170,6 +170,7 @@ ADD_EXECUTABLE( prepostproc prepost.cpp)
 ADD_EXECUTABLE( vis_fsi vis_driver.cpp )
 ADD_EXECUTABLE( vis_fluid vis_fluid.cpp )
 ADD_EXECUTABLE( vis_solid vis_solid.cpp )
+ADD_EXECUTABLE( vis_fsi_wss vis_fsi_wss.cpp )
 
 # Link libraries
 TARGET_LINK_LIBRARIES( gmshIO ${EXTRA_LINK_LIBS} perigee_preprocess )
@@ -179,6 +180,6 @@ TARGET_LINK_LIBRARIES( prepostproc ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( vis_fsi ${EXTRA_LINK_LIBS} perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_fluid ${EXTRA_LINK_LIBS} perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_solid ${EXTRA_LINK_LIBS} perigee_postprocess )
-
+TARGET_LINK_LIBRARIES( vis_fsi_wss ${EXTRA_LINK_LIBS} perigee_postprocess )
 
 #EOF

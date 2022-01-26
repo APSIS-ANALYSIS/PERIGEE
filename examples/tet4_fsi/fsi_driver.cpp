@@ -249,6 +249,7 @@ int main(int argc, char *argv[])
     cmdh5w->write_string(        "lpn_file",        lpn_file);
     cmdh5w->write_intScalar(     "inflow_type",     inflow_type);
     cmdh5w->write_string(        "inflow_file",     inflow_file);
+    cmdh5w->write_string(        "sol_bName",       sol_bName);
     if( inflow_type == 1 )
       cmdh5w->write_doubleScalar("inflow_thd_time", inflow_thd_time );
 
