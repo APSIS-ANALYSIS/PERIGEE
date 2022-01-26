@@ -15,6 +15,7 @@
 // Date Created: Jan. 8 2021
 // ==================================================================
 #include "FEAElement.hpp"
+#include "Math_Tools.hpp"
 
 class FEAElement_Triangle3_membrane : public FEAElement
 {

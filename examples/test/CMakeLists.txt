@@ -42,7 +42,6 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/IEN_Tetra_P1.cpp
   ${perigee_source}/Mesh/IEN_Tetra_P2.cpp
   ${perigee_source}/Mesh/INodalBC.cpp
-  ${perigee_source}/Mesh/IElemBC.cpp
   ${perigee_source}/Mesh/Mesh_Tet4.cpp
   ${perigee_source}/Mesh/Mesh_Tet10.cpp
   ${perigee_source}/Mesh/IPart.cpp
@@ -151,10 +150,12 @@ ADD_EXECUTABLE( sys_test sys_test.cpp )
 ADD_EXECUTABLE( mod_test matmodel_test.cpp )
 ADD_EXECUTABLE( testh5 h5_test.cpp )
 ADD_EXECUTABLE( elem_test elem_test.cpp )
+ADD_EXECUTABLE( mtest matrix_routine_test.cpp )
 
 TARGET_LINK_LIBRARIES( sys_test perigee_preprocess )
 TARGET_LINK_LIBRARIES( mod_test perigee_preprocess perigee_analysis )
 TARGET_LINK_LIBRARIES( testh5 perigee_preprocess )
 TARGET_LINK_LIBRARIES( elem_test perigee_analysis )
+TARGET_LINK_LIBRARIES( mtest perigee_analysis )
 
 # EOF

@@ -208,6 +208,7 @@ class Matrix_3x3
     void print_Voigt() const;
 
     // Eigen decomposition of the matrix M = eta1 v1 v1T + eta2 v2 v2T + eta3 v3
+    // The matrix has to be symmetric.
     // v3T. The algorithm is based on CMAME 197 2008 4007-4015 paper by
     // W.M. Scherzinger and C.R. Dohrmann
     // return 1 if the three eigenvalues are the same
