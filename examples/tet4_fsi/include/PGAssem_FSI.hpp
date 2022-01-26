@@ -219,15 +219,6 @@ class PGAssem_FSI : public IPGAssem
         const ALocal_NodalBC * const &nbc_v,
         const ALocal_EBC * const &ebc_part );
 
-
-    void GetLocal( const double * const &array, const int * const &IEN,
-        const int &in_locbas, const int &in_dof, double * const &local_array) const
-    {
-      for(int ii=0; ii<in_locbas; ++ii)
-        for(int jj=0; jj<in_dof; ++jj)
-          local_array[ii * in_dof + jj] = array[IEN[ii] * in_dof + jj];
-    }
-
     std::vector<double> GetLocal( const std::vector<double> &array,
         const std::vector<int> &IEN, const int &in_locbas, const int &in_dof ) const
     {
