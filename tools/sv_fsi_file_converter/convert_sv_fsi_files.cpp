@@ -168,12 +168,24 @@ int main( int argc, char * argv[] )
   const std::vector<int> fluid_global_nodal_id = TET_T::read_int_PointData( geo_f_file, "GlobalNodeID" );
   for(int ii=0; ii<VEC_T::get_size( fluid_global_nodal_id ); ++ii) SYS_T::print_fatal_if( ii+fluid_global_nodal_id[0] != fluid_global_nodal_id[ii], "Error: fluid global id %d does not match with its natrual id %d. \n", fluid_global_nodal_id[ii], ii );
   
-  SYS_T::commPrint("Status: fluid mesh starts from %d and are listed consecutively.\n", fluid_global_nodal_id[0]);
+  SYS_T::commPrint("Status: fluid mesh nodal id starts from %d and are listed consecutively.\n", fluid_global_nodal_id[0]);
 
+  const std::vector<int> fluid_global_elem_id = TET_T::read_int_CellData( geo_f_file, "GlobalElementID" );
+
+  for(int ii=0; ii<VEC_T::get_size( fluid_global_elem_id ); ++ii) SYS_T::print_fatal_if( ii+fluid_global_elem_id[0] != fluid_global_elem_id[ii], "Error: fluid global elem id %d does not match with its natrual id %d. \n", fluid_global_elem_id[ii], ii );
+
+  SYS_T::commPrint("Status: fluid mesh elem id starts from %d and are listed consecutively.\n", fluid_global_elem_id[0]);
+  
   const std::vector<int> solid_global_nodal_id = TET_T::read_int_PointData( geo_s_file, "GlobalNodeID" );
   for(int ii=0; ii<VEC_T::get_size( solid_global_nodal_id ); ++ii) SYS_T::print_fatal_if( ii+solid_global_nodal_id[0] != solid_global_nodal_id[ii], "Error: solid global id %d does not match with its natrual id %d. \n", solid_global_nodal_id[ii], ii);
 
-  SYS_T::commPrint("Status: solid mesh starts from %d and are listed consecutively.\n", solid_global_nodal_id[0]);
+  SYS_T::commPrint("Status: solid mesh nodal id starts from %d and are listed consecutively.\n", solid_global_nodal_id[0]);
+  
+  const std::vector<int> solid_global_elem_id = TET_T::read_int_CellData( geo_s_file, "GlobalElementID" );
+
+  for(int ii=0; ii<VEC_T::get_size( solid_global_elem_id ); ++ii) SYS_T::print_fatal_if( ii+solid_global_elem_id[0] != solid_global_elem_id[ii], "Error: solid global elem id %d does not match with its natrual id %d. \n", solid_global_elem_id[ii], ii );
+
+  SYS_T::commPrint("Status: solid mesh elem id starts from %d and are listed consecutively.\n", solid_global_elem_id[0]);
   
   // Obtain the nstart and estart, the first indices for element and nodal
   // indices. Make sure they start from 1.
