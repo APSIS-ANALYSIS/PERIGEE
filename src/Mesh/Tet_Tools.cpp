@@ -749,6 +749,27 @@ void TET_T::add_double_PointData( vtkPointSet * const &grid_w,
 }
 
 
+void TET_T::add_Vector3_PointData( vtkPointSet * const &grid_w,
+    const std::vector<Vector_3> &ptdata, const std::string &dataname )
+{
+  SYS_T::print_fatal_if( ptdata.size() != static_cast<unsigned int>( grid_w -> GetNumberOfPoints() ), "Error: add_Vector3_PointData data size does not match with the number of points.\n" );
+
+  vtkDoubleArray * data = vtkDoubleArray::New();
+  data -> SetNumberOfComponents(3);
+  data -> SetName(dataname.c_str());
+  
+  for(unsigned int ii=0; ii<ptdata.size(); ++ii)
+  {
+    data -> InsertComponent(ii, 0, ptdata[ii].x());
+    data -> InsertComponent(ii, 1, ptdata[ii].y());
+    data -> InsertComponent(ii, 2, ptdata[ii].z());
+  }
+
+  grid_w -> GetPointData() -> AddArray( data );
+  data -> Delete();
+}
+
+
 void TET_T::add_int_CellData( vtkPointSet * const &grid_w,
     const std::vector<int> &cldata, const std::string &dataname )
 {

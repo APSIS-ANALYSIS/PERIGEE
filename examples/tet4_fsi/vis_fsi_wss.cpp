@@ -337,21 +337,9 @@ void write_triangle_grid_wss( const std::string &filename,
   vtkPolyData * grid_w = vtkPolyData::New();
 
   TET_T::gen_triangle_grid( grid_w, numpts, numcels, pt, ien_array );
-  
-  // write wss
-  vtkDoubleArray * ptindex = vtkDoubleArray::New();
-  ptindex -> SetNumberOfComponents(3);
-  ptindex -> SetName("WSS");
-  for(int ii=0; ii<numpts; ++ii)
-  {
-    ptindex -> InsertComponent(ii, 0, wss_on_node[ii].x());
-    ptindex -> InsertComponent(ii, 1, wss_on_node[ii].y());
-    ptindex -> InsertComponent(ii, 2, wss_on_node[ii].z());
-  }
-  grid_w -> GetPointData() -> AddArray( ptindex );
-  ptindex->Delete();
 
-  // write grid_w to vtp file
+  TET_T::add_Vector3_PointData( grid_w, wss_on_node, "WSS" ); 
+
   TET_T::write_vtkPointSet(filename, grid_w);
 
   grid_w->Delete();
