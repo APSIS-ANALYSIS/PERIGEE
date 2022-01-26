@@ -43,7 +43,6 @@ class PGAssem_Mesh : public IPGAssem
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
-
     virtual void Assem_residual(
         const PDNSolution * const &sol_a,
         const PDNSolution * const &sol_b,
@@ -59,7 +58,6 @@ class PGAssem_Mesh : public IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
-
 
     virtual void Assem_tangent_residual(
         const PDNSolution * const &sol_a,
@@ -107,6 +105,18 @@ class PGAssem_Mesh : public IPGAssem
         for(int jj=0; jj<dof; ++jj)
           local_array[ii*dof + jj] = array[IEN[ii] * dof + jj];
     }
+
+    std::vector<double> GetLocal( const std::vector<double> &array,
+        const std::vector<int> &IEN, const int &in_locbas ) const
+    {
+      std::vector<double> out( in_locbas * dof, 0.0 );
+      for(int ii=0; ii<in_locbas; ++ii)
+        for(int jj=0; jj<dof; ++jj)
+          out[ii*dof + jj] = array[ IEN[ii] * dof + jj ];
+      
+      return out;
+    }
+
 };
 
 #endif
