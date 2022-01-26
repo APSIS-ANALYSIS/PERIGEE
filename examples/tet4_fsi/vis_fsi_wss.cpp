@@ -5,12 +5,18 @@
 //
 // Date: Jan 26 2022
 // ============================================================================
+#include "HDF5_Tools.hpp"
 #include "Tet_Tools.hpp"
 #include "QuadPts_vis_tet4.hpp"
 #include "FEAElement_Tet4.hpp"
 
+std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
+    const std::vector<int> &nodemap, const int &vec_size, const int &in_dof );
+
 int main( int argc, char * argv[] )
 {
+  const int dof_v = 3;
+
   int time_index = 0;
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
@@ -55,9 +61,202 @@ int main( int argc, char * argv[] )
   SYS_T::file_check( geo_file.c_str() );
   SYS_T::file_check( wall_file.c_str() );
 
+  // ----------------------------------------------------------------
+  // Read in the whole FSI volumetric mesh
+  int v_nFunc, v_nElem;
+  std::vector<int> v_vecIEN, phy_tag;
+  std::vector<double> v_ctrlPts;
+
+  TET_T::read_vtu_grid(geo_file.c_str(), v_nFunc, v_nElem, v_ctrlPts, v_vecIEN, phy_tag);
+
+  cout<<"Volumetric mesh contains "<<v_nElem<<" elements and "<<v_nFunc<<" vertices.\n";
+
+  // Read the wall surface mesh
+  int nFunc, nElem;
+  std::vector<double> ctrlPts;
+  std::vector<int> vecIEN, global_node_idx, global_ele_idx;
+
+  TET_T::read_vtp_grid( wall_file.c_str(), nFunc, nElem, ctrlPts, vecIEN,
+      global_node_idx, global_ele_idx );
+
+  cout<<"Wall mesh contains "<<nElem<<" elements and "<<nFunc<<" vertices.\n";
+
+  // Read the node mappings
+  const std::vector<int> analysis_new2old = HDF5_T::read_intVector( "node_mapping_v.h5",
+      "/", "new_2_old" );
+
+  // Read solution files
+  std::string disp_sol_name(sol_bname), velo_sol_name(sol_bname);
+  disp_sol_name.append("disp_");
+  velo_sol_name.append("velo_");
+  std::string name_to_write(out_bname);
+
+  std::ostringstream time_idx;
+  time_idx << 900000000 + time_index;
+  
+  disp_sol_name.append(time_idx.str());
+  velo_sol_name.append(time_idx.str());
+  name_to_write.append(time_idx.str());
+  
+  SYS_T::commPrint("Read %s and %s, and write %s. \n", disp_sol_name.c_str(),
+      velo_sol_name.c_str(), name_to_write.c_str() );
+
+  const std::vector<double> disp_sol = ReadPETSc_Vec( disp_sol_name, analysis_new2old, v_nFunc*dof_v, dof_v );
+  const std::vector<double> velo_sol = ReadPETSc_Vec( velo_sol_name, analysis_new2old, v_nFunc*dof_v, dof_v );
+
+  // Use the solution displacement field to update the control points
+  for(int ii=0; ii<v_nFunc; ++ii)
+  {
+    v_ctrlPts[3*ii+0] += disp_sol[3*ii+0];
+    v_ctrlPts[3*ii+1] += disp_sol[3*ii+1];
+    v_ctrlPts[3*ii+2] += disp_sol[3*ii+2];
+  }
+
+  for(int ii=0; ii<nFunc; ++ii)
+  {
+    // use global_node_idx to extract the correct solution entry for this
+    // surface node
+    ctrlPts[3*ii+0] += disp_sol[3*global_node_idx[ii]+0];
+    ctrlPts[3*ii+1] += disp_sol[3*global_node_idx[ii]+1];
+    ctrlPts[3*ii+2] += disp_sol[3*global_node_idx[ii]+2];
+  }
+
+  // Each surface triangle element requires an additional node: interior_node
+  std::vector<int> interior_node( nElem, 0 );
+
+  // Interior nodes's xyz coordinates
+  std::vector<double> interior_node_coord( 3*nElem, 0.0 );
+
+  // Unit outward normal vector
+  std::vector< Vector_3 > outnormal( nElem, Vector_3(0.0, 0.0, 0.0) );
+
+  // Triangle element surface area
+  std::vector<double> tri_area( nElem, 0.0 );
+
+  // Identify the interior node for surface elements
+  for(int ee=0; ee<nElem; ++ee)
+  {
+    std::vector<int> trn(3, 0);
+    int ten[4];
+
+    trn[0] = global_node_idx[ vecIEN[3*ee+0] ];
+    trn[1] = global_node_idx[ vecIEN[3*ee+1] ];
+    trn[2] = global_node_idx[ vecIEN[3*ee+2] ];
+
+    ten[0] = v_vecIEN[ global_ele_idx[ee]*4+0 ];
+    ten[1] = v_vecIEN[ global_ele_idx[ee]*4+1 ];
+    ten[2] = v_vecIEN[ global_ele_idx[ee]*4+2 ];
+    ten[3] = v_vecIEN[ global_ele_idx[ee]*4+3 ];
+
+    int node_check = 0;
+    for(int ii=0; ii<4; ++ii)
+    {
+      if( !VEC_T::is_invec( trn, ten[ii] ) ) interior_node[ee] = ten[ii];
+      else node_check += 1;
+    }
+
+    SYS_T::print_fatal_if(node_check!=3, "Error: the associated tet element is incompatible with the triangle element.\n");
+
+    // Record the interior node's coordinates
+    interior_node_coord[3*ee+0] = v_ctrlPts[ 3*interior_node[ee] + 0 ];
+    interior_node_coord[3*ee+1] = v_ctrlPts[ 3*interior_node[ee] + 1 ];
+    interior_node_coord[3*ee+2] = v_ctrlPts[ 3*interior_node[ee] + 2 ];
+
+   // Now decide the outward normal vector
+    const Vector_3 vec01( v_ctrlPts[3*trn[1]] - v_ctrlPts[3*trn[0]], 
+        v_ctrlPts[3*trn[1]+1] - v_ctrlPts[3*trn[0]+1], 
+        v_ctrlPts[3*trn[1]+2] - v_ctrlPts[3*trn[0]+2] );
+
+    const Vector_3 vec02( v_ctrlPts[3*trn[2]] - v_ctrlPts[3*trn[0]],
+        v_ctrlPts[3*trn[2]+1] - v_ctrlPts[3*trn[0]+1],
+        v_ctrlPts[3*trn[2]+2] - v_ctrlPts[3*trn[0]+2] );
+
+    outnormal[ee] = cross_product(vec01, vec02); // out = vec01 x vec02
+    
+    // return out length and scale itself to have unit length
+    tri_area[ee] = 0.5 * outnormal[ee].normalize();
+
+    const Vector_3 vec03( v_ctrlPts[interior_node[ee]*3] - v_ctrlPts[3*trn[0]], 
+        v_ctrlPts[interior_node[ee]*3+1] - v_ctrlPts[3*trn[0]+1],
+        v_ctrlPts[interior_node[ee]*3+2] - v_ctrlPts[3*trn[0]+2] );
+
+    if( dot_product(outnormal[ee], vec03)> 0 ) outnormal[ee].scale(-1.0);
+  }
+
+  // Clean the volumetric data to save memory
+  VEC_T::clean(v_ctrlPts); VEC_T::clean(v_vecIEN);
+
+  // Sampling points and element container
+  IQuadPts * quad = new QuadPts_vis_tet4();
+
+  quad -> print_info();
+
+  FEAElement * element = new FEAElement_Tet4( quad-> get_num_quadPts() );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  delete quad; delete element;
   PetscFinalize();
   return EXIT_SUCCESS;
 }
+
+
+std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
+    const std::vector<int> &nodemap, const int &vec_size, const int &in_dof )
+{
+  Vec sol_temp;
+  VecCreate(PETSC_COMM_SELF, &sol_temp);
+  VecSetType(sol_temp, VECSEQ);
+
+  PetscViewer viewer;
+  PetscViewerBinaryOpen(PETSC_COMM_SELF, solution_file_name.c_str(), 
+      FILE_MODE_READ, &viewer);
+  VecLoad(sol_temp, viewer);
+  PetscViewerDestroy(&viewer);
+
+  // Check the solution length
+  PetscInt get_sol_temp_size;
+  VecGetSize(sol_temp, &get_sol_temp_size);
+  SYS_T::print_fatal_if( get_sol_temp_size != vec_size, "The solution size %d is not compatible with the size %d given by partition file! \n", get_sol_temp_size, vec_size);
+
+  std::vector<double> veccopy( vec_size, 0.0 );
+  
+  double * array_temp;
+  VecGetArray(sol_temp, &array_temp);
+
+  for(int ii=0; ii<vec_size; ++ii) veccopy[ii] = array_temp[ii];
+
+  VecRestoreArray(sol_temp, &array_temp);
+  VecDestroy(&sol_temp);
+
+  // copy the solution varibles to the correct location
+  std::vector<double> sol( vec_size, 0.0 );
+
+  // check the nodemap size
+  SYS_T::print_fatal_if( VEC_T::get_size(nodemap) * in_dof != vec_size, "Error: node map size is incompatible with the solution length. \n");
+
+  for(int ii=0; ii<VEC_T::get_size(nodemap); ++ii)
+  {
+    for(int jj=0; jj<in_dof; ++jj)
+      sol[in_dof*nodemap[ii]+jj] = veccopy[in_dof*ii+jj];
+  }
+
+  return sol;
+}
+
+
 
 
 
