@@ -197,8 +197,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_ALE_NS(
       gassem_mesh_ptr->Clear_G();
       gassem_mesh_ptr->Assem_residual( sol, sol,
           curr_time, dt, alelem_ptr, lassem_mesh_ptr, elementv, elements,
-          quad_v, quad_s, lien_ptr, anode_ptr,
-          feanode_ptr, nbc_mesh_part, ebc_mesh_part );
+          quad_v, quad_s, lien_ptr, feanode_ptr, nbc_mesh_part, ebc_mesh_part );
       lsolver_mesh_ptr->Solve( gassem_mesh_ptr->G, mesh_disp ); 
       bc_mesh_mat -> MatMultSol( mesh_disp );
       SEG_SOL_T::UpdateU( -1.0, mesh_disp, sol );
@@ -404,8 +403,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_FSI(
     gassem_mesh_ptr->Clear_KG();
     gassem_mesh_ptr->Assem_tangent_residual( pre_sol, sol,
         curr_time, dt, alelem_ptr, lassem_mesh_ptr, elementv, elements,
-        quad_v, quad_s, lien_ptr, anode_ptr,
-        feanode_ptr, nbc_mesh_part, ebc_mesh_part );
+        quad_v, quad_s, lien_ptr, feanode_ptr, nbc_mesh_part, ebc_mesh_part );
     lsolver_mesh_ptr->Solve( gassem_mesh_ptr->K, gassem_mesh_ptr->G, mesh_disp ); 
     bc_mesh_mat -> MatMultSol( mesh_disp );
 
