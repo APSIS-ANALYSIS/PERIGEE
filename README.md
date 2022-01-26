@@ -12,16 +12,16 @@ PERIGEE is a nonlinear dynamic finite element / isogeometric analysis code for m
 ## Install
 Please go through the following steps to install external libraries.
 
-1. Before compiling PERIGEE, one has to install several libraries. A quick guide for library installation is [here](docs/install_external_libs.md) and a more advanced guide is [there](docs/install-advanced.md). After the libraries are all properly installed, proceed to step 3.
+1. Before compiling PERIGEE, you will have to install a few external libraries. A quick guide for library installation is [here](docs/install_external_libs.md) and a more advanced guide is [there](docs/install-advanced.md). After the libraries are all properly installed, proceed to step 3.
 
-2. You need to add the following to your `.bash_profile` or `.bashrc` file to define `MACHINE_NAME` as an environment variable, and then proceed to step 3. 
+2. You need to add the following to your `.bash_profile` or `.bashrc` file to define `MACHINE_NAME` as an environment variable, and then proceed to step 3. For example, I named one of my machine as `sherlock`, and PERIGEE will detech the `MACHINE_NAME` and load an appropriate configuration file.
 ```sh
 export MACHINE_NAME=sherlock
 export LD_LIBRARY_PATH=/home/groups/amarsden/lib-perigee/VTK-7.1.1-shared/lib:$LD_LIBRARY_PATH
 ```
- With the `MACHINE_NAME`, PERIGEE can load the proper configuration file for compiling. Because VTK is typically installed as a shared library in a non-standard folder, one has to edit the `LD_LIBRARY_PATH` environmental variable for the linker. For more information on this environmental variable, see [here](http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html).
+Additionally, because VTK is typically installed as a shared library in a non-standard folder, one has to edit the `LD_LIBRARY_PATH` environmental variable for the linker. So you will have to edit the `LD_LIBRARY_PATH` variable as above to tell the computer how to locate the VTK libraries. For more information on this environmental variable, see [here](http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html).
  
-3. After the libraries are installed, modify the configuration file in the [conf](conf) folder, following the steps [here](docs/configure_perigee_guide.md).
+3. After the libraries are installed, add or modify the configuration file in the [conf](conf) folder, following the steps [here](docs/configure_perigee_guide.md).
 
 
 ## Build
