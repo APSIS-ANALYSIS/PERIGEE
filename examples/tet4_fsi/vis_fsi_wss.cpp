@@ -193,9 +193,81 @@ int main( int argc, char * argv[] )
 
   FEAElement * element = new FEAElement_Tet4( quad-> get_num_quadPts() );
 
+  std::vector< Vector_3 > wss_ave( nFunc, Vector_3(0.0, 0.0, 0.0) );
+  std::vector<double> node_area( nFunc, 0.0 );
 
+  for(int ee=0; ee<nElem; ++ee)
+  {
+    const double trn[3] { vecIEN[3*ee+0], vecIEN[3*ee+1], vecIEN[3*ee+2] };
+    
+    const double ectrl_x[4] { ctrlPts[3*trn[0] + 0], ctrlPts[3*trn[1] + 0], ctrlPts[3*trn[2] + 0], interior_node_coord[3*ee + 0] };
 
+    const double ectrl_y[4] { ctrlPts[3*trn[0] + 1], ctrlPts[3*trn[1] + 1], ctrlPts[3*trn[2] + 1], interior_node_coord[3*ee + 1] };
 
+    const double ectrl_z[4] { ctrlPts[3*trn[0] + 2], ctrlPts[3*trn[1] + 2], ctrlPts[3*trn[2] + 2], interior_node_coord[3*ee + 2] };
+
+    element -> buildBasis(quad, ectrl_x, ectrl_y, ectrl_z);
+
+    const double esol_u[4] { sol[ global_node_idx[trn[0]] * dof_v ],
+      sol[ global_node_idx[trn[1]] * dof_v ],
+      sol[ global_node_idx[trn[2]] * dof_v ],
+      sol[ interior_node[ee] * dof_v ] };
+
+    const double esol_v[4] { sol[ global_node_idx[trn[0]] * dof_v + 1 ],
+      sol[ global_node_idx[trn[1]] * dof_v + 1 ],
+      sol[ global_node_idx[trn[2]] * dof_v + 1 ],
+      sol[ interior_node[ee] * dof_v + 1 ] };
+
+    const double esol_w[4] { sol[ global_node_idx[trn[0]] * dof_v + 2 ],
+      sol[ global_node_idx[trn[1]] * dof_v + 2 ],
+      sol[ global_node_idx[trn[2]] * dof_v + 2 ],
+      sol[ interior_node[ee] * dof_v + 2 ] };
+
+    const double nx = outnormal[ee].x();
+    const double ny = outnormal[ee].y();
+    const double nz = outnormal[ee].z();
+
+    for(int qua=0; qua<3; ++qua)
+    {
+      double Rx[4], Ry[4], Rz[4];
+      element -> get_gradR(qua, Rx, Ry, Rz);
+      
+      const double ux = esol_u[0] * Rx[0] + esol_u[1] * Rx[1] + esol_u[2] * Rx[2] + esol_u[3] * Rx[3];
+      const double vx = esol_v[0] * Rx[0] + esol_v[1] * Rx[1] + esol_v[2] * Rx[2] + esol_v[3] * Rx[3];
+      const double wx = esol_w[0] * Rx[0] + esol_w[1] * Rx[1] + esol_w[2] * Rx[2] + esol_w[3] * Rx[3];
+
+      const double uy = esol_u[0] * Ry[0] + esol_u[1] * Ry[1] + esol_u[2] * Ry[2] + esol_u[3] * Ry[3];
+      const double vy = esol_v[0] * Ry[0] + esol_v[1] * Ry[1] + esol_v[2] * Ry[2] + esol_v[3] * Ry[3];
+      const double wy = esol_w[0] * Ry[0] + esol_w[1] * Ry[1] + esol_w[2] * Ry[2] + esol_w[3] * Ry[3];
+
+      const double uz = esol_u[0] * Rz[0] + esol_u[1] * Rz[1] + esol_u[2] * Rz[2] + esol_u[3] * Rz[3];
+      const double vz = esol_v[0] * Rz[0] + esol_v[1] * Rz[1] + esol_v[2] * Rz[2] + esol_v[3] * Rz[3];
+      const double wz = esol_w[0] * Rz[0] + esol_w[1] * Rz[1] + esol_w[2] * Rz[2] + esol_w[3] * Rz[3];
+
+      const double ax = 2.0 * ux * nx + (uy + vx) * ny + (uz + wx) * nz;
+      const double ay = (vx + uy) * nx + 2.0 * vy * ny + (vz + wy) * nz;
+      const double az = (wx + uz) * nx + (wy + vz) * ny + 2.0 * wz * nz;
+
+      const double b = ax * nx + ay * ny + az * nz;
+
+      const double wss_x = fluid_mu * ( ax - b * nx );
+      const double wss_y = fluid_mu * ( ay - b * ny );
+      const double wss_z = fluid_mu * ( az - b * nz );
+
+      wss_ave[ trn[qua] ].x() += wss_x * tri_area[ee];
+      wss_ave[ trn[qua] ].y() += wss_y * tri_area[ee];
+      wss_ave[ trn[qua] ].z() += wss_z * tri_area[ee];
+
+      node_area[ trn[qua] ] += tri_area[ee];
+    }
+  }
+
+  for(int ii=0; ii<nFunc; ++ii)
+  {
+    wss_ave[ii].x() /= node_area[ii];
+    wss_ave[ii].y() /= node_area[ii];
+    wss_ave[ii].z() /= node_area[ii];
+  }
 
 
 
