@@ -43,7 +43,6 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Tet_Tools.cpp
   ${perigee_source}/Mesh/IEN_Tetra_P1.cpp
   ${perigee_source}/Mesh/INodalBC.cpp
-  ${perigee_source}/Mesh/IElemBC.cpp
   ${perigee_source}/Mesh/Mesh_Tet4.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet_outflow.cpp
@@ -107,7 +106,6 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Model/CVFlowRate_Linear2Steady.cpp
   ${perigee_source}/Solver/PDNSolution.cpp
   ${perigee_source}/Solver/PDNTimeStep.cpp
-  ${perigee_source}/Solver/Seg_Sol_Tools.cpp
   ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_Tet4_FSI_Mesh_Elastostatic.cpp
