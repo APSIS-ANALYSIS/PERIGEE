@@ -13,6 +13,12 @@
 std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
     const std::vector<int> &nodemap, const int &vec_size, const int &in_dof );
 
+void write_triangle_grid_wss( const std::string &filename,
+    const int &numpts, const int &numcels,
+    const std::vector<double> &pt,
+    const std::vector<int> &ien_array,
+    const std::vector< Vector_3 > &wss_on_node );
+
 int main( int argc, char * argv[] )
 {
   const int dof_v = 3;
@@ -198,7 +204,7 @@ int main( int argc, char * argv[] )
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    const double trn[3] { vecIEN[3*ee+0], vecIEN[3*ee+1], vecIEN[3*ee+2] };
+    const int trn[3] { vecIEN[3*ee+0], vecIEN[3*ee+1], vecIEN[3*ee+2] };
     
     const double ectrl_x[4] { ctrlPts[3*trn[0] + 0], ctrlPts[3*trn[1] + 0], ctrlPts[3*trn[2] + 0], interior_node_coord[3*ee + 0] };
 
@@ -208,20 +214,20 @@ int main( int argc, char * argv[] )
 
     element -> buildBasis(quad, ectrl_x, ectrl_y, ectrl_z);
 
-    const double esol_u[4] { sol[ global_node_idx[trn[0]] * dof_v ],
-      sol[ global_node_idx[trn[1]] * dof_v ],
-      sol[ global_node_idx[trn[2]] * dof_v ],
-      sol[ interior_node[ee] * dof_v ] };
+    const double esol_u[4] { velo_sol[ global_node_idx[trn[0]] * dof_v ],
+      velo_sol[ global_node_idx[trn[1]] * dof_v ],
+      velo_sol[ global_node_idx[trn[2]] * dof_v ],
+      velo_sol[ interior_node[ee] * dof_v ] };
 
-    const double esol_v[4] { sol[ global_node_idx[trn[0]] * dof_v + 1 ],
-      sol[ global_node_idx[trn[1]] * dof_v + 1 ],
-      sol[ global_node_idx[trn[2]] * dof_v + 1 ],
-      sol[ interior_node[ee] * dof_v + 1 ] };
+    const double esol_v[4] { velo_sol[ global_node_idx[trn[0]] * dof_v + 1 ],
+      velo_sol[ global_node_idx[trn[1]] * dof_v + 1 ],
+      velo_sol[ global_node_idx[trn[2]] * dof_v + 1 ],
+      velo_sol[ interior_node[ee] * dof_v + 1 ] };
 
-    const double esol_w[4] { sol[ global_node_idx[trn[0]] * dof_v + 2 ],
-      sol[ global_node_idx[trn[1]] * dof_v + 2 ],
-      sol[ global_node_idx[trn[2]] * dof_v + 2 ],
-      sol[ interior_node[ee] * dof_v + 2 ] };
+    const double esol_w[4] { velo_sol[ global_node_idx[trn[0]] * dof_v + 2 ],
+      velo_sol[ global_node_idx[trn[1]] * dof_v + 2 ],
+      velo_sol[ global_node_idx[trn[2]] * dof_v + 2 ],
+      velo_sol[ interior_node[ee] * dof_v + 2 ] };
 
     const double nx = outnormal[ee].x();
     const double ny = outnormal[ee].y();
@@ -269,15 +275,7 @@ int main( int argc, char * argv[] )
     wss_ave[ii].z() /= node_area[ii];
   }
 
-
-
-
-
-
-
-
-
-
+  write_triangle_grid_wss( name_to_write, nFunc, nElem, ctrlPts, vecIEN, wss_ave );
 
   delete quad; delete element;
   PetscFinalize();
@@ -328,9 +326,35 @@ std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
   return sol;
 }
 
+void write_triangle_grid_wss( const std::string &filename,
+    const int &numpts, const int &numcels,
+    const std::vector<double> &pt,
+    const std::vector<int> &ien_array,
+    const std::vector< Vector_3 > &wss_on_node )
+{
+  if(int(wss_on_node.size()) != numpts) SYS_T::print_fatal("Error: wss_on_node size does not match the number of points. \n");
 
+  vtkPolyData * grid_w = vtkPolyData::New();
 
+  TET_T::gen_triangle_grid( grid_w, numpts, numcels, pt, ien_array );
+  
+  // write wss
+  vtkDoubleArray * ptindex = vtkDoubleArray::New();
+  ptindex -> SetNumberOfComponents(3);
+  ptindex -> SetName("WSS");
+  for(int ii=0; ii<numpts; ++ii)
+  {
+    ptindex -> InsertComponent(ii, 0, wss_on_node[ii].x());
+    ptindex -> InsertComponent(ii, 1, wss_on_node[ii].y());
+    ptindex -> InsertComponent(ii, 2, wss_on_node[ii].z());
+  }
+  grid_w -> GetPointData() -> AddArray( ptindex );
+  ptindex->Delete();
 
+  // write grid_w to vtp file
+  TET_T::write_vtkPointSet(filename, grid_w);
 
+  grid_w->Delete();
+}
 
 // EOF
