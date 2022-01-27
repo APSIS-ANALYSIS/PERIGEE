@@ -166,28 +166,23 @@ void PGAssem_Mesh::Assem_residual(
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof * nLocBas;
   
-  double * array_a = new double [nlgn * dof];
-  double * array_b = new double [nlgn * dof];
-  double * local_a = new double [nLocBas * dof];
-  double * local_b = new double [nLocBas * dof];
-  int * IEN_e = new int [nLocBas];
   double * ectrl_x = new double [nLocBas];
   double * ectrl_y = new double [nLocBas];
   double * ectrl_z = new double [nLocBas];
   PetscInt * row_index = new PetscInt [nLocBas * dof];
 
-  sol_a->GetLocalArray( array_a );
-  sol_b->GetLocalArray( array_b );
+  const std::vector<double> array_a = sol_a->GetLocalArray();
+  const std::vector<double> array_b = sol_b->GetLocalArray();
 
   for( int ee=0; ee<nElem; ++ee )
   {
-    lien_ptr->get_LIEN(ee, IEN_e);
-    GetLocal(array_a, IEN_e, local_a);
-    GetLocal(array_b, IEN_e, local_b);
-
-    fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
-    
-    lassem_ptr->Assem_Residual(curr_time, dt, local_a, local_b,
+   const std::vector<int> IEN_e = lien_ptr -> get_LIEN(ee);
+   const std::vector<double> local_a = GetLocal(array_a, IEN_e, nLocBas);
+   const std::vector<double> local_b = GetLocal(array_b, IEN_e, nLocBas);
+  
+   fnode_ptr->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
+   
+   lassem_ptr->Assem_Residual(curr_time, dt, &local_a[0], &local_b[0],
         elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
 
     for(int ii=0; ii<nLocBas; ++ii)
@@ -197,11 +192,6 @@ void PGAssem_Mesh::Assem_residual(
     VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
 
-  delete [] array_a; array_a = nullptr;
-  delete [] array_b; array_b = nullptr;
-  delete [] local_a; local_a = nullptr;
-  delete [] local_b; local_b = nullptr;
-  delete [] IEN_e; IEN_e = nullptr;
   delete [] ectrl_x; ectrl_x = nullptr;
   delete [] ectrl_y; ectrl_y = nullptr;
   delete [] ectrl_z; ectrl_z = nullptr;
