@@ -89,23 +89,6 @@ class PGAssem_Mesh : public IPGAssem
         const ALocal_NodalBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
-
-    void GetLocal(const double * const &array, const int * const &IEN,
-        double * const &local_array) const
-    {
-      for(int ii=0; ii<nLocBas; ++ii)
-        for(int jj=0; jj<dof; ++jj)
-          local_array[ii*dof + jj] = array[IEN[ii] * dof + jj];
-    }
-
-    void GetLocal( const double * const &array, const int * const &IEN,
-        const int &in_locbas, double * const &local_array) const
-    {
-      for(int ii=0; ii<in_locbas; ++ii)
-        for(int jj=0; jj<dof; ++jj)
-          local_array[ii*dof + jj] = array[IEN[ii] * dof + jj];
-    }
-
     std::vector<double> GetLocal( const std::vector<double> &array,
         const std::vector<int> &IEN, const int &in_locbas ) const
     {
