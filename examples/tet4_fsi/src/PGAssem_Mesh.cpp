@@ -176,14 +176,14 @@ void PGAssem_Mesh::Assem_residual(
 
   for( int ee=0; ee<nElem; ++ee )
   {
-   const std::vector<int> IEN_e = lien_ptr -> get_LIEN(ee);
-   const std::vector<double> local_a = GetLocal(array_a, IEN_e, nLocBas);
-   const std::vector<double> local_b = GetLocal(array_b, IEN_e, nLocBas);
+    const std::vector<int> IEN_e = lien_ptr -> get_LIEN(ee);
+    const std::vector<double> local_a = GetLocal(array_a, IEN_e, nLocBas);
+    const std::vector<double> local_b = GetLocal(array_b, IEN_e, nLocBas);
   
-   fnode_ptr->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
+    fnode_ptr->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
    
-   lassem_ptr->Assem_Residual(curr_time, dt, &local_a[0], &local_b[0],
-        elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
+    lassem_ptr->Assem_Residual(curr_time, dt, &local_a[0], &local_b[0],
+		    elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
 
     for(int ii=0; ii<nLocBas; ++ii)
       for(int mm=0; mm<dof; ++mm)
