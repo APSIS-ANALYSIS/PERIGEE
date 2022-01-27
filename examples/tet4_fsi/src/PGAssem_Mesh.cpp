@@ -241,7 +241,6 @@ void PGAssem_Mesh::Assem_tangent_residual(
    const std::vector<double> local_a = GetLocal(array_a, IEN_e, nLocBas);
    const std::vector<double> local_b = GetLocal(array_b, IEN_e, nLocBas);
 
-
     fnode_ptr->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
 
     lassem_ptr->Assem_Tangent_Residual(curr_time, dt, &local_a[0], &local_b[0],
@@ -342,7 +341,6 @@ void PGAssem_Mesh::NatBC_G( const double &curr_time, const double &dt,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
-  int * LSIEN = new int [snLocBas];
   double * sctrl_x = new double [snLocBas];
   double * sctrl_y = new double [snLocBas];
   double * sctrl_z = new double [snLocBas];
@@ -354,8 +352,7 @@ void PGAssem_Mesh::NatBC_G( const double &curr_time, const double &dt,
 
     for(int ee=0; ee<num_sele; ++ee)
     {
-      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
-
+      const std::vector<int> LSIEN = ebc_part -> get_SIEN(ebc_id, ee); 
       ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
       lassem_ptr->Assem_Residual_EBC(ebc_id, curr_time, dt,
@@ -369,7 +366,6 @@ void PGAssem_Mesh::NatBC_G( const double &curr_time, const double &dt,
     }
   }
 
-  delete [] LSIEN;      LSIEN = nullptr;
   delete [] sctrl_x;    sctrl_x = nullptr;
   delete [] sctrl_y;    sctrl_y = nullptr;
   delete [] sctrl_z;    sctrl_z = nullptr;
