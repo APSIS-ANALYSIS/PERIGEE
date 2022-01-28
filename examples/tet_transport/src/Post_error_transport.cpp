@@ -2,49 +2,27 @@
 
 double POST_ERROR_T::exact_sol( const double &x, const double &y, const double &z, const double &time )
 {
-  const double pi = MATH_T::PI;
-  return time * time * sin(pi*x) * sin(pi*y) * sin(pi*z);
+  //const double pi = MATH_T::PI;
+  return time * time * time * time * x*(x-1)*y*(y-1)*z*(z-1);
 }
-
-
-double POST_ERROR_T::exact_sol_x( const double &x, const double &y, const double &z, const double &time )
-{
-  return 0.0;
-}
-
-
-double POST_ERROR_T::exact_sol_y( const double &x, const double &y, const double &z, const double &time )
-{
-  return 0.0;
-}
-
-
-double POST_ERROR_T::exact_sol_z( const double &x, const double &y, const double &z, const double &time )
-{
-  return 0.0;
-}
-
 
 double POST_ERROR_T::exact_sol_dx( const double &x, const double &y, const double &z, const double &time )
 {
-  const double pi = MATH_T::PI;
-  return time * time * pi * cos(pi*x) * sin(pi*y) * sin(pi*z);
+  //const double pi = MATH_T::PI;
+  return time * time * time * time * (2.0*x-1)*y*(y-1)*z*(z-1);
 }
-
 
 double POST_ERROR_T::exact_sol_dy( const double &x, const double &y, const double &z, const double &time )
 {
-  const double pi = MATH_T::PI;
-  return time * time * pi * sin(pi*x) * cos(pi*y) * sin(pi*z);
+  //const double pi = MATH_T::PI;
+  return time * time * time * time * x*(x-1)*(2.0*y-1)*z*(z-1);
 }
-
 
 double POST_ERROR_T::exact_sol_dz( const double &x, const double &y, const double &z, const double &time )
 {
-  const double pi = MATH_T::PI;
-  return time * time * pi * sin(pi*x) * sin(pi*y) * cos(pi*z);
+  //const double pi = MATH_T::PI;
+  return time * time * time * time * x*(x-1)*y*(y-1)*(2.0*z-1);
 }
-
 
 double POST_ERROR_T::get_manu_sol_error(
     const double &time,
@@ -80,7 +58,6 @@ double POST_ERROR_T::get_manu_sol_error(
 
   return error;
 }
-
 
 double POST_ERROR_T::get_manu_sol_errorH1(
     const double &time,

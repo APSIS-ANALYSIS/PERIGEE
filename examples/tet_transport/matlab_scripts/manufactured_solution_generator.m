@@ -2,7 +2,7 @@ clear all; clc;
 
 syms x y z t rho cap kappa;
 
-u = t*t * sin(pi*x) * sin(pi*y) * sin(pi*z);
+u = t*t*t*t * x*(x-1)*y*(y-1)*z*(z-1);
 
 u_x = diff(u,x);
 u_y = diff(u,y);

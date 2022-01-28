@@ -9,12 +9,6 @@ namespace POST_ERROR_T
 {
   double exact_sol( const double &x, const double &y, const double &z, const double &time );
 
-  double exact_sol_x( const double &x, const double &y, const double &z, const double &time );
-  
-  double exact_sol_y( const double &x, const double &y, const double &z, const double &time );
-  
-  double exact_sol_z( const double &x, const double &y, const double &z, const double &time );
-
   double exact_sol_dx( const double &x, const double &y, const double &z, const double &time );
 
   double exact_sol_dy( const double &x, const double &y, const double &z, const double &time );
