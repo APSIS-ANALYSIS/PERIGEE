@@ -60,6 +60,7 @@ int main( int argc, char * argv[] )
   int IEN_e[4];
   double ectrl_x[4], ectrl_y[4], ectrl_z[4], loc_sol[4];
   double subdomain_l2 = 0.0;
+  double subdomain_H1 = 0.0;
 
   for(int ee=0; ee<locElem->get_nlocalele(); ++ee)
   {
@@ -73,12 +74,20 @@ int main( int argc, char * argv[] )
     // Calculate the error
     subdomain_l2 += POST_ERROR_T::get_manu_sol_error(
       sol_time, loc_sol, elementv, ectrl_x, ectrl_y, ectrl_z, quadv );
+
+    subdomain_H1 += POST_ERROR_T::get_manu_sol_errorH1(
+      sol_time, loc_sol, elementv, ectrl_x, ectrl_y, ectrl_z, quadv );
   }
   
-  double l2_error = 0.0;
+  double l2_error = 0.0; double H1_error = 0.0;
   MPI_Reduce(&subdomain_l2, &l2_error, 1, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
   l2_error = std::sqrt( l2_error );
+ 
+  MPI_Reduce(&subdomain_H1, &H1_error, 1, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
+  H1_error = std::sqrt( H1_error );
+
   SYS_T::commPrint("Error in L2 norm is : %e \n", l2_error);
+  SYS_T::commPrint("Error in H1 norm is : %e \n", H1_error);
 
   delete elementv; delete quadv; delete locElem; delete pNode;
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
