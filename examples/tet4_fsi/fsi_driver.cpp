@@ -441,12 +441,12 @@ int main(int argc, char *argv[])
     dot_disp->ReadBinary(restart_dot_u_name.c_str());
 
     std::string restart_dot_v_name = "dot_";
-    restart_dot_u_name.append(restart_v_name);
+    restart_dot_v_name.append(restart_v_name);
     SYS_T::file_check(restart_dot_v_name.c_str());
     dot_velo->ReadBinary(restart_dot_v_name.c_str());
 
     std::string restart_dot_p_name = "dot_";
-    restart_dot_u_name.append(restart_p_name);
+    restart_dot_p_name.append(restart_p_name);
     SYS_T::file_check(restart_dot_p_name.c_str());
     dot_pres->ReadBinary(restart_dot_p_name.c_str());
 
