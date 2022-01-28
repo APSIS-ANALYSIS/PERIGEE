@@ -433,8 +433,7 @@ int main(int argc, char *argv[])
       GMIptr, locElem, locIEN, pNode, mesh_locnbc, mesh_locebc );
 
   SYS_T::commPrint("===> Assembly nonzero estimate for K_mesh ... \n");
-  gloAssem_mesh_ptr->Assem_nonzero_estimate( locElem, locAssem_mesh_ptr, locIEN,
-      pNode, mesh_locnbc );
+  gloAssem_mesh_ptr->Assem_nonzero_estimate( locElem, locAssem_mesh_ptr, locIEN, mesh_locnbc );
 
   SYS_T::commPrint("===> Matrix K_mesh nonzero structure fixed. \n");
   gloAssem_mesh_ptr->Fix_nonzero_err_str();
@@ -489,8 +488,7 @@ int main(int argc, char *argv[])
 
   gloAssem_mesh_ptr->Assem_tangent_residual( sol, sol, 0.0,
       timeinfo->get_step(), locElem, locAssem_mesh_ptr, elementv,
-      elements, quadv, quads, locIEN, pNode, fNode, mesh_locnbc,
-      mesh_locebc );
+      elements, quadv, quads, locIEN, fNode, mesh_locnbc, mesh_locebc );
 
   mesh_lsolver -> SetOperator( gloAssem_mesh_ptr->K );
   PC mesh_pc; mesh_lsolver->GetPC(&mesh_pc);
