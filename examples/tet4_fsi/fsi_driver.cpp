@@ -56,8 +56,8 @@ int main(int argc, char *argv[])
   double mesh_E  = 1.0;
   double mesh_nu = 0.3;
 
-  // flag for determining inflow type 0 pulsatile flow;
-  // 1 linear-to-steady; 2 steady
+  // flag for determining inflow type: 
+  // 0 pulsatile flow; 1 linear-to-steady; 2 steady
   int inflow_type = 0;
 
   // inflow file
