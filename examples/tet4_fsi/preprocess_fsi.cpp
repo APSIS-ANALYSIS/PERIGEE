@@ -58,7 +58,7 @@ int main( int argc, char * argv[] )
   const std::string part_file_p("./apart/part_p");
   const std::string part_file_v("./apart/part_v");
 
-  // fsiBC_type : 0 deformable wall, 1 rigid wall
+  // fsiBC_type : 0 deformable wall, 1 rigid wall, 2 prestress generation
   int fsiBC_type = 0;
 
   // ringBC_type : 0 fully clamped, 1 in-plane motion allowed
