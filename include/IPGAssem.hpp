@@ -903,9 +903,7 @@ class IPGAssem
         FEAElement * const &element_w,
         const IQuadPts * const &quad_s,
         ALocal_EBC * const &ebc_wall_part )
-    {
-      SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");
-    }
+    {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
 
     // Update solid prestress at all volumetric quadrature points    
     virtual void Update_Wall_Prestress(
@@ -917,9 +915,18 @@ class IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
         Prestress_solid * const &ps_ptr ) const
-    {
-      SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");
-    }
+    {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
+
+    virtual void Update_Wall_Prestress(
+        const PDNSolution * const &disp,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        FEAElement * const &elementv,
+        const IQuadPts * const &quadv,
+        const ALocal_IEN * const &lien_v,
+        const FEANode * const &fnode_ptr,
+        Prestress_solid * const &ps_ptr ) const
+    {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
 };
 
 #endif

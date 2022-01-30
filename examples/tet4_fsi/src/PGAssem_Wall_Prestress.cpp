@@ -462,4 +462,45 @@ void PGAssem_Wall_Prestress::Assem_tangent_residual(
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 }
 
+void PGAssem_Wall_Prestress::Update_Wall_Prestress(
+    const PDNSolution * const &disp,
+    const ALocal_Elem * const &alelem_ptr,
+    IPLocAssem_2x2Block * const &lassem_s_ptr,
+    FEAElement * const &elementv,
+    const IQuadPts * const &quadv,
+    const ALocal_IEN * const &lien_v,
+    const FEANode * const &fnode_ptr,
+    Prestress_solid * const &ps_ptr ) const
+{
+  const int nElem = alelem_ptr->get_nlocalele();
+  const int nqp   = quadv -> get_num_quadPts();
+
+  const std::vector<double> array_d = disp -> GetLocalArray();
+
+  double * ectrl_x = new double [nLocBas];
+  double * ectrl_y = new double [nLocBas];
+  double * ectrl_z = new double [nLocBas];
+
+  for( int ee =0; ee < nElem; ++ee )
+  {
+    if( alelem_ptr->get_elem_tag(ee) == 1 )
+    {
+      const std::vector<int> IEN_v = lien_v -> get_LIEN( ee );
+      fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
+      const std::vector<double> local_d = GetLocal( array_d, IEN_v, nLocBas, 3 );
+
+      const std::vector<Matrix_3x3> sigma = lassem_s_ptr -> get_Wall_CauchyStress( &local_d[0], elementv, ectrl_x, ectrl_y, ectrl_z, quadv );
+
+      for( int qua = 0; qua < nqp; ++qua )
+      {
+        const double sigma_at_qua[6] { sigma[qua].xx(), sigma[qua].yy(), sigma[qua].zz(), sigma[qua].yz(), sigma[qua].xz(), sigma[qua].xy() };
+        ps_ptr -> add_prestress( ee, qua, sigma_at_qua );
+      }
+    }
+  }
+
+  delete [] ectrl_x; delete [] ectrl_y; delete [] ectrl_z;
+  ectrl_x = nullptr; ectrl_y = nullptr; ectrl_z = nullptr;
+}
+
 // EOF
