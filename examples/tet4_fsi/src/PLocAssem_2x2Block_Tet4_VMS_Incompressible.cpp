@@ -702,7 +702,6 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Residual_EBC(
 
   const double curr = time + alpha_f * dt;
 
-  Zero_Residual();
   Zero_sur_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
@@ -745,7 +744,6 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Residual_EBC(
 
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  Zero_Residual();
   Zero_sur_Residual();
 
   for(int qua = 0; qua < quad -> get_num_quadPts(); ++qua)
