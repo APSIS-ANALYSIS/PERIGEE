@@ -41,7 +41,7 @@ class IPGAssem
     // Vector G is a generic vector object.
     // ------------------------------------------------------------------------
     Vec G;
-    
+
     IPGAssem(){};
 
     virtual ~IPGAssem(){};
@@ -88,7 +88,7 @@ class IPGAssem
       VecSet(G, 0.0);
     }
 
-    
+
     // ------------------------------------------------------------------------
     // ! Clear G to be zero
     // ------------------------------------------------------------------------
@@ -383,7 +383,7 @@ class IPGAssem
         const ALocal_EBC * const &ebc_part,
         const ALocal_EBC * const &ebc_wall_part,
         const IGenBC * const &gbc )
-    {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
+        {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
 
     virtual void Assem_residual(
@@ -449,7 +449,7 @@ class IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
         const Prestress_solid * const &ps_ptr )
-    {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
+        {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
 
     virtual void Assem_residual(
@@ -499,7 +499,32 @@ class IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
         const Prestress_solid * const &ps_ptr )
-    {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
+        {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
+
+    // Assembly in the prestress generation
+    virtual void Assem_residual(
+        const double &curr_time,
+        const double &dt,
+        const PDNSolution * const &dot_disp,
+        const PDNSolution * const &dot_velo,
+        const PDNSolution * const &dot_pres,
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
+        const PDNSolution * const &pres,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_v,
+        const ALocal_IEN * const &lien_p,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NodalBC * const &nbc_v,
+        const ALocal_NodalBC * const &nbc_p,
+        const ALocal_EBC * const &ebc_part,
+        const Prestress_solid * const &ps_ptr) 
+        {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
     // ------------------------------------------------------------------------
     // ! Assem_tangent_residual : assembly tangent matrix and residual vector 
@@ -565,7 +590,7 @@ class IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
-    
+
 
     // Assemble the residual vector and tangent matrix for CMM with ring BC
     virtual void Assem_tangent_residual(
@@ -591,8 +616,8 @@ class IPGAssem
         const ALocal_EBC * const &ebc_part,
         const ALocal_EBC * const &ebc_wall_part,
         const IGenBC * const &gbc )
-    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
-    
+        {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
+
 
     virtual void Assem_tangent_residual(
         const PDNSolution * const &sol_a,
@@ -674,7 +699,7 @@ class IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
         const Prestress_solid * const &ps_ptr )
-    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
+        {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
 
     virtual void Assem_tangent_residual(
@@ -724,7 +749,32 @@ class IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
         const Prestress_solid * const &ps_ptr )
-    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
+        {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
+
+    // Assembly in prestress generation
+    virtual void Assem_tangent_residual(
+        const double &curr_time,
+        const double &dt,
+        const PDNSolution * const &dot_disp,
+        const PDNSolution * const &dot_velo,
+        const PDNSolution * const &dot_pres,
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
+        const PDNSolution * const &pres,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_v,
+        const ALocal_IEN * const &lien_p,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NodalBC * const &nbc_v,
+        const ALocal_NodalBC * const &nbc_p,
+        const ALocal_EBC * const &ebc_part,
+        const Prestress_solid * const &ps_ptr )
+        {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
     // --------------------------------------------------------------
     // Assembly boundary integrals

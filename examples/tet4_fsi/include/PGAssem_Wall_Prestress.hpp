@@ -36,70 +36,76 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const ALocal_NodalBC * const &nbc_p );
 
     virtual void Assem_residual(
-        const PDNSolution * const &dot_sol,
-        const PDNSolution * const &sol,
-        const PDNSolution * const &dot_sol_np1,
-        const PDNSolution * const &sol_np1,
         const double &curr_time,
         const double &dt,
+        const PDNSolution * const &dot_disp,
+        const PDNSolution * const &dot_velo,
+        const PDNSolution * const &dot_pres,
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
+        const PDNSolution * const &pres,
         const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_s_ptr,
+        IPLocAssem_2x2Block * const &lassem_s_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
+        const ALocal_IEN * const &lien_v,
+        const ALocal_IEN * const &lien_p,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NodalBC * const &nbc_v,
+        const ALocal_NodalBC * const &nbc_p,
         const ALocal_EBC * const &ebc_part,
         const Prestress_solid * const &ps_ptr );
 
     virtual void Assem_tangent_residual(
-        const PDNSolution * const &dot_sol,
-        const PDNSolution * const &sol,
-        const PDNSolution * const &dot_sol_np1,
-        const PDNSolution * const &sol_np1,
         const double &curr_time,
         const double &dt,
+        const PDNSolution * const &dot_disp,
+        const PDNSolution * const &dot_velo,
+        const PDNSolution * const &dot_pres,
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
+        const PDNSolution * const &pres,
         const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_s_ptr,
+        IPLocAssem_2x2Block * const &lassem_s_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
+        const ALocal_IEN * const &lien_v,
+        const ALocal_IEN * const &lien_p,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NodalBC * const &nbc_v,
+        const ALocal_NodalBC * const &nbc_p,
         const ALocal_EBC * const &ebc_part,
         const Prestress_solid * const &ps_ptr );
 
   private:
-      const int nLocBas, snLocBas, num_ebc, nlgn_v, nlgn_p;
+    const int nLocBas, snLocBas, num_ebc, nlgn_v, nlgn_p;
 
-      void EssBC_KG( const ALocal_NodalBC * const &nbc_v, const ALocal_NodalBC * const &nbc_p );
+    void EssBC_KG( const ALocal_NodalBC * const &nbc_v, const ALocal_NodalBC * const &nbc_p );
 
-      void EssBC_G( const ALocal_NodalBC * const &nbc_v, const ALocal_NodalBC * const &nbc_p );
+    void EssBC_G( const ALocal_NodalBC * const &nbc_v, const ALocal_NodalBC * const &nbc_p );
 
-      void NatBC_G( const double &curr_time,
-          const PDNSolution * const &pres,
-          IPLocAssem_2x2Block * const &lassem_s_ptr,
-          FEAElement * const &element_s,
-          const IQuadPts * const &quad_s,
-          const ALocal_NodalBC * const &nbc_v,
-          const ALocal_EBC * const &ebc_part );
+    void NatBC_G( const double &curr_time,
+        const PDNSolution * const &pres,
+        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const ALocal_NodalBC * const &nbc_v,
+        const ALocal_EBC * const &ebc_part );
 
-      std::vector<double> GetLocal( const std::vector<double> &array,
-          const std::vector<int> &IEN, const int &in_locbas, const int &in_dof ) const
-      {
-        std::vector<double> out( in_locbas * in_dof, 0.0 );
-        for(int ii=0; ii<in_locbas; ++ii)
-          for(int jj=0; jj<in_dof; ++jj)
-            out[ii * in_dof + jj] = array[IEN[ii] * in_dof + jj];
+    std::vector<double> GetLocal( const std::vector<double> &array,
+        const std::vector<int> &IEN, const int &in_locbas, const int &in_dof ) const
+    {
+      std::vector<double> out( in_locbas * in_dof, 0.0 );
+      for(int ii=0; ii<in_locbas; ++ii)
+        for(int jj=0; jj<in_dof; ++jj)
+          out[ii * in_dof + jj] = array[IEN[ii] * in_dof + jj];
 
-        return out;
-      }
+      return out;
+    }
 };
 
 #endif
