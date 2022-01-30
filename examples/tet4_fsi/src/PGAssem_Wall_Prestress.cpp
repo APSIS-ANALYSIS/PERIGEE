@@ -2,8 +2,6 @@
 
 PGAssem_Wall_Prestress::PGAssem_Wall_Prestress( 
     IPLocAssem_2x2Block * const &locassem_s_ptr,
-    FEAElement * const &elements,
-    const IQuadPts * const &quads,
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &aien_v,
     const ALocal_IEN * const &aien_p,
@@ -18,14 +16,8 @@ PGAssem_Wall_Prestress::PGAssem_Wall_Prestress(
   nlgn_v( pnode_v -> get_nlocghonode() ),
   nlgn_p( pnode_p -> get_nlocghonode() )
 {
-  SYS_T::print_fatal_if( nLocBas != locassem_f_ptr->get_nLocBas_0(),
-      "Error: PGAssem_FSI::nLocBas does not match that in local assembly of fluid.\n");
-
   SYS_T::print_fatal_if( nLocBas != locassem_s_ptr->get_nLocBas_0(),
       "Error: PGAssem_FSI::nLocBas does not match that in local assembly of solid.\n");
-
-  SYS_T::print_fatal_if( snLocBas != locassem_f_ptr->get_snLocBas_0(),
-      "Error: PGAssem_FSI::nLocBas does not match that in local assembly of fluid.\n");
 
   SYS_T::print_fatal_if( snLocBas != locassem_s_ptr->get_snLocBas_0(),
       "Error: PGAssem_FSI::nLocBas does not match that in local assembly of solid.\n");
@@ -256,6 +248,8 @@ void PGAssem_Wall_Prestress::NatBC_G( const double &curr_time,
   double * sctrl_y = new double [snLocBas];
   double * sctrl_z = new double [snLocBas];
 
+  PetscInt * srow_index = new PetscInt [3*snLocBas];
+
   for(int ee=0; ee<num_sele; ++ee)
   {
     const std::vector<int> LSIEN = ebc_part -> get_SIEN(ebc_id, ee);
@@ -263,7 +257,7 @@ void PGAssem_Wall_Prestress::NatBC_G( const double &curr_time,
 
     const std::vector<double> local_p = GetLocal( array_p, LSIEN, snLocBas, 1 );
 
-    lassem_s_ptr -> Assem_Residual_EBC( time, &local_p[0], element_s, sctrl_x, sctrl_y, sctrl_z, quad_s );
+    lassem_s_ptr -> Assem_Residual_EBC( curr_time, &local_p[0], element_s, sctrl_x, sctrl_y, sctrl_z, quad_s );
 
     for(int ii=0; ii<snLocBas; ++ii)
     {

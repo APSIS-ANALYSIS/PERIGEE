@@ -208,6 +208,16 @@ class IPGAssem
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
 
+    // Nonzero pattern for FSI wall prestressing
+    virtual void Assem_nonzero_estimate(
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        const ALocal_IEN * const &lien_v,
+        const ALocal_IEN * const &lien_p,
+        const ALocal_NodalBC * const &nbc_v,
+        const ALocal_NodalBC * const &nbc_p )
+    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
+
     // ------------------------------------------------------------------------
     // ! Assem_mass_residual : assembly mass matrix and corresponding residual 
     //                         vector for 3D problems WITHOUT pre-existing 
