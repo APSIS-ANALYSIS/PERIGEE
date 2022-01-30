@@ -8,7 +8,8 @@ PLocAssem_2x2Block_Tet4_VMS_Incompressible::PLocAssem_2x2Block_Tet4_VMS_Incompre
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()),
   nLocBas( in_nlocbas ), snLocBas( in_snlocbas ), 
-  vec_size_0( nLocBas * 3 ), vec_size_1( nLocBas ), 
+  vec_size_0( nLocBas * 3 ), vec_size_1( nLocBas ),
+  sur_size_0( snLocBas * 3 ), sur_size_1( snLocBas ),	
   matmodel( in_matmodel )
 {
   Tangent00 = new PetscScalar[vec_size_0 * vec_size_0];
@@ -19,7 +20,10 @@ PLocAssem_2x2Block_Tet4_VMS_Incompressible::PLocAssem_2x2Block_Tet4_VMS_Incompre
   Residual0 = new PetscScalar[vec_size_0];
   Residual1 = new PetscScalar[vec_size_1];
 
+  sur_Residual0 = new PetscScalar[sur_size_0];
+
   Zero_Tangent_Residual();
+  Zero_sur_Residual();
 
   print_info();
 }
@@ -33,6 +37,8 @@ PLocAssem_2x2Block_Tet4_VMS_Incompressible::~PLocAssem_2x2Block_Tet4_VMS_Incompr
 
   delete [] Residual0; Residual0 = nullptr;
   delete [] Residual1; Residual1 = nullptr;
+
+  delete [] sur_Residual0; sur_Residual0 = nullptr;
 }
 
 void PLocAssem_2x2Block_Tet4_VMS_Incompressible::print_info() const
@@ -697,6 +703,7 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Residual_EBC(
   const double curr = time + alpha_f * dt;
 
   Zero_Residual();
+  Zero_sur_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
@@ -718,9 +725,9 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Residual_EBC(
 
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual0[3*A  ] -= surface_area * quad -> get_qw(qua) * R[A] * gg.x();
-      Residual0[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * gg.y();
-      Residual0[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * gg.z();
+      sur_Residual0[3*A  ] -= surface_area * quad -> get_qw(qua) * R[A] * gg.x();
+      sur_Residual0[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * gg.y();
+      sur_Residual0[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * gg.z();
     }
   }
 }
@@ -739,6 +746,7 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Residual_EBC(
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   Zero_Residual();
+  Zero_sur_Residual();
 
   for(int qua = 0; qua < quad -> get_num_quadPts(); ++qua)
   {
@@ -752,9 +760,9 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Residual_EBC(
 
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual0[3*A  ] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * factor * pp * n_out.x();
-      Residual0[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * factor * pp * n_out.y();
-      Residual0[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * factor * pp * n_out.z();
+      sur_Residual0[3*A  ] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * factor * pp * n_out.x();
+      sur_Residual0[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * factor * pp * n_out.y();
+      sur_Residual0[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * factor * pp * n_out.z();
     }
   }
 }

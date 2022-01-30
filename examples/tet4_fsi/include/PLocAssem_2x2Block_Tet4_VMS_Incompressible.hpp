@@ -39,6 +39,11 @@ class PLocAssem_2x2Block_Tet4_VMS_Incompressible : public IPLocAssem_2x2Block
 
     virtual void Zero_Residual(); 
 
+    virtual void Zero_sur_Residual()
+    {
+      for(int ii=0; ii<sur_size_0; ++ii) sur_Residual0[ii] = 0.0;
+    }
+
     virtual void Assem_Estimate();
 
     virtual void Assem_Residual(
@@ -117,7 +122,7 @@ class PLocAssem_2x2Block_Tet4_VMS_Incompressible : public IPLocAssem_2x2Block
 
     // memory layout
     // vec_size = 4 * nLocBas, which defines the local matrix/vector length
-    const int nLocBas, snLocBas, vec_size_0, vec_size_1;
+    const int nLocBas, snLocBas, vec_size_0, vec_size_1, sur_size_0, sur_size_1;
 
     // useful tensors for the material model
     const IMaterialModel * const matmodel;
