@@ -79,6 +79,47 @@ class PNonlinear_FSI_Solver
         PDNSolution * const &pres,
         bool &conv_flag, int &nl_counter ) const;
 
+    void GenAlpha_Seg_solve_Prestress(
+        const bool &new_tangent_flag,
+        const double &prestress_tol,
+        const double &curr_time,
+        const double &dt,
+        const IS &is_v,
+        const IS &is_p,
+        const PDNSolution * const &pre_dot_disp,
+        const PDNSolution * const &pre_dot_velo,
+        const PDNSolution * const &pre_dot_pres,
+        const PDNSolution * const &pre_disp,
+        const PDNSolution * const &pre_velo,
+        const PDNSolution * const &pre_pres,
+        const TimeMethod_GenAlpha * const &tmga_ptr,
+        const ALocal_Elem * const &alelem_ptr,
+        const ALocal_IEN * const &lien_v,
+        const ALocal_IEN * const &lien_p,
+        const FEANode * const &feanode_ptr,
+        const APart_Node * const &pnode_v,
+        const APart_Node * const &pnode_p,
+        const ALocal_NodalBC * const &nbc_v,
+        const ALocal_NodalBC * const &nbc_p,
+        const ALocal_EBC * const &ebc_v,
+        const ALocal_EBC * const &ebc_p,
+        const Matrix_PETSc * const &bc_mat,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const Prestress_solid * const &ps_ptr,
+        IPLocAssem_2x2Block * const &lassem_solid_ptr,
+        IPGAssem * const &gassem_ptr,
+        PLinear_Solver_PETSc * const &lsolver_ptr,
+        PDNSolution * const &dot_disp,
+        PDNSolution * const &dot_velo,
+        PDNSolution * const &dot_pres,
+        PDNSolution * const &disp,
+        PDNSolution * const &velo,
+        PDNSolution * const &pres,
+        bool &prestress_conv_flag, int &nl_counter ) const;
+  
   private:
     const double nr_tol, na_tol, nd_tol;
     const int nmaxits, nrenew_freq, nrenew_thred;

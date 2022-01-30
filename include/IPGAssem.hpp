@@ -502,7 +502,7 @@ class IPGAssem
         {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
     // Assembly in the prestress generation
-    virtual void Assem_residual(
+    virtual void Assem_Residual(
         const double &curr_time,
         const double &dt,
         const PDNSolution * const &dot_disp,
@@ -753,7 +753,7 @@ class IPGAssem
         {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
     // Assembly in prestress generation
-    virtual void Assem_tangent_residual(
+    virtual void Assem_Tangent_Residual(
         const double &curr_time,
         const double &dt,
         const PDNSolution * const &dot_disp,

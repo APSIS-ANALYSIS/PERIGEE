@@ -271,7 +271,7 @@ void PGAssem_Wall_Prestress::NatBC_G( const double &curr_time,
   sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
 }
 
-void PGAssem_Wall_Prestress::Assem_residual(
+void PGAssem_Wall_Prestress::Assem_Residual(
     const double &curr_time,
     const double &dt,
     const PDNSolution * const &dot_disp,
@@ -364,7 +364,7 @@ void PGAssem_Wall_Prestress::Assem_residual(
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 }
 
-void PGAssem_Wall_Prestress::Assem_tangent_residual(
+void PGAssem_Wall_Prestress::Assem_Tangent_Residual(
     const double &curr_time,
     const double &dt,
     const PDNSolution * const &dot_disp,

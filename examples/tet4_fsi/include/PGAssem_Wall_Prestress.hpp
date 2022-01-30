@@ -35,7 +35,7 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const ALocal_NodalBC * const &nbc_v,
         const ALocal_NodalBC * const &nbc_p );
 
-    virtual void Assem_residual(
+    virtual void Assem_Residual(
         const double &curr_time,
         const double &dt,
         const PDNSolution * const &dot_disp,
@@ -59,7 +59,7 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const ALocal_EBC * const &ebc_p,
         const Prestress_solid * const &ps_ptr );
 
-    virtual void Assem_tangent_residual(
+    virtual void Assem_Tangent_Residual(
         const double &curr_time,
         const double &dt,
         const PDNSolution * const &dot_disp,
