@@ -153,8 +153,6 @@ int main( int argc, char *argv[] )
 
   ALocal_IEN * locIEN_p = new ALocal_IEN(part_p_file, rank);
 
-  IAGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info_FEM_3D(part_v_file, rank);
-
   APart_Basic_Info * PartBasic = new APart_Basic_Info(part_v_file, rank);
 
   ALocal_Elem * locElem = new ALocal_Elem(part_v_file, rank);
@@ -321,33 +319,24 @@ int main( int argc, char *argv[] )
   SYS_T::commPrint("===> Time marching solver setted up:\n");
   tsolver->print_info();
 
+  // ===== FEM analysis =====
+  SYS_T::commPrint("===> Start Finite Element Analysis:\n");
+  tsolver -> TM_FSI_Prestress( is_record_sol, prestress_disp_tol, is_velo, is_pres,
+      dot_disp, dot_velo, dot_pres, disp, velo, pres, tm_galpha_ptr,
+      timeinfo, locElem, locIEN_v, locIEN_p, pNode_v, pNode_p, fNode,
+      locnbc_v, locnbc_p, locebc_v, locebc_p, pmat, elementv, elements,
+      quadv, quads, ps_data, locAssem_solid_ptr, gloAssem_ptr, lsolver, nsolver );
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  // Clean the memory
+  delete fNode; delete locIEN_v; delete locIEN_p; delete PartBasic; delete locElem;
+  delete pNode_v; delete pNode_p; delete locebc_v; delete locebc_p; delete locnbc_v; delete locnbc_p;
+  delete ps_data; delete quadv; delete quads; delete elementv; delete elements;
+  delete pmat; delete tm_galpha_ptr; delete matmodel; delete locAssem_solid_ptr;
+  delete velo; delete disp; delete pres; delete dot_velo; delete dot_disp; delete dot_pres;
+  delete timeinfo; delete gloAssem_ptr; delete lsolver; delete nsolver; delete tsolver;
 
   PetscFinalize();
   return EXIT_SUCCESS;
 }
-
 
 // EOF 
