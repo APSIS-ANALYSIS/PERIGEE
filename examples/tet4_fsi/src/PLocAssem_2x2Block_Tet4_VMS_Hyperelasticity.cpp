@@ -9,6 +9,7 @@ PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::PLocAssem_2x2Block_Tet4_VMS_Hyperel
   gamma(tm_gAlpha->get_gamma()),
   nLocBas( in_nlocbas ), snLocBas( in_snlocbas ), 
   vec_size_0( nLocBas * 3 ), vec_size_1( nLocBas ),
+  sur_size_0( snLocBas * 3 ), sur_size_1( snLocBas ),
   matmodel( in_matmodel )
 {
   Tangent00 = new PetscScalar[vec_size_0 * vec_size_0];
@@ -19,7 +20,10 @@ PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::PLocAssem_2x2Block_Tet4_VMS_Hyperel
   Residual0 = new PetscScalar[vec_size_0];
   Residual1 = new PetscScalar[vec_size_1];
 
+  sur_Residual0 = new PetscScalar[sur_size_0];
+
   Zero_Tangent_Residual();
+  Zero_sur_Residual();
 
   print_info();
 }
@@ -34,6 +38,8 @@ PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::~PLocAssem_2x2Block_Tet4_VMS_Hypere
 
   delete [] Residual0; Residual0 = nullptr;
   delete [] Residual1; Residual1 = nullptr;
+
+  delete [] sur_Residual0; sur_Residual0 = nullptr;
 }
 
 
