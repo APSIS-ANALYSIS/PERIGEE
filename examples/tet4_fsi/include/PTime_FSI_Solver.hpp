@@ -79,6 +79,9 @@ class PTime_FSI_Solver
 
     void Write_restart_file(const PDNTimeStep * const &timeinfo,
         const std::string &solname ) const;
+
+    void Nullify_solid_dof( const APart_Node * const &pnode,
+        const int &in_dof, PDNSolution * const &sol ) const;
 };
 
 #endif

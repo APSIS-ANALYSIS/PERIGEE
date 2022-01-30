@@ -907,7 +907,8 @@ class IPGAssem
         ALocal_EBC * const &ebc_wall_part )
     {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
 
-    // Update solid prestress at all volumetric quadrature points    
+    // Update solid prestress at all volumetric quadrature points (in
+    // tet4_vascular) 
     virtual void Update_Wall_Prestress(
         const PDNSolution * const &sol,
         const ALocal_Elem * const &alelem_ptr,
@@ -919,6 +920,7 @@ class IPGAssem
         Prestress_solid * const &ps_ptr ) const
     {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
 
+    // Update solid prestress at all volumetric quadrature points (in tet4_fsi) 
     virtual void Update_Wall_Prestress(
         const PDNSolution * const &disp,
         const PDNSolution * const &pres,

@@ -285,4 +285,62 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
   delete cur_disp; delete cur_velo; delete cur_pres;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void PTime_FSI_Solver::Nullify_solid_dof( const APart_Node * const &pnode,
+    const int &in_dof, PDNSolution * const &sol ) const
+{
+  SYS_T::print_fatal_if(sol->get_dof_num() != in_dof,
+      "Error: PTime_FSI_Solver::Nullify_solid_dof, the input dof value is wrong. \n");
+
+  SYS_T::print_fatal_if(pnode->get_dof() != in_dof,
+      "Error: PTime_FSI_Solver::Nullify_solid_dof, the input dof value is wrong. \n");
+
+  SYS_T::print_fatal_if(sol->get_nlocal() != pnode->get_nlocalnode() * in_dof,
+      "Error: PTime_FSI_Solver::Nullify_solid_dof, the input solution dimension is wrong. \n");
+
+  Vec lsol;
+  VecGhostGetLocalForm(sol->solution, &lsol);
+
+  double * array_sol;
+  VecGetArray(lsol, &array_sol);
+
+  const int nlocal_solid = pnode->get_nlocalnode_solid();
+
+  for(int ii=0; ii<nlocal_solid; ++ii)
+  {
+    const int offset = pnode -> get_node_loc_solid(ii) * in_dof;
+    for(int jj=0; jj<in_dof; ++jj)
+      array_sol[offset + jj] = 0.0;
+  }
+
+  VecRestoreArray(lsol, &array_sol);
+  VecGhostRestoreLocalForm(sol->solution, &lsol);
+
+  sol->GhostUpdate(); // update the ghost slots
+}
+
 // EOF

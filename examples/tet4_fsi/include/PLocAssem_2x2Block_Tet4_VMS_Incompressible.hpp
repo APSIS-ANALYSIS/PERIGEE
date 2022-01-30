@@ -111,6 +111,7 @@ class PLocAssem_2x2Block_Tet4_VMS_Incompressible : public IPLocAssem_2x2Block
     // ------------------------------------------------------------------------
     virtual std::vector<Matrix_3x3> get_Wall_CauchyStress(
         const double * const &disp,
+        const double * const &pres,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
