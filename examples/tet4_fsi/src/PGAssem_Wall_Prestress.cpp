@@ -544,22 +544,4 @@ void PGAssem_Wall_Prestress::Update_Wall_Prestress(
   ectrl_x = nullptr; ectrl_y = nullptr; ectrl_z = nullptr;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // EOF

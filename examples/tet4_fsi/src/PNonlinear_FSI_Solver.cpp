@@ -541,8 +541,8 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
 
   // --------------------------------------------------------------------------
   // Calculate teh Cauchy stress in solid element and update the prestress
-  gassem_ptr -> Update_Wall_Prestress( disp, alelem_ptr, lassem_solid_ptr, elementv,
-      quad_v, lien_v, feanode_ptr, ps_ptr );
+  gassem_ptr -> Update_Wall_Prestress( disp, pres, alelem_ptr, lassem_solid_ptr, elementv,
+      quad_v, lien_v, lien_p, feanode_ptr, ps_ptr );
 
   const double solid_disp_norm = disp -> Norm_2();
 

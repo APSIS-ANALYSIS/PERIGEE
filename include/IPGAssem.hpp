@@ -921,14 +921,17 @@ class IPGAssem
 
     virtual void Update_Wall_Prestress(
         const PDNSolution * const &disp,
+        const PDNSolution * const &pres,
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem_2x2Block * const &lassem_s_ptr,
         FEAElement * const &elementv,
         const IQuadPts * const &quadv,
         const ALocal_IEN * const &lien_v,
+        const ALocal_IEN * const &lien_p,
         const FEANode * const &fnode_ptr,
         Prestress_solid * const &ps_ptr ) const
     {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
+
 };
 
 #endif
