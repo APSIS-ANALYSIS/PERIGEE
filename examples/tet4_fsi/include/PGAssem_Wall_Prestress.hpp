@@ -35,6 +35,46 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const ALocal_NodalBC * const &nbc_v,
         const ALocal_NodalBC * const &nbc_p );
 
+    virtual void Assem_residual(
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
+        const PDNSolution * const &dot_sol_np1,
+        const PDNSolution * const &sol_np1,
+        const double &curr_time,
+        const double &dt,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_s_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const APart_Node * const &node_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const Prestress_solid * const &ps_ptr );
+
+    virtual void Assem_tangent_residual(
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
+        const PDNSolution * const &dot_sol_np1,
+        const PDNSolution * const &sol_np1,
+        const double &curr_time,
+        const double &dt,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_s_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const APart_Node * const &node_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const Prestress_solid * const &ps_ptr );
+
   private:
       const int nLocBas, snLocBas, num_ebc, nlgn_v, nlgn_p;
 

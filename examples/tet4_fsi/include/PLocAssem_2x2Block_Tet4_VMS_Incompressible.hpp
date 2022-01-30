@@ -96,7 +96,7 @@ class PLocAssem_2x2Block_Tet4_VMS_Incompressible : public IPLocAssem_2x2Block
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
-    virtual void Assem_Residual_EBC(
+    virtual void Assem_Residual_Interior_Wall_EBC(
         const double &time,
         const double * const &pres,
         FEAElement * const &element,

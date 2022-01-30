@@ -268,7 +268,7 @@ class IPLocAssem_2x2Block
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Residual_EBC is not implemented.\n");}
 
-    virtual void Assem_Residual_EBC(
+    virtual void Assem_Residual_Interior_Wall_EBC(
         const double &time,
         const double * const &pres,
         FEAElement * const &element,
@@ -276,7 +276,7 @@ class IPLocAssem_2x2Block
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad )
-    {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Residual_EBC is not implemented.\n");}
+    {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Residual_Interior_Wall_EBC is not implemented.\n");}
 
     virtual double get_flowrate(
         const double * const &disp,

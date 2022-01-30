@@ -731,7 +731,7 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Residual_EBC(
   }
 }
 
-void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Residual_EBC(
+void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Residual_Interior_Wall_EBC(
     const double &time,
     const double * const &pres,
     FEAElement * const &element,

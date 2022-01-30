@@ -257,7 +257,7 @@ void PGAssem_Wall_Prestress::NatBC_G( const double &curr_time,
 
     const std::vector<double> local_p = GetLocal( array_p, LSIEN, snLocBas, 1 );
 
-    lassem_s_ptr -> Assem_Residual_EBC( curr_time, &local_p[0], element_s, sctrl_x, sctrl_y, sctrl_z, quad_s );
+    lassem_s_ptr -> Assem_Residual_Interior_Wall_EBC( curr_time, &local_p[0], element_s, sctrl_x, sctrl_y, sctrl_z, quad_s );
 
     for(int ii=0; ii<snLocBas; ++ii)
     {
@@ -274,7 +274,48 @@ void PGAssem_Wall_Prestress::NatBC_G( const double &curr_time,
   sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
 }
 
+void PGAssem_Wall_Prestress::Assem_residual(
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
+        const PDNSolution * const &dot_sol_np1,
+        const PDNSolution * const &sol_np1,
+        const double &curr_time,
+        const double &dt,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_s_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const APart_Node * const &node_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const Prestress_solid * const &ps_ptr )
+{}
 
+
+void PGAssem_Wall_Prestress::Assem_tangent_residual(
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
+        const PDNSolution * const &dot_sol_np1,
+        const PDNSolution * const &sol_np1,
+        const double &curr_time,
+        const double &dt,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_s_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const APart_Node * const &node_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const Prestress_solid * const &ps_ptr )
+{}
 
 
 
