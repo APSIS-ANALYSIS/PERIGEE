@@ -11,7 +11,7 @@
 // ============================================================================
 #include "IPGAssem.hpp"
 #include "PETSc_Tools.hpp"
-#include "PDNSolution.hpp"
+#include "PDNSolution_V.hpp"
 
 class PGAssem_FSI : public IPGAssem
 {
