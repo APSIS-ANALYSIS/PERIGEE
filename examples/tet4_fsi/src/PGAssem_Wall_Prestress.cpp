@@ -468,11 +468,13 @@ void PGAssem_Wall_Prestress::Assem_Tangent_Residual(
 
 void PGAssem_Wall_Prestress::Update_Wall_Prestress(
     const PDNSolution * const &disp,
+    const PDNSolution * const &pres,
     const ALocal_Elem * const &alelem_ptr,
     IPLocAssem_2x2Block * const &lassem_s_ptr,
     FEAElement * const &elementv,
     const IQuadPts * const &quadv,
     const ALocal_IEN * const &lien_v,
+    const ALocal_IEN * const &lien_p,
     const FEANode * const &fnode_ptr,
     Prestress_solid * const &ps_ptr ) const
 {
@@ -480,6 +482,7 @@ void PGAssem_Wall_Prestress::Update_Wall_Prestress(
   const int nqp   = quadv -> get_num_quadPts();
 
   const std::vector<double> array_d = disp -> GetLocalArray();
+  const std::vector<double> array_p = pres -> GetLocalArray();
 
   double * ectrl_x = new double [nLocBas];
   double * ectrl_y = new double [nLocBas];
@@ -490,14 +493,48 @@ void PGAssem_Wall_Prestress::Update_Wall_Prestress(
     if( alelem_ptr->get_elem_tag(ee) == 1 )
     {
       const std::vector<int> IEN_v = lien_v -> get_LIEN( ee );
+      const std::vector<int> IEN_p = lien_p -> get_LIEN( ee );
       fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
       const std::vector<double> local_d = GetLocal( array_d, IEN_v, nLocBas, 3 );
+      const std::vector<double> local_p = GetLocal( array_p, IEN_p, nLocBas, 1 );
 
-      const std::vector<Matrix_3x3> sigma = lassem_s_ptr -> get_Wall_CauchyStress( &local_d[0], elementv, ectrl_x, ectrl_y, ectrl_z, quadv );
+      elementv -> buildBasis( quadv, ectrl_x, ectrl_y, ectrl_z );
 
       for( int qua = 0; qua < nqp; ++qua )
       {
-        const double sigma_at_qua[6] { sigma[qua].xx(), sigma[qua].yy(), sigma[qua].zz(), sigma[qua].yz(), sigma[qua].xz(), sigma[qua].xy() };
+        double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
+
+        element -> get_R_gradR( qua, R, dR_dx, dR_dy, dR_dz );
+
+        double pp = 0.0;
+        double ux_x = 0.0, uy_x = 0.0, uz_x = 0.0;
+        double ux_y = 0.0, uy_y = 0.0, uz_y = 0.0;
+        double ux_z = 0.0, uy_z = 0.0, uz_z = 0.0;
+
+        for(int ii=0; ii<nLocBas; ++ii)
+        {
+          pp   += local_p[ii] * R[ii];
+
+          ux_x += local_d[ii*3+0] * dR_dx[ii];
+          uy_x += local_d[ii*3+1] * dR_dx[ii];
+          uz_x += local_d[ii*3+2] * dR_dx[ii];
+
+          ux_y += local_d[ii*3+0] * dR_dy[ii];
+          uy_y += local_d[ii*3+1] * dR_dy[ii];
+          uz_y += local_d[ii*3+2] * dR_dy[ii];
+
+          ux_z += local_d[ii*3+0] * dR_dz[ii];
+          uy_z += local_d[ii*3+1] * dR_dz[ii];
+          uz_z += local_d[ii*3+2] * dR_dz[ii];
+        }
+
+        const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
+
+        const Matrix_3x3 sigma_dev = matmodel -> get_Cauchy_stress( F );
+
+        const double sigma_at_qua[6] { sigma_dev.xx() - pp, sigma_dev.yy() - pp, sigma_dev.zz() - pp, 
+          sigma_dev.yz(), sigma_dev.xz(), sigma_dev.xy() };
+        
         ps_ptr -> add_prestress( ee, qua, sigma_at_qua );
       }
     }
@@ -506,5 +543,23 @@ void PGAssem_Wall_Prestress::Update_Wall_Prestress(
   delete [] ectrl_x; delete [] ectrl_y; delete [] ectrl_z;
   ectrl_x = nullptr; ectrl_y = nullptr; ectrl_z = nullptr;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // EOF
