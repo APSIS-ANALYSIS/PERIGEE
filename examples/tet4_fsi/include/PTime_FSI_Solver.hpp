@@ -65,6 +65,40 @@ class PTime_FSI_Solver
         PLinear_Solver_PETSc * const &lsolver_mesh_ptr,
         PNonlinear_FSI_Solver * const &nsolver_ptr ) const;
 
+    void TM_FSI_Prestress(
+        const bool &is_record_sol_flag,
+        const double &prestress_tol,
+        const IS &is_v,
+        const IS &is_p,
+        const PDNSolution * const &init_dot_disp,
+        const PDNSolution * const &init_dot_velo,
+        const PDNSolution * const &init_dot_pres,
+        const PDNSolution * const &init_disp,
+        const PDNSolution * const &init_velo,
+        const PDNSolution * const &init_pres,
+        const TimeMethod_GenAlpha * const &tmga_ptr,
+        PDNTimeStep * const &time_info,
+        const ALocal_Elem * const &alelem_ptr,
+        const ALocal_IEN * const &lien_v,
+        const ALocal_IEN * const &lien_p,
+        const APart_Node * const &pnode_v,
+        const APart_Node * const &pnode_p,
+        const FEANode * const &feanode_ptr,
+        const ALocal_NodalBC * const &nbc_v,
+        const ALocal_NodalBC * const &nbc_p,
+        const ALocal_EBC * const &ebc_v,
+        const ALocal_EBC * const &ebc_p,
+        const Matrix_PETSc * const &bc_mat,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        Prestress_solid * const &ps_ptr,
+        IPLocAssem_2x2Block * const &lassem_solid_ptr,
+        IPGAssem * const &gassem_ptr,
+        PLinear_Solver_PETSc * const &lsolver_ptr,
+        PNonlinear_FSI_Solver * const &nsolver_ptr ) const;
+
   private:
     const double final_time;
     const int sol_record_freq; // the frequency for writing solutions

@@ -285,30 +285,140 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
   delete cur_disp; delete cur_velo; delete cur_pres;
 }
 
+void PTime_FSI_Solver::TM_FSI_Prestress(
+    const bool &is_record_sol_flag,
+    const double &prestress_tol,
+    const IS &is_v,
+    const IS &is_p,
+    const PDNSolution * const &init_dot_disp,
+    const PDNSolution * const &init_dot_velo,
+    const PDNSolution * const &init_dot_pres,
+    const PDNSolution * const &init_disp,
+    const PDNSolution * const &init_velo,
+    const PDNSolution * const &init_pres,
+    const TimeMethod_GenAlpha * const &tmga_ptr,
+    PDNTimeStep * const &time_info,
+    const ALocal_Elem * const &alelem_ptr,
+    const ALocal_IEN * const &lien_v,
+    const ALocal_IEN * const &lien_p,
+    const APart_Node * const &pnode_v,
+    const APart_Node * const &pnode_p,
+    const FEANode * const &feanode_ptr,
+    const ALocal_NodalBC * const &nbc_v,
+    const ALocal_NodalBC * const &nbc_p,
+    const ALocal_EBC * const &ebc_v,
+    const ALocal_EBC * const &ebc_p,
+    const Matrix_PETSc * const &bc_mat,
+    FEAElement * const &elementv,
+    FEAElement * const &elements,
+    const IQuadPts * const &quad_v,
+    const IQuadPts * const &quad_s,
+    Prestress_solid * const &ps_ptr,
+    IPLocAssem_2x2Block * const &lassem_solid_ptr,
+    IPGAssem * const &gassem_ptr,
+    PLinear_Solver_PETSc * const &lsolver_ptr,
+    PNonlinear_FSI_Solver * const &nsolver_ptr ) const
+{
+  PDNSolution * pre_dot_disp = new PDNSolution( init_dot_disp );
+  PDNSolution * pre_dot_velo = new PDNSolution( init_dot_velo );
+  PDNSolution * pre_dot_pres = new PDNSolution( init_dot_pres );
 
+  PDNSolution * pre_disp = new PDNSolution( init_disp );
+  PDNSolution * pre_velo = new PDNSolution( init_velo );
+  PDNSolution * pre_pres = new PDNSolution( init_pres );
 
+  PDNSolution * cur_dot_disp = new PDNSolution( init_dot_disp );
+  PDNSolution * cur_dot_velo = new PDNSolution( init_dot_velo );
+  PDNSolution * cur_dot_pres = new PDNSolution( init_dot_pres );
 
+  PDNSolution * cur_disp = new PDNSolution( init_disp );
+  PDNSolution * cur_velo = new PDNSolution( init_velo );
+  PDNSolution * cur_pres = new PDNSolution( init_pres );
 
+  bool prestress_conv_flag = false, renew_flag;
+  int nl_counter = nsolver_ptr -> get_non_max_its();
 
+  SYS_T::commPrint( "Time = %e, dt = %e, index = %d, %s \n",
+      time_info->get_time(), time_info->get_step(), time_info->get_index(),
+      SYS_T::get_time().c_str() );
 
+  while( time_info->get_time() < final_time && !prestress_conv_flag )
+  {
+    if(time_info->get_index() % renew_tang_freq == 0) renew_flag = true;
+    else renew_flag = false;
 
+    // If the previous step is solved in ONE Newton iteration, we do not update
+    // the tangent matrix
+    if( nl_counter == 1 ) renew_flag = false;
 
+    // Nullify the solid solutions
+    Nullify_solid_dof( pnode_v, 3, pre_dot_disp );
+    Nullify_solid_dof( pnode_v, 3, pre_dot_velo );
+    Nullify_solid_dof( pnode_p, 1, pre_dot_pres );
 
+    Nullify_solid_dof( pnode_v, 3, pre_disp );
+    Nullify_solid_dof( pnode_v, 3, pre_velo );
+    Nullify_solid_dof( pnode_p, 1, pre_pres );
 
+    Nullify_solid_dof( pnode_v, 3, cur_dot_disp );
+    Nullify_solid_dof( pnode_v, 3, cur_dot_velo );
+    Nullify_solid_dof( pnode_p, 1, cur_dot_pres );
 
+    Nullify_solid_dof( pnode_v, 3, cur_disp );
+    Nullify_solid_dof( pnode_v, 3, cur_velo );
+    Nullify_solid_dof( pnode_p, 1, cur_pres );
 
+    nsolver_ptr -> GenAlpha_Seg_solve_Prestress( renew_flag, prestress_tol,
+        time_info->get_time(), time_info->get_step(), is_v, is_p,
+        pre_dot_disp, pre_dot_velo, pre_dot_pres, pre_disp, pre_velo, pre_pres,
+        tmga_ptr, alelem_ptr, lien_v, lien_p, feanode_ptr, pnode_v, pnode_p,
+        nbc_v, nbc_p, ebc_v, ebc_p, bc_mat, elementv, elements, quad_v, quad_s,
+        ps_ptr, lassem_solid_ptr, gassem_ptr, lsolver_ptr,
+        cur_dot_disp, cur_dot_velo, cur_dot_pres, cur_disp, cur_velo, cur_pres,
+        prestress_conv_flag, nl_counter );
 
+    time_info->TimeIncrement();
 
+    SYS_T::commPrint( "Time = %e, dt = %e, index = %d, %s \n",
+        time_info->get_time(), time_info->get_step(), time_info->get_index(),
+        SYS_T::get_time().c_str() );
 
+    if( is_record_sol_flag && time_info->get_index()%sol_record_freq == 0)
+    {
+      std::string sol_name = Name_Generator("disp_", time_info->get_index());
+      cur_disp->WriteBinary(sol_name.c_str());
 
+      sol_name = Name_Generator("velo_", time_info->get_index());
+      cur_velo->WriteBinary(sol_name.c_str());
 
+      sol_name = Name_Generator("pres_", time_info->get_index());
+      cur_pres->WriteBinary(sol_name.c_str());
 
+      std::string sol_dot_name = Name_dot_Generator("disp_", time_info->get_index());
+      cur_dot_disp->WriteBinary(sol_dot_name.c_str());
 
+      sol_dot_name = Name_dot_Generator("velo_", time_info->get_index());
+      cur_dot_velo->WriteBinary(sol_dot_name.c_str());
 
+      sol_dot_name = Name_dot_Generator("pres_", time_info->get_index());
+      cur_dot_pres->WriteBinary(sol_dot_name.c_str());
+    }
 
+    pre_dot_disp -> Copy( cur_dot_disp );
+    pre_dot_velo -> Copy( cur_dot_velo );
+    pre_dot_pres -> Copy( cur_dot_pres );
 
+    pre_disp -> Copy( cur_disp );
+    pre_velo -> Copy( cur_velo );
+    pre_pres -> Copy( cur_pres );
+  }
 
+  delete pre_dot_disp; delete pre_dot_velo; delete pre_dot_pres;
+  delete pre_disp; delete pre_velo; delete pre_pres;
 
+  delete cur_dot_disp; delete cur_dot_velo; delete cur_dot_pres;
+  delete cur_disp; delete cur_velo; delete cur_pres;
+}
 
 void PTime_FSI_Solver::Nullify_solid_dof( const APart_Node * const &pnode,
     const int &in_dof, PDNSolution * const &sol ) const
