@@ -229,13 +229,14 @@ void PGAssem_Wall_Prestress::NatBC_G( const double &curr_time,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_NodalBC * const &nbc_v,
-    const ALocal_EBC * const &ebc_part )  
+    const ALocal_EBC * const &ebc_v,
+    const ALocal_EBC * const &ebc_p ) 
 {
   SYS_T::print_fatal_if( num_ebc != 1, "Error: there are more than 1 ebc surfaces.\n");
   
   const int ebc_id = 0;
 
-  const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+  const int num_sele = ebc_v -> get_num_local_cell(ebc_id);
 
   const std::vector<double> array_p = pres -> GetLocalArray();
 
@@ -247,18 +248,19 @@ void PGAssem_Wall_Prestress::NatBC_G( const double &curr_time,
 
   for(int ee=0; ee<num_sele; ++ee)
   {
-    const std::vector<int> LSIEN = ebc_part -> get_SIEN(ebc_id, ee);
-    ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+    const std::vector<int> LSIEN_v = ebc_v -> get_SIEN(ebc_id, ee);
+    const std::vector<int> LSIEN_p = ebc_p -> get_SIEN(ebc_id, ee);
+    ebc_v -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
-    const std::vector<double> local_p = GetLocal( array_p, LSIEN, snLocBas, 1 );
+    const std::vector<double> local_p = GetLocal( array_p, LSIEN_p, snLocBas, 1 );
 
     lassem_s_ptr -> Assem_Residual_Interior_Wall_EBC( curr_time, &local_p[0], element_s, sctrl_x, sctrl_y, sctrl_z, quad_s );
 
     for(int ii=0; ii<snLocBas; ++ii)
     {
-      srow_index[3*ii+0] = nbc_v -> get_LID(0, LSIEN[ii]);
-      srow_index[3*ii+1] = nbc_v -> get_LID(1, LSIEN[ii]);
-      srow_index[3*ii+2] = nbc_v -> get_LID(2, LSIEN[ii]);
+      srow_index[3*ii+0] = nbc_v -> get_LID(0, LSIEN_v[ii]);
+      srow_index[3*ii+1] = nbc_v -> get_LID(1, LSIEN_v[ii]);
+      srow_index[3*ii+2] = nbc_v -> get_LID(2, LSIEN_v[ii]);
     }
 
     VecSetValues(G, 3*snLocBas, srow_index, lassem_s_ptr->sur_Residual0, ADD_VALUES);
@@ -289,7 +291,8 @@ void PGAssem_Wall_Prestress::Assem_residual(
     const FEANode * const &fnode_ptr,
     const ALocal_NodalBC * const &nbc_v,
     const ALocal_NodalBC * const &nbc_p,
-    const ALocal_EBC * const &ebc_part,
+    const ALocal_EBC * const &ebc_v,
+    const ALocal_EBC * const &ebc_p,
     const Prestress_solid * const &ps_ptr )
 {
   const int nElem = alelem_ptr->get_nlocalele();
@@ -352,7 +355,7 @@ void PGAssem_Wall_Prestress::Assem_residual(
   delete [] row_id_v; delete [] row_id_p;
   row_id_v = nullptr; row_id_p = nullptr;
 
-  NatBC_G( curr_time, pres, lassem_s_ptr, elements, quad_s, nbc_v, ebc_part );
+  NatBC_G( curr_time, pres, lassem_s_ptr, elements, quad_s, nbc_v, ebc_v, ebc_p );
   
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 
@@ -381,7 +384,8 @@ void PGAssem_Wall_Prestress::Assem_tangent_residual(
     const FEANode * const &fnode_ptr,
     const ALocal_NodalBC * const &nbc_v,
     const ALocal_NodalBC * const &nbc_p,
-    const ALocal_EBC * const &ebc_part,
+    const ALocal_EBC * const &ebc_v,
+    const ALocal_EBC * const &ebc_p,
     const Prestress_solid * const &ps_ptr )
 {
   const int nElem = alelem_ptr->get_nlocalele();
@@ -453,7 +457,7 @@ void PGAssem_Wall_Prestress::Assem_tangent_residual(
   delete [] row_id_v; delete [] row_id_p;
   row_id_v = nullptr; row_id_p = nullptr;
 
-  NatBC_G( curr_time, pres, lassem_s_ptr, elements, quad_s, nbc_v, ebc_part );
+  NatBC_G( curr_time, pres, lassem_s_ptr, elements, quad_s, nbc_v, ebc_v, ebc_p );
 
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 

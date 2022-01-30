@@ -10,34 +10,16 @@
 #include "APart_Basic_Info.hpp"
 #include "APart_Node_FSI.hpp"
 #include "ALocal_Elem.hpp"
-
-
-#include "ALocal_EBC_outflow.hpp"
+#include "PGAssem_Wall_Prestress.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
 #include "FEAElement_Triangle3_3D_der0.hpp"
 #include "FEAElement_Tet4.hpp"
-#include "CVFlowRate_Unsteady.hpp"
-#include "CVFlowRate_Linear2Steady.hpp"
-#include "CVFlowRate_Steady.hpp"
-#include "GenBC_Resistance.hpp"
-#include "GenBC_RCR.hpp"
-#include "GenBC_Inductance.hpp"
-#include "GenBC_Coronary.hpp"
-#include "GenBC_Pressure.hpp"
 #include "MaterialModel_NeoHookean_M94_Mixed.hpp"
 #include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
-#include "PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha.hpp"
 #include "PLocAssem_2x2Block_Tet4_VMS_Incompressible.hpp"
 #include "PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity.hpp"
-#include "PLocAssem_Tet4_FSI_Mesh_Elastostatic.hpp"
-#include "PLocAssem_Tet4_FSI_Mesh_Laplacian.hpp"
-#include "PGAssem_FSI.hpp"
-#include "PGAssem_Mesh.hpp"
 #include "PTime_FSI_Solver.hpp"
-
-#include "PDNTimeStep.hpp"
-#include "PETSc_Tools.hpp"
 
 int main( int argc, char *argv[] )
 {
@@ -57,12 +39,12 @@ int main( int argc, char *argv[] )
   double prestress_disp_tol = 1.0e-6;
 
   // Nonlinear solver parameters
-  double nl_rtol = 1.0e-3;           // convergence criterion relative tolerance
-  double nl_atol = 1.0e-6;           // convergence criterion absolute tolerance
-  double nl_dtol = 1.0e3;            // divergence criterion
-  int    nl_maxits = 20;             // maximum number if nonlinear iterations
-  int    nl_refreq = 4;              // frequency of tangent matrix renewal
-  int    nl_threshold = 4;           // threshold of tangent matrix renewal
+  double nl_rtol    = 1.0e-3;        // convergence criterion relative tolerance
+  double nl_atol    = 1.0e-6;        // convergence criterion absolute tolerance
+  double nl_dtol    = 1.0e3;         // divergence criterion
+  int    nl_maxits  = 20;            // maximum number if nonlinear iterations
+  int    nl_refreq  = 4;             // frequency of tangent matrix renewal
+  int    nl_rethred = 4;             // threshold of tangent matrix renewal
 
   // Time stepping parameters
   double initial_time = 0.0;         // time of initial condition
@@ -127,7 +109,7 @@ int main( int argc, char *argv[] )
   SYS_T::GetOptionReal(  "-nl_dtol",             nl_dtol);
   SYS_T::GetOptionInt(   "-nl_maxits",           nl_maxits);
   SYS_T::GetOptionInt(   "-nl_refreq",           nl_refreq);
-  SYS_T::GetOptionInt(   "-nl_threshold",        nl_threshold);
+  SYS_T::GetOptionInt(   "-nl_rethred",          nl_rethred);
   SYS_T::GetOptionBool(  "-is_backward_Euler",   is_backward_Euler);
   SYS_T::GetOptionReal(  "-init_time",           initial_time);
   SYS_T::GetOptionReal(  "-fina_time",           final_time);
@@ -146,7 +128,7 @@ int main( int argc, char *argv[] )
   SYS_T::cmdPrint(       "-nl_dtol:",            nl_dtol);
   SYS_T::cmdPrint(       "-nl_maxits:",          nl_maxits);
   SYS_T::cmdPrint(       "-nl_refreq:",          nl_refreq);
-  SYS_T::cmdPrint(       "-nl_threshold:",       nl_threshold);
+  SYS_T::cmdPrint(       "-nl_rethred",          nl_rethred);
 
   if( is_backward_Euler )
     SYS_T::commPrint(    "-is_backward_Euler: true \n");
@@ -181,17 +163,13 @@ int main( int argc, char *argv[] )
 
   APart_Node * pNode_p = new APart_Node_FSI(part_p_file, rank);
 
-  ALocal_EBC * locebc_v = new ALocal_EBC_outflow(part_v_file, rank);
+  ALocal_EBC * locebc_v = new ALocal_EBC(part_v_file, rank);
 
   ALocal_EBC * locebc_p = new ALocal_EBC( part_p_file, rank );
-
-  ALocal_EBC * mesh_locebc = new ALocal_EBC(part_v_file, rank, "/mesh_ebc");  
 
   ALocal_NodalBC * locnbc_v = new ALocal_NodalBC(part_v_file, rank, "/nbc/MF");
 
   ALocal_NodalBC * locnbc_p = new ALocal_NodalBC(part_p_file, rank, "/nbc/MF");
-
-  ALocal_NodalBC * mesh_locnbc = new ALocal_NodalBC(part_v_file, rank, "/mesh_nbc/MF");
 
   Prestress_solid * ps_data = new Prestress_solid(locElem, nqp_tet, rank, is_load_ps, "prestress");  
 
@@ -203,8 +181,6 @@ int main( int argc, char *argv[] )
   std::vector<ALocal_NodalBC *> locnbc_list { locnbc_v, locnbc_p };
 
   std::vector<APart_Node *> pNode_m_list { pNode_v };
-
-  std::vector<ALocal_NodalBC *> locnbc_m_list { mesh_locnbc };
 
   // ===== Basic Checking =====
   SYS_T::print_fatal_if( size!= PartBasic->get_cpu_size(),
@@ -245,9 +221,6 @@ int main( int argc, char *argv[] )
   // ===== Generate a sparse matrix for strong enforcement of essential BC
   Matrix_PETSc * pmat = new Matrix_PETSc( idx_v_len + idx_p_len );
   pmat -> gen_perm_bc( pNode_list, locnbc_list );
-
-  Matrix_PETSc * mmat = new Matrix_PETSc( pNode_v -> get_nlocalnode() * pNode_v -> get_dof() );
-  mmat -> gen_perm_bc( pNode_m_list, locnbc_m_list );
 
   // ===== Generate the generalized-alpha method
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
@@ -315,6 +288,38 @@ int main( int argc, char *argv[] )
 
   // ===== Time step info =====
   PDNTimeStep * timeinfo = new PDNTimeStep(initial_index, initial_time, initial_step);
+
+  // ===== Global assembly routine =====
+  SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
+  IPGAssem * gloAssem_ptr = new PGAssem_Wall_Prestress( locAssem_solid_ptr, locElem, 
+      locIEN_v, locIEN_p, pNode_v, pNode_p, locnbc_v, locnbc_p, locebc_v, nz_estimate );
+
+  SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
+  gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_solid_ptr, locIEN_v, locIEN_p, 
+      locnbc_v, locnbc_p );
+
+  SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
+  gloAssem_ptr->Fix_nonzero_err_str();
+  gloAssem_ptr->Clear_KG();
+
+  // ===== Linear and nonlinear solver context =====
+  PLinear_Solver_PETSc * lsolver = new PLinear_Solver_PETSc();
+
+  PC upc; lsolver->GetPC(&upc);
+  PCFieldSplitSetIS(upc, "u", is_velo);
+  PCFieldSplitSetIS(upc, "p", is_pres);
+
+  // ===== Nonlinear solver context =====
+  PNonlinear_FSI_Solver * nsolver = new PNonlinear_FSI_Solver(
+      nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_rethred);
+  SYS_T::commPrint("===> Nonlinear solver setted up:\n");
+  nsolver->print_info();
+
+  // ===== Temporal solver context =====
+  PTime_FSI_Solver * tsolver = new PTime_FSI_Solver( sol_bName,
+      sol_record_freq, ttan_renew_freq, final_time );
+  SYS_T::commPrint("===> Time marching solver setted up:\n");
+  tsolver->print_info();
 
 
 

@@ -209,6 +209,7 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-nl_dtol:", nl_dtol);
   SYS_T::cmdPrint("-nl_maxits:", nl_maxits);
   SYS_T::cmdPrint("-nl_refreq:", nl_refreq);
+  SYS_T::cmdPrint("-nl_rethred", nl_rethred);
   SYS_T::cmdPrint("-init_time:", initial_time);
   SYS_T::cmdPrint("-init_step:", initial_step);
   SYS_T::cmdPrint("-init_index:", initial_index);

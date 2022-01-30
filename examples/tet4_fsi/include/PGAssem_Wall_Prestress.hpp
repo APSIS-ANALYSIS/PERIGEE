@@ -55,7 +55,8 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NodalBC * const &nbc_v,
         const ALocal_NodalBC * const &nbc_p,
-        const ALocal_EBC * const &ebc_part,
+        const ALocal_EBC * const &ebc_v,
+        const ALocal_EBC * const &ebc_p,
         const Prestress_solid * const &ps_ptr );
 
     virtual void Assem_tangent_residual(
@@ -78,7 +79,8 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NodalBC * const &nbc_v,
         const ALocal_NodalBC * const &nbc_p,
-        const ALocal_EBC * const &ebc_part,
+        const ALocal_EBC * const &ebc_v,
+        const ALocal_EBC * const &ebc_p,
         const Prestress_solid * const &ps_ptr );
 
     virtual void Update_Wall_Prestress(
@@ -104,7 +106,8 @@ class PGAssem_Wall_Prestress : public IPGAssem
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const ALocal_NodalBC * const &nbc_v,
-        const ALocal_EBC * const &ebc_part );
+        const ALocal_EBC * const &ebc_v,
+        const ALocal_EBC * const &ebc_p );
 
     std::vector<double> GetLocal( const std::vector<double> &array,
         const std::vector<int> &IEN, const int &in_locbas, const int &in_dof ) const
