@@ -291,7 +291,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     dot_disp_alpha -> PlusAX( dot_disp, alpha_m );
 
     // Assemble residual & tangent
-    if( nl_counter % nrenew_freq == 0 || nl_counter >= 4 )
+    if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_thred )
     {
       gassem_ptr -> Clear_KG();
 
@@ -337,7 +337,9 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
 
   VecDestroy(&sol_vp);
   VecDestroy(&sol_mesh);
-  delete Delta_dot_disp;
+  delete Delta_dot_disp; 
+  delete dot_disp_alpha; delete dot_velo_alpha; delete dot_pres_alpha;
+  delete disp_alpha; delete velo_alpha; delete pres_alpha;
 }
 
 void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
@@ -369,7 +371,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
     FEAElement * const &elements,
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
-    const Prestress_solid * const &ps_ptr,
+    Prestress_solid * const &ps_ptr,
     IPLocAssem_2x2Block * const &lassem_solid_ptr,
     IPGAssem * const &gassem_ptr,
     PLinear_Solver_PETSc * const &lsolver_ptr,
@@ -500,7 +502,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
     VecRestoreSubVector(sol_vp, is_p, &sol_p);
 
     // Assemble residual & tangent
-    if( nl_counter % nrenew_freq == 0 || nl_counter >= 4 )
+    if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_thred )
     {
       gassem_ptr -> Clear_KG();
 
@@ -552,6 +554,8 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
   Print_convergence_info(nl_counter, relative_error, residual_norm);
   VecDestroy(&sol_vp);
   delete Delta_dot_disp;
+  delete dot_disp_alpha; delete dot_velo_alpha; delete dot_pres_alpha;
+  delete disp_alpha; delete velo_alpha; delete pres_alpha;
 }
 
 // EOF

@@ -108,7 +108,7 @@ class PNonlinear_FSI_Solver
         FEAElement * const &elements,
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
-        const Prestress_solid * const &ps_ptr,
+        Prestress_solid * const &ps_ptr,
         IPLocAssem_2x2Block * const &lassem_solid_ptr,
         IPGAssem * const &gassem_ptr,
         PLinear_Solver_PETSc * const &lsolver_ptr,
