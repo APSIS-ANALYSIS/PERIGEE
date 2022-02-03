@@ -112,9 +112,12 @@ void PGAssem_Wall_Prestress::Assem_nonzero_estimate(
 
   delete [] row_id_v; row_id_v = nullptr; delete [] row_id_p; row_id_p = nullptr;
 
+  VecAssemblyBegin(G); VecAssemblyEnd(G);
+
   EssBC_KG( nbc_v, nbc_p );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY); MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
+  VecAssemblyBegin(G); VecAssemblyEnd(G);
 }
 
 void PGAssem_Wall_Prestress::EssBC_KG( const ALocal_NodalBC * const &nbc_v, 
@@ -232,7 +235,7 @@ void PGAssem_Wall_Prestress::NatBC_G( const double &curr_time,
     const ALocal_EBC * const &ebc_v,
     const ALocal_EBC * const &ebc_p ) 
 {
-  SYS_T::print_fatal_if( num_ebc != 1, "Error: there are more than 1 ebc surfaces.\n");
+  SYS_T::print_fatal_if( num_ebc != 1, "Error: PGAssem_Wall_Prestress, there are more than 1 ebc surfaces.\n");
   
   const int ebc_id = 0;
 

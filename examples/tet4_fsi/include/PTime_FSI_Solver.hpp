@@ -63,7 +63,7 @@ class PTime_FSI_Solver
         IPGAssem * const &gassem_mesh_ptr,
         PLinear_Solver_PETSc * const &lsolver_ptr,
         PLinear_Solver_PETSc * const &lsolver_mesh_ptr,
-        PNonlinear_FSI_Solver * const &nsolver_ptr ) const;
+        const PNonlinear_FSI_Solver * const &nsolver_ptr ) const;
 
     void TM_FSI_Prestress(
         const bool &is_record_sol_flag,
@@ -97,7 +97,7 @@ class PTime_FSI_Solver
         IPLocAssem_2x2Block * const &lassem_solid_ptr,
         IPGAssem * const &gassem_ptr,
         PLinear_Solver_PETSc * const &lsolver_ptr,
-        PNonlinear_FSI_Solver * const &nsolver_ptr ) const;
+        const PNonlinear_FSI_Solver * const &nsolver_ptr ) const;
 
   private:
     const double final_time;

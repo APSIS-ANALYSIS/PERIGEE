@@ -110,7 +110,7 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     IPGAssem * const &gassem_mesh_ptr,
     PLinear_Solver_PETSc * const &lsolver_ptr,
     PLinear_Solver_PETSc * const &lsolver_mesh_ptr,
-    PNonlinear_FSI_Solver * const &nsolver_ptr ) const
+    const PNonlinear_FSI_Solver * const &nsolver_ptr ) const
 {
   PDNSolution * pre_dot_disp = new PDNSolution( init_dot_disp );
   PDNSolution * pre_dot_velo = new PDNSolution( init_dot_velo );
@@ -317,7 +317,7 @@ void PTime_FSI_Solver::TM_FSI_Prestress(
     IPLocAssem_2x2Block * const &lassem_solid_ptr,
     IPGAssem * const &gassem_ptr,
     PLinear_Solver_PETSc * const &lsolver_ptr,
-    PNonlinear_FSI_Solver * const &nsolver_ptr ) const
+    const PNonlinear_FSI_Solver * const &nsolver_ptr ) const
 {
   PDNSolution * pre_dot_disp = new PDNSolution( init_dot_disp );
   PDNSolution * pre_dot_velo = new PDNSolution( init_dot_velo );
