@@ -9,7 +9,6 @@
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
 #include "APart_Node_FSI.hpp"
-#include "ALocal_Elem.hpp"
 #include "PGAssem_Wall_Prestress.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
@@ -62,9 +61,9 @@ int main( int argc, char *argv[] )
 
   HDF5_Reader * cmd_h5r = new HDF5_Reader( solver_cmd_file );
 
-  const int nqp_tet       = cmd_h5r -> read_intScalar(    "/", "nqp_tet");
-  const int nqp_tri       = cmd_h5r -> read_intScalar(    "/", "nqp_tri");
-  const double sl_nu      = cmd_h5r -> read_doubleScalar( "/", "sl_nu");
+  const int nqp_tet  = cmd_h5r -> read_intScalar(    "/", "nqp_tet");
+  const int nqp_tri  = cmd_h5r -> read_intScalar(    "/", "nqp_tri");
+  const double sl_nu = cmd_h5r -> read_doubleScalar( "/", "sl_nu");
 
   delete cmd_h5r; H5Fclose(solver_cmd_file);
 
@@ -73,7 +72,7 @@ int main( int argc, char *argv[] )
 
   const std::string part_v_file = pcmd_h5r -> read_string(    "/", "part_file_v" );
   const std::string part_p_file = pcmd_h5r -> read_string(    "/", "part_file_p" );
-  const int fsiBC_type        = pcmd_h5r -> read_intScalar( "/", "fsiBC_type" );
+  const int fsiBC_type          = pcmd_h5r -> read_intScalar( "/", "fsiBC_type" );
 
   delete pcmd_h5r; H5Fclose(prepcmd_file);
 
@@ -83,10 +82,11 @@ int main( int argc, char *argv[] )
   const PetscMPIInt rank = SYS_T::get_MPI_rank();
   const PetscMPIInt size = SYS_T::get_MPI_size();
 
+  // Assert that the fsiBC type is 2, which clamped the lumen nodes
   SYS_T::print_fatal_if( fsiBC_type != 2, "Error: fsiBC_type should be 2.\n" );
 
   // Clean potentially pre-existing hdf5 files of prestress saved in the folder
-  // named as prestress
+  // named as ps_data
   if(rank == 0 )
   {
     if( SYS_T::directory_exist("ps_data") )
@@ -97,6 +97,8 @@ int main( int argc, char *argv[] )
 
     SYS_T::execute("mkdir ps_data");
   }
+
+  const std::string ps_file_name("./ps_data/prestress");
 
   SYS_T::GetOptionString("-restart_velo_name",   restart_velo_name);
   SYS_T::GetOptionString("-restart_pres_name",   restart_pres_name);
@@ -169,7 +171,7 @@ int main( int argc, char *argv[] )
 
   ALocal_NodalBC * locnbc_p = new ALocal_NodalBC(part_p_file, rank, "/nbc/MF");
 
-  Prestress_solid * ps_data = new Prestress_solid(locElem, nqp_tet, rank, is_load_ps, "./ps_data/prestress");  
+  Prestress_solid * ps_data = new Prestress_solid(locElem, nqp_tet, rank, is_load_ps, ps_file_name);  
   SYS_T::commPrint("===> Mesh HDF5 files are read from disk.\n");
 
   // Group APart_Node and ALocal_NodalBC into a vector
@@ -329,14 +331,16 @@ int main( int argc, char *argv[] )
   // ===== Record the wall prestress to h5 file =====
   ps_data -> write_prestress_hdf5();
 
+  // ==========================================================================
   // Clean the memory
   delete fNode; delete locIEN_v; delete locIEN_p; delete PartBasic; delete locElem;
-  delete pNode_v; delete pNode_p; delete locebc_v; delete locebc_p; delete locnbc_v; delete locnbc_p;
+  delete pNode_v; delete pNode_p; delete locebc_v; delete locebc_p; 
+  delete locnbc_v; delete locnbc_p;
   delete ps_data; delete quadv; delete quads; delete elementv; delete elements;
   delete pmat; delete tm_galpha_ptr; delete matmodel; delete locAssem_solid_ptr;
   delete velo; delete disp; delete pres; delete dot_velo; delete dot_disp; delete dot_pres;
   delete timeinfo; delete gloAssem_ptr; delete lsolver; delete nsolver; delete tsolver;
-
+  ISDestroy(&is_velo); ISDestroy(&is_pres);
   PetscFinalize();
   return EXIT_SUCCESS;
 }
