@@ -383,6 +383,7 @@ void PTime_FSI_Solver::TM_FSI_Prestress(
         time_info->get_time(), time_info->get_step(), time_info->get_index(),
         SYS_T::get_time().c_str() );
 
+    // Record the solution under prestress generation, if meets criteria
     if( is_record_sol_flag && time_info->get_index()%sol_record_freq == 0)
     {
       std::string sol_name = Name_Generator("disp_", time_info->get_index());

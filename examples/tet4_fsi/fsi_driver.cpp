@@ -296,7 +296,7 @@ int main(int argc, char *argv[])
 
   ALocal_EBC * mesh_locebc = new ALocal_EBC(part_v_file, rank, "/mesh_ebc");
 
-  Prestress_solid * ps_data = new Prestress_solid(locElem, nqp_tet, rank, is_load_ps, "prestress");
+  Prestress_solid * ps_data = new Prestress_solid(locElem, nqp_tet, rank, is_load_ps, "./ps_data/prestress");
 
   // Group APart_Node and ALocal_NodalBC into a vector
   std::vector<APart_Node *> pNode_list { pNode_v, pNode_p };

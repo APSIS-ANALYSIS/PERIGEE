@@ -89,13 +89,13 @@ int main( int argc, char *argv[] )
   // named as prestress
   if(rank == 0 )
   {
-    if( SYS_T::directory_exist("prestress") )
+    if( SYS_T::directory_exist("ps_data") )
     {
-      std::cout<<"Clean the folder prestress.\n";
-      SYS_T::execute("rm -rf prestress");
+      std::cout<<"Clean the folder ps_data.\n";
+      SYS_T::execute("rm -rf ps_data");
     }
 
-    SYS_T::execute("mkdir prestress");
+    SYS_T::execute("mkdir ps_data");
   }
 
   SYS_T::GetOptionString("-restart_velo_name",   restart_velo_name);
@@ -169,8 +169,7 @@ int main( int argc, char *argv[] )
 
   ALocal_NodalBC * locnbc_p = new ALocal_NodalBC(part_p_file, rank, "/nbc/MF");
 
-  Prestress_solid * ps_data = new Prestress_solid(locElem, nqp_tet, rank, is_load_ps, "prestress");  
-
+  Prestress_solid * ps_data = new Prestress_solid(locElem, nqp_tet, rank, is_load_ps, "./ps_data/prestress");  
   SYS_T::commPrint("===> Mesh HDF5 files are read from disk.\n");
 
   // Group APart_Node and ALocal_NodalBC into a vector
@@ -233,7 +232,7 @@ int main( int argc, char *argv[] )
   tm_galpha_ptr->print_info();
 
   // ===== Local assembly =====
-  IMaterialModel * matmodel       = nullptr;
+  IMaterialModel * matmodel = nullptr;
   IPLocAssem_2x2Block * locAssem_solid_ptr = nullptr;
 
   if( sl_nu == 0.5 )
@@ -326,6 +325,9 @@ int main( int argc, char *argv[] )
       timeinfo, locElem, locIEN_v, locIEN_p, pNode_v, pNode_p, fNode,
       locnbc_v, locnbc_p, locebc_v, locebc_p, pmat, elementv, elements,
       quadv, quads, ps_data, locAssem_solid_ptr, gloAssem_ptr, lsolver, nsolver );
+
+  // ===== Record the wall prestress to h5 file =====
+  ps_data -> write_prestress_hdf5();
 
   // Clean the memory
   delete fNode; delete locIEN_v; delete locIEN_p; delete PartBasic; delete locElem;
