@@ -98,6 +98,8 @@ int main( int argc, char *argv[] )
     SYS_T::execute("mkdir ps_data");
   }
 
+  MPI_Barrier(PETSC_COMM_WORLD);
+
   const std::string ps_file_name("./ps_data/prestress");
 
   SYS_T::GetOptionString("-restart_velo_name",   restart_velo_name);
@@ -147,6 +149,20 @@ int main( int argc, char *argv[] )
     SYS_T::cmdPrint(     "-sol_rec_freq:",       sol_record_freq);
   else
     SYS_T::commPrint(    "-is_record_sol: false \n");
+
+  // ====== Record important parameters ======
+  if(rank == 0)
+  {
+    hid_t cmd_file_id = H5Fcreate("wall_ps_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+    HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
+    
+    cmdh5w -> write_string(      "ps_file_name",       ps_file_name);
+    cmdh5w -> write_doubleScalar("prestress_disp_tol", prestress_disp_tol );
+
+    delete cmdh5w; H5Fclose(cmd_file_id);
+  }
+
+  MPI_Barrier(PETSC_COMM_WORLD);
 
   // ====== Data for Analysis ======
   FEANode * fNode = new FEANode(part_v_file, rank);
