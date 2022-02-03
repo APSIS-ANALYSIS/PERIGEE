@@ -463,6 +463,8 @@ void PGAssem_Wall_Prestress::Assem_Tangent_Residual(
 
   EssBC_KG( nbc_v, nbc_p );
 
+  MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
+  MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 }
 
