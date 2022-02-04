@@ -88,8 +88,7 @@ PGAssem_Seg_FEM::PGAssem_Seg_FEM( IPLocAssem * const &locassem_ptr,
   for(int ii=0; ii<nlgn*dof_sol; ++ii) array_b[ii] = 0.0;
 
   // Now we run a nonzero estimate
-  Assem_nonzero_estimate( alelem_ptr, locassem_ptr,
-      aien_ptr, pnode_ptr, part_nbc );
+  Assem_nonzero_estimate( alelem_ptr, locassem_ptr, aien_ptr, part_nbc );
 
   // Obtain the precise dnz and onz
   std::vector<int> Kdnz, Konz;
@@ -297,7 +296,6 @@ void PGAssem_Seg_FEM::Assem_nonzero_estimate(
     const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
     const ALocal_IEN * const &lien_ptr,
-    const APart_Node * const &node_ptr,
     const ALocal_NodalBC * const &nbc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();
@@ -343,7 +341,6 @@ void PGAssem_Seg_FEM::Assem_mass_residual(
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
-    const APart_Node * const &node_ptr,
     const FEANode * const &fnode_ptr,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
@@ -410,7 +407,6 @@ void PGAssem_Seg_FEM::Assem_residual(
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
-    const APart_Node * const &node_ptr,
     const FEANode * const &fnode_ptr,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
@@ -471,7 +467,6 @@ void PGAssem_Seg_FEM::Assem_tangent_residual(
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
-    const APart_Node * const &node_ptr,
     const FEANode * const &fnode_ptr,
     const ALocal_NodalBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )

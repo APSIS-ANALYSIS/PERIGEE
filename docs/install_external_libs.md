@@ -4,11 +4,11 @@
 [![made-with-bash](https://img.shields.io/badge/Made%20with-Bash-1f425f.svg)](https://www.gnu.org/software/bash/)
 ![GitHub](https://img.shields.io/github/license/ju-liu/PERIGEE)
 
-This is a guide for installing the VTK, PETSc, and related libraries, which are needed by the PERIGEE code. The default operating system is Linux Ubuntu. Installing these libraries on Mac OS may require minor changes in the following steps.
+This is a guide for installing the libraries that PERIGEE is dependent on. The default operating system is Linux Ubuntu. Installing these libraries on Mac OS requires minor changes in the following steps.
 
-In general, we do an out-of-source compiling, except for PETSc. We will have all the libraries installed in a specified location (in this guide, $HOME/lib). This is because we typically do not have the access to /usr/local in clusters. Essentially, this requires you to specify the install prefix in the configuration stage for each library build.
+You will have all the libraries installed in a specified location (in this guide, $HOME/lib). This is because one typically does not have an access to /usr/local in remote clusters. Roughly speaking, this requires you to specify the install prefix in the configuration stage for the build of each library.
 
-Some of the libraries are not required for building the code. Typically, we require one to have VTK, PETSc, HDF5, and METIS as minimum requirement.
+The four libraries VTK, PETSc, HDF5, and METIS are required for the build of PERIGEE. MPICH is needed for parallelization; Gmsh is often needed for mesh generation; SLEPc is needed for calculating eigenvalues; ParaView is used for visualization solution outputs.
 
 ## Table of Contents
 
@@ -25,7 +25,7 @@ Some of the libraries are not required for building the code. Typically, we requ
 - [Install ParaView](#Install-ParaView)
 
 ## Create a lib folder
-It is recommended to have all the libraries in a single lib folder. Now we create an empty folder in the $HOME director.
+It is recommended to have all the libraries in a single lib folder. We typically create an empty folder in the $HOME directory.
 
 ```sh
 $ cd $HOME
@@ -33,7 +33,7 @@ $ mkdir lib
 ```
 
 ## Install Valgrind
-The Valgrind is a software for detecting memory leaking errors. It is **not mandatory** for compiling the PERIGEE code. For example, we do not install it on clusters. It is just useful when one do code development. Install Valgrind can be very straightforward in Linux.
+The Valgrind is a software for detecting memory leaking errors. It is **not mandatory** for compiling the PERIGEE code. For example, we do not install it on clusters. It is just useful in code development. Installing Valgrind can be very straightforward in Linux.
 ```sh
 $ sudo apt install valgrind
 ```
@@ -43,11 +43,11 @@ $ valgrind ls -l
 ```
 to make sure it is working.
 
-Of course, for experienced users, you can download the Valgrind source file and install it in the lib folder. I do not intend to cover that in this guide.
+Of course, for experienced users, you can download the Valgrind source file and install it in the lib folder.
 
 
 ## Install CMake
-make 2>&1 | tee m.txtMake sure you have cmake installed in your system. In case you do not have one, do the following.
+Make sure you have cmake installed in your system. In case you do not have one, do the following.
 ```sh
 $ sudo apt-get install cmake
 ```
@@ -58,6 +58,7 @@ If you are using a cluster, cmake can be loaded by
 ```sh
 $ module load cmake
 ```
+
 ## Install MPICH
 First, download the source file, extract the tar bar, and rename the folder as a source folder:
 ```

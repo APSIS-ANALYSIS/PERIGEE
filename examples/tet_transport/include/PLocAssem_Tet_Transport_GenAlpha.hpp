@@ -93,10 +93,14 @@ class PLocAssem_Tet_Transport_GenAlpha : public IPLocAssem
     void print_info() const;
 
     double get_f( const double &x, const double &y, const double &z, 
-        const double &time ) const
+        const double &t ) const
     {
-      const double pi = MATH_T::PI;
-      return time*sin(pi*x)*sin(pi*y)*sin(pi*z)*( 3*kappa*time*pi*pi + 2*cap*rho );
+      //const double pi = MATH_T::PI;
+    
+      const double t3 = t*t*t;
+      const double t4 = t3 * t;
+
+      return 4*cap*rho*t3*x*y*z*(x - 1)*(y - 1)*(z - 1) - 2*kappa*t4*x*z*(x - 1)*(z - 1) - 2*kappa*t4*y*z*(y - 1)*(z - 1) - 2*kappa*t4*x*y*(x - 1)*(y - 1); 
     }
 
     typedef double ( PLocAssem_Tet_Transport_GenAlpha::*locassem_transport_funs )( const double &x, const double &y, const double &z, const double &t ) const;

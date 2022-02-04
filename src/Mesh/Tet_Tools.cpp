@@ -409,15 +409,13 @@ void TET_T::write_tet_grid( const std::string &filename,
 
   // nodal indices (natural numbering)
   std::vector<int> node_idx(numpts);
-  for(int ii=0; ii<numpts; ++ii)
-    node_idx[ii] = ii;
+  for(int ii=0; ii<numpts; ++ii) node_idx[ii] = ii;
 
   add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
 
   // cell indices (natural numbering)
   std::vector<int> elem_idx(numcels);
-  for(int ii=0; ii<numcels; ++ii)
-    elem_idx[ii] = ii;
+  for(int ii=0; ii<numcels; ++ii) elem_idx[ii] = ii;
 
   add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
 
@@ -469,15 +467,13 @@ void TET_T::write_tet_grid( const std::string &filename,
 
   // nodal indices (natural numbering)
   std::vector<int> node_idx(numpts);
-  for(int ii=0; ii<numpts; ++ii)
-    node_idx[ii] = ii;
+  for(int ii=0; ii<numpts; ++ii) node_idx[ii] = ii;
 
   add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
 
   // cell indices (natural numbering)
   std::vector<int> elem_idx(numcels);
-  for(int ii=0; ii<numcels; ++ii)
-    elem_idx[ii] = ii + start_cell_index;
+  for(int ii=0; ii<numcels; ++ii) elem_idx[ii] = ii + start_cell_index;
 
   add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
 

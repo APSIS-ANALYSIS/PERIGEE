@@ -32,7 +32,7 @@ void SV_T::update_sv_vtu( const std::string &filename,
 
   reader->Delete();
 
-  // Determine the starting indices
+  // Determine the starting indices as the minimum in nid / eid
   sv_node_start = *std::min_element( nid.begin(), nid.end() );
   sv_elem_start = *std::min_element( eid.begin(), eid.end() );
 
@@ -42,8 +42,7 @@ void SV_T::update_sv_vtu( const std::string &filename,
   fend.assign( fname.end()-4 , fname.end() );
 
   // If the last four is .vtu, remove them for TET_T::write_tet_grid 
-  if(fend.compare(".vtu") == 0)
-    fname.erase( fname.end()-4, fname.end() );
+  if(fend.compare(".vtu") == 0) fname.erase( fname.end()-4, fname.end() );
 
   TET_T::write_tet_grid(fname, nFunc, nElem, ctrlPts, vecIEN);
 }
