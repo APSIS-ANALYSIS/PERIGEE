@@ -117,6 +117,18 @@ class NodalBC_3D_inflow : public INodalBC
     virtual int get_global_cell(const int &nbc_id, const int &cell_idx) const
     {return global_cell[nbc_id][cell_idx];}
 
+    // For linear element (type 501), the face node numbering is
+    //   Tet-Face-0 : Node 1 2 3
+    //   Tet-Face-1 : Node 0 3 2
+    //   Tet-Face-2 : Node 0 1 3
+    //   Tet-Face-3 : Node 0 2 1
+    // For quadratic element (type 502), the face node numbering is
+    //   Tet-Face-0 : Node 1 2 3 5 9 8
+    //   Tet-Face-1 : Node 0 3 2 7 9 6
+    //   Tet-Face-2 : Node 0 1 3 4 8 7
+    //   Tet-Face-3 : Node 0 2 1 6 5 4
+    virtual void resetTriIEN_outwardnormal( const IIEN * const &VIEN );
+
   private:
     NodalBC_3D_inflow() : num_nbc(0) {};
 
@@ -130,8 +142,8 @@ class NodalBC_3D_inflow : public INodalBC
     std::vector<unsigned int> dir_nodes;
     unsigned int num_dir_nodes;
 
-    // number of inlet surfaces
-    const int num_nbc;
+    // number of inlet surfaces and element type
+    const int num_nbc, elem_type;
     
     // This is the area calculated by setting the wall nodes to be zero.
     // It is designed to compute the area to give a plug flow profile with

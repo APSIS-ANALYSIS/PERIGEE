@@ -3,7 +3,7 @@
 NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
     const std::string &wallfile, const int &nFunc,
     const Vector_3 &in_outnormal,
-    const int &elemtype ) : num_nbc( 1 )
+    const int &elemtype ) : num_nbc( 1 ), elem_type( elemtype )
 {
   const std::vector<std::string> inffileList { inffile };
   const std::vector<Vector_3> outnormalList { in_outnormal };
@@ -15,7 +15,8 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileLis
     const std::string &wallfile,
     const int &nFunc,
     const std::vector<Vector_3> &in_outnormal,
-    const int &elemtype ) : num_nbc( static_cast<int>( inffileList.size() ) )
+    const int &elemtype ) 
+: num_nbc( static_cast<int>( inffileList.size() ) ), elem_type( elemtype )
 {
   init( inffileList, wallfile, nFunc, in_outnormal, elemtype );
 }
@@ -267,6 +268,63 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
     std::cout<<"          outward normal is ["<<outnormal[ii](0)<<'\t'<<outnormal[ii](1)<<'\t'<<outnormal[ii](2)<<"]. \n";
     std::cout<<"          area is "<<face_area[ii]<<", and active area is "<<inf_active_area[ii]<<'\n';
   }
+}
+
+void NodalBC_3D_inflow::resetTriIEN_outwardnormal( const IIEN * const &VIEN )
+{
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 // EOF
