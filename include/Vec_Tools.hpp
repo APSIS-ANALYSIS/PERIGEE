@@ -214,7 +214,7 @@ namespace VEC_T
   //   Note: this file can be read by matlab and do various operations in
   //   matlab.
   // --------------------------------------------------------------------------
-  template<typename T> void write_txt( const char * const &file_name,
+  template<typename T> void write_txt( const std::string &file_name,
       const std::vector<T> &vec, const bool &wIdx=true, const unsigned int &pres=6 )
   {
     const std::streamsize ss = std::cout.precision();
