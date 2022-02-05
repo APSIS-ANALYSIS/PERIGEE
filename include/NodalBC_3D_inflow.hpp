@@ -130,7 +130,7 @@ class NodalBC_3D_inflow : public INodalBC
     virtual void resetTriIEN_outwardnormal( const IIEN * const &VIEN );
 
   private:
-    NodalBC_3D_inflow() : num_nbc(0) {};
+    NodalBC_3D_inflow() : num_nbc(0), elem_type(501) {};
 
     // The dirichlet nodes on each inlet surface
     // length num_nbc x num_dir_nodes_on_inlet[ii]
