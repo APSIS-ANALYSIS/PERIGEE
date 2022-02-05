@@ -96,14 +96,12 @@ ElemBC_3D::ElemBC_3D( const std::vector<int> &edge_idx,
   std::cout<<"     is generated. \n";
 }
 
-
 ElemBC_3D::~ElemBC_3D()
 {
   delete [] num_node; num_node = NULL;
   delete [] num_cell; num_cell = NULL;
   delete [] cell_nLocBas; cell_nLocBas = NULL;
 }
-
 
 void ElemBC_3D::print_info() const
 {
@@ -127,6 +125,5 @@ void ElemBC_3D::print_info() const
   }
   std::cout<<"========================= \n";
 }
-
 
 // EOF

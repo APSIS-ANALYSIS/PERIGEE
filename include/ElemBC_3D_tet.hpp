@@ -103,9 +103,7 @@ class ElemBC_3D_tet : public ElemBC
     {SYS_T::commPrint("Warning: write_vtk is not implemented. \n");}
 
   protected:
-    const int elem_type;
-     
-    const int num_ebc;
+    const int elem_type, num_ebc;
     
     int * num_node;     // length num_ebc
     int * num_cell;     // length num_ebc

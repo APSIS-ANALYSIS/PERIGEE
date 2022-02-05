@@ -121,39 +121,29 @@ void ElemBC_3D_tet::resetTriIEN_outwardnormal( const IIEN * const &VIEN )
   {
     for(int ebcid = 0; ebcid < num_ebc; ++ebcid)
     {
-      std::vector<int> node_t(3, 0); // triange node index in 2D mesh
-      std::vector<int> node_t_gi(3, 0); // triange node index in 3D mesh
-      std::vector<int> tet_n(4,0); // tet node index in 3D mesh
-
       TET_T::Tet4 * tetcell = new TET_T::Tet4();
 
       for(int ee=0; ee<num_cell[ebcid]; ++ee)
       {
         // Triangle mesh node index
-        node_t[0] = get_ien(ebcid, ee, 0);
-        node_t[1] = get_ien(ebcid, ee, 1);
-        node_t[2] = get_ien(ebcid, ee, 2);
+        const int node_t[3] { get_ien(ebcid, ee, 0), get_ien(ebcid, ee, 1), get_ien(ebcid, ee, 2) };
 
         // The triangle mesh node's volumetric index
-        node_t_gi[0] = get_global_node(ebcid, node_t[0]);
-        node_t_gi[1] = get_global_node(ebcid, node_t[1]);
-        node_t_gi[2] = get_global_node(ebcid, node_t[2]);
+        const int node_t_gi[3] { get_global_node(ebcid, node_t[0]), 
+          get_global_node(ebcid, node_t[1]), get_global_node(ebcid, node_t[2]) };
 
         // cell ee's global/volumetric index  
         const int cell_gi = get_global_cell(ebcid, ee);
 
         // tet mesh first four node's volumetric index
-        tet_n[0] = VIEN->get_IEN(cell_gi, 0);
-        tet_n[1] = VIEN->get_IEN(cell_gi, 1);
-        tet_n[2] = VIEN->get_IEN(cell_gi, 2);
-        tet_n[3] = VIEN->get_IEN(cell_gi, 3);
+        const int tet_n[4] { VIEN->get_IEN(cell_gi, 0), VIEN->get_IEN(cell_gi, 1),
+          VIEN->get_IEN(cell_gi, 2), VIEN->get_IEN(cell_gi, 3) };
 
         // build the tet object
         tetcell->reset(tet_n[0], tet_n[1], tet_n[2], tet_n[3]);
 
         // determine the face id for this triangle in the tet object 
-        const int tet_face_id = tetcell->get_face_id(node_t_gi[0], 
-            node_t_gi[1], node_t_gi[2]);
+        const int tet_face_id = tetcell->get_face_id(node_t_gi[0], node_t_gi[1], node_t_gi[2]);
 
         int pos0 = -1, pos1 = -1, pos2 = -1;
         switch( tet_face_id )

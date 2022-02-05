@@ -1232,21 +1232,15 @@ namespace TET_T
 
   int Tet4::get_face_id( const int &n0, const int &n1, const int &n2) const
   {
-    int temp[] = { n0, n1, n2 };
+    const int temp[3] { n0, n1, n2 };
 
-    int * it0, * it1, * it2, * it3;
+    const auto it0 = std::find(temp, temp+3, gindex[0]);
+    const auto it1 = std::find(temp, temp+3, gindex[1]);
+    const auto it2 = std::find(temp, temp+3, gindex[2]);
+    const auto it3 = std::find(temp, temp+3, gindex[3]);
 
-    it0 = std::find(temp, temp+3, gindex[0]);
-    it1 = std::find(temp, temp+3, gindex[1]);
-    it2 = std::find(temp, temp+3, gindex[2]);
-    it3 = std::find(temp, temp+3, gindex[3]);
-
-    // flgx is true if the node is found in temp
-    bool flg[4];
-    flg[0] = (it0 != temp+3);
-    flg[1] = (it1 != temp+3);
-    flg[2] = (it2 != temp+3);
-    flg[3] = (it3 != temp+3);
+    // flg is true if the node is found in temp
+    bool flg[4] { (it0 != temp+3), (it1 != temp+3), (it2 != temp+3), (it3 != temp+3) };
 
     int sum = flg[0] + flg[1] + flg[2] + flg[3];
 
