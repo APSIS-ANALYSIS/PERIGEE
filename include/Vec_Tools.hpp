@@ -30,7 +30,7 @@ namespace VEC_T
   //   print the vector with given precision pres 
   // --------------------------------------------------------------------------
   template<typename T> void print( const std::vector<T> &vec, 
-      const unsigned int pres, const char &sep = '\t' )
+      const unsigned int &pres, const char &sep = '\t' )
   {
     const std::streamsize ss = std::cout.precision();
     for( auto it = vec.begin(); it != vec.end(); ++it )

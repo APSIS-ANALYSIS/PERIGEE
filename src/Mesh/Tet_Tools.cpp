@@ -882,30 +882,21 @@ Vector_3 TET_T::get_out_normal( const std::string &file,
     TET_T::read_vtu_grid( file, numpts, numcels, pts, ien, gnode, gelem );
   else
     SYS_T::print_fatal("Error: get_out_normal unknown file type.\n");
-
-  std::vector<int> trn; trn.resize(3); 
-  trn[0] = gnode[ ien[0] ]; // triangle nodes' global indices
-  trn[1] = gnode[ ien[1] ];
-  trn[2] = gnode[ ien[2] ];
+  
+  // triangle nodes' global indices
+  const std::vector<int> trn = { gnode[ ien[0] ], gnode[ ien[1] ], gnode[ ien[2] ] };
 
   const int tete0 = gelem[0]; // triangle's associated tet element indices
 
   SYS_T::print_fatal_if(tete0 == -1, "Error: TET_T::get_out_normal requires the element indices for the vtp file.\n");
 
-  std::vector<int> ten; ten.resize(4);
-  ten[0] = vol_ien->get_IEN(tete0, 0);
-  ten[1] = vol_ien->get_IEN(tete0, 1);
-  ten[2] = vol_ien->get_IEN(tete0, 2);
-  ten[3] = vol_ien->get_IEN(tete0, 3);
-
-  bool gotnode[4];
+  const int ten[4] { vol_ien->get_IEN(tete0, 0), vol_ien->get_IEN(tete0, 1), 
+    vol_ien->get_IEN(tete0, 2), vol_ien->get_IEN(tete0, 3) };
 
   int inside_node = 0, node_check = 0;
   for(int ii=0; ii<4; ++ii)
   {
-    gotnode[ii] = VEC_T::is_invec( trn, ten[ii] );
-
-    if(!gotnode[ii]) inside_node = ten[ii];
+    if( !VEC_T::is_invec( trn, ten[ii] ) ) inside_node = ten[ii];
     else node_check += 1;
   }
 
