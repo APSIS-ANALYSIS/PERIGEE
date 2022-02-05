@@ -129,7 +129,7 @@ void ElemBC_3D_tet::resetTriIEN_outwardnormal( const IIEN * const &VIEN )
         const int node_t[3] { get_ien(ebcid, ee, 0), get_ien(ebcid, ee, 1), get_ien(ebcid, ee, 2) };
 
         // The triangle mesh node's volumetric index
-        const int node_t_gi[3] { get_global_node(ebcid, node_t[0]), 
+        const std::vector<int> node_t_gi = { get_global_node(ebcid, node_t[0]), 
           get_global_node(ebcid, node_t[1]), get_global_node(ebcid, node_t[2]) };
 
         // cell ee's global/volumetric index  
