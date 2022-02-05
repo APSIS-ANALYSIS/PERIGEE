@@ -406,6 +406,8 @@ int main( int argc, char * argv[] )
 
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_f_file_in, sur_f_file_wall, nFunc_v, inlet_outvec );
 
+  InFBC -> resetTriIEN_outwardnormal( IEN_v ); // assign outward orientation for triangles
+  
   // Physical ElemBC
   cout<<"4. Elem boundary for the implicit solver: \n";
   std::vector< Vector_3 > outlet_outvec( num_outlet );

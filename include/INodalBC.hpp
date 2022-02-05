@@ -14,6 +14,7 @@
 #include "Sys_Tools.hpp"
 #include "Vec_Tools.hpp"
 #include "Vector_3.hpp"
+#include "IIEN.hpp"
 
 class INodalBC
 {
@@ -258,7 +259,14 @@ class INodalBC
     // --------------------------------------------------------------
     virtual std::vector<double> get_rotation_matrix() const
     {SYS_T::commPrint("Warning: get_rotation_matrix is not implemented. \n"); return {};}
-  
+
+    // --------------------------------------------------------------
+    // Reset the triangle element's surface IEN so that the outward normal
+    // vector is defined.
+    // --------------------------------------------------------------
+    virtual void resetTriIEN_outwardnormal( const IIEN * const &VIEN )
+    {SYS_T::print_fatal("Warning: resetTriIEN_outwardnormal is not implemented. \n");}
+
   protected:
     std::vector<int> ID;
 
