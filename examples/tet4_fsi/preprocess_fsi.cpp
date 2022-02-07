@@ -15,6 +15,7 @@
 #include "Global_Part_Reload.hpp"
 #include "Part_Tet_FSI.hpp"
 #include "NodalBC_3D_FSI.hpp"
+#include "NodalBC_3D_vtp.hpp"
 #include "NodalBC_3D_vtu.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_tet_outflow.hpp"
@@ -382,10 +383,18 @@ int main( int argc, char * argv[] )
   // that in the velocity mesh.
   NBC_list_p[0] = new NodalBC_3D_FSI( geo_f_file, nFunc_p, fsiBC_type );
 
+  /*
   for( int ii=0; ii<3; ++ii )
     NBC_list_v[ii] = new NodalBC_3D_FSI( geo_f_file, geo_s_file, sur_f_file_wall, 
         sur_s_file_wall, sur_f_file_in, sur_f_file_out, sur_s_file_in, sur_s_file_out, 
         nFunc_v, ii, ringBC_type, fsiBC_type );
+  */
+
+  std::vector<std::string> dir_z_list = { sur_s_file_in[0], sur_s_file_out[0] };
+
+  NBC_list_v[0] = new NodalBC_3D_vtp( nFunc_v );
+  NBC_list_v[1] = new NodalBC_3D_vtp( nFunc_v );
+  NBC_list_v[2] = new NodalBC_3D_vtp( dir_z_list, nFunc_v );
 
   // Mesh solver NodalBC
   std::cout<<"2. Nodal boundary condition for the mesh motion: \n";
@@ -404,9 +413,9 @@ int main( int argc, char * argv[] )
   for(int ii=0; ii<num_inlet; ++ii)
     inlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_in[ii], ctrlPts, IEN_v );
 
-  INodalBC * InFBC = new NodalBC_3D_inflow( sur_f_file_in, sur_f_file_wall, nFunc_v, inlet_outvec );
+  //INodalBC * InFBC = nullptr; //new NodalBC_3D_inflow( sur_f_file_in, sur_f_file_wall, nFunc_v, inlet_outvec );
 
-  InFBC -> resetTriIEN_outwardnormal( IEN_v ); // assign outward orientation for triangles
+  //InFBC -> resetTriIEN_outwardnormal( IEN_v ); // assign outward orientation for triangles
   
   // Physical ElemBC
   cout<<"4. Elem boundary for the implicit solver: \n";
@@ -416,11 +425,17 @@ int main( int argc, char * argv[] )
     outlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_out[ii], ctrlPts, IEN_v );
 
   ElemBC * ebc = nullptr;
+
+  std::vector<std::string> ebclist = { sur_f_file_in[0], sur_f_file_out[0] }; 
+  ebc = new ElemBC_3D_tet( ebclist );
+
+  /*
   if( fsiBC_type == 0 || fsiBC_type == 1 )
     ebc = new ElemBC_3D_tet_outflow( sur_f_file_out, outlet_outvec );
   else if( fsiBC_type == 2 )
     ebc = new ElemBC_3D_tet( sur_s_file_interior_wall );
   else SYS_T::print_fatal("ERROR: uncognized fsiBC type. \n");
+  */
 
   ebc -> resetTriIEN_outwardnormal( IEN_v ); // assign outward orientation for triangles
 
@@ -467,8 +482,8 @@ int main( int argc, char * argv[] )
     NBC_Partition * mbcpart = new NBC_Partition_MF(part_v, mnindex_v, meshBC_list);
     mbcpart -> write_hdf5( part_file_v, "/mesh_nbc" );
 
-    NBC_Partition_inflow * infpart = new NBC_Partition_inflow_MF(part_v, mnindex_v, InFBC, mapper_v);
-    infpart->write_hdf5( part_file_v );
+    //NBC_Partition_inflow * infpart = new NBC_Partition_inflow_MF(part_v, mnindex_v, InFBC, mapper_v);
+    //infpart->write_hdf5( part_file_v );
 
     if( fsiBC_type == 0 || fsiBC_type == 1 )
     {
@@ -492,7 +507,9 @@ int main( int argc, char * argv[] )
     mebcpart-> write_hdf5( part_file_v, "/mesh_ebc" );
 
     delete part_p; delete part_v; delete nbcpart_p; delete nbcpart_v;
-    delete mbcpart; delete infpart; delete mebcpart; 
+    delete mbcpart; 
+    //delete infpart; 
+    delete mebcpart; 
   }
 
   // Clean up the memory
@@ -502,7 +519,8 @@ int main( int argc, char * argv[] )
 
   for(auto it_nbc=meshBC_list.begin(); it_nbc != meshBC_list.end(); ++it_nbc) delete *it_nbc;
 
-  delete ebc; delete InFBC; delete mesh_ebc; 
+  delete ebc; //delete InFBC; 
+  delete mesh_ebc; 
   delete mnindex_p; delete mnindex_v; delete mesh_p; delete mesh_v; 
   delete IEN_p; delete IEN_v; delete mytimer; delete global_part; 
   PetscFinalize();
