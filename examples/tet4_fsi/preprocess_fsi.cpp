@@ -485,19 +485,9 @@ int main( int argc, char * argv[] )
     //NBC_Partition_inflow * infpart = new NBC_Partition_inflow_MF(part_v, mnindex_v, InFBC, mapper_v);
     //infpart->write_hdf5( part_file_v );
 
-    if( fsiBC_type == 0 || fsiBC_type == 1 )
-    {
-      EBC_Partition_outflow_MF * ebcpart = new EBC_Partition_outflow_MF(part_v, mnindex_v, ebc, NBC_list_v, mapper_v);
-      ebcpart -> write_hdf5( part_file_v );
-      delete ebcpart;
-    }
-    else if( fsiBC_type == 2 )
-    {
-      EBC_Partition * ebcpart = new EBC_Partition( part_v, mnindex_v, ebc );
-      ebcpart -> write_hdf5( part_file_v );
-      delete ebcpart;
-    }
-    else SYS_T::print_fatal("ERROR: unrecognized fsiBC_type. \n");
+    EBC_Partition * ebcpart = new EBC_Partition( part_v, mnindex_v, ebc );
+    ebcpart -> write_hdf5( part_file_v );
+    delete ebcpart;
 
     EBC_Partition * ebcpart_p = new EBC_Partition( part_p, mnindex_p, ebc );
     ebcpart_p -> write_hdf5( part_file_p );
@@ -514,7 +504,7 @@ int main( int argc, char * argv[] )
 
   // Clean up the memory
   for(auto it_nbc=NBC_list_v.begin(); it_nbc != NBC_list_v.end(); ++it_nbc) delete *it_nbc;
-  
+
   for(auto it_nbc=NBC_list_p.begin(); it_nbc != NBC_list_p.end(); ++it_nbc) delete *it_nbc;
 
   for(auto it_nbc=meshBC_list.begin(); it_nbc != meshBC_list.end(); ++it_nbc) delete *it_nbc;

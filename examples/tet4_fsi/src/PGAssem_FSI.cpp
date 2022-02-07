@@ -141,11 +141,11 @@ void PGAssem_FSI::Assem_nonzero_estimate(
   delete [] row_id_v; row_id_v = nullptr; delete [] row_id_p; row_id_p = nullptr;
 
   // Resis BC for K and G
-  PDNSolution * temp = new PDNSolution_V( pnode_v, 0, false, "aux" );
+  //PDNSolution * temp = new PDNSolution_V( pnode_v, 0, false, "aux" );
 
-  NatBC_Resis_KG( 0.1, 0.1, temp, temp, temp, lassem_f_ptr, elements, quad_s,nbc_v, ebc_part, gbc );
+  //NatBC_Resis_KG( 0.1, 0.1, temp, temp, temp, lassem_f_ptr, elements, quad_s,nbc_v, ebc_part, gbc );
 
-  delete temp; temp = nullptr;
+  //delete temp; temp = nullptr;
 
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 
@@ -347,12 +347,14 @@ void PGAssem_FSI::Assem_Residual(
   row_id_v = nullptr; row_id_p = nullptr;
 
   // Backflow stabilization
-  BackFlow_G( dot_disp, disp, velo, lassem_f_ptr, elements, quad_s, nbc_v, ebc_part );
+  //BackFlow_G( dot_disp, disp, velo, lassem_f_ptr, elements, quad_s, nbc_v, ebc_part );
 
   // Resistance BC for G
-  NatBC_Resis_G( curr_time, dt, disp_np1, dot_velo_np1, velo_np1, lassem_f_ptr, elements, quad_s,
-      nbc_v, ebc_part, gbc );
+  //NatBC_Resis_G( curr_time, dt, disp_np1, dot_velo_np1, velo_np1, lassem_f_ptr, elements, quad_s,
+  //    nbc_v, ebc_part, gbc );
 
+  NatBC_G( curr_time, dt, disp_np1, lassem_f_ptr, elements, quad_s, nbc_v, ebc_part );
+  
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 
   EssBC_G( nbc_v, nbc_p );
@@ -473,12 +475,14 @@ void PGAssem_FSI::Assem_Tangent_Residual(
   row_id_v = nullptr; row_id_p = nullptr;
 
   // Backflow stabilization
-  BackFlow_KG( dt, dot_disp, disp, velo, lassem_f_ptr, elements, quad_s, nbc_v, ebc_part );
+  //BackFlow_KG( dt, dot_disp, disp, velo, lassem_f_ptr, elements, quad_s, nbc_v, ebc_part );
 
   // Resistance BC for G
-  NatBC_Resis_KG( curr_time, dt, disp_np1, dot_velo_np1, velo_np1, lassem_f_ptr, elements, quad_s,
-      nbc_v, ebc_part, gbc );
+  //NatBC_Resis_KG( curr_time, dt, disp_np1, dot_velo_np1, velo_np1, lassem_f_ptr, elements, quad_s,
+  //    nbc_v, ebc_part, gbc );
 
+  NatBC_G( curr_time, dt, disp_np1, lassem_f_ptr, elements, quad_s, nbc_v, ebc_part );
+  
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 
   EssBC_KG( nbc_v, nbc_p );

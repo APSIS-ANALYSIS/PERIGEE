@@ -214,6 +214,14 @@ class PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
         const double &t, const double &nx, const double &ny,
         const double &nz, double &gx, double &gy, double &gz ) const
     {
+      const double p0 = 5.0e4;
+      gx = p0*nx; gy = p0*ny; gz = p0*nz;
+    }
+
+    void get_H2(const double &x, const double &y, const double &z,
+        const double &t, const double &nx, const double &ny,
+        const double &nz, double &gx, double &gy, double &gz ) const
+    {
       const double p0 = 0.0;
       gx = p0*nx; gy = p0*ny; gz = p0*nz;
     }

@@ -25,6 +25,11 @@ PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::PLocAssem_2x2Block_Tet4_ALE_VMS_NS_
   Zero_Tangent_Residual();
   Zero_sur_Tangent_Residual();
 
+  flist = new locassem_2x2block_tet4_ale_vms_ns_funs [2];
+  
+  flist[0] = &PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::get_H1;
+  flist[1] = &PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::get_H2;
+
   // print info of this assembly routine
   print_info();
 }

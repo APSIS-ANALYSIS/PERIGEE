@@ -282,7 +282,7 @@ int main(int argc, char *argv[])
   
   APart_Node * pNode_p = new APart_Node_FSI(part_p_file, rank);
 
-  ALocal_Inflow_NodalBC * locinfnbc = new ALocal_Inflow_NodalBC(part_v_file, rank);
+  ALocal_Inflow_NodalBC * locinfnbc = nullptr; //new ALocal_Inflow_NodalBC(part_v_file, rank);
 
   ALocal_NodalBC * locnbc_v = new ALocal_NodalBC(part_v_file, rank, "/nbc/MF");
   
@@ -290,7 +290,7 @@ int main(int argc, char *argv[])
 
   ALocal_NodalBC * mesh_locnbc = new ALocal_NodalBC(part_v_file, rank, "/mesh_nbc/MF");
 
-  ALocal_EBC * locebc_v = new ALocal_EBC_outflow(part_v_file, rank);
+  ALocal_EBC * locebc_v = new ALocal_EBC(part_v_file, rank);
   
   ALocal_EBC * locebc_p = new ALocal_EBC( part_p_file, rank );
 
@@ -318,6 +318,7 @@ int main(int argc, char *argv[])
 
   ICVFlowRate * inflow_rate_ptr = nullptr;
 
+  /*
   if( inflow_type == 0 )
     inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file );
   else if( inflow_type == 1 )
@@ -331,6 +332,7 @@ int main(int argc, char *argv[])
 
   SYS_T::print_fatal_if(locinfnbc->get_num_nbc() != inflow_rate_ptr->get_num_nbc(),
       "Error: ALocal_Inflow_NodalBC number of faces does not match with that in ICVFlowRate.\n");
+  */
 
   // ===== Quadrature rules and FEM container =====
   SYS_T::commPrint("===> Build quadrature rules. \n");
@@ -410,7 +412,7 @@ int main(int argc, char *argv[])
   IPLocAssem * locAssem_mesh_ptr = new PLocAssem_Tet4_FSI_Mesh_Laplacian();
   
   // ===== Initial condition =====
-  PDNSolution * base = new PDNSolution_V( pNode_v, fNode, locinfnbc, 1, true, "base" ); 
+  PDNSolution * base = nullptr; //new PDNSolution_V( pNode_v, fNode, locinfnbc, 1, true, "base" ); 
   
   PDNSolution * velo = new PDNSolution_V(pNode_v, 0, true, "velo");
   PDNSolution * disp = new PDNSolution_V(pNode_v, 0, true, "disp");
@@ -469,6 +471,7 @@ int main(int argc, char *argv[])
   // ===== GenBC =====
   IGenBC * gbc = nullptr;
 
+  /*
   if( GENBC_T::get_genbc_file_type( lpn_file ) == 1  )
     gbc = new GenBC_Resistance( lpn_file );
   else if( GENBC_T::get_genbc_file_type( lpn_file ) == 2  )
@@ -486,6 +489,7 @@ int main(int argc, char *argv[])
 
   SYS_T::print_fatal_if(gbc->get_num_ebc() != locebc_v->get_num_ebc(),
       "Error: GenBC number of faces does not match with that in ALocal_EBC.\n");
+  */
 
   // ===== Global assembly routine =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
@@ -594,6 +598,7 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("===> Time marching solver setted up:\n");
   tsolver->print_info();
 
+  /*
   // ===== Outlet flowrate recording files =====
   for(int ff=0; ff<locebc_v->get_num_ebc(); ++ff)
   {
@@ -637,7 +642,8 @@ int main(int argc, char *argv[])
 
   // Write all 0D solutions into a file
   if( rank == 0 ) gbc -> write_0D_sol ( initial_index, initial_time );
-
+  */
+  /*
   // ===== Inlet data recording files =====
   for(int ff=0; ff<locinfnbc->get_num_nbc(); ++ff)
   {
@@ -664,7 +670,7 @@ int main(int argc, char *argv[])
       ofile.close();
     }
   }
-
+  */
   MPI_Barrier(PETSC_COMM_WORLD);
 
   // ===== FEM analysis =====

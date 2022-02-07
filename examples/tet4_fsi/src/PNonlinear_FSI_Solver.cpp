@@ -195,8 +195,8 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
   disp_alpha     -> PlusAX( Delta_dot_disp, alpha_f * gamma * dt );
   
   // Update inflow boundary values
-  rescale_inflow_value( curr_time + dt,           infnbc_part, flr_ptr, sol_base, velo );
-  rescale_inflow_value( curr_time + alpha_f * dt, infnbc_part, flr_ptr, sol_base, velo_alpha );
+  //rescale_inflow_value( curr_time + dt,           infnbc_part, flr_ptr, sol_base, velo );
+  //rescale_inflow_value( curr_time + alpha_f * dt, infnbc_part, flr_ptr, sol_base, velo_alpha );
 
   // If new_tangent_flag == TRUE, update the tangent matrix;
   // otherwise, use the matrix from the previous time step
