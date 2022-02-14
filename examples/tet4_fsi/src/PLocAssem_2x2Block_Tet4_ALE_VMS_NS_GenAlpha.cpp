@@ -47,6 +47,8 @@ PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::~PLocAssem_2x2Block_Tet4_ALE_VMS_NS
   delete [] sur_Tangent00; sur_Tangent00 = nullptr;
 
   delete [] sur_Residual0; sur_Residual0 = nullptr;
+
+  delete [] flist; flist = nullptr;
 }
 
 
