@@ -22,6 +22,14 @@ Matrix_3x3::Matrix_3x3(
   mat[6] = a31; mat[7] = a32; mat[8] = a33;
 }
 
+Matrix_3x3::Matrix_3x3(
+    const Vector_3 &vec1, const Vector_3 &vec2, const Vector_3 &vec3 )
+{
+  mat[0] = vec1(0); mat[1] = vec2(0); mat[2] = vec3(0);
+  mat[3] = vec1(1); mat[4] = vec2(1); mat[5] = vec3(1);
+  mat[6] = vec1(2); mat[7] = vec2(2); mat[8] = vec3(2);
+}
+
 Matrix_3x3::~Matrix_3x3()
 {}
 
@@ -115,18 +123,25 @@ void Matrix_3x3::gen_hilb()
       mat[ii*3+jj] = 1.0 / (ii + jj + 1.0);
 }
 
-void Matrix_3x3::gen_outprod( const Vector_3 &a, const Vector_3 &b ) 
+void Matrix_3x3::gen_outprod( const Vector_3 &va, const Vector_3 &vb ) 
 {
-  mat[0] = a(0) * b(0); mat[1] = a(0) * b(1); mat[2] = a(0) * b(2);
-  mat[3] = a(1) * b(0); mat[4] = a(1) * b(1); mat[5] = a(1) * b(2);
-  mat[6] = a(2) * b(0); mat[7] = a(2) * b(1); mat[8] = a(2) * b(2);
+  mat[0] = va(0) * vb(0); mat[1] = va(0) * vb(1); mat[2] = va(0) * vb(2);
+  mat[3] = va(1) * vb(0); mat[4] = va(1) * vb(1); mat[5] = va(1) * vb(2);
+  mat[6] = va(2) * vb(0); mat[7] = va(2) * vb(1); mat[8] = va(2) * vb(2);
 }
 
-void Matrix_3x3::gen_outprod( const Vector_3 &a )
+void Matrix_3x3::gen_outprod( const Vector_3 &va )
 {
-  mat[0] = a(0) * a(0); mat[1] = a(0) * a(1); mat[2] = a(0) * a(2);
-  mat[3] = a(1) * a(0); mat[4] = a(1) * a(1); mat[5] = a(1) * a(2);
-  mat[6] = a(2) * a(0); mat[7] = a(2) * a(1); mat[8] = a(2) * a(2);
+  mat[0] = va(0) * va(0); mat[1] = va(0) * va(1); mat[2] = va(0) * va(2);
+  mat[3] = va(1) * va(0); mat[4] = va(1) * va(1); mat[5] = va(1) * va(2);
+  mat[6] = va(2) * va(0); mat[7] = va(2) * va(1); mat[8] = va(2) * va(2);
+}
+
+void Matrix_3x3::add_outprod( const double &val, const Vector_3 &va, const Vector_3 &vb ) 
+{
+  mat[0] += val * va(0) * vb(0); mat[1] += val * va(0) * vb(1); mat[2] += val * va(0) * vb(2);
+  mat[3] += val * va(1) * vb(0); mat[4] += val * va(1) * vb(1); mat[5] += val * va(1) * vb(2);
+  mat[6] += val * va(2) * vb(0); mat[7] += val * va(2) * vb(1); mat[8] += val * va(2) * vb(2);
 }
 
 void Matrix_3x3::transpose()
@@ -468,7 +483,7 @@ int Matrix_3x3::eigen_decomp( double &eta1, double &eta2, double &eta3,
 
     // Find the most distinct eigenvalue as eta1
     if( alpha <= PI*frac13*0.5 ) eta1 = val * cos(alpha); 
-    else eta1 = val * cos(alpha + 4.0*PI*frac13);
+    else eta1 = val * cos(alpha + 2.0*PI*frac13);
 
     // v1 is determined, v2 and v3 are used to hold s1 s2 for now
     find_eigen_vector(eta1, v1, v2, v3);
@@ -486,7 +501,7 @@ int Matrix_3x3::eigen_decomp( double &eta1, double &eta2, double &eta3,
 
     eta3 = A22 + A33 - eta2;
 
-    if( eta3 != eta2)
+    if( std::abs( eta3 - eta2 ) > 1.0e-10 )
     {
       // Now form u1 and u2
       // u1 = (A - 0.333 tr - eta2 ) s1
@@ -501,13 +516,13 @@ int Matrix_3x3::eigen_decomp( double &eta1, double &eta2, double &eta3,
 
       if( v2.norm2() >= v3.norm2() )
       {
-        v2.normalize(); // w1 
+        v2.normalize();               // w1 
         v2 = cross_product( v1, v2 ); // v2 = w1 x v1
         v3 = cross_product( v1, v2 ); // v3 = v1 x v2
       }
       else
       {
-        v3.normalize(); // w1 
+        v3.normalize();               // w1 
         v2 = cross_product( v1, v3 ); // v2 = w1 x v1
         v3 = cross_product( v1, v2 ); // v3 = v1 x v2
       }

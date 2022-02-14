@@ -35,6 +35,9 @@ class Matrix_3x3
         const double &a21, const double &a22, const double &a23,
         const double &a31, const double &a32, const double &a33 );
 
+    // Generate a matrix made by 3 vectors [ vec1 | vec2 | vec3 ]
+    Matrix_3x3 ( const Vector_3 &vec1, const Vector_3 &vec2, const Vector_3 &vec3 );
+    
     // Destructor
     ~Matrix_3x3();
 
@@ -118,11 +121,15 @@ class Matrix_3x3
 
     // Set a matrix from out-product of two vecs with length 3
     // mat_ij = a_i b_j
-    void gen_outprod( const Vector_3 &a, const Vector_3 &b );
+    void gen_outprod( const Vector_3 &va, const Vector_3 &vb );
    
     // mat_ij = a_i a_j 
-    void gen_outprod( const Vector_3 &a );
-
+    void gen_outprod( const Vector_3 &va );
+    
+    // Add a matrix from out-product of two vecs with length 3
+    // mat_ij += val a_i b_j
+    void add_outprod( const double &val, const Vector_3 &va, const Vector_3 &vb );
+   
     // Transpose the matrix
     void transpose();
 
@@ -208,7 +215,6 @@ class Matrix_3x3
     void print_Voigt() const;
 
     // Eigen decomposition of the matrix M = eta1 v1 v1T + eta2 v2 v2T + eta3 v3
-    // The matrix has to be symmetric.
     // v3T. The algorithm is based on CMAME 197 2008 4007-4015 paper by
     // W.M. Scherzinger and C.R. Dohrmann
     // return 1 if the three eigenvalues are the same
@@ -245,7 +251,7 @@ Matrix_3x3 operator*( const Matrix_3x3 &left, const Matrix_3x3 &right );
 // Return the inverse of the input matrix
 Matrix_3x3 inverse( const Matrix_3x3 &input );
 
-// Return the cofactor of input matrix, which is J input^(-T)
+// Return the cofactor of input matrix which is J input^(-T)
 Matrix_3x3 cofactor( const Matrix_3x3 &input );
 
 // Return the transpose of input matrix
