@@ -544,9 +544,9 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
   gassem_ptr -> Update_Wall_Prestress( disp, pres, alelem_ptr, lassem_solid_ptr, elementv,
       quad_v, lien_v, lien_p, feanode_ptr, ps_ptr );
 
-  const double solid_disp_norm = disp -> Norm_2();
+  const double solid_disp_norm = disp -> Norm_inf();
 
-  SYS_T::commPrint("  --- solid_disp_norm: %e. \n", solid_disp_norm );
+  SYS_T::commPrint("  --- solid disp l_inf norm: %e.\n", solid_disp_norm );
 
   if( solid_disp_norm < prestress_tol ) prestress_conv_flag = true;
   // --------------------------------------------------------------------------
