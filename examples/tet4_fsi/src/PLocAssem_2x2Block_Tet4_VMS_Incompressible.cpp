@@ -820,5 +820,4 @@ std::vector<Matrix_3x3> PLocAssem_2x2Block_Tet4_VMS_Incompressible::get_Wall_Cau
   return stress;
 }
 
-
 // EOF
