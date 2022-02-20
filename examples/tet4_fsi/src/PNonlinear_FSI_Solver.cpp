@@ -139,11 +139,13 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     bool &conv_flag, int &nl_counter ) const
 {
 #ifdef PETSC_USE_LOG
-  PetscLogEvent assem_event_0, assem_event_1, solve_mech_event, solve_mesh_event;
+  PetscLogEvent assem_event_0, assem_event_1, assem_event_2;
+  PetscLogEvent solve_mech_event, solve_mesh_event;
   PetscClassId classid;
   PetscClassIdRegister("user-log-info", &classid);
   PetscLogEventRegister("assembly_0", classid, &assem_event_0);
   PetscLogEventRegister("assembly_1", classid, &assem_event_1);
+  PetscLogEventRegister("assembly_2", classid, &assem_event_2);
   PetscLogEventRegister("lin_solve_mech", classid, &solve_mech_event);
   PetscLogEventRegister("lin_solve_mesh", classid, &solve_mesh_event);
 #endif
@@ -290,9 +292,17 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     // Solve for mesh motion
     gassem_mesh_ptr -> Clear_G();
 
+#ifdef PETSC_USE_LOG
+  PetscLogEventBegin(assem_event_2, 0,0,0,0);
+#endif
+
     gassem_mesh_ptr -> Assem_residual( pre_disp, disp, curr_time, dt, 
         alelem_ptr, lassem_mesh_ptr, elementv, elements,
         quad_v, quad_s, lien_v, feanode_ptr, nbc_mesh, ebc_mesh );
+
+#ifdef PETSC_USE_LOG
+    PetscLogEventEnd(assem_event_2,0,0,0,0);
+#endif
 
 #ifdef PETSC_USE_LOG
     PetscLogEventBegin(solve_mesh_event, 0,0,0,0);
