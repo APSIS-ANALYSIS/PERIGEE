@@ -204,10 +204,6 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
   dot_disp_alpha -> PlusAX( Delta_dot_disp, alpha_m );
   disp_alpha     -> PlusAX( Delta_dot_disp, alpha_f * gamma * dt );
   
-  // Update inflow boundary values
-  rescale_inflow_value( curr_time + dt,           infnbc_part, flr_ptr, sol_base, velo );
-  rescale_inflow_value( curr_time + alpha_f * dt, infnbc_part, flr_ptr, sol_base, velo_alpha );
-
 #ifdef PETSC_USE_LOG
   PetscLogEventBegin(assem_event_0, 0,0,0,0);
 #endif
@@ -291,22 +287,22 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     VecRestoreSubVector(sol_vp, is_v, &sol_v);
     VecRestoreSubVector(sol_vp, is_p, &sol_p);
 
-#ifdef PETSC_USE_LOG
-    PetscLogEventBegin(solve_mesh_event, 0,0,0,0);
-#endif
-    
     // Solve for mesh motion
     gassem_mesh_ptr -> Clear_G();
-
-#ifdef PETSC_USE_LOG
-    PetscLogEventEnd(solve_mesh_event,0,0,0,0);
-#endif
 
     gassem_mesh_ptr -> Assem_residual( pre_disp, disp, curr_time, dt, 
         alelem_ptr, lassem_mesh_ptr, elementv, elements,
         quad_v, quad_s, lien_v, feanode_ptr, nbc_mesh, ebc_mesh );
 
+#ifdef PETSC_USE_LOG
+    PetscLogEventBegin(solve_mesh_event, 0,0,0,0);
+#endif
+    
     lsolver_mesh_ptr -> Solve( gassem_mesh_ptr -> G, sol_mesh );
+
+#ifdef PETSC_USE_LOG
+    PetscLogEventEnd(solve_mesh_event,0,0,0,0);
+#endif
 
     bc_mesh_mat -> MatMultSol( sol_mesh );
 
