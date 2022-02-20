@@ -139,7 +139,8 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     bool &conv_flag, int &nl_counter ) const
 {
 #ifdef PETSC_USE_LOG
-  PetscLogEvent assem_event_0, assem_event_1, solve_mech_event, solve_mesh_event;
+  PetscLogEvent assem_event_0, assem_event_1, assem_event_2;
+  PetscLogEvent solve_mech_event, solve_mesh_event;
   PetscClassId classid;
   PetscClassIdRegister("user-log-info", &classid);
   PetscLogEventRegister("assembly_0", classid, &assem_event_0);
