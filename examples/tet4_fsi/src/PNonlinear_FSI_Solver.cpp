@@ -138,6 +138,16 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     PDNSolution * const &pres,
     bool &conv_flag, int &nl_counter ) const
 {
+#ifdef PETSC_USE_LOG
+  PetscLogEvent assem_event_0, assem_event_1, solve_mech_event, solve_mesh_event;
+  PetscClassId classid;
+  PetscClassIdRegister("user-log-info", &classid);
+  PetscLogEventRegister("assembly_0", classid, &assem_event_0);
+  PetscLogEventRegister("assembly_1", classid, &assem_event_1);
+  PetscLogEventRegister("lin_solve_mech", classid, &solve_mech_event);
+  PetscLogEventRegister("lin_solve_mesh", classid, &solve_mesh_event);
+#endif
+
   // Initialization
   nl_counter = 0;
   double residual_norm = 0.0, initial_norm = 0.0, relative_error = 0.0;
@@ -195,8 +205,12 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
   disp_alpha     -> PlusAX( Delta_dot_disp, alpha_f * gamma * dt );
   
   // Update inflow boundary values
-  //rescale_inflow_value( curr_time + dt,           infnbc_part, flr_ptr, sol_base, velo );
-  //rescale_inflow_value( curr_time + alpha_f * dt, infnbc_part, flr_ptr, sol_base, velo_alpha );
+  rescale_inflow_value( curr_time + dt,           infnbc_part, flr_ptr, sol_base, velo );
+  rescale_inflow_value( curr_time + alpha_f * dt, infnbc_part, flr_ptr, sol_base, velo_alpha );
+
+#ifdef PETSC_USE_LOG
+  PetscLogEventBegin(assem_event_0, 0,0,0,0);
+#endif
 
   // If new_tangent_flag == TRUE, update the tangent matrix;
   // otherwise, use the matrix from the previous time step
@@ -226,6 +240,10 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
         feanode_ptr, nbc_v, nbc_p, ebc_part, gbc, ps_ptr );
   }
 
+#ifdef PETSC_USE_LOG
+  PetscLogEventEnd(assem_event_0,0,0,0,0);
+#endif
+
   VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
   SYS_T::commPrint("  Init res 2-norm: %e \n", initial_norm);
 
@@ -238,7 +256,15 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
   // Now we do consistent Newton-Raphson iteration
   do
   {
+#ifdef PETSC_USE_LOG
+    PetscLogEventBegin(solve_mech_event, 0,0,0,0);
+#endif
+
     lsolver_ptr->Solve( gassem_ptr->G, sol_vp );
+
+#ifdef PETSC_USE_LOG
+    PetscLogEventEnd(solve_mech_event,0,0,0,0);
+#endif
 
     bc_mat -> MatMultSol( sol_vp );
 
@@ -265,8 +291,16 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     VecRestoreSubVector(sol_vp, is_v, &sol_v);
     VecRestoreSubVector(sol_vp, is_p, &sol_p);
 
+#ifdef PETSC_USE_LOG
+    PetscLogEventBegin(solve_mesh_event, 0,0,0,0);
+#endif
+    
     // Solve for mesh motion
     gassem_mesh_ptr -> Clear_G();
+
+#ifdef PETSC_USE_LOG
+    PetscLogEventEnd(solve_mesh_event,0,0,0,0);
+#endif
 
     gassem_mesh_ptr -> Assem_residual( pre_disp, disp, curr_time, dt, 
         alelem_ptr, lassem_mesh_ptr, elementv, elements,
@@ -289,6 +323,10 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     dot_disp_alpha -> Copy( pre_dot_disp );
     dot_disp_alpha -> ScaleValue( 1.0 - alpha_m );
     dot_disp_alpha -> PlusAX( dot_disp, alpha_m );
+
+#ifdef PETSC_USE_LOG
+    PetscLogEventBegin(assem_event_1, 0,0,0,0);
+#endif
 
     // Assemble residual & tangent
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_thred )
@@ -316,7 +354,11 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
           elementv, elements, quad_v, quad_s, lien_v, lien_p,
           feanode_ptr, nbc_v, nbc_p, ebc_part, gbc, ps_ptr );
     }
-   
+
+#ifdef PETSC_USE_LOG
+    PetscLogEventEnd(assem_event_1,0,0,0,0);
+#endif
+
     VecNorm(gassem_ptr->G, NORM_2, &residual_norm);
     SYS_T::commPrint("  --- nl_res: %e \n", residual_norm);
 
@@ -544,9 +586,9 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
   gassem_ptr -> Update_Wall_Prestress( disp, pres, alelem_ptr, lassem_solid_ptr, elementv,
       quad_v, lien_v, lien_p, feanode_ptr, ps_ptr );
 
-  const double solid_disp_norm = disp -> Norm_2();
+  const double solid_disp_norm = disp -> Norm_inf();
 
-  SYS_T::commPrint("  --- solid_disp_norm: %e. \n", solid_disp_norm );
+  SYS_T::commPrint("  --- solid disp l_inf norm: %e.\n", solid_disp_norm );
 
   if( solid_disp_norm < prestress_tol ) prestress_conv_flag = true;
   // --------------------------------------------------------------------------
