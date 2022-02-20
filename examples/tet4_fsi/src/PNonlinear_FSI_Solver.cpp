@@ -144,6 +144,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
   PetscClassIdRegister("user-log-info", &classid);
   PetscLogEventRegister("assembly_0", classid, &assem_event_0);
   PetscLogEventRegister("assembly_1", classid, &assem_event_1);
+  PetscLogEventRegister("assembly_2", classid, &assem_event_2);
   PetscLogEventRegister("lin_solve_mech", classid, &solve_mech_event);
   PetscLogEventRegister("lin_solve_mesh", classid, &solve_mesh_event);
 #endif
@@ -291,22 +292,30 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     VecRestoreSubVector(sol_vp, is_v, &sol_v);
     VecRestoreSubVector(sol_vp, is_p, &sol_p);
 
-#ifdef PETSC_USE_LOG
-    PetscLogEventBegin(solve_mesh_event, 0,0,0,0);
-#endif
-    
     // Solve for mesh motion
     gassem_mesh_ptr -> Clear_G();
 
 #ifdef PETSC_USE_LOG
-    PetscLogEventEnd(solve_mesh_event,0,0,0,0);
+  PetscLogEventBegin(assem_event_2, 0,0,0,0);
 #endif
 
     gassem_mesh_ptr -> Assem_residual( pre_disp, disp, curr_time, dt, 
         alelem_ptr, lassem_mesh_ptr, elementv, elements,
         quad_v, quad_s, lien_v, feanode_ptr, nbc_mesh, ebc_mesh );
 
+#ifdef PETSC_USE_LOG
+    PetscLogEventEnd(assem_event_2, 0,0,0,0);
+#endif
+
+#ifdef PETSC_USE_LOG
+    PetscLogEventBegin(solve_mesh_event, 0,0,0,0);
+#endif
+    
     lsolver_mesh_ptr -> Solve( gassem_mesh_ptr -> G, sol_mesh );
+
+#ifdef PETSC_USE_LOG
+    PetscLogEventEnd(solve_mesh_event,0,0,0,0);
+#endif
 
     bc_mesh_mat -> MatMultSol( sol_mesh );
 
