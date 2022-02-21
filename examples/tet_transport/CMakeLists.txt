@@ -41,7 +41,6 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/IEN_Tetra_P1.cpp
   ${perigee_source}/Mesh/IEN_Tetra_P2.cpp
   ${perigee_source}/Mesh/INodalBC.cpp
-  ${perigee_source}/Mesh/IElemBC.cpp
   ${perigee_source}/Mesh/Mesh_Tet4.cpp
   ${perigee_source}/Mesh/Mesh_Tet10.cpp
   ${perigee_source}/Mesh/IPart.cpp
@@ -146,7 +145,7 @@ TARGET_LINK_LIBRARIES( gmsh_IO perigee_preprocess )
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( transport_3d perigee_analysis )
 TARGET_LINK_LIBRARIES( prepost perigee_preprocess )
-TARGET_LINK_LIBRARIES( post_error perigee_postprocess )
+TARGET_LINK_LIBRARIES( post_error perigee_postprocess perigee_analysis )
 #TARGET_LINK_LIBRARIES( vis_ns perigee_postprocess )
 #TARGET_LINK_LIBRARIES( vis_p1_wss perigee_postprocess )
 #TARGET_LINK_LIBRARIES( vis_p2_wss perigee_postprocess )

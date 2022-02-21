@@ -99,7 +99,7 @@ int main( int argc, char * argv[] )
     mytimer->Reset(); mytimer->Start();
     
     IPart * part = new Part_Tet( mesh, global_part, mnindex, IEN,
-        ctrlPts, proc_rank, cpu_size, 1, 1, elemType, true );
+        ctrlPts, proc_rank, cpu_size, 1, 1, elemType );
     
     part->write(part_file.c_str());
     mytimer->Stop();
