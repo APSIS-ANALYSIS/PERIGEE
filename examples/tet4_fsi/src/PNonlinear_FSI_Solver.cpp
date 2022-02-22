@@ -243,7 +243,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
   }
 
 #ifdef PETSC_USE_LOG
-  PetscLogEventEnd(assem_event_0,0,0,0,0);
+  PetscLogEventEnd(assem_event_0, 0,0,0,0);
 #endif
 
   VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
@@ -258,6 +258,13 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
   // Now we do consistent Newton-Raphson iteration
   do
   {
+    // Check the residual dot_u_alpha - v_alpha
+    Delta_dot_disp -> ScaleValue( 0.0 );
+    update_solid_kinematics(  1.0, pnode_v, dot_disp_alpha->solution, Delta_dot_disp );
+    update_solid_kinematics( -1.0, pnode_v,     velo_alpha->solution, Delta_dot_disp );
+    const double solid_kinematics_residual = Delta_dot_disp -> Norm_2();
+    // Finish calculating dot_u_alpha - v_alpha
+
 #ifdef PETSC_USE_LOG
     PetscLogEventBegin(solve_mech_event, 0,0,0,0);
 #endif
@@ -265,7 +272,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     lsolver_ptr->Solve( gassem_ptr->G, sol_vp );
 
 #ifdef PETSC_USE_LOG
-    PetscLogEventEnd(solve_mech_event,0,0,0,0);
+    PetscLogEventEnd(solve_mech_event, 0,0,0,0);
 #endif
 
     bc_mat -> MatMultSol( sol_vp );
@@ -371,6 +378,8 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
 
     VecNorm(gassem_ptr->G, NORM_2, &residual_norm);
     SYS_T::commPrint("  --- nl_res: %e \n", residual_norm);
+
+    SYS_T::commPrint("  --- solid kinematics residual: %e \n", solid_kinematics_residual);
 
     relative_error = residual_norm / initial_norm;
 
