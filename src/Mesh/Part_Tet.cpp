@@ -279,14 +279,13 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
 
   // 6. LIEN
   LIEN = new int * [nlocalele];
-  for(int e=0; e<nlocalele; ++e) LIEN[e] = new int [nLocBas];
+  for(int ee=0; ee<nlocalele; ++ee) LIEN[ee] = new int [nLocBas];
 
-  for(int e=0; e<nlocalele; ++e)
+  for(int ee=0; ee<nlocalele; ++ee)
   {
-    for(int i=0; i<nLocBas; ++i)
+    for(int ii=0; ii<nLocBas; ++ii)
     {
-      int global_index = IEN->get_IEN(elem_loc[e], i);
-      global_index = mnindex->get_old2new(global_index);
+      const int global_index = mnindex->get_old2new( IEN->get_IEN(elem_loc[ee], ii) );
       const auto lien_ptr = find( local_to_global.begin(), local_to_global.end(),
           global_index );
 
@@ -296,7 +295,7 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
         exit(EXIT_FAILURE);
       }
 
-      LIEN[e][i] = lien_ptr - local_to_global.begin();
+      LIEN[ee][ii] = lien_ptr - local_to_global.begin();
     }
   }
 
