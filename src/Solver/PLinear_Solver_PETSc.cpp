@@ -162,10 +162,14 @@ void PLinear_Solver_PETSc::Monitor() const
 {
 #if PETSC_VERSION_LT(3,7,0)
   KSPMonitorSet(ksp, KSPMonitorDefault, PETSC_NULL, PETSC_NULL);
-#else
+#elif PETSC_VERSION_LT(3,15,0)
   PetscViewerAndFormat *vf;
   PetscViewerAndFormatCreate(PETSC_VIEWER_STDOUT_WORLD,PETSC_VIEWER_DEFAULT,&vf);
   KSPMonitorSet(ksp,(PetscErrorCode (*)(KSP,PetscInt,PetscReal,void*))KSPMonitorDefault,vf,(PetscErrorCode (*)(void**))PetscViewerAndFormatDestroy);
+#else
+  PetscViewerAndFormat *vf;
+  PetscViewerAndFormatCreate(PETSC_VIEWER_STDOUT_WORLD,PETSC_VIEWER_DEFAULT,&vf);
+  KSPMonitorSet(ksp,(PetscErrorCode (*)(KSP,PetscInt,PetscReal,void*))KSPMonitorResidual,vf,(PetscErrorCode (*)(void**))PetscViewerAndFormatDestroy);
 #endif
 }
 

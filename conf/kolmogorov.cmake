@@ -5,9 +5,11 @@
 # ========================================================
 set(VTK_DIR /Users/juliu/lib/VTK-8.2.0/lib/cmake/vtk-8.2)
 
-set(PETSC_DIR /Users/juliu/lib/petsc-3.14.2-debug)
+set(PETSC_DIR /Users/juliu/lib/petsc-3.15.5-debug)
 
 set(PETSC_ARCH .)
+
+set(METIS_DIR /Users/juliu/lib/metis-5.1.0)
 
 set(HDF5_ROOT /Users/juliu/lib/hdf5-1.12.0)
 
@@ -28,8 +30,15 @@ include_directories(${PETSC_INC})
 set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${VTK_LIBRARIES})
 set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${HDF5_LIBRARIES})
 set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${PETSC_LIB})
-set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${PETSC_METIS_LIB})
-message(STATUS "Use METIS in PETSc: " ${PETSC_METIS_LIB})
+
+if(PETSC_METIS)
+  set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${PETSC_METIS_LIB})
+  message(STATUS "Use METIS in PETSc: " ${PETSC_METIS_LIB})
+else(PETSC_METIS)
+  find_package(METIS)
+  include_directories(${METIS_INCLUDE_DIRS})
+  set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${METIS_LIBRARIES})
+endif(PETSC_METIS)
 
 message(STATUS "External Libraries: " ${EXTRA_LINK_LIBS})
 
