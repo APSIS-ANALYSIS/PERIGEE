@@ -55,9 +55,9 @@ message(STATUS "External Libraries: " ${EXTRA_LINK_LIBS})
 #set(CMAKE_CXX_COMPILER /PARA2/app/MPI/Gnu/MPICH/3.2-gcc5.4.0-dyn/bin/mpicxx)
 set(CMAKE_C_COMPILER /WORK/app/MPI/Intel/MPICH/3.2-icc2018-dyn/bin/mpicc)
 set(CMAKE_CXX_COMPILER /WORK/app/MPI/Intel/MPICH/3.2-icc2018-dyn/bin/mpicxx)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall")
+set(CMAKE_CXX_FLAGS "-O3 -Wall")
 set(CMAKE_BUILD_TYPE RELEASE)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 # EOF
