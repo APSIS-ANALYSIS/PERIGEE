@@ -7,7 +7,12 @@ set(HOME_DIR /PARA2/blsc018)
 # ========================================================
 set(VTK_DIR ${HOME_DIR}/lib/VTK-7.1.1-SHARED/lib/cmake/vtk-7.1)
 
-set(PETSC_DIR ${HOME_DIR}/lib/petsc-3.15.5-mpich3.2-gcc5.4.0-opt)
+# gcc
+# set(PETSC_DIR ${HOME_DIR}/lib/petsc-3.15.5-mpich3.2-gcc5.4.0-opt)
+
+# icc
+set(PETSC_DIR ${HOME_DIR}/lib/petsc-3.15.5-mpich3.2-icc2018-opt)
+
 set(PETSC_ARCH .)
 
 set(METIS_DIR ${HOME_DIR}/lib/metis-5.1.0)
@@ -46,11 +51,13 @@ message(STATUS "External Libraries: " ${EXTRA_LINK_LIBS})
 # ===================================================================
 # Compiler options
 # ===================================================================
-set(CMAKE_C_COMPILER /PARA2/app/MPI/Gnu/MPICH/3.2-gcc5.4.0-dyn/bin/mpicc)
-set(CMAKE_CXX_COMPILER /PARA2/app/MPI/Gnu/MPICH/3.2-gcc5.4.0-dyn/bin/mpicxx)
-set(CMAKE_CXX_FLAGS "-O3 -Wall")
+#set(CMAKE_C_COMPILER /PARA2/app/MPI/Gnu/MPICH/3.2-gcc5.4.0-dyn/bin/mpicc)
+#set(CMAKE_CXX_COMPILER /PARA2/app/MPI/Gnu/MPICH/3.2-gcc5.4.0-dyn/bin/mpicxx)
+set(CMAKE_C_COMPILER /WORK/app/MPI/Intel/MPICH/3.2-icc2018-dyn/bin/mpicc)
+set(CMAKE_CXX_COMPILER /WORK/app/MPI/Intel/MPICH/3.2-icc2018-dyn/bin/mpicxx)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall")
 set(CMAKE_BUILD_TYPE RELEASE)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 # EOF
