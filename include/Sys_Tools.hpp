@@ -117,6 +117,13 @@ namespace SYS_T
     b[a.size()] = '\0';
   }
 
+  inline std::string to_string( const int &aa )
+  {
+    std::ostringstream ss;
+    ss<<aa;
+    return ss.str();
+  }
+
   // ================================================================
   // The following are used in processor.
   // ================================================================
