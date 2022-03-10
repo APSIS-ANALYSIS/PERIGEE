@@ -9,6 +9,7 @@
 // Date: Oct. 10 2017
 // Author: Ju Liu
 // ============================================================================
+#include <array>
 #include "HDF5_Writer.hpp"
 #include "ALocal_Elem.hpp"
 

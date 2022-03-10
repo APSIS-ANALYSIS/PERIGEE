@@ -79,8 +79,8 @@ std::vector<double> Prestress_solid::get_prestress( const int &ee ) const
 
 std::array<double,6> Prestress_solid::get_prestress( const int &ee, const int &qua ) const
 {
-  return { qua_prestress[ee][6*qua], qua_prestress[ee][6*qua+1], qua_prestress[ee][6*qua+2],
-    qua_prestress[ee][6*qua+3], qua_prestress[ee][6*qua+4], qua_prestress[ee][6*qua+5] };
+  return {{ qua_prestress[ee][6*qua], qua_prestress[ee][6*qua+1], qua_prestress[ee][6*qua+2],
+    qua_prestress[ee][6*qua+3], qua_prestress[ee][6*qua+4], qua_prestress[ee][6*qua+5] }};
 }
 
 void Prestress_solid::add_prestress( const int &ee, const double * const &in_psval )
