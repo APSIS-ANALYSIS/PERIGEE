@@ -944,7 +944,7 @@ void Gmsh_FileIO::write_tri_h5( const int &index_2d,
 
     // Record info
     std::string name_1d_domain(slash);
-    name_1d_domain.append( std::to_string( static_cast<int>(ii) ) );
+    name_1d_domain.append( SYS_T::to_string( static_cast<int>(ii) ) );
     hid_t g_id = H5Gcreate( file_id, name_1d_domain.c_str(), 
         H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 
@@ -1109,7 +1109,7 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
 
     // Record info
     std::string name_2d_domain(slash);
-    name_2d_domain.append( std::to_string( static_cast<int>(ii) ) );
+    name_2d_domain.append( SYS_T::to_string( static_cast<int>(ii) ) );
     hid_t g_id = H5Gcreate( file_id, name_2d_domain.c_str(),
                 H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 
@@ -1278,7 +1278,7 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
 
     // Record info
     std::string name_2d_domain(slash);
-    name_2d_domain.append( std::to_string( static_cast<int>(ii) ) );
+    name_2d_domain.append( SYS_T::to_string( static_cast<int>(ii) ) );
     hid_t g_id = H5Gcreate( file_id, name_2d_domain.c_str(),
         H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 
