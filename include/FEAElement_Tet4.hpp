@@ -121,7 +121,7 @@ class FEAElement_Tet4 : public FEAElement
     virtual std::array<double,9> get_Jacobian( const int &quaindex ) const
     {
       assert( quaindex >= 0 && quaindex < numQuapts );
-      return {Jac[0], Jac[1], Jac[2], Jac[3], Jac[4], Jac[5], Jac[6], Jac[7], Jac[8]};
+      return {{Jac[0], Jac[1], Jac[2], Jac[3], Jac[4], Jac[5], Jac[6], Jac[7], Jac[8]}};
     }
 
     // Get the inverse Jacobian matrix dr/dx
@@ -130,7 +130,7 @@ class FEAElement_Tet4 : public FEAElement
     virtual std::array<double,9> get_invJacobian( const int &quaindex ) const
     {
       assert( quaindex >= 0 && quaindex < numQuapts );
-      return {Jac[9], Jac[10], Jac[11], Jac[12], Jac[13], Jac[14], Jac[15], Jac[16], Jac[17]};
+      return {{Jac[9], Jac[10], Jac[11], Jac[12], Jac[13], Jac[14], Jac[15], Jac[16], Jac[17]}};
     }
 
     // Get the determinant of the Jacobian matrix
