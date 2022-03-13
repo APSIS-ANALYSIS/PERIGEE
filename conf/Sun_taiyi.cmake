@@ -70,12 +70,12 @@ message(STATUS "External Libraries: " ${EXTRA_LINK_LIBS})
 # Specify the MPI compilers. There should be compilers in
 # $PETSC_DIR/$PETSC_ARCH/bin, or the mpich you specified for 
 # PETSc install.
-set(CMAKE_C_COMPILER /share/intel/2018u4/compilers_and_libraries_2018.5.274/linux/mpi/intel64/bin/mpicc)
-set(CMAKE_CXX_COMPILER /share/intel/2018u4/compilers_and_libraries_2018.5.274/linux/mpi/intel64/bin/mpicxx)
+set(CMAKE_C_COMPILER /share/intel/2018u4/compilers_and_libraries_2018.5.274/linux/mpi/intel64/bin/mpiicc)
+set(CMAKE_CXX_COMPILER /share/intel/2018u4/compilers_and_libraries_2018.5.274/linux/mpi/intel64/bin/mpiicpc)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_BUILD_TYPE RELEASE)
-set(CMAKE_CXX_FLAGS "-O3 -Wall")
+set(CMAKE_CXX_FLAGS "-xHOST -Wall")
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 # EOF
