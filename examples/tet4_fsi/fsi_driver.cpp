@@ -664,7 +664,19 @@ int main(int argc, char *argv[])
   MPI_Barrier(PETSC_COMM_WORLD);
 
   // ===== FEM analysis =====
+#ifdef PETSC_USE_LOG
+  PetscLogEvent tsolver_event;
+  PetscClassId classid;
+  PetscClassIdRegister("user-log-info-time-solver", &classid);
+  PetscLogEventRegister("time_solve", classid, &tsolver_event);
+#endif
+
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
+
+#ifdef PETSC_USE_LOG
+  PetscLogEventBegin(tsolver_event, 0,0,0,0);
+#endif
+
   tsolver->TM_FSI_GenAlpha(is_restart, is_velo, is_pres, base, 
       dot_disp, dot_velo, dot_pres, disp, velo, pres, 
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN_v, locIEN_p, 
@@ -673,6 +685,10 @@ int main(int argc, char *argv[])
       gbc, pmat, mmat, elementv, elements, quadv, quads, ps_data,
       locAssem_fluid_ptr, locAssem_solid_ptr, locAssem_mesh_ptr,
       gloAssem_ptr, gloAssem_mesh_ptr, lsolver, mesh_lsolver, nsolver);
+
+#ifdef PETSC_USE_LOG
+  PetscLogEventEnd(tsolver_event,0,0,0,0);
+#endif
 
   // ===== PETSc Finalize =====
   delete tsolver; delete nsolver; delete lsolver; delete mesh_lsolver;
