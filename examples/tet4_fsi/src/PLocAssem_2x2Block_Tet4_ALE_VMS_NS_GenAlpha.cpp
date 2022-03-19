@@ -9,7 +9,7 @@ PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::PLocAssem_2x2Block_Tet4_ALE_VMS_NS_
   gamma(tm_gAlpha->get_gamma()), beta(in_beta), CI(36.0), CT(4.0),
   nLocBas(in_nlocbas), snLocBas(in_snlocbas),
   vec_size_0( nLocBas * 3 ), vec_size_1( nLocBas ), 
-  sur_size_0( snLocBas * 3 ), sur_size_1( snLocBas )
+  sur_size_0( snLocBas * 3 )
 {
   Tangent00 = new PetscScalar[vec_size_0 * vec_size_0];
   Tangent01 = new PetscScalar[vec_size_0 * vec_size_1];

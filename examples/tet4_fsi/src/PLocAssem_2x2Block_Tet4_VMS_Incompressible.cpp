@@ -9,7 +9,7 @@ PLocAssem_2x2Block_Tet4_VMS_Incompressible::PLocAssem_2x2Block_Tet4_VMS_Incompre
   gamma(tm_gAlpha->get_gamma()),
   nLocBas( in_nlocbas ), snLocBas( in_snlocbas ), 
   vec_size_0( nLocBas * 3 ), vec_size_1( nLocBas ),
-  sur_size_0( snLocBas * 3 ), sur_size_1( snLocBas ),	
+  sur_size_0( snLocBas * 3 ),
   matmodel( in_matmodel )
 {
   Tangent00 = new PetscScalar[vec_size_0 * vec_size_0];
