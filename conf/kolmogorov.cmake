@@ -47,7 +47,7 @@ message(STATUS "External Libraries: " ${EXTRA_LINK_LIBS})
 # ========================================================
 set(CMAKE_C_COMPILER  /Users/juliu/lib/mpich-3.3.2/bin/mpicc)
 set(CMAKE_CXX_COMPILER  /Users/juliu/lib/mpich-3.3.2/bin/mpicxx)
-set(CMAKE_CXX_FLAGS "-O0 -Wall")
+set(CMAKE_CXX_FLAGS "-O0 -Wall -Wextra -Wno-unused-parameter")
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_MACOSX_RPATH 1)
 set(CMAKE_VERBOSE_MAKEFILE OFF)

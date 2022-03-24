@@ -121,7 +121,7 @@ class PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity : public IPLocAssem_2x2Block
   private:
     const double rho0, alpha_f, alpha_m, gamma;
 
-    const int nLocBas, snLocBas, vec_size_0, vec_size_1, sur_size_0, sur_size_1;
+    const int nLocBas, snLocBas, vec_size_0, vec_size_1, sur_size_0;
     
     // useful tensors for the material model
     const IMaterialModel * const matmodel;
