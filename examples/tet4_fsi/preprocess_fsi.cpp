@@ -86,6 +86,7 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionString("-geo_s_file",          geo_s_file);
   SYS_T::GetOptionString("-sur_f_file_wall",     sur_f_file_wall);
   SYS_T::GetOptionString("-sur_s_file_wall",     sur_s_file_wall);
+  SYS_T::GetOptionString("-sur_s_file_int_wall", sur_s_file_interior_wall);
   SYS_T::GetOptionString("-sur_f_file_in_base",  sur_f_file_in_base);
   SYS_T::GetOptionString("-sur_f_file_out_base", sur_f_file_out_base);
   SYS_T::GetOptionString("-sur_s_file_in_base",  sur_s_file_in_base);
@@ -105,6 +106,7 @@ int main( int argc, char * argv[] )
   std::cout<<" -geo_s_file: "         <<geo_s_file         <<std::endl;
   std::cout<<" -sur_f_file_wall: "    <<sur_f_file_wall    <<std::endl;
   std::cout<<" -sur_s_file_wall: "    <<sur_s_file_wall    <<std::endl;
+  std::cout<<" -sur_s_file_int_wall: "<<sur_s_file_interior_wall <<std::endl;
   std::cout<<" -sur_f_file_in_base: " <<sur_f_file_in_base <<std::endl;
   std::cout<<" -sur_f_file_out_base: "<<sur_f_file_out_base<<std::endl;
   std::cout<<" -sur_s_file_in_base: " <<sur_s_file_in_base <<std::endl;
@@ -130,6 +132,8 @@ int main( int argc, char * argv[] )
   SYS_T::file_check(sur_f_file_wall); std::cout<<sur_f_file_wall<<" found. \n";
 
   SYS_T::file_check(sur_s_file_wall); std::cout<<sur_s_file_wall<<" found. \n";
+
+  SYS_T::file_check(sur_s_file_interior_wall); std::cout<<sur_s_file_interior_wall<<" found. \n";
 
   std::vector< std::string > sur_f_file_in(  num_inlet ) , sur_s_file_in(  num_inlet );
   std::vector< std::string > sur_f_file_out( num_outlet ), sur_s_file_out( num_outlet );
