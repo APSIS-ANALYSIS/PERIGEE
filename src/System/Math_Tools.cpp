@@ -185,24 +185,23 @@ void MATH_T::print_Histogram( const std::vector<double> &val )
 
   const int n = (int)val.size();
 
-  int i,j,k;
   const int nbins = (int)((high - low) / delta);
   int* bins = (int*)calloc(nbins,sizeof(int));
   if ( bins != NULL )
   {
-    for ( i = 0; i < n; i++ )
+    for ( int i = 0; i < n; i++ )
     {
       int j = (int)( (val[i] - low) / delta );
       if ( 0 <= j  &&  j < nbins ) bins[j]++;
     }
 
-    for ( j = 0; j < nbins; j++ )
+    for ( int j = 0; j < nbins; j++ )
       if ( max < bins[j] ) max = bins[j];
 
-    for ( j = 0; j < nbins; j++ )
+    for ( int j = 0; j < nbins; j++ )
     {
       printf("(%5.2f, %5.2f) |", low + j * delta, low + (j + 1) * delta );
-      k = (int)( (double)width * (double)bins[j] / (double)max );
+      int k = (int)( (double)width * (double)bins[j] / (double)max );
       while(k-- > 0) putchar('*');
       printf("  %-.1f%%", bins[j] * 100.0 / (double)n);
       putchar('\n');

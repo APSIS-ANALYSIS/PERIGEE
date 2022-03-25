@@ -243,19 +243,13 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &vtufilename,
   {
     SYS_T::file_check( vtpfileList[ii] );
 
-    int numpts, numcels;
-    std::vector<double> pts;
-    std::vector<int> ien, gnode, gelem;
+    const std::vector<int> vtp_gnode = TET_T::read_int_PointData( vtpfileList[ii], "GlobalNodeID");
 
-    TET_T::read_vtp_grid( vtpfileList[ii], numpts, numcels, pts, ien, gnode, gelem );
-
-    if( numpts != static_cast<int>(gnode.size()) ) SYS_T::print_fatal("Error: the numpts != global_node.size()! \n");
-
-    for(unsigned int jj=0; jj<gnode.size(); ++jj)
+    for(unsigned int jj=0; jj<vtp_gnode.size(); ++jj)
     {
-      if(gnode[jj]<0) SYS_T::print_fatal("Error: there are negative nodal index! \n");
+      if(vtp_gnode[jj]<0) SYS_T::print_fatal("Error: there are negative nodal index! \n");
 
-      dir_nodes.push_back( static_cast<unsigned int>( gnode[jj] ) );
+      dir_nodes.push_back( static_cast<unsigned int>( vtp_gnode[jj] ) );
     }
   }
 
