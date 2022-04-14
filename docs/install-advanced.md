@@ -22,7 +22,7 @@ $ make install
 ```
 On certain clusters, OpenGL is not installed. So we have to turnoff the rendering. A minimum required install for VTK is as follows.
 ```sh
-$ CMAKE ../VTK-7.1.1 -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_INSTALL_PREFIX:PATH=/home/juliu/lib/VTK-7.1.1-OPT -DVTK_Group_StandAlone:BOOL=OFF -DVTK_Group_Rendering:BOOL=OFF -DModule_vtkCommonMath:BOOL=ON -DModule_vtkCommonMisc:BOOL=ON -DModule_vtkCommonCore:BOOL=ON -DModule_vtkCommonSystem:BOOL=ON -DModule_vtkIOCore:BOOL=ON -DModule_vtkIOLegacy:BOOL=ON -DModule_vtkIOXML:BOOL=ON
+$ cmake ../VTK-7.1.1 -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_INSTALL_PREFIX:PATH=/home/juliu/lib/VTK-7.1.1-OPT -DVTK_Group_StandAlone:BOOL=OFF -DVTK_Group_Rendering:BOOL=OFF -DModule_vtkCommonMath:BOOL=ON -DModule_vtkCommonMisc:BOOL=ON -DModule_vtkCommonCore:BOOL=ON -DModule_vtkCommonSystem:BOOL=ON -DModule_vtkIOCore:BOOL=ON -DModule_vtkIOLegacy:BOOL=ON -DModule_vtkIOXML:BOOL=ON
 $ make
 $ make install
 ```
