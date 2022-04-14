@@ -17,7 +17,7 @@ set(PETSC_ARCH .)
 
 set(METIS_DIR ${HOME_DIR}/lib/metis-5.1.0)
 
-set(HDF5_ROOT ${HOME_DIR}/lib/hdf5-1.8.6)
+set(HDF5_ROOT ${PETSC_DIR})
 
 # ========================================================
 # Setup the libraries
