@@ -1,0 +1,22 @@
+cmake ../VTK-7.1.1 -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_INSTALL_PREFIX:PATH=/PARA/pp545/lib/VTK-7.1.1 -DVTK_Group_StandAlone:BOOL=OFF -DVTK_Group_Rendering:BOOL=OFF -DModule_vtkCommonMath:BOOL=ON -DModule_vtkCommonMisc:BOOL=ON -DModule_vtkCommonCore:BOOL=ON -DModule_vtkCommonSystem:BOOL=ON -DModule_vtkIOCore:BOOL=ON -DModule_vtkIOLegacy:BOOL=ON -DModule_vtkIOXML:BOOL=ON
+
+
+
+
+--prefix=/PARA/pp545/lib/petsc-3.16.6-opt
+--with-mpi-dir=/WORK/app/MPI/Intel/MPICH/3.2-icc2018-dyn
+--with-blaslapack-dir=/WORK/app/intel/parallel_studio_xe_2018/compilers_and_libraries_2018.0.128/linux/mkl
+--with-scalapack-include=/WORK/app/intel/parallel_studio_xe_2018/compilers_and_libraries_2018.0.128/linux/mkl/include
+--with-scalapack-lib="-L/WORK/app/intel/parallel_studio_xe_2018/compilers_and_libraries_2018.0.128/linux/mkl/lib/intel64 -lmkl_blacs_intelmpi_lp64 -lmkl_scalapack_lp64"
+
+--COPTFLAGS="-O3 -xHOST" --CXXOPTFLAGS="-O3 -xHOST" --FOPTFLAGS="-O3 -xHOST"
+--download-hypre=/PARA/pp545/petsc-3.16.6/petsc3166-ext/hypre-2.23.0.tar.gz
+--download-mumps=/PARA/pp545/petsc-3.16.6/petsc3166-ext/petsc-pkg-mumps-6d1470374d32.tar.gz
+--download-metis=/PARA/pp545/petsc-3.16.6/petsc3166-ext/petsc-pkg-metis-c8d2dc1e751e.tar.gz
+--download-hdf5=/PARA/pp545/petsc-3.16.6/petsc3166-ext/hdf5-1.12.1.tar.bz2
+
+
+module load intel-compilers/2018
+module load MPI/Intel/MPICH/3.2-icc2018-dyn
+module load Python/3.6.10
+module load cmake/3.16.4
