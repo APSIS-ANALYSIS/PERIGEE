@@ -67,7 +67,7 @@ int main( int argc, char * argv[] )
   // Mesh partition setting
   int cpu_size = 1;
   int in_ncommon = 2;
-  const bool isDualGraph = true;
+  bool isDualGraph = true;
 
   bool isReload = false;
 
@@ -91,7 +91,8 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionString("-sur_f_file_out_base", sur_f_file_out_base);
   SYS_T::GetOptionString("-sur_s_file_in_base",  sur_s_file_in_base);
   SYS_T::GetOptionString("-sur_s_file_out_base", sur_s_file_out_base);
-  SYS_T::GetOptionBool("-isReload",              isReload);
+  SYS_T::GetOptionBool(  "-isReload",            isReload);
+  SYS_T::GetOptionBool(  "-isDualGraph",         isDualGraph);
 
   SYS_T::print_fatal_if( fsiBC_type != 0 && fsiBC_type != 1 && fsiBC_type != 2, "Error: fsiBC_type should be 0, 1, or 2.\n" );
   SYS_T::print_fatal_if( ringBC_type != 0 && ringBC_type != 1, "Error: ringBC_type should be 0 or 1.\n" );
@@ -113,7 +114,8 @@ int main( int argc, char * argv[] )
   std::cout<<" -sur_s_file_out_base: "<<sur_s_file_out_base<<std::endl;
   std::cout<<" -cpu_size: "           <<cpu_size           <<std::endl;
   std::cout<<" -in_ncommon: "         <<in_ncommon         <<std::endl;
-  std::cout<<" -isDualGraph: true \n";
+  if(isDualGraph) std::cout<<" -isDualGraph: true \n";
+  else std::cout<<" -isDualGraph: false \n";
   if(isReload) std::cout<<" -isReload : true \n";
   else std::cout<<" -isReload : false \n";
   std::cout<<"----------------------------------\n";
