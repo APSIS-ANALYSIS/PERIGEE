@@ -6,7 +6,7 @@ set(HOME_DIR /work/mae-liuj)
 # ========================================================
 set(VTK_DIR ${HOME_DIR}/lib/VTK-8.2.0-shared/lib64/cmake/vtk-8.2)
 
-set(PETSC_DIR ${HOME_DIR}/lib/petsc-3.14.6-opt)
+set(PETSC_DIR ${HOME_DIR}/lib/petsc-3.14.6-opt-avx512)
 set(PETSC_ARCH .)
 
 set(HDF5_ROOT ${HOME_DIR}/lib/hdf5-1.8.16)
