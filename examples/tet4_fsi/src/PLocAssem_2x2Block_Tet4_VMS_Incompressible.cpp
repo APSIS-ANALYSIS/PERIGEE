@@ -758,9 +758,9 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Residual_Interior_Wall_EB
 
     for(int A=0; A<snLocBas; ++A)
     {
-      sur_Residual0[3*A  ] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * factor * pp * n_out.x();
-      sur_Residual0[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * factor * pp * n_out.y();
-      sur_Residual0[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * (-1.0) * factor * pp * n_out.z();
+      sur_Residual0[3*A  ] -= surface_area * quad -> get_qw(qua) * R[A] * factor * pp * n_out.x();
+      sur_Residual0[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * factor * pp * n_out.y();
+      sur_Residual0[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * factor * pp * n_out.z();
     }
   }
 }
