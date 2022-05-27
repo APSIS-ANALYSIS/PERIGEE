@@ -69,6 +69,22 @@ PGAssem_FSI::PGAssem_FSI(
   std::vector<int> Kdnz, Konz;
   PETSc_T::Get_dnz_onz(K, Kdnz, Konz);
 
+  // Get the maximum nonzeros in each processor
+  int Kdnz_max = *std::max_element( Kdnz.begin(), Kdnz.end() );
+  int Konz_max = *std::max_element( Konz.begin(), Konz.end() );
+
+  // Reduce the values to processor 0 and print on screen
+  MPI_Reduce( SYS_T::get_MPI_rank() ? &Kdnz_max : MPI_IN_PLACE, &Kdnz_max, 1, MPI_INT,
+      MPI_MAX, 0, PETSC_COMM_WORLD );
+
+  MPI_Reduce( SYS_T::get_MPI_rank() ? &Konz_max : MPI_IN_PLACE, &Konz_max, 1, MPI_INT,
+      MPI_MAX, 0, PETSC_COMM_WORLD );
+
+  if( SYS_T::get_MPI_rank() == 0 ) 
+    std::cout<<"===> K dnz max: "<<Kdnz_max<<", and K onz max: "<<Konz_max<<std::endl;
+
+  MPI_Barrier(PETSC_COMM_WORLD);
+
   MatDestroy(&K); // Destroy the K with rough preallocation
 
   // Create Mat with precise preallocation
