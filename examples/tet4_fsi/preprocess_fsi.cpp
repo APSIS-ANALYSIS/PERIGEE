@@ -180,7 +180,6 @@ int main( int argc, char * argv[] )
     cout<<endl<<"Warning: there are additional outlet surface files on disk. Check num_outlet please.\n\n";
 
   // ----- Write the input argument into a HDF5 file
-  std::cout<<"Record the command line arguments into preprocessor_cmd.h5.\n";
   SYS_T::execute("rm -rf preprocessor_cmd.h5");
   hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
   HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
