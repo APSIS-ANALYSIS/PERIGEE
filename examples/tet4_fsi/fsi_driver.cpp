@@ -696,6 +696,7 @@ int main(int argc, char *argv[])
 
   // Print complete solver info
   lsolver -> print_info();
+  mesh_lsolver -> print_info();
 
   // ===== PETSc Finalize =====
   delete tsolver; delete nsolver; delete lsolver; delete mesh_lsolver;
