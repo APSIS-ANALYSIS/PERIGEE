@@ -694,6 +694,9 @@ int main(int argc, char *argv[])
   PetscLogEventEnd(tsolver_event,0,0,0,0);
 #endif
 
+  // Print complete solver info
+  lsolver -> print_info();
+
   // ===== PETSc Finalize =====
   delete tsolver; delete nsolver; delete lsolver; delete mesh_lsolver;
   delete gloAssem_ptr; delete gloAssem_mesh_ptr;
