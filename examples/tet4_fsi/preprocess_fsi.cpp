@@ -71,6 +71,9 @@ int main( int argc, char * argv[] )
 
   bool isReload = false;
 
+  bool isPrintMeshQual = true;
+  double critical_val_aspect_ratio = 3.5;
+
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
   SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: preprocessor needs to be run in serial.\n");
@@ -93,6 +96,8 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionString("-sur_s_file_out_base", sur_s_file_out_base);
   SYS_T::GetOptionBool(  "-isReload",            isReload);
   SYS_T::GetOptionBool(  "-isDualGraph",         isDualGraph);
+  SYS_T::GetOptionBool(  "-isPrintMeshQual",     isPrintMeshQual);
+  SYS_T::GetOptionReal(  "-critical_val_aspect_ratio", critical_val_aspect_ratio);
 
   SYS_T::print_fatal_if( fsiBC_type != 0 && fsiBC_type != 1 && fsiBC_type != 2, "Error: fsiBC_type should be 0, 1, or 2.\n" );
   SYS_T::print_fatal_if( ringBC_type != 0 && ringBC_type != 1, "Error: ringBC_type should be 0 or 1.\n" );
@@ -118,6 +123,9 @@ int main( int argc, char * argv[] )
   else std::cout<<" -isDualGraph: false \n";
   if(isReload) std::cout<<" -isReload : true \n";
   else std::cout<<" -isReload : false \n";
+  if(isPrintMeshQual) std::cout<<" -isPrintMeshQual: true \n";
+  else std::cout<<" -isPrintMeshQual: false \n";
+  std::cout<<" -critical_val_aspect_ratio: "<<critical_val_aspect_ratio<<std::endl;
   std::cout<<"----------------------------------\n";
   std::cout<<" elemType: "<<elemType<<std::endl;
   std::cout<<" part_file_p: "<<part_file_p<<std::endl;
@@ -285,8 +293,11 @@ int main( int argc, char * argv[] )
   VEC_T::sort_unique_resize( p_node_f ); VEC_T::sort_unique_resize( p_node_s );
 
   // Check the mesh of kinematics
-  const double critical_val_aspect_ratio = 3.5;
-  TET_T::tetmesh_check( ctrlPts, IEN_v, nElem, critical_val_aspect_ratio );
+  if( isPrintMeshQual )
+  {
+    std::cout<<"Check the mesh quality... \n";
+    TET_T::tetmesh_check( ctrlPts, IEN_v, nElem, critical_val_aspect_ratio );
+  }
 
   // Generate the mesh for kinematics
   IMesh * mesh_v = new Mesh_Tet4(nFunc_v, nElem);
