@@ -16,7 +16,7 @@ endif( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
 
 set(PETSC_ARCH .)
 
-set(HDF5_ROOT ${HOME_DIR}/lib/hdf5-1.12.0)
+set(HDF5_ROOT ${HOME_DIR}/lib/hdf5-1.13.2)
 
 set(GMSH_DIR ${HOME_DIR}/lib/gmsh-4.8.4)
 
