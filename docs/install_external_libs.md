@@ -155,7 +155,11 @@ $ wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.16/src/h
 $ tar -zxvf hdf5-1.8.16.tar.gz 
 $ mv hdf5-1.8.16 hdf5-1.8.16-src
 $ cd hdf5-1.8.16-src
-$ ./configure --prefix=$HOME/lib/hdf5-1.8.16 --enable-cxx
+$ ./configure --prefix=$HOME/lib/hdf5-1.8.16 --enable-production
+```
+So far, you have downloaded the source file and configured the HDF5 source. In the configuration stage, you specified the install location for the HDF5 library and the compile uses production mode rather than debug mode. You can always see all configuration options by running ```./configure --help```.
+
+```sh
 $ make
 $ make check
 $ make install
