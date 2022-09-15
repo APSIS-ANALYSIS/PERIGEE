@@ -1,4 +1,4 @@
-# Configuration setup for Tai-Yi
+# Configuration setup for Qi-Ming of J. Liu
 set(HOME_DIR /home/maad-liuj)
 
 # ========================================================
@@ -9,7 +9,7 @@ set(VTK_DIR ${HOME_DIR}/lib/VTK-7.1.1-SHARED/lib/cmake/vtk-7.1)
 set(PETSC_DIR ${HOME_DIR}/lib/petsc-3.15.3-opt)
 set(PETSC_ARCH .)
 
-set(HDF5_ROOT ${HOME_DIR}/lib/hdf5-1.12.0)
+set(HDF5_ROOT ${HOME_DIR}/lib/hdf5-1.12.2)
 
 # ========================================================
 # Setup the libraries
