@@ -6,6 +6,8 @@ set(HOME_DIR /work/mae-liuj)
 # ========================================================
 set(VTK_DIR ${HOME_DIR}/lib/VTK-8.2.0-shared/lib64/cmake/vtk-8.2)
 
+set(MPI_DIR /share/intel/2018u4/compilers_and_libraries_2018.5.274/linux/mpi/intel64/bin)
+
 set(PETSC_DIR ${HOME_DIR}/lib/petsc-3.14.6-opt-avx512)
 set(PETSC_ARCH .)
 
@@ -35,8 +37,8 @@ message(STATUS "External Libraries: " ${EXTRA_LINK_LIBS})
 # ===================================================================
 # Compiler options
 # ===================================================================
-set(CMAKE_C_COMPILER /share/intel/2018u4/compilers_and_libraries_2018.5.274/linux/mpi/intel64/bin/mpiicc)
-set(CMAKE_CXX_COMPILER /share/intel/2018u4/compilers_and_libraries_2018.5.274/linux/mpi/intel64/bin/mpiicpc)
+set(CMAKE_C_COMPILER ${MPI_DIR}/mpiicc)
+set(CMAKE_CXX_COMPILER ${MPI_DIR}/mpiicpc)
 set(CMAKE_BUILD_TYPE RELEASE)
 set(CMAKE_CXX_FLAGS "-xHOST -Wall")
 set(CMAKE_CXX_STANDARD 11)
