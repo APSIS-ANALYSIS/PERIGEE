@@ -55,17 +55,17 @@ Of course, for experienced users, you can download the Valgrind source file and 
 
 
 ## Install CMake
-Make sure you have cmake installed in your system. In case you do not have one, do the following.
+Make sure you have cmake installed in your system. In case you do not have one, you will have to install it youself. There are several ways of intalling CMake. If you have the admin privilege, do the following.
 ```sh
 $ sudo apt-get install cmake
 ```
-
-If you are an advanced user and wants to build cmake youself, consult this page: https://cmake.org/install/ You may encounter issues like the lack of openssl in the system, which can be conveniently resolved by, e.g., `sudo apt install libssl-dev`. Of course to tell the system to load the correct CMake, you may also want to modify PATH in the .bashrc or .bash_profile file.
+Linux will automatically install CMake for you. If you are an advanced user and wants to build cmake youself, consult this page: https://cmake.org/install/ You may encounter issues like the lack of openssl in the system, which can be conveniently resolved by, e.g., `sudo apt install libssl-dev`. Of course to tell the system to load the correct CMake, you may also want to modify PATH in the .bashrc or .bash_profile file.
 
 If you are using a cluster, cmake can be loaded by
 ```sh
 $ module load cmake
 ```
+The easiest way of getting CMake is directly downloading a compiled CMake from the [official site](https://cmake.org/download/). When you download the compiled CMake, make sure you get the correct platform. Typically, it should be Linux x86-64.
 
 ## Install MPICH
 First, download the source file, extract the tar bar, and rename the folder as a source folder:
