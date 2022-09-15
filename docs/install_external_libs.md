@@ -112,12 +112,12 @@ $ mkdir build_vtk
 $ cd build_vtk
 $ cmake $HOME/VTK-7.1.1-src -DCMAKE_INSTALL_PREFIX=$HOME/lib/VTK-7.1.1-shared -DBUILD_SHARED_LIBS=ON
 ```
-At this stage, you may encounter an issue due to the lack of the OpenGL library. There are two ways to address this issue. Suppose the machine is of your own and you have the admin privilege. You may choose to install OpenGL. Otherwise, if the machine is a cluster and you are a regular user, you may install VTK without OpenGL. Let us give the first approach here. Run `sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev`.
+At this stage, you may encounter an issue due to the lack of the OpenGL library. There are two ways to address this issue. Suppose the machine is of your own and you have the admin privilege. You may choose to install OpenGL. Otherwise, if the machine is a cluster and you are a regular user, you may install VTK without OpenGL. Let us give the first approach here. Run `sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev`. The second approach is documented in [guide for advanced users](install-advanced.md).
 ```
 $ make -j 6
 $ make install
 ```
-A folder named VTK-7.1.1-shared will be created in `$HOME/lib`. The name of this folder indicate that the library is a shared library, because we set `BUILD_SHARED_LIBS=ON` in the configuration stage. For an explanation of the differences between shared libraries and static libraries, please consult this [page](https://stackoverflow.com/questions/2649334/difference-between-static-and-shared-libraries). Now, if you go to `$HOME/lib/VTK-7.1.1-shared`, you should be able to see four sub-directories named as share, include, lib, and bin. Now, you may safely remove VTK-7.1.1.tar.gz, VTK-7.1.1-src, and build_vtk.
+A folder named VTK-7.1.1-shared will be created in `$HOME/lib`. The name of this folder indicate that the library is a shared library, because we set `BUILD_SHARED_LIBS=ON` in the configuration stage. For an explanation of the differences between shared libraries and static libraries, please consult this [page](https://stackoverflow.com/questions/2649334/difference-between-static-and-shared-libraries). Now, if you go to `$HOME/lib/VTK-7.1.1-shared`, you should be able to see four sub-directories named as share, include, lib, and bin. With the library installed, you may safely remove VTK-7.1.1.tar.gz, VTK-7.1.1-src, and build_vtk.
 
 ```sh
 $ rm -rf VTK-7.1.1.tar.gz VTK-7.1.1-src build_vtk
