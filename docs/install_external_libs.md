@@ -112,7 +112,7 @@ $ mkdir build_vtk
 $ cd build_vtk
 $ cmake $HOME/VTK-7.1.1-src -DCMAKE_INSTALL_PREFIX=$HOME/lib/VTK-7.1.1-shared -DBUILD_SHARED_LIBS=ON
 ```
-At this stage, you may encounter an issue due to the lack of the OpenGL library. Run `sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev`.
+At this stage, you may encounter an issue due to the lack of the OpenGL library. There are two ways to address this issue. Suppose the machine is of your own and you have the admin privilege. You may choose to install OpenGL. Otherwise, if the machine is a cluster and you are a regular user, you may install VTK without OpenGL. Let us give the first approach here. Run `sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev`.
 ```
 $ make -j 6
 $ make install
