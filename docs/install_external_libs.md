@@ -160,7 +160,7 @@ $ mv hdf5-1.8.16 hdf5-1.8.16-src
 $ cd hdf5-1.8.16-src
 $ ./configure --prefix=$HOME/lib/hdf5-1.8.16 --enable-production
 ```
-So far, you have downloaded the source file and configured the HDF5 source. In the configuration stage, you specified the install location for the HDF5 library and the compile uses production mode rather than debug mode. You can always see all configuration options by running ```./configure --help```.
+So far, you have downloaded the source file and configured the HDF5 source. In the configuration stage, you specified the install location for the HDF5 library and the compile uses production mode rather than debug mode. You can always see all configuration options by running ```./configure --help```. At the end of configure output, there will be a summary of the configuration setup. Make sure that (1) the install location is correct; (2) the build type is production (or debug); (3) optionally, parallel hdf5 is supported.
 
 ```sh
 $ make
@@ -173,7 +173,7 @@ $ rm -rf hdf5-1.8.16-src
 In the lib folder, there should be a sub-directory hdf5-1.8.16, containing the HDF5 library.
 
 ## Install METIS
-Run the following commands to install METIS
+Run the following commands to install METIS.
 ```sh
 $ wget http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/OLD/metis-5.0.3.tar.gz
 $ tar -zxvf metis-5.0.3.tar.gz
