@@ -170,7 +170,7 @@ $ make check-install
 $ cd ..
 $ rm -rf hdf5-1.8.16-src
 ```
-In the lib folder, there should be a sub-directory hdf5-1.8.16, containing the HDF5 library.
+The commands `make check` and `make check-install` are optional but recommended. In the lib folder, there should be a sub-directory hdf5-1.8.16, containing the HDF5 library.
 
 ## Install METIS
 Run the following commands to install METIS.
