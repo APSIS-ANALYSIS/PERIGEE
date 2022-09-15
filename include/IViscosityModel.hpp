@@ -9,6 +9,7 @@
 #include "Sys_Tools.hpp"
 #include "HDF5_Writer.hpp"
 #include "HDF5_Reader.hpp"
+#include "Matrix_3x3.hpp"
 
 class IViscosityModel
 {
