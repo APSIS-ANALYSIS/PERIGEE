@@ -185,6 +185,7 @@ $ make install
 $ cd ..
 $ rm -rf metis-5.0.3-src
 ```
+Remarks: (1) You should read BUILD.txt to have an idea of all relevant configure options. (2) If you need 64-bit integer support, you need to modify the `metis.h` file in the include folder before compiling.
 
 ## Install Gmsh
 The PERIGEE code does **not** depend on Gmsh. However, we frequently use Gmsh to generate input files for unstructured grid. Therefore, it is recommended that you install Gmsh on your machine. This step is **unnecessary** for compiling PERIGEE on clusters. Currently, the code is compatible with the mesh format from Gmsh-3. Run the following commands to install Gmsh. We do not need to link the PERIGEE code to Gmsh. For many cases, we generate a mesh using Gmsh as a binary executable.
