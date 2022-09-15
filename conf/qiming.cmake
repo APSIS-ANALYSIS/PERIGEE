@@ -6,6 +6,8 @@ set(HOME_DIR /home/maad-liuj)
 # ========================================================
 set(VTK_DIR ${HOME_DIR}/lib/VTK-7.1.1-SHARED/lib/cmake/vtk-7.1)
 
+set(MPI_DIR /opt/software/intel/2017/compilers_and_libraries_2017.8.262/linux/mpi/intel64/bin)
+
 set(PETSC_DIR ${HOME_DIR}/lib/petsc-3.15.3-opt)
 set(PETSC_ARCH .)
 
@@ -35,8 +37,8 @@ message(STATUS "External Libraries: " ${EXTRA_LINK_LIBS})
 # ===================================================================
 # Compiler options
 # ===================================================================
-set(CMAKE_C_COMPILER /opt/software/intel/2017/compilers_and_libraries_2017.8.262/linux/mpi/intel64/bin/mpicc)
-set(CMAKE_CXX_COMPILER /opt/software/intel/2017/compilers_and_libraries_2017.8.262/linux/mpi/intel64/bin/mpiicpc)
+set(CMAKE_C_COMPILER ${MPI_DIR}/mpicc)
+set(CMAKE_CXX_COMPILER ${MPI_DIR}/mpiicpc)
 set(CMAKE_BUILD_TYPE RELEASE)
 set(CMAKE_CXX_FLAGS "-xHOST -Wall")
 set(CMAKE_CXX_STANDARD 11)
