@@ -142,11 +142,6 @@ If the configuration stage is completed successfully, there will be messages to 
 $ make PETSC_DIR=/home/jliu/lib/petsc-3.11.3 PETSC_ARCH=arch-linux2-c-debug all
 $ make PETSC_DIR=/home/jliu/lib/petsc-3.11.3 PETSC_ARCH=arch-linux2-c-debug check
 ```
-On TACC machines, you do not have to install PETSc yourself. Run the following command, you will see the location of the PETSc library on TACC machines.
-```sh
-$ module load petsc
-$ echo $TACC_PETSC_DIR
-```
 
 ## Install HDF5
 Run the following commands to install HDF5.
@@ -167,11 +162,7 @@ $ make check-install
 $ cd ..
 $ rm -rf hdf5-1.8.16-src
 ```
-In the lib folder, there should be a sub-directory hdf5-1.8.16, containing the HDF5 library. Again, on TACC machines, the HDF5 library is already installed. To locate it, run the following.
-```sh
-$ module load hdf5
-$ echo $TACC_HDF5_DIR
-```
+In the lib folder, there should be a sub-directory hdf5-1.8.16, containing the HDF5 library.
 
 ## Install METIS
 Run the following commands to install METIS
