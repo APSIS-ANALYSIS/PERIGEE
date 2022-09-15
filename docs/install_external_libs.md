@@ -15,7 +15,6 @@ On most clusters, there are already certain libraries installed by the admin. Yo
 module purge
 module load intel/2018.4
 module load mpi/intel/2018.4
-
 ```
 The above indicates that all modules are unloaded first and the intel/2018.4 compiler is loaded, and then the corresponding MPI is loaded.
 
