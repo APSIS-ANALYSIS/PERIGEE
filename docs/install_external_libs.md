@@ -130,7 +130,7 @@ A folder named VTK-7.1.1-shared will be created in `$HOME/lib`. The name of this
 ```sh
 $ rm -rf VTK-7.1.1.tar.gz VTK-7.1.1-src build_vtk
 ```
-For more detailed discussion of installing the VTK library, refer to the [guide for advanced users](install-advanced.md).
+For more detailed discussion of installing the VTK library, refer to the [guide for advanced users](install-advanced.md). We recommend using VTK-7.1.1 or VTK-8.2.0.
 
 ## Install PETSc
 First, we enter the lib folder and download petsc source files in the folder.
@@ -170,7 +170,7 @@ $ make check-install
 $ cd ..
 $ rm -rf hdf5-1.8.16-src
 ```
-The commands `make check` and `make check-install` are optional but recommended. In the lib folder, there should be a sub-directory hdf5-1.8.16, containing the HDF5 library.
+The commands `make check` and `make check-install` are optional but recommended. In the lib folder, there should be a sub-directory hdf5-1.8.16, containing the HDF5 library. As a note, we recommend using hdf5-1.8.16 or hdf5-1.12.2.
 
 ## Install METIS
 Run the following commands to install METIS.
