@@ -10,6 +10,9 @@ You will have all the libraries installed in a specified location (in this guide
 
 The four libraries VTK, PETSc, HDF5, and METIS are required for the build of PERIGEE. MPICH is needed for parallelization; Gmsh is often needed for mesh generation; SLEPc is needed for calculating eigenvalues; ParaView is used for visualization solution outputs.
 
+On most clusters, there are already certain libraries installed by the admin. You need to use [Environment Modules](https://modules.readthedocs.io/en/latest/) to manage the installed libraries if you want to use them. As a short note, you can use `module list` to see the currently loaded modules and `module avail` to see the available (or, installed) modules. You may load and unload one by `module load [name]` and `module unload [name]`. You may use `module purge` to unload all modules. If you want to see the detailed info about the module, in particular the library path, you may use `module show [name]` to list related info.
+
+
 ## Table of Contents
 
 - [Create a lib folder](#Create-a-lib-folder)
