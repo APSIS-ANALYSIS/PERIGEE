@@ -14,6 +14,7 @@
 // Author: Ju Liu
 // Date: June 24 2020
 // ============================================================================
+#include <cstdlib>
 #include <iomanip>
 #include <iostream>
 #include <ctime>

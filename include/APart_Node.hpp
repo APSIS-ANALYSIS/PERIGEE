@@ -2,7 +2,7 @@
 #define APART_NODE_HPP
 // ============================================================================
 // APart_Node.hpp
-// Interface for partitioned node indices, including:
+// Class storing information of partitioned node indices, including:
 // 1. re-ordered global indices of nodes;
 // 2. number of local nodes, ghost nodes, etc.
 // 3. dof : dofNum in the preprocessor. The total degrees of freedom
