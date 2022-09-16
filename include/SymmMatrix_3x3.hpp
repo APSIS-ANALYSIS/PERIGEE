@@ -34,6 +34,92 @@ class SymmMatrix_3x3
 
     const double& operator()(const int &index) const {return mat[index];}
 
+    // Get-functions that access components directly
+    const double& xx() const {return mat[0];}
+    double& xx() {return mat[0];}
+    
+    // TO-BE-FINISHED
+
+    // Addition operator : return left + right
+    friend SymmMatrix_3x3 operator+( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right);
+
+    // Minus operator : return left - right
+    friend Matrix_3x3 operator-( const Matrix_3x3 &left, const Matrix_3x3 &right);
+
+    // Add the source matrix to the object
+    Matrix_3x3& operator+=( const Matrix_3x3 &source );
+
+    // Minus the source matrix to the object
+    Matrix_3x3& operator-=( const Matrix_3x3 &source );
+
+    // Scalar product
+    Matrix_3x3& operator*=( const double &val );
+
+    // Return true if the input matrix is identical to the mat
+    bool is_identical( const Matrix_3x3 source ) const;
+
+    // Set all components to zero
+    void gen_zero();
+
+    // Set an identity matrix
+    void gen_id();
+
+    // Set components a random value
+    void gen_rand();
+
+    // Invert the matrix
+    void inverse();
+
+    // Scale the matrix by a scalar
+    void scale( const double &val );
+
+    // add the matrix with a given matrix with scaling
+    // X = X + a * Y
+    void AXPY( const double &val, const Matrix_3x3 &source );
+
+    // X = X + a * I
+    void AXPI( const double &val );
+
+    // add the matrix source with the matrix
+    // X = X + Y
+    void PY( const Matrix_3x3 &source );
+
+    // Get the determinant of the matrix
+    double det() const;
+
+    // Get the trace of the matrix
+    double tr() const {return mat[0] + mat[4] + mat[8];}
+
+    // Get the invariants
+    double I1() const {return tr();}
+
+    double I2() const;
+
+    double I3() const {return det();}
+
+    // Return x^T Mat y, assuming x, y are both column vectors of size 3
+    double VecMatVec( const Vector_3 &x, const Vector_3 &y ) const;
+
+    // Vector multiplication y = Ax, the vectors have to be size 3
+    Vector_3 VecMult( const Vector_3 &x ) const;
+
+    void VecMult( const double &x0, const double &x1, const double &x2,
+       double &y0, double &y1, double &y2 ) const;
+
+    // Matrix rotation
+    // Let Q be a rotation matrix, the matrix gets updated by
+    // Q^T M Q = Q_ki M_kl Q_lj = output_matrix_ij
+    void MatRot( const Matrix_3x3 &Q );
+
+    // print the matrix
+    void print() const;
+
+    // print the matrix in a row
+    void print_in_row() const;
+
+    // print the Voigt components in the order of xx yy zz yz xz xy
+    void print_Voigt() const;
+
   private:
     double mat[6];
 };
