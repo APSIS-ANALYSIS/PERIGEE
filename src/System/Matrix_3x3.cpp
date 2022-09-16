@@ -33,7 +33,7 @@ Matrix_3x3::Matrix_3x3(
 Matrix_3x3::~Matrix_3x3()
 {}
 
-bool Matrix_3x3::is_identical( const Matrix_3x3 source ) const
+bool Matrix_3x3::is_identical( const Matrix_3x3 &source ) const
 {
   for(int ii=0; ii<9; ++ii) 
     if(source(ii) != mat[ii]) return false;
