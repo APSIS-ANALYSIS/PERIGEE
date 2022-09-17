@@ -22,4 +22,20 @@ SymmMatrix_3x3::SymmMatrix_3x3( const double &m0, const double &m1,
 SymmMatrix_3x3::~SymmMatrix_3x3()
 {}
 
+SymmMatrix_3x3 operator+( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right )
+{
+  SymmMatrix_3x3 result;
+  for(int ii=0; ii<6; ii++) result.mat[ii] = left.mat[ii] + right.mat[ii];
+
+  return result;
+}
+
+SymmMatrix_3x3 operator-( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right )
+{
+  SymmMatrix_3x3 result;
+  for(int ii=0; ii<6; ii++) result.mat[ii] = left.mat[ii] - right.mat[ii];
+
+  return result;
+}
+
 // EOF
