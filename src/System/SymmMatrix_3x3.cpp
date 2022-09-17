@@ -173,4 +173,24 @@ void SymmMatrix_3x3::MatRot( const Matrix_3x3 &Q )
   for(int ii=0; ii<9; ++ii) mat[ii] = temp[ii];
 }
 
+void SymmMatrix_3x3::print() const
+{
+  std::cout<<std::setprecision(9)<<mat[0]<<'\t'<<mat[5]<<'\t'<<mat[4]<<std::endl;
+  std::cout<<std::setprecision(9)<<mat[5]<<'\t'<<mat[1]<<'\t'<<mat[3]<<std::endl;
+  std::cout<<std::setprecision(9)<<mat[4]<<'\t'<<mat[3]<<'\t'<<mat[2]<<std::endl;
+}
+
+void SymmMatrix_3x3::print_in_row() const
+{
+  std::cout<<std::setprecision(9)<<mat[0]<<'\t'<<mat[5]<<'\t'<<mat[4]<<'\t';
+  std::cout<<std::setprecision(9)<<mat[5]<<'\t'<<mat[1]<<'\t'<<mat[3]<<'\t';
+  std::cout<<std::setprecision(9)<<mat[4]<<'\t'<<mat[3]<<'\t'<<mat[2]<<std::endl;
+}
+
+void SymmMatrix_3x3::print_Voigt() const
+{
+  std::cout<<std::setprecision(9)<<mat[0]<<'\t'<<mat[1]<<'\t'<<mat[2]<<'\t';
+  std::cout<<std::setprecision(9)<<mat[3]<<'\t'<<mat[4]<<'\t'<<mat[5]<<std::endl;
+}
+
 // EOF
