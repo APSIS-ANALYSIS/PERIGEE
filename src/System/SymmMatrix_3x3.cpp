@@ -170,7 +170,8 @@ void SymmMatrix_3x3::MatRot( const Matrix_3x3 &Q )
     }
   }
   
-  for(int ii=0; ii<9; ++ii) mat[ii] = temp[ii];
+  mat[0] = temp[0]; mat[5] = temp[1]; mat[4] = temp[2];
+  mat[1] = temp[4]; mat[3] = temp[5]; mat[2] = temp[8];
 }
 
 void SymmMatrix_3x3::print() const
