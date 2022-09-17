@@ -107,4 +107,19 @@ void SymmMatrix_3x3::scale( const double &val )
   for(int ii=0; ii<6; ii++) mat[ii] = mat[ii] * val;
 }
 
+void SymmMatrix_3x3::AXPY( const double &val, const SymmMatrix_3x3 &source )
+{
+  for(int ii=0; ii<6; ii++) mat[ii] = mat[ii] + val * source(ii);
+}
+
+void SymmMatrix_3x3::AXPI( const double &val )
+{
+  mat[0] += val; mat[1] += val; mat[2] += val;
+}
+
+void SymmMatrix_3x3::PY( const SymmMatrix_3x3 &source )
+{
+  for(int ii=0; ii<6; ii++) mat[ii] += source(ii);
+}
+
 // EOF
