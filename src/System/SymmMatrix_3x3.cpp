@@ -122,4 +122,24 @@ void SymmMatrix_3x3::PY( const SymmMatrix_3x3 &source )
   for(int ii=0; ii<6; ii++) mat[ii] += source(ii);
 }
 
+double SymmMatrix_3x3::det() const
+{
+  return mat[0] * mat[1] * mat[2] + mat[5] * mat[3] * mat[4]
+    + mat[4] * mat[5] * mat[3] - mat[4] * mat[1] * mat[4]
+    - mat[0] * mat[3] * mat[3] - mat[5] * mat[5] * mat[2];
+}
+
+double SymmMatrix_3x3::I2() const
+{
+  return 0.5 * ( I1() * I1() - mat[0] * mat[0] - mat[1] * mat[1] 
+     - mat[2] * mat[2] - 2.0 * ( mat[5] * mat[5] + mat[4] * mat[4] + mat[3] * mat[3] ) );
+}
+
+double SymmMatrix_3x3::VecMatVec( const Vector_3 &x, const Vector_3 &y ) const
+{
+  return x(0) * ( mat[0] * y(0) + mat[5] * y(1) + mat[4] * y(2) )
+    + x(1) * ( mat[5] * y(0) + mat[1] * y(1) + mat[3] * y(2) )
+    + x(2) * ( mat[4] * y(0) + mat[3] * y(1) + mat[2] * y(2) );
+}
+
 // EOF
