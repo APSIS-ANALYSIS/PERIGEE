@@ -37,6 +37,30 @@ class SymmMatrix_3x3
     // Get-functions that access components directly
     const double& xx() const {return mat[0];}
     double& xx() {return mat[0];}
+
+    const double& xy() const {return mat[5];}
+    double& xy() {return mat[5];}
+
+    const double& xz() const {return mat[4];}
+    double& xz() {return mat[4];}
+
+    const double& yx() const {return mat[5];}
+    double& yx() {return mat[5];}
+
+    const double& yy() const {return mat[1];}
+    double& yy() {return mat[1];}
+
+    const double& yz() const {return mat[3];}
+    double& yz() {return mat[3];}
+
+    const double& zx() const {return mat[4];}
+    double& zx() {return mat[4];}
+
+    const double& zy() const {return mat[3];}
+    double& zy() {return mat[3];}
+
+    const double& zz() const {return mat[2];}
+    double& zz() {return mat[2];}
     
     // TO-BE-FINISHED
 
