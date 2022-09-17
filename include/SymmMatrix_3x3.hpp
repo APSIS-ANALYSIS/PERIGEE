@@ -65,22 +65,22 @@ class SymmMatrix_3x3
     // TO-BE-FINISHED
 
     // Addition operator : return left + right
-    friend SymmMatrix_3x3 operator+( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right);
+    friend SymmMatrix_3x3 operator+( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right );
 
     // Minus operator : return left - right
-    friend Matrix_3x3 operator-( const Matrix_3x3 &left, const Matrix_3x3 &right);
+    friend SymmMatrix_3x3 operator-( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right );
 
     // Add the source matrix to the object
-    Matrix_3x3& operator+=( const Matrix_3x3 &source );
+    SymmMatrix_3x3& operator+=( const SymmMatrix_3x3 &source );
 
     // Minus the source matrix to the object
-    Matrix_3x3& operator-=( const Matrix_3x3 &source );
+    SymmMatrix_3x3& operator-=( const SymmMatrix_3x3 &source );
 
     // Scalar product
-    Matrix_3x3& operator*=( const double &val );
+    SymmMatrix_3x3& operator*=( const double &val );
 
     // Return true if the input matrix is identical to the mat
-    bool is_identical( const Matrix_3x3 source ) const;
+    bool is_identical( const SymmMatrix_3x3 source ) const;
 
     // Set all components to zero
     void gen_zero();
@@ -99,20 +99,20 @@ class SymmMatrix_3x3
 
     // add the matrix with a given matrix with scaling
     // X = X + a * Y
-    void AXPY( const double &val, const Matrix_3x3 &source );
+    void AXPY( const double &val, const SymmMatrix_3x3 &source );
 
     // X = X + a * I
     void AXPI( const double &val );
 
     // add the matrix source with the matrix
     // X = X + Y
-    void PY( const Matrix_3x3 &source );
+    void PY( const SymmMatrix_3x3 &source );
 
     // Get the determinant of the matrix
     double det() const;
 
     // Get the trace of the matrix
-    double tr() const {return mat[0] + mat[4] + mat[8];}
+    double tr() const {return mat[0] + mat[1] + mat[2];}
 
     // Get the invariants
     double I1() const {return tr();}
