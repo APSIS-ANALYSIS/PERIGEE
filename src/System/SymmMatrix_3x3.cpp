@@ -74,6 +74,37 @@ void SymmMatrix_3x3::gen_id()
   mat[3] = 0.0; mat[4] = 0.0; mat[5] = 0.0; 
 }
 
+void SymmMatrix_3x3::gen_rand()
+{
+  srand(time(NULL));
 
+  for(int ii=0; ii<6; ii++)
+  {
+    double value = rand() % 10000;
+
+    mat[ii] = value * 1.0e-3 - 5.0;
+  }
+}
+
+void SymmMatrix_3x3::inverse()
+{
+  const double invdetA = 1.0 / det();
+
+  double temp[6];
+
+  temp[0] = invdetA * (mat[1] * mat[2] - mat[3] * mat[3]);
+  temp[5] = invdetA * (mat[4] * mat[3] - mat[5] * mat[2]);
+  temp[4] = invdetA * (mat[5] * mat[3] - mat[4] * mat[1]);
+  temp[1] = invdetA * (mat[0] * mat[2] - mat[4] * mat[4]);
+  temp[3] = invdetA * (mat[4] * mat[5] - mat[0] * mat[3]);
+  temp[2] = invdetA * (mat[0] * mat[1] - mat[5] * mat[5]);
+
+  for(int ii=0; ii<6; ii++) mat[ii] = temp[ii];
+}
+
+void SymmMatrix_3x3::scale( const double &val )
+{
+  for(int ii=0; ii<6; ii++) mat[ii] = mat[ii] * val;
+}
 
 // EOF
