@@ -12,6 +12,8 @@
 // Author: Ju Liu
 // Date: Sept. 16 2022
 // ============================================================================
+#include "Vector_3.hpp"
+#include "Matrix_3x3.hpp"
 
 class SymmMatrix_3x3
 {
