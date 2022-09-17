@@ -142,4 +142,35 @@ double SymmMatrix_3x3::VecMatVec( const Vector_3 &x, const Vector_3 &y ) const
     + x(2) * ( mat[4] * y(0) + mat[3] * y(1) + mat[2] * y(2) );
 }
 
+Vector_3 SymmMatrix_3x3::VecMult( const Vector_3 &x ) const
+{
+  return Vector_3( mat[0] * x(0) + mat[5] * x(1) + mat[4] * x(2),
+      mat[5] * x(0) + mat[1] * x(1) + mat[3] * x(2),
+      mat[4] * x(0) + mat[3] * x(1) + mat[2] * x(2) );
+}
+
+void SymmMatrix_3x3::VecMult( const double &x0, const double &x1, const double &x2,
+       double &y0, double &y1, double &y2 ) const
+{
+  y0 = mat[0] * x0 + mat[5] * x1 + mat[4] * x2;
+  y1 = mat[5] * x0 + mat[1] * x1 + mat[3] * x2;
+  y2 = mat[4] * x0 + mat[3] * x1 + mat[2] * x2;
+}
+
+void SymmMatrix_3x3::MatRot( const Matrix_3x3 &Q )
+{
+  double temp[9] = {0};
+  for(int ii=0; ii<3; ++ii)
+  {
+    for(int jj=0; jj<3; ++jj)
+    {
+      temp[ii*3+jj] = Q(0,ii) * ( mat[0]*Q(0,jj) + mat[5]*Q(1,jj) + mat[4]*Q(2,jj) )
+                    + Q(1,ii) * ( mat[5]*Q(0,jj) + mat[1]*Q(1,jj) + mat[3]*Q(2,jj) )
+                    + Q(2,ii) * ( mat[4]*Q(0,jj) + mat[3]*Q(1,jj) + mat[2]*Q(2,jj) );
+    }
+  }
+  
+  for(int ii=0; ii<9; ++ii) mat[ii] = temp[ii];
+}
+
 // EOF
