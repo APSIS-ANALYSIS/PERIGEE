@@ -38,4 +38,22 @@ SymmMatrix_3x3 operator-( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &righ
   return result;
 }
 
+SymmMatrix_3x3& SymmMatrix_3x3::operator+=( const SymmMatrix_3x3 &source )
+{
+  for(int ii=0; ii<6; ii++) mat[ii] += source(ii);
+  return *this; 
+}
+
+ SymmMatrix_3x3& SymmMatrix_3x3::operator-=( const SymmMatrix_3x3 &source )
+{
+  for(int ii=0; ii<6; ii++) mat[ii] -= source(ii);
+  return *this; 
+}
+
+SymmMatrix_3x3& SymmMatrix_3x3::operator*=( const double &val )
+{
+  for(int ii=0; ii<6; ii++) mat[ii] *= val;
+  return *this;
+}
+
 // EOF
