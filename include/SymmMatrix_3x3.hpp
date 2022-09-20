@@ -12,7 +12,6 @@
 // Author: Ju Liu
 // Date: Sept. 16 2022
 // ============================================================================
-#include "Vector_3.hpp"
 #include "Matrix_3x3.hpp"
 
 class SymmMatrix_3x3
@@ -23,6 +22,9 @@ class SymmMatrix_3x3
 
     // Copy constructor
     SymmMatrix_3x3( const SymmMatrix_3x3 &source );
+
+    // Construct the symmetric part of the input source matrix
+    SymmMatrix_3x3( const Matrix_3x3 &source );
 
     // Constructor by six numbers in Voigt numbering
     SymmMatrix_3x3( const double &m0, const double &m1, const double &m2,
@@ -90,6 +92,10 @@ class SymmMatrix_3x3
 
     // Set components a random value
     void gen_rand();
+
+    // Generate the symmetric part of the input source matrix, i.e.
+    // output = 0.5 x ( source + source_transpose )
+    void gen_symm( const Matrix_3x3 &source );
 
     // Invert the matrix
     void inverse();
