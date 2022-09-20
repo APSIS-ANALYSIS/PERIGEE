@@ -64,8 +64,6 @@ class SymmMatrix_3x3
     const double& zz() const {return mat[2];}
     double& zz() {return mat[2];}
     
-    // TO-BE-FINISHED
-
     // Addition operator : return left + right
     friend SymmMatrix_3x3 operator+( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right );
 
@@ -82,7 +80,7 @@ class SymmMatrix_3x3
     SymmMatrix_3x3& operator*=( const double &val );
 
     // Return true if the input matrix is identical to the mat
-    bool is_identical( const SymmMatrix_3x3 source ) const;
+    bool is_identical( const SymmMatrix_3x3 &source ) const;
 
     // Set all components to zero
     void gen_zero();

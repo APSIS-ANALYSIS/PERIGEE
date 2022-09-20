@@ -56,7 +56,7 @@ SymmMatrix_3x3& SymmMatrix_3x3::operator*=( const double &val )
   return *this;
 }
 
-bool SymmMatrix_3x3::is_identical( const SymmMatrix_3x3 source ) const
+bool SymmMatrix_3x3::is_identical( const SymmMatrix_3x3 &source ) const
 {
   for(int ii=0; ii<6; ii++)
     if(source(ii) != mat[ii]) return false;
