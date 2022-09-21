@@ -168,7 +168,7 @@ int main( int argc, char *argv[] )
   }
   else
   {
-    SYS_T::commPrint(    "-is_record_sol: false \n");
+    SYS_T::commPrint(    "-is_read_material: false \n");
     SYS_T::cmdPrint(     "-sl_density:",         solid_density);
     SYS_T::cmdPrint(     "-sl_E:",               solid_E);
     SYS_T::cmdPrint(     "-sl_nu:",              solid_nu);
