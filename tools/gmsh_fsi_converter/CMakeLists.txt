@@ -34,16 +34,22 @@ INCLUDE(../../conf/system_lib_loading.cmake)
 # Set my own source code
 # ===============================================
 SET( perigee_source ${perigee_SOURCE_DIR}/../../src )
+
 SET( perigee_lib_src 
+  ${perigee_source}/System/Vector_3.cpp
+  ${perigee_source}/System/SV_Tools.cpp
+  ${perigee_source}/Mesh/Tet_Tools.cpp
+  ${perigee_source}/System/Math_Tools.cpp
+  ${perigee_source}/System/Matrix_double_3by3_Array.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
   ${perigee_source}/System/HDF5_Reader.cpp
-  ${perigee_source}/Mesh/Tet_Tools.cpp
   )
 
 # ===============================================
 # Finish setting my own source code
 # ===============================================
 # INCLUDE MY OWN HEADER FILES
+
 INCLUDE_DIRECTORIES( ../../include )
 
 # -------------------------------------------------------------------
@@ -64,6 +70,7 @@ ADD_EXECUTABLE( gmsh_converter gmsh_file_converter.cpp)
 
 # -------------------------------------------------------------------
 # 2. Link libraries
-TARGET_LINK_LIBRARIES( gmsh_converter perigee )
+TARGET_LINK_LIBRARIES( gmsh_converter ${EXTRA_LINK_LIBS} perigee )
 
 #EOF
+
