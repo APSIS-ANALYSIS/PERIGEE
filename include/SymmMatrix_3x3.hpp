@@ -9,7 +9,7 @@
 //                    mat[5], mat[1], mat[3]
 //                    mat[4], mat[3], mat[2]
 //
-// Author: Ju Liu
+// Author: Yujie Sun, Ju Liu
 // Date: Sept. 16 2022
 // ============================================================================
 #include "Matrix_3x3.hpp"
