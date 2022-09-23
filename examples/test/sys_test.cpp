@@ -61,6 +61,43 @@ int main( int argc, char * argv[] )
   std::cout<<(A1 - A).zx() - (B1 - B).zx()<<std::endl;
   std::cout<<(A1 - A).zy() - (B1 - B).zy()<<std::endl;
 
+  srand(time(NULL));
+  double val = ( rand() % 1000 ) * 1.0e-3 - 0.5;
+  A1.scale(val); B1.scale(val);
+  std::cout<<A1.xx() - B1.xx()<<std::endl;
+  std::cout<<A1.xy() - B1.xy()<<std::endl;
+  std::cout<<A1.xz() - B1.xz()<<std::endl;
+  std::cout<<A1.yy() - B1.yy()<<std::endl;
+  std::cout<<A1.yz() - B1.yz()<<std::endl;
+  std::cout<<A1.zz() - B1.zz()<<std::endl;
+  std::cout<<A1.yx() - B1.yx()<<std::endl;
+  std::cout<<A1.zx() - B1.zx()<<std::endl;
+  std::cout<<A1.zy() - B1.zy()<<std::endl;
+
+  for (int ii=0; ii<3; ++ii) A1 += A;
+  for (int ii=0; ii<3; ++ii) B1 += B;
+  std::cout<<A1.xx() - B1.xx()<<std::endl;
+  std::cout<<A1.xy() - B1.xy()<<std::endl;
+  std::cout<<A1.xz() - B1.xz()<<std::endl;
+  std::cout<<A1.yy() - B1.yy()<<std::endl;
+  std::cout<<A1.yz() - B1.yz()<<std::endl;
+  std::cout<<A1.zz() - B1.zz()<<std::endl;
+  std::cout<<A1.yx() - B1.yx()<<std::endl;
+  std::cout<<A1.zx() - B1.zx()<<std::endl;
+  std::cout<<A1.zy() - B1.zy()<<std::endl;
+
+  for (int ii=0; ii<3; ++ii) A1 -= A;
+  for (int ii=0; ii<3; ++ii) B1 -= B;
+  std::cout<<A1.xx() - B1.xx()<<std::endl;
+  std::cout<<A1.xy() - B1.xy()<<std::endl;
+  std::cout<<A1.xz() - B1.xz()<<std::endl;
+  std::cout<<A1.yy() - B1.yy()<<std::endl;
+  std::cout<<A1.yz() - B1.yz()<<std::endl;
+  std::cout<<A1.zz() - B1.zz()<<std::endl;
+  std::cout<<A1.yx() - B1.yx()<<std::endl;
+  std::cout<<A1.zx() - B1.zx()<<std::endl;
+  std::cout<<A1.zy() - B1.zy()<<std::endl;
+
   return EXIT_SUCCESS;
 }
 
