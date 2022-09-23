@@ -256,6 +256,13 @@ int main( int argc, char * argv[] )
 //  Q.MatMult(Q, QT);
 //  Q.print();
 
+  Vector_3 xx(thetax, thetay, thetaz);
+  Vector_3 yy(thetay, thetaz, thetax);
+
+  std::cout<<A1.VecMatVec(xx, yy) - B1.VecMatVec(xx, yy)<<std::endl;
+
+  (A1.VecMult(xx) - B1.VecMult(xx)).print();
+
   return EXIT_SUCCESS;
 }
 
