@@ -36,6 +36,31 @@ int main( int argc, char * argv[] )
 
   A.print_Voigt();
 
+  sleep(1);
+  SymmMatrix_3x3 A1;
+  A1.gen_rand();
+  Matrix_3x3 B1( A1.xx(), A1.xy(), A1.xz(), A1.yx(), A1.yy(), A1.yz(), A1.zx(), A1.zy(), A1.zz() );
+
+  std::cout<<(A1 + A).xx() - (B1 + B).xx()<<std::endl;
+  std::cout<<(A1 + A).xy() - (B1 + B).xy()<<std::endl;
+  std::cout<<(A1 + A).xz() - (B1 + B).xz()<<std::endl;
+  std::cout<<(A1 + A).yy() - (B1 + B).yy()<<std::endl;
+  std::cout<<(A1 + A).yz() - (B1 + B).yz()<<std::endl;
+  std::cout<<(A1 + A).zz() - (B1 + B).zz()<<std::endl;
+  std::cout<<(A1 + A).yx() - (B1 + B).yx()<<std::endl;
+  std::cout<<(A1 + A).zx() - (B1 + B).zx()<<std::endl;
+  std::cout<<(A1 + A).zy() - (B1 + B).zy()<<std::endl;
+
+  std::cout<<(A1 - A).xx() - (B1 - B).xx()<<std::endl;
+  std::cout<<(A1 - A).xy() - (B1 - B).xy()<<std::endl;
+  std::cout<<(A1 - A).xz() - (B1 - B).xz()<<std::endl;
+  std::cout<<(A1 - A).yy() - (B1 - B).yy()<<std::endl;
+  std::cout<<(A1 - A).yz() - (B1 - B).yz()<<std::endl;
+  std::cout<<(A1 - A).zz() - (B1 - B).zz()<<std::endl;
+  std::cout<<(A1 - A).yx() - (B1 - B).yx()<<std::endl;
+  std::cout<<(A1 - A).zx() - (B1 - B).zx()<<std::endl;
+  std::cout<<(A1 - A).zy() - (B1 - B).zy()<<std::endl;
+
   return EXIT_SUCCESS;
 }
 
