@@ -12,6 +12,11 @@ SymmMatrix_3x3::SymmMatrix_3x3( const SymmMatrix_3x3 &source )
   mat[3] = source(3); mat[4] = source(4); mat[5] = source(5);
 }
 
+SymmMatrix_3x3::SymmMatrix_3x3( const Matrix_3x3 &source )
+{
+  gen_symm( source );
+}
+
 SymmMatrix_3x3::SymmMatrix_3x3( const double &m0, const double &m1, 
     const double &m2, const double &m3, const double &m4, const double &m5 )
 {
@@ -84,6 +89,16 @@ void SymmMatrix_3x3::gen_rand()
 
     mat[ii] = value * 1.0e-3 - 5.0;
   }
+}
+
+void SymmMatrix_3x3::gen_symm( const Matrix_3x3 &source )
+{
+  Matrix_3x3 result;
+  result = ( source + transpose( source ) );
+  result.scale(0.5);
+
+  mat[0] = result(0); mat[1] = result(4); mat[2] = result(8);
+  mat[3] = result(5); mat[4] = result(2); mat[5] = result(1);
 }
 
 void SymmMatrix_3x3::inverse()
