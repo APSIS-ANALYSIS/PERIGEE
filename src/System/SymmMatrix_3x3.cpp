@@ -25,7 +25,7 @@ SymmMatrix_3x3::~SymmMatrix_3x3()
 SymmMatrix_3x3 operator+( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right )
 {
   SymmMatrix_3x3 result;
-  for(int ii=0; ii<6; ii++) result.mat[ii] = left.mat[ii] + right.mat[ii];
+  for(int ii=0; ii<6; ++ii) result.mat[ii] = left.mat[ii] + right.mat[ii];
 
   return result;
 }
@@ -33,39 +33,39 @@ SymmMatrix_3x3 operator+( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &righ
 SymmMatrix_3x3 operator-( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right )
 {
   SymmMatrix_3x3 result;
-  for(int ii=0; ii<6; ii++) result.mat[ii] = left.mat[ii] - right.mat[ii];
+  for(int ii=0; ii<6; ++ii) result.mat[ii] = left.mat[ii] - right.mat[ii];
 
   return result;
 }
 
 SymmMatrix_3x3& SymmMatrix_3x3::operator+=( const SymmMatrix_3x3 &source )
 {
-  for(int ii=0; ii<6; ii++) mat[ii] += source(ii);
+  for(int ii=0; ii<6; ++ii) mat[ii] += source(ii);
   return *this; 
 }
 
  SymmMatrix_3x3& SymmMatrix_3x3::operator-=( const SymmMatrix_3x3 &source )
 {
-  for(int ii=0; ii<6; ii++) mat[ii] -= source(ii);
+  for(int ii=0; ii<6; ++ii) mat[ii] -= source(ii);
   return *this; 
 }
 
 SymmMatrix_3x3& SymmMatrix_3x3::operator*=( const double &val )
 {
-  for(int ii=0; ii<6; ii++) mat[ii] *= val;
+  for(int ii=0; ii<6; ++ii) mat[ii] *= val;
   return *this;
 }
 
 bool SymmMatrix_3x3::is_identical( const SymmMatrix_3x3 &source ) const
 {
-  for(int ii=0; ii<6; ii++)
+  for(int ii=0; ii<6; ++ii)
     if(source(ii) != mat[ii]) return false;
   return true;  
 }
 
 void SymmMatrix_3x3::gen_zero()
 {
-  for(int ii=0; ii<6; ii++) mat[ii] = 0.0;
+  for(int ii=0; ii<6; ++ii) mat[ii] = 0.0;
 }
 
 void SymmMatrix_3x3::gen_id()
@@ -78,7 +78,7 @@ void SymmMatrix_3x3::gen_rand()
 {
   srand(time(NULL));
 
-  for(int ii=0; ii<6; ii++)
+  for(int ii=0; ii<6; ++ii)
   {
     double value = rand() % 10000;
 
@@ -99,17 +99,17 @@ void SymmMatrix_3x3::inverse()
   temp[3] = invdetA * (mat[4] * mat[5] - mat[0] * mat[3]);
   temp[2] = invdetA * (mat[0] * mat[1] - mat[5] * mat[5]);
 
-  for(int ii=0; ii<6; ii++) mat[ii] = temp[ii];
+  for(int ii=0; ii<6; ++ii) mat[ii] = temp[ii];
 }
 
 void SymmMatrix_3x3::scale( const double &val )
 {
-  for(int ii=0; ii<6; ii++) mat[ii] = mat[ii] * val;
+  for(int ii=0; ii<6; ++ii) mat[ii] = mat[ii] * val;
 }
 
 void SymmMatrix_3x3::AXPY( const double &val, const SymmMatrix_3x3 &source )
 {
-  for(int ii=0; ii<6; ii++) mat[ii] = mat[ii] + val * source(ii);
+  for(int ii=0; ii<6; ++ii) mat[ii] = mat[ii] + val * source(ii);
 }
 
 void SymmMatrix_3x3::AXPI( const double &val )
@@ -119,7 +119,7 @@ void SymmMatrix_3x3::AXPI( const double &val )
 
 void SymmMatrix_3x3::PY( const SymmMatrix_3x3 &source )
 {
-  for(int ii=0; ii<6; ii++) mat[ii] += source(ii);
+  for(int ii=0; ii<6; ++ii) mat[ii] += source(ii);
 }
 
 double SymmMatrix_3x3::det() const
