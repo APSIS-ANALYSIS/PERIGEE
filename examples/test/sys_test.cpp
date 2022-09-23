@@ -98,6 +98,65 @@ int main( int argc, char * argv[] )
   std::cout<<A1.zx() - B1.zx()<<std::endl;
   std::cout<<A1.zy() - B1.zy()<<std::endl;
 
+  A.inverse(); B.inverse();
+  std::cout<<A.xx() - B.xx()<<std::endl;
+  std::cout<<A.xy() - B.xy()<<std::endl;
+  std::cout<<A.xz() - B.xz()<<std::endl;
+  std::cout<<A.yy() - B.yy()<<std::endl;
+  std::cout<<A.yz() - B.yz()<<std::endl;
+  std::cout<<A.zz() - B.zz()<<std::endl;
+  std::cout<<A.yx() - B.yx()<<std::endl;
+  std::cout<<A.zx() - B.zx()<<std::endl;
+  std::cout<<A.zy() - B.zy()<<std::endl;
+
+  for (int ii=0; ii<3; ++ii) A1 *= val;
+  for (int ii=0; ii<3; ++ii) B1 *= val;
+  std::cout<<A1.xx() - B1.xx()<<std::endl;
+  std::cout<<A1.xy() - B1.xy()<<std::endl;
+  std::cout<<A1.xz() - B1.xz()<<std::endl;
+  std::cout<<A1.yy() - B1.yy()<<std::endl;
+  std::cout<<A1.yz() - B1.yz()<<std::endl;
+  std::cout<<A1.zz() - B1.zz()<<std::endl;
+  std::cout<<A1.yx() - B1.yx()<<std::endl;
+  std::cout<<A1.zx() - B1.zx()<<std::endl;
+  std::cout<<A1.zy() - B1.zy()<<std::endl;
+
+  A.AXPY(val, A1); B.AXPY(val, B1);
+  std::cout<<A.xx() - B.xx()<<std::endl;
+  std::cout<<A.xy() - B.xy()<<std::endl;
+  std::cout<<A.xz() - B.xz()<<std::endl;
+  std::cout<<A.yy() - B.yy()<<std::endl;
+  std::cout<<A.yz() - B.yz()<<std::endl;
+  std::cout<<A.zz() - B.zz()<<std::endl;
+  std::cout<<A.yx() - B.yx()<<std::endl;
+  std::cout<<A.zx() - B.zx()<<std::endl;
+  std::cout<<A.zy() - B.zy()<<std::endl;
+
+  A.AXPI(val); B.AXPI(val);
+  std::cout<<A.xx() - B.xx()<<std::endl;
+  std::cout<<A.xy() - B.xy()<<std::endl;
+  std::cout<<A.xz() - B.xz()<<std::endl;
+  std::cout<<A.yy() - B.yy()<<std::endl;
+  std::cout<<A.yz() - B.yz()<<std::endl;
+  std::cout<<A.zz() - B.zz()<<std::endl;
+  std::cout<<A.yx() - B.yx()<<std::endl;
+  std::cout<<A.zx() - B.zx()<<std::endl;
+  std::cout<<A.zy() - B.zy()<<std::endl;
+
+  A.PY(A1); B.PY(B1);
+  std::cout<<A.xx() - B.xx()<<std::endl;
+  std::cout<<A.xy() - B.xy()<<std::endl;
+  std::cout<<A.xz() - B.xz()<<std::endl;
+  std::cout<<A.yy() - B.yy()<<std::endl;
+  std::cout<<A.yz() - B.yz()<<std::endl;
+  std::cout<<A.zz() - B.zz()<<std::endl;
+  std::cout<<A.yx() - B.yx()<<std::endl;
+  std::cout<<A.zx() - B.zx()<<std::endl;
+  std::cout<<A.zy() - B.zy()<<std::endl;
+
+  A.inverse(); B.inverse();
+
+
   return EXIT_SUCCESS;
 }
 
