@@ -185,6 +185,29 @@ int main( int argc, char * argv[] )
   std::cout<<S(3) - B(5)<<std::endl;
   std::cout<<S(2) - B(8)<<std::endl;
 
+  const SymmMatrix_3x3 I;
+  SymmMatrix_3x3 S2; S2.gen_rand();
+  S2(0) = I(0); S2(1) = I(1); S2(2) = I(2);
+  S2(3) = I(3); S2(4) = I(4); S2(5) = I(5);
+  (S2 - I).print();
+
+  SymmMatrix_3x3 E(D);
+  (E - D).print();
+
+  SymmMatrix_3x3 ISM;
+  ISM.gen_id();
+  Matrix_3x3 IM;
+  IM.gen_id();
+  std::cout<<ISM.xx() - IM.xx()<<std::endl;
+  std::cout<<ISM.xy() - IM.xy()<<std::endl;
+  std::cout<<ISM.xz() - IM.xz()<<std::endl;
+  std::cout<<ISM.yy() - IM.yy()<<std::endl;
+  std::cout<<ISM.yz() - IM.yz()<<std::endl;
+  std::cout<<ISM.zz() - IM.zz()<<std::endl;
+  std::cout<<ISM.yx() - IM.yx()<<std::endl;
+  std::cout<<ISM.zx() - IM.zx()<<std::endl;
+  std::cout<<ISM.zy() - IM.zy()<<std::endl;
+
   return EXIT_SUCCESS;
 }
 
