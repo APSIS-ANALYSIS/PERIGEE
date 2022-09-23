@@ -208,6 +208,20 @@ int main( int argc, char * argv[] )
   std::cout<<ISM.zx() - IM.zx()<<std::endl;
   std::cout<<ISM.zy() - IM.zy()<<std::endl;
 
+  SymmMatrix_3x3 OSM;
+  OSM.gen_zero();
+  Matrix_3x3 OM;
+  OM.gen_zero();
+  std::cout<<OSM.xx() - OM.xx()<<std::endl;
+  std::cout<<OSM.xy() - OM.xy()<<std::endl;
+  std::cout<<OSM.xz() - OM.xz()<<std::endl;
+  std::cout<<OSM.yy() - OM.yy()<<std::endl;
+  std::cout<<OSM.yz() - OM.yz()<<std::endl;
+  std::cout<<OSM.zz() - OM.zz()<<std::endl;
+  std::cout<<OSM.yx() - OM.yx()<<std::endl;
+  std::cout<<OSM.zx() - OM.zx()<<std::endl;
+  std::cout<<OSM.zy() - OM.zy()<<std::endl;
+
   return EXIT_SUCCESS;
 }
 
