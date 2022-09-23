@@ -222,6 +222,40 @@ int main( int argc, char * argv[] )
   std::cout<<OSM.zx() - OM.zx()<<std::endl;
   std::cout<<OSM.zy() - OM.zy()<<std::endl;
 
+  const double pi = 4.0 * atan(1.0);
+  double thetay = pi/val;
+  double thetax = 2*pi/val;
+  double thetaz = 3*pi/val;
+  Matrix_3x3 Ry(cos(thetay),   0,   sin(thetay),
+                     0,        1,       0,
+               -sin(thetay),   0,   cos(thetay));
+
+  Matrix_3x3 Rx(1,         0,           0,
+                0,   cos(thetax),  -sin(thetax),
+                0,   sin(thetax),   cos(thetax));
+
+  Matrix_3x3 Rz(cos(thetaz), -sin(thetaz),   0,
+                sin(thetaz),  cos(thetaz),   0,
+                     0,          0,          1);
+  Matrix_3x3 Q;
+  Q.MatMult(Rx, Ry);
+  Q.MatMult(Q, Rz);
+
+  A.MatRot(Q); B.MatRot(Q);
+  std::cout<<A.xx() - B.xx()<<std::endl;
+  std::cout<<A.yy() - B.yy()<<std::endl;
+  std::cout<<A.zz() - B.zz()<<std::endl;
+  std::cout<<A.xy() - B.xy()<<std::endl;
+  std::cout<<A.xz() - B.xz()<<std::endl;
+  std::cout<<A.yx() - B.yx()<<std::endl;
+  std::cout<<A.yz() - B.yz()<<std::endl;
+  std::cout<<A.zx() - B.zx()<<std::endl;
+  std::cout<<A.zy() - B.zy()<<std::endl;
+
+//  Matrix_3x3 QT(transpose(Q));
+//  Q.MatMult(Q, QT);
+//  Q.print();
+
   return EXIT_SUCCESS;
 }
 
