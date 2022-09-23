@@ -27,6 +27,8 @@ int main( int argc, char * argv[] )
   std::cout<<A.I1() - B.I1()<<std::endl;
   std::cout<<A.I2() - B.I2()<<std::endl;
   std::cout<<A.I3() - B.I3()<<std::endl;
+  std::cout<<A.det() - B.det()<<std::endl;
+  std::cout<<A.tr() - B.tr()<<std::endl;
 
   A.print_in_row();
 
