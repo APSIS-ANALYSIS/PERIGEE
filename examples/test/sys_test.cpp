@@ -156,6 +156,34 @@ int main( int argc, char * argv[] )
 
   A.inverse(); B.inverse();
 
+  Matrix_3x3 C;
+  C.gen_rand();
+
+  Matrix_3x3 SC( C.xx(), 0.5*( C.xy() + C.yx() ), 0.5*( C.xz() + C.zx() ),
+                 0.5*( C.yx() + C.xy() ), C.yy(), 0.5*( C.yz() + C.zy() ),
+                 0.5*( C.zx() + C.xz() ), 0.5*( C.zy() + C.yz() ), C.zz() );
+
+  const SymmMatrix_3x3 D(C);
+  std::cout<<SC.xx() - D.xx()<<std::endl;
+  std::cout<<SC.yy() - D.yy()<<std::endl;
+  std::cout<<SC.zz() - D.zz()<<std::endl;
+  std::cout<<SC.xy() - D.xy()<<std::endl;
+  std::cout<<SC.xz() - D.xz()<<std::endl;
+  std::cout<<SC.yx() - D.yx()<<std::endl;
+  std::cout<<SC.yz() - D.yz()<<std::endl;
+  std::cout<<SC.zx() - D.zx()<<std::endl;
+  std::cout<<SC.zy() - D.zy()<<std::endl;
+
+  SymmMatrix_3x3 S;
+  S(0) = B(0); S(5) = B(1); S(4) = B(2);
+  S(1) = B(4); S(3) = B(5); S(2) = B(8);
+
+  std::cout<<S(0) - B(0)<<std::endl;
+  std::cout<<S(5) - B(1)<<std::endl;
+  std::cout<<S(4) - B(2)<<std::endl;
+  std::cout<<S(1) - B(4)<<std::endl;
+  std::cout<<S(3) - B(5)<<std::endl;
+  std::cout<<S(2) - B(8)<<std::endl;
 
   return EXIT_SUCCESS;
 }
