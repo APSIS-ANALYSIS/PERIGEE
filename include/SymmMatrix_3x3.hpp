@@ -110,10 +110,6 @@ class SymmMatrix_3x3
     // X = X + a * I
     void AXPI( const double &val );
 
-    // add the matrix source with the matrix
-    // X = X + Y
-    void PY( const SymmMatrix_3x3 &source );
-
     // Get the determinant of the matrix
     double det() const;
 

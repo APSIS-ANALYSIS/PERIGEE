@@ -132,11 +132,6 @@ void SymmMatrix_3x3::AXPI( const double &val )
   mat[0] += val; mat[1] += val; mat[2] += val;
 }
 
-void SymmMatrix_3x3::PY( const SymmMatrix_3x3 &source )
-{
-  for(int ii=0; ii<6; ++ii) mat[ii] += source(ii);
-}
-
 double SymmMatrix_3x3::det() const
 {
   return mat[0] * mat[1] * mat[2] + mat[5] * mat[3] * mat[4]
