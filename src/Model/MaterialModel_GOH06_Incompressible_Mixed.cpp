@@ -129,7 +129,7 @@ void MaterialModel_GOH06_Incompressible_Mixed::get_PK(
 
   // PxI = P : I = I - 1/3 trC C^-1
   Matrix_3x3 PxI(Cinv); PxI.scale( (-1.0) * pt33 * trC );
-  PxI.PY(I);
+  PxI.AXPI( 1.0 );
 
   // PxH1(2) = P : H = kd PxI + (1-3kd) a x a + (kd - 1/3) (a.Ca) C^-1
   Matrix_3x3 PxH1, PxH2;
@@ -177,7 +177,7 @@ void MaterialModel_GOH06_Incompressible_Mixed::get_PK_Stiffness(
 
   // P : I = I - 1/3 trC C^-1
   Matrix_3x3 PxI(Cinv); PxI.scale( (-1.0) * pt33 * trC );
-  PxI.PY(I);
+  PxI.AXPI( 1.0 );
 
   // P : H = kd PxI + (1-3kd) a x a + (kd - 1/3) (a.Ca) C^-1
   Matrix_3x3 PxH1, PxH2;

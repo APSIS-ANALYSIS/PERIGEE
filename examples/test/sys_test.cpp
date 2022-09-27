@@ -143,7 +143,7 @@ int main( int argc, char * argv[] )
   std::cout<<A.zx() - B.zx()<<std::endl;
   std::cout<<A.zy() - B.zy()<<std::endl;
 
-  A.PY(A1); B.PY(B1);
+  A+=A1; B+=B1;
   std::cout<<A.xx() - B.xx()<<std::endl;
   std::cout<<A.xy() - B.xy()<<std::endl;
   std::cout<<A.xz() - B.xz()<<std::endl;
