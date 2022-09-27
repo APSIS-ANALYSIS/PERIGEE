@@ -33,6 +33,12 @@ class SymmMatrix_3x3
     // Destructor
     ~SymmMatrix_3x3();
 
+    // Copy
+    void copy( const SymmMatrix_3x3 &source );
+
+    // Assignment operator
+    SymmMatrix_3x3& operator= (const SymmMatrix_3x3 &source);
+
     // Parenthesis operator. It allows accessing and assigning the matrix entries.
     double& operator()(const int &index) {return mat[index];}
 
@@ -137,6 +143,24 @@ class SymmMatrix_3x3
     // Q^T M Q = Q_ki M_kl Q_lj = output_matrix_ij
     void MatRot( const Matrix_3x3 &Q );
 
+    // Matrix multiplication as mat = source^T * source
+    // This is used for the evaluation of right Cauchy-Green strain tensor:
+    //                       C = F^T F
+    // The resulting matrix is symmetric. Hence the computation is simplified.
+    void MatMultTransposeLeft( const Matrix_3x3 &source );
+
+    // Matrix multiplication as mat = source * source^T
+    // This is used for the evaluation of the left Cauchy-Green strain tensor:
+    //                       b = F F^T
+    // The resulting matrix is symmetric. Hence, the computation is simplified.
+    void MatMultTransposeRight( const Matrix_3x3 &source );
+
+    // Matrix contraction
+    // return mat_ij source_ij
+    double MatContraction( const Matrix_3x3 &source ) const;
+    
+    double MatContraction( const SymmMatrix_3x3 &source ) const;
+
     // print the matrix
     void print() const;
 
@@ -149,5 +173,16 @@ class SymmMatrix_3x3
   private:
     double mat[6];
 };
+
+Vector_3 operator*( const SymmMatrix_3x3 &left, const Vector_3 &right );
+
+Matrix_3x3 operator*( const SymmMatrix_3x3 &left, const Matrix_3x3 &right );
+
+Matrix_3x3 operator*( const Matrix_3x3 &left, const SymmMatrix_3x3 &right );
+
+Matrix_3x3 operator*( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right );
+
+// Return the inverse of the input matrix
+Matrix_3x3 inverse( const Matrix_3x3 &input );
 
 #endif
