@@ -18,10 +18,10 @@ Tensor4_3D::Tensor4_3D( const Tensor4_3D &source )
 Tensor4_3D::~Tensor4_3D()
 {}
 
-bool Tensor4_3D::is_identical(const Tensor4_3D &source) const
+bool Tensor4_3D::is_identical(const Tensor4_3D &source, const double &tol) const
 {
   for(int ii=0; ii<81; ++ii)
-    if( source(ii) != ten[ii] ) return false;
+    if( std::abs(source(ii) - ten[ii]) > tol ) return false;
   return true;
 }
 
@@ -51,6 +51,29 @@ void Tensor4_3D::print() const
     }
   }
 }
+
+void Tensor4_3D::print_in_mat() const
+{
+  std::cout<<"Tensor4_3D: \n\n";
+  for ( int ii=0; ii<3; ii++ )
+  {
+    for( int jj=0; jj<3; jj++ )
+    {
+      for( int kk=0; kk<3; kk++ )
+      { 
+        for ( int ll=0; ll<3; ll++ )
+        {
+          std::cout << std::setprecision(6) << std::setw(12) << std::left << std::setfill(' ') 
+          << ten[27*ii+9*jj+3*kk+ll] << " ";
+        }
+        std::cout<<"\t";
+      }  
+      std::cout<<'\n';
+    }
+    std::cout<<"\n";      
+  }
+}
+
 
 void Tensor4_3D::gen_id()
 {
@@ -150,6 +173,22 @@ void Tensor4_3D::add_OutProduct( const double &val, const Matrix_3x3 &mleft,
   }
 }
 
+void Tensor4_3D::add_OutProduct( const double &val, const Vector_3 &vec1, 
+    const Vector_3 &vec2, const Vector_3 &vec3, const Vector_3 &vec4 )
+{
+  for(int ii=0; ii<3; ++ii)
+  {
+    for(int jj=0; jj<3; ++jj)
+    {
+      for(int kk=0; kk<3; ++kk)
+      {
+        for(int ll=0; ll<3; ++ll)
+          ten[27*ii+9*jj+3*kk+ll] += val * vec1( ii ) * vec2( jj ) * vec3( kk ) * vec4( ll );
+      }
+    }
+  }
+}
+
 void Tensor4_3D::add_SymmProduct( const double &val, const Matrix_3x3 &mleft,
     const Matrix_3x3 &mright )
 {
@@ -187,7 +226,7 @@ void Tensor4_3D::MatMult_2( const Matrix_3x3 &source )
 {
   double temp[81];
   
-  double index[27];
+  int index[27];
   for(int ii=0; ii<9; ++ii)
   {
     index[ii] = ii;
@@ -195,10 +234,9 @@ void Tensor4_3D::MatMult_2( const Matrix_3x3 &source )
     index[18+ii] = 54 + ii;
   }
 
-  int loc;
   for(int m=0; m<27; ++m)
   {
-    loc = index[m];
+    const int loc = index[m];
     temp[loc]    = source(0) * ten[loc] + source(1) * ten[loc+9] + source(2) * ten[loc+18];
     temp[loc+9]  = source(3) * ten[loc] + source(4) * ten[loc+9] + source(5) * ten[loc+18]; 
     temp[loc+18] = source(6) * ten[loc] + source(7) * ten[loc+9] + source(8) * ten[loc+18];
@@ -211,7 +249,7 @@ void Tensor4_3D::MatMult_3( const Matrix_3x3 &source )
 {
   double temp[81];
 
-  double index[27];
+  int index[27];
   index[0] = 0;  index[1] = 1;  index[2] = 2;
   index[3] = 9;  index[4] = 10; index[5] = 11;
   index[6] = 18; index[7] = 19; index[8] = 20;
@@ -222,10 +260,9 @@ void Tensor4_3D::MatMult_3( const Matrix_3x3 &source )
     index[18+ii] = index[ii] + 54;
   }
 
-  int loc;
   for(int m=0; m<27; ++m)
   {
-    loc = index[m];
+    const int loc = index[m];
     temp[loc]   = source(0) * ten[loc] + source(1) * ten[loc+3] + source(2) * ten[loc+6];
     temp[loc+3] = source(3) * ten[loc] + source(4) * ten[loc+3] + source(5) * ten[loc+6];
     temp[loc+6] = source(6) * ten[loc] + source(7) * ten[loc+3] + source(8) * ten[loc+6];
@@ -237,10 +274,10 @@ void Tensor4_3D::MatMult_3( const Matrix_3x3 &source )
 void Tensor4_3D::MatMult_4( const Matrix_3x3 &source )
 {
   double temp[81];
-  int loc;
+  
   for(int m=0; m<27; ++m)
   {
-    loc = 3*m;
+    const int loc = 3*m;
     temp[loc]   = source(0) * ten[loc] + source(1) * ten[loc+1] + source(2) * ten[loc+2];
     temp[loc+1] = source(3) * ten[loc] + source(4) * ten[loc+1] + source(5) * ten[loc+2];
     temp[loc+2] = source(6) * ten[loc] + source(7) * ten[loc+1] + source(8) * ten[loc+2];
@@ -382,6 +419,29 @@ void Tensor4_3D::TenPMult( const Tensor4_3D &P )
   }
   
   for(int ii=0; ii<81; ++ii) ten[ii] = temp[ii];
+}
+
+bool Tensor4_3D::is_major_sym( const double &tol ) const
+{
+  for( int ii=0; ii<3; ++ii )
+    for( int jj=0; jj<3; ++jj )
+      for( int kk=0; kk<3; ++kk )
+        for( int ll=0; ll<3; ++ll )
+          if( std::abs( ten[ 27*ii+ 9*jj + 3*kk + ll ] - ten[ 27*kk+ 9*ll + 3*ii + jj ] ) >= tol ) return false;
+
+  return true;
+}
+
+bool Tensor4_3D::is_minor_sym( const double &tol ) const
+{
+  for( int ii=0; ii<3; ++ii )
+    for( int jj=0; jj<3; ++jj )
+      for( int kk=0; kk<3; ++kk )
+        for( int ll=0; ll<3; ++ll )
+          if( std::abs( ten[ 27*ii+ 9*jj + 3*kk + ll ] - ten[ 27*jj+ 9*ii + 3*kk + ll ] ) >= tol
+            || std::abs( ten[ 27*ii+ 9*jj + 3*kk + ll ] - ten[ 27*ii+ 9*jj + 3*ll + kk ] ) >= tol ) return false;
+
+  return true;
 }
 
 // EOF
