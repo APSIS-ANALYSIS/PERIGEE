@@ -106,7 +106,7 @@ class Matrix_3x3
     Matrix_3x3& operator*=( const double &val );
 
     // Return true if the input matrix is identical to the mat
-    bool is_identical( const Matrix_3x3 &source ) const;
+    bool is_identical( const Matrix_3x3 &source, const double &tol = 1.0e-12 ) const;
 
     // Set all components to zero
     void gen_zero();
