@@ -187,4 +187,9 @@ Vector_3 cross_product( const Vector_3 &a, const Vector_3 &b )
       a(2) * b(0) - a(0) * b(2), a(0) * b(1) - a(1) * b(0) );
 }
 
+Vector_3 operator*( const double &val, const Vector_3 &source )
+{
+  return Vector_3( source.x() * val, source.y() * val, source.z() * val );
+}
+
 // EOF

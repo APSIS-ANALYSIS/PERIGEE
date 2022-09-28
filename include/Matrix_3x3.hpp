@@ -240,9 +240,14 @@ class Matrix_3x3
     double J3() const;
 };
 
+// Return the matrix-vectror multiplication
 Vector_3 operator*( const Matrix_3x3 &left, const Vector_3 &right );
 
+// Return the matrix-matrix multiplication
 Matrix_3x3 operator*( const Matrix_3x3 &left, const Matrix_3x3 &right );
+
+// Return the scalar scaling of matrix
+Matrix_3x3 operator*( const double &val, const Matrix_3x3 &input );
 
 // Return the inverse of the input matrix
 Matrix_3x3 inverse( const Matrix_3x3 &input );

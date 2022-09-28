@@ -556,6 +556,13 @@ Matrix_3x3 operator*(const Matrix_3x3 &mleft, const Matrix_3x3 &mright)
    mleft(6) * mright(2) + mleft(7) * mright(5) + mleft(8) * mright(8) );
 }
 
+Matrix_3x3 operator*( const double &val, const Matrix_3x3 &input )
+{
+  return Matrix_3x3( val * input(0), val * input(1), val * input(2),
+      val * input(3), val * input(4), val * input(5),
+      val * input(6), val * input(7), val * input(8) );
+}
+
 Matrix_3x3 inverse( const Matrix_3x3 &input )
 {
   const double invdet = 1.0 / input.det();
