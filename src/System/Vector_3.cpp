@@ -39,22 +39,12 @@ Vector_3& Vector_3::operator= (const Vector_3 &source)
 
 Vector_3 operator+( const Vector_3 &left, const Vector_3 &right )
 {
-  Vector_3 result;
-  result.vec[0] = left(0) + right(0);
-  result.vec[1] = left(1) + right(1);
-  result.vec[2] = left(2) + right(2);
-
-  return result;
+  return Vector_3( left(0) + right(0), left(1) + right(1), left(2) + right(2) );
 }
 
 Vector_3 operator-( const Vector_3 &left, const Vector_3 &right )
 {
-  Vector_3 result;
-  result.vec[0] = left(0) - right(0);
-  result.vec[1] = left(1) - right(1);
-  result.vec[2] = left(2) - right(2);
-
-  return result;
+  return Vector_3( left(0) - right(0), left(1) - right(1), left(2) - right(2) );
 }
 
 Vector_3& Vector_3::operator+=( const Vector_3 &source )
