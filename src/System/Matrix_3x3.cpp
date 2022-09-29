@@ -45,7 +45,7 @@ void Matrix_3x3::copy( const Matrix_3x3 &source )
   for(int ii=0; ii<9; ++ii) mat[ii] = source(ii);
 }
 
-void Matrix_3x3::copy( double source[9] )
+void Matrix_3x3::copy( const double source[9] )
 {
   for(int ii=0; ii<9; ++ii) mat[ii] = source[ii];
 }

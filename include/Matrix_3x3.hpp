@@ -45,7 +45,7 @@ class Matrix_3x3
     // Copy
     void copy( const Matrix_3x3 &source );    
     
-    void copy( double source[9] );
+    void copy( const double source[9] );
 
     // Assignment operator
     Matrix_3x3& operator= (const Matrix_3x3 &source);
