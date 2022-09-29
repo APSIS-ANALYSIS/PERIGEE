@@ -23,7 +23,7 @@ void Vector_3::copy( const Vector_3 &source )
   vec[0] = source(0); vec[1] = source(1); vec[2] = source(2);
 }
 
-void Vector_3::copy( double source[3] )
+void Vector_3::copy( const double source[3] )
 {
   vec[0] = source[0]; vec[1] = source[1]; vec[2] = source[2];
 }

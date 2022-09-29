@@ -36,7 +36,7 @@ class Vector_3
     // Copy
     void copy( const Vector_3 &source );
 
-    void copy( double source[3] );
+    void copy( const double source[3] );
 
     // Assignment operator
     Vector_3& operator= (const Vector_3 &source);
