@@ -256,7 +256,7 @@ void Matrix_3x3::MatMult( const Matrix_3x3 &mleft, const Matrix_3x3 &mright )
 
 void Matrix_3x3::MatRot( const Matrix_3x3 &Q )
 {
-  double temp[9] = {0};
+  double temp[9] = {0.0};
   for(int ii=0; ii<3; ++ii)
   {
     for(int jj=0; jj<3; ++jj)
