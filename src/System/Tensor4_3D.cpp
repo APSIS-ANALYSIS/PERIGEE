@@ -210,7 +210,7 @@ void Tensor4_3D::add_SymmProduct( const double &val, const Matrix_3x3 &mleft,
 
 void Tensor4_3D::MatMult_1( const Matrix_3x3 &source )
 {
-  double temp[81];
+  double temp[81] {0.0};
   
   for( int m=0; m<27; ++m )
   {
@@ -224,8 +224,6 @@ void Tensor4_3D::MatMult_1( const Matrix_3x3 &source )
 
 void Tensor4_3D::MatMult_2( const Matrix_3x3 &source )
 {
-  double temp[81];
-  
   int index[27];
   for(int ii=0; ii<9; ++ii)
   {
@@ -234,6 +232,8 @@ void Tensor4_3D::MatMult_2( const Matrix_3x3 &source )
     index[18+ii] = 54 + ii;
   }
 
+  double temp[81] {0.0};
+  
   for(int m=0; m<27; ++m)
   {
     const int loc = index[m];
@@ -247,8 +247,6 @@ void Tensor4_3D::MatMult_2( const Matrix_3x3 &source )
 
 void Tensor4_3D::MatMult_3( const Matrix_3x3 &source )
 {
-  double temp[81];
-
   int index[27];
   index[0] = 0;  index[1] = 1;  index[2] = 2;
   index[3] = 9;  index[4] = 10; index[5] = 11;
@@ -259,6 +257,8 @@ void Tensor4_3D::MatMult_3( const Matrix_3x3 &source )
     index[9+ii]  = index[ii] + 27;
     index[18+ii] = index[ii] + 54;
   }
+
+  double temp[81] {0.0};
 
   for(int m=0; m<27; ++m)
   {
@@ -273,7 +273,7 @@ void Tensor4_3D::MatMult_3( const Matrix_3x3 &source )
 
 void Tensor4_3D::MatMult_4( const Matrix_3x3 &source )
 {
-  double temp[81];
+  double temp[81] {0.0};
   
   for(int m=0; m<27; ++m)
   {
