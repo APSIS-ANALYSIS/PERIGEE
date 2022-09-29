@@ -146,7 +146,7 @@ void Matrix_3x3::add_outprod( const double &val, const Vector_3 &va, const Vecto
 
 void Matrix_3x3::transpose()
 {
-  double temp;
+  double temp; // temperary variable for swapping off diagonal entries
   temp = mat[1]; mat[1] = mat[3]; mat[3] = temp;
   temp = mat[2]; mat[2] = mat[6]; mat[6] = temp;
   temp = mat[5]; mat[5] = mat[7]; mat[7] = temp;
