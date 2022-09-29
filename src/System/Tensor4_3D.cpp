@@ -224,13 +224,10 @@ void Tensor4_3D::MatMult_1( const Matrix_3x3 &source )
 
 void Tensor4_3D::MatMult_2( const Matrix_3x3 &source )
 {
-  int index[27];
-  for(int ii=0; ii<9; ++ii)
-  {
-    index[ii] = ii;
-    index[9+ii] = 27 + ii;
-    index[18+ii] = 54 + ii;
-  }
+  // 27 I + 3 K + L ranges from 0 - 8, 27 - 35, 54 - 62
+  const int index[27] { 0, 1, 2, 3, 4, 5, 6, 7, 8,
+    27, 28, 29, 30, 31, 32, 33, 34, 35,
+    54, 55, 56, 57, 58, 59, 60, 61, 62 };
 
   double temp[81] {0.0};
   
@@ -247,16 +244,12 @@ void Tensor4_3D::MatMult_2( const Matrix_3x3 &source )
 
 void Tensor4_3D::MatMult_3( const Matrix_3x3 &source )
 {
-  int index[27];
-  index[0] = 0;  index[1] = 1;  index[2] = 2;
-  index[3] = 9;  index[4] = 10; index[5] = 11;
-  index[6] = 18; index[7] = 19; index[8] = 20;
-
-  for(int ii=0; ii<9; ++ii)
-  {
-    index[9+ii]  = index[ii] + 27;
-    index[18+ii] = index[ii] + 54;
-  }
+  // 27 I + 9 J + L: ranges from [0-2], [0-2] + 9, [0-2] + 18
+  // [0-2] + 27, [0-2] + 36, [0-2] + 45
+  // [0-2] + 54, [0-2] + 63, [0-2] + 72
+  const int index[27] { 0, 1, 2, 9, 10, 11, 18, 19, 20,
+    27, 28, 29, 36, 37, 38, 45, 46, 47,
+    54, 55, 56, 63, 64, 65, 72, 73, 74 };
 
   double temp[81] {0.0};
 
