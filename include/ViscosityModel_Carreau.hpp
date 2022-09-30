@@ -18,6 +18,16 @@ class ViscosityModel_Carreau : public IViscosityModel
 		ViscosityModel_Carreau( const char * const &fname = "viscosity_model.h5");
 
 		virtual ~ViscosityModel_Carreau();
+    
+    virtual void print_info() const;
+
+    virtual std::string get_model_name() const
+    {
+      const std::string mname = "Carreau";
+      return mname;
+    }
+
+    virtual void write_hdf5( const char * const &fname = "viscosity_model.h5" ) const;
 
 		private:
 // ----------------------------------------------------------------------------
