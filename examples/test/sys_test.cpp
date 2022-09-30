@@ -321,6 +321,21 @@ int main( int argc, char * argv[] )
   std::cout<<A2.yx() - B2.yx()<<std::endl;
   std::cout<<A2.zx() - B2.zx()<<std::endl;
   std::cout<<A2.zy() - B2.zy()<<std::endl;
+ 
+  (A2 * xx - B2 * xx).print();
+
+  Matrix_3x3 A1_A2(A1 * A2);
+  Matrix_3x3 B1_B2(B1 * B2);
+  (A1_A2 - B1_B2).print();
+
+  B2.gen_rand();
+  Matrix_3x3 A1B2(A1 * B2);
+  Matrix_3x3 B1B2(B1 * B2);
+  (A1B2 - B1B2).print();
+
+  Matrix_3x3 B2A1(B2 * A1);
+  Matrix_3x3 B2B1(B2 * B1);
+  (B2A1 - B2B1).print();
 
   return EXIT_SUCCESS;
 }
