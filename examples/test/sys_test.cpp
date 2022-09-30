@@ -263,6 +263,19 @@ int main( int argc, char * argv[] )
 
   (A1.VecMult(xx) - B1.VecMult(xx)).print();
 
+  SymmMatrix_3x3 A2{};
+  A2.copy(A1);
+  (A2 - A1).print();
+  
+  SymmMatrix_3x3 A3;
+  A3.gen_rand();
+  
+  A3 = A2 = A1;
+  A2 = A2;
+  (A3 - A2).print();
+  (A3 - A1).print();
+  (A1 - A2).print();
+
   return EXIT_SUCCESS;
 }
 
