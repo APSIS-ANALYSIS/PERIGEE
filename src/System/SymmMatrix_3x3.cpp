@@ -247,4 +247,50 @@ void SymmMatrix_3x3::print_Voigt() const
   std::cout<<std::setprecision(9)<<mat[3]<<'\t'<<mat[4]<<'\t'<<mat[5]<<std::endl;
 }
 
+Vector_3 operator*( const SymmMatrix_3x3 &left, const Vector_3 &right )
+{
+  return Vector_3( left.xx() * right.x() + left.xy() * right.y() + left.xz() * right.z(),
+      left.yx() * right.x() + left.yy() * right.y() + left.yz() * right.z(),
+      left.zx() * right.x() + left.zy() * right.y() + left.zz() * right.z() ); 
+}
+
+Matrix_3x3 operator*( const SymmMatrix_3x3 &left, const Matrix_3x3 &right )
+{
+  return Matrix_3x3( left(0) * right(0) + left(5) * right(3) + left(4) * right(6),
+   left(0) * right(1) + left(5) * right(4) + left(4) * right(7),
+   left(0) * right(2) + left(5) * right(5) + left(4) * right(8),
+   left(5) * right(0) + left(1) * right(3) + left(3) * right(6),
+   left(5) * right(1) + left(1) * right(4) + left(3) * right(7),
+   left(5) * right(2) + left(1) * right(5) + left(3) * right(8),
+   left(4) * right(0) + left(3) * right(3) + left(2) * right(6),
+   left(4) * right(1) + left(3) * right(4) + left(2) * right(7),
+   left(4) * right(2) + left(3) * right(5) + left(2) * right(8) );
+}
+
+Matrix_3x3 operator*( const Matrix_3x3 &left, const SymmMatrix_3x3 &right )
+{
+  return Matrix_3x3( left(0) * right(0) + left(1) * right(5) + left(2) * right(4),
+   left(0) * right(5) + left(1) * right(1) + left(2) * right(3),
+   left(0) * right(4) + left(1) * right(3) + left(2) * right(2),
+   left(3) * right(0) + left(4) * right(5) + left(5) * right(4),
+   left(3) * right(5) + left(4) * right(1) + left(5) * right(3),
+   left(3) * right(4) + left(4) * right(3) + left(5) * right(2),
+   left(6) * right(0) + left(7) * right(5) + left(8) * right(4),
+   left(6) * right(5) + left(7) * right(1) + left(8) * right(3),
+   left(6) * right(4) + left(7) * right(3) + left(8) * right(2) );
+}
+
+Matrix_3x3 operator*( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right )
+{
+  return Matrix_3x3( left(0) * right(0) + left(5) * right(5) + left(4) * right(4),
+   left(0) * right(5) + left(5) * right(1) + left(4) * right(3),
+   left(0) * right(4) + left(5) * right(3) + left(4) * right(2),
+   left(5) * right(0) + left(1) * right(5) + left(3) * right(4),
+   left(5) * right(5) + left(1) * right(1) + left(3) * right(3),
+   left(5) * right(4) + left(1) * right(3) + left(3) * right(2),
+   left(4) * right(0) + left(3) * right(5) + left(2) * right(4),
+   left(4) * right(5) + left(3) * right(1) + left(2) * right(3),
+   left(4) * right(4) + left(3) * right(3) + left(2) * right(2) );
+}
+
 // EOF
