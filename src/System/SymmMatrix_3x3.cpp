@@ -29,18 +29,16 @@ SymmMatrix_3x3::~SymmMatrix_3x3()
 
 SymmMatrix_3x3 operator+( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right )
 {
-  SymmMatrix_3x3 result;
-  for(int ii=0; ii<6; ++ii) result.mat[ii] = left.mat[ii] + right.mat[ii];
-
-  return result;
+  return SymmMatrix_3x3( left.mat[0] + right.mat[0], left.mat[1] + right.mat[1], 
+		         left.mat[2] + right.mat[2], left.mat[3] + right.mat[3], 
+		         left.mat[4] + right.mat[4], left.mat[5] + right.mat[5] );
 }
 
 SymmMatrix_3x3 operator-( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right )
 {
-  SymmMatrix_3x3 result;
-  for(int ii=0; ii<6; ++ii) result.mat[ii] = left.mat[ii] - right.mat[ii];
-
-  return result;
+  return SymmMatrix_3x3( left.mat[0] - right.mat[0], left.mat[1] - right.mat[1], 
+		         left.mat[2] - right.mat[2], left.mat[3] - right.mat[3], 
+		         left.mat[4] - right.mat[4], left.mat[5] - right.mat[5] );
 }
 
 SymmMatrix_3x3& SymmMatrix_3x3::operator+=( const SymmMatrix_3x3 &source )
