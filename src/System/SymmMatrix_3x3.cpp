@@ -91,8 +91,7 @@ void SymmMatrix_3x3::gen_rand()
 
 void SymmMatrix_3x3::gen_symm( const Matrix_3x3 &source )
 {
-  Matrix_3x3 result;
-  result = ( source + transpose( source ) );
+  Matrix_3x3 result( source + transpose( source ) );
   result.scale(0.5);
 
   mat[0] = result(0); mat[1] = result(4); mat[2] = result(8);
