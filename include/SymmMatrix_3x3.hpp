@@ -88,7 +88,7 @@ class SymmMatrix_3x3
     SymmMatrix_3x3& operator*=( const double &val );
 
     // Return true if the input matrix is identical to the mat
-    bool is_identical( const SymmMatrix_3x3 &source ) const;
+    bool is_identical( const SymmMatrix_3x3 &source, const double &tol ) const;
 
     // Set all components to zero
     void gen_zero();
@@ -183,6 +183,6 @@ Matrix_3x3 operator*( const Matrix_3x3 &left, const SymmMatrix_3x3 &right );
 Matrix_3x3 operator*( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right );
 
 // Return the inverse of the input matrix
-Matrix_3x3 inverse( const Matrix_3x3 &input );
+SymmMatrix_3x3 inverse( const SymmMatrix_3x3 &input );
 
 #endif
