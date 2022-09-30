@@ -193,6 +193,40 @@ void SymmMatrix_3x3::MatRot( const Matrix_3x3 &Q )
   mat[1] = temp[4]; mat[3] = temp[5]; mat[2] = temp[8];
 }
 
+void SymmMatrix_3x3::MatMultTransposeLeft (const Matrix_3x3 &source)
+{
+  mat[0] = source(0) * source(0) + source(3) * source(3) + source(6) * source(6);
+  mat[1] = source(1) * source(1) + source(4) * source(4) + source(7) * source(7);
+  mat[2] = source(2) * source(2) + source(5) * source(5) + source(8) * source(8);
+  mat[3] = source(1) * source(2) + source(4) * source(5) + source(7) * source(8);
+  mat[4] = source(0) * source(2) + source(3) * source(5) + source(6) * source(8);
+  mat[5] = source(0) * source(1) + source(3) * source(4) + source(6) * source(7);
+}
+
+void SymmMatrix_3x3::MatMultTransposeRight (const Matrix_3x3 &source)
+{
+  mat[0] = source(0) * source(0) + source(1) * source(1) + source(2) * source(2);
+  mat[1] = source(3) * source(3) + source(4) * source(4) + source(5) * source(5);
+  mat[2] = source(6) * source(6) + source(7) * source(7) + source(8) * source(8);
+  mat[3] = source(3) * source(6) + source(4) * source(7) + source(5) * source(8);
+  mat[4] = source(0) * source(6) + source(1) * source(7) + source(2) * source(8);
+  mat[5] = source(0) * source(3) + source(1) * source(4) + source(2) * source(5); 
+}
+
+double SymmMatrix_3x3::MatContraction( const Matrix_3x3 &source ) const
+{
+  return mat[0] * source(0) + mat[5] * source(1) + mat[4] * source(2) + mat[5] * source(3)
+    + mat[1] * source(4) + mat[3] * source(5) + mat[4] * source(6) + mat[3] * source(7)
+    + mat[2] * source(8);
+}
+
+double SymmMatrix_3x3::MatContraction( const SymmMatrix_3x3 &source ) const
+{
+  return mat[0] * source(0) + mat[5] * source(5) + mat[4] * source(4) + mat[5] * source(5)
+    + mat[1] * source(1) + mat[3] * source(3) + mat[4] * source(4) + mat[3] * source(3)
+    + mat[2] * source(2);
+}
+
 void SymmMatrix_3x3::print() const
 {
   std::cout<<std::setprecision(9)<<mat[0]<<'\t'<<mat[5]<<'\t'<<mat[4]<<std::endl;
