@@ -27,6 +27,19 @@ SymmMatrix_3x3::SymmMatrix_3x3( const double &m0, const double &m1,
 SymmMatrix_3x3::~SymmMatrix_3x3()
 {}
 
+void SymmMatrix_3x3::copy( const SymmMatrix_3x3 &source )
+{
+  for(int ii=0; ii<6; ++ii) mat[ii] = source(ii);
+}
+
+SymmMatrix_3x3& SymmMatrix_3x3::operator= (const SymmMatrix_3x3 &source)
+{
+  if (this == &source) return *this;
+
+  for(int ii=0; ii<6; ++ii) mat[ii] = source(ii);
+  return *this;
+}
+
 SymmMatrix_3x3 operator+( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right )
 {
   return SymmMatrix_3x3( left.mat[0] + right.mat[0], left.mat[1] + right.mat[1], 
