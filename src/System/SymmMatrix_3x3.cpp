@@ -293,4 +293,17 @@ Matrix_3x3 operator*( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right )
    left(4) * right(4) + left(3) * right(3) + left(2) * right(2) );
 }
 
+SymmMatrix_3x3 inverse( const SymmMatrix_3x3 &input )
+{
+  const double invdetA = 1.0 / input.det();
+
+  return SymmMatrix_3x3 (
+  invdetA * (input(1) * input(2) - input(3) * input(3)),
+  invdetA * (input(0) * input(2) - input(4) * input(4)),
+  invdetA * (input(0) * input(1) - input(5) * input(5)),
+  invdetA * (input(4) * input(5) - input(0) * input(3)),
+  invdetA * (input(5) * input(3) - input(4) * input(1)),
+  invdetA * (input(4) * input(3) - input(5) * input(2)) );
+}
+
 // EOF
