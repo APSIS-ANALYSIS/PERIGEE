@@ -24,7 +24,7 @@ class SymmMatrix_3x3
     SymmMatrix_3x3( const SymmMatrix_3x3 &source );
 
     // Construct the symmetric part of the input source matrix
-    SymmMatrix_3x3( const Matrix_3x3 &source );
+    explicit SymmMatrix_3x3( const Matrix_3x3 &source );
 
     // Constructor by six numbers in Voigt numbering
     SymmMatrix_3x3( const double &m0, const double &m1, const double &m2,
