@@ -276,6 +276,32 @@ int main( int argc, char * argv[] )
   (A3 - A1).print();
   (A1 - A2).print();
 
+  A2.MatMultTransposeLeft(B1);
+  Matrix_3x3 B2;
+  B2.MatMultTransposeLeft(B1);
+  std::cout<<A2.xx() - B2.xx()<<std::endl;
+  std::cout<<A2.yy() - B2.yy()<<std::endl;
+  std::cout<<A2.zz() - B2.zz()<<std::endl;
+  std::cout<<A2.xy() - B2.xy()<<std::endl;
+  std::cout<<A2.xz() - B2.xz()<<std::endl;
+  std::cout<<A2.yx() - B2.yx()<<std::endl;
+  std::cout<<A2.yz() - B2.yz()<<std::endl;
+  std::cout<<A2.zx() - B2.zx()<<std::endl;
+  std::cout<<A2.zy() - B2.zy()<<std::endl;
+
+  A3.MatMultTransposeRight(B1);
+  Matrix_3x3 B3;
+  B3.MatMultTransposeRight(B1);
+  std::cout<<A3.xx() - B3.xx()<<std::endl;
+  std::cout<<A3.yy() - B3.yy()<<std::endl;
+  std::cout<<A3.zz() - B3.zz()<<std::endl;
+  std::cout<<A3.xy() - B3.xy()<<std::endl;
+  std::cout<<A3.xz() - B3.xz()<<std::endl;
+  std::cout<<A3.yx() - B3.yx()<<std::endl;
+  std::cout<<A3.yz() - B3.yz()<<std::endl;
+  std::cout<<A3.zx() - B3.zx()<<std::endl;
+  std::cout<<A3.zy() - B3.zy()<<std::endl;
+
   return EXIT_SUCCESS;
 }
 
