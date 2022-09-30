@@ -302,6 +302,26 @@ int main( int argc, char * argv[] )
   std::cout<<A3.zx() - B3.zx()<<std::endl;
   std::cout<<A3.zy() - B3.zy()<<std::endl;
 
+  double a2b1 = A2.MatContraction(B1);
+  double b2b1 = B2.MatContraction(B1);
+  std::cout<<a2b1 - b2b1<<std::endl;
+
+  double a1b2 = A1.MatContraction(A2);
+  double b1b2 = B1.MatContraction(B2);
+  std::cout<<a1b2 - b1b2<<std::endl;
+   
+  inverse(A2);   
+  inverse(B2);
+  std::cout<<A2.xx() - B2.xx()<<std::endl;
+  std::cout<<A2.xy() - B2.xy()<<std::endl;
+  std::cout<<A2.xz() - B2.xz()<<std::endl;
+  std::cout<<A2.yy() - B2.yy()<<std::endl;
+  std::cout<<A2.yz() - B2.yz()<<std::endl;
+  std::cout<<A2.zz() - B2.zz()<<std::endl;
+  std::cout<<A2.yx() - B2.yx()<<std::endl;
+  std::cout<<A2.zx() - B2.zx()<<std::endl;
+  std::cout<<A2.zy() - B2.zy()<<std::endl;
+
   return EXIT_SUCCESS;
 }
 
