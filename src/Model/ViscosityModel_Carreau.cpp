@@ -26,3 +26,32 @@ ViscosityModel_Carreau::ViscosityModel_Carreau( const char * const &fname )
 ViscosityModel_Carreau::~ViscosityModel_Carreau()
 {}
 
+void ViscosityModel_Carreau::print_info() const
+{
+  SYS_T::commPrint("\t  ViscosityModel_Carreau:: \n");
+  SYS_T::commPrint("\t  Infinite Shear Viscosity mu_inf  = %e \n", mu_inf);
+  SYS_T::commPrint("\t  Zero Shear Viscosity     mu_0    = %e \n", mu_0);
+  SYS_T::commPrint("\t  Time Constant            lambda  = %e \n", lambda);
+  SYS_T::commPrint("\t  Power Law Index          n       = %e \n", n);
+}
+
+void ViscosityModel_Carreau::write_hdf5( const char * const &fname ) const
+{
+  if( SYS_T::get_MPI_rank() == 0 )
+  {
+    hid_t file_id = H5Fcreate( fname, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
+    HDF5_Writer * h5w = new HDF5_Writer( file_id );
+
+    h5w -> write_string("model_name", get_model_name());
+    h5w -> write_doubleScalar( "mu_inf", mu_inf);
+    h5w -> write_doubleScalar( "mu_0", mu_0);
+    h5w -> write_doubleScalar( "lambda", lambda);
+    h5w -> write_doubleScalar( "n", n);
+
+    delete h5w;
+    H5Fclose(file_id);
+  }
+
+  MPI_Barrier(PETSC_COMM_WORLD);
+}
+
