@@ -103,26 +103,25 @@ void SymmMatrix_3x3::inverse()
 {
   const double invdetA = 1.0 / det();
 
-  double temp[6];
-
-  temp[0] = invdetA * (mat[1] * mat[2] - mat[3] * mat[3]);
-  temp[5] = invdetA * (mat[4] * mat[3] - mat[5] * mat[2]);
-  temp[4] = invdetA * (mat[5] * mat[3] - mat[4] * mat[1]);
-  temp[1] = invdetA * (mat[0] * mat[2] - mat[4] * mat[4]);
-  temp[3] = invdetA * (mat[4] * mat[5] - mat[0] * mat[3]);
-  temp[2] = invdetA * (mat[0] * mat[1] - mat[5] * mat[5]);
+  const double temp[6] = {
+    invdetA * (mat[1] * mat[2] - mat[3] * mat[3]),
+    invdetA * (mat[0] * mat[2] - mat[4] * mat[4]),
+    invdetA * (mat[0] * mat[1] - mat[5] * mat[5]),
+    invdetA * (mat[4] * mat[5] - mat[0] * mat[3]),
+    invdetA * (mat[5] * mat[3] - mat[4] * mat[1]),
+    invdetA * (mat[4] * mat[3] - mat[5] * mat[2]) };
 
   for(int ii=0; ii<6; ++ii) mat[ii] = temp[ii];
 }
 
 void SymmMatrix_3x3::scale( const double &val )
 {
-  for(int ii=0; ii<6; ++ii) mat[ii] = mat[ii] * val;
+  for(int ii=0; ii<6; ++ii) mat[ii] *= val;
 }
 
 void SymmMatrix_3x3::AXPY( const double &val, const SymmMatrix_3x3 &source )
 {
-  for(int ii=0; ii<6; ++ii) mat[ii] = mat[ii] + val * source(ii);
+  for(int ii=0; ii<6; ++ii) mat[ii] += val * source(ii);
 }
 
 void SymmMatrix_3x3::AXPI( const double &val )
