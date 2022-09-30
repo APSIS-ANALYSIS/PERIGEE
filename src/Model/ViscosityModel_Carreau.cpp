@@ -55,3 +55,21 @@ void ViscosityModel_Carreau::write_hdf5( const char * const &fname ) const
   MPI_Barrier(PETSC_COMM_WORLD);
 }
 
+double ViscosityModel_Carreau::get_mu( const double &D_xx, const double &D_yy,
+                                       const double &D_zz, const double &D_yz,
+                                       const double &D_xz, const double &D_xy ) const
+{
+  const SymmMatrix_3x3 D( D_xx, D_yy, D_zz, D_yz, D_xz, D_xy);
+  const double DII = std::abs( D.I2() );
+  const double pow_base = 1.0 + lambda * lambda * 4.0 * DII;
+  return mu_inf + ( mu_0 - mu_inf ) * std::pow( pow_base, (n - 1.0) / 2.0 );
+}
+
+double ViscosityModel_Carreau::get_mu( const Matrix_3x3 &grad_velo ) const
+{
+  const SymmMatrix_3x3 D( grad_velo );
+  const double DII = std::abs( D.I2() );
+  const double pow_base = 1.0 + lambda * lambda * 4.0 * DII;
+  return mu_inf + ( mu_0 - mu_inf ) * std::pow( pow_base, (n - 1.0) / 2.0 );
+}
+
