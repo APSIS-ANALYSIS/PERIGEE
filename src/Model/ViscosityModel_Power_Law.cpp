@@ -49,3 +49,19 @@ void ViscosityModel_Power_Law::write_hdf5( const char * const &fname ) const
   MPI_Barrier(PETSC_COMM_WORLD);
 }
 
+double ViscosityModel_Power_Law::get_mu( const double &D_xx, const double &D_yy,
+                                         const double &D_zz, const double &D_yz,
+                                         const double &D_xz, const double &D_xy ) const
+{
+  const SymmMatrix_3x3 D( D_xx, D_yy, D_zz, D_yz, D_xz, D_xy);
+  const double DII = std::abs( D.I2() );
+  return m * std::pow( 2.0 * std::sqrt( DII ), n - 1.0 );
+}
+
+double ViscosityModel_Power_Law::get_mu( const Matrix_3x3 &grad_velo ) const
+{
+  const SymmMatrix_3x3 D( grad_velo );
+  const double DII = std::abs( D.I2() );
+  return m * std::pow( 2.0 * std::sqrt( DII ), n - 1.0 );
+}
+
