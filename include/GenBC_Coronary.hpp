@@ -42,6 +42,7 @@
 // <outlet_id> <Rp> <C> <Rd> <C> <Rd> <Pd> 0 1.0
 //
 // ============================================================================
+#include <iomanip>
 #include "IGenBC.hpp"
 #include "GenBC_Tools.hpp"
 
