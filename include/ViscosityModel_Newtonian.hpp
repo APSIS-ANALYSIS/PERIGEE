@@ -18,6 +18,16 @@ class ViscosityModel_Newtonian : public IViscosityModel
 
 		virtual ~ViscosityModel_Newtonian();
 
+    virtual void print_info() const;
+
+    virtual std::string get_model_name() const
+    {
+      const std::string mname = "Newtonian";
+      return mname;
+    }
+
+    virtual void write_hdf5( const char * const &fname = "viscosity_model.h5" ) const;
+
 		private:
 // ----------------------------------------------------------------------------
 // mu : viscosity
