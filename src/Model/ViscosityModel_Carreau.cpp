@@ -73,20 +73,20 @@ double ViscosityModel_Carreau::get_mu( const Matrix_3x3 &grad_velo ) const
   return mu_inf + ( mu_0 - mu_inf ) * std::pow( pow_base, (n - 1.0) / 2.0 );
 }
 
-double ViscosityModel_Carreau::get_dmu_dvelo_I1( const double &D_xx,
-                             const double &D_yy, const double &D_zz ) const
+double ViscosityModel_Carreau::get_dmu_dI1( const double &D_xx,
+                        const double &D_yy, const double &D_zz ) const
 {
   return 0.0;
 }
 
-double ViscosityModel_Carreau::get_dmu_dvelo_I1( const Matrix_3x3 &grad_velo ) const
+double ViscosityModel_Carreau::get_dmu_dI1( const Matrix_3x3 &grad_velo ) const
 {
   return 0.0;
 }
 
-double ViscosityModel_Carreau::get_dmu_dvelo_I2( const double &D_xx,
-         const double &D_yy, const double &D_zz, const double &D_yz,
-         const double &D_xz, const double &D_xy ) const
+double ViscosityModel_Carreau::get_dmu_dI2( const double &D_xx,
+    const double &D_yy, const double &D_zz, const double &D_yz,
+    const double &D_xz, const double &D_xy ) const
 {
   const SymmMatrix_3x3 D( D_xx, D_yy, D_zz, D_yz, D_xz, D_xy);
   const double DII = std::abs( D.I2() );
@@ -96,7 +96,7 @@ double ViscosityModel_Carreau::get_dmu_dvelo_I2( const double &D_xx,
   return dmu_dvelo;
 }
 
-double ViscosityModel_Carreau::get_dmu_dvelo_I2( const Matrix_3x3 &grad_velo ) const
+double ViscosityModel_Carreau::get_dmu_dI2( const Matrix_3x3 &grad_velo ) const
 {
   const SymmMatrix_3x3 D( grad_velo );
   const double DII = std::abs( D.I2() );
@@ -106,14 +106,14 @@ double ViscosityModel_Carreau::get_dmu_dvelo_I2( const Matrix_3x3 &grad_velo ) c
   return dmu_dvelo;
 }
 
-double ViscosityModel_Carreau::get_dmu_dvelo_I3( const double &D_xx,
+double ViscosityModel_Carreau::get_dmu_dI3( const double &D_xx,
          const double &D_yy, const double &D_zz, const double &D_yz,
          const double &D_xz, const double &D_xy ) const
 {
   return 0.0;
 }
 
-double ViscosityModel_Carreau::get_dmu_dvelo_I3( const Matrix_3x3 &grad_velo ) const
+double ViscosityModel_Carreau::get_dmu_dI3( const Matrix_3x3 &grad_velo ) const
 {
   return 0.0;
 }
