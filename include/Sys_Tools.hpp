@@ -99,24 +99,6 @@ namespace SYS_T
     std::cout<<get_string_mem_size( byte_size );
   }
   
-  // to get a non-constant (i.e. writable) char array from a string, 
-  // use &b[0]. Note: string.c_str() returns a const char array.
-  inline void to_char( const std::string &a, std::vector<char> &b )
-  {
-    b.assign(a.begin(), a.end());
-    b.push_back('\0');
-  }
-
-  // this gets a non-constant/writable char array from a string.
-  // this directly returns a char array, but the user is responsible 
-  // for deleting the char pointer after usage.
-  inline void to_char( const std::string &a, char * &b )
-  {
-    b = new char [a.size() + 1];
-    std::copy(a.begin(), a.end(), b);
-    b[a.size()] = '\0';
-  }
-
   inline std::string to_string( const int &aa )
   {
     std::ostringstream ss;
