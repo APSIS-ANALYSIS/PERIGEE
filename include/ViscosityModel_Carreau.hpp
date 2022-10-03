@@ -35,22 +35,22 @@ class ViscosityModel_Carreau : public IViscosityModel
 
     virtual double get_mu( const Matrix_3x3 &grad_velo ) const;
 
-    virtual double get_dmu_dvelo_I1( const double &D_xx, const double &D_yy,
-                                     const double &D_zz) const;
+    virtual double get_dmu_dI1( const double &D_xx, const double &D_yy,
+                                const double &D_zz) const;
 
-    virtual double get_dmu_dvelo_I1( const Matrix_3x3 &grad_velo ) const;
+    virtual double get_dmu_dI1( const Matrix_3x3 &grad_velo ) const;
 
-    virtual double get_dmu_dvelo_I2( const double &D_xx, const double &D_yy,
-                                     const double &D_zz, const double &D_yz,
-                                     const double &D_xz, const double &D_xy ) const;
+    virtual double get_dmu_dI2( const double &D_xx, const double &D_yy,
+                                const double &D_zz, const double &D_yz,
+                                const double &D_xz, const double &D_xy ) const;
 
-    virtual double get_dmu_dvelo_I2( const Matrix_3x3 &grad_velo ) const;
+    virtual double get_dmu_dI2( const Matrix_3x3 &grad_velo ) const;
 
-    virtual double get_dmu_dvelo_I3( const double &D_xx, const double &D_yy,
-                                     const double &D_zz, const double &D_yz,
-                                     const double &D_xz, const double &D_xy ) const;
+    virtual double get_dmu_dI3( const double &D_xx, const double &D_yy,
+                                const double &D_zz, const double &D_yz,
+                                const double &D_xz, const double &D_xy ) const;
 
-    virtual double get_dmu_dvelo_I3( const Matrix_3x3 &grad_velo) const;
+    virtual double get_dmu_dI3( const Matrix_3x3 &grad_velo) const;
 
 		private:
 // ----------------------------------------------------------------------------
