@@ -18,6 +18,16 @@ class ViscosityModel_Power_Law : public IViscosityModel
 
 		virtual ~ViscosityModel_Power_Law();
 
+    virtual void print_info() const;
+
+    virtual std::string get_model_name() const
+    {
+      const std::string mname = "Power Law";
+      return mname;
+    }
+
+    virtual void write_hdf5( const char * const &fname = "viscosity_model.h5" ) const;
+
 		private:
 // ----------------------------------------------------------------------------
 // m      : consistency ( Pa * s ^ n ) when n = 1, it is the same as viscosity
