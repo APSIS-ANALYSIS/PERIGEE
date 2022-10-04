@@ -55,6 +55,12 @@ int main( int argc, char *argv[] )
   int    ttan_renew_freq = 1;        // frequency of tangent matrix renewal
   int    sol_record_freq = 1;        // frequency for recording the solution
 
+  // Solid properties
+  bool   is_read_material = true;    // bool flag to decide if one wants to read material model from h5 file
+  double solid_density = 1.0;
+  double solid_E = 2.0e6;
+  double solid_nu = 0.5;
+
   // We assume that a 3D solver has been called (to generate the wall traction)
   // and a suite of command line arguments has been saved to disk
   hid_t solver_cmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
@@ -122,6 +128,10 @@ int main( int argc, char *argv[] )
   SYS_T::GetOptionInt(   "-ttan_freq",           ttan_renew_freq);
   SYS_T::GetOptionBool(  "-is_record_sol",       is_record_sol);
   SYS_T::GetOptionInt(   "-sol_rec_freq",        sol_record_freq);
+  SYS_T::GetOptionBool(  "-is_read_material",    is_read_material);
+  SYS_T::GetOptionReal(  "-sl_density",          solid_density);
+  SYS_T::GetOptionReal(  "-sl_E",                solid_E);
+  SYS_T::GetOptionReal(  "-sl_nu",               solid_nu);
 
   // ===== Print Command Line Arguments =====
   SYS_T::cmdPrint(      "part_v_file:",          part_v_file);
@@ -149,6 +159,20 @@ int main( int argc, char *argv[] )
     SYS_T::cmdPrint(     "-sol_rec_freq:",       sol_record_freq);
   else
     SYS_T::commPrint(    "-is_record_sol: false \n");
+
+  if( is_read_material )
+  {
+    SYS_T::commPrint(    "-is_read_material: true \n");
+    SYS_T::file_check(   "material_model.h5" );
+    SYS_T::commPrint(    "material_model.h5 found. \n");
+  }
+  else
+  {
+    SYS_T::commPrint(    "-is_read_material: false \n");
+    SYS_T::cmdPrint(     "-sl_density:",         solid_density);
+    SYS_T::cmdPrint(     "-sl_E:",               solid_E);
+    SYS_T::cmdPrint(     "-sl_nu:",              solid_nu);
+  }
 
   // ====== Record important parameters ======
   if(rank == 0)
@@ -253,19 +277,39 @@ int main( int argc, char *argv[] )
   IMaterialModel * matmodel = nullptr;
   IPLocAssem_2x2Block * locAssem_solid_ptr = nullptr;
 
-  if( sl_nu == 0.5 )
+  if( is_read_material )
   {
-    matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( "material_model.h5" );
+    if( sl_nu == 0.5 )
+    {
+      matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( "material_model.h5" );
 
-    locAssem_solid_ptr = new PLocAssem_2x2Block_Tet4_VMS_Incompressible(
-        matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+      locAssem_solid_ptr = new PLocAssem_2x2Block_Tet4_VMS_Incompressible(
+          matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+    }
+    else
+    {
+      matmodel = new MaterialModel_NeoHookean_M94_Mixed( "material_model.h5" );
+
+      locAssem_solid_ptr = new PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity(
+          matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+    }
   }
   else
   {
-    matmodel = new MaterialModel_NeoHookean_M94_Mixed( "material_model.h5" );
+    if( solid_nu == 0.5 )
+    {
+      matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( solid_density, solid_E );
 
-    locAssem_solid_ptr = new PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity(
-        matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+      locAssem_solid_ptr = new PLocAssem_2x2Block_Tet4_VMS_Incompressible(
+          matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+    }
+    else
+    {
+      matmodel = new MaterialModel_NeoHookean_M94_Mixed( solid_density, solid_E, solid_nu );
+
+      locAssem_solid_ptr = new PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity(
+          matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+    }
   }
 
   // ===== Initial conditions =====

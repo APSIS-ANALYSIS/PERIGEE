@@ -33,10 +33,10 @@ Matrix_3x3::Matrix_3x3(
 Matrix_3x3::~Matrix_3x3()
 {}
 
-bool Matrix_3x3::is_identical( const Matrix_3x3 source ) const
+bool Matrix_3x3::is_identical( const Matrix_3x3 &source, const double &tol ) const
 {
   for(int ii=0; ii<9; ++ii) 
-    if(source(ii) != mat[ii]) return false;
+    if( std::abs( source(ii) - mat[ii]) > tol ) return false;
   return true;
 }
 
@@ -45,7 +45,7 @@ void Matrix_3x3::copy( const Matrix_3x3 &source )
   for(int ii=0; ii<9; ++ii) mat[ii] = source(ii);
 }
 
-void Matrix_3x3::copy( double source[9] )
+void Matrix_3x3::copy( const double source[9] )
 {
   for(int ii=0; ii<9; ++ii) mat[ii] = source[ii];
 }
@@ -146,7 +146,7 @@ void Matrix_3x3::add_outprod( const double &val, const Vector_3 &va, const Vecto
 
 void Matrix_3x3::transpose()
 {
-  double temp;
+  double temp; // temperary variable for swapping off diagonal entries
   temp = mat[1]; mat[1] = mat[3]; mat[3] = temp;
   temp = mat[2]; mat[2] = mat[6]; mat[6] = temp;
   temp = mat[5]; mat[5] = mat[7]; mat[7] = temp;
@@ -156,39 +156,33 @@ void Matrix_3x3::inverse()
 {
   const double invdetA = 1.0 / det();
 
-  double temp[9];
-
-  temp[0] = invdetA * (mat[4] * mat[8] - mat[5] * mat[7]);
-  temp[1] = invdetA * (mat[2] * mat[7] - mat[1] * mat[8]);
-  temp[2] = invdetA * (mat[1] * mat[5] - mat[2] * mat[4]);
-  temp[3] = invdetA * (mat[5] * mat[6] - mat[3] * mat[8]);
-  temp[4] = invdetA * (mat[0] * mat[8] - mat[2] * mat[6]);
-  temp[5] = invdetA * (mat[2] * mat[3] - mat[0] * mat[5]);
-  temp[6] = invdetA * (mat[3] * mat[7] - mat[4] * mat[6]);
-  temp[7] = invdetA * (mat[1] * mat[6] - mat[0] * mat[7]);
-  temp[8] = invdetA * (mat[0] * mat[4] - mat[1] * mat[3]);
+  const double temp[9] = { 
+    invdetA * (mat[4] * mat[8] - mat[5] * mat[7]),
+    invdetA * (mat[2] * mat[7] - mat[1] * mat[8]),
+    invdetA * (mat[1] * mat[5] - mat[2] * mat[4]),
+    invdetA * (mat[5] * mat[6] - mat[3] * mat[8]),
+    invdetA * (mat[0] * mat[8] - mat[2] * mat[6]),
+    invdetA * (mat[2] * mat[3] - mat[0] * mat[5]),
+    invdetA * (mat[3] * mat[7] - mat[4] * mat[6]),
+    invdetA * (mat[1] * mat[6] - mat[0] * mat[7]),
+    invdetA * (mat[0] * mat[4] - mat[1] * mat[3]) };
 
   for(int ii=0; ii<9; ++ii) mat[ii] = temp[ii];
 }
 
 void Matrix_3x3::scale( const double &val )
 {
-  for(int ii=0; ii<9; ++ii) mat[ii] = mat[ii] * val;
+  for(int ii=0; ii<9; ++ii) mat[ii] *= val;
 }
 
 void Matrix_3x3::AXPY( const double &val, const Matrix_3x3 &source )
 {
-  for(int ii=0; ii<9; ++ii) mat[ii] = mat[ii] + val * source(ii);
+  for(int ii=0; ii<9; ++ii) mat[ii] += val * source(ii);
 }
 
 void Matrix_3x3::AXPI( const double &val )
 {
   mat[0] += val; mat[4] += val; mat[8] += val;
-}
-
-void Matrix_3x3::PY( const Matrix_3x3 &source )
-{
-  for(int ii=0; ii<9; ++ii) mat[ii] += source(ii);
 }
 
 double Matrix_3x3::det() const
@@ -262,7 +256,7 @@ void Matrix_3x3::MatMult( const Matrix_3x3 &mleft, const Matrix_3x3 &mright )
 
 void Matrix_3x3::MatRot( const Matrix_3x3 &Q )
 {
-  double temp[9] = {0};
+  double temp[9] = {0.0};
   for(int ii=0; ii<3; ++ii)
   {
     for(int jj=0; jj<3; ++jj)
@@ -559,6 +553,13 @@ Matrix_3x3 operator*(const Matrix_3x3 &mleft, const Matrix_3x3 &mright)
    mleft(6) * mright(0) + mleft(7) * mright(3) + mleft(8) * mright(6),
    mleft(6) * mright(1) + mleft(7) * mright(4) + mleft(8) * mright(7),
    mleft(6) * mright(2) + mleft(7) * mright(5) + mleft(8) * mright(8) );
+}
+
+Matrix_3x3 operator*( const double &val, const Matrix_3x3 &input )
+{
+  return Matrix_3x3( val * input(0), val * input(1), val * input(2),
+      val * input(3), val * input(4), val * input(5),
+      val * input(6), val * input(7), val * input(8) );
 }
 
 Matrix_3x3 inverse( const Matrix_3x3 &input )

@@ -23,7 +23,7 @@ void Vector_3::copy( const Vector_3 &source )
   vec[0] = source(0); vec[1] = source(1); vec[2] = source(2);
 }
 
-void Vector_3::copy( double source[3] )
+void Vector_3::copy( const double source[3] )
 {
   vec[0] = source[0]; vec[1] = source[1]; vec[2] = source[2];
 }
@@ -39,22 +39,12 @@ Vector_3& Vector_3::operator= (const Vector_3 &source)
 
 Vector_3 operator+( const Vector_3 &left, const Vector_3 &right )
 {
-  Vector_3 result;
-  result.vec[0] = left(0) + right(0);
-  result.vec[1] = left(1) + right(1);
-  result.vec[2] = left(2) + right(2);
-
-  return result;
+  return Vector_3( left(0) + right(0), left(1) + right(1), left(2) + right(2) );
 }
 
 Vector_3 operator-( const Vector_3 &left, const Vector_3 &right )
 {
-  Vector_3 result;
-  result.vec[0] = left(0) - right(0);
-  result.vec[1] = left(1) - right(1);
-  result.vec[2] = left(2) - right(2);
-
-  return result;
+  return Vector_3( left(0) - right(0), left(1) - right(1), left(2) - right(2) );
 }
 
 Vector_3& Vector_3::operator+=( const Vector_3 &source )
@@ -185,6 +175,11 @@ Vector_3 cross_product( const Vector_3 &a, const Vector_3 &b )
 {
   return Vector_3( a(1) * b(2) - a(2) * b(1), 
       a(2) * b(0) - a(0) * b(2), a(0) * b(1) - a(1) * b(0) );
+}
+
+Vector_3 operator*( const double &val, const Vector_3 &source )
+{
+  return Vector_3( source.x() * val, source.y() * val, source.z() * val );
 }
 
 // EOF

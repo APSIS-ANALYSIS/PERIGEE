@@ -10,8 +10,7 @@ MaterialModel_GOH06_Incompressible_Mixed::MaterialModel_GOH06_Incompressible_Mix
   rho0( in_rho ), E(3.0 * in_mu), nu(0.5), mu( in_mu ),
   f1_the( in_f1the*pi/180.0 ), f1_phi( in_f1phi*pi/180.0 ),
   f2_the( in_f2the*pi/180.0 ), f2_phi( in_f2phi*pi/180.0 ),
-  fk1(in_fk1), fk2(in_fk2), fkd(in_fkd),
-  I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+  fk1(in_fk1), fk2(in_fk2), fkd(in_fkd)
 {
   a1(0) = sin(f1_the) * cos(f1_phi);
   a1(1) = sin(f1_the) * sin(f1_phi);
@@ -24,8 +23,7 @@ MaterialModel_GOH06_Incompressible_Mixed::MaterialModel_GOH06_Incompressible_Mix
 
 MaterialModel_GOH06_Incompressible_Mixed::MaterialModel_GOH06_Incompressible_Mixed(
     const char * const &fname)
-: pt33( 1.0 / 3.0 ), mpt67( -2.0 * pt33 ), pi( MATH_T::PI ),
-  I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+: pt33( 1.0 / 3.0 ), mpt67( -2.0 * pt33 ), pi( MATH_T::PI )
 {
   hid_t h5file = H5Fopen(fname, H5F_ACC_RDONLY, H5P_DEFAULT);
 
@@ -129,7 +127,7 @@ void MaterialModel_GOH06_Incompressible_Mixed::get_PK(
 
   // PxI = P : I = I - 1/3 trC C^-1
   Matrix_3x3 PxI(Cinv); PxI.scale( (-1.0) * pt33 * trC );
-  PxI.PY(I);
+  PxI.AXPI( 1.0 );
 
   // PxH1(2) = P : H = kd PxI + (1-3kd) a x a + (kd - 1/3) (a.Ca) C^-1
   Matrix_3x3 PxH1, PxH2;
@@ -177,7 +175,7 @@ void MaterialModel_GOH06_Incompressible_Mixed::get_PK_Stiffness(
 
   // P : I = I - 1/3 trC C^-1
   Matrix_3x3 PxI(Cinv); PxI.scale( (-1.0) * pt33 * trC );
-  PxI.PY(I);
+  PxI.AXPI( 1.0 );
 
   // P : H = kd PxI + (1-3kd) a x a + (kd - 1/3) (a.Ca) C^-1
   Matrix_3x3 PxH1, PxH2;

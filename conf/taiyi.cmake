@@ -11,7 +11,7 @@ set(MPI_DIR /share/intel/2018u4/compilers_and_libraries_2018.5.274/linux/mpi/int
 set(PETSC_DIR ${HOME_DIR}/lib/petsc-3.14.6-opt-avx512)
 set(PETSC_ARCH .)
 
-set(HDF5_ROOT ${HOME_DIR}/lib/hdf5-1.8.16)
+set(HDF5_ROOT ${HOME_DIR}/lib/hdf5-1.12.2)
 
 # ========================================================
 # Setup the libraries

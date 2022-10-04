@@ -9,6 +9,7 @@
 //
 // Date: Dec 9 2013
 // ==================================================================
+#include <vector>
 #include "Sys_Tools.hpp"
 
 class PDNTimeStep

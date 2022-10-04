@@ -69,7 +69,7 @@ void MaterialModel_StVenant_Kirchhoff_Simo85::get_PK(
   S.inverse();
   S.scale( kappa * std::log(F.det()) );
   S.AXPY(mu, C);
-  S.AXPY(-1.0 * mu, I);
+  S.AXPI( -1.0 * mu );
   P.MatMult(F,S);
 }
 
@@ -92,7 +92,7 @@ void MaterialModel_StVenant_Kirchhoff_Simo85::get_PK_Stiffness(
 
   S.scale(kappa * std::log(detF));
   S.AXPY(mu, C);
-  S.AXPY(-1.0 * mu, I);
+  S.AXPI( -1.0 * mu );
   P.MatMult(F,S);
 }
 
@@ -100,7 +100,7 @@ double MaterialModel_StVenant_Kirchhoff_Simo85::get_strain_energy(
     const Matrix_3x3 &F ) const
 {
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
-  C.AXPY(-1.0, I);
+  C.AXPI( -1.0 );
   C.scale(0.5);
   C.MatMult(C,C);
   const double trE2 = C.tr();

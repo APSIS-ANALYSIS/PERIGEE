@@ -36,7 +36,7 @@ class Vector_3
     // Copy
     void copy( const Vector_3 &source );
 
-    void copy( double source[3] );
+    void copy( const double source[3] );
 
     // Assignment operator
     Vector_3& operator= (const Vector_3 &source);
@@ -47,10 +47,10 @@ class Vector_3
     const double& operator()(const int &index) const {return vec[index];}
 
     // Addition and substraction operators
-    friend Vector_3 operator+( const Vector_3 &left, const Vector_3 &right);
+    friend Vector_3 operator+( const Vector_3 &left, const Vector_3 &right );
 
-    friend Vector_3 operator-( const Vector_3 &left, const Vector_3 &right);
-
+    friend Vector_3 operator-( const Vector_3 &left, const Vector_3 &right );
+    
     Vector_3& operator+=( const Vector_3 &source );
 
     Vector_3& operator-=( const Vector_3 &source );
@@ -112,5 +112,8 @@ double dot_product( const Vector_3 &a, const Vector_3 &b );
 
 // calculate the cross product of two vectors
 Vector_3 cross_product( const Vector_3 &a, const Vector_3 &b );
+
+// calculate a scalar product of a input vector
+Vector_3 operator*( const double &val, const Vector_3 &source );
 
 #endif

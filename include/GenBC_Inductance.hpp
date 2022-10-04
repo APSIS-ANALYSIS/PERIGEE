@@ -12,6 +12,7 @@
 // Author: Ju Liu
 // Date: Feb. 20 2019
 // ==================================================================
+#include <vector>
 #include "IGenBC.hpp"
 
 class GenBC_Inductance : public IGenBC

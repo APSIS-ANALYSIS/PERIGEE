@@ -55,17 +55,17 @@ Of course, for experienced users, you can download the Valgrind source file and 
 
 
 ## Install CMake
-Make sure you have cmake installed in your system. In case you do not have one, do the following.
+Make sure you have cmake installed in your system. In case you do not have one, you will have to install it youself. There are several ways of intalling CMake. If you have the admin privilege, do the following.
 ```sh
 $ sudo apt-get install cmake
 ```
-
-If you are an advanced user and wants to build cmake youself, consult this page: https://cmake.org/install/ You may encounter issues like the lack of openssl in the system, which can be conveniently resolved by, e.g., `sudo apt install libssl-dev`. Of course to tell the system to load the correct CMake, you may also want to modify PATH in the .bashrc or .bash_profile file.
+Linux will automatically install CMake for you. If you are an advanced user and wants to build cmake youself, consult this page: https://cmake.org/install/ You may encounter issues like the lack of openssl in the system, which can be conveniently resolved by, e.g., `sudo apt install libssl-dev`. Of course to tell the system to load the correct CMake, you may also want to modify PATH in the .bashrc or .bash_profile file.
 
 If you are using a cluster, cmake can be loaded by
 ```sh
 $ module load cmake
 ```
+The easiest way of getting CMake is directly downloading a compiled CMake from the [official site](https://cmake.org/download/). When you download the compiled CMake, make sure you get the correct platform. Typically, it should be Linux x86-64.
 
 ## Install MPICH
 First, download the source file, extract the tar bar, and rename the folder as a source folder:
@@ -130,7 +130,7 @@ A folder named VTK-7.1.1-shared will be created in `$HOME/lib`. The name of this
 ```sh
 $ rm -rf VTK-7.1.1.tar.gz VTK-7.1.1-src build_vtk
 ```
-For more detailed discussion of installing the VTK library, refer to the [guide for advanced users](install-advanced.md).
+For more detailed discussion of installing the VTK library, refer to the [guide for advanced users](install-advanced.md). We recommend using VTK-7.1.1 or VTK-8.2.0.
 
 ## Install PETSc
 First, we enter the lib folder and download petsc source files in the folder.
@@ -160,7 +160,7 @@ $ mv hdf5-1.8.16 hdf5-1.8.16-src
 $ cd hdf5-1.8.16-src
 $ ./configure --prefix=$HOME/lib/hdf5-1.8.16 --enable-production
 ```
-So far, you have downloaded the source file and configured the HDF5 source. In the configuration stage, you specified the install location for the HDF5 library and the compile uses production mode rather than debug mode. You can always see all configuration options by running ```./configure --help```.
+So far, you have downloaded the source file and configured the HDF5 source. In the configuration stage, you specified the install location for the HDF5 library and the compile uses production mode rather than debug mode. You can always see all configuration options by running ```./configure --help```. At the end of configure output, there will be a summary of the configuration setup. Make sure that (1) the install location is correct; (2) the build type is production (or debug); (3) optionally, parallel hdf5 is supported.
 
 ```sh
 $ make
@@ -170,10 +170,10 @@ $ make check-install
 $ cd ..
 $ rm -rf hdf5-1.8.16-src
 ```
-In the lib folder, there should be a sub-directory hdf5-1.8.16, containing the HDF5 library.
+The commands `make check` and `make check-install` are optional but recommended. In the lib folder, there should be a sub-directory hdf5-1.8.16, containing the HDF5 library. As a note, we recommend using hdf5-1.8.16 or hdf5-1.12.2.
 
 ## Install METIS
-Run the following commands to install METIS
+Run the following commands to install METIS.
 ```sh
 $ wget http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/OLD/metis-5.0.3.tar.gz
 $ tar -zxvf metis-5.0.3.tar.gz
@@ -185,6 +185,7 @@ $ make install
 $ cd ..
 $ rm -rf metis-5.0.3-src
 ```
+Remarks: (1) You should read BUILD.txt to have an idea of all relevant configure options. (2) If you need 64-bit integer support, you need to modify the `metis.h` file in the include folder before compiling.
 
 ## Install Gmsh
 The PERIGEE code does **not** depend on Gmsh. However, we frequently use Gmsh to generate input files for unstructured grid. Therefore, it is recommended that you install Gmsh on your machine. This step is **unnecessary** for compiling PERIGEE on clusters. Currently, the code is compatible with the mesh format from Gmsh-3. Run the following commands to install Gmsh. We do not need to link the PERIGEE code to Gmsh. For many cases, we generate a mesh using Gmsh as a binary executable.
