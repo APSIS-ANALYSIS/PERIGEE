@@ -9,6 +9,7 @@
 //        [0.5 , 0.0], [0.5 , 0.5], [0.0 , 0.5].
 // These are the vertex points for the quadratic triangle elements.
 // ==================================================================
+#include <vector>
 #include "IQuadPts.hpp"
 
 class QuadPts_vis_tri6 : public IQuadPts

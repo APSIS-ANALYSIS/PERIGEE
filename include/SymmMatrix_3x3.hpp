@@ -9,7 +9,7 @@
 //                    mat[5], mat[1], mat[3]
 //                    mat[4], mat[3], mat[2]
 //
-// Author: Ju Liu
+// Author: Yujie Sun, Ju Liu
 // Date: Sept. 16 2022
 // ============================================================================
 #include "Matrix_3x3.hpp"
@@ -24,7 +24,7 @@ class SymmMatrix_3x3
     SymmMatrix_3x3( const SymmMatrix_3x3 &source );
 
     // Construct the symmetric part of the input source matrix
-    SymmMatrix_3x3( const Matrix_3x3 &source );
+    explicit SymmMatrix_3x3( const Matrix_3x3 &source );
 
     // Constructor by six numbers in Voigt numbering
     SymmMatrix_3x3( const double &m0, const double &m1, const double &m2,
@@ -32,6 +32,12 @@ class SymmMatrix_3x3
 
     // Destructor
     ~SymmMatrix_3x3();
+
+    // Copy
+    void copy( const SymmMatrix_3x3 &source );
+
+    // Assignment operator
+    SymmMatrix_3x3& operator= (const SymmMatrix_3x3 &source);
 
     // Parenthesis operator. It allows accessing and assigning the matrix entries.
     double& operator()(const int &index) {return mat[index];}
@@ -82,7 +88,7 @@ class SymmMatrix_3x3
     SymmMatrix_3x3& operator*=( const double &val );
 
     // Return true if the input matrix is identical to the mat
-    bool is_identical( const SymmMatrix_3x3 &source ) const;
+    bool is_identical( const SymmMatrix_3x3 &source, const double &tol ) const;
 
     // Set all components to zero
     void gen_zero();
@@ -109,10 +115,6 @@ class SymmMatrix_3x3
 
     // X = X + a * I
     void AXPI( const double &val );
-
-    // add the matrix source with the matrix
-    // X = X + Y
-    void PY( const SymmMatrix_3x3 &source );
 
     // Get the determinant of the matrix
     double det() const;
@@ -141,6 +143,24 @@ class SymmMatrix_3x3
     // Q^T M Q = Q_ki M_kl Q_lj = output_matrix_ij
     void MatRot( const Matrix_3x3 &Q );
 
+    // Matrix multiplication as mat = source^T * source
+    // This is used for the evaluation of right Cauchy-Green strain tensor:
+    //                       C = F^T F
+    // The resulting matrix is symmetric. Hence the computation is simplified.
+    void MatMultTransposeLeft( const Matrix_3x3 &source );
+
+    // Matrix multiplication as mat = source * source^T
+    // This is used for the evaluation of the left Cauchy-Green strain tensor:
+    //                       b = F F^T
+    // The resulting matrix is symmetric. Hence, the computation is simplified.
+    void MatMultTransposeRight( const Matrix_3x3 &source );
+
+    // Matrix contraction
+    // return mat_ij source_ij
+    double MatContraction( const Matrix_3x3 &source ) const;
+    
+    double MatContraction( const SymmMatrix_3x3 &source ) const;
+
     // print the matrix
     void print() const;
 
@@ -153,5 +173,16 @@ class SymmMatrix_3x3
   private:
     double mat[6];
 };
+
+Vector_3 operator*( const SymmMatrix_3x3 &left, const Vector_3 &right );
+
+Matrix_3x3 operator*( const SymmMatrix_3x3 &left, const Matrix_3x3 &right );
+
+Matrix_3x3 operator*( const Matrix_3x3 &left, const SymmMatrix_3x3 &right );
+
+Matrix_3x3 operator*( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right );
+
+// Return the inverse of the input matrix
+SymmMatrix_3x3 inverse( const SymmMatrix_3x3 &input );
 
 #endif

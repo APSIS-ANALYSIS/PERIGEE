@@ -39,9 +39,7 @@ void PDNTimeStep::TimeIncrement(const double &input_time_step)
 
 void PDNTimeStep::WriteTimeInfo() const
 {
-  int rank;
-  MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
-  if(rank == 0)
+  if( SYS_T::get_MPI_rank() == 0)
   {
     std::ofstream timefile;
     timefile.open("Time_log.txt", std::ios::app);
@@ -62,9 +60,7 @@ void PDNTimeStep::WriteTimeInfo() const
 
 void PDNTimeStep::WriteTimeInfo_step() const
 {
-  int rank;
-  MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
-  if(rank == 0)
+  if( SYS_T::get_MPI_rank() == 0 )
   {
     std::ofstream timefile;
     timefile.open("Time_log.txt", std::ios::app);

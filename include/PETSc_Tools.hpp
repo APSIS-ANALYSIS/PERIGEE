@@ -9,6 +9,7 @@
 // Author: Ju Liu
 // Date: Jan 19 2018
 // ==================================================================
+#include <vector>
 #include "Sys_Tools.hpp"
 #include "petsc.h"
 
