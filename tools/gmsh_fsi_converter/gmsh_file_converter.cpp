@@ -12,13 +12,24 @@
 #include <vtkXMLUnstructuredGridReader.h>
 #include <vtkXMLUnstructuredGridWriter.h>
 #include <fstream>
+#include <vtkKdTreePointLocator.h>
+#include <cmath>
+
+//normalize the vectors for comfortable visualization
+int normalization(double *normal)
+{
+  double total = sqrt(normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2]);
+  for (int i = 0; i < 3; ++i)
+    normal[i] /= total;
+  return 0;
+}
 
 int main(int argc, char *argv[])
 {
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
   // Parse command line arguments: read in the wall_vtu and centerline_vtp to output local_ref_vtu
-  if (argc != 4)
+  if (argc != 3)
   {
     std::cerr << "Usage: " << argv[0] << " Filename to read wall_vtu"
               << " Filename to read centerline_vtp"
@@ -34,17 +45,29 @@ int main(int argc, char *argv[])
   vtkNew<vtkXMLUnstructuredGridReader> reader_vtu;
   reader_vtu->SetFileName(filename_vtu.c_str());
   reader_vtu->Update();
+  vtkNew<vtkXMLUnstructuredGridReader> reader_vtu1;
+  reader_vtu1->SetFileName(filename_vtu.c_str());
+  reader_vtu1->Update();
+  vtkNew<vtkXMLUnstructuredGridReader> reader_vtu2;
+  reader_vtu2->SetFileName(filename_vtu.c_str());
+  reader_vtu2->Update();
+
+  //construct three gird containers to save three normals respectively
   vtkUnstructuredGrid *grid = reader_vtu->GetOutput();
+  vtkUnstructuredGrid *grid1 = reader_vtu1->GetOutput();
+  vtkUnstructuredGrid *grid2 = reader_vtu2->GetOutput();
+
   int nFunc = grid->GetNumberOfPoints();
 
   vtkNew<vtkXMLPolyDataReader> reader_vtp;
   reader_vtp->SetFileName(filename_vtp.c_str());
   reader_vtp->Update();
   vtkPolyData *poly = reader_vtp->GetOutput();
-  // int num_centerline = poly->GetNumberOfPoints();
+  vtkPoints *polypoints = poly->GetPoints();
+
 
   // Identify the closest point on the centerline
-  vtkCellLocator *locator = vtkCellLocator::New();
+  vtkNew<vtkCellLocator> locator;
   locator->Initialize();
   locator->SetDataSet(poly);
   locator->BuildLocator();
@@ -53,9 +76,20 @@ int main(int argc, char *argv[])
   vtkIdType cellId; // the cell id of the cell containing the closest point will be returned here
   double cl_pt[3];
   double nb_pt[3];
-  vtkGenericCell *cell = vtkGenericCell::New();
+  vtkNew<vtkGenericCell> cell;
   int subId;
   double dist;
+
+  // Create the tree
+  vtkSmartPointer<vtkKdTreePointLocator> pointTree =
+      vtkSmartPointer<vtkKdTreePointLocator>::New();
+  pointTree->SetDataSet(poly);
+  pointTree->BuildLocator();
+
+  // Find the k closest points to (0.5, 0.5, 0.5)
+  unsigned int k = 2;
+  vtkSmartPointer<vtkIdList> result =
+      vtkSmartPointer<vtkIdList>::New();
 
   // Three normal vectors definition
   vtkNew<vtkDoubleArray> radial_normal, longitudinal_normal, circumferential_normal;
@@ -74,36 +108,58 @@ int main(int argc, char *argv[])
   {
     double pt[3];
     grid->GetPoint(ii, pt);
-    locator->FindClosestPoint(&pt[0], &cl_pt[0], cell, cellId, subId, dist);
-    locator->FindClosestPoint(&cl_pt[0], &nb_pt[0], cell, cellId, subId, dist);
+    locator->FindClosestPoint(&pt[0], &cl_pt[0], cell, cellId, subId, dist);//the clostest point
+    pointTree->FindClosestNPoints(k, &pt[0], result);          //two clostest point 
+
+    //radial
     for (int jj = 0; jj < 3; ++jj)
     {
       u[jj] = pt[jj] - cl_pt[jj];
-      v[jj] = cl_pt[jj] - nb_pt[jj];
+      printf("pt[jj] - cl_pt[jj] = %lf - %lf\n", pt[jj], cl_pt[jj]);
     }
+    
+    //longitudinal
+    polypoints->GetPoint(result->GetId(1), nb_pt);
+    polypoints->GetPoint(result->GetId(0), cl_pt);
+
+    for (int jj = 0; jj < 3; ++jj)
+    {
+      v[jj] = nb_pt[jj] - cl_pt[jj];
+      printf("nb_pt[jj] - cl_pt[jj] = %lf - %lf\n", nb_pt[jj], cl_pt[jj]);
+    }
+
+    //cross to get circumferential
     w[0] = u[1] * v[2] - u[2] * v[1];
     w[1] = u[2] * v[0] - u[0] * v[2];
     w[2] = u[0] * v[1] - u[1] * v[0];
+
+    normalization(u);
+    normalization(v);
+    normalization(w);
+    
     radial_normal->InsertTuple(ii, u);
-    printf("radial_normal ii = %d\n", ii);
     longitudinal_normal->InsertTuple(ii, v);
-    printf("longitudinal_normal ii = %d\n", ii);
     circumferential_normal->InsertTuple(ii, w);
-    printf("circumferential_normal ii = %d\n", ii);
+    printf("normal ii = %d\n", ii);
   }
 
   grid->GetPointData()->SetVectors(radial_normal);
-  // grid->GetPointData()->SetVectors(longitudinal_normal);
-  // grid->GetPointData()->SetVectors(circumferential_normal);
-  std::string write_vtu = argv[3];
+  grid1->GetPointData()->SetVectors(longitudinal_normal);
+  grid2->GetPointData()->SetVectors(circumferential_normal);
+
   vtkNew<vtkXMLUnstructuredGridWriter> writer;
-  writer->SetFileName(write_vtu.c_str());
+  vtkNew<vtkXMLUnstructuredGridWriter> writer1;
+  vtkNew<vtkXMLUnstructuredGridWriter> writer2;
+
+  writer->SetFileName("radial_normal.vtu");
   writer->SetInputData(grid);
   writer->Write();
-
-  // clean memory
-  locator->Delete();
-  cell->Delete();
+  writer1->SetFileName("longitudinal_normal.vtu");
+  writer1->SetInputData(grid1);
+  writer1->Write();
+  writer2->SetFileName("circumferential_normal.vtu");
+  writer2->SetInputData(grid2);
+  writer2->Write();
 
   PetscFinalize();
   return 0;
