@@ -2,6 +2,18 @@ PROJECT(perigee)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
 
+find_package(VTK COMPONENTS 
+  CommonCore
+  IOXML
+)
+
+set(CMAKE_NINJA_FORCE_RESPONSE_FILE "ON" CACHE BOOL "Force Ninja to use response files.")
+
+
+if (NOT VTK_FOUND)
+  message(FATAL_ERROR "ReadPolyData: Unable to find the VTK build folder.")
+endif()
+
 IF(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
   cmake_policy(SET CMP0074 NEW)
@@ -66,11 +78,16 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 # 1. Make executable
 # 1.1 Preprocess
-ADD_EXECUTABLE( gmsh_converter gmsh_file_converter.cpp)
+ADD_EXECUTABLE( gmsh_converter MACOSX_BUNDLE gmsh_file_converter.cpp)
 
 # -------------------------------------------------------------------
 # 2. Link libraries
-TARGET_LINK_LIBRARIES( gmsh_converter ${EXTRA_LINK_LIBS} perigee )
+TARGET_LINK_LIBRARIES( gmsh_converter ${EXTRA_LINK_LIBS} perigee  ${VTK_LIBRARIES})
+
+vtk_module_autoinit(
+  TARGETS gmsh_converter
+  MODULES ${VTK_LIBRARIES}
+)
 
 #EOF
 
