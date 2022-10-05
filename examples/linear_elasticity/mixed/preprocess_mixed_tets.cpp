@@ -168,12 +168,12 @@ int main( int argc, char * argv[] )
   NBC_list.clear();
   NBC_list.resize( dofNum );
 
-  std::string file4nbc1 = sur_file + SYS_T::to_string(1)+ ".vtp";
-  std::string file4nbc2 = sur_file + SYS_T::to_string(2)+ ".vtp";
-  std::string file4nbc3 = sur_file + SYS_T::to_string(3)+ ".vtp";
-  std::string file4nbc4 = sur_file + SYS_T::to_string(4)+ ".vtp";
-  std::string file4nbc5 = sur_file + SYS_T::to_string(5)+ ".vtp";
-  std::string file4nbc6 = sur_file + SYS_T::to_string(6)+ ".vtp";
+  std::string file4nbc1 = sur_file + std::to_string(1)+ ".vtp";
+  std::string file4nbc2 = sur_file + std::to_string(2)+ ".vtp";
+  std::string file4nbc3 = sur_file + std::to_string(3)+ ".vtp";
+  std::string file4nbc4 = sur_file + std::to_string(4)+ ".vtp";
+  std::string file4nbc5 = sur_file + std::to_string(5)+ ".vtp";
+  std::string file4nbc6 = sur_file + std::to_string(6)+ ".vtp";
   
   std::vector<std::string> nlist; nlist.clear();
   nlist.push_back( file4nbc1 );

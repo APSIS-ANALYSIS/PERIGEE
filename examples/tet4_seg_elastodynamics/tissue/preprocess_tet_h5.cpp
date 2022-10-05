@@ -91,7 +91,7 @@ int main( int argc, char * argv[] )
 
   for(int ii=0; ii<nFace; ++ii)
   {
-    const std::string g1d_name = SYS_T::to_string(ii);
+    const std::string g1d_name = std::to_string(ii);
     g_h5r->read_string( g1d_name.c_str(), "name", face_name[ii]);
     nElem_2D[ii] = g_h5r -> read_intScalar(g1d_name.c_str(), "num_cell");
     nFunc_2D[ii] = g_h5r -> read_intScalar(g1d_name.c_str(), "num_node");

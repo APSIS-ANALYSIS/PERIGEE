@@ -47,7 +47,7 @@ void NBC_Partition_inflow_MF::write_hdf5( const std::string &FileName ) const
   for(int ii=0; ii<num_nbc; ++ii)
   {
     std::string subgroup_name( "nbcid_" );
-    subgroup_name.append( SYS_T::to_string(ii) );
+    subgroup_name.append( std::to_string(ii) );
 
     hid_t group_id = H5Gopen(g_id, subgroup_name.c_str(), H5P_DEFAULT);
 
