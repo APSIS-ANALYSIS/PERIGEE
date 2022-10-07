@@ -4,42 +4,24 @@
 // Author: Jiayi Huang and Ju Liu
 // Date: Sept. 20 2022
 // ============================================================================
-#include "Tet_Tools.hpp"
-#include "ElemBC_3D_tet_wall.hpp"
+#include "yaml.h"
+#include "Vector_3.hpp"
 #include <vtkPolyData.h>
-#include <vtkPolyDataMapper.h>
 #include <vtkXMLPolyDataReader.h>
 #include <vtkXMLUnstructuredGridReader.h>
 #include <vtkXMLUnstructuredGridWriter.h>
-#include <fstream>
-#include <vtkKdTreePointLocator.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkDoubleArray.h>
+#include <vtkPointData.h>
+#include <vtkPointLocator.h>
 #include <cmath>
 
-//normalize the vectors for comfortable visualization
-int normalization(double *normal)
-{
-  double total = sqrt(normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2]);
-  for (int i = 0; i < 3; ++i)
-    normal[i] /= total;
-  return 0;
-}
-
+// normalize the vectors for comfortable visualization
 int main(int argc, char *argv[])
 {
-  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-
-  // Parse command line arguments: read in the wall_vtu and centerline_vtp to output local_ref_vtu
-  if (argc != 3)
-  {
-    std::cerr << "Usage: " << argv[0] << " Filename to read wall_vtu"
-              << " Filename to read centerline_vtp"
-              << " Filename to write local_ref_vtu"
-              << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  std::string filename_vtu = argv[1]; // wall_vtu
-  std::string filename_vtp = argv[2]; // centerline_vtp
+  YAML::Node config = YAML::LoadFile("../config.yaml");
+  std::string filename_vtu = config["solid_vtu"].as<std::string>();      // wall_vtu
+  std::string filename_vtp = config["centerline_vtp"].as<std::string>(); // centerline_vtp
 
   // Read all the data from the file
   vtkNew<vtkXMLUnstructuredGridReader> reader_vtu;
@@ -52,7 +34,7 @@ int main(int argc, char *argv[])
   reader_vtu2->SetFileName(filename_vtu.c_str());
   reader_vtu2->Update();
 
-  //construct three gird containers to save three normals respectively
+  // construct three gird containers to save three normals respectively
   vtkUnstructuredGrid *grid = reader_vtu->GetOutput();
   vtkUnstructuredGrid *grid1 = reader_vtu1->GetOutput();
   vtkUnstructuredGrid *grid2 = reader_vtu2->GetOutput();
@@ -65,31 +47,20 @@ int main(int argc, char *argv[])
   vtkPolyData *poly = reader_vtp->GetOutput();
   vtkPoints *polypoints = poly->GetPoints();
 
-
   // Identify the closest point on the centerline
-  vtkNew<vtkCellLocator> locator;
-  locator->Initialize();
-  locator->SetDataSet(poly);
-  locator->BuildLocator();
+  vtkNew<vtkPointLocator> pt_locator;
+  pt_locator->Initialize();
+  pt_locator->SetDataSet(poly);
+  pt_locator->BuildLocator();
 
   // Find the closest points
-  vtkIdType cellId; // the cell id of the cell containing the closest point will be returned here
-  double cl_pt[3];
-  double nb_pt[3];
-  vtkNew<vtkGenericCell> cell;
-  int subId;
-  double dist;
+  double pt[3];
+  double cl_pt_1[3];
+  double cl_pt_2[3];
 
-  // Create the tree
-  vtkSmartPointer<vtkKdTreePointLocator> pointTree =
-      vtkSmartPointer<vtkKdTreePointLocator>::New();
-  pointTree->SetDataSet(poly);
-  pointTree->BuildLocator();
-
-  // Find the k closest points to (0.5, 0.5, 0.5)
-  unsigned int k = 2;
-  vtkSmartPointer<vtkIdList> result =
-      vtkSmartPointer<vtkIdList>::New();
+  // Initiate vectors for the computation of distance and normalization
+  Vector_3 pt1, pt2, uu, vv, ww;
+  int cl_pt_Id;
 
   // Three normal vectors definition
   vtkNew<vtkDoubleArray> radial_normal, longitudinal_normal, circumferential_normal;
@@ -102,45 +73,55 @@ int main(int argc, char *argv[])
   circumferential_normal->SetName("circumferential_normal");
   circumferential_normal->SetNumberOfComponents(3);
   circumferential_normal->SetNumberOfTuples(nFunc);
-  double u[3], v[3], w[3];
+  double u[3], v[3];
 
   for (int ii = 0; ii < nFunc; ++ii)
   {
-    double pt[3];
+
     grid->GetPoint(ii, pt);
-    locator->FindClosestPoint(&pt[0], &cl_pt[0], cell, cellId, subId, dist);//the clostest point
-    pointTree->FindClosestNPoints(k, &pt[0], result);          //two clostest point 
 
-    //radial
+    cl_pt_Id = pt_locator->FindClosestPoint(&pt[0]);
+    polypoints->GetPoint(cl_pt_Id, cl_pt_1);
+
+    // radial
     for (int jj = 0; jj < 3; ++jj)
     {
-      u[jj] = pt[jj] - cl_pt[jj];
-      printf("pt[jj] - cl_pt[jj] = %lf - %lf\n", pt[jj], cl_pt[jj]);
+      u[jj] = pt[jj] - cl_pt_1[jj];
     }
-    
-    //longitudinal
-    polypoints->GetPoint(result->GetId(1), nb_pt);
-    polypoints->GetPoint(result->GetId(0), cl_pt);
+
+    // longitudinal
+    polypoints->GetPoint(cl_pt_Id - 1, cl_pt_1);
+    polypoints->GetPoint(cl_pt_Id + 1, cl_pt_2);
+
+    pt1.copy(cl_pt_1);
+    pt2.copy(cl_pt_2);
+
+    if (dist(pt1, pt2) >= 1)
+    {
+      polypoints->GetPoint(cl_pt_Id, cl_pt_1);
+      polypoints->GetPoint(cl_pt_Id, cl_pt_2);
+    }
 
     for (int jj = 0; jj < 3; ++jj)
     {
-      v[jj] = nb_pt[jj] - cl_pt[jj];
-      printf("nb_pt[jj] - cl_pt[jj] = %lf - %lf\n", nb_pt[jj], cl_pt[jj]);
+      v[jj] = cl_pt_1[jj] - cl_pt_2[jj];
     }
 
-    //cross to get circumferential
-    w[0] = u[1] * v[2] - u[2] * v[1];
-    w[1] = u[2] * v[0] - u[0] * v[2];
-    w[2] = u[0] * v[1] - u[1] * v[0];
+    uu.copy(u);
+    vv.copy(v);
 
-    normalization(u);
-    normalization(v);
-    normalization(w);
-    
-    radial_normal->InsertTuple(ii, u);
-    longitudinal_normal->InsertTuple(ii, v);
-    circumferential_normal->InsertTuple(ii, w);
-    printf("normal ii = %d\n", ii);
+    // cross to get circumferential
+    ww.copy(cross_product(uu, vv));
+
+    uu.normalize();
+    vv.normalize();
+    ww.normalize();
+
+    radial_normal->InsertTuple3(ii, uu.x(), uu.y(), uu.z());
+    longitudinal_normal->InsertTuple3(ii, vv.x(), vv.y(), vv.z());
+    circumferential_normal->InsertTuple3(ii, ww.x(), ww.y(), ww.z());
+    if (ii % 10000 == 0)
+      printf("normal ii = %d\n", ii);
   }
 
   grid->GetPointData()->SetVectors(radial_normal);
@@ -161,7 +142,6 @@ int main(int argc, char *argv[])
   writer2->SetInputData(grid2);
   writer2->Write();
 
-  PetscFinalize();
   return 0;
 }
 
