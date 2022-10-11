@@ -16,13 +16,13 @@
 set(VTK_DIR /home/huangxm/lib/VTK-7.1.1-shared/lib/cmake/vtk-7.1)
 
 # Modify the PETSC_DIR variable to point to the location of PETSc.
-set(PETSC_DIR /home/huangxm/lib/petsc-3.11.0)
+set(PETSC_DIR /home/huangxm/lib/petsc-3.16.6-opt)
 
 # Modify the PETSC_ARCH variable. You can find it in your configuration
 # output. If you forget it, go to your PETSc home director and open
 # configure.log. Go the end of the file, and you shall find the value 
 # of PETSC_ARCH
-set(PETSC_ARCH arch-linux2-c-debug)
+set(PETSC_ARCH .)
 
 # Modify the METIS_DIR.
 # Note: If your PETSc has METIS installed, the conf
