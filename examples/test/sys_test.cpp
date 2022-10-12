@@ -6,7 +6,8 @@
 #include "HDF5_Reader.hpp"
 #include "PostVectSolution.hpp"
 
-int main( int argc, char * argv[] )
+
+int main(int argc, char *argv[])
 {
   //std::vector<std::string> a;
   //a.push_back("hello a\n");

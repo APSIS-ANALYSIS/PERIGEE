@@ -5,8 +5,8 @@ std::string PETSc_T::get_version()
   int major, minor, subminor;
   PetscGetVersionNumber(&major,&minor,&subminor, NULL);
 
-  std::string output = "petsc-" + SYS_T::to_string( major) + "." + SYS_T::to_string( minor)
-    + "." + SYS_T::to_string( subminor);
+  std::string output = "petsc-" + std::to_string( major) + "." + std::to_string( minor)
+    + "." + std::to_string( subminor);
 
   return output;
 }

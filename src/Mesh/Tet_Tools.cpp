@@ -1084,7 +1084,7 @@ void TET_T::tetgenio2vtp( const tetgenio &meshout, const std::string &fName,
   // preparing for mesh file (.vtp) name
   std::string outname(fName);
   outname.append(".");
-  std::string strbcindex = SYS_T::to_string(bcmarker);
+  std::string strbcindex = std::to_string(bcmarker);
   outname.append(strbcindex);
 
   write_triangle_grid( outname, bcnumpt, bcnumcl, tript, 

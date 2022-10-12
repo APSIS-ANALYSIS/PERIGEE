@@ -254,8 +254,8 @@ int main( int argc, char * argv[] )
   cout<<"- minimum tetrahedron volume : "<<teton_min_vol<<endl;
 
   std::string vol_file("vol");
-  //vol_file = vol_file + "_"+ SYS_T::to_string(nElem_x) 
-  //  + "_" + SYS_T::to_string(nElem_y) + "_" + SYS_T::to_string(nElem_z);
+  //vol_file = vol_file + "_"+ std::to_string(nElem_x) 
+  //  + "_" + std::to_string(nElem_y) + "_" + std::to_string(nElem_z);
 
   // Write the tetrahedral volume element info on disk in a .vtu file
   TET_T::write_tet_grid(vol_file, nFunc, nElem_tet, tetctrlPts, tetIEN );

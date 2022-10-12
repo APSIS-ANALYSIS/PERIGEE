@@ -97,13 +97,6 @@ namespace SYS_T
     std::cout<<get_string_mem_size( byte_size );
   }
   
-  inline std::string to_string( const int &aa )
-  {
-    std::ostringstream ss;
-    ss<<aa;
-    return ss.str();
-  }
-
   // ================================================================
   // The following are used in processor.
   // ================================================================

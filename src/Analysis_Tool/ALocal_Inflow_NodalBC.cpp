@@ -35,7 +35,7 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
   for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
   {
     std::string subgroup_name(groupbase);
-    subgroup_name.append( SYS_T::to_string(nbc_id) );
+    subgroup_name.append( std::to_string(nbc_id) );
 
     Num_LD[nbc_id] = h5r -> read_intScalar( subgroup_name.c_str(), "Num_LD" );
 
