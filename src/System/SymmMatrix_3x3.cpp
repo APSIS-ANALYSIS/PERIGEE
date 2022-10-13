@@ -12,11 +12,6 @@ SymmMatrix_3x3::SymmMatrix_3x3( const SymmMatrix_3x3 &source )
   mat[3] = source(3); mat[4] = source(4); mat[5] = source(5);
 }
 
-SymmMatrix_3x3::SymmMatrix_3x3( const Matrix_3x3 &source )
-{
-  gen_symm( source );
-}
-
 SymmMatrix_3x3::SymmMatrix_3x3( const double &m0, const double &m1, 
     const double &m2, const double &m3, const double &m4, const double &m5 )
 {
@@ -26,11 +21,6 @@ SymmMatrix_3x3::SymmMatrix_3x3( const double &m0, const double &m1,
 
 SymmMatrix_3x3::~SymmMatrix_3x3()
 {}
-
-void SymmMatrix_3x3::copy( const SymmMatrix_3x3 &source )
-{
-  for(int ii=0; ii<6; ++ii) mat[ii] = source(ii);
-}
 
 SymmMatrix_3x3& SymmMatrix_3x3::operator= (const SymmMatrix_3x3 &source)
 {
@@ -124,11 +114,6 @@ void SymmMatrix_3x3::inverse()
     invdetA * (mat[4] * mat[3] - mat[5] * mat[2]) };
 
   for(int ii=0; ii<6; ++ii) mat[ii] = temp[ii];
-}
-
-void SymmMatrix_3x3::scale( const double &val )
-{
-  for(int ii=0; ii<6; ++ii) mat[ii] *= val;
 }
 
 void SymmMatrix_3x3::AXPY( const double &val, const SymmMatrix_3x3 &source )
