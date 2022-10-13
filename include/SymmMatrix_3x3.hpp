@@ -100,10 +100,6 @@ class SymmMatrix_3x3
     // Set components a random value
     void gen_rand();
 
-    // Generate the symmetric part of the input source matrix, i.e.
-    // output = 0.5 x ( source + source_transpose )
-    void gen_symm( const Matrix_3x3 &source );
-
     // Invert the matrix
     void inverse();
 
@@ -183,6 +179,8 @@ Matrix_3x3 operator*( const Matrix_3x3 &left, const SymmMatrix_3x3 &right );
 
 Matrix_3x3 operator*( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right );
 
+SymmMatrix_3x3 operator*( const double &val, const SymmMatrix_3x3 &input );
+
 // Return the inverse of the input matrix
 SymmMatrix_3x3 inverse( const SymmMatrix_3x3 &input );
 
@@ -193,6 +191,7 @@ SymmMatrix_3x3 gen_right_Cauchy_Green( const Matrix_3x3 &input );
 SymmMatrix_3x3 gen_left_Cauchy_Green( const Matrix_3x3 &input );
 
 // convert a regular matrix to its symmetric part
+// output = 0.5 x ( source + source_transpose )
 SymmMatrix_3x3 symmetrize( const Matrix_3x3 &input );
 
 #endif
