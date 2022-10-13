@@ -92,11 +92,6 @@ void SymmMatrix_3x3::gen_rand()
   }
 }
 
-void SymmMatrix_3x3::gen_symm( const Matrix_3x3 &source )
-{
-  *this = gen_symm_part(source);
-}
-
 void SymmMatrix_3x3::inverse()
 {
   const double invdetA = 1.0 / det();
@@ -252,6 +247,12 @@ Matrix_3x3 operator*( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right )
    left(4) * right(0) + left(3) * right(5) + left(2) * right(4),
    left(4) * right(5) + left(3) * right(1) + left(2) * right(3),
    left(4) * right(4) + left(3) * right(3) + left(2) * right(2) );
+}
+
+SymmMatrix_3x3 operator*( const double &val, const SymmMatrix_3x3 &input )
+{
+  return SymmMatrix_3x3( val * input(0), val * input(1), val * input(2), 
+   val * input(3), val * input(4), val * input(5) );
 }
 
 SymmMatrix_3x3 inverse( const SymmMatrix_3x3 &input )
