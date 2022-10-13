@@ -291,4 +291,35 @@ SymmMatrix_3x3 inverse( const SymmMatrix_3x3 &input )
   invdetA * (input(4) * input(3) - input(5) * input(2)) );
 }
 
+SymmMatrix_3x3 gen_right_Cauchy_Green( const Matrix_3x3 &input )
+{
+  return SymmMatrix_3x3 (
+   input(0) * input(0) + input(3) * input(3) + input(6) * input(6),
+   input(1) * input(1) + input(4) * input(4) + input(7) * input(7),
+   input(2) * input(2) + input(5) * input(5) + input(8) * input(8),
+   input(1) * input(2) + input(4) * input(5) + input(7) * input(8),
+   input(0) * input(2) + input(3) * input(5) + input(6) * input(8),
+   input(0) * input(1) + input(3) * input(4) + input(6) * input(7) );
+}
+
+SymmMatrix_3x3 gen_left_Cauchy_Green( const Matrix_3x3 &input )
+{
+  return SymmMatrix_3x3 (
+  input(0) * input(0) + input(1) * input(1) + input(2) * input(2),
+  input(3) * input(3) + input(4) * input(4) + input(5) * input(5),
+  input(6) * input(6) + input(7) * input(7) + input(8) * input(8),
+  input(3) * input(6) + input(4) * input(7) + input(5) * input(8),
+  input(0) * input(6) + input(1) * input(7) + input(2) * input(8),
+  input(0) * input(3) + input(1) * input(4) + input(2) * input(5) );
+}
+
+SymmMatrix_3x3 gen_symm_part( const Matrix_3x3 &input )
+{
+  Matrix_3x3 result( input + transpose( input ) );
+  result *= 0.5;
+
+  return SymmMatrix_3x3( result(0), result(4), result(8), result(5), result(2), result(1) );
+}
+
+
 // EOF
