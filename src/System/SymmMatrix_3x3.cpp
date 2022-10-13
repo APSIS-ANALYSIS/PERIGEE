@@ -94,11 +94,7 @@ void SymmMatrix_3x3::gen_rand()
 
 void SymmMatrix_3x3::gen_symm( const Matrix_3x3 &source )
 {
-  Matrix_3x3 result( source + transpose( source ) );
-  result.scale(0.5);
-
-  mat[0] = result(0); mat[1] = result(4); mat[2] = result(8);
-  mat[3] = result(5); mat[4] = result(2); mat[5] = result(1);
+  *this = gen_symm_part(source);
 }
 
 void SymmMatrix_3x3::inverse()
@@ -315,10 +311,10 @@ SymmMatrix_3x3 gen_left_Cauchy_Green( const Matrix_3x3 &input )
 
 SymmMatrix_3x3 gen_symm_part( const Matrix_3x3 &input )
 {
-  Matrix_3x3 result( input + transpose( input ) );
-  result *= 0.5;
-
-  return SymmMatrix_3x3( result(0), result(4), result(8), result(5), result(2), result(1) );
+  return SymmMatrix_3x3( input(0), input(4), input(8),
+                        0.5 * ( input(5) + input(7) ),
+                        0.5 * ( input(2) + input(6) ),
+                        0.5 * ( input(1) + input(3) ) );
 }
 
 
