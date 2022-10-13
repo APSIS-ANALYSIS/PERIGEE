@@ -150,11 +150,10 @@ int main(int argc, char *argv[])
   Matrix_3x3 C;
   C.gen_rand();
 
-  Matrix_3x3 SC( C.xx(), 0.5*( C.xy() + C.yx() ), 0.5*( C.xz() + C.zx() ),
-                 0.5*( C.yx() + C.xy() ), C.yy(), 0.5*( C.yz() + C.zy() ),
-                 0.5*( C.zx() + C.xz() ), 0.5*( C.zy() + C.yz() ), C.zz() );
+  Matrix_3x3 SC( C + transpose(C) );
+  SC *= 0.5;
 
-const SymmMatrix_3x3 D = gen_symm_part(C);
+  const SymmMatrix_3x3 D = gen_symm_part(C);
   std::cout<<SC.xx() - D.xx()<<std::endl;
   std::cout<<SC.yy() - D.yy()<<std::endl;
   std::cout<<SC.zz() - D.zz()<<std::endl;
@@ -164,7 +163,19 @@ const SymmMatrix_3x3 D = gen_symm_part(C);
   std::cout<<SC.yz() - D.yz()<<std::endl;
   std::cout<<SC.zx() - D.zx()<<std::endl;
   std::cout<<SC.zy() - D.zy()<<std::endl;
-
+   
+  SymmMatrix_3x3 D1;
+  D1.gen_symm(C);
+  std::cout<<SC.xx() - D1.xx()<<std::endl;
+  std::cout<<SC.yy() - D1.yy()<<std::endl;
+  std::cout<<SC.zz() - D1.zz()<<std::endl;
+  std::cout<<SC.xy() - D1.xy()<<std::endl;
+  std::cout<<SC.xz() - D1.xz()<<std::endl;
+  std::cout<<SC.yx() - D1.yx()<<std::endl;
+  std::cout<<SC.yz() - D1.yz()<<std::endl;
+  std::cout<<SC.zx() - D1.zx()<<std::endl;
+  std::cout<<SC.zy() - D1.zy()<<std::endl;
+  
   SymmMatrix_3x3 S;
   S(0) = B(0); S(5) = B(1); S(4) = B(2);
   S(1) = B(4); S(3) = B(5); S(2) = B(8);
