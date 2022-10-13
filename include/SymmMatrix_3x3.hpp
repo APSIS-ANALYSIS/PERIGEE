@@ -23,6 +23,7 @@ class SymmMatrix_3x3
     // Copy constructor
     SymmMatrix_3x3( const SymmMatrix_3x3 &source );
 
+    // make it as a normal function named as convert or symmetrize
     // Construct the symmetric part of the input source matrix
     explicit SymmMatrix_3x3( const Matrix_3x3 &source );
 
@@ -88,7 +89,7 @@ class SymmMatrix_3x3
     SymmMatrix_3x3& operator*=( const double &val );
 
     // Return true if the input matrix is identical to the mat
-    bool is_identical( const SymmMatrix_3x3 &source, const double &tol ) const;
+    bool is_identical( const SymmMatrix_3x3 &source, const double &tol = 1.0e-12 ) const;
 
     // Set all components to zero
     void gen_zero();
@@ -184,5 +185,14 @@ Matrix_3x3 operator*( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right );
 
 // Return the inverse of the input matrix
 SymmMatrix_3x3 inverse( const SymmMatrix_3x3 &input );
+
+// C = F^T F
+SymmMatrix_3x3 gen_right_Cauchy_Green( const Matrix_3x3 &input );
+
+// b = F F^T
+SymmMatrix_3x3 gen_left_Cauchy_Green( const Matrix_3x3 &input );
+
+// convert a regular matrix to its symmetric part
+SymmMatrix_3x3 symmetrize( const Matrix_3x3 &input );
 
 #endif
