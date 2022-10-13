@@ -64,16 +64,6 @@ int main(int argc, char *argv[])
 
   srand(time(NULL));
   double val = ( rand() % 1000 ) * 1.0e-3 - 0.5;
-  A1.scale(val); B1.scale(val);
-  std::cout<<A1.xx() - B1.xx()<<std::endl;
-  std::cout<<A1.xy() - B1.xy()<<std::endl;
-  std::cout<<A1.xz() - B1.xz()<<std::endl;
-  std::cout<<A1.yy() - B1.yy()<<std::endl;
-  std::cout<<A1.yz() - B1.yz()<<std::endl;
-  std::cout<<A1.zz() - B1.zz()<<std::endl;
-  std::cout<<A1.yx() - B1.yx()<<std::endl;
-  std::cout<<A1.zx() - B1.zx()<<std::endl;
-  std::cout<<A1.zy() - B1.zy()<<std::endl;
 
   for (int ii=0; ii<3; ++ii) A1 += A;
   for (int ii=0; ii<3; ++ii) B1 += B;
@@ -164,7 +154,7 @@ int main(int argc, char *argv[])
                  0.5*( C.yx() + C.xy() ), C.yy(), 0.5*( C.yz() + C.zy() ),
                  0.5*( C.zx() + C.xz() ), 0.5*( C.zy() + C.yz() ), C.zz() );
 
-  const SymmMatrix_3x3 D(C);
+const SymmMatrix_3x3 D = gen_symm_part(C);
   std::cout<<SC.xx() - D.xx()<<std::endl;
   std::cout<<SC.yy() - D.yy()<<std::endl;
   std::cout<<SC.zz() - D.zz()<<std::endl;
@@ -265,7 +255,7 @@ int main(int argc, char *argv[])
   (A1.VecMult(xx) - B1.VecMult(xx)).print();
 
   SymmMatrix_3x3 A2{};
-  A2.copy(A1);
+  A2 = A1;
   (A2 - A1).print();
   
   SymmMatrix_3x3 A3;
@@ -337,6 +327,32 @@ int main(int argc, char *argv[])
   Matrix_3x3 B2A1(B2 * A1);
   Matrix_3x3 B2B1(B2 * B1);
   (B2A1 - B2B1).print();
+
+  Matrix_3x3 F;
+  F.gen_rand();
+  A3 = gen_right_Cauchy_Green(F);
+  B3.MatMultTransposeLeft(F);
+  std::cout<<A3.xx() - B3.xx()<<std::endl;
+  std::cout<<A3.yy() - B3.yy()<<std::endl;
+  std::cout<<A3.zz() - B3.zz()<<std::endl;
+  std::cout<<A3.xy() - B3.xy()<<std::endl;
+  std::cout<<A3.xz() - B3.xz()<<std::endl;
+  std::cout<<A3.yx() - B3.yx()<<std::endl;
+  std::cout<<A3.yz() - B3.yz()<<std::endl;
+  std::cout<<A3.zx() - B3.zx()<<std::endl;
+  std::cout<<A3.zy() - B3.zy()<<std::endl;
+
+  A3 = gen_left_Cauchy_Green(F);
+  B3.MatMultTransposeRight(F);
+  std::cout<<A3.xx() - B3.xx()<<std::endl;
+  std::cout<<A3.yy() - B3.yy()<<std::endl;
+  std::cout<<A3.zz() - B3.zz()<<std::endl;
+  std::cout<<A3.xy() - B3.xy()<<std::endl;
+  std::cout<<A3.xz() - B3.xz()<<std::endl;
+  std::cout<<A3.yx() - B3.yx()<<std::endl;
+  std::cout<<A3.yz() - B3.yz()<<std::endl;
+  std::cout<<A3.zx() - B3.zx()<<std::endl;
+  std::cout<<A3.zy() - B3.zy()<<std::endl;
 
   return EXIT_SUCCESS;
 }
