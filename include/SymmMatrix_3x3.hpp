@@ -130,18 +130,6 @@ class SymmMatrix_3x3
     // Q^T M Q = Q_ki M_kl Q_lj = output_matrix_ij
     void MatRot( const Matrix_3x3 &Q );
 
-    // Matrix multiplication as mat = source^T * source
-    // This is used for the evaluation of right Cauchy-Green strain tensor:
-    //                       C = F^T F
-    // The resulting matrix is symmetric. Hence the computation is simplified.
-    void MatMultTransposeLeft( const Matrix_3x3 &source );
-
-    // Matrix multiplication as mat = source * source^T
-    // This is used for the evaluation of the left Cauchy-Green strain tensor:
-    //                       b = F F^T
-    // The resulting matrix is symmetric. Hence, the computation is simplified.
-    void MatMultTransposeRight( const Matrix_3x3 &source );
-
     // Matrix contraction
     // return mat_ij source_ij
     double MatContraction( const Matrix_3x3 &source ) const;
