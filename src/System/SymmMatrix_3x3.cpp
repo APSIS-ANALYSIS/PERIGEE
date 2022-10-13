@@ -12,11 +12,6 @@ SymmMatrix_3x3::SymmMatrix_3x3( const SymmMatrix_3x3 &source )
   mat[3] = source(3); mat[4] = source(4); mat[5] = source(5);
 }
 
-SymmMatrix_3x3::SymmMatrix_3x3( const Matrix_3x3 &source )
-{
-  gen_symm( source );
-}
-
 SymmMatrix_3x3::SymmMatrix_3x3( const double &m0, const double &m1, 
     const double &m2, const double &m3, const double &m4, const double &m5 )
 {
@@ -26,11 +21,6 @@ SymmMatrix_3x3::SymmMatrix_3x3( const double &m0, const double &m1,
 
 SymmMatrix_3x3::~SymmMatrix_3x3()
 {}
-
-void SymmMatrix_3x3::copy( const SymmMatrix_3x3 &source )
-{
-  for(int ii=0; ii<6; ++ii) mat[ii] = source(ii);
-}
 
 SymmMatrix_3x3& SymmMatrix_3x3::operator= (const SymmMatrix_3x3 &source)
 {
@@ -104,11 +94,7 @@ void SymmMatrix_3x3::gen_rand()
 
 void SymmMatrix_3x3::gen_symm( const Matrix_3x3 &source )
 {
-  Matrix_3x3 result( source + transpose( source ) );
-  result.scale(0.5);
-
-  mat[0] = result(0); mat[1] = result(4); mat[2] = result(8);
-  mat[3] = result(5); mat[4] = result(2); mat[5] = result(1);
+  *this = gen_symm_part(source);
 }
 
 void SymmMatrix_3x3::inverse()
@@ -124,11 +110,6 @@ void SymmMatrix_3x3::inverse()
     invdetA * (mat[4] * mat[3] - mat[5] * mat[2]) };
 
   for(int ii=0; ii<6; ++ii) mat[ii] = temp[ii];
-}
-
-void SymmMatrix_3x3::scale( const double &val )
-{
-  for(int ii=0; ii<6; ++ii) mat[ii] *= val;
 }
 
 void SymmMatrix_3x3::AXPY( const double &val, const SymmMatrix_3x3 &source )
@@ -305,5 +286,36 @@ SymmMatrix_3x3 inverse( const SymmMatrix_3x3 &input )
   invdetA * (input(5) * input(3) - input(4) * input(1)),
   invdetA * (input(4) * input(3) - input(5) * input(2)) );
 }
+
+SymmMatrix_3x3 gen_right_Cauchy_Green( const Matrix_3x3 &input )
+{
+  return SymmMatrix_3x3 (
+   input(0) * input(0) + input(3) * input(3) + input(6) * input(6),
+   input(1) * input(1) + input(4) * input(4) + input(7) * input(7),
+   input(2) * input(2) + input(5) * input(5) + input(8) * input(8),
+   input(1) * input(2) + input(4) * input(5) + input(7) * input(8),
+   input(0) * input(2) + input(3) * input(5) + input(6) * input(8),
+   input(0) * input(1) + input(3) * input(4) + input(6) * input(7) );
+}
+
+SymmMatrix_3x3 gen_left_Cauchy_Green( const Matrix_3x3 &input )
+{
+  return SymmMatrix_3x3 (
+  input(0) * input(0) + input(1) * input(1) + input(2) * input(2),
+  input(3) * input(3) + input(4) * input(4) + input(5) * input(5),
+  input(6) * input(6) + input(7) * input(7) + input(8) * input(8),
+  input(3) * input(6) + input(4) * input(7) + input(5) * input(8),
+  input(0) * input(6) + input(1) * input(7) + input(2) * input(8),
+  input(0) * input(3) + input(1) * input(4) + input(2) * input(5) );
+}
+
+SymmMatrix_3x3 gen_symm_part( const Matrix_3x3 &input )
+{
+  return SymmMatrix_3x3( input(0), input(4), input(8),
+                        0.5 * ( input(5) + input(7) ),
+                        0.5 * ( input(2) + input(6) ),
+                        0.5 * ( input(1) + input(3) ) );
+}
+
 
 // EOF

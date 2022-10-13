@@ -23,19 +23,12 @@ class SymmMatrix_3x3
     // Copy constructor
     SymmMatrix_3x3( const SymmMatrix_3x3 &source );
 
-    // make it as a normal function named as convert or symmetrize
-    // Construct the symmetric part of the input source matrix
-    explicit SymmMatrix_3x3( const Matrix_3x3 &source );
-
     // Constructor by six numbers in Voigt numbering
     SymmMatrix_3x3( const double &m0, const double &m1, const double &m2,
         const double &m3, const double &m4, const double &m5 );
 
     // Destructor
     ~SymmMatrix_3x3();
-
-    // Copy
-    void copy( const SymmMatrix_3x3 &source );
 
     // Assignment operator
     SymmMatrix_3x3& operator= (const SymmMatrix_3x3 &source);
@@ -102,9 +95,6 @@ class SymmMatrix_3x3
 
     // Invert the matrix
     void inverse();
-
-    // Scale the matrix by a scalar
-    void scale( const double &val );
 
     // add the matrix with a given matrix with scaling
     // X = X + a * Y
@@ -192,6 +182,6 @@ SymmMatrix_3x3 gen_left_Cauchy_Green( const Matrix_3x3 &input );
 
 // convert a regular matrix to its symmetric part
 // output = 0.5 x ( source + source_transpose )
-SymmMatrix_3x3 symmetrize( const Matrix_3x3 &input );
+SymmMatrix_3x3 gen_symm_part( const Matrix_3x3 &input );
 
 #endif
