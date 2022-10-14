@@ -208,6 +208,29 @@ void SymmMatrix_3x3::print_Voigt() const
   std::cout<<std::setprecision(9)<<mat[3]<<'\t'<<mat[4]<<'\t'<<mat[5]<<std::endl;
 }
 
+double SymmMatrix_3x3::J2() const
+{
+  const double a = mat[0] * mat[0] + 2.0 * mat[5] * mat[5] + 2.0 * mat[4] * mat[4]
+    + mat[1] * mat[1] + 2.0 * mat[3] * mat[3] + mat[2] * mat[2];
+
+  const double b = mat[0] + mat[1] + mat[2];
+
+  return 0.5 * a - b * b / 6.0;
+}
+
+double SymmMatrix_3x3::J3() const
+{
+  const double a = ( mat[0] + mat[1] + mat[2] ) / 3.0;
+
+  const double m0 = mat[0] - a;
+  const double m4 = mat[1] - a;
+  const double m8 = mat[2] - a;
+
+  return m0 * m4 * m8 + mat[5] * mat[3] * mat[4]
+    + mat[4] * mat[5] * mat[3] - mat[4] * m4 * mat[4]
+    - m0 * mat[3] * mat[3] - mat[5] * mat[5] * m8;
+}
+
 Vector_3 operator*( const SymmMatrix_3x3 &left, const Vector_3 &right )
 {
   return Vector_3( left.xx() * right.x() + left.xy() * right.y() + left.xz() * right.z(),

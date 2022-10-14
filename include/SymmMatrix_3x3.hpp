@@ -149,6 +149,18 @@ class SymmMatrix_3x3
 
   private:
     double mat[6];
+
+    // ------------------------------------------------------------------------
+    // Return the deviatoric component's contraction scaled by 0.5.
+    // M' = M - 0.3333 tr(M) I, return 0.5 M' : M'.
+    // ------------------------------------------------------------------------
+    double J2() const;
+
+    // ------------------------------------------------------------------------
+    // Return the determinant of the deviatoric component.
+    // M' = M - 0.3333 tr(M) I, return det(M').
+    // ------------------------------------------------------------------------
+    double J3() const;
 };
 
 Vector_3 operator*( const SymmMatrix_3x3 &left, const Vector_3 &right );
