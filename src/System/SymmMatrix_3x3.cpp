@@ -22,6 +22,11 @@ SymmMatrix_3x3::SymmMatrix_3x3( const double &m0, const double &m1,
 SymmMatrix_3x3::~SymmMatrix_3x3()
 {}
 
+Matrix_3x3 SymmMatrix_3x3::convert_to_full() const
+{
+  return Matrix_3x3( mat[0], mat[5], mat[4], mat[5], mat[1], mat[3], mat[4], mat[3], mat[2] );
+}
+
 SymmMatrix_3x3& SymmMatrix_3x3::operator= (const SymmMatrix_3x3 &source)
 {
   if (this == &source) return *this;

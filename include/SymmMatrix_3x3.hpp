@@ -33,6 +33,8 @@ class SymmMatrix_3x3
     // Assignment operator
     SymmMatrix_3x3& operator= (const SymmMatrix_3x3 &source);
 
+    Matrix_3x3 convert_to_full() const;
+
     // Parenthesis operator. It allows accessing and assigning the matrix entries.
     double& operator()(const int &index) {return mat[index];}
 
