@@ -303,45 +303,6 @@ int main(int argc, char *argv[])
   Matrix_3x3 B2reB1(B2re * B1);
   (B2reA1 - B2reB1).print();
   
-  SymmMatrix_3x3 vaA2 = val * A2;
-  Matrix_3x3 vaB2 = val * B2;
-  std::cout<<vaA2.xx() - vaB2.xx()<<std::endl;
-  std::cout<<vaA2.xy() - vaB2.xy()<<std::endl;
-  std::cout<<vaA2.xz() - vaB2.xz()<<std::endl;
-  std::cout<<vaA2.yy() - vaB2.yy()<<std::endl;
-  std::cout<<vaA2.yz() - vaB2.yz()<<std::endl;
-  std::cout<<vaA2.zz() - vaB2.zz()<<std::endl;
-  std::cout<<vaA2.yx() - vaB2.yx()<<std::endl;
-  std::cout<<vaA2.zx() - vaB2.zx()<<std::endl;
-  std::cout<<vaA2.zy() - vaB2.zy()<<std::endl;
-  
-  Matrix_3x3 B3;
-  Matrix_3x3 F;
-  F.gen_rand();
-  A3 = gen_right_Cauchy_Green(F);
-  B3.MatMultTransposeLeft(F);
-  std::cout<<A3.xx() - B3.xx()<<std::endl;
-  std::cout<<A3.yy() - B3.yy()<<std::endl;
-  std::cout<<A3.zz() - B3.zz()<<std::endl;
-  std::cout<<A3.xy() - B3.xy()<<std::endl;
-  std::cout<<A3.xz() - B3.xz()<<std::endl;
-  std::cout<<A3.yx() - B3.yx()<<std::endl;
-  std::cout<<A3.yz() - B3.yz()<<std::endl;
-  std::cout<<A3.zx() - B3.zx()<<std::endl;
-  std::cout<<A3.zy() - B3.zy()<<std::endl;
-
-  A3 = gen_left_Cauchy_Green(F);
-  B3.MatMultTransposeRight(F);
-  std::cout<<A3.xx() - B3.xx()<<std::endl;
-  std::cout<<A3.yy() - B3.yy()<<std::endl;
-  std::cout<<A3.zz() - B3.zz()<<std::endl;
-  std::cout<<A3.xy() - B3.xy()<<std::endl;
-  std::cout<<A3.xz() - B3.xz()<<std::endl;
-  std::cout<<A3.yx() - B3.yx()<<std::endl;
-  std::cout<<A3.yz() - B3.yz()<<std::endl;
-  std::cout<<A3.zx() - B3.zx()<<std::endl;
-  std::cout<<A3.zy() - B3.zy()<<std::endl;
-
   return EXIT_SUCCESS;
 }
 
