@@ -162,13 +162,13 @@ SymmMatrix_3x3 operator*( const double &val, const SymmMatrix_3x3 &input );
 // Return the inverse of the input matrix
 SymmMatrix_3x3 inverse( const SymmMatrix_3x3 &input );
 
-// C = F^T F
+// Generate the right Cauchy-Green tensor C = F^T F
 SymmMatrix_3x3 gen_right_Cauchy_Green( const Matrix_3x3 &input );
 
-// b = F F^T
+// Generate the left Cauchy-Green tensor b = F F^T
 SymmMatrix_3x3 gen_left_Cauchy_Green( const Matrix_3x3 &input );
 
-// convert a regular matrix to its symmetric part
+// Convert a regular matrix to its symmetric part
 // output = 0.5 x ( source + source_transpose )
 SymmMatrix_3x3 gen_symm_part( const Matrix_3x3 &input );
 
