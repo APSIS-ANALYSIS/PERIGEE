@@ -22,6 +22,11 @@ SymmMatrix_3x3::SymmMatrix_3x3( const double &m0, const double &m1,
 SymmMatrix_3x3::~SymmMatrix_3x3()
 {}
 
+Matrix_3x3 SymmMatrix_3x3::convert_to_full() const
+{
+  return Matrix_3x3( mat[0], mat[5], mat[4], mat[5], mat[1], mat[3], mat[4], mat[3], mat[2] );
+}
+
 SymmMatrix_3x3& SymmMatrix_3x3::operator= (const SymmMatrix_3x3 &source)
 {
   if (this == &source) return *this;
@@ -90,11 +95,6 @@ void SymmMatrix_3x3::gen_rand()
 
     mat[ii] = value * 1.0e-3 - 5.0;
   }
-}
-
-void SymmMatrix_3x3::gen_symm( const Matrix_3x3 &source )
-{
-  *this = gen_symm_part(source);
 }
 
 void SymmMatrix_3x3::inverse()
@@ -208,6 +208,198 @@ void SymmMatrix_3x3::print_Voigt() const
   std::cout<<std::setprecision(9)<<mat[3]<<'\t'<<mat[4]<<'\t'<<mat[5]<<std::endl;
 }
 
+int SymmMatrix_3x3::eigen_decomp( double &eta1, double &eta2, double &eta3,
+    Vector_3 &v1, Vector_3 &v2, Vector_3 &v3 ) const
+{
+  const double frac13 = 1.0 / 3.0;
+  const double frac13_tr = tr() * frac13; // value used to shift the eigenvalue
+
+  const double mJ2 = J2();
+
+  const double val = 2.0 * std::pow( mJ2*frac13, 0.5 );
+
+  const double PI = atan(1.0) * 4.0;
+
+  // If J2 is zero, we directly get three identical eignevalues,
+  // meaning the matrix is eta I.
+  if( mJ2 <= 1.0e-14 )
+  {
+    eta1 = frac13_tr; eta2 = eta1; eta3 = eta1;
+    v1.gen_e1(); v2.gen_e2(); v3.gen_e3();
+    return 1;
+  }
+  else
+  {
+    const double mJ3 = J3();
+
+    double val_cos = 0.5*mJ3*std::pow(3.0/mJ2, 1.5);
+
+    if( val_cos > 1.0 ) val_cos = 1.0;
+
+    if( val_cos < -1.0 ) val_cos = -1.0;
+
+    // Find the angle pincipal value
+    const double alpha = acos( val_cos ) * frac13;
+
+    // Find the most distinct eigenvalue as eta1
+    if( alpha <= PI*frac13*0.5 ) eta1 = val * cos(alpha);
+    else eta1 = val * cos(alpha + 2.0*PI*frac13);
+
+    // v1 is determined, v2 and v3 are used to hold s1 s2 for now
+    find_eigen_vector(eta1, v1, v2, v3);
+
+    // Form the reduced matrix
+    const double A22 = VecMatVec(v2,v2) - frac13_tr * dot_product(v2, v2);
+    const double A23 = VecMatVec(v2,v3) - frac13_tr * dot_product(v2, v3);
+    const double A33 = VecMatVec(v3,v3) - frac13_tr * dot_product(v3, v3);
+
+    const double diff_2233 = A22 - A33;
+    if( diff_2233 >= 0.0 )
+      eta2 = 0.5 * ( (A22+A33) - std::sqrt( diff_2233 * diff_2233 + 4.0*A23*A23 ) );
+    else
+      eta2 = 0.5 * ( (A22+A33) + std::sqrt( diff_2233 * diff_2233 + 4.0*A23*A23 ) );
+
+    eta3 = A22 + A33 - eta2;
+
+    if( std::abs( eta3 - eta2 ) > 1.0e-10 )
+    {
+      // Now form u1 and u2
+      // u1 = (A - 0.333 tr - eta2 ) s1
+      // u2 = (A - 0.333 tr - eta2 ) s2
+      Vector_3 temp(v2);
+      v2 = (*this) * v2;
+      v2.AXPY( -1.0*(frac13_tr + eta2), temp );
+
+      temp.copy(v3);
+      v3 = (*this) * v3;
+      v3.AXPY( -1.0*(frac13_tr + eta2), temp );
+
+      if( v2.norm2() >= v3.norm2() )
+      {
+        v2.normalize();               // w1 
+        v2 = cross_product( v1, v2 ); // v2 = w1 x v1
+        v3 = cross_product( v1, v2 ); // v3 = v1 x v2
+      }
+      else
+      {
+        v3.normalize();               // w1 
+        v2 = cross_product( v1, v3 ); // v2 = w1 x v1
+        v3 = cross_product( v1, v2 ); // v3 = v1 x v2
+      }
+
+      // Shift back from deviatoric to the original matrix eigenvalues
+      eta1 += frac13_tr; eta2 += frac13_tr; eta3 += frac13_tr;
+      return 3;
+    }
+    else
+    {
+      // Shift back from deviatoric to the original matrix eigenvalues
+      eta1 += frac13_tr; eta2 += frac13_tr; eta3 += frac13_tr;
+
+      return 2;
+    }
+  }
+}
+
+void SymmMatrix_3x3::find_eigen_vector( const double &eta, Vector_3 &v,
+    Vector_3 &s1, Vector_3 &s2 ) const
+{
+  const double frac13_tr = tr() / 3.0; // value used to shift the eigenvalue
+
+  Vector_3 a = (*this) * Vector_3(1.0, 0.0, 0.0);
+  Vector_3 b = (*this) * Vector_3(0.0, 1.0, 0.0);
+  Vector_3 c = (*this) * Vector_3(0.0, 0.0, 1.0);
+
+  a(0) -= ( eta + frac13_tr );
+  b(1) -= ( eta + frac13_tr );
+  c(2) -= ( eta + frac13_tr );
+
+  const double len_a = a.norm2();
+  const double len_b = b.norm2();
+  const double len_c = c.norm2();
+
+  if( len_a >= len_b && len_a >= len_c )
+  {
+    a.normalize(); // a is s1 now
+
+    s1 = a;
+
+    b.AXPY(-1.0*dot_product(s1, b), s1);
+
+    c.AXPY(-1.0*dot_product(s1, c), s1);
+
+    if( b.norm2() >= c.norm2() )
+    {
+      b.normalize(); s2 = b; v = cross_product(s1,s2);
+    }
+    else
+    {
+      c.normalize(); s2 = c; v = cross_product(s1,s2);
+    }
+  }
+  else if( len_b >= len_a && len_b >= len_c )
+  {
+    b.normalize(); // b is s1 now
+
+    s1 = b;
+
+    a.AXPY(-1.0*dot_product(s1, a), s1);
+
+    c.AXPY(-1.0*dot_product(s1, c), s1);
+
+    if( a.norm2() >= c.norm2() )
+    {
+      a.normalize(); s2 = a; v = cross_product(s1, s2);
+    }
+    else
+    {
+      c.normalize(); s2 = c; v = cross_product(s1, s2);
+    }
+  }
+  else
+  {
+    c.normalize(); // c is s1 now
+
+    s1 = c;
+
+    a.AXPY(-1.0*dot_product(s1, a), s1);
+
+    b.AXPY(-1.0*dot_product(s1, b), s1);
+
+    if(a.norm2() >= b.norm2())
+    {
+      a.normalize(); s2 = a; v = cross_product(s1, s2);
+    }
+    else
+    {
+      b.normalize(); s2 = b; v = cross_product(s1, s2);
+    }
+  }
+}
+
+double SymmMatrix_3x3::J2() const
+{
+  const double a = mat[0] * mat[0] + 2.0 * mat[5] * mat[5] + 2.0 * mat[4] * mat[4]
+    + mat[1] * mat[1] + 2.0 * mat[3] * mat[3] + mat[2] * mat[2];
+
+  const double b = mat[0] + mat[1] + mat[2];
+
+  return 0.5 * a - b * b / 6.0;
+}
+
+double SymmMatrix_3x3::J3() const
+{
+  const double a = ( mat[0] + mat[1] + mat[2] ) / 3.0;
+
+  const double m0 = mat[0] - a;
+  const double m4 = mat[1] - a;
+  const double m8 = mat[2] - a;
+
+  return m0 * m4 * m8 + mat[5] * mat[3] * mat[4]
+    + mat[4] * mat[5] * mat[3] - mat[4] * m4 * mat[4]
+    - m0 * mat[3] * mat[3] - mat[5] * mat[5] * m8;
+}
+
 Vector_3 operator*( const SymmMatrix_3x3 &left, const Vector_3 &right )
 {
   return Vector_3( left.xx() * right.x() + left.xy() * right.y() + left.xz() * right.z(),
@@ -252,6 +444,12 @@ Matrix_3x3 operator*( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right )
    left(4) * right(0) + left(3) * right(5) + left(2) * right(4),
    left(4) * right(5) + left(3) * right(1) + left(2) * right(3),
    left(4) * right(4) + left(3) * right(3) + left(2) * right(2) );
+}
+
+SymmMatrix_3x3 operator*( const double &val, const SymmMatrix_3x3 &input )
+{
+  return SymmMatrix_3x3( val * input(0), val * input(1), val * input(2), 
+   val * input(3), val * input(4), val * input(5) );
 }
 
 SymmMatrix_3x3 inverse( const SymmMatrix_3x3 &input )
