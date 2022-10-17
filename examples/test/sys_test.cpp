@@ -49,6 +49,51 @@ int main(int argc, char *argv[])
   Q.MatMult(Rx, Ry);
   Q.MatMult(Q, Rz);
 
+  std::cout<<"eigen decomp test: \n";
+
+  SymmMatrix_3x3 A1;
+  A1.gen_rand();
+
+  double eta1 = 0.0; double eta2 = 0.0; double eta3 = 0.0;
+  Vector_3 v1; Vector_3 v2; Vector_3 v3;
+  int out = A1.eigen_decomp(eta1, eta2, eta3, v1, v2, v3);
+  std::cout << "case:" << out << std::endl;
+  
+  Matrix_3x3 Basis1; Matrix_3x3 Basis2; Matrix_3x3 Basis3;
+  Basis1.gen_outprod(v1);
+  Basis2.gen_outprod(v2);
+  Basis3.gen_outprod(v3);
+
+  Matrix_3x3 A1copy = eta1 * Basis1 + eta2 * Basis2 + eta3 * Basis3;
+  Matrix_3x3 A1full = A1.convert_to_full();
+  (A1full - A1copy).print();  
+  
+  double trA1 = A1.tr();  double frac_13= 1.0/3.0;
+  SymmMatrix_3x3 A1p(A1);
+  A1p(0) -= frac_13 * trA1;
+  A1p(1) -= frac_13 * trA1;
+  A1p(2) -= frac_13 * trA1;
+
+  Vector_3 v1p; Vector_3 s1; Vector_3 s2;
+  double eta1p = eta1 - frac_13 * trA1;
+  A1p.find_eigen_vector(eta1p, v1p, s1, s2);  
+  (v1p - v1).print(); 
+
+  // Compare with Matrix_3x3
+  double eta1b = 0.0; double eta2b = 0.0; double eta3b = 0.0;
+  Vector_3 v1b; Vector_3 v2b; Vector_3 v3b;
+  Matrix_3x3 B1( A1.xx(), A1.xy(), A1.xz(), A1.yx(), A1.yy(), A1.yz(), A1.zx(), A1.zy(), A1.zz() );
+  (A1full - B1).print(); // test of convert_to_full()
+  
+  B1.eigen_decomp(eta1b, eta2b, eta3b, v1b, v2b, v3b);
+  (v3b - v3).print();
+  (v2b - v2).print();
+  (v1b - v1).print();
+  std::cout << (eta1b - eta1) << std::endl;
+  std::cout << (eta2b - eta2) << std::endl;
+  std::cout << (eta3b - eta3) << std::endl;
+
+
   return EXIT_SUCCESS;
 }
 
