@@ -93,6 +93,27 @@ int main(int argc, char *argv[])
   std::cout << (eta2b - eta2) << std::endl;
   std::cout << (eta3b - eta3) << std::endl;
 
+  // test-case: three eigenvalues are the same
+  v1.gen_e1(); v2.gen_e2(); v3.gen_e3();
+  Basis1.gen_outprod(v1);
+  Basis2.gen_outprod(v2);
+  Basis3.gen_outprod(v3);
+
+  eta1 = val; eta2 = val; eta3 = val;
+  Matrix_3x3 B2 = eta1 * Basis1 + eta2 * Basis2 + eta3 * Basis3;
+  
+  double eta11 = 0.0; double eta22 = 0.0; double eta33 = 0.0;
+  Vector_3 v11; Vector_3 v22; Vector_3 v33;
+  SymmMatrix_3x3 A2 = gen_symm_part(B2);
+  out = A2.eigen_decomp(eta11, eta22, eta33, v11, v22, v33);
+
+  std::cout << "case:" << out << std::endl;
+  (v33 - v3).print();
+  (v22 - v2).print();
+  (v11 - v1).print();  
+  std::cout << (eta1 - eta11) << std::endl;
+  std::cout << (eta2 - eta22) << std::endl;
+  std::cout << (eta3 - eta33) << std::endl;
 
   return EXIT_SUCCESS;
 }
