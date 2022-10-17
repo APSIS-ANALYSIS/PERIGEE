@@ -115,6 +115,38 @@ int main(int argc, char *argv[])
   std::cout << (eta2 - eta22) << std::endl;
   std::cout << (eta3 - eta33) << std::endl;
 
+  // test-case2: two eigenvalues are the same
+  eta1 = 2 * val; eta2 = val; eta3 = val;
+  v1.gen_rand(); 
+  v1.normalize();
+  v2(0) = val;
+  v2(1) = 2 * val;
+  v2(2) = - ( v1(0) * v2(0) + v1(1) * v2(1) ) / ( v1(2) ) ; 
+  v2.normalize();
+  v3 = cross_product(v1, v2);
+  v3.normalize();
+
+  Basis1.gen_outprod(v1);
+  Basis2.gen_outprod(v2);
+  Basis3.gen_outprod(v3);
+  Matrix_3x3 B3 = eta1 * Basis1 + eta2 * Basis2 + eta3 * Basis3;
+  SymmMatrix_3x3 A3 = gen_symm_part(B3);
+ 
+  double eta111 = 0.0; double eta222 = 0.0; double eta333 = 0.0;
+  Vector_3 v111; Vector_3 v222; Vector_3 v333;
+  out = A3.eigen_decomp(eta111, eta222, eta333, v111, v222, v333);
+
+  Basis1.gen_outprod(v111);
+  Basis2.gen_outprod(v222);
+  Basis3.gen_outprod(v333);
+  Matrix_3x3 B3_ = eta111 * Basis1 + eta222 * Basis2 + eta333 * Basis3;
+  std::cout << "case:" << out << std::endl;   
+  std::cout << (eta1 - eta111) << std::endl;
+  std::cout << (eta2 - eta222) << std::endl;
+  std::cout << (eta3 - eta333) << std::endl;
+  SymmMatrix_3x3 A3_ = gen_symm_part(B3_);
+  (A3 - A3_).print();
+
   return EXIT_SUCCESS;
 }
 
