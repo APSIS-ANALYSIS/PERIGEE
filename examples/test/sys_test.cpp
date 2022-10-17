@@ -64,9 +64,9 @@ int main(int argc, char *argv[])
   Basis2.gen_outprod(v2);
   Basis3.gen_outprod(v3);
 
-  Matrix_3x3 A1copy = eta1 * Basis1 + eta2 * Basis2 + eta3 * Basis3;
+  Matrix_3x3 A1_ = eta1 * Basis1 + eta2 * Basis2 + eta3 * Basis3;
   Matrix_3x3 A1full = A1.convert_to_full();
-  (A1full - A1copy).print();  
+  (A1full - A1_).print();  
   
   double trA1 = A1.tr();  double frac_13= 1.0/3.0;
   SymmMatrix_3x3 A1p(A1);
