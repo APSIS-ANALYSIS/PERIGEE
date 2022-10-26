@@ -13,6 +13,7 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
 {
   public:
     PLocAssem_Tet_CMM_GenAlpha(
+        IViscosityModel * const &in_vismodel,
         const TimeMethod_GenAlpha * const &tm_gAlpha,
         const int &in_nqp, const int &in_face_nqp, 
         const double &in_rho, 
@@ -189,6 +190,9 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
     const double Ctauc; // Constant scaling factor for tau_C
 
     int nLocBas, snLocBas, vec_size, sur_size;
+
+    // viscosity for general fluid models
+    const IViscosityModel * const vismodel;
 
     // Private functions
     void print_info() const;

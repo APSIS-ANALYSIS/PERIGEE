@@ -1,6 +1,7 @@
 #include "PLocAssem_Tet_CMM_GenAlpha.hpp"
 
 PLocAssem_Tet_CMM_GenAlpha::PLocAssem_Tet_CMM_GenAlpha(
+    IViscosityModel * const &in_vismodel,
     const TimeMethod_GenAlpha * const &tm_gAlpha,
     const int &in_nqp, const int &in_face_nqp,
     const double &in_rho, const double &in_vis_mu,
@@ -11,7 +12,7 @@ PLocAssem_Tet_CMM_GenAlpha::PLocAssem_Tet_CMM_GenAlpha(
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()), beta(in_beta), rho_w(in_wall_rho),
   nu_w(in_nu), kappa_w(in_kappa), nqp(in_nqp), face_nqp(in_face_nqp), 
-  Ctauc( in_ctauc )
+  Ctauc( in_ctauc ), vismodel( in_vismodel )
 {
   if(elemtype == 501)
   {
@@ -65,8 +66,8 @@ void PLocAssem_Tet_CMM_GenAlpha::print_info() const
   SYS_T::commPrint("  Spatial: Residual-based VMS \n");
   SYS_T::commPrint("  Temporal: Generalized-alpha Method \n");
   SYS_T::commPrint("  Density rho = %e \n", rho0);
-  SYS_T::commPrint("  Dynamic Viscosity mu = %e \n", vis_mu);
-  SYS_T::commPrint("  Kienmatic Viscosity nu = %e \n", vis_mu / rho0);
+  SYS_T::commPrint("  Dynamic Viscosity mu = %e \n", vis_mu); // to be removed
+  SYS_T::commPrint("  Kienmatic Viscosity nu = %e \n", vis_mu / rho0); // to be removed
   SYS_T::commPrint("  Wall density = %e \n", rho_w);
   SYS_T::commPrint("  Wall Poisson ratio = %e \n", nu_w);
   SYS_T::commPrint("  Wall transverse shearing moduli = %e \n", kappa_w);
@@ -78,6 +79,7 @@ void PLocAssem_Tet_CMM_GenAlpha::print_info() const
   SYS_T::commPrint("  1. Consistent tangent matrix used. \n");
   SYS_T::commPrint("  2. Nonlinear quadratic term is in advective form. \n");
   SYS_T::commPrint("  3. Pressure is evaluated at n+alpha_f rather than n+1. \n");
+  vismodel -> print_info();
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 

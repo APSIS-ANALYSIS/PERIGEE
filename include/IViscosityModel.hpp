@@ -6,10 +6,8 @@
 // Interface for fluid viscosity model (including Newtonian and Non-Newtonian
 // fluid models)
 // ============================================================================
-#include "Sys_Tools.hpp"
 #include "HDF5_Writer.hpp"
 #include "HDF5_Reader.hpp"
-#include "Matrix_3x3.hpp"
 #include "SymmMatrix_3x3.hpp"
 
 class IViscosityModel
