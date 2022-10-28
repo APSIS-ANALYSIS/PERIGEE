@@ -219,7 +219,7 @@ void Tensor4_3D::add_SymmOutProduct( const double &val, const Matrix_3x3 &mleft,
       {
         for(int ll=0; ll<3; ++ll)
         {
-          ten[27*ii + 9*jj + 3*kk + ll] += val *  (mleft(3*ii + jj) * mright(3*jj + kk) 
+          ten[27*ii + 9*jj + 3*kk + ll] += val *  (mleft(3*ii + jj) * mright(3*kk + ll) 
               + mright(3*ii + jj) * mleft(3*kk + ll));
         }
       }
