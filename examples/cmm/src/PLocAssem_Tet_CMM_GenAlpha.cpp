@@ -349,8 +349,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
 
   double tau_m, tau_c;
 
-  const double two_mu = 2.0 * vis_mu;
-
   const double rho0_2 = rho0 * rho0;
 
   const double curr = time + alpha_f * dt;
@@ -424,6 +422,15 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
       coor_y += eleCtrlPts_y[ii] * R[ii];
       coor_z += eleCtrlPts_z[ii] * R[ii];
     }
+
+    // Get the viscosity
+    const double vis_mu = vismodel->get_mu( 2.0*u_x, 2.0*v_y, 2.0*w_z,
+                                            v_z+w_y, u_z+w_x, u_y+v_x);
+    const double two_mu = 2.0 * vis_mu;
+
+    // Get dmu_dvelo
+    const double dmu_dvelo = vismodel->get_dmu_dI2( 2.0*u_x, 2.0*v_y, 2.0*w_z,
+                                                    v_z+w_y, u_z+w_x, u_y+v_x);
 
     get_tau(tau_m, tau_c, dt, dxi_dx, u, v, w);
 
@@ -529,6 +536,11 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
         const double drz_du_B = rho0 * w_x * NB;
         const double drz_dv_B = rho0 * w_y * NB;
         const double drz_dw_B = rho0 * ( w_z * NB + velo_dot_gradNB ) - vis_mu * NB_lap;
+
+        // Generate dI2_du, dI2_dv, dI2_dw
+        const double dI2_du = NB_x * (v_y + w_z) - 0.5 * ( NB_y * (v_x + u_y) + NB_z * (w_x + u_z) );
+        const double dI2_dv = NB_y * (u_x + w_z) - 0.5 * ( NB_x * (u_y + v_x) + NB_z * (w_y + v_z) );
+        const double dI2_dw = NB_z * (u_x + v_y) - 0.5 * ( NB_x * (u_z + w_x) + NB_y * (v_z + w_y) );
 
         // Continuity equation with respect to p, u, v, w
         Tangent[16*nLocBas*A+4*B] += gwts * dd_dv * tau_m * (NAxNBx + NAyNBy + NAzNBz);
