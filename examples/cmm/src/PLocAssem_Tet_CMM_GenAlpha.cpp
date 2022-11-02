@@ -4,11 +4,11 @@ PLocAssem_Tet_CMM_GenAlpha::PLocAssem_Tet_CMM_GenAlpha(
     IViscosityModel * const &in_vismodel,
     const TimeMethod_GenAlpha * const &tm_gAlpha,
     const int &in_nqp, const int &in_face_nqp,
-    const double &in_rho, const double &in_vis_mu,
+    const double &in_rho,
     const double &in_beta, const double &in_wall_rho,
     const double &in_nu, const double &in_kappa,
     const double &in_ctauc, const int &elemtype )
-: rho0( in_rho ), vis_mu( in_vis_mu ),
+: rho0( in_rho ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()), beta(in_beta), rho_w(in_wall_rho),
   nu_w(in_nu), kappa_w(in_kappa), nqp(in_nqp), face_nqp(in_face_nqp), 
