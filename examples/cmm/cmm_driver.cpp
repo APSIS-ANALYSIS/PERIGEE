@@ -29,6 +29,7 @@
 #include "GenBC_Inductance.hpp"
 #include "GenBC_Coronary.hpp"
 #include "GenBC_Pressure.hpp"
+#include "ViscosityModel_Carreau.hpp"
 #include "PLocAssem_Tet_CMM_GenAlpha.hpp"
 #include "PGAssem_Tet_CMM_GenAlpha.hpp"
 #include "PTime_CMM_Solver.hpp"
@@ -360,6 +361,14 @@ int main( int argc, char *argv[] )
 
   tm_galpha_ptr->print_info();
 
+  // ===== Generate a Carreau viscosity model =====
+  IViscosityModel * vismodel = nullptr;
+  const double mu_inf = 0.0345;
+  const double mu_0   = 0.56;
+  const double lambda = 3.313;
+  const double n      = 0.3568; 
+  vismodel = new ViscosityModel_Carreau( mu_inf, mu_0, lambda, n );
+  
   // ===== Local assembly routine =====
   IPLocAssem * locAssem_ptr = new PLocAssem_Tet_CMM_GenAlpha(
       tm_galpha_ptr, quadv->get_num_quadPts(), quads->get_num_quadPts(),
