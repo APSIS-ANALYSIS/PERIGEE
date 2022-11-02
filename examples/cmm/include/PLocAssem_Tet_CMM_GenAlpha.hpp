@@ -8,6 +8,7 @@
 // ==================================================================
 #include "IPLocAssem.hpp"
 #include "TimeMethod_GenAlpha.hpp"
+#include "IViscosityModel.hpp"
 
 class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
 {
@@ -16,8 +17,7 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
         IViscosityModel * const &in_vismodel,
         const TimeMethod_GenAlpha * const &tm_gAlpha,
         const int &in_nqp, const int &in_face_nqp, 
-        const double &in_rho, 
-        const double &in_vis_mu, const double &in_beta,
+        const double &in_rho, const double &in_beta,
         const double &in_wall_rho, const double &in_nu,
         const double &in_kappa, const double &in_ctauc = 1.0,
         const int &elemtype = 501 );
@@ -204,7 +204,8 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
     // Return tau_m and tau_c in RB-VMS
     void get_tau( double &tau_m_qua, double &tau_c_qua,
         const double &dt, const double * const &dxi_dx,
-        const double &u, const double &v, const double &w ) const;
+        const double &u, const double &v, const double &w,
+        const double &vis_mu ) const;
 
     // Return tau_bar := (v' G v')^-0.5 x rho0, 
     //        which scales like Time x Density
