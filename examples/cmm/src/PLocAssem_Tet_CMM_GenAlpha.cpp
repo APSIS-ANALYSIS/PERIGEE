@@ -114,7 +114,8 @@ void PLocAssem_Tet_CMM_GenAlpha::get_metric(
 void PLocAssem_Tet_CMM_GenAlpha::get_tau(
     double &tau_m_qua, double &tau_c_qua,
     const double &dt, const double * const &dxidx,
-    const double &u, const double &v, const double &w ) const
+    const double &u, const double &v, const double &w,
+    const double &vis_mu ) const
 {
   // Use K matrix to correct the metric
   double G11, G12, G13, G22, G23, G33;
