@@ -66,8 +66,6 @@ void PLocAssem_Tet_CMM_GenAlpha::print_info() const
   SYS_T::commPrint("  Spatial: Residual-based VMS \n");
   SYS_T::commPrint("  Temporal: Generalized-alpha Method \n");
   SYS_T::commPrint("  Density rho = %e \n", rho0);
-  SYS_T::commPrint("  Dynamic Viscosity mu = %e \n", vis_mu); // to be removed
-  SYS_T::commPrint("  Kienmatic Viscosity nu = %e \n", vis_mu / rho0); // to be removed
   SYS_T::commPrint("  Wall density = %e \n", rho_w);
   SYS_T::commPrint("  Wall Poisson ratio = %e \n", nu_w);
   SYS_T::commPrint("  Wall transverse shearing moduli = %e \n", kappa_w);
