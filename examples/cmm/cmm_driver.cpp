@@ -371,7 +371,7 @@ int main( int argc, char *argv[] )
   
   // ===== Local assembly routine =====
   IPLocAssem * locAssem_ptr = new PLocAssem_Tet_CMM_GenAlpha(
-      vismodel
+      vismodel,
       tm_galpha_ptr, quadv->get_num_quadPts(), quads->get_num_quadPts(),
       fluid_density, bs_beta,
       wall_density, wall_poisson, wall_kappa,
