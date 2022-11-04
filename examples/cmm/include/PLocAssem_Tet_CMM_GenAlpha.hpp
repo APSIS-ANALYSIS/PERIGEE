@@ -178,7 +178,7 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
 
   private:
     // Private data
-    const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta;
+    const double rho0, alpha_f, alpha_m, gamma, beta;
 
     // wall properties: density, Poisson ratio, shear correction factor (kappa)
     const double rho_w, nu_w, kappa_w; 
