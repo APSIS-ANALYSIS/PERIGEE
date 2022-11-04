@@ -250,7 +250,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
     const double two_mu = 2.0 * vis_mu;
 
     // Get the tau_m and tau_c
-    get_tau(tau_m, tau_c, dt, dxi_dx, u, v, w);
+    get_tau(tau_m, tau_c, dt, dxi_dx, u, v, w, vis_mu);
 
     const double tau_m_2 = tau_m * tau_m;
 
@@ -432,7 +432,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
     const double dmu_dvelo = vismodel->get_dmu_dI2( 2.0*u_x, 2.0*v_y, 2.0*w_z,
                                                     v_z+w_y, u_z+w_x, u_y+v_x);
 
-    get_tau(tau_m, tau_c, dt, dxi_dx, u, v, w);
+    get_tau(tau_m, tau_c, dt, dxi_dx, u, v, w, vis_mu);
 
     const double tau_m_2 = tau_m * tau_m;
 
@@ -732,8 +732,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Mass_Residual(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  const double two_mu = 2.0 * vis_mu;
-
   const double curr = 0.0;
 
   Zero_Tangent_Residual();
@@ -774,6 +772,11 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Mass_Residual(
       coor_y += eleCtrlPts_y[ii] * R[ii];
       coor_z += eleCtrlPts_z[ii] * R[ii];
     }
+
+    // Get the viscosity
+    const double vis_mu = vismodel->get_mu( 2.0*u_x, 2.0*v_y, 2.0*w_z,
+                                            v_z+w_y, u_z+w_x, u_y+v_x);
+    const double two_mu = 2.0 * vis_mu;
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
