@@ -71,6 +71,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/System/Matrix_3x3.cpp
   ${perigee_source}/System/Matrix_double_6by6_Array.cpp
   ${perigee_source}/System/Matrix_PETSc.cpp
+  ${perigee_source}/System/SymmMatrix_3x3.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Tet.cpp
   ${perigee_source}/Analysis_Tool/AGlobal_Mesh_Info_FEM_3D.cpp
   ${perigee_source}/Analysis_Tool/APart_Basic_Info.cpp
@@ -98,6 +99,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Model/CVFlowRate_Steady.cpp
   ${perigee_source}/Model/CVFlowRate_Unsteady.cpp
   ${perigee_source}/Model/CVFlowRate_Linear2Steady.cpp
+  ${perigee_source}/Model/ViscosityModel_Carreau.cpp
   ${perigee_source}/Solver/PDNSolution.cpp
   ${perigee_source}/Solver/PDNTimeStep.cpp
   ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp
