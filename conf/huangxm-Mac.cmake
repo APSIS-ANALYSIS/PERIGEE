@@ -13,10 +13,10 @@
 # VTK_DIR should be the vtk directory/lib/cmake/vtk-version,
 # which contains VTKConfig.cmake file.
 # In the guide, vtk directory is $HOME/lib/VTK-7.1.1-shared
-set(VTK_DIR /work/mae-huangxm/lib/VTK-7.1.1-OPT/lib/cmake/vtk-7.1)
+set(VTK_DIR /Users/makinokazuo/lib/VTK-7.1.1-shared/lib/cmake/vtk-7.1)
 
 # Modify the PETSC_DIR variable to point to the location of PETSc.
-set(PETSC_DIR /work/mae-huangxm/lib/petsc-3.16.6-opt)
+set(PETSC_DIR /Users/makinokazuo/lib/petsc-3.16.6-opt)
 
 # Modify the PETSC_ARCH variable. You can find it in your configuration
 # output. If you forget it, go to your PETSc home director and open
@@ -29,10 +29,10 @@ set(PETSC_ARCH .)
 # file will directly load that METIS; otherwise this METIS will
 # be used for PERIGEE. This means, if you are sure that you have
 # METIS in PETSc, you do not have to specify the METIS_DIR variable.
-set(METIS_DIR /work/mae-huangxm/metis-5.0.3)
+set(METIS_DIR /Users/makinokazuo/lib/metis-5.0.3)
 
 # Modify the HDF5_ROOT, pointing to your hdf5 library location
-set(HDF5_ROOT /work/mae-huangxm/lib/hdf5-1.8.16)
+set(HDF5_ROOT /Users/makinokazuo/lib/hdf5-1.8.16)
 
 # ========================================================
 # Setup the libraries
@@ -70,8 +70,8 @@ message(STATUS "External Libraries: " ${EXTRA_LINK_LIBS})
 # Specify the MPI compilers. There should be compilers in
 # $PETSC_DIR/$PETSC_ARCH/bin, or the mpich you specified for 
 # PETSc install.
-set(CMAKE_C_COMPILER  /work/mae-huangxm/lib/mpich-3.3/bin/mpicc)
-set(CMAKE_CXX_COMPILER /work/mae-huangxm/lib/mpich-3.3/bin/mpicxx)
+set(CMAKE_C_COMPILER  /Users/makinokazuo/lib/petsc-3.16.6-opt/bin/mpicc)
+set(CMAKE_CXX_COMPILER /Users/makinokazuo/lib/petsc-3.16.6-opt/bin/mpicxx)
 set(CMAKE_CXX_STANDARD 11)
 if( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
   set(CMAKE_CXX_FLAGS "-O3 -Wall")
