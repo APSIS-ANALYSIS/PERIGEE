@@ -208,6 +208,25 @@ void Tensor4_3D::add_SymmProduct( const double &val, const Matrix_3x3 &mleft,
   }
 }
 
+void Tensor4_3D::add_SymmOutProduct( const double &val, const Matrix_3x3 &mleft,
+    const Matrix_3x3 &mright )
+{
+  for(int ii=0; ii<3 ; ++ii)
+  {
+    for(int jj=0; jj<3 ; ++jj)
+    {
+      for(int kk=0; kk<3; ++kk)
+      {
+        for(int ll=0; ll<3; ++ll)
+        {
+          ten[27*ii + 9*jj + 3*kk + ll] += val *  (mleft(3*ii + jj) * mright(3*jj + kk) 
+              + mright(3*ii + jj) * mleft(3*kk + ll));
+        }
+      }
+    }
+  }
+}
+
 void Tensor4_3D::MatMult_1( const Matrix_3x3 &source )
 {
   double temp[81] {0.0};

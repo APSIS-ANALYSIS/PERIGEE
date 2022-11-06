@@ -168,6 +168,12 @@ class Tensor4_3D
         const Matrix_3x3 &mright );
 
     // ------------------------------------------------------------------------
+    // ten_ijkl += val * [  (mleft_ij mright_kl + mleft_kl mright_ij) ]
+    // ------------------------------------------------------------------------
+    void add_SymmOutProduct( const double &val, const Matrix_3x3 &mleft,
+        const Matrix_3x3 &mright );
+  
+    // ------------------------------------------------------------------------
     // Matrix update for the tensor:
     // ------------------------------------------------------------------------
     //    ten[IJKL] = A[iI] (or A[jJ], A[kK], A[lL]) ten[IJKL]

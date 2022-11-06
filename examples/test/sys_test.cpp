@@ -25,204 +25,11 @@ int main(int argc, char *argv[])
 
   Matrix_3x3 B( A.xx(), A.xy(), A.xz(), A.yx(), A.yy(), A.yz(), A.zx(), A.zy(), A.zz() );
 
-  std::cout<<A.I1() - B.I1()<<std::endl;
-  std::cout<<A.I2() - B.I2()<<std::endl;
-  std::cout<<A.I3() - B.I3()<<std::endl;
-  std::cout<<A.det() - B.det()<<std::endl;
-  std::cout<<A.tr() - B.tr()<<std::endl;
-
-  A.print_in_row();
-
-  A.print();
-
-  A.print_Voigt();
-
   sleep(1);
-  SymmMatrix_3x3 A1;
-  A1.gen_rand();
-  Matrix_3x3 B1( A1.xx(), A1.xy(), A1.xz(), A1.yx(), A1.yy(), A1.yz(), A1.zx(), A1.zy(), A1.zz() );
-
-  std::cout<<(A1 + A).xx() - (B1 + B).xx()<<std::endl;
-  std::cout<<(A1 + A).xy() - (B1 + B).xy()<<std::endl;
-  std::cout<<(A1 + A).xz() - (B1 + B).xz()<<std::endl;
-  std::cout<<(A1 + A).yy() - (B1 + B).yy()<<std::endl;
-  std::cout<<(A1 + A).yz() - (B1 + B).yz()<<std::endl;
-  std::cout<<(A1 + A).zz() - (B1 + B).zz()<<std::endl;
-  std::cout<<(A1 + A).yx() - (B1 + B).yx()<<std::endl;
-  std::cout<<(A1 + A).zx() - (B1 + B).zx()<<std::endl;
-  std::cout<<(A1 + A).zy() - (B1 + B).zy()<<std::endl;
-
-  std::cout<<(A1 - A).xx() - (B1 - B).xx()<<std::endl;
-  std::cout<<(A1 - A).xy() - (B1 - B).xy()<<std::endl;
-  std::cout<<(A1 - A).xz() - (B1 - B).xz()<<std::endl;
-  std::cout<<(A1 - A).yy() - (B1 - B).yy()<<std::endl;
-  std::cout<<(A1 - A).yz() - (B1 - B).yz()<<std::endl;
-  std::cout<<(A1 - A).zz() - (B1 - B).zz()<<std::endl;
-  std::cout<<(A1 - A).yx() - (B1 - B).yx()<<std::endl;
-  std::cout<<(A1 - A).zx() - (B1 - B).zx()<<std::endl;
-  std::cout<<(A1 - A).zy() - (B1 - B).zy()<<std::endl;
-
   srand(time(NULL));
   double val = ( rand() % 1000 ) * 1.0e-3 - 0.5;
-  A1.scale(val); B1.scale(val);
-  std::cout<<A1.xx() - B1.xx()<<std::endl;
-  std::cout<<A1.xy() - B1.xy()<<std::endl;
-  std::cout<<A1.xz() - B1.xz()<<std::endl;
-  std::cout<<A1.yy() - B1.yy()<<std::endl;
-  std::cout<<A1.yz() - B1.yz()<<std::endl;
-  std::cout<<A1.zz() - B1.zz()<<std::endl;
-  std::cout<<A1.yx() - B1.yx()<<std::endl;
-  std::cout<<A1.zx() - B1.zx()<<std::endl;
-  std::cout<<A1.zy() - B1.zy()<<std::endl;
 
-  for (int ii=0; ii<3; ++ii) A1 += A;
-  for (int ii=0; ii<3; ++ii) B1 += B;
-  std::cout<<A1.xx() - B1.xx()<<std::endl;
-  std::cout<<A1.xy() - B1.xy()<<std::endl;
-  std::cout<<A1.xz() - B1.xz()<<std::endl;
-  std::cout<<A1.yy() - B1.yy()<<std::endl;
-  std::cout<<A1.yz() - B1.yz()<<std::endl;
-  std::cout<<A1.zz() - B1.zz()<<std::endl;
-  std::cout<<A1.yx() - B1.yx()<<std::endl;
-  std::cout<<A1.zx() - B1.zx()<<std::endl;
-  std::cout<<A1.zy() - B1.zy()<<std::endl;
-
-  for (int ii=0; ii<3; ++ii) A1 -= A;
-  for (int ii=0; ii<3; ++ii) B1 -= B;
-  std::cout<<A1.xx() - B1.xx()<<std::endl;
-  std::cout<<A1.xy() - B1.xy()<<std::endl;
-  std::cout<<A1.xz() - B1.xz()<<std::endl;
-  std::cout<<A1.yy() - B1.yy()<<std::endl;
-  std::cout<<A1.yz() - B1.yz()<<std::endl;
-  std::cout<<A1.zz() - B1.zz()<<std::endl;
-  std::cout<<A1.yx() - B1.yx()<<std::endl;
-  std::cout<<A1.zx() - B1.zx()<<std::endl;
-  std::cout<<A1.zy() - B1.zy()<<std::endl;
-
-  A.inverse(); B.inverse();
-  std::cout<<A.xx() - B.xx()<<std::endl;
-  std::cout<<A.xy() - B.xy()<<std::endl;
-  std::cout<<A.xz() - B.xz()<<std::endl;
-  std::cout<<A.yy() - B.yy()<<std::endl;
-  std::cout<<A.yz() - B.yz()<<std::endl;
-  std::cout<<A.zz() - B.zz()<<std::endl;
-  std::cout<<A.yx() - B.yx()<<std::endl;
-  std::cout<<A.zx() - B.zx()<<std::endl;
-  std::cout<<A.zy() - B.zy()<<std::endl;
-
-  for (int ii=0; ii<3; ++ii) A1 *= val;
-  for (int ii=0; ii<3; ++ii) B1 *= val;
-  std::cout<<A1.xx() - B1.xx()<<std::endl;
-  std::cout<<A1.xy() - B1.xy()<<std::endl;
-  std::cout<<A1.xz() - B1.xz()<<std::endl;
-  std::cout<<A1.yy() - B1.yy()<<std::endl;
-  std::cout<<A1.yz() - B1.yz()<<std::endl;
-  std::cout<<A1.zz() - B1.zz()<<std::endl;
-  std::cout<<A1.yx() - B1.yx()<<std::endl;
-  std::cout<<A1.zx() - B1.zx()<<std::endl;
-  std::cout<<A1.zy() - B1.zy()<<std::endl;
-
-  A.AXPY(val, A1); B.AXPY(val, B1);
-  std::cout<<A.xx() - B.xx()<<std::endl;
-  std::cout<<A.xy() - B.xy()<<std::endl;
-  std::cout<<A.xz() - B.xz()<<std::endl;
-  std::cout<<A.yy() - B.yy()<<std::endl;
-  std::cout<<A.yz() - B.yz()<<std::endl;
-  std::cout<<A.zz() - B.zz()<<std::endl;
-  std::cout<<A.yx() - B.yx()<<std::endl;
-  std::cout<<A.zx() - B.zx()<<std::endl;
-  std::cout<<A.zy() - B.zy()<<std::endl;
-
-  A.AXPI(val); B.AXPI(val);
-  std::cout<<A.xx() - B.xx()<<std::endl;
-  std::cout<<A.xy() - B.xy()<<std::endl;
-  std::cout<<A.xz() - B.xz()<<std::endl;
-  std::cout<<A.yy() - B.yy()<<std::endl;
-  std::cout<<A.yz() - B.yz()<<std::endl;
-  std::cout<<A.zz() - B.zz()<<std::endl;
-  std::cout<<A.yx() - B.yx()<<std::endl;
-  std::cout<<A.zx() - B.zx()<<std::endl;
-  std::cout<<A.zy() - B.zy()<<std::endl;
-
-  A+=A1; B+=B1;
-  std::cout<<A.xx() - B.xx()<<std::endl;
-  std::cout<<A.xy() - B.xy()<<std::endl;
-  std::cout<<A.xz() - B.xz()<<std::endl;
-  std::cout<<A.yy() - B.yy()<<std::endl;
-  std::cout<<A.yz() - B.yz()<<std::endl;
-  std::cout<<A.zz() - B.zz()<<std::endl;
-  std::cout<<A.yx() - B.yx()<<std::endl;
-  std::cout<<A.zx() - B.zx()<<std::endl;
-  std::cout<<A.zy() - B.zy()<<std::endl;
-
-  A.inverse(); B.inverse();
-
-  Matrix_3x3 C;
-  C.gen_rand();
-
-  Matrix_3x3 SC( C.xx(), 0.5*( C.xy() + C.yx() ), 0.5*( C.xz() + C.zx() ),
-                 0.5*( C.yx() + C.xy() ), C.yy(), 0.5*( C.yz() + C.zy() ),
-                 0.5*( C.zx() + C.xz() ), 0.5*( C.zy() + C.yz() ), C.zz() );
-
-  const SymmMatrix_3x3 D(C);
-  std::cout<<SC.xx() - D.xx()<<std::endl;
-  std::cout<<SC.yy() - D.yy()<<std::endl;
-  std::cout<<SC.zz() - D.zz()<<std::endl;
-  std::cout<<SC.xy() - D.xy()<<std::endl;
-  std::cout<<SC.xz() - D.xz()<<std::endl;
-  std::cout<<SC.yx() - D.yx()<<std::endl;
-  std::cout<<SC.yz() - D.yz()<<std::endl;
-  std::cout<<SC.zx() - D.zx()<<std::endl;
-  std::cout<<SC.zy() - D.zy()<<std::endl;
-
-  SymmMatrix_3x3 S;
-  S(0) = B(0); S(5) = B(1); S(4) = B(2);
-  S(1) = B(4); S(3) = B(5); S(2) = B(8);
-
-  std::cout<<S(0) - B(0)<<std::endl;
-  std::cout<<S(5) - B(1)<<std::endl;
-  std::cout<<S(4) - B(2)<<std::endl;
-  std::cout<<S(1) - B(4)<<std::endl;
-  std::cout<<S(3) - B(5)<<std::endl;
-  std::cout<<S(2) - B(8)<<std::endl;
-
-  const SymmMatrix_3x3 I;
-  SymmMatrix_3x3 S2; S2.gen_rand();
-  S2(0) = I(0); S2(1) = I(1); S2(2) = I(2);
-  S2(3) = I(3); S2(4) = I(4); S2(5) = I(5);
-  (S2 - I).print();
-
-  SymmMatrix_3x3 E(D);
-  (E - D).print();
-
-  SymmMatrix_3x3 ISM;
-  ISM.gen_id();
-  Matrix_3x3 IM;
-  IM.gen_id();
-  std::cout<<ISM.xx() - IM.xx()<<std::endl;
-  std::cout<<ISM.xy() - IM.xy()<<std::endl;
-  std::cout<<ISM.xz() - IM.xz()<<std::endl;
-  std::cout<<ISM.yy() - IM.yy()<<std::endl;
-  std::cout<<ISM.yz() - IM.yz()<<std::endl;
-  std::cout<<ISM.zz() - IM.zz()<<std::endl;
-  std::cout<<ISM.yx() - IM.yx()<<std::endl;
-  std::cout<<ISM.zx() - IM.zx()<<std::endl;
-  std::cout<<ISM.zy() - IM.zy()<<std::endl;
-
-  SymmMatrix_3x3 OSM;
-  OSM.gen_zero();
-  Matrix_3x3 OM;
-  OM.gen_zero();
-  std::cout<<OSM.xx() - OM.xx()<<std::endl;
-  std::cout<<OSM.xy() - OM.xy()<<std::endl;
-  std::cout<<OSM.xz() - OM.xz()<<std::endl;
-  std::cout<<OSM.yy() - OM.yy()<<std::endl;
-  std::cout<<OSM.yz() - OM.yz()<<std::endl;
-  std::cout<<OSM.zz() - OM.zz()<<std::endl;
-  std::cout<<OSM.yx() - OM.yx()<<std::endl;
-  std::cout<<OSM.zx() - OM.zx()<<std::endl;
-  std::cout<<OSM.zy() - OM.zy()<<std::endl;
-
+  std::cout<<"rotation test: \n";
   const double pi = 4.0 * atan(1.0);
   double thetay = pi/val;
   double thetax = 2*pi/val;
@@ -242,101 +49,103 @@ int main(int argc, char *argv[])
   Q.MatMult(Rx, Ry);
   Q.MatMult(Q, Rz);
 
-  A.MatRot(Q); B.MatRot(Q);
-  std::cout<<A.xx() - B.xx()<<std::endl;
-  std::cout<<A.yy() - B.yy()<<std::endl;
-  std::cout<<A.zz() - B.zz()<<std::endl;
-  std::cout<<A.xy() - B.xy()<<std::endl;
-  std::cout<<A.xz() - B.xz()<<std::endl;
-  std::cout<<A.yx() - B.yx()<<std::endl;
-  std::cout<<A.yz() - B.yz()<<std::endl;
-  std::cout<<A.zx() - B.zx()<<std::endl;
-  std::cout<<A.zy() - B.zy()<<std::endl;
+  std::cout<<"eigen decomp test: \n";
 
-//  Matrix_3x3 QT(transpose(Q));
-//  Q.MatMult(Q, QT);
-//  Q.print();
+  SymmMatrix_3x3 A1;
+  A1.gen_rand();
 
-  Vector_3 xx(thetax, thetay, thetaz);
-  Vector_3 yy(thetay, thetaz, thetax);
-
-  std::cout<<A1.VecMatVec(xx, yy) - B1.VecMatVec(xx, yy)<<std::endl;
-
-  (A1.VecMult(xx) - B1.VecMult(xx)).print();
-
-  SymmMatrix_3x3 A2{};
-  A2.copy(A1);
-  (A2 - A1).print();
+  double eta1 = 0.0; double eta2 = 0.0; double eta3 = 0.0;
+  Vector_3 v1; Vector_3 v2; Vector_3 v3;
+  int out = A1.eigen_decomp(eta1, eta2, eta3, v1, v2, v3);
+  std::cout << "case:" << out << std::endl;
   
-  SymmMatrix_3x3 A3;
-  A3.gen_rand();
+  Matrix_3x3 Basis1; Matrix_3x3 Basis2; Matrix_3x3 Basis3;
+  Basis1.gen_outprod(v1);
+  Basis2.gen_outprod(v2);
+  Basis3.gen_outprod(v3);
+
+  Matrix_3x3 A1_ = eta1 * Basis1 + eta2 * Basis2 + eta3 * Basis3;
+  Matrix_3x3 A1full = A1.convert_to_full();
+  (A1full - A1_).print();  
   
-  A3 = A2 = A1;
-  A2 = A2;
-  (A3 - A2).print();
-  (A3 - A1).print();
-  (A1 - A2).print();
+  double trA1 = A1.tr();  double frac_13= 1.0/3.0;
+  SymmMatrix_3x3 A1p(A1);
+  A1p(0) -= frac_13 * trA1;
+  A1p(1) -= frac_13 * trA1;
+  A1p(2) -= frac_13 * trA1;
 
-  A2.MatMultTransposeLeft(B1);
-  Matrix_3x3 B2;
-  B2.MatMultTransposeLeft(B1);
-  std::cout<<A2.xx() - B2.xx()<<std::endl;
-  std::cout<<A2.yy() - B2.yy()<<std::endl;
-  std::cout<<A2.zz() - B2.zz()<<std::endl;
-  std::cout<<A2.xy() - B2.xy()<<std::endl;
-  std::cout<<A2.xz() - B2.xz()<<std::endl;
-  std::cout<<A2.yx() - B2.yx()<<std::endl;
-  std::cout<<A2.yz() - B2.yz()<<std::endl;
-  std::cout<<A2.zx() - B2.zx()<<std::endl;
-  std::cout<<A2.zy() - B2.zy()<<std::endl;
+  Vector_3 v1p; Vector_3 s1; Vector_3 s2;
+  double eta1p = eta1 - frac_13 * trA1;
+  A1p.find_eigen_vector(eta1p, v1p, s1, s2);  
+  (v1p - v1).print(); 
 
-  A3.MatMultTransposeRight(B1);
-  Matrix_3x3 B3;
-  B3.MatMultTransposeRight(B1);
-  std::cout<<A3.xx() - B3.xx()<<std::endl;
-  std::cout<<A3.yy() - B3.yy()<<std::endl;
-  std::cout<<A3.zz() - B3.zz()<<std::endl;
-  std::cout<<A3.xy() - B3.xy()<<std::endl;
-  std::cout<<A3.xz() - B3.xz()<<std::endl;
-  std::cout<<A3.yx() - B3.yx()<<std::endl;
-  std::cout<<A3.yz() - B3.yz()<<std::endl;
-  std::cout<<A3.zx() - B3.zx()<<std::endl;
-  std::cout<<A3.zy() - B3.zy()<<std::endl;
+  // Compare with Matrix_3x3
+  double eta1b = 0.0; double eta2b = 0.0; double eta3b = 0.0;
+  Vector_3 v1b; Vector_3 v2b; Vector_3 v3b;
+  Matrix_3x3 B1( A1.xx(), A1.xy(), A1.xz(), A1.yx(), A1.yy(), A1.yz(), A1.zx(), A1.zy(), A1.zz() );
+  (A1full - B1).print(); // test of convert_to_full()
+  
+  B1.eigen_decomp(eta1b, eta2b, eta3b, v1b, v2b, v3b);
+  (v3b - v3).print();
+  (v2b - v2).print();
+  (v1b - v1).print();
+  std::cout << (eta1b - eta1) << std::endl;
+  std::cout << (eta2b - eta2) << std::endl;
+  std::cout << (eta3b - eta3) << std::endl;
 
-  double a2b1 = A2.MatContraction(B1);
-  double b2b1 = B2.MatContraction(B1);
-  std::cout<<a2b1 - b2b1<<std::endl;
+  // test-case: three eigenvalues are the same
+  v1.gen_e1(); v2.gen_e2(); v3.gen_e3();
+  Basis1.gen_outprod(v1);
+  Basis2.gen_outprod(v2);
+  Basis3.gen_outprod(v3);
 
-  double a1b2 = A1.MatContraction(A2);
-  double b1b2 = B1.MatContraction(B2);
-  std::cout<<a1b2 - b1b2<<std::endl;
-   
-  inverse(A2);   
-  inverse(B2);
-  std::cout<<A2.xx() - B2.xx()<<std::endl;
-  std::cout<<A2.xy() - B2.xy()<<std::endl;
-  std::cout<<A2.xz() - B2.xz()<<std::endl;
-  std::cout<<A2.yy() - B2.yy()<<std::endl;
-  std::cout<<A2.yz() - B2.yz()<<std::endl;
-  std::cout<<A2.zz() - B2.zz()<<std::endl;
-  std::cout<<A2.yx() - B2.yx()<<std::endl;
-  std::cout<<A2.zx() - B2.zx()<<std::endl;
-  std::cout<<A2.zy() - B2.zy()<<std::endl;
+  eta1 = val; eta2 = val; eta3 = val;
+  Matrix_3x3 B2 = eta1 * Basis1 + eta2 * Basis2 + eta3 * Basis3;
+  
+  double eta11 = 0.0; double eta22 = 0.0; double eta33 = 0.0;
+  Vector_3 v11; Vector_3 v22; Vector_3 v33;
+  SymmMatrix_3x3 A2 = gen_symm_part(B2);
+  out = A2.eigen_decomp(eta11, eta22, eta33, v11, v22, v33);
+
+  std::cout << "case:" << out << std::endl;
+  (v33 - v3).print();
+  (v22 - v2).print();
+  (v11 - v1).print();  
+  std::cout << (eta1 - eta11) << std::endl;
+  std::cout << (eta2 - eta22) << std::endl;
+  std::cout << (eta3 - eta33) << std::endl;
+
+  // test-case2: two eigenvalues are the same
+  eta1 = 2 * val; eta2 = val; eta3 = val;
+  v1.gen_rand(); 
+  v1.normalize();
+  v2(0) = val;
+  v2(1) = 2 * val;
+  v2(2) = - ( v1(0) * v2(0) + v1(1) * v2(1) ) / ( v1(2) ) ; 
+  v2.normalize();
+  v3 = cross_product(v1, v2);
+  v3.normalize();
+
+  Basis1.gen_outprod(v1);
+  Basis2.gen_outprod(v2);
+  Basis3.gen_outprod(v3);
+  Matrix_3x3 B3 = eta1 * Basis1 + eta2 * Basis2 + eta3 * Basis3;
+  SymmMatrix_3x3 A3 = gen_symm_part(B3);
  
-  (A2 * xx - B2 * xx).print();
+  double eta111 = 0.0; double eta222 = 0.0; double eta333 = 0.0;
+  Vector_3 v111; Vector_3 v222; Vector_3 v333;
+  out = A3.eigen_decomp(eta111, eta222, eta333, v111, v222, v333);
 
-  Matrix_3x3 A1_A2(A1 * A2);
-  Matrix_3x3 B1_B2(B1 * B2);
-  (A1_A2 - B1_B2).print();
-
-  B2.gen_rand();
-  Matrix_3x3 A1B2(A1 * B2);
-  Matrix_3x3 B1B2(B1 * B2);
-  (A1B2 - B1B2).print();
-
-  Matrix_3x3 B2A1(B2 * A1);
-  Matrix_3x3 B2B1(B2 * B1);
-  (B2A1 - B2B1).print();
+  Basis1.gen_outprod(v111);
+  Basis2.gen_outprod(v222);
+  Basis3.gen_outprod(v333);
+  Matrix_3x3 B3_ = eta111 * Basis1 + eta222 * Basis2 + eta333 * Basis3;
+  std::cout << "case:" << out << std::endl;   
+  std::cout << (eta1 - eta111) << std::endl;
+  std::cout << (eta2 - eta222) << std::endl;
+  std::cout << (eta3 - eta333) << std::endl;
+  SymmMatrix_3x3 A3_ = gen_symm_part(B3_);
+  (A3 - A3_).print();
 
   return EXIT_SUCCESS;
 }
