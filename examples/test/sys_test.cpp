@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
 // 普通随机测试
   std::cout<<"Ordinary random test: 5 times\n\n";
   sleep(1);
-  for(int temp{1}; temp < 6; temp++)
+  for(int temp{1}; temp < 6; ++temp)
   {
     std::cout<<"Loop "<<temp<<"\n";
     sleep(1);
@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
 // 设一个矩阵的分量值较大
   std::cout<<"(1): A's components are multiplied by a larger number: 5 times\n";
   sleep(2);
-  for(int temp{1}; temp < 6; temp++)
+  for(int temp{1}; temp < 6; ++temp)
   {
     std::cout<<"Loop "<<temp<<"\n";
     sleep(1);
@@ -255,13 +255,23 @@ int main(int argc, char *argv[])
     std::cout<<"\n";
     sleep(1);
 
+    if(D1.is_identical(D2) == 0){
+      std::cout<<"If D_ijkl is large, D1 cannot approximate to D2 within 10e-12 absolute error.\n"
+      <<"difference between D1 components and D2 components:\n";
+      for(int ii{0}; ii < 81; ++ii)
+      {
+      double dif = D1(ii) - D2(ii);
+      std::cout<<dif<<"\n";
+      }
+    }
+
     std::cout<<"If D1 == D2 ?: "<<D1.is_identical(D2)<<"\n";   
   }
 
 // 设一个矩阵的分量值较小
   std::cout<<"(2): A's components are multiplied with a smaller number: 5 times\n";
   sleep(2);
-  for(int temp{1}; temp < 6; temp++)
+  for(int temp{1}; temp < 6; ++temp)
   {
     std::cout<<"Loop "<<temp<<"\n";
     sleep(1);
@@ -307,10 +317,12 @@ int main(int argc, char *argv[])
     std::cout<<"If D1 == D2 ?: "<<D1.is_identical(D2)<<"\n";
   }
 
+
+
 // 设val较大
   std::cout<<"(3): Larger val: 5 times\n";
   sleep(2);
-  for(int temp{1}; temp < 6; temp++)
+  for(int temp{1}; temp < 6; ++temp)
   {
     std::cout<<"Loop "<<temp<<"\n";
     sleep(1);
@@ -353,12 +365,21 @@ int main(int argc, char *argv[])
     sleep(1);
 
     std::cout<<"If D1 == D2 ?: "<<D1.is_identical(D2)<<"\n";
+    if(D1.is_identical(D2) == 0){
+      std::cout<<"If D_ijkl is large, D1 cannot approximate to D2 within 10e-12 absolute error.\n"
+      <<"difference between D1 components and D2 components:\n";
+      for(int ii{0}; ii < 81; ++ii)
+      {
+      double dif = D1(ii) - D2(ii);
+      std::cout<<dif<<"\n";
+      }
+    }
   }
 
 // 设val较小
   std::cout<<"(4): Smaller val: 5 times\n";
   sleep(2);
-  for(int temp{1}; temp < 6; temp++)
+  for(int temp{1}; temp < 6; ++temp)
   {
     std::cout<<"Loop "<<temp<<"\n";
     sleep(1);
