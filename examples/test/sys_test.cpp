@@ -5,6 +5,7 @@
 #include "SymmMatrix_3x3.hpp"
 #include "HDF5_Reader.hpp"
 #include "PostVectSolution.hpp"
+#include "Tensor4_3D.hpp"
 
 
 int main(int argc, char *argv[])
@@ -19,7 +20,7 @@ int main(int argc, char *argv[])
 
   //for(auto out : a) std::cout<<out;
 
-  SymmMatrix_3x3 A;
+  /* SymmMatrix_3x3 A;
 
   A.gen_rand();
 
@@ -146,6 +147,284 @@ int main(int argc, char *argv[])
   std::cout << (eta3 - eta333) << std::endl;
   SymmMatrix_3x3 A3_ = gen_symm_part(B3_);
   (A3 - A3_).print();
+  */
+
+// 随机生成 A、B、val
+// D1使用新函数计算，D2使用旧函数计算
+  std::cout<<"\nTo test add_SymmOutProduct(val, A, B)\n"
+  <<"D_ijkl = I + val*(A_ij*B_kl + B_ij*A_kl):\n"
+  <<"D1 uses add_SymmOutProduct(val, A, B)\n"
+  <<"D2 uses add_OutProduct(val, A, B) + add_OutProduct(val, B, A)\n\n";
+  sleep(2);
+
+// 普通随机测试
+  std::cout<<"Ordinary random test: 5 times\n\n";
+  sleep(1);
+  for(int temp{1}; temp < 6; ++temp)
+  {
+    std::cout<<"Loop "<<temp<<"\n";
+    sleep(1);
+
+    srand(time(NULL));
+    Matrix_3x3 A;
+    A.gen_rand(); 
+    std::cout<<"matrix A =\n";
+    A.print();
+    std::cout<<"\n";
+    sleep(1);
+
+    srand(time(NULL));
+    Matrix_3x3 B;
+    B.gen_rand();
+    std::cout<<"matrix B =\n";
+    B.print();
+    std::cout<<"\n";
+    sleep(1);
+
+    srand(time(NULL));
+    double val = ( rand() % 1000 ) * 1.0e-3 - 0.5;
+    std::cout<<"val = \n"<<std::setprecision(9)<<val<<"\n";
+    std::cout<<"\n";
+    sleep(1);
+
+    Tensor4_3D D1;
+    D1.add_SymmOutProduct(val, A, B);
+    std::cout<<"tensor D1 = \n";
+    D1.print_in_mat();
+    std::cout<<"\n";
+    sleep(1);
+
+    Tensor4_3D D2;
+    D2.add_OutProduct(val, A, B);
+    D2.add_OutProduct(val, B, A);
+    std::cout<<"tensor D2 = \n";
+    D2.print_in_mat();
+    std::cout<<"\n";
+
+// 判断D1是否等于D2
+    std::cout<<"If D1 == D2 ?: "<<D1.is_identical(D2)<<"\n";
+
+    sleep(1);
+  }
+
+   std::cout<<"Extreme cases test:\n\n";
+  sleep(1);
+// 设一个矩阵的分量值较大
+  std::cout<<"(1): A's components are multiplied by a larger number: 5 times\n";
+  sleep(2);
+  for(int temp{1}; temp < 6; ++temp)
+  {
+    std::cout<<"Loop "<<temp<<"\n";
+    sleep(1);
+
+    srand(time(NULL));
+    Matrix_3x3 A;
+    A.gen_rand();
+    A *= 1.0e3;
+    std::cout<<"matrix A =\n";
+    A.print();
+    std::cout<<"\n";
+    sleep(1);
+
+    srand(time(NULL));
+    Matrix_3x3 B;
+    B.gen_rand();
+    std::cout<<"matrix B =\n";
+    B.print();
+    std::cout<<"\n";
+    sleep(1);
+
+    srand(time(NULL));
+    double val = ( rand() % 1000 ) * 1.0e-3 - 0.5;
+    std::cout<<"val = \n"<<std::setprecision(9)<<val<<"\n";
+    std::cout<<"\n";
+    sleep(1);
+
+    Tensor4_3D D1;
+    D1.add_SymmOutProduct(val, A, B);
+    std::cout<<"tensor D1 = \n";
+    D1.print_in_mat();
+    std::cout<<"\n";
+    sleep(1);
+
+    Tensor4_3D D2;
+    D2.add_OutProduct(val, A, B);
+    D2.add_OutProduct(val, B, A);
+    std::cout<<"tensor D2 = \n";
+    D2.print_in_mat();
+    std::cout<<"\n";
+    sleep(1);
+
+    if(D1.is_identical(D2) == 0){
+      std::cout<<"If D_ijkl is large, D1 cannot approximate to D2 within 10e-12 absolute error.\n"
+      <<"difference between D1 components and D2 components:\n";
+      for(int ii{0}; ii < 81; ++ii)
+      {
+      double dif = D1(ii) - D2(ii);
+      std::cout<<dif<<"\n";
+      }
+    }
+
+    std::cout<<"If D1 == D2 ?: "<<D1.is_identical(D2)<<"\n";   
+  }
+
+// 设一个矩阵的分量值较小
+  std::cout<<"(2): A's components are multiplied with a smaller number: 5 times\n";
+  sleep(2);
+  for(int temp{1}; temp < 6; ++temp)
+  {
+    std::cout<<"Loop "<<temp<<"\n";
+    sleep(1);
+
+    srand(time(NULL));
+    Matrix_3x3 A;
+    A.gen_rand();
+    A *= 1.0e-3;
+    std::cout<<"matrix A =\n";
+    A.print();
+    std::cout<<"\n";
+    sleep(1);
+
+    srand(time(NULL));
+    Matrix_3x3 B;
+    B.gen_rand();
+    std::cout<<"matrix B =\n";
+    B.print();
+    std::cout<<"\n";
+    sleep(1);
+
+    srand(time(NULL));
+    double val = ( rand() % 1000 ) * 1.0e-3 - 0.5;
+    std::cout<<"val = \n"<<std::setprecision(9)<<val<<"\n";
+    std::cout<<"\n";
+    sleep(1);
+
+    Tensor4_3D D1;
+    D1.add_SymmOutProduct(val, A, B);
+    std::cout<<"tensor D1 = \n";
+    D1.print_in_mat();
+    std::cout<<"\n";
+    sleep(1);
+
+    Tensor4_3D D2;
+    D2.add_OutProduct(val, A, B);
+    D2.add_OutProduct(val, B, A);
+    std::cout<<"tensor D2 = \n";
+    D2.print_in_mat();
+    std::cout<<"\n";
+    sleep(1);
+
+    std::cout<<"If D1 == D2 ?: "<<D1.is_identical(D2)<<"\n";
+  }
+
+
+
+// 设val较大
+  std::cout<<"(3): Larger val: 5 times\n";
+  sleep(2);
+  for(int temp{1}; temp < 6; ++temp)
+  {
+    std::cout<<"Loop "<<temp<<"\n";
+    sleep(1);
+
+    srand(time(NULL));
+    Matrix_3x3 A;
+    A.gen_rand();
+    std::cout<<"matrix A =\n";
+    A.print();
+    std::cout<<"\n";
+    sleep(1);
+
+    srand(time(NULL));
+    Matrix_3x3 B;
+    B.gen_rand();
+    std::cout<<"matrix B =\n";
+    B.print();
+    std::cout<<"\n";
+    sleep(1);
+
+    srand(time(NULL));
+    double val = (( rand() % 1000 ) * 1.0e-3 - 0.5) * 1.0e5;
+    std::cout<<"val = \n"<<std::setprecision(9)<<val<<"\n";
+    std::cout<<"\n";
+    sleep(1);
+
+    Tensor4_3D D1;
+    D1.add_SymmOutProduct(val, A, B);
+    std::cout<<"tensor D1 = \n";
+    D1.print_in_mat();
+    std::cout<<"\n";
+    sleep(1);
+
+    Tensor4_3D D2;
+    D2.add_OutProduct(val, A, B);
+    D2.add_OutProduct(val, B, A);
+    std::cout<<"tensor D2 = \n";
+    D2.print_in_mat();
+    std::cout<<"\n";
+    sleep(1);
+
+    std::cout<<"If D1 == D2 ?: "<<D1.is_identical(D2)<<"\n";
+    if(D1.is_identical(D2) == 0){
+      std::cout<<"If D_ijkl is large, D1 cannot approximate to D2 within 10e-12 absolute error.\n"
+      <<"difference between D1 components and D2 components:\n";
+      for(int ii{0}; ii < 81; ++ii)
+      {
+      double dif = D1(ii) - D2(ii);
+      std::cout<<dif<<"\n";
+      }
+    }
+  }
+
+// 设val较小
+  std::cout<<"(4): Smaller val: 5 times\n";
+  sleep(2);
+  for(int temp{1}; temp < 6; ++temp)
+  {
+    std::cout<<"Loop "<<temp<<"\n";
+    sleep(1);
+
+    srand(time(NULL));
+    Matrix_3x3 A;
+    A.gen_rand();
+    std::cout<<"matrix A =\n";
+    A.print();
+    std::cout<<"\n";
+    sleep(1);
+
+    srand(time(NULL));
+    Matrix_3x3 B;
+    B.gen_rand();
+    std::cout<<"matrix B =\n";
+    B.print();
+    std::cout<<"\n";
+    sleep(1);
+
+    srand(time(NULL));
+    double val = (( rand() % 1000 ) * 1.0e-3 - 0.5) * 1.0e-3;
+    std::cout<<"val = \n"<<std::setprecision(9)<<val<<"\n";
+    std::cout<<"\n";
+    sleep(1);
+
+    Tensor4_3D D1;
+    D1.add_SymmOutProduct(val, A, B);
+    std::cout<<"tensor D1 = \n";
+    D1.print_in_mat();
+    std::cout<<"\n";
+    sleep(1);
+
+    Tensor4_3D D2;
+    D2.add_OutProduct(val, A, B);
+    D2.add_OutProduct(val, B, A);
+    std::cout<<"tensor D2 = \n";
+    D2.print_in_mat();
+    std::cout<<"\n";
+    sleep(1);
+
+    std::cout<<"If D1 == D2 ?: "<<D1.is_identical(D2)<<"\n";
+  }
+
+  std::cout<<"Test finished.\n";
 
   return EXIT_SUCCESS;
 }
