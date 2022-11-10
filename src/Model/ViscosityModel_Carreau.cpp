@@ -67,7 +67,7 @@ double ViscosityModel_Carreau::get_mu( const double &D_xx, const double &D_yy,
 
 double ViscosityModel_Carreau::get_mu( const Matrix_3x3 &grad_velo ) const
 {
-  const SymmMatrix_3x3 D( grad_velo );
+  const SymmMatrix_3x3 D = gen_symm_part( grad_velo );
   const double DII = std::abs( D.I2() );
   const double pow_base = 1.0 + lambda * lambda * 4.0 * DII;
   return mu_inf + ( mu_0 - mu_inf ) * std::pow( pow_base, (n - 1.0) / 2.0 );
@@ -98,7 +98,7 @@ double ViscosityModel_Carreau::get_dmu_dI2( const double &D_xx,
 
 double ViscosityModel_Carreau::get_dmu_dI2( const Matrix_3x3 &grad_velo ) const
 {
-  const SymmMatrix_3x3 D( grad_velo );
+  const SymmMatrix_3x3 D = gen_symm_part( grad_velo );
   const double DII = std::abs( D.I2() );
   const double pow_base = 1.0 + lambda * lambda * 4.0 * DII;
   const double dmu_dvelo = ( mu_0 - mu_inf ) * ( n - 1.0 ) * lambda * 2.0 *
