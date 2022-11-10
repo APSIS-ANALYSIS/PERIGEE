@@ -52,7 +52,6 @@ class IViscosityModel
                                 const double &D_xz, const double &D_xy ) const = 0;
 
 		virtual double get_dmu_dI3( const Matrix_3x3 &grad_velo ) const = 0;
-
 };
 
 #endif

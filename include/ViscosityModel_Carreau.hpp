@@ -53,13 +53,13 @@ class ViscosityModel_Carreau : public IViscosityModel
     virtual double get_dmu_dI3( const Matrix_3x3 &grad_velo) const;
 
 		private:
-// ----------------------------------------------------------------------------
-// mu_inf : viscosity as shear rate tends to infinity
-// mu_0   : viscosity as shear rate tends to 0
-// lambda : a time constant
-// n      : an index shows the dependency of viscosity on shear rate
-// ----------------------------------------------------------------------------
-			double mu_inf, mu_0, lambda, n;
+    // ----------------------------------------------------------------------------
+    // mu_inf : viscosity as shear rate tends to infinity
+    // mu_0   : viscosity as shear rate tends to 0
+    // lambda : a time constant
+    // n      : an index shows the dependency of viscosity on shear rate
+    // ----------------------------------------------------------------------------
+    double mu_inf, mu_0, lambda, n;
 };
 
 #endif
