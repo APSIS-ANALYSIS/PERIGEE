@@ -1,8 +1,8 @@
 #include "ViscosityModel_Power_Law.hpp"
 
-ViscosityModel_Power_Law::ViscosityModel_Power_Law( const double &in_m,
-                                                    const double &in_n )
-: m( in_m ), n( in_n )
+ViscosityModel_Power_Law::ViscosityModel_Power_Law( const double &in_m_cons,
+                                                    const double &in_n_pli )
+: m_cons( in_m_cons ), n_pli( in_n_pli )
 {}
 
 ViscosityModel_Power_Law::ViscosityModel_Power_Law( const char * const &fname )
@@ -14,8 +14,8 @@ ViscosityModel_Power_Law::ViscosityModel_Power_Law( const char * const &fname )
 	SYS_T::print_fatal_if( h5r->read_string("/", "model_name") != get_model_name(),
 			"Error: ViscosityModel_Power_Law constructor does not match h5 file.\n");
 
-	m      = h5r -> read_doubleScalar("/", "m");
-	n      = h5r -> read_doubleScalar("/", "n");
+	m_cons = h5r -> read_doubleScalar("/", "m_cons");
+	n_pli  = h5r -> read_doubleScalar("/", "n_pli");
 
 	delete h5r;
 	H5Fclose(h5file);
@@ -27,8 +27,8 @@ ViscosityModel_Power_Law::~ViscosityModel_Power_Law()
 void ViscosityModel_Power_Law::print_info() const
 {
   SYS_T::commPrint("\t  ViscosityModel_Power_Law:: \n");
-  SYS_T::commPrint("\t  Zero Shear Viscosity     m       = %e \n", m);
-  SYS_T::commPrint("\t  Power Law Index          n       = %e \n", n);
+  SYS_T::commPrint("\t  Consistency       m_cons  = %e \n", m_cons);
+  SYS_T::commPrint("\t  Power Law Index   n_pli   = %e \n", n_pli);
 }
 
 void ViscosityModel_Power_Law::write_hdf5( const char * const &fname ) const
@@ -39,8 +39,8 @@ void ViscosityModel_Power_Law::write_hdf5( const char * const &fname ) const
     HDF5_Writer * h5w = new HDF5_Writer( file_id );
 
     h5w -> write_string("model_name", get_model_name());
-    h5w -> write_doubleScalar( "m", m);
-    h5w -> write_doubleScalar( "n", n);
+    h5w -> write_doubleScalar( "m_cons", m_cons);
+    h5w -> write_doubleScalar( "n_pli",  n_pli);
 
     delete h5w;
     H5Fclose(file_id);
@@ -55,7 +55,7 @@ double ViscosityModel_Power_Law::get_mu( const double &D_xx, const double &D_yy,
 {
   const SymmMatrix_3x3 D( D_xx, D_yy, D_zz, D_yz, D_xz, D_xy);
   const double DII = std::abs( D.I2() );
-  return m * std::pow( 2.0 * std::sqrt( DII ), n - 1.0 );
+  return m_cons * std::pow( 2.0 * std::sqrt( DII ), n_pli - 1.0 );
 }
 
 double ViscosityModel_Power_Law::get_mu( const Matrix_3x3 &grad_velo ) const
@@ -82,8 +82,8 @@ double ViscosityModel_Power_Law::get_dmu_dI2( const double &D_xx,
 {
   const SymmMatrix_3x3 D( D_xx, D_yy, D_zz, D_yz, D_xz, D_xy);
   const double DII = std::abs( D.I2() );
-  const double dmu_dvelo = m * ( n - 1.0) *
-                           std::pow( 2.0 * std::sqrt( DII ), n - 2.0 ) /
+  const double dmu_dvelo = m_cons * ( n_pli - 1.0) *
+                           std::pow( 2.0 * std::sqrt( DII ), n_pli - 2.0 ) /
                            std::sqrt( DII );
   return dmu_dvelo;
 }
