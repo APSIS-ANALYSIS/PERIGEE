@@ -12,7 +12,7 @@ class ViscosityModel_Power_Law : public IViscosityModel
 	public:
 		ViscosityModel_Power_Law() = delete;
 
-    ViscosityModel_Power_Law( const double &in_m, const double &in_n );
+    ViscosityModel_Power_Law( const double &in_m_cons, const double &in_n_pli );
 
 		ViscosityModel_Power_Law( const char * const &fname = "viscosity_model.h5");
 
@@ -53,10 +53,10 @@ class ViscosityModel_Power_Law : public IViscosityModel
 
 		private:
 // ----------------------------------------------------------------------------
-// m      : consistency ( Pa * s ^ n ) when n = 1, it is the same as viscosity
-// n      : an index shows the dependency of viscosity on shear rate
+// m_cons : consistency ( Pa * s ^ n ) when n = 1, it is the same as viscosity
+// n_pli  : an index shows the dependency of viscosity on shear rate
 // ----------------------------------------------------------------------------
-			double m, n;
+			double m_cons, n_pli;
 };
 
 #endif
