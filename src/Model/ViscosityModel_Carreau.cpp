@@ -1,8 +1,8 @@
 #include "ViscosityModel_Carreau.hpp"
 
 ViscosityModel_Carreau::ViscosityModel_Carreau( const double &in_mu_inf,
-const double &in_mu_0, const double &in_lambda, const double &in_n )
-: mu_inf( in_mu_inf ), mu_0( in_mu_0 ), lambda( in_lambda ), n( in_n )
+const double &in_mu_0, const double &in_lambda, const double &in_n_pli )
+: mu_inf( in_mu_inf ), mu_0( in_mu_0 ), lambda( in_lambda ), n_pli( in_n_pli )
 {}
 
 ViscosityModel_Carreau::ViscosityModel_Carreau( const char * const &fname )
@@ -17,7 +17,7 @@ ViscosityModel_Carreau::ViscosityModel_Carreau( const char * const &fname )
 	mu_inf = h5r -> read_doubleScalar("/", "mu_inf");
 	mu_0   = h5r -> read_doubleScalar("/", "mu_0");
 	lambda = h5r -> read_doubleScalar("/", "lambda");
-	n      = h5r -> read_doubleScalar("/", "n");
+	n_pli  = h5r -> read_doubleScalar("/", "n_pli");
 
 	delete h5r;
 	H5Fclose(h5file);
@@ -32,7 +32,7 @@ void ViscosityModel_Carreau::print_info() const
   SYS_T::commPrint("\t  Infinite Shear Viscosity mu_inf  = %e \n", mu_inf);
   SYS_T::commPrint("\t  Zero Shear Viscosity     mu_0    = %e \n", mu_0);
   SYS_T::commPrint("\t  Time Constant            lambda  = %e \n", lambda);
-  SYS_T::commPrint("\t  Power Law Index          n       = %e \n", n);
+  SYS_T::commPrint("\t  Power Law Index          n_pli   = %e \n", n_pli);
 }
 
 void ViscosityModel_Carreau::write_hdf5( const char * const &fname ) const
@@ -46,7 +46,7 @@ void ViscosityModel_Carreau::write_hdf5( const char * const &fname ) const
     h5w -> write_doubleScalar( "mu_inf", mu_inf);
     h5w -> write_doubleScalar( "mu_0", mu_0);
     h5w -> write_doubleScalar( "lambda", lambda);
-    h5w -> write_doubleScalar( "n", n);
+    h5w -> write_doubleScalar( "n_pli", n_pli);
 
     delete h5w;
     H5Fclose(file_id);
@@ -62,7 +62,7 @@ double ViscosityModel_Carreau::get_mu( const double &D_xx, const double &D_yy,
   const SymmMatrix_3x3 D( D_xx, D_yy, D_zz, D_yz, D_xz, D_xy);
   const double DII = std::abs( D.I2() );
   const double pow_base = 1.0 + lambda * lambda * 4.0 * DII;
-  return mu_inf + ( mu_0 - mu_inf ) * std::pow( pow_base, (n - 1.0) / 2.0 );
+  return mu_inf + ( mu_0 - mu_inf ) * std::pow( pow_base, (n_pli - 1.0) / 2.0 );
 }
 
 double ViscosityModel_Carreau::get_mu( const Matrix_3x3 &grad_velo ) const
@@ -90,8 +90,8 @@ double ViscosityModel_Carreau::get_dmu_dI2( const double &D_xx,
   const SymmMatrix_3x3 D( D_xx, D_yy, D_zz, D_yz, D_xz, D_xy);
   const double DII = std::abs( D.I2() );
   const double pow_base = 1.0 + lambda * lambda * 4.0 * DII;
-  const double dmu_dvelo = ( mu_0 - mu_inf ) * ( n - 1.0 ) * lambda * 2.0 *
-                           std::pow( pow_base, ( n - 3.0 ) / 2.0);
+  const double dmu_dvelo = ( mu_0 - mu_inf ) * ( n_pli - 1.0 ) * lambda * 2.0 *
+                           std::pow( pow_base, ( n_pli - 3.0 ) / 2.0);
   return dmu_dvelo;
 }
 
