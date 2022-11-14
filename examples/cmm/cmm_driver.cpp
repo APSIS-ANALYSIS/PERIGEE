@@ -609,6 +609,7 @@ int main( int argc, char *argv[] )
   delete locAssem_ptr; delete base; delete sol; delete dot_sol;
   delete sol_wall_disp; delete dot_sol_wall_disp; delete timeinfo; delete gbc;
   delete gloAssem_ptr; delete lsolver; delete nsolver; delete tsolver;
+  delete vismodel;
 
   PetscFinalize();
   return EXIT_SUCCESS;
