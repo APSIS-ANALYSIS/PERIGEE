@@ -3,7 +3,7 @@
 // ============================================================================
 // Vec_Tools.hpp
 // ----------------------------------------------------------------------------
-// VEC_T namespace contains a suite of functions for std::vector object.
+// VEC_T namespace contains a suite of functions for the std::vector object.
 // ============================================================================
 #include <iomanip>
 #include <algorithm>
@@ -54,7 +54,8 @@ namespace VEC_T
 
   // --------------------------------------------------------------------------
   // ! get_size
-  //   return the length of a std::vector in integer (rather than unsigned int).
+  //   return the length of a std::vector in signed int type (rather than 
+  //   unsigned int).
   // --------------------------------------------------------------------------
   template<typename T> int get_size( const std::vector<T> &vec )
   {
@@ -64,7 +65,7 @@ namespace VEC_T
   // --------------------------------------------------------------------------
   // ! shrink2fit  
   //   trim the capacity of vector.
-  //   See Item 17 in Effective STL by Scott Meyers
+  //   Ref. Item 17 in "Effective STL" by Scott Meyers
   // --------------------------------------------------------------------------
   template<typename T> void shrink2fit( std::vector<T> &vec )
   {
@@ -194,7 +195,7 @@ namespace VEC_T
 
   // --------------------------------------------------------------------------
   // ! cast_to_unsigned_int
-  //   This function is used to convert a std::vector<int> to std::vector<unsigned int>.
+  //   Convert a std::vector<int> to std::vector<unsigned int>.
   // --------------------------------------------------------------------------
   inline std::vector<unsigned int> cast_to_unsigned_int( const std::vector<int> &vec )
   {
