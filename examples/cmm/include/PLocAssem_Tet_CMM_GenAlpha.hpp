@@ -192,7 +192,7 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
     int nLocBas, snLocBas, vec_size, sur_size;
 
     // viscosity for general fluid models
-    const IViscosityModel * const vismodel;
+    IViscosityModel * vismodel;
 
     // Private functions
     void print_info() const;
