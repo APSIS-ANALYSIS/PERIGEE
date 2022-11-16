@@ -118,9 +118,6 @@ class PNonlinear_CMM_Solver
     const double nr_tol, na_tol, nd_tol;
     const int nmaxits, nrenew_freq, nrenew_threshold;
 
-    // vector container for the step update in the smaller matrix problem
-    PDNSolution * dot_step;
-
     void Print_convergence_info( const int &count, const double rel_err,
         const double abs_err ) const
     {SYS_T::commPrint("  === NR ite: %d, r_error: %e, a_error: %e \n", count, rel_err, abs_err);}
