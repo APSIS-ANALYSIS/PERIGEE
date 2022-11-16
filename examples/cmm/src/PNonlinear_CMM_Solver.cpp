@@ -283,7 +283,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
   Print_convergence_info(nl_counter, relative_error, residual_norm);
 
   // free the incremental solution vector
-  delete dot_step;
+  delete dot_step; dot_step = nullptr;
 
   // Debugging: check ring BC constraints
   // compute_ringbc_constraints(sol, sol_wall_disp, ringnbc_part);
@@ -457,7 +457,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_Prestress(
   }while(nl_counter<nmaxits && relative_error > nr_tol && residual_norm > na_tol);
 
   // free the incremental solution vector
-  delete dot_step;
+  delete dot_step; dot_step = nullptr;
 
   // --------------------------------------------------------------------------
   // Update the prestress values
