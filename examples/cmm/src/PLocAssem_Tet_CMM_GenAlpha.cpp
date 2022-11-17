@@ -245,8 +245,10 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
     }
 
     // Get the viscosity
-    const double vis_mu = vismodel->get_mu( 2.0*u_x, 2.0*v_y, 2.0*w_z,
-                                            v_z+w_y, u_z+w_x, u_y+v_x);
+    const double vis_mu = vismodel->get_mu( u_x, v_y, w_z,
+                                          0.5 * ( v_z + w_y ), 
+                                          0.5 * ( u_z + w_x ), 
+                                          0.5 * ( u_y + v_x ) );
     const double two_mu = 2.0 * vis_mu;
 
     // Get the tau_m and tau_c
@@ -424,8 +426,10 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
     }
 
     // Get the viscosity
-    const double vis_mu = vismodel->get_mu( 2.0*u_x, 2.0*v_y, 2.0*w_z,
-                                            v_z+w_y, u_z+w_x, u_y+v_x);
+    const double vis_mu = vismodel->get_mu( u_x, v_y, w_z,
+                                          0.5 * ( v_z + w_y ), 
+                                          0.5 * ( u_z + w_x ), 
+                                          0.5 * ( u_y + v_x ) );
     const double two_mu = 2.0 * vis_mu;
 
     // Get dmu_dI2
@@ -774,8 +778,10 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Mass_Residual(
     }
 
     // Get the viscosity
-    const double vis_mu = vismodel->get_mu( 2.0*u_x, 2.0*v_y, 2.0*w_z,
-                                            v_z+w_y, u_z+w_x, u_y+v_x);
+    const double vis_mu = vismodel->get_mu( u_x, v_y, w_z,
+                                          0.5 * ( v_z + w_y ), 
+                                          0.5 * ( u_z + w_x ), 
+                                          0.5 * ( u_y + v_x ) );
     const double two_mu = 2.0 * vis_mu;
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
