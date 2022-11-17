@@ -366,8 +366,8 @@ int main( int argc, char *argv[] )
   const double mu_inf = 0.0345;
   const double mu_0   = 0.56;
   const double lambda = 3.313;
-  const double n      = 0.3568; 
-  vismodel = new ViscosityModel_Carreau( mu_inf, mu_0, lambda, n );
+  const double n_pli  = 0.3568; 
+  vismodel = new ViscosityModel_Carreau( mu_inf, mu_0, lambda, n_pli );
   
   // ===== Local assembly routine =====
   IPLocAssem * locAssem_ptr = new PLocAssem_Tet_CMM_GenAlpha(
