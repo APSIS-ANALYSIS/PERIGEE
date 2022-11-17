@@ -61,7 +61,7 @@ double ViscosityModel_Power_Law::get_mu( const double &D_xx, const double &D_yy,
 double ViscosityModel_Power_Law::get_mu( const Matrix_3x3 &grad_velo ) const
 {
   const SymmMatrix_3x3 D = gen_symm_part( grad_velo );
-  return get_mu( D.xx(), D.yy(), D.zz(), D.yx(), D.xz(), D.xy() );
+  return get_mu( D.xx(), D.yy(), D.zz(), D.yz(), D.xz(), D.xy() );
 }
 
 double ViscosityModel_Power_Law::get_dmu_dI1( const double &D_xx,
@@ -91,7 +91,7 @@ double ViscosityModel_Power_Law::get_dmu_dI2( const double &D_xx,
 double ViscosityModel_Power_Law::get_dmu_dI2( const Matrix_3x3 &grad_velo ) const
 {
   const SymmMatrix_3x3 D = gen_symm_part( grad_velo );
-  return get_dmu_dI2( D.xx(), D.yy(), D.zz(), D.yx(), D.xz(), D.xy() );
+  return get_dmu_dI2( D.xx(), D.yy(), D.zz(), D.yz(), D.xz(), D.xy() );
 }
 
 double ViscosityModel_Power_Law::get_dmu_dI3( const double &D_xx,
@@ -104,6 +104,6 @@ double ViscosityModel_Power_Law::get_dmu_dI3( const double &D_xx,
 double ViscosityModel_Power_Law::get_dmu_dI3( const Matrix_3x3 &grad_velo ) const
 {
   const SymmMatrix_3x3 D = gen_symm_part( grad_velo );
-  return get_dmu_dI3( D.xx(), D.yy(), D.zz(), D.yx(), D.xz(), D.xy() );
+  return get_dmu_dI3( D.xx(), D.yy(), D.zz(), D.yz(), D.xz(), D.xy() );
 }
 
