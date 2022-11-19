@@ -433,8 +433,10 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
     const double two_mu = 2.0 * vis_mu;
 
     // Get dmu_dI2
-    const double dmu_dI2 = vismodel->get_dmu_dI2( 2.0*u_x, 2.0*v_y, 2.0*w_z,
-                                                    v_z+w_y, u_z+w_x, u_y+v_x);
+    const double dmu_dI2 = vismodel->get_dmu_dI2( u_x, v_y, w_z,
+                                                0.5 * ( v_z + w_y ), 
+                                                0.5 * ( u_z + w_x ), 
+                                                0.5 * ( u_y + v_x ) );
 
     get_tau(tau_m, tau_c, dt, dxi_dx, u, v, w, vis_mu);
 
