@@ -168,7 +168,10 @@ class Tensor4_3D
         const Matrix_3x3 &mright );
 
     // ------------------------------------------------------------------------
+    // add the out-product of two 2nd-order tensor in a symmetric fashion,
     // ten_ijkl += val * [  (mleft_ij mright_kl + mleft_kl mright_ij) ]
+    // this is equivalent to and faster than
+    // add_OutProduct(val, mleft, mright); add_OutProduct(val, mright, mleft);
     // ------------------------------------------------------------------------
     void add_SymmOutProduct( const double &val, const Matrix_3x3 &mleft,
         const Matrix_3x3 &mright );
