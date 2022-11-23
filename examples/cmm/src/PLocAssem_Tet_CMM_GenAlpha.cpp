@@ -140,6 +140,29 @@ void PLocAssem_Tet_CMM_GenAlpha::get_tau(
   tau_c_qua = Ctauc / denom_c;
 }
 
+double PLocAssem_Tet_CMM_GenAlpha::get_tau_m( const double &dt, 
+    const double * const &dxi_dx,
+    const double &uu, const double &vv, const double &ww,
+    const double &vis_mu ) const
+{}
+
+double PLocAssem_Tet_CMM_GenAlpha::get_tau_c( const double &dt, 
+    const double * const &dxi_dx,
+    const double &uu, const double &vv, const double &ww,
+    const double &vis_mu ) const
+{}
+
+double PLocAssem_Tet_CMM_GenAlpha::get_dtau_m_dmu( const double &dt, 
+    const double * const &dxi_dx,
+    const double &uu, const double &vv, const double &ww,
+    const double &vis_mu ) const
+{}
+
+double PLocAssem_Tet_CMM_GenAlpha::get_dtau_c_dmu( const double &dt, 
+    const double * const &dxi_dx,
+    const double &uu, const double &vv, const double &ww,
+    const double &vis_mu ) const
+{}
 
 double PLocAssem_Tet_CMM_GenAlpha::get_DC(
     const double * const &dxidx,
