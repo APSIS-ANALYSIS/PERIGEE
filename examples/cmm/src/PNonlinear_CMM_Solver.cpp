@@ -11,17 +11,11 @@ PNonlinear_CMM_Solver::PNonlinear_CMM_Solver(
   nmaxits(input_max_iteration), nrenew_freq(input_renew_freq),
   nrenew_threshold(input_renew_threshold)
 {
-  // Generate the incremental solution vector used for update 
-  // the solution of the nonlinear algebraic system 
-  dot_step = new PDNSolution_NS( anode_ptr, 0, false );
 }
-
 
 PNonlinear_CMM_Solver::~PNonlinear_CMM_Solver()
 {
-  delete dot_step; dot_step = nullptr;
 }
-
 
 void PNonlinear_CMM_Solver::print_info() const
 {
@@ -35,7 +29,6 @@ void PNonlinear_CMM_Solver::print_info() const
   SYS_T::commPrint("  tangent matrix renew threshold: %d \n", nrenew_threshold);
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
-
 
 void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
     const bool &new_tangent_flag,
@@ -181,6 +174,9 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
   VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
   SYS_T::commPrint("  Init res 2-norm: %e \n", initial_norm);
 
+  // Allocate the incremental solution vector
+  PDNSolution * dot_step = new PDNSolution( sol );
+
   // Now do consistent Newton-Raphson iteration
   do
   {
@@ -286,6 +282,9 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
 
   Print_convergence_info(nl_counter, relative_error, residual_norm);
 
+  // free the incremental solution vector
+  delete dot_step; dot_step = nullptr;
+
   // Debugging: check ring BC constraints
   // compute_ringbc_constraints(sol, sol_wall_disp, ringnbc_part);
 }
@@ -387,6 +386,9 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_Prestress(
   VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
   SYS_T::commPrint("  Init res 2-norm: %e \n", initial_norm);
 
+  // Allocate the incremental solution vector
+  PDNSolution * dot_step = new PDNSolution( sol );
+
   // Now do consistent Newton-Raphson iteration
   do
   {
@@ -453,6 +455,9 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_Prestress(
     SYS_T::print_fatal_if( relative_error >= nd_tol, "Error: nonlinear solver is diverging with error %e. Job killed.\n", relative_error);
 
   }while(nl_counter<nmaxits && relative_error > nr_tol && residual_norm > na_tol);
+
+  // free the incremental solution vector
+  delete dot_step; dot_step = nullptr;
 
   // --------------------------------------------------------------------------
   // Update the prestress values

@@ -13,7 +13,7 @@
 # VTK_DIR should be the vtk directory/lib/cmake/vtk-version,
 # which contains VTKConfig.cmake file.
 # In the guide, vtk directory is $HOME/lib/VTK-7.1.1-shared
-set(VTK_DIR /Users/makinokazuo/lib/VTK-7.1.1-shared/lib/cmake/vtk-7.1)
+set(VTK_DIR /Users/makinokazuo/lib/VTK-8.2.0-shared/lib/cmake/vtk-8.2)
 
 # Modify the PETSC_DIR variable to point to the location of PETSc.
 set(PETSC_DIR /Users/makinokazuo/lib/petsc-3.16.6-opt)
