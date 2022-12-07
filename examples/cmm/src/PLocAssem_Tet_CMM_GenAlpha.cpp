@@ -529,6 +529,9 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
 
     const double tau_m_2 = tau_m * tau_m;
 
+    const double dtau_m_dmu = get_dtau_m_dmu(dt, dxi_dx, u, v, w, vis_mu);
+    const double dtau_c_dmu = get_dtau_c_dmu(dt, dxi_dx, u, v, w, vis_mu);
+
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua); 
 
     const Vector_3 f_body = get_f(coor_x, coor_y, coor_z, curr);
