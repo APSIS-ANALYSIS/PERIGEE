@@ -165,7 +165,24 @@ double PLocAssem_Tet_CMM_GenAlpha::get_tau_c( const double &dt,
     const double * const &dxi_dx,
     const double &uu, const double &vv, const double &ww,
     const double &vis_mu ) const
-{}
+{
+  double G11, G12, G13, G22, G23, G33;
+  get_metric( dxi_dx, G11, G12, G13, G22, G23, G33 );
+
+  const double GdG = G11 * G11 + 2.0 * G12 * G12 + 2.0 * G13 * G13
+    + G22 * G22 + 2.0 * G23 * G23 + G33 * G33;
+
+  const double uGu = G11 * uu * uu + 2.0 * G12 * uu * vv + 2.0 * G13 * uu * ww
+    + G22 * vv * vv + 2.0 * G23 * vv * ww + G33 * ww * ww;
+
+  const double g_dot_g = G11 + G22 + G33;
+
+  const double temp_nu = vis_mu / rho0;
+
+  const double denom_m = CT / (dt*dt) + uGu + CI * temp_nu * temp_nu * GdG;
+
+  return Ctauc * rho0 * sqrt(denom_m) / g_dot_g;
+}
 
 double PLocAssem_Tet_CMM_GenAlpha::get_dtau_m_dmu( const double &dt, 
     const double * const &dxi_dx,
