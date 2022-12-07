@@ -18,8 +18,8 @@
 #include "NodalBC_3D_vtu.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_tet_outflow.hpp"
-#include "NBC_Partition_3D_inflow.hpp"
-#include "EBC_Partition_vtp_outflow.hpp"
+#include "NBC_Partition_inflow.hpp"
+#include "EBC_Partition_outflow.hpp"
 
 int main( int argc, char * argv[] )
 {

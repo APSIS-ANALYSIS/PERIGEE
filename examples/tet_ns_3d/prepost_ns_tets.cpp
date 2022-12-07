@@ -103,14 +103,13 @@ int main( int argc, char * argv[] )
   mnindex->write_hdf5("post_node_mapping");
 
   cout<<"=== Start Partition ... \n";
-  int proc_size = cpu_size; bool isPrintPartInfo = true;
+  int proc_size = cpu_size;
   SYS_T::Timer * mytimer = new SYS_T::Timer();
   for(int proc_rank = 0; proc_rank < proc_size; ++proc_rank)
   {
     mytimer->Reset(); mytimer->Start();
     IPart * part = new Part_Tet( mesh, global_part, mnindex, IEN,
-        ctrlPts, proc_rank, proc_size, dofNum, dofMat, elemType,
-        isPrintPartInfo );
+        ctrlPts, proc_rank, proc_size, dofNum, dofMat, elemType );
     part->write(part_file.c_str());
     mytimer->Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";

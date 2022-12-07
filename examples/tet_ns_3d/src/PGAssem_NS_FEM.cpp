@@ -644,7 +644,8 @@ double PGAssem_NS_FEM::Assem_surface_flowrate(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const ALocal_Inflow_NodalBC * const &infbc_part )
+    const ALocal_Inflow_NodalBC * const &infbc_part,
+    const int &nbc_id )
 {
   double * array = new double [nlgn * dof_sol];
   double * local = new double [snLocBas * dof_sol];
@@ -655,17 +656,17 @@ double PGAssem_NS_FEM::Assem_surface_flowrate(
 
   vec -> GetLocalArray( array );
 
-  const int num_sele = infbc_part -> get_num_local_cell();
+  const int num_sele = infbc_part -> get_num_local_cell(nbc_id);
 
   double esum = 0.0;
 
   for(int ee=0; ee<num_sele; ++ee)
   {
     // Obtain the LSIEN array
-    infbc_part -> get_SIEN( ee, LSIEN);
+    infbc_part -> get_SIEN( nbc_id, ee, LSIEN );
 
     // Obtain the control points coordinates
-    infbc_part -> get_ctrlPts_xyz( ee, sctrl_x, sctrl_y, sctrl_z);
+    infbc_part -> get_ctrlPts_xyz( nbc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
     // Obtain the solution vector in this element
     GetLocal(array, LSIEN, snLocBas, local);
@@ -751,7 +752,8 @@ double PGAssem_NS_FEM::Assem_surface_ave_pressure(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const ALocal_Inflow_NodalBC * const &infbc_part )
+    const ALocal_Inflow_NodalBC * const &infbc_part,
+    const int &nbc_id )
 {
   double * array = new double [nlgn * dof_sol];
   double * local = new double [snLocBas * dof_sol];
@@ -762,17 +764,17 @@ double PGAssem_NS_FEM::Assem_surface_ave_pressure(
 
   vec -> GetLocalArray( array );
 
-  const int num_sele = infbc_part -> get_num_local_cell();
+  const int num_sele = infbc_part -> get_num_local_cell(nbc_id);
 
   double val_pres = 0.0, val_area = 0.0;
 
   for(int ee=0; ee<num_sele; ++ee)
   {
     // Obtain the LSIEN array
-    infbc_part -> get_SIEN( ee, LSIEN);
+    infbc_part -> get_SIEN( nbc_id, ee, LSIEN );
 
     // Obtain the control points coordinates
-    infbc_part -> get_ctrlPts_xyz( ee, sctrl_x, sctrl_y, sctrl_z);
+    infbc_part -> get_ctrlPts_xyz( nbc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
     // Obtain the solution vector in this element
     GetLocal(array, LSIEN, snLocBas, local);

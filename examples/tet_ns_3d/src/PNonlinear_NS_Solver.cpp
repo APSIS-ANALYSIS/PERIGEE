@@ -244,30 +244,32 @@ void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
     const PDNSolution * const &sol_base,
     PDNSolution * const &sol ) const
 {
-  const int numnode = infbc -> get_Num_LD();
+  const int num_nbc = infbc -> get_num_nbc();
 
-  const double val = flrate -> get_flow_rate( stime );
-
-  double base_vals[3];
-  int base_idx[3];
-
-  for(int ii=0; ii<numnode; ++ii)
+  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
   {
-    const int node_index = infbc -> get_LDN( ii );
+    const int numnode = infbc -> get_Num_LD( nbc_id );
 
-    base_idx[0] = node_index * 4 + 1;
-    base_idx[1] = node_index * 4 + 2;
-    base_idx[2] = node_index * 4 + 3;
+    const double factor = flrate -> get_flow_rate( nbc_id, stime );
 
-    VecGetValues(sol_base->solution, 3, base_idx, base_vals);
+    for(int ii=0; ii<numnode; ++ii)
+    {
+      const int node_index = infbc -> get_LDN( nbc_id, ii );
+      
+      const int base_idx[3] = { node_index*4+1, node_index*4+2, node_index*4+3 };
 
-    VecSetValue(sol->solution, node_index*4+1, base_vals[0] * val, INSERT_VALUES);
-    VecSetValue(sol->solution, node_index*4+2, base_vals[1] * val, INSERT_VALUES);
-    VecSetValue(sol->solution, node_index*4+3, base_vals[2] * val, INSERT_VALUES);
+      double base_vals[3];
+
+      VecGetValues(sol_base->solution, 3, base_idx, base_vals);
+
+      const double vals[3] = { base_vals[0] * factor, base_vals[1] * factor,
+          base_vals[2] * factor };
+
+      VecSetValues(sol->solution, 3, base_idx, vals, INSERT_VALUES);
+    }
   }
 
-  VecAssemblyBegin(sol->solution); VecAssemblyEnd(sol->solution);
-  sol->GhostUpdate();
+  sol->Assembly_GhostUpdate();
 }
 
 // EOF
