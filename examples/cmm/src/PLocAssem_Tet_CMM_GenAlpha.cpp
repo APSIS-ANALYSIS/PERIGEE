@@ -739,7 +739,11 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_x * (ry * drx_du_B + rx * dry_du_B)
               - 2.0 * rho0 * tau_m_2 * ry * NA_y * dry_du_B
               - rho0 * tau_m_2 * NA_z * (ry * drz_du_B + rz * dry_du_B) 
-              + (dmu_dI2 * dI2_du) * (NA_x * (u_y + v_x) + 2.0 * NA_y * v_y + NA_z * (v_z + w_y))) );
+              + (dmu_dI2 * dI2_du) * (NA_x * (u_y + v_x) + 2.0 * NA_y * v_y + NA_z * (v_z + w_y))
+              + rho0 * dtau_m_dmu * dmu_dI2 * dI2_du * ry * velo_dot_gradR 
+              - rho0 * dtau_m_dmu * dmu_dI2 * dI2_du * NA * r_dot_gradv 
+              - 2.0 * rho0 * tau_m * dtau_m_dmu * dmu_dI2 * dI2_du * ry * r_dot_gradR 
+              + NA_y * dtau_c_dmu * dmu_dI2 * dI2_du * div_vel ) );
 
         Tangent[4*nLocBas*(4*A+2)+4*B+2] += gwts * (
             alpha_m * ( rho0 * NANB + velo_dot_gradR * rho0_2 * tau_m * NB
@@ -757,7 +761,11 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
               - 2.0 * rho0 * tau_m_2 * ry * NA_y * dry_dv_B
               - rho0 * tau_m_2 * NA_z * (ry * drz_dv_B + rz * dry_dv_B)
               + velo_prime_dot_gradR * tau_dc * velo_prime_dot_gradNB 
-              + (dmu_dI2 * dI2_dv) * (NA_x * (u_y + v_x) + 2.0 * NA_y * v_y + NA_z * (v_z + w_y))) );
+              + (dmu_dI2 * dI2_dv) * (NA_x * (u_y + v_x) + 2.0 * NA_y * v_y + NA_z * (v_z + w_y))
+              + rho0 * dtau_m_dmu * dmu_dI2 * dI2_dv * ry * velo_dot_gradR 
+              - rho0 * dtau_m_dmu * dmu_dI2 * dI2_dv * NA * r_dot_gradv 
+              - 2.0 * rho0 * tau_m * dtau_m_dmu * dmu_dI2 * dI2_dv * ry * r_dot_gradR 
+              + NA_y * dtau_c_dmu * dmu_dI2 * dI2_dv * div_vel ) );
 
         Tangent[4*nLocBas*(4*A+2)+4*B+3] += gwts * (
             alpha_m * (-1.0) * rho0_2 * ( tau_m * v_z * NANB + tau_m_2 * ry * NAzNB ) 
@@ -769,7 +777,11 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_x * (rx * dry_dw_B + ry * drx_dw_B)
               - rho0 * tau_m_2 * 2.0 * ry * NA_y * dry_dw_B
               - rho0 * tau_m_2 * NA_z * (ry * drz_dw_B + rz * dry_dw_B) 
-              + (dmu_dI2 * dI2_dw) * (NA_x * (u_y + v_x) + 2.0 * NA_y * v_y + NA_z * (v_z + w_y))) );
+              + (dmu_dI2 * dI2_dw) * (NA_x * (u_y + v_x) + 2.0 * NA_y * v_y + NA_z * (v_z + w_y))
+              + rho0 * dtau_m_dmu * dmu_dI2 * dI2_dw * ry * velo_dot_gradR 
+              - rho0 * dtau_m_dmu * dmu_dI2 * dI2_dw * NA * r_dot_gradv 
+              - 2.0 * rho0 * tau_m * dtau_m_dmu * dmu_dI2 * dI2_dw * ry * r_dot_gradR 
+              + NA_y * dtau_c_dmu * dmu_dI2 * dI2_dw * div_vel ) );
 
         // Momentum-z with respect to p u v w
         Tangent[4*nLocBas*(4*A+3)+4*B] += gwts * dd_dv * ( (-1.0) * NAzNB
