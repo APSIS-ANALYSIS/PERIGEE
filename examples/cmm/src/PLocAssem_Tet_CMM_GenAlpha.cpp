@@ -801,7 +801,11 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_x * (rx * drz_du_B + rz * drx_du_B)
               - rho0 * tau_m_2 * NA_y * (ry * drz_du_B + rz * dry_du_B)
               - 2.0 * rho0 * tau_m_2 * rz * NA_z * drz_du_B 
-              + (dmu_dI2 * dI2_du) * (NA_x * (u_z + w_x) + NA_y * (v_z + w_y) + 2.0 * NA_z * w_z)) );
+              + (dmu_dI2 * dI2_du) * (NA_x * (u_z + w_x) + NA_y * (v_z + w_y) + 2.0 * NA_z * w_z)
+              + rho0 * dtau_m_dmu * dmu_dI2 * dI2_du * rz * velo_dot_gradR 
+              - rho0 * dtau_m_dmu * dmu_dI2 * dI2_du * NA * r_dot_gradw 
+              - 2.0 * rho0 * tau_m * dtau_m_dmu * dmu_dI2 * dI2_du * rz * r_dot_gradR 
+              + NA_z * dtau_c_dmu * dmu_dI2 * dI2_du * div_vel ) );
 
         Tangent[4*nLocBas*(4*A+3)+4*B+2] += gwts * (
             alpha_m * (-1.0) * rho0_2 * (tau_m * w_y * NANB + tau_m_2 * rz * NAyNB)
@@ -813,7 +817,11 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_x * (rx * drz_dv_B + rz * drx_dv_B)
               - rho0 * tau_m_2 * NA_y * (ry * drz_dv_B + rz * dry_dv_B)
               - 2.0 * rho0 * tau_m_2 * rz * NA_z * drz_dv_B 
-              + (dmu_dI2 * dI2_dv) * (NA_x * (u_z + w_x) + NA_y * (v_z + w_y) + 2.0 * NA_z * w_z)) );
+              + (dmu_dI2 * dI2_dv) * (NA_x * (u_z + w_x) + NA_y * (v_z + w_y) + 2.0 * NA_z * w_z)
+              + rho0 * dtau_m_dmu * dmu_dI2 * dI2_dv * rz * velo_dot_gradR 
+              - rho0 * dtau_m_dmu * dmu_dI2 * dI2_dv * NA * r_dot_gradw 
+              - 2.0 * rho0 * tau_m * dtau_m_dmu * dmu_dI2 * dI2_dv * rz * r_dot_gradR 
+              + NA_z * dtau_c_dmu * dmu_dI2 * dI2_dv * div_vel ) );
 
         Tangent[4*nLocBas*(4*A+3)+4*B+3] += gwts * (
             alpha_m * ( rho0 * NANB + velo_dot_gradR * rho0_2 * tau_m * NB
@@ -831,7 +839,11 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
               - rho0 * tau_m_2 * NA_y * (ry * drz_dw_B + rz * dry_dw_B)
               - 2.0 * rho0 * tau_m_2 * NA_z * rz * drz_dw_B 
               + velo_prime_dot_gradR * tau_dc * velo_prime_dot_gradNB 
-              + (dmu_dI2 * dI2_dw) * (NA_x * (u_z + w_x) + NA_y * (v_z + w_y) + 2.0 * NA_z * w_z)) );
+              + (dmu_dI2 * dI2_dw) * (NA_x * (u_z + w_x) + NA_y * (v_z + w_y) + 2.0 * NA_z * w_z)
+              + rho0 * dtau_m_dmu * dmu_dI2 * dI2_dw * rz * velo_dot_gradR 
+              - rho0 * dtau_m_dmu * dmu_dI2 * dI2_dw * NA * r_dot_gradw 
+              - 2.0 * rho0 * tau_m * dtau_m_dmu * dmu_dI2 * dI2_dw * rz * r_dot_gradR 
+              + NA_z * dtau_c_dmu * dmu_dI2 * dI2_dw * div_vel ) );
       } // B-loop
     } // A-loop
   } // qua-loop
