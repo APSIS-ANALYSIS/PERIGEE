@@ -643,15 +643,18 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
 
         Tangent[16*nLocBas*A+4*B+1] += gwts * ( alpha_m * tau_m * rho0 * NAxNB
             + dd_dv * ( NANBx + tau_m * NA_x * drx_du_B
-              + tau_m * NA_y * dry_du_B + tau_m * NA_z * drz_du_B ) );
+              + tau_m * NA_y * dry_du_B + tau_m * NA_z * drz_du_B 
+              + dtau_m_dmu * dmu_dI2 * dI2_du * r_dot_gradR ) );
 
         Tangent[16*nLocBas*A+4*B+2] += gwts * ( alpha_m * tau_m * rho0 * NAyNB
             + dd_dv * ( NANBy + tau_m * NA_x * drx_dv_B
-              + tau_m * NA_y * dry_dv_B + tau_m * NA_z * drz_dv_B ) );
+              + tau_m * NA_y * dry_dv_B + tau_m * NA_z * drz_dv_B 
+              + dtau_m_dmu * dmu_dI2 * dI2_dv * r_dot_gradR ) );
 
         Tangent[16*nLocBas*A+4*B+3] += gwts * ( alpha_m * tau_m * rho0 * NAzNB
             + dd_dv * ( NANBz + tau_m * NA_x * drx_dw_B
-              + tau_m * NA_y * dry_dw_B + tau_m * NA_z * drz_dw_B ) );
+              + tau_m * NA_y * dry_dw_B + tau_m * NA_z * drz_dw_B
+              + dtau_m_dmu * dmu_dI2 * dI2_dw * r_dot_gradR ) );
 
         // Momentum-x with respect to p, u, v, w
         Tangent[4*nLocBas*(4*A+1)+4*B] += gwts * dd_dv * ((-1.0) * NAxNB
