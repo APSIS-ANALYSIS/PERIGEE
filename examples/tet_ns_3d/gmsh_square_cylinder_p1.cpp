@@ -26,6 +26,17 @@ int main(int argc, char * argv[] )
   const bool isXML = true;
   GIO -> write_vtu( wmname, isXML );
 
+  // Gmsh file should contain only one 3D domain
+  const int vol_id = 0;
+
+  GIO -> write_vtp( 0, vol_id, true); // assumed to be wall vtp
+  GIO -> write_vtp( 1, vol_id, true); // assumed to be inlet vtp
+  GIO -> write_vtp( 2, vol_id, true); // assumed to be outlet vtp
+  GIO -> write_vtp( 3, vol_id, true); // assumed to be top vtp
+  GIO -> write_vtp( 4, vol_id, true); // assumed to be bottom vtp
+  GIO -> write_vtp( 5, vol_id, true); // assumed to be front vtp
+  GIO -> write_vtp( 6, vol_id, true); // assumed to be back vtp
+
   delete GIO;
   PetscFinalize();
   return EXIT_SUCCESS;
