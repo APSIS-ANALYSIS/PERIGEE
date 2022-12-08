@@ -64,7 +64,7 @@ sudo gdebi AdbeRdr9.5.5-1_i386linux_enu.deb
 ```
 Then clean the .deb file from your disk.
 
-For machines with NVIDA graphic processors, you may need to install a driver. Run `ubuntu-drivers devices` to see the type of devices. Run `sudo ubuntu-drivers autoinstall` to install the recommended driver. Or, you may install specific driver by `sudo apt install nvidia-340`. You may refer to this [website](https://linuxconfig.org/benchmark-your-graphics-card-on-linux) to test your graphic card.
+For machines with NVIDA graphic processors, you may need to install a driver. Run `ubuntu-drivers devices` to see the type of devices. Run `sudo ubuntu-drivers autoinstall` to install the recommended driver. Or, you may install specific driver by `sudo apt install nvidia-340`. You may refer to this [website](https://linuxconfig.org/benchmark-your-graphics-card-on-linux) to test your graphic card. For more detailed guidance, you may refer to this [guide](https://zhuanlan.zhihu.com/p/59618999).
 
 ## Create a lib folder
 It is recommended to have all the libraries in a single lib folder. We typically create an empty folder in the $HOME directory.
