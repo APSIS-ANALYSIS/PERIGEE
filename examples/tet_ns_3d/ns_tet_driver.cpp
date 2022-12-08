@@ -344,7 +344,7 @@ int main(int argc, char *argv[])
   else if( GENBC_T::get_genbc_file_type( lpn_file ) == 4  )
     gbc = new GenBC_Coronary( lpn_file, 1000, initial_step, initial_index );
   else if( GENBC_T::get_genbc_file_type( lpn_file ) == 5  )
-    gbc = new GenBC_Pressure( lpn_file, initial_time );
+    gbc = new GenBC_Pressure( lpn_file initial_time );
   else
     SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
 
