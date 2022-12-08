@@ -40,9 +40,9 @@ int main( int argc, char * argv[] )
   
   // Default names for input geometry files
   std::string geo_file("./whole_vol.vtu");
-  std::string sur_file_in_base("./inlet_vol_");
+  std::string sur_file_in_base("./inflow_vol_");
   std::string sur_file_wall("./wall_vol.vtp");
-  std::string sur_file_out_base("./outlet_vol_");
+  std::string sur_file_out_base("./outflow_vol_");
 
   // Mesh partition setting
   int cpu_size = 1;
@@ -100,17 +100,12 @@ int main( int argc, char * argv[] )
   sur_file_in.resize( num_inlet );
 
   for(int ii=0; ii<num_inlet; ++ii)
-  {
-    std::ostringstream ss;
-    ss<<sur_file_in_base;
-    if( ii/10 == 0 ) ss<<"00";
-    else if( ii/100 == 0 ) ss<<"0";
-
-    if(elemType == 501 ) ss<<ii<<".vtp";
-    else ss<<ii<<".vtu";
-      
-    sur_file_in[ii] = ss.str(); // generate the inlet face file name
-    
+  {  
+    if(elemType == 501 )
+      sur_file_in[ii] = SYS_T::gen_capfile_name( sur_file_in_base, ii, ".vtp" );   
+    else
+      sur_file_in[ii] = SYS_T::gen_capfile_name( sur_file_in_base, ii, ".vtu" ); 
+  
     SYS_T::file_check(sur_file_in[ii]);
     cout<<sur_file_in[ii]<<" found. \n";
   }
@@ -121,16 +116,11 @@ int main( int argc, char * argv[] )
 
   for(int ii=0; ii<num_outlet; ++ii)
   {
-    std::ostringstream ss;
-    ss<<sur_file_out_base;
-    if( ii/10 == 0 ) ss<<"00";
-    else if( ii/100 == 0 ) ss<<"0";
-
-    if(elemType == 501 ) ss<<ii<<".vtp";
-    else ss<<ii<<".vtu";
-      
-    sur_file_out[ii] = ss.str(); // generate the outlet face file name
-    
+    if(elemType == 501 )
+      sur_file_out[ii] = SYS_T::gen_capfile_name( sur_file_out_base, ii, ".vtp" ); 
+    else
+      sur_file_out[ii] = SYS_T::gen_capfile_name( sur_file_out_base, ii, ".vtu" ); 
+ 
     SYS_T::file_check(sur_file_out[ii]);
     cout<<sur_file_out[ii]<<" found. \n";
   }
@@ -243,7 +233,6 @@ int main( int argc, char * argv[] )
   ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
  
   // Start partition the mesh for each cpu_rank 
-  // const bool isPrintPartInfo = true;
 
   std::vector<int> list_nlocalnode, list_nghostnode, list_ntotalnode, list_nbadnode;
   std::vector<double> list_ratio_g2l;
@@ -257,7 +246,7 @@ int main( int argc, char * argv[] )
     mytimer->Reset();
     mytimer->Start();
     IPart * part = new Part_Tet( mesh, global_part, mnindex, IEN,
-        ctrlPts, proc_rank, cpu_size, dofNum, dofMat, elemType);
+        ctrlPts, proc_rank, cpu_size, dofNum, dofMat, elemType );
     mytimer->Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
