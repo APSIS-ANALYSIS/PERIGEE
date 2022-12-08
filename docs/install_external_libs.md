@@ -19,7 +19,7 @@ module load mpi/intel/2018.4
 The above indicates that all modules are unloaded first and the intel/2018.4 compiler is loaded, and then the corresponding MPI is loaded.
 
 ## Table of Contents
-
+- [Setup the machine](#Setup-the-machine)
 - [Create a lib folder](#Create-a-lib-folder)
 - [Install Valgrind](#Install-Valgrind)
 - [Install CMake](#Install-CMake)
@@ -31,6 +31,38 @@ The above indicates that all modules are unloaded first and the intel/2018.4 com
 - [Install Gmsh](#Install-Gmsh)
 - [Install SLEPc](#Install-SLEPc)
 - [Install ParaView](#Install-ParaView)
+
+## Setup the machine
+Assuming that you just installed a Ubuntu system. You may want to do the following to setup the system with essiential components.
+```sh
+sudo apt update
+sudo apt upgrade
+sudo apt autoremove
+sudo apt install vim
+sudo apt install git-all
+sudo apt install build-essential
+sudo apt install texlive-latex-extra
+sudo apt install texlive-publishers
+sudo apt install texlive-science
+sudo apt install gfortran
+sudo apt install python2
+sudo apt install python3
+sudo apt install mesa-utils
+sudo apt install mesa-common-dev
+sudo apt install libgl1-mesa-dev
+sudo apt install libxt-dev
+sudo apt install cmake
+sudo apt install valgrind
+```
+Go to Ubuntu Software and install Texmaker, HDFView, and JabRef.
+
+For Acrobat Reader, you may need to run the following.
+```sh
+sudo apt install gdebi-core libxml2:i386 libcanberra-gtk-module:i386 gtk2-engines-murrine:i386 libatk-adaptor:i386
+wget ftp://ftp.adobe.com/pub/adobe/reader/unix/9.x/9.5.5/enu/AdbeRdr9.5.5-1_i386linux_enu.deb
+sudo gdebi AdbeRdr9.5.5-1_i386linux_enu.deb
+```
+Then clean the .deb file from your disk.
 
 ## Create a lib folder
 It is recommended to have all the libraries in a single lib folder. We typically create an empty folder in the $HOME directory.
