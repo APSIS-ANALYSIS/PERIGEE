@@ -25,6 +25,7 @@
 #include "GenBC_RCR.hpp"
 #include "GenBC_Inductance.hpp"
 #include "GenBC_Coronary.hpp"
+#include "GenBC_Pressure.hpp"
 #include "PLocAssem_Tet_VMS_NS_GenAlpha.hpp"
 #include "PGAssem_NS_FEM.hpp"
 #include "PTime_NS_Solver.hpp"
@@ -245,7 +246,8 @@ int main(int argc, char *argv[])
   if( SYS_T::file_exist( inflow_file ) )
     inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
   else
-    inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_tgt_rate );
+//    inflow_rate_ptr = new CVFlowRate_Linear2Steady( locinfnbc->get_num_nbc(), inflow_thd_time, inflow_tgt_rate );
+      inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_file );
 
   inflow_rate_ptr->print_info();
 
@@ -474,9 +476,9 @@ int main(int argc, char *argv[])
     {
       std::ofstream ofile;
       if( !is_restart )
-        ofile.open( locinfnbc->gen_flowfile_name().c_str(), std::ofstream::out | std::ofstream::trunc );
+        ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
       else
-        ofile.open( locinfnbc->gen_flowfile_name().c_str(), std::ofstream::out | std::ofstream::app );
+        ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
 
       if( !is_restart )
       {
