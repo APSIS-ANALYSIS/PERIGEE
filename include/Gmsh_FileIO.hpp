@@ -8,7 +8,6 @@
 // Date Created: July 1 2017
 // Author: Ju Liu
 // ==================================================================
-#include "Sys_Tools.hpp"
 #include "Tet_Tools.hpp"
 #include "HDF5_Writer.hpp"
 
