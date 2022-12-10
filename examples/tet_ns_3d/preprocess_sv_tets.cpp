@@ -18,8 +18,9 @@
 #include "NodalBC_3D_vtu.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_tet_outflow.hpp"
-#include "NBC_Partition_3D_inflow.hpp"
-#include "EBC_Partition_vtp_outflow.hpp"
+#include "NBC_Partition.hpp"
+#include "NBC_Partition_inflow.hpp"
+#include "EBC_Partition_outflow.hpp"
 
 int main( int argc, char * argv[] )
 {
@@ -35,10 +36,11 @@ int main( int argc, char * argv[] )
   // Element options: 501 linear tets, 502 quadratic tets
   int elemType = 501;
   int num_outlet = 1;
+  int num_inlet = 1;
   
   // Default names for input geometry files
   std::string geo_file("./whole_vol.vtu");
-  std::string sur_file_in("./inflow_vol.vtp");
+  std::string sur_file_in_base("./inflow_vol_");
   std::string sur_file_wall("./wall_vol.vtp");
   std::string sur_file_out_base("./outflow_vol_");
 
@@ -54,10 +56,11 @@ int main( int argc, char * argv[] )
   // Get the command line arguments
   SYS_T::GetOptionInt("-cpu_size", cpu_size);
   SYS_T::GetOptionInt("-in_ncommon", in_ncommon);
+  SYS_T::GetOptionInt("-num_inlet", num_inlet);
   SYS_T::GetOptionInt("-num_outlet", num_outlet);
   SYS_T::GetOptionInt("-elem_type", elemType);
   SYS_T::GetOptionString("-geo_file", geo_file);
-  SYS_T::GetOptionString("-sur_file_in", sur_file_in);
+  SYS_T::GetOptionString("-sur_file_in_base", sur_file_in_base);
   SYS_T::GetOptionString("-sur_file_wall", sur_file_wall);
   SYS_T::GetOptionString("-sur_file_out_base", sur_file_out_base);
 
@@ -68,7 +71,7 @@ int main( int argc, char * argv[] )
   cout<<" -elem_type: "<<elemType<<endl;
   cout<<" -num_outlet: "<<num_outlet<<endl;
   cout<<" -geo_file: "<<geo_file<<endl;
-  cout<<" -sur_file_in: "<<sur_file_in<<endl;
+  cout<<" -sur_file_in_base: "<<sur_file_in_base<<endl;
   cout<<" -sur_file_wall: "<<sur_file_wall<<endl;
   cout<<" -sur_file_out_base: "<<sur_file_out_base<<endl;
   cout<<" -part_file: "<<part_file<<endl;
@@ -86,15 +89,26 @@ int main( int argc, char * argv[] )
   // If it is quadratic mesh, the mesh file will be all in vtu format
   if(elemType == 502)
   {
-    sur_file_in.erase( sur_file_in.end()-4, sur_file_in.end() );
-    sur_file_in += ".vtu";
     sur_file_wall.erase( sur_file_wall.end()-4, sur_file_wall.end() );
     sur_file_wall += ".vtu";
   }
 
-  SYS_T::file_check(sur_file_in); cout<<sur_file_in<<" found. \n";
-
   SYS_T::file_check(sur_file_wall); cout<<sur_file_wall<<" found. \n";
+
+  // Generate the inlet file names and check existance
+  std::vector< std::string > sur_file_in;
+  sur_file_in.resize( num_inlet );
+
+  for(int ii=0; ii<num_inlet; ++ii)
+  {  
+    if(elemType == 501 )
+      sur_file_in[ii] = SYS_T::gen_capfile_name( sur_file_in_base, ii, ".vtp" );   
+    else
+      sur_file_in[ii] = SYS_T::gen_capfile_name( sur_file_in_base, ii, ".vtu" ); 
+  
+    SYS_T::file_check(sur_file_in[ii]);
+    cout<<sur_file_in[ii]<<" found. \n";
+  }
 
   // Generate the outlet file names and check existance
   std::vector< std::string > sur_file_out;
@@ -102,16 +116,11 @@ int main( int argc, char * argv[] )
 
   for(int ii=0; ii<num_outlet; ++ii)
   {
-    std::ostringstream ss;
-    ss<<sur_file_out_base;
-    if( ii/10 == 0 ) ss<<"00";
-    else if( ii/100 == 0 ) ss<<"0";
-
-    if(elemType == 501 ) ss<<ii<<".vtp";
-    else ss<<ii<<".vtu";
-      
-    sur_file_out[ii] = ss.str(); // generate the outlet face file name
-    
+    if(elemType == 501 )
+      sur_file_out[ii] = SYS_T::gen_capfile_name( sur_file_out_base, ii, ".vtp" ); 
+    else
+      sur_file_out[ii] = SYS_T::gen_capfile_name( sur_file_out_base, ii, ".vtu" ); 
+ 
     SYS_T::file_check(sur_file_out[ii]);
     cout<<sur_file_out[ii]<<" found. \n";
   }
@@ -120,6 +129,7 @@ int main( int argc, char * argv[] )
   hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
   HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
 
+  cmdh5w->write_intScalar("num_inlet", num_inlet);
   cmdh5w->write_intScalar("num_outlet", num_outlet);
   cmdh5w->write_intScalar("cpu_size", cpu_size);
   cmdh5w->write_intScalar("in_ncommon", in_ncommon);
@@ -127,7 +137,7 @@ int main( int argc, char * argv[] )
   cmdh5w->write_intScalar("dofMat", dofMat);
   cmdh5w->write_intScalar("elemType", elemType);
   cmdh5w->write_string("geo_file", geo_file);
-  cmdh5w->write_string("sur_file_in", sur_file_in);
+  cmdh5w->write_string("sur_file_in_base", sur_file_in_base);
   cmdh5w->write_string("sur_file_out_base", sur_file_out_base);
   cmdh5w->write_string("sur_file_wall", sur_file_wall);
   cmdh5w->write_string("part_file", part_file);
@@ -181,7 +191,9 @@ int main( int argc, char * argv[] )
   NBC_list.clear(); NBC_list.resize( dofMat );
 
   std::vector<std::string> dir_list;
-  dir_list.push_back( sur_file_in );
+  for(int ii=0; ii<num_inlet; ++ii)
+    dir_list.push_back( sur_file_in[ii] );
+ 
   dir_list.push_back( sur_file_wall );
 
   if(elemType == 501)
@@ -200,11 +212,15 @@ int main( int argc, char * argv[] )
   }
 
   // Inflow BC info
-  const Vector_3 inlet_outvec = TET_T::get_out_normal( sur_file_in, ctrlPts, IEN );
+  std::vector< Vector_3 > inlet_outvec( sur_file_in.size() );
+  for(unsigned int ii=0; ii<sur_file_in.size(); ++ii)
+    inlet_outvec[ii] = TET_T::get_out_normal( sur_file_in[ii], ctrlPts, IEN );
+
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall,
       nFunc, inlet_outvec, elemType );
 
   InFBC -> resetTriIEN_outwardnormal( IEN ); // assign outward orientation for triangles
+
 
   // Setup Elemental Boundary Conditions
   // Obtain the outward normal vector
@@ -217,7 +233,6 @@ int main( int argc, char * argv[] )
   ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
  
   // Start partition the mesh for each cpu_rank 
-  const bool isPrintPartInfo = true;
 
   std::vector<int> list_nlocalnode, list_nghostnode, list_ntotalnode, list_nbadnode;
   std::vector<double> list_ratio_g2l;
@@ -231,8 +246,7 @@ int main( int argc, char * argv[] )
     mytimer->Reset();
     mytimer->Start();
     IPart * part = new Part_Tet( mesh, global_part, mnindex, IEN,
-        ctrlPts, proc_rank, cpu_size, dofNum, dofMat, elemType,
-        isPrintPartInfo );
+        ctrlPts, proc_rank, cpu_size, dofNum, dofMat, elemType );
     mytimer->Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
@@ -242,17 +256,17 @@ int main( int argc, char * argv[] )
     part -> print_part_loadbalance_edgecut();
     
     // Partition Nodal BC and write to h5 file
-    INBC_Partition * nbcpart = new NBC_Partition_3D(part, mnindex, NBC_list);
+    NBC_Partition * nbcpart = new NBC_Partition(part, mnindex, NBC_list);
     
     nbcpart -> write_hdf5( part_file.c_str() );
 
     // Partition Nodal Inflow BC and write to h5 file
-    INBC_Partition * infpart = new NBC_Partition_3D_inflow(part, mnindex, InFBC);
+    NBC_Partition_inflow * infpart = new NBC_Partition_inflow(part, mnindex, InFBC);
     
     infpart->write_hdf5( part_file.c_str() );
     
     // Partition Elemental BC and write to h5 file
-    IEBC_Partition * ebcpart = new EBC_Partition_vtp_outflow(part, mnindex, ebc, NBC_list);
+    EBC_Partition * ebcpart = new EBC_Partition_outflow(part, mnindex, ebc, NBC_list);
 
     ebcpart -> write_hdf5( part_file.c_str() );
 

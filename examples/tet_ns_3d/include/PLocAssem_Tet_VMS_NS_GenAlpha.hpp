@@ -153,8 +153,6 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
 
     int nLocBas, snLocBas, vec_size, sur_size;
 
-    double dxi_dx[9];
-
     // Private functions
     void print_info() const;
 

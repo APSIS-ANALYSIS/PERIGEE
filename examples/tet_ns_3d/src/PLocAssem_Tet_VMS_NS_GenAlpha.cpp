@@ -190,6 +190,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
     element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
         &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
 
+    double dxi_dx[9];
     element->get_invJacobian( qua, dxi_dx );
 
     for(int ii=0; ii<nLocBas; ++ii)
@@ -366,6 +367,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
         &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
 
+    double dxi_dx[9];
     element->get_invJacobian( qua, dxi_dx );
 
     for(int ii=0; ii<nLocBas; ++ii)
