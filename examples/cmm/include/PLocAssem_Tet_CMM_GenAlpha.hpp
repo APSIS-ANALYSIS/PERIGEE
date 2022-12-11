@@ -197,40 +197,40 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
     // Private functions
     void print_info() const;
 
-    void get_metric( const double * const &dxi_dx,
+    void get_metric( const std::array<double,9> &dxi_dx,
         double &G11, double &G12, double &G13,
         double &G22, double &G23, double &G33 ) const;
 
     // Return tau_m and tau_c in RB-VMS
     void get_tau( double &tau_m_qua, double &tau_c_qua,
-        const double &dt, const double * const &dxi_dx,
+        const double &dt, const std::array<double,9> &dxi_dx,
         const double &u, const double &v, const double &w,
         const double &vis_mu ) const;
 
     // Return tau_m in RB-VMS
-    double get_tau_m( const double &dt, const double * const &dxi_dx,
+    double get_tau_m( const double &dt, const std::array<double,9> &dxi_dx,
         const double &uu, const double &vv, const double &ww,
         const double &vis_mu ) const;
 
     // Return tau_c in RB-VMS
-    double get_tau_c( const double &dt, const double * const &dxi_dx,
+    double get_tau_c( const double &dt, const std::array<double,9> &dxi_dx,
         const double &uu, const double &vv, const double &ww,
         const double &vis_mu ) const;
 
     // Return dtau_m / dmu with the goal of providing consistent linearization
     // of the residual for non-Newtonial fluid models
-    double get_dtau_m_dmu( const double &dt, const double * const &dxi_dx,
+    double get_dtau_m_dmu( const double &dt, const std::array<double,9> &dxi_dx,
         const double &uu, const double &vv, const double &ww,
         const double &vis_mu ) const;
     
     // Return dtau_c / dmu
-    double get_dtau_c_dmu( const double &dt, const double * const &dxi_dx,
+    double get_dtau_c_dmu( const double &dt, const std::array<double,9> &dxi_dx,
         const double &uu, const double &vv, const double &ww,
         const double &vis_mu ) const;
 
     // Return tau_bar := (v' G v')^-0.5 x rho0, 
     //        which scales like Time x Density
-    double get_DC( const double * const &dxi_dx,
+    double get_DC( const std::array<double,9> &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
     // Return body force acting on the fluid domain

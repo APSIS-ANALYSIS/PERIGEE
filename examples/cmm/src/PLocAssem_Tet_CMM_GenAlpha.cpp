@@ -83,7 +83,7 @@ void PLocAssem_Tet_CMM_GenAlpha::print_info() const
 
 
 void PLocAssem_Tet_CMM_GenAlpha::get_metric(
-    const double * const &f,
+    const std::array<double,9> &f,
     double &G11, double &G12, double &G13,
     double &G22, double &G23, double &G33 ) const
 {
@@ -113,7 +113,7 @@ void PLocAssem_Tet_CMM_GenAlpha::get_metric(
 
 void PLocAssem_Tet_CMM_GenAlpha::get_tau(
     double &tau_m_qua, double &tau_c_qua,
-    const double &dt, const double * const &dxidx,
+    const double &dt, const std::array<double,9> &dxidx,
     const double &u, const double &v, const double &w,
     const double &vis_mu ) const
 {
@@ -141,7 +141,7 @@ void PLocAssem_Tet_CMM_GenAlpha::get_tau(
 }
 
 double PLocAssem_Tet_CMM_GenAlpha::get_tau_m( const double &dt, 
-    const double * const &dxi_dx,
+    const std::array<double,9> &dxi_dx,
     const double &uu, const double &vv, const double &ww,
     const double &vis_mu ) const
 {
@@ -162,7 +162,7 @@ double PLocAssem_Tet_CMM_GenAlpha::get_tau_m( const double &dt,
 }
 
 double PLocAssem_Tet_CMM_GenAlpha::get_tau_c( const double &dt, 
-    const double * const &dxi_dx,
+    const std::array<double,9> &dxi_dx,
     const double &uu, const double &vv, const double &ww,
     const double &vis_mu ) const
 {
@@ -185,7 +185,7 @@ double PLocAssem_Tet_CMM_GenAlpha::get_tau_c( const double &dt,
 }
 
 double PLocAssem_Tet_CMM_GenAlpha::get_dtau_m_dmu( const double &dt, 
-    const double * const &dxi_dx,
+    const std::array<double,9> &dxi_dx,
     const double &uu, const double &vv, const double &ww,
     const double &vis_mu ) const
 {
@@ -206,7 +206,7 @@ double PLocAssem_Tet_CMM_GenAlpha::get_dtau_m_dmu( const double &dt,
 }
 
 double PLocAssem_Tet_CMM_GenAlpha::get_dtau_c_dmu( const double &dt, 
-    const double * const &dxi_dx,
+    const std::array<double,9> &dxi_dx,
     const double &uu, const double &vv, const double &ww,
     const double &vis_mu ) const
 {
@@ -229,7 +229,7 @@ double PLocAssem_Tet_CMM_GenAlpha::get_dtau_c_dmu( const double &dt,
 }
 
 double PLocAssem_Tet_CMM_GenAlpha::get_DC(
-    const double * const &dxidx,
+    const std::array<double,9> &dxidx,
     const double &u, const double &v, const double &w ) const
 {
   //double G11, G12, G13, G22, G23, G33;
@@ -282,9 +282,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
     element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
         &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
 
-    double dxi_dx[9];
-
-    element->get_invJacobian( qua, dxi_dx );
+    const std::array<double,9> dxi_dx = element->get_invJacobian( qua );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -463,9 +461,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
     element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
         &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
 
-    double dxi_dx[9];
-
-    element->get_invJacobian( qua, dxi_dx );
+    const std::array<double,9> dxi_dx = element->get_invJacobian( qua );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
