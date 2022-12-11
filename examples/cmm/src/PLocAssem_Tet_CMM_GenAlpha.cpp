@@ -279,8 +279,11 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
     double v_xx = 0.0, v_yy = 0.0, v_zz = 0.0;
     double w_xx = 0.0, w_yy = 0.0, w_zz = 0.0;
 
+    
     element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
         &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
+    // e.g. const std::vector<double> R = element->get_R(qua);
+    // e.g. const std::vector<double> dR_dx = element->get_dR_dx(qua);
 
     const std::array<double,9> dxi_dx = element->get_invJacobian( qua );
 
