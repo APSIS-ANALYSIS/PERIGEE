@@ -248,10 +248,8 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
   }
 }
 
-
 Gmsh_FileIO::~Gmsh_FileIO()
 {}
-
 
 void Gmsh_FileIO::print_info() const
 {
@@ -308,7 +306,6 @@ void Gmsh_FileIO::print_info() const
   std::cout<<"=== Total node number : "<<num_node<<std::endl;
   std::cout<<"=== Total element number : "<<num_elem<<std::endl;
 }
-
 
 void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
     const int &index_vol1, const int &index_vol2 ) const
@@ -503,7 +500,6 @@ void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
   delete mytimer;
 }
 
-
 void Gmsh_FileIO::write_vtp(const int &index_sur, 
     const int &index_vol, const bool &isf2e ) const
 {
@@ -658,7 +654,6 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
   delete mytimer;
 }
 
-
 void Gmsh_FileIO::write_each_vtu() const
 {
   std::cout<<"=== Gmsh_FileIO::wirte_each_vtu.\n";
@@ -733,7 +728,6 @@ void Gmsh_FileIO::write_each_vtu() const
   delete mytimer;
 }
 
-
 void Gmsh_FileIO::write_vtu( const std::string &in_fname, 
     const bool &isXML ) const
 {
@@ -780,7 +774,6 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
   delete mytimer;
 }
 
-
 void Gmsh_FileIO::check_FSI_ordering( const std::string &phy1,
    const std::string &phy2 ) const
 {
@@ -792,7 +785,6 @@ void Gmsh_FileIO::check_FSI_ordering( const std::string &phy1,
   SYS_T::print_fatal_if( name0.compare(phy1), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 0 should be fluid domain.\n" );
   SYS_T::print_fatal_if( name1.compare(phy2), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 1 should be solid domain.\n" );
 }
-
 
 void Gmsh_FileIO::write_tri_h5( const int &index_2d, 
     const std::vector<int> &index_1d ) const
@@ -968,7 +960,6 @@ void Gmsh_FileIO::write_tri_h5( const int &index_2d,
   H5Fclose( file_id );
 }
 
-
 void Gmsh_FileIO::write_tet_h5( const int &index_3d,
     const std::vector<int> &index_2d ) const
 {
@@ -1132,7 +1123,6 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
   delete h5w;
   H5Fclose( file_id ); 
 }
-
 
 void Gmsh_FileIO::write_tet_h5( const int &index_3d,
     const std::vector<int> &index_2d,
@@ -1302,7 +1292,6 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
   H5Fclose( file_id ); 
 }
 
-
 void Gmsh_FileIO::update_FSI_nodal_ordering()
 {
   // First generate the fluid and solid node lists
@@ -1359,7 +1348,6 @@ void Gmsh_FileIO::update_FSI_nodal_ordering()
   }
 }
 
-
 void Gmsh_FileIO::update_quadratic_tet_IEN( const int &index_3d )
 {
   SYS_T::print_fatal_if(index_3d < 0 || index_3d >= num_phy_domain_3d,
@@ -1383,7 +1371,6 @@ void Gmsh_FileIO::update_quadratic_tet_IEN( const int &index_3d )
     eIEN[domain_index][10*ee+9] = temp;
   }
 }
-
 
 void Gmsh_FileIO::write_quadratic_sur_vtu( const int &index_sur,
     const int &index_vol, const bool &isf2e ) const
