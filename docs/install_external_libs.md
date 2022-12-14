@@ -108,7 +108,7 @@ $ wget https://www.mpich.org/static/downloads/3.3rc1/mpich-3.3rc1.tar.gz
 $ tar -zxvf mpich-3.3rc1.tar.gz
 $ mv mpich-3.3rc1 mpich-3.3rc1-src
 ```
-Note that you may want to go to https://www.mpich.org/static/downloads/ to select the version of the MPICH implementation. Versions 3.2 and 3.3 are conservative choices. Now you may enter the folder and do the following to install MPICH at the prescribed location.
+Remark: you may want to go to https://www.mpich.org/static/downloads/ to select the version of the MPICH implementation. Versions 3.2 and 3.3 are conservative choices. Now you may enter the folder and do the following to install MPICH at the prescribed location.
 ```
 ./configure --prefix=$HOME/lib/mpich-3.3rc1 2>&1 | tee c.txt
 ```
