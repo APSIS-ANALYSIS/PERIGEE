@@ -244,7 +244,7 @@ $ tar -zxvf slepc-3.11.3.tar.gz
 $ mv slepc-3.11.3 slepc-3.11.3-src
 $ cd slepc-3.11.3-src
 $ export PETSC_DIR=/home/juliu/lib/petsc-3.11.3-debug
-$ export SLEPC_DIR=/home/juliu/lib/slepc-3.11.3
+$ export SLEPC_DIR=/home/juliu/lib/slepc-3.11.3-src
 $ ./configure --prefix=/home/juliu/lib/slepc-3.11.3-debug
 $ make SLEPC_DIR=/home/juliu/lib/slepc-3.11.3 PETSC_DIR=/home/juliu/lib/petsc-3.11.3-debug
 $ make SLEPC_DIR=/home/juliu/lib/slepc-3.11.3 PETSC_DIR=/home/juliu/lib/petsc-3.11.3-debug install
