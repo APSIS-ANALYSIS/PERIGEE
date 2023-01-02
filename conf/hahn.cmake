@@ -6,19 +6,19 @@ set(HOME_DIR /home/juliu)
 # ========================================================
 set(VTK_DIR ${HOME_DIR}/lib/VTK-8.2.0-SHARED/lib/cmake/vtk-8.2)
 
-set(MPI_DIR ${HOME_DIR}/lib/mpich-3.3)
+set(MPI_DIR ${HOME_DIR}/lib/mpich-3.3rc1)
 
 if( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
-  set(PETSC_DIR ${HOME_DIR}/lib/petsc-3.14.5-opt)
+  set(PETSC_DIR ${HOME_DIR}/lib/petsc-3.18.2-opt)
 else( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
-  set(PETSC_DIR ${HOME_DIR}/lib/petsc-3.14.5-debug)
+  set(PETSC_DIR ${HOME_DIR}/lib/petsc-3.18.2-debug)
 endif( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
 
 set(PETSC_ARCH .)
 
-set(HDF5_ROOT ${HOME_DIR}/lib/hdf5-1.13.2)
+set(HDF5_ROOT ${HOME_DIR}/lib/hdf5-1.12.2)
 
-set(GMSH_DIR ${HOME_DIR}/lib/gmsh-4.8.4)
+set(GMSH_DIR ${HOME_DIR}/lib/gmsh-4.11.0-Linux64-sdk)
 
 # ========================================================
 # Setup the libraries

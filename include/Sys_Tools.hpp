@@ -106,23 +106,23 @@ namespace SYS_T
   inline void synPrint(const std::string &output, const int &cpu_rank)
   {
     PetscSynchronizedPrintf(PETSC_COMM_WORLD, "Proc %d: ", cpu_rank);
-    PetscSynchronizedPrintf(PETSC_COMM_WORLD, output.c_str());
+    PetscSynchronizedPrintf(PETSC_COMM_WORLD, "%s", output.c_str());
     PetscSynchronizedFlush(PETSC_COMM_WORLD, PETSC_STDOUT);
   }
   inline void synPrint(const char * const &output, const int &cpu_rank)
   {
     PetscSynchronizedPrintf(PETSC_COMM_WORLD, "Proc %d: ", cpu_rank);
-    PetscSynchronizedPrintf(PETSC_COMM_WORLD, output);
+    PetscSynchronizedPrintf(PETSC_COMM_WORLD, "%s", output);
     PetscSynchronizedFlush(PETSC_COMM_WORLD, PETSC_STDOUT);
   }
   inline void synPrint(const std::string &output)
   {
-    PetscSynchronizedPrintf(PETSC_COMM_WORLD, output.c_str());
+    PetscSynchronizedPrintf(PETSC_COMM_WORLD, "%s", output.c_str());
     PetscSynchronizedFlush(PETSC_COMM_WORLD, PETSC_STDOUT);
   }
   inline void synPrint(const char * const &output)
   {
-    PetscSynchronizedPrintf(PETSC_COMM_WORLD, output);
+    PetscSynchronizedPrintf(PETSC_COMM_WORLD, "%s", output);
     PetscSynchronizedFlush(PETSC_COMM_WORLD, PETSC_STDOUT);
   }
 
@@ -143,11 +143,11 @@ namespace SYS_T
   //    and PETSC_COMM_WORLD. This is particularly designed to print
   //    command line arguments.
   inline void cmdPrint(const char * const &dataname, const int &datavalue)
-  {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, ss.str().c_str());}
+  {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, "%s", ss.str().c_str());}
   inline void cmdPrint(const char * const &dataname, const double &datavalue)
-  {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, ss.str().c_str());}
+  {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, "%s", ss.str().c_str());}
   inline void cmdPrint(const char * const &dataname, const std::string &datavalue)
-  {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, ss.str().c_str());}
+  {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, "%s", ss.str().c_str());}
 
   // 4. Print fatal error message and terminate the MPI process
   inline void print_fatal( const char output[], ... )
