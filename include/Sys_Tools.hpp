@@ -354,6 +354,20 @@ namespace SYS_T
     if(flg) outdata = char_outdata;
   }
 
+  inline void InsertFileYAML( const char * const &filename, const bool &require )
+  {
+#if PETSC_VERSION_GE(3,15,0)
+    commPrint("Status: loading YAML file %s from the disk.\n", filename);
+    if( require )
+      PetscOptionsInsertFileYAML(PETSC_COMM_WORLD, NULL, filename, PETSC_TRUE);
+    else
+      PetscOptionsInsertFileYAML(PETSC_COMM_WORLD, NULL, filename, PETSC_FALSE);
+#else
+    commPrint("Warning: YAML is unsupported in this PETSc.\n");
+#endif
+
+  }
+
   // ----------------------------------------------------------------
   // Check if a file exists. If a file cannot be found, throw an error
   // message and exit code
@@ -372,7 +386,7 @@ namespace SYS_T
   {
     if (dName.empty() || dName == "" || dName == "/0")
       return true;
-    
+
     struct stat info;
     if (stat(dName.c_str(), &info) == 0)
       return true;
@@ -438,7 +452,7 @@ namespace SYS_T
   {
     commPrint("----------------------------------------------------------------------\n");
   }
-  
+
   inline void print_sep_double_line()
   {
     commPrint("======================================================================\n");

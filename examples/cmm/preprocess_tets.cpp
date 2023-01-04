@@ -82,6 +82,8 @@ int main( int argc, char * argv[] )
 
   SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: preprocessor needs to be run in serial.\n");
 
+  SYS_T::InsertFileYAML( "preprocess_options.yml", false);
+
   // Get the command line arguments
   SYS_T::GetOptionInt(   "-cpu_size",          cpu_size);
   SYS_T::GetOptionInt(   "-in_ncommon",        in_ncommon);
