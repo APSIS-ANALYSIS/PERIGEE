@@ -301,6 +301,47 @@ namespace SYS_T
 #endif
   }
 
+  // ----------------------------------------------------------------
+  // Check if a file exists. If a file cannot be found, throw an error
+  // message and exit code
+  // ----------------------------------------------------------------
+  inline bool file_exist( const std::string &fName )
+  {
+    if( FILE *ff = fopen(fName.c_str(), "r") )
+    {
+      fclose(ff);
+      return true;
+    }
+    else return false;
+  }
+
+  inline bool directory_exist( const std::string &dName )
+  {
+    if (dName.empty() || dName == "" || dName == "/0")
+      return true;
+
+    struct stat info;
+    if (stat(dName.c_str(), &info) == 0)
+      return true;
+
+    return false;
+  }
+
+  inline void file_check( const std::string &fName )
+  {
+    print_fatal_if( !file_exist(fName), 
+        "Error: The file %s does not exist. Job is killed. \n", fName.c_str());
+  }
+
+  // --------------------------------------------------------------------------
+  // Execute a system call
+  // --------------------------------------------------------------------------
+  inline void execute( const char * const &command )
+  {
+    int sysret = system( command );
+    print_fatal_if(sysret != 0, "Error: system call %s failed. \n", command);
+  }
+
   // ================================================================
   // The folowing are options-get functions that read command-line
   // argument. They are really wrappers of the PetscOptionsGetXXXXX
@@ -354,59 +395,25 @@ namespace SYS_T
     if(flg) outdata = char_outdata;
   }
 
-  inline void InsertFileYAML( const char * const &filename, const bool &require )
+  inline void InsertFileYAML( const std::string &filename, const bool &require )
   {
 #if PETSC_VERSION_GE(3,15,0)
-    commPrint("Status: loading YAML file %s from the disk.\n", filename);
     if( require )
-      PetscOptionsInsertFileYAML(PETSC_COMM_WORLD, NULL, filename, PETSC_TRUE);
+    {
+      file_check( filename );
+      commPrint("Status: loading YAML file %s from the disk.\n", filename.c_str());
+      PetscOptionsInsertFileYAML(PETSC_COMM_WORLD, NULL, filename.c_str(), PETSC_TRUE);
+    }
     else
-      PetscOptionsInsertFileYAML(PETSC_COMM_WORLD, NULL, filename, PETSC_FALSE);
+    {
+      if(!file_exist(filename))
+        commPrint("Warning: the YAML file %s does not exist, and the command line arguments are loaded.\n", filename.c_str());
+
+      PetscOptionsInsertFileYAML(PETSC_COMM_WORLD, NULL, filename.c_str(), PETSC_FALSE);
+    }
 #else
     commPrint("Warning: YAML is unsupported in this PETSc.\n");
 #endif
-
-  }
-
-  // ----------------------------------------------------------------
-  // Check if a file exists. If a file cannot be found, throw an error
-  // message and exit code
-  // ----------------------------------------------------------------
-  inline bool file_exist( const std::string &fName )
-  {
-    if( FILE *ff = fopen(fName.c_str(), "r") )
-    {
-      fclose(ff);
-      return true;
-    }
-    else return false;
-  }
-
-  inline bool directory_exist( const std::string &dName )
-  {
-    if (dName.empty() || dName == "" || dName == "/0")
-      return true;
-
-    struct stat info;
-    if (stat(dName.c_str(), &info) == 0)
-      return true;
-
-    return false;
-  }
-
-  inline void file_check( const std::string &fName )
-  {
-    print_fatal_if( !file_exist(fName), 
-        "Error: The file %s does not exist. Job is killed. \n", fName.c_str());
-  }
-
-  // --------------------------------------------------------------------------
-  // Execute a system call
-  // --------------------------------------------------------------------------
-  inline void execute( const char * const &command )
-  {
-    int sysret = system( command );
-    print_fatal_if(sysret != 0, "Error: system call %s failed. \n", command);
   }
 
   // ================================================================
