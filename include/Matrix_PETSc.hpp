@@ -143,7 +143,7 @@ class Matrix_PETSc
     Mat K;
 
     // Global dimension of K matrix
-    int m, n;
+    int gm, gn;
 
     // Local dimension of K matrix
     int lm, ln;

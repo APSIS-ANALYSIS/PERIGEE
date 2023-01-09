@@ -9,7 +9,7 @@ Matrix_PETSc::Matrix_PETSc( const int &loc_row, const int &loc_col,
 
   is_set = false;
 
-  MatGetSize(K, &m, &n);
+  MatGetSize(K, &gm, &gn);
 
   lm = loc_row;
   ln = loc_col;  
@@ -23,7 +23,7 @@ Matrix_PETSc::Matrix_PETSc( const int &loc_row, const int &dnz, const int &onz )
 
   is_set = false;
 
-  MatGetSize(K, &m, &n);
+  MatGetSize(K, &gm, &gn);
 
   lm = loc_row;
   ln = loc_row; 
@@ -42,7 +42,7 @@ Matrix_PETSc::Matrix_PETSc(const APart_Node * const &pnode_ptr,
 
   is_set = false;
 
-  MatGetSize(K, &m, &n);
+  MatGetSize(K, &gm, &gn);
 }
 
 Matrix_PETSc::Matrix_PETSc(const APart_Node * const &pnode_ptr,
@@ -58,7 +58,7 @@ Matrix_PETSc::Matrix_PETSc(const APart_Node * const &pnode_ptr,
 
   is_set = false;
 
-  MatGetSize(K, &m, &n);
+  MatGetSize(K, &gm, &gn);
 }
 
 Matrix_PETSc::~Matrix_PETSc()
@@ -70,7 +70,7 @@ void Matrix_PETSc::gen_id(const APart_Node * const &pnode_ptr)
 {
   if(is_set) Clear();
 
-  SYS_T::print_fatal_if(m != n, "Error: This is not a square matrix. \n");
+  SYS_T::print_fatal_if(gm != gn, "Error: This is not a square matrix. \n");
 
   const int nnode = pnode_ptr->get_nlocalnode();
   const int dof   = pnode_ptr->get_dof();
@@ -94,7 +94,7 @@ void Matrix_PETSc::gen_perm_bc( const APart_Node * const &pnode_ptr,
 {
   if(is_set) Clear();
   
-  SYS_T::print_fatal_if(m != n, "Error: This is not a square matrix. \n");
+  SYS_T::print_fatal_if(gm != gn, "Error: This is not a square matrix. \n");
   
   const int nnode = pnode_ptr->get_nlocalnode();
   const int dof   = bc_part->get_dof_LID();
@@ -120,7 +120,7 @@ void Matrix_PETSc::gen_perm_bc( const std::vector<APart_Node *> &pnode_list,
   if(is_set) Clear();
 
   SYS_T::print_fatal_if( pnode_list.size() != bc_part_list.size(), "Error: the input apart_node and alocal_nodalbc should have the same length. \n");
-  SYS_T::print_fatal_if(m != n, "Error: This is not a square matrix. \n");
+  SYS_T::print_fatal_if(gm != gn, "Error: This is not a square matrix. \n");
 
   const int nfield = VEC_T::get_size(pnode_list);
   
@@ -150,7 +150,7 @@ void Matrix_PETSc::gen_extractor_for_Dirichlet_nodes(
 {
   if(is_set) Clear();
 
-  SYS_T::print_fatal_if(m != n, "Error: This is not a square matrix. \n");
+  SYS_T::print_fatal_if(gm != gn, "Error: This is not a square matrix. \n");
 
   const int nnode = pnode_ptr->get_nlocalnode();
   const int dof   = pnode_ptr->get_dof();
