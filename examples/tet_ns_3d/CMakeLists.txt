@@ -144,6 +144,7 @@ ADD_EXECUTABLE( prepost prepost_ns_tets.cpp)
 ADD_EXECUTABLE( vis_ns vis_ns.cpp)
 ADD_EXECUTABLE( vis_p1_wss vis_p1_wss.cpp)
 ADD_EXECUTABLE( vis_p2_wss vis_p2_wss.cpp)
+ADD_EXECUTABLE( test_mat test_mat.cpp)
 
 TARGET_LINK_LIBRARIES( gmsh_p1_IO perigee_preprocess )
 TARGET_LINK_LIBRARIES( gmsh_cyl_p1_IO perigee_preprocess )
@@ -154,5 +155,6 @@ TARGET_LINK_LIBRARIES( prepost perigee_preprocess )
 TARGET_LINK_LIBRARIES( vis_ns perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_p1_wss perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_p2_wss perigee_postprocess )
+TARGET_LINK_LIBRARIES( test_mat perigee_analysis )
 
 # EOF
