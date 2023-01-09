@@ -32,9 +32,11 @@ int main( int argc, char *argv[])
 
   Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
 
-  pmat->gen_perm_bc(pNode, locnbc);
+  pmat-> gen_id( pNode );
 
+  //pmat->gen_perm_bc(pNode, locnbc);
 
+  delete pmat;
   PetscFinalize();
   return EXIT_SUCCESS;
 }

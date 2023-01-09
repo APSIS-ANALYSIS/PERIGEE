@@ -9,6 +9,7 @@
 // Date: Feb. 14 2016
 // Author: Ju Liu
 // ============================================================================
+#include "PETSc_Tools.hpp"
 #include "ALocal_NodalBC.hpp"
 #include "ALocal_Ring_NodalBC.hpp"
 #include "PDNSolution.hpp"
