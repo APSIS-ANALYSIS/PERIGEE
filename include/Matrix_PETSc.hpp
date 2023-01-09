@@ -24,10 +24,10 @@ class Matrix_PETSc
     // permutation matrix.
     // ------------------------------------------------------------------------
     Matrix_PETSc( const int &loc_row, const int &loc_col, const int &dnz = 1,
-       const int &onz = 0 );
+       const int &onz = 1 );
 
     // loc_col = loc_row
-    Matrix_PETSc( const int &loc_row, const int &dnz = 1, const int &onz = 0 );
+    Matrix_PETSc( const int &loc_row, const int &dnz = 1, const int &onz = 1 );
 
     // ------------------------------------------------------------------------
     // Constructor: Generate a sparse square matrix with size defined
@@ -35,7 +35,7 @@ class Matrix_PETSc
     // * pnode_ptr->get_dof();
     // ------------------------------------------------------------------------
     Matrix_PETSc( const APart_Node * const &pnode_ptr, const int &dnz = 1,
-       const int &onz = 0 );
+       const int &onz = 1 );
 
     // ------------------------------------------------------------------------
     // Constructor: Generate a sparse square matrix with size defined
@@ -44,7 +44,7 @@ class Matrix_PETSc
     // ------------------------------------------------------------------------
     Matrix_PETSc( const APart_Node * const &pnode_ptr,
        const ALocal_NodalBC * const &bc_part,
-       const int &dnz = 1, const int &onz = 0 );
+       const int &dnz = 1, const int &onz = 1 );
 
     // ------------------------------------------------------------------------
     // Destroyer
