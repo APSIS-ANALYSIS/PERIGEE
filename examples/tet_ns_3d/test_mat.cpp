@@ -35,7 +35,8 @@ int main( int argc, char *argv[])
   //pmat-> gen_id( pNode );
 
   //pmat->gen_perm_bc(pNode, locnbc);
-  
+ 
+  /* 
   std::vector<APart_Node *> pnode_list;
   std::vector<ALocal_NodalBC *> bc_part_list;
 
@@ -43,6 +44,9 @@ int main( int argc, char *argv[])
   bc_part_list.push_back( locnbc );
 
   pmat -> gen_perm_bc( pnode_list, bc_part_list );
+  */
+
+  pmat -> gen_extractor_for_Dirichlet_nodes( pNode, locnbc );
 
   delete pmat;
   PetscFinalize();

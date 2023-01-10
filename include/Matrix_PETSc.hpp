@@ -128,7 +128,7 @@ class Matrix_PETSc
     //             0 0 0 ]       1 ]        0 ]
     // 
     // ------------------------------------------------------------------------
-    virtual void gen_extractor_for_Dirichlet_nodes( const APart_Node * const &pnode_ptr ,
+    virtual void gen_extractor_for_Dirichlet_nodes( const APart_Node * const &pnode_ptr,
         const ALocal_NodalBC * const &bc_part );
 
     // ------------------------------------------------------------------------
