@@ -122,6 +122,29 @@ void Matrix_PETSc::gen_perm_bc( const APart_Node * const &pnode_ptr,
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
 
+  // Obtain the precise dnz and onz count
+  std::vector<int> Kdnz, Konz;
+  PETSc_T::Get_dnz_onz(K, Kdnz, Konz);
+
+  MatDestroy(&K); // Destroy the K
+
+  // Create Mat with precise preallocation
+  MatCreateAIJ(PETSC_COMM_WORLD, lm, ln, PETSC_DETERMINE,
+      PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &K);
+
+  for(int ii=0; ii<nnode; ++ii)
+  {
+    for(int jj=0; jj<dof; ++jj)
+    {
+      const int row = pnode_ptr->get_node_loc(ii) * dof + jj;
+      const int col = bc_part->get_LID(jj, ii) * dof + jj;
+      MatSetValue(K, row, col, 1.0, INSERT_VALUES);
+    }
+  }
+
+  MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
+  MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
+
   is_set = true;
 }
 
