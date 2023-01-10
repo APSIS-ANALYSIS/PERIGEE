@@ -114,7 +114,8 @@ class Matrix_PETSc
     // NOTE: LID from the ALocal_NodalBC here should give the matrix row/col id
     // ------------------------------------------------------------------------
     virtual void gen_perm_bc( const std::vector<APart_Node *> &pnode_list,
-        const std::vector<ALocal_NodalBC *> &bc_part_list );
+        const std::vector<ALocal_NodalBC *> &bc_part_list,
+        const std::vector<int> &start_idx );
 
     // ------------------------------------------------------------------------
     // Gen_extractor_for_Dirichlet_nodes : Generate a matrix that is zero for

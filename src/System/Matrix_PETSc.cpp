@@ -109,6 +109,7 @@ void Matrix_PETSc::gen_perm_bc( const APart_Node * const &pnode_ptr,
   
   const int nnode = pnode_ptr->get_nlocalnode();
   const int dof   = bc_part->get_dof_LID();
+  
   for(int ii=0; ii<nnode; ++ii)
   {
     for(int jj=0; jj<dof; ++jj)
@@ -149,7 +150,8 @@ void Matrix_PETSc::gen_perm_bc( const APart_Node * const &pnode_ptr,
 }
 
 void Matrix_PETSc::gen_perm_bc( const std::vector<APart_Node *> &pnode_list,
-    const std::vector<ALocal_NodalBC *> &bc_part_list )
+    const std::vector<ALocal_NodalBC *> &bc_part_list, 
+    const std::vector<int> &start_idx )
 {
   if(is_set) Clear();
 
@@ -162,12 +164,14 @@ void Matrix_PETSc::gen_perm_bc( const std::vector<APart_Node *> &pnode_list,
   {
     const int dof   = pnode_list[ff] -> get_dof();
     const int nnode = pnode_list[ff] -> get_nlocalnode();
+    
     for(int ii=0; ii<nnode; ++ii)
     {
       for(int jj=0; jj<dof; ++jj)
       {
-        const int row = bc_part_list[ff] -> get_LID(jj, ii);
-        MatSetValue(K, row, row, 1.0, INSERT_VALUES);
+        const int row = start_idx[ff] + ii * dof + jj;
+        const int col = bc_part_list[ff] -> get_LID(jj, ii);
+        MatSetValue(K, row, col, 1.0, INSERT_VALUES);
       }
     }
   }
@@ -193,8 +197,9 @@ void Matrix_PETSc::gen_perm_bc( const std::vector<APart_Node *> &pnode_list,
     {
       for(int jj=0; jj<dof; ++jj)
       {
-        const int row = bc_part_list[ff] -> get_LID(jj, ii);
-        MatSetValue(K, row, row, 1.0, INSERT_VALUES);
+        const int row = start_idx[ff] + ii * dof + jj;
+        const int col = bc_part_list[ff] -> get_LID(jj, ii);
+        MatSetValue(K, row, col, 1.0, INSERT_VALUES);
       }
     }
   }
