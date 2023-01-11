@@ -28,7 +28,7 @@ class PGAssem_v360_FEM : public IPGAssem
         ALocal_Elem const * const &alelem_ptr,
         ALocal_IEN const * const &aien_ptr,
         APart_Node const * const &pnode_ptr,
-        ALocal_NodalBC const * const &part_nbc,
+        ALocal_NBC const * const &part_nbc,
         ALocal_EBC const * const &part_ebc );
 
     virtual ~PGAssem_v360_FEM();
@@ -38,7 +38,7 @@ class PGAssem_v360_FEM : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
-        const ALocal_NodalBC * const &nbc_part );
+        const ALocal_NBC * const &nbc_part );
 
     // --------------------------------------------------------------
     // Assem_mass_residual: Assembly the mass matrix and the residual
@@ -57,7 +57,7 @@ class PGAssem_v360_FEM : public IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
 
@@ -75,7 +75,7 @@ class PGAssem_v360_FEM : public IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
 
@@ -93,7 +93,7 @@ class PGAssem_v360_FEM : public IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
   private:
@@ -140,8 +140,8 @@ class PGAssem_v360_FEM : public IPGAssem
     double * sctrl_y;
     double * sctrl_z;
 
-    void EssBC_KG( const ALocal_NodalBC * const &nbc_part, const int &field );
-    void EssBC_G( const ALocal_NodalBC * const &nbc_part, const int &field );
+    void EssBC_KG( const ALocal_NBC * const &nbc_part, const int &field );
+    void EssBC_G( const ALocal_NBC * const &nbc_part, const int &field );
     
     void GetLocal(const double * const &array, const int * const &IEN,
         double * const &local_array) const
@@ -177,7 +177,7 @@ class PGAssem_v360_FEM : public IPGAssem
         const int &in_loc_dof,
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const lien_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
 
@@ -196,7 +196,7 @@ class PGAssem_v360_FEM : public IPGAssem
     void Get_dnz_onz( const int &nElem,
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         PetscInt * const &dnz, PetscInt * const &onz ) const;
 
 
@@ -212,7 +212,7 @@ class PGAssem_v360_FEM : public IPGAssem
     // --------------------------------------------------------------
     void Get_dnz_onz( const int &nlocnode,
         const int &empirical_neighbor_node_number,
-        const ALocal_NodalBC * const &nbc_ptr,
+        const ALocal_NBC * const &nbc_ptr,
         PetscInt * const &dnz, PetscInt * const &onz ) const;
 
 

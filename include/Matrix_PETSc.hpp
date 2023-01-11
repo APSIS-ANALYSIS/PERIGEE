@@ -10,7 +10,7 @@
 // Author: Ju Liu
 // ============================================================================
 #include "PETSc_Tools.hpp"
-#include "ALocal_NodalBC.hpp"
+#include "ALocal_NBC.hpp"
 #include "ALocal_Ring_NodalBC.hpp"
 #include "PDNSolution.hpp"
 #include "petscmat.h"
@@ -44,7 +44,7 @@ class Matrix_PETSc
     // * bc_part->get_dof_LID();
     // ------------------------------------------------------------------------
     Matrix_PETSc( const APart_Node * const &pnode_ptr,
-       const ALocal_NodalBC * const &bc_part,
+       const ALocal_NBC * const &bc_part,
        const int &dnz = 1, const int &onz = 1 );
 
     // ------------------------------------------------------------------------
@@ -106,15 +106,15 @@ class Matrix_PETSc
     // boundary conditions.
     // ------------------------------------------------------------------------
     virtual void gen_perm_bc( const APart_Node * const &pnode_ptr,
-        const ALocal_NodalBC * const &bc_part );
+        const ALocal_NBC * const &bc_part );
 
     // ------------------------------------------------------------------------
     // gen_perm_bc : Generate a permutation matrix for essential boundary
     // conditions for Multi-Field problems.
-    // NOTE: LID from the ALocal_NodalBC here should give the matrix row/col id
+    // NOTE: LID from the ALocal_NBC here should give the matrix row/col id
     // ------------------------------------------------------------------------
     virtual void gen_perm_bc( const std::vector<APart_Node *> &pnode_list,
-        const std::vector<ALocal_NodalBC *> &bc_part_list,
+        const std::vector<ALocal_NBC *> &bc_part_list,
         const std::vector<int> &start_idx );
 
     // ------------------------------------------------------------------------
@@ -130,7 +130,7 @@ class Matrix_PETSc
     // 
     // ------------------------------------------------------------------------
     virtual void gen_extractor_for_Dirichlet_nodes( const APart_Node * const &pnode_ptr,
-        const ALocal_NodalBC * const &bc_part );
+        const ALocal_NBC * const &bc_part );
 
     // ------------------------------------------------------------------------
     // MatMultSol : perform a matrix-vector multiplication : sol = K sol
