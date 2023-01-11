@@ -222,9 +222,9 @@ void Matrix_3x3::VecMult( const double &x0, const double &x1, const double &x2,
 
 Vector_3 Matrix_3x3::VecMultT( const Vector_3 &x ) const
 {
-  return Vector_3( mat[0] * x(0) + mat[3] * x(1) + mat[6] * x(2),
-      mat[1] * x(0) + mat[4] * x(1) + mat[7] * x(2),
-      mat[2] * x(0) + mat[5] * x(1) + mat[8] * x(2) );
+  return Vector_3( mat[0] * x.x() + mat[3] * x.y() + mat[6] * x.z(),
+      mat[1] * x.x() + mat[4] * x.y() + mat[7] * x.z(),
+      mat[2] * x.x() + mat[5] * x.y() + mat[8] * x.z() );
 }
 
 void Matrix_3x3::VecMultT(const double &x0, const double &x1, const double &x2,
@@ -346,9 +346,9 @@ void Matrix_3x3::find_eigen_vector( const double &eta, Vector_3 &v,
   Vector_3 b = (*this) * Vector_3(0.0, 1.0, 0.0); 
   Vector_3 c = (*this) * Vector_3(0.0, 0.0, 1.0); 
   
-  a(0) -= ( eta + frac13_tr );
-  b(1) -= ( eta + frac13_tr );
-  c(2) -= ( eta + frac13_tr );
+  a.x() -= ( eta + frac13_tr );
+  b.y() -= ( eta + frac13_tr );
+  c.z() -= ( eta + frac13_tr );
 
   const double len_a = a.norm2();
   const double len_b = b.norm2();
