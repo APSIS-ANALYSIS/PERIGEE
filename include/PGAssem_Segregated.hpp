@@ -29,7 +29,7 @@ class PGAssem_Segregated : public IPGAssem
         ALocal_Elem const * const &alelem_ptr,
         ALocal_IEN const * const &aien_ptr,
         APart_Node const * const &pnode_ptr,
-        ALocal_NodalBC const * const &part_nbc );
+        ALocal_NBC const * const &part_nbc );
 
     virtual ~PGAssem_Segregated();
 
