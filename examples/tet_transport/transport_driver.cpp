@@ -6,7 +6,7 @@
 #include "APart_Basic_Info.hpp"
 #include "ALocal_Elem.hpp"
 #include "ALocal_EBC.hpp"
-#include "ALocal_NodalBC.hpp"
+#include "ALocal_NBC.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
 #include "FEAElement_Tet4.hpp"
@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
 
   APart_Node * pNode = new APart_Node(part_file, rank);
 
-  ALocal_NodalBC * locnbc = new ALocal_NodalBC(part_file, rank);
+  ALocal_NBC * locnbc = new ALocal_NBC(part_file, rank);
 
   ALocal_EBC * locebc = new ALocal_EBC(part_file, rank);
 
