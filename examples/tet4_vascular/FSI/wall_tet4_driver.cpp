@@ -158,7 +158,7 @@ int main( int argc, char *argv[] )
 
   ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
 
-  ALocal_NodalBC * locnbc = new ALocal_NodalBC(part_file, rank);
+  ALocal_NBC * locnbc = new ALocal_NBC(part_file, rank);
 
   ALocal_EBC * locebc = new ALocal_EBC(part_file, rank);
 
