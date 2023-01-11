@@ -41,11 +41,6 @@ class Vector_3
     // Assignment operator
     Vector_3& operator= (const Vector_3 &source);
 
-    // Parenthesis operator gives access to components
-    double& operator()(const int &index) {return vec[index];}
-
-    const double& operator()(const int &index) const {return vec[index];}
-
     // Addition and substraction operators
     friend Vector_3 operator+( const Vector_3 &left, const Vector_3 &right );
 
