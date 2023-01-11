@@ -36,7 +36,7 @@ Matrix_PETSc::Matrix_PETSc(const APart_Node * const &pnode_ptr,
 }
 
 Matrix_PETSc::Matrix_PETSc(const APart_Node * const &pnode_ptr,
-    const ALocal_NodalBC * const &bc_part, const int &dnz, const int &onz )
+    const ALocal_NBC * const &bc_part, const int &dnz, const int &onz )
 : is_set( false )
 {
   SYS_T::commPrint("===> PETSc: MatCreateAIJ called. \n");
@@ -101,7 +101,7 @@ void Matrix_PETSc::gen_id(const APart_Node * const &pnode_ptr)
 }
 
 void Matrix_PETSc::gen_perm_bc( const APart_Node * const &pnode_ptr,
-   const ALocal_NodalBC * const &bc_part )
+   const ALocal_NBC * const &bc_part )
 {
   if(is_set) Clear();
   
@@ -150,7 +150,7 @@ void Matrix_PETSc::gen_perm_bc( const APart_Node * const &pnode_ptr,
 }
 
 void Matrix_PETSc::gen_perm_bc( const std::vector<APart_Node *> &pnode_list,
-    const std::vector<ALocal_NodalBC *> &bc_part_list, 
+    const std::vector<ALocal_NBC *> &bc_part_list, 
     const std::vector<int> &start_idx )
 {
   if(is_set) Clear();
@@ -212,7 +212,7 @@ void Matrix_PETSc::gen_perm_bc( const std::vector<APart_Node *> &pnode_list,
 
 void Matrix_PETSc::gen_extractor_for_Dirichlet_nodes( 
     const APart_Node * const &pnode_ptr ,
-    const ALocal_NodalBC * const &bc_part )
+    const ALocal_NBC * const &bc_part )
 {
   if(is_set) Clear();
 
