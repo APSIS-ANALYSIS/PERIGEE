@@ -1,6 +1,6 @@
-#include "ALocal_NodalBC.hpp"
+#include "ALocal_NBC.hpp"
 
-ALocal_NodalBC::ALocal_NodalBC( const std::string &fileBaseName, 
+ALocal_NBC::ALocal_NBC( const std::string &fileBaseName, 
     const int &cpu_rank, const std::string &gname )
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
@@ -12,7 +12,7 @@ ALocal_NodalBC::ALocal_NodalBC( const std::string &fileBaseName,
   nlocghonode = h5r->read_intScalar( "Local_Node", "nlocghonode" );
   LID = h5r->read_intVector( gname.c_str(), "LID" );
 
-  SYS_T::print_fatal_if( LID.size() % nlocghonode != 0, "Error:ALocal_NodalBC, LID length is not compatible with local and ghost node number. \n");
+  SYS_T::print_fatal_if( LID.size() % nlocghonode != 0, "Error:ALocal_NBC, LID length is not compatible with local and ghost node number. \n");
 
   dof = LID.size() / nlocghonode;
 
@@ -24,7 +24,7 @@ ALocal_NodalBC::ALocal_NodalBC( const std::string &fileBaseName,
 
   if( VEC_T::sum( Num_LD ) > 0 ) LDN = h5r->read_intVector( gname.c_str(), "LDN" );
 
-  SYS_T::print_fatal_if( int(LDN.size()) != VEC_T::sum( Num_LD ), "Error:ALocal_NodalBC, LDN length does not match Num_LD. \n" );
+  SYS_T::print_fatal_if( int(LDN.size()) != VEC_T::sum( Num_LD ), "Error:ALocal_NBC, LDN length does not match Num_LD. \n" );
 
   // Read local periodic nodes
   Num_LPS = h5r->read_intVector( gname.c_str(), "Num_LPS" );
@@ -35,8 +35,8 @@ ALocal_NodalBC::ALocal_NodalBC( const std::string &fileBaseName,
     LPMN = h5r->read_intVector( gname.c_str(), "LPMN" );
   }
 
-  SYS_T::print_fatal_if( int(LPSN.size()) != VEC_T::sum( Num_LPS ), "Error: ALocal_NodalBC, LPSN length does not match Num_LPS. \n" );
-  SYS_T::print_fatal_if( int(LPMN.size()) != VEC_T::sum( Num_LPS ), "Error: ALocal_NodalBC, LPMN length does not match Num_LPS. \n" );
+  SYS_T::print_fatal_if( int(LPSN.size()) != VEC_T::sum( Num_LPS ), "Error: ALocal_NBC, LPSN length does not match Num_LPS. \n" );
+  SYS_T::print_fatal_if( int(LPMN.size()) != VEC_T::sum( Num_LPS ), "Error: ALocal_NBC, LPMN length does not match Num_LPS. \n" );
 
   // Read local periodic master nodes
   Num_LPM = h5r->read_intVector( gname.c_str(), "Num_LPM" );
@@ -47,8 +47,8 @@ ALocal_NodalBC::ALocal_NodalBC( const std::string &fileBaseName,
     LocalMasterSlave = h5r->read_intVector( gname.c_str(), "LocalMasterSlave" );
   }
 
-  SYS_T::print_fatal_if( int(LocalMaster.size()) != VEC_T::sum( Num_LPM ), "Error: ALocal_NodalBC, LocalMaster length does not match Num_LPM. \n" );
-  SYS_T::print_fatal_if( int(LocalMasterSlave.size()) != VEC_T::sum( Num_LPM ), "Error: ALocal_NodalBC, LocalMasterSlave length does not match Num_LPM. \n" );
+  SYS_T::print_fatal_if( int(LocalMaster.size()) != VEC_T::sum( Num_LPM ), "Error: ALocal_NBC, LocalMaster length does not match Num_LPM. \n" );
+  SYS_T::print_fatal_if( int(LocalMasterSlave.size()) != VEC_T::sum( Num_LPM ), "Error: ALocal_NBC, LocalMasterSlave length does not match Num_LPM. \n" );
 
   delete h5r; H5Fclose( file_id );
 
@@ -68,7 +68,7 @@ ALocal_NodalBC::ALocal_NodalBC( const std::string &fileBaseName,
   VEC_T::shrink2fit( LPM_offset );
 }
 
-ALocal_NodalBC::~ALocal_NodalBC()
+ALocal_NBC::~ALocal_NBC()
 {
   clean_LocalMaster();
   VEC_T::clean(LID);
@@ -77,9 +77,9 @@ ALocal_NodalBC::~ALocal_NodalBC()
   VEC_T::clean(LD_offset); VEC_T::clean(LPS_offset);
 }
 
-void ALocal_NodalBC::print_info() const
+void ALocal_NBC::print_info() const
 {
-  std::cout<<"ALocal_NodalBC: \n";
+  std::cout<<"ALocal_NBC: \n";
 
   std::cout<<"LID: \n";
 
