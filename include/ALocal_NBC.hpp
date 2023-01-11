@@ -1,7 +1,7 @@
-#ifndef ALOCAL_NODALBC_HPP
-#define ALOCAL_NODALBC_HPP
+#ifndef ALOCAL_NBC_HPP
+#define ALOCAL_NBC_HPP
 // ============================================================================
-// ALocal_NodalBC.hpp
+// ALocal_NBC.hpp
 //
 // FEM-analysis-use Local subdomain's Nodal Boundary Conditions.
 //
@@ -10,7 +10,7 @@
 // ============================================================================
 #include "HDF5_Reader.hpp"
 
-class ALocal_NodalBC
+class ALocal_NBC
 {
   public:
     // ------------------------------------------------------------------------
@@ -19,10 +19,10 @@ class ALocal_NodalBC
     // This function is specifically designed to read the nbc for mesh motion 
     // equations in FSI problem, which are stored under the gname mesh_nbc.
     // ------------------------------------------------------------------------
-    ALocal_NodalBC( const std::string &fileBaseName, 
+    ALocal_NBC( const std::string &fileBaseName, 
         const int &cpu_rank, const std::string &gname="/nbc" );
 
-    virtual ~ALocal_NodalBC();
+    virtual ~ALocal_NBC();
 
     // ------------------------------------------------------------------------
     // print information
