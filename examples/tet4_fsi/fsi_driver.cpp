@@ -284,11 +284,11 @@ int main(int argc, char *argv[])
 
   ALocal_Inflow_NodalBC * locinfnbc = new ALocal_Inflow_NodalBC(part_v_file, rank);
 
-  ALocal_NodalBC * locnbc_v = new ALocal_NodalBC(part_v_file, rank, "/nbc/MF");
+  ALocal_NBC * locnbc_v = new ALocal_NBC(part_v_file, rank, "/nbc/MF");
   
-  ALocal_NodalBC * locnbc_p = new ALocal_NodalBC(part_p_file, rank, "/nbc/MF");
+  ALocal_NBC * locnbc_p = new ALocal_NBC(part_p_file, rank, "/nbc/MF");
 
-  ALocal_NodalBC * mesh_locnbc = new ALocal_NodalBC(part_v_file, rank, "/mesh_nbc/MF");
+  ALocal_NBC * mesh_locnbc = new ALocal_NBC(part_v_file, rank, "/mesh_nbc/MF");
 
   ALocal_EBC * locebc_v = new ALocal_EBC_outflow(part_v_file, rank);
   
@@ -298,14 +298,14 @@ int main(int argc, char *argv[])
 
   Prestress_solid * ps_data = new Prestress_solid(locElem, nqp_tet, rank, is_load_ps, "./ps_data/prestress");
 
-  // Group APart_Node and ALocal_NodalBC into a vector
+  // Group APart_Node and ALocal_NBC into a vector
   std::vector<APart_Node *> pNode_list { pNode_v, pNode_p };
 
-  std::vector<ALocal_NodalBC *> locnbc_list { locnbc_v, locnbc_p };
+  std::vector<ALocal_NBC *> locnbc_list { locnbc_v, locnbc_p };
 
   std::vector<APart_Node *> pNode_m_list { pNode_v };
 
-  std::vector<ALocal_NodalBC *> locnbc_m_list { mesh_locnbc };
+  std::vector<ALocal_NBC *> locnbc_m_list { mesh_locnbc };
 
   // ===== Basic Checking =====
   SYS_T::print_fatal_if( size!= PartBasic->get_cpu_size(),
