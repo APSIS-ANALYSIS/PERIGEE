@@ -27,13 +27,13 @@ int main( int argc, char *argv[])
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
   const PetscMPIInt rank = SYS_T::get_MPI_rank();
-  ALocal_NodalBC * locnbc = new ALocal_NodalBC(part_file, rank);
+  ALocal_NBC * locnbc = new ALocal_NBC(part_file, rank);
   APart_Node * pNode = new APart_Node(part_file, rank);
 
   Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
 
   std::vector<APart_Node *> pnode_list;
-  std::vector<ALocal_NodalBC *> bc_part_list;
+  std::vector<ALocal_NBC *> bc_part_list;
   std::vector<int> start_idx;
 
   pnode_list.push_back( pNode );
