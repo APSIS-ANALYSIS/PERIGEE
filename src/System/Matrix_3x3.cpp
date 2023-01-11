@@ -25,9 +25,9 @@ Matrix_3x3::Matrix_3x3(
 Matrix_3x3::Matrix_3x3(
     const Vector_3 &vec1, const Vector_3 &vec2, const Vector_3 &vec3 )
 {
-  mat[0] = vec1.x(); mat[1] = vec2.x(); mat[2] = vec3.x();
-  mat[3] = vec1.y(); mat[4] = vec2.y(); mat[5] = vec3.y();
-  mat[6] = vec1.z(); mat[7] = vec2.z(); mat[8] = vec3.z();
+  mat[0] = vec1(0); mat[1] = vec2(0); mat[2] = vec3(0);
+  mat[3] = vec1(1); mat[4] = vec2(1); mat[5] = vec3(1);
+  mat[6] = vec1(2); mat[7] = vec2(2); mat[8] = vec3(2);
 }
 
 Matrix_3x3::~Matrix_3x3()
@@ -125,23 +125,23 @@ void Matrix_3x3::gen_hilb()
 
 void Matrix_3x3::gen_outprod( const Vector_3 &va, const Vector_3 &vb ) 
 {
-  mat[0] = va.x() * vb.x(); mat[1] = va.x() * vb.y(); mat[2] = va.x() * vb.z();
-  mat[3] = va.y() * vb.x(); mat[4] = va.y() * vb.y(); mat[5] = va.y() * vb.z();
-  mat[6] = va.z() * vb.x(); mat[7] = va.z() * vb.y(); mat[8] = va.z() * vb.z();
+  mat[0] = va(0) * vb(0); mat[1] = va(0) * vb(1); mat[2] = va(0) * vb(2);
+  mat[3] = va(1) * vb(0); mat[4] = va(1) * vb(1); mat[5] = va(1) * vb(2);
+  mat[6] = va(2) * vb(0); mat[7] = va(2) * vb(1); mat[8] = va(2) * vb(2);
 }
 
 void Matrix_3x3::gen_outprod( const Vector_3 &va )
 {
-  mat[0] = va.x() * va.x(); mat[1] = va.x() * va.y(); mat[2] = va.x() * va.z();
-  mat[3] = va.y() * va.x(); mat[4] = va.y() * va.y(); mat[5] = va.y() * va.z();
-  mat[6] = va.z() * va.x(); mat[7] = va.z() * va.y(); mat[8] = va.z() * va.z();
+  mat[0] = va(0) * va(0); mat[1] = va(0) * va(1); mat[2] = va(0) * va(2);
+  mat[3] = va(1) * va(0); mat[4] = va(1) * va(1); mat[5] = va(1) * va(2);
+  mat[6] = va(2) * va(0); mat[7] = va(2) * va(1); mat[8] = va(2) * va(2);
 }
 
 void Matrix_3x3::add_outprod( const double &val, const Vector_3 &va, const Vector_3 &vb ) 
 {
-  mat[0] += val * va.x() * vb.x(); mat[1] += val * va.x() * vb.y(); mat[2] += val * va.x() * vb.z();
-  mat[3] += val * va.y() * vb.x(); mat[4] += val * va.y() * vb.y(); mat[5] += val * va.y() * vb.z();
-  mat[6] += val * va.z() * vb.x(); mat[7] += val * va.z() * vb.y(); mat[8] += val * va.z() * vb.z();
+  mat[0] += val * va(0) * vb(0); mat[1] += val * va(0) * vb(1); mat[2] += val * va(0) * vb(2);
+  mat[3] += val * va(1) * vb(0); mat[4] += val * va(1) * vb(1); mat[5] += val * va(1) * vb(2);
+  mat[6] += val * va(2) * vb(0); mat[7] += val * va(2) * vb(1); mat[8] += val * va(2) * vb(2);
 }
 
 void Matrix_3x3::transpose()
@@ -200,16 +200,16 @@ double Matrix_3x3::I2() const
 
 double Matrix_3x3::VecMatVec( const Vector_3 &x, const Vector_3 &y ) const
 {
-  return x.x() * ( mat[0] * y.x() + mat[1] * y.y() + mat[2] * y.z() )
-    + x.y() * ( mat[3] * y.x() + mat[4] * y.y() + mat[5] * y.z() )
-    + x.z() * ( mat[6] * y.x() + mat[7] * y.y() + mat[8] * y.z() );
+  return x(0) * ( mat[0] * y(0) + mat[1] * y(1) + mat[2] * y(2) )
+    + x(1) * ( mat[3] * y(0) + mat[4] * y(1) + mat[5] * y(2) )
+    + x(2) * ( mat[6] * y(0) + mat[7] * y(1) + mat[8] * y(2) );
 }
 
 Vector_3 Matrix_3x3::VecMult( const Vector_3 &x ) const
 {
-  return Vector_3( mat[0] * x.x() + mat[1] * x.y() + mat[2] * x.z(), 
-      mat[3] * x.x() + mat[4] * x.y() + mat[5] * x.z(), 
-      mat[6] * x.x() + mat[7] * x.y() + mat[8] * x.z() );
+  return Vector_3( mat[0] * x(0) + mat[1] * x(1) + mat[2] * x(2), 
+      mat[3] * x(0) + mat[4] * x(1) + mat[5] * x(2), 
+      mat[6] * x(0) + mat[7] * x(1) + mat[8] * x(2) );
 }
 
 void Matrix_3x3::VecMult( const double &x0, const double &x1, const double &x2, 
@@ -222,9 +222,9 @@ void Matrix_3x3::VecMult( const double &x0, const double &x1, const double &x2,
 
 Vector_3 Matrix_3x3::VecMultT( const Vector_3 &x ) const
 {
-  return Vector_3( mat[0] * x.x() + mat[3] * x.y() + mat[6] * x.z(),
-      mat[1] * x.x() + mat[4] * x.y() + mat[7] * x.z(),
-      mat[2] * x.x() + mat[5] * x.y() + mat[8] * x.z() );
+  return Vector_3( mat[0] * x(0) + mat[3] * x(1) + mat[6] * x(2),
+      mat[1] * x(0) + mat[4] * x(1) + mat[7] * x(2),
+      mat[2] * x(0) + mat[5] * x(1) + mat[8] * x(2) );
 }
 
 void Matrix_3x3::VecMultT(const double &x0, const double &x1, const double &x2,
@@ -346,9 +346,9 @@ void Matrix_3x3::find_eigen_vector( const double &eta, Vector_3 &v,
   Vector_3 b = (*this) * Vector_3(0.0, 1.0, 0.0); 
   Vector_3 c = (*this) * Vector_3(0.0, 0.0, 1.0); 
   
-  a.x() -= ( eta + frac13_tr );
-  b.y() -= ( eta + frac13_tr );
-  c.z() -= ( eta + frac13_tr );
+  a(0) -= ( eta + frac13_tr );
+  b(1) -= ( eta + frac13_tr );
+  c(2) -= ( eta + frac13_tr );
 
   const double len_a = a.norm2();
   const double len_b = b.norm2();

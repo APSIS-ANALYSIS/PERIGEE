@@ -7,7 +7,7 @@ Vector_3::Vector_3()
 
 Vector_3::Vector_3( const Vector_3 &source )
 {
-  vec[0] = source.x(); vec[1] = source.y(); vec[2] = source.z();
+  vec[0] = source(0); vec[1] = source(1); vec[2] = source(2);
 }
 
 Vector_3::Vector_3( const double &v0, const double &v1, const double &v2 )
@@ -20,7 +20,7 @@ Vector_3::~Vector_3()
 
 void Vector_3::copy( const Vector_3 &source )
 {
-  vec[0] = source.x(); vec[1] = source.y(); vec[2] = source.z();
+  vec[0] = source(0); vec[1] = source(1); vec[2] = source(2);
 }
 
 void Vector_3::copy( const double source[3] )
@@ -32,35 +32,35 @@ Vector_3& Vector_3::operator= (const Vector_3 &source)
 {
   if(this == &source) return *this;
 
-  vec[0] = source.x(); vec[1] = source.y(); vec[2] = source.z();
+  vec[0] = source(0); vec[1] = source(1); vec[2] = source(2);
 
   return *this;
 }
 
 Vector_3 operator+( const Vector_3 &left, const Vector_3 &right )
 {
-  return Vector_3( left.x() + right.x(), left.y() + right.y(), left.z() + right.z() );
+  return Vector_3( left(0) + right(0), left(1) + right(1), left(2) + right(2) );
 }
 
 Vector_3 operator-( const Vector_3 &left, const Vector_3 &right )
 {
-  return Vector_3( left.x() - right.x(), left.y() - right.y(), left.z() - right.z() );
+  return Vector_3( left(0) - right(0), left(1) - right(1), left(2) - right(2) );
 }
 
 Vector_3& Vector_3::operator+=( const Vector_3 &source )
 {
-  vec[0] += source.x();
-  vec[1] += source.y();
-  vec[2] += source.z();
+  vec[0] += source(0);
+  vec[1] += source(1);
+  vec[2] += source(2);
  
   return *this;
 }
 
 Vector_3& Vector_3::operator-=( const Vector_3 &source )
 {
-  vec[0] -= source.x();
-  vec[1] -= source.y();
-  vec[2] -= source.z();
+  vec[0] -= source(0);
+  vec[1] -= source(1);
+  vec[2] -= source(2);
 
   return *this;
 }
@@ -124,9 +124,9 @@ void Vector_3::scale( const double &val )
 
 void Vector_3::AXPY( const double &val, const Vector_3 &source )
 {
-  vec[0] += val * source.x();
-  vec[1] += val * source.y();
-  vec[2] += val * source.z();
+  vec[0] += val * source(0);
+  vec[1] += val * source(1);
+  vec[2] += val * source(2);
 }
 
 double Vector_3::normalize()
@@ -138,7 +138,7 @@ double Vector_3::normalize()
 
 double Vector_3::dot_product( const Vector_3 &source ) const
 {
-  return vec[0]*source.x() + vec[1]*source.y() + vec[2]*source.z();
+  return vec[0]*source(0) + vec[1]*source(1) + vec[2]*source(2);
 }
 
 double dist( const Vector_3 &a, const Vector_3 &b )
@@ -151,7 +151,7 @@ double dist( const Vector_3 &a, const Vector_3 &b )
 
 double dot_product( const Vector_3 &a, const Vector_3 &b )
 {
-  return a.x()*b.x() + a.y()*b.y() + a.z()*b.z();
+  return a(0)*b(0) + a(1)*b(1) + a(2)*b(2);
 }
 
 int Vector_3::get_dominant_comp() const
@@ -173,8 +173,8 @@ int Vector_3::get_dominant_comp() const
 
 Vector_3 cross_product( const Vector_3 &a, const Vector_3 &b )
 {
-  return Vector_3( a.y() * b.z() - a.z() * b.y(), 
-      a.z() * b.x() - a.x() * b.z(), a.x() * b.y() - a.y() * b.x() );
+  return Vector_3( a(1) * b(2) - a(2) * b(1), 
+      a(2) * b(0) - a(0) * b(2), a(0) * b(1) - a(1) * b(0) );
 }
 
 Vector_3 operator*( const double &val, const Vector_3 &source )
