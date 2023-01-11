@@ -25,9 +25,9 @@ Matrix_3x3::Matrix_3x3(
 Matrix_3x3::Matrix_3x3(
     const Vector_3 &vec1, const Vector_3 &vec2, const Vector_3 &vec3 )
 {
-  mat[0] = vec1(0); mat[1] = vec2(0); mat[2] = vec3(0);
-  mat[3] = vec1(1); mat[4] = vec2(1); mat[5] = vec3(1);
-  mat[6] = vec1(2); mat[7] = vec2(2); mat[8] = vec3(2);
+  mat[0] = vec1.x(); mat[1] = vec2.x(); mat[2] = vec3.x();
+  mat[3] = vec1.y(); mat[4] = vec2.y(); mat[5] = vec3.y();
+  mat[6] = vec1.z(); mat[7] = vec2.z(); mat[8] = vec3.z();
 }
 
 Matrix_3x3::~Matrix_3x3()
@@ -125,23 +125,23 @@ void Matrix_3x3::gen_hilb()
 
 void Matrix_3x3::gen_outprod( const Vector_3 &va, const Vector_3 &vb ) 
 {
-  mat[0] = va(0) * vb(0); mat[1] = va(0) * vb(1); mat[2] = va(0) * vb(2);
-  mat[3] = va(1) * vb(0); mat[4] = va(1) * vb(1); mat[5] = va(1) * vb(2);
-  mat[6] = va(2) * vb(0); mat[7] = va(2) * vb(1); mat[8] = va(2) * vb(2);
+  mat[0] = va.x() * vb.x(); mat[1] = va.x() * vb.y(); mat[2] = va.x() * vb.z();
+  mat[3] = va.y() * vb.x(); mat[4] = va.y() * vb.y(); mat[5] = va.y() * vb.z();
+  mat[6] = va.z() * vb.x(); mat[7] = va.z() * vb.y(); mat[8] = va.z() * vb.z();
 }
 
 void Matrix_3x3::gen_outprod( const Vector_3 &va )
 {
-  mat[0] = va(0) * va(0); mat[1] = va(0) * va(1); mat[2] = va(0) * va(2);
-  mat[3] = va(1) * va(0); mat[4] = va(1) * va(1); mat[5] = va(1) * va(2);
-  mat[6] = va(2) * va(0); mat[7] = va(2) * va(1); mat[8] = va(2) * va(2);
+  mat[0] = va.x() * va.x(); mat[1] = va.x() * va.y(); mat[2] = va.x() * va.z();
+  mat[3] = va.y() * va.x(); mat[4] = va.y() * va.y(); mat[5] = va.y() * va.z();
+  mat[6] = va.z() * va.x(); mat[7] = va.z() * va.y(); mat[8] = va.z() * va.z();
 }
 
 void Matrix_3x3::add_outprod( const double &val, const Vector_3 &va, const Vector_3 &vb ) 
 {
-  mat[0] += val * va(0) * vb(0); mat[1] += val * va(0) * vb(1); mat[2] += val * va(0) * vb(2);
-  mat[3] += val * va(1) * vb(0); mat[4] += val * va(1) * vb(1); mat[5] += val * va(1) * vb(2);
-  mat[6] += val * va(2) * vb(0); mat[7] += val * va(2) * vb(1); mat[8] += val * va(2) * vb(2);
+  mat[0] += val * va.x() * vb.x(); mat[1] += val * va.x() * vb.y(); mat[2] += val * va.x() * vb.z();
+  mat[3] += val * va.y() * vb.x(); mat[4] += val * va.y() * vb.y(); mat[5] += val * va.y() * vb.z();
+  mat[6] += val * va.z() * vb.x(); mat[7] += val * va.z() * vb.y(); mat[8] += val * va.z() * vb.z();
 }
 
 void Matrix_3x3::transpose()
