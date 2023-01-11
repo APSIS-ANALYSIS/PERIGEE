@@ -200,16 +200,16 @@ double Matrix_3x3::I2() const
 
 double Matrix_3x3::VecMatVec( const Vector_3 &x, const Vector_3 &y ) const
 {
-  return x(0) * ( mat[0] * y(0) + mat[1] * y(1) + mat[2] * y(2) )
-    + x(1) * ( mat[3] * y(0) + mat[4] * y(1) + mat[5] * y(2) )
-    + x(2) * ( mat[6] * y(0) + mat[7] * y(1) + mat[8] * y(2) );
+  return x.x() * ( mat[0] * y.x() + mat[1] * y.y() + mat[2] * y.z() )
+    + x.y() * ( mat[3] * y.x() + mat[4] * y.y() + mat[5] * y.z() )
+    + x.z() * ( mat[6] * y.x() + mat[7] * y.y() + mat[8] * y.z() );
 }
 
 Vector_3 Matrix_3x3::VecMult( const Vector_3 &x ) const
 {
-  return Vector_3( mat[0] * x(0) + mat[1] * x(1) + mat[2] * x(2), 
-      mat[3] * x(0) + mat[4] * x(1) + mat[5] * x(2), 
-      mat[6] * x(0) + mat[7] * x(1) + mat[8] * x(2) );
+  return Vector_3( mat[0] * x.x() + mat[1] * x.y() + mat[2] * x.z(), 
+      mat[3] * x.x() + mat[4] * x.y() + mat[5] * x.z(), 
+      mat[6] * x.x() + mat[7] * x.y() + mat[8] * x.z() );
 }
 
 void Matrix_3x3::VecMult( const double &x0, const double &x1, const double &x2, 
