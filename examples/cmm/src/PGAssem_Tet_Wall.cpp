@@ -6,7 +6,7 @@ PGAssem_Tet_Wall::PGAssem_Tet_Wall(
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &aien_ptr,
     const APart_Node * const &pnode_ptr,
-    const ALocal_NodalBC * const &part_nbc,
+    const ALocal_NBC * const &part_nbc,
     const ALocal_EBC * const &part_ebc,
     const int &in_nz_estimate )
 : nLocBas( agmi_ptr->get_nLocBas() ),
@@ -63,7 +63,7 @@ PGAssem_Tet_Wall::~PGAssem_Tet_Wall()
 void PGAssem_Tet_Wall::Assem_nonzero_estimate(
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &lien_ptr,
-    const ALocal_NodalBC * const &nbc_part )
+    const ALocal_NBC * const &nbc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
@@ -101,7 +101,7 @@ void PGAssem_Tet_Wall::Assem_nonzero_estimate(
 }
 
 
-void PGAssem_Tet_Wall::EssBC_KG( const ALocal_NodalBC * const &nbc_part, 
+void PGAssem_Tet_Wall::EssBC_KG( const ALocal_NBC * const &nbc_part, 
     const int &field )
 {
   const int local_dir = nbc_part->get_Num_LD(field);
@@ -257,7 +257,7 @@ void PGAssem_Tet_Wall::Assem_tangent_residual(
     const ALocal_IEN * const &lien_ptr,
     const APart_Node * const &node_ptr,
     const FEANode * const &fnode_ptr,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_Ring_NodalBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part,
     const ALocal_EBC * const &ebc_wall_part,
@@ -287,7 +287,7 @@ void PGAssem_Tet_Wall::WallMembrane_KG(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_w,
     const IQuadPts * const &quad_s,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_Ring_NodalBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_wall_part )
 {
