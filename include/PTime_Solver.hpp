@@ -79,49 +79,6 @@ class PTime_Solver
         PNonlinear_Solver * const &nsolver_ptr
         ) const;
   
-
-    // ------------------------------------------------------------------------
-    // ! Perform the VMS generalized-alpha time marching scheme
-    //   with NO cached quadrature info for 3D problems.
-    //   
-    //   TM_VMS_generalized_alpha_noCache_3D is a variant of the original
-    //   TM_VMS_generalized_alpha function.
-    //
-    //   This function does NOT require vector<FEAElement *> as input. Instead,
-    //   the following data structures are needed for evaluating basis functions
-    //   in each local assembly call:
-    //
-    //   1. IALocal_meshSize : object saving the mesh size
-    //   2. BernsteinBasis_Array bs, bt, bu : pre-evaluated Berntesin
-    //      polynomial at Gauss quadrature points for volumetric integration
-    //   3. IAExtractor : Bezier extraction operator
-    //   This function is written for 3D problems (input bs bt bu). 
-    //   
-    //   See CMAME 197 (2007), pp 182 for algorithm details.
-    // ------------------------------------------------------------------------
-    void TM_VMS_generalized_alpha_noCache_3D(
-        const bool &restart_init_assembly_flag,
-        const PDNSolution * const &init_velo,
-        const PDNSolution * const &init_disp,
-        PDNTimeStep * const &time_info,
-        const TimeMethod_GenAlpha * const &tmga_ptr,
-        const ALocal_Elem * const &alelem_ptr,
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &anode_ptr,
-        const FEANode * const &feanode_ptr,
-        const IALocal_BC * const &bc_part,
-        const AInt_Weight * const &wei_ptr,
-        const IALocal_meshSize * const &mSize,
-        const BernsteinBasis_Array * const &bs,
-        const BernsteinBasis_Array * const &bt,
-        const BernsteinBasis_Array * const &bu,
-        const IAExtractor * const &extractor,
-        IPLocAssem * const &lassem_ptr,
-        IPGAssem * const &gassem_ptr,
-        PLinear_Solver_PETSc * const &lsolver_ptr,
-        PNonlinear_Solver * const &nsolver_ptr
-        ) const;
-
     // --------------------------------------------------------------
     // This is the generalized-alpha method for first-order system,
     // with classical FEM method.
