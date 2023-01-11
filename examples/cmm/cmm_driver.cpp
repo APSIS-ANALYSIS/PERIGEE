@@ -305,7 +305,7 @@ int main( int argc, char *argv[] )
   else SYS_T::print_fatal("Error: Element type not supported.\n");
 
   // Local sub-domain's nodal (Dirichlet) BC
-  ALocal_NodalBC * locnbc = new ALocal_NodalBC(part_file, rank);
+  ALocal_NBC * locnbc = new ALocal_NBC(part_file, rank);
 
   // Local sub-domain's inflow (Dirichlet) BC
   ALocal_Inflow_NodalBC * locinfnbc = new ALocal_Inflow_NodalBC(part_file, rank);
