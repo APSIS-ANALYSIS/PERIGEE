@@ -114,8 +114,22 @@ class ALocal_NBC
     // dof := LID.size() / nlocghonode
     int dof, nlocghonode;
 
+    // LID stores the ID of all degrees-of-freedom. The ID value could be the
+    // corresponding grid point's index (old manner) or the corresponding matrix
+    // column index (new manner). For the actual definition of the LID array,
+    // the users should refer to the corresponding NBC_Partition routine.
     std::vector<int> LID;
-    
+   
+    // LDN stores the Dirichlet nodes' index owned by this CPU locally;
+    // LPSN stores the slave nodes' indices owned by this CPU locally;
+    // LPMN stores the corresponding master nodes (of LPSN) indices owned by
+    // this CPU locally;
+    // LocalMaster stores the master nodes' indices owned by this CPU locally;
+    // LocalMasterSlave stores the corresponding slave nodes (of LocalMaster)
+    // indices owned by this CPU locally.
+    // The meaning of the index meantioned above could be the grid point id (old
+    // manner) or the corresponding matrix column index (new manner). The
+    // actual definition is in the NBC_Partition routine. 
     std::vector<int> LDN, LPSN, LPMN, LocalMaster, LocalMasterSlave;
 
     std::vector<int> Num_LD, Num_LPS, Num_LPM;
