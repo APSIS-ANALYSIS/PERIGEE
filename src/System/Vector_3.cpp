@@ -20,7 +20,7 @@ Vector_3::~Vector_3()
 
 void Vector_3::copy( const Vector_3 &source )
 {
-  vec[0] = source(0); vec[1] = source(1); vec[2] = source(2);
+  vec[0] = source.x(); vec[1] = source.y(); vec[2] = source.z();
 }
 
 void Vector_3::copy( const double source[3] )
@@ -32,19 +32,19 @@ Vector_3& Vector_3::operator= (const Vector_3 &source)
 {
   if(this == &source) return *this;
 
-  vec[0] = source(0); vec[1] = source(1); vec[2] = source(2);
+  vec[0] = source.x(); vec[1] = source.y(); vec[2] = source.z();
 
   return *this;
 }
 
 Vector_3 operator+( const Vector_3 &left, const Vector_3 &right )
 {
-  return Vector_3( left(0) + right(0), left(1) + right(1), left(2) + right(2) );
+  return Vector_3( left.x() + right.x(), left.y() + right.y(), left.z() + right.z() );
 }
 
 Vector_3 operator-( const Vector_3 &left, const Vector_3 &right )
 {
-  return Vector_3( left(0) - right(0), left(1) - right(1), left(2) - right(2) );
+  return Vector_3( left.x() - right.x(), left.y() - right.y(), left.z() - right.z() );
 }
 
 Vector_3& Vector_3::operator+=( const Vector_3 &source )
