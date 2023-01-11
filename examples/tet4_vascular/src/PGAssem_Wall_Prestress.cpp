@@ -8,7 +8,7 @@ PGAssem_Wall_Prestress::PGAssem_Wall_Prestress(
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &aien_ptr,
     const APart_Node * const &pnode_ptr,
-    const ALocal_NodalBC * const &part_nbc,
+    const ALocal_NBC * const &part_nbc,
     const ALocal_EBC * const &part_ebc,
     const int &in_nz_estimate )
 : nLocBas( agmi_ptr->get_nLocBas() ),
@@ -144,7 +144,7 @@ PGAssem_Wall_Prestress::~PGAssem_Wall_Prestress()
 
 void PGAssem_Wall_Prestress::Get_dnz_onz( const int &nlocnode,
     const int &empirical_neighbor_node_number,
-    const ALocal_NodalBC * const &nbc_ptr,
+    const ALocal_NBC * const &nbc_ptr,
     PetscInt * const &dnz, PetscInt * const &onz ) const
 {
   const int nzbase = dof_mat * empirical_neighbor_node_number;
@@ -247,7 +247,7 @@ void PGAssem_Wall_Prestress::Get_dnz_onz( const int &nlocnode,
 }
 
 void PGAssem_Wall_Prestress::EssBC_KG( 
-    const ALocal_NodalBC * const &nbc_part, const int &field )
+    const ALocal_NBC * const &nbc_part, const int &field )
 {
   const int local_dir = nbc_part->get_Num_LD(field);
 
@@ -280,7 +280,7 @@ void PGAssem_Wall_Prestress::EssBC_KG(
 
 
 void PGAssem_Wall_Prestress::EssBC_G( 
-    const ALocal_NodalBC * const &nbc_part, const int &field )
+    const ALocal_NBC * const &nbc_part, const int &field )
 {
   const int local_dir = nbc_part->get_Num_LD(field);
   const int local_sla = nbc_part->get_Num_LPS(field);
@@ -312,7 +312,7 @@ void PGAssem_Wall_Prestress::Assem_nonzero_estimate(
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
     const APart_Node * const &node_ptr,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();
@@ -371,7 +371,7 @@ void PGAssem_Wall_Prestress::Assem_residual(
     const ALocal_IEN * const &lien_ptr,
     const APart_Node * const &node_ptr,
     const FEANode * const &fnode_ptr,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
     const Prestress_solid * const &ps_ptr )
 {
@@ -437,7 +437,7 @@ void PGAssem_Wall_Prestress::Assem_tangent_residual(
     const ALocal_IEN * const &lien_ptr,
     const APart_Node * const &node_ptr,
     const FEANode * const &fnode_ptr,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
     const Prestress_solid * const &ps_ptr )
 {
@@ -497,7 +497,7 @@ void PGAssem_Wall_Prestress::NatBC_G( const double &time,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const lien_ptr,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   SYS_T::print_fatal_if( num_ebc > 1, "Error: there are more than 1 ebc surfaces.\n");
