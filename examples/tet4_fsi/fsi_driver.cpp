@@ -108,6 +108,10 @@ int main(int argc, char *argv[])
   std::string restart_v_name = "SOL_V_";
   std::string restart_p_name = "SOL_P_";
 
+  // Yaml options
+  bool isloadYaml = true;
+  std::string yaml_file("./runscript.yml");
+
   // ===== Initialization of PETSc =====
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
@@ -118,6 +122,13 @@ int main(int argc, char *argv[])
 
   SYS_T::commPrint("Job started on %s %s \n", SYS_T::get_time().c_str(), SYS_T::get_date().c_str());
   SYS_T::commPrint("PETSc version: %s \n", PETSc_T::get_version().c_str());
+
+  // ===== Yaml Argument =====
+  SYS_T::GetOptionBool(  "-isloadYaml",   isloadYaml);
+  SYS_T::GetOptionString("-yaml_file",    yaml_file);
+
+  if (isloadYaml)
+    {SYS_T::InsertFileYAML( yaml_file,  false );}
 
   // ===== Command Line Argument =====
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");

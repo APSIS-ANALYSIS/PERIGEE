@@ -16,7 +16,7 @@
 set(VTK_DIR /home/sunyujie/lib/VTK-8.2.0-shared/lib/cmake/vtk-8.2)
 
 # Modify the PETSC_DIR variable to point to the location of PETSc.
-set(PETSC_DIR /home/sunyujie/lib/petsc-3.11.3-opt)
+set(PETSC_DIR /home/sunyujie/lib/petsc-3.16.3-opt)
 
 # Modify the PETSC_ARCH variable. You can find it in your configuration
 # output. If you forget it, go to your PETSc home director and open
