@@ -116,7 +116,11 @@ At this stage, you may encounter a warning saying you do not have Fortran compil
 ```
 sudo apt-get install gfortran
 ```
-and rerun the configure command. Once you see that the system tells the configuration is complete, run the following.
+and rerun the configure command. Or you may encounter an issue saying `gfortran will not compile files that call the same routine with arguments of different types`. You need to add the following to your bashrc or bash_profile file.
+```
+export FFLAGS="-w -fallow-argument-mismatch -O2"
+```
+Once you see that the system tells the configuration is complete, run the following.
 ```
 make 2>&1 | tee m.txt
 make install 2>&1 | tee mi.txt
