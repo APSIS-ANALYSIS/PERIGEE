@@ -29,7 +29,7 @@ include_directories(${PETSC_INC})
 
 set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${VTK_LIBRARIES})
 set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${HDF5_LIBRARIES})
-set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${PETSC_LIB})
+set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} -L/Users/juliu/lib/petsc-3.16.6-debug/lib -Wl,-rpath,/Users/juliu/lib/petsc-3.16.6-debug/lib -L/Users/juliu/lib/petsc-3.16.6-debug/lib -Wl,-rpath,/usr/local/lib -L/usr/local/lib -Wl,-rpath,/Users/juliu/lib/mpich-3.4rc1/lib -L/Users/juliu/lib/mpich-3.4rc1/lib -Wl,-rpath,/usr/local/Cellar/gcc/12.2.0/lib/gcc/current/gcc/x86_64-apple-darwin19/12 -L/usr/local/Cellar/gcc/12.2.0/lib/gcc/current/gcc/x86_64-apple-darwin19/12 -Wl,-rpath,/usr/local/Cellar/gcc/12.2.0/lib/gcc/current/gcc -L/usr/local/Cellar/gcc/12.2.0/lib/gcc/current/gcc -Wl,-rpath,/usr/local/Cellar/gcc/12.2.0/lib/gcc/current -L/usr/local/Cellar/gcc/12.2.0/lib/gcc/current -lpetsc -lHYPRE -lcmumps -ldmumps -lsmumps -lzmumps -lmumps_common -lpord -lscalapack -lflapack -lfblas -lchaco -lparmetis -lmetis -lyaml -lX11 -lc++ -ldl -lmpifort -lmpi -lpmpi -lgfortran -lgcc_s.1.1 -lquadmath -lc++ -ldl)
 
 if(PETSC_METIS)
   set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${PETSC_METIS_LIB})
