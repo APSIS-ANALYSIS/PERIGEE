@@ -21,24 +21,26 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
 find_package(VTK COMPONENTS vtkCommonCore vtkCommonSystem
   vtkCommonMisc vtkCommonMath vtkIOCore vtkIOLegacy vtkIOXML REQUIRED)
 find_package(HDF5 REQUIRED)
-find_package(PETSc REQUIRED)
+
+# set the env variable of location to find PETSc's pkg-config
+set(ENV{PKG_CONFIG_PATH} ${PETSC_DIR}/lib/pkgconfig)
+
+find_package(PkgConfig REQUIRED)
+pkg_search_module(PETSC REQUIRED IMPORTED_TARGET PETSc)
 
 include_directories(${VTK_INCLUDE_DIRS})
 include_directories(${HDF5_INCLUDE_DIRS})
-include_directories(${PETSC_INC})
+include_directories(${PETSC_INCLUDE_DIRS})
+
+link_directories(${PETSC_STATIC_LIBRARY_DIRS})
 
 set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${VTK_LIBRARIES})
 set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${HDF5_LIBRARIES})
-set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} -L/Users/juliu/lib/petsc-3.16.6-debug/lib -Wl,-rpath,/Users/juliu/lib/petsc-3.16.6-debug/lib -L/Users/juliu/lib/petsc-3.16.6-debug/lib -Wl,-rpath,/usr/local/lib -L/usr/local/lib -Wl,-rpath,/Users/juliu/lib/mpich-3.4rc1/lib -L/Users/juliu/lib/mpich-3.4rc1/lib -Wl,-rpath,/usr/local/Cellar/gcc/12.2.0/lib/gcc/current/gcc/x86_64-apple-darwin19/12 -L/usr/local/Cellar/gcc/12.2.0/lib/gcc/current/gcc/x86_64-apple-darwin19/12 -Wl,-rpath,/usr/local/Cellar/gcc/12.2.0/lib/gcc/current/gcc -L/usr/local/Cellar/gcc/12.2.0/lib/gcc/current/gcc -Wl,-rpath,/usr/local/Cellar/gcc/12.2.0/lib/gcc/current -L/usr/local/Cellar/gcc/12.2.0/lib/gcc/current -lpetsc -lHYPRE -lcmumps -ldmumps -lsmumps -lzmumps -lmumps_common -lpord -lscalapack -lflapack -lfblas -lchaco -lparmetis -lmetis -lyaml -lX11 -lc++ -ldl -lmpifort -lmpi -lpmpi -lgfortran -lgcc_s.1.1 -lquadmath -lc++ -ldl)
+set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${PETSC_STATIC_LIBRARIES})
 
-if(PETSC_METIS)
-  set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${PETSC_METIS_LIB})
-  message(STATUS "Use METIS in PETSc: " ${PETSC_METIS_LIB})
-else(PETSC_METIS)
-  find_package(METIS)
-  include_directories(${METIS_INCLUDE_DIRS})
-  set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${METIS_LIBRARIES})
-endif(PETSC_METIS)
+# find_package(METIS)
+# include_directories(${METIS_INCLUDE_DIRS})
+# set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${METIS_LIBRARIES})
 
 message(STATUS "External Libraries: " ${EXTRA_LINK_LIBS})
 
