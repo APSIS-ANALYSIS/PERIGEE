@@ -3,6 +3,8 @@
 # ========================================================
 # Specify the library locations
 # ========================================================
+set(MPI_DIR /Users/juliu/lib/mpich-3.4rc1)
+
 set(VTK_DIR /Users/juliu/lib/VTK-8.2.0/lib/cmake/vtk-8.2)
 
 set(PETSC_DIR /Users/juliu/lib/petsc-3.16.6-debug)
@@ -47,8 +49,8 @@ message(STATUS "External Libraries: " ${EXTRA_LINK_LIBS})
 # ========================================================
 # Compiler options 
 # ========================================================
-set(CMAKE_C_COMPILER  /Users/juliu/lib/mpich-3.4rc1/bin/mpicc)
-set(CMAKE_CXX_COMPILER  /Users/juliu/lib/mpich-3.4rc1/bin/mpicxx)
+set(CMAKE_C_COMPILER ${MPI_DIR}/bin/mpicc)
+set(CMAKE_CXX_COMPILER ${MPI_DIR}/bin/mpicxx)
 set(CMAKE_CXX_FLAGS "-O0 -W -Wshadow -Wall -Wextra -Wuninitialized -Wno-unused-parameter")
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_MACOSX_RPATH 1)
