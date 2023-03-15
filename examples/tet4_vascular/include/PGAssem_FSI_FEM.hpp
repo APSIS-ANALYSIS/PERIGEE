@@ -38,7 +38,7 @@ class PGAssem_FSI_FEM : public IPGAssem
         const ALocal_Elem * const &alelem_ptr,
         const ALocal_IEN * const &aien_ptr,
         const APart_Node * const &pnode_ptr,
-        const ALocal_NodalBC * const &part_nbc,
+        const ALocal_NBC * const &part_nbc,
         const ALocal_EBC * const &part_ebc,
         const IGenBC * const &gbc,
         const int &in_nz_estimate = 60 );
@@ -53,7 +53,7 @@ class PGAssem_FSI_FEM : public IPGAssem
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
@@ -69,7 +69,7 @@ class PGAssem_FSI_FEM : public IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const Prestress_solid * const &ps_ptr );
 
@@ -91,7 +91,7 @@ class PGAssem_FSI_FEM : public IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
         const Prestress_solid * const &ps_ptr );
@@ -114,7 +114,7 @@ class PGAssem_FSI_FEM : public IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
         const Prestress_solid * const &ps_ptr );
@@ -173,8 +173,8 @@ class PGAssem_FSI_FEM : public IPGAssem
     double * sctrl_x, * sctrl_y, * sctrl_z;
 
     // Private functions
-    void EssBC_KG( const ALocal_NodalBC * const &nbc_part, const int &field );
-    void EssBC_G( const ALocal_NodalBC * const &nbc_part, const int &field );
+    void EssBC_KG( const ALocal_NBC * const &nbc_part, const int &field );
+    void EssBC_G( const ALocal_NBC * const &nbc_part, const int &field );
 
     // For now, we only do ebc boundary integration for fluids 
     void NatBC_G( const double &curr_time, const double &dt,
@@ -183,7 +183,7 @@ class PGAssem_FSI_FEM : public IPGAssem
         const int &in_loc_dof,
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const lien_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
     // Resistance BC for fluid
@@ -194,7 +194,7 @@ class PGAssem_FSI_FEM : public IPGAssem
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const APart_Node * const &node_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
@@ -205,7 +205,7 @@ class PGAssem_FSI_FEM : public IPGAssem
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const APart_Node * const &node_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc ); 
 
@@ -214,7 +214,7 @@ class PGAssem_FSI_FEM : public IPGAssem
         FEAElement * const &element_s,
         const int &in_loc_dof,
         const IQuadPts * const &quad_s,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
     void BackFlow_KG( const double &dt,
@@ -222,7 +222,7 @@ class PGAssem_FSI_FEM : public IPGAssem
         FEAElement * const &element_s,
         const int &in_loc_dof,
         const IQuadPts * const &quad_s,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
     void GetLocal(const double * const &array, const int * const &IEN,
@@ -253,7 +253,7 @@ class PGAssem_FSI_FEM : public IPGAssem
 
     void Get_dnz_onz( const int &nlocnode,
         const int &empirical_neighbor_node_number,
-        const ALocal_NodalBC * const &nbc_ptr,
+        const ALocal_NBC * const &nbc_ptr,
         PetscInt * const &dnz, PetscInt * const &onz ) const;
 };
 

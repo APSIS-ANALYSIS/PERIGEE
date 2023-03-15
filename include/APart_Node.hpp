@@ -37,7 +37,7 @@ class APart_Node
     // This returns dofNum in the preprocessor, the total number of dof.
     // In segregated-type algorithms, this is different from the matrix
     // problem's degrees-of-freedom, which is typically obtained by
-    // ALocal_NodalBC->get_dof_LID();
+    // ALocal_NBC->get_dof_LID();
     // ------------------------------------------------------------------------
     virtual int get_dof() const {return dof;}
 

@@ -7,8 +7,8 @@ PGAssem_Wall_Prestress::PGAssem_Wall_Prestress(
     const ALocal_IEN * const &aien_p,
     const APart_Node * const &pnode_v,
     const APart_Node * const &pnode_p,
-    const ALocal_NodalBC * const &part_nbc_v,
-    const ALocal_NodalBC * const &part_nbc_p,
+    const ALocal_NBC * const &part_nbc_v,
+    const ALocal_NBC * const &part_nbc_p,
     const ALocal_EBC * const &part_ebc,
     const int &in_nz_estimate )
 : nLocBas(4), snLocBas(3),
@@ -76,8 +76,8 @@ void PGAssem_Wall_Prestress::Assem_nonzero_estimate(
     IPLocAssem_2x2Block * const &lassem_s_ptr,
     const ALocal_IEN * const &lien_v,
     const ALocal_IEN * const &lien_p,
-    const ALocal_NodalBC * const &nbc_v,
-    const ALocal_NodalBC * const &nbc_p )
+    const ALocal_NBC * const &nbc_v,
+    const ALocal_NBC * const &nbc_p )
 {
   const int nElem = alelem_ptr->get_nlocalele();
 
@@ -120,8 +120,8 @@ void PGAssem_Wall_Prestress::Assem_nonzero_estimate(
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 }
 
-void PGAssem_Wall_Prestress::EssBC_KG( const ALocal_NodalBC * const &nbc_v, 
-    const ALocal_NodalBC * const &nbc_p )
+void PGAssem_Wall_Prestress::EssBC_KG( const ALocal_NBC * const &nbc_v, 
+    const ALocal_NBC * const &nbc_p )
 {
   // For three velocity fields
   for(int field=0; field<3; ++field)
@@ -177,8 +177,8 @@ void PGAssem_Wall_Prestress::EssBC_KG( const ALocal_NodalBC * const &nbc_v,
   }
 }
 
-void PGAssem_Wall_Prestress::EssBC_G( const ALocal_NodalBC * const &nbc_v, 
-    const ALocal_NodalBC * const &nbc_p )
+void PGAssem_Wall_Prestress::EssBC_G( const ALocal_NBC * const &nbc_v, 
+    const ALocal_NBC * const &nbc_p )
 {
   // For three velocity fields
   for(int field=0; field<3; ++field)
@@ -231,7 +231,7 @@ void PGAssem_Wall_Prestress::NatBC_G( const double &curr_time,
     IPLocAssem_2x2Block * const &lassem_s_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const ALocal_NodalBC * const &nbc_v,
+    const ALocal_NBC * const &nbc_v,
     const ALocal_EBC * const &ebc_v,
     const ALocal_EBC * const &ebc_p ) 
 {
@@ -292,8 +292,8 @@ void PGAssem_Wall_Prestress::Assem_Residual(
     const ALocal_IEN * const &lien_v,
     const ALocal_IEN * const &lien_p,
     const FEANode * const &fnode_ptr,
-    const ALocal_NodalBC * const &nbc_v,
-    const ALocal_NodalBC * const &nbc_p,
+    const ALocal_NBC * const &nbc_v,
+    const ALocal_NBC * const &nbc_p,
     const ALocal_EBC * const &ebc_v,
     const ALocal_EBC * const &ebc_p,
     const Prestress_solid * const &ps_ptr )
@@ -385,8 +385,8 @@ void PGAssem_Wall_Prestress::Assem_Tangent_Residual(
     const ALocal_IEN * const &lien_v,
     const ALocal_IEN * const &lien_p,
     const FEANode * const &fnode_ptr,
-    const ALocal_NodalBC * const &nbc_v,
-    const ALocal_NodalBC * const &nbc_p,
+    const ALocal_NBC * const &nbc_v,
+    const ALocal_NBC * const &nbc_p,
     const ALocal_EBC * const &ebc_v,
     const ALocal_EBC * const &ebc_p,
     const Prestress_solid * const &ps_ptr )

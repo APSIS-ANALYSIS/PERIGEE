@@ -87,12 +87,23 @@ int main(int argc, char *argv[])
   double restart_step = 1.0e-3; // restart simulation time step size
   std::string restart_name = "SOL_"; // restart solution base name
 
+  // Yaml options
+  bool isloadYaml = true;
+  std::string yaml_file("./runscript.yml");
+
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
   const PetscMPIInt rank = SYS_T::get_MPI_rank();
   const PetscMPIInt size = SYS_T::get_MPI_size();
 
   SYS_T::print_perigee_art();
+
+  // ===== Yaml Arguments =====
+  SYS_T::GetOptionBool(  "-isloadYaml",   isloadYaml);
+  SYS_T::GetOptionString("-yaml_file",    yaml_file);
+
+  if (isloadYaml)
+    {SYS_T::InsertFileYAML( yaml_file,  false );}
 
   // ===== Read Command Line Arguments =====
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
@@ -218,7 +229,7 @@ int main(int argc, char *argv[])
   ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
 
   // Local sub-domain's nodal bc
-  ALocal_NodalBC * locnbc = new ALocal_NodalBC(part_file, rank);
+  ALocal_NBC * locnbc = new ALocal_NBC(part_file, rank);
 
   // Local sub-domain's inflow bc
   ALocal_Inflow_NodalBC * locinfnbc = new ALocal_Inflow_NodalBC(part_file, rank);

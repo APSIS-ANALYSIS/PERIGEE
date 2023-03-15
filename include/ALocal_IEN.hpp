@@ -2,6 +2,7 @@
 #define ALOCAL_IEN_HPP
 // ============================================================================
 // ALocal_IEN.hpp
+//
 // Local IEN array for Analysis code.
 // This class stores the IEN array for volumetric elements. The IEN array is 
 // stored in a one-dimensional vector, with stride length nLocBas. For the ee-th

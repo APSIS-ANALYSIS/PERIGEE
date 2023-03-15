@@ -19,7 +19,7 @@ class Matrix_PETSc_CMM : public Matrix_PETSc
 {
   public:
     Matrix_PETSc_CMM( const APart_Node * const &pnode_ptr,
-        const ALocal_NodalBC * const &bc_part,
+        const ALocal_NBC * const &bc_part,
         const ALocal_Ring_NodalBC * const &ring_bc_part );
 
     virtual ~Matrix_PETSc_CMM();
@@ -43,7 +43,7 @@ class Matrix_PETSc_CMM : public Matrix_PETSc
     // 3. For all remaining nodes, we assign 1 to the diagonal entries.
     // ------------------------------------------------------------------------
     void gen_ring_inplane_bc( const APart_Node * const &pnode_ptr,
-        const ALocal_NodalBC * const &bc_part,
+        const ALocal_NBC * const &bc_part,
         const ALocal_Ring_NodalBC * const &ring_bc_part );
 
     // ------------------------------------------------------------------------
@@ -70,7 +70,7 @@ class Matrix_PETSc_CMM : public Matrix_PETSc
     // 3. For all remaining nodes, we assign 1 to the diagonal entries. 
     // ------------------------------------------------------------------------
     void gen_ring_radial_motion_bc( const APart_Node * const &pnode_ptr,
-        const ALocal_NodalBC * const &bc_part,
+        const ALocal_NBC * const &bc_part,
         const ALocal_Ring_NodalBC * const &ring_bc_part );
 
     // ------------------------------------------------------------------------
@@ -91,7 +91,7 @@ class Matrix_PETSc_CMM : public Matrix_PETSc
     // 3. For all remaining nodes, we assign 1 to the diagonal entries.
     // ------------------------------------------------------------------------
     void gen_outlet_ring_inplane_bc( const APart_Node * const &pnode_ptr,
-        const ALocal_NodalBC * const &bc_part,
+        const ALocal_NBC * const &bc_part,
         const ALocal_Ring_NodalBC * const &ring_bc_part );
 
     // ------------------------------------------------------------------------
@@ -118,7 +118,7 @@ class Matrix_PETSc_CMM : public Matrix_PETSc
     // 3. For all remaining nodes, we assign 1 to the diagonal entries. 
     // ------------------------------------------------------------------------
     void gen_outlet_ring_radial_motion_bc( const APart_Node * const &pnode_ptr,
-        const ALocal_NodalBC * const &bc_part,
+        const ALocal_NBC * const &bc_part,
         const ALocal_Ring_NodalBC * const &ring_bc_part );
 
     // ------------------------------------------------------------------------
@@ -127,7 +127,7 @@ class Matrix_PETSc_CMM : public Matrix_PETSc
     // node per cap for a 4-dof system like the NS equations.
     // ------------------------------------------------------------------------
     void gen_ring_inplane_bc_partial_clamp( const APart_Node * const &pnode_ptr,
-        const ALocal_NodalBC * const &bc_part,
+        const ALocal_NBC * const &bc_part,
         const ALocal_Ring_NodalBC * const &ring_bc_part );
 
 };

@@ -1,7 +1,7 @@
 #include "Matrix_PETSc_CMM.hpp"
 
 Matrix_PETSc_CMM::Matrix_PETSc_CMM( const APart_Node * const &pnode_ptr,
-    const ALocal_NodalBC * const &bc_part,
+    const ALocal_NBC * const &bc_part,
     const ALocal_Ring_NodalBC * const &ring_bc_part )
 : Matrix_PETSc( pnode_ptr, bc_part, 2, 0 )
 {
@@ -43,7 +43,7 @@ Matrix_PETSc_CMM::~Matrix_PETSc_CMM()
 
 
 void Matrix_PETSc_CMM::gen_ring_inplane_bc( const APart_Node * const &pnode_ptr,
-    const ALocal_NodalBC * const &bc_part,
+    const ALocal_NBC * const &bc_part,
     const ALocal_Ring_NodalBC * const &ring_bc_part )
 {
   if(is_set) Clear();
@@ -92,7 +92,7 @@ void Matrix_PETSc_CMM::gen_ring_inplane_bc( const APart_Node * const &pnode_ptr,
 }
 
 void Matrix_PETSc_CMM::gen_ring_radial_motion_bc( const APart_Node * const &pnode_ptr,
-        const ALocal_NodalBC * const &bc_part,
+        const ALocal_NBC * const &bc_part,
         const ALocal_Ring_NodalBC * const &ring_bc_part )
 {
   if(is_set) Clear();
@@ -150,7 +150,7 @@ void Matrix_PETSc_CMM::gen_ring_radial_motion_bc( const APart_Node * const &pnod
 }
 
 void Matrix_PETSc_CMM::gen_outlet_ring_inplane_bc( const APart_Node * const &pnode_ptr,
-    const ALocal_NodalBC * const &bc_part,
+    const ALocal_NBC * const &bc_part,
     const ALocal_Ring_NodalBC * const &ring_bc_part )
 {
   if(is_set) Clear();
@@ -204,7 +204,7 @@ void Matrix_PETSc_CMM::gen_outlet_ring_inplane_bc( const APart_Node * const &pno
 }
 
 void Matrix_PETSc_CMM::gen_outlet_ring_radial_motion_bc( const APart_Node * const &pnode_ptr,
-        const ALocal_NodalBC * const &bc_part,
+        const ALocal_NBC * const &bc_part,
         const ALocal_Ring_NodalBC * const &ring_bc_part )
 {
   if(is_set) Clear();
@@ -267,7 +267,7 @@ void Matrix_PETSc_CMM::gen_outlet_ring_radial_motion_bc( const APart_Node * cons
 }
 
 void Matrix_PETSc_CMM::gen_ring_inplane_bc_partial_clamp( const APart_Node * const &pnode_ptr,
-    const ALocal_NodalBC * const &bc_part,
+    const ALocal_NBC * const &bc_part,
     const ALocal_Ring_NodalBC * const &ring_bc_part )
 {
   if(is_set) Clear();

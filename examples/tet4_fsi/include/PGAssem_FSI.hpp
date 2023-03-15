@@ -26,8 +26,8 @@ class PGAssem_FSI : public IPGAssem
         const ALocal_IEN * const &aien_p,
         const APart_Node * const &pnode_v,
         const APart_Node * const &pnode_p,
-        const ALocal_NodalBC * const &part_nbc_v,
-        const ALocal_NodalBC * const &part_nbc_p,
+        const ALocal_NBC * const &part_nbc_v,
+        const ALocal_NBC * const &part_nbc_p,
         const ALocal_EBC * const &part_ebc,
         const IGenBC * const &gbc,
         const int &in_nz_estimate = 60 );
@@ -43,8 +43,8 @@ class PGAssem_FSI : public IPGAssem
         const ALocal_IEN * const &lien_v,
         const ALocal_IEN * const &lien_p,
         const APart_Node * const &pnode_v,
-        const ALocal_NodalBC * const &nbc_v,
-        const ALocal_NodalBC * const &nbc_p,
+        const ALocal_NBC * const &nbc_v,
+        const ALocal_NBC * const &nbc_p,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
@@ -62,8 +62,8 @@ class PGAssem_FSI : public IPGAssem
         const ALocal_IEN * const &lien_v,
         const ALocal_IEN * const &lien_p,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_v,
-        const ALocal_NodalBC * const &nbc_p,
+        const ALocal_NBC * const &nbc_v,
+        const ALocal_NBC * const &nbc_p,
         const ALocal_EBC * const &ebc_part,
         const Prestress_solid * const &ps_ptr );
 
@@ -88,8 +88,8 @@ class PGAssem_FSI : public IPGAssem
         const ALocal_IEN * const &lien_v,
         const ALocal_IEN * const &lien_p,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_v,
-        const ALocal_NodalBC * const &nbc_p,
+        const ALocal_NBC * const &nbc_v,
+        const ALocal_NBC * const &nbc_p,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
         const Prestress_solid * const &ps_ptr );
@@ -115,8 +115,8 @@ class PGAssem_FSI : public IPGAssem
         const ALocal_IEN * const &lien_v,
         const ALocal_IEN * const &lien_p,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_v,
-        const ALocal_NodalBC * const &nbc_p,
+        const ALocal_NBC * const &nbc_v,
+        const ALocal_NBC * const &nbc_p,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
         const Prestress_solid * const &ps_ptr );
@@ -163,16 +163,16 @@ class PGAssem_FSI : public IPGAssem
   private:
     const int nLocBas, snLocBas, num_ebc, nlgn_v, nlgn_p;
 
-    void EssBC_KG( const ALocal_NodalBC * const &nbc_v, const ALocal_NodalBC * const &nbc_p );
+    void EssBC_KG( const ALocal_NBC * const &nbc_v, const ALocal_NBC * const &nbc_p );
 
-    void EssBC_G( const ALocal_NodalBC * const &nbc_v, const ALocal_NodalBC * const &nbc_p );
+    void EssBC_G( const ALocal_NBC * const &nbc_v, const ALocal_NBC * const &nbc_p );
 
     void NatBC_G( const double &curr_time, const double &dt,
         const PDNSolution * const &disp,
         IPLocAssem_2x2Block * const &lassem_f_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_NodalBC * const &nbc_v,
+        const ALocal_NBC * const &nbc_v,
         const ALocal_EBC * const &ebc_part );
 
     // Resistance BC for fluid
@@ -183,7 +183,7 @@ class PGAssem_FSI : public IPGAssem
         IPLocAssem_2x2Block * const &lassem_f_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_NodalBC * const &nbc_v,
+        const ALocal_NBC * const &nbc_v,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
@@ -194,7 +194,7 @@ class PGAssem_FSI : public IPGAssem
         IPLocAssem_2x2Block * const &lassem_f_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_NodalBC * const &nbc_v,
+        const ALocal_NBC * const &nbc_v,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
@@ -206,7 +206,7 @@ class PGAssem_FSI : public IPGAssem
         IPLocAssem_2x2Block * const &lassem_f_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_NodalBC * const &nbc_v,
+        const ALocal_NBC * const &nbc_v,
         const ALocal_EBC * const &ebc_part );
 
     void BackFlow_KG( const double &dt,
@@ -216,7 +216,7 @@ class PGAssem_FSI : public IPGAssem
         IPLocAssem_2x2Block * const &lassem_f_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_NodalBC * const &nbc_v,
+        const ALocal_NBC * const &nbc_v,
         const ALocal_EBC * const &ebc_part );
 
     std::vector<double> GetLocal( const std::vector<double> &array,

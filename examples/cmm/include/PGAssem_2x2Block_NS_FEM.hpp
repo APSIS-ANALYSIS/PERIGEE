@@ -15,7 +15,7 @@
 #include "IAGlobal_Mesh_Info.hpp"
 #include "IPLocAssem_2x2Block.hpp"
 #include "PDNSolution_NS.hpp"
-#include "ALocal_NodalBC.hpp"
+#include "ALocal_NBC.hpp"
 #include "ALocal_EBC.hpp"
 #include "IGenBC.hpp"
 #include "PETSc_Tools.hpp"
@@ -40,7 +40,7 @@ class PGAssem_2x2Block_NS_FEM
         const ALocal_Elem * const &alelem_ptr,
         const ALocal_IEN * const &aien_ptr,
         const APart_Node * const &pnode_ptr,
-        const ALocal_NodalBC * const &part_nbc,
+        const ALocal_NBC * const &part_nbc,
         const ALocal_EBC * const &part_ebc,
         const IGenBC * const &gbc,
         const int &in_nz_estimate=60 );
@@ -119,7 +119,7 @@ class PGAssem_2x2Block_NS_FEM
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
@@ -136,7 +136,7 @@ class PGAssem_2x2Block_NS_FEM
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
 
@@ -157,7 +157,7 @@ class PGAssem_2x2Block_NS_FEM
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
@@ -179,7 +179,7 @@ class PGAssem_2x2Block_NS_FEM
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
@@ -223,15 +223,15 @@ class PGAssem_2x2Block_NS_FEM
     int snLocBas;
 
     // Functions:
-    void EssBC_KG( const ALocal_NodalBC * const &nbc_part );
+    void EssBC_KG( const ALocal_NBC * const &nbc_part );
 
-    void EssBC_G( const ALocal_NodalBC * const &nbc_part );
+    void EssBC_G( const ALocal_NBC * const &nbc_part );
 
     void NatBC_G( const double &curr_time, const double &dt,
         IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
     void BackFlow_G( const PDNSolution * const &dot_sol,
@@ -239,7 +239,7 @@ class PGAssem_2x2Block_NS_FEM
         IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
     void BackFlow_KG( const double &dt,
@@ -248,7 +248,7 @@ class PGAssem_2x2Block_NS_FEM
         IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
     void NatBC_Resis_G( const PDNSolution * const &dot_sol,
@@ -256,7 +256,7 @@ class PGAssem_2x2Block_NS_FEM
         IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
@@ -266,7 +266,7 @@ class PGAssem_2x2Block_NS_FEM
         IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 

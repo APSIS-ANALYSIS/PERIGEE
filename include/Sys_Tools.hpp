@@ -106,23 +106,23 @@ namespace SYS_T
   inline void synPrint(const std::string &output, const int &cpu_rank)
   {
     PetscSynchronizedPrintf(PETSC_COMM_WORLD, "Proc %d: ", cpu_rank);
-    PetscSynchronizedPrintf(PETSC_COMM_WORLD, output.c_str());
+    PetscSynchronizedPrintf(PETSC_COMM_WORLD, "%s", output.c_str());
     PetscSynchronizedFlush(PETSC_COMM_WORLD, PETSC_STDOUT);
   }
   inline void synPrint(const char * const &output, const int &cpu_rank)
   {
     PetscSynchronizedPrintf(PETSC_COMM_WORLD, "Proc %d: ", cpu_rank);
-    PetscSynchronizedPrintf(PETSC_COMM_WORLD, output);
+    PetscSynchronizedPrintf(PETSC_COMM_WORLD, "%s", output);
     PetscSynchronizedFlush(PETSC_COMM_WORLD, PETSC_STDOUT);
   }
   inline void synPrint(const std::string &output)
   {
-    PetscSynchronizedPrintf(PETSC_COMM_WORLD, output.c_str());
+    PetscSynchronizedPrintf(PETSC_COMM_WORLD, "%s", output.c_str());
     PetscSynchronizedFlush(PETSC_COMM_WORLD, PETSC_STDOUT);
   }
   inline void synPrint(const char * const &output)
   {
-    PetscSynchronizedPrintf(PETSC_COMM_WORLD, output);
+    PetscSynchronizedPrintf(PETSC_COMM_WORLD, "%s", output);
     PetscSynchronizedFlush(PETSC_COMM_WORLD, PETSC_STDOUT);
   }
 
@@ -143,11 +143,11 @@ namespace SYS_T
   //    and PETSC_COMM_WORLD. This is particularly designed to print
   //    command line arguments.
   inline void cmdPrint(const char * const &dataname, const int &datavalue)
-  {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, ss.str().c_str());}
+  {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, "%s", ss.str().c_str());}
   inline void cmdPrint(const char * const &dataname, const double &datavalue)
-  {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, ss.str().c_str());}
+  {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, "%s", ss.str().c_str());}
   inline void cmdPrint(const char * const &dataname, const std::string &datavalue)
-  {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, ss.str().c_str());}
+  {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, "%s", ss.str().c_str());}
 
   // 4. Print fatal error message and terminate the MPI process
   inline void print_fatal( const char output[], ... )
@@ -301,6 +301,47 @@ namespace SYS_T
 #endif
   }
 
+  // ----------------------------------------------------------------
+  // Check if a file exists. If a file cannot be found, throw an error
+  // message and exit code
+  // ----------------------------------------------------------------
+  inline bool file_exist( const std::string &fName )
+  {
+    if( FILE *ff = fopen(fName.c_str(), "r") )
+    {
+      fclose(ff);
+      return true;
+    }
+    else return false;
+  }
+
+  inline bool directory_exist( const std::string &dName )
+  {
+    if (dName.empty() || dName == "" || dName == "/0")
+      return true;
+
+    struct stat info;
+    if (stat(dName.c_str(), &info) == 0)
+      return true;
+
+    return false;
+  }
+
+  inline void file_check( const std::string &fName )
+  {
+    print_fatal_if( !file_exist(fName), 
+        "Error: The file %s does not exist. Job is killed. \n", fName.c_str());
+  }
+
+  // --------------------------------------------------------------------------
+  // Execute a system call
+  // --------------------------------------------------------------------------
+  inline void execute( const char * const &command )
+  {
+    int sysret = system( command );
+    print_fatal_if(sysret != 0, "Error: system call %s failed. \n", command);
+  }
+
   // ================================================================
   // The folowing are options-get functions that read command-line
   // argument. They are really wrappers of the PetscOptionsGetXXXXX
@@ -354,45 +395,25 @@ namespace SYS_T
     if(flg) outdata = char_outdata;
   }
 
-  // ----------------------------------------------------------------
-  // Check if a file exists. If a file cannot be found, throw an error
-  // message and exit code
-  // ----------------------------------------------------------------
-  inline bool file_exist( const std::string &fName )
+  inline void InsertFileYAML( const std::string &filename, const bool &require )
   {
-    if( FILE *ff = fopen(fName.c_str(), "r") )
+#if PETSC_VERSION_GE(3,15,0)
+    if( require )
     {
-      fclose(ff);
-      return true;
+      file_check( filename );
+      commPrint("Status: loading YAML file %s from the disk.\n", filename.c_str());
+      PetscOptionsInsertFileYAML(PETSC_COMM_WORLD, NULL, filename.c_str(), PETSC_TRUE);
     }
-    else return false;
-  }
+    else
+    {
+      if(!file_exist(filename))
+        commPrint("Warning: the YAML file %s does not exist, and the command line arguments are loaded.\n", filename.c_str());
 
-  inline bool directory_exist( const std::string &dName )
-  {
-    if (dName.empty() || dName == "" || dName == "/0")
-      return true;
-    
-    struct stat info;
-    if (stat(dName.c_str(), &info) == 0)
-      return true;
-
-    return false;
-  }
-
-  inline void file_check( const std::string &fName )
-  {
-    print_fatal_if( !file_exist(fName), 
-        "Error: The file %s does not exist. Job is killed. \n", fName.c_str());
-  }
-
-  // --------------------------------------------------------------------------
-  // Execute a system call
-  // --------------------------------------------------------------------------
-  inline void execute( const char * const &command )
-  {
-    int sysret = system( command );
-    print_fatal_if(sysret != 0, "Error: system call %s failed. \n", command);
+      PetscOptionsInsertFileYAML(PETSC_COMM_WORLD, NULL, filename.c_str(), PETSC_FALSE);
+    }
+#else
+    commPrint("Warning: YAML is unsupported in this PETSc.\n");
+#endif
   }
 
   // ================================================================
@@ -438,7 +459,7 @@ namespace SYS_T
   {
     commPrint("----------------------------------------------------------------------\n");
   }
-  
+
   inline void print_sep_double_line()
   {
     commPrint("======================================================================\n");

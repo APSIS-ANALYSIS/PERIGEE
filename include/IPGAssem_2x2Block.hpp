@@ -17,7 +17,7 @@
 #include "PETSc_Tools.hpp"
 #include "IAGlobal_Mesh_Info.hpp"
 #include "IPLocAssem_2x2Block.hpp"
-#include "ALocal_NodalBC.hpp"
+#include "ALocal_NBC.hpp"
 #include "ALocal_NodalBC_2x2Block.hpp"
 #include "ALocal_EBC.hpp"
 #include "FEANode.hpp"
@@ -143,7 +143,7 @@ class IPGAssem_2x2Block
     virtual void Assem_nonzero_estimate(
         IPLocAssem_2x2Block * const &lassem_ptr,
         const ALocal_IEN * const &lien_ptr,
-        const ALocal_NodalBC * const &nbc_part )
+        const ALocal_NBC * const &nbc_part )
     {
       SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented.\n");
     }
@@ -162,7 +162,7 @@ class IPGAssem_2x2Block
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
@@ -180,7 +180,7 @@ class IPGAssem_2x2Block
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
@@ -201,7 +201,7 @@ class IPGAssem_2x2Block
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part )
     {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
@@ -224,7 +224,7 @@ class IPGAssem_2x2Block
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part )
     {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
@@ -246,7 +246,7 @@ class IPGAssem_2x2Block
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part )
     {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
@@ -269,7 +269,7 @@ class IPGAssem_2x2Block
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part )
     {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 

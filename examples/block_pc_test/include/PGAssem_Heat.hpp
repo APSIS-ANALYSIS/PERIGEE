@@ -8,7 +8,7 @@
 #include "ALocal_Elem.hpp"
 #include "IAGlobal_Mesh_Info.hpp"
 #include "IPLocAssem.hpp"
-#include "ALocal_NodalBC.hpp"
+#include "ALocal_NBC.hpp"
 #include "ALocal_Inflow_NodalBC.hpp"
 #include "ALocal_EBC.hpp"
 #include "PETSc_Tools.hpp"
@@ -29,7 +29,7 @@ class PGAssem_Heat : public IPGAssem
         const ALocal_Elem * const &alelem_ptr,
         const ALocal_IEN * const &aien_ptr,
         const APart_Node * const &pnode_ptr,
-        const ALocal_NodalBC * const &part_nbc,
+        const ALocal_NBC * const &part_nbc,
         const ALocal_EBC * const &part_ebc,
         const int &in_nz_estimate=60 );
 
@@ -42,7 +42,7 @@ class PGAssem_Heat : public IPGAssem
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
     virtual void Assem_tangent_residual(
@@ -61,14 +61,14 @@ class PGAssem_Heat : public IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
     virtual void Assem_intNA(
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
     virtual int get_num_ebc() const {return num_ebc;}
@@ -92,14 +92,14 @@ class PGAssem_Heat : public IPGAssem
 
     double * sctrl_x, * sctrl_y, * sctrl_z;
 
-    void EssBC_KG( const ALocal_NodalBC * const &nbc_part, const int &field );
+    void EssBC_KG( const ALocal_NBC * const &nbc_part, const int &field );
 
     void NatBC_G( const double &curr_time, const double &dt,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const int &in_loc_dof,
         const IQuadPts * const &quad_s,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
     void GetLocal(const double * const &array, const int * const &IEN,
@@ -130,7 +130,7 @@ class PGAssem_Heat : public IPGAssem
 
     void Get_dnz_onz( const int &nlocnode,
         const int &empirical_neighbor_node_number,
-        const ALocal_NodalBC * const &nbc_ptr,
+        const ALocal_NBC * const &nbc_ptr,
         PetscInt * const &dnz, PetscInt * const &onz ) const;
 };
 

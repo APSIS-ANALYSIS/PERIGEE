@@ -159,7 +159,7 @@ int main( int argc, char *argv[] )
   APart_Node * pNode = new APart_Node(part_file, rank);
 
   // Local sub-domain's nodal (Dirichlet) BC
-  ALocal_NodalBC * locnbc = new ALocal_NodalBC(part_file, rank);
+  ALocal_NBC * locnbc = new ALocal_NBC(part_file, rank);
 
   // Local sub-domain's ring (Dirichlet) in-plane motion BC
   ALocal_Ring_NodalBC * locringnbc = new ALocal_Ring_NodalBC(part_file, rank);

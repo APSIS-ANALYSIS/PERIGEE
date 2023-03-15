@@ -13,7 +13,7 @@
 #include "APart_Node.hpp"
 #include "ALocal_EBC_outflow.hpp"
 #include "ALocal_Inflow_NodalBC.hpp"
-#include "ALocal_NodalBC.hpp"
+#include "ALocal_NBC.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
 #include "FEAElement_Tet4.hpp"
@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
   
   ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
   
-  ALocal_NodalBC * locnbc = new ALocal_NodalBC(part_file, rank);
+  ALocal_NBC * locnbc = new ALocal_NBC(part_file, rank);
   
   ALocal_Inflow_NodalBC * locinfnbc = new ALocal_Inflow_NodalBC(part_file, rank);
   

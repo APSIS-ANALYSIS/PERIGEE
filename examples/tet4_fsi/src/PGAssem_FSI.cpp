@@ -10,8 +10,8 @@ PGAssem_FSI::PGAssem_FSI(
     const ALocal_IEN * const &aien_p,
     const APart_Node * const &pnode_v,
     const APart_Node * const &pnode_p,
-    const ALocal_NodalBC * const &part_nbc_v,
-    const ALocal_NodalBC * const &part_nbc_p,
+    const ALocal_NBC * const &part_nbc_v,
+    const ALocal_NBC * const &part_nbc_p,
     const ALocal_EBC * const &part_ebc,
     const IGenBC * const &gbc,
     const int &in_nz_estimate )
@@ -107,8 +107,8 @@ void PGAssem_FSI::Assem_nonzero_estimate(
     const ALocal_IEN * const &lien_v,
     const ALocal_IEN * const &lien_p,
     const APart_Node * const &pnode_v,
-    const ALocal_NodalBC * const &nbc_v,
-    const ALocal_NodalBC * const &nbc_p,
+    const ALocal_NBC * const &nbc_v,
+    const ALocal_NBC * const &nbc_p,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc )
 {
@@ -185,8 +185,8 @@ void PGAssem_FSI::Assem_mass_residual(
     const ALocal_IEN * const &lien_v,
     const ALocal_IEN * const &lien_p,
     const FEANode * const &fnode_ptr,
-    const ALocal_NodalBC * const &nbc_v,
-    const ALocal_NodalBC * const &nbc_p,
+    const ALocal_NBC * const &nbc_v,
+    const ALocal_NBC * const &nbc_p,
     const ALocal_EBC * const &ebc_part,
     const Prestress_solid * const &ps_ptr )
 {
@@ -287,8 +287,8 @@ void PGAssem_FSI::Assem_Residual(
     const ALocal_IEN * const &lien_v,
     const ALocal_IEN * const &lien_p,
     const FEANode * const &fnode_ptr,
-    const ALocal_NodalBC * const &nbc_v,
-    const ALocal_NodalBC * const &nbc_p,
+    const ALocal_NBC * const &nbc_v,
+    const ALocal_NBC * const &nbc_p,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc,
     const Prestress_solid * const &ps_ptr )
@@ -397,8 +397,8 @@ void PGAssem_FSI::Assem_Tangent_Residual(
     const ALocal_IEN * const &lien_v,
     const ALocal_IEN * const &lien_p,
     const FEANode * const &fnode_ptr,
-    const ALocal_NodalBC * const &nbc_v,
-    const ALocal_NodalBC * const &nbc_p,
+    const ALocal_NBC * const &nbc_v,
+    const ALocal_NBC * const &nbc_p,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc,
     const Prestress_solid * const &ps_ptr )
@@ -504,8 +504,8 @@ void PGAssem_FSI::Assem_Tangent_Residual(
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 }
 
-void PGAssem_FSI::EssBC_KG( const ALocal_NodalBC * const &nbc_v,
-    const ALocal_NodalBC * const &nbc_p )
+void PGAssem_FSI::EssBC_KG( const ALocal_NBC * const &nbc_v,
+    const ALocal_NBC * const &nbc_p )
 {
   // For three velocity fields
   for(int field=0; field<3; ++field)
@@ -562,8 +562,8 @@ void PGAssem_FSI::EssBC_KG( const ALocal_NodalBC * const &nbc_v,
 }
 
 
-void PGAssem_FSI::EssBC_G( const ALocal_NodalBC * const &nbc_v, 
-    const ALocal_NodalBC * const &nbc_p )
+void PGAssem_FSI::EssBC_G( const ALocal_NBC * const &nbc_v, 
+    const ALocal_NBC * const &nbc_p )
 {
   // For three velocity fields
   for(int field=0; field<3; ++field)
@@ -803,7 +803,7 @@ void PGAssem_FSI::NatBC_G( const double &curr_time, const double &dt,
     IPLocAssem_2x2Block * const &lassem_f_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const ALocal_NodalBC * const &nbc_v,
+    const ALocal_NBC * const &nbc_v,
     const ALocal_EBC * const &ebc_part )
 {
   const std::vector<double> array_d = disp -> GetLocalArray(); 
@@ -851,7 +851,7 @@ void PGAssem_FSI::NatBC_Resis_G( const double &curr_time, const double &dt,
     IPLocAssem_2x2Block * const &lassem_f_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const ALocal_NodalBC * const &nbc_v,
+    const ALocal_NBC * const &nbc_v,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc )
 {
@@ -915,7 +915,7 @@ void PGAssem_FSI::NatBC_Resis_KG( const double &curr_time, const double &dt,
     IPLocAssem_2x2Block * const &lassem_f_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const ALocal_NodalBC * const &nbc_v,
+    const ALocal_NBC * const &nbc_v,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc )
 {
@@ -1050,7 +1050,7 @@ void PGAssem_FSI::BackFlow_G(
     IPLocAssem_2x2Block * const &lassem_f_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const ALocal_NodalBC * const &nbc_v,
+    const ALocal_NBC * const &nbc_v,
     const ALocal_EBC * const &ebc_part )
 {
   const std::vector<double> array_d = disp -> GetLocalArray();
@@ -1103,7 +1103,7 @@ void PGAssem_FSI::BackFlow_KG( const double &dt,
     IPLocAssem_2x2Block * const &lassem_f_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const ALocal_NodalBC * const &nbc_v,
+    const ALocal_NBC * const &nbc_v,
     const ALocal_EBC * const &ebc_part )
 {
   const std::vector<double> array_d = disp -> GetLocalArray();
