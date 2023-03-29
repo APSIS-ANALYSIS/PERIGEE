@@ -114,12 +114,16 @@ void PLocAssem_Tet4_FSI_Mesh_Elastostatic::Assem_Tangent_Residual(
       wy += (vec_b[ii*3+2] - vec_a[ii*3+2]) * dR_dy[ii];
       wz += (vec_b[ii*3+2] - vec_a[ii*3+2]) * dR_dz[ii];
     }
-
-    const double gwts = detJac * quad->get_qw(qua) / detJac; // element stiffening
+    
+    // element stiffening: we multiply the inverse of the element volume given
+    // by detJac to enhance the mesh moving algorithm's robustness, as the small
+    // element will be stiffer and thus is resistant to mesh distortion.
+    // Reference: Tayfun Tezduyar and ... (to be added by Sun YuJie) 
+    const double gwts = detJac * quad->get_qw(qua) / detJac;
 
     for(int A=0; A<nLocBas; ++A)
     {
-      double NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
+      const double NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
       Residual[3*A] += gwts * (
           NA_x * (l2mu * ux + lambda * vy + lambda * wz)
@@ -138,7 +142,7 @@ void PLocAssem_Tet4_FSI_Mesh_Elastostatic::Assem_Tangent_Residual(
 
       for(int B=0; B<nLocBas; ++B)
       {
-        double NB_x = dR_dx[B], NB_y = dR_dy[B], NB_z = dR_dz[B];
+        const double NB_x = dR_dx[B], NB_y = dR_dy[B], NB_z = dR_dz[B];
 
         Tangent[ 3*nLocBas*(3*A+0) + 3*B + 0 ] += gwts * (l2mu * NA_x * NB_x + mu * NA_y * NB_y + mu * NA_z * NB_z );
 
