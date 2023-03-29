@@ -118,7 +118,7 @@ void PLocAssem_Tet4_FSI_Mesh_Elastostatic::Assem_Tangent_Residual(
     // element stiffening: we multiply the inverse of the element volume given
     // by detJac to enhance the mesh moving algorithm's robustness, as the small
     // element will be stiffer and thus is resistant to mesh distortion.
-    // Reference: Tayfun Tezduyar and ... (to be added by Sun YuJie) 
+    // Reference: T.E. Tezduyar and A.A. Johnson (1994) CMAME 119 (1994) 73–94
     const double gwts = detJac * quad->get_qw(qua) / detJac;
 
     for(int A=0; A<nLocBas; ++A)
