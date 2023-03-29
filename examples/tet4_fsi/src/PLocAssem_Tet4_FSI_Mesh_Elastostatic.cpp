@@ -28,7 +28,7 @@ void PLocAssem_Tet4_FSI_Mesh_Elastostatic::print_info() const
   SYS_T::commPrint("  Possion's ratio nu = %e \n", nu);
   SYS_T::commPrint("  Lame coeff lambda  = %e \n", lambda);
   SYS_T::commPrint("  Shear modulus mu   = %e \n", mu);
-  SYS_T::commPrint("  Bulk modulus kappa = %e \n", kappa));
+  SYS_T::commPrint("  Bulk modulus kappa = %e \n", kappa);
   SYS_T::commPrint("  Note: Element stiffening is applied. \n");
   SYS_T::print_sep_line();
 }
