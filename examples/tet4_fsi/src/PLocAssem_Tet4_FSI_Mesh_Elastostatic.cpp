@@ -21,18 +21,18 @@ PLocAssem_Tet4_FSI_Mesh_Elastostatic::~PLocAssem_Tet4_FSI_Mesh_Elastostatic()
 
 void PLocAssem_Tet4_FSI_Mesh_Elastostatic::print_info() const
 {
-  SYS_T::print_sep_line();
-  PetscPrintf(PETSC_COMM_WORLD, "  Three-dimensional Elastostatic equation: \n");
-  PetscPrintf(PETSC_COMM_WORLD, "  Spatial: Galerkin Finite element \n");
-  PetscPrintf(PETSC_COMM_WORLD, "  This solver is for mesh motion in the fluid sub-domain for FSI problems.\n");
-  PetscPrintf(PETSC_COMM_WORLD, "  Young's Modulus E  = %e \n", E);
-  PetscPrintf(PETSC_COMM_WORLD, "  Possion's ratio nu = %e \n", nu);
-  PetscPrintf(PETSC_COMM_WORLD, "  Lame coeff lambda  = %e \n", lambda);
-  PetscPrintf(PETSC_COMM_WORLD, "  Shear modulus mu   = %e \n", mu);
-  PetscPrintf(PETSC_COMM_WORLD, "  Bulk modulus kappa = %e \n", kappa);
-  PetscPrintf(PETSC_COMM_WORLD, "  Note: Element stiffening is applied. \n");
+  SYS_T::commPrint("  Three-dimensional Elastostatic equation: \n");
+  SYS_T::commPrint("  Spatial: Galerkin Finite element \n");
+  SYS_T::commPrint("  This solver is for mesh motion in the fluid sub-domain for FSI problems.\n");
+  SYS_T::commPrint("  Young's Modulus E  = %e \n", E);
+  SYS_T::commPrint("  Possion's ratio nu = %e \n", nu);
+  SYS_T::commPrint("  Lame coeff lambda  = %e \n", lambda);
+  SYS_T::commPrint("  Shear modulus mu   = %e \n", mu);
+  SYS_T::commPrint("  Bulk modulus kappa = %e \n", kappa));
+  SYS_T::commPrint("  Note: Element stiffening is applied. \n");
   SYS_T::print_sep_line();
 }
+
 
 void PLocAssem_Tet4_FSI_Mesh_Elastostatic::Zero_Tangent_Residual()
 {
