@@ -41,6 +41,8 @@ mesh_pc_hypre_boomeramg_truncfactor: 0.3
 mesh_pc_hypre_boomeramg_strong_threshold: 0.5
 mesh_pc_hypre_boomeramg_P_max: 5
 mesh_pc_hypre_boomeramg_agg_nl: 2
+mesh_ksp_rtol: 1e-10
+mesh_ksp_max_it: 500
 # Linear solver arguments
 ksp_type: gmres
 pc_type: asm
