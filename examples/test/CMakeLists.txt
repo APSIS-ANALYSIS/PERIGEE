@@ -48,7 +48,6 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/IPart.cpp
   ${perigee_source}/Mesh/Part_Tet.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet.cpp
-  ${perigee_source}/Mesh/ElemBC_3D_tet_wall.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet_outflow.cpp
   ${perigee_source}/Mesh/NodalBC_3D_inflow.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
@@ -151,10 +150,12 @@ ADD_EXECUTABLE( sys_test sys_test.cpp )
 ADD_EXECUTABLE( mod_test matmodel_test.cpp )
 ADD_EXECUTABLE( testh5 h5_test.cpp )
 ADD_EXECUTABLE( elem_test elem_test.cpp )
+ADD_EXECUTABLE( read_direction_vec_test read_direction_vec_test.cpp )
 
 TARGET_LINK_LIBRARIES( sys_test perigee_preprocess perigee_analysis )
 TARGET_LINK_LIBRARIES( mod_test perigee_preprocess perigee_analysis )
 TARGET_LINK_LIBRARIES( testh5 perigee_preprocess )
 TARGET_LINK_LIBRARIES( elem_test perigee_analysis )
+TARGET_LINK_LIBRARIES( read_direction_vec_test perigee_preprocess )
 
 # EOF
