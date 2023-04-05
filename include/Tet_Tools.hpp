@@ -80,6 +80,9 @@ namespace TET_T
   std::vector<double> read_double_PointData( const std::string &filename, 
       const std::string &dataname );
 
+  std::vector<double> read_double_vec_3_PointData( const std::string &filename,
+      const std::string &dataname );
+
   // ----------------------------------------------------------------
   // ! read_vtu_grid: read the mesh info just exactly the same way
   //                  as the original read_vtu_grid. In addition,

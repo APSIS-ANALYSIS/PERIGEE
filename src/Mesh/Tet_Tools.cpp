@@ -224,6 +224,47 @@ std::vector<double> TET_T::read_double_PointData( const std::string &filename,
   return data;
 }
 
+std::vector<double> TET_T::read_double_vec_3_PointData( const std::string &filename,
+    const std::string &dataname )
+{
+  vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
+  reader -> SetFileName( filename.c_str() );
+  reader -> Update();
+
+  vtkPointData * pointdata = nullptr;
+  int numpts = -1;
+
+  // Downcasting will return null if fails
+  if(dynamic_cast<vtkPolyData*>(reader->GetOutput()))
+  {
+    vtkPolyData * vtkgrid = reader -> GetPolyDataOutput ();
+    pointdata = vtkgrid->GetPointData();
+    numpts = static_cast<int>( vtkgrid -> GetNumberOfPoints() );
+  }
+  else if(dynamic_cast<vtkUnstructuredGrid*>(reader->GetOutput()))
+  {
+    vtkUnstructuredGrid * vtkgrid = reader -> GetUnstructuredGridOutput();
+    pointdata = vtkgrid->GetPointData();
+    numpts = static_cast<int>( vtkgrid -> GetNumberOfPoints() );
+  }
+  else
+    SYS_T::print_fatal("TET_T::read_double_PointData unknown vtk object type.\n");
+
+  vtkDataArray * pd = pointdata->GetScalars( dataname.c_str() );
+
+  std::vector<double> data( numpts*3 );
+  for(int ii=0; ii<numpts; ++ii)
+  {
+    data[ii*3+0] = static_cast<double>( pd->GetComponent(ii, 0) );
+    data[ii*3+1] = static_cast<double>( pd->GetComponent(ii, 1) );
+    data[ii*3+2] = static_cast<double>( pd->GetComponent(ii, 2) );
+  }
+
+  reader -> Delete();
+
+  return data;
+}
+
 
 void TET_T::read_vtu_grid( const std::string &filename,
     int &numpts, int &numcels,
