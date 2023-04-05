@@ -87,6 +87,150 @@ Part_Tet_FSI::Part_Tet_FSI( const IMesh * const &mesh,
 
   nlocalnode_fluid = static_cast<int>( node_loc_fluid.size() );
   nlocalnode_solid = static_cast<int>( node_loc_solid.size() );
+
+  is_direction_vec = false;
+
+  loc_radial_vec_x.clear();
+  loc_radial_vec_y.clear();
+  loc_radial_vec_z.clear();
+  loc_longitudinal_vec_x.clear();
+  loc_longitudinal_vec_y.clear();
+  loc_longitudinal_vec_z.clear();
+  loc_circumferential_vec_x.clear();
+  loc_circumferential_vec_y.clear();
+  loc_circumferential_vec_z.clear();
+}
+
+Part_Tet_FSI::Part_Tet_FSI( const IMesh * const &mesh,
+    const IGlobal_Part * const &gpart,
+    const Map_Node_Index * const &mnindex,
+    const IIEN * const &IEN,
+    const std::vector<double> &ctrlPts,
+    const std::vector<int> &phytag,
+    const std::vector<int> &node_f,
+    const std::vector<int> &node_s,
+    const std::vector<double> &radial_vec,
+    const std::vector<double> &longitudinal_vec,
+    const std::vector<double> &circumferential_vec,
+    const int &in_cpu_rank,
+    const int &in_cpu_size,
+    const int &in_elemType,
+    const int &field,
+    const int &in_dof,
+    const int &in_start_idx,
+    const bool &in_is_geo_field )
+: Part_Tet(), start_idx( in_start_idx ), is_geo_field(in_is_geo_field)
+{
+nElem = mesh->get_nElem();
+  nFunc = mesh->get_nFunc();
+  sDegree = mesh->get_s_degree();
+  tDegree = mesh->get_t_degree();
+  uDegree = mesh->get_u_degree();
+  nLocBas = mesh->get_nLocBas();
+  probDim = 3;
+  elemType = in_elemType;
+  cpu_rank = in_cpu_rank;
+  cpu_size = in_cpu_size;
+
+  // We set dofMat and dofNum to negative numbers, as they are not needed
+  dofMat = -1;
+  dofNum = in_dof;
+
+  // Check the cpu info
+  SYS_T::print_exit_if(cpu_size < 1, "Error: Part_Tet input cpu_size is wrong! \n");
+  SYS_T::print_exit_if(cpu_rank >= cpu_size, "Error: Part_Tet input cpu_rank is wrong! \n");
+  SYS_T::print_exit_if(cpu_rank < 0, "Error: Part_Tet input cpu_rank is wrong! \n");
+
+  // Generate group 1, 2, and 5.
+  Generate_Partition( mesh, gpart, mnindex, IEN, field );
+
+  // Generate group 6 if this field is geometry
+  if( is_geo_field )
+  {
+    // local copy of control points
+    ctrlPts_x_loc.resize(nlocghonode);
+    ctrlPts_y_loc.resize(nlocghonode);
+    ctrlPts_z_loc.resize(nlocghonode);
+
+    for(int ii=0; ii<nlocghonode; ++ii)
+    {
+      int aux_index = local_to_global[ii]; // new global index
+      aux_index = mnindex->get_new2old(aux_index); // back to old global index
+      ctrlPts_x_loc[ii] = ctrlPts[3*aux_index + 0];
+      ctrlPts_y_loc[ii] = ctrlPts[3*aux_index + 1];
+      ctrlPts_z_loc[ii] = ctrlPts[3*aux_index + 2];
+    }
+
+    VEC_T::shrink2fit(ctrlPts_x_loc);
+    VEC_T::shrink2fit(ctrlPts_y_loc);
+    VEC_T::shrink2fit(ctrlPts_z_loc);
+
+    std::cout<<"-- proc "<<cpu_rank<<" Local control points generated. \n";
+  }
+  else
+  {
+    ctrlPts_x_loc.clear();
+    ctrlPts_y_loc.clear();
+    ctrlPts_z_loc.clear();
+  }
+
+  // Generate the local array tagging the element's property.
+  elem_phy_tag.resize( nlocalele );
+  for(int ii=0; ii<nlocalele; ++ii) elem_phy_tag[ii] = phytag[ elem_loc[ii] ];
+
+  // Generate the node_loc_fluid/solid
+  node_loc_fluid.clear();
+  node_loc_solid.clear();
+
+  for(int ii=0; ii<nlocalnode; ++ii)
+  {
+    if( VEC_T::is_invec(node_f, node_loc_original[ii]) ) node_loc_fluid.push_back(ii);
+
+    if( VEC_T::is_invec(node_s, node_loc_original[ii]) ) node_loc_solid.push_back(ii);
+  }
+
+  nlocalnode_fluid = static_cast<int>( node_loc_fluid.size() );
+  nlocalnode_solid = static_cast<int>( node_loc_solid.size() );
+
+  is_direction_vec = true;
+
+  loc_radial_vec_x.resize(nlocalnode_solid);
+  loc_radial_vec_y.resize(nlocalnode_solid);
+  loc_radial_vec_z.resize(nlocalnode_solid);
+  loc_longitudinal_vec_x.resize(nlocalnode_solid);
+  loc_longitudinal_vec_y.resize(nlocalnode_solid);
+  loc_longitudinal_vec_z.resize(nlocalnode_solid);
+  loc_circumferential_vec_x.resize(nlocalnode_solid);
+  loc_circumferential_vec_y.resize(nlocalnode_solid);
+  loc_circumferential_vec_z.resize(nlocalnode_solid);
+
+  for(int ii=0; ii<nlocalnode_solid; ++ii)
+  {
+    const int pos = VEC_T::get_pos( node_s, node_loc_solid[ii] );
+    loc_radial_vec_x[ii] = radial_vec[3*pos + 0];
+    loc_radial_vec_y[ii] = radial_vec[3*pos + 1];
+    loc_radial_vec_z[ii] = radial_vec[3*pos + 2];
+
+    loc_longitudinal_vec_x[ii] = longitudinal_vec[3*pos + 0];
+    loc_longitudinal_vec_y[ii] = longitudinal_vec[3*pos + 1];
+    loc_longitudinal_vec_z[ii] = longitudinal_vec[3*pos + 2];
+
+    loc_circumferential_vec_x[ii] = circumferential_vec[3*pos + 0];
+    loc_circumferential_vec_y[ii] = circumferential_vec[3*pos + 1];
+    loc_circumferential_vec_z[ii] = circumferential_vec[3*pos + 2];
+  }
+
+  VEC_T::shrink2fit(loc_radial_vec_x);
+  VEC_T::shrink2fit(loc_radial_vec_y);
+  VEC_T::shrink2fit(loc_radial_vec_z);
+  VEC_T::shrink2fit(loc_longitudinal_vec_x);
+  VEC_T::shrink2fit(loc_longitudinal_vec_y);
+  VEC_T::shrink2fit(loc_longitudinal_vec_z);
+  VEC_T::shrink2fit(loc_circumferential_vec_x);
+  VEC_T::shrink2fit(loc_circumferential_vec_y);
+  VEC_T::shrink2fit(loc_circumferential_vec_z);
+
+  std::cout<<"-- proc "<<cpu_rank<<" Local direction vectors generated. \n";
 }
 
 Part_Tet_FSI::~Part_Tet_FSI()

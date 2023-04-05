@@ -32,6 +32,25 @@ class Part_Tet_FSI : public Part_Tet
         const int &in_start_idx,
         const bool &in_is_geo_field );
 
+    Part_Tet_FSI( const IMesh * const &mesh,
+        const IGlobal_Part * const &gpart,
+        const Map_Node_Index * const &mnindex,
+        const IIEN * const &IEN,
+        const std::vector<double> &ctrlPts,
+        const std::vector<int> &phytag,
+        const std::vector<int> &node_f,
+        const std::vector<int> &node_s,
+        const std::vector<double> &radial_vec,
+        const std::vector<double> &longitudinal_vec,
+        const std::vector<double> &circumferential_vec,
+        const int &in_cpu_rank,
+        const int &in_cpu_size,
+        const int &in_elemType,
+        const int &field,
+        const int &in_dof,
+        const int &in_start_idx,
+        const bool &in_is_geo_field );
+
     virtual ~Part_Tet_FSI();
 
     virtual void write( const char * inputFileName ) const;
@@ -55,6 +74,14 @@ class Part_Tet_FSI : public Part_Tet
 
     // Flag that determines if the field is a geometry field
     const bool is_geo_field;
+
+    // Flag that determines if the solid nodes contain direction vecter information
+    bool is_direction_vec;
+
+    // local direction vecters
+    std::vector<double> loc_radial_vec_x, loc_radial_vec_y, loc_radial_vec_z;
+    std::vector<double> loc_longitudinal_vec_x, loc_longitudinal_vec_y, loc_longitudinal_vec_z;
+    std::vector<double> loc_circumferential_vec_x, loc_circumferential_vec_y, loc_circumferential_vec_z;
 };
 
 #endif
