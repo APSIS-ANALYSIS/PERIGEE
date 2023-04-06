@@ -13,9 +13,9 @@ int main(int argc, char *argv[])
   
   //read sold data
   std::vector<int> global_node_index = TET_T::read_int_PointData(geo_s_file, "GlobalNodeID");
-  std::vector<double> radial_normal_vec = TET_T::read_double_vec_3_PointData(geo_s_file, "radial_normal");
-  std::vector<double> longitudinal_normal_vec = TET_T::read_double_vec_3_PointData(geo_s_file, "longitudinal_normal");
-  std::vector<double> circumferential_normal_vec = TET_T::read_double_vec_3_PointData(geo_s_file, "circumferential_normal");
+  std::vector<Vector_3> radial_normal_vec = TET_T::read_Vector_3_PointData(geo_s_file, "radial_normal");
+  std::vector<Vector_3> longitudinal_normal_vec = TET_T::read_Vector_3_PointData(geo_s_file, "longitudinal_normal");
+  std::vector<Vector_3> circumferential_normal_vec = TET_T::read_Vector_3_PointData(geo_s_file, "circumferential_normal");
 
   //read whole geo data
   int nFunc, nElem;
@@ -60,15 +60,18 @@ int main(int argc, char *argv[])
   cout<<"longitudinal_normal_vec size: "<<longitudinal_normal_vec.size()<<endl;
   cout<<"circumferential_normal_vec size: "<<circumferential_normal_vec.size()<<endl;
 
-  /*
+  
   for(unsigned int ii=0; ii<global_node_index.size(); ii++)
   {
     cout<<"nodeID: "<<global_node_index[ii]<<endl;
-    cout<<"radial normal: "<<radial_normal_vec[ii*3]<<"\t"<<radial_normal_vec[ii*3+1]<<"\t"<<radial_normal_vec[ii*3+2]<<endl;
-    cout<<"longitudinal normal: "<<longitudinal_normal_vec[ii*3]<<"\t"<<longitudinal_normal_vec[ii*3+1]<<"\t"<<longitudinal_normal_vec[ii*3+2]<<endl;
-    cout<<"circumferential normal: "<<circumferential_normal_vec[ii*3]<<"\t"<<circumferential_normal_vec[ii*3+1]<<"\t"<<circumferential_normal_vec[ii*3+2]<<endl;
+    cout<<"radial normal: "<<endl;
+    radial_normal_vec[ii].print();
+    cout<<"longitudinal normal: "<<endl;
+    longitudinal_normal_vec[ii].print();
+    cout<<"circumferential normal: "<<endl;
+    circumferential_normal_vec[ii].print();
   }
-  */
+  
 
   return EXIT_SUCCESS;
 }
