@@ -240,6 +240,8 @@ int main( int argc, char *argv[] )
   const int idx_v_start = HDF5_T::read_intScalar( SYS_T::gen_partfile_name(part_v_file, rank).c_str(), "/DOF_mapper", "start_idx" );
   const int idx_p_start = HDF5_T::read_intScalar( SYS_T::gen_partfile_name(part_p_file, rank).c_str(), "/DOF_mapper", "start_idx" );
 
+  std::vector<int> start_idx{ idx_v_start, idx_p_start};
+
   const int idx_v_len = pNode_v->get_dof() * pNode_v -> get_nlocalnode();
   const int idx_p_len = pNode_p->get_dof() * pNode_p -> get_nlocalnode();
 
@@ -259,7 +261,7 @@ int main( int argc, char *argv[] )
 
   // ===== Generate a sparse matrix for strong enforcement of essential BC
   Matrix_PETSc * pmat = new Matrix_PETSc( idx_v_len + idx_p_len );
-  pmat -> gen_perm_bc( pNode_list, locnbc_list );
+  pmat -> gen_perm_bc( pNode_list, locnbc_list, start_idx );
 
   // ===== Generate the generalized-alpha method
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
