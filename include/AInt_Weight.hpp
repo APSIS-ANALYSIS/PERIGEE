@@ -5,10 +5,6 @@
 // Analysis Tools: Integration Weights.
 // Stores the Integration weights.
 //
-// Note: This class is used if ParentElement is not used. This class
-//       together with BernsteinBasis class perofrm the same job as
-//       ParentElement class.
-//
 // Date: Nov. 23 2013.
 // ============================================================================
 #include "IQuadPts.hpp"

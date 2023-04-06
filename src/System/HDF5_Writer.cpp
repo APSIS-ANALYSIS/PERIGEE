@@ -378,7 +378,7 @@ void HDF5_Writer::write_Vector_3( const hid_t &group_id, const char * const &dat
     const Vector_3 &value ) const
 {
   // First convert Vector_3 to a double array
-  const double val[3] = { value(0), value(1), value(2) };
+  const double val[3] = { value.x(), value.y(), value.z() };
 
   hsize_t dims[1]; dims[0] = 3;
   if(dims[0] > 0)
@@ -399,7 +399,7 @@ void HDF5_Writer::write_Vector_3( const hid_t &group_id, const char * const &dat
 void HDF5_Writer::write_Vector_3( const char * const &data_name, const Vector_3 &value ) const
 {
   // First convert Vector_3 to a double array
-  const double val[3] = { value(0), value(1), value(2) };
+  const double val[3] = { value.x(), value.y(), value.z() };
 
   hsize_t dims[1]; dims[0] = 3;
   if(dims[0] > 0)

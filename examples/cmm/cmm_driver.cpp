@@ -106,6 +106,10 @@ int main( int argc, char *argv[] )
   std::string restart_name = "SOL_"; // restart solution base name
   std::string restart_disp_name = "SOL_disp_"; // restart disp solution base name
 
+  // Yaml options
+  bool isloadYaml = true;
+  std::string yaml_file("./runscript.yml");
+
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
   const PetscMPIInt rank = SYS_T::get_MPI_rank();
@@ -117,6 +121,13 @@ int main( int argc, char *argv[] )
   SYS_T::commPrint("PETSc version: %s \n", PETSc_T::get_version().c_str());
 
   SYS_T::print_fatal_if( cmmBC_type == 2, "Error: cmmBC_type is set to 2, which is designed for prestress generation. \n");
+
+  // ===== Yaml Arguments =====
+  SYS_T::GetOptionBool(  "-isloadYaml",   isloadYaml);
+  SYS_T::GetOptionString("-yaml_file",    yaml_file);
+
+  if (isloadYaml)
+    {SYS_T::InsertFileYAML( yaml_file,  false );}
 
   // ===== Read Command Line Arguments =====
   SYS_T::commPrint("===> Reading command line arguments... \n");
@@ -305,7 +316,7 @@ int main( int argc, char *argv[] )
   else SYS_T::print_fatal("Error: Element type not supported.\n");
 
   // Local sub-domain's nodal (Dirichlet) BC
-  ALocal_NodalBC * locnbc = new ALocal_NodalBC(part_file, rank);
+  ALocal_NBC * locnbc = new ALocal_NBC(part_file, rank);
 
   // Local sub-domain's inflow (Dirichlet) BC
   ALocal_Inflow_NodalBC * locinfnbc = new ALocal_Inflow_NodalBC(part_file, rank);

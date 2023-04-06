@@ -207,17 +207,17 @@ int main( int argc, char *argv[] )
 
   ALocal_EBC * locebc_p = new ALocal_EBC( part_p_file, rank );
 
-  ALocal_NodalBC * locnbc_v = new ALocal_NodalBC(part_v_file, rank, "/nbc/MF");
+  ALocal_NBC * locnbc_v = new ALocal_NBC(part_v_file, rank, "/nbc/MF");
 
-  ALocal_NodalBC * locnbc_p = new ALocal_NodalBC(part_p_file, rank, "/nbc/MF");
+  ALocal_NBC * locnbc_p = new ALocal_NBC(part_p_file, rank, "/nbc/MF");
 
   Prestress_solid * ps_data = new Prestress_solid(locElem, nqp_tet, rank, is_load_ps, ps_file_name);  
   SYS_T::commPrint("===> Mesh HDF5 files are read from disk.\n");
 
-  // Group APart_Node and ALocal_NodalBC into a vector
+  // Group APart_Node and ALocal_NBC into a vector
   std::vector<APart_Node *> pNode_list { pNode_v, pNode_p };
 
-  std::vector<ALocal_NodalBC *> locnbc_list { locnbc_v, locnbc_p };
+  std::vector<ALocal_NBC *> locnbc_list { locnbc_v, locnbc_p };
 
   std::vector<APart_Node *> pNode_m_list { pNode_v };
 
@@ -240,6 +240,8 @@ int main( int argc, char *argv[] )
   const int idx_v_start = HDF5_T::read_intScalar( SYS_T::gen_partfile_name(part_v_file, rank).c_str(), "/DOF_mapper", "start_idx" );
   const int idx_p_start = HDF5_T::read_intScalar( SYS_T::gen_partfile_name(part_p_file, rank).c_str(), "/DOF_mapper", "start_idx" );
 
+  std::vector<int> start_idx{ idx_v_start, idx_p_start};
+
   const int idx_v_len = pNode_v->get_dof() * pNode_v -> get_nlocalnode();
   const int idx_p_len = pNode_p->get_dof() * pNode_p -> get_nlocalnode();
 
@@ -259,7 +261,7 @@ int main( int argc, char *argv[] )
 
   // ===== Generate a sparse matrix for strong enforcement of essential BC
   Matrix_PETSc * pmat = new Matrix_PETSc( idx_v_len + idx_p_len );
-  pmat -> gen_perm_bc( pNode_list, locnbc_list );
+  pmat -> gen_perm_bc( pNode_list, locnbc_list, start_idx );
 
   // ===== Generate the generalized-alpha method
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");

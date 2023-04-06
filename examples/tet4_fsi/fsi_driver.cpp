@@ -108,6 +108,10 @@ int main(int argc, char *argv[])
   std::string restart_v_name = "SOL_V_";
   std::string restart_p_name = "SOL_P_";
 
+  // Yaml options
+  bool isloadYaml = true;
+  std::string yaml_file("./runscript.yml");
+
   // ===== Initialization of PETSc =====
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
@@ -118,6 +122,13 @@ int main(int argc, char *argv[])
 
   SYS_T::commPrint("Job started on %s %s \n", SYS_T::get_time().c_str(), SYS_T::get_date().c_str());
   SYS_T::commPrint("PETSc version: %s \n", PETSc_T::get_version().c_str());
+
+  // ===== Yaml Argument =====
+  SYS_T::GetOptionBool(  "-isloadYaml",   isloadYaml);
+  SYS_T::GetOptionString("-yaml_file",    yaml_file);
+
+  if (isloadYaml)
+    {SYS_T::InsertFileYAML( yaml_file,  false );}
 
   // ===== Command Line Argument =====
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
@@ -284,11 +295,11 @@ int main(int argc, char *argv[])
 
   ALocal_Inflow_NodalBC * locinfnbc = new ALocal_Inflow_NodalBC(part_v_file, rank);
 
-  ALocal_NodalBC * locnbc_v = new ALocal_NodalBC(part_v_file, rank, "/nbc/MF");
+  ALocal_NBC * locnbc_v = new ALocal_NBC(part_v_file, rank, "/nbc/MF");
   
-  ALocal_NodalBC * locnbc_p = new ALocal_NodalBC(part_p_file, rank, "/nbc/MF");
+  ALocal_NBC * locnbc_p = new ALocal_NBC(part_p_file, rank, "/nbc/MF");
 
-  ALocal_NodalBC * mesh_locnbc = new ALocal_NodalBC(part_v_file, rank, "/mesh_nbc/MF");
+  ALocal_NBC * mesh_locnbc = new ALocal_NBC(part_v_file, rank, "/mesh_nbc/MF");
 
   ALocal_EBC * locebc_v = new ALocal_EBC_outflow(part_v_file, rank);
   
@@ -298,14 +309,14 @@ int main(int argc, char *argv[])
 
   Prestress_solid * ps_data = new Prestress_solid(locElem, nqp_tet, rank, is_load_ps, "./ps_data/prestress");
 
-  // Group APart_Node and ALocal_NodalBC into a vector
+  // Group APart_Node and ALocal_NBC into a vector
   std::vector<APart_Node *> pNode_list { pNode_v, pNode_p };
 
-  std::vector<ALocal_NodalBC *> locnbc_list { locnbc_v, locnbc_p };
+  std::vector<ALocal_NBC *> locnbc_list { locnbc_v, locnbc_p };
 
   std::vector<APart_Node *> pNode_m_list { pNode_v };
 
-  std::vector<ALocal_NodalBC *> locnbc_m_list { mesh_locnbc };
+  std::vector<ALocal_NBC *> locnbc_m_list { mesh_locnbc };
 
   // ===== Basic Checking =====
   SYS_T::print_fatal_if( size!= PartBasic->get_cpu_size(),
@@ -345,6 +356,8 @@ int main(int argc, char *argv[])
   const int idx_v_start = HDF5_T::read_intScalar( SYS_T::gen_partfile_name(part_v_file, rank).c_str(), "/DOF_mapper", "start_idx" );
   const int idx_p_start = HDF5_T::read_intScalar( SYS_T::gen_partfile_name(part_p_file, rank).c_str(), "/DOF_mapper", "start_idx" );
 
+  std::vector<int> start_idx{ idx_v_start, idx_p_start};
+
   const int idx_v_len = pNode_v->get_dof() * pNode_v -> get_nlocalnode();
   const int idx_p_len = pNode_p->get_dof() * pNode_p -> get_nlocalnode();
 
@@ -364,10 +377,13 @@ int main(int argc, char *argv[])
 
   // ===== Generate a sparse matrix for strong enforcement of essential BC
   Matrix_PETSc * pmat = new Matrix_PETSc( idx_v_len + idx_p_len );
-  pmat -> gen_perm_bc( pNode_list, locnbc_list );
+  pmat -> gen_perm_bc( pNode_list, locnbc_list, start_idx );
+
+  const int idx_m_start = pNode_v->get_node_loc(0) * locnbc_v->get_dof_LID();
+  std::vector<int> start_m_idx{ idx_m_start };
   
   Matrix_PETSc * mmat = new Matrix_PETSc( pNode_v -> get_nlocalnode() * pNode_v -> get_dof() );
-  mmat -> gen_perm_bc( pNode_m_list, locnbc_m_list );
+  mmat -> gen_perm_bc( pNode_m_list, locnbc_m_list, start_m_idx );
 
   // ===== Generate the generalized-alpha method
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");

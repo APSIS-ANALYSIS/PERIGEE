@@ -37,7 +37,7 @@ class PNonlinear_Transport_Solver
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &anode_ptr,
         const FEANode * const &feanode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const Matrix_PETSc * const &bc_mat,
         FEAElement * const &elementv,

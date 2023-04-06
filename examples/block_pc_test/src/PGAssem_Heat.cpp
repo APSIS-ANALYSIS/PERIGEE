@@ -8,7 +8,7 @@ PGAssem_Heat::PGAssem_Heat(
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &aien_ptr,
     const APart_Node * const &pnode_ptr,
-    const ALocal_NodalBC * const &part_nbc,
+    const ALocal_NBC * const &part_nbc,
     const ALocal_EBC * const &part_ebc,
     const int &in_nz_estimate )
 : nLocBas( agmi_ptr->get_nLocBas() ),
@@ -140,7 +140,7 @@ PGAssem_Heat::~PGAssem_Heat()
 
 void PGAssem_Heat::Get_dnz_onz( const int &nlocnode,
     const int &empirical_neighbor_node_number,
-    const ALocal_NodalBC * const &nbc_ptr,
+    const ALocal_NBC * const &nbc_ptr,
     PetscInt * const &dnz, PetscInt * const &onz ) const
 {
   const int nzbase = dof_mat * empirical_neighbor_node_number;
@@ -243,7 +243,7 @@ void PGAssem_Heat::Assem_nonzero_estimate(
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
     const APart_Node * const &node_ptr,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();
@@ -303,7 +303,7 @@ void PGAssem_Heat::Assem_tangent_residual(
     const ALocal_IEN * const &lien_ptr,
     const APart_Node * const &node_ptr,
     const FEANode * const &fnode_ptr,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();
@@ -350,7 +350,7 @@ void PGAssem_Heat::Assem_tangent_residual(
 }
 
 
-void PGAssem_Heat::EssBC_KG( const ALocal_NodalBC * const &nbc_part, 
+void PGAssem_Heat::EssBC_KG( const ALocal_NBC * const &nbc_part, 
     const int &field )
 {
   const int local_dir = nbc_part->get_Num_LD(field);
@@ -385,7 +385,7 @@ void PGAssem_Heat::NatBC_G( const double &curr_time, const double &dt,
     FEAElement * const &element_s,
     const int &in_loc_dof,
     const IQuadPts * const &quad_s,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
@@ -417,7 +417,7 @@ void PGAssem_Heat::Assem_intNA(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   PetscScalar * Res = new PetscScalar [snLocBas * 1];

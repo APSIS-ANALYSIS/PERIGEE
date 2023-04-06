@@ -74,7 +74,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/APart_Basic_Info.cpp
   ${perigee_source}/Analysis_Tool/ALocal_Elem.cpp
   ${perigee_source}/Analysis_Tool/ALocal_IEN.cpp
-  ${perigee_source}/Analysis_Tool/ALocal_NodalBC.cpp
+  ${perigee_source}/Analysis_Tool/ALocal_NBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_Inflow_NodalBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_EBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_EBC_outflow.cpp

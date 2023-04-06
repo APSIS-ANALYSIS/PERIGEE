@@ -4,7 +4,7 @@ PGAssem_Mesh::PGAssem_Mesh( IPLocAssem * const &locassem_ptr,
     ALocal_Elem const * const &alelem_ptr,
     ALocal_IEN const * const &aien_ptr,
     APart_Node const * const &pnode_ptr,
-    ALocal_NodalBC const * const &part_nbc,
+    ALocal_NBC const * const &part_nbc,
     ALocal_EBC const * const &part_ebc,
     const int &in_nz_estimate )
 : nLocBas(  locassem_ptr->get_nLocBas() ), 
@@ -57,7 +57,7 @@ void PGAssem_Mesh::Assem_nonzero_estimate(
     const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
     const ALocal_IEN * const &lien_ptr,
-    const ALocal_NodalBC * const &nbc_part )
+    const ALocal_NBC * const &nbc_part )
 {
   const int nElem = alelem_ptr -> get_nlocalele();
 
@@ -99,7 +99,7 @@ void PGAssem_Mesh::Assem_mass_residual(
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   const int nElem = alelem_ptr -> get_nlocalele();
@@ -160,7 +160,7 @@ void PGAssem_Mesh::Assem_residual(
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();
@@ -221,7 +221,7 @@ void PGAssem_Mesh::Assem_tangent_residual(
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();
@@ -272,7 +272,7 @@ void PGAssem_Mesh::Assem_tangent_residual(
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 }
 
-void PGAssem_Mesh::EssBC_KG( const ALocal_NodalBC * const &nbc_part )
+void PGAssem_Mesh::EssBC_KG( const ALocal_NBC * const &nbc_part )
 {
   for(int field=0; field<dof; ++field)
   {
@@ -305,7 +305,7 @@ void PGAssem_Mesh::EssBC_KG( const ALocal_NodalBC * const &nbc_part )
   }
 }
 
-void PGAssem_Mesh::EssBC_G( const ALocal_NodalBC * const &nbc_part )
+void PGAssem_Mesh::EssBC_G( const ALocal_NBC * const &nbc_part )
 {
   for(int field=0; field<dof; ++field)
   {
@@ -338,7 +338,7 @@ void PGAssem_Mesh::NatBC_G( const double &curr_time, const double &dt,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   double * sctrl_x = new double [snLocBas];

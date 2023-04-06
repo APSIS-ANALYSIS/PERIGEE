@@ -1,7 +1,7 @@
-#ifndef ALOCAL_NODALBC_HPP
-#define ALOCAL_NODALBC_HPP
+#ifndef ALOCAL_NBC_HPP
+#define ALOCAL_NBC_HPP
 // ============================================================================
-// ALocal_NodalBC.hpp
+// ALocal_NBC.hpp
 //
 // FEM-analysis-use Local subdomain's Nodal Boundary Conditions.
 //
@@ -10,7 +10,7 @@
 // ============================================================================
 #include "HDF5_Reader.hpp"
 
-class ALocal_NodalBC
+class ALocal_NBC
 {
   public:
     // ------------------------------------------------------------------------
@@ -19,10 +19,10 @@ class ALocal_NodalBC
     // This function is specifically designed to read the nbc for mesh motion 
     // equations in FSI problem, which are stored under the gname mesh_nbc.
     // ------------------------------------------------------------------------
-    ALocal_NodalBC( const std::string &fileBaseName, 
+    ALocal_NBC( const std::string &fileBaseName, 
         const int &cpu_rank, const std::string &gname="/nbc" );
 
-    virtual ~ALocal_NodalBC();
+    virtual ~ALocal_NBC();
 
     // ------------------------------------------------------------------------
     // print information
@@ -114,8 +114,22 @@ class ALocal_NodalBC
     // dof := LID.size() / nlocghonode
     int dof, nlocghonode;
 
+    // LID stores the ID of all degrees-of-freedom. The ID value could be the
+    // corresponding grid point's index (old manner) or the corresponding matrix
+    // column index (new manner). For the actual definition of the LID array,
+    // the users should refer to the corresponding NBC_Partition routine.
     std::vector<int> LID;
-    
+   
+    // LDN stores the Dirichlet nodes' index owned by this CPU locally;
+    // LPSN stores the slave nodes' indices owned by this CPU locally;
+    // LPMN stores the corresponding master nodes (of LPSN) indices owned by
+    // this CPU locally;
+    // LocalMaster stores the master nodes' indices owned by this CPU locally;
+    // LocalMasterSlave stores the corresponding slave nodes (of LocalMaster)
+    // indices owned by this CPU locally.
+    // The meaning of the index meantioned above could be the grid point id (old
+    // manner) or the corresponding matrix column index (new manner). The
+    // actual definition is in the NBC_Partition routine. 
     std::vector<int> LDN, LPSN, LPMN, LocalMaster, LocalMasterSlave;
 
     std::vector<int> Num_LD, Num_LPS, Num_LPM;

@@ -6,7 +6,7 @@ PGAssem_Tet_Transport_GenAlpha::PGAssem_Tet_Transport_GenAlpha(
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &aien_ptr,
     const APart_Node * const &pnode_ptr,
-    const ALocal_NodalBC * const &part_nbc,
+    const ALocal_NBC * const &part_nbc,
     const ALocal_EBC * const &part_ebc,
     const int &in_nz_estimate )
 : nLocBas( agmi_ptr->get_nLocBas() ),
@@ -58,7 +58,7 @@ PGAssem_Tet_Transport_GenAlpha::~PGAssem_Tet_Transport_GenAlpha()
 
 
 void PGAssem_Tet_Transport_GenAlpha::EssBC_KG( 
-    const ALocal_NodalBC * const &nbc_part )
+    const ALocal_NBC * const &nbc_part )
 {
   const int field = 0;
   const int local_dir = nbc_part -> get_Num_LD(field);
@@ -90,7 +90,7 @@ void PGAssem_Tet_Transport_GenAlpha::EssBC_KG(
 
 
 void PGAssem_Tet_Transport_GenAlpha::EssBC_G( 
-    const ALocal_NodalBC * const &nbc_part )
+    const ALocal_NBC * const &nbc_part )
 {
   const int field = 0;
   const int local_dir = nbc_part->get_Num_LD(field);
@@ -119,7 +119,7 @@ void PGAssem_Tet_Transport_GenAlpha::Assem_nonzero_estimate(
     const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
     const ALocal_IEN * const &lien_ptr,
-    const ALocal_NodalBC * const &nbc_part )
+    const ALocal_NBC * const &nbc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();
   
@@ -157,7 +157,7 @@ void PGAssem_Tet_Transport_GenAlpha::NatBC_G(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   int * LSIEN = new int [snLocBas];
@@ -206,7 +206,7 @@ void PGAssem_Tet_Transport_GenAlpha::Assem_residual(
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();
@@ -276,7 +276,7 @@ void PGAssem_Tet_Transport_GenAlpha::Assem_tangent_residual(
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part)
 {
   const int nElem = alelem_ptr->get_nlocalele();
@@ -347,7 +347,7 @@ void PGAssem_Tet_Transport_GenAlpha::Assem_mass_residual(
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();

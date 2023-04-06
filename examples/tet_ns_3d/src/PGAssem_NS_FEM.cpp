@@ -8,7 +8,7 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &aien_ptr,
     const APart_Node * const &pnode_ptr,
-    const ALocal_NodalBC * const &part_nbc,
+    const ALocal_NBC * const &part_nbc,
     const ALocal_EBC * const &part_ebc,
     const IGenBC * const &gbc,
     const int &in_nz_estimate )
@@ -75,7 +75,7 @@ PGAssem_NS_FEM::~PGAssem_NS_FEM()
 
 
 void PGAssem_NS_FEM::EssBC_KG(
-    const ALocal_NodalBC * const &nbc_part, const int &field )
+    const ALocal_NBC * const &nbc_part, const int &field )
 {
   const int local_dir = nbc_part->get_Num_LD(field);
 
@@ -104,7 +104,7 @@ void PGAssem_NS_FEM::EssBC_KG(
 }
 
 
-void PGAssem_NS_FEM::EssBC_G( const ALocal_NodalBC * const &nbc_part, 
+void PGAssem_NS_FEM::EssBC_G( const ALocal_NBC * const &nbc_part, 
     const int &field )
 {
   const int local_dir = nbc_part->get_Num_LD(field);
@@ -136,7 +136,7 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
     const APart_Node * const &node_ptr,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc )
 {
@@ -194,7 +194,7 @@ void PGAssem_NS_FEM::Assem_mass_residual(
     const ALocal_IEN * const &lien_ptr,
     const APart_Node * const &node_ptr,
     const FEANode * const &fnode_ptr,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();
@@ -267,7 +267,7 @@ void PGAssem_NS_FEM::Assem_residual(
     const ALocal_IEN * const &lien_ptr,
     const APart_Node * const &node_ptr,
     const FEANode * const &fnode_ptr,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc )
 {
@@ -350,7 +350,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     const ALocal_IEN * const &lien_ptr,
     const APart_Node * const &node_ptr,
     const FEANode * const &fnode_ptr,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc )
 {
@@ -426,7 +426,7 @@ void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   int * LSIEN = new int [snLocBas];
@@ -472,7 +472,7 @@ void PGAssem_NS_FEM::BackFlow_G(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   double * array_a = new double [nlgn * dof_sol];
@@ -532,7 +532,7 @@ void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   double * array_a = new double [nlgn * dof_sol];
@@ -812,7 +812,7 @@ void PGAssem_NS_FEM::NatBC_Resis_G(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc )
 {
@@ -882,7 +882,7 @@ void PGAssem_NS_FEM::NatBC_Resis_KG(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc )
 {

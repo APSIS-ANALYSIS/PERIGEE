@@ -33,7 +33,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const ALocal_Elem * const &alelem_ptr,
         const ALocal_IEN * const &aien_ptr,
         const APart_Node * const &pnode_ptr,
-        const ALocal_NodalBC * const &part_nbc,
+        const ALocal_NBC * const &part_nbc,
         const ALocal_Ring_NodalBC * const &part_ringnbc,
         const ALocal_EBC * const &part_ebc,
         const IGenBC * const &gbc,
@@ -50,7 +50,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_Ring_NodalBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
@@ -67,7 +67,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_Ring_NodalBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part );
 
@@ -90,7 +90,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_Ring_NodalBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part,
         const ALocal_EBC * const &ebc_wall_part,
@@ -116,7 +116,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_Ring_NodalBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part,
         const ALocal_EBC * const &ebc_wall_part,
@@ -169,7 +169,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_Ring_NodalBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbci,
@@ -183,9 +183,9 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
 
     // Private function
     // Essential boundary condition
-    void EssBC_KG( const ALocal_NodalBC * const &nbc_part, const int &field );
+    void EssBC_KG( const ALocal_NBC * const &nbc_part, const int &field );
 
-    void EssBC_G( const ALocal_NodalBC * const &nbc_part, const int &field );
+    void EssBC_G( const ALocal_NBC * const &nbc_part, const int &field );
 
     // Ring nodal BC: 1) clamped, or 2) in-plane motion (skew bc)
     // References:
@@ -211,7 +211,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_Ring_NodalBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part );
 
@@ -221,7 +221,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_Ring_NodalBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part );
 
@@ -231,7 +231,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_Ring_NodalBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part );
 
@@ -242,7 +242,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_Ring_NodalBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
@@ -254,7 +254,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_Ring_NodalBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
@@ -268,7 +268,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_w,
         const IQuadPts * const &quad_s,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_Ring_NodalBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_wall_part );
 
@@ -280,7 +280,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_w,
         const IQuadPts * const &quad_s,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_Ring_NodalBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_wall_part );
 
