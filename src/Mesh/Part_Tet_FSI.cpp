@@ -344,6 +344,24 @@ void Part_Tet_FSI::write( const char * inputFileName ) const
 
   H5Gclose( group_id_7 );
 
+  // group 8: direction vecters
+  if( is_direction_vec )
+  {
+    hid_t group_id_8 = H5Gcreate(file_id, "/directionVectors_loc", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+    h5w -> write_doubleVector( group_id_8, "loc_radial_vec_x", loc_radial_vec_x );
+    h5w -> write_doubleVector( group_id_8, "loc_radial_vec_y", loc_radial_vec_y );
+    h5w -> write_doubleVector( group_id_8, "loc_radial_vec_z", loc_radial_vec_z );
+    h5w -> write_doubleVector( group_id_8, "loc_longitudinal_vec_x", loc_longitudinal_vec_x );
+    h5w -> write_doubleVector( group_id_8, "loc_longitudinal_vec_y", loc_longitudinal_vec_y );
+    h5w -> write_doubleVector( group_id_8, "loc_longitudinal_vec_z", loc_longitudinal_vec_z );
+    h5w -> write_doubleVector( group_id_8, "loc_circumferential_vec_x", loc_circumferential_vec_x );
+    h5w -> write_doubleVector( group_id_8, "loc_circumferential_vec_y", loc_circumferential_vec_y );
+    h5w -> write_doubleVector( group_id_8, "loc_circumferential_vec_z", loc_circumferential_vec_z );
+
+    H5Gclose( group_id_8 );
+  }
+
   // Finish writing, clean up
   delete h5w;
   H5Fclose(file_id);
