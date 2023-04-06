@@ -315,31 +315,6 @@ int main( int argc, char * argv[] )
   std::cout<<"Solid domain: "<<v_node_s.size()<<" nodes.\n";
   std::cout<<"Fluid-Solid interface: "<<nFunc_interface<<" nodes.\n";
 
-  // --------------------------------------------------------------------------
-  // CHANGE for vascular-tissue:
-  // Read the geometry file for the solid domain,
-  // generate the list of direction vectors of the nodes.
-  // Including radial, longitudinal, and circumferential vectors.
-  // --------------------------------------------------------------------------
-  std::vector<int> solid_node_id = TET_T::read_int_PointData(geo_s_file, "GlobalNodeID");
-  std::vector<double> radial_vec = TET_T::read_double_vec_3_PointData(geo_s_file, "radial_normal");
-  std::vector<double> longitudinal_vec = TET_T::read_double_vec_3_PointData(geo_s_file, "longitudinal_normal");
-  std::vector<double> circumferential_vec = TET_T::read_double_vec_3_PointData(geo_s_file, "circumferential_normal");
-
-  if (v_node_s != solid_node_id) SYS_T::print_fatal("ERROR: GlobalNodeID for solid geometry file is not equal to the whole FSI domain.");
-  if (solid_node_id.size()*3 != radial_vec.size()) SYS_T::print_fatal("ERROR: radial_vec is not matched.");
-  if (solid_node_id.size()*3 != longitudinal_vec.size()) SYS_T::print_fatal("ERROR: longitudinal_vec is not matched.");
-  if (solid_node_id.size()*3 != circumferential_vec.size()) SYS_T::print_fatal("ERROR: circumferential_vec is not matched.");
-
-  cout<<"=== Direction vectors generated."<<endl;
-  cout<<"solid_node_id size: "<<solid_node_id.size()<<endl;
-  cout<<"radial_vec size: "<<radial_vec.size()<<endl;
-  cout<<"longitudinal_vec size: "<<longitudinal_vec.size()<<endl;
-  cout<<"circumferential_vec size: "<<circumferential_vec.size()<<endl;
-  // --------------------------------------------------------------------------
-  // CHANGE END
-  // --------------------------------------------------------------------------
-
   std::vector<IIEN const *> ienlist;
   ienlist.push_back(IEN_p); ienlist.push_back(IEN_v);
 
@@ -490,7 +465,7 @@ int main( int argc, char * argv[] )
     part_p -> write( part_file_p );
 
     IPart * part_v = new Part_Tet_FSI( mesh_v, global_part, mnindex_v, IEN_v,
-        ctrlPts, phy_tag, v_node_f, v_node_s, radial_vec, longitudinal_vec, circumferential_vec,
+        ctrlPts, phy_tag, v_node_f, v_node_s,
         proc_rank, cpu_size, elemType, 1, dof_fields[1], start_idx_v[proc_rank], true );
 
     part_v -> print_part_loadbalance_edgecut();
