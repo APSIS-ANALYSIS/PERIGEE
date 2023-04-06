@@ -224,7 +224,7 @@ std::vector<double> TET_T::read_double_PointData( const std::string &filename,
   return data;
 }
 
-std::vector<double> TET_T::read_double_vec_3_PointData( const std::string &filename,
+std::vector<Vector_3> TET_T::read_Vector_3_PointData( const std::string &filename,
     const std::string &dataname )
 {
   vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
@@ -252,12 +252,14 @@ std::vector<double> TET_T::read_double_vec_3_PointData( const std::string &filen
 
   vtkDataArray * pd = pointdata->GetScalars( dataname.c_str() );
 
-  std::vector<double> data( numpts*3 );
+  std::vector<Vector_3> data( numpts );
   for(int ii=0; ii<numpts; ++ii)
   {
-    data[ii*3+0] = static_cast<double>( pd->GetComponent(ii, 0) );
-    data[ii*3+1] = static_cast<double>( pd->GetComponent(ii, 1) );
-    data[ii*3+2] = static_cast<double>( pd->GetComponent(ii, 2) );
+    const double data_x = static_cast<double>( pd->GetComponent(ii, 0) );
+    const double data_y = static_cast<double>( pd->GetComponent(ii, 1) );
+    const double data_z = static_cast<double>( pd->GetComponent(ii, 2) );
+
+    data[ii] = Vector_3( data_x, data_y, data_z );
   }
 
   reader -> Delete();
