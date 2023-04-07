@@ -255,7 +255,6 @@ void PGAssem_Tet_Wall::Assem_tangent_residual(
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
-    const APart_Node * const &node_ptr,
     const FEANode * const &fnode_ptr,
     const ALocal_NBC * const &nbc_part,
     const ALocal_Ring_NodalBC * const &ringnbc_part,

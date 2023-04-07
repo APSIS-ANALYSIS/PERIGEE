@@ -503,7 +503,7 @@ int main( int argc, char *argv[] )
   PCFieldSplitSetFields(upc,"p",1,pfield,pfield);
 
   // ===== Nonlinear solver context =====
-  PNonlinear_CMM_Solver * nsolver = new PNonlinear_CMM_Solver( pNode,
+  PNonlinear_CMM_Solver * nsolver = new PNonlinear_CMM_Solver(
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
   nsolver->print_info();
@@ -594,7 +594,7 @@ int main( int argc, char *argv[] )
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
   tsolver->TM_CMM_GenAlpha(is_restart, base, dot_sol, sol, dot_sol_wall_disp, sol_wall_disp,
-      tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN, pNode, fNode,
+      tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN, fNode,
       locnbc, locinfnbc, locringnbc, locebc, locebc_wall, gbc, pmat, elementv, elements, elementw,
       quadv, quads, locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
 

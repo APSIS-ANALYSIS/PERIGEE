@@ -34,7 +34,6 @@ class PTime_CMM_Solver
         const ICVFlowRate * const flr_ptr,
         const ALocal_Elem * const &alelem_ptr,
         const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &anode_ptr,
         const FEANode * const &feanode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_Inflow_NodalBC * const &infnbc_part,
@@ -66,7 +65,6 @@ class PTime_CMM_Solver
         const ICVFlowRate * const flr_ptr,
         const ALocal_Elem * const &alelem_ptr,
         const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &anode_ptr,
         const FEANode * const &feanode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_Inflow_NodalBC * const &infnbc_part,
@@ -86,7 +84,6 @@ class PTime_CMM_Solver
         PNonlinear_CMM_Solver * const &nsolver_ptr ) const;
 
   private:
-
     const double final_time;
     const int sol_record_freq; // the frequency for writing solutions
     const int renew_tang_freq; // the frequency for renewing tangents
