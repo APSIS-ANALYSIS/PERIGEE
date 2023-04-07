@@ -90,15 +90,9 @@ Part_Tet_FSI::Part_Tet_FSI( const IMesh * const &mesh,
 
   is_direction_vec = false;
 
-  loc_radial_vec_x.clear();
-  loc_radial_vec_y.clear();
-  loc_radial_vec_z.clear();
-  loc_longitudinal_vec_x.clear();
-  loc_longitudinal_vec_y.clear();
-  loc_longitudinal_vec_z.clear();
-  loc_circumferential_vec_x.clear();
-  loc_circumferential_vec_y.clear();
-  loc_circumferential_vec_z.clear();
+  loc_r_vec.clear();
+  loc_l_vec.clear();
+  loc_c_vec.clear();
 }
 
 Part_Tet_FSI::Part_Tet_FSI( const IMesh * const &mesh,
@@ -109,9 +103,9 @@ Part_Tet_FSI::Part_Tet_FSI( const IMesh * const &mesh,
     const std::vector<int> &phytag,
     const std::vector<int> &node_f,
     const std::vector<int> &node_s,
-    const std::vector<double> &radial_vec,
-    const std::vector<double> &longitudinal_vec,
-    const std::vector<double> &circumferential_vec,
+    const std::vector<Vector_3> &radial_vec,
+    const std::vector<Vector_3> &longitudinal_vec,
+    const std::vector<Vector_3> &circumferential_vec,
     const int &in_cpu_rank,
     const int &in_cpu_size,
     const int &in_elemType,
@@ -194,41 +188,21 @@ nElem = mesh->get_nElem();
 
   is_direction_vec = true;
 
-  loc_radial_vec_x.resize(nlocalnode_solid);
-  loc_radial_vec_y.resize(nlocalnode_solid);
-  loc_radial_vec_z.resize(nlocalnode_solid);
-  loc_longitudinal_vec_x.resize(nlocalnode_solid);
-  loc_longitudinal_vec_y.resize(nlocalnode_solid);
-  loc_longitudinal_vec_z.resize(nlocalnode_solid);
-  loc_circumferential_vec_x.resize(nlocalnode_solid);
-  loc_circumferential_vec_y.resize(nlocalnode_solid);
-  loc_circumferential_vec_z.resize(nlocalnode_solid);
+  loc_r_vec.resize(nlocalnode_solid);
+  loc_l_vec.resize(nlocalnode_solid);
+  loc_c_vec.resize(nlocalnode_solid);
 
   for(int ii=0; ii<nlocalnode_solid; ++ii)
   {
     const int pos = VEC_T::get_pos( node_s, node_loc_solid[ii] );
-    loc_radial_vec_x[ii] = radial_vec[3*pos + 0];
-    loc_radial_vec_y[ii] = radial_vec[3*pos + 1];
-    loc_radial_vec_z[ii] = radial_vec[3*pos + 2];
-
-    loc_longitudinal_vec_x[ii] = longitudinal_vec[3*pos + 0];
-    loc_longitudinal_vec_y[ii] = longitudinal_vec[3*pos + 1];
-    loc_longitudinal_vec_z[ii] = longitudinal_vec[3*pos + 2];
-
-    loc_circumferential_vec_x[ii] = circumferential_vec[3*pos + 0];
-    loc_circumferential_vec_y[ii] = circumferential_vec[3*pos + 1];
-    loc_circumferential_vec_z[ii] = circumferential_vec[3*pos + 2];
+    loc_r_vec[ii] = radial_vec[pos];
+    loc_l_vec[ii] = longitudinal_vec[pos];
+    loc_c_vec[ii] = circumferential_vec[pos];
   }
 
-  VEC_T::shrink2fit(loc_radial_vec_x);
-  VEC_T::shrink2fit(loc_radial_vec_y);
-  VEC_T::shrink2fit(loc_radial_vec_z);
-  VEC_T::shrink2fit(loc_longitudinal_vec_x);
-  VEC_T::shrink2fit(loc_longitudinal_vec_y);
-  VEC_T::shrink2fit(loc_longitudinal_vec_z);
-  VEC_T::shrink2fit(loc_circumferential_vec_x);
-  VEC_T::shrink2fit(loc_circumferential_vec_y);
-  VEC_T::shrink2fit(loc_circumferential_vec_z);
+  VEC_T::shrink2fit(loc_r_vec);
+  VEC_T::shrink2fit(loc_l_vec);
+  VEC_T::shrink2fit(loc_c_vec);
 
   std::cout<<"-- proc "<<cpu_rank<<" Local direction vectors generated. \n";
 }
@@ -344,6 +318,7 @@ void Part_Tet_FSI::write( const char * inputFileName ) const
 
   H5Gclose( group_id_7 );
 
+  /*
   // group 8: direction vecters
   if( is_direction_vec )
   {
@@ -361,6 +336,7 @@ void Part_Tet_FSI::write( const char * inputFileName ) const
 
     H5Gclose( group_id_8 );
   }
+  */
 
   // Finish writing, clean up
   delete h5w;

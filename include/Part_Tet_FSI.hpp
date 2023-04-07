@@ -40,9 +40,9 @@ class Part_Tet_FSI : public Part_Tet
         const std::vector<int> &phytag,
         const std::vector<int> &node_f,
         const std::vector<int> &node_s,
-        const std::vector<double> &radial_vec,
-        const std::vector<double> &longitudinal_vec,
-        const std::vector<double> &circumferential_vec,
+        const std::vector<Vector_3> &radial_vec,
+        const std::vector<Vector_3> &longitudinal_vec,
+        const std::vector<Vector_3> &circumferential_vec,
         const int &in_cpu_rank,
         const int &in_cpu_size,
         const int &in_elemType,
@@ -78,10 +78,9 @@ class Part_Tet_FSI : public Part_Tet
     // Flag that determines if the solid nodes contain direction vecter information
     bool is_direction_vec;
 
-    // local direction vecters
-    std::vector<double> loc_radial_vec_x, loc_radial_vec_y, loc_radial_vec_z;
-    std::vector<double> loc_longitudinal_vec_x, loc_longitudinal_vec_y, loc_longitudinal_vec_z;
-    std::vector<double> loc_circumferential_vec_x, loc_circumferential_vec_y, loc_circumferential_vec_z;
+    // local direction vecters. Letters r, l, and c denotes the radial, longitudinal,
+    // and circumferential directions, respectively.
+    std::vector<Vector_3> loc_r_vec, loc_l_vec, loc_c_vec;
 };
 
 #endif
