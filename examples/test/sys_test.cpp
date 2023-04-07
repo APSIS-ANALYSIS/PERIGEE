@@ -10,7 +10,11 @@
 
 int main(int argc, char *argv[])
 {
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+  
+  PetscAssertAbort( false, PETSC_COMM_WORLD, 60, "test\n");
 
+  PetscFinalize();
   return EXIT_SUCCESS;
 }
 
