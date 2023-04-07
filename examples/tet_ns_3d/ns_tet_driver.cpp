@@ -505,7 +505,7 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
   tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol,
-      tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN, pNode, fNode,
+      tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN, fNode,
       locnbc, locinfnbc, locebc, gbc, pmat, elementv, elements, quadv, quads,
       locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
 

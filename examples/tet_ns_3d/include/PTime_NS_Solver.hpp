@@ -32,7 +32,6 @@ class PTime_NS_Solver
         const ICVFlowRate * const flr_ptr,
         const ALocal_Elem * const &alelem_ptr,
         const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &anode_ptr,
         const FEANode * const &feanode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_Inflow_NodalBC * const &infnbc_part,
