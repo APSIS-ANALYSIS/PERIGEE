@@ -19,9 +19,9 @@
 class PNonlinear_CMM_Solver
 {
   public:
-    PNonlinear_CMM_Solver( const APart_Node * const &anode_ptr,
-        const double &input_nrtol, const double &input_natol, 
-        const double &input_ndtol, const int &input_max_iteration, 
+    PNonlinear_CMM_Solver( const double &input_nrtol, 
+        const double &input_natol, const double &input_ndtol, 
+        const int &input_max_iteration, 
         const int &input_renew_freq, 
         const int &input_renew_threshold = 4 );
 
@@ -49,7 +49,6 @@ class PNonlinear_CMM_Solver
         const ICVFlowRate * const flr_ptr,
         const ALocal_Elem * const &alelem_ptr,
         const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &anode_ptr,
         const FEANode * const &feanode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_Inflow_NodalBC * const &infnbc_part,
@@ -91,7 +90,6 @@ class PNonlinear_CMM_Solver
         const ICVFlowRate * const flr_ptr,
         const ALocal_Elem * const &alelem_ptr,
         const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &anode_ptr,
         const FEANode * const &feanode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_Inflow_NodalBC * const &infnbc_part,
