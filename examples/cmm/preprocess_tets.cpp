@@ -79,18 +79,17 @@ int main( int argc, char * argv[] )
   bool isDualGraph = true;
 
   // Yaml options
-  bool isloadYaml = true;
+  bool is_loadYaml = true;
   std::string yaml_file("./options_pre.yml");
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
-  SYS_T::GetOptionBool(  "-isloadYaml",   isloadYaml);
-  SYS_T::GetOptionString("-yaml_file",    yaml_file);
+  SYS_T::GetOptionBool(  "-is_loadYaml",       is_loadYaml);
+  SYS_T::GetOptionString("-yaml_file",         yaml_file);
 
   SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: preprocessor needs to be run in serial.\n");
 
-  if (isloadYaml)
-    {SYS_T::InsertFileYAML( yaml_file,  false );}
+  if (is_loadYaml) SYS_T::InsertFileYAML( yaml_file,  false );
 
   // Get the command line arguments
   SYS_T::GetOptionInt(   "-cpu_size",          cpu_size);

@@ -107,7 +107,7 @@ int main( int argc, char *argv[] )
   std::string restart_disp_name = "SOL_disp_"; // restart disp solution base name
 
   // Yaml options
-  bool isloadYaml = true;
+  bool   is_loadYaml = true;
   std::string yaml_file("./runscript.yml");
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
@@ -123,11 +123,10 @@ int main( int argc, char *argv[] )
   SYS_T::print_fatal_if( cmmBC_type == 2, "Error: cmmBC_type is set to 2, which is designed for prestress generation. \n");
 
   // ===== Yaml Arguments =====
-  SYS_T::GetOptionBool(  "-isloadYaml",   isloadYaml);
-  SYS_T::GetOptionString("-yaml_file",    yaml_file);
+  SYS_T::GetOptionBool(  "-is_loadYaml",     is_loadYaml);
+  SYS_T::GetOptionString("-yaml_file",       yaml_file);
 
-  if (isloadYaml)
-    {SYS_T::InsertFileYAML( yaml_file,  false );}
+  if (is_loadYaml) SYS_T::InsertFileYAML( yaml_file,  false );
 
   // ===== Read Command Line Arguments =====
   SYS_T::commPrint("===> Reading command line arguments... \n");
