@@ -124,8 +124,8 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("PETSc version: %s \n", PETSc_T::get_version().c_str());
 
   // ===== Yaml Argument =====
-  SYS_T::GetOptionBool(  "-is_loadYaml",   is_loadYaml);
-  SYS_T::GetOptionString("-yaml_file",    yaml_file);
+  SYS_T::GetOptionBool(  "-is_loadYaml",       is_loadYaml);
+  SYS_T::GetOptionString("-yaml_file",         yaml_file);
 
   // load the YAML file to pass the argument values
   if(is_loadYaml) SYS_T::InsertFileYAML( yaml_file,  false );
