@@ -64,8 +64,8 @@ Reference: J. Liu, W. Yang, I.S. Lan, and A.L. Marsden, "Fluid-structure interac
 [![Pulmonary FSI](http://img.youtube.com/vi/Y84vSN64ZCk/0.jpg)](https://www.youtube.com/watch?v=Y84vSN64ZCk "Pulmonary FSI")
 
 ## References
-### Finite Element Method
-* [The Finite Element Method: Linear Static and Dynamic Finite Element Analysis](https://www.amazon.com/Finite-Element-Method-Mechanical-Engineering/dp/0486411818/ref=sr_1_2?keywords=the+finite+element+method&qid=1566093145&s=books&sr=1-2) by Thomas J.R. Hughes
+### Theory
+* J. Liu and A.L. Marsden, [A unified continuum and variational multiscale formulation for fluids, solids, and fluid-structure interaction](https://doi.org/10.1016/j.cma.2018.03.045), Computer Methods in Applied Mechanics and Engineering, 337:549-597, 2018.
 * [Incompressible Flow and the Finite Element Method, Volume 1: Advection-Diffusion and Isothermal Laminar Flow](https://www.wiley.com/en-us/Incompressible+Flow+and+the+Finite+Element+Method%2C+Volume+1%3A+Advection+Diffusion+and+Isothermal+Laminar+Flow-p-9780471492498) by P.M. Gresho and R.L. Sani
 
 ### C++
