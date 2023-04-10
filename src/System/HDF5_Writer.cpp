@@ -422,7 +422,7 @@ void HDF5_Writer::write_Vector_3_Vector( const hid_t &group_id, const char * con
 {
   // First convert the input vector to a double vector
   std::vector<double> val;
-  const int vec_size = value.size();
+  const int vec_size = static_cast<int>( value.size() );
   val.resize(vec_size*3);
   for(int ii=0; ii<vec_size; ++ii)
   {
@@ -431,7 +431,7 @@ void HDF5_Writer::write_Vector_3_Vector( const hid_t &group_id, const char * con
     val[ii*3+2] = value[ii].z();
   }
 
-  hsize_t dims[2]; dims[0] = value.size(); dims[1] = 3;
+  hsize_t dims[2]; dims[0] = vec_size; dims[1] = 3;
 
   if(dims[0] > 0)
   {
