@@ -81,6 +81,12 @@ class Part_Tet_FSI : public Part_Tet
     // local direction vecters. Letters r, l, and c denotes the radial, longitudinal,
     // and circumferential directions, respectively.
     std::vector<Vector_3> loc_r_vec, loc_l_vec, loc_c_vec;
+
+    // The location in the local_to_global for the local solid nodes,
+    // including ghost nodes.
+    std::vector<int> node_locgho_solid;
+
+    int nlocghonode_s;
 };
 
 #endif

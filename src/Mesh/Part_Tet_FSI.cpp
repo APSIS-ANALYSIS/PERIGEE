@@ -186,23 +186,30 @@ nElem = mesh->get_nElem();
   nlocalnode_fluid = static_cast<int>( node_loc_fluid.size() );
   nlocalnode_solid = static_cast<int>( node_loc_solid.size() );
 
-  is_direction_vec = true;
+  // Generate the node_locgho_solid
+  //std::vector<int> node_locgho_solid;
+  node_locgho_solid.clear();
+  loc_r_vec.clear();
+  loc_l_vec.clear();
+  loc_c_vec.clear();
 
-  loc_r_vec.resize(nlocalnode_solid);
-  loc_l_vec.resize(nlocalnode_solid);
-  loc_c_vec.resize(nlocalnode_solid);
-
-  for(int ii=0; ii<nlocalnode_solid; ++ii)
+  for(int ii=0; ii<nlocghonode; ++ii)
   {
-    const int pos = VEC_T::get_pos( node_s, node_loc_solid[ii] );
-    loc_r_vec[ii] = radial_vec[pos];
-    loc_l_vec[ii] = longitudinal_vec[pos];
-    loc_c_vec[ii] = circumferential_vec[pos];
+    int aux_index = local_to_global[ii]; // new global index
+    aux_index = mnindex->get_new2old(aux_index); // back to old global index
+    if( VEC_T::is_invec(node_s, aux_index) )
+    {
+      node_locgho_solid.push_back(ii); // record local index
+      const int pos = VEC_T::get_pos( node_s, aux_index );
+      loc_r_vec.push_back(radial_vec[pos]);
+      loc_l_vec.push_back(longitudinal_vec[pos]);
+      loc_c_vec.push_back(circumferential_vec[pos]);
+    }
   }
 
-  VEC_T::shrink2fit(loc_r_vec);
-  VEC_T::shrink2fit(loc_l_vec);
-  VEC_T::shrink2fit(loc_c_vec);
+  nlocghonode_s = static_cast<int>( node_locgho_solid.size() );
+
+  is_direction_vec = true;
 
   std::cout<<"-- proc "<<cpu_rank<<" Local direction vectors generated. \n";
 }
