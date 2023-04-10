@@ -421,9 +421,8 @@ void HDF5_Writer::write_Vector_3_Vector( const hid_t &group_id, const char * con
     const std::vector<Vector_3> &value ) const
 {
   // First convert the input vector to a double vector
-  std::vector<double> val;
-  const int vec_size = static_cast<int>( value.size() );
-  val.resize(vec_size*3);
+  const int vec_size = VEC_T::get_size( value );
+  std::vector<double> val( vec_size*3 );
   for(int ii=0; ii<vec_size; ++ii)
   {
     val[ii*3+0] = value[ii].x();

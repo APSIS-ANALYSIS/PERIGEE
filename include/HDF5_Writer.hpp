@@ -43,6 +43,7 @@
 #include <climits>
 #include "Vector_3.hpp"
 #include "Matrix_3x3.hpp"
+#include "Vec_Tools.hpp"
 #include "hdf5.h"
 
 class HDF5_Writer
