@@ -88,11 +88,14 @@ Part_Tet_FSI::Part_Tet_FSI( const IMesh * const &mesh,
   nlocalnode_fluid = static_cast<int>( node_loc_fluid.size() );
   nlocalnode_solid = static_cast<int>( node_loc_solid.size() );
 
-  is_direction_vec = false;
+  is_direction_basis = false;
 
-  loc_r_vec.clear();
-  loc_l_vec.clear();
-  loc_c_vec.clear();
+  loc_r_basis.clear();
+  loc_l_basis.clear();
+  loc_c_basis.clear();
+
+  node_locgho_solid.clear();
+  nlocghonode_s = 0;
 }
 
 Part_Tet_FSI::Part_Tet_FSI( const IMesh * const &mesh,
@@ -103,9 +106,9 @@ Part_Tet_FSI::Part_Tet_FSI( const IMesh * const &mesh,
     const std::vector<int> &phytag,
     const std::vector<int> &node_f,
     const std::vector<int> &node_s,
-    const std::vector<Vector_3> &radial_vec,
-    const std::vector<Vector_3> &longitudinal_vec,
-    const std::vector<Vector_3> &circumferential_vec,
+    const std::vector<Vector_3> &r_basis,
+    const std::vector<Vector_3> &l_basis,
+    const std::vector<Vector_3> &c_basis,
     const int &in_cpu_rank,
     const int &in_cpu_size,
     const int &in_elemType,
@@ -187,11 +190,10 @@ nElem = mesh->get_nElem();
   nlocalnode_solid = static_cast<int>( node_loc_solid.size() );
 
   // Generate the node_locgho_solid
-  //std::vector<int> node_locgho_solid;
   node_locgho_solid.clear();
-  loc_r_vec.clear();
-  loc_l_vec.clear();
-  loc_c_vec.clear();
+  loc_r_basis.clear();
+  loc_l_basis.clear();
+  loc_c_basis.clear();
 
   for(int ii=0; ii<nlocghonode; ++ii)
   {
@@ -200,18 +202,19 @@ nElem = mesh->get_nElem();
     if( VEC_T::is_invec(node_s, aux_index) )
     {
       node_locgho_solid.push_back(ii); // record local index
+      
       const int pos = VEC_T::get_pos( node_s, aux_index );
-      loc_r_vec.push_back(radial_vec[pos]);
-      loc_l_vec.push_back(longitudinal_vec[pos]);
-      loc_c_vec.push_back(circumferential_vec[pos]);
+      loc_r_basis.push_back(r_basis[pos]);
+      loc_l_basis.push_back(l_basis[pos]);
+      loc_c_basis.push_back(c_basis[pos]);
     }
   }
 
   nlocghonode_s = static_cast<int>( node_locgho_solid.size() );
 
-  is_direction_vec = true;
+  is_direction_basis = true;
 
-  std::cout<<"-- proc "<<cpu_rank<<" Local direction vectors generated. \n";
+  std::cout<<"-- proc "<<cpu_rank<<" Local direction basis vectors generated. \n";
 }
 
 Part_Tet_FSI::~Part_Tet_FSI()
@@ -325,15 +328,15 @@ void Part_Tet_FSI::write( const char * inputFileName ) const
 
   H5Gclose( group_id_7 );
 
-  if( is_direction_vec )
+  if( is_direction_basis )
   {
-    hid_t group_id_8 = H5Gcreate(file_id, "/directionVectors_loc", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    hid_t group_id_8 = H5Gcreate(file_id, "/directionBasis_loc", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
     h5w -> write_intScalar( group_id_8, "nlocghonode_s", nlocghonode_s );
     h5w -> write_intVector( group_id_8, "node_locgho_solid", node_locgho_solid );
-    h5w -> write_Vector_3_Vector( group_id_8, "loc_r_vec", loc_r_vec );
-    h5w -> write_Vector_3_Vector( group_id_8, "loc_l_vec", loc_l_vec );
-    h5w -> write_Vector_3_Vector( group_id_8, "loc_c_vec", loc_c_vec );
+    h5w -> write_Vector_3_Vector( group_id_8, "loc_r_basis", loc_r_basis );
+    h5w -> write_Vector_3_Vector( group_id_8, "loc_l_basis", loc_l_basis );
+    h5w -> write_Vector_3_Vector( group_id_8, "loc_c_basis", loc_c_basis );
 
     H5Gclose( group_id_8 );
   }

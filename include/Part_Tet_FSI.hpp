@@ -76,11 +76,11 @@ class Part_Tet_FSI : public Part_Tet
     const bool is_geo_field;
 
     // Flag that determines if the solid nodes contain direction vecter information
-    bool is_direction_vec;
+    bool is_direction_basis;
 
     // local direction vecters. Letters r, l, and c denotes the radial, longitudinal,
     // and circumferential directions, respectively.
-    std::vector<Vector_3> loc_r_vec, loc_l_vec, loc_c_vec;
+    std::vector<Vector_3> loc_r_basis, loc_l_basis, loc_c_basis;
 
     // The location in the local_to_global for the local solid nodes,
     // including ghost nodes.
