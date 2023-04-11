@@ -85,8 +85,8 @@ Part_Tet_FSI::Part_Tet_FSI( const IMesh * const &mesh,
     if( VEC_T::is_invec(node_s, node_loc_original[ii]) ) node_loc_solid.push_back(ii);
   } 
 
-  nlocalnode_fluid = static_cast<int>( node_loc_fluid.size() );
-  nlocalnode_solid = static_cast<int>( node_loc_solid.size() );
+  nlocalnode_fluid = VEC_T::get_size( node_loc_fluid );
+  nlocalnode_solid = VEC_T::get_size( node_loc_solid );
 
   is_direction_basis = false;
 
@@ -186,8 +186,8 @@ nElem = mesh->get_nElem();
     if( VEC_T::is_invec(node_s, node_loc_original[ii]) ) node_loc_solid.push_back(ii);
   }
 
-  nlocalnode_fluid = static_cast<int>( node_loc_fluid.size() );
-  nlocalnode_solid = static_cast<int>( node_loc_solid.size() );
+  nlocalnode_fluid = VEC_T::get_size( node_loc_fluid );
+  nlocalnode_solid = VEC_T::get_size( node_loc_solid );
 
   // Generate the node_locgho_solid
   node_locgho_solid.clear();
@@ -210,7 +210,7 @@ nElem = mesh->get_nElem();
     }
   }
 
-  nlocghonode_s = static_cast<int>( node_locgho_solid.size() );
+  nlocghonode_s = VEC_T::get_size( node_locgho_solid );
 
   is_direction_basis = true;
 
