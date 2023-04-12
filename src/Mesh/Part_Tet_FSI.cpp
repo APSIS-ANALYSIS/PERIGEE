@@ -190,23 +190,29 @@ nElem = mesh->get_nElem();
   nlocalnode_solid = VEC_T::get_size( node_loc_solid );
 
   // Generate the node_locgho_solid
-  node_locgho_solid.clear();
+  node_locgho_solid.resize(nlocghonode);
   loc_r_basis.clear();
   loc_l_basis.clear();
   loc_c_basis.clear();
 
+  int index = 0;
   for(int ii=0; ii<nlocghonode; ++ii)
   {
     int aux_index = local_to_global[ii]; // new global index
     aux_index = mnindex->get_new2old(aux_index); // back to old global index
     if( VEC_T::is_invec(node_s, aux_index) )
     {
-      node_locgho_solid.push_back(ii); // record local index
-      
+      node_locgho_solid[ii] = index; // record local solid node index
+      ++index;
+
       const int pos = VEC_T::get_pos( node_s, aux_index );
       loc_r_basis.push_back(r_basis[pos]);
       loc_l_basis.push_back(l_basis[pos]);
       loc_c_basis.push_back(c_basis[pos]);
+    }
+    else
+    {
+      node_locgho_solid[ii] = -1;
     }
   }
 
