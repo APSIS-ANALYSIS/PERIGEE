@@ -330,18 +330,18 @@ int main( int argc, char * argv[] )
   // generate the list of direction basis vectors of the nodes.
   // The list includes radial, longitudinal, and circumferential basis,
   // denoting by r, l, and c, respectively.
-  // --------------------------------------------------------------------------
   std::vector<int> solid_node_id = TET_T::read_int_PointData(geo_s_file, "GlobalNodeID");
-  std::vector<Vector_3> r_basis = TET_T::read_Vector_3_PointData(geo_s_file, "radial_basis");
-  std::vector<Vector_3> l_basis = TET_T::read_Vector_3_PointData(geo_s_file, "longitudinal_basis");
-  std::vector<Vector_3> c_basis = TET_T::read_Vector_3_PointData(geo_s_file, "circumferential_basis");
+  std::vector<Vector_3> basis_r = TET_T::read_Vector_3_PointData(geo_s_file, "radial_basis");
+  std::vector<Vector_3> basis_l = TET_T::read_Vector_3_PointData(geo_s_file, "longitudinal_basis");
+  std::vector<Vector_3> basis_c = TET_T::read_Vector_3_PointData(geo_s_file, "circumferential_basis");
 
   SYS_T::print_fatal_if(v_node_s != solid_node_id, "ERROR: GlobalNodeID for solid geometry file is not equal to the whole FSI domain.");
-  SYS_T::print_fatal_if(solid_node_id.size() != r_basis.size(), "ERROR: radial_basis is not matched.");
-  SYS_T::print_fatal_if(solid_node_id.size() != l_basis.size(), "ERROR: longitudinal_basis is not matched.");
-  SYS_T::print_fatal_if(solid_node_id.size() != c_basis.size(), "ERROR: circumferential_basis is not matched.");
+  SYS_T::print_fatal_if(solid_node_id.size() != basis_r.size(), "ERROR: radial_basis is not matched.");
+  SYS_T::print_fatal_if(solid_node_id.size() != basis_l.size(), "ERROR: longitudinal_basis is not matched.");
+  SYS_T::print_fatal_if(solid_node_id.size() != basis_c.size(), "ERROR: circumferential_basis is not matched.");
 
   cout<<"=== Direction basis vectors generated."<<endl;
+  // --------------------------------------------------------------------------
 
   std::vector<IIEN const *> ienlist;
   ienlist.push_back(IEN_p); ienlist.push_back(IEN_v);
@@ -493,7 +493,7 @@ int main( int argc, char * argv[] )
     part_p -> write( part_file_p );
 
     IPart * part_v = new Part_Tet_FSI( mesh_v, global_part, mnindex_v, IEN_v,
-        ctrlPts, phy_tag, v_node_f, v_node_s, r_basis, l_basis, c_basis,
+        ctrlPts, phy_tag, v_node_f, v_node_s, basis_r, basis_l, basis_c,
         proc_rank, cpu_size, elemType, 1, dof_fields[1], start_idx_v[proc_rank], true );
 
     part_v -> print_part_loadbalance_edgecut();

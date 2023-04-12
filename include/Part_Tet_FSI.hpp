@@ -40,9 +40,9 @@ class Part_Tet_FSI : public Part_Tet
         const std::vector<int> &phytag,
         const std::vector<int> &node_f,
         const std::vector<int> &node_s,
-        const std::vector<Vector_3> &r_basis,
-        const std::vector<Vector_3> &l_basis,
-        const std::vector<Vector_3> &c_basis,
+        const std::vector<Vector_3> &basis_r,
+        const std::vector<Vector_3> &basis_l,
+        const std::vector<Vector_3> &basis_c,
         const int &in_cpu_rank,
         const int &in_cpu_size,
         const int &in_elemType,
@@ -80,7 +80,7 @@ class Part_Tet_FSI : public Part_Tet
 
     // local direction vecters. Letters r, l, and c denotes the radial, longitudinal,
     // and circumferential directions, respectively.
-    std::vector<Vector_3> loc_r_basis, loc_l_basis, loc_c_basis;
+    std::vector<Vector_3> loc_basis_r, loc_basis_l, loc_basis_c;
 
     // A vector with length of nlocghonode, mapping from the total local nodes
     // to the local solid nodes. When here goes a solid node, the mapping

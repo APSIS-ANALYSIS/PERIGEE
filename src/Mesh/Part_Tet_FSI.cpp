@@ -90,9 +90,9 @@ Part_Tet_FSI::Part_Tet_FSI( const IMesh * const &mesh,
 
   is_direction_basis = false;
 
-  loc_r_basis.clear();
-  loc_l_basis.clear();
-  loc_c_basis.clear();
+  loc_basis_r.clear();
+  loc_basis_l.clear();
+  loc_basis_c.clear();
 
   node_locgho_solid.clear();
   nlocghonode_s = 0;
@@ -106,9 +106,9 @@ Part_Tet_FSI::Part_Tet_FSI( const IMesh * const &mesh,
     const std::vector<int> &phytag,
     const std::vector<int> &node_f,
     const std::vector<int> &node_s,
-    const std::vector<Vector_3> &r_basis,
-    const std::vector<Vector_3> &l_basis,
-    const std::vector<Vector_3> &c_basis,
+    const std::vector<Vector_3> &basis_r,
+    const std::vector<Vector_3> &basis_l,
+    const std::vector<Vector_3> &basis_c,
     const int &in_cpu_rank,
     const int &in_cpu_size,
     const int &in_elemType,
@@ -191,9 +191,9 @@ nElem = mesh->get_nElem();
 
   // Generate the node_locgho_solid
   node_locgho_solid.resize(nlocghonode);
-  loc_r_basis.clear();
-  loc_l_basis.clear();
-  loc_c_basis.clear();
+  loc_basis_r.clear();
+  loc_basis_l.clear();
+  loc_basis_c.clear();
 
   int index = 0;
   for(int ii=0; ii<nlocghonode; ++ii)
@@ -206,9 +206,9 @@ nElem = mesh->get_nElem();
       ++index;
 
       const int pos = VEC_T::get_pos( node_s, aux_index );
-      loc_r_basis.push_back(r_basis[pos]);
-      loc_l_basis.push_back(l_basis[pos]);
-      loc_c_basis.push_back(c_basis[pos]);
+      loc_basis_r.push_back( basis_r[pos] );
+      loc_basis_l.push_back( basis_l[pos] );
+      loc_basis_c.push_back( basis_c[pos] );
     }
     else
     {
@@ -340,9 +340,9 @@ void Part_Tet_FSI::write( const char * inputFileName ) const
 
     h5w -> write_intScalar( group_id_8, "nlocghonode_s", nlocghonode_s );
     h5w -> write_intVector( group_id_8, "node_locgho_solid", node_locgho_solid );
-    h5w -> write_Vector_3_Vector( group_id_8, "loc_r_basis", loc_r_basis );
-    h5w -> write_Vector_3_Vector( group_id_8, "loc_l_basis", loc_l_basis );
-    h5w -> write_Vector_3_Vector( group_id_8, "loc_c_basis", loc_c_basis );
+    h5w -> write_Vector_3_Vector( group_id_8, "loc_basis_r", loc_basis_r );
+    h5w -> write_Vector_3_Vector( group_id_8, "loc_basis_l", loc_basis_l );
+    h5w -> write_Vector_3_Vector( group_id_8, "loc_basis_c", loc_basis_c );
 
     H5Gclose( group_id_8 );
   }
