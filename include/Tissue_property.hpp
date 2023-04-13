@@ -20,6 +20,16 @@ class Tissue_property
     virtual ~Tissue_property();
 
     // ------------------------------------------------------------------------
+    // Input: nn the node index
+    // Output: the Vector_3 of the corresponding direction basis vector
+    // ------------------------------------------------------------------------
+    virtual Vector_3 get_basis_r( const int &nn ) const;
+    
+    virtual Vector_3 get_basis_l( const int &nn ) const;
+
+    virtual Vector_3 get_basis_c( const int &nn ) const;
+
+    // ------------------------------------------------------------------------
     // ! Print the info for this class.
     // ------------------------------------------------------------------------
     virtual void print_info() const;

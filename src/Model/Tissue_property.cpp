@@ -21,6 +21,33 @@ Tissue_property::Tissue_property( const std::string &fileBaseName, const int &ra
 Tissue_property::~Tissue_property()
 {}
 
+Vector_3 Tissue_property::get_basis_r( const int &nn ) const
+{
+  int index = node_locgho_solid[nn];
+  Vector_3 out;
+  if(index > -1) out = Vector_3( basis_r[index] );
+  else SYS_T::print_fatal("ERROR: Tissue_property::get_basis_r the input node is a fluid node.");
+  return out;
+}
+
+Vector_3 Tissue_property::get_basis_l( const int &nn ) const
+{
+  int index = node_locgho_solid[nn];
+  Vector_3 out;
+  if(index > -1) out = Vector_3( basis_l[index] );
+  else SYS_T::print_fatal("ERROR: Tissue_property::get_basis_l the input node is a fluid node.");
+  return out;
+}
+
+Vector_3 Tissue_property::get_basis_c( const int &nn ) const
+{
+  int index = node_locgho_solid[nn];
+  Vector_3 out;
+  if(index > -1) out = Vector_3( basis_c[index] );
+  else SYS_T::print_fatal("ERROR: Tissue_property::get_basis_c the input node is a fluid node.");
+  return out;
+}
+
 void Tissue_property::print_info() const
 {
   std::cout<<"\n -- cpu "<<cpu_rank<<" node info: \n";
