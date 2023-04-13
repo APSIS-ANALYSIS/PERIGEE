@@ -1,0 +1,50 @@
+#ifndef TISSUE_PROPERTY_HPP
+#define TISSUE_PROPERTY_HPP
+// ============================================================================
+// Tissue_property.hpp
+//
+// This class stores the direction basis vectors at solid nodes. 
+// Direction basis includes 3 Vector_3 for each node.
+//
+// Constructed from inputs of the file basename and cpu_rank, and read using 
+// the HDF5_Reader tool.
+//
+// ============================================================================
+#include "HDF5_Reader.hpp"
+
+class Tissue_property
+{
+  public:
+    Tissue_property( const std::string &fileBaseName, const int &rank );
+
+    virtual ~Tissue_property();
+
+    // ------------------------------------------------------------------------
+    // ! Print the info for this class.
+    // ------------------------------------------------------------------------
+    virtual void print_info() const;
+
+  private:
+    // ------------------------------------------------------------------------
+    // The rank or id of the subdomain
+    // ------------------------------------------------------------------------
+    const int cpu_rank;
+
+    // ------------------------------------------------------------------------
+    // The number of local solid node
+    // ------------------------------------------------------------------------
+    int nlocghonode_s;
+
+    // ------------------------------------------------------------------------
+    // The mapping from the total local nodes to the local solid nodes.
+    // ------------------------------------------------------------------------
+    std::vector<int> node_locgho_solid;
+
+    // ------------------------------------------------------------------------
+    // The direction basis vectors. Letters r, l, and c denote radial, longitudinal,
+    // and circumferential, respectively. 
+    // ------------------------------------------------------------------------
+    std::vector< Vector_3 > basis_r, basis_l, basis_c;
+};
+
+#endif
