@@ -9,6 +9,8 @@
 // Constructed from inputs of the file basename and cpu_rank, and read using 
 // the HDF5_Reader tool.
 //
+// Date: Apr. 13th 2023
+// Author: Qingshuang Lu
 // ============================================================================
 #include "HDF5_Reader.hpp"
 
@@ -20,7 +22,8 @@ class Tissue_property
     virtual ~Tissue_property();
 
     // ------------------------------------------------------------------------
-    // Input: nn the node index
+    // Input: nn the index of local_to_global, including local nodes and ghost nodes. 
+    //        The maxmum of nn is nlocghonode-1.
     // Output: the Vector_3 of the corresponding direction basis vector
     // ------------------------------------------------------------------------
     virtual Vector_3 get_basis_r( const int &nn ) const;
