@@ -23,7 +23,7 @@ Tissue_property::~Tissue_property()
 
 Vector_3 Tissue_property::get_basis_r( const int &nn ) const
 {
-  int index = node_locgho_solid[nn];
+  const int index = node_locgho_solid[nn];
   Vector_3 out;
   if(index > -1) out = Vector_3( basis_r[index] );
   else SYS_T::print_fatal("ERROR: Tissue_property::get_basis_r the input node is a fluid node.");
@@ -32,7 +32,7 @@ Vector_3 Tissue_property::get_basis_r( const int &nn ) const
 
 Vector_3 Tissue_property::get_basis_l( const int &nn ) const
 {
-  int index = node_locgho_solid[nn];
+  const int index = node_locgho_solid[nn];
   Vector_3 out;
   if(index > -1) out = Vector_3( basis_l[index] );
   else SYS_T::print_fatal("ERROR: Tissue_property::get_basis_l the input node is a fluid node.");
@@ -41,7 +41,7 @@ Vector_3 Tissue_property::get_basis_l( const int &nn ) const
 
 Vector_3 Tissue_property::get_basis_c( const int &nn ) const
 {
-  int index = node_locgho_solid[nn];
+  const int index = node_locgho_solid[nn];
   Vector_3 out;
   if(index > -1) out = Vector_3( basis_c[index] );
   else SYS_T::print_fatal("ERROR: Tissue_property::get_basis_c the input node is a fluid node.");
@@ -54,7 +54,7 @@ void Tissue_property::print_info() const
   std::cout<<"\n nlocghonode_s: "<<nlocghonode_s<<std::endl;
   std::cout<<"\n node_locgho_solid: \n";
   VEC_T::print(node_locgho_solid);
-  int size = VEC_T::get_size( basis_r );
+  const int size = VEC_T::get_size( basis_r );
   std::cout<<"\n basis_r: \n";
   for(int ii=0; ii<size; ii++) basis_r[ii].print(); 
   std::cout<<"\n basis_l: \n";
