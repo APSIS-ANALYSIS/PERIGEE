@@ -203,17 +203,14 @@ nElem = mesh->get_nElem();
     if( VEC_T::is_invec(node_s, aux_index) )
     {
       node_locgho_solid[ii] = index; // record local solid node index
-      ++index;
+      index += 1;
 
       const int pos = VEC_T::get_pos( node_s, aux_index );
       loc_basis_r.push_back( basis_r[pos] );
       loc_basis_l.push_back( basis_l[pos] );
       loc_basis_c.push_back( basis_c[pos] );
     }
-    else
-    {
-      node_locgho_solid[ii] = -1;
-    }
+    else node_locgho_solid[ii] = -1;
   }
 
   nlocghonode_s = VEC_T::get_size( node_locgho_solid );
