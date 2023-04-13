@@ -234,7 +234,7 @@ std::vector<Vector_3> HDF5_Reader::read_Vector_3_Vector( const char * const &gro
     SYS_T::print_fatal( oss.str().c_str() );
   }
 
-  int vec_size = ddims[0];
+  const int vec_size = ddims[0];
 
   std::vector<Vector_3> out( vec_size );
 
