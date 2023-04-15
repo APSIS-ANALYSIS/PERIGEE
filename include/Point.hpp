@@ -14,8 +14,6 @@
 //
 // Date Created: Jan. 18 2017
 // ==================================================================
-
-#include <cassert>
 #include <iostream>
 
 template <int dim, typename T = double>

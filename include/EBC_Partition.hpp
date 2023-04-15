@@ -10,7 +10,6 @@
 // Author: Ju Liu
 // Date: Jan. 15 2017
 // ==================================================================
-#include <cassert>
 #include "IPart.hpp"
 #include "ElemBC.hpp"
 #include "HDF5_Writer.hpp"
