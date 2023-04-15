@@ -10,23 +10,16 @@
 
 int main(int argc, char *argv[])
 {
-  //PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
   
-  //PetscAssertAbort( false, PETSC_COMM_WORLD, 60, "test\n");
+  int a = 2;
 
-  //PetscFinalize();
+  PetscAssertAbort( a == 1, PETSC_COMM_WORLD, 60, "test\n");
+
+  std::cout<<a<<'\n';
+
+  PetscFinalize();
  
-  std::vector<double> a;
-
-  a.push_back(1.0);
-  a.push_back(1.0);
-  a.push_back(1.0);
-  a.clear();
-
-  //VEC_T::clean(a);
-
-  std::cout<<a.size()<<'\t'<<a.capacity()<<'\n'; 
-  
   return EXIT_SUCCESS;
 }
 

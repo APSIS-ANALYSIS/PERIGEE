@@ -7,7 +7,7 @@ set(MPI_DIR /Users/juliu/lib/mpich-3.4rc1)
 
 set(VTK_DIR /Users/juliu/lib/VTK-8.2.0/lib/cmake/vtk-8.2)
 
-set(PETSC_DIR /Users/juliu/lib/petsc-3.16.6-debug)
+set(PETSC_DIR /Users/juliu/lib/petsc-3.18.3-debug)
 
 set(PETSC_ARCH .)
 
