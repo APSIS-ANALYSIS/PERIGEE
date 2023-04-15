@@ -7,6 +7,7 @@
 #include "PostVectSolution.hpp"
 #include "Tensor4_3D.hpp"
 
+#include "assert.h"
 
 int main(int argc, char *argv[])
 {
@@ -14,7 +15,8 @@ int main(int argc, char *argv[])
   
   int a = 2;
 
-  PetscAssertAbort( a == 1, PETSC_COMM_WORLD, 60, "test\n");
+  ASSERT( a == 1, "a is not 1" );
+
 
   std::cout<<a<<'\n';
 

@@ -16,6 +16,12 @@
 #include <sys/stat.h>
 #include "petsc.h"
 
+#if PetscDefined(USE_DEBUG)
+#define ASSERT(cond, message, ...) SYS_T::print_fatal_if_not(cond, message, ##__VA_ARGS__)
+#else
+#define ASSERT(cond, ...) PetscAssume(cond)
+#endif
+
 namespace SYS_T
 {
   // Return the rank of the CPU
@@ -96,7 +102,7 @@ namespace SYS_T
   {
     std::cout<<get_string_mem_size( byte_size );
   }
-  
+
   // ================================================================
   // The following are used in processor.
   // ================================================================
@@ -167,6 +173,23 @@ namespace SYS_T
   inline void print_fatal_if( bool a, const char output[], ... )
   {
     if( a )
+    {
+      if( !get_MPI_rank() )
+      {
+        va_list Argp;
+        va_start(Argp, output);
+        (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
+        va_end(Argp);
+      }
+
+      MPI_Barrier(PETSC_COMM_WORLD);
+      MPI_Abort(PETSC_COMM_WORLD, 1);
+    }
+  }
+
+  inline void print_fatal_if_not( bool a, const char output[], ... )
+  {
+    if( !a )
     {
       if( !get_MPI_rank() )
       {
