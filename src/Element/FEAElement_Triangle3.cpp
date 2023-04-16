@@ -29,7 +29,7 @@ double FEAElement_Triangle3::get_memory_usage() const
 void FEAElement_Triangle3::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_x, const double * const &ctrl_y )
 {
-  assert(quad -> get_dim() == 3);
+  ASSERT(quad -> get_dim() == 3);
 
   for( int qua = 0; qua < numQuapts; ++qua )
   {
@@ -116,13 +116,13 @@ void FEAElement_Triangle3::get_gradR( const int &quaindex,
 
 std::vector<double> FEAElement_Triangle3::get_dR_dx( const int &quaindex ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts );
   return { dR_dx[0], dR_dx[1], dR_dx[2] };
 }
 
 std::vector<double> FEAElement_Triangle3::get_dR_dy( const int &quaindex ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts );
   return { dR_dy[0], dR_dy[1], dR_dy[2] };
 } 
 

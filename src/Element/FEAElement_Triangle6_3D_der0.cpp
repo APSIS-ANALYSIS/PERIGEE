@@ -40,7 +40,7 @@ void FEAElement_Triangle6_3D_der0::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_y,
     const double * const &ctrl_z )
 {
-  assert(quad->get_dim() == 3);
+  ASSERT(quad->get_dim() == 3);
 
   for( int qua = 0; qua < numQuapts; ++qua )
   {
@@ -89,7 +89,7 @@ void FEAElement_Triangle6_3D_der0::buildBasis( const IQuadPts * const &quad,
 void FEAElement_Triangle6_3D_der0::get_R( 
     const int &quaindex, double * const &basis ) const
 {
-  assert(quaindex>=0 && quaindex < numQuapts);
+  ASSERT(quaindex>=0 && quaindex < numQuapts);
   const int offset = quaindex * 6;
   basis[0] = R[offset];
   basis[1] = R[offset+1];
@@ -102,7 +102,7 @@ void FEAElement_Triangle6_3D_der0::get_R(
 std::vector<double> FEAElement_Triangle6_3D_der0::get_R( 
     const int &quaindex ) const
 {
-  assert(quaindex>=0 && quaindex < numQuapts);
+  ASSERT(quaindex>=0 && quaindex < numQuapts);
   const int offset = quaindex * 6;
   return { R[offset], R[offset+1], R[offset+2], R[offset+3], R[offset+4], R[offset+5] };
 }
@@ -110,7 +110,7 @@ std::vector<double> FEAElement_Triangle6_3D_der0::get_R(
 Vector_3 FEAElement_Triangle6_3D_der0::get_2d_normal_out( const int &qua,
     double &area ) const
 {
-  assert(qua >= 0 && qua < numQuapts);
+  ASSERT(qua >= 0 && qua < numQuapts);
   area = detJac[qua];
   return Vector_3( unx[qua], uny[qua], unz[qua] );
 }

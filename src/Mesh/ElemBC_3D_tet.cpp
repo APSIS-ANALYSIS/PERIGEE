@@ -172,9 +172,9 @@ void ElemBC_3D_tet::resetTriIEN_outwardnormal( const IIEN * const &VIEN )
             SYS_T::print_fatal("Error: resetTriIEN_outwardnormal : tet_face_id is out of range. \n");
             break;
         }
-        assert(pos0 >=0 && pos0 <=2);
-        assert(pos1 >=0 && pos1 <=2);
-        assert(pos2 >=0 && pos2 <=2); 
+        ASSERT(pos0 >=0 && pos0 <=2);
+        ASSERT(pos1 >=0 && pos1 <=2);
+        ASSERT(pos2 >=0 && pos2 <=2); 
 
         // Now we have got the corrected ordering of node_t, put them back into
         // tri_ien.
@@ -252,9 +252,9 @@ void ElemBC_3D_tet::resetTriIEN_outwardnormal( const IIEN * const &VIEN )
             SYS_T::print_fatal("Error: resetTriIEN_outwardnormal : tet_face_id is out of range. \n");
             break;
         }
-        assert(pos0 >=0 && pos0 <=5); assert(pos1 >=0 && pos1 <=5);
-        assert(pos2 >=0 && pos2 <=5); assert(pos3 >=0 && pos3 <=5);
-        assert(pos4 >=0 && pos4 <=5); assert(pos5 >=0 && pos5 <=5);
+        ASSERT(pos0 >=0 && pos0 <=5); ASSERT(pos1 >=0 && pos1 <=5);
+        ASSERT(pos2 >=0 && pos2 <=5); ASSERT(pos3 >=0 && pos3 <=5);
+        ASSERT(pos4 >=0 && pos4 <=5); ASSERT(pos5 >=0 && pos5 <=5);
 
         tri_ien[ebcid][6*ee+0] = node_t[pos0];
         tri_ien[ebcid][6*ee+1] = node_t[pos1];
