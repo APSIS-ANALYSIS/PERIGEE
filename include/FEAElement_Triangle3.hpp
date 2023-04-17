@@ -59,19 +59,19 @@ class FEAElement_Triangle3 : public FEAElement
 
     virtual std::vector<double> get_d2R_dxx( const int &quaindex ) const
     {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts );
+      assert( quaindex >= 0 && quaindex < numQuapts );
       return { 0.0, 0.0, 0.0 };
     }
 
     virtual std::vector<double> get_d2R_dyy( const int &quaindex ) const
     {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts );
+      assert( quaindex >= 0 && quaindex < numQuapts );
       return { 0.0, 0.0, 0.0 };
     }
 
     virtual std::vector<double> get_d2R_dxy( const int &quaindex ) const
     {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts );
+      assert( quaindex >= 0 && quaindex < numQuapts );
       return { 0.0, 0.0, 0.0 };
     }
 

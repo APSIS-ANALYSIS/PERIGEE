@@ -81,37 +81,37 @@ class FEAElement_Tet4 : public FEAElement
 
     virtual std::vector<double> get_d2R_dxx( const int &quaindex ) const
     {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts );
+      assert( quaindex >= 0 && quaindex < numQuapts );
       return { 0.0, 0.0, 0.0, 0.0 };
     }
 
     virtual std::vector<double> get_d2R_dyy( const int &quaindex ) const
     {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts );
+      assert( quaindex >= 0 && quaindex < numQuapts );
       return { 0.0, 0.0, 0.0, 0.0 };
     }
 
     virtual std::vector<double> get_d2R_dzz( const int &quaindex ) const
     {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts );
+      assert( quaindex >= 0 && quaindex < numQuapts );
       return { 0.0, 0.0, 0.0, 0.0 };
     }
 
     virtual std::vector<double> get_d2R_dxy( const int &quaindex ) const
     {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts );
+      assert( quaindex >= 0 && quaindex < numQuapts );
       return { 0.0, 0.0, 0.0, 0.0 };
     }
 
     virtual std::vector<double> get_d2R_dxz( const int &quaindex ) const
     {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts );
+      assert( quaindex >= 0 && quaindex < numQuapts );
       return { 0.0, 0.0, 0.0, 0.0 };
     }
 
     virtual std::vector<double> get_d2R_dyz( const int &quaindex ) const
     {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts );
+      assert( quaindex >= 0 && quaindex < numQuapts );
       return { 0.0, 0.0, 0.0, 0.0 };
     }
 
@@ -120,7 +120,7 @@ class FEAElement_Tet4 : public FEAElement
 
     virtual std::array<double,9> get_Jacobian( const int &quaindex ) const
     {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts );
+      assert( quaindex >= 0 && quaindex < numQuapts );
       return {{Jac[0], Jac[1], Jac[2], Jac[3], Jac[4], Jac[5], Jac[6], Jac[7], Jac[8]}};
     }
 
@@ -129,7 +129,7 @@ class FEAElement_Tet4 : public FEAElement
 
     virtual std::array<double,9> get_invJacobian( const int &quaindex ) const
     {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts );
+      assert( quaindex >= 0 && quaindex < numQuapts );
       return {{Jac[9], Jac[10], Jac[11], Jac[12], Jac[13], Jac[14], Jac[15], Jac[16], Jac[17]}};
     }
 

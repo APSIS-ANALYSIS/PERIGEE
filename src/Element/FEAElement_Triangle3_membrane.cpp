@@ -123,7 +123,7 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
 void FEAElement_Triangle3_membrane::get_R( const int &quaindex, 
     double * const &basis ) const
 {
-  ASSERT( quaindex >= 0 && quaindex < numQuapts );
+  assert( quaindex >= 0 && quaindex < numQuapts );
   const int offset = quaindex * nLocBas;
   basis[0] = R[offset];
   basis[1] = R[offset + 1];
@@ -132,7 +132,7 @@ void FEAElement_Triangle3_membrane::get_R( const int &quaindex,
 
 std::vector<double> FEAElement_Triangle3_membrane::get_R( const int &quaindex ) const
 {
-  ASSERT( quaindex >= 0 && quaindex < numQuapts );
+  assert( quaindex >= 0 && quaindex < numQuapts );
   const int offset = quaindex * nLocBas;
   return { R[offset], R[offset + 1], R[offset + 2] };
 }
@@ -140,7 +140,7 @@ std::vector<double> FEAElement_Triangle3_membrane::get_R( const int &quaindex ) 
 void FEAElement_Triangle3_membrane::get_gradR( const int &quaindex,
     double * const &basis_x, double * const &basis_y ) const
 {
-  ASSERT( quaindex >= 0 && quaindex < numQuapts );
+  assert( quaindex >= 0 && quaindex < numQuapts );
   for( int ii=0; ii<nLocBas; ++ii )
   {
     basis_x[ii] = dR_dx[ii];
@@ -151,7 +151,7 @@ void FEAElement_Triangle3_membrane::get_gradR( const int &quaindex,
 void FEAElement_Triangle3_membrane::get_R_gradR( const int &quaindex,
     double * const &basis, double * const &basis_x, double * const &basis_y ) const
 {
-  ASSERT( quaindex >= 0 && quaindex < numQuapts );
+  assert( quaindex >= 0 && quaindex < numQuapts );
   const int offset = quaindex * nLocBas;
   for( int ii=0; ii<nLocBas; ++ii )
   {
@@ -164,14 +164,14 @@ void FEAElement_Triangle3_membrane::get_R_gradR( const int &quaindex,
 Vector_3 FEAElement_Triangle3_membrane::get_2d_normal_out( const int &quaindex, 
     double &area ) const
 {
-  ASSERT(quaindex>=0 && quaindex < numQuapts);
+  assert(quaindex>=0 && quaindex < numQuapts);
   area = detJac;
   return Vector_3( unx, uny, unz );
 }
 
 Matrix_3x3 FEAElement_Triangle3_membrane::get_rotationMatrix( const int &quaindex ) const
 {
-  ASSERT( quaindex >= 0 && quaindex < numQuapts );
+  assert( quaindex >= 0 && quaindex < numQuapts );
   return Q;
 }
 

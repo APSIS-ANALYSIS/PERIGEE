@@ -63,7 +63,7 @@ double FEAElement_Tet_P2_P1::get_h( const double * const &ctrl_x,
 void FEAElement_Tet_P2_P1::get_R( const int &quaindex, 
     double * const &basis ) const
 {
-  ASSERT( quaindex >= 0 && quaindex < numQuapts );
+  assert( quaindex >= 0 && quaindex < numQuapts );
   const int offset = quaindex * 14;
   for(int ii=0; ii<14; ++ii) basis[ii] = R[offset+ii];
 }
@@ -73,7 +73,7 @@ void FEAElement_Tet_P2_P1::get_gradR( const int &quaindex,
     double * const &basis_x, double * const &basis_y, 
     double * const &basis_z ) const
 {
-  ASSERT( quaindex >= 0 && quaindex < numQuapts );
+  assert( quaindex >= 0 && quaindex < numQuapts );
   const int offset = quaindex * 14;
   for( int ii=0; ii<14; ++ii )
   {
@@ -88,7 +88,7 @@ void FEAElement_Tet_P2_P1::get_R_gradR( const int &quaindex,
     double * const &basis, double * const &basis_x, 
     double * const &basis_y, double * const &basis_z ) const
 {
-  ASSERT( quaindex >= 0 && quaindex < numQuapts );
+  assert( quaindex >= 0 && quaindex < numQuapts );
   const int offset = quaindex * 14;
   for( int ii=0; ii<14; ++ii )
   {
@@ -105,7 +105,7 @@ void FEAElement_Tet_P2_P1::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_y,
     const double * const &ctrl_z )
 {
-  ASSERT( quad -> get_dim() == 4 );
+  assert( quad -> get_dim() == 4 );
 
   double qua_r, qua_s, qua_t, qua_u;
   for(int qua=0; qua<numQuapts; ++qua)

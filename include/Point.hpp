@@ -24,14 +24,14 @@ class Point
     
     Point( const T &x, const T &y )
     {
-      ASSERT(dim == 2);
+      assert(dim == 2);
       this -> coor[0] = x;
       this -> coor[1] = y;
     }
 
     Point( const T &x, const T &y, const T &z )
     {
-      ASSERT(dim == 3);
+      assert(dim == 3);
       this -> coor[0] = x;
       this -> coor[1] = y;
       this -> coor[2] = z;
@@ -41,11 +41,11 @@ class Point
 
     // read-write operator
     T& operator[](const int &ii) 
-    {ASSERT(ii>=0 && ii<dim); return coor[ii];}
+    {assert(ii>=0 && ii<dim); return coor[ii];}
 
     // read only access operator
     const T& operator[](const int &ii) const 
-    {ASSERT(ii>=0 && ii<dim); return coor[ii];}
+    {assert(ii>=0 && ii<dim); return coor[ii];}
 
     Point& operator = ( const Point<dim, T> &rhs );
 
@@ -76,7 +76,7 @@ template<int dim, typename T> inline
 Point<dim,T> &
 Point<dim,T>::operator = ( const Point<dim,T> &rhs )
 {
-  ASSERT(dim > 0);
+  assert(dim > 0);
   for(int ii=0; ii<dim; ++ii) this -> coor[ii] = rhs[ii];
 
   return *this;
@@ -87,7 +87,7 @@ template<int dim, typename T> inline
 Point<dim,T> &
 Point<dim,T>::operator += ( const Point<dim,T> &rhs )
 {
-  ASSERT(dim > 0);
+  assert(dim > 0);
   for(int ii=0; ii<dim; ++ii) this -> coor[ii] += rhs[ii];
 
   return *this;
@@ -98,7 +98,7 @@ template<int dim, typename T> inline
 Point<dim,T> &
 Point<dim,T>::operator -= ( const Point<dim,T> &rhs )
 {
-  ASSERT(dim > 0);
+  assert(dim > 0);
   for(int ii=0; ii<dim; ++ii) this -> coor[ii] -= rhs[ii];
 
   return *this;
@@ -109,7 +109,7 @@ template<int dim, typename T> inline
 Point<dim,T> &
 Point<dim,T>::operator *= ( const T &val )
 {
-  ASSERT(dim > 0);
+  assert(dim > 0);
   for(int ii=0; ii<dim; ++ii) this -> coor[ii] *= val;
 
   return *this;
@@ -120,7 +120,7 @@ template<int dim, typename T> inline
 Point<dim,T> &
 Point<dim,T>::operator /= ( const T &val )
 {
-  ASSERT(dim > 0 && val != 0.0);
+  assert(dim > 0 && val != 0.0);
   for(int ii=0; ii<dim; ++ii) this -> coor[ii] /= val;
 
   return *this;

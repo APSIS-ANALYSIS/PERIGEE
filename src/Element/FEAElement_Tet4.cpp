@@ -30,7 +30,7 @@ void FEAElement_Tet4::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_y,
     const double * const &ctrl_z )
 {
-  ASSERT( quad -> get_dim() == 4 );
+  assert( quad -> get_dim() == 4 );
 
   // area coordinates, the rest one is  qua_u = 1.0 - qua_r - qua_s - qua_t
   for( int qua = 0; qua < numQuapts; ++qua )
@@ -93,7 +93,7 @@ void FEAElement_Tet4::buildBasis( const IQuadPts * const &quad,
 
 void FEAElement_Tet4::get_R( const int &quaindex, double * const &basis ) const
 {
-  ASSERT( quaindex >= 0 && quaindex < numQuapts );
+  assert( quaindex >= 0 && quaindex < numQuapts );
   const int offset = quaindex * 4;
   basis[0] = R[offset];
   basis[1] = R[offset+1];
@@ -103,7 +103,7 @@ void FEAElement_Tet4::get_R( const int &quaindex, double * const &basis ) const
 
 std::vector<double> FEAElement_Tet4::get_R( const int &quaindex ) const
 {
-  ASSERT( quaindex >= 0 && quaindex < numQuapts );
+  assert( quaindex >= 0 && quaindex < numQuapts );
   const int offset = quaindex * 4;
   return { R[offset], R[offset+1], R[offset+2], R[offset+3] };
 }
@@ -111,7 +111,7 @@ std::vector<double> FEAElement_Tet4::get_R( const int &quaindex ) const
 void FEAElement_Tet4::get_gradR( const int &quaindex, double * const &basis_x,
     double * const &basis_y, double * const &basis_z ) const
 {
-  ASSERT( quaindex >= 0 && quaindex < numQuapts );
+  assert( quaindex >= 0 && quaindex < numQuapts );
   for( int ii=0; ii<4; ++ii )
   {
     basis_x[ii] = dR_dx[ii];
@@ -122,19 +122,19 @@ void FEAElement_Tet4::get_gradR( const int &quaindex, double * const &basis_x,
 
 std::vector<double> FEAElement_Tet4::get_dR_dx( const int &quaindex ) const
 {
-  ASSERT( quaindex >= 0 && quaindex < numQuapts );
+  assert( quaindex >= 0 && quaindex < numQuapts );
   return { dR_dx[0], dR_dx[1], dR_dx[2], dR_dx[3] };
 }
 
 std::vector<double> FEAElement_Tet4::get_dR_dy( const int &quaindex ) const
 {
-  ASSERT( quaindex >= 0 && quaindex < numQuapts );
+  assert( quaindex >= 0 && quaindex < numQuapts );
   return { dR_dy[0], dR_dy[1], dR_dy[2], dR_dy[3] };
 }
 
 std::vector<double> FEAElement_Tet4::get_dR_dz( const int &quaindex ) const
 {
-  ASSERT( quaindex >= 0 && quaindex < numQuapts );
+  assert( quaindex >= 0 && quaindex < numQuapts );
   return { dR_dz[0], dR_dz[1], dR_dz[2], dR_dz[3] };
 }
 
@@ -142,7 +142,7 @@ void FEAElement_Tet4::get_R_gradR( const int &quaindex, double * const &basis,
     double * const &basis_x, double * const &basis_y,
     double * const &basis_z ) const
 {
-  ASSERT( quaindex >= 0 && quaindex < numQuapts );
+  assert( quaindex >= 0 && quaindex < numQuapts );
   const int offset = quaindex * 4;
   for( int ii=0; ii<4; ++ii )
   {
@@ -160,7 +160,7 @@ void FEAElement_Tet4::get_3D_R_dR_d2R( const int &quaindex,
     double * const &basis_zz, double * const &basis_xy,
     double * const &basis_xz, double * const &basis_yz ) const
 {
-  ASSERT( quaindex >= 0 && quaindex < numQuapts );
+  assert( quaindex >= 0 && quaindex < numQuapts );
   const int offset = quaindex * 4;
   for( int ii=0; ii<4; ++ii )
   {
@@ -183,7 +183,7 @@ void FEAElement_Tet4::get_3D_R_gradR_LaplacianR( const int &quaindex,
     double * const &basis_xx, double * const &basis_yy,
     double * const &basis_zz ) const
 {
-  ASSERT( quaindex >= 0 && quaindex < numQuapts );
+  assert( quaindex >= 0 && quaindex < numQuapts );
   const int offset = quaindex * 4;
   for( int ii=0; ii<4; ++ii )
   {
