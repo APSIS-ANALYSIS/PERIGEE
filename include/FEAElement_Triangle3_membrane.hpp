@@ -67,13 +67,13 @@ class FEAElement_Triangle3_membrane : public FEAElement
 
     virtual std::vector<double> get_dR_dx( const int &quaindex ) const
     {
-      assert( quaindex >= 0 && quaindex < numQuapts );
+      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle3_membrane::get_dR_dx function error.\n" );
       return { dR_dx[0], dR_dx[1], dR_dx[2] };
     }
     
     virtual std::vector<double> get_dR_dy( const int &quaindex ) const
     {
-      assert( quaindex >= 0 && quaindex < numQuapts );
+      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle3_membrane::get_dR_dy function error.\n" );
       return { dR_dy[0], dR_dy[1], dR_dy[2] };
     }
     
