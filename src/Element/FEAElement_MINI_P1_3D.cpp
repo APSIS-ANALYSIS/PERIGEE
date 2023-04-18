@@ -114,7 +114,7 @@ void FEAElement_MINI_P1_3D::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_y,
     const double * const &ctrl_z )
 {
-  assert( quad -> get_dim() == 4 );
+  ASSERT( quad -> get_dim() == 4, "FEAElement_MINI_P1_3D::buildBasis function error.\n");
 
   // Calculate the geometrical info first
   Jac[0] = ctrl_x[0] * (-1.0) + ctrl_x[1]; // dx_dr

@@ -1,7 +1,6 @@
 #include "PNonlinear_CMM_Solver.hpp"
 
 PNonlinear_CMM_Solver::PNonlinear_CMM_Solver(
-    const APart_Node * const &anode_ptr,
     const double &input_nrtol, const double &input_natol,
     const double &input_ndtol,
     const int &input_max_iteration, 
@@ -43,7 +42,6 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
     const ICVFlowRate * const flr_ptr,
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &lien_ptr,
-    const APart_Node * const &anode_ptr,
     const FEANode * const &feanode_ptr,
     const ALocal_NBC * const &nbc_part,
     const ALocal_Inflow_NodalBC * const &infnbc_part,
@@ -140,8 +138,8 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
 
     gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, &wall_disp_alpha,
         dot_sol, sol, curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
-        elementw, quad_v, quad_s, lien_ptr, anode_ptr,
-        feanode_ptr, nbc_part, ringnbc_part, ebc_part, ebc_wall_part, gbc );
+        elementw, quad_v, quad_s, lien_ptr, feanode_ptr, 
+        nbc_part, ringnbc_part, ebc_part, ebc_wall_part, gbc );
    
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(mat_assem_0_event,0,0,0,0);
@@ -163,8 +161,8 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
 
     gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, &wall_disp_alpha,
         dot_sol, sol, curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
-        elementw, quad_v, quad_s, lien_ptr, anode_ptr,
-        feanode_ptr, nbc_part, ringnbc_part, ebc_part, ebc_wall_part, gbc );
+        elementw, quad_v, quad_s, lien_ptr, feanode_ptr, 
+        nbc_part, ringnbc_part, ebc_part, ebc_wall_part, gbc );
 
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(vec_assem_0_event,0,0,0,0);
@@ -239,8 +237,8 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
 
       gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, &wall_disp_alpha,
           dot_sol, sol, curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
-          elementw, quad_v, quad_s, lien_ptr, anode_ptr,
-          feanode_ptr, nbc_part, ringnbc_part, ebc_part, ebc_wall_part, gbc );
+          elementw, quad_v, quad_s, lien_ptr, feanode_ptr, 
+          nbc_part, ringnbc_part, ebc_part, ebc_wall_part, gbc );
 
 #ifdef PETSC_USE_LOG
       PetscLogEventEnd(mat_assem_1_event,0,0,0,0);
@@ -259,8 +257,8 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
 
       gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, &wall_disp_alpha,
           dot_sol, sol, curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
-          elementw, quad_v, quad_s, lien_ptr, anode_ptr,
-          feanode_ptr, nbc_part, ringnbc_part, ebc_part, ebc_wall_part, gbc );
+          elementw, quad_v, quad_s, lien_ptr, feanode_ptr, 
+          nbc_part, ringnbc_part, ebc_part, ebc_wall_part, gbc );
 
 #ifdef PETSC_USE_LOG
       PetscLogEventEnd(vec_assem_1_event,0,0,0,0);
@@ -304,7 +302,6 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_Prestress(
     const ICVFlowRate * const flr_ptr,
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &lien_ptr,
-    const APart_Node * const &anode_ptr,
     const FEANode * const &feanode_ptr,
     const ALocal_NBC * const &nbc_part,
     const ALocal_Inflow_NodalBC * const &infnbc_part,
@@ -374,8 +371,8 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_Prestress(
 
   gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, &wall_disp_alpha,
       dot_sol, sol, curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
-      elementw, quad_v, quad_s, lien_ptr, anode_ptr,
-      feanode_ptr, nbc_part, ringnbc_part, ebc_part, ebc_wall_part, gbc );
+      elementw, quad_v, quad_s, lien_ptr, feanode_ptr, 
+      nbc_part, ringnbc_part, ebc_part, ebc_wall_part, gbc );
 
   SYS_T::commPrint("  --- M updated");
 
@@ -437,8 +434,8 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_Prestress(
 
     gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, &wall_disp_alpha,
         dot_sol, sol, curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
-        elementw, quad_v, quad_s, lien_ptr, anode_ptr,
-        feanode_ptr, nbc_part, ringnbc_part, ebc_part, ebc_wall_part, gbc );
+        elementw, quad_v, quad_s, lien_ptr, feanode_ptr, 
+        nbc_part, ringnbc_part, ebc_part, ebc_wall_part, gbc );
 
     SYS_T::commPrint("  --- M updated");
     lsolver_ptr->SetOperator(gassem_ptr->K);

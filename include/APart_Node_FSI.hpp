@@ -36,13 +36,15 @@ class APart_Node_FSI : public APart_Node
     virtual void print_info() const;
 
     // Get the solid local node number and indices
-    virtual int get_nlocalnode_solid() const {return nlocalnode_solid;}
+    virtual int get_nlocalnode_solid() const 
+    {return nlocalnode_solid;}
 
     virtual int get_node_loc_solid(const int &index) const
     {return node_loc_solid[index];}
 
     // Get the fluid local node number and indices
-    virtual int get_nlocalnode_fluid() const {return nlocalnode_fluid;}
+    virtual int get_nlocalnode_fluid() const 
+    {return nlocalnode_fluid;}
 
     virtual int get_node_loc_fluid(const int &index) const
     {return node_loc_fluid[index];}

@@ -258,8 +258,10 @@ int main( int argc, char *argv[] )
   // ================================================================
 
   // ===== Generate a sparse matrix for strong enforcement of essential BC
+  std::vector<int> start_idx{ idx_v_start, idx_p_start };
+
   Matrix_PETSc * pmat = new Matrix_PETSc( idx_v_len + idx_p_len );
-  pmat -> gen_perm_bc( pNode_list, locnbc_list );
+  pmat -> gen_perm_bc( pNode_list, locnbc_list, start_idx );
 
   // ===== Generate the generalized-alpha method
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");

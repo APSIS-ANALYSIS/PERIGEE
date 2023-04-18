@@ -21,18 +21,18 @@ PLocAssem_Tet4_FSI_Mesh_Elastostatic::~PLocAssem_Tet4_FSI_Mesh_Elastostatic()
 
 void PLocAssem_Tet4_FSI_Mesh_Elastostatic::print_info() const
 {
-  SYS_T::print_sep_line();
-  PetscPrintf(PETSC_COMM_WORLD, "  Three-dimensional Elastostatic equation: \n");
-  PetscPrintf(PETSC_COMM_WORLD, "  Spatial: Galerkin Finite element \n");
-  PetscPrintf(PETSC_COMM_WORLD, "  This solver is for mesh motion in the fluid sub-domain for FSI problems.\n");
-  PetscPrintf(PETSC_COMM_WORLD, "  Young's Modulus E  = %e \n", E);
-  PetscPrintf(PETSC_COMM_WORLD, "  Possion's ratio nu = %e \n", nu);
-  PetscPrintf(PETSC_COMM_WORLD, "  Lame coeff lambda  = %e \n", lambda);
-  PetscPrintf(PETSC_COMM_WORLD, "  Shear modulus mu   = %e \n", mu);
-  PetscPrintf(PETSC_COMM_WORLD, "  Bulk modulus kappa = %e \n", kappa);
-  PetscPrintf(PETSC_COMM_WORLD, "  Note: Element stiffening is applied. \n");
+  SYS_T::commPrint("  Three-dimensional Elastostatic equation: \n");
+  SYS_T::commPrint("  Spatial: Galerkin Finite element \n");
+  SYS_T::commPrint("  This solver is for mesh motion in the fluid sub-domain for FSI problems.\n");
+  SYS_T::commPrint("  Young's Modulus E  = %e \n", E);
+  SYS_T::commPrint("  Possion's ratio nu = %e \n", nu);
+  SYS_T::commPrint("  Lame coeff lambda  = %e \n", lambda);
+  SYS_T::commPrint("  Shear modulus mu   = %e \n", mu);
+  SYS_T::commPrint("  Bulk modulus kappa = %e \n", kappa);
+  SYS_T::commPrint("  Note: Element stiffening is applied. \n");
   SYS_T::print_sep_line();
 }
+
 
 void PLocAssem_Tet4_FSI_Mesh_Elastostatic::Zero_Tangent_Residual()
 {
@@ -114,12 +114,16 @@ void PLocAssem_Tet4_FSI_Mesh_Elastostatic::Assem_Tangent_Residual(
       wy += (vec_b[ii*3+2] - vec_a[ii*3+2]) * dR_dy[ii];
       wz += (vec_b[ii*3+2] - vec_a[ii*3+2]) * dR_dz[ii];
     }
-
-    const double gwts = detJac * quad->get_qw(qua) / detJac; // element stiffening
+    
+    // element stiffening: we multiply the inverse of the element volume given
+    // by detJac to enhance the mesh moving algorithm's robustness, as the small
+    // element will be stiffer and thus is resistant to mesh distortion.
+    // Reference: T.E. Tezduyar and A.A. Johnson (1994) CMAME 119 (1994) 73–94
+    const double gwts = detJac * quad->get_qw(qua) / detJac;
 
     for(int A=0; A<nLocBas; ++A)
     {
-      double NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
+      const double NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
       Residual[3*A] += gwts * (
           NA_x * (l2mu * ux + lambda * vy + lambda * wz)
@@ -138,7 +142,7 @@ void PLocAssem_Tet4_FSI_Mesh_Elastostatic::Assem_Tangent_Residual(
 
       for(int B=0; B<nLocBas; ++B)
       {
-        double NB_x = dR_dx[B], NB_y = dR_dy[B], NB_z = dR_dz[B];
+        const double NB_x = dR_dx[B], NB_y = dR_dy[B], NB_z = dR_dz[B];
 
         Tangent[ 3*nLocBas*(3*A+0) + 3*B + 0 ] += gwts * (l2mu * NA_x * NB_x + mu * NA_y * NB_y + mu * NA_z * NB_z );
 
