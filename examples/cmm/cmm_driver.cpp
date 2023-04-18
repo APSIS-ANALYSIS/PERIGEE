@@ -107,7 +107,7 @@ int main( int argc, char *argv[] )
   std::string restart_disp_name = "SOL_disp_"; // restart disp solution base name
 
   // Yaml options
-  bool isloadYaml = true;
+  bool   is_loadYaml = true;
   std::string yaml_file("./runscript.yml");
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
@@ -123,11 +123,10 @@ int main( int argc, char *argv[] )
   SYS_T::print_fatal_if( cmmBC_type == 2, "Error: cmmBC_type is set to 2, which is designed for prestress generation. \n");
 
   // ===== Yaml Arguments =====
-  SYS_T::GetOptionBool(  "-isloadYaml",   isloadYaml);
-  SYS_T::GetOptionString("-yaml_file",    yaml_file);
+  SYS_T::GetOptionBool(  "-is_loadYaml",     is_loadYaml);
+  SYS_T::GetOptionString("-yaml_file",       yaml_file);
 
-  if (isloadYaml)
-    {SYS_T::InsertFileYAML( yaml_file,  false );}
+  if (is_loadYaml) SYS_T::InsertFileYAML( yaml_file,  false );
 
   // ===== Read Command Line Arguments =====
   SYS_T::commPrint("===> Reading command line arguments... \n");
@@ -482,7 +481,7 @@ int main( int argc, char *argv[] )
     PCHYPRESetType( preproc, "boomeramg" );
 
     gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_ptr, elementv,
-        elements, quadv, quads, locIEN, pNode, fNode, locnbc, locringnbc, locebc );
+        elements, quadv, quads, locIEN, fNode, locnbc, locringnbc, locebc );
 
     lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
 
@@ -504,7 +503,7 @@ int main( int argc, char *argv[] )
   PCFieldSplitSetFields(upc,"p",1,pfield,pfield);
 
   // ===== Nonlinear solver context =====
-  PNonlinear_CMM_Solver * nsolver = new PNonlinear_CMM_Solver( pNode,
+  PNonlinear_CMM_Solver * nsolver = new PNonlinear_CMM_Solver(
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
   nsolver->print_info();
@@ -595,7 +594,7 @@ int main( int argc, char *argv[] )
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
   tsolver->TM_CMM_GenAlpha(is_restart, base, dot_sol, sol, dot_sol_wall_disp, sol_wall_disp,
-      tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN, pNode, fNode,
+      tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN, fNode,
       locnbc, locinfnbc, locringnbc, locebc, locebc_wall, gbc, pmat, elementv, elements, elementw,
       quadv, quads, locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
 

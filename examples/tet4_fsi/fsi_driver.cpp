@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
   std::string restart_p_name = "SOL_P_";
 
   // Yaml options
-  bool isloadYaml = true;
+  bool is_loadYaml = true;
   std::string yaml_file("./runscript.yml");
 
   // ===== Initialization of PETSc =====
@@ -124,11 +124,11 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("PETSc version: %s \n", PETSc_T::get_version().c_str());
 
   // ===== Yaml Argument =====
-  SYS_T::GetOptionBool(  "-isloadYaml",   isloadYaml);
-  SYS_T::GetOptionString("-yaml_file",    yaml_file);
+  SYS_T::GetOptionBool(  "-is_loadYaml",       is_loadYaml);
+  SYS_T::GetOptionString("-yaml_file",         yaml_file);
 
-  if (isloadYaml)
-    {SYS_T::InsertFileYAML( yaml_file,  false );}
+  // load the YAML file to pass the argument values
+  if(is_loadYaml) SYS_T::InsertFileYAML( yaml_file,  false );
 
   // ===== Command Line Argument =====
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
@@ -356,8 +356,6 @@ int main(int argc, char *argv[])
   const int idx_v_start = HDF5_T::read_intScalar( SYS_T::gen_partfile_name(part_v_file, rank).c_str(), "/DOF_mapper", "start_idx" );
   const int idx_p_start = HDF5_T::read_intScalar( SYS_T::gen_partfile_name(part_p_file, rank).c_str(), "/DOF_mapper", "start_idx" );
 
-  std::vector<int> start_idx{ idx_v_start, idx_p_start};
-
   const int idx_v_len = pNode_v->get_dof() * pNode_v -> get_nlocalnode();
   const int idx_p_len = pNode_p->get_dof() * pNode_p -> get_nlocalnode();
 
@@ -376,6 +374,8 @@ int main(int argc, char *argv[])
   // ================================================================
 
   // ===== Generate a sparse matrix for strong enforcement of essential BC
+  std::vector<int> start_idx{ idx_v_start, idx_p_start };
+
   Matrix_PETSc * pmat = new Matrix_PETSc( idx_v_len + idx_p_len );
   pmat -> gen_perm_bc( pNode_list, locnbc_list, start_idx );
 

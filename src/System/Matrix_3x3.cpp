@@ -92,6 +92,12 @@ Matrix_3x3& Matrix_3x3::operator*= (const double &val)
   return *this;
 }
 
+Matrix_3x3 Matrix_3x3::operator- () const
+{
+  return Matrix_3x3( -mat[0], -mat[1], -mat[2], -mat[3], -mat[4],
+      -mat[5], -mat[6], -mat[7], -mat[8] );
+}
+
 void Matrix_3x3::gen_zero()
 {
   for(int ii=0; ii<9; ++ii) mat[ii] = 0.0; 
@@ -595,6 +601,13 @@ Matrix_3x3 transpose( const Matrix_3x3 &input )
   return Matrix_3x3( input(0), input(3), input(6),
       input(1), input(4), input(7),
       input(2), input(5), input(8) );
+}
+
+Matrix_3x3 gen_identity_matrix()
+{
+  return Matrix_3x3( 1.0, 0.0, 0.0,
+      0.0, 1.0, 0.0,
+      0.0, 0.0, 1.0 );
 }
 
 // EOF

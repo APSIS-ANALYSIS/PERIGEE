@@ -70,7 +70,6 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     const ICVFlowRate * const flr_ptr,
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &lien_ptr,
-    const APart_Node * const &anode_ptr,
     const FEANode * const &feanode_ptr,
     const ALocal_NBC * const &nbc_part,
     const ALocal_Inflow_NodalBC * const &infnbc_part,
@@ -131,7 +130,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     nsolver_ptr->GenAlpha_Solve_NS( renew_flag, 
         time_info->get_time(), time_info->get_step(), 
         sol_base, pre_dot_sol, pre_sol, tmga_ptr, flr_ptr,
-        alelem_ptr, lien_ptr, anode_ptr, feanode_ptr, nbc_part, infnbc_part,
+        alelem_ptr, lien_ptr, feanode_ptr, nbc_part, infnbc_part,
         ebc_part, gbc, bc_mat, elementv, elements, quad_v, quad_s, lassem_fluid_ptr,
         gassem_ptr, lsolver_ptr, cur_dot_sol, cur_sol, conv_flag, nl_counter );
 

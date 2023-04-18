@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
   std::string restart_name = "SOL_"; // restart solution base name
 
   // Yaml options
-  bool isloadYaml = true;
+  bool is_loadYaml = true;
   std::string yaml_file("./runscript.yml");
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
@@ -99,11 +99,10 @@ int main(int argc, char *argv[])
   SYS_T::print_perigee_art();
 
   // ===== Yaml Arguments =====
-  SYS_T::GetOptionBool(  "-isloadYaml",   isloadYaml);
-  SYS_T::GetOptionString("-yaml_file",    yaml_file);
+  SYS_T::GetOptionBool("-is_loadYaml", is_loadYaml);
+  SYS_T::GetOptionString("-yaml_file", yaml_file);
 
-  if (isloadYaml)
-    {SYS_T::InsertFileYAML( yaml_file,  false );}
+  if (is_loadYaml) SYS_T::InsertFileYAML( yaml_file,  false );
 
   // ===== Read Command Line Arguments =====
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
@@ -396,7 +395,7 @@ int main(int argc, char *argv[])
     PCHYPRESetType( preproc, "boomeramg" );
 
     gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_ptr, elementv,
-        elements, quadv, quads, locIEN, pNode, fNode, locnbc, locebc );
+        elements, quadv, quads, locIEN, fNode, locnbc, locebc );
 
     lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
 
@@ -506,7 +505,7 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
   tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol,
-      tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN, pNode, fNode,
+      tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN, fNode,
       locnbc, locinfnbc, locebc, gbc, pmat, elementv, elements, quadv, quads,
       locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
 

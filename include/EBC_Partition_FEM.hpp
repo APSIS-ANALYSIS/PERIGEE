@@ -13,7 +13,6 @@
 // Author: Ju Liu
 // Date: Nov. 22 2017
 // ==================================================================
-#include <cassert>
 #include "IEBC_Partition.hpp"
 #include "IPart.hpp"
 #include "ElemBC.hpp"
