@@ -24,21 +24,21 @@ Tissue_property::~Tissue_property()
 Vector_3 Tissue_property::get_basis_r( const int &nn ) const
 {
   const int index = node_locgho_solid[nn];
-  SYS_T::print_fatal_if(index == -1, "ERROR: Tissue_property::get_basis_r the input node is a fluid node.");
+  ASSERT(index > -1, "ERROR: Tissue_property::get_basis_r the input node is a fluid node.");
   return basis_r[index];
 }
 
 Vector_3 Tissue_property::get_basis_l( const int &nn ) const
 {
   const int index = node_locgho_solid[nn];
-  SYS_T::print_fatal_if(index == -1, "ERROR: Tissue_property::get_basis_l the input node is a fluid node.");
+  ASSERT(index > -1, "ERROR: Tissue_property::get_basis_l the input node is a fluid node.");
   return basis_l[index];
 }
 
 Vector_3 Tissue_property::get_basis_c( const int &nn ) const
 {
   const int index = node_locgho_solid[nn];
-  SYS_T::print_fatal_if(index == -1, "ERROR: Tissue_property::get_basis_c the input node is a fluid node.");
+  ASSERT(index > -1, "ERROR: Tissue_property::get_basis_c the input node is a fluid node.");
   return basis_c[index];
 }
 
