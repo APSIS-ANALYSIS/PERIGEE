@@ -36,7 +36,7 @@ double FEAElement_MINI_P1_2D::get_memory_usage() const
 void FEAElement_MINI_P1_2D::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_x, const double * const &ctrl_y )
 {
-  assert( quad -> get_dim() == 3 );
+  ASSERT( quad -> get_dim() == 3, "FEAElement_MINI_P1_2D::buildBasis function error.\n");
  
   // Because of the constant strain, we can calculate the 
   // geometrical info first 

@@ -24,14 +24,14 @@ class Point
     
     Point( const T &x, const T &y )
     {
-      assert(dim == 2);
+      ASSERT(dim == 2, "The dimension of Point<dim,T> has to equal 2.\n" );
       this -> coor[0] = x;
       this -> coor[1] = y;
     }
 
     Point( const T &x, const T &y, const T &z )
     {
-      assert(dim == 3);
+      ASSERT(dim == 3, "The dimension of Point<dim,T> has to equal 3.\n" );
       this -> coor[0] = x;
       this -> coor[1] = y;
       this -> coor[2] = z;
@@ -41,11 +41,11 @@ class Point
 
     // read-write operator
     T& operator[](const int &ii) 
-    {assert(ii>=0 && ii<dim); return coor[ii];}
+    {ASSERT(ii>=0 && ii<dim, "The read-write access operator of the Point class error.\n" ); return coor[ii];}
 
     // read only access operator
     const T& operator[](const int &ii) const 
-    {assert(ii>=0 && ii<dim); return coor[ii];}
+    {ASSERT(ii>=0 && ii<dim, "The read only access operator of the Point class error.\n" ); return coor[ii];}
 
     Point& operator = ( const Point<dim, T> &rhs );
 
@@ -76,7 +76,7 @@ template<int dim, typename T> inline
 Point<dim,T> &
 Point<dim,T>::operator = ( const Point<dim,T> &rhs )
 {
-  assert(dim > 0);
+  ASSERT(dim > 0, "The operator = of the Point class error, the dimension of Point<dim,T> has to bigger than 0.\n" );
   for(int ii=0; ii<dim; ++ii) this -> coor[ii] = rhs[ii];
 
   return *this;
@@ -87,7 +87,7 @@ template<int dim, typename T> inline
 Point<dim,T> &
 Point<dim,T>::operator += ( const Point<dim,T> &rhs )
 {
-  assert(dim > 0);
+  ASSERT(dim > 0, "The operator += of the Point class error, the dimension of Point<dim,T> has to bigger than 0.\n" );
   for(int ii=0; ii<dim; ++ii) this -> coor[ii] += rhs[ii];
 
   return *this;
@@ -98,7 +98,7 @@ template<int dim, typename T> inline
 Point<dim,T> &
 Point<dim,T>::operator -= ( const Point<dim,T> &rhs )
 {
-  assert(dim > 0);
+  ASSERT(dim > 0, "The operator -= of the Point class error, the dimension of Point<dim,T> has to bigger than 0.\n" );
   for(int ii=0; ii<dim; ++ii) this -> coor[ii] -= rhs[ii];
 
   return *this;
@@ -109,7 +109,7 @@ template<int dim, typename T> inline
 Point<dim,T> &
 Point<dim,T>::operator *= ( const T &val )
 {
-  assert(dim > 0);
+  ASSERT(dim > 0, "The operator *= of the Point class error, the dimension of Point<dim,T> has to bigger than 0.\n" );
   for(int ii=0; ii<dim; ++ii) this -> coor[ii] *= val;
 
   return *this;
@@ -120,7 +120,7 @@ template<int dim, typename T> inline
 Point<dim,T> &
 Point<dim,T>::operator /= ( const T &val )
 {
-  assert(dim > 0 && val != 0.0);
+  ASSERT(dim > 0 && val != 0.0, "The operator /= of the Point class error, the dimension of Point<dim,T> has to bigger than 0 and the divisor should not be 0.0\n" );
   for(int ii=0; ii<dim; ++ii) this -> coor[ii] /= val;
 
   return *this;
