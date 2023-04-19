@@ -17,89 +17,24 @@
 #include "petsc.h"
 
   // ================================================================
-  // The following are used for PERIGEE_HasBuiltin in PERIGEE_ASSUME.
-  // ================================================================
-  // Determine whether a particular builtin method is supported by the compiler
-  // Used in PERIGEE_HasBuiltin for clangs
-
-#if !defined(__has_builtin)
-  #define __has_builtin(x) 0
-#endif
-
-#if defined(__clang__) && defined(__clang_major__) && (__clang_major__ < 10) && defined(__is_identifier)
-  #define PERIGEE_HasBuiltin(name) __is_identifier(name)
-#else
-  #define PERIGEE_HasBuiltin(name) __has_builtin(name)
-#endif
-
-  // ================================================================
-  // The following are used for PERIGEE_Unreachable in PERIGEE_ASSUME.
-  // ================================================================
-  // Indicate to the compiler that a code-path is logically unreachable
-  // Used in PERIGEE_ASSUME for gcc (and really old clang)
-
-#if PETSC_CPP_VERSION >= 23
-  #include <utility>
-  #define PERIGEE_Unreachable() std::unreachable()
-#elif defined(__GNUC__)
-  /* GCC 4.8+, Clang, Intel and other compilers compatible with GCC (-std=c++0x or above) */
-  #define PERIGEE_Unreachable() __builtin_unreachable()
-#elif defined(_MSC_VER) /* MSVC */
-  #define PERIGEE_Unreachable() __assume(0)
-#else /* ??? */
-  #define PERIGEE_Unreachable() SETERRABORT(PETSC_COMM_SELF, PETSC_ERR_PLIB, "Code path explicitly marked as unreachable executed")
-#endif
-
-  // ================================================================
-  // The following are used for PERIGEE_ASSUME.
-  // ================================================================
-  // PERIGEE_ASSUME(bool cond)
-  // If supported by the compiler, `cond` is used to inform the optimizer of an invariant
-  // truth. The argument itself is never evaluated, so any side effects of the expression will be
-  // discarded. This macro is used in `ASSERT(cond, ...)` to retain information gained from debug
-  // checks that would be lost in optimized builds.
-
-#if PETSC_CPP_VERSION >= 23
-  #define PERIGEE_ASSUME(...) [[assume(__VA_ARGS__)]]
-#elif defined(_MSC_VER) // msvc
-  #define PERIGEE_ASSUME(...) __assume(__VA_ARGS__)
-#elif defined(__clang__) && PERIGEE_HasBuiltin(__builtin_assume) // clang
-  #define PERIGEE_ASSUME(...) \
-    do { \
-      _Pragma("clang diagnostic push"); \
-      _Pragma("clang diagnostic ignored \"-Wassume\""); \
-      __builtin_assume(__VA_ARGS__); \
-      _Pragma("clang diagnostic pop"); \
-    } while (0)
-#else // gcc (and really old clang)
-  #define PERIGEE_ASSUME(...) \
-    do { \
-      if (0 && (__VA_ARGS__)) PERIGEE_Unreachable(); \
-    } while (0)
-#endif
-
-  // ================================================================
   // The following are used for backward compatibility like PetscDefined(USE_DEBUG).
   // ================================================================
-  // Versions >= 3.14.x : PetscDefined(USE_DEBUG) is used to determine whether it is debug mode
-  //                      include/petscmacros.h:963:#define PetscDefined(def) PetscDefined_(PetscConcat(PETSC_, def))
-  //                 or   include/petscsys.h:184:#  define PetscDefined(d)    PetscDefined_(PETSC_ ## d)
-  //
-  //           < 3.14.x   defined(PETSC_USE_DEBUG) is used to determine whether it is debug mode
+  // Versions >= 3.14.x : PetscDefined(USE_DEBUG) is used to determine whether it is debug mode;
+  //           < 3.14.x : defined(PETSC_USE_DEBUG) is used to determine whether it is debug mode.
 
 #if PETSC_VERSION_LT(3,14,6)
-  #define PETSC_NOT_RELEASE() defined(PETSC_USE_DEBUG)
+  #define PETSC_DEFINED(def) defined(PETSC_ ## def)
 #else
-  #define PETSC_NOT_RELEASE() PetscDefined(USE_DEBUG)
+  #define PETSC_DEFINED(def) PetscDefined(def)
 #endif
 
   // ================================================================
   // The following are used for ASSERT.
   // ================================================================
-  // In debug mode (not release mode), ASSERT is called to determine a "cond" condition
-  // In release mode (PERIGEE_ASSUME() is called to indicate an invariant condition to the compiler)
+  // In debug mode, ASSERT is called to determine a "cond" condition.
+  // In release mode, PERIGEE_ASSUME() is called to indicate an invariant condition to the compiler.
 
-#if PETSC_NOT_RELEASE()
+#if PETSC_DEFINED(USE_DEBUG)
   #define ASSERT(cond, message, ...) SYS_T::print_fatal_if_not(cond, message, ##__VA_ARGS__)
 #else
   #define ASSERT(cond, ...) PERIGEE_ASSUME(cond)
@@ -521,6 +456,68 @@ namespace SYS_T
     commPrint("Warning: YAML is unsupported in this PETSc.\n");
 #endif
   }
+
+  // ================================================================
+  // The following are used for PERIGEE_HasBuiltin in PERIGEE_ASSUME.
+  // ================================================================
+  // Determine whether a particular builtin method is supported by the compiler.
+  // Used in PERIGEE_HasBuiltin for clangs.
+
+#if !defined(__has_builtin)
+  #define __has_builtin(x) 0
+#endif
+
+#if defined(__clang__) && defined(__clang_major__) && (__clang_major__ < 10) && defined(__is_identifier)
+  #define PERIGEE_HasBuiltin(name) __is_identifier(name)
+#else
+  #define PERIGEE_HasBuiltin(name) __has_builtin(name)
+#endif
+
+  // ================================================================
+  // The following are used for PERIGEE_Unreachable in PERIGEE_ASSUME.
+  // ================================================================
+  // Indicate to the compiler that a code-path is logically unreachable.
+  // Used in PERIGEE_ASSUME for gcc (and really old clang).
+
+#if PETSC_CPP_VERSION >= 23
+  #include <utility>
+  #define PERIGEE_Unreachable() std::unreachable()
+#elif defined(__GNUC__)
+  /* GCC 4.8+, Clang, Intel and other compilers compatible with GCC (-std=c++0x or above) */
+  #define PERIGEE_Unreachable() __builtin_unreachable()
+#elif defined(_MSC_VER) /* MSVC */
+  #define PERIGEE_Unreachable() __assume(0)
+#else /* ??? */
+  #define PERIGEE_Unreachable() SETERRABORT(PETSC_COMM_SELF, PETSC_ERR_PLIB, "Code path explicitly marked as unreachable executed")
+#endif
+
+  // ================================================================
+  // The following are used for PERIGEE_ASSUME.
+  // ================================================================
+  // PERIGEE_ASSUME(bool cond)
+  // If supported by the compiler, `cond` is used to inform the optimizer of an invariant
+  // truth. The argument itself is never evaluated, so any side effects of the expression will be
+  // discarded. This macro is used in `ASSERT(cond, ...)` to retain information gained from debug
+  // checks that would be lost in optimized builds.
+
+#if PETSC_CPP_VERSION >= 23
+  #define PERIGEE_ASSUME(...) [[assume(__VA_ARGS__)]]
+#elif defined(_MSC_VER) // msvc
+  #define PERIGEE_ASSUME(...) __assume(__VA_ARGS__)
+#elif defined(__clang__) && PERIGEE_HasBuiltin(__builtin_assume) // clang
+  #define PERIGEE_ASSUME(...) \
+    do { \
+      _Pragma("clang diagnostic push"); \
+      _Pragma("clang diagnostic ignored \"-Wassume\""); \
+      __builtin_assume(__VA_ARGS__); \
+      _Pragma("clang diagnostic pop"); \
+    } while (0)
+#else // gcc (and really old clang)
+  #define PERIGEE_ASSUME(...) \
+    do { \
+      if (0 && (__VA_ARGS__)) PERIGEE_Unreachable(); \
+    } while (0)
+#endif
 
   // ================================================================
   // SYS_T::Timer class defines a timer tool that one can use to
