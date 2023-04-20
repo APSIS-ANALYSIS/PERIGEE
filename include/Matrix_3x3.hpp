@@ -105,6 +105,9 @@ class Matrix_3x3
     // Scalar product
     Matrix_3x3& operator*=( const double &val );
 
+    // unary minus operator
+    Matrix_3x3 operator-() const;
+
     // Return true if the input matrix is identical to the mat
     bool is_identical( const Matrix_3x3 &source, const double &tol = 1.0e-12 ) const;
 
@@ -279,5 +282,8 @@ Matrix_3x3 cofactor( const Matrix_3x3 &input );
 
 // Return the transpose of input matrix
 Matrix_3x3 transpose( const Matrix_3x3 &input );
+
+// Return an identity matrix
+Matrix_3x3 gen_identity_matrix();
 
 #endif

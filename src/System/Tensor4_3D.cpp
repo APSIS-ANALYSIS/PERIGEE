@@ -30,6 +30,15 @@ void Tensor4_3D::copy( const Tensor4_3D &source )
   for(int ii=0; ii<81; ++ii) ten[ii] = source(ii);
 }
 
+Tensor4_3D& Tensor4_3D::operator= (const Tensor4_3D &source)
+{
+  if(this == &source) return *this;
+
+  for(int ii=0; ii<81; ++ii) ten[ii] = source(ii);
+  
+  return *this;
+}
+
 void Tensor4_3D::print() const
 {
   std::cout<<"Tensor4_3D: \n";
@@ -74,6 +83,39 @@ void Tensor4_3D::print_in_mat() const
   }
 }
 
+Tensor4_3D operator+( const Tensor4_3D &left, const Tensor4_3D &right)
+{
+  Tensor4_3D result;
+  for(int ii=0; ii<81; ++ii) result.ten[ii] = left.ten[ii] + right.ten[ii];
+
+  return result;
+}
+
+Tensor4_3D operator-( const Tensor4_3D &left, const Tensor4_3D &right)
+{
+  Tensor4_3D result;
+  for(int ii=0; ii<81; ++ii) result.ten[ii] = left.ten[ii] - right.ten[ii];
+
+  return result;
+}
+
+Tensor4_3D& Tensor4_3D::operator+=( const Tensor4_3D &source )
+{
+  for(int ii=0; ii<81; ++ii) ten[ii] += source(ii);
+  return *this;
+}
+
+Tensor4_3D& Tensor4_3D::operator-=( const Tensor4_3D &source )
+{
+  for(int ii=0; ii<81; ++ii) ten[ii] -= source(ii);
+  return *this;
+}
+
+Tensor4_3D& Tensor4_3D::operator*=( const double &val )
+{
+  for(int ii=0; ii<81; ++ii) ten[ii] *= val;
+  return *this;
+}
 
 void Tensor4_3D::gen_id()
 {
@@ -147,11 +189,6 @@ void Tensor4_3D::scale( const double &val )
   for(int ii=0; ii<81; ++ii) ten[ii] *= val;
 }
 
-void Tensor4_3D::PY( const Tensor4_3D &input )
-{
-  for(int ii=0; ii<81; ++ii) ten[ii] += input(ii);
-}
-
 void Tensor4_3D::AXPY( const double &val, const Tensor4_3D &input )
 {
   for(int ii=0; ii<81; ++ii) ten[ii] += val * input(ii);
@@ -189,6 +226,27 @@ void Tensor4_3D::add_OutProduct( const double &val, const Vector_3 &vec1,
   }
 }
 
+void Tensor4_3D::add_SymmOutProduct( const double &val, const Vector_3 &vec1, 
+    const Vector_3 &vec2, const Vector_3 &vec3, const Vector_3 &vec4 )
+{
+  for(int ii=0; ii<3; ++ii)
+  {
+    for(int jj=0; jj<3; ++jj)
+    {
+      for(int kk=0; kk<3; ++kk)
+      {
+        for(int ll=0; ll<3; ++ll)
+        {
+          ten[27*ii+9*jj+3*kk+ll] += val * ( vec1( ii ) * vec2( jj ) * vec3( kk ) * vec4( ll )
+            + vec1( ii ) * vec2( jj ) * vec3( ll ) * vec4( kk )
+            + vec1( jj ) * vec2( ii ) * vec3( kk ) * vec4( ll )
+            + vec1( jj ) * vec2( ii ) * vec3( ll ) * vec4( kk ) );
+        }
+      }
+    }
+  }
+}
+
 void Tensor4_3D::add_SymmProduct( const double &val, const Matrix_3x3 &mleft,
     const Matrix_3x3 &mright )
 {
@@ -219,7 +277,7 @@ void Tensor4_3D::add_SymmOutProduct( const double &val, const Matrix_3x3 &mleft,
       {
         for(int ll=0; ll<3; ++ll)
         {
-          ten[27*ii + 9*jj + 3*kk + ll] += val *  (mleft(3*ii + jj) * mright(3*kk + ll) 
+          ten[27*ii + 9*jj + 3*kk + ll] += val *  (mleft(3*ii + jj) * mright(3*kk + ll)
               + mright(3*ii + jj) * mleft(3*kk + ll));
         }
       }
@@ -298,18 +356,21 @@ void Tensor4_3D::MatMult_4( const Matrix_3x3 &source )
   for(int ii=0; ii<81; ++ii) ten[ii] = temp[ii];
 }
 
-void Tensor4_3D::LeftContraction( const Matrix_3x3 &a, Matrix_3x3 &out ) const
+Matrix_3x3 Tensor4_3D::LeftContraction( const Matrix_3x3 &a ) const
 {
+  Matrix_3x3 out;
   for(int m=0; m<9; ++m)
   {
     out(m) = a(0) * ten[m] + a(3) * ten[m+27] + a(6) * ten[m+54] 
       + a(1) * ten[m+9] + a(4) * ten[m+36] + a(7) * ten[m+63]
       + a(2) * ten[m+18] + a(5) * ten[m+45] + a(8) * ten[m+72];
   }
+  return out;
 }
 
-void Tensor4_3D::RightContraction( const Matrix_3x3 &a, Matrix_3x3 &out ) const
+Matrix_3x3 Tensor4_3D::RightContraction( const Matrix_3x3 &a ) const
 {
+  Matrix_3x3 out;
   for(int n=0; n<9; ++n)
   {
     const int loc = 9*n;
@@ -317,6 +378,7 @@ void Tensor4_3D::RightContraction( const Matrix_3x3 &a, Matrix_3x3 &out ) const
       + ten[loc+3] * a(3) + ten[loc+4] * a(4) + ten[loc+5] * a(5)
       + ten[loc+6] * a(6) + ten[loc+7] * a(7) + ten[loc+8] * a(8);
   }
+  return out;
 }
 
 double Tensor4_3D::LnRContraction( const Matrix_3x3 &Left, const Matrix_3x3 &Right ) const
@@ -454,6 +516,100 @@ bool Tensor4_3D::is_minor_sym( const double &tol ) const
             || std::abs( ten[ 27*ii+ 9*jj + 3*kk + ll ] - ten[ 27*ii+ 9*jj + 3*ll + kk ] ) >= tol ) return false;
 
   return true;
+}
+
+Matrix_3x3 operator*( const Tensor4_3D &input, const Matrix_3x3 &aa )
+{
+  Matrix_3x3 out;
+  for(int n=0; n<9; ++n)
+  {
+    const int loc = 9*n;
+    out(n) = input(loc) * aa(0) + input(loc+1) * aa(1) + input(loc+2) * aa(2)
+      + input(loc+3) * aa(3) + input(loc+4) * aa(4) + input(loc+5) * aa(5)
+      + input(loc+6) * aa(6) + input(loc+7) * aa(7) + input(loc+8) * aa(8);
+  }
+  
+  return out;
+}
+
+Matrix_3x3 operator*( const Matrix_3x3 &aa, const Tensor4_3D &input )
+{
+  Matrix_3x3 out;
+  for(int m=0; m<9; ++m)
+  {
+    out(m) = aa(0) * input(m) + aa(3) * input(m+27) + aa(6) * input(m+54)
+      + aa(1) * input(m+9) + aa(4) * input(m+36) + aa(7) * input(m+63)
+      + aa(2) * input(m+18) + aa(5) * input(m+45) + aa(8) * input(m+72);
+  }
+  return out;
+}
+
+Tensor4_3D operator*( const Tensor4_3D &tleft, const Tensor4_3D &tright )
+{
+  Tensor4_3D out;
+  for(int ii=0; ii<9; ++ii)
+  {
+    for(int jj=0; jj<9; ++jj)
+    {
+      const int index = 9*ii + jj;
+      out(index) = 0.0;
+      for(int kk=0; kk<9; ++kk)
+        out(index) += tleft(9*ii+kk) * tright(9*kk+jj);
+    }
+  }
+
+  return out;
+}
+
+Tensor4_3D operator*( const double &val, const Tensor4_3D &input )
+{
+  Tensor4_3D out;
+  for(int ii=0; ii<81; ++ii) out(ii) = val * input(ii);
+
+  return out;
+}
+
+Tensor4_3D gen_symm_id()
+{
+  Tensor4_3D out;
+  out.gen_zero();
+  for(int aa=0; aa<3; ++aa)
+  {
+    for(int bb=0; bb<3; ++bb) 
+    {
+      out( 27 * aa + 9 * bb + 3 * aa + bb ) += 0.5;
+      out( 27 * aa + 9 * bb + 3 * bb + aa ) += 0.5; 
+    }
+  }
+  return out;
+}
+
+Tensor4_3D gen_P( const Matrix_3x3 &C, const Matrix_3x3 &invC )
+{
+  Tensor4_3D out = gen_symm_id();
+  
+  out.add_OutProduct( -1.0 / 3.0, invC, C );
+
+  return out;
+}
+
+Tensor4_3D gen_P( const Matrix_3x3 &C )
+{
+  return gen_P( C, inverse(C) );
+}
+
+Tensor4_3D gen_Pt( const Matrix_3x3 &C )
+{
+  return gen_P( inverse(C) );
+}
+
+Tensor4_3D gen_Ptilde( const Matrix_3x3 &invC )
+{
+  Tensor4_3D out;
+  out.gen_zero();
+  out.add_SymmProduct(1.0, invC, invC);
+  out.add_OutProduct( -1.0 / 3.0, invC, invC );
+  return out;
 }
 
 // EOF
