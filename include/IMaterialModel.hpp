@@ -198,6 +198,14 @@ class IMaterialModel
       return Vector_3();
     }
 
+    // ------------------------------------------------------------------------
+    // Special-purpose functions for certain material models
+    // ------------------------------------------------------------------------
+    virtual void update_fibre_dir( const Vector_3 &basis_r, const Vector_3 &basis_l,
+        const Vector_3 &basis_c )
+    {
+      SYS_T::commPrint("Warning: IMaterialModel::update_fibre_dir() is not implemented. \n");
+    }
 };
 
 #endif
