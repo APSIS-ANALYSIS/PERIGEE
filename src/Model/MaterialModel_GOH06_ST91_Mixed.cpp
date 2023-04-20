@@ -131,7 +131,6 @@ void MaterialModel_GOH06_ST91_Mixed::get_PK(
   const double dfpsi1 = fk1 * fE1 * std::exp( fk2 * fE1 * fE1 );
   const double dfpsi2 = fk1 * fE2 * std::exp( fk2 * fE2 * fE2 );
 
-  const double pt33 = 1.0 / 3.0;
   // P : I = I - 1/3 trC C^-1
   Matrix_3x3 PxI(Cinv); PxI.scale( (-1.0) * pt33 * trC );
   PxI.AXPI( 1.0 );
