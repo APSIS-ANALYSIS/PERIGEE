@@ -21,7 +21,6 @@
   // ================================================================
   // Versions >= 3.14.x : PetscDefined(USE_DEBUG) is used to determine whether it is debug mode;
   //           < 3.14.x : defined(PETSC_USE_DEBUG) is used to determine whether it is debug mode.
-
 #if PETSC_VERSION_LT(3,14,6)
   #define PETSC_DEFINED(def) defined(PETSC_ ## def)
 #else
@@ -32,7 +31,6 @@
   // The following are used for ASSERT.
   // ================================================================
   // In debug mode, ASSERT is called to determine a "cond" condition.
-
 #if PETSC_DEFINED(USE_DEBUG)
   #define ASSERT(cond, message, ...) SYS_T::print_fatal_if_not(cond, message, ##__VA_ARGS__)
 #else
