@@ -34,7 +34,7 @@
 #if PETSC_DEFINED(USE_DEBUG)
   #define ASSERT(cond, message, ...) SYS_T::print_fatal_if_not(cond, message, ##__VA_ARGS__)
 #else
-  #define ASSERT(cond, ...)
+  #define ASSERT(cond, ...) ((void)0)
 #endif
 
 namespace SYS_T
