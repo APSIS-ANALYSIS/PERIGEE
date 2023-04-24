@@ -258,4 +258,20 @@ Vector_3 MaterialModel_GOH06_Incompressible_Mixed::get_fibre_dir( const int &dir
   }
 }
 
+void MaterialModel_GOH06_Incompressible_Mixed::update_fibre_dir( const Vector_3 &basis_r,
+  const Vector_3 &basis_l, const Vector_3 &basis_c )
+{
+  Vector_3 temp_a1;
+  temp_a1.AXPY(a1(0), basis_c);
+  temp_a1.AXPY(a1(1), basis_r);
+  temp_a1.AXPY(a1(2), basis_l);
+  a1 = temp_a1;
+
+  Vector_3 temp_a2;
+  temp_a2.AXPY(a2(0), basis_c);
+  temp_a2.AXPY(a2(1), basis_r);
+  temp_a2.AXPY(a2(2), basis_l);
+  a2 = temp_a2;
+}
+
 // EOF
