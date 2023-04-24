@@ -188,7 +188,8 @@ void PGAssem_FSI::Assem_mass_residual(
     const ALocal_NBC * const &nbc_v,
     const ALocal_NBC * const &nbc_p,
     const ALocal_EBC * const &ebc_part,
-    const Prestress_solid * const &ps_ptr )
+    const Prestress_solid * const &ps_ptr,
+    const Tissue_property * const &tp_ptr )
 {
   const int nElem = alelem_ptr->get_nlocalele();
 
@@ -240,6 +241,19 @@ void PGAssem_FSI::Assem_mass_residual(
       // For solid element, quaprestress will return a vector of length nqp x 6
       // for the prestress values at the quadrature points
       const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
+
+      // For solid element, the direction basis includes 3 Vector_3 for each node.
+      // ebasis_r, ebasis_l, and ebasis_c are vectors of length nLocBas.
+      std::vector<Vector_3> ebasis_r(nLocBas);
+      std::vector<Vector_3> ebasis_l(nLocBas);
+      std::vector<Vector_3> ebasis_c(nLocBas);
+
+      for(int ii=0; ii<nLocBas; ++ii)
+      {
+	ebasis_r[ii] = tp_ptr -> get_basis_r(IEN_v[ii]);
+	ebasis_l[ii] = tp_ptr -> get_basis_l(IEN_v[ii]);
+	ebasis_c[ii] = tp_ptr -> get_basis_c(IEN_v[ii]);
+      }
 
       lassem_s_ptr->Assem_Mass_Residual(&local_d[0], &local_v[0], &local_p[0], elementv, 
           ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v);

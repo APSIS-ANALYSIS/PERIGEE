@@ -336,6 +336,8 @@ int main(int argc, char *argv[])
 
   Prestress_solid * ps_data = new Prestress_solid(locElem, nqp_tet, rank, is_load_ps, "./ps_data/prestress");
 
+  Tissue_property * tp_data = new Tissue_property(part_v_file, rank);
+
   // Group APart_Node and ALocal_NBC into a vector
   std::vector<APart_Node *> pNode_list { pNode_v, pNode_p };
 
@@ -580,7 +582,7 @@ int main(int argc, char *argv[])
 
     gloAssem_ptr->Assem_mass_residual( disp, velo, pres, locElem, locAssem_fluid_ptr,
         locAssem_solid_ptr, elementv, elements, quadv, quads, locIEN_v, locIEN_p, 
-        fNode, locnbc_v, locnbc_p, locebc_v, ps_data );
+        fNode, locnbc_v, locnbc_p, locebc_v, ps_data, tp_data );
 
     Vec proj_vp, proj_v, proj_p;
     VecDuplicate( gloAssem_ptr->G, &proj_vp );
@@ -758,7 +760,7 @@ int main(int argc, char *argv[])
   delete GMIptr; delete PartBasic; delete locElem; delete fNode; delete pNode_v; delete pNode_p;
   delete locinfnbc; delete locnbc_v; delete locnbc_p; delete mesh_locnbc; 
   delete locebc_v; delete locebc_p; delete mesh_locebc; 
-  delete locIEN_v; delete locIEN_p; delete ps_data;
+  delete locIEN_v; delete locIEN_p; delete ps_data; delete tp_data;
   PetscFinalize();
   return EXIT_SUCCESS;
 }

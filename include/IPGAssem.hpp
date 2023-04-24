@@ -293,6 +293,7 @@ class IPGAssem
         const Prestress_solid * const &ps_ptr )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
+    // Special-purpose functions for GOH06 material models, where tissue property is needed.
     virtual void Assem_mass_residual(
 	const PDNSolution * const &disp,
 	const PDNSolution * const &velo,
@@ -310,7 +311,8 @@ class IPGAssem
         const ALocal_NBC * const &nbc_v,
         const ALocal_NBC * const &nbc_p,
         const ALocal_EBC * const &ebc_part,
-        const Prestress_solid * const &ps_ptr )
+        const Prestress_solid * const &ps_ptr,
+	const Tissue_property * const &tp_ptr )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
     // ------------------------------------------------------------------------
