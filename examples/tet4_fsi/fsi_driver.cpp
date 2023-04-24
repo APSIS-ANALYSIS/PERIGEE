@@ -23,6 +23,8 @@
 #include "GenBC_Pressure.hpp"
 #include "MaterialModel_NeoHookean_M94_Mixed.hpp"
 #include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
+#include "MaterialModel_GOH06_ST91_Mixed.hpp"
+#include "MaterialModel_GOH06_Incompressible_Mixed.hpp"
 #include "PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha.hpp"
 #include "PLocAssem_2x2Block_Tet4_VMS_Incompressible.hpp"
 #include "PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity.hpp"
@@ -51,6 +53,15 @@ int main(int argc, char *argv[])
   double solid_density = 1.0;
   double solid_E = 2.0e6;
   double solid_nu = 0.5;
+  double solid_mu = 6.67e5;
+  double solid_f1the = 30.0;
+  double solid_f1phi = 0.0;
+  double solid_f2the = 30.0;
+  double solid_f2phi = 0.0;
+  double solid_fk1 = 1.0e6;
+  double solid_fk2 = 524.6;
+  double solid_fkd = 0.333;
+  // NEED meaningful initialization
 
   // mesh motion elasticity solver parameters
   double mesh_E  = 1.0;
@@ -145,6 +156,14 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal(  "-sl_density",        solid_density);
   SYS_T::GetOptionReal(  "-sl_E",              solid_E);
   SYS_T::GetOptionReal(  "-sl_nu",             solid_nu);
+  SYS_T::GetOptionReal(  "-sl_mu",             solid_mu);
+  SYS_T::GetOptionReal(  "-sl_f1the",          solid_f1the);
+  SYS_T::GetOptionReal(  "-sl_f1phi",          solid_f1phi);
+  SYS_T::GetOptionReal(  "-sl_f2the",          solid_f2the);
+  SYS_T::GetOptionReal(  "-sl_f2phi",          solid_f2phi);
+  SYS_T::GetOptionReal(  "-sl_fk1",            solid_fk1);
+  SYS_T::GetOptionReal(  "-sl_fk2",            solid_fk2);
+  SYS_T::GetOptionReal(  "-sl_fkd",            solid_fkd);
   SYS_T::GetOptionReal(  "-mesh_E",            mesh_E);
   SYS_T::GetOptionReal(  "-mesh_nu",           mesh_nu);
   SYS_T::GetOptionInt(   "-inflow_type",       inflow_type);
@@ -182,6 +201,14 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-sl_density:", solid_density);
   SYS_T::cmdPrint("-sl_E:", solid_E);
   SYS_T::cmdPrint("-sl_nu:", solid_nu);
+  SYS_T::cmdPrint("-sl_mu:", solid_mu);
+  SYS_T::cmdPrint("-sl_f1the:", solid_f1the);
+  SYS_T::cmdPrint("-sl_f1phi:", solid_f1phi);
+  SYS_T::cmdPrint("-sl_f2the:", solid_f2the);
+  SYS_T::cmdPrint("-sl_f2phi:", solid_f2phi);
+  SYS_T::cmdPrint("-sl_fk1:", solid_fk1);
+  SYS_T::cmdPrint("-sl_fk2:", solid_fk2);
+  SYS_T::cmdPrint("-sl_fkd:", solid_fkd);
   SYS_T::cmdPrint("-mesh_E:", mesh_E);
   SYS_T::cmdPrint("-mesh_nu:", mesh_nu);
 
@@ -407,14 +434,18 @@ int main(int argc, char *argv[])
 
   if( solid_nu == 0.5 )
   {
-    matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( solid_density, solid_E );
+    // matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( solid_density, solid_E );
+    matmodel = new MaterialModel_GOH06_Incompressible_Mixed( solid_density, solid_mu,
+        solid_f1the, solid_f1phi, solid_f2the, solid_f2phi, solid_fk1, solid_fk2, solid_fkd );
 
     locAssem_solid_ptr = new PLocAssem_2x2Block_Tet4_VMS_Incompressible(
         matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
   }
   else
   {
-    matmodel = new MaterialModel_NeoHookean_M94_Mixed( solid_density, solid_E, solid_nu );
+    // matmodel = new MaterialModel_NeoHookean_M94_Mixed( solid_density, solid_E, solid_nu );
+    matmodel = new MaterialModel_GOH06_ST91_Mixed( solid_density, solid_E, solid_nu,
+        solid_f1the, solid_f1phi, solid_f2the, solid_f2phi, solid_fk1, solid_fk2, solid_fkd );
 
     locAssem_solid_ptr = new PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity(
         matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
