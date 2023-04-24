@@ -256,7 +256,7 @@ void PGAssem_FSI::Assem_mass_residual(
       }
 
       lassem_s_ptr->Assem_Mass_Residual(&local_d[0], &local_v[0], &local_p[0], elementv, 
-          ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v);
+          ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v, ebasis_r, ebasis_l, ebasis_c);
 
       MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_s_ptr->Tangent00, ADD_VALUES);
 

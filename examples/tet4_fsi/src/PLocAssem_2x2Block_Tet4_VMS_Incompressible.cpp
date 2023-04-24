@@ -559,7 +559,10 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Mass_Residual(
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const double * const &qua_prestress,
-        const IQuadPts * const &quad )
+        const IQuadPts * const &quad,
+	const std::vector<Vector_3> &eleBasis_r,
+        const std::vector<Vector_3> &eleBasis_l,
+        const std::vector<Vector_3> &eleBasis_c )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -581,6 +584,10 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Mass_Residual(
     double vx_z = 0.0, vy_z = 0.0, vz_z = 0.0;
 
     double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+
+    Vector_3 basis_r(0.0, 0.0, 0.0);
+    Vector_3 basis_l(0.0, 0.0, 0.0);
+    Vector_3 basis_c(0.0, 0.0, 0.0);
 
     double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
 
@@ -621,6 +628,14 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Mass_Residual(
       coor_x += eleCtrlPts_x[ii] * R[ii];
       coor_y += eleCtrlPts_y[ii] * R[ii];
       coor_z += eleCtrlPts_z[ii] * R[ii];
+
+      basis_r.AXPY( R[ii], eleBasis_r[ii] );
+      basis_l.AXPY( R[ii], eleBasis_l[ii] );
+      basis_c.AXPY( R[ii], eleBasis_c[ii] );
+
+      basis_r.scale(1.0/basis_r.norm2());
+      basis_l.scale(1.0/basis_l.norm2());
+      basis_c.scale(1.0/basis_c.norm2());
     }
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
@@ -637,6 +652,7 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Mass_Residual(
     const double invFDV_t = invF.MatTContraction(DVelo);
 
     Matrix_3x3 P_iso, S_iso;
+    matmodel->update_fibre_dir(basis_r, basis_l, basis_c);
     matmodel->get_PK(F, P_iso, S_iso);
 
     // ------------------------------------------------------------------------
