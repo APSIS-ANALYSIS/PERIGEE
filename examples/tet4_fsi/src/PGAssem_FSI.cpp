@@ -496,7 +496,8 @@ void PGAssem_FSI::Assem_Tangent_Residual(
       }
 
       lassem_s_ptr -> Assem_Tangent_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], &local_dot_p[0],
-          &local_d[0], &local_v[0], &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v );
+          &local_d[0], &local_v[0], &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v,
+	  ebasis_r, ebasis_l, ebasis_c);
 
       MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_s_ptr->Tangent00, ADD_VALUES);
 

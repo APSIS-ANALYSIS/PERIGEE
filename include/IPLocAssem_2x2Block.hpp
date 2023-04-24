@@ -213,6 +213,26 @@ class IPLocAssem_2x2Block
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Tangent_Residual is not implemented. \n");}
 
+    // Special for GOH06 material models, where node direction basis is needed.
+    virtual void Assem_Tangent_Residual(
+        const double &time, const double &dt,
+        const double * const &dot_disp,
+        const double * const &dot_velo,
+        const double * const &dot_pres,
+        const double * const &disp,
+        const double * const &velo,
+        const double * const &pres,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const double * const &qua_prestress,
+        const IQuadPts * const &quad,
+	const std::vector<Vector_3> &eleBasis_r,
+        const std::vector<Vector_3> &eleBasis_l,
+        const std::vector<Vector_3> &eleBasis_c )
+    {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Tangent_Residual is not implemented. \n");}
+
     // Assembly the two Residuals and the four matrice blocks for mass matrices.
     virtual void Assem_Mass_Residual(
         const double * const &vec,
@@ -246,7 +266,7 @@ class IPLocAssem_2x2Block
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Mass_Residual is not implemented. \n");}
 
-    // Special-purpose functions for GOH06 material models, where node direction basis is needed.
+    // Special for GOH06 material models, where node direction basis is needed.
     virtual void Assem_Mass_Residual(
         const double * const &disp,
         const double * const &velo,
