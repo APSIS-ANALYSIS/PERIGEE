@@ -847,7 +847,10 @@ std::vector<Matrix_3x3> PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::get_Wall_Ca
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad ) const
+    const IQuadPts * const &quad,
+    const std::vector<Vector_3> &eleBasis_r,
+    const std::vector<Vector_3> &eleBasis_l,
+    const std::vector<Vector_3> &eleBasis_c ) const
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -866,6 +869,10 @@ std::vector<Matrix_3x3> PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::get_Wall_Ca
     double ux_y = 0.0, uy_y = 0.0, uz_y = 0.0;
     double ux_z = 0.0, uy_z = 0.0, uz_z = 0.0;
 
+    Vector_3 basis_r(0.0, 0.0, 0.0);
+    Vector_3 basis_l(0.0, 0.0, 0.0);
+    Vector_3 basis_c(0.0, 0.0, 0.0);
+
     for(int ii=0; ii<nLocBas; ++ii)
     {
       pp   += pres[ii] * R[ii];
@@ -881,10 +888,19 @@ std::vector<Matrix_3x3> PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::get_Wall_Ca
       ux_z += disp[ii*3+0] * dR_dz[ii];
       uy_z += disp[ii*3+1] * dR_dz[ii];
       uz_z += disp[ii*3+2] * dR_dz[ii];
+
+      basis_r.AXPY( R[ii], eleBasis_r[ii] );
+      basis_l.AXPY( R[ii], eleBasis_l[ii] );
+      basis_c.AXPY( R[ii], eleBasis_c[ii] );
+
+      basis_r.scale(1.0/basis_r.norm2());
+      basis_l.scale(1.0/basis_l.norm2());
+      basis_c.scale(1.0/basis_c.norm2());
     }
 
     const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
+    matmodel->update_fibre_dir(basis_r, basis_l, basis_c);
     stress[qua] = matmodel -> get_Cauchy_stress( F );
 
     stress[qua].xx() -= pp;
