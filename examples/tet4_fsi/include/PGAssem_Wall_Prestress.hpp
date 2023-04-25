@@ -57,7 +57,8 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const ALocal_NBC * const &nbc_p,
         const ALocal_EBC * const &ebc_v,
         const ALocal_EBC * const &ebc_p,
-        const Prestress_solid * const &ps_ptr );
+        const Prestress_solid * const &ps_ptr,
+	const Tissue_property * const &tp_ptr );
 
     virtual void Assem_Tangent_Residual(
         const double &curr_time,
@@ -81,7 +82,8 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const ALocal_NBC * const &nbc_p,
         const ALocal_EBC * const &ebc_v,
         const ALocal_EBC * const &ebc_p,
-        const Prestress_solid * const &ps_ptr );
+        const Prestress_solid * const &ps_ptr,
+	const Tissue_property * const &tp_ptr );
 
     virtual void Update_Wall_Prestress(
         const PDNSolution * const &disp,

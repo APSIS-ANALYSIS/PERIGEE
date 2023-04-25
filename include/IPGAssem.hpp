@@ -576,6 +576,34 @@ class IPGAssem
         const Prestress_solid * const &ps_ptr) 
         {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
+    // Assembly in the prestress generation
+    // Special for GOH06 material models, where tissue property is needed.
+    virtual void Assem_Residual(
+        const double &curr_time,
+        const double &dt,
+        const PDNSolution * const &dot_disp,
+        const PDNSolution * const &dot_velo,
+        const PDNSolution * const &dot_pres,
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
+        const PDNSolution * const &pres,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_v,
+        const ALocal_IEN * const &lien_p,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_v,
+        const ALocal_NBC * const &nbc_p,
+        const ALocal_EBC * const &ebc_v,
+        const ALocal_EBC * const &ebc_p,
+        const Prestress_solid * const &ps_ptr,
+	const Tissue_property * const &tp_ptr )
+        {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
+
     // ------------------------------------------------------------------------
     // ! Assem_tangent_residual : assembly tangent matrix and residual vector 
     //                            for 3D problem WITHOUT pre-existing cached 
@@ -853,6 +881,34 @@ class IPGAssem
         const ALocal_EBC * const &ebc_v,
         const ALocal_EBC * const &ebc_p,
         const Prestress_solid * const &ps_ptr )
+        {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
+
+    // Assembly in prestress generation
+    // Special for GOH06 material models, where tissue property is needed.
+    virtual void Assem_Tangent_Residual(
+        const double &curr_time,
+        const double &dt,
+        const PDNSolution * const &dot_disp,
+        const PDNSolution * const &dot_velo,
+        const PDNSolution * const &dot_pres,
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
+        const PDNSolution * const &pres,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_v,
+        const ALocal_IEN * const &lien_p,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_v,
+        const ALocal_NBC * const &nbc_p,
+        const ALocal_EBC * const &ebc_v,
+        const ALocal_EBC * const &ebc_p,
+        const Prestress_solid * const &ps_ptr,
+	const Tissue_property * const &tp_ptr )
         {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
     // --------------------------------------------------------------
