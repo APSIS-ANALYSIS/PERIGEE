@@ -93,7 +93,8 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const ALocal_IEN * const &lien_v,
         const ALocal_IEN * const &lien_p,
         const FEANode * const &fnode_ptr,
-        Prestress_solid * const &ps_ptr ) const;
+        Prestress_solid * const &ps_ptr,
+	const Tissue_property * const &tp_ptr ) const;
 
   private:
     const int nLocBas, snLocBas, num_ebc, nlgn_v, nlgn_p;

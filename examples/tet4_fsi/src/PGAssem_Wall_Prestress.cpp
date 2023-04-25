@@ -481,7 +481,8 @@ void PGAssem_Wall_Prestress::Update_Wall_Prestress(
     const ALocal_IEN * const &lien_v,
     const ALocal_IEN * const &lien_p,
     const FEANode * const &fnode_ptr,
-    Prestress_solid * const &ps_ptr ) const
+    Prestress_solid * const &ps_ptr,
+    const Tissue_property * const &tp_ptr ) const
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int nqp   = quadv -> get_num_quadPts();
@@ -503,8 +504,19 @@ void PGAssem_Wall_Prestress::Update_Wall_Prestress(
       const std::vector<double> local_d = GetLocal( array_d, IEN_v, nLocBas, 3 );
       const std::vector<double> local_p = GetLocal( array_p, IEN_p, nLocBas, 1 );
 
+      std::vector<Vector_3> ebasis_r(nLocBas);
+      std::vector<Vector_3> ebasis_l(nLocBas);
+      std::vector<Vector_3> ebasis_c(nLocBas);
+
+      for(int ii=0; ii<nLocBas; ++ii)
+      {
+	ebasis_r[ii] = tp_ptr -> get_basis_r(IEN_v[ii]);
+	ebasis_l[ii] = tp_ptr -> get_basis_l(IEN_v[ii]);
+	ebasis_c[ii] = tp_ptr -> get_basis_c(IEN_v[ii]);
+      }
+
       const std::vector<Matrix_3x3> sigma = lassem_s_ptr -> get_Wall_CauchyStress( &local_d[0], 
-          &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, quadv );
+          &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, quadv, ebasis_r, ebasis_l, ebasis_c );
 
       for( int qua = 0; qua < nqp; ++qua )
       {
