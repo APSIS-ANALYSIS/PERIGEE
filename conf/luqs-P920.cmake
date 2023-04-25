@@ -16,7 +16,7 @@
 set(VTK_DIR /home/luqs/lib/VTK-7.1.1-shared/lib/cmake/vtk-7.1)
 
 # Modify the PETSC_DIR variable to point to the location of PETSc.
-set(PETSC_DIR /home/luqs/lib/petsc-3.11.3-opt)
+set(PETSC_DIR /home/luqs/lib/petsc-3.18.3-debug)
 
 # Modify the PETSC_ARCH variable. You can find it in your configuration
 # output. If you forget it, go to your PETSc home director and open
