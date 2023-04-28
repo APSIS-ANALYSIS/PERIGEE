@@ -121,7 +121,7 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
       centroid[ii](1) += pt_xyz[ii][3*jj+1];
       centroid[ii](2) += pt_xyz[ii][3*jj+2];
     }
-    centroid[ii].scale( 1.0 / (double) num_node[ii] );
+    centroid[ii] *= (1.0 / (double) num_node[ii]);
 
     // assign outward normal vector from the input
     outnormal[ii] = in_outnormal[ii];

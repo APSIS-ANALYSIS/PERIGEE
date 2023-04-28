@@ -120,7 +120,11 @@ void Vector_3::gen_rand()
 double Vector_3::normalize()
 {
   const double len = norm2();
-  scale(1.0/len);
+  const double inv_len = 1.0 / len;
+  vec[0] *= inv_len; 
+  vec[1] *= inv_len; 
+  vec[2] *= inv_len;
+  
   return len;
 }
 

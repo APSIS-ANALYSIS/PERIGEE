@@ -921,7 +921,7 @@ Vector_3 TET_T::get_out_normal( const std::string &file,
       vol_ctrlPts[inside_node*3+2] - vol_ctrlPts[3*trn[0]+2] );
 
   // inner product outward with inward, and correct outVec
-  if(inw.dot_product(outVec) > 0.0) outVec.scale(-1.0);
+  if(inw.dot_product(outVec) > 0.0) outVec *= -1.0;
 
   return outVec;
 }

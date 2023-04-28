@@ -367,10 +367,10 @@ void Matrix_3x3::find_eigen_vector( const double &eta, Vector_3 &v,
     s1 = a;
 
     double val = dot_product(s1, b);
-    b.AXPY(-1.0*val, s1);
+    b -= val * s1;
 
     val = dot_product(s1, c);
-    c.AXPY(-1.0*val, s1);
+    c -= val * s1;
 
     if( b.norm2() >= c.norm2() )
     {
@@ -388,10 +388,10 @@ void Matrix_3x3::find_eigen_vector( const double &eta, Vector_3 &v,
     s1 = b;
 
     double val = dot_product(s1, a);
-    a.AXPY(-1.0*val, s1);
+    a -= val * s1;
 
     val = dot_product(s1, c);
-    c.AXPY(-1.0*val, s1);
+    c -= val * s1;
 
     if( a.norm2() >= c.norm2() )
     {
@@ -409,10 +409,10 @@ void Matrix_3x3::find_eigen_vector( const double &eta, Vector_3 &v,
     s1 = c;
 
     double val = dot_product(s1, a);
-    a.AXPY(-1.0*val, s1);
+    a -= val * s1;
 
     val = dot_product(s1, b);
-    b.AXPY(-1.0*val, s1);
+    b -= val * s1;
 
     if(a.norm2() >= b.norm2())
     {
@@ -508,11 +508,11 @@ int Matrix_3x3::eigen_decomp( double &eta1, double &eta2, double &eta3,
       // u2 = (A - 0.333 tr - eta2 ) s2
       Vector_3 temp(v2);
       v2 = (*this) * v2;
-      v2.AXPY( -1.0*(frac13_tr + eta2), temp );
+      v2 -= (frac13_tr + eta2) * temp;
 
       temp.copy(v3);
       v3 = (*this) * v3; 
-      v3.AXPY( -1.0*(frac13_tr + eta2), temp );
+      v3 -= (frac13_tr + eta2) * temp;
 
       if( v2.norm2() >= v3.norm2() )
       {
