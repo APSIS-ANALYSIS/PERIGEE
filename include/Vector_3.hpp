@@ -82,10 +82,6 @@ class Vector_3
     
     void gen_e3() {vec[0]=0.0; vec[1]=0.0; vec[2]=1.0;}
 
-    void scale( const double &val );
-
-    void AXPY( const double &val, const Vector_3 &source );
-
     double sum() const {return vec[0]+vec[1]+vec[2];}
 
     double norm2() const {return sqrt(vec[0]*vec[0]+vec[1]*vec[1]+vec[2]*vec[2]);}

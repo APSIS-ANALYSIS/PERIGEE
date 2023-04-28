@@ -117,18 +117,6 @@ void Vector_3::gen_rand()
   }
 }
 
-void Vector_3::scale( const double &val )
-{
-  vec[0] *= val; vec[1] *= val; vec[2] *= val;
-}
-
-void Vector_3::AXPY( const double &val, const Vector_3 &source )
-{
-  vec[0] += val * source(0);
-  vec[1] += val * source(1);
-  vec[2] += val * source(2);
-}
-
 double Vector_3::normalize()
 {
   const double len = norm2();
