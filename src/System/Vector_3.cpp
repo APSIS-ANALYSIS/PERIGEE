@@ -138,7 +138,7 @@ double dist( const Vector_3 &a, const Vector_3 &b )
   const double dist_x = a.x() - b.x();
   const double dist_y = a.y() - b.y();
   const double dist_z = a.z() - b.z();
-  return sqrt( dist_x*dist_x + dist_y*dist_y + dist_z*dist_z );
+  return std::sqrt( dist_x*dist_x + dist_y*dist_y + dist_z*dist_z );
 }
 
 double dot_product( const Vector_3 &a, const Vector_3 &b )
