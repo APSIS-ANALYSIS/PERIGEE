@@ -44,7 +44,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &feanode_ptr,
     const ALocal_NBC * const &nbc_part,
-    const ALocal_Inflow_NodalBC * const &infnbc_part,
+    const ALocal_InflowBC * const &infnbc_part,
     const ALocal_Ring_NodalBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part,
     const ALocal_EBC * const &ebc_wall_part,
@@ -304,7 +304,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_Prestress(
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &feanode_ptr,
     const ALocal_NBC * const &nbc_part,
-    const ALocal_Inflow_NodalBC * const &infnbc_part,
+    const ALocal_InflowBC * const &infnbc_part,
     const ALocal_Ring_NodalBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part,
     ALocal_EBC * const &ebc_wall_part,
@@ -469,7 +469,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_Prestress(
 }
 
 void PNonlinear_CMM_Solver::rescale_inflow_value( const double &stime,
-    const ALocal_Inflow_NodalBC * const &infbc,
+    const ALocal_InflowBC * const &infbc,
     const ICVFlowRate * const &flrate,
     const PDNSolution * const &sol_base,
     PDNSolution * const &sol ) const
