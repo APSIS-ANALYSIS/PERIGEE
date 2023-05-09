@@ -11,7 +11,7 @@
 #include "APart_Basic_Info.hpp"
 #include "ALocal_EBC_outflow.hpp"
 #include "ALocal_EBC_wall.hpp"
-#include "ALocal_Inflow_NodalBC.hpp"
+#include "ALocal_InflowBC.hpp"
 #include "ALocal_Ring_NodalBC.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
@@ -318,7 +318,7 @@ int main( int argc, char *argv[] )
   ALocal_NBC * locnbc = new ALocal_NBC(part_file, rank);
 
   // Local sub-domain's inflow (Dirichlet) BC
-  ALocal_Inflow_NodalBC * locinfnbc = new ALocal_Inflow_NodalBC(part_file, rank);
+  ALocal_InflowBC * locinfnbc = new ALocal_InflowBC(part_file, rank);
 
   // Local sub-domain's ring (Dirichlet) in-plane motion BC
   ALocal_Ring_NodalBC * locringnbc = new ALocal_Ring_NodalBC(part_file, rank);
@@ -353,7 +353,7 @@ int main( int argc, char *argv[] )
   inflow_rate_ptr->print_info();
 
   SYS_T::print_fatal_if(locinfnbc->get_num_nbc() != inflow_rate_ptr->get_num_nbc(),
-      "Error: ALocal_Inflow_NodalBC number of faces does not match with that in ICVFlowRate.\n");
+      "Error: ALocal_InflowBC number of faces does not match with that in ICVFlowRate.\n");
 
   // ===== Generate a sparse matrix for enforcing nodal BCs ====
   Matrix_PETSc * pmat = new Matrix_PETSc( pNode, locnbc );
