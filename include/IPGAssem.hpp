@@ -21,7 +21,7 @@
 #include "FEANode.hpp"
 #include "PDNSolution.hpp"
 #include "ALocal_NBC.hpp"
-#include "ALocal_Inflow_NodalBC.hpp"
+#include "ALocal_InflowBC.hpp"
 #include "ALocal_Ring_NodalBC.hpp"
 #include "ALocal_EBC.hpp"
 #include "IGenBC.hpp"
@@ -799,7 +799,7 @@ class IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_Inflow_NodalBC * const &infbc_part,
+        const ALocal_InflowBC * const &infbc_part,
         const int &nbc_id )
     {
       SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
@@ -825,7 +825,7 @@ class IPGAssem
         IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_Inflow_NodalBC * const &infbc_part,
+        const ALocal_InflowBC * const &infbc_part,
         const int &nbc_id )
     {
       SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
@@ -857,7 +857,7 @@ class IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_Inflow_NodalBC * const &infbc_part,
+        const ALocal_InflowBC * const &infbc_part,
         const int &nbc_id )
     {
       SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
@@ -884,7 +884,7 @@ class IPGAssem
         IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_Inflow_NodalBC * const &infbc_part,
+        const ALocal_InflowBC * const &infbc_part,
         const int &nbc_id )
     {
       SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
