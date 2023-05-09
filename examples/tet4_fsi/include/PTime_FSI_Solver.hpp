@@ -43,7 +43,7 @@ class PTime_FSI_Solver
         const FEANode * const &feanode_ptr,
         const ALocal_NBC * const &nbc_v,
         const ALocal_NBC * const &nbc_p,
-        const ALocal_Inflow_NodalBC * const &infnbc,
+        const ALocal_InflowBC * const &infnbc,
         const ALocal_NBC * const &nbc_mesh,
         const ALocal_EBC * const &ebc_v,
         const ALocal_EBC * const &ebc_p,
