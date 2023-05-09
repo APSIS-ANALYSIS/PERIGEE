@@ -641,7 +641,7 @@ double PGAssem_NS_FEM::Assem_surface_flowrate(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const ALocal_Inflow_NodalBC * const &infbc_part,
+    const ALocal_InflowBC * const &infbc_part,
     const int &nbc_id )
 {
   double * array = new double [nlgn * dof_sol];
@@ -749,7 +749,7 @@ double PGAssem_NS_FEM::Assem_surface_ave_pressure(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const ALocal_Inflow_NodalBC * const &infbc_part,
+    const ALocal_InflowBC * const &infbc_part,
     const int &nbc_id )
 {
   double * array = new double [nlgn * dof_sol];
