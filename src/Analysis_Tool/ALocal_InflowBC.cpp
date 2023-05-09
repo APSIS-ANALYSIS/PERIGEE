@@ -1,6 +1,6 @@
-#include "ALocal_Inflow_NodalBC.hpp"
+#include "ALocal_InflowBC.hpp"
 
-ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC( 
+ALocal_InflowBC::ALocal_InflowBC( 
     const std::string &fileBaseName, const int &cpu_rank )
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
@@ -86,7 +86,7 @@ ALocal_Inflow_NodalBC::ALocal_Inflow_NodalBC(
   delete h5r; H5Fclose( file_id );
 }
 
-ALocal_Inflow_NodalBC::~ALocal_Inflow_NodalBC()
+ALocal_InflowBC::~ALocal_InflowBC()
 {
   VEC_T::clean(Num_LD); 
   VEC_T::clean(LDN);
@@ -104,12 +104,12 @@ ALocal_Inflow_NodalBC::~ALocal_Inflow_NodalBC()
   VEC_T::clean(local_node_pos);
 }
 
-double ALocal_Inflow_NodalBC::get_radius( const int &nbc_id,
+double ALocal_InflowBC::get_radius( const int &nbc_id,
     const Vector_3 &pt ) const
 {
   // num_out_bc_pts is set to be zero for parition that does not contain
   // inflow boundary points (i.e. Num_LD = 0 ).
-  SYS_T::print_fatal_if( num_out_bc_pts[nbc_id] == 0, "Error: ALocal_Inflow_NodalBC::get_radius, this function can only be called in sub-domains which contains the inflow boundary node.\n");
+  SYS_T::print_fatal_if( num_out_bc_pts[nbc_id] == 0, "Error: ALocal_InflowBC::get_radius, this function can only be called in sub-domains which contains the inflow boundary node.\n");
 
   const double x = pt.x();
   const double y = pt.y();
@@ -133,7 +133,7 @@ double ALocal_Inflow_NodalBC::get_radius( const int &nbc_id,
   return rc / (rb + rc);
 }
 
-void ALocal_Inflow_NodalBC::get_ctrlPts_xyz( const int &nbc_id,
+void ALocal_InflowBC::get_ctrlPts_xyz( const int &nbc_id,
     const int &eindex, double * const &ctrl_x, double * const &ctrl_y, 
     double * const &ctrl_z ) const
 {
@@ -146,7 +146,7 @@ void ALocal_Inflow_NodalBC::get_ctrlPts_xyz( const int &nbc_id,
   }
 }
 
-void ALocal_Inflow_NodalBC::get_SIEN( const int &nbc_id,
+void ALocal_InflowBC::get_SIEN( const int &nbc_id,
     const int &eindex, int * const &sien ) const
 {
   for(int jj=0; jj<cell_nLocBas[nbc_id]; ++jj)
@@ -156,7 +156,7 @@ void ALocal_Inflow_NodalBC::get_SIEN( const int &nbc_id,
   }
 }
 
-std::vector<int> ALocal_Inflow_NodalBC::get_SIEN( const int &nbc_id,
+std::vector<int> ALocal_InflowBC::get_SIEN( const int &nbc_id,
     const int &eindex ) const
 {
   std::vector<int> out( cell_nLocBas[nbc_id], 0 );
