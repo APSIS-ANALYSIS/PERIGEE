@@ -12,7 +12,7 @@
 // ============================================================================
 #include "PDNSolution.hpp"
 #include "FEANode.hpp"
-#include "ALocal_Inflow_NodalBC.hpp"
+#include "ALocal_InflowBC.hpp"
 
 class PDNSolution_V : public PDNSolution
 {
@@ -23,7 +23,7 @@ class PDNSolution_V : public PDNSolution
 
     PDNSolution_V( const APart_Node * const &pNode,
         const FEANode * const &fNode,
-        const ALocal_Inflow_NodalBC * const &infbc,
+        const ALocal_InflowBC * const &infbc,
         const int &type, const bool &isprint = false,
         const std::string &in_name = "solution_kinematics" );
 
@@ -46,7 +46,7 @@ class PDNSolution_V : public PDNSolution
     // --------------------------------------------------------------
     void Init_flow_parabolic( const APart_Node * const &pNode_ptr,
         const FEANode * const &fNode_ptr,
-        const ALocal_Inflow_NodalBC * const &infbc );
+        const ALocal_InflowBC * const &infbc );
 };
 
 #endif
