@@ -660,7 +660,7 @@ double PGAssem_FSI::Assem_surface_flowrate(
     IPLocAssem_2x2Block * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const ALocal_Inflow_NodalBC * const &infbc_part,
+    const ALocal_InflowBC * const &infbc_part,
     const int &nbc_id )
 {
   const std::vector<double> array_d = disp -> GetLocalArray();
@@ -755,7 +755,7 @@ double PGAssem_FSI::Assem_surface_ave_pressure(
     IPLocAssem_2x2Block * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
-    const ALocal_Inflow_NodalBC * const &infbc_part,
+    const ALocal_InflowBC * const &infbc_part,
     const int &nbc_id )
 {
   const std::vector<double> array_d = disp -> GetLocalArray();
