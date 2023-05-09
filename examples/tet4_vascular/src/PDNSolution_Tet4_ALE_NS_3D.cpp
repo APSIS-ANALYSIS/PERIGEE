@@ -3,7 +3,7 @@
 PDNSolution_Tet4_ALE_NS_3D::PDNSolution_Tet4_ALE_NS_3D( 
     const APart_Node * const &pNode,
     const FEANode * const &fNode_ptr,
-    const ALocal_Inflow_NodalBC * const &infbc,
+    const ALocal_InflowBC * const &infbc,
     const int &type, const bool &isprint ) 
 : PDNSolution( pNode ), is_print(isprint)
 {
@@ -73,7 +73,7 @@ void PDNSolution_Tet4_ALE_NS_3D::Init_zero(const APart_Node * const &pNode_ptr)
 void PDNSolution_Tet4_ALE_NS_3D::Init_flow_parabolic(
     const APart_Node * const &pNode_ptr,
     const FEANode * const &fNode_ptr,
-    const ALocal_Inflow_NodalBC * const &infbc )
+    const ALocal_InflowBC * const &infbc )
 {
   double value[7] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   int nlocalnode = pNode_ptr->get_nlocalnode();
