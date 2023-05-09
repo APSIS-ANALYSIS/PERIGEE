@@ -56,7 +56,7 @@ void PNonlinear_FSI_Solver::update_solid_kinematics(
 }
 
 void PNonlinear_FSI_Solver::rescale_inflow_value( const double &stime,
-    const ALocal_Inflow_NodalBC * const &infbc,
+    const ALocal_InflowBC * const &infbc,
     const ICVFlowRate * const &flrate,
     const PDNSolution * const &sol_base,
     PDNSolution * const &sol ) const
@@ -111,7 +111,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     const APart_Node * const &pnode_p,
     const ALocal_NBC * const &nbc_v,
     const ALocal_NBC * const &nbc_p,
-    const ALocal_Inflow_NodalBC * const &infnbc_part,
+    const ALocal_InflowBC * const &infnbc_part,
     const ALocal_NBC * const &nbc_mesh,
     const ALocal_EBC * const &ebc_part,
     const ALocal_EBC * const &ebc_mesh,
