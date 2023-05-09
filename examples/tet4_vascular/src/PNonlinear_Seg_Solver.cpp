@@ -51,7 +51,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_ALE_NS(
     const APart_Node * const &anode_ptr,
     const FEANode * const &feanode_ptr,
     const ALocal_NBC * const &nbc_part,
-    const ALocal_Inflow_NodalBC * const &infnbc_part,
+    const ALocal_InflowBC * const &infnbc_part,
     const ALocal_NBC * const &nbc_mesh_part,
     const ALocal_EBC * const &ebc_part,
     const ALocal_EBC * const &ebc_mesh_part,
@@ -279,7 +279,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Seg_solve_FSI(
     const APart_Node * const &anode_ptr,
     const FEANode * const &feanode_ptr,
     const ALocal_NBC * const &nbc_part,
-    const ALocal_Inflow_NodalBC * const &infnbc_part,
+    const ALocal_InflowBC * const &infnbc_part,
     const ALocal_NBC * const &nbc_mesh_part,
     const ALocal_EBC * const &ebc_part,
     const ALocal_EBC * const &ebc_mesh_part,
@@ -634,7 +634,7 @@ void PNonlinear_Seg_Solver::GenAlpha_Solve_Prestress(
 
 
 void PNonlinear_Seg_Solver::rescale_inflow_value( const double &stime,
-    const ALocal_Inflow_NodalBC * const &infbc,
+    const ALocal_InflowBC * const &infbc,
     const ICVFlowRate * const &flrate,
     const PDNSolution * const &sol_base,
     PDNSolution * const &sol ) const
