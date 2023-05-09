@@ -11,7 +11,7 @@
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
 #include "ALocal_EBC_outflow.hpp"
-#include "ALocal_Inflow_NodalBC.hpp"
+#include "ALocal_InflowBC.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
 #include "FEAElement_Triangle3_3D_der0.hpp"
@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
 
   ALocal_NBC * locnbc = new ALocal_NBC(part_file, rank);
 
-  ALocal_Inflow_NodalBC * locinfnbc = new ALocal_Inflow_NodalBC(part_file, rank);
+  ALocal_InflowBC * locinfnbc = new ALocal_InflowBC(part_file, rank);
 
   ALocal_NBC * mesh_locnbc = new ALocal_NBC(part_file, rank, "mesh_nbc");
 
