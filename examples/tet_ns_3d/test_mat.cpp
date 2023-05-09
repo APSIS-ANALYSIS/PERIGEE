@@ -2,7 +2,7 @@
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
 #include "ALocal_EBC_outflow.hpp"
-#include "ALocal_Inflow_NodalBC.hpp"
+#include "ALocal_InflowBC.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
 #include "FEAElement_Tet4.hpp"
