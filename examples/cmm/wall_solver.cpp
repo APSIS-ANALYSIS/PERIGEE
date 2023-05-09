@@ -263,7 +263,7 @@ int main( int argc, char *argv[] )
   // The following objects are not needed in the prestress wall solver
   ICVFlowRate * inflow_rate_ptr = nullptr;
   IGenBC * gbc = nullptr;
-  ALocal_Inflow_NodalBC * locinfnbc = nullptr;
+  ALocal_InflowBC * locinfnbc = nullptr;
   ALocal_EBC * locebc = nullptr;
   IQuadPts * quadv = nullptr;
 
