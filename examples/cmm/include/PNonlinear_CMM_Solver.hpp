@@ -52,7 +52,7 @@ class PNonlinear_CMM_Solver
         const FEANode * const &feanode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_InflowBC * const &infnbc_part,
-        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_RingBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part,
         const ALocal_EBC * const &ebc_wall_part,
         const IGenBC * const &gbc,
@@ -93,7 +93,7 @@ class PNonlinear_CMM_Solver
         const FEANode * const &feanode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_InflowBC * const &infnbc_part,
-        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_RingBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part,
         ALocal_EBC * const &ebc_wall_part,
         const IGenBC * const &gbc,
@@ -146,7 +146,7 @@ class PNonlinear_CMM_Solver
     // Each ring node's corresponding velocity dot_steps will be rotated from
     // the local skew frame back into the global Cartesian frame.
     void rotate_ringbc(
-        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_RingBC * const &ringnbc_part,
         PDNSolution * const &dot_step) const; 
 
     // Check whether the ring BC constraints are properly satisfied
@@ -154,7 +154,7 @@ class PNonlinear_CMM_Solver
     void compute_ringbc_constraints(
         const PDNSolution * const &sol,
         const PDNSolution * const &sol_wall_disp,
-        const ALocal_Ring_NodalBC * const &ringnbc_part ) const;
+        const ALocal_RingBC * const &ringnbc_part ) const;
 };
 
 #endif
