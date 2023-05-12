@@ -2,7 +2,7 @@
 
 Matrix_PETSc_CMM::Matrix_PETSc_CMM( const APart_Node * const &pnode_ptr,
     const ALocal_NBC * const &bc_part,
-    const ALocal_Ring_NodalBC * const &ring_bc_part )
+    const ALocal_RingBC * const &ring_bc_part )
 : Matrix_PETSc( pnode_ptr, bc_part, 2, 0 )
 {
   switch( ring_bc_part -> get_ringbc_type() )
@@ -44,7 +44,7 @@ Matrix_PETSc_CMM::~Matrix_PETSc_CMM()
 
 void Matrix_PETSc_CMM::gen_ring_inplane_bc( const APart_Node * const &pnode_ptr,
     const ALocal_NBC * const &bc_part,
-    const ALocal_Ring_NodalBC * const &ring_bc_part )
+    const ALocal_RingBC * const &ring_bc_part )
 {
   if(is_set) Clear();
   SYS_T::print_fatal_if(m != n, "Error: This is not a square matrix. \n");
@@ -93,7 +93,7 @@ void Matrix_PETSc_CMM::gen_ring_inplane_bc( const APart_Node * const &pnode_ptr,
 
 void Matrix_PETSc_CMM::gen_ring_radial_motion_bc( const APart_Node * const &pnode_ptr,
         const ALocal_NBC * const &bc_part,
-        const ALocal_Ring_NodalBC * const &ring_bc_part )
+        const ALocal_RingBC * const &ring_bc_part )
 {
   if(is_set) Clear();
   SYS_T::print_fatal_if(m != n, "Error: This is not a square matrix. \n");
@@ -151,7 +151,7 @@ void Matrix_PETSc_CMM::gen_ring_radial_motion_bc( const APart_Node * const &pnod
 
 void Matrix_PETSc_CMM::gen_outlet_ring_inplane_bc( const APart_Node * const &pnode_ptr,
     const ALocal_NBC * const &bc_part,
-    const ALocal_Ring_NodalBC * const &ring_bc_part )
+    const ALocal_RingBC * const &ring_bc_part )
 {
   if(is_set) Clear();
   SYS_T::print_fatal_if(m != n, "Error: This is not a square matrix. \n");
@@ -205,7 +205,7 @@ void Matrix_PETSc_CMM::gen_outlet_ring_inplane_bc( const APart_Node * const &pno
 
 void Matrix_PETSc_CMM::gen_outlet_ring_radial_motion_bc( const APart_Node * const &pnode_ptr,
         const ALocal_NBC * const &bc_part,
-        const ALocal_Ring_NodalBC * const &ring_bc_part )
+        const ALocal_RingBC * const &ring_bc_part )
 {
   if(is_set) Clear();
   SYS_T::print_fatal_if(m != n, "Error: This is not a square matrix. \n");
@@ -268,7 +268,7 @@ void Matrix_PETSc_CMM::gen_outlet_ring_radial_motion_bc( const APart_Node * cons
 
 void Matrix_PETSc_CMM::gen_ring_inplane_bc_partial_clamp( const APart_Node * const &pnode_ptr,
     const ALocal_NBC * const &bc_part,
-    const ALocal_Ring_NodalBC * const &ring_bc_part )
+    const ALocal_RingBC * const &ring_bc_part )
 {
   if(is_set) Clear();
   SYS_T::print_fatal_if(m != n, "Error: This is not a square matrix. \n");
