@@ -9,7 +9,7 @@ PGAssem_Tet_CMM_GenAlpha::PGAssem_Tet_CMM_GenAlpha(
     const ALocal_IEN * const &aien_ptr,
     const APart_Node * const &pnode_ptr,
     const ALocal_NBC * const &part_nbc,
-    const ALocal_Ring_NodalBC * const &part_ringnbc,
+    const ALocal_RingBC * const &part_ringnbc,
     const ALocal_EBC * const &part_ebc,
     const IGenBC * const &gbc,
     const int &in_nz_estimate )
@@ -108,7 +108,7 @@ void PGAssem_Tet_CMM_GenAlpha::EssBC_KG(
 
 
 void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
-    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const ALocal_RingBC * const &ringnbc_part,
     const int &dof, const int &nrow, const int &ncol,
     const PetscInt * const &row_index,
     const PetscInt * const &col_index,
@@ -228,7 +228,7 @@ void PGAssem_Tet_CMM_GenAlpha::RingBC_KG(
 
 
 void PGAssem_Tet_CMM_GenAlpha::RingBC_G(
-    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const ALocal_RingBC * const &ringnbc_part,
     const int &dof, const int &nrow,
     const PetscInt * const &row_index,
     PetscScalar * const &Ge )
@@ -298,7 +298,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_nonzero_estimate(
     const ALocal_IEN * const &lien_ptr,
     const APart_Node * const &node_ptr,
     const ALocal_NBC * const &nbc_part,
-    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const ALocal_RingBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc )
 {
@@ -356,7 +356,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_mass_residual(
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
     const ALocal_NBC * const &nbc_part,
-    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const ALocal_RingBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();
@@ -434,7 +434,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_residual(
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
     const ALocal_NBC * const &nbc_part,
-    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const ALocal_RingBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part,
     const ALocal_EBC * const &ebc_wall_part,
     const IGenBC * const &gbc )
@@ -524,7 +524,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
     const ALocal_NBC * const &nbc_part,
-    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const ALocal_RingBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part,
     const ALocal_EBC * const &ebc_wall_part,
     const IGenBC * const &gbc )
@@ -608,7 +608,7 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_G( const double &curr_time, const double &d
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_NBC * const &nbc_part,
-    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const ALocal_RingBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   int * LSIEN = new int [snLocBas];
@@ -657,7 +657,7 @@ void PGAssem_Tet_CMM_GenAlpha::BackFlow_G(
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_NBC * const &nbc_part,
-    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const ALocal_RingBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   double * array_a = new double [nlgn * dof_sol];
@@ -720,7 +720,7 @@ void PGAssem_Tet_CMM_GenAlpha::BackFlow_KG( const double &dt,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_NBC * const &nbc_part,
-    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const ALocal_RingBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   double * array_a = new double [nlgn * dof_sol];
@@ -790,7 +790,7 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_G(
     FEAElement * const &element_w,
     const IQuadPts * const &quad_s,
     const ALocal_NBC * const &nbc_part,
-    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const ALocal_RingBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_wall_part )
 {
   const int dof_disp = 3; 
@@ -880,7 +880,7 @@ void PGAssem_Tet_CMM_GenAlpha::WallMembrane_KG(
     FEAElement * const &element_w,
     const IQuadPts * const &quad_s,
     const ALocal_NBC * const &nbc_part,
-    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const ALocal_RingBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_wall_part )
 {
   const int dof_disp = 3; 
@@ -1188,7 +1188,7 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_G(
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_NBC * const &nbc_part,
-    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const ALocal_RingBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc )
 {
@@ -1261,7 +1261,7 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_Resis_KG(
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_NBC * const &nbc_part,
-    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const ALocal_RingBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc )
 {
@@ -1403,7 +1403,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_matrix_free_K( const Vec &XX,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_NBC * const &nbc_part,
-    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const ALocal_RingBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc,
     Vec &YY )
