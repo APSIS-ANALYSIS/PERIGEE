@@ -50,7 +50,7 @@ class PGAssem_Tet_Wall : public IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
-        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_RingBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part,
         const ALocal_EBC * const &ebc_wall_part,
         const IGenBC * const &gbc );
@@ -76,7 +76,7 @@ class PGAssem_Tet_Wall : public IPGAssem
     //      conditions in finite element analysis
     //  ii. Bathe KJ (1996) Finite element procedures
     void RingBC_KG(
-        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_RingBC * const &ringnbc_part,
         const int &dof, const int &nrow, const int &ncol,
         const PetscInt * const &row_index,
         const PetscInt * const &col_index,
@@ -92,7 +92,7 @@ class PGAssem_Tet_Wall : public IPGAssem
         FEAElement * const &element_w,
         const IQuadPts * const &quad_s,
         const ALocal_NBC * const &nbc_part,
-        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_RingBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_wall_part );
 
     void GetLocal( const double * const &array, const int * const &IEN,
