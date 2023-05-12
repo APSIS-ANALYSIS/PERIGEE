@@ -13,14 +13,14 @@
 // Date Created: April 28 2021
 // ============================================================================
 #include "Matrix_PETSc.hpp"
-#include "ALocal_Ring_NodalBC.hpp"
+#include "ALocal_RingBC.hpp"
 
 class Matrix_PETSc_CMM : public Matrix_PETSc
 {
   public:
     Matrix_PETSc_CMM( const APart_Node * const &pnode_ptr,
         const ALocal_NBC * const &bc_part,
-        const ALocal_Ring_NodalBC * const &ring_bc_part );
+        const ALocal_RingBC * const &ring_bc_part );
 
     virtual ~Matrix_PETSc_CMM();
 
@@ -31,7 +31,7 @@ class Matrix_PETSc_CMM : public Matrix_PETSc
     // like the NS equations.
     // Assumption: the matrix system has 4 degrees-of-freedom per node and the
     //             1st dof is pressure, the next 3 dofs are velocity.
-    // 1. For ring nodes that belong to the ALocal_Ring_NodalBC class, the
+    // 1. For ring nodes that belong to the ALocal_RingBC class, the
     // dominant component's row will be modified. Let the dominant component's
     // corresponding entry in the outward normal be Nd, and the remaining two
     // non-dominant entries be Na, Nb. Then in the dominant component's row, the
@@ -44,7 +44,7 @@ class Matrix_PETSc_CMM : public Matrix_PETSc
     // ------------------------------------------------------------------------
     void gen_ring_inplane_bc( const APart_Node * const &pnode_ptr,
         const ALocal_NBC * const &bc_part,
-        const ALocal_Ring_NodalBC * const &ring_bc_part );
+        const ALocal_RingBC * const &ring_bc_part );
 
     // ------------------------------------------------------------------------
     // Type 2: Generate a matrix accounting for the essential boundary
@@ -62,7 +62,7 @@ class Matrix_PETSc_CMM : public Matrix_PETSc
     //             ub = val2 uc
     //             val1 = (nb tc - nc tb) / (na tb - nb ta)
     //             val2 = (ta nc - na tc) / (na tb - nb ta)         
-    // 1. For ring nodes that belong to the ALocal_Ring_NodalBC class,
+    // 1. For ring nodes that belong to the ALocal_RingBC class,
     //    the entries in (row ua, col uc) and (row ub, col uc) will be assigned
     //    values val1 & val2, respectively.
     // 2. For the remaining essential BC nodes, we assign 0 to all entries in
@@ -71,7 +71,7 @@ class Matrix_PETSc_CMM : public Matrix_PETSc
     // ------------------------------------------------------------------------
     void gen_ring_radial_motion_bc( const APart_Node * const &pnode_ptr,
         const ALocal_NBC * const &bc_part,
-        const ALocal_Ring_NodalBC * const &ring_bc_part );
+        const ALocal_RingBC * const &ring_bc_part );
 
     // ------------------------------------------------------------------------
     // Type 3 : Generate a matrix accounting for the essential
@@ -79,7 +79,7 @@ class Matrix_PETSc_CMM : public Matrix_PETSc
     // for a 4-dof system like the NS equations.
     // Assumption: the matrix system has 4 degrees-of-freedom per node and the
     //             1st dof is pressure, the next 3 dofs are velocity.
-    // 1. For outlet ring nodes that belong to the ALocal_Ring_NodalBC class, the
+    // 1. For outlet ring nodes that belong to the ALocal_RingBC class, the
     // dominant component's row will be modified. Let the dominant component's
     // corresponding entry in the outward normal be Nd, and the remaining two
     // non-dominant entries be Na, Nb. Then in the dominant component's row, the
@@ -92,7 +92,7 @@ class Matrix_PETSc_CMM : public Matrix_PETSc
     // ------------------------------------------------------------------------
     void gen_outlet_ring_inplane_bc( const APart_Node * const &pnode_ptr,
         const ALocal_NBC * const &bc_part,
-        const ALocal_Ring_NodalBC * const &ring_bc_part );
+        const ALocal_RingBC * const &ring_bc_part );
 
     // ------------------------------------------------------------------------
     // Type 4: Generate a matrix accounting for the essential boundary conditions
@@ -110,7 +110,7 @@ class Matrix_PETSc_CMM : public Matrix_PETSc
     //             ub = val2 uc
     //             val1 = (nb tc - nc tb) / (na tb - nb ta)
     //             val2 = (ta nc - na tc) / (na tb - nb ta)         
-    // 1. For outlet ring nodes that belong to the ALocal_Ring_NodalBC class,
+    // 1. For outlet ring nodes that belong to the ALocal_RingBC class,
     //    the entries in (row ua, col uc) and (row ub, col uc) will be assigned
     //    values val1 & val2, respectively.
     // 2. For the remaining essential BC nodes, we assign 0 to all entries in
@@ -119,7 +119,7 @@ class Matrix_PETSc_CMM : public Matrix_PETSc
     // ------------------------------------------------------------------------
     void gen_outlet_ring_radial_motion_bc( const APart_Node * const &pnode_ptr,
         const ALocal_NBC * const &bc_part,
-        const ALocal_Ring_NodalBC * const &ring_bc_part );
+        const ALocal_RingBC * const &ring_bc_part );
 
     // ------------------------------------------------------------------------
     // Type 5 : Generate a matrix accounting for the essential
@@ -128,7 +128,7 @@ class Matrix_PETSc_CMM : public Matrix_PETSc
     // ------------------------------------------------------------------------
     void gen_ring_inplane_bc_partial_clamp( const APart_Node * const &pnode_ptr,
         const ALocal_NBC * const &bc_part,
-        const ALocal_Ring_NodalBC * const &ring_bc_part );
+        const ALocal_RingBC * const &ring_bc_part );
 
 };
 
