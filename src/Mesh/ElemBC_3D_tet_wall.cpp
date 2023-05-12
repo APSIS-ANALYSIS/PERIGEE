@@ -207,7 +207,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
       {
         const int idx = std::distance(global_node[ebc_id].begin(), it);
 
-        const double pp[3] {pt_xyz[ebc_id][3*idx], pt_xyz[ebc_id][3*idx+1], pt_xyz[ebc_id][3*idx+2]};
+        double pp[3] {pt_xyz[ebc_id][3*idx], pt_xyz[ebc_id][3*idx+1], pt_xyz[ebc_id][3*idx+2]};
 
         locator -> FindClosestPoint(&pp[0], &cl_pt[0], cell, cellId, subId, dist);
 

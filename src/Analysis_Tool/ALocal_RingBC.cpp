@@ -1,6 +1,6 @@
-#include "ALocal_Ring_NodalBC.hpp"
+#include "ALocal_RingBC.hpp"
 
-ALocal_Ring_NodalBC::ALocal_Ring_NodalBC( 
+ALocal_RingBC::ALocal_RingBC( 
     const std::string &fileBaseName, const int &cpu_rank )
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
@@ -49,14 +49,14 @@ ALocal_Ring_NodalBC::ALocal_Ring_NodalBC(
   delete h5r; H5Fclose( file_id );
 }
 
-ALocal_Ring_NodalBC::~ALocal_Ring_NodalBC()
+ALocal_RingBC::~ALocal_RingBC()
 {
   VEC_T::clean( LDN          );
   VEC_T::clean( local_cap_id );
   VEC_T::clean( outnormal    );
 }
 
-bool ALocal_Ring_NodalBC::is_inLDN( const int &ii, int &pos ) const
+bool ALocal_RingBC::is_inLDN( const int &ii, int &pos ) const
 {
   if( VEC_T::is_invec(LDN, ii) )
   {
