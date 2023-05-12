@@ -12,7 +12,7 @@
 #include "ALocal_EBC_outflow.hpp"
 #include "ALocal_EBC_wall.hpp"
 #include "ALocal_InflowBC.hpp"
-#include "ALocal_Ring_NodalBC.hpp"
+#include "ALocal_RingBC.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
 #include "FEAElement_Tet4.hpp"
@@ -321,7 +321,7 @@ int main( int argc, char *argv[] )
   ALocal_InflowBC * locinfnbc = new ALocal_InflowBC(part_file, rank);
 
   // Local sub-domain's ring (Dirichlet) in-plane motion BC
-  ALocal_Ring_NodalBC * locringnbc = new ALocal_Ring_NodalBC(part_file, rank);
+  ALocal_RingBC * locringnbc = new ALocal_RingBC(part_file, rank);
 
   // Local sub-domain's outflow elemental (Neumann) BC
   ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
