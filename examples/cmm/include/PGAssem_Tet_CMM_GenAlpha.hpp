@@ -34,7 +34,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const ALocal_IEN * const &aien_ptr,
         const APart_Node * const &pnode_ptr,
         const ALocal_NBC * const &part_nbc,
-        const ALocal_Ring_NodalBC * const &part_ringnbc,
+        const ALocal_RingBC * const &part_ringnbc,
         const ALocal_EBC * const &part_ebc,
         const IGenBC * const &gbc,
         const int &in_nz_estimate=60 );
@@ -51,7 +51,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
         const ALocal_NBC * const &nbc_part,
-        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_RingBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
@@ -67,7 +67,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
-        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_RingBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part );
 
     // Assemble the residual vector for the CMM equations
@@ -89,7 +89,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
-        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_RingBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part,
         const ALocal_EBC * const &ebc_wall_part,
         const IGenBC * const &gbc );
@@ -114,7 +114,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
-        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_RingBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part,
         const ALocal_EBC * const &ebc_wall_part,
         const IGenBC * const &gbc );
@@ -167,7 +167,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const ALocal_NBC * const &nbc_part,
-        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_RingBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbci,
         Vec &YY );
@@ -190,7 +190,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
     //      conditions in finite element analysis
     //  ii. Bathe KJ (1996) Finite element procedures
     void RingBC_KG(
-        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_RingBC * const &ringnbc_part,
         const int &dof, const int &nrow, const int &ncol,
         const PetscInt * const &row_index,
         const PetscInt * const &col_index,
@@ -198,7 +198,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         PetscScalar * const &Ge );
 
     void RingBC_G(
-        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_RingBC * const &ringnbc_part,
         const int &dof, const int &nrow,
         const PetscInt * const &row_index,
         PetscScalar * const &Ge );
@@ -209,7 +209,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const ALocal_NBC * const &nbc_part,
-        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_RingBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part );
 
     // Backflow integral on outlet surfaces
@@ -219,7 +219,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const ALocal_NBC * const &nbc_part,
-        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_RingBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part );
 
     void BackFlow_KG( const double &dt,
@@ -229,7 +229,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const ALocal_NBC * const &nbc_part,
-        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_RingBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part );
 
     // Resistance type boundary condition on outlet surfaces
@@ -240,7 +240,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const ALocal_NBC * const &nbc_part,
-        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_RingBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
@@ -252,7 +252,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const ALocal_NBC * const &nbc_part,
-        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_RingBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
@@ -266,7 +266,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         FEAElement * const &element_w,
         const IQuadPts * const &quad_s,
         const ALocal_NBC * const &nbc_part,
-        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_RingBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_wall_part );
 
     void WallMembrane_KG( const double &curr_time,
@@ -278,7 +278,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         FEAElement * const &element_w,
         const IQuadPts * const &quad_s,
         const ALocal_NBC * const &nbc_part,
-        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_RingBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_wall_part );
 
     void GetLocal(const double * const &array, const int * const &IEN,
