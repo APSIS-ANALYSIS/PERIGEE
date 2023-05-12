@@ -45,7 +45,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_CMM(
     const FEANode * const &feanode_ptr,
     const ALocal_NBC * const &nbc_part,
     const ALocal_InflowBC * const &infnbc_part,
-    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const ALocal_RingBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part,
     const ALocal_EBC * const &ebc_wall_part,
     const IGenBC * const &gbc,
@@ -305,7 +305,7 @@ void PNonlinear_CMM_Solver::GenAlpha_Solve_Prestress(
     const FEANode * const &feanode_ptr,
     const ALocal_NBC * const &nbc_part,
     const ALocal_InflowBC * const &infnbc_part,
-    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const ALocal_RingBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part,
     ALocal_EBC * const &ebc_wall_part,
     const IGenBC * const &gbc,
@@ -550,7 +550,7 @@ void PNonlinear_CMM_Solver::update_wall( const double &val,
 
 
 void PNonlinear_CMM_Solver::rotate_ringbc(
-    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const ALocal_RingBC * const &ringnbc_part,
     PDNSolution * const &dot_step) const
 {
   const int ringbc_type = ringnbc_part -> get_ringbc_type();
@@ -592,7 +592,7 @@ void PNonlinear_CMM_Solver::rotate_ringbc(
 void PNonlinear_CMM_Solver::compute_ringbc_constraints(
     const PDNSolution * const &sol,
     const PDNSolution * const &sol_wall_disp,
-    const ALocal_Ring_NodalBC * const &ringnbc_part ) const
+    const ALocal_RingBC * const &ringnbc_part ) const
 {
   const int num_ringnode = ringnbc_part -> get_Num_LD();
 
