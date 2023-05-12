@@ -1,7 +1,7 @@
-#ifndef ALOCAL_RING_NODALBC_HPP
-#define ALOCAL_RING_NODALBC_HPP
+#ifndef ALOCAL_RINGBC_HPP
+#define ALOCAL_RINGBC_HPP
 // ============================================================================
-// ALocal_Ring_NodalBC.hpp
+// ALocal_RingBC.hpp
 //
 // Analysis-use, ring nodal indices.
 //
@@ -10,12 +10,12 @@
 // ============================================================================
 #include "HDF5_Reader.hpp"
 
-class ALocal_Ring_NodalBC
+class ALocal_RingBC
 {
   public:
-    ALocal_Ring_NodalBC( const std::string &fileBaseName, const int &cpu_rank );
+    ALocal_RingBC( const std::string &fileBaseName, const int &cpu_rank );
 
-    virtual ~ALocal_Ring_NodalBC();
+    virtual ~ALocal_RingBC();
 
     // Get the type of ring nodal BC
     virtual int get_ringbc_type() const { return ringbc_type; }
