@@ -3,7 +3,7 @@
 PDNSolution_Heat::PDNSolution_Heat( 
     const APart_Node * const &pNode,
     const FEANode * const &fNode_ptr,
-    const ALocal_Inflow_NodalBC * const &infbc,
+    const ALocal_InflowBC * const &infbc,
     const int &type, const bool &isprint ) 
 : PDNSolution( pNode ), is_print(isprint)
 {
@@ -71,7 +71,7 @@ void PDNSolution_Heat::Init_zero(const APart_Node * const &pNode_ptr)
 void PDNSolution_Heat::Init_flow_parabolic(
     const APart_Node * const &pNode_ptr,
     const FEANode * const &fNode_ptr,
-    const ALocal_Inflow_NodalBC * const &infbc )
+    const ALocal_InflowBC * const &infbc )
 {
   int location[1];
   double value[1] = {0.0};
