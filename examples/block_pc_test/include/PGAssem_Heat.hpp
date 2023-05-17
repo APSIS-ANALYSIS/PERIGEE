@@ -9,7 +9,7 @@
 #include "IAGlobal_Mesh_Info.hpp"
 #include "IPLocAssem.hpp"
 #include "ALocal_NBC.hpp"
-#include "ALocal_Inflow_NodalBC.hpp"
+#include "ALocal_InflowBC.hpp"
 #include "ALocal_EBC.hpp"
 #include "PETSc_Tools.hpp"
 #include "PDNSolution.hpp"
