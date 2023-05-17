@@ -186,7 +186,7 @@ int main( int argc, char * argv[] )
         v_ctrlPts[interior_node[ee]*3+1] - v_ctrlPts[3*trn[0]+1],
         v_ctrlPts[interior_node[ee]*3+2] - v_ctrlPts[3*trn[0]+2] );
 
-    if( dot_product(outnormal[ee], vec03)> 0 ) outnormal[ee]*=-1.0;
+    if( dot_product(outnormal[ee], vec03)> 0 ) outnormal[ee] *= -1.0;
   }
 
   // Clean the volumetric data to save memory
