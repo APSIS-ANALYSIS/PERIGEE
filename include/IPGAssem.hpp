@@ -21,8 +21,8 @@
 #include "FEANode.hpp"
 #include "PDNSolution.hpp"
 #include "ALocal_NBC.hpp"
-#include "ALocal_Inflow_NodalBC.hpp"
-#include "ALocal_Ring_NodalBC.hpp"
+#include "ALocal_InflowBC.hpp"
+#include "ALocal_RingBC.hpp"
 #include "ALocal_EBC.hpp"
 #include "IGenBC.hpp"
 #include "Prestress_solid.hpp"
@@ -153,7 +153,7 @@ class IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
         const ALocal_NBC * const &nbc_part,
-        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_RingBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
@@ -250,7 +250,7 @@ class IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
-        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_RingBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
@@ -375,7 +375,7 @@ class IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
-        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_RingBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part,
         const ALocal_EBC * const &ebc_wall_part,
         const IGenBC * const &gbc )
@@ -607,7 +607,7 @@ class IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
-        const ALocal_Ring_NodalBC * const &ringnbc_part,
+        const ALocal_RingBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part,
         const ALocal_EBC * const &ebc_wall_part,
         const IGenBC * const &gbc )
@@ -799,7 +799,7 @@ class IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_Inflow_NodalBC * const &infbc_part,
+        const ALocal_InflowBC * const &infbc_part,
         const int &nbc_id )
     {
       SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
@@ -825,7 +825,7 @@ class IPGAssem
         IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_Inflow_NodalBC * const &infbc_part,
+        const ALocal_InflowBC * const &infbc_part,
         const int &nbc_id )
     {
       SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
@@ -857,7 +857,7 @@ class IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_Inflow_NodalBC * const &infbc_part,
+        const ALocal_InflowBC * const &infbc_part,
         const int &nbc_id )
     {
       SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
@@ -884,7 +884,7 @@ class IPGAssem
         IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_Inflow_NodalBC * const &infbc_part,
+        const ALocal_InflowBC * const &infbc_part,
         const int &nbc_id )
     {
       SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");

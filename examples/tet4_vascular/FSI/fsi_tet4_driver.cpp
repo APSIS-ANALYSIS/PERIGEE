@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
   
   ALocal_NBC * locnbc = new ALocal_NBC(part_file, rank);
  
-  ALocal_Inflow_NodalBC * locinfnbc = new ALocal_Inflow_NodalBC(part_file, rank);
+  ALocal_InflowBC * locinfnbc = new ALocal_InflowBC(part_file, rank);
    
   ALocal_NBC * mesh_locnbc = new ALocal_NBC(part_file, rank, "mesh_nbc");
   
@@ -301,7 +301,7 @@ int main(int argc, char *argv[])
   inflow_rate_ptr->print_info();
 
   SYS_T::print_fatal_if(locinfnbc->get_num_nbc() != inflow_rate_ptr->get_num_nbc(),
-      "Error: ALocal_Inflow_NodalBC number of faces does not match with that in ICVFlowRate.\n");
+      "Error: ALocal_InflowBC number of faces does not match with that in ICVFlowRate.\n");
 
   // ===== Quadrature rules and FEM container =====
   SYS_T::commPrint("===> Build quadrature rules. \n");

@@ -198,7 +198,7 @@ class PGAssem_2x2Block_NS_FEM
         IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_Inflow_NodalBC * const &infbc_part );
+        const ALocal_InflowBC * const &infbc_part );
 
     // Assembly routine for the surface averaged pressure
     virtual double Assem_surface_ave_pressure(
@@ -214,7 +214,7 @@ class PGAssem_2x2Block_NS_FEM
         IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_Inflow_NodalBC * const &infbc_part );
+        const ALocal_InflowBC * const &infbc_part );
 
   private:
     // Data:

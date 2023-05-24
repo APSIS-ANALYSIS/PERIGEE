@@ -12,7 +12,7 @@
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
 #include "ALocal_EBC_outflow.hpp"
-#include "ALocal_Inflow_NodalBC.hpp"
+#include "ALocal_InflowBC.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
 #include "FEAElement_Tet4.hpp"
@@ -231,7 +231,7 @@ int main(int argc, char *argv[])
   ALocal_NBC * locnbc = new ALocal_NBC(part_file, rank);
 
   // Local sub-domain's inflow bc
-  ALocal_Inflow_NodalBC * locinfnbc = new ALocal_Inflow_NodalBC(part_file, rank);
+  ALocal_InflowBC * locinfnbc = new ALocal_InflowBC(part_file, rank);
 
   // Local sub-domain's elemental bc
   ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);

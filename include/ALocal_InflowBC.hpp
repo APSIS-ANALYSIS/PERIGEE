@@ -1,7 +1,7 @@
-#ifndef ALOCAL_INFLOW_NODALBC_HPP
-#define ALOCAL_INFLOW_NODALBC_HPP
+#ifndef ALOCAL_INFLOWBC_HPP
+#define ALOCAL_INFLOWBC_HPP
 // ============================================================================
-// ALocal_Inflow_NodalBC.hpp
+// ALocal_InflowBC.hpp
 //
 // Analysis-use data that is related to the inflow surface nodes.
 //
@@ -11,12 +11,12 @@
 #include "HDF5_Reader.hpp"
 #include "Math_Tools.hpp"
 
-class ALocal_Inflow_NodalBC
+class ALocal_InflowBC
 {
   public:
-    ALocal_Inflow_NodalBC( const std::string &fileBaseName, const int &cpu_rank );
+    ALocal_InflowBC( const std::string &fileBaseName, const int &cpu_rank );
 
-    virtual ~ALocal_Inflow_NodalBC();
+    virtual ~ALocal_InflowBC();
 
     // ------------------------------------------------------------------------
     // Get the number of surfaces with prescribed flow

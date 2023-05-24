@@ -120,7 +120,7 @@ void PGAssem_Tet_Wall::EssBC_KG( const ALocal_NBC * const &nbc_part,
 
 
 void PGAssem_Tet_Wall::RingBC_KG(
-    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const ALocal_RingBC * const &ringnbc_part,
     const int &dof, const int &nrow, const int &ncol,
     const PetscInt * const &row_index,
     const PetscInt * const &col_index,
@@ -257,7 +257,7 @@ void PGAssem_Tet_Wall::Assem_tangent_residual(
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
     const ALocal_NBC * const &nbc_part,
-    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const ALocal_RingBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part,
     const ALocal_EBC * const &ebc_wall_part,
     const IGenBC * const &gbc )
@@ -287,7 +287,7 @@ void PGAssem_Tet_Wall::WallMembrane_KG(
     FEAElement * const &element_w,
     const IQuadPts * const &quad_s,
     const ALocal_NBC * const &nbc_part,
-    const ALocal_Ring_NodalBC * const &ringnbc_part,
+    const ALocal_RingBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_wall_part )
 {
   const int dof_disp = 3; 

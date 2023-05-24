@@ -11,7 +11,7 @@
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
 #include "ALocal_EBC_wall.hpp"
-#include "ALocal_Ring_NodalBC.hpp"
+#include "ALocal_RingBC.hpp"
 #include "FEAElement_Triangle3_membrane.hpp"
 #include "FEAElement_Triangle6_membrane.hpp"
 #include "TimeMethod_GenAlpha.hpp"
@@ -162,7 +162,7 @@ int main( int argc, char *argv[] )
   ALocal_NBC * locnbc = new ALocal_NBC(part_file, rank);
 
   // Local sub-domain's ring (Dirichlet) in-plane motion BC
-  ALocal_Ring_NodalBC * locringnbc = new ALocal_Ring_NodalBC(part_file, rank);
+  ALocal_RingBC * locringnbc = new ALocal_RingBC(part_file, rank);
 
   // Local sub-domain's wall elemental (Neumann) BC for CMM
   ALocal_EBC * locebc_wall = new ALocal_EBC_wall(part_file, rank, quads->get_num_quadPts(), "ebc_wall");
@@ -263,7 +263,7 @@ int main( int argc, char *argv[] )
   // The following objects are not needed in the prestress wall solver
   ICVFlowRate * inflow_rate_ptr = nullptr;
   IGenBC * gbc = nullptr;
-  ALocal_Inflow_NodalBC * locinfnbc = nullptr;
+  ALocal_InflowBC * locinfnbc = nullptr;
   ALocal_EBC * locebc = nullptr;
   IQuadPts * quadv = nullptr;
 

@@ -25,7 +25,7 @@ PDNSolution_Mixed_UPV_3D::PDNSolution_Mixed_UPV_3D(
 PDNSolution_Mixed_UPV_3D::PDNSolution_Mixed_UPV_3D(
     const APart_Node * const &pNode,
     const FEANode * const &fNode_ptr,
-    const ALocal_Inflow_NodalBC * const &infbc,
+    const ALocal_InflowBC * const &infbc,
     const int &type, const bool &isprint ) 
 : PDNSolution( pNode ), is_print( isprint )
 {
@@ -93,7 +93,7 @@ void PDNSolution_Mixed_UPV_3D::Init_zero(
 void PDNSolution_Mixed_UPV_3D::Init_flow_parabolic( 
     const APart_Node * const &pNode_ptr,
     const FEANode * const &fNode_ptr,
-    const ALocal_Inflow_NodalBC * const &infbc )
+    const ALocal_InflowBC * const &infbc )
 {
   double value[7] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   const int nlocalnode = pNode_ptr->get_nlocalnode();

@@ -20,7 +20,7 @@ PDNSolution_V::PDNSolution_V( const APart_Node * const &pNode,
 
 PDNSolution_V::PDNSolution_V( const APart_Node * const &pNode,
     const FEANode * const &fNode,
-    const ALocal_Inflow_NodalBC * const &infbc,
+    const ALocal_InflowBC * const &infbc,
     const int &type, const bool &isprint,
     const std::string &in_name )
 : PDNSolution( pNode ), sol_name( in_name ), is_print( isprint )
@@ -69,7 +69,7 @@ void PDNSolution_V::Init_zero( const APart_Node * const &pNode )
 
 void PDNSolution_V::Init_flow_parabolic( const APart_Node * const &pNode_ptr,
     const FEANode * const &fNode_ptr,
-    const ALocal_Inflow_NodalBC * const &infbc )
+    const ALocal_InflowBC * const &infbc )
 {
   const int nlocalnode = pNode_ptr->get_nlocalnode();
 

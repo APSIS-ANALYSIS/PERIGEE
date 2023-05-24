@@ -72,7 +72,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &feanode_ptr,
     const ALocal_NBC * const &nbc_part,
-    const ALocal_Inflow_NodalBC * const &infnbc_part,
+    const ALocal_InflowBC * const &infnbc_part,
     const ALocal_EBC * const &ebc_part,
     IGenBC * const &gbc,
     const Matrix_PETSc * const &bc_mat,

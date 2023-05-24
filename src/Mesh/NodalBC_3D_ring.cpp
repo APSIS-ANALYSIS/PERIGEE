@@ -175,7 +175,7 @@ Vector_3 NodalBC_3D_ring::compute_cap_centroid( const std::vector<double> &pts )
     centroid.z() += pts[3*ii + 2];
   }
 
-  centroid.scale( 1.0 / static_cast<double>( num_node ) );
+  centroid *= (1.0 / static_cast<double>( num_node ));
 
   return centroid;
 }
