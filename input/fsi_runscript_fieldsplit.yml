@@ -70,9 +70,15 @@ fieldsplit_p_pc_hypre_boomeramg_agg_nl: 2
 fieldsplit_p_ksp_rtol: 1.0e-5
 fieldsplit_p_ksp_max_it: 50
 fieldsplit_p_ksp_gmres_restart: 50 
-fieldsplit_p_inner_ksp_type: gmres 
-fieldsplit_p_inner_pc_type: jacobi 
-fieldsplit_p_inner_ksp_rtol: 1.0e-2
-fieldsplit_p_inner_ksp_max_it: 100
-fieldsplit_p_inner_ksp_gmres_restart: 100
-
+# Inner solver arguments 
+## SIMPLE  
+fieldsplit_p_inner_ksp_type: preonly
+fieldsplit_p_inner_pc_type: jacobi
+fieldsplit_p_upper_ksp_type: preonly
+fieldsplit_p_upper_pc_type: jacobi
+## SCR
+#fieldsplit_p_inner_ksp_type: gmres 
+#fieldsplit_p_inner_pc_type: hypre 
+#fieldsplit_p_inner_ksp_rtol: 1.0e-2
+#fieldsplit_p_inner_ksp_max_it: 100
+#fieldsplit_p_inner_ksp_gmres_restart: 100
