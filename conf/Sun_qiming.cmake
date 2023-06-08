@@ -13,10 +13,10 @@
 # VTK_DIR should be the vtk directory/lib/cmake/vtk-version,
 # which contains VTKConfig.cmake file.
 # In the guide, vtk directory is $HOME/lib/VTK-7.1.1-shared
-set(VTK_DIR /work/mae-sunyj/lib/VTK-8.2.0-OPT/lib64/cmake/vtk-8.2)
+set(VTK_DIR /work/mae-sunyj/lib/VTK-8.2.0-OPT-a04u28l/lib64/cmake/vtk-8.2)
 
 # Modify the PETSC_DIR variable to point to the location of PETSc.
-set(PETSC_DIR /work/mae-sunyj/lib/petsc-3.18.4-opt)
+set(PETSC_DIR /work/mae-sunyj/lib/petsc-3.18.4-opt-oneapi-2023.1-a04u28l)
 
 # Modify the PETSC_ARCH variable. You can find it in your configuration
 # output. If you forget it, go to your PETSc home director and open
@@ -29,10 +29,10 @@ set(PETSC_ARCH .)
 # file will directly load that METIS; otherwise this METIS will
 # be used for PERIGEE. This means, if you are sure that you have
 # METIS in PETSc, you do not have to specify the METIS_DIR variable.
-set(METIS_DIR /work/mae-sunyj/lib/metis-5.0.3)
+set(METIS_DIR /work/mae-sunyj/lib/metis-5.0.3-a04u28l)
 
 # Modify the HDF5_ROOT, pointing to your hdf5 library location
-set(HDF5_ROOT /work/mae-sunyj/lib/hdf5-1.8.16)
+set(HDF5_ROOT /work/mae-sunyj/lib/hdf5-1.8.16-a04u28l)
 
 # ========================================================
 # Setup the libraries
@@ -71,12 +71,15 @@ message(STATUS "External Libraries: " ${EXTRA_LINK_LIBS})
 # $PETSC_DIR/$PETSC_ARCH/bin, or the mpich you specified for 
 # PETSc install.
 
-set(CMAKE_C_COMPILER /share/intel/oneapi/mpi/2021.7.0/bin/mpicc)
-set(CMAKE_CXX_COMPILER /share/intel/oneapi/mpi/2021.7.0/bin/mpicxx)
+#set(CMAKE_C_COMPILER /share/intel/oneapi/mpi/2021.7.0/bin/mpicc)
+#set(CMAKE_CXX_COMPILER /share/intel/oneapi/mpi/2021.7.0/bin/mpicxx)
+set(CMAKE_C_COMPILER /share/intel/oneapi-2023.1/mpi/2021.9.0/bin/mpicc)
+set(CMAKE_CXX_COMPILER /share/intel/oneapi-2023.1/mpi/2021.9.0/bin/mpicxx)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_BUILD_TYPE RELEASE)
 #set(CMAKE_CXX_FLAGS "-xHOST -Wall")
+set(CMAKE_CXX_FLAGS "-Wall")
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 # EOF
