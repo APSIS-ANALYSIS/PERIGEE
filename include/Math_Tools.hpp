@@ -38,6 +38,29 @@ namespace MATH_T
     return c;
   }
 
+  // ----------------------------------------------------------------
+  // Assume ii = iz * dim_x * dim_y + iy * dim_x + ix
+  // this function will return ix iy and iz based on the input ii,
+  // dim_x, dim_y.
+  // ----------------------------------------------------------------
+  inline void get_xyz_index( const int &ii, const int &dim_x, const int &dim_y,
+      int &ix, int &iy, int &iz)
+  {
+    const int ixy = ii % (dim_x * dim_y);
+    iz = (ii - ixy) / (dim_x * dim_y);
+    ix = ixy % dim_x; iy = (ixy - ix) / dim_x;
+  }
+
+  // ----------------------------------------------------------------
+  // Assume ii = iy * dim_x + ix;
+  // this function will return ix and iy based on the input ii and dim_x.
+  // ----------------------------------------------------------------
+  inline void get_xy_index( const int &ii, const int &dim_x, int &ix, int &iy)
+  {
+    ix = ii % dim_x;
+    iy = (ii-ix)/dim_x;
+  }
+
   // --------------------------------------------------------------------------
   // Useful Functions:
   // --------------------------------------------------------------------------
@@ -165,6 +188,32 @@ namespace MATH_T
   // ----------------------------------------------------------------
   void gen_Gaussian( const int &n, const double &mean, const double &std,
       std::vector<double> &val );
+
+  // ----------------------------------------------------------------
+  // gen_random()
+  // Generate a random double in [min, max] domain for _closed;
+  // (min, max) for open.
+  // Gernerate a random int in [min, max] domain.
+  // NOTE: Users have to call srand(time(NULL)) before calling the
+  //       following three gen functions.
+  // E.G.: srand(time(NULL));
+  //       for-loop
+  //       {gen_randomD_xxx(...); ...}
+  // ----------------------------------------------------------------
+  inline double gen_randomD_closed( const double &min, const double &max )
+  {
+    return ( rand() % 1000001 ) * 1.0e-6 * (max - min) + min;
+  }
+
+  inline double gen_randomD_open( const double &min, const double &max )
+  {
+    return ( rand() % 999998 + 1 ) * 1.0e-6 * (max - min) + min;
+  }
+
+  inline int gen_randomI_closed( const int &min, const int &max )
+  {
+    return ( rand() % (max - min + 1)) + min;
+  }
 
   // ----------------------------------------------------------------
   // Print Histogram of an array of random vector
