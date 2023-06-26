@@ -1,26 +1,44 @@
 #ifndef SYS_TOOLS_HPP
 #define SYS_TOOLS_HPP
-// ==================================================================
+// ============================================================================
 // Sys_Tools.hpp
-// ------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // The SYS_T namespace contains a suite of tools at the system level.
 //
-// These functions will be frequently used in the PERIGEE code.
-// ==================================================================
+// Author: Ju Liu
+// ============================================================================
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <vector>
 #include <ctime>
+#include <sys/stat.h>
 #include "petsc.h"
+
+  // ================================================================
+  // The following are used for backward compatibility like PetscDefined(USE_DEBUG).
+  // ================================================================
+  // Versions >= 3.14.x : PetscDefined(USE_DEBUG) is used to determine whether it is debug mode;
+  //           < 3.14.x : defined(PETSC_USE_DEBUG) is used to determine whether it is debug mode.
+#if PETSC_VERSION_LT(3,14,6)
+  #define PETSC_DEFINED(def) defined(PETSC_ ## def)
+#else
+  #define PETSC_DEFINED(def) PetscDefined(def)
+#endif
+
+  // ================================================================
+  // The following are used for ASSERT.
+  // ================================================================
+  // In debug mode, ASSERT is called to determine a "cond" condition.
+#if PETSC_DEFINED(USE_DEBUG)
+  #define ASSERT(cond, message, ...) SYS_T::print_fatal_if_not(cond, message, ##__VA_ARGS__)
+#else
+  #define ASSERT(cond, ...) ((void)0)
+#endif
 
 namespace SYS_T
 {
-  // Print ASCII art
-  void print_perigee_art();
-
   // Return the rank of the CPU
   inline PetscMPIInt get_MPI_rank()
   {
@@ -37,11 +55,10 @@ namespace SYS_T
     return size;
   }
 
-  // ----------------------------------------------------------------
-  // gen_partfile_name( baseName, rank )
-  // Generate a partition file's name (hdf5 file) in the default
-  // manner. It will return baseName_pxxxxx.h5.
-  // ----------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  // ! gen_partfile_name( baseName, rank )
+  //   Generate a partition file's name (hdf5 file) in the form baseName_pxxxxx.h5.
+  // --------------------------------------------------------------------------
   inline std::string gen_partfile_name( const std::string &baseName, 
       const int &rank )
   {
@@ -61,61 +78,27 @@ namespace SYS_T
     return ss.str();
   }
 
-  // ----------------------------------------------------------------
-  // Assume ii = iz * dim_x * dim_y + iy * dim_x + ix
-  // this function will return ix iy and iz based on the input ii, 
-  // dim_x, dim_y.
-  // ----------------------------------------------------------------
-  inline void get_xyz_index( const int &ii, const int &dim_x, const int &dim_y, 
-      int &ix, int &iy, int &iz)
+  // --------------------------------------------------------------------------
+  // ! gen_capfile_name
+  //   Generate a file (usually for cap surfaces) in the form baseName_xxx.vtp(vtu)
+  // --------------------------------------------------------------------------
+  inline std::string gen_capfile_name( const std::string &baseName,
+      const int &index, const std::string &filename )
   {
-    const int ixy = ii % (dim_x * dim_y);
-    iz = (ii - ixy) / (dim_x * dim_y);
-    ix = ixy % dim_x; iy = (ixy - ix) / dim_x;
+    std::ostringstream ss;
+    ss<<baseName;
+
+    if( index/10 == 0 ) ss<<"00";
+    else if( index/100 == 0 ) ss<<"0";
+
+    ss<<index<<filename;
+
+    return ss.str();
   }
 
-  // ----------------------------------------------------------------
-  // Assume ii = iy * dim_x + ix;
-  // this function will return ix and iy based on the input ii and dim_x.
-  // ----------------------------------------------------------------
-  inline void get_xy_index( const int &ii, const int &dim_x, int &ix, int &iy)
-  {
-    ix = ii % dim_x;
-    iy = (ii-ix)/dim_x;
-  }
-
-  // ----------------------------------------------------------------
-  // gen_random()
-  // Generate a random double in [min, max] domain for _closed; 
-  // (min, max) for open.
-  // Gernerate a random int in [min, max] domain.
-  // NOTE: Users have to call srand(time(NULL)) before calling the 
-  //       following three gen functions.
-  // E.G.: srand(time(NULL));
-  //       for-loop
-  //       {gen_randomD_xxx(...); ...}
-  // ----------------------------------------------------------------
-  double gen_randomD_closed( const double &min, const double &max );
-
-  double gen_randomD_open( const double &min, const double &max );
-
-  int gen_randomI_closed( const int &min, const int &max );
-
-  // ----------------------------------------------------------------
+  // --------------------------------------------------------------------------
   // print size based on bytes
-  // ----------------------------------------------------------------
-  template<typename T> void print_mem_size( const T &byte_size )
-  {
-    if(byte_size > 1.0e9)
-      std::cout<<double(byte_size)/1.0e9<<" GB.";
-    else if(byte_size > 1.0e6)
-      std::cout<<double(byte_size)/1.0e6<<" MB.";
-    else if(byte_size > 1.0e3)
-      std::cout<<double(byte_size)/1.0e3<<" KB";
-    else
-      std::cout<<byte_size<<" Bytes.";
-  }
-
+  // --------------------------------------------------------------------------
   template<typename T> std::string get_string_mem_size( const T &byte_size )
   {
     std::ostringstream ss;
@@ -130,40 +113,9 @@ namespace SYS_T
     return ss.str();
   }
 
-  // ----------------------------------------------------------------
-  // to_string functions : convert numeric values to string 
-  // Note: std::to_string is implemented in string in C++ 11.
-  // ----------------------------------------------------------------
-  inline std::string to_string( const int &a )
+  template<typename T> void print_mem_size( const T &byte_size )
   {
-    std::ostringstream ss;
-    ss<<a;
-    return ss.str();
-  }
-
-  inline std::string to_string( const double &a )
-  {
-    std::ostringstream ss;
-    ss<<a;
-    return ss.str();
-  }
-
-  // to get a non-constant (i.e. writable) char array from a string, 
-  // use &b[0]. Note: string.c_str() returns a const char array.
-  inline void to_char( const std::string &a, std::vector<char> &b )
-  {
-    b.assign(a.begin(), a.end());
-    b.push_back('\0');
-  }
-
-  // this gets a non-constant/writable char array from a string.
-  // this directly returns a char array, but the user is responsible 
-  // for deleting the char pointer after usage.
-  inline void to_char( const std::string &a, char * &b )
-  {
-    b = new char [a.size() + 1];
-    std::copy(a.begin(), a.end(), b);
-    b[a.size()] = '\0';
+    std::cout<<get_string_mem_size( byte_size );
   }
 
   // ================================================================
@@ -175,23 +127,23 @@ namespace SYS_T
   inline void synPrint(const std::string &output, const int &cpu_rank)
   {
     PetscSynchronizedPrintf(PETSC_COMM_WORLD, "Proc %d: ", cpu_rank);
-    PetscSynchronizedPrintf(PETSC_COMM_WORLD, output.c_str());
+    PetscSynchronizedPrintf(PETSC_COMM_WORLD, "%s", output.c_str());
     PetscSynchronizedFlush(PETSC_COMM_WORLD, PETSC_STDOUT);
   }
   inline void synPrint(const char * const &output, const int &cpu_rank)
   {
     PetscSynchronizedPrintf(PETSC_COMM_WORLD, "Proc %d: ", cpu_rank);
-    PetscSynchronizedPrintf(PETSC_COMM_WORLD, output);
+    PetscSynchronizedPrintf(PETSC_COMM_WORLD, "%s", output);
     PetscSynchronizedFlush(PETSC_COMM_WORLD, PETSC_STDOUT);
   }
   inline void synPrint(const std::string &output)
   {
-    PetscSynchronizedPrintf(PETSC_COMM_WORLD, output.c_str());
+    PetscSynchronizedPrintf(PETSC_COMM_WORLD, "%s", output.c_str());
     PetscSynchronizedFlush(PETSC_COMM_WORLD, PETSC_STDOUT);
   }
   inline void synPrint(const char * const &output)
   {
-    PetscSynchronizedPrintf(PETSC_COMM_WORLD, output);
+    PetscSynchronizedPrintf(PETSC_COMM_WORLD, "%s", output);
     PetscSynchronizedFlush(PETSC_COMM_WORLD, PETSC_STDOUT);
   }
 
@@ -199,11 +151,7 @@ namespace SYS_T
   //    PetscPrintf() with PETSC_COMM_WORLD is used.
   inline void commPrint(const char output[], ...)
   {
-    PetscMPIInt rank;
-
-    MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
-
-    if(!rank)
+    if( !get_MPI_rank() )
     {
       va_list Argp;
       va_start(Argp, output);
@@ -216,28 +164,16 @@ namespace SYS_T
   //    and PETSC_COMM_WORLD. This is particularly designed to print
   //    command line arguments.
   inline void cmdPrint(const char * const &dataname, const int &datavalue)
-  {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, ss.str().c_str());}
+  {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, "%s", ss.str().c_str());}
   inline void cmdPrint(const char * const &dataname, const double &datavalue)
-  {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, ss.str().c_str());}
+  {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, "%s", ss.str().c_str());}
   inline void cmdPrint(const char * const &dataname, const std::string &datavalue)
-  {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, ss.str().c_str());}
+  {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, "%s", ss.str().c_str());}
 
-  // 4. Print specific system message
-  inline void synPrintElementInfo(int nlocalele, double memspace, 
-      double totaltime, PetscMPIInt rank)
-  {
-    std::string memusage = get_string_mem_size(memspace);
-    std::ostringstream ss; ss<<nlocalele<<" elements cached, "<<totaltime<<
-      " secs and "<<memusage<<std::endl;
-    synPrint(ss.str(), rank);
-  }
-
-  // 5. Print fatal error message and terminate the MPI process
+  // 4. Print fatal error message and terminate the MPI process
   inline void print_fatal( const char output[], ... )
   {
-    const PetscMPIInt rank = get_MPI_rank();
-
-    if(!rank)
+    if( !get_MPI_rank() )
     {
       va_list Argp;
       va_start(Argp, output);
@@ -253,9 +189,7 @@ namespace SYS_T
   {
     if( a )
     {
-      const PetscMPIInt rank = get_MPI_rank();
-
-      if(!rank)
+      if( !get_MPI_rank() )
       {
         va_list Argp;
         va_start(Argp, output);
@@ -268,8 +202,42 @@ namespace SYS_T
     }
   }
 
-  // exit message printers are used in terminating serial program when 
-  // the communicator for MPI is not available.
+  inline void print_fatal_if_not( bool a, const char output[], ... )
+  {
+    if( !a )
+    {
+      if( !get_MPI_rank() )
+      {
+        va_list Argp;
+        va_start(Argp, output);
+        (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
+        va_end(Argp);
+      }
+
+      MPI_Barrier(PETSC_COMM_WORLD);
+      MPI_Abort(PETSC_COMM_WORLD, 1);
+    }
+  }
+
+  // 5. Print message (without termination the code) under conditions
+  inline void print_message_if( bool a, const char output[], ... )
+  {
+    if( a )
+    {
+      if( !get_MPI_rank() )
+      {
+        va_list Argp;
+        va_start(Argp, output);
+        (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
+        va_end(Argp);
+      }
+
+      MPI_Barrier(PETSC_COMM_WORLD);
+    }
+  }
+
+  // 6. Print exit message printers are used in terminating serial 
+  //    program when the communicator for MPI is not available.
   inline void print_exit( const char * const &mesg )
   {
     std::cout<<mesg<<std::endl;
@@ -292,47 +260,39 @@ namespace SYS_T
     if( a ) print_exit(mesg);
   }
 
-  // =================================================================
-  // The followings are system function to monitor system memory usages 
-  // dynamically.
-  // Note: Before calling the following four functions, the user need to call 
-  // PetscMemorySetGetMaximumUsage() immediately after PetscInitialize.
-  // =================================================================
-  // -----------------------------------------------------------------
-  // 1. Print the Maximum memory used for the program. The usage is
-  //    reduced to CPU 0 by MPI_SUM.
-  // -----------------------------------------------------------------
-  void print_MaxMemUsage();
-
-  // ----------------------------------------------------------------
-  // 2. Print the Current memory used for the program. The usage is 
-  //    reduced to CPU 0 by MPI_SUM.  
-  // ----------------------------------------------------------------
-  void print_CurMemUsage();
-
-  // ----------------------------------------------------------------
-  // 3. Print the Maximum space PETSc has allocated. This function 
-  //    should be used with the command line argument -malloc
-  // ----------------------------------------------------------------
-  void print_MaxMallocUsage();
-
-  // ----------------------------------------------------------------
-  // 4. Print the Current space PETSc has allocated. This function 
-  //    should be used with the command line argument -malloc
-  // ----------------------------------------------------------------
-  void print_CurMallocUsage();
-
   // ================================================================
   // The following are system functions that access the system info.
   // ================================================================
   // 1. get_time: return the present time as HH:MM:SS
   // ----------------------------------------------------------------
-  std::string get_time();
+  inline std::string get_time()
+  {
+    std::time_t  time1= std::time (0);
+    std::tm     *time = std::localtime(&time1);
+
+    std::ostringstream o;
+    o << time->tm_hour << ":"
+      << (time->tm_min < 10 ? "0" : "") << time->tm_min << ":"
+      << (time->tm_sec < 10 ? "0" : "") << time->tm_sec;
+
+    return o.str();
+  }
 
   // ----------------------------------------------------------------
   // 2. get_date: return the present date as YYYY/MM/DD
   // ----------------------------------------------------------------
-  std::string get_date();
+  inline std::string get_date()
+  {
+    std::time_t  time1= std::time (0);
+    std::tm     *time = std::localtime(&time1);
+
+    std::ostringstream o;
+    o << time->tm_year + 1900 << "/"
+      << time->tm_mon + 1 << "/"
+      << time->tm_mday;
+
+    return o.str();
+  }
 
   // ----------------------------------------------------------------
   // 3. Structure that holds information about memory usage in kB.
@@ -351,7 +311,74 @@ namespace SYS_T
   // 4. get_memory_stats(): fills the MemoryStats structure with info
   //    about the memory consumption of this process. Only for Linux.
   // ----------------------------------------------------------------
-  void get_memory_stats( MemoryStats &stats );
+  inline void get_memory_stats( MemoryStats &stats )
+  {
+    stats.VmPeak = stats.VmSize = stats.VmHWM = stats.VmRSS = 0;
+
+#if defined(__linux__)
+    std::ifstream file("/proc/self/status");
+    std::string line;
+    std::string name;
+    while (!file.eof())
+    {
+      file >> name;
+      if (name == "VmPeak:")
+        file >> stats.VmPeak;
+      else if (name == "VmSize:")
+        file >> stats.VmSize;
+      else if (name == "VmHWM:")
+        file >> stats.VmHWM;
+      else if (name == "VmRSS:")
+      {
+        file >> stats.VmRSS;
+        break; //this is always the last entry
+      }
+
+      getline(file, line);
+    }
+#endif
+  }
+
+  // ----------------------------------------------------------------
+  // Check if a file exists. If a file cannot be found, throw an error
+  // message and exit code
+  // ----------------------------------------------------------------
+  inline bool file_exist( const std::string &fName )
+  {
+    if( FILE *ff = fopen(fName.c_str(), "r") )
+    {
+      fclose(ff);
+      return true;
+    }
+    else return false;
+  }
+
+  inline bool directory_exist( const std::string &dName )
+  {
+    if (dName.empty() || dName == "" || dName == "/0")
+      return true;
+
+    struct stat info;
+    if (stat(dName.c_str(), &info) == 0)
+      return true;
+
+    return false;
+  }
+
+  inline void file_check( const std::string &fName )
+  {
+    print_fatal_if( !file_exist(fName), 
+        "Error: The file %s does not exist. Job is killed. \n", fName.c_str());
+  }
+
+  // --------------------------------------------------------------------------
+  // Execute a system call
+  // --------------------------------------------------------------------------
+  inline void execute( const char * const &command )
+  {
+    int sysret = system( command );
+    print_fatal_if(sysret != 0, "Error: system call %s failed. \n", command);
+  }
 
   // ================================================================
   // The folowing are options-get functions that read command-line
@@ -406,24 +433,25 @@ namespace SYS_T
     if(flg) outdata = char_outdata;
   }
 
-  // ----------------------------------------------------------------
-  // Check if a file exists. If a file cannot be found, throw an error
-  // message and exit code
-  // ----------------------------------------------------------------
-  inline bool file_exist( const std::string &fName )
+  inline void InsertFileYAML( const std::string &filename, const bool &require )
   {
-    if( FILE *ff = fopen(fName.c_str(), "r") )
+#if PETSC_VERSION_GE(3,15,0)
+    if( require )
     {
-      fclose(ff);
-      return true;
+      file_check( filename );
+      commPrint("Status: loading YAML file %s from the disk.\n", filename.c_str());
+      PetscOptionsInsertFileYAML(PETSC_COMM_WORLD, NULL, filename.c_str(), PETSC_TRUE);
     }
-    else return false;
-  }
+    else
+    {
+      if(!file_exist(filename))
+        commPrint("Warning: the YAML file %s does not exist, and the command line arguments are loaded.\n", filename.c_str());
 
-  inline void file_check( const std::string &fName )
-  {
-    print_fatal_if( !file_exist(fName), 
-        "Error: The file %s does not exist. Job is killed. \n", fName.c_str());
+      PetscOptionsInsertFileYAML(PETSC_COMM_WORLD, NULL, filename.c_str(), PETSC_FALSE);
+    }
+#else
+    commPrint("Warning: YAML is unsupported in this PETSc.\n");
+#endif
   }
 
   // ================================================================
@@ -433,23 +461,47 @@ namespace SYS_T
   class Timer
   {
     public:
-      Timer();
-      
-      ~Timer();
+      Timer() { startedAt = 0; stoppedAt = 0; }
 
-      void Start();
-      
-      void Stop();
-      
-      void Reset();
+      ~Timer() {};
 
-      double get_sec() const;
+      void Start() {startedAt = clock();}
+
+      void Stop() {stoppedAt = clock();}
+
+      void Reset() { startedAt = 0; stoppedAt = 0; }
+
+      double get_sec() const
+      {
+        return (double)(stoppedAt - startedAt)/(double)CLOCKS_PER_SEC;
+      }
 
     private:
-      clock_t startedAt;
-      clock_t stoppedAt;
+      clock_t startedAt, stoppedAt;
   };
 
+  // Print ASCII art text for the code
+  inline void print_perigee_art()
+  {
+    commPrint("$$$$$$$\\  $$$$$$$$\\ $$$$$$$\\  $$$$$$\\  $$$$$$\\  $$$$$$$$\\ $$$$$$$$\\ \n");
+    commPrint("$$  __$$\\ $$  _____|$$  __$$\\ \\_$$  _|$$  __$$\\ $$  _____|$$  _____| \n");
+    commPrint("$$ |  $$ |$$ |      $$ |  $$ |  $$ |  $$ /  \\__|$$ |      $$ | \n");
+    commPrint("$$$$$$$  |$$$$$\\    $$$$$$$  |  $$ |  $$ |$$$$\\ $$$$$\\    $$$$$\\ \n");
+    commPrint("$$  ____/ $$  __|   $$  __$$<   $$ |  $$ |\\_$$ |$$  __|   $$  __| \n");
+    commPrint("$$ |      $$ |      $$ |  $$ |  $$ |  $$ |  $$ |$$ |      $$ | \n");
+    commPrint("$$ |      $$$$$$$$\\ $$ |  $$ |$$$$$$\\ \\$$$$$$  |$$$$$$$$\\ $$$$$$$$\\ \n");
+    commPrint("\\__|      \\________|\\__|  \\__|\\______| \\______/ \\________|\\________| \n \n");
+  }
+
+  inline void print_sep_line()
+  {
+    commPrint("----------------------------------------------------------------------\n");
+  }
+
+  inline void print_sep_double_line()
+  {
+    commPrint("======================================================================\n");
+  }
 }
 
 #endif
