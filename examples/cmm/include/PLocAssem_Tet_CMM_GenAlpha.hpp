@@ -241,7 +241,7 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
         const double &t, const double &nx, const double &ny,
         const double &nz, double &gx, double &gy, double &gz ) const;
 
-    locassem_tet_cmm_funs * flist;
+    //locassem_tet_cmm_funs * flist;
 
     void get_ebc_fun( const int &ebc_id,
         const double &x, const double &y, const double &z,

@@ -414,20 +414,20 @@ void PNonlinear_CMM_Solver::update_nodal_bc( const double &stime,
 
 
 void PNonlinear_CMM_Solver::update_wall( const double &val,
-    const PDNSolution * const &dot_step,
+    const PDNSolution * const &dotstep,
     PDNSolution * const &wall_data,
     const ALocal_EBC * const &ebc_wall_part ) const
 {
-  // Verify that the dof of dot_step is 4
-  SYS_T::print_fatal_if(dot_step->get_dof_num() != 4,
-      "Error in PNonlinear_CMM_Solver::update_dot_wall_disp: incorrect dimension of dot_step. \n");
+  // Verify that the dof of dotstep is 4
+  SYS_T::print_fatal_if(dotstep->get_dof_num() != 4,
+      "Error in PNonlinear_CMM_Solver::update_dot_wall_disp: incorrect dimension of dotstep. \n");
 
   // Verify that the dof of wall_data is 3
   SYS_T::print_fatal_if(wall_data->get_dof_num() != 3,
       "Error in PNonlinear_CMM_Solver::update_dot_wall_disp: incorrect dimension of wall_data. \n");
 
   // Verify consistency in the number of local nodes
-  SYS_T::print_fatal_if( !is_layout_equal(*dot_step, *wall_data), "Error in PNonlinear_CMM_Solver::update_dot_wall_disp: solution vector layout mismatch between dot_step and wall_data. \n");
+  SYS_T::print_fatal_if( !is_layout_equal(*dotstep, *wall_data), "Error in PNonlinear_CMM_Solver::update_dot_wall_disp: solution vector layout mismatch between dotstep and wall_data. \n");
 
   // wall has only one surface per the assumption in wall ebc
   const int ebc_id = 0;
@@ -436,7 +436,7 @@ void PNonlinear_CMM_Solver::update_wall( const double &val,
   Vec ldotstep, lwalldata;
   double * array_dotstep, * array_walldata;
 
-  VecGhostGetLocalForm(dot_step->solution, &ldotstep);
+  VecGhostGetLocalForm(dotstep->solution, &ldotstep);
   VecGhostGetLocalForm(wall_data->solution, &lwalldata);
 
   VecGetArray(ldotstep, &array_dotstep);
@@ -454,7 +454,7 @@ void PNonlinear_CMM_Solver::update_wall( const double &val,
   // Deallocation of the local copy
   VecRestoreArray(ldotstep, &array_dotstep);
   VecRestoreArray(lwalldata, &array_walldata);
-  VecGhostRestoreLocalForm(dot_step->solution, &ldotstep);
+  VecGhostRestoreLocalForm(dotstep->solution, &ldotstep);
   VecGhostRestoreLocalForm(wall_data->solution, &lwalldata);
 
   // Update ghost values

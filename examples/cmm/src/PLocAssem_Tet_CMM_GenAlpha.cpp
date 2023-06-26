@@ -118,12 +118,12 @@ void PLocAssem_Tet_CMM_GenAlpha::get_metric(
 
 void PLocAssem_Tet_CMM_GenAlpha::get_tau(
     double &tau_m_qua, double &tau_c_qua,
-    const double &dt, const double * const &dxi_dx,
+    const double &dt, const double * const &dxidx,
     const double &u, const double &v, const double &w ) const
 {
   // Use K matrix to correct the metric
   double G11, G12, G13, G22, G23, G33;
-  get_metric( dxi_dx, G11, G12, G13, G22, G23, G33 );
+  get_metric( dxidx, G11, G12, G13, G22, G23, G33 );
 
   const double GdG = G11 * G11 + 2.0 * G12 * G12 + 2.0 * G13 * G13
     + G22 * G22 + 2.0 * G23 * G23 + G33 * G33;
@@ -146,11 +146,11 @@ void PLocAssem_Tet_CMM_GenAlpha::get_tau(
 
 
 void PLocAssem_Tet_CMM_GenAlpha::get_DC(
-    double &dc_tau, const double * const &dxi_dx,
+    double &dc_tau, const double * const &dxidx,
     const double &u, const double &v, const double &w ) const
 {
   //double G11, G12, G13, G22, G23, G33;
-  //get_metric( dxi_dx, G11, G12, G13, G22, G23, G33 );
+  //get_metric( dxidx, G11, G12, G13, G22, G23, G33 );
 
   //dc_tau = G11 * u * u + 2.0 * G12 * u * v + 2.0 * G13 * u * w + G22 * v * v
   //  + 2.0 * G23 * v * w + G33 * w * w;

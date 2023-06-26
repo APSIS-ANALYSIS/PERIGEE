@@ -18,33 +18,34 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   youngsmod.resize( num_node[ebc_id] );
 
   // Make sure that the files exist
-  SYS_T::file_check( walls_combined );
-  SYS_T::file_check( centerlines_combined );
+  //SYS_T::file_check( walls_combined );
+  //SYS_T::file_check( centerlines_combined );
 
-  vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
-  reader -> SetFileName( centerlines_combined.c_str() );
-  reader -> Update();
-  vtkPolyData * centerlineData = reader -> GetOutput();
+  //vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
+  //reader -> SetFileName( centerlines_combined.c_str() );
+  //reader -> Update();
+  //vtkPolyData * centerlineData = reader -> GetOutput();
 
   // Identify the closest point (not necessarily a cell vertex) on the centerline
-  vtkCellLocator * locator = vtkCellLocator::New();
-  locator -> Initialize();
-  locator -> SetDataSet( centerlineData );
-  locator -> BuildLocator();
+  //vtkCellLocator * locator = vtkCellLocator::New();
+  //locator -> Initialize();
+  //locator -> SetDataSet( centerlineData );
+  //locator -> BuildLocator();
 
-  double cl_pt[3];
-  vtkGenericCell * cell = vtkGenericCell::New();
-  vtkIdType cellId; int subId; double dist;
+  //double cl_pt[3];
+  //vtkGenericCell * cell = vtkGenericCell::New();
+  //vtkIdType cellId; int subId; double dist;
 
   for(int ii=0; ii<num_node[ebc_id]; ++ii)
   {
-    double pt[3] = {pt_xyz[ebc_id][3*ii], pt_xyz[ebc_id][3*ii+1], pt_xyz[ebc_id][3*ii+2]};
+    //double pt[3] = {pt_xyz[ebc_id][3*ii], pt_xyz[ebc_id][3*ii+1], pt_xyz[ebc_id][3*ii+2]};
 
-    locator -> FindClosestPoint(&pt[0], &cl_pt[0], cell, cellId, subId, dist); 
+    //locator -> FindClosestPoint(&pt[0], &cl_pt[0], cell, cellId, subId, dist); 
 
-    radius[ii] = MATH_T::norm2(cl_pt[0] - pt[0], cl_pt[1] - pt[1], cl_pt[2] - pt[2]);
+    //radius[ii] = MATH_T::norm2(cl_pt[0] - pt[0], cl_pt[1] - pt[1], cl_pt[2] - pt[2]);
   
     // ==== WOMERSLEY CHANGES BEGIN ====
+    radius[ii] = 0.3;
     thickness[ii] = 0.06;
     compute_youngsmod(0.3, 0.06, youngsmod[ii]);
 
@@ -55,9 +56,9 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   }
  
   // clean memory
-  locator -> Delete();
-  reader  -> Delete();
-  cell    -> Delete();
+  //locator -> Delete();
+  //reader  -> Delete();
+  //cell    -> Delete();
 
   // Write out vtp's with wall properties
   write_vtk(ebc_id, "varwallprop");
@@ -98,19 +99,19 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   // Loop over the surfaces (subsets of the whole wall surface)
   // to locally modify the wall property
   int numpts, numcels;
-  std::vector<double> pt;
+  std::vector<double> wallpt;
   std::vector<int> ien_array, global_node_idx, global_elem_idx;
   for(int ii=0; ii<num_srfs; ++ii)
   {
     if(elemtype == 501)
     {
       TET_T::read_vtp_grid( wallsList[ii], numpts, numcels,
-            pt, ien_array, global_node_idx, global_elem_idx ); 
+            wallpt, ien_array, global_node_idx, global_elem_idx ); 
     }
     else
     {
       TET_T::read_vtu_grid( wallsList[ii], numpts, numcels,
-            pt, ien_array, global_node_idx, global_elem_idx );
+            wallpt, ien_array, global_node_idx, global_elem_idx );
     }
 
     vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
@@ -159,7 +160,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     std::cout << "          " << wallsList[ii] << '\n';
   } // End of loop for ii-th wall surface
 
-  VEC_T::clean( pt ); VEC_T::clean( ien_array ); 
+  VEC_T::clean( wallpt ); VEC_T::clean( ien_array ); 
   VEC_T::clean( global_node_idx ); VEC_T::clean( global_elem_idx );
 
   // Write out vtp's with wall properties

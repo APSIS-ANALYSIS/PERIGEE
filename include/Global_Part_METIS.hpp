@@ -60,7 +60,7 @@ class Global_Part_METIS : public IGlobal_Part
         const int64_t * const &part_in,
         const int64_t &part_size, const int &cpu_size,
         const bool &part_isdual, const int &in_ncommon,
-        const bool &isMETIS ) const;
+        const bool &is_METIS ) const;
 };
 
 #endif

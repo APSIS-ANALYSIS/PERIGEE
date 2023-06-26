@@ -143,7 +143,7 @@ void Global_Part_METIS::write_part_hdf5( const char * const &fileName,
     const idx_t * const &part_in,
     const int &part_size, const int &cpu_size,
     const bool &part_isdual, const int &in_ncommon,
-    const bool &isMETIS ) const
+    const bool &is_METIS ) const
 {
   std::string fName( fileName );
   fName.append(".h5");
@@ -194,7 +194,7 @@ void Global_Part_METIS::write_part_hdf5( const char * const &fileName,
   H5Dwrite( setid_in_ncommon, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT,
       &in_ncommon);
 
-  if(isMETIS)
+  if(is_METIS)
     intbool = 1;
   else
     intbool = 0; 
@@ -216,7 +216,7 @@ void Global_Part_METIS::write_part_hdf5_64bit( const char * const &fileName,
     const int64_t * const &part_in,
     const int64_t &part_size, const int &cpu_size,
     const bool &part_isdual, const int &in_ncommon,
-    const bool &isMETIS ) const
+    const bool &is_METIS ) const
 {
   std::string fName( fileName );
   fName.append( ".h5" );
@@ -239,7 +239,7 @@ void Global_Part_METIS::write_part_hdf5_64bit( const char * const &fileName,
   h5w->write_intScalar("part_isdual", intbool);
   h5w->write_intScalar("in_ncommon", in_ncommon);
 
-  if(isMETIS)
+  if(is_METIS)
     intbool = 1;
   else
     intbool = 0;
