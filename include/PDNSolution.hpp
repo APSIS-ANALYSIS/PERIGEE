@@ -19,6 +19,7 @@
 // Author: Ju Liu
 // Date: Nov. 23th 2013
 // ==================================================================
+#include "Math_Tools.hpp"
 #include "APart_Node.hpp"
 
 class PDNSolution
