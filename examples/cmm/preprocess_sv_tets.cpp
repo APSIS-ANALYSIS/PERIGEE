@@ -210,8 +210,10 @@ int main( int argc, char * argv[] )
   if(elemType == 501)
   {
     NBC_list[0] = new NodalBC_3D_vtp( nFunc );
-    NBC_list[1] = new NodalBC_3D_vtp( sur_file_in, sur_file_wall, sur_file_out, nFunc );
-    NBC_list[2] = new NodalBC_3D_vtp( sur_file_in, sur_file_wall, sur_file_out, nFunc );
+    NBC_list[1] = new NodalBC_3D_vtp( nFunc ); // change for in-plane motion ring
+    NBC_list[2] = new NodalBC_3D_vtp( nFunc ); // change for in-plane motion ring
+    //NBC_list[1] = new NodalBC_3D_vtp( sur_file_in, sur_file_wall, sur_file_out, nFunc );
+    //NBC_list[2] = new NodalBC_3D_vtp( sur_file_in, sur_file_wall, sur_file_out, nFunc );
     NBC_list[3] = new NodalBC_3D_vtp( sur_file_in, sur_file_wall, sur_file_out, nFunc );
   }
   else

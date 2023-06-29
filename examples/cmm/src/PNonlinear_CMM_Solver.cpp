@@ -378,31 +378,34 @@ void PNonlinear_CMM_Solver::update_nodal_bc( const double &stime,
 
       if( VEC_T::is_invec(LDN, node_index) )
       {
-        const double x = feanode_ptr->get_ctrlPts_x(jj);
-        const double y = feanode_ptr->get_ctrlPts_y(jj);
-        const double z = feanode_ptr->get_ctrlPts_z(jj);
+        //const double x = feanode_ptr->get_ctrlPts_x(jj);
+        //const double y = feanode_ptr->get_ctrlPts_y(jj);
+        //const double z = feanode_ptr->get_ctrlPts_z(jj);
 
-        const double r  = std::sqrt(x*x + y*y);
-        const auto   xi = Lambda * r / R;
+        //const double r  = std::sqrt(x*x + y*y);
+        //const auto   xi = Lambda * r / R;
 
-        const auto bes0_xi     = sp_bessel::besselJ(0, xi);
-        const auto bes1_xi     = sp_bessel::besselJ(1, xi);
-        const auto bes0_Lambda = sp_bessel::besselJ(0, Lambda);
+        //const auto bes0_xi     = sp_bessel::besselJ(0, xi);
+        //const auto bes1_xi     = sp_bessel::besselJ(1, xi);
+        //const auto bes0_Lambda = sp_bessel::besselJ(0, Lambda);
 
         // axial velocity
-        const double w = k0 * (x*x + y*y - R*R) / (4.0*vis_mu)
-            + std::real( B1 / (rho * c1) * (1.0 - G1 * bes0_xi / bes0_Lambda) * exp(i1*omega*(stime-z/c1)) );
+        //const double w = k0 * (x*x + y*y - R*R) / (4.0*vis_mu)
+        //    + std::real( B1 / (rho * c1) * (1.0 - G1 * bes0_xi / bes0_Lambda) * exp(i1*omega*(stime-z/c1)) );
 
         // radial velocity
-        const double vr = std::real( i1 * omega * R * B1 / ( 2.0 * rho * c1 * c1 )
-            * ( r / R - 2.0 * G1 * bes1_xi / (Lambda * bes0_Lambda) ) * exp(i1*omega*(stime-z/c1)) );
+        //const double vr = std::real( i1 * omega * R * B1 / ( 2.0 * rho * c1 * c1 )
+        //    * ( r / R - 2.0 * G1 * bes1_xi / (Lambda * bes0_Lambda) ) * exp(i1*omega*(stime-z/c1)) );
 
         // polar to cartesian transformation
-        const double theta = std::atan2(y, x);
+        //const double theta = std::atan2(y, x);
 
-        VecSetValue(sol->solution, node_index*4+1, vr * std::cos(theta), INSERT_VALUES);
-        VecSetValue(sol->solution, node_index*4+2, vr * std::sin(theta), INSERT_VALUES);
-        VecSetValue(sol->solution, node_index*4+3, w, INSERT_VALUES);
+        VecSetValue(sol->solution, node_index*4+1, 0.0, INSERT_VALUES); // change for in-plane motion ring
+        VecSetValue(sol->solution, node_index*4+2, 0.0, INSERT_VALUES); // change for in-plane motion ring
+        VecSetValue(sol->solution, node_index*4+3, 0.0, INSERT_VALUES); // change for in-plane motion ring
+        //VecSetValue(sol->solution, node_index*4+1, vr * std::cos(theta), INSERT_VALUES);
+        //VecSetValue(sol->solution, node_index*4+2, vr * std::sin(theta), INSERT_VALUES);
+        //VecSetValue(sol->solution, node_index*4+3, w, INSERT_VALUES);
       }
     } // end nlocalnode loop
   }
