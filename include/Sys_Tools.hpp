@@ -13,6 +13,7 @@
 #include <sstream>
 #include <string>
 #include <ctime>
+#include <vector>
 #include <sys/stat.h>
 #include "petsc.h"
 
