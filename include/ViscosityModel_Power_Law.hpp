@@ -52,11 +52,11 @@ class ViscosityModel_Power_Law : public IViscosityModel
     virtual double get_dmu_dI3( const Matrix_3x3 &grad_velo) const;
 
 		private:
-// ----------------------------------------------------------------------------
-// m_cons : consistency ( Pa * s ^ n ) when n = 1, it is the same as viscosity
-// n_pli  : an index shows the dependency of viscosity on shear rate
-// ----------------------------------------------------------------------------
-			double m_cons, n_pli;
+    // ------------------------------------------------------------------------
+    // m_cons : consistency ( Pa * s ^ n ) when n = 1, it is the same as viscosity
+    // n_pli  : an index shows the dependency of viscosity on shear rate
+    // ------------------------------------------------------------------------
+    double m_cons, n_pli;
 };
 
 #endif
