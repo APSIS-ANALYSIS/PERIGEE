@@ -82,7 +82,8 @@ double ViscosityModel_Power_Law::get_dmu_dI2( const double &D_xx,
 {
   const SymmMatrix_3x3 D( D_xx, D_yy, D_zz, D_yz, D_xz, D_xy);
   const double DII = std::abs( D.I2() );
-  const double dmu_dvelo = m_cons * ( n_pli - 1.0) *
+  const double sign_DI2 = ((D.I2() > 0) ? 1.0 : -1.0);
+  const double dmu_dvelo = m_cons * ( n_pli - 1.0) * sign_DI2 * 
                            std::pow( 2.0 * std::sqrt( DII ), n_pli - 2.0 ) /
                            std::sqrt( DII );
   return dmu_dvelo;
@@ -107,3 +108,4 @@ double ViscosityModel_Power_Law::get_dmu_dI3( const Matrix_3x3 &grad_velo ) cons
   return get_dmu_dI3( D.xx(), D.yy(), D.zz(), D.yz(), D.xz(), D.xy() );
 }
 
+// EOF
