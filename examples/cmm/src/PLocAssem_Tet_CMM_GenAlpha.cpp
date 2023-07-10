@@ -83,7 +83,7 @@ void PLocAssem_Tet_CMM_GenAlpha::print_info() const
 
 
 void PLocAssem_Tet_CMM_GenAlpha::get_metric(
-    const std::array<double,9> &f,
+    const std::array<double,9> &ff,
     double &G11, double &G12, double &G13,
     double &G22, double &G23, double &G33 ) const
 {
@@ -92,22 +92,22 @@ void PLocAssem_Tet_CMM_GenAlpha::get_metric(
   const double diag = 2.0;
   const double offd = 1.0;
 
-  const double fk0 = diag * f[0] + offd * (f[3] + f[6]);
-  const double fk1 = diag * f[3] + offd * (f[0] + f[6]);
-  const double fk2 = diag * f[6] + offd * (f[0] + f[3]);
-  const double fk3 = diag * f[1] + offd * (f[4] + f[7]);
-  const double fk4 = diag * f[4] + offd * (f[1] + f[7]);
-  const double fk5 = diag * f[7] + offd * (f[1] + f[4]);
-  const double fk6 = diag * f[2] + offd * (f[5] + f[8]);
-  const double fk7 = diag * f[5] + offd * (f[2] + f[8]);
-  const double fk8 = diag * f[8] + offd * (f[2] + f[5]);
+  const double fk0 = diag * ff[0] + offd * (ff[3] + ff[6]);
+  const double fk1 = diag * ff[3] + offd * (ff[0] + ff[6]);
+  const double fk2 = diag * ff[6] + offd * (ff[0] + ff[3]);
+  const double fk3 = diag * ff[1] + offd * (ff[4] + ff[7]);
+  const double fk4 = diag * ff[4] + offd * (ff[1] + ff[7]);
+  const double fk5 = diag * ff[7] + offd * (ff[1] + ff[4]);
+  const double fk6 = diag * ff[2] + offd * (ff[5] + ff[8]);
+  const double fk7 = diag * ff[5] + offd * (ff[2] + ff[8]);
+  const double fk8 = diag * ff[8] + offd * (ff[2] + ff[5]);
 
-  G11 = coef * ( fk0 * f[0] + fk1 * f[3] + fk2 * f[6] );
-  G12 = coef * ( fk0 * f[1] + fk1 * f[4] + fk2 * f[7] );
-  G13 = coef * ( fk0 * f[2] + fk1 * f[5] + fk2 * f[8] );
-  G22 = coef * ( fk3 * f[1] + fk4 * f[4] + fk5 * f[7] );
-  G23 = coef * ( fk3 * f[2] + fk4 * f[5] + fk5 * f[8] );
-  G33 = coef * ( fk6 * f[2] + fk7 * f[5] + fk8 * f[8] );
+  G11 = coef * ( fk0 * ff[0] + fk1 * ff[3] + fk2 * ff[6] );
+  G12 = coef * ( fk0 * ff[1] + fk1 * ff[4] + fk2 * ff[7] );
+  G13 = coef * ( fk0 * ff[2] + fk1 * ff[5] + fk2 * ff[8] );
+  G22 = coef * ( fk3 * ff[1] + fk4 * ff[4] + fk5 * ff[7] );
+  G23 = coef * ( fk3 * ff[2] + fk4 * ff[5] + fk5 * ff[8] );
+  G33 = coef * ( fk6 * ff[2] + fk7 * ff[5] + fk8 * ff[8] );
 }
 
 double PLocAssem_Tet_CMM_GenAlpha::get_tau_m( const double &dt, 
