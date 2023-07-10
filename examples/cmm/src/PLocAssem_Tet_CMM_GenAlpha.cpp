@@ -350,7 +350,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
                         - mu_x * ( u_y + v_x ) - mu_y * 2.0 * v_y - mu_z * ( v_z + w_y );
     const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f_body.z() ) + p_z - vis_mu * w_lap
                         - mu_x * ( u_z + w_x ) - mu_y * ( v_z + w_y ) - mu_z * 2.0 * w_z;
-                        
+
     const double div_vel = u_x + v_y + w_z;
 
     const double u_prime = -1.0 * tau_m * rx;
@@ -443,6 +443,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
 
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
   std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
+  std::vector<double> d2R_dxy(nLocBas, 0.0), d2R_dxz(nLocBas, 0.0), d2R_dyz(nLocBas, 0.0);
 
   for(int qua=0; qua<nqp; ++qua)
   {
@@ -454,6 +455,9 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
     double u_xx = 0.0, u_yy = 0.0, u_zz = 0.0;
     double v_xx = 0.0, v_yy = 0.0, v_zz = 0.0;
     double w_xx = 0.0, w_yy = 0.0, w_zz = 0.0;
+    double u_xy = 0.0, u_xz = 0.0, u_yz = 0.0;
+    double v_xy = 0.0, v_xz = 0.0, v_yz = 0.0;
+    double w_xy = 0.0, w_xz = 0.0, w_yz = 0.0;
 
     element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
         &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
@@ -499,6 +503,18 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
       w_xx += sol[ii4+3] * d2R_dxx[ii];
       w_yy += sol[ii4+3] * d2R_dyy[ii];
       w_zz += sol[ii4+3] * d2R_dzz[ii];
+
+      u_xy += sol[ii4+1] * d2R_dxy[ii];
+      u_xz += sol[ii4+1] * d2R_dxz[ii];
+      u_yz += sol[ii4+1] * d2R_dyz[ii];
+
+      v_xy += sol[ii4+2] * d2R_dxy[ii];
+      v_xz += sol[ii4+2] * d2R_dxz[ii];
+      v_yz += sol[ii4+2] * d2R_dyz[ii];
+
+      w_xy += sol[ii4+3] * d2R_dxy[ii];
+      w_xz += sol[ii4+3] * d2R_dxz[ii];
+      w_yz += sol[ii4+3] * d2R_dyz[ii];
 
       coor_x += eleCtrlPts_x[ii] * R[ii];
       coor_y += eleCtrlPts_y[ii] * R[ii];
