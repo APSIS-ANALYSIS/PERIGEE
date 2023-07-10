@@ -217,17 +217,6 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
         const double &uu, const double &vv, const double &ww,
         const double &vis_mu ) const;
 
-    // Return dtau_m / dmu with the goal of providing consistent linearization
-    // of the residual for non-Newtonial fluid models
-    double get_dtau_m_dmu( const double &dt, const std::array<double,9> &dxi_dx,
-        const double &uu, const double &vv, const double &ww,
-        const double &vis_mu ) const;
-    
-    // Return dtau_c / dmu
-    double get_dtau_c_dmu( const double &dt, const std::array<double,9> &dxi_dx,
-        const double &uu, const double &vv, const double &ww,
-        const double &vis_mu ) const;
-
     // Return tau_bar := (v' G v')^-0.5 x rho0, 
     //        which scales like Time x Density
     double get_DC( const std::array<double,9> &dxi_dx,
