@@ -296,7 +296,7 @@ void PGAssem_Wall_Prestress::Assem_Residual(
     const ALocal_NBC * const &nbc_p,
     const ALocal_EBC * const &ebc_v,
     const ALocal_EBC * const &ebc_p,
-    const Prestress_solid * const &ps_ptr )
+    const Tissue_prestress * const &ps_ptr )
 {
   const int nElem = alelem_ptr->get_nlocalele();
 
@@ -389,7 +389,7 @@ void PGAssem_Wall_Prestress::Assem_Tangent_Residual(
     const ALocal_NBC * const &nbc_p,
     const ALocal_EBC * const &ebc_v,
     const ALocal_EBC * const &ebc_p,
-    const Prestress_solid * const &ps_ptr )
+    const Tissue_prestress * const &ps_ptr )
 {
   const int nElem = alelem_ptr->get_nlocalele();
 
@@ -481,7 +481,7 @@ void PGAssem_Wall_Prestress::Update_Wall_Prestress(
     const ALocal_IEN * const &lien_v,
     const ALocal_IEN * const &lien_p,
     const FEANode * const &fnode_ptr,
-    Prestress_solid * const &ps_ptr ) const
+    Tissue_prestress * const &ps_ptr ) const
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int nqp   = quadv -> get_num_quadPts();
