@@ -331,10 +331,26 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
     const double v_lap = v_xx + v_yy + v_zz;
     const double w_lap = w_xx + w_yy + w_zz;
 
-    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f_body.x() ) + p_x - vis_mu * u_lap;
-    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f_body.y() ) + p_y - vis_mu * v_lap;
-    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f_body.z() ) + p_z - vis_mu * w_lap;
+    const double mu_x = dmu_dI2 * ( u_x * ( v_xy + w_xz ) + v_y * ( u_xx + w_xz ) + w_z * ( u_xx + v_xy )
+                                  - 0.5 * ( u_y + v_x ) * ( u_xy + v_xx )
+                                  - 0.5 * ( u_z + w_x ) * ( u_xz + w_xx )
+                                  - 0.5 * ( v_z + w_y ) * ( v_xz + w_xy ));
+    const double mu_y = dmu_dI2 * ( u_x * ( v_yy + w_yz ) + v_y * ( u_xy + w_yz ) + w_z * ( u_xy + v_yy )
+                                  - 0.5 * ( u_y + v_x ) * ( u_yy + v_xy )
+                                  - 0.5 * ( u_z + w_x ) * ( u_yz + w_xy )
+                                  - 0.5 * ( v_z + w_y ) * ( v_yz + w_yy ));
+    const double mu_z = dmu_dI2 * ( u_x * ( v_yz + w_zz ) + v_y * ( u_xz + w_zz ) + w_z * ( u_xz + v_yz )
+                                  - 0.5 * ( u_y + v_x ) * ( u_yz + v_xz )
+                                  - 0.5 * ( u_z + w_x ) * ( u_zz + w_xz )
+                                  - 0.5 * ( v_z + w_y ) * ( v_zz + w_yz ));
 
+    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f_body.x() ) + p_x - vis_mu * u_lap
+                        - mu_x * 2.0 * u_x - mu_y * ( u_x + v_y ) - mu_z * ( u_z + w_x );
+    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f_body.y() ) + p_y - vis_mu * v_lap
+                        - mu_x * ( u_y + v_x ) - mu_y * 2.0 * v_y - mu_z * ( v_z + w_y );
+    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f_body.z() ) + p_z - vis_mu * w_lap
+                        - mu_x * ( u_z + w_x ) - mu_y * ( v_z + w_y ) - mu_z * 2.0 * w_z;
+                        
     const double div_vel = u_x + v_y + w_z;
 
     const double u_prime = -1.0 * tau_m * rx;
