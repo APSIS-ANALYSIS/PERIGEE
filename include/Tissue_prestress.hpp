@@ -1,5 +1,5 @@
-#ifndef PRESTRESS_SOLID_HPP
-#define PRESTRESS_SOLID_HPP
+#ifndef TISSUE_PRESTRESS_HPP
+#define TISSUE_PRESTRESS_HPP
 // ============================================================================
 // Tissue_prestress.hpp
 //
