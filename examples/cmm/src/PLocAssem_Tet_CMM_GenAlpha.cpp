@@ -318,7 +318,8 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
                                                 0.5 * ( u_y + v_x ) );
 
     // Get the tau_m and tau_c
-    get_tau(tau_m, tau_c, dt, dxi_dx, u, v, w, vis_mu);
+    tau_m = get_tau_m( dt, dxi_dx, u, v, w, vis_mu);
+    tau_c = get_tau_c( dt, dxi_dx, u, v, w, vis_mu);
 
     const double tau_m_2 = tau_m * tau_m;
 
@@ -534,7 +535,8 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
                                                 0.5 * ( u_z + w_x ), 
                                                 0.5 * ( u_y + v_x ) );
 
-    get_tau(tau_m, tau_c, dt, dxi_dx, u, v, w, vis_mu);
+    tau_m = get_tau_m( dt, dxi_dx, u, v, w, vis_mu);
+    tau_c = get_tau_c( dt, dxi_dx, u, v, w, vis_mu);
 
     const double tau_m_2 = tau_m * tau_m;
 
