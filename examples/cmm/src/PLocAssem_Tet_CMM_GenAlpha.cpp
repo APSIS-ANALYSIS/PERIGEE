@@ -459,8 +459,8 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
     double v_xy = 0.0, v_xz = 0.0, v_yz = 0.0;
     double w_xy = 0.0, w_xz = 0.0, w_yz = 0.0;
 
-    element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
-        &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
+    element->get_3D_R_dR_d2R( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0], 
+    &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0], &d2R_dxy[0], &d2R_dxz[0], &d2R_dyz[0] );
 
     const std::array<double,9> dxi_dx = element->get_invJacobian( qua );
 
