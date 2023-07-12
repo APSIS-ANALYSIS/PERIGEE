@@ -11,6 +11,7 @@
 // ==================================================================
 #include "IPLocAssem.hpp"
 #include "TimeMethod_GenAlpha.hpp"
+#include "SymmMatrix_3x3.hpp"
 
 class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
 {
@@ -156,18 +157,16 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
     // Private functions
     void print_info() const;
 
-    void get_metric( const double * const &dxi_dx,
-        double &G11, double &G12, double &G13,
-        double &G22, double &G23, double &G33 ) const;
+    SymmMatrix_3x3 get_metric( const std::array<double, 9> &dxi_dx ) const;
 
     // Return tau_m and tau_c in RB-VMS
     void get_tau( double &tau_m_qua, double &tau_c_qua,
-        const double &dt, const double * const &dxi_dx,
+        const double &dt, const std::array<double, 9> &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
     // Return tau_bar := (v' G v')^-0.5 x rho0, 
     //        which scales like Time x Density
-    void get_DC( double &dc_tau, const double * const &dxi_dx,
+    void get_DC( double &dc_tau, const std::array<double, 9> &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
     void get_f(const double &x, const double &y, const double &z,
