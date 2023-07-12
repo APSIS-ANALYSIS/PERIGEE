@@ -25,7 +25,7 @@
 #include "ALocal_RingBC.hpp"
 #include "ALocal_EBC.hpp"
 #include "IGenBC.hpp"
-#include "Prestress_solid.hpp"
+#include "Tissue_prestress.hpp"
 
 class IPGAssem
 {
@@ -269,7 +269,7 @@ class IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
-        const Prestress_solid * const &ps_ptr )
+        const Tissue_prestress * const &ps_ptr )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
     virtual void Assem_mass_residual(
@@ -289,7 +289,7 @@ class IPGAssem
         const ALocal_NBC * const &nbc_v,
         const ALocal_NBC * const &nbc_p,
         const ALocal_EBC * const &ebc_part,
-        const Prestress_solid * const &ps_ptr )
+        const Tissue_prestress * const &ps_ptr )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
     // ------------------------------------------------------------------------
@@ -444,7 +444,7 @@ class IPGAssem
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
-        const Prestress_solid * const &ps_ptr )
+        const Tissue_prestress * const &ps_ptr )
         {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
 
@@ -466,7 +466,7 @@ class IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
-        const Prestress_solid * const &ps_ptr )
+        const Tissue_prestress * const &ps_ptr )
     {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
     virtual void Assem_Residual(
@@ -494,7 +494,7 @@ class IPGAssem
         const ALocal_NBC * const &nbc_p,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
-        const Prestress_solid * const &ps_ptr )
+        const Tissue_prestress * const &ps_ptr )
         {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
     // Assembly in the prestress generation
@@ -520,7 +520,7 @@ class IPGAssem
         const ALocal_NBC * const &nbc_p,
         const ALocal_EBC * const &ebc_v,
         const ALocal_EBC * const &ebc_p,
-        const Prestress_solid * const &ps_ptr) 
+        const Tissue_prestress * const &ps_ptr) 
         {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
     // ------------------------------------------------------------------------
@@ -693,7 +693,7 @@ class IPGAssem
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
-        const Prestress_solid * const &ps_ptr )
+        const Tissue_prestress * const &ps_ptr )
         {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
 
@@ -715,7 +715,7 @@ class IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
-        const Prestress_solid * const &ps_ptr )
+        const Tissue_prestress * const &ps_ptr )
     {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
     virtual void Assem_Tangent_Residual(
@@ -743,7 +743,7 @@ class IPGAssem
         const ALocal_NBC * const &nbc_p,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
-        const Prestress_solid * const &ps_ptr )
+        const Tissue_prestress * const &ps_ptr )
         {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
     // Assembly in prestress generation
@@ -769,7 +769,7 @@ class IPGAssem
         const ALocal_NBC * const &nbc_p,
         const ALocal_EBC * const &ebc_v,
         const ALocal_EBC * const &ebc_p,
-        const Prestress_solid * const &ps_ptr )
+        const Tissue_prestress * const &ps_ptr )
         {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
     // --------------------------------------------------------------
@@ -911,7 +911,7 @@ class IPGAssem
         const IQuadPts * const &quad,
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
-        Prestress_solid * const &ps_ptr ) const
+        Tissue_prestress * const &ps_ptr ) const
     {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
 
     // Update solid prestress at all volumetric quadrature points (in tet4_fsi) 
@@ -925,7 +925,7 @@ class IPGAssem
         const ALocal_IEN * const &lien_v,
         const ALocal_IEN * const &lien_p,
         const FEANode * const &fnode_ptr,
-        Prestress_solid * const &ps_ptr ) const
+        Tissue_prestress * const &ps_ptr ) const
     {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
 
 };

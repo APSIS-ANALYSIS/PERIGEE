@@ -211,7 +211,7 @@ int main( int argc, char *argv[] )
 
   ALocal_NBC * locnbc_p = new ALocal_NBC(part_p_file, rank, "/nbc/MF");
 
-  Prestress_solid * ps_data = new Prestress_solid(locElem, nqp_tet, rank, is_load_ps, ps_file_name);  
+  Tissue_prestress * ps_data = new Tissue_prestress(locElem, nqp_tet, rank, is_load_ps, ps_file_name);  
   SYS_T::commPrint("===> Mesh HDF5 files are read from disk.\n");
 
   // Group APart_Node and ALocal_NBC into a vector

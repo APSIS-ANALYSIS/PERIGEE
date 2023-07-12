@@ -1,6 +1,6 @@
-#include "Prestress_solid.hpp"
+#include "Tissue_prestress.hpp"
 
-Prestress_solid::Prestress_solid( 
+Tissue_prestress::Tissue_prestress( 
     const ALocal_Elem * const &locelem, const int &in_nqp_tet, 
     const int &in_cpu_rank, const bool &load_from_file,
     const std::string &in_ps_fName )
@@ -40,7 +40,7 @@ Prestress_solid::Prestress_solid(
 
         const int ps_size = ps_h5r -> read_intScalar("/", "ps_array_size"); 
 
-        SYS_T::print_fatal_if(ps_size != counter_elem_s * nqp * 6, "Error: Prestress_solid the HDF5 file for prestress is incompatible with the local solid element number.\n");
+        SYS_T::print_fatal_if(ps_size != counter_elem_s * nqp * 6, "Error: Tissue_prestress the HDF5 file for prestress is incompatible with the local solid element number.\n");
 
         qua_ps_array = ps_h5r -> read_doubleVector("/", "prestress");
 
@@ -65,30 +65,30 @@ Prestress_solid::Prestress_solid(
   }// Finish initializing the prestress data structure
 }
 
-Prestress_solid::~Prestress_solid()
+Tissue_prestress::~Tissue_prestress()
 {
   for(int ee=0; ee<nlocalele; ++ee) VEC_T::clean( qua_prestress[ee] );
 
   VEC_T::clean( qua_prestress );
 }
 
-std::vector<double> Prestress_solid::get_prestress( const int &ee ) const
+std::vector<double> Tissue_prestress::get_prestress( const int &ee ) const
 {
   return qua_prestress[ee];
 }
 
-std::array<double,6> Prestress_solid::get_prestress( const int &ee, const int &qua ) const
+std::array<double,6> Tissue_prestress::get_prestress( const int &ee, const int &qua ) const
 {
   return {{ qua_prestress[ee][6*qua], qua_prestress[ee][6*qua+1], qua_prestress[ee][6*qua+2],
     qua_prestress[ee][6*qua+3], qua_prestress[ee][6*qua+4], qua_prestress[ee][6*qua+5] }};
 }
 
-void Prestress_solid::add_prestress( const int &ee, const double * const &in_psval )
+void Tissue_prestress::add_prestress( const int &ee, const double * const &in_psval )
 {
   for(int ii=0; ii<6*nqp; ++ii) qua_prestress[ee][ii] += in_psval[ii];
 }
 
-void Prestress_solid::add_prestress( const int &ee, const int &qua, 
+void Tissue_prestress::add_prestress( const int &ee, const int &qua, 
     const double * const &in_psval )
 {
   qua_prestress[ee][qua*6  ] += in_psval[0];
@@ -99,7 +99,7 @@ void Prestress_solid::add_prestress( const int &ee, const int &qua,
   qua_prestress[ee][qua*6+5] += in_psval[5];
 }
 
-void Prestress_solid::print_info() const
+void Tissue_prestress::print_info() const
 {
   for(int ee=0; ee<nlocalele; ++ee)
   {
@@ -109,7 +109,7 @@ void Prestress_solid::print_info() const
   }
 }
 
-void Prestress_solid::write_prestress_hdf5() const
+void Tissue_prestress::write_prestress_hdf5() const
 {
   // Prepare the data to be reccorded
   std::vector<double> qua_prestress_array;

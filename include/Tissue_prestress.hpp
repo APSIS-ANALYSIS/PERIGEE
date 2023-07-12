@@ -1,7 +1,7 @@
-#ifndef PRESTRESS_SOLID_HPP
-#define PRESTRESS_SOLID_HPP
+#ifndef TISSUE_PRESTRESS_HPP
+#define TISSUE_PRESTRESS_HPP
 // ============================================================================
-// Prestress_solid.hpp
+// Tissue_prestress.hpp
 //
 // This class stores the values of the pre-stresses at quadrature points. 
 // Pre-stress contains 6 components for the symmetric stress tensor.
@@ -13,14 +13,14 @@
 #include "HDF5_Writer.hpp"
 #include "ALocal_Elem.hpp"
 
-class Prestress_solid
+class Tissue_prestress
 {
   public:
-    Prestress_solid( const ALocal_Elem * const &locelem, const int &in_nqp_tet,
+    Tissue_prestress( const ALocal_Elem * const &locelem, const int &in_nqp_tet,
        const int &in_cpu_rank, const bool &load_from_file,
        const std::string &in_ps_fName = "prestress" );
 
-    virtual ~Prestress_solid();
+    virtual ~Tissue_prestress();
 
     // ------------------------------------------------------------------------
     // Input: ee the element index

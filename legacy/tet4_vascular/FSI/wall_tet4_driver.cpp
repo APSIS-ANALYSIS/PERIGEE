@@ -164,7 +164,7 @@ int main( int argc, char *argv[] )
 
   APart_Node * pNode = new APart_Node_FSI(part_file, rank);
 
-  Prestress_solid * ps_data = new Prestress_solid( locElem, nqp_tet, rank, is_load_ps, "prestress" );
+  Tissue_prestress * ps_data = new Tissue_prestress( locElem, nqp_tet, rank, is_load_ps, "prestress" );
 
   SYS_T::commPrint("===> Mesh HDF5 files are read from disk.\n");
 

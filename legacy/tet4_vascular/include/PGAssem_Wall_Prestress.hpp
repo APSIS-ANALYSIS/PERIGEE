@@ -74,7 +74,7 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
-        const Prestress_solid * const &ps_ptr );
+        const Tissue_prestress * const &ps_ptr );
 
     virtual void Assem_tangent_residual(
         const PDNSolution * const &dot_sol,
@@ -94,7 +94,7 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
-        const Prestress_solid * const &ps_ptr );
+        const Tissue_prestress * const &ps_ptr );
 
     // Update the solid prestress at quadrature points
     virtual void Update_Wall_Prestress(
@@ -105,7 +105,7 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const IQuadPts * const &quad,
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
-        Prestress_solid * const &ps_ptr ) const;
+        Tissue_prestress * const &ps_ptr ) const;
 
   private:
     // Private data

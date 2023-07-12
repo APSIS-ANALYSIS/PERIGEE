@@ -188,7 +188,7 @@ void PGAssem_FSI::Assem_mass_residual(
     const ALocal_NBC * const &nbc_v,
     const ALocal_NBC * const &nbc_p,
     const ALocal_EBC * const &ebc_part,
-    const Prestress_solid * const &ps_ptr )
+    const Tissue_prestress * const &ps_ptr )
 {
   const int nElem = alelem_ptr->get_nlocalele();
 
@@ -291,7 +291,7 @@ void PGAssem_FSI::Assem_Residual(
     const ALocal_NBC * const &nbc_p,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc,
-    const Prestress_solid * const &ps_ptr )
+    const Tissue_prestress * const &ps_ptr )
 {
   const int nElem = alelem_ptr->get_nlocalele();
 
@@ -401,7 +401,7 @@ void PGAssem_FSI::Assem_Tangent_Residual(
     const ALocal_NBC * const &nbc_p,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc,
-    const Prestress_solid * const &ps_ptr )
+    const Tissue_prestress * const &ps_ptr )
 {
   const int nElem = alelem_ptr->get_nlocalele();
 

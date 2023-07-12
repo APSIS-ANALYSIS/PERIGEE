@@ -71,7 +71,7 @@ class PGAssem_FSI_FEM : public IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
-        const Prestress_solid * const &ps_ptr );
+        const Tissue_prestress * const &ps_ptr );
 
 
     virtual void Assem_residual(
@@ -94,7 +94,7 @@ class PGAssem_FSI_FEM : public IPGAssem
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
-        const Prestress_solid * const &ps_ptr );
+        const Tissue_prestress * const &ps_ptr );
 
 
     virtual void Assem_tangent_residual(
@@ -117,7 +117,7 @@ class PGAssem_FSI_FEM : public IPGAssem
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
-        const Prestress_solid * const &ps_ptr );
+        const Tissue_prestress * const &ps_ptr );
 
     // Assembly routine for the surface integrals for flow rates
     // and averaged pressure

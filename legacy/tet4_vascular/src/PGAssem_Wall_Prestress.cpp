@@ -373,7 +373,7 @@ void PGAssem_Wall_Prestress::Assem_residual(
     const FEANode * const &fnode_ptr,
     const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
-    const Prestress_solid * const &ps_ptr )
+    const Tissue_prestress * const &ps_ptr )
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
@@ -439,7 +439,7 @@ void PGAssem_Wall_Prestress::Assem_tangent_residual(
     const FEANode * const &fnode_ptr,
     const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
-    const Prestress_solid * const &ps_ptr )
+    const Tissue_prestress * const &ps_ptr )
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
@@ -537,7 +537,7 @@ void PGAssem_Wall_Prestress::Update_Wall_Prestress(
     const IQuadPts * const &quad,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
-    Prestress_solid * const &ps_ptr ) const
+    Tissue_prestress * const &ps_ptr ) const
 {
   double * array = new double [nlgn * dof_sol];
   double * local = new double [nLocBas * dof_sol];
