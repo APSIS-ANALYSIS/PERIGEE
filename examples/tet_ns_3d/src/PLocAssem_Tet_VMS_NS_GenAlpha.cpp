@@ -78,10 +78,8 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::print_info() const
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::get_metric(
-    const double * const &f,
-    double &G11, double &G12, double &G13,
-    double &G22, double &G23, double &G33 ) const
+SymmMatrix_3x3 PLocAssem_Tet_VMS_NS_GenAlpha::get_metric(
+    const std::array<double, 9> &f ) const
 {
   // PHASTA definition 
   const double coef = 0.6299605249474365;
@@ -98,31 +96,34 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_metric(
   const double fk7 = diag * f[5] + offd * (f[2] + f[8]);
   const double fk8 = diag * f[8] + offd * (f[2] + f[5]);
 
-  G11 = coef * ( fk0 * f[0] + fk1 * f[3] + fk2 * f[6] );
-  G12 = coef * ( fk0 * f[1] + fk1 * f[4] + fk2 * f[7] );
-  G13 = coef * ( fk0 * f[2] + fk1 * f[5] + fk2 * f[8] );
-  G22 = coef * ( fk3 * f[1] + fk4 * f[4] + fk5 * f[7] );
-  G23 = coef * ( fk3 * f[2] + fk4 * f[5] + fk5 * f[8] );
-  G33 = coef * ( fk6 * f[2] + fk7 * f[5] + fk8 * f[8] );
+  return SymmMatrix_3x3( coef * ( fk0 * f[0] + fk1 * f[3] + fk2 * f[6] ),
+  coef * ( fk3 * f[1] + fk4 * f[4] + fk5 * f[7] ),
+  coef * ( fk6 * f[2] + fk7 * f[5] + fk8 * f[8] ),
+  coef * ( fk3 * f[2] + fk4 * f[5] + fk5 * f[8] ),
+  coef * ( fk0 * f[2] + fk1 * f[5] + fk2 * f[8] ),
+  coef * ( fk0 * f[1] + fk1 * f[4] + fk2 * f[7] ) );
+  // G11 = coef * ( fk0 * f[0] + fk1 * f[3] + fk2 * f[6] );
+  // G12 = coef * ( fk0 * f[1] + fk1 * f[4] + fk2 * f[7] );
+  // G13 = coef * ( fk0 * f[2] + fk1 * f[5] + fk2 * f[8] );
+  // G22 = coef * ( fk3 * f[1] + fk4 * f[4] + fk5 * f[7] );
+  // G23 = coef * ( fk3 * f[2] + fk4 * f[5] + fk5 * f[8] );
+  // G33 = coef * ( fk6 * f[2] + fk7 * f[5] + fk8 * f[8] );
 }
 
 
 void PLocAssem_Tet_VMS_NS_GenAlpha::get_tau(
     double &tau_m_qua, double &tau_c_qua,
-    const double &dt, const double * const &dxi_dx,
+    const double &dt, const std::array<double, 9> &dxi_dx,
     const double &u, const double &v, const double &w ) const
 {
-  // Use K matrix to correct the metric
-  double G11, G12, G13, G22, G23, G33;
-  get_metric( dxi_dx, G11, G12, G13, G22, G23, G33 );
+  const SymmMatrix_3x3 G = get_metric( dxi_dx );
 
-  const double GdG = G11 * G11 + 2.0 * G12 * G12 + 2.0 * G13 * G13
-    + G22 * G22 + 2.0 * G23 * G23 + G33 * G33;
+  const double GdG = G.MatContraction( G );
 
-  const double uGu = G11 * u * u + 2.0 * G12 * u * v + 2.0 * G13 * u * w
-    + G22 * v * v + 2.0 * G23 * v * w + G33 * w * w;
+  const Vector_3 velo_vec( u, v, w );
+  const double uGu = G.VecMatVec( velo_vec, velo_vec);
 
-  const double g_dot_g = G11 + G22 + G33;
+  const double g_dot_g = G.tr();
 
   const double temp_nu = vis_mu / rho0;
 
@@ -137,7 +138,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_tau(
 
 
 void PLocAssem_Tet_VMS_NS_GenAlpha::get_DC(
-    double &dc_tau, const double * const &dxi_dx,
+    double &dc_tau, const std::array<double, 9> &dxi_dx,
     const double &u, const double &v, const double &w ) const
 {
   // double G11, G12, G13, G22, G23, G33;
@@ -190,8 +191,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
     element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
         &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
 
-    double dxi_dx[9];
-    element->get_invJacobian( qua, dxi_dx );
+    const std::array<double, 9> dxi_dx = element->get_invJacobian(qua);
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -367,8 +367,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
         &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
 
-    double dxi_dx[9];
-    element->get_invJacobian( qua, dxi_dx );
+    const std::array<double, 9> dxi_dx = element->get_invJacobian( qua );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
