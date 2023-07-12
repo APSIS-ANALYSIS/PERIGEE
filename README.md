@@ -1,4 +1,5 @@
-# PERIGEE
+<img src="./docs/PERIGEE-logo.png"  width="32%" height="32%"> 
+
 PERIGEE is a nonlinear dynamic finite element analysis code for multiphysics simulations. The code has been developed with the goal of providing an object-oriented framework for parallel implementation of multiphysics problems. Copyright and licensing information can be found in files [LICENSE](LICENSE).
 
 ## Table of Contents
@@ -67,6 +68,11 @@ Reference: J. Liu, W. Yang, I.S. Lan, and A.L. Marsden, "Fluid-structure interac
 ### Theory
 * J. Liu and A.L. Marsden, [A unified continuum and variational multiscale formulation for fluids, solids, and fluid-structure interaction](https://doi.org/10.1016/j.cma.2018.03.045), Computer Methods in Applied Mechanics and Engineering, 337:549-597, 2018.
 * I.S. Lan, J. Liu, W. Yang, and A.L. Marsden, [A reduced unified continuum formulation for vascular fluid-structure interaction](https://doi.org/10.1016/j.cma.2022.114852), Computer Methods in Applied Mechanics and Engineering, 394:114852, 2022.
+* J. Liu, I.S. Lan, O.Z. Tikenogullari, and A.L. Marsden, [A note on the accuracy of the generalized-α scheme for the incompressible Navier-Stokes equations](https://doi.org/10.1002/nme.6550), International Journal for Numerical Methods in Engineering, 122:638-651, 2021.
+
+### Validation
+* I.S. Lan, J. Liu, W. Yang, J. Zimmermann, D.B. Ennis, and A.L. Marsden, [Validation of the reduced unified continuum formulation against in vitro 4D-flow MRI](https://doi.org/10.1007/s10439-022-03038-4), Annals of Biomedical Engineering, 51:377-393, 2023.
+* J. Liu, W. Yang, I.S. Lan, and A.L. Marsden, [Fluid-structure interaction modeling of blood flow in the pulmonary arteries using the unified continuum and variational multiscale formulation](https://doi.org/10.1016/j.mechrescom.2020.103556), Mechanics Research Communications, 107:103556, 2020.
 
 ### HPC
 * D. Goldberg, What every computer scientist should know about floating-point arithmetic.
@@ -78,3 +84,8 @@ Reference: J. Liu, W. Yang, I.S. Lan, and A.L. Marsden, "Fluid-structure interac
 
 ## Contact
 Ju Liu, liujuy@gmail.com, liuj36@sustech.edu.cn
+
+## Acknowledgement
+National Natural Science Foundation of China, Grant number 12172160
+
+<img src="./docs/NSFC_logo.png"  width="16%" height="16%"> 
