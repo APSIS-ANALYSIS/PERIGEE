@@ -19,12 +19,13 @@ Please go through the following steps to install external libraries.
 ```sh
 export MACHINE_NAME=sherlock
 ```
-Additionally, because VTK is typically installed as a shared library in a non-standard folder, one has to edit the `LD_LIBRARY_PATH` environmental variable for the linker. So you will have to edit the `LD_LIBRARY_PATH` variable as above to tell the computer how to locate the VTK libraries. For more information on this environmental variable, see [here](http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html).
+Since VTK is typically installed as a shared library in a non-standard folder, one has to edit the `LD_LIBRARY_PATH` environmental variable for the linker to locate the .so files. Open the `.bash_profile` or `.bashrc` file and edit the `LD_LIBRARY_PATH` variable. See below is an example with my VTK installed at `/Users/juliu/lib/VTK-8.2.0/`.
 
 ```sh
-export LD_LIBRARY_PATH=/home/groups/amarsden/lib-perigee/VTK-7.1.1-shared/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/Users/juliu/lib/VTK-8.2.0/lib:$LD_LIBRARY_PATH
 ```
- 
+For more information on this environmental variable, see [here](http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html).
+
 3. After the libraries are installed, add or modify the configuration file in the [conf](conf) folder, following the steps [here](docs/configure_perigee_guide.md).
 
 
@@ -88,4 +89,4 @@ Ju Liu, liujuy@gmail.com, liuj36@sustech.edu.cn
 ## Acknowledgement
 National Natural Science Foundation of China, Grant number 12172160
 
-<img src="./docs/NSFC_logo.png"  width="20%" height="20%"> 
+<img src="./docs/NSFC_logo.png"  width="25%" height="25%"> 
