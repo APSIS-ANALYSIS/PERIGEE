@@ -19,29 +19,30 @@ Please go through the following steps to install external libraries.
 ```sh
 export MACHINE_NAME=sherlock
 ```
-Additionally, because VTK is typically installed as a shared library in a non-standard folder, one has to edit the `LD_LIBRARY_PATH` environmental variable for the linker. So you will have to edit the `LD_LIBRARY_PATH` variable as above to tell the computer how to locate the VTK libraries. For more information on this environmental variable, see [here](http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html).
+Since VTK is typically installed as a shared library in a non-standard folder, one has to edit the `LD_LIBRARY_PATH` environmental variable for the linker to locate the .so files. Open the `.bash_profile` or `.bashrc` file and edit the `LD_LIBRARY_PATH` variable. See below is an example with my VTK installed at `/Users/juliu/lib/VTK-8.2.0/`.
 
 ```sh
-export LD_LIBRARY_PATH=/home/groups/amarsden/lib-perigee/VTK-7.1.1-shared/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/Users/juliu/lib/VTK-8.2.0/lib:$LD_LIBRARY_PATH
 ```
- 
+For more information on this environmental variable, see [here](http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html).
+
 3. After the libraries are installed, add or modify the configuration file in the [conf](conf) folder, following the steps [here](docs/configure_perigee_guide.md).
 
 
 ## Build
 First, create a folder `build` out of the source directory. Enter that folder, and run the following commands to build, as an example, a suite of heat equation solvers.
 ```sh
-CMake ~/PERIGEE/examples/nonlinear_heat_eqn/
+CMake ~/PERIGEE/examples/transport/
 ```
-CMake will print some information on screen. Pay a look at the variable `CMAKE_BUILD_TYPE`. If its value is `Debug`, this means your code will be compiled in the debug mode. If you are not developing the code and wants to make the code faster, run CMake as follows,
+CMake will print some information on the screen. Pay a look at the variable `CMAKE_BUILD_TYPE`. If its value is `Debug`, this means your code will be compiled in the debug mode. If you want to make the code faster, run CMake as follows,
 ```sh
-CMake ~/PERIGEE/examples/nonlinear_heat_eqn/ -DCMAKE_BUILD_TYPE=Release
+CMake ~/PERIGEE/examples/transport/ -DCMAKE_BUILD_TYPE=Release
 ```
-Now the value of `CMAKE_BUILD_TYPE` is set to `Release`. The code will be compiled in the optimized mode. For more information about the compiler, please refer to [this](https://stackoverflow.com/questions/48754619/what-are-cmake-build-type-debug-release-relwithdebinfo-and-minsizerel/48755129). Of course, a fully optimized code requires that your external libraries, especially PETSc, are compiled in the optimized mode. See the [advanced guide](docs/install-advanced.md) to learn how to build libraries in optimal mode. CMake will generate the Makefile for you and you just need to run the following command to compile the source code.
+Now the value of `CMAKE_BUILD_TYPE` is set to `Release`. The code will be compiled in the optimized mode. For more information about the compiler, please refer to [this](https://stackoverflow.com/questions/48754619/what-are-cmake-build-type-debug-release-relwithdebinfo-and-minsizerel/48755129). Of course, a fully optimized code requires that your external libraries, especially PETSc, are compiled in the optimized mode also. Refer to the [advanced guide](docs/install-advanced.md) to learn how to build libraries in a release mode. After CMake generates the Makefile for you, you just need to run the following command to compile the source code.
 ```sh
 make
 ```
-Of course you may add `-j2` to run Makefile with 2 threads. If the make complains about the auto keyword or the nullptr, your default compiler does not support C++11. You may add `SET(CMAKE_CXX_STANDARD 11)` in your .cmake configuration file to enforce the C++11 standard. 
+Of course, you may add `-j2` to run Makefile with 2 threads. If the make complains about the auto keyword or the nullptr, your default compiler does not support C++11. You may add `SET(CMAKE_CXX_STANDARD 11)` in your .cmake configuration file to enforce the C++11 standard. 
 
 ## Tutorial
 In general, one has to go through the following steps for simulation.
@@ -70,7 +71,8 @@ Reference: J. Liu, W. Yang, I.S. Lan, and A.L. Marsden, "Fluid-structure interac
 * I.S. Lan, J. Liu, W. Yang, and A.L. Marsden, [A reduced unified continuum formulation for vascular fluid-structure interaction](https://doi.org/10.1016/j.cma.2022.114852), Computer Methods in Applied Mechanics and Engineering, 394:114852, 2022.
 * J. Liu, I.S. Lan, O.Z. Tikenogullari, and A.L. Marsden, [A note on the accuracy of the generalized-α scheme for the incompressible Navier-Stokes equations](https://doi.org/10.1002/nme.6550), International Journal for Numerical Methods in Engineering, 122:638-651, 2021.
 
-### Validation
+### Verification & Validation
+* J. Liu, W. Yang, M. Dong, and A.L. Marsden, [The nested block preconditioning technique for the incompressible Navier-Stokes equations with emphasis on hemodynamic simulations](https://doi.org/10.1016/j.cma.2020.113122), Computer Methods in Applied Mechanics and Engineering, 367:113122, 2020.
 * I.S. Lan, J. Liu, W. Yang, J. Zimmermann, D.B. Ennis, and A.L. Marsden, [Validation of the reduced unified continuum formulation against in vitro 4D-flow MRI](https://doi.org/10.1007/s10439-022-03038-4), Annals of Biomedical Engineering, 51:377-393, 2023.
 * J. Liu, W. Yang, I.S. Lan, and A.L. Marsden, [Fluid-structure interaction modeling of blood flow in the pulmonary arteries using the unified continuum and variational multiscale formulation](https://doi.org/10.1016/j.mechrescom.2020.103556), Mechanics Research Communications, 107:103556, 2020.
 
@@ -83,9 +85,9 @@ Reference: J. Liu, W. Yang, I.S. Lan, and A.L. Marsden, "Fluid-structure interac
 * [Google C++ Style](https://google.github.io/styleguide/cppguide.html).
 
 ## Contact
-Ju Liu, liujuy@gmail.com, liuj36@sustech.edu.cn
+Dr. Ju Liu, liujuy@gmail.com, liuj36@sustech.edu.cn
 
 ## Acknowledgement
 National Natural Science Foundation of China, Grant number 12172160
 
-<img src="./docs/NSFC_logo.png"  width="20%" height="20%"> 
+<img src="./docs/NSFC_logo.png"  width="22%" height="22%"> 
