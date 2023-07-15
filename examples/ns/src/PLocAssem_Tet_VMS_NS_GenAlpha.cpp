@@ -102,12 +102,6 @@ SymmMatrix_3x3 PLocAssem_Tet_VMS_NS_GenAlpha::get_metric(
   coef * ( fk3 * f[2] + fk4 * f[5] + fk5 * f[8] ),
   coef * ( fk0 * f[2] + fk1 * f[5] + fk2 * f[8] ),
   coef * ( fk0 * f[1] + fk1 * f[4] + fk2 * f[7] ) );
-  // G11 = coef * ( fk0 * f[0] + fk1 * f[3] + fk2 * f[6] );
-  // G12 = coef * ( fk0 * f[1] + fk1 * f[4] + fk2 * f[7] );
-  // G13 = coef * ( fk0 * f[2] + fk1 * f[5] + fk2 * f[8] );
-  // G22 = coef * ( fk3 * f[1] + fk4 * f[4] + fk5 * f[7] );
-  // G23 = coef * ( fk3 * f[2] + fk4 * f[5] + fk5 * f[8] );
-  // G33 = coef * ( fk6 * f[2] + fk7 * f[5] + fk8 * f[8] );
 }
 
 
@@ -166,7 +160,8 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  double tau_m, tau_c, tau_dc;
+  double tau_m, tau_c;
+  double tau_dc = 0.0;
 
   const double two_mu = 2.0 * vis_mu;
 
@@ -190,8 +185,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
 
     element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
         &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
-
-    const std::array<double, 9> dxi_dx = element->get_invJacobian(qua);
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -239,24 +232,22 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
     }
 
     // Get the tau_m and tau_c
-    get_tau(tau_m, tau_c, dt, dxi_dx, u, v, w);
+    get_tau(tau_m, tau_c, dt, element->get_invJacobian(qua), u, v, w);
 
     const double tau_m_2 = tau_m * tau_m;
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
     // Get the body force
-    double f1, f2, f3;
-
-    get_f(coor_x, coor_y, coor_z, curr, f1, f2, f3);
+    const Vector_3 f_body = get_f( coor_x, coor_y, coor_z, curr );
 
     const double u_lap = u_xx + u_yy + u_zz;
     const double v_lap = v_xx + v_yy + v_zz;
     const double w_lap = w_xx + w_yy + w_zz;
 
-    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f1 ) + p_x - vis_mu * u_lap;
-    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f2 ) + p_y - vis_mu * v_lap;
-    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f3 ) + p_z - vis_mu * w_lap;
+    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f_body.x() ) + p_x - vis_mu * u_lap;
+    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f_body.y() ) + p_y - vis_mu * v_lap;
+    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f_body.z() ) + p_z - vis_mu * w_lap;
 
     const double div_vel = u_x + v_y + w_z;
 
@@ -269,7 +260,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
     const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
     
     // Get the Discontinuity Capturing tau
-    get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
+    // get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
 
     for(int A=0; A<nLocBas; ++A)
     {
@@ -292,7 +283,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * rx
           + velo_prime_dot_gradR * tau_dc 
           * (u_prime * u_x + v_prime * u_y + w_prime * u_z)
-          - NA * rho0 * f1 );
+          - NA * rho0 * f_body.x() );
 
       Residual[4*A+2] += gwts * ( NA * rho0 * v_t
           + NA * rho0 * (u * v_x + v * v_y + w * v_z)
@@ -306,7 +297,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * ry
           + velo_prime_dot_gradR * tau_dc
           * (u_prime * v_x + v_prime * v_y + w_prime * v_z)
-          - NA * rho0 * f2 );
+          - NA * rho0 * f_body.y() );
 
       Residual[4*A+3] += gwts * (NA * rho0 * w_t
           + NA * rho0 * (u * w_x + v * w_y + w * w_z)
@@ -320,7 +311,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * rz
           + velo_prime_dot_gradR * tau_dc
           * (u_prime * w_x + v_prime * w_y + w_prime * w_z)
-          - NA * rho0 * f3 );
+          - NA * rho0 * f_body.z() );
     }
   }
 }
@@ -338,7 +329,8 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  double tau_m, tau_c, tau_dc;
+  double tau_m, tau_c;
+  double tau_dc = 0.0;
 
   const double two_mu = 2.0 * vis_mu;
 
@@ -366,8 +358,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
     element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
         &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
-
-    const std::array<double, 9> dxi_dx = element->get_invJacobian( qua );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -414,23 +404,21 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
       coor_z += eleCtrlPts_z[ii] * R[ii];
     }
 
-    get_tau(tau_m, tau_c, dt, dxi_dx, u, v, w);
+    get_tau(tau_m, tau_c, dt, element->get_invJacobian(qua), u, v, w);
 
     const double tau_m_2 = tau_m * tau_m;
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua); 
 
-    double f1, f2, f3;
-
-    get_f(coor_x, coor_y, coor_z, curr, f1, f2, f3);
+    const Vector_3 f_body = get_f( coor_x, coor_y, coor_z, curr );
 
     const double u_lap = u_xx + u_yy + u_zz;
     const double v_lap = v_xx + v_yy + v_zz;
     const double w_lap = w_xx + w_yy + w_zz;
 
-    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f1 ) + p_x - vis_mu * u_lap;
-    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f2 ) + p_y - vis_mu * v_lap ;
-    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f3 ) + p_z - vis_mu * w_lap;
+    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f_body.x() ) + p_x - vis_mu * u_lap;
+    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f_body.y() ) + p_y - vis_mu * v_lap ;
+    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f_body.z() ) + p_z - vis_mu * w_lap;
 
     const double div_vel = u_x + v_y + w_z;
 
@@ -442,7 +430,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     const double r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
     const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
     
-    get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
+    // get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
 
     for(int A=0; A<nLocBas; ++A)
     {
@@ -466,7 +454,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * rx
           + velo_prime_dot_gradR * tau_dc 
           * (u_prime * u_x + v_prime * u_y + w_prime * u_z)
-          - NA * rho0 * f1 );
+          - NA * rho0 * f_body.x() );
 
       Residual[4*A+2] += gwts * ( NA * rho0 * v_t
           + NA * rho0 * (u * v_x + v * v_y + w * v_z)
@@ -480,7 +468,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * ry
           + velo_prime_dot_gradR * tau_dc
           * (u_prime * v_x + v_prime * v_y + w_prime * v_z)
-          - NA * rho0 * f2 );
+          - NA * rho0 * f_body.y() );
 
       Residual[4*A+3] += gwts * (NA * rho0 * w_t
           + NA * rho0 * (u * w_x + v * w_y + w * w_z)
@@ -494,7 +482,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
           - r_dot_gradR * tau_m_2 * rho0 * rz
           + velo_prime_dot_gradR * tau_dc
           * (u_prime * w_x + v_prime * w_y + w_prime * w_z)
-          - NA * rho0 * f3 );
+          - NA * rho0 * f_body.z() );
 
       for(int B=0; B<nLocBas; ++B)
       {
@@ -747,9 +735,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
-    double f1, f2, f3;
-
-    get_f(coor_x, coor_y, coor_z, curr, f1, f2, f3);
+    const Vector_3 f_body = get_f( coor_x, coor_y, coor_z, curr );
 
     for(int A=0; A<nLocBas; ++A)
     {
@@ -760,21 +746,21 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
           + two_mu * NA_x * u_x
           + vis_mu * NA_y * (u_y + v_x)
           + vis_mu * NA_z * (u_z + w_x)
-          - NA * rho0 * f1 );
+          - NA * rho0 * f_body.x() );
 
       Residual[4*A+2] += gwts * ( NA * rho0 * (u*v_x + v*v_y + w*v_z) 
           - NA_y * p
           + vis_mu * NA_x * (u_y + v_x)
           + two_mu * NA_y * v_y
           + vis_mu * NA_z * (v_z + w_y)
-          - NA * rho0 * f2 );
+          - NA * rho0 * f_body.y() );
 
       Residual[4*A+3] += gwts * ( NA * rho0 * (u*w_x + v*w_y + w*w_z) 
           - NA_z * p
           + vis_mu * NA_x * (u_z + w_x)
           + vis_mu * NA_y * (w_y + v_z)
           + two_mu * NA_z * w_z
-          - NA * rho0 * f3 );
+          - NA * rho0 * f_body.z() );
 
       for(int B=0; B<nLocBas; ++B)
       {
