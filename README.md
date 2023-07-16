@@ -53,7 +53,7 @@ In general, one has to go through the following steps for simulation.
 * Run a postprocessor in parallel. Often, this step refers to the visualization of the solutions. The visualzation routine will read the binary solution files and write the data into (parallel) vtu/vtp format. Then the data can be visualized in Paraview.
 
 ## Simulation Samples
-The vortex-induced vibration of an elastic plate with Re $\approx$ 3 $\times$ 10^4. The mesh consists of 18 million linear tetrahedral elements for the fluid and 0.7 million elements for the solid. The variational multiscale formulation provides the LES technique in the flow problem, and the time integration is based on the generalized-$\alpha$ scheme.
+The vortex-induced vibration of an elastic plate with Re $\approx$ 3 $\times$ 10^4. The mesh consists of 18 million linear tetrahedral elements for the fluid and 0.7 million elements for the solid. The variational multiscale formulation provides the LES technique in the flow problem, and the time integration is based on the generalized-&alpha; scheme.
 
 [![Pulmonary CFD](http://img.youtube.com/vi/Vc4Dnm9yeWE/0.jpg)](https://www.youtube.com/watch?v=Vc4Dnm9yeWE "Vortex induced vibration")
 
