@@ -166,7 +166,7 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
 
     // Return tau_bar := (v' G v')^-0.5 x rho0, 
     //        which scales like Time x Density
-    void get_DC( double &dc_tau, const std::array<double, 9> &dxi_dx,
+    double get_DC( const std::array<double, 9> &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
     Vector_3 get_f(const double &x, const double &y, const double &z,

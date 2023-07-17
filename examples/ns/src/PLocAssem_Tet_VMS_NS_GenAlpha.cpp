@@ -117,22 +117,20 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_tau(
   const Vector_3 velo_vec( u, v, w );
   const double uGu = G.VecMatVec( velo_vec, velo_vec);
 
-  const double g_dot_g = G.tr();
-
   const double temp_nu = vis_mu / rho0;
 
   const double denom_m = CT / (dt*dt) + uGu + CI * temp_nu * temp_nu * GdG;
 
   tau_m_qua = 1.0 / ( rho0 * sqrt(denom_m) );
 
-  const double denom_c = tau_m_qua * g_dot_g;
+  const double denom_c = tau_m_qua * G.tr();
 
   tau_c_qua = Ctauc / denom_c;
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::get_DC(
-    double &dc_tau, const std::array<double, 9> &dxi_dx,
+double PLocAssem_Tet_VMS_NS_GenAlpha::get_DC(
+    const std::array<double, 9> &dxi_dx,
     const double &u, const double &v, const double &w ) const
 {
   // double G11, G12, G13, G22, G23, G33;
@@ -144,7 +142,9 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_DC(
   // if(dc_tau > 1.0e-15) dc_tau = rho0 * std::pow(dc_tau, -0.5);
   // else dc_tau = 0.0;
 
-  dc_tau = 0.0;
+  const double dc_tau = 0.0;
+
+  return dc_tau;
 }
 
 
@@ -159,9 +159,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
     const IQuadPts * const &quad )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  double tau_m, tau_c;
-  double tau_dc = 0.0;
 
   const double two_mu = 2.0 * vis_mu;
 
@@ -232,7 +229,11 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
     }
 
     // Get the tau_m and tau_c
-    get_tau(tau_m, tau_c, dt, element->get_invJacobian(qua), u, v, w);
+    double tau_m, tau_c;
+    
+    const auto dxi_dx = element->get_invJacobian(qua);
+
+    get_tau(tau_m, tau_c, dt, dxi_dx, u, v, w);
 
     const double tau_m_2 = tau_m * tau_m;
 
@@ -260,7 +261,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
     const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
     
     // Get the Discontinuity Capturing tau
-    // get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
+    const tau_dc = get_DC( dxi_dx, u_prime, v_prime, w_prime );
 
     for(int A=0; A<nLocBas; ++A)
     {
