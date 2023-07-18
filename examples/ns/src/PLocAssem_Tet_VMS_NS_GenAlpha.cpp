@@ -133,11 +133,9 @@ double PLocAssem_Tet_VMS_NS_GenAlpha::get_DC(
     const std::array<double, 9> &dxi_dx,
     const double &u, const double &v, const double &w ) const
 {
-  // double G11, G12, G13, G22, G23, G33;
-  // get_metric( dxi_dx, G11, G12, G13, G22, G23, G33 );
-
-  // dc_tau = G11 * u * u + 2.0 * G12 * u * v + 2.0 * G13 * u * w + G22 * v * v
-  //   + 2.0 * G23 * v * w + G33 * w * w;
+  // const SymmMatrix_3x3 G = get_metric( dxi_dx );
+  // const Vector_3 velo_vec{ u, v, w };
+  // double dc_tau = G.VecMatVec( velo_vec, velo_vec );
 
   // if(dc_tau > 1.0e-15) dc_tau = rho0 * std::pow(dc_tau, -0.5);
   // else dc_tau = 0.0;
@@ -261,7 +259,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
     const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
     
     // Get the Discontinuity Capturing tau
-    const tau_dc = get_DC( dxi_dx, u_prime, v_prime, w_prime );
+    const double tau_dc = get_DC( dxi_dx, u_prime, v_prime, w_prime );
 
     for(int A=0; A<nLocBas; ++A)
     {
@@ -329,9 +327,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     const IQuadPts * const &quad )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  double tau_m, tau_c;
-  double tau_dc = 0.0;
 
   const double two_mu = 2.0 * vis_mu;
 
@@ -405,7 +400,11 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
       coor_z += eleCtrlPts_z[ii] * R[ii];
     }
 
-    get_tau(tau_m, tau_c, dt, element->get_invJacobian(qua), u, v, w);
+    double tau_m, tau_c;
+
+    const auto dxi_dx = element->get_invJacobian(qua);
+
+    get_tau(tau_m, tau_c, dt, dxi_dx, u, v, w);
 
     const double tau_m_2 = tau_m * tau_m;
 
@@ -431,7 +430,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     const double r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
     const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
     
-    // get_DC( tau_dc, dxi_dx, u_prime, v_prime, w_prime );
+    const double tau_dc = get_DC( dxi_dx, u_prime, v_prime, w_prime );
 
     for(int A=0; A<nLocBas; ++A)
     {
