@@ -55,7 +55,7 @@ In general, one has to go through the following steps for simulation.
 ## Simulation Samples
 The vortex-induced vibration of an elastic plate with Re $\approx$ 3 $\times$ 10^4. The mesh consists of 18 million linear tetrahedral elements for the fluid and 0.7 million elements for the solid. The variational multiscale formulation provides the LES technique in the flow problem, and the time integration is based on the generalized-&alpha; scheme.
 
-[![Pulmonary CFD](http://img.youtube.com/vi/Vc4Dnm9yeWE/0.jpg)](https://www.youtube.com/watch?v=Vc4Dnm9yeWE "Vortex induced vibration")
+[![Pulmonary CFD](http://img.youtube.com/vi/QiSkyBMGhmI/0.jpg)](https://www.youtube.com/watch?v=QiSkyBMGhmI "Vortex induced vibration")
 
 A fluid-structure interaction simulation of a pulmonary model is performed using **the unified continuum and variational multiscale formulation**. The model and mesh are prepared by W. Yang. The solid model is *fully incompressible* and is numerically modeled via the residual-based variational multiscale formulation.
 
