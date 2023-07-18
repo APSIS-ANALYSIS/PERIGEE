@@ -184,18 +184,17 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
       gx = p0*nx; gy = p0*ny; gz = p0*nz;
     }
 
-    typedef void ( PLocAssem_Tet_VMS_NS_GenAlpha::*locassem_tet_vms_ns_funs )( const double &x, const double &y, const double &z,
-        const double &t, const double &nx, const double &ny,
-        const double &nz, double &gx, double &gy, double &gz ) const;
+    typedef Vector_3 ( PLocAssem_Tet_VMS_NS_GenAlpha::*locassem_tet_vms_ns_funs )( 
+        const double &x, const double &y, const double &z, const double &t, 
+        const double &nx, const double &ny, const double &nz ) const;
 
     locassem_tet_vms_ns_funs * flist;
 
-    void get_ebc_fun( const int &ebc_id,
-        const double &x, const double &y, const double &z,
-        const double &t, const double &nx, const double &ny,
-        const double &nz, double &gx, double &gy, double &gz ) const
+    Vector_3 get_ebc_fun( const int &ebc_id,
+        const double &x, const double &y, const double &z, const double &t, 
+        const double &nx, const double &ny, const double &nz ) const
     {
-      return ((*this).*(flist[ebc_id]))(x,y,z,t,nx,ny,nz,gx,gy,gz);
+      return ((*this).*(flist[ebc_id]))(x,y,z,t,nx,ny,nz);
     }
 };
 
