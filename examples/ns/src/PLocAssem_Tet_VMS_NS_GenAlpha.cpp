@@ -115,12 +115,11 @@ std::array<double, 2> PLocAssem_Tet_VMS_NS_GenAlpha::get_tau(
 
   const double temp_nu = vis_mu / rho0;
 
-  //const double denom_m = CT / (dt*dt) + G.VecMatVec( velo_vec, velo_vec) + CI * temp_nu * temp_nu * G.MatContraction( G );
-  const double denom_m = CT / (dt*dt) + CI * temp_nu * temp_nu * G.MatContraction( G );
+  const double denom_m = CT / (dt*dt) + G.VecMatVec( velo_vec, velo_vec) + CI * temp_nu * temp_nu * G.MatContraction( G );
 
   const double tau_m_qua = 1.0 / ( rho0 * sqrt(denom_m) );
 
-  const double tau_c_qua = 0.0;//Ctauc / (tau_m_qua * G.tr());
+  const double tau_c_qua = Ctauc / (tau_m_qua * G.tr());
 
   // return tau_m followed by tau_c
   return {{tau_m_qua, tau_c_qua}};
