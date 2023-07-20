@@ -111,14 +111,11 @@ std::array<double, 2> PLocAssem_Tet_VMS_NS_GenAlpha::get_tau(
 {
   const SymmMatrix_3x3 G = get_metric( dxi_dx );
 
-  const double GdG = G.MatContraction( G );
-
   const Vector_3 velo_vec( u, v, w );
-  const double uGu = G.VecMatVec( velo_vec, velo_vec);
 
   const double temp_nu = vis_mu / rho0;
 
-  const double denom_m = CT / (dt*dt) + uGu + CI * temp_nu * temp_nu * GdG;
+  const double denom_m = CT / (dt*dt) + G.VecMatVec( velo_vec, velo_vec) + CI * temp_nu * temp_nu * G.MatContraction( G );
 
   const double tau_m_qua = 1.0 / ( rho0 * sqrt(denom_m) );
 
