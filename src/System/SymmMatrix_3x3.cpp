@@ -183,9 +183,8 @@ double SymmMatrix_3x3::MatContraction( const Matrix_3x3 &source ) const
 
 double SymmMatrix_3x3::MatContraction( const SymmMatrix_3x3 &source ) const
 {
-  return mat[0] * source(0) + mat[5] * source(5) + mat[4] * source(4) + mat[5] * source(5)
-    + mat[1] * source(1) + mat[3] * source(3) + mat[4] * source(4) + mat[3] * source(3)
-    + mat[2] * source(2);
+  return mat[0] * source(0) + mat[1] * source(1) + mat[2] * source(2)
+    + 2.0 * ( mat[3] * source(3) + mat[4] * source(4) + mat[5] * source(5) );
 }
 
 void SymmMatrix_3x3::print() const
