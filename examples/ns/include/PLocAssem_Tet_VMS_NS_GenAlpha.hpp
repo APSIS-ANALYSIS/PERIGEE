@@ -160,8 +160,8 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
     SymmMatrix_3x3 get_metric( const std::array<double, 9> &dxi_dx ) const;
 
     // Return tau_m and tau_c in RB-VMS
-    void get_tau( double &tau_m_qua, double &tau_c_qua,
-        const double &dt, const std::array<double, 9> &dxi_dx,
+    std::array<double, 2> get_tau( const double &dt, 
+        const std::array<double, 9> &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
     // Return tau_bar := (v' G v')^-0.5 x rho0, 
@@ -186,15 +186,15 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
 
     typedef Vector_3 ( PLocAssem_Tet_VMS_NS_GenAlpha::*locassem_tet_vms_ns_funs )( 
         const double &x, const double &y, const double &z, const double &t, 
-        const double &nx, const double &ny, const double &nz ) const;
+        const Vector_3 &n_out ) const;
 
     locassem_tet_vms_ns_funs * flist;
 
     Vector_3 get_ebc_fun( const int &ebc_id,
         const double &x, const double &y, const double &z, const double &t, 
-        const double &nx, const double &ny, const double &nz ) const
+        const Vector_3 &n_out ) const
     {
-      return ((*this).*(flist[ebc_id]))(x,y,z,t,nx,ny,nz);
+      return ((*this).*(flist[ebc_id]))(x,y,z,t,n_out);
     }
 };
 
