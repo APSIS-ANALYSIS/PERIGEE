@@ -116,8 +116,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_tau(
   double G11, G12, G13, G22, G23, G33;
   get_metric( dxi_dx, G11, G12, G13, G22, G23, G33 );
 
-  const double GdG = G11 * G11 + 2.0 * G12 * G12 + 2.0 * G13 * G13
-    + G22 * G22 + 2.0 * G23 * G23 + G33 * G33;
+  const double GdG = G11 * G11 + G22 * G22 + G33 * G33 + 2.0 * ( G23 * G23 + G13 * G13 + G12 * G12 );
 
   const double uGu = G11 * u * u + 2.0 * G12 * u * v + 2.0 * G13 * u * w
     + G22 * v * v + 2.0 * G23 * v * w + G33 * w * w;
@@ -126,12 +125,12 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_tau(
 
   const double temp_nu = vis_mu / rho0;
 
-  const double denom_m = CT / (dt*dt) + uGu + CI * temp_nu * temp_nu * GdG;
+  //const double denom_m = CT / (dt*dt) + uGu + CI * temp_nu * temp_nu * GdG;
+  
+  const double denom_m = CT / (dt*dt) + CI * temp_nu * temp_nu * GdG;
 
   tau_m_qua = 1.0 / ( rho0 * sqrt(denom_m) );
 
-
-  tau_m_qua = dt;
   const double denom_c = tau_m_qua * g_dot_g;
 
   tau_c_qua = 0.0; //Ctauc / denom_c;
