@@ -105,8 +105,7 @@ SymmMatrix_3x3 PLocAssem_Tet_VMS_NS_GenAlpha::get_metric(
 }
 
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::get_tau(
-    double &tau_m_qua, double &tau_c_qua,
+std::array<double, 2> PLocAssem_Tet_VMS_NS_GenAlpha::get_tau(
     const double &dt, const std::array<double, 9> &dxi_dx,
     const double &u, const double &v, const double &w ) const
 {
@@ -121,11 +120,14 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_tau(
 
   const double denom_m = CT / (dt*dt) + uGu + CI * temp_nu * temp_nu * GdG;
 
-  tau_m_qua = 1.0 / ( rho0 * sqrt(denom_m) );
+  const double tau_m_qua = 1.0 / ( rho0 * sqrt(denom_m) );
 
   const double denom_c = tau_m_qua * G.tr();
 
-  tau_c_qua = Ctauc / denom_c;
+  const double tau_c_qua = Ctauc / denom_c;
+
+  const std::array<double, 2> tau_qua = {tau_m_qua, tau_c_qua};
+  return tau_qua;
 }
 
 
@@ -227,11 +229,11 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
     }
 
     // Get the tau_m and tau_c
-    double tau_m, tau_c;
-    
     const auto dxi_dx = element->get_invJacobian(qua);
 
-    get_tau(tau_m, tau_c, dt, dxi_dx, u, v, w);
+    const std::array<double, 2> tau = get_tau(dt, dxi_dx, u, v, w);
+    const double tau_m = tau[0];
+    const double tau_c = tau[1];
 
     const double tau_m_2 = tau_m * tau_m;
 
@@ -400,11 +402,11 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
       coor_z += eleCtrlPts_z[ii] * R[ii];
     }
 
-    double tau_m, tau_c;
-
     const auto dxi_dx = element->get_invJacobian(qua);
 
-    get_tau(tau_m, tau_c, dt, dxi_dx, u, v, w);
+    const std::array<double, 2> tau = get_tau(dt, dxi_dx, u, v, w);
+    const double tau_m = tau[0];
+    const double tau_c = tau[1];
 
     const double tau_m_2 = tau_m * tau_m;
 
@@ -807,8 +809,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
       coor_z += eleCtrlPts_z[ii] * R[ii];
     }
 
-    const Vector_3 traction = get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr,
-        n_out.x(), n_out.y(), n_out.z() );
+    const Vector_3 traction = get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr, n_out );
 
     for(int A=0; A<snLocBas; ++A)
     {
