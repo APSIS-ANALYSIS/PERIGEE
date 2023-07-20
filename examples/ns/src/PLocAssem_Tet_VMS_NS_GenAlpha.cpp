@@ -130,9 +130,11 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_tau(
 
   tau_m_qua = 1.0 / ( rho0 * sqrt(denom_m) );
 
+
+  tau_m_qua = dt;
   const double denom_c = tau_m_qua * g_dot_g;
 
-  tau_c_qua = Ctauc / denom_c;
+  tau_c_qua = 0.0; //Ctauc / denom_c;
 }
 
 
