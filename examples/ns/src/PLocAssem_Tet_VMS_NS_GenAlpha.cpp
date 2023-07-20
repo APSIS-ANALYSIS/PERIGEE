@@ -118,8 +118,9 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_tau(
 
   const double GdG = G11 * G11 + G22 * G22 + G33 * G33 + 2.0 * ( G23 * G23 + G13 * G13 + G12 * G12 );
 
-  const double uGu = G11 * u * u + 2.0 * G12 * u * v + 2.0 * G13 * u * w
-    + G22 * v * v + 2.0 * G23 * v * w + G33 * w * w;
+  const double uGu = u * ( G11 * u + G12 * v + G13 * w )
+    + v * ( G12 * u + G22 * v + G23 * w )
+    + w * ( G13 * u + G23 * v + G33 * w ); 
 
   const double g_dot_g = G11 + G22 + G33;
 
