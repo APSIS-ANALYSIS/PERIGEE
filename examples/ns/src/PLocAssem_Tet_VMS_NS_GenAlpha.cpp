@@ -120,14 +120,10 @@ std::array<double, 2> PLocAssem_Tet_VMS_NS_GenAlpha::get_tau(
 
   const double denom_m = CT / (dt*dt) + uGu + CI * temp_nu * temp_nu * GdG;
 
-  const double tau_m_qua = 1.0 / ( rho0 * sqrt(denom_m) );
-
   const double denom_c = tau_m_qua * G.tr();
 
-  const double tau_c_qua = Ctauc / denom_c;
-
-  const std::array<double, 2> tau_qua = {tau_m_qua, tau_c_qua};
-  return tau_qua;
+  // return tau_m followed by tau_c
+  return {{1.0 / ( rho0 * sqrt(denom_m) ), Ctauc / denom_}};
 }
 
 
