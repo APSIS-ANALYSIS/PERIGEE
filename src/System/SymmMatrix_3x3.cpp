@@ -494,5 +494,4 @@ SymmMatrix_3x3 gen_symm_part( const Matrix_3x3 &input )
                         0.5 * ( input(1) + input(3) ) );
 }
 
-
 // EOF
