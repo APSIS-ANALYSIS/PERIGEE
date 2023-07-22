@@ -83,18 +83,16 @@ SymmMatrix_3x3 PLocAssem_Tet_VMS_NS_GenAlpha::get_metric(
 {
   // PHASTA definition 
   const double coef = 0.6299605249474365;
-  const double diag = 2.0;
-  const double offd = 1.0;
 
-  const double fk0 = diag * f[0] + offd * (f[3] + f[6]);
-  const double fk1 = diag * f[3] + offd * (f[0] + f[6]);
-  const double fk2 = diag * f[6] + offd * (f[0] + f[3]);
-  const double fk3 = diag * f[1] + offd * (f[4] + f[7]);
-  const double fk4 = diag * f[4] + offd * (f[1] + f[7]);
-  const double fk5 = diag * f[7] + offd * (f[1] + f[4]);
-  const double fk6 = diag * f[2] + offd * (f[5] + f[8]);
-  const double fk7 = diag * f[5] + offd * (f[2] + f[8]);
-  const double fk8 = diag * f[8] + offd * (f[2] + f[5]);
+  const double fk0 = 2.0 * f[0] + (f[3] + f[6]);
+  const double fk1 = 2.0 * f[3] + (f[0] + f[6]);
+  const double fk2 = 2.0 * f[6] + (f[0] + f[3]);
+  const double fk3 = 2.0 * f[1] + (f[4] + f[7]);
+  const double fk4 = 2.0 * f[4] + (f[1] + f[7]);
+  const double fk5 = 2.0 * f[7] + (f[1] + f[4]);
+  const double fk6 = 2.0 * f[2] + (f[5] + f[8]);
+  const double fk7 = 2.0 * f[5] + (f[2] + f[8]);
+  const double fk8 = 2.0 * f[8] + (f[2] + f[5]);
 
   return SymmMatrix_3x3( coef * ( fk0 * f[0] + fk1 * f[3] + fk2 * f[6] ),
   coef * ( fk3 * f[1] + fk4 * f[4] + fk5 * f[7] ),
