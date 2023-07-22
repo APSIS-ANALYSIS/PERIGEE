@@ -11,6 +11,7 @@
 // ==================================================================
 #include "IPLocAssem.hpp"
 #include "TimeMethod_GenAlpha.hpp"
+#include "SymmMatrix_3x3.hpp"
 
 class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
 {
@@ -156,24 +157,23 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
     // Private functions
     void print_info() const;
 
-    void get_metric( const double * const &dxi_dx,
-        double &G11, double &G12, double &G13,
-        double &G22, double &G23, double &G33 ) const;
+    SymmMatrix_3x3 get_metric( const std::array<double, 9> &dxi_dx ) const;
 
     // Return tau_m and tau_c in RB-VMS
-    void get_tau( double &tau_m_qua, double &tau_c_qua,
-        const double &dt, const double * const &dxi_dx,
+    std::array<double, 2> get_tau( const double &dt, 
+        const std::array<double, 9> &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
     // Return tau_bar := (v' G v')^-0.5 x rho0, 
     //        which scales like Time x Density
-    void get_DC( double &dc_tau, const double * const &dxi_dx,
+    // Users can refer to Int. J. Numer. Meth. Fluids 2001; 35: 93–116 for more details
+    double get_DC( const std::array<double, 9> &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
-    void get_f(const double &x, const double &y, const double &z,
-        const double &t, double &fx, double &fy, double &fz ) const
+    Vector_3 get_f(const double &x, const double &y, const double &z,
+        const double &t) const
     {
-      fx = 0.0; fy = 0.0; fz = 0.0;
+      return Vector_3( 0.0, 0.0, 0.0 );
     }
 
     void get_H1(const double &x, const double &y, const double &z,
@@ -184,18 +184,17 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
       gx = p0*nx; gy = p0*ny; gz = p0*nz;
     }
 
-    typedef void ( PLocAssem_Tet_VMS_NS_GenAlpha::*locassem_tet_vms_ns_funs )( const double &x, const double &y, const double &z,
-        const double &t, const double &nx, const double &ny,
-        const double &nz, double &gx, double &gy, double &gz ) const;
+    typedef Vector_3 ( PLocAssem_Tet_VMS_NS_GenAlpha::*locassem_tet_vms_ns_funs )( 
+        const double &x, const double &y, const double &z, const double &t, 
+        const Vector_3 &n_out ) const;
 
     locassem_tet_vms_ns_funs * flist;
 
-    void get_ebc_fun( const int &ebc_id,
-        const double &x, const double &y, const double &z,
-        const double &t, const double &nx, const double &ny,
-        const double &nz, double &gx, double &gy, double &gz ) const
+    Vector_3 get_ebc_fun( const int &ebc_id,
+        const double &x, const double &y, const double &z, const double &t, 
+        const Vector_3 &n_out ) const
     {
-      return ((*this).*(flist[ebc_id]))(x,y,z,t,nx,ny,nz,gx,gy,gz);
+      return ((*this).*(flist[ebc_id]))(x,y,z,t,n_out);
     }
 };
 
