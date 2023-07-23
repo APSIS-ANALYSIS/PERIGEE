@@ -13,9 +13,13 @@ void TET_T::read_vtu_grid( const std::string &filename,
   // Number of grid points in the mesh
   numpts  = static_cast<int>( vtkugrid -> GetNumberOfPoints() );
   
+  SYS_T::print_fatal_if(numpts <= 0, "Error: the file %s contains no point. \n", filename.c_str());
+  
   // Number of cells in the mesh
   numcels = static_cast<int>( vtkugrid -> GetNumberOfCells() );
 
+  SYS_T::print_fatal_if(numcels <= 0, "Error: the file %s contains no cell. \n", filename.c_str());
+  
   // xyz coordinates of the points
   pt.clear();
   for(int ii=0; ii<numpts; ++ii)
