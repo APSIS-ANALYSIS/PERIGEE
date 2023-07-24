@@ -203,6 +203,7 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
 
     // Return tau_bar := (v' G v')^-0.5 x rho0, 
     //        which scales like Time x Density
+    // Users can refer to Int. J. Numer. Meth. Fluids 2001; 35: 93–116 for more details
     double get_DC( const std::array<double, 9> &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
