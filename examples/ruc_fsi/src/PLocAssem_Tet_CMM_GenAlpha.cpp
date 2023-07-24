@@ -130,18 +130,16 @@ double PLocAssem_Tet_CMM_GenAlpha::get_DC(
     const std::array<double, 9> &dxi_dx,
     const double &u, const double &v, const double &w ) const
 {
-  //double G11, G12, G13, G22, G23, G33;
-  //get_metric( dxidx, G11, G12, G13, G22, G23, G33 );
+  // const SymmMatrix_3x3 G = get_metric( dxi_dx );
+  // const Vector_3 velo_vec{ u, v, w };
+  // double dc_tau = G.VecMatVec( velo_vec, velo_vec );
 
-  //dc_tau = G11 * u * u + 2.0 * G12 * u * v + 2.0 * G13 * u * w + G22 * v * v
-  //  + 2.0 * G23 * v * w + G33 * w * w;
+  // if(dc_tau > 1.0e-15) dc_tau = rho0 * std::pow(dc_tau, -0.5);
+  // else dc_tau = 0.0;
 
-  //if(dc_tau > 1.0e-15) dc_tau = rho0 * std::pow(dc_tau, -0.5);
-  //else dc_tau = 0.0;
+  const double dc_tau = 0.0;
 
-  // return dc_tau;
-
-  return 0.0;
+  return dc_tau;
 }
 
 
