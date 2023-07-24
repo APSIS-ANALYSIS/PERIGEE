@@ -789,7 +789,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC(
   {
     const std::vector<double> R = element->get_R(qua);
   
-    double gx, gy, gz, surface_area;
+    double surface_area;
 
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
