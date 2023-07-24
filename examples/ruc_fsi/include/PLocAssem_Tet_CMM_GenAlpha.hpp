@@ -8,6 +8,7 @@
 // ==================================================================
 #include "IPLocAssem.hpp"
 #include "TimeMethod_GenAlpha.hpp"
+#include "SymmMatrix_3x3.hpp"
 
 class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
 {
@@ -193,18 +194,16 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
     // Private functions
     void print_info() const;
 
-    void get_metric( const double * const &dxi_dx,
-        double &G11, double &G12, double &G13,
-        double &G22, double &G23, double &G33 ) const;
+    SymmMatrix_3x3 get_metric( const std::array<double, 9> &dxi_dx ) const;
 
     // Return tau_m and tau_c in RB-VMS
-    void get_tau( double &tau_m_qua, double &tau_c_qua,
-        const double &dt, const double * const &dxi_dx,
+    std::array<double, 2> get_tau( 
+        const double &dt, const std::array<double, 9> &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
     // Return tau_bar := (v' G v')^-0.5 x rho0, 
     //        which scales like Time x Density
-    double get_DC( const double * const &dxi_dx,
+    double get_DC( const std::array<double, 9> &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
     // Return body force acting on the fluid domain
@@ -229,18 +228,17 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
       gx = p0*nx; gy = p0*ny; gz = p0*nz;
     }
 
-    typedef void ( PLocAssem_Tet_CMM_GenAlpha::*locassem_tet_cmm_funs )( const double &x, const double &y, const double &z,
-        const double &t, const double &nx, const double &ny,
-        const double &nz, double &gx, double &gy, double &gz ) const;
+    typedef Vector_3 ( PLocAssem_Tet_CMM_GenAlpha::*locassem_tet_cmm_funs )(
+      const double &x, const double &y, const double &z,
+      const double &t, const Vector_3 &n_out ) const;
 
     locassem_tet_cmm_funs * flist;
 
-    void get_ebc_fun( const int &ebc_id,
+    Vector_3 get_ebc_fun( const int &ebc_id,
         const double &x, const double &y, const double &z,
-        const double &t, const double &nx, const double &ny,
-        const double &nz, double &gx, double &gy, double &gz ) const
+        const double &t, const Vector_3 &n_out ) const
     {
-      return ((*this).*(flist[ebc_id]))(x,y,z,t,nx,ny,nz,gx,gy,gz);
+      return ((*this).*(flist[ebc_id]))(x,y,z,t,n_out);
     }
 };
 

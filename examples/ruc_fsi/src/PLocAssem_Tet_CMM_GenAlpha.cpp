@@ -82,66 +82,52 @@ void PLocAssem_Tet_CMM_GenAlpha::print_info() const
 }
 
 
-void PLocAssem_Tet_CMM_GenAlpha::get_metric(
-    const double * const &f,
-    double &G11, double &G12, double &G13,
-    double &G22, double &G23, double &G33 ) const
+SymmMatrix_3x3 PLocAssem_Tet_CMM_GenAlpha::get_metric(
+    const std::array<double,9> &f ) const
 {
   // PHASTA definition 
   const double coef = 0.6299605249474365;
-  const double diag = 2.0;
-  const double offd = 1.0;
 
-  const double fk0 = diag * f[0] + offd * (f[3] + f[6]);
-  const double fk1 = diag * f[3] + offd * (f[0] + f[6]);
-  const double fk2 = diag * f[6] + offd * (f[0] + f[3]);
-  const double fk3 = diag * f[1] + offd * (f[4] + f[7]);
-  const double fk4 = diag * f[4] + offd * (f[1] + f[7]);
-  const double fk5 = diag * f[7] + offd * (f[1] + f[4]);
-  const double fk6 = diag * f[2] + offd * (f[5] + f[8]);
-  const double fk7 = diag * f[5] + offd * (f[2] + f[8]);
-  const double fk8 = diag * f[8] + offd * (f[2] + f[5]);
+  const double fk0 = 2.0 * f[0] + (f[3] + f[6]);
+  const double fk1 = 2.0 * f[3] + (f[0] + f[6]);
+  const double fk2 = 2.0 * f[6] + (f[0] + f[3]);
+  const double fk3 = 2.0 * f[1] + (f[4] + f[7]);
+  const double fk4 = 2.0 * f[4] + (f[1] + f[7]);
+  const double fk5 = 2.0 * f[7] + (f[1] + f[4]);
+  const double fk6 = 2.0 * f[2] + (f[5] + f[8]);
+  const double fk7 = 2.0 * f[5] + (f[2] + f[8]);
+  const double fk8 = 2.0 * f[8] + (f[2] + f[5]);
 
-  G11 = coef * ( fk0 * f[0] + fk1 * f[3] + fk2 * f[6] );
-  G12 = coef * ( fk0 * f[1] + fk1 * f[4] + fk2 * f[7] );
-  G13 = coef * ( fk0 * f[2] + fk1 * f[5] + fk2 * f[8] );
-  G22 = coef * ( fk3 * f[1] + fk4 * f[4] + fk5 * f[7] );
-  G23 = coef * ( fk3 * f[2] + fk4 * f[5] + fk5 * f[8] );
-  G33 = coef * ( fk6 * f[2] + fk7 * f[5] + fk8 * f[8] );
+  return SymmMatrix_3x3(coef * ( fk0 * f[0] + fk1 * f[3] + fk2 * f[6] ),
+  coef * ( fk3 * f[1] + fk4 * f[4] + fk5 * f[7] ),
+  coef * ( fk6 * f[2] + fk7 * f[5] + fk8 * f[8] ),
+  coef * ( fk3 * f[2] + fk4 * f[5] + fk5 * f[8] ),
+  coef * ( fk0 * f[2] + fk1 * f[5] + fk2 * f[8] ),
+  coef * ( fk0 * f[1] + fk1 * f[4] + fk2 * f[7] ));
 }
 
 
-void PLocAssem_Tet_CMM_GenAlpha::get_tau(
-    double &tau_m_qua, double &tau_c_qua,
-    const double &dt, const double * const &dxidx,
+std::array<double, 2> PLocAssem_Tet_CMM_GenAlpha::get_tau(
+    const double &dt, const std::array<double,9> &dxi_dx,
     const double &u, const double &v, const double &w ) const
 {
   // Use K matrix to correct the metric
-  double G11, G12, G13, G22, G23, G33;
-  get_metric( dxidx, G11, G12, G13, G22, G23, G33 );
+  const SymmMatrix_3x3 G = get_metric( dxi_dx );
 
-  const double GdG = G11 * G11 + 2.0 * G12 * G12 + 2.0 * G13 * G13
-    + G22 * G22 + 2.0 * G23 * G23 + G33 * G33;
-
-  const double uGu = G11 * u * u + 2.0 * G12 * u * v + 2.0 * G13 * u * w
-    + G22 * v * v + 2.0 * G23 * v * w + G33 * w * w;
-
-  const double g_dot_g = G11 + G22 + G33;
+  const Vector_3 velo_vec( u, v, w );
 
   const double temp_nu = vis_mu / rho0;
 
-  const double denom_m = CT / (dt*dt) + uGu + CI * temp_nu * temp_nu * GdG;
+  const double denom_m = std::sqrt(CT / (dt*dt) + 
+  G.VecMatVec( velo_vec, velo_vec ) + 
+  CI * temp_nu * temp_nu * G.MatContraction( G ));
 
-  tau_m_qua = 1.0 / ( rho0 * sqrt(denom_m) );
-
-  const double denom_c = tau_m_qua * g_dot_g;
-
-  tau_c_qua = Ctauc / denom_c;
+  return {{1.0 / ( rho0 * denom_m ), Ctauc * rho0 * denom_m / G.tr()}};
 }
 
 
 double PLocAssem_Tet_CMM_GenAlpha::get_DC(
-    const double * const &dxidx,
+    const std::array<double, 9> &dxi_dx,
     const double &u, const double &v, const double &w ) const
 {
   //double G11, G12, G13, G22, G23, G33;
@@ -171,8 +157,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  double tau_m, tau_c;
-
   const double two_mu = 2.0 * vis_mu;
 
   const double curr = time + alpha_f * dt;
@@ -195,10 +179,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
 
     element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
         &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
-
-    double dxi_dx[9];
-
-    element->get_invJacobian( qua, dxi_dx );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -246,7 +226,11 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
     }
 
     // Get the tau_m and tau_c
-    get_tau(tau_m, tau_c, dt, dxi_dx, u, v, w);
+    const auto dxi_dx = element->get_invJacobian(qua);
+
+    const std::array<double, 2> tau = get_tau(dt, dxi_dx, u, v, w);
+    const double tau_m = tau[0];
+    const double tau_c = tau[1];
 
     const double tau_m_2 = tau_m * tau_m;
 
@@ -343,8 +327,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  double tau_m, tau_c;
-
   const double two_mu = 2.0 * vis_mu;
 
   const double rho0_2 = rho0 * rho0;
@@ -371,10 +353,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
 
     element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
         &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
-
-    double dxi_dx[9];
-
-    element->get_invJacobian( qua, dxi_dx );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -421,7 +399,11 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
       coor_z += eleCtrlPts_z[ii] * R[ii];
     }
 
-    get_tau(tau_m, tau_c, dt, dxi_dx, u, v, w);
+    const auto dxi_dx = element->get_invJacobian(qua);
+
+    const std::array<double, 2> tau = get_tau(dt, dxi_dx, u, v, w);
+    const double tau_m = tau[0];
+    const double tau_c = tau[1];
 
     const double tau_m_2 = tau_m * tau_m;
 
@@ -821,14 +803,13 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC(
       coor_z += eleCtrlPts_z[ii] * R[ii];
     }
 
-    get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr, 
-        n_out.x(), n_out.y(), n_out.z(), gx, gy, gz );
+    const Vector_3 traction = get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr, n_out );
 
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * gx;
-      Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * gy;
-      Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * gz;
+      Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * traction.x();
+      Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * traction.y();
+      Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * traction.z();
     }
   }
 }
