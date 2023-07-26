@@ -13,9 +13,13 @@ void TET_T::read_vtu_grid( const std::string &filename,
   // Number of grid points in the mesh
   numpts  = static_cast<int>( vtkugrid -> GetNumberOfPoints() );
   
+  SYS_T::print_fatal_if(numpts <= 0, "Error: the file %s contains no point. \n", filename.c_str());
+  
   // Number of cells in the mesh
   numcels = static_cast<int>( vtkugrid -> GetNumberOfCells() );
 
+  SYS_T::print_fatal_if(numcels <= 0, "Error: the file %s contains no cell. \n", filename.c_str());
+  
   // xyz coordinates of the points
   pt.clear();
   for(int ii=0; ii<numpts; ++ii)
@@ -258,9 +262,18 @@ void TET_T::read_vtp_grid( const std::string &filename,
   reader -> SetFileName( filename.c_str() );
   reader -> Update();
   vtkPolyData * polydata = reader -> GetOutput();
+  
+  // Number of grid points in the mesh
   numpts = static_cast<int>( polydata -> GetNumberOfPoints() );
+  
+  SYS_T::print_fatal_if(numpts <= 0, "Error: the file %s contains no point. \n", filename.c_str());
+  
+  // Number of cells in the mesh
   numcels = static_cast<int>( polydata -> GetNumberOfPolys() );
 
+  SYS_T::print_fatal_if(numcels <= 0, "Error: the file %s contains no cell. \n", filename.c_str());
+  
+  // xyz coordinates of the points
   pt.clear();
   for(int ii=0; ii<numpts; ++ii)
   {
@@ -271,6 +284,7 @@ void TET_T::read_vtp_grid( const std::string &filename,
     pt.push_back(pt_xyz[2]);
   }
 
+  // xyz coordinates of the points
   ien_array.clear();
   for(int ii=0; ii<numcels; ++ii)
   {
