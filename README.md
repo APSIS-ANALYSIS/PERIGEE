@@ -36,7 +36,7 @@ For more information on this environmental variable, see [here](http://tldp.org/
  - Set `CMAKE_C_COMPILER` to `$PETSC_DIR/$PETSC_ARCH/bin/mpicc`
  - Set `CMAKE_CXX_COMPILER` to `$PETSC_DIR/$PETSC_ARCH/bin/mpicxx`
 
-After the editing, save and close CMake file and rename it as `system_lib_loading.cmake`. And you have your own configuration file set up. Notice that we have the file 'system_lib_loading.cmake' added in .gitignore, meaning that git will not track this file. You may want to keep a copy of this file out of PERIGEE, because when you switch to other branches, PERIGEE will not keep a copy of this file. 
+After the editing, save and close CMake file and rename it as `system_lib_loading.cmake`. And you have your own configuration file set up. Notice that we have the file name `system_lib_loading.cmake` added in .gitignore, meaning that git will not track this file. You may want to keep a copy of this file out of PERIGEE, because when you switch to other branches, PERIGEE will not keep a copy of this file. 
 
 
 ## Build
