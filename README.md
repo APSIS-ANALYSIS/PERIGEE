@@ -48,7 +48,7 @@ CMake will print some information on the screen. Pay a look at the variable `CMA
 ```sh
 CMake ~/PERIGEE/examples/transport/ -DCMAKE_BUILD_TYPE=Release
 ```
-Now the value of `CMAKE_BUILD_TYPE` is set to `Release`. The code will be compiled in the optimized mode. For more information about the compiler, please refer to [this](https://stackoverflow.com/questions/48754619/what-are-cmake-build-type-debug-release-relwithdebinfo-and-minsizerel/48755129). Of course, a fully optimized code requires that your external libraries, especially PETSc, are compiled in the optimized mode also. Refer to the [advanced guide](docs/install-advanced.md) to learn how to build libraries in a release mode. After CMake generates the Makefile for you, you just need to run the following command to compile the source code.
+Now the value of `CMAKE_BUILD_TYPE` is set to `Release`. The code will be compiled in the optimized mode. For more information about the compiler, please refer to [this](https://stackoverflow.com/questions/48754619/what-are-cmake-build-type-debug-release-relwithdebinfo-and-minsizerel/48755129). Of course, a fully optimized code requires that your external libraries, especially PETSc, are compiled in the optimized mode also. Refer to the [advanced guide](docs/install-advanced.md) for more info on building libraries in a release mode. After CMake generates the Makefile for you, you just need to run the following command to compile the source code.
 ```sh
 make
 ```
@@ -56,7 +56,7 @@ Of course, you may add `-j2` to run Makefile with 2 threads. If the make complai
 
 ## Tutorial
 In general, one has to go through the following steps for simulation.
-* Obtain the mesh in vtu/vtp format from SimVascular or Gmsh.
+* Obtain the mesh in vtu/vtp format from a front-end code, e.g., SimVascular or Gmsh.
 * Run a preprocessor to load the mesh, assign boundary conditions, and partition the mesh. The preprocessor is a *serial* code and may need to be run on a large memory cluster node if you are dealing with a very large problem.
 * Run a finite element analysis code to solve the partial differential equations. The solutions will be saved on disk in the binary format.
 * Run a preprocessor for postprocessing. This step re-partition the mesh to make preparations for postprocessing, such as visualization, error calculation, etc. Similar to the preprocessor, this routine should be run in *serial* and may consume a lot memory if your mesh is fine. With this routine, we are able to run the postprocessing routine with different number of CPUs. For example, we run FEM analysis with, say, 360 CPUs; visualizing the solution is much less intensive in computing and may only need, say, 24 CPUs. So you should repartition the domain into 24 sub-domains in this step.
