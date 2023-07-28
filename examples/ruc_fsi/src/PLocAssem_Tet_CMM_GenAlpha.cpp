@@ -1050,7 +1050,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     double u_t = 0.0, v_t = 0.0, w_t = 0.0, u = 0.0, v = 0.0, w = 0.0;
     double disp_x = 0.0, disp_y = 0.0, disp_z = 0.0;
     double h_w = 0.0, ks_w = 0.0, cs_w = 0.0;
-    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    Vector_3 coor( 0.0, 0.0, 0.0 );
 
     for(int ii=0; ii<snLocBas; ++ii)
     {
@@ -1070,9 +1070,9 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
       ks_w += ele_springconst[ii]  * R[ii];
       cs_w += ele_dampingconst[ii] * R[ii];
 
-      coor_x += eleCtrlPts_x[ii] * R[ii];
-      coor_y += eleCtrlPts_y[ii] * R[ii];
-      coor_z += eleCtrlPts_z[ii] * R[ii];
+      coor.x() += eleCtrlPts_x[ii] * R[ii];
+      coor.y() += eleCtrlPts_y[ii] * R[ii];
+      coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
     // Add prestress: convert from Voigt notation (comps 11, 22, 33, 23, 13, 12)
@@ -1089,7 +1089,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
     // Body force acting on the wall
-    const Vector_3 fw =  get_fw(coor_x, coor_y, coor_z, curr);
+    const Vector_3 fw =  get_fw(coor, curr);
 
     // Basis function gradients with respect to global coords
     // dR/dx_{i} = Q_{ji} * dR/dxl_{j}. Note that dR/dzl = 0.0
@@ -1173,7 +1173,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     double u_t = 0.0, v_t = 0.0, w_t = 0.0, u = 0.0, v = 0.0, w = 0.0; 
     double disp_x = 0.0, disp_y = 0.0, disp_z = 0.0;
     double h_w = 0.0, E_w = 0.0, ks_w = 0.0, cs_w = 0.0;
-    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    Vector_3 coor( 0.0, 0.0, 0.0 );
 
     for(int ii=0; ii<snLocBas; ++ii)
     {
@@ -1195,15 +1195,15 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
       ks_w += ele_springconst[ii]  * R[ii];
       cs_w += ele_dampingconst[ii] * R[ii];
 
-      coor_x += eleCtrlPts_x[ii] * R[ii];
-      coor_y += eleCtrlPts_y[ii] * R[ii];
-      coor_z += eleCtrlPts_z[ii] * R[ii];
+      coor.x() += eleCtrlPts_x[ii] * R[ii];
+      coor.y() += eleCtrlPts_y[ii] * R[ii];
+      coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
     // Body force acting on the wall
-    const Vector_3 fw = get_fw(coor_x, coor_y, coor_z, curr);
+    const Vector_3 fw = get_fw(coor, curr);
 
     const double coef = E_w / (1.0 - nu_w * nu_w);
 
