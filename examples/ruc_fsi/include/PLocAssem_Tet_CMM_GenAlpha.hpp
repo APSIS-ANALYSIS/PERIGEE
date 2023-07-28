@@ -219,12 +219,10 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
       return Vector_3( 0.0, 0.0, 0.0 );
     }
 
-    void get_H1( const double &x, const double &y, const double &z,
-        const double &t, const double &nx, const double &ny,
-        const double &nz, double &gx, double &gy, double &gz ) const
+    Vector_3 get_H1( const Vector_3 &pt, const double &tt, const Vector_3 &n_out ) const
     {
       const double p0 = 0.0;
-      gx = p0*nx; gy = p0*ny; gz = p0*nz;
+      return Vector_3( p0*n_out.x(), p0*n_out.y(), p0*n_out.z() );
     }
 
     typedef Vector_3 ( PLocAssem_Tet_CMM_GenAlpha::*locassem_tet_cmm_funs )(
