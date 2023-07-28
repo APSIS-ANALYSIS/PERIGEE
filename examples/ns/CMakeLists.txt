@@ -138,7 +138,7 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 ADD_EXECUTABLE( gmsh_p1_IO gmsh_p1_process.cpp )
 ADD_EXECUTABLE( gmsh_p2_IO gmsh_p2_process.cpp )
-ADD_EXECUTABLE( preprocess3d preprocess_sv_tets.cpp)
+ADD_EXECUTABLE( preprocess3d preprocess_ns.cpp)
 ADD_EXECUTABLE( ns_tet_3d ns_tet_driver.cpp)
 ADD_EXECUTABLE( prepost prepost_ns_tets.cpp)
 ADD_EXECUTABLE( vis_ns vis_ns.cpp)
