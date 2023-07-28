@@ -1,5 +1,5 @@
 // ==================================================================
-// cmm_driver.cpp
+// ruc_driver.cpp
 //
 // Tetrahedral element based finite element code for the 3D Coupled-Momentum
 // Method using the Variational Multiscale Formulation and Generalized-
