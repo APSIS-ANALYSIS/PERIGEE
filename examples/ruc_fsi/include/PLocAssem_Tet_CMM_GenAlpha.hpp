@@ -226,16 +226,14 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
     }
 
     typedef Vector_3 ( PLocAssem_Tet_CMM_GenAlpha::*locassem_tet_cmm_funs )(
-      const double &x, const double &y, const double &z,
-      const double &t, const Vector_3 &n_out ) const;
+      const Vector_3 &pt, const double &tt, const Vector_3 &n_out ) const;
 
     locassem_tet_cmm_funs * flist;
 
     Vector_3 get_ebc_fun( const int &ebc_id,
-        const double &x, const double &y, const double &z,
-        const double &t, const Vector_3 &n_out ) const
+        const Vector_3 &pt, const double &tt, const Vector_3 &n_out ) const
     {
-      return ((*this).*(flist[ebc_id]))(x,y,z,t,n_out);
+      return ((*this).*(flist[ebc_id]))(pt, tt, n_out);
     }
 };
 

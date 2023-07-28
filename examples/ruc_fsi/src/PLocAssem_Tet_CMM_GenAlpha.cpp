@@ -797,15 +797,15 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC(
 
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
-    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    Vector_3 coor( 0.0, 0.0, 0.0 );
     for(int ii=0; ii<snLocBas; ++ii)
     {
-      coor_x += eleCtrlPts_x[ii] * R[ii];
-      coor_y += eleCtrlPts_y[ii] * R[ii];
-      coor_z += eleCtrlPts_z[ii] * R[ii];
+      coor.x() += eleCtrlPts_x[ii] * R[ii];
+      coor.y() += eleCtrlPts_y[ii] * R[ii];
+      coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
-    const Vector_3 traction = get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr, n_out );
+    const Vector_3 traction = get_ebc_fun( ebc_id, coor, curr, n_out );
 
     for(int A=0; A<snLocBas; ++A)
     {
