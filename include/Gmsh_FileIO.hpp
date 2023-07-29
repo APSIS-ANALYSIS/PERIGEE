@@ -40,6 +40,10 @@ class Gmsh_FileIO
     
     std::string get_phy_name_1d( const int &ii ) const {return phy_1d_name[ii];} 
 
+    int get_nlocbas( const int &ii ) const {return ele_nlocbas[ii];}
+
+    int get_eleType( const int &ii ) const {return ele_type[ii];}
+
     // --------------------------------------------------------------
     // In FSI problems, we require that the 3d physical domain index
     // 0 be the fluid domain and 3d physical domain index 1 be the 
