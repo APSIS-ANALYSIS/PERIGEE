@@ -1,15 +1,18 @@
 #ifndef IEN_FEM_HPP
 #define IEN_FEM_HPP
-// ==================================================================
+// ============================================================================
 // IEN_FEM.hpp
 //
-// This class defines the IEN array for a FEM mesh using uniform 
-// element type.
+// This class defines the IEN array for a FEM mesh using uniform element type.
+//
+// According to the uniform element type assumption, nLocBas here is determined
+// by in_ien.size() / in_nelem.
 //
 // Author: Ju Liu
 // Date: July 30 2023
-// ==================================================================
-#include <vector>
+// ============================================================================
+#include "Sys_Tools.hpp"
+#include "Vec_Tools.hpp"
 #include "IIEN.hpp"
 
 class IEN_FEM : public IIEN
@@ -24,7 +27,7 @@ class IEN_FEM : public IIEN
     virtual void print_IEN() const;
 
   private:
-    const int nElem;
+    const int nElem, nLocBas;
     
     int * IEN;
 };
