@@ -21,8 +21,12 @@ class Mesh_Tet : public IMesh
     virtual void print_info() const;
 
     virtual int get_s_degree() const {return deg;}
+
     virtual int get_t_degree() const {return deg;}
+    
     virtual int get_u_degree() const {return deg;}
+    
+    virtual int get_degree() const {return deg;}
 
     virtual int get_nFunc() const {return nFunc;}
 
