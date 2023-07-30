@@ -1,19 +1,20 @@
 #include "Mesh_Tet.hpp"
 
 Mesh_Tet::Mesh_Tet(const int &in_nfunc, const int &in_nelem, 
-    const &in_deg) : nFunc(in_nfunc), 
-  nElem(in_nelem), det(in_deg)
+    const int &in_deg) : nFunc(in_nfunc), 
+  nElem(in_nelem), deg(in_deg)
 {
   switch(deg)
   {
     case 1:
       nLocBas = 4;
-      breal;
+      break;
     case 2:
       nLocBas = 10;
       break;
     default:
-      SYS_T::print_fatal("Error: Mesh_Tet, the input value of degree %d is not supported", deg);
+      SYS_T::print_exit("Error: Mesh_Tet, the input value of degree is not supported.\n");
+      nLocBas = 0;
       break;
   }
 }

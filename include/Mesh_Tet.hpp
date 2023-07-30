@@ -35,7 +35,8 @@ class Mesh_Tet : public IMesh
     virtual int get_nLocBas() const {return nLocBas;}
 
   private:
-    const int nFunc, nElem, deg, nLocBas;
+    const int nFunc, nElem, deg;
+    int nLocBas;
 };
 
 #endif
