@@ -27,7 +27,7 @@ class IIEN
 
     // get the IEN pointer
     virtual int * get_IENptr() const
-    {std::cerr<<"Error: get_IENptr is not implemented. \n"; exit(EXIT_FAILURE); return NULL;}
+    {std::cerr<<"Error: get_IENptr is not implemented. \n"; exit(EXIT_FAILURE); return nullptr;}
 };
 
 #endif
