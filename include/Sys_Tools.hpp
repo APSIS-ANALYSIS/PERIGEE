@@ -261,6 +261,19 @@ namespace SYS_T
     }
   }
 
+  inline void print_exit_if_not( bool a, const char output[], ... )
+  {
+    if( !a )
+    {
+      va_list Argp;
+      va_start(Argp, output);
+      vfprintf (stdout, output, Argp);
+      va_end(Argp);
+
+      exit( EXIT_FAILURE );
+    }
+  }
+
   // ================================================================
   // The following are system functions that access the system info.
   // ================================================================
