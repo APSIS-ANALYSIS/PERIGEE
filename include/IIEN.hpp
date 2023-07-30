@@ -29,10 +29,6 @@ class IIEN
     // print info
     virtual void print_info() const
     {std::cerr<<"Error: print_info is not implemented. \n"; exit(EXIT_FAILURE);}
-
-    // get the IEN pointer
-    virtual int * get_IENptr() const
-    {std::cerr<<"Error: get_IENptr is not implemented. \n"; exit(EXIT_FAILURE); return nullptr;}
 };
 
 #endif
