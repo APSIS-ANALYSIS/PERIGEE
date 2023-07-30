@@ -24,6 +24,8 @@ class IEN_FEM : public IIEN
 
     virtual int get_IEN( const int &ee, const int &l_node ) const;
 
+    virtual int get_nLocBas( const int &ee = 0 ) const {return nLocBas;}
+
     virtual void print_IEN() const;
 
   private:

@@ -18,6 +18,8 @@ class IIEN
     // get the IEN arrray for element e at local node l_node
     virtual int get_IEN( const int &ee, const int &l_node ) const = 0;
 
+    virtual int get_nLocBas( const int &ee = 0 ) const = 0;
+
     // print IEN array
     virtual void print_IEN() const = 0;
 
