@@ -18,7 +18,7 @@ int IEN_Tetra_P2::get_IEN( const int &ee, const int &l_node ) const
   return IEN[ee*10+l_node];
 }
 
-void IEN_Tetra_P2::print_IEN() const
+void IEN_Tetra_P2::print_info() const
 {
   std::cout<<std::endl;
   std::cout<<"====== IEN ====== \n";

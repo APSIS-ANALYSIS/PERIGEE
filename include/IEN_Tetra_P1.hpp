@@ -25,7 +25,7 @@ class IEN_Tetra_P1 : public IIEN
 
     virtual int get_IEN( const int &ee, const int &l_node ) const;
 
-    virtual void print_IEN() const;
+    virtual void print_info() const;
 
   private:
     const int nElem;

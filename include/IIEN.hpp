@@ -24,11 +24,7 @@ class IIEN
     virtual int get_nLocBas( const int &ee = 0 ) const = 0;
 
     // print IEN array
-    virtual void print_IEN() const = 0;
-
-    // print info
-    virtual void print_info() const
-    {std::cerr<<"Error: print_info is not implemented. \n"; exit(EXIT_FAILURE);}
+    virtual void print_info() const = 0;
 };
 
 #endif

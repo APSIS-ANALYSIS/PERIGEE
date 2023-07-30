@@ -22,7 +22,7 @@ int IEN_Tetra_P1::get_IEN( const int &ee, const int &l_node ) const
 }
 
 
-void IEN_Tetra_P1::print_IEN() const
+void IEN_Tetra_P1::print_info() const
 {
   std::cout<<std::endl;
   std::cout<<"====== IEN ====== \n";

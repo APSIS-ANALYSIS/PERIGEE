@@ -21,7 +21,7 @@ int IEN_FEM::get_IEN( const int &ee, const int &ii ) const
   return IEN[ee*nLocBas + ii];
 }
 
-void IEN_FEM::print_IEN() const
+void IEN_FEM::print_info() const
 {
   std::cout<<std::endl;
   std::cout<<"====== IEN ====== \n";
