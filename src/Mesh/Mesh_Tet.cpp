@@ -13,7 +13,7 @@ Mesh_Tet::Mesh_Tet(const int &in_nfunc, const int &in_nelem,
       nLocBas = 10;
       break;
     default:
-      SYS_T::print_exit("Error: Mesh_Tet, the input value of degree is not supported.\n");
+      SYS_T::print_exit("Error: Mesh_Tet, the input value of degree %d is not supported.\n", deg);
       nLocBas = 0;
       break;
   }

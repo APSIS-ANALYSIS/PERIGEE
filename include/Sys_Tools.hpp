@@ -238,26 +238,27 @@ namespace SYS_T
 
   // 6. Print exit message printers are used in terminating serial 
   //    program when the communicator for MPI is not available.
-  inline void print_exit( const char * const &mesg )
+  inline void print_exit( const char output[], ... )
   {
-    std::cout<<mesg<<std::endl;
+    va_list Argp;
+    va_start(Argp, output);
+    vfprintf (stdout, output, Argp);
+    va_end(Argp);
+
     exit( EXIT_FAILURE );
   }
 
-  inline void print_exit( const std::string &mesg )
+  inline void print_exit_if( bool a, const char output[], ... )
   {
-    std::cout<<mesg<<std::endl;
-    exit( EXIT_FAILURE );
-  }
+    if( a )
+    {
+      va_list Argp;
+      va_start(Argp, output);
+      vfprintf (stdout, output, Argp);
+      va_end(Argp);
 
-  inline void print_exit_if( bool a, const char * const &mesg )
-  {
-    if( a ) print_exit(mesg);
-  }
-
-  inline void print_exit_if( bool a, const std::string &mesg )
-  {
-    if( a ) print_exit(mesg);
+      exit( EXIT_FAILURE );
+    }
   }
 
   // ================================================================
