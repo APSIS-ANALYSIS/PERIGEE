@@ -131,7 +131,7 @@ double PLocAssem_Tet_CMM_GenAlpha::get_DC(
     const double &u, const double &v, const double &w ) const
 {
   // const SymmMatrix_3x3 G = get_metric( dxi_dx );
-  // const Vector_3 velo_vec{ u, v, w };
+  // const Vector_3 velo_vec( u, v, w );
   // double dc_tau = G.VecMatVec( velo_vec, velo_vec );
 
   // if(dc_tau > 1.0e-15) dc_tau = rho0 * std::pow(dc_tau, -0.5);
