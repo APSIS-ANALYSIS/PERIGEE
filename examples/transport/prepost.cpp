@@ -1,10 +1,8 @@
 // prepost.cpp
 #include "HDF5_Reader.hpp"
 #include "Tet_Tools.hpp"
-#include "Mesh_Tet4.hpp"
-#include "Mesh_Tet10.hpp"
-#include "IEN_Tetra_P1.hpp"
-#include "IEN_Tetra_P2.hpp"
+#include "Mesh_Tet.hpp"
+#include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
 #include "Part_Tet.hpp"
@@ -58,25 +56,25 @@ int main( int argc, char * argv[] )
 
   TET_T::read_vtu_grid(geo_file.c_str(), nFunc, nElem, ctrlPts, vecIEN);
   
-  IIEN * IEN = nullptr;
+  IIEN * IEN = new IEN_FEM(nElem, vecIEN);
+  VEC_T::clean( vecIEN ); // clean the vector
+
   IMesh * mesh = nullptr;
 
-  if(elemType == 501)
+  switch( elemType )
   {
-    SYS_T::print_fatal_if(vecIEN.size() / nElem != 4, "Error: the mesh connectivity array size does not match with the element type 501. \n");
-
-    IEN = new IEN_Tetra_P1(nElem, vecIEN);
-    mesh = new Mesh_Tet4(nFunc, nElem);
-  }
-  else
-  {
-    SYS_T::print_fatal_if(vecIEN.size() / nElem != 10, "Error: the mesh connectivity array size does not match with the element type 502. \n");
-
-    IEN = new IEN_Tetra_P2(nElem, vecIEN);
-    mesh = new Mesh_Tet10(nFunc, nElem);
+    case 501:
+      mesh = new Mesh_Tet(nFunc, nElem, 1);
+      break;
+    case 502:
+      mesh = new Mesh_Tet(nFunc, nElem, 2);
+      break;
+    default:
+      SYS_T::print_exit("Error: elemType %d is not supported.\n", elemType);
+      break;
   }
 
-  VEC_T::clean( vecIEN ); // clean the vector
+  SYS_T::print_exit_if_not( IEN->get_nLocBas() == mesh->get_nLocBas(), "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", mesh->get_nLocBas(), IEN->get_nLocBas()); 
 
   mesh -> print_info();
 
