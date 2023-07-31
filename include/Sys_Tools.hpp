@@ -242,7 +242,7 @@ namespace SYS_T
   {
     va_list Argp;
     va_start(Argp, output);
-    vfprintf (stdout, output, Argp);
+    vfprintf (stderr, output, Argp);
     va_end(Argp);
 
     exit( EXIT_FAILURE );
@@ -254,7 +254,7 @@ namespace SYS_T
     {
       va_list Argp;
       va_start(Argp, output);
-      vfprintf (stdout, output, Argp);
+      vfprintf (stderr, output, Argp);
       va_end(Argp);
 
       exit( EXIT_FAILURE );
@@ -267,7 +267,7 @@ namespace SYS_T
     {
       va_list Argp;
       va_start(Argp, output);
-      vfprintf (stdout, output, Argp);
+      vfprintf (stderr, output, Argp);
       va_end(Argp);
 
       exit( EXIT_FAILURE );
