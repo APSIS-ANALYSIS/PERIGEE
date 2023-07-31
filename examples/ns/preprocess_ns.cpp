@@ -8,11 +8,7 @@
 // ==================================================================
 #include "Math_Tools.hpp"
 #include "Mesh_Tet.hpp"
-#include "Mesh_Tet4.hpp"
-#include "Mesh_Tet10.hpp"
 #include "IEN_FEM.hpp"
-#include "IEN_Tetra_P1.hpp"
-#include "IEN_Tetra_P2.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
 #include "Part_Tet.hpp"
