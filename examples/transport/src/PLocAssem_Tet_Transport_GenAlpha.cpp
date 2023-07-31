@@ -89,7 +89,8 @@ void PLocAssem_Tet_Transport_GenAlpha::Assem_Residual(
   for(int qua=0; qua<nqp; ++qua)
   {
     double u_t = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
-    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+
+    Vector_3 coor(0.0, 0.0, 0.0);
 
     element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
     
@@ -100,14 +101,14 @@ void PLocAssem_Tet_Transport_GenAlpha::Assem_Residual(
       u_y += sol[ii]     * dR_dy[ii];
       u_z += sol[ii]     * dR_dz[ii];
       
-      coor_x += eleCtrlPts_x[ii] * R[ii];
-      coor_y += eleCtrlPts_y[ii] * R[ii];
-      coor_z += eleCtrlPts_z[ii] * R[ii];
+      coor.x() += eleCtrlPts_x[ii] * R[ii];
+      coor.y() += eleCtrlPts_y[ii] * R[ii];
+      coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
     
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
     
-    const double ff = get_f(coor_x, coor_y, coor_z, curr);
+    const double ff = get_f(coor, curr);
 
     for(int A=0; A<nLocBas; ++A)
     {
@@ -141,7 +142,8 @@ void PLocAssem_Tet_Transport_GenAlpha::Assem_Tangent_Residual(
   for(int qua=0; qua<nqp; ++qua)
   {
     double u_t = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
-    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    
+    Vector_3 coor(0.0, 0.0, 0.0);
 
     element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
     
@@ -152,14 +154,14 @@ void PLocAssem_Tet_Transport_GenAlpha::Assem_Tangent_Residual(
       u_y += sol[ii]     * dR_dy[ii];
       u_z += sol[ii]     * dR_dz[ii];
       
-      coor_x += eleCtrlPts_x[ii] * R[ii];
-      coor_y += eleCtrlPts_y[ii] * R[ii];
-      coor_z += eleCtrlPts_z[ii] * R[ii];
+      coor.x() += eleCtrlPts_x[ii] * R[ii];
+      coor.y() += eleCtrlPts_y[ii] * R[ii];
+      coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
     
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
     
-    const double ff = get_f(coor_x, coor_y, coor_z, curr);
+    const double ff = get_f(coor, curr);
 
     for(int A=0; A<nLocBas; ++A)
     {
@@ -201,7 +203,7 @@ void PLocAssem_Tet_Transport_GenAlpha::Assem_Mass_Residual(
   for(int qua=0; qua<nqp; ++qua)
   {
     double u_x = 0.0, u_y = 0.0, u_z = 0.0;
-    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    Vector_3 coor(0.0, 0.0, 0.0);
 
     element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
 
@@ -211,14 +213,14 @@ void PLocAssem_Tet_Transport_GenAlpha::Assem_Mass_Residual(
       u_y += sol[ii]     * dR_dy[ii];
       u_z += sol[ii]     * dR_dz[ii];
 
-      coor_x += eleCtrlPts_x[ii] * R[ii];
-      coor_y += eleCtrlPts_y[ii] * R[ii];
-      coor_z += eleCtrlPts_z[ii] * R[ii];
+      coor.x() += eleCtrlPts_x[ii] * R[ii];
+      coor.y() += eleCtrlPts_y[ii] * R[ii];
+      coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
-    const double ff = get_f(coor_x, coor_y, coor_z, curr);
+    const double ff = get_f(coor, curr);
 
     for(int A=0; A<nLocBas; ++A)
     {
@@ -256,16 +258,16 @@ void PLocAssem_Tet_Transport_GenAlpha::Assem_Residual_EBC(
     double surface_area;
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
-    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    Vector_3 coor(0.0, 0.0, 0.0);
 
     for(int ii=0; ii<snLocBas; ++ii)
     {
-      coor_x += eleCtrlPts_x[ii] * R[ii];
-      coor_y += eleCtrlPts_y[ii] * R[ii];
-      coor_z += eleCtrlPts_z[ii] * R[ii];
+      coor.x() += eleCtrlPts_x[ii] * R[ii];
+      coor.y() += eleCtrlPts_y[ii] * R[ii];
+      coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
-    const double gg = get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr );
+    const double gg = get_ebc_fun( ebc_id, coor, curr );
 
     const double gwts = surface_area * quad -> get_qw( qua );
 

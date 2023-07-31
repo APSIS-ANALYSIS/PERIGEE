@@ -92,35 +92,34 @@ class PLocAssem_Tet_Transport_GenAlpha : public IPLocAssem
 
     void print_info() const;
 
-    double get_f( const double &x, const double &y, const double &z, 
-        const double &t ) const
+    double get_f( const Vector_3 &pt, const double &tt ) const
     {
       //const double pi = MATH_T::PI;
     
-      const double t3 = t*t*t;
-      const double t4 = t3 * t;
+      const double t3 = tt*tt*tt;
+      const double t4 = t3 * tt;
+      const double x = pt.x();
+      const double y = pt.y();
+      const double z = pt.z();
 
       return 4*cap*rho*t3*x*y*z*(x - 1)*(y - 1)*(z - 1) - 2*kappa*t4*x*z*(x - 1)*(z - 1) - 2*kappa*t4*y*z*(y - 1)*(z - 1) - 2*kappa*t4*x*y*(x - 1)*(y - 1); 
     }
 
-    typedef double ( PLocAssem_Tet_Transport_GenAlpha::*locassem_transport_funs )( const double &x, const double &y, const double &z, const double &t ) const;
+    typedef double ( PLocAssem_Tet_Transport_GenAlpha::*locassem_transport_funs )( const Vector_3 &pt, const double &t ) const;
 
     locassem_transport_funs * flist;
 
-    double get_ebc_fun( const int &ebc_id,
-        const double &x, const double &y, const double &z, const double &t ) const
+    double get_ebc_fun( const int &ebc_id, const Vector_3 &pt, const double &tt ) const
     {
-      return ((*this).*(flist[ebc_id]))(x,y,z,t);
+      return ((*this).*(flist[ebc_id]))(pt, tt);
     }
 
-    double get_g_0( const double &x, const double &y, const double &z,
-        const double &time ) const
+    double get_g_0( const Vector_3 &pt, const double &time ) const
     {
       return 0.0;
     }
 
-    double get_g_1( const double &x, const double &y, const double &z,
-        const double &time ) const
+    double get_g_1( const Vector_3 &pt, const double &time ) const
     {
       return 0.0;
     }
