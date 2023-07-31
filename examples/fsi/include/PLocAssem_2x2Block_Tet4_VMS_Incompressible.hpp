@@ -130,8 +130,7 @@ class PLocAssem_2x2Block_Tet4_VMS_Incompressible : public IPLocAssem_2x2Block
 
     void print_info() const;
 
-    void get_tau( double &tau_m_qua, double &tau_c_qua,
-        const double &dt, const double &Jin, const double &dx ) const;
+    std::array<double, 2> get_tau( const double &dt, const double &Jin, const double &dx ) const;
 
     Vector_3 get_f(const double &x, const double &y, const double &z,
         const double &t ) const
