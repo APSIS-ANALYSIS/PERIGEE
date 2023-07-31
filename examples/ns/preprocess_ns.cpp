@@ -1,5 +1,5 @@
 // ==================================================================
-// preprocess_sv_tets.cpp
+// preprocess_ns.cpp
 //
 // This is a preprocessor code for handling Navier-Stokes equations 
 // discretized by tetradedral elements.
@@ -7,8 +7,10 @@
 // Date Created: Jan 01 2020
 // ==================================================================
 #include "Math_Tools.hpp"
+#include "Mesh_Tet.hpp"
 #include "Mesh_Tet4.hpp"
 #include "Mesh_Tet10.hpp"
+#include "IEN_FEM.hpp"
 #include "IEN_Tetra_P1.hpp"
 #include "IEN_Tetra_P2.hpp"
 #include "Global_Part_METIS.hpp"
@@ -160,26 +162,26 @@ int main( int argc, char * argv[] )
   
   TET_T::read_vtu_grid(geo_file.c_str(), nFunc, nElem, ctrlPts, vecIEN);
   
-  IIEN * IEN = nullptr;
-  IMesh * mesh = nullptr;
-
-  if(elemType == 501)
-  {
-    SYS_T::print_fatal_if(vecIEN.size() / nElem != 4, "Error: the mesh connectivity array size does not match with the element type 501. \n");
-    
-    IEN = new IEN_Tetra_P1(nElem, vecIEN);
-    mesh = new Mesh_Tet4(nFunc, nElem);
-  }
-  else
-  {
-    SYS_T::print_fatal_if(vecIEN.size() / nElem != 10, "Error: the mesh connectivity array size does not match with the element type 502. \n");
-    
-    IEN = new IEN_Tetra_P2(nElem, vecIEN);
-    mesh = new Mesh_Tet10(nFunc, nElem);
-  }
-
+  IIEN * IEN = new IEN_FEM(nElem, vecIEN);
   VEC_T::clean( vecIEN ); // clean the vector
   
+  IMesh * mesh = nullptr;
+
+  switch( elemType )
+  {
+    case 501:
+      mesh = new Mesh_Tet(nFunc, nElem, 1);
+      break;
+    case 502:
+      mesh = new Mesh_Tet(nFunc, nElem, 2);
+      break;
+    default:
+      SYS_T::print_exit("Error: elemType %d is not supported.\n", elemType);
+      break;
+  }
+
+  SYS_T::print_exit_if_not( IEN->get_nLocBas() == mesh->get_nLocBas(), "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", mesh->get_nLocBas(), IEN->get_nLocBas());
+
   mesh -> print_info();
   
   // Call METIS to partition the mesh 
@@ -189,7 +191,7 @@ int main( int argc, char * argv[] )
         isDualGraph, mesh, IEN, "epart", "npart" );
   else if(cpu_size == 1)
     global_part = new Global_Part_Serial( mesh, "epart", "npart" );
-  else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
+  else SYS_T::print_exit("ERROR: wrong cpu_size: %d \n", cpu_size);
 
   // Generate the new nodal numbering
   Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, mesh->get_nFunc());

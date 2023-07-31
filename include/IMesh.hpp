@@ -25,14 +25,11 @@ class IMesh
 
     virtual void print_info() const = 0;
 
-    virtual int get_s_degree() const
-    {std::cerr<<"Error: IMesh::get_s_degree is not implemented.\n"; exit(EXIT_FAILURE);}
+    virtual int get_s_degree() const {return get_degree();}
     
-    virtual int get_t_degree() const
-    {std::cerr<<"Error: IMesh::get_t_degree is not implemented.\n"; exit(EXIT_FAILURE);}
+    virtual int get_t_degree() const {return get_degree();}
     
-    virtual int get_u_degree() const
-    {std::cerr<<"Error: IMesh::get_u_degree is not implemented.\n"; exit(EXIT_FAILURE);}
+    virtual int get_u_degree() const {return get_degree();}
   
     // ------------------------------------------------------------------------ 
     // For unstructured meshes, there is no intrinsic definition of direction
