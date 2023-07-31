@@ -55,16 +55,14 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::print_info() const
 }
 
 
-void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::get_tau( 
-    double &tau_m_qua, double &tau_c_qua,
+std::array<double, 2> PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::get_tau( 
     const double &dt, const double &Jin, const double &dx ) const
 {
   const double mu = matmodel->get_elastic_mu();
   const double ka = matmodel->get_elastic_kappa();
   const double c_max = std::pow( rho0 / (ka + 4*mu/3.0), -0.5);
   const double dt_ka = dx / c_max;
-  tau_m_qua = 0.000 * dt_ka * Jin / rho0;
-  tau_c_qua = 0.000 * dx * c_max * rho0 / Jin;
+  return {{0.000 * dt_ka * Jin / rho0, 0.000 * dx * c_max * rho0 / Jin}};
 }
 
 
@@ -210,8 +208,9 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Residual(
     const double detF = F.det();
 
     // Get stabilization parameters
-    double tau_m, tau_c;
-    get_tau(tau_m, tau_c, dt, detF, h_e);
+    const std::array<double, 2> tau = get_tau(dt, detF, h_e);
+    const double tau_m = tau[0];
+    const double tau_c = tau[1];
 
     // Residual of momentum equation
     const double Res_Mom[3] { rho * detF * ( vx_t - f_body.x() ) + detF * ( invF(0) * p_x + invF(3) * p_y + invF(6) * p_z ), 
@@ -377,8 +376,9 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Tangent_Residual(
     const double detF = F.det();
 
     // Get stabilization parameters
-    double tau_m, tau_c;
-    get_tau(tau_m, tau_c, dt, detF, h_e);
+    const std::array<double, 2> tau = get_tau(dt, detF, h_e);
+    const double tau_m = tau[0];
+    const double tau_c = tau[1];
 
     // Residual of momentum equation
     const double Res_Mom[3] { rho * detF * ( vx_t - f_body.x() ) + detF * ( invF(0) * p_x + invF(3) * p_y + invF(6) * p_z ), 
