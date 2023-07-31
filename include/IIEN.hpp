@@ -17,8 +17,8 @@ class IIEN
 
     virtual ~IIEN(){};
 
-    // get the IEN arrray for element e at local node l_node
-    virtual int get_IEN( const int &ee, const int &l_node ) const = 0;
+    // get the IEN arrray for element e at local node ii
+    virtual int get_IEN( const int &ee, const int &ii ) const = 0;
 
     // get the number of local basis functions (per element)
     virtual int get_nLocBas( const int &ee = 0 ) const = 0;

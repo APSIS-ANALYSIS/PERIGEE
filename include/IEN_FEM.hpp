@@ -22,7 +22,7 @@ class IEN_FEM : public IIEN
 
     ~IEN_FEM();
 
-    virtual int get_IEN( const int &ee, const int &l_node ) const;
+    virtual int get_IEN( const int &ee, const int &ii ) const;
 
     virtual int get_nLocBas( const int &ee = 0 ) const {return nLocBas;}
 
