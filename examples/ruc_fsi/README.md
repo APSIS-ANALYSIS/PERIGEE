@@ -34,7 +34,7 @@ The following argument determines the boundary condition type on the inlet and o
 * `-ringbc_type` is an integer flag that determines NodalBC_3D_ring, which also affects NodalBC_3D_CMM. If it is `0` (default value), the ring nodes are fully clamped; if it is `1`, the ring nodes are allowed to move within their original plane. The ringbc_type only affects the boundary condition when the cmmbc_type = 0 or 2.
 
 ## FSI Analysis
-In the actual [analysis driver](cmm_driver.cpp), one can perform both deformable membrane FSI analysis (i.e., CMM-FSI) and the rigid wall CFD analysis. There are a few things that we want to mention about its arguments.
+In the actual [analysis driver](ruc_driver.cpp), one can perform both deformable membrane FSI analysis (i.e., RUC-FSI) and the rigid wall CFD analysis. There are a few things that we want to mention about its arguments.
 
 * `-fl_density` and `-fl-mu` define the fluid density and viscosity, respectively.
 * `-wall_density`, `-wall_poisson`, and `-wall_kappa` define the wall density, Poisson's ratio, and the shear correction factor. We assume they are uniform.
@@ -84,7 +84,7 @@ A few things about its input arguments:
 * `-is_record_sol` tells the wall solver if we want to save the solution files.
 
 ## Simulation pipeline
-Here we describe a standard pipeline for performing CMM-FSI simulations. 
+Here we describe a standard pipeline for performing RUC-FSI simulations. 
 
 1. One may want to prepare the mesh partitioning for a rigid wall CFD simulation. We assume that the mesh files whole_vol.vtu, inflow_vol.vtp, wall_vol.vtp, outflow_vol_xxx, and the centerline file centerlines.vtp have been placed in the job folder.
 ```sh
@@ -92,7 +92,7 @@ Here we describe a standard pipeline for performing CMM-FSI simulations.
 ```
 2. With the generated HDF5 files as well as the LPN file `lpn_rcr_input.txt`, one may call the analysis solver to generate a flow profile at the diastolic phase.
 ```sh
-mpirun -np 60 ./cmm_tet_3d \
+mpirun -np 60 ./ruc_tet_3d \
   -fl_density 1.00 -fl_mu 4.0e-2 -wall_density 1.0 -wall_poisson 0.5 \
   -nqp_tet 5 -nqp_tri 4 -init_step 4.055e-3 -fina_time 4.866 -is_backward_Euler YES \
   -inflow_file inflow_fourier_series_steady.txt -lpn_file lpn_rcr_input.txt \
@@ -125,9 +125,9 @@ Note, in the generation of prestress, it is recommended to clamp the ring (-ring
 ./preprocess3d -cmmbc_type 0 -ringbc_type 0 -is_uniform_wall NO -num_outlet 46 -cpu_size 60 -elem_type 501
 ```
 
-5. Now make sure that the HDF5 files generated from the above script, the prestress_pxxxxx.h5 file, the LPN file `lpn_rcr_input.txt`, and the inflow file `inflow_fourier_series.txt` have all been placed in the same job folder. Also, one needs to copy all the steady-state solutions from the previous CFD analysis and place them with the SOL_re file in the job folder. Run the following for the CMM simulation.
+5. Now make sure that the HDF5 files generated from the above script, the prestress_pxxxxx.h5 file, the LPN file `lpn_rcr_input.txt`, and the inflow file `inflow_fourier_series.txt` have all been placed in the same job folder. Also, one needs to copy all the steady-state solutions from the previous CFD analysis and place them with the SOL_re file in the job folder. Run the following for the RUC simulation.
 ```sh
-mpirun -np 60 ./cmm_tet_3d \
+mpirun -np 60 ./ruc_tet_3d \
    -nz_estimate 1000 -fl_density 1.00 -fl_mu 4.0e-2 -wall_density 1.0 -wall_poisson 0.5 \
    -nqp_tet 5 -nqp_tri 4 \
    -fina_time 2.433 \
@@ -152,6 +152,6 @@ To run postprocessing scripts, one has to repartition the mesh. Running this scr
 ```
 Next, as an example of postprocessing, we visualize the data. First, we need to make sure that we have all the necessary data, including `epart.h5`, `node_mapping.h5`, all postprocessing mesh partitioning generated hdf5 files, and solution files (e.g. SOL_900000000). Then run the following to do the visualization.
 ```sh
-mpirun -np 16 ./vis_cmm -time_start 1000 -time_step 1000 -time_end 5000
+mpirun -np 16 ./vis_ruc -time_start 1000 -time_step 1000 -time_end 5000
 ```
 The above command convert the solution files to vtk files, from time step 1000 to 5000, with incremental step being 1000.

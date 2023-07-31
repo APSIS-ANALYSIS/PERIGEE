@@ -20,12 +20,30 @@ class Gmsh_FileIO
 
     void print_info() const;
 
+    int get_num_phy_domain() const {return num_phy_domain;}
+
     int get_num_phy_domain_3d() const {return num_phy_domain_3d;}
 
     int get_num_phy_domain_2d() const {return num_phy_domain_2d;}
 
     int get_num_phy_domain_1d() const {return num_phy_domain_1d;}
+
+    int get_phy_id_3d( const int &ii ) const {return phy_3d_index[ii];}
     
+    int get_phy_id_2d( const int &ii ) const {return phy_2d_index[ii];}
+    
+    int get_phy_id_1d( const int &ii ) const {return phy_1d_index[ii];}
+
+    std::string get_phy_name_3d( const int &ii ) const {return phy_3d_name[ii];} 
+    
+    std::string get_phy_name_2d( const int &ii ) const {return phy_2d_name[ii];} 
+    
+    std::string get_phy_name_1d( const int &ii ) const {return phy_1d_name[ii];} 
+
+    int get_nlocbas( const int &ii ) const {return ele_nlocbas[ii];}
+
+    int get_eleType( const int &ii ) const {return ele_type[ii];}
+
     // --------------------------------------------------------------
     // In FSI problems, we require that the 3d physical domain index
     // 0 be the fluid domain and 3d physical domain index 1 be the 
