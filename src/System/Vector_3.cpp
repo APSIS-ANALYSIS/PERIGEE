@@ -86,6 +86,11 @@ std::vector<double> Vector_3::to_std_vec() const
   return outvec; 
 }
 
+std::array<double, 3> Vector_3::to_std_array() const
+{
+  return {{ vec[0], vec[1], vec[2] }}; 
+}
+
 void Vector_3::print() const
 {
   std::cout<<std::setprecision(12)<<vec[0]<<'\t'<<vec[1]<<'\t'<<vec[2]<<std::endl;

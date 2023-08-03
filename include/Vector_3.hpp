@@ -18,6 +18,7 @@
 #include <ctime>
 #include <cmath>
 #include <vector>
+#include <array>
 
 class Vector_3
 {
@@ -56,6 +57,8 @@ class Vector_3
     Vector_3& operator*=( const double &val );
 
     std::vector<double> to_std_vec() const;
+
+    std::array<double, 3> to_std_array() const;
 
     const double& x() const {return vec[0];}
     double& x() {return vec[0];}

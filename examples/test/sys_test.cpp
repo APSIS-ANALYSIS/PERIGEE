@@ -8,23 +8,35 @@
 #include "Tensor4_3D.hpp"
 #include "Mesh_Tet.hpp"
 #include "IEN_FEM.hpp"
+#include "Matrix_double_3by3_Array.hpp"
 
 int main(int argc, char *argv[])
 {
-  Mesh_Tet * mesh = new Mesh_Tet(100, 201, 1);
+  Matrix_double_3by3_Array A;
 
-  mesh -> print_info();
+  A.gen_rand();
 
-  std::vector<int> inien {1,3,4,5,6};
+  A.LU_fac();
 
-  IIEN * ien = new IEN_FEM(2, inien);
+  Vector_3 RHS;
 
-  ien -> print_info();
+  RHS.gen_rand();
 
+  Vector_3 sol = A.LU_solve(RHS);
 
-  delete ien;
-  delete mesh;
-  
+  auto rrhs = RHS.to_std_array();
+
+  auto ssol = A.LU_solve(rrhs);
+
+  double x1, x2, x3;
+  A.LU_solve(RHS(0), RHS(1), RHS(2), x1, x2, x3);
+
+  std::cout<<x1 - ssol[0]<<'\t';
+  std::cout<<x2 - ssol[1]<<'\t';
+  std::cout<<x3 - ssol[2]<<'\n';
+
+  sol.print();
+
   return EXIT_SUCCESS;
 }
 
