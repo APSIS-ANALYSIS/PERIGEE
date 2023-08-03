@@ -204,31 +204,27 @@ class PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
     double get_DC( const std::array<double, 9> &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
-    Vector_3 get_f(const double &x, const double &y, const double &z, const double &t ) const
+    Vector_3 get_f(const Vector_3 &pt, const double &tt ) const
     {
       return Vector_3( 0.0, 0.0, 0.0 );
     }
 
-    void get_H1(const double &x, const double &y, const double &z,
-        const double &t, const double &nx, const double &ny,
-        const double &nz, double &gx, double &gy, double &gz ) const
+    Vector_3 get_H1(const Vector_3 &pt, const double &tt, const Vector_3 &n_out) const
     {
       const double p0 = 0.0;
-      gx = p0*nx; gy = p0*ny; gz = p0*nz;
+      return Vector_3( p0*n_out.x(), p0*n_out.y(), p0*n_out.z() );
     }
 
     // Define Natural BC functions
     typedef Vector_3 ( PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::*locassem_2x2block_tet4_ale_vms_ns_funs )( 
-        const double &x, const double &y, const double &z,
-        const double &t, const Vector_3 &n_out ) const;
+        const Vector_3 &pt, const double &tt, const Vector_3 &n_out ) const;
 
     locassem_2x2block_tet4_ale_vms_ns_funs * flist;
 
     Vector_3 get_ebc_fun( const int &ebc_id,
-        const double &x, const double &y, const double &z,
-        const double &t, const Vector_3 &n_out ) const
+        const Vector_3 &pt, const double &tt, const Vector_3 &n_out ) const
     {
-      return ((*this).*(flist[ebc_id]))(x,y,z,t,n_out);
+      return ((*this).*(flist[ebc_id]))(pt, tt, n_out);
     }
 
     // Get the current point coordinates
