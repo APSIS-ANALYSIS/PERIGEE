@@ -132,7 +132,7 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Residual(
     double vx_y = 0.0, vy_y = 0.0, vz_y = 0.0;
     double vx_z = 0.0, vy_z = 0.0, vz_z = 0.0;
 
-    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    Vector_3 coor(0.0, 0.0, 0.0);
 
     double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
 
@@ -181,14 +181,14 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Residual(
       vy_z += velo[ii*3+1] * dR_dz[ii];
       vz_z += velo[ii*3+2] * dR_dz[ii];
 
-      coor_x += eleCtrlPts_x[ii] * R[ii];
-      coor_y += eleCtrlPts_y[ii] * R[ii];
-      coor_z += eleCtrlPts_z[ii] * R[ii];
+      coor.x() += eleCtrlPts_x[ii] * R[ii];
+      coor.y() += eleCtrlPts_y[ii] * R[ii];
+      coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
-    const Vector_3 f_body = get_f(coor_x, coor_y, coor_z, curr);
+    const Vector_3 f_body = get_f(coor, curr);
 
     const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
@@ -299,7 +299,7 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Tangent_Residual(
     double vx_y = 0.0, vy_y = 0.0, vz_y = 0.0;
     double vx_z = 0.0, vy_z = 0.0, vz_z = 0.0;
 
-    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    Vector_3 coor(0.0, 0.0, 0.0);
 
     double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
     
@@ -348,14 +348,14 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Tangent_Residual(
       vy_z += velo[ii*3+1] * dR_dz[ii];
       vz_z += velo[ii*3+2] * dR_dz[ii];
 
-      coor_x += eleCtrlPts_x[ii] * R[ii];
-      coor_y += eleCtrlPts_y[ii] * R[ii];
-      coor_z += eleCtrlPts_z[ii] * R[ii];
+      coor.x() += eleCtrlPts_x[ii] * R[ii];
+      coor.y() += eleCtrlPts_y[ii] * R[ii];
+      coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
-    const Vector_3 f_body = get_f(coor_x, coor_y, coor_z, curr);
+    const Vector_3 f_body = get_f(coor, curr);
 
     const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
@@ -580,7 +580,7 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Mass_Residual(
     double vx_y = 0.0, vy_y = 0.0, vz_y = 0.0;
     double vx_z = 0.0, vy_z = 0.0, vz_z = 0.0;
 
-    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    Vector_3 coor(0.0, 0.0, 0.0);
 
     double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
 
@@ -618,14 +618,14 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Mass_Residual(
       vy_z += velo[ii*3+1] * dR_dz[ii];
       vz_z += velo[ii*3+2] * dR_dz[ii];
 
-      coor_x += eleCtrlPts_x[ii] * R[ii];
-      coor_y += eleCtrlPts_y[ii] * R[ii];
-      coor_z += eleCtrlPts_z[ii] * R[ii];
+      coor.x() += eleCtrlPts_x[ii] * R[ii];
+      coor.y() += eleCtrlPts_y[ii] * R[ii];
+      coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
     
-    const Vector_3 f_body = get_f(coor_x, coor_y, coor_z, curr);
+    const Vector_3 f_body = get_f(coor, curr);
 
     const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
@@ -711,16 +711,15 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Residual_EBC(
     double surface_area;
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
-    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    Vector_3 coor(0.0, 0.0, 0.0);
     for(int ii=0; ii<snLocBas; ++ii)
     {
-      coor_x += eleCtrlPts_x[ii] * R[ii];
-      coor_y += eleCtrlPts_y[ii] * R[ii];
-      coor_z += eleCtrlPts_z[ii] * R[ii];
+      coor.x() += eleCtrlPts_x[ii] * R[ii];
+      coor.y() += eleCtrlPts_y[ii] * R[ii];
+      coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
-    const Vector_3 gg = get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr,
-        n_out.x(), n_out.y(), n_out.z() );
+    const Vector_3 gg = get_ebc_fun( ebc_id, coor, curr, n_out );
 
     for(int A=0; A<snLocBas; ++A)
     {

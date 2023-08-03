@@ -157,9 +157,9 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual(
     double u = 0.0, u_t = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
     double v = 0.0, v_t = 0.0, v_x = 0.0, v_y = 0.0, v_z = 0.0;
     double w = 0.0, w_t = 0.0, w_x = 0.0, w_y = 0.0, w_z = 0.0;
-    double p = 0.0, coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
-    double p_x = 0.0, p_y = 0.0, p_z = 0.0;
+    double p = 0.0, p_x = 0.0, p_y = 0.0, p_z = 0.0;
     double mu = 0.0, mv = 0.0, mw = 0.0; // mesh velocity, i.e. hat-v
+    Vector_3 coor(0.0, 0.0, 0.0);
 
     element->get_R_gradR( qua, R, dR_dx, dR_dy, dR_dz );
 
@@ -193,9 +193,9 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual(
       w_z += velo[ii*3+2] * dR_dz[ii];
       p_z += pres[ii]     * dR_dz[ii];
 
-      coor_x += curPt_x[ii] * R[ii];
-      coor_y += curPt_y[ii] * R[ii];
-      coor_z += curPt_z[ii] * R[ii];
+      coor.x() += curPt_x[ii] * R[ii];
+      coor.y() += curPt_y[ii] * R[ii];
+      coor.z() += curPt_z[ii] * R[ii];
     }
 
     // v - hat(v)
@@ -212,7 +212,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual(
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
-    const Vector_3 f_body = get_f(coor_x, coor_y, coor_z, curr);
+    const Vector_3 f_body = get_f(coor, curr);
 
     const double rx = rho0 * ( u_t + u_x * cu + u_y * cv + u_z * cw - f_body.x() ) + p_x;
     const double ry = rho0 * ( v_t + v_x * cu + v_y * cv + v_z * cw - f_body.y() ) + p_y;
@@ -322,9 +322,9 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     double u = 0.0, u_t = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
     double v = 0.0, v_t = 0.0, v_x = 0.0, v_y = 0.0, v_z = 0.0;
     double w = 0.0, w_t = 0.0, w_x = 0.0, w_y = 0.0, w_z = 0.0;
-    double p = 0.0, coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
-    double p_x = 0.0, p_y = 0.0, p_z = 0.0;
+    double p = 0.0, p_x = 0.0, p_y = 0.0, p_z = 0.0;
     double mu = 0.0, mv = 0.0, mw = 0.0;
+    Vector_3 coor(0.0, 0.0, 0.0);
 
     element->get_R_gradR( qua, R, dR_dx, dR_dy, dR_dz );
 
@@ -358,9 +358,9 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
       w_z += velo[ii*3+2] * dR_dz[ii];
       p_z += pres[ii]     * dR_dz[ii];
 
-      coor_x += curPt_x[ii] * R[ii];
-      coor_y += curPt_y[ii] * R[ii];
-      coor_z += curPt_z[ii] * R[ii];
+      coor.x() += curPt_x[ii] * R[ii];
+      coor.y() += curPt_y[ii] * R[ii];
+      coor.z() += curPt_z[ii] * R[ii];
     }
 
     const double cu = u - mu;
@@ -376,7 +376,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua); 
 
-    const Vector_3 f_body = get_f(coor_x, coor_y, coor_z, curr);
+    const Vector_3 f_body = get_f(coor, curr);
 
     const double rx = rho0 * ( u_t + u_x * cu + u_y * cv + u_z * cw - f_body.x() ) + p_x;
     const double ry = rho0 * ( v_t + v_x * cu + v_y * cv + v_z * cw - f_body.y() ) + p_y;
@@ -661,7 +661,8 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Mass_Residual(
     double u = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
     double v = 0.0, v_x = 0.0, v_y = 0.0, v_z = 0.0;
     double w = 0.0, w_x = 0.0, w_y = 0.0, w_z = 0.0;
-    double p = 0.0, coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    double p = 0.0;
+    Vector_3 coor(0.0, 0.0, 0.0);
 
     element->get_R_gradR( qua, R, dR_dx, dR_dy, dR_dz );
 
@@ -684,14 +685,14 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Mass_Residual(
       v_z += velo[ii*3+1] * dR_dz[ii];
       w_z += velo[ii*3+2] * dR_dz[ii];
 
-      coor_x += curPt_x[ii] * R[ii];
-      coor_y += curPt_y[ii] * R[ii];
-      coor_z += curPt_z[ii] * R[ii];
+      coor.x() += curPt_x[ii] * R[ii];
+      coor.y() += curPt_y[ii] * R[ii];
+      coor.z() += curPt_z[ii] * R[ii];
     }
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
-    const Vector_3 f_body = get_f(coor_x, coor_y, coor_z, curr);
+    const Vector_3 f_body = get_f(coor, curr);
 
     for(int A=0; A<nLocBas; ++A)
     {
@@ -759,15 +760,15 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC(
     const std::vector<double> R = element->get_R(qua);
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
-    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    Vector_3 coor(0.0, 0.0, 0.0);
     for(int ii=0; ii<snLocBas; ++ii)
     {
-      coor_x += curPt_x[ii] * R[ii];
-      coor_y += curPt_y[ii] * R[ii];
-      coor_z += curPt_z[ii] * R[ii];
+      coor.x() += curPt_x[ii] * R[ii];
+      coor.y() += curPt_y[ii] * R[ii];
+      coor.z() += curPt_z[ii] * R[ii];
     }
 
-    const Vector_3 traction = get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr, n_out );
+    const Vector_3 traction = get_ebc_fun( ebc_id, coor, curr, n_out );
 
     for(int A=0; A<snLocBas; ++A)
     {
