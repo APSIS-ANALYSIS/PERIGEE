@@ -208,38 +208,32 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
         const double &u, const double &v, const double &w ) const;
 
     // Return body force acting on the fluid domain
-    Vector_3 get_f( const double &x, const double &y, const double &z,
-        const double &t ) const
+    Vector_3 get_f( const Vector_3 &pt, const double &tt ) const
     {
       return Vector_3(0.0, 0.0, 0.0);
     }
 
     // Return body force acting on the wall domain
-    Vector_3 get_fw( const double &x, const double &y, const double &z,
-        const double &t ) const
+    Vector_3 get_fw( const Vector_3 &pt, const double &tt ) const
     {
       return Vector_3( 0.0, 0.0, 0.0 );
     }
 
-    void get_H1( const double &x, const double &y, const double &z,
-        const double &t, const double &nx, const double &ny,
-        const double &nz, double &gx, double &gy, double &gz ) const
+    Vector_3 get_H1( const Vector_3 &pt, const double &tt, const Vector_3 &n_out ) const
     {
       const double p0 = 0.0;
-      gx = p0*nx; gy = p0*ny; gz = p0*nz;
+      return Vector_3( p0*n_out.x(), p0*n_out.y(), p0*n_out.z() );
     }
 
     typedef Vector_3 ( PLocAssem_Tet_CMM_GenAlpha::*locassem_tet_cmm_funs )(
-      const double &x, const double &y, const double &z,
-      const double &t, const Vector_3 &n_out ) const;
+      const Vector_3 &pt, const double &tt, const Vector_3 &n_out ) const;
 
     locassem_tet_cmm_funs * flist;
 
     Vector_3 get_ebc_fun( const int &ebc_id,
-        const double &x, const double &y, const double &z,
-        const double &t, const Vector_3 &n_out ) const
+        const Vector_3 &pt, const double &tt, const Vector_3 &n_out ) const
     {
-      return ((*this).*(flist[ebc_id]))(x,y,z,t,n_out);
+      return ((*this).*(flist[ebc_id]))(pt, tt, n_out);
     }
 };
 
