@@ -9,6 +9,7 @@
 // ==================================================================
 #include <iostream>
 #include <cmath>
+#include <array>
 
 class Matrix_double_6by6_Array
 {
@@ -26,7 +27,9 @@ class Matrix_double_6by6_Array
 
     void LU_fac();
     
-    void LU_solve(const double * const &b, double * const &x) const;
+    void LU_solve( const double * const &rhs, double * const &sol ) const;
+    
+    std::array<double, 6> LU_solve( const std::array<double, 6> &rhs ) const;
 
     void print() const;
 
