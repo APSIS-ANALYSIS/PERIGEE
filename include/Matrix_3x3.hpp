@@ -286,4 +286,7 @@ Matrix_3x3 transpose( const Matrix_3x3 &input );
 // Return an identity matrix
 Matrix_3x3 gen_identity_matrix();
 
+// Return a zero matrix
+Matrix_3x3 gen_zero_matrix();
+
 #endif
