@@ -5,6 +5,7 @@
 // This is a 6by6 matrix class that we used in calculating 2nd order
 // derivatives of element basis functions.
 //
+// Author: Ju Liu
 // Date: Nov. 21 2013
 // ==================================================================
 #include <iostream>
@@ -26,8 +27,6 @@ class Matrix_double_6by6_Array
     ~Matrix_double_6by6_Array();
 
     void LU_fac();
-    
-    void LU_solve( const double * const &rhs, double * const &sol ) const;
     
     std::array<double, 6> LU_solve( const std::array<double, 6> &rhs ) const;
 
