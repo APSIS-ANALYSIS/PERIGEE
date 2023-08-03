@@ -169,11 +169,13 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
     double u = 0.0, u_t = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
     double v = 0.0, v_t = 0.0, v_x = 0.0, v_y = 0.0, v_z = 0.0;
     double w = 0.0, w_t = 0.0, w_x = 0.0, w_y = 0.0, w_z = 0.0;
-    double p = 0.0, coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
-    double p_x = 0.0, p_y = 0.0, p_z = 0.0;
+    double p = 0.0, p_x = 0.0, p_y = 0.0, p_z = 0.0;
+
     double u_xx = 0.0, u_yy = 0.0, u_zz = 0.0;
     double v_xx = 0.0, v_yy = 0.0, v_zz = 0.0;
     double w_xx = 0.0, w_yy = 0.0, w_zz = 0.0;
+
+    Vector_3 coor(0.0, 0.0, 0.0);
 
     element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
         &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
@@ -218,9 +220,9 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
       w_yy += sol[ii4+3] * d2R_dyy[ii];
       w_zz += sol[ii4+3] * d2R_dzz[ii];
 
-      coor_x += eleCtrlPts_x[ii] * R[ii];
-      coor_y += eleCtrlPts_y[ii] * R[ii];
-      coor_z += eleCtrlPts_z[ii] * R[ii];
+      coor.x() += eleCtrlPts_x[ii] * R[ii];
+      coor.y() += eleCtrlPts_y[ii] * R[ii];
+      coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
     // Get the tau_m and tau_c
@@ -235,7 +237,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
     // Get the body force
-    const Vector_3 f_body = get_f(coor_x, coor_y, coor_z, curr);
+    const Vector_3 f_body = get_f(coor, curr);
 
     const double u_lap = u_xx + u_yy + u_zz;
     const double v_lap = v_xx + v_yy + v_zz;
@@ -343,11 +345,13 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
     double u = 0.0, u_t = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
     double v = 0.0, v_t = 0.0, v_x = 0.0, v_y = 0.0, v_z = 0.0;
     double w = 0.0, w_t = 0.0, w_x = 0.0, w_y = 0.0, w_z = 0.0;
-    double p = 0.0, coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
-    double p_x = 0.0, p_y = 0.0, p_z = 0.0;
+    double p = 0.0, p_x = 0.0, p_y = 0.0, p_z = 0.0;
+
     double u_xx = 0.0, u_yy = 0.0, u_zz = 0.0;
     double v_xx = 0.0, v_yy = 0.0, v_zz = 0.0;
     double w_xx = 0.0, w_yy = 0.0, w_zz = 0.0;
+
+    Vector_3 coor(0.0, 0.0, 0.0);
 
     element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
         &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
@@ -392,9 +396,9 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
       w_yy += sol[ii4+3] * d2R_dyy[ii];
       w_zz += sol[ii4+3] * d2R_dzz[ii];
 
-      coor_x += eleCtrlPts_x[ii] * R[ii];
-      coor_y += eleCtrlPts_y[ii] * R[ii];
-      coor_z += eleCtrlPts_z[ii] * R[ii];
+      coor.x() += eleCtrlPts_x[ii] * R[ii];
+      coor.y() += eleCtrlPts_y[ii] * R[ii];
+      coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
     const auto dxi_dx = element->get_invJacobian(qua);
@@ -407,7 +411,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua); 
 
-    const Vector_3 f_body = get_f(coor_x, coor_y, coor_z, curr);
+    const Vector_3 f_body = get_f(coor, curr);
 
     const double u_lap = u_xx + u_yy + u_zz;
     const double v_lap = v_xx + v_yy + v_zz;
@@ -700,7 +704,8 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Mass_Residual(
     double u = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
     double v = 0.0, v_x = 0.0, v_y = 0.0, v_z = 0.0;
     double w = 0.0, w_x = 0.0, w_y = 0.0, w_z = 0.0;
-    double p = 0.0, coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    double p = 0.0;
+    Vector_3 coor(0.0, 0.0, 0.0);
 
     element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
 
@@ -725,14 +730,14 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Mass_Residual(
       v_z += sol[ii4+2] * dR_dz[ii];
       w_z += sol[ii4+3] * dR_dz[ii];
 
-      coor_x += eleCtrlPts_x[ii] * R[ii];
-      coor_y += eleCtrlPts_y[ii] * R[ii];
-      coor_z += eleCtrlPts_z[ii] * R[ii];
+      coor.x() += eleCtrlPts_x[ii] * R[ii];
+      coor.y() += eleCtrlPts_y[ii] * R[ii];
+      coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
-    const Vector_3 f_body = get_f(coor_x, coor_y, coor_z, curr);
+    const Vector_3 f_body = get_f(coor, curr);
 
     for(int A=0; A<nLocBas; ++A)
     {
@@ -793,15 +798,15 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC(
 
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
-    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    Vector_3 coor(0.0, 0.0, 0.0);
     for(int ii=0; ii<snLocBas; ++ii)
     {
-      coor_x += eleCtrlPts_x[ii] * R[ii];
-      coor_y += eleCtrlPts_y[ii] * R[ii];
-      coor_z += eleCtrlPts_z[ii] * R[ii];
+      coor.x() += eleCtrlPts_x[ii] * R[ii];
+      coor.y() += eleCtrlPts_y[ii] * R[ii];
+      coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
-    const Vector_3 traction = get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr, n_out );
+    const Vector_3 traction = get_ebc_fun( ebc_id, coor, curr, n_out );
 
     for(int A=0; A<snLocBas; ++A)
     {
@@ -1046,7 +1051,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     double u_t = 0.0, v_t = 0.0, w_t = 0.0, u = 0.0, v = 0.0, w = 0.0;
     double disp_x = 0.0, disp_y = 0.0, disp_z = 0.0;
     double h_w = 0.0, ks_w = 0.0, cs_w = 0.0;
-    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    Vector_3 coor(0.0, 0.0, 0.0);
 
     for(int ii=0; ii<snLocBas; ++ii)
     {
@@ -1066,9 +1071,9 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
       ks_w += ele_springconst[ii]  * R[ii];
       cs_w += ele_dampingconst[ii] * R[ii];
 
-      coor_x += eleCtrlPts_x[ii] * R[ii];
-      coor_y += eleCtrlPts_y[ii] * R[ii];
-      coor_z += eleCtrlPts_z[ii] * R[ii];
+      coor.x() += eleCtrlPts_x[ii] * R[ii];
+      coor.y() += eleCtrlPts_y[ii] * R[ii];
+      coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
     // Add prestress: convert from Voigt notation (comps 11, 22, 33, 23, 13, 12)
@@ -1085,7 +1090,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
     // Body force acting on the wall
-    const Vector_3 fw =  get_fw(coor_x, coor_y, coor_z, curr);
+    const Vector_3 fw =  get_fw(coor, curr);
 
     // Basis function gradients with respect to global coords
     // dR/dx_{i} = Q_{ji} * dR/dxl_{j}. Note that dR/dzl = 0.0
@@ -1169,7 +1174,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     double u_t = 0.0, v_t = 0.0, w_t = 0.0, u = 0.0, v = 0.0, w = 0.0; 
     double disp_x = 0.0, disp_y = 0.0, disp_z = 0.0;
     double h_w = 0.0, E_w = 0.0, ks_w = 0.0, cs_w = 0.0;
-    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+    Vector_3 coor(0.0, 0.0, 0.0);
 
     for(int ii=0; ii<snLocBas; ++ii)
     {
@@ -1191,15 +1196,15 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
       ks_w += ele_springconst[ii]  * R[ii];
       cs_w += ele_dampingconst[ii] * R[ii];
 
-      coor_x += eleCtrlPts_x[ii] * R[ii];
-      coor_y += eleCtrlPts_y[ii] * R[ii];
-      coor_z += eleCtrlPts_z[ii] * R[ii];
+      coor.x() += eleCtrlPts_x[ii] * R[ii];
+      coor.y() += eleCtrlPts_y[ii] * R[ii];
+      coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
     // Body force acting on the wall
-    const Vector_3 fw = get_fw(coor_x, coor_y, coor_z, curr);
+    const Vector_3 fw = get_fw(coor, curr);
 
     const double coef = E_w / (1.0 - nu_w * nu_w);
 
