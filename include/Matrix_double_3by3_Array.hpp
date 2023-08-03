@@ -16,7 +16,6 @@
 // Author: Ju Liu
 // Date: Oct. 1st 2015
 // ============================================================================
-#include <array>
 #include "Vector_3.hpp"
 
 class Matrix_double_3by3_Array
