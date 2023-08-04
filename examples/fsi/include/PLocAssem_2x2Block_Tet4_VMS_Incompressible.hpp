@@ -130,29 +130,24 @@ class PLocAssem_2x2Block_Tet4_VMS_Incompressible : public IPLocAssem_2x2Block
 
     void print_info() const;
 
-    void get_tau( double &tau_m_qua, double &tau_c_qua,
-        const double &dt, const double &Jin, const double &dx ) const;
+    std::array<double, 2> get_tau( const double &dt, const double &Jin, const double &dx ) const;
 
-    Vector_3 get_f(const double &x, const double &y, const double &z,
-        const double &t ) const
+    Vector_3 get_f(const Vector_3 &pt, const double &tt ) const
     {
       return Vector_3( 0.0, 0.0, 0.0 );
     }
 
     // Use pointers to the member functions to facilitate the automatic
     // treatment of ebc surface integration.
-    typedef Vector_3 ( PLocAssem_2x2Block_Tet4_VMS_Incompressible::*locassem_2x2block_vms_ela_fem_funs )( const double &x, const double &y, const double &z,
-        const double &t, const double &nx, const double &ny,
-        const double &nz ) const;
+    typedef Vector_3 ( PLocAssem_2x2Block_Tet4_VMS_Incompressible::*locassem_2x2block_vms_ela_fem_funs )( 
+        const Vector_3 &pt, const double &tt, const Vector_3 &n_out ) const;
 
     locassem_2x2block_vms_ela_fem_funs * flist;
 
-    Vector_3 get_ebc_fun( const int &ebc_id,
-        const double &x, const double &y, const double &z,
-        const double &t, const double &nx, const double &ny,
-        const double &nz ) const
+    Vector_3 get_ebc_fun( const int &ebc_id, const Vector_3 &pt,
+        const double &tt, const Vector_3 &n_out ) const
     {
-      return ((*this).*(flist[ebc_id]))(x,y,z,t,nx,ny,nz);
+      return ((*this).*(flist[ebc_id]))(pt, tt, n_out);
     }
 
 };

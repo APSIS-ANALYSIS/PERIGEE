@@ -131,7 +131,7 @@ double PLocAssem_Tet_CMM_GenAlpha::get_DC(
     const double &u, const double &v, const double &w ) const
 {
   // const SymmMatrix_3x3 G = get_metric( dxi_dx );
-  // const Vector_3 velo_vec{ u, v, w };
+  // const Vector_3 velo_vec( u, v, w );
   // double dc_tau = G.VecMatVec( velo_vec, velo_vec );
 
   // if(dc_tau > 1.0e-15) dc_tau = rho0 * std::pow(dc_tau, -0.5);
@@ -170,6 +170,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
     double v = 0.0, v_t = 0.0, v_x = 0.0, v_y = 0.0, v_z = 0.0;
     double w = 0.0, w_t = 0.0, w_x = 0.0, w_y = 0.0, w_z = 0.0;
     double p = 0.0, p_x = 0.0, p_y = 0.0, p_z = 0.0;
+
     double u_xx = 0.0, u_yy = 0.0, u_zz = 0.0;
     double v_xx = 0.0, v_yy = 0.0, v_zz = 0.0;
     double w_xx = 0.0, w_yy = 0.0, w_zz = 0.0;
@@ -345,6 +346,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
     double v = 0.0, v_t = 0.0, v_x = 0.0, v_y = 0.0, v_z = 0.0;
     double w = 0.0, w_t = 0.0, w_x = 0.0, w_y = 0.0, w_z = 0.0;
     double p = 0.0, p_x = 0.0, p_y = 0.0, p_z = 0.0;
+
     double u_xx = 0.0, u_yy = 0.0, u_zz = 0.0;
     double v_xx = 0.0, v_yy = 0.0, v_zz = 0.0;
     double w_xx = 0.0, w_yy = 0.0, w_zz = 0.0;
@@ -798,6 +800,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC(
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
     Vector_3 coor( 0.0, 0.0, 0.0 );
+
     for(int ii=0; ii<snLocBas; ++ii)
     {
       coor.x() += eleCtrlPts_x[ii] * R[ii];
@@ -1050,6 +1053,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     double u_t = 0.0, v_t = 0.0, w_t = 0.0, u = 0.0, v = 0.0, w = 0.0;
     double disp_x = 0.0, disp_y = 0.0, disp_z = 0.0;
     double h_w = 0.0, ks_w = 0.0, cs_w = 0.0;
+
     Vector_3 coor( 0.0, 0.0, 0.0 );
 
     for(int ii=0; ii<snLocBas; ++ii)
@@ -1173,6 +1177,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     double u_t = 0.0, v_t = 0.0, w_t = 0.0, u = 0.0, v = 0.0, w = 0.0; 
     double disp_x = 0.0, disp_y = 0.0, disp_z = 0.0;
     double h_w = 0.0, E_w = 0.0, ks_w = 0.0, cs_w = 0.0;
+
     Vector_3 coor( 0.0, 0.0, 0.0 );
 
     for(int ii=0; ii<snLocBas; ++ii)

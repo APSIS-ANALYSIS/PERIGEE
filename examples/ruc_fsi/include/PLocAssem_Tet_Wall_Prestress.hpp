@@ -85,8 +85,7 @@ class PLocAssem_Tet_Wall_Prestress : public IPLocAssem
     void print_info() const;
 
     // Return body force acting on the wall domain
-    Vector_3 get_fw( const double &x, const double &y, const double &z,
-        const double &t ) const
+    Vector_3 get_fw( const Vector_3 &pt, const double &t ) const
     {
       return Vector_3( 0.0, 0.0, 0.0 );
     }
