@@ -38,11 +38,9 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/System/HDF5_Reader.cpp
   ${perigee_source}/Mesh/Gmsh_FileIO.cpp
   ${perigee_source}/Mesh/Tet_Tools.cpp
-  ${perigee_source}/Mesh/IEN_Tetra_P1.cpp
-  ${perigee_source}/Mesh/IEN_Tetra_P2.cpp
+  ${perigee_source}/Mesh/IEN_FEM.cpp
   ${perigee_source}/Mesh/INodalBC.cpp
-  ${perigee_source}/Mesh/Mesh_Tet4.cpp
-  ${perigee_source}/Mesh/Mesh_Tet10.cpp
+  ${perigee_source}/Mesh/Mesh_Tet.cpp
   ${perigee_source}/Mesh/IPart.cpp
   ${perigee_source}/Mesh/Part_Tet.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet.cpp
@@ -161,9 +159,9 @@ ADD_EXECUTABLE( gmsh_p1_IO    gmsh_p1_process.cpp )
 ADD_EXECUTABLE( gmsh_p2_IO    gmsh_p2_process.cpp )
 ADD_EXECUTABLE( preprocess3d  preprocess_tets.cpp)
 ADD_EXECUTABLE( wall_solver   wall_solver.cpp)
-ADD_EXECUTABLE( cmm_tet_3d    cmm_driver.cpp)
+ADD_EXECUTABLE( ruc_tet_3d    ruc_driver.cpp)
 ADD_EXECUTABLE( prepost       prepost_tets.cpp)
-ADD_EXECUTABLE( vis_cmm       vis_cmm.cpp)
+ADD_EXECUTABLE( vis_ruc       vis_ruc.cpp)
 ADD_EXECUTABLE( vis_p1_wss    vis_p1_wss.cpp)
 ADD_EXECUTABLE( vis_p2_wss    vis_p2_wss.cpp)
 
@@ -173,10 +171,10 @@ ADD_EXECUTABLE( vis_p2_wss    vis_p2_wss.cpp)
 TARGET_LINK_LIBRARIES( gmsh_p1_IO    perigee_preprocess )
 TARGET_LINK_LIBRARIES( gmsh_p2_IO    perigee_preprocess )
 TARGET_LINK_LIBRARIES( preprocess3d  perigee_preprocess )
-TARGET_LINK_LIBRARIES( cmm_tet_3d    perigee_analysis )
+TARGET_LINK_LIBRARIES( ruc_tet_3d    perigee_analysis )
 TARGET_LINK_LIBRARIES( wall_solver   perigee_analysis )
 TARGET_LINK_LIBRARIES( prepost       perigee_preprocess )
-TARGET_LINK_LIBRARIES( vis_cmm       perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_ruc       perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_p1_wss    perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_p2_wss    perigee_postprocess )
 

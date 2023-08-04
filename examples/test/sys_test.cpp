@@ -6,32 +6,37 @@
 #include "HDF5_Reader.hpp"
 #include "PostVectSolution.hpp"
 #include "Tensor4_3D.hpp"
+#include "Mesh_Tet.hpp"
+#include "IEN_FEM.hpp"
+#include "Matrix_double_3by3_Array.hpp"
+#include "Matrix_double_6by6_Array.hpp"
 
 int main(int argc, char *argv[])
 {
-  const double tol = 1e-13;
-  const int max_itr = 1000;
-  for(int i = 0; i < max_itr; ++i)
-  {
-    SymmMatrix_3x3 symm_mat_1;
-    symm_mat_1.gen_rand();
+  Matrix_double_6by6_Array A(-1.1, -2.3, 3.5, 4.8, 5.5, -6.0, 7.023, -18.0, 9.0);
 
-    SymmMatrix_3x3 symm_mat_2;
-    symm_mat_2.gen_rand();
+  A.LU_fac();
 
-    Matrix_3x3 mat_2 = symm_mat_2.convert_to_full();
+  double rhs [] = {1.0, 222222.0, -332325.2, 4.0, 5.5, 6.9};
 
-    double symm_contraction = symm_mat_1.MatContraction( symm_mat_2 );
-    double contraction = symm_mat_1.MatContraction( mat_2 );
-    
-    std::cout<<std::setprecision(8)<<"step "<<i<<" : "<<symm_contraction<<" "<<contraction<<std::endl;
-    if (std::abs(symm_contraction - contraction) > tol)
-    {
-      std::cout<<"Warning: unsafe with tol: "<<tol<<std::endl;
-      break;
-    }
-    usleep(1000000);
-  }
+  double sol [] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+  A.LU_solve(rhs, sol);
+
+  std::array<double, 6> rrhs;
+
+  for(int ii=0; ii<6; ++ii) rrhs[ii] = rhs[ii];
+
+  auto ssol = A.LU_solve(rrhs);
+
+  std::cout<<sol[0] - ssol[0]<<'\t';
+  std::cout<<sol[1] - ssol[1]<<'\t';
+  std::cout<<sol[2] - ssol[2]<<'\t';
+  std::cout<<sol[3] - ssol[3]<<'\t';
+  std::cout<<sol[4] - ssol[4]<<'\t';
+  std::cout<<sol[5] - ssol[5]<<'\n';
+
+  for(int ii=0; ii<6; ++ii) std::cout<<sol[ii]<<'\n';
 
   return EXIT_SUCCESS;
 }

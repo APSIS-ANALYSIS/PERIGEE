@@ -610,4 +610,11 @@ Matrix_3x3 gen_identity_matrix()
       0.0, 0.0, 1.0 );
 }
 
+Matrix_3x3 gen_zero_matrix()
+{
+  return Matrix_3x3( 0.0, 0.0, 0.0,
+      0.0, 0.0, 0.0,
+      0.0, 0.0, 0.0 );
+}
+
 // EOF

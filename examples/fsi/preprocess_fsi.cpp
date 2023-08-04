@@ -8,8 +8,8 @@
 // Date: Dec. 13 2021
 // ============================================================================
 #include "Math_Tools.hpp"
-#include "Mesh_Tet4.hpp"
-#include "IEN_Tetra_P1.hpp"
+#include "Mesh_Tet.hpp"
+#include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
 #include "Global_Part_Reload.hpp"
@@ -232,7 +232,7 @@ int main( int argc, char * argv[] )
   }
 
   // Generate IEN
-  IIEN * IEN_v = new IEN_Tetra_P1( nElem, vecIEN );
+  IIEN * IEN_v = new IEN_FEM( nElem, vecIEN );
 
   // --------------------------------------------------------------------------
   // The fluid-solid interface file will be read and the nodal index will be
@@ -263,7 +263,7 @@ int main( int argc, char * argv[] )
     }
   }
 
-  IIEN * IEN_p = new IEN_Tetra_P1( nElem, vecIEN_p );
+  IIEN * IEN_p = new IEN_FEM( nElem, vecIEN_p );
 
   VEC_T::clean( vecIEN ); VEC_T::clean( vecIEN_p );
   // --------------------------------------------------------------------------
@@ -309,10 +309,10 @@ int main( int argc, char * argv[] )
   }
 
   // Generate the mesh for kinematics
-  IMesh * mesh_v = new Mesh_Tet4(nFunc_v, nElem);
+  IMesh * mesh_v = new Mesh_Tet(nFunc_v, nElem, 1);
 
   // Generate the mesh for pressure (discontinuous over interface)
-  IMesh * mesh_p = new Mesh_Tet4(nFunc_p, nElem);
+  IMesh * mesh_p = new Mesh_Tet(nFunc_p, nElem, 1);
 
   std::vector<IMesh const *> mlist;
   mlist.push_back(mesh_p); mlist.push_back(mesh_v);

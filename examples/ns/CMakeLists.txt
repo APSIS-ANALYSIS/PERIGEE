@@ -36,13 +36,11 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/System/Math_Tools.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
   ${perigee_source}/System/HDF5_Reader.cpp
-  ${perigee_source}/Mesh/Gmsh_FileIO.cpp
   ${perigee_source}/Mesh/Tet_Tools.cpp
-  ${perigee_source}/Mesh/IEN_Tetra_P1.cpp
-  ${perigee_source}/Mesh/IEN_Tetra_P2.cpp
+  ${perigee_source}/Mesh/Gmsh_FileIO.cpp
+  ${perigee_source}/Mesh/Mesh_Tet.cpp
+  ${perigee_source}/Mesh/IEN_FEM.cpp
   ${perigee_source}/Mesh/INodalBC.cpp
-  ${perigee_source}/Mesh/Mesh_Tet4.cpp
-  ${perigee_source}/Mesh/Mesh_Tet10.cpp
   ${perigee_source}/Mesh/IPart.cpp
   ${perigee_source}/Mesh/Part_Tet.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet.cpp
@@ -137,25 +135,21 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # BUILD THE MAIN DRIVERS
 # ===================================================================
 ADD_EXECUTABLE( gmsh_p1_IO gmsh_p1_process.cpp )
-ADD_EXECUTABLE( gmsh_cyl_p1_IO gmsh_square_cylinder_p1.cpp )
 ADD_EXECUTABLE( gmsh_p2_IO gmsh_p2_process.cpp )
-ADD_EXECUTABLE( preprocess3d preprocess_sv_tets.cpp)
-ADD_EXECUTABLE( ns_tet_3d ns_tet_driver.cpp)
-ADD_EXECUTABLE( prepost prepost_ns_tets.cpp)
+ADD_EXECUTABLE( preprocess3d preprocess_ns.cpp)
+ADD_EXECUTABLE( ns3d ns_driver.cpp)
+ADD_EXECUTABLE( prepost3d prepost_ns.cpp)
 ADD_EXECUTABLE( vis_ns vis_ns.cpp)
 ADD_EXECUTABLE( vis_p1_wss vis_p1_wss.cpp)
 ADD_EXECUTABLE( vis_p2_wss vis_p2_wss.cpp)
-ADD_EXECUTABLE( test_mat test_mat.cpp)
 
 TARGET_LINK_LIBRARIES( gmsh_p1_IO perigee_preprocess )
-TARGET_LINK_LIBRARIES( gmsh_cyl_p1_IO perigee_preprocess )
 TARGET_LINK_LIBRARIES( gmsh_p2_IO perigee_preprocess )
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
-TARGET_LINK_LIBRARIES( ns_tet_3d perigee_analysis )
-TARGET_LINK_LIBRARIES( prepost perigee_preprocess )
+TARGET_LINK_LIBRARIES( ns3d perigee_analysis )
+TARGET_LINK_LIBRARIES( prepost3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( vis_ns perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_p1_wss perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_p2_wss perigee_postprocess )
-TARGET_LINK_LIBRARIES( test_mat perigee_analysis )
 
 # EOF

@@ -10,8 +10,7 @@
 // array as
 //           mat[3i + j] = A_{ij}.
 //
-// The designed purpose is to ease the handling of stiffness tensor in solid 
-// mechanics.
+// The design purpose is to handle the stiffness tensor in solid mechanics.
 //
 // Author: Ju Liu
 // Date: July 3rd 2016
