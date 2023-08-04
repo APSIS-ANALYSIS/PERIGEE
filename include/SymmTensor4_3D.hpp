@@ -38,6 +38,7 @@
 // Author: Ju Liu
 // Date: Aug. 3rd 2023
 // ============================================================================
+#include "Tensor4_3D.hpp"
 
 class SymmTensor4_3D
 {
@@ -52,9 +53,105 @@ class SymmTensor4_3D
 
     ~SymmTensor4_3D();
 
+    // Assignment operator
+    SymmTensor4_3D& operator= (const SymmTensor4_3D &source);
+
+    // Parenthesis operator: access through single index with 0 <= index < 21
+    double& operator()(const int &index) {return ten[index];}
+
+    const double& operator()(const int &index) const {return ten[index];}
+
+    bool is_identical(const Tensor4_3D &source, const double &tol = 1.0e-12) const;
+    
+    bool is_identical(const SymmTensor4_3D &source, const double &tol = 1.0e-12) const;
+
+    void print() const;
+
+    void print_in_mat() const;
+
+    // Addition operator : return left + right
+    friend SymmTensor4_3D operator+( const SymmTensor4_3D &left, const SymmTensor4_3D &right);
+
+    // Minus operator : return left - right
+    friend SymmTensor4_3D operator-( const SymmTensor4_3D &left, const SymmTensor4_3D &right);
+
+    // Add the source tensor to the object
+    SymmTensor4_3D& operator+=( const SymmTensor4_3D &source );
+
+    // Minus the source tensor to the object
+    SymmTensor4_3D& operator-=( const SymmTensor4_3D &source );
+
+    // Scalar multiplication
+    SymmTensor4_3D& operator*=( const double &val );
+
     void gen_rand();
 
     void gen_zero();
+    
+    // ------------------------------------------------------------------------
+    // Generate 0.5 * (delta_ik delta_jl + delta_il delta_jk) = dA_ij / dA_kl
+    // with A = A^T.
+    // Note: this is the derivative for symmetric 2nd-order tensor. In
+    // principle, the derivative for symmetric tensor is nonunique, since the
+    // derivative is acting on a symmetric tensor for the linearization and adding
+    // a skew-symmetric tensor will not changing the effect. Hence, we define
+    // the symmetric part of the 4th-order tensor be the derivative for the
+    // 2nd-order tensor.
+    // ------------------------------------------------------------------------
+    void gen_symm_id();
+
+    // ------------------------------------------------------------------------
+    // add an outer product with scaling factor:
+    //            ten_ijkl += val * mmat_ij  * mmat_kl
+    // This is often used in the evaluation of the stiffness tensor.
+    // ------------------------------------------------------------------------
+    void add_OutProduct( const double &val, const SymmMatrix_3x3 &mmat );
+
+    // ------------------------------------------------------------------------
+    // add a symmetric tensor product of 4 vectors which is defined the
+    // following way,
+    //     val x ( vex1[i] x vec2[j] x vec3[k] x vec4[l]
+    //     + vex1[i] x vec2[j] x vec3[l] x vec4[k]
+    //     + vex1[j] x vec2[i] x vec3[k] x vec4[l]
+    //     + vex1[j] x vec2[i] x vec3[l] x vec4[k] ).
+    // This function is typically called in the generation of the elasticity
+    // tensor in the stretch-based models.
+    // See, Holzapfel book p. 263, equation (6.196) for an example.
+    // ------------------------------------------------------------------------
+    void add_SymmOutProduct( const double &val, const Vector_3 &vec1,
+        const Vector_3 &vec2, const Vector_3 &vec3, const Vector_3 &vec4 );
+
+    // ------------------------------------------------------------------------
+    // add a symmetric product with a scaling factor -- val:
+    // ten_ijkl += val * [ 0.5 * (mleft_ik mright_jl + mleft_il mright_jk) ]
+    // This is often used in the evaluation of the stiffness tensor.
+    // E.G., partial C^{-1}_AB / partial C_CD
+    //     = -0.5 (C^{-1}_AC C^{-1}_BD + C^{-1}_AD C^{-1}_{BC})
+    //     = SymmProduct(-0.5, invC, invC )
+    // for invertible and symmetric 2nd-order tensor C.
+    // Holzapfel book, p. 254
+    // ------------------------------------------------------------------------
+    void add_SymmProduct( const double &val, const SymmMatrix_3x3 &mleft,
+        const SymmMatrix_3x3 &mright );
+
+    // ------------------------------------------------------------------------
+    // add the out-product of two 2nd-order tensor in a symmetric fashion,
+    // ten_ijkl += val * [  (mleft_ij mright_kl + mleft_kl mright_ij) ]
+    // this is equivalent to and faster than
+    //         add_OutProduct(val, mleft, mright);
+    //         add_OutProduct(val, mright, mleft);
+    // This function can be used in the generation of the elasticity tensor. For
+    // example, in Holzapfel book p. 261, the terms associalted with delta_2,
+    // delta_3, and delta_5 in (6.193) can be generated with this function by
+    //         add_SymmOutProduct(delta_2, I, C   );
+    //         add_SymmOutProduct(delta_3, I, Cinv);
+    //         add_SymmOutProduct(delta_5, C, Cinv);
+    // Or, in the definition of C_iso of (6.168), this function can be used to
+    // genereate the last term by
+    //         add_SymmOutProduct(-2/3, Cinv, Siso);
+    // ------------------------------------------------------------------------
+    void add_SymmOutProduct( const double &val, const SymmMatrix_3x3 &mleft,
+        const SymmMatrix_3x3 &mright );
 
   private:
     double ten[21];
