@@ -44,7 +44,7 @@ class SymmTensor4_3D
   public:
     // ------------------------------------------------------------------------
     // Default constructor:
-    // It construct 
+    // It construct the tensor with components ijkl being 
     // 0.5 * (delta_ik delta_jl + delta_il delta_jk) = dA_ij / dA_kl
     // with A = A^T.
     // ------------------------------------------------------------------------
