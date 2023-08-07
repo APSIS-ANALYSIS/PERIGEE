@@ -28,6 +28,50 @@ void SymmTensor4_3D::gen_zero()
   ten = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0,0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0,0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0,0};
 }
 
+void SymmTensor4_3D::print() const
+{
+  std::cout<<"SymmTensor4_3D: \n";
+  for(int kk=0; kk<3; ++kk)
+  {
+    for(int ll=0; ll<3; ++ll)
+    {
+      std::cout<<"k = "<<kk<<"\tl = "<<ll<<'\n';
+      for(int ii=0; ii<3; ++ii)
+      {
+        for(int jj=0; jj<3; ++jj)
+        {
+          std::cout<<"i = "<<ii<<'\t'<<"j = "<<jj<<'\t'
+          <<std::setprecision(6)<<ten[ Voigt_notation(ii, jj, kk, ll) ]<<'\t';
+        }
+        std::cout<<'\n';
+      }
+      std::cout<<'\n';
+    }
+  }  
+}
+
+void SymmTensor4_3D::print_in_mat() const
+{
+  std::cout<<"SymmTensor4_3D: \n\n";
+  for ( int ii=0; ii<3; ii++ )
+  {
+    for( int jj=0; jj<3; jj++ )
+    {
+      for( int kk=0; kk<3; kk++ )
+      { 
+        for ( int ll=0; ll<3; ll++ )
+        {
+          std::cout << std::setprecision(6) << std::setw(12) << std::left << std::setfill(' ') 
+          << ten[ Voigt_notation(ii, jj, kk, ll) ] << " ";
+        }
+        std::cout<<"\t";
+      }  
+      std::cout<<'\n';
+    }
+    std::cout<<"\n";      
+  }
+}
+
 int SymmTensor4_3D::Voigt_notation( const int &ii, const int &jj, const int &kk, const int &ll ) const
 {
   int index_I = 3;
