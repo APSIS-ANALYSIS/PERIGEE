@@ -153,8 +153,15 @@ class SymmTensor4_3D
     void add_SymmOutProduct( const double &val, const SymmMatrix_3x3 &mleft,
         const SymmMatrix_3x3 &mright );
 
+    // ------------------------------------------------------------------------
+    // transform the natural indices of forth-order symmetric tensor to Voigt 
+    // notation, minor symmetry requires ij / ji: 3x3 -> 6, kl / lk: 3x3 -> 6,
+    // major symmetry requires ij_kl / ij_lk / ji_kl / ji_lk: 6x6 -> 21,
+    // for more information, check the diagram above.
+    // ------------------------------------------------------------------------
+    int Voigt_notation( const int &ii, const int &jj, const int &kk, const int &ll ) const;
+
   private:
     double ten[21];
 };
-
 #endif
