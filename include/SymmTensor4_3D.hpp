@@ -161,6 +161,12 @@ class SymmTensor4_3D
     // ------------------------------------------------------------------------
     int Voigt_notation( const int &ii, const int &jj, const int &kk, const int &ll ) const;
 
+    // ------------------------------------------------------------------------
+    // transfrom the natural indices of 3x3 symmetric matrix to Voigt notation,
+    // so as to say ij / ji: 3x3 -> 6
+    // ------------------------------------------------------------------------ 
+    int Voigt_notation( const int &ii, const int &jj ) const;
+
   private:
     double ten[21];
 };

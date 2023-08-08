@@ -206,4 +206,63 @@ case 2:
     return sum + index_I;
   }
 }
+
+int SymmTensor4_3D::Voigt_notation( const int &ii, const int &jj ) const
+{
+  int index = 3;
+  switch (ii)
+  {
+  case 0:
+    switch (jj)
+    {
+    case 0:
+     index = 0;
+     break;
+
+   case 1:
+     index = 5;
+     break;
+
+   case 2:
+     index = 4;
+     break;
+   }
+   break;
+
+ case 1:
+  switch (jj)
+  {
+  case 0:
+   index = 5;
+   break;
+
+ case 1:
+   index = 1;
+   break;
+
+ case 2:
+   index = 3;
+   break;
+ }
+ break;
+
+case 2:
+  switch (jj)
+  {
+  case 0:
+   index = 4;
+   break;
+
+ case 1:
+   index = 3;
+   break;
+
+ case 2:
+   index = 2;
+   break;
+ }
+ break;}
+
+ return index;
+}
 // EOF
