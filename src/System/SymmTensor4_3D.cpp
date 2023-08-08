@@ -99,6 +99,32 @@ void SymmTensor4_3D::add_OutProduct( const double &val, const SymmMatrix_3x3 &mm
   }
 }
 
+void SymmTensor4_3D::add_SymmOutProduct( const double &val, const Vector_3 &vec1, 
+  const Vector_3 &vec2, const Vector_3 &vec3, const Vector_3 &vec4 )
+{
+  double add_ten[21];
+  for(int ii=0; ii<3; ++ii)
+  {
+    for(int jj=0; jj<3; ++jj)
+    {
+      for(int kk=0; kk<3; ++kk)
+      {
+        for(int ll=0; ll<3; ++ll)
+        {
+          add_ten[ Voigt_notation(ii,jj,kk,ll) ] = val * ( vec1( ii ) * vec2( jj ) * vec3( kk ) * vec4( ll )
+            + vec1( ii ) * vec2( jj ) * vec3( ll ) * vec4( kk )
+            + vec1( jj ) * vec2( ii ) * vec3( kk ) * vec4( ll )
+            + vec1( jj ) * vec2( ii ) * vec3( ll ) * vec4( kk ) );
+        }
+      }
+    }
+  }
+  for(int counter=0; counter<21; counter++)
+  {
+    ten[counter] += add_ten[counter];
+  }
+}
+
 int SymmTensor4_3D::Voigt_notation( const int &ii, const int &jj, const int &kk, const int &ll ) const
 {
   int index_I = 3;

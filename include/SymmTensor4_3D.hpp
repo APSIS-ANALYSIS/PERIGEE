@@ -130,6 +130,7 @@ class SymmTensor4_3D
     //     = SymmProduct(-0.5, invC, invC )
     // for invertible and symmetric 2nd-order tensor C.
     // Holzapfel book, p. 254
+    // Notes: vec1 = vec3 and vec2 = vec4 to maintain the major symmetry
     // ------------------------------------------------------------------------
     void add_SymmProduct( const double &val, const SymmMatrix_3x3 &mleft,
         const SymmMatrix_3x3 &mright );
