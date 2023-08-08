@@ -88,6 +88,22 @@ void SymmTensor4_3D::print_in_mat() const
   }
 }
 
+SymmTensor4_3D operator+( const SymmTensor4_3D &left, const SymmTensor4_3D &right)
+{
+  SymmTensor4_3D result;
+  for(int ii=0; ii<21; ++ii) result.ten[ii] = left.ten[ii] + right.ten[ii];
+
+  return result;
+}
+
+SymmTensor4_3D operator-( const SymmTensor4_3D &left, const SymmTensor4_3D &right)
+{
+  SymmTensor4_3D result;
+  for(int ii=0; ii<21; ++ii) result.ten[ii] = left.ten[ii] - right.ten[ii];
+
+  return result;
+}
+
 void SymmTensor4_3D::add_OutProduct( const double &val, const SymmMatrix_3x3 &mmat )
 {
   double add_ten[21];
