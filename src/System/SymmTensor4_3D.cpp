@@ -28,6 +28,13 @@ void SymmTensor4_3D::gen_zero()
   ten = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0,0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0,0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0,0};
 }
 
+void SymmTensor4_3D::gen_symm_id()
+{
+  gen_zero();
+  ten[0] = 1.0; ten[6] = 1.0; ten[11] = 1.0;
+  ten[15] = 0.5; ten[18] = 0.5; ten[20] = 0.5;
+}
+
 void SymmTensor4_3D::print() const
 {
   std::cout<<"SymmTensor4_3D: \n";
