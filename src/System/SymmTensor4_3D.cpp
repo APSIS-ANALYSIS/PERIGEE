@@ -35,6 +35,15 @@ void SymmTensor4_3D::gen_symm_id()
   ten[15] = 0.5; ten[18] = 0.5; ten[20] = 0.5;
 }
 
+SymmTensor4_3D& SymmTensor4_3D::operator= (const SymmTensor4_3D &source)
+{
+  if(this == &source) return *this;
+
+  for(int ii=0; ii<21; ++ii) ten[ii] = source(ii);
+  
+  return *this;
+}
+
 void SymmTensor4_3D::print() const
 {
   std::cout<<"SymmTensor4_3D: \n";
