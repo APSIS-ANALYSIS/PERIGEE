@@ -117,6 +117,7 @@ class SymmTensor4_3D
     // This function is typically called in the generation of the elasticity
     // tensor in the stretch-based models.
     // See, Holzapfel book p. 263, equation (6.196) for an example.
+    // Notes: vec1 = vec3 and vec2 = vec4 to maintain the major symmetry
     // ------------------------------------------------------------------------
     void add_SymmOutProduct( const double &val, const Vector_3 &vec1,
         const Vector_3 &vec2, const Vector_3 &vec3, const Vector_3 &vec4 );
@@ -130,7 +131,8 @@ class SymmTensor4_3D
     //     = SymmProduct(-0.5, invC, invC )
     // for invertible and symmetric 2nd-order tensor C.
     // Holzapfel book, p. 254
-    // Notes: vec1 = vec3 and vec2 = vec4 to maintain the major symmetry
+    // Notes: taking same mleft and mright maintains major symmetry, another
+    // fact that mleft and mright are all symmetric maintains minor symmetry 
     // ------------------------------------------------------------------------
     void add_SymmProduct( const double &val, const SymmMatrix_3x3 &mleft,
         const SymmMatrix_3x3 &mright );
