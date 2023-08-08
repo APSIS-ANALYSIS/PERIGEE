@@ -152,6 +152,7 @@ class SymmTensor4_3D
     // Or, in the definition of C_iso of (6.168), this function can be used to
     // genereate the last term by
     //         add_SymmOutProduct(-2/3, Cinv, Siso);
+    // Notes: mleft and mright being all symmetric maintains minor symmetry
     // ------------------------------------------------------------------------
     void add_SymmOutProduct( const double &val, const SymmMatrix_3x3 &mleft,
         const SymmMatrix_3x3 &mright );
