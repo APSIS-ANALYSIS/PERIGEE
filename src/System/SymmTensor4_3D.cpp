@@ -81,7 +81,7 @@ void SymmTensor4_3D::print_in_mat() const
 
 void SymmTensor4_3D::add_OutProduct( const double &val, const SymmMatrix_3x3 &mmat )
 {
-  int add_ten[21];
+  double add_ten[21];
   for(int ii=0; ii<3; ++ii)
   {
     for(int jj=0; jj<3; ++jj)
