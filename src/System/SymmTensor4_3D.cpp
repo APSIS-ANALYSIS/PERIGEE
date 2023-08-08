@@ -104,6 +104,24 @@ SymmTensor4_3D operator-( const SymmTensor4_3D &left, const SymmTensor4_3D &righ
   return result;
 }
 
+SymmTensor4_3D& SymmTensor4_3D::operator+=( const SymmTensor4_3D &source )
+{
+  for(int ii=0; ii<21; ++ii) ten[ii] += source(ii);
+  return *this;
+}
+
+SymmTensor4_3D& SymmTensor4_3D::operator-=( const SymmTensor4_3D &source )
+{
+  for(int ii=0; ii<21; ++ii) ten[ii] -= source(ii);
+  return *this;
+}
+
+SymmTensor4_3D& SymmTensor4_3D::operator*=( const double &val )
+{
+  for(int ii=0; ii<21; ++ii) ten[ii] *= val;
+  return *this;
+}
+
 void SymmTensor4_3D::add_OutProduct( const double &val, const SymmMatrix_3x3 &mmat )
 {
   double add_ten[21];
