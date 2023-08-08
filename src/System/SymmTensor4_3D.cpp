@@ -29,6 +29,7 @@ bool SymmTensor4_3D::is_identical(const Tensor4_3D &source, const double &tol) c
       }
     }
   }
+  return true;
 }
 
 bool SymmTensor4_3D::is_identical(const SymmTensor4_3D &source, const double &tol) const
@@ -96,13 +97,13 @@ void SymmTensor4_3D::print() const
 void SymmTensor4_3D::print_in_mat() const
 {
   std::cout<<"SymmTensor4_3D: \n\n";
-  for ( int ii=0; ii<3; ii++ )
+  for ( int ii=0; ii<3; ++ii )
   {
-    for( int jj=0; jj<3; jj++ )
+    for( int jj=0; jj<3; ++jj )
     {
-      for( int kk=0; kk<3; kk++ )
+      for( int kk=0; kk<3; ++kk )
       { 
-        for ( int ll=0; ll<3; ll++ )
+        for ( int ll=0; ll<3; ++ll )
         {
           std::cout << std::setprecision(6) << std::setw(12) << std::left << std::setfill(' ') 
           << ten[ Voigt_notation(ii, jj, kk, ll) ] << " ";
@@ -163,7 +164,7 @@ void SymmTensor4_3D::add_OutProduct( const double &val, const SymmMatrix_3x3 &mm
       }
     }
   }
-  for(int counter=0; counter<21; counter++)
+  for(int counter=0; counter<21; ++counter)
   {
     ten[counter] += add_ten[counter];
   }
@@ -189,7 +190,7 @@ void SymmTensor4_3D::add_SymmOutProduct( const double &val, const Vector_3 &vec1
       }
     }
   }
-  for(int counter=0; counter<21; counter++)
+  for(int counter=0; counter<21; ++counter)
   {
     ten[counter] += add_ten[counter];
   }
@@ -213,7 +214,7 @@ void SymmTensor4_3D::add_SymmProduct( const double &val, const SymmMatrix_3x3 &m
       }
     }
   }
-  for(int counter=0; counter<21; counter++)
+  for(int counter=0; counter<21; ++counter)
   {
     ten[counter] += add_ten[counter];
   }
@@ -237,7 +238,7 @@ void SymmTensor4_3D::add_SymmOutProduct( const double &val, const SymmMatrix_3x3
       }
     }
   }
-  for(int counter=0; counter<21; counter++)
+  for(int counter=0; counter<21; ++counter)
   {
     ten[counter] += add_ten[counter];
   }
