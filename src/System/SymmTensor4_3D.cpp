@@ -11,6 +11,33 @@ SymmTensor4_3D::SymmTensor4_3D()
 SymmTensor4_3D::~SymmTensor4_3D()
 {}
 
+bool SymmTensor4_3D::is_identical(const Tensor4_3D &source, const double &tol) const
+{
+  for(int ii=0; ii<3; ++ii)
+  {
+    for(int jj=0; jj<3; ++jj)
+    {
+      for(int kk=0; kk<3; ++kk)
+      {
+        for(int ll=0; ll<3; ++ll)
+        {
+          if( std::abs(source(27*ii+9*jj+3*kk+ll) - ten[Voigt_notation(ii,jj,kk,ll)] ) > tol )
+          {
+            return false;
+          }
+        }
+      }
+    }
+  }
+}
+
+bool SymmTensor4_3D::is_identical(const SymmTensor4_3D &source, const double &tol) const
+{
+  for(int ii=0; ii<21; ++ii)
+    if( std::abs(source(ii) - ten[ii]) > tol ) return false;
+  return true;
+}
+
 void SymmTensor4_3D::gen_rand()
 {
   srand(time(NULL));
