@@ -71,7 +71,7 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::vector<std::string> &vtufileList,
     std::vector<double> pts;
     std::vector<int> ien, gnode, gelem;
 
-    TET_T::read_vtu_grid( vtufileList[ii], numpts, numcels, pts, ien, gnode, gelem );
+    VTK_T::read_vtu_grid( vtufileList[ii], numpts, numcels, pts, ien, gnode, gelem );
   
     for(unsigned int jj=0; jj<gnode.size(); ++jj)
     {
@@ -113,7 +113,7 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &vtufilename,
     std::vector<double> pts;
     std::vector<int> ien, gnode, gelem;
 
-    TET_T::read_vtp_grid( vtpfileList[ii], numpts, numcels, pts, ien, gnode, gelem );
+    VTK_T::read_vtp_grid( vtpfileList[ii], numpts, numcels, pts, ien, gnode, gelem );
 
     if( numpts != static_cast<int>(gnode.size()) )
       SYS_T::print_fatal("Error: the numpts != global_node.size()! \n");
@@ -189,7 +189,7 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &vtufilename,
     std::vector<double> m_pts;
     std::vector<int> m_ien, m_gnode, m_gelem;
 
-    TET_T::read_vtp_grid( vtpminus[ii], m_numpts, m_numcels, 
+    VTK_T::read_vtp_grid( vtpminus[ii], m_numpts, m_numcels, 
         m_pts, m_ien, m_gnode, m_gelem );
 
     if( m_numpts != static_cast<int>(m_gnode.size()) )
@@ -243,7 +243,7 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &vtufilename,
   {
     SYS_T::file_check( vtpfileList[ii] );
 
-    const std::vector<int> vtp_gnode = TET_T::read_int_PointData( vtpfileList[ii], "GlobalNodeID");
+    const std::vector<int> vtp_gnode = VTK_T::read_int_PointData( vtpfileList[ii], "GlobalNodeID");
 
     for(unsigned int jj=0; jj<vtp_gnode.size(); ++jj)
     {
