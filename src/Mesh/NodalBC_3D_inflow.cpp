@@ -67,13 +67,13 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
 
   if( elemtype == 501 )
   {
-    TET_T::read_vtp_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
+    VTK_T::read_vtp_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
         wall_ien, wall_gnode, wall_gelem );
 
   }
   else if( elemtype == 502 )
   {
-    TET_T::read_vtu_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
+    VTK_T::read_vtu_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
         wall_ien, wall_gnode, wall_gelem );
   }
   else SYS_T::print_fatal("Error: unknown element type.\n");
@@ -87,14 +87,14 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
     {
       nLocBas[ii] = 3;
 
-      TET_T::read_vtp_grid( inffileList[ii], num_node[ii], num_cell[ii],
+      VTK_T::read_vtp_grid( inffileList[ii], num_node[ii], num_cell[ii],
           pt_xyz[ii], tri_ien[ii], global_node[ii], global_cell[ii] );
     }
     else if( elemtype == 502 )
     {
       nLocBas[ii] = 6;
 
-      TET_T::read_vtu_grid( inffileList[ii], num_node[ii], num_cell[ii],
+      VTK_T::read_vtu_grid( inffileList[ii], num_node[ii], num_cell[ii],
           pt_xyz[ii], tri_ien[ii], global_node[ii], global_cell[ii] );
     }
     else SYS_T::print_fatal("Error: unknown element type.\n");
