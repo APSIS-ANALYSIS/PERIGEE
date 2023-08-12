@@ -1,13 +1,14 @@
-#ifndef TET_TOOLS_HPP
-#define TET_TOOLS_HPP
-// ==================================================================
-// Tet_Tools.hpp
+#ifndef VTK_TOOLS_HPP
+#define VTK_TOOLS_HPP
+// ============================================================================
+// VTK_Tools.hpp
 //
-// This is a suite of basic tetrahedral element tools with IO and
-// basic mesh quality evaluation.
+// This is a suite of function tools that assist some fundamental operations for
+// VTK files.
 // 
+// Date: Aug. 12 2023
 // Author: Ju Liu, liujuy@gmail.com
-// ==================================================================
+// ============================================================================
 #include "Sys_Tools.hpp"
 #include "Vec_Tools.hpp"
 #include "Math_Tools.hpp"
@@ -34,9 +35,7 @@
 #include "vtkXMLPolyDataReader.h"
 #include "vtkXMLGenericDataObjectReader.h"
 
-#include "tetgen.h"
-
-namespace TET_T
+namespace VTK_T
 {
   // ================================================================
   // ===> 1. The first set of tools READ volumetric mesh from .vtu 
@@ -394,154 +393,6 @@ namespace TET_T
   void write_vtkPointSet( const std::string &filename, 
       vtkPointSet * const &grid_w, const bool &isXML = true );
 
-
-  // ================================================================
-  // 3. Mesh quality measures
-  // This set of tools give various measure of tetrahedral element mesh.
-  // ================================================================
-  // ! get_aspect_ratio:
-  //   Input: \para x_i, y_i, z_i for node i=0,1,2,3.
-  //          x0 y0 z0 x1 y1 z1 x2 y2 z2 x3 y3 z3
-  //   Output: The ratio between the longest edge and the shortest edge.
-  //           l_max / l_min.
-  //   Lower aspect ratio implies better shape. If the input contains
-  //   more than 4 points' coordinate, (e.g. you give the coor of 10-node
-  //   tet), the routine will still read the first four nodes. This means
-  //   for quadratic tets, the aspect ratio is calculated by extracting
-  //   its four vertices and ignoring the mid-edge points.
-  // ----------------------------------------------------------------
-  double get_aspect_ratio( const std::vector<double> &coors );
-
-
-  // ----------------------------------------------------------------
-  // ! get_out_normal:
-  //   This function obtains the unit outward normal vector for a 
-  //   triangle vtp or vtu file, with the assumption that the file
-  //   describes a flat surface.
-  //   The outward normal is calculated based on the first triangle 
-  //   element in the vtp file, edge 0-1 and edge 0-2. Making cross
-  //   product and compare with the 0-out-of-surface node. If the normal
-  //   vector is in the same direction with the 0-out-of-surface line,
-  //   correct its direction by multiplying -1.
-  //   Note: This function requires one obtain the element index for
-  //         the outlet vtp file.
-  //   Input: \para file : surface file
-  //          \para vol_ctrlPts, the volume mesh control points
-  //          \para vol_ien, the volume mesh IEN array
-  //   Output: outVec, the outward normal vector
-  // ----------------------------------------------------------------
-  Vector_3 get_out_normal( const std::string &file,
-      const std::vector<double> &vol_ctrlPts,
-      const IIEN * const &vol_ien );
-  
-  // ================================================================
-  // 4. TetGen interface
-  // ----------------------------------------------------------------
-  // This set of tools convert the tetgenio object to vtu grid and vtp
-  // surface files with markers for the preprocess code to read.
-  // ================================================================
-  // Input: \para meshout: tetgenio object containing the mesh points 
-  //                      and cell connectivity.
-  //        \para fName: fName.vtu will be write on disk as the volumetric
-  //                     grid.
-  // ----------------------------------------------------------------
-  void tetgenio2vtu( const tetgenio &meshout, const std::string &fName );
-
-
-  // ----------------------------------------------------------------  
-  // Input: \para meshout: tetgenio object containing the mesh points 
-  //                      and cell connectivity.
-  //        \para fName: fName.vtp will be write on disk as the surface 
-  //                     grid.
-  //        \para bcmarker: the marker input in the tetgen input file
-  //                        specifying the boundary domain.
-  // Output: fName.bcmarker.vtp will be write on disk for the boundary
-  //         with marker bcmarker.
-  // ----------------------------------------------------------------
-  void tetgenio2vtp( const tetgenio &meshout, const std::string &fName,
-      const int &bcmarker );
-
-
-  // ================================================================
-  // 5. Tet4 class defines a four node linear tetrahedron object with 
-  // basic manipulations including checking the size, the aspect ratio,
-  // and check the face index for given three nodal indices.
-  // The object is defined by 12 double data: 
-  //             x0, y0, z0, x1, ..., z3
-  // ================================================================
-  class Tet4
-  {
-    public:
-      // Default constructor: generate a default tetrahedron in the
-      // following form
-      //          x y z
-      // node 0 : 0 0 0
-      // node 1 : 1 0 0
-      // node 2 : 0 1 0
-      // node 3 : 0 0 1
-      Tet4();
-
-      // Generate a tetrahedron with the x-y-z coordinates of the
-      // four points given by nodes-vector
-      Tet4( const std::vector<double> &nodes );
-
-      Tet4( const std::vector<double> &ctrlPts, 
-          const int &ien0, const int &ien1, 
-          const int &ien2, const int &ien3 );
-
-      virtual ~Tet4();
-
-      void reset( const std::vector<double> &nodes );
-
-      void reset( const std::vector<double> &ctrlPts,
-          const int &ien0, const int &ien1,
-          const int &ien2, const int &ien3 );
-
-      // Changes the gindex array only. It is used to determine
-      // the face index, e.g. in ElemBC_3D_tet4::resetTriIEN_outwardnormal
-      // function.
-      void reset( const int &ien0, const int &ien1,
-          const int &ien2, const int &ien3 );
-
-      void reset( const std::vector<double> &ctrlPts,
-          const IIEN * const &ien_pt, const int &ee );
-
-      double get_aspect_ratio() const;
-
-      double get_volume() const;
-
-      // get the circumscribing sphere's DIAMETER.
-      // This is a measure of the mesh size
-      double get_diameter() const;
-
-      // Given the face node IEN indices, determine the face id is determined by
-      // its opposite node number.
-      int get_face_id(const int &n0, const int &n1, const int &n2) const;
-
-      void write_vtu( const std::string &fileName ) const;
-
-      void print_info() const;
-
-    private:
-      double pts[12];
-
-      int gindex[4];
-  };
-
-
-  // ================================================================
-  // 6. Tetrahedral mesh checker. 
-  //    This routine will read in the mesh information: control points
-  //    and IEN array, and check each element's quality and print
-  //    necessary information.
-  //    cpts: list of control points;
-  //    ienptr: IEN array
-  //    nelem: total number of element
-  //    crit_aspect_ratio: the element above this value will be counted.
-  // ================================================================
-  void tetmesh_check(const std::vector<double> &cpts,
-      const IIEN * const &ienptr, const int &nelem,
-      const double &crit_aspect_ratio = 3.5 );
 }
 
 #endif
