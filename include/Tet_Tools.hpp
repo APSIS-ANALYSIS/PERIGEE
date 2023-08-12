@@ -13,6 +13,11 @@
 #include "Math_Tools.hpp"
 #include "IIEN.hpp"
 
+#include "vtkTriangle.h"
+#include "vtkQuadraticTriangle.h"
+#include "vtkTetra.h"
+#include "vtkQuadraticTetra.h"
+
 #include "tetgen.h"
 
 namespace TET_T
