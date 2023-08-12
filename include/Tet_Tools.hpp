@@ -8,31 +8,8 @@
 // 
 // Author: Ju Liu, liujuy@gmail.com
 // ==================================================================
-#include "Sys_Tools.hpp"
-#include "Vec_Tools.hpp"
-#include "Math_Tools.hpp"
-#include "Vector_3.hpp"
+#include "VTK_Tools.hpp"
 #include "IIEN.hpp"
-
-#include "vtkCellLocator.h"
-#include "vtkIntArray.h"
-#include "vtkDoubleArray.h"
-#include "vtkPolyData.h"
-#include "vtkCellData.h"
-#include "vtkCellArray.h"
-#include "vtkPointData.h"
-#include "vtkTriangle.h"
-#include "vtkQuadraticTriangle.h"
-#include "vtkTetra.h"
-#include "vtkQuadraticTetra.h"
-#include "vtkGenericCell.h"
-#include "vtkUnstructuredGrid.h"
-#include "vtkUnstructuredGridWriter.h"
-#include "vtkXMLUnstructuredGridWriter.h"
-#include "vtkXMLUnstructuredGridReader.h"
-#include "vtkXMLPolyDataWriter.h"
-#include "vtkXMLPolyDataReader.h"
-#include "vtkXMLGenericDataObjectReader.h"
 
 #include "tetgen.h"
 

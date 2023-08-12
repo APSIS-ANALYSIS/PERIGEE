@@ -13,7 +13,6 @@
 #include "Vec_Tools.hpp"
 #include "Math_Tools.hpp"
 #include "Vector_3.hpp"
-#include "IIEN.hpp"
 
 #include "vtkCellLocator.h"
 #include "vtkIntArray.h"
