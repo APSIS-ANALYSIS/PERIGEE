@@ -8,6 +8,7 @@
 // 
 // Author: Ju Liu, liujuy@gmail.com
 // ==================================================================
+#include "Vec_Tools.hpp"
 #include "VTK_Tools.hpp"
 #include "Math_Tools.hpp"
 #include "IIEN.hpp"

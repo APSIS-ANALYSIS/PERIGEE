@@ -10,10 +10,8 @@
 // Author: Ju Liu, liujuy@gmail.com
 // ============================================================================
 #include "Sys_Tools.hpp"
-#include "Vec_Tools.hpp"
 #include "Vector_3.hpp"
 
-#include "vtkCellLocator.h"
 #include "vtkIntArray.h"
 #include "vtkDoubleArray.h"
 #include "vtkPolyData.h"
@@ -36,8 +34,8 @@
 namespace VTK_T
 {
   // ================================================================
-  // ===> 1. The first set of tools READ volumetric mesh from .vtu 
-  //         file and surface mesh from .vtp file.  
+  // ===> 1. The first set of tools assists READING volumetric mesh 
+  //         from .vtu file and surface mesh from .vtp file.  
   // ================================================================
   // --------------------------------------------------------------
   // ! read_vtu_grid: read the mesh generated from other software
@@ -91,6 +89,8 @@ namespace VTK_T
   //           \para phy_tag: the tag of the elements, length is numcels
   //   This function is specifically designed for FSI or multi-domain 
   //   problems, where we need a tag to identify the physical domain.
+  //
+  // TO BE REMOVED
   // ----------------------------------------------------------------
   void read_vtu_grid( const std::string &filename,
       int &numpts, int &numcels,
@@ -114,6 +114,8 @@ namespace VTK_T
   //           \para global_ele_index: the mapping from the triangle
   //                                   cell to its corresponding tet
   //                                   cell index
+  //
+  // TO BE REMOVED
   // ----------------------------------------------------------------
   void read_vtu_grid( const std::string &filename,
       int &numpts, int &numcels,
@@ -160,6 +162,8 @@ namespace VTK_T
   //           \para global_ele_index: the mapping from the triangle
   //                                   cell to its corresponding tet
   //                                   cell index
+  //
+  // TO BE REMOVED
   // ----------------------------------------------------------------
   void read_vtp_grid( const std::string &filename,
       int &numpts, int &numcels,
@@ -167,6 +171,10 @@ namespace VTK_T
       std::vector<int> &global_node_index,
       std::vector<int> &global_ele_index );
 
+  // ================================================================
+  // ===> 2. The second set of tools assists WRITING volumetric mesh 
+  //         to .vtu file and surface mesh to .vtp file.  
+  // ================================================================
   // ----------------------------------------------------------------
   // ! add_int_PointData : add a point data associated with nodal
   //                       points in the grid_w, which can be either
