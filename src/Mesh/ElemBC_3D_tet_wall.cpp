@@ -172,12 +172,12 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   {
     if(elemtype == 501)
     {
-      TET_T::read_vtp_grid( wallsList[ii], numpts, numcels,
+      VTK_T::read_vtp_grid( wallsList[ii], numpts, numcels,
             pt, ien_array, global_node_idx, global_elem_idx ); 
     }
     else
     {
-      TET_T::read_vtu_grid( wallsList[ii], numpts, numcels,
+      VTK_T::read_vtu_grid( wallsList[ii], numpts, numcels,
             pt, ien_array, global_node_idx, global_elem_idx );
     }
 
@@ -268,9 +268,9 @@ void ElemBC_3D_tet_wall::overwrite_from_vtk(
 {
   SYS_T::file_check( wallprop_vtk );
 
-  std::vector<int> global_node_idx = TET_T::read_int_PointData( wallprop_vtk, "GlobalNodeID");
+  std::vector<int> global_node_idx = VTK_T::read_int_PointData( wallprop_vtk, "GlobalNodeID");
 
-  std::vector<double> wallprop = TET_T::read_double_PointData( wallprop_vtk, vtk_fieldname );
+  std::vector<double> wallprop = VTK_T::read_double_PointData( wallprop_vtk, vtk_fieldname );
 
   const int ebc_id = 0;
   for( int ii = 0; ii < num_node[ebc_id]; ++ii )
@@ -350,7 +350,7 @@ void ElemBC_3D_tet_wall::write_vtk( const int &ebc_id,
 
     add_wall_data(grid_w, ebc_id);
 
-    TET_T::write_vtkPointSet(filename, grid_w);
+    VTK_T::write_vtkPointSet(filename, grid_w);
     grid_w->Delete();  
   }
   else
@@ -362,7 +362,7 @@ void ElemBC_3D_tet_wall::write_vtk( const int &ebc_id,
 
     add_wall_data(grid_w, ebc_id);
 
-    TET_T::write_vtkPointSet(filename, grid_w);
+    VTK_T::write_vtkPointSet(filename, grid_w);
     grid_w->Delete();
   }
 }
@@ -371,25 +371,25 @@ void ElemBC_3D_tet_wall::write_vtk( const int &ebc_id,
 void ElemBC_3D_tet_wall::add_wall_data( vtkPointSet * const &grid_w, const int &ebc_id ) const
 {
   // Add nodal indices
-  TET_T::add_int_PointData( grid_w, global_node[ebc_id], "GlobalNodeID" );
+  VTK_T::add_int_PointData( grid_w, global_node[ebc_id], "GlobalNodeID" );
 
   // Add cell indices
-  TET_T::add_int_CellData( grid_w, global_cell[ebc_id], "GlobalElementID");
+  VTK_T::add_int_CellData( grid_w, global_cell[ebc_id], "GlobalElementID");
 
   // Add thickness
-  TET_T::add_double_PointData( grid_w, thickness, "Thickness" );
+  VTK_T::add_double_PointData( grid_w, thickness, "Thickness" );
 
   // Add Young's modulus
-  TET_T::add_double_PointData( grid_w, youngsmod, "YoungsModulus" );
+  VTK_T::add_double_PointData( grid_w, youngsmod, "YoungsModulus" );
 
   // Add radius
-  TET_T::add_double_PointData( grid_w, radius, "Radius" );
+  VTK_T::add_double_PointData( grid_w, radius, "Radius" );
 
   // Add spring constant
-  TET_T::add_double_PointData( grid_w, springconst, "SpringConstant" );
+  VTK_T::add_double_PointData( grid_w, springconst, "SpringConstant" );
 
   // Add damping constant
-  TET_T::add_double_PointData( grid_w, dampingconst, "DampingConstant" );
+  VTK_T::add_double_PointData( grid_w, dampingconst, "DampingConstant" );
 }
 
 

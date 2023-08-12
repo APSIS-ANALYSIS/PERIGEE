@@ -33,13 +33,13 @@ ElemBC_3D_tet::ElemBC_3D_tet( const std::string &vtkfile,
   if(elemtype == 501)
   {
     cell_nLocBas[0] = 3; // linear triangle
-    TET_T::read_vtp_grid( vtkfile, num_node[0], num_cell[0],
+    VTK_T::read_vtp_grid( vtkfile, num_node[0], num_cell[0],
         pt_xyz[0], tri_ien[0], global_node[0], global_cell[0] );
   }
   else if(elemtype == 502)
   {
     cell_nLocBas[0] = 6; // quadratic triangle
-    TET_T::read_vtu_grid( vtkfile, num_node[0], num_cell[0],
+    VTK_T::read_vtu_grid( vtkfile, num_node[0], num_cell[0],
         pt_xyz[0], tri_ien[0], global_node[0], global_cell[0] );
   }
 
@@ -69,13 +69,13 @@ ElemBC_3D_tet::ElemBC_3D_tet( const std::vector<std::string> &vtkfileList,
     if(elemtype == 501)
     {
       cell_nLocBas[ii] = 3; // linear triangle
-      TET_T::read_vtp_grid( vtkfileList[ii], num_node[ii], num_cell[ii],
+      VTK_T::read_vtp_grid( vtkfileList[ii], num_node[ii], num_cell[ii],
           pt_xyz[ii], tri_ien[ii], global_node[ii], global_cell[ii] );
     }
     else if(elemtype == 502)
     {
       cell_nLocBas[ii] = 6; // quadratic triangle
-      TET_T::read_vtu_grid( vtkfileList[ii], num_node[ii], num_cell[ii],
+      VTK_T::read_vtu_grid( vtkfileList[ii], num_node[ii], num_cell[ii],
           pt_xyz[ii], tri_ien[ii], global_node[ii], global_cell[ii] );
     }
   }
