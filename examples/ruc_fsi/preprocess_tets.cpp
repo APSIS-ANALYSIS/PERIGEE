@@ -215,7 +215,7 @@ int main( int argc, char * argv[] )
   std::vector<int> vecIEN;
   std::vector<double> ctrlPts;
 
-  TET_T::read_vtu_grid( geo_file, nFunc, nElem, ctrlPts, vecIEN );
+  VTK_T::read_vtu_grid( geo_file, nFunc, nElem, ctrlPts, vecIEN );
 
   IIEN * IEN = new IEN_FEM( nElem, vecIEN );
   VEC_T::clean( vecIEN ); // clean the vector
