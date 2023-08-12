@@ -23,8 +23,8 @@
 namespace TET_T
 {
   // ================================================================
-  // ===> 2. The second set of tools WRITE volumetric mesh to .vtu 
-  //         file and surface mesh to .vtp file.  
+  // ===> 1. This set of tools WRITE volumetric mesh of Tetrahedron or
+  //         triangle to .vtu file and surface mesh to .vtp file.  
   // ================================================================
   // ----------------------------------------------------------------
   // ! gen_tet_grid: generate the volumetric mesh described by tet
@@ -95,7 +95,6 @@ namespace TET_T
       const std::vector<int> &phy_tag, const bool &isXML,
       const int &start_cell_index = 0 );
 
-
   // ----------------------------------------------------------------
   // ! write_triangle_grid: write the surface mesh described by triangle
   //                        elements.
@@ -113,7 +112,6 @@ namespace TET_T
       const std::vector<int> &ien_array,
       const std::vector<int> &global_node_index,
       const std::vector<int> &global_ele_index );
-
 
   // ----------------------------------------------------------------
   // ! gen_triangle_grid: generate the surface mesh described by triangle
@@ -145,7 +143,6 @@ namespace TET_T
       const std::vector<int> &global_node_index,
       const std::vector<int> &global_ele_index );
 
-
   // ----------------------------------------------------------------
   // ! gen_quadratic_triangle_grid: generate the surface mesh described by
   //                                triangle elements and pass the data
@@ -158,7 +155,6 @@ namespace TET_T
       const int &numpts, const int &numcels,
       const std::vector<double> &pt,
       const std::vector<int> &ien_array );
-
 
   // ----------------------------------------------------------------
   // ! write_triangle_grid: write the surface mesh described by triangle
@@ -177,7 +173,6 @@ namespace TET_T
       const std::vector<int> &global_node_index,
       const std::vector<int> &global_ele_index_1, 
       const std::vector<int> &global_ele_index_2 );
-
 
   // ----------------------------------------------------------------
   // ! write_quadratic_triangle_grid: write the surface mesh described 
@@ -199,7 +194,7 @@ namespace TET_T
       const std::vector<int> &global_ele_index_2 );
 
   // ================================================================
-  // 3. Mesh quality measures
+  // 2. Mesh quality measures
   // This set of tools give various measure of tetrahedral element mesh.
   // ================================================================
   // ! get_aspect_ratio:
@@ -238,7 +233,7 @@ namespace TET_T
       const IIEN * const &vol_ien );
   
   // ================================================================
-  // 4. TetGen interface
+  // 3. TetGen interface
   // ----------------------------------------------------------------
   // This set of tools convert the tetgenio object to vtu grid and vtp
   // surface files with markers for the preprocess code to read.
@@ -249,7 +244,6 @@ namespace TET_T
   //                     grid.
   // ----------------------------------------------------------------
   void tetgenio2vtu( const tetgenio &meshout, const std::string &fName );
-
 
   // ----------------------------------------------------------------  
   // Input: \para meshout: tetgenio object containing the mesh points 
@@ -264,9 +258,8 @@ namespace TET_T
   void tetgenio2vtp( const tetgenio &meshout, const std::string &fName,
       const int &bcmarker );
 
-
   // ================================================================
-  // 5. Tet4 class defines a four node linear tetrahedron object with 
+  // 4. Tet4 class defines a four node linear tetrahedron object with 
   // basic manipulations including checking the size, the aspect ratio,
   // and check the face index for given three nodal indices.
   // The object is defined by 12 double data: 
@@ -331,9 +324,8 @@ namespace TET_T
       int gindex[4];
   };
 
-
   // ================================================================
-  // 6. Tetrahedral mesh checker. 
+  // 5. Tetrahedral mesh checker. 
   //    This routine will read in the mesh information: control points
   //    and IEN array, and check each element's quality and print
   //    necessary information.
