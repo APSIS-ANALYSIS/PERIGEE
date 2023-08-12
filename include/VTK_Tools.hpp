@@ -18,7 +18,6 @@
 #include "vtkCellData.h"
 #include "vtkCellArray.h"
 #include "vtkPointData.h"
-#include "vtkGenericCell.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkUnstructuredGridWriter.h"
 #include "vtkXMLUnstructuredGridWriter.h"
