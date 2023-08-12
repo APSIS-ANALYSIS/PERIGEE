@@ -49,14 +49,14 @@ NodalBC_3D_ring::NodalBC_3D_ring(
   { 
     SYS_T::file_check(wallfile);
 
-    TET_T::read_vtp_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
+    VTK_T::read_vtp_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
         wall_ien, wall_gnode, wall_gelem );
 
     for(int ii=0; ii<num_caps; ++ii)
     {
       SYS_T::file_check( cap_files[ii] );
 
-      TET_T::read_vtp_grid( cap_files[ii], numpts, numcels, pts, ien, gnode, gelem );
+      VTK_T::read_vtp_grid( cap_files[ii], numpts, numcels, pts, ien, gnode, gelem );
      
       const Vector_3 centroid = compute_cap_centroid( pts );
 
@@ -99,14 +99,14 @@ NodalBC_3D_ring::NodalBC_3D_ring(
   {
     SYS_T::file_check(wallfile);
 
-    TET_T::read_vtu_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
+    VTK_T::read_vtu_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
         wall_ien, wall_gnode, wall_gelem );
 
     for(int ii=0; ii<num_caps; ++ii)
     {
       SYS_T::file_check( cap_files[ii] );
 
-      TET_T::read_vtu_grid( cap_files[ii], numpts, numcels, pts, ien, gnode, gelem );
+      VTK_T::read_vtu_grid( cap_files[ii], numpts, numcels, pts, ien, gnode, gelem );
 
       const Vector_3 centroid = compute_cap_centroid( pts );
 

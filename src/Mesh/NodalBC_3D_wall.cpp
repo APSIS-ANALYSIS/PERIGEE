@@ -30,14 +30,14 @@ NodalBC_3D_wall::NodalBC_3D_wall(
   {
     SYS_T::file_check(wall_file);
 
-    TET_T::read_vtp_grid( wall_file, wall_numpts, wall_numcels, wall_pts,
+    VTK_T::read_vtp_grid( wall_file, wall_numpts, wall_numcels, wall_pts,
         wall_ien, wall_gnode, wall_gelem );
 
     for( const auto &capfile : cap_files )
     {
       SYS_T::file_check( capfile );
 
-      TET_T::read_vtp_grid( capfile, numpts, numcels, pts, ien, gnode, gelem );
+      VTK_T::read_vtp_grid( capfile, numpts, numcels, pts, ien, gnode, gelem );
     
       VEC_T::insert_end( ring_gnode, gnode );
     }
@@ -46,14 +46,14 @@ NodalBC_3D_wall::NodalBC_3D_wall(
   {
     SYS_T::file_check(wall_file);
 
-    TET_T::read_vtu_grid( wall_file, wall_numpts, wall_numcels, wall_pts,
+    VTK_T::read_vtu_grid( wall_file, wall_numpts, wall_numcels, wall_pts,
         wall_ien, wall_gnode, wall_gelem );
 
     for( const auto &capfile : cap_files )
     {
       SYS_T::file_check( capfile );
 
-      TET_T::read_vtu_grid( capfile, numpts, numcels, pts, ien, gnode, gelem );
+      VTK_T::read_vtu_grid( capfile, numpts, numcels, pts, ien, gnode, gelem );
 
       VEC_T::insert_end( ring_gnode, gnode );
     }
