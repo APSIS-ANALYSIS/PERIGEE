@@ -108,16 +108,16 @@ void TET_T::write_tet_grid( const std::string &filename,
   std::vector<int> node_idx(numpts);
   for(int ii=0; ii<numpts; ++ii) node_idx[ii] = ii;
 
-  add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
+  VTK_T::add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
 
   // cell indices (natural numbering)
   std::vector<int> elem_idx(numcels);
   for(int ii=0; ii<numcels; ++ii) elem_idx[ii] = ii;
 
-  add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
+  VTK_T::add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
 
   // write vtu (by default of the writer function)
-  write_vtkPointSet(filename, grid_w);
+  VTK_T::write_vtkPointSet(filename, grid_w);
 
   VEC_T::clean( node_idx );
   VEC_T::clean( elem_idx );
@@ -138,13 +138,13 @@ void TET_T::write_tet_grid( const std::string &filename,
   gen_tet_grid( grid_w, numpts, numcels, pt, ien_array );
 
   // nodal indices
-  add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
+  VTK_T::add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
 
   // cell indices
-  add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
+  VTK_T::add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
 
   // write vtu (by default of the writer function)
-  write_vtkPointSet(filename, grid_w);
+  VTK_T::write_vtkPointSet(filename, grid_w);
 
   grid_w->Delete();
 }
@@ -166,19 +166,19 @@ void TET_T::write_tet_grid( const std::string &filename,
   std::vector<int> node_idx(numpts);
   for(int ii=0; ii<numpts; ++ii) node_idx[ii] = ii;
 
-  add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
+  VTK_T::add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
 
   // cell indices (natural numbering)
   std::vector<int> elem_idx(numcels);
   for(int ii=0; ii<numcels; ++ii) elem_idx[ii] = ii + start_cell_index;
 
-  add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
+  VTK_T::add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
 
   // physics tags
-  add_int_CellData( grid_w, phytag, "Physics_tag" );
+  VTK_T::add_int_CellData( grid_w, phytag, "Physics_tag" );
 
   // write vtu or vtk
-  write_vtkPointSet(filename, grid_w, isXML);
+  VTK_T::write_vtkPointSet(filename, grid_w, isXML);
 
   VEC_T::clean( node_idx );
   VEC_T::clean( elem_idx );
@@ -200,16 +200,16 @@ void TET_T::write_tet_grid( const std::string &filename,
   gen_tet_grid( grid_w, numpts, numcels, pt, ien_array );
 
   // nodal indices
-  add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
+  VTK_T::add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
 
   // cell indices
-  add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
+  VTK_T::add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
 
   // physics tags
-  add_int_CellData( grid_w, phytag, "Physics_tag" );
+  VTK_T::add_int_CellData( grid_w, phytag, "Physics_tag" );
 
   // write vtu or vtk
-  write_vtkPointSet(filename, grid_w, isXML);
+  VTK_T::write_vtkPointSet(filename, grid_w, isXML);
 
   grid_w->Delete();
 }
@@ -229,13 +229,13 @@ void TET_T::write_triangle_grid( const std::string &filename,
   gen_triangle_grid( grid_w, numpts, numcels, pt, ien_array );
 
   // nodal indices
-  add_int_PointData( grid_w, node_index, "GlobalNodeID" );
+  VTK_T::add_int_PointData( grid_w, node_index, "GlobalNodeID" );
 
   // cell indices
-  add_int_CellData( grid_w, ele_index, "GlobalElementID");
+  VTK_T::add_int_CellData( grid_w, ele_index, "GlobalElementID");
 
   // write grid_w to vtp file
-  write_vtkPointSet(filename, grid_w);
+  VTK_T::write_vtkPointSet(filename, grid_w);
 
   grid_w->Delete();
 }
@@ -295,13 +295,13 @@ void TET_T::write_quadratic_triangle_grid(
   gen_quadratic_triangle_grid( grid_w, numpts, numcels, pt, ien_array );
 
   // nodal indices
-  add_int_PointData( grid_w, node_index, "GlobalNodeID" );
+  VTK_T::add_int_PointData( grid_w, node_index, "GlobalNodeID" );
 
   // cell indices
-  add_int_CellData( grid_w, ele_index, "GlobalElementID" );
+  VTK_T::add_int_CellData( grid_w, ele_index, "GlobalElementID" );
 
   // write vtu (by default of the writer function)
-  write_vtkPointSet(filename, grid_w);
+  VTK_T::write_vtkPointSet(filename, grid_w);
 
   grid_w->Delete();
 }
@@ -365,15 +365,15 @@ void TET_T::write_triangle_grid( const std::string &filename,
   gen_triangle_grid( grid_w, numpts, numcels, pt, ien_array );
 
   // nodal indices
-  add_int_PointData( grid_w, node_index, "GlobalNodeID" );
+  VTK_T::add_int_PointData( grid_w, node_index, "GlobalNodeID" );
 
   // cell indices
-  add_int_CellData( grid_w, ele_index_1, "GlobalElementID_1" );
+  VTK_T::add_int_CellData( grid_w, ele_index_1, "GlobalElementID_1" );
 
-  add_int_CellData( grid_w, ele_index_2, "GlobalElementID_2" );
+  VTK_T::add_int_CellData( grid_w, ele_index_2, "GlobalElementID_2" );
 
   // write vtp
-  write_vtkPointSet(filename, grid_w);
+  VTK_T::write_vtkPointSet(filename, grid_w);
 
   grid_w->Delete();
 }
@@ -394,15 +394,15 @@ void TET_T::write_quadratic_triangle_grid( const std::string &filename,
   gen_quadratic_triangle_grid( grid_w, numpts, numcels, pt, ien_array );
 
   // nodal indices
-  add_int_PointData( grid_w, node_index, "GlobalNodeID" );
+  VTK_T::add_int_PointData( grid_w, node_index, "GlobalNodeID" );
 
   // cell indices
-  add_int_CellData( grid_w, ele_index_1, "GlobalElementID_1" );
+  VTK_T::add_int_CellData( grid_w, ele_index_1, "GlobalElementID_1" );
 
-  add_int_CellData( grid_w, ele_index_2, "GlobalElementID_2" );
+  VTK_T::add_int_CellData( grid_w, ele_index_2, "GlobalElementID_2" );
 
   // write vtu (by default of write function)
-  write_vtkPointSet(filename, grid_w);
+  VTK_T::write_vtkPointSet(filename, grid_w);
 
   grid_w->Delete();
 }
@@ -442,9 +442,9 @@ Vector_3 TET_T::get_out_normal( const std::string &file,
   std::string fend; fend.assign( file.end()-4 , file.end() );
 
   if( fend.compare(".vtp") == 0 )
-    TET_T::read_vtp_grid( file, numpts, numcels, pts, ien, gnode, gelem );
+    VTK_T::read_vtp_grid( file, numpts, numcels, pts, ien, gnode, gelem );
   else if( fend.compare(".vtu") == 0 )
-    TET_T::read_vtu_grid( file, numpts, numcels, pts, ien, gnode, gelem );
+    VTK_T::read_vtu_grid( file, numpts, numcels, pts, ien, gnode, gelem );
   else
     SYS_T::print_fatal("Error: get_out_normal unknown file type.\n");
   
@@ -852,10 +852,10 @@ namespace TET_T
 
     std::vector<int> input_node_index(gindex, gindex+4);
 
-    add_int_PointData( grid_w, input_node_index, "GlobalNodeID" );
+    VTK_T::add_int_PointData( grid_w, input_node_index, "GlobalNodeID" );
 
     // write vtu
-    write_vtkPointSet( fileName, grid_w, true );
+    VTK_T::write_vtkPointSet( fileName, grid_w, true );
 
     grid_w->Delete();
   }

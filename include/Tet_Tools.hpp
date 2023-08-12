@@ -9,6 +9,7 @@
 // Author: Ju Liu, liujuy@gmail.com
 // ==================================================================
 #include "VTK_Tools.hpp"
+#include "Math_Tools.hpp"
 #include "IIEN.hpp"
 
 #include "tetgen.h"
