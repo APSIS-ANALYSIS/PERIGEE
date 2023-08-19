@@ -71,7 +71,7 @@ int main( int argc, char * argv[] )
   std::vector<int> vecIEN, phy_tag;
   std::vector<double> ctrlPts;
 
-  TET_T::read_vtu_grid( geo_file, nFunc_v, nElem, ctrlPts, vecIEN, phy_tag );
+  VTK_T::read_vtu_grid( geo_file, nFunc_v, nElem, ctrlPts, vecIEN, phy_tag );
 
   // Generate IEN
   IIEN * IEN_v = new IEN_FEM( nElem, vecIEN );
@@ -81,7 +81,7 @@ int main( int argc, char * argv[] )
   // mapped to a new value by the following rule. The ii-th node in the
   // interface wall node will be assgiend to nFunc_v + ii.
   // Read the F-S interface vtp file
-  const std::vector<int> wall_node_id = TET_T::read_int_PointData( sur_s_file_interior_wall, "GlobalNodeID" );
+  const std::vector<int> wall_node_id = VTK_T::read_int_PointData( sur_s_file_interior_wall, "GlobalNodeID" );
 
   const int nFunc_interface = static_cast<int>( wall_node_id.size() );
   const int nFunc_p = nFunc_v + nFunc_interface;

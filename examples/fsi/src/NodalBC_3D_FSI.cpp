@@ -43,7 +43,7 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
       // ====== Rigid wall ======
     case 1:
       {
-        dir_nodes = VEC_T::cast_to_unsigned_int( TET_T::read_int_PointData( solid_file, "GlobalNodeID" ) );
+        dir_nodes = VEC_T::cast_to_unsigned_int( VTK_T::read_int_PointData( solid_file, "GlobalNodeID" ) );
 
         VEC_T::insert_end( dir_nodes, get_vtp_nodal_id( fluid_inlet_files ) );
 
@@ -58,8 +58,8 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
       {
         if(ringBC_type == 0)
         {
-          const std::vector<int> f_node = TET_T::read_int_PointData( fluid_file, "GlobalNodeID" );
-          const std::vector<int> fwall_node = TET_T::read_int_PointData( fluid_wall_file, "GlobalNodeID" );
+          const std::vector<int> f_node = VTK_T::read_int_PointData( fluid_file, "GlobalNodeID" );
+          const std::vector<int> fwall_node = VTK_T::read_int_PointData( fluid_wall_file, "GlobalNodeID" );
 
           dir_nodes = VEC_T::cast_to_unsigned_int( VEC_T::set_diff( f_node, fwall_node ) );
 
@@ -109,7 +109,7 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
       break;
       // ====== Wall prestress solver =====
     case 2:
-      dir_nodes = VEC_T::cast_to_unsigned_int( TET_T::read_int_PointData( fluid_file, "GlobalNodeID" ) );
+      dir_nodes = VEC_T::cast_to_unsigned_int( VTK_T::read_int_PointData( fluid_file, "GlobalNodeID" ) );
       std::cout<<"===> NodalBC_3D_FSI for wall prestressing (fsiBC_type = 2) is generated for pressure \n";
       break;
     default:
@@ -134,7 +134,7 @@ std::vector<unsigned int> NodalBC_3D_FSI::get_vtp_nodal_id( const std::vector<st
   {
     SYS_T::file_check( vtpfileList[ii] );
 
-    VEC_T::insert_end( output, VEC_T::cast_to_unsigned_int( TET_T::read_int_PointData( vtpfileList[ii], "GlobalNodeID" ) ) );
+    VEC_T::insert_end( output, VEC_T::cast_to_unsigned_int( VTK_T::read_int_PointData( vtpfileList[ii], "GlobalNodeID" ) ) );
   }
 
   return output;

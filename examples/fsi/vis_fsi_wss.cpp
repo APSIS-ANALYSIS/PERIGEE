@@ -73,7 +73,7 @@ int main( int argc, char * argv[] )
   std::vector<int> v_vecIEN, phy_tag;
   std::vector<double> v_ctrlPts;
 
-  TET_T::read_vtu_grid(geo_file.c_str(), v_nFunc, v_nElem, v_ctrlPts, v_vecIEN, phy_tag);
+  VTK_T::read_vtu_grid(geo_file.c_str(), v_nFunc, v_nElem, v_ctrlPts, v_vecIEN, phy_tag);
 
   cout<<"Volumetric mesh contains "<<v_nElem<<" elements and "<<v_nFunc<<" vertices.\n";
 
@@ -82,7 +82,7 @@ int main( int argc, char * argv[] )
   std::vector<double> ctrlPts;
   std::vector<int> vecIEN, global_node_idx, global_ele_idx;
 
-  TET_T::read_vtp_grid( wall_file.c_str(), nFunc, nElem, ctrlPts, vecIEN,
+  VTK_T::read_vtp_grid( wall_file.c_str(), nFunc, nElem, ctrlPts, vecIEN,
       global_node_idx, global_ele_idx );
 
   cout<<"Wall mesh contains "<<nElem<<" elements and "<<nFunc<<" vertices.\n";
@@ -338,9 +338,9 @@ void write_triangle_grid_wss( const std::string &filename,
 
   TET_T::gen_triangle_grid( grid_w, numpts, numcels, pt, ien_array );
 
-  TET_T::add_Vector3_PointData( grid_w, wss_on_node, "WSS" ); 
+  VTK_T::add_Vector3_PointData( grid_w, wss_on_node, "WSS" ); 
 
-  TET_T::write_vtkPointSet(filename, grid_w);
+  VTK_T::write_vtkPointSet(filename, grid_w);
 
   grid_w->Delete();
 }
