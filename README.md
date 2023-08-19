@@ -1,6 +1,6 @@
 <img src="./docs/PERIGEE-logo.png"  width="36%" height="36%"> 
 
-PERIGEE is a nonlinear dynamic finite element analysis code for multiphysics simulations. The code has been developed with the goal of providing an object-oriented framework for parallel implementation of multiphysics problems. Copyright and licensing information can be found in files [LICENSE](LICENSE).
+PERIGEE is a nonlinear dynamic finite element analysis code for multiphysics simulations. The code has been developed with the goal of providing an object-oriented framework for parallel implementation of multiphysics problems. Copyright and licensing information can be found in [LICENSE](LICENSE).
 
 ## Table of Contents
 
@@ -11,14 +11,10 @@ PERIGEE is a nonlinear dynamic finite element analysis code for multiphysics sim
 - [References](#References)
 
 ## Install
-Please go through the following steps to install external libraries.
+Please go through the following steps to install external libraries on your own machine.
 
-1. Before compiling PERIGEE, you will have to install a few external libraries. A quick guide for library installation is [here](docs/install_external_libs.md) and a more advanced guide is [there](docs/install-advanced.md). After the libraries are all properly installed, proceed to step 3.
+1. A quick guide for library installation is [here](docs/install_external_libs.md) and a more advanced guide is [there](docs/install-advanced.md). After the libraries are all properly installed, proceed to step 2.
 
-2. You need to add the following to your `.bash_profile` or `.bashrc` file to define `MACHINE_NAME` as an environment variable, and then proceed to step 3. For example, I named one of my machine as `sherlock`, and PERIGEE will detech the `MACHINE_NAME` and load an appropriate configuration file.
-```sh
-export MACHINE_NAME=sherlock
-```
 Since VTK is typically installed as a shared library in a non-standard folder, one has to edit the `LD_LIBRARY_PATH` environmental variable for the linker to locate the .so files. Open the `.bash_profile` or `.bashrc` file and edit the `LD_LIBRARY_PATH` variable. See below is an example with my VTK installed at `/Users/juliu/lib/VTK-8.2.0/`.
 
 ```sh
@@ -26,7 +22,7 @@ export LD_LIBRARY_PATH=/Users/juliu/lib/VTK-8.2.0/lib:$LD_LIBRARY_PATH
 ```
 For more information on this environmental variable, see [here](http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html).
 
-3. After the libraries are installed, add or modify the configuration file `system_lib_loading.cmake` in the [conf](conf) folder. You may find a file called `system_lib_loading_example.cmake`, which is an example that gives complete system loading information. In this file, you will have to specify the paths for the external libraries,
+2. After installing the libraries, add or modify the configuration file `system_lib_loading.cmake` in the [conf](conf) folder. You may find a file called `system_lib_loading_example.cmake`, which is an example that gives complete system loading information. In this file, you will have to specify the paths for the external libraries,
 
  - Set `VTK_DIR` to the VTK library location (e.g. `/home/jliu/lib/VTK-7.1.1-shared`).
  - Set `PETSC_DIR` to the PETSc library location (e.g. `/home/jliu/lib/petsc-3.11.3`).
@@ -37,7 +33,6 @@ For more information on this environmental variable, see [here](http://tldp.org/
  - Set `CMAKE_CXX_COMPILER` to `$PETSC_DIR/$PETSC_ARCH/bin/mpicxx`
 
 After the editing, save and close CMake file and rename it as `system_lib_loading.cmake`. And you have your own configuration file set up. Notice that we have the file name `system_lib_loading.cmake` added in .gitignore, meaning that git will not track this file. You may want to keep a copy of this file out of PERIGEE, because when you switch to other branches, PERIGEE will not keep a copy of this file. 
-
 
 ## Build
 First, create a folder `build` out of the source directory. Enter that folder, and run the following commands to build, as an example, a suite of heat equation solvers.

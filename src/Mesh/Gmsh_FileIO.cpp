@@ -583,22 +583,11 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
 
   // generate the local triangle IEN array
   std::vector<int> trien; trien.clear();
-  int node0, node1, node2;
-  std::vector<int>::iterator it;
   for(int ee=0; ee<bcnumcl; ++ee)
   {
-    node0 = trien_global[3*ee];
-    node1 = trien_global[3*ee+1];
-    node2 = trien_global[3*ee+2];
-
-    it = find(bcpt.begin(), bcpt.end(), node0);
-    trien.push_back( it - bcpt.begin() );
-
-    it = find(bcpt.begin(), bcpt.end(), node1);
-    trien.push_back( it - bcpt.begin() );
-
-    it = find(bcpt.begin(), bcpt.end(), node2);
-    trien.push_back( it - bcpt.begin() );
+    trien.push_back( VEC_T::get_pos(bcpt, trien_global[3*ee  ]) );
+    trien.push_back( VEC_T::get_pos(bcpt, trien_global[3*ee+1]) );
+    trien.push_back( VEC_T::get_pos(bcpt, trien_global[3*ee+2]) );
   }
   std::cout<<"      triangle IEN generated. \n";
 
@@ -609,29 +598,24 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
   std::vector<int> face2elem; face2elem.resize( bcnumcl, -1 );
   if( isf2e )
   {
-    int vol_elem;
-    int vnode[4];
-    bool got0, got1, got2, gotit;
     for(int ff=0; ff<bcnumcl; ++ff)
     {
-      node0 = trien_global[3*ff];
-      node1 = trien_global[3*ff+1];
-      node2 = trien_global[3*ff+2];
-      gotit = false;
+      const int node0 = trien_global[3*ff];
+      const int node1 = trien_global[3*ff+1];
+      const int node2 = trien_global[3*ff+2];
+      bool gotit = false;
       int ee = -1;
       while( !gotit && ee < int(gelem.size()) - 1 )
       {
         ee += 1;
-        vol_elem = gelem[ee];
-        vnode[0] = vol_IEN[4*vol_elem];
-        vnode[1] = vol_IEN[4*vol_elem+1];
-        vnode[2] = vol_IEN[4*vol_elem+2];
-        vnode[3] = vol_IEN[4*vol_elem+3];
+        const int vol_elem = gelem[ee];
+        int vnode[4] { vol_IEN[4*vol_elem], vol_IEN[4*vol_elem+1],
+         vol_IEN[4*vol_elem+2], vol_IEN[4*vol_elem+3] };
         std::sort(vnode, vnode+4);
 
-        got0 = ( std::find(vnode, vnode+4, node0) != vnode+4 );
-        got1 = ( std::find(vnode, vnode+4, node1) != vnode+4 );
-        got2 = ( std::find(vnode, vnode+4, node2) != vnode+4 );
+        const bool got0 = ( std::find(vnode, vnode+4, node0) != vnode+4 );
+        const bool got1 = ( std::find(vnode, vnode+4, node1) != vnode+4 );
+        const bool got2 = ( std::find(vnode, vnode+4, node2) != vnode+4 );
         gotit = got0 && got1 && got2;
       }
 
