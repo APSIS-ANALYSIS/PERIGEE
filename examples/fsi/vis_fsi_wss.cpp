@@ -70,10 +70,12 @@ int main( int argc, char * argv[] )
   // ----------------------------------------------------------------
   // Read in the whole FSI volumetric mesh
   int v_nFunc, v_nElem;
-  std::vector<int> v_vecIEN, phy_tag;
+  std::vector<int> v_vecIEN;
   std::vector<double> v_ctrlPts;
 
-  VTK_T::read_vtu_grid(geo_file.c_str(), v_nFunc, v_nElem, v_ctrlPts, v_vecIEN, phy_tag);
+  VTK_T::read_vtu_grid(geo_file, v_nFunc, v_nElem, v_ctrlPts, v_vecIEN);
+
+  const std::vector<int> phy_tag = VTK_T::read_int_CellData(geo_file, "Physics_tag");
 
   cout<<"Volumetric mesh contains "<<v_nElem<<" elements and "<<v_nFunc<<" vertices.\n";
 

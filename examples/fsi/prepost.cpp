@@ -68,10 +68,12 @@ int main( int argc, char * argv[] )
   // Read the geometry file for the whole FSI domain for the velocity /
   // displacement field
   int nFunc_v, nElem;
-  std::vector<int> vecIEN, phy_tag;
+  std::vector<int> vecIEN;
   std::vector<double> ctrlPts;
 
-  VTK_T::read_vtu_grid( geo_file, nFunc_v, nElem, ctrlPts, vecIEN, phy_tag );
+  VTK_T::read_vtu_grid( geo_file, nFunc_v, nElem, ctrlPts, vecIEN );
+  
+  const std::vector<int> phy_tag = VTK_T::read_int_CellData( geo_file, "Physics_tag" );
 
   // Generate IEN
   IIEN * IEN_v = new IEN_FEM( nElem, vecIEN );

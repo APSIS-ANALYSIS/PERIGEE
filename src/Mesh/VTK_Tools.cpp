@@ -228,18 +228,6 @@ std::vector<double> VTK_T::read_double_PointData( const std::string &filename,
   return data;
 }
 
-
-void VTK_T::read_vtu_grid( const std::string &filename,
-    int &numpts, int &numcels,
-    std::vector<double> &pt, std::vector<int> &ien_array,
-    std::vector<int> &phy_tag )
-{
-  read_vtu_grid(filename, numpts, numcels, pt, ien_array);
-  
-  phy_tag = read_int_CellData(filename, "Physics_tag");
-}
-
-
 void VTK_T::read_vtu_grid( const std::string &filename,
     int &numpts, int &numcels,
     std::vector<double> &pt, std::vector<int> &ien_array,
