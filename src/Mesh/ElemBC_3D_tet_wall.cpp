@@ -173,13 +173,16 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     if(elemtype == 501)
     {
       VTK_T::read_vtp_grid( wallsList[ii], numpts, numcels,
-            pt, ien_array, global_node_idx, global_elem_idx ); 
+            pt, ien_array ); 
     }
     else
     {
       VTK_T::read_vtu_grid( wallsList[ii], numpts, numcels,
-            pt, ien_array, global_node_idx, global_elem_idx );
+            pt, ien_array );
     }
+
+    global_node_idx = VTK_T::read_int_PointData(wallsList[ii], "GlobalNodeID");
+    global_elem_idx = VTK_T::read_int_CellData(wallsList[ii], "GlobalElementID");
 
     vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
     reader -> SetFileName( centerlinesList[ii].c_str() );
