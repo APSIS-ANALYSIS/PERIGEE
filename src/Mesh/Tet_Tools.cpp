@@ -436,15 +436,19 @@ Vector_3 TET_T::get_out_normal( const std::string &file,
 {
   int numpts, numcels;
   std::vector<double> pts;
-  std::vector<int> ien, gnode, gelem;
+  std::vector<int> ien;
 
   // Analyze the file type
   std::string fend; fend.assign( file.end()-4 , file.end() );
 
   if( fend.compare(".vtp") == 0 )
-    VTK_T::read_vtp_grid( file, numpts, numcels, pts, ien, gnode, gelem );
+    VTK_T::read_vtp_grid( file, numpts, numcels, pts, ien);
+    const std::vector<int> gnode = read_int_PointData(file, "GlobalNodeID");
+    const std::vector<int> gelem = read_int_CellData(file, "GlobalElementID");
   else if( fend.compare(".vtu") == 0 )
-    VTK_T::read_vtu_grid( file, numpts, numcels, pts, ien, gnode, gelem );
+    VTK_T::read_vtu_grid( file, numpts, numcels, pts, ien);
+    const std::vector<int> gnode = read_int_PointData(file, "GlobalNodeID");
+    const std::vector<int> gelem = read_int_CellData(file, "GlobalElementID");
   else
     SYS_T::print_fatal("Error: get_out_normal unknown file type.\n");
   
