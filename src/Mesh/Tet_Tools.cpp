@@ -448,8 +448,8 @@ Vector_3 TET_T::get_out_normal( const std::string &file,
   else
     SYS_T::print_fatal("Error: get_out_normal unknown file type.\n");
 
-  const std::vector<int> gnode = read_int_PointData(file, "GlobalNodeID");
-  const std::vector<int> gelem = read_int_CellData(file, "GlobalElementID");
+  const std::vector<int> gnode = VTK_T::read_int_PointData(file, "GlobalNodeID");
+  const std::vector<int> gelem = VTK_T::read_int_CellData(file, "GlobalElementID");
   
   // triangle nodes' global indices
   const std::vector<int> trn = { gnode[ ien[0] ], gnode[ ien[1] ], gnode[ ien[2] ] };

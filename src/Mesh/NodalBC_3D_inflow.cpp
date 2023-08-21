@@ -77,8 +77,8 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
   }
   else SYS_T::print_fatal("Error: unknown element type.\n");
 
-  const std::vector<int> wall_gnode = read_int_PointData(wallfile, "GlobalNodeID");
-  const std::vector<int> wall_gelem = read_int_CellData(wallfile, "GlobalElementID");
+  const std::vector<int> wall_gnode = VTK_T::read_int_PointData(wallfile, "GlobalNodeID");
+  const std::vector<int> wall_gelem = VTK_T::read_int_CellData(wallfile, "GlobalElementID");
 
   // Loop over each surface with id ii
   for( int ii=0; ii<num_nbc; ++ii )
@@ -101,8 +101,8 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
     }
     else SYS_T::print_fatal("Error: unknown element type.\n");
 
-    global_node[ii] = read_int_PointData(inffileList[ii], "GlobalNodeID");
-    global_cell[ii] = read_int_CellData(inffileList[ii], "GlobalElementID");
+    global_node[ii] = VTK_T::read_int_PointData(inffileList[ii], "GlobalNodeID");
+    global_cell[ii] = VTK_T::read_int_CellData(inffileList[ii], "GlobalElementID");
 
     // Generate the dir-node list. Nodes belonging to the wall are excluded.
     for(unsigned int jj=0; jj<global_node[ii].size(); ++jj)
