@@ -69,10 +69,13 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::vector<std::string> &vtufileList,
 
     int numpts, numcels;
     std::vector<double> pts;
-    std::vector<int> ien, gnode, gelem;
+    std::vector<int> ien;
 
-    VTK_T::read_vtu_grid( vtufileList[ii], numpts, numcels, pts, ien, gnode, gelem );
-  
+    VTK_T::read_vtu_grid( vtufileList[ii], numpts, numcels, pts, ien );
+ 
+    const std::vector<int> gnode = VTK_T::read_int_PointData( vtufileList[ii], "GlobalNodeID");
+    const std::vector<int> gelem = VTK_T::read_int_CellData( vtufileList[ii], "GlobalElementID");
+
     for(unsigned int jj=0; jj<gnode.size(); ++jj)
     {
       if(gnode[jj]<0) SYS_T::print_fatal("Error: there are negative nodal index! \n");
