@@ -443,14 +443,13 @@ Vector_3 TET_T::get_out_normal( const std::string &file,
 
   if( fend.compare(".vtp") == 0 )
     VTK_T::read_vtp_grid( file, numpts, numcels, pts, ien);
-    const std::vector<int> gnode = read_int_PointData(file, "GlobalNodeID");
-    const std::vector<int> gelem = read_int_CellData(file, "GlobalElementID");
   else if( fend.compare(".vtu") == 0 )
     VTK_T::read_vtu_grid( file, numpts, numcels, pts, ien);
-    const std::vector<int> gnode = read_int_PointData(file, "GlobalNodeID");
-    const std::vector<int> gelem = read_int_CellData(file, "GlobalElementID");
   else
     SYS_T::print_fatal("Error: get_out_normal unknown file type.\n");
+
+  const std::vector<int> gnode = read_int_PointData(file, "GlobalNodeID");
+  const std::vector<int> gelem = read_int_CellData(file, "GlobalElementID");
   
   // triangle nodes' global indices
   const std::vector<int> trn = { gnode[ ien[0] ], gnode[ ien[1] ], gnode[ ien[2] ] };
