@@ -108,6 +108,7 @@ class SymmTensor4_3D
     void add_OutProduct( const double &val, const SymmMatrix_3x3 &mmat );
 
     // ------------------------------------------------------------------------
+    // TO BE UPDATED!
     // add a symmetric tensor product of 4 vectors which is defined the
     // following way,
     //     val x ( vex1[i] x vec2[j] x vec3[k] x vec4[l]
@@ -119,8 +120,7 @@ class SymmTensor4_3D
     // See, Holzapfel book p. 263, equation (6.196) for an example.
     // Notes: vec1 = vec3 and vec2 = vec4 to maintain the major symmetry
     // ------------------------------------------------------------------------
-    void add_SymmOutProduct( const double &val, const Vector_3 &vec1,
-        const Vector_3 &vec2, const Vector_3 &vec3, const Vector_3 &vec4 );
+    void add_SymmOutProduct( const double &val, const Vector_3 &vec1, const Vector_3 &vec2 );
 
     // ------------------------------------------------------------------------
     // add a symmetric product with a scaling factor -- val:

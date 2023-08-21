@@ -2,10 +2,7 @@
 
 SymmTensor4_3D::SymmTensor4_3D()
 {
-  gen_zero();
-
-  ten[0] = 1.0; ten[6] = 1.0; ten[11] = 1.0;
-  ten[15] = 0.5; ten[18] = 0.5; ten[20] = 0.5;
+  gen_symm_id();
 }
 
 SymmTensor4_3D::~SymmTensor4_3D()
@@ -152,6 +149,9 @@ SymmTensor4_3D& SymmTensor4_3D::operator*=( const double &val )
 
 void SymmTensor4_3D::add_OutProduct( const double &val, const SymmMatrix_3x3 &mmat )
 {
+  // ten[0] += val * mmat[0] * mmat[0];
+  // ten[1] += val * mmat[] * mmat[];
+  
   double add_ten[21];
   for(int ii=0; ii<3; ++ii)
   {
@@ -171,7 +171,7 @@ void SymmTensor4_3D::add_OutProduct( const double &val, const SymmMatrix_3x3 &mm
 }
 
 void SymmTensor4_3D::add_SymmOutProduct( const double &val, const Vector_3 &vec1, 
-  const Vector_3 &vec2, const Vector_3 &vec3, const Vector_3 &vec4 )
+  const Vector_3 &vec2 )
 {
   double add_ten[21];
   for(int ii=0; ii<3; ++ii)
@@ -248,6 +248,14 @@ int SymmTensor4_3D::Voigt_notation( const int &ii, const int &jj, const int &kk,
 {
   int index_I = 3;
   int index_J = 3;
+  
+  // [ 0, 5, 4;
+  //   5, 1, 3;
+  //   4, 3, 2 ]
+  //
+  //   const index_I = mapper(ii,jj);
+  //   const index_J = mapper(kk,ll);
+  
   switch (ii)
   {
   case 0:
