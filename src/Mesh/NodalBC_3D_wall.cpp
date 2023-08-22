@@ -18,7 +18,7 @@ NodalBC_3D_wall::NodalBC_3D_wall(
 
   int numpts, numcels;
   std::vector<double> pts;
-  std::vector<int> ien, gnode, gelem;
+  std::vector<int> ien, gnode;
 
   int wall_numpts, wall_numcels;
   std::vector<double> wall_pts;
