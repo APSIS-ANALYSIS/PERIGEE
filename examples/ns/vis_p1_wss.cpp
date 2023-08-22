@@ -119,10 +119,12 @@ int main( int argc, char * argv[] )
   // Now read the wall surface mesh info
   int nFunc, nElem;
   std::vector<double> ctrlPts;
-  std::vector<int> vecIEN, global_node_idx, global_ele_idx;
+  std::vector<int> vecIEN;
   
-  VTK_T::read_vtp_grid( wall_file.c_str(), nFunc, nElem, ctrlPts, vecIEN,
-      global_node_idx, global_ele_idx );
+  VTK_T::read_vtp_grid( wall_file.c_str(), nFunc, nElem, ctrlPts, vecIEN );
+  
+  const std::vector<int> global_node_idx = VTK_T::read_int_PointData(wall_file.c_str(), "GlobalNodeID");
+  const std::vector<int> global_ele_idx = VTK_T::read_int_CellData(wall_file.c_str(), "GlobalElementID");
 
   cout<<"Wall mesh contains "<<nElem<<" elements and "<<nFunc<<" vertices.\n";
 
