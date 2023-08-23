@@ -64,8 +64,6 @@ NodalBC_3D_wall::NodalBC_3D_wall(
     SYS_T::print_fatal("Error: Nodal_3D_wall unknown file type.\n");
 
   const std::vector<int> wall_gnode = VTK_T::read_int_PointData(wall_file, "GlobalNodeID");
-  const std::vector<int> wall_gelem = VTK_T::read_int_CellData(wall_file, "GlobalElementID");
-
 
   VEC_T::sort_unique_resize( ring_gnode );
 

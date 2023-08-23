@@ -80,10 +80,8 @@ void SV_T::gen_sv_fsi_vtus( const std::string &filename_f,
   int nFunc_i, nElem_i;
   std::vector<int> vecIEN_i;
   std::vector<double> ctrlPts_i;
-  VTK_T::read_vtp_grid( filename_f_wall, nFunc_i, nElem_i, ctrlPts_i,
-      vecIEN_i, node_idx_i, elem_idx_i );
+  VTK_T::read_vtp_grid( filename_f_wall, nFunc_i, nElem_i, ctrlPts_i, vecIEN_i );
   const std::vector<int> node_idx_i = VTK_T::read_int_PointData(filename_f_wall, "GlobalNodeID");
-  const std::vector<int> elem_idx_i = VTK_T::read_int_CellData(filename_f_wall, "GlobalElementID");
 
   // Read solid mesh
   int nFunc_s, nElem_s;
@@ -116,7 +114,7 @@ void SV_T::gen_sv_fsi_vtus( const std::string &filename_f,
   SYS_T::print_fatal_if( counter != nFunc_s - nFunc_i, "Error: SV_T::merge_sv_vtus, there are points in the interface not located in the solid domain. \n");
 
   // Clean the interface data
-  VEC_T::clean(ctrlPts_i); VEC_T::clean(node_idx_i); VEC_T::clean(elem_idx_i);
+  VEC_T::clean(ctrlPts_i); VEC_T::clean(node_idx_i);
 
   // adjust the solid IEN array in the FSI IEN array
   std::vector<int> tempIEN; tempIEN.resize( vecIEN_s.size() ); 
