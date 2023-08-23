@@ -53,24 +53,6 @@ namespace VTK_T
       std::vector<double> &pt, std::vector<int> &ien_array );
 
   // ----------------------------------------------------------------
-  // read integer / double cell or point data from file in vtu / vtp format.
-  // Input: \para filename the vtk file name
-  //        \para dataname the data property name
-  // Output: \para data the data associated with cell/point
-  // ----------------------------------------------------------------
-  std::vector<int> read_int_CellData( const std::string &filename, 
-      const std::string &dataname );
-
-  std::vector<double> read_double_CellData( const std::string &filename, 
-      const std::string &dataname );
-
-  std::vector<int> read_int_PointData( const std::string &filename, 
-      const std::string &dataname );
-
-  std::vector<double> read_double_PointData( const std::string &filename, 
-      const std::string &dataname );
-
-  // ----------------------------------------------------------------
   // ! read_vtp_grid: read the surface mesh from a .vtp file. The mesh
   //                  file is assumed to be a VTK trangle grid with 3
   //                  nodes. 
@@ -89,6 +71,24 @@ namespace VTK_T
   void read_vtp_grid( const std::string &filename,
       int &numpts, int &numcels,
       std::vector<double> &pt, std::vector<int> &ien_array );
+
+  // ----------------------------------------------------------------
+  // read integer / double cell or point data from file in vtu / vtp format.
+  // Input: \para filename the vtk file name
+  //        \para dataname the data property name
+  // Output: \para data the data associated with cell/point
+  // ----------------------------------------------------------------
+  std::vector<int> read_int_CellData( const std::string &filename, 
+      const std::string &dataname );
+
+  std::vector<double> read_double_CellData( const std::string &filename, 
+      const std::string &dataname );
+
+  std::vector<int> read_int_PointData( const std::string &filename, 
+      const std::string &dataname );
+
+  std::vector<double> read_double_PointData( const std::string &filename, 
+      const std::string &dataname );
 
   // ================================================================
   // ===> 2. The second set of tools assists WRITING volumetric mesh 
@@ -138,7 +138,6 @@ namespace VTK_T
   // ----------------------------------------------------------------
   void write_vtkPointSet( const std::string &filename, 
       vtkPointSet * const &grid_w, const bool &isXML = true );
-
 }
 
 #endif
