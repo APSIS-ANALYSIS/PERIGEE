@@ -99,6 +99,20 @@ namespace VTK_T
   std::vector<double> read_double_PointData( const std::string &filename, 
       const std::string &dataname );
 
+  // ----------------------------------------------------------------
+  // ! read_num_pt: read the number of points from either a .vtp or a .vtu file.
+  // Input: \para filename the vtk file name
+  // Output: the number of points in the file
+  // ----------------------------------------------------------------
+  int read_num_pt( const std::string &filename );
+
+  // ----------------------------------------------------------------
+  // ! read_num_cl: read the number of cells from either a .vtp or a .vtu file.
+  // Input: \para filename the vtk file name
+  // Output: the number of cells in the file
+  // ----------------------------------------------------------------
+  int read_num_cl( const std::string &filename );
+
   // ================================================================
   // ===> 2. The second set of tools assists WRITING volumetric mesh 
   //         to .vtu file and surface mesh to .vtp file.  
