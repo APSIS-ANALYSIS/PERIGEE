@@ -64,26 +64,30 @@ int main( int argc, char * argv[] )
   cout<<" out_bname: "<<out_bname<<endl;
   cout<<"==== Command Line Arguments ===="<<endl;
 
-  SYS_T::file_check( geo_file.c_str() );
-  SYS_T::file_check( wall_file.c_str() );
+  SYS_T::file_check( geo_file );
+  SYS_T::file_check( wall_file );
 
   // ----------------------------------------------------------------
   // Read in the whole FSI volumetric mesh
   int v_nFunc, v_nElem;
-  std::vector<int> v_vecIEN, phy_tag;
+  std::vector<int> v_vecIEN;
   std::vector<double> v_ctrlPts;
 
-  TET_T::read_vtu_grid(geo_file.c_str(), v_nFunc, v_nElem, v_ctrlPts, v_vecIEN, phy_tag);
+  VTK_T::read_vtu_grid(geo_file, v_nFunc, v_nElem, v_ctrlPts, v_vecIEN);
+
+  const std::vector<int> phy_tag = VTK_T::read_int_CellData(geo_file, "Physics_tag");
 
   cout<<"Volumetric mesh contains "<<v_nElem<<" elements and "<<v_nFunc<<" vertices.\n";
 
   // Read the wall surface mesh
   int nFunc, nElem;
   std::vector<double> ctrlPts;
-  std::vector<int> vecIEN, global_node_idx, global_ele_idx;
+  std::vector<int> vecIEN;
 
-  TET_T::read_vtp_grid( wall_file.c_str(), nFunc, nElem, ctrlPts, vecIEN,
-      global_node_idx, global_ele_idx );
+  VTK_T::read_vtp_grid( wall_file, nFunc, nElem, ctrlPts, vecIEN );
+
+  const std::vector<int> global_node_idx = VTK_T::read_int_PointData(wall_file, "GlobalNodeID");
+  const std::vector<int> global_ele_idx = VTK_T::read_int_CellData(wall_file, "GlobalElementID");
 
   cout<<"Wall mesh contains "<<nElem<<" elements and "<<nFunc<<" vertices.\n";
 
@@ -338,9 +342,9 @@ void write_triangle_grid_wss( const std::string &filename,
 
   TET_T::gen_triangle_grid( grid_w, numpts, numcels, pt, ien_array );
 
-  TET_T::add_Vector3_PointData( grid_w, wss_on_node, "WSS" ); 
+  VTK_T::add_Vector3_PointData( grid_w, wss_on_node, "WSS" ); 
 
-  TET_T::write_vtkPointSet(filename, grid_w);
+  VTK_T::write_vtkPointSet(filename, grid_w);
 
   grid_w->Delete();
 }

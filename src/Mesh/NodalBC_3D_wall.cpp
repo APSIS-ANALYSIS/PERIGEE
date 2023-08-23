@@ -18,11 +18,11 @@ NodalBC_3D_wall::NodalBC_3D_wall(
 
   int numpts, numcels;
   std::vector<double> pts;
-  std::vector<int> ien, gnode, gelem;
+  std::vector<int> ien, gnode;
 
   int wall_numpts, wall_numcels;
   std::vector<double> wall_pts;
-  std::vector<int> wall_ien, wall_gnode, wall_gelem;
+  std::vector<int> wall_ien;
 
   std::vector<int> ring_gnode {};
 
@@ -30,14 +30,15 @@ NodalBC_3D_wall::NodalBC_3D_wall(
   {
     SYS_T::file_check(wall_file);
 
-    TET_T::read_vtp_grid( wall_file, wall_numpts, wall_numcels, wall_pts,
-        wall_ien, wall_gnode, wall_gelem );
+    VTK_T::read_vtp_grid( wall_file, wall_numpts, wall_numcels, wall_pts,
+        wall_ien );
 
     for( const auto &capfile : cap_files )
     {
       SYS_T::file_check( capfile );
 
-      TET_T::read_vtp_grid( capfile, numpts, numcels, pts, ien, gnode, gelem );
+      VTK_T::read_vtp_grid( capfile, numpts, numcels, pts, ien );
+      gnode = VTK_T::read_int_PointData(capfile, "GlobalNodeID"); 
     
       VEC_T::insert_end( ring_gnode, gnode );
     }
@@ -46,20 +47,23 @@ NodalBC_3D_wall::NodalBC_3D_wall(
   {
     SYS_T::file_check(wall_file);
 
-    TET_T::read_vtu_grid( wall_file, wall_numpts, wall_numcels, wall_pts,
-        wall_ien, wall_gnode, wall_gelem );
+    VTK_T::read_vtu_grid( wall_file, wall_numpts, wall_numcels, wall_pts,
+        wall_ien );
 
     for( const auto &capfile : cap_files )
     {
       SYS_T::file_check( capfile );
 
-      TET_T::read_vtu_grid( capfile, numpts, numcels, pts, ien, gnode, gelem );
+      VTK_T::read_vtu_grid( capfile, numpts, numcels, pts, ien );
+      gnode = VTK_T::read_int_PointData(capfile, "GlobalNodeID");
 
       VEC_T::insert_end( ring_gnode, gnode );
     }
   }
   else
     SYS_T::print_fatal("Error: Nodal_3D_wall unknown file type.\n");
+
+  const std::vector<int> wall_gnode = VTK_T::read_int_PointData(wall_file, "GlobalNodeID");
 
   VEC_T::sort_unique_resize( ring_gnode );
 

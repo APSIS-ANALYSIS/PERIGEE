@@ -69,10 +69,12 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::vector<std::string> &vtufileList,
 
     int numpts, numcels;
     std::vector<double> pts;
-    std::vector<int> ien, gnode, gelem;
+    std::vector<int> ien;
 
-    TET_T::read_vtu_grid( vtufileList[ii], numpts, numcels, pts, ien, gnode, gelem );
-  
+    VTK_T::read_vtu_grid( vtufileList[ii], numpts, numcels, pts, ien );
+ 
+    const std::vector<int> gnode = VTK_T::read_int_PointData( vtufileList[ii], "GlobalNodeID");
+
     for(unsigned int jj=0; jj<gnode.size(); ++jj)
     {
       if(gnode[jj]<0) SYS_T::print_fatal("Error: there are negative nodal index! \n");
@@ -111,9 +113,11 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &vtufilename,
 
     int numpts, numcels;
     std::vector<double> pts;
-    std::vector<int> ien, gnode, gelem;
+    std::vector<int> ien;
 
-    TET_T::read_vtp_grid( vtpfileList[ii], numpts, numcels, pts, ien, gnode, gelem );
+    VTK_T::read_vtp_grid( vtpfileList[ii], numpts, numcels, pts, ien );
+
+    const std::vector<int> gnode = VTK_T::read_int_PointData( vtpfileList[ii], "GlobalNodeID");
 
     if( numpts != static_cast<int>(gnode.size()) )
       SYS_T::print_fatal("Error: the numpts != global_node.size()! \n");
@@ -187,10 +191,10 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &vtufilename,
 
     int m_numpts, m_numcels;
     std::vector<double> m_pts;
-    std::vector<int> m_ien, m_gnode, m_gelem;
+    std::vector<int> m_ien;
 
-    TET_T::read_vtp_grid( vtpminus[ii], m_numpts, m_numcels, 
-        m_pts, m_ien, m_gnode, m_gelem );
+    VTK_T::read_vtp_grid( vtpminus[ii], m_numpts, m_numcels, m_pts, m_ien );
+    const std::vector<int> m_gnode = VTK_T::read_int_PointData( vtpminus[ii], "GlobalNodeID");
 
     if( m_numpts != static_cast<int>(m_gnode.size()) )
       SYS_T::print_fatal("Error: the m_numpts != m_global_node.size()! \n");
@@ -243,7 +247,7 @@ NodalBC_3D_vtu::NodalBC_3D_vtu( const std::string &vtufilename,
   {
     SYS_T::file_check( vtpfileList[ii] );
 
-    const std::vector<int> vtp_gnode = TET_T::read_int_PointData( vtpfileList[ii], "GlobalNodeID");
+    const std::vector<int> vtp_gnode = VTK_T::read_int_PointData( vtpfileList[ii], "GlobalNodeID");
 
     for(unsigned int jj=0; jj<vtp_gnode.size(); ++jj)
     {

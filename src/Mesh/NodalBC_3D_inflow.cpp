@@ -63,20 +63,21 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
 
   int wall_numpts, wall_numcels;
   std::vector<double> wall_pts;
-  std::vector<int> wall_ien, wall_gnode, wall_gelem;
+  std::vector<int> wall_ien;
 
   if( elemtype == 501 )
   {
-    TET_T::read_vtp_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
-        wall_ien, wall_gnode, wall_gelem );
-
+    VTK_T::read_vtp_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
+        wall_ien );
   }
   else if( elemtype == 502 )
   {
-    TET_T::read_vtu_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
-        wall_ien, wall_gnode, wall_gelem );
+    VTK_T::read_vtu_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
+        wall_ien );
   }
   else SYS_T::print_fatal("Error: unknown element type.\n");
+
+  const std::vector<int> wall_gnode = VTK_T::read_int_PointData(wallfile, "GlobalNodeID");
 
   // Loop over each surface with id ii
   for( int ii=0; ii<num_nbc; ++ii )
@@ -87,17 +88,20 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
     {
       nLocBas[ii] = 3;
 
-      TET_T::read_vtp_grid( inffileList[ii], num_node[ii], num_cell[ii],
-          pt_xyz[ii], tri_ien[ii], global_node[ii], global_cell[ii] );
+      VTK_T::read_vtp_grid( inffileList[ii], num_node[ii], num_cell[ii],
+          pt_xyz[ii], tri_ien[ii] );
     }
     else if( elemtype == 502 )
     {
       nLocBas[ii] = 6;
 
-      TET_T::read_vtu_grid( inffileList[ii], num_node[ii], num_cell[ii],
-          pt_xyz[ii], tri_ien[ii], global_node[ii], global_cell[ii] );
+      VTK_T::read_vtu_grid( inffileList[ii], num_node[ii], num_cell[ii],
+          pt_xyz[ii], tri_ien[ii] );
     }
     else SYS_T::print_fatal("Error: unknown element type.\n");
+
+    global_node[ii] = VTK_T::read_int_PointData(inffileList[ii], "GlobalNodeID");
+    global_cell[ii] = VTK_T::read_int_CellData(inffileList[ii], "GlobalElementID");
 
     // Generate the dir-node list. Nodes belonging to the wall are excluded.
     for(unsigned int jj=0; jj<global_node[ii].size(); ++jj)
