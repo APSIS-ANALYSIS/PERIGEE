@@ -37,10 +37,6 @@ NodalBC_3D_ring::NodalBC_3D_ring(
   std::vector<double> pts;
   std::vector<int> ien;
 
-  int wall_numpts, wall_numcels;
-  std::vector<double> wall_pts;
-  std::vector<int> wall_ien;
-
   // Generate the dir-node list with all ring nodes.
   dir_nodes.clear();
   cap_id.clear();
@@ -49,7 +45,6 @@ NodalBC_3D_ring::NodalBC_3D_ring(
   { 
     SYS_T::file_check(wallfile);
 
-    VTK_T::read_vtp_grid( wallfile, wall_numpts, wall_numcels, wall_pts, wall_ien );
     const std::vector<int> wall_gnode = VTK_T::read_int_PointData(wallfile, "GlobalNodeID");
 
     for(int ii=0; ii<num_caps; ++ii)
@@ -100,8 +95,6 @@ NodalBC_3D_ring::NodalBC_3D_ring(
   {
     SYS_T::file_check(wallfile);
 
-    VTK_T::read_vtu_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
-        wall_ien );
     const std::vector<int> wall_gnode = VTK_T::read_int_PointData(wallfile, "GlobalNodeID");
 
     for(int ii=0; ii<num_caps; ++ii)
