@@ -66,9 +66,9 @@ int main( int argc, char * argv[] )
   std::vector<int> vecIEN;
   std::vector<double> ctrlPts;
 
-  SYS_T::file_check( geo_file.c_str() );
+  SYS_T::file_check( geo_file );
 
-  TET_T::read_vtu_grid(geo_file.c_str(), nFunc, nElem, ctrlPts, vecIEN);
+  VTK_T::read_vtu_grid(geo_file, nFunc, nElem, ctrlPts, vecIEN);
 
   if(int(ctrlPts.size()) != nFunc * 3) SYS_T::print_fatal("Error: the ctrlPts from geo_file does not match the given number of nodes. \n");
 

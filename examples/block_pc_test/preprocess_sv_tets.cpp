@@ -148,7 +148,7 @@ int main( int argc, char * argv[] )
   std::vector<int> vecIEN;
   std::vector<double> ctrlPts;
   
-  TET_T::read_vtu_grid(geo_file.c_str(), nFunc, nElem, ctrlPts, vecIEN);
+  VTK_T::read_vtu_grid(geo_file, nFunc, nElem, ctrlPts, vecIEN);
   
   IIEN * IEN = nullptr;
   IMesh * mesh = nullptr;
