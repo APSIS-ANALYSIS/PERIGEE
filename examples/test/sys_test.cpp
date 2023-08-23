@@ -10,6 +10,7 @@
 #include "IEN_FEM.hpp"
 #include "Matrix_double_3by3_Array.hpp"
 #include "Matrix_double_6by6_Array.hpp"
+#include "VTK_Tools.hpp"
 
 int main(int argc, char *argv[])
 {

@@ -73,6 +73,15 @@ namespace VTK_T
       std::vector<double> &pt, std::vector<int> &ien_array );
 
   // ----------------------------------------------------------------
+  // ! read_grid: read a generic mesh from either a .vtp or a .vtu file.
+  //              The output is identical to the read_vtp_grid and read_vtu_grid
+  //              functions.
+  // ----------------------------------------------------------------
+  void read_grid( const std::string &filename,
+      int &numpts, int &numcels,
+      std::vector<double> &pt, std::vector<int> &ien_array );
+
+  // ----------------------------------------------------------------
   // read integer / double cell or point data from file in vtu / vtp format.
   // Input: \para filename the vtk file name
   //        \para dataname the data property name
@@ -89,6 +98,20 @@ namespace VTK_T
 
   std::vector<double> read_double_PointData( const std::string &filename, 
       const std::string &dataname );
+
+  // ----------------------------------------------------------------
+  // ! read_num_pt: read the number of points from either a .vtp or a .vtu file.
+  // Input: \para filename the vtk file name
+  // Output: the number of points in the file
+  // ----------------------------------------------------------------
+  int read_num_pt( const std::string &filename );
+
+  // ----------------------------------------------------------------
+  // ! read_num_cl: read the number of cells from either a .vtp or a .vtu file.
+  // Input: \para filename the vtk file name
+  // Output: the number of cells in the file
+  // ----------------------------------------------------------------
+  int read_num_cl( const std::string &filename );
 
   // ================================================================
   // ===> 2. The second set of tools assists WRITING volumetric mesh 
