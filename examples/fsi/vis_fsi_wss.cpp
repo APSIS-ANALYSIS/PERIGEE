@@ -64,8 +64,8 @@ int main( int argc, char * argv[] )
   cout<<" out_bname: "<<out_bname<<endl;
   cout<<"==== Command Line Arguments ===="<<endl;
 
-  SYS_T::file_check( geo_file.c_str() );
-  SYS_T::file_check( wall_file.c_str() );
+  SYS_T::file_check( geo_file );
+  SYS_T::file_check( wall_file );
 
   // ----------------------------------------------------------------
   // Read in the whole FSI volumetric mesh

@@ -111,8 +111,8 @@ int main( int argc, char * argv[] )
   cout<<"==== Command Line Arguments ===="<<endl;
 
   // Make sure the geometry files exist
-  SYS_T::file_check( geo_file.c_str() );
-  SYS_T::file_check( wall_file.c_str() );
+  SYS_T::file_check( geo_file );
+  SYS_T::file_check( wall_file );
 
   // Read the volumetric mesh
   int v_nFunc, v_nElem;
