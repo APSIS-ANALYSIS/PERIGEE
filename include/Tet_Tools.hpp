@@ -210,7 +210,6 @@ namespace TET_T
   // ----------------------------------------------------------------
   double get_aspect_ratio( const std::vector<double> &coors );
 
-
   // ----------------------------------------------------------------
   // ! get_out_normal:
   //   This function obtains the unit outward normal vector for a 
