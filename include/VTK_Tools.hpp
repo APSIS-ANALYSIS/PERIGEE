@@ -71,33 +71,6 @@ namespace VTK_T
       const std::string &dataname );
 
   // ----------------------------------------------------------------
-  // ! read_vtu_grid: read the surface mesh generated from other software
-  //                  in .vtu files. The mesh file is assumed to be a VTK
-  //                  triangle grid (type 22 in VTK cell type); 
-  //                  otherwise, an error message will be thrown.
-  //   Input:  \para filename : the file name ending with .vtu
-  //   Output: \para numpts: the number of grid points
-  //           \para numcels: the number of triangle cells
-  //           \para pt: xyz coordinate of the triangles, 
-  //                     length is 3 x numpts.
-  //           \para ien_array: the connectivity array, 
-  //                            length is 6 x numcels.
-  //           \para global_node_index: the mapping from local nodal
-  //                                    index to global nodal index
-  //           \para global_ele_index: the mapping from the triangle
-  //                                   cell to its corresponding tet
-  //                                   cell index
-  //
-  // TO BE REMOVED
-  // ----------------------------------------------------------------
-  void read_vtu_grid( const std::string &filename,
-      int &numpts, int &numcels,
-      std::vector<double> &pt, std::vector<int> &ien_array,
-      std::vector<int> &global_node_index,
-      std::vector<int> &global_elem_index );
-
-
-  // ----------------------------------------------------------------
   // ! read_vtp_grid: read the surface mesh from a .vtp file. The mesh
   //                  file is assumed to be a VTK trangle grid with 3
   //                  nodes. 
@@ -116,33 +89,6 @@ namespace VTK_T
   void read_vtp_grid( const std::string &filename,
       int &numpts, int &numcels,
       std::vector<double> &pt, std::vector<int> &ien_array );
-
-
-  // ----------------------------------------------------------------
-  // ! read_vtp_grid: read the surface mesh generated from other software
-  //                  in .vtp files. The mesh file is assumed to be a VTK
-  //                  triangle grid (type 5 in VTK cell type); 
-  //                  otherwise, an error message will be thrown.
-  //   Input:  \para filename : the file name ending with .vtp
-  //   Output: \para numpts: the number of grid points
-  //           \para numcels: the number of triangle cells
-  //           \para pt: xyz coordinate of the triangles, 
-  //                     length is 3 x numpts.
-  //           \para ien_array: the connectivity array, 
-  //                            length is 3 x numcels.
-  //           \para global_node_index: the mapping from local nodal
-  //                                    index to global nodal index
-  //           \para global_ele_index: the mapping from the triangle
-  //                                   cell to its corresponding tet
-  //                                   cell index
-  //
-  // TO BE REMOVED
-  // ----------------------------------------------------------------
-  void read_vtp_grid( const std::string &filename,
-      int &numpts, int &numcels,
-      std::vector<double> &pt, std::vector<int> &ien_array,
-      std::vector<int> &global_node_index,
-      std::vector<int> &global_ele_index );
 
   // ================================================================
   // ===> 2. The second set of tools assists WRITING volumetric mesh 

@@ -228,20 +228,6 @@ std::vector<double> VTK_T::read_double_PointData( const std::string &filename,
   return data;
 }
 
-void VTK_T::read_vtu_grid( const std::string &filename,
-    int &numpts, int &numcels,
-    std::vector<double> &pt, std::vector<int> &ien_array,
-    std::vector<int> &global_node_index,
-    std::vector<int> &global_elem_index )
-{
-  read_vtu_grid(filename, numpts, numcels, pt, ien_array);
-  
-  global_node_index = read_int_PointData(filename, "GlobalNodeID"); 
-
-  global_elem_index = read_int_CellData(filename, "GlobalElementID");
-}
-
-
 void VTK_T::read_vtp_grid( const std::string &filename,
     int &numpts, int &numcels,
     std::vector<double> &pt, std::vector<int> &ien_array )
@@ -289,21 +275,6 @@ void VTK_T::read_vtp_grid( const std::string &filename,
 
   reader->Delete();
 }
-
-
-void VTK_T::read_vtp_grid( const std::string &filename,
-    int &numpts, int &numcels,
-    std::vector<double> &pt, std::vector<int> &ien_array,
-    std::vector<int> &global_node_index,
-    std::vector<int> &global_elem_index )
-{
-  read_vtp_grid(filename, numpts, numcels, pt, ien_array);
-  
-  global_node_index = read_int_PointData(filename, "GlobalNodeID"); 
-
-  global_elem_index = read_int_CellData(filename, "GlobalElementID");
-}
-
 
 void VTK_T::add_int_PointData( vtkPointSet * const &grid_w,
     const std::vector<int> &ptdata, const std::string &dataname )
