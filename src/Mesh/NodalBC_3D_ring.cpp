@@ -33,10 +33,6 @@ NodalBC_3D_ring::NodalBC_3D_ring(
     outnormal.push_back( outlet_outnormal[ii](2) );
   }
 
-  int numpts, numcels;
-  std::vector<double> pts;
-  std::vector<int> ien;
-
   // Generate the dir-node list with all ring nodes.
   dir_nodes.clear();
   cap_id.clear();
@@ -47,20 +43,24 @@ NodalBC_3D_ring::NodalBC_3D_ring(
 
   for(int ii=0; ii<num_caps; ++ii)
   {
+    int numpts, numcels;
+    std::vector<double> pts;
+    std::vector<int> ien;
+
     SYS_T::file_check( cap_files[ii] );
 
     if ( elemtype == 501 ) VTK_T::read_vtp_grid( cap_files[ii], numpts, numcels, pts, ien );
     else if ( elemtype == 502 ) VTK_T::read_vtu_grid( cap_files[ii], numpts, numcels, pts, ien );
     else SYS_T::print_fatal("Error: Nodal_3D_ring unknown element type.\n");
 
-    const std::vector<int> gnode = VTK_T::read_int_PointData(cap_files[ii], "GlobalNodeID");
+    const auto gnode = VTK_T::read_int_PointData(cap_files[ii], "GlobalNodeID");
 
     const Vector_3 centroid = compute_cap_centroid( pts );
 
     int num_outline_pts = 0;
     for(unsigned int jj=0; jj<gnode.size(); ++jj)
     {
-      if( gnode[jj]<0 ) SYS_T::print_fatal("Error: negative nodal index on cap %d! \n", ii);
+      SYS_T::print_exit_if( gnode[jj]<0, "Error: negative nodal index on cap %d! \n", ii);
 
       if( VEC_T::is_invec( wall_gnode, gnode[jj]) )
       {
@@ -88,8 +88,7 @@ NodalBC_3D_ring::NodalBC_3D_ring(
     }
 
     // Detect usage of the sv exterior surface (containing caps) as the wall surface
-    if( num_outline_pts == numpts )
-      SYS_T::print_fatal( "Error: Cap %d has %d outline nodes and %d total nodes. This is likely due to an improper wall mesh.\n", ii, num_outline_pts, numpts );
+    SYS_T::print_exit_if( num_outline_pts == numpts, "Error: Cap %d has %d outline nodes and %d total nodes. This is likely due to an improper wall mesh.\n", ii, num_outline_pts, numpts );
   }
 
   num_dir_nodes = dir_nodes.size(); 
@@ -104,7 +103,7 @@ NodalBC_3D_ring::NodalBC_3D_ring(
   std::cout<<"     is generated ";
   if(ring_bc_type == 0) std::cout<<"for fully clamped case (ring_bc_type = 0).\n";
   else if(ring_bc_type == 1) std::cout<<"for in-plane motion (ring_bc_type = 1).\n";
-  else SYS_T::print_fatal("Error: NodalBC_3D_ring does not allow this ring_bc_type!\n");
+  else SYS_T::print_exit("Error: NodalBC_3D_ring does not allow this ring_bc_type!\n");
 }
 
 Vector_3 NodalBC_3D_ring::compute_cap_centroid( const std::vector<double> &pts ) const
