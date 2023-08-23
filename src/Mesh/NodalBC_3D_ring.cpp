@@ -49,10 +49,8 @@ NodalBC_3D_ring::NodalBC_3D_ring(
   { 
     SYS_T::file_check(wallfile);
 
-    VTK_T::read_vtp_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
-        wall_ien );
+    VTK_T::read_vtp_grid( wallfile, wall_numpts, wall_numcels, wall_pts, wall_ien );
     const std::vector<int> wall_gnode = VTK_T::read_int_PointData(wallfile, "GlobalNodeID");
-    const std::vector<int> wall_gelem = VTK_T::read_int_CellData(wallfile, "GlobalElementID");
 
     for(int ii=0; ii<num_caps; ++ii)
     {
@@ -60,7 +58,6 @@ NodalBC_3D_ring::NodalBC_3D_ring(
 
       VTK_T::read_vtp_grid( cap_files[ii], numpts, numcels, pts, ien );
       const std::vector<int> gnode =  VTK_T::read_int_PointData(cap_files[ii], "GlobalNodeID");
-      const std::vector<int> gelem =  VTK_T::read_int_CellData(cap_files[ii], "GlobalElementID");
 
       const Vector_3 centroid = compute_cap_centroid( pts );
 
@@ -106,7 +103,6 @@ NodalBC_3D_ring::NodalBC_3D_ring(
     VTK_T::read_vtu_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
         wall_ien );
     const std::vector<int> wall_gnode = VTK_T::read_int_PointData(wallfile, "GlobalNodeID");
-    const std::vector<int> wall_gelem = VTK_T::read_int_CellData(wallfile, "GlobalElementID");
 
     for(int ii=0; ii<num_caps; ++ii)
     {
@@ -114,7 +110,6 @@ NodalBC_3D_ring::NodalBC_3D_ring(
 
       VTK_T::read_vtu_grid( cap_files[ii], numpts, numcels, pts, ien );
       const std::vector<int> gnode =  VTK_T::read_int_PointData(cap_files[ii], "GlobalNodeID");
-      const std::vector<int> gelem =  VTK_T::read_int_CellData(cap_files[ii], "GlobalElementID");
 
       const Vector_3 centroid = compute_cap_centroid( pts );
 
