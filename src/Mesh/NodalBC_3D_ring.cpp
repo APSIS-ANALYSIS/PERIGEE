@@ -41,107 +41,56 @@ NodalBC_3D_ring::NodalBC_3D_ring(
   dir_nodes.clear();
   cap_id.clear();
 
-  if( elemtype == 501 )
-  { 
-    SYS_T::file_check(wallfile);
+  SYS_T::file_check(wallfile);
 
-    const std::vector<int> wall_gnode = VTK_T::read_int_PointData(wallfile, "GlobalNodeID");
+  const std::vector<int> wall_gnode = VTK_T::read_int_PointData(wallfile, "GlobalNodeID");
 
-    for(int ii=0; ii<num_caps; ++ii)
-    {
-      SYS_T::file_check( cap_files[ii] );
-
-      VTK_T::read_vtp_grid( cap_files[ii], numpts, numcels, pts, ien );
-      const std::vector<int> gnode = VTK_T::read_int_PointData(cap_files[ii], "GlobalNodeID");
-
-      const Vector_3 centroid = compute_cap_centroid( pts );
-
-      int num_outline_pts = 0;
-      for(unsigned int jj=0; jj<gnode.size(); ++jj)
-      {
-        if( gnode[jj]<0 ) SYS_T::print_fatal("Error: negative nodal index on cap %d! \n", ii);
-
-        if( VEC_T::is_invec( wall_gnode, gnode[jj]) )
-        {
-          dir_nodes.push_back( static_cast<unsigned int>( gnode[jj] ) );
-          cap_id.push_back( ii );
-
-          // Compute the cap's skew bc transformation matrix with the first ring node
-          if( num_outline_pts == 0 )
-          {
-            Vector_3 radial_vec = Vector_3( pts[3*jj], pts[3*jj + 1], pts[3*jj + 2] );
-            radial_vec -= centroid;
-            radial_vec.normalize();
-
-            Vector_3 normal_vec = Vector_3( outnormal[3*ii], outnormal[3*ii+1], outnormal[3*ii+2] );
-            Vector_3 tan_vec    = cross_product( normal_vec, radial_vec );
-            tan_vec.normalize();
-
-            Q[9*ii+0] = normal_vec.x(); Q[9*ii+1] = normal_vec.y(); Q[9*ii+2] = normal_vec.z();
-            Q[9*ii+3] = radial_vec.x(); Q[9*ii+4] = radial_vec.y(); Q[9*ii+5] = radial_vec.z();
-            Q[9*ii+6] = tan_vec.x();    Q[9*ii+7] = tan_vec.y();    Q[9*ii+8] = tan_vec.z();
-          }
-
-          num_outline_pts += 1;
-        }
-      }
-
-      // Detect usage of the sv exterior surface (containing caps) as the wall surface
-      if( num_outline_pts == numpts )
-        SYS_T::print_fatal( "Error: Cap %d has %d outline nodes and %d total nodes. This is likely due to an improper wall mesh.\n", ii, num_outline_pts, numpts );
-    }
-  }
-  else if( elemtype == 502 )
+  for(int ii=0; ii<num_caps; ++ii)
   {
-    SYS_T::file_check(wallfile);
+    SYS_T::file_check( cap_files[ii] );
 
-    const std::vector<int> wall_gnode = VTK_T::read_int_PointData(wallfile, "GlobalNodeID");
+    if ( elemtype == 501 ) VTK_T::read_vtp_grid( cap_files[ii], numpts, numcels, pts, ien );
+    else if ( elemtype == 502 ) VTK_T::read_vtu_grid( cap_files[ii], numpts, numcels, pts, ien );
+    else SYS_T::print_fatal("Error: Nodal_3D_ring unknown file type.\n");
 
-    for(int ii=0; ii<num_caps; ++ii)
+    const std::vector<int> gnode = VTK_T::read_int_PointData(cap_files[ii], "GlobalNodeID");
+
+    const Vector_3 centroid = compute_cap_centroid( pts );
+
+    int num_outline_pts = 0;
+    for(unsigned int jj=0; jj<gnode.size(); ++jj)
     {
-      SYS_T::file_check( cap_files[ii] );
+      if( gnode[jj]<0 ) SYS_T::print_fatal("Error: negative nodal index on cap %d! \n", ii);
 
-      VTK_T::read_vtu_grid( cap_files[ii], numpts, numcels, pts, ien );
-      const std::vector<int> gnode = VTK_T::read_int_PointData(cap_files[ii], "GlobalNodeID");
-
-      const Vector_3 centroid = compute_cap_centroid( pts );
-
-      int num_outline_pts = 0;
-      for(unsigned int jj=0; jj<gnode.size(); ++jj)
+      if( VEC_T::is_invec( wall_gnode, gnode[jj]) )
       {
-        if( gnode[jj]<0 ) SYS_T::print_fatal("Error: negative nodal index on cap %d! \n", ii);
+        dir_nodes.push_back( static_cast<unsigned int>( gnode[jj] ) );
+        cap_id.push_back( ii );
 
-        if( VEC_T::is_invec( wall_gnode, gnode[jj]) )
+        // Compute the cap's skew bc transformation matrix with the first ring node
+        if( num_outline_pts == 0 )
         {
-          dir_nodes.push_back( static_cast<unsigned int>( gnode[jj] ) );
-          cap_id.push_back( ii );
+          Vector_3 radial_vec = Vector_3( pts[3*jj], pts[3*jj + 1], pts[3*jj + 2] );
+          radial_vec -= centroid;
+          radial_vec.normalize();
 
-          // Compute the cap's skew bc transformation matrix with the first ring node
-          if( num_outline_pts == 0 )
-          {
-            Vector_3 radial_vec = Vector_3( pts[3*jj], pts[3*jj + 1], pts[3*jj + 2] );
-            radial_vec -= centroid;
+          Vector_3 normal_vec = Vector_3( outnormal[3*ii], outnormal[3*ii+1], outnormal[3*ii+2] );
+          Vector_3 tan_vec    = cross_product( normal_vec, radial_vec );
+          tan_vec.normalize();
 
-            Vector_3 normal_vec = Vector_3( outnormal[3*ii], outnormal[3*ii+1], outnormal[3*ii+2] );
-            Vector_3 tan_vec    = cross_product( normal_vec, radial_vec );
-            tan_vec.normalize();
-
-            Q[9*ii+0] = normal_vec.x(); Q[9*ii+1] = normal_vec.y(); Q[9*ii+2] = normal_vec.z();
-            Q[9*ii+3] = radial_vec.x(); Q[9*ii+4] = radial_vec.y(); Q[9*ii+5] = radial_vec.z();
-            Q[9*ii+6] = tan_vec.x();    Q[9*ii+7] = tan_vec.y();    Q[9*ii+8] = tan_vec.z();
-          }
-
-          num_outline_pts += 1;
+          Q[9*ii+0] = normal_vec.x(); Q[9*ii+1] = normal_vec.y(); Q[9*ii+2] = normal_vec.z();
+          Q[9*ii+3] = radial_vec.x(); Q[9*ii+4] = radial_vec.y(); Q[9*ii+5] = radial_vec.z();
+          Q[9*ii+6] = tan_vec.x();    Q[9*ii+7] = tan_vec.y();    Q[9*ii+8] = tan_vec.z();
         }
-      }
 
-      // Detect usage of the sv exterior surface (containing caps) as the wall surface
-      if( num_outline_pts == numpts )
-        SYS_T::print_fatal( "Error: Cap %d has %d outline nodes and %d total nodes. This is likely due to an improper wall mesh.\n", ii, num_outline_pts, numpts );
+        num_outline_pts += 1;
+      }
     }
+
+    // Detect usage of the sv exterior surface (containing caps) as the wall surface
+    if( num_outline_pts == numpts )
+      SYS_T::print_fatal( "Error: Cap %d has %d outline nodes and %d total nodes. This is likely due to an improper wall mesh.\n", ii, num_outline_pts, numpts );
   }
-  else
-    SYS_T::print_fatal("Error: Nodal_3D_ring unknown file type.\n");
 
   num_dir_nodes = dir_nodes.size(); 
 

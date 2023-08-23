@@ -61,22 +61,6 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
   // Read the wall file
   SYS_T::file_check(wallfile);
 
-  int wall_numpts, wall_numcels;
-  std::vector<double> wall_pts;
-  std::vector<int> wall_ien;
-
-  if( elemtype == 501 )
-  {
-    VTK_T::read_vtp_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
-        wall_ien );
-  }
-  else if( elemtype == 502 )
-  {
-    VTK_T::read_vtu_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
-        wall_ien );
-  }
-  else SYS_T::print_fatal("Error: unknown element type.\n");
-
   const std::vector<int> wall_gnode = VTK_T::read_int_PointData(wallfile, "GlobalNodeID");
 
   // Loop over each surface with id ii
