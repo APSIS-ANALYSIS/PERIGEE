@@ -228,6 +228,33 @@ std::vector<double> VTK_T::read_double_PointData( const std::string &filename,
   return data;
 }
 
+int VTK_T::read_num_cl( const std::string &filename )
+{
+  vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
+  reader -> SetFileName( filename.c_str() );
+  reader -> Update();
+  
+  int numcels = -1;
+
+  // Downcasting will return null if fails
+  if(dynamic_cast<vtkPolyData*>(reader->GetOutput()))
+  {
+    vtkPolyData * vtkgrid = reader -> GetPolyDataOutput (); 
+    numcels = static_cast<int>( vtkgrid -> GetNumberOfCells() );
+  }
+  else if(dynamic_cast<vtkUnstructuredGrid*>(reader->GetOutput()))
+  {
+    vtkUnstructuredGrid * vtkgrid = reader -> GetUnstructuredGridOutput();
+    numcels = static_cast<int>( vtkgrid -> GetNumberOfCells() );
+  }
+  else
+    SYS_T::print_exit("VTK_T::read_num_cl unknown vtk object type.\n");
+
+  reader -> Delete();
+
+  return numcels;
+}
+
 void VTK_T::read_grid( const std::string &filename,
     int &numpts, int &numcels,
     std::vector<double> &pt, std::vector<int> &ien_array )
@@ -253,7 +280,7 @@ void VTK_T::read_grid( const std::string &filename,
     read_vtu_grid(filename, numpts, numcels, pt, ien_array);
   }
   else
-    SYS_T::print_exit("VTK_T::read_double_PointData unknown vtk object type.\n");
+    SYS_T::print_exit("VTK_T::read_grid unknown vtk object type.\n");
 
   reader -> Delete();
 }
