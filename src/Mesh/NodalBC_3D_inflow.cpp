@@ -78,7 +78,6 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
   else SYS_T::print_fatal("Error: unknown element type.\n");
 
   const std::vector<int> wall_gnode = VTK_T::read_int_PointData(wallfile, "GlobalNodeID");
-  const std::vector<int> wall_gelem = VTK_T::read_int_CellData(wallfile, "GlobalElementID");
 
   // Loop over each surface with id ii
   for( int ii=0; ii<num_nbc; ++ii )
