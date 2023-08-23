@@ -81,7 +81,7 @@ void SV_T::gen_sv_fsi_vtus( const std::string &filename_f,
   std::vector<int> vecIEN_i;
   std::vector<double> ctrlPts_i;
   VTK_T::read_vtp_grid( filename_f_wall, nFunc_i, nElem_i, ctrlPts_i, vecIEN_i );
-  const std::vector<int> node_idx_i = VTK_T::read_int_PointData(filename_f_wall, "GlobalNodeID");
+  std::vector<int> node_idx_i = VTK_T::read_int_PointData(filename_f_wall, "GlobalNodeID");
 
   // Read solid mesh
   int nFunc_s, nElem_s;
