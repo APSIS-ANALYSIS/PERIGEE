@@ -228,6 +228,33 @@ std::vector<double> VTK_T::read_double_PointData( const std::string &filename,
   return data;
 }
 
+int VTK_T::read_num_pt( const std::string &filename )
+{
+  vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
+  reader -> SetFileName( filename.c_str() );
+  reader -> Update();
+  
+  int numpts = -1;
+
+  // Downcasting will return null if fails
+  if(dynamic_cast<vtkPolyData*>(reader->GetOutput()))
+  {
+    vtkPolyData * vtkgrid = reader -> GetPolyDataOutput (); 
+    numpts = static_cast<int>( vtkgrid -> GetNumberOfPoints() );
+  }
+  else if(dynamic_cast<vtkUnstructuredGrid*>(reader->GetOutput()))
+  {
+    vtkUnstructuredGrid * vtkgrid = reader -> GetUnstructuredGridOutput();
+    numpts = static_cast<int>( vtkgrid -> GetNumberOfPoints() );
+  }
+  else
+    SYS_T::print_exit("VTK_T::read_num_pt unknown vtk object type.\n");
+
+  reader -> Delete();
+
+  return numpts;
+}
+
 int VTK_T::read_num_cl( const std::string &filename )
 {
   vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
