@@ -115,7 +115,7 @@ int main( int argc, char * argv[] )
   std::vector<int> v_vecIEN;
   std::vector<double> v_ctrlPts;
 
-  VTK_T::read_vtu_grid(geo_file.c_str(), v_nFunc, v_nElem, v_ctrlPts, v_vecIEN);
+  VTK_T::read_vtu_grid(geo_file, v_nFunc, v_nElem, v_ctrlPts, v_vecIEN);
 
   cout<<endl<<"Volumetric mesh contains "<<v_nElem<<" elements and "<<v_nFunc<<" vertices.\n";
 
@@ -124,7 +124,7 @@ int main( int argc, char * argv[] )
   std::vector<double> ctrlPts;
   std::vector<int> vecIEN;
 
-  VTK_T::read_vtu_grid( wall_file.c_str(), nFunc, nElem, ctrlPts, vecIEN);
+  VTK_T::read_vtu_grid( wall_file, nFunc, nElem, ctrlPts, vecIEN);
 
   const std::vector<int> global_node_idx = VTK_T::read_int_PointData( wall_file.c_str(), "GlobalNodeID");
   const std::vector<int> global_ele_idx = VTK_T::read_int_CellData( wall_file.c_str(), "GlobalElementID");
