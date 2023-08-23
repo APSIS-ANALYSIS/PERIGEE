@@ -83,7 +83,7 @@ void PLocAssem_Tet_CMM_GenAlpha::print_info() const
 
 
 void PLocAssem_Tet_CMM_GenAlpha::get_metric(
-    const std::array<double,9> &ff,
+    const std::array<double,9> &f,
     double &G11, double &G12, double &G13,
     double &G22, double &G23, double &G33 ) const
 {
@@ -92,22 +92,52 @@ void PLocAssem_Tet_CMM_GenAlpha::get_metric(
   const double diag = 2.0;
   const double offd = 1.0;
 
-  const double fk0 = diag * ff[0] + offd * (ff[3] + ff[6]);
-  const double fk1 = diag * ff[3] + offd * (ff[0] + ff[6]);
-  const double fk2 = diag * ff[6] + offd * (ff[0] + ff[3]);
-  const double fk3 = diag * ff[1] + offd * (ff[4] + ff[7]);
-  const double fk4 = diag * ff[4] + offd * (ff[1] + ff[7]);
-  const double fk5 = diag * ff[7] + offd * (ff[1] + ff[4]);
-  const double fk6 = diag * ff[2] + offd * (ff[5] + ff[8]);
-  const double fk7 = diag * ff[5] + offd * (ff[2] + ff[8]);
-  const double fk8 = diag * ff[8] + offd * (ff[2] + ff[5]);
+  const double fk0 = diag * f[0] + offd * (f[3] + f[6]);
+  const double fk1 = diag * f[3] + offd * (f[0] + f[6]);
+  const double fk2 = diag * f[6] + offd * (f[0] + f[3]);
+  const double fk3 = diag * f[1] + offd * (f[4] + f[7]);
+  const double fk4 = diag * f[4] + offd * (f[1] + f[7]);
+  const double fk5 = diag * f[7] + offd * (f[1] + f[4]);
+  const double fk6 = diag * f[2] + offd * (f[5] + f[8]);
+  const double fk7 = diag * f[5] + offd * (f[2] + f[8]);
+  const double fk8 = diag * f[8] + offd * (f[2] + f[5]);
 
-  G11 = coef * ( fk0 * ff[0] + fk1 * ff[3] + fk2 * ff[6] );
-  G12 = coef * ( fk0 * ff[1] + fk1 * ff[4] + fk2 * ff[7] );
-  G13 = coef * ( fk0 * ff[2] + fk1 * ff[5] + fk2 * ff[8] );
-  G22 = coef * ( fk3 * ff[1] + fk4 * ff[4] + fk5 * ff[7] );
-  G23 = coef * ( fk3 * ff[2] + fk4 * ff[5] + fk5 * ff[8] );
-  G33 = coef * ( fk6 * ff[2] + fk7 * ff[5] + fk8 * ff[8] );
+  G11 = coef * ( fk0 * f[0] + fk1 * f[3] + fk2 * f[6] );
+  G12 = coef * ( fk0 * f[1] + fk1 * f[4] + fk2 * f[7] );
+  G13 = coef * ( fk0 * f[2] + fk1 * f[5] + fk2 * f[8] );
+  G22 = coef * ( fk3 * f[1] + fk4 * f[4] + fk5 * f[7] );
+  G23 = coef * ( fk3 * f[2] + fk4 * f[5] + fk5 * f[8] );
+  G33 = coef * ( fk6 * f[2] + fk7 * f[5] + fk8 * f[8] );
+}
+
+
+void PLocAssem_Tet_CMM_GenAlpha::get_tau(
+    double &tau_m_qua, double &tau_c_qua,
+    const double &dt, const std::array<double,9> &dxidx,
+    const double &u, const double &v, const double &w,
+    const double &vis_mu ) const
+{
+  // Use K matrix to correct the metric
+  double G11, G12, G13, G22, G23, G33;
+  get_metric( dxidx, G11, G12, G13, G22, G23, G33 );
+
+  const double GdG = G11 * G11 + 2.0 * G12 * G12 + 2.0 * G13 * G13
+    + G22 * G22 + 2.0 * G23 * G23 + G33 * G33;
+
+  const double uGu = G11 * u * u + 2.0 * G12 * u * v + 2.0 * G13 * u * w
+    + G22 * v * v + 2.0 * G23 * v * w + G33 * w * w;
+
+  const double g_dot_g = G11 + G22 + G33;
+
+  const double temp_nu = vis_mu / rho0;
+
+  const double denom_m = CT / (dt*dt) + uGu + CI * temp_nu * temp_nu * GdG;
+
+  tau_m_qua = 1.0 / ( rho0 * sqrt(denom_m) );
+
+  const double denom_c = tau_m_qua * g_dot_g;
+
+  tau_c_qua = Ctauc / denom_c;
 }
 
 double PLocAssem_Tet_CMM_GenAlpha::get_tau_m( const double &dt, 
@@ -193,7 +223,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
 
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
   std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
-  std::vector<double> d2R_dxy(nLocBas, 0.0), d2R_dxz(nLocBas, 0.0), d2R_dyz(nLocBas, 0.0);
 
   for(int qua=0; qua<nqp; ++qua)
   {
@@ -205,13 +234,10 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
     double u_xx = 0.0, u_yy = 0.0, u_zz = 0.0;
     double v_xx = 0.0, v_yy = 0.0, v_zz = 0.0;
     double w_xx = 0.0, w_yy = 0.0, w_zz = 0.0;
-    double u_xy = 0.0, u_xz = 0.0, u_yz = 0.0;
-    double v_xy = 0.0, v_xz = 0.0, v_yz = 0.0;
-    double w_xy = 0.0, w_xz = 0.0, w_yz = 0.0;
 
     
-    element->get_3D_R_dR_d2R( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0], 
-    &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0], &d2R_dxy[0], &d2R_dxz[0], &d2R_dyz[0] );
+    element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
+        &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
     // e.g. const std::vector<double> R = element->get_R(qua);
     // e.g. const std::vector<double> dR_dx = element->get_dR_dx(qua);
 
@@ -257,18 +283,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
       w_yy += sol[ii4+3] * d2R_dyy[ii];
       w_zz += sol[ii4+3] * d2R_dzz[ii];
 
-      u_xy += sol[ii4+1] * d2R_dxy[ii];
-      u_xz += sol[ii4+1] * d2R_dxz[ii];
-      u_yz += sol[ii4+1] * d2R_dyz[ii];
-
-      v_xy += sol[ii4+2] * d2R_dxy[ii];
-      v_xz += sol[ii4+2] * d2R_dxz[ii];
-      v_yz += sol[ii4+2] * d2R_dyz[ii];
-
-      w_xy += sol[ii4+3] * d2R_dxy[ii];
-      w_xz += sol[ii4+3] * d2R_dxz[ii];
-      w_yz += sol[ii4+3] * d2R_dyz[ii];
-
       coor_x += eleCtrlPts_x[ii] * R[ii];
       coor_y += eleCtrlPts_y[ii] * R[ii];
       coor_z += eleCtrlPts_z[ii] * R[ii];
@@ -281,15 +295,8 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
                                           0.5 * ( u_y + v_x ) );
     const double two_mu = 2.0 * vis_mu;
 
-    // Get dmu_dI2
-    const double dmu_dI2 = vismodel->get_dmu_dI2( u_x, v_y, w_z,
-                                                0.5 * ( v_z + w_y ), 
-                                                0.5 * ( u_z + w_x ), 
-                                                0.5 * ( u_y + v_x ) );
-
     // Get the tau_m and tau_c
-    tau_m = get_tau_m( dt, dxi_dx, u, v, w, vis_mu);
-    tau_c = get_tau_c( dt, dxi_dx, u, v, w, vis_mu);
+    get_tau(tau_m, tau_c, dt, dxi_dx, u, v, w, vis_mu);
 
     const double tau_m_2 = tau_m * tau_m;
 
@@ -302,25 +309,9 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
     const double v_lap = v_xx + v_yy + v_zz;
     const double w_lap = w_xx + w_yy + w_zz;
 
-    const double mu_x = dmu_dI2 * ( u_x * ( v_xy + w_xz ) + v_y * ( u_xx + w_xz ) + w_z * ( u_xx + v_xy )
-                                  - 0.5 * ( u_y + v_x ) * ( u_xy + v_xx )
-                                  - 0.5 * ( u_z + w_x ) * ( u_xz + w_xx )
-                                  - 0.5 * ( v_z + w_y ) * ( v_xz + w_xy ));
-    const double mu_y = dmu_dI2 * ( u_x * ( v_yy + w_yz ) + v_y * ( u_xy + w_yz ) + w_z * ( u_xy + v_yy )
-                                  - 0.5 * ( u_y + v_x ) * ( u_yy + v_xy )
-                                  - 0.5 * ( u_z + w_x ) * ( u_yz + w_xy )
-                                  - 0.5 * ( v_z + w_y ) * ( v_yz + w_yy ));
-    const double mu_z = dmu_dI2 * ( u_x * ( v_yz + w_zz ) + v_y * ( u_xz + w_zz ) + w_z * ( u_xz + v_yz )
-                                  - 0.5 * ( u_y + v_x ) * ( u_yz + v_xz )
-                                  - 0.5 * ( u_z + w_x ) * ( u_zz + w_xz )
-                                  - 0.5 * ( v_z + w_y ) * ( v_zz + w_yz ));
-
-    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f_body.x() ) + p_x - vis_mu * u_lap
-                        - mu_x * 2.0 * u_x - mu_y * ( u_x + v_y ) - mu_z * ( u_z + w_x );
-    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f_body.y() ) + p_y - vis_mu * v_lap
-                        - mu_x * ( u_y + v_x ) - mu_y * 2.0 * v_y - mu_z * ( v_z + w_y );
-    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f_body.z() ) + p_z - vis_mu * w_lap
-                        - mu_x * ( u_z + w_x ) - mu_y * ( v_z + w_y ) - mu_z * 2.0 * w_z;
+    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f_body.x() ) + p_x - vis_mu * u_lap;
+    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f_body.y() ) + p_y - vis_mu * v_lap;
+    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f_body.z() ) + p_z - vis_mu * w_lap;
 
     const double div_vel = u_x + v_y + w_z;
 
@@ -414,7 +405,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
 
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
   std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
-  std::vector<double> d2R_dxy(nLocBas, 0.0), d2R_dxz(nLocBas, 0.0), d2R_dyz(nLocBas, 0.0);
 
   for(int qua=0; qua<nqp; ++qua)
   {
@@ -426,12 +416,9 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
     double u_xx = 0.0, u_yy = 0.0, u_zz = 0.0;
     double v_xx = 0.0, v_yy = 0.0, v_zz = 0.0;
     double w_xx = 0.0, w_yy = 0.0, w_zz = 0.0;
-    double u_xy = 0.0, u_xz = 0.0, u_yz = 0.0;
-    double v_xy = 0.0, v_xz = 0.0, v_yz = 0.0;
-    double w_xy = 0.0, w_xz = 0.0, w_yz = 0.0;
 
-    element->get_3D_R_dR_d2R( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0], 
-    &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0], &d2R_dxy[0], &d2R_dxz[0], &d2R_dyz[0] );
+    element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
+        &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
 
     const std::array<double,9> dxi_dx = element->get_invJacobian( qua );
 
@@ -475,18 +462,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
       w_yy += sol[ii4+3] * d2R_dyy[ii];
       w_zz += sol[ii4+3] * d2R_dzz[ii];
 
-      u_xy += sol[ii4+1] * d2R_dxy[ii];
-      u_xz += sol[ii4+1] * d2R_dxz[ii];
-      u_yz += sol[ii4+1] * d2R_dyz[ii];
-
-      v_xy += sol[ii4+2] * d2R_dxy[ii];
-      v_xz += sol[ii4+2] * d2R_dxz[ii];
-      v_yz += sol[ii4+2] * d2R_dyz[ii];
-
-      w_xy += sol[ii4+3] * d2R_dxy[ii];
-      w_xz += sol[ii4+3] * d2R_dxz[ii];
-      w_yz += sol[ii4+3] * d2R_dyz[ii];
-
       coor_x += eleCtrlPts_x[ii] * R[ii];
       coor_y += eleCtrlPts_y[ii] * R[ii];
       coor_z += eleCtrlPts_z[ii] * R[ii];
@@ -505,8 +480,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
                                                 0.5 * ( u_z + w_x ), 
                                                 0.5 * ( u_y + v_x ) );
 
-    tau_m = get_tau_m( dt, dxi_dx, u, v, w, vis_mu);
-    tau_c = get_tau_c( dt, dxi_dx, u, v, w, vis_mu);
+    get_tau(tau_m, tau_c, dt, dxi_dx, u, v, w, vis_mu);
 
     const double tau_m_2 = tau_m * tau_m;
 
@@ -518,25 +492,9 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
     const double v_lap = v_xx + v_yy + v_zz;
     const double w_lap = w_xx + w_yy + w_zz;
 
-    const double mu_x = dmu_dI2 * ( u_x * ( v_xy + w_xz ) + v_y * ( u_xx + w_xz ) + w_z * ( u_xx + v_xy )
-                                  - 0.5 * ( u_y + v_x ) * ( u_xy + v_xx )
-                                  - 0.5 * ( u_z + w_x ) * ( u_xz + w_xx )
-                                  - 0.5 * ( v_z + w_y ) * ( v_xz + w_xy ));
-    const double mu_y = dmu_dI2 * ( u_x * ( v_yy + w_yz ) + v_y * ( u_xy + w_yz ) + w_z * ( u_xy + v_yy )
-                                  - 0.5 * ( u_y + v_x ) * ( u_yy + v_xy )
-                                  - 0.5 * ( u_z + w_x ) * ( u_yz + w_xy )
-                                  - 0.5 * ( v_z + w_y ) * ( v_yz + w_yy ));
-    const double mu_z = dmu_dI2 * ( u_x * ( v_yz + w_zz ) + v_y * ( u_xz + w_zz ) + w_z * ( u_xz + v_yz )
-                                  - 0.5 * ( u_y + v_x ) * ( u_yz + v_xz )
-                                  - 0.5 * ( u_z + w_x ) * ( u_zz + w_xz )
-                                  - 0.5 * ( v_z + w_y ) * ( v_zz + w_yz ));
-
-    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f_body.x() ) + p_x - vis_mu * u_lap
-                        - mu_x * 2.0 * u_x - mu_y * ( u_x + v_y ) - mu_z * ( u_z + w_x );
-    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f_body.y() ) + p_y - vis_mu * v_lap
-                        - mu_x * ( u_y + v_x ) - mu_y * 2.0 * v_y - mu_z * ( v_z + w_y );
-    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f_body.z() ) + p_z - vis_mu * w_lap
-                        - mu_x * ( u_z + w_x ) - mu_y * ( v_z + w_y ) - mu_z * 2.0 * w_z;
+    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f_body.x() ) + p_x - vis_mu * u_lap;
+    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f_body.y() ) + p_y - vis_mu * v_lap ;
+    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f_body.z() ) + p_z - vis_mu * w_lap;
 
     const double div_vel = u_x + v_y + w_z;
 
@@ -628,10 +586,10 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
         const double drz_dw_B = rho0 * ( w_z * NB + velo_dot_gradNB ) - vis_mu * NB_lap;
 
         // Generate dI2_du, dI2_dv, dI2_dw
-        const double dI2_du = NB_x * (v_y + w_z) - 0.5 * ( NB_y * (v_x + u_y) + NB_z * (w_x + u_z) );
-        const double dI2_dv = NB_y * (u_x + w_z) - 0.5 * ( NB_x * (u_y + v_x) + NB_z * (w_y + v_z) );
-        const double dI2_dw = NB_z * (u_x + v_y) - 0.5 * ( NB_x * (u_z + w_x) + NB_y * (v_z + w_y) );
-
+        const double dI2_du = 2.0 * u_x * NB_x + NB_y * ( u_y + v_x ) + NB_z * ( u_z + w_x );
+        const double dI2_dv = 2.0 * u_y * NB_y + NB_x * ( u_y + v_x ) + NB_z * ( v_z + w_y );
+        const double dI2_dw = 2.0 * u_z * NB_z + NB_x * ( u_z + w_x ) + NB_y * ( v_z + w_y );
+        
         // Continuity equation with respect to p, u, v, w
         Tangent[16*nLocBas*A+4*B] += gwts * dd_dv * tau_m * (NAxNBx + NAyNBy + NAzNBz);
 

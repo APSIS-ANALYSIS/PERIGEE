@@ -60,8 +60,8 @@ double ViscosityModel_Carreau::get_mu( const double &D_xx, const double &D_yy,
                                        const double &D_xz, const double &D_xy ) const
 {
   const SymmMatrix_3x3 D( D_xx, D_yy, D_zz, D_yz, D_xz, D_xy);
-  const double DII = std::abs( D.I2() );
-  const double pow_base = 1.0 + lambda * lambda * 4.0 * DII;
+  const double DII = D.MatContraction( D );
+  const double pow_base = 1.0 + lambda * lambda * 2.0 * DII;
   return mu_inf + ( mu_0 - mu_inf ) * std::pow( pow_base, (n_pli - 1.0) * 0.5 );
 }
 
@@ -88,11 +88,10 @@ double ViscosityModel_Carreau::get_dmu_dI2( const double &D_xx,
     const double &D_xz, const double &D_xy ) const
 {
   const SymmMatrix_3x3 D( D_xx, D_yy, D_zz, D_yz, D_xz, D_xy );
-  const double DII = std::abs( D.I2() );
-  const double sign_DI2 = ((D.I2() > 0) ? 1.0 : -1.0);
-  const double pow_base = 1.0 + lambda * lambda * 4.0 * DII;
+  const double DII = D.MatContraction( D );
+  const double pow_base = 1.0 + lambda * lambda * 2.0 * DII;
   const double dmu_dvelo = ( mu_0 - mu_inf ) * ( n_pli - 1.0 ) * lambda * lambda 
-    * 2.0 * std::pow( pow_base, ( n_pli - 3.0 ) / 2.0) * sign_DI2;
+                            * std::pow( pow_base, ( n_pli - 3.0 ) * 0.5 );
   return dmu_dvelo;
 }
 
