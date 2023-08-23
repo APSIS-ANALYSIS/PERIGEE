@@ -119,8 +119,8 @@ int main( int argc, char * argv[] )
   
   VTK_T::read_vtp_grid( wall_file, nFunc, nElem, ctrlPts, vecIEN );
 
-  const std::vector<int> global_node_idx = VTK_T::read_int_PointData(wall_file.c_str(), "GlobalNodeID");
-  const std::vector<int> global_ele_idx = VTK_T::read_int_CellData(wall_file.c_str(), "GlobalElementID");
+  const std::vector<int> global_node_idx = VTK_T::read_int_PointData(wall_file, "GlobalNodeID");
+  const std::vector<int> global_ele_idx = VTK_T::read_int_CellData(wall_file, "GlobalElementID");
 
   cout<<"Wall mesh contains "<<nElem<<" elements and "<<nFunc<<" vertices.\n";
 
