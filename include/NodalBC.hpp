@@ -70,7 +70,7 @@ class NodalBC : public INodalBC
     // files will be enforced as essential boundary conditions.
     // It is OK that the vtu and the vtp's have overlapping nodes.
     // --------------------------------------------------------------
-    NodalBC( const std::string &vtufilename, 
+    NodalBC( const std::string &vtufile, 
         const std::vector<std::string> &vtpfileList, const int &nFunc );
 
     virtual ~NodalBC();
