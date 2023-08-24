@@ -17,17 +17,19 @@
 
 int main(int argc, char *argv[])
 {
-  const int nFunc = 13500;
+  const int nFunc = 7500;
 
-  std::vector<std::string> fname { "wall_vol.vtp" };
+  std::vector<std::string> fname { "wall_vol.vtu" };
 
-  INodalBC * a = new NodalBC_3D_vtp( fname, nFunc );
+  INodalBC * a = new NodalBC_3D_vtu( fname, nFunc );
 
   INodalBC * b = new NodalBC( fname, nFunc );
 
-  a -> print_info();
-
-  b -> print_info();
+  for(int ii=0; ii<nFunc; ++ii)
+  {
+    if( a-> get_ID(ii) != b-> get_ID(ii) )
+      std::cout<<"Error "<<a-> get_ID(ii)<<'\t'<<b-> get_ID(ii)<<'\n';
+  }
 
   delete a; delete b;
 
