@@ -76,6 +76,91 @@ void VTK_T::read_vtu_grid( const std::string &filename,
   reader->Delete();
 }
 
+void VTK_T::read_vtp_grid( const std::string &filename,
+    int &numpts, int &numcels,
+    std::vector<double> &pt, std::vector<int> &ien_array )
+{
+  vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
+  reader -> SetFileName( filename.c_str() );
+  reader -> Update();
+  vtkPolyData * polydata = reader -> GetOutput();
+
+  // Number of grid points in the mesh
+  numpts = static_cast<int>( polydata -> GetNumberOfPoints() );
+
+  SYS_T::print_fatal_if(numpts <= 0, "Error: the file %s contains no point. \n", filename.c_str());
+
+  // Number of cells in the mesh
+  numcels = static_cast<int>( polydata -> GetNumberOfPolys() );
+
+  SYS_T::print_fatal_if(numcels <= 0, "Error: the file %s contains no cell. \n", filename.c_str());
+
+  // xyz coordinates of the points
+  pt.clear();
+  for(int ii=0; ii<numpts; ++ii)
+  {
+    double pt_xyz[3];
+    polydata -> GetPoint(ii, pt_xyz);
+    pt.push_back(pt_xyz[0]);
+    pt.push_back(pt_xyz[1]);
+    pt.push_back(pt_xyz[2]);
+  }
+
+  // xyz coordinates of the points
+  ien_array.clear();
+  for(int ii=0; ii<numcels; ++ii)
+  {
+    vtkCell * cell = polydata -> GetCell(ii);
+
+    if( cell->GetCellType() == 5 )
+    {
+      ien_array.push_back( static_cast<int>( cell->GetPointId(0) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
+    }
+    else SYS_T::print_fatal("Error: read_vtp_grid read a mesh with non triangle elements. \n");
+  }
+
+  reader->Delete();
+}
+
+int VTK_T::read_grid( const std::string &filename,
+    int &numpts, int &numcels,
+    std::vector<double> &pt, std::vector<int> &ien_array )
+{
+  int file_type = 0;
+
+  vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
+  reader -> SetFileName( filename.c_str() );
+  reader -> Update();
+
+  // Obtain the filename extension
+  std::string fend;
+  fend.assign( filename.end()-4 , filename.end() );
+
+  if(dynamic_cast<vtkPolyData*>(reader->GetOutput()))
+  {
+    SYS_T::print_exit_if(fend.compare(".vtp") !=0, "Error: VTK::read_grid, the filename %s does not end with vtp. \n", filename.c_str());
+    
+    file_type = 1; 
+
+    read_vtp_grid(filename, numpts, numcels, pt, ien_array);
+  }
+  else if(dynamic_cast<vtkUnstructuredGrid*>(reader->GetOutput()))
+  {
+    SYS_T::print_exit_if(fend.compare(".vtu") !=0, "Error: VTK::read_grid, the filename %s does not end with vtu. \n", filename.c_str());
+    
+    file_type = 2;
+
+    read_vtu_grid(filename, numpts, numcels, pt, ien_array);
+  }
+  else
+    SYS_T::print_exit("VTK_T::read_grid unknown vtk object type.\n");
+
+  reader -> Delete();
+
+  return file_type;
+}
 
 std::vector<int> VTK_T::read_int_CellData( const std::string &filename,
     const std::string &dataname )
@@ -114,7 +199,6 @@ std::vector<int> VTK_T::read_int_CellData( const std::string &filename,
   return data;
 }
 
-
 std::vector<double> VTK_T::read_double_CellData( const std::string &filename,
     const std::string &dataname )
 {
@@ -152,7 +236,6 @@ std::vector<double> VTK_T::read_double_CellData( const std::string &filename,
   return data;
 }
 
-
 std::vector<int> VTK_T::read_int_PointData( const std::string &filename,
     const std::string &dataname )
 {
@@ -189,7 +272,6 @@ std::vector<int> VTK_T::read_int_PointData( const std::string &filename,
 
   return data;
 }
-
 
 std::vector<double> VTK_T::read_double_PointData( const std::string &filename,
     const std::string &dataname )
@@ -280,84 +362,6 @@ int VTK_T::read_num_cl( const std::string &filename )
   reader -> Delete();
 
   return numcels;
-}
-
-void VTK_T::read_grid( const std::string &filename,
-    int &numpts, int &numcels,
-    std::vector<double> &pt, std::vector<int> &ien_array )
-{
-  vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
-  reader -> SetFileName( filename.c_str() );
-  reader -> Update();
-
-  // Obtain the filename extension
-  std::string fend;
-  fend.assign( filename.end()-4 , filename.end() );
-
-  if(dynamic_cast<vtkPolyData*>(reader->GetOutput()))
-  {
-    SYS_T::print_exit_if(fend.compare(".vtp") !=0, "Error: VTK::read_grid, the filename %s does not end with vtp.", filename.c_str());
-    
-    read_vtp_grid(filename, numpts, numcels, pt, ien_array);
-  }
-  else if(dynamic_cast<vtkUnstructuredGrid*>(reader->GetOutput()))
-  {
-    SYS_T::print_exit_if(fend.compare(".vtu") !=0, "Error: VTK::read_grid, the filename %s does not end with vtu.", filename.c_str());
-    
-    read_vtu_grid(filename, numpts, numcels, pt, ien_array);
-  }
-  else
-    SYS_T::print_exit("VTK_T::read_grid unknown vtk object type.\n");
-
-  reader -> Delete();
-}
-
-void VTK_T::read_vtp_grid( const std::string &filename,
-    int &numpts, int &numcels,
-    std::vector<double> &pt, std::vector<int> &ien_array )
-{
-  vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
-  reader -> SetFileName( filename.c_str() );
-  reader -> Update();
-  vtkPolyData * polydata = reader -> GetOutput();
-
-  // Number of grid points in the mesh
-  numpts = static_cast<int>( polydata -> GetNumberOfPoints() );
-
-  SYS_T::print_fatal_if(numpts <= 0, "Error: the file %s contains no point. \n", filename.c_str());
-
-  // Number of cells in the mesh
-  numcels = static_cast<int>( polydata -> GetNumberOfPolys() );
-
-  SYS_T::print_fatal_if(numcels <= 0, "Error: the file %s contains no cell. \n", filename.c_str());
-
-  // xyz coordinates of the points
-  pt.clear();
-  for(int ii=0; ii<numpts; ++ii)
-  {
-    double pt_xyz[3];
-    polydata -> GetPoint(ii, pt_xyz);
-    pt.push_back(pt_xyz[0]);
-    pt.push_back(pt_xyz[1]);
-    pt.push_back(pt_xyz[2]);
-  }
-
-  // xyz coordinates of the points
-  ien_array.clear();
-  for(int ii=0; ii<numcels; ++ii)
-  {
-    vtkCell * cell = polydata -> GetCell(ii);
-
-    if( cell->GetCellType() == 5 )
-    {
-      ien_array.push_back( static_cast<int>( cell->GetPointId(0) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
-    }
-    else SYS_T::print_fatal("Error: read_vtp_grid read a mesh with non triangle elements. \n");
-  }
-
-  reader->Delete();
 }
 
 void VTK_T::add_int_PointData( vtkPointSet * const &grid_w,
