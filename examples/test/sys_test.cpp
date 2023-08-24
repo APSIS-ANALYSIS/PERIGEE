@@ -17,11 +17,13 @@
 
 int main(int argc, char *argv[])
 {
-  const int nFunc = 5;
+  const int nFunc = 13500;
 
-  INodalBC * a = new NodalBC_3D_vtp( nFunc );
+  std::vector<std::string> fname { "wall_vol.vtp" };
 
-  INodalBC * b = new NodalBC( nFunc );
+  INodalBC * a = new NodalBC_3D_vtp( fname, nFunc );
+
+  INodalBC * b = new NodalBC( fname, nFunc );
 
   a -> print_info();
 

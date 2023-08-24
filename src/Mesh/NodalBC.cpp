@@ -29,7 +29,7 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
   
     for(unsigned int jj=0; jj<gnode.size(); ++jj)
     {
-      SYS_T::print_exit_if(gnode[jj]<0, "Error: there are negative nodal index! \n");
+      SYS_T::print_exit_if( gnode[jj]<0 || gnode[jj]>=nFunc, "Error: the nodal index %d is not in the range [0, %d)! \n", gnode[jj], nFunc);
 
       dir_nodes.push_back( static_cast<unsigned int>( gnode[jj]) );
     }
