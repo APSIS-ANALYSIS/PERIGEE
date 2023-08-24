@@ -180,27 +180,74 @@ void SymmTensor4_3D::add_OutProduct( const double &val, const SymmMatrix_3x3 &mm
 void SymmTensor4_3D::add_SymmOutProduct( const double &val, const Vector_3 &vec1, 
   const Vector_3 &vec2 )
 {
-  double add_ten[21];
-  for(int ii=0; ii<3; ++ii)
-  {
-    for(int jj=0; jj<3; ++jj)
-    {
-      for(int kk=0; kk<3; ++kk)
-      {
-        for(int ll=0; ll<3; ++ll)
-        {
-          add_ten[ Voigt_notation(ii,jj,kk,ll) ] = val * ( vec1( ii ) * vec2( jj ) * vec3( kk ) * vec4( ll )
-            + vec1( ii ) * vec2( jj ) * vec3( ll ) * vec4( kk )
-            + vec1( jj ) * vec2( ii ) * vec3( kk ) * vec4( ll )
-            + vec1( jj ) * vec2( ii ) * vec3( ll ) * vec4( kk ) );
-        }
-      }
-    }
-  }
-  for(int counter=0; counter<21; ++counter)
-  {
-    ten[counter] += add_ten[counter];
-  }
+  ten[0]  += val * 4 * vec1(0) * vec2(0) * vec1(0) * vec2(0);
+
+  ten[1]  += val * 4 * vec1(0) * vec2(0) * vec1(1) * vec2(1);
+
+  ten[2]  += val * 4 * vec1(0) * vec2(0) * vec1(2) * vec2(2);
+
+  ten[3]  += val * ( 2 * vec1(0) * vec2(0) * vec1(1) * vec2(2)
+                   + 2 * vec1(0) * vec2(0) * vec1(2) * vec2(1) );
+
+  ten[4]  += val * ( 2 * vec1(0) * vec2(0) * vec1(0) * vec2(2)
+                   + 2 * vec1(0) * vec2(0) * vec1(2) * vec2(0) );
+
+  ten[5]  += val * ( 2 * vec1(0) * vec2(0) * vec1(0) * vec2(1)
+                   + 2 * vec1(0) * vec2(0) * vec1(1) * vec2(0) );
+
+  ten[6]  += val * 4 * vec1(1) * vec2(1) * vec1(1) * vec2(1);
+
+  ten[7]  += val * 4 * vec1(1) * vec2(1) * vec1(2) * vec2(2);
+
+  ten[8]  += val * ( 2 * vec1(1) * vec2(1) * vec1(1) * vec2(2)
+                   + 2 * vec1(1) * vec2(1) * vec1(2) * vec2(1) );
+
+  ten[9]  += val * ( 2 * vec1(0) * vec2(2) * vec1(1) * vec2(1)
+                   + 2 * vec1(2) * vec2(0) * vec1(1) * vec2(1) );
+
+  ten[10] += val * ( 2 * vec1(1) * vec2(0) * vec1(1) * vec2(1)
+                   + 2 * vec1(0) * vec2(1) * vec1(1) * vec2(1) );
+
+  ten[11] += val * 4 * vec1(2) * vec2(2) * vec1(2) * vec2(2);
+
+  ten[12] += val * ( 2 * vec1(1) * vec2(2) * vec1(2) * vec2(2)
+                   + 2 * vec1(2) * vec2(1) * vec1(2) * vec2(2) );
+
+  ten[13] += val * ( 2 * vec1(2) * vec2(0) * vec1(2) * vec2(2)
+                   + 2 * vec1(0) * vec2(2) * vec1(2) * vec2(2) );
+
+  ten[14] += val * ( 2 * vec1(0) * vec2(1) * vec1(2) * vec2(2)
+                   + 2 * vec1(1) * vec2(0) * vec1(2) * vec2(2) );
+
+  ten[15] += val * ( vec1(1) * vec2(2) * vec1(1) * vec2(2)
+                   + vec1(1) * vec2(2) * vec1(2) * vec2(1)
+                   + vec1(2) * vec2(1) * vec1(1) * vec2(2)
+                   + vec1(2) * vec2(1) * vec1(2) * vec2(1) );
+
+  ten[16] += val * ( vec1(0) * vec2(2) * vec1(1) * vec2(2)
+                   + vec1(0) * vec2(2) * vec1(2) * vec2(1)
+                   + vec1(2) * vec2(0) * vec1(1) * vec2(2)
+                   + vec1(2) * vec2(0) * vec1(2) * vec2(1) );
+
+  ten[17] += val * ( vec1(0) * vec2(1) * vec1(1) * vec2(2)
+                   + vec1(0) * vec2(1) * vec1(2) * vec2(1)
+                   + vec1(1) * vec2(0) * vec1(1) * vec2(2)
+                   + vec1(1) * vec2(0) * vec1(2) * vec2(1) );
+
+  ten[18] += val * ( vec1(0) * vec2(2) * vec1(0) * vec2(2)
+                   + vec1(0) * vec2(2) * vec1(2) * vec2(0)
+                   + vec1(2) * vec2(0) * vec1(0) * vec2(2)
+                   + vec1(2) * vec2(0) * vec1(2) * vec2(0) );
+
+  ten[19] += val * ( vec1(0) * vec2(1) * vec1(0) * vec2(2)
+                   + vec1(0) * vec2(1) * vec1(2) * vec2(0)
+                   + vec1(1) * vec2(0) * vec1(0) * vec2(2)
+                   + vec1(1) * vec2(0) * vec1(2) * vec2(0) );
+
+  ten[20] += val * ( vec1(0) * vec2(1) * vec1(0) * vec2(1)
+                   + vec1(0) * vec2(1) * vec1(1) * vec2(0)
+                   + vec1(1) * vec2(0) * vec1(0) * vec2(1)
+                   + vec1(1) * vec2(0) * vec1(1) * vec2(0) );
 }
 
 void SymmTensor4_3D::add_SymmProduct( const double &val, const SymmMatrix_3x3 &mleft,

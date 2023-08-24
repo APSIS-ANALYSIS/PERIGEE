@@ -118,7 +118,18 @@ class SymmTensor4_3D
     // This function is typically called in the generation of the elasticity
     // tensor in the stretch-based models.
     // See, Holzapfel book p. 263, equation (6.196) for an example.
-    // Notes: vec1 = vec3 and vec2 = vec4 to maintain the major symmetry
+    // for example: 
+    // add_ten[20] = 
+    // val x ( vex1[0] x vec2[1] x vec1[0] x vec2[1]
+    //       + vex1[0] x vec2[1] x vec1[1] x vec2[0]
+    //       + vex1[1] x vec2[0] x vec1[0] x vec2[1]
+    //       + vex1[1] x vec2[0] x vec1[1] x vec2[0] ).
+    // 
+    // add_ten[20] = 
+    // val x ( vex1[0] x vec2[1] x vec1[1] x vec2[0]
+    //       + vex1[0] x vec2[1] x vec1[0] x vec2[1]
+    //       + vex1[1] x vec2[0] x vec1[1] x vec2[0]
+    //       + vex1[1] x vec2[0] x vec1[0] x vec2[1] ).
     // ------------------------------------------------------------------------
     void add_SymmOutProduct( const double &val, const Vector_3 &vec1, const Vector_3 &vec2 );
 
