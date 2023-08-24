@@ -54,7 +54,7 @@ class NodalBC : public INodalBC
     // NOTE: Make sure that master_idx[ii] is smaller than the number 
     // of nodes in the vtpfileList[ii].
     // --------------------------------------------------------------
-    NodalBC( const std::vector<std::string> &vtpfileList, 
+    NodalBC( const std::vector<std::string> &vtkfileList, 
         const int &nFunc, const std::vector<int> &master_idx );
 
     // --------------------------------------------------------------

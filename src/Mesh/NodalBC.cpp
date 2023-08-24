@@ -48,7 +48,7 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
 }
 
 
-NodalBC::NodalBC( const std::vector<std::string> &vtpfileList,
+NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
     const int &nFunc, const std::vector<int> &master_idx )
 {
   dir_nodes.clear();
@@ -56,28 +56,20 @@ NodalBC::NodalBC( const std::vector<std::string> &vtpfileList,
   per_master_nodes.clear();
   num_dir_nodes = 0;
 
-  const unsigned int num_file = vtpfileList.size();
+  const unsigned int num_file = vtkfileList.size();
 
-  if( num_file != master_idx.size() )
-    SYS_T::print_fatal("Error: the file size does not match the master idx size.\n");
+  SYS_T::print_exit_if(vtkfileList.size() != master_idx.size(),
+    "Error: the file size does not match the master idx size.\n");
 
-  for(unsigned int ii=0; ii<num_file; ++ii)
+  for (const auto &vtkfile : vtkfileList)
   {
-    SYS_T::file_check( vtpfileList[ii] );
+    SYS_T::file_check( vtkfile );
 
-    int numpts, numcels;
-    std::vector<double> pts;
-    std::vector<int> ien;
-
-    VTK_T::read_vtp_grid( vtpfileList[ii], numpts, numcels, pts, ien );
-    const std::vector<int> gnode = VTK_T::read_int_PointData(vtpfileList[ii], "GlobalNodeID");
-  
-    if( numpts != static_cast<int>(gnode.size()) )
-      SYS_T::print_fatal("Error: the numpts != global_node.size()! \n");
+    const auto gnode = VTK_T::read_int_PointData(vtkfile, "GlobalNodeID");
 
     for(unsigned int jj=0; jj<gnode.size(); ++jj)
     {
-      if(gnode[jj]<0) SYS_T::print_fatal("Error: there are negative nodal index! \n");
+      SYS_T::print_exit_if(gnode[jj]<0, "Error: there are negative nodal index! \n");
 
       if( static_cast<int>(jj) != master_idx[ii] )
       {
@@ -96,8 +88,8 @@ NodalBC::NodalBC( const std::vector<std::string> &vtpfileList,
   Create_ID( nFunc );
 
   std::cout<<"===> NodalBC specified by \n";
-  for(unsigned int ii=0; ii<num_file; ++ii)
-    std::cout<<"     "<<vtpfileList[ii]<<" follows "<<master_idx[ii]<<std::endl;
+  for(const auto &vtkfile : vtkfileList)
+    std::cout<<"     "<<vtkfile<<" follows "<<master_idx[ii]<<std::endl;
   std::cout<<"     is generated. \n";
 }
 
