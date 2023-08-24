@@ -44,9 +44,8 @@ class NodalBC : public INodalBC
     NodalBC( const std::vector<std::string> &vtkfileList, const int &nFunc );
 
     // --------------------------------------------------------------
-    // General NodalBC constructor. The specific implementation of the 
-    // Nodal bc is given by the private funcitons and are chosen by 
-    // the type flag.
+    // General NodalBC constructor. The specific implementation is 
+    // determined by the private funcitons, indicated by the type var.
     // --------------------------------------------------------------
     NodalBC( const std::vector<std::string> &vtkfileList,
         const int &nFunc, const int &type );
