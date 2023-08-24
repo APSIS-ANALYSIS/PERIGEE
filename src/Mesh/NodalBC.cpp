@@ -195,29 +195,20 @@ NodalBC::NodalBC( const std::string &vtufile,
 NodalBC::~NodalBC()
 {}
 
-
-void NodalBC::BC_type_1( const std::vector<std::string> &vtpfileList,
-    const int &nFunc  )
+void NodalBC::BC_type_1( const std::vector<std::string> &vtkfileList,
+    const int &nFunc )
 {
   const unsigned int num_file = vtpfileList.size();
 
-  for(unsigned int ii=0; ii<num_file; ++ii)
+  for( const auto &vtkfile : vtkfileList )
   {
-    SYS_T::file_check( vtpfileList[ii] );
+    SYS_T::file_check( vtkfile );
 
-    int numpts, numcels;
-    std::vector<double> pts;
-    std::vector<int> ien;
-
-    VTK_T::read_vtp_grid( vtpfileList[ii], numpts, numcels, pts, ien );
-    const std::vector<int> gnode = VTK_T::read_int_PointData(vtpfileList[ii], "GlobalNodeID");
-
-    if( numpts != static_cast<int>(gnode.size()) )
-      SYS_T::print_fatal("Error: the numpts != global_node.size()! \n");
+    const std::vector<int> gnode = VTK_T::read_int_PointData(vtkfile, "GlobalNodeID");
 
     for(unsigned int jj=1; jj<gnode.size(); ++jj)
     {
-      if(gnode[jj]<0) SYS_T::print_fatal("Error: there are negative nodal index! \n");
+      SYS_T::print_exit_if(gnode[jj]<0, "Error: there are negative nodal index! \n");
 
       per_slave_nodes.push_back( static_cast<unsigned int>( gnode[jj]) );
       per_master_nodes.push_back( static_cast<unsigned int>(gnode[ 0 ]) );
@@ -226,13 +217,13 @@ void NodalBC::BC_type_1( const std::vector<std::string> &vtpfileList,
 
   num_per_nodes = per_slave_nodes.size();
   std::cout<<"-----> Master slave relations: \n";
-  for(unsigned int ii=0; ii<num_file; ++ii)
-    std::cout<<"     "<<vtpfileList[ii]<<" follows 0th node in the file "<<std::endl;
+  for( const auto &vtkfile : vtkfileList )
+    std::cout<<"     "<<vtkfile<<" follows 0th node in the file "<<std::endl;
 }
 
 
 void NodalBC::BC_type_2( const std::vector<std::string> &vtpfileList,
-    const int &nFunc  )
+    const int &nFunc )
 {
   const unsigned int num_file = vtpfileList.size();
 

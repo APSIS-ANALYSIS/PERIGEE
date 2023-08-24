@@ -99,11 +99,11 @@ class NodalBC : public INodalBC
 
     // --------------------------------------------------------------
     // BC_type_1 is a master-slave driven implementation. It is 
-    // identical to the NodalBC(vtpfilelist, nFunc, master_idx),
+    // identical to the NodalBC(vtkfilelist, nFunc, master_idx),
     // with master_idx = [0,0,...,0].
     // --------------------------------------------------------------
-    void BC_type_1( const std::vector<std::string> &vtpfileList,
-        const int &nFunc  );
+    void BC_type_1( const std::vector<std::string> &vtkfileList,
+        const int &nFunc );
 
     // --------------------------------------------------------------
     // BC_type_2 is a bc that sets Dirichlet on the first vtp surface
