@@ -11,9 +11,23 @@
 #include "Matrix_double_3by3_Array.hpp"
 #include "Matrix_double_6by6_Array.hpp"
 #include "VTK_Tools.hpp"
+#include "NodalBC.hpp"
+#include "NodalBC_3D_vtp.hpp"
+#include "NodalBC_3D_vtu.hpp"
 
 int main(int argc, char *argv[])
 {
+  const int nFunc = 5;
+
+  INodalBC * a = new NodalBC_3D_vtp( nFunc );
+
+  INodalBC * b = new NodalBC( nFunc );
+
+  a -> print_info();
+
+  b -> print_info();
+
+  delete a; delete b;
 
   return EXIT_SUCCESS;
 }

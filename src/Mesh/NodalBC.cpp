@@ -113,12 +113,11 @@ void NodalBC::BC_type_1( const std::vector<std::string> &vtkfileList,
 void NodalBC::BC_type_2( const std::vector<std::string> &vtkfileList,
     const int &nFunc )
 {
-  SYS_T::print_exit_if(vtkfileList.size() != 2,
-    "Error: NodalBC::BC_type_2 the number of vtp files is wrong. \n")
+  SYS_T::print_exit_if(vtkfileList.size() != 2, "Error: NodalBC::BC_type_2 the number of vtk files is wrong. \n");
 
-  SYS_T::file_check( vtpfileList[0] );
+  SYS_T::file_check( vtkfileList[0] );
 
-  std::vector<int> gnode = VTK_T::read_int_PointData(vtpfileList[0], "GlobalNodeID");
+  std::vector<int> gnode = VTK_T::read_int_PointData(vtkfileList[0], "GlobalNodeID");
 
   dir_nodes.resize( gnode.size() );
   for(unsigned int ii=0; ii<gnode.size(); ++ii)
@@ -128,9 +127,9 @@ void NodalBC::BC_type_2( const std::vector<std::string> &vtkfileList,
     dir_nodes[ii] = static_cast<unsigned int>( gnode[ii] );
   }
 
-  SYS_T::file_check( vtpfileList[1] );
+  SYS_T::file_check( vtkfileList[1] );
 
-  gnode = VTK_T::read_int_PointData(vtpfileList[1], "GlobalNodeID");
+  gnode = VTK_T::read_int_PointData(vtkfileList[1], "GlobalNodeID");
 
   for(unsigned int jj=1; jj<gnode.size(); ++jj)
   {
@@ -143,8 +142,8 @@ void NodalBC::BC_type_2( const std::vector<std::string> &vtkfileList,
   num_dir_nodes = dir_nodes.size();
   num_per_nodes = per_slave_nodes.size();
 
-  std::cout<<"-----> Dirichlet nodes from "<<vtpfileList[0]<<std::endl;
-  std::cout<<"       Master-slave from "<<vtpfileList[1]<<" with 0th node master."<<std::endl;
+  std::cout<<"-----> Dirichlet nodes from "<<vtkfileList[0]<<std::endl;
+  std::cout<<"       Master-slave from "<<vtkfileList[1]<<" with 0th node master."<<std::endl;
 }
 
 void NodalBC::BC_type_3( const std::vector<std::string> &vtkfileList,
@@ -152,7 +151,7 @@ void NodalBC::BC_type_3( const std::vector<std::string> &vtkfileList,
 {
   SYS_T::print_exit_if( vtkfileList.size() != 1, "Error: NodalBC::BC_type_3 the number of vtp files is wrong. \n" );
 
-  SYS_T::file_check( vtpfileList[0] );
+  SYS_T::file_check( vtkfileList[0] );
 
   const std::vector<int> gnode = VTK_T::read_int_PointData(vtkfileList[0], "GlobalNodeID");
 
@@ -167,7 +166,7 @@ void NodalBC::BC_type_3( const std::vector<std::string> &vtkfileList,
   per_master_nodes.clear();
   num_per_nodes = 0;
   std::cout<<"-----> Dirichlet node "<<gnode[0]<<
-    " from "<<vtpfileList[0]<<std::endl;
+    " from "<<vtkfileList[0]<<std::endl;
 }
 
 // EOF
