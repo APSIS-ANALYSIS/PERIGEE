@@ -114,8 +114,8 @@ class NodalBC : public INodalBC
     // is fixed; the second file specifies the surface where the
     // pulling force is applied.
     // --------------------------------------------------------------
-    void BC_type_2( const std::vector<std::string> &vtpfileList,
-        const int &nFunc  );
+    void BC_type_2( const std::vector<std::string> &vtkfileList,
+        const int &nFunc );
 
     // --------------------------------------------------------------
     // BC_type_3 is a bc that sets Dirichlet on the given vtp file's

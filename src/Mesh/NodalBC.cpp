@@ -222,46 +222,31 @@ void NodalBC::BC_type_1( const std::vector<std::string> &vtkfileList,
 }
 
 
-void NodalBC::BC_type_2( const std::vector<std::string> &vtpfileList,
+void NodalBC::BC_type_2( const std::vector<std::string> &vtkfileList,
     const int &nFunc )
 {
-  const unsigned int num_file = vtpfileList.size();
-
-  if( num_file != 2 ) 
-    SYS_T::print_fatal("Error: NodalBC::BC_type_2 the number of vtp files is wrong. \n");
+  SYS_T::print_exit_if(vtkfileList.size() != 2,
+    "Error: NodalBC::BC_type_2 the number of vtp files is wrong. \n")
 
   SYS_T::file_check( vtpfileList[0] );
 
-  int numpts, numcels;
-  std::vector<double> pts;
-  std::vector<int> ien;
-
-  VTK_T::read_vtp_grid( vtpfileList[0], numpts, numcels, pts, ien );
-
   std::vector<int> gnode = VTK_T::read_int_PointData(vtpfileList[0], "GlobalNodeID");
-
-  if( numpts != static_cast<int>(gnode.size()) )
-    SYS_T::print_fatal("Error: the numpts != global_node.size()! \n");
 
   dir_nodes.resize( gnode.size() );
   for(unsigned int ii=0; ii<gnode.size(); ++ii)
   {
-    if(gnode[ii]<0) SYS_T::print_fatal("Error: there are negative nodal index! \n");
+    SYS_T::print_exit_if(gnode[ii]<0, "Error: there are negative nodal index! \n");
 
     dir_nodes[ii] = static_cast<unsigned int>( gnode[ii] );
   }
 
   SYS_T::file_check( vtpfileList[1] );
-  VTK_T::read_vtp_grid( vtpfileList[1], numpts, numcels, pts, ien );
 
   gnode = VTK_T::read_int_PointData(vtpfileList[1], "GlobalNodeID");
 
-  if( numpts != static_cast<int>(gnode.size()) )
-    SYS_T::print_fatal("Error: the numpts != global_node.size()! \n");
-
   for(unsigned int jj=1; jj<gnode.size(); ++jj)
   {
-    if(gnode[jj]<0) SYS_T::print_fatal("Error: there are negative nodal index! \n");
+    SYS_T::print_exit_if(gnode[jj]<0, "Error: there are negative nodal index! \n");
 
     per_slave_nodes.push_back( static_cast<unsigned int>( gnode[jj]) );
     per_master_nodes.push_back( static_cast<unsigned int>( gnode[ 0 ]) );
