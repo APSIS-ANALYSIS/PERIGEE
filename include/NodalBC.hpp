@@ -21,13 +21,13 @@
 //      xxx_nodes, and nFunc are given, the ID array will be generated
 //      by the function create_ID.
 //
-// Date: Jan. 6 2017
+// Date Created: Aug. 24 2023
 // Author: Ju Liu
 // ==================================================================
 #include "INodalBC.hpp"
 #include "Tet_Tools.hpp"
 
-class NodalBC_3D_vtp : public INodalBC
+class NodalBC : public INodalBC
 {
   public:
     // --------------------------------------------------------------
@@ -35,19 +35,13 @@ class NodalBC_3D_vtp : public INodalBC
     // per_master_nodes; set num_dir_nodes, num_per_nodes to be zero;
     // set ID based on the above "no-nodal bc" setting.
     // --------------------------------------------------------------
-    NodalBC_3D_vtp( const int &nFunc );
+    NodalBC( const int &nFunc );
     
-    // --------------------------------------------------------------
-    // The vtp file specifies the Dirichlet nodes. No periodical BC.
-    // --------------------------------------------------------------
-    NodalBC_3D_vtp( const std::string &vtpfileName, const int &nFunc );
-
     // --------------------------------------------------------------
     // The list of vtp files specifies the Dirichlet nodes. 
     // No periodical type BC nodes.
     // --------------------------------------------------------------
-    NodalBC_3D_vtp( const std::vector<std::string> &vtpfileList, 
-        const int &nFunc );
+    NodalBC( const std::vector<std::string> &vtpfileList, const int &nFunc );
 
     // --------------------------------------------------------------
     // Set a master-slave constraint relation, nodes in the given
@@ -60,7 +54,7 @@ class NodalBC_3D_vtp : public INodalBC
     // NOTE: Make sure that master_idx[ii] is smaller than the number 
     // of nodes in the vtpfileList[ii].
     // --------------------------------------------------------------
-    NodalBC_3D_vtp( const std::vector<std::string> &vtpfileList, 
+    NodalBC( const std::vector<std::string> &vtpfileList, 
         const int &nFunc, const std::vector<int> &master_idx );
 
     // --------------------------------------------------------------
@@ -68,10 +62,10 @@ class NodalBC_3D_vtp : public INodalBC
     // Nodal bc is given by the private funcitons and are chosen by 
     // the type flag.
     // --------------------------------------------------------------
-    NodalBC_3D_vtp( const std::vector<std::string> &vtpfileList,
+    NodalBC( const std::vector<std::string> &vtpfileList,
         const int &nFunc, const int &type );
 
-    virtual ~NodalBC_3D_vtp();
+    virtual ~NodalBC();
 
     virtual unsigned int get_dir_nodes(const unsigned int &ii) const
     {return dir_nodes[ii];}
@@ -93,11 +87,11 @@ class NodalBC_3D_vtp : public INodalBC
     std::vector<unsigned int> per_slave_nodes, per_master_nodes;
     unsigned int num_per_nodes;
     
-    NodalBC_3D_vtp() {};
+    NodalBC() {};
 
     // --------------------------------------------------------------
     // BC_type_1 is a master-slave driven implementation. It is 
-    // identical to the NodalBC_3D_vtp(vtpfilelist, nFunc, master_idx),
+    // identical to the NodalBC(vtpfilelist, nFunc, master_idx),
     // with master_idx = [0,0,...,0].
     // --------------------------------------------------------------
     void BC_type_1( const std::vector<std::string> &vtpfileList,
