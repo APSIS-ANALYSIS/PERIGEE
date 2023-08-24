@@ -149,25 +149,32 @@ SymmTensor4_3D& SymmTensor4_3D::operator*=( const double &val )
 
 void SymmTensor4_3D::add_OutProduct( const double &val, const SymmMatrix_3x3 &mmat )
 {
-  // ten[0] += val * mmat[0] * mmat[0];
-  // ten[1] += val * mmat[] * mmat[];
-  
-  double add_ten[21];
-  for(int ii=0; ii<3; ++ii)
-  {
-    for(int jj=0; jj<3; ++jj)
-    {
-      for(int kk=0; kk<3; ++kk)
-      {
-        for(int ll=0; ll<3; ++ll)
-          add_ten[ Voigt_notation(ii,jj,kk,ll) ] = val * mmat( Voigt_notation(ii,jj) ) * mmat( Voigt_notation(kk,ll) );
-      }
-    }
-  }
-  for(int counter=0; counter<21; ++counter)
-  {
-    ten[counter] += add_ten[counter];
-  }
+  ten[0] += val * mmat(0) * mmat(0);
+  ten[1] += val * mmat(0) * mmat(1);
+  ten[2] += val * mmat(0) * mmat(2);
+  ten[3] += val * mmat(0) * mmat(3);
+  ten[4] += val * mmat(0) * mmat(4);
+  ten[5] += val * mmat(0) * mmat(5);
+
+  ten[6]  += val * mmat(1) * mmat(1);
+  ten[7]  += val * mmat(1) * mmat(2);
+  ten[8]  += val * mmat(1) * mmat(3);
+  ten[9]  += val * mmat(1) * mmat(4);
+  ten[10] += val * mmat(1) * mmat(5);
+
+  ten[11] += val * mmat(2) * mmat(2);
+  ten[12] += val * mmat(2) * mmat(3);
+  ten[13] += val * mmat(2) * mmat(4);
+  ten[14] += val * mmat(2) * mmat(5);
+
+  ten[15] += val * mmat(3) * mmat(3);
+  ten[16] += val * mmat(3) * mmat(4);
+  ten[17] += val * mmat(3) * mmat(5);
+
+  ten[18] += val * mmat(4) * mmat(4);
+  ten[19] += val * mmat(4) * mmat(5);
+
+  ten[20] += val * mmat(5) * mmat(5);
 }
 
 void SymmTensor4_3D::add_SymmOutProduct( const double &val, const Vector_3 &vec1, 
