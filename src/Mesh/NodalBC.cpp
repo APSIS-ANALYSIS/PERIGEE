@@ -94,7 +94,7 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
 }
 
 
-NodalBC::NodalBC( const std::vector<std::string> &vtpfileList,
+NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
     const int &nFunc, const int &type )
 {
   clock_t log_time = clock();
@@ -110,13 +110,13 @@ NodalBC::NodalBC( const std::vector<std::string> &vtpfileList,
   switch( type )
   {
     case 1:
-      BC_type_1( vtpfileList, nFunc );
+      BC_type_1( vtkfileList, nFunc );
       break;
     case 2:
-      BC_type_2( vtpfileList, nFunc );
+      BC_type_2( vtkfileList, nFunc );
       break;
     case 3:
-      BC_type_3( vtpfileList, nFunc );
+      BC_type_3( vtkfileList, nFunc );
       break;
     default:
       std::cerr<<"Error: NodalBC with bc type = "<<type<<" is not implemented. \n";

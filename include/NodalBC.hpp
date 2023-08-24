@@ -62,7 +62,7 @@ class NodalBC : public INodalBC
     // Nodal bc is given by the private funcitons and are chosen by 
     // the type flag.
     // --------------------------------------------------------------
-    NodalBC( const std::vector<std::string> &vtpfileList,
+    NodalBC( const std::vector<std::string> &vtkfileList,
         const int &nFunc, const int &type );
 
     virtual ~NodalBC();
