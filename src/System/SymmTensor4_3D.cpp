@@ -246,196 +246,24 @@ void SymmTensor4_3D::add_SymmOutProduct( const double &val, const SymmMatrix_3x3
 
 int SymmTensor4_3D::Voigt_notation( const int &ii, const int &jj, const int &kk, const int &ll ) const
 {
-  int index_I = 3;
-  int index_J = 3;
-  
-  // [ 0, 5, 4;
-  //   5, 1, 3;
-  //   4, 3, 2 ]
-  //
-  //   const index_I = mapper(ii,jj);
-  //   const index_J = mapper(kk,ll);
-  
-  switch (ii)
-  {
-  case 0:
-    switch (jj)
-    {
-    case 0:
-     index_I = 0;
-     break;
+  const int index_I = Voigt_notation(ii, jj);
+  const int index_J = Voigt_notation(kk, ll);
 
-   case 1:
-     index_I = 5;
-     break;
+  const int mat[36] = {0, 1,  2,  3,  4,  5,
+                       1, 6,  7,  8,  9,  10,
+                       2, 7,  11, 12, 13, 14,
+                       3, 8,  12, 15, 16, 17,
+                       4, 9,  13, 16, 18, 19,
+                       5, 10, 14, 17, 19, 20 };
 
-   case 2:
-     index_I = 4;
-     break;
-   }
-   break;
-
- case 1:
-  switch (jj)
-  {
-  case 0:
-   index_I = 5;
-   break;
-
- case 1:
-   index_I = 1;
-   break;
-
- case 2:
-   index_I = 3;
-   break;
- }
- break;
-
-case 2:
-  switch (jj)
-  {
-  case 0:
-   index_I = 4;
-   break;
-
- case 1:
-   index_I = 3;
-   break;
-
- case 2:
-   index_I = 2;
-   break;
- }
- break;}
-
- switch (kk)
- {
- case 0:
-  switch (ll)
-  {
-  case 0:
-   index_J = 0;
-   break;
-
- case 1:
-   index_J = 5;
-   break;
-
- case 2:
-   index_J = 4;
-   break;
- }
- break;
-
-case 1:
-  switch (ll)
-  {
-  case 0:
-   index_J = 5;
-   break;
-
- case 1:
-   index_J = 1;
-   break;
-
- case 2:
-   index_J = 3;
-   break;
- }
- break;
-
-case 2:
-  switch (ll)
-  {
-  case 0:
-   index_J = 4;
-   break;
-
- case 1:
-   index_J = 3;
-   break;
-
- case 2:
-   index_J = 2;
-   break;
- }
- break;}
-
- int sum = 0;
- if (index_I <= index_J){
-  for (int counter=index_I; counter>0; counter--)
-  {
-    sum += 6 - counter;
-  }
-  return sum + index_J;}
-  else
-  {
-    for (int counter=index_J; counter>0; counter--)
-    {
-      sum += 6 - counter;
-    }
-
-    return sum + index_I;
-  }
+  return mat[ 6 * index_I + index_J ];
 }
 
 int SymmTensor4_3D::Voigt_notation( const int &ii, const int &jj ) const
 {
-  int index = 3;
-  switch (ii)
-  {
-  case 0:
-    switch (jj)
-    {
-    case 0:
-     index = 0;
-     break;
-
-   case 1:
-     index = 5;
-     break;
-
-   case 2:
-     index = 4;
-     break;
-   }
-   break;
-
- case 1:
-  switch (jj)
-  {
-  case 0:
-   index = 5;
-   break;
-
- case 1:
-   index = 1;
-   break;
-
- case 2:
-   index = 3;
-   break;
- }
- break;
-
-case 2:
-  switch (jj)
-  {
-  case 0:
-   index = 4;
-   break;
-
- case 1:
-   index = 3;
-   break;
-
- case 2:
-   index = 2;
-   break;
- }
- break;}
-
- return index;
+  const int mat[9] = { 0, 5, 4, 
+                       5, 1, 3, 
+                       4, 3, 2 };
+  return mat[ 3 * ii + jj ];
 }
 // EOF
