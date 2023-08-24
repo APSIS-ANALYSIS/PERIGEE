@@ -76,8 +76,11 @@ namespace VTK_T
   // ! read_grid: read a generic mesh from either a .vtp or a .vtu file.
   //              The output is identical to the read_vtp_grid and read_vtu_grid
   //              functions.
+  //   Note: it will return 1 if the file is of vtp type,
+  //                 return 2 if the file is of vtu type,
+  //                 return 0 if the file is unindentified.
   // ----------------------------------------------------------------
-  void read_grid( const std::string &filename,
+  int read_grid( const std::string &filename,
       int &numpts, int &numcels,
       std::vector<double> &pt, std::vector<int> &ien_array );
 

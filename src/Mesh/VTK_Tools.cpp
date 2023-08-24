@@ -124,10 +124,12 @@ void VTK_T::read_vtp_grid( const std::string &filename,
   reader->Delete();
 }
 
-void VTK_T::read_grid( const std::string &filename,
+int VTK_T::read_grid( const std::string &filename,
     int &numpts, int &numcels,
     std::vector<double> &pt, std::vector<int> &ien_array )
 {
+  int file_type = 0;
+
   vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
   reader -> SetFileName( filename.c_str() );
   reader -> Update();
@@ -138,20 +140,26 @@ void VTK_T::read_grid( const std::string &filename,
 
   if(dynamic_cast<vtkPolyData*>(reader->GetOutput()))
   {
-    SYS_T::print_exit_if(fend.compare(".vtp") !=0, "Error: VTK::read_grid, the filename %s does not end with vtp.", filename.c_str());
+    SYS_T::print_exit_if(fend.compare(".vtp") !=0, "Error: VTK::read_grid, the filename %s does not end with vtp. \n", filename.c_str());
     
+    file_type = 1; 
+
     read_vtp_grid(filename, numpts, numcels, pt, ien_array);
   }
   else if(dynamic_cast<vtkUnstructuredGrid*>(reader->GetOutput()))
   {
-    SYS_T::print_exit_if(fend.compare(".vtu") !=0, "Error: VTK::read_grid, the filename %s does not end with vtu.", filename.c_str());
+    SYS_T::print_exit_if(fend.compare(".vtu") !=0, "Error: VTK::read_grid, the filename %s does not end with vtu. \n", filename.c_str());
     
+    file_type = 2;
+
     read_vtu_grid(filename, numpts, numcels, pt, ien_array);
   }
   else
     SYS_T::print_exit("VTK_T::read_grid unknown vtk object type.\n");
 
   reader -> Delete();
+
+  return file_type;
 }
 
 std::vector<int> VTK_T::read_int_CellData( const std::string &filename,
