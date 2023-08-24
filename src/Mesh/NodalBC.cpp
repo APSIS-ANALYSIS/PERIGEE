@@ -13,45 +13,7 @@ NodalBC::NodalBC( const int &nFunc )
   std::cout<<"===> NodalBC: No nodal BC is generated. \n";
 }
 
-
-NodalBC::NodalBC( const std::string &vtpfileName,
-   const int &nFunc )
-{
-  SYS_T::file_check( vtpfileName );
-
-  int numpts, numcels;
-  std::vector<double> pts;
-  std::vector<int> ien;
-
-  VTK_T::read_vtp_grid( vtpfileName, numpts, numcels, pts, ien );
-
-  const std::vector<int> gnode = VTK_T::read_int_PointData(vtpfileName, "GlobalNodeID");
-
-  dir_nodes.clear();
-  per_slave_nodes.clear();
-  per_master_nodes.clear();
-  num_per_nodes = 0;
-  num_dir_nodes = numpts;
-
-  if( numpts != static_cast<int>(gnode.size()) )
-    SYS_T::print_fatal("Error: the numpts != global_node.size()! \n");
-
-  dir_nodes.resize( gnode.size() );
-  for(unsigned int ii=0; ii<gnode.size(); ++ii)
-  {
-    if(gnode[ii]<0) SYS_T::print_fatal("Error: there are negative nodal index! \n");
-  
-    dir_nodes[ii] = static_cast<unsigned int>( gnode[ii] ); 
-  }
-
-  // Generate the ID array
-  Create_ID(nFunc);
-
-  std::cout<<"===> NodalBC specified by "<<vtpfileName<<" is generated. \n";
-}
-
-
-NodalBC::NodalBC( const std::vector<std::string> &vtpfileList, 
+NodalBC::NodalBC( const std::vector<std::string> &vtkfileList, 
     const int &nFunc )
 {
   dir_nodes.clear();
@@ -59,25 +21,15 @@ NodalBC::NodalBC( const std::vector<std::string> &vtpfileList,
   per_master_nodes.clear();
   num_per_nodes = 0;
 
-  const unsigned int num_file = vtpfileList.size();
-
-  for(unsigned int ii=0; ii<num_file; ++ii)
+  for( const auto &vtkfile : vtkfileList )
   {
-    SYS_T::file_check( vtpfileList[ii] );
+    SYS_T::file_check( vtkfile );
 
-    int numpts, numcels;
-    std::vector<double> pts;
-    std::vector<int> ien;
-
-    VTK_T::read_vtp_grid( vtpfileList[ii], numpts, numcels, pts, ien );
-    const std::vector<int> gnode = VTK_T::read_int_PointData(vtpfileList[ii], "GlobalNodeID");
+    const auto gnode = VTK_T::read_int_PointData(vtkfile, "GlobalNodeID");
   
-    if( numpts != static_cast<int>(gnode.size()) )
-      SYS_T::print_fatal("Error: the numpts != global_node.size()! \n");
-
     for(unsigned int jj=0; jj<gnode.size(); ++jj)
     {
-      if(gnode[jj]<0) SYS_T::print_fatal("Error: there are negative nodal index! \n");
+      SYS_T::print_exit_if(gnode[jj]<0, "Error: there are negative nodal index! \n");
 
       dir_nodes.push_back( static_cast<unsigned int>( gnode[jj]) );
     }
@@ -90,9 +42,9 @@ NodalBC::NodalBC( const std::vector<std::string> &vtpfileList,
   Create_ID( nFunc );
 
   std::cout<<"===> NodalBC specified by \n";
-  for(unsigned int ii=0; ii<num_file; ++ii)
-    std::cout<<"     "<<vtpfileList[ii]<<std::endl;
-  std::cout<<"     is generated. \n";
+  for( const auto &vtkfile : vtkfileList )
+    std::cout<<"     "<<vtkfile<<"\n";
+  std::cout<<"     is generated."<<std::endl;
 }
 
 

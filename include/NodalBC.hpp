@@ -41,7 +41,7 @@ class NodalBC : public INodalBC
     // The list of vtp files specifies the Dirichlet nodes. 
     // No periodical type BC nodes.
     // --------------------------------------------------------------
-    NodalBC( const std::vector<std::string> &vtpfileList, const int &nFunc );
+    NodalBC( const std::vector<std::string> &vtkfileList, const int &nFunc );
 
     // --------------------------------------------------------------
     // Set a master-slave constraint relation, nodes in the given
