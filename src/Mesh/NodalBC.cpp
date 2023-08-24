@@ -196,8 +196,6 @@ NodalBC::~NodalBC()
 void NodalBC::BC_type_1( const std::vector<std::string> &vtkfileList,
     const int &nFunc )
 {
-  const unsigned int num_file = vtpfileList.size();
-
   for( const auto &vtkfile : vtkfileList )
   {
     SYS_T::file_check( vtkfile );
@@ -218,7 +216,6 @@ void NodalBC::BC_type_1( const std::vector<std::string> &vtkfileList,
   for( const auto &vtkfile : vtkfileList )
     std::cout<<"     "<<vtkfile<<" follows 0th node in the file "<<std::endl;
 }
-
 
 void NodalBC::BC_type_2( const std::vector<std::string> &vtkfileList,
     const int &nFunc )
@@ -256,7 +253,6 @@ void NodalBC::BC_type_2( const std::vector<std::string> &vtkfileList,
   std::cout<<"-----> Dirichlet nodes from "<<vtpfileList[0]<<std::endl;
   std::cout<<"       Master-slave from "<<vtpfileList[1]<<" with 0th node master."<<std::endl;
 }
-
 
 void NodalBC::BC_type_3( const std::vector<std::string> &vtkfileList,
     const int &nFunc  )
