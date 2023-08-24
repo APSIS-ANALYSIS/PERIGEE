@@ -128,68 +128,6 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
   std::cout<<"Time taken: "<<((float) log_time)/CLOCKS_PER_SEC<<" seconds."<<std::endl; 
 }
 
-NodalBC::NodalBC( const std::string &vtufile, 
-        const std::vector<std::string> &vtpfileList, const int &nFunc )
-{
-  dir_nodes.clear();
-  per_slave_nodes.clear();
-  per_master_nodes.clear();
-  num_per_nodes = 0;
-
-  // Read vtp files
-  for( const auto &vtpfile : vtpfileList )
-  {
-    SYS_T::file_check( vtpfile );
-
-    const std::vector<int> gnode = VTK_T::read_int_PointData( vtpfile , "GlobalNodeID");
-
-    for(unsigned int jj=0; jj<gnode.size(); ++jj)
-    {
-      SYS_T::print_exit_if(gnode[jj]<0, "Error: there are negative nodal index! \n");
-
-      dir_nodes.push_back( static_cast<unsigned int>( gnode[jj]) );
-    }
-  }
-
-  // Read vtu file
-  SYS_T::file_check( vtufile );
-
-  // vtkXMLUnstructuredGridReader * reader = vtkXMLUnstructuredGridReader::New();
-  // reader -> SetFileName( vtufile.c_str() );
-  // reader -> Update();
-  // vtkUnstructuredGrid * vtkugrid = reader -> GetOutput();
-
-  // const int numpts = static_cast<int>( vtkugrid -> GetNumberOfPoints() );
-
-  // vtkPointData * pointdata = vtkugrid->GetPointData();
-  // vtkDataArray * pd = pointdata->GetScalars("GlobalNodeID");
-
-  // std::vector<unsigned int> gnode; gnode.clear();
-
-  // for(int ii=0; ii<numpts; ++ii) gnode.push_back( static_cast<unsigned int>(pd->GetComponent(ii,0)) );
-
-  // reader->Delete();
-
-  std::vector<int> gnode = VTK_T::read_int_PointData( vtufile, "GlobalNodeID" ); // Line 159 ~ 173
-
-  VEC_T::sort_unique_resize( gnode );
-
-  // VEC_T::insert_end(dir_nodes, gnode );
-
-  VEC_T::insert_end(dir_nodes, std::vector<unsigned int> (gnode.begin(), gnode.end()) ); // Line 179
-
-  VEC_T::sort_unique_resize(dir_nodes);
-
-  num_dir_nodes = dir_nodes.size();
-
-  Create_ID( nFunc );
-
-  std::cout<<"===> NodalBC_3D_vtu specified by \n";
-  for(const auto &vtpfile : vtpfileList)
-    std::cout<<"     "<<vtpfile<<std::endl;
-  std::cout<<"     "<<vtufile<<"     is generated. \n";
-}
-
 NodalBC::~NodalBC()
 {}
 
