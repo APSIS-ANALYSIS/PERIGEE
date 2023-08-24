@@ -124,8 +124,8 @@ class NodalBC : public INodalBC
     // Note: the input vtifileList should have size 1, which means
     // only one vtp file is provided.
     // --------------------------------------------------------------
-    void BC_type_3( const std::vector<std::string> &vtpfileList,
-        const int &nFunc  );
+    void BC_type_3( const std::vector<std::string> &vtkfileList,
+        const int &nFunc );
 };
 
 #endif

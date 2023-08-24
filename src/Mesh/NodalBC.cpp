@@ -260,40 +260,29 @@ void NodalBC::BC_type_2( const std::vector<std::string> &vtkfileList,
 }
 
 
-void NodalBC::BC_type_3( const std::vector<std::string> &vtpfileList,
+void NodalBC::BC_type_3( const std::vector<std::string> &vtkfileList,
     const int &nFunc  )
 {
-  const unsigned int num_file = vtpfileList.size();
-
-  SYS_T::print_fatal_if( num_file != 1, 
+  SYS_T::print_exit_if( vtkfileList.size() != 1, 
       "Error: NodalBC::BC_type_3 the number of vtp files is wrong. \n" );
 
   SYS_T::file_check( vtpfileList[0] );
 
-  int numpts, numcels;
-  std::vector<double> pts;
-  std::vector<int> ien;
+  const std::vector<int> gnode = VTK_T::read_int_PointData(vtkfileList[0], "GlobalNodeID");
 
-  VTK_T::read_vtp_grid( vtpfileList[0], numpts, numcels, pts, ien );
-
-  const std::vector<int> gnode = VTK_T::read_int_PointData(vtpfileList[0], "GlobalNodeID");
-
-  SYS_T::print_fatal_if( numpts != static_cast<int>(gnode.size()),
-      "Error: the numpts != global_node.size()! \n");
-
-  SYS_T::print_fatal_if( numpts < 1,
+  SYS_T::print_exit_if( gnode.size() < 1,
       "Error: the numpts is less than 1 in the vtp file! \n");
 
-  SYS_T::print_fatal_if( gnode[0]<0,
+  SYS_T::print_exit_if( gnode[0]<0,
       "Error: there are negative nodal index! \n");
 
   dir_nodes.resize(1);
   dir_nodes[0] = static_cast<unsigned int>( gnode[0] );
-  num_dir_nodes = dir_nodes.size();
+  num_dir_nodes = 1;
   per_slave_nodes.clear();
   per_master_nodes.clear();
   num_per_nodes = 0;
-  std::cout<<"-----> Dirichlet nodes "<<gnode[0]<<
+  std::cout<<"-----> Dirichlet node "<<gnode[0]<<
     " from "<<vtpfileList[0]<<std::endl;
 }
 
