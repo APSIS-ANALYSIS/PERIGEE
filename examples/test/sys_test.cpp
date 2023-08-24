@@ -31,6 +31,21 @@ int main(int argc, char *argv[])
       std::cout<<"Error "<<a-> get_ID(ii)<<'\t'<<b-> get_ID(ii)<<'\n';
   }
 
+  for(unsigned int ii=0; ii< a->get_num_dir_nodes(); ++ii)
+  {
+    if( a->get_dir_nodes(ii) != b->get_dir_nodes(ii) )
+      std::cout<<"Error! \n";
+  }
+
+  for( unsigned int ii=0; ii< a->get_num_per_nodes(); ++ii )
+  {
+    if( a->get_per_slave_nodes(ii) != b->get_per_slave_nodes(ii) )
+      std::cout<<"ERROR! \n";
+    
+    if( a->get_per_master_nodes(ii) != b->get_per_master_nodes(ii) )
+      std::cout<<"ERROR! \n";
+  }
+  
   delete a; delete b;
 
   return EXIT_SUCCESS;
