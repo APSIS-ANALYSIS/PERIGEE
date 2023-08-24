@@ -65,6 +65,14 @@ class NodalBC : public INodalBC
     NodalBC( const std::vector<std::string> &vtkfileList,
         const int &nFunc, const int &type );
 
+    // --------------------------------------------------------------
+    // Read in the vtu file and a list of vtp file that all nodes in these
+    // files will be enforced as essential boundary conditions.
+    // It is OK that the vtu and the vtp's have overlapping nodes.
+    // --------------------------------------------------------------
+    NodalBC( const std::string &vtufilename, 
+        const std::vector<std::string> &vtpfileList, const int &nFunc );
+
     virtual ~NodalBC();
 
     virtual unsigned int get_dir_nodes(const unsigned int &ii) const
