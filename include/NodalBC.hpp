@@ -44,20 +44,6 @@ class NodalBC : public INodalBC
     NodalBC( const std::vector<std::string> &vtkfileList, const int &nFunc );
 
     // --------------------------------------------------------------
-    // Set a master-slave constraint relation, nodes in the given
-    // file will follow the given master index. In each vtp file, the
-    // master_idx[ii]-th node will be set as master and the rest nodes
-    // are slave nodes. 
-    // This BC type is useful in the constrained motion on the boundary.
-    // I use this in my tensile test for a adventitial strp to disallow
-    // deformation on the boundary of the loaded surface.
-    // NOTE: Make sure that master_idx[ii] is smaller than the number 
-    // of nodes in the vtpfileList[ii].
-    // --------------------------------------------------------------
-    NodalBC( const std::vector<std::string> &vtkfileList, 
-        const int &nFunc, const std::vector<int> &master_idx );
-
-    // --------------------------------------------------------------
     // General NodalBC constructor. The specific implementation of the 
     // Nodal bc is given by the private funcitons and are chosen by 
     // the type flag.

@@ -47,51 +47,6 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
   std::cout<<"     is generated."<<std::endl;
 }
 
-
-NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
-    const int &nFunc, const std::vector<int> &master_idx )
-{
-  dir_nodes.clear();
-  per_slave_nodes.clear();
-  per_master_nodes.clear();
-  num_dir_nodes = 0;
-
-  SYS_T::print_exit_if(vtkfileList.size() != master_idx.size(),
-    "Error: the file size does not match the master idx size.\n");
-
-  for (const auto &vtkfile : vtkfileList)
-  {
-    SYS_T::file_check( vtkfile );
-
-    const auto gnode = VTK_T::read_int_PointData(vtkfile, "GlobalNodeID");
-
-    for(unsigned int jj=0; jj<gnode.size(); ++jj)
-    {
-      SYS_T::print_exit_if(gnode[jj]<0, "Error: there are negative nodal index! \n");
-
-      if( static_cast<int>(jj) != master_idx[ii] )
-      {
-        per_slave_nodes.push_back( static_cast<unsigned int>( gnode[jj]) );
-        per_master_nodes.push_back( static_cast<unsigned int>(gnode[ master_idx[ii] ]) );
-      }
-      else
-      {
-        std::cout<<"jj = "<<jj<<'\t'<<gnode[jj]<<" matched master index "<<master_idx[ii]<<std::endl;
-      }
-    }
-  }
-
-  num_per_nodes = per_slave_nodes.size();
-
-  Create_ID( nFunc );
-
-  std::cout<<"===> NodalBC specified by \n";
-  for(const auto &vtkfile : vtkfileList)
-    std::cout<<"     "<<vtkfile<<" follows "<<master_idx[ii]<<std::endl;
-  std::cout<<"     is generated. \n";
-}
-
-
 NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
     const int &nFunc, const int &type )
 {
