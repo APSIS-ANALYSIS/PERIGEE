@@ -1,6 +1,6 @@
-#include "NodalBC_3D_vtp.hpp"
+#include "NodalBC.hpp"
 
-NodalBC_3D_vtp::NodalBC_3D_vtp( const int &nFunc )
+NodalBC::NodalBC( const int &nFunc )
 {
   dir_nodes.clear();
   per_slave_nodes.clear();
@@ -10,11 +10,11 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const int &nFunc )
 
   Create_ID( nFunc );
   
-  std::cout<<"===> NodalBC_3D_vtp: No nodal BC is generated. \n";
+  std::cout<<"===> NodalBC: No nodal BC is generated. \n";
 }
 
 
-NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &vtpfileName,
+NodalBC::NodalBC( const std::string &vtpfileName,
    const int &nFunc )
 {
   SYS_T::file_check( vtpfileName );
@@ -47,11 +47,11 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::string &vtpfileName,
   // Generate the ID array
   Create_ID(nFunc);
 
-  std::cout<<"===> NodalBC_3D_vtp specified by "<<vtpfileName<<" is generated. \n";
+  std::cout<<"===> NodalBC specified by "<<vtpfileName<<" is generated. \n";
 }
 
 
-NodalBC_3D_vtp::NodalBC_3D_vtp( const std::vector<std::string> &vtpfileList, 
+NodalBC::NodalBC( const std::vector<std::string> &vtpfileList, 
     const int &nFunc )
 {
   dir_nodes.clear();
@@ -89,14 +89,14 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::vector<std::string> &vtpfileList,
 
   Create_ID( nFunc );
 
-  std::cout<<"===> NodalBC_3D_vtp specified by \n";
+  std::cout<<"===> NodalBC specified by \n";
   for(unsigned int ii=0; ii<num_file; ++ii)
     std::cout<<"     "<<vtpfileList[ii]<<std::endl;
   std::cout<<"     is generated. \n";
 }
 
 
-NodalBC_3D_vtp::NodalBC_3D_vtp( const std::vector<std::string> &vtpfileList,
+NodalBC::NodalBC( const std::vector<std::string> &vtpfileList,
     const int &nFunc, const std::vector<int> &master_idx )
 {
   dir_nodes.clear();
@@ -143,14 +143,14 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::vector<std::string> &vtpfileList,
 
   Create_ID( nFunc );
 
-  std::cout<<"===> NodalBC_3D_vtp specified by \n";
+  std::cout<<"===> NodalBC specified by \n";
   for(unsigned int ii=0; ii<num_file; ++ii)
     std::cout<<"     "<<vtpfileList[ii]<<" follows "<<master_idx[ii]<<std::endl;
   std::cout<<"     is generated. \n";
 }
 
 
-NodalBC_3D_vtp::NodalBC_3D_vtp( const std::vector<std::string> &vtpfileList,
+NodalBC::NodalBC( const std::vector<std::string> &vtpfileList,
     const int &nFunc, const int &type )
 {
   clock_t log_time = clock();
@@ -175,23 +175,23 @@ NodalBC_3D_vtp::NodalBC_3D_vtp( const std::vector<std::string> &vtpfileList,
       BC_type_3( vtpfileList, nFunc );
       break;
     default:
-      std::cerr<<"Error: NodalBC_3D_vtp with bc type = "<<type<<" is not implemented. \n";
+      std::cerr<<"Error: NodalBC with bc type = "<<type<<" is not implemented. \n";
       exit(EXIT_FAILURE);
   }
 
   Create_ID( nFunc );
 
   log_time = clock() - log_time;
-  std::cout<<"===> NodalBC_3D_vtp, type = "<<type<<" is generated. ";
+  std::cout<<"===> NodalBC, type = "<<type<<" is generated. ";
   std::cout<<"Time taken: "<<((float) log_time)/CLOCKS_PER_SEC<<" seconds."<<std::endl; 
 }
 
 
-NodalBC_3D_vtp::~NodalBC_3D_vtp()
+NodalBC::~NodalBC()
 {}
 
 
-void NodalBC_3D_vtp::BC_type_1( const std::vector<std::string> &vtpfileList,
+void NodalBC::BC_type_1( const std::vector<std::string> &vtpfileList,
     const int &nFunc  )
 {
   const unsigned int num_file = vtpfileList.size();
@@ -226,13 +226,13 @@ void NodalBC_3D_vtp::BC_type_1( const std::vector<std::string> &vtpfileList,
 }
 
 
-void NodalBC_3D_vtp::BC_type_2( const std::vector<std::string> &vtpfileList,
+void NodalBC::BC_type_2( const std::vector<std::string> &vtpfileList,
     const int &nFunc  )
 {
   const unsigned int num_file = vtpfileList.size();
 
   if( num_file != 2 ) 
-    SYS_T::print_fatal("Error: NodalBC_3D_vtp::BC_type_2 the number of vtp files is wrong. \n");
+    SYS_T::print_fatal("Error: NodalBC::BC_type_2 the number of vtp files is wrong. \n");
 
   SYS_T::file_check( vtpfileList[0] );
 
@@ -279,13 +279,13 @@ void NodalBC_3D_vtp::BC_type_2( const std::vector<std::string> &vtpfileList,
 }
 
 
-void NodalBC_3D_vtp::BC_type_3( const std::vector<std::string> &vtpfileList,
+void NodalBC::BC_type_3( const std::vector<std::string> &vtpfileList,
     const int &nFunc  )
 {
   const unsigned int num_file = vtpfileList.size();
 
   SYS_T::print_fatal_if( num_file != 1, 
-      "Error: NodalBC_3D_vtp::BC_type_3 the number of vtp files is wrong. \n" );
+      "Error: NodalBC::BC_type_3 the number of vtp files is wrong. \n" );
 
   SYS_T::file_check( vtpfileList[0] );
 
