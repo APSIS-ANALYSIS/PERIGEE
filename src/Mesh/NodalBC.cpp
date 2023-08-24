@@ -56,8 +56,6 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
   per_master_nodes.clear();
   num_dir_nodes = 0;
 
-  const unsigned int num_file = vtkfileList.size();
-
   SYS_T::print_exit_if(vtkfileList.size() != master_idx.size(),
     "Error: the file size does not match the master idx size.\n");
 
