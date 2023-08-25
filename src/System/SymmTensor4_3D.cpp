@@ -253,25 +253,32 @@ void SymmTensor4_3D::add_SymmOutProduct( const double &val, const Vector_3 &vec1
 void SymmTensor4_3D::add_SymmProduct( const double &val, const SymmMatrix_3x3 &mleft,
   const SymmMatrix_3x3 &mright )
 {
-  double add_ten[21];
-  for(int ii=0; ii<3; ++ii)
-  {
-    for(int jj=0; jj<3; ++jj)
-    {
-      for(int kk=0; kk<3; ++kk)
-      {
-        for(int ll=0; ll<3; ++ll)
-        {
-          add_ten[ Voigt_notation(ii,jj,kk,ll) ] = val * 0.5 * ( mleft( Voigt_notation(ii,kk) ) 
-            * mright( Voigt_notation(jj,ll) ) + mleft( Voigt_notation(ii,ll) ) * mright( Voigt_notation(jj,kk) ) );
-        }
-      }
-    }
-  }
-  for(int counter=0; counter<21; ++counter)
-  {
-    ten[counter] += add_ten[counter];
-  }
+  ten[0]  += val * 0.5 * 2.0 * ( mleft(0) * mright(0) );
+  ten[1]  += val * 0.5 * 2.0 * ( mleft(5) * mright(5) );
+  ten[2]  += val * 0.5 * 2.0 * ( mleft(4) * mright(4) );
+
+  ten[3]  += val * 0.5 * ( mleft(5) * mright(4) + mleft(4) * mright(5) );
+  ten[4]  += val * 0.5 * ( mleft(0) * mright(4) + mleft(4) * mright(0) );
+  ten[5]  += val * 0.5 * ( mleft(0) * mright(5) + mleft(5) * mright(0) );
+
+  ten[6]  += val * 0.5 * 2.0 * ( mleft(1) * mright(1) );
+  ten[7]  += val * 0.5 * 2.0 * ( mleft(3) * mright(3) );
+
+  ten[8]  += val * 0.5 * ( mleft(1) * mright(3) + mleft(3) * mright(1) );
+  ten[9]  += val * 0.5 * ( mleft(5) * mright(3) + mleft(5) * mright(3) );
+  ten[10] += val * 0.5 * ( mleft(5) * mright(1) + mleft(5) * mright(1) );
+
+  ten[11] += val * 0.5 * 2.0 * ( mleft(2) * mright(2) );
+
+  ten[12] += val * 0.5 * ( mleft(3) * mright(2) + mleft(3) * mright(2) );
+  ten[13] += val * 0.5 * ( mleft(4) * mright(2) + mleft(4) * mright(2) );
+  ten[14] += val * 0.5 * ( mleft(4) * mright(3) + mleft(4) * mright(3) );
+  ten[15] += val * 0.5 * ( mleft(1) * mright(2) + mleft(3) * mright(3) );
+  ten[16] += val * 0.5 * ( mleft(5) * mright(2) + mleft(4) * mright(3) );
+  ten[17] += val * 0.5 * ( mleft(5) * mright(3) + mleft(4) * mright(1) );
+  ten[18] += val * 0.5 * ( mleft(0) * mright(2) + mleft(4) * mright(4) );
+  ten[19] += val * 0.5 * ( mleft(0) * mright(3) + mleft(4) * mright(5) );
+  ten[20] += val * 0.5 * ( mleft(0) * mright(1) + mleft(5) * mright(5) );
 }
 
 void SymmTensor4_3D::add_SymmOutProduct( const double &val, const SymmMatrix_3x3 &mleft,
