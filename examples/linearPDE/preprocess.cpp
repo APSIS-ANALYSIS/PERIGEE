@@ -7,7 +7,7 @@
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
 #include "Tet_Tools.hpp"
-#include "NodalBC_3D_vtp.hpp"
+#include "NodalBC.hpp"
 #include "ElemBC_3D_tet.hpp"
 #include "Part_Tet.hpp"
 #include "NBC_Partition.hpp"
@@ -113,19 +113,11 @@ int main( int argc, char * argv[] )
   mnindex->write_hdf5("node_mapping");
 
   // Setup Nodal (Dirichlet type) boundary condition(s)
-  std::vector<std::string> dir_list;
-  dir_list.push_back("top_vol.vtp");
-  dir_list.push_back("bot_vol.vtp");
-  dir_list.push_back("lef_vol.vtp");
-  dir_list.push_back("rig_vol.vtp");
-  dir_list.push_back("fro_vol.vtp");
-  dir_list.push_back("bac_vol.vtp");
+  std::vector<std::string> dir_list { "top_vol.vtp", "bot_vol.vtp", "lef_vol.vtp", "rig_vol.vtp", "fro_vol.vtp", "bac_vol.vtp" };
 
-  INodalBC * nbc = new NodalBC_3D_vtp( dir_list, nFunc );
+  INodalBC * nbc = new NodalBC( dir_list, nFunc );
   
-  std::vector<INodalBC *> NBC_list;
-  NBC_list.clear();
-  NBC_list.push_back( nbc );
+  std::vector<INodalBC *> NBC_list { nbc };
 
   // Setup Elemental (Neumann type) boundary condition(s)
   std::vector<std::string> neu_list; neu_list.clear();

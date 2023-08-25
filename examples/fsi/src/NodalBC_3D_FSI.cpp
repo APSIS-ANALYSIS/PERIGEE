@@ -25,9 +25,9 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
       {
         if(ringBC_type == 0)
         {
-          dir_nodes = get_vtp_nodal_id( fluid_inlet_files );
-          VEC_T::insert_end( dir_nodes, get_vtp_nodal_id( solid_inlet_files ) );
-          VEC_T::insert_end( dir_nodes, get_vtp_nodal_id( solid_outlet_files ) );
+          dir_nodes = get_vtk_nodal_id( fluid_inlet_files );
+          VEC_T::insert_end( dir_nodes, get_vtk_nodal_id( solid_inlet_files ) );
+          VEC_T::insert_end( dir_nodes, get_vtk_nodal_id( solid_outlet_files ) );
           VEC_T::sort_unique_resize( dir_nodes );
 
           std::cout<<"===> NodalBC_3D_FSI for deformable wall (fsiBC_type = 0) with cap surface \n";
@@ -45,7 +45,7 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
       {
         dir_nodes = VEC_T::cast_to_unsigned_int( VTK_T::read_int_PointData( solid_file, "GlobalNodeID" ) );
 
-        VEC_T::insert_end( dir_nodes, get_vtp_nodal_id( fluid_inlet_files ) );
+        VEC_T::insert_end( dir_nodes, get_vtk_nodal_id( fluid_inlet_files ) );
 
         VEC_T::sort_unique_resize( dir_nodes );
 
@@ -63,8 +63,8 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
 
           dir_nodes = VEC_T::cast_to_unsigned_int( VEC_T::set_diff( f_node, fwall_node ) );
 
-          VEC_T::insert_end( dir_nodes, get_vtp_nodal_id( solid_inlet_files ) );
-          VEC_T::insert_end( dir_nodes, get_vtp_nodal_id( solid_outlet_files ) );
+          VEC_T::insert_end( dir_nodes, get_vtk_nodal_id( solid_inlet_files ) );
+          VEC_T::insert_end( dir_nodes, get_vtk_nodal_id( solid_outlet_files ) );
           VEC_T::sort_unique_resize( dir_nodes );
 
           std::cout<<"===> NodalBC_3D_FSI for wall prestressing (fsiBC_type = 2) with cap surface \n";
@@ -124,17 +124,15 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
   Create_ID( nFunc );
 }
 
-std::vector<unsigned int> NodalBC_3D_FSI::get_vtp_nodal_id( const std::vector<std::string> &vtpfileList ) const
+std::vector<unsigned int> NodalBC_3D_FSI::get_vtk_nodal_id( const std::vector<std::string> &vtkfileList ) const
 {
-  std::vector<unsigned int> output; output.clear();
+  std::vector<unsigned int> output {};
 
-  const unsigned int num_file = vtpfileList.size();
-
-  for(unsigned int ii=0; ii<num_file; ++ii)
+  for( const auto &vtkfile : vtkfileList )
   {
-    SYS_T::file_check( vtpfileList[ii] );
+    SYS_T::file_check( vtkfile );
 
-    VEC_T::insert_end( output, VEC_T::cast_to_unsigned_int( VTK_T::read_int_PointData( vtpfileList[ii], "GlobalNodeID" ) ) );
+    VEC_T::insert_end( output, VEC_T::cast_to_unsigned_int( VTK_T::read_int_PointData( vtkfile, "GlobalNodeID" ) ) );
   }
 
   return output;
