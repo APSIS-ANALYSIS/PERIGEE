@@ -420,7 +420,7 @@ int main( int argc, char * argv[] )
   std::vector<INodalBC *> meshBC_list( 3, nullptr );
 
   std::vector<std::string> meshdir_file_list { geo_s_file };
-  VEC_T::insert_end( meshdir_file_list, sur_f_file_out );
+  VEC_T::insert_end( meshdir_file_list, sur_f_file_in );
   VEC_T::insert_end( meshdir_file_list, sur_f_file_out );
 
   meshBC_list[0] = new NodalBC( meshdir_file_list, nFunc_v );
