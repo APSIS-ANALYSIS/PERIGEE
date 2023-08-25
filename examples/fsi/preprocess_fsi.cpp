@@ -14,8 +14,8 @@
 #include "Global_Part_Serial.hpp"
 #include "Global_Part_Reload.hpp"
 #include "Part_Tet_FSI.hpp"
+#include "NodalBC.hpp"
 #include "NodalBC_3D_FSI.hpp"
-#include "NodalBC_3D_vtu.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_tet_outflow.hpp"
 #include "NBC_Partition_MF.hpp"
@@ -419,12 +419,13 @@ int main( int argc, char * argv[] )
   std::cout<<"2. Nodal boundary condition for the mesh motion: \n";
   std::vector<INodalBC *> meshBC_list( 3, nullptr );
 
-  std::vector<std::string> meshdir_vtp_list = sur_f_file_in;
-  VEC_T::insert_end( meshdir_vtp_list, sur_f_file_out );
+  std::vector<std::string> meshdir_file_list { geo_s_file };
+  VEC_T::insert_end( meshdir_file_list, sur_f_file_out );
+  VEC_T::insert_end( meshdir_file_list, sur_f_file_out );
 
-  meshBC_list[0] = new NodalBC_3D_vtu( geo_s_file, meshdir_vtp_list, nFunc_v );
-  meshBC_list[1] = new NodalBC_3D_vtu( geo_s_file, meshdir_vtp_list, nFunc_v );
-  meshBC_list[2] = new NodalBC_3D_vtu( geo_s_file, meshdir_vtp_list, nFunc_v );
+  meshBC_list[0] = new NodalBC( meshdir_file_list, nFunc_v );
+  meshBC_list[1] = new NodalBC( meshdir_file_list, nFunc_v );
+  meshBC_list[2] = new NodalBC( meshdir_file_list, nFunc_v );
 
   // InflowBC info
   std::cout<<"3. Inflow cap surfaces: \n";
