@@ -26,9 +26,9 @@ int main( int argc, char * argv[] )
   SYS_T::execute("rm -rf preprocessor_cmd.h5");
 
   // Define basic problem settins
-  const int dofNum = 4; // degree-of-freedom for the physical problem
-  const int dofMat = 4; // degree-of-freedom in the matrix problem
-  const std::string part_file("part");
+  constexpr int dofNum = 4; // degree-of-freedom for the physical problem
+  constexpr int dofMat = 4; // degree-of-freedom in the matrix problem
+  constexpr std::string part_file("part");
   
   // Element options: 501 linear tets, 502 quadratic tets
   int elemType = 501;
