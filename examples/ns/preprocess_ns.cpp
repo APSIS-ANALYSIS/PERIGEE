@@ -28,7 +28,7 @@ int main( int argc, char * argv[] )
   // Define basic problem settins
   constexpr int dofNum = 4; // degree-of-freedom for the physical problem
   constexpr int dofMat = 4; // degree-of-freedom in the matrix problem
-  constexpr std::string part_file("part");
+  const std::string part_file("part");
   
   // Element options: 501 linear tets, 502 quadratic tets
   int elemType = 501;
