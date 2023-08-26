@@ -3,7 +3,7 @@
 // ============================================================================
 // SymmTensor4_3D.hpp
 //
-// This is a symmetric rank-4 tensor class. Here symmetric means both the major
+// This is a symmetric rank-4 tensor class. Here symmetry means both the major
 // and minor symmetry.
 // There are 6+5+...+1=21 entries in this object, which are stored in an array. 
 // The ordering follows the Voigt notation.
@@ -35,7 +35,7 @@
 //
 // ten[20] -> I=5, J=5 : 0101 0110 1001 1010
 //
-// Author: Ju Liu
+// Author: Chongran Zhao, Ju Liu
 // Date: Aug. 3rd 2023
 // ============================================================================
 #include "Tensor4_3D.hpp"
@@ -60,6 +60,11 @@ class SymmTensor4_3D
     double& operator()(const int &index) {return ten[index];}
 
     const double& operator()(const int &index) const {return ten[index];}
+
+    // Parenthesis operator: access through ii jj kk ll component index
+    double& operator()(const int &ii, const int &jj, const int &kk, const int &ll);
+
+    const double& operator()(const int &ii, const int &jj, const int &kk, const int &ll) const; 
 
     bool is_identical(const Tensor4_3D &source, const double &tol = 1.0e-12) const;
     
@@ -185,4 +190,5 @@ class SymmTensor4_3D
   private:
     double ten[21];
 };
+
 #endif
