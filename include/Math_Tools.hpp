@@ -17,10 +17,10 @@ namespace MATH_T
   // Useful Constants:
   // --------------------------------------------------------------------------
   // PI = 3.1415926
-  const double PI = atan(1.0) * 4.0;
+  constexpr double PI = atan(1.0) * 4.0;
 
   // E = 2.71828
-  const double E  = exp(1.0);
+  constexpr double E  = exp(1.0);
 
   // Compute the binomial coefficient, e.g.
   // n = 0 : 1                  n = 1 : 1 1
