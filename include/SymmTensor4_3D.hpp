@@ -106,6 +106,20 @@ class SymmTensor4_3D
     void gen_symm_id();
 
     // ------------------------------------------------------------------------
+    // Generate devaitoric projector
+    // P_dev = Id4 - id2 corss id2 = delta_ik delta_jl - 1/3 delta_ij delta_kl
+    // Holzapfel book, p. 24.
+    // ------------------------------------------------------------------------
+    void gen_proj_dev();
+
+    // ------------------------------------------------------------------------
+    // Generate Projector Ptilde = invC O invC - 1/3 invC x invC
+    // invC is assumed to be the right Cauchy-Green tensor
+    // see Holzapfel book p. 255, eqn. (6.170).
+    // ------------------------------------------------------------------------
+    void gen_Ptilde( const Matrix_3x3 &invC );
+
+    // ------------------------------------------------------------------------
     // add an outer product with scaling factor:
     //            ten_ijkl += val * mmat_ij  * mmat_kl
     // This is often used in the evaluation of the stiffness tensor.
