@@ -9,7 +9,6 @@
 // Author: Ju Liu
 // Date: Aug. 27 2023
 // ----------------------------------------------------------------------------
-#include <initializer_list>
 #include <vector>
 #include <string>
 
