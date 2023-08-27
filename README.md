@@ -22,7 +22,7 @@ export LD_LIBRARY_PATH=/Users/juliu/lib/VTK-8.2.0/lib:$LD_LIBRARY_PATH
 ```
 For more information on this environmental variable, see [here](http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html).
 
-2. After installing the libraries, add or modify the configuration file `system_lib_loading.cmake` in the [conf](conf) folder. You may find a file called `system_lib_loading_example.cmake`, which is an example that gives complete system loading information. In this file, you will have to specify the paths for the external libraries,
+2. After the libraries are installed, add a configuration file named as `system_lib_loading.cmake` in the [conf](conf) folder. You may find a file called `system_lib_loading_example.cmake`, which is an example. In this file, you will have to specify the paths for the external libraries,
 
  - Set `VTK_DIR` to the VTK library location (e.g. `/home/jliu/lib/VTK-7.1.1-shared`).
  - Set `PETSC_DIR` to the PETSc library location (e.g. `/home/jliu/lib/petsc-3.11.3`).
@@ -32,7 +32,7 @@ For more information on this environmental variable, see [here](http://tldp.org/
  - Set `CMAKE_C_COMPILER` to `$PETSC_DIR/$PETSC_ARCH/bin/mpicc`
  - Set `CMAKE_CXX_COMPILER` to `$PETSC_DIR/$PETSC_ARCH/bin/mpicxx`
 
-After the editing, save the CMake file and rename it as `system_lib_loading.cmake`. And you have your own configuration file set up. Notice that we have the file name `system_lib_loading.cmake` added in .gitignore, meaning that git will not track this file. You may want to keep a copy of this file out of PERIGEE, because when you switch to other branches, PERIGEE may not keep a copy of this file. 
+After the edit, save the CMake file and rename it as `system_lib_loading.cmake`, and you have your own configuration file set up. Notice that we have the file name `system_lib_loading.cmake` added in .gitignore, meaning that git will not track this file. You may want to keep a copy of this file out of PERIGEE, because when you switch to other branches, PERIGEE may not keep a copy of this file. 
 
 ## Build
 First, create a folder `build` out of the source directory. Enter that folder, and run the following commands to build, as an example, a suite of heat equation solvers.
