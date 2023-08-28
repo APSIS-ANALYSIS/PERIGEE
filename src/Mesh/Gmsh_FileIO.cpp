@@ -608,7 +608,7 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
       const int node2 = trien_global[3*ff+2];
       bool gotit = false;
       int ee = -1;
-      while( !gotit && ee < int(gelem.size()) - 1 )
+      while( !gotit && ee < VEC_T::get_size(gelem) - 1 )
       {
         ee += 1;
         const int vol_elem = gelem[ee];
