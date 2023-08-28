@@ -118,7 +118,7 @@ class SymmTensor4_3D
     // invC is assumed to be the right Cauchy-Green tensor
     // see Holzapfel book p. 255, eqn. (6.170).
     // ------------------------------------------------------------------------
-    void gen_Ptilde( const Matrix_3x3 &invC );
+    void gen_Ptilde( const SymmMatrix_3x3 &invC );
 
     // ------------------------------------------------------------------------
     // add an outer product with scaling factor:
