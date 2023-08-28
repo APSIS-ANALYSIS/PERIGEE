@@ -27,6 +27,9 @@ int main(int argc, char *argv[])
   VEC_T::print(mm[0].get_data());
 
   std::cout<<mm[0].get_name()<<std::endl;
+  
+  std::cout<<mm[0]<<std::endl;
+  
   return EXIT_SUCCESS;
 }
 

@@ -11,6 +11,7 @@
 // ----------------------------------------------------------------------------
 #include <vector>
 #include <string>
+#include <iostream>
 
 template <typename T>
 class DataVecStr
@@ -35,6 +36,13 @@ class DataVecStr
     std::vector<T> get_data() const {return data;}
 
     std::string get_name() const {return name;}
+
+    friend std::ostream& operator<< (std::ostream& out, const DataVecStr<T>& val)
+    {
+      out<<val.name<<'\t';
+      for( auto it = val.data.begin(); it != val.data.end(); ++it ) out<<*it<<'\t';
+      return out;
+    }
 
   private:
     std::vector<T> data;
