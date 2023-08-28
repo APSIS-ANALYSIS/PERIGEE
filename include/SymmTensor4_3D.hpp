@@ -39,6 +39,7 @@
 // Date: Aug. 3rd 2023
 // ============================================================================
 #include "Tensor4_3D.hpp"
+#include "SymmMatrix_3x3.hpp"
 
 class SymmTensor4_3D
 {
