@@ -593,7 +593,8 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
       {
         ee += 1;
         const int vol_elem = gelem[ee];
-        int vnode[4] { vol_IEN[4*vol_elem], vol_IEN[4*vol_elem+1], vol_IEN[4*vol_elem+2], vol_IEN[4*vol_elem+3] };
+        int vnode[4] { vol_IEN[4*vol_elem]  , vol_IEN[4*vol_elem+1],
+                       vol_IEN[4*vol_elem+2], vol_IEN[4*vol_elem+3] };
         std::sort(vnode, vnode+4);
 
         const bool got0 = ( std::find(vnode, vnode+4, node0) != vnode+4 );
@@ -1338,20 +1339,20 @@ void Gmsh_FileIO::update_quadratic_tet_IEN( const int &index_3d )
 void Gmsh_FileIO::write_quadratic_sur_vtu( const int &index_sur,
     const int &index_vol, const bool &isf2e ) const
 {
-  SYS_T::print_fatal_if( index_sur >= num_phy_domain_2d || index_sur < 0,
+  SYS_T::print_exit_if( index_sur >= num_phy_domain_2d || index_sur < 0,
       "Error: Gmsh_FileIO::write_vtp, surface index is wrong. \n");
 
-  SYS_T::print_fatal_if( index_vol >= num_phy_domain_3d || index_vol < 0,
+  SYS_T::print_exit_if( index_vol >= num_phy_domain_3d || index_vol < 0,
       "Error: Gmsh_FileIO::write_vtp, volume index is wrong. \n");
 
   const int phy_index_sur = phy_2d_index[index_sur];
   const int phy_index_vol = phy_3d_index[index_vol];
-  const int bcnumcl = phy_2d_nElem[index_sur];
-  const int numcel = phy_3d_nElem[index_vol];
 
-  SYS_T::print_fatal_if( ele_nlocbas[phy_index_sur] != 6, "Error: Gmsh_FileIO write_quadratic_sur_vtu only works for 6-node triangle surface mesh.\n");
+  SYS_T::print_exit_if( ele_nlocbas[phy_index_sur] != 6,
+      "Error: Gmsh_FileIO write_quadratic_sur_vtu only works for 6-node triangle surface mesh.\n");
 
-  SYS_T::print_fatal_if( ele_nlocbas[phy_index_vol] != 10, "Error: Gmsh_FileIO write_quadratic_sur_vtu only works for 10-node tetrahedral volumetric mesh.\n");
+  SYS_T::print_exit_if( ele_nlocbas[phy_index_vol] != 10,
+      "Error: Gmsh_FileIO write_quadratic_sur_vtu only works for 10-node tetrahedral volumetric mesh.\n");
 
   std::cout<<"=== Gmsh_FileIO::write_quadratuc_sur_vtu for "
     <<phy_2d_name[index_sur]
@@ -1376,18 +1377,19 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const int &index_sur,
 
   // global node index
   std::vector<int> bcpt( trien_global );
+  const int bcnumcl = phy_2d_nElem[index_sur];
 
   SYS_T::print_fatal_if( int(trien_global.size() ) != 6 * bcnumcl,
       "Error: Gmsh_FileIO::write_quadratic_sur_vtu, sur IEN size wrong. \n" );
 
   VEC_T::sort_unique_resize( bcpt ); // unique ascending order nodes
 
-  const int bcnumpt = static_cast<int>( bcpt.size() );
+  const int bcnumpt = VEC_T::get_size( bcpt );
 
   std::cout<<"      num of bc pt = "<<bcnumpt<<'\n';
 
   // tript stores the coordinates of the boundary points
-  std::vector<double> tript; tript.clear(); tript.resize(3*bcnumpt);
+  std::vector<double> tript( 3*bcnumpt, 0.0 );
   for( int ii=0; ii<bcnumpt; ++ii )
   {
     tript[ii*3]   = node[bcpt[ii]*3] ;
@@ -1402,11 +1404,12 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const int &index_sur,
 
   // Volume mesh IEN
   std::vector<int> vol_IEN( eIEN[phy_index_vol] );
+  const int numcel = phy_3d_nElem[index_vol];
 
-  SYS_T::print_fatal_if( int( vol_IEN.size() ) != 10 * numcel,
+  SYS_T::print_exit_if( int( vol_IEN.size() ) != 10 * numcel,
       "Error: Gmsh_FileIO::write_quadratic_sur_vtu, vol IEN size wrong. \n");
 
-  std::vector<int> gelem; gelem.clear();
+  std::vector<int> gelem;
   for( int ee=0; ee<numcel; ++ee )
   {
     int total = 0;
@@ -1420,54 +1423,39 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const int &index_sur,
   std::cout<<"      "<<gelem.size()<<" tets have faces over the surface. \n";
 
   // generate local triangle IEN array
-  std::vector<int> trien; trien.clear();
+  std::vector<int> trien;
   for(int ee=0; ee<bcnumcl; ++ee)
-  {
-    auto it = find(bcpt.begin(), bcpt.end(), trien_global[6*ee]);
-    trien.push_back( it - bcpt.begin() );
-
-    it = find(bcpt.begin(), bcpt.end(), trien_global[6*ee+1]);
-    trien.push_back( it - bcpt.begin() );
-
-    it = find(bcpt.begin(), bcpt.end(), trien_global[6*ee+2]);
-    trien.push_back( it - bcpt.begin() );
-
-    it = find(bcpt.begin(), bcpt.end(), trien_global[6*ee+3]);
-    trien.push_back( it - bcpt.begin() );
-
-    it = find(bcpt.begin(), bcpt.end(), trien_global[6*ee+4]);
-    trien.push_back( it - bcpt.begin() );
-
-    it = find(bcpt.begin(), bcpt.end(), trien_global[6*ee+5]);
-    trien.push_back( it - bcpt.begin() );
+  { 
+    trien.push_back( VEC_T::get_pos(bcpt, trien_global[6*ee  ]));
+    trien.push_back( VEC_T::get_pos(bcpt, trien_global[6*ee+1]));
+    trien.push_back( VEC_T::get_pos(bcpt, trien_global[6*ee+2]));
+    trien.push_back( VEC_T::get_pos(bcpt, trien_global[6*ee+3]));
+    trien.push_back( VEC_T::get_pos(bcpt, trien_global[6*ee+4]));
+    trien.push_back( VEC_T::get_pos(bcpt, trien_global[6*ee+5]));
   }
   std::cout<<"      triangle IEN generated. \n"; 
 
-  std::vector<int> face2elem; face2elem.resize( bcnumcl, -1 );
+  std::vector<int> face2elem( bcnumcl, -1 );
   if( isf2e )
   {
-    int vnode[4];
-    bool got0, got1, got2, gotit;
     for(int ff=0; ff<bcnumcl; ++ff)
     {
       const int node0 = trien_global[6*ff];
       const int node1 = trien_global[6*ff+1];
       const int node2 = trien_global[6*ff+2];
-      gotit = false;
+      bool gotit = false;
       int ee = -1;
       while( !gotit && ee < int(gelem.size()) - 1 )
       {
         ee += 1;
         const int vol_elem = gelem[ee];
-        vnode[0] = vol_IEN[10*vol_elem];
-        vnode[1] = vol_IEN[10*vol_elem+1];
-        vnode[2] = vol_IEN[10*vol_elem+2];
-        vnode[3] = vol_IEN[10*vol_elem+3];
+        int vnode[4] { vol_IEN[10*vol_elem]  , vol_IEN[10*vol_elem+1],
+                       vol_IEN[10*vol_elem+2], vol_IEN[10*vol_elem+3]};
         std::sort(vnode, vnode+4);
 
-        got0 = ( std::find(vnode, vnode+4, node0) != vnode+4 );
-        got1 = ( std::find(vnode, vnode+4, node1) != vnode+4 );
-        got2 = ( std::find(vnode, vnode+4, node2) != vnode+4 );
+        const bool got0 = ( std::find(vnode, vnode+4, node0) != vnode+4 );
+        const bool got1 = ( std::find(vnode, vnode+4, node1) != vnode+4 );
+        const bool got2 = ( std::find(vnode, vnode+4, node2) != vnode+4 );
         gotit = got0 && got1 && got2;
       }
 
