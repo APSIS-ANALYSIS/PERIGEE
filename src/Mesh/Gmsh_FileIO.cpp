@@ -507,10 +507,10 @@ void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
 void Gmsh_FileIO::write_vtp(const int &index_sur, 
     const int &index_vol, const bool &isf2e ) const
 {
-  SYS_T::print_fatal_if( index_sur >= num_phy_domain_2d || index_sur < 0,
+  SYS_T::print_exit_if( index_sur >= num_phy_domain_2d || index_sur < 0,
       "Error: Gmsh_FileIO::write_vtp, surface index is wrong. \n");
 
-  SYS_T::print_fatal_if( index_vol >= num_phy_domain_3d || index_vol < 0,
+  SYS_T::print_exit_if( index_vol >= num_phy_domain_3d || index_vol < 0,
       "Error: Gmsh_FileIO::write_vtp, volume index is wrong. \n");
 
   const int phy_index_sur = phy_2d_index[index_sur];
@@ -529,10 +529,12 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
 
   SYS_T::Timer * mytimer = new SYS_T::Timer();
 
+  // Generate a file name to be writen for this vtp file
   std::string vtp_file_name(phy_2d_name[index_sur]);
   vtp_file_name += "_";
   vtp_file_name += phy_3d_name[index_vol];
   std::cout<<"-----> write "<<vtp_file_name<<".vtp \n";
+
   mytimer->Reset();
   mytimer->Start();
 
@@ -543,23 +545,23 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
   // bcpt stores the global node index
   std::vector<int> bcpt( trien_global );
 
-  SYS_T::print_fatal_if( int(trien_global.size() ) != 3 * bcnumcl,
+  SYS_T::print_exit_if( VEC_T::get_size(trien_global) != 3 * bcnumcl,
       "Error: Gmsh_FileIO::write_vtp, sur IEN size wrong. \n" );
 
   // obtain the volumetric mesh IEN array
   std::vector<int> vol_IEN( eIEN[phy_index_vol] );
 
-  SYS_T::print_fatal_if( int( vol_IEN.size() ) != 4 * numcel,
+  SYS_T::print_exit_if( VEC_T::get_size(vol_IEN) != 4 * numcel,
       "Error: Gmsh_FileIO::write_vtp, vol IEN size wrong. \n");
 
-  VEC_T::sort_unique_resize( bcpt ); // unique ascending order nodes
+  VEC_T::sort_unique_resize( bcpt ); // unique ascending order nodal id
 
-  const int bcnumpt = static_cast<int>( bcpt.size() );
+  const int bcnumpt = VEC_T::get_size( bcpt );
 
   std::cout<<"      num of bc pt = "<<bcnumpt<<'\n';
 
   // tript stores the coordinates of the boundary points
-  std::vector<double> tript; tript.clear(); tript.resize(3*bcnumpt);
+  std::vector<double> tript(3*bcnumpt, 0.0);
   for( int ii=0; ii<bcnumpt; ++ii )
   {
     tript[ii*3]   = node[bcpt[ii]*3] ;
@@ -567,42 +569,13 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
     tript[ii*3+2] = node[bcpt[ii]*3+2] ;
   }
 
-  // generate a mapper that maps the bc node to 1, other node to 0
-  bool * bcmap = new bool [num_node];
-  for(int ii=0; ii<num_node; ++ii) bcmap[ii] = 0;
-  for(int ii=0; ii<bcnumpt; ++ii) bcmap[bcpt[ii]] = 1;
-
-  std::vector<int> gelem; gelem.clear();
-  for( int ee=0; ee<numcel; ++ee )
-  {
-    int total = 0;
-    total += bcmap[ vol_IEN[4*ee] ];
-    total += bcmap[ vol_IEN[4*ee+1] ];
-    total += bcmap[ vol_IEN[4*ee+2] ];
-    total += bcmap[ vol_IEN[4*ee+3] ];
-    if(total >= 3) gelem.push_back(ee);
-  }
-  delete [] bcmap; bcmap = nullptr;
-  std::cout<<"      "<<gelem.size()<<" tets have faces over the surface. \n";
-
   // generate the local triangle IEN array
-  std::vector<int> trien; trien.clear();
-  int node0, node1, node2;
-  std::vector<int>::iterator it;
+  std::vector<int> trien {};
   for(int ee=0; ee<bcnumcl; ++ee)
   {
-    node0 = trien_global[3*ee];
-    node1 = trien_global[3*ee+1];
-    node2 = trien_global[3*ee+2];
-
-    it = find(bcpt.begin(), bcpt.end(), node0);
-    trien.push_back( it - bcpt.begin() );
-
-    it = find(bcpt.begin(), bcpt.end(), node1);
-    trien.push_back( it - bcpt.begin() );
-
-    it = find(bcpt.begin(), bcpt.end(), node2);
-    trien.push_back( it - bcpt.begin() );
+    trien.push_back( VEC_T::get_pos(bcpt, trien_global[3*ee]) );
+    trien.push_back( VEC_T::get_pos(bcpt, trien_global[3*ee+1]) );
+    trien.push_back( VEC_T::get_pos(bcpt, trien_global[3*ee+2]) );
   }
   std::cout<<"      triangle IEN generated. \n";
 
@@ -613,29 +586,42 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
   std::vector<int> face2elem; face2elem.resize( bcnumcl, -1 );
   if( isf2e )
   {
-    int vol_elem;
-    int vnode[4];
-    bool got0, got1, got2, gotit;
+    // generate a mapper that maps the bc node to 1, other node to 0
+    bool * bcmap = new bool [num_node];
+    for(int ii=0; ii<num_node; ++ii) bcmap[ii] = 0;
+    for(int ii=0; ii<bcnumpt; ++ii) bcmap[bcpt[ii]] = 1;
+
+    // use the bcmap to obtain the vol element that has its face on this surface
+    std::vector<int> gelem {};
+    for( int ee=0; ee<numcel; ++ee )
+    {
+      int total = 0;
+      total += bcmap[ vol_IEN[4*ee] ];
+      total += bcmap[ vol_IEN[4*ee+1] ];
+      total += bcmap[ vol_IEN[4*ee+2] ];
+      total += bcmap[ vol_IEN[4*ee+3] ];
+      if(total >= 3) gelem.push_back(ee);
+    }
+    delete [] bcmap; bcmap = nullptr;
+    std::cout<<"      "<<gelem.size()<<" tets have faces over the surface. \n";
+
     for(int ff=0; ff<bcnumcl; ++ff)
     {
-      node0 = trien_global[3*ff];
-      node1 = trien_global[3*ff+1];
-      node2 = trien_global[3*ff+2];
-      gotit = false;
+      const int node0 = trien_global[3*ff];
+      const int node1 = trien_global[3*ff+1];
+      const int node2 = trien_global[3*ff+2];
+      bool gotit = false;
       int ee = -1;
       while( !gotit && ee < int(gelem.size()) - 1 )
       {
         ee += 1;
-        vol_elem = gelem[ee];
-        vnode[0] = vol_IEN[4*vol_elem];
-        vnode[1] = vol_IEN[4*vol_elem+1];
-        vnode[2] = vol_IEN[4*vol_elem+2];
-        vnode[3] = vol_IEN[4*vol_elem+3];
+        const int vol_elem = gelem[ee];
+        const int vnode[4] { vol_IEN[4*vol_elem], vol_IEN[4*vol_elem+1], vol_IEN[4*vol_elem+2], vol_IEN[4*vol_elem+3] }
         std::sort(vnode, vnode+4);
 
-        got0 = ( std::find(vnode, vnode+4, node0) != vnode+4 );
-        got1 = ( std::find(vnode, vnode+4, node1) != vnode+4 );
-        got2 = ( std::find(vnode, vnode+4, node2) != vnode+4 );
+        const bool got0 = ( std::find(vnode, vnode+4, node0) != vnode+4 );
+        const bool got1 = ( std::find(vnode, vnode+4, node1) != vnode+4 );
+        const bool got2 = ( std::find(vnode, vnode+4, node2) != vnode+4 );
         gotit = got0 && got1 && got2;
       }
 
@@ -648,7 +634,7 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
     }
     std::cout<<"      face2elem mapping generated. \n";
   }
-  
+
   // Write the mesh file in vtp format
   TET_T::write_triangle_grid( vtp_file_name, bcnumpt, bcnumcl,
       tript, trien, bcpt, face2elem );
@@ -684,7 +670,7 @@ void Gmsh_FileIO::write_each_vtu() const
     // generate physics tag
     std::vector<int> ptag; ptag.clear();
     ptag.assign(phy_3d_nElem[ii], ii);
-    
+
     // collect the FSI indices of the sub-domain nodes
     std::vector<int> local_node_idx = eIEN[ domain_index ];
     VEC_T::sort_unique_resize( local_node_idx );
@@ -700,7 +686,7 @@ void Gmsh_FileIO::write_each_vtu() const
       local_coor[ 3*jj+1 ] = node[ 3*local_node_idx[jj] + 1 ];
       local_coor[ 3*jj+2 ] = node[ 3*local_node_idx[jj] + 2 ];
     }
-    
+
     // generate a local IEN
     std::vector<int> domain_IEN;
     const int nloc = ele_nlocbas[domain_index];
@@ -782,7 +768,7 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
 
 
 void Gmsh_FileIO::check_FSI_ordering( const std::string &phy1,
-   const std::string &phy2 ) const
+    const std::string &phy2 ) const
 {
   SYS_T::print_fatal_if( num_phy_domain_3d != 2, "Error: Gmsh_FileIO FSI mesh should contain only 2 physical domains.\n");
 
@@ -805,7 +791,7 @@ void Gmsh_FileIO::write_tri_h5( const int &index_2d,
 
   for(unsigned int ii=0; ii<num_1d_edge; ++ii)
     SYS_T::print_fatal_if( index_1d[ii] >= num_phy_domain_1d || index_1d[ii] < 0,
-              "Error: Gmsh_FileIO::write_2d_h5, edge index is wrong. \n");
+        "Error: Gmsh_FileIO::write_2d_h5, edge index is wrong. \n");
 
   // Open an HDF5 file
   std::string h5_file_name( "Gmsh_" );
@@ -821,7 +807,7 @@ void Gmsh_FileIO::write_tri_h5( const int &index_2d,
 
   hid_t file_id = H5Fcreate(h5_file_name.c_str(), 
       H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-  
+
   HDF5_Writer * h5w = new HDF5_Writer( file_id );
 
   // Write 2D domain first
@@ -847,23 +833,23 @@ void Gmsh_FileIO::write_tri_h5( const int &index_2d,
   for(unsigned int ii=0; ii<num_1d_edge; ++ii)
   {
     const int domain_1d_idx = phy_1d_index[ index_1d[ii] ];
-    
+
     std::cout<<"-----> write /"<<phy_1d_name[ index_1d[ii] ]<<'\n';
-    
+
     const int nLocBas_1d = ele_nlocbas[domain_1d_idx];
 
     const int num_1d_cell = phy_1d_nElem[ index_1d[ii] ];
 
     std::vector<int> edge_ien_global( eIEN[domain_1d_idx] );
-    
+
     std::vector<int> bcpt( edge_ien_global ); 
 
     VEC_T::sort_unique_resize( bcpt );
-    
+
     const int bcnumpt = static_cast<int>( bcpt.size() );
-    
+
     std::cout<<"      num of bc pt = "<<bcnumpt<<'\n';    
-   
+
     // tript stores the coordinates of the boundary points 
     std::vector<double> tript; tript.clear(); tript.resize(3*bcnumpt);
     for( int jj=0; jj<bcnumpt; ++jj )
@@ -998,7 +984,7 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
       H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
   HDF5_Writer * h5w = new HDF5_Writer( file_id );
-  
+
   // Write the 3D domain at the root
   const std::string slash("/");
   const int domain_3d_idx = phy_3d_index[index_3d];
@@ -1006,7 +992,7 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
 
   const int num_3d_cell = phy_3d_nElem[index_3d];
   const int nLocBas_3d  = ele_nlocbas[ domain_3d_idx ];
-  
+
   h5w->write_intScalar(file_id, "num_face", num_2d_face);
   h5w->write_intScalar(file_id, "num_node", num_node);
   h5w->write_intScalar(file_id, "num_cell", num_3d_cell);
@@ -1022,17 +1008,17 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
   for(unsigned int ii=0; ii<num_2d_face; ++ii)
   {
     std::cout<<"-----> write /"<<phy_2d_name[ index_2d[ii] ]<<'\n';
-    
+
     const int domain_2d_idx = phy_2d_index[ index_2d[ii] ];
     const int nLocBas_2d = ele_nlocbas[ domain_2d_idx ];
     const int num_2d_cell = phy_2d_nElem[ index_2d[ii] ];
-    
+
     std::vector<int> face_ien_global( eIEN[domain_2d_idx] );
     std::vector<int> bcpt( face_ien_global );
     VEC_T::sort_unique_resize(bcpt);
     const int bcnumpt = static_cast<int>( bcpt.size() );
     std::cout<<"      num of bc pt = "<<bcnumpt<<'\n';
-    
+
     // tript stores the coordinates of the boundary points
     std::vector<double> tript; tript.clear(); tript.resize(3*bcnumpt);
     for( int jj=0; jj<bcnumpt; ++jj )
@@ -1041,7 +1027,7 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
       tript[jj*3+1] = node[bcpt[jj]*3+1];
       tript[jj*3+2] = node[bcpt[jj]*3+2];
     }
-    
+
     // Generate a mapper that maps the bc node to 1; other node to 0
     bool * bcmap = new bool [num_node];
     for(int jj=0; jj<num_node; ++jj) bcmap[jj] = 0;
@@ -1059,7 +1045,7 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
     }
     delete [] bcmap; bcmap = nullptr;
     std::cout<<"      "<<gelem.size()<<" elems have face over the boundary.\n";
-    
+
     // Generate the local face element IEN array
     std::vector<int> face_ien_local; face_ien_local.clear();
     for(int ee=0; ee<num_2d_cell; ++ee)
@@ -1072,7 +1058,7 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
       }
     }
     std::cout<<"      edge IEN generated. \n";
-     
+
     // Loacate the volumetric element that the face element belongs to 
     std::vector<int> face2elem; face2elem.resize(num_2d_cell, -1);
     int vol_elem, node0, node1, node2;
@@ -1094,7 +1080,7 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
         vnode[2] = eIEN[domain_3d_idx][nLocBas_3d * vol_elem + 2];
         vnode[3] = eIEN[domain_3d_idx][nLocBas_3d * vol_elem + 3];
         std::sort(vnode, vnode+4);
-        
+
         got0 = ( std::find(vnode, vnode+4, node0) != vnode+4 );
         got1 = ( std::find(vnode, vnode+4, node1) != vnode+4 );
         got2 = ( std::find(vnode, vnode+4, node2) != vnode+4 );
@@ -1111,7 +1097,7 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
     std::string name_2d_domain(slash);
     name_2d_domain.append( std::to_string( static_cast<int>(ii) ) );
     hid_t g_id = H5Gcreate( file_id, name_2d_domain.c_str(),
-                H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+        H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 
     h5w->write_string(g_id, "name", phy_2d_name[ index_2d[ii] ] );
     h5w->write_intScalar(g_id, "phy_tag", index_2d[ii]);
@@ -1164,7 +1150,7 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
       H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
   HDF5_Writer * h5w = new HDF5_Writer( file_id );
-  
+
   // Write the 3D domain at the root
   const std::string slash("/");
   const int domain_3d_idx = phy_3d_index[index_3d];
@@ -1172,7 +1158,7 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
 
   const int num_3d_cell = phy_3d_nElem[index_3d];
   const int nLocBas_3d  = ele_nlocbas[ domain_3d_idx ];
-  
+
   h5w->write_intScalar(file_id, "num_face", num_2d_face);
   h5w->write_intScalar(file_id, "num_node", num_node);
   h5w->write_intScalar(file_id, "num_cell", num_3d_cell);
@@ -1188,17 +1174,17 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
   for(unsigned int ii=0; ii<num_2d_face; ++ii)
   {
     std::cout<<"-----> write /"<<phy_2d_name[ index_2d[ii] ]<<'\n';
-    
+
     const int domain_2d_idx = phy_2d_index[ index_2d[ii] ];
     const int nLocBas_2d = ele_nlocbas[ domain_2d_idx ];
     const int num_2d_cell = phy_2d_nElem[ index_2d[ii] ];
-    
+
     std::vector<int> face_ien_global( eIEN[domain_2d_idx] );
     std::vector<int> bcpt( face_ien_global );
     VEC_T::sort_unique_resize(bcpt);
     const int bcnumpt = static_cast<int>( bcpt.size() );
     std::cout<<"      num of bc pt = "<<bcnumpt<<'\n';
-    
+
     // tript stores the coordinates of the boundary points
     std::vector<double> tript; tript.clear(); tript.resize(3*bcnumpt);
     for( int jj=0; jj<bcnumpt; ++jj )
@@ -1207,7 +1193,7 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
       tript[jj*3+1] = node[bcpt[jj]*3+1];
       tript[jj*3+2] = node[bcpt[jj]*3+2];
     }
-    
+
     // Generate a mapper that maps the bc node to 1; other node to 0
     bool * bcmap = new bool [num_node];
     for(int jj=0; jj<num_node; ++jj) bcmap[jj] = 0;
@@ -1225,7 +1211,7 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
     }
     delete [] bcmap; bcmap = nullptr;
     std::cout<<"      "<<gelem.size()<<" elems have face over the boundary.\n";
-    
+
     // Generate the local face element IEN array
     std::vector<int> face_ien_local; face_ien_local.clear();
     for(int ee=0; ee<num_2d_cell; ++ee)
@@ -1238,7 +1224,7 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
       }
     }
     std::cout<<"      edge IEN generated. \n";
-     
+
     // Loacate the volumetric element that the face element belongs to 
     std::vector<int> face2elem; face2elem.resize(num_2d_cell, -1);
     if( VEC_T::is_invec( index_2d_need_facemap, index_2d[ii] ) )
@@ -1311,7 +1297,7 @@ void Gmsh_FileIO::update_FSI_nodal_ordering()
 
   std::vector<int> snode = eIEN[ phy_3d_index[1] ];
   VEC_T::sort_unique_resize(snode);
- 
+
   // append the node unique in the solid domain after the fluid node to generate
   // a new2old mapping 
   for( const int ii : snode )
@@ -1336,7 +1322,7 @@ void Gmsh_FileIO::update_FSI_nodal_ordering()
 
   // Now update the nodal x-y-z coordinates
   std::vector<double> temp; // temporary xyz coordinates based on new indices
-  
+
   temp.resize( 3 * num_node );
 
   for( int ii=0; ii<num_node; ++ii )
@@ -1372,7 +1358,7 @@ void Gmsh_FileIO::update_quadratic_tet_IEN( const int &index_3d )
   const int nlocbas = ele_nlocbas[ domain_index ];
 
   SYS_T::print_fatal_if(nlocbas != 10, "Error: Gmsh_FileIO updata_quadratic_tet_IEN only works for 10-node quadratic element. \n");
-  
+
   std::cout<<"=== Gmsh_FileIO::update_quadratic_tet_IEN for "<<phy_3d_name[index_3d]<<std::endl;;
 
   // Now upateing the eIEN array
@@ -1400,7 +1386,7 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const int &index_sur,
   const int numcel = phy_3d_nElem[index_vol];
 
   SYS_T::print_fatal_if( ele_nlocbas[phy_index_sur] != 6, "Error: Gmsh_FileIO write_quadratic_sur_vtu only works for 6-node triangle surface mesh.\n");
-  
+
   SYS_T::print_fatal_if( ele_nlocbas[phy_index_vol] != 10, "Error: Gmsh_FileIO write_quadratic_sur_vtu only works for 10-node tetrahedral volumetric mesh.\n");
 
   std::cout<<"=== Gmsh_FileIO::write_quadratuc_sur_vtu for "
@@ -1418,12 +1404,12 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const int &index_sur,
   vtu_file_name += "_";
   vtu_file_name += phy_3d_name[index_vol];
   std::cout<<"-----> write "<<vtu_file_name<<".vtu \n";
-  
+
   mytimer->Reset(); mytimer->Start();
 
   // triangle mesh ien copied from eIEN
   std::vector<int> trien_global( eIEN[phy_index_sur] );
-  
+
   // global node index
   std::vector<int> bcpt( trien_global );
 
@@ -1431,7 +1417,7 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const int &index_sur,
       "Error: Gmsh_FileIO::write_quadratic_sur_vtu, sur IEN size wrong. \n" );
 
   VEC_T::sort_unique_resize( bcpt ); // unique ascending order nodes
- 
+
   const int bcnumpt = static_cast<int>( bcpt.size() );
 
   std::cout<<"      num of bc pt = "<<bcnumpt<<'\n';
@@ -1481,7 +1467,7 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const int &index_sur,
 
     it = find(bcpt.begin(), bcpt.end(), trien_global[6*ee+2]);
     trien.push_back( it - bcpt.begin() );
-    
+
     it = find(bcpt.begin(), bcpt.end(), trien_global[6*ee+3]);
     trien.push_back( it - bcpt.begin() );
 
