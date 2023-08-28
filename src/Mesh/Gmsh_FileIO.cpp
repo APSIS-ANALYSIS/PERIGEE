@@ -705,9 +705,7 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
 
   // Prepare for the whole mesh's IEN, and physical tag
   std::vector<int> wIEN; // whole mesh IEN
-  wIEN.clear();
   std::vector<int> wtag; // whole vol mehs phys tag
-  wtag.clear();
   int wnElem = 0; // whole mesh number of elements
 
   // whole mesh num of node is assumed to be num_node 
@@ -741,13 +739,13 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
 void Gmsh_FileIO::check_FSI_ordering( const std::string &phy1,
     const std::string &phy2 ) const
 {
-  SYS_T::print_fatal_if( num_phy_domain_3d != 2, "Error: Gmsh_FileIO FSI mesh should contain only 2 physical domains.\n");
+  SYS_T::print_exit_if( num_phy_domain_3d != 2, "Error: Gmsh_FileIO FSI mesh should contain only 2 physical domains.\n");
 
   const std::string name0 = phy_3d_name[ 0 ];
   const std::string name1 = phy_3d_name[ 1 ];
 
-  SYS_T::print_fatal_if( name0.compare(phy1), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 0 should be fluid domain.\n" );
-  SYS_T::print_fatal_if( name1.compare(phy2), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 1 should be solid domain.\n" );
+  SYS_T::print_exit_if( name0.compare(phy1), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 0 should be fluid domain.\n" );
+  SYS_T::print_exit_if( name1.compare(phy2), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 1 should be solid domain.\n" );
 }
 
 void Gmsh_FileIO::write_tri_h5( const int &index_2d, 
