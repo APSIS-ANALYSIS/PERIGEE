@@ -1268,27 +1268,27 @@ void Gmsh_FileIO::update_FSI_nodal_ordering()
   for( const int ii : snode )
   {
     // if solid node is NOT in the fluid node, append it
-    if( !VEC_T::is_invec(new2old, ii) ) new2old.push_back( ii );
+    if( !VEC_T::is_invec(new2old, ii) )
+      new2old.push_back( ii );
   }
 
   // Now clean the snode vector to save memory
   VEC_T::clean( snode );
 
-  SYS_T::print_fatal_if( static_cast<int>( new2old.size() ) != num_node, "Error: Gmsh_FildIO::update_FSI_nodal_ordering the number of nodes in the first two sub-domain does match the num_node!\n" );
+  SYS_T::print_exit_if( static_cast<int>( new2old.size() ) != num_node,
+  "Error: Gmsh_FildIO::update_FSI_nodal_ordering the number of nodes in the first two sub-domain does match the num_node!\n" );
 
   // Now generate the old2new mapping
-  std::vector<int> old2new;
-  old2new.resize( num_node );
+  std::vector<int> old2new( num_node, 0 );
 
-  for(int ii=0; ii<num_node; ++ii) old2new[ new2old[ii] ] = ii;
+  for(int ii=0; ii<num_node; ++ii)
+    old2new[ new2old[ii] ] = ii;
 
   // Now clean the new2old mapper to save memory
   VEC_T::clean( new2old );
 
   // Now update the nodal x-y-z coordinates
-  std::vector<double> temp; // temporary xyz coordinates based on new indices
-
-  temp.resize( 3 * num_node );
+  std::vector<double> temp( 3 * num_node, 0.0 ); // temporary xyz coordinates based on new indices
 
   for( int ii=0; ii<num_node; ++ii )
   {
@@ -1304,7 +1304,7 @@ void Gmsh_FileIO::update_FSI_nodal_ordering()
   // Now update all the IEN arrays by the new nodal index set
   for(int ii=0; ii<num_phy_domain; ++ii)
   {
-    const int len = static_cast<int>( eIEN[ii].size() );
+    const int len = VEC_T::get_size(eIEN[ii]);
     for( int jj=0; jj<len; ++jj )
       eIEN[ii][jj] = old2new[ eIEN[ii][jj] ];
   }
