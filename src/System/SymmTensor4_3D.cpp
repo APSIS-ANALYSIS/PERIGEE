@@ -86,7 +86,7 @@ void SymmTensor4_3D::gen_Ptilde( const SymmMatrix_3x3 &invC )
 {
   gen_zero();
   add_SymmProduct( 1.0, invC, invC );
-  add_OutProduct( -1.0/3.0, invC, invC );
+  add_OutProduct( -1.0/3.0, invC );
 }
 
 void SymmTensor4_3D::print() const
