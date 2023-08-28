@@ -491,11 +491,6 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
   SYS_T::print_exit_if( index_vol >= num_phy_domain_3d || index_vol < 0,
       "Error: Gmsh_FileIO::write_vtp, volume index is wrong. \n");
 
-  const int phy_index_sur = phy_2d_index[index_sur];
-  const int phy_index_vol = phy_3d_index[index_vol];
-  const int bcnumcl = phy_2d_nElem[index_sur];
-  const int numcel = phy_3d_nElem[index_vol];
-
   std::cout<<"=== Gmsh_FileIO::write_vtp for "
     <<phy_2d_name[index_sur]
     <<" associated with "<<phy_3d_name[index_vol];
@@ -518,17 +513,21 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
 
   // Copy the IEN from the whole domain, the nodal indices is from the
   // global domain indices.
+  const int phy_index_sur = phy_2d_index[index_sur];
   std::vector<int> trien_global( eIEN[phy_index_sur] );
 
   // bcpt stores the global node index
   std::vector<int> bcpt( trien_global );
 
   // obtain the volumetric mesh IEN array
+  const int phy_index_vol = phy_3d_index[index_vol];
   std::vector<int> vol_IEN( eIEN[phy_index_vol] );
 
+  const int bcnumcl = phy_2d_nElem[index_sur];
   SYS_T::print_exit_if( VEC_T::get_size(trien_global) != 3 * bcnumcl,
       "Error: Gmsh_FileIO::write_vtp, sur IEN size wrong. \n" );
 
+  const int numcel = phy_3d_nElem[index_vol];
   SYS_T::print_exit_if( VEC_T::get_size(vol_IEN) != 4 * numcel,
       "Error: Gmsh_FileIO::write_vtp, vol IEN size wrong. \n");
 
@@ -548,7 +547,7 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
   }
 
   // generate the local triangle IEN array
-  std::vector<int> trien; trien.clear();
+  std::vector<int> trien;
   for(int ee=0; ee<bcnumcl; ++ee)
   {
     trien.push_back( VEC_T::get_pos(bcpt, trien_global[3*ee  ]) );
@@ -561,7 +560,7 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
   // meaning this face needs boundary integral); otherwise, set
   // the face2elem as -1, since we will only need the nodal indices
   // for Dirichlet type face.
-  std::vector<int> face2elem; face2elem.resize( bcnumcl, -1 );
+  std::vector<int> face2elem( bcnumcl, -1 );
   if( isf2e )
   {
     // generate a mapper that maps the bc node to 1, other node to 0
