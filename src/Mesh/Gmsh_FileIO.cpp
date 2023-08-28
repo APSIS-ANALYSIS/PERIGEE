@@ -310,21 +310,14 @@ void Gmsh_FileIO::print_info() const
 void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
     const int &index_vol1, const int &index_vol2 ) const
 {
-  SYS_T::print_fatal_if( index_sur >= num_phy_domain_2d || index_sur < 0,
+  SYS_T::print_exit_if( index_sur >= num_phy_domain_2d || index_sur < 0,
       "Error: Gmsh_FileIO::write_vtp, surface index is wrong. \n");
 
-  SYS_T::print_fatal_if( index_vol1 >= num_phy_domain_3d || index_vol1 < 0,
+  SYS_T::print_exit_if( index_vol1 >= num_phy_domain_3d || index_vol1 < 0,
       "Error: Gmsh_FileIO::write_vtp, volume 1 index is wrong. \n");
 
-  SYS_T::print_fatal_if( index_vol2 >= num_phy_domain_3d || index_vol2 < 0,
+  SYS_T::print_exit_if( index_vol2 >= num_phy_domain_3d || index_vol2 < 0,
       "Error: Gmsh_FileIO::write_vtp, volume 2 index is wrong. \n");
-
-  const int phy_index_sur = phy_2d_index[index_sur];
-  const int phy_index_vol_1 = phy_3d_index[index_vol1];
-  const int phy_index_vol_2 = phy_3d_index[index_vol2];
-  const int bcnumcl = phy_2d_nElem[index_sur];
-  const int numcel_1 = phy_3d_nElem[index_vol1];
-  const int numcel_2 = phy_3d_nElem[index_vol2];
 
   std::cout<<"=== Gmsh_FileIO::write_interior_vtp for "
     <<phy_2d_name[index_sur]
@@ -343,23 +336,21 @@ void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
   mytimer->Start();
 
   // Obtain the surface's IEN array associated with global nodal indices
+  const int phy_index_sur = phy_2d_index[index_sur];
   std::vector<int> trien_global( eIEN[phy_index_sur] );
 
-  SYS_T::print_fatal_if( int(trien_global.size() ) != 3 * bcnumcl,
+  const int bcnumcl = phy_2d_nElem[index_sur];
+  SYS_T::print_exit_if( int(trien_global.size() ) != 3 * bcnumcl,
       "Error: Gmsh_FileIO::write_vtp, sur IEN size wrong. \n" );
 
   // bcpt stores the global nodal indices in ascending order
   std::vector<int> bcpt( trien_global );
   VEC_T::sort_unique_resize( bcpt ); // unique ascending order nodes
-  const int bcnumpt = static_cast<int>( bcpt.size() );
+  const int bcnumpt = VEC_T::get_size(bcpt);
   std::cout<<"      num of bc pt = "<<bcnumpt<<'\n';
 
-  // Obtain the volumetric IEN array
-  std::vector<int> vol_IEN_1( eIEN[phy_index_vol_1] );
-  std::vector<int> vol_IEN_2( eIEN[phy_index_vol_2] );
-
   // tript stores the xyz coordinates of the points for the surface
-  std::vector<double> tript; tript.clear(); tript.resize(3*bcnumpt);
+  std::vector<double> tript (3*bcnumpt, 0.0);
   for( int ii=0; ii<bcnumpt; ++ii )
   {
     tript[ii*3]   = node[bcpt[ii]*3] ;
@@ -373,9 +364,14 @@ void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
   for(int ii=0; ii<num_node; ++ii) bcmap[ii] = 0;
   for(int ii=0; ii<bcnumpt; ++ii) bcmap[bcpt[ii]] = 1;
 
+  // Obtain the volumetric IEN array
+  const int phy_index_vol_1 = phy_3d_index[index_vol1];
+  std::vector<int> vol_IEN_1( eIEN[phy_index_vol_1] );
+
   // use gelem_1[2] to store the vol elements that have face over the surface
   // mesh 
-  std::vector<int> gelem_1; gelem_1.clear();
+  const int numcel_1 = phy_3d_nElem[index_vol1];
+  std::vector<int> gelem_1;
   for( int ee=0; ee<numcel_1; ++ee )
   {
     int total = 0;
@@ -387,7 +383,11 @@ void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
   }
   std::cout<<"      vol 1 domain: "<<gelem_1.size()<<" tets have more than 3 points on the surface. \n";
 
-  std::vector<int> gelem_2; gelem_2.clear();
+  const int phy_index_vol_2 = phy_3d_index[index_vol2];
+  std::vector<int> vol_IEN_2( eIEN[phy_index_vol_2] );
+
+  const int numcel_2 = phy_3d_nElem[index_vol2];
+  std::vector<int> gelem_2;;
   for( int ee=0; ee<numcel_2; ++ee )
   {
     int total = 0;
@@ -400,51 +400,35 @@ void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
   std::cout<<"      vol 2 domain: "<<gelem_2.size()<<" tets have more than 3 points on the surface. \n";
 
   // generate the local triangle IEN array
-  std::vector<int> trien; trien.clear();
-  int node0, node1, node2;
-  std::vector<int>::iterator it;
+  std::vector<int> trien;
   for(int ee=0; ee<bcnumcl; ++ee)
   {
-    node0 = trien_global[3*ee];
-    node1 = trien_global[3*ee+1];
-    node2 = trien_global[3*ee+2];
-
-    it = find(bcpt.begin(), bcpt.end(), node0);
-    trien.push_back( it - bcpt.begin() );
-
-    it = find(bcpt.begin(), bcpt.end(), node1);
-    trien.push_back( it - bcpt.begin() );
-
-    it = find(bcpt.begin(), bcpt.end(), node2);
-    trien.push_back( it - bcpt.begin() );
+    trien.push_back(VEC_T::get_pos(bcpt, trien_global[3*ee]));
+    trien.push_back(VEC_T::get_pos(bcpt, trien_global[3*ee+1]));
+    trien.push_back(VEC_T::get_pos(bcpt, trien_global[3*ee+2]));
   }
   std::cout<<"      triangle IEN generated. \n";
 
   // determine the face-2-element mapping
-  std::vector<int> face2elem_1; face2elem_1.resize( bcnumcl );
-  int vol_elem;
-  int vnode[4];
-  bool got0, got1, got2, gotit;
+  std::vector<int> face2elem_1(bcnumcl, -1);
   for(int ff=0; ff<bcnumcl; ++ff)
   {
-    node0 = trien_global[3*ff];
-    node1 = trien_global[3*ff+1];
-    node2 = trien_global[3*ff+2];
-    gotit = false;
+    const int node0 = trien_global[3*ff];
+    const int node1 = trien_global[3*ff+1];
+    const int node2 = trien_global[3*ff+2];
+    bool gotit = false;
     int ee = -1;
     while( !gotit && ee < int(gelem_1.size()) - 1 )
     {
       ee += 1;
-      vol_elem = gelem_1[ee];
-      vnode[0] = vol_IEN_1[4*vol_elem];
-      vnode[1] = vol_IEN_1[4*vol_elem+1];
-      vnode[2] = vol_IEN_1[4*vol_elem+2];
-      vnode[3] = vol_IEN_1[4*vol_elem+3];
+      const int vol_elem = gelem_1[ee];
+      int vnode[4] { vol_IEN_1[4*vol_elem]  , vol_IEN_1[4*vol_elem+1],
+                     vol_IEN_1[4*vol_elem+2], vol_IEN_1[4*vol_elem+3] };
       std::sort(vnode, vnode+4);
 
-      got0 = ( std::find(vnode, vnode+4, node0) != vnode+4 );
-      got1 = ( std::find(vnode, vnode+4, node1) != vnode+4 );
-      got2 = ( std::find(vnode, vnode+4, node2) != vnode+4 );
+      const bool got0 = ( std::find(vnode, vnode+4, node0) != vnode+4 );
+      const bool got1 = ( std::find(vnode, vnode+4, node1) != vnode+4 );
+      const bool got2 = ( std::find(vnode, vnode+4, node2) != vnode+4 );
       gotit = got0 && got1 && got2;
     }
 
@@ -457,27 +441,25 @@ void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
     }
   }
 
-  std::vector<int> face2elem_2; face2elem_2.resize( bcnumcl );
+  std::vector<int> face2elem_2( bcnumcl, -1);
   for(int ff=0; ff<bcnumcl; ++ff)
   {
-    node0 = trien_global[3*ff];
-    node1 = trien_global[3*ff+1];
-    node2 = trien_global[3*ff+2];
-    gotit = false;
+    const int node0 = trien_global[3*ff];
+    const int node1 = trien_global[3*ff+1];
+    const int node2 = trien_global[3*ff+2];
+    bool gotit = false;
     int ee = -1;
     while( !gotit && ee < int(gelem_2.size()) - 1 )
     {
       ee += 1;
-      vol_elem = gelem_2[ee];
-      vnode[0] = vol_IEN_2[4*vol_elem];
-      vnode[1] = vol_IEN_2[4*vol_elem+1];
-      vnode[2] = vol_IEN_2[4*vol_elem+2];
-      vnode[3] = vol_IEN_2[4*vol_elem+3];
+      const int vol_elem = gelem_2[ee];
+      int vnode[4] { vol_IEN_2[4*vol_elem]  , vol_IEN_2[4*vol_elem+1],
+                     vol_IEN_2[4*vol_elem+2], vol_IEN_2[4*vol_elem+3] };
       std::sort(vnode, vnode+4);
 
-      got0 = ( std::find(vnode, vnode+4, node0) != vnode+4 );
-      got1 = ( std::find(vnode, vnode+4, node1) != vnode+4 );
-      got2 = ( std::find(vnode, vnode+4, node2) != vnode+4 );
+      const bool got0 = ( std::find(vnode, vnode+4, node0) != vnode+4 );
+      const bool got1 = ( std::find(vnode, vnode+4, node1) != vnode+4 );
+      const bool got2 = ( std::find(vnode, vnode+4, node2) != vnode+4 );
       gotit = got0 && got1 && got2;
     }
 
