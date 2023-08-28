@@ -37,6 +37,8 @@ class DataVecStr
 
     std::string get_name() const {return name;}
 
+    int get_data_size() const {return static_cast<int>(data.size());}
+
     friend std::ostream& operator<< (std::ostream& out, const DataVecStr<T>& val)
     {
       out<<val.name<<'\t';
