@@ -124,18 +124,16 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
   int eidx, etype, num_tag, phy_tag, geo_tag, enum_node = 0;
 
   // stores the ii-th domain's number of elements. ii is the physical tag
-  std::vector<int> phy_domain_nElem;
+  std::vector<int> phy_domain_nElem(num_phy_domain, 0);
 
   // We assume that the physical tag ranges from 1 to num_phy_domain
   eIEN.resize(num_phy_domain);
-  phy_domain_nElem.resize(num_phy_domain);
   ele_nlocbas.resize(num_phy_domain);
   ele_type.resize(num_phy_domain);
 
   for(int ii=0; ii<num_phy_domain; ++ii)
   {
     eIEN[ii].clear();
-    phy_domain_nElem[ii] = 0;
     ele_nlocbas[ii] = -1;
   }
 
