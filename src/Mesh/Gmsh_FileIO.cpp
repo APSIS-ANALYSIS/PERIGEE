@@ -541,11 +541,11 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
   // bcpt stores the global node index
   std::vector<int> bcpt( trien_global );
 
-  SYS_T::print_exit_if( VEC_T::get_size(trien_global) != 3 * bcnumcl,
-      "Error: Gmsh_FileIO::write_vtp, sur IEN size wrong. \n" );
-
   // obtain the volumetric mesh IEN array
   std::vector<int> vol_IEN( eIEN[phy_index_vol] );
+
+  SYS_T::print_exit_if( VEC_T::get_size(trien_global) != 3 * bcnumcl,
+      "Error: Gmsh_FileIO::write_vtp, sur IEN size wrong. \n" );
 
   SYS_T::print_exit_if( VEC_T::get_size(vol_IEN) != 4 * numcel,
       "Error: Gmsh_FileIO::write_vtp, vol IEN size wrong. \n");
@@ -612,7 +612,7 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
       {
         ee += 1;
         const int vol_elem = gelem[ee];
-        const int vnode[4] { vol_IEN[4*vol_elem], vol_IEN[4*vol_elem+1], vol_IEN[4*vol_elem+2], vol_IEN[4*vol_elem+3] }
+        int vnode[4] { vol_IEN[4*vol_elem], vol_IEN[4*vol_elem+1], vol_IEN[4*vol_elem+2], vol_IEN[4*vol_elem+3] };
         std::sort(vnode, vnode+4);
 
         const bool got0 = ( std::find(vnode, vnode+4, node0) != vnode+4 );
@@ -632,8 +632,7 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
   }
 
   // Write the mesh file in vtp format
-  TET_T::write_triangle_grid( vtp_file_name, bcnumpt, bcnumcl,
-      tript, trien, bcpt, face2elem );
+  TET_T::write_triangle_grid( vtp_file_name, bcnumpt, bcnumcl, tript, trien, bcpt, face2elem );
 
   mytimer->Stop();
   std::cout<<"      Time taken "<<mytimer->get_sec()<<" sec. \n";
