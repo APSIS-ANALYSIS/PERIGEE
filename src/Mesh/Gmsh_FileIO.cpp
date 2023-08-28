@@ -1312,7 +1312,7 @@ void Gmsh_FileIO::update_FSI_nodal_ordering()
 
 void Gmsh_FileIO::update_quadratic_tet_IEN( const int &index_3d )
 {
-  SYS_T::print_fatal_if(index_3d < 0 || index_3d >= num_phy_domain_3d,
+  SYS_T::print_exit_if(index_3d < 0 || index_3d >= num_phy_domain_3d,
       "Error: input index_3d is out of range.\n");
 
   const int domain_index = phy_3d_index[ index_3d ];
@@ -1321,7 +1321,8 @@ void Gmsh_FileIO::update_quadratic_tet_IEN( const int &index_3d )
 
   const int nlocbas = ele_nlocbas[ domain_index ];
 
-  SYS_T::print_fatal_if(nlocbas != 10, "Error: Gmsh_FileIO updata_quadratic_tet_IEN only works for 10-node quadratic element. \n");
+  SYS_T::print_exit_if(nlocbas != 10,
+      "Error: Gmsh_FileIO updata_quadratic_tet_IEN only works for 10-node quadratic element. \n");
 
   std::cout<<"=== Gmsh_FileIO::update_quadratic_tet_IEN for "<<phy_3d_name[index_3d]<<std::endl;;
 
