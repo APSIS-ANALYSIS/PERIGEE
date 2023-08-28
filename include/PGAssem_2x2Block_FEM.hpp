@@ -31,7 +31,7 @@ class PGAssem_2x2Block_FEM : public IPGAssem_2x2Block
         ALocal_Elem const * const &alelem_ptr,
         ALocal_IEN const * const &aien_ptr,
         APart_Node const * const &pnode_ptr,
-        ALocal_NodalBC const * const &part_nbc,
+        ALocal_NBC const * const &part_nbc,
         ALocal_EBC const * const &part_ebc );
 
     virtual ~PGAssem_2x2Block_FEM();
@@ -43,7 +43,7 @@ class PGAssem_2x2Block_FEM : public IPGAssem_2x2Block
     virtual void Assem_nonzero_estimate(
         IPLocAssem_2x2Block * const &lassem_ptr,
         const ALocal_IEN * const &lien_ptr,
-        const ALocal_NodalBC * const &nbc_part );
+        const ALocal_NBC * const &nbc_part );
 
     virtual void Assem_mass_residual(
         const PDNSolution * const &sol_0,
@@ -55,7 +55,7 @@ class PGAssem_2x2Block_FEM : public IPGAssem_2x2Block
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
     virtual void Assem_residual(
@@ -72,7 +72,7 @@ class PGAssem_2x2Block_FEM : public IPGAssem_2x2Block
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
     virtual void Assem_tangent_residual(
@@ -89,7 +89,7 @@ class PGAssem_2x2Block_FEM : public IPGAssem_2x2Block
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
   private:
@@ -145,8 +145,8 @@ class PGAssem_2x2Block_FEM : public IPGAssem_2x2Block
 
     // Impose essential boundary conditions on field 1,2,3.
     // Field 0 is assumbed to be pressure, which does not have essential bc.
-    void EssBC_K11G1( const ALocal_NodalBC * const &nbc_part );
-    void EssBC_G1( const ALocal_NodalBC * const &nbc_part );
+    void EssBC_K11G1( const ALocal_NBC * const &nbc_part );
+    void EssBC_G1( const ALocal_NBC * const &nbc_part );
 
     // GetLocal funciton extract the values from array_xxx_0/1 to local_xxx_0/1.
     void GetLocal_0( const double * const &array, const int * const &IEN,
@@ -160,7 +160,7 @@ class PGAssem_2x2Block_FEM : public IPGAssem_2x2Block
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const lien_ptr,
-        const ALocal_NodalBC * const &nbc_part,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
 };

@@ -5,9 +5,7 @@
 //
 // This is a 3-component vector class. The components are stored in an array 
 // vec[3]:
-//                vec[0]
-//                vec[1]
-//                vec[2]
+//             [ vec[0]; vec[1]; vec[2] ]
 // 
 // It is designed primarily for material constitutive routines.
 //
@@ -20,6 +18,7 @@
 #include <ctime>
 #include <cmath>
 #include <vector>
+#include <array>
 
 class Vector_3
 {
@@ -59,6 +58,8 @@ class Vector_3
 
     std::vector<double> to_std_vec() const;
 
+    std::array<double, 3> to_std_array() const;
+
     const double& x() const {return vec[0];}
     double& x() {return vec[0];}
 
@@ -82,13 +83,9 @@ class Vector_3
     
     void gen_e3() {vec[0]=0.0; vec[1]=0.0; vec[2]=1.0;}
 
-    void scale( const double &val );
-
-    void AXPY( const double &val, const Vector_3 &source );
-
     double sum() const {return vec[0]+vec[1]+vec[2];}
 
-    double norm2() const {return sqrt(vec[0]*vec[0]+vec[1]*vec[1]+vec[2]*vec[2]);}
+    double norm2() const {return std::sqrt(vec[0]*vec[0]+vec[1]*vec[1]+vec[2]*vec[2]);}
     
     // rescale vec to be norm one and return its length
     double normalize();

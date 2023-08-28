@@ -467,7 +467,7 @@ void SEG_SOL_T::PlusAiVPV(const double &aa,
 }
 
 void SEG_SOL_T::Insert_plug_inflow_UPV(const double &val,
-    const ALocal_Inflow_NodalBC * const &infnbc, 
+    const ALocal_InflowBC * const &infnbc, 
     PDNSolution * const &sol )
 {
   // Make sure the dof of the sol vector is 7

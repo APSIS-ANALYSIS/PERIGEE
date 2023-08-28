@@ -83,7 +83,7 @@ EBC_Partition_FEM::EBC_Partition_FEM( const IPart * const &part,
       local_cell_node_xyz[ii][3*jj+2] = ebc->get_pt_xyz( ii, local_cell_node[jj], 2 );
       local_cell_node_vol_id[ii][jj] = ebc->get_global_node( ii, local_cell_node[jj] );
       local_cell_node_pos[ii][jj] = part->get_nodeLocGhoIndex( mnindex->get_old2new( local_cell_node_vol_id[ii][jj] ) );
-      assert(local_cell_node_pos[ii][jj] >= 0);
+      ASSERT(local_cell_node_pos[ii][jj] >= 0, "EBC_Partition_FEM::EBC_Partition_FEM function error.\n");
     }
 
     // now create the new IEN & cell interior point

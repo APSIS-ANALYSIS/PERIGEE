@@ -5,11 +5,12 @@ AInt_Weight::AInt_Weight( const IQuadPts * const &qua_s,
     const IQuadPts * const &qua_u )
 : num( qua_s->get_num_quadPts() * qua_t->get_num_quadPts() * qua_u->get_num_quadPts() )
 {
+  // Allocate the weights
+  Weight = new double [num];
+
   const int n_s = qua_s->get_num_quadPts();
   const int n_t = qua_t->get_num_quadPts();
   const int n_u = qua_u->get_num_quadPts();
-
-  Weight = new double [num];
 
   for(int ii=0; ii<n_s; ++ii)
   {
@@ -30,10 +31,11 @@ AInt_Weight::AInt_Weight( const IQuadPts * const &qua_s,
     const IQuadPts * const &qua_t  )
 : num( qua_s->get_num_quadPts() * qua_t->get_num_quadPts() )
 {
+  // Allocate the weights
+  Weight = new double [num];
+
   const int n_s = qua_s->get_num_quadPts();
   const int n_t = qua_t->get_num_quadPts();
-
-  Weight = new double [num];
 
   for(int ii=0; ii<n_s; ++ii)
   {
@@ -49,7 +51,9 @@ AInt_Weight::AInt_Weight( const IQuadPts * const &qua_s,
 AInt_Weight::AInt_Weight( const IQuadPts * const &qua ) 
 : num( qua->get_num_quadPts() )
 {
+  // Allocate the weights
   Weight = new double [num];
+
   for(int ii=0; ii<num; ++ii) Weight[ii] = qua -> get_qw(ii);
 }
 

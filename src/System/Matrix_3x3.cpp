@@ -92,6 +92,12 @@ Matrix_3x3& Matrix_3x3::operator*= (const double &val)
   return *this;
 }
 
+Matrix_3x3 Matrix_3x3::operator- () const
+{
+  return Matrix_3x3( -mat[0], -mat[1], -mat[2], -mat[3], -mat[4],
+      -mat[5], -mat[6], -mat[7], -mat[8] );
+}
+
 void Matrix_3x3::gen_zero()
 {
   for(int ii=0; ii<9; ++ii) mat[ii] = 0.0; 
@@ -361,10 +367,10 @@ void Matrix_3x3::find_eigen_vector( const double &eta, Vector_3 &v,
     s1 = a;
 
     double val = dot_product(s1, b);
-    b.AXPY(-1.0*val, s1);
+    b -= val * s1;
 
     val = dot_product(s1, c);
-    c.AXPY(-1.0*val, s1);
+    c -= val * s1;
 
     if( b.norm2() >= c.norm2() )
     {
@@ -382,10 +388,10 @@ void Matrix_3x3::find_eigen_vector( const double &eta, Vector_3 &v,
     s1 = b;
 
     double val = dot_product(s1, a);
-    a.AXPY(-1.0*val, s1);
+    a -= val * s1;
 
     val = dot_product(s1, c);
-    c.AXPY(-1.0*val, s1);
+    c -= val * s1;
 
     if( a.norm2() >= c.norm2() )
     {
@@ -403,10 +409,10 @@ void Matrix_3x3::find_eigen_vector( const double &eta, Vector_3 &v,
     s1 = c;
 
     double val = dot_product(s1, a);
-    a.AXPY(-1.0*val, s1);
+    a -= val * s1;
 
     val = dot_product(s1, b);
-    b.AXPY(-1.0*val, s1);
+    b -= val * s1;
 
     if(a.norm2() >= b.norm2())
     {
@@ -502,11 +508,11 @@ int Matrix_3x3::eigen_decomp( double &eta1, double &eta2, double &eta3,
       // u2 = (A - 0.333 tr - eta2 ) s2
       Vector_3 temp(v2);
       v2 = (*this) * v2;
-      v2.AXPY( -1.0*(frac13_tr + eta2), temp );
+      v2 -= (frac13_tr + eta2) * temp;
 
       temp.copy(v3);
       v3 = (*this) * v3; 
-      v3.AXPY( -1.0*(frac13_tr + eta2), temp );
+      v3 -= (frac13_tr + eta2) * temp;
 
       if( v2.norm2() >= v3.norm2() )
       {
@@ -595,6 +601,20 @@ Matrix_3x3 transpose( const Matrix_3x3 &input )
   return Matrix_3x3( input(0), input(3), input(6),
       input(1), input(4), input(7),
       input(2), input(5), input(8) );
+}
+
+Matrix_3x3 gen_identity_matrix()
+{
+  return Matrix_3x3( 1.0, 0.0, 0.0,
+      0.0, 1.0, 0.0,
+      0.0, 0.0, 1.0 );
+}
+
+Matrix_3x3 gen_zero_matrix()
+{
+  return Matrix_3x3( 0.0, 0.0, 0.0,
+      0.0, 0.0, 0.0,
+      0.0, 0.0, 0.0 );
 }
 
 // EOF

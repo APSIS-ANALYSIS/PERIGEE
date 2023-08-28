@@ -59,7 +59,7 @@ void FEAElement_Tet10::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_y,
     const double * const &ctrl_z )
 {
-  assert( quad -> get_dim() == 4 );
+  ASSERT( quad -> get_dim() == 4, "FEAElement_Tet10::buildBasis function error.\n" );
 
   // second der wrt ref var  0    1    2    3    4     5     6     7    8    9
   const double d2R_drr[10] { 4.0, 4.0, 0.0, 0.0, -8.0, 0.0,  0.0,  0.0, 0.0, 0.0 };
@@ -185,16 +185,14 @@ void FEAElement_Tet10::buildBasis( const IQuadPts * const &quad,
 
     for(int ii=0; ii<10; ++ii)
     {
-      const double RHS[6] { d2R_drr[ii] - dR_dx[q10+ii] * xrr - dR_dy[q10+ii] * yrr - dR_dz[q10+ii] * zrr,
+      const std::array<double, 6> RHS {{ d2R_drr[ii] - dR_dx[q10+ii] * xrr - dR_dy[q10+ii] * yrr - dR_dz[q10+ii] * zrr,
       d2R_drs[ii] - dR_dx[q10+ii] * xrs - dR_dy[q10+ii] * yrs - dR_dz[q10+ii] * zrs,
       d2R_drt[ii] - dR_dx[q10+ii] * xrt - dR_dy[q10+ii] * yrt - dR_dz[q10+ii] * zrt,
       d2R_dss[ii] - dR_dx[q10+ii] * xss - dR_dy[q10+ii] * yss - dR_dz[q10+ii] * zss,
       d2R_dst[ii] - dR_dx[q10+ii] * xst - dR_dy[q10+ii] * yst - dR_dz[q10+ii] * zst,
-      d2R_dtt[ii] - dR_dx[q10+ii] * xtt - dR_dy[q10+ii] * ytt - dR_dz[q10+ii] * ztt };
+      d2R_dtt[ii] - dR_dx[q10+ii] * xtt - dR_dy[q10+ii] * ytt - dR_dz[q10+ii] * ztt }};
 
-      double sol[6] {0.0};
-
-      LHS.LU_solve(RHS, sol);
+      const auto sol = LHS.LU_solve(RHS);
 
       d2R_dxx[q10+ii] = sol[0];
       d2R_dyy[q10+ii] = sol[1];
@@ -223,14 +221,14 @@ double FEAElement_Tet10::get_h( const double * const &ctrl_x,
 
 void FEAElement_Tet10::get_R( const int &quaindex, double * const &basis ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_R function error.\n" );
   const int offset = quaindex * 10;
   for(int ii=0; ii<10; ++ii) basis[ii] = R[offset+ii];
 }
 
 std::vector<double> FEAElement_Tet10::get_R( const int &quaindex ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_R function error.\n" );
   const int offset = quaindex * 10;
   return { R[offset], R[offset+1], R[offset+2], R[offset+3],
     R[offset+4], R[offset+5], R[offset+6], R[offset+7], R[offset+8], R[offset+9] };
@@ -239,7 +237,7 @@ std::vector<double> FEAElement_Tet10::get_R( const int &quaindex ) const
 void FEAElement_Tet10::get_gradR( const int &quaindex, double * const &basis_x,
     double * const &basis_y, double * const &basis_z ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_gradR function error.\n" );
   const int offset = quaindex * 10;
   for( int ii=0; ii<10; ++ii )
   {
@@ -251,7 +249,7 @@ void FEAElement_Tet10::get_gradR( const int &quaindex, double * const &basis_x,
 
 std::vector<double> FEAElement_Tet10::get_dR_dx( const int &quaindex ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );  
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_dR_dx function error.\n" );  
   const int offset = quaindex * 10;
   return { dR_dx[offset], dR_dx[offset+1], dR_dx[offset+2], dR_dx[offset+3], 
 	  dR_dx[offset+4], dR_dx[offset+5], dR_dx[offset+6], dR_dx[offset+7],
@@ -260,7 +258,7 @@ std::vector<double> FEAElement_Tet10::get_dR_dx( const int &quaindex ) const
 
 std::vector<double> FEAElement_Tet10::get_dR_dy( const int &quaindex ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_dR_dy function error.\n" );
   const int offset = quaindex * 10;
   return { dR_dy[offset], dR_dy[offset+1], dR_dy[offset+2], dR_dy[offset+3], 
           dR_dy[offset+4], dR_dy[offset+5], dR_dy[offset+6], dR_dy[offset+7],
@@ -269,7 +267,7 @@ std::vector<double> FEAElement_Tet10::get_dR_dy( const int &quaindex ) const
 
 std::vector<double> FEAElement_Tet10::get_dR_dz( const int &quaindex ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_dR_dz function error.\n" );
   const int offset = quaindex * 10;
   return { dR_dz[offset], dR_dz[offset+1], dR_dz[offset+2], dR_dz[offset+3], 
           dR_dz[offset+4], dR_dz[offset+5], dR_dz[offset+6], dR_dz[offset+7],
@@ -280,7 +278,7 @@ void FEAElement_Tet10::get_R_gradR( const int &quaindex, double * const &basis,
     double * const &basis_x, double * const &basis_y,
     double * const &basis_z ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_R_gradR function error.\n" );
   const int offset = quaindex * 10;
   for( int ii=0; ii<10; ++ii )
   {
@@ -298,7 +296,7 @@ void FEAElement_Tet10::get_3D_R_dR_d2R( const int &quaindex,
     double * const &basis_zz, double * const &basis_xy,
     double * const &basis_xz, double * const &basis_yz ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_3D_R_dR_d2R function error.\n" );
   const int offset = quaindex * 10;
   for( int ii=0; ii<10; ++ii )
   {
@@ -321,7 +319,7 @@ void FEAElement_Tet10::get_3D_R_gradR_LaplacianR( const int &quaindex,
     double * const &basis_xx, double * const &basis_yy,
     double * const &basis_zz ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_3D_R_gradR_LaplacianR function error.\n" );
   const int offset = quaindex * 10;
   for( int ii=0; ii<10; ++ii )
   {
@@ -337,7 +335,7 @@ void FEAElement_Tet10::get_3D_R_gradR_LaplacianR( const int &quaindex,
 
 std::vector<double> FEAElement_Tet10::get_d2R_dxx( const int &quaindex ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_d2R_dxx function error.\n" );
   const int offset = quaindex * 10;
   return { d2R_dxx[offset], d2R_dxx[offset+1], d2R_dxx[offset+2], d2R_dxx[offset+3],
           d2R_dxx[offset+4], d2R_dxx[offset+5], d2R_dxx[offset+6], d2R_dxx[offset+7],
@@ -346,7 +344,7 @@ std::vector<double> FEAElement_Tet10::get_d2R_dxx( const int &quaindex ) const
 
 std::vector<double> FEAElement_Tet10::get_d2R_dyy( const int &quaindex ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_d2R_dyy function error.\n" );
   const int offset = quaindex * 10;
   return { d2R_dyy[offset], d2R_dyy[offset+1], d2R_dyy[offset+2], d2R_dyy[offset+3],
           d2R_dyy[offset+4], d2R_dyy[offset+5], d2R_dyy[offset+6], d2R_dyy[offset+7],
@@ -355,7 +353,7 @@ std::vector<double> FEAElement_Tet10::get_d2R_dyy( const int &quaindex ) const
 
 std::vector<double> FEAElement_Tet10::get_d2R_dzz( const int &quaindex ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_d2R_dzz function error.\n" );
   const int offset = quaindex * 10;
   return { d2R_dzz[offset], d2R_dzz[offset+1], d2R_dzz[offset+2], d2R_dzz[offset+3],
           d2R_dzz[offset+4], d2R_dzz[offset+5], d2R_dzz[offset+6], d2R_dzz[offset+7],
@@ -364,7 +362,7 @@ std::vector<double> FEAElement_Tet10::get_d2R_dzz( const int &quaindex ) const
 
 std::vector<double> FEAElement_Tet10::get_d2R_dxy( const int &quaindex ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_d2R_dxy function error.\n" );
   const int offset = quaindex * 10;
   return { d2R_dxy[offset], d2R_dxy[offset+1], d2R_dxy[offset+2], d2R_dxy[offset+3],
           d2R_dxy[offset+4], d2R_dxy[offset+5], d2R_dxy[offset+6], d2R_dxy[offset+7],
@@ -373,7 +371,7 @@ std::vector<double> FEAElement_Tet10::get_d2R_dxy( const int &quaindex ) const
 
 std::vector<double> FEAElement_Tet10::get_d2R_dxz( const int &quaindex ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_d2R_dxz function error.\n" );
   const int offset = quaindex * 10;
   return { d2R_dxz[offset], d2R_dxz[offset+1], d2R_dxz[offset+2], d2R_dxz[offset+3],
           d2R_dxz[offset+4], d2R_dxz[offset+5], d2R_dxz[offset+6], d2R_dxz[offset+7],
@@ -382,7 +380,7 @@ std::vector<double> FEAElement_Tet10::get_d2R_dxz( const int &quaindex ) const
 
 std::vector<double> FEAElement_Tet10::get_d2R_dyz( const int &quaindex ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_d2R_dyz function error.\n" );
   const int offset = quaindex * 10;
   return { d2R_dyz[offset], d2R_dyz[offset+1], d2R_dyz[offset+2], d2R_dyz[offset+3],
           d2R_dyz[offset+4], d2R_dyz[offset+5], d2R_dyz[offset+6], d2R_dyz[offset+7],
@@ -392,31 +390,31 @@ std::vector<double> FEAElement_Tet10::get_d2R_dyz( const int &quaindex ) const
 void FEAElement_Tet10::get_Jacobian(const int &quaindex,
     double * const &jac_value) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_Jacobian function error.\n" );
   for(int ii=0; ii<9; ++ii) jac_value[ii] = dx_dr[9*quaindex + ii];
 }
 
 std::array<double,9> FEAElement_Tet10::get_Jacobian(const int &quaindex) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
-  return { dx_dr[9*quaindex], dx_dr[9*quaindex+1], dx_dr[9*quaindex+2], 
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_Jacobian function error.\n" );
+  return {{ dx_dr[9*quaindex], dx_dr[9*quaindex+1], dx_dr[9*quaindex+2], 
     dx_dr[9*quaindex+3], dx_dr[9*quaindex+4], dx_dr[9*quaindex+5], 
-    dx_dr[9*quaindex+6], dx_dr[9*quaindex+7], dx_dr[9*quaindex+8] };
+    dx_dr[9*quaindex+6], dx_dr[9*quaindex+7], dx_dr[9*quaindex+8] }};
 }
 
 void FEAElement_Tet10::get_invJacobian(const int &quaindex,
     double * const &jac_value) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_invJacobian function error.\n" );
   for(int ii=0; ii<9; ++ii) jac_value[ii] = dr_dx[9*quaindex + ii];
 }
 
 std::array<double,9> FEAElement_Tet10::get_invJacobian(const int &quaindex) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
-  return { dr_dx[9*quaindex], dr_dx[9*quaindex+1], dr_dx[9*quaindex+2], 
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_invJacobian function error.\n" );
+  return {{ dr_dx[9*quaindex], dr_dx[9*quaindex+1], dr_dx[9*quaindex+2], 
     dr_dx[9*quaindex+3], dr_dx[9*quaindex+4], dr_dx[9*quaindex+5], 
-    dr_dx[9*quaindex+6], dr_dx[9*quaindex+7], dr_dx[9*quaindex+8] };
+    dr_dx[9*quaindex+6], dr_dx[9*quaindex+7], dr_dx[9*quaindex+8] }};
 }
 
 // EOF

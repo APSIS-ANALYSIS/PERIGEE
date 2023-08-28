@@ -86,6 +86,11 @@ std::vector<double> Vector_3::to_std_vec() const
   return outvec; 
 }
 
+std::array<double, 3> Vector_3::to_std_array() const
+{
+  return {{ vec[0], vec[1], vec[2] }}; 
+}
+
 void Vector_3::print() const
 {
   std::cout<<std::setprecision(12)<<vec[0]<<'\t'<<vec[1]<<'\t'<<vec[2]<<std::endl;
@@ -117,22 +122,14 @@ void Vector_3::gen_rand()
   }
 }
 
-void Vector_3::scale( const double &val )
-{
-  vec[0] *= val; vec[1] *= val; vec[2] *= val;
-}
-
-void Vector_3::AXPY( const double &val, const Vector_3 &source )
-{
-  vec[0] += val * source(0);
-  vec[1] += val * source(1);
-  vec[2] += val * source(2);
-}
-
 double Vector_3::normalize()
 {
   const double len = norm2();
-  scale(1.0/len);
+  const double inv_len = 1.0 / len;
+  vec[0] *= inv_len; 
+  vec[1] *= inv_len; 
+  vec[2] *= inv_len;
+  
   return len;
 }
 
@@ -146,7 +143,7 @@ double dist( const Vector_3 &a, const Vector_3 &b )
   const double dist_x = a.x() - b.x();
   const double dist_y = a.y() - b.y();
   const double dist_z = a.z() - b.z();
-  return sqrt( dist_x*dist_x + dist_y*dist_y + dist_z*dist_z );
+  return std::sqrt( dist_x*dist_x + dist_y*dist_y + dist_z*dist_z );
 }
 
 double dot_product( const Vector_3 &a, const Vector_3 &b )

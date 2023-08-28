@@ -1,6 +1,6 @@
-project(perigee)
-
 CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
+
+project(perigee)
 
 IF(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
@@ -36,21 +36,23 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/System/Matrix_3x3.cpp
   ${perigee_source}/System/SymmMatrix_3x3.cpp
   ${perigee_source}/System/Math_Tools.cpp
+  ${perigee_source}/System/SV_Tools.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
   ${perigee_source}/System/HDF5_Reader.cpp
   ${perigee_source}/Mesh/Gmsh_FileIO.cpp
+  ${perigee_source}/Mesh/VTK_Tools.cpp
   ${perigee_source}/Mesh/Tet_Tools.cpp
-  ${perigee_source}/Mesh/IEN_Tetra_P1.cpp
-  ${perigee_source}/Mesh/IEN_Tetra_P2.cpp
-  ${perigee_source}/Mesh/INodalBC.cpp
-  ${perigee_source}/Mesh/Mesh_Tet4.cpp
-  ${perigee_source}/Mesh/Mesh_Tet10.cpp
+  ${perigee_source}/Mesh/IEN_FEM.cpp
+  ${perigee_source}/Mesh/Mesh_Tet.cpp
   ${perigee_source}/Mesh/IPart.cpp
   ${perigee_source}/Mesh/Part_Tet.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet_wall.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet_outflow.cpp
+  ${perigee_source}/Mesh/NodalBC.cpp
   ${perigee_source}/Mesh/NodalBC_3D_inflow.cpp
+  ${perigee_source}/Mesh/NodalBC_3D_ring.cpp
+  ${perigee_source}/Mesh/NodalBC_3D_wall.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
   ${perigee_source}/Mesh/NBC_Partition.cpp
   ${perigee_source}/Mesh/NBC_Partition_inflow.cpp
@@ -75,8 +77,8 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/APart_Basic_Info.cpp
   ${perigee_source}/Analysis_Tool/ALocal_Elem.cpp
   ${perigee_source}/Analysis_Tool/ALocal_IEN.cpp
-  ${perigee_source}/Analysis_Tool/ALocal_NodalBC.cpp
-  ${perigee_source}/Analysis_Tool/ALocal_Inflow_NodalBC.cpp
+  ${perigee_source}/Analysis_Tool/ALocal_NBC.cpp
+  ${perigee_source}/Analysis_Tool/ALocal_InflowBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_EBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_EBC_outflow.cpp
   ${perigee_source}/Analysis_Tool/ALocal_EBC_wall.cpp
@@ -152,7 +154,7 @@ ADD_EXECUTABLE( mod_test matmodel_test.cpp )
 ADD_EXECUTABLE( testh5 h5_test.cpp )
 ADD_EXECUTABLE( elem_test elem_test.cpp )
 
-TARGET_LINK_LIBRARIES( sys_test perigee_preprocess )
+TARGET_LINK_LIBRARIES( sys_test perigee_preprocess perigee_analysis )
 TARGET_LINK_LIBRARIES( mod_test perigee_preprocess perigee_analysis )
 TARGET_LINK_LIBRARIES( testh5 perigee_preprocess )
 TARGET_LINK_LIBRARIES( elem_test perigee_analysis )

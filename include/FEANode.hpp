@@ -14,6 +14,7 @@
 // Constructed from inputs of the file basename and cpu_rank, and read using
 // the  HDF5_Reader tool.
 //
+// Author: Ju Liu
 // Date Created:  Nov.  5 2013
 // Date Modified: Jan. 20 2017 
 // ============================================================================

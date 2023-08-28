@@ -10,7 +10,7 @@
 // ==================================================================
 #include "PDNSolution.hpp"
 #include "Math_Tools.hpp"
-#include "ALocal_Inflow_NodalBC.hpp"
+#include "ALocal_InflowBC.hpp"
 
 namespace SEG_SOL_T
 {
@@ -144,7 +144,7 @@ namespace SEG_SOL_T
   //   \para sol : the solution class
   // ----------------------------------------------------------------
   void Insert_plug_inflow_UPV(const double &val,
-     const ALocal_Inflow_NodalBC * const &infnbc,
+     const ALocal_InflowBC * const &infnbc,
      PDNSolution * const &sol );
 
   void Insert_zero_solid_UV( const APart_Node * const &pnode,

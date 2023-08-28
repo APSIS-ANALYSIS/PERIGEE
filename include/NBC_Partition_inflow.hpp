@@ -11,7 +11,7 @@
 // inflow surface area and the inflow surface outward normal vector.
 // 
 // The data recorded in the HDF5 file by this class will be loaded
-// in the ALocal_Inflow_NodalBC class in the analysis code.
+// in the ALocal_InflowBC class in the analysis code.
 //
 // Date crated: Aug. 9 2017
 // Author: Ju Liu

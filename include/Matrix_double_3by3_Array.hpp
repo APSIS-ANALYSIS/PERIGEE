@@ -16,10 +16,7 @@
 // Author: Ju Liu
 // Date: Oct. 1st 2015
 // ============================================================================
-#include <iostream>
-#include <iomanip>
-#include <cmath>
-#include <cstdlib>
+#include "Vector_3.hpp"
 
 class Matrix_double_3by3_Array
 {
@@ -71,7 +68,9 @@ class Matrix_double_3by3_Array
 
     // Perform LU solve for the 3 mat x = b equations.
     // LU_fac() has to be called first.
-    void LU_solve(const double * const &b, double * const &x ) const;
+    Vector_3 LU_solve( const Vector_3 &b ) const;
+
+    std::array<double, 3> LU_solve( const std::array<double, 3> &b ) const;
 
     // Perofrm LU solve for the 3 mat x = b equations
     // LU_fac() has to be called first.

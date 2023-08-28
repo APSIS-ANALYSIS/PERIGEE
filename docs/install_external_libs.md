@@ -19,7 +19,7 @@ module load mpi/intel/2018.4
 The above indicates that all modules are unloaded first and the intel/2018.4 compiler is loaded, and then the corresponding MPI is loaded.
 
 ## Table of Contents
-
+- [Setup the machine](#Setup-the-machine)
 - [Create a lib folder](#Create-a-lib-folder)
 - [Install Valgrind](#Install-Valgrind)
 - [Install CMake](#Install-CMake)
@@ -31,6 +31,40 @@ The above indicates that all modules are unloaded first and the intel/2018.4 com
 - [Install Gmsh](#Install-Gmsh)
 - [Install SLEPc](#Install-SLEPc)
 - [Install ParaView](#Install-ParaView)
+
+## Setup the machine
+Assuming that you just installed a Ubuntu system. You may want to do the following to setup the system with essiential components.
+```sh
+sudo apt update
+sudo apt upgrade
+sudo apt autoremove
+sudo apt install vim
+sudo apt install git-all
+sudo apt install build-essential
+sudo apt install texlive-latex-extra
+sudo apt install texlive-publishers
+sudo apt install texlive-science
+sudo apt install gfortran
+sudo apt install python2
+sudo apt install python3
+sudo apt install mesa-utils
+sudo apt install mesa-common-dev
+sudo apt install libgl1-mesa-dev
+sudo apt install libxt-dev
+sudo apt install cmake
+sudo apt install valgrind
+```
+Go to Ubuntu Software and install Texmaker, HDFView, and JabRef.
+
+For Acrobat Reader, you may need to run the following.
+```sh
+sudo apt install gdebi-core libxml2:i386 libcanberra-gtk-module:i386 gtk2-engines-murrine:i386 libatk-adaptor:i386
+wget ftp://ftp.adobe.com/pub/adobe/reader/unix/9.x/9.5.5/enu/AdbeRdr9.5.5-1_i386linux_enu.deb
+sudo gdebi AdbeRdr9.5.5-1_i386linux_enu.deb
+```
+Then clean the .deb file from your disk.
+
+For machines with NVIDA graphic processors, you may need to install a driver. Run `ubuntu-drivers devices` to see the type of devices. Run `sudo ubuntu-drivers autoinstall` to install the recommended driver. Or, you may install specific driver by `sudo apt install nvidia-340`. You may refer to this [website](https://linuxconfig.org/benchmark-your-graphics-card-on-linux) to test your graphic card. For more detailed guidance, you may refer to this [guide](https://zhuanlan.zhihu.com/p/59618999).
 
 ## Create a lib folder
 It is recommended to have all the libraries in a single lib folder. We typically create an empty folder in the $HOME directory.
@@ -74,7 +108,7 @@ $ wget https://www.mpich.org/static/downloads/3.3rc1/mpich-3.3rc1.tar.gz
 $ tar -zxvf mpich-3.3rc1.tar.gz
 $ mv mpich-3.3rc1 mpich-3.3rc1-src
 ```
-Note that you may want to go to https://www.mpich.org/static/downloads/ to select the version of the MPICH implementation. Versions 3.2 and 3.3 are conservative choices. Now you may enter the folder and do the following to install MPICH at the prescribed location.
+Remark: you may want to go to https://www.mpich.org/static/downloads/ to select the version of the MPICH implementation. Versions 3.2 and 3.3 are conservative choices. Now you may enter the folder and do the following to install MPICH at the prescribed location.
 ```
 ./configure --prefix=$HOME/lib/mpich-3.3rc1 2>&1 | tee c.txt
 ```
@@ -82,7 +116,11 @@ At this stage, you may encounter a warning saying you do not have Fortran compil
 ```
 sudo apt-get install gfortran
 ```
-and rerun the configure command. Once you see that the system tells the configuration is complete, run the following.
+and rerun the configure command. Or you may encounter an issue saying `gfortran will not compile files that call the same routine with arguments of different types`. You need to add the following to your bashrc or bash_profile file.
+```
+export FFLAGS="-w -fallow-argument-mismatch -O2"
+```
+Once you see that the system tells the configuration is complete, run the following.
 ```
 make 2>&1 | tee m.txt
 make install 2>&1 | tee mi.txt
@@ -210,7 +248,7 @@ $ tar -zxvf slepc-3.11.3.tar.gz
 $ mv slepc-3.11.3 slepc-3.11.3-src
 $ cd slepc-3.11.3-src
 $ export PETSC_DIR=/home/juliu/lib/petsc-3.11.3-debug
-$ export SLEPC_DIR=/home/juliu/lib/slepc-3.11.3
+$ export SLEPC_DIR=/home/juliu/lib/slepc-3.11.3-src
 $ ./configure --prefix=/home/juliu/lib/slepc-3.11.3-debug
 $ make SLEPC_DIR=/home/juliu/lib/slepc-3.11.3 PETSC_DIR=/home/juliu/lib/petsc-3.11.3-debug
 $ make SLEPC_DIR=/home/juliu/lib/slepc-3.11.3 PETSC_DIR=/home/juliu/lib/petsc-3.11.3-debug install

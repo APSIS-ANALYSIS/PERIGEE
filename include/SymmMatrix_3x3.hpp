@@ -23,9 +23,6 @@ class SymmMatrix_3x3
     // Copy constructor
     SymmMatrix_3x3( const SymmMatrix_3x3 &source );
 
-    // Construct the symmetric part of the input source matrix
-    explicit SymmMatrix_3x3( const Matrix_3x3 &source );
-
     // Constructor by six numbers in Voigt numbering
     SymmMatrix_3x3( const double &m0, const double &m1, const double &m2,
         const double &m3, const double &m4, const double &m5 );
@@ -33,11 +30,10 @@ class SymmMatrix_3x3
     // Destructor
     ~SymmMatrix_3x3();
 
-    // Copy
-    void copy( const SymmMatrix_3x3 &source );
-
     // Assignment operator
     SymmMatrix_3x3& operator= (const SymmMatrix_3x3 &source);
+
+    Matrix_3x3 convert_to_full() const;
 
     // Parenthesis operator. It allows accessing and assigning the matrix entries.
     double& operator()(const int &index) {return mat[index];}
@@ -88,7 +84,7 @@ class SymmMatrix_3x3
     SymmMatrix_3x3& operator*=( const double &val );
 
     // Return true if the input matrix is identical to the mat
-    bool is_identical( const SymmMatrix_3x3 &source, const double &tol ) const;
+    bool is_identical( const SymmMatrix_3x3 &source, const double &tol = 1.0e-12 ) const;
 
     // Set all components to zero
     void gen_zero();
@@ -99,15 +95,8 @@ class SymmMatrix_3x3
     // Set components a random value
     void gen_rand();
 
-    // Generate the symmetric part of the input source matrix, i.e.
-    // output = 0.5 x ( source + source_transpose )
-    void gen_symm( const Matrix_3x3 &source );
-
     // Invert the matrix
     void inverse();
-
-    // Scale the matrix by a scalar
-    void scale( const double &val );
 
     // add the matrix with a given matrix with scaling
     // X = X + a * Y
@@ -143,18 +132,6 @@ class SymmMatrix_3x3
     // Q^T M Q = Q_ki M_kl Q_lj = output_matrix_ij
     void MatRot( const Matrix_3x3 &Q );
 
-    // Matrix multiplication as mat = source^T * source
-    // This is used for the evaluation of right Cauchy-Green strain tensor:
-    //                       C = F^T F
-    // The resulting matrix is symmetric. Hence the computation is simplified.
-    void MatMultTransposeLeft( const Matrix_3x3 &source );
-
-    // Matrix multiplication as mat = source * source^T
-    // This is used for the evaluation of the left Cauchy-Green strain tensor:
-    //                       b = F F^T
-    // The resulting matrix is symmetric. Hence, the computation is simplified.
-    void MatMultTransposeRight( const Matrix_3x3 &source );
-
     // Matrix contraction
     // return mat_ij source_ij
     double MatContraction( const Matrix_3x3 &source ) const;
@@ -170,8 +147,44 @@ class SymmMatrix_3x3
     // print the Voigt components in the order of xx yy zz yz xz xy
     void print_Voigt() const;
 
+    // ------------------------------------------------------------------------
+    // Eigen decomposition of the matrix 
+    // M = eta1 v1 v1T + eta2 v2 v2T + eta3 v3 v3T. 
+    // The algorithm is based on CMAME 197 2008 4007-4015 paper by W.M. Scherzinger
+    // and C.R. Dohrmann.
+    // This function will
+    // return 1 if the three eigenvalues are the same
+    // return 2 if there are two identical eigenvalues, the most distinct one is
+    // eta_1 and eta_1's associated eigenvector is v1
+    // return 3 if all three are distinct
+    // ------------------------------------------------------------------------
+    int eigen_decomp( double &eta1, double &eta2, double &eta3,
+       Vector_3 &v1, Vector_3 &v2, Vector_3 &v3 ) const;
+
+    // ------------------------------------------------------------------------
+    // Find the eignevector correspond to a eigenvalue
+    // This implements the algorithm documented in
+    // CMAME 2008 v197 4007-4015, sec 2.4
+    // It will return an eigenvector v for this eigenvalue,
+    // and two additional vectors s1 s2; v-s1-s2 forms a orthonormal basis.
+    // ------------------------------------------------------------------------
+    void find_eigen_vector( const double &eta, Vector_3 &v,
+        Vector_3 &s1, Vector_3 &s2 ) const;
+
   private:
     double mat[6];
+
+    // ------------------------------------------------------------------------
+    // Return the deviatoric component's contraction scaled by 0.5.
+    // M' = M - 0.3333 tr(M) I, return 0.5 M' : M'.
+    // ------------------------------------------------------------------------
+    double J2() const;
+
+    // ------------------------------------------------------------------------
+    // Return the determinant of the deviatoric component.
+    // M' = M - 0.3333 tr(M) I, return det(M').
+    // ------------------------------------------------------------------------
+    double J3() const;
 };
 
 Vector_3 operator*( const SymmMatrix_3x3 &left, const Vector_3 &right );
@@ -182,7 +195,19 @@ Matrix_3x3 operator*( const Matrix_3x3 &left, const SymmMatrix_3x3 &right );
 
 Matrix_3x3 operator*( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right );
 
+SymmMatrix_3x3 operator*( const double &val, const SymmMatrix_3x3 &input );
+
 // Return the inverse of the input matrix
 SymmMatrix_3x3 inverse( const SymmMatrix_3x3 &input );
+
+// Generate the right Cauchy-Green tensor C = F^T F
+SymmMatrix_3x3 gen_right_Cauchy_Green( const Matrix_3x3 &input );
+
+// Generate the left Cauchy-Green tensor b = F F^T
+SymmMatrix_3x3 gen_left_Cauchy_Green( const Matrix_3x3 &input );
+
+// Convert a regular matrix to its symmetric part
+// output = 0.5 x ( source + source_transpose )
+SymmMatrix_3x3 gen_symm_part( const Matrix_3x3 &input );
 
 #endif

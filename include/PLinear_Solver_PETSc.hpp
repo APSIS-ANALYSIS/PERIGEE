@@ -77,7 +77,11 @@ class PLinear_Solver_PETSc
     // ! Get the iteration number
     // ------------------------------------------------------------------------
     int get_ksp_it_num() const
-    {int it_num; KSPGetIterationNumber(ksp, &it_num); return it_num;}
+    {
+      int it_num; 
+      KSPGetIterationNumber(ksp, &it_num); 
+      return it_num;
+    }
 
     // ------------------------------------------------------------------------
     // ! Get maximum iteration number for this linear solver

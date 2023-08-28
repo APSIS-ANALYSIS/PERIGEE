@@ -9,8 +9,9 @@
 // Date: Feb. 14 2016
 // Author: Ju Liu
 // ============================================================================
-#include "ALocal_NodalBC.hpp"
-#include "ALocal_Ring_NodalBC.hpp"
+#include "PETSc_Tools.hpp"
+#include "ALocal_NBC.hpp"
+#include "ALocal_RingBC.hpp"
 #include "PDNSolution.hpp"
 #include "petscmat.h"
 
@@ -24,10 +25,10 @@ class Matrix_PETSc
     // permutation matrix.
     // ------------------------------------------------------------------------
     Matrix_PETSc( const int &loc_row, const int &loc_col, const int &dnz = 1,
-       const int &onz = 0 );
+       const int &onz = 1 );
 
     // loc_col = loc_row
-    Matrix_PETSc( const int &loc_row, const int &dnz = 1, const int &onz = 0 );
+    Matrix_PETSc( const int &loc_row, const int &dnz = 1, const int &onz = 1 );
 
     // ------------------------------------------------------------------------
     // Constructor: Generate a sparse square matrix with size defined
@@ -35,7 +36,7 @@ class Matrix_PETSc
     // * pnode_ptr->get_dof();
     // ------------------------------------------------------------------------
     Matrix_PETSc( const APart_Node * const &pnode_ptr, const int &dnz = 1,
-       const int &onz = 0 );
+       const int &onz = 1 );
 
     // ------------------------------------------------------------------------
     // Constructor: Generate a sparse square matrix with size defined
@@ -43,8 +44,8 @@ class Matrix_PETSc
     // * bc_part->get_dof_LID();
     // ------------------------------------------------------------------------
     Matrix_PETSc( const APart_Node * const &pnode_ptr,
-       const ALocal_NodalBC * const &bc_part,
-       const int &dnz = 1, const int &onz = 0 );
+       const ALocal_NBC * const &bc_part,
+       const int &dnz = 1, const int &onz = 1 );
 
     // ------------------------------------------------------------------------
     // Destroyer
@@ -105,15 +106,16 @@ class Matrix_PETSc
     // boundary conditions.
     // ------------------------------------------------------------------------
     virtual void gen_perm_bc( const APart_Node * const &pnode_ptr,
-        const ALocal_NodalBC * const &bc_part );
+        const ALocal_NBC * const &bc_part );
 
     // ------------------------------------------------------------------------
     // gen_perm_bc : Generate a permutation matrix for essential boundary
     // conditions for Multi-Field problems.
-    // NOTE: LID from the ALocal_NodalBC here should give the matrix row/col id
+    // NOTE: LID from the ALocal_NBC here should give the matrix row/col id
     // ------------------------------------------------------------------------
     virtual void gen_perm_bc( const std::vector<APart_Node *> &pnode_list,
-        const std::vector<ALocal_NodalBC *> &bc_part_list );
+        const std::vector<ALocal_NBC *> &bc_part_list,
+        const std::vector<int> &start_idx );
 
     // ------------------------------------------------------------------------
     // Gen_extractor_for_Dirichlet_nodes : Generate a matrix that is zero for
@@ -127,8 +129,8 @@ class Matrix_PETSc
     //             0 0 0 ]       1 ]        0 ]
     // 
     // ------------------------------------------------------------------------
-    virtual void gen_extractor_for_Dirichlet_nodes( const APart_Node * const &pnode_ptr ,
-        const ALocal_NodalBC * const &bc_part );
+    virtual void gen_extractor_for_Dirichlet_nodes( const APart_Node * const &pnode_ptr,
+        const ALocal_NBC * const &bc_part );
 
     // ------------------------------------------------------------------------
     // MatMultSol : perform a matrix-vector multiplication : sol = K sol
@@ -143,7 +145,7 @@ class Matrix_PETSc
     Mat K;
 
     // Global dimension of K matrix
-    int m, n;
+    int gm, gn;
 
     // Local dimension of K matrix
     int lm, ln;

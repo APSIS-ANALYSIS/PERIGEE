@@ -44,7 +44,7 @@ void FEAElement_Triangle6::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_x,
     const double * const &ctrl_y )
 {
-  assert(quad->get_dim() == 3);
+  ASSERT(quad->get_dim() == 3, "FEAElement_Triangle6::buildBasis function error.\n" );
 
   const double d2R_drr[6] { 4.0, 4.0, 0.0, -8.0, 0.0,  0.0 };
   const double d2R_dss[6] { 4.0, 0.0, 4.0,  0.0, 0.0, -8.0 };
@@ -142,13 +142,11 @@ void FEAElement_Triangle6::buildBasis( const IQuadPts * const &quad,
 
     for(int ii=0; ii<6; ++ii)
     {
-      const double RHS[3] { d2R_drr[ii] - dR_dx[offset+ii] * xrr - dR_dy[offset+ii] * yrr,
+      const std::array<double, 3> RHS {{ d2R_drr[ii] - dR_dx[offset+ii] * xrr - dR_dy[offset+ii] * yrr,
         d2R_drs[ii] - dR_dx[offset+ii] * xrs - dR_dy[offset+ii] * yrs,
-        d2R_dss[ii] - dR_dx[offset+ii] * xss - dR_dy[offset+ii] * yss };
+        d2R_dss[ii] - dR_dx[offset+ii] * xss - dR_dy[offset+ii] * yss }};
 
-      double sol[3] {0.0};
-
-      LHS.LU_solve(RHS, sol);
+      const auto sol = LHS.LU_solve(RHS);
 
       d2R_dxx[offset+ii] = sol[0];
       d2R_dyy[offset+ii] = sol[1];
@@ -243,7 +241,7 @@ void FEAElement_Triangle6::get_2D_R_dR_d2R( const int &quaindex,
 
 std::vector<double> FEAElement_Triangle6::get_d2R_dxx( const int &quaindex ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle6::get_d2R_dxx function error.\n" );
   const int offset = quaindex * 6;
   return { d2R_dxx[offset],  d2R_dxx[offset+1], d2R_dxx[offset+2], 
            d2R_dxx[offset+3],d2R_dxx[offset+4], d2R_dxx[offset+5] };
@@ -251,7 +249,7 @@ std::vector<double> FEAElement_Triangle6::get_d2R_dxx( const int &quaindex ) con
 
 std::vector<double> FEAElement_Triangle6::get_d2R_dyy( const int &quaindex ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle6::get_d2R_dyy function error.\n" );
   const int offset = quaindex * 6;
   return { d2R_dyy[offset],  d2R_dyy[offset+1], d2R_dyy[offset+2],
            d2R_dyy[offset+3],d2R_dyy[offset+4], d2R_dyy[offset+5] };
@@ -259,7 +257,7 @@ std::vector<double> FEAElement_Triangle6::get_d2R_dyy( const int &quaindex ) con
 
 std::vector<double> FEAElement_Triangle6::get_d2R_dxy( const int &quaindex ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle6::get_d2R_dxy function error.\n" );
   const int offset = quaindex * 6;
   return { d2R_dxy[offset],  d2R_dxy[offset+1], d2R_dxy[offset+2], 
            d2R_dxy[offset+3],d2R_dxy[offset+4], d2R_dxy[offset+5] };

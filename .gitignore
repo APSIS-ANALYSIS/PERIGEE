@@ -3,3 +3,4 @@
 *.aux
 *~
 .DS_Store
+system_lib_loading.cmake

@@ -90,10 +90,9 @@ void Matrix_double_6by6_Array::LU_fac()
   invm3 = 1.0 / Mat[3][3]; invm4 = 1.0 / Mat[4][4]; invm5 = 1.0 / Mat[5][5];
 }
 
-void Matrix_double_6by6_Array::LU_solve(const double * const &b, double * const &x) const
+std::array<double, 6> Matrix_double_6by6_Array::LU_solve( const std::array<double, 6> &b ) const
 {
-  for(int ii=0; ii<6; ++ii)
-    x[ii] = b[p[ii]];
+  std::array<double, 6> x {{ b[p[0]], b[p[1]], b[p[2]], b[p[3]], b[p[4]], b[p[5]] }};
 
   //x[0] = x[0];
   x[1] = x[1] - Mat[1][0] * x[0];
@@ -108,8 +107,9 @@ void Matrix_double_6by6_Array::LU_solve(const double * const &b, double * const 
   x[2] = (x[2] - Mat[2][5]*x[5] - Mat[2][4]*x[4] - Mat[2][3] * x[3] ) * invm2;
   x[1] = (x[1] - Mat[1][5]*x[5] - Mat[1][4]*x[4] - Mat[1][3]*x[3] - Mat[1][2]*x[2]) * invm1;
   x[0] = (x[0] - Mat[0][5]*x[5] - Mat[0][4]*x[4] - Mat[0][3]*x[3] - Mat[0][2]*x[2] -Mat[0][1]*x[1]) * invm0;
-}
 
+  return x;
+}
 
 void Matrix_double_6by6_Array::print() const
 {
