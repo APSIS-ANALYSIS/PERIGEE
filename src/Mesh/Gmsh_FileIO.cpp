@@ -26,19 +26,19 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
 
   // First four lines are Gmsh default file format 
   getline(infile, sline); 
-  SYS_T::print_fatal_if(sline.compare("$MeshFormat") != 0, 
+  SYS_T::print_exit_if(sline.compare("$MeshFormat") != 0, 
       "Error: .msh format first line should be $MeshFormat. \n");
   
   getline(infile, sline);
-  SYS_T::print_fatal_if(sline.compare("2.2 0 8") != 0, 
+  SYS_T::print_exit_if(sline.compare("2.2 0 8") != 0, 
       "Error: .msh format second line should be 2.2 0 8. \n");
   
   getline(infile, sline); 
-  SYS_T::print_fatal_if(sline.compare("$EndMeshFormat") != 0, 
+  SYS_T::print_exit_if(sline.compare("$EndMeshFormat") != 0, 
       "Error: .msh format third line should be $EndMeshFormat. \n");
   
   getline(infile, sline);
-  SYS_T::print_fatal_if(sline.compare("$PhysicalNames") != 0, 
+  SYS_T::print_exit_if(sline.compare("$PhysicalNames") != 0, 
       "Error: .msh format fourth line should be $PhysicalNames. \n");
   
   sstrm.clear();
@@ -74,17 +74,17 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
   VEC_T::sort_unique_resize(temp_phy_idx);
   for(int ii=0; ii<num_phy_domain; ++ii)
   {
-    if( temp_phy_idx[ii] != static_cast<int>(ii) )
-      SYS_T::print_fatal("Error: in the .msh file, the physical domain index should be in the rage [1, num_phy_domain]. \n");
+    SYS_T::print_exit_if(temp_phy_idx[ii] != static_cast<int>(ii), 
+      "Error: in the .msh file, the physical domain index should be in the rage [1, num_phy_domain]. \n");
   }
 
   // file syntax $EndPhysicalNames $Nodes 
   getline(infile, sline); 
-  SYS_T::print_fatal_if(sline.compare("$EndPhysicalNames") != 0, 
+  SYS_T::print_exit_if(sline.compare("$EndPhysicalNames") != 0, 
       "Error: .msh format line should be $EndPhysicalNames. \n");
   
   getline(infile, sline);
-  SYS_T::print_fatal_if(sline.compare("$Nodes") != 0, 
+  SYS_T::print_exit_if(sline.compare("$Nodes") != 0, 
       "Error: .msh format line should be $Nodes. \n");
   
   // get the number of nodes
@@ -100,7 +100,7 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
     int nidx; // node index
     sstrm >> nidx;
   
-    SYS_T::print_fatal_if( nidx != ii+1, "Error: .msh file, the nodal index should be in the range [1, num_node]. \n");
+    SYS_T::print_exit_if( nidx != ii+1, "Error: .msh file, the nodal index should be in the range [1, num_node]. \n");
 
     sstrm >> node[ii*3];
     sstrm >> node[ii*3+1];
@@ -109,11 +109,11 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
 
   // file syntax $EndNodes, $Elements
   getline(infile, sline); 
-  SYS_T::print_fatal_if(sline.compare("$EndNodes") != 0, 
+  SYS_T::print_exit_if(sline.compare("$EndNodes") != 0, 
       "Error: .msh format line should be $EndNodes. \n");
   
   getline(infile, sline);
-  SYS_T::print_fatal_if(sline.compare("$Elements") != 0, 
+  SYS_T::print_exit_if(sline.compare("$Elements") != 0, 
       "Error: .msh format line should be $Elements. \n");
 
   // get the number of elements
@@ -146,7 +146,7 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
     
     // number of tag has to be 2, physical tag and geometrical tag,
     // based on the Gmsh default setting.
-    SYS_T::print_fatal_if( num_tag!=2,
+    SYS_T::print_exit_if( num_tag!=2,
         "Error: .msh file number of tag for element is not 2.\n");
 
     // The pre-defined const array in the beginning of the constructor
@@ -169,7 +169,7 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
     }
     else 
     {
-      SYS_T::print_fatal_if( ele_type[phy_tag-1] != etype,
+      SYS_T::print_exit_if( ele_type[phy_tag-1] != etype,
         "Error: the physical domain have mixed type of elements. \n" );
     }
     
@@ -186,7 +186,7 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
 
   // Finish the file reading, the last line should be $EndElements  
   getline(infile, sline);
-  SYS_T::print_fatal_if(sline.compare("$EndElements") != 0, 
+  SYS_T::print_exit_if(sline.compare("$EndElements") != 0, 
       "Error: .msh format line should be $EndElements. \n");
 
   // Generate the details of the 1d, 2d and 3d info
