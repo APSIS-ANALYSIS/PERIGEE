@@ -13,13 +13,32 @@
 #include <string>
 
 template <typename T>
-struct DataVecStr
+class DataVecStr
 {
-  std::vector<T> data {};
-  std::string name {"undefined"};
+  public:
+    DataVecStr( const std::vector<T> &input_data, const std::string &input_name ) : data(input_data), name(input_name) {};
+ 
+    DataVecStr() { data = {}; name = "undefined";}
 
-  DataVecStr( const std::vector<T> &input_data, const std::string input_name ) : data(input_data), name(input_name) {};
+    virtual ~DataVecStr() {};
 
+    DataVecStr<T>& operator= ( const DataVecStr<T> &input )
+    {
+      if( this == &input) return *this;
+
+      data = input.get_data();
+      name = input.get_name();
+    
+      return *this;
+    }
+
+    std::vector<T> get_data() const {return data;}
+
+    std::string get_name() const {return name;}
+
+  private:
+    std::vector<T> data;
+    std::string name;
 };
 
 #endif

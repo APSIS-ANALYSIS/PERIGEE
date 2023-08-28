@@ -18,11 +18,15 @@ int main(int argc, char *argv[])
 {
   std::vector<int> b {1,2};
 
-  DataVecStr<int> a( {1,2,3,4,5,6}, "tt" );
+  DataVecStr<int> a { {1,2,3,4,5,6}, "tt" };
 
-  VEC_T::print(a.data);
+  std::vector<DataVecStr<int>> mm {};
 
-  std::cout<<a.name<<std::endl;
+  mm.push_back({ b, "first"});
+
+  VEC_T::print(mm[0].get_data());
+
+  std::cout<<mm[0].get_name()<<std::endl;
   return EXIT_SUCCESS;
 }
 
