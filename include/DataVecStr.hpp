@@ -4,7 +4,11 @@
 // DataVecStr.hpp
 // ----------------------------------------------------------------------------
 // DataVecStr defines a data type for a std::vector with a string holding its
-// name.
+// name and an AssociateObject flag identifying if it is a node-related or
+// cell-related data.
+//
+// This class is designed for the input and output of data between the code and VTK
+// file, primarily.
 //
 // Author: Ju Liu
 // Date: Aug. 27 2023
@@ -31,7 +35,7 @@ class DataVecStr
 
     DataVecStr<T>& operator= ( const DataVecStr<T> &input )
     {
-      if( this == &input) return *this;
+      if( this == &input ) return *this;
 
       data   = input.get_data();
       name   = input.get_name();
@@ -62,10 +66,13 @@ class DataVecStr
     }
 
   private:
+    // ------------------------------------------------------------------------
+    // data is the container that holds the values
+    // name is the name to be writen or read from the file
+    // object = AssociateObject::Node or AssociateObject::Cell.
+    // ------------------------------------------------------------------------
     std::vector<T> data;
     std::string name;
-
-    // This flag identifies the object that the data is associated with
     AssociateObject object;
 };
 
