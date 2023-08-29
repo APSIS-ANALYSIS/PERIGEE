@@ -20,6 +20,8 @@ int main(int argc, char *argv[])
 
   DataVecStr<int> a { {1,2,3,4,5,6}, "tt", AssociateObject::Node };
 
+  std::cout<<a<<std::endl;
+
   std::vector<DataVecStr<int>> mm {};
 
   mm.push_back({ b, "first", AssociateObject::Cell});
