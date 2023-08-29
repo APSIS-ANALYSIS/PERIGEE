@@ -16,6 +16,8 @@
 
 int main(int argc, char *argv[])
 {
+  AssociateObject ao = AssociateObject::Cell;
+
   std::vector<int> b {1,2};
 
   DataVecStr<int> a { {1,2,3,4,5,6}, "tt", AssociateObject::Node };
