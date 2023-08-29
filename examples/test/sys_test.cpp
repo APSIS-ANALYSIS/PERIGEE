@@ -18,11 +18,11 @@ int main(int argc, char *argv[])
 {
   std::vector<int> b {1,2};
 
-  DataVecStr<int> a { {1,2,3,4,5,6}, "tt" };
+  DataVecStr<int> a { {1,2,3,4,5,6}, "tt", AssociateObject::Node };
 
   std::vector<DataVecStr<int>> mm {};
 
-  mm.push_back({ b, "first"});
+  mm.push_back({ b, "first", AssociateObject::Cell});
 
   VEC_T::print(mm[0].get_data());
 
