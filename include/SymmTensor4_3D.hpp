@@ -111,7 +111,7 @@ class SymmTensor4_3D
     // P_dev = Id4 - id2 corss id2 = delta_ik delta_jl - 1/3 delta_ij delta_kl
     // Holzapfel book, p. 24.
     // ------------------------------------------------------------------------
-    void gen_proj_dev();
+    // void gen_proj_dev();
 
     // ------------------------------------------------------------------------
     // Generate Projector Ptilde = invC O invC - 1/3 invC x invC

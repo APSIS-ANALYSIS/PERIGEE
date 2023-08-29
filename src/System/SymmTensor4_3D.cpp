@@ -327,6 +327,66 @@ void SymmTensor4_3D::add_SymmOutProduct( const double &val, const SymmMatrix_3x3
   ten[20] = val * ( mleft(5) * mright(5) + mleft(5) * mright(5) );
 }
 
+void SymmTensor4_3D::TenPMult( const Tensor4_3D &P )
+{
+  double temp[21] = {0.0};
+  int value_left[21]  = {0,  0,  0,  0,  0, 0, 36, 36, 36, 36, 36, 72, 72, 72, 72, 45, 45, 45, 18, 9, 9};
+  int value_right[21] = {0, 36, 72, 45, 18, 9, 36, 72, 45, 18,  9, 72, 45, 18,  9, 45, 18, 9, 18, 18, 9};
+
+  for(int kk=0; kk<21; ++kk)
+  {
+    temp[kk] += P( value_left[kk] ) * ten[0] * P( value_right[kk]   );
+    temp[kk] += P( value_left[kk] ) * ten[1] * P( value_right[kk]+4 );
+    temp[kk] += P( value_left[kk] ) * ten[2] * P( value_right[kk]+8 );
+
+    temp[kk] += 2.0 * P( value_left[kk] ) * ten[3] * P( value_right[kk]+5 );
+    temp[kk] += 2.0 * P( value_left[kk] ) * ten[4] * P( value_right[kk]+2 );
+    temp[kk] += 2.0 * P( value_left[kk] ) * ten[5] * P( value_right[kk]+1 );
+
+    temp[kk] += P( value_left[kk]+4 ) * ten[1] * P( value_right[kk]   );
+    temp[kk] += P( value_left[kk]+4 ) * ten[6] * P( value_right[kk]+4 );
+    temp[kk] += P( value_left[kk]+4 ) * ten[7] * P( value_right[kk]+8 );
+
+    temp[kk] += 2.0 * P( value_left[kk] ) * ten[8]  * P( value_right[kk]+5 );
+    temp[kk] += 2.0 * P( value_left[kk] ) * ten[9]  * P( value_right[kk]+2 );
+    temp[kk] += 2.0 * P( value_left[kk] ) * ten[10] * P( value_right[kk]+1 );
+
+    temp[kk] += P( value_left[kk]+8 ) * ten[2]  * P( value_right[kk]   );
+    temp[kk] += P( value_left[kk]+8 ) * ten[7]  * P( value_right[kk]+4 );
+    temp[kk] += P( value_left[kk]+8 ) * ten[11] * P( value_right[kk]+8 );
+
+    temp[kk] += 2.0 * P( value_left[kk]+8 ) * ten[12] * P( value_right[kk]+5 );
+    temp[kk] += 2.0 * P( value_left[kk]+8 ) * ten[13] * P( value_right[kk]+2 );
+    temp[kk] += 2.0 * P( value_left[kk]+8 ) * ten[14] * P( value_right[kk]+1 );
+
+    temp[kk] += 2.0 * P( value_left[kk]+5 ) * ten[3]  * P( value_right[kk]   );
+    temp[kk] += 2.0 * P( value_left[kk]+5 ) * ten[8]  * P( value_right[kk]+4 );
+    temp[kk] += 2.0 * P( value_left[kk]+5 ) * ten[12] * P( value_right[kk]+8 );
+
+    temp[kk] += 4.0 * P( value_left[kk]+5 ) * ten[15] * P( value_right[kk]+5 );
+    temp[kk] += 4.0 * P( value_left[kk]+5 ) * ten[16] * P( value_right[kk]+2 );
+    temp[kk] += 4.0 * P( value_left[kk]+5 ) * ten[17] * P( value_right[kk]+1 );
+
+    temp[kk] += 2.0 * P( value_left[kk]+2 ) * ten[4]  * P( value_right[kk]   );
+    temp[kk] += 2.0 * P( value_left[kk]+2 ) * ten[9]  * P( value_right[kk]+4 );
+    temp[kk] += 2.0 * P( value_left[kk]+2 ) * ten[13] * P( value_right[kk]+8 );
+
+    temp[kk] += 4.0 * P( value_left[kk]+2 ) * ten[16] * P( value_right[kk]+5 );
+    temp[kk] += 4.0 * P( value_left[kk]+2 ) * ten[18] * P( value_right[kk]+2 );
+    temp[kk] += 4.0 * P( value_left[kk]+2 ) * ten[19] * P( value_right[kk]+1 );
+
+    temp[kk] += 2.0 * P( value_left[kk]+1 ) * ten[5]  * P( value_right[kk]   );
+    temp[kk] += 2.0 * P( value_left[kk]+1 ) * ten[10] * P( value_right[kk]+4 );
+    temp[kk] += 2.0 * P( value_left[kk]+1 ) * ten[14] * P( value_right[kk]+8 );
+
+    temp[kk] += 4.0 *  P( value_left[kk]+1 ) * ten[17] * P( value_right[kk]+5 );
+    temp[kk] += 4.0 *  P( value_left[kk]+1 ) * ten[19] * P( value_right[kk]+2 );
+    temp[kk] += 4.0 *  P( value_left[kk]+1 ) * ten[20] * P( value_right[kk]+1 );
+  }
+  
+  for(int ii=0; ii<21; ++ii) ten[ii] = temp[ii];
+}
+
 int SymmTensor4_3D::Voigt_notation( const int &ii, const int &jj, const int &kk, const int &ll ) const
 {
   const int index_I = Voigt_notation(ii, jj);
