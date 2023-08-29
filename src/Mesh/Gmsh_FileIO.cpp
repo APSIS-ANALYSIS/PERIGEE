@@ -48,9 +48,8 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
   // in the gmsh file, the index ranges from [1, num_phy_domain].
   // read the domain's dimension, should be 2 or 3;
   // read the domain's name, and remove the " " at the names.
-  std::vector<std::string> phy_name;
-  std::vector<int> phy_index, phy_dim;
-  phy_index.clear(); phy_dim.clear(); phy_name.clear();
+  std::vector<std::string> phy_name{};
+  std::vector<int> phy_index{}, phy_dim{};
   int pdim, pidx; std::string pname;
   for(int ii=0; ii<num_phy_domain; ++ii)
   {
@@ -369,7 +368,7 @@ void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
   // use gelem_1[2] to store the vol elements that have face over the surface
   // mesh 
   const int numcel_1 = phy_3d_nElem[index_vol1];
-  std::vector<int> gelem_1;
+  std::vector<int> gelem_1{};
   for( int ee=0; ee<numcel_1; ++ee )
   {
     int total = 0;
@@ -385,7 +384,7 @@ void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
   std::vector<int> vol_IEN_2( eIEN[phy_index_vol_2] );
 
   const int numcel_2 = phy_3d_nElem[index_vol2];
-  std::vector<int> gelem_2;;
+  std::vector<int> gelem_2{};
   for( int ee=0; ee<numcel_2; ++ee )
   {
     int total = 0;
@@ -398,7 +397,7 @@ void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
   std::cout<<"      vol 2 domain: "<<gelem_2.size()<<" tets have more than 3 points on the surface. \n";
 
   // generate the local triangle IEN array
-  std::vector<int> trien;
+  std::vector<int> trien{};
   for(int ee=0; ee<bcnumcl; ++ee)
   {
     trien.push_back(VEC_T::get_pos(bcpt, trien_global[3*ee]));
@@ -545,7 +544,7 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
   }
 
   // generate the local triangle IEN array
-  std::vector<int> trien;
+  std::vector<int> trien{};
   for(int ee=0; ee<bcnumcl; ++ee)
   {
     trien.push_back( VEC_T::get_pos(bcpt, trien_global[3*ee  ]) );
@@ -641,7 +640,7 @@ void Gmsh_FileIO::write_each_vtu() const
     std::cout<<" starting e index = "<<start_eindex<<'\t';
 
     // generate physics tag
-    std::vector<int> ptag;
+    std::vector<int> ptag{};
     ptag.assign(phy_3d_nElem[ii], ii);
 
     // collect the FSI indices of the sub-domain nodes
@@ -703,8 +702,8 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
   mytimer->Start();
 
   // Prepare for the whole mesh's IEN, and physical tag
-  std::vector<int> wIEN; // whole mesh IEN
-  std::vector<int> wtag; // whole vol mehs phys tag
+  std::vector<int> wIEN{}; // whole mesh IEN
+  std::vector<int> wtag{}; // whole vol mehs phys tag
   int wnElem = 0; // whole mesh number of elements
 
   // whole mesh num of node is assumed to be num_node 
@@ -1407,7 +1406,7 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const int &index_sur,
   SYS_T::print_exit_if( int( vol_IEN.size() ) != 10 * numcel,
       "Error: Gmsh_FileIO::write_quadratic_sur_vtu, vol IEN size wrong. \n");
 
-  std::vector<int> gelem;
+  std::vector<int> gelem{};
   for( int ee=0; ee<numcel; ++ee )
   {
     int total = 0;
@@ -1421,7 +1420,7 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const int &index_sur,
   std::cout<<"      "<<gelem.size()<<" tets have faces over the surface. \n";
 
   // generate local triangle IEN array
-  std::vector<int> trien;
+  std::vector<int> trien{};
   for(int ee=0; ee<bcnumcl; ++ee)
   { 
     trien.push_back( VEC_T::get_pos(bcpt, trien_global[6*ee  ]));
