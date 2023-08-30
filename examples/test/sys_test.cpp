@@ -15,6 +15,15 @@
 
 int main(int argc, char *argv[])
 {
+  std::vector<int> a(5, -1);
+
+  std::vector<int> b;
+  b.assign(5, -1);
+
+  VEC_T::print(a);
+  VEC_T::print(b);
+
+
   return EXIT_SUCCESS;
 }
 
