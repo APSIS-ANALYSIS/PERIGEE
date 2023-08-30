@@ -749,13 +749,13 @@ void Gmsh_FileIO::write_tri_h5( const int &index_2d,
     const std::vector<int> &index_1d ) const
 {
   // Perform basic logical checks
-  SYS_T::print_fatal_if( index_2d >= num_phy_domain_2d || index_2d < 0,
+  SYS_T::print_exit_if( index_2d >= num_phy_domain_2d || index_2d < 0,
       "Error: Gmsh_FileIO::write_2d_h5, surface index is wrong. \n");
 
   const unsigned int num_1d_edge = index_1d.size();
 
   for(unsigned int ii=0; ii<num_1d_edge; ++ii)
-    SYS_T::print_fatal_if( index_1d[ii] >= num_phy_domain_1d || index_1d[ii] < 0,
+    SYS_T::print_exit_if( index_1d[ii] >= num_phy_domain_1d || index_1d[ii] < 0,
         "Error: Gmsh_FileIO::write_2d_h5, edge index is wrong. \n");
 
   // Open an HDF5 file
@@ -811,12 +811,12 @@ void Gmsh_FileIO::write_tri_h5( const int &index_2d,
 
     VEC_T::sort_unique_resize( bcpt );
 
-    const int bcnumpt = static_cast<int>( bcpt.size() );
+    const int bcnumpt = VEC_T::get_size( bcpt );
 
     std::cout<<"      num of bc pt = "<<bcnumpt<<'\n';    
 
     // tript stores the coordinates of the boundary points 
-    std::vector<double> tript; tript.clear(); tript.resize(3*bcnumpt);
+    std::vector<double> tript( 3*bcnumpt, 0.0 );
     for( int jj=0; jj<bcnumpt; ++jj )
     {
       tript[jj*3]   = node[bcpt[jj]*3] ;
@@ -830,7 +830,7 @@ void Gmsh_FileIO::write_tri_h5( const int &index_2d,
     for(int jj=0; jj<bcnumpt; ++jj) bcmap[bcpt[jj]] = 1;
 
     // generate a list of surface elements that has boundary on this edge 
-    std::vector<int> gelem; gelem.clear();
+    std::vector<int> gelem {};
     for( int ee=0; ee<num_2d_cell; ++ee )
     {
       int total = 0;
@@ -843,15 +843,11 @@ void Gmsh_FileIO::write_tri_h5( const int &index_2d,
     std::cout<<"      "<<gelem.size()<<" elems have edge over the boundary.\n";
 
     // generate the local edge element IEN array
-    std::vector<int> edge_ien_local; edge_ien_local.clear();
+    std::vector<int> edge_ien_local {};
     for(int ee=0; ee<num_1d_cell; ++ee)
     {
       for(int jj=0; jj<nLocBas_1d; ++jj)
-      {
-        std::vector<int>::iterator it = find( bcpt.begin(),
-            bcpt.end(), edge_ien_global[nLocBas_1d*ee+jj] );
-        edge_ien_local.push_back( it - bcpt.begin() );
-      }
+        edge_ien_local.push_back( VEC_T::get_pos(bcpt, edge_ien_global[nLocBas_1d*ee+jj]) );
     }
     std::cout<<"      edge IEN generated. \n";
 
@@ -863,27 +859,25 @@ void Gmsh_FileIO::write_tri_h5( const int &index_2d,
     // Hence, we only need to treat all elements as if they are linear
     // line/triangle elements. Once the end points match with the corner
     // points, the edge is on the triangle boundary.
-    std::vector<int> face2elem; face2elem.resize(num_1d_cell, -1);
-    int sur_elem, node0, node1;
+    std::vector<int> face2elem(num_1d_cell, -1);
     int snode[3];
-    bool got0, got1, gotit;
     for(int ff=0; ff<num_1d_cell; ++ff)
     {
-      node0 = edge_ien_global[ nLocBas_1d * ff + 0 ];
-      node1 = edge_ien_global[ nLocBas_1d * ff + 1 ];
-      gotit = false;
+      const int node0 = edge_ien_global[ nLocBas_1d * ff + 0 ];
+      const int node1 = edge_ien_global[ nLocBas_1d * ff + 1 ];
+      bool gotit = false;
       int ee = -1;
       while( !gotit && ee < int(gelem.size()) - 1 )
       {
         ee += 1;
-        sur_elem = gelem[ee];
-        snode[0] = eIEN[domain_2d_idx][nLocBas_2d * sur_elem + 0];
-        snode[1] = eIEN[domain_2d_idx][nLocBas_2d * sur_elem + 1];
-        snode[2] = eIEN[domain_2d_idx][nLocBas_2d * sur_elem + 2];
+        const int sur_elem = gelem[ee];
+        int snode[3] { eIEN[domain_2d_idx][nLocBas_2d * sur_elem],
+                       eIEN[domain_2d_idx][nLocBas_2d * sur_elem + 1],
+                       eIEN[domain_2d_idx][nLocBas_2d * sur_elem + 2]};
         std::sort(snode, snode+3);
 
-        got0 = ( std::find(snode, snode+3, node0) != snode+3 );
-        got1 = ( std::find(snode, snode+3, node1) != snode+3 );
+        const bool got0 = ( std::find(snode, snode+3, node0) != snode+3 );
+        const bool got1 = ( std::find(snode, snode+3, node1) != snode+3 );
         gotit = got0 && got1;
       }
       if(gotit)
