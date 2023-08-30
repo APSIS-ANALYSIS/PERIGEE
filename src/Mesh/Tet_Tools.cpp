@@ -188,6 +188,34 @@ void TET_T::write_tet_grid( const std::string &filename,
 
 
 void TET_T::write_tet_grid( const std::string &filename,
+      const int &numpts, const int &numcels,
+      const std::vector<double> &pt, const std::vector<int> &ien_array,
+      const std::vector< DataVecStr<int> > &IOdata, const bool &isXML )
+{
+  // Setup the VTK objects
+  vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
+
+  // Generate the mesh and compute aspect ratios
+  gen_tet_grid( grid_w, numpts, numcels, pt, ien_array );
+
+  for( auto data : IOdata )
+  {
+    if( data.get_object() == AssociateObject::Node )
+      VTK_T::add_int_PointData( grid_w, data.get_data(), data.get_name() );
+    else if( data.get_object() == AssociateObject::Cell )
+      VTK_T::add_int_CellData( grid_w, data.get_data(), data.get_name() );
+    else
+      SYS_T::print_exit( "Error: unknown object type in DataVecStr %s", data.get_name().c_str() );
+  }
+
+  // write vtu or vtk
+  VTK_T::write_vtkPointSet(filename, grid_w, isXML);
+
+  grid_w->Delete();
+}
+
+
+void TET_T::write_tet_grid( const std::string &filename,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt, const std::vector<int> &ien_array,
     const std::vector<int> &node_idx, const std::vector<int> &elem_idx, 

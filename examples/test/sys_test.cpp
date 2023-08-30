@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 
   std::vector<DataVecStr<int>> mm {};
 
-  mm.push_back({ b, "first", AssociateObject::Cell});
+  mm.push_back({ b, "first", ao});
 
   VEC_T::print(mm[0].get_data());
 
