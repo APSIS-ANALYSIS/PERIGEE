@@ -22,11 +22,11 @@ int main(int argc, char *argv[])
   TET_T::write_tet_grid( "old", 5, 2, {0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0}, {0,1,2,3,1, 2, 3,4}, {-1, 32, 5, 3, 22}, eid, ptag, true );
 
   std::vector<DataVecStr<int>> input {};
-  input.push_back({{-1,32,5,3, 22}, "GlobalNodeID", AssociateObject::Node});
-  input.push_back({eid, "GlobalNodeID", AssociateObject::Cell});
+  input.push_back({{-1,32,5,3, 22}, "GlobalNID", AssociateObject::Node});
+  input.push_back({eid, "GlobalEID", AssociateObject::Cell});
   input.push_back({{-2, 23}, "Physics_tag", AssociateObject::Cell});
 
-  TET_T::write_tet_grid( "new", 5, 2, {0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0}, {0,1,2,3, 1,2,3,4}, input, true ); 
+  TET_T::write_tet_grid( "new", 5, 2, {0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0}, {0,1,2,3, 1,2,3,4}, {} ); 
 
   return EXIT_SUCCESS;
 }

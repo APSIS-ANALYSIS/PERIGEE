@@ -68,7 +68,7 @@ namespace TET_T
   void write_tet_grid( const std::string &filename,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, const std::vector<int> &ien_array );
-
+  
   void write_tet_grid( const std::string &filename,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, const std::vector<int> &ien_array,
@@ -79,12 +79,12 @@ namespace TET_T
       const std::vector<double> &pt, const std::vector<int> &ien_array,
       const std::vector<int> &node_idx, const std::vector<int> &elem_idx,
       const std::vector<int> &phy_tag, const bool &isXML );
-
+  
   void write_tet_grid( const std::string &filename,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, const std::vector<int> &ien_array,
       const std::vector<DataVecStr<int>> &IOdata, const bool &isXML = true );
-
+  
   // ----------------------------------------------------------------
   // ! write_tet_grid : write a volumetric mesh with 
   //                    1) NodalIndex; 2) ElemIndex; 3) Phy_tag
