@@ -6,18 +6,18 @@ void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
     const std::vector<int> &ien_array )
 {
   // Check the input data compatibility
-  if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: TET_T::write_tet_grid point vector size does not match the number of points. \n");
+  if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: TET_T::gen_tet_grid point vector size does not match the number of points. \n");
 
   // detect the element type
   int nlocbas = -1;
   if( int(ien_array.size()) == 4*numcels ) nlocbas = 4;
   else if( int(ien_array.size()) == 10*numcels ) nlocbas = 10;
-  else SYS_T::print_fatal("Error: TET_T::write_tet_grid ien array size does not match the number of cells. \n");
+  else SYS_T::print_fatal("Error: TET_T::gen_tet_grid ien array size does not match the number of cells. \n");
 
   // Check the connectivity array
   std::vector<int> temp = ien_array;
   VEC_T::sort_unique_resize(temp);
-  if( int(temp.size()) != numpts ) SYS_T::print_fatal("Error: TET_T::write_tet_grid numpts does not match the number of unique points in the ien array. Please re-organize the input. \n");
+  if( int(temp.size()) != numpts ) SYS_T::print_fatal("Error: TET_T::gen_tet_grid numpts does not match the number of unique points in the ien array. Please re-organize the input. \n");
   VEC_T::clean(temp);
 
   // 1. nodal points coordinates
@@ -86,7 +86,7 @@ void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
 
     cl -> Delete();
   }
-  else SYS_T::print_fatal("Error: TET_T::write_tet_grid unknown local basis number.\n");
+  else SYS_T::print_fatal("Error: TET_T::gen_tet_grid unknown local basis number.\n");
 
   // Add the asepct-ratio to grid_w
   grid_w -> GetCellData() -> AddArray( edge_aspect_ratio );
@@ -211,16 +211,18 @@ void TET_T::write_tet_grid( const std::string &filename,
     for(int ii=0; ii<numpts; ++ii) node_idx[ii] = ii;
 
     VTK_T::add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
+    VEC_T::clean( node_idx );
   }
 
   // We need to assign GlobalElementID if the user does not provide it
-  // explicitly
+  // explicitly in IOdata
   if( !VEC_T::is_invec(name_list, static_cast<std::string>("GlobalElementID")) )
   {
     std::vector<int> elem_idx(numcels, -1);
     for(int ii=0; ii<numcels; ++ii) elem_idx[ii] = ii;
 
     VTK_T::add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
+    VEC_T::clean( elem_idx );
   }
 
   // We add the IOdata for VTK
@@ -231,10 +233,10 @@ void TET_T::write_tet_grid( const std::string &filename,
     else if( data.get_object() == AssociateObject::Cell )
       VTK_T::add_int_CellData( grid_w, data.get_data(), data.get_name() );
     else
-      SYS_T::print_exit( "Error: unknown object type in DataVecStr %s", data.get_name().c_str() );
+      SYS_T::print_exit( "Error: In TET_T::write_tet_grid, there is an unknown object type in DataVecStr %s", data.get_name().c_str() );
   }
 
-  // write vtu or vtk
+  // Write the prepared grid_w to a vtu or vtk file on disk
   VTK_T::write_vtkPointSet(filename, grid_w, isXML);
 
   grid_w->Delete();
