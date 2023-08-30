@@ -198,6 +198,14 @@ void TET_T::write_tet_grid( const std::string &filename,
   // Generate the mesh and compute aspect ratios
   gen_tet_grid( grid_w, numpts, numcels, pt, ien_array );
 
+  // We need to make sure there are no data in IOdata that have the same name
+  std::vector<std::string> name_list {};
+  for( auto data : IOdata ) name_list.push_back( data.get_name() );
+
+  VEC_T::sort_unique_resize( name_list );
+
+  SYS_T::print_exit_if( name_list.size() != IOdata.size(), "Error: In TET_T::write_tet_grid, there are %d data in the IOdata that have the same name.\n", IOdata.size() - name_list.size() + 1 );
+
   for( auto data : IOdata )
   {
     if( data.get_object() == AssociateObject::Node )

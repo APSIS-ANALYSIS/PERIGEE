@@ -17,19 +17,17 @@
 
 int main(int argc, char *argv[])
 {
-  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
   std::vector<int> eid {11, 21};
   std::vector<int> ptag {-2, 23};
   TET_T::write_tet_grid( "old", 5, 2, {0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0}, {0,1,2,3,1, 2, 3,4}, {-1, 32, 5, 3, 22}, eid, ptag, true );
 
   std::vector<DataVecStr<int>> input {};
   input.push_back({{-1,32,5,3, 22}, "GlobalNodeID", AssociateObject::Node});
-  input.push_back({eid, "GlobalElementID", AssociateObject::Cell});
+  input.push_back({eid, "GlobalNodeID", AssociateObject::Cell});
   input.push_back({{-2, 23}, "Physics_tag", AssociateObject::Cell});
 
   TET_T::write_tet_grid( "new", 5, 2, {0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0}, {0,1,2,3, 1,2,3,4}, input, true ); 
 
-  PetscFinalize();
   return EXIT_SUCCESS;
 }
 
