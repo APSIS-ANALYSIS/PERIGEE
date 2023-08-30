@@ -860,7 +860,6 @@ void Gmsh_FileIO::write_tri_h5( const int &index_2d,
     // line/triangle elements. Once the end points match with the corner
     // points, the edge is on the triangle boundary.
     std::vector<int> face2elem(num_1d_cell, -1);
-    int snode[3];
     for(int ff=0; ff<num_1d_cell; ++ff)
     {
       const int node0 = edge_ien_global[ nLocBas_1d * ff + 0 ];
@@ -873,7 +872,7 @@ void Gmsh_FileIO::write_tri_h5( const int &index_2d,
         const int sur_elem = gelem[ee];
         int snode[3] { eIEN[domain_2d_idx][nLocBas_2d * sur_elem],
                        eIEN[domain_2d_idx][nLocBas_2d * sur_elem + 1],
-                       eIEN[domain_2d_idx][nLocBas_2d * sur_elem + 2]};
+                       eIEN[domain_2d_idx][nLocBas_2d * sur_elem + 2] };
         std::sort(snode, snode+3);
 
         const bool got0 = ( std::find(snode, snode+3, node0) != snode+3 );
@@ -1015,7 +1014,6 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
 
     // Loacate the volumetric element that the face element belongs to 
     std::vector<int> face2elem(num_2d_cell, -1);
-    int vnode[4];
     for(int ff=0; ff<num_2d_cell; ++ff)
     {
       const int node0 = face_ien_global[ nLocBas_2d * ff + 0 ];
@@ -1033,9 +1031,9 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
                        eIEN[domain_3d_idx][nLocBas_3d * vol_elem + 3] };
         std::sort(vnode, vnode+4);
 
-        bool got0 = ( std::find(vnode, vnode+4, node0) != vnode+4 );
-        bool got1 = ( std::find(vnode, vnode+4, node1) != vnode+4 );
-        bool got2 = ( std::find(vnode, vnode+4, node2) != vnode+4 );
+        const bool got0 = ( std::find(vnode, vnode+4, node0) != vnode+4 );
+        const bool got1 = ( std::find(vnode, vnode+4, node1) != vnode+4 );
+        const bool got2 = ( std::find(vnode, vnode+4, node2) != vnode+4 );
         gotit = got0 && got1 && got2;
       }
       if(gotit)
@@ -1076,13 +1074,13 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
     const std::vector<int> &index_2d_need_facemap ) const
 {
   // Perform basic index boundary check
-  SYS_T::print_fatal_if( index_3d >= num_phy_domain_3d || index_3d < 0,
+  SYS_T::print_exit_if( index_3d >= num_phy_domain_3d || index_3d < 0,
       "Error: Gmsh_FileIO::write_tet_h5, surface index is wrong.\n");
 
   const unsigned int num_2d_face = index_2d.size();
 
   for(unsigned int ii=0; ii<num_2d_face; ++ii)
-    SYS_T::print_fatal_if( index_2d[ii] >= num_phy_domain_2d || index_2d[ii] < 0,
+    SYS_T::print_exit_if( index_2d[ii] >= num_phy_domain_2d || index_2d[ii] < 0,
         "Error: Gmsh_FileIO::write_tet_h5, face index is wrong. \n");
 
   // Open an HDF5 file
@@ -1133,11 +1131,11 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
     std::vector<int> face_ien_global( eIEN[domain_2d_idx] );
     std::vector<int> bcpt( face_ien_global );
     VEC_T::sort_unique_resize(bcpt);
-    const int bcnumpt = static_cast<int>( bcpt.size() );
+    const int bcnumpt = VEC_T::get_size( bcpt );
     std::cout<<"      num of bc pt = "<<bcnumpt<<'\n';
 
     // tript stores the coordinates of the boundary points
-    std::vector<double> tript; tript.clear(); tript.resize(3*bcnumpt);
+    std::vector<double> tript(3*bcnumpt, 0.0);
     for( int jj=0; jj<bcnumpt; ++jj )
     {
       tript[jj*3]   = node[bcpt[jj]*3];
@@ -1151,7 +1149,7 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
     for(int jj=0; jj<bcnumpt; ++jj) bcmap[bcpt[jj]] = 1;
 
     // Generate a list of volume elements that have boundary over the face
-    std::vector<int> gelem; gelem.clear();
+    std::vector<int> gelem {};
     for( int ee=0; ee<num_3d_cell; ++ee )
     {
       int total = 0;
@@ -1164,45 +1162,38 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
     std::cout<<"      "<<gelem.size()<<" elems have face over the boundary.\n";
 
     // Generate the local face element IEN array
-    std::vector<int> face_ien_local; face_ien_local.clear();
+    std::vector<int> face_ien_local {};
     for(int ee=0; ee<num_2d_cell; ++ee)
     {
       for(int jj=0; jj<nLocBas_2d; ++jj)
-      {
-        std::vector<int>::iterator it = find( bcpt.begin(),
-            bcpt.end(), face_ien_global[nLocBas_2d*ee+jj] );
-        face_ien_local.push_back( it - bcpt.begin() );
-      }
+        face_ien_local.push_back(VEC_T::get_pos(bcpt, face_ien_global[nLocBas_2d*ee+jj]));
     }
     std::cout<<"      edge IEN generated. \n";
 
     // Loacate the volumetric element that the face element belongs to 
-    std::vector<int> face2elem; face2elem.resize(num_2d_cell, -1);
+    std::vector<int> face2elem(num_2d_cell, -1);
     if( VEC_T::is_invec( index_2d_need_facemap, index_2d[ii] ) )
     {
-      int vol_elem, node0, node1, node2;
-      int vnode[4];
-      bool got0, got1, got2, gotit;
       for(int ff=0; ff<num_2d_cell; ++ff)
       {
-        node0 = face_ien_global[ nLocBas_2d * ff + 0 ];
-        node1 = face_ien_global[ nLocBas_2d * ff + 1 ];
-        node2 = face_ien_global[ nLocBas_2d * ff + 2 ];
-        gotit = false;
+        const int node0 = face_ien_global[ nLocBas_2d * ff + 0 ];
+        const int node1 = face_ien_global[ nLocBas_2d * ff + 1 ];
+        const int node2 = face_ien_global[ nLocBas_2d * ff + 2 ];
+        bool gotit = false;
         int ee = -1;
         while( !gotit && ee < int(gelem.size()) - 1 )
         {
           ee += 1;
-          vol_elem = gelem[ee];
-          vnode[0] = eIEN[domain_3d_idx][nLocBas_3d * vol_elem + 0];
-          vnode[1] = eIEN[domain_3d_idx][nLocBas_3d * vol_elem + 1];
-          vnode[2] = eIEN[domain_3d_idx][nLocBas_3d * vol_elem + 2];
-          vnode[3] = eIEN[domain_3d_idx][nLocBas_3d * vol_elem + 3];
+          const int vol_elem = gelem[ee];
+          int vnode[4] { eIEN[domain_3d_idx][nLocBas_3d * vol_elem + 0],
+                         eIEN[domain_3d_idx][nLocBas_3d * vol_elem + 1],
+                         eIEN[domain_3d_idx][nLocBas_3d * vol_elem + 2],
+                         eIEN[domain_3d_idx][nLocBas_3d * vol_elem + 3] };
           std::sort(vnode, vnode+4);
 
-          got0 = ( std::find(vnode, vnode+4, node0) != vnode+4 );
-          got1 = ( std::find(vnode, vnode+4, node1) != vnode+4 );
-          got2 = ( std::find(vnode, vnode+4, node2) != vnode+4 );
+          const bool got0 = ( std::find(vnode, vnode+4, node0) != vnode+4 );
+          const bool got1 = ( std::find(vnode, vnode+4, node1) != vnode+4 );
+          const bool got2 = ( std::find(vnode, vnode+4, node2) != vnode+4 );
           gotit = got0 && got1 && got2;
         }
         if(gotit)
