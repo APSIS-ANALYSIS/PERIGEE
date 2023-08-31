@@ -44,13 +44,9 @@ bool SymmTensor4_3D::is_identical(const Tensor4_3D &source, const double &tol) c
     {
       for(int kk=0; kk<3; ++kk)
       {
-        for(int ll=0; ll<3; ++ll)
-        {
-          if( std::abs(source(27*ii+9*jj+3*kk+ll) - ten[Voigt_notation(ii,jj,kk,ll)] ) > tol )
-          {
-            return false;
-          }
-        }
+        if( std::abs( source(ii,jj,kk,0) - ten[Voigt_notation(ii,jj,kk,0)] ) > tol ) return false;
+        if( std::abs( source(ii,jj,kk,1) - ten[Voigt_notation(ii,jj,kk,1)] ) > tol ) return false;
+        if( std::abs( source(ii,jj,kk,2) - ten[Voigt_notation(ii,jj,kk,2)] ) > tol ) return false;
       }
     }
   }
@@ -345,8 +341,8 @@ void SymmTensor4_3D::add_SymmOutProduct( const double &val, const SymmMatrix_3x3
 void SymmTensor4_3D::TenPMult( const Tensor4_3D &P )
 {
   double temp[21] = {0.0};
-  int value_left[21]  = {0,  0,  0,  0,  0, 0, 36, 36, 36, 36, 36, 72, 72, 72, 72, 45, 45, 45, 18, 9, 9};
-  int value_right[21] = {0, 36, 72, 45, 18, 9, 36, 72, 45, 18,  9, 72, 45, 18,  9, 45, 18, 9, 18, 18, 9};
+  const int value_left[21]  = {0,  0,  0,  0,  0, 0, 36, 36, 36, 36, 36, 72, 72, 72, 72, 45, 45, 45, 18, 9, 9};
+  const int value_right[21] = {0, 36, 72, 45, 18, 9, 36, 72, 45, 18,  9, 72, 45, 18,  9, 45, 18, 9, 18, 18, 9};
 
   for(int kk=0; kk<21; ++kk)
   {
@@ -407,22 +403,22 @@ int SymmTensor4_3D::Voigt_notation( const int &ii, const int &jj, const int &kk,
   const int index_I = Voigt_notation(ii, jj);
   const int index_J = Voigt_notation(kk, ll);
 
-  const int mat[36] = {0, 1,  2,  3,  4,  5,
-                       1, 6,  7,  8,  9,  10,
-                       2, 7,  11, 12, 13, 14,
-                       3, 8,  12, 15, 16, 17,
-                       4, 9,  13, 16, 18, 19,
-                       5, 10, 14, 17, 19, 20 };
+  const int mapper[36] = { 0, 1,  2,  3,  4,  5,
+                           1, 6,  7,  8,  9,  10,
+                           2, 7,  11, 12, 13, 14,
+                           3, 8,  12, 15, 16, 17,
+                           4, 9,  13, 16, 18, 19,
+                           5, 10, 14, 17, 19, 20 };
 
-  return mat[ 6 * index_I + index_J ];
+  return mapper[ 6 * index_I + index_J ];
 }
 
 int SymmTensor4_3D::Voigt_notation( const int &ii, const int &jj ) const
 {
-  const int mat[9] = { 0, 5, 4, 
-                       5, 1, 3, 
-                       4, 3, 2 };
-  return mat[ 3 * ii + jj ];
+  const int mapper[9] = { 0, 5, 4, 
+                          5, 1, 3, 
+                          4, 3, 2 };
+  return mapper[ 3 * ii + jj ];
 }
 
 SymmTensor4_3D gen_ST4_zero()
