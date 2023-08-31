@@ -295,6 +295,64 @@ void TET_T::write_triangle_grid( const std::string &filename,
   grid_w->Delete();
 }
 
+void TET_T::write_triangle_grid( const std::string &filename,
+      const int &numpts, const int &numcels,
+      const std::vector<double> &pt, 
+      const std::vector<int> &ien_array,
+      const std::vector<DataVecStr<int>> &IOdata )
+{
+  // Setup the VTK objects
+  vtkPolyData * grid_w = vtkPolyData::New();
+
+  // Generate the mesh
+  gen_triangle_grid( grid_w, numpts, numcels, pt, ien_array );
+
+  // We need to make sure there are no data in IOdata that have the same name
+  std::vector<std::string> name_list {};
+  for( auto data : IOdata ) name_list.push_back( data.get_name() );
+
+  VEC_T::sort_unique_resize( name_list );
+
+  SYS_T::print_exit_if( name_list.size() != IOdata.size(), "Error: In TET_T::write_triangle_grid, there are %d data in the IOdata that have the same name.\n", IOdata.size() - name_list.size() + 1 );
+  
+  // We need to assign GlobalNodeID if the user does not provide it explicitly
+  // in IOdata
+  if( !VEC_T::is_invec(name_list, static_cast<std::string>("GlobalNodeID")) )
+  {
+    std::vector<int> node_idx(numpts, -1);
+    for(int ii=0; ii<numpts; ++ii) node_idx[ii] = ii;
+
+    VTK_T::add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
+    VEC_T::clean( node_idx );
+  }
+
+  // We need to assign GlobalElementID if the user does not provide it
+  // explicitly in IOdata
+  if( !VEC_T::is_invec(name_list, static_cast<std::string>("GlobalElementID")) )
+  {
+    std::vector<int> elem_idx(numcels, -1);
+    for(int ii=0; ii<numcels; ++ii) elem_idx[ii] = ii;
+
+    VTK_T::add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
+    VEC_T::clean( elem_idx );
+  }
+
+// We add the IOdata for VTK
+  for( auto data : IOdata )
+  {
+    if( data.get_object() == AssociateObject::Node )
+      VTK_T::add_int_PointData( grid_w, data.get_data(), data.get_name() );
+    else if( data.get_object() == AssociateObject::Cell )
+      VTK_T::add_int_CellData( grid_w, data.get_data(), data.get_name() );
+    else
+      SYS_T::print_exit( "Error: In TET_T::write_triangle_grid, there is an unknown object type in DataVecStr %s", data.get_name().c_str() );
+  }
+
+  // Write the prepared grid_w to a vtu or vtk file on disk
+  VTK_T::write_vtkPointSet(filename, grid_w);
+
+  grid_w->Delete();
+}
 
 void TET_T::gen_triangle_grid( vtkPolyData * const &grid_w,
     const int &numpts, const int &numcels,

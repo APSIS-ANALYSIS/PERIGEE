@@ -17,16 +17,17 @@
 
 int main(int argc, char *argv[])
 {
+  std::vector<int> nid {32, 5, 3, 22};
   std::vector<int> eid {11, 21};
-  std::vector<int> ptag {-2, 23};
-  TET_T::write_tet_grid( "old", 5, 2, {0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0}, {0,1,2,3,1, 2, 3,4}, {-1, 32, 5, 3, 22}, eid, ptag, true );
+  // old function cannot add Physics_tag
+  TET_T::write_triangle_grid( "old", 4, 2, {0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0}, {0,1,2,2,1,3}, nid, eid );
 
   std::vector<DataVecStr<int>> input {};
-  input.push_back({{-1,32,5,3, 22}, "GlobalNID", AssociateObject::Node});
-  input.push_back({eid, "GlobalEID", AssociateObject::Cell});
+  input.push_back({nid, "GlobalNodeID", AssociateObject::Node});
+  input.push_back({eid, "GlobalElementID", AssociateObject::Cell});
   input.push_back({{-2, 23}, "Physics_tag", AssociateObject::Cell});
 
-  TET_T::write_tet_grid( "new", 5, 2, {0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0}, {0,1,2,3, 1,2,3,4}, {} ); 
+  TET_T::write_triangle_grid( "new", 4, 2, {0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0}, {0,1,2,2,1,3}, input ); 
 
   return EXIT_SUCCESS;
 }
