@@ -315,27 +315,27 @@ void SymmTensor4_3D::add_SymmProduct( const double &val, const SymmMatrix_3x3 &m
 void SymmTensor4_3D::add_SymmOutProduct( const double &val, const SymmMatrix_3x3 &mleft,
     const SymmMatrix_3x3 &mright )
 {
-  ten[0]  = val * ( mleft(0) * mright(0) + mleft(0) * mright(0) );
-  ten[1]  = val * ( mleft(0) * mright(1) + mleft(1) * mright(0) );
-  ten[2]  = val * ( mleft(0) * mright(2) + mleft(2) * mright(0) );
-  ten[3]  = val * ( mleft(0) * mright(3) + mleft(3) * mright(0) );
-  ten[4]  = val * ( mleft(0) * mright(4) + mleft(4) * mright(0) );
-  ten[5]  = val * ( mleft(0) * mright(5) + mleft(5) * mright(0) );
-  ten[6]  = val * ( mleft(1) * mright(1) + mleft(1) * mright(1) );
-  ten[7]  = val * ( mleft(1) * mright(2) + mleft(2) * mright(1) );
-  ten[8]  = val * ( mleft(1) * mright(3) + mleft(3) * mright(1) );
-  ten[9]  = val * ( mleft(4) * mright(1) + mleft(1) * mright(4) );
-  ten[10] = val * ( mleft(5) * mright(1) + mleft(1) * mright(5) );
-  ten[11] = val * ( mleft(2) * mright(2) + mleft(2) * mright(2) );
-  ten[12] = val * ( mleft(3) * mright(2) + mleft(2) * mright(3) );
-  ten[13] = val * ( mleft(4) * mright(2) + mleft(2) * mright(4) );
-  ten[14] = val * ( mleft(5) * mright(2) + mleft(2) * mright(5) );
-  ten[15] = val * ( mleft(3) * mright(3) + mleft(3) * mright(3) );
-  ten[16] = val * ( mleft(4) * mright(3) + mleft(3) * mright(4) );
-  ten[17] = val * ( mleft(5) * mright(3) + mleft(3) * mright(5) );
-  ten[18] = val * ( mleft(4) * mright(4) + mleft(4) * mright(4) );
-  ten[19] = val * ( mleft(5) * mright(4) + mleft(4) * mright(5) );
-  ten[20] = val * ( mleft(5) * mright(5) + mleft(5) * mright(5) );
+  ten[0]  += val * ( mleft(0) * mright(0) + mleft(0) * mright(0) );
+  ten[1]  += val * ( mleft(0) * mright(1) + mleft(1) * mright(0) );
+  ten[2]  += val * ( mleft(0) * mright(2) + mleft(2) * mright(0) );
+  ten[3]  += val * ( mleft(0) * mright(3) + mleft(3) * mright(0) );
+  ten[4]  += val * ( mleft(0) * mright(4) + mleft(4) * mright(0) );
+  ten[5]  += val * ( mleft(0) * mright(5) + mleft(5) * mright(0) );
+  ten[6]  += val * ( mleft(1) * mright(1) + mleft(1) * mright(1) );
+  ten[7]  += val * ( mleft(1) * mright(2) + mleft(2) * mright(1) );
+  ten[8]  += val * ( mleft(1) * mright(3) + mleft(3) * mright(1) );
+  ten[9]  += val * ( mleft(4) * mright(1) + mleft(1) * mright(4) );
+  ten[10] += val * ( mleft(5) * mright(1) + mleft(1) * mright(5) );
+  ten[11] += val * ( mleft(2) * mright(2) + mleft(2) * mright(2) );
+  ten[12] += val * ( mleft(3) * mright(2) + mleft(2) * mright(3) );
+  ten[13] += val * ( mleft(4) * mright(2) + mleft(2) * mright(4) );
+  ten[14] += val * ( mleft(5) * mright(2) + mleft(2) * mright(5) );
+  ten[15] += val * ( mleft(3) * mright(3) + mleft(3) * mright(3) );
+  ten[16] += val * ( mleft(4) * mright(3) + mleft(3) * mright(4) );
+  ten[17] += val * ( mleft(5) * mright(3) + mleft(3) * mright(5) );
+  ten[18] += val * ( mleft(4) * mright(4) + mleft(4) * mright(4) );
+  ten[19] += val * ( mleft(5) * mright(4) + mleft(4) * mright(5) );
+  ten[20] += val * ( mleft(5) * mright(5) + mleft(5) * mright(5) );
 }
 
 void SymmTensor4_3D::TenPMult( const Tensor4_3D &P )

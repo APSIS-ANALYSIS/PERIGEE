@@ -6,6 +6,7 @@
 #include "HDF5_Reader.hpp"
 #include "PostVectSolution.hpp"
 #include "Tensor4_3D.hpp"
+#include "SymmTensor4_3D.hpp"
 #include "Mesh_Tet.hpp"
 #include "IEN_FEM.hpp"
 #include "Matrix_double_3by3_Array.hpp"
@@ -13,30 +14,26 @@
 
 int main(int argc, char *argv[])
 {
-  Matrix_double_6by6_Array A(-1.1, -2.3, 3.5, 4.8, 5.5, -6.0, 7.023, -18.0, 9.0);
+  SymmMatrix_3x3 smat; smat.gen_rand();
+  Matrix_3x3 mat = smat.convert_to_full();
 
-  A.LU_fac();
+  Tensor4_3D ten = gen_symm_id();
+  SymmTensor4_3D sten = gen_ST4_symm_id();
 
-  double rhs [] = {1.0, 222222.0, -332325.2, 4.0, 5.5, 6.9};
+  ten.gen_Ptilde( mat );
+  sten.gen_Ptilde( smat );
 
-  double sol [] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  SymmMatrix_3x3 smat2; smat2.gen_rand();
+  Matrix_3x3 mat2 = smat2.convert_to_full();
 
-  A.LU_solve(rhs, sol);
+  ten.add_SymmOutProduct(3.14159, mat, mat2);
+  sten.add_SymmOutProduct(3.14159, smat, smat2);
+  
 
-  std::array<double, 6> rrhs;
+  sten.print_in_mat();
 
-  for(int ii=0; ii<6; ++ii) rrhs[ii] = rhs[ii];
-
-  auto ssol = A.LU_solve(rrhs);
-
-  std::cout<<sol[0] - ssol[0]<<'\t';
-  std::cout<<sol[1] - ssol[1]<<'\t';
-  std::cout<<sol[2] - ssol[2]<<'\t';
-  std::cout<<sol[3] - ssol[3]<<'\t';
-  std::cout<<sol[4] - ssol[4]<<'\t';
-  std::cout<<sol[5] - ssol[5]<<'\n';
-
-  for(int ii=0; ii<6; ++ii) std::cout<<sol[ii]<<'\n';
+  if( sten.is_identical(ten, 1.0e-13) ) std::cout<<"passed! \n";
+  else std::cout<<"error. \n";
 
   return EXIT_SUCCESS;
 }
