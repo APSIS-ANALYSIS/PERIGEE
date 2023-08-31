@@ -226,8 +226,10 @@ void SV_T::update_sv_vtp( const std::string &filename,
   if(fend.compare(".vtp") == 0)
     fname.erase(fname.end()-4, fname.end());
 
-  TET_T::write_triangle_grid( fname, numpts, numcels, pt, ien_array,
-      global_node_index, global_ele_index );
+  std::vector<DataVecStr<int>> dvs {};
+  dvs.push_back({global_node_index, "GlobalNodeID", AssociateObject::Node});
+  dvs.push_back({global_ele_index, "GlobalElementID", AssociateObject::Cell});
+  TET_T::write_triangle_grid( fname, numpts, numcels, pt, ien_array, dvs );
 }
 
 
@@ -340,8 +342,10 @@ void SV_T::update_sv_vtp( const std::string &filename,
   if(fend.compare(".vtp") == 0)
     fname.erase(fname.end()-4, fname.end());
 
-  TET_T::write_triangle_grid( fname, numpts, numcels, pt, ien_array,
-      global_node_index, global_ele_index );
+  std::vector<DataVecStr<int>> dvs {};
+  dvs.push_back({global_node_index, "GlobalNodeID", AssociateObject::Node});
+  dvs.push_back({global_ele_index, "GlobalElementID", AssociateObject::Cell});
+  TET_T::write_triangle_grid( fname, numpts, numcels, pt, ien_array, dvs );
 }
 
 

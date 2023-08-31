@@ -630,8 +630,11 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
   }
   
   // Write the mesh file in vtp format
+  std::vector<DataVecStr<int>> dvs {};
+  dvs.push_back({bcpt, "GlobalNodeID", AssociateObject::Node});
+  dvs.push_back({face2elem, "GlobalElementID", AssociateObject::Cell});
   TET_T::write_triangle_grid( vtp_file_name, bcnumpt, bcnumcl,
-      tript, trien, bcpt, face2elem );
+      tript, trien, dvs );
 
   mytimer->Stop();
   std::cout<<"      Time taken "<<mytimer->get_sec()<<" sec. \n";
