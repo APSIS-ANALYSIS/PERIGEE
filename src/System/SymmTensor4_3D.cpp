@@ -400,6 +400,8 @@ void SymmTensor4_3D::TenPMult( const Tensor4_3D &P )
 
 int SymmTensor4_3D::Voigt_notation( const int &ii, const int &jj, const int &kk, const int &ll ) const
 {
+  // This map is used to transform the natural indices of a 3x3 symmetric matrix
+  // to Voigt notation
   const int map[9] = { 0, 5, 4, 
                        5, 1, 3, 
                        4, 3, 2 };
