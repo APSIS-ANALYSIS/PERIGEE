@@ -591,7 +591,7 @@ Tensor4_3D gen_T4_symm_id()
 
 Tensor4_3D gen_T4_P( const Matrix_3x3 &C, const Matrix_3x3 &invC )
 {
-  Tensor4_3D out = gen_symm_id();
+  Tensor4_3D out = gen_T4_symm_id();
   
   out.add_OutProduct( -1.0 / 3.0, invC, C );
 
@@ -600,12 +600,12 @@ Tensor4_3D gen_T4_P( const Matrix_3x3 &C, const Matrix_3x3 &invC )
 
 Tensor4_3D gen_T4_P( const Matrix_3x3 &C )
 {
-  return gen_P( C, inverse(C) );
+  return gen_T4_P( C, inverse(C) );
 }
 
 Tensor4_3D gen_T4_Pt( const Matrix_3x3 &C )
 {
-  return gen_P( inverse(C) );
+  return gen_T4_P( inverse(C) );
 }
 
 Tensor4_3D gen_T4_Ptilde( const Matrix_3x3 &invC )

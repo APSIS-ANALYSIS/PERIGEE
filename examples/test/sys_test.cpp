@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
   SymmMatrix_3x3 smat; smat.gen_rand();
   Matrix_3x3 mat = smat.convert_to_full();
 
-  Tensor4_3D ten = gen_symm_id();
+  Tensor4_3D ten = gen_T4_symm_id();
   SymmTensor4_3D sten = gen_ST4_symm_id();
 
   ten.gen_Ptilde( mat );
