@@ -409,4 +409,5 @@ int SymmTensor4_3D::Voigt_notation( const int &ii, const int &jj ) const
                        4, 3, 2 };
   return mat[ 3 * ii + jj ];
 }
+
 // EOF
