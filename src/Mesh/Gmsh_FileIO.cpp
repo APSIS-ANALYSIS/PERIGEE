@@ -491,8 +491,12 @@ void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
   }
 
   // Write the mesh file in vtp format
+  std::vector<DataVecStr<int>> dvs {};
+  dvs.push_back({bcpt, "GlobalNodeID", AssociateObject::Node});
+  dvs.push_back({face2elem_1, "GlobalElementID_1", AssociateObject::Cell});
+  dvs.push_back({face2elem_2, "GlobalElementID_2", AssociateObject::Cell});
   TET_T::write_triangle_grid( vtp_file_name, bcnumpt, bcnumcl,
-      tript, trien, bcpt, face2elem_1, face2elem_2 );
+      tript, trien, dvs );
 
   delete [] bcmap; bcmap = nullptr;
   mytimer->Stop();
