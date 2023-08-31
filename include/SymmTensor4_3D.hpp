@@ -121,15 +121,15 @@ class SymmTensor4_3D
     void add_OutProduct( const double &val, const SymmMatrix_3x3 &mmat );
 
     // ------------------------------------------------------------------------
-    // TO BE UPDATED!
     // add a symmetric tensor product of 4 vectors which is defined the
     // following way,
-    //     val x ( vex1[i] x vec2[j] x vec3[k] x vec4[l]
-    //     + vex1[i] x vec2[j] x vec3[l] x vec4[k]
-    //     + vex1[j] x vec2[i] x vec3[k] x vec4[l]
-    //     + vex1[j] x vec2[i] x vec3[l] x vec4[k] ).
+    //     val x ( vex1[i] x vec2[j] x vec1[k] x vec2[l]
+    //     + vex1[i] x vec2[j] x vec1[l] x vec2[k]
+    //     + vex1[j] x vec2[i] x vec1[k] x vec2[l]
+    //     + vex1[j] x vec2[i] x vec1[l] x vec2[k] ).
     // This function is typically called in the generation of the elasticity
-    // tensor in the stretch-based models.
+    // tensor in the stretch-based models. Different combinations of ijkl
+    // yield same result tensor because of major and minor symmetry.
     // See, Holzapfel book p. 263, equation (6.196) for an example.
     // for example: 
     // add_ten[20] = 
