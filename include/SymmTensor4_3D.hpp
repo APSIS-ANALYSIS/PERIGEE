@@ -211,6 +211,6 @@ SymmTensor4_3D gen_ST4_zero();
 
 SymmTensor4_3D gen_ST4_symm_id();
 
-SymmTensor4_3D gen_Ptilde( const SymmMatrix_3x3 &invC );
+SymmTensor4_3D gen_ST4_Ptilde( const SymmMatrix_3x3 &invC );
 
 #endif

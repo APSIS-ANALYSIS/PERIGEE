@@ -574,7 +574,7 @@ Tensor4_3D operator*( const double &val, const Tensor4_3D &input )
   return out;
 }
 
-Tensor4_3D gen_symm_id()
+Tensor4_3D gen_T4_symm_id()
 {
   Tensor4_3D out;
   out.gen_zero();
@@ -589,7 +589,7 @@ Tensor4_3D gen_symm_id()
   return out;
 }
 
-Tensor4_3D gen_P( const Matrix_3x3 &C, const Matrix_3x3 &invC )
+Tensor4_3D gen_T4_P( const Matrix_3x3 &C, const Matrix_3x3 &invC )
 {
   Tensor4_3D out = gen_symm_id();
   
@@ -598,17 +598,17 @@ Tensor4_3D gen_P( const Matrix_3x3 &C, const Matrix_3x3 &invC )
   return out;
 }
 
-Tensor4_3D gen_P( const Matrix_3x3 &C )
+Tensor4_3D gen_T4_P( const Matrix_3x3 &C )
 {
   return gen_P( C, inverse(C) );
 }
 
-Tensor4_3D gen_Pt( const Matrix_3x3 &C )
+Tensor4_3D gen_T4_Pt( const Matrix_3x3 &C )
 {
   return gen_P( inverse(C) );
 }
 
-Tensor4_3D gen_Ptilde( const Matrix_3x3 &invC )
+Tensor4_3D gen_T4_Ptilde( const Matrix_3x3 &invC )
 {
   Tensor4_3D out;
   out.gen_zero();

@@ -300,7 +300,7 @@ Tensor4_3D operator*( const Tensor4_3D &tleft, const Tensor4_3D &tright );
 // Return scalar multiplication on the input tensor
 Tensor4_3D operator*( const double &val, const Tensor4_3D &input );
 
-Tensor4_3D gen_symm_id();
+Tensor4_3D gen_T_symm_id();
 
 // ------------------------------------------------------------------------
 // Generate Projector P = SymmId4 - 1/3 invC x C
@@ -309,9 +309,9 @@ Tensor4_3D gen_symm_id();
 // invC is the inverse of C
 // see Holzapfel book p.229 eqn. (6.84).
 // ------------------------------------------------------------------------
-Tensor4_3D gen_P( const Matrix_3x3 &C, const Matrix_3x3 &invC );
+Tensor4_3D gen_T4_P( const Matrix_3x3 &C, const Matrix_3x3 &invC );
 
-Tensor4_3D gen_P( const Matrix_3x3 &C );
+Tensor4_3D gen_T4_P( const Matrix_3x3 &C );
 
 // ------------------------------------------------------------------------
 // Generate Projector Pt = transpose of P = SymmId4 - 1/3 C x invC
@@ -320,13 +320,13 @@ Tensor4_3D gen_P( const Matrix_3x3 &C );
 // invC is the inverse of C
 // see Holzapfel book p.229 eqn. (6.84).
 // ------------------------------------------------------------------------
-Tensor4_3D gen_Pt( const Matrix_3x3 &C );
+Tensor4_3D gen_T4_Pt( const Matrix_3x3 &C );
 
 // ------------------------------------------------------------------------
 // Generate Projector Ptilde = invC O invC - 1/3 invC x invC
 // invC is assumed to be the right Cauchy-Green tensor 
 // see Holzapfel book p. 255, eqn. (6.170).
 // ------------------------------------------------------------------------
-Tensor4_3D gen_Ptilde( const Matrix_3x3 &invC );
+Tensor4_3D gen_T4_Ptilde( const Matrix_3x3 &invC );
 
 #endif

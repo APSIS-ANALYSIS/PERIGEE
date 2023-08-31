@@ -435,7 +435,7 @@ SymmTensor4_3D gen_ST4_symm_id()
   return out;
 }
 
-SymmTensor4_3D gen_Ptilde( const SymmMatrix_3x3 &invC )
+SymmTensor4_3D gen_ST4_Ptilde( const SymmMatrix_3x3 &invC )
 {     
   SymmTensor4_3D out = gen_ST4_zero();
   out.add_SymmProduct( 1.0, invC, invC );
