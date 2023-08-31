@@ -400,9 +400,10 @@ void SymmTensor4_3D::TenPMult( const Tensor4_3D &P )
 
 int SymmTensor4_3D::Voigt_notation( const int &ii, const int &jj, const int &kk, const int &ll ) const
 {
-  const int index_I = Voigt_notation(ii, jj);
-  const int index_J = Voigt_notation(kk, ll);
-
+  const int map[9] = { 0, 5, 4, 
+                       5, 1, 3, 
+                       4, 3, 2 };
+  
   const int mapper[36] = { 0, 1,  2,  3,  4,  5,
                            1, 6,  7,  8,  9,  10,
                            2, 7,  11, 12, 13, 14,
@@ -410,15 +411,7 @@ int SymmTensor4_3D::Voigt_notation( const int &ii, const int &jj, const int &kk,
                            4, 9,  13, 16, 18, 19,
                            5, 10, 14, 17, 19, 20 };
 
-  return mapper[ 6 * index_I + index_J ];
-}
-
-int SymmTensor4_3D::Voigt_notation( const int &ii, const int &jj ) const
-{
-  const int mapper[9] = { 0, 5, 4, 
-                          5, 1, 3, 
-                          4, 3, 2 };
-  return mapper[ 3 * ii + jj ];
+  return mapper[ 6 * map[ 3*ii + jj ] + map[ 3*kk + ll ] ];
 }
 
 SymmTensor4_3D gen_ST4_zero()
