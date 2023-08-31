@@ -121,7 +121,7 @@ namespace MATH_T
   // --------------------------------------------------------------------------
   inline double normalize3d( double &x, double &y, double &z )
   {
-    const double len = sqrt(x*x + y*y + z*z);
+    const double len = std::sqrt(x*x + y*y + z*z);
     x = x / len;
     y = y / len;
     z = z / len;
@@ -131,7 +131,7 @@ namespace MATH_T
 
   inline double norm2(const double &x, const double &y, const double &z)
   {
-    return sqrt(x*x + y*y + z*z);
+    return std::sqrt(x*x + y*y + z*z);
   }
 
   // ----------------------------------------------------------------

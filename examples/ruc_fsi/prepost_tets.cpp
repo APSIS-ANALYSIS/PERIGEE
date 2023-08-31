@@ -56,14 +56,14 @@ int main( int argc, char * argv[] )
   cout<<"==== Command Line Arguments ===="<<endl;
 
   // Check if the given geo file exist
-  SYS_T::file_check( geo_file.c_str() );
+  SYS_T::file_check( geo_file );
 
   // Read the geo_file
   int nFunc, nElem;
   std::vector<int> vecIEN;
   std::vector<double> ctrlPts;
   
-  TET_T::read_vtu_grid(geo_file.c_str(), nFunc, nElem, ctrlPts, vecIEN);
+  VTK_T::read_vtu_grid(geo_file, nFunc, nElem, ctrlPts, vecIEN);
   
   IIEN * IEN = new IEN_FEM(nElem, vecIEN);
   VEC_T::clean( vecIEN ); // clean the vector
@@ -83,7 +83,7 @@ int main( int argc, char * argv[] )
       break;
   }
 
-  SYS_T::print_exit_if_not( IEN->get_nLocBas() == mesh->get_nLocBas(), "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", mesh->get_nLocBas(), IEN->get_nLocBas());
+  SYS_T::print_exit_if( IEN->get_nLocBas() != mesh->get_nLocBas(), "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", mesh->get_nLocBas(), IEN->get_nLocBas());
 
   mesh -> print_info();
 

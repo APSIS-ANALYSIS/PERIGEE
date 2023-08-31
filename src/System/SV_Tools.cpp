@@ -8,7 +8,7 @@ void SV_T::update_sv_vtu( const std::string &filename,
   std::vector<int> vecIEN;
   std::vector<double> ctrlPts;
 
-  TET_T::read_vtu_grid(filename, nFunc, nElem, ctrlPts, vecIEN);
+  VTK_T::read_vtu_grid(filename, nFunc, nElem, ctrlPts, vecIEN);
 
   // Read element index
   vtkXMLUnstructuredGridReader * reader = vtkXMLUnstructuredGridReader::New();
@@ -66,7 +66,7 @@ void SV_T::gen_sv_fsi_vtus( const std::string &filename_f,
   std::vector<int> vecIEN_f;
   std::vector<double> ctrlPts_f;
 
-  TET_T::read_vtu_grid(filename_f, nFunc_f, nElem_f, ctrlPts_f, vecIEN_f);
+  VTK_T::read_vtu_grid(filename_f, nFunc_f, nElem_f, ctrlPts_f, vecIEN_f);
 
   // The FSI mesh IEN and control points start from those in fluid sub-domain
   VEC_T::insert_end( wIEN, vecIEN_f );
@@ -78,17 +78,17 @@ void SV_T::gen_sv_fsi_vtus( const std::string &filename_f,
   // Read the interface mesh
   // This surface mesh is assumed to be the UPDATED fluid wall vtp mesh.
   int nFunc_i, nElem_i;
-  std::vector<int> vecIEN_i, node_idx_i, elem_idx_i;
+  std::vector<int> vecIEN_i;
   std::vector<double> ctrlPts_i;
-  TET_T::read_vtp_grid( filename_f_wall, nFunc_i, nElem_i, ctrlPts_i,
-      vecIEN_i, node_idx_i, elem_idx_i );
+  VTK_T::read_vtp_grid( filename_f_wall, nFunc_i, nElem_i, ctrlPts_i, vecIEN_i );
+  std::vector<int> node_idx_i = VTK_T::read_int_PointData(filename_f_wall, "GlobalNodeID");
 
   // Read solid mesh
   int nFunc_s, nElem_s;
   std::vector<int> vecIEN_s;
   std::vector<double> ctrlPts_s;
 
-  TET_T::read_vtu_grid(filename_s, nFunc_s, nElem_s, ctrlPts_s, vecIEN_s);
+  VTK_T::read_vtu_grid(filename_s, nFunc_s, nElem_s, ctrlPts_s, vecIEN_s);
 
   // Create a node mapping for the solid nodes that maps the solid own
   // node index to the whole FSI mesh nodal index.
@@ -114,7 +114,7 @@ void SV_T::gen_sv_fsi_vtus( const std::string &filename_f,
   SYS_T::print_fatal_if( counter != nFunc_s - nFunc_i, "Error: SV_T::merge_sv_vtus, there are points in the interface not located in the solid domain. \n");
 
   // Clean the interface data
-  VEC_T::clean(ctrlPts_i); VEC_T::clean(node_idx_i); VEC_T::clean(elem_idx_i);
+  VEC_T::clean(ctrlPts_i); VEC_T::clean(node_idx_i);
 
   // adjust the solid IEN array in the FSI IEN array
   std::vector<int> tempIEN; tempIEN.resize( vecIEN_s.size() ); 
@@ -234,7 +234,7 @@ void SV_T::update_sv_sur_vtu( const std::string &filename,
   std::vector<int> vecIEN;
   std::vector<double> ctrlPts;
 
-  TET_T::read_vtu_grid( filename, nFunc, nElem, ctrlPts, vecIEN );
+  VTK_T::read_vtu_grid( filename, nFunc, nElem, ctrlPts, vecIEN );
 
   vtkXMLUnstructuredGridReader * reader = vtkXMLUnstructuredGridReader::New();
   reader -> SetFileName( filename.c_str() );
@@ -360,8 +360,8 @@ void SV_T::compare_sv_vtp( const std::string &filename_1,
   std::vector<double> pt_1, pt_2;
   std::vector<int> ien_1, ien_2;
 
-  TET_T::read_vtp_grid( filename_1, numpts_1, numcels_1, pt_1, ien_1 );
-  TET_T::read_vtp_grid( filename_2, numpts_2, numcels_2, pt_2, ien_2 );
+  VTK_T::read_vtp_grid( filename_1, numpts_1, numcels_1, pt_1, ien_1 );
+  VTK_T::read_vtp_grid( filename_2, numpts_2, numcels_2, pt_2, ien_2 );
 
   SYS_T::print_fatal_if(numpts_1 != numpts_2, "Error: SV_T::compare_sv_vtp number of points does not match. \n");
 

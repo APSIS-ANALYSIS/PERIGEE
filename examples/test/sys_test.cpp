@@ -13,6 +13,8 @@
 #include "IEN_FEM.hpp"
 #include "Matrix_double_3by3_Array.hpp"
 #include "Matrix_double_6by6_Array.hpp"
+#include "VTK_Tools.hpp"
+#include "NodalBC.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -60,6 +62,7 @@ int main(int argc, char *argv[])
     else std::cout<<"error. \n";
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
+  
   return EXIT_SUCCESS;
 }
 

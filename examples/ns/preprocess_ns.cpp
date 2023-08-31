@@ -12,8 +12,7 @@
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
 #include "Part_Tet.hpp"
-#include "NodalBC_3D_vtp.hpp"
-#include "NodalBC_3D_vtu.hpp"
+#include "NodalBC.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_tet_outflow.hpp"
 #include "NBC_Partition.hpp"
@@ -27,8 +26,8 @@ int main( int argc, char * argv[] )
   SYS_T::execute("rm -rf preprocessor_cmd.h5");
 
   // Define basic problem settins
-  const int dofNum = 4; // degree-of-freedom for the physical problem
-  const int dofMat = 4; // degree-of-freedom in the matrix problem
+  constexpr int dofNum = 4; // degree-of-freedom for the physical problem
+  constexpr int dofMat = 4; // degree-of-freedom in the matrix problem
   const std::string part_file("part");
   
   // Element options: 501 linear tets, 502 quadratic tets
@@ -156,7 +155,7 @@ int main( int argc, char * argv[] )
   std::vector<int> vecIEN;
   std::vector<double> ctrlPts;
   
-  TET_T::read_vtu_grid(geo_file.c_str(), nFunc, nElem, ctrlPts, vecIEN);
+  VTK_T::read_vtu_grid(geo_file, nFunc, nElem, ctrlPts, vecIEN);
   
   IIEN * IEN = new IEN_FEM(nElem, vecIEN);
   VEC_T::clean( vecIEN ); // clean the vector
@@ -176,7 +175,7 @@ int main( int argc, char * argv[] )
       break;
   }
 
-  SYS_T::print_exit_if_not( IEN->get_nLocBas() == mesh->get_nLocBas(), "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", mesh->get_nLocBas(), IEN->get_nLocBas());
+  SYS_T::print_exit_if( IEN->get_nLocBas() != mesh->get_nLocBas(), "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", mesh->get_nLocBas(), IEN->get_nLocBas());
 
   mesh -> print_info();
   
@@ -194,29 +193,18 @@ int main( int argc, char * argv[] )
   mnindex->write_hdf5("node_mapping");
 
   // Setup Nodal i.e. Dirichlet type Boundary Conditions
-  std::vector<INodalBC *> NBC_list;
-  NBC_list.clear(); NBC_list.resize( dofMat );
+  std::vector<INodalBC *> NBC_list( dofMat, nullptr );
 
-  std::vector<std::string> dir_list;
+  std::vector<std::string> dir_list {};
   for(int ii=0; ii<num_inlet; ++ii)
     dir_list.push_back( sur_file_in[ii] );
  
   dir_list.push_back( sur_file_wall );
 
-  if(elemType == 501)
-  {
-    NBC_list[0] = new NodalBC_3D_vtp( nFunc );
-    NBC_list[1] = new NodalBC_3D_vtp( dir_list, nFunc );
-    NBC_list[2] = new NodalBC_3D_vtp( dir_list, nFunc );
-    NBC_list[3] = new NodalBC_3D_vtp( dir_list, nFunc );
-  }
-  else
-  {
-    NBC_list[0] = new NodalBC_3D_vtu( nFunc );
-    NBC_list[1] = new NodalBC_3D_vtu( dir_list, nFunc );
-    NBC_list[2] = new NodalBC_3D_vtu( dir_list, nFunc );
-    NBC_list[3] = new NodalBC_3D_vtu( dir_list, nFunc );
-  }
+  NBC_list[0] = new NodalBC( nFunc );
+  NBC_list[1] = new NodalBC( dir_list, nFunc );
+  NBC_list[2] = new NodalBC( dir_list, nFunc );
+  NBC_list[3] = new NodalBC( dir_list, nFunc );
 
   // Inflow BC info
   std::vector< Vector_3 > inlet_outvec( sur_file_in.size() );

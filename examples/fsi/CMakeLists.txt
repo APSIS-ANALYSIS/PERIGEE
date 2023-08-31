@@ -40,13 +40,13 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/System/HDF5_Writer.cpp
   ${perigee_source}/System/HDF5_Reader.cpp
   ${perigee_source}/Mesh/Gmsh_FileIO.cpp
+  ${perigee_source}/Mesh/VTK_Tools.cpp
   ${perigee_source}/Mesh/Tet_Tools.cpp
   ${perigee_source}/Mesh/IEN_FEM.cpp
-  ${perigee_source}/Mesh/INodalBC.cpp
   ${perigee_source}/Mesh/Mesh_Tet.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet_outflow.cpp
-  ${perigee_source}/Mesh/NodalBC_3D_vtu.cpp
+  ${perigee_source}/Mesh/NodalBC.cpp
   ${perigee_source}/Mesh/NodalBC_3D_inflow.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
   ${perigee_source}/Mesh/NBC_Partition.cpp
