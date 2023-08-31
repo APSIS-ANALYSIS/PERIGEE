@@ -111,7 +111,8 @@ class SymmTensor4_3D
 
     // ------------------------------------------------------------------------
     // Generate Projector Ptilde = invC O invC - 1/3 invC x invC
-    // invC is assumed to be the right Cauchy-Green tensor
+    // here, invC is assumed to be the right Cauchy-Green tensor
+    // O represents a SymmProduct and x represents an outproduct 
     // see Holzapfel book p. 255, eqn. (6.170).
     // ------------------------------------------------------------------------
     void gen_Ptilde( const SymmMatrix_3x3 &invC );
@@ -124,28 +125,22 @@ class SymmTensor4_3D
     void add_OutProduct( const double &val, const SymmMatrix_3x3 &mmat );
 
     // ------------------------------------------------------------------------
-    // add a symmetric tensor product of 4 vectors which is defined the
+    // add a symmetric tensor product of 2 vectors which is defined the
     // following way,
-    //     val x ( vex1[i] x vec2[j] x vec1[k] x vec2[l]
-    //     + vex1[i] x vec2[j] x vec1[l] x vec2[k]
-    //     + vex1[j] x vec2[i] x vec1[k] x vec2[l]
-    //     + vex1[j] x vec2[i] x vec1[l] x vec2[k] ).
+    //     val x ( vec1[i] x vec2[j] x vec1[k] x vec2[l]
+    //           + vec1[i] x vec2[j] x vec1[l] x vec2[k]
+    //           + vec1[j] x vec2[i] x vec1[k] x vec2[l]
+    //           + vec1[j] x vec2[i] x vec1[l] x vec2[k] ).
     // This function is typically called in the generation of the elasticity
     // tensor in the stretch-based models. Different combinations of ijkl
-    // yield same result tensor because of major and minor symmetry.
+    // yield same result tensor because of the major and minor symmetry.
     // See, Holzapfel book p. 263, equation (6.196) for an example.
-    // for example: 
-    // add_ten[20] = 
-    // val x ( vex1[0] x vec2[1] x vec1[0] x vec2[1]
-    //       + vex1[0] x vec2[1] x vec1[1] x vec2[0]
-    //       + vex1[1] x vec2[0] x vec1[0] x vec2[1]
-    //       + vex1[1] x vec2[0] x vec1[1] x vec2[0] ).
-    // 
-    // add_ten[20] = 
-    // val x ( vex1[0] x vec2[1] x vec1[1] x vec2[0]
-    //       + vex1[0] x vec2[1] x vec1[0] x vec2[1]
-    //       + vex1[1] x vec2[0] x vec1[1] x vec2[0]
-    //       + vex1[1] x vec2[0] x vec1[0] x vec2[1] ).
+    // for example, consider the last component of ten: 
+    // ten[20] += 
+    //      val x ( vec1[0] x vec2[1] x vec1[0] x vec2[1]
+    //            + vec1[0] x vec2[1] x vec1[1] x vec2[0]
+    //            + vec1[1] x vec2[0] x vec1[0] x vec2[1]
+    //            + vec1[1] x vec2[0] x vec1[1] x vec2[0] ).
     // ------------------------------------------------------------------------
     void add_SymmOutProduct( const double &val, const Vector_3 &vec1, const Vector_3 &vec2 );
 
@@ -157,9 +152,7 @@ class SymmTensor4_3D
     //     = -0.5 (C^{-1}_AC C^{-1}_BD + C^{-1}_AD C^{-1}_{BC})
     //     = SymmProduct(-0.5, invC, invC )
     // for invertible and symmetric 2nd-order tensor C.
-    // Holzapfel book, p. 254
-    // Notes: taking same mleft and mright maintains major symmetry, another
-    // fact that mleft and mright are all symmetric maintains minor symmetry 
+    // Holzapfel book, p. 254, eqn. (6.165).
     // ------------------------------------------------------------------------
     void add_SymmProduct( const double &val, const SymmMatrix_3x3 &mleft,
         const SymmMatrix_3x3 &mright );

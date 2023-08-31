@@ -78,10 +78,7 @@ void SymmTensor4_3D::gen_rand()
 
 void SymmTensor4_3D::gen_zero()
 {
-  for(int ii=0; ii<21; ++ii)
-  {
-    ten[ii] = 0.0;
-  }
+  for(int ii=0; ii<21; ++ii) ten[ii] = 0.0;
 }
 
 void SymmTensor4_3D::gen_symm_id()
