@@ -177,10 +177,13 @@ class SymmTensor4_3D
     void add_SymmOutProduct( const double &val, const SymmMatrix_3x3 &mleft,
         const SymmMatrix_3x3 &mright );
    
+    // ------------------------------------------------------------------------
     // Tensor Left and Right Multiplication modification with the same
     // tensor P. See Holzapfel p. 255, the first term in eqn. (6.168) for
     // an example of this function.
     // ten_IJKL = P_IJMN ten_MNST P_KLST
+    // Note: Here the tensor P is assumed to have minor symmetry.
+    // ------------------------------------------------------------------------
     void TenPMult( const Tensor4_3D &P );
 
     // ------------------------------------------------------------------------
