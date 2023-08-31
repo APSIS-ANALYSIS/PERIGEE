@@ -44,7 +44,7 @@ void SV_T::update_sv_vtu( const std::string &filename,
   // If the last four is .vtu, remove them for TET_T::write_tet_grid 
   if(fend.compare(".vtu") == 0) fname.erase( fname.end()-4, fname.end() );
 
-  TET_T::write_tet_grid(fname, nFunc, nElem, ctrlPts, vecIEN);
+  TET_T::write_tet_grid(fname, nFunc, nElem, ctrlPts, vecIEN, {});
 }
 
 
@@ -135,8 +135,10 @@ void SV_T::gen_sv_fsi_vtus( const std::string &filename_f,
   // If the last four is .vtu, remove them for TET_T::write_tet_grid 
   if(fend.compare(".vtu") == 0) fname.erase( fname.end()-4, fname.end() );
 
+  std::vector<DataVecStr<int>> dvs {};
+  dvs.push_back({wtag, "Physics_tag", AssociateObject::Cell});
   TET_T::write_tet_grid( fname, nFunc_f + counter, nElem_f + nElem_s,
-      ctrlPts, wIEN, wtag, true );
+      ctrlPts, wIEN, dvs, true );
 
   std::cout<<"Status: "<<writename_whole<<" is generated. \n";
 
@@ -148,8 +150,11 @@ void SV_T::gen_sv_fsi_vtus( const std::string &filename_f,
   map_s_elem.resize(nElem_s);
   for(int ii=0; ii<nElem_s; ++ii) map_s_elem[ii] = nElem_f + ii;
 
+  dvs.clear();
+  dvs.push_back({map_s_node, "GlobalNodeID", AssociateObject::Node});
+  dvs.push_back({map_s_elem, "GlobalElementID", AssociateObject::Cell});
   TET_T::write_tet_grid( fname, nFunc_s, nElem_s, 
-      ctrlPts_s, vecIEN_s, map_s_node, map_s_elem );
+      ctrlPts_s, vecIEN_s, dvs );
 
   std::cout<<"Status: "<<filename_s<<" is updated to "<<writename_solid<<'\n';
 }

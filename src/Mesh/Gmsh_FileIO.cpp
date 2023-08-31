@@ -700,9 +700,12 @@ void Gmsh_FileIO::write_each_vtu() const
 
     // write the sub-volumetric domain's vtk/vtu file
     // the subdomain element index start with the start_eindex
+    std::vector<DataVecStr<int>> dvs {};
+    dvs.push_back({local_node_idx, "GlobalNodeID", AssociateObject::Node});
+    dvs.push_back({local_cell_idx, "GlobalElementID", AssociateObject::Cell});
+    dvs.push_back({ptag, "Physics_tag", AssociateObject::Cell});
     TET_T::write_tet_grid( vtu_file_name, num_local_node, 
-        phy_3d_nElem[ ii ], local_coor, domain_IEN, 
-        local_node_idx, local_cell_idx, ptag, true);
+        phy_3d_nElem[ ii ], local_coor, domain_IEN, dvs, true);
 
     mytimer->Stop();
 
@@ -749,9 +752,11 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
 
   std::cout<<"\n    "<<wnElem<<" total elems and "<<wnNode<<" total nodes. \n";
 
-  // write whole domain  
+  // write whole domain
+  std::vector<DataVecStr<int>> dvs {};
+  dvs.push_back({wtag, "Physics_tag", AssociateObject::Cell});
   TET_T::write_tet_grid( in_fname, wnNode, wnElem, node,
-      wIEN, wtag, isXML ); 
+      wIEN, dvs, isXML ); 
 
   mytimer->Stop();
   std::cout<<"    Time taken "<<mytimer->get_sec()<<" sec. \n";
