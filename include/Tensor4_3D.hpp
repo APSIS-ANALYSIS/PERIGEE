@@ -32,6 +32,8 @@ class Tensor4_3D
     // Copy constructor
     Tensor4_3D( const Tensor4_3D &source );
 
+    Tensor4_3D( const std::array<double, 81> &source );
+
     // Destructor
     ~Tensor4_3D();
    

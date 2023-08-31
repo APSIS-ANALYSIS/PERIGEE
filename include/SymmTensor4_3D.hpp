@@ -54,6 +54,9 @@ class SymmTensor4_3D
 
     ~SymmTensor4_3D();
 
+    // Convert the symmetric tensor to a full tensor
+    Tensor4_3D convert_to_full() const;
+
     // Assignment operator
     SymmTensor4_3D& operator= (const SymmTensor4_3D &source);
 

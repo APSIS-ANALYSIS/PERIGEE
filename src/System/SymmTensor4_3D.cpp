@@ -8,6 +8,24 @@ SymmTensor4_3D::SymmTensor4_3D()
 SymmTensor4_3D::~SymmTensor4_3D()
 {}
 
+Tensor4_3D SymmTensor4_3D::convert_to_full() const
+{
+  Tensor4_3D out;
+  for(int ii=0; ii<3; ++ii)
+  {
+    for(int jj=0; jj<3; ++jj)
+    {
+      for(int kk=0; kk<3; ++kk)
+      {
+        out(ii, jj, kk, 0) = ten[ Voigt_notation(ii, jj, kk, 0)];
+        out(ii, jj, kk, 1) = ten[ Voigt_notation(ii, jj, kk, 1)];
+        out(ii, jj, kk, 2) = ten[ Voigt_notation(ii, jj, kk, 2)];
+      }
+    }
+  }
+  return out;
+}
+
 double& SymmTensor4_3D::operator()(const int &ii, const int &jj, const int &kk, const int &ll)
 {
   return ten[ Voigt_notation(ii,jj,kk,ll) ];

@@ -15,6 +15,11 @@ Tensor4_3D::Tensor4_3D( const Tensor4_3D &source )
   for(int ii=0; ii<81; ++ii) ten[ii] = source(ii);
 }
 
+Tensor4_3D::Tensor4_3D( const std::array<double,81> &source )
+{
+  for(int ii=0; ii<81; ++ii) ten[ii] = source[ii];
+}
+
 Tensor4_3D::~Tensor4_3D()
 {}
 
