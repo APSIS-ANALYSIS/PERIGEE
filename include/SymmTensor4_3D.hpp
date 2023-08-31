@@ -62,7 +62,7 @@ class SymmTensor4_3D
 
     const double& operator()(const int &index) const {return ten[index];}
 
-    // Parenthesis operator: access through ii jj kk ll component index
+    // Parenthesis operator: access through 0 <= ii jj kk ll < 3 component index
     double& operator()(const int &ii, const int &jj, const int &kk, const int &ll);
 
     const double& operator()(const int &ii, const int &jj, const int &kk, const int &ll) const; 
@@ -204,5 +204,9 @@ class SymmTensor4_3D
   private:
     double ten[21];
 };
+
+// This function behaves in an identical manner to the member function of the
+// same function name
+SymmTensor4_3D gen_Ptilde( const SymmMatrix_3x3 &invC );
 
 #endif
