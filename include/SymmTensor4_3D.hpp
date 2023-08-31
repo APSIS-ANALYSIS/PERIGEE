@@ -205,8 +205,13 @@ class SymmTensor4_3D
     double ten[21];
 };
 
-// This function behaves in an identical manner to the member function of the
-// same function name
+// These functions behave in an identical manner to the member function of the
+// same function name. For the gen_zero and gem_symm_id, we added a middle name
+// ST4 to differentiate them from the functions of Tensor4_3D.
+SymmTensor4_3D gen_ST4_zero();
+
+SymmTensor4_3D gen_ST4_symm_id();
+
 SymmTensor4_3D gen_Ptilde( const SymmMatrix_3x3 &invC );
 
 #endif

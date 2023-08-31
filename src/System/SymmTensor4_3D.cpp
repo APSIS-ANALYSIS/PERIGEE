@@ -410,10 +410,23 @@ int SymmTensor4_3D::Voigt_notation( const int &ii, const int &jj ) const
   return mat[ 3 * ii + jj ];
 }
 
+SymmTensor4_3D gen_ST4_zero()
+{
+  SymmTensor4_3D out;
+  out.gen_zero();
+  return out;
+}
+
+SymmTensor4_3D gen_ST4_symm_id()
+{
+  SymmTensor4_3D out;
+  out.gen_symm_id();
+  return out;
+}
+
 SymmTensor4_3D gen_Ptilde( const SymmMatrix_3x3 &invC )
 {     
-  Tensor4_3D out;
-  out.gen_zero(); 
+  SymmTensor4_3D out = gen_ST4_zero();
   out.add_SymmProduct( 1.0, invC, invC );
   out.add_OutProduct( -1.0/3.0, invC );
   return out;
