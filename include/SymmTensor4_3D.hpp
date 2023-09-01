@@ -198,11 +198,11 @@ class SymmTensor4_3D
     {
       // This map is used to transform the natural indices of a 3x3 symmetric matrix
       // to Voigt notation
-      const int map[9] = { 0, 5, 4, 
+      constexpr int map[9] = { 0, 5, 4, 
         5, 1, 3, 
         4, 3, 2 };
 
-      const int mapper[36] = { 0, 1,  2,  3,  4,  5,
+      constexpr int mapper[36] = { 0, 1,  2,  3,  4,  5,
         1, 6,  7,  8,  9,  10,
         2, 7,  11, 12, 13, 14,
         3, 8,  12, 15, 16, 17,
