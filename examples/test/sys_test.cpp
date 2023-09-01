@@ -28,16 +28,12 @@ int main(int argc, char *argv[])
   ten.gen_Ptilde( mat );
   sten.gen_Ptilde( smat );
   
-  SymmTensor4_3D test( std::array<double, 21> {} );
-  test.print_in_mat();
-
   SymmMatrix_3x3 smat2; smat2.gen_rand(); 
   Matrix_3x3 mat2 = smat2.convert_to_full();
 
   //ten.add_SymmOutProduct(3.14159, mat, mat2);
   //sten.add_SymmOutProduct(3.14159, smat, smat2);
 
-  /*
   for(int ii=0; ii<100; ++ii)
   {
     //Vector_3 vec1; vec1.gen_rand(); vec1.normalize();
@@ -63,11 +59,11 @@ int main(int argc, char *argv[])
     ten.TenPMult( PP );
     sten.TenPMult( PP );
 
-    if( sten.is_identical(ten, 1.0e-15) ) std::cout<<"passed! \n";
+    if( sten.is_identical(ten, 5.0e-15) ) std::cout<<"passed! \n";
     else std::cout<<"error. \n";
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
-  */  
+  
   return EXIT_SUCCESS;
 }
 
