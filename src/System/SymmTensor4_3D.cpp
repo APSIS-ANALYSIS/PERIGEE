@@ -398,24 +398,6 @@ void SymmTensor4_3D::TenPMult( const Tensor4_3D &P )
   for(int ii=0; ii<21; ++ii) ten[ii] = temp[ii];
 }
 
-int SymmTensor4_3D::Voigt_notation( const int &ii, const int &jj, const int &kk, const int &ll ) const
-{
-  // This map is used to transform the natural indices of a 3x3 symmetric matrix
-  // to Voigt notation
-  const int map[9] = { 0, 5, 4, 
-                       5, 1, 3, 
-                       4, 3, 2 };
-  
-  const int mapper[36] = { 0, 1,  2,  3,  4,  5,
-                           1, 6,  7,  8,  9,  10,
-                           2, 7,  11, 12, 13, 14,
-                           3, 8,  12, 15, 16, 17,
-                           4, 9,  13, 16, 18, 19,
-                           5, 10, 14, 17, 19, 20 };
-
-  return mapper[ 6 * map[ 3*ii + jj ] + map[ 3*kk + ll ] ];
-}
-
 SymmTensor4_3D gen_ST4_zero()
 {
   SymmTensor4_3D out;

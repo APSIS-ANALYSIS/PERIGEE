@@ -192,7 +192,23 @@ class SymmTensor4_3D
     // major symmetry requires ij_kl / ij_lk / ji_kl / ji_lk: 6x6 -> 21,
     // for more information, check the diagram above.
     // ------------------------------------------------------------------------
-    int Voigt_notation( const int &ii, const int &jj, const int &kk, const int &ll ) const;
+    int Voigt_notation( const int &ii, const int &jj, const int &kk, const int &ll ) const
+    {
+      // This map is used to transform the natural indices of a 3x3 symmetric matrix
+      // to Voigt notation
+      const int map[9] = { 0, 5, 4, 
+        5, 1, 3, 
+        4, 3, 2 };
+
+      const int mapper[36] = { 0, 1,  2,  3,  4,  5,
+        1, 6,  7,  8,  9,  10,
+        2, 7,  11, 12, 13, 14,
+        3, 8,  12, 15, 16, 17,
+        4, 9,  13, 16, 18, 19,
+        5, 10, 14, 17, 19, 20 };
+
+      return mapper[ 6 * map[ 3*ii + jj ] + map[ 3*kk + ll ] ];
+    }
 
   private:
     double ten[21];
