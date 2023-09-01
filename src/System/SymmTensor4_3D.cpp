@@ -62,14 +62,10 @@ bool SymmTensor4_3D::is_identical(const SymmTensor4_3D &source, const double &to
 
 void SymmTensor4_3D::gen_rand(const double &left, const double &right)
 {
-  srand(time(NULL));
-
-  for(int ii=0; ii<21; ++ii)
-  {
-    const double value = ( rand() % 100000 ) * 1.0e-5;
-
-    ten[ii] = value * (right - left) + left; // range [0, 1]
-  }
+  std::random_device rd;
+  std::mt19937_64 gen( rd() );
+  std::uniform_real_distribution<> dis(left, right);
+  for(int ii=0; ii<21; ++ii) ten[ii] = dis(gen);
 }
 
 void SymmTensor4_3D::gen_zero()
@@ -89,7 +85,7 @@ SymmTensor4_3D& SymmTensor4_3D::operator= (const SymmTensor4_3D &source)
   if(this == &source) return *this;
 
   for(int ii=0; ii<21; ++ii) ten[ii] = source(ii);
-  
+
   return *this;
 }
 
@@ -113,7 +109,7 @@ void SymmTensor4_3D::print() const
         for(int jj=0; jj<3; ++jj)
         {
           std::cout<<"i = "<<ii<<'\t'<<"j = "<<jj<<'\t'
-          <<std::setprecision(6)<<ten[ Voigt_notation(ii, jj, kk, ll) ]<<'\t';
+            <<std::setprecision(6)<<ten[ Voigt_notation(ii, jj, kk, ll) ]<<'\t';
         }
         std::cout<<'\n';
       }
@@ -134,7 +130,7 @@ void SymmTensor4_3D::print_in_mat() const
         for ( int ll=0; ll<3; ++ll )
         {
           std::cout << std::setprecision(6) << std::setw(12) << std::left << std::setfill(' ') 
-          << ten[ Voigt_notation(ii, jj, kk, ll) ] << " ";
+            << ten[ Voigt_notation(ii, jj, kk, ll) ] << " ";
         }
         std::cout<<"\t";
       }  
@@ -209,7 +205,7 @@ void SymmTensor4_3D::add_OutProduct( const double &val, const SymmMatrix_3x3 &mm
 }
 
 void SymmTensor4_3D::add_SymmOutProduct( const double &val, const Vector_3 &vec1, 
-  const Vector_3 &vec2 )
+    const Vector_3 &vec2 )
 {
   ten[0]  += val * 4.0 * vec1(0) * vec2(0) * vec1(0) * vec2(0);
 
@@ -218,71 +214,71 @@ void SymmTensor4_3D::add_SymmOutProduct( const double &val, const Vector_3 &vec1
   ten[2]  += val * 4.0 * vec1(0) * vec2(0) * vec1(2) * vec2(2);
 
   ten[3]  += val * ( 2.0 * vec1(0) * vec2(0) * vec1(1) * vec2(2)
-                   + 2.0 * vec1(0) * vec2(0) * vec1(2) * vec2(1) );
+      + 2.0 * vec1(0) * vec2(0) * vec1(2) * vec2(1) );
 
   ten[4]  += val * ( 2.0 * vec1(0) * vec2(0) * vec1(0) * vec2(2)
-                   + 2.0 * vec1(0) * vec2(0) * vec1(2) * vec2(0) );
+      + 2.0 * vec1(0) * vec2(0) * vec1(2) * vec2(0) );
 
   ten[5]  += val * ( 2.0 * vec1(0) * vec2(0) * vec1(0) * vec2(1)
-                   + 2.0 * vec1(0) * vec2(0) * vec1(1) * vec2(0) );
+      + 2.0 * vec1(0) * vec2(0) * vec1(1) * vec2(0) );
 
   ten[6]  += val * 4.0 * vec1(1) * vec2(1) * vec1(1) * vec2(1);
 
   ten[7]  += val * 4.0 * vec1(1) * vec2(1) * vec1(2) * vec2(2);
 
   ten[8]  += val * ( 2.0 * vec1(1) * vec2(1) * vec1(1) * vec2(2)
-                   + 2.0 * vec1(1) * vec2(1) * vec1(2) * vec2(1) );
+      + 2.0 * vec1(1) * vec2(1) * vec1(2) * vec2(1) );
 
   ten[9]  += val * ( 2.0 * vec1(0) * vec2(2) * vec1(1) * vec2(1)
-                   + 2.0 * vec1(2) * vec2(0) * vec1(1) * vec2(1) );
+      + 2.0 * vec1(2) * vec2(0) * vec1(1) * vec2(1) );
 
   ten[10] += val * ( 2.0 * vec1(1) * vec2(0) * vec1(1) * vec2(1)
-                   + 2.0 * vec1(0) * vec2(1) * vec1(1) * vec2(1) );
+      + 2.0 * vec1(0) * vec2(1) * vec1(1) * vec2(1) );
 
   ten[11] += val * 4.0 * vec1(2) * vec2(2) * vec1(2) * vec2(2);
 
   ten[12] += val * ( 2.0 * vec1(1) * vec2(2) * vec1(2) * vec2(2)
-                   + 2.0 * vec1(2) * vec2(1) * vec1(2) * vec2(2) );
+      + 2.0 * vec1(2) * vec2(1) * vec1(2) * vec2(2) );
 
   ten[13] += val * ( 2.0 * vec1(2) * vec2(0) * vec1(2) * vec2(2)
-                   + 2.0 * vec1(0) * vec2(2) * vec1(2) * vec2(2) );
+      + 2.0 * vec1(0) * vec2(2) * vec1(2) * vec2(2) );
 
   ten[14] += val * ( 2.0 * vec1(0) * vec2(1) * vec1(2) * vec2(2)
-                   + 2.0 * vec1(1) * vec2(0) * vec1(2) * vec2(2) );
+      + 2.0 * vec1(1) * vec2(0) * vec1(2) * vec2(2) );
 
   ten[15] += val * ( vec1(1) * vec2(2) * vec1(1) * vec2(2)
-                   + vec1(1) * vec2(2) * vec1(2) * vec2(1)
-                   + vec1(2) * vec2(1) * vec1(1) * vec2(2)
-                   + vec1(2) * vec2(1) * vec1(2) * vec2(1) );
+      + vec1(1) * vec2(2) * vec1(2) * vec2(1)
+      + vec1(2) * vec2(1) * vec1(1) * vec2(2)
+      + vec1(2) * vec2(1) * vec1(2) * vec2(1) );
 
   ten[16] += val * ( vec1(0) * vec2(2) * vec1(1) * vec2(2)
-                   + vec1(0) * vec2(2) * vec1(2) * vec2(1)
-                   + vec1(2) * vec2(0) * vec1(1) * vec2(2)
-                   + vec1(2) * vec2(0) * vec1(2) * vec2(1) );
+      + vec1(0) * vec2(2) * vec1(2) * vec2(1)
+      + vec1(2) * vec2(0) * vec1(1) * vec2(2)
+      + vec1(2) * vec2(0) * vec1(2) * vec2(1) );
 
   ten[17] += val * ( vec1(0) * vec2(1) * vec1(1) * vec2(2)
-                   + vec1(0) * vec2(1) * vec1(2) * vec2(1)
-                   + vec1(1) * vec2(0) * vec1(1) * vec2(2)
-                   + vec1(1) * vec2(0) * vec1(2) * vec2(1) );
+      + vec1(0) * vec2(1) * vec1(2) * vec2(1)
+      + vec1(1) * vec2(0) * vec1(1) * vec2(2)
+      + vec1(1) * vec2(0) * vec1(2) * vec2(1) );
 
   ten[18] += val * ( vec1(0) * vec2(2) * vec1(0) * vec2(2)
-                   + vec1(0) * vec2(2) * vec1(2) * vec2(0)
-                   + vec1(2) * vec2(0) * vec1(0) * vec2(2)
-                   + vec1(2) * vec2(0) * vec1(2) * vec2(0) );
+      + vec1(0) * vec2(2) * vec1(2) * vec2(0)
+      + vec1(2) * vec2(0) * vec1(0) * vec2(2)
+      + vec1(2) * vec2(0) * vec1(2) * vec2(0) );
 
   ten[19] += val * ( vec1(0) * vec2(1) * vec1(0) * vec2(2)
-                   + vec1(0) * vec2(1) * vec1(2) * vec2(0)
-                   + vec1(1) * vec2(0) * vec1(0) * vec2(2)
-                   + vec1(1) * vec2(0) * vec1(2) * vec2(0) );
+      + vec1(0) * vec2(1) * vec1(2) * vec2(0)
+      + vec1(1) * vec2(0) * vec1(0) * vec2(2)
+      + vec1(1) * vec2(0) * vec1(2) * vec2(0) );
 
   ten[20] += val * ( vec1(0) * vec2(1) * vec1(0) * vec2(1)
-                   + vec1(0) * vec2(1) * vec1(1) * vec2(0)
-                   + vec1(1) * vec2(0) * vec1(0) * vec2(1)
-                   + vec1(1) * vec2(0) * vec1(1) * vec2(0) );
+      + vec1(0) * vec2(1) * vec1(1) * vec2(0)
+      + vec1(1) * vec2(0) * vec1(0) * vec2(1)
+      + vec1(1) * vec2(0) * vec1(1) * vec2(0) );
 }
 
 void SymmTensor4_3D::add_SymmProduct( const double &val, const SymmMatrix_3x3 &mleft,
-  const SymmMatrix_3x3 &mright )
+    const SymmMatrix_3x3 &mright )
 {
   ten[0]  += val * ( mleft(0) * mright(0) );
   ten[1]  += val * ( mleft(5) * mright(5) );
@@ -394,7 +390,7 @@ void SymmTensor4_3D::TenPMult( const Tensor4_3D &P )
     temp[kk] += 4.0 *  P( value_left[kk]+1 ) * ten[19] * P( value_right[kk]+2 );
     temp[kk] += 4.0 *  P( value_left[kk]+1 ) * ten[20] * P( value_right[kk]+1 );
   }
-  
+
   for(int ii=0; ii<21; ++ii) ten[ii] = temp[ii];
 }
 

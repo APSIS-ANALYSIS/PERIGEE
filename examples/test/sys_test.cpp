@@ -32,8 +32,8 @@ int main(int argc, char *argv[])
   std::vector<double> temp {}; 
   for(int ii=0; ii<100000; ++ii)
   {
-    smat2.gen_rand(-0.5, 1.2);
-    for(int jj=0; jj<6; ++jj) temp.push_back( smat2(jj) );
+    sten.gen_rand(-2.5, 12.2);
+    for(int jj=0; jj<21; ++jj) temp.push_back( sten(jj) );
   }
   MATH_T::print_Histogram(temp);
   
