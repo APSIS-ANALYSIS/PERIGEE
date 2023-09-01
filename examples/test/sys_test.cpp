@@ -46,11 +46,11 @@ int main(int argc, char *argv[])
 
     //sten.print_in_mat();
 
-    sten.gen_rand();
+    sten.gen_rand(-1, 1);
     ten = sten.convert_to_full();
 
-    SymmMatrix_3x3 smat3; smat3.gen_rand(); 
-    SymmMatrix_3x3 smat4; smat4.gen_rand(); 
+    SymmMatrix_3x3 smat3; smat3.gen_rand(-1, 1); 
+    SymmMatrix_3x3 smat4; smat4.gen_rand(-1, 1); 
 
     Tensor4_3D PP; PP.gen_zero();
     PP.add_OutProduct(1.1523235904, smat3.convert_to_full(), smat4.convert_to_full());
@@ -58,9 +58,9 @@ int main(int argc, char *argv[])
     ten.TenPMult( PP );
     sten.TenPMult( PP );
 
-    if( sten.is_identical(ten, 1.0e-10) ) std::cout<<"passed! \n";
+    if( sten.is_identical(ten, 1.0e-15) ) std::cout<<"passed! \n";
     else std::cout<<"error. \n";
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
   }
   
   return EXIT_SUCCESS;

@@ -60,15 +60,15 @@ bool SymmTensor4_3D::is_identical(const SymmTensor4_3D &source, const double &to
   return true;
 }
 
-void SymmTensor4_3D::gen_rand()
+void SymmTensor4_3D::gen_rand(const double &left, const double &right)
 {
   srand(time(NULL));
 
   for(int ii=0; ii<21; ++ii)
   {
-    const double value = rand() % 100000;
+    const double value = ( rand() % 100000 ) * 1.0e-5;
 
-    ten[ii] = value * 1.0e-4 - 5.0; // range [-5, 4.9999]
+    ten[ii] = value * (right - left) + left; // range [0, 1]
   }
 }
 

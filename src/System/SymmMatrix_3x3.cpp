@@ -85,15 +85,15 @@ void SymmMatrix_3x3::gen_id()
   mat[3] = 0.0; mat[4] = 0.0; mat[5] = 0.0; 
 }
 
-void SymmMatrix_3x3::gen_rand()
+void SymmMatrix_3x3::gen_rand(const double &left, const double &right)
 {
   srand(time(NULL));
 
   for(int ii=0; ii<6; ++ii)
   {
-    double value = rand() % 10000;
+    const double value = (rand() % 100000) * 1.0e-5;
 
-    mat[ii] = value * 1.0e-3 - 5.0;
+    mat[ii] = value * (right - left) + left;
   }
 }
 

@@ -93,7 +93,7 @@ class SymmTensor4_3D
     // Scalar multiplication
     SymmTensor4_3D& operator*=( const double &val );
 
-    void gen_rand();
+    void gen_rand(const double &left = -1.0, const double &right = 1.0);
 
     void gen_zero();
     
