@@ -172,16 +172,12 @@ void Tensor4_3D::gen_Ptilde( const Matrix_3x3 &invC )
   add_OutProduct( -1.0 / 3.0, invC, invC );
 }
 
-void Tensor4_3D::gen_rand()
+void Tensor4_3D::gen_rand(const double &left, const double &right)
 {
-  srand(time(NULL));
-
-  for(int ii=0; ii<81; ++ii)
-  {
-    double value = rand() % 100000;
-
-    ten[ii] = value * 1.0e-4 - 5.0; // range [-5, 4.9999]
-  }
+  std::random_device rd;
+  std::mt19937_64 gen( rd() );
+  std::uniform_real_distribution<double> dis(left, right);
+  for(int ii=0; ii<81; ++ii) ten[ii] = dis(gen);
 }
 
 void Tensor4_3D::gen_zero()

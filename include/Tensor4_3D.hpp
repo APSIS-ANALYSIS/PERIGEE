@@ -138,7 +138,7 @@ class Tensor4_3D
     // ------------------------------------------------------------------------
     // generate a random 4th-order tensor (mainly used for debuggin)
     // ------------------------------------------------------------------------
-    void gen_rand();
+    void gen_rand(const double &left = -1.0, const double &right = 1.0);
 
     // ------------------------------------------------------------------------
     // generate a zero 4th-order tensor

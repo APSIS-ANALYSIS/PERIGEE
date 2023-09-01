@@ -28,15 +28,7 @@ int main(int argc, char *argv[])
   ten.gen_Ptilde( mat );
   sten.gen_Ptilde( smat );
   
-  SymmMatrix_3x3 smat2; 
-  std::vector<double> temp {}; 
-  for(int ii=0; ii<100000; ++ii)
-  {
-    Matrix_3x3 vv; vv.gen_rand(-2, 5);
-    for(int jj=0; jj<9; ++jj) temp.push_back( vv(jj) );
-  }
-  MATH_T::print_Histogram(temp);
-  
+  SymmMatrix_3x3 smat2; smat2.gen_rand(); 
   Matrix_3x3 mat2 = smat2.convert_to_full();
 
   //ten.add_SymmOutProduct(3.14159, mat, mat2);
