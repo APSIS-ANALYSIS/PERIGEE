@@ -5,6 +5,11 @@ SymmTensor4_3D::SymmTensor4_3D()
   gen_symm_id();
 }
 
+SymmTensor4_3D::SymmTensor4_3D( const std::array<double,21> &source )
+{
+  for( int ii=0; ii<21; ++ii ) ten[ii] = source[ii];
+}
+
 SymmTensor4_3D::~SymmTensor4_3D()
 {}
 

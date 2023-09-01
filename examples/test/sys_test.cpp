@@ -28,6 +28,9 @@ int main(int argc, char *argv[])
   ten.gen_Ptilde( mat );
   sten.gen_Ptilde( smat );
   
+  SymmTensor4_3D test( std::array<double, 21> {} );
+  test.print_in_mat();
+
   SymmMatrix_3x3 smat2; smat2.gen_rand(); 
   Matrix_3x3 mat2 = smat2.convert_to_full();
 
