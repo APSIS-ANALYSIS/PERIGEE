@@ -32,8 +32,8 @@ int main(int argc, char *argv[])
   std::vector<double> temp {}; 
   for(int ii=0; ii<100000; ++ii)
   {
-    Vector_3 vv; vv.gen_rand(-2, 5);
-    for(int jj=0; jj<3; ++jj) temp.push_back( vv(jj) );
+    Matrix_3x3 vv; vv.gen_rand(-2, 5);
+    for(int jj=0; jj<9; ++jj) temp.push_back( vv(jj) );
   }
   MATH_T::print_Histogram(temp);
   

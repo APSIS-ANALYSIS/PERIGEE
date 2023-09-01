@@ -114,7 +114,7 @@ void Vector_3::gen_rand(const double &left, const double &right)
 {
   std::random_device rd;
   std::mt19937_64 gen( rd() );
-  std::uniform_real_distribution<> dis(left, right);
+  std::uniform_real_distribution<double> dis(left, right);
   vec[0] = dis(gen);
   vec[1] = dis(gen);
   vec[2] = dis(gen);
