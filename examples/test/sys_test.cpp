@@ -2,6 +2,7 @@
 #include <thread>
 #include <unistd.h>
 #include "Vec_Tools.hpp"
+#include "Math_Tools.hpp"
 #include "Vector_3.hpp"
 #include "Matrix_3x3.hpp"
 #include "SymmMatrix_3x3.hpp"
@@ -26,13 +27,22 @@ int main(int argc, char *argv[])
 
   ten.gen_Ptilde( mat );
   sten.gen_Ptilde( smat );
-
-  SymmMatrix_3x3 smat2; smat2.gen_rand();
+  
+  SymmMatrix_3x3 smat2; 
+  std::vector<double> temp {}; 
+  for(int ii=0; ii<100000; ++ii)
+  {
+    smat2.gen_rand(-0.5, 1.2);
+    for(int jj=0; jj<6; ++jj) temp.push_back( smat2(jj) );
+  }
+  MATH_T::print_Histogram(temp);
+  
   Matrix_3x3 mat2 = smat2.convert_to_full();
 
   //ten.add_SymmOutProduct(3.14159, mat, mat2);
   //sten.add_SymmOutProduct(3.14159, smat, smat2);
 
+  /*
   for(int ii=0; ii<100; ++ii)
   {
     //Vector_3 vec1; vec1.gen_rand(); vec1.normalize();
@@ -62,7 +72,7 @@ int main(int argc, char *argv[])
     else std::cout<<"error. \n";
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
   }
-  
+  */  
   return EXIT_SUCCESS;
 }
 

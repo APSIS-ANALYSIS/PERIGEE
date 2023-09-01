@@ -87,14 +87,10 @@ void SymmMatrix_3x3::gen_id()
 
 void SymmMatrix_3x3::gen_rand(const double &left, const double &right)
 {
-  srand(time(NULL));
-
-  for(int ii=0; ii<6; ++ii)
-  {
-    const double value = (rand() % 100000) * 1.0e-5;
-
-    mat[ii] = value * (right - left) + left;
-  }
+  std::random_device rd;
+  std::mt19937_64 gen( rd() );
+  std::uniform_real_distribution<> dis(left, right);
+  for(int ii=0; ii<6; ++ii) mat[ii] = dis(gen);
 }
 
 void SymmMatrix_3x3::inverse()

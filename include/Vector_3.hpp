@@ -19,6 +19,7 @@
 #include <cmath>
 #include <vector>
 #include <array>
+#include <random>
 
 class Vector_3
 {
