@@ -89,7 +89,7 @@ void SymmMatrix_3x3::gen_rand(const double &left, const double &right)
 {
   std::random_device rd;
   std::mt19937_64 gen( rd() );
-  std::uniform_real_distribution<> dis(left, right);
+  std::uniform_real_distribution<double> dis(left, right);
   for(int ii=0; ii<6; ++ii) mat[ii] = dis(gen);
 }
 
