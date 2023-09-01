@@ -358,9 +358,9 @@ void SymmTensor4_3D::TenPMult( const Tensor4_3D &P )
     temp[kk] += P( value_left[kk]+4 ) * ten[6] * P( value_right[kk]+4 );
     temp[kk] += P( value_left[kk]+4 ) * ten[7] * P( value_right[kk]+8 );
 
-    temp[kk] += 2.0 * P( value_left[kk] ) * ten[8]  * P( value_right[kk]+5 );
-    temp[kk] += 2.0 * P( value_left[kk] ) * ten[9]  * P( value_right[kk]+2 );
-    temp[kk] += 2.0 * P( value_left[kk] ) * ten[10] * P( value_right[kk]+1 );
+    temp[kk] += 2.0 * P( value_left[kk]+4 ) * ten[8]  * P( value_right[kk]+5 );
+    temp[kk] += 2.0 * P( value_left[kk]+4 ) * ten[9]  * P( value_right[kk]+2 );
+    temp[kk] += 2.0 * P( value_left[kk]+4 ) * ten[10] * P( value_right[kk]+1 );
 
     temp[kk] += P( value_left[kk]+8 ) * ten[2]  * P( value_right[kk]   );
     temp[kk] += P( value_left[kk]+8 ) * ten[7]  * P( value_right[kk]+4 );
