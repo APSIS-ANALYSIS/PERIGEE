@@ -36,34 +36,50 @@ int main(int argc, char *argv[])
 
   for(int ii=0; ii<100; ++ii)
   {
-    //Vector_3 vec1; vec1.gen_rand(); vec1.normalize();
-    //Vector_3 vec2; vec2.gen_rand(); vec2.normalize();
+    sten.gen_rand();
+    ten = sten.convert_to_full();
+    
+    const double rval = MATH_T::gen_randomD_closed(-1.11, 1.23);
 
-    //ten.add_SymmOutProduct(1.1232789, vec1, vec2, vec1, vec2);
-    //sten.add_SymmOutProduct(1.1232789, vec1, vec2);
+    /*
+    Vector_3 vec1; vec1.gen_rand(); vec1.normalize();
+    Vector_3 vec2; vec2.gen_rand(); vec2.normalize();
+
+
+    ten.add_SymmOutProduct(rval, vec1, vec2, vec1, vec2);
+    sten.add_SymmOutProduct(rval, vec1, vec2);
+    */
+
+    SymmMatrix_3x3 smat2; smat2.gen_rand();
+    Matrix_3x3 mat2 = smat2.convert_to_full();
+
+    ten.add_SymmOutProduct(rval, mat, mat2);
+    sten.add_SymmOutProduct(rval, smat, smat2);
 
     //ten = gen_Ptilde(mat2);
     //sten = gen_Ptilde(smat2);
 
     //sten.print_in_mat();
 
-    sten.gen_rand(-1, 1);
-    ten = sten.convert_to_full();
+    /*
+       sten.gen_rand(-1, 1);
+       ten = sten.convert_to_full();
 
-    SymmMatrix_3x3 smat3; smat3.gen_rand(-1, 1); 
-    SymmMatrix_3x3 smat4; smat4.gen_rand(-1, 1); 
+       SymmMatrix_3x3 smat3; smat3.gen_rand(-1, 1); 
+       SymmMatrix_3x3 smat4; smat4.gen_rand(-1, 1); 
 
-    Tensor4_3D PP; PP.gen_zero();
-    PP.add_OutProduct(1.1523235904, smat3.convert_to_full(), smat4.convert_to_full());
+       Tensor4_3D PP; PP.gen_zero();
+       PP.add_OutProduct(1.1523235904, smat3.convert_to_full(), smat4.convert_to_full());
 
-    ten.TenPMult( PP );
-    sten.TenPMult( PP );
+       ten.TenPMult( PP );
+       sten.TenPMult( PP );
+       */
 
-    if( sten.is_identical(ten, 5.0e-15) ) std::cout<<"passed! \n";
+    if( sten.is_identical(ten, 2.0e-15) ) std::cout<<"passed! \n";
     else std::cout<<"error. \n";
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
-  
+
   return EXIT_SUCCESS;
 }
 
