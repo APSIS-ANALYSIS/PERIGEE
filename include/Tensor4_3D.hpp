@@ -300,6 +300,8 @@ Tensor4_3D operator*( const Tensor4_3D &tleft, const Tensor4_3D &tright );
 // Return scalar multiplication on the input tensor
 Tensor4_3D operator*( const double &val, const Tensor4_3D &input );
 
+Tensor4_3D gen_T4_zero();
+
 Tensor4_3D gen_T4_symm_id();
 
 // ------------------------------------------------------------------------

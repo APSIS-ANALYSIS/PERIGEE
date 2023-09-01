@@ -88,6 +88,16 @@ int main(int argc, char *argv[])
 
   aaa.print_in_mat();
 
+  Tensor4_3D ta = gen_T4_symm_id();
+  Tensor4_3D tb; tb.gen_symm_id();
+
+  if( ta.is_identical(tb, 1.0e-17) ) std::cout<<"symm_id is good! \n";
+  else std::cout<<"symm_id is bad. \n";
+
+  ta -= tb;
+
+  ta.print_in_mat();
+
   return EXIT_SUCCESS;
 }
 
