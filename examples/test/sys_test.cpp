@@ -77,8 +77,12 @@ int main(int argc, char *argv[])
 
     if( sten.is_identical(ten, 2.0e-15) ) std::cout<<"passed! \n";
     else std::cout<<"error. \n";
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
+
+  SymmTensor4_3D aaa = gen_ST4_zero();
+
+  aaa.print_in_mat();
 
   return EXIT_SUCCESS;
 }
