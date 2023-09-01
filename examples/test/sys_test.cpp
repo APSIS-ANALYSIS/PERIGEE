@@ -80,7 +80,11 @@ int main(int argc, char *argv[])
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
 
-  SymmTensor4_3D aaa = gen_ST4_zero();
+  SymmTensor4_3D aaa = gen_ST4_symm_id();
+  
+  SymmTensor4_3D bbb; bbb.gen_symm_id();
+  
+  aaa -= bbb;
 
   aaa.print_in_mat();
 

@@ -401,15 +401,14 @@ void SymmTensor4_3D::TenPMult( const Tensor4_3D &P )
 
 SymmTensor4_3D gen_ST4_zero()
 {
-  std::array<double,21> temp {{ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }};
+  constexpr std::array<double,21> temp {{ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }};
   return SymmTensor4_3D(temp);
 }
 
 SymmTensor4_3D gen_ST4_symm_id()
 {
-  SymmTensor4_3D out;
-  out.gen_symm_id();
-  return out;
+  constexpr std::array<double,21> temp {{ 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.5, 0.0, 0.5 }};
+  return SymmTensor4_3D(temp);
 }
 
 SymmTensor4_3D gen_ST4_Ptilde( const SymmMatrix_3x3 &invC )
