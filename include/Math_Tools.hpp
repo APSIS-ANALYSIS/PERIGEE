@@ -103,18 +103,6 @@ namespace MATH_T
   }
 
   // --------------------------------------------------------------------------
-  // Dot product of two 3D vectors
-  // Input: u = (u1, u2, u3)
-  //        v = (v1, v2, v3)
-  // Output: u1*v1 + u2*v2 + u3*v3
-  // --------------------------------------------------------------------------
-  inline double dot3d( const double &u1, const double &u2, const double &u3,
-      const double &v1, const double &v2, const double &v3 )
-  {
-    return u1*v1 + u2*v2 + u3*v3; 
-  }
-
-  // --------------------------------------------------------------------------
   // Normalize 3D vector
   // Input: x, y, z
   // Output: x/len, y/len, z/len, len = sqrt(x^2+y^2+z^2)
