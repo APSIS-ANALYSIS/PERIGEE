@@ -114,6 +114,15 @@ int main(int argc, char *argv[])
   MATH_T::print_Histogram(hold_d);
   MATH_T::print_Histogram(hold_i);
   
+  Matrix_double_3by3_Array m3a; 
+  hold_d = {};
+  for(int ii=0; ii<1000; ++ii)
+  {
+    m3a.gen_rand(-2.1, 3.5);
+    for(int jj=0; jj<9; ++jj) hold_d.push_back(m3a(jj));
+  }
+  MATH_T::print_Histogram(hold_d);
+
   return EXIT_SUCCESS;
 }
 

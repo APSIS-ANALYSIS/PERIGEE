@@ -78,7 +78,7 @@ void Matrix_double_3by3_Array::gen_id()
   invm0 = 1.0; invm1 = 1.0; invm2 = 1.0;
 }
 
-void Matrix_double_3by3_Array::gen_rand()
+void Matrix_double_3by3_Array::gen_rand(const double &min, const double &max)
 {
   std::random_device rd;
   std::mt19937_64 gen( rd() );
