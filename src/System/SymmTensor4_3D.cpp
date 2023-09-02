@@ -218,38 +218,38 @@ void SymmTensor4_3D::add_SymmOutProduct( const double &val, const Vector_3 &vec1
 
   ten[2]  += val * 4.0 * vec1(0) * vec2(0) * vec1(2) * vec2(2);
 
-  ten[3]  += val * ( 2.0 * vec1(0) * vec2(0) * vec1(1) * vec2(2)
-      + 2.0 * vec1(0) * vec2(0) * vec1(2) * vec2(1) );
+  ten[3]  += val * 2.0 * ( vec1(0) * vec2(0) * vec1(1) * vec2(2)
+      + vec1(0) * vec2(0) * vec1(2) * vec2(1) );
 
-  ten[4]  += val * ( 2.0 * vec1(0) * vec2(0) * vec1(0) * vec2(2)
-      + 2.0 * vec1(0) * vec2(0) * vec1(2) * vec2(0) );
+  ten[4]  += val * 2.0 * ( vec1(0) * vec2(0) * vec1(0) * vec2(2)
+      + vec1(0) * vec2(0) * vec1(2) * vec2(0) );
 
-  ten[5]  += val * ( 2.0 * vec1(0) * vec2(0) * vec1(0) * vec2(1)
-      + 2.0 * vec1(0) * vec2(0) * vec1(1) * vec2(0) );
+  ten[5]  += val * 2.0 * ( vec1(0) * vec2(0) * vec1(0) * vec2(1)
+      + vec1(0) * vec2(0) * vec1(1) * vec2(0) );
 
   ten[6]  += val * 4.0 * vec1(1) * vec2(1) * vec1(1) * vec2(1);
 
   ten[7]  += val * 4.0 * vec1(1) * vec2(1) * vec1(2) * vec2(2);
 
-  ten[8]  += val * ( 2.0 * vec1(1) * vec2(1) * vec1(1) * vec2(2)
-      + 2.0 * vec1(1) * vec2(1) * vec1(2) * vec2(1) );
+  ten[8]  += val * 2.0 * ( vec1(1) * vec2(1) * vec1(1) * vec2(2)
+      + vec1(1) * vec2(1) * vec1(2) * vec2(1) );
 
-  ten[9]  += val * ( 2.0 * vec1(0) * vec2(2) * vec1(1) * vec2(1)
-      + 2.0 * vec1(2) * vec2(0) * vec1(1) * vec2(1) );
+  ten[9]  += val * 2.0 * ( vec1(0) * vec2(2) * vec1(1) * vec2(1)
+      + vec1(2) * vec2(0) * vec1(1) * vec2(1) );
 
-  ten[10] += val * ( 2.0 * vec1(1) * vec2(0) * vec1(1) * vec2(1)
-      + 2.0 * vec1(0) * vec2(1) * vec1(1) * vec2(1) );
+  ten[10] += val * 2.0 * ( vec1(1) * vec2(0) * vec1(1) * vec2(1)
+      + vec1(0) * vec2(1) * vec1(1) * vec2(1) );
 
   ten[11] += val * 4.0 * vec1(2) * vec2(2) * vec1(2) * vec2(2);
 
-  ten[12] += val * ( 2.0 * vec1(1) * vec2(2) * vec1(2) * vec2(2)
-      + 2.0 * vec1(2) * vec2(1) * vec1(2) * vec2(2) );
+  ten[12] += val * 2.0 * ( vec1(1) * vec2(2) * vec1(2) * vec2(2)
+      + vec1(2) * vec2(1) * vec1(2) * vec2(2) );
 
-  ten[13] += val * ( 2.0 * vec1(2) * vec2(0) * vec1(2) * vec2(2)
-      + 2.0 * vec1(0) * vec2(2) * vec1(2) * vec2(2) );
+  ten[13] += val * 2.0 * ( vec1(2) * vec2(0) * vec1(2) * vec2(2)
+      + vec1(0) * vec2(2) * vec1(2) * vec2(2) );
 
-  ten[14] += val * ( 2.0 * vec1(0) * vec2(1) * vec1(2) * vec2(2)
-      + 2.0 * vec1(1) * vec2(0) * vec1(2) * vec2(2) );
+  ten[14] += val * 2.0 * ( vec1(0) * vec2(1) * vec1(2) * vec2(2)
+      + vec1(1) * vec2(0) * vec1(2) * vec2(2) );
 
   ten[15] += val * ( vec1(1) * vec2(2) * vec1(1) * vec2(2)
       + vec1(1) * vec2(2) * vec1(2) * vec2(1)
