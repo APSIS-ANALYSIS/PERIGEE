@@ -80,14 +80,11 @@ void Matrix_double_3by3_Array::gen_id()
 
 void Matrix_double_3by3_Array::gen_rand()
 {
-  srand(time(NULL));
+  std::random_device rd;
+  std::mt19937_64 gen( rd() );
+  std::uniform_real_distribution<double> dis(min, max);
+  for(int ii=0; ii<9; ++ii) mat[ii] = dis(gen); 
 
-  for(int ii=0; ii<9; ++ii)
-  {
-    double value = rand() % 10000;
-
-    mat[ii] = value * 1.0e-3 - 5.0;
-  }
   p[0] = 0; p[1] = 1; p[2] = 2;
   
   invm0 = 1.0; invm1 = 1.0; invm2 = 1.0;
