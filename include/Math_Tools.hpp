@@ -190,31 +190,26 @@ namespace MATH_T
       std::vector<double> &val );
 
   // ----------------------------------------------------------------
-  // gen_random()
-  // Generate a random double in [min, max] domain for _closed;
-  // (min, max) for open.
-  // Gernerate a random int in [min, max] domain.
-  // NOTE: Users have to call srand(time(NULL)) before calling the
-  //       following three gen functions.
-  // E.G.: srand(time(NULL));
-  //       for-loop
-  //       {gen_randomD_xxx(...); ...}
+  // gen_int_rand and gen_double_rand
+  // Generate a random double in [min, max] domain for integer and double
+  // precision numbers, respectively. 
   // ----------------------------------------------------------------
-  inline double gen_randomD_closed( const double &min, const double &max )
+  inline double gen_int_rand( const int &min, const int &max )
   {
-    return ( rand() % 1000001 ) * 1.0e-6 * (max - min) + min;
+    std::random_device rd;
+    std::mt19937_64 gen( rd() );
+    std::uniform_int_distribution<int> dis(min, max);
+    return dis(gen);
   }
 
-  inline double gen_randomD_open( const double &min, const double &max )
+  inline double gen_double_rand( const double &min = -1.0, const double &max = 1.0 )
   {
-    return ( rand() % 999998 + 1 ) * 1.0e-6 * (max - min) + min;
+    std::random_device rd;
+    std::mt19937_64 gen( rd() );
+    std::uniform_real_distribution<double> dis(min, max);
+    return dis(gen);
   }
-
-  inline int gen_randomI_closed( const int &min, const int &max )
-  {
-    return ( rand() % (max - min + 1)) + min;
-  }
-
+  
   // ----------------------------------------------------------------
   // Print Histogram of an array of random vector
   // ----------------------------------------------------------------

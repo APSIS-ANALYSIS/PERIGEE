@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     sten.gen_rand();
     ten = sten.convert_to_full();
     
-    const double rval = MATH_T::gen_randomD_closed(-1.11, 1.23);
+    const double rval = MATH_T::gen_double_rand(-1.11, 1.23);
 
     /*
     Vector_3 vec1; vec1.gen_rand(); vec1.normalize();
@@ -99,6 +99,17 @@ int main(int argc, char *argv[])
   ta.print_in_mat();
 
   Vector_3 vec1; vec1.gen_rand(); auto stdvec = vec1.to_std_vec();
+  
+  std::vector<double> hold_d {}, hold_i {};
+  for(int ii=0; ii<100000; ++ii)
+  {
+    hold_d.push_back(MATH_T::gen_double_rand());
+    hold_i.push_back(MATH_T::gen_int_rand(-2,2));
+  }
+  
+  MATH_T::print_Histogram(hold_d);
+  MATH_T::print_Histogram(hold_i);
+  
   return EXIT_SUCCESS;
 }
 
