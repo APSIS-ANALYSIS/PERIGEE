@@ -34,22 +34,26 @@ int main(int argc, char *argv[])
   //ten.add_SymmOutProduct(3.14159, mat, mat2);
   //sten.add_SymmOutProduct(3.14159, smat, smat2);
 
-  for(int ii=0; ii<10; ++ii)
+  for(int ii=0; ii<100; ++ii)
   {
     sten.gen_rand();
     ten = sten.convert_to_full();
     
     const double rval = MATH_T::gen_double_rand(-1.11, 1.23);
 
-    /*
     Vector_3 vec1; vec1.gen_rand(); vec1.normalize();
     Vector_3 vec2; vec2.gen_rand(); vec2.normalize();
 
-
     ten.add_SymmOutProduct(rval, vec1, vec2, vec1, vec2);
     sten.add_SymmOutProduct(rval, vec1, vec2);
-    */
+    
+    if( sten.is_identical(ten, 2.0e-15) ) std::cout<<"passed! \n";
+    else std::cout<<"error. \n";
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
+    sten.gen_rand();
+    ten = sten.convert_to_full();
+    
     SymmMatrix_3x3 smat2; smat2.gen_rand();
     Matrix_3x3 mat2 = smat2.convert_to_full();
 
