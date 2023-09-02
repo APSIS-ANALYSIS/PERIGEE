@@ -4,8 +4,7 @@
 // Math_Tools.hpp
 // This file defines mathematical constants and functions.
 //
-// Author: Ju Liu
-// Date: Feb. 13 2016
+// Date Created: Feb. 13 2016
 // ============================================================================
 #include <stdio.h>
 #include <vector> 
