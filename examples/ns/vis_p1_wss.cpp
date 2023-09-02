@@ -419,7 +419,7 @@ std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
   VecDestroy(&sol_temp);
 
   // copy the solution varibles to the correct location
-  std::vector<double> sol.clear(vec_size, 0.0);
+  std::vector<double> sol(vec_size, 0.0);
 
   // check the nodemap size
   if( (int)nodemap.size() * in_dof != vec_size ) SYS_T::print_fatal("Error: node map size is incompatible with the solution length. \n");
