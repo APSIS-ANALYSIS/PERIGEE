@@ -15,6 +15,7 @@
 #include <iomanip>
 #include <cstdlib>
 #include <ctime>
+#include <random>
 
 class Matrix_2x2
 {
@@ -55,7 +56,7 @@ class Matrix_2x2
     void gen_id();
 
     // Set components a random value
-    void gen_rand();
+    void gen_rand(const double &min = -1.0, const double &max = 1.0);
 
     // Set a Hilbert matrix
     void gen_hilb();
