@@ -221,8 +221,7 @@ int main( int argc, char * argv[] )
     name_to_read.append(time_index.str());
     name_to_write.append(time_index.str());
 
-    PetscPrintf(PETSC_COMM_WORLD, "Time %d: Read %s and Write %s \n",
-        time, name_to_read.c_str(), name_to_write.c_str() );
+    std::cout<<"Time "<<time<<": Read "<<name_to_read<<" and Write "<<name_to_write<<std::endl;
 
     // Read in the solution vector and arrange them into the natural numbering
     ReadPETSc_Vec( name_to_read, analysis_new2old, v_nFunc*dof, dof, sol );
