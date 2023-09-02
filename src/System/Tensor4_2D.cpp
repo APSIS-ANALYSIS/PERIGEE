@@ -69,16 +69,12 @@ void Tensor4_2D::gen_symm_id()
 }
 
 
-void Tensor4_2D::gen_rand()
+void Tensor4_2D::gen_rand(const double &min, const double &max)
 {
-  srand(time(NULL));
-
-  for(int ii=0; ii<16; ++ii)
-  {
-    double value = rand() % 100000;
-
-    ten[ii] = value * 1.0e-4 - 5.0; // range [-5, 4.9999]
-  }
+  std::random_device rd;
+  std::mt19937_64 gen( rd() );
+  std::uniform_real_distribution<double> dis(min, max);
+  for(int ii=0; ii<16; ++ii) ten[ii] = dis(gen);
 }
 
 
