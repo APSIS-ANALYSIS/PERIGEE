@@ -76,14 +76,7 @@ Vector_3& Vector_3::operator*=( const double &val )
 
 std::vector<double> Vector_3::to_std_vec() const
 {
-  std::vector<double> outvec;
-  
-  outvec.resize(3);
-  for(int ii=0; ii<3; ++ii) outvec[ii] = vec[ii];
-  
-  std::vector<double>(outvec.begin(), outvec.end()).swap(outvec);
-
-  return outvec; 
+  return { vec[0], vec[1], vec[2] }; 
 }
 
 std::array<double, 3> Vector_3::to_std_array() const

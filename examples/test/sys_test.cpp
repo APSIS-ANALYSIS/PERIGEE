@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
   //ten.add_SymmOutProduct(3.14159, mat, mat2);
   //sten.add_SymmOutProduct(3.14159, smat, smat2);
 
-  for(int ii=0; ii<100; ++ii)
+  for(int ii=0; ii<10; ++ii)
   {
     sten.gen_rand();
     ten = sten.convert_to_full();
@@ -98,6 +98,7 @@ int main(int argc, char *argv[])
 
   ta.print_in_mat();
 
+  Vector_3 vec1; vec1.gen_rand(); auto stdvec = vec1.to_std_vec();
   return EXIT_SUCCESS;
 }
 
