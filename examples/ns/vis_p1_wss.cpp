@@ -203,7 +203,6 @@ int main( int argc, char * argv[] )
   // Read solutions
   std::ostringstream time_index;
   std::vector<double> sol;
-  double Rx[4], Ry[4], Rz[4];
 
   // Container for TAWSS & OSI
   std::vector<double> tawss( nFunc, 0.0 ); 
@@ -232,7 +231,7 @@ int main( int argc, char * argv[] )
     std::vector< Vector_3 > wss_ave( nFunc, Vector_3(0.0, 0.0, 0.0) );
 
     // Container for the area associated with the node
-    std::vector<double> node_area; node_area.resize(nFunc, 0.0);
+    std::vector<double> node_area( nFunc, 0.0 );
 
     for(int ee=0; ee<nElem; ++ee)
     {
@@ -275,6 +274,7 @@ int main( int argc, char * argv[] )
         // 4-th basis function is associated with the interior node.
         // Also, the sampling points are aranged such that the first three
         // node are evaluated first. 
+        double Rx[4], Ry[4], Rz[4];
         element -> get_gradR(qua, Rx, Ry, Rz);
 
         const double ux = esol_u[0] * Rx[0] + esol_u[1] * Rx[1] + esol_u[2] * Rx[2] + esol_u[3] * Rx[3];
