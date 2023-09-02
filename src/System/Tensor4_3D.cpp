@@ -172,16 +172,12 @@ void Tensor4_3D::gen_Ptilde( const Matrix_3x3 &invC )
   add_OutProduct( -1.0 / 3.0, invC, invC );
 }
 
-void Tensor4_3D::gen_rand()
+void Tensor4_3D::gen_rand(const double &left, const double &right)
 {
-  srand(time(NULL));
-
-  for(int ii=0; ii<81; ++ii)
-  {
-    double value = rand() % 100000;
-
-    ten[ii] = value * 1.0e-4 - 5.0; // range [-5, 4.9999]
-  }
+  std::random_device rd;
+  std::mt19937_64 gen( rd() );
+  std::uniform_real_distribution<double> dis(left, right);
+  for(int ii=0; ii<81; ++ii) ten[ii] = dis(gen);
 }
 
 void Tensor4_3D::gen_zero()
@@ -574,19 +570,26 @@ Tensor4_3D operator*( const double &val, const Tensor4_3D &input )
   return out;
 }
 
+Tensor4_3D gen_T4_zero()
+{
+  constexpr std::array<double,81> temp{{
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }};
+
+  return Tensor4_3D(temp);
+}
+
 Tensor4_3D gen_T4_symm_id()
 {
-  Tensor4_3D out;
-  out.gen_zero();
-  for(int aa=0; aa<3; ++aa)
-  {
-    for(int bb=0; bb<3; ++bb) 
-    {
-      out( 27 * aa + 9 * bb + 3 * aa + bb ) += 0.5;
-      out( 27 * aa + 9 * bb + 3 * bb + aa ) += 0.5; 
-    }
-  }
-  return out;
+  constexpr std::array<double,81> temp {{ 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 }};
+  return Tensor4_3D(temp);
 }
 
 Tensor4_3D gen_T4_P( const Matrix_3x3 &C, const Matrix_3x3 &invC )

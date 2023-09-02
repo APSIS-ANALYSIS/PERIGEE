@@ -110,16 +110,12 @@ void Matrix_3x3::gen_id()
   mat[6] = 0.0; mat[7] = 0.0; mat[8] = 1.0;
 }
 
-void Matrix_3x3::gen_rand()
+void Matrix_3x3::gen_rand(const double &left, const double &right)
 {
-  srand(time(NULL));
-
-  for(int ii=0; ii<9; ++ii)
-  {
-    double value = rand() % 10000;
-
-    mat[ii] = value * 1.0e-3 - 5.0;
-  }
+  std::random_device rd;
+  std::mt19937_64 gen( rd() );
+  std::uniform_real_distribution<double> dis(left, right);
+  for(int ii=0; ii<9; ++ii) mat[ii] = dis(gen);
 }
 
 void Matrix_3x3::gen_hilb()

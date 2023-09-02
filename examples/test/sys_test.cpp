@@ -2,6 +2,7 @@
 #include <thread>
 #include <unistd.h>
 #include "Vec_Tools.hpp"
+#include "Math_Tools.hpp"
 #include "Vector_3.hpp"
 #include "Matrix_3x3.hpp"
 #include "SymmMatrix_3x3.hpp"
@@ -26,8 +27,8 @@ int main(int argc, char *argv[])
 
   ten.gen_Ptilde( mat );
   sten.gen_Ptilde( smat );
-
-  SymmMatrix_3x3 smat2; smat2.gen_rand();
+  
+  SymmMatrix_3x3 smat2; smat2.gen_rand(); 
   Matrix_3x3 mat2 = smat2.convert_to_full();
 
   //ten.add_SymmOutProduct(3.14159, mat, mat2);
@@ -35,33 +36,83 @@ int main(int argc, char *argv[])
 
   for(int ii=0; ii<100; ++ii)
   {
-    //Vector_3 vec1; vec1.gen_rand(); vec1.normalize();
-    //Vector_3 vec2; vec2.gen_rand(); vec2.normalize();
+    sten.gen_rand();
+    ten = sten.convert_to_full();
+    
+    const double rval = MATH_T::gen_double_rand(-1.11, 1.23);
 
-    //ten.add_SymmOutProduct(1.1232789, vec1, vec2, vec1, vec2);
-    //sten.add_SymmOutProduct(1.1232789, vec1, vec2);
+    Vector_3 vec1; vec1.gen_rand(); vec1.normalize();
+    Vector_3 vec2; vec2.gen_rand(); vec2.normalize();
+
+    ten.add_SymmOutProduct(rval, vec1, vec2, vec1, vec2);
+    sten.add_SymmOutProduct(rval, vec1, vec2);
+    
+    if( sten.is_identical(ten, 2.0e-15) ) std::cout<<"passed! \n";
+    else std::cout<<"error. \n";
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+    sten.gen_rand();
+    ten = sten.convert_to_full();
+    
+    SymmMatrix_3x3 smat2; smat2.gen_rand();
+    Matrix_3x3 mat2 = smat2.convert_to_full();
+
+    ten.add_SymmOutProduct(rval, mat, mat2);
+    sten.add_SymmOutProduct(rval, smat, smat2);
 
     //ten = gen_Ptilde(mat2);
     //sten = gen_Ptilde(smat2);
 
     //sten.print_in_mat();
 
-    sten.gen_rand();
-    ten = sten.convert_to_full();
+    /*
+       sten.gen_rand(-1, 1);
+       ten = sten.convert_to_full();
 
-    SymmMatrix_3x3 smat3; smat3.gen_rand(); 
-    SymmMatrix_3x3 smat4; smat4.gen_rand(); 
+       SymmMatrix_3x3 smat3; smat3.gen_rand(-1, 1); 
+       SymmMatrix_3x3 smat4; smat4.gen_rand(-1, 1); 
 
-    Tensor4_3D PP; PP.gen_zero();
-    PP.add_OutProduct(1.1523235904, smat3.convert_to_full(), smat4.convert_to_full());
+       Tensor4_3D PP; PP.gen_zero();
+       PP.add_OutProduct(1.1523235904, smat3.convert_to_full(), smat4.convert_to_full());
 
-    ten.TenPMult( PP );
-    sten.TenPMult( PP );
+       ten.TenPMult( PP );
+       sten.TenPMult( PP );
+       */
 
-    if( sten.is_identical(ten, 1.0e-10) ) std::cout<<"passed! \n";
+    if( sten.is_identical(ten, 2.0e-15) ) std::cout<<"passed! \n";
     else std::cout<<"error. \n";
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
+
+  SymmTensor4_3D aaa = gen_ST4_symm_id();
+  
+  SymmTensor4_3D bbb; bbb.gen_symm_id();
+  
+  aaa -= bbb;
+
+  aaa.print_in_mat();
+
+  Tensor4_3D ta = gen_T4_symm_id();
+  Tensor4_3D tb; tb.gen_symm_id();
+
+  if( ta.is_identical(tb, 1.0e-17) ) std::cout<<"symm_id is good! \n";
+  else std::cout<<"symm_id is bad. \n";
+
+  ta -= tb;
+
+  ta.print_in_mat();
+
+  Vector_3 vec1; vec1.gen_rand(); auto stdvec = vec1.to_std_vec();
+  
+  std::vector<double> hold_d {}, hold_i {};
+  for(int ii=0; ii<100000; ++ii)
+  {
+    hold_d.push_back(MATH_T::gen_double_rand());
+    hold_i.push_back(MATH_T::gen_int_rand(-2,2));
+  }
+  
+  MATH_T::print_Histogram(hold_d);
+  MATH_T::print_Histogram(hold_i);
   
   return EXIT_SUCCESS;
 }

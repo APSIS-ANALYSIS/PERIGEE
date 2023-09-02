@@ -35,6 +35,8 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/System/Matrix_double_3by3_Array.cpp
   ${perigee_source}/System/Matrix_3x3.cpp
   ${perigee_source}/System/SymmMatrix_3x3.cpp
+  ${perigee_source}/System/Tensor4_3D.cpp
+  ${perigee_source}/System/SymmTensor4_3D.cpp
   ${perigee_source}/System/Math_Tools.cpp
   ${perigee_source}/System/SV_Tools.cpp
   ${perigee_source}/System/HDF5_Writer.cpp

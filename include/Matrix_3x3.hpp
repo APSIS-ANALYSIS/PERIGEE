@@ -118,7 +118,7 @@ class Matrix_3x3
     void gen_id();
 
     // Set components a random value
-    void gen_rand();
+    void gen_rand(const double &left = -1.0, const double &right = 1.0);
 
     // Set a Hilbert matrix
     void gen_hilb();

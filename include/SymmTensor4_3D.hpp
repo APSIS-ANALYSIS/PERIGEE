@@ -52,6 +52,8 @@ class SymmTensor4_3D
     // ------------------------------------------------------------------------
     SymmTensor4_3D();
 
+    SymmTensor4_3D( const std::array<double,21> &source );
+
     ~SymmTensor4_3D();
 
     // Convert the symmetric tensor to a full tensor
@@ -93,7 +95,7 @@ class SymmTensor4_3D
     // Scalar multiplication
     SymmTensor4_3D& operator*=( const double &val );
 
-    void gen_rand();
+    void gen_rand(const double &left = -1.0, const double &right = 1.0);
 
     void gen_zero();
     
@@ -192,13 +194,23 @@ class SymmTensor4_3D
     // major symmetry requires ij_kl / ij_lk / ji_kl / ji_lk: 6x6 -> 21,
     // for more information, check the diagram above.
     // ------------------------------------------------------------------------
-    int Voigt_notation( const int &ii, const int &jj, const int &kk, const int &ll ) const;
+    int Voigt_notation( const int &ii, const int &jj, const int &kk, const int &ll ) const
+    {
+      // This map is used to transform the natural indices of a 3x3 symmetric matrix
+      // to Voigt notation
+      constexpr int map[9] = { 0, 5, 4, 
+        5, 1, 3, 
+        4, 3, 2 };
 
-    // ------------------------------------------------------------------------
-    // transfrom the natural indices of 3x3 symmetric matrix to Voigt notation,
-    // so as to say ij / ji: 3x3 -> 6
-    // ------------------------------------------------------------------------ 
-    int Voigt_notation( const int &ii, const int &jj ) const;
+      constexpr int mapper[36] = { 0, 1,  2,  3,  4,  5,
+        1, 6,  7,  8,  9,  10,
+        2, 7,  11, 12, 13, 14,
+        3, 8,  12, 15, 16, 17,
+        4, 9,  13, 16, 18, 19,
+        5, 10, 14, 17, 19, 20 };
+
+      return mapper[ 6 * map[ 3*ii + jj ] + map[ 3*kk + ll ] ];
+    }
 
   private:
     double ten[21];
