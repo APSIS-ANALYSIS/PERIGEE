@@ -5,8 +5,6 @@
 // ----------------------------------------------------------------------------
 // VEC_T namespace contains a suite of functions for the manipulation of the 
 // std::vector object.
-//
-// Author: Ju Liu
 // ============================================================================
 #include <iomanip>
 #include <algorithm>
