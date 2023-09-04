@@ -266,8 +266,6 @@ class Gmsh_FileIO
     // This function is bound to the constructor of Gmsh_FileIO
     // --------------------------------------------------------------
     void read_msh4(std::ifstream &infile, const int (&elem_nlocbas)[32]);
-
-
     // --------------------------------------------------------------
 };
 

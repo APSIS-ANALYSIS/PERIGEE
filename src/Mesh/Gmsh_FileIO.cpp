@@ -1437,7 +1437,8 @@ void Gmsh_FileIO::read_msh2(std::ifstream &infile, const int (&elem_nlocbas)[32]
     // Record the number of basis function (element type) in 
     // the physical domain. If there are different type element in the
     // physical subdomain, throw an error message.
-    if( ele_nlocbas[phy_tag-1] == -1 ){
+    if( ele_nlocbas[phy_tag-1] == -1 )
+    {
       ele_nlocbas[phy_tag-1] = enum_node;
       ele_type[phy_tag-1] = etype;
     }
@@ -1521,7 +1522,8 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile, const int (&elem_nlocbas)[32]
   // read each line for the information of original curves
   std::vector<int> curveTag (numCurves, -1);
   std::vector<int> curvePhyTag (numCurves, -1);
-  for (int curve{0}; curve < numCurves; ++curve){
+  for (int curve{0}; curve < numCurves; ++curve)
+  {
     sstrm.clear(); getline(infile, sline); sstrm.str(sline);
 
     sstrm >> GeoTag;
@@ -1531,11 +1533,13 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile, const int (&elem_nlocbas)[32]
     sstrm >> maxX; sstrm >> maxY; sstrm >> maxZ;
 
     sstrm >> num_phy_tag;
-    if (num_phy_tag == 0){
+    if (num_phy_tag == 0)
+    {
       // some curves are not in any physical group, set phy_tag = -1 by default
       continue;
     }
-    else {
+    else
+    {
       // here we suppose one entity belongs to at most one physical group
       SYS_T::print_exit_if( num_phy_tag != 1,
         "Error: .msh file number of physical tag for a curve is not 1.\n");
@@ -1547,7 +1551,8 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile, const int (&elem_nlocbas)[32]
   // read each line for the information of original surfaces
   std::vector<int> surfaceTag (numSurfaces, -1);
   std::vector<int> surfacePhyTag (numSurfaces, -1);
-  for (int surface{0}; surface < numSurfaces; ++surface){
+  for (int surface{0}; surface < numSurfaces; ++surface)
+  {
     sstrm.clear(); getline(infile, sline); sstrm.str(sline);
 
     sstrm >> GeoTag;
@@ -1557,11 +1562,13 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile, const int (&elem_nlocbas)[32]
     sstrm >> maxX; sstrm >> maxY; sstrm >> maxZ;
 
     sstrm >> num_phy_tag;
-    if (num_phy_tag == 0){
+    if (num_phy_tag == 0)
+    {
       // some surfaces are not in any physical group, set phy_tag = -1 by default
       continue;
     }
-    else {
+    else
+    {
       // here we suppose one entity belongs to at most one physical group
       SYS_T::print_exit_if( num_phy_tag != 1,
         "Error: .msh file number of physical tag for a surface is not 1.\n");
@@ -1573,7 +1580,8 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile, const int (&elem_nlocbas)[32]
   // read each line for the information of original volumes
   std::vector<int> volumeTag (numVolumes, -1);
   std::vector<int> volumePhyTag (numVolumes, -1);
-  for (int volume{0}; volume < numVolumes; ++ volume){
+  for (int volume{0}; volume < numVolumes; ++ volume)
+  {
     sstrm.clear(); getline(infile, sline); sstrm.str(sline);
 
     sstrm >> GeoTag;
@@ -1583,11 +1591,13 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile, const int (&elem_nlocbas)[32]
     sstrm >> maxX; sstrm >> maxY; sstrm >> maxZ;
 
     sstrm >> num_phy_tag;
-    if (num_phy_tag == 0){
+    if (num_phy_tag == 0)
+    {
       // some volumes are not in any physical group, set phy_tag = -1 by default
       continue;
     }
-    else {
+    else
+    {
       // here we suppose one entity belongs to at most one physical group
       SYS_T::print_exit_if( num_phy_tag != 1,
         "Error: .msh file number of physical tag for a volume is not 1.\n");
@@ -1614,7 +1624,8 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile, const int (&elem_nlocbas)[32]
   node.resize(3*num_node);
 
   int recorded_node_num {0};
-  for (int block{0}; block < num_blocks; ++block){
+  for (int block{0}; block < num_blocks; ++block)
+  {
     sstrm.clear(); getline(infile, sline); sstrm.str(sline);
     int entity_dim, entity_tag, parametric, num_node_in_block;
     sstrm >> entity_dim; sstrm >> entity_tag; sstrm >> parametric; sstrm >> num_node_in_block;
@@ -1624,7 +1635,8 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile, const int (&elem_nlocbas)[32]
       "Error: .msh file, the third parameter of nodal blocks should be 0 in block %d.\n", block);
 
     // here we suppose the nodal index should ve in [1, num_node]
-    for (int ii{0}; ii < num_node_in_block; ++ii){
+    for (int ii{0}; ii < num_node_in_block; ++ii)
+    {
       sstrm.clear(); getline(infile, sline); sstrm.str(sline);
       int nidx;
       sstrm >> nidx;
@@ -1633,7 +1645,8 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile, const int (&elem_nlocbas)[32]
     }
 
     // record coordinates
-    for (int ii{0}; ii < num_node_in_block; ++ii){
+    for (int ii{0}; ii < num_node_in_block; ++ii)
+    {
       sstrm.clear(); getline(infile, sline); sstrm.str(sline);
       int coor_idx{recorded_node_num + ii};
       sstrm >> node[coor_idx * 3];
@@ -1676,7 +1689,8 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile, const int (&elem_nlocbas)[32]
   }
 
   int recorded_ele_num {0};
-  for (int block{0}; block < num_blocks; ++block){
+  for (int block{0}; block < num_blocks; ++block)
+  {
     sstrm.clear(); getline(infile, sline); sstrm.str(sline);
     int entity_dim, geo_tag, etype, num_ele_in_block;
     sstrm >> entity_dim; sstrm >> geo_tag; sstrm >> etype; sstrm >> num_ele_in_block;
@@ -1687,26 +1701,29 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile, const int (&elem_nlocbas)[32]
 
     // find physical tag according to the entity information
     int phy_tag, geo_index;
-    if (entity_dim == 1){ // line element
+    if (entity_dim == 1)  // line element
+    {
       geo_index = VEC_T::get_pos(curveTag, geo_tag);
       phy_tag = curvePhyTag[geo_index];
     }
-    else if (entity_dim == 2){   // surface element
+    else if (entity_dim == 2) // surface element
+    {
       geo_index = VEC_T::get_pos(surfaceTag, geo_tag);
       phy_tag = surfacePhyTag[geo_index];
     }
-    else if (entity_dim == 3){  // volume element
+    else if (entity_dim == 3) // volume element
+    {
       geo_index = VEC_T::get_pos(volumeTag, geo_tag);
       phy_tag = volumePhyTag[geo_index];
     }
-    else {
+    else
       SYS_T::print_exit( "Error: .msh file, the dimension of element should be 1, 2 or 3.\n" );
-    }
 
     // Record the number of basis function (element type) in 
     // the physical domain. If there are different type element in the
     // physical subdomain, throw an error message.
-    if( ele_nlocbas[phy_tag-1] == -1 ){
+    if( ele_nlocbas[phy_tag-1] == -1 )
+    {
       ele_nlocbas[phy_tag-1] = enum_node;
       ele_type[phy_tag-1] = etype;
     }
@@ -1717,13 +1734,14 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile, const int (&elem_nlocbas)[32]
     }
 
     // read each line of element information in a block
-    for (int ii{0}; ii < num_ele_in_block; ++ii){
+    for (int ii{0}; ii < num_ele_in_block; ++ii)
+    {
       sstrm.clear(); getline(infile, sline); sstrm.str(sline);
       int eidx;
       sstrm >> eidx;
       // Record the IEN array for the element
       for(int jj=0; jj<enum_node; ++jj)
-        {
+      {
         int temp_index;
         sstrm >> temp_index;
         // to make the IEN compatible with the c array: we correct
@@ -1738,7 +1756,7 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile, const int (&elem_nlocbas)[32]
 
   // check
   SYS_T::print_exit_if( recorded_ele_num != num_elem, 
-    "Error: .msh file, the number of recorded elements does not match with the number of elements . \n");
+    "Error: .msh file, the number of recorded elements does not match with the number of elements. \n");
 
   // here we suppose there is no periordic condition, so the next line is the end of .msh file
 }
