@@ -17,17 +17,17 @@
 
 int main(int argc, char *argv[])
 {
-  std::vector<int> nid {32, 5, 3, 22};
+  std::vector<int> nid {1,2,3,4,5,6,7,8,9};
   std::vector<int> eid {11, 21};
+  std::vector<double> node {0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.5, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.5, 0.0, 0.5, 1.0, 0.0, 1.0, 0.5, 0.0};
+  std::vector<int> ien {0,1,2,4,5,6,3,2,1,7,5,8};
   // old function cannot add Physics_tag
-  TET_T::write_triangle_grid( "old", 4, 2, {0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0}, {0,1,2,2,1,3}, nid, eid );
+  TET_T::write_quadratic_triangle_grid( "old", 9, 2, node, ien, nid, eid );
 
   std::vector<DataVecStr<int>> input {};
   input.push_back({nid, "GlobalNodeID", AssociateObject::Node});
   input.push_back({eid, "GlobalElementID", AssociateObject::Cell});
-  input.push_back({{-2, 23}, "Physics_tag", AssociateObject::Cell});
-
-  TET_T::write_triangle_grid( "new", 4, 2, {0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0}, {0,1,2,2,1,3}, input ); 
+  TET_T::write_quadratic_triangle_grid( "new", 9, 2, node, ien, input ); 
 
   return EXIT_SUCCESS;
 }

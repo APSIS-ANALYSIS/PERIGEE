@@ -135,10 +135,10 @@ void SV_T::gen_sv_fsi_vtus( const std::string &filename_f,
   // If the last four is .vtu, remove them for TET_T::write_tet_grid 
   if(fend.compare(".vtu") == 0) fname.erase( fname.end()-4, fname.end() );
 
-  std::vector<DataVecStr<int>> dvs {};
-  dvs.push_back({wtag, "Physics_tag", AssociateObject::Cell});
+  std::vector<DataVecStr<int>> input_vtk_data {};
+  input_vtk_data.push_back({wtag, "Physics_tag", AssociateObject::Cell});
   TET_T::write_tet_grid( fname, nFunc_f + counter, nElem_f + nElem_s,
-      ctrlPts, wIEN, dvs, true );
+      ctrlPts, wIEN, input_vtk_data, true );
 
   std::cout<<"Status: "<<writename_whole<<" is generated. \n";
 
@@ -150,11 +150,11 @@ void SV_T::gen_sv_fsi_vtus( const std::string &filename_f,
   map_s_elem.resize(nElem_s);
   for(int ii=0; ii<nElem_s; ++ii) map_s_elem[ii] = nElem_f + ii;
 
-  dvs.clear();
-  dvs.push_back({map_s_node, "GlobalNodeID", AssociateObject::Node});
-  dvs.push_back({map_s_elem, "GlobalElementID", AssociateObject::Cell});
+  input_vtk_data.clear();
+  input_vtk_data.push_back({map_s_node, "GlobalNodeID", AssociateObject::Node});
+  input_vtk_data.push_back({map_s_elem, "GlobalElementID", AssociateObject::Cell});
   TET_T::write_tet_grid( fname, nFunc_s, nElem_s, 
-      ctrlPts_s, vecIEN_s, dvs );
+      ctrlPts_s, vecIEN_s, input_vtk_data );
 
   std::cout<<"Status: "<<filename_s<<" is updated to "<<writename_solid<<'\n';
 }
@@ -226,10 +226,10 @@ void SV_T::update_sv_vtp( const std::string &filename,
   if(fend.compare(".vtp") == 0)
     fname.erase(fname.end()-4, fname.end());
 
-  std::vector<DataVecStr<int>> dvs {};
-  dvs.push_back({global_node_index, "GlobalNodeID", AssociateObject::Node});
-  dvs.push_back({global_ele_index, "GlobalElementID", AssociateObject::Cell});
-  TET_T::write_triangle_grid( fname, numpts, numcels, pt, ien_array, dvs );
+  std::vector<DataVecStr<int>> input_vtk_data {};
+  input_vtk_data.push_back({global_node_index, "GlobalNodeID", AssociateObject::Node});
+  input_vtk_data.push_back({global_ele_index, "GlobalElementID", AssociateObject::Cell});
+  TET_T::write_triangle_grid( fname, numpts, numcels, pt, ien_array, input_vtk_data );
 }
 
 
@@ -269,9 +269,12 @@ void SV_T::update_sv_sur_vtu( const std::string &filename,
   fend.assign( fname.end()-4 , fname.end() );
 
   if(fend.compare(".vtu") == 0) fname.erase(fname.end()-4, fname.end());
-
+  
+  std::vector<DataVecStr<int>> input_vtk_data {};
+  input_vtk_data.push_back({nid, "GlobalNodeID", AssociateObject::Node});
+  input_vtk_data.push_back({eid, "GlobalElementID", AssociateObject::Cell});
   TET_T::write_quadratic_triangle_grid( fname, nFunc, nElem, ctrlPts,
-      vecIEN, nid, eid );
+      vecIEN, input_vtk_data );
 }
 
 
@@ -342,10 +345,10 @@ void SV_T::update_sv_vtp( const std::string &filename,
   if(fend.compare(".vtp") == 0)
     fname.erase(fname.end()-4, fname.end());
 
-  std::vector<DataVecStr<int>> dvs {};
-  dvs.push_back({global_node_index, "GlobalNodeID", AssociateObject::Node});
-  dvs.push_back({global_ele_index, "GlobalElementID", AssociateObject::Cell});
-  TET_T::write_triangle_grid( fname, numpts, numcels, pt, ien_array, dvs );
+  std::vector<DataVecStr<int>> input_vtk_data {};
+  input_vtk_data.push_back({global_node_index, "GlobalNodeID", AssociateObject::Node});
+  input_vtk_data.push_back({global_ele_index, "GlobalElementID", AssociateObject::Cell});
+  TET_T::write_triangle_grid( fname, numpts, numcels, pt, ien_array, input_vtk_data );
 }
 
 
