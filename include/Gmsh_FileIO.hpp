@@ -191,12 +191,12 @@ class Gmsh_FileIO
     int num_phy_domain;
 
     // store the names, indices and dimension of each physical groups
-    std::vector<std::string> phy_name{};
-    std::vector<int> phy_index{};
-    std::vector<int> phy_dim{};
+    std::vector<std::string> phy_name {};
+    std::vector<int> phy_index {};
+    std::vector<int> phy_dim {};
 
     // stores the ii-th domain's number of elements. ii is the physical tag
-    std::vector<int> phy_domain_nElem;
+    std::vector<int> phy_domain_nElem {};
 
     // details of the physical domain
     // the number of 3d, 2d, and 1d domains.
@@ -259,6 +259,15 @@ class Gmsh_FileIO
     // This function is bound to the constructor of Gmsh_FileIO
     // --------------------------------------------------------------
     void read_msh2(std::ifstream &infile, const int (&elem_nlocbas)[32]);
+
+    // --------------------------------------------------------------
+    // read the node data and element data in .msh file of v4.1 0 8,
+    // then write them in node coordinates array and eIEN array.
+    // This function is bound to the constructor of Gmsh_FileIO
+    // --------------------------------------------------------------
+    void read_msh4(std::ifstream &infile, const int (&elem_nlocbas)[32]);
+
+
     // --------------------------------------------------------------
 };
 

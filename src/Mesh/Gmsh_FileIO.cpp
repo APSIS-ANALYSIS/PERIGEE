@@ -31,11 +31,12 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
 
   // read the node data and element data in .msh file
   getline(infile, sline);
-  if (sline.compare("2.2 0 8") == 0){
+  if (sline.compare("2.2 0 8") == 0)
     read_msh2(infile, elem_nlocbas);
-  }
+  else if (sline.compare("4.1 0 8") == 0)
+    read_msh4(infile, elem_nlocbas);
   else
-    SYS_T::print_exit("Error: .msh format second line should be '2.2 0 8' or ''4.1 0 8'. \n");
+    SYS_T::print_exit("Error: .msh format second line should be '2.2 0 8' or '4.1 0 8'. \n");
 
   // Finish the file reading, the last line should be $EndElements  
   getline(infile, sline);
@@ -1456,6 +1457,290 @@ void Gmsh_FileIO::read_msh2(std::ifstream &infile, const int (&elem_nlocbas)[32]
       eIEN[phy_tag-1].push_back( temp_index - 1 );
     }
   }
+}
+
+void Gmsh_FileIO::read_msh4(std::ifstream &infile, const int (&elem_nlocbas)[32])
+{
+  std::istringstream sstrm;
+  std::string sline;
+
+    getline(infile, sline); 
+  SYS_T::print_exit_if(sline.compare("$EndMeshFormat") != 0, 
+      "Error: .msh format third line should be $EndMeshFormat. \n");
+  
+  getline(infile, sline);
+  SYS_T::print_exit_if(sline.compare("$PhysicalNames") != 0, 
+      "Error: .msh format fourth line should be $PhysicalNames. \n");
+
+  getline(infile, sline); sstrm.str(sline); sstrm>>num_phy_domain;
+
+  // For each physical domain, read their index, we assume that
+  // in the gmsh file, the index ranges from [1, num_phy_domain].
+  // read the domain's dimension, should be 2 or 3;
+  // read the domain's name, and remove the " " at the names.
+  int pdim, pidx; std::string pname;
+  for(int ii=0; ii<num_phy_domain; ++ii)
+  {
+    sstrm.clear(); getline(infile, sline); sstrm.str(sline);
+    sstrm >> pdim; sstrm >> pidx; sstrm >> pname;
+
+    // Gmsh have "name" as the physical name, first removes
+    // the two primes in the name.
+    pname.erase( pname.begin() ); 
+    pname.erase( pname.end()-1 );
+    
+    // minus 1 because .msh file index starts from 1
+    phy_dim.push_back(pdim);
+    phy_index.push_back(pidx-1);
+    phy_name.push_back(pname);
+  }
+
+  // file syntax $EndPhysicalNames $Nodes 
+  getline(infile, sline); 
+  SYS_T::print_exit_if(sline.compare("$EndPhysicalNames") != 0, 
+      "Error: .msh format line should be $EndPhysicalNames. \n");
+  
+  getline(infile, sline);
+  SYS_T::print_exit_if(sline.compare("$Entities") != 0, 
+      "Error: .msh format line should be $Entities. \n");
+
+  // get the number of original points, curves, surfaces and volumes
+  int numPoints, numCurves, numSurfaces, numVolumes;
+  sstrm.clear(); getline(infile, sline); sstrm.str(sline);
+  sstrm >> numPoints; sstrm >> numCurves; sstrm >> numSurfaces; sstrm >> numVolumes;
+
+  // skip over the information of original points
+  for (int point{0}; point < numPoints; ++point)
+    getline(infile, sline);
+  // If we assign physical groups to these points, we cannot skip the information above
+
+  // build up the relationship of entities(GeoTag) and physical groups(PhyTag)
+  int GeoTag, PhyTag, num_phy_tag; 
+  double minX, minY, minZ, maxX, maxY, maxZ;
+
+  // read each line for the information of original curves
+  std::vector<int> curveTag (numCurves, -1);
+  std::vector<int> curvePhyTag (numCurves, -1);
+  for (int curve{0}; curve < numCurves; ++curve){
+    sstrm.clear(); getline(infile, sline); sstrm.str(sline);
+
+    sstrm >> GeoTag;
+    curveTag[curve] = GeoTag;
+
+    sstrm >> minX; sstrm >> minY; sstrm >> minZ;
+    sstrm >> maxX; sstrm >> maxY; sstrm >> maxZ;
+
+    sstrm >> num_phy_tag;
+    if (num_phy_tag == 0){
+      // some curves are not in any physical group, set phy_tag = -1 by default
+      continue;
+    }
+    else {
+      // here we suppose one entity belongs to at most one physical group
+      SYS_T::print_exit_if( num_phy_tag != 1,
+        "Error: .msh file number of physical tag for a curve is not 1.\n");
+      sstrm >> PhyTag;
+      curvePhyTag[curve] = PhyTag;
+    }
+  }
+
+  // read each line for the information of original surfaces
+  std::vector<int> surfaceTag (numSurfaces, -1);
+  std::vector<int> surfacePhyTag (numSurfaces, -1);
+  for (int surface{0}; surface < numSurfaces; ++surface){
+    sstrm.clear(); getline(infile, sline); sstrm.str(sline);
+
+    sstrm >> GeoTag;
+    surfaceTag[surface] = GeoTag;
+
+    sstrm >> minX; sstrm >> minY; sstrm >> minZ;
+    sstrm >> maxX; sstrm >> maxY; sstrm >> maxZ;
+
+    sstrm >> num_phy_tag;
+    if (num_phy_tag == 0){
+      // some surfaces are not in any physical group, set phy_tag = -1 by default
+      continue;
+    }
+    else {
+      // here we suppose one entity belongs to at most one physical group
+      SYS_T::print_exit_if( num_phy_tag != 1,
+        "Error: .msh file number of physical tag for a surface is not 1.\n");
+      sstrm >> PhyTag;
+      surfacePhyTag[surface] = PhyTag;
+    }
+  }
+
+  // read each line for the information of original volumes
+  std::vector<int> volumeTag (numVolumes, -1);
+  std::vector<int> volumePhyTag (numVolumes, -1);
+  for (int volume{0}; volume < numVolumes; ++ volume){
+    sstrm.clear(); getline(infile, sline); sstrm.str(sline);
+
+    sstrm >> GeoTag;
+    volumeTag[volume] = GeoTag;
+
+    sstrm >> minX; sstrm >> minY; sstrm >> minZ;
+    sstrm >> maxX; sstrm >> maxY; sstrm >> maxZ;
+
+    sstrm >> num_phy_tag;
+    if (num_phy_tag == 0){
+      // some volumes are not in any physical group, set phy_tag = -1 by default
+      continue;
+    }
+    else {
+      // here we suppose one entity belongs to at most one physical group
+      SYS_T::print_exit_if( num_phy_tag != 1,
+        "Error: .msh file number of physical tag for a volume is not 1.\n");
+      sstrm >> PhyTag;
+      volumePhyTag[volume] = PhyTag;
+    }
+  }
+
+  getline(infile, sline);
+  SYS_T::print_exit_if(sline.compare("$EndEntities") != 0, 
+    "Error: .msh format line should be $EndEntities. \n");
+
+  // here we suppose there is no partitioned entities, the next line should be '$Nodes'
+  getline(infile, sline);
+  SYS_T::print_exit_if(sline.compare("$Nodes") != 0, 
+     "Error: .msh format line should be $Nodes. \n");
+  
+  // get the number of nodes
+  int num_blocks;    // numEntityBlocks
+  sstrm.clear(); getline(infile, sline); sstrm.str(sline);
+  sstrm >> num_blocks; sstrm>>num_node;
+
+  // Record x-y-z coordinates for the nodes into the vector node
+  node.resize(3*num_node);
+
+  int recorded_node_num {0};
+  for (int block{0}; block < num_blocks; ++block){
+    sstrm.clear(); getline(infile, sline); sstrm.str(sline);
+    int entity_dim, entity_tag, parametric, num_node_in_block;
+    sstrm >> entity_dim; sstrm >> entity_tag; sstrm >> parametric; sstrm >> num_node_in_block;
+
+    // here we suppose parametric = 0, then there is no <u>, <v>, <w>
+    SYS_T::print_exit_if( parametric != 0, 
+      "Error: .msh file, the third parameter of nodal blocks should be 0 in block %d.\n", block);
+
+    // here we suppose the nodal index should ve in [1, num_node]
+    for (int ii{0}; ii < num_node_in_block; ++ii){
+      sstrm.clear(); getline(infile, sline); sstrm.str(sline);
+      int nidx;
+      sstrm >> nidx;
+      SYS_T::print_exit_if( nidx != recorded_node_num + ii + 1, 
+        "Error: .msh file, the nodal index should be in the range [1, num_node]. \n");
+    }
+
+    // record coordinates
+    for (int ii{0}; ii < num_node_in_block; ++ii){
+      sstrm.clear(); getline(infile, sline); sstrm.str(sline);
+      int coor_idx{recorded_node_num + ii};
+      sstrm >> node[coor_idx * 3];
+      sstrm >> node[coor_idx * 3 + 1];
+      sstrm >> node[coor_idx * 3 + 2];
+    }
+    
+    // finish record in this block
+    recorded_node_num += num_node_in_block;
+  }
+  
+  // check
+  SYS_T::print_exit_if( recorded_node_num != num_node, 
+    "Error: .msh file, the number of recorded nodes does not match with the number of nodes . \n");
+
+  // file syntax $EndNodes, $Elements
+  getline(infile, sline); 
+  SYS_T::print_exit_if(sline.compare("$EndNodes") != 0, 
+      "Error: .msh format line should be $EndNodes. \n");
+  
+  getline(infile, sline);
+  SYS_T::print_exit_if(sline.compare("$Elements") != 0, 
+      "Error: .msh format line should be $Elements. \n");
+
+  // get the number of elements
+  sstrm.clear(); getline(infile, sline); sstrm.str(sline);
+  sstrm >> num_blocks; sstrm>>num_elem;
+
+  // We assume that the physical tag ranges from 1 to num_phy_domain
+  eIEN.resize(num_phy_domain);
+  phy_domain_nElem.resize(num_phy_domain);
+  ele_nlocbas.resize(num_phy_domain);
+  ele_type.resize(num_phy_domain);
+
+  for(int ii=0; ii<num_phy_domain; ++ii)
+  {
+    eIEN[ii].clear();
+    phy_domain_nElem[ii] = 0;
+    ele_nlocbas[ii] = -1;
+  }
+
+  int recorded_ele_num {0};
+  for (int block{0}; block < num_blocks; ++block){
+    sstrm.clear(); getline(infile, sline); sstrm.str(sline);
+    int entity_dim, geo_tag, etype, num_ele_in_block;
+    sstrm >> entity_dim; sstrm >> geo_tag; sstrm >> etype; sstrm >> num_ele_in_block;
+
+    // The pre-defined const array in the beginning of the constructor
+    // gives the element number of nodes
+    int enum_node {elem_nlocbas [etype]};
+
+    // find physical tag according to the entity information
+    int phy_tag, geo_index;
+    if (entity_dim == 1){ // line element
+      geo_index = VEC_T::get_pos(curveTag, geo_tag);
+      phy_tag = curvePhyTag[geo_index];
+    }
+    else if (entity_dim == 2){   // surface element
+      geo_index = VEC_T::get_pos(surfaceTag, geo_tag);
+      phy_tag = surfacePhyTag[geo_index];
+    }
+    else if (entity_dim == 3){  // volume element
+      geo_index = VEC_T::get_pos(volumeTag, geo_tag);
+      phy_tag = volumePhyTag[geo_index];
+    }
+    else {
+      SYS_T::print_exit( "Error: .msh file, the dimension of element should be 1, 2 or 3.\n" );
+    }
+
+    // Record the number of basis function (element type) in 
+    // the physical domain. If there are different type element in the
+    // physical subdomain, throw an error message.
+    if( ele_nlocbas[phy_tag-1] == -1 ){
+      ele_nlocbas[phy_tag-1] = enum_node;
+      ele_type[phy_tag-1] = etype;
+    }
+    else 
+    {
+      SYS_T::print_exit_if( ele_type[phy_tag-1] != etype,
+        "Error: the physical domain have mixed type of elements. \n" );
+    }
+
+    // read each line of element information in a block
+    for (int ii{0}; ii < num_ele_in_block; ++ii){
+      sstrm.clear(); getline(infile, sline); sstrm.str(sline);
+      int eidx;
+      sstrm >> eidx;
+      // Record the IEN array for the element
+      for(int jj=0; jj<enum_node; ++jj)
+        {
+        int temp_index;
+        sstrm >> temp_index;
+        // to make the IEN compatible with the c array: we correct
+        // the node index by minus 1.
+        eIEN[phy_tag-1].push_back( temp_index - 1 );
+      } 
+    }
+    // Add the number of element to the physical domain
+    phy_domain_nElem[phy_tag - 1] += num_ele_in_block;
+    recorded_ele_num += num_ele_in_block;
+  }
+
+  // check
+  SYS_T::print_exit_if( recorded_ele_num != num_elem, 
+    "Error: .msh file, the number of recorded elements does not match with the number of elements . \n");
+
+  // here we suppose there is no periordic condition, so the next line is the end of .msh file
 }
 
 // EOF
