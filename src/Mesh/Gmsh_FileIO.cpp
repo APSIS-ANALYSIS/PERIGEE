@@ -1634,7 +1634,7 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile, const int (&elem_nlocbas)[32]
     SYS_T::print_exit_if( parametric != 0, 
       "Error: .msh file, the third parameter of nodal blocks should be 0 in block %d.\n", block);
 
-    // here we suppose the nodal index should ve in [1, num_node]
+    // here we suppose the nodal index should be in [1, num_node]
     for (int ii{0}; ii < num_node_in_block; ++ii)
     {
       sstrm.clear(); getline(infile, sline); sstrm.str(sline);

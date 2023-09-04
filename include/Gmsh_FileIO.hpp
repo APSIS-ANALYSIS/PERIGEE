@@ -202,18 +202,18 @@ class Gmsh_FileIO
     // the number of 3d, 2d, and 1d domains.
     // num_phy_domain = num_phy_domain_3d + num_phy_domain_2d
     //                 + num_phy_domain_1d
-    int num_phy_domain_3d, num_phy_domain_2d, num_phy_domain_1d;
+    int num_phy_domain_3d, num_phy_domain_2d, num_phy_domain_1d {};
 
     // the indices (physical tag) of the 1d/2d/3d domains respectively
     // {phy_index} = {phy_3d_index} + {phy_2d_index} + {phy_1d_index} 
-    std::vector<int> phy_3d_index, phy_2d_index, phy_1d_index;
+    std::vector<int> phy_3d_index, phy_2d_index, phy_1d_index {};
 
     // the physicla subdomain names of the corresponding phy_xd_index.
-    std::vector<std::string> phy_3d_name, phy_2d_name, phy_1d_name;
+    std::vector<std::string> phy_3d_name, phy_2d_name, phy_1d_name {};
 
     // stores the number of 3d/2d/1d element respectively
     // vector lengths are num_phy_domain_3d/2d/1d respectively
-    std::vector<int> phy_3d_nElem, phy_2d_nElem, phy_1d_nElem;
+    std::vector<int> phy_3d_nElem, phy_2d_nElem, phy_1d_nElem {};
 
     // Stores the starting index for the 3d/2d volume mesh, with length
     // num_phy_domain_3d/num_phy_domain_2d.
@@ -222,48 +222,48 @@ class Gmsh_FileIO
     // the second phy domain element indices follows, etc. This is because
     // Gmsh has an element id for 1d, 2d, and 3d elements all together,
     // we need to manage our own element id ourselves. 
-    std::vector<int> phy_3d_start_index;
-    std::vector<int> phy_2d_start_index;
+    std::vector<int> phy_3d_start_index {};
+    std::vector<int> phy_2d_start_index {};
 
     // --------------------------------------------------------------
     // Geometry info    
     int num_node; // number of nodal points
     
-    std::vector<double> node; // 3 x num_node: x-y-z coordinates
+    std::vector<double> node {}; // 3 x num_node: x-y-z coordinates
 
     int num_elem; // number of total elem (2D and 3D together)
 
     // size is {num_phy_domain} x { ele_nlocbas[ii] times phy_domain_nElem[ii] }
     // note: the eIEN values are with nodal indices starting from 0.       
     //       the first argument 0 <= ii < num_phy_domain is the physical tag
-    std::vector< std::vector<int> > eIEN;
+    std::vector< std::vector<int> > eIEN {};
 
     // stores the number of basis functions in each physical domain. 
     // This implicitly implies that the we use the same type of element 
     // in each physical domain. 
     // ele_nlocbas stores the number of local basis functions in element.
     // the argument 0<= ii < num_phy_domain is the physical tag
-    std::vector<int> ele_nlocbas;
+    std::vector<int> ele_nlocbas {};
 
     // stores the element type for each physical subdomain.
     // the argument 0<= ii < num_phy_domain is the physical tag
     // its value and the corresponding ele_nlocbas satisfies the ele_nlocbas
     // mapping, which is defined by Gmsh.
-    std::vector<int> ele_type;
+    std::vector<int> ele_type {};
     
     // --------------------------------------------------------------
     // Private functions for the constructor
     // --------------------------------------------------------------
     // read the node data and element data in .msh file of v2.2 0 8,
     // then write them in node coordinates array and eIEN array.
-    // This function is bound to the constructor of Gmsh_FileIO
+    // This function is bound to the constructor of Gmsh_FileIO.
     // --------------------------------------------------------------
     void read_msh2(std::ifstream &infile, const int (&elem_nlocbas)[32]);
 
     // --------------------------------------------------------------
     // read the node data and element data in .msh file of v4.1 0 8,
     // then write them in node coordinates array and eIEN array.
-    // This function is bound to the constructor of Gmsh_FileIO
+    // This function is bound to the constructor of Gmsh_FileIO.
     // --------------------------------------------------------------
     void read_msh4(std::ifstream &infile, const int (&elem_nlocbas)[32]);
     // --------------------------------------------------------------
