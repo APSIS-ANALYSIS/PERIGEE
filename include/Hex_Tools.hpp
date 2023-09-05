@@ -9,7 +9,7 @@
 #include <vtkQuad.h>
 #include <vtkQuadraticQuad.h>
 #include <vtkHexahedron.h>
-#include <vtkQuadraticHexahedron.h>
+#include <vtkTriQuadraticHexahedron.h>
 
 namespace HEX_T
 {
@@ -24,6 +24,12 @@ namespace HEX_T
       const std::vector<DataVecStr<int>> &IOdata, const bool &isXML = true );
 
   double get_aspect_ratio( const std::vector<double> &coors );
+
+  // ----------------------------------------------------------------
+  // ! rest_node: convert the node arrangment of a quadratic hexahedron,
+  //              i.e. the local ien, from Gmsh style to VTK style.
+  // ----------------------------------------------------------------
+  std::vector<int> reset_node (const std::vector<int> &local_ien_msh);
   
 }
 

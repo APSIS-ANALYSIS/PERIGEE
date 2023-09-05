@@ -70,19 +70,21 @@ void HEX_T::gen_hex_grid( vtkUnstructuredGrid * const &grid_w,
   }
   else if(nlocbas == 27)
   {
-    vtkCell * cl = vtkQuadraticHexahedron::New();
+    vtkCell * cl = vtkTriQuadraticHexahedron::New();
 
     for(int ii=0; ii<numcels; ++ii)
-    {
+    { 
+      std::vector<int> local_ien_msh = VEC_T::pick(ien_array, 27*ii, 27*ii + 26);
+      std::vector<int> local_ien_vtk = HEX_T::reset_node(local_ien_msh);
       for(int lnode=0; lnode<27; ++lnode)
-        cl->GetPointIds()->SetId( lnode, ien_array[27*ii + lnode] );
+        cl->GetPointIds()->SetId( lnode, local_ien_vtk[lnode] );
 
       grid_w->InsertNextCell( cl->GetCellType(), cl->GetPointIds() );
 
       std::vector<double> cell_node; cell_node.clear();
       for(int lnode=0; lnode<8; ++lnode)
       {
-        int node_offset = 3 * ien_array[27*ii + lnode];
+        int node_offset = 3 * local_ien_vtk[lnode];
         cell_node.push_back(pt[node_offset]);
         cell_node.push_back(pt[node_offset+1]);
         cell_node.push_back(pt[node_offset+2]);
@@ -191,4 +193,25 @@ double HEX_T::get_aspect_ratio( const std::vector<double> &pt )
   const double emin = *std::min_element(edge, edge+12);
 
   return emax / emin;
+}
+
+std::vector<int> HEX_T::reset_node (const std::vector<int> &ien)
+{
+  if (ien.size() == 27)
+  {
+   std::vector<int> local_ien_vtk {ien[0], ien[1], ien[2], ien[3], ien[4], ien[5],
+     ien[6], ien[7], ien[8], ien[11], ien[13], ien[9], ien[16], ien[18], ien[19],
+     ien[17], ien[10], ien[12], ien[14], ien[15], ien[22], ien[23], ien[21], ien[24],
+     ien[20], ien[25], ien[26]};
+   return local_ien_vtk;
+  }
+  else if (ien.size() == 20)
+  {
+    std::vector<int> local_ien_vtk {ien[0], ien[1], ien[2], ien[3], ien[4], ien[5],
+     ien[6], ien[7], ien[8], ien[11], ien[13], ien[9], ien[16], ien[18], ien[19],
+     ien[17], ien[10], ien[12], ien[14], ien[15]};
+   return local_ien_vtk;
+  }
+  else
+    SYS_T::print_exit("Error: In HEX_T::reset_node, undefined hexahedron type.");
 }
