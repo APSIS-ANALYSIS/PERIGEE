@@ -1758,7 +1758,7 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile, const int (&elem_nlocbas)[32]
   SYS_T::print_exit_if( recorded_ele_num != num_elem, 
     "Error: .msh file, the number of recorded elements does not match with the number of elements. \n");
 
-  // here we suppose there is no periordic condition, so the next line is the end of .msh file
+  // here we suppose there is no periodic condition, so the next line is the end of .msh file
 }
 
 // EOF
