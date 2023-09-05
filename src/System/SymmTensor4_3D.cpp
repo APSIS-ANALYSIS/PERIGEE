@@ -342,8 +342,9 @@ void SymmTensor4_3D::add_SymmOutProduct( const double &val, const SymmMatrix_3x3
 void SymmTensor4_3D::TenPMult( const Tensor4_3D &P )
 {
   double temp[21] = {0.0};
-  const int value_left[21]  = {0,  0,  0,  0,  0, 0, 36, 36, 36, 36, 36, 72, 72, 72, 72, 45, 45, 45, 18, 9, 9};
-  const int value_right[21] = {0, 36, 72, 45, 18, 9, 36, 72, 45, 18,  9, 72, 45, 18,  9, 45, 18, 9, 18, 18, 9};
+
+  constexpr int value_left[21]  = {0,  0,  0,  0,  0, 0, 36, 36, 36, 36, 36, 72, 72, 72, 72, 45, 45, 45, 18, 9, 9};
+  constexpr int value_right[21] = {0, 36, 72, 45, 18, 9, 36, 72, 45, 18,  9, 72, 45, 18,  9, 45, 18, 9, 18, 18, 9};
 
   for(int kk=0; kk<21; ++kk)
   {
