@@ -1,10 +1,10 @@
 ## Install PERIGEE on Windows
 
-To install PERIGEE on Windows, we need to install Windows Subsystem for Linux (WSL) first. Then, we can refer to the install guidance for Linux for subsequent steps.
+To install PERIGEE on Windows, we must first install Windows Subsystem for Linux (WSL). Then, we may perform procedures similar to those of UNIX-like systems to complete the install.
 
 ### Install WSL
 
-You can refer to the [official guidance](https://learn.microsoft.com/zh-cn/windows/wsl/) for details. According to the official guidance, WSL can be installed simply by running the following in "Command Prompt" as administrator and restarting on the Windows with OS build later than 19041.
+For details, refer to the [official guidance](https://learn.microsoft.com/zh-cn/windows/wsl/). According to the official guidance, WSL can be installed simply by running the following in "Command Prompt" as administrator and restarting on the Windows with OS build later than [19041](https://en.wikipedia.org/wiki/Windows_10_version_history).
 ```sh
 wsl --install -d Ubuntu-20.04
 ```
