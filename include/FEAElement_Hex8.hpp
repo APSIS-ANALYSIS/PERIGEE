@@ -79,37 +79,37 @@ class FEAElement_Hex8 : public FEAElement
     virtual std::vector<double> get_d2R_dxx( const int &quaindex ) const
     {
       ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_d2R_dxx function error.\n" );
-      return { 0.0, 0.0, 0.0, 0.0 };
+      return { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
     }
 
     virtual std::vector<double> get_d2R_dyy( const int &quaindex ) const
     {
       ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_d2R_dyy function error.\n" );
-      return { 0.0, 0.0, 0.0, 0.0 };
+      return { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
     }
 
     virtual std::vector<double> get_d2R_dzz( const int &quaindex ) const
     {
       ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_d2R_dzz function error.\n"  );
-      return { 0.0, 0.0, 0.0, 0.0 };
+      return { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
     }
 
     virtual std::vector<double> get_d2R_dxy( const int &quaindex ) const
     {
       ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_d2R_dxy function error.\n"  );
-      return { 0.0, 0.0, 0.0, 0.0 };
+      return { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
     }
 
     virtual std::vector<double> get_d2R_dxz( const int &quaindex ) const
     {
       ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_d2R_dxz function error.\n"  );
-      return { 0.0, 0.0, 0.0, 0.0 };
+      return { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
     }
 
     virtual std::vector<double> get_d2R_dyz( const int &quaindex ) const
     {
       ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_d2R_dyz function error.\n"  );
-      return { 0.0, 0.0, 0.0, 0.0 };
+      return { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
     }
 
     // Get the Jacobian matrix dx/dr
@@ -141,7 +141,7 @@ class FEAElement_Hex8 : public FEAElement
     double * R;
 
     // tet4 is linear, thus the first-order derivatives are constant
-    double dR_dx[4], dR_dy[4], dR_dz[4];
+    double dR_dx[8], dR_dy[8], dR_dz[8];
 
     // Container for
     // dx_dr : 0 <= ii < 9
