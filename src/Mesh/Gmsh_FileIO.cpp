@@ -491,8 +491,12 @@ void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
   }
 
   // Write the mesh file in vtp format
+  std::vector<DataVecStr<int>> input_vtk_data {};
+  input_vtk_data.push_back({bcpt, "GlobalNodeID", AssociateObject::Node});
+  input_vtk_data.push_back({face2elem_1, "GlobalElementID_1", AssociateObject::Cell});
+  input_vtk_data.push_back({face2elem_2, "GlobalElementID_2", AssociateObject::Cell});
   TET_T::write_triangle_grid( vtp_file_name, bcnumpt, bcnumcl,
-      tript, trien, bcpt, face2elem_1, face2elem_2 );
+      tript, trien, input_vtk_data );
 
   delete [] bcmap; bcmap = nullptr;
   mytimer->Stop();
@@ -630,8 +634,11 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
   }
   
   // Write the mesh file in vtp format
+  std::vector<DataVecStr<int>> input_vtk_data {};
+  input_vtk_data.push_back({bcpt, "GlobalNodeID", AssociateObject::Node});
+  input_vtk_data.push_back({face2elem, "GlobalElementID", AssociateObject::Cell});
   TET_T::write_triangle_grid( vtp_file_name, bcnumpt, bcnumcl,
-      tript, trien, bcpt, face2elem );
+      tript, trien, input_vtk_data );
 
   mytimer->Stop();
   std::cout<<"      Time taken "<<mytimer->get_sec()<<" sec. \n";
@@ -700,9 +707,12 @@ void Gmsh_FileIO::write_each_vtu() const
 
     // write the sub-volumetric domain's vtk/vtu file
     // the subdomain element index start with the start_eindex
+    std::vector<DataVecStr<int>> input_vtk_data {};
+    input_vtk_data.push_back({local_node_idx, "GlobalNodeID", AssociateObject::Node});
+    input_vtk_data.push_back({local_cell_idx, "GlobalElementID", AssociateObject::Cell});
+    input_vtk_data.push_back({ptag, "Physics_tag", AssociateObject::Cell});
     TET_T::write_tet_grid( vtu_file_name, num_local_node, 
-        phy_3d_nElem[ ii ], local_coor, domain_IEN, 
-        local_node_idx, local_cell_idx, ptag, true);
+        phy_3d_nElem[ ii ], local_coor, domain_IEN, input_vtk_data, true);
 
     mytimer->Stop();
 
@@ -749,9 +759,21 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
 
   std::cout<<"\n    "<<wnElem<<" total elems and "<<wnNode<<" total nodes. \n";
 
-  // write whole domain  
+  // write whole domain
+  std::vector<DataVecStr<int>> input_vtk_data {};
+  input_vtk_data.push_back({wtag, "Physics_tag", AssociateObject::Cell});
+  
+  std::vector<int> temp_nid(wnNode, 0);
+  for(int ii=0; ii<wnNode; ++ii) temp_nid[ii] = ii;
+  input_vtk_data.push_back({temp_nid, "GlobalNodeID", AssociateObject::Node});
+
+  std::vector<int> temp_eid(wnElem, 0);
+  for(int ii=0; ii<wnElem; ++ii) temp_eid[ii] = ii;
+  input_vtk_data.push_back({temp_eid, "GlobalElementID", AssociateObject::Cell});
+  
+  
   TET_T::write_tet_grid( in_fname, wnNode, wnElem, node,
-      wIEN, wtag, isXML ); 
+      wIEN, input_vtk_data, isXML ); 
 
   mytimer->Stop();
   std::cout<<"    Time taken "<<mytimer->get_sec()<<" sec. \n";
@@ -1501,9 +1523,12 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const int &index_sur,
     }
     std::cout<<"      face2elem mapping generated. \n";
   }
-
+  
+  std::vector<DataVecStr<int>> input_vtk_data {};
+  input_vtk_data.push_back({bcpt, "GlobalNodeID", AssociateObject::Node});
+  input_vtk_data.push_back({face2elem, "GlobalElementID", AssociateObject::Cell});
   TET_T::write_quadratic_triangle_grid( vtu_file_name, bcnumpt, bcnumcl,
-      tript, trien, bcpt, face2elem );
+      tript, trien, input_vtk_data );
 
   mytimer->Stop();
   std::cout<<"      Time taken "<<mytimer->get_sec()<<" sec. \n";

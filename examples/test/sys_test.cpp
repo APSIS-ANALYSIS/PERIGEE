@@ -16,112 +16,66 @@
 #include "Matrix_double_6by6_Array.hpp"
 #include "VTK_Tools.hpp"
 #include "NodalBC.hpp"
+#include "DataVecStr.hpp"
+#include "Tet_Tools.hpp"
+#include "Hex_Tools.hpp"
 
 int main(int argc, char *argv[])
 {
-  SymmMatrix_3x3 smat; smat.gen_rand();
-  Matrix_3x3 mat = smat.convert_to_full();
+  std::vector<int> nid1 {1,2,3,4,5,6,7,8};
+  std::vector<int> nid2 {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27};
 
-  Tensor4_3D ten = gen_T4_symm_id();
-  SymmTensor4_3D sten = gen_ST4_symm_id();
+  std::vector<int> eid {11};
 
-  ten.gen_Ptilde( mat );
-  sten.gen_Ptilde( smat );
-  
-  SymmMatrix_3x3 smat2; smat2.gen_rand(); 
-  Matrix_3x3 mat2 = smat2.convert_to_full();
+  // these node array and ien array are designed by Gmsh PDF P358, let node0 = [0, 0, 0], length of side = 2, u = x, v = y, w = z
+  std::vector<double> node1 {0.0, 0.0, 0.0,
+                             2.0, 0.0, 0.0,
+                             2.0, 2.0, 0.0,
+                             0.0, 2.0, 0.0,
+                             0.0, 0.0, 2.0,
+                             2.0, 0.0, 2.0,
+                             2.0, 2.0, 2.0,
+                             0.0, 2.0, 2.0};
+  std::vector<int> ien1 {0,1,2,3,4,5,6,7};
 
-  //ten.add_SymmOutProduct(3.14159, mat, mat2);
-  //sten.add_SymmOutProduct(3.14159, smat, smat2);
+  std::vector<double> node2 {0.0, 0.0, 0.0, // 0
+                             2.0, 0.0, 0.0, // 1
+                             2.0, 2.0, 0.0, // 2
+                             0.0, 2.0, 0.0, // 3
+                             0.0, 0.0, 2.0, // 4
+                             2.0, 0.0, 2.0, // 5
+                             2.0, 2.0, 2.0, // 6
+                             0.0, 2.0, 2.0, // 7
+                             1.0, 0.0, 0.0, // 8
+                             0.0, 1.0, 0.0, // 9
+                             0.0, 0.0, 1.0, // 10
+                             2.0, 1.0, 0.0, // 11
+                             2.0, 0.0, 1.0, // 12
+                             1.0, 2.0, 0.0, // 13
+                             2.0, 2.0, 1.0, // 14
+                             0.0, 2.0, 1.0, // 15
+                             1.0, 0.0, 2.0, // 16
+                             0.0, 1.0, 2.0, // 17
+                             2.0, 1.0, 2.0, // 18
+                             1.0, 2.0, 2.0, // 19
+                             1.0, 1.0, 0.0, // 20
+                             1.0, 0.0, 1.0, // 21
+                             0.0, 1.0, 1.0, // 22
+                             2.0, 1.0, 1.0, // 23
+                             1.0, 2.0, 1.0, // 24
+                             1.0, 1.0, 2.0, // 25
+                             1.0, 1.0, 1.0};// 26
+  std::vector<int> ien2 {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26};
 
-  for(int ii=0; ii<100; ++ii)
-  {
-    sten.gen_rand();
-    ten = sten.convert_to_full();
-    
-    const double rval = MATH_T::gen_double_rand(-1.11, 1.23);
+  std::vector<DataVecStr<int>> input1 {};
+  input1.push_back({nid1, "GlobalNodeID", AssociateObject::Node});
+  input1.push_back({eid, "GlobalElementID", AssociateObject::Cell});
+  HEX_T::write_hex_grid( "LinearHex", 8, 1, node1, ien1, input1 );
 
-    Vector_3 vec1; vec1.gen_rand(); vec1.normalize();
-    Vector_3 vec2; vec2.gen_rand(); vec2.normalize();
-
-    ten.add_SymmOutProduct(rval, vec1, vec2, vec1, vec2);
-    sten.add_SymmOutProduct(rval, vec1, vec2);
-    
-    if( sten.is_identical(ten, 2.0e-15) ) std::cout<<"passed! \n";
-    else std::cout<<"error. \n";
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
-    sten.gen_rand();
-    ten = sten.convert_to_full();
-    
-    SymmMatrix_3x3 smat2; smat2.gen_rand();
-    Matrix_3x3 mat2 = smat2.convert_to_full();
-
-    ten.add_SymmOutProduct(rval, mat, mat2);
-    sten.add_SymmOutProduct(rval, smat, smat2);
-
-    //ten = gen_Ptilde(mat2);
-    //sten = gen_Ptilde(smat2);
-
-    //sten.print_in_mat();
-
-    /*
-       sten.gen_rand(-1, 1);
-       ten = sten.convert_to_full();
-
-       SymmMatrix_3x3 smat3; smat3.gen_rand(-1, 1); 
-       SymmMatrix_3x3 smat4; smat4.gen_rand(-1, 1); 
-
-       Tensor4_3D PP; PP.gen_zero();
-       PP.add_OutProduct(1.1523235904, smat3.convert_to_full(), smat4.convert_to_full());
-
-       ten.TenPMult( PP );
-       sten.TenPMult( PP );
-       */
-
-    if( sten.is_identical(ten, 2.0e-15) ) std::cout<<"passed! \n";
-    else std::cout<<"error. \n";
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-  }
-
-  SymmTensor4_3D aaa = gen_ST4_symm_id();
-  
-  SymmTensor4_3D bbb; bbb.gen_symm_id();
-  
-  aaa -= bbb;
-
-  aaa.print_in_mat();
-
-  Tensor4_3D ta = gen_T4_symm_id();
-  Tensor4_3D tb; tb.gen_symm_id();
-
-  if( ta.is_identical(tb, 1.0e-17) ) std::cout<<"symm_id is good! \n";
-  else std::cout<<"symm_id is bad. \n";
-
-  ta -= tb;
-
-  ta.print_in_mat();
-
-  Vector_3 vec1; vec1.gen_rand(); auto stdvec = vec1.to_std_vec();
-  
-  std::vector<double> hold_d {}, hold_i {};
-  for(int ii=0; ii<100000; ++ii)
-  {
-    hold_d.push_back(MATH_T::gen_double_rand());
-    hold_i.push_back(MATH_T::gen_int_rand(-2,2));
-  }
-  
-  MATH_T::print_Histogram(hold_d);
-  MATH_T::print_Histogram(hold_i);
-  
-  Matrix_double_3by3_Array m3a; 
-  hold_d = {};
-  for(int ii=0; ii<1000; ++ii)
-  {
-    m3a.gen_rand(-2.1, 3.5);
-    for(int jj=0; jj<9; ++jj) hold_d.push_back(m3a(jj));
-  }
-  MATH_T::print_Histogram(hold_d);
+  std::vector<DataVecStr<int>> input2 {};
+  input2.push_back({nid2, "GlobalNodeID", AssociateObject::Node});
+  input2.push_back({eid, "GlobalElementID", AssociateObject::Cell});
+  HEX_T::write_hex_grid( "QuadraticHex", 27, 1, node2, ien2, input2 ); 
 
   return EXIT_SUCCESS;
 }
