@@ -185,6 +185,20 @@ class Gmsh_FileIO
 
     const std::string filename; // file = xxx.msh
 
+    // This is the element-type-to-num-of-local-basis mapping
+    // based on the Gmsh format. The first is zero because Gmsh
+    // start the element type number with 1. Detailed definition
+    // of the element type is in elm-type of the MSH ASCII file
+    // format.
+    // The elm type 1 is a two-node line
+    // The elm type 2 is a three-node triangle
+    // The elm type 3 is a 4-node quadrangle
+    // The elm type 4 is a 4-node tetrahedron
+    // ...
+    // The elm type 31 is a 56-node fifth-order tetrahedron
+    // the complete array reads as {0, 2, 3, 4, 4, 8, 6, 5, 3, 6, 9,
+    //  10, 27, 18, 14, 1, 8, 20, 15, 13, 9, 10, 12, 15, 15, 21,
+    //  4, 5, 6, 20, 35, 56};
     const std::array<int,32> elem_nlocbas;
 
     // --------------------------------------------------------------
@@ -230,7 +244,7 @@ class Gmsh_FileIO
     // --------------------------------------------------------------
     // Geometry info    
     int num_node; // number of nodal points
-    
+
     std::vector<double> node {}; // 3 x num_node: x-y-z coordinates
 
     int num_elem; // number of total elem (2D and 3D together)
@@ -252,7 +266,7 @@ class Gmsh_FileIO
     // its value and the corresponding ele_nlocbas satisfies the ele_nlocbas
     // mapping, which is defined by Gmsh.
     std::vector<int> ele_type {};
-    
+
     // --------------------------------------------------------------
     // Private functions for the constructor
     // --------------------------------------------------------------

@@ -5,21 +5,6 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
     10, 27, 18, 14, 1, 8, 20, 15, 13, 9, 10, 12, 15, 15, 21, 
     4, 5, 6, 20, 35, 56 }}
 {
-  // This is the element-type-to-num-of-local-basis mapping
-  // based on the Gmsh format. The first is zero because Gmsh
-  // start the element type number with 1. Detailed definition
-  // of the element type is in elm-type of the MSH ASCII file
-  // format.
-  // The elm type 1 is a two-node line
-  // The elm type 2 is a three-node triangle
-  // The elm type 3 is a 4-node quadrangle
-  // The elm type 4 is a 4-node tetrahedron
-  // ...
-  // The elm type 31 is a 56-node fifth-order tetrahedron
-  //const int elem_nlocbas[] = {0, 2, 3, 4, 4, 8, 6, 5, 3, 6, 9,
-  //  10, 27, 18, 14, 1, 8, 20, 15, 13, 9, 10, 12, 15, 15, 21, 
-  //  4, 5, 6, 20, 35, 56};
-
   // Setup the file instream
   std::ifstream infile( filename.c_str(), std::ifstream::in );
 
