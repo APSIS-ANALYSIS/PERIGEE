@@ -181,9 +181,11 @@ class Gmsh_FileIO
         const std::vector<int> &index_2d_need_facemap ) const;
 
   private:
-    Gmsh_FileIO(){}; // disallow default constructor
+    Gmsh_FileIO(); // disallow default constructor
 
     const std::string filename; // file = xxx.msh
+
+    const std::array<int,32> elem_nlocbas;
 
     // --------------------------------------------------------------
     // physical info 
@@ -258,14 +260,14 @@ class Gmsh_FileIO
     // then write them in node coordinates array and eIEN array.
     // This function is bound to the constructor of Gmsh_FileIO.
     // --------------------------------------------------------------
-    void read_msh2(std::ifstream &infile, const int (&elem_nlocbas)[32]);
+    void read_msh2(std::ifstream &infile);
 
     // --------------------------------------------------------------
     // read the node data and element data in .msh file of v4.1 0 8,
     // then write them in node coordinates array and eIEN array.
     // This function is bound to the constructor of Gmsh_FileIO.
     // --------------------------------------------------------------
-    void read_msh4(std::ifstream &infile, const int (&elem_nlocbas)[32]);
+    void read_msh4(std::ifstream &infile);
     // --------------------------------------------------------------
 };
 

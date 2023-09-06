@@ -1,7 +1,15 @@
 #include "Gmsh_FileIO.hpp"
 
+Gmsh_FileIO::Gmsh_FileIO()
+: filename( "" ), elem_nlocbas{{ 0, 2, 3, 4, 4, 8, 6, 5, 3, 6, 9,
+    10, 27, 18, 14, 1, 8, 20, 15, 13, 9, 10, 12, 15, 15, 21, 
+    4, 5, 6, 20, 35, 56 }}
+{}
+
 Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
-: filename( in_file_name )
+: filename( in_file_name ), elem_nlocbas{{ 0, 2, 3, 4, 4, 8, 6, 5, 3, 6, 9,
+    10, 27, 18, 14, 1, 8, 20, 15, 13, 9, 10, 12, 15, 15, 21, 
+    4, 5, 6, 20, 35, 56 }}
 {
   // This is the element-type-to-num-of-local-basis mapping
   // based on the Gmsh format. The first is zero because Gmsh
@@ -14,9 +22,9 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
   // The elm type 4 is a 4-node tetrahedron
   // ...
   // The elm type 31 is a 56-node fifth-order tetrahedron
-  const int elem_nlocbas[] = {0, 2, 3, 4, 4, 8, 6, 5, 3, 6, 9,
-    10, 27, 18, 14, 1, 8, 20, 15, 13, 9, 10, 12, 15, 15, 21, 
-    4, 5, 6, 20, 35, 56};
+  //const int elem_nlocbas[] = {0, 2, 3, 4, 4, 8, 6, 5, 3, 6, 9,
+  //  10, 27, 18, 14, 1, 8, 20, 15, 13, 9, 10, 12, 15, 15, 21, 
+  //  4, 5, 6, 20, 35, 56};
 
   // Setup the file instream
   std::ifstream infile( filename.c_str(), std::ifstream::in );
@@ -32,9 +40,9 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
   // read the node data and element data in .msh file
   getline(infile, sline);
   if (sline.compare("2.2 0 8") == 0)
-    read_msh2(infile, elem_nlocbas);
+    read_msh2(infile);
   else if (sline.compare("4.1 0 8") == 0)
-    read_msh4(infile, elem_nlocbas);
+    read_msh4(infile);
   else
     SYS_T::print_exit("Error: .msh format second line should be '2.2 0 8' or '4.1 0 8'. \n");
 
@@ -1308,7 +1316,7 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const int &index_sur,
   delete mytimer;
 }
 
-void Gmsh_FileIO::read_msh2(std::ifstream &infile, const int (&elem_nlocbas)[32])
+void Gmsh_FileIO::read_msh2(std::ifstream &infile)
 {
   std::istringstream sstrm;
   std::string sline;
@@ -1460,7 +1468,7 @@ void Gmsh_FileIO::read_msh2(std::ifstream &infile, const int (&elem_nlocbas)[32]
   }
 }
 
-void Gmsh_FileIO::read_msh4(std::ifstream &infile, const int (&elem_nlocbas)[32])
+void Gmsh_FileIO::read_msh4(std::ifstream &infile)
 {
   std::istringstream sstrm;
   std::string sline;
@@ -1700,7 +1708,7 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile, const int (&elem_nlocbas)[32]
     int enum_node {elem_nlocbas [etype]};
 
     // find physical tag according to the entity information
-    int phy_tag, geo_index;
+    int phy_tag {-1}, geo_index {-1};
     if (entity_dim == 1)  // line element
     {
       geo_index = VEC_T::get_pos(curveTag, geo_tag);
