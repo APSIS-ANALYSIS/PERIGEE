@@ -506,7 +506,6 @@ void TET_T::write_triangle_grid( const std::string &filename,
   grid_w->Delete();
 }
 
-
 void TET_T::write_quadratic_triangle_grid( const std::string &filename,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt,
@@ -534,7 +533,6 @@ void TET_T::write_quadratic_triangle_grid( const std::string &filename,
 
   grid_w->Delete();
 }
-
 
 double TET_T::get_aspect_ratio( const std::vector<double> &pt )
 {
@@ -621,7 +619,6 @@ Vector_3 TET_T::get_out_normal( const std::string &file,
 
   return outVec;
 }
-
 
 void TET_T::tetgenio2vtu( const tetgenio &meshout, const std::string &fName )
 {

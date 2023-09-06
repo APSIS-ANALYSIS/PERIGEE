@@ -43,8 +43,18 @@ void SV_T::update_sv_vtu( const std::string &filename,
 
   // If the last four is .vtu, remove them for TET_T::write_tet_grid 
   if(fend.compare(".vtu") == 0) fname.erase( fname.end()-4, fname.end() );
+  
+  std::vector<DataVecStr<int>> input_vtk_data {};
 
-  TET_T::write_tet_grid(fname, nFunc, nElem, ctrlPts, vecIEN, {});
+  std::vector<int> temp_nid(nFunc, 0);
+  for(int ii=0; ii<nFunc; ++ii) temp_nid[ii] = ii;
+  input_vtk_data.push_back({temp_nid, "GlobalNodeID", AssociateObject::Node});
+
+  std::vector<int> temp_eid(nElem, 0);
+  for(int ii=0; ii<nElem; ++ii) temp_eid[ii] = ii;
+  input_vtk_data.push_back({temp_eid, "GlobalElementID", AssociateObject::Cell});
+
+  TET_T::write_tet_grid(fname, nFunc, nElem, ctrlPts, vecIEN, input_vtk_data);
 }
 
 
@@ -137,6 +147,15 @@ void SV_T::gen_sv_fsi_vtus( const std::string &filename_f,
 
   std::vector<DataVecStr<int>> input_vtk_data {};
   input_vtk_data.push_back({wtag, "Physics_tag", AssociateObject::Cell});
+  
+  std::vector<int> temp_nid(nFunc_f + counter, 0);
+  for(int ii=0; ii<nFunc_f + counter; ++ii) temp_nid[ii] = ii;
+  input_vtk_data.push_back({temp_nid, "GlobalNodeID", AssociateObject::Node});
+
+  std::vector<int> temp_eid(nElem_f + nElem_s, 0);
+  for(int ii=0; ii<nElem_f + nElem_s; ++ii) temp_eid[ii] = ii;
+  input_vtk_data.push_back({temp_eid, "GlobalElementID", AssociateObject::Cell});
+  
   TET_T::write_tet_grid( fname, nFunc_f + counter, nElem_f + nElem_s,
       ctrlPts, wIEN, input_vtk_data, true );
 

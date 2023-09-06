@@ -762,6 +762,16 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
   // write whole domain
   std::vector<DataVecStr<int>> input_vtk_data {};
   input_vtk_data.push_back({wtag, "Physics_tag", AssociateObject::Cell});
+  
+  std::vector<int> temp_nid(wnNode, 0);
+  for(int ii=0; ii<wnNode; ++ii) temp_nid[ii] = ii;
+  input_vtk_data.push_back({temp_nid, "GlobalNodeID", AssociateObject::Node});
+
+  std::vector<int> temp_eid(wnElem, 0);
+  for(int ii=0; ii<wnElem; ++ii) temp_eid[ii] = ii;
+  input_vtk_data.push_back({temp_eid, "GlobalElementID", AssociateObject::Cell});
+  
+  
   TET_T::write_tet_grid( in_fname, wnNode, wnElem, node,
       wIEN, input_vtk_data, isXML ); 
 
