@@ -92,23 +92,6 @@ namespace TET_T
       const std::vector<DataVecStr<int>> &IOdata );
 
   // ----------------------------------------------------------------
-  // ! write_quadratic_triangle_grid: write the surface mesh described 
-  //                                  by quadratic triangle elements.
-  //   Input: \para filename : the filename.vtu is the file to be written.
-  //          \para numpts : the number of grid points
-  //          \para numcels : the number of tetrahedral elements
-  //          \para pt: xyz coordinates of the linear tets, length 3 numpts
-  //          \para ien_array : connectivity array, length 3 numcels
-  //          \para nodal_index : the point data to be written
-  //          \para elem_index : the element index to be written
-  // ----------------------------------------------------------------
-  void write_quadratic_triangle_grid( const std::string &filename,
-      const int &numpts, const int &numcels,
-      const std::vector<double> &pt, 
-      const std::vector<int> &ien_array,
-      const std::vector<DataVecStr<int>> &IOdata );
-
-  // ----------------------------------------------------------------
   // ! gen_quadratic_triangle_grid: generate the surface mesh described by
   //                                triangle elements and pass the data
   //                                to vtkUnstructuredGrid data.
@@ -120,6 +103,22 @@ namespace TET_T
       const int &numpts, const int &numcels,
       const std::vector<double> &pt,
       const std::vector<int> &ien_array );
+  
+  // ----------------------------------------------------------------
+  // ! write_quadratic_triangle_grid: write the surface mesh described 
+  //                                  by quadratic triangle elements.
+  //   Input: \para filename : the filename.vtu is the file to be written.
+  //          \para numpts : the number of grid points
+  //          \para numcels : the number of tetrahedral elements
+  //          \para pt: xyz coordinates of the linear tets, length 3 numpts
+  //          \para ien_array : connectivity array, length 3 numcels
+  //          \para IOdata : the integer data to be written on cells or nodes 
+  // ----------------------------------------------------------------
+  void write_quadratic_triangle_grid( const std::string &filename,
+      const int &numpts, const int &numcels,
+      const std::vector<double> &pt, 
+      const std::vector<int> &ien_array,
+      const std::vector<DataVecStr<int>> &IOdata );
 
   // ================================================================
   // 2. Mesh quality measures
