@@ -4,8 +4,6 @@
 // Sys_Tools.hpp
 // ----------------------------------------------------------------------------
 // The SYS_T namespace contains a suite of tools at the system level.
-//
-// Author: Ju Liu
 // ============================================================================
 #include <cstdlib>
 #include <iostream>

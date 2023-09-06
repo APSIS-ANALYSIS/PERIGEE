@@ -5,8 +5,6 @@
 //
 // This is a suite of basic tetrahedral element tools with IO and
 // basic mesh quality evaluation.
-// 
-// Author: Ju Liu, liujuy@gmail.com
 // ==================================================================
 #include "DataVecStr.hpp"
 #include "Vec_Tools.hpp"

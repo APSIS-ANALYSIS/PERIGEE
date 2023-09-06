@@ -19,6 +19,7 @@
 #include <cmath>
 #include <vector>
 #include <array>
+#include <random>
 
 class Vector_3
 {
@@ -75,7 +76,7 @@ class Vector_3
 
     void gen_val(const double &val);
 
-    void gen_rand();
+    void gen_rand(const double &left =-1.0, const double &right = 1.0);
 
     void gen_e1() {vec[0]=1.0; vec[1]=0.0; vec[2]=0.0;}
     

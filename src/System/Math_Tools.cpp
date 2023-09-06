@@ -100,8 +100,8 @@ void MATH_T::get_n_from_t(
   const double my = p0_y - p1_y;
   const double mz = p0_z - p1_z;
 
-  const double mdt = dot3d(mx,my,mz,tx,ty,tz);
-  const double tdt = dot3d(tx,ty,tz,tx,ty,tz);
+  const double mdt = mx * tx + my * ty + mz * tz;
+  const double tdt = tx * tx + ty * ty + tz * tz;
   const double fac = mdt / tdt;
 
   nx = mx - fac * tx;

@@ -51,15 +51,10 @@ int main( int argc, char * argv[] )
   int time_step = 1;
   int time_end = 1;
 
-  std::string geo_file, wall_file;
-  int elemType = 502;
-
   const int nLocBas = 6;
   const int v_nLocBas = 10;
 
-  double fluid_mu = 3.5e-2;
-
-  const int dof = 4; 
+  constexpr int dof = 4; 
 
   PetscMPIInt size;
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
@@ -70,9 +65,9 @@ int main( int argc, char * argv[] )
   hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
-  cmd_h5r -> read_string("/", "geo_file");
-  cmd_h5r -> read_string("/", "sur_file_wall");
-  elemType = cmd_h5r -> read_intScalar("/", "elemType");
+  const std::string geo_file  = cmd_h5r -> read_string("/", "geo_file");
+  const std::string wall_file = cmd_h5r -> read_string("/", "sur_file_wall");
+  const int elemType = cmd_h5r -> read_intScalar("/", "elemType");
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
@@ -81,7 +76,7 @@ int main( int argc, char * argv[] )
 
   cmd_h5r = new HDF5_Reader( prepcmd_file );
 
-  fluid_mu = cmd_h5r -> read_doubleScalar("/", "fl_mu");
+  const double fluid_mu = cmd_h5r -> read_doubleScalar("/", "fl_mu");
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
@@ -149,17 +144,13 @@ int main( int argc, char * argv[] )
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    std::vector<int> trn; trn.resize(3);
-    int ten[4];
-
-    trn[0] = global_node_idx[ vecIEN[nLocBas*ee+0] ];
-    trn[1] = global_node_idx[ vecIEN[nLocBas*ee+1] ];
-    trn[2] = global_node_idx[ vecIEN[nLocBas*ee+2] ];
-
-    ten[0] = v_vecIEN[ global_ele_idx[ee]*v_nLocBas+0 ];
-    ten[1] = v_vecIEN[ global_ele_idx[ee]*v_nLocBas+1 ];
-    ten[2] = v_vecIEN[ global_ele_idx[ee]*v_nLocBas+2 ];
-    ten[3] = v_vecIEN[ global_ele_idx[ee]*v_nLocBas+3 ];
+    std::vector<int> trn { global_node_idx[ vecIEN[nLocBas*ee+0] ],
+      global_node_idx[ vecIEN[nLocBas*ee+1] ], global_node_idx[ vecIEN[nLocBas*ee+2] ] };
+    
+    const int ten[4] { v_vecIEN[ global_ele_idx[ee]*v_nLocBas+0 ],
+      v_vecIEN[ global_ele_idx[ee]*v_nLocBas+1 ],
+      v_vecIEN[ global_ele_idx[ee]*v_nLocBas+2 ],
+      v_vecIEN[ global_ele_idx[ee]*v_nLocBas+3 ] };
 
     bool gotnode[4];
     int node_check = 0;
@@ -175,7 +166,7 @@ int main( int argc, char * argv[] )
       else node_check += 1;
     }
 
-    SYS_T::print_fatal_if(node_check!=3, "Error: the associated tet element is incompatible with the triangle element.\n");
+    SYS_T::print_exit_if(node_check!=3, "Error: the associated tet element is incompatible with the triangle element.\n");
 
     // Now we have found the interior node's volumetric mesh index, record its
     // spatial xyz coordinate
