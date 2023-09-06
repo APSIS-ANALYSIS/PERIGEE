@@ -237,21 +237,6 @@ namespace VEC_T
     vfile.close();
     std::cout.precision(ss);
   }
-
-  // --------------------------------------------------------------------------
-  // ! pick
-  //   pick out a part of a vector from vec[first_idex] to vec[last_index],
-  //   e.g. vec1 = [2,4,6,8,10,12]
-  //   vec2 = VEC_T::pick(vec1, 1, 4) will become [4,6,8,10]
-  // --------------------------------------------------------------------------
-  template<typename T> std::vector<T> pick(const std::vector<T> &vec,
-      const int &first_idx, const int &last_idx)
-  {
-    const auto first = vec.begin() + first_idx;
-    const auto last = vec.begin() + last_idx + 1;
-
-    return std::vector<T>(first, last);
-  }
 }
 
 #endif
