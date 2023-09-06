@@ -106,13 +106,6 @@ namespace TET_T
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, 
       const std::vector<int> &ien_array,
-      const std::vector<int> &global_node_index,
-      const std::vector<int> &global_ele_index );
-
-  void write_quadratic_triangle_grid( const std::string &filename,
-      const int &numpts, const int &numcels,
-      const std::vector<double> &pt, 
-      const std::vector<int> &ien_array,
       const std::vector<DataVecStr<int>> &IOdata );
 
   // ----------------------------------------------------------------
@@ -127,25 +120,6 @@ namespace TET_T
       const int &numpts, const int &numcels,
       const std::vector<double> &pt,
       const std::vector<int> &ien_array );
-
-  // ----------------------------------------------------------------
-  // ! write_quadratic_triangle_grid: write the surface mesh described 
-  //                                  by quadratic triangle elements
-  //                                  with two element index arrays.
-  //   The input parameter is identical to the former one, with one
-  //   more array, global_ele_index_2, for the additional triangle-to
-  //   -tetrahedron mapping.
-  //   This function is implemented specifically for the interior
-  //   surface between two physical domains, e.g. interior surface
-  //   in FSI problem.
-  // ----------------------------------------------------------------
-  void write_quadratic_triangle_grid( const std::string &filename,
-      const int &numpts, const int &numcels,
-      const std::vector<double> &pt, 
-      const std::vector<int> &ien_array,
-      const std::vector<int> &global_node_index,
-      const std::vector<int> &global_ele_index_1, 
-      const std::vector<int> &global_ele_index_2 );
 
   // ================================================================
   // 2. Mesh quality measures

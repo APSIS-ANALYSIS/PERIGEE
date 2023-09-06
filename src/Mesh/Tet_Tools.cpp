@@ -204,33 +204,6 @@ void TET_T::gen_triangle_grid( vtkPolyData * const &grid_w,
   cl->Delete();
 }
 
-
-void TET_T::write_quadratic_triangle_grid( 
-    const std::string &filename,
-    const int &numpts, const int &numcels,
-    const std::vector<double> &pt,
-    const std::vector<int> &ien_array,
-    const std::vector<int> &node_index,
-    const std::vector<int> &ele_index )
-{
-  // Setup the VTK objects
-  vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
-
-  // Generate the mesh
-  gen_quadratic_triangle_grid( grid_w, numpts, numcels, pt, ien_array );
-
-  // nodal indices
-  VTK_T::add_int_PointData( grid_w, node_index, "GlobalNodeID" );
-
-  // cell indices
-  VTK_T::add_int_CellData( grid_w, ele_index, "GlobalElementID" );
-
-  // write vtu (by default of the writer function)
-  VTK_T::write_vtkPointSet(filename, grid_w);
-
-  grid_w->Delete();
-}
-
 void TET_T::write_quadratic_triangle_grid( const std::string &filename,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, 
@@ -310,34 +283,6 @@ void TET_T::gen_quadratic_triangle_grid( vtkUnstructuredGrid * const &grid_w,
 
   grid_w -> SetCells(22, cl);
   cl -> Delete();
-}
-
-void TET_T::write_quadratic_triangle_grid( const std::string &filename,
-    const int &numpts, const int &numcels,
-    const std::vector<double> &pt,
-    const std::vector<int> &ien_array,
-    const std::vector<int> &node_index,
-    const std::vector<int> &ele_index_1,
-    const std::vector<int> &ele_index_2 )
-{
-  // Setup the VTK objects
-  vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
-
-  // Generate the mesh
-  gen_quadratic_triangle_grid( grid_w, numpts, numcels, pt, ien_array );
-
-  // nodal indices
-  VTK_T::add_int_PointData( grid_w, node_index, "GlobalNodeID" );
-
-  // cell indices
-  VTK_T::add_int_CellData( grid_w, ele_index_1, "GlobalElementID_1" );
-
-  VTK_T::add_int_CellData( grid_w, ele_index_2, "GlobalElementID_2" );
-
-  // write vtu (by default of write function)
-  VTK_T::write_vtkPointSet(filename, grid_w);
-
-  grid_w->Delete();
 }
 
 double TET_T::get_aspect_ratio( const std::vector<double> &pt )
