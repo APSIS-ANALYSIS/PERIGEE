@@ -1,60 +1,127 @@
+#include <chrono>
+#include <thread>
+#include <unistd.h>
 #include "Vec_Tools.hpp"
+#include "Math_Tools.hpp"
 #include "Vector_3.hpp"
 #include "Matrix_3x3.hpp"
+#include "SymmMatrix_3x3.hpp"
 #include "HDF5_Reader.hpp"
 #include "PostVectSolution.hpp"
+#include "Tensor4_3D.hpp"
+#include "SymmTensor4_3D.hpp"
+#include "Mesh_Tet.hpp"
+#include "IEN_FEM.hpp"
+#include "Matrix_double_3by3_Array.hpp"
+#include "Matrix_double_6by6_Array.hpp"
+#include "VTK_Tools.hpp"
+#include "NodalBC.hpp"
 
-int main( int argc, char * argv[] )
+int main(int argc, char *argv[])
 {
-  std::vector<std::string> a;
-  a.push_back("hello a\n");
-  a.push_back("cmame \t");
-  a.push_back("july 31th \n");
-  a.push_back("aug 31th \n");
+  SymmMatrix_3x3 smat; smat.gen_rand();
+  Matrix_3x3 mat = smat.convert_to_full();
 
-  for(auto &out : a) out = "hello\n";
+  Tensor4_3D ten = gen_T4_symm_id();
+  SymmTensor4_3D sten = gen_ST4_symm_id();
 
-  //for(auto out : a) std::cout<<out;
-
-
-  Vector_3 va, vb, vc;
-  Matrix_3x3 A(
-      1.0, 5.2, -0.33,
-      5.2, 2.0, 3.0,
-     -0.33, 3.0, -1.0);
-
-  va.gen_rand();
-
-  vb = A * va;
-
-  //A.print();
-
-  double eta1, eta2, eta3;
-  Vector_3 v1, v2, v3;
-
-  std::cout<<A.eigen_decomp( eta1, eta2, eta3, v1, v2, v3 )<<std::endl;
-
-  std::cout<<std::setprecision(16)<<eta1<<'\t'<<eta2<<'\t'<<eta3<<'\n';
-
-  std::cout<<std::setprecision(16)<<v1(0)<<'\t'<<v1(1)<<'\t'<<v1(2)<<'\n';
-
-  v2.print();
-
-  v3.print();
-
-  int nsize = 4;
-
-  std::vector<int> b (nsize, -100), c (5, 99), d (2, 1);
-
-  std::cout<<b.size()<<'\t'<<b.capacity()<<std::endl;
+  ten.gen_Ptilde( mat );
+  sten.gen_Ptilde( smat );
   
-  VEC_T::print(b);
+  SymmMatrix_3x3 smat2; smat2.gen_rand(); 
+  Matrix_3x3 mat2 = smat2.convert_to_full();
 
-  b = {1, 3, 5, -1, -2, -3, -5};
+  //ten.add_SymmOutProduct(3.14159, mat, mat2);
+  //sten.add_SymmOutProduct(3.14159, smat, smat2);
+
+  for(int ii=0; ii<100; ++ii)
+  {
+    sten.gen_rand();
+    ten = sten.convert_to_full();
+    
+    const double rval = MATH_T::gen_double_rand(-1.11, 1.23);
+
+    Vector_3 vec1; vec1.gen_rand(); vec1.normalize();
+    Vector_3 vec2; vec2.gen_rand(); vec2.normalize();
+
+    ten.add_SymmOutProduct(rval, vec1, vec2, vec1, vec2);
+    sten.add_SymmOutProduct(rval, vec1, vec2);
+    
+    if( sten.is_identical(ten, 2.0e-15) ) std::cout<<"passed! \n";
+    else std::cout<<"error. \n";
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+    sten.gen_rand();
+    ten = sten.convert_to_full();
+    
+    SymmMatrix_3x3 smat2; smat2.gen_rand();
+    Matrix_3x3 mat2 = smat2.convert_to_full();
+
+    ten.add_SymmOutProduct(rval, mat, mat2);
+    sten.add_SymmOutProduct(rval, smat, smat2);
+
+    //ten = gen_Ptilde(mat2);
+    //sten = gen_Ptilde(smat2);
+
+    //sten.print_in_mat();
+
+    /*
+       sten.gen_rand(-1, 1);
+       ten = sten.convert_to_full();
+
+       SymmMatrix_3x3 smat3; smat3.gen_rand(-1, 1); 
+       SymmMatrix_3x3 smat4; smat4.gen_rand(-1, 1); 
+
+       Tensor4_3D PP; PP.gen_zero();
+       PP.add_OutProduct(1.1523235904, smat3.convert_to_full(), smat4.convert_to_full());
+
+       ten.TenPMult( PP );
+       sten.TenPMult( PP );
+       */
+
+    if( sten.is_identical(ten, 2.0e-15) ) std::cout<<"passed! \n";
+    else std::cout<<"error. \n";
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  }
+
+  SymmTensor4_3D aaa = gen_ST4_symm_id();
   
-  VEC_T::print(b);
+  SymmTensor4_3D bbb; bbb.gen_symm_id();
+  
+  aaa -= bbb;
 
-  std::cout<<b.size()<<'\t'<<b.capacity()<<'\t'<<VEC_T::sum(b)<<std::endl;
+  aaa.print_in_mat();
+
+  Tensor4_3D ta = gen_T4_symm_id();
+  Tensor4_3D tb; tb.gen_symm_id();
+
+  if( ta.is_identical(tb, 1.0e-17) ) std::cout<<"symm_id is good! \n";
+  else std::cout<<"symm_id is bad. \n";
+
+  ta -= tb;
+
+  ta.print_in_mat();
+
+  Vector_3 vec1; vec1.gen_rand(); auto stdvec = vec1.to_std_vec();
+  
+  std::vector<double> hold_d {}, hold_i {};
+  for(int ii=0; ii<100000; ++ii)
+  {
+    hold_d.push_back(MATH_T::gen_double_rand());
+    hold_i.push_back(MATH_T::gen_int_rand(-2,2));
+  }
+  
+  MATH_T::print_Histogram(hold_d);
+  MATH_T::print_Histogram(hold_i);
+  
+  Matrix_double_3by3_Array m3a; 
+  hold_d = {};
+  for(int ii=0; ii<1000; ++ii)
+  {
+    m3a.gen_rand(-2.1, 3.5);
+    for(int jj=0; jj<9; ++jj) hold_d.push_back(m3a(jj));
+  }
+  MATH_T::print_Histogram(hold_d);
 
   return EXIT_SUCCESS;
 }

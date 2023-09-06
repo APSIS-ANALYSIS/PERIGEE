@@ -19,15 +19,20 @@ class IAGlobal_Mesh_Info
     virtual int get_ydegree() const = 0;
     virtual int get_zdegree() const = 0;
 
-    virtual double get_max_hx() const = 0;
-    virtual double get_max_hy() const = 0;
-    virtual double get_max_hz() const = 0;
-
     virtual int get_nElem() const = 0;
     virtual int get_nFunc() const = 0;
     
     virtual int get_nLocBas() const = 0;
     virtual int get_probDim() const = 0;
+
+    virtual double get_max_hx() const
+    {SYS_T::print_fatal("Error: IAGlobal_Mesh_Info::get_max_hx is not implemented. \n"); return 0.0;}
+
+    virtual double get_max_hy() const
+    {SYS_T::print_fatal("Error: IAGlobal_Mesh_Info::get_max_hy is not implemented. \n"); return 0.0;}
+
+    virtual double get_max_hz() const
+    {SYS_T::print_fatal("Error: IAGlobal_Mesh_Info::get_max_hz is not implemented. \n"); return 0.0;}
 
     virtual int get_elemType() const
     {SYS_T::print_fatal("Error: IAGLobal_Mesh_Info::get_elemType is not implemented. \n"); return -1;}

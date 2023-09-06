@@ -248,10 +248,8 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
   }
 }
 
-
 Gmsh_FileIO::~Gmsh_FileIO()
 {}
-
 
 void Gmsh_FileIO::print_info() const
 {
@@ -308,7 +306,6 @@ void Gmsh_FileIO::print_info() const
   std::cout<<"=== Total node number : "<<num_node<<std::endl;
   std::cout<<"=== Total element number : "<<num_elem<<std::endl;
 }
-
 
 void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
     const int &index_vol1, const int &index_vol2 ) const
@@ -503,7 +500,6 @@ void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
   delete mytimer;
 }
 
-
 void Gmsh_FileIO::write_vtp(const int &index_sur, 
     const int &index_vol, const bool &isf2e ) const
 {
@@ -587,22 +583,11 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
 
   // generate the local triangle IEN array
   std::vector<int> trien; trien.clear();
-  int node0, node1, node2;
-  std::vector<int>::iterator it;
   for(int ee=0; ee<bcnumcl; ++ee)
   {
-    node0 = trien_global[3*ee];
-    node1 = trien_global[3*ee+1];
-    node2 = trien_global[3*ee+2];
-
-    it = find(bcpt.begin(), bcpt.end(), node0);
-    trien.push_back( it - bcpt.begin() );
-
-    it = find(bcpt.begin(), bcpt.end(), node1);
-    trien.push_back( it - bcpt.begin() );
-
-    it = find(bcpt.begin(), bcpt.end(), node2);
-    trien.push_back( it - bcpt.begin() );
+    trien.push_back( VEC_T::get_pos(bcpt, trien_global[3*ee  ]) );
+    trien.push_back( VEC_T::get_pos(bcpt, trien_global[3*ee+1]) );
+    trien.push_back( VEC_T::get_pos(bcpt, trien_global[3*ee+2]) );
   }
   std::cout<<"      triangle IEN generated. \n";
 
@@ -613,29 +598,24 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
   std::vector<int> face2elem; face2elem.resize( bcnumcl, -1 );
   if( isf2e )
   {
-    int vol_elem;
-    int vnode[4];
-    bool got0, got1, got2, gotit;
     for(int ff=0; ff<bcnumcl; ++ff)
     {
-      node0 = trien_global[3*ff];
-      node1 = trien_global[3*ff+1];
-      node2 = trien_global[3*ff+2];
-      gotit = false;
+      const int node0 = trien_global[3*ff];
+      const int node1 = trien_global[3*ff+1];
+      const int node2 = trien_global[3*ff+2];
+      bool gotit = false;
       int ee = -1;
       while( !gotit && ee < int(gelem.size()) - 1 )
       {
         ee += 1;
-        vol_elem = gelem[ee];
-        vnode[0] = vol_IEN[4*vol_elem];
-        vnode[1] = vol_IEN[4*vol_elem+1];
-        vnode[2] = vol_IEN[4*vol_elem+2];
-        vnode[3] = vol_IEN[4*vol_elem+3];
+        const int vol_elem = gelem[ee];
+        int vnode[4] { vol_IEN[4*vol_elem], vol_IEN[4*vol_elem+1],
+         vol_IEN[4*vol_elem+2], vol_IEN[4*vol_elem+3] };
         std::sort(vnode, vnode+4);
 
-        got0 = ( std::find(vnode, vnode+4, node0) != vnode+4 );
-        got1 = ( std::find(vnode, vnode+4, node1) != vnode+4 );
-        got2 = ( std::find(vnode, vnode+4, node2) != vnode+4 );
+        const bool got0 = ( std::find(vnode, vnode+4, node0) != vnode+4 );
+        const bool got1 = ( std::find(vnode, vnode+4, node1) != vnode+4 );
+        const bool got2 = ( std::find(vnode, vnode+4, node2) != vnode+4 );
         gotit = got0 && got1 && got2;
       }
 
@@ -657,7 +637,6 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
   std::cout<<"      Time taken "<<mytimer->get_sec()<<" sec. \n";
   delete mytimer;
 }
-
 
 void Gmsh_FileIO::write_each_vtu() const
 {
@@ -733,7 +712,6 @@ void Gmsh_FileIO::write_each_vtu() const
   delete mytimer;
 }
 
-
 void Gmsh_FileIO::write_vtu( const std::string &in_fname, 
     const bool &isXML ) const
 {
@@ -780,7 +758,6 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
   delete mytimer;
 }
 
-
 void Gmsh_FileIO::check_FSI_ordering( const std::string &phy1,
    const std::string &phy2 ) const
 {
@@ -792,7 +769,6 @@ void Gmsh_FileIO::check_FSI_ordering( const std::string &phy1,
   SYS_T::print_fatal_if( name0.compare(phy1), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 0 should be fluid domain.\n" );
   SYS_T::print_fatal_if( name1.compare(phy2), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 1 should be solid domain.\n" );
 }
-
 
 void Gmsh_FileIO::write_tri_h5( const int &index_2d, 
     const std::vector<int> &index_1d ) const
@@ -944,7 +920,7 @@ void Gmsh_FileIO::write_tri_h5( const int &index_2d,
 
     // Record info
     std::string name_1d_domain(slash);
-    name_1d_domain.append( SYS_T::to_string( static_cast<int>(ii) ) );
+    name_1d_domain.append( std::to_string( static_cast<int>(ii) ) );
     hid_t g_id = H5Gcreate( file_id, name_1d_domain.c_str(), 
         H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 
@@ -967,7 +943,6 @@ void Gmsh_FileIO::write_tri_h5( const int &index_2d,
   delete h5w;
   H5Fclose( file_id );
 }
-
 
 void Gmsh_FileIO::write_tet_h5( const int &index_3d,
     const std::vector<int> &index_2d ) const
@@ -1109,7 +1084,7 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
 
     // Record info
     std::string name_2d_domain(slash);
-    name_2d_domain.append( SYS_T::to_string( static_cast<int>(ii) ) );
+    name_2d_domain.append( std::to_string( static_cast<int>(ii) ) );
     hid_t g_id = H5Gcreate( file_id, name_2d_domain.c_str(),
                 H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 
@@ -1132,7 +1107,6 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
   delete h5w;
   H5Fclose( file_id ); 
 }
-
 
 void Gmsh_FileIO::write_tet_h5( const int &index_3d,
     const std::vector<int> &index_2d,
@@ -1278,7 +1252,7 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
 
     // Record info
     std::string name_2d_domain(slash);
-    name_2d_domain.append( SYS_T::to_string( static_cast<int>(ii) ) );
+    name_2d_domain.append( std::to_string( static_cast<int>(ii) ) );
     hid_t g_id = H5Gcreate( file_id, name_2d_domain.c_str(),
         H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 
@@ -1301,7 +1275,6 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
   delete h5w;
   H5Fclose( file_id ); 
 }
-
 
 void Gmsh_FileIO::update_FSI_nodal_ordering()
 {
@@ -1359,7 +1332,6 @@ void Gmsh_FileIO::update_FSI_nodal_ordering()
   }
 }
 
-
 void Gmsh_FileIO::update_quadratic_tet_IEN( const int &index_3d )
 {
   SYS_T::print_fatal_if(index_3d < 0 || index_3d >= num_phy_domain_3d,
@@ -1383,7 +1355,6 @@ void Gmsh_FileIO::update_quadratic_tet_IEN( const int &index_3d )
     eIEN[domain_index][10*ee+9] = temp;
   }
 }
-
 
 void Gmsh_FileIO::write_quadratic_sur_vtu( const int &index_sur,
     const int &index_vol, const bool &isf2e ) const

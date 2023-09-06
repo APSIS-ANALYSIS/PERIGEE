@@ -79,9 +79,9 @@ void MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_PK(
   const double detFm0d67 = std::pow( F.det(), mpt67 );
 
   const double mpt33CdC = (-1.0) * pt33 * C.MatContraction(C);
-  Matrix_3x3 PxC(Cinv); PxC.scale(mpt33CdC); PxC.PY(C);
+  Matrix_3x3 PxC(Cinv); PxC.scale(mpt33CdC); PxC += C;
   
-  Matrix_3x3 PxI(Cinv); PxI.scale( (-1.0) * pt33 * C.tr() ); PxI.PY(I);
+  Matrix_3x3 PxI(Cinv); PxI.scale( (-1.0) * pt33 * C.tr() ); PxI.AXPI( 1.0 );
 
   S.copy(PxC); S.scale(detFm0d67);  S.AXPY( -1.0, PxI );
   S.scale( mu*detFm0d67 );
@@ -98,8 +98,8 @@ void MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_PK_Stiffness(
   const double CdC = C.MatContraction(C);
   const double mpt33CdC = (-1.0) * pt33 * CdC;
   
-  Matrix_3x3 PxC(Cinv); PxC.scale(mpt33CdC); PxC.PY(C);
-  Matrix_3x3 PxI(Cinv); PxI.scale( (-1.0) * pt33 * C.tr() ); PxI.PY(I);
+  Matrix_3x3 PxC(Cinv); PxC.scale(mpt33CdC); PxC += C;
+  Matrix_3x3 PxI(Cinv); PxI.scale( (-1.0) * pt33 * C.tr() ); PxI.AXPI( 1.0 );
 
   S.copy(PxC); S.scale(detFm0d67);  S.AXPY( -1.0, PxI );
   S.scale( mu*detFm0d67 );
@@ -132,11 +132,11 @@ double MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_strain_energy(
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
   const double detFm0d67 = std::pow(F.det(), mpt67);
   
-  Matrix_3x3 E( C ); E.scale(0.5 * detFm0d67); E.AXPY(-0.5, I);
+  Matrix_3x3 Es( C ); Es.scale(0.5 * detFm0d67); Es.AXPY(-0.5, I);
 
-  E.MatMult(E,E);
+  Es.MatMult(Es,Es);
 
-  return mu * E.tr();
+  return mu * Es.tr();
 }
 
 double MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_rho( 

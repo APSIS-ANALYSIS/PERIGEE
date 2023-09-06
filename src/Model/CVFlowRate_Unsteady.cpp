@@ -150,7 +150,7 @@ double CVFlowRate_Unsteady::get_flow_rate( const int &nbc_id,
 
 void CVFlowRate_Unsteady::print_info() const
 {
-  SYS_T::commPrint("----------------------------------------------------------- \n");
+  SYS_T::print_sep_line();
   SYS_T::commPrint("  CVFlowRate_Unsteady:\n");
 
   for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
@@ -162,7 +162,7 @@ void CVFlowRate_Unsteady::print_info() const
       SYS_T::commPrint("     i = %d, a = %e, b = %e \n", ii, coef_a[nbc_id][ii], coef_b[nbc_id][ii]);
   }
 
-  SYS_T::commPrint("----------------------------------------------------------- \n");
+  SYS_T::print_sep_line();
 }
 
 // EOF

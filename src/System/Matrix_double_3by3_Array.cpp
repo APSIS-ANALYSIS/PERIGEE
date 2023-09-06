@@ -78,16 +78,13 @@ void Matrix_double_3by3_Array::gen_id()
   invm0 = 1.0; invm1 = 1.0; invm2 = 1.0;
 }
 
-void Matrix_double_3by3_Array::gen_rand()
+void Matrix_double_3by3_Array::gen_rand(const double &min, const double &max)
 {
-  srand(time(NULL));
+  std::random_device rd;
+  std::mt19937_64 gen( rd() );
+  std::uniform_real_distribution<double> dis(min, max);
+  for(int ii=0; ii<9; ++ii) mat[ii] = dis(gen); 
 
-  for(int ii=0; ii<9; ++ii)
-  {
-    double value = rand() % 10000;
-
-    mat[ii] = value * 1.0e-3 - 5.0;
-  }
   p[0] = 0; p[1] = 1; p[2] = 2;
   
   invm0 = 1.0; invm1 = 1.0; invm2 = 1.0;
@@ -194,18 +191,32 @@ void Matrix_double_3by3_Array::LU_fac()
   invm0 = 1.0 / mat[0]; invm1 = 1.0 / mat[4]; invm2 = 1.0 / mat[8];
 }
 
-void Matrix_double_3by3_Array::LU_solve(const double * const &b, double * const &x) const
+Vector_3 Matrix_double_3by3_Array::LU_solve( const Vector_3 &b ) const
 {
-  x[0] = b[p[0]];
-  x[1] = b[p[1]];
-  x[2] = b[p[2]];
+  Vector_3 x( b(p[0]), b(p[1]), b(p[2]) );
 
+  x(1) = x(1) - mat[3] * x(0);
+  x(2) = x(2) - mat[6] * x(0) - mat[7] * x(1);
+
+  x(2) = x(2) * invm2;
+  x(1) = (x(1) - mat[5] * x(2)) * invm1;
+  x(0) = (x(0) - mat[2] * x(2) - mat[1] * x(1)) * invm0;
+
+  return x;
+}
+
+std::array<double, 3> Matrix_double_3by3_Array::LU_solve( const std::array<double, 3> &b ) const
+{
+  std::array<double, 3> x {{ b[p[0]], b[p[1]], b[p[2]] }};
+  
   x[1] = x[1] - mat[3] * x[0];
   x[2] = x[2] - mat[6] * x[0] - mat[7] * x[1];
 
   x[2] = x[2] * invm2;
   x[1] = (x[1] - mat[5] * x[2]) * invm1;
   x[0] = (x[0] - mat[2] * x[2] - mat[1] * x[1]) * invm0;
+
+  return x;
 }
 
 void Matrix_double_3by3_Array::LU_solve(const double &b1, const double &b2, const double &b3,

@@ -5,20 +5,21 @@
 //
 // This is a 3-component vector class. The components are stored in an array 
 // vec[3]:
-//                vec[0]
-//                vec[1]
-//                vec[2]
+//             [ vec[0]; vec[1]; vec[2] ]
 // 
 // It is designed primarily for material constitutive routines.
 //
 // Author: Ju Liu
 // Date: June 24 2020
 // ============================================================================
+#include <cstdlib>
 #include <iomanip>
 #include <iostream>
 #include <ctime>
 #include <cmath>
 #include <vector>
+#include <array>
+#include <random>
 
 class Vector_3
 {
@@ -35,7 +36,7 @@ class Vector_3
     // Copy
     void copy( const Vector_3 &source );
 
-    void copy( double source[3] );
+    void copy( const double source[3] );
 
     // Assignment operator
     Vector_3& operator= (const Vector_3 &source);
@@ -46,10 +47,10 @@ class Vector_3
     const double& operator()(const int &index) const {return vec[index];}
 
     // Addition and substraction operators
-    friend Vector_3 operator+( const Vector_3 &left, const Vector_3 &right);
+    friend Vector_3 operator+( const Vector_3 &left, const Vector_3 &right );
 
-    friend Vector_3 operator-( const Vector_3 &left, const Vector_3 &right);
-
+    friend Vector_3 operator-( const Vector_3 &left, const Vector_3 &right );
+    
     Vector_3& operator+=( const Vector_3 &source );
 
     Vector_3& operator-=( const Vector_3 &source );
@@ -57,6 +58,8 @@ class Vector_3
     Vector_3& operator*=( const double &val );
 
     std::vector<double> to_std_vec() const;
+
+    std::array<double, 3> to_std_array() const;
 
     const double& x() const {return vec[0];}
     double& x() {return vec[0];}
@@ -73,7 +76,7 @@ class Vector_3
 
     void gen_val(const double &val);
 
-    void gen_rand();
+    void gen_rand(const double &left =-1.0, const double &right = 1.0);
 
     void gen_e1() {vec[0]=1.0; vec[1]=0.0; vec[2]=0.0;}
     
@@ -81,13 +84,9 @@ class Vector_3
     
     void gen_e3() {vec[0]=0.0; vec[1]=0.0; vec[2]=1.0;}
 
-    void scale( const double &val );
-
-    void AXPY( const double &val, const Vector_3 &source );
-
     double sum() const {return vec[0]+vec[1]+vec[2];}
 
-    double norm2() const {return sqrt(vec[0]*vec[0]+vec[1]*vec[1]+vec[2]*vec[2]);}
+    double norm2() const {return std::sqrt(vec[0]*vec[0]+vec[1]*vec[1]+vec[2]*vec[2]);}
     
     // rescale vec to be norm one and return its length
     double normalize();
@@ -111,5 +110,8 @@ double dot_product( const Vector_3 &a, const Vector_3 &b );
 
 // calculate the cross product of two vectors
 Vector_3 cross_product( const Vector_3 &a, const Vector_3 &b );
+
+// calculate a scalar product of a input vector
+Vector_3 operator*( const double &val, const Vector_3 &source );
 
 #endif

@@ -20,6 +20,14 @@ $ cmake $HOME/VTK-7.1.1-src
 $ make -j 6
 $ make install
 ```
+On certain clusters, OpenGL is not installed. So we have to turnoff the rendering. A minimum required install for VTK is as follows.
+```sh
+$ cmake ../VTK-7.1.1 -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_INSTALL_PREFIX:PATH=/home/juliu/lib/VTK-7.1.1-OPT -DVTK_Group_StandAlone:BOOL=OFF -DVTK_Group_Rendering:BOOL=OFF -DModule_vtkCommonMath:BOOL=ON -DModule_vtkCommonMisc:BOOL=ON -DModule_vtkCommonCore:BOOL=ON -DModule_vtkCommonSystem:BOOL=ON -DModule_vtkIOCore:BOOL=ON -DModule_vtkIOLegacy:BOOL=ON -DModule_vtkIOXML:BOOL=ON
+$ make
+$ make install
+```
+In the above, we only install the modules we need.
+
 ## Advanced Guide for PETSc Installation
 The PETSc package has an official installation guide [page](https://www.mcs.anl.gov/petsc/documentation/installation.html). The package installation is controlled through the `configure` command.
 * `--with-mpi-dir=/home/jliu/lib/mpich-3.2` The `--with-mpi-dir` tells the PETSc that there exists a MPI library installed in the computer, and the PETSc will not have to download and compile a MPICH during installation. My own mpich is installed in `/home/jliu/lib/mpich-3.2`.
@@ -36,8 +44,17 @@ Also, notice that sometimes, PETSc configure command may not have the correct do
 
 * Refer to [this](https://www.mcs.anl.gov/petsc/documentation/installation.html) for the installation details.
 
-As an example, let me attach the full configuration command here.
+As an example, let me attach the full configuration command for debug build here.
 ```sh
-$ ./configure --with-x=0 -with-pic --with-make-np=12 --with-mpi-compilers=1 --with-mpi-dir=${HOME}/lib/mpich-3.3.2/ --with-scalar-type=real --with-precision=double --with-chaco=1 --download-chaco --with-hypre=1 --download-hypre --with-spai=1 --download-spai --with-sundials=1 --download-sundials --with-mumps=1 --download-mumps --with-scalapack=1 --download-scalapack --with-blacs=1 --download-blacs --with-spooles=1 --download-spooles --with-superlu_dist=1 --download-superlu_dist --with-superlu=1 --download-superlu --download-fblaslapack --download-metis --download-parmetis --with-ml=1 --download-ml --with-eigen=1 --download-eigen --with-debugging=no COPTFLAGS="-O3 -march=native -mtune=native" CXXOPTFLAGS="-O3 -march=native -mtune=native" FOPTFLAGS="-O3 -march=native -mtune=native" --prefix=${HOME}/lib/petsc-xx.yy.zz-opt
+ ./configure -with-pic --with-make-np=12 --with-mpi-compilers=1 --with-mpi-dir=/home/juliu/lib/mpich-3.2/ --with-scalar-type=real --with-precision=double --with-chaco=1 --download-chaco --with-hypre=1 --download-hypre=/home/juliu/lib/hypre-2.11.1.tar.gz --with-mumps=1 --download-mumps --with-scalapack=1 --download-scalapack --download-fblaslapack --download-metis --download-parmetis --with-yaml=1 --download-yaml --with-debugging=yes --prefix=/home/juliu/lib/petsc-xx.yy.zz-debug
+```
+Let me attach the full configuration command for optimized build here.
+```sh
+$ ./configure --with-x=0 -with-pic --with-make-np=12 --with-mpi-compilers=1 --with-mpi-dir=${HOME}/lib/mpich-3.3.2/ --with-scalar-type=real --with-precision=double --with-chaco=1 --download-chaco --with-hypre=1 --download-hypre --with-spai=1 --download-spai --with-sundials=1 --download-sundials --with-mumps=1 --download-mumps --with-scalapack=1 --download-scalapack --with-blacs=1 --download-blacs --with-spooles=1 --download-spooles --with-superlu_dist=1 --download-superlu_dist --with-superlu=1 --download-superlu --download-fblaslapack --download-metis --download-parmetis --with-ml=1 --download-ml --with-eigen=1 --download-eigen --with-yaml=1 --download-yaml --with-debugging=no COPTFLAGS="-O3 -march=native -mtune=native" CXXOPTFLAGS="-O3 -march=native -mtune=native" FOPTFLAGS="-O3 -march=native -mtune=native" --prefix=${HOME}/lib/petsc-xx.yy.zz-opt
 ```
 In the above, you should specify the correct version number in `petsc-xx.yy.zz-opt`.
+
+My configuration on TaiYi is as follows.
+```sh
+./configure --with-mpi-dir=/share/intel/2018u4/compilers_and_libraries_2018.5.274/linux/mpi/intel64/ --with-blaslapack-dir=/share/intel/2018u4/compilers_and_libraries_2018.5.274/linux/mkl --with-debugging=no --prefix=/work/mae-liuj/lib/petsc-3.16.6-opt --download-hypre=/work/mae-liuj/petsc-3.16.6-extlibs/hypre-2.23.0.tar.gz --download-mumps=/work/mae-liuj/petsc-3.16.6-extlibs/petsc-pkg-mumps-6d1470374d32.tar.gz --download-metis=/work/mae-liuj/petsc-3.16.6-extlibs/petsc-pkg-metis-c8d2dc1e751e.tar.gz COPTFLAGS="-O3 -xHOST" CXXOPTFLAGS="-O3 -xHOST" FOPTFLAGS="-O3 -xHOST" --with-scalapack-include=/share/intel/2018u4/compilers_and_libraries_2018.5.274/linux/mkl/include --with-scalapack-lib="-L/share/intel/2018u4/compilers_and_libraries_2018.5.274/linux/mkl/lib/intel64/ -lmkl_blacs_intelmpi_lp64 -lmkl_scalapack_lp64"
+```

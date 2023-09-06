@@ -23,9 +23,9 @@
 class Map_Node_Index
 {
   public:
-    // Construct the index mapping based on the partitioning
+    // Construct the index mapping based on the partitioning for field 0
     Map_Node_Index( const IGlobal_Part * const &gpart,
-        const int &cpu_size, const int &nFunc );
+        const int &cpu_size, const int &nFunc, const int &field = 0 );
 
     // Load the index mapping from file on disk
     Map_Node_Index( const char * const &fileName );
@@ -42,7 +42,7 @@ class Map_Node_Index
     virtual void print_info() const;
 
     // write the old_2_new and new_2_old mappings into an hdf5 file
-    virtual void write_hdf5( const char * const &fileName ) const;
+    virtual void write_hdf5( const std::string &fileName ) const;
 
   private:
     std::vector<int> old_2_new, new_2_old;

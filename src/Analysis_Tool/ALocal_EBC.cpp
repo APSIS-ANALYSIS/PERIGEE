@@ -34,7 +34,7 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
     if( num_local_cell[ii] > 0 )
     {
       std::string subgroup_name(groupbase);
-      subgroup_name.append( SYS_T::to_string(ii) );
+      subgroup_name.append( std::to_string(ii) );
 
       local_cell_node_xyz[ii] = h5r -> read_doubleVector( subgroup_name.c_str(), "local_cell_node_xyz" );
 
@@ -94,6 +94,18 @@ void ALocal_EBC::get_SIEN( const int &ii,
     const int pos = local_tri_ien[ii][len*eindex+jj];
     sien[jj] = local_cell_node_pos[ii][pos];
   }
+}
+
+std::vector<int> ALocal_EBC::get_SIEN( const int &ii, const int &eindex ) const
+{
+  const int len = cell_nLocBas[ii];
+  std::vector<int> out (len, 0);
+  for(int jj=0; jj<len; ++jj)
+  {
+    const int pos = local_tri_ien[ii][len*eindex+jj];
+    out[jj] = local_cell_node_pos[ii][pos];
+  }
+  return out;
 }
 
 // EOF

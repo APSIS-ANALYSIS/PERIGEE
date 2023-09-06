@@ -4,8 +4,7 @@
 // Math_Tools.hpp
 // This file defines mathematical constants and functions.
 //
-// Author: Ju Liu
-// Date: Feb. 13 2016
+// Date Created: Feb. 13 2016
 // ============================================================================
 #include <stdio.h>
 #include <vector> 
@@ -36,6 +35,29 @@ namespace MATH_T
     double c = 1.0;
     for(int ii=1; ii<=m; ++ii) c = c * ( n - m + ii ) / ii;
     return c;
+  }
+
+  // ----------------------------------------------------------------
+  // Assume ii = iz * dim_x * dim_y + iy * dim_x + ix
+  // this function will return ix iy and iz based on the input ii,
+  // dim_x, dim_y.
+  // ----------------------------------------------------------------
+  inline void get_xyz_index( const int &ii, const int &dim_x, const int &dim_y,
+      int &ix, int &iy, int &iz)
+  {
+    const int ixy = ii % (dim_x * dim_y);
+    iz = (ii - ixy) / (dim_x * dim_y);
+    ix = ixy % dim_x; iy = (ixy - ix) / dim_x;
+  }
+
+  // ----------------------------------------------------------------
+  // Assume ii = iy * dim_x + ix;
+  // this function will return ix and iy based on the input ii and dim_x.
+  // ----------------------------------------------------------------
+  inline void get_xy_index( const int &ii, const int &dim_x, int &ix, int &iy)
+  {
+    ix = ii % dim_x;
+    iy = (ii-ix)/dim_x;
   }
 
   // --------------------------------------------------------------------------
@@ -80,25 +102,13 @@ namespace MATH_T
   }
 
   // --------------------------------------------------------------------------
-  // Dot product of two 3D vectors
-  // Input: u = (u1, u2, u3)
-  //        v = (v1, v2, v3)
-  // Output: u1*v1 + u2*v2 + u3*v3
-  // --------------------------------------------------------------------------
-  inline double dot3d( const double &u1, const double &u2, const double &u3,
-      const double &v1, const double &v2, const double &v3 )
-  {
-    return u1*v1 + u2*v2 + u3*v3; 
-  }
-
-  // --------------------------------------------------------------------------
   // Normalize 3D vector
   // Input: x, y, z
   // Output: x/len, y/len, z/len, len = sqrt(x^2+y^2+z^2)
   // --------------------------------------------------------------------------
   inline double normalize3d( double &x, double &y, double &z )
   {
-    const double len = sqrt(x*x + y*y + z*z);
+    const double len = std::sqrt(x*x + y*y + z*z);
     x = x / len;
     y = y / len;
     z = z / len;
@@ -108,7 +118,7 @@ namespace MATH_T
 
   inline double norm2(const double &x, const double &y, const double &z)
   {
-    return sqrt(x*x + y*y + z*z);
+    return std::sqrt(x*x + y*y + z*z);
   }
 
   // ----------------------------------------------------------------
@@ -166,6 +176,27 @@ namespace MATH_T
   void gen_Gaussian( const int &n, const double &mean, const double &std,
       std::vector<double> &val );
 
+  // ----------------------------------------------------------------
+  // gen_int_rand and gen_double_rand
+  // Generate a random double in [min, max] domain for integer and double
+  // precision numbers, respectively. 
+  // ----------------------------------------------------------------
+  inline double gen_int_rand( const int &min, const int &max )
+  {
+    std::random_device rd;
+    std::mt19937_64 gen( rd() );
+    std::uniform_int_distribution<int> dis(min, max);
+    return dis(gen);
+  }
+
+  inline double gen_double_rand( const double &min = -1.0, const double &max = 1.0 )
+  {
+    std::random_device rd;
+    std::mt19937_64 gen( rd() );
+    std::uniform_real_distribution<double> dis(min, max);
+    return dis(gen);
+  }
+  
   // ----------------------------------------------------------------
   // Print Histogram of an array of random vector
   // ----------------------------------------------------------------

@@ -3,7 +3,7 @@
 // ==================================================================
 // SV_Tools.hpp
 //
-// This is a suite of tools that handle the interface between this
+// This is a suite of tools that handle the IO files between this
 // code and the SimVascular files.
 //
 // Author: Ju Liu

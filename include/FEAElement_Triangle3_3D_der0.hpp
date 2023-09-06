@@ -20,6 +20,7 @@
 // Date Created: Jan. 19 2017
 // ==================================================================
 #include "FEAElement.hpp"
+#include "Math_Tools.hpp"
 
 class FEAElement_Triangle3_3D_der0 : public FEAElement
 {
@@ -35,13 +36,11 @@ class FEAElement_Triangle3_3D_der0 : public FEAElement
     // 2: 2D element
     virtual int get_Type() const {return 521;}
 
-    virtual int get_numType() const {return 1;}
-
     virtual int get_numQuapts() const {return numQuapts;}
 
     virtual int get_nLocBas() const {return 3;}
 
-    virtual void print() const;
+    virtual void print_info() const;
 
     virtual double get_memory_usage() const;
 

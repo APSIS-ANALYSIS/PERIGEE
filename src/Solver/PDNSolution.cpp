@@ -78,14 +78,12 @@ PDNSolution::~PDNSolution()
 
 void PDNSolution::Gen_random()
 {
-  srand(time(NULL));
-  
   PetscScalar * val = new PetscScalar[nlocal];
   PetscInt * idx = new PetscInt[nlocal];
   
   for(int ii=0; ii<nlocal; ++ii) 
   {
-    val[ii] = SYS_T::gen_randomD_open(0.0, 1.0);
+    val[ii] = MATH_T::gen_double_rand(-1.0, 1.0);
     idx[ii] = ii;
   }
 
@@ -160,6 +158,13 @@ void PDNSolution::PlusAX(const PDNSolution &x, const double &a)
 void PDNSolution::PlusAX(const PDNSolution * const &x_ptr, const double &a)
 {
   VecAXPY(solution, a, x_ptr->solution);
+  VecGhostUpdateBegin(solution, INSERT_VALUES, SCATTER_FORWARD);
+  VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
+}
+
+void PDNSolution::PlusAX(const Vec &x, const double &a)
+{
+  VecAXPY(solution, a, x);
   VecGhostUpdateBegin(solution, INSERT_VALUES, SCATTER_FORWARD);
   VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
 }

@@ -3,7 +3,8 @@
 // ============================================================================
 // Vec_Tools.hpp
 // ----------------------------------------------------------------------------
-// VEC_T namespace contains a suite of functions for std::vector object.
+// VEC_T namespace contains a suite of functions for the manipulation of the 
+// std::vector object.
 // ============================================================================
 #include <iomanip>
 #include <algorithm>
@@ -30,7 +31,7 @@ namespace VEC_T
   //   print the vector with given precision pres 
   // --------------------------------------------------------------------------
   template<typename T> void print( const std::vector<T> &vec, 
-      const unsigned int pres, const char &sep = '\t' )
+      const unsigned int &pres, const char &sep = '\t' )
   {
     const std::streamsize ss = std::cout.precision();
     for( auto it = vec.begin(); it != vec.end(); ++it )
@@ -53,8 +54,19 @@ namespace VEC_T
   }
 
   // --------------------------------------------------------------------------
+  // ! get_size
+  //   return the length of a std::vector in signed int type (rather than 
+  //   unsigned int).
+  // --------------------------------------------------------------------------
+  template<typename T> int get_size( const std::vector<T> &vec )
+  {
+    return static_cast<int>(vec.size());
+  }
+
+  // --------------------------------------------------------------------------
   // ! shrink2fit  
-  //   trim the capacity of vector
+  //   trim the capacity of vector.
+  //   Ref. Item 17 in "Effective STL" by Scott Meyers
   // --------------------------------------------------------------------------
   template<typename T> void shrink2fit( std::vector<T> &vec )
   {
@@ -136,6 +148,28 @@ namespace VEC_T
   }
 
   // --------------------------------------------------------------------------
+  // ! set_diff
+  //   input: vec_a and vec_b
+  //   output : the set difference of vec_a - vec_b, that is the value belonging
+  //   to vec_a, but not vec_b.
+  //   e.g. vec_a = [ 5, 10, 15, 20, 10, 25 ]; vec_b = [ 10, 20, 30, 50, 30, 40 ];
+  //   output is [ 5, 15, 25 ].
+  // --------------------------------------------------------------------------
+  template<typename T> std::vector<T> set_diff( const std::vector<T> &vec_a,
+      const std::vector<T> &vec_b )
+  {
+    auto temp_a = vec_a, temp_b = vec_b;
+
+    sort_unique_resize( temp_a );
+    sort_unique_resize( temp_b );
+
+    auto output = temp_a;
+    auto it = std::set_difference( temp_a.begin(), temp_a.end(), temp_b.begin(), temp_b.end(), output.begin() );
+    output.resize( it - output.begin() );
+    return output;
+  }
+
+  // --------------------------------------------------------------------------
   // ! is_invec
   //   determine if a given value val is in the vector vec (return true),
   //   or not (return false).
@@ -161,6 +195,20 @@ namespace VEC_T
   }
 
   // --------------------------------------------------------------------------
+  // ! cast_to_unsigned_int
+  //   Convert a std::vector<int> to std::vector<unsigned int>.
+  // --------------------------------------------------------------------------
+  inline std::vector<unsigned int> cast_to_unsigned_int( const std::vector<int> &vec )
+  {
+    std::vector<unsigned int> output( vec.size() );
+
+    for(unsigned int ii=0; ii<vec.size(); ++ii)
+      output[ii] = static_cast<unsigned int>( vec[ii] );
+    
+    return output;
+  }
+
+  // --------------------------------------------------------------------------
   // ! write_txt
   //   write a vector to disk in .txt format.
   //   \para file_name : file_name.vec.txt will be the name for the file
@@ -168,7 +216,7 @@ namespace VEC_T
   //   Note: this file can be read by matlab and do various operations in
   //   matlab.
   // --------------------------------------------------------------------------
-  template<typename T> void write_txt( const char * const &file_name,
+  template<typename T> void write_txt( const std::string &file_name,
       const std::vector<T> &vec, const bool &wIdx=true, const unsigned int &pres=6 )
   {
     const std::streamsize ss = std::cout.precision();

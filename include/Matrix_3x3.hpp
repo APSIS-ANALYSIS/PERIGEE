@@ -2,19 +2,20 @@
 #define MATRIX_3X3_HPP
 // ============================================================================
 // Matrix_3x3.hpp
-// This is a 3 x 3 matrix class. The components are stored in a 1-D 
-// array: mat[9]. Logically, the matrix is 
+// This is a 3 x 3 matrix class. The components are stored in a 1-D array: 
+// mat[9]. Logically, the matrix is 
 //
 //                   mat[0], mat[1], mat[2]
 //                   mat[3], mat[4], mat[5]
 //                   mat[6], mat[7], mat[8]
 //
-// Note: This is adopted from a previous implementation Matrix_double
-// _3by3_Array.hpp. The difference is that we do not intend to 
-// implement the LU factorization in this class; this means that we do
-// not have the pivoting flag array and the inverse diagonal array in 
-// this class. If needed, one can implement a LU-factorization in this
-// class with pivoting and LU factorized matrix as an output.
+// Note: This is adopted from a previous implementation 
+//                   Matrix_double_3by3_Array.hpp.
+// The difference is that we do not intend to implement the LU factorization in
+// this class; this means that we do not have the pivoting flag array and the 
+// inverse diagonal array in this class. If needed, one can implement a 
+// LU-factorization in this class with pivoting and LU factorized matrix as an
+// output.
 //
 // Author: Ju Liu
 // Date: June 21 2016
@@ -35,13 +36,16 @@ class Matrix_3x3
         const double &a21, const double &a22, const double &a23,
         const double &a31, const double &a32, const double &a33 );
 
+    // Generate a matrix made by 3 vectors [ vec1 | vec2 | vec3 ]
+    Matrix_3x3 ( const Vector_3 &vec1, const Vector_3 &vec2, const Vector_3 &vec3 );
+    
     // Destructor
     ~Matrix_3x3();
 
     // Copy
     void copy( const Matrix_3x3 &source );    
     
-    void copy( double source[9] );
+    void copy( const double source[9] );
 
     // Assignment operator
     Matrix_3x3& operator= (const Matrix_3x3 &source);
@@ -101,8 +105,11 @@ class Matrix_3x3
     // Scalar product
     Matrix_3x3& operator*=( const double &val );
 
+    // unary minus operator
+    Matrix_3x3 operator-() const;
+
     // Return true if the input matrix is identical to the mat
-    bool is_identical( const Matrix_3x3 source ) const;
+    bool is_identical( const Matrix_3x3 &source, const double &tol = 1.0e-12 ) const;
 
     // Set all components to zero
     void gen_zero();
@@ -111,18 +118,22 @@ class Matrix_3x3
     void gen_id();
 
     // Set components a random value
-    void gen_rand();
+    void gen_rand(const double &left = -1.0, const double &right = 1.0);
 
     // Set a Hilbert matrix
     void gen_hilb();
 
     // Set a matrix from out-product of two vecs with length 3
     // mat_ij = a_i b_j
-    void gen_outprod( const Vector_3 &a, const Vector_3 &b );
+    void gen_outprod( const Vector_3 &va, const Vector_3 &vb );
    
     // mat_ij = a_i a_j 
-    void gen_outprod( const Vector_3 &a );
-
+    void gen_outprod( const Vector_3 &va );
+    
+    // Add a matrix from out-product of two vecs with length 3
+    // mat_ij += val a_i b_j
+    void add_outprod( const double &val, const Vector_3 &va, const Vector_3 &vb );
+   
     // Transpose the matrix
     void transpose();
 
@@ -138,10 +149,6 @@ class Matrix_3x3
 
     // X = X + a * I
     void AXPI( const double &val );
-
-    // add the matrix source with the matrix
-    // X = X + Y
-    void PY( const Matrix_3x3 &source );
 
     // Get the determinant of the matrix
     double det() const;
@@ -174,28 +181,39 @@ class Matrix_3x3
     // Matrix multiplication mat = mleft * mright
     void MatMult( const Matrix_3x3 &mleft, const Matrix_3x3 &mright );
 
+    // ------------------------------------------------------------------------
     // Matrix rotation
     // Let Q be a rotation matrix, the matrix gets updated by
     // Q^T M Q = Q_ki M_kl Q_lj = output_matrix_ij
+    // ------------------------------------------------------------------------
     void MatRot( const Matrix_3x3 &Q );
 
+    // ------------------------------------------------------------------------
     // Matrix multiplication as mat = source^T * source
     // This is used for the evaluation of right Cauchy-Green strain tensor:
     //                       C = F^T F
     // The resulting matrix is symmetric. Hence the computation is simplified.
+    // ------------------------------------------------------------------------
     void MatMultTransposeLeft( const Matrix_3x3 &source );
 
+    // ------------------------------------------------------------------------
     // Matrix multiplication as mat = source * source^T
     // This is used for the evaluation of the left Cauchy-Green strain tensor:
     //                       b = F F^T
     // The resulting matrix is symmetric. Hence, the computation is simplified.
+    // ------------------------------------------------------------------------
     void MatMultTransposeRight( const Matrix_3x3 &source );
 
+    // ------------------------------------------------------------------------
     // Matrix contraction
     // return mat_ij source_ij
+    // ------------------------------------------------------------------------
     double MatContraction( const Matrix_3x3 &source ) const;
 
+    // ------------------------------------------------------------------------
+    // Contraction with the transposed input
     // return mat_ij source_ji
+    // ------------------------------------------------------------------------
     double MatTContraction( const Matrix_3x3 &source ) const;
 
     // print the matrix
@@ -207,36 +225,68 @@ class Matrix_3x3
     // print the Voigt components in the order of xx yy zz yz xz xy
     void print_Voigt() const;
 
-    // Eigen decomposition of the matrix M = eta1 v1 v1T + eta2 v2 v2T + eta3 v3
-    // v3T. The algorithm is based on CMAME 197 2008 4007-4015 paper by
-    // W.M. Scherzinger and C.R. Dohrmann
+    // ------------------------------------------------------------------------
+    // Eigen decomposition of the matrix 
+    // M = eta1 v1 v1T + eta2 v2 v2T + eta3 v3 v3T. 
+    // The algorithm is based on CMAME 197 2008 4007-4015 paper by W.M. Scherzinger
+    // and C.R. Dohrmann.
+    // This function will
     // return 1 if the three eigenvalues are the same
     // return 2 if there are two identical eigenvalues, the most distinct one is
     // eta_1 and eta_1's associated eigenvector is v1
     // return 3 if all three are distinct
+    // ------------------------------------------------------------------------
     int eigen_decomp( double &eta1, double &eta2, double &eta3,
        Vector_3 &v1, Vector_3 &v2, Vector_3 &v3 ) const;
 
   private:
     double mat[9];
 
+    // ------------------------------------------------------------------------
     // Find the eignevector correspond to a eigenvalue
     // This implements the algorithm documented in
     // CMAME 2008 v197 4007-4015, sec 2.4
     // It will return an eigenvector v for this eigenvalue,
     // and two additional vectors s1 s2; v-s1-s2 forms a orthonormal basis.
+    // ------------------------------------------------------------------------
     void find_eigen_vector( const double &eta, Vector_3 &v,
         Vector_3 &s1, Vector_3 &s2 ) const;
 
+    // ------------------------------------------------------------------------
     // Return the deviatoric component's contraction scaled by 0.5.
     // M' = M - 0.3333 tr(M) I, return 0.5 M' : M'.
+    // ------------------------------------------------------------------------
     double J2() const;
 
+    // ------------------------------------------------------------------------
     // Return the determinant of the deviatoric component.
     // M' = M - 0.3333 tr(M) I, return det(M').
+    // ------------------------------------------------------------------------
     double J3() const;
 };
 
+// Return the matrix-vectror multiplication
 Vector_3 operator*( const Matrix_3x3 &left, const Vector_3 &right );
+
+// Return the matrix-matrix multiplication
+Matrix_3x3 operator*( const Matrix_3x3 &left, const Matrix_3x3 &right );
+
+// Return the scalar scaling of matrix
+Matrix_3x3 operator*( const double &val, const Matrix_3x3 &input );
+
+// Return the inverse of the input matrix
+Matrix_3x3 inverse( const Matrix_3x3 &input );
+
+// Return the cofactor of input matrix which is J input^(-T)
+Matrix_3x3 cofactor( const Matrix_3x3 &input );
+
+// Return the transpose of input matrix
+Matrix_3x3 transpose( const Matrix_3x3 &input );
+
+// Return an identity matrix
+Matrix_3x3 gen_identity_matrix();
+
+// Return a zero matrix
+Matrix_3x3 gen_zero_matrix();
 
 #endif

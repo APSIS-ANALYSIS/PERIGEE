@@ -31,6 +31,7 @@
 // Date Created: Feb. 17 2018.
 // ==================================================================
 #include "FEAElement.hpp"
+#include "Math_Tools.hpp"
 
 class FEAElement_Triangle6_3D_der0 : public FEAElement
 {
@@ -47,8 +48,6 @@ class FEAElement_Triangle6_3D_der0 : public FEAElement
     virtual int get_Type() const {return 522;}
 
     virtual int get_numQuapts() const {return numQuapts;}
-
-    virtual int get_numType() const {return 1;}
 
     virtual int get_nLocBas() const {return 6;}
 

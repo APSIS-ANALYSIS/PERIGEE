@@ -75,30 +75,28 @@ class IPLocAssem_2x2Block
     PetscScalar * sur_Residual1; // sur_R1
     
     // -------------------------------------------------------------- 
-    // Get the degree-of-freedom of this problem. For segregated 
-    // algorithms this returns the fully-coupled multiphysics 
-    // problem's dof.
-    // -------------------------------------------------------------- 
-    virtual int get_dof() const = 0;
-
-    // -------------------------------------------------------------- 
-    // Get the degree of freedom of the full matrix (i.e. n0 + n1).
-    // In most problems, this value is the same as the get_dof value;
-    // In the solid dynamics with kinematic segregated, this returns 4
-    // (3 for velocity plus 1 for pressure); while get_dof returns 7 with
-    // 3 additional displacement variables.
-    // -------------------------------------------------------------- 
-    virtual int get_dof_mat() const = 0;
-
-    // -------------------------------------------------------------- 
     // Return the first variable's dof.
     // -------------------------------------------------------------- 
-    virtual int get_dof_mat_0() const = 0;
+    virtual int get_dof_0() const = 0;
     
     // -------------------------------------------------------------- 
     // Return the second variable's dof.
     // -------------------------------------------------------------- 
-    virtual int get_dof_mat_1() const = 0;
+    virtual int get_dof_1() const = 0;
+
+    // --------------------------------------------------------------
+    // Return the number of local basis associated with field 0
+    // --------------------------------------------------------------
+    virtual int get_nLocBas_0() const = 0;
+
+    virtual int get_snLocBas_0() const = 0;
+
+    // --------------------------------------------------------------
+    // Return the number of local basis associated with field 1
+    // --------------------------------------------------------------
+    virtual int get_nLocBas_1() const = 0;
+
+    virtual int get_snLocBas_1() const = 0;
 
     // -------------------------------------------------------------- 
     // Return the number of ebc functions implemented inside this local
@@ -156,6 +154,22 @@ class IPLocAssem_2x2Block
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Residual is not implemented. \n");}
 
+    virtual void Assem_Residual(
+        const double &time, const double &dt,
+        const double * const &dot_disp,
+        const double * const &dot_velo,
+        const double * const &dot_pres,
+        const double * const &disp,
+        const double * const &velo,
+        const double * const &pres,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const double * const &qua_prestress,
+        const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Residual is not implemented. \n");}
+
     // Assembly the two Residuals and the four matrice blocks.
     virtual void Assem_Tangent_Residual(
         const double &time, const double &dt,
@@ -183,6 +197,22 @@ class IPLocAssem_2x2Block
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Tangent_Residual is not implemented. \n");}
 
+    virtual void Assem_Tangent_Residual(
+        const double &time, const double &dt,
+        const double * const &dot_disp,
+        const double * const &dot_velo,
+        const double * const &dot_pres,
+        const double * const &disp,
+        const double * const &velo,
+        const double * const &pres,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const double * const &qua_prestress,
+        const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Tangent_Residual is not implemented. \n");}
+
     // Assembly the two Residuals and the four matrice blocks for mass matrices.
     virtual void Assem_Mass_Residual(
         const double * const &vec,
@@ -204,7 +234,30 @@ class IPLocAssem_2x2Block
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Mass_Residual is not implemented. \n");}
 
+    virtual void Assem_Mass_Residual(
+        const double * const &disp,
+        const double * const &velo,
+        const double * const &pres,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const double * const &qua_prestress,
+        const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Mass_Residual is not implemented. \n");}
+
     // Perform surface integration for elemental BC id ebc_id.
+    virtual void Assem_Residual_EBC(
+        const int &ebc_id,
+        const double &time, const double &dt,
+        const double * const &disp,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Residual_EBC is not implemented.\n");}
+
     virtual void Assem_Residual_EBC(
         const int &ebc_id,
         const double &time, const double &dt,
@@ -215,8 +268,19 @@ class IPLocAssem_2x2Block
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Residual_EBC is not implemented.\n");}
 
+    virtual void Assem_Residual_Interior_Wall_EBC(
+        const double &time,
+        const double * const &pres,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Residual_Interior_Wall_EBC is not implemented.\n");}
 
-    virtual double get_flowrate( const double * const &vec,
+    virtual double get_flowrate(
+        const double * const &disp,
+        const double * const &velo,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -227,20 +291,22 @@ class IPLocAssem_2x2Block
       return 0.0;
     }
 
-    virtual void get_pressure_area( const double * const &vec,
+    virtual void get_pressure_area( 
+        const double * const &disp,
+        const double * const &pres,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad,
-        double &pres, double &area )
+        double &pressure, double &area )
     {
       SYS_T::commPrint("Warning: get_pressure_area() is not implemented. \n");
     }
 
     virtual void Assem_Residual_EBC_Resistance(
-        const int &ebc_id,
         const double &val,
+        const double * const &disp,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -249,8 +315,9 @@ class IPLocAssem_2x2Block
     {SYS_T::commPrint("Warning: this Assem_Residual_EBC_Resistance is not implemented.\n");}
 
     virtual void Assem_Residual_BackFlowStab(
-        const double * const &dot_sol,
-        const double * const &sol,
+        const double * const &dot_disp,
+        const double * const &disp,
+        const double * const &velo,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -260,8 +327,9 @@ class IPLocAssem_2x2Block
 
     virtual void Assem_Tangent_Residual_BackFlowStab(
         const double &dt,
-        const double * const &dot_sol,
-        const double * const &sol,
+        const double * const &dot_disp,
+        const double * const &disp,
+        const double * const &velo,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -269,6 +337,19 @@ class IPLocAssem_2x2Block
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Tangent_Residual_BackFlowStab is not implemented.\n");}
 
+    virtual std::vector<Matrix_3x3> get_Wall_CauchyStress(
+        const double * const &disp,
+        const double * const &pres,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad ) const
+    {
+      SYS_T::commPrint("Warning: get_CauchyStress() is not implemented. \n");
+      std::vector<Matrix_3x3> output; output.clear();
+      return output;
+    }
 
     virtual double get_model_para_1() const
     {

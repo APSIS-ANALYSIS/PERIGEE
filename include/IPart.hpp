@@ -39,7 +39,6 @@
 // ==================================================================
 #include "Sys_Tools.hpp"
 #include "Vec_Tools.hpp"
-#include "IGlobal_Part.hpp"
 #include "Map_Node_Index.hpp"
 #include "IIEN.hpp"
 
@@ -149,15 +148,14 @@ class IPart
     virtual int get_nlocghonode() const
     {SYS_T::print_exit("Error: get_nlocghonode is not implemented. \n"); return 0;}
 
-    virtual bool isElemInPart(int gloindex) const
+    virtual bool isElemInPart(const int &gloindex) const
     {SYS_T::print_exit("Error: isElemInPart is not implemented. \n"); return false;}
 
-    virtual bool isNodeInPart(int gloindex) const
+    virtual bool isNodeInPart(const int &gloindex) const
     {SYS_T::print_exit("Error: isNodeInPart is not implemented. \n"); return false;}
 
     virtual int get_elemLocIndex(const int &gloindex) const
     {SYS_T::print_exit("Error: get_elemLocIndex is not implemented. \n"); return 0;}
-
 
     virtual int get_nodeLocGhoIndex(const int &gloindex) const
     {SYS_T::print_exit("Error: get_nodeLocGhoIndex is not implemented. \n"); return 0;}
@@ -168,9 +166,6 @@ class IPart
 
     virtual int get_cpu_size() const
     {SYS_T::print_exit("Error: get_cpu_size is not implemented. \n"); return 0;}
-
-    virtual int get_dual_edge_ncommon() const
-    {SYS_T::print_exit("Error: get_dual_edge_ncommon is not implemented. \n"); return 0;}
 
     // 3. Global mesh information
     virtual int get_nElem() const

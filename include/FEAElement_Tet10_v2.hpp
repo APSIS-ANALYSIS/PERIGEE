@@ -39,6 +39,7 @@
 // Date created: Nov. 3 2019
 // ==================================================================
 #include "FEAElement.hpp"
+#include "Math_Tools.hpp"
 #include "Matrix_double_6by6_Array.hpp"
 
 class FEAElement_Tet10_v2 : public FEAElement
@@ -52,8 +53,6 @@ class FEAElement_Tet10_v2 : public FEAElement
 
     // A unique number for this element. 
     virtual int get_Type() const {return 502;}
-
-    virtual int get_numType() const {return 1;}
 
     virtual int get_numQuapts() const {return numQuapts;}
 

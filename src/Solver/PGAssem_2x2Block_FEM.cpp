@@ -6,7 +6,7 @@ PGAssem_2x2Block_FEM::PGAssem_2x2Block_FEM(
     ALocal_Elem const * const &alelem_ptr,
     ALocal_IEN const * const &aien_ptr,
     APart_Node const * const &pnode_ptr,
-    ALocal_NodalBC const * const &part_nbc,
+    ALocal_NBC const * const &part_nbc,
     ALocal_EBC const * const &part_ebc )
 : nlocElem( alelem_ptr -> get_nlocalele() ),
   dof(       locassem_ptr -> get_dof() ),
@@ -203,7 +203,7 @@ void PGAssem_2x2Block_FEM::Get_res_norms( const PDNSolution * const &sol_0,
 }
 
 
-void PGAssem_2x2Block_FEM::EssBC_K11G1( const ALocal_NodalBC * const &nbc_part )
+void PGAssem_2x2Block_FEM::EssBC_K11G1( const ALocal_NBC * const &nbc_part )
 {
   for(int field = 1; field <= 3; ++field)
   {
@@ -222,7 +222,7 @@ void PGAssem_2x2Block_FEM::EssBC_K11G1( const ALocal_NodalBC * const &nbc_part )
 }
 
 
-void PGAssem_2x2Block_FEM::EssBC_G1( const ALocal_NodalBC * const &nbc_part )
+void PGAssem_2x2Block_FEM::EssBC_G1( const ALocal_NBC * const &nbc_part )
 {
   for(int field = 1; field <= 3; ++field)
   {
@@ -264,7 +264,7 @@ void PGAssem_2x2Block_FEM::NatBC_G1(
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const lien_ptr,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
@@ -303,7 +303,7 @@ void PGAssem_2x2Block_FEM::NatBC_G1(
 void PGAssem_2x2Block_FEM::Assem_nonzero_estimate(
     IPLocAssem_2x2Block * const &lassem_ptr,
     const ALocal_IEN * const &lien_ptr,
-    const ALocal_NodalBC * const &nbc_part )
+    const ALocal_NBC * const &nbc_part )
 {
   lassem_ptr -> Assem_Estimate();
 
@@ -362,7 +362,7 @@ void PGAssem_2x2Block_FEM::Assem_mass_residual(
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   // array_sol_0/1 will be extracted to get local_sur_0/1 
@@ -443,7 +443,7 @@ void PGAssem_2x2Block_FEM::Assem_residual(
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   dot_sol_0 -> GetLocalArray( array_dot_0 );
@@ -508,7 +508,7 @@ void PGAssem_2x2Block_FEM::Assem_tangent_residual(
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
-    const ALocal_NodalBC * const &nbc_part,
+    const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
   dot_sol_0 -> GetLocalArray( array_dot_0 );

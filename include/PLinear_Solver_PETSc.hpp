@@ -77,7 +77,11 @@ class PLinear_Solver_PETSc
     // ! Get the iteration number
     // ------------------------------------------------------------------------
     int get_ksp_it_num() const
-    {int it_num; KSPGetIterationNumber(ksp, &it_num); return it_num;}
+    {
+      int it_num; 
+      KSPGetIterationNumber(ksp, &it_num); 
+      return it_num;
+    }
 
     // ------------------------------------------------------------------------
     // ! Get maximum iteration number for this linear solver
@@ -94,9 +98,9 @@ class PLinear_Solver_PETSc
     // ------------------------------------------------------------------------
     void print_info() const
     {
-      SYS_T::commPrint("----------------------------------------------------------- \n");
+      SYS_T::print_sep_line();
       KSPView(ksp, PETSC_VIEWER_STDOUT_WORLD);
-      SYS_T::commPrint("----------------------------------------------------------- \n");
+      SYS_T::print_sep_line();
     }
 
     // ------------------------------------------------------------------------

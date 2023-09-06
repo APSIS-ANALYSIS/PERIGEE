@@ -10,16 +10,13 @@ Tensor4_2D::Tensor4_2D()
   }
 }
 
-
 Tensor4_2D::Tensor4_2D( const Tensor4_2D &source )
 {
   for(int ii=0; ii<16; ++ii) ten[ii] = source(ii);
 }
 
-
 Tensor4_2D::~Tensor4_2D()
 {}
-
 
 void Tensor4_2D::print() const
 {
@@ -43,7 +40,6 @@ void Tensor4_2D::print() const
   }
 }
 
-
 void Tensor4_2D::gen_id()
 {
   for(int ii=0; ii<16; ++ii) ten[ii] = 0.0;
@@ -53,7 +49,6 @@ void Tensor4_2D::gen_id()
     for(int bb=0; bb<2; ++bb) ten[8*aa+4*bb+2*aa+bb] = 1.0;
   }
 }
-
 
 void Tensor4_2D::gen_symm_id()
 {
@@ -68,43 +63,33 @@ void Tensor4_2D::gen_symm_id()
   }
 }
 
-
-void Tensor4_2D::gen_rand()
+void Tensor4_2D::gen_rand(const double &min, const double &max)
 {
-  srand(time(NULL));
-
-  for(int ii=0; ii<16; ++ii)
-  {
-    double value = rand() % 100000;
-
-    ten[ii] = value * 1.0e-4 - 5.0; // range [-5, 4.9999]
-  }
+  std::random_device rd;
+  std::mt19937_64 gen( rd() );
+  std::uniform_real_distribution<double> dis(min, max);
+  for(int ii=0; ii<16; ++ii) ten[ii] = dis(gen);
 }
-
 
 void Tensor4_2D::gen_zero()
 {
   for(int ii=0; ii<16; ++ii) ten[ii] = 0.0;
 }
 
-
 void Tensor4_2D::scale( const double &val )
 {
   for(int ii=0; ii<16; ++ii) ten[ii] *= val;
 }
-
 
 void Tensor4_2D::PY( const Tensor4_2D &input )
 {
   for(int ii=0; ii<16; ++ii) ten[ii] += input(ii);
 }
 
-
 void Tensor4_2D::AXPY( const double &val, const Tensor4_2D &input )
 {
   for(int ii=0; ii<16; ++ii) ten[ii] += val * input(ii);
 }
-
 
 void Tensor4_2D::add_OutProduct( const double &val, const Matrix_2x2 &mleft,
             const Matrix_2x2 &mright )
@@ -121,7 +106,6 @@ void Tensor4_2D::add_OutProduct( const double &val, const Matrix_2x2 &mleft,
     }
   }
 }
-
 
 void Tensor4_2D::add_SymmProduct( const double &val, const Matrix_2x2 &mleft,
     const Matrix_2x2 &mright )
@@ -142,7 +126,6 @@ void Tensor4_2D::add_SymmProduct( const double &val, const Matrix_2x2 &mleft,
   }
 }
 
-
 void Tensor4_2D::MatMult_1( const Matrix_2x2 &source )
 {
   double temp[16];
@@ -153,7 +136,6 @@ void Tensor4_2D::MatMult_1( const Matrix_2x2 &source )
   }
   for(int m=0; m<16; ++m) ten[m] = temp[m];
 }
-
 
 void Tensor4_2D::MatMult_2( const Matrix_2x2 &source )
 {
@@ -173,7 +155,6 @@ void Tensor4_2D::MatMult_2( const Matrix_2x2 &source )
   for(int m=0; m<16; ++m) ten[m] = temp[m];
 }
 
-
 void Tensor4_2D::MatMult_3( const Matrix_2x2 &source )
 {
   double temp[16];
@@ -187,7 +168,6 @@ void Tensor4_2D::MatMult_3( const Matrix_2x2 &source )
   for(int m=0; m<16; ++m) ten[m] = temp[m];
 }
 
-
 void Tensor4_2D::MatMult_4( const Matrix_2x2 &source )
 {
   double temp[16];
@@ -199,7 +179,6 @@ void Tensor4_2D::MatMult_4( const Matrix_2x2 &source )
   for(int m=0; m<16; ++m) ten[m] = temp[m];
 }
 
-
 void Tensor4_2D::LeftContraction( const Matrix_2x2 &source, Matrix_2x2 &out ) const
 {
   out(0) = ten[0] * source(0) + ten[4] * source(1) + ten[8] * source(2) + ten[12] * source(3);
@@ -207,7 +186,6 @@ void Tensor4_2D::LeftContraction( const Matrix_2x2 &source, Matrix_2x2 &out ) co
   out(2) = ten[2] * source(0) + ten[6] * source(1) + ten[10] * source(2) + ten[14] * source(3);
   out(3) = ten[3] * source(0) + ten[7] * source(1) + ten[11] * source(2) + ten[15] * source(3);
 }
-
 
 void Tensor4_2D::RightContraction( const Matrix_2x2 &source, Matrix_2x2 &out ) const
 {
@@ -217,13 +195,11 @@ void Tensor4_2D::RightContraction( const Matrix_2x2 &source, Matrix_2x2 &out ) c
   out(3) = ten[12] * source(0) + ten[13] * source(1) + ten[14] * source(2) + ten[15] * source(3);
 }
 
-
 double Tensor4_2D::LnRContraction( const Matrix_2x2 &Left,
             const Matrix_2x2 &Right ) const
 {
   return Left(0) * (ten[0]*Right(0) + ten[1] * Right(1) + ten[2] * Right(2) + ten[3] * Right(3) ) + Left(1) * (ten[4]*Right(0) + ten[5] * Right(1) + ten[6] * Right(2) + ten[7] * Right(3) ) + Left(2) * (ten[8]*Right(0) + ten[9] * Right(1) + ten[10] * Right(2) + ten[11] * Right(3) ) + Left(3) * (ten[12]*Right(0) + ten[13] * Right(1) + ten[14] * Right(2) + ten[15] * Right(3));
 }
-
 
 double Tensor4_2D::Ten4Contraction( const Tensor4_2D &input ) const
 {
@@ -232,7 +208,5 @@ double Tensor4_2D::Ten4Contraction( const Tensor4_2D &input ) const
 
   return sum;
 }
-
-
 
 // EOF

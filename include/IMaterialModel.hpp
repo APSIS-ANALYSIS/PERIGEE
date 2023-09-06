@@ -89,13 +89,14 @@ class IMaterialModel
     // Input: F : deformation gradient
     // Output: sigma : Cauchy stress tensor
     // ------------------------------------------------------------------------
-    virtual void get_Cauchy_stress( const Matrix_3x3 &F, Matrix_3x3 &sigma ) const
+    virtual Matrix_3x3 get_Cauchy_stress( const Matrix_3x3 &F ) const
     {
       Matrix_3x3 P, S;
       get_PK(F, P, S);
-      Matrix_3x3 Ft(F); Ft.transpose();
-      sigma.MatMult(P, Ft);
+      const Matrix_3x3 Ft = transpose( F );
+      Matrix_3x3 sigma = P * Ft;
       sigma.scale( (1.0/F.det()) );
+      return sigma;
     }
 
     // ------------------------------------------------------------------------

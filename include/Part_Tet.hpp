@@ -17,14 +17,17 @@
 class Part_Tet : public IPart
 {
   public:
+    // Default constructor
+    // The actual construction is in the derived class.
+    Part_Tet(){};
+    
     Part_Tet( const IMesh * const &mesh,
         const IGlobal_Part * const &gpart,
         const Map_Node_Index * const &mnindex,
         const IIEN * const &IEN,
         const std::vector<double> &ctrlPts,
         const int &in_cpu_rank, const int &in_cpu_size,
-        const int &in_dofNum, const int &in_elemType,
-        const bool isPrintInfo );
+        const int &in_dofNum, const int &in_elemType );
 
     Part_Tet( const IMesh * const &mesh,
         const IGlobal_Part * const &gpart,
@@ -33,8 +36,7 @@ class Part_Tet : public IPart
         const std::vector<double> &ctrlPts,
         const int &in_cpu_rank, const int &in_cpu_size,
         const int &in_dofNum, const int &in_dofMat,
-        const int &in_elemType,
-        const bool isPrintInfo );
+        const int &in_elemType );
 
     // Constructor that load the partition info from h5 file on disk
     Part_Tet( const char * const &fileName, const int &in_cpu_rank );
@@ -43,14 +45,15 @@ class Part_Tet : public IPart
 
     virtual void write( const char * inputFileName ) const;
     
-    virtual bool isElemInPart(int gloindex) const
+    virtual bool isElemInPart(const int &gloindex) const
     {return VEC_T::is_invec(elem_loc, gloindex);}
     
-    virtual bool isNodeInPart(int gloindex) const
+    virtual bool isNodeInPart(const int &gloindex) const
     {return VEC_T::is_invec(node_loc, gloindex);}
    
     // Determine the position of a given index in the elem_loc array 
-    virtual int get_elemLocIndex(const int &gloindex) const;
+    virtual int get_elemLocIndex(const int &gloindex) const
+    {return VEC_T::get_pos(elem_loc, gloindex);}
 
     // Determine the position of a given index in the local_to_global array
     virtual int get_nodeLocGhoIndex(const int &gloindex) const
@@ -81,7 +84,6 @@ class Part_Tet : public IPart
     virtual int get_nlocghonode() const {return nlocghonode;}
     virtual int get_cpu_rank() const {return cpu_rank;}
     virtual int get_cpu_size() const {return cpu_size;}
-    virtual int get_dual_edge_ncommon() const {return dual_edge_ncommon;}
 
     virtual int get_nElem() const {return nElem;}
     virtual int get_nFunc() const {return nFunc;}
@@ -108,15 +110,10 @@ class Part_Tet : public IPart
     std::vector<int> node_ghost;
     std::vector<int> local_to_global;
 
-    int nlocalnode;
-    int nghostnode;
-    int ntotalnode;
-    int nbadnode;
-    int nlocghonode;
+    int nlocalnode, nghostnode, ntotalnode, nbadnode, nlocghonode;
 
     // 3. CPU info and partition parameters
     int cpu_rank, cpu_size;
-    int dual_edge_ncommon;
 
     // 4. global mesh info
     int nElem, nFunc, sDegree, tDegree, uDegree, nLocBas;
@@ -134,8 +131,7 @@ class Part_Tet : public IPart
         const IGlobal_Part * const &gpart,
         const Map_Node_Index * const &mnindex,
         const IIEN * const &IEN,
-        const std::vector<double> &ctrlPts,
-        const bool &isPrintinfo );
+        const int &field = 0 );
 };
 
 #endif

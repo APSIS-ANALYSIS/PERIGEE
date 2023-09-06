@@ -4,10 +4,16 @@
 // APart_Basic_Info.hpp
 // This class stores basic mesh partition info:
 // 
+// In the preprocessing stage, there will be the number of CPUs assigned
+// for mesh partition; in each file, there will also be a rank ID to
+// identify the corresponding CPU of the file. The cpu_size and cpu_rank
+// are stored in Part_Info of the hdf5 file. This class will load the two
+// from the hdf5 file. 
+//
 // cpu_rank : index of the cpu
 // cpu_size : total number of cpu's for the simulation
-// dual_edge_ncommon : parameter for mesh partition.
 //
+// Author: Ju Liu
 // Date: Nov. 8th 2013
 // ==================================================================
 #include "HDF5_Reader.hpp"
@@ -29,8 +35,6 @@ class APart_Basic_Info
     
     virtual int get_cpu_size() const {return cpu_size;}
     
-    virtual int get_dual_edge_ncommon() const {return dual_edge_ncommon;}
-
     virtual void print_info() const;
   
   private:
@@ -39,7 +43,7 @@ class APart_Basic_Info
     // --------------------------------------------------------------
     APart_Basic_Info(){};  
 
-    int cpu_rank, cpu_size, dual_edge_ncommon;
+    int cpu_rank, cpu_size;
 };
 
 #endif

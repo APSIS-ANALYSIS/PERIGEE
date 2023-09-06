@@ -29,6 +29,7 @@
 // Date Created: Jan. 8 2021.
 // ==================================================================
 #include "FEAElement.hpp"
+#include "Math_Tools.hpp"
 
 class FEAElement_Triangle6_membrane : public FEAElement
 {
@@ -45,8 +46,6 @@ class FEAElement_Triangle6_membrane : public FEAElement
     virtual int get_Type() const {return 524;}
 
     virtual int get_numQuapts() const {return numQuapts;}
-
-    virtual int get_numType() const {return 1;}
 
     virtual int get_nLocBas() const {return 6;}
 

@@ -8,7 +8,7 @@ void SV_T::update_sv_vtu( const std::string &filename,
   std::vector<int> vecIEN;
   std::vector<double> ctrlPts;
 
-  TET_T::read_vtu_grid(filename, nFunc, nElem, ctrlPts, vecIEN);
+  VTK_T::read_vtu_grid(filename, nFunc, nElem, ctrlPts, vecIEN);
 
   // Read element index
   vtkXMLUnstructuredGridReader * reader = vtkXMLUnstructuredGridReader::New();
@@ -32,7 +32,7 @@ void SV_T::update_sv_vtu( const std::string &filename,
 
   reader->Delete();
 
-  // Determine the starting indices
+  // Determine the starting indices as the minimum in nid / eid
   sv_node_start = *std::min_element( nid.begin(), nid.end() );
   sv_elem_start = *std::min_element( eid.begin(), eid.end() );
 
@@ -42,8 +42,7 @@ void SV_T::update_sv_vtu( const std::string &filename,
   fend.assign( fname.end()-4 , fname.end() );
 
   // If the last four is .vtu, remove them for TET_T::write_tet_grid 
-  if(fend.compare(".vtu") == 0)
-    fname.erase( fname.end()-4, fname.end() );
+  if(fend.compare(".vtu") == 0) fname.erase( fname.end()-4, fname.end() );
 
   TET_T::write_tet_grid(fname, nFunc, nElem, ctrlPts, vecIEN);
 }
@@ -67,7 +66,7 @@ void SV_T::gen_sv_fsi_vtus( const std::string &filename_f,
   std::vector<int> vecIEN_f;
   std::vector<double> ctrlPts_f;
 
-  TET_T::read_vtu_grid(filename_f, nFunc_f, nElem_f, ctrlPts_f, vecIEN_f);
+  VTK_T::read_vtu_grid(filename_f, nFunc_f, nElem_f, ctrlPts_f, vecIEN_f);
 
   // The FSI mesh IEN and control points start from those in fluid sub-domain
   VEC_T::insert_end( wIEN, vecIEN_f );
@@ -79,17 +78,17 @@ void SV_T::gen_sv_fsi_vtus( const std::string &filename_f,
   // Read the interface mesh
   // This surface mesh is assumed to be the UPDATED fluid wall vtp mesh.
   int nFunc_i, nElem_i;
-  std::vector<int> vecIEN_i, node_idx_i, elem_idx_i;
+  std::vector<int> vecIEN_i;
   std::vector<double> ctrlPts_i;
-  TET_T::read_vtp_grid( filename_f_wall, nFunc_i, nElem_i, ctrlPts_i,
-      vecIEN_i, node_idx_i, elem_idx_i );
+  VTK_T::read_vtp_grid( filename_f_wall, nFunc_i, nElem_i, ctrlPts_i, vecIEN_i );
+  std::vector<int> node_idx_i = VTK_T::read_int_PointData(filename_f_wall, "GlobalNodeID");
 
   // Read solid mesh
   int nFunc_s, nElem_s;
   std::vector<int> vecIEN_s;
   std::vector<double> ctrlPts_s;
 
-  TET_T::read_vtu_grid(filename_s, nFunc_s, nElem_s, ctrlPts_s, vecIEN_s);
+  VTK_T::read_vtu_grid(filename_s, nFunc_s, nElem_s, ctrlPts_s, vecIEN_s);
 
   // Create a node mapping for the solid nodes that maps the solid own
   // node index to the whole FSI mesh nodal index.
@@ -115,7 +114,7 @@ void SV_T::gen_sv_fsi_vtus( const std::string &filename_f,
   SYS_T::print_fatal_if( counter != nFunc_s - nFunc_i, "Error: SV_T::merge_sv_vtus, there are points in the interface not located in the solid domain. \n");
 
   // Clean the interface data
-  VEC_T::clean(ctrlPts_i); VEC_T::clean(node_idx_i); VEC_T::clean(elem_idx_i);
+  VEC_T::clean(ctrlPts_i); VEC_T::clean(node_idx_i);
 
   // adjust the solid IEN array in the FSI IEN array
   std::vector<int> tempIEN; tempIEN.resize( vecIEN_s.size() ); 
@@ -235,7 +234,7 @@ void SV_T::update_sv_sur_vtu( const std::string &filename,
   std::vector<int> vecIEN;
   std::vector<double> ctrlPts;
 
-  TET_T::read_vtu_grid( filename, nFunc, nElem, ctrlPts, vecIEN );
+  VTK_T::read_vtu_grid( filename, nFunc, nElem, ctrlPts, vecIEN );
 
   vtkXMLUnstructuredGridReader * reader = vtkXMLUnstructuredGridReader::New();
   reader -> SetFileName( filename.c_str() );
@@ -361,8 +360,8 @@ void SV_T::compare_sv_vtp( const std::string &filename_1,
   std::vector<double> pt_1, pt_2;
   std::vector<int> ien_1, ien_2;
 
-  TET_T::read_vtp_grid( filename_1, numpts_1, numcels_1, pt_1, ien_1 );
-  TET_T::read_vtp_grid( filename_2, numpts_2, numcels_2, pt_2, ien_2 );
+  VTK_T::read_vtp_grid( filename_1, numpts_1, numcels_1, pt_1, ien_1 );
+  VTK_T::read_vtp_grid( filename_2, numpts_2, numcels_2, pt_2, ien_2 );
 
   SYS_T::print_fatal_if(numpts_1 != numpts_2, "Error: SV_T::compare_sv_vtp number of points does not match. \n");
 
@@ -370,10 +369,7 @@ void SV_T::compare_sv_vtp( const std::string &filename_1,
 
   const int numpts = numpts_1;
 
-  std::vector<double> pt2_x, pt2_y, pt2_z;
-  pt2_x.resize(numpts);
-  pt2_y.resize(numpts);
-  pt2_z.resize(numpts);
+  std::vector<double> pt2_x(numpts), pt2_y(numpts), pt2_z(numpts);
   for(int ii=0; ii<numpts; ++ii)
   {
     pt2_x[ii] = pt_2[3*ii];
@@ -385,11 +381,7 @@ void SV_T::compare_sv_vtp( const std::string &filename_1,
   std::vector<int> map_idx; map_idx.resize(numpts);
   for(int ii=0; ii<numpts; ++ii)
   {
-    const double coor_x = pt_1[3*ii+0];
-    const double coor_y = pt_1[3*ii+1];
-    const double coor_z = pt_1[3*ii+2];
-
-    const int loc = find_idx( pt_1, numpts, coor_x, coor_y, coor_z, 1.0e-15 );
+    const int loc = find_idx( pt_1, numpts, pt2_x[ii], pt2_y[ii], pt2_z[ii], 1.0e-15 );
     SYS_T::print_fatal_if( loc == -1, "Error: SV_T::compare_sv_vtp, There are points not found in the vtp file.\n" );
     map_idx[ii] = loc;
   }

@@ -1,308 +1,5 @@
 #include "Tet_Tools.hpp"
 
-void TET_T::read_vtu_grid( const std::string &filename,
-    int &numpts, int &numcels,
-    std::vector<double> &pt, std::vector<int> &ien_array )
-{
-  vtkXMLUnstructuredGridReader * reader = vtkXMLUnstructuredGridReader::New();
-  reader -> SetFileName( filename.c_str() );
-  reader -> Update();
-  reader -> GlobalWarningDisplayOff();
-  vtkUnstructuredGrid * vtkugrid = reader -> GetOutput();
-
-  // Number of grid points in the mesh
-  numpts  = static_cast<int>( vtkugrid -> GetNumberOfPoints() );
-  
-  // Number of cells in the mesh
-  numcels = static_cast<int>( vtkugrid -> GetNumberOfCells() );
-
-  // xyz coordinates of the points
-  pt.clear();
-  for(int ii=0; ii<numpts; ++ii)
-  {
-    double pt_xyz[3];
-    vtkugrid -> GetPoint(ii, pt_xyz);
-    pt.push_back(pt_xyz[0]);
-    pt.push_back(pt_xyz[1]);
-    pt.push_back(pt_xyz[2]);
-  }
- 
-  // Connectivity of the mesh 
-  ien_array.clear();
-  
-  for(int ii=0; ii<numcels; ++ii)
-  {
-    vtkCell * cell = vtkugrid -> GetCell(ii);
-
-    if( cell->GetCellType() == 10 ) 
-    {
-      // cell type 10 is four-node tet
-      ien_array.push_back( static_cast<int>( cell->GetPointId(0) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(3) ) );
-    }
-    else if( cell-> GetCellType() == 22 )
-    {
-      // cell type 22 is six-node triangle
-      ien_array.push_back( static_cast<int>( cell->GetPointId(0) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(3) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(4) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(5) ) );
-    }
-    else if( cell-> GetCellType() == 24 )
-    {
-      // cell type 24 is ten-node tet
-      ien_array.push_back( static_cast<int>( cell->GetPointId(0) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(3) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(4) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(5) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(6) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(7) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(8) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(9) ) );
-    }
-    else SYS_T::print_fatal("Error: TET_T::read_vtu_grid read a mesh with VTK cell type 10, 24, or 22. \n"); 
-  }
-
-  reader->Delete();
-}
-
-
-std::vector<int> TET_T::read_int_CellData( const std::string &filename,
-    const std::string &dataname )
-{
-  vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
-  reader -> SetFileName( filename.c_str() );
-  reader -> Update();
-  
-  vtkCellData * celldata = nullptr;
-  int numcels = -1;
-
-  // Downcasting will return null if fails
-  if(dynamic_cast<vtkPolyData*>(reader->GetOutput()))
-  {
-    vtkPolyData * vtkgrid = reader -> GetPolyDataOutput (); 
-    celldata = vtkgrid->GetCellData();
-    numcels = static_cast<int>( vtkgrid -> GetNumberOfCells() );
-  }
-  else if(dynamic_cast<vtkUnstructuredGrid*>(reader->GetOutput()))
-  {
-    vtkUnstructuredGrid * vtkgrid = reader -> GetUnstructuredGridOutput();
-    celldata = vtkgrid->GetCellData();
-    numcels = static_cast<int>( vtkgrid -> GetNumberOfCells() );
-  }
-  else
-    SYS_T::print_fatal("TET_T::read_int_CellData unknown vtk object type.\n");
-
-  vtkDataArray * cd = celldata->GetScalars( dataname.c_str() );
-
-  std::vector<int> data( numcels );
-  for(int ii=0; ii<numcels; ++ii)
-    data[ii] = static_cast<int>( cd->GetComponent(ii, 0) );
-
-  reader -> Delete();
-
-  return data;
-}
-
-
-std::vector<double> TET_T::read_double_CellData( const std::string &filename,
-    const std::string &dataname )
-{
-  vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
-  reader -> SetFileName( filename.c_str() );
-  reader -> Update();
-  
-  vtkCellData * celldata = nullptr;
-  int numcels = -1;
-
-  // Downcasting will return null if fails
-  if(dynamic_cast<vtkPolyData*>(reader->GetOutput()))
-  {
-    vtkPolyData * vtkgrid = reader -> GetPolyDataOutput (); 
-    celldata = vtkgrid->GetCellData();
-    numcels = static_cast<int>( vtkgrid -> GetNumberOfCells() );
-  }
-  else if(dynamic_cast<vtkUnstructuredGrid*>(reader->GetOutput()))
-  {
-    vtkUnstructuredGrid * vtkgrid = reader -> GetUnstructuredGridOutput();
-    celldata = vtkgrid->GetCellData();
-    numcels = static_cast<int>( vtkgrid -> GetNumberOfCells() );
-  }
-  else
-    SYS_T::print_fatal("TET_T::read_double_CellData unknown vtk object type.\n");
-
-  vtkDataArray * cd = celldata->GetScalars( dataname.c_str() );
-
-  std::vector<double> data( numcels );
-  for(int ii=0; ii<numcels; ++ii)
-    data[ii] = static_cast<double>( cd->GetComponent(ii, 0) );
-
-  reader -> Delete();
-
-  return data;
-}
-
-
-std::vector<int> TET_T::read_int_PointData( const std::string &filename,
-    const std::string &dataname )
-{
-  vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
-  reader -> SetFileName( filename.c_str() );
-  reader -> Update();
-  
-  vtkPointData * pointdata = nullptr;
-  int numpts = -1;
-
-  // Downcasting will return null if fails
-  if(dynamic_cast<vtkPolyData*>(reader->GetOutput()))
-  {
-    vtkPolyData * vtkgrid = reader -> GetPolyDataOutput (); 
-    pointdata = vtkgrid->GetPointData();
-    numpts = static_cast<int>( vtkgrid -> GetNumberOfPoints() );
-  }
-  else if(dynamic_cast<vtkUnstructuredGrid*>(reader->GetOutput()))
-  {
-    vtkUnstructuredGrid * vtkgrid = reader -> GetUnstructuredGridOutput();
-    pointdata = vtkgrid->GetPointData();
-    numpts = static_cast<int>( vtkgrid -> GetNumberOfPoints() );
-  }
-  else
-    SYS_T::print_fatal("TET_T::read_int_PointData unknown vtk object type.\n");
-
-  vtkDataArray * pd = pointdata->GetScalars( dataname.c_str() );
-
-  std::vector<int> data( numpts );
-  for(int ii=0; ii<numpts; ++ii)
-    data[ii] = static_cast<int>( pd->GetComponent(ii, 0) );
-
-  reader -> Delete();
-
-  return data;
-}
-
-
-std::vector<double> TET_T::read_double_PointData( const std::string &filename,
-    const std::string &dataname )
-{
-  vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
-  reader -> SetFileName( filename.c_str() );
-  reader -> Update();
-  
-  vtkPointData * pointdata = nullptr;
-  int numpts = -1;
-
-  // Downcasting will return null if fails
-  if(dynamic_cast<vtkPolyData*>(reader->GetOutput()))
-  {
-    vtkPolyData * vtkgrid = reader -> GetPolyDataOutput (); 
-    pointdata = vtkgrid->GetPointData();
-    numpts = static_cast<int>( vtkgrid -> GetNumberOfPoints() );
-  }
-  else if(dynamic_cast<vtkUnstructuredGrid*>(reader->GetOutput()))
-  {
-    vtkUnstructuredGrid * vtkgrid = reader -> GetUnstructuredGridOutput();
-    pointdata = vtkgrid->GetPointData();
-    numpts = static_cast<int>( vtkgrid -> GetNumberOfPoints() );
-  }
-  else
-    SYS_T::print_fatal("TET_T::read_double_PointData unknown vtk object type.\n");
-
-  vtkDataArray * pd = pointdata->GetScalars( dataname.c_str() );
-
-  std::vector<double> data( numpts );
-  for(int ii=0; ii<numpts; ++ii)
-    data[ii] = static_cast<double>( pd->GetComponent(ii, 0) );
-
-  reader -> Delete();
-
-  return data;
-}
-
-
-void TET_T::read_vtu_grid( const std::string &filename,
-    int &numpts, int &numcels,
-    std::vector<double> &pt, std::vector<int> &ien_array,
-    std::vector<int> &phy_tag )
-{
-  read_vtu_grid(filename, numpts, numcels, pt, ien_array);
-  
-  phy_tag = read_int_CellData(filename, "Physics_tag");
-}
-
-
-void TET_T::read_vtu_grid( const std::string &filename,
-    int &numpts, int &numcels,
-    std::vector<double> &pt, std::vector<int> &ien_array,
-    std::vector<int> &global_node_index,
-    std::vector<int> &global_elem_index )
-{
-  read_vtu_grid(filename, numpts, numcels, pt, ien_array);
-  
-  global_node_index = read_int_PointData(filename, "GlobalNodeID"); 
-
-  global_elem_index = read_int_CellData(filename, "GlobalElementID");
-}
-
-
-void TET_T::read_vtp_grid( const std::string &filename,
-    int &numpts, int &numcels,
-    std::vector<double> &pt, std::vector<int> &ien_array )
-{
-  vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
-  reader -> SetFileName( filename.c_str() );
-  reader -> Update();
-  vtkPolyData * polydata = reader -> GetOutput();
-  numpts = static_cast<int>( polydata -> GetNumberOfPoints() );
-  numcels = static_cast<int>( polydata -> GetNumberOfPolys() );
-
-  pt.clear();
-  for(int ii=0; ii<numpts; ++ii)
-  {
-    double pt_xyz[3];
-    polydata -> GetPoint(ii, pt_xyz);
-    pt.push_back(pt_xyz[0]);
-    pt.push_back(pt_xyz[1]);
-    pt.push_back(pt_xyz[2]);
-  }
-
-  ien_array.clear();
-  for(int ii=0; ii<numcels; ++ii)
-  {
-    vtkCell * cell = polydata -> GetCell(ii);
-
-    if( cell->GetCellType() == 5 )
-    {
-      ien_array.push_back( static_cast<int>( cell->GetPointId(0) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
-      ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
-    }
-    else SYS_T::print_fatal("Error: read_vtp_grid read a mesh with non triangle elements. \n");
-  }
-
-  reader->Delete();
-}
-
-
-void TET_T::read_vtp_grid( const std::string &filename,
-    int &numpts, int &numcels,
-    std::vector<double> &pt, std::vector<int> &ien_array,
-    std::vector<int> &global_node_index,
-    std::vector<int> &global_elem_index )
-{
-  read_vtp_grid(filename, numpts, numcels, pt, ien_array);
-  
-  global_node_index = read_int_PointData(filename, "GlobalNodeID"); 
-
-  global_elem_index = read_int_CellData(filename, "GlobalElementID");
-}
-
-
 void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt,
@@ -409,20 +106,18 @@ void TET_T::write_tet_grid( const std::string &filename,
 
   // nodal indices (natural numbering)
   std::vector<int> node_idx(numpts);
-  for(int ii=0; ii<numpts; ++ii)
-    node_idx[ii] = ii;
+  for(int ii=0; ii<numpts; ++ii) node_idx[ii] = ii;
 
-  add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
+  VTK_T::add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
 
   // cell indices (natural numbering)
   std::vector<int> elem_idx(numcels);
-  for(int ii=0; ii<numcels; ++ii)
-    elem_idx[ii] = ii;
+  for(int ii=0; ii<numcels; ++ii) elem_idx[ii] = ii;
 
-  add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
+  VTK_T::add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
 
   // write vtu (by default of the writer function)
-  write_vtkPointSet(filename, grid_w);
+  VTK_T::write_vtkPointSet(filename, grid_w);
 
   VEC_T::clean( node_idx );
   VEC_T::clean( elem_idx );
@@ -443,13 +138,13 @@ void TET_T::write_tet_grid( const std::string &filename,
   gen_tet_grid( grid_w, numpts, numcels, pt, ien_array );
 
   // nodal indices
-  add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
+  VTK_T::add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
 
   // cell indices
-  add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
+  VTK_T::add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
 
   // write vtu (by default of the writer function)
-  write_vtkPointSet(filename, grid_w);
+  VTK_T::write_vtkPointSet(filename, grid_w);
 
   grid_w->Delete();
 }
@@ -469,23 +164,21 @@ void TET_T::write_tet_grid( const std::string &filename,
 
   // nodal indices (natural numbering)
   std::vector<int> node_idx(numpts);
-  for(int ii=0; ii<numpts; ++ii)
-    node_idx[ii] = ii;
+  for(int ii=0; ii<numpts; ++ii) node_idx[ii] = ii;
 
-  add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
+  VTK_T::add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
 
   // cell indices (natural numbering)
   std::vector<int> elem_idx(numcels);
-  for(int ii=0; ii<numcels; ++ii)
-    elem_idx[ii] = ii + start_cell_index;
+  for(int ii=0; ii<numcels; ++ii) elem_idx[ii] = ii + start_cell_index;
 
-  add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
+  VTK_T::add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
 
   // physics tags
-  add_int_CellData( grid_w, phytag, "Physics_tag" );
+  VTK_T::add_int_CellData( grid_w, phytag, "Physics_tag" );
 
   // write vtu or vtk
-  write_vtkPointSet(filename, grid_w, isXML);
+  VTK_T::write_vtkPointSet(filename, grid_w, isXML);
 
   VEC_T::clean( node_idx );
   VEC_T::clean( elem_idx );
@@ -507,16 +200,16 @@ void TET_T::write_tet_grid( const std::string &filename,
   gen_tet_grid( grid_w, numpts, numcels, pt, ien_array );
 
   // nodal indices
-  add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
+  VTK_T::add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
 
   // cell indices
-  add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
+  VTK_T::add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
 
   // physics tags
-  add_int_CellData( grid_w, phytag, "Physics_tag" );
+  VTK_T::add_int_CellData( grid_w, phytag, "Physics_tag" );
 
   // write vtu or vtk
-  write_vtkPointSet(filename, grid_w, isXML);
+  VTK_T::write_vtkPointSet(filename, grid_w, isXML);
 
   grid_w->Delete();
 }
@@ -536,13 +229,13 @@ void TET_T::write_triangle_grid( const std::string &filename,
   gen_triangle_grid( grid_w, numpts, numcels, pt, ien_array );
 
   // nodal indices
-  add_int_PointData( grid_w, node_index, "GlobalNodeID" );
+  VTK_T::add_int_PointData( grid_w, node_index, "GlobalNodeID" );
 
   // cell indices
-  add_int_CellData( grid_w, ele_index, "GlobalElementID");
+  VTK_T::add_int_CellData( grid_w, ele_index, "GlobalElementID");
 
   // write grid_w to vtp file
-  write_vtkPointSet(filename, grid_w);
+  VTK_T::write_vtkPointSet(filename, grid_w);
 
   grid_w->Delete();
 }
@@ -602,13 +295,13 @@ void TET_T::write_quadratic_triangle_grid(
   gen_quadratic_triangle_grid( grid_w, numpts, numcels, pt, ien_array );
 
   // nodal indices
-  add_int_PointData( grid_w, node_index, "GlobalNodeID" );
+  VTK_T::add_int_PointData( grid_w, node_index, "GlobalNodeID" );
 
   // cell indices
-  add_int_CellData( grid_w, ele_index, "GlobalElementID" );
+  VTK_T::add_int_CellData( grid_w, ele_index, "GlobalElementID" );
 
   // write vtu (by default of the writer function)
-  write_vtkPointSet(filename, grid_w);
+  VTK_T::write_vtkPointSet(filename, grid_w);
 
   grid_w->Delete();
 }
@@ -672,15 +365,15 @@ void TET_T::write_triangle_grid( const std::string &filename,
   gen_triangle_grid( grid_w, numpts, numcels, pt, ien_array );
 
   // nodal indices
-  add_int_PointData( grid_w, node_index, "GlobalNodeID" );
+  VTK_T::add_int_PointData( grid_w, node_index, "GlobalNodeID" );
 
   // cell indices
-  add_int_CellData( grid_w, ele_index_1, "GlobalElementID_1" );
+  VTK_T::add_int_CellData( grid_w, ele_index_1, "GlobalElementID_1" );
 
-  add_int_CellData( grid_w, ele_index_2, "GlobalElementID_2" );
+  VTK_T::add_int_CellData( grid_w, ele_index_2, "GlobalElementID_2" );
 
   // write vtp
-  write_vtkPointSet(filename, grid_w);
+  VTK_T::write_vtkPointSet(filename, grid_w);
 
   grid_w->Delete();
 }
@@ -701,128 +394,17 @@ void TET_T::write_quadratic_triangle_grid( const std::string &filename,
   gen_quadratic_triangle_grid( grid_w, numpts, numcels, pt, ien_array );
 
   // nodal indices
-  add_int_PointData( grid_w, node_index, "GlobalNodeID" );
+  VTK_T::add_int_PointData( grid_w, node_index, "GlobalNodeID" );
 
   // cell indices
-  add_int_CellData( grid_w, ele_index_1, "GlobalElementID_1" );
+  VTK_T::add_int_CellData( grid_w, ele_index_1, "GlobalElementID_1" );
 
-  add_int_CellData( grid_w, ele_index_2, "GlobalElementID_2" );
+  VTK_T::add_int_CellData( grid_w, ele_index_2, "GlobalElementID_2" );
 
   // write vtu (by default of write function)
-  write_vtkPointSet(filename, grid_w);
+  VTK_T::write_vtkPointSet(filename, grid_w);
 
   grid_w->Delete();
-}
-
-
-void TET_T::add_int_PointData( vtkPointSet * const &grid_w,
-    const std::vector<int> &ptdata, const std::string &dataname )
-{
-  SYS_T::print_fatal_if( ptdata.size() != static_cast<unsigned int>( grid_w -> GetNumberOfPoints() ), "Error: add_int_PointData data size does not match with the number of points.\n" );
-
-  vtkIntArray * data = vtkIntArray::New();
-  data -> SetNumberOfComponents(1);
-  data -> SetName(dataname.c_str());
-
-  for(unsigned int ii=0; ii<ptdata.size(); ++ii)
-    data -> InsertComponent(ii, 0, ptdata[ii]);
-
-  grid_w -> GetPointData() -> AddArray( data );
-  data -> Delete();
-}
-
-
-void TET_T::add_double_PointData( vtkPointSet * const &grid_w,
-    const std::vector<double> &ptdata, const std::string &dataname )
-{
-  SYS_T::print_fatal_if( ptdata.size() != static_cast<unsigned int>( grid_w -> GetNumberOfPoints() ), "Error: add_double_PointData data size does not match with the number of points.\n" );
-
-  vtkDoubleArray * data = vtkDoubleArray::New();
-  data -> SetNumberOfComponents(1);
-  data -> SetName(dataname.c_str());
-
-  for(unsigned int ii=0; ii<ptdata.size(); ++ii)
-    data -> InsertComponent(ii, 0, ptdata[ii]);
-
-  grid_w -> GetPointData() -> AddArray( data );
-  data -> Delete();
-}
-
-
-void TET_T::add_int_CellData( vtkPointSet * const &grid_w,
-    const std::vector<int> &cldata, const std::string &dataname )
-{
-  SYS_T::print_fatal_if( cldata.size() != static_cast<unsigned int>( grid_w -> GetNumberOfCells() ), "Error: add_int_CellData data size does not match with the number of cells.\n" );
-
-  vtkIntArray * data = vtkIntArray::New();
-  data -> SetNumberOfComponents(1);
-  data -> SetName(dataname.c_str());
-
-  for(unsigned int ii=0; ii<cldata.size(); ++ii)
-    data -> InsertComponent(ii, 0, cldata[ii]);
-
-  grid_w -> GetCellData() -> AddArray( data );
-  data -> Delete();
-}
-
-
-void TET_T::add_double_CellData( vtkPointSet * const &grid_w,
-    const std::vector<double> &cldata, const std::string &dataname )
-{
-  SYS_T::print_fatal_if( cldata.size() != static_cast<unsigned int>( grid_w -> GetNumberOfCells() ), "Error: add_double_CellData data size does not match with the number of cells.\n" );
-
-  vtkDoubleArray * data = vtkDoubleArray::New();
-  data -> SetNumberOfComponents(1);
-  data -> SetName(dataname.c_str());
-
-  for(unsigned int ii=0; ii<cldata.size(); ++ii)
-    data -> InsertComponent(ii, 0, cldata[ii]);
-
-  grid_w -> GetCellData() -> AddArray( data );
-  data -> Delete();
-}
-
-
-void TET_T::write_vtkPointSet( const std::string &filename,
-    vtkPointSet * const &grid_w, const bool &isXML )
-{
-  if( grid_w -> GetDataObjectType() == VTK_UNSTRUCTURED_GRID )
-  {
-    if ( isXML )
-    {
-      vtkXMLUnstructuredGridWriter * writer = vtkXMLUnstructuredGridWriter::New();
-      std::string name_to_write(filename);
-      name_to_write.append(".vtu");
-      writer -> SetFileName( name_to_write.c_str() );
-
-      writer->SetInputData(grid_w);
-      writer->Write();
-      writer->Delete();
-    }
-    else
-    {
-      vtkUnstructuredGridWriter * writer = vtkUnstructuredGridWriter::New();
-      std::string name_to_write(filename);
-      name_to_write.append(".vtk");
-      writer -> SetFileName( name_to_write.c_str() );
-
-      writer->SetInputData(grid_w);
-      writer->Write();
-      writer->Delete();
-    }
-  }
-  else if( grid_w -> GetDataObjectType() == VTK_POLY_DATA )
-  {
-    vtkXMLPolyDataWriter * writer = vtkXMLPolyDataWriter::New();
-    std::string name_to_write(filename);
-    name_to_write.append(".vtp");
-    writer -> SetFileName( name_to_write.c_str() );
-    writer->SetInputData(grid_w);
-    writer->Write();
-    writer->Delete();
-  }
-  else
-    SYS_T::print_fatal("Error: TET_T::write_vtkPointSet unknown vtkPointSet data. \n");
 }
 
 
@@ -854,41 +436,35 @@ Vector_3 TET_T::get_out_normal( const std::string &file,
 {
   int numpts, numcels;
   std::vector<double> pts;
-  std::vector<int> ien, gnode, gelem;
+  std::vector<int> ien;
 
   // Analyze the file type
   std::string fend; fend.assign( file.end()-4 , file.end() );
 
   if( fend.compare(".vtp") == 0 )
-    TET_T::read_vtp_grid( file, numpts, numcels, pts, ien, gnode, gelem );
+    VTK_T::read_vtp_grid( file, numpts, numcels, pts, ien);
   else if( fend.compare(".vtu") == 0 )
-    TET_T::read_vtu_grid( file, numpts, numcels, pts, ien, gnode, gelem );
+    VTK_T::read_vtu_grid( file, numpts, numcels, pts, ien);
   else
     SYS_T::print_fatal("Error: get_out_normal unknown file type.\n");
 
-  std::vector<int> trn; trn.resize(3); 
-  trn[0] = gnode[ ien[0] ]; // triangle nodes' global indices
-  trn[1] = gnode[ ien[1] ];
-  trn[2] = gnode[ ien[2] ];
+  const std::vector<int> gnode = VTK_T::read_int_PointData(file, "GlobalNodeID");
+  const std::vector<int> gelem = VTK_T::read_int_CellData(file, "GlobalElementID");
+  
+  // triangle nodes' global indices
+  const std::vector<int> trn = { gnode[ ien[0] ], gnode[ ien[1] ], gnode[ ien[2] ] };
 
   const int tete0 = gelem[0]; // triangle's associated tet element indices
 
   SYS_T::print_fatal_if(tete0 == -1, "Error: TET_T::get_out_normal requires the element indices for the vtp file.\n");
 
-  std::vector<int> ten; ten.resize(4);
-  ten[0] = vol_ien->get_IEN(tete0, 0);
-  ten[1] = vol_ien->get_IEN(tete0, 1);
-  ten[2] = vol_ien->get_IEN(tete0, 2);
-  ten[3] = vol_ien->get_IEN(tete0, 3);
-
-  bool gotnode[4];
+  const int ten[4] { vol_ien->get_IEN(tete0, 0), vol_ien->get_IEN(tete0, 1), 
+    vol_ien->get_IEN(tete0, 2), vol_ien->get_IEN(tete0, 3) };
 
   int inside_node = 0, node_check = 0;
   for(int ii=0; ii<4; ++ii)
   {
-    gotnode[ii] = VEC_T::is_invec( trn, ten[ii] );
-
-    if(!gotnode[ii]) inside_node = ten[ii];
+    if( !VEC_T::is_invec( trn, ten[ii] ) ) inside_node = ten[ii];
     else node_check += 1;
   }
 
@@ -913,7 +489,7 @@ Vector_3 TET_T::get_out_normal( const std::string &file,
       vol_ctrlPts[inside_node*3+2] - vol_ctrlPts[3*trn[0]+2] );
 
   // inner product outward with inward, and correct outVec
-  if(inw.dot_product(outVec) > 0.0) outVec.scale(-1.0);
+  if(inw.dot_product(outVec) > 0.0) outVec *= -1.0;
 
   return outVec;
 }
@@ -1076,7 +652,7 @@ void TET_T::tetgenio2vtp( const tetgenio &meshout, const std::string &fName,
   // preparing for mesh file (.vtp) name
   std::string outname(fName);
   outname.append(".");
-  std::string strbcindex = SYS_T::to_string(bcmarker);
+  std::string strbcindex = std::to_string(bcmarker);
   outname.append(strbcindex);
 
   write_triangle_grid( outname, bcnumpt, bcnumcl, tript, 
@@ -1215,21 +791,15 @@ namespace TET_T
 
   int Tet4::get_face_id( const int &n0, const int &n1, const int &n2) const
   {
-    int temp[] = { n0, n1, n2 };
+    const int temp[3] { n0, n1, n2 };
 
-    int * it0, * it1, * it2, * it3;
+    const auto it0 = std::find(temp, temp+3, gindex[0]);
+    const auto it1 = std::find(temp, temp+3, gindex[1]);
+    const auto it2 = std::find(temp, temp+3, gindex[2]);
+    const auto it3 = std::find(temp, temp+3, gindex[3]);
 
-    it0 = std::find(temp, temp+3, gindex[0]);
-    it1 = std::find(temp, temp+3, gindex[1]);
-    it2 = std::find(temp, temp+3, gindex[2]);
-    it3 = std::find(temp, temp+3, gindex[3]);
-
-    // flgx is true if the node is found in temp
-    bool flg[4];
-    flg[0] = (it0 != temp+3);
-    flg[1] = (it1 != temp+3);
-    flg[2] = (it2 != temp+3);
-    flg[3] = (it3 != temp+3);
+    // flg is true if the node is found in temp
+    bool flg[4] { (it0 != temp+3), (it1 != temp+3), (it2 != temp+3), (it3 != temp+3) };
 
     int sum = flg[0] + flg[1] + flg[2] + flg[3];
 
@@ -1285,10 +855,10 @@ namespace TET_T
 
     std::vector<int> input_node_index(gindex, gindex+4);
 
-    add_int_PointData( grid_w, input_node_index, "GlobalNodeID" );
+    VTK_T::add_int_PointData( grid_w, input_node_index, "GlobalNodeID" );
 
     // write vtu
-    write_vtkPointSet( fileName, grid_w, true );
+    VTK_T::write_vtkPointSet( fileName, grid_w, true );
 
     grid_w->Delete();
   }

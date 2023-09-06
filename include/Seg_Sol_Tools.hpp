@@ -10,7 +10,7 @@
 // ==================================================================
 #include "PDNSolution.hpp"
 #include "Math_Tools.hpp"
-#include "ALocal_Inflow_NodalBC.hpp"
+#include "ALocal_InflowBC.hpp"
 
 namespace SEG_SOL_T
 {
@@ -129,10 +129,9 @@ namespace SEG_SOL_T
   void PlusAiVPV( const double &aa, const double &bb, const double &cc,
       const APart_Node * const &pnode,
       const PDNSolution * const &step, PDNSolution * const &sol );
- 
 
   // ================================================================
-  // Part 2: Insert Inflow values
+  // Part 2: Insert values
   // ----------------------------------------------------------------
   // ! Insert_plug_inflow_UPV: Ths U_P_V 7-dof solution vector's Inflow 
   //                      nodes gets the inflow values inserted.
@@ -145,12 +144,35 @@ namespace SEG_SOL_T
   //   \para sol : the solution class
   // ----------------------------------------------------------------
   void Insert_plug_inflow_UPV(const double &val,
-     const ALocal_Inflow_NodalBC * const &infnbc,
+     const ALocal_InflowBC * const &infnbc,
      PDNSolution * const &sol );
 
+  void Insert_zero_solid_UV( const APart_Node * const &pnode,
+      PDNSolution * const &sol );
 
   // ================================================================
-  // Part 3: Check solution
+  // Part 3: Extract values
+  // ----------------------------------------------------------------
+  // ! extract_solid_U : The U-P-V 7-dof solution's solid displacement
+  //                     gets extracted to a 3-dof solution vector.
+  //   This function is designed for assessing the convergence in the 
+  //   prestress generation algorithm.
+  // ================================================================
+  void Extract_solid_U( const APart_Node * const &pnode,
+      const PDNSolution * const &sol, PDNSolution * const &output );
+
+  // ----------------------------------------------------------------
+  // ! extract_solid_P : The U-P-V 7-dof solution's solid pressure
+  //                     gets extracted to a single dof solution vector.
+  //   Note: the pressure on the solid-fluid interface is set to be
+  //   zero in the output. This function is designed for assessing the
+  //   convergence in the prestress generation algorithm.
+  // ----------------------------------------------------------------
+  void Extract_solid_P( const APart_Node * const &pnode,
+      const PDNSolution * const &sol, PDNSolution * const &output );
+
+  // ================================================================
+  // Part 4: Check solution
   // ----------------------------------------------------------------
   // ! CheckUV: This routine checks the dot{U}_n+alpha_m - V_n+alpha_f
   //            = 0 for all the consistent Newton-Raphson iterations.

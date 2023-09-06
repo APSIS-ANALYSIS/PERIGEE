@@ -50,8 +50,7 @@ class ALocal_EBC
     // ! get the number of surface cells within this partition.
     //   \para 0 <= ii < num_ebc
     // ------------------------------------------------------------------------
-    virtual int get_num_local_cell(const int &ii) const 
-    {return num_local_cell[ii];}
+    virtual int get_num_local_cell(const int &ii) const {return num_local_cell[ii];}
 
     // ------------------------------------------------------------------------
     // ! get the number of local basis functions of the surface cells. This is
@@ -121,6 +120,8 @@ class ALocal_EBC
     // sien : length cell_nLocBas[ii].
     // ------------------------------------------------------------------------
     virtual void get_SIEN( const int &ii, const int &eindex, int * const &sien ) const;
+
+    virtual std::vector<int> get_SIEN( const int &ii, const int &eindex ) const;
 
     // ------------------------------------------------------------------------
     // get_intPts_xyz: returns the surface element's interior point

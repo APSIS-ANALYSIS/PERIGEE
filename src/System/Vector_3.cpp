@@ -23,7 +23,7 @@ void Vector_3::copy( const Vector_3 &source )
   vec[0] = source(0); vec[1] = source(1); vec[2] = source(2);
 }
 
-void Vector_3::copy( double source[3] )
+void Vector_3::copy( const double source[3] )
 {
   vec[0] = source[0]; vec[1] = source[1]; vec[2] = source[2];
 }
@@ -39,22 +39,12 @@ Vector_3& Vector_3::operator= (const Vector_3 &source)
 
 Vector_3 operator+( const Vector_3 &left, const Vector_3 &right )
 {
-  Vector_3 result;
-  result.vec[0] = left(0) + right(0);
-  result.vec[1] = left(1) + right(1);
-  result.vec[2] = left(2) + right(2);
-
-  return result;
+  return Vector_3( left(0) + right(0), left(1) + right(1), left(2) + right(2) );
 }
 
 Vector_3 operator-( const Vector_3 &left, const Vector_3 &right )
 {
-  Vector_3 result;
-  result.vec[0] = left(0) - right(0);
-  result.vec[1] = left(1) - right(1);
-  result.vec[2] = left(2) - right(2);
-
-  return result;
+  return Vector_3( left(0) - right(0), left(1) - right(1), left(2) - right(2) );
 }
 
 Vector_3& Vector_3::operator+=( const Vector_3 &source )
@@ -86,14 +76,12 @@ Vector_3& Vector_3::operator*=( const double &val )
 
 std::vector<double> Vector_3::to_std_vec() const
 {
-  std::vector<double> outvec;
-  
-  outvec.resize(3);
-  for(int ii=0; ii<3; ++ii) outvec[ii] = vec[ii];
-  
-  std::vector<double>(outvec.begin(), outvec.end()).swap(outvec);
+  return { vec[0], vec[1], vec[2] }; 
+}
 
-  return outvec; 
+std::array<double, 3> Vector_3::to_std_array() const
+{
+  return {{ vec[0], vec[1], vec[2] }}; 
 }
 
 void Vector_3::print() const
@@ -115,34 +103,24 @@ void Vector_3::gen_val(const double &val)
   vec[2] = val;
 }
 
-void Vector_3::gen_rand()
+void Vector_3::gen_rand(const double &left, const double &right)
 {
-  srand(time(NULL));
-
-  for(int ii=0; ii<3; ++ii)
-  {
-    const double value = rand() % 10000;
-
-    vec[ii] = value * 1.0e-3 - 5.0;
-  }
-}
-
-void Vector_3::scale( const double &val )
-{
-  vec[0] *= val; vec[1] *= val; vec[2] *= val;
-}
-
-void Vector_3::AXPY( const double &val, const Vector_3 &source )
-{
-  vec[0] += val * source(0);
-  vec[1] += val * source(1);
-  vec[2] += val * source(2);
+  std::random_device rd;
+  std::mt19937_64 gen( rd() );
+  std::uniform_real_distribution<double> dis(left, right);
+  vec[0] = dis(gen);
+  vec[1] = dis(gen);
+  vec[2] = dis(gen);
 }
 
 double Vector_3::normalize()
 {
   const double len = norm2();
-  scale(1.0/len);
+  const double inv_len = 1.0 / len;
+  vec[0] *= inv_len; 
+  vec[1] *= inv_len; 
+  vec[2] *= inv_len;
+  
   return len;
 }
 
@@ -156,7 +134,7 @@ double dist( const Vector_3 &a, const Vector_3 &b )
   const double dist_x = a.x() - b.x();
   const double dist_y = a.y() - b.y();
   const double dist_z = a.z() - b.z();
-  return sqrt( dist_x*dist_x + dist_y*dist_y + dist_z*dist_z );
+  return std::sqrt( dist_x*dist_x + dist_y*dist_y + dist_z*dist_z );
 }
 
 double dot_product( const Vector_3 &a, const Vector_3 &b )
@@ -185,6 +163,11 @@ Vector_3 cross_product( const Vector_3 &a, const Vector_3 &b )
 {
   return Vector_3( a(1) * b(2) - a(2) * b(1), 
       a(2) * b(0) - a(0) * b(2), a(0) * b(1) - a(1) * b(0) );
+}
+
+Vector_3 operator*( const double &val, const Vector_3 &source )
+{
+  return Vector_3( source.x() * val, source.y() * val, source.z() * val );
 }
 
 // EOF

@@ -375,14 +375,11 @@ void VIS_T::read_epart( const std::string &epart_file, const int &esize,
 {
   std::string fname(epart_file);
   fname.erase( fname.end()-3, fname.end() );
-
   fname.append(".h5");
-  hid_t file_id = H5Fopen( fname.c_str() , H5F_ACC_RDONLY, H5P_DEFAULT );
-  HDF5_Reader * h5r = new HDF5_Reader( file_id );
-  elem_part = h5r->read_intVector( "/", "part" );
-  delete h5r; H5Fclose( file_id );
+  
+  elem_part = HDF5_T::read_intVector( fname.c_str(), "/", "part" );
 
-  if( int(elem_part.size()) != esize ) SYS_T::print_fatal( "Error: the epart file's part length does not match given size. \n" );
+  SYS_T::print_fatal_if( int(elem_part.size()) != esize, "Error: the epart file's part length does not match given size. \n" );
 }
 
 // EOF

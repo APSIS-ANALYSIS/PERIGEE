@@ -11,7 +11,7 @@ FEAElement_Triangle3_membrane::~FEAElement_Triangle3_membrane()
   delete [] R; R = nullptr;
 }
 
-void FEAElement_Triangle3_membrane::print() const
+void FEAElement_Triangle3_membrane::print_info() const
 {
   SYS_T::commPrint("Triangle3_membrane: ");
   SYS_T::commPrint("3-node triangle element in the local lamina coordinate system. \n ");
@@ -123,7 +123,7 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
 void FEAElement_Triangle3_membrane::get_R( const int &quaindex, 
     double * const &basis ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle3_membrane::get_R function error.\n" );
   const int offset = quaindex * nLocBas;
   basis[0] = R[offset];
   basis[1] = R[offset + 1];
@@ -132,7 +132,7 @@ void FEAElement_Triangle3_membrane::get_R( const int &quaindex,
 
 std::vector<double> FEAElement_Triangle3_membrane::get_R( const int &quaindex ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle3_membrane::get_R function error.\n" );
   const int offset = quaindex * nLocBas;
   return { R[offset], R[offset + 1], R[offset + 2] };
 }
@@ -140,7 +140,7 @@ std::vector<double> FEAElement_Triangle3_membrane::get_R( const int &quaindex ) 
 void FEAElement_Triangle3_membrane::get_gradR( const int &quaindex,
     double * const &basis_x, double * const &basis_y ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle3_membrane::get_gradR function error.\n" );
   for( int ii=0; ii<nLocBas; ++ii )
   {
     basis_x[ii] = dR_dx[ii];
@@ -151,7 +151,7 @@ void FEAElement_Triangle3_membrane::get_gradR( const int &quaindex,
 void FEAElement_Triangle3_membrane::get_R_gradR( const int &quaindex,
     double * const &basis, double * const &basis_x, double * const &basis_y ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle3_membrane::get_R_gradR function error.\n" );
   const int offset = quaindex * nLocBas;
   for( int ii=0; ii<nLocBas; ++ii )
   {
@@ -164,14 +164,14 @@ void FEAElement_Triangle3_membrane::get_R_gradR( const int &quaindex,
 Vector_3 FEAElement_Triangle3_membrane::get_2d_normal_out( const int &quaindex, 
     double &area ) const
 {
-  assert(quaindex>=0 && quaindex < numQuapts);
+  ASSERT(quaindex>=0 && quaindex < numQuapts, "FEAElement_Triangle3_membrane::get_2d_normal_out function error.\n" );
   area = detJac;
   return Vector_3( unx, uny, unz );
 }
 
 Matrix_3x3 FEAElement_Triangle3_membrane::get_rotationMatrix( const int &quaindex ) const
 {
-  assert( quaindex >= 0 && quaindex < numQuapts );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle3_membrane::get_rotationMatrix function error.\n" );
   return Q;
 }
 

@@ -5,14 +5,12 @@ MaterialModel_NeoHookean_ST91::MaterialModel_NeoHookean_ST91(
 : rho0( in_rho ), E( in_E ), nu( in_nu ), 
   lambda( nu * E / ((1+nu) * (1-2.0*nu)) ),
   mu( E/(2.0+2.0*nu) ), kappa( lambda + 2.0 * mu / 3.0 ),
-  pt33( 1.0 / 3.0 ), pt67( 2.0 / 3.0 ), mpt67( -1.0 * pt67 ),  
-  I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+  pt33( 1.0 / 3.0 ), mpt67( -2.0 / 3.0 ) 
 {}
 
 MaterialModel_NeoHookean_ST91::MaterialModel_NeoHookean_ST91(
         const char * const &fname )
-: pt33( 1.0 / 3.0 ), pt67( 2.0 / 3.0 ), mpt67( -1.0 * pt67 ),
-  I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+: pt33( 1.0 / 3.0 ), mpt67( -2.0 / 3.0 )
 {
   hid_t h5file = H5Fopen(fname, H5F_ACC_RDONLY, H5P_DEFAULT);
 
@@ -77,7 +75,7 @@ void MaterialModel_NeoHookean_ST91::get_PK( const Matrix_3x3 &F,
   const double detFm0d67 = std::pow(detF, mpt67);
 
   S.copy(Cinv); S.scale( 0.5 * kappa * (detF*detF - 1.0) );
-  S.AXPY( mu * detFm0d67, I);
+  S.AXPI( mu * detFm0d67 );
   S.AXPY( (-1.0) * mu * detFm0d67 * pt33 * C.tr() , Cinv );
   P.MatMult(F,S);
 }
@@ -85,16 +83,18 @@ void MaterialModel_NeoHookean_ST91::get_PK( const Matrix_3x3 &F,
 void MaterialModel_NeoHookean_ST91::get_PK_Stiffness( const Matrix_3x3 &F, 
     Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &Stiffness ) const
 {
+  const Matrix_3x3 I( 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 );
+
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
   
   Matrix_3x3 Cinv(C); Cinv.inverse();
 
   const double detF = F.det();
   const double detF2 = detF * detF;
-  const double detFm0d67 = pow(detF, mpt67);
+  const double detFm0d67 = std::pow(detF, mpt67);
 
   S.copy(Cinv); S.scale( 0.5 * kappa * (detF2 - 1.0) );
-  S.AXPY( mu * detFm0d67, I);
+  S.AXPI( mu * detFm0d67 );
   S.AXPY( (-1.0) * mu * detFm0d67 * pt33 * C.tr() , Cinv );
   P.MatMult(F,S);
 

@@ -1,6 +1,6 @@
 PROJECT(perigee)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
 
 IF(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
@@ -35,7 +35,6 @@ INCLUDE(../../conf/system_lib_loading.cmake)
 # ===============================================
 SET( perigee_source ${perigee_SOURCE_DIR}/../../src )
 SET( perigee_lib_src 
-  ${perigee_source}/System/Sys_Tools.cpp
   ${perigee_source}/System/Vector_3.cpp
   ${perigee_source}/System/SV_Tools.cpp
   ${perigee_source}/System/Math_Tools.cpp

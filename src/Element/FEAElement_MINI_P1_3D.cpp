@@ -9,14 +9,15 @@ FEAElement_MINI_P1_3D::FEAElement_MINI_P1_3D( const int &in_nqp )
   dB_dz = new double [numQuapts];
 }
 
-
 FEAElement_MINI_P1_3D::~FEAElement_MINI_P1_3D()
 {
-  clearBasisCache();
+  delete [] R; R = nullptr;
+  delete [] dB_dx; dB_dx = nullptr;
+  delete [] dB_dy; dB_dy = nullptr;
+  delete [] dB_dz; dB_dz = nullptr;
 }
 
-
-void FEAElement_MINI_P1_3D::print() const
+void FEAElement_MINI_P1_3D::print_info() const
 {
   SYS_T::commPrint("MINI_P1: ");
   SYS_T::commPrint("4-node tet element with quartic bubble. \n");
@@ -24,23 +25,12 @@ void FEAElement_MINI_P1_3D::print() const
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
 }
 
-
-void FEAElement_MINI_P1_3D::clearBasisCache()
-{
-  delete [] R; R = NULL;
-  delete [] dB_dx; dB_dx = NULL;
-  delete [] dB_dy; dB_dy = NULL;
-  delete [] dB_dz; dB_dz = NULL;
-}
-
-
 double FEAElement_MINI_P1_3D::get_memory_usage() const
 {
   const double double_size = 8 * numQuapts + 31;
   const double int_size = 1;
   return double_size * 8.0 + int_size * 4.0;
 }
-
 
 double FEAElement_MINI_P1_3D::get_h( const double * const &ctrl_x,
     const double * const &ctrl_y,
@@ -57,7 +47,6 @@ double FEAElement_MINI_P1_3D::get_h( const double * const &ctrl_x,
   return 2.0 * r;
 }
 
-
 void FEAElement_MINI_P1_3D::get_R( const int &quaindex, 
     double * const &basis ) const
 {
@@ -68,7 +57,6 @@ void FEAElement_MINI_P1_3D::get_R( const int &quaindex,
   basis[3] = R[offset+3];
   basis[4] = R[offset+4];
 }
-
 
 void FEAElement_MINI_P1_3D::get_gradR( const int &quaindex, 
     double * const &basis_x, double * const &basis_y, 
@@ -85,7 +73,6 @@ void FEAElement_MINI_P1_3D::get_gradR( const int &quaindex,
   basis_y[4] = dB_dy[quaindex];
   basis_z[4] = dB_dz[quaindex];
 }
-
 
 void FEAElement_MINI_P1_3D::get_R_gradR( const int &quaindex, 
     double * const &basis, double * const &basis_x, 
@@ -110,13 +97,11 @@ void FEAElement_MINI_P1_3D::get_R_gradR( const int &quaindex,
   basis_z[4] = dB_dz[quaindex];
 }
 
-
 void FEAElement_MINI_P1_3D::get_Jacobian(const int &quaindex,
     double * const &jac_value) const
 {
   for( int ii=0; ii<9; ++ii ) jac_value[ii] = Jac[ii];
 }
-
 
 void FEAElement_MINI_P1_3D::get_invJacobian(const int &quaindex,
     double * const &jac_value) const
@@ -124,13 +109,12 @@ void FEAElement_MINI_P1_3D::get_invJacobian(const int &quaindex,
   for(int ii=0; ii<9; ++ii) jac_value[ii] = Jac[9+ii];
 }
 
-
 void FEAElement_MINI_P1_3D::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_x,
     const double * const &ctrl_y,
     const double * const &ctrl_z )
 {
-  assert( quad -> get_dim() == 4 );
+  ASSERT( quad -> get_dim() == 4, "FEAElement_MINI_P1_3D::buildBasis function error.\n");
 
   // Calculate the geometrical info first
   Jac[0] = ctrl_x[0] * (-1.0) + ctrl_x[1]; // dx_dr
@@ -201,6 +185,5 @@ void FEAElement_MINI_P1_3D::buildBasis( const IQuadPts * const &quad,
     dB_dz[qua] = N_r * Jac[11] + N_s * Jac[14] + N_t * Jac[17];
   }
 }
-
 
 // EOF

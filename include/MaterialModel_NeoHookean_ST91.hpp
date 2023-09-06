@@ -56,8 +56,7 @@ class MaterialModel_NeoHookean_ST91 : public IMaterialModel
 
   private:
     double rho0, E, nu, lambda, mu, kappa;
-    const double pt33, pt67, mpt67;
-    const Matrix_3x3 I;
+    const double pt33, mpt67;
 };
 
 #endif

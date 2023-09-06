@@ -82,7 +82,8 @@ EBC_Partition::EBC_Partition( const IPart * const &part,
       local_cell_node_xyz[ii][3*jj+2] = ebc->get_pt_xyz( ii, local_cell_node[ii][jj], 2 );
       local_cell_node_vol_id[ii][jj] = ebc->get_global_node( ii, local_cell_node[ii][jj] );
       local_cell_node_pos[ii][jj] = part->get_nodeLocGhoIndex( mnindex->get_old2new( local_cell_node_vol_id[ii][jj] ) );
-      assert(local_cell_node_pos[ii][jj] >= 0);
+      
+      SYS_T::print_fatal_if( local_cell_node_pos[ii][jj] < 0, "ERROR: there are nodes on the ebc surface not found in the partition's localtogloal array.\n" );
     }
 
     // now create the new IEN
@@ -140,7 +141,7 @@ void EBC_Partition::write_hdf5( const std::string &FileName,
     if( num_local_cell[ii] > 0 )
     {
       std::string subgroup_name(groupbase);
-      subgroup_name.append( SYS_T::to_string(ii) );
+      subgroup_name.append( std::to_string(ii) );
 
       hid_t group_id = H5Gcreate(g_id, subgroup_name.c_str(), 
           H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);

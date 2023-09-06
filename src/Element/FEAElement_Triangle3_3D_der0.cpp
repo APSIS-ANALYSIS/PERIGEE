@@ -11,7 +11,7 @@ FEAElement_Triangle3_3D_der0::~FEAElement_Triangle3_3D_der0()
   delete [] R; R = nullptr;
 }
 
-void FEAElement_Triangle3_3D_der0::print() const
+void FEAElement_Triangle3_3D_der0::print_info() const
 {
   SYS_T::commPrint("Triangle3_3D_der0: ");
   SYS_T::commPrint("3-node triangle element with no derivative evaluated. \n ");
@@ -58,7 +58,7 @@ void FEAElement_Triangle3_3D_der0::buildBasis( const IQuadPts * const &quad,
 void FEAElement_Triangle3_3D_der0::get_R( const int &quaindex, 
     double * const &basis ) const
 {
-  assert(quaindex>=0 && quaindex < numQuapts);
+  ASSERT(quaindex>=0 && quaindex < numQuapts, "FEAElement_Triangle3_3D_der0::get_R function error.\n" );
   const int offset = quaindex * 3;
   basis[0] = R[offset];
   basis[1] = R[offset+1];
@@ -67,7 +67,7 @@ void FEAElement_Triangle3_3D_der0::get_R( const int &quaindex,
 
 std::vector<double> FEAElement_Triangle3_3D_der0::get_R( const int &quaindex ) const
 {
-  assert(quaindex>=0 && quaindex < numQuapts);
+  ASSERT(quaindex>=0 && quaindex < numQuapts, "FEAElement_Triangle3_3D_der0::get_R function error.\n" );
   const int offset = quaindex * 3;
   return { R[offset], R[offset+1], R[offset+2] };
 }
@@ -75,7 +75,7 @@ std::vector<double> FEAElement_Triangle3_3D_der0::get_R( const int &quaindex ) c
 Vector_3 FEAElement_Triangle3_3D_der0::get_2d_normal_out( const int &quaindex,
     double &area ) const
 {
-  assert(quaindex>=0 && quaindex < numQuapts);
+  ASSERT(quaindex>=0 && quaindex < numQuapts, "FEAElement_Triangle3_3D_der0::get_2d_normal_out function error.\n" );
   area = detJac;
   return Vector_3( unx, uny, unz );
 }

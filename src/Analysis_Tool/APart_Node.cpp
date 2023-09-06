@@ -9,11 +9,11 @@ APart_Node::APart_Node( const std::string &fbasename, const int &rank )
 
   HDF5_Reader * h5r = new HDF5_Reader( file_id );
   
-  nlocalnode = h5r->read_intScalar("Local_Node", "nlocalnode");
-  nghostnode = h5r->read_intScalar("Local_Node", "nghostnode");
-  nbadnode   = h5r->read_intScalar("Local_Node", "nbadnode");
+  nlocalnode  = h5r->read_intScalar("Local_Node", "nlocalnode");
+  nghostnode  = h5r->read_intScalar("Local_Node", "nghostnode");
+  nbadnode    = h5r->read_intScalar("Local_Node", "nbadnode");
   nlocghonode = h5r->read_intScalar("Local_Node", "nlocghonode");
-  ntotalnode = h5r->read_intScalar("Local_Node", "ntotalnode");
+  ntotalnode  = h5r->read_intScalar("Local_Node", "ntotalnode");
 
   local_to_global = h5r->read_intVector("Local_Node", "local_to_global");
   

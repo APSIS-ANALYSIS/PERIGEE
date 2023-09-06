@@ -36,6 +36,7 @@
 // Date created: Feb. 16 2018
 // ==================================================================
 #include "FEAElement.hpp"
+#include "Math_Tools.hpp"
 #include "Matrix_double_6by6_Array.hpp"
 
 class FEAElement_Tet10 : public FEAElement
@@ -48,8 +49,6 @@ class FEAElement_Tet10 : public FEAElement
     virtual int get_elemDim() const {return 3;}
 
     virtual int get_Type() const {return 503;}
-
-    virtual int get_numType() const {return 1;}
 
     virtual int get_numQuapts() const {return numQuapts;}
 

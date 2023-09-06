@@ -17,35 +17,36 @@ class Global_Part_Serial : public IGlobal_Part
 {
   public:
     Global_Part_Serial( const IMesh * const &mesh,
-       const std::string &element_part_name = "epart",
-       const std::string &node_part_name = "npart" );
+        const std::string &element_part_name = "epart",
+        const std::string &node_part_name = "npart" );
+
+    Global_Part_Serial( const int &num_fields,
+        const std::vector<IMesh const *> &mesh_list,
+        const std::string &element_part_name = "epart",
+        const std::string &node_part_name = "npart" );
 
     virtual ~Global_Part_Serial();
 
     virtual idx_t get_epart( const int &ee ) const {return epart[ee];}
-    
-    virtual idx_t get_npart( const int &nn ) const {return npart[nn];}
 
-    virtual bool get_isMETIS() const {return isMETIS;};
-    
-    virtual bool get_isDual() const {return isDual;};
-    
-    virtual int get_dual_edge_ncommon() const {return dual_edge_ncommon;}
-    
+    virtual idx_t get_npart( const int &nn, const int &field = 0 ) const 
+    {return npart[nn + field_offset[field]];}
+
+    virtual bool get_isMETIS() const {return false;};
+
+    virtual bool get_isDual() const {return false;};
+
+    virtual int get_dual_edge_ncommon() const {return 0;}
+
     virtual bool is_serial() const {return true;}
 
   private:
-    const bool isMETIS, isDual;
-    const int dual_edge_ncommon;
-    
-    idx_t * epart;
-    idx_t * npart;
+    idx_t * epart, * npart;
+
+    std::vector<int> field_offset;
 
     virtual void write_part_hdf5( const std::string &fileName, 
-        const idx_t * const &part_in,
-        const int &part_size, const int &cpu_size,
-        const bool &part_isdual, const int &in_ncommon,
-        const bool &isMETIS ) const;
+        const idx_t * const &part_in, const int &part_size ) const;
 };
 
 #endif

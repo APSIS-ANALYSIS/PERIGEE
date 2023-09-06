@@ -18,8 +18,7 @@ EBC_Partition_outflow::EBC_Partition_outflow(
       face_int_NA[ii] = ebc -> get_intNA(ii);
     
       // Obtain the old indices of the face nodes 
-      std::vector<int> old_node_idx; 
-      ebc -> get_global_node(ii, old_node_idx);
+      const std::vector<int> old_node_idx = ebc -> get_global_node(ii);
       
       LID_all_face_nodes[ii].resize( old_node_idx.size() * 3 );
       for(unsigned int jj=0; jj<old_node_idx.size(); ++jj)
@@ -82,7 +81,7 @@ void EBC_Partition_outflow::write_hdf5( const std::string &FileName,
     if( num_local_cell[ii] > 0 )
     {
       std::string subgroup_name( "ebcid_" );
-      subgroup_name.append( SYS_T::to_string(ii) );
+      subgroup_name.append( std::to_string(ii) );
       hid_t subgroup_id = H5Gopen(g_id, subgroup_name.c_str(), H5P_DEFAULT );
 
       h5w->write_doubleVector( subgroup_id, "intNA", face_int_NA[ii] );

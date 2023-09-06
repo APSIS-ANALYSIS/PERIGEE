@@ -19,6 +19,7 @@
 // Author: Ju Liu
 // Date: Nov. 23th 2013
 // ============================================================================
+#include "Math_Tools.hpp"
 #include "APart_Node.hpp"
 
 class PDNSolution
@@ -82,6 +83,13 @@ class PDNSolution
     virtual void PlusAX(const PDNSolution &x, const double &a);
     
     virtual void PlusAX(const PDNSolution * const &x_ptr, const double &a);
+
+    // ------------------------------------------------------------------------
+    // ! Perform solution = solution + a * x
+    //   here x is a plain PETSc Vec object. The user is responsible for making
+    //   sure that the parallel layout is compatible between x and solution. 
+    // ------------------------------------------------------------------------
+    virtual void PlusAX(const Vec &x, const double &a);
 
     // ------------------------------------------------------------------------
     // ! Perform uniform scaling operation : solution = a * solution

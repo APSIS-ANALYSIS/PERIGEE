@@ -11,6 +11,7 @@
 // Author: Ju Liu
 // Date: Aug 21 2019
 // ==================================================================
+#include <vector>
 #include "IGenBC.hpp"
 
 class GenBC_Resistance : public IGenBC

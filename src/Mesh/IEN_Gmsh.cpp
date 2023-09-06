@@ -20,7 +20,7 @@ int IEN_Gmsh::get_IEN( const int &ee, const int &l_node ) const
   return IEN[ee*nLocBas + l_node];
 }
 
-void IEN_Gmsh::print_IEN() const
+void IEN_Gmsh::print_info() const
 {
   std::cout<<std::endl;
   std::cout<<"====== IEN ====== \n";

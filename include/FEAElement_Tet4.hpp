@@ -10,6 +10,7 @@
 // Date Created: Jan 19 2017
 // ==================================================================
 #include "FEAElement.hpp"
+#include "Math_Tools.hpp"
 #include "Matrix_double_3by3_Array.hpp"
 
 class FEAElement_Tet4 : public FEAElement
@@ -24,15 +25,11 @@ class FEAElement_Tet4 : public FEAElement
     // A unique number for this element.
     virtual int get_Type() const {return 501;}
 
-    virtual std::string get_TypeName() const { return "Tet-4"; }
-
-    virtual int get_numType() const {return 1;}
-
     virtual int get_numQuapts() const {return numQuapts;}
 
     virtual int get_nLocBas() const {return 4;}
 
-    virtual void print() const;
+    virtual void print_info() const;
 
     virtual double get_memory_usage() const;
 
@@ -84,37 +81,37 @@ class FEAElement_Tet4 : public FEAElement
 
     virtual std::vector<double> get_d2R_dxx( const int &quaindex ) const
     {
-      assert( quaindex >= 0 && quaindex < numQuapts );
+      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_d2R_dxx function error.\n" );
       return { 0.0, 0.0, 0.0, 0.0 };
     }
 
     virtual std::vector<double> get_d2R_dyy( const int &quaindex ) const
     {
-      assert( quaindex >= 0 && quaindex < numQuapts );
+      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_d2R_dyy function error.\n" );
       return { 0.0, 0.0, 0.0, 0.0 };
     }
 
     virtual std::vector<double> get_d2R_dzz( const int &quaindex ) const
     {
-      assert( quaindex >= 0 && quaindex < numQuapts );
+      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_d2R_dzz function error.\n"  );
       return { 0.0, 0.0, 0.0, 0.0 };
     }
 
     virtual std::vector<double> get_d2R_dxy( const int &quaindex ) const
     {
-      assert( quaindex >= 0 && quaindex < numQuapts );
+      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_d2R_dxy function error.\n"  );
       return { 0.0, 0.0, 0.0, 0.0 };
     }
 
     virtual std::vector<double> get_d2R_dxz( const int &quaindex ) const
     {
-      assert( quaindex >= 0 && quaindex < numQuapts );
+      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_d2R_dxz function error.\n"  );
       return { 0.0, 0.0, 0.0, 0.0 };
     }
 
     virtual std::vector<double> get_d2R_dyz( const int &quaindex ) const
     {
-      assert( quaindex >= 0 && quaindex < numQuapts );
+      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_d2R_dyz function error.\n"  );
       return { 0.0, 0.0, 0.0, 0.0 };
     }
 
@@ -123,8 +120,8 @@ class FEAElement_Tet4 : public FEAElement
 
     virtual std::array<double,9> get_Jacobian( const int &quaindex ) const
     {
-      assert( quaindex >= 0 && quaindex < numQuapts );
-      return {Jac[0], Jac[1], Jac[2], Jac[3], Jac[4], Jac[5], Jac[6], Jac[7], Jac[8]};
+      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_Jacobian function error.\n"  );
+      return {{Jac[0], Jac[1], Jac[2], Jac[3], Jac[4], Jac[5], Jac[6], Jac[7], Jac[8]}};
     }
 
     // Get the inverse Jacobian matrix dr/dx
@@ -132,8 +129,8 @@ class FEAElement_Tet4 : public FEAElement
 
     virtual std::array<double,9> get_invJacobian( const int &quaindex ) const
     {
-      assert( quaindex >= 0 && quaindex < numQuapts );
-      return {Jac[9], Jac[10], Jac[11], Jac[12], Jac[13], Jac[14], Jac[15], Jac[16], Jac[17]};
+      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_invJacobian function error.\n"  );
+      return {{Jac[9], Jac[10], Jac[11], Jac[12], Jac[13], Jac[14], Jac[15], Jac[16], Jac[17]}};
     }
 
     // Get the determinant of the Jacobian matrix

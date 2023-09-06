@@ -1,20 +1,19 @@
 #include "Map_Node_Index.hpp"
 
 Map_Node_Index::Map_Node_Index( const IGlobal_Part * const &gpart,
-    const int &cpu_size, const int &nFunc )
+    const int &cpu_size, const int &nFunc, const int &field )
 {
-  int newnum = 0;
-  old_2_new.resize(nFunc);
-  new_2_old.resize(nFunc);
+  old_2_new.resize(nFunc); new_2_old.resize(nFunc);
   
   std::cout<<"-- generating old2new & new2old index mapping. \n";
 
   // old to new mapping
+  int newnum = 0;
   for(int proc = 0; proc<cpu_size; ++proc)
   {
     for( int nn=0; nn<nFunc; ++nn )
     {
-      if( (int) gpart->get_npart(nn) == proc )
+      if( (int) gpart->get_npart(nn, field) == proc )
       {
         old_2_new[nn] = newnum;
         new_2_old[newnum] = nn;
@@ -22,8 +21,7 @@ Map_Node_Index::Map_Node_Index( const IGlobal_Part * const &gpart,
       }
     }
   }
-  VEC_T::shrink2fit(old_2_new);
-  VEC_T::shrink2fit(new_2_old);
+  VEC_T::shrink2fit(old_2_new); VEC_T::shrink2fit(new_2_old);
   
   std::cout<<"-- mapping generated. Memory usage: ";
   SYS_T::print_mem_size( double(old_2_new.size())*2.0*sizeof(int) );
@@ -67,7 +65,7 @@ void Map_Node_Index::print_info() const
   std::cout<<"========================== "<<std::endl;
 }
 
-void Map_Node_Index::write_hdf5( const char * const &fileName ) const
+void Map_Node_Index::write_hdf5( const std::string &fileName ) const
 {
   std::string fName(fileName);
   fName.append(".h5");

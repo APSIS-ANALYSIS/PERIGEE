@@ -7,6 +7,7 @@
 // modeling of the cardiovascular system
 //
 // ==================================================================
+#include <vector>
 #include "Sys_Tools.hpp"
 
 namespace GENBC_T

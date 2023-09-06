@@ -16,6 +16,7 @@
 // Date: July 12 2016
 // ==================================================================
 #include "FEAElement.hpp"
+#include "HDF5_Tools.hpp"
 
 #include "vtkPointData.h"
 #include "vtkCellData.h"

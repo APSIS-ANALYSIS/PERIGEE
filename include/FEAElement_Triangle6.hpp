@@ -23,13 +23,11 @@ class FEAElement_Triangle6 : public FEAElement
 
     virtual int get_Type() const {return 552;}
 
-    virtual int get_numType() const {return 1;}
-
     virtual int get_numQuapts() const {return numQuapts;}
 
     virtual int get_nLocBas() const {return 6;}
 
-    virtual void print() const;
+    virtual void print_info() const;
 
     virtual double get_memory_usage() const;
 

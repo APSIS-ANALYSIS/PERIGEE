@@ -24,7 +24,7 @@ class IGlobal_Part
 
     virtual idx_t get_epart( const int &ee ) const = 0;
     
-    virtual idx_t get_npart( const int &nn ) const = 0;
+    virtual idx_t get_npart( const int &nn, const int &field = 0 ) const = 0;
 
     virtual bool get_isMETIS() const = 0;
     

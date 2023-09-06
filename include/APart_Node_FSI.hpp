@@ -12,12 +12,14 @@
 // the number by default should be 1. (In FSI problems, 0 domain is
 // fluid domain and 1 domain is solid domain.)
 //
-// local_to_global[ node_loc_solid ] gives the node index for the
+// Usage:
+// local_to_global[ node_loc_solid[ii] ] gives the nodal index for the
 // solid subdomain.
+// local_to_global[ node_loc_fluid[ii] ] gives the nodal index for the
+// fluid subdomain.
 // 
-// The node_loc_fluid is defined similarily for the fluid elements.
-// There may be overlaps for the local solid node list and the local
-// fluid node list.
+// There are non-empty intersection for the local solid node list and 
+// the local fluid node list.
 //
 // Author: Ju Liu
 // Date: Aug. 10 2017
@@ -34,13 +36,15 @@ class APart_Node_FSI : public APart_Node
     virtual void print_info() const;
 
     // Get the solid local node number and indices
-    virtual int get_nlocalnode_solid() const {return nlocalnode_solid;}
+    virtual int get_nlocalnode_solid() const 
+    {return nlocalnode_solid;}
 
     virtual int get_node_loc_solid(const int &index) const
     {return node_loc_solid[index];}
 
     // Get the fluid local node number and indices
-    virtual int get_nlocalnode_fluid() const {return nlocalnode_fluid;}
+    virtual int get_nlocalnode_fluid() const 
+    {return nlocalnode_fluid;}
 
     virtual int get_node_loc_fluid(const int &index) const
     {return node_loc_fluid[index];}

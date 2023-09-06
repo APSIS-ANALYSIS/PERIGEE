@@ -14,13 +14,14 @@
 #include "Sys_Tools.hpp"
 #include "Vec_Tools.hpp"
 #include "Vector_3.hpp"
+#include "IIEN.hpp"
 
 class INodalBC
 {
   public:
-    INodalBC();
+    INodalBC() {};
 
-    virtual ~INodalBC();
+    virtual ~INodalBC() {VEC_T::clean(ID);}
 
     // ------------------------------------------------------------------------
     // get_dir_nodes returns the ii-th dirichlet node's global nodal index.
@@ -67,8 +68,32 @@ class INodalBC
     // print_info() will print the content of dir_nodes, per_slave_nodes, and
     // per_master_nodes on screen.
     // ------------------------------------------------------------------------
-    virtual void print_info() const;
-   
+    virtual void print_info() const
+    {
+      std::cout<<std::endl;
+      std::cout<<"======== BC info ======="<<std::endl;
+      if( get_num_dir_nodes() > 0 )
+      {
+        std::cout<<"Dirichlet nodes: "<<std::endl;
+        for(unsigned int ii=0; ii<get_num_dir_nodes(); ++ii)
+          std::cout<<get_dir_nodes(ii)<<'\t';
+        std::cout<<std::endl;
+      }
+
+      if( get_num_per_nodes() > 0 )
+      {
+        std::cout<<"Periodic master - slave nodes: "<<std::endl;
+        for(unsigned int ii=0; ii<get_num_per_nodes(); ++ii)
+          std::cout<<get_per_master_nodes(ii)<<'\t'<<get_per_slave_nodes(ii)<<std::endl;
+      }
+
+      std::cout<<std::endl<<"ID array: "<<std::endl;
+      for(unsigned int ii=0; ii<ID.size(); ++ii)
+        std::cout<<ID[ii]<<'\t';
+      std::cout<<'\n';
+      std::cout<<std::endl<<"========================"<<std::endl;
+    }
+
     // ------------------------------------------------------------------------
     // get_inf_active_area() return inflow cap surface active area
     // ------------------------------------------------------------------------
@@ -106,7 +131,7 @@ class INodalBC
       SYS_T::print_fatal("Error: INodalBC::get_outnormal is not implemented.\n");
       return Vector_3();
     }
-  
+
     // ------------------------------------------------------------------------
     // get_num_out_bc_pts() return the number of outline boundary points
     // ------------------------------------------------------------------------
@@ -124,7 +149,7 @@ class INodalBC
       SYS_T::print_fatal("Error: INodalBC::get_centroid is not implemented.\n");
       return Vector_3();
     }
-    
+
     // ------------------------------------------------------------------------
     // get_outline_pts() return the outline points. ii ranges from 0 to 3 x
     // num_out_bc_pts[nbc_id]
@@ -134,7 +159,7 @@ class INodalBC
       SYS_T::print_fatal("Error: INodalBC::get_outline_pts is not implemented.\n");
       return 0.0;
     }
-    
+
     // ------------------------------------------------------------------------
     // get_face_area() return inflow cap surface face area
     // ------------------------------------------------------------------------
@@ -167,7 +192,7 @@ class INodalBC
       SYS_T::commPrint("Warning: get_num_node is not implemented. \n");
       return -1;
     }
-  
+
     // --------------------------------------------------------------
     // get_num_cell returns the number of cells on surface
     // --------------------------------------------------------------
@@ -176,7 +201,7 @@ class INodalBC
       SYS_T::commPrint("Warning: get_num_cell is not implemented. \n");
       return -1;
     }
-  
+
     // --------------------------------------------------------------
     // get_num_nLocBas returns the number of local basis on surface
     // --------------------------------------------------------------
@@ -185,7 +210,7 @@ class INodalBC
       SYS_T::commPrint("Warning: get_nLocBas is not implemented. \n");
       return -1;
     }
-  
+
     // --------------------------------------------------------------
     // get_ien returns the surface mesh ien array
     // --------------------------------------------------------------
@@ -230,7 +255,7 @@ class INodalBC
       SYS_T::commPrint("Warning: get_num_caps in not implemented\n");
       return -1;
     }
-    
+
     // --------------------------------------------------------------
     // get_ring_bc_type returns essential bc type for ring nodes
     // --------------------------------------------------------------
@@ -251,14 +276,21 @@ class INodalBC
     // --------------------------------------------------------------
     virtual std::vector<double> get_outnormal() const
     {SYS_T::commPrint("Warning: get_outnormal is not implemented.\n"); return {};}
-  
+
     // --------------------------------------------------------------
     // get_rotation_matrix returns each cap's 3x3 rotation matrix for
     //                     skew boundary conditions
     // --------------------------------------------------------------
     virtual std::vector<double> get_rotation_matrix() const
     {SYS_T::commPrint("Warning: get_rotation_matrix is not implemented. \n"); return {};}
-  
+
+    // --------------------------------------------------------------
+    // Reset the triangle element's surface IEN so that the outward normal
+    // vector is defined.
+    // --------------------------------------------------------------
+    virtual void resetTriIEN_outwardnormal( const IIEN * const &VIEN )
+    {SYS_T::print_fatal("Warning: resetTriIEN_outwardnormal is not implemented. \n");}
+
   protected:
     std::vector<int> ID;
 
@@ -266,7 +298,18 @@ class INodalBC
     // Create_ID() will generate the ID array based on get_dir_nodes and
     // get_per_xxx_nodes.
     // ------------------------------------------------------------------------
-    virtual void Create_ID( const unsigned int &num_node );
+    virtual void Create_ID( const unsigned int &num_node )
+    {
+      ID.resize(num_node); VEC_T::shrink2fit(ID);
+
+      for(unsigned int ii = 0; ii<ID.size(); ++ii) ID[ii] = ii;
+
+      for(unsigned int ii = 0; ii<get_num_dir_nodes(); ++ii)
+        ID[ get_dir_nodes(ii) ] = -1;
+
+      for(unsigned int ii = 0; ii<get_num_per_nodes(); ++ii)
+        ID[ get_per_slave_nodes(ii) ] = get_per_master_nodes(ii);
+    }
 };
 
 #endif

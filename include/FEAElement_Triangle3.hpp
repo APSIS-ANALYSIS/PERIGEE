@@ -22,13 +22,11 @@ class FEAElement_Triangle3 : public FEAElement
 
     virtual int get_Type() const {return 551;}
 
-    virtual int get_numType() const {return 1;}
-
     virtual int get_numQuapts() const {return numQuapts;}
 
     virtual int get_nLocBas() const {return 3;}
 
-    virtual void print() const;
+    virtual void print_info() const;
 
     virtual double get_memory_usage() const;
 
@@ -61,19 +59,19 @@ class FEAElement_Triangle3 : public FEAElement
 
     virtual std::vector<double> get_d2R_dxx( const int &quaindex ) const
     {
-      assert( quaindex >= 0 && quaindex < numQuapts );
+      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle3::get_d2R_dxx function error.\n" );
       return { 0.0, 0.0, 0.0 };
     }
 
     virtual std::vector<double> get_d2R_dyy( const int &quaindex ) const
     {
-      assert( quaindex >= 0 && quaindex < numQuapts );
+      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle3::get_d2R_dyy function error.\n" );
       return { 0.0, 0.0, 0.0 };
     }
 
     virtual std::vector<double> get_d2R_dxy( const int &quaindex ) const
     {
-      assert( quaindex >= 0 && quaindex < numQuapts );
+      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle3::get_d2R_dxy function error.\n" );
       return { 0.0, 0.0, 0.0 };
     }
 

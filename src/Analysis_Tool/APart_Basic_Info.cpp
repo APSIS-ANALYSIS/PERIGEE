@@ -10,7 +10,6 @@ APart_Basic_Info::APart_Basic_Info( const std::string &fileBaseName,
 
   cpu_rank = h5r->read_intScalar("Part_Info", "cpu_rank");
   cpu_size = h5r->read_intScalar("Part_Info", "cpu_size");
-  dual_edge_ncommon = h5r->read_intScalar("Part_Info", "dual_edge_ncommon");
 
   delete h5r; H5Fclose( file_id );
 }
@@ -23,7 +22,6 @@ void APart_Basic_Info::print_info() const
   PetscSynchronizedPrintf(PETSC_COMM_WORLD, "Basic Partition Information: \n");
   PetscSynchronizedPrintf(PETSC_COMM_WORLD, "cpu_rank: %d \n", cpu_rank);
   PetscSynchronizedPrintf(PETSC_COMM_WORLD, "cpu_size: %d \n", cpu_size);
-  PetscSynchronizedPrintf(PETSC_COMM_WORLD, "dual_edge_ncommon: %d \n", dual_edge_ncommon);
   PetscSynchronizedFlush(PETSC_COMM_WORLD, PETSC_STDOUT);
 }
 

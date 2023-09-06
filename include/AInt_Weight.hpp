@@ -5,10 +5,6 @@
 // Analysis Tools: Integration Weights.
 // Stores the Integration weights.
 //
-// Note: This class is used if ParentElement is not used. This class
-//       together with BernsteinBasis class perofrm the same job as
-//       ParentElement class.
-//
 // Date: Nov. 23 2013.
 // ============================================================================
 #include "IQuadPts.hpp"
@@ -16,8 +12,7 @@
 class AInt_Weight
 {
   public:
-    AInt_Weight( const IQuadPts * const &qua_s,
-        const IQuadPts * const &qua_t,
+    AInt_Weight( const IQuadPts * const &qua_s, const IQuadPts * const &qua_t,
         const IQuadPts * const &qua_u );
 
     AInt_Weight( const IQuadPts * const &qua_s, const IQuadPts * const &qua_t );

@@ -175,7 +175,7 @@ double CVFlowRate_Linear2Steady::get_flow_rate( const int &nbc_id,
 
 void CVFlowRate_Linear2Steady::print_info() const
 {
-  SYS_T::commPrint("----------------------------------------------------------- \n");
+  SYS_T::print_sep_line();
   SYS_T::commPrint("     CVFlowRate_Linear2Steady:\n");
   SYS_T::commPrint("     Time to reach steady state is %e \n", thred_time);
   for(int nbc_id = 0; nbc_id < num_nbc; ++nbc_id)
@@ -183,7 +183,7 @@ void CVFlowRate_Linear2Steady::print_info() const
     SYS_T::commPrint("  -- nbc_id = %d", nbc_id);
     SYS_T::commPrint("     target flow rate =%e \n", target_flow_rate[nbc_id]);
   }
-  SYS_T::commPrint("----------------------------------------------------------- \n");
+  SYS_T::print_sep_line();
 }
 
 // EOF

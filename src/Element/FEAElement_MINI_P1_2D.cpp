@@ -16,7 +16,7 @@ FEAElement_MINI_P1_2D::~FEAElement_MINI_P1_2D()
   delete [] dB_dy; dB_dy = NULL;
 }
 
-void FEAElement_MINI_P1_2D::print() const
+void FEAElement_MINI_P1_2D::print_info() const
 {
   SYS_T::commPrint("MINI_P1: ");
   SYS_T::commPrint("4-node triangle element with cubic bubble. \n");
@@ -36,7 +36,7 @@ double FEAElement_MINI_P1_2D::get_memory_usage() const
 void FEAElement_MINI_P1_2D::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_x, const double * const &ctrl_y )
 {
-  assert( quad -> get_dim() == 3 );
+  ASSERT( quad -> get_dim() == 3, "FEAElement_MINI_P1_2D::buildBasis function error.\n");
  
   // Because of the constant strain, we can calculate the 
   // geometrical info first 

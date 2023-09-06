@@ -100,21 +100,11 @@ void PostVectSolution::ReadNodeMapping( const std::string &node_mapping_file,
     const char * const &mapping_type, const int &node_size,
     int * const &nodemap ) const
 {
-  hid_t file_id = H5Fopen(node_mapping_file.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
-  HDF5_Reader * h5r = new HDF5_Reader( file_id );
+  const std::vector<int> temp_nodemap = HDF5_T::read_intVector( node_mapping_file.c_str(), "/", mapping_type );
 
-  const std::vector<int> temp_nodemap = h5r -> read_intVector( "/", mapping_type );
-
-  if( int( temp_nodemap.size() ) != node_size )
-  {
-    PetscPrintf(PETSC_COMM_SELF, "Error: the allocated array has wrong size! \n");
-    MPI_Abort(PETSC_COMM_WORLD, 1);
-  }
+  SYS_T::print_fatal_if(int( temp_nodemap.size() ) != node_size, "Error: PostVectSolution the allocated array has wrong size! \n");
 
   for(int ii=0; ii<node_size; ++ii) nodemap[ii] = temp_nodemap[ii];
-
-  delete h5r;
-  H5Fclose( file_id );
 }
 
 // EOF

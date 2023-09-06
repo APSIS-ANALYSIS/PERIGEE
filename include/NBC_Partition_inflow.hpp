@@ -11,13 +11,12 @@
 // inflow surface area and the inflow surface outward normal vector.
 // 
 // The data recorded in the HDF5 file by this class will be loaded
-// in the ALocal_Inflow_NodalBC class in the analysis code.
+// in the ALocal_InflowBC class in the analysis code.
 //
 // Date crated: Aug. 9 2017
 // Author: Ju Liu
 // ==================================================================
 #include "IPart.hpp"
-#include "Map_Node_Index.hpp"
 #include "INodalBC.hpp"
 
 class NBC_Partition_inflow
@@ -31,9 +30,8 @@ class NBC_Partition_inflow
 
     virtual void write_hdf5( const std::string &FileName ) const;
 
-  private:
-    const int cpu_rank;
-    const int num_nbc;
+  protected:
+    const int cpu_rank, num_nbc;
 
     // Local Dirichlet nodes that belong to different inlet surfaces
     // Length: num_nbc x NumLD[ii], for 0 <= ii < num_nbc
@@ -81,11 +79,6 @@ class NBC_Partition_inflow
     // local cell's global index
     // num_nbc x num_local_cell[ii]
     std::vector< std::vector<int> > local_global_cell;
-  
-    // ------------------------------------------------------------------------
-    // This function is NOT allowed for inflow nbc 
-    virtual void write_hdf5( const std::string &FileName,
-        const std::string &GroupName ) const;
 };
 
 #endif

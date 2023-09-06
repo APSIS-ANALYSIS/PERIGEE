@@ -60,8 +60,8 @@ class Tensor4_2D
     // 2nd-order tensor.
     void gen_symm_id();
 
-    // generate a random 4th-order tensor (mainly used for debuggin)
-    void gen_rand();
+    // generate a random 4th-order tensor (mainly used for debugging)
+    void gen_rand(const double &min = -1.0, const double &max = 1.0);
 
     // generate a zero 4th-order tensor
     void gen_zero();
