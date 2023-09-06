@@ -74,7 +74,7 @@ void HEX_T::gen_hex_grid( vtkUnstructuredGrid * const &grid_w,
 
     for(int ii=0; ii<numcels; ++ii)
     { 
-      std::vector<int> local_ien_msh(ien_array.begin()+27*ii, ien_array.end() + 27*ii + 27);
+      std::vector<int> local_ien_msh(ien_array.begin()+27*ii, ien_array.begin() + 27*ii + 27);
       std::vector<int> local_ien_vtk = HEX_T::reset_node(local_ien_msh);
       for(int lnode=0; lnode<27; ++lnode)
         cl->GetPointIds()->SetId( lnode, local_ien_vtk[lnode] );
