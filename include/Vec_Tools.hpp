@@ -249,7 +249,6 @@ namespace VEC_T
   {
     const auto first = vec.begin() + first_idx;
     const auto last = vec.begin() + last_idx + 1;
-    const std::vector<T> picked(first, last);
 
     return std::vector<T>(first, last);
   }
