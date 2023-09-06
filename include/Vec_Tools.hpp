@@ -248,14 +248,11 @@ namespace VEC_T
   template<typename T> std::vector<T> pick(const std::vector<T> &vec,
       const int &first_idx, const int &last_idx)
   {
-    SYS_T::print_exit_if(first_idx < 0 || last_idx > vec.size()-1 || first_idx >= last_idx,
-      "Error: VEC_T::pick, wrong index is input to cut this vector.");
-    
-    auto first = vec.begin() + first_idx;
-    auto last = vec.begin() + last_idx + 1;
-    std::vector<T> picked(first, last);
+    const auto first = vec.begin() + first_idx;
+    const auto last = vec.begin() + last_idx + 1;
+    const std::vector<T> picked(first, last);
 
-    return picked;
+    return std::vector<T>(first, last);
   }
 }
 
