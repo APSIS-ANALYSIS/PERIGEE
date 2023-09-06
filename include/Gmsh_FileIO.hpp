@@ -181,7 +181,7 @@ class Gmsh_FileIO
         const std::vector<int> &index_2d_need_facemap ) const;
 
   private:
-    Gmsh_FileIO(); // disallow default constructor
+    Gmsh_FileIO() = delete; // disallow default constructor
 
     const std::string filename; // file = xxx.msh
 

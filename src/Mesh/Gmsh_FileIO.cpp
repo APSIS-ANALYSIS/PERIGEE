@@ -1,11 +1,5 @@
 #include "Gmsh_FileIO.hpp"
 
-Gmsh_FileIO::Gmsh_FileIO()
-: filename( "" ), elem_nlocbas{{ 0, 2, 3, 4, 4, 8, 6, 5, 3, 6, 9,
-    10, 27, 18, 14, 1, 8, 20, 15, 13, 9, 10, 12, 15, 15, 21, 
-    4, 5, 6, 20, 35, 56 }}
-{}
-
 Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
 : filename( in_file_name ), elem_nlocbas{{ 0, 2, 3, 4, 4, 8, 6, 5, 3, 6, 9,
     10, 27, 18, 14, 1, 8, 20, 15, 13, 9, 10, 12, 15, 15, 21, 
