@@ -292,8 +292,7 @@ void SV_T::update_sv_sur_vtu( const std::string &filename,
   std::vector<DataVecStr<int>> input_vtk_data {};
   input_vtk_data.push_back({nid, "GlobalNodeID", AssociateObject::Node});
   input_vtk_data.push_back({eid, "GlobalElementID", AssociateObject::Cell});
-  TET_T::write_quadratic_triangle_grid( fname, nFunc, nElem, ctrlPts,
-      vecIEN, input_vtk_data );
+  TET_T::write_quadratic_triangle_grid( fname, nFunc, nElem, ctrlPts, vecIEN, input_vtk_data );
 }
 
 
