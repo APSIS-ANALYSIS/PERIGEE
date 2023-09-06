@@ -130,31 +130,6 @@ void TET_T::write_tet_grid( const std::string &filename,
 }
 
 void TET_T::write_triangle_grid( const std::string &filename,
-    const int &numpts, const int &numcels,
-    const std::vector<double> &pt,
-    const std::vector<int> &ien_array,
-    const std::vector<int> &node_index,
-    const std::vector<int> &ele_index )
-{
-  // Setup the VTK objects
-  vtkPolyData * grid_w = vtkPolyData::New();
-
-  // Generate the mesh
-  gen_triangle_grid( grid_w, numpts, numcels, pt, ien_array );
-
-  // nodal indices
-  VTK_T::add_int_PointData( grid_w, node_index, "GlobalNodeID" );
-
-  // cell indices
-  VTK_T::add_int_CellData( grid_w, ele_index, "GlobalElementID");
-
-  // write grid_w to vtp file
-  VTK_T::write_vtkPointSet(filename, grid_w);
-
-  grid_w->Delete();
-}
-
-void TET_T::write_triangle_grid( const std::string &filename,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, 
       const std::vector<int> &ien_array,
@@ -335,34 +310,6 @@ void TET_T::gen_quadratic_triangle_grid( vtkUnstructuredGrid * const &grid_w,
 
   grid_w -> SetCells(22, cl);
   cl -> Delete();
-}
-
-void TET_T::write_triangle_grid( const std::string &filename,
-    const int &numpts, const int &numcels,
-    const std::vector<double> &pt,
-    const std::vector<int> &ien_array,
-    const std::vector<int> &node_index,
-    const std::vector<int> &ele_index_1,
-    const std::vector<int> &ele_index_2 )
-{
-  // Setup the VTK objects
-  vtkPolyData * grid_w = vtkPolyData::New();
-
-  // Generate the mesh
-  gen_triangle_grid( grid_w, numpts, numcels, pt, ien_array );
-
-  // nodal indices
-  VTK_T::add_int_PointData( grid_w, node_index, "GlobalNodeID" );
-
-  // cell indices
-  VTK_T::add_int_CellData( grid_w, ele_index_1, "GlobalElementID_1" );
-
-  VTK_T::add_int_CellData( grid_w, ele_index_2, "GlobalElementID_2" );
-
-  // write vtp
-  VTK_T::write_vtkPointSet(filename, grid_w);
-
-  grid_w->Delete();
 }
 
 void TET_T::write_quadratic_triangle_grid( const std::string &filename,
@@ -649,8 +596,11 @@ void TET_T::tetgenio2vtp( const tetgenio &meshout, const std::string &fName,
   std::string strbcindex = std::to_string(bcmarker);
   outname.append(strbcindex);
 
-  write_triangle_grid( outname, bcnumpt, bcnumcl, tript, 
-      trien, bcpt, face2elem );
+  std::vector<DataVecStr<int>> input_vtk_data {};
+  input_vtk_data.push_back({bcpt, "GlobalNodeID", AssociateObject::Node});
+  input_vtk_data.push_back({face2elem, "GlobalElementID", AssociateObject::Cell});
+
+  write_triangle_grid( outname, bcnumpt, bcnumcl, tript, trien, input_vtk_data );
   std::cout<<"Surface file "<<outname<<".vtp has been written on disk. \n";  
 }
 

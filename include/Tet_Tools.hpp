@@ -64,30 +64,6 @@ namespace TET_T
       const std::vector<DataVecStr<int>> &IOdata, const bool &isXML = true );
   
   // ----------------------------------------------------------------
-  // ! write_triangle_grid: write the surface mesh described by triangle
-  //                        elements.
-  //   Input: \para filename : the filename.vtp is the file to be written.
-  //          \para numpts : the number of grid points
-  //          \para numcels : the number of tetrahedral elements
-  //          \para pt: xyz coordinates of the linear tets, length 3 numpts
-  //          \para ien_array : connectivity array, length 3 numcels
-  //          \para nodal_index : the point data to be written
-  //          \para elem_index : the element index to be written
-  // ----------------------------------------------------------------
-  void write_triangle_grid( const std::string &filename,
-      const int &numpts, const int &numcels,
-      const std::vector<double> &pt, 
-      const std::vector<int> &ien_array,
-      const std::vector<int> &global_node_index,
-      const std::vector<int> &global_ele_index );
-
-  void write_triangle_grid( const std::string &filename,
-      const int &numpts, const int &numcels,
-      const std::vector<double> &pt, 
-      const std::vector<int> &ien_array,
-      const std::vector<DataVecStr<int>> &IOdata );
-
-  // ----------------------------------------------------------------
   // ! gen_triangle_grid: generate the surface mesh described by triangle
   //                      elements, and pass the data to vtkPolyData.
   //   All input parameters are the same as above, but grid_w is to be
@@ -99,6 +75,22 @@ namespace TET_T
       const std::vector<double> &pt,
       const std::vector<int> &ien_array );
  
+  // ----------------------------------------------------------------
+  // ! write_triangle_grid: write the surface mesh described by triangle
+  //                        elements.
+  //   Input: \para filename : the filename.vtp is the file to be written.
+  //          \para numpts : the number of grid points
+  //          \para numcels : the number of tetrahedral elements
+  //          \para pt: xyz coordinates of the linear tets, length 3 numpts
+  //          \para ien_array : connectivity array, length 3 numcels
+  //          \para IOdata : the integer data to be written on cells or nodes 
+  // ----------------------------------------------------------------
+  void write_triangle_grid( const std::string &filename,
+      const int &numpts, const int &numcels,
+      const std::vector<double> &pt, 
+      const std::vector<int> &ien_array,
+      const std::vector<DataVecStr<int>> &IOdata );
+
   // ----------------------------------------------------------------
   // ! write_quadratic_triangle_grid: write the surface mesh described 
   //                                  by quadratic triangle elements.
@@ -135,24 +127,6 @@ namespace TET_T
       const int &numpts, const int &numcels,
       const std::vector<double> &pt,
       const std::vector<int> &ien_array );
-
-  // ----------------------------------------------------------------
-  // ! write_triangle_grid: write the surface mesh described by triangle
-  //                        elements with two element index arrays.
-  //   The input parameter is identical to the former one, with one
-  //   more array, global_ele_index_2, for the additional triangle-to
-  //   -tetrahedron mapping.
-  //   This function is implemented specifically for the interior
-  //   surface between two physical domains, e.g. interior surface
-  //   in FSI problem.
-  // ----------------------------------------------------------------
-  void write_triangle_grid( const std::string &filename,
-      const int &numpts, const int &numcels,
-      const std::vector<double> &pt, 
-      const std::vector<int> &ien_array,
-      const std::vector<int> &global_node_index,
-      const std::vector<int> &global_ele_index_1, 
-      const std::vector<int> &global_ele_index_2 );
 
   // ----------------------------------------------------------------
   // ! write_quadratic_triangle_grid: write the surface mesh described 
