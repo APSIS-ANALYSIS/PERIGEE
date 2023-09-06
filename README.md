@@ -11,7 +11,7 @@ PERIGEE is a nonlinear dynamic finite element analysis code for multiphysics ana
 - [References](#References)
 
 ## Install
-Please go through the following steps to install external libraries on your own machine.
+We recommend using UNIX-like operating systems, such as Linux and MacOS, for the code development. If you are a Windows user, you may refer [here](docs/install_guidance_windows.md) for a detailed guide. The following instructions are based on a Linux Ubuntu system, and there could be minor differences for Mac users.
 
 1. A quick guide for library installation is [here](docs/install_external_libs.md) and a more advanced guide is [there](docs/install-advanced.md). After the libraries are all properly installed, proceed to step 2.
 
