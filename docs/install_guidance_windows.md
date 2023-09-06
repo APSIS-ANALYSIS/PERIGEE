@@ -4,7 +4,7 @@ To install PERIGEE on Windows, we need to install Windows Subsystem for Linux (W
 
 ### Install WSL
 
-You can refer to the [official guidance](https://learn.microsoft.com/zh-cn/windows/wsl/) for details. According to the official guidance, WSL can be install simply by running the following in "Command Prompt" as administrater and restarting on the Windows with OS build later than 19041.
+You can refer to the [official guidance](https://learn.microsoft.com/zh-cn/windows/wsl/) for details. According to the official guidance, WSL can be installed simply by running the following in "Command Prompt" as administrator and restarting on the Windows with OS build later than 19041.
 ```sh
 wsl --install -d Ubuntu-20.04
 ```
@@ -13,7 +13,7 @@ Here, I post my steps to install WSL.
 
 Open "Control Panel > Programs > Turn Windows features on or off". Select the checkbox of "Windows Subsystem for Linux", click "OK", and then restart your Windows.
 
-Run "Command Prompt" as administrater. Run the following to check the valid distributions that can be installed.
+Run "Command Prompt" as administrator. Run the following to check the valid distributions that can be installed.
 ```sh
 wsl -l -o
 ```
@@ -23,7 +23,7 @@ Then, run the following to install a distribution. Here, "Ubuntu 20.04 LTS" is r
 wsl --install -d Ubuntu-20.04
 ```
 
-Then, Open the application, "Ubuntu 20.04.6 LTS". It will ask you to enter a UNIX name and set a password. After that, you have the WSL successfully installed. If it throws "The attempted operation is not supported for the type of object referenced." Open "Command Prompt" as administrater. Run the following and restart you WSL, not the Windows.
+Then, Open the application "Ubuntu 20.04.6 LTS". It will ask you to enter a UNIX name and set a password. After that, you have the WSL successfully installed. If it throws "The attempted operation is not supported for the type of object referenced." Open "Command Prompt" as administrator. Run the following and restart your WSL, not the Windows.
 ```sh
 net winsock reset
 ```
@@ -115,7 +115,7 @@ cmake ../VTK-8.2.0-src/ -DCMAKE_INSTALL_PREFIX=$HOME/lib/VTK-8.2.0-shared -DBUIL
 make -j 4
 make install
 ```
-Remove the useless files, when VTK is successfully installed.
+Remove the useless files when VTK is successfully installed.
 ```sh
 cd $HOME/lib
 rm -rf build_vtk VTK-8.2.0-src VTK-8.2.0.tar.gz
@@ -124,8 +124,8 @@ After that, you need to add the VTK path to your ``.bashrc``.
 ```sh
 export LD_LIBRARY_PATH=/home/yxh/lib/VTK-8.2.0/lib:$LD_LIBRARY_PATH
 ```
-#### 3. Install PETSC
-Go to the lib directory, download PETSC source, extract the tar bar, and rename the directory as a source directory.
+#### 3. Install PETSc
+Go to the lib directory, download PETSc source, extract the tar bar, and rename the directory as a source directory.
 ```sh
 cd $HOME/lib
 wget http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.18.6.tar.gz
@@ -232,7 +232,7 @@ set(CMAKE_MACOSX_RPATH 1)
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 # EOF
 ```
-Save and exit file. Next, make a build directory.
+Save and exit the file. Next, make a build directory.
 ```sh
 cd $HOME
 mkdir build
