@@ -172,8 +172,7 @@ void SV_T::gen_sv_fsi_vtus( const std::string &filename_f,
   input_vtk_data.clear();
   input_vtk_data.push_back({map_s_node, "GlobalNodeID", AssociateObject::Node});
   input_vtk_data.push_back({map_s_elem, "GlobalElementID", AssociateObject::Cell});
-  TET_T::write_tet_grid( fname, nFunc_s, nElem_s, 
-      ctrlPts_s, vecIEN_s, input_vtk_data );
+  TET_T::write_tet_grid( fname, nFunc_s, nElem_s, ctrlPts_s, vecIEN_s, input_vtk_data );
 
   std::cout<<"Status: "<<filename_s<<" is updated to "<<writename_solid<<'\n';
 }
