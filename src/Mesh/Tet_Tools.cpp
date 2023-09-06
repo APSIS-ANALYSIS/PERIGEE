@@ -203,28 +203,6 @@ void TET_T::write_tet_grid( const std::string &filename,
 
   SYS_T::print_exit_if( name_list.size() != IOdata.size(), "Error: In TET_T::write_tet_grid, there are %d data in the IOdata that have the same name.\n", IOdata.size() - name_list.size() + 1 );
   
-  // We need to assign GlobalNodeID if the user does not provide it explicitly
-  // in IOdata
-  if( !VEC_T::is_invec(name_list, static_cast<std::string>("GlobalNodeID")) )
-  {
-    std::vector<int> node_idx(numpts, -1);
-    for(int ii=0; ii<numpts; ++ii) node_idx[ii] = ii;
-
-    VTK_T::add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
-    VEC_T::clean( node_idx );
-  }
-
-  // We need to assign GlobalElementID if the user does not provide it
-  // explicitly in IOdata
-  if( !VEC_T::is_invec(name_list, static_cast<std::string>("GlobalElementID")) )
-  {
-    std::vector<int> elem_idx(numcels, -1);
-    for(int ii=0; ii<numcels; ++ii) elem_idx[ii] = ii;
-
-    VTK_T::add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
-    VEC_T::clean( elem_idx );
-  }
-
   // We add the IOdata for VTK
   for( auto data : IOdata )
   {
