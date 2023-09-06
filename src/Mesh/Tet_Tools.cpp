@@ -94,97 +94,6 @@ void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
 }
 
 void TET_T::write_tet_grid( const std::string &filename,
-    const int &numpts, const int &numcels,
-    const std::vector<double> &pt, const std::vector<int> &ien_array )
-{
-  // Setup the VTK objects
-  vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
-
-  // Generate the mesh and compute aspect ratios
-  gen_tet_grid( grid_w, numpts, numcels, pt, ien_array );
-
-  // nodal indices (natural numbering)
-  std::vector<int> node_idx(numpts);
-  for(int ii=0; ii<numpts; ++ii) node_idx[ii] = ii;
-
-  VTK_T::add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
-
-  // cell indices (natural numbering)
-  std::vector<int> elem_idx(numcels);
-  for(int ii=0; ii<numcels; ++ii) elem_idx[ii] = ii;
-
-  VTK_T::add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
-
-  // write vtu (by default of the writer function)
-  VTK_T::write_vtkPointSet(filename, grid_w);
-
-  VEC_T::clean( node_idx );
-  VEC_T::clean( elem_idx );
-
-  grid_w->Delete();
-}
-
-void TET_T::write_tet_grid( const std::string &filename,
-    const int &numpts, const int &numcels,
-    const std::vector<double> &pt, const std::vector<int> &ien_array,
-    const std::vector<int> &node_idx, const std::vector<int> &elem_idx )
-{
-  // Setup the VTK objects
-  vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
-
-  // Generate the mesh and compute aspect ratios
-  gen_tet_grid( grid_w, numpts, numcels, pt, ien_array );
-
-  // nodal indices
-  VTK_T::add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
-
-  // cell indices
-  VTK_T::add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
-
-  // write vtu (by default of the writer function)
-  VTK_T::write_vtkPointSet(filename, grid_w);
-
-  grid_w->Delete();
-}
-
-
-void TET_T::write_tet_grid( const std::string &filename,
-    const int &numpts, const int &numcels,
-    const std::vector<double> &pt, const std::vector<int> &ien_array,
-    const std::vector<int> &phytag, const bool &isXML,
-    const int &start_cell_index )
-{
-  // Setup the VTK objects
-  vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
-
-  // Generate the mesh and compute aspect ratios
-  gen_tet_grid( grid_w, numpts, numcels, pt, ien_array );
-
-  // nodal indices (natural numbering)
-  std::vector<int> node_idx(numpts);
-  for(int ii=0; ii<numpts; ++ii) node_idx[ii] = ii;
-
-  VTK_T::add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
-
-  // cell indices (natural numbering)
-  std::vector<int> elem_idx(numcels);
-  for(int ii=0; ii<numcels; ++ii) elem_idx[ii] = ii + start_cell_index;
-
-  VTK_T::add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
-
-  // physics tags
-  VTK_T::add_int_CellData( grid_w, phytag, "Physics_tag" );
-
-  // write vtu or vtk
-  VTK_T::write_vtkPointSet(filename, grid_w, isXML);
-
-  VEC_T::clean( node_idx );
-  VEC_T::clean( elem_idx );
-
-  grid_w->Delete();
-}
-
-void TET_T::write_tet_grid( const std::string &filename,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, const std::vector<int> &ien_array,
       const std::vector< DataVecStr<int> > &IOdata, const bool &isXML )
@@ -219,34 +128,6 @@ void TET_T::write_tet_grid( const std::string &filename,
 
   grid_w->Delete();
 }
-
-void TET_T::write_tet_grid( const std::string &filename,
-    const int &numpts, const int &numcels,
-    const std::vector<double> &pt, const std::vector<int> &ien_array,
-    const std::vector<int> &node_idx, const std::vector<int> &elem_idx, 
-    const std::vector<int> &phytag, const bool &isXML )
-{
-  // Setup the VTK objects
-  vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
-
-  // Generate the mesh and compute aspect ratios
-  gen_tet_grid( grid_w, numpts, numcels, pt, ien_array );
-
-  // nodal indices
-  VTK_T::add_int_PointData( grid_w, node_idx, "GlobalNodeID" );
-
-  // cell indices
-  VTK_T::add_int_CellData( grid_w, elem_idx, "GlobalElementID" );
-
-  // physics tags
-  VTK_T::add_int_CellData( grid_w, phytag, "Physics_tag" );
-
-  // write vtu or vtk
-  VTK_T::write_vtkPointSet(filename, grid_w, isXML);
-
-  grid_w->Delete();
-}
-
 
 void TET_T::write_triangle_grid( const std::string &filename,
     const int &numpts, const int &numcels,
@@ -617,7 +498,17 @@ void TET_T::tetgenio2vtu( const tetgenio &meshout, const std::string &fName )
 
   for(int ii=0; ii<numcel*4; ++ii) ien[ii] = meshout.tetrahedronlist[ii] - index_offset;
 
-  write_tet_grid(fName, numpts, numcel, pt, ien);
+  std::vector<DataVecStr<int>> input_vtk_data {};
+
+  std::vector<int> temp_nid(numpts, 0);
+  for(int ii=0; ii<numpts; ++ii) temp_nid[ii] = ii;
+  input_vtk_data.push_back({temp_nid, "GlobalNodeID", AssociateObject::Node});
+
+  std::vector<int> temp_eid(numcel, 0);
+  for(int ii=0; ii<numcel; ++ii) temp_eid[ii] = ii;
+  input_vtk_data.push_back({temp_eid, "GlobalElementID", AssociateObject::Cell});
+
+  write_tet_grid(fName, numpts, numcel, pt, ien, input_vtk_data);
 
   std::cout<<"Volumetric grid file "<<fName<<".vtu has been written on disk. \n";
 }

@@ -46,8 +46,8 @@ namespace TET_T
   // ----------------------------------------------------------------
   // ! write_tet_grid: write the volumetric mesh described by linear 
   //                   or quadratic tetrahedral elements. The routine
-  //                   will detect the element type from the length of
-  //                   the ien_array and the numcels.
+  //                   will detect the element type based on the length
+  //                   of the ien_array and the numcels.
   //   Input: \para filename : the filename.vtu is the file to be written.
   //          \para numpts : the number of grid points
   //          \para numcels : the number of tetrahedral elements
@@ -55,52 +55,14 @@ namespace TET_T
   //                    3 x numpts
   //          \para ien_array : connectivity array, 
   //                            length 4 or 10 x numcels
-  //          \para node_idx : the nodal index associated with nodes
-  //          \para elem_idx : the element index asscoiated with cells
-  //
-  //   If node_idx, elem_idx are not given, a natural numbering will
-  //   be generated for nodes and cells.
-  //   Additional argument, 
-  //          \para phy_tag : the tag indicating different physical
-  //                          domains.
+  //          \para IOdata : the integer data to be written on cells or nodes 
   //          \para isXML : the flag indicate vtk/vtu format
   // ----------------------------------------------------------------
-  void write_tet_grid( const std::string &filename,
-      const int &numpts, const int &numcels,
-      const std::vector<double> &pt, const std::vector<int> &ien_array );
-  
-  void write_tet_grid( const std::string &filename,
-      const int &numpts, const int &numcels,
-      const std::vector<double> &pt, const std::vector<int> &ien_array,
-      const std::vector<int> &node_idx, const std::vector<int> &elem_idx );
-
-  void write_tet_grid( const std::string &filename,
-      const int &numpts, const int &numcels,
-      const std::vector<double> &pt, const std::vector<int> &ien_array,
-      const std::vector<int> &node_idx, const std::vector<int> &elem_idx,
-      const std::vector<int> &phy_tag, const bool &isXML );
-  
   void write_tet_grid( const std::string &filename,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, const std::vector<int> &ien_array,
       const std::vector<DataVecStr<int>> &IOdata, const bool &isXML = true );
   
-  // ----------------------------------------------------------------
-  // ! write_tet_grid : write a volumetric mesh with 
-  //                    1) NodalIndex; 2) ElemIndex; 3) Phy_tag
-  //   Additional Input compared with original write_tet_grid: 
-  //          \para phy_tag : the vector of physical domain tags
-  //          \para isXML : the flag that determines write as vtk or
-  //                        vtu file
-  //          \para start_cell_index : the starting cell/element index
-  //                        in this subdomain, by default 0
-  // ----------------------------------------------------------------
-  void write_tet_grid( const std::string &filename,
-      const int &numpts, const int &numcels,
-      const std::vector<double> &pt, const std::vector<int> &ien_array,
-      const std::vector<int> &phy_tag, const bool &isXML,
-      const int &start_cell_index = 0 );
-
   // ----------------------------------------------------------------
   // ! write_triangle_grid: write the surface mesh described by triangle
   //                        elements.
