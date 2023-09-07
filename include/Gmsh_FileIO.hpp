@@ -94,6 +94,9 @@ class Gmsh_FileIO
     // is used to give the global domain element index for all output
     // elemental quantities.
     // --------------------------------------------------------------
+    void write_interior_vtp( const std::string &vtp_filename, 
+        const int &index_sur,const int &index_vol1, const int &index_vol2 ) const;
+
     void write_interior_vtp( const int &index_sur,
        const int &index_vol1, const int &index_vol2 ) const;
 

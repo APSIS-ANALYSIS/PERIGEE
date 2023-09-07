@@ -148,8 +148,8 @@ void Gmsh_FileIO::print_info() const
   std::cout<<"=== Total element number : "<<num_elem<<std::endl;
 }
 
-void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
-    const int &index_vol1, const int &index_vol2 ) const
+void Gmsh_FileIO::write_interior_vtp( const std::string &vtp_filename, 
+    const int &index_sur, const int &index_vol1, const int &index_vol2 ) const
 {
   SYS_T::print_exit_if( index_sur >= num_phy_domain_2d || index_sur < 0,
       "Error: Gmsh_FileIO::write_vtp, surface index is wrong. \n");
@@ -166,15 +166,6 @@ void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
     <<" and "<<phy_3d_name[index_vol2]<<std::endl;
 
   SYS_T::Timer * mytimer = new SYS_T::Timer();
-
-  std::string vtp_file_name(phy_2d_name[index_sur]);
-  vtp_file_name += "_";
-  vtp_file_name += phy_3d_name[index_vol1];
-  vtp_file_name += "_";
-  vtp_file_name += phy_3d_name[index_vol2];
-  std::cout<<"-----> write "<<vtp_file_name<<".vtp \n";
-  mytimer->Reset();
-  mytimer->Start();
 
   // Obtain the surface's IEN array associated with global nodal indices
   const int phy_index_sur = phy_2d_index[index_sur];
@@ -318,13 +309,25 @@ void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
   input_vtk_data.push_back({bcpt, "GlobalNodeID", AssociateObject::Node});
   input_vtk_data.push_back({face2elem_1, "GlobalElementID_1", AssociateObject::Cell});
   input_vtk_data.push_back({face2elem_2, "GlobalElementID_2", AssociateObject::Cell});
-  TET_T::write_triangle_grid( vtp_file_name, bcnumpt, bcnumcl,
+  TET_T::write_triangle_grid( vtp_filename, bcnumpt, bcnumcl,
       tript, trien, input_vtk_data );
 
   delete [] bcmap; bcmap = nullptr;
   mytimer->Stop();
   std::cout<<"      Time taken "<<mytimer->get_sec()<<" sec. \n";
   delete mytimer;
+}
+
+void Gmsh_FileIO::write_interior_vtp( const int &index_sur, 
+    const int &index_vol1, const int &index_vol2 ) const
+{
+  std::string vtp_file_name(phy_2d_name[index_sur]);
+  vtp_file_name += "_";
+  vtp_file_name += phy_3d_name[index_vol1];
+  vtp_file_name += "_";
+  vtp_file_name += phy_3d_name[index_vol2];
+  
+  write_interior_vtp(vtp_file_name, index_sur, index_vol1, index_vol2);
 }
 
 void Gmsh_FileIO::write_vtp(const int &index_sur, 
