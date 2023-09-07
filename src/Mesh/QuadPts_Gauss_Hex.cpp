@@ -58,9 +58,9 @@ QuadPts_Gauss_Hex::QuadPts_Gauss_Hex( const int &in_num_pts )
   for(int i = 0; i < nn; ++i){
     for(int j = 0; j < nn; ++j){
       for(int k = 0; k < nn; ++k){
-        qp[nn2*k+nn*j+i          ] = xx[i];
-        qp[nn2*k+nn*j+i+num_pts  ] = xx[j];
-        qp[nn2*k+nn*j+i+num_pts*2] = xx[k];
+        qp[3*(nn2*k+nn*j+i)  ] = xx[i];
+        qp[3*(nn2*k+nn*j+i)+1] = xx[j];
+        qp[3*(nn2*k+nn*j+i)+2] = xx[k];
 
         qw[nn2*k+nn*j+i] = ww[i] * ww[j] * ww[k]; 
       }
