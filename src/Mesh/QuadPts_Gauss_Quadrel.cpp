@@ -1,9 +1,9 @@
-#include "QuadPts_Gauss_Hex.hpp"
+#include "QuadPts_Gauss_Quadrel.hpp"
 
-QuadPts_Gauss_Hex::QuadPts_Gauss_Hex( const int &in_num_pts )
+QuadPts_Gauss_Quadrel::QuadPts_Gauss_Quadrel( const int &in_num_pts )
 : num_pts( in_num_pts )
 {
-  qp.resize( 3 * num_pts );
+  qp.resize( 2 * num_pts );
   qw.resize( num_pts );
   std::vector<double> xx, ww;
   
@@ -13,13 +13,13 @@ QuadPts_Gauss_Hex::QuadPts_Gauss_Hex( const int &in_num_pts )
       xx.push_back(0.5);
       ww.push_back(1.0);
       break;
-    case 8:
+    case 4:
       xx.push_back(0.788675134594813);
       xx.push_back(0.211324865405187);
       ww.push_back(0.5);
       ww.push_back(0.5);
       break;
-    case 27:
+    case 9:
       xx.push_back(0.887298334620742);
       xx.push_back(0.5);
       xx.push_back(0.112701665379258);
@@ -27,7 +27,7 @@ QuadPts_Gauss_Hex::QuadPts_Gauss_Hex( const int &in_num_pts )
       ww.push_back(0.444444444444444);
       ww.push_back(0.277777777777777);
       break;
-    case 64:
+    case 16:
       xx.push_back(0.930568155797026);
       xx.push_back(0.669990521792428);
       xx.push_back(0.330009478207572);
@@ -37,7 +37,7 @@ QuadPts_Gauss_Hex::QuadPts_Gauss_Hex( const int &in_num_pts )
       ww.push_back(0.326072577431273);
       ww.push_back(0.173927422568727);
       break;
-    case 125:
+    case 25:
       xx.push_back(0.953089922969332);
       xx.push_back(0.769234655052841);
       xx.push_back(0.500000000000000);
@@ -53,41 +53,38 @@ QuadPts_Gauss_Hex::QuadPts_Gauss_Hex( const int &in_num_pts )
       SYS_T::print_fatal("Error: QuadPts_Gauss_Hex: input number of quadrature points is not implemented. \n");
       break;
   }
-  int nn = xx.size();
-  int nn2 = nn * nn; 
+  int nn = xx.size(); 
   for(int i = 0; i < nn; ++i){
     for(int j = 0; j < nn; ++j){
-      for(int k = 0; k < nn; ++k){
-        qp[3*(nn2*k+nn*j+i)  ] = xx[i];
-        qp[3*(nn2*k+nn*j+i)+1] = xx[j];
-        qp[3*(nn2*k+nn*j+i)+2] = xx[k];
+      qp[2*(nn*j+i)  ] = xx[i];
+      qp[2*(nn*j+i)+1] = xx[j];
 
-        qw[nn2*k+nn*j+i] = ww[i] * ww[j] * ww[k]; 
-      }
+      qw[nn*j+i] = ww[i] * ww[j]; 
     }
   }
   VEC_T::shrink2fit(qp); VEC_T::shrink2fit(qw);
 }
 
 
-QuadPts_Gauss_Hex::~QuadPts_Gauss_Hex()
+QuadPts_Gauss_Quadrel::~QuadPts_Gauss_Quadrel()
 {
-  VEC_T::clean(qp); VEC_T::clean(qw);
+  VEC_T::clean(qp);
+  VEC_T::clean(qw);
 }
 
 
-void QuadPts_Gauss_Hex::print_info() const
+void QuadPts_Gauss_Quadrel::print_info() const
 {
   std::cout<<std::endl;
-  std::cout<<"====== Gauss Points for Hexagon ======="<<std::endl;
+  std::cout<<"====== Gauss Points for Quadrel ======="<<std::endl;
   std::cout<<"Num of pt = "<<num_pts<<std::endl;
   std::cout<<"qp.size() = "<<qp.size()<<std::endl;
   std::cout<<"qw.size() = "<<qw.size()<<std::endl;
   for(int ii=0; ii<num_pts; ++ii)
-    std::cout<<std::setprecision(16)
-      <<'\t'<<qp[3*ii  ]<<'\t'<<qp[3*ii+1]
-      <<'\t'<<qp[3*ii+2]<<'\t'<<qw[ii]<<'\n';
-  std::cout<<"==========================================="<<std::endl;
+    std::cout<<std::setprecision(16)<<qp[2*ii]
+      <<'\t'<<qp[2*ii+1]<<'\t'<<qw[ii]<<'\n';
+  std::cout<<"========================================="<<std::endl;
 }
+
 
 // EOF
