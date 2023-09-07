@@ -5,7 +5,30 @@
 // Element routine for the linear hexagon element, with evaluation
 // of shape functions and their derivatives.
 // 
-// Hex8 means 8-node hex, aka linear hexes.
+// Hex8 means 8-node hex, aka trilinear hex.
+//
+//                    t
+//                    ^
+//                    |
+//                    4------------------7
+//                   /.                 /|
+//                  / .                / |
+//                 /  .               /  |
+//                /   .              /   |
+//               /    .             /    |
+//              /     .            /     |
+//             5------------------6      |
+//             |      0...........|......3-------> s
+//             |     .            |     /
+//             |    .             |    /
+//             |   .              |   /
+//             |  .               |  /
+//             | .                | /
+//             |.                 |/
+//             1------------------2
+//            /
+//           *
+//           r
 //
 // Date Created: Sep 6 2023
 // ==================================================================
@@ -16,14 +39,14 @@
 class FEAElement_Hex8 : public FEAElement
 {
   public :
-    FEAElement_Tet8( const int &in_nqua );
+    FEAElement_Hex8( const int &in_nqua );
 
     virtual ~FEAElement_Hex8();
 
     virtual int get_elemDim() const {return 3;}
 
     // A unique number for this element.
-    virtual int get_Type() const {return 504;}
+    virtual int get_Type() const {return 601;}
 
     virtual int get_numQuapts() const {return numQuapts;}
 
@@ -76,59 +99,27 @@ class FEAElement_Hex8 : public FEAElement
         double * const &basis_xx, double * const &basis_yy, 
         double * const &basis_zz ) const;
     
-    virtual std::vector<double> get_d2R_dxx( const int &quaindex ) const
-    {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_d2R_dxx function error.\n" );
-      return { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-    }
+    virtual std::vector<double> get_d2R_dxx( const int &quaindex ) const;
 
-    virtual std::vector<double> get_d2R_dyy( const int &quaindex ) const
-    {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_d2R_dyy function error.\n" );
-      return { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-    }
+    virtual std::vector<double> get_d2R_dyy( const int &quaindex ) const;
 
-    virtual std::vector<double> get_d2R_dzz( const int &quaindex ) const
-    {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_d2R_dzz function error.\n"  );
-      return { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-    }
+    virtual std::vector<double> get_d2R_dzz( const int &quaindex ) const;
 
-    virtual std::vector<double> get_d2R_dxy( const int &quaindex ) const
-    {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_d2R_dxy function error.\n"  );
-      return { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-    }
+    virtual std::vector<double> get_d2R_dxy( const int &quaindex ) const;
 
-    virtual std::vector<double> get_d2R_dxz( const int &quaindex ) const
-    {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_d2R_dxz function error.\n"  );
-      return { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-    }
+    virtual std::vector<double> get_d2R_dxz( const int &quaindex ) const;
 
-    virtual std::vector<double> get_d2R_dyz( const int &quaindex ) const
-    {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_d2R_dyz function error.\n"  );
-      return { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-    }
+    virtual std::vector<double> get_d2R_dyz( const int &quaindex ) const;
 
     // Get the Jacobian matrix dx/dr
     virtual void get_Jacobian(const int &quaindex, double * const &jac_value) const;
 
-    virtual std::array<double,9> get_Jacobian( const int &quaindex ) const
-    {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_Jacobian function error.\n"  );
-      return {{Jac[0], Jac[1], Jac[2], Jac[3], Jac[4], Jac[5], Jac[6], Jac[7], Jac[8]}};
-    }
+    virtual std::array<double,9> get_Jacobian( const int &quaindex ) const;
 
     // Get the inverse Jacobian matrix dr/dx
     virtual void get_invJacobian(const int &quaindex, double * const &jac_value) const;
 
     virtual std::array<double,9> get_invJacobian( const int &quaindex ) const
-    {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_invJacobian function error.\n"  );
-      return {{Jac[9], Jac[10], Jac[11], Jac[12], Jac[13], Jac[14], Jac[15], Jac[16], Jac[17]}};
-    }
 
     // Get the determinant of the Jacobian matrix
     virtual double get_detJac(const int &quaindex) const {return detJac;}
@@ -137,18 +128,20 @@ class FEAElement_Hex8 : public FEAElement
     // Number of quadrature points
     const int numQuapts;
 
-    // R : 0 <= ii < 4 x numQuapts
-    double * R;
-
-    // tet4 is linear, thus the first-order derivatives are constant
-    double dR_dx[8], dR_dy[8], dR_dz[8];
+    // R : 0 <= ii < 8 x numQuapts
+    double * R, * dR_dx, * dR_dy, * dR_dz;
+    double * d2R_dxx, * d2R_dyy, * d2R_dzz;
+    double * d2R_dxy, * d2R_dxz, * d2R_dyz;
 
     // Container for
-    // dx_dr : 0 <= ii < 9
-    // dr_dx : 9 <= ii < 18
-    double Jac[18]; 
+    // dx_dr : 0 <= ii < 9 numQuapts
+    double * dx_dr;
 
-    double detJac;
+    // dr_dx : 0 <= ii < 9 numQuapts
+    double * dr_dx;
+
+    // detJac : 0 <= ii < numQuapts
+    double * detJac;
 }
 
 #endif
