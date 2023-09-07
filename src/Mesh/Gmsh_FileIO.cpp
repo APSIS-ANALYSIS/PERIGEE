@@ -167,6 +167,10 @@ void Gmsh_FileIO::write_interior_vtp( const std::string &vtp_filename,
 
   SYS_T::Timer * mytimer = new SYS_T::Timer();
 
+  std::cout<<"-----> write "<<vtp_filename<<".vtp \n";
+  mytimer->Reset();
+  mytimer->Start();
+
   // Obtain the surface's IEN array associated with global nodal indices
   const int phy_index_sur = phy_2d_index[index_sur];
   std::vector<int> trien_global( eIEN[phy_index_sur] );
