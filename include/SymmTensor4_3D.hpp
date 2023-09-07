@@ -3,7 +3,7 @@
 // ============================================================================
 // SymmTensor4_3D.hpp
 //
-// This is a symmetric rank-4 tensor class. Here symmetric means both the major
+// This is a symmetric rank-4 tensor class. Here symmetry means both the major
 // and minor symmetry.
 // There are 6+5+...+1=21 entries in this object, which are stored in an array. 
 // The ordering follows the Voigt notation.
@@ -35,10 +35,11 @@
 //
 // ten[20] -> I=5, J=5 : 0101 0110 1001 1010
 //
-// Author: Ju Liu
+// Author: Chongran Zhao, Ju Liu
 // Date: Aug. 3rd 2023
 // ============================================================================
 #include "Tensor4_3D.hpp"
+#include "SymmMatrix_3x3.hpp"
 
 class SymmTensor4_3D
 {
@@ -51,7 +52,12 @@ class SymmTensor4_3D
     // ------------------------------------------------------------------------
     SymmTensor4_3D();
 
+    SymmTensor4_3D( const std::array<double,21> &source );
+
     ~SymmTensor4_3D();
+
+    // Convert the symmetric tensor to a full tensor
+    Tensor4_3D convert_to_full() const;
 
     // Assignment operator
     SymmTensor4_3D& operator= (const SymmTensor4_3D &source);
@@ -60,6 +66,11 @@ class SymmTensor4_3D
     double& operator()(const int &index) {return ten[index];}
 
     const double& operator()(const int &index) const {return ten[index];}
+
+    // Parenthesis operator: access through 0 <= ii jj kk ll < 3 component index
+    double& operator()(const int &ii, const int &jj, const int &kk, const int &ll);
+
+    const double& operator()(const int &ii, const int &jj, const int &kk, const int &ll) const; 
 
     bool is_identical(const Tensor4_3D &source, const double &tol = 1.0e-12) const;
     
@@ -84,7 +95,7 @@ class SymmTensor4_3D
     // Scalar multiplication
     SymmTensor4_3D& operator*=( const double &val );
 
-    void gen_rand();
+    void gen_rand(const double &left = -1.0, const double &right = 1.0);
 
     void gen_zero();
     
@@ -101,6 +112,14 @@ class SymmTensor4_3D
     void gen_symm_id();
 
     // ------------------------------------------------------------------------
+    // Generate Projector Ptilde = invC O invC - 1/3 invC x invC
+    // here, invC is assumed to be the right Cauchy-Green tensor
+    // O represents a SymmProduct and x represents an outproduct 
+    // see Holzapfel book p. 255, eqn. (6.170).
+    // ------------------------------------------------------------------------
+    void gen_Ptilde( const SymmMatrix_3x3 &invC );
+
+    // ------------------------------------------------------------------------
     // add an outer product with scaling factor:
     //            ten_ijkl += val * mmat_ij  * mmat_kl
     // This is often used in the evaluation of the stiffness tensor.
@@ -108,18 +127,24 @@ class SymmTensor4_3D
     void add_OutProduct( const double &val, const SymmMatrix_3x3 &mmat );
 
     // ------------------------------------------------------------------------
-    // add a symmetric tensor product of 4 vectors which is defined the
+    // add a symmetric tensor product of 2 vectors which is defined the
     // following way,
-    //     val x ( vex1[i] x vec2[j] x vec3[k] x vec4[l]
-    //     + vex1[i] x vec2[j] x vec3[l] x vec4[k]
-    //     + vex1[j] x vec2[i] x vec3[k] x vec4[l]
-    //     + vex1[j] x vec2[i] x vec3[l] x vec4[k] ).
+    //     val x ( vec1[i] x vec2[j] x vec1[k] x vec2[l]
+    //           + vec1[i] x vec2[j] x vec1[l] x vec2[k]
+    //           + vec1[j] x vec2[i] x vec1[k] x vec2[l]
+    //           + vec1[j] x vec2[i] x vec1[l] x vec2[k] ).
     // This function is typically called in the generation of the elasticity
-    // tensor in the stretch-based models.
+    // tensor in the stretch-based models. Different combinations of ijkl
+    // yield same result tensor because of the major and minor symmetry.
     // See, Holzapfel book p. 263, equation (6.196) for an example.
+    // for example, consider the last component of ten: 
+    // ten[20] += 
+    //      val x ( vec1[0] x vec2[1] x vec1[0] x vec2[1]
+    //            + vec1[0] x vec2[1] x vec1[1] x vec2[0]
+    //            + vec1[1] x vec2[0] x vec1[0] x vec2[1]
+    //            + vec1[1] x vec2[0] x vec1[1] x vec2[0] ).
     // ------------------------------------------------------------------------
-    void add_SymmOutProduct( const double &val, const Vector_3 &vec1,
-        const Vector_3 &vec2, const Vector_3 &vec3, const Vector_3 &vec4 );
+    void add_SymmOutProduct( const double &val, const Vector_3 &vec1, const Vector_3 &vec2 );
 
     // ------------------------------------------------------------------------
     // add a symmetric product with a scaling factor -- val:
@@ -129,7 +154,7 @@ class SymmTensor4_3D
     //     = -0.5 (C^{-1}_AC C^{-1}_BD + C^{-1}_AD C^{-1}_{BC})
     //     = SymmProduct(-0.5, invC, invC )
     // for invertible and symmetric 2nd-order tensor C.
-    // Holzapfel book, p. 254
+    // Holzapfel book, p. 254, eqn. (6.165).
     // ------------------------------------------------------------------------
     void add_SymmProduct( const double &val, const SymmMatrix_3x3 &mleft,
         const SymmMatrix_3x3 &mright );
@@ -149,12 +174,55 @@ class SymmTensor4_3D
     // Or, in the definition of C_iso of (6.168), this function can be used to
     // genereate the last term by
     //         add_SymmOutProduct(-2/3, Cinv, Siso);
+    // Notes: mleft and mright being all symmetric maintains minor symmetry
     // ------------------------------------------------------------------------
     void add_SymmOutProduct( const double &val, const SymmMatrix_3x3 &mleft,
         const SymmMatrix_3x3 &mright );
+   
+    // ------------------------------------------------------------------------
+    // Tensor Left and Right Multiplication modification with the same
+    // tensor P. See Holzapfel p. 255, the first term in eqn. (6.168) for
+    // an example of this function.
+    // ten_IJKL = P_IJMN ten_MNST P_KLST
+    // Note: Here the tensor P is assumed to have minor symmetry.
+    // ------------------------------------------------------------------------
+    void TenPMult( const Tensor4_3D &P );
+
+    // ------------------------------------------------------------------------
+    // transform the natural indices of forth-order symmetric tensor to Voigt 
+    // notation, minor symmetry requires ij / ji: 3x3 -> 6, kl / lk: 3x3 -> 6,
+    // major symmetry requires ij_kl / ij_lk / ji_kl / ji_lk: 6x6 -> 21,
+    // for more information, check the diagram above.
+    // ------------------------------------------------------------------------
+    int Voigt_notation( const int &ii, const int &jj, const int &kk, const int &ll ) const
+    {
+      // This map is used to transform the natural indices of a 3x3 symmetric matrix
+      // to Voigt notation
+      constexpr int map[9] = { 0, 5, 4, 
+        5, 1, 3, 
+        4, 3, 2 };
+
+      constexpr int mapper[36] = { 0, 1,  2,  3,  4,  5,
+        1, 6,  7,  8,  9,  10,
+        2, 7,  11, 12, 13, 14,
+        3, 8,  12, 15, 16, 17,
+        4, 9,  13, 16, 18, 19,
+        5, 10, 14, 17, 19, 20 };
+
+      return mapper[ 6 * map[ 3*ii + jj ] + map[ 3*kk + ll ] ];
+    }
 
   private:
     double ten[21];
 };
+
+// These functions behave in an identical manner to the member function of the
+// same function name. For the gen_zero and gem_symm_id, we added a middle name
+// ST4 to differentiate them from the functions of Tensor4_3D.
+SymmTensor4_3D gen_ST4_zero();
+
+SymmTensor4_3D gen_ST4_symm_id();
+
+SymmTensor4_3D gen_ST4_Ptilde( const SymmMatrix_3x3 &invC );
 
 #endif

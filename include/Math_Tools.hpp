@@ -4,8 +4,7 @@
 // Math_Tools.hpp
 // This file defines mathematical constants and functions.
 //
-// Author: Ju Liu
-// Date: Feb. 13 2016
+// Date Created: Feb. 13 2016
 // ============================================================================
 #include <stdio.h>
 #include <vector> 
@@ -103,18 +102,6 @@ namespace MATH_T
   }
 
   // --------------------------------------------------------------------------
-  // Dot product of two 3D vectors
-  // Input: u = (u1, u2, u3)
-  //        v = (v1, v2, v3)
-  // Output: u1*v1 + u2*v2 + u3*v3
-  // --------------------------------------------------------------------------
-  inline double dot3d( const double &u1, const double &u2, const double &u3,
-      const double &v1, const double &v2, const double &v3 )
-  {
-    return u1*v1 + u2*v2 + u3*v3; 
-  }
-
-  // --------------------------------------------------------------------------
   // Normalize 3D vector
   // Input: x, y, z
   // Output: x/len, y/len, z/len, len = sqrt(x^2+y^2+z^2)
@@ -190,31 +177,26 @@ namespace MATH_T
       std::vector<double> &val );
 
   // ----------------------------------------------------------------
-  // gen_random()
-  // Generate a random double in [min, max] domain for _closed;
-  // (min, max) for open.
-  // Gernerate a random int in [min, max] domain.
-  // NOTE: Users have to call srand(time(NULL)) before calling the
-  //       following three gen functions.
-  // E.G.: srand(time(NULL));
-  //       for-loop
-  //       {gen_randomD_xxx(...); ...}
+  // gen_int_rand and gen_double_rand
+  // Generate a random double in [min, max] domain for integer and double
+  // precision numbers, respectively. 
   // ----------------------------------------------------------------
-  inline double gen_randomD_closed( const double &min, const double &max )
+  inline double gen_int_rand( const int &min, const int &max )
   {
-    return ( rand() % 1000001 ) * 1.0e-6 * (max - min) + min;
+    std::random_device rd;
+    std::mt19937_64 gen( rd() );
+    std::uniform_int_distribution<int> dis(min, max);
+    return dis(gen);
   }
 
-  inline double gen_randomD_open( const double &min, const double &max )
+  inline double gen_double_rand( const double &min = -1.0, const double &max = 1.0 )
   {
-    return ( rand() % 999998 + 1 ) * 1.0e-6 * (max - min) + min;
+    std::random_device rd;
+    std::mt19937_64 gen( rd() );
+    std::uniform_real_distribution<double> dis(min, max);
+    return dis(gen);
   }
-
-  inline int gen_randomI_closed( const int &min, const int &max )
-  {
-    return ( rand() % (max - min + 1)) + min;
-  }
-
+  
   // ----------------------------------------------------------------
   // Print Histogram of an array of random vector
   // ----------------------------------------------------------------

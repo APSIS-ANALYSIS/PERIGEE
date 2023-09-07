@@ -78,14 +78,12 @@ PDNSolution::~PDNSolution()
 
 void PDNSolution::Gen_random()
 {
-  srand(time(NULL));
-  
   PetscScalar * val = new PetscScalar[nlocal];
   PetscInt * idx = new PetscInt[nlocal];
   
   for(int ii=0; ii<nlocal; ++ii) 
   {
-    val[ii] = MATH_T::gen_randomD_open(0.0, 1.0);
+    val[ii] = MATH_T::gen_double_rand(-1.0, 1.0);
     idx[ii] = ii;
   }
 

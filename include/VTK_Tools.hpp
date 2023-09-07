@@ -6,8 +6,7 @@
 // This is a suite of function tools that assist some fundamental operations for
 // VTK files.
 // 
-// Date: Aug. 12 2023
-// Author: Ju Liu, liujuy@gmail.com
+// Date Created: Aug. 12 2023
 // ============================================================================
 #include "Sys_Tools.hpp"
 #include "Vector_3.hpp"
