@@ -11,9 +11,9 @@ QuadPts_Gauss_Quad::QuadPts_Gauss_Quad( const int &in_num_pts_1d,
   const QuadPts_Gauss qpg1d_x( in_num_pts_1d, x_min, x_max );
   const QuadPts_Gauss qpg1d_y( in_num_pts_1d, y_min, y_max );
 
-  for(int ii=0; ii<in_num_pts_1d; ++ii)
+  for(int jj=0; jj<in_num_pts_1d; ++jj)
   {
-    for(int jj=0; jj<in_num_pts_1d; ++jj)
+    for(int ii=0; ii<in_num_pts_1d; ++ii)
     {
       qp.push_back( qpg1d_x.get_qp(ii) );
       qp.push_back( qpg1d_y.get_qp(jj) );
@@ -36,9 +36,9 @@ QuadPts_Gauss_Quad::QuadPts_Gauss_Quad( const int &in_num_pts_x,
   const QuadPts_Gauss qpg1d_x( in_num_pts_x, x_min, x_max );
   const QuadPts_Gauss qpg1d_y( in_num_pts_y, y_min, y_max );
 
-  for(int ii=0; ii<in_num_pts_x; ++ii)
+  for(int jj=0; jj<in_num_pts_y; ++jj)
   {
-    for(int jj=0; jj<in_num_pts_y; ++jj)
+    for(int ii=0; ii<in_num_pts_x; ++ii)
     {
       qp.push_back( qpg1d_x.get_qp(ii) );
       qp.push_back( qpg1d_y.get_qp(jj) );
