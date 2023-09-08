@@ -16,6 +16,12 @@ class QuadPts_Gauss_Quad : public IQuadPts
     // both directions.
     QuadPts_Gauss_Quad( const int &in_num_pts_1d, const double &x_min = -1.0,
        const double &x_max = 1.0, const double &y_min = -1.0, const double &y_max = 1.0 );
+   
+    // Construct a quadrature rule with in_num_pts_x points in the r-direction 
+    // and in_num_pts_y in the s-direction 
+    QuadPts_Gauss_Quad( const int &in_num_pts_x, const int &in_num_pts_y, 
+        const double &x_min = -1.0, const double &x_max = 1.0, 
+        const double &y_min = -1.0, const double &y_max = 1.0 );
     
     virtual ~QuadPts_Gauss_Quad();
 

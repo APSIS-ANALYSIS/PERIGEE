@@ -24,6 +24,31 @@ QuadPts_Gauss_Quad::QuadPts_Gauss_Quad( const int &in_num_pts_1d,
   VEC_T::shrink2fit(qp); VEC_T::shrink2fit(qw);
 }
 
+QuadPts_Gauss_Quad::QuadPts_Gauss_Quad( const int &in_num_pts_x,
+    const int &in_num_pts_y 
+    const double &x_min, const double &x_max, 
+    const double &y_min, const double &y_max )
+: num_pts( in_num_pts_x * in_num_pts_y )
+{
+  qp.clear(); qw.clear();
+
+  // Use QuadPts_Gauss to generate a rule in 1D with in_num_pts_1d points
+  const QuadPts_Gauss qpg1d_x( in_num_pts_x, x_min, x_max );
+  const QuadPts_Gauss qpg1d_y( in_num_pts_y, y_min, y_max );
+
+  for(int ii=0; ii<in_num_pts_x; ++ii)
+  {
+    for(int jj=0; jj<in_num_pts_y; ++jj)
+    {
+      qp.push_back( qpg1d_x.get_qp(ii) );
+      qp.push_back( qpg1d_y.get_qp(jj) );
+      qw.push_back( qpg1d_x.get_qw(ii) * qpg1d_y.get_qw(jj) );
+    }
+  }
+
+  VEC_T::shrink2fit(qp); VEC_T::shrink2fit(qw);
+}
+
 QuadPts_Gauss_Quad::~QuadPts_Gauss_Quad()
 {
   VEC_T::clean(qp);
