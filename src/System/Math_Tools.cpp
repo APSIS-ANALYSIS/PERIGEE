@@ -137,6 +137,27 @@ void MATH_T::get_tet_sphere_info( const double &x0, const double &x1,
   r = std::sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0) );
 }
 
+Vector_3 MATH_T::get_tet_sphere_info( const Vector_3 &pt1, 
+    const Vector_3 &pt2, const Vector_3 &pt3, const Vector_3 &pt4, 
+    double &radius ) 
+{
+  Matrix_double_3by3_Array AA(
+      2.0 * (pt1.x()-pt0.x()), 2.0 * (pt1.y()-pt0.y()), 2.0 * (pt1.z()-pt0.z()),
+      2.0 * (pt2.x()-pt0.x()), 2.0 * (pt2.y()-pt0.y()), 2.0 * (pt2.z()-pt0.z()),
+      2.0 * (pt3.x()-pt0.x()), 2.0 * (pt3.y()-pt0.y()), 2.0 * (pt3.z()-pt0.z()) );
+
+  AA.LU_fac();
+
+  const double xyz2 = pt0.dot_product( pt0 );
+
+  const Vector_3 centre = AA.LU_solve( Vector_3( pt1.dot_product(pt1) - xyz2,
+      pt2.dot_product(pt2) - xyz2, pt3.dot_product(pt3) - xyz2 ) );
+
+  radius = ( centre - pt0 ).norm2();
+
+  return centre;
+}
+
 double MATH_T::get_std_dev( const std::vector<double> &vec )
 {
   double mean_val = MATH_T::get_mean(vec);

@@ -146,6 +146,9 @@ namespace MATH_T
       const double &z0, const double &z1, const double &z2, 
       const double &z3, double &x, double &y, double &z, double &r );
 
+  Vector_3 get_tet_sphere_info( const Vector_3 &pt1, const Vector_3 &pt2, 
+      const Vector_3 &pt3, const Vector_3 &pt4, double &radius );
+
   // ----------------------------------------------------------------
   // Statistical quantities
   // Mean value
