@@ -56,8 +56,8 @@ class QuadPts_Gauss_Tet : public IQuadPts
     //                    c a b c; c b a c;
     //                    c a c b; c b c a;
     //                    c c a b; c c b a;
-    void gen_permutations( const double &a, const double &b, 
-        const double &c, std::vector<double> &out ) const;
+    std::vector<double> gen_permutations( const double &a, 
+        const double &b, const double &c ) const;
 };
 
 #endif

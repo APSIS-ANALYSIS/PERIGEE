@@ -8,7 +8,7 @@ QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( const int &in_num_pts ) : num_pts( in_num_
   int offset;
   double a,b,c,w;
   std::vector<double> temp;
-  
+
   switch( num_pts )
   {
     case 1:
@@ -39,7 +39,7 @@ QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( const int &in_num_pts ) : num_pts( in_num_
       a = 0.1325810999384657;
       b = 0.02454003792903;
       c = (1.0 - a - b) / 2.0;
-      gen_permutations(a,b,c, temp);
+      temp = gen_permutations(a,b,c);
       for(int ii=0; ii<48; ++ii) qp[ii] = temp[ii];
       
       for(int ii=0; ii<12; ++ii) qw[ii] = 0.04528559236327399;
@@ -72,7 +72,7 @@ QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( const int &in_num_pts ) : num_pts( in_num_
       b = 0.4860510285706072;
       c = (1.0 - a - b) * 0.5;
       w = 0.04361493840666568;
-      gen_permutations(a,b,c, temp);
+      temp = gen_permutations(a,b,c);
       for(int ii=0; ii<48; ++ii) qp[ii] = temp[ii];
 
       for(int ii=0; ii<12; ++ii) qw[ii] = w;
@@ -81,7 +81,7 @@ QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( const int &in_num_pts ) : num_pts( in_num_
       b = 0.6081079894015281;
       c = (1.0 - a - b) * 0.5;
       w = 0.02581167596199161;
-      gen_permutations(a,b,c, temp);
+      temp = gen_permutations(a,b,c);
       offset = 48;
       for(int ii=0; ii<48; ++ii) qp[offset+ii] = temp[ii];
       
@@ -140,10 +140,10 @@ void QuadPts_Gauss_Tet::print_info() const
   std::cout<<"==========================================="<<std::endl;
 }
 
-void QuadPts_Gauss_Tet::gen_permutations(const double &a,
-    const double &b, const double &c, std::vector<double> &out ) const
+std::vector<double> QuadPts_Gauss_Tet::gen_permutations(const double &a,
+    const double &b, const double &c ) const
 {
-  out.clear();
+  std::vector<double> out {};
   out.push_back(a); out.push_back(b); out.push_back(c); out.push_back(c);
   out.push_back(a); out.push_back(c); out.push_back(b); out.push_back(c);
   out.push_back(a); out.push_back(c); out.push_back(c); out.push_back(b);
@@ -160,6 +160,8 @@ void QuadPts_Gauss_Tet::gen_permutations(const double &a,
   
   out.push_back(c); out.push_back(c); out.push_back(a); out.push_back(b);
   out.push_back(c); out.push_back(c); out.push_back(b); out.push_back(a);
+
+  return out;
 }
 
 // EOF
