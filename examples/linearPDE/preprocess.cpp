@@ -120,7 +120,7 @@ int main( int argc, char * argv[] )
   std::vector<INodalBC *> NBC_list { nbc };
 
   // Setup Elemental (Neumann type) boundary condition(s)
-  std::vector<std::string> neu_list; neu_list.clear();
+  std::vector<std::string> neu_list {};
   ElemBC * ebc = new ElemBC_3D_tet( neu_list, elemType );
   
   ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
