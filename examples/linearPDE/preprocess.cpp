@@ -9,7 +9,7 @@
 #include "Tet_Tools.hpp"
 #include "NodalBC.hpp"
 #include "ElemBC_3D_tet.hpp"
-#include "Part_Tet.hpp"
+#include "Part_FEM.hpp"
 #include "NBC_Partition.hpp"
 #include "EBC_Partition.hpp"
 
@@ -138,7 +138,7 @@ int main( int argc, char * argv[] )
     mytimer->Reset();
     mytimer->Start();
     
-    IPart * part = new Part_Tet( mesh, global_part, mnindex, IEN,
+    IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
         ctrlPts, proc_rank, cpu_size, 1, 1, elemType );
 
     part -> print_part_loadbalance_edgecut();
