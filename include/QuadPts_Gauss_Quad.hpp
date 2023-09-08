@@ -1,20 +1,20 @@
 #ifndef QUADPTS_GAUSS_QUAD_HPP
 #define QUADPTS_GAUSS_QUAD_HPP
-// ==================================================================
+// ============================================================================
 // QuadPts_Gauss_Quad.hpp
 // The Gaussian quadrature rule for a quadrelateral domain defined by 
-// vertices
 // [0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]
 //
 // Date Created: Sep. 7 2023
-// ==================================================================
-#include "Vec_Tools.hpp"
-#include "IQuadPts.hpp"
+// ============================================================================
+#include "QuadPts_Gauss.hpp"
 
 class QuadPts_Gauss_Quad : public IQuadPts
 {
   public:
-    QuadPts_Gauss_Quad( const int &in_num_pts );
+    // Construct a quadrature rule with given number of quadrature points in
+    // both directions.
+    QuadPts_Gauss_Quad( const int &in_num_pts_1d );
     
     virtual ~QuadPts_Gauss_Quad();
 
