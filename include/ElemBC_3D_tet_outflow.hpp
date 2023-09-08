@@ -43,7 +43,7 @@ class ElemBC_3D_tet_outflow : public ElemBC_3D_tet
 
   private:
     // Disallow the default constructor
-    ElemBC_3D_tet_outflow() {};
+    ElemBC_3D_tet_outflow() = delete;
 
     // It stores the surface integral of each nodal basis function on the 
     // outlet surfaces.
