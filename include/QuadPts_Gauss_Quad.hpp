@@ -3,7 +3,7 @@
 // ============================================================================
 // QuadPts_Gauss_Quad.hpp
 // The Gaussian quadrature rule for a quadrelateral domain defined by 
-// [0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]
+//                  [r_min, r_max] x [s_min, s_max]
 //
 // Date Created: Sep. 7 2023
 // ============================================================================
@@ -14,14 +14,15 @@ class QuadPts_Gauss_Quad : public IQuadPts
   public:
     // Construct a quadrature rule with given number of quadrature points in
     // both directions.
-    QuadPts_Gauss_Quad( const int &in_num_pts_1d, const double &x_min = -1.0,
-       const double &x_max = 1.0, const double &y_min = -1.0, const double &y_max = 1.0 );
+    QuadPts_Gauss_Quad( const int &in_num_pts_1d, 
+        const double &r_min = -1.0, const double &r_max = 1.0, 
+        const double &s_min = -1.0, const double &s_max = 1.0 );
    
     // Construct a quadrature rule with in_num_pts_x points in the r-direction 
     // and in_num_pts_y in the s-direction 
     QuadPts_Gauss_Quad( const int &in_num_pts_x, const int &in_num_pts_y, 
-        const double &x_min = -1.0, const double &x_max = 1.0, 
-        const double &y_min = -1.0, const double &y_max = 1.0 );
+        const double &r_min = -1.0, const double &r_max = 1.0, 
+        const double &s_min = -1.0, const double &s_max = 1.0 );
     
     virtual ~QuadPts_Gauss_Quad();
 
