@@ -137,8 +137,8 @@ void MATH_T::get_tet_sphere_info( const double &x0, const double &x1,
   r = std::sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0) );
 }
 
-Vector_3 MATH_T::get_tet_sphere_info( const Vector_3 &pt1, 
-    const Vector_3 &pt2, const Vector_3 &pt3, const Vector_3 &pt4, 
+Vector_3 MATH_T::get_tet_sphere_info( const Vector_3 &pt0,
+    const Vector_3 &pt1, const Vector_3 &pt2, const Vector_3 &pt3, 
     double &radius ) 
 {
   Matrix_double_3by3_Array AA(
