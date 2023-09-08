@@ -189,7 +189,7 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
     if( gpart->get_epart(e) == cpu_rank ) elem_loc.push_back(e);
   }
   VEC_T::shrink2fit(elem_loc);
-  nlocalele = (int) elem_loc.size();
+  nlocalele = VEC_T::get_size( elem_loc );
 
   for( int n=0; n<nFunc; ++n )
   {
@@ -200,7 +200,7 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
     }
   }
   VEC_T::shrink2fit(node_loc); VEC_T::shrink2fit(node_loc_original);
-  nlocalnode = (int) node_loc.size();
+  nlocalnode = VEC_T::get_size( node_loc );
 
   std::cout<<"-- proc "<<cpu_rank<<" -- elem_loc & node_loc arrays generated. \n";
   std::cout<<"-- proc "<<cpu_rank<<" local element number: "<<elem_loc.size()<<std::endl;
@@ -210,8 +210,7 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
     node_loc[ii] = mnindex->get_old2new( node_loc[ii] );
 
   // 3. Generate node_tot, which stores the nodes needed by the elements in the subdomain
-  std::vector<int> node_tot;
-  node_tot.clear();
+  std::vector<int> node_tot {};
   for( int e=0; e<nlocalele; ++e )
   {
     for( int ii=0; ii<nLocBas; ++ii )
@@ -224,7 +223,7 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
 
   VEC_T::sort_unique_resize( node_tot );
 
-  ntotalnode = (int) node_tot.size();
+  ntotalnode = VEC_T::get_size( node_tot );
 
   // 4. generate node_ghost
   node_ghost.clear();
@@ -235,18 +234,18 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
   }
 
   VEC_T::shrink2fit(node_ghost);
-  nghostnode = (int) node_ghost.size();
+  nghostnode = VEC_T::get_size( node_ghost );
 
   nbadnode = 0;
   if( nghostnode + nlocalnode != ntotalnode )
   {
-    std::vector<int> badnode;
+    std::vector<int> badnode {};
     for( int n=0; n<nlocalnode; ++n )
     {
       if( !VEC_T::is_invec(node_tot, node_loc[n]) )
         badnode.push_back( node_loc[n] );
     }
-    nbadnode = (int) badnode.size();
+    nbadnode = VEC_T::get_size( badnode );
     if( nghostnode + nlocalnode != ntotalnode + nbadnode )
     {
       std::cerr<<"ERROR: The local node partition is wrong in proc "<<cpu_rank<<std::endl;
@@ -273,7 +272,7 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
     local_to_global.push_back( node_ghost[n] );
 
   VEC_T::shrink2fit(local_to_global);
-  nlocghonode = (int) local_to_global.size();
+  nlocghonode = VEC_T::get_size( local_to_global );
 
   std::cout<<"-- proc "<<cpu_rank<<" local_to_global generated. \n";
 
@@ -286,8 +285,7 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
     for(int ii=0; ii<nLocBas; ++ii)
     {
       const int global_index = mnindex->get_old2new( IEN->get_IEN(elem_loc[ee], ii) );
-      const auto lien_ptr = find( local_to_global.begin(), local_to_global.end(),
-          global_index );
+      const auto lien_ptr = find( local_to_global.begin(), local_to_global.end(), global_index );
 
       if(lien_ptr == local_to_global.end())
       {
