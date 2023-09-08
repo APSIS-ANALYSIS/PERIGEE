@@ -1,6 +1,6 @@
-#include "Part_Tet.hpp"
+#include "Part_FEM.hpp"
 
-Part_Tet::Part_Tet(
+Part_FEM::Part_FEM(
     const IMesh * const &mesh,
     const IGlobal_Part * const &gpart,
     const Map_Node_Index * const &mnindex,
@@ -20,9 +20,9 @@ Part_Tet::Part_Tet(
   cpu_size = in_cpu_size;
 
   // Check the cpu info
-  SYS_T::print_exit_if(cpu_size < 1, "Error: Part_Tet input cpu_size is wrong! \n");
-  SYS_T::print_exit_if(cpu_rank >= cpu_size, "Error: Part_Tet input cpu_rank is wrong! \n");
-  SYS_T::print_exit_if(cpu_rank < 0, "Error: Part_Tet input cpu_rank is wrong! \n");
+  SYS_T::print_exit_if(cpu_size < 1, "Error: Part_FEM input cpu_size is wrong! \n");
+  SYS_T::print_exit_if(cpu_rank >= cpu_size, "Error: Part_FEM input cpu_rank is wrong! \n");
+  SYS_T::print_exit_if(cpu_rank < 0, "Error: Part_FEM input cpu_rank is wrong! \n");
 
   // Generate group 1, 2, and 5.
   Generate_Partition( mesh, gpart, mnindex, IEN );
@@ -49,7 +49,7 @@ Part_Tet::Part_Tet(
   std::cout<<"-- proc "<<cpu_rank<<" Local control points generated. \n";
 }
 
-Part_Tet::Part_Tet( const char * const &inputfileName, const int &in_cpu_rank )
+Part_FEM::Part_FEM( const char * const &inputfileName, const int &in_cpu_rank )
 {
   const std::string input_fName( inputfileName );
   std::string fName = SYS_T::gen_partfile_name( input_fName, in_cpu_rank );
@@ -80,7 +80,7 @@ Part_Tet::Part_Tet( const char * const &inputfileName, const int &in_cpu_rank )
   // Part info
   cpu_rank = h5r->read_intScalar("Part_Info", "cpu_rank");
   
-  SYS_T::print_fatal_if( cpu_rank != in_cpu_rank, "Error: Part_Tet::cpu_rank is inconsistent.\n");
+  SYS_T::print_fatal_if( cpu_rank != in_cpu_rank, "Error: Part_FEM::cpu_rank is inconsistent.\n");
   
   cpu_size = h5r->read_intScalar("Part_Info", "cpu_size");
   
@@ -101,9 +101,9 @@ Part_Tet::Part_Tet( const char * const &inputfileName, const int &in_cpu_rank )
   int num_row, num_col;
   const std::vector<int> LIEN_vec = h5r -> read_intMatrix("LIEN", "LIEN", num_row, num_col);
 
-  SYS_T::print_fatal_if( num_row != nlocalele, "Error: Part_Tet::LIEN size does not match the number of element. \n");
+  SYS_T::print_fatal_if( num_row != nlocalele, "Error: Part_FEM::LIEN size does not match the number of element. \n");
 
-  SYS_T::print_fatal_if( num_col != nLocBas, "Error: Part_Tet::LIEN size does not match the value of nLocBas. \n");
+  SYS_T::print_fatal_if( num_col != nLocBas, "Error: Part_FEM::LIEN size does not match the value of nLocBas. \n");
   
   LIEN = new int * [nlocalele];
   for(int ee=0; ee<nlocalele; ++ee) LIEN[ee] = new int [nLocBas];
@@ -121,13 +121,13 @@ Part_Tet::Part_Tet( const char * const &inputfileName, const int &in_cpu_rank )
   delete h5r; H5Fclose( file_id );
 }
 
-Part_Tet::~Part_Tet()
+Part_FEM::~Part_FEM()
 {
   for(int ii=0; ii<nlocalele; ++ii) delete [] LIEN[ii];
   delete [] LIEN;
 }
 
-void Part_Tet::Generate_Partition( const IMesh * const &mesh,
+void Part_FEM::Generate_Partition( const IMesh * const &mesh,
     const IGlobal_Part * const &gpart,
     const Map_Node_Index * const &mnindex,
     const IIEN * const &IEN,
@@ -252,7 +252,7 @@ void Part_Tet::Generate_Partition( const IMesh * const &mesh,
   std::cout<<"-- proc "<<cpu_rank<<" LIEN generated. \n";
 }
 
-void Part_Tet::write( const char * inputFileName ) const
+void Part_FEM::write( const char * inputFileName ) const
 {
   const std::string input_fName( inputFileName );
   std::string fName = SYS_T::gen_partfile_name( input_fName, cpu_rank );
@@ -350,7 +350,7 @@ void Part_Tet::write( const char * inputFileName ) const
   H5Fclose(file_id);
 }
 
-void Part_Tet::print_part_ele() const
+void Part_FEM::print_part_ele() const
 {
   std::cout<<"Proc: "<<cpu_rank<<" local elements: "<<std::endl;
   for(int e=0; e<nlocalele; ++e)
@@ -358,7 +358,7 @@ void Part_Tet::print_part_ele() const
   std::cout<<std::endl;
 }
 
-void Part_Tet::print_part_node() const
+void Part_FEM::print_part_node() const
 {
   std::cout<<"Proc: "<<cpu_rank<<" local nodes: "<<std::endl;
   for(int n=0; n<nlocalnode; ++n)
@@ -372,7 +372,7 @@ void Part_Tet::print_part_node() const
   }
 }
 
-void Part_Tet::print_part_ghost_node() const
+void Part_FEM::print_part_ghost_node() const
 {
   std::cout<<"Proc: "<<cpu_rank<<" ghost nodes: "<<std::endl;
   for(int n=0; n<nghostnode; ++n)
@@ -380,7 +380,7 @@ void Part_Tet::print_part_ghost_node() const
   std::cout<<std::endl;
 }
 
-void Part_Tet::print_part_local_to_global() const
+void Part_FEM::print_part_local_to_global() const
 {
   std::cout<<"Proc: "<<cpu_rank<<" local_to_global array: "<<std::endl;
   for(int n=0; n<nlocghonode; ++n)
@@ -388,7 +388,7 @@ void Part_Tet::print_part_local_to_global() const
   std::cout<<std::endl;
 }
 
-void Part_Tet::print_part_LIEN() const
+void Part_FEM::print_part_LIEN() const
 {
   std::cout<<"Proc: "<<cpu_rank<<" LIEN: "<<std::endl;
   for(int ee=0; ee<nlocalele; ++ee)
@@ -400,7 +400,7 @@ void Part_Tet::print_part_LIEN() const
   std::cout<<std::endl;
 }
 
-void Part_Tet::print_part_loadbalance_edgecut() const
+void Part_FEM::print_part_loadbalance_edgecut() const
 {
   std::cout<<"Proc:"<<" "<<cpu_rank;
   std::cout<<" "<<"element ratio:"<<" "<<(double) nlocalele / (double) nElem;

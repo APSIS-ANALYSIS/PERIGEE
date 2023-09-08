@@ -1,9 +1,9 @@
-#ifndef PART_TET_HPP
-#define PART_TET_HPP
+#ifndef PART_FEM_HPP
+#define PART_FEM_HPP
 // ============================================================================
-// Part_Tet.hpp
+// Part_FEM.hpp
 //
-// Object: Partition 3D tetrahedral mesh into subdomains, and record each 
+// Object: Partition 3D finite element mesh into subdomains, and record each 
 //         subdomain in hdf5 file format.
 //
 // Date: Jan. 12 2017
@@ -14,14 +14,14 @@
 #include "IMesh.hpp"
 #include "IPart.hpp"
 
-class Part_Tet : public IPart
+class Part_FEM : public IPart
 {
   public:
     // Default constructor
     // The actual construction is in the derived class.
-    Part_Tet(){};
+    Part_FEM(){};
     
-    Part_Tet( const IMesh * const &mesh,
+    Part_FEM( const IMesh * const &mesh,
         const IGlobal_Part * const &gpart,
         const Map_Node_Index * const &mnindex,
         const IIEN * const &IEN,
@@ -31,9 +31,9 @@ class Part_Tet : public IPart
         const int &in_elemType );
 
     // Constructor that load the partition info from h5 file on disk
-    Part_Tet( const char * const &fileName, const int &in_cpu_rank );
+    Part_FEM( const char * const &fileName, const int &in_cpu_rank );
 
-    virtual ~Part_Tet();
+    virtual ~Part_FEM();
 
     virtual void write( const char * inputFileName ) const;
     
