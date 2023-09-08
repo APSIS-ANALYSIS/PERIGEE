@@ -1,6 +1,6 @@
-#include "QuadPts_Gauss_Quadrel.hpp"
+#include "QuadPts_Gauss_Quad.hpp"
 
-QuadPts_Gauss_Quadrel::QuadPts_Gauss_Quadrel( const int &in_num_pts )
+QuadPts_Gauss_Quad::QuadPts_Gauss_Quad( const int &in_num_pts )
 : num_pts( in_num_pts )
 {
   qp.resize( 2 * num_pts );
@@ -66,17 +66,17 @@ QuadPts_Gauss_Quadrel::QuadPts_Gauss_Quadrel( const int &in_num_pts )
 }
 
 
-QuadPts_Gauss_Quadrel::~QuadPts_Gauss_Quadrel()
+QuadPts_Gauss_Quad::~QuadPts_Gauss_Quad()
 {
   VEC_T::clean(qp);
   VEC_T::clean(qw);
 }
 
 
-void QuadPts_Gauss_Quadrel::print_info() const
+void QuadPts_Gauss_Quad::print_info() const
 {
   std::cout<<std::endl;
-  std::cout<<"====== Gauss Points for Quadrel ======="<<std::endl;
+  std::cout<<"====== Gauss Points for Quad ======="<<std::endl;
   std::cout<<"Num of pt = "<<num_pts<<std::endl;
   std::cout<<"qp.size() = "<<qp.size()<<std::endl;
   std::cout<<"qw.size() = "<<qw.size()<<std::endl;
