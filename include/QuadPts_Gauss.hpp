@@ -42,7 +42,6 @@ class QuadPts_Gauss : public IQuadPts
     // points-weights. This algorithm is obtained from the dealii
     // code, quadrature_lib.cc file.
     virtual void compute_npts();
-
 };
 
 #endif
