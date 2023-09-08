@@ -1,12 +1,12 @@
 #ifndef QUADPTS_GAUSS_HPP
 #define QUADPTS_GAUSS_HPP
-// ========================================================
+// ============================================================================
 // QuadPts_Gauss.hpp
-// The quadrature points class that gives gauss quadrature
-// for the integration on domain [0, 1].
+// This is the class that gives Gauss quadrature rule for the integration on a 
+// domain [left, right] with any number of points.
 //
 // Date: Sept. 24th 2013
-// ========================================================
+// ============================================================================
 #include <limits>
 #include "Vec_Tools.hpp"
 #include "Math_Tools.hpp"
@@ -30,16 +30,18 @@ class QuadPts_Gauss : public IQuadPts
     virtual double get_qw(unsigned int ii) const {return qw[ii];}
 
   private:
+    // number of quadrature points
+    const int num_pts;
+    
+    // quadrature points and weights
+    std::vector<double> qp {};
+    std::vector<double> qw {};
+    
     // use Newton-Raphson iteration to find the Gauss quadrature
     // points-weights. This algorithm is obtained from the dealii
     // code, quadrature_lib.cc file.
     virtual void compute_npts();
 
-    // number of quadrature points
-    const int num_pts;
-    
-    // quadrature points and weights
-    std::vector<double> qp, qw;
 };
 
 #endif
