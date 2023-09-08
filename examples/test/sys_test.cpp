@@ -22,60 +22,31 @@
 
 int main(int argc, char *argv[])
 {
-  std::vector<int> nid1 {1,2,3,4,5,6,7,8};
-  std::vector<int> nid2 {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27};
+  Vector_3 pt0, pt1, pt2, pt3;
+  pt0.gen_rand();
+  pt1.gen_rand();
+  pt2.gen_rand();
+  pt3.gen_rand();
 
-  std::vector<int> eid {11};
+  double rad;
+  auto cen = MATH_T::get_tet_sphere_info(pt0, pt1, pt2, pt3, rad);
 
-  // these node array and ien array are designed by Gmsh PDF P358, let node0 = [0, 0, 0], length of side = 2, u = x, v = y, w = z
-  std::vector<double> node1 {0.0, 0.0, 0.0,
-                             2.0, 0.0, 0.0,
-                             2.0, 2.0, 0.0,
-                             0.0, 2.0, 0.0,
-                             0.0, 0.0, 2.0,
-                             2.0, 0.0, 2.0,
-                             2.0, 2.0, 2.0,
-                             0.0, 2.0, 2.0};
-  std::vector<int> ien1 {0,1,2,3,4,5,6,7};
+  double x, y, z, r;
+  MATH_T::get_tet_sphere_info( 
+      pt0.x(), pt1.x(), pt2.x(), pt3.x(),
+      pt0.y(), pt1.y(), pt2.y(), pt3.y(),
+      pt0.z(), pt1.z(), pt2.z(), pt3.z(),
+      x, y, z, r );
 
-  std::vector<double> node2 {0.0, 0.0, 0.0, // 0
-                             2.0, 0.0, 0.0, // 1
-                             2.0, 2.0, 0.0, // 2
-                             0.0, 2.0, 0.0, // 3
-                             0.0, 0.0, 2.0, // 4
-                             2.0, 0.0, 2.0, // 5
-                             2.0, 2.0, 2.0, // 6
-                             0.0, 2.0, 2.0, // 7
-                             1.0, 0.0, 0.0, // 8
-                             0.0, 1.0, 0.0, // 9
-                             0.0, 0.0, 1.0, // 10
-                             2.0, 1.0, 0.0, // 11
-                             2.0, 0.0, 1.0, // 12
-                             1.0, 2.0, 0.0, // 13
-                             2.0, 2.0, 1.0, // 14
-                             0.0, 2.0, 1.0, // 15
-                             1.0, 0.0, 2.0, // 16
-                             0.0, 1.0, 2.0, // 17
-                             2.0, 1.0, 2.0, // 18
-                             1.0, 2.0, 2.0, // 19
-                             1.0, 1.0, 0.0, // 20
-                             1.0, 0.0, 1.0, // 21
-                             0.0, 1.0, 1.0, // 22
-                             2.0, 1.0, 1.0, // 23
-                             1.0, 2.0, 1.0, // 24
-                             1.0, 1.0, 2.0, // 25
-                             1.0, 1.0, 1.0};// 26
-  std::vector<int> ien2 {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26};
+  pt0.print();
+  pt1.print();
+  pt2.print();
+  pt3.print();
 
-  std::vector<DataVecStr<int>> input1 {};
-  input1.push_back({nid1, "GlobalNodeID", AssociateObject::Node});
-  input1.push_back({eid, "GlobalElementID", AssociateObject::Cell});
-  HEX_T::write_hex_grid( "LinearHex", 8, 1, node1, ien1, input1 );
-
-  std::vector<DataVecStr<int>> input2 {};
-  input2.push_back({nid2, "GlobalNodeID", AssociateObject::Node});
-  input2.push_back({eid, "GlobalElementID", AssociateObject::Cell});
-  HEX_T::write_hex_grid( "QuadraticHex", 27, 1, node2, ien2, input2 ); 
+  std::cout<<cen.x() - x<<'\t';
+  std::cout<<cen.y() - y<<'\t';
+  std::cout<<cen.z() - z<<'\t';
+  std::cout<<rad - r<<'\n';
 
   return EXIT_SUCCESS;
 }
