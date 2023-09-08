@@ -14,7 +14,8 @@ class QuadPts_Gauss_Quad : public IQuadPts
   public:
     // Construct a quadrature rule with given number of quadrature points in
     // both directions.
-    QuadPts_Gauss_Quad( const int &in_num_pts_1d );
+    QuadPts_Gauss_Quad( const int &in_num_pts_1d, const double &x_min = -1.0,
+       const double &x_max = 1.0, const double &y_min = -1.0, const double &y_max = 1.0 );
     
     virtual ~QuadPts_Gauss_Quad();
 
