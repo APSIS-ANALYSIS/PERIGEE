@@ -78,6 +78,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/System/Matrix_PETSc.cpp
   ${perigee_source}/System/Tensor4_3D.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Tet.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_Quad.cpp
   ${perigee_source}/Mesh/QuadPts_debug.cpp
   ${perigee_source}/Analysis_Tool/AGlobal_Mesh_Info_FEM_3D.cpp
   ${perigee_source}/Analysis_Tool/APart_Basic_Info.cpp

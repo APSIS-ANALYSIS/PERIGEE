@@ -1,31 +1,7 @@
 #include "QuadPts_Gauss_Quad.hpp"
 
-QuadPts_Gauss_Quad::QuadPts_Gauss_Quad( const int &in_num_pts_1d, 
-    const double &x_min, const double &x_max, 
-    const double &y_min, const double &y_max )
-: num_pts( in_num_pts_1d * in_num_pts_1d )
-{
-  qp.clear(); qw.clear();
-  
-  // Use QuadPts_Gauss to generate a rule in 1D with in_num_pts_1d points
-  const QuadPts_Gauss qpg1d_x( in_num_pts_1d, x_min, x_max );
-  const QuadPts_Gauss qpg1d_y( in_num_pts_1d, y_min, y_max );
-
-  for(int jj=0; jj<in_num_pts_1d; ++jj)
-  {
-    for(int ii=0; ii<in_num_pts_1d; ++ii)
-    {
-      qp.push_back( qpg1d_x.get_qp(ii) );
-      qp.push_back( qpg1d_y.get_qp(jj) );
-      qw.push_back( qpg1d_x.get_qw(ii) * qpg1d_y.get_qw(jj) );
-    }
-  }
-
-  VEC_T::shrink2fit(qp); VEC_T::shrink2fit(qw);
-}
-
 QuadPts_Gauss_Quad::QuadPts_Gauss_Quad( const int &in_num_pts_x,
-    const int &in_num_pts_y 
+    const int &in_num_pts_y, 
     const double &x_min, const double &x_max, 
     const double &y_min, const double &y_max )
 : num_pts( in_num_pts_x * in_num_pts_y )
@@ -48,6 +24,12 @@ QuadPts_Gauss_Quad::QuadPts_Gauss_Quad( const int &in_num_pts_x,
 
   VEC_T::shrink2fit(qp); VEC_T::shrink2fit(qw);
 }
+
+QuadPts_Gauss_Quad::QuadPts_Gauss_Quad( const int &in_num_pts_1d, 
+    const double &x_min, const double &x_max, 
+    const double &y_min, const double &y_max )
+: QuadPts_Gauss_Quad(in_num_pts_1d, in_num_pts_1d, x_min, x_max, y_min, y_max)
+{}
 
 QuadPts_Gauss_Quad::~QuadPts_Gauss_Quad()
 {
