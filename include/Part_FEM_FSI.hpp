@@ -1,7 +1,7 @@
-#ifndef PART_TET_FSI_HPP
-#define PART_TET_FSI_HPP
+#ifndef PART_FEM_FSI_HPP
+#define PART_FEM_FSI_HPP
 // ==================================================================
-// Part_Tet_FSI.hpp
+// Part_FEM_FSI.hpp
 //
 // Object: Partition 3D tet mesh into subdomains. The
 //         mesh contains sub-domains that has a physical tag.
@@ -11,12 +11,12 @@
 //
 // Date Created: July 27 2017
 // ==================================================================
-#include "Part_Tet.hpp"
+#include "Part_FEM.hpp"
 
-class Part_Tet_FSI : public Part_Tet
+class Part_FEM_FSI : public Part_FEM
 {
   public:
-    Part_Tet_FSI( const IMesh * const &mesh,
+    Part_FEM_FSI( const IMesh * const &mesh,
         const IGlobal_Part * const &gpart,
         const Map_Node_Index * const &mnindex,
         const IIEN * const &IEN,
@@ -32,7 +32,7 @@ class Part_Tet_FSI : public Part_Tet
         const int &in_start_idx,
         const bool &in_is_geo_field );
 
-    virtual ~Part_Tet_FSI();
+    virtual ~Part_FEM_FSI();
 
     virtual void write( const char * inputFileName ) const;
 
