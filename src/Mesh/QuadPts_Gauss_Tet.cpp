@@ -1,7 +1,6 @@
 #include "QuadPts_Gauss_Tet.hpp"
 
-QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( const int &in_num_pts )
-: num_pts( in_num_pts )
+QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( const int &in_num_pts ) : num_pts( in_num_pts )
 {
   qp.resize( 4 * num_pts );
   qw.resize( num_pts );
@@ -122,12 +121,10 @@ QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( const int &in_num_pts )
   for(int ii=0; ii<num_pts; ++ii) qw[ii] /= 6.0;
 }
 
-
 QuadPts_Gauss_Tet::~QuadPts_Gauss_Tet()
 {
   VEC_T::clean(qp); VEC_T::clean(qw);
 }
-
 
 void QuadPts_Gauss_Tet::print_info() const
 {
@@ -142,7 +139,6 @@ void QuadPts_Gauss_Tet::print_info() const
       <<'\t'<<qp[4*ii+3]<<'\t'<<qw[ii]<<'\n';
   std::cout<<"==========================================="<<std::endl;
 }
-
 
 void QuadPts_Gauss_Tet::gen_permutations(const double &a,
     const double &b, const double &c, std::vector<double> &out ) const
@@ -165,6 +161,5 @@ void QuadPts_Gauss_Tet::gen_permutations(const double &a,
   out.push_back(c); out.push_back(c); out.push_back(a); out.push_back(b);
   out.push_back(c); out.push_back(c); out.push_back(b); out.push_back(a);
 }
-
 
 // EOF

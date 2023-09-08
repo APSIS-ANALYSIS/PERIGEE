@@ -46,7 +46,8 @@ class QuadPts_Gauss_Tet : public IQuadPts
     //      quadrature points.
     //      u = 1 - r - s - t
     // qw : length num_pts. Stores the quadrature weights.
-    std::vector<double> qp, qw;
+    std::vector<double> qp {};
+    std::vector<double> qw {};
     
     // gen_permutations : generate permutations of a, b, c such that the
     //                    vector out includes the following 12 patterns.
