@@ -3,7 +3,7 @@
 // ============================================================================
 // QuadPts_Gauss.hpp
 // This is the class that gives Gauss quadrature rule for the integration on a 
-// domain [left, right] with any number of points.
+// domain [min, max] with any number of points.
 //
 // Date: Sept. 24th 2013
 // ============================================================================
@@ -15,7 +15,8 @@
 class QuadPts_Gauss : public IQuadPts
 {
   public:
-    QuadPts_Gauss( const int &in_num_pts );
+    // Construct in_num_pts-point rule for [min, max] domain
+    QuadPts_Gauss( const int &in_num_pts, const double &min = 0.0, const double &max = 1.0 );
     
     virtual ~QuadPts_Gauss();
 
