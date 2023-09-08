@@ -1190,8 +1190,8 @@ void Gmsh_FileIO::update_quadratic_tet_IEN( const int &index_3d )
   }
 }
 
-void Gmsh_FileIO::write_quadratic_sur_vtu( const int &index_sur,
-    const int &index_vol, const bool &isf2e ) const
+void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
+    const int &index_sur, const int &index_vol, const bool &isf2e ) const
 {
   SYS_T::print_exit_if( index_sur >= num_phy_domain_2d || index_sur < 0,
       "Error: Gmsh_FileIO::write_vtp, surface index is wrong. \n");
@@ -1219,10 +1219,7 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const int &index_sur,
 
   SYS_T::Timer * mytimer = new SYS_T::Timer();
 
-  std::string vtu_file_name(phy_2d_name[index_sur]);
-  vtu_file_name += "_";
-  vtu_file_name += phy_3d_name[index_vol];
-  std::cout<<"-----> write "<<vtu_file_name<<".vtu \n";
+  std::cout<<"-----> write "<<vtu_filename<<".vtu \n";
 
   mytimer->Reset(); mytimer->Start();
 
@@ -1277,7 +1274,7 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const int &index_sur,
   std::cout<<"      "<<gelem.size()<<" tets have faces over the surface. \n";
 
   // generate local triangle IEN array
-  std::vector<int> trien{};
+  std::vector<int> trien {};
   for(int ee=0; ee<bcnumcl; ++ee)
   { 
     trien.push_back( VEC_T::get_pos(bcpt, trien_global[6*ee  ]));
@@ -1326,12 +1323,22 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const int &index_sur,
   std::vector<DataVecStr<int>> input_vtk_data {};
   input_vtk_data.push_back({bcpt, "GlobalNodeID", AssociateObject::Node});
   input_vtk_data.push_back({face2elem, "GlobalElementID", AssociateObject::Cell});
-  TET_T::write_quadratic_triangle_grid( vtu_file_name, bcnumpt, bcnumcl,
+  TET_T::write_quadratic_triangle_grid( vtu_filename, bcnumpt, bcnumcl,
       tript, trien, input_vtk_data );
 
   mytimer->Stop();
   std::cout<<"      Time taken "<<mytimer->get_sec()<<" sec. \n";
   delete mytimer;
+}
+
+void Gmsh_FileIO::write_quadratic_sur_vtu( const int &index_sur,
+    const int &index_vol, const bool &isf2e ) const
+{
+  std::string vtu_file_name(phy_2d_name[index_sur]);
+  vtu_file_name += "_";
+  vtu_file_name += phy_3d_name[index_vol];
+
+  write_quadratic_sur_vtu(vtu_file_name, index_sur, index_vol, isf2e);
 }
 
 void Gmsh_FileIO::read_msh2(std::ifstream &infile)

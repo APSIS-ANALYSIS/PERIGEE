@@ -133,6 +133,9 @@ class Gmsh_FileIO
     // and will write the surface mesh into a vtu file. It functionality
     // is quite close to write_vtp.
     // --------------------------------------------------------------
+    void write_quadratic_sur_vtu( const std::string &vtu_filename,
+        const int &index_sur, const int &index_vol, const bool &isf2e = false) const;
+
     void write_quadratic_sur_vtu( const int &index_sur, 
         const int &index_vol, const bool &isf2e = false) const;
 
