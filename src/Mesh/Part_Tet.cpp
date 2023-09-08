@@ -7,54 +7,6 @@ Part_Tet::Part_Tet(
     const IIEN * const &IEN,
     const std::vector<double> &ctrlPts,
     const int &in_cpu_rank, const int &in_cpu_size,
-    const int &in_dofNum, const int &in_elemType )
-: nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),
-  sDegree( mesh->get_s_degree() ), tDegree( mesh->get_t_degree() ),
-  uDegree( mesh->get_u_degree() ), nLocBas( mesh->get_nLocBas() ),
-  probDim(3), dofNum( in_dofNum ), dofMat(in_dofNum), 
-  elemType(in_elemType)
-{
-  // Initialize group 3 data
-  cpu_rank = in_cpu_rank;
-  cpu_size = in_cpu_size;
-  
-  // Check the cpu info
-  SYS_T::print_exit_if(cpu_size < 1, "Error: Part_Tet input cpu_size is wrong! \n");
-  SYS_T::print_exit_if(cpu_rank >= cpu_size, "Error: Part_Tet input cpu_rank is wrong! \n");
-  SYS_T::print_exit_if(cpu_rank < 0, "Error: Part_Tet input cpu_rank is wrong! \n");
-
-  // Generate group 1, 2, and 5.
-  Generate_Partition( mesh, gpart, mnindex, IEN );
-
-  // Generate group 6
-  // local copy of control points
-  ctrlPts_x_loc.resize(nlocghonode);
-  ctrlPts_y_loc.resize(nlocghonode);
-  ctrlPts_z_loc.resize(nlocghonode);
-
-  for(int ii=0; ii<nlocghonode; ++ii)
-  {
-    int aux_index = local_to_global[ii];         // new global index
-    aux_index = mnindex->get_new2old(aux_index); // back to old global index
-    ctrlPts_x_loc[ii] = ctrlPts[3*aux_index + 0];
-    ctrlPts_y_loc[ii] = ctrlPts[3*aux_index + 1];
-    ctrlPts_z_loc[ii] = ctrlPts[3*aux_index + 2];
-  }
-
-  VEC_T::shrink2fit(ctrlPts_x_loc);
-  VEC_T::shrink2fit(ctrlPts_y_loc);
-  VEC_T::shrink2fit(ctrlPts_z_loc);
-
-  std::cout<<"-- proc "<<cpu_rank<<" Local control points generated. \n";
-}
-
-Part_Tet::Part_Tet(
-    const IMesh * const &mesh,
-    const IGlobal_Part * const &gpart,
-    const Map_Node_Index * const &mnindex,
-    const IIEN * const &IEN,
-    const std::vector<double> &ctrlPts,
-    const int &in_cpu_rank, const int &in_cpu_size,
     const int &in_dofNum, const int &in_dofMat,
     const int &in_elemType )
 : nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),

@@ -27,14 +27,6 @@ class Part_Tet : public IPart
         const IIEN * const &IEN,
         const std::vector<double> &ctrlPts,
         const int &in_cpu_rank, const int &in_cpu_size,
-        const int &in_dofNum, const int &in_elemType );
-
-    Part_Tet( const IMesh * const &mesh,
-        const IGlobal_Part * const &gpart,
-        const Map_Node_Index * const &mnindex,
-        const IIEN * const &IEN,
-        const std::vector<double> &ctrlPts,
-        const int &in_cpu_rank, const int &in_cpu_size,
         const int &in_dofNum, const int &in_dofMat,
         const int &in_elemType );
 
