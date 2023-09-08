@@ -334,8 +334,8 @@ void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
   write_interior_vtp(vtp_file_name, index_sur, index_vol1, index_vol2);
 }
 
-void Gmsh_FileIO::write_vtp(const int &index_sur, 
-    const int &index_vol, const bool &isf2e ) const
+void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
+  const int &index_sur, const int &index_vol, const bool &isf2e ) const
 {
   SYS_T::print_exit_if( index_sur >= num_phy_domain_2d || index_sur < 0,
       "Error: Gmsh_FileIO::write_vtp, surface index is wrong. \n");
@@ -354,11 +354,7 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
 
   SYS_T::Timer * mytimer = new SYS_T::Timer();
 
-  // Generate a file name to be writen for this vtp file
-  std::string vtp_file_name(phy_2d_name[index_sur]);
-  vtp_file_name += "_";
-  vtp_file_name += phy_3d_name[index_vol];
-  std::cout<<"-----> write "<<vtp_file_name<<".vtp \n";
+  std::cout<<"-----> write "<<vtp_filename<<".vtp \n";
 
   mytimer->Reset();
   mytimer->Start();
@@ -469,12 +465,22 @@ void Gmsh_FileIO::write_vtp(const int &index_sur,
   std::vector<DataVecStr<int>> input_vtk_data {};
   input_vtk_data.push_back({bcpt, "GlobalNodeID", AssociateObject::Node});
   input_vtk_data.push_back({face2elem, "GlobalElementID", AssociateObject::Cell});
-  TET_T::write_triangle_grid( vtp_file_name, bcnumpt, bcnumcl,
+  TET_T::write_triangle_grid( vtp_filename, bcnumpt, bcnumcl,
       tript, trien, input_vtk_data );
 
   mytimer->Stop();
   std::cout<<"      Time taken "<<mytimer->get_sec()<<" sec. \n";
   delete mytimer;
+}
+
+void Gmsh_FileIO::write_vtp(const int &index_sur, const int &index_vol,
+  const bool &isf2e ) const
+{
+  std::string vtp_file_name(phy_2d_name[index_sur]);
+  vtp_file_name += "_";
+  vtp_file_name += phy_3d_name[index_vol];
+
+  write_vtp(vtp_file_name, index_sur, index_vol, isf2e);
 }
 
 void Gmsh_FileIO::write_each_vtu() const

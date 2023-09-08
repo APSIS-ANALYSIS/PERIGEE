@@ -120,6 +120,9 @@ class Gmsh_FileIO
     // volumetric physical domain. In case that a surface spans over
     // many physical volumetric domain, the face2elem mapping is -1.
     // --------------------------------------------------------------
+    void write_vtp(const std::string &vtp_filename,
+        const int &index_sur, const int &index_vol, const bool &isf2e = false) const;
+
     void write_vtp(const int &index_sur, const int &index_vol,
         const bool &isf2e = false) const;
   
