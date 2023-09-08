@@ -39,7 +39,7 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionInt("-in_ncommon", in_ncommon);
   SYS_T::GetOptionBool("-METIS_isDualGraph", isDualGraph);
 
-   cout<<"==== Command Line Arguments ===="<<endl;
+  cout<<"==== Command Line Arguments ===="<<endl;
   cout<<" -cpu_size: "<<cpu_size<<endl;
   cout<<" -in_ncommon: "<<in_ncommon<<endl;
   if(isDualGraph) cout<<" -METIS_isDualGraph: true \n";
@@ -48,14 +48,14 @@ int main( int argc, char * argv[] )
   cout<<"part_file: "<<part_file<<endl;
   cout<<"geo_file: "<<geo_file<<endl;
   cout<<"elemType: "<<elemType<<endl;
-  
+
   // Read the volumetric mesh file from the vtu file: geo_file
   int nFunc, nElem;
   std::vector<int> vecIEN;
   std::vector<double> ctrlPts;
 
   VTK_T::read_vtu_grid(geo_file, nFunc, nElem, ctrlPts, vecIEN);
-  
+
   IIEN * IEN = new IEN_FEM(nElem, vecIEN);
   VEC_T::clean( vecIEN ); // clean the vector
 
@@ -89,16 +89,16 @@ int main( int argc, char * argv[] )
 
   Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, mesh->get_nFunc());
   mnindex->write_hdf5("post_node_mapping");
-  
+
   cout<<"=== Start Partition ... \n";
   SYS_T::Timer * mytimer = new SYS_T::Timer();
-   for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
+  for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
   {
     mytimer->Reset(); mytimer->Start();
-    
+
     IPart * part = new Part_Tet( mesh, global_part, mnindex, IEN,
         ctrlPts, proc_rank, cpu_size, 1, 1, elemType );
-    
+
     part->write(part_file.c_str());
     mytimer->Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
