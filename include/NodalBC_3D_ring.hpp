@@ -17,8 +17,7 @@
 // Date: Apr. 7 2021
 // ============================================================================
 #include "INodalBC.hpp"
-#include "Tet_Tools.hpp"
-#include "Vector_3.hpp"
+#include "VTK_Tools.hpp"
 
 class NodalBC_3D_ring : public INodalBC
 {

@@ -29,7 +29,6 @@ void Matrix_2x2::copy( const Matrix_2x2 &source )
   mat[3] = source(3);
 }
 
-
 void Matrix_2x2::copy( double source[4] )
 {
   mat[0] = source[0];
@@ -37,7 +36,6 @@ void Matrix_2x2::copy( double source[4] )
   mat[2] = source[2];
   mat[3] = source[3];
 }
-
 
 void Matrix_2x2::gen_zero()
 {
@@ -49,14 +47,12 @@ void Matrix_2x2::gen_id()
   mat[0] = 1.0; mat[1] = 0.0; mat[2] = 0.0; mat[3] = 1.0;
 }
 
-void Matrix_2x2::gen_rand()
+void Matrix_2x2::gen_rand(const double &min, const double &max)
 {
-  srand(time(NULL));
-  for(int ii=0; ii<4; ++ii)
-  {
-    double value = rand() % 10000;
-    mat[ii] = value * 1.0e-3 - 5.0;
-  }
+  std::random_device rd;
+  std::mt19937_64 gen( rd() );
+  std::uniform_real_distribution<double> dis(min, max);
+  for(int ii=0; ii<4; ++ii) mat[ii] = dis(gen);
 }
 
 void Matrix_2x2::gen_hilb()
@@ -147,7 +143,6 @@ void Matrix_2x2::MatMultTransposeLeft( const Matrix_2x2 &source )
   mat[0] = temp[0]; mat[1] = temp[1];
   mat[2] = temp[2]; mat[3] = temp[3];
 }
-
 
 void Matrix_2x2::MatMultTransposeRight( const Matrix_2x2 &source )
 {

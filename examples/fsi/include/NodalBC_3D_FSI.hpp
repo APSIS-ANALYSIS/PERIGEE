@@ -56,7 +56,7 @@ class NodalBC_3D_FSI : public INodalBC
 
     NodalBC_3D_FSI() {};
 
-    std::vector<unsigned int> get_vtp_nodal_id( const std::vector<std::string> &vtp_file_list_name ) const;
+    std::vector<unsigned int> get_vtk_nodal_id( const std::vector<std::string> &vtk_file_list_name ) const;
 };
 
 #endif

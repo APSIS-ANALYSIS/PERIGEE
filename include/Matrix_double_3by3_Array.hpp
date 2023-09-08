@@ -55,7 +55,7 @@ class Matrix_double_3by3_Array
 
     // Generate a matrix with random entries
     // All previous values are erased and p & invm are reset to default.
-    void gen_rand();
+    void gen_rand(const double &min = -1.0, const double &max = 1.0);
 
     // Generate a Hilbert matrix
     // all previous values are earsed and p & invm are reset to default.

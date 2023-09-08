@@ -100,15 +100,15 @@ void MATH_T::get_n_from_t(
   const double my = p0_y - p1_y;
   const double mz = p0_z - p1_z;
 
-  const double mdt = dot3d(mx,my,mz,tx,ty,tz);
-  const double tdt = dot3d(tx,ty,tz,tx,ty,tz);
+  const double mdt = mx * tx + my * ty + mz * tz;
+  const double tdt = tx * tx + ty * ty + tz * tz;
   const double fac = mdt / tdt;
 
   nx = mx - fac * tx;
   ny = my - fac * ty;
   nz = mz - fac * tz;
 
-  const double len = sqrt(nx*nx + ny*ny + nz*nz);
+  const double len = std::sqrt(nx*nx + ny*ny + nz*nz);
   nx = nx / len;
   ny = ny / len;
   nz = nz / len;
@@ -134,7 +134,7 @@ void MATH_T::get_tet_sphere_info( const double &x0, const double &x1,
       x3*x3 + y3*y3 + z3*z3 - xyz2,
       x, y, z );
 
-  r = sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0) );
+  r = std::sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0) );
 }
 
 double MATH_T::get_std_dev( const std::vector<double> &vec )
@@ -149,7 +149,7 @@ double MATH_T::get_std_dev( const std::vector<double> &vec )
     nn  += 1.0;
   }
 
-  return sqrt( sum / nn );
+  return std::sqrt( sum / nn );
 }
 
 void MATH_T::gen_Gaussian( const int &n, const double &mean, 
@@ -165,7 +165,7 @@ void MATH_T::gen_Gaussian( const int &n, const double &mean,
       y = 2.0 * rand() / (double)RAND_MAX - 1.0;
       rsq = x * x + y * y;
     }while( rsq >= 1. || rsq == 0. );
-    f = sqrt( -2.0 * log(rsq) / rsq );
+    f = std::sqrt( -2.0 * log(rsq) / rsq );
     val[ii]   = mean + std * x * f;
     val[ii+1] = mean + std * y * f;
   }

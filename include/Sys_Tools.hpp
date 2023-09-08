@@ -4,8 +4,6 @@
 // Sys_Tools.hpp
 // ----------------------------------------------------------------------------
 // The SYS_T namespace contains a suite of tools at the system level.
-//
-// Author: Ju Liu
 // ============================================================================
 #include <cstdlib>
 #include <iostream>
@@ -251,19 +249,6 @@ namespace SYS_T
   inline void print_exit_if( bool a, const char output[], ... )
   {
     if( a )
-    {
-      va_list Argp;
-      va_start(Argp, output);
-      vfprintf (stderr, output, Argp);
-      va_end(Argp);
-
-      exit( EXIT_FAILURE );
-    }
-  }
-
-  inline void print_exit_if_not( bool a, const char output[], ... )
-  {
-    if( !a )
     {
       va_list Argp;
       va_start(Argp, output);

@@ -76,14 +76,7 @@ Vector_3& Vector_3::operator*=( const double &val )
 
 std::vector<double> Vector_3::to_std_vec() const
 {
-  std::vector<double> outvec;
-  
-  outvec.resize(3);
-  for(int ii=0; ii<3; ++ii) outvec[ii] = vec[ii];
-  
-  std::vector<double>(outvec.begin(), outvec.end()).swap(outvec);
-
-  return outvec; 
+  return { vec[0], vec[1], vec[2] }; 
 }
 
 std::array<double, 3> Vector_3::to_std_array() const
@@ -110,16 +103,14 @@ void Vector_3::gen_val(const double &val)
   vec[2] = val;
 }
 
-void Vector_3::gen_rand()
+void Vector_3::gen_rand(const double &left, const double &right)
 {
-  srand(time(NULL));
-
-  for(int ii=0; ii<3; ++ii)
-  {
-    const double value = rand() % 10000;
-
-    vec[ii] = value * 1.0e-3 - 5.0;
-  }
+  std::random_device rd;
+  std::mt19937_64 gen( rd() );
+  std::uniform_real_distribution<double> dis(left, right);
+  vec[0] = dis(gen);
+  vec[1] = dis(gen);
+  vec[2] = dis(gen);
 }
 
 double Vector_3::normalize()

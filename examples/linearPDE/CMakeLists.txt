@@ -36,22 +36,19 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/System/Math_Tools.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
   ${perigee_source}/System/HDF5_Reader.cpp
+  ${perigee_source}/Mesh/Gmsh_FileIO.cpp
   ${perigee_source}/Mesh/VTK_Tools.cpp
   ${perigee_source}/Mesh/Tet_Tools.cpp
-  ${perigee_source}/Mesh/Gmsh_FileIO.cpp
-  ${perigee_source}/Mesh/Mesh_Tet.cpp
   ${perigee_source}/Mesh/IEN_FEM.cpp
+  ${perigee_source}/Mesh/Mesh_Tet.cpp
   ${perigee_source}/Mesh/IPart.cpp
   ${perigee_source}/Mesh/Part_Tet.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet_outflow.cpp
   ${perigee_source}/Mesh/NodalBC.cpp
-  ${perigee_source}/Mesh/NodalBC_3D_inflow.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
   ${perigee_source}/Mesh/NBC_Partition.cpp
-  ${perigee_source}/Mesh/NBC_Partition_inflow.cpp
   ${perigee_source}/Mesh/EBC_Partition.cpp
-  ${perigee_source}/Mesh/EBC_Partition_outflow.cpp
   ${perigee_source}/Mesh/Map_Node_Index.cpp
   ${perigee_source}/Mesh/Global_Part_METIS.cpp
   ${perigee_source}/Mesh/Global_Part_Serial.cpp
@@ -64,7 +61,6 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/System/Matrix_double_6by6_Array.cpp
   ${perigee_source}/System/Matrix_PETSc.cpp
   ${perigee_source}/System/Matrix_3x3.cpp
-  ${perigee_source}/System/SymmMatrix_3x3.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Tet.cpp
   ${perigee_source}/Analysis_Tool/AGlobal_Mesh_Info_FEM_3D.cpp
   ${perigee_source}/Analysis_Tool/APart_Basic_Info.cpp
@@ -83,18 +79,17 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Model/GenBC_Inductance.cpp
   ${perigee_source}/Model/GenBC_Coronary.cpp
   ${perigee_source}/Model/GenBC_Tools.cpp
-  ${perigee_source}/Model/GenBC_Pressure.cpp
   ${perigee_source}/Model/CVFlowRate_Unsteady.cpp
   ${perigee_source}/Model/CVFlowRate_Linear2Steady.cpp
   ${perigee_source}/Solver/PDNSolution.cpp
   ${perigee_source}/Solver/PDNTimeStep.cpp
   ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
-  ${perigee_SOURCE_DIR}/src/PLocAssem_Tet_VMS_NS_GenAlpha.cpp
-  ${perigee_SOURCE_DIR}/src/PGAssem_NS_FEM.cpp
-  ${perigee_SOURCE_DIR}/src/PDNSolution_NS.cpp
-  ${perigee_SOURCE_DIR}/src/PNonlinear_NS_Solver.cpp
-  ${perigee_SOURCE_DIR}/src/PTime_NS_Solver.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_Tet_Transport_GenAlpha.cpp
+  ${perigee_SOURCE_DIR}/src/PDNSolution_Transport.cpp
+  ${perigee_SOURCE_DIR}/src/PGAssem_Tet_Transport_GenAlpha.cpp
+  ${perigee_SOURCE_DIR}/src/PNonlinear_Transport_Solver.cpp
+  ${perigee_SOURCE_DIR}/src/PTime_Transport_Solver.cpp
   )
 
 SET( perigee_postprocess_lib_src
@@ -104,8 +99,7 @@ SET( perigee_postprocess_lib_src
   ${perigee_source}/Postproc_Tool/PostVectSolution.cpp
   ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   ${perigee_source}/Postproc_Tool/Interpolater.cpp
-  ${perigee_SOURCE_DIR}/src/VisDataPrep_NS.cpp
-  ${perigee_SOURCE_DIR}/src/VTK_Writer_NS.cpp
+  ${perigee_SOURCE_DIR}/src/Post_error_transport.cpp
   )
 
 INCLUDE_DIRECTORIES( ../../include )
@@ -133,22 +127,16 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 # BUILD THE MAIN DRIVERS
 # ===================================================================
-ADD_EXECUTABLE( gmsh_p1_IO gmsh_p1_process.cpp )
-ADD_EXECUTABLE( gmsh_p2_IO gmsh_p2_process.cpp )
-ADD_EXECUTABLE( preprocess3d preprocess_ns.cpp)
-ADD_EXECUTABLE( ns3d ns_driver.cpp)
-ADD_EXECUTABLE( prepost3d prepost_ns.cpp)
-ADD_EXECUTABLE( vis_ns vis_ns.cpp)
-ADD_EXECUTABLE( vis_p1_wss vis_p1_wss.cpp)
-ADD_EXECUTABLE( vis_p2_wss vis_p2_wss.cpp)
+ADD_EXECUTABLE( gmsh_IO gmsh_convert.cpp )
+ADD_EXECUTABLE( preprocess3d preprocess.cpp)
+ADD_EXECUTABLE( transport_3d driver.cpp)
+ADD_EXECUTABLE( prepost prepost.cpp)
+ADD_EXECUTABLE( post_error post_compare_manu.cpp )
 
-TARGET_LINK_LIBRARIES( gmsh_p1_IO perigee_preprocess )
-TARGET_LINK_LIBRARIES( gmsh_p2_IO perigee_preprocess )
+TARGET_LINK_LIBRARIES( gmsh_IO perigee_preprocess )
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
-TARGET_LINK_LIBRARIES( ns3d perigee_analysis )
-TARGET_LINK_LIBRARIES( prepost3d perigee_preprocess )
-TARGET_LINK_LIBRARIES( vis_ns perigee_postprocess )
-TARGET_LINK_LIBRARIES( vis_p1_wss perigee_postprocess )
-TARGET_LINK_LIBRARIES( vis_p2_wss perigee_postprocess )
+TARGET_LINK_LIBRARIES( transport_3d perigee_analysis )
+TARGET_LINK_LIBRARIES( prepost perigee_preprocess )
+TARGET_LINK_LIBRARIES( post_error perigee_postprocess )
 
 # EOF

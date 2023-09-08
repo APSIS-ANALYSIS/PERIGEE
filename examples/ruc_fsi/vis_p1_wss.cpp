@@ -26,7 +26,7 @@ void write_triangle_grid_wss( const std::string &filename,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt,
     const std::vector<int> &ien_array,
-    const std::vector< std::vector<double> > &wss_on_node );
+    const std::vector< Vector_3 > &wss_on_node );
 
 void write_triangle_grid_tawss_osi( const std::string &filename,
     const int &numpts, const int &numcels,
@@ -44,10 +44,7 @@ int main( int argc, char * argv[] )
   int time_step = 1;
   int time_end = 1;
 
-  // fluid properties
-  double fluid_mu = 3.5e-2;
-  
-  const int dof = 4;
+  constexpr int dof = 4;
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
@@ -70,7 +67,7 @@ int main( int argc, char * argv[] )
   
   cmd_h5r = new HDF5_Reader( prepcmd_file );
   
-  fluid_mu = cmd_h5r -> read_doubleScalar("/", "fl_mu");
+  const double fluid_mu = cmd_h5r -> read_doubleScalar("/", "fl_mu");
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
@@ -100,70 +97,63 @@ int main( int argc, char * argv[] )
   cout<<"==== Command Line Arguments ===="<<endl;
 
   // Make sure the files exist on disk
-  SYS_T::file_check( geo_file.c_str() );
-  SYS_T::file_check( wall_file.c_str() );
+  SYS_T::file_check( geo_file );
+  SYS_T::file_check( wall_file );
 
   // Now read in the volumetric mesh info
   int v_nFunc, v_nElem;
   std::vector<int> v_vecIEN;
   std::vector<double> v_ctrlPts;
 
-  TET_T::read_vtu_grid(geo_file.c_str(), v_nFunc, v_nElem, v_ctrlPts, v_vecIEN);
+  VTK_T::read_vtu_grid(geo_file, v_nFunc, v_nElem, v_ctrlPts, v_vecIEN);
 
   cout<<endl<<"Volumetric mesh contains "<<v_nElem<<" elements and "<<v_nFunc<<" vertices.\n";
 
   // Now read the wall surface mesh info
   int nFunc, nElem;
   std::vector<double> ctrlPts;
-  std::vector<int> vecIEN, global_node_idx, global_ele_idx;
+  std::vector<int> vecIEN;
   
-  TET_T::read_vtp_grid( wall_file.c_str(), nFunc, nElem, ctrlPts, vecIEN,
-      global_node_idx, global_ele_idx );
+  VTK_T::read_vtp_grid( wall_file, nFunc, nElem, ctrlPts, vecIEN );
+
+  const std::vector<int> global_node_idx = VTK_T::read_int_PointData(wall_file, "GlobalNodeID");
+  const std::vector<int> global_ele_idx = VTK_T::read_int_CellData(wall_file, "GlobalElementID");
 
   cout<<"Wall mesh contains "<<nElem<<" elements and "<<nFunc<<" vertices.\n";
 
   // Each surface element requires an additional node. interior_node
   // stores their global indices
-  std::vector<int> interior_node;
-  interior_node.resize( nElem );
+  std::vector<int> interior_node( nElem, -1 );
 
-  std::vector<double> interior_node_coord;
-  interior_node_coord.resize(3*nElem);
+  std::vector<double> interior_node_coord( 3*nElem, 0.0 );
 
   // On each surface element, there is a unit outward normal vector
-  std::vector< std::vector<double> > outnormal;
-  outnormal.resize( nElem );
+  std::vector< Vector_3 > outnormal( nElem, Vector_3(0.0, 0.0, 0.0) );
 
   // On each surface element, we store its area
-  std::vector<double> tri_area;
-  tri_area.resize( nElem );
+  std::vector<double> tri_area( nElem, 0.0 );
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    std::vector<int> trn; trn.resize(3);
-    int ten[4];
-
-    trn[0] = global_node_idx[ vecIEN[3*ee+0] ];
-    trn[1] = global_node_idx[ vecIEN[3*ee+1] ];
-    trn[2] = global_node_idx[ vecIEN[3*ee+2] ];
-
-    ten[0] = v_vecIEN[ global_ele_idx[ee]*4+0 ]; 
-    ten[1] = v_vecIEN[ global_ele_idx[ee]*4+1 ]; 
-    ten[2] = v_vecIEN[ global_ele_idx[ee]*4+2 ]; 
-    ten[3] = v_vecIEN[ global_ele_idx[ee]*4+3 ];
+    const std::vector<int> trn { global_node_idx[ vecIEN[3*ee+0] ], 
+      global_node_idx[ vecIEN[3*ee+1] ], global_node_idx[ vecIEN[3*ee+2] ] };
+    
+    const int ten[4] { v_vecIEN[ global_ele_idx[ee]*4+0 ], 
+      v_vecIEN[ global_ele_idx[ee]*4+1 ], 
+      v_vecIEN[ global_ele_idx[ee]*4+2 ], 
+      v_vecIEN[ global_ele_idx[ee]*4+3 ] };
 
     // Locate the interior node's global node index
-    bool gotnode[4];
     int node_check = 0;
     for(int ii=0; ii<4; ++ii)
     {
-      gotnode[ii] = VEC_T::is_invec( trn, ten[ii] );
+      const bool gotnode = VEC_T::is_invec( trn, ten[ii] );
 
-      if(!gotnode[ii]) interior_node[ee] = ten[ii];
+      if( !gotnode ) interior_node[ee] = ten[ii];
       else node_check += 1;
     }
 
-    SYS_T::print_fatal_if(node_check!=3, "Error: the associated tet element is incompatible with the triangle element.\n");
+    SYS_T::print_exit_if(node_check!=3, "Error: the associated tet element is incompatible with the triangle element.\n");
 
     // Record the interior node's coordinates
     interior_node_coord[3*ee+0] = v_ctrlPts[ 3*interior_node[ee] + 0 ];
@@ -171,39 +161,29 @@ int main( int argc, char * argv[] )
     interior_node_coord[3*ee+2] = v_ctrlPts[ 3*interior_node[ee] + 2 ];
 
     // Now decide the outward normal vector
-    outnormal[ee].resize(3);
-    const double l01x = v_ctrlPts[3*trn[1]] - v_ctrlPts[3*trn[0]];
-    const double l01y = v_ctrlPts[3*trn[1]+1] - v_ctrlPts[3*trn[0]+1];
-    const double l01z = v_ctrlPts[3*trn[1]+2] - v_ctrlPts[3*trn[0]+2];
+    const Vector_3 l01( v_ctrlPts[3*trn[1]] - v_ctrlPts[3*trn[0]],
+        v_ctrlPts[3*trn[1]+1] - v_ctrlPts[3*trn[0]+1],
+        v_ctrlPts[3*trn[1]+2] - v_ctrlPts[3*trn[0]+2] );
 
-    const double l02x = v_ctrlPts[3*trn[2]] - v_ctrlPts[3*trn[0]];
-    const double l02y = v_ctrlPts[3*trn[2]+1] - v_ctrlPts[3*trn[0]+1];
-    const double l02z = v_ctrlPts[3*trn[2]+2] - v_ctrlPts[3*trn[0]+2]; 
+    const Vector_3 l02( v_ctrlPts[3*trn[2]] - v_ctrlPts[3*trn[0]],
+     v_ctrlPts[3*trn[2]+1] - v_ctrlPts[3*trn[0]+1],
+     v_ctrlPts[3*trn[2]+2] - v_ctrlPts[3*trn[0]+2] ); 
 
-    double oux, ouy, ouz;
+    Vector_3 ou = cross_product( l01, l02 );
 
-    MATH_T::cross3d( l01x, l01y, l01z, l02x, l02y, l02z, oux, ouy, ouz );
+    tri_area[ee] = 0.5 * ou.normalize();
 
-    tri_area[ee] = 0.5 * MATH_T::normalize3d( oux, ouy, ouz );
+    const Vector_3 inw( v_ctrlPts[interior_node[ee]*3]   - v_ctrlPts[3*trn[0]],
+        v_ctrlPts[interior_node[ee]*3+1] - v_ctrlPts[3*trn[0]+1],
+        v_ctrlPts[interior_node[ee]*3+2] - v_ctrlPts[3*trn[0]+2] );
 
-    const double inwx = v_ctrlPts[interior_node[ee]*3]   - v_ctrlPts[3*trn[0]];
-    const double inwy = v_ctrlPts[interior_node[ee]*3+1] - v_ctrlPts[3*trn[0]+1];
-    const double inwz = v_ctrlPts[interior_node[ee]*3+2] - v_ctrlPts[3*trn[0]+2];
-
-    const double out_dot_in = MATH_T::dot3d(oux, ouy, ouz, inwx, inwy, inwz);
+    const double out_dot_in = dot_product( ou, inw ); 
 
     // if in case the normal points inside, multiply by -1
-    if(out_dot_in > 0)
-    {
-      oux *= -1.0;
-      ouy *= -1.0;
-      ouz *= -1.0;
-    }
+    if(out_dot_in > 0) ou *= -1.0;
 
     // record the outward normal  
-    outnormal[ee][0] = oux;
-    outnormal[ee][1] = ouy;
-    outnormal[ee][2] = ouz;
+    outnormal[ee] = ou;
   }
 
   // Clean the volumetric data for memory
@@ -217,42 +197,18 @@ int main( int argc, char * argv[] )
   // Element container
   FEAElement * element = new FEAElement_Tet4( quad-> get_num_quadPts() );
 
-  double ectrl_x[4], ectrl_y[4], ectrl_z[4];
-  double esol_u[4], esol_v[4], esol_w[4];
-
   // Read the node mappings
-  std::vector<int> analysis_new2old;
-  analysis_new2old.resize(v_nFunc);
+  std::vector<int> analysis_new2old( v_nFunc, -1 );
   ReadNodeMapping("node_mapping.h5", "new_2_old", v_nFunc, &analysis_new2old[0] );
 
   // Read solutions
   std::ostringstream time_index;
   std::vector<double> sol;
-  double Rx[4], Ry[4], Rz[4];
-
-  // Container for WSS averaged value
-  std::vector< std::vector<double> > wss_ave;
-  wss_ave.resize( nFunc );
-  for(int ii=0; ii<nFunc; ++ii) wss_ave[ii].resize(3);
-
-  // Container for the area associated with the node
-  std::vector<double> node_area; node_area.resize(nFunc);
 
   // Container for TAWSS & OSI
-  std::vector<double> tawss, osi; 
-  std::vector< std::vector<double> > osi_top;
-  tawss.resize( nFunc ); osi.resize( nFunc ); osi_top.resize( nFunc );
-
-  for(int ii=0; ii<nFunc; ++ii)
-  {
-    tawss[ii]   = 0.0;
-    osi[ii]     = 0.0;
-
-    osi_top[ii].resize(3);
-    osi_top[ii][0] = 0.0;
-    osi_top[ii][1] = 0.0;
-    osi_top[ii][2] = 0.0;
-  }
+  std::vector<double> tawss( nFunc, 0.0 ); 
+  std::vector<double> osi( nFunc, 0.0 ); 
+  std::vector< Vector_3 > osi_top( nFunc, Vector_3(0.0, 0.0, 0.0) );
 
   const double inv_T = 1.0 / ( static_cast<double>((time_end - time_start)/time_step) + 1.0 );
 
@@ -266,66 +222,51 @@ int main( int argc, char * argv[] )
     name_to_read.append(time_index.str());
     name_to_write.append(time_index.str());
 
-    PetscPrintf(PETSC_COMM_WORLD, "Time %d: Read %s and Write %s \n",
-        time, name_to_read.c_str(), name_to_write.c_str() );
+    std::cout<<"Time "<<time<<": Read "<<name_to_read<<" and Write "<<name_to_write<<std::endl;
 
     // Read in the solution vector and arrange them into the natural numbering
     ReadPETSc_Vec( name_to_read, analysis_new2old, v_nFunc*dof, dof, sol );
 
-    // zero the container for averaged wss
-    for(int ii=0; ii<nFunc; ++ii)
-    {
-      wss_ave[ii][0] = 0.0;
-      wss_ave[ii][1] = 0.0;
-      wss_ave[ii][2] = 0.0;
+    // Container for WSS averaged value
+    std::vector< Vector_3 > wss_ave( nFunc, Vector_3(0.0, 0.0, 0.0) );
 
-      node_area[ii] = 0.0;
-    }
+    // Container for the area associated with the node
+    std::vector<double> node_area(nFunc, 0.0);
 
     for(int ee=0; ee<nElem; ++ee)
     {
-      double trn[3];
-
       // Make sure the interior node is the node 3 
-      trn[0] = vecIEN[3*ee+0];
-      trn[1] = vecIEN[3*ee+1];
-      trn[2] = vecIEN[3*ee+2];
+      const int trn[3] { vecIEN[3*ee+0], vecIEN[3*ee+1], vecIEN[3*ee+2] };
 
-      ectrl_x[0] = ctrlPts[3*trn[0] + 0]; 
-      ectrl_x[1] = ctrlPts[3*trn[1] + 0]; 
-      ectrl_x[2] = ctrlPts[3*trn[2] + 0]; 
-      ectrl_x[3] = interior_node_coord[3*ee + 0]; 
+      const double ectrl_x[4] { ctrlPts[3*trn[0] + 0], ctrlPts[3*trn[1] + 0], 
+        ctrlPts[3*trn[2] + 0], interior_node_coord[3*ee + 0] }; 
 
-      ectrl_y[0] = ctrlPts[3*trn[0] + 1]; 
-      ectrl_y[1] = ctrlPts[3*trn[1] + 1]; 
-      ectrl_y[2] = ctrlPts[3*trn[2] + 1]; 
-      ectrl_y[3] = interior_node_coord[3*ee + 1]; 
+      const double ectrl_y[4] { ctrlPts[3*trn[0] + 1], ctrlPts[3*trn[1] + 1], 
+        ctrlPts[3*trn[2] + 1], interior_node_coord[3*ee + 1] }; 
 
-      ectrl_z[0] = ctrlPts[3*trn[0] + 2]; 
-      ectrl_z[1] = ctrlPts[3*trn[1] + 2]; 
-      ectrl_z[2] = ctrlPts[3*trn[2] + 2]; 
-      ectrl_z[3] = interior_node_coord[3*ee + 2];
+      const double ectrl_z[4] { ctrlPts[3*trn[0] + 2], ctrlPts[3*trn[1] + 2], 
+        ctrlPts[3*trn[2] + 2], interior_node_coord[3*ee + 2] };
 
       element -> buildBasis(quad, ectrl_x, ectrl_y, ectrl_z); 
 
-      esol_u[0] = sol[ global_node_idx[trn[0]] * dof + 1 ];
-      esol_u[1] = sol[ global_node_idx[trn[1]] * dof + 1 ];
-      esol_u[2] = sol[ global_node_idx[trn[2]] * dof + 1 ];
-      esol_u[3] = sol[ interior_node[ee] * dof + 1 ];
+     const double esol_u[4] { sol[ global_node_idx[trn[0]] * dof + 1 ],
+       sol[ global_node_idx[trn[1]] * dof + 1 ],
+       sol[ global_node_idx[trn[2]] * dof + 1 ],
+       sol[ interior_node[ee] * dof + 1 ] };
 
-      esol_v[0] = sol[ global_node_idx[trn[0]] * dof + 2 ];
-      esol_v[1] = sol[ global_node_idx[trn[1]] * dof + 2 ];
-      esol_v[2] = sol[ global_node_idx[trn[2]] * dof + 2 ];
-      esol_v[3] = sol[ interior_node[ee] * dof + 2 ];
+     const double esol_v[4] { sol[ global_node_idx[trn[0]] * dof + 2 ],
+       sol[ global_node_idx[trn[1]] * dof + 2 ],
+       sol[ global_node_idx[trn[2]] * dof + 2 ],
+       sol[ interior_node[ee] * dof + 2 ] };
 
-      esol_w[0] = sol[ global_node_idx[trn[0]] * dof + 3 ];
-      esol_w[1] = sol[ global_node_idx[trn[1]] * dof + 3 ];
-      esol_w[2] = sol[ global_node_idx[trn[2]] * dof + 3 ];
-      esol_w[3] = sol[ interior_node[ee] * dof + 3 ];
+     const double esol_w[4] { sol[ global_node_idx[trn[0]] * dof + 3 ],
+       sol[ global_node_idx[trn[1]] * dof + 3 ],
+       sol[ global_node_idx[trn[2]] * dof + 3 ],
+       sol[ interior_node[ee] * dof + 3 ] };
 
-      const double nx = outnormal[ee][0];
-      const double ny = outnormal[ee][1];
-      const double nz = outnormal[ee][2];
+      const double nx = outnormal[ee].x();
+      const double ny = outnormal[ee].y();
+      const double nz = outnormal[ee].z();
 
       for(int qua=0; qua<3; ++qua)
       {
@@ -333,6 +274,7 @@ int main( int argc, char * argv[] )
         // 4-th basis function is associated with the interior node.
         // Also, the sampling points are aranged such that the first three
         // node are evaluated first. 
+        double Rx[4], Ry[4], Rz[4];
         element -> get_gradR(qua, Rx, Ry, Rz);
 
         const double ux = esol_u[0] * Rx[0] + esol_u[1] * Rx[1] + esol_u[2] * Rx[2] + esol_u[3] * Rx[3];
@@ -360,43 +302,31 @@ int main( int argc, char * argv[] )
         // Due to the numbering in the visualization quadrature routine, the
         // first quadrature point located on the vertex associated with basis-0,
         // and so on.
-        wss_ave[ trn[qua] ][0] += wss_x * tri_area[ee];
-        wss_ave[ trn[qua] ][1] += wss_y * tri_area[ee];
-        wss_ave[ trn[qua] ][2] += wss_z * tri_area[ee];
+        wss_ave[ trn[qua] ].x() += wss_x * tri_area[ee];
+        wss_ave[ trn[qua] ].y() += wss_y * tri_area[ee];
+        wss_ave[ trn[qua] ].z() += wss_z * tri_area[ee];
 
         node_area[ trn[qua] ] += tri_area[ee]; 
       } // Loop over the three surface points  
     } // Loop over surface elements
 
     // Do the averaging by dividing by the area owned by this node
-    for(int ii=0; ii<nFunc; ++ii)
-    {
-      wss_ave[ii][0] /= node_area[ii];
-      wss_ave[ii][1] /= node_area[ii];
-      wss_ave[ii][2] /= node_area[ii];
-    }
+    for(int ii=0; ii<nFunc; ++ii) wss_ave[ii] *= (1.0 / node_area[ii]);
 
     // write the wall shear stress at this time instance
     write_triangle_grid_wss( name_to_write, nFunc, nElem, ctrlPts, vecIEN, wss_ave );
 
     for(int ii=0; ii<nFunc; ++ii)
     {
-      tawss[ii] += inv_T * std::sqrt( wss_ave[ii][0] * wss_ave[ii][0] 
-          + wss_ave[ii][1] * wss_ave[ii][1] + wss_ave[ii][2] * wss_ave[ii][2] );
-
-      osi_top[ii][0] += inv_T * wss_ave[ii][0];
-      osi_top[ii][1] += inv_T * wss_ave[ii][1];
-      osi_top[ii][2] += inv_T * wss_ave[ii][2];
+      tawss[ii]   += inv_T * wss_ave[ii].norm2();
+      osi_top[ii] += inv_T * wss_ave[ii];
     } 
 
   }// Loop over each time instance
 
-  MPI_Barrier(PETSC_COMM_WORLD);
-
   for(int ii=0; ii<nFunc; ++ii)
   {
-    const double mag = std::sqrt( osi_top[ii][0] * osi_top[ii][0] +
-        osi_top[ii][1] * osi_top[ii][1] + osi_top[ii][2] * osi_top[ii][2] );
+    const double mag = osi_top[ii].norm2();
 
     // We will disallow very small tawss in the osi calculation
     if( std::abs(tawss[ii]) > 1.0e-12 )
@@ -514,7 +444,7 @@ void write_triangle_grid_wss( const std::string &filename,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt,
     const std::vector<int> &ien_array,
-    const std::vector< std::vector<double> > &wss_on_node )
+    const std::vector< Vector_3 > &wss_on_node )
 {
   if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: point vector size does not match the number of points. \n");
 
@@ -560,9 +490,9 @@ void write_triangle_grid_wss( const std::string &filename,
   ptindex -> SetName("WSS");
   for(int ii=0; ii<numpts; ++ii)
   {
-    ptindex -> InsertComponent(ii, 0, wss_on_node[ii][0]);
-    ptindex -> InsertComponent(ii, 1, wss_on_node[ii][1]);
-    ptindex -> InsertComponent(ii, 2, wss_on_node[ii][2]);
+    ptindex -> InsertComponent(ii, 0, wss_on_node[ii].x());
+    ptindex -> InsertComponent(ii, 1, wss_on_node[ii].y());
+    ptindex -> InsertComponent(ii, 2, wss_on_node[ii].z());
   }
   grid_w -> GetPointData() -> AddArray( ptindex );
   ptindex->Delete();
