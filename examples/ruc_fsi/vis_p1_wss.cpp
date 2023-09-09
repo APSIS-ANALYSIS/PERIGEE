@@ -13,14 +13,12 @@
 #include "QuadPts_vis_tet4.hpp"
 #include "FEAElement_Tet4.hpp"
 
-void ReadNodeMapping( const char * const &node_mapping_file,
-    const char * const &mapping_type, const int &node_size,
-    int * const &nodemap );
+std::vector<int> ReadNodeMapping( const char * const &node_mapping_file,
+    const char * const &mapping_type, const int &node_size );
 
-void ReadPETSc_Vec( const std::string &solution_file_name,
+std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
     const std::vector<int> &nodemap,
-    const int &vec_size, const int &in_dof,
-    std::vector<double> &sol );
+    const int &vec_size, const int &in_dof );
 
 void write_triangle_grid_wss( const std::string &filename,
     const int &numpts, const int &numcels,
@@ -198,12 +196,10 @@ int main( int argc, char * argv[] )
   FEAElement * element = new FEAElement_Tet4( quad-> get_num_quadPts() );
 
   // Read the node mappings
-  std::vector<int> analysis_new2old( v_nFunc, -1 );
-  ReadNodeMapping("node_mapping.h5", "new_2_old", v_nFunc, &analysis_new2old[0] );
+  const std::vector<int> analysis_new2old = ReadNodeMapping("node_mapping.h5", "new_2_old", v_nFunc );
 
   // Read solutions
   std::ostringstream time_index;
-  std::vector<double> sol;
 
   // Container for TAWSS & OSI
   std::vector<double> tawss( nFunc, 0.0 ); 
@@ -225,7 +221,7 @@ int main( int argc, char * argv[] )
     std::cout<<"Time "<<time<<": Read "<<name_to_read<<" and Write "<<name_to_write<<std::endl;
 
     // Read in the solution vector and arrange them into the natural numbering
-    ReadPETSc_Vec( name_to_read, analysis_new2old, v_nFunc*dof, dof, sol );
+    std::vector<double> sol = ReadPETSc_Vec( name_to_read, analysis_new2old, v_nFunc*dof, dof );
 
     // Container for WSS averaged value
     std::vector< Vector_3 > wss_ave( nFunc, Vector_3(0.0, 0.0, 0.0) );
@@ -347,9 +343,8 @@ int main( int argc, char * argv[] )
 
 
 // Read the node mappings
-void ReadNodeMapping( const char * const &node_mapping_file,
-    const char * const &mapping_type, const int &node_size,
-    int * const &nodemap )
+std::vector<int> ReadNodeMapping( const char * const &node_mapping_file,
+    const char * const &mapping_type, const int &node_size )
 {
   hid_t file_id = H5Fopen(node_mapping_file, H5F_ACC_RDONLY, H5P_DEFAULT);
   hid_t data_id = H5Dopen(file_id, mapping_type, H5P_DEFAULT);
@@ -377,20 +372,23 @@ void ReadNodeMapping( const char * const &node_mapping_file,
     MPI_Abort(PETSC_COMM_WORLD, 1);
   }
 
+  std::vector<int> out(node_size, -1);
+
   H5Dread( data_id, H5T_NATIVE_INT, mem_space, data_space,
-      H5P_DEFAULT, nodemap );
+      H5P_DEFAULT, &out[0] );
 
   delete [] data_dims;
   H5Sclose( mem_space );
   H5Sclose(data_space);
   H5Dclose(data_id);
   H5Fclose(file_id);
+
+  return out;
 }
 
-void ReadPETSc_Vec( const std::string &solution_file_name,
+std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
     const std::vector<int> &nodemap,
-    const int &vec_size, const int &in_dof,
-    std::vector<double> &sol )
+    const int &vec_size, const int &in_dof )
 {
   Vec sol_temp;
   VecCreate(PETSC_COMM_SELF, &sol_temp);
@@ -413,8 +411,7 @@ void ReadPETSc_Vec( const std::string &solution_file_name,
     MPI_Abort(PETSC_COMM_WORLD, 1);
   }
 
-  std::vector<double> veccopy;
-  veccopy.resize(vec_size);
+  std::vector<double> veccopy(vec_size, 0.0);
   double * array_temp;
   VecGetArray(sol_temp, &array_temp);
 
@@ -425,8 +422,7 @@ void ReadPETSc_Vec( const std::string &solution_file_name,
   VecDestroy(&sol_temp);
 
   // copy the solution varibles to the correct location
-  sol.clear();
-  sol.resize(vec_size);
+  std::vector<double> sol(vec_size, 0.0);
 
   // check the nodemap size
   if( (int)nodemap.size() * in_dof != vec_size ) SYS_T::print_fatal("Error: node map size is incompatible with the solution length. \n");
@@ -437,6 +433,8 @@ void ReadPETSc_Vec( const std::string &solution_file_name,
     for(int jj=0; jj<in_dof; ++jj)
       sol[in_dof*index+jj] = veccopy[in_dof*ii+jj];
   }
+
+  return sol;
 }
 
 

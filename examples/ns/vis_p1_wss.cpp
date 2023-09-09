@@ -140,13 +140,12 @@ int main( int argc, char * argv[] )
       v_vecIEN[ global_ele_idx[ee]*4+3 ] };
 
     // Locate the interior node's global node index
-    bool gotnode[4];
     int node_check = 0;
     for(int ii=0; ii<4; ++ii)
     {
-      gotnode[ii] = VEC_T::is_invec( trn, ten[ii] );
+      const bool gotnode = VEC_T::is_invec( trn, ten[ii] );
 
-      if(!gotnode[ii]) interior_node[ee] = ten[ii];
+      if(!gotnode) interior_node[ee] = ten[ii];
       else node_check += 1;
     }
 
