@@ -11,7 +11,7 @@
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
-#include "Part_Tet_FSI.hpp"
+#include "Part_FEM_FSI.hpp"
 
 int main( int argc, char * argv[] )
 {
@@ -236,14 +236,14 @@ int main( int argc, char * argv[] )
     mytimer->Reset();
     mytimer->Start();
     
-    IPart * part_p = new Part_Tet_FSI( mesh_p, global_part, mnindex_p, IEN_p,
+    IPart * part_p = new Part_FEM_FSI( mesh_p, global_part, mnindex_p, IEN_p,
         ctrlPts, phy_tag, p_node_f, p_node_s,
         proc_rank, cpu_size, elemType, 0, dof_fields[0], start_idx_p[proc_rank], false );
 
     part_p -> write( part_file_p );
     delete part_p;
 
-    IPart * part_v = new Part_Tet_FSI( mesh_v, global_part, mnindex_v, IEN_v,
+    IPart * part_v = new Part_FEM_FSI( mesh_v, global_part, mnindex_v, IEN_v,
         ctrlPts, phy_tag, v_node_f, v_node_s,
         proc_rank, cpu_size, elemType, 1, dof_fields[1], start_idx_v[proc_rank], true );
 
