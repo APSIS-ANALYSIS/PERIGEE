@@ -18,10 +18,9 @@ void ReadNodeMapping( const char * const &node_mapping_file,
     const char * const &mapping_type, const int &node_size,
     int * const &nodemap );
 
-void ReadPETSc_Vec( const std::string &solution_file_name,
+std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
     const std::vector<int> &nodemap,
-    const int &vec_size, const int &in_dof,
-    std::vector<double> &sol );
+    const int &vec_size, const int &in_dof );
 
 int get_tri_local_id( const double * const &coor_x,
     const double * const &coor_y,
@@ -204,9 +203,6 @@ int main( int argc, char * argv[] )
   double * Ry = new double [v_nLocBas];
   double * Rz = new double [v_nLocBas];
 
-  // Container for the solution vector
-  std::vector<double> sol;
-
   // Container for Time averaged WSS and OSI
   std::vector<double> tawss( nFunc, 0.0 ); 
   std::vector<double> osi( nFunc, 0.0 ); 
@@ -230,7 +226,7 @@ int main( int argc, char * argv[] )
         time, name_to_read.c_str(), name_to_write.c_str() );
 
     // Read the solution vector and renumber them based on the nodal mappings
-    ReadPETSc_Vec( name_to_read, analysis_new2old, v_nFunc*dof, dof, sol );
+    std::vector<double> sol = ReadPETSc_Vec( name_to_read, analysis_new2old, v_nFunc*dof, dof );
 
     // Container for (averaged) WSS
     std::vector< Vector_3 > wss_ave( nFunc, Vector_3(0.0, 0.0, 0.0) );
@@ -494,10 +490,9 @@ void ReadNodeMapping( const char * const &node_mapping_file,
 }
 
 
-void ReadPETSc_Vec( const std::string &solution_file_name,
+std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
     const std::vector<int> &nodemap,
-    const int &vec_size, const int &in_dof,
-    std::vector<double> &sol )
+    const int &vec_size, const int &in_dof )
 {
   Vec sol_temp;
   VecCreate(PETSC_COMM_SELF, &sol_temp);
@@ -520,8 +515,7 @@ void ReadPETSc_Vec( const std::string &solution_file_name,
     MPI_Abort(PETSC_COMM_WORLD, 1);
   }
 
-  std::vector<double> veccopy;
-  veccopy.resize(vec_size);
+  std::vector<double> veccopy(vec_size, 0.0);
   double * array_temp;
   VecGetArray(sol_temp, &array_temp);
 
@@ -532,8 +526,7 @@ void ReadPETSc_Vec( const std::string &solution_file_name,
   VecDestroy(&sol_temp);
 
   // copy the solution varibles to the correct location
-  sol.clear();
-  sol.resize(vec_size);
+  std::vector<double> sol(vec_size, 0.0);
 
   // check the nodemap size
   if( (int)nodemap.size() * in_dof != vec_size ) SYS_T::print_fatal("Error: node map size is incompatible with the solution length. \n");
@@ -544,6 +537,8 @@ void ReadPETSc_Vec( const std::string &solution_file_name,
     for(int jj=0; jj<in_dof; ++jj)
       sol[in_dof*index+jj] = veccopy[in_dof*ii+jj];
   }
+
+  return sol;
 }
 
 
@@ -596,7 +591,6 @@ void write_triangle_grid_wss( const std::string &filename,
 
   grid_w->Delete();
 }
-
 
 void write_triangle_grid_tawss_osi( const std::string &filename,
     const int &numpts, const int &numcels,
