@@ -489,14 +489,9 @@ void write_triangle_grid_wss( const std::string &filename,
   grid_w -> GetPointData() -> AddArray( ptindex );
   ptindex->Delete();
 
-  vtkXMLPolyDataWriter * writer = vtkXMLPolyDataWriter::New();
-  std::string name_to_write(filename);
-  name_to_write.append(".vtp");
-  writer -> SetFileName( name_to_write.c_str() );
-  writer->SetInputData(grid_w);
-  writer->Write();
-
-  writer->Delete();
+  // write vtp
+  VTK_T::write_vtkPointSet(filename, grid_w);
+  
   grid_w->Delete();
 }
 
@@ -563,16 +558,10 @@ void write_triangle_grid_tawss_osi( const std::string &filename,
   
   grid_w -> GetPointData() -> AddArray( vtkosi );
   vtkosi -> Delete();
-
+  
   // write vtp
-  vtkXMLPolyDataWriter * writer = vtkXMLPolyDataWriter::New();
-  std::string name_to_write(filename);
-  name_to_write.append(".vtp");
-  writer -> SetFileName( name_to_write.c_str() );
-  writer->SetInputData(grid_w);
-  writer->Write();
+  VTK_T::write_vtkPointSet(filename, grid_w);
 
-  writer->Delete();
   grid_w->Delete();
 }
 
