@@ -94,7 +94,7 @@ Part_FEM_FSI::~Part_FEM_FSI()
 
 void Part_FEM_FSI::write( const std::string &inputFileName ) const
 {
-  const std::string fName = SYS_T::gen_partfile_name( inputiFileName, cpu_rank );
+  const std::string fName = SYS_T::gen_partfile_name( inputFileName, cpu_rank );
 
   hid_t file_id = H5Fcreate(fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
