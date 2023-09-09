@@ -434,7 +434,6 @@ std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
   return sol;
 }
 
-
 void write_triangle_grid_wss( const std::string &filename,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt,
@@ -449,32 +448,8 @@ void write_triangle_grid_wss( const std::string &filename,
 
   vtkPolyData * grid_w = vtkPolyData::New();
 
-  // 1. nodal points
-  vtkPoints * ppt = vtkPoints::New();
-  ppt->SetDataTypeToDouble();
-  for(int ii=0; ii<numpts; ++ii)
-  {
-    const double coor[3] { pt[3*ii], pt[3*ii+1], pt[3*ii+2] };
-    ppt -> InsertPoint(ii, coor);
-  }
-
-  grid_w -> SetPoints(ppt);
-  ppt -> Delete();
-
-  // 2. cell data
-  vtkCellArray * cl = vtkCellArray::New();
-  for(int ii=0; ii<numcels; ++ii)
-  {
-    vtkTriangle * tr = vtkTriangle::New();
-
-    tr->GetPointIds()->SetId( 0, ien_array[3*ii] );
-    tr->GetPointIds()->SetId( 1, ien_array[3*ii+1] );
-    tr->GetPointIds()->SetId( 2, ien_array[3*ii+2] );
-    cl -> InsertNextCell(tr);
-    tr -> Delete();
-  }
-  grid_w->SetPolys(cl);
-  cl->Delete();
+  // generate the triangle grid
+  TET_T::gen_triangle_grid(grid_w, numpts, numcels, pt, ien_array);
 
   // write wss
   vtkDoubleArray * ptindex = vtkDoubleArray::New();
@@ -491,7 +466,7 @@ void write_triangle_grid_wss( const std::string &filename,
 
   // write vtp
   VTK_T::write_vtkPointSet(filename, grid_w);
-  
+
   grid_w->Delete();
 }
 
@@ -512,32 +487,8 @@ void write_triangle_grid_tawss_osi( const std::string &filename,
 
   vtkPolyData * grid_w = vtkPolyData::New();
 
-  // 1. nodal points
-  vtkPoints * ppt = vtkPoints::New();
-  ppt->SetDataTypeToDouble();
-  for(int ii=0; ii<numpts; ++ii)
-  {
-    const double coor[3] { pt[3*ii], pt[3*ii+1], pt[3*ii+2] };
-    ppt -> InsertPoint(ii, coor);
-  }
-
-  grid_w -> SetPoints(ppt);
-  ppt -> Delete();
-
-  // 2. cell data
-  vtkCellArray * cl = vtkCellArray::New();
-  for(int ii=0; ii<numcels; ++ii)
-  {
-    vtkTriangle * tr = vtkTriangle::New();
-
-    tr->GetPointIds()->SetId( 0, ien_array[3*ii] );
-    tr->GetPointIds()->SetId( 1, ien_array[3*ii+1] );
-    tr->GetPointIds()->SetId( 2, ien_array[3*ii+2] );
-    cl -> InsertNextCell(tr);
-    tr -> Delete();
-  }
-  grid_w->SetPolys(cl);
-  cl->Delete();
+  // generate the triangle grid
+  TET_T::gen_triangle_grid(grid_w, numpts, numcels, pt, ien_array);
 
   // write tawss
   vtkDoubleArray * ptindex = vtkDoubleArray::New();
