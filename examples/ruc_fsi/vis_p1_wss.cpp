@@ -452,57 +452,15 @@ void write_triangle_grid_wss( const std::string &filename,
 
   vtkPolyData * grid_w = vtkPolyData::New();
 
-  // 1. nodal points
-  vtkPoints * ppt = vtkPoints::New();
-  ppt->SetDataTypeToDouble();
-  double coor[3];
-  for(int ii=0; ii<numpts; ++ii)
-  {
-    coor[0] = pt[3*ii];
-    coor[1] = pt[3*ii+1];
-    coor[2] = pt[3*ii+2];
-    ppt -> InsertPoint(ii, coor);
-  }
-
-  grid_w -> SetPoints(ppt);
-  ppt -> Delete();
-
-  // 2. cell data
-  vtkCellArray * cl = vtkCellArray::New();
-  for(int ii=0; ii<numcels; ++ii)
-  {
-    vtkTriangle * tr = vtkTriangle::New();
-
-    tr->GetPointIds()->SetId( 0, ien_array[3*ii] );
-    tr->GetPointIds()->SetId( 1, ien_array[3*ii+1] );
-    tr->GetPointIds()->SetId( 2, ien_array[3*ii+2] );
-    cl -> InsertNextCell(tr);
-    tr -> Delete();
-  }
-  grid_w->SetPolys(cl);
-  cl->Delete();
+  // generate the triangle grid
+  TET_T::gen_triangle_grid(grid_w, numpts, numcels, pt, ien_array);
 
   // write wss
-  vtkDoubleArray * ptindex = vtkDoubleArray::New();
-  ptindex -> SetNumberOfComponents(3);
-  ptindex -> SetName("WSS");
-  for(int ii=0; ii<numpts; ++ii)
-  {
-    ptindex -> InsertComponent(ii, 0, wss_on_node[ii].x());
-    ptindex -> InsertComponent(ii, 1, wss_on_node[ii].y());
-    ptindex -> InsertComponent(ii, 2, wss_on_node[ii].z());
-  }
-  grid_w -> GetPointData() -> AddArray( ptindex );
-  ptindex->Delete();
+  VTK_T::add_Vector3_PointData(grid_w, wss_on_node, "WSS");
 
-  vtkXMLPolyDataWriter * writer = vtkXMLPolyDataWriter::New();
-  std::string name_to_write(filename);
-  name_to_write.append(".vtp");
-  writer -> SetFileName( name_to_write.c_str() );
-  writer->SetInputData(grid_w);
-  writer->Write();
+  // write vtp
+  VTK_T::write_vtkPointSet(filename, grid_w);
 
-  writer->Delete();
   grid_w->Delete();
 }
 
@@ -523,67 +481,18 @@ void write_triangle_grid_tawss_osi( const std::string &filename,
 
   vtkPolyData * grid_w = vtkPolyData::New();
 
-  // 1. nodal points
-  vtkPoints * ppt = vtkPoints::New();
-  ppt->SetDataTypeToDouble();
-  double coor[3];
-  for(int ii=0; ii<numpts; ++ii)
-  {
-    coor[0] = pt[3*ii];
-    coor[1] = pt[3*ii+1];
-    coor[2] = pt[3*ii+2];
-    ppt -> InsertPoint(ii, coor);
-  }
-
-  grid_w -> SetPoints(ppt);
-  ppt -> Delete();
-
-  // 2. cell data
-  vtkCellArray * cl = vtkCellArray::New();
-  for(int ii=0; ii<numcels; ++ii)
-  {
-    vtkTriangle * tr = vtkTriangle::New();
-
-    tr->GetPointIds()->SetId( 0, ien_array[3*ii] );
-    tr->GetPointIds()->SetId( 1, ien_array[3*ii+1] );
-    tr->GetPointIds()->SetId( 2, ien_array[3*ii+2] );
-    cl -> InsertNextCell(tr);
-    tr -> Delete();
-  }
-  grid_w->SetPolys(cl);
-  cl->Delete();
+  // generate the triangle grid
+  TET_T::gen_triangle_grid(grid_w, numpts, numcels, pt, ien_array);
 
   // write tawss
-  vtkDoubleArray * ptindex = vtkDoubleArray::New();
-  ptindex -> SetNumberOfComponents(1);
-  ptindex -> SetName("TAWSS");
-  for(int ii=0; ii<numpts; ++ii)
-  {
-    ptindex -> InsertComponent(ii, 0, tawss[ii]);
-  }
-  grid_w -> GetPointData() -> AddArray( ptindex );
-  ptindex->Delete();
+  VTK_T::add_double_PointData(grid_w, tawss, "TAWSS");
 
   // write osi 
-  vtkDoubleArray * vtkosi = vtkDoubleArray::New();
-  vtkosi -> SetNumberOfComponents(1);
-  vtkosi -> SetName("OSI");
-  for(int ii=0; ii<numpts; ++ii)
-  {
-    vtkosi -> InsertComponent(ii, 0, osi[ii]);
-  }
-  grid_w -> GetPointData() -> AddArray( vtkosi );
-  vtkosi -> Delete();
+  VTK_T::add_double_PointData(grid_w, osi, "OSI");
 
   // write vtp
-  vtkXMLPolyDataWriter * writer = vtkXMLPolyDataWriter::New();
-  std::string name_to_write(filename);
-  name_to_write.append(".vtp");
-  writer -> SetFileName( name_to_write.c_str() );
-  writer->SetInputData(grid_w);
-  writer->Write();
-
-  writer->Delete();
+  VTK_T::write_vtkPointSet(filename, grid_w);
+  
   grid_w->Delete();
 }
 
