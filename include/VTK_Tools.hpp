@@ -155,11 +155,12 @@ namespace VTK_T
       const std::vector<double> &cldata, const std::string &dataname );
 
   // ----------------------------------------------------------------
-  // ! write_vtkUnstructuredGrid: write the info in vtkUnstructuredGrid
-  //                              to a vtu or vtk file. 
-  //   Input: \para filename : filename.{vtu/vtk} is the file to be written
-  //          \para grid_w   : vtkUnstructuredGrid object to be written
-  //          \para isXML    : flag for vtu (true) or vtk (false)
+  // ! write_vtkPointSet : write the info in vtkUnstructuredGrid or
+  //                       vtkXMLPolyData to a vtu or vtk file. 
+  //   Input: \para filename : filename.{vtu/vtk} is the file to be written.
+  //          \para grid_w   : vtkUnstructuredGrid or vtkXMLPolyData object 
+  //                           to be written.
+  //          \para isXML    : flag for vtu (true) or vtk (false).
   // ----------------------------------------------------------------
   void write_vtkPointSet( const std::string &filename, 
       vtkPointSet * const &grid_w, const bool &isXML = true );
