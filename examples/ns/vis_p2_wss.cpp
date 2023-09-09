@@ -147,13 +147,12 @@ int main( int argc, char * argv[] )
       v_vecIEN[ global_ele_idx[ee]*v_nLocBas+2 ],
       v_vecIEN[ global_ele_idx[ee]*v_nLocBas+3 ] };
 
-    bool gotnode[4];
     int node_check = 0;
     for(int ii=0; ii<4; ++ii)
     {
-      gotnode[ii] = VEC_T::is_invec( trn, ten[ii] );
+      const bool gotnode = VEC_T::is_invec( trn, ten[ii] );
 
-      if(!gotnode[ii]) 
+      if(!gotnode) 
       {
         interior_node[ee] = ten[ii]; // interior node's global volumetric mesh nodal index
         interior_node_local_index[ee] = ii; // interior node's local tetrahedral element index
