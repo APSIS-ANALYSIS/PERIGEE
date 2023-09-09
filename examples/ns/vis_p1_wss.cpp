@@ -491,24 +491,10 @@ void write_triangle_grid_tawss_osi( const std::string &filename,
   TET_T::gen_triangle_grid(grid_w, numpts, numcels, pt, ien_array);
 
   // write tawss
-  vtkDoubleArray * ptindex = vtkDoubleArray::New();
-  ptindex -> SetNumberOfComponents(1);
-  ptindex -> SetName("TAWSS");
-
-  for(int ii=0; ii<numpts; ++ii) ptindex -> InsertComponent(ii, 0, tawss[ii]);
-  
-  grid_w -> GetPointData() -> AddArray( ptindex );
-  ptindex->Delete();
+  VTK_T::add_double_PointData(grid_w, tawss, "TAWSS");
 
   // write osi 
-  vtkDoubleArray * vtkosi = vtkDoubleArray::New();
-  vtkosi -> SetNumberOfComponents(1);
-  vtkosi -> SetName("OSI");
-
-  for(int ii=0; ii<numpts; ++ii) vtkosi -> InsertComponent(ii, 0, osi[ii]);
-  
-  grid_w -> GetPointData() -> AddArray( vtkosi );
-  vtkosi -> Delete();
+  VTK_T::add_double_PointData(grid_w, osi, "OSI");
   
   // write vtp
   VTK_T::write_vtkPointSet(filename, grid_w);
