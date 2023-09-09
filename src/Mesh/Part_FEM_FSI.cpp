@@ -92,18 +92,16 @@ Part_FEM_FSI::Part_FEM_FSI( const IMesh * const &mesh,
 Part_FEM_FSI::~Part_FEM_FSI()
 {}
 
-void Part_FEM_FSI::write( const char * inputFileName ) const
+void Part_FEM_FSI::write( const std::string &inputFileName ) const
 {
-  std::string inputName( inputFileName );
-  std::string fName = SYS_T::gen_partfile_name( inputName, cpu_rank );
+  const std::string fName = SYS_T::gen_partfile_name( inputiFileName, cpu_rank );
 
   hid_t file_id = H5Fcreate(fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
   HDF5_Writer * h5w = new HDF5_Writer(file_id);
 
   // group 1: local element
-  hid_t group_id_1 = H5Gcreate(file_id, "/Local_Elem", H5P_DEFAULT, 
-      H5P_DEFAULT, H5P_DEFAULT);
+  hid_t group_id_1 = H5Gcreate(file_id, "/Local_Elem", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
   h5w->write_intScalar( group_id_1, "nlocalele", nlocalele );
   h5w->write_intVector( group_id_1, "elem_loc", elem_loc );
@@ -167,9 +165,7 @@ void Part_FEM_FSI::write( const char * inputFileName ) const
   // group 5: LIEN
   hid_t group_id_5 = H5Gcreate(file_id, "/LIEN", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-  std::vector<int> row_LIEN;
-
-  row_LIEN.resize(nlocalele * nLocBas);
+  std::vector<int> row_LIEN(nlocalele * nLocBas, -1);
 
   for(int e=0; e<nlocalele; ++e)
   {

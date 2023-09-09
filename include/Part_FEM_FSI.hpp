@@ -34,7 +34,7 @@ class Part_FEM_FSI : public Part_FEM
 
     virtual ~Part_FEM_FSI();
 
-    virtual void write( const char * inputFileName ) const;
+    virtual void write( const std::string &inputFileName ) const;
 
   protected:
     std::vector<int> elem_phy_tag;
