@@ -14,9 +14,8 @@
 
 void range_generator( const int &ii, std::vector<int> &surface_id_range );
 
-void ReadNodeMapping( const char * const &node_mapping_file,
-    const char * const &mapping_type, const int &node_size,
-    int * const &nodemap );
+std::vector<int> ReadNodeMapping( const char * const &node_mapping_file,
+    const char * const &mapping_type, const int &node_size );
 
 std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
     const std::vector<int> &nodemap,
@@ -196,8 +195,7 @@ int main( int argc, char * argv[] )
   FEAElement * element_tri = new FEAElement_Triangle6_3D_der0( quad_tri_vis-> get_num_quadPts() );
 
   // Read the mappings of the nodal indices
-  std::vector<int> analysis_new2old (v_nFunc, -1);
-  ReadNodeMapping("node_mapping.h5", "new_2_old", v_nFunc, &analysis_new2old[0] );
+  const std::vector<int> analysis_new2old = ReadNodeMapping("node_mapping.h5", "new_2_old", v_nFunc );
 
   double * Rx = new double [v_nLocBas];
   double * Ry = new double [v_nLocBas];
@@ -448,10 +446,8 @@ void range_generator( const int &ii, std::vector<int> &surface_id_range )
   }
 }
 
-
-void ReadNodeMapping( const char * const &node_mapping_file,
-    const char * const &mapping_type, const int &node_size,
-    int * const &nodemap )
+std::vector<int> ReadNodeMapping( const char * const &node_mapping_file,
+    const char * const &mapping_type, const int &node_size )
 {
   hid_t file_id = H5Fopen(node_mapping_file, H5F_ACC_RDONLY, H5P_DEFAULT);
   hid_t data_id = H5Dopen(file_id, mapping_type, H5P_DEFAULT);
@@ -479,16 +475,19 @@ void ReadNodeMapping( const char * const &node_mapping_file,
     MPI_Abort(PETSC_COMM_WORLD, 1);
   }
 
+  std::vector<int> out(node_size, -1);
+
   H5Dread( data_id, H5T_NATIVE_INT, mem_space, data_space,
-      H5P_DEFAULT, nodemap );
+      H5P_DEFAULT, &out[0] );
 
   delete [] data_dims;
   H5Sclose( mem_space );
   H5Sclose(data_space);
   H5Dclose(data_id);
   H5Fclose(file_id);
-}
 
+  return out;
+}
 
 std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
     const std::vector<int> &nodemap,
