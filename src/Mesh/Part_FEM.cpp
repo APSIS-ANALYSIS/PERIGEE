@@ -49,10 +49,9 @@ Part_FEM::Part_FEM(
   std::cout<<"-- proc "<<cpu_rank<<" Local control points generated. \n";
 }
 
-Part_FEM::Part_FEM( const char * const &inputfileName, const int &in_cpu_rank )
+Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
 {
-  const std::string input_fName( inputfileName );
-  std::string fName = SYS_T::gen_partfile_name( input_fName, in_cpu_rank );
+  const std::string fName = SYS_T::gen_partfile_name( inputfileName, in_cpu_rank );
   
   hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
   HDF5_Reader * h5r = new HDF5_Reader( file_id );
@@ -62,11 +61,11 @@ Part_FEM::Part_FEM( const char * const &inputfileName, const int &in_cpu_rank )
   nlocalele = h5r->read_intScalar( "Local_Elem", "nlocalele" );
   
   // local node
-  nlocalnode = h5r->read_intScalar("Local_Node", "nlocalnode");
-  nghostnode = h5r->read_intScalar("Local_Node", "nghostnode");
-  nbadnode   = h5r->read_intScalar("Local_Node", "nbadnode");
+  nlocalnode  = h5r->read_intScalar("Local_Node", "nlocalnode");
+  nghostnode  = h5r->read_intScalar("Local_Node", "nghostnode");
+  nbadnode    = h5r->read_intScalar("Local_Node", "nbadnode");
   nlocghonode = h5r->read_intScalar("Local_Node", "nlocghonode");
-  ntotalnode = h5r->read_intScalar("Local_Node", "ntotalnode");
+  ntotalnode  = h5r->read_intScalar("Local_Node", "ntotalnode");
 
   local_to_global = h5r->read_intVector("Local_Node", "local_to_global");
   if( nghostnode > 0)
@@ -252,18 +251,16 @@ void Part_FEM::Generate_Partition( const IMesh * const &mesh,
   std::cout<<"-- proc "<<cpu_rank<<" LIEN generated. \n";
 }
 
-void Part_FEM::write( const char * inputFileName ) const
+void Part_FEM::write( const std::string &inputFileName ) const
 {
-  const std::string input_fName( inputFileName );
-  std::string fName = SYS_T::gen_partfile_name( input_fName, cpu_rank );
+  const std::string fName = SYS_T::gen_partfile_name( inputFileName, cpu_rank );
 
   hid_t file_id = H5Fcreate(fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
   HDF5_Writer * h5w = new HDF5_Writer(file_id);
 
   // group 1: local element
-  hid_t group_id_1 = H5Gcreate(file_id, "/Local_Elem", H5P_DEFAULT, 
-      H5P_DEFAULT, H5P_DEFAULT);
+  hid_t group_id_1 = H5Gcreate(file_id, "/Local_Elem", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
   h5w->write_intScalar( group_id_1, "nlocalele", nlocalele );
   h5w->write_intVector( group_id_1, "elem_loc", elem_loc );
@@ -288,14 +285,12 @@ void Part_FEM::write( const char * inputFileName ) const
   H5Gclose( group_id_2 );
 
   // group 3: global mesh info
-  hid_t group_id_3 = H5Gcreate(file_id, "/Global_Mesh_Info", 
-      H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  hid_t group_id_3 = H5Gcreate(file_id, "/Global_Mesh_Info", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
   h5w->write_intScalar( group_id_3, "nElem", nElem );
   h5w->write_intScalar( group_id_3, "nFunc", nFunc );
 
-  std::vector<int> vdeg; vdeg.clear();
-  vdeg.push_back(sDegree); vdeg.push_back(tDegree); vdeg.push_back(uDegree);
+  const std::vector<int> vdeg { sDegree, tDegree, uDegree };
 
   h5w->write_intVector( group_id_3, "degree", vdeg );
 
@@ -309,8 +304,7 @@ void Part_FEM::write( const char * inputFileName ) const
   H5Gclose( group_id_3 );
 
   // group 4: part info
-  hid_t group_id_4 = H5Gcreate( file_id, "/Part_Info", H5P_DEFAULT, H5P_DEFAULT,
-      H5P_DEFAULT ); 
+  hid_t group_id_4 = H5Gcreate( file_id, "/Part_Info", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT ); 
 
   h5w->write_intScalar( group_id_4, "cpu_rank", cpu_rank );
   h5w->write_intScalar( group_id_4, "cpu_size", cpu_size );
@@ -318,12 +312,9 @@ void Part_FEM::write( const char * inputFileName ) const
   H5Gclose( group_id_4 );
 
   // group 5: LIEN
-  hid_t group_id_5 = H5Gcreate(file_id, "/LIEN", H5P_DEFAULT, 
-      H5P_DEFAULT, H5P_DEFAULT);
+  hid_t group_id_5 = H5Gcreate(file_id, "/LIEN", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-  std::vector<int> row_LIEN;
-
-  row_LIEN.resize(nlocalele * nLocBas);
+  std::vector<int> row_LIEN(nlocalele * nLocBas, -1);
 
   for(int e=0; e<nlocalele; ++e)
   {
@@ -336,8 +327,7 @@ void Part_FEM::write( const char * inputFileName ) const
   H5Gclose( group_id_5 );
 
   // group 6: control points
-  hid_t group_id_6 = H5Gcreate(file_id, "/ctrlPts_loc", H5P_DEFAULT, 
-      H5P_DEFAULT, H5P_DEFAULT);
+  hid_t group_id_6 = H5Gcreate(file_id, "/ctrlPts_loc", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
   h5w -> write_doubleVector( group_id_6, "ctrlPts_x_loc", ctrlPts_x_loc );
   h5w -> write_doubleVector( group_id_6, "ctrlPts_y_loc", ctrlPts_y_loc );

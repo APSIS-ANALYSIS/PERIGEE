@@ -31,11 +31,11 @@ class Part_FEM : public IPart
         const int &in_elemType );
 
     // Constructor that load the partition info from h5 file on disk
-    Part_FEM( const char * const &fileName, const int &in_cpu_rank );
+    Part_FEM( const std::string &fileName, const int &in_cpu_rank );
 
     virtual ~Part_FEM();
 
-    virtual void write( const char * inputFileName ) const;
+    virtual void write( const std::string &inputFileName ) const;
     
     virtual bool isElemInPart(const int &gloindex) const
     {return VEC_T::is_invec(elem_loc, gloindex);}
