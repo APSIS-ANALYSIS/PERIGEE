@@ -1,46 +1,40 @@
 #ifndef IPART_HPP
 #define IPART_HPP
-// ==================================================================
+// ============================================================================
 // IPart.hpp
 // Object:
-// An interface for partitioned mesh information. This is a pure 
-// abstract interface. Detailed implementation is in the derived classes.
+// An interface for partitioned mesh information. This is a pure abstract 
+// interface. Detailed implementation is in the derived classes.
 //
 // Details:
-// 1. elem_loc[nlocalele]: the array storing the global indices of the 
-//    elements that belong to this processor.
-// 2. node_loc[nlocalnode]: the array storing the global indices of the
-//    nodes that belong to this processor.
+// 1. elem_loc[nlocalele]: the array stores the global indices of the  elements
+//    that belong to this processor/subdomain.
+// 2. node_loc[nlocalnode]: the array stores the global indices of the nodes
+//    that belong to this processor/subdomain.
 // 3. ghost_node[nghostnode]: the array that stores the global indices of the
-//    ghost nodes that belong to this processor. For i in ghost_nodes,
-//    i is in IEN[e][*], e \in elem_loc, but i is not in node_loc.
-// 4. nghostnode, ntotnode, nolcalnode, nbadnode: basic int variables
-//    that stores the number of different nodes in this processor.
-//    nghostnode + nlocalnode = ntotalnode + nbadnode
-//    if nbadnode > 0, then the partition is not good.
+//    ghost nodes that belong to this processor. For node in ghost_nodes,
+//    node is in {IEN[e][*]}, for e in elem_loc, but node is NOT in node_loc.
+// 4. nghostnode, ntotnode, nolcalnode, nbadnode: basic integere variables
+//    that stores the number of different nodes in this processor. They satisfy
+//    the following relation:
+//            nghostnode + nlocalnode = ntotalnode + nbadnode
+//    if nbadnode > 0, then the partition is typically not accepted.
 // 5. LIEN[e][i]: the Local IEN array. e ranges from 0 to nlocalele, 
-//    while i ranges from 0 to nlocbas. It gives the local indices of 
-//    the corresponding global node.
+//    while i ranges from 0 to nlocbas. It gives the local (local to the
+//    subdomain) indices of the corresponding global node.
 // 6. local_to_global[nlocalnode]: This is a mapping that maps the local
-//    node indices to its global indices. An important relation is that
-//     local_to_global[ LIEN[e][i] ] = IEN[ elem_loc[e] ][ i ].
+//    node indices to its global indices. It is defined as follows,
+//            local_to_global[ LIEN[e][i] ] = IEN[ elem_loc[e] ][ i ].
 // 7. cpu_rank, cpu_size: MPI parameters telling the number of total
 //    processors and the id of this processor.
-// 8. int dual_edge_ncommon: parameters that
-//    deifine the partition.
-// 9. nElem, nElem_x, nElem_y, nElem_z, nFunc, nFunc_x, nFunc_y, nFunc_z
-//    hx_max hy_max, hz_max, hx_min hy_min hz_min nlocbas: global mesh
-//    parameters.
+// 8. dual_edge_ncommon: parameters that deifine the partition.
+// 9. nElem, nFunc, nlocbas: global mesh parameters.
 // 10. ctrlPts_x(y,z,w)_loc: local copy of control variables. These 
 //     coordniates should have been projected down. 
-// 11. hx hy hz: global mesh size of local element in xyz directions.
 //
 // Date: Sept. 30 2013
-// ==================================================================
+// ============================================================================
 #include "Sys_Tools.hpp"
-#include "Vec_Tools.hpp"
-#include "Map_Node_Index.hpp"
-#include "IIEN.hpp"
 
 class IPart
 {
@@ -53,23 +47,23 @@ class IPart
     virtual void write( const std::string &inputFileName ) const = 0;
 
     // 1. function access element partition.
-    virtual int get_elem_loc(int pos) const
+    virtual int get_elem_loc(const int &pos) const
     {SYS_T::print_exit("Error: get_elem_loc is not implemented. \n"); return 0;}
 
     virtual int get_nlocalele() const
     {SYS_T::print_exit("Error: get_nlocalele is not implemented. \n"); return 0;}
 
     // 2. function access node partition
-    virtual int get_node_loc(int pos) const
+    virtual int get_node_loc(const int &pos) const
     {SYS_T::print_exit("Error: get_node_loc is not implemented. \n"); return 0;}
 
-    virtual int get_node_loc_original(int pos) const
+    virtual int get_node_loc_original(const int &pos) const
     {SYS_T::print_exit("Error: get_node_loc_original is not implemented. \n"); return 0;}
 
-    virtual int get_node_ghost(int pos) const
+    virtual int get_node_ghost(const int &pos) const
     {SYS_T::print_exit("Error: get_node_ghost is not implemented. \n"); return 0;}
 
-    virtual int get_local_to_global(int pos) const
+    virtual int get_local_to_global(const int &pos) const
     {SYS_T::print_exit("Error: get_local_to_global is not implemented. \n"); return 0;}
 
     virtual int get_nlocalnode() const
@@ -110,26 +104,8 @@ class IPart
     virtual int get_nElem() const
     {SYS_T::print_exit("Error: get_nElem is not implemented. \n"); return 0;}
 
-    virtual int get_nElem_x() const
-    {SYS_T::print_exit("Error: get_nElem_x is not implemented. \n"); return 0;}
-
-    virtual int get_nElem_y() const
-    {SYS_T::print_exit("Error: get_nElem_y is not implemented. \n"); return 0;}
-
-    virtual int get_nElem_z() const
-    {SYS_T::print_exit("Error: get_nElem_z is not implemented. \n"); return 0;}
-
     virtual int get_nFunc() const
     {SYS_T::print_exit("Error: get_nFunc is not implemented. \n"); return 0;}
-
-    virtual int get_nFunc_x() const
-    {SYS_T::print_exit("Error: get_nFunc_x is not implemented. \n"); return 0;}
-
-    virtual int get_nFunc_y() const
-    {SYS_T::print_exit("Error: get_nFunc_y is not implemented. \n"); return 0;}
-
-    virtual int get_nFunc_z() const
-    {SYS_T::print_exit("Error: get_nFunc_z is not implemented. \n"); return 0;}
 
     virtual int get_sDegree() const
     {SYS_T::print_exit("Error: get_sDegree is not implemented. \n"); return 0;}
@@ -143,50 +119,22 @@ class IPart
     virtual int get_nLocBas() const
     {SYS_T::print_exit("Error: get_nLocBas is not implemented. \n"); return 0;}
 
-    virtual double get_hx_max() const
-    {SYS_T::print_exit("Error: get_hx_max is not implemented. \n"); return 0.0;}
-
-    virtual double get_hy_max() const
-    {SYS_T::print_exit("Error: get_hy_max is not implemented. \n"); return 0.0;}
-
-    virtual double get_hz_max() const
-    {SYS_T::print_exit("Error: get_hz_max is not implemented. \n"); return 0.0;}
-
-    virtual double get_hx_min() const
-    {SYS_T::print_exit("Error: get_hx_min is not implemented. \n"); return 0.0;}
-
-    virtual double get_hy_min() const
-    {SYS_T::print_exit("Error: get_hy_min is not implemented. \n"); return 0.0;}
-
-    virtual double get_hz_min() const
-    {SYS_T::print_exit("Error: get_hz_min is not implemented. \n"); return 0.0;}
-
-    virtual double get_hx(int ee) const
-    {SYS_T::print_exit("Error: get_hx is not implemented. \n"); return 0.0;}
-
-    virtual double get_hy(int ee) const
-    {SYS_T::print_exit("Error: get_hy is not implemented. \n"); return 0.0;}
-
-    virtual double get_hz(int ee) const
-    {SYS_T::print_exit("Error: get_hz is not implemented. \n"); return 0.0;}
-
     // 4. LIEN array
-    virtual int get_LIEN(int ee, int ii) const
+    virtual int get_LIEN(const int &ee, const int &ii) const
     {SYS_T::print_exit("Error: get_LIEN is not implemented. \n"); return 0;}
 
     // 5. Control points in this processor
-    virtual double get_ctrlPts_x_loc(int pos) const
+    virtual double get_ctrlPts_x_loc(const int &pos) const
     {SYS_T::print_exit("Error: get_ctrlPts_x is not implemented. \n"); return 0.0;}
 
-    virtual double get_ctrlPts_y_loc(int pos) const
+    virtual double get_ctrlPts_y_loc(const int &pos) const
     {SYS_T::print_exit("Error: get_ctrlPts_y is not implemented. \n"); return 0.0;}
 
-    virtual double get_ctrlPts_z_loc(int pos) const
+    virtual double get_ctrlPts_z_loc(const int &pos) const
     {SYS_T::print_exit("Error: get_ctrlPts_z is not implemented. \n"); return 0.0;}
 
-    virtual double get_ctrlPts_w_loc(int pos) const
+    virtual double get_ctrlPts_w_loc(const int &pos) const
     {SYS_T::print_exit("Error: get_ctrlPts_w is not implemented. \n"); return 0.0;}
-
 
     // 6. print on screen the partition results 
     virtual void print_info() const
@@ -209,16 +157,6 @@ class IPart
 
     virtual void print_part_loadbalance_edgecut() const
     {SYS_T::print_exit("Error: print_part_loadbalance_edgecut is not implemented. \n");}
-
-    virtual void print_part_bezier_ext_x(int elem) const
-    {SYS_T::print_exit("Error: print_part_bezier_ext_x is not implemented. \n");}
-
-    virtual void print_part_bezier_ext_y(int elem) const
-    {SYS_T::print_exit("Error: print_part_bezier_ext_y is not implemented. \n");}
-
-    virtual void print_part_bezier_ext_z(int elem) const
-    {SYS_T::print_exit("Error: print_part_bezier_ext_z is not implemented. \n");}
-
 };
 
 #endif

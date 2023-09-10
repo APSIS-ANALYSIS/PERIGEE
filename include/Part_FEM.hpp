@@ -11,8 +11,11 @@
 //         cases for dofNum is not the dof for the matrix problem in
 //         the implicit solver.
 // ============================================================================
+#include "Vec_Tools.hpp"
 #include "IMesh.hpp"
 #include "IPart.hpp"
+#include "Map_Node_Index.hpp"
+#include "IIEN.hpp"
 
 class Part_FEM : public IPart
 {
@@ -63,12 +66,12 @@ class Part_FEM : public IPart
 
     virtual void print_part_loadbalance_edgecut() const;
 
-    virtual int get_elem_loc(int pos) const {return elem_loc[pos];}
+    virtual int get_elem_loc(const int &pos) const {return elem_loc[pos];}
     virtual int get_nlocalele() const {return nlocalele;}
-    virtual int get_node_loc(int pos) const {return node_loc[pos];}
-    virtual int get_node_loc_original(int pos) const {return node_loc_original[pos];}
-    virtual int get_node_ghost(int pos) const {return node_ghost[pos];}
-    virtual int get_local_to_global(int pos) const {return local_to_global[pos];}
+    virtual int get_node_loc(const int &pos) const {return node_loc[pos];}
+    virtual int get_node_loc_original(const int &pos) const {return node_loc_original[pos];}
+    virtual int get_node_ghost(const int &pos) const {return node_ghost[pos];}
+    virtual int get_local_to_global(const int &pos) const {return local_to_global[pos];}
     virtual int get_nlocalnode() const {return nlocalnode;}
     virtual int get_nghostnode() const {return nghostnode;}
     virtual int get_ntotalnode() const {return ntotalnode;}
@@ -83,11 +86,11 @@ class Part_FEM : public IPart
     virtual int get_tDegree() const {return tDegree;}
     virtual int get_uDegree() const {return uDegree;}
     virtual int get_nLocBas() const {return nLocBas;}
-    virtual int get_LIEN(int ee, int ii) const {return LIEN[ee][ii];}
+    virtual int get_LIEN(const int &ee, const int &ii) const {return LIEN[ee][ii];}
 
-    virtual double get_ctrlPts_x_loc(int pos) const {return ctrlPts_x_loc[pos];}
-    virtual double get_ctrlPts_y_loc(int pos) const {return ctrlPts_y_loc[pos];}
-    virtual double get_ctrlPts_z_loc(int pos) const {return ctrlPts_z_loc[pos];}
+    virtual double get_ctrlPts_x_loc(const int &pos) const {return ctrlPts_x_loc[pos];}
+    virtual double get_ctrlPts_y_loc(const int &pos) const {return ctrlPts_y_loc[pos];}
+    virtual double get_ctrlPts_z_loc(const int &pos) const {return ctrlPts_z_loc[pos];}
 
   protected:
     // ------------------------------------------------------------------------
