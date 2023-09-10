@@ -80,6 +80,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Mesh/QuadPts_Gauss_Tet.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Quad.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_Hex.cpp
   ${perigee_source}/Mesh/QuadPts_debug.cpp
   ${perigee_source}/Analysis_Tool/AGlobal_Mesh_Info_FEM_3D.cpp
   ${perigee_source}/Analysis_Tool/APart_Basic_Info.cpp
@@ -92,6 +93,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/ALocal_EBC_wall.cpp
   ${perigee_source}/Analysis_Tool/APart_Node.cpp
   ${perigee_source}/Element/FEANode.cpp
+  ${perigee_source}/Element/FEAElement_Hex8.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
   ${perigee_source}/Element/FEAElement_Tet10.cpp
   ${perigee_source}/Element/FEAElement_Tet10_v2.cpp
