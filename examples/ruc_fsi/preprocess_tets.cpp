@@ -15,7 +15,7 @@
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
-#include "Part_Tet.hpp"
+#include "Part_FEM.hpp"
 #include "NodalBC_3D_CMM.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "NodalBC_3D_ring.hpp"
@@ -356,7 +356,7 @@ int main( int argc, char * argv[] )
     mytimer->Reset();
     mytimer->Start();
 
-    IPart * part = new Part_Tet( mesh, global_part, mnindex, IEN,
+    IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
         ctrlPts, proc_rank, cpu_size, dofNum, dofMat, elemType );
     mytimer->Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";

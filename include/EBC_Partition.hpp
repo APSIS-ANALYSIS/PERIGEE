@@ -11,6 +11,7 @@
 // Date: Jan. 15 2017
 // ==================================================================
 #include "IPart.hpp"
+#include "Map_Node_Index.hpp"
 #include "ElemBC.hpp"
 #include "HDF5_Writer.hpp"
 

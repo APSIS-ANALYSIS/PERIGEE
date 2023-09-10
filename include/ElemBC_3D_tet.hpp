@@ -64,9 +64,8 @@ class ElemBC_3D_tet : public ElemBC
     virtual void resetTriIEN_outwardnormal( const IIEN * const &VIEN );
 
     // Access the data in ElemBC_3D_tet_outflow, outward normal vector
-    virtual void get_normal_vec( const int &ebc_id, double &out_nx,
-        double &out_ny, double &out_nz ) const
-    {SYS_T::commPrint("Warning: get_normal_vec is not implemented. \n");}
+    virtual Vector_3 get_normal_vec( const int &ebc_id ) const
+    {SYS_T::commPrint("Warning: get_normal_vec is not implemented. \n"); return Vector_3();}
 
     // Access the data in ElemBC_3D_tet_outflow, basis surface integration
     virtual std::vector<double> get_intNA( const int &ebc_id ) const

@@ -11,7 +11,7 @@
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
-#include "Part_Tet.hpp"
+#include "Part_FEM.hpp"
 
 int main( int argc, char * argv[] )
 {
@@ -103,7 +103,7 @@ int main( int argc, char * argv[] )
   for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
   {
     mytimer->Reset(); mytimer->Start();
-    IPart * part = new Part_Tet( mesh, global_part, mnindex, IEN,
+    IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
         ctrlPts, proc_rank, cpu_size, dofNum, dofMat, elemType );
     part->write(part_file.c_str());
     mytimer->Stop();

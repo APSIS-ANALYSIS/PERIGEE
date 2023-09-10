@@ -24,10 +24,6 @@ class Matrix_double_3by3_Array
     // Defalt constructor: an identity matrix
     Matrix_double_3by3_Array();
 
-    // Copy an input array and make it into a 3by3 matrix
-    // Make sure in_mat has 9 components
-    Matrix_double_3by3_Array(const double * const &in_mat);
-
     // Explicitly define the matrix components
     Matrix_double_3by3_Array( const double &a11, const double &a12, 
         const double &a13, const double &a21, const double &a22, 
