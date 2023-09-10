@@ -35,6 +35,7 @@
 #include "FEAElement.hpp"
 #include "Math_Tools.hpp"
 #include "Matrix_double_3by3_Array.hpp"
+#include "Matrix_double_6by6_Array.hpp"
 
 class FEAElement_Hex8 : public FEAElement
 {
@@ -119,10 +120,10 @@ class FEAElement_Hex8 : public FEAElement
     // Get the inverse Jacobian matrix dr/dx
     virtual void get_invJacobian(const int &quaindex, double * const &jac_value) const;
 
-    virtual std::array<double,9> get_invJacobian( const int &quaindex ) const
+    virtual std::array<double,9> get_invJacobian( const int &quaindex ) const;
 
     // Get the determinant of the Jacobian matrix
-    virtual double get_detJac(const int &quaindex) const {return detJac;}
+    virtual double get_detJac(const int &quaindex) const {return detJac[quaindex];}
 
   private:
     // Number of quadrature points
@@ -142,6 +143,6 @@ class FEAElement_Hex8 : public FEAElement
 
     // detJac : 0 <= ii < numQuapts
     double * detJac;
-}
+};
 
 #endif

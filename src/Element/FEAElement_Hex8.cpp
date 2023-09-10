@@ -48,7 +48,7 @@ void FEAElement_Hex8::print_info() const
 
 double FEAElement_Hex8::get_memory_usage() const
 {
-  const double double_size = 49.0 * numQuapts;
+  const double double_size = 99.0 * numQuapts;
   const double int_size = 1.0;
   return double_size * 8.0 + int_size * 4.0;
 }
@@ -59,10 +59,6 @@ void FEAElement_Hex8::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_z )
 {
   ASSERT( quad -> get_dim() == 3, "FEAElement_Hex8::buildBasis function error.\n" );
-
-  const double xrr = 0.0, xss = 0.0, xtt = 0.0;
-  const double yrr = 0.0, yss = 0.0, ytt = 0.0;
-  const double zrr = 0.0, zss = 0.0, ztt = 0.0;
 
   for(int qua=0; qua<numQuapts; ++qua)
   {
@@ -116,6 +112,10 @@ void FEAElement_Hex8::buildBasis( const IQuadPts * const &quad,
     double xr = 0.0, xs = 0.0, xt = 0.0;
     double yr = 0.0, ys = 0.0, yt = 0.0;
     double zr = 0.0, zs = 0.0, zt = 0.0;
+    
+    double xrs = 0.0, xrt = 0.0, xst = 0.0;
+    double yrs = 0.0, yrt = 0.0, yst = 0.0;
+    double zrs = 0.0, zrt = 0.0, zst = 0.0;
 
     for(int ii=0; ii<8; ++ii)
     {
@@ -221,17 +221,12 @@ void FEAElement_Hex8::get_R( const int &quaindex, double * const &basis ) const
   for(int ii=0; ii<8; ++ii) basis[ii] = R[offset+ii];
 }
 
-void FEAElement_Hex8::get_gradR( const int &quaindex, double * const &basis_x,
-    double * const &basis_y, double * const &basis_z ) const
+std::vector<double> FEAElement_Hex8::get_R( const int &quaindex ) const
 {
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex8::get_gradR function error.\n" );
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex8::get_R function error.\n" );
   const int offset = quaindex * 8;
-  for( int ii=0; ii<8; ++ii )
-  {
-    basis_x[ii] = dR_dx[offset + ii];
-    basis_y[ii] = dR_dy[offset + ii];
-    basis_z[ii] = dR_dz[offset + ii];
-  }
+  return { R[offset], R[offset+1], R[offset+2], R[offset+3],
+         R[offset+4], R[offset+5], R[offset+6], R[offset+7] };
 }
 
 void FEAElement_Hex8::get_gradR( const int &quaindex, double * const &basis_x,
