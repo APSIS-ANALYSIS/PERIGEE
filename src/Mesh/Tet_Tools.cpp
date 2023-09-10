@@ -322,7 +322,7 @@ Vector_3 TET_T::get_out_normal( const std::string &file,
   else if( fend.compare(".vtu") == 0 )
     VTK_T::read_vtu_grid( file, numpts, numcels, pts, ien);
   else
-    SYS_T::print_fatal("Error: get_out_normal unknown file type.\n");
+    SYS_T::print_exit("Error: TET_T::get_out_normal unknown file type.\n");
 
   const std::vector<int> gnode = VTK_T::read_int_PointData(file, "GlobalNodeID");
   const std::vector<int> gelem = VTK_T::read_int_CellData(file, "GlobalElementID");

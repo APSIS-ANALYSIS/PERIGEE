@@ -45,6 +45,10 @@ void write_quadratic_quadrangle_grid( const std::string &filename,
       const std::vector<int> &ien_array,
       const std::vector<DataVecStr<int>> &IOdata );
 
+Vector_3 get_out_normal( const std::string &file,
+      const std::vector<double> &vol_ctrlPts,
+      const IIEN * const &vol_ien );
+
   double get_aspect_ratio( const std::vector<double> &coors );
 
   // ----------------------------------------------------------------

@@ -360,6 +360,81 @@ double HEX_T::get_aspect_ratio( const std::vector<double> &pt )
   return emax / emin;
 }
 
+Vector_3 HEX_T::get_out_normal( const std::string &file,
+      const std::vector<double> &vol_ctrlPts,
+      const IIEN * const &vol_ien )
+{
+  int numpts, numcels;
+  std::vector<double> pts;
+  std::vector<int> ien;
+
+  // Analyze the file type
+  std::string fend; fend.assign( file.end()-4 , file.end() );
+
+  if( fend.compare(".vtp") == 0 )
+    VTK_T::read_vtp_grid( file, numpts, numcels, pts, ien);
+  else if( fend.compare(".vtu") == 0 )
+    VTK_T::read_vtu_grid( file, numpts, numcels, pts, ien);
+  else
+    SYS_T::print_fatal("Error: HEX_T::get_out_normal unknown file type.\n");
+
+  const std::vector<int> gnode = VTK_T::read_int_PointData(file, "GlobalNodeID");
+  const std::vector<int> gelem = VTK_T::read_int_CellData(file, "GlobalElementID");
+
+  // quadrangle nodes' global indices
+  const std::vector<int> qun = { gnode[ ien[0] ], gnode[ ien[1] ], gnode[ ien[2] ], gnode[ ien[3] ] };
+
+  const int hexe0 = gelem[0]; // quadrangle's associated hex element indices
+
+  SYS_T::print_fatal_if(hexe0 == -1, "Error: HEX_T::get_out_normal requires the element indices for the vtp file.\n");
+
+  const std::vector<int> hen { vol_ien->get_IEN(hexe0, 0), vol_ien->get_IEN(hexe0, 1), 
+                               vol_ien->get_IEN(hexe0, 2), vol_ien->get_IEN(hexe0, 3),
+                               vol_ien->get_IEN(hexe0, 4), vol_ien->get_IEN(hexe0, 5),
+                               vol_ien->get_IEN(hexe0, 6), vol_ien->get_IEN(hexe0, 7)};
+
+  // the coordinates of the center of the hex element, average of the coordinates of 8 vertices
+  double cen_hex_x {0.0}, cen_hex_y {0.0}, cen_hex_z {0.0};
+  for (int vertex : hen)
+  {
+    cen_hex_x += vol_ctrlPts[3 * vertex];
+    cen_hex_y += vol_ctrlPts[3 * vertex + 1];
+    cen_hex_z += vol_ctrlPts[3 * vertex + 2];
+  }
+  const Vector_3 cen_hex(0.125 * cen_hex_x, 0.125 * cen_hex_y, 0.125 * cen_hex_z);
+
+  // the coordinates of the center of the surface quadrangle element, average of the coordinates of 4 vertices
+  double cen_quad_x {0.0}, cen_quad_y {0.0}, cen_quad_z {0.0};
+  for (int vertex : qun)
+  {
+    cen_quad_x += vol_ctrlPts[3 * vertex];
+    cen_quad_y += vol_ctrlPts[3 * vertex + 1];
+    cen_quad_z += vol_ctrlPts[3 * vertex + 2];
+  }
+  const Vector_3 cen_quad (0.25 * cen_quad_x, 0.25 * cen_quad_y, 0.25 * cen_quad_z);
+
+  // obtain the inward vector
+  const Vector_3 inw = cen_hex - cen_quad;
+
+  // make cross line-0-1 and line-0-3
+  const Vector_3 l01 (vol_ctrlPts[3*qun[1]] - vol_ctrlPts[3*qun[0]],
+                      vol_ctrlPts[3*qun[1] + 1] - vol_ctrlPts[3*qun[0] + 1],
+                      vol_ctrlPts[3*qun[1] + 2] - vol_ctrlPts[3*qun[0] + 2]);
+  
+  const Vector_3 l03 (vol_ctrlPts[3*qun[3]] - vol_ctrlPts[3*qun[0]],
+                      vol_ctrlPts[3*qun[3] + 1] - vol_ctrlPts[3*qun[0] + 1],
+                      vol_ctrlPts[3*qun[3] + 2] - vol_ctrlPts[3*qun[0] + 2]);
+
+  Vector_3 outVec = cross_product( l01, l03 );
+
+  outVec.normalize();
+
+  // inner product outward with inward, and correct outVec
+  if(inw.dot_product(outVec) > 0.0) outVec *= -1.0;
+
+  return outVec;
+}
+
 std::vector<int> HEX_T::reset_node (const std::vector<int> &ien)
 {
   if (ien.size() == 27)
