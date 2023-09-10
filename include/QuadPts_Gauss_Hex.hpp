@@ -3,19 +3,29 @@
 // ==================================================================
 // QuadPts_Gauss_Hex.hpp
 // The Gaussian quadrature rule for a Hexagon domain defined by 
-// eight vertex points:
-// [0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [1.0, 1.0, 0.0], [0.0, 1.0, 0.0],
-// [0.0, 0.0, 1.0], [1.0, 0.0, 1.0], [1.0, 1.0, 1.0], [0.0, 1.0, 1.0],
+//         [r_min, r_max] x [s_min, s_max] x [t_min, t_max]
 //
 // Date Created: Sep 7 2023
 // ==================================================================
-#include "Vec_Tools.hpp"
-#include "IQuadPts.hpp"
+#include "QuadPts_Gauss.hpp"
 
 class QuadPts_Gauss_Hex : public IQuadPts
 {
   public:
-    QuadPts_Gauss_Hex( const int &in_num_pts );
+    // Construct a quadrature rule with in_num_pts_x points in the r-direction, 
+    // in_num_pts_y in the s-direction, and in_num_pts_z in the t-direction
+    QuadPts_Gauss_Hex( const int &in_num_pts_x, 
+        const int &in_num_pts_y, const int &in_num_pts_z,
+        const double &r_min = -1.0, const double &r_max = 1.0,
+        const double &s_min = -1.0, const double &s_max = 1.0,
+        const double &t_min = -1.0, const double &t_max = 1.0 );
+    
+    // Construct a quadrature rule with given number of quadrature points in
+    // all directions.
+    QuadPts_Gauss_Hex( const int &in_num_pts_1d, 
+        const double &r_min = -1.0, const double &r_max = 1.0, 
+        const double &s_min = -1.0, const double &s_max = 1.0,
+        const double &t_min = -1.0, const double &t_max = 1.0 );
 
     virtual ~QuadPts_Gauss_Hex();
 
@@ -37,7 +47,8 @@ class QuadPts_Gauss_Hex : public IQuadPts
     // qp : length 3 * num_pts. Stores the r-s-t coordinates of the 
     //      quadrature points.
     // qw : length num_pts. Stores the quadrature weights.
-    std::vector<double> qp, qw;
+    std::vector<double> qp {};
+    std::vector<double> qw {};
 };
 
 #endif
