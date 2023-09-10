@@ -72,7 +72,7 @@ class NodalBC : public INodalBC
     std::vector<unsigned int> per_slave_nodes, per_master_nodes;
     unsigned int num_per_nodes;
     
-    NodalBC() {};
+    NodalBC() = delete;
 
     // --------------------------------------------------------------
     // BC_type_1 is a master-slave driven implementation. It is 

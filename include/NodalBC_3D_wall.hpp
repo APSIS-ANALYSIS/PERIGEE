@@ -40,6 +40,8 @@ class NodalBC_3D_wall : public INodalBC
 
     std::vector<unsigned int> per_slave_nodes, per_master_nodes;
     unsigned int num_per_nodes;
+
+    NodalBC_3D_wall() = delete;
 };
 
 #endif

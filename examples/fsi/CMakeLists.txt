@@ -59,9 +59,8 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Global_Part_METIS.cpp
   ${perigee_source}/Mesh/Global_Part_Serial.cpp
   ${perigee_source}/Mesh/Global_Part_Reload.cpp
-  ${perigee_source}/Mesh/IPart.cpp
-  ${perigee_source}/Mesh/Part_Tet.cpp
-  ${perigee_source}/Mesh/Part_Tet_FSI.cpp
+  ${perigee_source}/Mesh/Part_FEM.cpp
+  ${perigee_source}/Mesh/Part_FEM_FSI.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
   ${perigee_SOURCE_DIR}/src/NodalBC_3D_FSI.cpp

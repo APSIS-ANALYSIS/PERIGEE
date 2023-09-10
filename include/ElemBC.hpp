@@ -35,6 +35,7 @@
 #include "Sys_Tools.hpp"
 #include "Tet_Tools.hpp"
 #include "IIEN.hpp"
+#include "Vector_3.hpp"
 
 class ElemBC
 {
@@ -116,10 +117,8 @@ class ElemBC
 
     
     // This function returns the outward normal vector for faces
-    virtual void get_normal_vec( const int &ebc_id, double &out_nx,
-        double &out_ny, double &out_nz ) const
-    {SYS_T::commPrint("Warning: get_normal_vec is not implemented. \n");}
-
+    virtual Vector_3 get_normal_vec( const int &ebc_id ) const
+    {SYS_T::commPrint("Warning: get_normal_vec is not implemented. \n"); return Vector_3();}
 
     // This function returns the integral of basis NA on the faces
     virtual std::vector<double> get_intNA( const int &ebc_id ) const

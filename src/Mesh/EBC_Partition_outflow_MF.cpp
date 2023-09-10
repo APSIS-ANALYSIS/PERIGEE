@@ -55,7 +55,7 @@ EBC_Partition_outflow_MF::EBC_Partition_outflow_MF(
       }
 
       // Outward normal vector
-      ebc -> get_normal_vec(ii, outvec[ii].x(), outvec[ii].y(), outvec[ii].z());
+      outvec[ii] = ebc -> get_normal_vec(ii);
     }
     else
     {

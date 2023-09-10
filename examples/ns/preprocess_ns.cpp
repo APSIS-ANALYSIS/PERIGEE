@@ -11,7 +11,7 @@
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
-#include "Part_Tet.hpp"
+#include "Part_FEM.hpp"
 #include "NodalBC.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_tet_outflow.hpp"
@@ -240,30 +240,30 @@ int main( int argc, char * argv[] )
   {
     mytimer->Reset();
     mytimer->Start();
-    IPart * part = new Part_Tet( mesh, global_part, mnindex, IEN,
+    IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
         ctrlPts, proc_rank, cpu_size, dofNum, dofMat, elemType );
     mytimer->Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
     // write the part hdf5 file
-    part -> write( part_file.c_str() );
+    part -> write( part_file );
 
     part -> print_part_loadbalance_edgecut();
     
     // Partition Nodal BC and write to h5 file
     NBC_Partition * nbcpart = new NBC_Partition(part, mnindex, NBC_list);
     
-    nbcpart -> write_hdf5( part_file.c_str() );
+    nbcpart -> write_hdf5( part_file );
 
     // Partition Nodal Inflow BC and write to h5 file
     NBC_Partition_inflow * infpart = new NBC_Partition_inflow(part, mnindex, InFBC);
     
-    infpart->write_hdf5( part_file.c_str() );
+    infpart->write_hdf5( part_file );
     
     // Partition Elemental BC and write to h5 file
     EBC_Partition * ebcpart = new EBC_Partition_outflow(part, mnindex, ebc, NBC_list);
 
-    ebcpart -> write_hdf5( part_file.c_str() );
+    ebcpart -> write_hdf5( part_file );
 
     // Collect partition statistics
     list_nlocalnode.push_back(part->get_nlocalnode());
@@ -277,25 +277,16 @@ int main( int argc, char * argv[] )
   }
 
   cout<<"\n===> Mesh Partition Quality: "<<endl;
-  cout<<"The largest ghost / local node ratio is: ";
-  cout<<*std::max_element(list_ratio_g2l.begin(), list_ratio_g2l.end())<<endl;
-
-  cout<<"The smallest ghost / local node ratio is: ";
-  cout<<*std::min_element(list_ratio_g2l.begin(), list_ratio_g2l.end())<<endl;
-
+  cout<<"The largest ghost / local node ratio is: "<<VEC_T::max(list_ratio_g2l)<<endl;
+  cout<<"The smallest ghost / local node ratio is: "<<VEC_T::min(list_ratio_g2l)<<endl;
   cout<<"The summation of the number of ghost nodes is: "<<sum_nghostnode<<endl;
+  cout<<"The maximum badnode number is: "<<VEC_T::max(list_nbadnode)<<endl;
 
-  cout<<"The maximum badnode number is: ";
-  cout<<*std::max_element(list_nbadnode.begin(), list_nbadnode.end())<<endl;
-
-  const int maxpart_nlocalnode = *std::max_element(list_nlocalnode.begin(),
-      list_nlocalnode.end());
-  const int minpart_nlocalnode = *std::min_element(list_nlocalnode.begin(),
-      list_nlocalnode.end());
+  const int maxpart_nlocalnode = VEC_T::max(list_nlocalnode); 
+  const int minpart_nlocalnode = VEC_T::min(list_nlocalnode);
 
   cout<<"The maximum and minimum local node numbers are ";
-  cout<<maxpart_nlocalnode<<"\t";
-  cout<<minpart_nlocalnode<<endl;
+  cout<<maxpart_nlocalnode<<"\t"<<minpart_nlocalnode<<endl;
   cout<<"The maximum / minimum of local node is: ";
   cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<endl;
 
