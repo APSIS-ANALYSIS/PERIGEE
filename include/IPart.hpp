@@ -49,64 +49,6 @@ class IPart
     
     virtual ~IPart(){};
 
-    // --------------------------------------------------------------
-    // Generate partition based on the IGlobal_Part class, and the
-    // nodal indices are updated based on the Map_Node_Index class.
-    // Input:
-    // nElem : the number of cells in the global domain
-    // nFunc : the number of nodes in the global domain
-    // nLocBas : the number of basis functions for the cell
-    // cpu_rank : the rank of the cpu for this subdomain 
-    // gpart : the global partitioning information
-    // mnindex : the map between old and new indices
-    // IEN : the global IEN array
-    // ctrlPts : the global control points coordinates
-    // isPrintinfo : flag for information display. set as true if one
-    //                wants to view detailed information for the partitioning
-    // Output:
-    // elem_loc : the cell indices that belong to this partition
-    // nlocalele : the number of local cells (=elem_loc.size)
-    // node_loc : the (new) nodal indices that belong to this partition
-    // node_loc_original : the old nodal indices
-    // node_ghost : the ghost nodes' indices
-    // local_to_global : the map from local subdomain nodal indices to the
-    //                   global indices
-    // nlocalnode : the number of local nodes
-    // nghostnode : the number of ghost nodes
-    // ntotalnode : nlocalnode + nghostnode - nbadnode
-    // nbadnode : the nubmer of bad node, which is the node the local 
-    //            subdomain does not need, but belongs to node_loc.
-    // nlocghonode : nlocalnode + nghostnode
-    // ctrlPts_x_loc : the local and ghost nodes' x coordinate
-    // ctrlPts_y_loc : the local and ghost nodes' y coordinate
-    // ctrlPts_z_loc : the local and ghost nodes' z coordinate
-    // LIEN : the Local IEN array, which is based on the local cell indices
-    //        and the local node indices.
-    // --------------------------------------------------------------
-    virtual void GenPart( const int &nElem,
-        const int &nFunc, const int &nLocBas,
-        const int &cpu_rank,
-        const IGlobal_Part * const &gpart,
-        const Map_Node_Index * const &mnindex,
-        const IIEN * const &IEN,
-        const std::vector<double> &ctrlPts,
-        const bool &isPrintinfo,
-        std::vector<int> &elem_loc,
-        int &nlocalele,
-        std::vector<int> &node_loc,
-        std::vector<int> &node_loc_original,
-        std::vector<int> &node_ghost,
-        std::vector<int> &local_to_global,
-        int &nlocalnode,
-        int &nghostnode,
-        int &ntotalnode,
-        int &nbadnode,
-        int &nlocghonode,
-        std::vector<double> &ctrlPts_x_loc,
-        std::vector<double> &ctrlPts_y_loc,
-        std::vector<double> &ctrlPts_z_loc,
-        std::vector<std::vector<int> > &LIEN ) const;
-
     // Pure virtual function: Write the partition into HDF5 files
     virtual void write( const std::string &inputFileName ) const = 0;
 
