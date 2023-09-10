@@ -85,7 +85,7 @@ void VTK_T::read_vtu_grid( const std::string &filename,
     }
     else if( cell-> GetCellType() == 28 )
     {
-      // cell type 24 is nine-node quadrangle
+      // cell type 28 is nine-node quadrangle
       ien_array.push_back( static_cast<int>( cell->GetPointId(0) ) );
       ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
       ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
@@ -127,7 +127,7 @@ void VTK_T::read_vtu_grid( const std::string &filename,
       ien_array.push_back( static_cast<int>( cell->GetPointId(25) ) );
       ien_array.push_back( static_cast<int>( cell->GetPointId(26) ) );
     }
-    else SYS_T::print_fatal("Error: VTK_T::read_vtu_grid read a mesh with VTK cell type 10, 24, 22, 28 or 29. \n"); 
+    else SYS_T::print_fatal("Error: VTK_T::read_vtu_grid read a mesh with VTK cell type 10, 12, 22, 24, 28 or 29. \n"); 
   }
 
   reader->Delete();
