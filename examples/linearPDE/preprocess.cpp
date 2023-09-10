@@ -147,17 +147,17 @@ int main( int argc, char * argv[] )
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
     // write the part hdf5 file
-    part -> write( part_file.c_str() );
+    part -> write( part_file );
 
     // Partition Nodal BC and write to h5 file
     NBC_Partition * nbcpart = new NBC_Partition(part, mnindex, NBC_list);
 
-    nbcpart -> write_hdf5( part_file.c_str() );
+    nbcpart -> write_hdf5( part_file );
 
     // Partition Elemental BC and write to h5 file
     EBC_Partition * ebcpart = new EBC_Partition(part, mnindex, ebc);
 
-    ebcpart -> write_hdf5( part_file.c_str() );
+    ebcpart -> write_hdf5( part_file );
 
     // Collect partition statistics
     list_nlocalnode.push_back(part->get_nlocalnode());

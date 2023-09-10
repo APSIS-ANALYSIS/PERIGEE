@@ -37,7 +37,7 @@ class Part_FEM_FSI : public Part_FEM
     virtual void write( const std::string &inputFileName ) const;
 
   protected:
-    std::vector<int> elem_phy_tag;
+    std::vector<int> elem_phy_tag {};
     
     // The location in the node_loc for the local fluid/solid nodes
     // e.g. node_loc_fluid.size() gives the number of nodes belonging
@@ -46,7 +46,8 @@ class Part_FEM_FSI : public Part_FEM
     // Storing the index in node_loc array makes things more flexible,
     // because sometimes, we manage arrays using local partition's numbering
     // sometimes, we directly set entries using the global numbering.
-    std::vector<int> node_loc_fluid, node_loc_solid; 
+    std::vector<int> node_loc_fluid {};
+    std::vector<int> node_loc_solid {}; 
 
     int nlocalnode_fluid, nlocalnode_solid;
 

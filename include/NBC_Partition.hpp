@@ -11,6 +11,7 @@
 // ============================================================================
 #include "IPart.hpp"
 #include "INodalBC.hpp"
+#include "Map_Node_Index.hpp"
 
 class NBC_Partition
 {
