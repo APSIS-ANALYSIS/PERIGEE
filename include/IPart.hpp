@@ -2,9 +2,7 @@
 #define IPART_HPP
 // ============================================================================
 // IPart.hpp
-// Object:
-// An interface for partitioned mesh information. This is a pure abstract 
-// interface. Detailed implementation is in the derived classes.
+// A pure abstract interface for mesh partitioning.
 //
 // Details:
 // 1. elem_loc[nlocalele]: the array stores the global indices of the  elements
@@ -25,12 +23,11 @@
 // 6. local_to_global[nlocalnode]: This is a mapping that maps the local
 //    node indices to its global indices. It is defined as follows,
 //            local_to_global[ LIEN[e][i] ] = IEN[ elem_loc[e] ][ i ].
-// 7. cpu_rank, cpu_size: MPI parameters telling the number of total
-//    processors and the id of this processor.
+// 7. cpu_rank, cpu_size: MPI parameters telling the number of total processors
+//    and the id of this processor.
 // 8. dual_edge_ncommon: parameters that deifine the partition.
 // 9. nElem, nFunc, nlocbas: global mesh parameters.
-// 10. ctrlPts_x(y,z,w)_loc: local copy of control variables. These 
-//     coordniates should have been projected down. 
+// 10. ctrlPts_x(y,z,w)_loc: local copy of control variables. 
 //
 // Date: Sept. 30 2013
 // ============================================================================
