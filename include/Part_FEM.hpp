@@ -96,14 +96,14 @@ class Part_FEM : public IPart
     // ------------------------------------------------------------------------
     // Data
     // 1. local element
-    std::vector<int> elem_loc;
+    std::vector<int> elem_loc {};
     int nlocalele;
 
     // 2. local node
-    std::vector<int> node_loc;
-    std::vector<int> node_loc_original;
-    std::vector<int> node_ghost;
-    std::vector<int> local_to_global;
+    std::vector<int> node_loc {};
+    std::vector<int> node_loc_original {};
+    std::vector<int> node_ghost {};
+    std::vector<int> local_to_global {};
 
     int nlocalnode, nghostnode, ntotalnode, nbadnode, nlocghonode;
 
@@ -118,7 +118,9 @@ class Part_FEM : public IPart
     int ** LIEN;
 
     // 6. local point coordinates (i.e. control point geometry)
-    std::vector<double> ctrlPts_x_loc, ctrlPts_y_loc, ctrlPts_z_loc;
+    std::vector<double> ctrlPts_x_loc {};
+    std::vector<double> ctrlPts_y_loc {};
+    std::vector<double> ctrlPts_z_loc {};
 
     // ------------------------------------------------------------------------
     // Function
