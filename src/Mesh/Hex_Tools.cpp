@@ -535,4 +535,34 @@ namespace HEX_T
       pts[ii*3+2] = ctrlPts[gindex[ii]*3+2];
     }
   }
+
+  void Hex8::reset( const int &ien0, const int &ien1,
+          const int &ien2, const int &ien3, const int &ien4,
+          const int &ien5, const int &ien6, const int &ien7 )
+  {
+    gindex[0] = ien0; gindex[1] = ien1;
+    gindex[2] = ien2; gindex[3] = ien3;
+    gindex[4] = ien4; gindex[5] = ien5;
+    gindex[6] = ien6; gindex[7] = ien7;
+  }
+
+  void Hex8::reset( const std::vector<double> &ctrlPts,
+          const IIEN * const &ien_ptr, const int &ee )
+  {
+    gindex[0] = ien_ptr->get_IEN(ee, 0);
+    gindex[1] = ien_ptr->get_IEN(ee, 1);
+    gindex[2] = ien_ptr->get_IEN(ee, 2);
+    gindex[3] = ien_ptr->get_IEN(ee, 3);
+    gindex[4] = ien_ptr->get_IEN(ee, 4);
+    gindex[5] = ien_ptr->get_IEN(ee, 5);
+    gindex[6] = ien_ptr->get_IEN(ee, 6);
+    gindex[7] = ien_ptr->get_IEN(ee, 7);
+
+    for(int ii=0; ii<8; ++ii)
+    {
+      pts[ii*3]   = ctrlPts[gindex[ii]*3];
+      pts[ii*3+1] = ctrlPts[gindex[ii]*3+1];
+      pts[ii*3+2] = ctrlPts[gindex[ii]*3+2];
+    }
+  }
 }

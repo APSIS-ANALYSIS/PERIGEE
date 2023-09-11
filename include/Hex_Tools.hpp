@@ -91,6 +91,13 @@ namespace HEX_T
           const int &ien3, const int &ien4, const int &ien5,
           const int &ien6, const int &ien7 );
 
+      void reset( const int &ien0, const int &ien1,
+          const int &ien2, const int &ien3, const int &ien4,
+          const int &ien5, const int &ien6, const int &ien7 );
+
+      void reset( const std::vector<double> &ctrlPts,
+          const IIEN * const &ien_ptr, const int &ee );
+
       private:
       double pts[24];
 
