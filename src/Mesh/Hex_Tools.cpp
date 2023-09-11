@@ -81,7 +81,7 @@ void HEX_T::gen_hex_grid( vtkUnstructuredGrid * const &grid_w,
 
       grid_w->InsertNextCell( cl->GetCellType(), cl->GetPointIds() );
 
-      std::vector<double> cell_node; cell_node.clear();
+      std::vector<double> cell_node {};
       for(int lnode=0; lnode<8; ++lnode)
       {
         int node_offset = 3 * local_ien_vtk[lnode];
@@ -170,7 +170,7 @@ void HEX_T::gen_quadrangle_grid( vtkPolyData * const &grid_w,
   SYS_T::print_exit_if(pt.size() != 3*numpts, 
     "Error: HEX_T::gen_quadrangle_grid, point vector size does not match the number of points. \n");
 
-  SYS_T::print_exit_if(ien_array.size()!= 4*numcels,
+  SYS_T::print_exit_if(ien_array.size() != 4*numcels,
     "Error: HEX_T::gen_quadrangle_grid, ien array size does not match the number of cells. \n");
 
   // 1. nodal points
@@ -381,44 +381,34 @@ Vector_3 HEX_T::get_out_normal( const std::string &file,
 
   const int hexe0 = gelem[0]; // quadrangle's associated hex element indices
 
-  SYS_T::print_fatal_if(hexe0 == -1, "Error: HEX_T::get_out_normal requires the element indices for the vtp file.\n");
+  SYS_T::print_exit_if(hexe0 == -1, "Error: HEX_T::get_out_normal the vtp file %s contains -1 for GlobalElementID.\n", file.c_str());
 
   const std::vector<int> hen { vol_ien->get_IEN(hexe0, 0), vol_ien->get_IEN(hexe0, 1), 
                                vol_ien->get_IEN(hexe0, 2), vol_ien->get_IEN(hexe0, 3),
                                vol_ien->get_IEN(hexe0, 4), vol_ien->get_IEN(hexe0, 5),
                                vol_ien->get_IEN(hexe0, 6), vol_ien->get_IEN(hexe0, 7)};
 
-  // the coordinates of the center of the hex element, average of the coordinates of 8 vertices
-  double cen_hex_x {0.0}, cen_hex_y {0.0}, cen_hex_z {0.0};
+  // the coordinates of the center of the hex element, defined as the average of the coordinates of 8 vertices
+  Vector_3 cen_hex( 0.0, 0.0, 0.0 );
   for (int vertex : hen)
-  {
-    cen_hex_x += vol_ctrlPts[3 * vertex];
-    cen_hex_y += vol_ctrlPts[3 * vertex + 1];
-    cen_hex_z += vol_ctrlPts[3 * vertex + 2];
-  }
-  const Vector_3 cen_hex(0.125 * cen_hex_x, 0.125 * cen_hex_y, 0.125 * cen_hex_z);
+    cen_hex += 0.125 * Vector_3( vol_ctrlPts[3 * vertex], vol_ctrlPts[3 * vertex + 1], vol_ctrlPts[3 * vertex + 2] );
 
   // the coordinates of the center of the surface quadrangle element, average of the coordinates of 4 vertices
-  double cen_quad_x {0.0}, cen_quad_y {0.0}, cen_quad_z {0.0};
+  Vector_3 cen_quad(0.0, 0.0, 0.0);
   for (int vertex : qun)
-  {
-    cen_quad_x += vol_ctrlPts[3 * vertex];
-    cen_quad_y += vol_ctrlPts[3 * vertex + 1];
-    cen_quad_z += vol_ctrlPts[3 * vertex + 2];
-  }
-  const Vector_3 cen_quad (0.25 * cen_quad_x, 0.25 * cen_quad_y, 0.25 * cen_quad_z);
+    cen_quad += 0.25 * Vector_3( vol_ctrlPts[3 * vertex], vol_ctrlPts[3 * vertex + 1], vol_ctrlPts[3 * vertex + 2] );
 
   // obtain the inward vector
   const Vector_3 inw = cen_hex - cen_quad;
 
   // make cross line-0-1 and line-0-3
-  const Vector_3 l01 (vol_ctrlPts[3*qun[1]] - vol_ctrlPts[3*qun[0]],
-                      vol_ctrlPts[3*qun[1] + 1] - vol_ctrlPts[3*qun[0] + 1],
-                      vol_ctrlPts[3*qun[1] + 2] - vol_ctrlPts[3*qun[0] + 2]);
+  const Vector_3 l01 ( vol_ctrlPts[3*qun[1]    ] - vol_ctrlPts[3*qun[0]    ],
+                       vol_ctrlPts[3*qun[1] + 1] - vol_ctrlPts[3*qun[0] + 1],
+                       vol_ctrlPts[3*qun[1] + 2] - vol_ctrlPts[3*qun[0] + 2] );
   
-  const Vector_3 l03 (vol_ctrlPts[3*qun[3]] - vol_ctrlPts[3*qun[0]],
-                      vol_ctrlPts[3*qun[3] + 1] - vol_ctrlPts[3*qun[0] + 1],
-                      vol_ctrlPts[3*qun[3] + 2] - vol_ctrlPts[3*qun[0] + 2]);
+  const Vector_3 l03 ( vol_ctrlPts[3*qun[3]    ] - vol_ctrlPts[3*qun[0]    ],
+                       vol_ctrlPts[3*qun[3] + 1] - vol_ctrlPts[3*qun[0] + 1],
+                       vol_ctrlPts[3*qun[3] + 2] - vol_ctrlPts[3*qun[0] + 2] );
 
   Vector_3 outVec = cross_product( l01, l03 );
 
@@ -628,8 +618,9 @@ namespace HEX_T
     TET_T::Tet4 tet5(pts, 1, 5, 6, 7);
     TET_T::Tet4 tet6(pts, 1, 6, 2, 7);
 
-    double volume {tet1.get_volume() + tet2.get_volume() + tet3.get_volume() + 
-                   tet4.get_volume() + tet5.get_volume() + tet6.get_volume()};
-    return volume;
+    return tet1.get_volume() + tet2.get_volume() + tet3.get_volume() + tet4.get_volume() + tet5.get_volume() + tet6.get_volume();
   }
+
 }
+
+// EOF

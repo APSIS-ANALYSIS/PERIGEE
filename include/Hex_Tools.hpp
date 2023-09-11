@@ -105,7 +105,7 @@ namespace HEX_T
 
       double get_volume() const;
 
-      private:
+    private:
       std::vector<double> pts;
 
       int gindex[8];
