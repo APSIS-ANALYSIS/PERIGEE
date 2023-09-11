@@ -77,9 +77,19 @@ namespace HEX_T
       // eight points given by nodes-vector
       Hex8( const std::vector<double> &in_nodes );
 
+      Hex8( const std::vector<double> &ctrlPts,
+          const int &ien0, const int &ien1, const int &ien2,
+          const int &ien3, const int &ien4, const int &ien5,
+          const int &ien6, const int &ien7 );
+
       virtual ~Hex8();
 
-      void reset( const std::vector<double> &nodes );
+      void reset( const std::vector<double> &inTnodes );
+
+      void reset( const std::vector<double> &ctrlPts,
+          const int &ien0, const int &ien1, const int &ien2,
+          const int &ien3, const int &ien4, const int &ien5,
+          const int &ien6, const int &ien7 );
 
       private:
       double pts[24];
