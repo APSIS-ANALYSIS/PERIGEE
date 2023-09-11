@@ -17,7 +17,7 @@ void HEX_T::gen_hex_grid( vtkUnstructuredGrid * const &grid_w,
     nlocbas = 27;
   else
     SYS_T::print_exit("Error: HEX_T::gen_hex_grid, ien array size does not match the number of cells. \n");
-  // Now we donnot consider the serendipity elements i.e. 8-node quadrangle and 20-node hexahedron.
+  // Now we donnot consider the serendipity elements i.e. 8-node quadrilateral and 20-node hexahedron.
 
   // Check the connectivity array
   std::vector<int> temp = ien_array;
@@ -161,17 +161,17 @@ void HEX_T::write_hex_grid( const std::string &filename,
   grid_w->Delete();
 }
 
-void HEX_T::gen_quadrangle_grid( vtkPolyData * const &grid_w,
+void HEX_T::gen_quad_grid( vtkPolyData * const &grid_w,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt,
     const std::vector<int> &ien_array )
 {
   // check the input data compatibility
   SYS_T::print_exit_if(pt.size() != 3*numpts, 
-    "Error: HEX_T::gen_quadrangle_grid, point vector size does not match the number of points. \n");
+    "Error: HEX_T::gen_quad_grid, point vector size does not match the number of points. \n");
 
   SYS_T::print_exit_if(ien_array.size() != 4*numcels,
-    "Error: HEX_T::gen_quadrangle_grid, ien array size does not match the number of cells. \n");
+    "Error: HEX_T::gen_quad_grid, ien array size does not match the number of cells. \n");
 
   // 1. nodal points
   vtkPoints * ppt = vtkPoints::New();
@@ -202,7 +202,7 @@ void HEX_T::gen_quadrangle_grid( vtkPolyData * const &grid_w,
   cl->Delete();
 }
 
-void HEX_T::write_quadrangle_grid( const std::string &filename,
+void HEX_T::write_quad_grid( const std::string &filename,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, 
       const std::vector<int> &ien_array,
@@ -212,7 +212,7 @@ void HEX_T::write_quadrangle_grid( const std::string &filename,
   vtkPolyData * grid_w = vtkPolyData::New();
 
   // Generate the mesh
-  gen_quadrangle_grid( grid_w, numpts, numcels, pt, ien_array );
+  gen_quad_grid( grid_w, numpts, numcels, pt, ien_array );
 
   // We need to make sure there are no data in IOdata that have the same name
   std::vector<std::string> name_list {};
@@ -221,7 +221,7 @@ void HEX_T::write_quadrangle_grid( const std::string &filename,
   VEC_T::sort_unique_resize( name_list );
 
   SYS_T::print_exit_if( name_list.size() != IOdata.size(),
-    "Error: In HEX_T::write_qudrangle_grid, there are %d data in the IOdata that have the same name.\n", IOdata.size() - name_list.size() + 1 );
+    "Error: In HEX_T::write_quad_grid, there are %d data in the IOdata that have the same name.\n", IOdata.size() - name_list.size() + 1 );
 
 // We add the IOdata for VTK
   for( auto data : IOdata )
@@ -231,7 +231,7 @@ void HEX_T::write_quadrangle_grid( const std::string &filename,
     else if( data.get_object() == AssociateObject::Cell )
       VTK_T::add_int_CellData( grid_w, data.get_data(), data.get_name() );
     else
-      SYS_T::print_exit( "Error: In HEX_T::write_qudrangle_grid, there is an unknown object type in DataVecStr %s", data.get_name().c_str() );
+      SYS_T::print_exit( "Error: In HEX_T::write_quad_grid, there is an unknown object type in DataVecStr %s", data.get_name().c_str() );
   }
 
   // Write the prepared grid_w to a vtu or vtk file on disk
@@ -240,17 +240,17 @@ void HEX_T::write_quadrangle_grid( const std::string &filename,
   grid_w->Delete();
 }
 
-void HEX_T::gen_quadratic_quadrangle_grid( vtkUnstructuredGrid * const &grid_w,
+void HEX_T::gen_quadratic_quad_grid( vtkUnstructuredGrid * const &grid_w,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt,
     const std::vector<int> &ien_array )
 {
   // check the input data compatibility
   SYS_T::print_exit_if(pt.size() != 3*numpts,
-    "Error: HEX_T::gen_quadratic_quadrangle_grid point, vector size does not match the number of points. \n");
+    "Error: HEX_T::gen_quadratic_quad_grid point, vector size does not match the number of points. \n");
 
   SYS_T::print_exit_if(ien_array.size() != 9*numcels, 
-    "Error: HEX_T::gen_quadratic_quadrangle_grid, ien array size does not match the number of cells. \n");
+    "Error: HEX_T::gen_quadratic_quad_grid, ien array size does not match the number of cells. \n");
 
   // 1. nodal points
   vtkPoints * ppt = vtkPoints::New(); 
@@ -288,7 +288,7 @@ void HEX_T::gen_quadratic_quadrangle_grid( vtkUnstructuredGrid * const &grid_w,
   cl -> Delete();
 }
 
-void HEX_T::write_quadratic_quadrangle_grid( const std::string &filename,
+void HEX_T::write_quadratic_quad_grid( const std::string &filename,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, 
       const std::vector<int> &ien_array,
@@ -298,7 +298,7 @@ void HEX_T::write_quadratic_quadrangle_grid( const std::string &filename,
   vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
 
   // Generate the mesh
-  gen_quadratic_quadrangle_grid( grid_w, numpts, numcels, pt, ien_array );
+  gen_quadratic_quad_grid( grid_w, numpts, numcels, pt, ien_array );
 
   // We need to make sure there are no data in IOdata that have the same name
   std::vector<std::string> name_list {};
@@ -307,7 +307,7 @@ void HEX_T::write_quadratic_quadrangle_grid( const std::string &filename,
   VEC_T::sort_unique_resize( name_list );
 
   SYS_T::print_exit_if( name_list.size() != IOdata.size(),
-    "Error: In HEX_T::write_quadratic_quadrangle_grid, there are %d data in the IOdata that have the same name.\n", IOdata.size() - name_list.size() + 1 );
+    "Error: In HEX_T::write_quadratic_quad_grid, there are %d data in the IOdata that have the same name.\n", IOdata.size() - name_list.size() + 1 );
 
 // We add the IOdata for VTK
   for( auto data : IOdata )
@@ -317,7 +317,7 @@ void HEX_T::write_quadratic_quadrangle_grid( const std::string &filename,
     else if( data.get_object() == AssociateObject::Cell )
       VTK_T::add_int_CellData( grid_w, data.get_data(), data.get_name() );
     else
-      SYS_T::print_exit( "Error: In HEX_T::write_quadratic_quadrangle_grid, there is an unknown object type in DataVecStr %s", data.get_name().c_str() );
+      SYS_T::print_exit( "Error: In HEX_T::write_quadratic_quad_grid, there is an unknown object type in DataVecStr %s", data.get_name().c_str() );
   }
 
   // Write the prepared grid_w to a vtu file on disk
@@ -376,10 +376,10 @@ Vector_3 HEX_T::get_out_normal( const std::string &file,
   const std::vector<int> gnode = VTK_T::read_int_PointData(file, "GlobalNodeID");
   const std::vector<int> gelem = VTK_T::read_int_CellData(file, "GlobalElementID");
 
-  // quadrangle nodes' global indices
+  // quad nodes' global indices
   const std::vector<int> qun = { gnode[ ien[0] ], gnode[ ien[1] ], gnode[ ien[2] ], gnode[ ien[3] ] };
 
-  const int hexe0 = gelem[0]; // quadrangle's associated hex element indices
+  const int hexe0 = gelem[0]; // quad's associated hex element indices
 
   SYS_T::print_exit_if(hexe0 == -1, "Error: HEX_T::get_out_normal the vtp file %s contains -1 for GlobalElementID.\n", file.c_str());
 
@@ -393,7 +393,7 @@ Vector_3 HEX_T::get_out_normal( const std::string &file,
   for (int vertex : hen)
     cen_hex += 0.125 * Vector_3( vol_ctrlPts[3 * vertex], vol_ctrlPts[3 * vertex + 1], vol_ctrlPts[3 * vertex + 2] );
 
-  // the coordinates of the center of the surface quadrangle element, average of the coordinates of 4 vertices
+  // the coordinates of the center of the surface quad element, defined as the average of the coordinates of 4 vertices
   Vector_3 cen_quad(0.0, 0.0, 0.0);
   for (int vertex : qun)
     cen_quad += 0.25 * Vector_3( vol_ctrlPts[3 * vertex], vol_ctrlPts[3 * vertex + 1], vol_ctrlPts[3 * vertex + 2] );
