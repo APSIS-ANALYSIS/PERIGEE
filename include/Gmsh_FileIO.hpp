@@ -77,6 +77,20 @@ class Gmsh_FileIO
     // --------------------------------------------------------------
     void update_quadratic_tet_IEN( const int &index_3d );
 
+
+    // --------------------------------------------------------------
+    // update the IEN array to accomodate for the VTK ordering for
+    // quadratic hexahedral elements. For quadratic hexahedral
+    // element, the nodes in Gmsh format correspond to the nodes 
+    // in VTK format as follows:
+    // Gmsh: 0~7 8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
+    // VTK : 0~7 8 11 13  9 16 18 19 17 10 12 14 15 22 23 21 24 20 25 26
+    // \para index_3d : the 3D domain index. so the 
+    //                  eIEN[ phy_3d_index[index_3d]][ ]
+    //                  will be modified.
+    // --------------------------------------------------------------
+    void update_quadratic_hex_IEN( const int &index_3d );
+
     // --------------------------------------------------------------
     // write a vtp file for an interior surface between two physical
     // subdomains, with name surfaceName_vol1Name_vol2Name.vtp

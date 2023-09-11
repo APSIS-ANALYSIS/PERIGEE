@@ -52,12 +52,6 @@ namespace HEX_T
 
   double get_aspect_ratio( const std::vector<double> &coors );
 
-  // ----------------------------------------------------------------
-  // ! rest_node: convert the node arrangment of a quadratic hexahedron,
-  //              i.e. the local ien, from Gmsh style to VTK style.
-  // ----------------------------------------------------------------
-  std::vector<int> reset_node (const std::vector<int> &local_ien_msh);
-
   class Hex8
   {
     public:

@@ -1378,6 +1378,60 @@ void Gmsh_FileIO::update_quadratic_tet_IEN( const int &index_3d )
   }
 }
 
+void Gmsh_FileIO::update_quadratic_hex_IEN( const int &index_3d )
+{
+  SYS_T::print_exit_if(index_3d < 0 || index_3d >= num_phy_domain_3d,
+      "Error: input index_3d is out of range.\n");
+
+  const int domain_index = phy_3d_index[ index_3d ];
+
+  const int ne = phy_3d_nElem[ index_3d ];
+
+  const int nlocbas = ele_nlocbas[ domain_index ];
+
+  SYS_T::print_exit_if(nlocbas != 27 || nlocbas != 20, "Error: Gmsh_FileIO updata_quadratic_hex_IEN only works for 27-node or 20-node quadratic element. \n");
+
+  // Now upateing the eIEN array
+  for(int ee=0; ee<ne; ++ee)
+  {
+    const double temp9  = eIEN[domain_index][nlocbas * ee + 9];
+    const double temp10 = eIEN[domain_index][nlocbas * ee + 10];
+    const double temp11 = eIEN[domain_index][nlocbas * ee + 11];
+    const double temp12 = eIEN[domain_index][nlocbas * ee + 12];
+    const double temp13 = eIEN[domain_index][nlocbas * ee + 13];
+    const double temp14 = eIEN[domain_index][nlocbas * ee + 14];
+    const double temp15 = eIEN[domain_index][nlocbas * ee + 15];
+    const double temp16 = eIEN[domain_index][nlocbas * ee + 16];
+    const double temp17 = eIEN[domain_index][nlocbas * ee + 17];
+    const double temp18 = eIEN[domain_index][nlocbas * ee + 18];
+    const double temp19 = eIEN[domain_index][nlocbas * ee + 19];
+    eIEN[domain_index][nlocbas * ee + 9] = temp11;
+    eIEN[domain_index][nlocbas * ee + 10] = temp13;
+    eIEN[domain_index][nlocbas * ee + 11] = temp9;
+    eIEN[domain_index][nlocbas * ee + 12] = temp16;
+    eIEN[domain_index][nlocbas * ee + 13] = temp18;
+    eIEN[domain_index][nlocbas * ee + 14] = temp19;
+    eIEN[domain_index][nlocbas * ee + 15] = temp17;
+    eIEN[domain_index][nlocbas * ee + 16] = temp10;
+    eIEN[domain_index][nlocbas * ee + 17] = temp12;
+    eIEN[domain_index][nlocbas * ee + 18] = temp14;
+    eIEN[domain_index][nlocbas * ee + 19] = temp15;
+    if (nlocbas == 27)
+    {
+      const double temp20 = eIEN[domain_index][27 * ee + 20];
+      const double temp21 = eIEN[domain_index][27 * ee + 21];
+      const double temp22 = eIEN[domain_index][27 * ee + 22];
+      const double temp23 = eIEN[domain_index][27 * ee + 23];
+      const double temp24 = eIEN[domain_index][27 * ee + 24];
+      eIEN[domain_index][27 * ee + 20] = temp22;
+      eIEN[domain_index][27 * ee + 21] = temp23;
+      eIEN[domain_index][27 * ee + 22] = temp21;
+      eIEN[domain_index][27 * ee + 23] = temp24;
+      eIEN[domain_index][27 * ee + 24] = temp20;
+    }
+  }
+}
+
 void Gmsh_FileIO::write_quadratic_sur_vtu( const int &index_sur,
     const int &index_vol, const bool &isf2e ) const
 {
