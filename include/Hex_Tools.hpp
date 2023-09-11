@@ -84,7 +84,7 @@ namespace HEX_T
 
       virtual ~Hex8();
 
-      void reset( const std::vector<double> &inTnodes );
+      void reset( const std::vector<double> &in_nodes );
 
       void reset( const std::vector<double> &ctrlPts,
           const int &ien0, const int &ien1, const int &ien2,
