@@ -5,6 +5,7 @@
 #include "VTK_Tools.hpp"
 #include "Math_Tools.hpp"
 #include "IIEN.hpp"
+#include "Tet_Tools.hpp"
 
 #include <vtkQuad.h>
 #include <vtkBiQuadraticQuad.h>
@@ -102,8 +103,10 @@ namespace HEX_T
 
       double get_aspect_ratio() const;
 
+      double get_volume() const;
+
       private:
-      double pts[24];
+      std::vector<double> pts;
 
       int gindex[8];
   };

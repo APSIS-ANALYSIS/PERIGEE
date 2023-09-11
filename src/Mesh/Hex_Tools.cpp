@@ -455,6 +455,7 @@ namespace HEX_T
 {
   Hex8::Hex8()
   {
+    pts.resize(24);
     pts[0]  = -1.0; pts[1]  = -1.0; pts[2]  = -1.0;
     pts[3]  =  1.0; pts[4]  = -1.0; pts[5]  = -1.0;
     pts[6]  =  1.0; pts[7]  =  1.0; pts[8]  = -1.0;
@@ -472,6 +473,7 @@ namespace HEX_T
 
   Hex8::Hex8( const std::vector<double> &in_nodes )
   {
+    pts.resize(24);
     SYS_T::print_exit_if( in_nodes.size() != 24,
       "Error: input nodal list shall have 8 nodes with xyz-coordinates. \n");
     
@@ -488,6 +490,7 @@ namespace HEX_T
           const int &ien3, const int &ien4, const int &ien5,
           const int &ien6, const int &ien7 )
   {
+    pts.resize(24);
     gindex[0] = ien0; gindex[1] = ien1;
     gindex[2] = ien2; gindex[3] = ien3;
     gindex[4] = ien4; gindex[5] = ien5;
@@ -614,5 +617,19 @@ namespace HEX_T
     const double emin = *std::min_element(edge, edge+12);
 
     return emax / emin;
+  }
+
+  double Hex8::get_volume() const
+  {
+    TET_T::Tet4 tet1(pts, 0, 1, 3, 7);
+    TET_T::Tet4 tet2(pts, 0, 4, 1, 7);
+    TET_T::Tet4 tet3(pts, 1, 4, 5, 7);
+    TET_T::Tet4 tet4(pts, 1, 2, 3, 7);
+    TET_T::Tet4 tet5(pts, 1, 5, 6, 7);
+    TET_T::Tet4 tet6(pts, 1, 6, 2, 7);
+
+    double volume {tet1.get_volume() + tet2.get_volume() + tet3.get_volume() + 
+                   tet4.get_volume() + tet5.get_volume() + tet6.get_volume()};
+    return volume;
   }
 }
