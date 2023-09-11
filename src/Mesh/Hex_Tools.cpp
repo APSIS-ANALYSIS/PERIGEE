@@ -581,4 +581,38 @@ namespace HEX_T
     std::cout<<" -- pt6 : "<<pts[18]<<'\t'<<pts[19]<<'\t'<<pts[20]<<'\n';
     std::cout<<" -- pt7 : "<<pts[21]<<'\t'<<pts[22]<<'\t'<<pts[23]<<std::endl;
   }
+
+  double Hex8::get_aspect_ratio() const
+  {
+    double edge[12];
+    //e01
+    edge[0] = MATH_T::norm2(pts[3]-pts[0], pts[4]-pts[1], pts[5]-pts[2]);
+    //e12
+    edge[1] = MATH_T::norm2(pts[6]-pts[3], pts[7]-pts[4], pts[8]-pts[5]);
+    //e23
+    edge[2] = MATH_T::norm2(pts[9]-pts[6], pts[10]-pts[7], pts[11]-pts[8]);
+    //e03
+    edge[3] = MATH_T::norm2(pts[9]-pts[0], pts[10]-pts[1], pts[11]-pts[2]);
+    //e45
+    edge[4] = MATH_T::norm2(pts[15]-pts[12], pts[16]-pts[13], pts[17]-pts[14]);
+    //e56
+    edge[5] = MATH_T::norm2(pts[18]-pts[15], pts[19]-pts[16], pts[20]-pts[17]);
+    //e67
+    edge[6] = MATH_T::norm2(pts[21]-pts[18], pts[22]-pts[19], pts[23]-pts[20]);
+    //e47
+    edge[7] = MATH_T::norm2(pts[21]-pts[12], pts[22]-pts[13], pts[23]-pts[14]);
+    //e04
+    edge[8] = MATH_T::norm2(pts[12]-pts[0], pts[13]-pts[1], pts[14]-pts[2]);
+    //e15
+    edge[9] = MATH_T::norm2(pts[15]-pts[3], pts[16]-pts[4], pts[17]-pts[5]);
+    //e26
+    edge[10] = MATH_T::norm2(pts[18]-pts[6], pts[19]-pts[7], pts[20]-pts[8]);
+    //e37
+    edge[11] = MATH_T::norm2(pts[21]-pts[9], pts[22]-pts[10], pts[23]-pts[11]);
+
+    const double emax = *std::max_element(edge, edge+12);
+    const double emin = *std::min_element(edge, edge+12);
+
+    return emax / emin;
+  }
 }

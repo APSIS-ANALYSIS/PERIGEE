@@ -100,6 +100,8 @@ namespace HEX_T
 
       void print_info() const;
 
+      double get_aspect_ratio() const;
+
       private:
       double pts[24];
 
