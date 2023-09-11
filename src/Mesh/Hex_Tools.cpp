@@ -470,7 +470,33 @@ namespace HEX_T
     gindex[6] = 6; gindex[7] = 7;
   }
 
+  Hex8::Hex8( const std::vector<double> &in_nodes )
+  {
+    SYS_T::print_exit_if( in_nodes.size() != 24,
+      "Error: input nodal list shall have 8 nodes with xyz-coordinates. \n");
+    
+    for(int ii=0; ii<24; ++ii) pts[ii] = in_nodes[ii];
+
+    gindex[0] = 0; gindex[1] = 1;
+    gindex[2] = 2; gindex[3] = 3;
+    gindex[4] = 4; gindex[5] = 5;
+    gindex[6] = 6; gindex[7] = 7;
+  }
+
   Hex8::~Hex8()
   {
+  }
+
+  void Hex8::reset( const std::vector<double> &in_nodes )
+  {
+    SYS_T::print_exit_if( in_nodes.size() != 24,
+      "Error: input nodal list shall have 8 nodes with xyz-coordinates. \n");
+    
+    for(int ii=0; ii<24; ++ii) pts[ii] = in_nodes[ii];
+
+    gindex[0] = 0; gindex[1] = 1;
+    gindex[2] = 2; gindex[3] = 3;
+    gindex[4] = 4; gindex[5] = 5;
+    gindex[6] = 6; gindex[7] = 7;
   }
 }

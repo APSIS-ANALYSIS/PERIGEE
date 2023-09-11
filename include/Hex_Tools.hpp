@@ -73,7 +73,13 @@ namespace HEX_T
       // node 7 : -1  1  1
       Hex8();
 
+      // Generate a hexahedron with the x-y-z coordinates of the
+      // eight points given by nodes-vector
+      Hex8( const std::vector<double> &in_nodes );
+
       virtual ~Hex8();
+
+      void reset( const std::vector<double> &nodes );
 
       private:
       double pts[24];
