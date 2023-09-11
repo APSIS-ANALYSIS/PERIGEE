@@ -565,4 +565,20 @@ namespace HEX_T
       pts[ii*3+2] = ctrlPts[gindex[ii]*3+2];
     }
   }
+
+  void Hex8::print_info() const
+  {
+    std::cout<<"Hex8 object : \n";
+    std::cout<<" -- global indices: "<<gindex[0]<<'\t';
+    std::cout<<gindex[1]<<'\t'<<gindex[2]<<'\t'<<gindex[3]<<'\n'<<'\t';
+    std::cout<<gindex[4]<<'\t'<<gindex[5]<<'\t'<<gindex[6]<<'\t'<<gindex[7]<<'\n';
+    std::cout<<" -- pt0 : "<<pts[0]<<'\t'<<pts[1]<<'\t'<<pts[2]<<'\n';
+    std::cout<<" -- pt1 : "<<pts[3]<<'\t'<<pts[4]<<'\t'<<pts[5]<<'\n';
+    std::cout<<" -- pt2 : "<<pts[6]<<'\t'<<pts[7]<<'\t'<<pts[8]<<'\n';
+    std::cout<<" -- pt3 : "<<pts[9]<<'\t'<<pts[10]<<'\t'<<pts[11]<<'\n';
+    std::cout<<" -- pt4 : "<<pts[12]<<'\t'<<pts[13]<<'\t'<<pts[14]<<'\n';
+    std::cout<<" -- pt5 : "<<pts[15]<<'\t'<<pts[16]<<'\t'<<pts[17]<<'\n';
+    std::cout<<" -- pt6 : "<<pts[18]<<'\t'<<pts[19]<<'\t'<<pts[20]<<'\n';
+    std::cout<<" -- pt7 : "<<pts[21]<<'\t'<<pts[22]<<'\t'<<pts[23]<<std::endl;
+  }
 }

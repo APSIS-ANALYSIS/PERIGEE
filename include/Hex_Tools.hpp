@@ -98,6 +98,8 @@ namespace HEX_T
       void reset( const std::vector<double> &ctrlPts,
           const IIEN * const &ien_ptr, const int &ee );
 
+      void print_info() const;
+
       private:
       double pts[24];
 
