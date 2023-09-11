@@ -206,6 +206,10 @@ $ make
 $ make check
 $ make install
 $ make check-install
+```
+
+You may go to the upper level and remove the source folder in the following manner,
+```sh
 $ cd ..
 $ rm -rf hdf5-1.8.16-src
 ```
@@ -221,6 +225,10 @@ $ cd metis-5.0.3-src
 $ make config prefix=$HOME/lib/metis-5.0.3
 $ make
 $ make install
+```
+
+After the installation, you may remove the source folder in the following manner,
+```sh
 $ cd ..
 $ rm -rf metis-5.0.3-src
 ```
@@ -235,7 +243,8 @@ $ cmake ../yaml-cpp -DCMAKE_INSTALL_PREFIX=$HOME/lib/yaml-shared -DBUILD_SHARED_
 $ make
 $ make install
 ```
-After the install, you do not need the source or the build folder. So you may run the following to clean them.
+
+After the installation, you do not need the source or the build folder. So you may run the following to clean them.
 ```sh
 $ cd ..
 $ rm -rf build_yaml
