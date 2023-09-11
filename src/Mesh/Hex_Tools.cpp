@@ -450,3 +450,27 @@ std::vector<int> HEX_T::reset_node (const std::vector<int> &ien)
   else
     SYS_T::print_exit("Error: In HEX_T::reset_node, undefined hexahedron type.");
 }
+
+namespace HEX_T
+{
+  Hex8::Hex8()
+  {
+    pts[0]  = -1.0; pts[1]  = -1.0; pts[2]  = -1.0;
+    pts[3]  =  1.0; pts[4]  = -1.0; pts[5]  = -1.0;
+    pts[6]  =  1.0; pts[7]  =  1.0; pts[8]  = -1.0;
+    pts[9]  = -1.0; pts[10] =  1.0; pts[11] = -1.0;
+    pts[12] = -1.0; pts[13] = -1.0; pts[14] =  1.0;
+    pts[15] =  1.0; pts[16] = -1.0; pts[17] =  1.0;
+    pts[18] =  1.0; pts[19] =  1.0; pts[20] =  1.0;
+    pts[21] = -1.0; pts[22] =  1.0; pts[23] =  1.0;
+
+    gindex[0] = 0; gindex[1] = 1;
+    gindex[2] = 2; gindex[3] = 3;
+    gindex[4] = 4; gindex[5] = 5;
+    gindex[6] = 6; gindex[7] = 7;
+  }
+
+  Hex8::~Hex8()
+  {
+  }
+}
