@@ -572,8 +572,8 @@ namespace HEX_T
   void Hex8::print_info() const
   {
     std::cout<<"Hex8 object : \n";
-    std::cout<<" -- global indices: "<<gindex[0]<<'\t';
-    std::cout<<gindex[1]<<'\t'<<gindex[2]<<'\t'<<gindex[3]<<'\n'<<'\t';
+    std::cout<<" -- global indices: "<<'\n'<<gindex[0]<<'\t';
+    std::cout<<gindex[1]<<'\t'<<gindex[2]<<'\t'<<gindex[3]<<'\t';
     std::cout<<gindex[4]<<'\t'<<gindex[5]<<'\t'<<gindex[6]<<'\t'<<gindex[7]<<'\n';
     std::cout<<" -- pt0 : "<<pts[0]<<'\t'<<pts[1]<<'\t'<<pts[2]<<'\n';
     std::cout<<" -- pt1 : "<<pts[3]<<'\t'<<pts[4]<<'\t'<<pts[5]<<'\n';

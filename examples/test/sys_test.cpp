@@ -23,55 +23,16 @@
 
 int main(int argc, char *argv[])
 {
-  std::vector<int> nid1 {0, 1, 2, 3};
-
-  std::vector<int> eid {0};
-
-  // these node array and ien array are designed by Gmsh PDF P358, let node0 = [0, 0, 0], length of side = 2, u = x, v = y, w = z
-  std::vector<double> node1 {0.0, 0.0, 0.0,
-                             2.0, 0.0, 0.0,
-                             2.0, 2.0, 0.0,
-                             0.0, 2.0, 0.0};
-  std::vector<int> ien1 {0,1,2,3};
-
-  std::vector<DataVecStr<int>> input1 {};
-  input1.push_back({nid1, "GlobalNodeID", AssociateObject::Node});
-  input1.push_back({eid, "GlobalElementID", AssociateObject::Cell});
-  HEX_T::write_quadrangle_grid( "LinearQuad", 4, 1, node1, ien1, input1 );
-
   std::vector<double> vol_pts1 {0.0, 0.0, 0.0,
-                                2.0, 0.0, 0.0,
-                                2.0, 2.0, 0.0,
-                                0.0, 2.0, 0.0,
-                                0.0, 0.0, 2.0,
-                                2.0, 0.0, 2.0,
-                                2.0, 2.0, 2.0,
-                                0.0, 2.0, 2.0};
+                                1.0, 0.0, 0.0,
+                                1.0, 1.0, 0.0,
+                                0.0, 1.0, 0.0,
+                                0.0, 0.0, 1.0,
+                                1.0, 0.0, 1.0,
+                                1.0, 1.0, 1.0,
+                                0.0, 1.0, 1.0};
   std::vector<int> vol_ien1 {0,1,2,3,4,5,6,7};
   IIEN * IEN_v1 = new IEN_FEM(1, vol_ien1);
-
-  const Vector_3 out1 = HEX_T::get_out_normal("LinearQuad.vtp", vol_pts1, IEN_v1);
-  out1.print();
-
-  delete IEN_v1; 
-
-  std::vector<int> nid2 {0, 1, 2, 3, 4, 5, 6, 7, 8};
-
-  std::vector<double> node2 {0.0, 0.0, 0.0,
-                             2.0, 0.0, 0.0,
-                             2.0, 2.0, 0.0,
-                             0.0, 2.0, 0.0,
-                             1.0, 0.0, 0.0,
-                             2.0, 1.0, 0.0,
-                             1.0, 2.0, 0.0,
-                             0.0, 1.0, 0.0,
-                             1.0, 1.0, 0.0};
-  std::vector<int> ien2 {0,1,2,3,4,5,6,7,8};
-
-  std::vector<DataVecStr<int>> input2 {};
-  input2.push_back({nid2, "GlobalNodeID", AssociateObject::Node});
-  input2.push_back({eid, "GlobalElementID", AssociateObject::Cell});
-  HEX_T::write_quadratic_quadrangle_grid( "QuadraticQuad", 9, 1, node2, ien2, input2 );
 
   std::vector<double> vol_pts2 {0.0, 0.0, 0.0, // 0
                                 2.0, 0.0, 0.0, // 1
@@ -100,13 +61,24 @@ int main(int argc, char *argv[])
                                 1.0, 2.0, 1.0, // 24
                                 1.0, 1.0, 2.0, // 25
                                 1.0, 1.0, 1.0};// 26
-  std::vector<int> vol_ien2 {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26};
-  IIEN * IEN_v2 = new IEN_FEM(1, vol_ien2);
 
-  Vector_3 out2 = HEX_T::get_out_normal("QuadraticQuad.vtu", vol_pts2, IEN_v2);
-  out2.print();
+  // test for Hex8
+  HEX_T::Hex8 test_hex;
+  test_hex.print_info();
+  std::cout << test_hex.get_aspect_ratio() << '\n' << test_hex.get_volume() << '\n' << std::endl;
 
-  delete IEN_v2;
+  test_hex.reset(vol_pts1, IEN_v1, 0);
+  test_hex.print_info();
+  std::cout << test_hex.get_aspect_ratio() << '\n' << test_hex.get_volume() << '\n' << std::endl;
+  delete IEN_v1;
+
+  test_hex.reset(2, 3, 5, 7, 9, 11, 13, 17);
+  test_hex.print_info();
+  std::cout << test_hex.get_aspect_ratio() << '\n' << test_hex.get_volume() << '\n' << std::endl;
+
+  test_hex.reset(vol_pts2, 0, 1, 2, 3, 4, 5 ,6, 7);
+  test_hex.print_info();
+  std::cout << test_hex.get_aspect_ratio() << '\n' << test_hex.get_volume() << '\n' << std::endl;
 
   return EXIT_SUCCESS;
 }
