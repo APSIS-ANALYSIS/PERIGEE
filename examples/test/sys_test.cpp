@@ -34,14 +34,14 @@ int main(int argc, char *argv[])
 
   // GIO -> print_info();
 
-  GIO -> write_vtp_plan("ftop",0,0,true);
-  GIO -> write_vtp_plan("fbot",1,0,true);
-  GIO -> write_vtp_plan("fwall",2,0,true);
+  GIO -> write_vtp("ftop",0,0,true);
+  GIO -> write_vtp("fbot",1,0,true);
+  GIO -> write_vtp("fwall",2,0,true);
 
-  GIO -> write_vtp_plan("fswall",2,1,true);
-  GIO -> write_vtp_plan("sbot",3,1);
-  GIO -> write_vtp_plan("stop",4,1);
-  GIO -> write_vtp_plan("swall",5,1);
+  GIO -> write_vtp("fswall",2,1,true);
+  GIO -> write_vtp("sbot",3,1);
+  GIO -> write_vtp("stop",4,1);
+  GIO -> write_vtp("swall",5,1);
 
   GIO -> write_each_vtu();
 
