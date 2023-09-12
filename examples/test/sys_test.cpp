@@ -36,14 +36,14 @@ int main(int argc, char *argv[])
   GIO -> update_quadratic_hex_IEN(0);
   GIO -> update_quadratic_hex_IEN(1);
 
-  GIO -> write_quadratic_sur_vtu_plan("ftop",0,0,true);
-  GIO -> write_quadratic_sur_vtu_plan("fbot",1,0,true);
-  GIO -> write_quadratic_sur_vtu_plan("fwall",2,0,true);
+  GIO -> write_quadratic_sur_vtu("ftop",0,0,true);
+  GIO -> write_quadratic_sur_vtu("fbot",1,0,true);
+  GIO -> write_quadratic_sur_vtu("fwall",2,0,true);
 
-  GIO -> write_quadratic_sur_vtu_plan("fswall",2,1,true);
-  GIO -> write_quadratic_sur_vtu_plan("sbot",3,1);
-  GIO -> write_quadratic_sur_vtu_plan("stop",4,1);
-  GIO -> write_quadratic_sur_vtu_plan("swall",5,1);
+  GIO -> write_quadratic_sur_vtu("fswall",2,1,true);
+  GIO -> write_quadratic_sur_vtu("sbot",3,1);
+  GIO -> write_quadratic_sur_vtu("stop",4,1);
+  GIO -> write_quadratic_sur_vtu("swall",5,1);
 
   GIO -> write_each_vtu();
 
