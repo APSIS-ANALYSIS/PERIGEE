@@ -173,9 +173,7 @@ class Gmsh_FileIO
     // E.G. for a FSI problem a fluid and a solid domain will be written;
     //      for a fluid problem, a single fluid domain will be written.
     // --------------------------------------------------------------
-    void write_each_vtu( const std::vector<std::string> &name_list) const;
-
-    void write_each_vtu() const;
+    void write_each_vtu( std::vector<std::string> &name_list) const;
     
     // --------------------------------------------------------------
     // write a h5 file for the 2D simplex domain with given index : 
