@@ -891,6 +891,10 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
   // whole mesh num of node is assumed to be num_node 
   const int wnNode = num_node;
 
+  // Element type of whole mesh.
+  // Now we need all 3d domain use the same element.
+  const int wElemtype = ele_type[phy_3d_index[0]];
+
   // The 3d volumetric elements are list in the order of phy_3d_index.
   // That means, phy_3d_index[0]'s elements come first, then phy_3d_index[1],
   // etc. 
@@ -903,6 +907,9 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
 
     for(int jj=0; jj<phy_3d_nElem[ii]; ++jj)
       wtag.push_back(ii);
+
+    SYS_T::print_exit_if(ele_type[phy_3d_index[ii]] != wElemtype, 
+      "Error: Gmsh_FileIO::write_vtu, 3d domain use different elements. \n" );
   }
 
   std::cout<<"\n    "<<wnElem<<" total elems and "<<wnNode<<" total nodes. \n";
@@ -919,9 +926,18 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
   for(int ii=0; ii<wnElem; ++ii) temp_eid[ii] = ii;
   input_vtk_data.push_back({temp_eid, "GlobalElementID", AssociateObject::Cell});
   
-  
-  TET_T::write_tet_grid( in_fname, wnNode, wnElem, node,
+  if ( wElemtype == 10 || wElemtype == 24 )
+  {
+    TET_T::write_tet_grid( in_fname, wnNode, wnElem, node,
       wIEN, input_vtk_data, isXML ); 
+  }
+  else if ( wElemtype == 12 || wElemtype == 29 )
+  {
+    HEX_T::write_hex_grid( in_fname, wnNode, wnElem, node,
+      wIEN, input_vtk_data, isXML ); 
+  }
+  else
+    SYS_T::print_exit("Error: Gmsh_FileIO::write_vtu, undefined element type. \n" );
 
   mytimer->Stop();
   std::cout<<"    Time taken "<<mytimer->get_sec()<<" sec. \n";

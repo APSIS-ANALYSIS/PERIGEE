@@ -85,7 +85,7 @@ void VTK_T::read_vtu_grid( const std::string &filename,
     }
     else if( cell-> GetCellType() == 28 )
     {
-      // cell type 28 is nine-node quadrangle
+      // cell type 28 is nine-node quad
       ien_array.push_back( static_cast<int>( cell->GetPointId(0) ) );
       ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
       ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
@@ -178,7 +178,7 @@ void VTK_T::read_vtp_grid( const std::string &filename,
     }
     else if(cell->GetCellType() == 9)
     {
-      // cell type 9 is four-node quadrangle
+      // cell type 9 is four-node quad
       ien_array.push_back( static_cast<int>( cell->GetPointId(0) ) );
       ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
       ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
