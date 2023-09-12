@@ -11,15 +11,6 @@ Matrix_double_3by3_Array::Matrix_double_3by3_Array()
   invm0 = 1.0; invm1 = 1.0; invm2 = 1.0;
 }
 
-Matrix_double_3by3_Array::Matrix_double_3by3_Array( const double * const &in_mat )
-{
-  for(int ii=0; ii<9; ++ii) mat[ii] = in_mat[ii];
-
-  p[0] = 0; p[1] = 1; p[2] = 2;
-  
-  invm0 = 1.0; invm1 = 1.0; invm2 = 1.0;
-}
-
 Matrix_double_3by3_Array::Matrix_double_3by3_Array( 
     const double &a11, const double &a12, const double &a13,
     const double &a21, const double &a22, const double &a23,

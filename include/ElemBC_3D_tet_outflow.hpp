@@ -30,20 +30,15 @@ class ElemBC_3D_tet_outflow : public ElemBC_3D_tet
 
     virtual void print_info() const;
 
-    virtual void get_normal_vec( const int &ebc_id, double &out_nx,
-        double &out_ny, double &out_nz ) const
-    {
-      out_nx = outNormal[ebc_id](0);
-      out_ny = outNormal[ebc_id](1);
-      out_nz = outNormal[ebc_id](2);
-    }
+    virtual Vector_3 get_normal_vec( const int &ebc_id ) const
+    { return outNormal[ebc_id]; }
 
     virtual std::vector<double> get_intNA( const int &ebc_id ) const
     { return intNA[ebc_id]; }
 
   private:
     // Disallow the default constructor
-    ElemBC_3D_tet_outflow() {};
+    ElemBC_3D_tet_outflow() = delete;
 
     // It stores the surface integral of each nodal basis function on the 
     // outlet surfaces.
