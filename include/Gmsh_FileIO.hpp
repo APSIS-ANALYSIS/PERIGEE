@@ -173,7 +173,9 @@ class Gmsh_FileIO
     // E.G. for a FSI problem a fluid and a solid domain will be written;
     //      for a fluid problem, a single fluid domain will be written.
     // --------------------------------------------------------------
-    void write_each_vtu( std::vector<std::string> &name_list) const;
+    void write_each_vtu( const std::vector<std::string> name_list) const;
+
+    void write_each_vtu() const;
     
     // --------------------------------------------------------------
     // write a h5 file for the 2D simplex domain with given index : 
@@ -247,18 +249,18 @@ class Gmsh_FileIO
     // the number of 3d, 2d, and 1d domains.
     // num_phy_domain = num_phy_domain_3d + num_phy_domain_2d
     //                 + num_phy_domain_1d
-    int num_phy_domain_3d, num_phy_domain_2d, num_phy_domain_1d {};
+    int num_phy_domain_3d {}, num_phy_domain_2d {}, num_phy_domain_1d {};
 
     // the indices (physical tag) of the 1d/2d/3d domains respectively
     // {phy_index} = {phy_3d_index} + {phy_2d_index} + {phy_1d_index} 
-    std::vector<int> phy_3d_index, phy_2d_index, phy_1d_index {};
+    std::vector<int> phy_3d_index {}, phy_2d_index {}, phy_1d_index {};
 
-    // the physicla subdomain names of the corresponding phy_xd_index.
-    std::vector<std::string> phy_3d_name, phy_2d_name, phy_1d_name {};
+    // the physical subdomain names of the corresponding phy_xd_index.
+    std::vector<std::string> phy_3d_name {}, phy_2d_name {}, phy_1d_name {};
 
     // stores the number of 3d/2d/1d element respectively
     // vector lengths are num_phy_domain_3d/2d/1d respectively
-    std::vector<int> phy_3d_nElem, phy_2d_nElem, phy_1d_nElem {};
+    std::vector<int> phy_3d_nElem {}, phy_2d_nElem {}, phy_1d_nElem {};
 
     // Stores the starting index for the 3d/2d volume mesh, with length
     // num_phy_domain_3d/num_phy_domain_2d.

@@ -657,18 +657,13 @@ void Gmsh_FileIO::write_vtp(const int &index_sur, const int &index_vol,
   write_vtp(vtp_file_name, index_sur, index_vol, isf2e);
 }
 
-void Gmsh_FileIO::write_each_vtu(std::vector<std::string> &name_list) const
+void Gmsh_FileIO::write_each_vtu( const std::vector<std::string> name_list) const
 {
-  std::cout<<"=== Gmsh_FileIO::wirte_each_vtu.\n";
+  std::cout<<"=== Gmsh_FileIO::write_each_vtu.\n";
   std::cout<<"--- There are "<<num_phy_domain_3d<<" 3D physical domains.\n";
 
-  if (VEC_T::get_size(name_list) == 0)
-    name_list = phy_3d_name;
-  else 
-  {
-    SYS_T::print_exit_if(VEC_T::get_size(name_list) != num_phy_domain_3d,
-      "Error: Gmsh_FileIO::write_each_vtu, the number of files should match the number of 3d domains");
-  }
+  SYS_T::print_exit_if(VEC_T::get_size(name_list) != num_phy_domain_3d,
+    "Error: Gmsh_FileIO::write_each_vtu, the number of files should match the number of 3d domains");
 
   SYS_T::Timer * mytimer = new SYS_T::Timer();
 
@@ -730,13 +725,14 @@ void Gmsh_FileIO::write_each_vtu(std::vector<std::string> &name_list) const
     input_vtk_data.push_back({ptag, "Physics_tag", AssociateObject::Cell});
 
     // Element type of this domain
+    // Element type is difined by Gmsh, different from vtk->GetCellType()!
     const int Etype = ele_type[phy_3d_index[ii]];
-    if ( Etype == 10 || Etype == 24 )
+    if ( Etype == 4 || Etype == 11 )
     {
       TET_T::write_tet_grid( vtu_file_name, num_local_node, 
         phy_3d_nElem[ ii ], local_coor, domain_IEN, input_vtk_data, true);
     }
-    else if ( Etype == 12 || Etype == 29 )
+    else if ( Etype == 5 || Etype == 12 )
     {
       HEX_T::write_hex_grid( vtu_file_name, num_local_node, 
         phy_3d_nElem[ ii ], local_coor, domain_IEN, input_vtk_data, true);
@@ -751,6 +747,12 @@ void Gmsh_FileIO::write_each_vtu(std::vector<std::string> &name_list) const
 
   delete mytimer;
 }
+
+void Gmsh_FileIO::write_each_vtu() const
+{
+  write_each_vtu(phy_3d_name);
+}
+
 
 void Gmsh_FileIO::write_vtu( const std::string &in_fname, 
     const bool &isXML ) const
@@ -806,12 +808,12 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
   for(int ii=0; ii<wnElem; ++ii) temp_eid[ii] = ii;
   input_vtk_data.push_back({temp_eid, "GlobalElementID", AssociateObject::Cell});
   
-  if ( wElemtype == 10 || wElemtype == 24 )
+  if ( wElemtype == 4 || wElemtype == 11 )
   {
     TET_T::write_tet_grid( in_fname, wnNode, wnElem, node,
       wIEN, input_vtk_data, isXML ); 
   }
-  else if ( wElemtype == 12 || wElemtype == 29 )
+  else if ( wElemtype == 5 || wElemtype == 12 )
   {
     HEX_T::write_hex_grid( in_fname, wnNode, wnElem, node,
       wIEN, input_vtk_data, isXML ); 

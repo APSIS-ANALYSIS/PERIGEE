@@ -20,65 +20,37 @@
 #include "Tet_Tools.hpp"
 #include "Hex_Tools.hpp"
 #include "IIEN.hpp"
+#include "Gmsh_FileIO.hpp"
 
 int main(int argc, char *argv[])
 {
-  std::vector<double> vol_pts1 {0.0, 0.0, 0.0,
-                                1.0, 0.0, 0.0,
-                                1.0, 1.0, 0.0,
-                                0.0, 1.0, 0.0,
-                                0.0, 0.0, 1.0,
-                                1.0, 0.0, 1.0,
-                                1.0, 1.0, 1.0,
-                                0.0, 1.0, 1.0};
-  std::vector<int> vol_ien1 {0,1,2,3,4,5,6,7};
-  IIEN * IEN_v1 = new IEN_FEM(1, vol_ien1);
+  std::string gmshFile = "two_cube.msh";
 
-  std::vector<double> vol_pts2 {0.0, 0.0, 0.0, // 0
-                                2.0, 0.0, 0.0, // 1
-                                2.0, 2.0, 0.0, // 2
-                                0.0, 2.0, 0.0, // 3
-                                0.0, 0.0, 2.0, // 4
-                                2.0, 0.0, 2.0, // 5
-                                2.0, 2.0, 2.0, // 6
-                                0.0, 2.0, 2.0, // 7
-                                1.0, 0.0, 0.0, // 8
-                                0.0, 1.0, 0.0, // 9
-                                0.0, 0.0, 1.0, // 10
-                                2.0, 1.0, 0.0, // 11
-                                2.0, 0.0, 1.0, // 12
-                                1.0, 2.0, 0.0, // 13
-                                2.0, 2.0, 1.0, // 14
-                                0.0, 2.0, 1.0, // 15
-                                1.0, 0.0, 2.0, // 16
-                                0.0, 1.0, 2.0, // 17
-                                2.0, 1.0, 2.0, // 18
-                                1.0, 2.0, 2.0, // 19
-                                1.0, 1.0, 0.0, // 20
-                                1.0, 0.0, 1.0, // 21
-                                0.0, 1.0, 1.0, // 22
-                                2.0, 1.0, 1.0, // 23
-                                1.0, 2.0, 1.0, // 24
-                                1.0, 1.0, 2.0, // 25
-                                1.0, 1.0, 1.0};// 26
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+  SYS_T::GetOptionString("-gmsh_file", gmshFile);
+  std::cout<<" -gmsh_file: "<<gmshFile<<std::endl;
 
-  // test for Hex8
-  HEX_T::Hex8 test_hex;
-  test_hex.print_info();
-  std::cout << test_hex.get_aspect_ratio() << '\n' << test_hex.get_volume() << '\n' << std::endl;
+  Gmsh_FileIO * GIO = new Gmsh_FileIO( gmshFile );
 
-  test_hex.reset(vol_pts1, IEN_v1, 0);
-  test_hex.print_info();
-  std::cout << test_hex.get_aspect_ratio() << '\n' << test_hex.get_volume() << '\n' << std::endl;
-  delete IEN_v1;
+  // GIO -> print_info();
 
-  test_hex.reset(2, 3, 5, 7, 9, 11, 13, 17);
-  test_hex.print_info();
-  std::cout << test_hex.get_aspect_ratio() << '\n' << test_hex.get_volume() << '\n' << std::endl;
+  GIO -> write_vtp_plan("ftop",0,0,true);
+  GIO -> write_vtp_plan("fbot",1,0,true);
+  GIO -> write_vtp_plan("fwall",2,0,true);
 
-  test_hex.reset(vol_pts2, 0, 1, 2, 3, 4, 5 ,6, 7);
-  test_hex.print_info();
-  std::cout << test_hex.get_aspect_ratio() << '\n' << test_hex.get_volume() << '\n' << std::endl;
+  GIO -> write_vtp_plan("fswall",2,1,true);
+  GIO -> write_vtp_plan("sbot",3,1);
+  GIO -> write_vtp_plan("stop",4,1);
+  GIO -> write_vtp_plan("swall",5,1);
+
+  GIO -> write_each_vtu();
+
+  const std::string wmname("whole_vol");
+  const bool isXML = true;
+  GIO -> write_vtu( wmname, isXML );
+
+  delete GIO; 
+  PetscFinalize();
 
   return EXIT_SUCCESS;
 }
