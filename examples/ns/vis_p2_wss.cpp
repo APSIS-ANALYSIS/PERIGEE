@@ -54,10 +54,8 @@ int main( int argc, char * argv[] )
 
   constexpr int dof = 4; 
 
-  PetscMPIInt size;
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-  MPI_Comm_size(PETSC_COMM_WORLD, &size);
-  SYS_T::print_fatal_if(size!=1, "ERROR: vis_p2_wss is a serial program! \n");
+  SYS_T::print_fatal_if( SYS_T::get_MPI_size() != 1, "ERROR: vis_p2_wss is a serial program! \n");
 
   // Read the geometry file name from preprocessor hdf5 file
   hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
@@ -223,7 +221,7 @@ int main( int argc, char * argv[] )
         time, name_to_read.c_str(), name_to_write.c_str() );
 
     // Read the solution vector and renumber them based on the nodal mappings
-    std::vector<double> sol = ReadPETSc_Vec( name_to_read, analysis_new2old, v_nFunc*dof, dof );
+    const auto sol = ReadPETSc_Vec( name_to_read, analysis_new2old, v_nFunc*dof, dof );
 
     // Container for (averaged) WSS
     std::vector< Vector_3 > wss_ave( nFunc, Vector_3(0.0, 0.0, 0.0) );
@@ -570,12 +568,6 @@ void write_triangle_grid_wss( const std::string &filename,
     const std::vector<int> &ien_array,
     const std::vector< Vector_3 > &wss_on_node )
 {
-  if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: point vector size does not match the number of points. \n");
-
-  if(int(ien_array.size()) != 6*numcels) SYS_T::print_fatal("Error: ien array size does not match the number of cells. \n");
-
-  if(int(wss_on_node.size()) != numpts) SYS_T::print_fatal("Error: wss_on_node size does not match the number of points. \n");
-
   vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
 
   // generate the triangle grid
@@ -597,14 +589,6 @@ void write_triangle_grid_tawss_osi( const std::string &filename,
     const std::vector<double> &tawss,
     const std::vector<double> &osi )
 {
-  if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: point vector size does not match the number of points. \n");
-
-  if(int(ien_array.size()) != 6*numcels) SYS_T::print_fatal("Error: ien array size does not match the number of cells. \n");
-
-  if(int(tawss.size()) != numpts) SYS_T::print_fatal("Error: tawss size does not match the number of points. \n");
-
-  if(int(osi.size()) != numpts) SYS_T::print_fatal("Error: osi size does not match the number of points. \n");
-
   vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
 
   // generate the triangle grid
