@@ -657,16 +657,19 @@ void Gmsh_FileIO::write_vtp(const int &index_sur, const int &index_vol,
   write_vtp(vtp_file_name, index_sur, index_vol, isf2e);
 }
 
-void Gmsh_FileIO::write_each_vtu() const
+void Gmsh_FileIO::write_each_vtu(const std::vector<std::string> &name_list) const
 {
   std::cout<<"=== Gmsh_FileIO::wirte_each_vtu.\n";
   std::cout<<"--- There are "<<num_phy_domain_3d<<" 3D physical domains.\n";
+
+  SYS_T::print_exit_if(VEC_T::get_size(name_list) != num_phy_domain_3d,
+    "Error: Gmsh_FileIO::write_each_vtu, the number of files should match the number of 3d domains");
 
   SYS_T::Timer * mytimer = new SYS_T::Timer();
 
   for(int ii=0; ii<num_phy_domain_3d; ++ii)
   {
-    const std::string vtu_file_name = phy_3d_name[ ii ];
+    const std::string vtu_file_name = name_list[ ii ];
     std::cout<<"-----> write "<<vtu_file_name<<".vtu \t";
 
     mytimer->Reset();
@@ -742,6 +745,11 @@ void Gmsh_FileIO::write_each_vtu() const
   }
 
   delete mytimer;
+}
+
+void Gmsh_FileIO::write_each_vtu() const
+{
+  write_each_vtu(phy_3d_name);
 }
 
 void Gmsh_FileIO::write_vtu( const std::string &in_fname, 
