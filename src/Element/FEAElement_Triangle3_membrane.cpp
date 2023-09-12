@@ -40,51 +40,41 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
     R[qua*3 + 2] = qua_s;
   }
 
-  const double dx_dr = ctrl_x[0] * (-1.0) + ctrl_x[1];
-  const double dy_dr = ctrl_y[0] * (-1.0) + ctrl_y[1];
-  const double dz_dr = ctrl_z[0] * (-1.0) + ctrl_z[1];
-  const double dx_ds = ctrl_x[0] * (-1.0) + ctrl_x[2];
-  const double dy_ds = ctrl_y[0] * (-1.0) + ctrl_y[2];
-  const double dz_ds = ctrl_z[0] * (-1.0) + ctrl_z[2];
+  const Vector_3 dx_dr(ctrl_x[0] * (-1.0) + ctrl_x[1],
+    ctrl_y[0] * (-1.0) + ctrl_y[1],
+    ctrl_z[0] * (-1.0) + ctrl_z[1]);
+
+  const Vector_3 dx_ds(ctrl_x[0] * (-1.0) + ctrl_x[2],
+    ctrl_y[0] * (-1.0) + ctrl_y[2],
+    ctrl_z[0] * (-1.0) + ctrl_z[2]);
 
   // vec(un) = vec(dx_dr) x vec(dx_ds)
-  MATH_T::cross3d(dx_dr, dy_dr, dz_dr, dx_ds, dy_ds, dz_ds, unx, uny, unz);
-
-  MATH_T::normalize3d( unx, uny, unz );
+  un = cross_product( dx_dr, dx_ds );
+  un.normalize();
 
   // ======= Global-to-local rotation matrix =======
-  const double inv_len_er = 1.0 / MATH_T::norm2( dx_dr, dy_dr, dz_dr );
-  const double e_r[3] { dx_dr * inv_len_er, dy_dr * inv_len_er,
-    dz_dr * inv_len_er };
+  const double inv_len_er = 1.0 / dx_dr.norm2();
+  const Vector_3 e_r = inv_len_er * dx_dr;
 
-  const double inv_len_es = 1.0 / MATH_T::norm2( dx_ds, dy_ds, dz_ds );
-  const double e_s[3] { dx_ds * inv_len_es, dy_ds * inv_len_es,
-    dz_ds * inv_len_es }; 
+  const double inv_len_es = 1.0 / dx_ds.norm2();
+  const Vector_3 e_s = inv_len_es * dx_ds;
 
   // e_a = 0.5*(e_r + e_s) / || 0.5*(e_r + e_s) ||
-  double e_a[3] = { 0.5 * ( e_r[0] + e_s[0] ), 0.5 * ( e_r[1] + e_s[1] ),
-    0.5 * ( e_r[2] + e_s[2] ) };
-  MATH_T::normalize3d( e_a[0], e_a[1], e_a[2] );
+  Vector_3 e_a = 0.5 * (e_r + e_s);
+  e_a.normalize();
 
   // e_b = vec(un) x e_a / || vec(un) x e_a ||
-  double e_b[3] = {0.0};
-  MATH_T::cross3d(unx, uny, unz, e_a[0], e_a[1], e_a[2], e_b[0], e_b[1], e_b[2]);
-  MATH_T::normalize3d( e_b[0], e_b[1], e_b[2] );
+  Vector_3 e_b = cross_product( un, e_a );
+  e_b.normalize();
 
   // e_l1 = sqrt(2)/2 * (e_a - e_b)
   // e_l2 = sqrt(2)/2 * (e_a + e_b)
-  const double e_l1[3] { std::sqrt(2.0) * 0.5 * ( e_a[0] - e_b[0] ),
-                         std::sqrt(2.0) * 0.5 * ( e_a[1] - e_b[1] ),
-                         std::sqrt(2.0) * 0.5 * ( e_a[2] - e_b[2] ) };
+  const Vector_3 e_l1 = std::sqrt(2.0) * 0.5 * ( e_a - e_b );
   
-  const double e_l2[3] { std::sqrt(2.0) * 0.5 * ( e_a[0] + e_b[0] ),
-                         std::sqrt(2.0) * 0.5 * ( e_a[1] + e_b[1] ),
-                         std::sqrt(2.0) * 0.5 * ( e_a[2] + e_b[2] ) };
+  const Vector_3 e_l2 = std::sqrt(2.0) * 0.5 * ( e_a + e_b );
 
   // Q = transpose([ e_l1, e_l2, un ])
-  Q = Matrix_3x3(e_l1[0], e_l1[1], e_l1[2],
-                 e_l2[0], e_l2[1], e_l2[2],
-                     unx,     uny,     unz );
+  Q = Matrix_3x3( e_l1, e_l2, un );
   
   // Rotated lamina coordinates
   double ctrl_xl [nLocBas], ctrl_yl [nLocBas];
@@ -166,7 +156,7 @@ Vector_3 FEAElement_Triangle3_membrane::get_2d_normal_out( const int &quaindex,
 {
   ASSERT(quaindex>=0 && quaindex < numQuapts, "FEAElement_Triangle3_membrane::get_2d_normal_out function error.\n" );
   area = detJac;
-  return Vector_3( unx, uny, unz );
+  return un;
 }
 
 Matrix_3x3 FEAElement_Triangle3_membrane::get_rotationMatrix( const int &quaindex ) const
@@ -175,36 +165,24 @@ Matrix_3x3 FEAElement_Triangle3_membrane::get_rotationMatrix( const int &quainde
   return Q;
 }
 
-void FEAElement_Triangle3_membrane::get_normal_out( const int &quaindex,
+Vector_3 FEAElement_Triangle3_membrane::get_normal_out( const int &quaindex,
     const double &sur_pt_x, const double &sur_pt_y, const double &sur_pt_z,
     const double &intpt_x, const double &intpt_y, const double &intpt_z,
-    double &nx, double &ny, double &nz, double &area ) const
+    double &area ) const
 {
   // Construct a vector from the interior point to the triangle first node
-  const double mx = sur_pt_x - intpt_x;
-  const double my = sur_pt_y - intpt_y;
-  const double mz = sur_pt_z - intpt_z;
+  const Vector_3 m( sur_pt_x - intpt_x, sur_pt_y - intpt_y, sur_pt_z - intpt_z);
 
   // Dot product of the defined vector with the calculated normal vector
-  const double mdotn = mx * unx + my * uny + mz * unz;
+  const double mdotn = dot_product( m, un );
 
   SYS_T::print_fatal_if( std::abs(mdotn) < 1.0e-10, "Warning: FEAElement_Triangle3_membrane::get_normal_out, the element might be ill-shaped.\n");
 
-  // If dot product is negative, adjust the normal vector
-  if(mdotn < 0)
-  {
-    nx = (-1.0) * unx;
-    ny = (-1.0) * uny;
-    nz = (-1.0) * unz;
-  }
-  else
-  {
-    nx = unx;
-    ny = uny;
-    nz = unz;
-  }
-
   area = detJac;
+
+  // If dot product is negative, adjust the normal vector
+  if(mdotn < 0) return (-1.0) * un;
+  else return un;
 }
 
 // EOF
