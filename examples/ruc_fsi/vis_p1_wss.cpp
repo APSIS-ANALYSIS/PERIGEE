@@ -444,12 +444,6 @@ void write_triangle_grid_wss( const std::string &filename,
     const std::vector<int> &ien_array,
     const std::vector< Vector_3 > &wss_on_node )
 {
-  if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: point vector size does not match the number of points. \n");
-
-  if(int(ien_array.size()) != 3*numcels) SYS_T::print_fatal("Error: ien array size does not match the number of cells. \n");
-
-  if(int(wss_on_node.size()) != numpts) SYS_T::print_fatal("Error: wss_on_node size does not match the number of points. \n");
-
   vtkPolyData * grid_w = vtkPolyData::New();
 
   // generate the triangle grid
@@ -471,14 +465,6 @@ void write_triangle_grid_tawss_osi( const std::string &filename,
     const std::vector<double> &tawss,
     const std::vector<double> &osi )
 {
-  if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: point vector size does not match the number of points. \n");
-
-  if(int(ien_array.size()) != 3*numcels) SYS_T::print_fatal("Error: ien array size does not match the number of cells. \n");
-
-  if(int(tawss.size()) != numpts) SYS_T::print_fatal("Error: tawss size does not match the number of points. \n");
-
-  if(int(osi.size()) != numpts) SYS_T::print_fatal("Error: osi size does not match the number of points. \n");
-
   vtkPolyData * grid_w = vtkPolyData::New();
 
   // generate the triangle grid
