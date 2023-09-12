@@ -16,37 +16,34 @@
 #include "Matrix_double_6by6_Array.hpp"
 #include "VTK_Tools.hpp"
 #include "NodalBC.hpp"
-#include "DataVecStr.hpp"
-#include "Tet_Tools.hpp"
-#include "Hex_Tools.hpp"
+#include "Gmsh_FileIO.hpp"
 
 int main(int argc, char *argv[])
 {
-  Vector_3 pt0, pt1, pt2, pt3;
-  pt0.gen_rand();
-  pt1.gen_rand();
-  pt2.gen_rand();
-  pt3.gen_rand();
+  // test 1
+  Gmsh_FileIO * GIO_1 = new Gmsh_FileIO( "fsi_cylinder.msh" );
+  GIO_1 -> print_info();
+  GIO_1 -> write_tet_h5(0, {0, 1, 2});
+  GIO_1 -> write_tet_h5(1, {3, 4, 5});
 
-  double rad;
-  auto cen = MATH_T::get_tet_sphere_info(pt0, pt1, pt2, pt3, rad);
+  delete GIO_1;
 
-  double x, y, z, r;
-  MATH_T::get_tet_sphere_info( 
-      pt0.x(), pt1.x(), pt2.x(), pt3.x(),
-      pt0.y(), pt1.y(), pt2.y(), pt3.y(),
-      pt0.z(), pt1.z(), pt2.z(), pt3.z(),
-      x, y, z, r );
+  // test 2
+  Gmsh_FileIO * GIO_2 = new Gmsh_FileIO( "fsi_beam.msh" );
+  GIO_2 -> print_info();
+  GIO_2 -> write_tet_h5(0, {0, 1, 2, 3, 4, 5});
+  GIO_2 -> write_tet_h5(1, {7, 8, 9, 10, 11, 12});
 
-  pt0.print();
-  pt1.print();
-  pt2.print();
-  pt3.print();
+  delete GIO_2;
 
-  std::cout<<cen.x() - x<<'\t';
-  std::cout<<cen.y() - y<<'\t';
-  std::cout<<cen.z() - z<<'\t';
-  std::cout<<rad - r<<'\n';
+  // test 3
+  Gmsh_FileIO * GIO_3 = new Gmsh_FileIO( "cook_membrane.msh" );
+
+  GIO_3 -> print_info();
+  GIO_3 -> write_tri_h5(0, {0, 1, 2, 3}); // 2d problem
+
+  delete GIO_3;
+
 
   return EXIT_SUCCESS;
 }

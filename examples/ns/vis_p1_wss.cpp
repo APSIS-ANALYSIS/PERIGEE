@@ -45,7 +45,7 @@ int main( int argc, char * argv[] )
   constexpr int dof = 4;
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-  SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: vis_tet4_wss is a serial program! \n");
+  SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: vis_p1_wss is a serial program! \n");
 
   // Directly read in the volumetric and wall file from the file
   // that record the preprocessor command lines.
@@ -140,13 +140,12 @@ int main( int argc, char * argv[] )
       v_vecIEN[ global_ele_idx[ee]*4+3 ] };
 
     // Locate the interior node's global node index
-    bool gotnode[4];
     int node_check = 0;
     for(int ii=0; ii<4; ++ii)
     {
-      gotnode[ii] = VEC_T::is_invec( trn, ten[ii] );
+      const bool gotnode = VEC_T::is_invec( trn, ten[ii] );
 
-      if(!gotnode[ii]) interior_node[ee] = ten[ii];
+      if(!gotnode) interior_node[ee] = ten[ii];
       else node_check += 1;
     }
 
@@ -297,9 +296,7 @@ int main( int argc, char * argv[] )
         // Due to the numbering in the visualization quadrature routine, the
         // first quadrature point located on the vertex associated with basis-0,
         // and so on.
-        wss_ave[ trn[qua] ].x() += wss_x * tri_area[ee];
-        wss_ave[ trn[qua] ].y() += wss_y * tri_area[ee];
-        wss_ave[ trn[qua] ].z() += wss_z * tri_area[ee];
+        wss_ave[ trn[qua] ] += tri_area[ee] * Vector_3(wss_x, wss_y, wss_z);
 
         node_area[ trn[qua] ] += tri_area[ee]; 
       } // Loop over the three surface points  
@@ -434,69 +431,23 @@ std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
   return sol;
 }
 
-
 void write_triangle_grid_wss( const std::string &filename,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt,
     const std::vector<int> &ien_array,
     const std::vector< Vector_3 > &wss_on_node )
 {
-  if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: point vector size does not match the number of points. \n");
-
-  if(int(ien_array.size()) != 3*numcels) SYS_T::print_fatal("Error: ien array size does not match the number of cells. \n");
-
-  if(int(wss_on_node.size()) != numpts) SYS_T::print_fatal("Error: wss_on_node size does not match the number of points. \n");
-
   vtkPolyData * grid_w = vtkPolyData::New();
 
-  // 1. nodal points
-  vtkPoints * ppt = vtkPoints::New();
-  ppt->SetDataTypeToDouble();
-  for(int ii=0; ii<numpts; ++ii)
-  {
-    const double coor[3] { pt[3*ii], pt[3*ii+1], pt[3*ii+2] };
-    ppt -> InsertPoint(ii, coor);
-  }
-
-  grid_w -> SetPoints(ppt);
-  ppt -> Delete();
-
-  // 2. cell data
-  vtkCellArray * cl = vtkCellArray::New();
-  for(int ii=0; ii<numcels; ++ii)
-  {
-    vtkTriangle * tr = vtkTriangle::New();
-
-    tr->GetPointIds()->SetId( 0, ien_array[3*ii] );
-    tr->GetPointIds()->SetId( 1, ien_array[3*ii+1] );
-    tr->GetPointIds()->SetId( 2, ien_array[3*ii+2] );
-    cl -> InsertNextCell(tr);
-    tr -> Delete();
-  }
-  grid_w->SetPolys(cl);
-  cl->Delete();
+  // generate the triangle grid
+  TET_T::gen_triangle_grid(grid_w, numpts, numcels, pt, ien_array);
 
   // write wss
-  vtkDoubleArray * ptindex = vtkDoubleArray::New();
-  ptindex -> SetNumberOfComponents(3);
-  ptindex -> SetName("WSS");
-  for(int ii=0; ii<numpts; ++ii)
-  {
-    ptindex -> InsertComponent(ii, 0, wss_on_node[ii].x());
-    ptindex -> InsertComponent(ii, 1, wss_on_node[ii].y());
-    ptindex -> InsertComponent(ii, 2, wss_on_node[ii].z());
-  }
-  grid_w -> GetPointData() -> AddArray( ptindex );
-  ptindex->Delete();
+  VTK_T::add_Vector3_PointData(grid_w, wss_on_node, "WSS");
 
-  vtkXMLPolyDataWriter * writer = vtkXMLPolyDataWriter::New();
-  std::string name_to_write(filename);
-  name_to_write.append(".vtp");
-  writer -> SetFileName( name_to_write.c_str() );
-  writer->SetInputData(grid_w);
-  writer->Write();
+  // write vtp
+  VTK_T::write_vtkPointSet(filename, grid_w);
 
-  writer->Delete();
   grid_w->Delete();
 }
 
@@ -507,72 +458,20 @@ void write_triangle_grid_tawss_osi( const std::string &filename,
     const std::vector<double> &tawss,
     const std::vector<double> &osi )
 {
-  if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: point vector size does not match the number of points. \n");
-
-  if(int(ien_array.size()) != 3*numcels) SYS_T::print_fatal("Error: ien array size does not match the number of cells. \n");
-
-  if(int(tawss.size()) != numpts) SYS_T::print_fatal("Error: tawss size does not match the number of points. \n");
-
-  if(int(osi.size()) != numpts) SYS_T::print_fatal("Error: osi size does not match the number of points. \n");
-
   vtkPolyData * grid_w = vtkPolyData::New();
 
-  // 1. nodal points
-  vtkPoints * ppt = vtkPoints::New();
-  ppt->SetDataTypeToDouble();
-  for(int ii=0; ii<numpts; ++ii)
-  {
-    const double coor[3] { pt[3*ii], pt[3*ii+1], pt[3*ii+2] };
-    ppt -> InsertPoint(ii, coor);
-  }
-
-  grid_w -> SetPoints(ppt);
-  ppt -> Delete();
-
-  // 2. cell data
-  vtkCellArray * cl = vtkCellArray::New();
-  for(int ii=0; ii<numcels; ++ii)
-  {
-    vtkTriangle * tr = vtkTriangle::New();
-
-    tr->GetPointIds()->SetId( 0, ien_array[3*ii] );
-    tr->GetPointIds()->SetId( 1, ien_array[3*ii+1] );
-    tr->GetPointIds()->SetId( 2, ien_array[3*ii+2] );
-    cl -> InsertNextCell(tr);
-    tr -> Delete();
-  }
-  grid_w->SetPolys(cl);
-  cl->Delete();
+  // generate the triangle grid
+  TET_T::gen_triangle_grid(grid_w, numpts, numcels, pt, ien_array);
 
   // write tawss
-  vtkDoubleArray * ptindex = vtkDoubleArray::New();
-  ptindex -> SetNumberOfComponents(1);
-  ptindex -> SetName("TAWSS");
-
-  for(int ii=0; ii<numpts; ++ii) ptindex -> InsertComponent(ii, 0, tawss[ii]);
-  
-  grid_w -> GetPointData() -> AddArray( ptindex );
-  ptindex->Delete();
+  VTK_T::add_double_PointData(grid_w, tawss, "TAWSS");
 
   // write osi 
-  vtkDoubleArray * vtkosi = vtkDoubleArray::New();
-  vtkosi -> SetNumberOfComponents(1);
-  vtkosi -> SetName("OSI");
-
-  for(int ii=0; ii<numpts; ++ii) vtkosi -> InsertComponent(ii, 0, osi[ii]);
+  VTK_T::add_double_PointData(grid_w, osi, "OSI");
   
-  grid_w -> GetPointData() -> AddArray( vtkosi );
-  vtkosi -> Delete();
-
   // write vtp
-  vtkXMLPolyDataWriter * writer = vtkXMLPolyDataWriter::New();
-  std::string name_to_write(filename);
-  name_to_write.append(".vtp");
-  writer -> SetFileName( name_to_write.c_str() );
-  writer->SetInputData(grid_w);
-  writer->Write();
+  VTK_T::write_vtkPointSet(filename, grid_w);
 
-  writer->Delete();
   grid_w->Delete();
 }
 

@@ -336,8 +336,6 @@ void write_triangle_grid_wss( const std::string &filename,
     const std::vector<int> &ien_array,
     const std::vector< Vector_3 > &wss_on_node )
 {
-  if(int(wss_on_node.size()) != numpts) SYS_T::print_fatal("Error: wss_on_node size does not match the number of points. \n");
-
   vtkPolyData * grid_w = vtkPolyData::New();
 
   TET_T::gen_triangle_grid( grid_w, numpts, numcels, pt, ien_array );
