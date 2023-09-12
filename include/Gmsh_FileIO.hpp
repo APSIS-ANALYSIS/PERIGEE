@@ -155,6 +155,9 @@ class Gmsh_FileIO
     void write_quadratic_sur_vtu( const std::string &vtu_filename,
         const int &index_sur, const int &index_vol, const bool &isf2e = false) const;
 
+    void write_quadratic_sur_vtu_plan( const std::string &vtu_filename,
+        const int &index_sur, const int &index_vol, const bool &isf2e = false) const;
+
     void write_quadratic_sur_vtu( const int &index_sur, 
         const int &index_vol, const bool &isf2e = false) const;
 

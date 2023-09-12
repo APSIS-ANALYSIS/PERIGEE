@@ -1588,6 +1588,177 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
   delete mytimer;
 }
 
+void Gmsh_FileIO::write_quadratic_sur_vtu_plan( const std::string &vtu_filename,
+    const int &index_sur, const int &index_vol, const bool &isf2e ) const
+{
+  SYS_T::print_exit_if( index_sur >= num_phy_domain_2d || index_sur < 0,
+      "Error: Gmsh_FileIO::write__quadratic_sur_vtu, surface index is wrong. \n");
+
+  SYS_T::print_exit_if( index_vol >= num_phy_domain_3d || index_vol < 0,
+      "Error: Gmsh_FileIO::write__quadratic_sur_vtu, volume index is wrong. \n");
+
+  std::cout<<"=== Gmsh_FileIO::write_quadratuc_sur_vtu for "
+    <<phy_2d_name[index_sur]
+    <<" associated with "<<phy_3d_name[index_vol];
+
+  if( isf2e )
+    std::cout<<" with face-to-volume element index. \n";
+  else
+    std::cout<<" without face-to-volume element index. \n";
+
+  SYS_T::Timer * mytimer = new SYS_T::Timer();
+
+  std::cout<<"-----> write "<<vtu_filename<<".vtu \n";
+
+  mytimer->Reset(); mytimer->Start();
+
+  const int phy_index_sur = phy_2d_index[index_sur];
+  const int phy_index_vol = phy_3d_index[index_vol];
+
+  // obtain the number of local basis function of the surface and volume domains
+  const int nlocbas_2d {ele_nlocbas[phy_index_sur]};
+  const int nlocbas_3d {ele_nlocbas[phy_index_vol]};
+
+  // number of vertices of a element of the surface and volume 
+  int nVertex_2d {-1};
+  int nVertex_3d {-1};
+
+  std::string ele_2d {};
+  std::string ele_3d {};
+  if (nlocbas_2d == 6 && nlocbas_3d == 10)
+  { 
+    nVertex_2d = 3;
+    nVertex_3d = 4;
+    ele_2d += static_cast<std::string>("triangle");
+    ele_3d += static_cast<std::string>("tetrahedron");
+  }
+  else if (nlocbas_2d == 9 && nlocbas_3d == 27)
+  {
+    nVertex_2d = 4;
+    nVertex_3d = 8;
+    ele_2d += static_cast<std::string>("quadrilateral");
+    ele_3d += static_cast<std::string>("hexahedron");
+  }
+  else
+    SYS_T::print_exit("Error: Gmsh_FileIO::write_quadratic_sur_vtu, element types of surface and volume donnot match. \n");
+
+  // surface mesh ien copied from eIEN
+  std::vector<int> sur_ien_global( eIEN[phy_index_sur] );
+
+  // global node index
+  std::vector<int> bcpt( sur_ien_global );
+  const int bcnumcl = phy_2d_nElem[index_sur];
+
+  SYS_T::print_exit_if( VEC_T::get_size(sur_ien_global) != nlocbas_2d * bcnumcl,
+      "Error: Gmsh_FileIO::write_quadratic_sur_vtu, sur IEN size wrong. \n" );
+
+  VEC_T::sort_unique_resize( bcpt ); // unique ascending order nodes
+
+  const int bcnumpt = VEC_T::get_size( bcpt );
+
+  std::cout<<"      num of bc pt = "<<bcnumpt<<'\n';
+
+  // tript stores the coordinates of the boundary points
+  std::vector<double> sur_pt( 3*bcnumpt, 0.0 );
+  for( int ii=0; ii<bcnumpt; ++ii )
+  {
+    sur_pt[ii*3]   = node[bcpt[ii]*3] ;
+    sur_pt[ii*3+1] = node[bcpt[ii]*3+1] ;
+    sur_pt[ii*3+2] = node[bcpt[ii]*3+2] ;
+  }
+
+  // Volume mesh IEN
+  std::vector<int> vol_IEN( eIEN[phy_index_vol] );
+  const int numcel = phy_3d_nElem[index_vol];
+
+  SYS_T::print_exit_if( int( vol_IEN.size() ) != nlocbas_3d * numcel,
+      "Error: Gmsh_FileIO::write_quadratic_sur_vtu, vol IEN size wrong. \n");
+
+  // generate local triangle IEN array
+  std::vector<int> sur_ien {};
+  for(int ee=0; ee<bcnumcl; ++ee)
+  { 
+    for (int ii{0}; ii < nlocbas_2d; ++ii)
+      sur_ien.push_back( VEC_T::get_pos(bcpt, sur_ien_global[nlocbas_2d * ee + ii]) );
+  }
+  std::cout<<"      " << ele_2d <<" IEN generated. \n";
+
+  std::vector<int> face2elem( bcnumcl, -1 );
+  if( isf2e )
+  {
+    // A mapper that maps bc node to 1 other to 0
+    bool * bcmap = new bool [num_node];
+    for(int ii=0; ii<num_node; ++ii) bcmap[ii] = 0;
+    for(int ii=0; ii<bcnumpt; ++ii) bcmap[bcpt[ii]] = 1;
+
+    std::vector<int> gelem {};
+    for( int ee=0; ee<numcel; ++ee )
+    {
+      int total = 0;
+      for (int jj{0}; jj < nVertex_3d; ++jj)
+        total += bcmap[ vol_IEN[nlocbas_3d + jj] ];
+      if(total >= nVertex_2d) 
+        gelem.push_back(ee);
+    }
+    delete [] bcmap; bcmap = nullptr;
+    std::cout<<"      "<<gelem.size()<<" "<<ele_3d<<"s have faces over the surface. \n";
+
+    for(int ff=0; ff<bcnumcl; ++ff)
+    {
+      int snode[nVertex_2d];
+      for (int ii{0}; ii < nVertex_2d; ++ii)
+        snode[ii] = sur_ien_global[nlocbas_2d * ff + ii];
+      
+      bool got_sur_elem = false;
+      int ee = -1;
+      while( !got_sur_elem && ee < VEC_T::get_size(gelem) - 1 )
+      {
+        ee += 1;
+        const int vol_elem = gelem[ee];
+
+        int vnode[nVertex_3d];
+        for (int jj{0}; jj < nVertex_3d; ++jj)
+          vnode[jj] = vol_IEN[nlocbas_3d * vol_elem + jj];
+        std::sort(vnode, vnode + nVertex_3d);
+
+        bool got_all_vertices = true;
+        for (int ii{0}; ii < nVertex_2d; ++ii)
+        {
+          const bool got_each_vertex = ( std::find(vnode, vnode+nVertex_3d, snode[ii]) != vnode+nVertex_3d );
+          got_all_vertices = got_all_vertices && got_each_vertex;
+        }
+        got_sur_elem = got_all_vertices;
+      }
+
+      // If the boundary surface element is not found,
+      // we write -1 as the mapping value
+      if(got_sur_elem)
+        face2elem[ff] = gelem[ee] + phy_3d_start_index[index_vol];
+      else
+        face2elem[ff] = -1;
+    }
+    std::cout<<"      face2elem mapping generated. \n";
+  }
+  
+  std::vector<DataVecStr<int>> input_vtk_data {};
+  input_vtk_data.push_back({bcpt, "GlobalNodeID", AssociateObject::Node});
+  input_vtk_data.push_back({face2elem, "GlobalElementID", AssociateObject::Cell});
+  if (nlocbas_2d == 6){
+    TET_T::write_quadratic_triangle_grid( vtu_filename, bcnumpt, bcnumcl,
+      sur_pt, sur_ien, input_vtk_data );
+  }
+  else if (nlocbas_2d == 9){
+    HEX_T::write_quadratic_quad_grid( vtu_filename, bcnumpt, bcnumcl,
+      sur_pt, sur_ien, input_vtk_data );
+  }
+  else
+    SYS_T::print_exit("Error: Gmsh_FileIO::write_quadratic_sur_vtu, undefined element type. \n");
+
+  mytimer->Stop();
+  std::cout<<"      Time taken "<<mytimer->get_sec()<<" sec. \n";
+  delete mytimer;
+}
+
 void Gmsh_FileIO::write_quadratic_sur_vtu( const int &index_sur,
     const int &index_vol, const bool &isf2e ) const
 {
