@@ -165,10 +165,10 @@ void HEX_T::gen_quad_grid( vtkPolyData * const &grid_w,
     const std::vector<int> &ien_array )
 {
   // check the input data compatibility
-  SYS_T::print_exit_if(pt.size() != 3*numpts, 
+  SYS_T::print_exit_if(VEC_T::get_size(pt) != 3*numpts, 
     "Error: HEX_T::gen_quad_grid, point vector size does not match the number of points. \n");
 
-  SYS_T::print_exit_if(ien_array.size() != 4*numcels,
+  SYS_T::print_exit_if(VEC_T::get_size(ien_array) != 4*numcels,
     "Error: HEX_T::gen_quad_grid, ien array size does not match the number of cells. \n");
 
   // 1. nodal points
@@ -244,10 +244,10 @@ void HEX_T::gen_quadratic_quad_grid( vtkUnstructuredGrid * const &grid_w,
     const std::vector<int> &ien_array )
 {
   // check the input data compatibility
-  SYS_T::print_exit_if(pt.size() != 3*numpts,
+  SYS_T::print_exit_if(VEC_T::get_size(pt) != 3*numpts,
     "Error: HEX_T::gen_quadratic_quad_grid point, vector size does not match the number of points. \n");
 
-  SYS_T::print_exit_if(ien_array.size() != 9*numcels, 
+  SYS_T::print_exit_if(VEC_T::get_size(ien_array) != 9*numcels, 
     "Error: HEX_T::gen_quadratic_quad_grid, ien array size does not match the number of cells. \n");
 
   // 1. nodal points
