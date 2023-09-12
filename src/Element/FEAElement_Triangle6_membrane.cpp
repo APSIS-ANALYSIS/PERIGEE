@@ -7,9 +7,7 @@ FEAElement_Triangle6_membrane::FEAElement_Triangle6_membrane( const int &in_nqua
   dR_dx = new double [nLocBas * numQuapts];
   dR_dy = new double [nLocBas * numQuapts];
   
-  unx = new double [numQuapts];
-  uny = new double [numQuapts];
-  unz = new double [numQuapts];
+  un = new Vector_3 [numQuapts];
 
   Jac    = new double [8 * numQuapts];
   detJac = new double [numQuapts];
@@ -23,9 +21,7 @@ FEAElement_Triangle6_membrane::~FEAElement_Triangle6_membrane()
   delete [] dR_dx; dR_dx = nullptr;
   delete [] dR_dy; dR_dy = nullptr;
 
-  delete [] unx; unx = nullptr; 
-  delete [] uny; uny = nullptr; 
-  delete [] unz; unz = nullptr;
+  delete [] un; un = nullptr;
 
   delete []    Jac;    Jac = nullptr;
   delete [] detJac; detJac = nullptr;
@@ -53,10 +49,6 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
   ASSERT(quad->get_dim() == 3, "FEAElement_Triangle6_membrane::buildBasis function error.\n" );
 
   double Rr [nLocBas], Rs [nLocBas];
-
-  double dx_dr [numQuapts], dx_ds [numQuapts];
-  double dy_dr [numQuapts], dy_ds [numQuapts];
-  double dz_dr [numQuapts], dz_ds [numQuapts];
 
   for( int qua = 0; qua < numQuapts; ++qua )
   {
@@ -87,65 +79,44 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
     Rs[4] = 4.0 * qua_r;
     Rs[5] = 4.0 - 4.0 * qua_r - 8.0 * qua_s;
     
-    dx_dr[qua] = 0.0; dx_ds[qua] = 0.0;
-    dy_dr[qua] = 0.0; dy_ds[qua] = 0.0;
-    dz_dr[qua] = 0.0; dz_ds[qua] = 0.0;
+    Vector_3 dx_dr( 0.0, 0.0, 0.0 );
+    Vector_3 dx_ds( 0.0, 0.0, 0.0 );
 
     for( int ii=0; ii<nLocBas; ++ii )
     {
-      dx_dr[qua] += ctrl_x[ii] * Rr[ii];
-      dx_ds[qua] += ctrl_x[ii] * Rs[ii];
-      
-      dy_dr[qua] += ctrl_y[ii] * Rr[ii];
-      dy_ds[qua] += ctrl_y[ii] * Rs[ii];
-      
-      dz_dr[qua] += ctrl_z[ii] * Rr[ii];
-      dz_ds[qua] += ctrl_z[ii] * Rs[ii];
+      const Vector_3 temp_dx_dr( ctrl_x[ii] * Rr[ii], ctrl_y[ii] * Rr[ii], ctrl_z[ii] * Rr[ii] );
+      dx_dr += temp_dx_dr;
+
+      const Vector_3 temp_dx_ds( ctrl_x[ii] * Rs[ii], ctrl_y[ii] * Rs[ii], ctrl_z[ii] * Rs[ii] );
+      dx_ds += temp_dx_ds;
     }
 
     // vec(un) = vec(dx_dr) x vec(dx_ds)
-    MATH_T::cross3d( dx_dr[qua], dy_dr[qua], dz_dr[qua], 
-        dx_ds[qua], dy_ds[qua], dz_ds[qua],
-        unx[qua],   uny[qua],   unz[qua] );
-
-    MATH_T::normalize3d( unx[qua], uny[qua], unz[qua] );
+    un[qua] = cross_product( dx_dr, dx_ds );
+    un[qua].normalize();
 
     // ======= Global-to-local rotation matrix =======
-    const double inv_len_er = 1.0 / MATH_T::norm2( dx_dr[qua], dy_dr[qua], dz_dr[qua] );
-    const double e_r[3] { dx_dr[qua] * inv_len_er, dy_dr[qua] * inv_len_er,
-      dz_dr[qua] * inv_len_er };
+    const double inv_len_er = 1.0 / dx_dr.norm2();
+    const Vector_3 e_r = inv_len_er * dx_dr;
 
-    const double inv_len_es = 1.0 / MATH_T::norm2( dx_ds[qua], dy_ds[qua], dz_ds[qua] );
-    const double e_s[3] { dx_ds[qua] * inv_len_es, dy_ds[qua] * inv_len_es,
-      dz_ds[qua] * inv_len_es };
+    const double inv_len_es = 1.0 / dx_ds.norm2();
+    const Vector_3 e_s = inv_len_es * dx_ds;
 
     // e_a = 0.5*(e_r + e_s) / || 0.5*(e_r + e_s) ||
-    double e_a[3] = { 0.5 * ( e_r[0] + e_s[0] ), 
-      0.5 * ( e_r[1] + e_s[1] ), 0.5 * ( e_r[2] + e_s[2] ) };
-
-    MATH_T::normalize3d( e_a[0], e_a[1], e_a[2] );
+    Vector_3 e_a = 0.5 * ( e_r + e_s );
+    e_a.normalize();
 
     // e_b = vec(un) x e_a / || vec(un) x e_a ||
-    double e_b[3] = {0.0};
-    MATH_T::cross3d(unx[qua], uny[qua], unz[qua], e_a[0], e_a[1], e_a[2],
-      e_b[0], e_b[1], e_b[2]);
-
-    MATH_T::normalize3d( e_b[0], e_b[1], e_b[2] );
+    Vector_3 e_b = cross_product( un[qua], e_a );
+    e_b.normalize();
 
     // e_l1 = sqrt(2)/2 * (e_a - e_b)
     // e_l2 = sqrt(2)/2 * (e_a + e_b)
-    const double e_l1[3] { std::sqrt(2.0) * 0.5 * ( e_a[0] - e_b[0] ),
-                           std::sqrt(2.0) * 0.5 * ( e_a[1] - e_b[1] ),
-                           std::sqrt(2.0) * 0.5 * ( e_a[2] - e_b[2] ) };
-
-    const double e_l2[3] { std::sqrt(2.0) * 0.5 * ( e_a[0] + e_b[0] ),
-                           std::sqrt(2.0) * 0.5 * ( e_a[1] + e_b[1] ),
-                           std::sqrt(2.0) * 0.5 * ( e_a[2] + e_b[2] ) };
+    const Vector_3 e_l1 = std::sqrt(2.0) * 0.5 * ( e_a - e_b );
+    const Vector_3 e_l2 = std::sqrt(2.0) * 0.5 * ( e_a + e_b );
 
     // Q = transpose([ e_l1, e_l2, un ])
-    Q[qua] = Matrix_3x3( e_l1[0],  e_l1[1],  e_l1[2],
-                         e_l2[0],  e_l2[1],  e_l2[2],
-                        unx[qua], uny[qua], unz[qua] );
+    Q[qua] = Matrix_3x3( e_l1, e_l2, un[qua] );
 
     // Rotated lamina coordinates
     double ctrl_xl [nLocBas], ctrl_yl [nLocBas];
@@ -262,7 +233,7 @@ Vector_3 FEAElement_Triangle6_membrane::get_2d_normal_out( const int &qua,
     double &area ) const
 {
   area = detJac[qua];
-  return Vector_3( unx[qua], uny[qua], unz[qua] );
+  return un[qua];
 }
 
 Matrix_3x3 FEAElement_Triangle6_membrane::get_rotationMatrix( const int &quaindex ) const
@@ -271,35 +242,23 @@ Matrix_3x3 FEAElement_Triangle6_membrane::get_rotationMatrix( const int &quainde
   return Q[quaindex];
 }
 
-void FEAElement_Triangle6_membrane::get_normal_out( const int &qua,
+Vector_3 FEAElement_Triangle6_membrane::get_normal_out( const int &qua,
     const double &sur_pt_x, const double &sur_pt_y, const double &sur_pt_z,
     const double &intpt_x, const double &intpt_y, const double &intpt_z,
-    double &nx, double &ny, double &nz, double &len ) const
+    double &len ) const
 {
   // Construct a vector starting from the interior point to the triangle
-  const double mx = sur_pt_x - intpt_x;
-  const double my = sur_pt_y - intpt_y;
-  const double mz = sur_pt_z - intpt_z;
+  const Vector_3 m( sur_pt_x - intpt_x, sur_pt_y - intpt_y, sur_pt_z - intpt_z );
 
   // Do inner product with the normal vector
-  const double mdotn = mx * unx[qua] + my * uny[qua] + mz * unz[qua];
+  const double mdotn = dot_product( m, un[qua] );
 
   SYS_T::print_fatal_if( std::abs(mdotn) < 1.0e-10, "Warning: FEAElement_Triangle3_membrane::get_normal_out, the element might be ill-shaped.\n");
 
-  if(mdotn < 0)
-  {
-    nx = (-1.0) * unx[qua];
-    ny = (-1.0) * uny[qua];
-    nz = (-1.0) * unz[qua];
-  }
-  else
-  {
-    nx = unx[qua];
-    ny = uny[qua];
-    nz = unz[qua];
-  }
-
   len = detJac[qua];
+
+  if(mdotn < 0) return (-1.0) * un[qua];
+  else return un[qua];
 }
 
 // EOF

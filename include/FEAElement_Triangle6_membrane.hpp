@@ -91,10 +91,10 @@ class FEAElement_Triangle6_membrane : public FEAElement
 
     // If the triangle nodes are NOT arranged in any particular order,
     // use an interior node to define the outward direction. 
-    virtual void get_normal_out( const int &quaindex,
+    virtual Vector_3 get_normal_out( const int &quaindex,
         const double &sur_pt_x, const double &sur_pt_y, const double &sur_pt_z,
         const double &intpt_x, const double &intpt_y, const double &intpt_z,
-        double &nx, double &ny, double &nz, double &len ) const;
+        double &len ) const;
 
     virtual double get_detJac(const int &quaindex) const {return detJac[quaindex];}
 
@@ -114,7 +114,7 @@ class FEAElement_Triangle6_membrane : public FEAElement
     std::vector< Matrix_3x3 > Q;
 
     // Unit normal vector components, each of length numQuapts
-    double * unx, * uny, * unz;
+    Vector_3 * un;
 
     // Container for rotated *lamina* 2D Jacobian and its inverse
     // dx_dr : 0             <= ii < 4 * numQuapts
