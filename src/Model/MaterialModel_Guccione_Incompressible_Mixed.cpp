@@ -9,31 +9,31 @@ MaterialModel_Guccione_Incompressible_Mixed::MaterialModel_Guccione_Incompressib
   rho0( in_rho ), Cq(in_C), b_f(in_bf), b_t(in_bt), b_ft(in_bft),
   I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
 {
-  f[0] = fx; f[1] = fy; f[2] = fz;
+  f(0) = fx; f(1) = fy; f(2) = fz;
 
   // Check to make sure f is a unit vector
   if( !MATH_T::equals( MATH_T::norm2(fx,fy,fz), 1.0, 1.0e-12) )
   {
     SYS_T::commPrint("Guccione model, input f vector is not unit.\n");
-    MATH_T::normalize3d(f[0], f[1], f[2]);
+    f.normalize();
   }
 
   // Check to make sure s is a unit vector
-  s[0] = sx; s[1] = sy; s[2] = sz;
+  s(0) = sx; s(1) = sy; s(2) = sz;
   if( !MATH_T::equals( MATH_T::norm2(sx, sy, sz), 1.0, 1.0e-12) )
   {
     SYS_T::commPrint("Guccione model, input s vector is not unit.\n");
-    MATH_T::normalize3d(s[0], s[1], s[2]);
+    s.normalize();
   }
  
   // f x s / || f x s || = n 
-  MATH_T::cross3d( f[0], f[1], f[2], s[0], s[1], s[2], n[0], n[1], n[2] );
-  MATH_T::normalize3d( n[0], n[1], n[2] ); 
+  n = cross_product( f, s );
+  n.normalize();
 
   // Define the roatation matrix R
-  R(0,0) = f[0]; R(0,1) = f[1]; R(0,2) = f[2];
-  R(1,0) = s[0]; R(1,1) = s[1]; R(1,2) = s[2];
-  R(2,0) = n[0]; R(2,1) = n[1]; R(2,2) = n[2];
+  R(0,0) = f(0); R(0,1) = f(1); R(0,2) = f(2);
+  R(1,0) = s(0); R(1,1) = s(1); R(1,2) = s(2);
+  R(2,0) = n(0); R(2,1) = n(1); R(2,2) = n(2);
 }
 
 MaterialModel_Guccione_Incompressible_Mixed::MaterialModel_Guccione_Incompressible_Mixed(
@@ -55,35 +55,35 @@ MaterialModel_Guccione_Incompressible_Mixed::MaterialModel_Guccione_Incompressib
   b_ft = h5r -> read_doubleScalar("/", "b_ft");
 
   const std::vector<double> temp_f = h5r -> read_doubleVector( "/", "f" );
-  f[0] = temp_f[0]; f[1] = temp_f[1]; f[2] = temp_f[2];
+  f(0) = temp_f[0]; f(1) = temp_f[1]; f(2) = temp_f[2];
 
   const std::vector<double> temp_s = h5r -> read_doubleVector( "/", "s" );
-  s[0] = temp_s[0]; s[1] = temp_s[1]; s[2] = temp_s[2];
+  s(0) = temp_s[0]; s(1) = temp_s[1]; s(2) = temp_s[2];
 
   delete h5r; H5Fclose(h5file);
   
   // Check to make sure f is a unit vector
-  if( !MATH_T::equals( MATH_T::norm2(f[0],f[1],f[2]), 1.0, 1.0e-12) )
+  if( !MATH_T::equals( f.norm2(), 1.0, 1.0e-12) )
   {
     SYS_T::commPrint("Guccione model, input f vector is not unit.\n");
-    MATH_T::normalize3d(f[0], f[1], f[2]);
+    f.normalize();
   }
 
   // Check to make sure s is a unit vector
-  if( !MATH_T::equals( MATH_T::norm2(s[0], s[1], s[2]), 1.0, 1.0e-12) )
+  if( !MATH_T::equals( s.norm2(), 1.0, 1.0e-12) )
   {
     SYS_T::commPrint("Guccione model, input s vector is not unit.\n");
-    MATH_T::normalize3d(s[0], s[1], s[2]);
+    s.normalize();
   }
 
   // f x s / || f x s || = n
-  MATH_T::cross3d( f[0], f[1], f[2], s[0], s[1], s[2], n[0], n[1], n[2] );
-  MATH_T::normalize3d( n[0], n[1], n[2] );
+  n = cross_product( f, s );
+  n.normalize();
 
   // Define the roatation matrix R
-  R(0,0) = f[0]; R(0,1) = f[1]; R(0,2) = f[2];
-  R(1,0) = s[0]; R(1,1) = s[1]; R(1,2) = s[2];
-  R(2,0) = n[0]; R(2,1) = n[1]; R(2,2) = n[2];
+  R(0,0) = f(0); R(0,1) = f(1); R(0,2) = f(2);
+  R(1,0) = s(0); R(1,1) = s(1); R(1,2) = s(2);
+  R(2,0) = n(0); R(2,1) = n(1); R(2,2) = n(2);
 }
 
 MaterialModel_Guccione_Incompressible_Mixed::~MaterialModel_Guccione_Incompressible_Mixed()
@@ -97,9 +97,9 @@ void MaterialModel_Guccione_Incompressible_Mixed::print_info() const
   SYS_T::commPrint("\t  Para b_f  = %e \n", b_f);
   SYS_T::commPrint("\t  Para b_t  = %e \n", b_t);
   SYS_T::commPrint("\t  Para b_ft = %e \n", b_ft);
-  SYS_T::commPrint("\t  Fibre dir = [%e %e %e] \n", f[0], f[1], f[2]); 
-  SYS_T::commPrint("\t  Sheet normal dir = [%e %e %e] \n", s[0], s[1], s[2]); 
-  SYS_T::commPrint("\t  Third n dir = [%e %e %e] \n", n[0], n[1], n[2]); 
+  SYS_T::commPrint("\t  Fibre dir = [%e %e %e] \n", f(0), f(1), f(2));
+  SYS_T::commPrint("\t  Sheet normal dir = [%e %e %e] \n", s(0), s(1), s(2));
+  SYS_T::commPrint("\t  Third n dir = [%e %e %e] \n", n(0), n(1), n(2));
 }
 
 void MaterialModel_Guccione_Incompressible_Mixed::write_hdf5( const char * const &fname ) const
@@ -115,8 +115,8 @@ void MaterialModel_Guccione_Incompressible_Mixed::write_hdf5( const char * const
     h5w -> write_doubleScalar("b_f", b_f);
     h5w -> write_doubleScalar("b_t", b_t);
     h5w -> write_doubleScalar("b_ft", b_ft);
-    h5w -> write_doubleVector("f", f, 3);
-    h5w -> write_doubleVector("s", s, 3);
+    h5w -> write_Vector_3("f", f);
+    h5w -> write_Vector_3("s", s);
 
     delete h5w; H5Fclose(file_id);
   }

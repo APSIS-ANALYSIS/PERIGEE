@@ -84,7 +84,7 @@ class MaterialModel_Guccione_Incompressible_Mixed : public IMaterialModel
     double Cq, b_f, b_t, b_ft;
 
     // unit vector for fibre and firbre sheet orientation
-    double f[3], s[3], n[3];
+    Vector_3 f, s, n;
 
     const Matrix_3x3 I;
 
