@@ -40,19 +40,20 @@ void FEAElement_Triangle3_3D_der0::buildBasis( const IQuadPts * const &quad,
     R[qua*3 + 2] = qua_s;
   }
 
-  const double dx_dr = ctrl_x[0] * (-1.0) + ctrl_x[1];
-  const double dy_dr = ctrl_y[0] * (-1.0) + ctrl_y[1];
-  const double dz_dr = ctrl_z[0] * (-1.0) + ctrl_z[1];
+  const Vector_3 dx_dr(ctrl_x[0] * (-1.0) + ctrl_x[1],
+    ctrl_y[0] * (-1.0) + ctrl_y[1],
+    ctrl_z[0] * (-1.0) + ctrl_z[1]);
 
-  const double dx_ds = ctrl_x[0] * (-1.0) + ctrl_x[2];
-  const double dy_ds = ctrl_y[0] * (-1.0) + ctrl_y[2];
-  const double dz_ds = ctrl_z[0] * (-1.0) + ctrl_z[2];
+  const Vector_3 dx_ds(ctrl_x[0] * (-1.0) + ctrl_x[2],
+    ctrl_y[0] * (-1.0) + ctrl_y[2],
+    ctrl_z[0] * (-1.0) + ctrl_z[2]);
 
   // vec(un) = vec(dx_dr) x vec(dx_ds)
-  MATH_T::cross3d(dx_dr, dy_dr, dz_dr, dx_ds, dy_ds, dz_ds, unx, uny, unz);
+  un = cross_product( dx_dr, dx_ds );
+
   
   // area = || vec(un) ||
-  detJac = MATH_T::normalize3d( unx, uny, unz );
+  detJac = un.normalize();
 }
 
 void FEAElement_Triangle3_3D_der0::get_R( const int &quaindex, 
@@ -77,39 +78,27 @@ Vector_3 FEAElement_Triangle3_3D_der0::get_2d_normal_out( const int &quaindex,
 {
   ASSERT(quaindex>=0 && quaindex < numQuapts, "FEAElement_Triangle3_3D_der0::get_2d_normal_out function error.\n" );
   area = detJac;
-  return Vector_3( unx, uny, unz );
+  return un;
 }
 
-void FEAElement_Triangle3_3D_der0::get_normal_out( const int &quaindex,
+Vector_3 FEAElement_Triangle3_3D_der0::get_normal_out( const int &quaindex,
     const double &sur_pt_x, const double &sur_pt_y, const double &sur_pt_z,
     const double &intpt_x, const double &intpt_y, const double &intpt_z,
-    double &nx, double &ny, double &nz, double &area ) const
+    double &area ) const
 {
   // Construct a vector from the interior point to the triangle first node
-  const double mx = sur_pt_x - intpt_x;
-  const double my = sur_pt_y - intpt_y;
-  const double mz = sur_pt_z - intpt_z;
+  const Vector_3 m( sur_pt_x - intpt_x, sur_pt_y - intpt_y, sur_pt_z - intpt_z);
 
   // Dot product of the defined vector with the calculated normal vector
-  const double mdotn = mx * unx + my * uny + mz * unz;
+  const double mdotn = dot_product( m, un );
 
   SYS_T::print_fatal_if( std::abs(mdotn) < 1.0e-10, "Warning: FEAElement_Triangle3_3D_der0::get_normal_out, the element might be ill-shaped.\n");
 
-  // If dot product is negative, adjust the normal vector
-  if(mdotn < 0)
-  {
-    nx = (-1.0) * unx;
-    ny = (-1.0) * uny;
-    nz = (-1.0) * unz;
-  }
-  else
-  {
-    nx = unx;
-    ny = uny;
-    nz = unz;
-  }
-
   area = detJac;
+
+  // If dot product is negative, adjust the normal vector
+  if(mdotn < 0) return (-1.0)*un;
+  else return un;
 }
 
 // EOF
