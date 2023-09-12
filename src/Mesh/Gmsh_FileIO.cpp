@@ -1274,7 +1274,7 @@ void Gmsh_FileIO::update_quadratic_hex_IEN( const int &index_3d )
 
   const int nlocbas = ele_nlocbas[ domain_index ];
 
-  SYS_T::print_exit_if(nlocbas != 27 || nlocbas != 20, "Error: Gmsh_FileIO updata_quadratic_hex_IEN only works for 27-node or 20-node quadratic element. \n");
+  SYS_T::print_exit_if(nlocbas != 27 && nlocbas != 20, "Error: Gmsh_FileIO updata_quadratic_hex_IEN only works for 27-node or 20-node quadratic element. \n");
 
   // Now upateing the eIEN array
   for(int ee=0; ee<ne; ++ee)
