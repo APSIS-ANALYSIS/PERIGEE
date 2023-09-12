@@ -347,10 +347,7 @@ int main( int argc, char * argv[] )
        
         const int tri_global_id = vecIEN[nLocBas * ee + tri_local_id];
 
-        wss_ave[ tri_global_id ].x() += wss_x * tri_area;
-        wss_ave[ tri_global_id ].y() += wss_y * tri_area;
-        wss_ave[ tri_global_id ].z() += wss_z * tri_area;
-
+        wss_ave[ tri_global_id ]   += tri_area * Vector_3(wss_x, wss_y, wss_z);
         node_area[ tri_global_id ] += tri_area;
 
       } // loop over the sampling points (on surface)
