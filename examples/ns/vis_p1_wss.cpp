@@ -296,9 +296,7 @@ int main( int argc, char * argv[] )
         // Due to the numbering in the visualization quadrature routine, the
         // first quadrature point located on the vertex associated with basis-0,
         // and so on.
-        wss_ave[ trn[qua] ].x() += wss_x * tri_area[ee];
-        wss_ave[ trn[qua] ].y() += wss_y * tri_area[ee];
-        wss_ave[ trn[qua] ].z() += wss_z * tri_area[ee];
+        wss_ave[ trn[qua] ] += tri_area[ee] * Vector_3(wss_x, wss_y, wss_z);
 
         node_area[ trn[qua] ] += tri_area[ee]; 
       } // Loop over the three surface points  
