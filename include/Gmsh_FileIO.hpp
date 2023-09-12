@@ -138,11 +138,11 @@ class Gmsh_FileIO
     void write_vtp(const std::string &vtp_filename,
         const int &index_sur, const int &index_vol, const bool &isf2e = false) const;
 
-    void write_vtp(const int &index_sur, const int &index_vol,
-        const bool &isf2e = false) const;
+    // This is the plan of new write_vtp which accepts either linear tri or linear quad
+    void write_vtp_plan(const std::string &vtp_filename,
+        const int &index_sur, const int &index_vol, const bool &isf2e = false) const;
 
-    // This temporary function will be merged into write_vtp in the end.
-    void write_quad_vtp(const int &index_sur, const int &index_vol,
+    void write_vtp(const int &index_sur, const int &index_vol,
         const bool &isf2e = false) const;
   
     // --------------------------------------------------------------

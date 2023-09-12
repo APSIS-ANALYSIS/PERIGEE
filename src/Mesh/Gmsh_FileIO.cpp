@@ -473,19 +473,14 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
   delete mytimer;
 }
 
-void Gmsh_FileIO::write_quad_vtp(const int &index_sur, 
-    const int &index_vol, const bool &isf2e ) const
+void Gmsh_FileIO::write_vtp_plan( const std::string &vtp_filename,
+  const int &index_sur, const int &index_vol, const bool &isf2e ) const
 {
   SYS_T::print_exit_if( index_sur >= num_phy_domain_2d || index_sur < 0,
       "Error: Gmsh_FileIO::write_vtp, surface index is wrong. \n");
 
   SYS_T::print_exit_if( index_vol >= num_phy_domain_3d || index_vol < 0,
       "Error: Gmsh_FileIO::write_vtp, volume index is wrong. \n");
-
-  const int phy_index_sur = phy_2d_index[index_sur];
-  const int phy_index_vol = phy_3d_index[index_vol];
-  const int bcnumcl = phy_2d_nElem[index_sur];
-  const int numcel = phy_3d_nElem[index_vol];
 
   std::cout<<"=== Gmsh_FileIO::write_vtp for "
     <<phy_2d_name[index_sur]
@@ -498,74 +493,73 @@ void Gmsh_FileIO::write_quad_vtp(const int &index_sur,
 
   SYS_T::Timer * mytimer = new SYS_T::Timer();
 
-  std::string vtp_file_name(phy_2d_name[index_sur]);
-  vtp_file_name += "_";
-  vtp_file_name += phy_3d_name[index_vol];
-  std::cout<<"-----> write "<<vtp_file_name<<".vtp \n";
+  std::cout<<"-----> write "<<vtp_filename<<".vtp \n";
+
   mytimer->Reset();
   mytimer->Start();
 
   // Copy the IEN from the whole domain, the nodal indices is from the
   // global domain indices.
-  std::vector<int> quadien_global( eIEN[phy_index_sur] );
+  const int phy_index_sur = phy_2d_index[index_sur];
+  std::vector<int> sur_ien_global( eIEN[phy_index_sur] );
 
   // bcpt stores the global node index
-  std::vector<int> bcpt( quadien_global );
-
-  SYS_T::print_exit_if( int(quadien_global.size() ) != 4 * bcnumcl,
-      "Error: Gmsh_FileIO::write_vtp, sur IEN size wrong. \n" );
+  std::vector<int> bcpt( sur_ien_global );
 
   // obtain the volumetric mesh IEN array
+  const int phy_index_vol = phy_3d_index[index_vol];
   std::vector<int> vol_IEN( eIEN[phy_index_vol] );
 
-  SYS_T::print_exit_if( int( vol_IEN.size() ) != 8 * numcel,
-      "Error: Gmsh_FileIO::write_vtp, vol IEN size wrong. \n");
-  
-  VEC_T::sort_unique_resize( bcpt ); // unique ascending order nodes
+  // obtain the number of local basis function of the surface and volume domains
+  const int nlocbas_2d {ele_nlocbas[phy_index_sur]};
+  const int nlocbas_3d {ele_nlocbas[phy_index_vol]};
 
-  const int bcnumpt = static_cast<int>( bcpt.size() );
+  const int bcnumcl = phy_2d_nElem[index_sur];
+  SYS_T::print_exit_if( VEC_T::get_size(sur_ien_global) != nlocbas_2d * bcnumcl,
+      "Error: Gmsh_FileIO::write_vtp, sur IEN size wrong. \n" );
+
+  const int numcel = phy_3d_nElem[index_vol];
+  SYS_T::print_exit_if( VEC_T::get_size(vol_IEN) != nlocbas_3d * numcel,
+      "Error: Gmsh_FileIO::write_vtp, vol IEN size wrong. \n");
+
+  std::string ele_2d {};
+  std::string ele_3d {};
+  if (nlocbas_2d == 3 && nlocbas_3d == 4)
+  {
+    ele_2d += static_cast<std::string>("triangle");
+    ele_3d += static_cast<std::string>("tetrahedron");
+  }
+  else if (nlocbas_2d == 4 && nlocbas_3d == 8)
+  {
+    ele_2d += static_cast<std::string>("quadrilateral");
+    ele_3d += static_cast<std::string>("hexahedron");
+  }
+  else
+    SYS_T::print_exit("Error: Gmsh_FileIO::write_vtp, element types of surface and volume donnot match. \n");
+
+  VEC_T::sort_unique_resize( bcpt ); // unique ascending order nodal id
+
+  const int bcnumpt = VEC_T::get_size( bcpt );
 
   std::cout<<"      num of bc pt = "<<bcnumpt<<'\n';
 
-  std::vector<double> quadpt(3*bcnumpt , 0.0);
+  // sur_pt stores the coordinates of the boundary points
+  std::vector<double> sur_pt(3*bcnumpt, 0.0);
   for( int ii=0; ii<bcnumpt; ++ii )
   {
-    quadpt[ii*3]   = node[bcpt[ii]*3] ;
-    quadpt[ii*3+1] = node[bcpt[ii]*3+1] ;
-    quadpt[ii*3+2] = node[bcpt[ii]*3+2] ;
+    sur_pt[ii*3]   = node[bcpt[ii]*3] ;
+    sur_pt[ii*3+1] = node[bcpt[ii]*3+1] ;
+    sur_pt[ii*3+2] = node[bcpt[ii]*3+2] ;
   }
 
-  // generate a mapper that maps the bc node to 1, other node to 0
-  bool * bcmap = new bool [num_node];
-  for(int ii=0; ii<num_node; ++ii) bcmap[ii] = 0;
-  for(int ii=0; ii<bcnumpt; ++ii) bcmap[bcpt[ii]] = 1;
-
-  std::vector<int> gelem {};
-  for( int ee=0; ee<numcel; ++ee )
-  {
-    int total = 0;
-    total += bcmap[ vol_IEN[8*ee] ];
-    total += bcmap[ vol_IEN[8*ee+1] ];
-    total += bcmap[ vol_IEN[8*ee+2] ];
-    total += bcmap[ vol_IEN[8*ee+3] ];
-    total += bcmap[ vol_IEN[8*ee+4] ];
-    total += bcmap[ vol_IEN[8*ee+5] ];
-    total += bcmap[ vol_IEN[8*ee+6] ];
-    total += bcmap[ vol_IEN[8*ee+7] ];
-    if(total >= 4) gelem.push_back(ee);
-  }
-  delete [] bcmap; bcmap = nullptr;
-  std::cout<<"      "<<gelem.size()<<" hexs have faces over the surface. \n";
-
-  std::vector<int> quadien {};
+  // generate the local triangle or quadrilateral IEN array
+  std::vector<int> sur_ien {};
   for(int ee=0; ee<bcnumcl; ++ee)
   {
-    quadien.push_back( VEC_T::get_pos(bcpt, quadien_global[4*ee  ]) );
-    quadien.push_back( VEC_T::get_pos(bcpt, quadien_global[4*ee+1]) );
-    quadien.push_back( VEC_T::get_pos(bcpt, quadien_global[4*ee+2]) );
-    quadien.push_back( VEC_T::get_pos(bcpt, quadien_global[4*ee+3]) );
+    for (int ii{0}; ii < nlocbas_2d; ++ii)
+      sur_ien.push_back( VEC_T::get_pos(bcpt, sur_ien_global[nlocbas_2d * ee + ii]) );
   }
-  std::cout<<"      quadrilateral IEN generated. \n";
+  std::cout<<"      " << ele_2d <<" IEN generated. \n";
 
   // determine the face-to-element mapping, if we demand it (
   // meaning this face needs boundary integral); otherwise, set
@@ -574,34 +568,55 @@ void Gmsh_FileIO::write_quad_vtp(const int &index_sur,
   std::vector<int> face2elem( bcnumcl, -1 );
   if( isf2e )
   {
+    // generate a mapper that maps the bc node to 1, other node to 0
+    bool * bcmap = new bool [num_node];
+    for(int ii=0; ii<num_node; ++ii) bcmap[ii] = 0;
+    for(int ii=0; ii<bcnumpt; ++ii) bcmap[bcpt[ii]] = 1;
+
+    // use the bcmap to obtain the vol element that has its face on this surface
+    std::vector<int> gelem {};
+    for( int ee=0; ee<numcel; ++ee )
+    {
+      int total = 0;
+      for (int jj{0}; jj < nlocbas_3d; ++jj)
+        total += bcmap[ vol_IEN[nlocbas_3d + jj] ];
+      if(total >= nlocbas_2d)
+        gelem.push_back(ee);
+    }
+    delete [] bcmap; bcmap = nullptr;
+    std::cout<<"      "<<gelem.size()<<" "<<ele_3d<<"s have faces over the surface. \n";
+
     for(int ff=0; ff<bcnumcl; ++ff)
     {
-      const int node0 = quadien_global[4*ff];
-      const int node1 = quadien_global[4*ff+1];
-      const int node2 = quadien_global[4*ff+2];
-      const int node3 = quadien_global[4*ff+3];
-      bool gotit = false;
+      int snode[nlocbas_2d];
+      for (int ii{0}; ii < nlocbas_2d; ++ii)
+        snode[ii] = sur_ien_global[nlocbas_2d * ff + ii];
+
+      bool got_sur_elem = false;
       int ee = -1;
-      while( !gotit && ee < gelem.size() - 1 )
+      while( !got_sur_elem && ee < VEC_T::get_size(gelem) - 1 )
       {
         ee += 1;
         const int vol_elem = gelem[ee];
-        int vnode[8] { vol_IEN[8*vol_elem  ], vol_IEN[8*vol_elem+1],
-                       vol_IEN[8*vol_elem+2], vol_IEN[8*vol_elem+3],
-                       vol_IEN[8*vol_elem+4], vol_IEN[8*vol_elem+5],
-                       vol_IEN[8*vol_elem+6], vol_IEN[8*vol_elem+7]};
-        std::sort(vnode, vnode+8);
 
-        const bool got0 = ( std::find(vnode, vnode+8, node0) != vnode+8 );
-        const bool got1 = ( std::find(vnode, vnode+8, node1) != vnode+8 );
-        const bool got2 = ( std::find(vnode, vnode+8, node2) != vnode+8 );
-        const bool got3 = ( std::find(vnode, vnode+8, node3) != vnode+8 );
-        gotit = got0 && got1 && got2 && got3;
+        int vnode[nlocbas_3d];
+        for (int jj{0}; jj < nlocbas_3d; ++jj)
+          vnode[jj] = vol_IEN[nlocbas_3d * vol_elem + jj];
+        std::sort(vnode, vnode + nlocbas_3d); 
+
+        bool got_all_nodes = true;
+
+        for (int ii{0}; ii < nlocbas_2d; ++ii)
+        {
+          const bool got_each_node = ( std::find(vnode, vnode+nlocbas_3d, snode[ii]) != vnode+nlocbas_3d );
+          got_all_nodes = got_all_nodes && got_each_node;
+        }
+        got_sur_elem = got_all_nodes;
       }
 
       // If the boundary surface element is not found, 
       // we write -1 as the mapping value
-      if(gotit)
+      if(got_sur_elem)
         face2elem[ff] = gelem[ee] + phy_3d_start_index[index_vol];
       else
         face2elem[ff] = -1;
@@ -613,8 +628,19 @@ void Gmsh_FileIO::write_quad_vtp(const int &index_sur,
   std::vector<DataVecStr<int>> input_vtk_data {};
   input_vtk_data.push_back({bcpt, "GlobalNodeID", AssociateObject::Node});
   input_vtk_data.push_back({face2elem, "GlobalElementID", AssociateObject::Cell});
-  HEX_T::write_quad_grid( vtp_file_name, bcnumpt, bcnumcl,
-      quadpt, quadien, input_vtk_data );
+
+  if (nlocbas_2d == 3)
+  {
+    TET_T::write_triangle_grid( vtp_filename, bcnumpt, bcnumcl,
+      sur_pt, sur_ien, input_vtk_data );
+  }
+  else if (nlocbas_2d == 4)
+  {
+    HEX_T::write_quad_grid( vtp_filename, bcnumpt, bcnumcl,
+      sur_pt, sur_ien, input_vtk_data );
+  }
+  else
+    SYS_T::print_exit("Error: Gmsh_FileIO::write_vtp, undefined element type. \n");
 
   mytimer->Stop();
   std::cout<<"      Time taken "<<mytimer->get_sec()<<" sec. \n";
