@@ -1,4 +1,6 @@
 #include "FEAElement_Hex8.hpp"
+#include "FEAElement_Quad4.hpp"
+#include "FEAElement_Quad4_3D_der0.hpp"
 #include "QuadPts_Gauss_Hex.hpp"
 #include "QuadPts_Gauss_Quad.hpp"
 #include "Vector_3.hpp"
@@ -173,6 +175,19 @@ int main( int argc, char * argv[] )
     for(int nbas = 0; nbas<8; ++nbas) sum3[qua] += base[nbas];
   }
 
+  double * ctrl_x_quad_3D = new double[4]{0.0, vec1.x(), vec1.x()+vec2.x(), vec2.x()};
+  double * ctrl_y_quad_3D = new double[4]{0.0, vec1.y(), vec1.y()+vec2.y(), vec2.y()};
+  double * ctrl_z_quad_3D = new double[4]{0.0, vec1.z(), vec1.z()+vec2.z(), vec2.z()};
+  FEAElement_Quad4_3D_der0 quad_3D(4);
+  IQuadPts * quad_q = new QuadPts_Gauss_Quad(2, 0.0, 1.0, 0.0, 1.0);
+  quad_3D.buildBasis(quad_q, ctrl_x_quad_3D, ctrl_y_quad_3D, ctrl_z_quad_3D);
+  double * sum_quad_3D = new double[4]{};
+  for(int qua = 0; qua<4; ++qua)
+  {
+    auto base = quad_3D.get_R(qua);
+    for(int nbas = 0; nbas<4; ++nbas) sum_quad_3D[qua] += base[nbas];
+  }
+
   std::cout << "Testing hex element:" << std::endl;
   hex2.print_info();
   // test buildBasis
@@ -186,13 +201,31 @@ int main( int argc, char * argv[] )
   std::cout << std::setprecision(16) << volume - volume2 << std::endl;
   std::cout << std::setprecision(16) << volume - volume3 << std::endl;
 
+  std::cout << "Testing quad 3D element:" << std::endl;
+  // test buildBasis
+  // test R by the sum of basis
+  for(int ii = 0; ii<4; ii++)  std::cout << std::setprecision(16) << sum_quad_3D[ii] << " ";
+  std::cout << std::endl;
+  // test get_2d_normal_out
+  Vector_3 norm_vec = cross_product(vec1,vec2);
+  norm_vec.normalize();
+  double area = 1.0;
+  Vector_3 test_norm_vec = quad_3D.get_2d_normal_out(1, area);
+  norm_vec.print();
+  test_norm_vec.print();
+
   PetscFinalize();
 
   delete quad1; delete quad2; delete quad3;
+  delete quad_q;
   delete[] coefficient;
   delete[] ctrl_x_hex;
   delete[] ctrl_y_hex;
   delete[] ctrl_z_hex;
+  delete[] ctrl_x_quad_3D;
+  delete[] ctrl_y_quad_3D;
+  delete[] ctrl_z_quad_3D;
   delete[] sum2; delete[] sum3;
+  delete[] sum_quad_3D;
   return EXIT_SUCCESS;
 }

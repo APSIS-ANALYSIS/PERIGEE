@@ -99,10 +99,12 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Element/FEAElement_Tet10_v2.cpp
   ${perigee_source}/Element/FEAElement_Triangle3.cpp
   ${perigee_source}/Element/FEAElement_Triangle6.cpp
+  ${perigee_source}/Element/FEAElement_Quad4.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_membrane.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_membrane.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Quad4_3D_der0.cpp
   ${perigee_source}/Model/GenBC_RCR.cpp
   ${perigee_source}/Model/GenBC_Resistance.cpp
   ${perigee_source}/Model/GenBC_Inductance.cpp
@@ -168,5 +170,5 @@ TARGET_LINK_LIBRARIES( sys_test perigee_preprocess perigee_analysis )
 TARGET_LINK_LIBRARIES( mod_test perigee_preprocess perigee_analysis )
 TARGET_LINK_LIBRARIES( testh5 perigee_preprocess )
 TARGET_LINK_LIBRARIES( elem_test perigee_analysis )
-
+add_definitions(-w)
 # EOF
