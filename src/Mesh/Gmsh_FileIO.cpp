@@ -859,8 +859,21 @@ void Gmsh_FileIO::write_each_vtu() const
     input_vtk_data.push_back({local_node_idx, "GlobalNodeID", AssociateObject::Node});
     input_vtk_data.push_back({local_cell_idx, "GlobalElementID", AssociateObject::Cell});
     input_vtk_data.push_back({ptag, "Physics_tag", AssociateObject::Cell});
-    TET_T::write_tet_grid( vtu_file_name, num_local_node, 
+
+    // Element type of this domain
+    const int Etype = ele_type[phy_3d_index[ii]];
+    if ( Etype == 10 || Etype == 24 )
+    {
+      TET_T::write_tet_grid( vtu_file_name, num_local_node, 
         phy_3d_nElem[ ii ], local_coor, domain_IEN, input_vtk_data, true);
+    }
+    else if ( Etype == 12 || Etype == 29 )
+    {
+      HEX_T::write_hex_grid( vtu_file_name, num_local_node, 
+        phy_3d_nElem[ ii ], local_coor, domain_IEN, input_vtk_data, true);
+    }
+    else
+      SYS_T::print_exit("Error: Gmsh_FileIO::write_each_vtu, undefined element type of domain %d. \n", phy_3d_index[ii] + 1);
 
     mytimer->Stop();
 
