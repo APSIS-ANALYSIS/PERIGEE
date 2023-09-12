@@ -162,8 +162,7 @@ class Gmsh_FileIO
     // index_2d in [ 0, num_phy_domain_2d ),
     // index_1d in [ 0, num_phy_domain_1d ).
     // --------------------------------------------------------------
-    void write_tri_h5(const int &index_2d, 
-        const std::vector<int> &index_1d ) const;
+    void write_tri_h5(const int &index_2d, const std::vector<int> &index_1d ) const;
 
     // --------------------------------------------------------------
     // write a h5 file for the 3D simplex domain with given index :
@@ -172,8 +171,7 @@ class Gmsh_FileIO
     // index_3d in [ 0, num_phy_domain_3d ),
     // index_2d in [ 0, num_phy_domain_2d ).
     // --------------------------------------------------------------
-    void write_tet_h5( const int &index_3d,
-        const std::vector<int> &index_2d ) const;
+    void write_tet_h5( const int &index_3d, const std::vector<int> &index_2d ) const;
 
     // --------------------------------------------------------------
     // write a h5 file for the 3D simplex domain with given index,
