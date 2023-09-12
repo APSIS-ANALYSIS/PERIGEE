@@ -222,7 +222,7 @@ void TET_T::write_quadratic_triangle_grid( const std::string &filename,
 
   VEC_T::sort_unique_resize( name_list );
 
-  SYS_T::print_exit_if( name_list.size() != IOdata.size(), "Error: In TET_T::write_triangle_grid, there are %d data in the IOdata that have the same name.\n", IOdata.size() - name_list.size() + 1 );
+  SYS_T::print_exit_if( name_list.size() != IOdata.size(), "Error: In TET_T::write_quadratic_triangle_grid, there are %d data in the IOdata that have the same name.\n", IOdata.size() - name_list.size() + 1 );
 
 // We add the IOdata for VTK
   for( auto data : IOdata )
@@ -232,7 +232,7 @@ void TET_T::write_quadratic_triangle_grid( const std::string &filename,
     else if( data.get_object() == AssociateObject::Cell )
       VTK_T::add_int_CellData( grid_w, data.get_data(), data.get_name() );
     else
-      SYS_T::print_exit( "Error: In TET_T::write_triangle_grid, there is an unknown object type in DataVecStr %s", data.get_name().c_str() );
+      SYS_T::print_exit( "Error: In TET_T::write_quadratic_triangle_grid, there is an unknown object type in DataVecStr %s", data.get_name().c_str() );
   }
 
   // Write the prepared grid_w to a vtu file on disk
@@ -240,7 +240,6 @@ void TET_T::write_quadratic_triangle_grid( const std::string &filename,
 
   grid_w->Delete();
 }
-
 
 void TET_T::gen_quadratic_triangle_grid( vtkUnstructuredGrid * const &grid_w,
     const int &numpts, const int &numcels,
@@ -318,12 +317,7 @@ Vector_3 TET_T::get_out_normal( const std::string &file,
   // Analyze the file type
   std::string fend; fend.assign( file.end()-4 , file.end() );
 
-  if( fend.compare(".vtp") == 0 )
-    VTK_T::read_vtp_grid( file, numpts, numcels, pts, ien);
-  else if( fend.compare(".vtu") == 0 )
-    VTK_T::read_vtu_grid( file, numpts, numcels, pts, ien);
-  else
-    SYS_T::print_fatal("Error: get_out_normal unknown file type.\n");
+  VTK_T::read_grid( file, numpts, numcels, pts, ien);
 
   const std::vector<int> gnode = VTK_T::read_int_PointData(file, "GlobalNodeID");
   const std::vector<int> gelem = VTK_T::read_int_CellData(file, "GlobalElementID");

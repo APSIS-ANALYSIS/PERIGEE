@@ -473,6 +473,154 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
   delete mytimer;
 }
 
+void Gmsh_FileIO::write_quad_vtp(const int &index_sur, 
+    const int &index_vol, const bool &isf2e ) const
+{
+  SYS_T::print_exit_if( index_sur >= num_phy_domain_2d || index_sur < 0,
+      "Error: Gmsh_FileIO::write_vtp, surface index is wrong. \n");
+
+  SYS_T::print_exit_if( index_vol >= num_phy_domain_3d || index_vol < 0,
+      "Error: Gmsh_FileIO::write_vtp, volume index is wrong. \n");
+
+  const int phy_index_sur = phy_2d_index[index_sur];
+  const int phy_index_vol = phy_3d_index[index_vol];
+  const int bcnumcl = phy_2d_nElem[index_sur];
+  const int numcel = phy_3d_nElem[index_vol];
+
+  std::cout<<"=== Gmsh_FileIO::write_vtp for "
+    <<phy_2d_name[index_sur]
+    <<" associated with "<<phy_3d_name[index_vol];
+
+  if( isf2e )
+    std::cout<<" with face-to-volume element index. \n";
+  else
+    std::cout<<" without face-to-volume element index. \n";
+
+  SYS_T::Timer * mytimer = new SYS_T::Timer();
+
+  std::string vtp_file_name(phy_2d_name[index_sur]);
+  vtp_file_name += "_";
+  vtp_file_name += phy_3d_name[index_vol];
+  std::cout<<"-----> write "<<vtp_file_name<<".vtp \n";
+  mytimer->Reset();
+  mytimer->Start();
+
+  // Copy the IEN from the whole domain, the nodal indices is from the
+  // global domain indices.
+  std::vector<int> quadien_global( eIEN[phy_index_sur] );
+
+  // bcpt stores the global node index
+  std::vector<int> bcpt( quadien_global );
+
+  SYS_T::print_exit_if( int(quadien_global.size() ) != 4 * bcnumcl,
+      "Error: Gmsh_FileIO::write_vtp, sur IEN size wrong. \n" );
+
+  // obtain the volumetric mesh IEN array
+  std::vector<int> vol_IEN( eIEN[phy_index_vol] );
+
+  SYS_T::print_exit_if( int( vol_IEN.size() ) != 8 * numcel,
+      "Error: Gmsh_FileIO::write_vtp, vol IEN size wrong. \n");
+  
+  VEC_T::sort_unique_resize( bcpt ); // unique ascending order nodes
+
+  const int bcnumpt = static_cast<int>( bcpt.size() );
+
+  std::cout<<"      num of bc pt = "<<bcnumpt<<'\n';
+
+  std::vector<double> quadpt(3*bcnumpt , 0.0);
+  for( int ii=0; ii<bcnumpt; ++ii )
+  {
+    quadpt[ii*3]   = node[bcpt[ii]*3] ;
+    quadpt[ii*3+1] = node[bcpt[ii]*3+1] ;
+    quadpt[ii*3+2] = node[bcpt[ii]*3+2] ;
+  }
+
+  // generate a mapper that maps the bc node to 1, other node to 0
+  bool * bcmap = new bool [num_node];
+  for(int ii=0; ii<num_node; ++ii) bcmap[ii] = 0;
+  for(int ii=0; ii<bcnumpt; ++ii) bcmap[bcpt[ii]] = 1;
+
+  std::vector<int> gelem {};
+  for( int ee=0; ee<numcel; ++ee )
+  {
+    int total = 0;
+    total += bcmap[ vol_IEN[8*ee] ];
+    total += bcmap[ vol_IEN[8*ee+1] ];
+    total += bcmap[ vol_IEN[8*ee+2] ];
+    total += bcmap[ vol_IEN[8*ee+3] ];
+    total += bcmap[ vol_IEN[8*ee+4] ];
+    total += bcmap[ vol_IEN[8*ee+5] ];
+    total += bcmap[ vol_IEN[8*ee+6] ];
+    total += bcmap[ vol_IEN[8*ee+7] ];
+    if(total >= 4) gelem.push_back(ee);
+  }
+  delete [] bcmap; bcmap = nullptr;
+  std::cout<<"      "<<gelem.size()<<" hexs have faces over the surface. \n";
+
+  std::vector<int> quadien {};
+  for(int ee=0; ee<bcnumcl; ++ee)
+  {
+    quadien.push_back( VEC_T::get_pos(bcpt, quadien_global[4*ee  ]) );
+    quadien.push_back( VEC_T::get_pos(bcpt, quadien_global[4*ee+1]) );
+    quadien.push_back( VEC_T::get_pos(bcpt, quadien_global[4*ee+2]) );
+    quadien.push_back( VEC_T::get_pos(bcpt, quadien_global[4*ee+3]) );
+  }
+  std::cout<<"      quadrilateral IEN generated. \n";
+
+  // determine the face-to-element mapping, if we demand it (
+  // meaning this face needs boundary integral); otherwise, set
+  // the face2elem as -1, since we will only need the nodal indices
+  // for Dirichlet type face.
+  std::vector<int> face2elem( bcnumcl, -1 );
+  if( isf2e )
+  {
+    for(int ff=0; ff<bcnumcl; ++ff)
+    {
+      const int node0 = quadien_global[4*ff];
+      const int node1 = quadien_global[4*ff+1];
+      const int node2 = quadien_global[4*ff+2];
+      const int node3 = quadien_global[4*ff+3];
+      bool gotit = false;
+      int ee = -1;
+      while( !gotit && ee < gelem.size() - 1 )
+      {
+        ee += 1;
+        const int vol_elem = gelem[ee];
+        int vnode[8] { vol_IEN[8*vol_elem  ], vol_IEN[8*vol_elem+1],
+                       vol_IEN[8*vol_elem+2], vol_IEN[8*vol_elem+3],
+                       vol_IEN[8*vol_elem+4], vol_IEN[8*vol_elem+5],
+                       vol_IEN[8*vol_elem+6], vol_IEN[8*vol_elem+7]};
+        std::sort(vnode, vnode+8);
+
+        const bool got0 = ( std::find(vnode, vnode+8, node0) != vnode+8 );
+        const bool got1 = ( std::find(vnode, vnode+8, node1) != vnode+8 );
+        const bool got2 = ( std::find(vnode, vnode+8, node2) != vnode+8 );
+        const bool got3 = ( std::find(vnode, vnode+8, node3) != vnode+8 );
+        gotit = got0 && got1 && got2 && got3;
+      }
+
+      // If the boundary surface element is not found, 
+      // we write -1 as the mapping value
+      if(gotit)
+        face2elem[ff] = gelem[ee] + phy_3d_start_index[index_vol];
+      else
+        face2elem[ff] = -1;
+    }
+    std::cout<<"      face2elem mapping generated. \n";
+  }
+
+  // Write the mesh file in vtp format
+  std::vector<DataVecStr<int>> input_vtk_data {};
+  input_vtk_data.push_back({bcpt, "GlobalNodeID", AssociateObject::Node});
+  input_vtk_data.push_back({face2elem, "GlobalElementID", AssociateObject::Cell});
+  HEX_T::write_quad_grid( vtp_file_name, bcnumpt, bcnumcl,
+      quadpt, quadien, input_vtk_data );
+
+  mytimer->Stop();
+  std::cout<<"      Time taken "<<mytimer->get_sec()<<" sec. \n";
+  delete mytimer;
+}
+
 void Gmsh_FileIO::write_vtp(const int &index_sur, const int &index_vol,
   const bool &isf2e ) const
 {
@@ -546,8 +694,21 @@ void Gmsh_FileIO::write_each_vtu() const
     input_vtk_data.push_back({local_node_idx, "GlobalNodeID", AssociateObject::Node});
     input_vtk_data.push_back({local_cell_idx, "GlobalElementID", AssociateObject::Cell});
     input_vtk_data.push_back({ptag, "Physics_tag", AssociateObject::Cell});
-    TET_T::write_tet_grid( vtu_file_name, num_local_node, 
+
+    // Element type of this domain
+    const int Etype = ele_type[phy_3d_index[ii]];
+    if ( Etype == 10 || Etype == 24 )
+    {
+      TET_T::write_tet_grid( vtu_file_name, num_local_node, 
         phy_3d_nElem[ ii ], local_coor, domain_IEN, input_vtk_data, true);
+    }
+    else if ( Etype == 12 || Etype == 29 )
+    {
+      HEX_T::write_hex_grid( vtu_file_name, num_local_node, 
+        phy_3d_nElem[ ii ], local_coor, domain_IEN, input_vtk_data, true);
+    }
+    else
+      SYS_T::print_exit("Error: Gmsh_FileIO::write_each_vtu, undefined element type of domain %d. \n", phy_3d_index[ii] + 1);
 
     mytimer->Stop();
 
@@ -576,6 +737,10 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
   // whole mesh num of node is assumed to be num_node 
   const int wnNode = num_node;
 
+  // Element type of whole mesh.
+  // Now we need all 3d domain use the same element.
+  const int wElemtype = ele_type[phy_3d_index[0]];
+
   // The 3d volumetric elements are list in the order of phy_3d_index.
   // That means, phy_3d_index[0]'s elements come first, then phy_3d_index[1],
   // etc. 
@@ -588,6 +753,9 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
 
     for(int jj=0; jj<phy_3d_nElem[ii]; ++jj)
       wtag.push_back(ii);
+
+    SYS_T::print_exit_if(ele_type[phy_3d_index[ii]] != wElemtype, 
+      "Error: Gmsh_FileIO::write_vtu, 3d domain use different elements. \n" );
   }
 
   std::cout<<"\n    "<<wnElem<<" total elems and "<<wnNode<<" total nodes. \n";
@@ -604,9 +772,18 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
   for(int ii=0; ii<wnElem; ++ii) temp_eid[ii] = ii;
   input_vtk_data.push_back({temp_eid, "GlobalElementID", AssociateObject::Cell});
   
-  
-  TET_T::write_tet_grid( in_fname, wnNode, wnElem, node,
+  if ( wElemtype == 10 || wElemtype == 24 )
+  {
+    TET_T::write_tet_grid( in_fname, wnNode, wnElem, node,
       wIEN, input_vtk_data, isXML ); 
+  }
+  else if ( wElemtype == 12 || wElemtype == 29 )
+  {
+    HEX_T::write_hex_grid( in_fname, wnNode, wnElem, node,
+      wIEN, input_vtk_data, isXML ); 
+  }
+  else
+    SYS_T::print_exit("Error: Gmsh_FileIO::write_vtu, undefined element type. \n" );
 
   mytimer->Stop();
   std::cout<<"    Time taken "<<mytimer->get_sec()<<" sec. \n";
@@ -1187,6 +1364,60 @@ void Gmsh_FileIO::update_quadratic_tet_IEN( const int &index_3d )
     const double temp = eIEN[domain_index][10*ee+8];
     eIEN[domain_index][10*ee+8] = eIEN[domain_index][10*ee+9];
     eIEN[domain_index][10*ee+9] = temp;
+  }
+}
+
+void Gmsh_FileIO::update_quadratic_hex_IEN( const int &index_3d )
+{
+  SYS_T::print_exit_if(index_3d < 0 || index_3d >= num_phy_domain_3d,
+      "Error: input index_3d is out of range.\n");
+
+  const int domain_index = phy_3d_index[ index_3d ];
+
+  const int ne = phy_3d_nElem[ index_3d ];
+
+  const int nlocbas = ele_nlocbas[ domain_index ];
+
+  SYS_T::print_exit_if(nlocbas != 27 || nlocbas != 20, "Error: Gmsh_FileIO updata_quadratic_hex_IEN only works for 27-node or 20-node quadratic element. \n");
+
+  // Now upateing the eIEN array
+  for(int ee=0; ee<ne; ++ee)
+  {
+    const double temp9  = eIEN[domain_index][nlocbas * ee + 9];
+    const double temp10 = eIEN[domain_index][nlocbas * ee + 10];
+    const double temp11 = eIEN[domain_index][nlocbas * ee + 11];
+    const double temp12 = eIEN[domain_index][nlocbas * ee + 12];
+    const double temp13 = eIEN[domain_index][nlocbas * ee + 13];
+    const double temp14 = eIEN[domain_index][nlocbas * ee + 14];
+    const double temp15 = eIEN[domain_index][nlocbas * ee + 15];
+    const double temp16 = eIEN[domain_index][nlocbas * ee + 16];
+    const double temp17 = eIEN[domain_index][nlocbas * ee + 17];
+    const double temp18 = eIEN[domain_index][nlocbas * ee + 18];
+    const double temp19 = eIEN[domain_index][nlocbas * ee + 19];
+    eIEN[domain_index][nlocbas * ee + 9] = temp11;
+    eIEN[domain_index][nlocbas * ee + 10] = temp13;
+    eIEN[domain_index][nlocbas * ee + 11] = temp9;
+    eIEN[domain_index][nlocbas * ee + 12] = temp16;
+    eIEN[domain_index][nlocbas * ee + 13] = temp18;
+    eIEN[domain_index][nlocbas * ee + 14] = temp19;
+    eIEN[domain_index][nlocbas * ee + 15] = temp17;
+    eIEN[domain_index][nlocbas * ee + 16] = temp10;
+    eIEN[domain_index][nlocbas * ee + 17] = temp12;
+    eIEN[domain_index][nlocbas * ee + 18] = temp14;
+    eIEN[domain_index][nlocbas * ee + 19] = temp15;
+    if (nlocbas == 27)
+    {
+      const double temp20 = eIEN[domain_index][27 * ee + 20];
+      const double temp21 = eIEN[domain_index][27 * ee + 21];
+      const double temp22 = eIEN[domain_index][27 * ee + 22];
+      const double temp23 = eIEN[domain_index][27 * ee + 23];
+      const double temp24 = eIEN[domain_index][27 * ee + 24];
+      eIEN[domain_index][27 * ee + 20] = temp22;
+      eIEN[domain_index][27 * ee + 21] = temp23;
+      eIEN[domain_index][27 * ee + 22] = temp21;
+      eIEN[domain_index][27 * ee + 23] = temp24;
+      eIEN[domain_index][27 * ee + 24] = temp20;
+    }
   }
 }
 

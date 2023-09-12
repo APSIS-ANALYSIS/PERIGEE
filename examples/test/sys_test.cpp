@@ -16,34 +16,69 @@
 #include "Matrix_double_6by6_Array.hpp"
 #include "VTK_Tools.hpp"
 #include "NodalBC.hpp"
-#include "Gmsh_FileIO.hpp"
+#include "DataVecStr.hpp"
+#include "Tet_Tools.hpp"
+#include "Hex_Tools.hpp"
+#include "IIEN.hpp"
 
 int main(int argc, char *argv[])
 {
-  // test 1
-  Gmsh_FileIO * GIO_1 = new Gmsh_FileIO( "fsi_cylinder.msh" );
-  GIO_1 -> print_info();
-  GIO_1 -> write_tet_h5(0, {0, 1, 2});
-  GIO_1 -> write_tet_h5(1, {3, 4, 5});
+  std::vector<double> vol_pts1 {0.0, 0.0, 0.0,
+                                1.0, 0.0, 0.0,
+                                1.0, 1.0, 0.0,
+                                0.0, 1.0, 0.0,
+                                0.0, 0.0, 1.0,
+                                1.0, 0.0, 1.0,
+                                1.0, 1.0, 1.0,
+                                0.0, 1.0, 1.0};
+  std::vector<int> vol_ien1 {0,1,2,3,4,5,6,7};
+  IIEN * IEN_v1 = new IEN_FEM(1, vol_ien1);
 
-  delete GIO_1;
+  std::vector<double> vol_pts2 {0.0, 0.0, 0.0, // 0
+                                2.0, 0.0, 0.0, // 1
+                                2.0, 2.0, 0.0, // 2
+                                0.0, 2.0, 0.0, // 3
+                                0.0, 0.0, 2.0, // 4
+                                2.0, 0.0, 2.0, // 5
+                                2.0, 2.0, 2.0, // 6
+                                0.0, 2.0, 2.0, // 7
+                                1.0, 0.0, 0.0, // 8
+                                0.0, 1.0, 0.0, // 9
+                                0.0, 0.0, 1.0, // 10
+                                2.0, 1.0, 0.0, // 11
+                                2.0, 0.0, 1.0, // 12
+                                1.0, 2.0, 0.0, // 13
+                                2.0, 2.0, 1.0, // 14
+                                0.0, 2.0, 1.0, // 15
+                                1.0, 0.0, 2.0, // 16
+                                0.0, 1.0, 2.0, // 17
+                                2.0, 1.0, 2.0, // 18
+                                1.0, 2.0, 2.0, // 19
+                                1.0, 1.0, 0.0, // 20
+                                1.0, 0.0, 1.0, // 21
+                                0.0, 1.0, 1.0, // 22
+                                2.0, 1.0, 1.0, // 23
+                                1.0, 2.0, 1.0, // 24
+                                1.0, 1.0, 2.0, // 25
+                                1.0, 1.0, 1.0};// 26
 
-  // test 2
-  Gmsh_FileIO * GIO_2 = new Gmsh_FileIO( "fsi_beam.msh" );
-  GIO_2 -> print_info();
-  GIO_2 -> write_tet_h5(0, {0, 1, 2, 3, 4, 5});
-  GIO_2 -> write_tet_h5(1, {7, 8, 9, 10, 11, 12});
+  // test for Hex8
+  HEX_T::Hex8 test_hex;
+  test_hex.print_info();
+  std::cout << test_hex.get_aspect_ratio() << '\n' << test_hex.get_volume() << '\n' << std::endl;
 
-  delete GIO_2;
+  test_hex.reset(vol_pts1, IEN_v1, 0);
+  test_hex.print_info();
+  std::cout << test_hex.get_aspect_ratio() << '\n' << test_hex.get_volume() << '\n' << std::endl;
+  delete IEN_v1;
 
-  // test 3
-  Gmsh_FileIO * GIO_3 = new Gmsh_FileIO( "cook_membrane.msh" );
+  test_hex.reset(2, 3, 5, 7, 9, 11, 13, 17);
+  test_hex.print_info();
+  std::cout << test_hex.get_aspect_ratio() << '\n' << test_hex.get_volume() << '\n' << std::endl;
 
-  GIO_3 -> print_info();
-  GIO_3 -> write_tri_h5(0, {0, 1, 2, 3}); // 2d problem
-
-  delete GIO_3;
-
+  test_hex.reset(vol_pts2, 0, 1, 2, 3, 4, 5 ,6, 7);
+  test_hex.print_info();
+  std::cout << test_hex.get_aspect_ratio() << '\n' << test_hex.get_volume() << '\n' << std::endl;
 
   return EXIT_SUCCESS;
 }
