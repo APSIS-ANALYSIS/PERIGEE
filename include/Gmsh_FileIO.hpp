@@ -9,6 +9,7 @@
 // Author: Ju Liu
 // ==================================================================
 #include "Tet_Tools.hpp"
+#include "Hex_Tools.hpp"
 #include "HDF5_Writer.hpp"
 
 class Gmsh_FileIO
@@ -132,6 +133,10 @@ class Gmsh_FileIO
     // many physical volumetric domain, the face2elem mapping is -1.
     // --------------------------------------------------------------
     void write_vtp(const int &index_sur, const int &index_vol,
+        const bool &isf2e = false) const;
+
+    // This temporary function will be merged into write_vtp in the end.
+    void write_quad_vtp(const int &index_sur, const int &index_vol,
         const bool &isf2e = false) const;
   
     // --------------------------------------------------------------
