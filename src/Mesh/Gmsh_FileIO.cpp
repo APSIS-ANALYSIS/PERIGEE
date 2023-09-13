@@ -440,7 +440,7 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
     {
       int total = 0;
       for (int jj{0}; jj < nlocbas_3d; ++jj)
-        total += bcmap[ vol_IEN[nlocbas_3d + jj] ];
+        total += bcmap[ vol_IEN[nlocbas_3d  * ee + jj] ];
       if(total >= nlocbas_2d)
         gelem.push_back(ee);
     }
@@ -1425,7 +1425,7 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
     {
       int total = 0;
       for (int jj{0}; jj < nVertex_3d; ++jj)
-        total += bcmap[ vol_IEN[nlocbas_3d + jj] ];
+        total += bcmap[ vol_IEN[nlocbas_3d * ee + jj] ];
       if(total >= nVertex_2d) 
         gelem.push_back(ee);
     }
