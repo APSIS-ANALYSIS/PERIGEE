@@ -87,10 +87,10 @@ Vector_3 FEAElement_Triangle3_3D_der0::get_normal_out( const int &quaindex,
     double &area ) const
 {
   // Construct a vector from the interior point to the triangle first node
-  const Vector_3 m( sur_pt_x - intpt_x, sur_pt_y - intpt_y, sur_pt_z - intpt_z);
+  const Vector_3 mm( sur_pt_x - intpt_x, sur_pt_y - intpt_y, sur_pt_z - intpt_z);
 
   // Dot product of the defined vector with the calculated normal vector
-  const double mdotn = dot_product( m, un );
+  const double mdotn = dot_product( mm, un );
 
   SYS_T::print_fatal_if( std::abs(mdotn) < 1.0e-10, "Warning: FEAElement_Triangle3_3D_der0::get_normal_out, the element might be ill-shaped.\n");
 
