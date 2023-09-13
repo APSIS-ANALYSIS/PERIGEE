@@ -78,7 +78,6 @@ class Gmsh_FileIO
     // --------------------------------------------------------------
     void update_quadratic_tet_IEN( const int &index_3d );
 
-
     // --------------------------------------------------------------
     // update the IEN array to accomodate for the VTK ordering for
     // quadratic hexahedral elements. For quadratic hexahedral
