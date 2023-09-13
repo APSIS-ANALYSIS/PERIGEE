@@ -6,18 +6,20 @@ void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
     const std::vector<int> &ien_array )
 {
   // Check the input data compatibility
-  if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: TET_T::gen_tet_grid point vector size does not match the number of points. \n");
+  SYS_T::print_exit_if(VEC_T::get_size(pt) != 3*numpts,
+    "Error: TET_T::gen_tet_grid point vector size does not match the number of points. \n");
 
   // detect the element type
   int nlocbas = -1;
   if( int(ien_array.size()) == 4*numcels ) nlocbas = 4;
   else if( int(ien_array.size()) == 10*numcels ) nlocbas = 10;
-  else SYS_T::print_fatal("Error: TET_T::gen_tet_grid ien array size does not match the number of cells. \n");
+  else SYS_T::print_exit("Error: TET_T::gen_tet_grid ien array size does not match the number of cells. \n");
 
   // Check the connectivity array
   std::vector<int> temp = ien_array;
   VEC_T::sort_unique_resize(temp);
-  if( int(temp.size()) != numpts ) SYS_T::print_fatal("Error: TET_T::gen_tet_grid numpts does not match the number of unique points in the ien array. Please re-organize the input. \n");
+  SYS_T::print_exit_if(VEC_T::get_size(temp) != numpts,
+    "Error: TET_T::gen_tet_grid numpts does not match the number of unique points in the ien array. Please re-organize the input. \n");
   VEC_T::clean(temp);
 
   // 1. nodal points coordinates
@@ -86,7 +88,7 @@ void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
 
     cl -> Delete();
   }
-  else SYS_T::print_fatal("Error: TET_T::gen_tet_grid unknown local basis number.\n");
+  else SYS_T::print_exit("Error: TET_T::gen_tet_grid unknown local basis number.\n");
 
   // Add the asepct-ratio to grid_w
   grid_w -> GetCellData() -> AddArray( edge_aspect_ratio );
@@ -172,9 +174,11 @@ void TET_T::gen_triangle_grid( vtkPolyData * const &grid_w,
     const std::vector<int> &ien_array )
 {
   // check the input data compatibility
-  if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: TET_T::gen_triangle_grid point vector size does not match the number of points. \n");
+  SYS_T::print_exit_if(VEC_T::get_size(pt) != 3*numpts,
+    "Error: TET_T::gen_triangle_grid point vector size does not match the number of points. \n");
 
-  if(int(ien_array.size()) != 3*numcels) SYS_T::print_fatal("Error: TET_T::gen_triangle_grid ien array size does not match the number of cells. \n");
+  SYS_T::print_exit_if(VEC_T::get_size(ien_array) != 3*numcels,
+    "Error: TET_T::gen_triangle_grid ien array size does not match the number of cells. \n");
 
   // 1. nodal points
   vtkPoints * ppt = vtkPoints::New();
@@ -247,9 +251,10 @@ void TET_T::gen_quadratic_triangle_grid( vtkUnstructuredGrid * const &grid_w,
     const std::vector<int> &ien_array )
 {
   // check the input data compatibility
-  if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: TET_T::gen_quadratic_triangle_grid point vector size does not match the number of points. \n");
+  SYS_T::print_exit_if(VEC_T::get_size(pt) != 3*numpts,
+    "Error: TET_T::gen_quadratic_triangle_grid point vector size does not match the number of points. \n");
 
-  if(int(ien_array.size()) != 6*numcels) SYS_T::print_fatal("Error: TET_T::gen_quadratic_quadratic_triangle_grid ien array size does not match the number of cells. \n");
+  SYS_T::print_exit_if(VEC_T::get_size(ien_array) != 6*numcels, "Error: TET_T::gen_quadratic_quadratic_triangle_grid ien array size does not match the number of cells. \n");
 
   // 1. nodal points
   vtkPoints * ppt = vtkPoints::New(); 
@@ -327,7 +332,7 @@ Vector_3 TET_T::get_out_normal( const std::string &file,
 
   const int tete0 = gelem[0]; // triangle's associated tet element indices
 
-  SYS_T::print_fatal_if(tete0 == -1, "Error: TET_T::get_out_normal requires the element indices for the vtp file.\n");
+  SYS_T::print_exit_if(tete0 == -1, "Error: TET_T::get_out_normal requires the element indices for the vtp file.\n");
 
   const int ten[4] { vol_ien->get_IEN(tete0, 0), vol_ien->get_IEN(tete0, 1), 
     vol_ien->get_IEN(tete0, 2), vol_ien->get_IEN(tete0, 3) };
@@ -339,7 +344,7 @@ Vector_3 TET_T::get_out_normal( const std::string &file,
     else node_check += 1;
   }
 
-  SYS_T::print_fatal_if(node_check!=3, "Error: TET_T::get_out_normal, the associated tet element is incompatible with the triangle element. \n");
+  SYS_T::print_exit_if(node_check!=3, "Error: TET_T::get_out_normal, the associated tet element is incompatible with the triangle element. \n");
 
   // make cross line-0-1 and line-0-2
   const Vector_3 l01( vol_ctrlPts[3*trn[1]] - vol_ctrlPts[3*trn[0]],
