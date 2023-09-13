@@ -117,7 +117,7 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
 
     // Q = transpose([ e_l1, e_l2, un ])
     Q[qua] = Matrix_3x3( e_l1, e_l2, un[qua] );
-    Q.transpose();
+    Q[qua].transpose();
 
     // Rotated lamina coordinates
     double ctrl_xl [nLocBas], ctrl_yl [nLocBas];
