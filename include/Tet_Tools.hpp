@@ -230,7 +230,7 @@ namespace TET_T
 
       double get_volume() const;
 
-      // get the circumscribing sphere's DIAMETER.
+      // Get the circumscribing sphere's DIAMETER.
       // This is a measure of the mesh size
       double get_diameter() const;
 
