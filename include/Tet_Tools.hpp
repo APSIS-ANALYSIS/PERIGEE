@@ -203,9 +203,9 @@ namespace TET_T
 
       // Generate a tetrahedron with the x-y-z coordinates of the
       // four points given by nodes-vector
-      Tet4( const std::array<Vector_3, 4> &nodes );
+      Tet4( const std::array<Vector_3, 4> &in_nodes );
 
-      Tet4( const std::vector<Vector_3, 4> &input_pts, 
+      Tet4( const std::array<Vector_3, 4> &input_pts, 
           const int &ien0, const int &ien1, 
           const int &ien2, const int &ien3 );
 
@@ -216,6 +216,9 @@ namespace TET_T
       // function.
       void reset( const int &ien0, const int &ien1,
           const int &ien2, const int &ien3 );
+
+      void reset( const std::vector<double> &ctrlPts,
+          const IIEN * const &ien_pt, const int &ee );
 
       double get_aspect_ratio() const;
 
