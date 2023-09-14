@@ -598,9 +598,7 @@ namespace TET_T
     gindex[3] = ien_ptr->get_IEN(ee, 3);
 
     for(int ii=0; ii<4; ++ii)
-    {
       pts[ii] = Vector_3(ctrlPts[gindex[ii]*3], ctrlPts[gindex[ii]*3+1], ctrlPts[gindex[ii]*3+2]);
-    }
   }
 
   void Tet4::print_info() const
@@ -643,12 +641,8 @@ namespace TET_T
 
   double Tet4::get_diameter() const
   {
-    double x, y, z, r;
-    MATH_T::get_tet_sphere_info(
-        pts[0].x(), pts[1].x(), pts[2].x(), pts[3].x(),
-        pts[0].y(), pts[1].y(), pts[2].y(), pts[3].y(),
-        pts[0].z(), pts[1].z(), pts[2].z(), pts[3].z(),
-        x, y, z, r );
+    double r;
+    MATH_T::get_tet_sphere_info( pts[0], pts[1], pts[2], pts[3], r );
 
     return 2.0 * r;
   }
