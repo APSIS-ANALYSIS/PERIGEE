@@ -9,7 +9,7 @@ MaterialModel_Guccione_Incompressible_Mixed::MaterialModel_Guccione_Incompressib
   rho0( in_rho ), Cq(in_C), b_f(in_bf), b_t(in_bt), b_ft(in_bft),
   I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
 {
-  f(0) = fx; f(1) = fy; f(2) = fz;
+  f = Vector_3(fx, fy, fz);
 
   // Check to make sure f is a unit vector
   if( !MATH_T::equals( MATH_T::norm2(fx,fy,fz), 1.0, 1.0e-12) )
@@ -19,7 +19,7 @@ MaterialModel_Guccione_Incompressible_Mixed::MaterialModel_Guccione_Incompressib
   }
 
   // Check to make sure s is a unit vector
-  s(0) = sx; s(1) = sy; s(2) = sz;
+  s = Vector_3(sx, sy, sz);
   if( !MATH_T::equals( MATH_T::norm2(sx, sy, sz), 1.0, 1.0e-12) )
   {
     SYS_T::commPrint("Guccione model, input s vector is not unit.\n");
@@ -55,10 +55,10 @@ MaterialModel_Guccione_Incompressible_Mixed::MaterialModel_Guccione_Incompressib
   b_ft = h5r -> read_doubleScalar("/", "b_ft");
 
   const std::vector<double> temp_f = h5r -> read_doubleVector( "/", "f" );
-  f(0) = temp_f[0]; f(1) = temp_f[1]; f(2) = temp_f[2];
+  f = Vector_3(temp_f[0], temp_f[1], temp_f[2]);
 
   const std::vector<double> temp_s = h5r -> read_doubleVector( "/", "s" );
-  s(0) = temp_s[0]; s(1) = temp_s[1]; s(2) = temp_s[2];
+  s = Vector_3(temp_s[0], temp_s[1], temp_s[2]);
 
   delete h5r; H5Fclose(h5file);
   
