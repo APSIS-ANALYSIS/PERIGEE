@@ -1,4 +1,5 @@
 #include "FEAElement_Quad4_3D_der0.hpp"
+#include "Vector_3.hpp"
 
 FEAElement_Quad4_3D_der0::FEAElement_Quad4_3D_der0( const int &in_nqua )
 : numQuapts( in_nqua )
@@ -71,11 +72,15 @@ void FEAElement_Quad4_3D_der0::buildBasis( const IQuadPts * const &quad,
       dz_dr += ctrl_z[ii] * Rr[ii];
       dz_ds += ctrl_z[ii] * Rs[ii];
     }
-
-    MATH_T::cross3d( dx_dr, dy_dr, dz_dr, dx_ds, dy_ds, dz_ds,
-        unx[qua], uny[qua], unz[qua] );
+    
+    Vector_3 vec1(dx_dr, dy_dr, dz_dr);
+    Vector_3 vec2(dx_ds, dy_ds, dz_ds);
+    Vector_3 un = cross_product(vec1, vec2);
   
-    detJac[qua] = MATH_T::normalize3d( unx[qua], uny[qua], unz[qua] );
+    detJac[qua] = un.normalize();
+    unx[qua] = un.x();
+    uny[qua] = un.y();
+    unz[qua] = un.z();
   }
 }
 
