@@ -16,16 +16,16 @@ class QuadPts_Gauss_Hex : public IQuadPts
     // in_num_pts_y in the s-direction, and in_num_pts_z in the t-direction
     QuadPts_Gauss_Hex( const int &in_num_pts_x, 
         const int &in_num_pts_y, const int &in_num_pts_z,
-        const double &r_min = -1.0, const double &r_max = 1.0,
-        const double &s_min = -1.0, const double &s_max = 1.0,
-        const double &t_min = -1.0, const double &t_max = 1.0 );
+        const double &r_min = 0.0, const double &r_max = 1.0,
+        const double &s_min = 0.0, const double &s_max = 1.0,
+        const double &t_min = 0.0, const double &t_max = 1.0 );
     
     // Construct a quadrature rule with given number of quadrature points in
     // all directions.
     QuadPts_Gauss_Hex( const int &in_num_pts_1d, 
-        const double &r_min = -1.0, const double &r_max = 1.0, 
-        const double &s_min = -1.0, const double &s_max = 1.0,
-        const double &t_min = -1.0, const double &t_max = 1.0 );
+        const double &r_min = 0.0, const double &r_max = 1.0, 
+        const double &s_min = 0.0, const double &s_max = 1.0,
+        const double &t_min = 0.0, const double &t_max = 1.0 );
 
     virtual ~QuadPts_Gauss_Hex();
 
