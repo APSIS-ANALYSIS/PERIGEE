@@ -17,7 +17,7 @@ QuadPts_Gauss_Hex::QuadPts_Gauss_Hex( const int &in_num_pts_x,
   {
     for(int jj = 0; jj<in_num_pts_y; ++jj)
     {
-      for(int ii = 0; ii<in_num_pts_z; ++ii)
+      for(int ii = 0; ii<in_num_pts_x; ++ii)
       {
         qp.push_back( qpg1d_x.get_qp(ii) );
         qp.push_back( qpg1d_y.get_qp(jj) );
