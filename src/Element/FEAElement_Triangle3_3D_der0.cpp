@@ -82,12 +82,10 @@ Vector_3 FEAElement_Triangle3_3D_der0::get_2d_normal_out( const int &quaindex,
 }
 
 Vector_3 FEAElement_Triangle3_3D_der0::get_normal_out( const int &quaindex,
-    const double &sur_pt_x, const double &sur_pt_y, const double &sur_pt_z,
-    const double &intpt_x, const double &intpt_y, const double &intpt_z,
-    double &area ) const
+    const Vector_3 &sur_pt, const Vector_3 &int_pt, double &area ) const
 {
   // Construct a vector from the interior point to the triangle first node
-  const Vector_3 mm( sur_pt_x - intpt_x, sur_pt_y - intpt_y, sur_pt_z - intpt_z);
+  const Vector_3 mm = sur_pt - int_pt;
 
   // Dot product of the defined vector with the calculated normal vector
   const double mdotn = dot_product( mm, un );
