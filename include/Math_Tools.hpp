@@ -8,6 +8,9 @@
 // ============================================================================
 #include <stdio.h>
 #include <vector> 
+#include <random>
+#include <iostream>
+#include <iomanip>
 
 namespace MATH_T
 {
