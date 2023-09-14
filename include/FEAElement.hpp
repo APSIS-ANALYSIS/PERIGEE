@@ -251,15 +251,12 @@ class FEAElement
     {SYS_T::commPrint("Warning: get_normal_out is not implemented. \n");}
 
     virtual Vector_3 get_normal_out( const int &quaindex,
-        const double &sur_pt_x, const double &sur_pt_y,
-        const double &sur_pt_z, const double &intpt_x, 
-        const double &intpt_y, const double &intpt_z,
+        const Vector_3 &sur_pt, const Vector_3 &int_pt, 
         double &length ) const
     {
       SYS_T::commPrint("Warning: get_normal_out is not implemented. \n");
       return Vector_3();
     }
-
 };
 
 #endif
