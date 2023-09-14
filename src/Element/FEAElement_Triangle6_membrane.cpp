@@ -244,12 +244,10 @@ Matrix_3x3 FEAElement_Triangle6_membrane::get_rotationMatrix( const int &quainde
 }
 
 Vector_3 FEAElement_Triangle6_membrane::get_normal_out( const int &qua,
-    const double &sur_pt_x, const double &sur_pt_y, const double &sur_pt_z,
-    const double &intpt_x, const double &intpt_y, const double &intpt_z,
-    double &len ) const
+    const Vector_3 &sur_pt, const Vector_3 &int_pt, double &len ) const
 {
   // Construct a vector starting from the interior point to the triangle
-  const Vector_3 mm( sur_pt_x - intpt_x, sur_pt_y - intpt_y, sur_pt_z - intpt_z );
+  const Vector_3 mm = sur_pt - int_pt;
 
   // Do inner product with the normal vector
   const double mdotn = dot_product( mm, un[qua] );
