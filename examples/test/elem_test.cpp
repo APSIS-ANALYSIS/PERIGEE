@@ -10,117 +10,144 @@ int main( int argc, char * argv[] )
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
   // Test quadrature 1D
-  const int poly_degree = 5;
-  const int num_pts = 4;
-  const double lower_bound = 0;
-  const double upper_bound = 1.0;
-  double integral = 0.0;
-  double integral_qua = 0.0;
-
-  QuadPts_Gauss quad_gauss(num_pts, lower_bound, upper_bound);
-
-  double * coefficient = new double[6] {1.0, 6.9, 3.14, 0.1, 0.05, 0.34};
-  int count = 0;
-  for(int ii = 0; ii<=poly_degree; ++ii)
+  const double left = -1.0;
+  const double right = 1.0;
+  const int max_num = 11;
+  double * coefficient = new double[1024] {};
+  std::random_device rd;
+  std::mt19937_64 gen( rd() );
+  std::uniform_real_distribution<double> dis(left, right);
+  for(int ii = 0; ii<1024; ++ii)
   {
-    double temp = coefficient[ii];
-    for(int qua = 0; qua<num_pts; ++qua)
-    {
-      integral_qua += temp * std::pow(quad_gauss.get_qp(qua), ii) * quad_gauss.get_qw(qua);  
-    }
-    integral += (std::pow(upper_bound, ii+1) - std::pow(lower_bound, ii+1)) * temp/(ii+1);
+    coefficient[ii] = dis(gen);
   }
   std::cout <<"Testing Quadrature 1D:" << std::endl;
-  std::cout << std::setprecision(16) << integral_qua << std::endl;
-  std::cout << std::setprecision(16) << integral << std::endl;
-  std::cout << std::setprecision(16) << integral_qua - integral << std::endl;
+  for(int num_pts = 1; num_pts<max_num; ++num_pts)
+  {
+    const int poly_degree = 2*num_pts-1;
+    const double lower_bound = 0;
+    const double upper_bound = 1.0;
+    double integral = 0.0;
+    double integral_qua = 0.0;
+
+    QuadPts_Gauss quad_gauss(num_pts, lower_bound, upper_bound);
+    int count = 0;
+    for(int ii = 0; ii<=poly_degree; ++ii)
+    {
+      double temp = coefficient[ii];
+      for(int qua = 0; qua<num_pts; ++qua)
+      {
+        integral_qua += temp * std::pow(quad_gauss.get_qp(qua), ii) * quad_gauss.get_qw(qua);  
+      }
+      integral += (std::pow(upper_bound, ii+1) - std::pow(lower_bound, ii+1)) * temp/(ii+1);
+    }
+    std::cout <<"Number of quadrature point:" << num_pts << std::endl;
+    std::cout << std::setprecision(16) << integral_qua << std::endl;
+    std::cout << std::setprecision(16) << integral << std::endl;
+    std::cout << std::setprecision(16) << integral_qua - integral << std::endl;
+  }
   
   // Test quadrature 2D
   // Quad
-  const int poly_degree_x = 2;
-  const int poly_degree_y = 2;
-  const int num_pts_x = 2;
-  const int num_pts_y = 2;
-  const double lower_bound_x = 0.0;
-  const double upper_bound_x = 1.0;
-  const double lower_bound_y = -1.0;
-  const double upper_bound_y = 0.0;
-  double integral_quad = 0.0;
-  double integral_qua_quad = 0.0;
-
-  QuadPts_Gauss_Quad quad_gauss_quad(num_pts_x, num_pts_y,
-    lower_bound_x, upper_bound_x, lower_bound_y, upper_bound_y);
-  
-  count = 0;
-  for(int ii = 0; ii<=poly_degree_x; ++ii)
+  std::cout <<"Testing Quadrature Quad:" << std::endl;
+  for(int num_pts_y = 1; num_pts_y<max_num; ++num_pts_y)
   {
-    for(int jj = 0; jj<=poly_degree_y; ++jj)
-    {
-      double temp = coefficient[count];
-      ++count;
-      for(int qua = 0; qua<num_pts_x*num_pts_y; ++qua)
+    for(int num_pts_x = 1; num_pts_x<max_num; ++num_pts_x)
+    {    
+      const int poly_degree_x = 2*num_pts_x-1;
+      const int poly_degree_y = 2*num_pts_y-1;
+      const double lower_bound_x = 0.0;
+      const double upper_bound_x = 1.0;
+      const double lower_bound_y = -1.0;
+      const double upper_bound_y = 0.0;
+      double integral_quad = 0.0;
+      double integral_qua_quad = 0.0;
+
+      QuadPts_Gauss_Quad quad_gauss_quad(num_pts_x, num_pts_y,
+        lower_bound_x, upper_bound_x, lower_bound_y, upper_bound_y);
+  
+      int count = 0;
+      for(int ii = 0; ii<=poly_degree_x; ++ii)
       {
-        integral_qua_quad += temp * std::pow(quad_gauss_quad.get_qp(qua, 0), ii)
-                                  * std::pow(quad_gauss_quad.get_qp(qua, 1), jj)
-                                  * quad_gauss_quad.get_qw(qua);
+        for(int jj = 0; jj<=poly_degree_y; ++jj)
+        {
+          double temp = coefficient[count];
+          ++count;
+          for(int qua = 0; qua<num_pts_x*num_pts_y; ++qua)
+          {
+            integral_qua_quad += temp * std::pow(quad_gauss_quad.get_qp(qua, 0), ii)
+                                      * std::pow(quad_gauss_quad.get_qp(qua, 1), jj)
+                                      * quad_gauss_quad.get_qw(qua);
+          }
+          integral_quad += (std::pow(upper_bound_x, ii+1) - std::pow(lower_bound_x, ii+1)) / (ii+1)
+                         * (std::pow(upper_bound_y, jj+1) - std::pow(lower_bound_y, jj+1)) / (jj+1)
+                         * temp;
+        }
       }
-      integral_quad += (std::pow(upper_bound_x, ii+1) - std::pow(lower_bound_x, ii+1)) / (ii+1)
-                     * (std::pow(upper_bound_y, jj+1) - std::pow(lower_bound_y, jj+1)) / (jj+1)
-                     * temp;
+      std::cout <<"Number of quadrature point x:" << num_pts_x << std::endl;
+      std::cout <<"Number of quadrature point y:" << num_pts_y << std::endl;
+      std::cout << std::setprecision(16) << integral_qua_quad << std::endl;
+      std::cout << std::setprecision(16) << integral_quad << std::endl;
+      std::cout << std::setprecision(16) << integral_qua_quad - integral_quad << std::endl;
     }
   }
-  std::cout <<"Testing Quadrature Quad:" << std::endl;
-  std::cout << std::setprecision(16) << integral_qua_quad << std::endl;
-  std::cout << std::setprecision(16) << integral_quad << std::endl;
-  std::cout << std::setprecision(16) << integral_qua_quad - integral_quad << std::endl;
 
   // Test quadrature 3D
   // Hex
-  const int poly_degree_xx = 2;
-  const int poly_degree_yy = 2;
-  const int poly_degree_zz = 2;
-  const int num_pts_xx = 2;
-  const int num_pts_yy = 2;
-  const int num_pts_zz = 2;
-  const double lower_bound_xx = 0.0;
-  const double upper_bound_xx = 1.0;
-  const double lower_bound_yy = 0.0;
-  const double upper_bound_yy = 1.0;
-  const double lower_bound_zz = 0.0;
-  const double upper_bound_zz = 1.0;
-  double integral_hex = 0.0;
-  double integral_qua_hex = 0.0;
-
-  QuadPts_Gauss_Hex quad_gauss_hex(num_pts_xx, num_pts_yy, num_pts_zz,
-    lower_bound_xx, upper_bound_xx, lower_bound_yy, upper_bound_yy,
-    lower_bound_zz, upper_bound_zz);
-  count = 0;
-  for(int ii = 0; ii<=poly_degree_xx; ++ii)
+  std::cout <<"Testing Quadrature 3D Hex:" << std::endl;
+  for(int num_pts_zz = 1; num_pts_zz<max_num; ++num_pts_zz)
   {
-    for(int jj = 0; jj<=poly_degree_yy; ++jj)
+    for(int num_pts_yy = 1; num_pts_yy<max_num; ++num_pts_yy)
     {
-      for(int kk = 0; kk<=poly_degree_zz; ++kk)
+      for(int num_pts_xx = 1; num_pts_xx<max_num; ++num_pts_xx)
       {
-        double temp = coefficient[count];
-        ++count;
-        for(int qua = 0; qua<num_pts_xx*num_pts_yy*num_pts_zz; ++qua)
+        const int poly_degree_xx = 2*num_pts_xx-1;
+        const int poly_degree_yy = 2*num_pts_yy-1;
+        const int poly_degree_zz = 2*num_pts_zz-1;
+        const double lower_bound_xx = 0.0;
+        const double upper_bound_xx = 1.0;
+        const double lower_bound_yy = 0.0;
+        const double upper_bound_yy = 1.0;
+        const double lower_bound_zz = 0.0;
+        const double upper_bound_zz = 1.0;
+        double integral_hex = 0.0;
+        double integral_qua_hex = 0.0;
+
+        QuadPts_Gauss_Hex quad_gauss_hex(num_pts_xx, num_pts_yy, num_pts_zz,
+          lower_bound_xx, upper_bound_xx, lower_bound_yy, upper_bound_yy,
+          lower_bound_zz, upper_bound_zz);
+        int count = 0;
+        for(int ii = 0; ii<=poly_degree_xx; ++ii)
         {
-          integral_qua_hex += temp * std::pow(quad_gauss_hex.get_qp(qua, 0), ii)
-                                   * std::pow(quad_gauss_hex.get_qp(qua, 1), jj)
-                                   * std::pow(quad_gauss_hex.get_qp(qua, 2), kk)
-                                   * quad_gauss_hex.get_qw(qua);
+          for(int jj = 0; jj<=poly_degree_yy; ++jj)
+          {
+            for(int kk = 0; kk<=poly_degree_zz; ++kk)
+            {
+              double temp = coefficient[count];
+              ++count;
+              for(int qua = 0; qua<num_pts_xx*num_pts_yy*num_pts_zz; ++qua)
+              {
+                integral_qua_hex += temp * std::pow(quad_gauss_hex.get_qp(qua, 0), ii)
+                                         * std::pow(quad_gauss_hex.get_qp(qua, 1), jj)
+                                         * std::pow(quad_gauss_hex.get_qp(qua, 2), kk)
+                                         * quad_gauss_hex.get_qw(qua);
+              }
+              integral_hex += (std::pow(upper_bound_xx, ii+1) - std::pow(lower_bound_xx, ii+1)) / (ii+1)
+                            * (std::pow(upper_bound_yy, jj+1) - std::pow(lower_bound_yy, jj+1)) / (jj+1)
+                            * (std::pow(upper_bound_zz, kk+1) - std::pow(lower_bound_zz, kk+1)) / (kk+1)
+                            * temp;
+            }
+          }
         }
-        integral_hex += (std::pow(upper_bound_xx, ii+1) - std::pow(lower_bound_xx, ii+1)) / (ii+1)
-                      * (std::pow(upper_bound_yy, jj+1) - std::pow(lower_bound_yy, jj+1)) / (jj+1)
-                      * (std::pow(upper_bound_zz, kk+1) - std::pow(lower_bound_zz, kk+1)) / (kk+1)
-                      * temp;
+        std::cout <<"Number of quadrature point x:" << num_pts_xx << std::endl;
+        std::cout <<"Number of quadrature point y:" << num_pts_yy << std::endl;
+        std::cout <<"Number of quadrature point z:" << num_pts_zz << std::endl;
+        std::cout << std::setprecision(16) << integral_qua_hex << std::endl;
+        std::cout << std::setprecision(16) << integral_hex << std::endl;
+        std::cout << std::setprecision(16) << integral_qua_hex - integral_hex << std::endl;
       }
     }
   }
-  std::cout <<"Testing Quadrature 3D Hex:" << std::endl;
-  std::cout << std::setprecision(16) << integral_qua_hex << std::endl;
-  std::cout << std::setprecision(16) << integral_hex << std::endl;
-  std::cout << std::setprecision(16) << integral_qua_hex - integral_hex << std::endl;
 
   // Test Hex element
   Vector_3 vec1,vec2,vec3;
