@@ -599,9 +599,7 @@ namespace TET_T
 
     for(int ii=0; ii<4; ++ii)
     {
-      pts[ii].x() = ctrlPts[gindex[ii]*3];
-      pts[ii].y() = ctrlPts[gindex[ii]*3+1];
-      pts[ii].z() = ctrlPts[gindex[ii]*3+2];
+      pts[ii] = Vector_3(ctrlPts[gindex[ii]*3], ctrlPts[gindex[ii]*3+1], ctrlPts[gindex[ii]*3+2]);
     }
   }
 
