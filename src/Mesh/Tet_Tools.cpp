@@ -666,6 +666,7 @@ namespace TET_T
 
   double Tet4::get_aspect_ratio() const
   {
+    return TET_T::get_aspect_ratio( std::array<Vector_3, 4> input );
     double edge[6];
     // e01
     edge[0] = MATH_T::norm2(pts[3]-pts[0], pts[4]-pts[1], pts[5]-pts[2]) ;

@@ -203,30 +203,19 @@ namespace TET_T
 
       // Generate a tetrahedron with the x-y-z coordinates of the
       // four points given by nodes-vector
-      Tet4( const std::vector<double> &nodes );
-      
       Tet4( const std::array<Vector_3, 4> &nodes );
 
-      Tet4( const std::vector<double> &ctrlPts, 
+      Tet4( const std::vector<Vector_3, 4> &input_pts, 
           const int &ien0, const int &ien1, 
           const int &ien2, const int &ien3 );
 
       virtual ~Tet4();
-
-      void reset( const std::vector<double> &nodes );
-
-      void reset( const std::vector<double> &ctrlPts,
-          const int &ien0, const int &ien1,
-          const int &ien2, const int &ien3 );
 
       // Changes the gindex array only. It is used to determine
       // the face index, e.g. in ElemBC_3D_tet4::resetTriIEN_outwardnormal
       // function.
       void reset( const int &ien0, const int &ien1,
           const int &ien2, const int &ien3 );
-
-      void reset( const std::vector<double> &ctrlPts,
-          const IIEN * const &ien_pt, const int &ee );
 
       double get_aspect_ratio() const;
 
@@ -240,12 +229,10 @@ namespace TET_T
       // its opposite node number.
       int get_face_id(const int &n0, const int &n1, const int &n2) const;
 
-      void write_vtu( const std::string &fileName ) const;
-
       void print_info() const;
 
     private:
-      double pts[12];
+      std::array<Vector_3, 4> pts;
 
       int gindex[4];
   };
