@@ -56,6 +56,7 @@ int main(int argc, char *argv[])
 
   test_hex.reset(8,7,6,5,4,3,2,1);
   test_hex.print_info();
+  std::cout << test_hex.get_diameter() << std::endl;
   
 
   return EXIT_SUCCESS;
