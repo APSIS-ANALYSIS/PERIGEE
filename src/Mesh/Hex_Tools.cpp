@@ -55,13 +55,11 @@ void HEX_T::gen_hex_grid( vtkUnstructuredGrid * const &grid_w,
 
       grid_w->InsertNextCell( cl->GetCellType(), cl->GetPointIds() );
 
-      std::vector<double> cell_node; cell_node.clear();
+      std::array<Vector_3, 8> cell_node;
       for(int lnode=0; lnode<8; ++lnode)
       {
         int node_offset = 3 * ien_array[8*ii + lnode];
-        cell_node.push_back(pt[node_offset]);
-        cell_node.push_back(pt[node_offset+1]);
-        cell_node.push_back(pt[node_offset+2]);
+        cell_node[lnode] = Vector_3(pt[node_offset], pt[node_offset+1], pt[node_offset+2]);
       }
       edge_aspect_ratio -> InsertNextValue( HEX_T::get_aspect_ratio(cell_node) );
     }
@@ -79,13 +77,11 @@ void HEX_T::gen_hex_grid( vtkUnstructuredGrid * const &grid_w,
 
       grid_w->InsertNextCell( cl->GetCellType(), cl->GetPointIds() );
 
-      std::vector<double> cell_node {};
+      std::array<Vector_3, 8> cell_node;
       for(int lnode=0; lnode<8; ++lnode)
       {
         int node_offset = 3 * ien_array[27*ii + lnode];
-        cell_node.push_back(pt[node_offset]);
-        cell_node.push_back(pt[node_offset+1]);
-        cell_node.push_back(pt[node_offset+2]);
+        cell_node[lnode] = Vector_3(pt[node_offset], pt[node_offset+1], pt[node_offset+2]);
       }
       edge_aspect_ratio -> InsertNextValue( HEX_T::get_aspect_ratio(cell_node) );
     }
@@ -324,33 +320,15 @@ void HEX_T::write_quadratic_quad_grid( const std::string &filename,
   grid_w->Delete();
 }
 
-double HEX_T::get_aspect_ratio( const std::vector<double> &pt )
+double HEX_T::get_aspect_ratio( const std::array<Vector_3, 8> &pt )
 {
-  double edge[12];
-  //e01
-  edge[0] = MATH_T::norm2(pt[3]-pt[0], pt[4]-pt[1], pt[5]-pt[2]);
-  //e12
-  edge[1] = MATH_T::norm2(pt[6]-pt[3], pt[7]-pt[4], pt[8]-pt[5]);
-  //e23
-  edge[2] = MATH_T::norm2(pt[9]-pt[6], pt[10]-pt[7], pt[11]-pt[8]);
-  //e03
-  edge[3] = MATH_T::norm2(pt[9]-pt[0], pt[10]-pt[1], pt[11]-pt[2]);
-  //e45
-  edge[4] = MATH_T::norm2(pt[15]-pt[12], pt[16]-pt[13], pt[17]-pt[14]);
-  //e56
-  edge[5] = MATH_T::norm2(pt[18]-pt[15], pt[19]-pt[16], pt[20]-pt[17]);
-  //e67
-  edge[6] = MATH_T::norm2(pt[21]-pt[18], pt[22]-pt[19], pt[23]-pt[20]);
-  //e47
-  edge[7] = MATH_T::norm2(pt[21]-pt[12], pt[22]-pt[13], pt[23]-pt[14]);
-  //e04
-  edge[8] = MATH_T::norm2(pt[12]-pt[0], pt[13]-pt[1], pt[14]-pt[2]);
-  //e15
-  edge[9] = MATH_T::norm2(pt[15]-pt[3], pt[16]-pt[4], pt[17]-pt[5]);
-  //e26
-  edge[10] = MATH_T::norm2(pt[18]-pt[6], pt[19]-pt[7], pt[20]-pt[8]);
-  //e37
-  edge[11] = MATH_T::norm2(pt[21]-pt[9], pt[22]-pt[10], pt[23]-pt[11]);
+  // e01, e12, e23, e03, e45, e56, e67, e47, e04, e15, e26, e37
+  const double edge[12] {(pt[1] - pt[0]).norm2(), (pt[2] - pt[1]).norm2(),
+                         (pt[3] - pt[2]).norm2(), (pt[3] - pt[0]).norm2(),
+                         (pt[5] - pt[4]).norm2(), (pt[6] - pt[5]).norm2(),
+                         (pt[7] - pt[6]).norm2(), (pt[7] - pt[4]).norm2(),
+                         (pt[4] - pt[0]).norm2(), (pt[5] - pt[1]).norm2(),
+                         (pt[6] - pt[2]).norm2(), (pt[7] - pt[3]).norm2()};
 
   const double emax = *std::max_element(edge, edge+12);
   const double emin = *std::min_element(edge, edge+12);
@@ -422,15 +400,14 @@ namespace HEX_T
 {
   Hex8::Hex8()
   {
-    pts.resize(24);
-    pts[0]  = -1.0; pts[1]  = -1.0; pts[2]  = -1.0;
-    pts[3]  =  1.0; pts[4]  = -1.0; pts[5]  = -1.0;
-    pts[6]  =  1.0; pts[7]  =  1.0; pts[8]  = -1.0;
-    pts[9]  = -1.0; pts[10] =  1.0; pts[11] = -1.0;
-    pts[12] = -1.0; pts[13] = -1.0; pts[14] =  1.0;
-    pts[15] =  1.0; pts[16] = -1.0; pts[17] =  1.0;
-    pts[18] =  1.0; pts[19] =  1.0; pts[20] =  1.0;
-    pts[21] = -1.0; pts[22] =  1.0; pts[23] =  1.0;
+    pts[0] = Vector_3(-1.0, -1.0, -1.0);
+    pts[1] = Vector_3( 1.0, -1.0, -1.0);
+    pts[2] = Vector_3( 1.0,  1.0, -1.0);
+    pts[3] = Vector_3(-1.0,  1.0, -1.0);
+    pts[4] = Vector_3(-1.0, -1.0,  1.0);
+    pts[5] = Vector_3( 1.0, -1.0,  1.0);
+    pts[6] = Vector_3( 1.0,  1.0,  1.0);
+    pts[7] = Vector_3(-1.0,  1.0,  1.0);
 
     gindex[0] = 0; gindex[1] = 1;
     gindex[2] = 2; gindex[3] = 3;
@@ -438,13 +415,10 @@ namespace HEX_T
     gindex[6] = 6; gindex[7] = 7;
   }
 
-  Hex8::Hex8( const std::vector<double> &in_nodes )
-  {
-    pts.resize(24);
-    SYS_T::print_exit_if( in_nodes.size() != 24,
-      "Error: input nodal list shall have 8 nodes with xyz-coordinates. \n");
-    
-    for(int ii=0; ii<24; ++ii) pts[ii] = in_nodes[ii];
+  Hex8::Hex8( const std::array<Vector_3, 8> &in_nodes )
+  {   
+    for(int ii=0; ii<8; ++ii)
+      pts[ii] = in_nodes[ii];
 
     gindex[0] = 0; gindex[1] = 1;
     gindex[2] = 2; gindex[3] = 3;
@@ -452,58 +426,22 @@ namespace HEX_T
     gindex[6] = 6; gindex[7] = 7;
   }
 
-  Hex8::Hex8( const std::vector<double> &ctrlPts,
+  Hex8::Hex8( const std::array<Vector_3, 8> &input_pts,
           const int &ien0, const int &ien1, const int &ien2,
           const int &ien3, const int &ien4, const int &ien5,
           const int &ien6, const int &ien7 )
   {
-    pts.resize(24);
     gindex[0] = ien0; gindex[1] = ien1;
     gindex[2] = ien2; gindex[3] = ien3;
     gindex[4] = ien4; gindex[5] = ien5;
     gindex[6] = ien6; gindex[7] = ien7;
 
     for(int ii=0; ii<8; ++ii)
-    {
-      pts[ii*3]   = ctrlPts[gindex[ii]*3];
-      pts[ii*3+1] = ctrlPts[gindex[ii]*3+1];
-      pts[ii*3+2] = ctrlPts[gindex[ii]*3+2];
-    }
+      pts[ii] = input_pts[ii];
   }
 
   Hex8::~Hex8()
   {
-  }
-
-  void Hex8::reset( const std::vector<double> &in_nodes )
-  {
-    SYS_T::print_exit_if( in_nodes.size() != 24,
-      "Error: input nodal list shall have 8 nodes with xyz-coordinates. \n");
-    
-    for(int ii=0; ii<24; ++ii) pts[ii] = in_nodes[ii];
-
-    gindex[0] = 0; gindex[1] = 1;
-    gindex[2] = 2; gindex[3] = 3;
-    gindex[4] = 4; gindex[5] = 5;
-    gindex[6] = 6; gindex[7] = 7;
-  }
-
-  void Hex8::reset( const std::vector<double> &ctrlPts,
-          const int &ien0, const int &ien1, const int &ien2,
-          const int &ien3, const int &ien4, const int &ien5,
-          const int &ien6, const int &ien7 )
-  {
-    gindex[0] = ien0; gindex[1] = ien1;
-    gindex[2] = ien2; gindex[3] = ien3;
-    gindex[4] = ien4; gindex[5] = ien5;
-    gindex[6] = ien6; gindex[7] = ien7;
-
-    for(int ii=0; ii<8; ++ii)
-    {
-      pts[ii*3]   = ctrlPts[gindex[ii]*3];
-      pts[ii*3+1] = ctrlPts[gindex[ii]*3+1];
-      pts[ii*3+2] = ctrlPts[gindex[ii]*3+2];
-    }
   }
 
   void Hex8::reset( const int &ien0, const int &ien1,
@@ -529,11 +467,7 @@ namespace HEX_T
     gindex[7] = ien_ptr->get_IEN(ee, 7);
 
     for(int ii=0; ii<8; ++ii)
-    {
-      pts[ii*3]   = ctrlPts[gindex[ii]*3];
-      pts[ii*3+1] = ctrlPts[gindex[ii]*3+1];
-      pts[ii*3+2] = ctrlPts[gindex[ii]*3+2];
-    }
+      pts[ii] = Vector_3(ctrlPts[gindex[ii]*3], ctrlPts[gindex[ii]*3+1], ctrlPts[gindex[ii]*3+2]);
   }
 
   void Hex8::print_info() const
@@ -542,58 +476,29 @@ namespace HEX_T
     std::cout<<" -- global indices: "<<'\n'<<gindex[0]<<'\t';
     std::cout<<gindex[1]<<'\t'<<gindex[2]<<'\t'<<gindex[3]<<'\t';
     std::cout<<gindex[4]<<'\t'<<gindex[5]<<'\t'<<gindex[6]<<'\t'<<gindex[7]<<'\n';
-    std::cout<<" -- pt0 : "<<pts[0]<<'\t'<<pts[1]<<'\t'<<pts[2]<<'\n';
-    std::cout<<" -- pt1 : "<<pts[3]<<'\t'<<pts[4]<<'\t'<<pts[5]<<'\n';
-    std::cout<<" -- pt2 : "<<pts[6]<<'\t'<<pts[7]<<'\t'<<pts[8]<<'\n';
-    std::cout<<" -- pt3 : "<<pts[9]<<'\t'<<pts[10]<<'\t'<<pts[11]<<'\n';
-    std::cout<<" -- pt4 : "<<pts[12]<<'\t'<<pts[13]<<'\t'<<pts[14]<<'\n';
-    std::cout<<" -- pt5 : "<<pts[15]<<'\t'<<pts[16]<<'\t'<<pts[17]<<'\n';
-    std::cout<<" -- pt6 : "<<pts[18]<<'\t'<<pts[19]<<'\t'<<pts[20]<<'\n';
-    std::cout<<" -- pt7 : "<<pts[21]<<'\t'<<pts[22]<<'\t'<<pts[23]<<std::endl;
+    std::cout<<" -- pt0 : "<<pts[0].x()<<'\t'<<pts[0].y()<<'\t'<<pts[0].z()<<'\n';
+    std::cout<<" -- pt1 : "<<pts[1].x()<<'\t'<<pts[1].y()<<'\t'<<pts[1].z()<<'\n';
+    std::cout<<" -- pt2 : "<<pts[2].x()<<'\t'<<pts[2].y()<<'\t'<<pts[2].z()<<'\n';
+    std::cout<<" -- pt3 : "<<pts[3].x()<<'\t'<<pts[3].y()<<'\t'<<pts[3].z()<<'\n';
+    std::cout<<" -- pt4 : "<<pts[4].x()<<'\t'<<pts[4].y()<<'\t'<<pts[4].z()<<'\n';
+    std::cout<<" -- pt5 : "<<pts[5].x()<<'\t'<<pts[5].y()<<'\t'<<pts[5].z()<<'\n';
+    std::cout<<" -- pt6 : "<<pts[6].x()<<'\t'<<pts[6].y()<<'\t'<<pts[6].z()<<'\n';
+    std::cout<<" -- pt7 : "<<pts[7].x()<<'\t'<<pts[7].y()<<'\t'<<pts[7].z()<<std::endl;
   }
 
   double Hex8::get_aspect_ratio() const
   {
-    double edge[12];
-    //e01
-    edge[0] = MATH_T::norm2(pts[3]-pts[0], pts[4]-pts[1], pts[5]-pts[2]);
-    //e12
-    edge[1] = MATH_T::norm2(pts[6]-pts[3], pts[7]-pts[4], pts[8]-pts[5]);
-    //e23
-    edge[2] = MATH_T::norm2(pts[9]-pts[6], pts[10]-pts[7], pts[11]-pts[8]);
-    //e03
-    edge[3] = MATH_T::norm2(pts[9]-pts[0], pts[10]-pts[1], pts[11]-pts[2]);
-    //e45
-    edge[4] = MATH_T::norm2(pts[15]-pts[12], pts[16]-pts[13], pts[17]-pts[14]);
-    //e56
-    edge[5] = MATH_T::norm2(pts[18]-pts[15], pts[19]-pts[16], pts[20]-pts[17]);
-    //e67
-    edge[6] = MATH_T::norm2(pts[21]-pts[18], pts[22]-pts[19], pts[23]-pts[20]);
-    //e47
-    edge[7] = MATH_T::norm2(pts[21]-pts[12], pts[22]-pts[13], pts[23]-pts[14]);
-    //e04
-    edge[8] = MATH_T::norm2(pts[12]-pts[0], pts[13]-pts[1], pts[14]-pts[2]);
-    //e15
-    edge[9] = MATH_T::norm2(pts[15]-pts[3], pts[16]-pts[4], pts[17]-pts[5]);
-    //e26
-    edge[10] = MATH_T::norm2(pts[18]-pts[6], pts[19]-pts[7], pts[20]-pts[8]);
-    //e37
-    edge[11] = MATH_T::norm2(pts[21]-pts[9], pts[22]-pts[10], pts[23]-pts[11]);
-
-    const double emax = *std::max_element(edge, edge+12);
-    const double emin = *std::min_element(edge, edge+12);
-
-    return emax / emin;
+    return HEX_T::get_aspect_ratio(pts);
   }
 
   double Hex8::get_volume() const
   {
-    TET_T::Tet4 tet1(pts, 0, 1, 3, 7);
-    TET_T::Tet4 tet2(pts, 0, 4, 1, 7);
-    TET_T::Tet4 tet3(pts, 1, 4, 5, 7);
-    TET_T::Tet4 tet4(pts, 1, 2, 3, 7);
-    TET_T::Tet4 tet5(pts, 1, 5, 6, 7);
-    TET_T::Tet4 tet6(pts, 1, 6, 2, 7);
+    TET_T::Tet4 tet1(std::array<Vector_3, 4> {pts[0], pts[1], pts[3], pts[7]});
+    TET_T::Tet4 tet2(std::array<Vector_3, 4> {pts[0], pts[4], pts[1], pts[7]});
+    TET_T::Tet4 tet3(std::array<Vector_3, 4> {pts[1], pts[4], pts[5], pts[7]});
+    TET_T::Tet4 tet4(std::array<Vector_3, 4> {pts[1], pts[2], pts[3], pts[7]});
+    TET_T::Tet4 tet5(std::array<Vector_3, 4> {pts[1], pts[5], pts[6], pts[7]});
+    TET_T::Tet4 tet6(std::array<Vector_3, 4> {pts[1], pts[6], pts[2], pts[7]});
 
     return tet1.get_volume() + tet2.get_volume() + tet3.get_volume() + tet4.get_volume() + tet5.get_volume() + tet6.get_volume();
   }

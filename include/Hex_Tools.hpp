@@ -159,7 +159,7 @@ namespace HEX_T
   //   for quadratic hexes, the aspect ratio is calculated by extracting
   //   its eight vertices and ignoring the mid-edge points.
   // ----------------------------------------------------------------
-  double get_aspect_ratio( const std::vector<double> &coors );
+  double get_aspect_ratio( const std::array<Vector_3, 8> &pt );
 
   // ================================================================
   // 3. Hex8 class defines a four node linear tetrahedron object with 
@@ -185,21 +185,14 @@ namespace HEX_T
 
       // Generate a hexahedron with the x-y-z coordinates of the
       // eight points given by nodes-vector
-      Hex8( const std::vector<double> &in_nodes );
+      Hex8( const std::array<Vector_3, 8> &in_nodes );
 
-      Hex8( const std::vector<double> &ctrlPts,
+      Hex8( const std::array<Vector_3, 8> &input_pts,
           const int &ien0, const int &ien1, const int &ien2,
           const int &ien3, const int &ien4, const int &ien5,
           const int &ien6, const int &ien7 );
 
       virtual ~Hex8();
-      
-      void reset( const std::vector<double> &in_nodes );
-
-      void reset( const std::vector<double> &ctrlPts,
-          const int &ien0, const int &ien1, const int &ien2,
-          const int &ien3, const int &ien4, const int &ien5,
-          const int &ien6, const int &ien7 );
       
       // Changes the gindex array only. It is used to determine
       // the face index, e.g. in ElemBC_3D_hex8::resetQuadIEN_outwardnormal
@@ -218,7 +211,7 @@ namespace HEX_T
       double get_volume() const;
 
     private:
-      std::vector<double> pts;
+      std::array<Vector_3, 8> pts;
 
       int gindex[8];
   };

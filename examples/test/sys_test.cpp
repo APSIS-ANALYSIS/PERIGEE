@@ -40,6 +40,24 @@ int main(int argc, char *argv[])
 
   delete IEN_v;
 
+  std::array<Vector_3, 8> node;
+  node[0] = Vector_3(0.0, 0.0, 0.0);
+  node[1] = Vector_3(1.0, 0.0, 0.0);
+  node[2] = Vector_3(1.0, 1.0, 0.0);
+  node[3] = Vector_3(0.0, 1.0, 0.0);
+  node[4] = Vector_3(0.0, 0.0, 1.0);
+  node[5] = Vector_3(1.0, 0.0, 1.0);
+  node[6] = Vector_3(1.0, 1.0, 1.0);
+  node[7] = Vector_3(0.0, 1.0, 1.0);
+
+  HEX_T::Hex8 test_hex(node, 11, 13, 17, 19, 23, 29, 31, 37);
+  test_hex.print_info();
+  std::cout << test_hex.get_aspect_ratio() << '\n' << test_hex.get_volume() << '\n' << std::endl;
+
+  test_hex.reset(8,7,6,5,4,3,2,1);
+  test_hex.print_info();
+  
+
   return EXIT_SUCCESS;
 }
 
