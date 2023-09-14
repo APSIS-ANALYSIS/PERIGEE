@@ -133,7 +133,7 @@ namespace TET_T
   //   for quadratic tets, the aspect ratio is calculated by extracting
   //   its four vertices and ignoring the mid-edge points.
   // ----------------------------------------------------------------
-  double get_aspect_ratio( const std::vector<double> &coors );
+  double get_aspect_ratio( const std::array<Vector_3, 4> &coors );
 
   // ----------------------------------------------------------------
   // ! get_out_normal:
@@ -204,6 +204,8 @@ namespace TET_T
       // Generate a tetrahedron with the x-y-z coordinates of the
       // four points given by nodes-vector
       Tet4( const std::vector<double> &nodes );
+      
+      Tet4( const std::array<Vector_3, 4> &nodes );
 
       Tet4( const std::vector<double> &ctrlPts, 
           const int &ien0, const int &ien1, 

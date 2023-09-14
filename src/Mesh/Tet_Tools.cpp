@@ -51,13 +51,11 @@ void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
 
       grid_w->InsertNextCell( cl->GetCellType(), cl->GetPointIds() );
 
-      std::vector<double> cell_node; cell_node.clear();
+      std::array<Vector_3, 4> cell_node;
       for(int lnode=0; lnode<4; ++lnode)
       {
-        int node_offset = 3 * ien_array[4*ii + lnode];
-        cell_node.push_back(pt[node_offset]);
-        cell_node.push_back(pt[node_offset+1]);
-        cell_node.push_back(pt[node_offset+2]);
+        const int node_offset = 3 * ien_array[4*ii + lnode];
+        cell_node[lnode] = Vector_3( pt[node_offset], pt[node_offset+1], pt[node_offset+2] );
       }
       edge_aspect_ratio -> InsertNextValue( TET_T::get_aspect_ratio(cell_node) );
     }
@@ -75,13 +73,11 @@ void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
 
       grid_w->InsertNextCell( cl->GetCellType(), cl->GetPointIds() );
 
-      std::vector<double> cell_node; cell_node.clear();
+      std::array<Vector_3, 4> cell_node;
       for(int lnode=0; lnode<4; ++lnode)
       {
-        int node_offset = 3 * ien_array[10*ii + lnode];
-        cell_node.push_back(pt[node_offset]);
-        cell_node.push_back(pt[node_offset+1]);
-        cell_node.push_back(pt[node_offset+2]);
+        const int node_offset = 3 * ien_array[10*ii + lnode];
+        cell_node[lnode] = Vector_3( pt[node_offset], pt[node_offset+1], pt[node_offset+2] );
       }
       edge_aspect_ratio -> InsertNextValue( TET_T::get_aspect_ratio(cell_node) );
     }
@@ -289,21 +285,12 @@ void TET_T::gen_quadratic_triangle_grid( vtkUnstructuredGrid * const &grid_w,
   cl -> Delete();
 }
 
-double TET_T::get_aspect_ratio( const std::vector<double> &pt )
+double TET_T::get_aspect_ratio( const std::array<Vector_3, 4> &pt )
 {
-  double edge[6];
-  // e01
-  edge[0] = MATH_T::norm2(pt[3]-pt[0], pt[4]-pt[1], pt[5]-pt[2]) ;
-  // e12
-  edge[1] = MATH_T::norm2(pt[6]-pt[3], pt[7]-pt[4], pt[8]-pt[5]) ;
-  // e02
-  edge[2] = MATH_T::norm2(pt[6]-pt[0], pt[7]-pt[1], pt[8]-pt[2]) ;
-  // e03
-  edge[3] = MATH_T::norm2(pt[9]-pt[0], pt[10]-pt[1], pt[11]-pt[2]) ;
-  // e13
-  edge[4] = MATH_T::norm2(pt[9]-pt[3], pt[10]-pt[4], pt[11]-pt[5]) ;
-  // e23
-  edge[5] = MATH_T::norm2(pt[9]-pt[6], pt[10]-pt[7], pt[11]-pt[8]) ;
+  // edges e01, e12, e02, e03, e13, e23
+  const double edge[6] { (pt[1] - pt[0]).norm2(), (pt[2] - pt[1]).norm2(),
+    ( pt[2] - pt[0] ).norm2(), ( pt[3] - pt[0] ).norm2(),
+    ( pt[3] - pt[1] ).norm2(), ( pt[3] - pt[2] ).norm2() };
 
   const double emax = *std::max_element(edge, edge+6);
   const double emin = *std::min_element(edge, edge+6);
@@ -568,6 +555,28 @@ namespace TET_T
 
     for(int ii=0; ii<12; ++ii) pts[ii] = in_nodes[ii];
 
+    gindex[0] = 0; gindex[1] = 1;
+    gindex[2] = 2; gindex[3] = 3;
+  }
+
+  Tet4::Tet4( const std::array<Vector_3, 4> &in_nodes )
+  {
+    pts[0]  = in_nodes[0].x();
+    pts[1]  = in_nodes[0].y();
+    pts[2]  = in_nodes[0].z();
+    
+    pts[3]  = in_nodes[1].x(); 
+    pts[4]  = in_nodes[1].y();
+    pts[5]  = in_nodes[1].z();
+    
+    pts[6]  = in_nodes[2].x();
+    pts[7]  = in_nodes[2].y();
+    pts[8]  = in_nodes[2].z();
+    
+    pts[9]  = in_nodes[3].x();
+    pts[10] = in_nodes[3].y();
+    pts[11] = in_nodes[3].z();
+    
     gindex[0] = 0; gindex[1] = 1;
     gindex[2] = 2; gindex[3] = 3;
   }
