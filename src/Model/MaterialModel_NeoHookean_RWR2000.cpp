@@ -59,9 +59,9 @@ void MaterialModel_NeoHookean_RWR2000::write_hdf5( const char * const &fname ) c
 }
 
 void MaterialModel_NeoHookean_RWR2000::get_PK( 
-    const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S ) const
+    const Tensor2_3D &F, Tensor2_3D &P, Tensor2_3D &S ) const
 {
-  Matrix_3x3 Cinv; Cinv.MatMultTransposeLeft(F);
+  Tensor2_3D Cinv; Cinv.MatMultTransposeLeft(F);
   Cinv.inverse();
   const double ln_detF = std::log( F.det() );
   S.gen_id(); S.scale( mu );
@@ -70,9 +70,9 @@ void MaterialModel_NeoHookean_RWR2000::get_PK(
 }
 
 void MaterialModel_NeoHookean_RWR2000::get_PK_Stiffness( 
-    const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &CC) const
+    const Tensor2_3D &F, Tensor2_3D &P, Tensor2_3D &S, Tensor4_3D &CC) const
 {
-  Matrix_3x3 Cinv; Cinv.MatMultTransposeLeft(F);
+  Tensor2_3D Cinv; Cinv.MatMultTransposeLeft(F);
   Cinv.inverse();
   const double ln_detF = std::log( F.det() );
   
@@ -86,9 +86,9 @@ void MaterialModel_NeoHookean_RWR2000::get_PK_Stiffness(
   CC.add_SymmProduct(val1, Cinv, Cinv);
 }
 
-double MaterialModel_NeoHookean_RWR2000::get_strain_energy( const Matrix_3x3 &F ) const
+double MaterialModel_NeoHookean_RWR2000::get_strain_energy( const Tensor2_3D &F ) const
 {
-  Matrix_3x3 C; C.MatMultTransposeLeft(F);
+  Tensor2_3D C; C.MatMultTransposeLeft(F);
   const double lnJ = std::log( F.det() );
   return 0.5 * mu * (C.tr() - 3.0) - mu * lnJ + 0.5 * kappa * lnJ * lnJ;
 }
