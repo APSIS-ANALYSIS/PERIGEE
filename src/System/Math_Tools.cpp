@@ -173,25 +173,6 @@ double MATH_T::get_std_dev( const std::vector<double> &vec )
   return std::sqrt( sum / nn );
 }
 
-void MATH_T::gen_Gaussian( const int &n, const double &mean, 
-    const double &std, std::vector<double> &val )
-{
-  const int m = n + n % 2;
-  val.resize(m);
-  for ( int ii = 0; ii < m; ii += 2 )
-  {
-    double x,y,rsq,f;
-    do {
-      x = 2.0 * rand() / (double)RAND_MAX - 1.0;
-      y = 2.0 * rand() / (double)RAND_MAX - 1.0;
-      rsq = x * x + y * y;
-    }while( rsq >= 1. || rsq == 0. );
-    f = std::sqrt( -2.0 * log(rsq) / rsq );
-    val[ii]   = mean + std * x * f;
-    val[ii+1] = mean + std * y * f;
-  }
-}
-
 void MATH_T::print_Histogram( const std::vector<double> &val )
 {
   const int width = 50;

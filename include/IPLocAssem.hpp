@@ -503,14 +503,14 @@ class IPLocAssem
         const double * const &sol_wall_disp,
         const FEAElement * const &element,
         const double * const &ele_youngsmod,
-        std::vector<Matrix_3x3> &stress )
+        std::vector<Tensor2_3D> &stress )
     {
       SYS_T::commPrint("Warning: get_Wall_CauchyStress() is not implemented. \n");
     }
 
     // Calculate the Cauchy stress at every quadrature points
     // within this element. The output stress has length quad -> get_num_quadPts()
-    virtual std::vector<Matrix_3x3> get_Wall_CauchyStress(
+    virtual std::vector<Tensor2_3D> get_Wall_CauchyStress(
         const double * const &disp,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
@@ -519,7 +519,7 @@ class IPLocAssem
         const IQuadPts * const &quad ) const
     {
       SYS_T::commPrint("Warning: get_CauchyStress() is not implemented. \n");
-      std::vector<Matrix_3x3> output; output.clear(); 
+      std::vector<Tensor2_3D> output; output.clear(); 
       return output;
     }
 

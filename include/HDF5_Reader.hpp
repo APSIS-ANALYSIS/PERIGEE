@@ -35,7 +35,7 @@
 #include "Sys_Tools.hpp"
 #include "Vec_Tools.hpp"
 #include "Vector_3.hpp"
-#include "Matrix_3x3.hpp"
+#include "Tensor2_3D.hpp"
 #include "hdf5.h"
 
 class HDF5_Reader
@@ -95,9 +95,9 @@ class HDF5_Reader
         const char * const &data_name ) const;
 
     // --------------------------------------------------------------
-    // ! read_Matrix_3x3 : output the Matrix_3x3 object.
+    // ! read_Tensor2_3D : output the Tensor2_3D object.
     // --------------------------------------------------------------
-    Matrix_3x3 read_Matrix_3x3( const char * const &group_name,
+    Tensor2_3D read_Tensor2_3D( const char * const &group_name,
         const char * const &data_name ) const;
 
     // --------------------------------------------------------------

@@ -61,26 +61,26 @@ void MaterialModel_StVenant_Kirchhoff::write_hdf5( const char * const &fname ) c
 }
 
 void MaterialModel_StVenant_Kirchhoff::get_PK( 
-		const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S ) const
+		const Tensor2_3D &F, Tensor2_3D &P, Tensor2_3D &S ) const
 {
-  Matrix_3x3 G; G.MatMultTransposeLeft(F); G.AXPY(-1.0, I); G.scale(0.5);
+  Tensor2_3D G; G.MatMultTransposeLeft(F); G.AXPY(-1.0, I); G.scale(0.5);
   S.gen_id(); S.scale(lambda * G.tr());
   S.AXPY(2.0 * mu, G); P.MatMult(F, S);
 }
 
 void MaterialModel_StVenant_Kirchhoff::get_PK_Stiffness( 
-		const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &CC) const
+		const Tensor2_3D &F, Tensor2_3D &P, Tensor2_3D &S, Tensor4_3D &CC) const
 {
-  Matrix_3x3 G; G.MatMultTransposeLeft(F); G.AXPY(-1.0, I);  G.scale(0.5);
+  Tensor2_3D G; G.MatMultTransposeLeft(F); G.AXPY(-1.0, I);  G.scale(0.5);
   S.gen_id(); S.scale(lambda * G.tr()); S.AXPY(2.0 * mu, G);
   P.MatMult(F, S);
   CC.gen_symm_id(); CC.scale(2.0 * mu);
   CC.add_OutProduct(lambda, I, I);
 }
 
-double MaterialModel_StVenant_Kirchhoff::get_strain_energy( const Matrix_3x3 &F ) const
+double MaterialModel_StVenant_Kirchhoff::get_strain_energy( const Tensor2_3D &F ) const
 {
-  Matrix_3x3 G; G.MatMultTransposeLeft(F); G.AXPY(-1.0, I); G.scale(0.5);
+  Tensor2_3D G; G.MatMultTransposeLeft(F); G.AXPY(-1.0, I); G.scale(0.5);
   const double trG = G.tr();
   G.MatMult(G,G);
   const double trG2 = G.tr();

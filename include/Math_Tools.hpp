@@ -171,13 +171,16 @@ namespace MATH_T
   double get_std_dev( const std::vector<double> &vec );
   
   // ----------------------------------------------------------------
-  // Generate a Gaussian distribution vector with length n, mean value
-  // mean, and standard deviation dev, using Marsaglia algorithm
-  //
-  // Note: Call srand((unsigned int)time(NULL)) before calling this generator!
+  // Generate a Gaussian/normal distribution random value with mean value
+  // mean, and standard deviation dev.
   // ----------------------------------------------------------------
-  void gen_Gaussian( const int &n, const double &mean, const double &std,
-      std::vector<double> &val );
+  inline double gen_double_rand_normal( const double &mean, const double &std )
+  {
+    std::random_device rd;
+    std::mt19937_64 gen( rd() );
+    std::normal_distribution<double> dis(mean, std);
+    return dis(gen);
+  }
 
   // ----------------------------------------------------------------
   // gen_int_rand and gen_double_rand

@@ -68,7 +68,7 @@ class PLocAssem_Tet_Wall_Prestress : public IPLocAssem
         const double * const &sol_wall_disp,
         const FEAElement * const &element,
         const double * const &ele_youngsmod,
-        std::vector<Matrix_3x3> &stress );
+        std::vector<Tensor2_3D> &stress );
 
   private:
     // Private data

@@ -1,8 +1,8 @@
-#ifndef MATRIX_3X3_HPP
-#define MATRIX_3X3_HPP
+#ifndef TENSOR2_3D_HPP
+#define TENSOR2_3D_HPP
 // ============================================================================
-// Matrix_3x3.hpp
-// This is a 3 x 3 matrix class. The components are stored in a 1-D array: 
+// Tensor2_3D.hpp
+// This is a 2nd-order tensor in 3D. The components are stored in a 1-D array: 
 // mat[9]. Logically, the matrix is 
 //
 //                   mat[0], mat[1], mat[2]
@@ -22,33 +22,33 @@
 // ============================================================================
 #include "Vector_3.hpp"
 
-class Matrix_3x3
+class Tensor2_3D
 {
   public:
     // Constructor (default an identity 3-by-3 matrix)
-    Matrix_3x3();
+    Tensor2_3D();
 
     // Copy constructor
-    Matrix_3x3( const Matrix_3x3 &source );
+    Tensor2_3D( const Tensor2_3D &source );
 
     // Explicit Defintion of all 9 entries
-    Matrix_3x3( const double &a11, const double &a12, const double &a13,
+    Tensor2_3D( const double &a11, const double &a12, const double &a13,
         const double &a21, const double &a22, const double &a23,
         const double &a31, const double &a32, const double &a33 );
 
     // Generate a matrix made by 3 vectors [ vec1 | vec2 | vec3 ]
-    Matrix_3x3 ( const Vector_3 &vec1, const Vector_3 &vec2, const Vector_3 &vec3 );
+    Tensor2_3D ( const Vector_3 &vec1, const Vector_3 &vec2, const Vector_3 &vec3 );
     
     // Destructor
-    ~Matrix_3x3();
+    ~Tensor2_3D();
 
     // Copy
-    void copy( const Matrix_3x3 &source );    
+    void copy( const Tensor2_3D &source );    
     
     void copy( const double source[9] );
 
     // Assignment operator
-    Matrix_3x3& operator= (const Matrix_3x3 &source);
+    Tensor2_3D& operator= (const Tensor2_3D &source);
 
     // Parenthesis operator. It allows accessing and assigning the matrix entries.
     double& operator()(const int &index) {return mat[index];}
@@ -91,25 +91,25 @@ class Matrix_3x3
     double& zz() {return mat[8];}
 
     // Addition operator : return left + right
-    friend Matrix_3x3 operator+( const Matrix_3x3 &left, const Matrix_3x3 &right);
+    friend Tensor2_3D operator+( const Tensor2_3D &left, const Tensor2_3D &right);
 
     // Minus operator : return left - right
-    friend Matrix_3x3 operator-( const Matrix_3x3 &left, const Matrix_3x3 &right);
+    friend Tensor2_3D operator-( const Tensor2_3D &left, const Tensor2_3D &right);
     
     // Add the source matrix to the object
-    Matrix_3x3& operator+=( const Matrix_3x3 &source );
+    Tensor2_3D& operator+=( const Tensor2_3D &source );
 
     // Minus the source matrix to the object
-    Matrix_3x3& operator-=( const Matrix_3x3 &source );
+    Tensor2_3D& operator-=( const Tensor2_3D &source );
 
     // Scalar product
-    Matrix_3x3& operator*=( const double &val );
+    Tensor2_3D& operator*=( const double &val );
 
     // unary minus operator
-    Matrix_3x3 operator-() const;
+    Tensor2_3D operator-() const;
 
     // Return true if the input matrix is identical to the mat
-    bool is_identical( const Matrix_3x3 &source, const double &tol = 1.0e-12 ) const;
+    bool is_identical( const Tensor2_3D &source, const double &tol = 1.0e-12 ) const;
 
     // Set all components to zero
     void gen_zero();
@@ -145,7 +145,7 @@ class Matrix_3x3
 
     // add the matrix with a given matrix with scaling
     // X = X + a * Y
-    void AXPY( const double &val, const Matrix_3x3 &source );
+    void AXPY( const double &val, const Tensor2_3D &source );
 
     // X = X + a * I
     void AXPI( const double &val );
@@ -179,14 +179,14 @@ class Matrix_3x3
        double &y0, double &y1, double &y2 ) const;
 
     // Matrix multiplication mat = mleft * mright
-    void MatMult( const Matrix_3x3 &mleft, const Matrix_3x3 &mright );
+    void MatMult( const Tensor2_3D &mleft, const Tensor2_3D &mright );
 
     // ------------------------------------------------------------------------
     // Matrix rotation
     // Let Q be a rotation matrix, the matrix gets updated by
     // Q^T M Q = Q_ki M_kl Q_lj = output_matrix_ij
     // ------------------------------------------------------------------------
-    void MatRot( const Matrix_3x3 &Q );
+    void MatRot( const Tensor2_3D &Q );
 
     // ------------------------------------------------------------------------
     // Matrix multiplication as mat = source^T * source
@@ -194,7 +194,7 @@ class Matrix_3x3
     //                       C = F^T F
     // The resulting matrix is symmetric. Hence the computation is simplified.
     // ------------------------------------------------------------------------
-    void MatMultTransposeLeft( const Matrix_3x3 &source );
+    void MatMultTransposeLeft( const Tensor2_3D &source );
 
     // ------------------------------------------------------------------------
     // Matrix multiplication as mat = source * source^T
@@ -202,19 +202,19 @@ class Matrix_3x3
     //                       b = F F^T
     // The resulting matrix is symmetric. Hence, the computation is simplified.
     // ------------------------------------------------------------------------
-    void MatMultTransposeRight( const Matrix_3x3 &source );
+    void MatMultTransposeRight( const Tensor2_3D &source );
 
     // ------------------------------------------------------------------------
     // Matrix contraction
     // return mat_ij source_ij
     // ------------------------------------------------------------------------
-    double MatContraction( const Matrix_3x3 &source ) const;
+    double MatContraction( const Tensor2_3D &source ) const;
 
     // ------------------------------------------------------------------------
     // Contraction with the transposed input
     // return mat_ij source_ji
     // ------------------------------------------------------------------------
-    double MatTContraction( const Matrix_3x3 &source ) const;
+    double MatTContraction( const Tensor2_3D &source ) const;
 
     // print the matrix
     void print() const;
@@ -266,27 +266,27 @@ class Matrix_3x3
 };
 
 // Return the matrix-vectror multiplication
-Vector_3 operator*( const Matrix_3x3 &left, const Vector_3 &right );
+Vector_3 operator*( const Tensor2_3D &left, const Vector_3 &right );
 
 // Return the matrix-matrix multiplication
-Matrix_3x3 operator*( const Matrix_3x3 &left, const Matrix_3x3 &right );
+Tensor2_3D operator*( const Tensor2_3D &left, const Tensor2_3D &right );
 
 // Return the scalar scaling of matrix
-Matrix_3x3 operator*( const double &val, const Matrix_3x3 &input );
+Tensor2_3D operator*( const double &val, const Tensor2_3D &input );
 
 // Return the inverse of the input matrix
-Matrix_3x3 inverse( const Matrix_3x3 &input );
+Tensor2_3D inverse( const Tensor2_3D &input );
 
 // Return the cofactor of input matrix which is J input^(-T)
-Matrix_3x3 cofactor( const Matrix_3x3 &input );
+Tensor2_3D cofactor( const Tensor2_3D &input );
 
 // Return the transpose of input matrix
-Matrix_3x3 transpose( const Matrix_3x3 &input );
+Tensor2_3D transpose( const Tensor2_3D &input );
 
 // Return an identity matrix
-Matrix_3x3 gen_identity_matrix();
+Tensor2_3D gen_identity_matrix();
 
 // Return a zero matrix
-Matrix_3x3 gen_zero_matrix();
+Tensor2_3D gen_zero_matrix();
 
 #endif

@@ -72,16 +72,17 @@ void MaterialModel_StVenant_Kirchhoff_M94_Mixed::write_hdf5( const char * const 
 }
 
 void MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_PK( 
-    const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S ) const
+    const Tensor2_3D &F, Tensor2_3D &P, Tensor2_3D &S ) const
 {
-  Matrix_3x3 C; C.MatMultTransposeLeft(F);
+  Tensor2_3D C; C.MatMultTransposeLeft(F);
   Tensor2_3D Cinv = inverse(C);
+  
   const double detFm0d67 = std::pow( F.det(), mpt67 );
 
   const double mpt33CdC = (-1.0) * pt33 * C.MatContraction(C);
-  Matrix_3x3 PxC(Cinv); PxC.scale(mpt33CdC); PxC += C;
+  Tensor2_3D PxC(Cinv); PxC.scale(mpt33CdC); PxC += C;
   
-  Matrix_3x3 PxI(Cinv); PxI.scale( (-1.0) * pt33 * C.tr() ); PxI.AXPI( 1.0 );
+  Tensor2_3D PxI(Cinv); PxI.scale( (-1.0) * pt33 * C.tr() ); PxI.AXPI( 1.0 );
 
   S.copy(PxC); S.scale(detFm0d67);  S.AXPY( -1.0, PxI );
   S.scale( mu*detFm0d67 );
@@ -90,16 +91,17 @@ void MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_PK(
 }
 
 void MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_PK_Stiffness( 
-    const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &CC ) const
+    const Tensor2_3D &F, Tensor2_3D &P, Tensor2_3D &S, Tensor4_3D &CC ) const
 {
-  Matrix_3x3 C; C.MatMultTransposeLeft(F);
+  Tensor2_3D C; C.MatMultTransposeLeft(F);
   Tensor2_3D Cinv = inverse(C);
+  
   const double detFm0d67 = std::pow(F.det(), mpt67);
   const double CdC = C.MatContraction(C);
   const double mpt33CdC = (-1.0) * pt33 * CdC;
   
-  Matrix_3x3 PxC(Cinv); PxC.scale(mpt33CdC); PxC += C;
-  Matrix_3x3 PxI(Cinv); PxI.scale( (-1.0) * pt33 * C.tr() ); PxI.AXPI( 1.0 );
+  Tensor2_3D PxC(Cinv); PxC.scale(mpt33CdC); PxC += C;
+  Tensor2_3D PxI(Cinv); PxI.scale( (-1.0) * pt33 * C.tr() ); PxI.AXPI( 1.0 );
 
   S.copy(PxC); S.scale(detFm0d67);  S.AXPY( -1.0, PxI );
   S.scale( mu*detFm0d67 );
@@ -127,12 +129,12 @@ void MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_PK_Stiffness(
 }
 
 double MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_strain_energy( 
-    const Matrix_3x3 &F ) const
+    const Tensor2_3D &F ) const
 {
-  Matrix_3x3 C; C.MatMultTransposeLeft(F);
+  Tensor2_3D C; C.MatMultTransposeLeft(F);
   const double detFm0d67 = std::pow(F.det(), mpt67);
   
-  Matrix_3x3 Es( C ); Es.scale(0.5 * detFm0d67); Es.AXPY(-0.5, I);
+  Tensor2_3D Es( C ); Es.scale(0.5 * detFm0d67); Es.AXPY(-0.5, I);
 
   Es.MatMult(Es,Es);
 
