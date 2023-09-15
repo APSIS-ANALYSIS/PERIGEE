@@ -530,9 +530,9 @@ namespace HEX_T
 
     int index_pos[4]{};
     
-    for(unsigned int ii = 0; ii < std::size(index_pos); ++ii) index_pos[ii] = std::distance(std::begin(gindex), (it[ii]));
+    for(unsigned int ii = 0; ii < 4; ++ii) index_pos[ii] = std::distance(std::begin(gindex), (it[ii]));
 
-    std::sort(index_pos, index_pos + std::size(index_pos));
+    std::sort(index_pos, index_pos + 4);
 
     const int zeroth[4] {0,1,2,3};
     const int first [4] {4,5,6,7};
@@ -543,27 +543,27 @@ namespace HEX_T
 
     int face_id = 0;
 
-    if (std::equal(index_pos, index_pos + std::size(index_pos), zeroth))
+    if (std::equal(index_pos, index_pos + 4, zeroth))
       {
         face_id = 0;
       }    
-    else if(std::equal(index_pos, index_pos + std::size(index_pos), first))
+    else if(std::equal(index_pos, index_pos + 4, first))
       {
         face_id = 1;
       }
-    else if(std::equal(index_pos, index_pos + std::size(index_pos), second))
+    else if(std::equal(index_pos, index_pos + 4, second))
       {
         face_id = 2;
       }
-    else if(std::equal(index_pos, index_pos + std::size(index_pos), third))
+    else if(std::equal(index_pos, index_pos + 4, third))
       {
         face_id = 3;
       }
-    else if(std::equal(index_pos, index_pos + std::size(index_pos), fourth))
+    else if(std::equal(index_pos, index_pos + 4, fourth))
       {
         face_id = 4;
       }
-    else if(std::equal(index_pos, index_pos + std::size(index_pos), fifth))
+    else if(std::equal(index_pos, index_pos + 4, fifth))
       {
         face_id = 5;
       }
