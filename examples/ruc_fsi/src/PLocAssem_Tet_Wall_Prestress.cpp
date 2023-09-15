@@ -86,7 +86,7 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
   const double curr = time + alpha_f * dt;
 
   // Global Cauchy stress at all quadrature points
-  std::vector<Tensor2_3D> sigma; sigma.resize( face_nqp );
+  std::vector<Tensor2_3D> sigma( face_nqp, Tensor2_3D() );
   get_Wall_CauchyStress(sol_wall_disp, element, ele_youngsmod, sigma );
 
   Zero_sur_Tangent_Residual();

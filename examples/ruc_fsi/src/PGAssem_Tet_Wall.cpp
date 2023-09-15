@@ -390,7 +390,7 @@ void PGAssem_Tet_Wall::Update_Wall_Prestress(
   double * syoungsmod   = new double [snLocBas];
   double * quaprestress = new double [6 * face_nqp];
 
-  std::vector<Tensor2_3D> sigma; sigma.resize( face_nqp );
+  std::vector<Tensor2_3D> sigma( face_nqp, Tensor2_3D() );
 
   sol_wall_disp->GetLocalArray( array_b );
 
