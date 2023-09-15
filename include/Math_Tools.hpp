@@ -363,6 +363,57 @@ namespace MATH_T
       bool is_fac;
   };
 
+  template<unsigned int N>
+  class Matrix_Dense
+  {
+    public:
+      Matrix_Dense() : NN(N * N)
+      {
+        for(unsigned int ii=0; ii < NN; ++ii) mat[ii] = 0.0;
+        for(unsigned int ii=0; ii < N; ++ii)
+        {
+          mat[ii*N + ii] = 1.0;
+          p[ii] = ii;
+        }
+        is_fac = false;
+      }
+
+      virtual ~Matrix_Dense() {};
+
+      void print_info() const
+      {
+        std::cout<<"N ="<<N<<'\n';
+        std::cout<<"Matrix :\n";
+        int counter = -1;
+        for(unsigned int ii=0; ii<N; ++ii)
+        {
+          for(unsigned int jj=0; jj<N; ++jj)
+          {
+            counter += 1;
+            std::cout<<mat[counter]<<'\t';
+          }
+          std::cout<<'\n';
+        }
+        std::cout<<"p : \n";
+        for(unsigned int ii=0; ii<N; ++ii)
+          std::cout<<p[ii]<<'\t';
+        std::cout<<std::endl;
+
+        if(is_fac)
+          std::cout<<"Matrix is factorized.\n";
+        else
+          std::cout<<"Matrix is NOT factorized.\n";
+      }
+
+    private:
+      const unsigned int NN;
+
+      double mat[N*N];
+
+      unsigned int p[N];
+
+      bool is_fac;
+  };
 
   // ================================================================
   // Dense Symmetric Positive definite matrix tool.
