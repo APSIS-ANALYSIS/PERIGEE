@@ -626,7 +626,7 @@ void Gmsh_FileIO::write_each_vtu( const std::vector<std::string> name_list) cons
     input_vtk_data.push_back({ptag, "Physics_tag", AssociateObject::Cell});
 
     // Element type of this domain
-    // Element type is difined by Gmsh, different from vtk->GetCellType()!
+    // Element type is defined by Gmsh, different from vtk->GetCellType()!
     const int Etype = ele_type[phy_3d_index[ii]];
     if ( Etype == 4 || Etype == 11 )
     {
