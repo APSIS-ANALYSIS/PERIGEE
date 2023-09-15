@@ -149,7 +149,7 @@ void Gmsh_FileIO::print_info() const
 }
 
 void Gmsh_FileIO::write_interior_vtp( const std::string &vtp_filename, 
-        const int &index_sur,const int &index_vol1, const int &index_vol2 ) const
+  const int &index_sur,const int &index_vol1, const int &index_vol2 ) const
 {
   SYS_T::print_exit_if( index_sur >= num_phy_domain_2d || index_sur < 0,
       "Error: Gmsh_FileIO::write_vtp, surface index is wrong. \n");
