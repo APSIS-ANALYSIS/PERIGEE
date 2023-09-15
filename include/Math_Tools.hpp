@@ -425,15 +425,11 @@ namespace MATH_T
 
       void LU_fac()
       {
-        double max_value, temp, invAkk;
-        int max_index, int_temp;
-        bool pivot_flag;
-
         for(int kk=0; kk<N-1; ++kk)
         {
-          max_value = std::abs(mat[kk*N+kk]);
-          max_index = kk;
-          pivot_flag = false;
+          double max_value = std::abs(mat[kk*N+kk]);
+          int max_index = kk;
+          bool pivot_flag = false;
           for(int ii=kk+1; ii<N; ++ii)
           {
             if( max_value < std::abs(mat[ii*N+kk]) )
@@ -446,19 +442,19 @@ namespace MATH_T
 
           if(pivot_flag)
           {
-            int_temp = p[kk];
+            const int int_temp = p[kk];
             p[kk] = p[max_index];
             p[max_index] = int_temp;
 
             for(int ii=0; ii<N; ++ii)
             {
-              temp = mat[kk*N+ii];
+              const double temp = mat[kk*N+ii];
               mat[kk*N+ii] = mat[max_index*N+ii];
               mat[max_index*N+ii] = temp;
             }
           }
 
-          invAkk = 1.0 / mat[kk*N+kk];
+          const double invAkk = 1.0 / mat[kk*N+kk];
 
           for(int ii=kk+1; ii<N; ++ii)
           {
@@ -469,9 +465,6 @@ namespace MATH_T
         }
 
         is_fac = true;
-
-        for(int kk=0; kk<N; ++kk)
-          invm[kk] = 1.0 / mat[kk*N+kk];
       }
 
     private:
