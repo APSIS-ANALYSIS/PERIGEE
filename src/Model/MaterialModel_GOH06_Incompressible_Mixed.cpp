@@ -112,7 +112,7 @@ void MaterialModel_GOH06_Incompressible_Mixed::get_PK(
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S ) const
 {
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
-  Matrix_3x3 Cinv(C); Cinv.inverse();
+  Tensor2_3D Cinv = inverse(C);
   const double trC = C.tr();
   const double detFm0d67 = std::pow(F.det(), mpt67);
 
@@ -160,7 +160,7 @@ void MaterialModel_GOH06_Incompressible_Mixed::get_PK_Stiffness(
     const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &CC ) const
 {
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
-  Matrix_3x3 Cinv(C); Cinv.inverse();
+  Tensor2_3D Cinv = inverse(C);
   const double trC = C.tr();
   const double detFm0d67 = std::pow(F.det(), mpt67);
 
@@ -228,7 +228,7 @@ double MaterialModel_GOH06_Incompressible_Mixed::get_strain_energy(
     const Matrix_3x3 &F ) const
 {
   Matrix_3x3 C; C.MatMultTransposeLeft(F);
-  Matrix_3x3 Cinv(C); Cinv.inverse();
+  Tensor2_3D Cinv = inverse(C);
   const double trC = C.tr();
   const double detFm0d67 = std::pow(F.det(), mpt67);
 
