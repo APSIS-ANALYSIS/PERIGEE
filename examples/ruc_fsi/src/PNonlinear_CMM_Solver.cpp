@@ -573,7 +573,7 @@ void PNonlinear_CMM_Solver::rotate_ringbc(
 
       VecGetValues(dot_step->solution, 3, idx, vals);
 
-      Matrix_3x3 Q = ringnbc_part->get_rotation_matrix( ii );
+      Tensor2_3D Q = ringnbc_part->get_rotation_matrix( ii );
       Q.transpose(); // Skew-to-global transformation matrix 
 
       // rot_vals = Q * vals
