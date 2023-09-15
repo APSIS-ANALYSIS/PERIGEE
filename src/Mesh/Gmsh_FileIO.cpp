@@ -1361,7 +1361,7 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
     const int &index_sur, const int &index_vol, const bool &isf2e ) const
 {
   SYS_T::print_exit_if( index_sur >= num_phy_domain_2d || index_sur < 0,
-      "Error: Gmsh_FileIO::write__quadratic_sur_vtu, surface index is wrong. \n");
+      "Error: Gmsh_FileIO::write_quadratic_sur_vtu, surface index is wrong. \n");
 
   SYS_T::print_exit_if( index_vol >= num_phy_domain_3d || index_vol < 0,
       "Error: Gmsh_FileIO::write__quadratic_sur_vtu, volume index is wrong. \n");
