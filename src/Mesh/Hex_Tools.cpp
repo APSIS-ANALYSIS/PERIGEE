@@ -510,6 +510,72 @@ namespace HEX_T
     return tet1.get_volume() + tet2.get_volume() + tet3.get_volume() + tet4.get_volume() + tet5.get_volume() + tet6.get_volume();
   }
 
+  int Hex8::get_face_id( const int &n0, const int &n1, const int &n2, const int &n3) const
+  {
+    const int temp[4] { n0, n1, n2, n3 };
+
+    const auto it0 = std::find(gindex, gindex+8, temp[0]);
+    const auto it1 = std::find(gindex, gindex+8, temp[1]);
+    const auto it2 = std::find(gindex, gindex+8, temp[2]);
+    const auto it3 = std::find(gindex, gindex+8, temp[3]);
+
+    const int* it[4]{it0, it1, it2, it3};
+
+    // flg is true if the temp is found in gindex
+    bool flg[4] { (it0 != temp+4), (it1 != temp+4), (it2 != temp+4), (it3 != temp+4) };
+
+    int sum = flg[0] + flg[1] + flg[2] + flg[3];
+
+    SYS_T::print_exit_if( sum != 4, "Error: Hex8::find_face_id input is not a proper face of this element. \n");
+
+    int index_pos[4]{};
+    
+    for(unsigned int ii = 0; ii < std::size(index_pos); ++ii) index_pos[ii] = std::distance(std::begin(gindex), (it[ii]));
+
+    std::sort(index_pos, index_pos + std::size(index_pos));
+
+    const int zeroth[4] {0,1,2,3};
+    const int first [4] {4,5,6,7};
+    const int second[4] {0,1,4,5};
+    const int third [4] {1,2,5,6};
+    const int fourth[4] {2,3,6,7};
+    const int fifth [4] {0,3,4,7};
+
+    int face_id = 0;
+
+    if (std::equal(index_pos, index_pos + std::size(index_pos), zeroth))
+      {
+        face_id = 0;
+      }    
+    else if(std::equal(index_pos, index_pos + std::size(index_pos), first))
+      {
+        face_id = 1;
+      }
+    else if(std::equal(index_pos, index_pos + std::size(index_pos), second))
+      {
+        face_id = 2;
+      }
+    else if(std::equal(index_pos, index_pos + std::size(index_pos), third))
+      {
+        face_id = 3;
+      }
+    else if(std::equal(index_pos, index_pos + std::size(index_pos), fourth))
+      {
+        face_id = 4;
+      }
+    else if(std::equal(index_pos, index_pos + std::size(index_pos), fifth))
+      {
+        face_id = 5;
+      }
+    else
+      {
+        face_id = -1;
+        SYS_T::print_exit( "Error: Hex8::find_face_id input is not a proper face of this element. \n");
+      }
+
+    return face_id;
+
+  }  
 }
 
 // EOF

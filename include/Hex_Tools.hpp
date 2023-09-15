@@ -214,6 +214,9 @@ namespace HEX_T
 
       double get_volume() const;
 
+      // Given the face node IEN indices, determine the face id
+      int get_face_id(const int &n0, const int &n1, const int &n2, const int &n3) const;
+
     private:
       std::array<Vector_3, 8> pts;
 
