@@ -2,7 +2,7 @@
 #define TENSOR2_3D_HPP
 // ============================================================================
 // Tensor2_3D.hpp
-// This is a 2th-order tensor in 3D. The components are stored in a 1-D array: 
+// This is a 2nd-order tensor in 3D. The components are stored in a 1-D array: 
 // mat[9]. Logically, the matrix is 
 //
 //                   mat[0], mat[1], mat[2]
