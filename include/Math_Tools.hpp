@@ -179,6 +179,14 @@ namespace MATH_T
   void gen_Gaussian( const int &n, const double &mean, const double &std,
       std::vector<double> &val );
 
+  inline double gen_double_rand_normal( const double &mean, const double &std )
+  {
+    std::random_device rd;
+    std::mt19937_64 gen( rd() );
+    std::normal_distribution<double> dis(mean, std);
+    return dis(gen);
+  }
+
   // ----------------------------------------------------------------
   // gen_int_rand and gen_double_rand
   // Generate a random double in [min, max] domain for integer and double
