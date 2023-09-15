@@ -115,10 +115,10 @@ void MaterialModel_GOH06_ST91_Mixed::write_hdf5( const char * const &fname ) con
 }
 
 void MaterialModel_GOH06_ST91_Mixed::get_PK( 
-    const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S ) const
+    const Tensor2_3D &F, Tensor2_3D &P, Tensor2_3D &S ) const
 {
-  Matrix_3x3 C; C.MatMultTransposeLeft(F);
-  Matrix_3x3 Cinv(C); Cinv.inverse();
+  Tensor2_3D C; C.MatMultTransposeLeft(F);
+  Tensor2_3D Cinv(C); Cinv.inverse();
   const double trC = C.tr();
   const double detFm0d67 = std::pow(F.det(), mpt67);
 
@@ -132,16 +132,16 @@ void MaterialModel_GOH06_ST91_Mixed::get_PK(
   const double dfpsi2 = fk1 * fE2 * std::exp( fk2 * fE2 * fE2 );
 
   // P : I = I - 1/3 trC C^-1
-  Matrix_3x3 PxI(Cinv); PxI.scale( (-1.0) * pt33 * trC );
+  Tensor2_3D PxI(Cinv); PxI.scale( (-1.0) * pt33 * trC );
   PxI.AXPI( 1.0 );
 
   // P : H = kd PxI + (1-3kd) a x a + (kd - 1/3) (a.Ca) C^-1
-  Matrix_3x3 PxH1; Matrix_3x3 PxH2;
+  Tensor2_3D PxH1; Tensor2_3D PxH2;
   PxH1.gen_zero(); PxH2.gen_zero();
   PxH1.AXPY( fkd, PxI );
   PxH2.AXPY( fkd, PxI );
 
-  Matrix_3x3 a1xa1, a2xa2;
+  Tensor2_3D a1xa1, a2xa2;
   a1xa1.gen_outprod(a1);
   a2xa2.gen_outprod(a2);
 
@@ -163,10 +163,10 @@ void MaterialModel_GOH06_ST91_Mixed::get_PK(
 }
 
 void MaterialModel_GOH06_ST91_Mixed::get_PK_Stiffness( 
-    const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &CC ) const
+    const Tensor2_3D &F, Tensor2_3D &P, Tensor2_3D &S, Tensor4_3D &CC ) const
 {
-  Matrix_3x3 C; C.MatMultTransposeLeft(F);
-  Matrix_3x3 Cinv(C); Cinv.inverse();
+  Tensor2_3D C; C.MatMultTransposeLeft(F);
+  Tensor2_3D Cinv(C); Cinv.inverse();
   const double trC = C.tr();
   const double detFm0d67 = std::pow(F.det(), mpt67);
 
@@ -180,16 +180,16 @@ void MaterialModel_GOH06_ST91_Mixed::get_PK_Stiffness(
   const double dfpsi2 = fk1 * fE2 * std::exp( fk2 * fE2 * fE2 );
 
   // P : I = I - 1/3 trC C^-1
-  Matrix_3x3 PxI(Cinv); PxI.scale( (-1.0) * pt33 * trC );
+  Tensor2_3D PxI(Cinv); PxI.scale( (-1.0) * pt33 * trC );
   PxI.AXPI( 1.0 );
 
   // P : H = kd PxI + (1-3kd) a x a + (kd - 1/3) (a.Ca) C^-1
-  Matrix_3x3 PxH1; Matrix_3x3 PxH2;
+  Tensor2_3D PxH1; Tensor2_3D PxH2;
   PxH1.gen_zero(); PxH2.gen_zero();
   PxH1.AXPY( fkd, PxI );
   PxH2.AXPY( fkd, PxI );
 
-  Matrix_3x3 a1xa1, a2xa2;
+  Tensor2_3D a1xa1, a2xa2;
   a1xa1.gen_outprod(a1);
   a2xa2.gen_outprod(a2);
 
@@ -230,10 +230,10 @@ void MaterialModel_GOH06_ST91_Mixed::get_PK_Stiffness(
   CC.add_OutProduct(mpt67, S, Cinv);
 }
 
-double MaterialModel_GOH06_ST91_Mixed::get_strain_energy( const Matrix_3x3 &F ) const
+double MaterialModel_GOH06_ST91_Mixed::get_strain_energy( const Tensor2_3D &F ) const
 {
-  Matrix_3x3 C; C.MatMultTransposeLeft(F);
-  Matrix_3x3 Cinv(C); Cinv.inverse();
+  Tensor2_3D C; C.MatMultTransposeLeft(F);
+  Tensor2_3D Cinv(C); Cinv.inverse();
   const double trC = C.tr();
   const double detFm0d67 = std::pow(F.det(), mpt67);
 
