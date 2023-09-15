@@ -208,7 +208,7 @@ namespace HEX_T
 
       double get_aspect_ratio() const;
 
-      // This is a measure of the mesh size, defined as
+      // This is a measure of the mesh size, defined by
       // the max length of four body diagonals
       double get_diameter() const;
 
