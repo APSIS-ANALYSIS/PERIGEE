@@ -507,7 +507,7 @@ std::array<double,9> FEAElement_Hex27::get_Jacobian(const int &quaindex) const
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_Jacobian function error.\n" );
   return {{ dx_dr[9*quaindex], dx_dr[9*quaindex+1], dx_dr[9*quaindex+2],
     dx_dr[9*quaindex+3], dx_dr[9*quaindex+4], dx_dr[9*quaindex+5],
-    dx_dr[9*quaindex+6], dx_dr[9*quaindex+7], dx_dr[9*quaindex+27] }};
+    dx_dr[9*quaindex+6], dx_dr[9*quaindex+7], dx_dr[9*quaindex+8] }};
 }
 
 void FEAElement_Hex27::get_invJacobian(const int &quaindex,
@@ -521,5 +521,5 @@ std::array<double,9> FEAElement_Hex27::get_invJacobian(const int &quaindex) cons
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_invJacobian function error.\n" );
   return {{ dr_dx[9*quaindex], dr_dx[9*quaindex+1], dr_dx[9*quaindex+2],
     dr_dx[9*quaindex+3], dr_dx[9*quaindex+4], dr_dx[9*quaindex+5],
-    dr_dx[9*quaindex+6], dr_dx[9*quaindex+7], dr_dx[9*quaindex+27] }};
+    dr_dx[9*quaindex+6], dr_dx[9*quaindex+7], dr_dx[9*quaindex+8] }};
 }
