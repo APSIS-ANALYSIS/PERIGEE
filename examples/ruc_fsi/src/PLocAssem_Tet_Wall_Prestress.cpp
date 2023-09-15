@@ -86,7 +86,7 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
   const double curr = time + alpha_f * dt;
 
   // Global Cauchy stress at all quadrature points
-  std::vector<Matrix_3x3> sigma; sigma.resize( face_nqp );
+  std::vector<Tensor2_3D> sigma; sigma.resize( face_nqp );
   get_Wall_CauchyStress(sol_wall_disp, element, ele_youngsmod, sigma );
 
   Zero_sur_Tangent_Residual();
@@ -105,7 +105,7 @@ void PLocAssem_Tet_Wall_Prestress::Assem_Tangent_Residual_EBC_Wall(
     double * Kg = new double [ (snLocBas*dim) * (snLocBas*dim) ] {};
 
     // Global-to-local rotation matrix Q
-    const Matrix_3x3 Q = element->get_rotationMatrix(qua);
+    const Tensor2_3D Q = element->get_rotationMatrix(qua);
 
     double u_t = 0.0, v_t = 0.0, w_t = 0.0;
     double u = 0.0, v = 0.0, w = 0.0, pp = 0.0; 
@@ -297,7 +297,7 @@ void PLocAssem_Tet_Wall_Prestress::get_Wall_CauchyStress(
     const double * const &sol_wall_disp,
     const FEAElement * const &element,
     const double * const &ele_youngsmod,
-    std::vector<Matrix_3x3> &sigma )
+    std::vector<Tensor2_3D> &sigma )
 {
   SYS_T::print_fatal_if( element -> get_numQuapts() != face_nqp, "Error: The element's data structure is incompatible with the face_nqp in the local assembly.\n" );
 
@@ -316,7 +316,7 @@ void PLocAssem_Tet_Wall_Prestress::get_Wall_CauchyStress(
     const std::vector<double> dR_dyl = element -> get_dR_dy( qua );
 
     // Global-to-local rotation matrix Q
-    const Matrix_3x3 Q = element->get_rotationMatrix(qua);
+    const Tensor2_3D Q = element->get_rotationMatrix(qua);
 
     for(int ii=0; ii<snLocBas; ++ii)
     {
@@ -349,7 +349,7 @@ void PLocAssem_Tet_Wall_Prestress::get_Wall_CauchyStress(
     const double coef = E_w / (1.0 - nu_w * nu_w);
 
     // Lamina Cauchy stress
-    sigma[qua] = Matrix_3x3(
+    sigma[qua] = Tensor2_3D(
         u1l_xl + nu_w*u2l_yl,               0.5*(1.0-nu_w) * (u1l_yl + u2l_xl), 0.5*kappa_w*(1.0-nu_w) * u3l_xl,
         0.5*(1.0-nu_w) * (u1l_yl + u2l_xl), nu_w*u1l_xl + u2l_yl,               0.5*kappa_w*(1.0-nu_w) * u3l_yl,
         0.5*kappa_w*(1.0-nu_w) * u3l_xl,    0.5*kappa_w*(1.0-nu_w) * u3l_yl,    0.0 );
