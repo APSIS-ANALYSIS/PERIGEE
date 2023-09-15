@@ -75,7 +75,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::print_info() const
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
-SymmMatrix_3x3 PLocAssem_Tet_VMS_NS_GenAlpha::get_metric(
+SymmTensor2_3D PLocAssem_Tet_VMS_NS_GenAlpha::get_metric(
     const std::array<double, 9> &f ) const
 {
   // PHASTA definition 
@@ -91,7 +91,7 @@ SymmMatrix_3x3 PLocAssem_Tet_VMS_NS_GenAlpha::get_metric(
   const double fk7 = 2.0 * f[5] + (f[2] + f[8]);
   const double fk8 = 2.0 * f[8] + (f[2] + f[5]);
 
-  return SymmMatrix_3x3( coef * ( fk0 * f[0] + fk1 * f[3] + fk2 * f[6] ),
+  return SymmTensor2_3D( coef * ( fk0 * f[0] + fk1 * f[3] + fk2 * f[6] ),
   coef * ( fk3 * f[1] + fk4 * f[4] + fk5 * f[7] ),
   coef * ( fk6 * f[2] + fk7 * f[5] + fk8 * f[8] ),
   coef * ( fk3 * f[2] + fk4 * f[5] + fk5 * f[8] ),
@@ -103,7 +103,7 @@ std::array<double, 2> PLocAssem_Tet_VMS_NS_GenAlpha::get_tau(
     const double &dt, const std::array<double, 9> &dxi_dx,
     const double &u, const double &v, const double &w ) const
 {
-  const SymmMatrix_3x3 G = get_metric( dxi_dx );
+  const SymmTensor2_3D G = get_metric( dxi_dx );
 
   const Vector_3 velo_vec( u, v, w );
 
@@ -119,7 +119,7 @@ double PLocAssem_Tet_VMS_NS_GenAlpha::get_DC(
     const std::array<double, 9> &dxi_dx,
     const double &u, const double &v, const double &w ) const
 {
-  // const SymmMatrix_3x3 G = get_metric( dxi_dx );
+  // const SymmTensor2_3D G = get_metric( dxi_dx );
   // const Vector_3 velo_vec( u, v, w );
   // double dc_tau = G.VecMatVec( velo_vec, velo_vec );
 
