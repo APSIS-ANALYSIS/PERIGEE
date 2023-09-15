@@ -485,8 +485,8 @@ namespace MATH_T
 
       std::array<double, N> LU_solve( std::array<double, N> &b ) const
       {
-        for(int ii=0; ii<N; ++ii)
-          x[ii] = b[p[ii]];
+        std::array<double, N> x;
+        for(int ii=0; ii<N; ++ii) x[ii] = b[p[ii]];
 
         for(int ii=1; ii<N; ++ii)
           for(int jj=0; jj<ii; ++jj)
@@ -496,8 +496,10 @@ namespace MATH_T
         {
           for(int jj=N-1; jj>ii; --jj)
             x[ii] -= mat[ii*N+jj] * x[jj];
-          x[ii] = x[ii] * invm[ii];
+          
+          x[ii] = x[ii] / mat[ii*N+ii];
         }
+        return x;
       }
 
     private:
