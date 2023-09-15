@@ -382,23 +382,23 @@ namespace MATH_T
   template<unsigned int N> class Matrix_Dense
   {
     public:
-      Matrix_Dense() : NN(N * N)
-    {
-      for(unsigned int ii=0; ii < NN; ++ii) mat[ii] = 0.0;
-      for(unsigned int ii=0; ii < N; ++ii)
+      Matrix_Dense()
       {
-        mat[ii*N + ii] = 1.0;
-        p[ii] = ii;
+        for(unsigned int ii=0; ii < N*N; ++ii) mat[ii] = 0.0;
+        for(unsigned int ii=0; ii < N; ++ii)
+        {
+          mat[ii*N + ii] = 1.0;
+          p[ii] = ii;
+        }
+        is_fac = false;
       }
-      is_fac = false;
-    }
 
-      Matrix_Dense( const std::array<double,N*N> &input ) : NN( N * N )
-    {
-      for(unsigned int ii=0; ii < NN; ++ii) mat[ii] = input[ii];
-      for(unsigned int ii=0; ii < N; ++ii) p[ii] = ii;
-      is_fac = false;
-    }
+      Matrix_Dense( const std::array<double,N*N> &input )
+      {
+        for(unsigned int ii=0; ii < N*N; ++ii) mat[ii] = input[ii];
+        for(unsigned int ii=0; ii < N; ++ii) p[ii] = ii;
+        is_fac = false;
+      }
 
       virtual ~Matrix_Dense() {};
 
@@ -483,9 +483,24 @@ namespace MATH_T
         is_fac = true;
       }
 
-    private:
-      const unsigned int NN;
+      std::array<double, N> LU_solve( std::array<double, N> &b ) const
+      {
+        for(int ii=0; ii<N; ++ii)
+          x[ii] = b[p[ii]];
 
+        for(int ii=1; ii<N; ++ii)
+          for(int jj=0; jj<ii; ++jj)
+            x[ii] -= mat[ii*N+jj] * x[jj];
+
+        for(int ii=N-1; ii>=0; --ii)
+        {
+          for(int jj=N-1; jj>ii; --jj)
+            x[ii] -= mat[ii*N+jj] * x[jj];
+          x[ii] = x[ii] * invm[ii];
+        }
+      }
+
+    private:
       double mat[N*N];
 
       unsigned int p[N];
