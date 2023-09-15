@@ -64,12 +64,12 @@ void MaterialModel_NeoHookean_ST91::write_hdf5( const char * const &fname ) cons
   MPI_Barrier(PETSC_COMM_WORLD);
 }
 
-void MaterialModel_NeoHookean_ST91::get_PK( const Matrix_3x3 &F, 
-    Matrix_3x3 &P, Matrix_3x3 &S ) const
+void MaterialModel_NeoHookean_ST91::get_PK( const Tensor2_3D &F, 
+    Tensor2_3D &P, Tensor2_3D &S ) const
 {
-  Matrix_3x3 C; C.MatMultTransposeLeft(F);
+  Tensor2_3D C; C.MatMultTransposeLeft(F);
   
-  Matrix_3x3 Cinv(C); Cinv.inverse();
+  Tensor2_3D Cinv(C); Cinv.inverse();
 
   const double detF = F.det();
   const double detFm0d67 = std::pow(detF, mpt67);
@@ -80,14 +80,14 @@ void MaterialModel_NeoHookean_ST91::get_PK( const Matrix_3x3 &F,
   P.MatMult(F,S);
 }
 
-void MaterialModel_NeoHookean_ST91::get_PK_Stiffness( const Matrix_3x3 &F, 
-    Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &Stiffness ) const
+void MaterialModel_NeoHookean_ST91::get_PK_Stiffness( const Tensor2_3D &F, 
+    Tensor2_3D &P, Tensor2_3D &S, Tensor4_3D &Stiffness ) const
 {
-  const Matrix_3x3 I( 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 );
+  const Tensor2_3D I( 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 );
 
-  Matrix_3x3 C; C.MatMultTransposeLeft(F);
+  Tensor2_3D C; C.MatMultTransposeLeft(F);
   
-  Matrix_3x3 Cinv(C); Cinv.inverse();
+  Tensor2_3D Cinv(C); Cinv.inverse();
 
   const double detF = F.det();
   const double detF2 = detF * detF;
@@ -108,9 +108,9 @@ void MaterialModel_NeoHookean_ST91::get_PK_Stiffness( const Matrix_3x3 &F,
   Stiffness.add_OutProduct(val3, Cinv, I);
 }
 
-double MaterialModel_NeoHookean_ST91::get_strain_energy( const Matrix_3x3 &F ) const
+double MaterialModel_NeoHookean_ST91::get_strain_energy( const Tensor2_3D &F ) const
 {
-  Matrix_3x3 C; C.MatMultTransposeLeft(F);
+  Tensor2_3D C; C.MatMultTransposeLeft(F);
   const double detF = F.det();
   const double detF2 = detF * detF;
   const double detFm0d67 = std::pow(detF, mpt67);
