@@ -83,7 +83,7 @@ class FEAElement_Triangle6_membrane : public FEAElement
 
     virtual std::vector<double> get_dR_dy( const int &quaindex ) const;
 
-    virtual Matrix_3x3 get_rotationMatrix( const int &quaindex ) const;
+    virtual Tensor2_3D get_rotationMatrix( const int &quaindex ) const;
 
     // Assuming the triangle nodes are arranged such that the outward
     // direction is given by dx_dr x dx_ds
@@ -111,7 +111,7 @@ class FEAElement_Triangle6_membrane : public FEAElement
     double * dR_dx, * dR_dy;
 
     // Global-to-lamina 3x3 rotation matrix, of length numQuapts
-    std::vector< Matrix_3x3 > Q;
+    std::vector< Tensor2_3D > Q;
 
     // Unit normal vector components, each of length numQuapts
     double * unx, * uny, * unz;
