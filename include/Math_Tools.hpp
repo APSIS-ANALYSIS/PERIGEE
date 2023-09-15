@@ -379,20 +379,26 @@ namespace MATH_T
       bool is_fac;
   };
 
-  template<unsigned int N>
-  class Matrix_Dense
+  template<unsigned int N> class Matrix_Dense
   {
     public:
       Matrix_Dense() : NN(N * N)
+    {
+      for(unsigned int ii=0; ii < NN; ++ii) mat[ii] = 0.0;
+      for(unsigned int ii=0; ii < N; ++ii)
       {
-        for(unsigned int ii=0; ii < NN; ++ii) mat[ii] = 0.0;
-        for(unsigned int ii=0; ii < N; ++ii)
-        {
-          mat[ii*N + ii] = 1.0;
-          p[ii] = ii;
-        }
-        is_fac = false;
+        mat[ii*N + ii] = 1.0;
+        p[ii] = ii;
       }
+      is_fac = false;
+    }
+
+      Matrix_Dense( const std::array<double,N*N> &input ) : NN( N * N )
+    {
+      for(unsigned int ii=0; ii < NN; ++ii) mat[ii] = input[ii];
+      for(unsigned int ii=0; ii < N; ++ii) p[ii] = ii;
+      is_fac = false;
+    }
 
       virtual ~Matrix_Dense() {};
 
@@ -421,6 +427,69 @@ namespace MATH_T
           std::cout<<"Matrix is NOT factorized.\n";
       }
 
+      double& operator()(const unsigned int &index) {return mat[index];}
+
+      const double& operator()(const unsigned int &index) const {return mat[index];}
+
+      double& operator()(const unsigned int &ii, const unsigned int &jj) {return mat[N*ii+jj];}
+
+      const double& operator()(const unsigned int &ii, const unsigned int &jj) const {return mat[N*ii+jj];}
+
+      int get_size() const {return static_cast<int>(N);}
+
+      bool get_is_face() const {return is_fac;}
+
+      void LU_fac()
+      {
+        double max_value, temp, invAkk;
+        int max_index, int_temp;
+        bool pivot_flag;
+
+        for(int kk=0; kk<N-1; ++kk)
+        {
+          max_value = std::abs(mat[kk*N+kk]);
+          max_index = kk;
+          pivot_flag = false;
+          for(int ii=kk+1; ii<N; ++ii)
+          {
+            if( max_value < std::abs(mat[ii*N+kk]) )
+            {
+              max_value = std::abs(mat[ii*N+kk]);
+              max_index = ii;
+              pivot_flag = true;
+            }
+          }
+
+          if(pivot_flag)
+          {
+            int_temp = p[kk];
+            p[kk] = p[max_index];
+            p[max_index] = int_temp;
+
+            for(int ii=0; ii<N; ++ii)
+            {
+              temp = mat[kk*N+ii];
+              mat[kk*N+ii] = mat[max_index*N+ii];
+              mat[max_index*N+ii] = temp;
+            }
+          }
+
+          invAkk = 1.0 / mat[kk*N+kk];
+
+          for(int ii=kk+1; ii<N; ++ii)
+          {
+            mat[ii*N+kk] = mat[ii*N+kk] * invAkk;
+            for(int jj=kk+1; jj<N; ++jj)
+              mat[ii*N+jj] -= mat[ii*N+kk] * mat[kk*N+jj];
+          }
+        }
+
+        is_fac = true;
+
+        for(int kk=0; kk<N; ++kk)
+          invm[kk] = 1.0 / mat[kk*N+kk];
+      }
+
     private:
       const unsigned int NN;
 
@@ -430,6 +499,19 @@ namespace MATH_T
 
       bool is_fac;
   };
+
+  template<unsigned int N> std::array<double,N> operator*( const Matrix_Dense<N> &left, const std::array<double,N> &right )
+  {
+    if( left.get_is_face() == true ) std::cout<<"Warning: the matrix has been factroized.\n";
+    std::array<double,N> out;
+    for(unsigned int ii=0; ii<N; ++ii)
+    {
+      out[ii] = 0.0;
+      for(unsigned int jj=0; jj<N; ++jj)
+        out[ii] += left(ii,jj) * right[jj];
+    }
+    return out;
+  }
 
   // ================================================================
   // Dense Symmetric Positive definite matrix tool.
