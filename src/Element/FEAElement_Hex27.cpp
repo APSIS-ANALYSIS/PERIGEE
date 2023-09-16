@@ -74,7 +74,7 @@ void FEAElement_Hex27::buildBasis( const IQuadPts * const &quad,
     const double Ns[3] = { (2.0 * qua_s - 1.0) * (qua_s - 1.0),
         - 4.0 * qua_s * (qua_s - 1.0), qua_s * (2.0 * qua_s - 1.0) };
 
-    const double Nt[3] = { (2.0 * qua_t - 1.0) * (qua_t - 1.0)
+    const double Nt[3] = { (2.0 * qua_t - 1.0) * (qua_t - 1.0),
         - 4.0 * qua_t * (qua_t - 1.0), qua_t * (2.0 * qua_t - 1.0) };
 
     // vertices 0 - 7
