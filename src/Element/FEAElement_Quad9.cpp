@@ -116,7 +116,7 @@ void FEAElement_Quad9::buildBasis( const IQuadPts * const &quad,
       yss += ctrl_y[ii] * d2R_dss[ii];
 
       xrs += ctrl_x[ii] * d2R_drs[ii];
-      yrs += ctrl_x[ii] * d2R_drs[ii];
+      yrs += ctrl_y[ii] * d2R_drs[ii];
     }
     
     Jac[4*qua+0] = dx_dr;
@@ -160,7 +160,7 @@ void FEAElement_Quad9::buildBasis( const IQuadPts * const &quad,
     // LU factorization
     LHS.LU_fac();
 
-    for(int ii=0; ii<4; ++ii)
+    for(int ii=0; ii<9; ++ii)
     {
       const std::array<double, 3> RHS {{ d2R_drr[ii] - dR_dx[offset+ii] * xrr - dR_dy[offset+ii] * yrr,
         d2R_drs[ii] - dR_dx[offset+ii] * xrs - dR_dy[offset+ii] * yrs,
@@ -257,7 +257,17 @@ void FEAElement_Quad9::get_2D_R_dR_d2R( const int &quaindex,
     double * const &basis_xx, double * const &basis_yy,
     double * const &basis_xy ) const
 {
-  SYS_T::print_fatal("Error: FEAElement_Quad9::get_2D_R_dR_d2R is not implemented. \n");
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Quad::get_2D_R_dR_d2R function error.\n" );
+  const int offset = quaindex * 9;
+  for( int ii=0; ii<9; ++ii )
+  {
+    basis[ii]   = R[offset + ii];
+    basis_x[ii] = dR_dx[offset + ii];
+    basis_y[ii] = dR_dy[offset + ii];
+    basis_xx[ii] = d2R_dxx[offset + ii];
+    basis_yy[ii] = d2R_dyy[offset + ii];
+    basis_xy[ii] = d2R_dxy[offset + ii];
+  }
 }
 
 std::vector<double> FEAElement_Quad9::get_d2R_dxx( const int &quaindex ) const
