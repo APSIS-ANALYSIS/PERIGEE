@@ -36,7 +36,7 @@ class Tensor2_3D
         const double &a21, const double &a22, const double &a23,
         const double &a31, const double &a32, const double &a33 );
 
-    // Generate a matrix made by 3 vectors [ vec1 | vec2 | vec3 ]
+    // Generate a matrix made by 3 column vectors [ vec1 | vec2 | vec3 ]
     Tensor2_3D ( const Vector_3 &vec1, const Vector_3 &vec2, const Vector_3 &vec3 );
     
     // Destructor
@@ -45,8 +45,6 @@ class Tensor2_3D
     // Copy
     void copy( const Tensor2_3D &source );    
     
-    void copy( const double source[9] );
-
     // Assignment operator
     Tensor2_3D& operator= (const Tensor2_3D &source);
 

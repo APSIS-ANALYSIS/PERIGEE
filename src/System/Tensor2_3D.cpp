@@ -45,11 +45,6 @@ void Tensor2_3D::copy( const Tensor2_3D &source )
   for(int ii=0; ii<9; ++ii) mat[ii] = source(ii);
 }
 
-void Tensor2_3D::copy( const double source[9] )
-{
-  for(int ii=0; ii<9; ++ii) mat[ii] = source[ii];
-}
-
 Tensor2_3D& Tensor2_3D::operator= (const Tensor2_3D &source)
 {
   if(this == &source) return *this;

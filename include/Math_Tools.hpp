@@ -27,7 +27,7 @@ namespace MATH_T
   // n = 4 : 1 4 6 4 1          n = 5 : 1 5 10 10 5 1
   inline double binomialCoefficient( const double &n, const double &k )
   {
-    if( (k<0) || (k>n) ) return 0;
+    if( (k<0) || (k>n) ) return 0.0;
 
     int m = k;
     if( k > n-k ) m = n-k;
@@ -156,8 +156,7 @@ namespace MATH_T
   inline double get_mean( const std::vector<double> &vec )
   {
     double sum = 0.0; double nn = 0.0;
-    const unsigned int len = vec.size();
-    for(unsigned int ii=0; ii<len; ++ii)
+    for(unsigned int ii=0; ii<vec.size(); ++ii)
     {
       sum += vec[ii];
       nn  += 1.0;
@@ -168,7 +167,17 @@ namespace MATH_T
   // ----------------------------------------------------------------
   // Standard deviation
   // ----------------------------------------------------------------
-  double get_std_dev( const std::vector<double> &vec );
+  double get_std_dev( const std::vector<double> &vec )
+  {
+    const double mean_val = MATH_T::get_mean(vec);
+    double sum = 0.0; double nn = 0.0;
+    for(unsigned int ii=0; ii<vec.size(); ++ii)
+    {
+      sum += (vec[ii] - mean_val) * (vec[ii] - mean_val);
+      nn  += 1.0;
+    }
+    return std::sqrt( sum / nn );
+  }
   
   // ----------------------------------------------------------------
   // Generate a Gaussian/normal distribution random value with mean value
@@ -206,7 +215,44 @@ namespace MATH_T
   // ----------------------------------------------------------------
   // Print Histogram of an array of random vector
   // ----------------------------------------------------------------
-  void print_Histogram( const std::vector<double> &val );
+  void print_Histogram( const std::vector<double> &val )
+  {
+    const int width = 50;
+    int max = 0;
+
+    const double mean = MATH_T::get_mean(val);
+    const double std  = MATH_T::get_std_dev(val);
+
+    const double low   = mean - 3.05 * std;
+    const double high  = mean + 3.05 * std;
+    const double delta =  0.1 * std;
+
+    const int n = (int)val.size();
+
+    const int nbins = (int)((high - low) / delta);
+    int* bins = (int*)calloc(nbins,sizeof(int));
+    if ( bins != NULL )
+    {
+      for ( int i = 0; i < n; i++ )
+      {
+        int j = (int)( (val[i] - low) / delta );
+        if ( 0 <= j  &&  j < nbins ) bins[j]++;
+      }
+
+      for ( int j = 0; j < nbins; j++ )
+        if ( max < bins[j] ) max = bins[j];
+
+      for ( int j = 0; j < nbins; j++ )
+      {
+        printf("(%5.2f, %5.2f) |", low + j * delta, low + (j + 1) * delta );
+        int k = (int)( (double)width * (double)bins[j] / (double)max );
+        while(k-- > 0) putchar('*');
+        printf("  %-.1f%%", bins[j] * 100.0 / (double)n);
+        putchar('\n');
+      }
+      free(bins);
+    }
+  }
 
   // --------------------------------------------------------------------------
   // Projection operator
@@ -342,7 +388,7 @@ namespace MATH_T
       // users are responsible for allocating the b and x arrays.
       virtual void LU_solve( double const * const &b, double * const &x ) const;
       // ------------------------------------------------------------
-    
+
     protected:
       // Matrix size: N by N
       const int N;
