@@ -386,11 +386,120 @@ int main( int argc, char * argv[] )
   std::cout << "Testing d2R_dxz: " << isSame_d2R_dxz << std::endl; 
   std::cout << "Testing d2R_dyz: " << isSame_d2R_dyz << std::endl;  
   std::cout << "Testing J: " << isSame_J << std::endl;
-  std::cout << "Testing Jinv: " << isSame_Jinv << std::endl; 
+  std::cout << "Testing Jinv: " << isSame_Jinv << std::endl;
+
+  // test quad9
+  double * ctrl_x_quad_9 = new double[9]{};
+  double * ctrl_y_quad_9 = new double[9]{};
+  double * R_quad_matlab = new double[9]{};
+  double * dR_dx_quad_matlab = new double[9]{};
+  double * dR_dy_quad_matlab = new double[9]{};
+  double * d2R_dxx_quad_matlab = new double[9]{};
+  double * d2R_dyy_quad_matlab = new double[9]{};
+  double * d2R_dxy_quad_matlab = new double[9]{};
+  double * J_quad_matlab = new double[4]{};
+  double * Jinv_quad_matlab = new double[4]{};
+
+  infile.open("/Users/seavegetable/Documents/MATLAB/code_test/ctrlpts_quad.txt",std::ios::in);
+  if (!infile.is_open())
+	{
+		std::cout << "error" << std::endl;
+	}
+  for(int ii = 0; ii<9; ++ii)
+  {
+    infile >> ctrl_x_quad_9[ii];
+  }
+  for(int jj = 0; jj<9; ++jj)
+  {
+    infile >> ctrl_y_quad_9[jj];
+  }
+  for(int ii = 0; ii<9; ++ii)
+  {
+    infile >> R_quad_matlab[ii];
+  }
+  for(int ii = 0; ii<9; ++ii)
+  {
+    infile >> dR_dx_quad_matlab[ii];
+  }
+  for(int ii = 0; ii<9; ++ii)
+  {
+    infile >> dR_dy_quad_matlab[ii];
+  }
+  for(int ii = 0; ii<9; ++ii)
+  {
+    infile >> d2R_dxx_quad_matlab[ii];
+  }
+  for(int ii = 0; ii<9; ++ii)
+  {
+    infile >> d2R_dyy_quad_matlab[ii];
+  }
+  for(int ii = 0; ii<9; ++ii)
+  {
+    infile >> d2R_dxy_quad_matlab[ii];
+  }
+  for(int ii = 0; ii<4; ++ii)
+  {
+    infile >> J_quad_matlab[ii];
+  }
+  for(int ii = 0; ii<4; ++ii)
+  {
+    infile >> Jinv_quad_matlab[ii];
+  }
+  infile.close();
+  FEAElement_Quad9 quad_9(1);
+  std::vector<double> in_qp_quad{{0.5, 0.5}};
+  QuadPts_debug * quad_debug_quad = new QuadPts_debug(2, 1, in_qp_quad, in_qw );
+  quad_9.buildBasis(quad_debug_quad, ctrl_x_quad_9, ctrl_y_quad_9);
+  isSame_R = true;
+  isSame_dR_dx = true;
+  isSame_dR_dy = true;
+  isSame_d2R_dxx = true;
+  isSame_d2R_dyy = true;
+  isSame_d2R_dxy = true;
+  isSame_J = true;
+  isSame_Jinv = true;
+  
+  double * basis_quad = new double[9]{};
+  double * dR_dx_quad = new double[9]{};
+  double * dR_dy_quad = new double[9]{};
+  double * d2R_dxx_quad = new double[9]{};
+  double * d2R_dyy_quad = new double[9]{};
+  double * d2R_dxy_quad = new double[9]{};
+  double * J_quad = new double[4]{};
+  double * Jinv_quad = new double[4]{};
+  quad_9.get_2D_R_dR_d2R(0, basis_quad, dR_dx_quad, dR_dy_quad, d2R_dxx_quad, d2R_dyy_quad, d2R_dxy_quad);
+  quad_9.get_Jacobian(0, J_quad);
+  quad_9.get_invJacobian(0, Jinv_quad);
+  tol = 1e-14;
+  
+  for (int ii = 0; ii<9; ++ii)
+  {
+    if (std::abs(basis_quad[ii]-R_quad_matlab[ii])>tol) isSame_R = false;
+    if (std::abs(dR_dx_quad[ii]-dR_dx_quad_matlab[ii])>tol) isSame_dR_dx = false;
+    if (std::abs(dR_dy_quad[ii]-dR_dy_quad_matlab[ii])>tol) isSame_dR_dy = false;
+    if (std::abs(d2R_dxx_quad[ii]-d2R_dxx_quad_matlab[ii])>tol) isSame_d2R_dxx = false;
+    if (std::abs(d2R_dyy_quad[ii]-d2R_dyy_quad_matlab[ii])>tol) isSame_d2R_dyy = false;
+    if (std::abs(d2R_dxy_quad[ii]-d2R_dxy_quad_matlab[ii])>tol) isSame_d2R_dxy = false;
+  }
+  for (int ii = 0; ii<4; ++ii)
+  {
+    if (std::abs(J_quad[ii]-J_quad_matlab[ii])>tol) isSame_J = false;
+    if (std::abs(Jinv_quad[ii]-Jinv_quad_matlab[ii])>tol) isSame_Jinv = false;
+  }
+  std::cout << "============================" << std::endl; 
+  std::cout << "Testing R: " << isSame_R << std::endl; 
+  std::cout << "Testing dR_dx: " << isSame_dR_dx << std::endl;
+  std::cout << "Testing dR_dy: " << isSame_dR_dy << std::endl; 
+  std::cout << "Testing d2R_dxx: " << isSame_d2R_dxx << std::endl;
+  std::cout << "Testing d2R_dyy: " << isSame_d2R_dyy << std::endl; 
+  std::cout << "Testing d2R_dxy: " << isSame_d2R_dxy << std::endl;
+  std::cout << "Testing J: " << isSame_J << std::endl;
+  std::cout << "Testing Jinv: " << isSame_Jinv << std::endl;
+
   PetscFinalize();
 
   delete quad1; delete quad2; delete quad3;
-  delete quad_q; delete quad_debug;
+  delete quad_q; delete quad_debug; delete quad_debug_quad;
   delete[] coefficient;
   delete[] ctrl_x_hex;
   delete[] ctrl_y_hex;
@@ -427,5 +536,15 @@ int main( int argc, char * argv[] )
   delete[] d2R_dyz;
   delete[] J;
   delete[] Jinv;
+  delete[] ctrl_x_quad_9;
+  delete[] ctrl_y_quad_9;
+  delete[] R_quad_matlab;
+  delete[] dR_dx_quad_matlab;
+  delete[] dR_dy_quad_matlab;
+  delete[] d2R_dxx_quad_matlab;
+  delete[] d2R_dyy_quad_matlab;
+  delete[] d2R_dxy_quad_matlab;
+  delete[] J_quad_matlab;
+  delete[] Jinv_quad_matlab;
   return EXIT_SUCCESS;
 }
