@@ -493,7 +493,7 @@ namespace HEX_T
 
   double Hex8::get_diameter() const
   {
-    double body_diag[4] = { (pts[6] - pts[0]).norm2(), (pts[7] - pts[1]).norm2(),
+    const double body_diag[4] = { (pts[6] - pts[0]).norm2(), (pts[7] - pts[1]).norm2(),
                             (pts[4] - pts[2]).norm2(), (pts[5] - pts[3]).norm2()};
     return *std::max_element(body_diag, body_diag+4);
   }
