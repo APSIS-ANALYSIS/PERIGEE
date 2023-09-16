@@ -6,6 +6,7 @@
 #include "FEAElement_Quad9_3D_der0.hpp"
 #include "QuadPts_Gauss_Hex.hpp"
 #include "QuadPts_Gauss_Quad.hpp"
+#include "QuadPts_debug.hpp"
 #include "Vector_3.hpp"
 #include <iostream>
 #include <fstream>
@@ -318,7 +319,10 @@ int main( int argc, char * argv[] )
   infile >> detJ_matlab;
   infile.close();
   FEAElement_Hex27 hex_27(1);
-  hex_27.buildBasis(quad1, ctrl_x_hex_27, ctrl_y_hex_27, ctrl_z_hex_27);
+  std::vector<double> in_qp{{0.2, 0.3, 0.4}};
+  std::vector<double> in_qw{{1}};
+  QuadPts_debug * quad_debug = new QuadPts_debug(3, 1, in_qp, in_qw );
+  hex_27.buildBasis(quad_debug, ctrl_x_hex_27, ctrl_y_hex_27, ctrl_z_hex_27);
   double tol = 1e-14;
   bool isSame_R = true;
   bool isSame_dR_dx = true;
@@ -386,7 +390,7 @@ int main( int argc, char * argv[] )
   PetscFinalize();
 
   delete quad1; delete quad2; delete quad3;
-  delete quad_q;
+  delete quad_q; delete quad_debug;
   delete[] coefficient;
   delete[] ctrl_x_hex;
   delete[] ctrl_y_hex;
