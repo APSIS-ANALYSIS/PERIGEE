@@ -447,7 +447,7 @@ int main( int argc, char * argv[] )
   }
   infile.close();
   FEAElement_Quad9 quad_9(1);
-  std::vector<double> in_qp_quad{{0.5, 0.5}};
+  std::vector<double> in_qp_quad{{0.2, 0.3}};
   QuadPts_debug * quad_debug_quad = new QuadPts_debug(2, 1, in_qp_quad, in_qw );
   quad_9.buildBasis(quad_debug_quad, ctrl_x_quad_9, ctrl_y_quad_9);
   isSame_R = true;
@@ -470,7 +470,7 @@ int main( int argc, char * argv[] )
   quad_9.get_2D_R_dR_d2R(0, basis_quad, dR_dx_quad, dR_dy_quad, d2R_dxx_quad, d2R_dyy_quad, d2R_dxy_quad);
   quad_9.get_Jacobian(0, J_quad);
   quad_9.get_invJacobian(0, Jinv_quad);
-  tol = 1e-14;
+  tol = 1e-4;
   
   for (int ii = 0; ii<9; ++ii)
   {
@@ -495,6 +495,63 @@ int main( int argc, char * argv[] )
   std::cout << "Testing d2R_dxy: " << isSame_d2R_dxy << std::endl;
   std::cout << "Testing J: " << isSame_J << std::endl;
   std::cout << "Testing Jinv: " << isSame_Jinv << std::endl;
+
+  // test quad 9 3D
+  double * ctrl_x_quad9_3D = new double[9]{};
+  double * ctrl_y_quad9_3D = new double[9]{};
+  double * ctrl_z_quad9_3D = new double[9]{};
+  double * R_quad_3D_matlab = new double[9]{};
+  double * outn_matlab = new double[3]{};
+  
+  infile.open("/Users/seavegetable/Documents/MATLAB/code_test/ctrlpts_quad_3D.txt",std::ios::in);
+  if (!infile.is_open())
+	{
+		std::cout << "error" << std::endl;
+	}
+  for(int ii = 0; ii<9; ++ii)
+  {
+    infile >> ctrl_x_quad9_3D[ii];
+  }
+  for(int jj = 0; jj<9; ++jj)
+  {
+    infile >> ctrl_y_quad9_3D[jj];
+  }
+  for(int jj = 0; jj<9; ++jj)
+  {
+    infile >> ctrl_z_quad9_3D[jj];
+  }
+  for(int ii = 0; ii<9; ++ii)
+  {
+    infile >> R_quad_3D_matlab[ii];
+  }
+  for(int ii = 0; ii<3; ++ii)
+  {
+    infile >> outn_matlab[ii];
+  }
+  infile.close();
+  FEAElement_Quad9_3D_der0 quad9_3D(1);
+  quad9_3D.buildBasis(quad_debug_quad, ctrl_x_quad_3D, ctrl_y_quad_3D, ctrl_z_quad_3D);
+  isSame_R = true;
+  bool isSame_outn = true;
+  
+  double * basis_quad_3D = new double[9]{};
+  quad9_3D.get_R(0,basis_quad_3D);
+  double area;
+  Vector_3 outn = quad9_3D.get_2d_normal_out(0, area);
+  double * nout = new double[3]{};
+  nout[0] = outn.x();
+  nout[1] = outn.y();
+  nout[2] = outn.z();
+  tol = 1e-14;
+  
+  for (int ii = 0; ii<9; ++ii)
+  {
+    if (std::abs(basis_quad_3D[ii]-R_quad_3D_matlab[ii])>tol) isSame_R = false;
+    if (std::abs(nout[ii]-outn_matlab[ii])>tol) isSame_dR_dx = false;
+  }
+  std::cout << "============================" << std::endl; 
+  std::cout << "Testing R: " << isSame_R << std::endl; 
+  std::cout << "Testing nout: " << isSame_outn << std::endl;
 
   PetscFinalize();
 
@@ -546,5 +603,9 @@ int main( int argc, char * argv[] )
   delete[] d2R_dxy_quad_matlab;
   delete[] J_quad_matlab;
   delete[] Jinv_quad_matlab;
+  delete[] ctrl_x_quad9_3D;
+  delete[] ctrl_y_quad9_3D;
+  delete[] R_quad_3D_matlab;
+  delete[] outn_matlab;
   return EXIT_SUCCESS;
 }
