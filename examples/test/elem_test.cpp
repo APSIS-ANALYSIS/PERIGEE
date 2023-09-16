@@ -1,9 +1,14 @@
 #include "FEAElement_Hex8.hpp"
 #include "FEAElement_Quad4.hpp"
+#include "FEAElement_Hex27.hpp"
+#include "FEAElement_Quad9.hpp"
 #include "FEAElement_Quad4_3D_der0.hpp"
+#include "FEAElement_Quad9_3D_der0.hpp"
 #include "QuadPts_Gauss_Hex.hpp"
 #include "QuadPts_Gauss_Quad.hpp"
 #include "Vector_3.hpp"
+#include <iostream>
+#include <fstream>
 
 int main( int argc, char * argv[] )
 {
@@ -12,7 +17,7 @@ int main( int argc, char * argv[] )
   // Test quadrature 1D
   const double left = -1.0;
   const double right = 1.0;
-  const int max_num = 11;
+  const int max_num = 3;
   double * coefficient = new double[1024] {};
   std::random_device rd;
   std::mt19937_64 gen( rd() );
@@ -22,11 +27,11 @@ int main( int argc, char * argv[] )
     coefficient[ii] = dis(gen);
   }
   std::cout <<"Testing Quadrature 1D:" << std::endl;
-  for(int num_pts = 1; num_pts<max_num; ++num_pts)
+  for(int num_pts = 1; num_pts<max_num*5; ++num_pts)
   {
     const int poly_degree = 2*num_pts-1;
-    const double lower_bound = 0;
-    const double upper_bound = 1.0;
+    const double lower_bound = -5.0;
+    const double upper_bound = -4.0;
     double integral = 0.0;
     double integral_qua = 0.0;
 
@@ -216,7 +221,6 @@ int main( int argc, char * argv[] )
   }
 
   std::cout << "Testing hex element:" << std::endl;
-  hex2.print_info();
   // test buildBasis
   // test R by the sum of basis
   for(int ii = 0; ii<8; ii++)  std::cout << std::setprecision(16) << sum2[ii] << " ";
@@ -228,19 +232,157 @@ int main( int argc, char * argv[] )
   std::cout << std::setprecision(16) << volume - volume2 << std::endl;
   std::cout << std::setprecision(16) << volume - volume3 << std::endl;
 
-  std::cout << "Testing quad 3D element:" << std::endl;
-  // test buildBasis
-  // test R by the sum of basis
-  for(int ii = 0; ii<4; ii++)  std::cout << std::setprecision(16) << sum_quad_3D[ii] << " ";
-  std::cout << std::endl;
-  // test get_2d_normal_out
-  Vector_3 norm_vec = cross_product(vec1,vec2);
-  norm_vec.normalize();
-  double area = 1.0;
-  Vector_3 test_norm_vec = quad_3D.get_2d_normal_out(1, area);
-  norm_vec.print();
-  test_norm_vec.print();
+  // test Hex27
+  double * ctrl_x_hex_27 = new double[27]{};
+  double * ctrl_y_hex_27 = new double[27]{};
+  double * ctrl_z_hex_27 = new double[27]{};
+  double * R_matlab = new double[27]{};
+  double * dR_dx_matlab = new double[27]{};
+  double * dR_dy_matlab = new double[27]{};
+  double * dR_dz_matlab = new double[27]{};
+  double * d2R_dxx_matlab = new double[27]{};
+  double * d2R_dyy_matlab = new double[27]{};
+  double * d2R_dzz_matlab = new double[27]{};
+  double * d2R_dxy_matlab = new double[27]{};
+  double * d2R_dxz_matlab = new double[27]{};
+  double * d2R_dyz_matlab = new double[27]{};
+  double * J_matlab = new double[9]{};
+  double * Jinv_matlab = new double[9]{};
+  double detJ_matlab = 0.0;
+  std::ifstream infile;
+  infile.open("/Users/seavegetable/Documents/MATLAB/code_test/ctrlpts.txt",std::ios::in);
+  if (!infile.is_open())
+	{
+		std::cout << "error" << std::endl;
+	}
+  for(int ii = 0; ii<27; ++ii)
+  {
+    infile >> ctrl_x_hex_27[ii];
+  }
+  for(int jj = 0; jj<27; ++jj)
+  {
+    infile >> ctrl_y_hex_27[jj];
+  }
+  for(int kk = 0; kk<27; ++kk)
+  {
+    infile >> ctrl_z_hex_27[kk];
+  }
+  for(int ii = 0; ii<27; ++ii)
+  {
+    infile >> R_matlab[ii];
+  }
+  for(int ii = 0; ii<27; ++ii)
+  {
+    infile >> dR_dx_matlab[ii];
+  }
+  for(int ii = 0; ii<27; ++ii)
+  {
+    infile >> dR_dy_matlab[ii];
+  }
+  for(int ii = 0; ii<27; ++ii)
+  {
+    infile >> dR_dz_matlab[ii];
+  }
+  for(int ii = 0; ii<27; ++ii)
+  {
+    infile >> d2R_dxx_matlab[ii];
+  }
+  for(int ii = 0; ii<27; ++ii)
+  {
+    infile >> d2R_dyy_matlab[ii];
+  }
+  for(int ii = 0; ii<27; ++ii)
+  {
+    infile >> d2R_dzz_matlab[ii];
+  }
+  for(int ii = 0; ii<27; ++ii)
+  {
+    infile >> d2R_dxy_matlab[ii];
+  }
+  for(int ii = 0; ii<27; ++ii)
+  {
+    infile >> d2R_dxz_matlab[ii];
+  }
+  for(int ii = 0; ii<27; ++ii)
+  {
+    infile >> d2R_dyz_matlab[ii];
+  }
+  for(int ii = 0; ii<9; ++ii)
+  {
+    infile >> J_matlab[ii];
+  }
+  for(int ii = 0; ii<9; ++ii)
+  {
+    infile >> Jinv_matlab[ii];
+  }
+  infile >> detJ_matlab;
+  infile.close();
+  FEAElement_Hex27 hex_27(1);
+  hex_27.buildBasis(quad1, ctrl_x_hex_27, ctrl_y_hex_27, ctrl_z_hex_27);
+  double tol = 1e-14;
+  bool isSame_R = true;
+  bool isSame_dR_dx = true;
+  bool isSame_dR_dy = true;
+  bool isSame_dR_dz = true;
+  bool isSame_d2R_dxx = true;
+  bool isSame_d2R_dyy = true;
+  bool isSame_d2R_dzz = true;
+  bool isSame_d2R_dxy = true;
+  bool isSame_d2R_dxz = true;
+  bool isSame_d2R_dyz = true;
+  bool isSame_J = true;
+  bool isSame_Jinv = true;
+  bool isSame_detJ = true;
 
+  double * basis = new double[27]{};
+  double * dR_dx = new double[27]{};
+  double * dR_dy = new double[27]{};
+  double * dR_dz = new double[27]{};
+  double * d2R_dxx = new double[27]{};
+  double * d2R_dyy = new double[27]{};
+  double * d2R_dzz = new double[27]{};
+  double * d2R_dxy = new double[27]{};
+  double * d2R_dxz = new double[27]{};
+  double * d2R_dyz = new double[27]{};
+  double * J = new double[9]{};
+  double * Jinv = new double[9]{};
+  double detJ = 0.0;
+  hex_27.get_3D_R_dR_d2R(0, basis, dR_dx, dR_dy, dR_dz, d2R_dxx, d2R_dyy, d2R_dzz,
+      d2R_dxy, d2R_dxz, d2R_dyz);
+  hex_27.get_Jacobian(0, J);
+  hex_27.get_invJacobian(0, Jinv);
+
+  for (int ii = 0; ii<27; ++ii)
+  {
+    if (std::abs(basis[ii]-R_matlab[ii])>tol) isSame_R = false;
+    if (std::abs(dR_dx[ii]-dR_dx_matlab[ii])>tol) isSame_dR_dx = false;
+    if (std::abs(dR_dy[ii]-dR_dy_matlab[ii])>tol) isSame_dR_dy = false;
+    if (std::abs(dR_dz[ii]-dR_dz_matlab[ii])>tol) isSame_dR_dz = false;
+    if (std::abs(d2R_dxx[ii]-d2R_dxx_matlab[ii])>tol) isSame_d2R_dxx = false;
+    if (std::abs(d2R_dyy[ii]-d2R_dyy_matlab[ii])>tol) isSame_d2R_dyy = false;
+    if (std::abs(d2R_dzz[ii]-d2R_dzz_matlab[ii])>tol) isSame_d2R_dzz = false;
+    if (std::abs(d2R_dxy[ii]-d2R_dxy_matlab[ii])>tol) isSame_d2R_dxy = false;
+    if (std::abs(d2R_dxz[ii]-d2R_dxz_matlab[ii])>tol) isSame_d2R_dxz = false;
+    if (std::abs(d2R_dyz[ii]-d2R_dyz_matlab[ii])>tol) isSame_d2R_dyz = false;
+  }
+  for (int ii = 0; ii<9; ++ii)
+  {
+    if (std::abs(J[ii]-J_matlab[ii])>tol) isSame_J = false;
+    if (std::abs(Jinv[ii]-Jinv_matlab[ii])>tol) isSame_Jinv = false;
+  }
+
+  std::cout << "Testing R: " << isSame_R << std::endl; 
+  std::cout << "Testing dR_dx: " << isSame_dR_dx << std::endl;
+  std::cout << "Testing dR_dy: " << isSame_dR_dy << std::endl; 
+  std::cout << "Testing dR_dz: " << isSame_dR_dz << std::endl;
+  std::cout << "Testing d2R_dxx: " << isSame_d2R_dxx << std::endl;
+  std::cout << "Testing d2R_dyy: " << isSame_d2R_dyy << std::endl; 
+  std::cout << "Testing d2R_dzz: " << isSame_d2R_dzz << std::endl;
+  std::cout << "Testing d2R_dxy: " << isSame_d2R_dxy << std::endl;
+  std::cout << "Testing d2R_dxz: " << isSame_d2R_dxz << std::endl; 
+  std::cout << "Testing d2R_dyz: " << isSame_d2R_dyz << std::endl;  
+  std::cout << "Testing J: " << isSame_J << std::endl;
+  std::cout << "Testing Jinv: " << isSame_Jinv << std::endl; 
   PetscFinalize();
 
   delete quad1; delete quad2; delete quad3;
@@ -249,10 +391,37 @@ int main( int argc, char * argv[] )
   delete[] ctrl_x_hex;
   delete[] ctrl_y_hex;
   delete[] ctrl_z_hex;
+  delete[] ctrl_x_hex_27;
+  delete[] ctrl_y_hex_27;
+  delete[] ctrl_z_hex_27;
   delete[] ctrl_x_quad_3D;
   delete[] ctrl_y_quad_3D;
   delete[] ctrl_z_quad_3D;
   delete[] sum2; delete[] sum3;
   delete[] sum_quad_3D;
+  delete[] R_matlab;
+  delete[] dR_dx_matlab; 
+  delete[] dR_dy_matlab; 
+  delete[] dR_dz_matlab; 
+  delete[] d2R_dxx_matlab;
+  delete[] d2R_dyy_matlab;
+  delete[] d2R_dzz_matlab;
+  delete[] d2R_dxy_matlab;
+  delete[] d2R_dxz_matlab;
+  delete[] d2R_dyz_matlab;
+  delete[] J_matlab;
+  delete[] Jinv_matlab;
+  delete[] basis;
+  delete[] dR_dx;
+  delete[] dR_dy;
+  delete[] dR_dz;
+  delete[] d2R_dxx;
+  delete[] d2R_dyy;
+  delete[] d2R_dzz;
+  delete[] d2R_dxy;
+  delete[] d2R_dxz;
+  delete[] d2R_dyz;
+  delete[] J;
+  delete[] Jinv;
   return EXIT_SUCCESS;
 }
