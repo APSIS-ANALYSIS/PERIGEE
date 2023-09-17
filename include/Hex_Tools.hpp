@@ -33,13 +33,11 @@ namespace HEX_T
   //                    length 3 x numpts
   //          \para ien_array : connectivity array, length is 8 or 27 x numcels
   // --------------------------------------------------------------------------
-  // ----------------------------------------------------------------
   void gen_hex_grid( vtkUnstructuredGrid * const &grid_w,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt,
       const std::vector<int> &ien_array );
 
-  // ----------------------------------------------------------------
   // --------------------------------------------------------------------------
   // ! write_tet_grid: write the volumetric mesh described by linear 
   //                   or quadratic hexahedral elements. The routine
@@ -53,13 +51,11 @@ namespace HEX_T
   //          \para IOdata : the integer data to be written on cells or nodes 
   //          \para isXML : the flag indicate vtk/vtu format
   // --------------------------------------------------------------------------
-  // ----------------------------------------------------------------
   void write_hex_grid( const std::string &filename,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, const std::vector<int> &ien_array,
       const std::vector<DataVecStr<int>> &IOdata, const bool &isXML = true );
 
-  // ----------------------------------------------------------------
   // --------------------------------------------------------------------------
   // ! gen_quad_grid: generate the surface mesh described by linear quadrilateral 
   //                  elements, and pass the data to vtkPolyData.
@@ -67,13 +63,11 @@ namespace HEX_T
   //   modified by reference. This is convenient for adding additional
   //   fields to the polydata before writing.
   // --------------------------------------------------------------------------
-  // ----------------------------------------------------------------
   void gen_quad_grid( vtkPolyData * const &grid_w,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt,
       const std::vector<int> &ien_array );
 
-  // ----------------------------------------------------------------
   // --------------------------------------------------------------------------
   // ! write_quad_grid: write the surface mesh described by linear quadrilateral
   //                    elements.
@@ -84,14 +78,12 @@ namespace HEX_T
   //          \para ien_array : connectivity array, length 4 numcels
   //          \para IOdata : the integer data to be written on cells or nodes 
   // --------------------------------------------------------------------------
-  // ----------------------------------------------------------------
   void write_quad_grid( const std::string &filename,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, 
       const std::vector<int> &ien_array,
       const std::vector<DataVecStr<int>> &IOdata );
 
-  // ----------------------------------------------------------------
   // --------------------------------------------------------------------------
   // ! gen_quadratic_quad_grid: generate the surface mesh described by
   //                            quadratic quadrilateral elements and pass 
@@ -100,13 +92,11 @@ namespace HEX_T
   //   modified by reference. This is convenient for adding additional
   //   fields to the unstructured grid before writing.
   // --------------------------------------------------------------------------
-  // ----------------------------------------------------------------
   void gen_quadratic_quad_grid( vtkUnstructuredGrid * const &grid_w,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt,
       const std::vector<int> &ien_array );
 
-  // ----------------------------------------------------------------
   // --------------------------------------------------------------------------
   // ! write_quadratic_quad_grid: write the surface mesh described by
   //                              quadratic quadrilateral elements.
@@ -117,7 +107,6 @@ namespace HEX_T
   //          \para ien_array : connectivity array, length 9 numcels
   //          \para IOdata : the integer data to be written on cells or nodes 
   // --------------------------------------------------------------------------
-  // ----------------------------------------------------------------
   void write_quadratic_quad_grid( const std::string &filename,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, 
@@ -151,7 +140,6 @@ namespace HEX_T
       const std::vector<double> &vol_ctrlPts,
       const IIEN * const &vol_ien );
 
-  // ----------------------------------------------------------------
   // --------------------------------------------------------------------------
   // ! get_aspect_ratio:
   //   Input: \para x_i, y_i, z_i for node i=0,1,2,3,4,5,6,7.
@@ -164,7 +152,6 @@ namespace HEX_T
   //   for quadratic hexes, the aspect ratio is calculated by extracting
   //   its eight vertices and ignoring the mid-edge points.
   // --------------------------------------------------------------------------
-  // ----------------------------------------------------------------
   double get_aspect_ratio( const std::array<Vector_3, 8> &pt );
 
   // ==========================================================================
