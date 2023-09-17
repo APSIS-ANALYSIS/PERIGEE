@@ -273,7 +273,7 @@ void Gmsh_FileIO::write_interior_vtp( const std::string &vtp_filename,
   std::vector<int> face2elem_2( bcnumcl, -1) ;
   for(int ff=0; ff<bcnumcl; ++ff)
   {
-    int snode[nlocbas_2d];
+    std::vector<int> snode( nlocbas_2d, -1 );
     for (int ii{0}; ii < nlocbas_2d; ++ii)
       snode[ii] = sur_ien_global[nlocbas_2d * ff + ii];
 
@@ -284,16 +284,15 @@ void Gmsh_FileIO::write_interior_vtp( const std::string &vtp_filename,
       ee += 1;
       const int vol_elem = gelem_1[ee];
 
-      int vnode[nlocbas_3d_1];
+      std::vector<int> vnode( nlocbas_3d_1, -1 );
       for (int jj{0}; jj < nlocbas_3d_1; ++jj)
         vnode[jj] = vol_IEN_1[nlocbas_3d_1 * vol_elem + jj];
-      std::sort(vnode, vnode + nlocbas_3d_1); 
 
       bool got_all_nodes = true;
 
         for (int ii{0}; ii < nlocbas_2d; ++ii)
         {
-          const bool got_each_node = ( std::find(vnode, vnode+nlocbas_3d_1, snode[ii]) != vnode+nlocbas_3d_1 );
+          const bool got_each_node = VEC_T::is_invec(vnode, snode[ii]);
           got_all_nodes = got_all_nodes && got_each_node;
         }
         vol1_got_sur_elem = got_all_nodes;
@@ -314,16 +313,15 @@ void Gmsh_FileIO::write_interior_vtp( const std::string &vtp_filename,
       ee += 1;
       const int vol_elem = gelem_2[ee];
 
-      int vnode[nlocbas_3d_2];
-        for (int jj{0}; jj < nlocbas_3d_2; ++jj)
-          vnode[jj] = vol_IEN_2[nlocbas_3d_2 * vol_elem + jj];
-        std::sort(vnode, vnode + nlocbas_3d_2); 
+      std::vector<int> vnode( nlocbas_3d_2, -1 );
+      for (int jj{0}; jj < nlocbas_3d_2; ++jj)
+        vnode[jj] = vol_IEN_2[nlocbas_3d_2 * vol_elem + jj];
 
       bool got_all_nodes = true;
 
         for (int ii{0}; ii < nlocbas_2d; ++ii)
         {
-          const bool got_each_node = ( std::find(vnode, vnode+nlocbas_3d_2, snode[ii]) != vnode+nlocbas_3d_2 );
+          const bool got_each_node = VEC_T::is_invec(vnode, snode[ii]);
           got_all_nodes = got_all_nodes && got_each_node;
         }
         vol2_got_sur_elem = got_all_nodes;
@@ -424,13 +422,13 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
   std::string ele_3d {};
   if (nlocbas_2d == 3 && nlocbas_3d == 4)
   {
-    ele_2d = static_cast<std::string>("triangle");
-    ele_3d = static_cast<std::string>("tetrahedron");
+    ele_2d += static_cast<std::string>("triangle");
+    ele_3d += static_cast<std::string>("tetrahedron");
   }
   else if (nlocbas_2d == 4 && nlocbas_3d == 8)
   {
-    ele_2d = static_cast<std::string>("quadrilateral");
-    ele_3d = static_cast<std::string>("hexahedron");
+    ele_2d += static_cast<std::string>("quadrilateral");
+    ele_3d += static_cast<std::string>("hexahedron");
   }
   else
     SYS_T::print_exit("Error: Gmsh_FileIO::write_vtp, element types of surface and volume donnot match. \n");
@@ -489,8 +487,8 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
 
     for(int ff=0; ff<bcnumcl; ++ff)
     {
-      int snode[nlocbas_2d];
-      for(int ii{0}; ii < nlocbas_2d; ++ii)
+      std::vector<int> snode( nlocbas_2d, -1);
+      for (int ii{0}; ii < nlocbas_2d; ++ii)
         snode[ii] = sur_ien_global[nlocbas_2d * ff + ii];
 
       bool got_sur_elem = false;
@@ -500,16 +498,15 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
         ee += 1;
         const int vol_elem = gelem[ee];
 
-        int vnode[nlocbas_3d];
+        std::vector<int> vnode( nlocbas_3d, -1 );
         for (int jj{0}; jj < nlocbas_3d; ++jj)
           vnode[jj] = vol_IEN[nlocbas_3d * vol_elem + jj];
-        std::sort(vnode, vnode + nlocbas_3d); 
 
         bool got_all_nodes = true;
 
-        for(int ii{0}; ii < nlocbas_2d; ++ii)
+        for (int ii{0}; ii < nlocbas_2d; ++ii)
         {
-          const bool got_each_node = ( std::find(vnode, vnode+nlocbas_3d, snode[ii]) != vnode+nlocbas_3d );
+          const bool got_each_node = VEC_T::is_invec(vnode, snode[ii]);
           got_all_nodes = got_all_nodes && got_each_node;
         }
         got_sur_elem = got_all_nodes;
@@ -530,12 +527,12 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
   input_vtk_data.push_back({bcpt, "GlobalNodeID", AssociateObject::Node});
   input_vtk_data.push_back({face2elem, "GlobalElementID", AssociateObject::Cell});
 
-  if(nlocbas_2d == 3)
+  if (nlocbas_2d == 3)
   {
     TET_T::write_triangle_grid( vtp_filename, bcnumpt, bcnumcl,
       sur_pt, sur_ien, input_vtk_data );
   }
-  else if(nlocbas_2d == 4)
+  else if (nlocbas_2d == 4)
   {
     HEX_T::write_quad_grid( vtp_filename, bcnumpt, bcnumcl,
       sur_pt, sur_ien, input_vtk_data );
@@ -1398,15 +1395,15 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
   { 
     nVertex_2d = 3;
     nVertex_3d = 4;
-    ele_2d = static_cast<std::string>("triangle");
-    ele_3d = static_cast<std::string>("tetrahedron");
+    ele_2d += static_cast<std::string>("triangle");
+    ele_3d += static_cast<std::string>("tetrahedron");
   }
   else if (nlocbas_2d == 9 && nlocbas_3d == 27)
   {
     nVertex_2d = 4;
     nVertex_3d = 8;
-    ele_2d = static_cast<std::string>("quadrilateral");
-    ele_3d = static_cast<std::string>("hexahedron");
+    ele_2d += static_cast<std::string>("quadrilateral");
+    ele_3d += static_cast<std::string>("hexahedron");
   }
   else
     SYS_T::print_exit("Error: Gmsh_FileIO::write_quadratic_sur_vtu, element types of surface and volume donnot match. \n");
@@ -1474,7 +1471,7 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
 
     for(int ff=0; ff<bcnumcl; ++ff)
     {
-      int snode[nVertex_2d];
+      std::vector<int> snode( nVertex_2d, -1 );
       for (int ii{0}; ii < nVertex_2d; ++ii)
         snode[ii] = sur_ien_global[nlocbas_2d * ff + ii];
       
@@ -1485,15 +1482,14 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
         ee += 1;
         const int vol_elem = gelem[ee];
 
-        int vnode[nVertex_3d];
+        std::vector<int> vnode( nVertex_3d, -1 );
         for (int jj{0}; jj < nVertex_3d; ++jj)
           vnode[jj] = vol_IEN[nlocbas_3d * vol_elem + jj];
-        std::sort(vnode, vnode + nVertex_3d);
 
         bool got_all_vertices = true;
         for (int ii{0}; ii < nVertex_2d; ++ii)
         {
-          const bool got_each_vertex = ( std::find(vnode, vnode+nVertex_3d, snode[ii]) != vnode+nVertex_3d );
+          const bool got_each_vertex = VEC_T::is_invec(vnode, snode[ii]);
           got_all_vertices = got_all_vertices && got_each_vertex;
         }
         got_sur_elem = got_all_vertices;
