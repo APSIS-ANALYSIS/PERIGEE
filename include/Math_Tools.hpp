@@ -8,9 +8,7 @@
 // ============================================================================
 #include <stdio.h>
 #include <vector> 
-#include <random>
-#include <iostream>
-#include <iomanip>
+#include "Matrix_double_3by3_Array.hpp"
 
 namespace MATH_T
 {
@@ -29,7 +27,7 @@ namespace MATH_T
   // n = 4 : 1 4 6 4 1          n = 5 : 1 5 10 10 5 1
   inline double binomialCoefficient( const double &n, const double &k )
   {
-    if( (k<0) || (k>n) ) return 0;
+    if( (k<0) || (k>n) ) return 0.0;
 
     int m = k;
     if( k > n-k ) m = n-k;
@@ -124,14 +122,41 @@ namespace MATH_T
   }
 
   // ----------------------------------------------------------------
+  // Generate outward normal vector from a tangential vector.
+  // t : the tangential vector
+  // p0 : the starting point of the tangential vector
+  // p1 : the interior point 
+  // n : the normal vector
+  // Algorithm: p1->p0 gives the vector m,
+  //            n = m - (m,t) t / (t,t).
+  // ----------------------------------------------------------------
+  void get_n_from_t( const double &tx, const double &ty, const double &tz,
+      const double &p0_x, const double &p0_y, const double &p0_z,
+      const double &p1_x, const double &p1_y, const double &p1_z,
+      double &nx, double &ny, double &nz );
+
+
+  // ----------------------------------------------------------------
+  // Calculate the circumscribing sphere's centre point and radius
+  // of four given points
+  // ----------------------------------------------------------------
+  void get_tet_sphere_info( const double &x0, const double &x1,
+      const double &x2, const double &x3, const double &y0, 
+      const double &y1, const double &y2, const double &y3,
+      const double &z0, const double &z1, const double &z2, 
+      const double &z3, double &x, double &y, double &z, double &r );
+
+  Vector_3 get_tet_sphere_info( const Vector_3 &pt0, const Vector_3 &pt1, 
+      const Vector_3 &pt2, const Vector_3 &pt3, double &radius );
+
+  // ----------------------------------------------------------------
   // Statistical quantities
   // Mean value
   // ----------------------------------------------------------------
   inline double get_mean( const std::vector<double> &vec )
   {
     double sum = 0.0; double nn = 0.0;
-    const unsigned int len = vec.size();
-    for(unsigned int ii=0; ii<len; ++ii)
+    for(unsigned int ii=0; ii<vec.size(); ++ii)
     {
       sum += vec[ii];
       nn  += 1.0;
@@ -142,16 +167,29 @@ namespace MATH_T
   // ----------------------------------------------------------------
   // Standard deviation
   // ----------------------------------------------------------------
-  double get_std_dev( const std::vector<double> &vec );
+  double get_std_dev( const std::vector<double> &vec )
+  {
+    const double mean_val = MATH_T::get_mean(vec);
+    double sum = 0.0; double nn = 0.0;
+    for(unsigned int ii=0; ii<vec.size(); ++ii)
+    {
+      sum += (vec[ii] - mean_val) * (vec[ii] - mean_val);
+      nn  += 1.0;
+    }
+    return std::sqrt( sum / nn );
+  }
   
   // ----------------------------------------------------------------
-  // Generate a Gaussian distribution vector with length n, mean value
-  // mean, and standard deviation dev, using Marsaglia algorithm
-  //
-  // Note: Call srand((unsigned int)time(NULL)) before calling this generator!
+  // Generate a Gaussian/normal distribution random value with mean value
+  // mean, and standard deviation dev.
   // ----------------------------------------------------------------
-  void gen_Gaussian( const int &n, const double &mean, const double &std,
-      std::vector<double> &val );
+  inline double gen_double_rand_normal( const double &mean, const double &std )
+  {
+    std::random_device rd;
+    std::mt19937_64 gen( rd() );
+    std::normal_distribution<double> dis(mean, std);
+    return dis(gen);
+  }
 
   // ----------------------------------------------------------------
   // gen_int_rand and gen_double_rand
@@ -177,8 +215,97 @@ namespace MATH_T
   // ----------------------------------------------------------------
   // Print Histogram of an array of random vector
   // ----------------------------------------------------------------
-  void print_Histogram( const std::vector<double> &val );
-  
+  void print_Histogram( const std::vector<double> &val )
+  {
+    const int width = 50;
+    int max = 0;
+
+    const double mean = MATH_T::get_mean(val);
+    const double std  = MATH_T::get_std_dev(val);
+
+    const double low   = mean - 3.05 * std;
+    const double high  = mean + 3.05 * std;
+    const double delta =  0.1 * std;
+
+    const int n = (int)val.size();
+
+    const int nbins = (int)((high - low) / delta);
+    int* bins = (int*)calloc(nbins,sizeof(int));
+    if ( bins != NULL )
+    {
+      for ( int i = 0; i < n; i++ )
+      {
+        int j = (int)( (val[i] - low) / delta );
+        if ( 0 <= j  &&  j < nbins ) bins[j]++;
+      }
+
+      for ( int j = 0; j < nbins; j++ )
+        if ( max < bins[j] ) max = bins[j];
+
+      for ( int j = 0; j < nbins; j++ )
+      {
+        printf("(%5.2f, %5.2f) |", low + j * delta, low + (j + 1) * delta );
+        int k = (int)( (double)width * (double)bins[j] / (double)max );
+        while(k-- > 0) putchar('*');
+        printf("  %-.1f%%", bins[j] * 100.0 / (double)n);
+        putchar('\n');
+      }
+      free(bins);
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // Projection operator
+  // --------------------------------------------------------------------------
+  // L2-projection of a function to a piecewise constant (DGP0 space)
+  // f : the function f's value evaluated at nqp quadrature points
+  // gwts : gwts = detJac(i) * w(i) the Jacobian for the element and the
+  //        quadrature weights.
+  // nqp : number of quadrature points
+  // return a scalar Prof(f) := int_omega f dx / int_omega 1 dx
+  //                          = sum(f * gwts) / sum(gwts)
+  // --------------------------------------------------------------------------
+  double L2Proj_DGP0( const double * const &f, 
+      const double * const &gwts, const int &nqp );
+
+  // --------------------------------------------------------------------------
+  // L2-projection of a function to a piecewise linear (DGP1 space) in 2D.
+  // f : the function value evaluated at nqp quadrature points
+  // gwts : gwts = detJac(i) * w(i) the Jacobian for the element and the weights
+  // qp_x : the quadrature points x-coordinates
+  // qp_y : the quadrature points y-coordinates
+  // nqp : the number of quadrature points
+  // output: coeff_0, coeff_x, coeff_y.
+  // The projected polynomial is
+  //         coeff_0 + coeff_x x + coeff_y y.
+  // --------------------------------------------------------------------------
+  void L2Proj_DGP1_2D( const double * const &f,
+      const double * const &gwts,
+      const double * const &qp_x,
+      const double * const &qp_y,
+      const int &nqp,
+      double &coeff_0, double &coeff_x, double &coeff_y );
+
+  // --------------------------------------------------------------------------
+  // L2-projection of a function to a piecewise linear (DGP1 space) in 3D.
+  // f : the function value evaluated at nqp quadrature points
+  // gwts : gwts = detJac(i) * w(i) the Jacobian for the element and the weights
+  // qp_x : the quadrature points x-coordinates
+  // qp_y : the quadrature points y-coordinates
+  // qp_z : the quadrature points z-coordinates
+  // nqp : the number of quadrature points
+  // output: coeff_0, coeff_x, coeff_y, coeff_z.
+  // The projected polynomial is
+  //         coeff_0 + coeff_x x + coeff_y y + coeff_z z.
+  // --------------------------------------------------------------------------
+  void L2Proj_DGP1_3D( const double * const &f,
+      const double * const &gwts,
+      const double * const &qp_x,
+      const double * const &qp_y,
+      const double * const &qp_z,
+      const int &nqp,
+      double &coeff_0, double &coeff_x, double &coeff_y, double &coeff_z );
+
   // ================================================================
   // Dense Matrix tool
   // This is an implementation of dense matrix in C++.
@@ -261,7 +388,7 @@ namespace MATH_T
       // users are responsible for allocating the b and x arrays.
       virtual void LU_solve( double const * const &b, double * const &x ) const;
       // ------------------------------------------------------------
-    
+
     protected:
       // Matrix size: N by N
       const int N;

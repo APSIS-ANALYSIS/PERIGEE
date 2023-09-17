@@ -1,76 +1,161 @@
 #include "Math_Tools.hpp"
 
-double MATH_T::get_std_dev( const std::vector<double> &vec )
+double MATH_T::L2Proj_DGP0( const double * const &f,
+    const double * const &gwts, const int &nqp )
 {
-  double mean_val = MATH_T::get_mean(vec);
-  const unsigned int len = vec.size();
-
-  double sum = 0.0; double nn = 0.0;
-  for(unsigned int ii=0; ii<len; ++ii)
+  double sum_top = 0.0, sum_bot = 0.0;
+  for(int ii=0; ii<nqp; ++ii)
   {
-    sum += (vec[ii] - mean_val) * (vec[ii] - mean_val);
-    nn  += 1.0;
+    sum_top += f[ii] * gwts[ii];
+    sum_bot += gwts[ii];
   }
-
-  return std::sqrt( sum / nn );
+  return sum_top / sum_bot;
 }
 
-void MATH_T::gen_Gaussian( const int &n, const double &mean, 
-    const double &std, std::vector<double> &val )
+void MATH_T::L2Proj_DGP1_2D( const double * const &f,
+    const double * const &gwts,
+    const double * const &qp_x,
+    const double * const &qp_y,
+    const int &nqp,
+    double &coeff_0, double &coeff_x, double &coeff_y )
 {
-  const int m = n + n % 2;
-  val.resize(m);
-  for ( int ii = 0; ii < m; ii += 2 )
+  double a [9] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  double b [3] = {0.0, 0.0, 0.0};
+
+  for(int ii=0; ii<nqp; ++ii)
   {
-    double x,y,rsq,f;
-    do {
-      x = 2.0 * rand() / (double)RAND_MAX - 1.0;
-      y = 2.0 * rand() / (double)RAND_MAX - 1.0;
-      rsq = x * x + y * y;
-    }while( rsq >= 1. || rsq == 0. );
-    f = std::sqrt( -2.0 * log(rsq) / rsq );
-    val[ii]   = mean + std * x * f;
-    val[ii+1] = mean + std * y * f;
+    a[0] += gwts[ii];
+    a[1] += gwts[ii] * qp_x[ii];
+    a[2] += gwts[ii] * qp_y[ii];
+    a[4] += gwts[ii] * qp_x[ii] * qp_x[ii];
+    a[5] += gwts[ii] * qp_x[ii] * qp_y[ii];
+    a[8] += gwts[ii] * qp_y[ii] * qp_y[ii];
+
+    b[0] += gwts[ii] * f[ii];
+    b[1] += gwts[ii] * f[ii] * qp_x[ii];
+    b[2] += gwts[ii] * f[ii] * qp_y[ii];
   }
+  a[3] = a[1]; a[6] = a[2]; a[7] = a[5];
+
+  Matrix_double_3by3_Array AA(a[0], a[1], a[2], a[3],
+      a[4], a[5], a[6], a[7], a[8]);
+
+  AA.LU_fac();
+
+  AA.LU_solve(b[0], b[1], b[2], coeff_0, coeff_x, coeff_y);
 }
 
-void MATH_T::print_Histogram( const std::vector<double> &val )
+void MATH_T::L2Proj_DGP1_3D( const double * const &f,
+    const double * const &gwts,
+    const double * const &qp_x,
+    const double * const &qp_y,
+    const double * const &qp_z,
+    const int &nqp,
+    double &coeff_0, double &coeff_x, double &coeff_y, double &coeff_z )
 {
-  const int width = 50;
-  int max = 0;
+  double a [16] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  double b [4]  = {0.0, 0.0, 0.0, 0.0};
 
-  const double mean = MATH_T::get_mean(val);
-  const double std  = MATH_T::get_std_dev(val);
-
-  const double low   = mean - 3.05 * std;
-  const double high  = mean + 3.05 * std;
-  const double delta =  0.1 * std;
-
-  const int n = (int)val.size();
-
-  const int nbins = (int)((high - low) / delta);
-  int* bins = (int*)calloc(nbins,sizeof(int));
-  if ( bins != NULL )
+  for(int ii=0; ii<nqp; ++ii)
   {
-    for ( int i = 0; i < n; i++ )
-    {
-      int j = (int)( (val[i] - low) / delta );
-      if ( 0 <= j  &&  j < nbins ) bins[j]++;
-    }
+    a[0] += gwts[ii];
+    a[1] += gwts[ii] * qp_x[ii];
+    a[2] += gwts[ii] * qp_y[ii];
+    a[3] += gwts[ii] * qp_z[ii];
+    a[5] += gwts[ii] * qp_x[ii] * qp_x[ii];
+    a[6] += gwts[ii] * qp_x[ii] * qp_y[ii];
+    a[7] += gwts[ii] * qp_x[ii] * qp_z[ii];
+    a[10] += gwts[ii] * qp_y[ii] * qp_y[ii];
+    a[11] += gwts[ii] * qp_y[ii] * qp_z[ii];
+    a[15] += gwts[ii] * qp_z[ii] * qp_z[ii];
 
-    for ( int j = 0; j < nbins; j++ )
-      if ( max < bins[j] ) max = bins[j];
-
-    for ( int j = 0; j < nbins; j++ )
-    {
-      printf("(%5.2f, %5.2f) |", low + j * delta, low + (j + 1) * delta );
-      int k = (int)( (double)width * (double)bins[j] / (double)max );
-      while(k-- > 0) putchar('*');
-      printf("  %-.1f%%", bins[j] * 100.0 / (double)n);
-      putchar('\n');
-    }
-    free(bins);
+    b[0] += gwts[ii] * f[ii];
+    b[1] += gwts[ii] * f[ii] * qp_x[ii];
+    b[2] += gwts[ii] * f[ii] * qp_y[ii];
+    b[3] += gwts[ii] * f[ii] * qp_z[ii];
   }
+  a[4] = a[1]; a[8] = a[2]; a[12] = a[3];
+  a[9] = a[6]; a[13] = a[7]; a[14] = a[11];
+
+  MATH_T::Matrix_dense AA(4);
+
+  AA.set_values( a );
+
+  AA.LU_fac();
+
+  double out[4] = {0.0, 0.0, 0.0, 0.0};
+
+  AA.LU_solve(b, out);
+
+  coeff_0 = out[0]; coeff_x = out[1]; coeff_y = out[2]; coeff_z = out[3];
+}
+
+void MATH_T::get_n_from_t( 
+    const double &tx, const double &ty, const double &tz,
+    const double &p0_x, const double &p0_y, const double &p0_z,
+    const double &p1_x, const double &p1_y, const double &p1_z,
+    double &nx, double &ny, double &nz )
+{
+  const double mx = p0_x - p1_x;
+  const double my = p0_y - p1_y;
+  const double mz = p0_z - p1_z;
+
+  const double mdt = mx * tx + my * ty + mz * tz;
+  const double tdt = tx * tx + ty * ty + tz * tz;
+  const double fac = mdt / tdt;
+
+  nx = mx - fac * tx;
+  ny = my - fac * ty;
+  nz = mz - fac * tz;
+
+  const double len = std::sqrt(nx*nx + ny*ny + nz*nz);
+  nx = nx / len;
+  ny = ny / len;
+  nz = nz / len;
+}
+
+void MATH_T::get_tet_sphere_info( const double &x0, const double &x1,
+    const double &x2, const double &x3, const double &y0,
+    const double &y1, const double &y2, const double &y3,
+    const double &z0, const double &z1, const double &z2,
+    const double &z3, double &x, double &y, double &z, double &r )
+{
+  Matrix_double_3by3_Array AA(
+      2.0 * (x1-x0), 2.0 * (y1-y0), 2.0 * (z1-z0),
+      2.0 * (x2-x0), 2.0 * (y2-y0), 2.0 * (z2-z0),
+      2.0 * (x3-x0), 2.0 * (y3-y0), 2.0 * (z3-z0) );
+
+  AA.LU_fac();
+
+  const double xyz2 = x0*x0 + y0*y0 + z0*z0;
+
+  AA.LU_solve( x1*x1 + y1*y1 + z1*z1 - xyz2,
+      x2*x2 + y2*y2 + z2*z2 - xyz2,
+      x3*x3 + y3*y3 + z3*z3 - xyz2,
+      x, y, z );
+
+  r = std::sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0) );
+}
+
+Vector_3 MATH_T::get_tet_sphere_info( const Vector_3 &pt0,
+    const Vector_3 &pt1, const Vector_3 &pt2, const Vector_3 &pt3, 
+    double &radius ) 
+{
+  Matrix_double_3by3_Array AA(
+      2.0 * (pt1.x()-pt0.x()), 2.0 * (pt1.y()-pt0.y()), 2.0 * (pt1.z()-pt0.z()),
+      2.0 * (pt2.x()-pt0.x()), 2.0 * (pt2.y()-pt0.y()), 2.0 * (pt2.z()-pt0.z()),
+      2.0 * (pt3.x()-pt0.x()), 2.0 * (pt3.y()-pt0.y()), 2.0 * (pt3.z()-pt0.z()) );
+
+  AA.LU_fac();
+
+  const double xyz2 = pt0.dot_product( pt0 );
+
+  const Vector_3 centre = AA.LU_solve( Vector_3( pt1.dot_product(pt1) - xyz2,
+      pt2.dot_product(pt2) - xyz2, pt3.dot_product(pt3) - xyz2 ) );
+
+  radius = ( centre - pt0 ).norm2();
+
+  return centre;
 }
 
 namespace MATH_T
