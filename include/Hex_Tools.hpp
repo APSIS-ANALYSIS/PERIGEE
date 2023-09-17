@@ -1,20 +1,15 @@
 #ifndef HEX_TOOLS_HPP
 #define HEX_TOOLS_HPP
-// ==================================================================
+// ============================================================================
 // Hex_Tools.hpp
 //
-// This is a suite of basic hexahedral element tools with IO and
-// basic mesh quality evaluation.
+// This is a suite of basic hexahedral element tools with IO and basic mesh 
+// quality evaluation.
 
-// We use 27-node hexahedron and 9-node quadrilateral, but NOT
-// 20-node hexahedron or 8-node quadrilateral, as the quadratic
+// We use 27-node hexahedron and 9-node quadrilateral, but NOT 20-node hexahedron
+// or 8-node quadrilateral, as the quadratic
 // elements at present.
-// ==================================================================
-#include "DataVecStr.hpp"
-#include "Vec_Tools.hpp"
-#include "VTK_Tools.hpp"
-#include "Math_Tools.hpp"
-#include "IIEN.hpp"
+// ============================================================================
 #include "Tet_Tools.hpp"
 
 #include <vtkQuad.h>
@@ -24,11 +19,11 @@
 
 namespace HEX_T
 {
-  // ================================================================
+  // ==========================================================================
   // ===> 1. This set of tools WRITE volumetric mesh of Hexahedron or
   //         quadrilateral to .vtu file and surface mesh to .vtp file.  
-  // ================================================================
-  // ----------------------------------------------------------------
+  // ==========================================================================
+  // --------------------------------------------------------------------------
   // ! gen_hex_grid: generate the volumetric mesh described by hex
   //                 elements, and pass the data to vtkUnstructuredGrid.
   //   Input: \para grid_w : the vtk object taking the mesh info
@@ -36,8 +31,8 @@ namespace HEX_T
   //          \para numcels : the number of hexahedral elements
   //          \para pt: xyz coordinates of the linear or quadratic hexes,
   //                    length 3 x numpts
-  //          \para ien_array : connectivity array, 
-  //                            length 8 or 27 x numcels
+  //          \para ien_array : connectivity array, length is 8 or 27 x numcels
+  // --------------------------------------------------------------------------
   // ----------------------------------------------------------------
   void gen_hex_grid( vtkUnstructuredGrid * const &grid_w,
       const int &numpts, const int &numcels,
@@ -45,6 +40,7 @@ namespace HEX_T
       const std::vector<int> &ien_array );
 
   // ----------------------------------------------------------------
+  // --------------------------------------------------------------------------
   // ! write_tet_grid: write the volumetric mesh described by linear 
   //                   or quadratic hexahedral elements. The routine
   //                   will detect the element type based on the length
@@ -52,12 +48,11 @@ namespace HEX_T
   //   Input: \para filename : the filename.vtu is the file to be written.
   //          \para numpts : the number of grid points
   //          \para numcels : the number of hexahedral elements
-  //          \para pt: xyz coordinates of the linear tets, length 
-  //                    3 x numpts
-  //          \para ien_array : connectivity array, 
-  //                            length 8 or 27 x numcels
+  //          \para pt: xyz coordinates of the linear tets, length 3 x numpts
+  //          \para ien_array : connectivity array, length 8 or 27 x numcels
   //          \para IOdata : the integer data to be written on cells or nodes 
   //          \para isXML : the flag indicate vtk/vtu format
+  // --------------------------------------------------------------------------
   // ----------------------------------------------------------------
   void write_hex_grid( const std::string &filename,
       const int &numpts, const int &numcels,
@@ -65,11 +60,13 @@ namespace HEX_T
       const std::vector<DataVecStr<int>> &IOdata, const bool &isXML = true );
 
   // ----------------------------------------------------------------
+  // --------------------------------------------------------------------------
   // ! gen_quad_grid: generate the surface mesh described by linear quadrilateral 
   //                  elements, and pass the data to vtkPolyData.
   //   All input parameters are the same as above, but grid_w is to be
   //   modified by reference. This is convenient for adding additional
   //   fields to the polydata before writing.
+  // --------------------------------------------------------------------------
   // ----------------------------------------------------------------
   void gen_quad_grid( vtkPolyData * const &grid_w,
       const int &numpts, const int &numcels,
@@ -77,6 +74,7 @@ namespace HEX_T
       const std::vector<int> &ien_array );
 
   // ----------------------------------------------------------------
+  // --------------------------------------------------------------------------
   // ! write_quad_grid: write the surface mesh described by linear quadrilateral
   //                    elements.
   //   Input: \para filename : the filename.vtp is the file to be written.
@@ -85,6 +83,7 @@ namespace HEX_T
   //          \para pt: xyz coordinates of the linear quads, length 3 numpts
   //          \para ien_array : connectivity array, length 4 numcels
   //          \para IOdata : the integer data to be written on cells or nodes 
+  // --------------------------------------------------------------------------
   // ----------------------------------------------------------------
   void write_quad_grid( const std::string &filename,
       const int &numpts, const int &numcels,
@@ -93,12 +92,14 @@ namespace HEX_T
       const std::vector<DataVecStr<int>> &IOdata );
 
   // ----------------------------------------------------------------
+  // --------------------------------------------------------------------------
   // ! gen_quadratic_quad_grid: generate the surface mesh described by
   //                            quadratic quadrilateral elements and pass 
   //                            the data to vtkUnstructuredGrid data.
   //   All input parameters are the same as above, but grid_w is to be
   //   modified by reference. This is convenient for adding additional
   //   fields to the unstructured grid before writing.
+  // --------------------------------------------------------------------------
   // ----------------------------------------------------------------
   void gen_quadratic_quad_grid( vtkUnstructuredGrid * const &grid_w,
       const int &numpts, const int &numcels,
@@ -106,6 +107,7 @@ namespace HEX_T
       const std::vector<int> &ien_array );
 
   // ----------------------------------------------------------------
+  // --------------------------------------------------------------------------
   // ! write_quadratic_quad_grid: write the surface mesh described by
   //                              quadratic quadrilateral elements.
   //   Input: \para filename : the filename.vtu is the file to be written.
@@ -114,6 +116,7 @@ namespace HEX_T
   //          \para pt: xyz coordinates of the quadratic quads, length 3 numpts
   //          \para ien_array : connectivity array, length 9 numcels
   //          \para IOdata : the integer data to be written on cells or nodes 
+  // --------------------------------------------------------------------------
   // ----------------------------------------------------------------
   void write_quadratic_quad_grid( const std::string &filename,
       const int &numpts, const int &numcels,
@@ -121,10 +124,10 @@ namespace HEX_T
       const std::vector<int> &ien_array,
       const std::vector<DataVecStr<int>> &IOdata );
 
-  // ================================================================
+  // ==========================================================================
   // 2. Mesh quality measures
   // This set of tools give various measure of hexahedral element mesh.
-  // ================================================================
+  // ==========================================================================
   // ! get_out_normal:
   //   This function obtains the unit outward normal vector for a 
   //   quadrilateral vtp or vtu file, with the assumption that the file
@@ -142,12 +145,14 @@ namespace HEX_T
   //          \para vol_ctrlPts, the volume mesh control points
   //          \para vol_ien, the volume mesh IEN array
   //   Output: outVec, the outward normal vector
+  // --------------------------------------------------------------------------
   // ----------------------------------------------------------------
   Vector_3 get_out_normal( const std::string &file,
       const std::vector<double> &vol_ctrlPts,
       const IIEN * const &vol_ien );
 
   // ----------------------------------------------------------------
+  // --------------------------------------------------------------------------
   // ! get_aspect_ratio:
   //   Input: \para x_i, y_i, z_i for node i=0,1,2,3,4,5,6,7.
   //          x0 y0 z0 x1 y1 z1 x2 y2 z2 x3 y3 z3 ... x7 y7 z7
@@ -158,20 +163,21 @@ namespace HEX_T
   //   hex), the routine will still read the first eight nodes. This means
   //   for quadratic hexes, the aspect ratio is calculated by extracting
   //   its eight vertices and ignoring the mid-edge points.
+  // --------------------------------------------------------------------------
   // ----------------------------------------------------------------
   double get_aspect_ratio( const std::array<Vector_3, 8> &pt );
 
-  // ================================================================
+  // ==========================================================================
   // 3. Hex8 class defines a four node linear tetrahedron object with 
   // basic manipulations including checking the size, the aspect ratio.
   // The object is defined by 12 double data: 
   //             x0, y0, z0, x1, ..., z7
-  // ================================================================
+  // ==========================================================================
   class Hex8
   {
     public:
-      // Default constructor: generate a default hexahedron in the
-      // following form
+      // ----------------------------------------------------------------------
+      // Default constructor: generate a default hexahedron in the following form
       //           x  y  z
       // node 0 : -1 -1 -1
       // node 1 :  1 -1 -1
@@ -181,6 +187,7 @@ namespace HEX_T
       // node 5 :  1 -1  1
       // node 6 :  1  1  1
       // node 7 : -1  1  1
+      // ----------------------------------------------------------------------
       Hex8();
 
       // Generate a hexahedron with the x-y-z coordinates of the
