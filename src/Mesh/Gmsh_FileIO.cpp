@@ -424,13 +424,13 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
   std::string ele_3d {};
   if (nlocbas_2d == 3 && nlocbas_3d == 4)
   {
-    ele_2d += static_cast<std::string>("triangle");
-    ele_3d += static_cast<std::string>("tetrahedron");
+    ele_2d = static_cast<std::string>("triangle");
+    ele_3d = static_cast<std::string>("tetrahedron");
   }
   else if (nlocbas_2d == 4 && nlocbas_3d == 8)
   {
-    ele_2d += static_cast<std::string>("quadrilateral");
-    ele_3d += static_cast<std::string>("hexahedron");
+    ele_2d = static_cast<std::string>("quadrilateral");
+    ele_3d = static_cast<std::string>("hexahedron");
   }
   else
     SYS_T::print_exit("Error: Gmsh_FileIO::write_vtp, element types of surface and volume donnot match. \n");

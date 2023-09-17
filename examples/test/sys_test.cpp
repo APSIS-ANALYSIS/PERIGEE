@@ -24,9 +24,13 @@
 
 int main(int argc, char *argv[])
 {
+  Gmsh_FileIO gfio( "two_cube.msh" );
+
+  gfio.print_info();
+
+  gfio.write_interior_vtp(2, 0, 1);
 
   return EXIT_SUCCESS;
 }
-#endif
 
 // EOF
