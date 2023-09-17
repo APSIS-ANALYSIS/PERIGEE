@@ -25,13 +25,11 @@
 int main(int argc, char *argv[])
 {
 
-  HEX_T::Hex8 * test_hex = new HEX_T::Hex8();  
-  test_hex -> reset(8, 10, 1, 6, 21, 22, 5, 7);
+  Gmsh_FileIO gfio( "two_cube.msh" );
 
-  std::cout << "face_id:" << test_hex.get_face_id(10, 1, 22, 5) << std::endl;
-  std::cout << "face_id:" << test_hex.get_face_id(22, 10, 1, 5) << std::endl;
-  std::cout << "face_id:" << test_hex.get_face_id(23, 10, 1, 5) << std::endl;
+  gfio.print_info();
 
+  gfio.write_interior_vtp(2, 0, 1);
   return EXIT_SUCCESS;
 }
 

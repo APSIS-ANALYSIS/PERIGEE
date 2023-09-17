@@ -520,11 +520,11 @@ namespace HEX_T
     const auto it3 = std::find(gindex, gindex+8, temp[3]);
 
     // flg is true if the temp is found in gindex
-    const bool flg[4] { (it0 != temp+4), (it1 != temp+4), (it2 != temp+4), (it3 != temp+4) };
+    const bool flg[4] { (it0 != gindex+8), (it1 != gindex+8), (it2 != gindex+8), (it3 != gindex+8) };
 
     const int sum = flg[0] + flg[1] + flg[2] + flg[3];
 
-    SYS_T::print_exit_if( sum != 4, "Error: Hex8::find_face_id input is not a proper face of this element. \n");
+    SYS_T::print_exit_if( sum != 4, "Error: Hex8::find_face_id input dose not belong to this element. \n");
 
     const int index_pos[4]{ std::distance( std::begin(gindex), it0 ),
       std::distance( std::begin(gindex), it1 ),
