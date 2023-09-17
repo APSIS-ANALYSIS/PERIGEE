@@ -190,20 +190,20 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Residual(
 
     const Vector_3 f_body = get_f(coor, curr);
 
-    const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
+    const Tensor2_3D F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
-    const Matrix_3x3 invF = inverse(F);
+    const Tensor2_3D invF = inverse(F);
 
-    const Matrix_3x3 DVelo( vx_x, vx_y, vx_z, vy_x, vy_y, vy_z, vz_x, vz_y, vz_z );
+    const Tensor2_3D DVelo( vx_x, vx_y, vx_z, vy_x, vy_y, vy_z, vz_x, vz_y, vz_z );
 
     const double invFDV_t = invF.MatTContraction(DVelo); // invF_Ii V_i,I
 
-    Matrix_3x3 P_iso, S_iso;
+    Tensor2_3D P_iso, S_iso;
     matmodel->get_PK(F, P_iso, S_iso);
 
     // ------------------------------------------------------------------------
     // 1st PK stress corrected by prestress
-    const Matrix_3x3 prestress( qua_prestress[qua*6+0], qua_prestress[qua*6+5], qua_prestress[qua*6+4],
+    const Tensor2_3D prestress( qua_prestress[qua*6+0], qua_prestress[qua*6+5], qua_prestress[qua*6+4],
         qua_prestress[qua*6+5], qua_prestress[qua*6+1], qua_prestress[qua*6+3],
         qua_prestress[qua*6+4], qua_prestress[qua*6+3], qua_prestress[qua*6+2] );
 
@@ -357,26 +357,26 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Tangent_Residual(
 
     const Vector_3 f_body = get_f(coor, curr);
 
-    const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
+    const Tensor2_3D F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
-    const Matrix_3x3 invF = inverse(F);
+    const Tensor2_3D invF = inverse(F);
 
-    const Matrix_3x3 DVelo( vx_x, vx_y, vx_z, vy_x, vy_y, vy_z, vz_x, vz_y, vz_z );
+    const Tensor2_3D DVelo( vx_x, vx_y, vx_z, vy_x, vy_y, vy_z, vz_x, vz_y, vz_z );
 
-    const Matrix_3x3 Dvelo_invF = DVelo * invF;  // v_i,I invF_Ij = v_i,j
+    const Tensor2_3D Dvelo_invF = DVelo * invF;  // v_i,I invF_Ij = v_i,j
 
     double GradP_invF[3];
     invF.VecMultT( p_x, p_y, p_z, GradP_invF[0], GradP_invF[1], GradP_invF[2] ); // p_I invF_ii = p,i
 
     const double invFDV_t = invF.MatTContraction(DVelo); // invF_Ii V_i,I
 
-    Matrix_3x3 P_iso, S_iso;
+    Tensor2_3D P_iso, S_iso;
     Tensor4_3D AA_iso;
     matmodel->get_PK_FFStiffness(F, P_iso, S_iso, AA_iso);
 
     // ------------------------------------------------------------------------
     // 1st PK stress corrected by prestress
-    const Matrix_3x3 prestress( qua_prestress[qua*6+0], qua_prestress[qua*6+5], qua_prestress[qua*6+4],
+    const Tensor2_3D prestress( qua_prestress[qua*6+0], qua_prestress[qua*6+5], qua_prestress[qua*6+4],
         qua_prestress[qua*6+5], qua_prestress[qua*6+1], qua_prestress[qua*6+3],
         qua_prestress[qua*6+4], qua_prestress[qua*6+3], qua_prestress[qua*6+2] );
 
@@ -627,21 +627,21 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Mass_Residual(
     
     const Vector_3 f_body = get_f(coor, curr);
 
-    const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
+    const Tensor2_3D F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
-    const Matrix_3x3 invF = inverse(F);
+    const Tensor2_3D invF = inverse(F);
 
-    const Matrix_3x3 DVelo(  vx_x, vx_y, vx_z, vy_x, vy_y, vy_z, vz_x, vz_y, vz_z );
+    const Tensor2_3D DVelo(  vx_x, vx_y, vx_z, vy_x, vy_y, vy_z, vz_x, vz_y, vz_z );
 
     // invF_Ii DV_i,I = v_i,i = div v
     const double invFDV_t = invF.MatTContraction(DVelo);
 
-    Matrix_3x3 P_iso, S_iso;
+    Tensor2_3D P_iso, S_iso;
     matmodel->get_PK(F, P_iso, S_iso);
 
     // ------------------------------------------------------------------------
     // 1st PK stress corrected by prestress
-    const Matrix_3x3 prestress( qua_prestress[qua*6+0], qua_prestress[qua*6+5], qua_prestress[qua*6+4],
+    const Tensor2_3D prestress( qua_prestress[qua*6+0], qua_prestress[qua*6+5], qua_prestress[qua*6+4],
         qua_prestress[qua*6+5], qua_prestress[qua*6+1], qua_prestress[qua*6+3],
         qua_prestress[qua*6+4], qua_prestress[qua*6+3], qua_prestress[qua*6+2] );
 
@@ -764,7 +764,7 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Residual_Interior_Wall_EB
   }
 }
 
-std::vector<Matrix_3x3> PLocAssem_2x2Block_Tet4_VMS_Incompressible::get_Wall_CauchyStress(
+std::vector<Tensor2_3D> PLocAssem_2x2Block_Tet4_VMS_Incompressible::get_Wall_CauchyStress(
     const double * const &disp,
     const double * const &pres,
     FEAElement * const &element,
@@ -777,7 +777,7 @@ std::vector<Matrix_3x3> PLocAssem_2x2Block_Tet4_VMS_Incompressible::get_Wall_Cau
 
   const int nqp = quad -> get_num_quadPts();
 
-  std::vector<Matrix_3x3> stress( nqp );
+  std::vector<Tensor2_3D> stress( nqp );
 
   for( int qua = 0; qua < nqp; ++qua )
   {
@@ -807,7 +807,7 @@ std::vector<Matrix_3x3> PLocAssem_2x2Block_Tet4_VMS_Incompressible::get_Wall_Cau
       uz_z += disp[ii*3+2] * dR_dz[ii];
     }
 
-    const Matrix_3x3 F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
+    const Tensor2_3D F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
     stress[qua] = matmodel -> get_Cauchy_stress( F );
 

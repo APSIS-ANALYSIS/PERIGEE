@@ -39,7 +39,7 @@
 // Date: Aug. 3rd 2023
 // ============================================================================
 #include "Tensor4_3D.hpp"
-#include "SymmMatrix_3x3.hpp"
+#include "SymmTensor2_3D.hpp"
 
 class SymmTensor4_3D
 {
@@ -117,14 +117,14 @@ class SymmTensor4_3D
     // O represents a SymmProduct and x represents an outproduct 
     // see Holzapfel book p. 255, eqn. (6.170).
     // ------------------------------------------------------------------------
-    void gen_Ptilde( const SymmMatrix_3x3 &invC );
+    void gen_Ptilde( const SymmTensor2_3D &invC );
 
     // ------------------------------------------------------------------------
     // add an outer product with scaling factor:
     //            ten_ijkl += val * mmat_ij  * mmat_kl
     // This is often used in the evaluation of the stiffness tensor.
     // ------------------------------------------------------------------------
-    void add_OutProduct( const double &val, const SymmMatrix_3x3 &mmat );
+    void add_OutProduct( const double &val, const SymmTensor2_3D &mmat );
 
     // ------------------------------------------------------------------------
     // add a symmetric tensor product of 2 vectors which is defined the
@@ -156,8 +156,8 @@ class SymmTensor4_3D
     // for invertible and symmetric 2nd-order tensor C.
     // Holzapfel book, p. 254, eqn. (6.165).
     // ------------------------------------------------------------------------
-    void add_SymmProduct( const double &val, const SymmMatrix_3x3 &mleft,
-        const SymmMatrix_3x3 &mright );
+    void add_SymmProduct( const double &val, const SymmTensor2_3D &mleft,
+        const SymmTensor2_3D &mright );
 
     // ------------------------------------------------------------------------
     // add the out-product of two 2nd-order tensor in a symmetric fashion,
@@ -176,8 +176,8 @@ class SymmTensor4_3D
     //         add_SymmOutProduct(-2/3, Cinv, Siso);
     // Notes: mleft and mright being all symmetric maintains minor symmetry
     // ------------------------------------------------------------------------
-    void add_SymmOutProduct( const double &val, const SymmMatrix_3x3 &mleft,
-        const SymmMatrix_3x3 &mright );
+    void add_SymmOutProduct( const double &val, const SymmTensor2_3D &mleft,
+        const SymmTensor2_3D &mright );
    
     // ------------------------------------------------------------------------
     // Tensor Left and Right Multiplication modification with the same
@@ -223,6 +223,6 @@ SymmTensor4_3D gen_ST4_zero();
 
 SymmTensor4_3D gen_ST4_symm_id();
 
-SymmTensor4_3D gen_ST4_Ptilde( const SymmMatrix_3x3 &invC );
+SymmTensor4_3D gen_ST4_Ptilde( const SymmTensor2_3D &invC );
 
 #endif

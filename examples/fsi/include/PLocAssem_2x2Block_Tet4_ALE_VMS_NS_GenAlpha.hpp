@@ -11,7 +11,7 @@
 // ============================================================================
 #include "IPLocAssem_2x2Block.hpp"
 #include "TimeMethod_GenAlpha.hpp"
-#include "SymmMatrix_3x3.hpp"
+#include "SymmTensor2_3D.hpp"
 
 class PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
 {
@@ -191,7 +191,7 @@ class PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
 
     // The metric tensor for tetrahedron needs to be modified.
     // See Pauli dissertation and Whiting, C.H. RPI dissertation
-    SymmMatrix_3x3 get_metric( const std::array<double, 9> &dxi_dx ) const;
+    SymmTensor2_3D get_metric( const std::array<double, 9> &dxi_dx ) const;
 
     // Tau is different from the kinematic tau with rho come
     // into the definition of tau's

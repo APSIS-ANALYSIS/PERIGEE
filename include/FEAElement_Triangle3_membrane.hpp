@@ -77,7 +77,7 @@ class FEAElement_Triangle3_membrane : public FEAElement
       return { dR_dy[0], dR_dy[1], dR_dy[2] };
     }
     
-    virtual Matrix_3x3 get_rotationMatrix( const int &quaindex ) const;
+    virtual Tensor2_3D get_rotationMatrix( const int &quaindex ) const;
 
     // Assumes the triangle nodes are arranged such that the outward
     // direction is given by dx_dr x dx_ds
@@ -104,7 +104,7 @@ class FEAElement_Triangle3_membrane : public FEAElement
     double dR_dx [3], dR_dy [3];
 
     // Global-to-lamina 3x3 rotation matrix
-    Matrix_3x3 Q;
+    Tensor2_3D Q;
 
     // Unit outward normal vector
     double unx, uny, unz;
