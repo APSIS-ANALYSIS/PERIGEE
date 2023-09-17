@@ -178,25 +178,14 @@ void FEAElement_Quad9::buildBasis( const IQuadPts * const &quad,
 double FEAElement_Quad9::get_h( const double * const &ctrl_x,
     const double * const &ctrl_y ) const
 {
-  const double a = 2.0 * ( ctrl_x[1] - ctrl_x[0] );
-  const double b = 2.0 * ( ctrl_y[1] - ctrl_y[0] );
-  const double c = 2.0 * ( ctrl_x[2] - ctrl_x[0] );
-  const double d = 2.0 * ( ctrl_y[2] - ctrl_y[0] );
+  const double diag[2] { std::pow((ctrl_x[0] - ctrl_x[2]), 2.0) 
+      + std::pow((ctrl_y[0] - ctrl_y[2]), 2.0),
+      std::pow((ctrl_x[1] - ctrl_x[3]), 2.0)
+      + std::pow((ctrl_y[1] - ctrl_y[3]), 2.0) };
+    
+  double d = (diag[0] > diag[1] ? diag[0] : diag[1]);
 
-  const double m = ctrl_x[1] * ctrl_x[1] + ctrl_y[1] * ctrl_y[1]
-    - ctrl_x[0] * ctrl_x[0] - ctrl_y[0] * ctrl_y[0];
-
-  const double n = ctrl_x[2] * ctrl_x[2] + ctrl_y[2] * ctrl_y[2]
-    - ctrl_x[0] * ctrl_x[0] - ctrl_y[0] * ctrl_y[0];
-
-
-  const double xc = (d * m - b * n) / (a*d-b*c);
-  const double yc = (a * n - c * m) / (a*d-b*c);
-
-  const double radius = std::sqrt( (xc-ctrl_x[0])*(xc-ctrl_x[0])
-      + (yc - ctrl_y[0])*(yc - ctrl_y[0]) );
-
-  return 2.0 * radius;
+  return std::sqrt(d);
 }
 
 void FEAElement_Quad9::get_R( const int &quaindex, 

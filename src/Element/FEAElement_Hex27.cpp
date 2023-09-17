@@ -326,15 +326,22 @@ double FEAElement_Hex27::get_h( const double * const &ctrl_x,
     const double * const &ctrl_y,
     const double * const &ctrl_z ) const
 {
-  double x,y,z,r;
+  const double diag[4] { std::pow((ctrl_x[0] - ctrl_x[6]), 2.0)
+      + std::pow((ctrl_y[0] - ctrl_y[6]), 2.0) + std::pow((ctrl_z[0] - ctrl_z[6]), 2.0),
+      std::pow((ctrl_x[1] - ctrl_x[7]), 2.0)
+      + std::pow((ctrl_y[1] - ctrl_y[7]), 2.0) + std::pow((ctrl_z[1] - ctrl_z[7]), 2.0),
+      std::pow((ctrl_x[2] - ctrl_x[4]), 2.0)
+      + std::pow((ctrl_y[2] - ctrl_y[4]), 2.0) + std::pow((ctrl_z[2] - ctrl_z[4]), 2.0),
+      std::pow((ctrl_x[3] - ctrl_x[5]), 2.0)
+      + std::pow((ctrl_y[3] - ctrl_y[5]), 2.0) + std::pow((ctrl_z[3] - ctrl_z[5]), 2.0) };
+    
+  double d = diag[0];
+  for(int ii = 1; ii<4; ++ii)
+  {
+    if(diag[ii] > d) d = diag[ii];
+  }
 
-  MATH_T::get_tet_sphere_info(
-      ctrl_x[0], ctrl_x[1], ctrl_x[2], ctrl_x[3],
-      ctrl_y[0], ctrl_y[1], ctrl_y[2], ctrl_y[3],
-      ctrl_z[0], ctrl_z[1], ctrl_z[2], ctrl_z[3],
-      x, y, z, r );
-
-  return 2.0 * r;
+  return std::sqrt(d);
 }
 
 void FEAElement_Hex27::get_R( const int &quaindex, double * const &basis ) const
