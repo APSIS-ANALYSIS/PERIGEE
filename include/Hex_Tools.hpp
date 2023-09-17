@@ -216,6 +216,20 @@ namespace HEX_T
 
       int gindex[8];
   };
+
+  // ================================================================
+  // 4. Hexahedral mesh checker. 
+  //    This routine will read in the mesh information: control points
+  //    and IEN array, and check each element's quality and print
+  //    necessary information.
+  //    cpts: list of control points;
+  //    ienptr: IEN array
+  //    nelem: total number of element
+  //    crit_aspect_ratio: the element above this value will be counted.
+  // ================================================================
+  void hexmesh_check(const std::vector<double> &cpts,
+      const IIEN * const &ienptr, const int &nelem,
+      const double &crit_aspect_ratio = 3.5 );
 }
 
 #endif

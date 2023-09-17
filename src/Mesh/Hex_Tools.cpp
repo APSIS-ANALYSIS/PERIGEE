@@ -564,4 +564,48 @@ namespace HEX_T
   }  
 }
 
+void HEX_T::hexmesh_check(const std::vector<double> &cpts,
+    const IIEN * const &ienptr, const int &nelem,
+    const double &crit_aspect_ratio )
+{
+  std::cout<<"\n======= Hex mesh quality =======\n";
+  HEX_T::Hex8 * hexon = new HEX_T::Hex8();
+  hexon -> reset( cpts, ienptr, 0 );
+  double hexon_max_vol = hexon -> get_volume();
+  double hexon_min_vol = hexon_max_vol;
+  double hexon_max_h = hexon -> get_diameter();
+  double hexon_min_h = hexon_max_h;
+  int num_dist_elem = 0; // number of element that has negative volume
+  int num_aspt_elem = 0; // number of element that has aspect ratio larger
+  // than the given critical aspect ratio value
+  for(int ee = 0; ee<nelem; ++ee)
+  {
+    hexon->reset( cpts, ienptr, ee );
+
+    if( hexon->get_aspect_ratio() > crit_aspect_ratio )
+      num_aspt_elem += 1;
+
+    double hexon_ee_vol = hexon -> get_volume();
+    if( hexon_ee_vol < 0.0 ) num_dist_elem += 1;
+
+    if( hexon_max_vol < hexon_ee_vol) hexon_max_vol = hexon_ee_vol;
+
+    if( hexon_min_vol > hexon_ee_vol) hexon_min_vol = hexon_ee_vol;
+
+    double hexon_he = hexon -> get_diameter();
+
+    if( hexon_max_h < hexon_he ) hexon_max_h = hexon_he;
+
+    if( hexon_min_h > hexon_he ) hexon_min_h = hexon_he;
+  }
+  delete hexon;
+  cout<<"- maximum hexahedron volume : "<<hexon_max_vol<<endl;
+  cout<<"- minimum hexahedron volume : "<<hexon_min_vol<<endl;
+  cout<<"- maximum hexahedron diameter : "<<hexon_max_h<<endl;
+  cout<<"- minimum hexahedron diameter : "<<hexon_min_h<<endl;
+  cout<<"- number of distorted element : "<<num_dist_elem<<endl;
+  cout<<"- number of element with aspect ratio larger than "<<crit_aspect_ratio<<" : "<<num_aspt_elem<<endl;
+  std::cout<<"==================================\n";
+}
+
 // EOF
