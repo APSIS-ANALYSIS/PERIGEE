@@ -526,7 +526,7 @@ namespace HEX_T
 
     SYS_T::print_exit_if( sum != 4, "Error: Hex8::find_face_id input dose not belong to this element. \n");
 
-    const int index_pos[4]{ std::distance( std::begin(gindex), it0 ),
+    int index_pos[4]{ std::distance( std::begin(gindex), it0 ),
       std::distance( std::begin(gindex), it1 ),
       std::distance( std::begin(gindex), it2 ),
       std::distance( std::begin(gindex), it3 ) };
