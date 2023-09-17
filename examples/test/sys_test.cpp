@@ -22,10 +22,14 @@
 #include "IIEN.hpp"
 #include "Gmsh_FileIO.hpp"
 
+#ifndef WITHOUT_PETSC
+#define WITHOUT_PETSC
+
 int main(int argc, char *argv[])
 {
 
   return EXIT_SUCCESS;
 }
+#endif
 
 // EOF
