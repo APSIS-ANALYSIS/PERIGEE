@@ -82,7 +82,7 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
                          std::sqrt(2.0) * 0.5 * ( e_a[2] + e_b[2] ) };
 
   // Q = transpose([ e_l1, e_l2, un ])
-  Q = Tensor2_3D(e_l1[0], e_l1[1], e_l1[2],
+  Q = Matrix_3x3(e_l1[0], e_l1[1], e_l1[2],
                  e_l2[0], e_l2[1], e_l2[2],
                      unx,     uny,     unz );
   
@@ -169,7 +169,7 @@ Vector_3 FEAElement_Triangle3_membrane::get_2d_normal_out( const int &quaindex,
   return Vector_3( unx, uny, unz );
 }
 
-Tensor2_3D FEAElement_Triangle3_membrane::get_rotationMatrix( const int &quaindex ) const
+Matrix_3x3 FEAElement_Triangle3_membrane::get_rotationMatrix( const int &quaindex ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle3_membrane::get_rotationMatrix function error.\n" );
   return Q;
