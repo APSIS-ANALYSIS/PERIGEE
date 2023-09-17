@@ -31,8 +31,8 @@ namespace TET_T
   //   Input: \para grid_w : the vtk object taking the mesh info
   //          \para numpts : the number of grid points
   //          \para numcels : the number of tetrahedral elements
-  //          \para pt: xyz coordinates of the linear tets, length 
-  //                    3 x numpts
+  //          \para pt: xyz coordinates of the linear or quadratic tets,
+  //                    length 3 x numpts
   //          \para ien_array : connectivity array, 
   //                            length 4 or 10 x numcels
   // ----------------------------------------------------------------
@@ -49,8 +49,8 @@ namespace TET_T
   //   Input: \para filename : the filename.vtu is the file to be written.
   //          \para numpts : the number of grid points
   //          \para numcels : the number of tetrahedral elements
-  //          \para pt: xyz coordinates of the linear tets, length 
-  //                    3 x numpts
+  //          \para pt: xyz coordinates of the linear or quadratic tets,
+  //                    length 3 x numpts
   //          \para ien_array : connectivity array, 
   //                            length 4 or 10 x numcels
   //          \para IOdata : the integer data to be written on cells or nodes 
@@ -62,7 +62,7 @@ namespace TET_T
       const std::vector<DataVecStr<int>> &IOdata, const bool &isXML = true );
   
   // ----------------------------------------------------------------
-  // ! gen_triangle_grid: generate the surface mesh described by triangle
+  // ! gen_triangle_grid: generate the surface mesh described by linear triangular
   //                      elements, and pass the data to vtkPolyData.
   //   All input parameters are the same as above, but grid_w is to be
   //   modified by reference. This is convenient for adding additional
@@ -74,12 +74,12 @@ namespace TET_T
       const std::vector<int> &ien_array );
  
   // ----------------------------------------------------------------
-  // ! write_triangle_grid: write the surface mesh described by triangle
+  // ! write_triangle_grid: write the surface mesh described by linear triangular
   //                        elements.
   //   Input: \para filename : the filename.vtp is the file to be written.
   //          \para numpts : the number of grid points
-  //          \para numcels : the number of tetrahedral elements
-  //          \para pt: xyz coordinates of the linear tets, length 3 numpts
+  //          \para numcels : the number of linear triangular elements
+  //          \para pt: xyz coordinates of the linear triangles, length 3 numpts
   //          \para ien_array : connectivity array, length 3 numcels
   //          \para IOdata : the integer data to be written on cells or nodes 
   // ----------------------------------------------------------------
@@ -91,8 +91,8 @@ namespace TET_T
 
   // ----------------------------------------------------------------
   // ! gen_quadratic_triangle_grid: generate the surface mesh described by
-  //                                triangle elements and pass the data
-  //                                to vtkUnstructuredGrid data.
+  //                                quadratic triangular elements and pass 
+  //                                the data to vtkUnstructuredGrid data.
   //   All input parameters are the same as above, but grid_w is to be
   //   modified by reference. This is convenient for adding additional
   //   fields to the unstructured grid before writing.
@@ -108,8 +108,8 @@ namespace TET_T
   //   Input: \para filename : the filename.vtu is the file to be written.
   //          \para numpts : the number of grid points
   //          \para numcels : the number of tetrahedral elements
-  //          \para pt: xyz coordinates of the linear tets, length 3 numpts
-  //          \para ien_array : connectivity array, length 3 numcels
+  //          \para pt: xyz coordinates of the quadratic triangles, length 3 numpts
+  //          \para ien_array : connectivity array, length 6 numcels
   //          \para IOdata : the integer data to be written on cells or nodes 
   // ----------------------------------------------------------------
   void write_quadratic_triangle_grid( const std::string &filename,
@@ -133,7 +133,7 @@ namespace TET_T
   //   for quadratic tets, the aspect ratio is calculated by extracting
   //   its four vertices and ignoring the mid-edge points.
   // ----------------------------------------------------------------
-  double get_aspect_ratio( const std::vector<double> &coors );
+  double get_aspect_ratio( const std::array<Vector_3, 4> &coors );
 
   // ----------------------------------------------------------------
   // ! get_out_normal:
@@ -203,19 +203,13 @@ namespace TET_T
 
       // Generate a tetrahedron with the x-y-z coordinates of the
       // four points given by nodes-vector
-      Tet4( const std::vector<double> &nodes );
+      Tet4( const std::array<Vector_3, 4> &in_nodes );
 
-      Tet4( const std::vector<double> &ctrlPts, 
+      Tet4( const std::array<Vector_3, 4> &input_pts, 
           const int &ien0, const int &ien1, 
           const int &ien2, const int &ien3 );
 
       virtual ~Tet4();
-
-      void reset( const std::vector<double> &nodes );
-
-      void reset( const std::vector<double> &ctrlPts,
-          const int &ien0, const int &ien1,
-          const int &ien2, const int &ien3 );
 
       // Changes the gindex array only. It is used to determine
       // the face index, e.g. in ElemBC_3D_tet4::resetTriIEN_outwardnormal
@@ -230,7 +224,7 @@ namespace TET_T
 
       double get_volume() const;
 
-      // get the circumscribing sphere's DIAMETER.
+      // Get the circumscribing sphere's DIAMETER.
       // This is a measure of the mesh size
       double get_diameter() const;
 
@@ -238,12 +232,10 @@ namespace TET_T
       // its opposite node number.
       int get_face_id(const int &n0, const int &n1, const int &n2) const;
 
-      void write_vtu( const std::string &fileName ) const;
-
       void print_info() const;
 
     private:
-      double pts[12];
+      std::array<Vector_3, 4> pts;
 
       int gindex[4];
   };

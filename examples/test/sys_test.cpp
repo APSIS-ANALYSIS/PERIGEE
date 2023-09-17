@@ -16,22 +16,22 @@
 #include "Matrix_double_6by6_Array.hpp"
 #include "VTK_Tools.hpp"
 #include "NodalBC.hpp"
+#include "DataVecStr.hpp"
+#include "Tet_Tools.hpp"
+#include "Hex_Tools.hpp"
+#include "IIEN.hpp"
 #include "Gmsh_FileIO.hpp"
 
 int main(int argc, char *argv[])
 {
-  double mean = 1.5, std = 5.23;
 
-  std::vector<double> val1, val2;
-  MATH_T::gen_Gaussian(10000, mean, std, val1);
+  HEX_T::Hex8 * test_hex = new HEX_T::Hex8();  
+  test_hex -> reset(8, 10, 1, 6, 21, 22, 5, 7);
 
-  val2.clear();
-  for(int ii=0; ii<10000; ++ii)
-    val2.push_back( MATH_T::gen_double_rand_normal(mean, std) );
-
-  MATH_T::print_Histogram(val1);
-  std::cout<<std::endl;
-  MATH_T::print_Histogram(val2);
+  std::cout << "face_id:" << test_hex->get_face_id(10, 1, 22, 5) << std::endl;
+  std::cout << "face_id:" << test_hex->get_face_id(22, 10, 1, 5) << std::endl;
+  //std::cout << "face_id:" << test_hex->get_face_id(7, 10, 1, 5) << std::endl;
+  std::cout << "face_id:" << test_hex->get_face_id(23, 10, 1, 5) << std::endl;
 
   return EXIT_SUCCESS;
 }

@@ -6,18 +6,20 @@ void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
     const std::vector<int> &ien_array )
 {
   // Check the input data compatibility
-  if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: TET_T::gen_tet_grid point vector size does not match the number of points. \n");
+  SYS_T::print_exit_if(VEC_T::get_size(pt) != 3*numpts,
+    "Error: TET_T::gen_tet_grid point vector size does not match the number of points. \n");
 
   // detect the element type
   int nlocbas = -1;
   if( int(ien_array.size()) == 4*numcels ) nlocbas = 4;
   else if( int(ien_array.size()) == 10*numcels ) nlocbas = 10;
-  else SYS_T::print_fatal("Error: TET_T::gen_tet_grid ien array size does not match the number of cells. \n");
+  else SYS_T::print_exit("Error: TET_T::gen_tet_grid ien array size does not match the number of cells. \n");
 
   // Check the connectivity array
   std::vector<int> temp = ien_array;
   VEC_T::sort_unique_resize(temp);
-  if( int(temp.size()) != numpts ) SYS_T::print_fatal("Error: TET_T::gen_tet_grid numpts does not match the number of unique points in the ien array. Please re-organize the input. \n");
+  SYS_T::print_exit_if(VEC_T::get_size(temp) != numpts,
+    "Error: TET_T::gen_tet_grid numpts does not match the number of unique points in the ien array. Please re-organize the input. \n");
   VEC_T::clean(temp);
 
   // 1. nodal points coordinates
@@ -49,13 +51,11 @@ void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
 
       grid_w->InsertNextCell( cl->GetCellType(), cl->GetPointIds() );
 
-      std::vector<double> cell_node; cell_node.clear();
+      std::array<Vector_3, 4> cell_node;
       for(int lnode=0; lnode<4; ++lnode)
       {
-        int node_offset = 3 * ien_array[4*ii + lnode];
-        cell_node.push_back(pt[node_offset]);
-        cell_node.push_back(pt[node_offset+1]);
-        cell_node.push_back(pt[node_offset+2]);
+        const int node_offset = 3 * ien_array[4*ii + lnode];
+        cell_node[lnode] = Vector_3( pt[node_offset], pt[node_offset+1], pt[node_offset+2] );
       }
       edge_aspect_ratio -> InsertNextValue( TET_T::get_aspect_ratio(cell_node) );
     }
@@ -73,20 +73,18 @@ void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
 
       grid_w->InsertNextCell( cl->GetCellType(), cl->GetPointIds() );
 
-      std::vector<double> cell_node; cell_node.clear();
+      std::array<Vector_3, 4> cell_node;
       for(int lnode=0; lnode<4; ++lnode)
       {
-        int node_offset = 3 * ien_array[10*ii + lnode];
-        cell_node.push_back(pt[node_offset]);
-        cell_node.push_back(pt[node_offset+1]);
-        cell_node.push_back(pt[node_offset+2]);
+        const int node_offset = 3 * ien_array[10*ii + lnode];
+        cell_node[lnode] = Vector_3( pt[node_offset], pt[node_offset+1], pt[node_offset+2] );
       }
       edge_aspect_ratio -> InsertNextValue( TET_T::get_aspect_ratio(cell_node) );
     }
 
     cl -> Delete();
   }
-  else SYS_T::print_fatal("Error: TET_T::gen_tet_grid unknown local basis number.\n");
+  else SYS_T::print_exit("Error: TET_T::gen_tet_grid unknown local basis number.\n");
 
   // Add the asepct-ratio to grid_w
   grid_w -> GetCellData() -> AddArray( edge_aspect_ratio );
@@ -172,9 +170,11 @@ void TET_T::gen_triangle_grid( vtkPolyData * const &grid_w,
     const std::vector<int> &ien_array )
 {
   // check the input data compatibility
-  if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: TET_T::gen_triangle_grid point vector size does not match the number of points. \n");
+  SYS_T::print_exit_if(VEC_T::get_size(pt) != 3*numpts,
+    "Error: TET_T::gen_triangle_grid point vector size does not match the number of points. \n");
 
-  if(int(ien_array.size()) != 3*numcels) SYS_T::print_fatal("Error: TET_T::gen_triangle_grid ien array size does not match the number of cells. \n");
+  SYS_T::print_exit_if(VEC_T::get_size(ien_array) != 3*numcels,
+    "Error: TET_T::gen_triangle_grid ien array size does not match the number of cells. \n");
 
   // 1. nodal points
   vtkPoints * ppt = vtkPoints::New();
@@ -222,7 +222,7 @@ void TET_T::write_quadratic_triangle_grid( const std::string &filename,
 
   VEC_T::sort_unique_resize( name_list );
 
-  SYS_T::print_exit_if( name_list.size() != IOdata.size(), "Error: In TET_T::write_triangle_grid, there are %d data in the IOdata that have the same name.\n", IOdata.size() - name_list.size() + 1 );
+  SYS_T::print_exit_if( name_list.size() != IOdata.size(), "Error: In TET_T::write_quadratic_triangle_grid, there are %d data in the IOdata that have the same name.\n", IOdata.size() - name_list.size() + 1 );
 
 // We add the IOdata for VTK
   for( auto data : IOdata )
@@ -232,7 +232,7 @@ void TET_T::write_quadratic_triangle_grid( const std::string &filename,
     else if( data.get_object() == AssociateObject::Cell )
       VTK_T::add_int_CellData( grid_w, data.get_data(), data.get_name() );
     else
-      SYS_T::print_exit( "Error: In TET_T::write_triangle_grid, there is an unknown object type in DataVecStr %s", data.get_name().c_str() );
+      SYS_T::print_exit( "Error: In TET_T::write_quadratic_triangle_grid, there is an unknown object type in DataVecStr %s", data.get_name().c_str() );
   }
 
   // Write the prepared grid_w to a vtu file on disk
@@ -241,16 +241,16 @@ void TET_T::write_quadratic_triangle_grid( const std::string &filename,
   grid_w->Delete();
 }
 
-
 void TET_T::gen_quadratic_triangle_grid( vtkUnstructuredGrid * const &grid_w,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt,
     const std::vector<int> &ien_array )
 {
   // check the input data compatibility
-  if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: TET_T::gen_quadratic_triangle_grid point vector size does not match the number of points. \n");
+  SYS_T::print_exit_if(VEC_T::get_size(pt) != 3*numpts,
+    "Error: TET_T::gen_quadratic_triangle_grid point vector size does not match the number of points. \n");
 
-  if(int(ien_array.size()) != 6*numcels) SYS_T::print_fatal("Error: TET_T::gen_quadratic_quadratic_triangle_grid ien array size does not match the number of cells. \n");
+  SYS_T::print_exit_if(VEC_T::get_size(ien_array) != 6*numcels, "Error: TET_T::gen_quadratic_quadratic_triangle_grid ien array size does not match the number of cells. \n");
 
   // 1. nodal points
   vtkPoints * ppt = vtkPoints::New(); 
@@ -285,21 +285,12 @@ void TET_T::gen_quadratic_triangle_grid( vtkUnstructuredGrid * const &grid_w,
   cl -> Delete();
 }
 
-double TET_T::get_aspect_ratio( const std::vector<double> &pt )
+double TET_T::get_aspect_ratio( const std::array<Vector_3, 4> &pt )
 {
-  double edge[6];
-  // e01
-  edge[0] = MATH_T::norm2(pt[3]-pt[0], pt[4]-pt[1], pt[5]-pt[2]) ;
-  // e12
-  edge[1] = MATH_T::norm2(pt[6]-pt[3], pt[7]-pt[4], pt[8]-pt[5]) ;
-  // e02
-  edge[2] = MATH_T::norm2(pt[6]-pt[0], pt[7]-pt[1], pt[8]-pt[2]) ;
-  // e03
-  edge[3] = MATH_T::norm2(pt[9]-pt[0], pt[10]-pt[1], pt[11]-pt[2]) ;
-  // e13
-  edge[4] = MATH_T::norm2(pt[9]-pt[3], pt[10]-pt[4], pt[11]-pt[5]) ;
-  // e23
-  edge[5] = MATH_T::norm2(pt[9]-pt[6], pt[10]-pt[7], pt[11]-pt[8]) ;
+  // edges e01, e12, e02, e03, e13, e23
+  const double edge[6] { ( pt[1] - pt[0] ).norm2(), ( pt[2] - pt[1] ).norm2(),
+                         ( pt[2] - pt[0] ).norm2(), ( pt[3] - pt[0] ).norm2(),
+                         ( pt[3] - pt[1] ).norm2(), ( pt[3] - pt[2] ).norm2() };
 
   const double emax = *std::max_element(edge, edge+6);
   const double emin = *std::min_element(edge, edge+6);
@@ -318,12 +309,7 @@ Vector_3 TET_T::get_out_normal( const std::string &file,
   // Analyze the file type
   std::string fend; fend.assign( file.end()-4 , file.end() );
 
-  if( fend.compare(".vtp") == 0 )
-    VTK_T::read_vtp_grid( file, numpts, numcels, pts, ien);
-  else if( fend.compare(".vtu") == 0 )
-    VTK_T::read_vtu_grid( file, numpts, numcels, pts, ien);
-  else
-    SYS_T::print_fatal("Error: get_out_normal unknown file type.\n");
+  VTK_T::read_grid( file, numpts, numcels, pts, ien);
 
   const std::vector<int> gnode = VTK_T::read_int_PointData(file, "GlobalNodeID");
   const std::vector<int> gelem = VTK_T::read_int_CellData(file, "GlobalElementID");
@@ -333,7 +319,7 @@ Vector_3 TET_T::get_out_normal( const std::string &file,
 
   const int tete0 = gelem[0]; // triangle's associated tet element indices
 
-  SYS_T::print_fatal_if(tete0 == -1, "Error: TET_T::get_out_normal requires the element indices for the vtp file.\n");
+  SYS_T::print_exit_if(tete0 == -1, "Error: TET_T::get_out_normal requires the element indices for the vtp file.\n");
 
   const int ten[4] { vol_ien->get_IEN(tete0, 0), vol_ien->get_IEN(tete0, 1), 
     vol_ien->get_IEN(tete0, 2), vol_ien->get_IEN(tete0, 3) };
@@ -345,7 +331,7 @@ Vector_3 TET_T::get_out_normal( const std::string &file,
     else node_check += 1;
   }
 
-  SYS_T::print_fatal_if(node_check!=3, "Error: TET_T::get_out_normal, the associated tet element is incompatible with the triangle element. \n");
+  SYS_T::print_exit_if(node_check!=3, "Error: TET_T::get_out_normal, the associated tet element is incompatible with the triangle element. \n");
 
   // make cross line-0-1 and line-0-2
   const Vector_3 l01( vol_ctrlPts[3*trn[1]] - vol_ctrlPts[3*trn[0]],
@@ -554,26 +540,28 @@ namespace TET_T
 {
   Tet4::Tet4()
   {
-    pts[0] = 0.0; pts[1] = 0.0;  pts[2] = 0.0;
-    pts[3] = 1.0; pts[4] = 0.0;  pts[5] = 0.0;
-    pts[6] = 0.0; pts[7] = 1.0;  pts[8] = 0.0;
-    pts[9] = 0.0; pts[10] = 0.0; pts[11] = 1.0;
+    pts[0] = Vector_3(0.0, 0.0, 0.0);
+    pts[1] = Vector_3(1.0, 0.0, 0.0);
+    pts[2] = Vector_3(0.0, 1.0, 0.0);
+    pts[3] = Vector_3(0.0, 0.0, 1.0);
 
     gindex[0] = 0; gindex[1] = 1;
     gindex[2] = 2; gindex[3] = 3;
   }
 
-  Tet4::Tet4( const std::vector<double> &in_nodes )
+
+  Tet4::Tet4( const std::array<Vector_3, 4> &in_nodes )
   {
-    SYS_T::print_exit_if( in_nodes.size() != 12, "Error: input nodal list shall have 4 nodes with xyz-coordinates. \n");
-
-    for(int ii=0; ii<12; ++ii) pts[ii] = in_nodes[ii];
-
+    pts[0] = in_nodes[0];
+    pts[1] = in_nodes[1];
+    pts[2] = in_nodes[2];
+    pts[3] = in_nodes[3];
+    
     gindex[0] = 0; gindex[1] = 1;
     gindex[2] = 2; gindex[3] = 3;
   }
 
-  Tet4::Tet4( const std::vector<double> &ctrlPts,
+  Tet4::Tet4( const std::array<Vector_3, 4> &input_pts,
       const int &ien0, const int &ien1,
       const int &ien2, const int &ien3 )
   {
@@ -582,42 +570,14 @@ namespace TET_T
     gindex[2] = ien2;
     gindex[3] = ien3;
 
-    for(int ii=0; ii<4; ++ii)
-    {
-      pts[ii*3]   = ctrlPts[gindex[ii]*3];
-      pts[ii*3+1] = ctrlPts[gindex[ii]*3+1];
-      pts[ii*3+2] = ctrlPts[gindex[ii]*3+2];
-    }
+    pts[0] = input_pts[0];
+    pts[1] = input_pts[1];
+    pts[2] = input_pts[2];
+    pts[3] = input_pts[3];
   }
 
   Tet4::~Tet4()
   {
-  }
-
-  void Tet4::reset( const std::vector<double> &in_nodes )
-  {
-    SYS_T::print_exit_if( in_nodes.size() != 12, "Error: input nodal list shall have 4 nodes with xyz-coordinates. \n");
-    for(int ii=0; ii<12; ++ii) pts[ii] = in_nodes[ii];
-
-    gindex[0] = 0; gindex[1] = 1;
-    gindex[2] = 2; gindex[3] = 3;
-  }
-
-  void Tet4::reset( const std::vector<double> &ctrlPts,
-      const int &ien0, const int &ien1,
-      const int &ien2, const int &ien3 )
-  {
-    gindex[0] = ien0;
-    gindex[1] = ien1;
-    gindex[2] = ien2;
-    gindex[3] = ien3;
-
-    for(int ii=0; ii<4; ++ii)
-    {
-      pts[ii*3]   = ctrlPts[gindex[ii]*3];
-      pts[ii*3+1] = ctrlPts[gindex[ii]*3+1];
-      pts[ii*3+2] = ctrlPts[gindex[ii]*3+2];
-    }
   }
 
   void Tet4::reset( const int &ien0, const int &ien1,
@@ -638,11 +598,7 @@ namespace TET_T
     gindex[3] = ien_ptr->get_IEN(ee, 3);
 
     for(int ii=0; ii<4; ++ii)
-    {
-      pts[ii*3]   = ctrlPts[gindex[ii]*3];
-      pts[ii*3+1] = ctrlPts[gindex[ii]*3+1];
-      pts[ii*3+2] = ctrlPts[gindex[ii]*3+2];
-    }
+      pts[ii] = Vector_3(ctrlPts[gindex[ii]*3], ctrlPts[gindex[ii]*3+1], ctrlPts[gindex[ii]*3+2]);
   }
 
   void Tet4::print_info() const
@@ -650,32 +606,15 @@ namespace TET_T
     std::cout<<"Tet4 object : \n";
     std::cout<<" -- global indices: "<<gindex[0]<<'\t';
     std::cout<<gindex[1]<<'\t'<<gindex[2]<<'\t'<<gindex[3]<<'\n';
-    std::cout<<" -- pt0 : "<<pts[0]<<'\t'<<pts[1]<<'\t'<<pts[2]<<'\n';
-    std::cout<<" -- pt1 : "<<pts[3]<<'\t'<<pts[4]<<'\t'<<pts[5]<<'\n';
-    std::cout<<" -- pt2 : "<<pts[6]<<'\t'<<pts[7]<<'\t'<<pts[8]<<'\n';
-    std::cout<<" -- pt3 : "<<pts[9]<<'\t'<<pts[10]<<'\t'<<pts[11]<<'\n';
+    std::cout<<" -- pt0 : "<<pts[0].x()<<'\t'<<pts[0].y()<<'\t'<<pts[0].z()<<'\n';
+    std::cout<<" -- pt1 : "<<pts[1].x()<<'\t'<<pts[1].y()<<'\t'<<pts[1].z()<<'\n';
+    std::cout<<" -- pt2 : "<<pts[2].x()<<'\t'<<pts[2].y()<<'\t'<<pts[2].z()<<'\n';
+    std::cout<<" -- pt3 : "<<pts[3].x()<<'\t'<<pts[3].y()<<'\t'<<pts[3].z()<<'\n';
   }
 
   double Tet4::get_aspect_ratio() const
   {
-    double edge[6];
-    // e01
-    edge[0] = MATH_T::norm2(pts[3]-pts[0], pts[4]-pts[1], pts[5]-pts[2]) ;
-    // e12
-    edge[1] = MATH_T::norm2(pts[6]-pts[3], pts[7]-pts[4], pts[8]-pts[5]) ;
-    // e02
-    edge[2] = MATH_T::norm2(pts[6]-pts[0], pts[7]-pts[1], pts[8]-pts[2]) ;
-    // e03
-    edge[3] = MATH_T::norm2(pts[9]-pts[0], pts[10]-pts[1], pts[11]-pts[2]) ;
-    // e13
-    edge[4] = MATH_T::norm2(pts[9]-pts[3], pts[10]-pts[4], pts[11]-pts[5]) ;
-    // e23
-    edge[5] = MATH_T::norm2(pts[9]-pts[6], pts[10]-pts[7], pts[11]-pts[8]) ;
-
-    const double emax = *std::max_element(edge, edge+6);
-    const double emin = *std::min_element(edge, edge+6);
-
-    return emax / emin;
+    return TET_T::get_aspect_ratio( pts );
   }
 
   int Tet4::get_face_id( const int &n0, const int &n1, const int &n2) const
@@ -692,7 +631,7 @@ namespace TET_T
 
     int sum = flg[0] + flg[1] + flg[2] + flg[3];
 
-    SYS_T::print_exit_if( sum != 3, "Error: Tet4::find_face_id input is not a proper face of this element. \n");
+    SYS_T::print_exit_if( sum != 3, "Error: Tet4::get_face_id input is not a proper face of this element. \n");
 
     int loc = 0;
     while( flg[loc] ) loc+=1;
@@ -702,57 +641,32 @@ namespace TET_T
 
   double Tet4::get_diameter() const
   {
-    double x, y, z, r;
-    MATH_T::get_tet_sphere_info(
-        pts[0], pts[3], pts[6], pts[9],
-        pts[1], pts[4], pts[7], pts[10],
-        pts[2], pts[5], pts[8], pts[11],
-        x, y, z, r );
+    double r;
+    MATH_T::get_tet_sphere_info( pts[0], pts[1], pts[2], pts[3], r );
 
     return 2.0 * r;
   }
 
   double Tet4::get_volume() const
   {
-    const double x10 = pts[3] - pts[0];
-    const double y01 = pts[1] - pts[4];
-    const double z01 = pts[2] - pts[5];
+    const double x10 = pts[1].x() - pts[0].x();
+    const double y01 = pts[0].y() - pts[1].y();
+    const double z01 = pts[0].z() - pts[1].z();
 
-    const double x21 = pts[6] - pts[3];
-    const double y12 = pts[4] - pts[7];
-    const double z12 = pts[5] - pts[8];
+    const double x21 = pts[2].x() - pts[1].x();
+    const double y12 = pts[1].y() - pts[2].y();
+    const double z12 = pts[1].z() - pts[2].z();
 
-    const double x32 = pts[9] - pts[6];
-    const double z23 = pts[8] - pts[11];
-    const double y23 = pts[7] - pts[10];
+    const double x32 = pts[3].x() - pts[2].x();
+    const double z23 = pts[2].z() - pts[3].z();
+    const double y23 = pts[2].y() - pts[3].y();
 
     const double sum = x10 * (y12*z23 - y23*z12)
       + x21*(y23*z01 - y01*z23) + x32*(y01*z12 - y12*z01);
 
     return sum / 6.0;
   }
-
-  void Tet4::write_vtu( const std::string &fileName ) const
-  {
-    // Setup the VTK objects
-    vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
-
-    std::vector<double> input_pt(pts, pts+12);
-    std::vector<int> input_ien{0, 1, 2, 3};
-
-    gen_tet_grid( grid_w, 4, 1, input_pt, input_ien );
-
-    std::vector<int> input_node_index(gindex, gindex+4);
-
-    VTK_T::add_int_PointData( grid_w, input_node_index, "GlobalNodeID" );
-
-    // write vtu
-    VTK_T::write_vtkPointSet( fileName, grid_w, true );
-
-    grid_w->Delete();
-  }
 }
-
 
 void TET_T::tetmesh_check(const std::vector<double> &cpts,
     const IIEN * const &ienptr, const int &nelem,
