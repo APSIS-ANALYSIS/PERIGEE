@@ -519,8 +519,6 @@ namespace HEX_T
     const auto it2 = std::find(gindex, gindex+8, temp[2]);
     const auto it3 = std::find(gindex, gindex+8, temp[3]);
 
-    const int * it[4] {it0, it1, it2, it3};
-
     // flg is true if the temp is found in gindex
     const bool flg[4] { (it0 != temp+4), (it1 != temp+4), (it2 != temp+4), (it3 != temp+4) };
 
@@ -528,9 +526,10 @@ namespace HEX_T
 
     SYS_T::print_exit_if( sum != 4, "Error: Hex8::find_face_id input is not a proper face of this element. \n");
 
-    int index_pos[4]{};
-
-    for(unsigned int ii = 0; ii < 4; ++ii) index_pos[ii] = std::distance(std::begin(gindex), (it[ii]));
+    const int index_pos[4]{ std::distance( std::begin(gindex), it0 ),
+      std::distance( std::begin(gindex), it1 ),
+      std::distance( std::begin(gindex), it2 ),
+      std::distance( std::begin(gindex), it3 ) };
 
     std::sort(index_pos, index_pos + 4);
 
