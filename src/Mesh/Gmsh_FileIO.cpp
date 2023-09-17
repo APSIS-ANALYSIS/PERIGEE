@@ -201,13 +201,13 @@ void Gmsh_FileIO::write_interior_vtp( const std::string &vtp_filename,
   std::string ele_3d {};
   if (nlocbas_2d == 3 && nlocbas_3d_1 == 4 && nlocbas_3d_2 == 4)
   {
-    ele_2d += static_cast<std::string>("triangle");
-    ele_3d += static_cast<std::string>("tetrahedron");
+    ele_2d = static_cast<std::string>("triangle");
+    ele_3d = static_cast<std::string>("tetrahedron");
   }
   else if (nlocbas_2d == 4 && nlocbas_3d_1 == 8 && nlocbas_3d_2 == 8)
   {
-    ele_2d += static_cast<std::string>("quadrilateral");
-    ele_3d += static_cast<std::string>("hexahedron");
+    ele_2d = static_cast<std::string>("quadrilateral");
+    ele_3d = static_cast<std::string>("hexahedron");
   }
   else
     SYS_T::print_exit("Error: Gmsh_FileIO::write_interior_vtp, element types of surface and volume donnot match. \n");
@@ -274,8 +274,8 @@ void Gmsh_FileIO::write_interior_vtp( const std::string &vtp_filename,
   for(int ff=0; ff<bcnumcl; ++ff)
   {
     int snode[nlocbas_2d];
-      for (int ii{0}; ii < nlocbas_2d; ++ii)
-        snode[ii] = sur_ien_global[nlocbas_2d * ff + ii];
+    for (int ii{0}; ii < nlocbas_2d; ++ii)
+      snode[ii] = sur_ien_global[nlocbas_2d * ff + ii];
 
     bool vol1_got_sur_elem = false;
     int ee = -1;
@@ -285,9 +285,9 @@ void Gmsh_FileIO::write_interior_vtp( const std::string &vtp_filename,
       const int vol_elem = gelem_1[ee];
 
       int vnode[nlocbas_3d_1];
-        for (int jj{0}; jj < nlocbas_3d_1; ++jj)
-          vnode[jj] = vol_IEN_1[nlocbas_3d_1 * vol_elem + jj];
-        std::sort(vnode, vnode + nlocbas_3d_1); 
+      for (int jj{0}; jj < nlocbas_3d_1; ++jj)
+        vnode[jj] = vol_IEN_1[nlocbas_3d_1 * vol_elem + jj];
+      std::sort(vnode, vnode + nlocbas_3d_1); 
 
       bool got_all_nodes = true;
 
@@ -490,7 +490,7 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
     for(int ff=0; ff<bcnumcl; ++ff)
     {
       int snode[nlocbas_2d];
-      for (int ii{0}; ii < nlocbas_2d; ++ii)
+      for(int ii{0}; ii < nlocbas_2d; ++ii)
         snode[ii] = sur_ien_global[nlocbas_2d * ff + ii];
 
       bool got_sur_elem = false;
@@ -507,7 +507,7 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
 
         bool got_all_nodes = true;
 
-        for (int ii{0}; ii < nlocbas_2d; ++ii)
+        for(int ii{0}; ii < nlocbas_2d; ++ii)
         {
           const bool got_each_node = ( std::find(vnode, vnode+nlocbas_3d, snode[ii]) != vnode+nlocbas_3d );
           got_all_nodes = got_all_nodes && got_each_node;
@@ -530,12 +530,12 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
   input_vtk_data.push_back({bcpt, "GlobalNodeID", AssociateObject::Node});
   input_vtk_data.push_back({face2elem, "GlobalElementID", AssociateObject::Cell});
 
-  if (nlocbas_2d == 3)
+  if(nlocbas_2d == 3)
   {
     TET_T::write_triangle_grid( vtp_filename, bcnumpt, bcnumcl,
       sur_pt, sur_ien, input_vtk_data );
   }
-  else if (nlocbas_2d == 4)
+  else if(nlocbas_2d == 4)
   {
     HEX_T::write_quad_grid( vtp_filename, bcnumpt, bcnumcl,
       sur_pt, sur_ien, input_vtk_data );
@@ -1398,15 +1398,15 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
   { 
     nVertex_2d = 3;
     nVertex_3d = 4;
-    ele_2d += static_cast<std::string>("triangle");
-    ele_3d += static_cast<std::string>("tetrahedron");
+    ele_2d = static_cast<std::string>("triangle");
+    ele_3d = static_cast<std::string>("tetrahedron");
   }
   else if (nlocbas_2d == 9 && nlocbas_3d == 27)
   {
     nVertex_2d = 4;
     nVertex_3d = 8;
-    ele_2d += static_cast<std::string>("quadrilateral");
-    ele_3d += static_cast<std::string>("hexahedron");
+    ele_2d = static_cast<std::string>("quadrilateral");
+    ele_3d = static_cast<std::string>("hexahedron");
   }
   else
     SYS_T::print_exit("Error: Gmsh_FileIO::write_quadratic_sur_vtu, element types of surface and volume donnot match. \n");

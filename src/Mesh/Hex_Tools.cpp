@@ -519,17 +519,17 @@ namespace HEX_T
     const auto it2 = std::find(gindex, gindex+8, temp[2]);
     const auto it3 = std::find(gindex, gindex+8, temp[3]);
 
-    const int* it[4]{it0, it1, it2, it3};
+    const auto it[4] {it0, it1, it2, it3};
 
     // flg is true if the temp is found in gindex
-    bool flg[4] { (it0 != temp+4), (it1 != temp+4), (it2 != temp+4), (it3 != temp+4) };
+    const bool flg[4] { (it0 != temp+4), (it1 != temp+4), (it2 != temp+4), (it3 != temp+4) };
 
     int sum = flg[0] + flg[1] + flg[2] + flg[3];
 
     SYS_T::print_exit_if( sum != 4, "Error: Hex8::find_face_id input is not a proper face of this element. \n");
 
     int index_pos[4]{};
-    
+
     for(unsigned int ii = 0; ii < 4; ++ii) index_pos[ii] = std::distance(std::begin(gindex), (it[ii]));
 
     std::sort(index_pos, index_pos + 4);
@@ -544,34 +544,34 @@ namespace HEX_T
     int face_id = 0;
 
     if (std::equal(index_pos, index_pos + 4, zeroth))
-      {
-        face_id = 0;
-      }    
+    {
+      face_id = 0;
+    }    
     else if(std::equal(index_pos, index_pos + 4, first))
-      {
-        face_id = 1;
-      }
+    {
+      face_id = 1;
+    }
     else if(std::equal(index_pos, index_pos + 4, second))
-      {
-        face_id = 2;
-      }
+    {
+      face_id = 2;
+    }
     else if(std::equal(index_pos, index_pos + 4, third))
-      {
-        face_id = 3;
-      }
+    {
+      face_id = 3;
+    }
     else if(std::equal(index_pos, index_pos + 4, fourth))
-      {
-        face_id = 4;
-      }
+    {
+      face_id = 4;
+    }
     else if(std::equal(index_pos, index_pos + 4, fifth))
-      {
-        face_id = 5;
-      }
+    {
+      face_id = 5;
+    }
     else
-      {
-        face_id = -1;
-        SYS_T::print_exit( "Error: Hex8::find_face_id input is not a proper face of this element. \n");
-      }
+    {
+      face_id = -1;
+      SYS_T::print_exit( "Error: Hex8::find_face_id input is not a proper face of this element. \n");
+    }
 
     return face_id;
 
