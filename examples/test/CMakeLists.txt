@@ -33,13 +33,12 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/System/PETSc_Tools.cpp
   ${perigee_source}/System/Vector_3.cpp
   ${perigee_source}/System/Matrix_double_3by3_Array.cpp
-  ${perigee_source}/System/Matrix_3x3.cpp
+  ${perigee_source}/System/Tensor2_3D.cpp
   ${perigee_source}/System/Matrix_2x2.cpp
-  ${perigee_source}/System/SymmMatrix_3x3.cpp
+  ${perigee_source}/System/SymmTensor2_3D.cpp
   ${perigee_source}/System/Tensor4_3D.cpp
   ${perigee_source}/System/Tensor4_2D.cpp
   ${perigee_source}/System/SymmTensor4_3D.cpp
-  ${perigee_source}/System/Math_Tools.cpp
   ${perigee_source}/System/SV_Tools.cpp
   ${perigee_source}/System/Math_Tools.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
@@ -88,7 +87,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/ALocal_EBC_outflow.cpp
   ${perigee_source}/Analysis_Tool/ALocal_EBC_wall.cpp
   ${perigee_source}/Analysis_Tool/APart_Node.cpp
-  ${perigee_source}/Element/FEANode.cpp
+  ${perigee_source}/Analysis_Tool/FEANode.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
   ${perigee_source}/Element/FEAElement_Tet10.cpp
   ${perigee_source}/Element/FEAElement_Tet10_v2.cpp

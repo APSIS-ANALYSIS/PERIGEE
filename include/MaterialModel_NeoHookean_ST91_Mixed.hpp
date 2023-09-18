@@ -49,14 +49,14 @@ class MaterialModel_NeoHookean_ST91_Mixed : public IMaterialModel
     virtual void write_hdf5( const char * const &fname = "material_model.h5" ) const;
 
     // Returns the S_iso and P_iso
-    virtual void get_PK( const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S ) const;
+    virtual void get_PK( const Tensor2_3D &F, Tensor2_3D &P, Tensor2_3D &S ) const;
 
     // Returns the S_iso, P_iso, and CC_iso
-    virtual void get_PK_Stiffness( const Matrix_3x3 &F, Matrix_3x3 &P,
-        Matrix_3x3 &S, Tensor4_3D &CC ) const;
+    virtual void get_PK_Stiffness( const Tensor2_3D &F, Tensor2_3D &P,
+        Tensor2_3D &S, Tensor4_3D &CC ) const;
 
     // Return the Psi_iso
-    virtual double get_strain_energy( const Matrix_3x3 &F ) const;
+    virtual double get_strain_energy( const Tensor2_3D &F ) const;
 
     // Elastic material properties
     virtual double get_elastic_rho0() const {return rho0;}
@@ -87,7 +87,7 @@ class MaterialModel_NeoHookean_ST91_Mixed : public IMaterialModel
   private:
     double rho0, E, nu, lambda, mu, kappa;
     const double pt33, mpt67;
-    const Matrix_3x3 I;
+    const Tensor2_3D I;
 };
 
 #endif

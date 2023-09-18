@@ -28,6 +28,7 @@ The above indicates that all modules are unloaded first and the intel/2018.4 com
 - [Install PETSc](#Install-PETSc)
 - [Install HDF5](#Install-HDF5)
 - [Install METIS](#Install-METIS)
+- [Install YAML-cpp](#Install-YAML-cpp)
 - [Install Gmsh](#Install-Gmsh)
 - [Install SLEPc](#Install-SLEPc)
 - [Install ParaView](#Install-ParaView)
@@ -205,6 +206,10 @@ $ make
 $ make check
 $ make install
 $ make check-install
+```
+
+You may go to the upper level and remove the source folder in the following manner,
+```sh
 $ cd ..
 $ rm -rf hdf5-1.8.16-src
 ```
@@ -220,10 +225,31 @@ $ cd metis-5.0.3-src
 $ make config prefix=$HOME/lib/metis-5.0.3
 $ make
 $ make install
+```
+
+After the installation, you may remove the source folder in the following manner,
+```sh
 $ cd ..
 $ rm -rf metis-5.0.3-src
 ```
 Remarks: (1) You should read BUILD.txt to have an idea of all relevant configure options. (2) If you need 64-bit integer support, you need to modify the `metis.h` file in the include folder before compiling.
+
+## Install YAML-cpp
+```sh
+$ git clone https://github.com/jbeder/yaml-cpp.git
+$ mkdir build_yaml
+$ cd build_yaml
+$ cmake ../yaml-cpp -DCMAKE_INSTALL_PREFIX=$HOME/lib/yaml-shared -DBUILD_SHARED_LIBS=ON
+$ make
+$ make install
+```
+
+After the installation, you do not need the source or the build folder. So you may run the following to clean them.
+```sh
+$ cd ..
+$ rm -rf build_yaml
+$ rm -rf yaml-cpp
+```
 
 ## Install Gmsh
 The PERIGEE code does **not** depend on Gmsh. However, we frequently use Gmsh to generate input files for unstructured grid. Therefore, it is recommended that you install Gmsh on your machine. This step is **unnecessary** for compiling PERIGEE on clusters. Currently, the code is compatible with the mesh format from Gmsh-3. Run the following commands to install Gmsh. We do not need to link the PERIGEE code to Gmsh. For many cases, we generate a mesh using Gmsh as a binary executable.

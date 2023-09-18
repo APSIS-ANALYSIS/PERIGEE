@@ -209,10 +209,10 @@ class FEAElement
     // and shell elements.
     // Reference: TJRH Linear finite element book page 386.
     // ------------------------------------------------------------------------    
-    virtual Matrix_3x3 get_rotationMatrix( const int &quaindex ) const 
+    virtual Tensor2_3D get_rotationMatrix( const int &quaindex ) const 
     {
       SYS_T::commPrint("Warning: get_rotationMatrix is not implemented. \n"); 
-      return Matrix_3x3();
+      return Tensor2_3D();
     }
 
     // ------------------------------------------------------------------------

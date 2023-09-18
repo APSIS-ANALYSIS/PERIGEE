@@ -29,7 +29,6 @@
 // Date Created: Jan. 8 2021.
 // ==================================================================
 #include "FEAElement.hpp"
-#include "Math_Tools.hpp"
 
 class FEAElement_Triangle6_membrane : public FEAElement
 {
@@ -83,7 +82,7 @@ class FEAElement_Triangle6_membrane : public FEAElement
 
     virtual std::vector<double> get_dR_dy( const int &quaindex ) const;
 
-    virtual Matrix_3x3 get_rotationMatrix( const int &quaindex ) const;
+    virtual Tensor2_3D get_rotationMatrix( const int &quaindex ) const;
 
     // Assuming the triangle nodes are arranged such that the outward
     // direction is given by dx_dr x dx_ds
@@ -97,7 +96,7 @@ class FEAElement_Triangle6_membrane : public FEAElement
     virtual double get_detJac(const int &quaindex) const {return detJac[quaindex];}
 
   private:
-    const int nLocBas, numQuapts;
+    const int numQuapts;
 
     // Container for R0, R1, R2, R3, R4, R5
     // 0 <= ii < 6 x numQuapts
@@ -109,7 +108,7 @@ class FEAElement_Triangle6_membrane : public FEAElement
     double * dR_dx, * dR_dy;
 
     // Global-to-lamina 3x3 rotation matrix, of length numQuapts
-    std::vector< Matrix_3x3 > Q;
+    std::vector< Tensor2_3D > Q;
 
     // Unit normal vector components, each of length numQuapts
     Vector_3 * un;

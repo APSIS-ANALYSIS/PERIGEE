@@ -1,33 +1,33 @@
-#include "SymmMatrix_3x3.hpp"
+#include "SymmTensor2_3D.hpp"
 
-SymmMatrix_3x3::SymmMatrix_3x3()
+SymmTensor2_3D::SymmTensor2_3D()
 {
   mat[0] = 1.0; mat[1] = 1.0; mat[2] = 1.0;
   mat[3] = 0.0; mat[4] = 0.0; mat[5] = 0.0;
 }
 
-SymmMatrix_3x3::SymmMatrix_3x3( const SymmMatrix_3x3 &source )
+SymmTensor2_3D::SymmTensor2_3D( const SymmTensor2_3D &source )
 {
   mat[0] = source(0); mat[1] = source(1); mat[2] = source(2);
   mat[3] = source(3); mat[4] = source(4); mat[5] = source(5);
 }
 
-SymmMatrix_3x3::SymmMatrix_3x3( const double &m0, const double &m1, 
+SymmTensor2_3D::SymmTensor2_3D( const double &m0, const double &m1, 
     const double &m2, const double &m3, const double &m4, const double &m5 )
 {
   mat[0] = m0; mat[1] = m1; mat[2] = m2;
   mat[3] = m3; mat[4] = m4; mat[5] = m5;
 }
 
-SymmMatrix_3x3::~SymmMatrix_3x3()
+SymmTensor2_3D::~SymmTensor2_3D()
 {}
 
-Matrix_3x3 SymmMatrix_3x3::convert_to_full() const
+Tensor2_3D SymmTensor2_3D::convert_to_full() const
 {
-  return Matrix_3x3( mat[0], mat[5], mat[4], mat[5], mat[1], mat[3], mat[4], mat[3], mat[2] );
+  return Tensor2_3D( mat[0], mat[5], mat[4], mat[5], mat[1], mat[3], mat[4], mat[3], mat[2] );
 }
 
-SymmMatrix_3x3& SymmMatrix_3x3::operator= (const SymmMatrix_3x3 &source)
+SymmTensor2_3D& SymmTensor2_3D::operator= (const SymmTensor2_3D &source)
 {
   if (this == &source) return *this;
 
@@ -35,57 +35,57 @@ SymmMatrix_3x3& SymmMatrix_3x3::operator= (const SymmMatrix_3x3 &source)
   return *this;
 }
 
-SymmMatrix_3x3 operator+( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right )
+SymmTensor2_3D operator+( const SymmTensor2_3D &left, const SymmTensor2_3D &right )
 {
-  return SymmMatrix_3x3( left.mat[0] + right.mat[0], left.mat[1] + right.mat[1], 
+  return SymmTensor2_3D( left.mat[0] + right.mat[0], left.mat[1] + right.mat[1], 
 		         left.mat[2] + right.mat[2], left.mat[3] + right.mat[3], 
 		         left.mat[4] + right.mat[4], left.mat[5] + right.mat[5] );
 }
 
-SymmMatrix_3x3 operator-( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right )
+SymmTensor2_3D operator-( const SymmTensor2_3D &left, const SymmTensor2_3D &right )
 {
-  return SymmMatrix_3x3( left.mat[0] - right.mat[0], left.mat[1] - right.mat[1], 
+  return SymmTensor2_3D( left.mat[0] - right.mat[0], left.mat[1] - right.mat[1], 
 		         left.mat[2] - right.mat[2], left.mat[3] - right.mat[3], 
 		         left.mat[4] - right.mat[4], left.mat[5] - right.mat[5] );
 }
 
-SymmMatrix_3x3& SymmMatrix_3x3::operator+=( const SymmMatrix_3x3 &source )
+SymmTensor2_3D& SymmTensor2_3D::operator+=( const SymmTensor2_3D &source )
 {
   for(int ii=0; ii<6; ++ii) mat[ii] += source(ii);
   return *this; 
 }
 
- SymmMatrix_3x3& SymmMatrix_3x3::operator-=( const SymmMatrix_3x3 &source )
+ SymmTensor2_3D& SymmTensor2_3D::operator-=( const SymmTensor2_3D &source )
 {
   for(int ii=0; ii<6; ++ii) mat[ii] -= source(ii);
   return *this; 
 }
 
-SymmMatrix_3x3& SymmMatrix_3x3::operator*=( const double &val )
+SymmTensor2_3D& SymmTensor2_3D::operator*=( const double &val )
 {
   for(int ii=0; ii<6; ++ii) mat[ii] *= val;
   return *this;
 }
 
-bool SymmMatrix_3x3::is_identical( const SymmMatrix_3x3 &source, const double &tol ) const
+bool SymmTensor2_3D::is_identical( const SymmTensor2_3D &source, const double &tol ) const
 {
   for(int ii=0; ii<6; ++ii)
     if( std::abs( source(ii) - mat[ii]) > tol ) return false;
   return true;  
 }
 
-void SymmMatrix_3x3::gen_zero()
+void SymmTensor2_3D::gen_zero()
 {
   for(int ii=0; ii<6; ++ii) mat[ii] = 0.0;
 }
 
-void SymmMatrix_3x3::gen_id()
+void SymmTensor2_3D::gen_id()
 {
   mat[0] = 1.0; mat[1] = 1.0; mat[2] = 1.0;
   mat[3] = 0.0; mat[4] = 0.0; mat[5] = 0.0; 
 }
 
-void SymmMatrix_3x3::gen_rand(const double &left, const double &right)
+void SymmTensor2_3D::gen_rand(const double &left, const double &right)
 {
   std::random_device rd;
   std::mt19937_64 gen( rd() );
@@ -93,7 +93,7 @@ void SymmMatrix_3x3::gen_rand(const double &left, const double &right)
   for(int ii=0; ii<6; ++ii) mat[ii] = dis(gen);
 }
 
-void SymmMatrix_3x3::inverse()
+void SymmTensor2_3D::inverse()
 {
   const double invdetA = 1.0 / det();
 
@@ -108,44 +108,44 @@ void SymmMatrix_3x3::inverse()
   for(int ii=0; ii<6; ++ii) mat[ii] = temp[ii];
 }
 
-void SymmMatrix_3x3::AXPY( const double &val, const SymmMatrix_3x3 &source )
+void SymmTensor2_3D::AXPY( const double &val, const SymmTensor2_3D &source )
 {
   for(int ii=0; ii<6; ++ii) mat[ii] += val * source(ii);
 }
 
-void SymmMatrix_3x3::AXPI( const double &val )
+void SymmTensor2_3D::AXPI( const double &val )
 {
   mat[0] += val; mat[1] += val; mat[2] += val;
 }
 
-double SymmMatrix_3x3::det() const
+double SymmTensor2_3D::det() const
 {
   return mat[0] * mat[1] * mat[2] + mat[5] * mat[3] * mat[4]
     + mat[4] * mat[5] * mat[3] - mat[4] * mat[1] * mat[4]
     - mat[0] * mat[3] * mat[3] - mat[5] * mat[5] * mat[2];
 }
 
-double SymmMatrix_3x3::I2() const
+double SymmTensor2_3D::I2() const
 {
   return 0.5 * ( I1() * I1() - mat[0] * mat[0] - mat[1] * mat[1] 
      - mat[2] * mat[2] - 2.0 * ( mat[5] * mat[5] + mat[4] * mat[4] + mat[3] * mat[3] ) );
 }
 
-double SymmMatrix_3x3::VecMatVec( const Vector_3 &x, const Vector_3 &y ) const
+double SymmTensor2_3D::VecMatVec( const Vector_3 &x, const Vector_3 &y ) const
 {
   return x(0) * ( mat[0] * y(0) + mat[5] * y(1) + mat[4] * y(2) )
     + x(1) * ( mat[5] * y(0) + mat[1] * y(1) + mat[3] * y(2) )
     + x(2) * ( mat[4] * y(0) + mat[3] * y(1) + mat[2] * y(2) );
 }
 
-Vector_3 SymmMatrix_3x3::VecMult( const Vector_3 &x ) const
+Vector_3 SymmTensor2_3D::VecMult( const Vector_3 &x ) const
 {
   return Vector_3( mat[0] * x(0) + mat[5] * x(1) + mat[4] * x(2),
       mat[5] * x(0) + mat[1] * x(1) + mat[3] * x(2),
       mat[4] * x(0) + mat[3] * x(1) + mat[2] * x(2) );
 }
 
-void SymmMatrix_3x3::VecMult( const double &x0, const double &x1, const double &x2,
+void SymmTensor2_3D::VecMult( const double &x0, const double &x1, const double &x2,
        double &y0, double &y1, double &y2 ) const
 {
   y0 = mat[0] * x0 + mat[5] * x1 + mat[4] * x2;
@@ -153,7 +153,7 @@ void SymmMatrix_3x3::VecMult( const double &x0, const double &x1, const double &
   y2 = mat[4] * x0 + mat[3] * x1 + mat[2] * x2;
 }
 
-void SymmMatrix_3x3::MatRot( const Matrix_3x3 &Q )
+void SymmTensor2_3D::MatRot( const Tensor2_3D &Q )
 {
   double temp[9] = {0.0};
   for(int ii=0; ii<3; ++ii)
@@ -170,40 +170,40 @@ void SymmMatrix_3x3::MatRot( const Matrix_3x3 &Q )
   mat[1] = temp[4]; mat[3] = temp[5]; mat[2] = temp[8];
 }
 
-double SymmMatrix_3x3::MatContraction( const Matrix_3x3 &source ) const
+double SymmTensor2_3D::MatContraction( const Tensor2_3D &source ) const
 {
   return mat[0] * source(0) + mat[5] * source(1) + mat[4] * source(2) + mat[5] * source(3)
     + mat[1] * source(4) + mat[3] * source(5) + mat[4] * source(6) + mat[3] * source(7)
     + mat[2] * source(8);
 }
 
-double SymmMatrix_3x3::MatContraction( const SymmMatrix_3x3 &source ) const
+double SymmTensor2_3D::MatContraction( const SymmTensor2_3D &source ) const
 {
   return mat[0] * source(0) + mat[1] * source(1) + mat[2] * source(2)
     + 2.0 * ( mat[3] * source(3) + mat[4] * source(4) + mat[5] * source(5) );
 }
 
-void SymmMatrix_3x3::print() const
+void SymmTensor2_3D::print() const
 {
   std::cout<<std::setprecision(9)<<mat[0]<<'\t'<<mat[5]<<'\t'<<mat[4]<<std::endl;
   std::cout<<std::setprecision(9)<<mat[5]<<'\t'<<mat[1]<<'\t'<<mat[3]<<std::endl;
   std::cout<<std::setprecision(9)<<mat[4]<<'\t'<<mat[3]<<'\t'<<mat[2]<<std::endl;
 }
 
-void SymmMatrix_3x3::print_in_row() const
+void SymmTensor2_3D::print_in_row() const
 {
   std::cout<<std::setprecision(9)<<mat[0]<<'\t'<<mat[5]<<'\t'<<mat[4]<<'\t';
   std::cout<<std::setprecision(9)<<mat[5]<<'\t'<<mat[1]<<'\t'<<mat[3]<<'\t';
   std::cout<<std::setprecision(9)<<mat[4]<<'\t'<<mat[3]<<'\t'<<mat[2]<<std::endl;
 }
 
-void SymmMatrix_3x3::print_Voigt() const
+void SymmTensor2_3D::print_Voigt() const
 {
   std::cout<<std::setprecision(9)<<mat[0]<<'\t'<<mat[1]<<'\t'<<mat[2]<<'\t';
   std::cout<<std::setprecision(9)<<mat[3]<<'\t'<<mat[4]<<'\t'<<mat[5]<<std::endl;
 }
 
-int SymmMatrix_3x3::eigen_decomp( double &eta1, double &eta2, double &eta3,
+int SymmTensor2_3D::eigen_decomp( double &eta1, double &eta2, double &eta3,
     Vector_3 &v1, Vector_3 &v2, Vector_3 &v3 ) const
 {
   const double frac13 = 1.0 / 3.0;
@@ -296,7 +296,7 @@ int SymmMatrix_3x3::eigen_decomp( double &eta1, double &eta2, double &eta3,
   }
 }
 
-void SymmMatrix_3x3::find_eigen_vector( const double &eta, Vector_3 &v,
+void SymmTensor2_3D::find_eigen_vector( const double &eta, Vector_3 &v,
     Vector_3 &s1, Vector_3 &s2 ) const
 {
   const double frac13_tr = tr() / 3.0; // value used to shift the eigenvalue
@@ -372,7 +372,7 @@ void SymmMatrix_3x3::find_eigen_vector( const double &eta, Vector_3 &v,
   }
 }
 
-double SymmMatrix_3x3::J2() const
+double SymmTensor2_3D::J2() const
 {
   const double a = mat[0] * mat[0] + 2.0 * mat[5] * mat[5] + 2.0 * mat[4] * mat[4]
     + mat[1] * mat[1] + 2.0 * mat[3] * mat[3] + mat[2] * mat[2];
@@ -382,7 +382,7 @@ double SymmMatrix_3x3::J2() const
   return 0.5 * a - b * b / 6.0;
 }
 
-double SymmMatrix_3x3::J3() const
+double SymmTensor2_3D::J3() const
 {
   const double a = ( mat[0] + mat[1] + mat[2] ) / 3.0;
 
@@ -395,16 +395,16 @@ double SymmMatrix_3x3::J3() const
     - m0 * mat[3] * mat[3] - mat[5] * mat[5] * m8;
 }
 
-Vector_3 operator*( const SymmMatrix_3x3 &left, const Vector_3 &right )
+Vector_3 operator*( const SymmTensor2_3D &left, const Vector_3 &right )
 {
   return Vector_3( left.xx() * right.x() + left.xy() * right.y() + left.xz() * right.z(),
       left.yx() * right.x() + left.yy() * right.y() + left.yz() * right.z(),
       left.zx() * right.x() + left.zy() * right.y() + left.zz() * right.z() ); 
 }
 
-Matrix_3x3 operator*( const SymmMatrix_3x3 &left, const Matrix_3x3 &right )
+Tensor2_3D operator*( const SymmTensor2_3D &left, const Tensor2_3D &right )
 {
-  return Matrix_3x3( left(0) * right(0) + left(5) * right(3) + left(4) * right(6),
+  return Tensor2_3D( left(0) * right(0) + left(5) * right(3) + left(4) * right(6),
    left(0) * right(1) + left(5) * right(4) + left(4) * right(7),
    left(0) * right(2) + left(5) * right(5) + left(4) * right(8),
    left(5) * right(0) + left(1) * right(3) + left(3) * right(6),
@@ -415,9 +415,9 @@ Matrix_3x3 operator*( const SymmMatrix_3x3 &left, const Matrix_3x3 &right )
    left(4) * right(2) + left(3) * right(5) + left(2) * right(8) );
 }
 
-Matrix_3x3 operator*( const Matrix_3x3 &left, const SymmMatrix_3x3 &right )
+Tensor2_3D operator*( const Tensor2_3D &left, const SymmTensor2_3D &right )
 {
-  return Matrix_3x3( left(0) * right(0) + left(1) * right(5) + left(2) * right(4),
+  return Tensor2_3D( left(0) * right(0) + left(1) * right(5) + left(2) * right(4),
    left(0) * right(5) + left(1) * right(1) + left(2) * right(3),
    left(0) * right(4) + left(1) * right(3) + left(2) * right(2),
    left(3) * right(0) + left(4) * right(5) + left(5) * right(4),
@@ -428,9 +428,9 @@ Matrix_3x3 operator*( const Matrix_3x3 &left, const SymmMatrix_3x3 &right )
    left(6) * right(4) + left(7) * right(3) + left(8) * right(2) );
 }
 
-Matrix_3x3 operator*( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right )
+Tensor2_3D operator*( const SymmTensor2_3D &left, const SymmTensor2_3D &right )
 {
-  return Matrix_3x3( left(0) * right(0) + left(5) * right(5) + left(4) * right(4),
+  return Tensor2_3D( left(0) * right(0) + left(5) * right(5) + left(4) * right(4),
    left(0) * right(5) + left(5) * right(1) + left(4) * right(3),
    left(0) * right(4) + left(5) * right(3) + left(4) * right(2),
    left(5) * right(0) + left(1) * right(5) + left(3) * right(4),
@@ -441,17 +441,17 @@ Matrix_3x3 operator*( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right )
    left(4) * right(4) + left(3) * right(3) + left(2) * right(2) );
 }
 
-SymmMatrix_3x3 operator*( const double &val, const SymmMatrix_3x3 &input )
+SymmTensor2_3D operator*( const double &val, const SymmTensor2_3D &input )
 {
-  return SymmMatrix_3x3( val * input(0), val * input(1), val * input(2), 
+  return SymmTensor2_3D( val * input(0), val * input(1), val * input(2), 
    val * input(3), val * input(4), val * input(5) );
 }
 
-SymmMatrix_3x3 inverse( const SymmMatrix_3x3 &input )
+SymmTensor2_3D inverse( const SymmTensor2_3D &input )
 {
   const double invdetA = 1.0 / input.det();
 
-  return SymmMatrix_3x3 (
+  return SymmTensor2_3D (
   invdetA * (input(1) * input(2) - input(3) * input(3)),
   invdetA * (input(0) * input(2) - input(4) * input(4)),
   invdetA * (input(0) * input(1) - input(5) * input(5)),
@@ -460,9 +460,9 @@ SymmMatrix_3x3 inverse( const SymmMatrix_3x3 &input )
   invdetA * (input(4) * input(3) - input(5) * input(2)) );
 }
 
-SymmMatrix_3x3 gen_right_Cauchy_Green( const Matrix_3x3 &input )
+SymmTensor2_3D gen_right_Cauchy_Green( const Tensor2_3D &input )
 {
-  return SymmMatrix_3x3 (
+  return SymmTensor2_3D (
    input(0) * input(0) + input(3) * input(3) + input(6) * input(6),
    input(1) * input(1) + input(4) * input(4) + input(7) * input(7),
    input(2) * input(2) + input(5) * input(5) + input(8) * input(8),
@@ -471,9 +471,9 @@ SymmMatrix_3x3 gen_right_Cauchy_Green( const Matrix_3x3 &input )
    input(0) * input(1) + input(3) * input(4) + input(6) * input(7) );
 }
 
-SymmMatrix_3x3 gen_left_Cauchy_Green( const Matrix_3x3 &input )
+SymmTensor2_3D gen_left_Cauchy_Green( const Tensor2_3D &input )
 {
-  return SymmMatrix_3x3 (
+  return SymmTensor2_3D (
   input(0) * input(0) + input(1) * input(1) + input(2) * input(2),
   input(3) * input(3) + input(4) * input(4) + input(5) * input(5),
   input(6) * input(6) + input(7) * input(7) + input(8) * input(8),
@@ -482,9 +482,9 @@ SymmMatrix_3x3 gen_left_Cauchy_Green( const Matrix_3x3 &input )
   input(0) * input(3) + input(1) * input(4) + input(2) * input(5) );
 }
 
-SymmMatrix_3x3 gen_symm_part( const Matrix_3x3 &input )
+SymmTensor2_3D gen_symm_part( const Tensor2_3D &input )
 {
-  return SymmMatrix_3x3( input(0), input(4), input(8),
+  return SymmTensor2_3D( input(0), input(4), input(8),
                         0.5 * ( input(5) + input(7) ),
                         0.5 * ( input(2) + input(6) ),
                         0.5 * ( input(1) + input(3) ) );

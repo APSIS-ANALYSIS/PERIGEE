@@ -31,7 +31,7 @@ SET( perigee_source ${perigee_SOURCE_DIR}/../../src )
 # 1. Preprocessor source cpp
 SET( perigee_preprocess_lib_src 
   ${perigee_source}/System/Vector_3.cpp
-  ${perigee_source}/System/Matrix_3x3.cpp
+  ${perigee_source}/System/Tensor2_3D.cpp
   ${perigee_source}/System/Matrix_double_3by3_Array.cpp
   ${perigee_source}/System/Math_Tools.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
@@ -39,6 +39,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Gmsh_FileIO.cpp
   ${perigee_source}/Mesh/VTK_Tools.cpp
   ${perigee_source}/Mesh/Tet_Tools.cpp
+  ${perigee_source}/Mesh/Hex_Tools.cpp
   ${perigee_source}/Mesh/IEN_FEM.cpp
   ${perigee_source}/Mesh/Mesh_Tet.cpp
   ${perigee_source}/Mesh/Part_FEM.cpp
@@ -59,7 +60,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/System/PETSc_Tools.cpp
   ${perigee_source}/System/Matrix_double_6by6_Array.cpp
   ${perigee_source}/System/Matrix_PETSc.cpp
-  ${perigee_source}/System/Matrix_3x3.cpp
+  ${perigee_source}/System/Tensor2_3D.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Tet.cpp
   ${perigee_source}/Analysis_Tool/AGlobal_Mesh_Info_FEM_3D.cpp
   ${perigee_source}/Analysis_Tool/APart_Basic_Info.cpp
@@ -70,7 +71,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/ALocal_EBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_EBC_outflow.cpp
   ${perigee_source}/Analysis_Tool/APart_Node.cpp
-  ${perigee_source}/Element/FEANode.cpp
+  ${perigee_source}/Analysis_Tool/FEANode.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
   ${perigee_source}/Element/FEAElement_Tet10_v2.cpp
   ${perigee_source}/Model/GenBC_RCR.cpp
