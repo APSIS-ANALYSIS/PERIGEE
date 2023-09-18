@@ -40,13 +40,13 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
     R[qua*3 + 2] = qua_s;
   }
 
-  const Vector_3 dx_dr(ctrl_x[0] * (-1.0) + ctrl_x[1],
-    ctrl_y[0] * (-1.0) + ctrl_y[1],
-    ctrl_z[0] * (-1.0) + ctrl_z[1]);
+  const Vector_3 dx_dr( -ctrl_x[0] + ctrl_x[1],
+    -ctrl_y[0] + ctrl_y[1],
+    -ctrl_z[0] + ctrl_z[1] );
 
-  const Vector_3 dx_ds(ctrl_x[0] * (-1.0) + ctrl_x[2],
-    ctrl_y[0] * (-1.0) + ctrl_y[2],
-    ctrl_z[0] * (-1.0) + ctrl_z[2]);
+  const Vector_3 dx_ds(-ctrl_x[0] + ctrl_x[2],
+    -ctrl_y[0] + ctrl_y[2],
+    -ctrl_z[0] + ctrl_z[2]);
 
   // vec(un) = vec(dx_dr) x vec(dx_ds)
   un = VEC3_T::cross_product( dx_dr, dx_ds );
@@ -87,26 +87,26 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   }
 
   // Rotated lamina 2D Jacobian & inverse Jacobian components
-  Jac[0] = ctrl_xl[0] * (-1.0) + ctrl_xl[1]; // dxl_dr 
-  Jac[1] = ctrl_xl[0] * (-1.0) + ctrl_xl[2]; // dxl_ds
+  Jac[0] = -ctrl_xl[0] + ctrl_xl[1]; // dxl_dr 
+  Jac[1] = -ctrl_xl[0] + ctrl_xl[2]; // dxl_ds
 
-  Jac[2] = ctrl_yl[0] * (-1.0) + ctrl_yl[1]; // dyl_dr
-  Jac[3] = ctrl_yl[0] * (-1.0) + ctrl_yl[2]; // dyl_ds
+  Jac[2] = -ctrl_yl[0] + ctrl_yl[1]; // dyl_dr
+  Jac[3] = -ctrl_yl[0] + ctrl_yl[2]; // dyl_ds
 
   detJac = Jac[0] * Jac[3] - Jac[1] * Jac[2];
 
   double inv_detJac = 1.0 / detJac;
 
-  Jac[4] = Jac[3] * inv_detJac;              // dr_dxl
-  Jac[5] = -1.0 * Jac[1] * inv_detJac;       // dr_dyl
-  Jac[6] = -1.0 * Jac[2] * inv_detJac;       // ds_dxl
-  Jac[7] = Jac[0] * inv_detJac;              // ds_dyl
+  Jac[4] =  Jac[3] * inv_detJac;     // dr_dxl
+  Jac[5] = -Jac[1] * inv_detJac;     // dr_dyl
+  Jac[6] = -Jac[2] * inv_detJac;     // ds_dxl
+  Jac[7] =  Jac[0] * inv_detJac;     // ds_dyl
 
-  dR_dx[0] = (-1.0) * Jac[4] - Jac[6];
+  dR_dx[0] = - Jac[4] - Jac[6];
   dR_dx[1] = Jac[4];
   dR_dx[2] = Jac[6];
 
-  dR_dy[0] = (-1.0) * Jac[5] - Jac[7];
+  dR_dy[0] = - Jac[5] - Jac[7];
   dR_dy[1] = Jac[5];
   dR_dy[2] = Jac[7];
 }

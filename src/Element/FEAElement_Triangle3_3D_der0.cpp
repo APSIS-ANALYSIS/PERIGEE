@@ -51,7 +51,6 @@ void FEAElement_Triangle3_3D_der0::buildBasis( const IQuadPts * const &quad,
   // vec(un) = vec(dx_dr) x vec(dx_ds)
   un = VEC3_T::cross_product( dx_dr, dx_ds );
 
-  
   // area = || vec(un) ||
   detJac = un.normalize();
 }
