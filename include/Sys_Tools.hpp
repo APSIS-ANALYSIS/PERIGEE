@@ -172,8 +172,7 @@ namespace SYS_T
   inline void print_fatal( const char output[], ... )
   { 
     int mpi_flag {-1};
-    int *flag = &mpi_flag;
-    MPI_Initialized(flag);
+    MPI_Initialized(&mpi_flag);
     if (mpi_flag)
     {
       if( !get_MPI_rank() )
@@ -201,8 +200,7 @@ namespace SYS_T
     if( a )
     {
     int mpi_flag {-1};
-    int *flag = &mpi_flag;
-    MPI_Initialized(flag);
+    MPI_Initialized(&mpi_flag);
     if (mpi_flag)
     {
       if( !get_MPI_rank() )
