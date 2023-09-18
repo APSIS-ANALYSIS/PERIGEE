@@ -1,5 +1,3 @@
-#define WITHOUT_PETSC
-
 #include <chrono>
 #include <thread>
 #include <unistd.h>
@@ -26,7 +24,11 @@
 
 int main(int argc, char *argv[])
 { 
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+
   SYS_T::print_fatal("Some error messages.");
+
+  PetscFinalize();
 
   return EXIT_SUCCESS;
 }
