@@ -171,6 +171,14 @@ namespace SYS_T
   // 4. Print fatal error message and terminate the MPI process
   inline void print_fatal( const char output[], ... )
   {
+#ifdef WITHOUT_PETSC
+    va_list Argp;
+    va_start(Argp, output);
+    vfprintf (stderr, output, Argp);
+    va_end(Argp);
+
+    exit( EXIT_FAILURE );
+#else
     if( !get_MPI_rank() )
     {
       va_list Argp;
@@ -181,12 +189,21 @@ namespace SYS_T
 
     MPI_Barrier(PETSC_COMM_WORLD);
     MPI_Abort(PETSC_COMM_WORLD, 1);
+#endif
   }
 
   inline void print_fatal_if( bool a, const char output[], ... )
   {
     if( a )
     {
+#ifdef WITHOUT_PETSC
+    va_list Argp;
+    va_start(Argp, output);
+    vfprintf (stderr, output, Argp);
+    va_end(Argp);
+
+    exit( EXIT_FAILURE );
+#else
       if( !get_MPI_rank() )
       {
         va_list Argp;
@@ -197,6 +214,7 @@ namespace SYS_T
 
       MPI_Barrier(PETSC_COMM_WORLD);
       MPI_Abort(PETSC_COMM_WORLD, 1);
+#endif
     }
   }
 
