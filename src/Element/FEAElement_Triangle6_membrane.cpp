@@ -83,7 +83,7 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
     }
 
     // vec(un) = vec(dx_dr) x vec(dx_ds)
-    un[qua] = cross_product( dx_dr, dx_ds );
+    un[qua] = VEC3_T::cross_product( dx_dr, dx_ds );
     un[qua].normalize();
 
     // ======= Global-to-local rotation matrix =======
@@ -98,7 +98,7 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
     e_a.normalize();
 
     // e_b = vec(un) x e_a / || vec(un) x e_a ||
-    Vector_3 e_b = cross_product( un[qua], e_a );
+    Vector_3 e_b = VEC3_T::cross_product( un[qua], e_a );
     e_b.normalize();
 
     // e_l1 = sqrt(2)/2 * (e_a - e_b)
