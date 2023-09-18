@@ -46,6 +46,9 @@ int main( int argc, char * argv[] )
   std::cout << std::fixed << std::setprecision(16) << out_n(1) << std::endl;
   std::cout << std::fixed << std::setprecision(16) << out_n(2) << std::endl;
 
+  Matrix_3x3 Q = tri6_3d -> get_rotationMatrix(0);
+  Q.print();
+
   delete tri6_3d; delete quad;
   return EXIT_SUCCESS;
 }
