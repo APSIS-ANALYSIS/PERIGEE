@@ -111,7 +111,7 @@ class FEAElement_Triangle6_membrane : public FEAElement
     std::vector< Tensor2_3D > Q;
 
     // Unit normal vector components, each of length numQuapts
-    Vector_3 * un;
+    std::vector<Vector_3> un;
 
     // Container for rotated *lamina* 2D Jacobian and its inverse
     // dx_dr : 0             <= ii < 4 * numQuapts

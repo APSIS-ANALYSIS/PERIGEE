@@ -7,8 +7,6 @@ FEAElement_Triangle6_membrane::FEAElement_Triangle6_membrane( const int &in_nqua
   dR_dx = new double [6 * numQuapts];
   dR_dy = new double [6 * numQuapts];
   
-  un = new Vector_3 [numQuapts];
-
   Jac    = new double [8 * numQuapts];
   detJac = new double [numQuapts];
 
@@ -20,8 +18,6 @@ FEAElement_Triangle6_membrane::~FEAElement_Triangle6_membrane()
   delete []     R;     R = nullptr;
   delete [] dR_dx; dR_dx = nullptr;
   delete [] dR_dy; dR_dy = nullptr;
-
-  delete [] un; un = nullptr;
 
   delete []    Jac;    Jac = nullptr;
   delete [] detJac; detJac = nullptr;
