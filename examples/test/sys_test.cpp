@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 
   aa.print();
 
-  bb = normalize(aa);
+  bb = VEC3_T::normalize(aa);
 
   aa.normalize();
   
