@@ -83,7 +83,7 @@ class FEAElement_Triangle6_3D_der0 : public FEAElement
     double * R;
 
     // unit normal vector components, each of length numQuapts
-    Vector_3 * un;
+    std::vector<Vector_3> un;
 
     // Jacobian determinant, length numQuapts
     double * detJac; 

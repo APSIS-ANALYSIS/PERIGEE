@@ -4,14 +4,12 @@ FEAElement_Triangle6_3D_der0::FEAElement_Triangle6_3D_der0( const int &in_nqua )
 : numQuapts( in_nqua )
 {
   R = new double [6*numQuapts];
-  un = new Vector_3 [numQuapts];
   detJac = new double [numQuapts];
 }
 
 FEAElement_Triangle6_3D_der0::~FEAElement_Triangle6_3D_der0()
 {
   delete [] R;         R = nullptr;
-  delete [] un;        un = nullptr; 
   delete [] detJac; detJac = nullptr;
 }
 
