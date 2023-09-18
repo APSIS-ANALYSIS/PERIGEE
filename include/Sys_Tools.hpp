@@ -173,28 +173,27 @@ namespace SYS_T
   { 
     int mpi_flag {-1};
     int *flag = &mpi_flag;
-    int mpi_flag2 = MPI_Initialized(flag);
-    std::cout << mpi_flag  << '\t' << mpi_flag2 << std::endl;
-    // if (mpi_flag)
-    // {
-    //   if( !get_MPI_rank() )
-    //   {
-    //     va_list Argp;
-    //     va_start(Argp, output);
-    //     (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
-    //     va_end(Argp);
-    //   }
-    //   MPI_Barrier(PETSC_COMM_WORLD);
-    //   MPI_Abort(PETSC_COMM_WORLD, 1);
-    // }
-    // else
-    // {
-    //   va_list Argp;
-    //   va_start(Argp, output);
-    //   vfprintf (stderr, output, Argp);
-    //   va_end(Argp);
-    //   exit( EXIT_FAILURE );
-    // }
+    MPI_Initialized(flag);
+    if (mpi_flag)
+    {
+      if( !get_MPI_rank() )
+      {
+        va_list Argp;
+        va_start(Argp, output);
+        (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
+        va_end(Argp);
+      }
+      MPI_Barrier(PETSC_COMM_WORLD);
+      MPI_Abort(PETSC_COMM_WORLD, 1);
+    }
+    else
+    {
+      va_list Argp;
+      va_start(Argp, output);
+      vfprintf (stderr, output, Argp);
+      va_end(Argp);
+      exit( EXIT_FAILURE );
+    }
   }
 
   inline void print_fatal_if( bool a, const char output[], ... )
@@ -203,7 +202,7 @@ namespace SYS_T
     {
     int mpi_flag {-1};
     int *flag = &mpi_flag;
-    mpi_flag = MPI_Initialized(flag);
+    MPI_Initialized(flag);
     if (mpi_flag)
     {
       if( !get_MPI_rank() )
