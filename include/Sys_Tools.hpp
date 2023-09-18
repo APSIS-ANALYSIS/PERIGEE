@@ -225,6 +225,23 @@ namespace SYS_T
     }
   }
 
+  inline void print_fatal_if_not( bool a, const char output[], ... )
+  {
+    if( !a )
+    {
+      if( !get_MPI_rank() )
+      {
+        va_list Argp;
+        va_start(Argp, output);
+        (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
+        va_end(Argp);
+      }
+
+      MPI_Barrier(PETSC_COMM_WORLD);
+      MPI_Abort(PETSC_COMM_WORLD, 1);
+    }
+  }
+
   // 5. Print message (without termination the code) under conditions
   inline void print_message_if( bool a, const char output[], ... )
   {
