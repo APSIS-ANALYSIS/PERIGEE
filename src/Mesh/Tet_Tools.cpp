@@ -342,7 +342,7 @@ Vector_3 TET_T::get_out_normal( const std::string &file,
       vol_ctrlPts[3*trn[2]+1] - vol_ctrlPts[3*trn[0]+1],
       vol_ctrlPts[3*trn[2]+2] - vol_ctrlPts[3*trn[0]+2] );
 
-  Vector_3 outVec = cross_product( l01, l02 );
+  Vector_3 outVec = VEC3_T::cross_product( l01, l02 );
 
   outVec.normalize();
 
