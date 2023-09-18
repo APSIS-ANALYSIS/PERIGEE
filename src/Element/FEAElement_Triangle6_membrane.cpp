@@ -114,7 +114,7 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
     const Vector_3 e_l2 = std::sqrt(2.0) * 0.5 * ( e_a + e_b );
 
     // Q = transpose([ e_l1, e_l2, un ])
-    Q[qua] = Matrix_3x3( e_l1, e_l2, un[qua] );
+    Q[qua] = Tensor2_3D( e_l1, e_l2, un[qua] );
     Q[qua].transpose();
 
     // Rotated lamina coordinates
@@ -235,7 +235,7 @@ Vector_3 FEAElement_Triangle6_membrane::get_2d_normal_out( const int &qua,
   return un[qua];
 }
 
-Matrix_3x3 FEAElement_Triangle6_membrane::get_rotationMatrix( const int &quaindex ) const
+Tensor2_3D FEAElement_Triangle6_membrane::get_rotationMatrix( const int &quaindex ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle6_membrane::get_rotationMatrix function error.\n" );
   return Q[quaindex];

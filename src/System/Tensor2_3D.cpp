@@ -1,18 +1,18 @@
-#include "Matrix_3x3.hpp"
+#include "Tensor2_3D.hpp"
 
-Matrix_3x3::Matrix_3x3()
+Tensor2_3D::Tensor2_3D()
 {
   mat[0] = 1.0; mat[1] = 0.0; mat[2] = 0.0;
   mat[3] = 0.0; mat[4] = 1.0; mat[5] = 0.0;
   mat[6] = 0.0; mat[7] = 0.0; mat[8] = 1.0;
 }
 
-Matrix_3x3::Matrix_3x3( const Matrix_3x3 &source )
+Tensor2_3D::Tensor2_3D( const Tensor2_3D &source )
 {
   for(int ii=0; ii<9; ++ii) mat[ii] = source(ii);
 }
 
-Matrix_3x3::Matrix_3x3( 
+Tensor2_3D::Tensor2_3D( 
     const double &a11, const double &a12, const double &a13,
     const double &a21, const double &a22, const double &a23,
     const double &a31, const double &a32, const double &a33 )
@@ -22,7 +22,7 @@ Matrix_3x3::Matrix_3x3(
   mat[6] = a31; mat[7] = a32; mat[8] = a33;
 }
 
-Matrix_3x3::Matrix_3x3(
+Tensor2_3D::Tensor2_3D(
     const Vector_3 &vec1, const Vector_3 &vec2, const Vector_3 &vec3 )
 {
   mat[0] = vec1(0); mat[1] = vec2(0); mat[2] = vec3(0);
@@ -30,27 +30,22 @@ Matrix_3x3::Matrix_3x3(
   mat[6] = vec1(2); mat[7] = vec2(2); mat[8] = vec3(2);
 }
 
-Matrix_3x3::~Matrix_3x3()
+Tensor2_3D::~Tensor2_3D()
 {}
 
-bool Matrix_3x3::is_identical( const Matrix_3x3 &source, const double &tol ) const
+bool Tensor2_3D::is_identical( const Tensor2_3D &source, const double &tol ) const
 {
   for(int ii=0; ii<9; ++ii) 
     if( std::abs( source(ii) - mat[ii]) > tol ) return false;
   return true;
 }
 
-void Matrix_3x3::copy( const Matrix_3x3 &source )
+void Tensor2_3D::copy( const Tensor2_3D &source )
 {
   for(int ii=0; ii<9; ++ii) mat[ii] = source(ii);
 }
 
-void Matrix_3x3::copy( const double source[9] )
-{
-  for(int ii=0; ii<9; ++ii) mat[ii] = source[ii];
-}
-
-Matrix_3x3& Matrix_3x3::operator= (const Matrix_3x3 &source)
+Tensor2_3D& Tensor2_3D::operator= (const Tensor2_3D &source)
 {
   if(this == &source) return *this;
 
@@ -58,59 +53,59 @@ Matrix_3x3& Matrix_3x3::operator= (const Matrix_3x3 &source)
   return *this; 
 }
 
-Matrix_3x3 operator+(const Matrix_3x3 &left, const Matrix_3x3 &right)
+Tensor2_3D operator+(const Tensor2_3D &left, const Tensor2_3D &right)
 {
-  Matrix_3x3 result;
+  Tensor2_3D result;
   for(int ii=0; ii<9; ++ii) result.mat[ii] = left.mat[ii] + right.mat[ii];
   
   return result;
 }
 
-Matrix_3x3 operator-(const Matrix_3x3 &left, const Matrix_3x3 &right)
+Tensor2_3D operator-(const Tensor2_3D &left, const Tensor2_3D &right)
 {
-  Matrix_3x3 result;
+  Tensor2_3D result;
   for(int ii=0; ii<9; ++ii) result.mat[ii] = left.mat[ii] - right.mat[ii];
   
   return result;
 }
 
-Matrix_3x3& Matrix_3x3::operator+= (const Matrix_3x3 &source)
+Tensor2_3D& Tensor2_3D::operator+= (const Tensor2_3D &source)
 {
   for(int ii=0; ii<9; ++ii) mat[ii] += source(ii);
   return *this;
 }
 
-Matrix_3x3& Matrix_3x3::operator-= (const Matrix_3x3 &source)
+Tensor2_3D& Tensor2_3D::operator-= (const Tensor2_3D &source)
 {
   for(int ii=0; ii<9; ++ii) mat[ii] -= source(ii);
   return *this;
 }
 
-Matrix_3x3& Matrix_3x3::operator*= (const double &val)
+Tensor2_3D& Tensor2_3D::operator*= (const double &val)
 {
   for(int ii=0; ii<9; ++ii) mat[ii] *= val;
   return *this;
 }
 
-Matrix_3x3 Matrix_3x3::operator- () const
+Tensor2_3D Tensor2_3D::operator- () const
 {
-  return Matrix_3x3( -mat[0], -mat[1], -mat[2], -mat[3], -mat[4],
+  return Tensor2_3D( -mat[0], -mat[1], -mat[2], -mat[3], -mat[4],
       -mat[5], -mat[6], -mat[7], -mat[8] );
 }
 
-void Matrix_3x3::gen_zero()
+void Tensor2_3D::gen_zero()
 {
   for(int ii=0; ii<9; ++ii) mat[ii] = 0.0; 
 }
 
-void Matrix_3x3::gen_id()
+void Tensor2_3D::gen_id()
 {
   mat[0] = 1.0; mat[1] = 0.0; mat[2] = 0.0;
   mat[3] = 0.0; mat[4] = 1.0; mat[5] = 0.0;
   mat[6] = 0.0; mat[7] = 0.0; mat[8] = 1.0;
 }
 
-void Matrix_3x3::gen_rand(const double &left, const double &right)
+void Tensor2_3D::gen_rand(const double &left, const double &right)
 {
   std::random_device rd;
   std::mt19937_64 gen( rd() );
@@ -118,35 +113,35 @@ void Matrix_3x3::gen_rand(const double &left, const double &right)
   for(int ii=0; ii<9; ++ii) mat[ii] = dis(gen);
 }
 
-void Matrix_3x3::gen_hilb()
+void Tensor2_3D::gen_hilb()
 {
   for(int ii=0; ii<3; ++ii)
     for(int jj=0; jj<3; ++jj)
       mat[ii*3+jj] = 1.0 / (ii + jj + 1.0);
 }
 
-void Matrix_3x3::gen_outprod( const Vector_3 &va, const Vector_3 &vb ) 
+void Tensor2_3D::gen_outprod( const Vector_3 &va, const Vector_3 &vb ) 
 {
   mat[0] = va(0) * vb(0); mat[1] = va(0) * vb(1); mat[2] = va(0) * vb(2);
   mat[3] = va(1) * vb(0); mat[4] = va(1) * vb(1); mat[5] = va(1) * vb(2);
   mat[6] = va(2) * vb(0); mat[7] = va(2) * vb(1); mat[8] = va(2) * vb(2);
 }
 
-void Matrix_3x3::gen_outprod( const Vector_3 &va )
+void Tensor2_3D::gen_outprod( const Vector_3 &va )
 {
   mat[0] = va(0) * va(0); mat[1] = va(0) * va(1); mat[2] = va(0) * va(2);
   mat[3] = va(1) * va(0); mat[4] = va(1) * va(1); mat[5] = va(1) * va(2);
   mat[6] = va(2) * va(0); mat[7] = va(2) * va(1); mat[8] = va(2) * va(2);
 }
 
-void Matrix_3x3::add_outprod( const double &val, const Vector_3 &va, const Vector_3 &vb ) 
+void Tensor2_3D::add_outprod( const double &val, const Vector_3 &va, const Vector_3 &vb ) 
 {
   mat[0] += val * va(0) * vb(0); mat[1] += val * va(0) * vb(1); mat[2] += val * va(0) * vb(2);
   mat[3] += val * va(1) * vb(0); mat[4] += val * va(1) * vb(1); mat[5] += val * va(1) * vb(2);
   mat[6] += val * va(2) * vb(0); mat[7] += val * va(2) * vb(1); mat[8] += val * va(2) * vb(2);
 }
 
-void Matrix_3x3::transpose()
+void Tensor2_3D::transpose()
 {
   double temp; // temperary variable for swapping off diagonal entries
   temp = mat[1]; mat[1] = mat[3]; mat[3] = temp;
@@ -154,7 +149,7 @@ void Matrix_3x3::transpose()
   temp = mat[5]; mat[5] = mat[7]; mat[7] = temp;
 }
 
-void Matrix_3x3::inverse()
+void Tensor2_3D::inverse()
 {
   const double invdetA = 1.0 / det();
 
@@ -172,49 +167,49 @@ void Matrix_3x3::inverse()
   for(int ii=0; ii<9; ++ii) mat[ii] = temp[ii];
 }
 
-void Matrix_3x3::scale( const double &val )
+void Tensor2_3D::scale( const double &val )
 {
   for(int ii=0; ii<9; ++ii) mat[ii] *= val;
 }
 
-void Matrix_3x3::AXPY( const double &val, const Matrix_3x3 &source )
+void Tensor2_3D::AXPY( const double &val, const Tensor2_3D &source )
 {
   for(int ii=0; ii<9; ++ii) mat[ii] += val * source(ii);
 }
 
-void Matrix_3x3::AXPI( const double &val )
+void Tensor2_3D::AXPI( const double &val )
 {
   mat[0] += val; mat[4] += val; mat[8] += val;
 }
 
-double Matrix_3x3::det() const
+double Tensor2_3D::det() const
 {
   return mat[0] * mat[4] * mat[8] + mat[1] * mat[5] * mat[6]
     + mat[2] * mat[3] * mat[7] - mat[2] * mat[4] * mat[6]
     - mat[0] * mat[5] * mat[7] - mat[1] * mat[3] * mat[8];
 }
 
-double Matrix_3x3::I2() const
+double Tensor2_3D::I2() const
 {
   return 0.5 * ( I1() * I1() - mat[0]*mat[0] - mat[4] * mat[4]
      - mat[8] * mat[8] - 2.0 * ( mat[1]*mat[3] + mat[2] * mat[6] + mat[5] * mat[7] ) );
 }
 
-double Matrix_3x3::VecMatVec( const Vector_3 &x, const Vector_3 &y ) const
+double Tensor2_3D::VecMatVec( const Vector_3 &x, const Vector_3 &y ) const
 {
   return x(0) * ( mat[0] * y(0) + mat[1] * y(1) + mat[2] * y(2) )
     + x(1) * ( mat[3] * y(0) + mat[4] * y(1) + mat[5] * y(2) )
     + x(2) * ( mat[6] * y(0) + mat[7] * y(1) + mat[8] * y(2) );
 }
 
-Vector_3 Matrix_3x3::VecMult( const Vector_3 &x ) const
+Vector_3 Tensor2_3D::VecMult( const Vector_3 &x ) const
 {
   return Vector_3( mat[0] * x(0) + mat[1] * x(1) + mat[2] * x(2), 
       mat[3] * x(0) + mat[4] * x(1) + mat[5] * x(2), 
       mat[6] * x(0) + mat[7] * x(1) + mat[8] * x(2) );
 }
 
-void Matrix_3x3::VecMult( const double &x0, const double &x1, const double &x2, 
+void Tensor2_3D::VecMult( const double &x0, const double &x1, const double &x2, 
     double &y0, double &y1, double &y2 ) const
 {
   y0 = mat[0] * x0 + mat[1] * x1 + mat[2] * x2;
@@ -222,14 +217,14 @@ void Matrix_3x3::VecMult( const double &x0, const double &x1, const double &x2,
   y2 = mat[6] * x0 + mat[7] * x1 + mat[8] * x2;
 }
 
-Vector_3 Matrix_3x3::VecMultT( const Vector_3 &x ) const
+Vector_3 Tensor2_3D::VecMultT( const Vector_3 &x ) const
 {
   return Vector_3( mat[0] * x(0) + mat[3] * x(1) + mat[6] * x(2),
       mat[1] * x(0) + mat[4] * x(1) + mat[7] * x(2),
       mat[2] * x(0) + mat[5] * x(1) + mat[8] * x(2) );
 }
 
-void Matrix_3x3::VecMultT(const double &x0, const double &x1, const double &x2,
+void Tensor2_3D::VecMultT(const double &x0, const double &x1, const double &x2,
     double &y0, double &y1, double &y2 ) const 
 {
   y0 = mat[0] * x0 + mat[3] * x1 + mat[6] * x2;
@@ -237,7 +232,7 @@ void Matrix_3x3::VecMultT(const double &x0, const double &x1, const double &x2,
   y2 = mat[2] * x0 + mat[5] * x1 + mat[8] * x2;
 }
 
-void Matrix_3x3::MatMult( const Matrix_3x3 &mleft, const Matrix_3x3 &mright )
+void Tensor2_3D::MatMult( const Tensor2_3D &mleft, const Tensor2_3D &mright )
 {
   double temp[9];
 
@@ -256,7 +251,7 @@ void Matrix_3x3::MatMult( const Matrix_3x3 &mleft, const Matrix_3x3 &mright )
   for(int ii=0; ii<9; ++ii) mat[ii] = temp[ii];
 }
 
-void Matrix_3x3::MatRot( const Matrix_3x3 &Q )
+void Tensor2_3D::MatRot( const Tensor2_3D &Q )
 {
   double temp[9] = {0.0};
   for(int ii=0; ii<3; ++ii)
@@ -272,7 +267,7 @@ void Matrix_3x3::MatRot( const Matrix_3x3 &Q )
   for(int ii=0; ii<9; ++ii) mat[ii] = temp[ii];
 }
 
-void Matrix_3x3::MatMultTransposeLeft( const Matrix_3x3 &in )
+void Tensor2_3D::MatMultTransposeLeft( const Tensor2_3D &in )
 {
   double temp[9];
   temp[0] = in(0) * in(0) + in(3) * in(3) + in(6) * in(6);
@@ -288,7 +283,7 @@ void Matrix_3x3::MatMultTransposeLeft( const Matrix_3x3 &in )
   for(int ii=0; ii<9; ++ii) mat[ii] = temp[ii];
 }
 
-void Matrix_3x3::MatMultTransposeRight( const Matrix_3x3 &in )
+void Tensor2_3D::MatMultTransposeRight( const Tensor2_3D &in )
 {
   double temp[9];
 
@@ -305,41 +300,41 @@ void Matrix_3x3::MatMultTransposeRight( const Matrix_3x3 &in )
   for(int ii=0; ii<9; ++ii) mat[ii] = temp[ii];
 }
 
-void Matrix_3x3::print() const
+void Tensor2_3D::print() const
 {
   std::cout<<std::setprecision(9)<<mat[0]<<'\t'<<mat[1]<<'\t'<<mat[2]<<std::endl;
   std::cout<<std::setprecision(9)<<mat[3]<<'\t'<<mat[4]<<'\t'<<mat[5]<<std::endl;
   std::cout<<std::setprecision(9)<<mat[6]<<'\t'<<mat[7]<<'\t'<<mat[8]<<std::endl;
 }
 
-void Matrix_3x3::print_in_row() const
+void Tensor2_3D::print_in_row() const
 {
   std::cout<<std::setprecision(9)<<mat[0]<<'\t'<<mat[1]<<'\t'<<mat[2]<<'\t';
   std::cout<<std::setprecision(9)<<mat[3]<<'\t'<<mat[4]<<'\t'<<mat[5]<<'\t';
   std::cout<<std::setprecision(9)<<mat[6]<<'\t'<<mat[7]<<'\t'<<mat[8]<<std::endl;
 }
 
-void Matrix_3x3::print_Voigt() const
+void Tensor2_3D::print_Voigt() const
 {
   std::cout<<std::setprecision(9)<<mat[0]<<'\t'<<mat[4]<<'\t'<<mat[8]<<'\t';
   std::cout<<std::setprecision(9)<<mat[5]<<'\t'<<mat[2]<<'\t'<<mat[1]<<std::endl;
 }
 
-double Matrix_3x3::MatContraction( const Matrix_3x3 &in ) const
+double Tensor2_3D::MatContraction( const Tensor2_3D &in ) const
 {
   return mat[0] * in(0) + mat[1] * in(1) + mat[2] * in(2) + mat[3] * in(3)
     + mat[4] * in(4) + mat[5] * in(5) + mat[6] * in(6) + mat[7] * in(7)
     + mat[8] * in(8);
 }
 
-double Matrix_3x3::MatTContraction( const Matrix_3x3 &in ) const
+double Tensor2_3D::MatTContraction( const Tensor2_3D &in ) const
 {
   return mat[0] * in(0) + mat[1] * in(3) + mat[2] * in(6) + mat[3] * in(1)
     + mat[4] * in(4) + mat[5] * in(7) + mat[6] * in(2) + mat[7] * in(5)
     + mat[8] * in(8);
 }
 
-void Matrix_3x3::find_eigen_vector( const double &eta, Vector_3 &v,
+void Tensor2_3D::find_eigen_vector( const double &eta, Vector_3 &v,
     Vector_3 &s1, Vector_3 &s2 ) const
 {
   const double frac13_tr = tr() / 3.0; // value used to shift the eigenvalue
@@ -421,7 +416,7 @@ void Matrix_3x3::find_eigen_vector( const double &eta, Vector_3 &v,
   }
 }
 
-double Matrix_3x3::J2() const
+double Tensor2_3D::J2() const
 {
   const double a = mat[0] * mat[0] + 2.0 * mat[1] * mat[3] + 2.0 * mat[2] * mat[6]
     + mat[4] * mat[4] + 2.0 * mat[5] * mat[7] + mat[8] * mat[8];
@@ -431,7 +426,7 @@ double Matrix_3x3::J2() const
   return 0.5 * a - b * b / 6.0;
 }
 
-double Matrix_3x3::J3() const
+double Tensor2_3D::J3() const
 {
   const double a = ( mat[0] + mat[4] + mat[8] ) / 3.0;
 
@@ -444,7 +439,7 @@ double Matrix_3x3::J3() const
     - m0 * mat[5] * mat[7] - mat[1] * mat[3] * m8;
 }
 
-int Matrix_3x3::eigen_decomp( double &eta1, double &eta2, double &eta3,
+int Tensor2_3D::eigen_decomp( double &eta1, double &eta2, double &eta3,
            Vector_3 &v1, Vector_3 &v2, Vector_3 &v3 ) const
 {
   const double frac13 = 1.0 / 3.0;
@@ -537,16 +532,16 @@ int Matrix_3x3::eigen_decomp( double &eta1, double &eta2, double &eta3,
   }
 }
 
-Vector_3 operator*(const Matrix_3x3 &left, const Vector_3 &right)
+Vector_3 operator*(const Tensor2_3D &left, const Vector_3 &right)
 {
   return Vector_3( left.xx() * right.x() + left.xy() * right.y() + left.xz() * right.z(), 
       left.yx() * right.x() + left.yy() * right.y() + left.yz() * right.z(),
       left.zx() * right.x() + left.zy() * right.y() + left.zz() * right.z() );
 }
 
-Matrix_3x3 operator*(const Matrix_3x3 &mleft, const Matrix_3x3 &mright)
+Tensor2_3D operator*(const Tensor2_3D &mleft, const Tensor2_3D &mright)
 {
-  return Matrix_3x3( mleft(0) * mright(0) + mleft(1) * mright(3) + mleft(2) * mright(6),
+  return Tensor2_3D( mleft(0) * mright(0) + mleft(1) * mright(3) + mleft(2) * mright(6),
    mleft(0) * mright(1) + mleft(1) * mright(4) + mleft(2) * mright(7),
    mleft(0) * mright(2) + mleft(1) * mright(5) + mleft(2) * mright(8),
    mleft(3) * mright(0) + mleft(4) * mright(3) + mleft(5) * mright(6),
@@ -557,18 +552,18 @@ Matrix_3x3 operator*(const Matrix_3x3 &mleft, const Matrix_3x3 &mright)
    mleft(6) * mright(2) + mleft(7) * mright(5) + mleft(8) * mright(8) );
 }
 
-Matrix_3x3 operator*( const double &val, const Matrix_3x3 &input )
+Tensor2_3D operator*( const double &val, const Tensor2_3D &input )
 {
-  return Matrix_3x3( val * input(0), val * input(1), val * input(2),
+  return Tensor2_3D( val * input(0), val * input(1), val * input(2),
       val * input(3), val * input(4), val * input(5),
       val * input(6), val * input(7), val * input(8) );
 }
 
-Matrix_3x3 inverse( const Matrix_3x3 &input )
+Tensor2_3D inverse( const Tensor2_3D &input )
 {
   const double invdet = 1.0 / input.det();
 
-  return Matrix_3x3( invdet * (input(4) * input(8) - input(5) * input(7)),
+  return Tensor2_3D( invdet * (input(4) * input(8) - input(5) * input(7)),
     invdet * (input(2) * input(7) - input(1) * input(8)),
     invdet * (input(1) * input(5) - input(2) * input(4)),
     invdet * (input(5) * input(6) - input(3) * input(8)),
@@ -579,9 +574,9 @@ Matrix_3x3 inverse( const Matrix_3x3 &input )
     invdet * (input(0) * input(4) - input(1) * input(3)) );
 }
 
-Matrix_3x3 cofactor( const Matrix_3x3 &input )
+Tensor2_3D cofactor( const Tensor2_3D &input )
 {
-  return Matrix_3x3( (input(4) * input(8) - input(5) * input(7)),
+  return Tensor2_3D( (input(4) * input(8) - input(5) * input(7)),
       (input(5) * input(6) - input(3) * input(8)),
       (input(3) * input(7) - input(4) * input(6)),
       (input(2) * input(7) - input(1) * input(8)),
@@ -592,23 +587,23 @@ Matrix_3x3 cofactor( const Matrix_3x3 &input )
       (input(0) * input(4) - input(1) * input(3)) );
 }
 
-Matrix_3x3 transpose( const Matrix_3x3 &input )
+Tensor2_3D transpose( const Tensor2_3D &input )
 {
-  return Matrix_3x3( input(0), input(3), input(6),
+  return Tensor2_3D( input(0), input(3), input(6),
       input(1), input(4), input(7),
       input(2), input(5), input(8) );
 }
 
-Matrix_3x3 gen_identity_matrix()
+Tensor2_3D gen_identity_matrix()
 {
-  return Matrix_3x3( 1.0, 0.0, 0.0,
+  return Tensor2_3D( 1.0, 0.0, 0.0,
       0.0, 1.0, 0.0,
       0.0, 0.0, 1.0 );
 }
 
-Matrix_3x3 gen_zero_matrix()
+Tensor2_3D gen_zero_matrix()
 {
-  return Matrix_3x3( 0.0, 0.0, 0.0,
+  return Tensor2_3D( 0.0, 0.0, 0.0,
       0.0, 0.0, 0.0,
       0.0, 0.0, 0.0 );
 }

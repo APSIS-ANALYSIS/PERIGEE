@@ -30,9 +30,6 @@ class Matrix_double_3by3_Array
         const double &a23, const double &a31, const double &a32, 
         const double &a33 );
 
-    // Copy constructor
-    Matrix_double_3by3_Array( const Matrix_double_3by3_Array &other );
-
     // Destructor
     ~Matrix_double_3by3_Array();
 

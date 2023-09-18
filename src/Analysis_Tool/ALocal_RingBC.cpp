@@ -32,7 +32,7 @@ ALocal_RingBC::ALocal_RingBC(
   Q.resize(num_caps);
   for(int ii=0; ii<num_caps; ++ii)
   {
-    Q[ii] = Matrix_3x3( Q_vec[9*ii+0], Q_vec[9*ii+1], Q_vec[9*ii+2],
+    Q[ii] = Tensor2_3D( Q_vec[9*ii+0], Q_vec[9*ii+1], Q_vec[9*ii+2],
                         Q_vec[9*ii+3], Q_vec[9*ii+4], Q_vec[9*ii+5],
                         Q_vec[9*ii+6], Q_vec[9*ii+7], Q_vec[9*ii+8]  );
   }

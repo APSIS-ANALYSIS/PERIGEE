@@ -82,7 +82,7 @@ void PLocAssem_Tet_CMM_GenAlpha::print_info() const
 }
 
 
-SymmMatrix_3x3 PLocAssem_Tet_CMM_GenAlpha::get_metric(
+SymmTensor2_3D PLocAssem_Tet_CMM_GenAlpha::get_metric(
     const std::array<double,9> &f ) const
 {
   // PHASTA definition 
@@ -98,7 +98,7 @@ SymmMatrix_3x3 PLocAssem_Tet_CMM_GenAlpha::get_metric(
   const double fk7 = 2.0 * f[5] + (f[2] + f[8]);
   const double fk8 = 2.0 * f[8] + (f[2] + f[5]);
 
-  return SymmMatrix_3x3(coef * ( fk0 * f[0] + fk1 * f[3] + fk2 * f[6] ),
+  return SymmTensor2_3D(coef * ( fk0 * f[0] + fk1 * f[3] + fk2 * f[6] ),
   coef * ( fk3 * f[1] + fk4 * f[4] + fk5 * f[7] ),
   coef * ( fk6 * f[2] + fk7 * f[5] + fk8 * f[8] ),
   coef * ( fk3 * f[2] + fk4 * f[5] + fk5 * f[8] ),
@@ -112,7 +112,7 @@ std::array<double, 2> PLocAssem_Tet_CMM_GenAlpha::get_tau(
     const double &u, const double &v, const double &w ) const
 {
   // Use K matrix to correct the metric
-  const SymmMatrix_3x3 G = get_metric( dxi_dx );
+  const SymmTensor2_3D G = get_metric( dxi_dx );
 
   const Vector_3 velo_vec( u, v, w );
 
@@ -130,7 +130,7 @@ double PLocAssem_Tet_CMM_GenAlpha::get_DC(
     const std::array<double, 9> &dxi_dx,
     const double &u, const double &v, const double &w ) const
 {
-  // const SymmMatrix_3x3 G = get_metric( dxi_dx );
+  // const SymmTensor2_3D G = get_metric( dxi_dx );
   // const Vector_3 velo_vec( u, v, w );
   // double dc_tau = G.VecMatVec( velo_vec, velo_vec );
 
@@ -1033,7 +1033,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
   const double curr = time + alpha_f * dt;
 
   // Global Cauchy stress at all quadrature points
-  std::vector<Matrix_3x3> sigma; sigma.resize( face_nqp );
+  std::vector<Tensor2_3D> sigma( face_nqp, Tensor2_3D() );
   get_Wall_CauchyStress(sol_wall_disp, element, ele_youngsmod, sigma );
 
   Zero_sur_Residual();
@@ -1048,7 +1048,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Wall(
     const std::vector<double> dR_dyl = element -> get_dR_dy( qua );
 
     // Global-to-local rotation matrix Q
-    const Matrix_3x3 Q = element->get_rotationMatrix(qua);
+    const Tensor2_3D Q = element->get_rotationMatrix(qua);
 
     double u_t = 0.0, v_t = 0.0, w_t = 0.0, u = 0.0, v = 0.0, w = 0.0;
     double disp_x = 0.0, disp_y = 0.0, disp_z = 0.0;
@@ -1153,7 +1153,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
   const double curr = time + alpha_f * dt;
 
   // Global Cauchy stress at all quadrature points
-  std::vector<Matrix_3x3> sigma; sigma.resize( face_nqp );
+  std::vector<Tensor2_3D> sigma( face_nqp, Tensor2_3D() );
   get_Wall_CauchyStress(sol_wall_disp, element, ele_youngsmod, sigma );
 
   Zero_sur_Tangent_Residual();
@@ -1172,7 +1172,7 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_EBC_Wall(
     double * Kg = new double [ (snLocBas*dim) * (snLocBas*dim) ] {};
 
     // Global-to-local rotation matrix Q
-    const Matrix_3x3 Q = element->get_rotationMatrix(qua);
+    const Tensor2_3D Q = element->get_rotationMatrix(qua);
 
     double u_t = 0.0, v_t = 0.0, w_t = 0.0, u = 0.0, v = 0.0, w = 0.0; 
     double disp_x = 0.0, disp_y = 0.0, disp_z = 0.0;
@@ -1358,7 +1358,7 @@ void PLocAssem_Tet_CMM_GenAlpha::get_Wall_CauchyStress(
     const double * const &sol_wall_disp,
     const FEAElement * const &element,
     const double * const &ele_youngsmod,
-    std::vector<Matrix_3x3> &sigma )
+    std::vector<Tensor2_3D> &sigma )
 {
   SYS_T::print_fatal_if( element -> get_numQuapts() != face_nqp, "Error: The element's data structure is incompatible with the face_nqp in the local assembly.\n" );
 
@@ -1377,7 +1377,7 @@ void PLocAssem_Tet_CMM_GenAlpha::get_Wall_CauchyStress(
     const std::vector<double> dR_dyl = element -> get_dR_dy( qua );
 
     // Global-to-local rotation matrix Q
-    const Matrix_3x3 Q = element->get_rotationMatrix(qua);
+    const Tensor2_3D Q = element->get_rotationMatrix(qua);
 
     for(int ii=0; ii<snLocBas; ++ii)
     {
@@ -1410,7 +1410,7 @@ void PLocAssem_Tet_CMM_GenAlpha::get_Wall_CauchyStress(
     const double coef = E_w / (1.0 - nu_w * nu_w);
 
     // Lamina Cauchy stress
-    sigma[qua] = Matrix_3x3(
+    sigma[qua] = Tensor2_3D(
         u1l_xl + nu_w*u2l_yl,               0.5*(1.0-nu_w) * (u1l_yl + u2l_xl), 0.5*kappa_w*(1.0-nu_w) * u3l_xl,
         0.5*(1.0-nu_w) * (u1l_yl + u2l_xl), nu_w*u1l_xl + u2l_yl,               0.5*kappa_w*(1.0-nu_w) * u3l_yl,
         0.5*kappa_w*(1.0-nu_w) * u3l_xl,    0.5*kappa_w*(1.0-nu_w) * u3l_yl,    0.0 );

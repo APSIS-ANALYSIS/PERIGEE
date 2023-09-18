@@ -43,7 +43,7 @@ class ALocal_RingBC
 
     // get the Dirichlet node's rotation matrix for skew boundary conditions.
     // parameter node ranges [ 0, Num_LD )
-    virtual Matrix_3x3 get_rotation_matrix( const int &node ) const
+    virtual Tensor2_3D get_rotation_matrix( const int &node ) const
     { return Q[ local_cap_id[node] ]; }
 
     // determine whether a given index belongs to the LDN vector.
@@ -76,7 +76,7 @@ class ALocal_RingBC
 
     // Each cap's rotation matrix for skew boundary conditions
     // vector length is num_caps
-    std::vector<Matrix_3x3> Q;
+    std::vector<Tensor2_3D> Q;
 };
 
 #endif

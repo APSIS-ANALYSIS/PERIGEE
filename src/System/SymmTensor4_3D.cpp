@@ -94,7 +94,7 @@ SymmTensor4_3D& SymmTensor4_3D::operator= (const SymmTensor4_3D &source)
   return *this;
 }
 
-void SymmTensor4_3D::gen_Ptilde( const SymmMatrix_3x3 &invC )
+void SymmTensor4_3D::gen_Ptilde( const SymmTensor2_3D &invC )
 {
   gen_zero();
   add_SymmProduct( 1.0, invC, invC );
@@ -179,7 +179,7 @@ SymmTensor4_3D& SymmTensor4_3D::operator*=( const double &val )
   return *this;
 }
 
-void SymmTensor4_3D::add_OutProduct( const double &val, const SymmMatrix_3x3 &mmat )
+void SymmTensor4_3D::add_OutProduct( const double &val, const SymmTensor2_3D &mmat )
 {
   ten[0] += val * mmat(0) * mmat(0);
   ten[1] += val * mmat(0) * mmat(1);
@@ -282,8 +282,8 @@ void SymmTensor4_3D::add_SymmOutProduct( const double &val, const Vector_3 &vec1
       + vec1(1) * vec2(0) * vec1(1) * vec2(0) );
 }
 
-void SymmTensor4_3D::add_SymmProduct( const double &val, const SymmMatrix_3x3 &mleft,
-    const SymmMatrix_3x3 &mright )
+void SymmTensor4_3D::add_SymmProduct( const double &val, const SymmTensor2_3D &mleft,
+    const SymmTensor2_3D &mright )
 {
   ten[0]  += val * ( mleft(0) * mright(0) );
   ten[1]  += val * ( mleft(5) * mright(5) );
@@ -313,8 +313,8 @@ void SymmTensor4_3D::add_SymmProduct( const double &val, const SymmMatrix_3x3 &m
   ten[20] += val * 0.5 * ( mleft(0) * mright(1) + mleft(5) * mright(5) );
 }
 
-void SymmTensor4_3D::add_SymmOutProduct( const double &val, const SymmMatrix_3x3 &mleft,
-    const SymmMatrix_3x3 &mright )
+void SymmTensor4_3D::add_SymmOutProduct( const double &val, const SymmTensor2_3D &mleft,
+    const SymmTensor2_3D &mright )
 {
   ten[0]  += val * ( mleft(0) * mright(0) + mleft(0) * mright(0) );
   ten[1]  += val * ( mleft(0) * mright(1) + mleft(1) * mright(0) );
@@ -412,7 +412,7 @@ SymmTensor4_3D gen_ST4_symm_id()
   return SymmTensor4_3D(temp);
 }
 
-SymmTensor4_3D gen_ST4_Ptilde( const SymmMatrix_3x3 &invC )
+SymmTensor4_3D gen_ST4_Ptilde( const SymmTensor2_3D &invC )
 {     
   SymmTensor4_3D out = gen_ST4_zero();
   out.add_SymmProduct( 1.0, invC, invC );

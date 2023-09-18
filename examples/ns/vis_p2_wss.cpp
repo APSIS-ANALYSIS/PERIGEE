@@ -14,14 +14,12 @@
 
 void range_generator( const int &ii, std::vector<int> &surface_id_range );
 
-void ReadNodeMapping( const char * const &node_mapping_file,
-    const char * const &mapping_type, const int &node_size,
-    int * const &nodemap );
+std::vector<int> ReadNodeMapping( const char * const &node_mapping_file,
+    const char * const &mapping_type, const int &node_size );
 
-void ReadPETSc_Vec( const std::string &solution_file_name,
+std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
     const std::vector<int> &nodemap,
-    const int &vec_size, const int &in_dof,
-    std::vector<double> &sol );
+    const int &vec_size, const int &in_dof );
 
 int get_tri_local_id( const double * const &coor_x,
     const double * const &coor_y,
@@ -34,7 +32,7 @@ void write_triangle_grid_wss( const std::string &filename,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt,
     const std::vector<int> &ien_array,
-    const std::vector< std::vector<double> > &wss_on_node );
+    const std::vector< Vector_3 > &wss_on_node );
 
 void write_triangle_grid_tawss_osi( const std::string &filename,
     const int &numpts, const int &numcels,
@@ -56,10 +54,8 @@ int main( int argc, char * argv[] )
 
   constexpr int dof = 4; 
 
-  PetscMPIInt size;
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-  MPI_Comm_size(PETSC_COMM_WORLD, &size);
-  SYS_T::print_fatal_if(size!=1, "ERROR: vis_tet10_wss is a serial program! \n");
+  SYS_T::print_fatal_if( SYS_T::get_MPI_size() != 1, "ERROR: vis_p2_wss is a serial program! \n");
 
   // Read the geometry file name from preprocessor hdf5 file
   hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
@@ -131,16 +127,13 @@ int main( int argc, char * argv[] )
   cout<<"Wall mesh contains "<<nElem<<" elements and "<<nFunc<<" vertices.\n";
 
   // Now calculate the outward normal vector and element area
-  std::vector<int> interior_node;
-  interior_node.resize( nElem );
+  std::vector<int> interior_node( nElem, -1 );
 
-  std::vector<double> interior_node_coord;
-  interior_node_coord.resize(3*nElem);
+  std::vector<double> interior_node_coord(3*nElem, 0.0);
 
   // take values 0, 1, 2, or 3, it determines the side of the surface in the
   // tetrahedron
-  std::vector<int> interior_node_local_index; 
-  interior_node_local_index.resize( nElem );
+  std::vector<int> interior_node_local_index( nElem, -1 );
 
   for(int ee=0; ee<nElem; ++ee)
   {
@@ -152,13 +145,12 @@ int main( int argc, char * argv[] )
       v_vecIEN[ global_ele_idx[ee]*v_nLocBas+2 ],
       v_vecIEN[ global_ele_idx[ee]*v_nLocBas+3 ] };
 
-    bool gotnode[4];
     int node_check = 0;
     for(int ii=0; ii<4; ++ii)
     {
-      gotnode[ii] = VEC_T::is_invec( trn, ten[ii] );
+      const bool gotnode = VEC_T::is_invec( trn, ten[ii] );
 
-      if(!gotnode[ii]) 
+      if(!gotnode) 
       {
         interior_node[ee] = ten[ii]; // interior node's global volumetric mesh nodal index
         interior_node_local_index[ee] = ii; // interior node's local tetrahedral element index
@@ -200,40 +192,16 @@ int main( int argc, char * argv[] )
   FEAElement * element_tri = new FEAElement_Triangle6_3D_der0( quad_tri_vis-> get_num_quadPts() );
 
   // Read the mappings of the nodal indices
-  std::vector<int> analysis_new2old;
-  analysis_new2old.resize(v_nFunc);
-  ReadNodeMapping("node_mapping.h5", "new_2_old", v_nFunc, &analysis_new2old[0] );
+  const std::vector<int> analysis_new2old = ReadNodeMapping("node_mapping.h5", "new_2_old", v_nFunc );
 
   double * Rx = new double [v_nLocBas];
   double * Ry = new double [v_nLocBas];
   double * Rz = new double [v_nLocBas];
 
-  // Container for the solution vector
-  std::vector<double> sol;
-
-  // Container for (averaged) WSS
-  std::vector< std::vector<double> > wss_ave;
-  wss_ave.resize( nFunc );
-  for(int ii=0; ii<nFunc; ++ii) wss_ave[ii].resize(3);
-
-  // Container for the element area associated with surface nodes
-  std::vector<double> node_area; node_area.resize(nFunc);
-
   // Container for Time averaged WSS and OSI
-  std::vector<double> tawss, osi;
-  std::vector< std::vector<double> > osi_top;
-  tawss.resize( nFunc ); osi.resize( nFunc ); osi_top.resize( nFunc );
-
-  for(int ii=0; ii<nFunc; ++ii)
-  {
-    tawss[ii]   = 0.0;
-    osi[ii]     = 0.0;
-
-    osi_top[ii].resize(3);
-    osi_top[ii][0] = 0.0;
-    osi_top[ii][1] = 0.0;
-    osi_top[ii][2] = 0.0;
-  }
+  std::vector<double> tawss( nFunc, 0.0 ); 
+  std::vector<double> osi( nFunc, 0.0 ); 
+  std::vector< Vector_3 > osi_top( nFunc, Vector_3(0.0, 0.0, 0.0) );
 
   const double inv_T = 1.0 / ( static_cast<double>((time_end - time_start)/time_step) + 1.0 );
 
@@ -253,17 +221,13 @@ int main( int argc, char * argv[] )
         time, name_to_read.c_str(), name_to_write.c_str() );
 
     // Read the solution vector and renumber them based on the nodal mappings
-    ReadPETSc_Vec( name_to_read, analysis_new2old, v_nFunc*dof, dof, sol );
+    const auto sol = ReadPETSc_Vec( name_to_read, analysis_new2old, v_nFunc*dof, dof );
 
-    // Zero the container for the averaged WSS
-    for(int ii=0; ii<nFunc; ++ii)
-    {
-      wss_ave[ii][0] = 0.0;
-      wss_ave[ii][1] = 0.0;
-      wss_ave[ii][2] = 0.0;
+    // Container for (averaged) WSS
+    std::vector< Vector_3 > wss_ave( nFunc, Vector_3(0.0, 0.0, 0.0) );
 
-      node_area[ii] = 0.0;
-    }
+    // Container for the element area associated with surface nodes
+    std::vector<double> node_area( nFunc, 0.0 );
 
     for(int ee=0; ee<nElem; ++ee)
     {
@@ -306,8 +270,7 @@ int main( int argc, char * argv[] )
       // triangle element
       element_tri -> buildBasis(quad_tri_vis, ectrl_x, ectrl_y, ectrl_z);
 
-      std::vector< std::vector<double> > outnormal;
-      outnormal.resize( nLocBas );
+      std::vector< Vector_3 > outnormal( nLocBas, Vector_3(0.0, 0.0, 0.0) );
 
       // For each nodal point, calculate the outward normal vector using the
       // triangle element. The triangle element's ii-th basis corresponds to the
@@ -321,10 +284,7 @@ int main( int argc, char * argv[] )
             interior_node_coord[3*ee+2], nx, ny, nz, len );
 
         // id_range[ii] 's outward normal
-        outnormal[ii].resize(3);
-        outnormal[ii][0] = nx;
-        outnormal[ii][1] = ny;
-        outnormal[ii][2] = nz;
+        outnormal[ii] = Vector_3(nx, ny, nz);
       }
 
       // Now calcualte the element surface area
@@ -367,9 +327,9 @@ int main( int argc, char * argv[] )
         }
 
         // obtain the tet element's id_range[qua] node's outward normal vector 
-        const double nx = outnormal[qua][0];
-        const double ny = outnormal[qua][1];
-        const double nz = outnormal[qua][2];
+        const double nx = outnormal[qua].x();
+        const double ny = outnormal[qua].y();
+        const double nz = outnormal[qua].z();
 
         const double ax = 2.0 * ux * nx + (uy + vx) * ny + (uz + wx) * nz;
         const double ay = (vx + uy) * nx + 2.0 * vy * ny + (vz + wy) * nz;
@@ -387,10 +347,7 @@ int main( int argc, char * argv[] )
        
         const int tri_global_id = vecIEN[nLocBas * ee + tri_local_id];
 
-        wss_ave[ tri_global_id ][0] += wss_x * tri_area;
-        wss_ave[ tri_global_id ][1] += wss_y * tri_area;
-        wss_ave[ tri_global_id ][2] += wss_z * tri_area;
-
+        wss_ave[ tri_global_id ]   += tri_area * Vector_3(wss_x, wss_y, wss_z);
         node_area[ tri_global_id ] += tri_area;
 
       } // loop over the sampling points (on surface)
@@ -399,24 +356,15 @@ int main( int argc, char * argv[] )
 
     } // End of loop over element
 
-    for(int ii=0; ii<nFunc; ++ii)
-    {
-      wss_ave[ii][0] /= node_area[ii];
-      wss_ave[ii][1] /= node_area[ii];
-      wss_ave[ii][2] /= node_area[ii];
-    }
+    for(int ii=0; ii<nFunc; ++ii) wss_ave[ii] *= (1.0 / node_area[ii]);
 
     // Write the wall shear stress at this time instance
     write_triangle_grid_wss( name_to_write, nFunc, nElem, ctrlPts, vecIEN, wss_ave );
 
     for(int ii=0; ii<nFunc; ++ii)
     {
-      tawss[ii] += inv_T * std::sqrt( wss_ave[ii][0] * wss_ave[ii][0]
-          + wss_ave[ii][1] * wss_ave[ii][1] + wss_ave[ii][2] * wss_ave[ii][2] );
-
-      osi_top[ii][0] += inv_T * wss_ave[ii][0];
-      osi_top[ii][1] += inv_T * wss_ave[ii][1];
-      osi_top[ii][2] += inv_T * wss_ave[ii][2];
+      tawss[ii]   += inv_T * wss_ave[ii].norm2();
+      osi_top[ii] += inv_T * wss_ave[ii];
     }
 
   } // End of loop over time
@@ -425,8 +373,7 @@ int main( int argc, char * argv[] )
 
   for(int ii=0; ii<nFunc; ++ii)
   {
-    const double mag = std::sqrt( osi_top[ii][0] * osi_top[ii][0] +
-        osi_top[ii][1] * osi_top[ii][1] + osi_top[ii][2] * osi_top[ii][2] );
+    const double mag = osi_top[ii].norm2();
 
     // We will disallow very small tawss in the osi calculation
     if( std::abs(tawss[ii]) > 1.0e-12 )
@@ -493,10 +440,8 @@ void range_generator( const int &ii, std::vector<int> &surface_id_range )
   }
 }
 
-
-void ReadNodeMapping( const char * const &node_mapping_file,
-    const char * const &mapping_type, const int &node_size,
-    int * const &nodemap )
+std::vector<int> ReadNodeMapping( const char * const &node_mapping_file,
+    const char * const &mapping_type, const int &node_size )
 {
   hid_t file_id = H5Fopen(node_mapping_file, H5F_ACC_RDONLY, H5P_DEFAULT);
   hid_t data_id = H5Dopen(file_id, mapping_type, H5P_DEFAULT);
@@ -524,21 +469,23 @@ void ReadNodeMapping( const char * const &node_mapping_file,
     MPI_Abort(PETSC_COMM_WORLD, 1);
   }
 
+  std::vector<int> out(node_size, -1);
+
   H5Dread( data_id, H5T_NATIVE_INT, mem_space, data_space,
-      H5P_DEFAULT, nodemap );
+      H5P_DEFAULT, &out[0] );
 
   delete [] data_dims;
   H5Sclose( mem_space );
   H5Sclose(data_space);
   H5Dclose(data_id);
   H5Fclose(file_id);
+
+  return out;
 }
 
-
-void ReadPETSc_Vec( const std::string &solution_file_name,
+std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
     const std::vector<int> &nodemap,
-    const int &vec_size, const int &in_dof,
-    std::vector<double> &sol )
+    const int &vec_size, const int &in_dof )
 {
   Vec sol_temp;
   VecCreate(PETSC_COMM_SELF, &sol_temp);
@@ -561,8 +508,7 @@ void ReadPETSc_Vec( const std::string &solution_file_name,
     MPI_Abort(PETSC_COMM_WORLD, 1);
   }
 
-  std::vector<double> veccopy;
-  veccopy.resize(vec_size);
+  std::vector<double> veccopy(vec_size, 0.0);
   double * array_temp;
   VecGetArray(sol_temp, &array_temp);
 
@@ -573,8 +519,7 @@ void ReadPETSc_Vec( const std::string &solution_file_name,
   VecDestroy(&sol_temp);
 
   // copy the solution varibles to the correct location
-  sol.clear();
-  sol.resize(vec_size);
+  std::vector<double> sol(vec_size, 0.0);
 
   // check the nodemap size
   if( (int)nodemap.size() * in_dof != vec_size ) SYS_T::print_fatal("Error: node map size is incompatible with the solution length. \n");
@@ -585,6 +530,8 @@ void ReadPETSc_Vec( const std::string &solution_file_name,
     for(int jj=0; jj<in_dof; ++jj)
       sol[in_dof*index+jj] = veccopy[in_dof*ii+jj];
   }
+
+  return sol;
 }
 
 
@@ -616,75 +563,21 @@ void write_triangle_grid_wss( const std::string &filename,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt,
     const std::vector<int> &ien_array,
-    const std::vector< std::vector<double> > &wss_on_node )
+    const std::vector< Vector_3 > &wss_on_node )
 {
-  if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: point vector size does not match the number of points. \n");
-
-  if(int(ien_array.size()) != 6*numcels) SYS_T::print_fatal("Error: ien array size does not match the number of cells. \n");
-
-  if(int(wss_on_node.size()) != numpts) SYS_T::print_fatal("Error: wss_on_node size does not match the number of points. \n");
-
   vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
 
-  // 1. nodal points
-  vtkPoints * ppt = vtkPoints::New();
-  ppt->SetDataTypeToDouble();
-  double coor[3];
-  for(int ii=0; ii<numpts; ++ii)
-  {
-    coor[0] = pt[3*ii];
-    coor[1] = pt[3*ii+1];
-    coor[2] = pt[3*ii+2];
-    ppt -> InsertPoint(ii, coor);
-  }
-
-  grid_w -> SetPoints(ppt);
-  ppt -> Delete();
-
-  // 2. cell data
-  vtkCellArray * cl = vtkCellArray::New();
-  for(int ii=0; ii<numcels; ++ii)
-  {
-    vtkQuadraticTriangle * tr = vtkQuadraticTriangle::New();
-
-    tr->GetPointIds()->SetId( 0, ien_array[6*ii] );
-    tr->GetPointIds()->SetId( 1, ien_array[6*ii+1] );
-    tr->GetPointIds()->SetId( 2, ien_array[6*ii+2] );
-    tr->GetPointIds()->SetId( 3, ien_array[6*ii+3] );
-    tr->GetPointIds()->SetId( 4, ien_array[6*ii+4] );
-    tr->GetPointIds()->SetId( 5, ien_array[6*ii+5] );
-    cl -> InsertNextCell(tr);
-    tr -> Delete();
-  }
-  
-  grid_w -> SetCells(22, cl);
-  
-  cl->Delete();
+  // generate the triangle grid
+  TET_T::gen_quadratic_triangle_grid(grid_w, numpts, numcels, pt, ien_array);
 
   // write wss
-  vtkDoubleArray * ptindex = vtkDoubleArray::New();
-  ptindex -> SetNumberOfComponents(3);
-  ptindex -> SetName("WSS");
-  for(int ii=0; ii<numpts; ++ii)
-  {
-    ptindex -> InsertComponent(ii, 0, wss_on_node[ii][0]);
-    ptindex -> InsertComponent(ii, 1, wss_on_node[ii][1]);
-    ptindex -> InsertComponent(ii, 2, wss_on_node[ii][2]);
-  }
-  grid_w -> GetPointData() -> AddArray( ptindex );
-  ptindex->Delete();
+  VTK_T::add_Vector3_PointData(grid_w, wss_on_node, "WSS");
 
-  vtkXMLUnstructuredGridWriter * writer = vtkXMLUnstructuredGridWriter::New();
-  std::string name_to_write(filename);
-  name_to_write.append(".vtu");
-  writer -> SetFileName( name_to_write.c_str() );
-  writer->SetInputData(grid_w);
-  writer->Write();
+  // write vtu
+  VTK_T::write_vtkPointSet(filename, grid_w, true);
 
-  writer->Delete();
   grid_w->Delete();
 }
-
 
 void write_triangle_grid_tawss_osi( const std::string &filename,
     const int &numpts, const int &numcels,
@@ -693,83 +586,20 @@ void write_triangle_grid_tawss_osi( const std::string &filename,
     const std::vector<double> &tawss,
     const std::vector<double> &osi )
 {
-  if(int(pt.size()) != 3*numpts) SYS_T::print_fatal("Error: point vector size does not match the number of points. \n");
-
-  if(int(ien_array.size()) != 6*numcels) SYS_T::print_fatal("Error: ien array size does not match the number of cells. \n");
-
-  if(int(tawss.size()) != numpts) SYS_T::print_fatal("Error: tawss size does not match the number of points. \n");
-
-  if(int(osi.size()) != numpts) SYS_T::print_fatal("Error: osi size does not match the number of points. \n");
-
   vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
 
-  // 1. nodal points
-  vtkPoints * ppt = vtkPoints::New();
-  ppt->SetDataTypeToDouble();
-  double coor[3];
-  for(int ii=0; ii<numpts; ++ii)
-  {
-    coor[0] = pt[3*ii];
-    coor[1] = pt[3*ii+1];
-    coor[2] = pt[3*ii+2];
-    ppt -> InsertPoint(ii, coor);
-  }
-
-  grid_w -> SetPoints(ppt);
-  ppt -> Delete();
-
-  // 2. cell data
-  vtkCellArray * cl = vtkCellArray::New();
-  for(int ii=0; ii<numcels; ++ii)
-  {
-    vtkQuadraticTriangle * tr = vtkQuadraticTriangle::New();
-
-    tr->GetPointIds()->SetId( 0, ien_array[6*ii] );
-    tr->GetPointIds()->SetId( 1, ien_array[6*ii+1] );
-    tr->GetPointIds()->SetId( 2, ien_array[6*ii+2] );
-    tr->GetPointIds()->SetId( 3, ien_array[6*ii+3] );
-    tr->GetPointIds()->SetId( 4, ien_array[6*ii+4] );
-    tr->GetPointIds()->SetId( 5, ien_array[6*ii+5] );
-    
-    cl -> InsertNextCell(tr);
-    tr -> Delete();
-  }
-  
-  grid_w -> SetCells(22, cl);
-  
-  cl->Delete();
+  // generate the triangle grid
+  TET_T::gen_quadratic_triangle_grid(grid_w, numpts, numcels, pt, ien_array);
 
   // write tawss
-  vtkDoubleArray * ptindex = vtkDoubleArray::New();
-  ptindex -> SetNumberOfComponents(1);
-  ptindex -> SetName("TAWSS");
-  for(int ii=0; ii<numpts; ++ii)
-  {
-    ptindex -> InsertComponent(ii, 0, tawss[ii]);
-  }
-  grid_w -> GetPointData() -> AddArray( ptindex );
-  ptindex->Delete();
+  VTK_T::add_double_PointData(grid_w, tawss, "TAWSS");
 
   // write osi
-  vtkDoubleArray * vtkosi = vtkDoubleArray::New();
-  vtkosi -> SetNumberOfComponents(1);
-  vtkosi -> SetName("OSI");
-  for(int ii=0; ii<numpts; ++ii)
-  {
-    vtkosi -> InsertComponent(ii, 0, osi[ii]);
-  }
-  grid_w -> GetPointData() -> AddArray( vtkosi );
-  vtkosi -> Delete();
+  VTK_T::add_double_PointData(grid_w, osi, "OSI");
 
   // write vtu
-  vtkXMLUnstructuredGridWriter * writer = vtkXMLUnstructuredGridWriter::New();
-  std::string name_to_write(filename);
-  name_to_write.append(".vtu");
-  writer -> SetFileName( name_to_write.c_str() );
-  writer->SetInputData(grid_w);
-  writer->Write();
+  VTK_T::write_vtkPointSet(filename, grid_w, true);
 
-  writer->Delete();
   grid_w->Delete();
 }
 
