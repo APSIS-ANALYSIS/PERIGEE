@@ -91,7 +91,7 @@ class FEAElement_Triangle3_membrane : public FEAElement
     virtual double get_detJac(const int &quaindex) const {return detJac;}
 
   private:
-    const int nLocBas, numQuapts;
+    const int numQuapts;
 
     // Container for R0 = 1 - r - s, R1 = r, R2 = s :
     // 0 <= ii < 3 x numQuapts
