@@ -107,7 +107,7 @@ Vector_3 FEAElement_Triangle6_3D_der0::get_normal_out( const int &qua,
   const Vector_3 mm = sur_pt - int_pt;
 
   // Do inner product with the normal vector
-  const double mdotn = dot_product( mm, un[qua] );
+  const double mdotn = VEC3_T::dot_product( mm, un[qua] );
 
   SYS_T::print_fatal_if( std::abs(mdotn) < 1.0e-10, "Warning: FEAElement_Triangle3_3D_der0::get_normal_out, the element might be ill-shaped.\n");
 
