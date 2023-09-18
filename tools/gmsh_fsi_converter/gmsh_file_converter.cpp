@@ -303,11 +303,11 @@ int main(int argc, char *argv[])
     Vector_3 loc_c_vec;
 
     // ===== Computes the circumferential direction vecters ===== 
-    loc_c_vec.copy(cross_product(temp_l_vec, loc_r_vec));
+    loc_c_vec.copy(VEC3_T::cross_product(temp_l_vec, loc_r_vec));
     loc_c_vec.normalize();
 
     // ===== Computes the correct longitudinal direction vecters ===== 
-    loc_l_vec.copy(cross_product(loc_r_vec, loc_c_vec));
+    loc_l_vec.copy(VEC3_T::cross_product(loc_r_vec, loc_c_vec));
     loc_l_vec.normalize();
 
     loc_l_vec_array->InsertTuple3(ii, loc_l_vec.x(), loc_l_vec.y(), loc_l_vec.z());
