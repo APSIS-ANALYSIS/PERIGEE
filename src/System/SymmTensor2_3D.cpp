@@ -272,14 +272,14 @@ int SymmTensor2_3D::eigen_decomp( double &eta1, double &eta2, double &eta3,
       if( v2.norm2() >= v3.norm2() )
       {
         v2.normalize();               // w1 
-        v2 = VEC3_T::corss_product( v1, v2 ); // v2 = w1 x v1
-        v3 = VEC3_T::corss_product( v1, v2 ); // v3 = v1 x v2
+        v2 = VEC3_T::cross_product( v1, v2 ); // v2 = w1 x v1
+        v3 = VEC3_T::cross_product( v1, v2 ); // v3 = v1 x v2
       }
       else
       {
         v3.normalize();               // w1 
-        v2 = VEC3_T::corss_product( v1, v3 ); // v2 = w1 x v1
-        v3 = VEC3_T::corss_product( v1, v2 ); // v3 = v1 x v2
+        v2 = VEC3_T::cross_product( v1, v3 ); // v2 = w1 x v1
+        v3 = VEC3_T::cross_product( v1, v2 ); // v3 = v1 x v2
       }
 
       // Shift back from deviatoric to the original matrix eigenvalues
@@ -325,11 +325,11 @@ void SymmTensor2_3D::find_eigen_vector( const double &eta, Vector_3 &v,
 
     if( b.norm2() >= c.norm2() )
     {
-      b.normalize(); s2 = b; v = VEC3_T::corss_product(s1,s2);
+      b.normalize(); s2 = b; v = VEC3_T::cross_product(s1,s2);
     }
     else
     {
-      c.normalize(); s2 = c; v = VEC3_T::corss_product(s1,s2);
+      c.normalize(); s2 = c; v = VEC3_T::cross_product(s1,s2);
     }
   }
   else if( len_b >= len_a && len_b >= len_c )
@@ -344,11 +344,11 @@ void SymmTensor2_3D::find_eigen_vector( const double &eta, Vector_3 &v,
 
     if( a.norm2() >= c.norm2() )
     {
-      a.normalize(); s2 = a; v = VEC3_T::corss_product(s1, s2);
+      a.normalize(); s2 = a; v = VEC3_T::cross_product(s1, s2);
     }
     else
     {
-      c.normalize(); s2 = c; v = VEC3_T::corss_product(s1, s2);
+      c.normalize(); s2 = c; v = VEC3_T::cross_product(s1, s2);
     }
   }
   else
@@ -363,11 +363,11 @@ void SymmTensor2_3D::find_eigen_vector( const double &eta, Vector_3 &v,
 
     if(a.norm2() >= b.norm2())
     {
-      a.normalize(); s2 = a; v = VEC3_T::corss_product(s1, s2);
+      a.normalize(); s2 = a; v = VEC3_T::cross_product(s1, s2);
     }
     else
     {
-      b.normalize(); s2 = b; v = VEC3_T::corss_product(s1, s2);
+      b.normalize(); s2 = b; v = VEC3_T::cross_product(s1, s2);
     }
   }
 }
