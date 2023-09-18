@@ -24,20 +24,11 @@
 
 int main(int argc, char *argv[])
 {
-  Vector_3 aa, bb;
+  double a = 2.5, b = 0.5;
 
-  aa.gen_rand(-0.375, 9.239);
+  double c = -  b + a;
 
-  aa.print();
-
-  bb = VEC3_T::normalize(aa);
-
-  aa.normalize();
-  
-  bb -= aa;
-
-  bb.print();
-
+  std::cout<<c<<'\t';
   return EXIT_SUCCESS;
 }
 
