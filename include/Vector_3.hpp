@@ -102,19 +102,22 @@ class Vector_3
     double vec[3];
 };
 
-// calculate the distance between two vector by L2 norm
-double dist( const Vector_3 &a, const Vector_3 &b );
-
-// calculate the dot product of two vectors
-double dot_product( const Vector_3 &a, const Vector_3 &b );
-
-// calculate the cross product of two vectors
-Vector_3 cross_product( const Vector_3 &a, const Vector_3 &b );
-
 // calculate a scalar product of a input vector
 Vector_3 operator*( const double &val, const Vector_3 &source );
 
-// return the normalized input vector, and normalization is made by its L2 norm
-Vector_3 normalize( const Vector_3 &val );
+namespace VEC3_T
+{
+  // calculate the distance between two vector by L2 norm
+  double dist( const Vector_3 &a, const Vector_3 &b );
+
+  // calculate the dot product of two vectors
+  double dot_product( const Vector_3 &a, const Vector_3 &b );
+
+  // calculate the cross product of two vectors
+  Vector_3 cross_product( const Vector_3 &a, const Vector_3 &b );
+
+  // return the normalized input vector, and normalization is made by its L2 norm
+  Vector_3 normalize( const Vector_3 &val );
+}
 
 #endif
