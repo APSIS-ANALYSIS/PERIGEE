@@ -64,11 +64,8 @@ void FEAElement_Triangle6_3D_der0::buildBasis( const IQuadPts * const &quad,
 
     for( int ii=0; ii<6; ++ii )
     {
-      const Vector_3 temp_dx_dr( ctrl_x[ii] * Rr[ii], ctrl_y[ii] * Rr[ii], ctrl_z[ii] * Rr[ii] );
-      dx_dr += temp_dx_dr;
-
-      const Vector_3 temp_dx_ds( ctrl_x[ii] * Rs[ii], ctrl_y[ii] * Rs[ii], ctrl_z[ii] * Rs[ii] );
-      dx_ds += temp_dx_ds;
+      dx_dr += Vector_3( ctrl_x[ii] * Rr[ii], ctrl_y[ii] * Rr[ii], ctrl_z[ii] * Rr[ii] );
+      dx_ds += Vector_3( ctrl_x[ii] * Rs[ii], ctrl_y[ii] * Rs[ii], ctrl_z[ii] * Rs[ii] );
     }
 
     un[qua] = cross_product( dx_dr, dx_ds );
