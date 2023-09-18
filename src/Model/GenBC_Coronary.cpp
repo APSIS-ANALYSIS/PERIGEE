@@ -287,9 +287,7 @@ double GenBC_Coronary::get_P( const int &ii, const double &in_dot_Q,
     // Here, we know it is a coronary face.
     // Each coronary face is governed by num_odes = 2 ODEs.
     // initial pressures at Ca and Cim
-    std::vector<double> pi_m(num_odes, 0.0);
-    for(int jj=0; jj<num_odes; ++jj)
-      pi_m[jj] = Pi0[ii][jj];
+    std::vector<double> pi_m  = Pi0[ii];
 
     // auxiliary variables for RK4
     std::vector<double> K1(num_odes, 0.0);
