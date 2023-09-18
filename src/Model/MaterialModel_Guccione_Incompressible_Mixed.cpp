@@ -12,7 +12,7 @@ MaterialModel_Guccione_Incompressible_Mixed::MaterialModel_Guccione_Incompressib
   f = Vector_3(fx, fy, fz);
 
   // Check to make sure f is a unit vector
-  if( !MATH_T::equals( MATH_T::norm2(fx,fy,fz), 1.0, 1.0e-12) )
+  if( !MATH_T::equals( f.norm2(), 1.0, 1.0e-12) )
   {
     SYS_T::commPrint("Guccione model, input f vector is not unit.\n");
     f.normalize();
@@ -20,7 +20,7 @@ MaterialModel_Guccione_Incompressible_Mixed::MaterialModel_Guccione_Incompressib
 
   // Check to make sure s is a unit vector
   s = Vector_3(sx, sy, sz);
-  if( !MATH_T::equals( MATH_T::norm2(sx, sy, sz), 1.0, 1.0e-12) )
+  if( !MATH_T::equals( s.norm2(), 1.0, 1.0e-12) )
   {
     SYS_T::commPrint("Guccione model, input s vector is not unit.\n");
     s.normalize();
