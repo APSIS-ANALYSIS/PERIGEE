@@ -114,4 +114,7 @@ Vector_3 cross_product( const Vector_3 &a, const Vector_3 &b );
 // calculate a scalar product of a input vector
 Vector_3 operator*( const double &val, const Vector_3 &source );
 
+// return the normalized input vector, and normalization is made by its L2 norm
+Vector_3 normalize( const Vector_3 &val );
+
 #endif

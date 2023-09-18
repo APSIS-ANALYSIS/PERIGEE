@@ -170,4 +170,10 @@ Vector_3 operator*( const double &val, const Vector_3 &source )
   return Vector_3( source.x() * val, source.y() * val, source.z() * val );
 }
 
+Vector_3 normalize( const Vector_3 &val )
+{
+  const double len = val.norm2();
+  return (1.0/len) * val;
+}
+
 // EOF
