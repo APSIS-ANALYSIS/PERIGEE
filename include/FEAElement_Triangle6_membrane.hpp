@@ -29,7 +29,6 @@
 // Date Created: Jan. 8 2021.
 // ==================================================================
 #include "FEAElement.hpp"
-#include "Math_Tools.hpp"
 
 class FEAElement_Triangle6_membrane : public FEAElement
 {
@@ -97,7 +96,7 @@ class FEAElement_Triangle6_membrane : public FEAElement
     virtual double get_detJac(const int &quaindex) const {return detJac[quaindex];}
 
   private:
-    const int nLocBas, numQuapts;
+    const int numQuapts;
 
     // Container for R0, R1, R2, R3, R4, R5
     // 0 <= ii < 6 x numQuapts

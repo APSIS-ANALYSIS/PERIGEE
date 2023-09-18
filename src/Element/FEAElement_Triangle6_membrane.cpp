@@ -1,11 +1,11 @@
 #include "FEAElement_Triangle6_membrane.hpp"
 
 FEAElement_Triangle6_membrane::FEAElement_Triangle6_membrane( const int &in_nqua )
-: nLocBas( 6 ), numQuapts( in_nqua )
+: numQuapts( in_nqua )
 {
-  R     = new double [nLocBas * numQuapts];
-  dR_dx = new double [nLocBas * numQuapts];
-  dR_dy = new double [nLocBas * numQuapts];
+  R     = new double [6 * numQuapts];
+  dR_dx = new double [6 * numQuapts];
+  dR_dy = new double [6 * numQuapts];
   
   un = new Vector_3 [numQuapts];
 
@@ -31,7 +31,7 @@ void FEAElement_Triangle6_membrane::print_info() const
 {
   SYS_T::commPrint("Triangle6_membrane: ");
   SYS_T::commPrint("6-node triangle element in the local lamina coordinate system. \n ");
-  PetscPrintf(PETSC_COMM_WORLD, "elemType: %d. \n", get_Type());
+  SYS_T::commPrint("elemType: %d. \n", get_Type());
   SYS_T::commPrint("Note: This element is designed for the coupled momentum method. \n ");
 }
 
@@ -48,8 +48,6 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
 {
   ASSERT(quad->get_dim() == 3, "FEAElement_Triangle6_membrane::buildBasis function error.\n" );
 
-  double Rr [nLocBas], Rs [nLocBas];
-
   for( int qua = 0; qua < numQuapts; ++qua )
   {
     const double qua_r = quad -> get_qp( qua, 0 );
@@ -65,24 +63,24 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
     R[offset + 4] = 4.0 * qua_r * qua_s;
     R[offset + 5] = 4.0 * qua_s * qua_t;
  
-    Rr[0] = 4.0 * qua_r + 4.0 * qua_s - 3.0;
-    Rr[1] = 4.0 * qua_r - 1.0;
-    Rr[2] = 0.0;
-    Rr[3] = 4.0 - 8.0 * qua_r - 4.0 * qua_s;
-    Rr[4] = 4.0 * qua_s;
-    Rr[5] = -4.0 * qua_s;
+    const double Rr[6] = { 4.0 * qua_r + 4.0 * qua_s - 3.0,
+      4.0 * qua_r - 1.0,
+      0.0,
+      4.0 - 8.0 * qua_r - 4.0 * qua_s,
+      4.0 * qua_s,
+      -4.0 * qua_s };
     
-    Rs[0] = 4.0 * qua_r + 4.0 * qua_s - 3.0;
-    Rs[1] = 0.0;
-    Rs[2] = 4.0 * qua_s - 1.0;
-    Rs[3] = -4.0 * qua_r;
-    Rs[4] = 4.0 * qua_r;
-    Rs[5] = 4.0 - 4.0 * qua_r - 8.0 * qua_s;
+    const double Rs[6] = { 4.0 * qua_r + 4.0 * qua_s - 3.0,
+      0.0,
+      4.0 * qua_s - 1.0,
+      -4.0 * qua_r,
+      4.0 * qua_r,
+      4.0 - 4.0 * qua_r - 8.0 * qua_s };
     
     Vector_3 dx_dr( 0.0, 0.0, 0.0 );
     Vector_3 dx_ds( 0.0, 0.0, 0.0 );
 
-    for( int ii=0; ii<nLocBas; ++ii )
+    for( int ii=0; ii<6; ++ii )
     {
       const Vector_3 temp_dx_dr( ctrl_x[ii] * Rr[ii], ctrl_y[ii] * Rr[ii], ctrl_z[ii] * Rr[ii] );
       dx_dr += temp_dx_dr;
@@ -120,9 +118,9 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
     Q[qua].transpose();
 
     // Rotated lamina coordinates
-    double ctrl_xl [nLocBas], ctrl_yl [nLocBas];
+    double ctrl_xl [6], ctrl_yl [6];
 
-    for(int ii = 0; ii < nLocBas; ++ii)
+    for(int ii = 0; ii < 6; ++ii)
     {
       double temp_val;
       Q[qua].VecMult( ctrl_x[ii], ctrl_y[ii], ctrl_z[ii], ctrl_xl[ii], ctrl_yl[ii], temp_val );
@@ -130,7 +128,7 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
 
     // Rotated lamina 2D Jacobian & inverse Jacobian components
     double dxl_dr = 0.0, dxl_ds = 0.0, dyl_dr = 0.0, dyl_ds = 0.0;
-    for( int ii = 0; ii < nLocBas; ++ii )
+    for( int ii = 0; ii < 6; ++ii )
     {
       dxl_dr += ctrl_xl[ii] * Rr[ii];
       dxl_ds += ctrl_xl[ii] * Rs[ii];
@@ -158,7 +156,7 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
     Jac[4*numQuapts + 4*qua + 2] = ds_dxl;
     Jac[4*numQuapts + 4*qua + 3] = ds_dyl;
 
-    for(int ii=0; ii<nLocBas; ++ii)
+    for(int ii=0; ii<6; ++ii)
     {
       dR_dx[offset+ii] = Rr[ii] * dr_dxl + Rs[ii] * ds_dxl;
       dR_dy[offset+ii] = Rr[ii] * dr_dyl + Rs[ii] * ds_dyl;
@@ -171,7 +169,7 @@ void FEAElement_Triangle6_membrane::get_R(
     const int &quaindex, double * const &basis ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle6_membrane::get_R function error.\n" );
-  const int offset = quaindex * nLocBas;
+  const int offset = quaindex * 6;
   basis[0] = R[offset];
   basis[1] = R[offset + 1];
   basis[2] = R[offset + 2];
@@ -184,7 +182,7 @@ std::vector<double> FEAElement_Triangle6_membrane::get_R(
     const int &quaindex ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle6_membrane::get_R function error.\n" );
-  const int offset = quaindex * nLocBas;
+  const int offset = quaindex * 6;
   return { R[offset], R[offset + 1], R[offset + 2],
    R[offset + 3], R[offset + 4], R[offset + 5] };
 }
@@ -193,8 +191,8 @@ void FEAElement_Triangle6_membrane::get_gradR( const int &quaindex,
     double * const &basis_x, double * const &basis_y ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle6_membrane::get_gradR function error.\n" );
-  const int offset = quaindex * nLocBas;
-  for( int ii=0; ii<nLocBas; ++ii )
+  const int offset = quaindex * 6;
+  for( int ii=0; ii<6; ++ii )
   {
     basis_x[ii] = dR_dx[offset + ii];
     basis_y[ii] = dR_dy[offset + ii];
@@ -205,8 +203,8 @@ void FEAElement_Triangle6_membrane::get_R_gradR( const int &quaindex,
     double * const &basis, double * const &basis_x, double * const &basis_y ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle6_membrane::get_R_gradR function error.\n" );
-  const int offset = quaindex * nLocBas;
-  for( int ii=0; ii<nLocBas; ++ii )
+  const int offset = quaindex * 6;
+  for( int ii=0; ii<6; ++ii )
   {
     basis[ii]   = R[offset + ii];
     basis_x[ii] = dR_dx[offset + ii];
@@ -217,7 +215,7 @@ void FEAElement_Triangle6_membrane::get_R_gradR( const int &quaindex,
 std::vector<double> FEAElement_Triangle6_membrane::get_dR_dx( const int &quaindex ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle6_membrane::get_dR_dx function error.\n" );
-  const int offset = quaindex * nLocBas;
+  const int offset = quaindex * 6;
   return { dR_dx[offset], dR_dx[offset+1], dR_dx[offset+2],
     dR_dx[offset+3], dR_dx[offset+4], dR_dx[offset+5] }; 
 }
@@ -225,7 +223,7 @@ std::vector<double> FEAElement_Triangle6_membrane::get_dR_dx( const int &quainde
 std::vector<double> FEAElement_Triangle6_membrane::get_dR_dy( const int &quaindex ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle6_membrane::get_dR_dy function error.\n" );
-  const int offset = quaindex * nLocBas;
+  const int offset = quaindex * 6;
   return { dR_dy[offset], dR_dy[offset+1], dR_dy[offset+2],
     dR_dy[offset+3], dR_dy[offset+4], dR_dy[offset+5] }; 
 }
