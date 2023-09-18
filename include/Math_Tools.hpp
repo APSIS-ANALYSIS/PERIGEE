@@ -86,35 +86,6 @@ namespace MATH_T
     return true;
   }
   
-  // --------------------------------------------------------------------------
-  // Cross product of two 3D vectors
-  // Input: u = (u1, u2, u3)
-  //        v = (v1, v2, v3)
-  // Output: uxv = (u2v3 - u3v2)i + (u3v1 - u1v3)j + (u1v2 - u2v1)k
-  // --------------------------------------------------------------------------
-  inline void cross3d(const double &u1, const double &u2, const double &u3,
-      const double &v1, const double &v2, const double &v3,
-      double &w1, double &w2, double &w3 )
-  {
-    w1 = u2 * v3 - u3 * v2;
-    w2 = u3 * v1 - u1 * v3;
-    w3 = u1 * v2 - u2 * v1;
-  }
-
-  // --------------------------------------------------------------------------
-  // Normalize 3D vector
-  // Input: x, y, z
-  // Output: x/len, y/len, z/len, len = sqrt(x^2+y^2+z^2)
-  // --------------------------------------------------------------------------
-  inline double normalize3d( double &x, double &y, double &z )
-  {
-    const double len = std::sqrt(x*x + y*y + z*z);
-    x = x / len;
-    y = y / len;
-    z = z / len;
-
-    return len;
-  }
 
   inline double norm2(const double &x, const double &y, const double &z)
   {
