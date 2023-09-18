@@ -45,6 +45,19 @@ void VTK_T::read_vtu_grid( const std::string &filename,
       ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
       ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
       ien_array.push_back( static_cast<int>( cell->GetPointId(3) ) );
+      
+    }
+    else if( cell->GetCellType() == 12 ) 
+    {
+      // cell type 12 is eight-node hex
+      ien_array.push_back( static_cast<int>( cell->GetPointId(0) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(3) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(4) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(5) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(6) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(7) ) );
     }
     else if( cell-> GetCellType() == 22 )
     {
@@ -70,7 +83,51 @@ void VTK_T::read_vtu_grid( const std::string &filename,
       ien_array.push_back( static_cast<int>( cell->GetPointId(8) ) );
       ien_array.push_back( static_cast<int>( cell->GetPointId(9) ) );
     }
-    else SYS_T::print_fatal("Error: VTK_T::read_vtu_grid read a mesh with VTK cell type 10, 24, or 22. \n"); 
+    else if( cell-> GetCellType() == 28 )
+    {
+      // cell type 28 is nine-node quad
+      ien_array.push_back( static_cast<int>( cell->GetPointId(0) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(3) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(4) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(5) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(6) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(7) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(8) ) );
+    }
+    else if( cell-> GetCellType() == 29 )
+    {
+      // cell type 29 is 27-node hex
+      ien_array.push_back( static_cast<int>( cell->GetPointId(0) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(3) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(4) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(5) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(6) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(7) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(8) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(9) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(10) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(11) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(12) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(13) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(14) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(15) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(16) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(17) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(18) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(19) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(20) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(21) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(22) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(23) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(24) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(25) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(26) ) );
+    }
+    else SYS_T::print_fatal("Error: VTK_T::read_vtu_grid read a mesh with VTK cell type %d is not supported.\n", cell-> GetCellType() ); 
   }
 
   reader->Delete();
@@ -114,11 +171,20 @@ void VTK_T::read_vtp_grid( const std::string &filename,
 
     if( cell->GetCellType() == 5 )
     {
+      // cell type 5 is three-node triangle
       ien_array.push_back( static_cast<int>( cell->GetPointId(0) ) );
       ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
       ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
     }
-    else SYS_T::print_fatal("Error: read_vtp_grid read a mesh with non triangle elements. \n");
+    else if(cell->GetCellType() == 9)
+    {
+      // cell type 9 is four-node quad
+      ien_array.push_back( static_cast<int>( cell->GetPointId(0) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(1) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(2) ) );
+      ien_array.push_back( static_cast<int>( cell->GetPointId(3) ) );
+    }
+    else SYS_T::print_fatal("Error: read_vtp_grid read a mesh with VTK cell type 5 or 9. \n");
   }
 
   reader->Delete();

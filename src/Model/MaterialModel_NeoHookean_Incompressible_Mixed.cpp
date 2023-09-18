@@ -68,8 +68,7 @@ void MaterialModel_NeoHookean_Incompressible_Mixed::get_PK(
     const Tensor2_3D &F, Tensor2_3D &P, Tensor2_3D &S) const
 {
   Tensor2_3D C; C.MatMultTransposeLeft(F);
-  Tensor2_3D Cinv(C); Cinv.inverse();
-
+  Tensor2_3D Cinv = inverse(C);
   S.copy(Cinv); S.scale( (-1.0) * mu * pt33 * C.tr() );
   S.AXPY( mu , I ); P.MatMult(F,S);
 }
@@ -78,8 +77,7 @@ void MaterialModel_NeoHookean_Incompressible_Mixed::get_PK_Stiffness(
     const Tensor2_3D &F, Tensor2_3D &P, Tensor2_3D &S, Tensor4_3D &CC ) const
 {
   Tensor2_3D C; C.MatMultTransposeLeft(F);
-  Tensor2_3D Cinv(C); Cinv.inverse();
-
+  Tensor2_3D Cinv = inverse(C);
   S.copy(Cinv); S.scale( (-1.0) * mu * pt33 * C.tr() );
   S.AXPY( mu , I );
   P.MatMult(F,S);

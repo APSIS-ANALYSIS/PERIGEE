@@ -470,7 +470,7 @@ namespace MATH_T
   void Matrix_SymPos_dense::LDLt_fac()
   {
     // This algorithm is given in Shufang XU's book, pp 31. 
-    double v[N]; 
+    std::vector<double> v(N, 0.0); 
 
     for(int jj=0; jj<N; ++jj)
     {
