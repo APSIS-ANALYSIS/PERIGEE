@@ -199,19 +199,19 @@ namespace SYS_T
   {
     if( a )
     {
-    int mpi_flag {-1};
-    MPI_Initialized(&mpi_flag);
-    if (mpi_flag)
-    {
-      if( !get_MPI_rank() )
+      int mpi_flag {-1};
+      MPI_Initialized(&mpi_flag);
+      if (mpi_flag)
       {
-        va_list Argp;
-        va_start(Argp, output);
-        (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
-        va_end(Argp);
-      }
-      MPI_Barrier(PETSC_COMM_WORLD);
-      MPI_Abort(PETSC_COMM_WORLD, 1);
+        if( !get_MPI_rank() )
+        {
+          va_list Argp;
+          va_start(Argp, output);
+          (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
+          va_end(Argp);
+        }
+        MPI_Barrier(PETSC_COMM_WORLD);
+        MPI_Abort(PETSC_COMM_WORLD, 1);
     }
     else
     {
@@ -222,23 +222,6 @@ namespace SYS_T
 
       exit( EXIT_FAILURE );
     }      
-    }
-  }
-
-  inline void print_fatal_if_not( bool a, const char output[], ... )
-  {
-    if( !a )
-    {
-      if( !get_MPI_rank() )
-      {
-        va_list Argp;
-        va_start(Argp, output);
-        (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
-        va_end(Argp);
-      }
-
-      MPI_Barrier(PETSC_COMM_WORLD);
-      MPI_Abort(PETSC_COMM_WORLD, 1);
     }
   }
 
