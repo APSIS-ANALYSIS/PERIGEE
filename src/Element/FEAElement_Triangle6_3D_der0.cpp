@@ -66,7 +66,7 @@ void FEAElement_Triangle6_3D_der0::buildBasis( const IQuadPts * const &quad,
       dx_ds += Vector_3( ctrl_x[ii] * Rs[ii], ctrl_y[ii] * Rs[ii], ctrl_z[ii] * Rs[ii] );
     }
 
-    un[qua] = cross_product( dx_dr, dx_ds );
+    un[qua] = VEC3_T::cross_product( dx_dr, dx_ds );
     detJac[qua] = un[qua].normalize();
   }
 }
