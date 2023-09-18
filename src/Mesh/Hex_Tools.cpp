@@ -386,7 +386,7 @@ Vector_3 HEX_T::get_out_normal( const std::string &file,
                        vol_ctrlPts[3*qun[3] + 1] - vol_ctrlPts[3*qun[0] + 1],
                        vol_ctrlPts[3*qun[3] + 2] - vol_ctrlPts[3*qun[0] + 2] );
 
-  Vector_3 outVec = cross_product( l01, l03 );
+  Vector_3 outVec = VEC3_T::cross_product( l01, l03 );
 
   outVec.normalize();
 
