@@ -167,7 +167,7 @@ int main( int argc, char * argv[] )
      v_ctrlPts[3*trn[2]+1] - v_ctrlPts[3*trn[0]+1],
      v_ctrlPts[3*trn[2]+2] - v_ctrlPts[3*trn[0]+2] ); 
 
-    Vector_3 ou = cross_product( l01, l02 );
+    Vector_3 ou = VEC3_T::cross_product( l01, l02 );
 
     tri_area[ee] = 0.5 * ou.normalize();
 
