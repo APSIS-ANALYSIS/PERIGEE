@@ -1291,10 +1291,10 @@ void Gmsh_FileIO::update_quadratic_tet_IEN( const int &index_3d )
 
   std::cout<<"=== Gmsh_FileIO::update_quadratic_tet_IEN for "<<phy_3d_name[index_3d]<<std::endl;;
 
-  // Now upateing the eIEN array
+  // Now updating the eIEN array
   for(int ee=0; ee<ne; ++ee)
   {
-    const double temp = eIEN[domain_index][10*ee+8];
+    const int temp = eIEN[domain_index][10*ee+8];
     eIEN[domain_index][10*ee+8] = eIEN[domain_index][10*ee+9];
     eIEN[domain_index][10*ee+9] = temp;
   }
@@ -1313,20 +1313,20 @@ void Gmsh_FileIO::update_quadratic_hex_IEN( const int &index_3d )
 
   SYS_T::print_exit_if(nlocbas != 27 && nlocbas != 20, "Error: Gmsh_FileIO updata_quadratic_hex_IEN only works for 27-node or 20-node quadratic element. \n");
 
-  // Now upateing the eIEN array
+  // Now updating the eIEN array
   for(int ee=0; ee<ne; ++ee)
   {
-    const double temp9  = eIEN[domain_index][nlocbas * ee + 9];
-    const double temp10 = eIEN[domain_index][nlocbas * ee + 10];
-    const double temp11 = eIEN[domain_index][nlocbas * ee + 11];
-    const double temp12 = eIEN[domain_index][nlocbas * ee + 12];
-    const double temp13 = eIEN[domain_index][nlocbas * ee + 13];
-    const double temp14 = eIEN[domain_index][nlocbas * ee + 14];
-    const double temp15 = eIEN[domain_index][nlocbas * ee + 15];
-    const double temp16 = eIEN[domain_index][nlocbas * ee + 16];
-    const double temp17 = eIEN[domain_index][nlocbas * ee + 17];
-    const double temp18 = eIEN[domain_index][nlocbas * ee + 18];
-    const double temp19 = eIEN[domain_index][nlocbas * ee + 19];
+    const int temp9  = eIEN[domain_index][nlocbas * ee + 9];
+    const int temp10 = eIEN[domain_index][nlocbas * ee + 10];
+    const int temp11 = eIEN[domain_index][nlocbas * ee + 11];
+    const int temp12 = eIEN[domain_index][nlocbas * ee + 12];
+    const int temp13 = eIEN[domain_index][nlocbas * ee + 13];
+    const int temp14 = eIEN[domain_index][nlocbas * ee + 14];
+    const int temp15 = eIEN[domain_index][nlocbas * ee + 15];
+    const int temp16 = eIEN[domain_index][nlocbas * ee + 16];
+    const int temp17 = eIEN[domain_index][nlocbas * ee + 17];
+    const int temp18 = eIEN[domain_index][nlocbas * ee + 18];
+    const int temp19 = eIEN[domain_index][nlocbas * ee + 19];
     eIEN[domain_index][nlocbas * ee + 9] = temp11;
     eIEN[domain_index][nlocbas * ee + 10] = temp13;
     eIEN[domain_index][nlocbas * ee + 11] = temp9;
@@ -1340,11 +1340,11 @@ void Gmsh_FileIO::update_quadratic_hex_IEN( const int &index_3d )
     eIEN[domain_index][nlocbas * ee + 19] = temp15;
     if (nlocbas == 27)
     {
-      const double temp20 = eIEN[domain_index][27 * ee + 20];
-      const double temp21 = eIEN[domain_index][27 * ee + 21];
-      const double temp22 = eIEN[domain_index][27 * ee + 22];
-      const double temp23 = eIEN[domain_index][27 * ee + 23];
-      const double temp24 = eIEN[domain_index][27 * ee + 24];
+      const int temp20 = eIEN[domain_index][27 * ee + 20];
+      const int temp21 = eIEN[domain_index][27 * ee + 21];
+      const int temp22 = eIEN[domain_index][27 * ee + 22];
+      const int temp23 = eIEN[domain_index][27 * ee + 23];
+      const int temp24 = eIEN[domain_index][27 * ee + 24];
       eIEN[domain_index][27 * ee + 20] = temp22;
       eIEN[domain_index][27 * ee + 21] = temp23;
       eIEN[domain_index][27 * ee + 22] = temp21;
