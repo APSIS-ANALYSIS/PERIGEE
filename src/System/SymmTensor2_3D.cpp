@@ -244,9 +244,9 @@ int SymmTensor2_3D::eigen_decomp( double &eta1, double &eta2, double &eta3,
     find_eigen_vector(eta1, v1, v2, v3);
 
     // Form the reduced matrix
-    const double A22 = VecMatVec(v2,v2) - frac13_tr * dot_product(v2, v2);
-    const double A23 = VecMatVec(v2,v3) - frac13_tr * dot_product(v2, v3);
-    const double A33 = VecMatVec(v3,v3) - frac13_tr * dot_product(v3, v3);
+    const double A22 = VecMatVec(v2,v2) - frac13_tr * VEC3_T::dot_product(v2, v2);
+    const double A23 = VecMatVec(v2,v3) - frac13_tr * VEC3_T::dot_product(v2, v3);
+    const double A33 = VecMatVec(v3,v3) - frac13_tr * VEC3_T::dot_product(v3, v3);
 
     const double diff_2233 = A22 - A33;
     if( diff_2233 >= 0.0 )
@@ -319,9 +319,9 @@ void SymmTensor2_3D::find_eigen_vector( const double &eta, Vector_3 &v,
 
     s1 = a;
 
-    b -= dot_product(s1, b) * s1;
+    b -= VEC3_T::dot_product(s1, b) * s1;
 
-    c -= dot_product(s1, c) * s1;
+    c -= VEC3_T::dot_product(s1, c) * s1;
 
     if( b.norm2() >= c.norm2() )
     {
@@ -338,9 +338,9 @@ void SymmTensor2_3D::find_eigen_vector( const double &eta, Vector_3 &v,
 
     s1 = b;
 
-    a -= dot_product(s1, a) * s1;
+    a -= VEC3_T::dot_product(s1, a) * s1;
 
-    c -= dot_product(s1, c) * s1;
+    c -= VEC3_T::dot_product(s1, c) * s1;
 
     if( a.norm2() >= c.norm2() )
     {
@@ -357,9 +357,9 @@ void SymmTensor2_3D::find_eigen_vector( const double &eta, Vector_3 &v,
 
     s1 = c;
 
-    a -= dot_product(s1, a) * s1;
+    a -= VEC3_T::dot_product(s1, a) * s1;
 
-    b -= dot_product(s1, b) * s1;
+    b -= VEC3_T::dot_product(s1, b) * s1;
 
     if(a.norm2() >= b.norm2())
     {
