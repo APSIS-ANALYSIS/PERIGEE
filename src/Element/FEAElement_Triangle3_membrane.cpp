@@ -78,7 +78,7 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   Q.transpose();
   
   // Rotated lamina coordinates
-  double ctrl_xl [3], ctrl_yl [3];
+  double ctrl_xl [3] {}, ctrl_yl [3] {};
 
   for(int ii = 0; ii < 3; ++ii)
   {
