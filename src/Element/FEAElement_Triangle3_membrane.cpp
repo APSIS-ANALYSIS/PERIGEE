@@ -173,7 +173,7 @@ Vector_3 FEAElement_Triangle3_membrane::get_normal_out( const int &quaindex,
   const Vector_3 mm = sur_pt - int_pt;
 
   // Dot product of the defined vector with the calculated normal vector
-  const double mdotn = dot_product( mm, un );
+  const double mdotn = VEC3_T::dot_product( mm, un );
 
   SYS_T::print_fatal_if( std::abs(mdotn) < 1.0e-10, "Warning: FEAElement_Triangle3_membrane::get_normal_out, the element might be ill-shaped.\n");
 
