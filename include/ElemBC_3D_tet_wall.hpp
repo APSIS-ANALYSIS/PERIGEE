@@ -12,7 +12,6 @@
 // Date: July 12 2020
 // ============================================================================
 #include "ElemBC_3D_tet.hpp"
-#include "Vector_3.hpp"
 #include "vtkCellLocator.h"
 #include "vtkGenericCell.h"
 
