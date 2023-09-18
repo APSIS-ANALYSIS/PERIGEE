@@ -167,7 +167,7 @@ namespace MATH_T
   // ----------------------------------------------------------------
   // Standard deviation
   // ----------------------------------------------------------------
-  double get_std_dev( const std::vector<double> &vec )
+  inline double get_std_dev( const std::vector<double> &vec )
   {
     const double mean_val = MATH_T::get_mean(vec);
     double sum = 0.0; double nn = 0.0;
@@ -215,7 +215,7 @@ namespace MATH_T
   // ----------------------------------------------------------------
   // Print Histogram of an array of random vector
   // ----------------------------------------------------------------
-  void print_Histogram( const std::vector<double> &val )
+  inline void print_Histogram( const std::vector<double> &val )
   {
     const int width = 50;
     int max = 0;
