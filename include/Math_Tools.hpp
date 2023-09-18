@@ -86,12 +86,6 @@ namespace MATH_T
     return true;
   }
   
-
-  inline double norm2(const double &x, const double &y, const double &z)
-  {
-    return std::sqrt(x*x + y*y + z*z);
-  }
-
   // ----------------------------------------------------------------
   // Generate outward normal vector from a tangential vector.
   // t : the tangential vector

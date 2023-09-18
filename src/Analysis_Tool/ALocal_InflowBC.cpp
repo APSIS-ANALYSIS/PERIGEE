@@ -111,21 +111,14 @@ double ALocal_InflowBC::get_radius( const int &nbc_id,
   // inflow boundary points (i.e. Num_LD = 0 ).
   SYS_T::print_fatal_if( num_out_bc_pts[nbc_id] == 0, "Error: ALocal_InflowBC::get_radius, this function can only be called in sub-domains which contains the inflow boundary node.\n");
 
-  const double x = pt.x();
-  const double y = pt.y();
-  const double z = pt.z();
-
-  const double rc = MATH_T::norm2( x-centroid[nbc_id](0), y-centroid[nbc_id](1),
-      z-centroid[nbc_id](2) );
+  const double rc = VEC3_T::dist( pt, centroid[nbc_id] );
 
   // Now loop over the boundary points to find rb.
-  double rb = MATH_T::norm2(x-outline_pts[nbc_id][0], y-outline_pts[nbc_id][1], 
-      z-outline_pts[nbc_id][2]);
+  double rb = VEC3_T::dist( pt, Vector_3( outline_pts[nbc_id][0], outline_pts[nbc_id][1], outline_pts[nbc_id][2]) );
 
   for(int ii=1; ii<num_out_bc_pts[nbc_id]; ++ii)
   {
-    double newdist = MATH_T::norm2(x-outline_pts[nbc_id][3*ii],
-        y-outline_pts[nbc_id][3*ii+1], z-outline_pts[nbc_id][3*ii+2]);
+    double newdist = VEC3_T::dist( pt, Vector_3( outline_pts[nbc_id][3*ii], outline_pts[nbc_id][3*ii+1], outline_pts[nbc_id][3*ii+2]) );
 
     if(newdist < rb) rb = newdist;
   }
