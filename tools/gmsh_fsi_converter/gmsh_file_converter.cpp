@@ -194,8 +194,8 @@ int main(int argc, char *argv[])
     Vector_3 solid_vec(solid_pt[0],solid_pt[1],solid_pt[2]);
 
     // ===== Compute the distance from solid point to the closest point =====
-    double dist_lu_to_s = dist(lumen_closest_solid_vec,solid_vec);
-    double dist_ti_to_s = dist(tissue_closest_solid_vec,solid_vec);
+    double dist_lu_to_s = VEC3_T::dist(lumen_closest_solid_vec,solid_vec);
+    double dist_ti_to_s = VEC3_T::dist(tissue_closest_solid_vec,solid_vec);
 
     // ===== Get the surface normal from the closest point =====
     Vector_3 lumen_nor_vec;
@@ -280,7 +280,7 @@ int main(int argc, char *argv[])
 
 
       // ===== Compute the distance from solid point to the closest centerline =====
-      double dist_center_to_s = dist(centerline_closest_solid_vec,solid_vec);
+      double dist_center_to_s = VEC3_T::dist(centerline_closest_solid_vec,solid_vec);
       
       // ===== Update when the relative distance has a smaller value =====
       if ((dist_center_to_s / dataArray->GetComponent(id_centerline_closest_solid_pt, 0)) < dist_relevant[ii])
