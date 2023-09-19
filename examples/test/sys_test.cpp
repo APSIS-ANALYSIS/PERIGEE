@@ -204,8 +204,6 @@ int main(int argc, char *argv[])
 
   std::array<double, size*size> array_test1 {};
 
-  srand(time(NULL));
-
   for(unsigned int ii=0; ii<size*size; ++ii)
   {
     double value = rand() % 1000; 
@@ -234,6 +232,8 @@ int main(int argc, char *argv[])
   double totalTime_3x3 = 0;
   double totalTimeD_3x3 = 0;
 
+
+
   for (int nn = 0; nn<10000; ++nn)
   {
     Matrix_double_3by3_Array mtest1_3x3 {};
@@ -251,8 +251,6 @@ int main(int argc, char *argv[])
     //mtest1_3x3.print();
 
     std::array<double, 3> b3 {};
-
-    srand(time(NULL));
 
     for(unsigned int ii=0; ii<3; ++ii)
     {
@@ -334,8 +332,6 @@ int main(int argc, char *argv[])
 
     std::array<double, 6> b6 {};
 
-    srand(time(NULL));
-
     for(unsigned int ii=0; ii<6; ++ii)
     {
       double value = rand() % 1000; 
@@ -416,8 +412,6 @@ int main(int argc, char *argv[])
     //mtest1_3x3.print();
 
     std::array<double, 3> b3 {};
-
-    srand(time(NULL));
 
     for(unsigned int ii=0; ii<3; ++ii)
     {
@@ -501,8 +495,6 @@ int main(int argc, char *argv[])
     //mtest1_6x6.print();
 
     std::array<double, 6> b6 {};
-
-    srand(time(NULL));
 
     for(unsigned int ii=0; ii<6; ++ii)
     {
