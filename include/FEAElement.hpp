@@ -11,7 +11,6 @@
 // Author: Ju Liu
 // Date created: Nov. 6 2013
 // ============================================================================
-#include <array>
 #include "IQuadPts.hpp"
 #include "FEANode.hpp"
 
