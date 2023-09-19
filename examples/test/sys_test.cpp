@@ -474,7 +474,7 @@ int main(int argc, char *argv[])
   std::cout << "Matrix_SymPos_Dense<3> LDLt total runtime：" << totalTimeD_3x3 << " ms" << std::endl;
 
 
- std::cout<<"---------------------------------"<<std::endl;
+  std::cout<<"---------------------------------"<<std::endl;
   // Matrix_double_6by6_Array vs Matrix_SymPos_Dense<6>
 
   totalTime_6x6 = 0;
