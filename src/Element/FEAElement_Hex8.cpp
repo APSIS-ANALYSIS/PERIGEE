@@ -407,3 +407,5 @@ std::array<double,9> FEAElement_Hex8::get_invJacobian(const int &quaindex) const
     dr_dx[9*quaindex+3], dr_dx[9*quaindex+4], dr_dx[9*quaindex+5],
     dr_dx[9*quaindex+6], dr_dx[9*quaindex+7], dr_dx[9*quaindex+8] }};
 }
+
+// EOF
