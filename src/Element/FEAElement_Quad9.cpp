@@ -1,7 +1,6 @@
 #include "FEAElement_Quad9.hpp"
 
-FEAElement_Quad9::FEAElement_Quad9( const int &in_nqua )
-: numQuapts( in_nqua )
+FEAElement_Quad9::FEAElement_Quad9( const int &in_nqua ) : numQuapts( in_nqua )
 {
   R = new double [9*numQuapts];
   dR_dx = new double [9*numQuapts];
@@ -29,7 +28,7 @@ void FEAElement_Quad9::print_info() const
 {
   SYS_T::commPrint("Quad9: ");
   SYS_T::commPrint("9-node quadrilateral element with up to 2nd derivatives. \n");
-  PetscPrintf(PETSC_COMM_WORLD, "elemType: %d \n", get_Type());
+  SYS_T::commPrint("elemType: %d \n", get_Type());
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
 }
 
@@ -77,6 +76,7 @@ void FEAElement_Quad9::buildBasis( const IQuadPts * const &quad,
     dNr[0] * Ns[0], dNr[2] * Ns[0], dNr[2] * Ns[2],
     dNr[0] * Ns[2], dNr[1] * Ns[0], dNr[2] * Ns[1],
     dNr[1] * Ns[2], dNr[0] * Ns[1], dNr[1] * Ns[1] };
+    
     const double dR_ds[9] { 
     Nr[0] * dNs[0], Nr[2] * dNs[0], Nr[2] * dNs[2],
     Nr[0] * dNs[2], Nr[1] * dNs[0], Nr[2] * dNs[1],
@@ -94,6 +94,7 @@ void FEAElement_Quad9::buildBasis( const IQuadPts * const &quad,
     d2Nr[0] * Ns[0], d2Nr[2] * Ns[0], d2Nr[2] * Ns[2],
     d2Nr[0] * Ns[2], d2Nr[1] * Ns[0], d2Nr[2] * Ns[1],
     d2Nr[1] * Ns[2], d2Nr[0] * Ns[1], d2Nr[1] * Ns[1] };
+    
     const double d2R_dss[9] {
     Nr[0] * d2Ns[0], Nr[2] * d2Ns[0], Nr[2] * d2Ns[2],
     Nr[0] * d2Ns[2], Nr[1] * d2Ns[0], Nr[2] * d2Ns[1],
@@ -129,8 +130,8 @@ void FEAElement_Quad9::buildBasis( const IQuadPts * const &quad,
     const double inv_detJac = 1.0 / Jac[8*numQuapts + qua];
 
     const double dr_dx = dy_ds * inv_detJac;
-    const double dr_dy = (-1.0) * dx_ds * inv_detJac;
-    const double ds_dx = (-1.0) * dy_dr * inv_detJac;
+    const double dr_dy = - dx_ds * inv_detJac;
+    const double ds_dx = - dy_dr * inv_detJac;
     const double ds_dy = dx_dr * inv_detJac;
 
     Jac[4*numQuapts + 4*qua + 0] = dr_dx;
@@ -183,7 +184,7 @@ double FEAElement_Quad9::get_h( const double * const &ctrl_x,
       std::pow((ctrl_x[1] - ctrl_x[3]), 2.0)
       + std::pow((ctrl_y[1] - ctrl_y[3]), 2.0) };
     
-  double d = (diag[0] > diag[1] ? diag[0] : diag[1]);
+  const double d = (diag[0] > diag[1] ? diag[0] : diag[1]);
 
   return std::sqrt(d);
 }
