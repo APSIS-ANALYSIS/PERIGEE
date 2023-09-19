@@ -411,7 +411,7 @@ namespace MATH_T
           std::cout<<"Matrix is NOT factorized.\n";
       }
   
-      void gen_rand()
+      virtual void gen_rand()
       {
         srand(time(NULL));
 
@@ -516,7 +516,7 @@ namespace MATH_T
         return out;
       }
 
-    private:
+    protected:
       double mat[N*N];
 
       unsigned int p[N];
@@ -562,12 +562,20 @@ namespace MATH_T
       for(unsigned int jj=0; jj<N; ++jj)
       {
         for(unsigned int kk=0; kk<N; ++kk)
-        {
           out(ii, jj) += left(ii,kk) * right(kk, jj);
-        }
       }
     }
     return out;
+  }
+
+  template<unsigned int N> Matrix_Dense<N> transpose(Matrix_Dense<N> &input)
+  {
+    Matrix_Dense<N> output {};
+    for(unsigned int ii=0; ii<N; ++ii)
+    {
+      for(unsigned int jj=0; jj<N; ++jj) output(jj, ii) = input(ii, jj);         
+    }
+    return output;
   }
 
   template<unsigned int N> class Matrix_SymPos_Dense : public Matrix_Dense <N>
@@ -579,18 +587,22 @@ namespace MATH_T
       Matrix_SymPos_Dense(const std::array<double,N*N> &input) : Matrix_Dense<N>(&input)
       {}
 
-      virtual ~Matrix_SymPos_Dense();
+      // We assume that the input matrix are the symmetry positive definite matrix 
+      Matrix_SymPos_Dense( const Matrix_Dense<N> &input ) : Matrix_Dense<N>()
+      { for(unsigned int ii=0; ii < N*N; ++ii) Matrix_Dense <N>::mat[ii] = input(ii); }
+
+      virtual ~Matrix_SymPos_Dense() {};
 
       // Check the symmetry of the matrix, throw an error if
       // non-symmetriness is found.
       void check_symm() const
       {
-        for(int ii = 0; ii<N; ++ii)
+        for(unsigned int ii = 0; ii<N; ++ii)
         {
-          for(int jj = 0; jj<ii; ++jj)
+          for(unsigned int jj = 0; jj<ii; ++jj)
           {
             if( !MATH_T::equals( Matrix_Dense <N>::mat[ii*N+jj], Matrix_Dense <N>::mat[jj*N+ii], 1.0e-15) ) 
-              std::cout<<"error: Matrix_SymPos entry ("<<ii<<","<<jj<<") does not match entry (jj"<<","<<ii<<"). \n";
+              std::cout<<"error: Matrix_SymPos entry ("<<ii<<","<<jj<<") does not match entry ("<<jj<<","<<ii<<"). \n";
           }
         }
       }
@@ -598,17 +610,42 @@ namespace MATH_T
       // Copy the content of a matrix
       // We assume that the input matrix and the object have the same
       // size.
+/*
       void copy( const Matrix_SymPos_Dense * const &in_mat )
       {
-        for(int ii=0; ii<N*N; ++ii) Matrix_Dense <N>::mat[ii] = in_mat->operator()(ii);
+        for(unsigned int ii=0; ii<N*N; ++ii) Matrix_Dense <N>::mat[ii] = in_mat->operator()(ii);
 
-        for(int ii=0; ii<N; ++ii)
+        for(unsigned int ii=0; ii<N; ++ii)
         {
-          Matrix_Dense <N>::p[ii] = in_mat->p(ii);
+          Matrix_Dense <N>::p[ii] = in_mat->p[ii];
         }
         Matrix_Dense <N>::is_fac = false; 
       }
+*/
+ /*
+      virtual void gen_rand()
+      {
+        srand(time(NULL));
 
+        for(unsigned int ii=0; ii<(N*N); ++ii)
+        {
+          double value = rand() % 1000; 
+
+          Matrix_Dense <N>::mat[ii] = value * 1.0e-2 - 5;
+        }
+
+        for(unsigned int ii=0; ii<N; ++ii)
+        {
+          for(unsigned int jj=ii; jj<N; ++jj)
+            Matrix_Dense <N>::mat[ii*N+jj] = 0.5 * (Matrix_Dense <N>::mat[ii*N+jj] + Matrix_Dense <N>::mat[jj*N+ii]);
+
+          for (unsigned int jj=0; jj<=ii; ++jj)
+            Matrix_Dense <N>::mat[jj*N+ii] =  Matrix_Dense <N>::mat[ii*N+jj];
+        } 
+
+        for(unsigned int ii=0; ii<N; ++ii) Matrix_Dense <N>::p[ii] = ii;
+      }
+*/
       // ------------------------------------------------------------
       // Perform LDL^t transformation. The mat object will be replace
       // by the entries of the L matrix and the D matrix. Pivoting is
@@ -619,16 +656,16 @@ namespace MATH_T
         // This algorithm is given in Shufang XU's book, pp 31. 
         double v[N]; 
 
-        for(int jj=0; jj<N; ++jj)
+        for(unsigned int jj=0; jj<N; ++jj)
         {
           const int Njj = jj * N;
-          for(int kk=0; kk<jj; ++kk) v[kk] = Matrix_Dense <N>::mat[Njj+kk] * Matrix_Dense <N>::mat[kk*N+kk];
+          for(unsigned int kk=0; kk<jj; ++kk) v[kk] = Matrix_Dense <N>::mat[Njj+kk] * Matrix_Dense <N>::mat[kk*N+kk];
 
-          for(int kk=0; kk<jj; ++kk) Matrix_Dense <N>::mat[Njj+jj] -= v[kk] * Matrix_Dense <N>::mat[Njj+kk];
+          for(unsigned int kk=0; kk<jj; ++kk) Matrix_Dense <N>::mat[Njj+jj] -= v[kk] * Matrix_Dense <N>::mat[Njj+kk];
 
-          for(int ii=jj+1; ii<N; ++ii)
+          for(unsigned int ii=jj+1; ii<N; ++ii)
           {
-            for(int kk=0; kk<jj; ++kk) Matrix_Dense <N>::mat[N*ii+jj] -= Matrix_Dense <N>::mat[ii*N+kk] * v[kk];
+            for(unsigned int kk=0; kk<jj; ++kk) Matrix_Dense <N>::mat[N*ii+jj] -= Matrix_Dense <N>::mat[ii*N+kk] * v[kk];
 
             Matrix_Dense <N>::mat[N*ii+jj] *= 1.0 / Matrix_Dense <N>::mat[Njj+jj];
           }
@@ -640,24 +677,27 @@ namespace MATH_T
       // With the LDLt_fac() function performed, solve a linear problem
       // with the given RHS.
       // users are responsible for allocating the b and x arrays.
-      void LDLt_solve( double const * const &b, 
-          double * const &x ) const
+      std::array<double, N>  LDLt_solve( std::array<double, N> &b ) const
       {
+        std::array<double, N> x;
+
         // Solve for Ly = b
-        for(int ii=0; ii<N; ++ii)
+        for(unsigned int  ii=0; ii<N; ++ii)
         {
           x[ii] = b[ii];
-          for(int jj=0; jj<ii; ++jj) x[ii] -= Matrix_Dense <N>::mat[ii*N+jj] * x[jj];
+          for(unsigned int jj=0; jj<ii; ++jj) x[ii] -= Matrix_Dense <N>::mat[ii*N+jj] * x[jj];
         }
 
         // Solve for D z = y;
-        for(int ii=0; ii<N; ++ii) x[ii] *= Matrix_Dense <N>::mat[ii*N+ii];
+        for(unsigned int  ii=0; ii<N; ++ii) x[ii] *= 1.0 / Matrix_Dense <N>::mat[ii*N+ii];
 
         // Solve L^t x = z
-        for(int ii=N-2; ii>=0; --ii)
+        for(int ii=N-2; static_cast<int>(ii)>=0; --ii)
         {
-          for(int jj=ii+1; jj<N; ++jj) x[ii] -= Matrix_Dense <N>::mat[jj*N+ii] * x[jj];
+          for(unsigned int jj=ii+1; jj<N; ++jj) x[ii] -= Matrix_Dense <N>::mat[jj*N+ii] * x[jj];
         }
+        
+        return x;
       }
 
       // ------------------------------------------------------------
