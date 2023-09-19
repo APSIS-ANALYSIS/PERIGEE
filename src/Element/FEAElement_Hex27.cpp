@@ -129,6 +129,7 @@ void FEAElement_Hex27::buildBasis( const IQuadPts * const &quad,
     dNr[2] * Ns[2] * Nt[1], dNr[0] * Ns[2] * Nt[1], dNr[0] * Ns[1] * Nt[1],
     dNr[2] * Ns[1] * Nt[1], dNr[1] * Ns[0] * Nt[1], dNr[1] * Ns[2] * Nt[1],
     dNr[1] * Ns[1] * Nt[0], dNr[1] * Ns[1] * Nt[2], dNr[1] * Ns[1] * Nt[1] };
+    
     const double dR_ds[27] { 
     Nr[0] * dNs[0] * Nt[0], Nr[2] * dNs[0] * Nt[0], Nr[2] * dNs[2] * Nt[0],
     Nr[0] * dNs[2] * Nt[0], Nr[0] * dNs[0] * Nt[2], Nr[2] * dNs[0] * Nt[2],
@@ -139,6 +140,7 @@ void FEAElement_Hex27::buildBasis( const IQuadPts * const &quad,
     Nr[2] * dNs[2] * Nt[1], Nr[0] * dNs[2] * Nt[1], Nr[0] * dNs[1] * Nt[1],
     Nr[2] * dNs[1] * Nt[1], Nr[1] * dNs[0] * Nt[1], Nr[1] * dNs[2] * Nt[1],
     Nr[1] * dNs[1] * Nt[0], Nr[1] * dNs[1] * Nt[2], Nr[1] * dNs[1] * Nt[1] };
+    
     const double dR_dt[27] { 
     Nr[0] * Ns[0] * dNt[0], Nr[2] * Ns[0] * dNt[0], Nr[2] * Ns[2] * dNt[0],
     Nr[0] * Ns[2] * dNt[0], Nr[0] * Ns[0] * dNt[2], Nr[2] * Ns[0] * dNt[2],
@@ -160,6 +162,7 @@ void FEAElement_Hex27::buildBasis( const IQuadPts * const &quad,
     dNr[2] * dNs[2] * Nt[1], dNr[0] * dNs[2] * Nt[1], dNr[0] * dNs[1] * Nt[1],
     dNr[2] * dNs[1] * Nt[1], dNr[1] * dNs[0] * Nt[1], dNr[1] * dNs[2] * Nt[1],
     dNr[1] * dNs[1] * Nt[0], dNr[1] * dNs[1] * Nt[2], dNr[1] * dNs[1] * Nt[1] };
+    
     const double d2R_drt[27] { 
     dNr[0] * Ns[0] * dNt[0], dNr[2] * Ns[0] * dNt[0], dNr[2] * Ns[2] * dNt[0],
     dNr[0] * Ns[2] * dNt[0], dNr[0] * Ns[0] * dNt[2], dNr[2] * Ns[0] * dNt[2],
@@ -170,6 +173,7 @@ void FEAElement_Hex27::buildBasis( const IQuadPts * const &quad,
     dNr[2] * Ns[2] * dNt[1], dNr[0] * Ns[2] * dNt[1], dNr[0] * Ns[1] * dNt[1],
     dNr[2] * Ns[1] * dNt[1], dNr[1] * Ns[0] * dNt[1], dNr[1] * Ns[2] * dNt[1],
     dNr[1] * Ns[1] * dNt[0], dNr[1] * Ns[1] * dNt[2], dNr[1] * Ns[1] * dNt[1] };
+    
     const double d2R_dst[27] {
     Nr[0] * dNs[0] * dNt[0], Nr[2] * dNs[0] * dNt[0], Nr[2] * dNs[2] * dNt[0],
     Nr[0] * dNs[2] * dNt[0], Nr[0] * dNs[0] * dNt[2], Nr[2] * dNs[0] * dNt[2],
@@ -195,6 +199,7 @@ void FEAElement_Hex27::buildBasis( const IQuadPts * const &quad,
     d2Nr[2] * Ns[2] * Nt[1], d2Nr[0] * Ns[2] * Nt[1], d2Nr[0] * Ns[1] * Nt[1],
     d2Nr[2] * Ns[1] * Nt[1], d2Nr[1] * Ns[0] * Nt[1], d2Nr[1] * Ns[2] * Nt[1],
     d2Nr[1] * Ns[1] * Nt[0], d2Nr[1] * Ns[1] * Nt[2], d2Nr[1] * Ns[1] * Nt[1] };
+    
     const double d2R_dss[27] { 
     Nr[0] * d2Ns[0] * Nt[0], Nr[2] * d2Ns[0] * Nt[0], Nr[2] * d2Ns[2] * Nt[0],
     Nr[0] * d2Ns[2] * Nt[0], Nr[0] * d2Ns[0] * Nt[2], Nr[2] * d2Ns[0] * Nt[2],
@@ -205,6 +210,7 @@ void FEAElement_Hex27::buildBasis( const IQuadPts * const &quad,
     Nr[2] * d2Ns[2] * Nt[1], Nr[0] * d2Ns[2] * Nt[1], Nr[0] * d2Ns[1] * Nt[1],
     Nr[2] * d2Ns[1] * Nt[1], Nr[1] * d2Ns[0] * Nt[1], Nr[1] * d2Ns[2] * Nt[1],
     Nr[1] * d2Ns[1] * Nt[0], Nr[1] * d2Ns[1] * Nt[2], Nr[1] * d2Ns[1] * Nt[1] };
+    
     const double d2R_dtt[27] { 
     Nr[0] * Ns[0] * d2Nt[0], Nr[2] * Ns[0] * d2Nt[0], Nr[2] * Ns[2] * d2Nt[0],
     Nr[0] * Ns[2] * d2Nt[0], Nr[0] * Ns[0] * d2Nt[2], Nr[2] * Ns[0] * d2Nt[2],
@@ -530,3 +536,5 @@ std::array<double,9> FEAElement_Hex27::get_invJacobian(const int &quaindex) cons
     dr_dx[9*quaindex+3], dr_dx[9*quaindex+4], dr_dx[9*quaindex+5],
     dr_dx[9*quaindex+6], dr_dx[9*quaindex+7], dr_dx[9*quaindex+8] }};
 }
+
+// EOF
