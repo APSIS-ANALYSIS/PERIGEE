@@ -72,21 +72,6 @@ namespace MATH_T
   }
 
   // --------------------------------------------------------------------------
-  // This function is used to determine if two vector object are identical
-  // up to a tolerance (default 1.0e-12).
-  // --------------------------------------------------------------------------
-  template<typename T> bool equals( const std::vector<T> &a, 
-      const std::vector<T> &b, const double &tol = 1.0e-12 )
-  {
-    if( a.size() != b.size() ) return false;
-    for(unsigned int ii=0; ii<a.size(); ++ii)
-    {
-      if( std::abs(a[ii]-b[ii]) >= tol ) return false;
-    }
-    return true;
-  }
-  
-  // --------------------------------------------------------------------------
   // Cross product of two 3D vectors
   // Input: u = (u1, u2, u3)
   //        v = (v1, v2, v3)
