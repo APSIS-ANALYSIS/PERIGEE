@@ -51,8 +51,10 @@ void FEAElement_Quad4::buildBasis( const IQuadPts * const &quad,
   // Caclulate second derivative of geometry
   // Here, second derivatives d2R_drr, etc are constant. We can calculate
   // xrr, etc. out of the quadrature loop.
-  double xrr = 0.0, xss = 0.0, xrs = 0.0;
-  double yrr = 0.0, yss = 0.0, yrs = 0.0;
+  // xrr = 0.0, xss = 0.0, xrs = 0.0;
+  // yrr = 0.0, yss = 0.0, yrs = 0.0;
+
+  double xrs = 0.0, yrs = 0.0;
 
   for(int ii=0; ii<4; ++ii)
   {
@@ -94,8 +96,8 @@ void FEAElement_Quad4::buildBasis( const IQuadPts * const &quad,
     const double inv_detJac = 1.0 / Jac[8*numQuapts + qua];
 
     const double dr_dx = dy_ds * inv_detJac;
-    const double dr_dy = (-1.0) * dx_ds * inv_detJac;
-    const double ds_dx = (-1.0) * dy_dr * inv_detJac;
+    const double dr_dy = - dx_ds * inv_detJac;
+    const double ds_dx = - dy_dr * inv_detJac;
     const double ds_dy = dx_dr * inv_detJac;
 
     Jac[4*numQuapts + 4*qua + 0] = dr_dx;
@@ -148,7 +150,7 @@ double FEAElement_Quad4::get_h( const double * const &ctrl_x,
       std::pow((ctrl_x[1] - ctrl_x[3]), 2.0)
       + std::pow((ctrl_y[1] - ctrl_y[3]), 2.0) };
     
-  double d = (diag[0] > diag[1] ? diag[0] : diag[1]);
+  const double d = (diag[0] > diag[1] ? diag[0] : diag[1]);
 
   return std::sqrt(d);
 }
