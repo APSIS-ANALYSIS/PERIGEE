@@ -15,7 +15,7 @@
 int main(int argc, char *argv[])
 {
 
-  const unsigned int size = 6;
+  const unsigned int size = 9;
 
   MATH_T::Matrix_Dense<size> mtest1 {};
 
@@ -226,10 +226,10 @@ int main(int argc, char *argv[])
   }
 
 
-  std::cout<<"================Comparison==============="<<std::endl;
+  std::cout<<"================Comparison 1==============="<<std::endl;
   SYS_T::Timer * mytimer = new SYS_T::Timer();
 
-  // Matrix_double_3by3_Array vs template<unsigned int 3> class Matrix_Dense
+  // Matrix_double_3by3_Array vs Matrix_Dense<3>
 
   double totalTime_3x3 = 0;
   double totalTimeD_3x3 = 0;
@@ -301,15 +301,15 @@ int main(int argc, char *argv[])
     for(unsigned int ii=0; ii<3; ++ii)
     {
       if(sol3.at(ii) - sol3d.at(ii) > 1.0e-10)
-        std::cout<<"diff between Matrix_double_3by3_Array and Matrix_Dense:"<< sol3.at(ii) - sol3d.at(ii) << std::endl;
+        std::cout<<"diff between Matrix_double_3by3_Array and Matrix_Dense<3>:"<< sol3.at(ii) - sol3d.at(ii) << std::endl;
     }
   }
 
   std::cout << "Matrix_double_3by3_Array LU total runtime：" << totalTime_3x3 << " ms" << std::endl;
-  std::cout << "template<unsigned int 3> class Matrix_Dense LU total runtime：" << totalTimeD_3x3 << " ms" << std::endl;
+  std::cout << "Matrix_Dense<3> LU total runtime：         " << totalTimeD_3x3 << " ms" << std::endl;
 
   std::cout<<"---------------------------------"<<std::endl;
-  // Matrix_double_6by6_Array vs template<unsigned int 6> class Matrix_Dense
+  // Matrix_double_6by6_Array vs Matrix_Dense<6>
 
   double totalTime_6x6 = 0;
   double totalTimeD_6x6 = 0;
@@ -383,12 +383,180 @@ int main(int argc, char *argv[])
     for(unsigned int ii=0; ii<6; ++ii)
     {
       if(sol6.at(ii) - sol6d.at(ii) > 1.0e-10)
-        std::cout<<"diff between Matrix_double_6by6_Array and Matrix_Dense:"<< sol6.at(ii) - sol6d.at(ii) << std::endl;
+        std::cout<<"diff between Matrix_double_6by6_Array and Matrix_Dense<6>:"<< sol6.at(ii) - sol6d.at(ii) << std::endl;
     }
   }
 
   std::cout << "Matrix_double_6by6_Array LU total runtime：" << totalTime_6x6 << " ms" << std::endl;
-  std::cout << "template<unsigned int 6> class Matrix_Dense LU total runtime：" << totalTimeD_6x6 << " ms" << std::endl;
+  std::cout << "Matrix_Dense<6> LU total runtime：         " << totalTimeD_6x6 << " ms" << std::endl;
+
+
+  std::cout<<"================Comparison 2==============="<<std::endl;
+  // Matrix_double_3by3_Array vs Matrix_SymPos_Dense<3>
+
+  totalTime_3x3 = 0;
+  totalTimeD_3x3 = 0;
+
+  for (int nn = 0; nn<10000; ++nn)
+  {
+    MATH_T::Matrix_Dense<3> mtest1d_3x3 {};
+
+    mtest1d_3x3.gen_rand();
+
+    MATH_T::Matrix_SymPos_Dense<3> smtest1d_3x3(transpose(mtest1d_3x3) * mtest1d_3x3);
+
+    Matrix_double_3by3_Array mtest1_3x3 {};
+
+    for(unsigned int ii=0; ii<9; ++ii)
+    { 
+      mtest1_3x3(ii) = smtest1d_3x3(ii);
+    }
+
+    //smtest1d_3x3.print_info();
+    //mtest1_3x3.print();
+
+    std::array<double, 3> b3 {};
+
+    srand(time(NULL));
+
+    for(unsigned int ii=0; ii<3; ++ii)
+    {
+      double value = rand() % 1000; 
+
+      b3[ii] = value * 1.0e-2 - 5;
+    }
+/*
+    for(unsigned int ii=0; ii<3; ++ii)
+    {
+      std::cout<<b3.at(ii)<< std::endl;
+    }
+*/
+    mytimer->Reset();
+    mytimer->Start();
+
+    mtest1_3x3.LU_fac();
+    //mtest1_3x3.print();
+
+    std::array<double, 3> sol3 = mtest1_3x3.LU_solve(b3);
+
+    mytimer -> Stop();
+
+    double Time_3x3 = mytimer->get_sec();
+
+    totalTime_3x3 += Time_3x3;
+
+    mytimer->Reset();
+    mytimer->Start();
+
+    smtest1d_3x3.LDLt_fac();
+    //smtest1d_3x3.print_info();
+    std::array<double, 3> sol3d = smtest1d_3x3.LDLt_solve(b3);
+
+    mytimer -> Stop();
+
+    double TimeD_3x3 = mytimer->get_sec();
+
+    totalTimeD_3x3 += TimeD_3x3;
+/*
+    for(unsigned int ii=0; ii<3; ++ii)
+    {
+      std::cout<<sol3[ii]<<" "<< sol3d[ii] << std::endl;
+    }
+*/
+    for(unsigned int ii=0; ii<3; ++ii)
+    {
+      if(sol3.at(ii) - sol3d.at(ii) > 1.0e-10)
+        std::cout<<"diff between Matrix_double_3by3_Array and Matrix_SymPos_Dense<3>:"<< sol3.at(ii) - sol3d.at(ii) << std::endl;
+    }
+  }
+
+  std::cout << "Matrix_double_3by3_Array LU total runtime：" << totalTime_3x3 << " ms" << std::endl;
+  std::cout << "Matrix_SymPos_Dense<3> LDLt total runtime：" << totalTimeD_3x3 << " ms" << std::endl;
+
+
+ std::cout<<"---------------------------------"<<std::endl;
+  // Matrix_double_6by6_Array vs Matrix_SymPos_Dense<6>
+
+  totalTime_6x6 = 0;
+  totalTimeD_6x6 = 0;
+
+  for (int nn = 0; nn<10000; ++nn)
+  {
+    MATH_T::Matrix_Dense<6> mtest1d_6x6 {};
+    
+    mtest1d_6x6.gen_rand();
+
+    MATH_T::Matrix_SymPos_Dense<6> smtest1d_6x6(transpose(mtest1d_6x6) * mtest1d_6x6);
+
+    double atest1_6x6[36] = {0.0} ; 
+
+    for(unsigned int ii=0; ii<36; ++ii)
+    { 
+      atest1_6x6[ii] = smtest1d_6x6(ii);
+    }
+
+    Matrix_double_6by6_Array mtest1_6x6 (atest1_6x6);
+
+    //mtest1d_6x6.print_info();
+    //mtest1_6x6.print();
+
+    std::array<double, 6> b6 {};
+
+    srand(time(NULL));
+
+    for(unsigned int ii=0; ii<6; ++ii)
+    {
+      double value = rand() % 1000; 
+
+      b6[ii] = value * 1.0e-2 - 5;
+    }
+/*
+    for(unsigned int ii=0; ii<6; ++ii)
+    {
+      std::cout<<b6.at(ii)<< std::endl;
+    }
+*/
+    mytimer->Reset();
+    mytimer->Start();
+
+    mtest1_6x6.LU_fac();
+    //mtest1_6x6.print();
+
+    std::array<double, 6> sol6 = mtest1_6x6.LU_solve(b6);
+
+    mytimer -> Stop();
+
+    double Time_6x6 = mytimer->get_sec();
+
+    totalTime_6x6 += Time_6x6;
+
+    mytimer->Reset();
+    mytimer->Start();
+
+    smtest1d_6x6.LDLt_fac();
+    //mtest1d_6x6.print_info();
+    std::array<double, 6> sol6d = smtest1d_6x6.LDLt_solve(b6);
+
+    mytimer -> Stop();
+
+    double TimeD_6x6 = mytimer->get_sec();
+
+    totalTimeD_6x6 += TimeD_6x6;
+/*
+    for(unsigned int ii=0; ii<6; ++ii)
+    {
+      std::cout<<sol6[ii]<<" "<< sol6d[ii] << std::endl;
+    }
+*/
+    for(unsigned int ii=0; ii<6; ++ii)
+    {
+      if(sol6.at(ii) - sol6d.at(ii) > 1.0e-10)
+        std::cout<<"diff between Matrix_double_6by6_Array and Matrix_SymPos_Dense<6>:"<< sol6.at(ii) - sol6d.at(ii) << std::endl;
+    }
+  }
+
+  std::cout << "Matrix_double_6by6_Array LU total runtime：" << totalTime_6x6 << " ms" << std::endl;
+  std::cout << "Matrix_SymPos_Dense<6> LDLt total runtime：" << totalTimeD_6x6 << " ms" << std::endl;
 
   return EXIT_SUCCESS;
 }
