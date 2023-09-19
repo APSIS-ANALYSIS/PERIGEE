@@ -71,10 +71,18 @@ class FEAElement
         const double * const &ctrl_z )
     {SYS_T::commPrint("Warning: buildBasis() is not implemented. \n");}
 
+    virtual void buildBasis( const IQuadPts * const &quad_rule,
+        const std::array<std::vector<double>,3> &pts )
+    {buildBasis(quad_rule, &pts[0][0], &pts[1][0], &pts[2][0]);}
+
     // Build 2D basis -- FEM
     virtual void buildBasis( const IQuadPts * const &quad_rule,
         const double * const &ctrl_x, const double * const &ctrl_y )
     {SYS_T::commPrint("Warning: buildBasis() is not implemented. \n");}
+
+    virtual void buildBasis( const IQuadPts * const &quad_rule,
+        const std::array<std::vector<double>,2> &pts )
+    {buildBasis(quad_rule, &pts[0][0], &pts[1][0]);}
 
     // ------------------------------------------------------------------------
     // Get functions : Obtain the value of basis functions and their derivatives.
