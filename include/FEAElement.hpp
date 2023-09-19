@@ -62,6 +62,12 @@ class FEAElement
         const double * const &ctrl_y ) const
     {SYS_T::commPrint("Warning: get_h is not implemented. \n"); return 0.0;}
 
+    virtual double get_h( const std::array<std::vector<double>,3> pts ) const
+    {return get_h( &pts[0][0], &pts[1][0], &pts[2][0] );}
+
+    virtual double get_h( const std::array<std::vector<double>,2> pts ) const
+    {return get_h( &pts[0][0], &pts[1][0] );}
+
     // ------------------------------------------------------------------------
     // Build Basis function quadrature info
     // ------------------------------------------------------------------------
