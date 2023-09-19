@@ -26,7 +26,7 @@ void FEAElement_Quad9_3D_der0::print_info() const
 {
   SYS_T::commPrint("Quad9_3D_der0: ");
   SYS_T::commPrint("9-node quad element with no derivative evaluated. \n ");
-  PetscPrintf(PETSC_COMM_WORLD, "elemType: %d. \n", get_Type());
+  SYS_T::commPrint("elemType: %d. \n", get_Type());
   SYS_T::commPrint("Note: This element is designed for natural BC integrals. \n ");
 }
 
