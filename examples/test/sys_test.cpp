@@ -232,8 +232,6 @@ int main(int argc, char *argv[])
   double totalTime_3x3 = 0;
   double totalTimeD_3x3 = 0;
 
-
-
   for (int nn = 0; nn<10000; ++nn)
   {
     Matrix_double_3by3_Array mtest1_3x3 {};
