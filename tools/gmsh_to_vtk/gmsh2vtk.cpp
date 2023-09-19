@@ -24,12 +24,14 @@ int main( int argc, char * argv[] )
 
   GIO -> print_info();
 
-  std::vector<int> nbc_face_id {1, 2};
-  std::vector<std::string> nbc_face_name {"", ""};
+  std::vector<int> nbc_face_id { 1, 2 };
+  std::vector<std::string> nbc_face_name { "ftop", "fbot" };
   std::vector<int> nbc_vol_id { 0, 0 };
 
-  std::vector<int> ebc_face_id {0, 3, 4, 5};
-
+  std::vector<int> ebc_face_id { 0, 3, 4, 5 };
+  std::vector<std::string> ebc_face_name { "ffro", "fbac", "flef", "frig" };
+  std::vector<int> ebc_vol_id { 0, 0, 0, 0 };
+  
   const int vol_id = 0;
 
   for( auto id : nbc_face_id )
@@ -38,6 +40,8 @@ int main( int argc, char * argv[] )
   for( auto id : ebc_face_id )
     GIO -> write_vtp( id, vol_id, true );
 
+  const std::string wmname("whole_vol");
+  const bool ixXML = true;
   GIO -> write_vtu( wmname, isXML );
 
   delete GIO; 
