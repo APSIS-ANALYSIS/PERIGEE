@@ -212,16 +212,16 @@ namespace SYS_T
         }
         MPI_Barrier(PETSC_COMM_WORLD);
         MPI_Abort(PETSC_COMM_WORLD, 1);
-    }
-    else
-    {
-      va_list Argp;
-      va_start(Argp, output);
-      vfprintf (stderr, output, Argp);
-      va_end(Argp);
+      }
+      else
+      {
+        va_list Argp;
+        va_start(Argp, output);
+        vfprintf (stderr, output, Argp);
+        va_end(Argp);
 
-      exit( EXIT_FAILURE );
-    }      
+        exit( EXIT_FAILURE );
+      }      
     }
   }
 
