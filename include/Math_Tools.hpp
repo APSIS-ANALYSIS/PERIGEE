@@ -437,7 +437,7 @@ namespace MATH_T
 
       int get_size() const {return static_cast<int>(N);}
 
-      bool get_is_face() const {return is_fac;}
+      bool get_is_fac() const {return is_fac;}
 
       void LU_fac()
       {
@@ -527,7 +527,7 @@ namespace MATH_T
 
   template<unsigned int N> std::array<double,N> operator*( const Matrix_Dense<N> &left, const std::vector<double> &right )
   {
-    if( left.get_is_face() == true ) std::cout<<"Warning: the matrix has been factroized.\n";
+    if( left.get_is_fac() == true ) std::cout<<"Warning: the matrix has been factroized.\n";
     std::array<double,N> out;
     for(unsigned int ii=0; ii<N; ++ii)
     {
@@ -540,7 +540,7 @@ namespace MATH_T
 
   template<unsigned int N> std::array<double,N> ArrayMult( const Matrix_Dense<N> &left, const std::array<double,static_cast<unsigned int>(N)> &right )
   {
-    if( left.get_is_face() == true ) std::cout<<"Warning: the matrix has been factroized.\n";
+    if( left.get_is_fac() == true ) std::cout<<"Warning: the matrix has been factroized.\n";
     std::array<double,N> out;
     for(unsigned int ii=0; ii<N; ++ii)
     {
