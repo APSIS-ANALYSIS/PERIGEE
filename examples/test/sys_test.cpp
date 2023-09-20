@@ -238,6 +238,7 @@ int main(int argc, char *argv[])
  
     mtest1_3x3.gen_rand();
 
+    //the pivot is also required to initialize
     MATH_T::Matrix_Dense<3> mtest1d_3x3 {};
 
     for(unsigned int ii=0; ii<9; ++ii)
