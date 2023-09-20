@@ -53,11 +53,8 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   un.normalize();
 
   // ======= Global-to-local rotation matrix =======
-  const double inv_len_er = 1.0 / dx_dr.norm2();
-  const Vector_3 e_r = inv_len_er * dx_dr;
-
-  const double inv_len_es = 1.0 / dx_ds.norm2();
-  const Vector_3 e_s = inv_len_es * dx_ds;
+  const Vector_3 e_r = 1.0 / dx_dr.norm2() * dx_dr;
+  const Vector_3 e_s = 1.0 / dx_ds.norm2() * dx_ds;
 
   // e_a = 0.5*(e_r + e_s) / || 0.5*(e_r + e_s) ||
   Vector_3 e_a = 0.5 * (e_r + e_s);
@@ -69,9 +66,8 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
 
   // e_l1 = sqrt(2)/2 * (e_a - e_b)
   // e_l2 = sqrt(2)/2 * (e_a + e_b)
-  const Vector_3 e_l1 = std::sqrt(2.0) * 0.5 * ( e_a - e_b );
-  
-  const Vector_3 e_l2 = std::sqrt(2.0) * 0.5 * ( e_a + e_b );
+  const Vector_3 e_l1 = 0.5 * std::sqrt(2.0) * ( e_a - e_b );
+  const Vector_3 e_l2 = 0.5 * std::sqrt(2.0) * ( e_a + e_b );
 
   // Q = transpose([ e_l1, e_l2, un ])
   Q = Tensor2_3D( e_l1, e_l2, un );
