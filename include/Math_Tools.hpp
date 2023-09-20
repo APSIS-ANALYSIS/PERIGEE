@@ -411,7 +411,7 @@ namespace MATH_T
           std::cout<<"Matrix is NOT factorized.\n";
       }
   
-      virtual void gen_rand()
+      void gen_rand()
       {
         srand(time(NULL));
 
