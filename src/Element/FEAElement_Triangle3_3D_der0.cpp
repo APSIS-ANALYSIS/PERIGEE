@@ -40,18 +40,17 @@ void FEAElement_Triangle3_3D_der0::buildBasis( const IQuadPts * const &quad,
     R[qua*3 + 2] = qua_s;
   }
 
-  const Vector_3 dx_dr(ctrl_x[0] * (-1.0) + ctrl_x[1],
-    ctrl_y[0] * (-1.0) + ctrl_y[1],
-    ctrl_z[0] * (-1.0) + ctrl_z[1]);
+  const Vector_3 dx_dr( - ctrl_x[0] + ctrl_x[1],
+    - ctrl_y[0] + ctrl_y[1],
+    - ctrl_z[0] + ctrl_z[1]);
 
-  const Vector_3 dx_ds(ctrl_x[0] * (-1.0) + ctrl_x[2],
-    ctrl_y[0] * (-1.0) + ctrl_y[2],
-    ctrl_z[0] * (-1.0) + ctrl_z[2]);
+  const Vector_3 dx_ds( - ctrl_x[0] + ctrl_x[2],
+    - ctrl_y[0] + ctrl_y[2],
+    - ctrl_z[0] + ctrl_z[2]);
 
   // vec(un) = vec(dx_dr) x vec(dx_ds)
   un = VEC3_T::cross_product( dx_dr, dx_ds );
 
-  
   // area = || vec(un) ||
   detJac = un.normalize();
 }

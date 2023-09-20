@@ -24,20 +24,21 @@
 
 int main(int argc, char *argv[])
 {
-  Vector_3 aa, bb;
+  Vector_3 p1, p2, p3, p4;
+  p1.gen_rand(-2.0, 3.3);
+  p2.gen_rand(-2.1, 6.3);
+  p3.gen_rand(-112.0, -23.3);
+  p4.gen_rand(-2.3, 7.3);
 
-  aa.gen_rand(-0.375, 9.239);
+  p1.print();
+  p2.print();
+  p3.print();
+  p4.print();
 
-  aa.print();
+  double cr;
+  const auto cc = MATH_T::get_tet_sphere_info(p1, p2, p3, p4, cr );
 
-  bb = VEC3_T::normalize(aa);
-
-  aa.normalize();
-  
-  bb -= aa;
-
-  bb.print();
-
+  std::cout<<cr - MATH_T::get_circumradius( std::array<Vector_3, 4> {{p1, p2, p3, p4}})<<'\n';
   return EXIT_SUCCESS;
 }
 

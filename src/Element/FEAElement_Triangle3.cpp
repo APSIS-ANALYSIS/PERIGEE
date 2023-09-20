@@ -41,26 +41,26 @@ void FEAElement_Triangle3::buildBasis( const IQuadPts * const &quad,
     R[qua * 3 + 2] = qua_s;
   }
 
-  Jac[0] = ctrl_x[0] * (-1.0) + ctrl_x[1]; // dx_dr
-  Jac[1] = ctrl_x[0] * (-1.0) + ctrl_x[2]; // dx_ds
+  Jac[0] = - ctrl_x[0] + ctrl_x[1]; // dx_dr
+  Jac[1] = - ctrl_x[0] + ctrl_x[2]; // dx_ds
 
-  Jac[2] = ctrl_y[0] * (-1.0) + ctrl_y[1]; // dy_dr
-  Jac[3] = ctrl_y[0] * (-1.0) + ctrl_y[2]; // dy_ds
+  Jac[2] = - ctrl_y[0] + ctrl_y[1]; // dy_dr
+  Jac[3] = - ctrl_y[0] + ctrl_y[2]; // dy_ds
 
   detJac = Jac[0] * Jac[3] - Jac[1] * Jac[2];
 
   double inv_detJac = 1.0 / detJac;
 
-  Jac[4] = Jac[3] * inv_detJac;        // dr_dx
-  Jac[5] = -1.0 * Jac[1] * inv_detJac; // dr_dy
-  Jac[6] = -1.0 * Jac[2] * inv_detJac; // ds_dx
-  Jac[7] = Jac[0] * inv_detJac;        // ds_dy
+  Jac[4] =   Jac[3] * inv_detJac;  // dr_dx
+  Jac[5] = - Jac[1] * inv_detJac;  // dr_dy
+  Jac[6] = - Jac[2] * inv_detJac;  // ds_dx
+  Jac[7] =   Jac[0] * inv_detJac;  // ds_dy
 
-  dR_dx[0] = (-1.0) * Jac[4] - Jac[6];
+  dR_dx[0] = - Jac[4] - Jac[6];
   dR_dx[1] = Jac[4];
   dR_dx[2] = Jac[6];
 
-  dR_dy[0] = (-1.0) * Jac[5] - Jac[7];
+  dR_dy[0] = - Jac[5] - Jac[7];
   dR_dy[1] = Jac[5];
   dR_dy[2] = Jac[7];
 }

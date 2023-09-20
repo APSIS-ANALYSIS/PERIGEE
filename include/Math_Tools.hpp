@@ -114,6 +114,23 @@ namespace MATH_T
   Vector_3 get_tet_sphere_info( const Vector_3 &pt0, const Vector_3 &pt1, 
       const Vector_3 &pt2, const Vector_3 &pt3, double &radius );
 
+  inline double get_circumradius( const std::array<Vector_3, 4> &pts )
+  {
+    Matrix_double_3by3_Array AA(
+        2.0 * (pts[1].x()-pts[0].x()), 2.0 * (pts[1].y()-pts[0].y()), 2.0 * (pts[1].z()-pts[0].z()),
+        2.0 * (pts[2].x()-pts[0].x()), 2.0 * (pts[2].y()-pts[0].y()), 2.0 * (pts[2].z()-pts[0].z()),
+        2.0 * (pts[3].x()-pts[0].x()), 2.0 * (pts[3].y()-pts[0].y()), 2.0 * (pts[3].z()-pts[0].z()) );
+
+    AA.LU_fac();
+
+    const double xyz2 = pts[0].dot_product( pts[0] );
+
+    const Vector_3 centre = AA.LU_solve( Vector_3( pts[1].dot_product(pts[1]) - xyz2,
+          pts[2].dot_product(pts[2]) - xyz2, pts[3].dot_product(pts[3]) - xyz2 ) );
+
+    return ( centre - pts[0] ).norm2();
+  }
+
   // ----------------------------------------------------------------
   // Statistical quantities
   // Mean value
