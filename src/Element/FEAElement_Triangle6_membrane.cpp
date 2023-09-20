@@ -10,6 +10,7 @@ FEAElement_Triangle6_membrane::FEAElement_Triangle6_membrane( const int &in_nqua
   Jac    = new double [8 * numQuapts];
   detJac = new double [numQuapts];
 
+  un.resize(numQuapts);
   Q.resize(numQuapts);
 }
 

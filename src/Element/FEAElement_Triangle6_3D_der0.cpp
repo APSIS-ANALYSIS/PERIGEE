@@ -5,6 +5,7 @@ FEAElement_Triangle6_3D_der0::FEAElement_Triangle6_3D_der0( const int &in_nqua )
 {
   R = new double [6*numQuapts];
   detJac = new double [numQuapts];
+  un.resize( numQuapts );
 }
 
 FEAElement_Triangle6_3D_der0::~FEAElement_Triangle6_3D_der0()
