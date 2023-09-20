@@ -15,7 +15,6 @@
 // ==================================================================
 #include "FEAElement.hpp"
 #include "ALocal_IEN.hpp"
-#include "AInt_Weight.hpp"
 
 class IPLocAssem
 {
@@ -108,25 +107,6 @@ class IPLocAssem
     // -------------------------------------------------------------- 
     virtual void Assem_Estimate() = 0;
 
-    // -------------------------------------------------------------- 
-    // ! Assembly element residual vector: Residual
-    // \para vec_a: input vector a -- displacement / current solution
-    // \para vec_b: input vector b -- velocity / next solution
-    // \para element: the element quadrature info
-    // \para eleCtrlPts: this element's control points
-    // \para wight: the corresponding quadrature weights    
-    // -------------------------------------------------------------- 
-    virtual void Assem_Residual(
-        double time, double dt,
-        const double * const &vec_a,
-        const double * const &vec_b,
-        const FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const AInt_Weight * const &weight )
-    {SYS_T::commPrint("Warning: this Assem_Residual(...) is not implemented. \n");}
-
     // \para element: the container for classical element routine. It only
     //                requires the x-y-z coordinates for the nodes and the 
     //                volumetric quadrature routine to generate the basis
@@ -183,24 +163,6 @@ class IPLocAssem
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Residual(...) is not implemented. \n");}
 
-
-    // ! Assembly element residual vector and tangent matrix
-    // \para vec_a: input vector a -- displacement / current solution
-    // \para vec_b: input vector b -- velocity / next solution
-    // \para element: the element quadrature info
-    // \para eleCtrlPts: this element's control points
-    // \para wight: the corresponding quadrature weights    
-    virtual void Assem_Tangent_Residual(
-        double time, double dt,
-        const double * const &vec_a,
-        const double * const &vec_b,
-        const FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const AInt_Weight * const &weight )
-    {SYS_T::commPrint("Warning: this Assem_Tangent_Residual(...) is not implemented. \n");}
-
     // \para element: the container for classical element routine. It only
     //                requires the x-y-z coordinates for the nodes and the 
     //                volumetric quadrature routine to generate the basis
@@ -245,15 +207,6 @@ class IPLocAssem
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Tangent_Residual(...) is not implemented. \n");}
-
-    // -------------------------------------------------------------------
-    // ! Assembly the mass matrix
-    // \para element: the element quadrature info
-    // \para wight: the corresponding quadrature weights    
-    virtual void Assem_Mass(
-        const FEAElement * const &element,
-        const AInt_Weight * const &weight )
-    {SYS_T::commPrint("Warning: this Assem_Mass(...) is not implemented. \n");}
 
     // \para element: the container for classical element routine. It only
     //                requires the x-y-z coordinates for the nodes and the 
