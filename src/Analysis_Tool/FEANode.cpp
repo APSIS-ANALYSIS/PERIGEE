@@ -48,6 +48,22 @@ void FEANode::get_ctrlPts_xyz(
   }
 }
 
+std::array<std::vector<double>, 3> FEANode::get_ctrlPts_xyz( 
+    const std::vector<int> &index ) const
+{
+  std::array<std::vector<double>, 3> out;
+  out[0].resize( index.size() );
+  out[1].resize( index.size() );
+  out[2].resize( index.size() );
+  for(unsigned int ii=0; ii<index.size(); ++ii)
+  {
+    out[0][ii] = ctrlPts_x[ index[ii] ];
+    out[1][ii] = ctrlPts_y[ index[ii] ];
+    out[2][ii] = ctrlPts_z[ index[ii] ];
+  }
+  return out;
+}
+
 void FEANode::get_ctrlPts_xyzw( 
     const int &num, const int * const &index,
     double * const &ctrl_x, double * const &ctrl_y, 
