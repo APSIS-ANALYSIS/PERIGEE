@@ -503,7 +503,7 @@ namespace MATH_T
         return x;
       }
 
-      std::array<double,N> operator*( const std::array<double,N> &right )
+      std::array<double,N> operator*( const std::array<double,N> &input )
       {
         if( is_fac == true ) std::cout<<"Warning: the matrix has been factroized.\n";
         std::array<double,N> out;
@@ -511,7 +511,7 @@ namespace MATH_T
         {
           out[ii] = 0.0;
           for(unsigned int jj=0; jj<N; ++jj)
-          out[ii] += mat[N*ii+jj] * right[jj];
+          out[ii] += mat[N*ii+jj] * input[jj];
         }
         return out;
       }
