@@ -515,7 +515,35 @@ namespace MATH_T
         }
         return out;
       }
+/*
+      void inverse()
+      {
+        if (N==3)
+        {
+          const double det = mat[0] * mat[4] * mat[8] + mat[1] * mat[5] * mat[6] 
+                           + mat[2] * mat[3] * mat[7] - mat[2] * mat[4] * mat[6] 
+                           - mat[0] * mat[5] * mat[7] - mat[1] * mat[3] * mat[8];
 
+          const double invdetA = 1.0 / det;
+
+          double temp[9];
+  
+          temp[0] = invdetA * (mat[4] * mat[8] - mat[5] * mat[7]);
+          temp[1] = invdetA * (mat[2] * mat[7] - mat[1] * mat[8]);
+          temp[2] = invdetA * (mat[1] * mat[5] - mat[2] * mat[4]);
+          temp[3] = invdetA * (mat[5] * mat[6] - mat[3] * mat[8]);
+          temp[4] = invdetA * (mat[0] * mat[8] - mat[2] * mat[6]);
+          temp[5] = invdetA * (mat[2] * mat[3] - mat[0] * mat[5]);
+          temp[6] = invdetA * (mat[3] * mat[7] - mat[4] * mat[6]);
+          temp[7] = invdetA * (mat[1] * mat[6] - mat[0] * mat[7]);
+          temp[8] = invdetA * (mat[0] * mat[4] - mat[1] * mat[3]);
+
+          for(int ii=0; ii<9; ++ii) mat[ii] = temp[ii];
+        }        
+        else
+          std::cout<<"Warning: Matrix inverse calculation is just for N=3!"<<std::endl;
+      }
+*/
     protected:
       double mat[N*N];
 
@@ -523,8 +551,7 @@ namespace MATH_T
 
       bool is_fac;
   };
-
-
+/*
   template<unsigned int N> std::array<double,N> operator*( const Matrix_Dense<N> &left, const std::vector<double> &right )
   {
     if( left.get_is_fac() == true ) std::cout<<"Warning: the matrix has been factroized.\n";
@@ -537,7 +564,7 @@ namespace MATH_T
     }
     return out;
   }
-
+*/
   template<unsigned int N> std::array<double,N> ArrayMult( const Matrix_Dense<N> &left, const std::array<double,static_cast<unsigned int>(N)> &right )
   {
     if( left.get_is_fac() == true ) std::cout<<"Warning: the matrix has been factroized.\n";
