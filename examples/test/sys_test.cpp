@@ -296,8 +296,8 @@ int main(int argc, char *argv[])
 */
     for(unsigned int ii=0; ii<3; ++ii)
     {
-      if(sol3.at(ii) - sol3d.at(ii) > 1.0e-10)
-        std::cout<<"diff between Matrix_double_3by3_Array and Matrix_Dense<3>:"<< sol3.at(ii) - sol3d.at(ii) << std::endl;
+      if(std::abs(sol3.at(ii) - sol3d.at(ii)) > 1.0e-10)
+        std::cout<<"nn="<< nn<<":diff between Matrix_double_3by3_Array and Matrix_Dense<3>:"<< sol3.at(ii) - sol3d.at(ii) << std::endl;
     }
   }
 
@@ -347,7 +347,6 @@ int main(int argc, char *argv[])
 
     mtest1_6x6.LU_fac();
     //mtest1_6x6.print();
-
     std::array<double, 6> sol6 = mtest1_6x6.LU_solve(b6);
 
     mytimer -> Stop();
@@ -376,8 +375,8 @@ int main(int argc, char *argv[])
 */
     for(unsigned int ii=0; ii<6; ++ii)
     {
-      if(sol6.at(ii) - sol6d.at(ii) > 1.0e-10)
-        std::cout<<"diff between Matrix_double_6by6_Array and Matrix_Dense<6>:"<< sol6.at(ii) - sol6d.at(ii) << std::endl;
+      if(std::abs(sol6.at(ii) - sol6d.at(ii)) > 1.0e-10)
+        std::cout<<"nn="<< nn<<":diff between Matrix_double_6by6_Array and Matrix_Dense<6>:"<< sol6.at(ii) - sol6d.at(ii) << std::endl;
     }
   }
 
@@ -457,8 +456,8 @@ int main(int argc, char *argv[])
 */
     for(unsigned int ii=0; ii<3; ++ii)
     {
-      if(sol3.at(ii) - sol3d.at(ii) > 1.0e-10)
-        std::cout<<"diff between Matrix_double_3by3_Array and Matrix_SymPos_Dense<3>:"<< sol3.at(ii) - sol3d.at(ii) << std::endl;
+      if(std::abs(sol3.at(ii) - sol3d.at(ii)) > 1.0e-10)
+        std::cout<<"nn="<< nn<<":diff between Matrix_double_3by3_Array and Matrix_SymPos_Dense<3>:"<< sol3.at(ii) - sol3d.at(ii) << std::endl;
     }
   }
 
@@ -540,8 +539,8 @@ int main(int argc, char *argv[])
 */
     for(unsigned int ii=0; ii<6; ++ii)
     {
-      if(sol6.at(ii) - sol6d.at(ii) > 1.0e-10)
-        std::cout<<"diff between Matrix_double_6by6_Array and Matrix_SymPos_Dense<6>:"<< sol6.at(ii) - sol6d.at(ii) << std::endl;
+      if(std::abs(sol6.at(ii) - sol6d.at(ii)) > 1.0e-10)
+        std::cout<<"nn="<< nn<<":diff between Matrix_double_6by6_Array and Matrix_SymPos_Dense<6>:"<< sol6.at(ii) - sol6d.at(ii) << std::endl;
     }
   }
 
