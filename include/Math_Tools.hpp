@@ -415,7 +415,7 @@ namespace MATH_T
       {
         srand(time(NULL));
 
-        for(unsigned int ii=0; ii<(N*N); ++ii)
+        for(unsigned int ii=0; ii<N*N; ++ii)
         {
           double value = rand() % 1000; 
 
@@ -537,8 +537,8 @@ namespace MATH_T
     }
     return out;
   }
-/*
-  template<unsigned int N> std::array<double,N> operator*( const Matrix_Dense<N> &left, const std::array<double,N> &right )
+
+  template<unsigned int N> std::array<double,N> ArrayMult( const Matrix_Dense<N> &left, const std::array<double,N> &right )
   {
     if( left.get_is_face() == true ) std::cout<<"Warning: the matrix has been factroized.\n";
     std::array<double,N> out;
@@ -550,7 +550,7 @@ namespace MATH_T
     }
     return out;
   }
-*/
+
   template<unsigned int N> Matrix_Dense<N> operator*( const Matrix_Dense<N> &left, const Matrix_Dense<N> &right )
   {
     Matrix_Dense<N> out{};
