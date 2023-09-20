@@ -5,7 +5,8 @@
 #include "QuadPts_debug.hpp"
 
 int main( int argc, char * argv[] )
-{  
+{ 
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
   double r = 0.237;
   double s = 0.15;
   IQuadPts * quad = new QuadPts_debug( 3, 1, {r, s, 1.0-r-s}, {1.0} );
@@ -14,9 +15,9 @@ int main( int argc, char * argv[] )
   //FEAElement * tri6_3d = new FEAElement_Triangle3_membrane( 1 );
   //FEAElement * tri6_3d = new FEAElement_Triangle6_3D_der0( 1 );
   FEAElement * tri6_3d = new FEAElement_Triangle6_membrane( 1 );
-
+  
   std::vector<double> tri6_x(6), tri6_y(6), tri6_z(6);
-  srand(5);
+  srand(12);
   for(int ii=0; ii<6; ++ii)
   {
     tri6_x[ii] = rand();
@@ -32,23 +33,27 @@ int main( int argc, char * argv[] )
   //std::vector<double> tri6_z {0.0, 0.0, -0.1, 0.3, 0.0, 0.0};
   
   tri6_3d -> buildBasis( quad, &tri6_x[0], &tri6_y[0], &tri6_z[0] );
+  std::cout << "==build basis==" << std::endl;
 
   std::vector<double> R = tri6_3d -> get_R(0);
-  std::cout.precision(16);
-  for(int ii=0; ii<R.size(); ++ii) std::cout << std::fixed << std::setprecision(16) << R[ii] << std::endl;
+  std::cout << "R:" << std::endl;
+  for(int ii=0; ii<VEC_T::get_size(R); ++ii) std::cout << std::fixed << std::setprecision(16) << R[ii] << std::endl;
 
   double area = 0.0;
   const Vector_3 sur_pt( tri6_x[0], tri6_y[0], tri6_z[0] );
   const Vector_3 int_pt( 1.0, 1.0, 1.0 );
   Vector_3 out_n = tri6_3d -> get_normal_out(0, sur_pt, int_pt, area);
   
+  std::cout << "out normal:" << std::endl;
   std::cout << std::fixed << std::setprecision(16) << out_n(0) << std::endl;
   std::cout << std::fixed << std::setprecision(16) << out_n(1) << std::endl;
   std::cout << std::fixed << std::setprecision(16) << out_n(2) << std::endl;
 
   Tensor2_3D Q = tri6_3d -> get_rotationMatrix(0);
+  std::cout << "Q:" << std::endl;
   Q.print();
 
   delete tri6_3d; delete quad;
+  PetscFinalize();
   return EXIT_SUCCESS;
 }
