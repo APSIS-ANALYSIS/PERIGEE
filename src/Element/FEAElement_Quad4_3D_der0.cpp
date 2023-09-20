@@ -59,28 +59,17 @@ void FEAElement_Quad4_3D_der0::buildBasis( const IQuadPts * const &quad,
     
     const double Rs[4] { qua_r - 1.0, -qua_r, qua_r, 1.0 - qua_r };
     
-    double dx_dr = 0.0, dx_ds = 0.0, dy_dr = 0.0, dy_ds = 0.0, dz_dr = 0.0, dz_ds = 0.0;
+    Vector_3 dx_dr( 0.0, 0.0, 0.0 );
+    Vector_3 dx_ds( 0.0, 0.0, 0.0 );
 
     for( int ii=0; ii<4; ++ii )
     {
-      dx_dr += ctrl_x[ii] * Rr[ii];
-      dx_ds += ctrl_x[ii] * Rs[ii];
-      
-      dy_dr += ctrl_y[ii] * Rr[ii];
-      dy_ds += ctrl_y[ii] * Rs[ii];
-      
-      dz_dr += ctrl_z[ii] * Rr[ii];
-      dz_ds += ctrl_z[ii] * Rs[ii];
+      dx_dr += Vector_3( ctrl_x[ii] * Rr[ii], ctrl_y[ii] * Rr[ii], ctrl_z[ii] * Rr[ii] );
+      dx_ds += Vector_3( ctrl_x[ii] * Rs[ii], ctrl_y[ii] * Rs[ii], ctrl_z[ii] * Rs[ii] );
     }
-    
-    Vector_3 vec1(dx_dr, dy_dr, dz_dr);
-    Vector_3 vec2(dx_ds, dy_ds, dz_ds);
-    Vector_3 un = cross_product(vec1, vec2);
-  
-    detJac[qua] = un.normalize();
-    unx[qua] = un.x();
-    uny[qua] = un.y();
-    unz[qua] = un.z();
+
+    un[qua] = VEC3_T::cross_product( dx_dr, dx_ds );
+    detJac[qua] = un[qua].normalize();
   }
 }
 
@@ -111,35 +100,21 @@ Vector_3 FEAElement_Quad4_3D_der0::get_2d_normal_out( const int &qua,
   return Vector_3( unx[qua], uny[qua], unz[qua] );
 }
 
-void FEAElement_Quad4_3D_der0::get_normal_out( const int &qua,
-    const double &sur_pt_x, const double &sur_pt_y, const double &sur_pt_z,
-    const double &intpt_x, const double &intpt_y, const double &intpt_z,
-    double &nx, double &ny, double &nz, double &len ) const
+Vector_3 FEAElement_Quad4_3D_der0::get_normal_out( const int &qua,
+    const Vector_3 &sur_pt, const Vector_3 &int_pt, double &len ) const
 {
   // Construct a vector starting from the interior point to the triangle
-  const double mx = sur_pt_x - intpt_x;
-  const double my = sur_pt_y - intpt_y;
-  const double mz = sur_pt_z - intpt_z;
+  const Vector_3 mm = sur_pt - int_pt;
 
   // Do inner product with the normal vector
-  const double mdotn = mx * unx[qua] + my * uny[qua] + mz * unz[qua];
+  const double mdotn = VEC3_T::dot_product( mm, un[qua] );
 
-  SYS_T::print_fatal_if( std::abs(mdotn) < 1.0e-10, "Warning: FEAElement_Triangle3_3D_der0::get_normal_out, the element might be ill-shaped.\n");
-
-  if(mdotn < 0)
-  {
-    nx = (-1.0) * unx[qua];
-    ny = (-1.0) * uny[qua];
-    nz = (-1.0) * unz[qua];
-  }
-  else
-  {
-    nx = unx[qua];
-    ny = uny[qua];
-    nz = unz[qua];
-  }
+  SYS_T::print_fatal_if( std::abs(mdotn) < 1.0e-10, "Warning: FEAElement_Quad4_3D_der0::get_normal_out, the element might be ill-shaped.\n");
 
   len = detJac[qua];
+
+  if(mdotn < 0) return (-1.0)*un[qua];
+  else return un[qua];
 }
 
 // EOF
