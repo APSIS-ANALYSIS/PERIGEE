@@ -15,8 +15,6 @@
 class Matrix_double_6by6_Array
 {
   public:
-    Matrix_double_6by6_Array(const double * const &in_array);
-    
     // This constructor is designed for the special structure when
     // solving for 2nd order derivatives.
     Matrix_double_6by6_Array(const double &a, const double &b,

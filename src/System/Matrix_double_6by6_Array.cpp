@@ -1,19 +1,5 @@
 #include "Matrix_double_6by6_Array.hpp"
 
-Matrix_double_6by6_Array::Matrix_double_6by6_Array(const double * const &in_array)
-{
-  int counter = 0;
-  for(int ii=0; ii<6; ++ii)
-  {
-    for(int jj=0; jj<6; ++jj)
-    {
-      Mat[ii][jj] = in_array[counter];
-      counter += 1;
-    }
-    p[ii] = ii;
-  }
-}
-
 Matrix_double_6by6_Array::Matrix_double_6by6_Array(const double &a, const double &b,
     const double &c, const double &d, const double &e, const double &f,
     const double &g, const double &h, const double &i)
