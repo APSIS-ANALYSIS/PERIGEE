@@ -64,6 +64,21 @@ namespace VEC_T
   }
 
   // --------------------------------------------------------------------------
+  // ! is_equal
+  // determine if two vector object are identical up to a tolerance.
+  // --------------------------------------------------------------------------
+  template<typename T> bool is_equal( const std::vector<T> &a, 
+      const std::vector<T> &b, const double &tol = 1.0e-12 )
+  {
+    if( a.size() != b.size() ) return false;
+    for(unsigned int ii=0; ii<a.size(); ++ii)
+    {
+      if( std::abs(a[ii]-b[ii]) >= tol ) return false;
+    }
+    return true;
+  }
+  
+  // --------------------------------------------------------------------------
   // ! shrink2fit  
   //   trim the capacity of vector.
   //   Ref. Item 17 in "Effective STL" by Scott Meyers

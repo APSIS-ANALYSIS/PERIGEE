@@ -9,13 +9,11 @@
 //                   mat[3], mat[4], mat[5]
 //                   mat[6], mat[7], mat[8]
 //
-// Note: This is adopted from a previous implementation 
-//                   Matrix_double_3by3_Array.hpp.
-// The difference is that we do not intend to implement the LU factorization in
-// this class; this means that we do not have the pivoting flag array and the 
-// inverse diagonal array in this class. If needed, one can implement a 
-// LU-factorization in this class with pivoting and LU factorized matrix as an
-// output.
+// Note: We do not intend to implement the LU factorization in this class; this
+// means that we do not have the pivoting flag array in this class. If one wants
+// to solve a small dense matrix problem efficiently, one should refer to the
+// matrix class implemented in Math_Tools.hpp. This class is used primarily for
+// material modeling.
 //
 // Author: Ju Liu
 // Date: June 21 2016

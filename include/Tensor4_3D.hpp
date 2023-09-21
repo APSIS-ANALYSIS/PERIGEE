@@ -2,6 +2,7 @@
 #define TENSOR4_3D_HPP
 // ============================================================================
 // Tensor4_3D.hpp
+//
 // This is a 4th-order tensor in 3D. There are 3^4 = 81 double entries in this 
 // object, which are stored in an array. The indices are arranged in the 
 // following way:
@@ -10,7 +11,8 @@
 // array as
 //           mat[3i + j] = A_{ij}.
 //
-// The design purpose is to handle the stiffness tensor in solid mechanics.
+// The design purpose is primarily to handle the stiffness tensor arising in 
+// solid mechanics.
 //
 // Author: Ju Liu
 // Date: July 3rd 2016

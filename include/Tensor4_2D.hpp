@@ -13,7 +13,7 @@
 // Author: Ju Liu
 // Date: Sept. 12 2016
 // ==================================================================
-#include "Matrix_2x2.hpp" 
+#include "Tensor2_2D.hpp" 
 
 class Tensor4_2D
 {
@@ -78,14 +78,14 @@ class Tensor4_2D
     // add an outer product with scaling factor:
     //            ten_ijkl += val * mleft_ij  * mright_kl
     // This is often used in the evaluation of the stiffness tensor.
-    void add_OutProduct( const double &val, const Matrix_2x2 &mleft,
-        const Matrix_2x2 &mright );
+    void add_OutProduct( const double &val, const Tensor2_2D &mleft,
+        const Tensor2_2D &mright );
 
     // add a symmetric product with scaling factor:
     //  ten_ijkl += val * [ 0.5 * (mleft_ik mright_jl + mleft_il mright_jk) ]
     // This is often used in the evaluation of the stiffness tensor
-    void add_SymmProduct( const double &val, const Matrix_2x2 &mleft,
-        const Matrix_2x2 &mright );
+    void add_SymmProduct( const double &val, const Tensor2_2D &mleft,
+        const Tensor2_2D &mright );
 
     // Matrix update for the tensor:
     //    ten[IJKL] = A[iI] (or A[jJ], A[kK], A[lL]) ten[IJKL]
@@ -93,27 +93,27 @@ class Tensor4_2D
     // This is mainly designed for the push-forward/pull-back operator for the
     // tensor. A is often the deformation gradient.
     // MatMult_1 : ten[iJKL] = A[iI] ten[IJKL]
-    void MatMult_1( const Matrix_2x2 &source );
+    void MatMult_1( const Tensor2_2D &source );
 
     // MatMult_2 : ten[IjKL] = A[jJ] ten[IJKL]
-    void MatMult_2( const Matrix_2x2 &source ); 
+    void MatMult_2( const Tensor2_2D &source ); 
 
     // MatMult_3 : ten[IJkL] = A[kK] ten[IJKL]
-    void MatMult_3( const Matrix_2x2 &source );
+    void MatMult_3( const Tensor2_2D &source );
 
     // MatMult_4 : ten[IJKl] = A[lL] ten[IJKL]
-    void MatMult_4( const Matrix_2x2 &source );
+    void MatMult_4( const Tensor2_2D &source );
 
     // Contraction with a 2nd-order tensor
     // Left contraction: A_ij ten_ijkl = B_kl
-    void LeftContraction( const Matrix_2x2 &source, Matrix_2x2 &out ) const;
+    void LeftContraction( const Tensor2_2D &source, Tensor2_2D &out ) const;
 
     // Right contraction: ten_ijkl A_kl = B_ij 
-    void RightContraction( const Matrix_2x2 &source, Matrix_2x2 &out ) const;
+    void RightContraction( const Tensor2_2D &source, Tensor2_2D &out ) const;
 
     // Left & Right contraction A_ij ten_ijkl B_kl
-    double LnRContraction( const Matrix_2x2 &Left, 
-        const Matrix_2x2 &Right ) const;
+    double LnRContraction( const Tensor2_2D &Left, 
+        const Tensor2_2D &Right ) const;
 
     // Tensor contraction in_ijkl ten_ijkl
     double Ten4Contraction( const Tensor4_2D &input ) const;

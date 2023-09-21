@@ -37,13 +37,23 @@ int main( int argc, char * argv[] )
   double t = 0.119;
   IQuadPts * quad4 = new QuadPts_debug( 4, 1, {r, s, t, 1.0-r-s-t}, {1.0} );
   
-  FEAElement * tet4 = new FEAElement_Tet4( 1 );
+  FEAElement * tet4  = new FEAElement_Tet4( 1 );
+  FEAElement * tet42 = new FEAElement_Tet4( 1 );
   
   std::vector<double> tet4_x { 0.0, 2.0, -0.90, 0.1 }; 
   std::vector<double> tet4_y { 0.0, 0.0, 0.3, 0.2 }; 
   std::vector<double> tet4_z { 0.0, 0.0, 2.0, 1.375 }; 
 
+  std::array<std::vector<double>,3> pp {{ tet4_x, tet4_y, tet4_z }};
+
   tet4 -> buildBasis( quad4, &tet4_x[0], &tet4_y[0], &tet4_z[0] );
+  tet42 -> buildBasis( quad4, pp );
+
+  auto aa = tet4 -> get_R(0);
+  auto bb = tet42 -> get_R(0);
+
+  if( VEC_T::is_equal(aa,bb, 1.0e-18) ) std::cout<<"equal \n";
+  else std::cout<<"not right! \n";
 
   auto jac = tet4 -> get_Jacobian(0);
   auto inv_jac = tet4 -> get_invJacobian(0);
