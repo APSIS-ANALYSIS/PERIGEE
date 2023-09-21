@@ -15,13 +15,19 @@
 int main(int argc, char *argv[])
 {
 
-  const unsigned int size = 9;
+  const unsigned int size = 3;
 
-  MATH_T::Matrix_Dense<size> mtest1 {};
+  std::array<double, 9> AR {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 2.0};
 
-  mtest1.gen_rand();
+  // std::array<double, 9> AR {0.01, 0.0102, 0.0101, 0.0098, 0.01, 0.01, 0.01001, 0.0101, 0.0099};
+
+  MATH_T::Matrix_Dense<size> mtest1 {AR};
+
+  // mtest1.gen_rand();
 
   mtest1.print_info();
+
+  std::cout << "det = " << mtest1.det() << std::endl;
 
   MATH_T::Matrix_Dense<size> mtest1_copy = mtest1;
 
