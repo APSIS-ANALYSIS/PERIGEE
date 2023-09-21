@@ -15,26 +15,14 @@
 int main(int argc, char *argv[])
 {
 
-<<<<<<< HEAD
   // ===== Initialization of PETSc =====
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
   const int size = 9;
-=======
-  const unsigned int size = 3;
->>>>>>> 2c8ed80bbb98b01eac5675d572a015b95376bf38
 
-  std::array<double, 9> AR {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 2.0};
+  MATH_T::Matrix_Dense<size> mtest1 {};
 
-<<<<<<< HEAD
   mtest1.gen_rand(-10, 10);
-=======
-  // std::array<double, 9> AR {0.01, 0.0102, 0.0101, 0.0098, 0.01, 0.01, 0.01001, 0.0101, 0.0099};
-
-  MATH_T::Matrix_Dense<size> mtest1 {AR};
-
-  // mtest1.gen_rand();
->>>>>>> 2c8ed80bbb98b01eac5675d572a015b95376bf38
 
   mtest1.print_info();
 
