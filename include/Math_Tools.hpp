@@ -488,9 +488,8 @@ namespace MATH_T
         copy.LU_fac();
         double result = 1.0;
         for(int ii{0}; ii < N; ++ii){
-          if (std::abs(copy(ii, ii)) < 1e-16){
+          if (std::abs(copy(ii, ii)) < 1e-16)
             return 0.0;
-          }
           else
             result *= copy(ii, ii);
         }
