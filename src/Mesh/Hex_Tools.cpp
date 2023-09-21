@@ -500,12 +500,12 @@ namespace HEX_T
 
   double Hex8::get_volume() const
   {
-    TET_T::Tet4 tet1(std::array<Vector_3, 4> {pts[0], pts[1], pts[3], pts[7]});
-    TET_T::Tet4 tet2(std::array<Vector_3, 4> {pts[0], pts[4], pts[1], pts[7]});
-    TET_T::Tet4 tet3(std::array<Vector_3, 4> {pts[1], pts[4], pts[5], pts[7]});
-    TET_T::Tet4 tet4(std::array<Vector_3, 4> {pts[1], pts[2], pts[3], pts[7]});
-    TET_T::Tet4 tet5(std::array<Vector_3, 4> {pts[1], pts[5], pts[6], pts[7]});
-    TET_T::Tet4 tet6(std::array<Vector_3, 4> {pts[1], pts[6], pts[2], pts[7]});
+    TET_T::Tet4 tet1(std::array<Vector_3, 4> {{pts[0], pts[1], pts[3], pts[7]}});
+    TET_T::Tet4 tet2(std::array<Vector_3, 4> {{pts[0], pts[4], pts[1], pts[7]}});
+    TET_T::Tet4 tet3(std::array<Vector_3, 4> {{pts[1], pts[4], pts[5], pts[7]}});
+    TET_T::Tet4 tet4(std::array<Vector_3, 4> {{pts[1], pts[2], pts[3], pts[7]}});
+    TET_T::Tet4 tet5(std::array<Vector_3, 4> {{pts[1], pts[5], pts[6], pts[7]}});
+    TET_T::Tet4 tet6(std::array<Vector_3, 4> {{pts[1], pts[6], pts[2], pts[7]}});
 
     return tet1.get_volume() + tet2.get_volume() + tet3.get_volume() + tet4.get_volume() + tet5.get_volume() + tet6.get_volume();
   }

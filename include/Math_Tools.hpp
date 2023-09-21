@@ -15,11 +15,11 @@ namespace MATH_T
   // --------------------------------------------------------------------------
   // Useful Constants:
   // --------------------------------------------------------------------------
-  // PI = 3.1415926
-  const double PI = atan(1.0) * 4.0;
+  // PI = 3.1415926......
+  constexpr double PI = 3.14159265358979323846264338327950288419716939937510582;
 
-  // E = 2.71828
-  const double E  = exp(1.0);
+  // E = 2.71828......
+  constexpr double E  = 2.71828182845904523536028747135266249775724709369995957;
 
   // Compute the binomial coefficient, e.g.
   // n = 0 : 1                  n = 1 : 1 1
@@ -69,21 +69,6 @@ namespace MATH_T
   inline bool equals( const double &a, const double &b, const double &tol=1.0e-12 )
   {
     return ( std::abs(a-b)<tol );
-  }
-
-  // --------------------------------------------------------------------------
-  // This function is used to determine if two vector object are identical
-  // up to a tolerance (default 1.0e-12).
-  // --------------------------------------------------------------------------
-  template<typename T> bool equals( const std::vector<T> &a, 
-      const std::vector<T> &b, const double &tol = 1.0e-12 )
-  {
-    if( a.size() != b.size() ) return false;
-    for(unsigned int ii=0; ii<a.size(); ++ii)
-    {
-      if( std::abs(a[ii]-b[ii]) >= tol ) return false;
-    }
-    return true;
   }
   
   // ----------------------------------------------------------------

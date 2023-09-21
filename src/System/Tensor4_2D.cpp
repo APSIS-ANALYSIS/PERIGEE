@@ -91,8 +91,8 @@ void Tensor4_2D::AXPY( const double &val, const Tensor4_2D &input )
   for(int ii=0; ii<16; ++ii) ten[ii] += val * input(ii);
 }
 
-void Tensor4_2D::add_OutProduct( const double &val, const Matrix_2x2 &mleft,
-            const Matrix_2x2 &mright )
+void Tensor4_2D::add_OutProduct( const double &val, const Tensor2_2D &mleft,
+            const Tensor2_2D &mright )
 {
   for(int ii=0; ii<2; ++ii)
   {
@@ -107,8 +107,8 @@ void Tensor4_2D::add_OutProduct( const double &val, const Matrix_2x2 &mleft,
   }
 }
 
-void Tensor4_2D::add_SymmProduct( const double &val, const Matrix_2x2 &mleft,
-    const Matrix_2x2 &mright )
+void Tensor4_2D::add_SymmProduct( const double &val, const Tensor2_2D &mleft,
+    const Tensor2_2D &mright )
 {
   for(int ii=0; ii<2; ++ii)
   {
@@ -126,7 +126,7 @@ void Tensor4_2D::add_SymmProduct( const double &val, const Matrix_2x2 &mleft,
   }
 }
 
-void Tensor4_2D::MatMult_1( const Matrix_2x2 &source )
+void Tensor4_2D::MatMult_1( const Tensor2_2D &source )
 {
   double temp[16];
   for(int m=0; m<8; ++m)
@@ -137,7 +137,7 @@ void Tensor4_2D::MatMult_1( const Matrix_2x2 &source )
   for(int m=0; m<16; ++m) ten[m] = temp[m];
 }
 
-void Tensor4_2D::MatMult_2( const Matrix_2x2 &source )
+void Tensor4_2D::MatMult_2( const Tensor2_2D &source )
 {
   double temp[16];
   // i = 0
@@ -155,7 +155,7 @@ void Tensor4_2D::MatMult_2( const Matrix_2x2 &source )
   for(int m=0; m<16; ++m) ten[m] = temp[m];
 }
 
-void Tensor4_2D::MatMult_3( const Matrix_2x2 &source )
+void Tensor4_2D::MatMult_3( const Tensor2_2D &source )
 {
   double temp[16];
   for(int m=0; m<=12; m=m+4)
@@ -168,7 +168,7 @@ void Tensor4_2D::MatMult_3( const Matrix_2x2 &source )
   for(int m=0; m<16; ++m) ten[m] = temp[m];
 }
 
-void Tensor4_2D::MatMult_4( const Matrix_2x2 &source )
+void Tensor4_2D::MatMult_4( const Tensor2_2D &source )
 {
   double temp[16];
   for(int m=0; m<=14; m=m+2)
@@ -179,7 +179,7 @@ void Tensor4_2D::MatMult_4( const Matrix_2x2 &source )
   for(int m=0; m<16; ++m) ten[m] = temp[m];
 }
 
-void Tensor4_2D::LeftContraction( const Matrix_2x2 &source, Matrix_2x2 &out ) const
+void Tensor4_2D::LeftContraction( const Tensor2_2D &source, Tensor2_2D &out ) const
 {
   out(0) = ten[0] * source(0) + ten[4] * source(1) + ten[8] * source(2) + ten[12] * source(3);
   out(1) = ten[1] * source(0) + ten[5] * source(1) + ten[9] * source(2) + ten[13] * source(3);
@@ -187,7 +187,7 @@ void Tensor4_2D::LeftContraction( const Matrix_2x2 &source, Matrix_2x2 &out ) co
   out(3) = ten[3] * source(0) + ten[7] * source(1) + ten[11] * source(2) + ten[15] * source(3);
 }
 
-void Tensor4_2D::RightContraction( const Matrix_2x2 &source, Matrix_2x2 &out ) const
+void Tensor4_2D::RightContraction( const Tensor2_2D &source, Tensor2_2D &out ) const
 {
   out(0) = ten[0] * source(0) + ten[1] * source(1) + ten[2] * source(2) + ten[3] * source(3);
   out(1) = ten[4] * source(0) + ten[5] * source(1) + ten[6] * source(2) + ten[7] * source(3);
@@ -195,8 +195,8 @@ void Tensor4_2D::RightContraction( const Matrix_2x2 &source, Matrix_2x2 &out ) c
   out(3) = ten[12] * source(0) + ten[13] * source(1) + ten[14] * source(2) + ten[15] * source(3);
 }
 
-double Tensor4_2D::LnRContraction( const Matrix_2x2 &Left,
-            const Matrix_2x2 &Right ) const
+double Tensor4_2D::LnRContraction( const Tensor2_2D &Left,
+            const Tensor2_2D &Right ) const
 {
   return Left(0) * (ten[0]*Right(0) + ten[1] * Right(1) + ten[2] * Right(2) + ten[3] * Right(3) ) + Left(1) * (ten[4]*Right(0) + ten[5] * Right(1) + ten[6] * Right(2) + ten[7] * Right(3) ) + Left(2) * (ten[8]*Right(0) + ten[9] * Right(1) + ten[10] * Right(2) + ten[11] * Right(3) ) + Left(3) * (ten[12]*Right(0) + ten[13] * Right(1) + ten[14] * Right(2) + ten[15] * Right(3));
 }
