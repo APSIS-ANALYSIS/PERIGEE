@@ -85,7 +85,7 @@ class FEAElement_Triangle3_membrane : public FEAElement
     // If the triangle nodes are NOT arranged in any particular order,
     // use an interior node to define the outward direction.
     virtual Vector_3 get_normal_out( const int &quaindex, const Vector_3 &sur_pt,
-	const Vector_3 &int_pt, double &area ) const;
+        const Vector_3 &int_pt, double &area ) const;
 
     virtual double get_detJac(const int &quaindex) const {return detJac;}
 

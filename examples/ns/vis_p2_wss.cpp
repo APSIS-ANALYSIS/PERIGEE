@@ -278,8 +278,8 @@ int main( int argc, char * argv[] )
       for(int ii=0; ii<nLocBas; ++ii)
       {
         double len;
-	const Vector_3 sur_pt( ectrl_x[ii], ectrl_y[ii], ectrl_z[ii] );
-	const Vector_3 int_pt( interior_node_coord[3*ee+0], interior_node_coord[3*ee+1], interior_node_coord[3*ee+2] );
+        const Vector_3 sur_pt( ectrl_x[ii], ectrl_y[ii], ectrl_z[ii] );
+        const Vector_3 int_pt( interior_node_coord[3*ee+0], interior_node_coord[3*ee+1], interior_node_coord[3*ee+2] );
 
         // id_range[ii] 's outward normal
         outnormal[ii] = element_tri -> get_normal_out( ii, sur_pt, int_pt, len );

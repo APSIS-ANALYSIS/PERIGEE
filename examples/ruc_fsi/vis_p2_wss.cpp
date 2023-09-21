@@ -280,8 +280,8 @@ int main( int argc, char * argv[] )
       // tetrahedral element's id_range[ii]-th basis
       for(int ii=0; ii<nLocBas; ++ii)
       {
-	double len;
-	const Vector_3 sur_pt( ectrl_x[ii], ectrl_y[ii], ectrl_z[ii] );
+        double len;
+        const Vector_3 sur_pt( ectrl_x[ii], ectrl_y[ii], ectrl_z[ii] );
         const Vector_3 int_pt( interior_node_coord[3*ee+0], interior_node_coord[3*ee+1], interior_node_coord[3*ee+2] );
 
         // id_range[ii] 's outward normal
