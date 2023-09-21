@@ -8,6 +8,7 @@
 // ============================================================================
 #include <stdio.h>
 #include <vector> 
+#include "Sys_Tools.hpp"
 #include "Matrix_double_3by3_Array.hpp"
 
 namespace MATH_T
@@ -79,7 +80,7 @@ namespace MATH_T
       const std::vector<T> &b, const double &tol = 1.0e-12 )
   {
     if( a.size() != b.size() ) return false;
-    for(unsigned int ii=0; ii<a.size(); ++ii)
+    for(int ii=0; ii<a.size(); ++ii)
     {
       if( std::abs(a[ii]-b[ii]) >= tol ) return false;
     }
@@ -156,8 +157,8 @@ namespace MATH_T
   inline double get_mean( const std::vector<double> &vec )
   {
     double sum = 0.0; double nn = 0.0;
-    const unsigned int len = vec.size();
-    for(unsigned int ii=0; ii<len; ++ii)
+    const int len = vec.size();
+    for(int ii=0; ii<len; ++ii)
     {
       sum += vec[ii];
       nn  += 1.0;
@@ -174,7 +175,7 @@ namespace MATH_T
   // Generate a Gaussian distribution vector with length n, mean value
   // mean, and standard deviation dev, using Marsaglia algorithm
   //
-  // Note: Call srand((unsigned int)time(NULL)) before calling this generator!
+  // Note: Call srand((int)time(NULL)) before calling this generator!
   // ----------------------------------------------------------------
   void gen_Gaussian( const int &n, const double &mean, const double &std,
       std::vector<double> &val );
@@ -363,13 +364,15 @@ namespace MATH_T
       bool is_fac;
   };
 
-  template<unsigned int N> class Matrix_Dense
+  template<int N> class Matrix_Dense
   {
     public:
       Matrix_Dense()
       {
-        for(unsigned int ii=0; ii < N*N; ++ii) mat[ii] = 0.0;
-        for(unsigned int ii=0; ii < N; ++ii)
+        ASSERT(N>=1, "Matrix_Dense<N> Error: The matrix size N must be positive.\n");      
+
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = 0.0;
+        for(int ii=0; ii<N; ++ii)
         {
           mat[ii*N + ii] = 1.0;
           p[ii] = ii;
@@ -379,8 +382,10 @@ namespace MATH_T
 
       Matrix_Dense( const std::array<double,N*N> &input )
       {
-        for(unsigned int ii=0; ii < N*N; ++ii) mat[ii] = input[ii];
-        for(unsigned int ii=0; ii < N; ++ii) p[ii] = ii;
+        ASSERT(N>=1, "Matrix_Dense<N> Error: The matrix size N must be positive.\n");      
+        
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = input[ii];
+        for(int ii=0; ii<N; ++ii) p[ii] = ii;
         is_fac = false;
       }
 
@@ -391,9 +396,9 @@ namespace MATH_T
         std::cout<<"N ="<<N<<'\n';
         std::cout<<"Matrix :\n";
         int counter = -1;
-        for(unsigned int ii=0; ii<N; ++ii)
+        for(int ii=0; ii<N; ++ii)
         {
-          for(unsigned int jj=0; jj<N; ++jj)
+          for(int jj=0; jj<N; ++jj)
           {
             counter += 1;
             std::cout<<mat[counter]<<'\t';
@@ -401,7 +406,7 @@ namespace MATH_T
           std::cout<<'\n';
         }
         std::cout<<"p : \n";
-        for(unsigned int ii=0; ii<N; ++ii)
+        for(int ii=0; ii<N; ++ii)
           std::cout<<p[ii]<<'\t';
         std::cout<<std::endl;
 
@@ -411,29 +416,46 @@ namespace MATH_T
           std::cout<<"Matrix is NOT factorized.\n";
       }
   
-      void gen_rand()
+      void gen_rand(const double &min = -1.0, const double &max = 1.0)
       {
-        srand(time(NULL));
+/*        srand(time(NULL));
 
-        for(unsigned int ii=0; ii<N*N; ++ii)
+        for(int ii=0; ii<N*N; ++ii)
         {
           double value = rand() % 1000; 
 
           mat[ii] = value * 1.0e-2 - 5;
         }
+*/
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = gen_double_rand(min, max);
 
-        for(unsigned int ii=0; ii<N; ++ii) p[ii] = ii;
+        for(int ii=0; ii<N; ++ii) p[ii] = ii;
       }
 
       int get_p(const int &ii) const { return p[ii];}
 
-      double& operator()(const unsigned int &index) {return mat[index];}
+      double& operator()(const int &index) {return mat[index];}
 
-      const double& operator()(const unsigned int &index) const {return mat[index];}
+      const double& operator()(const int &index) const {return mat[index];}
 
-      double& operator()(const unsigned int &ii, const unsigned int &jj) {return mat[N*ii+jj];}
+      double& operator()(const int &ii, const int &jj) {return mat[N*ii+jj];}
 
-      const double& operator()(const unsigned int &ii, const unsigned int &jj) const {return mat[N*ii+jj];}
+      const double& operator()(const int &ii, const int &jj) const {return mat[N*ii+jj];}
+
+      // Assignment operator
+      virtual Matrix_Dense<N>& operator= (const Matrix_Dense<N> &source)
+      {
+        // self-assignment guard
+        if(this == &source) return *this;
+
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = source(ii);
+
+        for(int ii=0; ii<N; ++ii) p[ii] = source.get_p(ii);
+
+        is_fac = source.get_is_fac();
+
+        return *this;             
+      }     
 
       int get_size() const {return static_cast<int>(N);}
 
@@ -441,12 +463,12 @@ namespace MATH_T
 
       void LU_fac()
       {
-        for(unsigned int kk=0; kk<N-1; ++kk)
+        for(int kk=0; kk<N-1; ++kk)
         {
           double max_value = std::abs(mat[kk*N+kk]);
           int max_index = kk;
           bool pivot_flag = false;
-          for(unsigned int ii=kk+1; ii<N; ++ii)
+          for(int ii=kk+1; ii<N; ++ii)
           {
             if( max_value < std::abs(mat[ii*N+kk]) )
             {
@@ -462,7 +484,7 @@ namespace MATH_T
             p[kk] = p[max_index];
             p[max_index] = int_temp;
 
-            for(unsigned int ii=0; ii<N; ++ii)
+            for(int ii=0; ii<N; ++ii)
             {
               const double temp = mat[kk*N+ii];
               mat[kk*N+ii] = mat[max_index*N+ii];
@@ -472,10 +494,10 @@ namespace MATH_T
 
           const double invAkk = 1.0 / mat[kk*N+kk];
 
-          for(unsigned int ii=kk+1; ii<N; ++ii)
+          for(int ii=kk+1; ii<N; ++ii)
           {
             mat[ii*N+kk] = mat[ii*N+kk] * invAkk;
-            for(unsigned int jj=kk+1; jj<N; ++jj)
+            for(int jj=kk+1; jj<N; ++jj)
               mat[ii*N+jj] -= mat[ii*N+kk] * mat[kk*N+jj];
           }
         }
@@ -486,13 +508,13 @@ namespace MATH_T
       std::array<double, N> LU_solve( std::array<double, N> &b ) const
       {
         std::array<double, N> x;
-        for(unsigned int ii=0; ii<N; ++ii) x[ii] = b[p[ii]];
+        for(int ii=0; ii<N; ++ii) x[ii] = b[p[ii]];
 
-        for(unsigned int ii=1; ii<N; ++ii)
-          for(unsigned int jj=0; jj<ii; ++jj)
+        for(int ii=1; ii<N; ++ii)
+          for(int jj=0; jj<ii; ++jj)
             x[ii] -= mat[ii*N+jj] * x[jj];
 
-        for(int ii=N-1; static_cast<int>(ii)>=0; --ii)
+        for(int ii=N-1; ii>=0; --ii)
         {
           for(int jj=N-1; jj>ii; --jj)
               x[ii] -= mat[ii*N+jj] * x[jj];
@@ -503,109 +525,53 @@ namespace MATH_T
         return x;
       }
 
-      std::array<double,N> operator*( const std::array<double,N> &input )
+      std::array<double,N> Mult( const std::array<double,N> &input )
       {
         if( is_fac == true ) std::cout<<"Warning: the matrix has been factroized.\n";
         std::array<double,N> out;
-        for(unsigned int ii=0; ii<N; ++ii)
+        for(int ii=0; ii<N; ++ii)
         {
           out[ii] = 0.0;
-          for(unsigned int jj=0; jj<N; ++jj)
+          for(int jj=0; jj<N; ++jj)
           out[ii] += mat[N*ii+jj] * input[jj];
         }
         return out;
       }
-/*
-      void inverse()
+
+      void Mult( const Matrix_Dense<N> &left, const Matrix_Dense<N> &right )
       {
-        if (N==3)
+        for(int ii=0; ii<N*N; ++ii)
+          mat[ii] = 0.0;
+
+        for(int ii=0; ii<N; ++ii)
         {
-          const double det = mat[0] * mat[4] * mat[8] + mat[1] * mat[5] * mat[6] 
-                           + mat[2] * mat[3] * mat[7] - mat[2] * mat[4] * mat[6] 
-                           - mat[0] * mat[5] * mat[7] - mat[1] * mat[3] * mat[8];
-
-          const double invdetA = 1.0 / det;
-
-          double temp[9];
-  
-          temp[0] = invdetA * (mat[4] * mat[8] - mat[5] * mat[7]);
-          temp[1] = invdetA * (mat[2] * mat[7] - mat[1] * mat[8]);
-          temp[2] = invdetA * (mat[1] * mat[5] - mat[2] * mat[4]);
-          temp[3] = invdetA * (mat[5] * mat[6] - mat[3] * mat[8]);
-          temp[4] = invdetA * (mat[0] * mat[8] - mat[2] * mat[6]);
-          temp[5] = invdetA * (mat[2] * mat[3] - mat[0] * mat[5]);
-          temp[6] = invdetA * (mat[3] * mat[7] - mat[4] * mat[6]);
-          temp[7] = invdetA * (mat[1] * mat[6] - mat[0] * mat[7]);
-          temp[8] = invdetA * (mat[0] * mat[4] - mat[1] * mat[3]);
-
-          for(int ii=0; ii<9; ++ii) mat[ii] = temp[ii];
-        }        
-        else
-          std::cout<<"Warning: Matrix inverse calculation is just for N=3!"<<std::endl;
+          for(int jj=0; jj<N; ++jj)
+          {
+            for(int kk=0; kk<N; ++kk)
+              mat[ii*N+jj] += left(ii, kk) * right(kk, jj);
+          }
+        }
       }
-*/
+
     protected:
       double mat[N*N];
 
-      unsigned int p[N];
+      int p[N];
 
       bool is_fac;
   };
-/*
-  template<unsigned int N> std::array<double,N> operator*( const Matrix_Dense<N> &left, const std::vector<double> &right )
-  {
-    if( left.get_is_fac() == true ) std::cout<<"Warning: the matrix has been factroized.\n";
-    std::array<double,N> out;
-    for(unsigned int ii=0; ii<N; ++ii)
-    {
-      out[ii] = 0.0;
-      for(unsigned int jj=0; jj<N; ++jj)
-        out[ii] += left(ii,jj) * right[jj];
-    }
-    return out;
-  }
-*/
-  template<unsigned int N> std::array<double,N> ArrayMult( const Matrix_Dense<N> &left, const std::array<double,static_cast<unsigned int>(N)> &right )
-  {
-    if( left.get_is_fac() == true ) std::cout<<"Warning: the matrix has been factroized.\n";
-    std::array<double,N> out;
-    for(unsigned int ii=0; ii<N; ++ii)
-    {
-      out[ii] = 0.0;
-      for(unsigned int jj=0; jj<N; ++jj)
-        out[ii] += left(ii,jj) * right[jj];
-    }
-    return out;
-  }
 
-  template<unsigned int N> Matrix_Dense<N> operator*( const Matrix_Dense<N> &left, const Matrix_Dense<N> &right )
-  {
-    Matrix_Dense<N> out{};
-
-    for(unsigned int ii=0; ii<N; ++ii)
-    {
-      out(ii, ii) = 0.0;
-
-      for(unsigned int jj=0; jj<N; ++jj)
-      {
-        for(unsigned int kk=0; kk<N; ++kk)
-          out(ii, jj) += left(ii,kk) * right(kk, jj);
-      }
-    }
-    return out;
-  }
-
-  template<unsigned int N> Matrix_Dense<N> transpose(Matrix_Dense<N> &input)
+  template<int N> Matrix_Dense<N> transpose(Matrix_Dense<N> &input)
   {
     Matrix_Dense<N> output {};
-    for(unsigned int ii=0; ii<N; ++ii)
+    for(int ii=0; ii<N; ++ii)
     {
-      for(unsigned int jj=0; jj<N; ++jj) output(jj, ii) = input(ii, jj);         
+      for(int jj=0; jj<N; ++jj) output(jj, ii) = input(ii, jj);         
     }
     return output;
   }
 
-  template<unsigned int N> class Matrix_SymPos_Dense : public Matrix_Dense <N>
+  template<int N> class Matrix_SymPos_Dense : public Matrix_Dense <N>
   {
     public:
       Matrix_SymPos_Dense() : Matrix_Dense<N>()
@@ -616,7 +582,18 @@ namespace MATH_T
 
       // We assume that the input matrix are the symmetry positive definite matrix 
       Matrix_SymPos_Dense( const Matrix_Dense<N> &input ) : Matrix_Dense<N>()
-      { for(unsigned int ii=0; ii < N*N; ++ii) Matrix_Dense <N>::mat[ii] = input(ii); }
+      { 
+        for(int ii=0; ii<N*N; ++ii) 
+          Matrix_Dense <N>::mat[ii] = input(ii);
+        
+        // Check the symmetry of the matrix
+        check_symm();
+
+        for(int ii=0; ii<N; ++ii) 
+          Matrix_Dense <N>::p[ii] = input.get_p(ii); 
+
+        Matrix_Dense <N>::is_fac = input.get_is_fac();
+      }
 
       virtual ~Matrix_SymPos_Dense() {};
 
@@ -624,55 +601,23 @@ namespace MATH_T
       // non-symmetriness is found.
       void check_symm() const
       {
-        for(unsigned int ii = 0; ii<N; ++ii)
+        for(int ii=0; ii<N; ++ii)
         {
-          for(unsigned int jj = 0; jj<ii; ++jj)
+          for(int jj=0; jj<ii; ++jj)
           {
             if( !MATH_T::equals( Matrix_Dense <N>::mat[ii*N+jj], Matrix_Dense <N>::mat[jj*N+ii], 1.0e-15) ) 
               std::cout<<"error: Matrix_SymPos entry ("<<ii<<","<<jj<<") does not match entry ("<<jj<<","<<ii<<"). \n";
           }
         }
       }
-    
-      // Copy the content of a matrix
-      // We assume that the input matrix and the object have the same
-      // size.
-/*
-      void copy( const Matrix_SymPos_Dense * const &in_mat )
+
+      // Assignment operator
+      Matrix_SymPos_Dense<N>& operator= (const Matrix_SymPos_Dense<N> &source)
       {
-        for(unsigned int ii=0; ii<N*N; ++ii) Matrix_Dense <N>::mat[ii] = in_mat->operator()(ii);
+        Matrix_Dense <N>::operator=(source);
+        return *this;             
+      }    
 
-        for(unsigned int ii=0; ii<N; ++ii)
-        {
-          Matrix_Dense <N>::p[ii] = in_mat->p[ii];
-        }
-        Matrix_Dense <N>::is_fac = false; 
-      }
-*/
- /*
-      virtual void gen_rand()
-      {
-        srand(time(NULL));
-
-        for(unsigned int ii=0; ii<(N*N); ++ii)
-        {
-          double value = rand() % 1000; 
-
-          Matrix_Dense <N>::mat[ii] = value * 1.0e-2 - 5;
-        }
-
-        for(unsigned int ii=0; ii<N; ++ii)
-        {
-          for(unsigned int jj=ii; jj<N; ++jj)
-            Matrix_Dense <N>::mat[ii*N+jj] = 0.5 * (Matrix_Dense <N>::mat[ii*N+jj] + Matrix_Dense <N>::mat[jj*N+ii]);
-
-          for (unsigned int jj=0; jj<=ii; ++jj)
-            Matrix_Dense <N>::mat[jj*N+ii] =  Matrix_Dense <N>::mat[ii*N+jj];
-        } 
-
-        for(unsigned int ii=0; ii<N; ++ii) Matrix_Dense <N>::p[ii] = ii;
-      }
-*/
       // ------------------------------------------------------------
       // Perform LDL^t transformation. The mat object will be replace
       // by the entries of the L matrix and the D matrix. Pivoting is
@@ -683,16 +628,16 @@ namespace MATH_T
         // This algorithm is given in Shufang XU's book, pp 31. 
         double v[N]; 
 
-        for(unsigned int jj=0; jj<N; ++jj)
+        for(int jj=0; jj<N; ++jj)
         {
           const int Njj = jj * N;
-          for(unsigned int kk=0; kk<jj; ++kk) v[kk] = Matrix_Dense <N>::mat[Njj+kk] * Matrix_Dense <N>::mat[kk*N+kk];
+          for(int kk=0; kk<jj; ++kk) v[kk] = Matrix_Dense <N>::mat[Njj+kk] * Matrix_Dense <N>::mat[kk*N+kk];
 
-          for(unsigned int kk=0; kk<jj; ++kk) Matrix_Dense <N>::mat[Njj+jj] -= v[kk] * Matrix_Dense <N>::mat[Njj+kk];
+          for(int kk=0; kk<jj; ++kk) Matrix_Dense <N>::mat[Njj+jj] -= v[kk] * Matrix_Dense <N>::mat[Njj+kk];
 
-          for(unsigned int ii=jj+1; ii<N; ++ii)
+          for(int ii=jj+1; ii<N; ++ii)
           {
-            for(unsigned int kk=0; kk<jj; ++kk) Matrix_Dense <N>::mat[N*ii+jj] -= Matrix_Dense <N>::mat[ii*N+kk] * v[kk];
+            for(int kk=0; kk<jj; ++kk) Matrix_Dense <N>::mat[N*ii+jj] -= Matrix_Dense <N>::mat[ii*N+kk] * v[kk];
 
             Matrix_Dense <N>::mat[N*ii+jj] *= 1.0 / Matrix_Dense <N>::mat[Njj+jj];
           }
@@ -709,19 +654,19 @@ namespace MATH_T
         std::array<double, N> x;
 
         // Solve for Ly = b
-        for(unsigned int  ii=0; ii<N; ++ii)
+        for(int ii=0; ii<N; ++ii)
         {
           x[ii] = b[ii];
-          for(unsigned int jj=0; jj<ii; ++jj) x[ii] -= Matrix_Dense <N>::mat[ii*N+jj] * x[jj];
+          for(int jj=0; jj<ii; ++jj) x[ii] -= Matrix_Dense <N>::mat[ii*N+jj] * x[jj];
         }
 
         // Solve for D z = y;
-        for(unsigned int  ii=0; ii<N; ++ii) x[ii] *= 1.0 / Matrix_Dense <N>::mat[ii*N+ii];
+        for(int ii=0; ii<N; ++ii) x[ii] *= 1.0 / Matrix_Dense <N>::mat[ii*N+ii];
 
         // Solve L^t x = z
-        for(int ii=N-2; static_cast<int>(ii)>=0; --ii)
+        for(int ii=N-2; ii>=0; --ii)
         {
-          for(unsigned int jj=ii+1; jj<N; ++jj) x[ii] -= Matrix_Dense <N>::mat[jj*N+ii] * x[jj];
+          for(int jj=ii+1; jj<N; ++jj) x[ii] -= Matrix_Dense <N>::mat[jj*N+ii] * x[jj];
         }
         
         return x;
