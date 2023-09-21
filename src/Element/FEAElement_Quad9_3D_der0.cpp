@@ -5,20 +5,13 @@ FEAElement_Quad9_3D_der0::FEAElement_Quad9_3D_der0( const int &in_nqua )
 : numQuapts( in_nqua )
 {
   R = new double [9*numQuapts];
-  
-  unx = new double [numQuapts];
-  uny = new double [numQuapts];
-  unz = new double [numQuapts];
-
   detJac = new double [numQuapts];
+  un.resize( numQuapts );
 }
 
 FEAElement_Quad9_3D_der0::~FEAElement_Quad9_3D_der0()
 {
   delete [] R;         R = nullptr;
-  delete [] unx;     unx = nullptr; 
-  delete [] uny;     uny = nullptr;
-  delete [] unz;     unz = nullptr;
   delete [] detJac; detJac = nullptr;
 }
 
