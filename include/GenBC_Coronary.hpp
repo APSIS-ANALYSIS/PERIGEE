@@ -133,8 +133,8 @@ class GenBC_Coronary : public IGenBC
     // PRIVATE FUNCTIONS:
     // Evaluate the coronary LPM (2 first order ODEs) for the ii-th outlet 
     // face (which is a coronary outlet) and output the ODE derivatives to K.
-    void F_coronary( const int &ii, const double * const &pi, const double &q, 
-        const double &dPimdt, double * const &K ) const;
+    void F_coronary( const int &ii, const std::vector<double> &pi, const double &q, 
+        const double &dPimdt, std::vector<double> &K ) const;
 
     // Evaluate the RCR ODE for the ii-th outlet face and return the result.
     double F_RCR( const int &ii, const double &pi, const double &q ) const;

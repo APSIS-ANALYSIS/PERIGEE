@@ -1,19 +1,16 @@
 #include "FEAElement_Triangle6_membrane.hpp"
 
 FEAElement_Triangle6_membrane::FEAElement_Triangle6_membrane( const int &in_nqua )
-: nLocBas( 6 ), numQuapts( in_nqua )
+: numQuapts( in_nqua )
 {
-  R     = new double [nLocBas * numQuapts];
-  dR_dx = new double [nLocBas * numQuapts];
-  dR_dy = new double [nLocBas * numQuapts];
+  R     = new double [6 * numQuapts];
+  dR_dx = new double [6 * numQuapts];
+  dR_dy = new double [6 * numQuapts];
   
-  unx = new double [numQuapts];
-  uny = new double [numQuapts];
-  unz = new double [numQuapts];
-
   Jac    = new double [8 * numQuapts];
   detJac = new double [numQuapts];
 
+  un.resize(numQuapts);
   Q.resize(numQuapts);
 }
 
@@ -23,10 +20,6 @@ FEAElement_Triangle6_membrane::~FEAElement_Triangle6_membrane()
   delete [] dR_dx; dR_dx = nullptr;
   delete [] dR_dy; dR_dy = nullptr;
 
-  delete [] unx; unx = nullptr; 
-  delete [] uny; uny = nullptr; 
-  delete [] unz; unz = nullptr;
-
   delete []    Jac;    Jac = nullptr;
   delete [] detJac; detJac = nullptr;
 }
@@ -35,7 +28,7 @@ void FEAElement_Triangle6_membrane::print_info() const
 {
   SYS_T::commPrint("Triangle6_membrane: ");
   SYS_T::commPrint("6-node triangle element in the local lamina coordinate system. \n ");
-  PetscPrintf(PETSC_COMM_WORLD, "elemType: %d. \n", get_Type());
+  SYS_T::commPrint("elemType: %d. \n", get_Type());
   SYS_T::commPrint("Note: This element is designed for the coupled momentum method. \n ");
 }
 
@@ -52,12 +45,6 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
 {
   ASSERT(quad->get_dim() == 3, "FEAElement_Triangle6_membrane::buildBasis function error.\n" );
 
-  double Rr [nLocBas], Rs [nLocBas];
-
-  double dx_dr [numQuapts], dx_ds [numQuapts];
-  double dy_dr [numQuapts], dy_ds [numQuapts];
-  double dz_dr [numQuapts], dz_ds [numQuapts];
-
   for( int qua = 0; qua < numQuapts; ++qua )
   {
     const double qua_r = quad -> get_qp( qua, 0 );
@@ -73,84 +60,58 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
     R[offset + 4] = 4.0 * qua_r * qua_s;
     R[offset + 5] = 4.0 * qua_s * qua_t;
  
-    Rr[0] = 4.0 * qua_r + 4.0 * qua_s - 3.0;
-    Rr[1] = 4.0 * qua_r - 1.0;
-    Rr[2] = 0.0;
-    Rr[3] = 4.0 - 8.0 * qua_r - 4.0 * qua_s;
-    Rr[4] = 4.0 * qua_s;
-    Rr[5] = -4.0 * qua_s;
+    const double Rr[6] = { 4.0 * qua_r + 4.0 * qua_s - 3.0,
+      4.0 * qua_r - 1.0,
+      0.0,
+      4.0 - 8.0 * qua_r - 4.0 * qua_s,
+      4.0 * qua_s,
+      -4.0 * qua_s };
     
-    Rs[0] = 4.0 * qua_r + 4.0 * qua_s - 3.0;
-    Rs[1] = 0.0;
-    Rs[2] = 4.0 * qua_s - 1.0;
-    Rs[3] = -4.0 * qua_r;
-    Rs[4] = 4.0 * qua_r;
-    Rs[5] = 4.0 - 4.0 * qua_r - 8.0 * qua_s;
+    const double Rs[6] = { 4.0 * qua_r + 4.0 * qua_s - 3.0,
+      0.0,
+      4.0 * qua_s - 1.0,
+      -4.0 * qua_r,
+      4.0 * qua_r,
+      4.0 - 4.0 * qua_r - 8.0 * qua_s };
     
-    dx_dr[qua] = 0.0; dx_ds[qua] = 0.0;
-    dy_dr[qua] = 0.0; dy_ds[qua] = 0.0;
-    dz_dr[qua] = 0.0; dz_ds[qua] = 0.0;
+    Vector_3 dx_dr( 0.0, 0.0, 0.0 );
+    Vector_3 dx_ds( 0.0, 0.0, 0.0 );
 
-    for( int ii=0; ii<nLocBas; ++ii )
+    for( int ii=0; ii<6; ++ii )
     {
-      dx_dr[qua] += ctrl_x[ii] * Rr[ii];
-      dx_ds[qua] += ctrl_x[ii] * Rs[ii];
-      
-      dy_dr[qua] += ctrl_y[ii] * Rr[ii];
-      dy_ds[qua] += ctrl_y[ii] * Rs[ii];
-      
-      dz_dr[qua] += ctrl_z[ii] * Rr[ii];
-      dz_ds[qua] += ctrl_z[ii] * Rs[ii];
+      dx_dr += Vector_3( ctrl_x[ii] * Rr[ii], ctrl_y[ii] * Rr[ii], ctrl_z[ii] * Rr[ii] );
+      dx_ds += Vector_3( ctrl_x[ii] * Rs[ii], ctrl_y[ii] * Rs[ii], ctrl_z[ii] * Rs[ii] );
     }
 
     // vec(un) = vec(dx_dr) x vec(dx_ds)
-    MATH_T::cross3d( dx_dr[qua], dy_dr[qua], dz_dr[qua], 
-        dx_ds[qua], dy_ds[qua], dz_ds[qua],
-        unx[qua],   uny[qua],   unz[qua] );
-
-    MATH_T::normalize3d( unx[qua], uny[qua], unz[qua] );
+    un[qua] = VEC3_T::cross_product( dx_dr, dx_ds );
+    un[qua].normalize();
 
     // ======= Global-to-local rotation matrix =======
-    const double inv_len_er = 1.0 / MATH_T::norm2( dx_dr[qua], dy_dr[qua], dz_dr[qua] );
-    const double e_r[3] { dx_dr[qua] * inv_len_er, dy_dr[qua] * inv_len_er,
-      dz_dr[qua] * inv_len_er };
-
-    const double inv_len_es = 1.0 / MATH_T::norm2( dx_ds[qua], dy_ds[qua], dz_ds[qua] );
-    const double e_s[3] { dx_ds[qua] * inv_len_es, dy_ds[qua] * inv_len_es,
-      dz_ds[qua] * inv_len_es };
+    const Vector_3 e_r = 1.0 / dx_dr.norm2() * dx_dr;
+    const Vector_3 e_s = 1.0 / dx_ds.norm2() * dx_ds;
 
     // e_a = 0.5*(e_r + e_s) / || 0.5*(e_r + e_s) ||
-    double e_a[3] = { 0.5 * ( e_r[0] + e_s[0] ), 
-      0.5 * ( e_r[1] + e_s[1] ), 0.5 * ( e_r[2] + e_s[2] ) };
-
-    MATH_T::normalize3d( e_a[0], e_a[1], e_a[2] );
+    Vector_3 e_a = 0.5 * ( e_r + e_s );
+    e_a.normalize();
 
     // e_b = vec(un) x e_a / || vec(un) x e_a ||
-    double e_b[3] = {0.0};
-    MATH_T::cross3d(unx[qua], uny[qua], unz[qua], e_a[0], e_a[1], e_a[2],
-      e_b[0], e_b[1], e_b[2]);
-
-    MATH_T::normalize3d( e_b[0], e_b[1], e_b[2] );
+    Vector_3 e_b = VEC3_T::cross_product( un[qua], e_a );
+    e_b.normalize();
 
     // e_l1 = sqrt(2)/2 * (e_a - e_b)
     // e_l2 = sqrt(2)/2 * (e_a + e_b)
-    const double e_l1[3] { std::sqrt(2.0) * 0.5 * ( e_a[0] - e_b[0] ),
-                           std::sqrt(2.0) * 0.5 * ( e_a[1] - e_b[1] ),
-                           std::sqrt(2.0) * 0.5 * ( e_a[2] - e_b[2] ) };
-
-    const double e_l2[3] { std::sqrt(2.0) * 0.5 * ( e_a[0] + e_b[0] ),
-                           std::sqrt(2.0) * 0.5 * ( e_a[1] + e_b[1] ),
-                           std::sqrt(2.0) * 0.5 * ( e_a[2] + e_b[2] ) };
+    const Vector_3 e_l1 = 0.5 * std::sqrt(2.0) * ( e_a - e_b );
+    const Vector_3 e_l2 = 0.5 * std::sqrt(2.0) * ( e_a + e_b );
 
     // Q = transpose([ e_l1, e_l2, un ])
-    Q[qua] = Tensor2_3D( e_l1[0],  e_l1[1],  e_l1[2],
-                         e_l2[0],  e_l2[1],  e_l2[2],
-                        unx[qua], uny[qua], unz[qua] );
+    Q[qua] = Tensor2_3D( e_l1, e_l2, un[qua] );
+    Q[qua].transpose();
 
     // Rotated lamina coordinates
-    double ctrl_xl [nLocBas], ctrl_yl [nLocBas];
+    double ctrl_xl [6], ctrl_yl [6];
 
-    for(int ii = 0; ii < nLocBas; ++ii)
+    for(int ii = 0; ii < 6; ++ii)
     {
       double temp_val;
       Q[qua].VecMult( ctrl_x[ii], ctrl_y[ii], ctrl_z[ii], ctrl_xl[ii], ctrl_yl[ii], temp_val );
@@ -158,7 +119,7 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
 
     // Rotated lamina 2D Jacobian & inverse Jacobian components
     double dxl_dr = 0.0, dxl_ds = 0.0, dyl_dr = 0.0, dyl_ds = 0.0;
-    for( int ii = 0; ii < nLocBas; ++ii )
+    for( int ii = 0; ii < 6; ++ii )
     {
       dxl_dr += ctrl_xl[ii] * Rr[ii];
       dxl_ds += ctrl_xl[ii] * Rs[ii];
@@ -186,7 +147,7 @@ void FEAElement_Triangle6_membrane::buildBasis( const IQuadPts * const &quad,
     Jac[4*numQuapts + 4*qua + 2] = ds_dxl;
     Jac[4*numQuapts + 4*qua + 3] = ds_dyl;
 
-    for(int ii=0; ii<nLocBas; ++ii)
+    for(int ii=0; ii<6; ++ii)
     {
       dR_dx[offset+ii] = Rr[ii] * dr_dxl + Rs[ii] * ds_dxl;
       dR_dy[offset+ii] = Rr[ii] * dr_dyl + Rs[ii] * ds_dyl;
@@ -199,7 +160,7 @@ void FEAElement_Triangle6_membrane::get_R(
     const int &quaindex, double * const &basis ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle6_membrane::get_R function error.\n" );
-  const int offset = quaindex * nLocBas;
+  const int offset = quaindex * 6;
   basis[0] = R[offset];
   basis[1] = R[offset + 1];
   basis[2] = R[offset + 2];
@@ -212,7 +173,7 @@ std::vector<double> FEAElement_Triangle6_membrane::get_R(
     const int &quaindex ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle6_membrane::get_R function error.\n" );
-  const int offset = quaindex * nLocBas;
+  const int offset = quaindex * 6;
   return { R[offset], R[offset + 1], R[offset + 2],
    R[offset + 3], R[offset + 4], R[offset + 5] };
 }
@@ -221,8 +182,8 @@ void FEAElement_Triangle6_membrane::get_gradR( const int &quaindex,
     double * const &basis_x, double * const &basis_y ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle6_membrane::get_gradR function error.\n" );
-  const int offset = quaindex * nLocBas;
-  for( int ii=0; ii<nLocBas; ++ii )
+  const int offset = quaindex * 6;
+  for( int ii=0; ii<6; ++ii )
   {
     basis_x[ii] = dR_dx[offset + ii];
     basis_y[ii] = dR_dy[offset + ii];
@@ -233,8 +194,8 @@ void FEAElement_Triangle6_membrane::get_R_gradR( const int &quaindex,
     double * const &basis, double * const &basis_x, double * const &basis_y ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle6_membrane::get_R_gradR function error.\n" );
-  const int offset = quaindex * nLocBas;
-  for( int ii=0; ii<nLocBas; ++ii )
+  const int offset = quaindex * 6;
+  for( int ii=0; ii<6; ++ii )
   {
     basis[ii]   = R[offset + ii];
     basis_x[ii] = dR_dx[offset + ii];
@@ -245,7 +206,7 @@ void FEAElement_Triangle6_membrane::get_R_gradR( const int &quaindex,
 std::vector<double> FEAElement_Triangle6_membrane::get_dR_dx( const int &quaindex ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle6_membrane::get_dR_dx function error.\n" );
-  const int offset = quaindex * nLocBas;
+  const int offset = quaindex * 6;
   return { dR_dx[offset], dR_dx[offset+1], dR_dx[offset+2],
     dR_dx[offset+3], dR_dx[offset+4], dR_dx[offset+5] }; 
 }
@@ -253,7 +214,7 @@ std::vector<double> FEAElement_Triangle6_membrane::get_dR_dx( const int &quainde
 std::vector<double> FEAElement_Triangle6_membrane::get_dR_dy( const int &quaindex ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle6_membrane::get_dR_dy function error.\n" );
-  const int offset = quaindex * nLocBas;
+  const int offset = quaindex * 6;
   return { dR_dy[offset], dR_dy[offset+1], dR_dy[offset+2],
     dR_dy[offset+3], dR_dy[offset+4], dR_dy[offset+5] }; 
 }
@@ -262,7 +223,7 @@ Vector_3 FEAElement_Triangle6_membrane::get_2d_normal_out( const int &qua,
     double &area ) const
 {
   area = detJac[qua];
-  return Vector_3( unx[qua], uny[qua], unz[qua] );
+  return un[qua];
 }
 
 Tensor2_3D FEAElement_Triangle6_membrane::get_rotationMatrix( const int &quaindex ) const
@@ -271,35 +232,21 @@ Tensor2_3D FEAElement_Triangle6_membrane::get_rotationMatrix( const int &quainde
   return Q[quaindex];
 }
 
-void FEAElement_Triangle6_membrane::get_normal_out( const int &qua,
-    const double &sur_pt_x, const double &sur_pt_y, const double &sur_pt_z,
-    const double &intpt_x, const double &intpt_y, const double &intpt_z,
-    double &nx, double &ny, double &nz, double &len ) const
+Vector_3 FEAElement_Triangle6_membrane::get_normal_out( const int &qua,
+    const Vector_3 &sur_pt, const Vector_3 &int_pt, double &len ) const
 {
   // Construct a vector starting from the interior point to the triangle
-  const double mx = sur_pt_x - intpt_x;
-  const double my = sur_pt_y - intpt_y;
-  const double mz = sur_pt_z - intpt_z;
+  const Vector_3 mm = sur_pt - int_pt;
 
   // Do inner product with the normal vector
-  const double mdotn = mx * unx[qua] + my * uny[qua] + mz * unz[qua];
+  const double mdotn = VEC3_T::dot_product( mm, un[qua] );
 
   SYS_T::print_fatal_if( std::abs(mdotn) < 1.0e-10, "Warning: FEAElement_Triangle3_membrane::get_normal_out, the element might be ill-shaped.\n");
 
-  if(mdotn < 0)
-  {
-    nx = (-1.0) * unx[qua];
-    ny = (-1.0) * uny[qua];
-    nz = (-1.0) * unz[qua];
-  }
-  else
-  {
-    nx = unx[qua];
-    ny = uny[qua];
-    nz = unz[qua];
-  }
-
   len = detJac[qua];
+
+  if(mdotn < 0) return (-1.0) * un[qua];
+  else return un[qua];
 }
 
 // EOF

@@ -70,42 +70,7 @@ namespace MATH_T
   {
     return ( std::abs(a-b)<tol );
   }
-
-  // --------------------------------------------------------------------------
-  // Cross product of two 3D vectors
-  // Input: u = (u1, u2, u3)
-  //        v = (v1, v2, v3)
-  // Output: uxv = (u2v3 - u3v2)i + (u3v1 - u1v3)j + (u1v2 - u2v1)k
-  // --------------------------------------------------------------------------
-  inline void cross3d(const double &u1, const double &u2, const double &u3,
-      const double &v1, const double &v2, const double &v3,
-      double &w1, double &w2, double &w3 )
-  {
-    w1 = u2 * v3 - u3 * v2;
-    w2 = u3 * v1 - u1 * v3;
-    w3 = u1 * v2 - u2 * v1;
-  }
-
-  // --------------------------------------------------------------------------
-  // Normalize 3D vector
-  // Input: x, y, z
-  // Output: x/len, y/len, z/len, len = sqrt(x^2+y^2+z^2)
-  // --------------------------------------------------------------------------
-  inline double normalize3d( double &x, double &y, double &z )
-  {
-    const double len = std::sqrt(x*x + y*y + z*z);
-    x = x / len;
-    y = y / len;
-    z = z / len;
-
-    return len;
-  }
-
-  inline double norm2(const double &x, const double &y, const double &z)
-  {
-    return std::sqrt(x*x + y*y + z*z);
-  }
-
+  
   // ----------------------------------------------------------------
   // Generate outward normal vector from a tangential vector.
   // t : the tangential vector
@@ -133,6 +98,23 @@ namespace MATH_T
 
   Vector_3 get_tet_sphere_info( const Vector_3 &pt0, const Vector_3 &pt1, 
       const Vector_3 &pt2, const Vector_3 &pt3, double &radius );
+
+  inline double get_circumradius( const std::array<Vector_3, 4> &pts )
+  {
+    Matrix_double_3by3_Array AA(
+        2.0 * (pts[1].x()-pts[0].x()), 2.0 * (pts[1].y()-pts[0].y()), 2.0 * (pts[1].z()-pts[0].z()),
+        2.0 * (pts[2].x()-pts[0].x()), 2.0 * (pts[2].y()-pts[0].y()), 2.0 * (pts[2].z()-pts[0].z()),
+        2.0 * (pts[3].x()-pts[0].x()), 2.0 * (pts[3].y()-pts[0].y()), 2.0 * (pts[3].z()-pts[0].z()) );
+
+    AA.LU_fac();
+
+    const double xyz2 = pts[0].dot_product( pts[0] );
+
+    const Vector_3 centre = AA.LU_solve( Vector_3( pts[1].dot_product(pts[1]) - xyz2,
+          pts[2].dot_product(pts[2]) - xyz2, pts[3].dot_product(pts[3]) - xyz2 ) );
+
+    return ( centre - pts[0] ).norm2();
+  }
 
   // ----------------------------------------------------------------
   // Statistical quantities

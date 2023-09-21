@@ -25,30 +25,6 @@
 
 int main(int argc, char *argv[])
 {
-  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-
-  std::string part_file("part");
-  int rank = 1;
-  FEANode * fNode = new FEANode(part_file, rank);
-
-  std::vector<int> id { 13, 12, 153, 82, 21, 19, 245 };
-
-  std::vector<double> px(7), py(7), pz(7);
-
-  fNode -> get_ctrlPts_xyz( 7, &id[0], &px[0], &py[0], &pz[0] );
-  auto val = fNode -> get_ctrlPts_xyz( id );
-
-  if( VEC_T::is_equal( val[0], px, 1.0e-27 ) ) std::cout<<"good x!\n";
-  else std::cout<<"bad x \n";
-
-  if( VEC_T::is_equal( val[1], py, 1.0e-27 ) ) std::cout<<"good y!\n";
-  else std::cout<<"bad y \n";
-
-  if( VEC_T::is_equal( val[2], pz, 1.0e-27 ) ) std::cout<<"good z!\n";
-  else std::cout<<"bad z \n";
-
-  PetscFinalize();
-
   return EXIT_SUCCESS;
 }
 

@@ -11,7 +11,6 @@
 // Author: Ju Liu
 // Date created: Nov. 6 2013
 // ============================================================================
-#include <array>
 #include "IQuadPts.hpp"
 #include "FEANode.hpp"
 
@@ -264,6 +263,13 @@ class FEAElement
         double &nx, double &ny, double &nz, double &length ) const
     {SYS_T::commPrint("Warning: get_normal_out is not implemented. \n");}
 
+    virtual Vector_3 get_normal_out( const int &quaindex,
+        const Vector_3 &sur_pt, const Vector_3 &int_pt, 
+        double &length ) const
+    {
+      SYS_T::commPrint("Warning: get_normal_out is not implemented. \n");
+      return Vector_3();
+    }
 };
 
 #endif
