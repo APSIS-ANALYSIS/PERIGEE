@@ -505,6 +505,19 @@ namespace MATH_T
         is_fac = true;
       }
 
+      const double det() const{
+        Matrix_Dense copy = *this;
+        copy.LU_fac();
+        double result = 1.0;
+        for(int ii{0}; ii < N; ++ii){
+          if (std::abs(copy(ii, ii)) < 1e-16)
+            return 0.0;
+          else
+            result *= copy(ii, ii);
+        }
+        return result;
+      }
+
       std::array<double, N> LU_solve( std::array<double, N> &b ) const
       {
         std::array<double, N> x;
