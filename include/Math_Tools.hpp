@@ -611,7 +611,7 @@ namespace MATH_T
       Matrix_SymPos_Dense() : Matrix_Dense<N>()
       {}
 
-      Matrix_SymPos_Dense(const std::array<double,N*N> &input) : Matrix_Dense<N>(&input)
+      Matrix_SymPos_Dense(const std::array<double,N*N> &input) : Matrix_Dense<N>(input)
       {}
 
       // We assume that the input matrix are the symmetry positive definite matrix 

@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
   }
 
   MATH_T::Matrix_Dense<size> array_mtest1 {array_test1};
-  MATH_T::Matrix_Dense<size> array_symtest1 {array_test1};
+  MATH_T::Matrix_SymPos_Dense<size> array_symtest1 {array_test1};
 
   //array_mtest1.print_info();
   //array_symtest1.print_info();
