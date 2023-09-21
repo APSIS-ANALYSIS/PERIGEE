@@ -54,7 +54,7 @@ INCLUDE_DIRECTORIES( ../../include )
 # MAKE MY OWN LIBRARIES
 # 1. Preprocess libs
 ADD_LIBRARY( perigee-mesh ${perigee_lib_src} )
-TARGET_LINK_LIBRARIES( perigee-mesh ${EXTRA_LINK_LIBS} )
+TARGET_LINK_LIBRARIES( perigee-mesh ${EXTRA_LINK_LIBS} OpenMP::OpenMP_CXX)
 # -------------------------------------------------------------------
 
 # Print compiler setup
@@ -69,6 +69,6 @@ ADD_EXECUTABLE( gmsh2vtk gmsh2vtk.cpp)
 
 # -------------------------------------------------------------------
 # 2. Link libraries
-TARGET_LINK_LIBRARIES( gmsh2vtk ${EXTRA_LINK_LIBS} perigee-mesh )
+TARGET_LINK_LIBRARIES( gmsh2vtk ${EXTRA_LINK_LIBS} perigee-mesh OpenMP::OpenMP_CXX)
 
 #EOF
