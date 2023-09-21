@@ -50,7 +50,6 @@ PDNSolution_NS::~PDNSolution_NS()
 void PDNSolution_NS::Init_zero(const APart_Node * const &pNode_ptr)
 {
   const double value[4] = {0.0, 0.0, 0.0, 0.0};
-  const int nlocalnode = pNode_ptr->get_nlocalnode();
 
   for(int ii=0; ii<nlocalnode; ++ii)
   {
@@ -76,7 +75,6 @@ void PDNSolution_NS::Init_flow_parabolic(
     const ALocal_InflowBC * const &infbc )
 {
   double value[4] = {0.0, 0.0, 0.0, 0.0};
-  const int nlocalnode = pNode_ptr->get_nlocalnode();
 
   // First enforce everything to be zero
   for(int ii=0; ii<nlocalnode; ++ii)
@@ -151,7 +149,6 @@ void PDNSolution_NS::Init_pipe_parabolic(
     const FEANode * const &fNode_ptr )
 {
   double value[4] = {0.0, 0.0, 0.0, 0.0};
-  const int nlocalnode = pNode_ptr->get_nlocalnode();
 
   // First enforce everything to be zero
   for(int ii=0; ii<nlocalnode; ++ii)
