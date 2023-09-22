@@ -32,6 +32,7 @@
 // ==================================================================
 #include "FEAElement.hpp"
 #include "Math_Tools.hpp"
+#include "Vector_3.hpp"
 
 class FEAElement_Quad9_3D_der0 : public FEAElement
 {
