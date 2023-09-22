@@ -10,6 +10,7 @@
 // ==================================================================
 #include "Tet_Tools.hpp"
 #include "HDF5_Writer.hpp"
+#include "/opt/homebrew/Cellar/libomp/16.0.6/include/omp.h"
 
 class Gmsh_FileIO
 {
