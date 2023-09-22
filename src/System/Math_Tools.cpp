@@ -158,79 +158,6 @@ Vector_3 MATH_T::get_tet_sphere_info( const Vector_3 &pt0,
   return centre;
 }
 
-double MATH_T::get_std_dev( const std::vector<double> &vec )
-{
-  double mean_val = MATH_T::get_mean(vec);
-  const unsigned int len = vec.size();
-
-  double sum = 0.0; double nn = 0.0;
-  for(unsigned int ii=0; ii<len; ++ii)
-  {
-    sum += (vec[ii] - mean_val) * (vec[ii] - mean_val);
-    nn  += 1.0;
-  }
-
-  return std::sqrt( sum / nn );
-}
-
-void MATH_T::gen_Gaussian( const int &n, const double &mean, 
-    const double &std, std::vector<double> &val )
-{
-  const int m = n + n % 2;
-  val.resize(m);
-  for ( int ii = 0; ii < m; ii += 2 )
-  {
-    double x,y,rsq,f;
-    do {
-      x = 2.0 * rand() / (double)RAND_MAX - 1.0;
-      y = 2.0 * rand() / (double)RAND_MAX - 1.0;
-      rsq = x * x + y * y;
-    }while( rsq >= 1. || rsq == 0. );
-    f = std::sqrt( -2.0 * log(rsq) / rsq );
-    val[ii]   = mean + std * x * f;
-    val[ii+1] = mean + std * y * f;
-  }
-}
-
-void MATH_T::print_Histogram( const std::vector<double> &val )
-{
-  const int width = 50;
-  int max = 0;
-
-  const double mean = MATH_T::get_mean(val);
-  const double std  = MATH_T::get_std_dev(val);
-
-  const double low   = mean - 3.05 * std;
-  const double high  = mean + 3.05 * std;
-  const double delta =  0.1 * std;
-
-  const int n = (int)val.size();
-
-  const int nbins = (int)((high - low) / delta);
-  int* bins = (int*)calloc(nbins,sizeof(int));
-  if ( bins != NULL )
-  {
-    for ( int i = 0; i < n; i++ )
-    {
-      int j = (int)( (val[i] - low) / delta );
-      if ( 0 <= j  &&  j < nbins ) bins[j]++;
-    }
-
-    for ( int j = 0; j < nbins; j++ )
-      if ( max < bins[j] ) max = bins[j];
-
-    for ( int j = 0; j < nbins; j++ )
-    {
-      printf("(%5.2f, %5.2f) |", low + j * delta, low + (j + 1) * delta );
-      int k = (int)( (double)width * (double)bins[j] / (double)max );
-      while(k-- > 0) putchar('*');
-      printf("  %-.1f%%", bins[j] * 100.0 / (double)n);
-      putchar('\n');
-    }
-    free(bins);
-  }
-}
-
 namespace MATH_T
 {
   Matrix_dense::Matrix_dense()
@@ -543,7 +470,7 @@ namespace MATH_T
   void Matrix_SymPos_dense::LDLt_fac()
   {
     // This algorithm is given in Shufang XU's book, pp 31. 
-    double v[N]; 
+    std::vector<double> v(N, 0.0); 
 
     for(int jj=0; jj<N; ++jj)
     {

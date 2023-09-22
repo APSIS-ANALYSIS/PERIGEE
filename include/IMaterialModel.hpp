@@ -66,10 +66,10 @@ class IMaterialModel
       SYS_T::commPrint("Warning: IMaterialModel::write_hdf5() is not implemented. \n");
     }
 
-    virtual void get_PK(const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S) const = 0;
+    virtual void get_PK(const Tensor2_3D &F, Tensor2_3D &P, Tensor2_3D &S) const = 0;
 
-    virtual void get_PK_Stiffness(const Matrix_3x3 &F, Matrix_3x3 &P, 
-        Matrix_3x3 &S, Tensor4_3D &CC) const = 0;
+    virtual void get_PK_Stiffness(const Tensor2_3D &F, Tensor2_3D &P, 
+        Tensor2_3D &S, Tensor4_3D &CC) const = 0;
 
     // ------------------------------------------------------------------------
     // Input: F : deformation gradient
@@ -77,8 +77,8 @@ class IMaterialModel
     //         S : 2nd PK
     //         AA : F_iK F_jL C_KILJ
     // ------------------------------------------------------------------------
-    virtual void get_PK_FFStiffness( const Matrix_3x3 &F, Matrix_3x3 &P, 
-        Matrix_3x3 &S, Tensor4_3D &AA ) const
+    virtual void get_PK_FFStiffness( const Tensor2_3D &F, Tensor2_3D &P, 
+        Tensor2_3D &S, Tensor4_3D &AA ) const
     {
       get_PK_Stiffness(F, P, S, AA);
       AA.MatMult_1(F);
@@ -89,12 +89,12 @@ class IMaterialModel
     // Input: F : deformation gradient
     // Output: sigma : Cauchy stress tensor
     // ------------------------------------------------------------------------
-    virtual Matrix_3x3 get_Cauchy_stress( const Matrix_3x3 &F ) const
+    virtual Tensor2_3D get_Cauchy_stress( const Tensor2_3D &F ) const
     {
-      Matrix_3x3 P, S;
+      Tensor2_3D P, S;
       get_PK(F, P, S);
-      const Matrix_3x3 Ft = transpose( F );
-      Matrix_3x3 sigma = P * Ft;
+      const Tensor2_3D Ft = transpose( F );
+      Tensor2_3D sigma = P * Ft;
       sigma.scale( (1.0/F.det()) );
       return sigma;
     }
@@ -104,13 +104,13 @@ class IMaterialModel
     // Output: sigma : Cauchy stress tensor
     //         aa : J^{-1} F_iI F_jJ F_kK F_lL C_IJKL
     // ------------------------------------------------------------------------
-    virtual void get_Cauchy_stiffness( const Matrix_3x3 &F, Matrix_3x3 &sigma,
+    virtual void get_Cauchy_stiffness( const Tensor2_3D &F, Tensor2_3D &sigma,
        Tensor4_3D &aa ) const
     {
       const double invJ = 1.0 / F.det();
-      Matrix_3x3 P, S;
+      Tensor2_3D P, S;
       get_PK_Stiffness(F, P, S, aa);
-      Matrix_3x3 Ft(F); Ft.transpose();
+      Tensor2_3D Ft(F); Ft.transpose();
       sigma.MatMult(P, Ft);
       sigma.scale( invJ );
 
@@ -119,7 +119,7 @@ class IMaterialModel
       aa.scale( invJ );
     }
 
-    virtual double get_strain_energy( const Matrix_3x3 &F ) const
+    virtual double get_strain_energy( const Tensor2_3D &F ) const
     {
       SYS_T::commPrint("Warning: IMaterialModel::get_strain_energy() is not implemented. \n");
       return 0.0;

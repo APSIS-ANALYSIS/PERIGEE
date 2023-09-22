@@ -38,7 +38,7 @@ void VTK_Writer_FSI_Tet4::interpolateJ( const int * const &ptid,
 
   for(int ii=0; ii<nqp; ++ii)
   {
-    Matrix_3x3 F( ux[ii] + 1.0, uy[ii],       uz[ii],
+    Tensor2_3D F( ux[ii] + 1.0, uy[ii],       uz[ii],
                   vx[ii],       vy[ii] + 1.0, vz[ii],
                   wx[ii],       wy[ii],       wz[ii] + 1.0 );
 

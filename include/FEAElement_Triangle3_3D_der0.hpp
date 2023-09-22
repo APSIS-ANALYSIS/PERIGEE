@@ -59,10 +59,8 @@ class FEAElement_Triangle3_3D_der0 : public FEAElement
 
     // If the triangle nodes are NOT arranged in any particular order,
     // use an interior node to define the outward direction.
-    virtual void get_normal_out( const int &quaindex,
-        const double &sur_pt_x, const double &sur_pt_y, const double &sur_pt_z,
-        const double &intpt_x, const double &intpt_y, const double &intpt_z,
-        double &nx, double &ny, double &nz, double &len ) const;
+    virtual Vector_3 get_normal_out( const int &quaindex, const Vector_3 &sur_pt,
+        const Vector_3 &int_pt, double &area ) const;
 
     virtual double get_detJac(const int &quaindex) const {return detJac;}
 
@@ -74,8 +72,8 @@ class FEAElement_Triangle3_3D_der0 : public FEAElement
     double * R;
 
     // unit outward normal vector
-    double unx, uny, unz;
-
+    Vector_3 un;
+    
     // Jacobian determinant 
     double detJac;
 };

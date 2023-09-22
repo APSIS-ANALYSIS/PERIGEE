@@ -1,7 +1,7 @@
-#ifndef MATRIX_2X2_HPP
-#define MATRIX_2X2_HPP
+#ifndef TENSOR2_2D_HPP
+#define TENSOR2_2D_HPP
 // ==================================================================
-// Matrix_2x2.hpp
+// Tensor2_2D.hpp
 // This is a 2 x 2 matrix class. The components are stored in a 1-D
 // array: mat[4], or logically
 //                  mat[0], mat[1]
@@ -17,24 +17,24 @@
 #include <ctime>
 #include <random>
 
-class Matrix_2x2
+class Tensor2_2D
 {
   public:
     // Default Constructor: generate an identity 2-by-2 matrix
-    Matrix_2x2();
+    Tensor2_2D();
 
     // Copy constructor
-    Matrix_2x2( const Matrix_2x2 &source );
+    Tensor2_2D( const Tensor2_2D &source );
 
     // Explicit defintion of all 4 components
-    Matrix_2x2( const double &a11, const double &a12,
+    Tensor2_2D( const double &a11, const double &a12,
         const double &a21, const double &a22 );
 
     // Destructor
-    ~Matrix_2x2();
+    ~Tensor2_2D();
 
     // Copy
-    void copy( const Matrix_2x2 &source );
+    void copy( const Tensor2_2D &source );
 
     void copy( double source[4] );
 
@@ -72,11 +72,11 @@ class Matrix_2x2
 
     // add the matrix with a given matrix with scaling
     // X = X + a * Y
-    void AXPY( const double &val, const Matrix_2x2 &source );
+    void AXPY( const double &val, const Tensor2_2D &source );
 
     // add the matrix source with the matrix
     // X = X + Y
-    void PY( const Matrix_2x2 &source );
+    void PY( const Tensor2_2D &source );
 
     // Get the determinant of the matrix
     double det() const;
@@ -95,24 +95,24 @@ class Matrix_2x2
     void VecMult( double * const &x ) const;
 
     // Matrix multiplication mat = mleft * mright
-    void MatMult( const Matrix_2x2 &mleft, const Matrix_2x2 &mright );
+    void MatMult( const Tensor2_2D &mleft, const Tensor2_2D &mright );
 
 
     // Matrix multiplication as mat = source^T * source
     // This is used for the evaluation of right Cauchy-Green strain tensor:
     //                       C = F^T F
     // The resulting matrix is symmetric. Hence the computation is simplified.
-    void MatMultTransposeLeft( const Matrix_2x2 &source );
+    void MatMultTransposeLeft( const Tensor2_2D &source );
 
     // Matrix multiplication as mat = source * source^T
     // This is used for the evaluation of the left Cauchy-Green strain tensor:
     //                       b = F F^T
     // The resulting matrix is symmetric. Hence, the computation is simplified.
-    void MatMultTransposeRight( const Matrix_2x2 &source );
+    void MatMultTransposeRight( const Tensor2_2D &source );
 
     // Matrix contraction
     // return mat_ij source_ij
-    double MatContraction( const Matrix_2x2 &source ) const;
+    double MatContraction( const Tensor2_2D &source ) const;
 
     // print the matrix
     void print() const;

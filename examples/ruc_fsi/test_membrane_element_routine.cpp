@@ -127,7 +127,7 @@ int main( int argc, char * argv[] )
   elem -> get_gradR(qua, dR_dxl, dR_dyl);
 
   // Global-to-local rotation matrix Q
-  const Matrix_3x3 Q = elem -> get_rotationMatrix(0);
+  const Tensor2_3D Q = elem -> get_rotationMatrix(0);
   std::cout << "\n===== Q =====" << std::endl;
   Q.print();
 
@@ -310,7 +310,7 @@ int main( int argc, char * argv[] )
   // sigma_l[7] = coef * 0.5*kappa*(1.0-nu) * u3l_yl;       // sigma_l_32 
   // sigma_l[8] = 0.0;                                      // sigma_l_33
 
-  Matrix_3x3 sigma = Matrix_3x3(
+  Tensor2_3D sigma = Tensor2_3D(
       u1l_xl + nu*u2l_yl,               0.5*(1.0-nu) * (u1l_yl + u2l_xl), 0.5*kappa*(1.0-nu) * u3l_xl,
       0.5*(1.0-nu) * (u1l_yl + u2l_xl), nu*u1l_xl + u2l_yl,               0.5*kappa*(1.0-nu) * u3l_yl,
       0.5*kappa*(1.0-nu) * u3l_xl,      0.5*kappa*(1.0-nu) * u3l_yl,      0.0 );

@@ -160,7 +160,6 @@ int main( int argc, char * argv[] )
   vec1.gen_rand();
   vec2.gen_rand();
   vec3.gen_rand();
-
   Vector_3 vec_cross = cross_product(vec1, vec2);
   if(vec_cross.dot_product( vec3 )<0.0)
   {

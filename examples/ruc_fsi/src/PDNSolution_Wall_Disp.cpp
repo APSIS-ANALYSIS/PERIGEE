@@ -25,7 +25,6 @@ void PDNSolution_Wall_Disp::Init_zero( const APart_Node * const &pNode_ptr )
 {
   int location[3];
   const double value[3] = {0.0, 0.0, 0.0};
-  const int nlocalnode = pNode_ptr->get_nlocalnode();
 
   for(int ii=0; ii<nlocalnode; ++ii)
   {

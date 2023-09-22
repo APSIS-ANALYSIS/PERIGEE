@@ -40,10 +40,10 @@ void FEAElement_MINI_P1_2D::buildBasis( const IQuadPts * const &quad,
  
   // Because of the constant strain, we can calculate the 
   // geometrical info first 
-  Jac[0] = ctrl_x[0] * (-1.0) + ctrl_x[1]; // dx_dr
-  Jac[1] = ctrl_x[0] * (-1.0) + ctrl_x[2]; // dx_ds
-  Jac[2] = ctrl_y[0] * (-1.0) + ctrl_y[1]; // dy_dr
-  Jac[3] = ctrl_y[0] * (-1.0) + ctrl_y[2]; // dy_ds
+  Jac[0] = - ctrl_x[0] + ctrl_x[1]; // dx_dr
+  Jac[1] = - ctrl_x[0] + ctrl_x[2]; // dx_ds
+  Jac[2] = - ctrl_y[0] + ctrl_y[1]; // dy_dr
+  Jac[3] = - ctrl_y[0] + ctrl_y[2]; // dy_ds
 
   detJac = Jac[0] * Jac[3] - Jac[1] * Jac[2];
 

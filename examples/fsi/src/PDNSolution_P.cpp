@@ -21,7 +21,6 @@ PDNSolution_P::PDNSolution_P( const APart_Node * const &pNode,
 void PDNSolution_P::Init_zero( const APart_Node * const &pNode )
 {
   const double val = 0.0;
-  const int nlocalnode = pNode -> get_nlocalnode();
 
   for(int ii=0; ii<nlocalnode; ++ii)
   {

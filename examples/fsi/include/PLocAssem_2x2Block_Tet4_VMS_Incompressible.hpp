@@ -109,7 +109,7 @@ class PLocAssem_2x2Block_Tet4_VMS_Incompressible : public IPLocAssem_2x2Block
     // This function will calculate the Cauchy stress at every quadrature points
     // within this element. The output stress has length quad -> get_num_quadPts()
     // ------------------------------------------------------------------------
-    virtual std::vector<Matrix_3x3> get_Wall_CauchyStress(
+    virtual std::vector<Tensor2_3D> get_Wall_CauchyStress(
         const double * const &disp,
         const double * const &pres,
         FEAElement * const &element,

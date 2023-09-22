@@ -1,9 +1,9 @@
-#ifndef SYMMMATRIX_3X3_HPP
-#define SYMMMATRIX_3X3_HPP
+#ifndef SYMMTENSOR2_3D_HPP
+#define SYMMTENSOR2_3D_HPP
 // ============================================================================
-// SymmMatrix_3x3.hpp
-// This is a 3 x 3 Symmetric Matrix class. The components are stored in a 1-D
-// array following the Voigt notation. The matrix is thus
+// SymmTensor2_3D.hpp
+// This is a 3 x 3 Symmetric Matrix/Tensor class. The components are stored in
+// a 1-D array following the Voigt notation. The matrix is thus
 // 
 //                    mat[0], mat[5], mat[4]
 //                    mat[5], mat[1], mat[3]
@@ -12,28 +12,28 @@
 // Author: Yujie Sun, Ju Liu
 // Date: Sept. 16 2022
 // ============================================================================
-#include "Matrix_3x3.hpp"
+#include "Tensor2_3D.hpp"
 
-class SymmMatrix_3x3
+class SymmTensor2_3D
 {
   public:
     // Constructor (default an identity 3-by-3 matrix)
-    SymmMatrix_3x3();
+    SymmTensor2_3D();
 
     // Copy constructor
-    SymmMatrix_3x3( const SymmMatrix_3x3 &source );
+    SymmTensor2_3D( const SymmTensor2_3D &source );
 
     // Constructor by six numbers in Voigt numbering
-    SymmMatrix_3x3( const double &m0, const double &m1, const double &m2,
+    SymmTensor2_3D( const double &m0, const double &m1, const double &m2,
         const double &m3, const double &m4, const double &m5 );
 
     // Destructor
-    ~SymmMatrix_3x3();
+    ~SymmTensor2_3D();
 
     // Assignment operator
-    SymmMatrix_3x3& operator= (const SymmMatrix_3x3 &source);
+    SymmTensor2_3D& operator= (const SymmTensor2_3D &source);
 
-    Matrix_3x3 convert_to_full() const;
+    Tensor2_3D convert_to_full() const;
 
     // Parenthesis operator. It allows accessing and assigning the matrix entries.
     double& operator()(const int &index) {return mat[index];}
@@ -69,22 +69,22 @@ class SymmMatrix_3x3
     double& zz() {return mat[2];}
     
     // Addition operator : return left + right
-    friend SymmMatrix_3x3 operator+( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right );
+    friend SymmTensor2_3D operator+( const SymmTensor2_3D &left, const SymmTensor2_3D &right );
 
     // Minus operator : return left - right
-    friend SymmMatrix_3x3 operator-( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right );
+    friend SymmTensor2_3D operator-( const SymmTensor2_3D &left, const SymmTensor2_3D &right );
 
     // Add the source matrix to the object
-    SymmMatrix_3x3& operator+=( const SymmMatrix_3x3 &source );
+    SymmTensor2_3D& operator+=( const SymmTensor2_3D &source );
 
     // Minus the source matrix to the object
-    SymmMatrix_3x3& operator-=( const SymmMatrix_3x3 &source );
+    SymmTensor2_3D& operator-=( const SymmTensor2_3D &source );
 
     // Scalar product
-    SymmMatrix_3x3& operator*=( const double &val );
+    SymmTensor2_3D& operator*=( const double &val );
 
     // Return true if the input matrix is identical to the mat
-    bool is_identical( const SymmMatrix_3x3 &source, const double &tol = 1.0e-12 ) const;
+    bool is_identical( const SymmTensor2_3D &source, const double &tol = 1.0e-12 ) const;
 
     // Set all components to zero
     void gen_zero();
@@ -100,7 +100,7 @@ class SymmMatrix_3x3
 
     // add the matrix with a given matrix with scaling
     // X = X + a * Y
-    void AXPY( const double &val, const SymmMatrix_3x3 &source );
+    void AXPY( const double &val, const SymmTensor2_3D &source );
 
     // X = X + a * I
     void AXPI( const double &val );
@@ -130,13 +130,13 @@ class SymmMatrix_3x3
     // Matrix rotation
     // Let Q be a rotation matrix, the matrix gets updated by
     // Q^T M Q = Q_ki M_kl Q_lj = output_matrix_ij
-    void MatRot( const Matrix_3x3 &Q );
+    void MatRot( const Tensor2_3D &Q );
 
     // Matrix contraction
     // return mat_ij source_ij
-    double MatContraction( const Matrix_3x3 &source ) const;
+    double MatContraction( const Tensor2_3D &source ) const;
     
-    double MatContraction( const SymmMatrix_3x3 &source ) const;
+    double MatContraction( const SymmTensor2_3D &source ) const;
 
     // print the matrix
     void print() const;
@@ -187,27 +187,27 @@ class SymmMatrix_3x3
     double J3() const;
 };
 
-Vector_3 operator*( const SymmMatrix_3x3 &left, const Vector_3 &right );
+Vector_3 operator*( const SymmTensor2_3D &left, const Vector_3 &right );
 
-Matrix_3x3 operator*( const SymmMatrix_3x3 &left, const Matrix_3x3 &right );
+Tensor2_3D operator*( const SymmTensor2_3D &left, const Tensor2_3D &right );
 
-Matrix_3x3 operator*( const Matrix_3x3 &left, const SymmMatrix_3x3 &right );
+Tensor2_3D operator*( const Tensor2_3D &left, const SymmTensor2_3D &right );
 
-Matrix_3x3 operator*( const SymmMatrix_3x3 &left, const SymmMatrix_3x3 &right );
+Tensor2_3D operator*( const SymmTensor2_3D &left, const SymmTensor2_3D &right );
 
-SymmMatrix_3x3 operator*( const double &val, const SymmMatrix_3x3 &input );
+SymmTensor2_3D operator*( const double &val, const SymmTensor2_3D &input );
 
 // Return the inverse of the input matrix
-SymmMatrix_3x3 inverse( const SymmMatrix_3x3 &input );
+SymmTensor2_3D inverse( const SymmTensor2_3D &input );
 
 // Generate the right Cauchy-Green tensor C = F^T F
-SymmMatrix_3x3 gen_right_Cauchy_Green( const Matrix_3x3 &input );
+SymmTensor2_3D gen_right_Cauchy_Green( const Tensor2_3D &input );
 
 // Generate the left Cauchy-Green tensor b = F F^T
-SymmMatrix_3x3 gen_left_Cauchy_Green( const Matrix_3x3 &input );
+SymmTensor2_3D gen_left_Cauchy_Green( const Tensor2_3D &input );
 
 // Convert a regular matrix to its symmetric part
 // output = 0.5 x ( source + source_transpose )
-SymmMatrix_3x3 gen_symm_part( const Matrix_3x3 &input );
+SymmTensor2_3D gen_symm_part( const Tensor2_3D &input );
 
 #endif
