@@ -1,5 +1,4 @@
 #include "FEAElement_Quad4_3D_der0.hpp"
-#include "Vector_3.hpp"
 
 FEAElement_Quad4_3D_der0::FEAElement_Quad4_3D_der0( const int &in_nqua )
 : numQuapts( in_nqua )
