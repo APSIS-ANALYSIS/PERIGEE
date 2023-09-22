@@ -5,6 +5,7 @@
 // into vtk files.
 // ============================================================================
 #include "Gmsh_FileIO.hpp"
+#include <yaml-cpp/yaml.h>
 
 int main( int argc, char * argv[] )
 {
