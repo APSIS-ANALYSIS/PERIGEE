@@ -597,15 +597,15 @@ namespace MATH_T
       Matrix_SymPos_Dense( const Matrix_Dense<N> &input ) : Matrix_Dense<N>()
       { 
         for(int ii=0; ii<N*N; ++ii) 
-          Matrix_Dense <N>::mat[ii] = input(ii);
+          this->mat[ii] = input(ii);
         
         // Check the symmetry of the matrix
         check_symm();
 
         for(int ii=0; ii<N; ++ii) 
-          Matrix_Dense <N>::pp[ii] = input.get_p(ii); 
+          this->pp[ii] = input.get_p(ii); 
 
-        Matrix_Dense <N>::is_fac = input.get_is_fac();
+        this->is_fac = input.get_is_fac();
       }
 
       virtual ~Matrix_SymPos_Dense() {};
@@ -618,7 +618,7 @@ namespace MATH_T
         {
           for(int jj=0; jj<ii; ++jj)
           {
-            if( !MATH_T::equals( Matrix_Dense <N>::mat[ii*N+jj], Matrix_Dense <N>::mat[jj*N+ii], 1.0e-15) ) 
+            if( !MATH_T::equals( this->mat[ii*N+jj], this->mat[jj*N+ii], 1.0e-15) ) 
               std::cout<<"error: Matrix_SymPos entry ("<<ii<<","<<jj<<") does not match entry ("<<jj<<","<<ii<<"). \n";
           }
         }
@@ -627,7 +627,7 @@ namespace MATH_T
       // Assignment operator
       Matrix_SymPos_Dense<N>& operator= (const Matrix_SymPos_Dense<N> &source)
       {
-        Matrix_Dense <N>::operator=(source);
+        this->operator=(source);
         return *this;             
       }    
 
@@ -644,19 +644,19 @@ namespace MATH_T
         for(int jj=0; jj<N; ++jj)
         {
           const int Njj = jj * N;
-          for(int kk=0; kk<jj; ++kk) v[kk] = Matrix_Dense <N>::mat[Njj+kk] * Matrix_Dense <N>::mat[kk*N+kk];
+          for(int kk=0; kk<jj; ++kk) v[kk] = this->mat[Njj+kk] * this->mat[kk*N+kk];
 
-          for(int kk=0; kk<jj; ++kk) Matrix_Dense <N>::mat[Njj+jj] -= v[kk] * Matrix_Dense <N>::mat[Njj+kk];
+          for(int kk=0; kk<jj; ++kk) this->mat[Njj+jj] -= v[kk] * this->mat[Njj+kk];
 
           for(int ii=jj+1; ii<N; ++ii)
           {
-            for(int kk=0; kk<jj; ++kk) Matrix_Dense <N>::mat[N*ii+jj] -= Matrix_Dense <N>::mat[ii*N+kk] * v[kk];
+            for(int kk=0; kk<jj; ++kk) this->mat[N*ii+jj] -= this->mat[ii*N+kk] * v[kk];
 
-            Matrix_Dense <N>::mat[N*ii+jj] *= 1.0 / Matrix_Dense <N>::mat[Njj+jj];
+            this->mat[N*ii+jj] *= 1.0 / this->mat[Njj+jj];
           }
         }
 
-        Matrix_Dense <N>::is_fac = true;
+        this->is_fac = true;
       }
 
       // With the LDLt_fac() function performed, solve a linear problem
@@ -670,16 +670,16 @@ namespace MATH_T
         for(int ii=0; ii<N; ++ii)
         {
           xx[ii] = bb[ii];
-          for(int jj=0; jj<ii; ++jj) xx[ii] -= Matrix_Dense <N>::mat[ii*N+jj] * xx[jj];
+          for(int jj=0; jj<ii; ++jj) xx[ii] -= this->mat[ii*N+jj] * xx[jj];
         }
 
         // Solve for D z = y;
-        for(int ii=0; ii<N; ++ii) xx[ii] *= 1.0 / Matrix_Dense <N>::mat[ii*N+ii];
+        for(int ii=0; ii<N; ++ii) xx[ii] *= 1.0 / this->mat[ii*N+ii];
 
         // Solve L^t x = z
         for(int ii=N-2; ii>=0; --ii)
         {
-          for(int jj=ii+1; jj<N; ++jj) xx[ii] -= Matrix_Dense <N>::mat[jj*N+ii] * xx[jj];
+          for(int jj=ii+1; jj<N; ++jj) xx[ii] -= this->mat[jj*N+ii] * xx[jj];
         }
         
         return xx;
