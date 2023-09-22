@@ -399,10 +399,7 @@ namespace MATH_T
         for(int ii=0; ii<N; ++ii)
         {
           for(int jj=0; jj<N; ++jj)
-          {
-            counter += 1;
-            std::cout<<mat[counter]<<'\t';
-          }
+            std::cout<<mat[++counter]<<'\t';
           std::cout<<'\n';
         }
         std::cout<<"p : \n";
