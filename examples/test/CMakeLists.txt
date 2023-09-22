@@ -32,7 +32,7 @@ SET( perigee_source ${perigee_SOURCE_DIR}/../../src )
 SET( perigee_preprocess_lib_src 
   ${perigee_source}/System/PETSc_Tools.cpp
   ${perigee_source}/System/Vector_3.cpp
-  ${perigee_source}/System/Math_Tools.cpp
+  ${perigee_source}/System/FE_Tools.cpp
   ${perigee_source}/System/Matrix_double_3by3_Array.cpp
   ${perigee_source}/System/Tensor2_3D.cpp
   ${perigee_source}/System/Tensor2_2D.cpp
@@ -89,6 +89,8 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/APart_Node.cpp
   ${perigee_source}/Analysis_Tool/FEANode.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
+  ${perigee_source}/Element/FEAElement_Tet_P2_P1.cpp
+  ${perigee_source}/Element/FEAElement_MINI_P1_3D.cpp
   ${perigee_source}/Element/FEAElement_Tet10.cpp
   ${perigee_source}/Element/FEAElement_Tet10_v2.cpp
   ${perigee_source}/Element/FEAElement_Triangle3.cpp

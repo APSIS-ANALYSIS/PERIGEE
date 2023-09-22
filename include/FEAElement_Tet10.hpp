@@ -36,7 +36,7 @@
 // Date created: Feb. 16 2018
 // ==================================================================
 #include "FEAElement.hpp"
-#include "Math_Tools.hpp"
+#include "FE_Tools.hpp"
 #include "Matrix_double_6by6_Array.hpp"
 
 class FEAElement_Tet10 : public FEAElement

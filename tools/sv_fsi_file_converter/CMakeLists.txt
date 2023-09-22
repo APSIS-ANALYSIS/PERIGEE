@@ -39,7 +39,6 @@ SET( perigee_lib_src
   ${perigee_source}/System/SV_Tools.cpp
   ${perigee_source}/Mesh/VTK_Tools.cpp
   ${perigee_source}/Mesh/Tet_Tools.cpp
-  ${perigee_source}/System/Math_Tools.cpp
   ${perigee_source}/System/Matrix_double_3by3_Array.cpp
   )
 
