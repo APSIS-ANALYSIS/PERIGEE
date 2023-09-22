@@ -533,7 +533,7 @@ namespace MATH_T
 
       std::array<double,N> Mult( const std::array<double,N> &input ) const
       {
-        ASSERT(is_fac == true, "Error: the matrix has been factroized.\n");
+        ASSERT(is_fac == false, "Error: the matrix has been factroized.\n");
         std::array<double,N> out {};
         for(int ii=0; ii<N; ++ii)
         {
@@ -546,7 +546,7 @@ namespace MATH_T
 
       void Mult( const Matrix_Dense<N> &left, const Matrix_Dense<N> &right ) 
       {
-        ASSERT(is_fac == true, "Error: the matrix has been factroized.\n");
+        ASSERT(is_fac == false, "Error: the matrix has been factroized.\n");
         
         for(int ii=0; ii<N*N; ++ii) mat[ii] = 0.0;
 
@@ -574,14 +574,14 @@ namespace MATH_T
 
   template<int N> Matrix_Dense<N> transpose(const Matrix_Dense<N> &input)
   {
-    ASSERT(input.get_is_fac() == true, "Error: the matrix has been factroized.\n");
+    ASSERT(input.get_is_fac() == false, "Error: the matrix has been factroized.\n");
         
     Matrix_Dense<N> output {};
     for(int ii=0; ii<N; ++ii)
     {
       for(int jj=0; jj<N; ++jj) output(jj, ii) = input(ii, jj);         
     }
-  
+
     return output;
   }
 

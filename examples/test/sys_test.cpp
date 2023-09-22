@@ -118,6 +118,8 @@ int main(int argc, char *argv[])
 
   const std::array<double, size> xx = mtest1.LU_solve(bb);
 
+  //std::cout<< mtest1_copy.get_is_fac()<<std::endl;
+
   const std::array<double, size> mx = mtest1_copy.Mult(xx);
 
   for (int ii=0; ii<size; ++ii)
@@ -136,6 +138,9 @@ int main(int argc, char *argv[])
   {
     for(int jj=0; jj<size; ++jj) std::cout<<mtest1_copy_T (jj, ii) - mtest1_copy(ii, jj)<<std::endl;         
   }
+
+  for(int ii=0; ii<size; ++ii) std::cout<<mtest1_copy.get_p(ii) - mtest1_copy_T.get_p(ii)<<std::endl;
+  for(int ii=0; ii<size; ++ii) std::cout<<mtest1_copy.get_is_fac()<<" "<<mtest1_copy_T.get_is_fac()<<std::endl;
 
   //(mtest1_copy_T.Mult(mtest1_copy)).print_info();
 
