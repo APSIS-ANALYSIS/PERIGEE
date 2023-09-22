@@ -387,6 +387,7 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
 
   // tript stores the coordinates of the boundary points
   std::vector<double> tript(3*bcnumpt, 0.0);
+  #pragma omp parallel for
   for( int ii=0; ii<bcnumpt; ++ii )
   {
     tript[ii*3]   = node[bcpt[ii]*3] ;
@@ -418,18 +419,27 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
 
     // use the bcmap to obtain the vol element that has its face on this surface
     std::vector<int> gelem {};
-    for( int ee=0; ee<numcel; ++ee )
+    #pragma omp parallel
     {
-      int total = 0;
-      total += bcmap[ vol_IEN[4*ee] ];
-      total += bcmap[ vol_IEN[4*ee+1] ];
-      total += bcmap[ vol_IEN[4*ee+2] ];
-      total += bcmap[ vol_IEN[4*ee+3] ];
-      if(total >= 3) gelem.push_back(ee);
+      std::vector<int> temp_gelem {};
+
+      #pragma omp for
+      for( int ee=0; ee<numcel; ++ee )
+      {
+        int total = 0;
+        total += bcmap[ vol_IEN[4*ee] ];
+        total += bcmap[ vol_IEN[4*ee+1] ];
+        total += bcmap[ vol_IEN[4*ee+2] ];
+        total += bcmap[ vol_IEN[4*ee+3] ];
+        if(total >= 3) temp_gelem.push_back(ee);
+      }
+      #pragma omp critical
+      VEC_T::insert_end(gelem, temp_gelem);
     }
     delete [] bcmap; bcmap = nullptr;
     std::cout<<"      "<<gelem.size()<<" tets have faces over the surface. \n";
 
+    #pragma omp parallel for
     for(int ff=0; ff<bcnumcl; ++ff)
     {
       const int node0 = trien_global[3*ff];
