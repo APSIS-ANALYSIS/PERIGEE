@@ -546,15 +546,16 @@ namespace MATH_T
         {
           out[ii] = 0.0;
           for(int jj=0; jj<N; ++jj)
-          out[ii] += mat[N*ii+jj] * input[jj];
+            out[ii] += mat[N*ii+jj] * input[jj];
         }
         return out;
       }
 
       void Mult( const Matrix_Dense<N> &left, const Matrix_Dense<N> &right ) 
       {
-        for(int ii=0; ii<N*N; ++ii)
-          mat[ii] = 0.0;
+        if( is_fac == true ) std::cout<<"Warning: the matrix has been factroized.\n";
+        
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = 0.0;
 
         for(int ii=0; ii<N; ++ii)
         {
@@ -564,6 +565,8 @@ namespace MATH_T
               mat[ii*N+jj] += left(ii, kk) * right(kk, jj);
           }
         }
+
+        // PP AND is_fac
       }
 
     protected:
@@ -576,6 +579,8 @@ namespace MATH_T
 
   template<int N> Matrix_Dense<N> transpose(const Matrix_Dense<N> &input)
   {
+    if( is_fac == true ) std::cout<<"Warning: the matrix has been factroized.\n";
+        
     Matrix_Dense<N> output {};
     for(int ii=0; ii<N; ++ii)
     {
