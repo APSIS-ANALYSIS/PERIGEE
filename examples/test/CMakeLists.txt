@@ -173,5 +173,4 @@ TARGET_LINK_LIBRARIES( sys_test perigee_preprocess perigee_analysis )
 TARGET_LINK_LIBRARIES( mod_test perigee_preprocess perigee_analysis )
 TARGET_LINK_LIBRARIES( testh5 perigee_preprocess )
 TARGET_LINK_LIBRARIES( elem_test perigee_analysis )
-add_definitions(-w)
 # EOF
