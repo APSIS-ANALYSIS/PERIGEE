@@ -67,11 +67,10 @@ void MaterialModel_NeoHookean_Quad_Mixed::write_hdf5( const char * const &fname 
 }
 
 void MaterialModel_NeoHookean_Quad_Mixed::get_PK(
-    const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S ) const
+    const Tensor2_3D &F, Tensor2_3D &P, Tensor2_3D &S ) const
 {
-  Matrix_3x3 C; C.MatMultTransposeLeft(F);
-  Matrix_3x3 Cinv(C); Cinv.inverse();
-
+  Tensor2_3D C; C.MatMultTransposeLeft(F);
+  Tensor2_3D Cinv = inverse(C);
   const double detF = F.det();
   const double detFm0d67 = std::pow(detF, mpt67);
 
@@ -81,11 +80,10 @@ void MaterialModel_NeoHookean_Quad_Mixed::get_PK(
 }
 
 void MaterialModel_NeoHookean_Quad_Mixed::get_PK_Stiffness(
-    const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &CC ) const
+    const Tensor2_3D &F, Tensor2_3D &P, Tensor2_3D &S, Tensor4_3D &CC ) const
 {
-  Matrix_3x3 C; C.MatMultTransposeLeft(F);
-  Matrix_3x3 Cinv(C); Cinv.inverse();
-
+  Tensor2_3D C; C.MatMultTransposeLeft(F);
+  Tensor2_3D Cinv = inverse(C);
   const double detF = F.det();
   const double detFm0d67 = std::pow(detF, mpt67);
 
@@ -104,9 +102,9 @@ void MaterialModel_NeoHookean_Quad_Mixed::get_PK_Stiffness(
 }
 
 double MaterialModel_NeoHookean_Quad_Mixed::get_strain_energy( 
-    const Matrix_3x3 &F ) const
+    const Tensor2_3D &F ) const
 {
-  Matrix_3x3 C; C.MatMultTransposeLeft(F);
+  Tensor2_3D C; C.MatMultTransposeLeft(F);
   return 0.5 * mu * ( std::pow(F.det(), mpt67) * C.tr() - 3.0);
 }
 

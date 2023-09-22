@@ -9,7 +9,7 @@ int main( int argc, char * argv[] )
   
   model -> print_info();
 
-  Matrix_3x3 F, P, S;
+  Tensor2_3D F, P, S;
   Tensor4_3D CC;
 
   F.xx() = 1.0; F.xy() = 0.3; F.xz() = 0.0;

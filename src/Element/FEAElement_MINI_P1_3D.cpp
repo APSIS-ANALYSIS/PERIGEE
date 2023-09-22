@@ -117,17 +117,17 @@ void FEAElement_MINI_P1_3D::buildBasis( const IQuadPts * const &quad,
   ASSERT( quad -> get_dim() == 4, "FEAElement_MINI_P1_3D::buildBasis function error.\n");
 
   // Calculate the geometrical info first
-  Jac[0] = ctrl_x[0] * (-1.0) + ctrl_x[1]; // dx_dr
-  Jac[1] = ctrl_x[0] * (-1.0) + ctrl_x[2]; // dx_ds
-  Jac[2] = ctrl_x[0] * (-1.0) + ctrl_x[3]; // dx_dt
+  Jac[0] = - ctrl_x[0] + ctrl_x[1]; // dx_dr
+  Jac[1] = - ctrl_x[0] + ctrl_x[2]; // dx_ds
+  Jac[2] = - ctrl_x[0] + ctrl_x[3]; // dx_dt
 
-  Jac[3] = ctrl_y[0] * (-1.0) + ctrl_y[1]; // dy_dr
-  Jac[4] = ctrl_y[0] * (-1.0) + ctrl_y[2]; // dy_ds
-  Jac[5] = ctrl_y[0] * (-1.0) + ctrl_y[3]; // dy_dt
+  Jac[3] = - ctrl_y[0] + ctrl_y[1]; // dy_dr
+  Jac[4] = - ctrl_y[0] + ctrl_y[2]; // dy_ds
+  Jac[5] = - ctrl_y[0] + ctrl_y[3]; // dy_dt
 
-  Jac[6] = ctrl_z[0] * (-1.0) + ctrl_z[1]; // dz_dr
-  Jac[7] = ctrl_z[0] * (-1.0) + ctrl_z[2]; // dz_ds
-  Jac[8] = ctrl_z[0] * (-1.0) + ctrl_z[3]; // dz_dt
+  Jac[6] = - ctrl_z[0] + ctrl_z[1]; // dz_dr
+  Jac[7] = - ctrl_z[0] + ctrl_z[2]; // dz_ds
+  Jac[8] = - ctrl_z[0] + ctrl_z[3]; // dz_dt
 
   // Generate 3x3 matrix
   Matrix_double_3by3_Array mdrdx( Jac[0], Jac[1], Jac[2], Jac[3], Jac[4],

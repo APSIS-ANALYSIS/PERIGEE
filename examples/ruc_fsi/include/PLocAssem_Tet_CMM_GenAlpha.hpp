@@ -8,7 +8,7 @@
 // ==================================================================
 #include "IPLocAssem.hpp"
 #include "TimeMethod_GenAlpha.hpp"
-#include "SymmMatrix_3x3.hpp"
+#include "SymmTensor2_3D.hpp"
 
 class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
 {
@@ -174,7 +174,7 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
         const double * const &sol_wall_disp,
         const FEAElement * const &element,
         const double * const &ele_youngsmod,
-        std::vector<Matrix_3x3> &stress );
+        std::vector<Tensor2_3D> &stress );
 
   private:
     // Private data
@@ -194,7 +194,7 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
     // Private functions
     void print_info() const;
 
-    SymmMatrix_3x3 get_metric( const std::array<double, 9> &dxi_dx ) const;
+    SymmTensor2_3D get_metric( const std::array<double, 9> &dxi_dx ) const;
 
     // Return tau_m and tau_c in RB-VMS
     std::array<double, 2> get_tau( 

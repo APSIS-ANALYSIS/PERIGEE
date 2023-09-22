@@ -181,7 +181,7 @@ int main( int argc, char * argv[] )
         v_ctrlPts[3*trn[2]+1] - v_ctrlPts[3*trn[0]+1],
         v_ctrlPts[3*trn[2]+2] - v_ctrlPts[3*trn[0]+2] );
 
-    outnormal[ee] = cross_product(vec01, vec02); // out = vec01 x vec02
+    outnormal[ee] = VEC3_T::cross_product(vec01, vec02); // out = vec01 x vec02
     
     // return out length and scale itself to have unit length
     tri_area[ee] = 0.5 * outnormal[ee].normalize();
@@ -190,7 +190,7 @@ int main( int argc, char * argv[] )
         v_ctrlPts[interior_node[ee]*3+1] - v_ctrlPts[3*trn[0]+1],
         v_ctrlPts[interior_node[ee]*3+2] - v_ctrlPts[3*trn[0]+2] );
 
-    if( dot_product(outnormal[ee], vec03)> 0 ) outnormal[ee] *= -1.0;
+    if( VEC3_T::dot_product(outnormal[ee], vec03)> 0 ) outnormal[ee] *= -1.0;
   }
 
   // Clean the volumetric data to save memory
