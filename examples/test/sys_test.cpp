@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 
   //std::cout << "det = " << mtest1.det() << std::endl;
 
-  MATH_T::Matrix_Dense<size> mtest1_copy = mtest1;
+  const MATH_T::Matrix_Dense<size> mtest1_copy = mtest1;
 
   for(int ii=0; ii<size*size; ++ii) std::cout<<mtest1_copy(ii) - mtest1(ii)<<std::endl;
   for(int ii=0; ii<size; ++ii) std::cout<<mtest1_copy.get_p(ii) - mtest1.get_p(ii)<<std::endl;
@@ -116,9 +116,9 @@ int main(int argc, char *argv[])
     bb[ii] = MATH_T::gen_double_rand(-10, 10);
   }
 
-  std::array<double, size> xx = mtest1.LU_solve(bb);
+  const std::array<double, size> xx = mtest1.LU_solve(bb);
 
-  std::array<double, size> mx = mtest1_copy.Mult(xx);
+  const std::array<double, size> mx = mtest1_copy.Mult(xx);
 
   for (int ii=0; ii<size; ++ii)
     std::cout<<mx.at(ii)-bb.at(ii)<<std::endl;
@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
 
   std::cout<<"================template< int N> class Matrix_SymPos_Dense test==============="<<std::endl;
 
-  MATH_T::Matrix_Dense<size> mtest1_copy_T = transpose(mtest1_copy);
+  const MATH_T::Matrix_Dense<size> mtest1_copy_T = transpose(mtest1_copy);
 
   //mtest1_copy_T.print_info();
 
@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
 
   temp_mtest1.Mult(mtest1_copy_T, mtest1_copy);
 
-  MATH_T::Matrix_SymPos_Dense<size> temp_symtest1{temp_mtest1}; 
+  const MATH_T::Matrix_SymPos_Dense<size> temp_symtest1{temp_mtest1}; 
 
   for(int ii=0; ii<size*size; ++ii) std::cout<<symtest1(ii) - temp_symtest1(ii)<<std::endl;
   for(int ii=0; ii<size; ++ii) std::cout<<symtest1.get_p(ii) - temp_symtest1.get_p(ii)<<std::endl;
@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
 
   symtest1.check_symm();
 
-  MATH_T::Matrix_SymPos_Dense<size> symtest1_copy = symtest1;
+  const MATH_T::Matrix_SymPos_Dense<size> symtest1_copy = symtest1;
 
   for(int ii=0; ii<size*size; ++ii) std::cout<<symtest1_copy(ii) - symtest1(ii)<<std::endl;
   for(int ii=0; ii<size; ++ii) std::cout<<symtest1_copy.get_p(ii) - symtest1.get_p(ii)<<std::endl;
@@ -227,8 +227,8 @@ int main(int argc, char *argv[])
 
   std::cout<<"----------------LDLt solve----------------"<<std::endl;
 
-  std::array<double, size> xx2 = symtest1.LDLt_solve(bb);
-  std::array<double, size> mx2 = symtest1_copy.Mult(xx2);
+  const std::array<double, size> xx2 = symtest1.LDLt_solve(bb);
+  const std::array<double, size> mx2 = symtest1_copy.Mult(xx2);
 
   for(int ii=0; ii<size; ++ii)
     std::cout<<mx2.at(ii) - bb.at(ii)<<std::endl;
@@ -388,7 +388,7 @@ int main(int argc, char *argv[])
 
     mtest1_6x6.LU_fac();
     //mtest1_6x6.print();
-    std::array<double, 6> sol6 = mtest1_6x6.LU_solve(b6);
+    const std::array<double, 6> sol6 = mtest1_6x6.LU_solve(b6);
 
     mytimer -> Stop();
 
@@ -401,7 +401,7 @@ int main(int argc, char *argv[])
 
     mtest1d_6x6.LU_fac();
     //mtest1d_6x6.print_info();
-    std::array<double, 6> sol6d = mtest1d_6x6.LU_solve(b6);
+    const std::array<double, 6> sol6d = mtest1d_6x6.LU_solve(b6);
 
     mytimer -> Stop();
 
@@ -443,7 +443,7 @@ int main(int argc, char *argv[])
 
     smtest1d_3x3.Mult(transpose(mtest1d_3x3), mtest1d_3x3);
 
-    MATH_T::Matrix_SymPos_Dense<3> smtest1d_3x3_copy = smtest1d_3x3;
+    const MATH_T::Matrix_SymPos_Dense<3> smtest1d_3x3_copy = smtest1d_3x3;
 
     smtest1d_3x3.check_symm();
 
@@ -482,7 +482,7 @@ int main(int argc, char *argv[])
     mtest1_3x3.LU_fac();
     //mtest1_3x3.print();
 
-    std::array<double, 3> sol3 = mtest1_3x3.LU_solve(b3);
+    const std::array<double, 3> sol3 = mtest1_3x3.LU_solve(b3);
 
     mytimer -> Stop();
 
@@ -508,7 +508,7 @@ int main(int argc, char *argv[])
       sum_square += (act_sol3[ii]-b3[ii])*(act_sol3[ii]-b3[ii]);
     }
 
-    double norm2_3 = std::sqrt(sum_square);
+    const double norm2_3 = std::sqrt(sum_square);
 
     mytimer->Reset();
     mytimer->Start();
@@ -530,7 +530,7 @@ int main(int argc, char *argv[])
 */
 
     // compute norm of error     
-    std::array<double, 3> act_sol3d = smtest1d_3x3_copy.Mult(sol3d);
+    const std::array<double, 3> act_sol3d = smtest1d_3x3_copy.Mult(sol3d);
 
     double error_3d[3] {}; 
 
@@ -543,7 +543,7 @@ int main(int argc, char *argv[])
       sum_square += (act_sol3d[ii]-b3[ii])*(act_sol3d[ii]-b3[ii]);
     }
 
-    double norm2_3d = std::sqrt(sum_square);
+    const double norm2_3d = std::sqrt(sum_square);
 
     if(std::abs(norm2_3- norm2_3d) > 1.0e-10)
     {
@@ -576,7 +576,7 @@ int main(int argc, char *argv[])
 
     smtest1d_6x6.Mult(transpose(mtest1d_6x6), mtest1d_6x6);
 
-    MATH_T::Matrix_SymPos_Dense<6> smtest1d_6x6_copy = smtest1d_6x6;
+    const MATH_T::Matrix_SymPos_Dense<6> smtest1d_6x6_copy = smtest1d_6x6;
 
     smtest1d_6x6.check_symm();
 
@@ -615,7 +615,7 @@ int main(int argc, char *argv[])
     mtest1_6x6.LU_fac();
     //mtest1_6x6.print();
 
-    std::array<double, 6> sol6 = mtest1_6x6.LU_solve(b6);
+    const std::array<double, 6> sol6 = mtest1_6x6.LU_solve(b6);
 
     mytimer -> Stop();
 
@@ -645,14 +645,14 @@ int main(int argc, char *argv[])
       sum_square += (act_sol6[ii]-b6[ii])*(act_sol6[ii]-b6[ii]);
     }
 
-    double norm2_6 = std::sqrt(sum_square);
+    const double norm2_6 = std::sqrt(sum_square);
 
     mytimer->Reset();
     mytimer->Start();
 
     smtest1d_6x6.LDLt_fac();
     //mtest1d_6x6.print_info();
-    std::array<double, 6> sol6d = smtest1d_6x6.LDLt_solve(b6);
+    const std::array<double, 6> sol6d = smtest1d_6x6.LDLt_solve(b6);
 
     mytimer -> Stop();
 
@@ -667,7 +667,7 @@ int main(int argc, char *argv[])
 */
 
     // compute error     
-    std::array<double, 6> act_sol6d = smtest1d_6x6_copy.Mult(sol6d);
+    const std::array<double, 6> act_sol6d = smtest1d_6x6_copy.Mult(sol6d);
      
     double error_6d[6] {}; 
 
@@ -680,7 +680,7 @@ int main(int argc, char *argv[])
       sum_square += (act_sol6d[ii]-b6[ii])*(act_sol6d[ii]-b6[ii]);
     }
 
-    double norm2_6d = std::sqrt(sum_square);
+    const double norm2_6d = std::sqrt(sum_square);
 
     if(std::abs(norm2_6 - norm2_6d) > 1.0e-10)
     {

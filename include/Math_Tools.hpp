@@ -506,7 +506,7 @@ namespace MATH_T
       }
 
       const double det() const{
-        Matrix_Dense copy = *this;
+        Matrix_Dense<N> copy = *this;
         copy.LU_fac();
         double result = 1.0;
         for(int ii{0}; ii < N; ++ii){
@@ -538,7 +538,7 @@ namespace MATH_T
         return xx;
       }
 
-      std::array<double,N> Mult( const std::array<double,N> &input )
+      std::array<double,N> Mult( const std::array<double,N> &input ) const
       {
         if( is_fac == true ) std::cout<<"Warning: the matrix has been factroized.\n";
         std::array<double,N> out;
@@ -551,7 +551,7 @@ namespace MATH_T
         return out;
       }
 
-      void Mult( const Matrix_Dense<N> &left, const Matrix_Dense<N> &right )
+      void Mult( const Matrix_Dense<N> &left, const Matrix_Dense<N> &right ) 
       {
         for(int ii=0; ii<N*N; ++ii)
           mat[ii] = 0.0;
@@ -574,7 +574,7 @@ namespace MATH_T
       bool is_fac;
   };
 
-  template<int N> Matrix_Dense<N> transpose(Matrix_Dense<N> &input)
+  template<int N> Matrix_Dense<N> transpose(const Matrix_Dense<N> &input)
   {
     Matrix_Dense<N> output {};
     for(int ii=0; ii<N; ++ii)
