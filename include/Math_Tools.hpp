@@ -80,7 +80,7 @@ namespace MATH_T
       const std::vector<T> &b, const double &tol = 1.0e-12 )
   {
     if( a.size() != b.size() ) return false;
-    for(int ii=0; ii<a.size(); ++ii)
+    for(unsigned int ii=0; ii<a.size(); ++ii)
     {
       if( std::abs(a[ii]-b[ii]) >= tol ) return false;
     }
@@ -157,8 +157,8 @@ namespace MATH_T
   inline double get_mean( const std::vector<double> &vec )
   {
     double sum = 0.0; double nn = 0.0;
-    const int len = vec.size();
-    for(int ii=0; ii<len; ++ii)
+
+    for(unsigned int ii=0; ii<vec.size(); ++ii)
     {
       sum += vec[ii];
       nn  += 1.0;
@@ -175,7 +175,7 @@ namespace MATH_T
   // Generate a Gaussian distribution vector with length n, mean value
   // mean, and standard deviation dev, using Marsaglia algorithm
   //
-  // Note: Call srand((int)time(NULL)) before calling this generator!
+  // Note: Call srand((unsigned)time(NULL)) before calling this generator!
   // ----------------------------------------------------------------
   void gen_Gaussian( const int &n, const double &mean, const double &std,
       std::vector<double> &val );
@@ -418,15 +418,6 @@ namespace MATH_T
   
       void gen_rand(const double &min = -1.0, const double &max = 1.0)
       {
-/*        srand(time(NULL));
-
-        for(int ii=0; ii<N*N; ++ii)
-        {
-          double value = rand() % 1000; 
-
-          mat[ii] = value * 1.0e-2 - 5;
-        }
-*/
         for(int ii=0; ii<N*N; ++ii) mat[ii] = gen_double_rand(min, max);
 
         for(int ii=0; ii<N; ++ii) pp[ii] = ii;
@@ -457,7 +448,7 @@ namespace MATH_T
         return *this;             
       }     
 
-      int get_size() const {return static_cast<int>(N);}
+      int get_size() const {return N;}
 
       bool get_is_fac() const {return is_fac;}
 
@@ -505,11 +496,13 @@ namespace MATH_T
         is_fac = true;
       }
 
-      const double det() const{
+      const double det() const
+      {
         Matrix_Dense<N> copy = *this;
         copy.LU_fac();
         double result = 1.0;
-        for(int ii{0}; ii < N; ++ii){
+        for(int ii{0}; ii < N; ++ii)
+        {
           if (std::abs(copy(ii, ii)) < 1e-16)
             return 0.0;
           else
@@ -540,8 +533,8 @@ namespace MATH_T
 
       std::array<double,N> Mult( const std::array<double,N> &input ) const
       {
-        if( is_fac == true ) std::cout<<"Warning: the matrix has been factroized.\n";
-        std::array<double,N> out;
+        ASSERT(is_fac == true, "Error: the matrix has been factroized.\n");
+        std::array<double,N> out {};
         for(int ii=0; ii<N; ++ii)
         {
           out[ii] = 0.0;
@@ -553,7 +546,7 @@ namespace MATH_T
 
       void Mult( const Matrix_Dense<N> &left, const Matrix_Dense<N> &right ) 
       {
-        if( is_fac == true ) std::cout<<"Warning: the matrix has been factroized.\n";
+        ASSERT(is_fac == true, "Error: the matrix has been factroized.\n");
         
         for(int ii=0; ii<N*N; ++ii) mat[ii] = 0.0;
 
@@ -566,7 +559,9 @@ namespace MATH_T
           }
         }
 
-        // PP AND is_fac
+        for(int ii=0; ii<N; ++ii) pp[ii] = ii; 
+
+        is_fac = false;
       }
 
     protected:
@@ -579,13 +574,14 @@ namespace MATH_T
 
   template<int N> Matrix_Dense<N> transpose(const Matrix_Dense<N> &input)
   {
-    if( is_fac == true ) std::cout<<"Warning: the matrix has been factroized.\n";
+    ASSERT(input.get_is_fac() == true, "Error: the matrix has been factroized.\n");
         
     Matrix_Dense<N> output {};
     for(int ii=0; ii<N; ++ii)
     {
       for(int jj=0; jj<N; ++jj) output(jj, ii) = input(ii, jj);         
     }
+  
     return output;
   }
 
@@ -601,14 +597,12 @@ namespace MATH_T
       // We assume that the input matrix are the symmetry positive definite matrix 
       Matrix_SymPos_Dense( const Matrix_Dense<N> &input ) : Matrix_Dense<N>()
       { 
-        for(int ii=0; ii<N*N; ++ii) 
-          this->mat[ii] = input(ii);
+        for(int ii=0; ii<N*N; ++ii) this->mat[ii] = input(ii);
         
         // Check the symmetry of the matrix
         check_symm();
 
-        for(int ii=0; ii<N; ++ii) 
-          this->pp[ii] = input.get_p(ii); 
+        for(int ii=0; ii<N; ++ii) this->pp[ii] = input.get_p(ii); 
 
         this->is_fac = input.get_is_fac();
       }
@@ -644,7 +638,7 @@ namespace MATH_T
       void LDLt_fac()
       {
         // This algorithm is given in Shufang XU's book, pp 31. 
-        double v[N]; 
+        std::array<double, N> v {}; 
 
         for(int jj=0; jj<N; ++jj)
         {
@@ -669,7 +663,7 @@ namespace MATH_T
       // users are responsible for allocating the bb and xx arrays.
       std::array<double, N>  LDLt_solve( std::array<double, N> &bb ) const
       {
-        std::array<double, N> xx;
+        std::array<double, N> xx {};
 
         // Solve for Ly = b
         for(int ii=0; ii<N; ++ii)
