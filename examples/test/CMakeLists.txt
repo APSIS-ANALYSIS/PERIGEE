@@ -88,9 +88,12 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/ALocal_EBC_wall.cpp
   ${perigee_source}/Analysis_Tool/APart_Node.cpp
   ${perigee_source}/Analysis_Tool/FEANode.cpp
+  ${perigee_source}/Element/FEAElement_Line2_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Line3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
   ${perigee_source}/Element/FEAElement_Tet_P2_P1.cpp
   ${perigee_source}/Element/FEAElement_MINI_P1_3D.cpp
+  ${perigee_source}/Element/FEAElement_MINI_P1_2D.cpp
   ${perigee_source}/Element/FEAElement_Tet10.cpp
   ${perigee_source}/Element/FEAElement_Tet10_v2.cpp
   ${perigee_source}/Element/FEAElement_Triangle3.cpp

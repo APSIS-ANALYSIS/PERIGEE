@@ -18,6 +18,7 @@
 // Date Created: Nov. 28 2017
 // ==================================================================
 #include "FEAElement.hpp"
+#include "FE_Tools.hpp"
 
 class FEAElement_Line3_3D_der0 : public FEAElement
 {
@@ -32,7 +33,7 @@ class FEAElement_Line3_3D_der0 : public FEAElement
 
     virtual int get_numQuapts() const {return numQuapts;}
 
-    virtual int get_nLocBas() const {return nLocBas;}
+    virtual int get_nLocBas() const {return 3;}
 
     virtual void print_info() const;
 
@@ -54,7 +55,7 @@ class FEAElement_Line3_3D_der0 : public FEAElement
     {return detJac[quaindex];};
 
   private:
-    const int nLocBas, numQuapts;
+    const int numQuapts;
 
     // length is nLocBas x numQuapts = 3 x numQuapts
     double * R;

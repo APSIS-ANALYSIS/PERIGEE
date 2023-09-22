@@ -1,22 +1,21 @@
 #include "FEAElement_Line2_3D_der0.hpp"
 
 FEAElement_Line2_3D_der0::FEAElement_Line2_3D_der0( 
-    const int &in_nqua )
-: nLocBas( 2 ), numQuapts( in_nqua )
+    const int &in_nqua ) : numQuapts( in_nqua )
 {
   R = new double [2 * numQuapts];
 }
 
 FEAElement_Line2_3D_der0::~FEAElement_Line2_3D_der0()
 {
-  delete [] R; R = NULL;
+  delete [] R; R = nullptr;
 }
 
 void FEAElement_Line2_3D_der0::print_info() const
 {
   SYS_T::commPrint("Line2_3D_der0: ");
   SYS_T::commPrint("P1 line element in 3D with no derivative evaluation. \n");
-  PetscPrintf(PETSC_COMM_WORLD, "elemType: %d \n", get_Type());
+  SYS_T::commPrint("elemType: %d \n", get_Type());
   SYS_T::commPrint("Note: This element is designed for natural BC integrals. \n ");
 }
 
@@ -64,7 +63,7 @@ void FEAElement_Line2_3D_der0::get_normal_out( const int &quaindex,
   double tan_root_y = ctrl_y[0] * R[offset] + ctrl_y[1] * R[offset+1];
   double tan_root_z = ctrl_z[0] * R[offset] + ctrl_z[1] * R[offset+1];
 
-  MATH_T::get_n_from_t( dx_dr, dy_dr, dz_dr, tan_root_x, tan_root_y,
+  FE_T::get_n_from_t( dx_dr, dy_dr, dz_dr, tan_root_x, tan_root_y,
       tan_root_z, intpt_x, intpt_y, intpt_z, nx, ny, nz );
 
   len = detJac;
