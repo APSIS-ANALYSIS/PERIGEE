@@ -275,21 +275,24 @@ namespace MATH_T
       const int &nqp,
       double &coeff_0, double &coeff_x, double &coeff_y, double &coeff_z );
 
-  // ================================================================
+  // ==========================================================================
   // Dense Matrix tool
   // This is an implementation of dense matrix in C++.
-  // The matrix has to be a square matrix with size N X N.
-  // The objective is to implement efficient, dense linear algebra,
-  // especially the LU factorization and LU-Solver.
-  // The matrix data is stored as a one-dimensional array in row-
-  // oriented manner.
+  // The matrix has to be a square matrix with size N X N, and the matrix
+  // entries are stoed in a 1D array in row-oriented manner.
+  // The objective is to implement efficient, dense linear algebra, especially
+  // the LU factorization and LU-Solver.
   // 
-  // A typical usage is, one should call
-  // LU_fac();
-  // LU_solve(b,x);
+  // A typical usage is, one should first call
+  //                  LU_fac();
+  // to obtain the LU factorization of the matrix. The L and U matrices are
+  // stored in the same 1D array by replacing the original matrix entries. This
+  // means the matrix content is changed after one calls LU_fac function. To
+  // solve with a RHS b, one just need to make a second function call as
+  //                  x = LU_solve(b);
   //
   // Ref. Numerical Linear Algebra by L.N. Trefethen and D. Bau, III, SIAM.
-  // ================================================================
+  // ==========================================================================
   template<int N> class Matrix_Dense
   {
     public:
@@ -375,11 +378,12 @@ namespace MATH_T
 
       bool get_is_fac() const {return is_fac;}
 
-      // ------------------------------------------------------------
+      // ----------------------------------------------------------------------
       // perform LU-factorization for the matrix. The mat object will be replaced
       // by the LU matrices. Only partial pivoting is performed. Complete pivoting
       // is not used because the improvement of stability is marginal and the
       // amount of time needed will increase.
+      // ----------------------------------------------------------------------
       void LU_fac()
       {
         for(int kk=0; kk<N-1; ++kk)
@@ -439,8 +443,10 @@ namespace MATH_T
         return result;
       }
 
+      // ----------------------------------------------------------------------
       // with LU factorization performed, solve a linear problem with given RHS
       // users are responsible for allocating the b and x arrays.
+      // ----------------------------------------------------------------------
       std::array<double, N> LU_solve( std::array<double, N> &bb ) const
       {
         std::array<double, N> xx {};
@@ -522,19 +528,18 @@ namespace MATH_T
       bool is_fac;
   };
 
-  // ================================================================
+  // ==========================================================================
   // Dense Symmetric Positive definite matrix tool.
-  // The user should be sure that the matrix is symmetric and positive
-  // definite.
+  // The user should be sure that the matrix is symmetric and positive definite.
   // The objective is to implement efficient LDL^t decomposition,
-  // which can be used to solve problems like inverting the normal
-  // equation.
-  // Typical usage is that one should call
-  // LDLt_fac();
-  // LDLt_solve(b,x);
+  // which can be used to solve problems like inverting the normal equation.
+  // Typical usage is that one should first call
+  //               LDLt_fac();
+  // and then call the following to solve with the RHS b.
+  //               x = LDLt_solve(b);
   //
   // Ref. Shufang Xu, Numerical Linear Algebra, Peking Univ.
-  // ================================================================
+  // ==========================================================================
   template<int N> class Matrix_SymPos_Dense : public Matrix_Dense <N>
   {
     public:
@@ -544,7 +549,10 @@ namespace MATH_T
       Matrix_SymPos_Dense(const std::array<double,N*N> &input) : Matrix_Dense<N>(input)
       {}
 
-      // We assume that the input matrix are the symmetry positive definite matrix 
+      // ----------------------------------------------------------------------
+      // We assume that the input matrix are the symmetry positive definite matrix
+      // and we do not check this in the constructor 
+      // ----------------------------------------------------------------------
       Matrix_SymPos_Dense( const Matrix_Dense<N> &input ) : Matrix_Dense<N>()
       { 
         for(int ii=0; ii<N*N; ++ii) this->mat[ii] = input(ii);
@@ -559,8 +567,9 @@ namespace MATH_T
 
       virtual ~Matrix_SymPos_Dense() {};
 
-      // Check the symmetry of the matrix, throw an error if
-      // non-symmetriness is found.
+      // ----------------------------------------------------------------------
+      // Check the symmetry of the matrix, throw an error if non-symmetriness is found.
+      // ----------------------------------------------------------------------
       void check_symm() const
       {
         for(int ii=0; ii<N; ++ii)
@@ -580,12 +589,11 @@ namespace MATH_T
         return *this;             
       }    
 
-      // ------------------------------------------------------------
-      // Perform LDL^t transformation. The mat object will be replace
-      // by the entries of the L matrix and the D matrix. Pivoting is
-      // not used because this decomposition for symmetry positive
-      // definite matrix is stable.
-      // ------------------------------------------------------------
+      // ----------------------------------------------------------------------
+      // Perform LDL^t transformation. The mat object will be replace by the 
+      // entries of the L matrix and the D matrix. Pivoting is NOT used because 
+      // this decomposition for symmetry positive definite matrix is stable.
+      // ----------------------------------------------------------------------
       void LDLt_fac()
       {
         // This algorithm is given in Shufang XU's book, pp 31. 
@@ -609,11 +617,10 @@ namespace MATH_T
         this->is_fac = true;
       }
 
-      // ------------------------------------------------------------
-      // With the LDLt_fac() function performed, solve a linear problem
-      // with the given RHS.
-      // users are responsible for allocating the bb and xx arrays.
-      // ------------------------------------------------------------
+      // ----------------------------------------------------------------------
+      // With the LDLt_fac() function performed, solve a linear problem with 
+      // the given RHS.
+      // ----------------------------------------------------------------------
       std::array<double, N>  LDLt_solve( std::array<double, N> &bb ) const
       {
         std::array<double, N> xx {};
@@ -633,11 +640,10 @@ namespace MATH_T
         {
           for(int jj=ii+1; jj<N; ++jj) xx[ii] -= this->mat[jj*N+ii] * xx[jj];
         }
-        
         return xx;
       }
-
   };
-}
+
+} // End of Math_T
 
 #endif
