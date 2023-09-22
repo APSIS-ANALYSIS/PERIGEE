@@ -8,6 +8,7 @@
 // ============================================================================
 #include <stdio.h>
 #include <vector> 
+#include "Sys_Tools.hpp"
 #include "Matrix_double_3by3_Array.hpp"
 
 namespace MATH_T
@@ -123,6 +124,7 @@ namespace MATH_T
   inline double get_mean( const std::vector<double> &vec )
   {
     double sum = 0.0; double nn = 0.0;
+
     for(unsigned int ii=0; ii<vec.size(); ++ii)
     {
       sum += vec[ii];
@@ -147,8 +149,8 @@ namespace MATH_T
   }
   
   // ----------------------------------------------------------------
-  // Generate a Gaussian/normal distribution random value with mean value
-  // mean, and standard deviation dev.
+  // Generate a Gaussian distribution vector with length n, mean value
+  // mean, and standard deviation dev, using Marsaglia algorithm
   // ----------------------------------------------------------------
   inline double gen_double_rand_normal( const double &mean, const double &std )
   {
@@ -377,6 +379,330 @@ namespace MATH_T
 
       // bool variable indicate if the matrix has been LU factorized.
       bool is_fac;
+  };
+
+  template<int N> class Matrix_Dense
+  {
+    public:
+      Matrix_Dense()
+      {
+        ASSERT(N>=1, "Matrix_Dense<N> Error: The matrix size N must be positive.\n");      
+
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = 0.0;
+        for(int ii=0; ii<N; ++ii)
+        {
+          mat[ii*N+ii] = 1.0;
+          pp[ii] = ii;
+        }
+        is_fac = false;
+      }
+
+      Matrix_Dense( const std::array<double,N*N> &input )
+      {
+        ASSERT(N>=1, "Matrix_Dense<N> Error: The matrix size N must be positive.\n");      
+        
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = input[ii];
+        for(int ii=0; ii<N; ++ii) pp[ii] = ii;
+        is_fac = false;
+      }
+
+      virtual ~Matrix_Dense() {};
+
+      void print_info() const
+      {
+        std::cout<<"N ="<<N<<'\n';
+        std::cout<<"Matrix :\n";
+        int counter = -1;
+        for(int ii=0; ii<N; ++ii)
+        {
+          for(int jj=0; jj<N; ++jj)
+            std::cout<<mat[++counter]<<'\t';
+          std::cout<<'\n';
+        }
+        std::cout<<"p : \n";
+        for(int ii=0; ii<N; ++ii)
+          std::cout<<pp[ii]<<'\t';
+        std::cout<<std::endl;
+
+        if(is_fac)
+          std::cout<<"Matrix is factorized.\n";
+        else
+          std::cout<<"Matrix is NOT factorized.\n";
+      }
+  
+      void gen_rand(const double &min = -1.0, const double &max = 1.0)
+      {
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = gen_double_rand(min, max);
+
+        for(int ii=0; ii<N; ++ii) pp[ii] = ii;
+      }
+
+      int get_p(const int &ii) const {return pp[ii];}
+
+      double& operator()(const int &index) {return mat[index];}
+
+      const double& operator()(const int &index) const {return mat[index];}
+
+      double& operator()(const int &ii, const int &jj) {return mat[N*ii+jj];}
+
+      const double& operator()(const int &ii, const int &jj) const {return mat[N*ii+jj];}
+
+      // Assignment operator
+      virtual Matrix_Dense<N>& operator= (const Matrix_Dense<N> &source)
+      {
+        // self-assignment guard
+        if(this == &source) return *this;
+
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = source(ii);
+
+        for(int ii=0; ii<N; ++ii) pp[ii] = source.get_p(ii);
+
+        is_fac = source.get_is_fac();
+
+        return *this;             
+      }     
+
+      int get_size() const {return N;}
+
+      bool get_is_fac() const {return is_fac;}
+
+      void LU_fac()
+      {
+        for(int kk=0; kk<N-1; ++kk)
+        {
+          double max_value = std::abs(mat[kk*N+kk]);
+          int max_index = kk;
+          bool pivot_flag = false;
+          for(int ii=kk+1; ii<N; ++ii)
+          {
+            if( max_value < std::abs(mat[ii*N+kk]) )
+            {
+              max_value = std::abs(mat[ii*N+kk]);
+              max_index = ii;
+              pivot_flag = true;
+            }
+          }
+
+          if(pivot_flag)
+          {
+            const int int_temp = pp[kk];
+            pp[kk] = pp[max_index];
+            pp[max_index] = int_temp;
+
+            for(int ii=0; ii<N; ++ii)
+            {
+              const double temp = mat[kk*N+ii];
+              mat[kk*N+ii] = mat[max_index*N+ii];
+              mat[max_index*N+ii] = temp;
+            }
+          }
+
+          const double invAkk = 1.0 / mat[kk*N+kk];
+
+          for(int ii=kk+1; ii<N; ++ii)
+          {
+            mat[ii*N+kk] = mat[ii*N+kk] * invAkk;
+            for(int jj=kk+1; jj<N; ++jj)
+              mat[ii*N+jj] -= mat[ii*N+kk] * mat[kk*N+jj];
+          }
+        }
+
+        is_fac = true;
+      }
+
+      double det() const
+      {
+        Matrix_Dense<N> copy = *this;
+        copy.LU_fac();
+        double result = 1.0;
+        for(int ii {0}; ii < N; ++ii)
+        {
+          if (std::abs(copy(ii, ii)) < 1.0e-16)
+            return 0.0;
+          else
+            result *= copy(ii, ii);
+        }
+        return result;
+      }
+
+      std::array<double, N> LU_solve( std::array<double, N> &bb ) const
+      {
+        std::array<double, N> xx {};
+        for(int ii=0; ii<N; ++ii) xx[ii] = bb[pp[ii]];
+
+        for(int ii=1; ii<N; ++ii)
+          for(int jj=0; jj<ii; ++jj)
+            xx[ii] -= mat[ii*N+jj] * xx[jj];
+
+        for(int ii=N-1; ii>=0; --ii)
+        {
+          for(int jj=N-1; jj>ii; --jj)
+              xx[ii] -= mat[ii*N+jj] * xx[jj];
+
+          xx[ii] = xx[ii] / mat[ii*N+ii];
+        }
+
+        return xx;
+      }
+
+      std::array<double,N> Mult( const std::array<double,N> &input ) const
+      {
+        ASSERT(is_fac == false, "Error: the matrix has been factroized.\n");
+        std::array<double,N> out {};
+        for(int ii=0; ii<N; ++ii)
+        {
+          out[ii] = 0.0;
+          for(int jj=0; jj<N; ++jj)
+            out[ii] += mat[N*ii+jj] * input[jj];
+        }
+        return out;
+      }
+
+      void Mult( const Matrix_Dense<N> &left, const Matrix_Dense<N> &right ) 
+      {
+        ASSERT(is_fac == false, "Error: the matrix has been factroized.\n");
+        
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = 0.0;
+
+        for(int ii=0; ii<N; ++ii)
+        {
+          for(int jj=0; jj<N; ++jj)
+          {
+            for(int kk=0; kk<N; ++kk)
+              mat[ii*N+jj] += left(ii, kk) * right(kk, jj);
+          }
+        }
+
+        for(int ii=0; ii<N; ++ii) pp[ii] = ii; 
+
+        is_fac = false;
+      }
+
+      void transpose()
+      {
+        ASSERT(is_fac == false, "Error: the matrix has been factroized.\n");
+
+        double temp[N*N];
+        for(int ii=0; ii<N; ++ii)
+        {
+          for(int jj=0; jj<N; ++jj) temp[jj*N+ii] = mat[ii*N+jj];
+        }
+
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = temp[ii];
+
+        for(int ii=0; ii<N; ++ii) pp[ii] = ii;
+
+        is_fac = false;
+      }
+
+    protected:
+      double mat[N*N];
+
+      int pp[N];
+
+      bool is_fac;
+  };
+
+  template<int N> class Matrix_SymPos_Dense : public Matrix_Dense <N>
+  {
+    public:
+      Matrix_SymPos_Dense() : Matrix_Dense<N>()
+      {}
+
+      Matrix_SymPos_Dense(const std::array<double,N*N> &input) : Matrix_Dense<N>(input)
+      {}
+
+      // We assume that the input matrix are the symmetry positive definite matrix 
+      Matrix_SymPos_Dense( const Matrix_Dense<N> &input ) : Matrix_Dense<N>()
+      { 
+        for(int ii=0; ii<N*N; ++ii) this->mat[ii] = input(ii);
+        
+        // Check the symmetry of the matrix
+        check_symm();
+
+        for(int ii=0; ii<N; ++ii) this->pp[ii] = input.get_p(ii); 
+
+        this->is_fac = input.get_is_fac();
+      }
+
+      virtual ~Matrix_SymPos_Dense() {};
+
+      // Check the symmetry of the matrix, throw an error if
+      // non-symmetriness is found.
+      void check_symm() const
+      {
+        for(int ii=0; ii<N; ++ii)
+        {
+          for(int jj=0; jj<ii; ++jj)
+          {
+            if( !MATH_T::equals( this->mat[ii*N+jj], this->mat[jj*N+ii], 1.0e-15) ) 
+              std::cout<<"error: Matrix_SymPos entry ("<<ii<<","<<jj<<") does not match entry ("<<jj<<","<<ii<<"). \n";
+          }
+        }
+      }
+
+      // Assignment operator
+      Matrix_SymPos_Dense<N>& operator= (const Matrix_SymPos_Dense<N> &source)
+      {
+        this->operator=(source);
+        return *this;             
+      }    
+
+      // ------------------------------------------------------------
+      // Perform LDL^t transformation. The mat object will be replace
+      // by the entries of the L matrix and the D matrix. Pivoting is
+      // not used because this decomposition for symmetry positive
+      // definite matrix is stable.
+      void LDLt_fac()
+      {
+        // This algorithm is given in Shufang XU's book, pp 31. 
+        std::array<double, N> v {}; 
+
+        for(int jj=0; jj<N; ++jj)
+        {
+          const int Njj = jj * N;
+          for(int kk=0; kk<jj; ++kk) v[kk] = this->mat[Njj+kk] * this->mat[kk*N+kk];
+
+          for(int kk=0; kk<jj; ++kk) this->mat[Njj+jj] -= v[kk] * this->mat[Njj+kk];
+
+          for(int ii=jj+1; ii<N; ++ii)
+          {
+            for(int kk=0; kk<jj; ++kk) this->mat[N*ii+jj] -= this->mat[ii*N+kk] * v[kk];
+
+            this->mat[N*ii+jj] *= 1.0 / this->mat[Njj+jj];
+          }
+        }
+
+        this->is_fac = true;
+      }
+
+      // With the LDLt_fac() function performed, solve a linear problem
+      // with the given RHS.
+      // users are responsible for allocating the bb and xx arrays.
+      std::array<double, N>  LDLt_solve( std::array<double, N> &bb ) const
+      {
+        std::array<double, N> xx {};
+
+        // Solve for Ly = b
+        for(int ii=0; ii<N; ++ii)
+        {
+          xx[ii] = bb[ii];
+          for(int jj=0; jj<ii; ++jj) xx[ii] -= this->mat[ii*N+jj] * xx[jj];
+        }
+
+        // Solve for D z = y;
+        for(int ii=0; ii<N; ++ii) xx[ii] *= 1.0 / this->mat[ii*N+ii];
+
+        // Solve L^t x = z
+        for(int ii=N-2; ii>=0; --ii)
+        {
+          for(int jj=ii+1; jj<N; ++jj) xx[ii] -= this->mat[jj*N+ii] * xx[jj];
+        }
+        
+        return xx;
+      }
+
+      // ------------------------------------------------------------
   };
 
 

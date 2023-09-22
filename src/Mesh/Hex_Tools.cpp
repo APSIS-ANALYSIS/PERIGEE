@@ -607,6 +607,7 @@ void HEX_T::hexmesh_check(const std::vector<double> &cpts,
   cout<<"- number of distorted element : "<<num_dist_elem<<endl;
   cout<<"- number of element with aspect ratio larger than "<<crit_aspect_ratio<<" : "<<num_aspt_elem<<endl;
   std::cout<<"==================================\n";
+
 }
 
 // EOF

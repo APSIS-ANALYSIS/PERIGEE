@@ -317,9 +317,10 @@ namespace MATH_T
       double value = rand() % 1000; 
 
       mat[ii] = value * 1.0e-2 - 5;
-
-      p[ii] = ii;
     }
+        
+    for(int ii=0; ii<N; ++ii)
+      p[ii] = ii;
   }
 
   void Matrix_dense::gen_hilb()
@@ -511,6 +512,7 @@ namespace MATH_T
       for(int jj=ii+1; jj<N; ++jj) x[ii] -= mat[jj*N+ii] * x[jj];
     }
   }
-}
-// End of Namespace Math_T
+
+} // End of Namespace Math_T
+
 // EOF
