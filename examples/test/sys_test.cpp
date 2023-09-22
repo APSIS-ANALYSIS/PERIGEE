@@ -24,23 +24,10 @@ int main(int argc, char *argv[])
 
   mtest1.gen_rand(-10, 10);
 
-  auto mt1 = MATH_T::transpose(mtest1);
-  auto mt2 = mtest1;
-  mt2.transpose();
-  std::cout<<"transpose test. \n";
-  for(int ii=0; ii<size*size; ++ii) std::cout<<mt1(ii) - mt2(ii)<<std::endl;
-  for(int ii=0; ii<size; ++ii) std::cout<<mt1.get_p(ii) - mt2.get_p(ii)<<std::endl;
-  for(int ii=0; ii<size; ++ii) std::cout<<mt1.get_is_fac()<<" "<<mt2.get_is_fac()<<std::endl;
-
   mtest1.print_info();
 
-  //std::cout << "det = " << mtest1.det() << std::endl;
+  auto mtest1_copy = mtest1;  
 
-  const MATH_T::Matrix_Dense<size> mtest1_copy = mtest1;
-
-  for(int ii=0; ii<size*size; ++ii) std::cout<<mtest1_copy(ii) - mtest1(ii)<<std::endl;
-  for(int ii=0; ii<size; ++ii) std::cout<<mtest1_copy.get_p(ii) - mtest1.get_p(ii)<<std::endl;
-  for(int ii=0; ii<size; ++ii) std::cout<<mtest1_copy.get_is_fac()<<" "<<mtest1.get_is_fac()<<std::endl;
 
   std::cout<<"================template< int N> class Matrix_Dense test==============="<<std::endl;
 
@@ -50,15 +37,8 @@ int main(int argc, char *argv[])
   
   mtest1.LU_fac();
 
-  mtest1.print_info();
-
-  //MATH_T::Matrix_Dense<size> mtest11 = mtest1;
-
-  //mtest11.print_info();
-
   MATH_T::Matrix_Dense<size> l_mtest1 {};
   MATH_T::Matrix_Dense<size> u_mtest1 {};
-
 
   for (int ii=0; ii<size; ++ii)
   {
@@ -76,11 +56,9 @@ int main(int argc, char *argv[])
     }
   }
 
-
   std::cout<<"----------------L----------------"<<std::endl;
 
   l_mtest1.print_info();
-
 
   std::cout<<"----------------U----------------"<<std::endl;
 
@@ -101,14 +79,6 @@ int main(int argc, char *argv[])
     pp[ii] = mtest1.get_p(ii);
     //std::cout<<"p:"<<pp[ii]<<std::endl;
   }    
-
-  for(int ii = 0; ii<size; ++ii)
-  {
-    for(int jj = 0; jj<size; ++jj)
-    {
-      std::cout << mtest1_copy(pp[ii], jj) - lu_mtest1(ii , jj) << std::endl;
-    }
-  }
 
   std::cout<<"----------------Lu solve----------------"<<std::endl;
 
@@ -136,7 +106,8 @@ int main(int argc, char *argv[])
 
   std::cout<<"================template< int N> class Matrix_SymPos_Dense test==============="<<std::endl;
 
-  const MATH_T::Matrix_Dense<size> mtest1_copy_T = transpose(mtest1_copy);
+  MATH_T::Matrix_Dense<size> mtest1_copy_T = mtest1_copy;
+  mtest1_copy_T.transpose();
 
   //mtest1_copy_T.print_info();
 
@@ -231,7 +202,8 @@ int main(int argc, char *argv[])
 
   MATH_T::Matrix_SymPos_Dense<size> ldlt_symtest1 {};
 
-  ldlt_symtest1.Mult(ld_symtest1, transpose(l_symtest1)); 
+  auto temp3 = l_symtest1; temp3.transpose();
+  ldlt_symtest1.Mult(ld_symtest1, temp3); 
 
   ldlt_symtest1.print_info();
 
@@ -338,12 +310,12 @@ int main(int argc, char *argv[])
     double TimeD_3x3 = mytimer->get_sec();
 
     totalTimeD_3x3 += TimeD_3x3;
-    std::cout<<"sol3 - sol3d \n"; 
-    for( int ii=0; ii<3; ++ii)
-    {
-      std::cout<<sol3[ii] -  sol3d[ii] << '\t';
-    }
-    std::cout<<'\n';
+    //std::cout<<"sol3 - sol3d \n"; 
+    //for( int ii=0; ii<3; ++ii)
+   // {
+   //   std::cout<<sol3[ii] -  sol3d[ii] << '\t';
+   // }
+   // std::cout<<'\n';
     
     for(int ii=0; ii<3; ++ii)
     {
@@ -452,7 +424,9 @@ int main(int argc, char *argv[])
 
     MATH_T::Matrix_SymPos_Dense<3> smtest1d_3x3{};
 
-    smtest1d_3x3.Mult(transpose(mtest1d_3x3), mtest1d_3x3);
+    auto temp1 = mtest1d_3x3; temp1.transpose();
+
+    smtest1d_3x3.Mult(temp1, mtest1d_3x3);
 
     const MATH_T::Matrix_SymPos_Dense<3> smtest1d_3x3_copy = smtest1d_3x3;
 
@@ -585,7 +559,9 @@ int main(int argc, char *argv[])
 
     MATH_T::Matrix_SymPos_Dense<6> smtest1d_6x6{};
 
-    smtest1d_6x6.Mult(transpose(mtest1d_6x6), mtest1d_6x6);
+    auto temp2 = mtest1d_6x6; temp2.transpose();
+
+    smtest1d_6x6.Mult(temp2, mtest1d_6x6);
 
     const MATH_T::Matrix_SymPos_Dense<6> smtest1d_6x6_copy = smtest1d_6x6;
 
@@ -670,12 +646,13 @@ int main(int argc, char *argv[])
     double TimeD_6x6 = mytimer->get_sec();
 
     totalTimeD_6x6 += TimeD_6x6;
-/*
+    
+    std::cout<<"sol6 - sol6d : \t";
     for( int ii=0; ii<6; ++ii)
     {
-      std::cout<<sol6[ii]<<" "<< sol6d[ii] << std::endl;
+      std::cout<<sol6[ii] - sol6d[ii] << '\t';
     }
-*/
+    std::cout<<'\n';
 
     // compute error     
     const std::array<double, 6> act_sol6d = smtest1d_6x6_copy.Mult(sol6d);
