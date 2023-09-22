@@ -24,6 +24,14 @@ int main(int argc, char *argv[])
 
   mtest1.gen_rand(-10, 10);
 
+  auto mt1 = MATH_T::transpose(mtest1);
+  auto mt2 = mtest1;
+  mt2.transpose();
+  std::cout<<"transpose test. \n";
+  for(int ii=0; ii<size*size; ++ii) std::cout<<mt1(ii) - mt2(ii)<<std::endl;
+  for(int ii=0; ii<size; ++ii) std::cout<<mt1.get_p(ii) - mt2.get_p(ii)<<std::endl;
+  for(int ii=0; ii<size; ++ii) std::cout<<mt1.get_is_fac()<<" "<<mt2.get_is_fac()<<std::endl;
+
   mtest1.print_info();
 
   //std::cout << "det = " << mtest1.det() << std::endl;
@@ -296,9 +304,6 @@ int main(int argc, char *argv[])
 
     for(int ii=0; ii<3; ++ii)
     {
-      //double value = rand() % 1000; 
-
-      //b3[ii] = value * 1.0e-2 - 5;
       b3[ii] = MATH_T::gen_double_rand(-10, 10);
     }
 /*
@@ -333,12 +338,13 @@ int main(int argc, char *argv[])
     double TimeD_3x3 = mytimer->get_sec();
 
     totalTimeD_3x3 += TimeD_3x3;
-/*
+    std::cout<<"sol3 - sol3d \n"; 
     for( int ii=0; ii<3; ++ii)
     {
-      std::cout<<sol3[ii]<<" "<< sol3d[ii] << std::endl;
+      std::cout<<sol3[ii] -  sol3d[ii] << '\t';
     }
-*/
+    std::cout<<'\n';
+    
     for(int ii=0; ii<3; ++ii)
     {
       if(std::abs(sol3.at(ii) - sol3d.at(ii)) > 1.0e-10)

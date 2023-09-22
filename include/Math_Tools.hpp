@@ -584,19 +584,6 @@ namespace MATH_T
       bool is_fac;
   };
 
-  template<int N> Matrix_Dense<N> transpose(const Matrix_Dense<N> &input)
-  {
-    ASSERT(input.get_is_fac() == false, "Error: the matrix has been factroized.\n");
-        
-    Matrix_Dense<N> output {};
-    for(int ii=0; ii<N; ++ii)
-    {
-      for(int jj=0; jj<N; ++jj) output(jj, ii) = input(ii, jj);         
-    }
-
-    return output;
-  }
-
   template<int N> class Matrix_SymPos_Dense : public Matrix_Dense <N>
   {
     public:
