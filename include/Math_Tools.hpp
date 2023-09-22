@@ -510,7 +510,7 @@ namespace MATH_T
 
       std::array<double, N> LU_solve( std::array<double, N> &bb ) const
       {
-        std::array<double, N> xx;
+        std::array<double, N> xx {};
         for(int ii=0; ii<N; ++ii) xx[ii] = bb[pp[ii]];
 
         for(int ii=1; ii<N; ++ii)

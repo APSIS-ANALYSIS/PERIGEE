@@ -390,9 +390,10 @@ namespace MATH_T
       double value = rand() % 1000; 
 
       mat[ii] = value * 1.0e-2 - 5;
-
-      p[ii] = ii;
     }
+        
+    for(int ii=0; ii<N; ++ii)
+      p[ii] = ii;
   }
 
   void Matrix_dense::gen_hilb()
