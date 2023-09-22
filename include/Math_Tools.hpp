@@ -375,7 +375,7 @@ namespace MATH_T
         for(int ii=0; ii<N; ++ii)
         {
           mat[ii*N + ii] = 1.0;
-          p[ii] = ii;
+          pp[ii] = ii;
         }
         is_fac = false;
       }
@@ -385,7 +385,7 @@ namespace MATH_T
         ASSERT(N>=1, "Matrix_Dense<N> Error: The matrix size N must be positive.\n");      
         
         for(int ii=0; ii<N*N; ++ii) mat[ii] = input[ii];
-        for(int ii=0; ii<N; ++ii) p[ii] = ii;
+        for(int ii=0; ii<N; ++ii) pp[ii] = ii;
         is_fac = false;
       }
 
@@ -407,7 +407,7 @@ namespace MATH_T
         }
         std::cout<<"p : \n";
         for(int ii=0; ii<N; ++ii)
-          std::cout<<p[ii]<<'\t';
+          std::cout<<pp[ii]<<'\t';
         std::cout<<std::endl;
 
         if(is_fac)
@@ -429,10 +429,10 @@ namespace MATH_T
 */
         for(int ii=0; ii<N*N; ++ii) mat[ii] = gen_double_rand(min, max);
 
-        for(int ii=0; ii<N; ++ii) p[ii] = ii;
+        for(int ii=0; ii<N; ++ii) pp[ii] = ii;
       }
 
-      int get_p(const int &ii) const { return p[ii];}
+      int get_p(const int &ii) const { return pp[ii];}
 
       double& operator()(const int &index) {return mat[index];}
 
@@ -450,7 +450,7 @@ namespace MATH_T
 
         for(int ii=0; ii<N*N; ++ii) mat[ii] = source(ii);
 
-        for(int ii=0; ii<N; ++ii) p[ii] = source.get_p(ii);
+        for(int ii=0; ii<N; ++ii) pp[ii] = source.get_p(ii);
 
         is_fac = source.get_is_fac();
 
@@ -480,9 +480,9 @@ namespace MATH_T
 
           if(pivot_flag)
           {
-            const int int_temp = p[kk];
-            p[kk] = p[max_index];
-            p[max_index] = int_temp;
+            const int int_temp = pp[kk];
+            pp[kk] = pp[max_index];
+            pp[max_index] = int_temp;
 
             for(int ii=0; ii<N; ++ii)
             {
@@ -518,24 +518,24 @@ namespace MATH_T
         return result;
       }
 
-      std::array<double, N> LU_solve( std::array<double, N> &b ) const
+      std::array<double, N> LU_solve( std::array<double, N> &bb ) const
       {
-        std::array<double, N> x;
-        for(int ii=0; ii<N; ++ii) x[ii] = b[p[ii]];
+        std::array<double, N> xx;
+        for(int ii=0; ii<N; ++ii) xx[ii] = bb[pp[ii]];
 
         for(int ii=1; ii<N; ++ii)
           for(int jj=0; jj<ii; ++jj)
-            x[ii] -= mat[ii*N+jj] * x[jj];
+            xx[ii] -= mat[ii*N+jj] * xx[jj];
 
         for(int ii=N-1; ii>=0; --ii)
         {
           for(int jj=N-1; jj>ii; --jj)
-              x[ii] -= mat[ii*N+jj] * x[jj];
+              xx[ii] -= mat[ii*N+jj] * xx[jj];
 
-          x[ii] = x[ii] / mat[ii*N+ii];
+          xx[ii] = xx[ii] / mat[ii*N+ii];
         }
 
-        return x;
+        return xx;
       }
 
       std::array<double,N> Mult( const std::array<double,N> &input )
@@ -569,7 +569,7 @@ namespace MATH_T
     protected:
       double mat[N*N];
 
-      int p[N];
+      int pp[N];
 
       bool is_fac;
   };
@@ -603,7 +603,7 @@ namespace MATH_T
         check_symm();
 
         for(int ii=0; ii<N; ++ii) 
-          Matrix_Dense <N>::p[ii] = input.get_p(ii); 
+          Matrix_Dense <N>::pp[ii] = input.get_p(ii); 
 
         Matrix_Dense <N>::is_fac = input.get_is_fac();
       }
@@ -661,28 +661,28 @@ namespace MATH_T
 
       // With the LDLt_fac() function performed, solve a linear problem
       // with the given RHS.
-      // users are responsible for allocating the b and x arrays.
-      std::array<double, N>  LDLt_solve( std::array<double, N> &b ) const
+      // users are responsible for allocating the bb and xx arrays.
+      std::array<double, N>  LDLt_solve( std::array<double, N> &bb ) const
       {
-        std::array<double, N> x;
+        std::array<double, N> xx;
 
         // Solve for Ly = b
         for(int ii=0; ii<N; ++ii)
         {
-          x[ii] = b[ii];
-          for(int jj=0; jj<ii; ++jj) x[ii] -= Matrix_Dense <N>::mat[ii*N+jj] * x[jj];
+          xx[ii] = bb[ii];
+          for(int jj=0; jj<ii; ++jj) xx[ii] -= Matrix_Dense <N>::mat[ii*N+jj] * xx[jj];
         }
 
         // Solve for D z = y;
-        for(int ii=0; ii<N; ++ii) x[ii] *= 1.0 / Matrix_Dense <N>::mat[ii*N+ii];
+        for(int ii=0; ii<N; ++ii) xx[ii] *= 1.0 / Matrix_Dense <N>::mat[ii*N+ii];
 
         // Solve L^t x = z
         for(int ii=N-2; ii>=0; --ii)
         {
-          for(int jj=ii+1; jj<N; ++jj) x[ii] -= Matrix_Dense <N>::mat[jj*N+ii] * x[jj];
+          for(int jj=ii+1; jj<N; ++jj) xx[ii] -= Matrix_Dense <N>::mat[jj*N+ii] * xx[jj];
         }
         
-        return x;
+        return xx;
       }
 
       // ------------------------------------------------------------

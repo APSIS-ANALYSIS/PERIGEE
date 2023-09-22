@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 
   mtest1.print_info();
 
-  std::cout << "det = " << mtest1.det() << std::endl;
+  //std::cout << "det = " << mtest1.det() << std::endl;
 
   MATH_T::Matrix_Dense<size> mtest1_copy = mtest1;
 
