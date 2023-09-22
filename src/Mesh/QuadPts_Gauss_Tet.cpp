@@ -143,25 +143,18 @@ void QuadPts_Gauss_Tet::print_info() const
 std::vector<double> QuadPts_Gauss_Tet::gen_permutations(const double &a,
     const double &b, const double &c ) const
 {
-  std::vector<double> out {};
-  out.push_back(a); out.push_back(b); out.push_back(c); out.push_back(c);
-  out.push_back(a); out.push_back(c); out.push_back(b); out.push_back(c);
-  out.push_back(a); out.push_back(c); out.push_back(c); out.push_back(b);
-  
-  out.push_back(b); out.push_back(a); out.push_back(c); out.push_back(c);
-  out.push_back(b); out.push_back(c); out.push_back(a); out.push_back(c);
-  out.push_back(b); out.push_back(c); out.push_back(c); out.push_back(a);
-  
-  out.push_back(c); out.push_back(a); out.push_back(b); out.push_back(c);
-  out.push_back(c); out.push_back(b); out.push_back(a); out.push_back(c);
-  
-  out.push_back(c); out.push_back(a); out.push_back(c); out.push_back(b);
-  out.push_back(c); out.push_back(b); out.push_back(c); out.push_back(a);
-  
-  out.push_back(c); out.push_back(c); out.push_back(a); out.push_back(b);
-  out.push_back(c); out.push_back(c); out.push_back(b); out.push_back(a);
-
-  return out;
+  return {a,b,c,c,
+    a,c,b,c,
+    a,c,c,b,
+    b,a,c,c,
+    b,c,a,c,
+    b,c,c,a,
+    c,a,b,c,
+    c,b,a,c,
+    c,a,c,b,
+    c,b,c,a,
+    c,c,a,b,
+    c,c,b,a };
 }
 
 // EOF
