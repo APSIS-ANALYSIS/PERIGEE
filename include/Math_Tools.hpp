@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <vector> 
 #include "Sys_Tools.hpp"
-#include "Matrix_double_3by3_Array.hpp"
 
 namespace MATH_T
 {
