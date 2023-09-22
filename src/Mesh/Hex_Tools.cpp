@@ -213,5 +213,10 @@ std::vector<int> HEX_T::reset_node (const std::vector<int> &ien)
    return local_ien_vtk;
   }
   else
+  {
     SYS_T::print_exit("Error: In HEX_T::reset_node, undefined hexahedron type.");
+    return {};
+  }
 }
+
+// EOF

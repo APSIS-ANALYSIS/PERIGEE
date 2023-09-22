@@ -174,8 +174,6 @@ namespace MATH_T
   // ----------------------------------------------------------------
   // Generate a Gaussian distribution vector with length n, mean value
   // mean, and standard deviation dev, using Marsaglia algorithm
-  //
-  // Note: Call srand((unsigned)time(NULL)) before calling this generator!
   // ----------------------------------------------------------------
   void gen_Gaussian( const int &n, const double &mean, const double &std,
       std::vector<double> &val );
@@ -420,7 +418,7 @@ namespace MATH_T
         for(int ii=0; ii<N; ++ii) pp[ii] = ii;
       }
 
-      int get_p(const int &ii) const { return pp[ii];}
+      int get_p(const int &ii) const {return pp[ii];}
 
       double& operator()(const int &index) {return mat[index];}
 
@@ -493,14 +491,14 @@ namespace MATH_T
         is_fac = true;
       }
 
-      const double det() const
+      double det() const
       {
         Matrix_Dense<N> copy = *this;
         copy.LU_fac();
         double result = 1.0;
-        for(int ii{0}; ii < N; ++ii)
+        for(int ii {0}; ii < N; ++ii)
         {
-          if (std::abs(copy(ii, ii)) < 1e-16)
+          if (std::abs(copy(ii, ii)) < 1.0e-16)
             return 0.0;
           else
             result *= copy(ii, ii);
@@ -557,6 +555,23 @@ namespace MATH_T
         }
 
         for(int ii=0; ii<N; ++ii) pp[ii] = ii; 
+
+        is_fac = false;
+      }
+
+      void transpose()
+      {
+        ASSERT(is_fac == false, "Error: the matrix has been factroized.\n");
+
+        double temp[N*N];
+        for(int ii=0; ii<N; ++ii)
+        {
+          for(int jj=0; jj<N; ++jj) temp[jj*N+ii] = mat[ii*N+jj];
+        }
+
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = temp[ii];
+
+        for(int ii=0; ii<N; ++ii) pp[ii] = ii;
 
         is_fac = false;
       }
