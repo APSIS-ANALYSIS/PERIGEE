@@ -24,11 +24,11 @@
 
 int main(int argc, char *argv[])
 { 
-  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+  std::string myname {};
 
-  SYS_T::print_fatal("Some error messages.\n");
+  SYS_T::get_option_string("-name", myname, argc, argv);
 
-  PetscFinalize();
+  std::cout << myname << std::endl;
 
   return EXIT_SUCCESS;
 }
