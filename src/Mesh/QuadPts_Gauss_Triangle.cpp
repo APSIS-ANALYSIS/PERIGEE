@@ -1,6 +1,7 @@
 #include "QuadPts_Gauss_Triangle.hpp"
 
-QuadPts_Gauss_Triangle::QuadPts_Gauss_Triangle( const int &in_num_pts ) : num_pts( in_num_pts )
+QuadPts_Gauss_Triangle::QuadPts_Gauss_Triangle( const int &in_num_pts )
+: num_pts( in_num_pts )
 {
   qp.resize( 3 * num_pts );
   qw.resize( num_pts );
@@ -300,11 +301,13 @@ QuadPts_Gauss_Triangle::QuadPts_Gauss_Triangle( const int &in_num_pts ) : num_pt
   for(int ii=0; ii<num_pts; ++ii) qw[ii] *= 0.5;
 }
 
+
 QuadPts_Gauss_Triangle::~QuadPts_Gauss_Triangle()
 {
   VEC_T::clean(qp);
   VEC_T::clean(qw);
 }
+
 
 void QuadPts_Gauss_Triangle::print_info() const
 {
@@ -318,5 +321,6 @@ void QuadPts_Gauss_Triangle::print_info() const
       <<'\t'<<qp[3*ii+1]<<'\t'<<qp[3*ii+2]<<'\t'<<qw[ii]<<'\n';
   std::cout<<"========================================="<<std::endl;
 }
+
 
 // EOF

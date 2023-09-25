@@ -1,15 +1,8 @@
 #include "QuadPts_Gauss.hpp"
 
-QuadPts_Gauss::QuadPts_Gauss( const int &in_num_pts, const double &min, 
-    const double &max ) : num_pts(in_num_pts)
+QuadPts_Gauss::QuadPts_Gauss( const int &in_num_pts )
+: num_pts(in_num_pts)
 {
-  // Make sure that min < max
-  SYS_T::print_fatal_if( min >= max, "Error: QuadPts_Gauss, the given range of quadrature domain is incorrect.\n");
-
-  // Make sure that the containers are empty
-  qp.clear(); qw.clear();
-
-  // Generate the rule for [0, 1] domain
   switch( num_pts )
   {
     case 1:
@@ -157,15 +150,6 @@ QuadPts_Gauss::QuadPts_Gauss( const int &in_num_pts, const double &min,
   // Reverse the points and weights to make them in ascending order
   std::reverse(qp.begin(), qp.end());
   std::reverse(qw.begin(), qw.end());
-  
-  // Now map the rule to the [min, max] domain via a linear change of interval
-  // x = (max-min) xi + min
-  // see en.wikipedia.org/wiki/Gaussian_quadrature
-  for( int ii =0; ii<num_pts; ++ii )
-  {
-    qp[ii] = (max - min) * qp[ii] + min;
-    qw[ii] = (max - min) * qw[ii];
-  }
 }
 
 QuadPts_Gauss::~QuadPts_Gauss()
