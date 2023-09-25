@@ -407,7 +407,7 @@ void ElemBC_3D::reset602IEN_outwardnormal( const IIEN * const &VIEN )
   {
     std::vector<int> node_q(9, 0); // biquadratic quadrangle node index in 2D mesh
     std::vector<int> node_q_gi(9, 0); // biquadratic quadrangle node index in 3D mesh
-    std::vector<int> hex_n(27,0); // triquadratic hex node index in 3D mesh
+    std::vector<int> hex_n(27, 0); // triquadratic hex node index in 3D mesh
 
     HEX_T::Hex8 * hexcell = new HEX_T::Hex8();  
 
