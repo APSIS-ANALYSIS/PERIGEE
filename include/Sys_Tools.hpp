@@ -180,6 +180,8 @@ namespace SYS_T
       va_end(Argp);
     }
 
+    if ( omp_in_parallel() ) omp_cancel( omp_get_thread_num() );
+
     MPI_Barrier(PETSC_COMM_WORLD);
     MPI_Abort(PETSC_COMM_WORLD, 1);
   }
