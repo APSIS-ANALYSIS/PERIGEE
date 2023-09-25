@@ -14,8 +14,6 @@ int main( int argc, char * argv[] )
 
   Gmsh_FileIO * GIO = new Gmsh_FileIO( gmshFile );
 
-  const std::string ffro_name("fluid_fro");
-
   GIO -> write_vtp(0,0,true);
   GIO -> write_vtp(1,0,true);
 
@@ -32,8 +30,6 @@ int main( int argc, char * argv[] )
   GIO -> write_vtp(10,1,true);
 
   GIO -> write_each_vtu();
-
-  const std::string inter_name("inter");
 
   const std::string wmname("whole_vol");
   const bool isXML = true;

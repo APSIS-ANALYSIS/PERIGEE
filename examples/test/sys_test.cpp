@@ -168,6 +168,8 @@ int main( int argc, char * argv[] )
 
       un = VEC3_T::cross_product( dx_dr, dx_ds );
 
+      un.normalize();
+
       std::cout<<"surface element "<<ee<<" out_normal: ("<<un.x()<<","<<un.y()<<","<<un.z()<<")"<<std::endl;
     }
 
