@@ -96,7 +96,6 @@ int main( int argc, char * argv[] )
 
   SYS_T::file_check(sur_s_file_interior_wall); std::cout<<sur_s_file_interior_wall<<" found. \n";
 
-
   // Read the geometry file for the whole FSI domain for the velocity /
   // displacement field
   int nFunc_v, nElem;

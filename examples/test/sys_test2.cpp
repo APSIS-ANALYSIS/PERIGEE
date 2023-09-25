@@ -96,7 +96,6 @@ int main( int argc, char * argv[] )
 
   SYS_T::file_check(sur_s_file_interior_wall); std::cout<<sur_s_file_interior_wall<<" found. \n";
 
-
   // Read the geometry file for the whole FSI domain for the velocity /
   // displacement field
   int nFunc_v, nElem;
@@ -122,12 +121,6 @@ int main( int argc, char * argv[] )
   ElemBC * ebc = new ElemBC_3D( ebclist, 602 );
 
   ebc -> resetSurIEN_outwardnormal( IEN_v ); // assign outward orientation for surface
-
-  //int nFunc_v_sur, nElem_sur;
-  //std::vector<int> vecIEN_sur;
-  //std::vector<double> ctrlPts_sur;
-
-  //VTK_T::read_vtp_grid( sur_s_file_out, nFunc_v_sur, nElem_sur, ctrlPts_sur, vecIEN_sur );
 
   for (int ii=0; ii<static_cast<int>(ebclist.size()); ++ii)
   {  
