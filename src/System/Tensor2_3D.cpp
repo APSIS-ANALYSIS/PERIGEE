@@ -559,7 +559,7 @@ Tensor2_3D operator*( const double &val, const Tensor2_3D &input )
       val * input(6), val * input(7), val * input(8) );
 }
 
-Tensor2_3D inverse( const Tensor2_3D &input )
+Tensor2_3D Ten2::inverse( const Tensor2_3D &input )
 {
   const double invdet = 1.0 / input.det();
 
@@ -574,7 +574,7 @@ Tensor2_3D inverse( const Tensor2_3D &input )
     invdet * (input(0) * input(4) - input(1) * input(3)) );
 }
 
-Tensor2_3D cofactor( const Tensor2_3D &input )
+Tensor2_3D Ten2::cofactor( const Tensor2_3D &input )
 {
   return Tensor2_3D( (input(4) * input(8) - input(5) * input(7)),
       (input(5) * input(6) - input(3) * input(8)),
@@ -587,21 +587,21 @@ Tensor2_3D cofactor( const Tensor2_3D &input )
       (input(0) * input(4) - input(1) * input(3)) );
 }
 
-Tensor2_3D transpose( const Tensor2_3D &input )
+Tensor2_3D Ten2::transpose( const Tensor2_3D &input )
 {
   return Tensor2_3D( input(0), input(3), input(6),
       input(1), input(4), input(7),
       input(2), input(5), input(8) );
 }
 
-Tensor2_3D gen_identity_matrix()
+Tensor2_3D Ten2::gen_identity_matrix()
 {
   return Tensor2_3D( 1.0, 0.0, 0.0,
       0.0, 1.0, 0.0,
       0.0, 0.0, 1.0 );
 }
 
-Tensor2_3D gen_zero_matrix()
+Tensor2_3D Ten2::gen_zero_matrix()
 {
   return Tensor2_3D( 0.0, 0.0, 0.0,
       0.0, 0.0, 0.0,

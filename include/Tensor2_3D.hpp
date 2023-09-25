@@ -270,19 +270,22 @@ Tensor2_3D operator*( const Tensor2_3D &left, const Tensor2_3D &right );
 // Return the scalar scaling of matrix
 Tensor2_3D operator*( const double &val, const Tensor2_3D &input );
 
-// Return the inverse of the input matrix
-Tensor2_3D inverse( const Tensor2_3D &input );
+namespace Ten2
+{
+  // Return the inverse of the input matrix
+  Tensor2_3D inverse( const Tensor2_3D &input );
 
-// Return the cofactor of input matrix which is J input^(-T)
-Tensor2_3D cofactor( const Tensor2_3D &input );
+  // Return the cofactor of input matrix which is J input^(-T)
+  Tensor2_3D cofactor( const Tensor2_3D &input );
 
-// Return the transpose of input matrix
-Tensor2_3D transpose( const Tensor2_3D &input );
+  // Return the transpose of input matrix
+  Tensor2_3D transpose( const Tensor2_3D &input );
 
-// Return an identity matrix
-Tensor2_3D gen_identity_matrix();
+  // Return an identity matrix
+  Tensor2_3D gen_identity_matrix();
 
-// Return a zero matrix
-Tensor2_3D gen_zero_matrix();
+  // Return a zero matrix
+  Tensor2_3D gen_zero_matrix();
+}
 
 #endif
