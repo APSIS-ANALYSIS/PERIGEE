@@ -1,12 +1,12 @@
 #ifndef ELEMBC_3D_HPP
 #define ELEMBC_3D_HPP
 // ============================================================================
-// ElemBC_3D_tet.hpp
+// ElemBC_3D.hpp
 //
 // This is an instantiation of ElemBC for 3D problems. It records the elemental 
 // bc information for separate surface files.
 //
-// Date: Feb. 6 2020
+// Date: Sep. 7 2023
 // ============================================================================
 #include "ElemBC.hpp"
 
