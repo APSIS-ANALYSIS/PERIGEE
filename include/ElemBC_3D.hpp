@@ -14,7 +14,7 @@ class ElemBC_3D : public ElemBC
 {
   public:
     // Default constructor: prescribe an elembc class with no surface mesh data.
-    ElemBC_3D( const int &elemtype = 501 );
+    ElemBC_3D( const int &elemtype=501 );
 
     ElemBC_3D( const std::string &vtkfile, const int &elemtype=501 );
 
