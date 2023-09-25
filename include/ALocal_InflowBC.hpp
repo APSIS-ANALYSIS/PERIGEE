@@ -62,7 +62,7 @@ class ALocal_InflowBC
     // determine whether a given index belongs to the LDN[nbc_id] vector
     // ------------------------------------------------------------------------
     virtual bool is_inLDN( const int &nbc_id, const int &ii ) const 
-    { return VEC_T::is_invec(LDN[nbc_id], ii); }
+    { return Vec3::is_invec(LDN[nbc_id], ii); }
 
     // ------------------------------------------------------------------------
     // get_radius: return the given point's (estimated) scaled radius for
