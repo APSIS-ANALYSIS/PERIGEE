@@ -467,23 +467,30 @@ namespace SYS_T
 
       ~Timer() {};
 
+      void Reset() { startedAt = 0; stoppedAt = 0; }
+
 #ifdef _OPENMP
       void Start() { startedAt = omp_get_wtime(); }
       void Stop()  { stoppedAt = omp_get_wtime(); }
+      double get_sec() const
+      {
+        return (stoppedAt - startedAt);
+      }
 #else
       void Start() { startedAt = clock(); }
       void Stop()  { stoppedAt = clock(); }
-#endif
-
-      void Reset() { startedAt = 0; stoppedAt = 0; }
-
       double get_sec() const
       {
         return (double)(stoppedAt - startedAt)/(double)CLOCKS_PER_SEC;
       }
+#endif
 
     private:
+#ifdef _OPENMP
+      double startedAt, stoppedAt;
+#else
       clock_t startedAt, stoppedAt;
+#endif
   };
 
   // Print ASCII art text for the code
