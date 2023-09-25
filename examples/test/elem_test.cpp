@@ -160,7 +160,7 @@ int main( int argc, char * argv[] )
   vec1.gen_rand();
   vec2.gen_rand();
   vec3.gen_rand();
-  Vector_3 vec_cross = cross_product(vec1, vec2);
+  Vector_3 vec_cross = VEC3_T::cross_product(vec1, vec2);
   if(vec_cross.dot_product( vec3 )<0.0)
   {
     Vector_3 temp = vec1;
@@ -168,7 +168,7 @@ int main( int argc, char * argv[] )
     vec2 = temp;
   }
 
-  const double volume = vec3.dot_product(cross_product(vec1, vec2));
+  const double volume = vec3.dot_product(VEC3_T::cross_product(vec1, vec2));
 
   double * ctrl_x_hex = new double[8]{0.0, vec1.x(), vec1.x()+vec2.x(), vec2.x(), 
     vec3.x(), vec3.x()+vec1.x(), vec3.x()+vec1.x()+vec2.x(), vec3.x()+vec2.x()};
@@ -250,7 +250,7 @@ int main( int argc, char * argv[] )
   double * Jinv_matlab = new double[9]{};
   double detJ_matlab = 0.0;
   std::ifstream infile;
-  infile.open("/Users/seavegetable/Documents/MATLAB/code_test/ctrlpts.txt",std::ios::in);
+  infile.open("../ctrlpts.txt",std::ios::in);
   if (!infile.is_open())
 	{
 		std::cout << "error" << std::endl;
@@ -318,7 +318,7 @@ int main( int argc, char * argv[] )
   infile >> detJ_matlab;
   infile.close();
   FEAElement_Hex27 hex_27(1);
-  std::vector<double> in_qp{{0.2, 0.3, 0.4}};
+  std::vector<double> in_qp{{0.52572, 0.33891, 0.12345}};
   std::vector<double> in_qw{{1}};
   QuadPts_debug * quad_debug = new QuadPts_debug(3, 1, in_qp, in_qw );
   hex_27.buildBasis(quad_debug, ctrl_x_hex_27, ctrl_y_hex_27, ctrl_z_hex_27);

@@ -107,7 +107,7 @@ Vector_3 FEAElement_Quad9_3D_der0::get_2d_normal_out( const int &qua,
 {
   ASSERT(qua >= 0 && qua < numQuapts, "FEAElement_Quad9_3D_der0::get_2d_normal_out function error.\n" );
   area = detJac[qua];
-  return Vector_3( unx[qua], uny[qua], unz[qua] );
+  return un[qua]; 
 }
 
 Vector_3 FEAElement_Quad9_3D_der0::get_normal_out( const int &qua,
