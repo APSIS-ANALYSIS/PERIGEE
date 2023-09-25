@@ -85,11 +85,11 @@ class ElemBC_3D : public ElemBC
 
     void reset602IEN_outwardnormal( const IIEN * const &VIEN );
 
-    // Access the data in ElemBC_3D_tet_outflow, outward normal vector
+    // Access the data in ElemBC_3D_outflow, outward normal vector
     virtual Vector_3 get_normal_vec( const int &ebc_id ) const
     {SYS_T::commPrint("Warning: get_normal_vec is not implemented. \n"); return Vector_3();}
 
-    // Access the data in ElemBC_3D_tet_outflow, basis surface integration
+    // Access the data in ElemBC_3D_outflow, basis surface integration
     virtual std::vector<double> get_intNA( const int &ebc_id ) const
     {SYS_T::commPrint("Warning: get_intNA is not implemented.\n"); return {};}
 /*

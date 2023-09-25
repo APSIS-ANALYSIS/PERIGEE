@@ -233,7 +233,7 @@ void ElemBC_3D::reset502IEN_outwardnormal( const IIEN * const &VIEN )
   {
     std::vector<int> node_t(6, 0); // triange node index in 2D mesh
     std::vector<int> node_t_gi(6, 0); // triange node index in 3D mesh
-    std::vector<int> tet_n(10,0); // tet node index in 3D mesh
+    std::vector<int> tet_n(10, 0); // tet node index in 3D mesh
 
     TET_T::Tet4 * tetcell = new TET_T::Tet4();
 
@@ -316,16 +316,16 @@ void ElemBC_3D::reset601IEN_outwardnormal( const IIEN * const &VIEN )
 {
   for (int ebcid = 0; ebcid < num_ebc; ++ebcid)
   {
-    HEX_T::Hex8 * hexcell = new HEX_T::Hex8();  //+ Hex8 to be discussed
+    HEX_T::Hex8 * hexcell = new HEX_T::Hex8(); 
 
     for (int ee = 0; ee < num_cell[ebcid]; ++ee)
     {
       // Quadrangle mesh node index
-      const int node_q[4] { get_ien(ebcid, ee, 0), get_ien(ebcid, ee, 1),  get_ien(ebcid, ee, 2), get_ien(ebcid, ee, 3) };  //+ node_q to be discussed
+      const int node_q[4] { get_ien(ebcid, ee, 0), get_ien(ebcid, ee, 1),  get_ien(ebcid, ee, 2), get_ien(ebcid, ee, 3) };  
 
       // The quadrangle mesh node's volumetric index
       const std::vector<int> node_q_gi = { get_global_node(ebcid, node_q[0]), get_global_node(ebcid, node_q[1]),  
-                                           get_global_node(ebcid, node_q[2]), get_global_node(ebcid, node_q[3]) };  //+ node_q_gi to be discussed
+                                           get_global_node(ebcid, node_q[2]), get_global_node(ebcid, node_q[3]) }; 
 
       // cell ee's global/volumetric index  
       const int cell_gi = get_global_cell(ebcid, ee);
@@ -338,10 +338,10 @@ void ElemBC_3D::reset601IEN_outwardnormal( const IIEN * const &VIEN )
 
       // build the hex object
       hexcell->reset(hex_n[0], hex_n[1], hex_n[2], hex_n[3],
-                   hex_n[4], hex_n[5], hex_n[6], hex_n[7]);
+                     hex_n[4], hex_n[5], hex_n[6], hex_n[7]);
 
       // determind the face id for this quadrangle in the hex object
-      const int hex_face_id = hexcell->get_face_id(node_q_gi[0], node_q_gi[1], node_q_gi[2], node_q_gi[3]);  //+ get_face_id to be finished
+      const int hex_face_id = hexcell->get_face_id(node_q_gi[0], node_q_gi[1], node_q_gi[2], node_q_gi[3]);  
 
       int pos0 = -1, pos1 = -1, pos2 = -1, pos3 = -1;
 
@@ -407,11 +407,11 @@ void ElemBC_3D::reset602IEN_outwardnormal( const IIEN * const &VIEN )
 {
   for (int ebcid = 0; ebcid < num_ebc; ++ebcid)
   {
-    std::vector<int> node_q(9, 0); // quadrangle node index in 2D mesh
-    std::vector<int> node_q_gi(9, 0); // quadrangle node index in 3D mesh
-    std::vector<int> hex_n(27,0); // hex node index in 3D mesh
+    std::vector<int> node_q(9, 0); // biquadratic quadrangle node index in 2D mesh
+    std::vector<int> node_q_gi(9, 0); // biquadratic quadrangle node index in 3D mesh
+    std::vector<int> hex_n(27,0); // triquadratic hex node index in 3D mesh
 
-    HEX_T::Hex8 * hexcell = new HEX_T::Hex8();  //+ Hex8 to be discussed
+    HEX_T::Hex8 * hexcell = new HEX_T::Hex8();  
 
     for (int ee=0; ee<num_cell[ebcid]; ++ee)
     {
@@ -427,10 +427,10 @@ void ElemBC_3D::reset602IEN_outwardnormal( const IIEN * const &VIEN )
 
       // build the hex object
       hexcell->reset(hex_n[0], hex_n[1], hex_n[2], hex_n[3],
-                   hex_n[4], hex_n[5], hex_n[6], hex_n[7]);
+                     hex_n[4], hex_n[5], hex_n[6], hex_n[7]);
 
       // determind the face id for this quadrangle in the hex object
-      const int hex_face_id = hexcell->get_face_id(node_q_gi[0], node_q_gi[1], node_q_gi[2], node_q_gi[3]);  //+ get_face_id to be finished
+      const int hex_face_id = hexcell->get_face_id(node_q_gi[0], node_q_gi[1], node_q_gi[2], node_q_gi[3]); 
 
       int pos0 = -1, pos1 = -1, pos2 = -1, pos3 = -1, pos4 = -1;
       int pos5 = -1, pos6 = -1, pos7 = -1, pos8 = -1;
