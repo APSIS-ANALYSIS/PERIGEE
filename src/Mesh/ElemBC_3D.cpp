@@ -15,7 +15,6 @@ ElemBC_3D::ElemBC_3D( const int &elemtype )
   std::cout<<"===> ElemBC_3D called by an empty constructor is generated. \n";
 }
 
-
 ElemBC_3D::ElemBC_3D( const std::string &vtkfile,
    const int &elemtype ) : elem_type( elemtype ), num_ebc( 1 )
 {
@@ -61,7 +60,6 @@ ElemBC_3D::ElemBC_3D( const std::string &vtkfile,
 
   std::cout<<"     is generated. \n";
 }
-
 
 ElemBC_3D::ElemBC_3D( const std::vector<std::string> &vtkfileList,
     const int &elemtype ) : elem_type( elemtype ), 
@@ -116,14 +114,12 @@ ElemBC_3D::ElemBC_3D( const std::vector<std::string> &vtkfileList,
   std::cout<<"     is generated. \n";
 }
 
-
 ElemBC_3D::~ElemBC_3D()
 {
   delete [] num_node; num_node = nullptr;
   delete [] num_cell; num_cell = nullptr;
   delete [] cell_nLocBas; cell_nLocBas = nullptr;
 }
-
 
 void ElemBC_3D::print_info() const
 {
@@ -146,7 +142,6 @@ void ElemBC_3D::print_info() const
   }
   std::cout<<"========================= \n";
 }
-
 
 void ElemBC_3D::resetSurIEN_outwardnormal( const IIEN * const &VIEN )
 {
