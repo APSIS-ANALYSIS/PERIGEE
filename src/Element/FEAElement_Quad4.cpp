@@ -29,7 +29,7 @@ void FEAElement_Quad4::print_info() const
 {
   SYS_T::commPrint("Quad4: ");
   SYS_T::commPrint("4-node quadrilateral element with up to 2nd derivatives. \n");
-  PetscPrintf(PETSC_COMM_WORLD, "elemType: %d \n", get_Type());
+  SYS_T::commPrint("elemType: %d \n", get_Type());
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
 }
 
