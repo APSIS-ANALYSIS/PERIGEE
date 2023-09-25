@@ -416,10 +416,10 @@ void ElemBC_3D::reset602IEN_outwardnormal( const IIEN * const &VIEN )
     for (int ee=0; ee<num_cell[ebcid]; ++ee)
     {
       for (int ii=0; ii<9; ++ii)
-       {
-        node_q[ii] = get_ien(ebcid, ee, ii);
-        node_q_gi[ii] = get_global_node(ebcid, node_q[ii]);
-       }
+        {
+          node_q[ii] = get_ien(ebcid, ee, ii);
+          node_q_gi[ii] = get_global_node(ebcid, node_q[ii]);
+        }
 
       const int cell_gi = get_global_cell(ebcid, ee);
 
