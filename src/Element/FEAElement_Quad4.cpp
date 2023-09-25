@@ -48,12 +48,6 @@ void FEAElement_Quad4::buildBasis( const IQuadPts * const &quad,
 
   const double d2R_drs[4] { 1.0, -1.0, 1.0, -1.0 };
 
-  // Caclulate second derivative of geometry
-  // Here, second derivatives d2R_drr, etc are constant. We can calculate
-  // xrr, etc. out of the quadrature loop.
-  // xrr = 0.0, xss = 0.0, xrs = 0.0;
-  // yrr = 0.0, yss = 0.0, yrs = 0.0;
-
   double xrs = 0.0, yrs = 0.0;
 
   for(int ii=0; ii<4; ++ii)
