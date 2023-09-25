@@ -129,7 +129,7 @@ double Vector_3::dot_product( const Vector_3 &source ) const
   return vec[0]*source(0) + vec[1]*source(1) + vec[2]*source(2);
 }
 
-double VEC3_T::dist( const Vector_3 &a, const Vector_3 &b )
+double Vec3::dist( const Vector_3 &a, const Vector_3 &b )
 {
   const double dist_x = a.x() - b.x();
   const double dist_y = a.y() - b.y();
@@ -137,7 +137,7 @@ double VEC3_T::dist( const Vector_3 &a, const Vector_3 &b )
   return std::sqrt( dist_x*dist_x + dist_y*dist_y + dist_z*dist_z );
 }
 
-double VEC3_T::dot_product( const Vector_3 &a, const Vector_3 &b )
+double Vec3::dot_product( const Vector_3 &a, const Vector_3 &b )
 {
   return a(0)*b(0) + a(1)*b(1) + a(2)*b(2);
 }
@@ -159,7 +159,7 @@ int Vector_3::get_dominant_comp() const
   return dominant_comp;
 }
 
-Vector_3 VEC3_T::cross_product( const Vector_3 &a, const Vector_3 &b )
+Vector_3 Vec3::cross_product( const Vector_3 &a, const Vector_3 &b )
 {
   return Vector_3( a(1) * b(2) - a(2) * b(1), 
       a(2) * b(0) - a(0) * b(2), a(0) * b(1) - a(1) * b(0) );
@@ -170,7 +170,7 @@ Vector_3 operator*( const double &val, const Vector_3 &source )
   return Vector_3( source.x() * val, source.y() * val, source.z() * val );
 }
 
-Vector_3 VEC3_T::normalize( const Vector_3 &val )
+Vector_3 Vec3::normalize( const Vector_3 &val )
 {
   const double len = val.norm2();
   return (1.0/len) * val;
