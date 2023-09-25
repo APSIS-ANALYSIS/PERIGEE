@@ -160,7 +160,7 @@ void ElemBC_3D::resetSurIEN_outwardnormal( const IIEN * const &VIEN )
 
 void ElemBC_3D::reset501IEN_outwardnormal( const IIEN * const &VIEN )
 {
-  for(int ebcid = 0; ebcid < num_ebc; ++ebcid)
+  for(int ebcid=0; ebcid<num_ebc; ++ebcid)
   {
     TET_T::Tet4 * tetcell = new TET_T::Tet4();
 
@@ -229,7 +229,7 @@ void ElemBC_3D::reset501IEN_outwardnormal( const IIEN * const &VIEN )
 
 void ElemBC_3D::reset502IEN_outwardnormal( const IIEN * const &VIEN )
 {
-  for(int ebcid = 0; ebcid < num_ebc; ++ebcid)
+  for(int ebcid=0; ebcid<num_ebc; ++ebcid)
   {
     std::vector<int> node_t(6, 0); // triange node index in 2D mesh
     std::vector<int> node_t_gi(6, 0); // triange node index in 3D mesh
@@ -314,11 +314,11 @@ void ElemBC_3D::reset502IEN_outwardnormal( const IIEN * const &VIEN )
 
 void ElemBC_3D::reset601IEN_outwardnormal( const IIEN * const &VIEN )
 {
-  for (int ebcid = 0; ebcid < num_ebc; ++ebcid)
+  for (int ebcid=0; ebcid<num_ebc; ++ebcid)
   {
     HEX_T::Hex8 * hexcell = new HEX_T::Hex8(); 
 
-    for (int ee = 0; ee < num_cell[ebcid]; ++ee)
+    for (int ee=0; ee<num_cell[ebcid]; ++ee)
     {
       // Quadrangle mesh node index
       const int node_q[4] { get_ien(ebcid, ee, 0), get_ien(ebcid, ee, 1),  get_ien(ebcid, ee, 2), get_ien(ebcid, ee, 3) };  
@@ -405,7 +405,7 @@ void ElemBC_3D::reset601IEN_outwardnormal( const IIEN * const &VIEN )
 
 void ElemBC_3D::reset602IEN_outwardnormal( const IIEN * const &VIEN )
 {
-  for (int ebcid = 0; ebcid < num_ebc; ++ebcid)
+  for (int ebcid=0; ebcid<num_ebc; ++ebcid)
   {
     std::vector<int> node_q(9, 0); // biquadratic quadrangle node index in 2D mesh
     std::vector<int> node_q_gi(9, 0); // biquadratic quadrangle node index in 3D mesh
@@ -415,7 +415,7 @@ void ElemBC_3D::reset602IEN_outwardnormal( const IIEN * const &VIEN )
 
     for (int ee=0; ee<num_cell[ebcid]; ++ee)
     {
-      for (int ii = 0; ii < 9; ++ii)
+      for (int ii=0; ii<9; ++ii)
        {
         node_q[ii] = get_ien(ebcid, ee, ii);
         node_q_gi[ii] = get_global_node(ebcid, node_q[ii]);
