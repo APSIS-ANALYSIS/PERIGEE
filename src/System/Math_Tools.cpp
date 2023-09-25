@@ -511,6 +511,7 @@ namespace MATH_T
       for(int jj=ii+1; jj<N; ++jj) x[ii] -= mat[jj*N+ii] * x[jj];
     }
   }
-}
-// End of Namespace Math_T
+
+} // End of Namespace Math_T
+
 // EOF
