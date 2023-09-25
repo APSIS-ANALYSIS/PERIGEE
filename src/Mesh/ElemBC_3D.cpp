@@ -153,7 +153,7 @@ void ElemBC_3D::resetSurIEN_outwardnormal( const IIEN * const &VIEN )
     reset601IEN_outwardnormal(VIEN);     
   else if(elem_type == 602)
     reset602IEN_outwardnormal(VIEN);     
-  else SYS_T::print_exit("Error: unknown element type.\n");
+  else SYS_T::print_exit("Error: resetSurIEN_outwardnormal: unknown element type.\n");
 }
 
 void ElemBC_3D::reset501IEN_outwardnormal( const IIEN * const &VIEN )
