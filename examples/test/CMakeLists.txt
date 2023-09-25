@@ -40,7 +40,6 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/System/Tensor4_2D.cpp
   ${perigee_source}/System/SymmTensor4_3D.cpp
   ${perigee_source}/System/SV_Tools.cpp
-  ${perigee_source}/System/Math_Tools.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
   ${perigee_source}/System/HDF5_Reader.cpp
   ${perigee_source}/Mesh/Gmsh_FileIO.cpp

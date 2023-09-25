@@ -8,12 +8,6 @@
 #include "SymmTensor2_3D.hpp"
 #include "HDF5_Reader.hpp"
 #include "PostVectSolution.hpp"
-#include "Tensor4_3D.hpp"
-#include "SymmTensor4_3D.hpp"
-#include "Mesh_Tet.hpp"
-#include "IEN_FEM.hpp"
-#include "Matrix_double_3by3_Array.hpp"
-#include "Matrix_double_6by6_Array.hpp"
 #include "VTK_Tools.hpp"
 #include "NodalBC.hpp"
 #include "DataVecStr.hpp"
@@ -27,5 +21,4 @@ int main(int argc, char *argv[])
 {
   return EXIT_SUCCESS;
 }
-
 // EOF
