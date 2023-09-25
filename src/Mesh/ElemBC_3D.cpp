@@ -216,9 +216,9 @@ void ElemBC_3D::reset501IEN_outwardnormal( const IIEN * const &VIEN )
           SYS_T::print_exit("Error: resetTriIEN_outwardnormal : tet_face_id is out of range. \n");
           break;
       }
-      ASSERT(pos0 >=0 && pos0 <=2, "While elem_type == 501, ElemBC_3D_tet::resetTriIEN_outwardnormal function error.\n" );
-      ASSERT(pos1 >=0 && pos1 <=2, "While elem_type == 501, ElemBC_3D_tet::resetTriIEN_outwardnormal function error.\n" );
-      ASSERT(pos2 >=0 && pos2 <=2, "While elem_type == 501, ElemBC_3D_tet::resetTriIEN_outwardnormal function error.\n" ); 
+      ASSERT(pos0 >=0 && pos0 <=2, "While elem_type == 501, ElemBC_3D::reset501IEN_outwardnormal function error.\n" );
+      ASSERT(pos1 >=0 && pos1 <=2, "While elem_type == 501, ElemBC_3D::reset501IEN_outwardnormal function error.\n" );
+      ASSERT(pos2 >=0 && pos2 <=2, "While elem_type == 501, ElemBC_3D::reset501IEN_outwardnormal function error.\n" ); 
 
       // Now we have got the corrected ordering of node_t, put them back into
       // sur_ien.
@@ -297,12 +297,12 @@ void ElemBC_3D::reset502IEN_outwardnormal( const IIEN * const &VIEN )
           SYS_T::print_exit("Error: resetTriIEN_outwardnormal : tet_face_id is out of range. \n");
           break;
       }
-      ASSERT(pos0 >=0 && pos0 <=5, "While elem_type == 502, ElemBC_3D_tet::resetTriIEN_outwardnormal function error.\n" ); 
-      ASSERT(pos1 >=0 && pos1 <=5, "While elem_type == 502, ElemBC_3D_tet::resetTriIEN_outwardnormal function error.\n" );
-      ASSERT(pos2 >=0 && pos2 <=5, "While elem_type == 502, ElemBC_3D_tet::resetTriIEN_outwardnormal function error.\n" ); 
-      ASSERT(pos3 >=0 && pos3 <=5, "While elem_type == 502, ElemBC_3D_tet::resetTriIEN_outwardnormal function error.\n" );
-      ASSERT(pos4 >=0 && pos4 <=5, "While elem_type == 502, ElemBC_3D_tet::resetTriIEN_outwardnormal function error.\n" ); 
-      ASSERT(pos5 >=0 && pos5 <=5, "While elem_type == 502, ElemBC_3D_tet::resetTriIEN_outwardnormal function error.\n" );
+      ASSERT(pos0 >=0 && pos0 <=5, "While elem_type == 502, ElemBC_3D::reset502IEN_outwardnormal function error.\n" ); 
+      ASSERT(pos1 >=0 && pos1 <=5, "While elem_type == 502, ElemBC_3D::reset502IEN_outwardnormal function error.\n" );
+      ASSERT(pos2 >=0 && pos2 <=5, "While elem_type == 502, ElemBC_3D::reset502IEN_outwardnormal function error.\n" ); 
+      ASSERT(pos3 >=0 && pos3 <=5, "While elem_type == 502, ElemBC_3D::reset502IEN_outwardnormal function error.\n" );
+      ASSERT(pos4 >=0 && pos4 <=5, "While elem_type == 502, ElemBC_3D::reset502IEN_outwardnormal function error.\n" ); 
+      ASSERT(pos5 >=0 && pos5 <=5, "While elem_type == 502, ElemBC_3D::reset502IEN_outwardnormal function error.\n" );
 
       sur_ien[ebcid][6*ee+0] = node_t[pos0];
       sur_ien[ebcid][6*ee+1] = node_t[pos1];
@@ -390,10 +390,10 @@ void ElemBC_3D::reset601IEN_outwardnormal( const IIEN * const &VIEN )
           SYS_T::print_exit("Error: resetTriIEN_outwardnormal : hex_face_id is out of range. \n");
           break;
       }
-      ASSERT(pos0 >=0 && pos0 <=3, "While elem_type == 601, ElemBC_3D_hex::resetTriIEN_outwardnormal function error.\n" );
-      ASSERT(pos1 >=0 && pos1 <=3, "While elem_type == 601, ElemBC_3D_hex::resetTriIEN_outwardnormal function error.\n" );
-      ASSERT(pos2 >=0 && pos2 <=3, "While elem_type == 601, ElemBC_3D_hex::resetTriIEN_outwardnormal function error.\n" ); 
-      ASSERT(pos3 >=0 && pos3 <=3, "While elem_type == 601, ElemBC_3D_hex::resetTriIEN_outwardnormal function error.\n" ); 
+      ASSERT(pos0 >=0 && pos0 <=3, "While elem_type == 601, ElemBC_3D::reset601IEN_outwardnormal function error.\n" );
+      ASSERT(pos1 >=0 && pos1 <=3, "While elem_type == 601, ElemBC_3D::reset601IEN_outwardnormal function error.\n" );
+      ASSERT(pos2 >=0 && pos2 <=3, "While elem_type == 601, ElemBC_3D::reset601IEN_outwardnormal function error.\n" ); 
+      ASSERT(pos3 >=0 && pos3 <=3, "While elem_type == 601, ElemBC_3D::reset601IEN_outwardnormal function error.\n" ); 
 
       // Now we have got the corrected ordering of node_q, put them back into
       // sur_ien.
@@ -510,15 +510,15 @@ void ElemBC_3D::reset602IEN_outwardnormal( const IIEN * const &VIEN )
           SYS_T::print_exit("Error: resetTriIEN_outwardnormal : hex_face_id is out of range. \n");
           break;
       }
-      ASSERT(pos0 >=0 && pos0 <=8, "While elem_type == 602, ElemBC_3D_hex::resetTriIEN_outwardnormal function error.\n" );
-      ASSERT(pos1 >=0 && pos1 <=8, "While elem_type == 602, ElemBC_3D_hex::resetTriIEN_outwardnormal function error.\n" );
-      ASSERT(pos2 >=0 && pos2 <=8, "While elem_type == 602, ElemBC_3D_hex::resetTriIEN_outwardnormal function error.\n" ); 
-      ASSERT(pos3 >=0 && pos3 <=8, "While elem_type == 602, ElemBC_3D_hex::resetTriIEN_outwardnormal function error.\n" ); 
-      ASSERT(pos4 >=0 && pos4 <=8, "While elem_type == 602, ElemBC_3D_hex::resetTriIEN_outwardnormal function error.\n" );
-      ASSERT(pos5 >=0 && pos5 <=8, "While elem_type == 602, ElemBC_3D_hex::resetTriIEN_outwardnormal function error.\n" );
-      ASSERT(pos6 >=0 && pos6 <=8, "While elem_type == 602, ElemBC_3D_hex::resetTriIEN_outwardnormal function error.\n" ); 
-      ASSERT(pos7 >=0 && pos7 <=8, "While elem_type == 602, ElemBC_3D_hex::resetTriIEN_outwardnormal function error.\n" ); 
-      ASSERT(pos8 >=0 && pos8 <=8, "While elem_type == 602, ElemBC_3D_hex::resetTriIEN_outwardnormal function error.\n" ); 
+      ASSERT(pos0 >=0 && pos0 <=8, "While elem_type == 602, ElemBC_3D::reset602IEN_outwardnormal function error.\n" );
+      ASSERT(pos1 >=0 && pos1 <=8, "While elem_type == 602, ElemBC_3D::reset602IEN_outwardnormal function error.\n" );
+      ASSERT(pos2 >=0 && pos2 <=8, "While elem_type == 602, ElemBC_3D::reset602IEN_outwardnormal function error.\n" ); 
+      ASSERT(pos3 >=0 && pos3 <=8, "While elem_type == 602, ElemBC_3D::reset602IEN_outwardnormal function error.\n" ); 
+      ASSERT(pos4 >=0 && pos4 <=8, "While elem_type == 602, ElemBC_3D::reset602IEN_outwardnormal function error.\n" );
+      ASSERT(pos5 >=0 && pos5 <=8, "While elem_type == 602, ElemBC_3D::reset602IEN_outwardnormal function error.\n" );
+      ASSERT(pos6 >=0 && pos6 <=8, "While elem_type == 602, ElemBC_3D::reset602IEN_outwardnormal function error.\n" ); 
+      ASSERT(pos7 >=0 && pos7 <=8, "While elem_type == 602, ElemBC_3D::reset602IEN_outwardnormal function error.\n" ); 
+      ASSERT(pos8 >=0 && pos8 <=8, "While elem_type == 602, ElemBC_3D::reset602IEN_outwardnormal function error.\n" ); 
 
       sur_ien[ebcid][9*ee+0] = node_q[pos0];
       sur_ien[ebcid][9*ee+1] = node_q[pos1];
