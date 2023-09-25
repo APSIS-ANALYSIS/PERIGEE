@@ -13,6 +13,7 @@
 #include <ctime>
 #include <sys/stat.h>
 #include "petsc.h"
+#include "/opt/homebrew/Cellar/libomp/16.0.6/include/omp.h"
 
   // ================================================================
   // The following are used for backward compatibility like PetscDefined(USE_DEBUG).
@@ -464,9 +465,13 @@ namespace SYS_T
 
       ~Timer() {};
 
-      void Start() {startedAt = clock();}
-
-      void Stop() {stoppedAt = clock();}
+#ifdef _OPENMP
+      void Start() { startedAt = omp_get_wtime(); }
+      void Stop()  { stoppedAt = omp_get_wtime(); }
+#else
+      void Start() { startedAt = clock(); }
+      void Stop()  { stoppedAt = clock(); }
+#endif
 
       void Reset() { startedAt = 0; stoppedAt = 0; }
 
