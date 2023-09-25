@@ -53,8 +53,7 @@ class QuadPts_Gauss_Triangle : public IQuadPts
     //      quadrature points.
     //      t = 1 - r - s.
     // qw : length num_pts. Stores the quadrature weights.
-    std::vector<double> qp {};
-    std::vector<double> qw {};
+    std::vector<double> qp, qw;
 };
 
 #endif

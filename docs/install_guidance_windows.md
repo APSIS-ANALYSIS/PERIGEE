@@ -104,13 +104,13 @@ Go to the lib directory, download VTK source, extract the tar bar, and rename th
 cd $HOME/lib
 wget https://www.vtk.org/files/release/8.2/VTK-8.2.0.tar.gz
 tar -zxvf VTK-8.2.0.tar.gz
-mv VTK-8.2.0 VTK-8.2.0-src
+mv VTK-8.2.0 VTK-s.2.0-src
 ```
 Create a build directory and run the cmake to compile VTK.
 ```sh
 cd $HOME/lib
 mkdir build_vtk
-cd build_vtk
+cd build
 cmake ../VTK-8.2.0-src/ -DCMAKE_INSTALL_PREFIX=$HOME/lib/VTK-8.2.0-shared -DBUILD_SHARED_LIBS=ON  -DCMAKE_BUILD_TYPE=Release
 make -j 4
 make install
@@ -122,7 +122,7 @@ rm -rf build_vtk VTK-8.2.0-src VTK-8.2.0.tar.gz
 ```
 After that, you need to add the VTK path to your ``.bashrc``.
 ```sh
-export LD_LIBRARY_PATH=/home/yxh/lib/VTK-8.2.0-shared/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/home/yxh/lib/VTK-8.2.0/lib:$LD_LIBRARY_PATH
 ```
 #### 3. Install PETSc
 Go to the lib directory, download PETSc source, extract the tar bar, and rename the directory as a source directory.
@@ -139,7 +139,8 @@ vi conf.sh
 ```
 Copy all the following to the script file, ``conf.sh``.
 ```sh
-./configure --with-x=0 \
+./configure 
+  --with-x=0 \
   -with-pic \
   --with-make-np=4 \
   --with-mpi-compilers=1 \
@@ -239,6 +240,6 @@ cd build
 ```
 Run the following to build the code.
 ```sh
-cmake $HOME/code/PERIGEE/examples/ruc_fsi/ -DCMAKE_BUILD_TYPE=Release
+cmake $HOME/code/PERIGEE/example/ruc_fsi/ -DCMAKE_BUILD_TYPE=Release
 make -j 4
 ```
