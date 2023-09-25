@@ -208,7 +208,7 @@ void ElemBC_3D::reset501IEN_outwardnormal( const IIEN * const &VIEN )
           pos2 = VEC_T::get_pos(node_t_gi, tet_n[1]);
           break;
         default:
-          SYS_T::print_exit("Error: resetTriIEN_outwardnormal : tet_face_id is out of range. \n");
+          SYS_T::print_exit("Error: reset501IEN_outwardnormal : tet_face_id is out of range. \n");
           break;
       }
       ASSERT(pos0 >=0 && pos0 <=2, "While elem_type == 501, ElemBC_3D::reset501IEN_outwardnormal function error.\n" );
@@ -289,7 +289,7 @@ void ElemBC_3D::reset502IEN_outwardnormal( const IIEN * const &VIEN )
           pos5 = VEC_T::get_pos(node_t_gi, tet_n[4]);
           break;
         default:
-          SYS_T::print_exit("Error: resetTriIEN_outwardnormal : tet_face_id is out of range. \n");
+          SYS_T::print_exit("Error: reset502IEN_outwardnormal : tet_face_id is out of range. \n");
           break;
       }
       ASSERT(pos0 >=0 && pos0 <=5, "While elem_type == 502, ElemBC_3D::reset502IEN_outwardnormal function error.\n" ); 
@@ -382,7 +382,7 @@ void ElemBC_3D::reset601IEN_outwardnormal( const IIEN * const &VIEN )
           pos3 = VEC_T::get_pos(node_q_gi, hex_n[3]); 
           break;          
         default:
-          SYS_T::print_exit("Error: resetTriIEN_outwardnormal : hex_face_id is out of range. \n");
+          SYS_T::print_exit("Error: reset601IEN_outwardnormal : hex_face_id is out of range. \n");
           break;
       }
       ASSERT(pos0 >=0 && pos0 <=3, "While elem_type == 601, ElemBC_3D::reset601IEN_outwardnormal function error.\n" );
@@ -502,7 +502,7 @@ void ElemBC_3D::reset602IEN_outwardnormal( const IIEN * const &VIEN )
           pos8 = VEC_T::get_pos(node_q_gi, hex_n[20]); 
           break;         
         default:
-          SYS_T::print_exit("Error: resetTriIEN_outwardnormal : hex_face_id is out of range. \n");
+          SYS_T::print_exit("Error: reset602IEN_outwardnormal : hex_face_id is out of range. \n");
           break;
       }
       ASSERT(pos0 >=0 && pos0 <=8, "While elem_type == 602, ElemBC_3D::reset602IEN_outwardnormal function error.\n" );
