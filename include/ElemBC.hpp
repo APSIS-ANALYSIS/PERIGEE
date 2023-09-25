@@ -34,6 +34,7 @@
 // ==================================================================
 #include "Sys_Tools.hpp"
 #include "Tet_Tools.hpp"
+#include "Hex_Tools.hpp"
 #include "IIEN.hpp"
 #include "Vector_3.hpp"
 
@@ -167,8 +168,8 @@ class ElemBC
     {SYS_T::commPrint("Warning: print_info is not implemented. \n");}
 
 
-    virtual void resetTriIEN_outwardnormal( const IIEN * const &VIEN )
-    {SYS_T::print_fatal("Warning: resetTriIEN_outwardnormal is not implemented. \n");}
+    virtual void resetSurIEN_outwardnormal( const IIEN * const &VIEN )
+    {SYS_T::print_fatal("Warning: resetSurIEN_outwardnormal is not implemented. \n");}
 };
 
 #endif
