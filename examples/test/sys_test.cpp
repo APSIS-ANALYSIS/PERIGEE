@@ -153,7 +153,7 @@ int main( int argc, char * argv[] )
         ctrl_y[jj] = ebc->get_pt_xyz(ii, ebc->get_ien(ii, ee, jj), 1);
         ctrl_z[jj] = ebc->get_pt_xyz(ii, ebc->get_ien(ii, ee, jj), 2);
 
-        std::cout<<jj<<":"<<ebc->get_ien(ii, ee, jj)<<" "<<ebc->get_global_node(ii, ebc->get_ien(ii, ee, jj))<<"  ("<<ctrl_x[jj]<<","<<ctrl_y[jj]<<","<<ctrl_z[jj]<<")"<< std::endl;
+        std::cout<<jj<<": "<<ebc->get_ien(ii, ee, jj)<<"\t"<<ebc->get_global_node(ii, ebc->get_ien(ii, ee, jj))<<"\t("<<ctrl_x[jj]<<","<<ctrl_y[jj]<<","<<ctrl_z[jj]<<")"<< std::endl;
       }
 
       Vector_3 dx_dr( 0.0, 0.0, 0.0 );
@@ -168,7 +168,7 @@ int main( int argc, char * argv[] )
 
       un = VEC3_T::cross_product( dx_dr, dx_ds );
 
-      std::cout<<"surface out_normal: ("<<un.x()<<","<<un.y()<<","<<un.z()<<")"<<std::endl;
+      std::cout<<"surface element "<<ee<<" out_normal: ("<<un.x()<<","<<un.y()<<","<<un.z()<<")"<<std::endl;
     }
 
   }
