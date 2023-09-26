@@ -244,9 +244,9 @@ int SymmTensor2_3D::eigen_decomp( double &eta1, double &eta2, double &eta3,
     find_eigen_vector(eta1, v1, v2, v3);
 
     // Form the reduced matrix
-    const double A22 = VecMatVec(v2,v2) - frac13_tr * VEC3_T::dot_product(v2, v2);
-    const double A23 = VecMatVec(v2,v3) - frac13_tr * VEC3_T::dot_product(v2, v3);
-    const double A33 = VecMatVec(v3,v3) - frac13_tr * VEC3_T::dot_product(v3, v3);
+    const double A22 = VecMatVec(v2,v2) - frac13_tr * Vec3::dot_product(v2, v2);
+    const double A23 = VecMatVec(v2,v3) - frac13_tr * Vec3::dot_product(v2, v3);
+    const double A33 = VecMatVec(v3,v3) - frac13_tr * Vec3::dot_product(v3, v3);
 
     const double diff_2233 = A22 - A33;
     if( diff_2233 >= 0.0 )
@@ -272,14 +272,14 @@ int SymmTensor2_3D::eigen_decomp( double &eta1, double &eta2, double &eta3,
       if( v2.norm2() >= v3.norm2() )
       {
         v2.normalize();               // w1 
-        v2 = VEC3_T::cross_product( v1, v2 ); // v2 = w1 x v1
-        v3 = VEC3_T::cross_product( v1, v2 ); // v3 = v1 x v2
+        v2 = Vec3::cross_product( v1, v2 ); // v2 = w1 x v1
+        v3 = Vec3::cross_product( v1, v2 ); // v3 = v1 x v2
       }
       else
       {
         v3.normalize();               // w1 
-        v2 = VEC3_T::cross_product( v1, v3 ); // v2 = w1 x v1
-        v3 = VEC3_T::cross_product( v1, v2 ); // v3 = v1 x v2
+        v2 = Vec3::cross_product( v1, v3 ); // v2 = w1 x v1
+        v3 = Vec3::cross_product( v1, v2 ); // v3 = v1 x v2
       }
 
       // Shift back from deviatoric to the original matrix eigenvalues
@@ -319,17 +319,17 @@ void SymmTensor2_3D::find_eigen_vector( const double &eta, Vector_3 &v,
 
     s1 = a;
 
-    b -= VEC3_T::dot_product(s1, b) * s1;
+    b -= Vec3::dot_product(s1, b) * s1;
 
-    c -= VEC3_T::dot_product(s1, c) * s1;
+    c -= Vec3::dot_product(s1, c) * s1;
 
     if( b.norm2() >= c.norm2() )
     {
-      b.normalize(); s2 = b; v = VEC3_T::cross_product(s1,s2);
+      b.normalize(); s2 = b; v = Vec3::cross_product(s1,s2);
     }
     else
     {
-      c.normalize(); s2 = c; v = VEC3_T::cross_product(s1,s2);
+      c.normalize(); s2 = c; v = Vec3::cross_product(s1,s2);
     }
   }
   else if( len_b >= len_a && len_b >= len_c )
@@ -338,17 +338,17 @@ void SymmTensor2_3D::find_eigen_vector( const double &eta, Vector_3 &v,
 
     s1 = b;
 
-    a -= VEC3_T::dot_product(s1, a) * s1;
+    a -= Vec3::dot_product(s1, a) * s1;
 
-    c -= VEC3_T::dot_product(s1, c) * s1;
+    c -= Vec3::dot_product(s1, c) * s1;
 
     if( a.norm2() >= c.norm2() )
     {
-      a.normalize(); s2 = a; v = VEC3_T::cross_product(s1, s2);
+      a.normalize(); s2 = a; v = Vec3::cross_product(s1, s2);
     }
     else
     {
-      c.normalize(); s2 = c; v = VEC3_T::cross_product(s1, s2);
+      c.normalize(); s2 = c; v = Vec3::cross_product(s1, s2);
     }
   }
   else
@@ -357,17 +357,17 @@ void SymmTensor2_3D::find_eigen_vector( const double &eta, Vector_3 &v,
 
     s1 = c;
 
-    a -= VEC3_T::dot_product(s1, a) * s1;
+    a -= Vec3::dot_product(s1, a) * s1;
 
-    b -= VEC3_T::dot_product(s1, b) * s1;
+    b -= Vec3::dot_product(s1, b) * s1;
 
     if(a.norm2() >= b.norm2())
     {
-      a.normalize(); s2 = a; v = VEC3_T::cross_product(s1, s2);
+      a.normalize(); s2 = a; v = Vec3::cross_product(s1, s2);
     }
     else
     {
-      b.normalize(); s2 = b; v = VEC3_T::cross_product(s1, s2);
+      b.normalize(); s2 = b; v = Vec3::cross_product(s1, s2);
     }
   }
 }
