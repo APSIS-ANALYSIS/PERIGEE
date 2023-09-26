@@ -35,15 +35,15 @@ void Matrix_double_6by6_Array::LU_fac()
   bool pivot_flag;
   for(int kk=0; kk<5; ++kk)
   {
-    max_value = std::abs(Mat[kk][kk]);
+    max_value = std::abs( Mat[6*kk+kk] );
     max_index = kk;
     pivot_flag = false;
     // find the column pivoting
     for(int ii=kk+1; ii<6; ++ii)
     {
-      if(max_value < std::abs(Mat[ii][kk]))
+      if( max_value < std::abs( Mat[6*ii+kk] ) )
       {
-        max_value = std::abs(Mat[ii][kk]);
+        max_value = std::abs( Mat[6*ii+kk] );
         max_index = ii;
         pivot_flag = true;
       }
@@ -51,29 +51,25 @@ void Matrix_double_6by6_Array::LU_fac()
     
     if(pivot_flag)
     {
-      int_temp = p[kk];
-      p[kk] = p[max_index];
-      p[max_index] = int_temp;
+      int_temp = pp[kk];
+      pp[kk] = pp[max_index];
+      pp[max_index] = int_temp;
       
       for(int ii=0; ii<6; ++ii)
       {
-        temp = Mat[kk][ii];
-        Mat[kk][ii] = Mat[max_index][ii];
-        Mat[max_index][ii] = temp;
+        temp = Mat[6*kk+ii];
+        Mat[6*kk+ii] = Mat[6*max_index+ii];
+        Mat[6*max_index+ii] = temp;
       }
-    }
-
-    invAkk = 1.0 / Mat[kk][kk];
+    } 
     
     for(int ii=kk+1; ii<6; ++ii)
     {
-      Mat[ii][kk] = Mat[ii][kk] * invAkk;
+      Mat[6*ii+kk] = Mat[6*ii+kk] / Mat[6*kk+kk];
       for(int jj=kk+1; jj<6; ++jj)
-        Mat[ii][jj] = Mat[ii][jj] - Mat[ii][kk] * Mat[kk][jj];
+        Mat[6*ii+jj] = Mat[6*ii+jj] - Mat[6*ii+kk] * Mat[6*kk+jj];
     }
   }
-  invm0 = 1.0 / Mat[0][0]; invm1 = 1.0 / Mat[1][1]; invm2 = 1.0 / Mat[2][2];
-  invm3 = 1.0 / Mat[3][3]; invm4 = 1.0 / Mat[4][4]; invm5 = 1.0 / Mat[5][5];
 }
 
 std::array<double, 6> Matrix_double_6by6_Array::LU_solve( const std::array<double, 6> &b ) const
