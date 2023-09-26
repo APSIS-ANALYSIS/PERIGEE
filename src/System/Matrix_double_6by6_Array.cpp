@@ -74,7 +74,7 @@ void Matrix_double_6by6_Array::LU_fac()
 
 std::array<double, 6> Matrix_double_6by6_Array::LU_solve( const std::array<double, 6> &rhs ) const
 {
-  std::array<double, 6> xx {{ rhs[pp[0]], rhs[pp[1]], rhs[pp[2]], rhs[pp[3]], rhs[pp[4]], rhs[pp[5]] }};
+  std::array<double, 6> xx { rhs[pp[0]], rhs[pp[1]], rhs[pp[2]], rhs[pp[3]], rhs[pp[4]], rhs[pp[5]] };
 
   xx[1] = xx[1] - Mat[6]  * xx[0];
   xx[2] = xx[2] - Mat[12] * xx[0] - Mat[13] * xx[1];
