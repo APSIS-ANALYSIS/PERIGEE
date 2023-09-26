@@ -42,16 +42,15 @@ class Matrix_double_3by3_Array
     
     const double& operator()(const int &index) const {return mat[index];}
     
-    // Generate an identity matrix. Erase all previous values and reset p and
-    // invm to default values.
+    // Generate an identity matrix. Erase all previous values and reset p to default values.
     void gen_id();
 
     // Generate a matrix with random entries
-    // All previous values are erased and p & invm are reset to default.
+    // All previous values are erased and p is reset to default.
     void gen_rand(const double &min = -1.0, const double &max = 1.0);
 
     // Generate a Hilbert matrix
-    // all previous values are earsed and p & invm are reset to default.
+    // all previous values are earsed and p is reset to default.
     void gen_hilb();
 
     // Perform LU factorization of the matrix object and store the L & U
@@ -65,7 +64,7 @@ class Matrix_double_3by3_Array
 
     std::array<double, 3> LU_solve( const std::array<double, 3> &bb ) const;
 
-    // Perofrm LU solve for the 3 mat xx = bb equations
+    // Perofrm LU solve for the 3 mat x = b equations
     // LU_fac() has to be called first.
     void LU_solve(const double &b1, const double &b2, const double &b3,
         double &x1, double &x2, double &x3) const;
@@ -73,7 +72,7 @@ class Matrix_double_3by3_Array
     // Transpose operation for the matrix 
     void transpose();
 
-    // Inverse of the matrix (based on cofactor). The pp is not
+    // Inverse of the matrix (based on cofactor). The p is not
     // updated.
     void inverse();
 
@@ -81,7 +80,7 @@ class Matrix_double_3by3_Array
     double det() const;
 
     // Vector multiplication y = Ax
-    // make sure the xx yy vector has length 3.
+    // make sure the x y vector has length 3.
     void VecMult( const double * const &xx, double * const &yy ) const; 
     
     // Matrix multiplication
