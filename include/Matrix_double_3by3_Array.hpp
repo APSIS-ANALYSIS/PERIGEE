@@ -101,10 +101,6 @@ class Matrix_double_3by3_Array
     // Pivoting flag. It is generated in LU-factorization and is used for
     // LU_solve.
     int p[3];
-    
-    // Inverse of the diagonal entries. It is generated in LU_fac and is 
-    // used for LU_solve.
-    double invm0, invm1, invm2;
 };
 
 #endif
