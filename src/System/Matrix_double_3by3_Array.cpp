@@ -31,7 +31,7 @@ Matrix_double_3by3_Array& Matrix_double_3by3_Array::operator= (
   {
     for(int ii=0; ii<9; ++ii) mat[ii] = input.mat[ii];
     pp[0] = input.pp[0];
-    pi[1] = input.pp[1];
+    pp[1] = input.pp[1];
     pp[2] = input.pp[2];
   }
   return *this;
@@ -161,7 +161,7 @@ Vector_3 Matrix_double_3by3_Array::LU_solve( const Vector_3 &bb ) const
 
   xx(2) =  xx(2) / mat[8];
   xx(1) = (xx(1) - mat[5] * xx(2)) / mat[4];
-  xx(0) = (xx(0) - mat[2] * xx(2)  - mat[1] * x(1)) / mat[0];
+  xx(0) = (xx(0) - mat[2] * xx(2)  - mat[1] * xx(1)) / mat[0];
 
   return xx;
 }

@@ -87,7 +87,7 @@ std::array<double, 6> Matrix_double_6by6_Array::LU_solve( const std::array<doubl
   xx[3] = (xx[3] - Mat[23] * xx[5]  - Mat[22] * xx[4]) / Mat[21];
   xx[2] = (xx[2] - Mat[17] * xx[5]  - Mat[16] * xx[4]  - Mat[15] * xx[3]) / Mat[14];
   xx[1] = (xx[1] - Mat[11] * xx[5]  - Mat[10] * xx[4]  - Mat[9]  * xx[3]  - Mat[8] * xx[2]) / Mat[7];
-  xx[0] = (xx[0] - Mat[5]  * xx[5]  - Mat[4]  * xx[4]  - Mat[3]  * xx[3]  - Mat[2] * xx[2]  - Mat[1] * xx[1]) * Mat[0];
+  xx[0] = (xx[0] - Mat[5]  * xx[5]  - Mat[4]  * xx[4]  - Mat[3]  * xx[3]  - Mat[2] * xx[2]  - Mat[1] * xx[1]) / Mat[0];
 
   return xx;
 }
