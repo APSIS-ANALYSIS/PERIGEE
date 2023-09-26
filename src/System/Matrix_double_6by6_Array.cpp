@@ -72,25 +72,24 @@ void Matrix_double_6by6_Array::LU_fac()
   }
 }
 
-std::array<double, 6> Matrix_double_6by6_Array::LU_solve( const std::array<double, 6> &b ) const
+std::array<double, 6> Matrix_double_6by6_Array::LU_solve( const std::array<double, 6> &rhs ) const
 {
-  std::array<double, 6> x {{ b[p[0]], b[p[1]], b[p[2]], b[p[3]], b[p[4]], b[p[5]] }};
+  std::array<double, 6> xx {{ rhs[pp[0]], rhs[pp[1]], rhs[pp[2]], rhs[pp[3]], rhs[pp[4]], rhs[pp[5]] }};
 
-  //x[0] = x[0];
-  x[1] = x[1] - Mat[1][0] * x[0];
-  x[2] = x[2] - Mat[2][0] * x[0] - Mat[2][1] * x[1];
-  x[3] = x[3] - Mat[3][0] * x[0] - Mat[3][1] * x[1] - Mat[3][2] * x[2];
-  x[4] = x[4] - Mat[4][0] * x[0] - Mat[4][1] * x[1] - Mat[4][2] * x[2] - Mat[4][3] * x[3];
-  x[5] = x[5] - Mat[5][0] * x[0] - Mat[5][1] * x[1] - Mat[5][2] * x[2] - Mat[5][3] * x[3] - Mat[5][4]* x[4];
+  xx[1] = xx[1] - Mat[6]  * xx[0];
+  xx[2] = xx[2] - Mat[12] * xx[0] - Mat[13] * xx[1];
+  xx[3] = xx[3] - Mat[18] * xx[0] - Mat[19] * xx[1] - Mat[20] * xx[2];
+  xx[4] = xx[4] - Mat[24] * xx[0] - Mat[25] * xx[1] - Mat[26] * xx[2] - Mat[27] * xx[3];
+  xx[5] = xx[5] - Mat[30] * xx[0] - Mat[31] * xx[1] - Mat[32] * xx[2] - Mat[33] * xx[3] - Mat[34] * xx[4];
 
-  x[5] = x[5] * invm5;
-  x[4] = (x[4] - Mat[4][5]*x[5]) * invm4;
-  x[3] = (x[3] - Mat[3][5]*x[5] - Mat[3][4] * x[4]) * invm3;
-  x[2] = (x[2] - Mat[2][5]*x[5] - Mat[2][4]*x[4] - Mat[2][3] * x[3] ) * invm2;
-  x[1] = (x[1] - Mat[1][5]*x[5] - Mat[1][4]*x[4] - Mat[1][3]*x[3] - Mat[1][2]*x[2]) * invm1;
-  x[0] = (x[0] - Mat[0][5]*x[5] - Mat[0][4]*x[4] - Mat[0][3]*x[3] - Mat[0][2]*x[2] -Mat[0][1]*x[1]) * invm0;
+  xx[5] =  xx[5] / Mat[35];
+  xx[4] = (xx[4] - Mat[29] * xx[5]) / Mat[28];
+  xx[3] = (xx[3] - Mat[23] * xx[5]  - Mat[22] * xx[4]) / Mat[21];
+  xx[2] = (xx[2] - Mat[17] * xx[5]  - Mat[16] * xx[4]  - Mat[15] * xx[3]) / Mat[14];
+  xx[1] = (xx[1] - Mat[11] * xx[5]  - Mat[10] * xx[4]  - Mat[9]  * xx[3]  - Mat[8] * xx[2]) / Mat[7];
+  xx[0] = (xx[0] - Mat[5]  * xx[5]  - Mat[4]  * xx[4]  - Mat[3]  * xx[3]  - Mat[2] * xx[2]  - Mat[1] * xx[1]) * Mat[0];
 
-  return x;
+  return xx;
 }
 
 void Matrix_double_6by6_Array::print() const
