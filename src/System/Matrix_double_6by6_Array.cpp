@@ -97,12 +97,12 @@ void Matrix_double_6by6_Array::print() const
   for(int ii=0; ii<6; ++ii)
   {
     for(int jj=0; jj<6; ++jj)
-      std::cout<<Mat[ii][jj]<<'\t';
+      std::cout<<Mat[6*ii+jj]<<'\t';
     std::cout<<'\n';
   }
   std::cout<<'\n';
   for(int ii=0; ii<6; ++ii)
-    std::cout<<p[ii]<<'\t';
+    std::cout<<pp[ii]<<'\t';
   
   std::cout<<'\n'<<std::endl;
 }
