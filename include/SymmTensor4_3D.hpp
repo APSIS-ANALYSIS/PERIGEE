@@ -219,10 +219,12 @@ class SymmTensor4_3D
 // These functions behave in an identical manner to the member function of the
 // same function name. For the gen_zero and gem_symm_id, we added a middle name
 // ST4 to differentiate them from the functions of Tensor4_3D.
-SymmTensor4_3D gen_ST4_zero();
+namespace STen4
+{
+    SymmTensor4_3D gen_ST4_zero();
 
-SymmTensor4_3D gen_ST4_symm_id();
+    SymmTensor4_3D gen_ST4_symm_id();
 
-SymmTensor4_3D gen_ST4_Ptilde( const SymmTensor2_3D &invC );
-
+    SymmTensor4_3D gen_ST4_Ptilde( const SymmTensor2_3D &invC );
+}
 #endif
