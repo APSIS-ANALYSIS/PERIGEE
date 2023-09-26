@@ -30,7 +30,7 @@ Matrix_double_6by6_Array::~Matrix_double_6by6_Array()
 
 void Matrix_double_6by6_Array::LU_fac()
 {
-  double max_value, temp, invAkk;
+  double max_value, temp;
   int max_index, int_temp;
   bool pivot_flag;
   for(int kk=0; kk<5; ++kk)
