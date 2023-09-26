@@ -447,7 +447,7 @@ SymmTensor2_3D operator*( const double &val, const SymmTensor2_3D &input )
    val * input(3), val * input(4), val * input(5) );
 }
 
-SymmTensor2_3D inverse( const SymmTensor2_3D &input )
+SymmTensor2_3D STen2::inverse( const SymmTensor2_3D &input )
 {
   const double invdetA = 1.0 / input.det();
 
@@ -460,7 +460,7 @@ SymmTensor2_3D inverse( const SymmTensor2_3D &input )
   invdetA * (input(4) * input(3) - input(5) * input(2)) );
 }
 
-SymmTensor2_3D gen_right_Cauchy_Green( const Tensor2_3D &input )
+SymmTensor2_3D STen2::gen_right_Cauchy_Green( const Tensor2_3D &input )
 {
   return SymmTensor2_3D (
    input(0) * input(0) + input(3) * input(3) + input(6) * input(6),
@@ -471,7 +471,7 @@ SymmTensor2_3D gen_right_Cauchy_Green( const Tensor2_3D &input )
    input(0) * input(1) + input(3) * input(4) + input(6) * input(7) );
 }
 
-SymmTensor2_3D gen_left_Cauchy_Green( const Tensor2_3D &input )
+SymmTensor2_3D STen2::gen_left_Cauchy_Green( const Tensor2_3D &input )
 {
   return SymmTensor2_3D (
   input(0) * input(0) + input(1) * input(1) + input(2) * input(2),
@@ -482,7 +482,7 @@ SymmTensor2_3D gen_left_Cauchy_Green( const Tensor2_3D &input )
   input(0) * input(3) + input(1) * input(4) + input(2) * input(5) );
 }
 
-SymmTensor2_3D gen_symm_part( const Tensor2_3D &input )
+SymmTensor2_3D STen2::gen_symm_part( const Tensor2_3D &input )
 {
   return SymmTensor2_3D( input(0), input(4), input(8),
                         0.5 * ( input(5) + input(7) ),
