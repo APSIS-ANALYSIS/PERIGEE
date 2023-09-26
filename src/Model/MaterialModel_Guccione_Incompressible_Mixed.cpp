@@ -27,7 +27,7 @@ MaterialModel_Guccione_Incompressible_Mixed::MaterialModel_Guccione_Incompressib
   }
  
   // f x s / || f x s || = n 
-  n = VEC3_T::cross_product( f, s );
+  n = Vec3::cross_product( f, s );
   n.normalize();
 
   // Define the roatation matrix R
@@ -77,7 +77,7 @@ MaterialModel_Guccione_Incompressible_Mixed::MaterialModel_Guccione_Incompressib
   }
 
   // f x s / || f x s || = n
-  n = VEC3_T::cross_product( f, s );
+  n = Vec3::cross_product( f, s );
   n.normalize();
 
   // Define the roatation matrix R
