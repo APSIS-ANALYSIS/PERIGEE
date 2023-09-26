@@ -42,15 +42,15 @@ class Matrix_double_3by3_Array
     
     const double& operator()(const int &index) const {return mat[index];}
     
-    // Generate an identity matrix. Erase all previous values and reset p to default values.
+    // Generate an identity matrix. Erase all previous values and reset pp to default values.
     void gen_id();
 
     // Generate a matrix with random entries
-    // All previous values are erased and p is reset to default.
+    // All previous values are erased and pp is reset to default.
     void gen_rand(const double &min = -1.0, const double &max = 1.0);
 
     // Generate a Hilbert matrix
-    // all previous values are earsed and p is reset to default.
+    // all previous values are earsed and pp is reset to default.
     void gen_hilb();
 
     // Perform LU factorization of the matrix object and store the L & U
@@ -72,7 +72,7 @@ class Matrix_double_3by3_Array
     // Transpose operation for the matrix 
     void transpose();
 
-    // Inverse of the matrix (based on cofactor). The p is not
+    // Inverse of the matrix (based on cofactor). The pp is not
     // updated.
     void inverse();
 
