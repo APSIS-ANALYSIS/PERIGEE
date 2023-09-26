@@ -128,7 +128,7 @@ class Tensor4_3D
     // ------------------------------------------------------------------------
     void gen_P( const Tensor2_3D &C, const Tensor2_3D &invC );
 
-    void gen_P( const Tensor2_3D &C ) { gen_P( C, inverse(C) ); }
+    void gen_P( const Tensor2_3D &C ) { gen_P( C, Ten2::inverse(C) ); }
 
     // ------------------------------------------------------------------------
     // Generate Projector Ptilde = invC O invC - 1/3 invC x invC
