@@ -603,12 +603,12 @@ Tensor4_3D gen_T4_P( const Tensor2_3D &C, const Tensor2_3D &invC )
 
 Tensor4_3D gen_T4_P( const Tensor2_3D &C )
 {
-  return gen_T4_P( C, inverse(C) );
+  return gen_T4_P( C, Ten2::inverse(C) );
 }
 
 Tensor4_3D gen_T4_Pt( const Tensor2_3D &C )
 {
-  return gen_T4_P( inverse(C) );
+  return gen_T4_P( Ten2::inverse(C) );
 }
 
 Tensor4_3D gen_T4_Ptilde( const Tensor2_3D &invC )
