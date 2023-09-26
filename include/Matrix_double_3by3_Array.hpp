@@ -11,7 +11,7 @@
 //                     mat[3], mat[4], mat[5]
 //                     mat[6], mat[7], mat[8]
 // 
-// The p[3] array is a pointer for pivoting.
+// The pp[3] array is a pointer for pivoting.
 //
 // Author: Ju Liu
 // Date: Oct. 1st 2015
@@ -61,11 +61,11 @@ class Matrix_double_3by3_Array
 
     // Perform LU solve for the 3 mat x = b equations.
     // LU_fac() has to be called first.
-    Vector_3 LU_solve( const Vector_3 &b ) const;
+    Vector_3 LU_solve( const Vector_3 &bb ) const;
 
-    std::array<double, 3> LU_solve( const std::array<double, 3> &b ) const;
+    std::array<double, 3> LU_solve( const std::array<double, 3> &bb ) const;
 
-    // Perofrm LU solve for the 3 mat x = b equations
+    // Perofrm LU solve for the 3 mat xx = bb equations
     // LU_fac() has to be called first.
     void LU_solve(const double &b1, const double &b2, const double &b3,
         double &x1, double &x2, double &x3) const;
@@ -73,7 +73,7 @@ class Matrix_double_3by3_Array
     // Transpose operation for the matrix 
     void transpose();
 
-    // Inverse of the matrix (based on cofactor). The p and invm are not
+    // Inverse of the matrix (based on cofactor). The pp is not
     // updated.
     void inverse();
 
@@ -81,8 +81,8 @@ class Matrix_double_3by3_Array
     double det() const;
 
     // Vector multiplication y = Ax
-    // make sure the x y vector has length 3.
-    void VecMult( const double * const &x, double * const &y ) const; 
+    // make sure the xx yy vector has length 3.
+    void VecMult( const double * const &xx, double * const &yy ) const; 
     
     // Matrix multiplication
     void MatMult( const Matrix_double_3by3_Array &mleft, 
@@ -91,7 +91,7 @@ class Matrix_double_3by3_Array
     // print mat in matrix format
     void print() const;
 
-    // print mat in matrix format and p & invm0, invm1, invm2
+    // print mat in matrix format and pp
     void print_full() const;
 
   private:
@@ -100,7 +100,7 @@ class Matrix_double_3by3_Array
     
     // Pivoting flag. It is generated in LU-factorization and is used for
     // LU_solve.
-    int p[3];
+    int pp[3];
 };
 
 #endif
