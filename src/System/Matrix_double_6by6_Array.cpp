@@ -1,28 +1,28 @@
 #include "Matrix_double_6by6_Array.hpp"
 
-Matrix_double_6by6_Array::Matrix_double_6by6_Array(const double &a, const double &b,
-    const double &c, const double &d, const double &e, const double &f,
-    const double &g, const double &h, const double &i)
+Matrix_double_6by6_Array::Matrix_double_6by6_Array(const double &aa, const double &bb,
+    const double &cc, const double &dd, const double &ee, const double &ff,
+    const double &gg, const double &hh, const double &ii)
 {
-  Mat[0][0] = a*a;   Mat[0][1] = d*d;   Mat[0][2] = g*g;
-  Mat[0][3] = 2.0*a*d; Mat[0][4] = 2.0*a*g; Mat[0][5] = 2.0*d*g;
+  Mat[0] = aa*aa;     Mat[1] = dd*dd;     Mat[2] = gg*gg;
+  Mat[3] = 2.0*aa*dd; Mat[4] = 2.0*aa*gg; Mat[5] = 2.0*dd*gg;
 
-  Mat[1][0] = a*b; Mat[1][1] = d*e; Mat[1][2] = g*h;
-  Mat[1][3] = a*e+b*d; Mat[1][4] = a*h+b*g; Mat[1][5] = d*h+e*g;
+  Mat[6] = aa*bb;       Mat[7]  = dd*ee;       Mat[8]  = gg*hh;
+  Mat[9] = aa*ee+bb*dd; Mat[10] = aa*hh+bb*gg; Mat[11] = dd*hh+ee*gg;
   
-  Mat[2][0] = a*c; Mat[2][1] = d*f; Mat[2][2] = g*i;
-  Mat[2][3] = a*f+c*d; Mat[2][4] = a*i+c*g; Mat[2][5] = d*i+f*g;
+  Mat[12] = aa*cc;       Mat[13] = dd*ff;       Mat[14] = gg*ii;
+  Mat[15] = aa*ff+cc*dd; Mat[16] = aa*ii+cc*gg; Mat[17] = dd*ii+ff*gg;
   
-  Mat[3][0] = b*b;   Mat[3][1] = e*e;   Mat[3][2] = h*h;
-  Mat[3][3] = 2.0*b*e; Mat[3][4] = 2.0*b*h; Mat[3][5] = 2.0*e*h;
+  Mat[18] = bb*bb;     Mat[19] = ee*ee;     Mat[20] = hh*hh;
+  Mat[21] = 2.0*bb*ee; Mat[22] = 2.0*bb*hh; Mat[23] = 2.0*ee*hh;
   
-  Mat[4][0] = b*c; Mat[4][1] = e*f; Mat[4][2] = h*i;
-  Mat[4][3] = b*f+c*e; Mat[4][4] = b*i+c*h; Mat[4][5] = e*i+f*h;
+  Mat[24] = bb*cc;       Mat[25] = ee*ff;       Mat[26] = hh*ii;
+  Mat[27] = bb*ff+cc*ee; Mat[28] = bb*ii+cc*hh; Mat[29] = ee*ii+ff*hh;
 
-  Mat[5][0] = c*c; Mat[5][1] = f*f; Mat[5][2] = i*i;
-  Mat[5][3] = 2.0*c*f; Mat[5][4] = 2.0*c*i; Mat[5][5] = 2.0*f*i;
+  Mat[30] = cc*cc;     Mat[31] = ff*ff;     Mat[32] = ii*ii;
+  Mat[33] = 2.0*cc*ff; Mat[34] = 2.0*cc*ii; Mat[35] = 2.0*ff*ii;
 
-  p[0] = 0; p[1] = 1; p[2] = 2; p[3] = 3; p[4] = 4; p[5] = 5;
+  pp[0] = 0; pp[1] = 1; pp[2] = 2; pp[3] = 3; pp[4] = 4; pp[5] = 5;
 }
 
 Matrix_double_6by6_Array::~Matrix_double_6by6_Array()
