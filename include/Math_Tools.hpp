@@ -9,7 +9,7 @@
 #include <vector> 
 #include <random> 
 #include "Sys_Tools.hpp"
-
+#include <array>
 namespace MATH_T
 {
   // --------------------------------------------------------------------------
