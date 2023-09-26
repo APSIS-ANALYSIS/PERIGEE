@@ -93,7 +93,7 @@ class IMaterialModel
     {
       Tensor2_3D P, S;
       get_PK(F, P, S);
-      const Tensor2_3D Ft = transpose( F );
+      const Tensor2_3D Ft = Ten2::transpose( F );
       Tensor2_3D sigma = P * Ft;
       sigma.scale( (1.0/F.det()) );
       return sigma;
