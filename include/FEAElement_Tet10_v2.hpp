@@ -40,7 +40,6 @@
 // ==================================================================
 #include "FEAElement.hpp"
 #include "FE_Tools.hpp"
-#include "Matrix_double_6by6_Array.hpp"
 
 class FEAElement_Tet10_v2 : public FEAElement
 {

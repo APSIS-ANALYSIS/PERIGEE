@@ -80,7 +80,6 @@
 // ==================================================================
 #include "FEAElement.hpp"
 #include "FE_Tools.hpp"
-#include "Matrix_double_6by6_Array.hpp"
 
 class FEAElement_Hex27 : public FEAElement
 {
