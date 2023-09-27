@@ -37,7 +37,7 @@ void FE_T::L2Proj_DGP1_2D( const double * const &f,
   }
   a[3] = a[1]; a[6] = a[2]; a[7] = a[5];
 
-  Matrix_double_3by3_Array AA(a[0], a[1], a[2], a[3],
+  FE_T::Matrix_double_3by3_Array AA(a[0], a[1], a[2], a[3],
       a[4], a[5], a[6], a[7], a[8]);
 
   AA.LU_fac();
@@ -129,7 +129,7 @@ void FE_T::get_tet_sphere_info( const double &x0, const double &x1,
     const double &z0, const double &z1, const double &z2,
     const double &z3, double &x, double &y, double &z, double &r )
 {
-  Matrix_double_3by3_Array AA(
+  FE_T::Matrix_double_3by3_Array AA(
       2.0 * (x1-x0), 2.0 * (y1-y0), 2.0 * (z1-z0),
       2.0 * (x2-x0), 2.0 * (y2-y0), 2.0 * (z2-z0),
       2.0 * (x3-x0), 2.0 * (y3-y0), 2.0 * (z3-z0) );
@@ -150,7 +150,7 @@ Vector_3 FE_T::get_tet_sphere_info( const Vector_3 &pt0,
     const Vector_3 &pt1, const Vector_3 &pt2, const Vector_3 &pt3, 
     double &radius ) 
 {
-  Matrix_double_3by3_Array AA(
+  FE_T::Matrix_double_3by3_Array AA(
       2.0 * (pt1.x()-pt0.x()), 2.0 * (pt1.y()-pt0.y()), 2.0 * (pt1.z()-pt0.z()),
       2.0 * (pt2.x()-pt0.x()), 2.0 * (pt2.y()-pt0.y()), 2.0 * (pt2.z()-pt0.z()),
       2.0 * (pt3.x()-pt0.x()), 2.0 * (pt3.y()-pt0.y()), 2.0 * (pt3.z()-pt0.z()) );
@@ -165,6 +165,23 @@ Vector_3 FE_T::get_tet_sphere_info( const Vector_3 &pt0,
   radius = ( centre - pt0 ).norm2();
 
   return centre;
+}
+
+double FE_T::get_circumradius( const std::array<Vector_3, 4> &pts )
+{
+  FE_T::Matrix_double_3by3_Array AA(
+      2.0 * (pts[1].x()-pts[0].x()), 2.0 * (pts[1].y()-pts[0].y()), 2.0 * (pts[1].z()-pts[0].z()),
+      2.0 * (pts[2].x()-pts[0].x()), 2.0 * (pts[2].y()-pts[0].y()), 2.0 * (pts[2].z()-pts[0].z()),
+      2.0 * (pts[3].x()-pts[0].x()), 2.0 * (pts[3].y()-pts[0].y()), 2.0 * (pts[3].z()-pts[0].z()) );
+
+  AA.LU_fac();
+
+  const double xyz2 = pts[0].dot_product( pts[0] );
+
+  const Vector_3 centre = AA.LU_solve( Vector_3( pts[1].dot_product(pts[1]) - xyz2,
+        pts[2].dot_product(pts[2]) - xyz2, pts[3].dot_product(pts[3]) - xyz2 ) );
+
+  return ( centre - pts[0] ).norm2();
 }
 
 namespace FE_T

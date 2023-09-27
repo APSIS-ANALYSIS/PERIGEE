@@ -7,67 +7,10 @@
 #include "Vector_3.hpp"
 #include "Tensor4_3D.hpp"
 #include "SymmTensor4_3D.hpp"
-#include "Matrix_double_3by3_Array.hpp"
 #include "Matrix_double_6by6_Array.hpp"
 
 int main(int argc, char *argv[])
 {
-  // Matrix_double_3by3_Array TEST
-
-  Matrix_double_3by3_Array mtest3x3 {};
-  mtest3x3.gen_rand(-10, 10);
-
-  const Matrix_double_3by3_Array mtest3x3_copy = mtest3x3;
-
-  for (int ii=0; ii<9; ++ii) std::cout<<mtest3x3_copy(ii) - mtest3x3(ii) << std::endl;
-
-  FE_T::Matrix_double_3by3_Array mtestD3x3 {};
-
-  for (int ii=0; ii<9; ++ii) mtestD3x3(ii) = mtest3x3(ii);
-
-  std::cout<<"------------The 3x3 Matrix to be solved-----------"<<std::endl;
-
-  mtest3x3.print_full();  
-  mtestD3x3.print_info();
-  
-  // Define the right-hand-side vector b3
-
-  std::array<double, 3> b3_arr {};
-
-  for (int ii=0; ii<3; ++ii) b3_arr.at(ii) = MATH_T::gen_double_rand(-10, 10);
-
-  Vector_3 b3_vec (b3_arr.at(0), b3_arr.at(1), b3_arr.at(2));
-
-  std::cout<<"------------The right-hand-side vector b3 to be solved-----------"<<std::endl;
-
-  b3_vec.print();
-
-  mtest3x3.LU_fac();
-
-  std::cout<<"------------The difference between the results of the three LU_solve functions-----------"<<std::endl;
-
-  const std::array<double, 3> sol_b3_arr = mtest3x3.LU_solve(b3_arr);
- 
-  const Vector_3 sol_b3_vec = mtest3x3.LU_solve(b3_vec);
-
-  double sol_b3[3] {};
-
-  mtest3x3.LU_solve(b3_arr.at(0), b3_arr.at(1), b3_arr.at(2), sol_b3[0], sol_b3[1], sol_b3[2]);
-
-  std::cout<<sol_b3_arr.at(0)-sol_b3_vec.x()<<std::endl; 
-  std::cout<<sol_b3_arr.at(1)-sol_b3_vec.y()<<std::endl; 
-  std::cout<<sol_b3_arr.at(2)-sol_b3_vec.z()<<std::endl; 
-
-  for (int ii=0; ii<3; ++ii) std::cout<<sol_b3_arr.at(ii)-sol_b3[ii]<<std::endl;
-
-  std::cout<<"------------Matrix_double_3by3_Array vs Matrix_Dense<3>-----------"<<std::endl;
-
-  mtestD3x3.LU_fac();
-  
-  const std::array<double, 3> solD_b3_arr = mtestD3x3.LU_solve(b3_arr);
-
-  for (int ii=0; ii<3; ++ii) std::cout<<solD_b3_arr.at(ii)-sol_b3_arr[ii]<<std::endl;
-
   // Matrix_double_6by6_Array TEST
 
   std::array<double, 9> temp9_arr {};
