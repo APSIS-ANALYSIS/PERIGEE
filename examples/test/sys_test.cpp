@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 
   Matrix_double_6by6_Array mtest6x6 {temp9_arr.at(0), temp9_arr.at(1), temp9_arr.at(2), temp9_arr.at(3), temp9_arr.at(4), temp9_arr.at(5), temp9_arr.at(6), temp9_arr.at(7), temp9_arr.at(8)};
 
-  MATH_T::Matrix_Dense<6> mtestD6x6 {};
+  FE_T::Matrix_double_6by6_Array mtestD6x6 {};
 
   const double aa = temp9_arr.at(0); const double bb= temp9_arr.at(1); const double cc = temp9_arr.at(2);  
   const double dd = temp9_arr.at(3); const double ee= temp9_arr.at(4); const double ff = temp9_arr.at(5);  
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
   std::cout<<"------------The 6x6 Matrix to be solved-----------"<<std::endl;
 
   mtest6x6.print();  
-  mtestD6x6.print_info();
+  mtestD6x6.print();
 
   std::cout<<"------------The right-hand-side vector b6 to be solved-----------"<<std::endl;
 
