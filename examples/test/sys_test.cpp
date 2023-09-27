@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 
   for (int ii=0; ii<9; ++ii) std::cout<<mtest3x3_copy(ii) - mtest3x3(ii) << std::endl;
 
-  MATH_T::Matrix_Dense<3> mtestD3x3 {};
+  FE_T::Matrix_double_3by3_Array mtestD3x3 {};
 
   for (int ii=0; ii<9; ++ii) mtestD3x3(ii) = mtest3x3(ii);
 
