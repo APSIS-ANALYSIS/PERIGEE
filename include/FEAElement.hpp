@@ -256,13 +256,6 @@ class FEAElement
     // calculate the "root" of the tangential vector.
     // This function is, for example, called in FEAElement_Line2_3D_der0.
     // ------------------------------------------------------------------------
-    virtual void get_normal_out( const int &quaindex,
-        const double &sur_pt_x, const double &sur_pt_y,
-        const double &sur_pt_z, const double &intpt_x, 
-        const double &intpt_y, const double &intpt_z,
-        double &nx, double &ny, double &nz, double &length ) const
-    {SYS_T::commPrint("Warning: get_normal_out is not implemented. \n");}
-
     virtual Vector_3 get_normal_out( const int &quaindex,
         const std::vector< Vector_3> &sur_pt, const Vector_3 &int_pt, 
         double &length ) const
