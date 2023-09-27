@@ -24,9 +24,8 @@ int main( int argc, char * argv[] )
   std::string geo_file("./whole_vol.vtu");
 
   std::string geo_f_file("./fluid.vtu");
+  
   std::string geo_s_file("./solid.vtu");
-
-  std::string sur_s_file_interior_wall("./finter_solid.vtu");
 
   std::string sur_f_file_fro("./ffro_fluid.vtu");
 
@@ -48,6 +47,10 @@ int main( int argc, char * argv[] )
 
   std::string sur_s_file_top("./stop_solid.vtu");
 
+  std::string sur_f_file_inter("./finter_fluid.vtu");
+
+  std::string sur_s_file_inter("./finter_solid.vtu");
+
   std::cout<<"===== Command Line Arguments ====="<<std::endl;
   std::cout<<" -geo_file: "           <<geo_file           <<std::endl;
   std::cout<<" -geo_f_file: "         <<geo_f_file         <<std::endl;
@@ -62,6 +65,8 @@ int main( int argc, char * argv[] )
   std::cout<<" -sur_s_file_rig: "     <<sur_s_file_rig     <<std::endl;
   std::cout<<" -sur_f_file_top: "     <<sur_f_file_top     <<std::endl;
   std::cout<<" -sur_s_file_top: "     <<sur_s_file_top     <<std::endl;
+  std::cout<<" -sur_f_file_inter: "   <<sur_f_file_inter   <<std::endl;
+  std::cout<<" -sur_s_file_inter: "   <<sur_s_file_inter   <<std::endl;
   std::cout<<"----------------------------------\n";
   std::cout<<" elemType: "<<elemType<<std::endl;
   std::cout<<"===== Command Line Arguments ====="<<std::endl;
@@ -94,7 +99,9 @@ int main( int argc, char * argv[] )
 
   SYS_T::file_check(sur_s_file_top); std::cout<<sur_s_file_top<<" found. \n";
 
-  SYS_T::file_check(sur_s_file_interior_wall); std::cout<<sur_s_file_interior_wall<<" found. \n";
+  SYS_T::file_check(sur_f_file_inter); std::cout<<sur_f_file_inter<<" found. \n";
+
+  SYS_T::file_check(sur_s_file_inter); std::cout<<sur_s_file_inter<<" found. \n"; 
 
   // Read the geometry file for the whole FSI domain for the velocity /
   // displacement field
@@ -113,8 +120,8 @@ int main( int argc, char * argv[] )
   // Physical ElemBC
   std::cout<<"4. Elem boundary for the implicit solver: \n";
 
-  std::vector<std::string> ebclist {sur_f_file_fro, sur_f_file_bac, sur_f_file_lef, sur_f_file_rig, sur_f_file_top, 
-                                    sur_s_file_fro, sur_s_file_bac, sur_s_file_lef, sur_s_file_rig, sur_s_file_top};
+  std::vector<std::string> ebclist {sur_f_file_fro, sur_f_file_bac, sur_f_file_lef, sur_f_file_rig, sur_f_file_top,
+                                    sur_s_file_fro, sur_s_file_bac, sur_s_file_lef, sur_s_file_rig, sur_s_file_top, sur_f_file_inter , sur_s_file_inter};
 
   //std::vector<std::string> ebclist {sur_s_file_fro};
 

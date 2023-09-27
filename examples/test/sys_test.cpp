@@ -24,9 +24,8 @@ int main( int argc, char * argv[] )
   std::string geo_file("./whole_vol.vtu");
 
   std::string geo_f_file("./fluid.vtu");
+  
   std::string geo_s_file("./solid.vtu");
-
-  std::string sur_s_file_interior_wall("./finter_solid.vtp");
 
   std::string sur_f_file_fro("./ffro_fluid.vtp");
 
@@ -47,6 +46,10 @@ int main( int argc, char * argv[] )
   std::string sur_f_file_top("./ftop_fluid.vtp");
 
   std::string sur_s_file_top("./stop_solid.vtp");
+
+  std::string sur_f_file_inter("./finter_fluid.vtp");
+
+  std::string sur_s_file_inter("./finter_solid.vtp");
 
   std::cout<<"===== Command Line Arguments ====="<<std::endl;
   std::cout<<" -geo_file: "           <<geo_file           <<std::endl;
@@ -94,7 +97,9 @@ int main( int argc, char * argv[] )
 
   SYS_T::file_check(sur_s_file_top); std::cout<<sur_s_file_top<<" found. \n";
 
-  SYS_T::file_check(sur_s_file_interior_wall); std::cout<<sur_s_file_interior_wall<<" found. \n";
+  SYS_T::file_check(sur_f_file_inter); std::cout<<sur_f_file_inter<<" found. \n";
+
+  SYS_T::file_check(sur_s_file_inter); std::cout<<sur_s_file_inter<<" found. \n";
 
   // Read the geometry file for the whole FSI domain for the velocity /
   // displacement field
@@ -114,7 +119,7 @@ int main( int argc, char * argv[] )
   std::cout<<"4. Elem boundary for the implicit solver: \n";
 
   std::vector<std::string> ebclist {sur_f_file_fro, sur_f_file_bac, sur_f_file_lef, sur_f_file_rig, sur_f_file_top, 
-                                    sur_s_file_fro, sur_s_file_bac, sur_s_file_lef, sur_s_file_rig, sur_s_file_top};
+                                    sur_s_file_fro, sur_s_file_bac, sur_s_file_lef, sur_s_file_rig, sur_s_file_top, sur_f_file_inter , sur_s_file_inter};
 
   //std::vector<std::string> ebclist {sur_s_file_fro};
 
