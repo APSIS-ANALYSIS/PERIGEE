@@ -13,18 +13,13 @@ namespace FE_T
 {
   // ----------------------------------------------------------------
   // Generate outward normal vector from a tangential vector.
-  // t : the tangential vector
-  // p0 : the starting point of the tangential vector
-  // p1 : the interior point 
-  // n : the normal vector
+  // tan : the tangential vector
+  // p0  : the starting point of the tangential vector
+  // p1  : the interior point 
+  // return : the outward normal vector
   // Algorithm: p1->p0 gives the vector m,
   //            n = m - (m,t) t / (t,t).
   // ----------------------------------------------------------------
-  void get_n_from_t( const double &tx, const double &ty, const double &tz,
-      const double &p0_x, const double &p0_y, const double &p0_z,
-      const double &p1_x, const double &p1_y, const double &p1_z,
-      double &nx, double &ny, double &nz );
-
   Vector_3 get_n_from_t( const Vector_3 &tan, const Vector_3 &p0, const Vector_3 &p1 );
 
   // ----------------------------------------------------------------

@@ -86,31 +86,6 @@ void FE_T::L2Proj_DGP1_3D( const double * const &f,
   coeff_0 = out[0]; coeff_x = out[1]; coeff_y = out[2]; coeff_z = out[3];
 }
 
-void FE_T::get_n_from_t( 
-    const double &tx, const double &ty, const double &tz,
-    const double &p0_x, const double &p0_y, const double &p0_z,
-    const double &p1_x, const double &p1_y, const double &p1_z,
-    double &nx, double &ny, double &nz )
-{
-  const double mx = p0_x - p1_x;
-  const double my = p0_y - p1_y;
-  const double mz = p0_z - p1_z;
-
-  const double mdt = mx * tx + my * ty + mz * tz;
-  const double tdt = tx * tx + ty * ty + tz * tz;
-  const double fac = mdt / tdt;
-
-  nx = mx - fac * tx;
-  ny = my - fac * ty;
-  nz = mz - fac * tz;
-
-  const double len = std::sqrt(nx*nx + ny*ny + nz*nz);
-  nx = nx / len;
-  ny = ny / len;
-  nz = nz / len;
-}
-
-
 Vector_3 FE_T::get_n_from_t( const Vector_3 &tan, const Vector_3 &p0, const Vector_3 &p1 )
 {
   const Vector_3 mm = p0 - p1;
