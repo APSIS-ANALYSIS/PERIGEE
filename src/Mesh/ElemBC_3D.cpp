@@ -34,8 +34,7 @@ ElemBC_3D::ElemBC_3D( const std::vector<std::string> &vtkfileList,
   {
     std::cout<<"     ebc_id = "<<ii<<": "<<vtkfileList[ii]<<'\n';
 
-    const int file_type = VTK_T::read_grid( vtkfileList[ii], num_node[ii], num_cell[ii],
-        pt_xyz[ii], sur_ien[ii] );
+    VTK_T::read_grid( vtkfileList[ii], num_node[ii], num_cell[ii], pt_xyz[ii], sur_ien[ii] );
     
     if(elemtype == 501)
       cell_nLocBas[ii] = 3; // linear triangle
