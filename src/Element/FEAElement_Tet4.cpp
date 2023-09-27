@@ -58,7 +58,7 @@ void FEAElement_Tet4::buildBasis( const IQuadPts * const &quad,
   Jac[8] = -ctrl_z[0] + ctrl_z[3]; // dz_dt
 
   // Make use of the existing 3x3 matrix tool
-  Matrix_double_3by3_Array mdrdx( Jac[0], Jac[1], Jac[2], Jac[3], Jac[4],
+  FE_T::Matrix_double_3by3_Array mdrdx( Jac[0], Jac[1], Jac[2], Jac[3], Jac[4],
       Jac[5], Jac[6], Jac[7], Jac[8] );
 
   // detJac = det(dx/dr)
@@ -215,7 +215,7 @@ double FEAElement_Tet4::get_h( const double * const &ctrl_x,
 {
   double x,y,z,r;
 
-  MATH_T::get_tet_sphere_info(
+  FE_T::get_tet_sphere_info(
       ctrl_x[0], ctrl_x[1], ctrl_x[2], ctrl_x[3],
       ctrl_y[0], ctrl_y[1], ctrl_y[2], ctrl_y[3],
       ctrl_z[0], ctrl_z[1], ctrl_z[2], ctrl_z[3],

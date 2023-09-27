@@ -32,7 +32,7 @@ SET( perigee_source ${perigee_SOURCE_DIR}/../../src )
 SET( perigee_preprocess_lib_src 
   ${perigee_source}/System/PETSc_Tools.cpp
   ${perigee_source}/System/Vector_3.cpp
-  ${perigee_source}/System/Matrix_double_3by3_Array.cpp
+  ${perigee_source}/System/FE_Tools.cpp
   ${perigee_source}/System/Tensor2_3D.cpp
   ${perigee_source}/System/Tensor2_2D.cpp
   ${perigee_source}/System/SymmTensor2_3D.cpp
@@ -72,10 +72,14 @@ SET( perigee_preprocess_lib_src
 
 SET( perigee_analysis_lib_src
   ${perigee_source}/System/PETSc_Tools.cpp
-  ${perigee_source}/System/Matrix_double_6by6_Array.cpp
   ${perigee_source}/System/Matrix_PETSc.cpp
   ${perigee_source}/System/Tensor4_3D.cpp
+  ${perigee_source}/System/FE_Tools.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Tet.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_Quad.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_Hex.cpp
   ${perigee_source}/Mesh/QuadPts_debug.cpp
   ${perigee_source}/Analysis_Tool/AGlobal_Mesh_Info_FEM_3D.cpp
   ${perigee_source}/Analysis_Tool/APart_Basic_Info.cpp
@@ -88,15 +92,26 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/ALocal_EBC_wall.cpp
   ${perigee_source}/Analysis_Tool/APart_Node.cpp
   ${perigee_source}/Analysis_Tool/FEANode.cpp
+  ${perigee_source}/Element/FEAElement_Line2_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Line3_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Hex8.cpp
+  ${perigee_source}/Element/FEAElement_Hex27.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
+  ${perigee_source}/Element/FEAElement_Tet_P2_P1.cpp
+  ${perigee_source}/Element/FEAElement_MINI_P1_3D.cpp
+  ${perigee_source}/Element/FEAElement_MINI_P1_2D.cpp
   ${perigee_source}/Element/FEAElement_Tet10.cpp
   ${perigee_source}/Element/FEAElement_Tet10_v2.cpp
   ${perigee_source}/Element/FEAElement_Triangle3.cpp
   ${perigee_source}/Element/FEAElement_Triangle6.cpp
+  ${perigee_source}/Element/FEAElement_Quad4.cpp
+  ${perigee_source}/Element/FEAElement_Quad9.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_membrane.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_membrane.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Quad4_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Quad9_3D_der0.cpp
   ${perigee_source}/Model/GenBC_RCR.cpp
   ${perigee_source}/Model/GenBC_Resistance.cpp
   ${perigee_source}/Model/GenBC_Inductance.cpp

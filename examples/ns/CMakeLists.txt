@@ -32,8 +32,7 @@ SET( perigee_source ${perigee_SOURCE_DIR}/../../src )
 SET( perigee_preprocess_lib_src 
   ${perigee_source}/System/Vector_3.cpp
   ${perigee_source}/System/Tensor2_3D.cpp
-  ${perigee_source}/System/Matrix_double_3by3_Array.cpp
-  ${perigee_source}/System/Math_Tools.cpp
+  ${perigee_source}/System/FE_Tools.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
   ${perigee_source}/System/HDF5_Reader.cpp
   ${perigee_source}/Mesh/VTK_Tools.cpp
@@ -61,7 +60,6 @@ SET( perigee_preprocess_lib_src
 
 SET( perigee_analysis_lib_src
   ${perigee_source}/System/PETSc_Tools.cpp
-  ${perigee_source}/System/Matrix_double_6by6_Array.cpp
   ${perigee_source}/System/Matrix_PETSc.cpp
   ${perigee_source}/System/Tensor2_3D.cpp
   ${perigee_source}/System/SymmTensor2_3D.cpp
