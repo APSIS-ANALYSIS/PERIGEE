@@ -118,7 +118,7 @@ Vector_3 FE_T::get_n_from_t( const Vector_3 &tan, const Vector_3 &p0, const Vect
   const double tdt = VEC3_T::dot_product( tan, tan );
   const double fac = mdt / tdt;
 
-  const Vector_3 nn = fac * tan;
+  const Vector_3 nn = mm - fac * tan;
 
   return VEC3_T::normalize(nn);
 }
