@@ -130,7 +130,7 @@ void FEAElement_MINI_P1_3D::buildBasis( const IQuadPts * const &quad,
   Jac[8] = - ctrl_z[0] + ctrl_z[3]; // dz_dt
 
   // Generate 3x3 matrix
-  Matrix_double_3by3_Array mdrdx( Jac[0], Jac[1], Jac[2], Jac[3], Jac[4],
+  FE_T::Matrix_double_3by3_Array mdrdx( Jac[0], Jac[1], Jac[2], Jac[3], Jac[4],
       Jac[5], Jac[6], Jac[7], Jac[8] );
 
   detJac = mdrdx.det();

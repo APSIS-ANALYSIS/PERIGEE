@@ -10,7 +10,7 @@
 // Date created: Sep. 2023
 // ==================================================================
 #include "FEAElement.hpp"
-#include "Matrix_double_3by3_Array.hpp"
+#include "FE_Tools.hpp"
 
 class FEAElement_Quad4 : public FEAElement
 {

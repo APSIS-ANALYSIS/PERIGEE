@@ -11,7 +11,6 @@
 // ==================================================================
 #include "FEAElement.hpp"
 #include "FE_Tools.hpp"
-#include "Matrix_double_3by3_Array.hpp"
 
 class FEAElement_Tet4 : public FEAElement
 {

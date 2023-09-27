@@ -150,7 +150,7 @@ void FEAElement_Tet10::buildBasis( const IQuadPts * const &quad,
       zt += ctrl_z[ii] * dR_dt[ii];
     }
   
-    Matrix_double_3by3_Array mdrdx(xr, xs, xt, yr, ys, yt, zr, zs, zt);
+    FE_T::Matrix_double_3by3_Array mdrdx(xr, xs, xt, yr, ys, yt, zr, zs, zt);
 
     detJac[qua] = mdrdx.det(); // detJac = |dx/dr|
  

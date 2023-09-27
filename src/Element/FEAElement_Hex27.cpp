@@ -273,7 +273,7 @@ void FEAElement_Hex27::buildBasis( const IQuadPts * const &quad,
       zst += ctrl_z[ii] * d2R_dst[ii];
     }
 
-    Matrix_double_3by3_Array mdrdx(xr, xs, xt, yr, ys, yt, zr, zs, zt);
+    FE_T::Matrix_double_3by3_Array mdrdx(xr, xs, xt, yr, ys, yt, zr, zs, zt);
 
     detJac[qua] = mdrdx.det(); // detJac = |dx/dr|
  
