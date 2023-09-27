@@ -6,10 +6,10 @@
 //
 // Date Created: Feb. 13 2016
 // ============================================================================
-#include <stdio.h>
 #include <vector> 
+#include <random> 
 #include "Sys_Tools.hpp"
-#include "Matrix_double_3by3_Array.hpp"
+#include <array>
 
 namespace MATH_T
 {
@@ -72,51 +72,6 @@ namespace MATH_T
     return ( std::abs(a-b)<tol );
   }
   
-  // ----------------------------------------------------------------
-  // Generate outward normal vector from a tangential vector.
-  // t : the tangential vector
-  // p0 : the starting point of the tangential vector
-  // p1 : the interior point 
-  // n : the normal vector
-  // Algorithm: p1->p0 gives the vector m,
-  //            n = m - (m,t) t / (t,t).
-  // ----------------------------------------------------------------
-  void get_n_from_t( const double &tx, const double &ty, const double &tz,
-      const double &p0_x, const double &p0_y, const double &p0_z,
-      const double &p1_x, const double &p1_y, const double &p1_z,
-      double &nx, double &ny, double &nz );
-
-
-  // ----------------------------------------------------------------
-  // Calculate the circumscribing sphere's centre point and radius
-  // of four given points
-  // ----------------------------------------------------------------
-  void get_tet_sphere_info( const double &x0, const double &x1,
-      const double &x2, const double &x3, const double &y0, 
-      const double &y1, const double &y2, const double &y3,
-      const double &z0, const double &z1, const double &z2, 
-      const double &z3, double &x, double &y, double &z, double &r );
-
-  Vector_3 get_tet_sphere_info( const Vector_3 &pt0, const Vector_3 &pt1, 
-      const Vector_3 &pt2, const Vector_3 &pt3, double &radius );
-
-  inline double get_circumradius( const std::array<Vector_3, 4> &pts )
-  {
-    Matrix_double_3by3_Array AA(
-        2.0 * (pts[1].x()-pts[0].x()), 2.0 * (pts[1].y()-pts[0].y()), 2.0 * (pts[1].z()-pts[0].z()),
-        2.0 * (pts[2].x()-pts[0].x()), 2.0 * (pts[2].y()-pts[0].y()), 2.0 * (pts[2].z()-pts[0].z()),
-        2.0 * (pts[3].x()-pts[0].x()), 2.0 * (pts[3].y()-pts[0].y()), 2.0 * (pts[3].z()-pts[0].z()) );
-
-    AA.LU_fac();
-
-    const double xyz2 = pts[0].dot_product( pts[0] );
-
-    const Vector_3 centre = AA.LU_solve( Vector_3( pts[1].dot_product(pts[1]) - xyz2,
-          pts[2].dot_product(pts[2]) - xyz2, pts[3].dot_product(pts[3]) - xyz2 ) );
-
-    return ( centre - pts[0] ).norm2();
-  }
-
   // ----------------------------------------------------------------
   // Statistical quantities
   // Mean value
@@ -223,164 +178,24 @@ namespace MATH_T
     }
   }
 
-  // --------------------------------------------------------------------------
-  // Projection operator
-  // --------------------------------------------------------------------------
-  // L2-projection of a function to a piecewise constant (DGP0 space)
-  // f : the function f's value evaluated at nqp quadrature points
-  // gwts : gwts = detJac(i) * w(i) the Jacobian for the element and the
-  //        quadrature weights.
-  // nqp : number of quadrature points
-  // return a scalar Prof(f) := int_omega f dx / int_omega 1 dx
-  //                          = sum(f * gwts) / sum(gwts)
-  // --------------------------------------------------------------------------
-  double L2Proj_DGP0( const double * const &f, 
-      const double * const &gwts, const int &nqp );
-
-  // --------------------------------------------------------------------------
-  // L2-projection of a function to a piecewise linear (DGP1 space) in 2D.
-  // f : the function value evaluated at nqp quadrature points
-  // gwts : gwts = detJac(i) * w(i) the Jacobian for the element and the weights
-  // qp_x : the quadrature points x-coordinates
-  // qp_y : the quadrature points y-coordinates
-  // nqp : the number of quadrature points
-  // output: coeff_0, coeff_x, coeff_y.
-  // The projected polynomial is
-  //         coeff_0 + coeff_x x + coeff_y y.
-  // --------------------------------------------------------------------------
-  void L2Proj_DGP1_2D( const double * const &f,
-      const double * const &gwts,
-      const double * const &qp_x,
-      const double * const &qp_y,
-      const int &nqp,
-      double &coeff_0, double &coeff_x, double &coeff_y );
-
-  // --------------------------------------------------------------------------
-  // L2-projection of a function to a piecewise linear (DGP1 space) in 3D.
-  // f : the function value evaluated at nqp quadrature points
-  // gwts : gwts = detJac(i) * w(i) the Jacobian for the element and the weights
-  // qp_x : the quadrature points x-coordinates
-  // qp_y : the quadrature points y-coordinates
-  // qp_z : the quadrature points z-coordinates
-  // nqp : the number of quadrature points
-  // output: coeff_0, coeff_x, coeff_y, coeff_z.
-  // The projected polynomial is
-  //         coeff_0 + coeff_x x + coeff_y y + coeff_z z.
-  // --------------------------------------------------------------------------
-  void L2Proj_DGP1_3D( const double * const &f,
-      const double * const &gwts,
-      const double * const &qp_x,
-      const double * const &qp_y,
-      const double * const &qp_z,
-      const int &nqp,
-      double &coeff_0, double &coeff_x, double &coeff_y, double &coeff_z );
-
-  // ================================================================
+  // ==========================================================================
   // Dense Matrix tool
   // This is an implementation of dense matrix in C++.
-  // The matrix has to be a square matrix with size N X N.
-  // The objective is to implement efficient, dense linear algebra,
-  // especially the LU factorization and LU-Solver.
-  // The matrix data is stored as a one-dimensional array in row-
-  // oriented manner.
+  // The matrix has to be a square matrix with size N X N, and the matrix
+  // entries are stoed in a 1D array in row-oriented manner.
+  // The objective is to implement efficient, dense linear algebra, especially
+  // the LU factorization and LU-Solver.
   // 
-  // A typical usage is, one should call
-  // LU_fac();
-  // LU_solve(b,x);
+  // A typical usage is, one should first call
+  //                  LU_fac();
+  // to obtain the LU factorization of the matrix. The L and U matrices are
+  // stored in the same 1D array by replacing the original matrix entries. This
+  // means the matrix content is changed after one calls LU_fac function. To
+  // solve with a RHS b, one just need to make a second function call as
+  //                  x = LU_solve(b);
   //
   // Ref. Numerical Linear Algebra by L.N. Trefethen and D. Bau, III, SIAM.
-  // ================================================================
-  class Matrix_dense
-  {
-    public:
-      // default constructor will generate a NULL object for all ptrs
-      Matrix_dense();
-
-      // generate a in_msize x in_msize identity matrix
-      Matrix_dense(const int &in_msize);
-
-      // copy constructor
-      Matrix_dense( const Matrix_dense * const & in_m );
-
-      virtual ~Matrix_dense();
-
-      // print the full matrix on screen
-      virtual void print_mat(const int &pre = 6) const;
-
-      // print the mat content as well as the p and invm array
-      virtual void print_info() const;
-
-      // get the size of the matrix
-      virtual int get_size() const;
-
-      virtual double get_mat(const int &ii, const int &jj) const;
-
-      virtual double get_mat(const int &ii) const {return mat[ii];}
-
-      virtual int get_p(const int &ii) const;
-
-      virtual double get_invm(const int &ii) const;
-
-      // set all entries in matrix to be zero
-      virtual void zero_mat();
-
-      // set value at i, j
-      virtual void set_value(const int &ii, const int &jj, const double &val);
-
-      virtual void set_values( int const * const &index_i, 
-          int const * const &index_j,
-          double const * const &vals, const int &num );
-
-      virtual void set_values(double const * const &vals);
-
-      // generate identity matrix
-      virtual void gen_id();
-
-      // generate matrix with random entries
-      virtual void gen_rand();
-
-      // generate Hilbert matrices
-      virtual void gen_hilb();
-
-      // multiply the mat with a vector
-      // b and x canNOT be the same vector.
-      virtual void Axb( double const * const &b, double * const &x ) const;
-
-      // ------------------------------------------------------------
-      // perform LU-factorization for the matrix. The mat object will be replaced
-      // by the LU matrices. Only partial pivoting is performed. Complete pivoting
-      // is not used because the improvement of stability is marginal and the
-      // amount of time needed will increase.
-      virtual void LU_fac();
-
-      // with LU factorization performed, solve a linear problem with given RHS
-      // users are responsible for allocating the b and x arrays.
-      virtual void LU_solve( double const * const &b, double * const &x ) const;
-      // ------------------------------------------------------------
-
-    protected:
-      // Matrix size: N by N
-      const int N;
-
-      // Length of the mat array
-      const int NN;
-
-      // double array as a holder for the matrix
-      // size : N^2
-      double * mat;
-
-      // permutation infomation generated from LU-fac
-      // size : N
-      int * p;
-
-      // inverse of diagonal entries which are used for LU-solve
-      // size : N
-      double * invm;
-
-      // bool variable indicate if the matrix has been LU factorized.
-      bool is_fac;
-  };
-
+  // ==========================================================================
   template<int N> class Matrix_Dense
   {
     public:
@@ -466,6 +281,12 @@ namespace MATH_T
 
       bool get_is_fac() const {return is_fac;}
 
+      // ----------------------------------------------------------------------
+      // perform LU-factorization for the matrix. The mat object will be replaced
+      // by the LU matrices. Only partial pivoting is performed. Complete pivoting
+      // is not used because the improvement of stability is marginal and the
+      // amount of time needed will increase.
+      // ----------------------------------------------------------------------
       void LU_fac()
       {
         for(int kk=0; kk<N-1; ++kk)
@@ -525,6 +346,10 @@ namespace MATH_T
         return result;
       }
 
+      // ----------------------------------------------------------------------
+      // with LU factorization performed, solve a linear problem with given RHS
+      // users are responsible for allocating the b and x arrays.
+      // ----------------------------------------------------------------------
       std::array<double, N> LU_solve( std::array<double, N> &bb ) const
       {
         std::array<double, N> xx {};
@@ -596,13 +421,28 @@ namespace MATH_T
       }
 
     protected:
+      // container for the matrix
       double mat[N*N];
 
+      // permutation infomation generated from LU-fac
       int pp[N];
 
+      // bool variable indicate if the matrix has been LU factorized.
       bool is_fac;
   };
 
+  // ==========================================================================
+  // Dense Symmetric Positive definite matrix tool.
+  // The user should be sure that the matrix is symmetric and positive definite.
+  // The objective is to implement efficient LDL^t decomposition,
+  // which can be used to solve problems like inverting the normal equation.
+  // Typical usage is that one should first call
+  //               LDLt_fac();
+  // and then call the following to solve with the RHS b.
+  //               x = LDLt_solve(b);
+  //
+  // Ref. Shufang Xu, Numerical Linear Algebra, Peking Univ.
+  // ==========================================================================
   template<int N> class Matrix_SymPos_Dense : public Matrix_Dense <N>
   {
     public:
@@ -612,7 +452,10 @@ namespace MATH_T
       Matrix_SymPos_Dense(const std::array<double,N*N> &input) : Matrix_Dense<N>(input)
       {}
 
-      // We assume that the input matrix are the symmetry positive definite matrix 
+      // ----------------------------------------------------------------------
+      // We assume that the input matrix are the symmetry positive definite matrix
+      // and we do not check this in the constructor 
+      // ----------------------------------------------------------------------
       Matrix_SymPos_Dense( const Matrix_Dense<N> &input ) : Matrix_Dense<N>()
       { 
         for(int ii=0; ii<N*N; ++ii) this->mat[ii] = input(ii);
@@ -627,8 +470,9 @@ namespace MATH_T
 
       virtual ~Matrix_SymPos_Dense() {};
 
-      // Check the symmetry of the matrix, throw an error if
-      // non-symmetriness is found.
+      // ----------------------------------------------------------------------
+      // Check the symmetry of the matrix, throw an error if non-symmetriness is found.
+      // ----------------------------------------------------------------------
       void check_symm() const
       {
         for(int ii=0; ii<N; ++ii)
@@ -648,11 +492,11 @@ namespace MATH_T
         return *this;             
       }    
 
-      // ------------------------------------------------------------
-      // Perform LDL^t transformation. The mat object will be replace
-      // by the entries of the L matrix and the D matrix. Pivoting is
-      // not used because this decomposition for symmetry positive
-      // definite matrix is stable.
+      // ----------------------------------------------------------------------
+      // Perform LDL^t transformation. The mat object will be replace by the 
+      // entries of the L matrix and the D matrix. Pivoting is NOT used because 
+      // this decomposition for symmetry positive definite matrix is stable.
+      // ----------------------------------------------------------------------
       void LDLt_fac()
       {
         // This algorithm is given in Shufang XU's book, pp 31. 
@@ -676,9 +520,10 @@ namespace MATH_T
         this->is_fac = true;
       }
 
-      // With the LDLt_fac() function performed, solve a linear problem
-      // with the given RHS.
-      // users are responsible for allocating the bb and xx arrays.
+      // ----------------------------------------------------------------------
+      // With the LDLt_fac() function performed, solve a linear problem with 
+      // the given RHS.
+      // ----------------------------------------------------------------------
       std::array<double, N>  LDLt_solve( std::array<double, N> &bb ) const
       {
         std::array<double, N> xx {};
@@ -698,64 +543,10 @@ namespace MATH_T
         {
           for(int jj=ii+1; jj<N; ++jj) xx[ii] -= this->mat[jj*N+ii] * xx[jj];
         }
-        
         return xx;
       }
-
-      // ------------------------------------------------------------
   };
 
-
-  // ================================================================
-  // Dense Symmetric Positive definite matrix tool.
-  // The user should be sure that the matrix is symmetric and positive
-  // definite.
-  // The objective is to implement efficient LDL^t decomposition,
-  // which can be used to solve problems like inverting the normal
-  // equation.
-  // Typical usage is that one should call
-  // LDLt_fac();
-  // LDLt_solve(b,x);
-  //
-  // Ref. Shufang Xu, Numerical Linear Algebra, Peking Univ.
-  // ================================================================
-  class Matrix_SymPos_dense : public Matrix_dense
-  {
-    public:
-      // Default constructor, generate a NULL object for everything
-      Matrix_SymPos_dense();
-
-      // generate a msize x msize identity matrix
-      Matrix_SymPos_dense( const int &msize );
-
-      // Copy constructor
-      Matrix_SymPos_dense( const Matrix_SymPos_dense * const &in_mat );
-
-      virtual ~Matrix_SymPos_dense();
-
-      // Check the symmetry of the matrix, throw an error if
-      // non-symmetriness is found.
-      virtual void check_symm() const;
-
-      // Copy the content of a matrix
-      // We assume that the input matrix and the object have the same
-      // size.
-      virtual void copy( const Matrix_SymPos_dense * const &in_mat );
-
-      // ------------------------------------------------------------
-      // Perform LDL^t transformation. The mat object will be replace
-      // by the entries of the L matrix and the D matrix. Pivoting is
-      // not used because this decomposition for symmetry positive
-      // definite matrix is stable.
-      virtual void LDLt_fac();
-
-      // With the LDLt_fac() function performed, solve a linear problem
-      // with the given RHS.
-      // users are responsible for allocating the b and x arrays.
-      virtual void LDLt_solve( double const * const &b, 
-          double * const &x ) const;
-      // ------------------------------------------------------------
-  };
-}
+} // End of Math_T
 
 #endif

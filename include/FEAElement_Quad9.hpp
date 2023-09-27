@@ -1,31 +1,31 @@
-#ifndef FEAELEMENT_TRIANGLE6_HPP
-#define FEAELEMENT_TRIANGLE6_HPP
+#ifndef FEAELEMENT_QUAD9_HPP
+#define FEAELEMENT_QUAD9_HPP
 // ==================================================================
-// FEAElement_Triangle6.hpp
-// This is an implementation of the element routine for quadratic
-// triangle element in 2D.
+// FEAElement_Quad9.hpp
+// This is an implementation of the element routine for biquadratic
+// quadrilateral element in 2D.
 //
 // This class is designed mainly for the 2D FEM assembly.
 //
-// Date created: Nov. 28 2017
+// Date created: Sep. 2023
 // ==================================================================
 #include "FEAElement.hpp"
 #include "FE_Tools.hpp"
 
-class FEAElement_Triangle6 : public FEAElement
+class FEAElement_Quad9 : public FEAElement
 {
   public:
-    FEAElement_Triangle6( const int &in_nqua );
+    FEAElement_Quad9( const int &in_nqua );
 
-    virtual ~FEAElement_Triangle6();
+    virtual ~FEAElement_Quad9();
 
     virtual int get_elemDim() const {return 2;}
 
-    virtual int get_Type() const {return 552;}
+    virtual int get_Type() const {return 652;}
 
     virtual int get_numQuapts() const {return numQuapts;}
 
-    virtual int get_nLocBas() const {return 6;}
+    virtual int get_nLocBas() const {return 9;}
 
     virtual void print_info() const;
 
@@ -76,7 +76,7 @@ class FEAElement_Triangle6 : public FEAElement
   private:
     const int numQuapts;
 
-    // length 6 x numQuapts
+    // length 9 x numQuapts
     double * R, * dR_dx, * dR_dy;
     double * d2R_dxx, * d2R_dyy, * d2R_dxy;
 
