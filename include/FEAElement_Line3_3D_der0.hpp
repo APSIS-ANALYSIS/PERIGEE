@@ -45,11 +45,9 @@ class FEAElement_Line3_3D_der0 : public FEAElement
 
     virtual void get_R( const int &quaindex, double * const &basis ) const;
 
-    virtual void get_1d_normal_out( const int &quaindex,
-        const double * const &ctrl_x, const double * const &ctrl_y,
-        const double * const &ctrl_z,
-        const double &intpt_x, const double &intpt_y, const double &intpt_z,
-        double &nx, double &ny, double &nz, double &len ) const;
+    virtual Vector_3 get_normal_out( const int &quaindex,
+        const std::vector<Vector_3> &ctrl_pt,
+        const Vector_3 &int_pt, double &len ) const;
 
     virtual double get_detJac(const int &quaindex) const
     {return detJac[quaindex];};
@@ -61,9 +59,7 @@ class FEAElement_Line3_3D_der0 : public FEAElement
     double * R;
 
     // length is numQuapts
-    double * dx_dr;
-    double * dy_dr;
-    double * dz_dr;
+    std::vector<Vector_3> dx_dr;
     double * detJac;
 };
 
