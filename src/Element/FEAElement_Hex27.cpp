@@ -302,7 +302,7 @@ void FEAElement_Hex27::buildBasis( const IQuadPts * const &quad,
     }
 
     // Setup the 6x6 matrix
-    Matrix_double_6by6_Array LHS(xr, xs, xt, yr, ys, yt, zr, zs, zt);
+    FE_T::Matrix_double_6by6_Array LHS(xr, xs, xt, yr, ys, yt, zr, zs, zt);
 
     // LU factorization
     LHS.LU_fac();
