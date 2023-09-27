@@ -197,8 +197,7 @@ void Matrix_double_3by3_Array::LU_solve(const double &b1, const double &b2, cons
 
 void Matrix_double_3by3_Array::transpose()
 {
-  double temp;
-  temp = mat[1]; mat[1] = mat[3]; mat[3] = temp;
+  double temp = mat[1]; mat[1] = mat[3]; mat[3] = temp;
   temp = mat[2]; mat[2] = mat[6]; mat[6] = temp;
   temp = mat[5]; mat[5] = mat[7]; mat[7] = temp; 
 }
@@ -207,17 +206,15 @@ void Matrix_double_3by3_Array::inverse()
 {
   const double invdetA = 1.0 / det();
 
-  double temp[9];
-  
-  temp[0] = invdetA * (mat[4] * mat[8] - mat[5] * mat[7]);
-  temp[1] = invdetA * (mat[2] * mat[7] - mat[1] * mat[8]);
-  temp[2] = invdetA * (mat[1] * mat[5] - mat[2] * mat[4]);
-  temp[3] = invdetA * (mat[5] * mat[6] - mat[3] * mat[8]);
-  temp[4] = invdetA * (mat[0] * mat[8] - mat[2] * mat[6]);
-  temp[5] = invdetA * (mat[2] * mat[3] - mat[0] * mat[5]);
-  temp[6] = invdetA * (mat[3] * mat[7] - mat[4] * mat[6]);
-  temp[7] = invdetA * (mat[1] * mat[6] - mat[0] * mat[7]);
-  temp[8] = invdetA * (mat[0] * mat[4] - mat[1] * mat[3]);
+  const double temp[9] { invdetA * (mat[4] * mat[8] - mat[5] * mat[7]),
+    invdetA * (mat[2] * mat[7] - mat[1] * mat[8]),
+    invdetA * (mat[1] * mat[5] - mat[2] * mat[4]),
+    invdetA * (mat[5] * mat[6] - mat[3] * mat[8]),
+    invdetA * (mat[0] * mat[8] - mat[2] * mat[6]),
+    invdetA * (mat[2] * mat[3] - mat[0] * mat[5]),
+    invdetA * (mat[3] * mat[7] - mat[4] * mat[6]),
+    invdetA * (mat[1] * mat[6] - mat[0] * mat[7]),
+    invdetA * (mat[0] * mat[4] - mat[1] * mat[3]) };
 
   for(int ii=0; ii<9; ++ii) mat[ii] = temp[ii];
 }
