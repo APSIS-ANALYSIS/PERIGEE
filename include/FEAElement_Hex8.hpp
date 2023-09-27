@@ -33,9 +33,7 @@
 // Date Created: Sep 6 2023
 // ==================================================================
 #include "FEAElement.hpp"
-#include "Math_Tools.hpp"
-#include "Matrix_double_3by3_Array.hpp"
-#include "Matrix_double_6by6_Array.hpp"
+#include "FE_Tools.hpp"
 
 class FEAElement_Hex8 : public FEAElement
 {

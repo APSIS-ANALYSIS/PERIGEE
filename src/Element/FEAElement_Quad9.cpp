@@ -156,7 +156,7 @@ void FEAElement_Quad9::buildBasis( const IQuadPts * const &quad,
     const double a32 = dy_ds * dy_ds;
     const double a33 = 2 * dx_ds * dy_ds;
 
-    Matrix_double_3by3_Array LHS(a11, a12, a13, a21, a22, a23, a31, a32, a33);
+    FE_T::Matrix_double_3by3_Array LHS(a11, a12, a13, a21, a22, a23, a31, a32, a33);
 
     // LU factorization
     LHS.LU_fac();
