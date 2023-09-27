@@ -16,10 +16,7 @@ class ElemBC_3D : public ElemBC
     // Default constructor: prescribe an elembc class with no surface mesh data.
     ElemBC_3D( const int &elemtype=501 );
 
-    ElemBC_3D( const std::string &vtkfile, const int &elemtype=501 );
-
-    ElemBC_3D( const std::vector<std::string> &vtkfileList,
-       const int &elemtype=501 );
+    ElemBC_3D( const std::vector<std::string> &vtkfileList, const int &elemtype=501 );
 
     virtual ~ElemBC_3D();
 
@@ -62,28 +59,20 @@ class ElemBC_3D : public ElemBC
     //   Tet-Face-2 : Node 0 1 3 4 8 7
     //   Tet-Face-3 : Node 0 2 1 6 5 4
     // For trilinear element (type 601), the face node numbering is
-    //   Tet-Face-0 : Node 0 3 2 1
-    //   Tet-Face-1 : Node 4 5 6 7
-    //   Tet-Face-2 : Node 0 1 5 4
-    //   Tet-Face-3 : Node 1 2 6 5
-    //   Tet-Face-4 : Node 2 3 7 6
-    //   Tet-Face-5 : Node 0 4 7 3
+    //   Hex-Face-0 : Node 0 3 2 1
+    //   Hex-Face-1 : Node 4 5 6 7
+    //   Hex-Face-2 : Node 0 1 5 4
+    //   Hex-Face-3 : Node 1 2 6 5
+    //   Hex-Face-4 : Node 2 3 7 6
+    //   Hex-Face-5 : Node 0 4 7 3
     // For triquadratic element (type 602), the face node numbering is
-    //   Tet-Face-0 : Node 0 3 2 1 11 10 9 8 24
-    //   Tet-Face-1 : Node 4 5 6 7 12 13 14 15 25
-    //   Tet-Face-2 : Node 0 1 5 4 8 17 12 16 22
-    //   Tet-Face-3 : Node 1 2 6 5 9 18 13 17 21
-    //   Tet-Face-4 : Node 2 3 7 6 10 19 14 18 23
-    //   Tet-Face-5 : Node 0 4 7 3 16 15 19 11 20
+    //   Hex-Face-0 : Node 0 3 2 1 11 10 9 8 24
+    //   Hex-Face-1 : Node 4 5 6 7 12 13 14 15 25
+    //   Hex-Face-2 : Node 0 1 5 4 8 17 12 16 22
+    //   Hex-Face-3 : Node 1 2 6 5 9 18 13 17 21
+    //   Hex-Face-4 : Node 2 3 7 6 10 19 14 18 23
+    //   Hex-Face-5 : Node 0 4 7 3 16 15 19 11 20
     virtual void resetSurIEN_outwardnormal( const IIEN * const &VIEN );
-
-    void reset501IEN_outwardnormal( const IIEN * const &VIEN );
-
-    void reset502IEN_outwardnormal( const IIEN * const &VIEN );
-
-    void reset601IEN_outwardnormal( const IIEN * const &VIEN );
-
-    void reset602IEN_outwardnormal( const IIEN * const &VIEN );
 
     // Access the data in ElemBC_3D_outflow, outward normal vector
     virtual Vector_3 get_normal_vec( const int &ebc_id ) const
@@ -92,7 +81,8 @@ class ElemBC_3D : public ElemBC
     // Access the data in ElemBC_3D_outflow, basis surface integration
     virtual std::vector<double> get_intNA( const int &ebc_id ) const
     {SYS_T::commPrint("Warning: get_intNA is not implemented.\n"); return {};}
-/*
+
+    /*
     // Access the data in ElemBC_3D_tet_wall, wall thickness used in CMM
     virtual std::vector<double> get_wall_thickness() const
     {SYS_T::commPrint("Warning: get_wall_thickness is not implemented. \n"); return {};}
@@ -122,7 +112,8 @@ class ElemBC_3D : public ElemBC
     virtual void write_vtk( const int &ebc_id, 
         const std::string &filename="elembc_surface" ) const
     {SYS_T::commPrint("Warning: write_vtk is not implemented. \n");}
-*/
+    */
+
   protected:
     const int elem_type, num_ebc;
     
@@ -141,6 +132,16 @@ class ElemBC_3D : public ElemBC
 
     // num_ebc times num_cell[ii] in size
     std::vector< std::vector<int> > global_cell;
+
+    // ------------------------------------------------------------------------
+    // Reset function for the IEN array of different element types.
+    void reset501IEN_outwardnormal( const IIEN * const &VIEN );
+
+    void reset502IEN_outwardnormal( const IIEN * const &VIEN );
+
+    void reset601IEN_outwardnormal( const IIEN * const &VIEN );
+
+    void reset602IEN_outwardnormal( const IIEN * const &VIEN );
 };
 
 #endif

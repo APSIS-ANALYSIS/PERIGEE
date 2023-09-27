@@ -15,53 +15,6 @@ ElemBC_3D::ElemBC_3D( const int &elemtype )
   std::cout<<"===> ElemBC_3D called by an empty constructor is generated. \n";
 }
 
-ElemBC_3D::ElemBC_3D( const std::string &vtkfile,
-   const int &elemtype ) : elem_type( elemtype ), num_ebc( 1 )
-{
-  num_node     = new int [num_ebc];
-  num_cell     = new int [num_ebc];
-  cell_nLocBas = new int [num_ebc];
-
-  pt_xyz.resize(num_ebc);
-  sur_ien.resize(num_ebc);
-  global_node.resize(num_ebc);
-  global_cell.resize(num_ebc);
-
-  std::cout<<"===> ElemBC_3D specified by "<<vtkfile<<'\n';
-
-  if(elemtype == 501)
-  {
-    cell_nLocBas[0] = 3; // linear triangle
-    VTK_T::read_vtp_grid( vtkfile, num_node[0], num_cell[0],
-        pt_xyz[0], sur_ien[0] );
-  }
-  else if(elemtype == 502)
-  {
-    cell_nLocBas[0] = 6; // quadratic triangle
-    VTK_T::read_vtu_grid( vtkfile, num_node[0], num_cell[0],
-        pt_xyz[0], sur_ien[0] );
-  }
-  else if(elemtype == 601) 
-  {
-    cell_nLocBas[0] = 4; // bilinear quadrangle
-    VTK_T::read_vtp_grid( vtkfile, num_node[0], num_cell[0],
-        pt_xyz[0], sur_ien[0] );
-  }
-  else if(elemtype == 602)  
-  {
-    cell_nLocBas[0] = 9; // biquadratic quadrangle
-    VTK_T::read_vtu_grid( vtkfile, num_node[0], num_cell[0],
-        pt_xyz[0], sur_ien[0] );
-  }  
-  else
-    SYS_T::print_exit("Error: ElemBC_3D: unknown elemtype. \n");
-
-  global_node[0] = VTK_T::read_int_PointData( vtkfile, "GlobalNodeID");
-  global_cell[0] = VTK_T::read_int_CellData( vtkfile, "GlobalElementID");
-
-  std::cout<<"     is generated. \n";
-}
-
 ElemBC_3D::ElemBC_3D( const std::vector<std::string> &vtkfileList,
     const int &elemtype ) : elem_type( elemtype ), 
   num_ebc( static_cast<int>( vtkfileList.size() ) )
@@ -81,32 +34,19 @@ ElemBC_3D::ElemBC_3D( const std::vector<std::string> &vtkfileList,
   {
     std::cout<<"     ebc_id = "<<ii<<": "<<vtkfileList[ii]<<'\n';
 
+    const int file_type = VTK_T::read_grid( vtkfileList[ii], num_node[ii], num_cell[ii],
+        pt_xyz[ii], sur_ien[ii] );
+    
     if(elemtype == 501)
-    {
       cell_nLocBas[ii] = 3; // linear triangle
-      VTK_T::read_vtp_grid( vtkfileList[ii], num_node[ii], num_cell[ii],
-          pt_xyz[ii], sur_ien[ii] );
-    }
     else if(elemtype == 502)
-    {
       cell_nLocBas[ii] = 6; // quadratic triangle
-      VTK_T::read_vtu_grid( vtkfileList[ii], num_node[ii], num_cell[ii],
-          pt_xyz[ii], sur_ien[ii] );
-    }
     else if(elemtype == 601)
-    {
       cell_nLocBas[ii] = 4; // bilinear quadrangle
-      VTK_T::read_vtp_grid( vtkfileList[ii], num_node[ii], num_cell[ii],
-          pt_xyz[ii], sur_ien[ii] );
-    }
     else if(elemtype == 602) 
-    {
       cell_nLocBas[ii] = 9; // biquadratic quadrangle
-      VTK_T::read_vtu_grid( vtkfileList[ii], num_node[ii], num_cell[ii],
-          pt_xyz[ii], sur_ien[ii] );
-    }
     else
-      SYS_T::print_exit("Error: ElemBC_3D: unknown elemtype. \n");
+      SYS_T::print_exit("Error: ElemBC_3D: unknown element type. \n");
     
     global_node[ii] = VTK_T::read_int_PointData( vtkfileList[ii], "GlobalNodeID");
     global_cell[ii] = VTK_T::read_int_CellData( vtkfileList[ii], "GlobalElementID");
