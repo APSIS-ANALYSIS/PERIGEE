@@ -45,7 +45,7 @@ void FEAElement_Line3_3D_der0::buildBasis( const IQuadPts * const &quad,
 
     dx_dr[qua] = Vector_3( ctrl_x[0] * N0r + ctrl_x[1] * N1r + ctrl_x[2] * N2r,
         ctrl_y[0] * N0r + ctrl_y[1] * N1r + ctrl_y[2] * N2r,
-	ctrl_z[0] * N0r + ctrl_z[1] * N1r + ctrl_z[2] * N2r );
+        ctrl_z[0] * N0r + ctrl_z[1] * N1r + ctrl_z[2] * N2r );
 
     detJac[qua] = dx_dr[qua].norm2();
   }
