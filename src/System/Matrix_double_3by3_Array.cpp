@@ -67,8 +67,6 @@ void Matrix_double_3by3_Array::gen_hilb()
 
 void Matrix_double_3by3_Array::LU_fac()
 {
-  double temp;
-  int int_temp;
   // 1st row
   double max_value = std::abs(mat[0]);
   int max_index = 0;
@@ -91,11 +89,11 @@ void Matrix_double_3by3_Array::LU_fac()
 
   if( pivot_flag )
   {
-    int_temp = pp[0];
+    int int_temp = pp[0];
     pp[0] = pp[max_index];
     pp[max_index] = int_temp;
 
-    temp = mat[0];
+    double temp = mat[0];
     mat[0] = mat[max_index*3];
     mat[max_index*3] = temp;
 
@@ -130,11 +128,11 @@ void Matrix_double_3by3_Array::LU_fac()
 
   if(pivot_flag)
   {
-    int_temp = pp[1];
+    int int_temp = pp[1];
     pp[1] = pp[2];
     pp[2] = int_temp;
 
-    temp = mat[3];
+    double temp = mat[3];
     mat[3] = mat[6];
     mat[6] = temp;
 
