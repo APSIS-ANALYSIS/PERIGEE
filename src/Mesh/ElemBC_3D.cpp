@@ -259,10 +259,10 @@ void ElemBC_3D::reset601IEN_outwardnormal( const IIEN * const &VIEN )
 
     for (int ee=0; ee<num_cell[ebcid]; ++ee)
     {
-      // Quadrangle mesh node index
+      // Quad mesh node index
       const int node_q[4] { get_ien(ebcid, ee, 0), get_ien(ebcid, ee, 1),  get_ien(ebcid, ee, 2), get_ien(ebcid, ee, 3) };  
 
-      // The quadrangle mesh node's volumetric index
+      // The quad mesh node's volumetric index
       const std::vector<int> node_q_gi = { get_global_node(ebcid, node_q[0]), get_global_node(ebcid, node_q[1]),  
                                            get_global_node(ebcid, node_q[2]), get_global_node(ebcid, node_q[3]) }; 
 
@@ -346,19 +346,19 @@ void ElemBC_3D::reset602IEN_outwardnormal( const IIEN * const &VIEN )
 {
   for (int ebcid=0; ebcid<num_ebc; ++ebcid)
   {
-    std::vector<int> node_q(9, 0); // biquadratic quadrangle node index in 2D mesh
+    std::vector<int> node_q(9, 0);    // biquadratic quadrangle node index in 2D mesh
     std::vector<int> node_q_gi(9, 0); // biquadratic quadrangle node index in 3D mesh
-    std::vector<int> hex_n(27, 0); // triquadratic hex node index in 3D mesh
+    std::vector<int> hex_n(27, 0);    // triquadratic hex node index in 3D mesh
 
     HEX_T::Hex8 * hexcell = new HEX_T::Hex8();  
 
     for (int ee=0; ee<num_cell[ebcid]; ++ee)
     {
       for (int ii=0; ii<9; ++ii)
-        {
-          node_q[ii] = get_ien(ebcid, ee, ii);
-          node_q_gi[ii] = get_global_node(ebcid, node_q[ii]);
-        }
+      {
+        node_q[ii]    = get_ien(ebcid, ee, ii);
+        node_q_gi[ii] = get_global_node(ebcid, node_q[ii]);
+      }
 
       const int cell_gi = get_global_cell(ebcid, ee);
 
@@ -371,8 +371,7 @@ void ElemBC_3D::reset602IEN_outwardnormal( const IIEN * const &VIEN )
       // determind the face id for this quadrangle in the hex object
       const int hex_face_id = hexcell->get_face_id(node_q_gi[0], node_q_gi[1], node_q_gi[2], node_q_gi[3]); 
 
-      int pos0 = -1, pos1 = -1, pos2 = -1, pos3 = -1, pos4 = -1;
-      int pos5 = -1, pos6 = -1, pos7 = -1, pos8 = -1;
+      int pos0 = -1, pos1 = -1, pos2 = -1, pos3 = -1, pos4 = -1, pos5 = -1, pos6 = -1, pos7 = -1, pos8 = -1;
 
       switch (hex_face_id)
       {
