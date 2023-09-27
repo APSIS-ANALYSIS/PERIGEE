@@ -24,7 +24,7 @@ int main( int argc, char * argv[] )
   std::string geo_file("./whole_vol.vtu");
 
   std::string geo_f_file("./fluid.vtu");
-  
+
   std::string geo_s_file("./solid.vtu");
 
   std::string sur_f_file_fro("./ffro_fluid.vtp");
@@ -65,6 +65,8 @@ int main( int argc, char * argv[] )
   std::cout<<" -sur_s_file_rig: "     <<sur_s_file_rig     <<std::endl;
   std::cout<<" -sur_f_file_top: "     <<sur_f_file_top     <<std::endl;
   std::cout<<" -sur_s_file_top: "     <<sur_s_file_top     <<std::endl;
+  std::cout<<" -sur_f_file_inter: "   <<sur_f_file_inter   <<std::endl;
+  std::cout<<" -sur_s_file_inter: "   <<sur_s_file_inter   <<std::endl;
   std::cout<<"----------------------------------\n";
   std::cout<<" elemType: "<<elemType<<std::endl;
   std::cout<<"===== Command Line Arguments ====="<<std::endl;
