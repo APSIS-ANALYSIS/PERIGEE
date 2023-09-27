@@ -30,14 +30,11 @@ Matrix_double_6by6_Array::~Matrix_double_6by6_Array()
 
 void Matrix_double_6by6_Array::LU_fac()
 {
-  double max_value, temp;
-  int max_index, int_temp;
-  bool pivot_flag;
   for(int kk=0; kk<5; ++kk)
   {
-    max_value = std::abs( Mat[6*kk+kk] );
-    max_index = kk;
-    pivot_flag = false;
+    double max_value = std::abs( Mat[6*kk+kk] );
+    int max_index = kk;
+    bool pivot_flag = false;
     // find the column pivoting
     for(int ii=kk+1; ii<6; ++ii)
     {
@@ -51,13 +48,13 @@ void Matrix_double_6by6_Array::LU_fac()
     
     if(pivot_flag)
     {
-      int_temp = pp[kk];
+      int int_temp = pp[kk];
       pp[kk] = pp[max_index];
       pp[max_index] = int_temp;
       
       for(int ii=0; ii<6; ++ii)
       {
-        temp = Mat[6*kk+ii];
+        double temp = Mat[6*kk+ii];
         Mat[6*kk+ii] = Mat[6*max_index+ii];
         Mat[6*max_index+ii] = temp;
       }
