@@ -75,6 +75,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/System/Matrix_double_6by6_Array.cpp
   ${perigee_source}/System/Matrix_PETSc.cpp
   ${perigee_source}/System/Tensor4_3D.cpp
+  ${perigee_source}/System/FE_Tools.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Tet.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
