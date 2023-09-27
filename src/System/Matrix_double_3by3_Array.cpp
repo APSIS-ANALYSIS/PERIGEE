@@ -6,9 +6,7 @@ Matrix_double_3by3_Array::Matrix_double_3by3_Array()
   mat[3] = 0.0; mat[4] = 1.0; mat[5] = 0.0;
   mat[6] = 0.0; mat[7] = 0.0; mat[8] = 1.0;
 
-  p[0] = 0; p[1] = 1; p[2] = 2;
- 
-  invm0 = 1.0; invm1 = 1.0; invm2 = 1.0;
+  pp[0] = 0; pp[1] = 1; pp[2] = 2;
 }
 
 Matrix_double_3by3_Array::Matrix_double_3by3_Array( 
@@ -20,9 +18,7 @@ Matrix_double_3by3_Array::Matrix_double_3by3_Array(
   mat[3] = a21;  mat[4] = a22;  mat[5] = a23;
   mat[6] = a31;  mat[7] = a32;  mat[8] = a33;
 
-  p[0] = 0; p[1] = 1; p[2] = 2;
-  
-  invm0 = 1.0; invm1 = 1.0; invm2 = 1.0;
+  pp[0] = 0; pp[1] = 1; pp[2] = 2; 
 }
 
 Matrix_double_3by3_Array::~Matrix_double_3by3_Array()
@@ -34,12 +30,9 @@ Matrix_double_3by3_Array& Matrix_double_3by3_Array::operator= (
   if(this != &input)
   {
     for(int ii=0; ii<9; ++ii) mat[ii] = input.mat[ii];
-    p[0] = input.p[0];
-    p[1] = input.p[1];
-    p[2] = input.p[2];
-    invm0 = input.invm0;
-    invm1 = input.invm1;
-    invm2 = input.invm2;
+    pp[0] = input.pp[0];
+    pp[1] = input.pp[1];
+    pp[2] = input.pp[2];
   }
   return *this;
 }
@@ -50,9 +43,7 @@ void Matrix_double_3by3_Array::gen_id()
   mat[3] = 0.0;  mat[4] = 1.0;  mat[5] = 0.0;
   mat[6] = 0.0;  mat[7] = 0.0;  mat[8] = 1.0;
 
-  p[0] = 0; p[1] = 1; p[2] = 2;
-  
-  invm0 = 1.0; invm1 = 1.0; invm2 = 1.0;
+  pp[0] = 0; pp[1] = 1; pp[2] = 2;
 }
 
 void Matrix_double_3by3_Array::gen_rand(const double &min, const double &max)
@@ -62,9 +53,7 @@ void Matrix_double_3by3_Array::gen_rand(const double &min, const double &max)
   std::uniform_real_distribution<double> dis(min, max);
   for(int ii=0; ii<9; ++ii) mat[ii] = dis(gen); 
 
-  p[0] = 0; p[1] = 1; p[2] = 2;
-  
-  invm0 = 1.0; invm1 = 1.0; invm2 = 1.0;
+  pp[0] = 0; pp[1] = 1; pp[2] = 2;
 }
 
 void Matrix_double_3by3_Array::gen_hilb()
@@ -73,15 +62,11 @@ void Matrix_double_3by3_Array::gen_hilb()
     for(int jj=0; jj<3; ++jj)
       mat[ii*3+jj] = 1.0 / (ii + jj + 1.0);
 
-  p[0] = 0; p[1] = 1; p[2] = 2;
-  
-  invm0 = 1.0; invm1 = 1.0; invm2 = 1.0;
+  pp[0] = 0; pp[1] = 1; pp[2] = 2;
 }
 
 void Matrix_double_3by3_Array::LU_fac()
 {
-  double temp;
-  int int_temp;
   // 1st row
   double max_value = std::abs(mat[0]);
   int max_index = 0;
@@ -104,11 +89,11 @@ void Matrix_double_3by3_Array::LU_fac()
 
   if( pivot_flag )
   {
-    int_temp = p[0];
-    p[0] = p[max_index];
-    p[max_index] = int_temp;
+    int int_temp = pp[0];
+    pp[0] = pp[max_index];
+    pp[max_index] = int_temp;
 
-    temp = mat[0];
+    double temp = mat[0];
     mat[0] = mat[max_index*3];
     mat[max_index*3] = temp;
 
@@ -121,11 +106,10 @@ void Matrix_double_3by3_Array::LU_fac()
     mat[max_index*3+2] = temp;
   }
 
-  double invA0 = 1.0 / mat[0];
-  mat[3] = mat[3] * invA0;
+  mat[3] = mat[3] / mat[0];
   mat[4] = mat[4] - mat[3] * mat[1];
   mat[5] = mat[5] - mat[3] * mat[2];
-  mat[6] = mat[6] * invA0;
+  mat[6] = mat[6] / mat[0];
   mat[7] = mat[7] - mat[6] * mat[1];
   mat[8] = mat[8] - mat[6] * mat[2];
 
@@ -144,11 +128,11 @@ void Matrix_double_3by3_Array::LU_fac()
 
   if(pivot_flag)
   {
-    int_temp = p[1];
-    p[1] = p[2];
-    p[2] = int_temp;
+    int int_temp = pp[1];
+    pp[1] = pp[2];
+    pp[2] = int_temp;
 
-    temp = mat[3];
+    double temp = mat[3];
     mat[3] = mat[6];
     mat[6] = temp;
 
@@ -161,62 +145,59 @@ void Matrix_double_3by3_Array::LU_fac()
     mat[8] = temp;
   }
 
-  double invA1 = 1.0 / mat[4];
-  mat[7] = mat[7] * invA1;
+
+  mat[7] = mat[7] / mat[4];
   mat[8] = mat[8] - mat[7] * mat[5];
-
-  invm0 = 1.0 / mat[0]; invm1 = 1.0 / mat[4]; invm2 = 1.0 / mat[8];
 }
 
-Vector_3 Matrix_double_3by3_Array::LU_solve( const Vector_3 &b ) const
+Vector_3 Matrix_double_3by3_Array::LU_solve( const Vector_3 &bb ) const
 {
-  Vector_3 x( b(p[0]), b(p[1]), b(p[2]) );
+  Vector_3 xx( bb(pp[0]), bb(pp[1]), bb(pp[2]) );
 
-  x(1) = x(1) - mat[3] * x(0);
-  x(2) = x(2) - mat[6] * x(0) - mat[7] * x(1);
+  xx(1) = xx(1) - mat[3] * xx(0);
+  xx(2) = xx(2) - mat[6] * xx(0) - mat[7] * xx(1);
 
-  x(2) = x(2) * invm2;
-  x(1) = (x(1) - mat[5] * x(2)) * invm1;
-  x(0) = (x(0) - mat[2] * x(2) - mat[1] * x(1)) * invm0;
+  xx(2) =  xx(2) / mat[8];
+  xx(1) = (xx(1) - mat[5] * xx(2)) / mat[4];
+  xx(0) = (xx(0) - mat[2] * xx(2)  - mat[1] * xx(1)) / mat[0];
 
-  return x;
+  return xx;
 }
 
-std::array<double, 3> Matrix_double_3by3_Array::LU_solve( const std::array<double, 3> &b ) const
+std::array<double, 3> Matrix_double_3by3_Array::LU_solve( const std::array<double, 3> &bb ) const
 {
-  std::array<double, 3> x {{ b[p[0]], b[p[1]], b[p[2]] }};
+  std::array<double, 3> xx { bb[pp[0]], bb[pp[1]], bb[pp[2]] };
   
-  x[1] = x[1] - mat[3] * x[0];
-  x[2] = x[2] - mat[6] * x[0] - mat[7] * x[1];
+  xx[1] = xx[1] - mat[3] * xx[0];
+  xx[2] = xx[2] - mat[6] * xx[0] - mat[7] * xx[1];
 
-  x[2] = x[2] * invm2;
-  x[1] = (x[1] - mat[5] * x[2]) * invm1;
-  x[0] = (x[0] - mat[2] * x[2] - mat[1] * x[1]) * invm0;
+  xx[2] =  xx[2] / mat[8];
+  xx[1] = (xx[1] - mat[5] * xx[2]) / mat[4];
+  xx[0] = (xx[0] - mat[2] * xx[2]  - mat[1] * xx[1]) / mat[0];
 
-  return x;
+  return xx;
 }
 
 void Matrix_double_3by3_Array::LU_solve(const double &b1, const double &b2, const double &b3,
             double &x1, double &x2, double &x3) const
 {
-  const double b[3] = {b1, b2, b3};
+  const double bb[3] = {b1, b2, b3};
   
-  x1 = b[p[0]];
-  x2 = b[p[1]];
-  x3 = b[p[2]];
+  x1 = bb[pp[0]];
+  x2 = bb[pp[1]];
+  x3 = bb[pp[2]];
   
   x2 = x2 - mat[3] * x1;
   x3 = x3 - mat[6] * x1 - mat[7] * x2;
 
-  x3 = x3 * invm2;
-  x2 = (x2 - mat[5] * x3) * invm1;
-  x1 = (x1 - mat[2] * x3 - mat[1] * x2) * invm0;
+  x3 = x3 / mat[8];
+  x2 = (x2 - mat[5] * x3) / mat[4];
+  x1 = (x1 - mat[2] * x3 - mat[1] * x2) / mat[0];
 }
 
 void Matrix_double_3by3_Array::transpose()
 {
-  double temp;
-  temp = mat[1]; mat[1] = mat[3]; mat[3] = temp;
+  double temp = mat[1]; mat[1] = mat[3]; mat[3] = temp;
   temp = mat[2]; mat[2] = mat[6]; mat[6] = temp;
   temp = mat[5]; mat[5] = mat[7]; mat[7] = temp; 
 }
@@ -225,17 +206,15 @@ void Matrix_double_3by3_Array::inverse()
 {
   const double invdetA = 1.0 / det();
 
-  double temp[9];
-  
-  temp[0] = invdetA * (mat[4] * mat[8] - mat[5] * mat[7]);
-  temp[1] = invdetA * (mat[2] * mat[7] - mat[1] * mat[8]);
-  temp[2] = invdetA * (mat[1] * mat[5] - mat[2] * mat[4]);
-  temp[3] = invdetA * (mat[5] * mat[6] - mat[3] * mat[8]);
-  temp[4] = invdetA * (mat[0] * mat[8] - mat[2] * mat[6]);
-  temp[5] = invdetA * (mat[2] * mat[3] - mat[0] * mat[5]);
-  temp[6] = invdetA * (mat[3] * mat[7] - mat[4] * mat[6]);
-  temp[7] = invdetA * (mat[1] * mat[6] - mat[0] * mat[7]);
-  temp[8] = invdetA * (mat[0] * mat[4] - mat[1] * mat[3]);
+  const double temp[9] { invdetA * (mat[4] * mat[8] - mat[5] * mat[7]),
+    invdetA * (mat[2] * mat[7] - mat[1] * mat[8]),
+    invdetA * (mat[1] * mat[5] - mat[2] * mat[4]),
+    invdetA * (mat[5] * mat[6] - mat[3] * mat[8]),
+    invdetA * (mat[0] * mat[8] - mat[2] * mat[6]),
+    invdetA * (mat[2] * mat[3] - mat[0] * mat[5]),
+    invdetA * (mat[3] * mat[7] - mat[4] * mat[6]),
+    invdetA * (mat[1] * mat[6] - mat[0] * mat[7]),
+    invdetA * (mat[0] * mat[4] - mat[1] * mat[3]) };
 
   for(int ii=0; ii<9; ++ii) mat[ii] = temp[ii];
 }
@@ -247,11 +226,11 @@ double Matrix_double_3by3_Array::det() const
     - mat[0] * mat[5] * mat[7] - mat[1] * mat[3] * mat[8];
 }
 
-void Matrix_double_3by3_Array::VecMult(const double * const &x, double * const &y) const
+void Matrix_double_3by3_Array::VecMult(const double * const &xx, double * const &yy) const
 {
-  y[0] = mat[0] * x[0] + mat[1] * x[1] + mat[2] * x[2];
-  y[1] = mat[3] * x[0] + mat[4] * x[1] + mat[5] * x[2];
-  y[2] = mat[6] * x[0] + mat[7] * x[1] + mat[8] * x[2];
+  yy[0] = mat[0] * xx[0] + mat[1] * xx[1] + mat[2] * xx[2];
+  yy[1] = mat[3] * xx[0] + mat[4] * xx[1] + mat[5] * xx[2];
+  yy[2] = mat[6] * xx[0] + mat[7] * xx[1] + mat[8] * xx[2];
 }
 
 void Matrix_double_3by3_Array::MatMult( const Matrix_double_3by3_Array &mleft,
@@ -282,10 +261,7 @@ void Matrix_double_3by3_Array::print_full() const
   std::cout<<"Matrix: \n";
   print();
   std::cout<<"pivoting flag: \t";
-  std::cout<<std::setprecision(9)<<p[0]<<'\t'<<p[1]<<'\t'<<p[2]<<'\n';
-  std::cout<<"invm0 = "<<invm0<<'\t';
-  std::cout<<"invm1 = "<<invm1<<'\t';
-  std::cout<<"invm2 = "<<invm2<<'\n';
+  std::cout<<std::setprecision(9)<<pp[0]<<'\t'<<pp[1]<<'\t'<<pp[2]<<'\n';
 }
 
 // EOF

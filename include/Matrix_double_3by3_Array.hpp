@@ -11,7 +11,7 @@
 //                     mat[3], mat[4], mat[5]
 //                     mat[6], mat[7], mat[8]
 // 
-// The p[3] array is a pointer for pivoting.
+// The pp[3] array is a pointer for pivoting.
 //
 // Author: Ju Liu
 // Date: Oct. 1st 2015
@@ -42,16 +42,15 @@ class Matrix_double_3by3_Array
     
     const double& operator()(const int &index) const {return mat[index];}
     
-    // Generate an identity matrix. Erase all previous values and reset p and
-    // invm to default values.
+    // Generate an identity matrix. Erase all previous values and reset pp to default values.
     void gen_id();
 
     // Generate a matrix with random entries
-    // All previous values are erased and p & invm are reset to default.
+    // All previous values are erased and pp is reset to default.
     void gen_rand(const double &min = -1.0, const double &max = 1.0);
 
     // Generate a Hilbert matrix
-    // all previous values are earsed and p & invm are reset to default.
+    // all previous values are earsed and pp is reset to default.
     void gen_hilb();
 
     // Perform LU factorization of the matrix object and store the L & U
@@ -61,9 +60,9 @@ class Matrix_double_3by3_Array
 
     // Perform LU solve for the 3 mat x = b equations.
     // LU_fac() has to be called first.
-    Vector_3 LU_solve( const Vector_3 &b ) const;
+    Vector_3 LU_solve( const Vector_3 &bb ) const;
 
-    std::array<double, 3> LU_solve( const std::array<double, 3> &b ) const;
+    std::array<double, 3> LU_solve( const std::array<double, 3> &bb ) const;
 
     // Perofrm LU solve for the 3 mat x = b equations
     // LU_fac() has to be called first.
@@ -73,7 +72,7 @@ class Matrix_double_3by3_Array
     // Transpose operation for the matrix 
     void transpose();
 
-    // Inverse of the matrix (based on cofactor). The p and invm are not
+    // Inverse of the matrix (based on cofactor). The pp is not
     // updated.
     void inverse();
 
@@ -82,7 +81,7 @@ class Matrix_double_3by3_Array
 
     // Vector multiplication y = Ax
     // make sure the x y vector has length 3.
-    void VecMult( const double * const &x, double * const &y ) const; 
+    void VecMult( const double * const &xx, double * const &yy ) const; 
     
     // Matrix multiplication
     void MatMult( const Matrix_double_3by3_Array &mleft, 
@@ -91,7 +90,7 @@ class Matrix_double_3by3_Array
     // print mat in matrix format
     void print() const;
 
-    // print mat in matrix format and p & invm0, invm1, invm2
+    // print mat in matrix format and pp
     void print_full() const;
 
   private:
@@ -100,11 +99,7 @@ class Matrix_double_3by3_Array
     
     // Pivoting flag. It is generated in LU-factorization and is used for
     // LU_solve.
-    int p[3];
-    
-    // Inverse of the diagonal entries. It is generated in LU_fac and is 
-    // used for LU_solve.
-    double invm0, invm1, invm2;
+    int pp[3];
 };
 
 #endif

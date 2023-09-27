@@ -34,6 +34,7 @@
 // Date Created: Feb. 19 2018
 // ==================================================================
 #include "FEAElement.hpp"
+#include "FE_Tools.hpp"
 
 class FEAElement_Tet_P2_P1 : public FEAElement
 {

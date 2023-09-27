@@ -1,28 +1,28 @@
 #include "Matrix_double_6by6_Array.hpp"
 
-Matrix_double_6by6_Array::Matrix_double_6by6_Array(const double &a, const double &b,
-    const double &c, const double &d, const double &e, const double &f,
-    const double &g, const double &h, const double &i)
+Matrix_double_6by6_Array::Matrix_double_6by6_Array(const double &aa, const double &bb,
+    const double &cc, const double &dd, const double &ee, const double &ff,
+    const double &gg, const double &hh, const double &ii)
 {
-  Mat[0][0] = a*a;   Mat[0][1] = d*d;   Mat[0][2] = g*g;
-  Mat[0][3] = 2.0*a*d; Mat[0][4] = 2.0*a*g; Mat[0][5] = 2.0*d*g;
+  Mat[0] = aa*aa;     Mat[1] = dd*dd;     Mat[2] = gg*gg;
+  Mat[3] = 2.0*aa*dd; Mat[4] = 2.0*aa*gg; Mat[5] = 2.0*dd*gg;
 
-  Mat[1][0] = a*b; Mat[1][1] = d*e; Mat[1][2] = g*h;
-  Mat[1][3] = a*e+b*d; Mat[1][4] = a*h+b*g; Mat[1][5] = d*h+e*g;
+  Mat[6] = aa*bb;       Mat[7]  = dd*ee;       Mat[8]  = gg*hh;
+  Mat[9] = aa*ee+bb*dd; Mat[10] = aa*hh+bb*gg; Mat[11] = dd*hh+ee*gg;
   
-  Mat[2][0] = a*c; Mat[2][1] = d*f; Mat[2][2] = g*i;
-  Mat[2][3] = a*f+c*d; Mat[2][4] = a*i+c*g; Mat[2][5] = d*i+f*g;
+  Mat[12] = aa*cc;       Mat[13] = dd*ff;       Mat[14] = gg*ii;
+  Mat[15] = aa*ff+cc*dd; Mat[16] = aa*ii+cc*gg; Mat[17] = dd*ii+ff*gg;
   
-  Mat[3][0] = b*b;   Mat[3][1] = e*e;   Mat[3][2] = h*h;
-  Mat[3][3] = 2.0*b*e; Mat[3][4] = 2.0*b*h; Mat[3][5] = 2.0*e*h;
+  Mat[18] = bb*bb;     Mat[19] = ee*ee;     Mat[20] = hh*hh;
+  Mat[21] = 2.0*bb*ee; Mat[22] = 2.0*bb*hh; Mat[23] = 2.0*ee*hh;
   
-  Mat[4][0] = b*c; Mat[4][1] = e*f; Mat[4][2] = h*i;
-  Mat[4][3] = b*f+c*e; Mat[4][4] = b*i+c*h; Mat[4][5] = e*i+f*h;
+  Mat[24] = bb*cc;       Mat[25] = ee*ff;       Mat[26] = hh*ii;
+  Mat[27] = bb*ff+cc*ee; Mat[28] = bb*ii+cc*hh; Mat[29] = ee*ii+ff*hh;
 
-  Mat[5][0] = c*c; Mat[5][1] = f*f; Mat[5][2] = i*i;
-  Mat[5][3] = 2.0*c*f; Mat[5][4] = 2.0*c*i; Mat[5][5] = 2.0*f*i;
+  Mat[30] = cc*cc;     Mat[31] = ff*ff;     Mat[32] = ii*ii;
+  Mat[33] = 2.0*cc*ff; Mat[34] = 2.0*cc*ii; Mat[35] = 2.0*ff*ii;
 
-  p[0] = 0; p[1] = 1; p[2] = 2; p[3] = 3; p[4] = 4; p[5] = 5;
+  pp[0] = 0; pp[1] = 1; pp[2] = 2; pp[3] = 3; pp[4] = 4; pp[5] = 5;
 }
 
 Matrix_double_6by6_Array::~Matrix_double_6by6_Array()
@@ -30,20 +30,17 @@ Matrix_double_6by6_Array::~Matrix_double_6by6_Array()
 
 void Matrix_double_6by6_Array::LU_fac()
 {
-  double max_value, temp, invAkk;
-  int max_index, int_temp;
-  bool pivot_flag;
   for(int kk=0; kk<5; ++kk)
   {
-    max_value = std::abs(Mat[kk][kk]);
-    max_index = kk;
-    pivot_flag = false;
+    double max_value = std::abs( Mat[6*kk+kk] );
+    int max_index = kk;
+    bool pivot_flag = false;
     // find the column pivoting
     for(int ii=kk+1; ii<6; ++ii)
     {
-      if(max_value < std::abs(Mat[ii][kk]))
+      if( max_value < std::abs( Mat[6*ii+kk] ) )
       {
-        max_value = std::abs(Mat[ii][kk]);
+        max_value = std::abs( Mat[6*ii+kk] );
         max_index = ii;
         pivot_flag = true;
       }
@@ -51,50 +48,45 @@ void Matrix_double_6by6_Array::LU_fac()
     
     if(pivot_flag)
     {
-      int_temp = p[kk];
-      p[kk] = p[max_index];
-      p[max_index] = int_temp;
+      int int_temp = pp[kk];
+      pp[kk] = pp[max_index];
+      pp[max_index] = int_temp;
       
       for(int ii=0; ii<6; ++ii)
       {
-        temp = Mat[kk][ii];
-        Mat[kk][ii] = Mat[max_index][ii];
-        Mat[max_index][ii] = temp;
+        double temp = Mat[6*kk+ii];
+        Mat[6*kk+ii] = Mat[6*max_index+ii];
+        Mat[6*max_index+ii] = temp;
       }
-    }
-
-    invAkk = 1.0 / Mat[kk][kk];
+    } 
     
     for(int ii=kk+1; ii<6; ++ii)
     {
-      Mat[ii][kk] = Mat[ii][kk] * invAkk;
+      Mat[6*ii+kk] = Mat[6*ii+kk] / Mat[6*kk+kk];
       for(int jj=kk+1; jj<6; ++jj)
-        Mat[ii][jj] = Mat[ii][jj] - Mat[ii][kk] * Mat[kk][jj];
+        Mat[6*ii+jj] = Mat[6*ii+jj] - Mat[6*ii+kk] * Mat[6*kk+jj];
     }
   }
-  invm0 = 1.0 / Mat[0][0]; invm1 = 1.0 / Mat[1][1]; invm2 = 1.0 / Mat[2][2];
-  invm3 = 1.0 / Mat[3][3]; invm4 = 1.0 / Mat[4][4]; invm5 = 1.0 / Mat[5][5];
 }
 
-std::array<double, 6> Matrix_double_6by6_Array::LU_solve( const std::array<double, 6> &b ) const
+std::array<double, 6> Matrix_double_6by6_Array::LU_solve( const std::array<double, 6> &rhs ) const
 {
-  std::array<double, 6> x {{ b[p[0]], b[p[1]], b[p[2]], b[p[3]], b[p[4]], b[p[5]] }};
+  std::array<double, 6> xx { rhs[pp[0]], rhs[pp[1]], rhs[pp[2]], rhs[pp[3]], rhs[pp[4]], rhs[pp[5]] };
 
-  //x[0] = x[0];
-  x[1] = x[1] - Mat[1][0] * x[0];
-  x[2] = x[2] - Mat[2][0] * x[0] - Mat[2][1] * x[1];
-  x[3] = x[3] - Mat[3][0] * x[0] - Mat[3][1] * x[1] - Mat[3][2] * x[2];
-  x[4] = x[4] - Mat[4][0] * x[0] - Mat[4][1] * x[1] - Mat[4][2] * x[2] - Mat[4][3] * x[3];
-  x[5] = x[5] - Mat[5][0] * x[0] - Mat[5][1] * x[1] - Mat[5][2] * x[2] - Mat[5][3] * x[3] - Mat[5][4]* x[4];
+  xx[1] = xx[1] - Mat[6]  * xx[0];
+  xx[2] = xx[2] - Mat[12] * xx[0] - Mat[13] * xx[1];
+  xx[3] = xx[3] - Mat[18] * xx[0] - Mat[19] * xx[1] - Mat[20] * xx[2];
+  xx[4] = xx[4] - Mat[24] * xx[0] - Mat[25] * xx[1] - Mat[26] * xx[2] - Mat[27] * xx[3];
+  xx[5] = xx[5] - Mat[30] * xx[0] - Mat[31] * xx[1] - Mat[32] * xx[2] - Mat[33] * xx[3] - Mat[34] * xx[4];
 
-  x[5] = x[5] * invm5;
-  x[4] = (x[4] - Mat[4][5]*x[5]) * invm4;
-  x[3] = (x[3] - Mat[3][5]*x[5] - Mat[3][4] * x[4]) * invm3;
-  x[2] = (x[2] - Mat[2][5]*x[5] - Mat[2][4]*x[4] - Mat[2][3] * x[3] ) * invm2;
-  x[1] = (x[1] - Mat[1][5]*x[5] - Mat[1][4]*x[4] - Mat[1][3]*x[3] - Mat[1][2]*x[2]) * invm1;
-  x[0] = (x[0] - Mat[0][5]*x[5] - Mat[0][4]*x[4] - Mat[0][3]*x[3] - Mat[0][2]*x[2] -Mat[0][1]*x[1]) * invm0;
+  xx[5] =  xx[5] / Mat[35];
+  xx[4] = (xx[4] - Mat[29] * xx[5]) / Mat[28];
+  xx[3] = (xx[3] - Mat[23] * xx[5]  - Mat[22] * xx[4]) / Mat[21];
+  xx[2] = (xx[2] - Mat[17] * xx[5]  - Mat[16] * xx[4]  - Mat[15] * xx[3]) / Mat[14];
+  xx[1] = (xx[1] - Mat[11] * xx[5]  - Mat[10] * xx[4]  - Mat[9]  * xx[3]  - Mat[8] * xx[2]) / Mat[7];
+  xx[0] = (xx[0] - Mat[5]  * xx[5]  - Mat[4]  * xx[4]  - Mat[3]  * xx[3]  - Mat[2] * xx[2]  - Mat[1] * xx[1]) / Mat[0];
 
-  return x;
+  return xx;
 }
 
 void Matrix_double_6by6_Array::print() const
@@ -102,12 +94,12 @@ void Matrix_double_6by6_Array::print() const
   for(int ii=0; ii<6; ++ii)
   {
     for(int jj=0; jj<6; ++jj)
-      std::cout<<Mat[ii][jj]<<'\t';
+      std::cout<<Mat[6*ii+jj]<<'\t';
     std::cout<<'\n';
   }
   std::cout<<'\n';
   for(int ii=0; ii<6; ++ii)
-    std::cout<<p[ii]<<'\t';
+    std::cout<<pp[ii]<<'\t';
   
   std::cout<<'\n'<<std::endl;
 }
