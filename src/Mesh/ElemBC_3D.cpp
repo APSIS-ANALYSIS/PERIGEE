@@ -53,7 +53,8 @@ ElemBC_3D::ElemBC_3D( const std::string &vtkfile,
     VTK_T::read_vtu_grid( vtkfile, num_node[0], num_cell[0],
         pt_xyz[0], sur_ien[0] );
   }  
-
+  else
+    SYS_T::print_exit("Error: ElemBC_3D: unknown elemtype. \n");
 
   global_node[0] = VTK_T::read_int_PointData( vtkfile, "GlobalNodeID");
   global_cell[0] = VTK_T::read_int_CellData( vtkfile, "GlobalElementID");
