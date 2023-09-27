@@ -24,7 +24,7 @@ int main( int argc, char * argv[] )
   std::string geo_file("./whole_vol.vtu");
 
   std::string geo_f_file("./fluid.vtu");
-  
+
   std::string geo_s_file("./solid.vtu");
 
   std::string sur_f_file_fro("./ffro_fluid.vtu");
@@ -191,6 +191,7 @@ int main( int argc, char * argv[] )
 
   }
 
+  delete IEN_v;  delete ebc; 
 
   PetscFinalize();
 

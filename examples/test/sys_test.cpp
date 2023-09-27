@@ -181,6 +181,7 @@ int main( int argc, char * argv[] )
 
   }
 
+  delete IEN_v; delete ebc; 
 
   PetscFinalize();
 
