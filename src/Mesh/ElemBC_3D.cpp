@@ -151,9 +151,9 @@ void ElemBC_3D::reset501IEN_outwardnormal( const IIEN * const &VIEN )
           SYS_T::print_exit("Error: reset501IEN_outwardnormal : tet_face_id is out of range. \n");
           break;
       }
-      ASSERT(pos0 >=0 && pos0 <=2, "While elem_type == 501, ElemBC_3D::reset501IEN_outwardnormal function error.\n" );
-      ASSERT(pos1 >=0 && pos1 <=2, "While elem_type == 501, ElemBC_3D::reset501IEN_outwardnormal function error.\n" );
-      ASSERT(pos2 >=0 && pos2 <=2, "While elem_type == 501, ElemBC_3D::reset501IEN_outwardnormal function error.\n" ); 
+      ASSERT(pos0 >=0 && pos0 <=2, "Error: ElemBC_3D::reset501IEN_outwardnormal function logical error.\n" );
+      ASSERT(pos1 >=0 && pos1 <=2, "Error: ElemBC_3D::reset501IEN_outwardnormal function logical error.\n" );
+      ASSERT(pos2 >=0 && pos2 <=2, "Error: ElemBC_3D::reset501IEN_outwardnormal function logical error.\n" ); 
 
       // Now we have got the corrected ordering of node_t, put them back into
       // sur_ien.
@@ -169,9 +169,9 @@ void ElemBC_3D::reset502IEN_outwardnormal( const IIEN * const &VIEN )
 {
   for(int ebcid=0; ebcid<num_ebc; ++ebcid)
   {
-    std::vector<int> node_t(6, 0); // triange node index in 2D mesh
+    std::vector<int> node_t(6, 0);    // triange node index in 2D mesh
     std::vector<int> node_t_gi(6, 0); // triange node index in 3D mesh
-    std::vector<int> tet_n(10, 0); // tet node index in 3D mesh
+    std::vector<int> tet_n(10, 0);    // tet node index in 3D mesh
 
     TET_T::Tet4 * tetcell = new TET_T::Tet4();
 
