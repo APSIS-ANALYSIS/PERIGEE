@@ -25,6 +25,7 @@ namespace FE_T
       const double &p1_x, const double &p1_y, const double &p1_z,
       double &nx, double &ny, double &nz );
 
+  Vector_3 get_n_from_t( const Vector_3 &tan, const Vector_3 &p0, const Vector_3 &p1 );
 
   // ----------------------------------------------------------------
   // Calculate the circumscribing sphere's centre point and radius

@@ -110,6 +110,18 @@ void FE_T::get_n_from_t(
   nz = nz / len;
 }
 
+Vector_3 get_n_from_t( const Vector_3 &tan, const Vector_3 &p0, const Vector_3 &p1 )
+{
+  const Vector_3 mm = p0 - p1;
+  const double mdt = VEC3_T::dot_product( mm, tan );
+  const double tdt = VEC3_T::dot_product( tan, tan );
+  const double fac = mdt / tdt;
+
+  const Vector_3 nn = fac * tan;
+
+  return VEC3_T::normalize(nn);
+}
+
 void FE_T::get_tet_sphere_info( const double &x0, const double &x1,
     const double &x2, const double &x3, const double &y0,
     const double &y1, const double &y2, const double &y3,
