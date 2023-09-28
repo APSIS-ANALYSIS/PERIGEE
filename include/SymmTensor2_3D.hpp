@@ -196,6 +196,7 @@ Tensor2_3D operator*( const Tensor2_3D &left, const SymmTensor2_3D &right );
 Tensor2_3D operator*( const SymmTensor2_3D &left, const SymmTensor2_3D &right );
 
 SymmTensor2_3D operator*( const double &val, const SymmTensor2_3D &input );
+
 namespace STen2
 {
     // Return the inverse of the input matrix
@@ -211,4 +212,5 @@ namespace STen2
     // output = 0.5 x ( source + source_transpose )
     SymmTensor2_3D gen_symm_part( const Tensor2_3D &input );
 }
+
 #endif
