@@ -642,7 +642,7 @@ namespace TET_T
   double Tet4::get_diameter() const
   {
     double r;
-    MATH_T::get_tet_sphere_info( pts[0], pts[1], pts[2], pts[3], r );
+    FE_T::get_tet_sphere_info( pts[0], pts[1], pts[2], pts[3], r );
 
     return 2.0 * r;
   }
