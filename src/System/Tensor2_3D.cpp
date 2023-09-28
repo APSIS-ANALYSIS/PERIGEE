@@ -594,14 +594,14 @@ Tensor2_3D Ten2::transpose( const Tensor2_3D &input )
       input(2), input(5), input(8) );
 }
 
-Tensor2_3D Ten2::gen_identity_matrix()
+Tensor2_3D Ten2::gen_id()
 {
   return Tensor2_3D( 1.0, 0.0, 0.0,
       0.0, 1.0, 0.0,
       0.0, 0.0, 1.0 );
 }
 
-Tensor2_3D Ten2::gen_zero_matrix()
+Tensor2_3D Ten2::gen_zero()
 {
   return Tensor2_3D( 0.0, 0.0, 0.0,
       0.0, 0.0, 0.0,

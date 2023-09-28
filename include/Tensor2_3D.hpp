@@ -282,10 +282,10 @@ namespace Ten2
   Tensor2_3D transpose( const Tensor2_3D &input );
 
   // Return an identity matrix
-  Tensor2_3D gen_identity_matrix();
+  Tensor2_3D gen_id();
 
   // Return a zero matrix
-  Tensor2_3D gen_zero_matrix();
+  Tensor2_3D gen_zero();
 }
 
 #endif
