@@ -160,7 +160,7 @@ int main( int argc, char * argv[] )
   vec1.gen_rand();
   vec2.gen_rand();
   vec3.gen_rand();
-  Vector_3 vec_cross = VEC3_T::cross_product(vec1, vec2);
+  Vector_3 vec_cross = Vec3::cross_product(vec1, vec2);
   if(vec_cross.dot_product( vec3 )<0.0)
   {
     Vector_3 temp = vec1;
@@ -168,7 +168,7 @@ int main( int argc, char * argv[] )
     vec2 = temp;
   }
 
-  const double volume = vec3.dot_product(VEC3_T::cross_product(vec1, vec2));
+  const double volume = vec3.dot_product(Vec3::cross_product(vec1, vec2));
 
   double * ctrl_x_hex = new double[8]{0.0, vec1.x(), vec1.x()+vec2.x(), vec2.x(), 
     vec3.x(), vec3.x()+vec1.x(), vec3.x()+vec1.x()+vec2.x(), vec3.x()+vec2.x()};
