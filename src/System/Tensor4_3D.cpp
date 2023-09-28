@@ -570,7 +570,7 @@ Tensor4_3D operator*( const double &val, const Tensor4_3D &input )
   return out;
 }
 
-Tensor4_3D Ten4::gen_T4_zero()
+Tensor4_3D Ten4::gen_zero()
 {
   constexpr std::array<double,81> temp{{
     0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -586,32 +586,32 @@ Tensor4_3D Ten4::gen_T4_zero()
   return Tensor4_3D(temp);
 }
 
-Tensor4_3D Ten4::gen_T4_symm_id()
+Tensor4_3D Ten4::gen_symm_id()
 {
   constexpr std::array<double,81> temp {{ 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 }};
   return Tensor4_3D(temp);
 }
 
-Tensor4_3D Ten4::gen_T4_P( const Tensor2_3D &C, const Tensor2_3D &invC )
+Tensor4_3D Ten4::gen_P( const Tensor2_3D &C, const Tensor2_3D &invC )
 {
-  Tensor4_3D out = Ten4::gen_T4_symm_id();
+  Tensor4_3D out = Ten4::gen_symm_id();
   
   out.add_OutProduct( -1.0 / 3.0, invC, C );
 
   return out;
 }
 
-Tensor4_3D Ten4::gen_T4_P( const Tensor2_3D &C )
+Tensor4_3D Ten4::gen_P( const Tensor2_3D &C )
 {
-  return Ten4::gen_T4_P( C, Ten2::inverse(C) );
+  return Ten4::gen_P( C, Ten2::inverse(C) );
 }
 
-Tensor4_3D Ten4::gen_T4_Pt( const Tensor2_3D &C )
+Tensor4_3D Ten4::gen_Pt( const Tensor2_3D &C )
 {
-  return Ten4::gen_T4_P( Ten2::inverse(C) );
+  return Ten4::gen_P( Ten2::inverse(C) );
 }
 
-Tensor4_3D Ten4::gen_T4_Ptilde( const Tensor2_3D &invC )
+Tensor4_3D Ten4::gen_Ptilde( const Tensor2_3D &invC )
 {
   Tensor4_3D out;
   out.gen_zero();
