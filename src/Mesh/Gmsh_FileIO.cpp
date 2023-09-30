@@ -13,7 +13,7 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
 
   // First four lines are Gmsh default file format 
   getline(infile, sline); 
-  SYS_T::print_exit_if(sline.compare("$MeshFormat") != 0, 
+  SYS_T::print_fatal_if(sline.compare("$MeshFormat") != 0, 
       "Error: .msh format first line should be $MeshFormat. \n");
 
   // read the node data and element data in .msh file
@@ -23,11 +23,11 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
   else if (sline.compare("4.1 0 8") == 0)
     read_msh4(infile);
   else
-    SYS_T::print_exit("Error: .msh format second line should be '2.2 0 8' or '4.1 0 8'. \n");
+    SYS_T::print_fatal("Error: .msh format second line should be '2.2 0 8' or '4.1 0 8'. \n");
 
   // Finish the file reading, the last line should be $EndElements  
   getline(infile, sline);
-  SYS_T::print_exit_if(sline.compare("$EndElements") != 0, 
+  SYS_T::print_fatal_if(sline.compare("$EndElements") != 0, 
       "Error: .msh format line should be $EndElements. \n");
 
   // Generate the details of the 1d, 2d and 3d info
@@ -151,13 +151,13 @@ void Gmsh_FileIO::print_info() const
 void Gmsh_FileIO::write_interior_vtp( const std::string &vtp_filename, 
   const int &index_sur,const int &index_vol1, const int &index_vol2 ) const
 {
-  SYS_T::print_exit_if( index_sur >= num_phy_domain_2d || index_sur < 0,
+  SYS_T::print_fatal_if( index_sur >= num_phy_domain_2d || index_sur < 0,
       "Error: Gmsh_FileIO::write_vtp, surface index is wrong. \n");
 
-  SYS_T::print_exit_if( index_vol1 >= num_phy_domain_3d || index_vol1 < 0,
+  SYS_T::print_fatal_if( index_vol1 >= num_phy_domain_3d || index_vol1 < 0,
       "Error: Gmsh_FileIO::write_vtp, volume 1 index is wrong. \n");
 
-  SYS_T::print_exit_if( index_vol2 >= num_phy_domain_3d || index_vol2 < 0,
+  SYS_T::print_fatal_if( index_vol2 >= num_phy_domain_3d || index_vol2 < 0,
       "Error: Gmsh_FileIO::write_vtp, volume 2 index is wrong. \n");
 
   std::cout<<"=== Gmsh_FileIO::write_interior_vtp for "
@@ -179,7 +179,7 @@ void Gmsh_FileIO::write_interior_vtp( const std::string &vtp_filename,
   const int nlocbas_2d {ele_nlocbas[phy_index_sur]};
 
   const int bcnumcl = phy_2d_nElem[index_sur];
-  SYS_T::print_exit_if( int(sur_ien_global.size() ) != nlocbas_2d * bcnumcl,
+  SYS_T::print_fatal_if( int(sur_ien_global.size() ) != nlocbas_2d * bcnumcl,
       "Error: Gmsh_FileIO::write_interior_vtp, sur IEN size wrong. \n" );
 
   // Obtain the volumetric IEN array
@@ -187,14 +187,14 @@ void Gmsh_FileIO::write_interior_vtp( const std::string &vtp_filename,
   std::vector<int> vol_IEN_1( eIEN[phy_index_vol_1] );
   const int nlocbas_3d_1 {ele_nlocbas[phy_index_vol_1]};
   const int numcel_1 = phy_3d_nElem[index_vol1];
-  SYS_T::print_exit_if( VEC_T::get_size(vol_IEN_1) != nlocbas_3d_1 * numcel_1,
+  SYS_T::print_fatal_if( VEC_T::get_size(vol_IEN_1) != nlocbas_3d_1 * numcel_1,
       "Error: Gmsh_FileIO::write_interior_vtp, vol_1 IEN size wrong. \n");
 
   const int phy_index_vol_2 = phy_3d_index[index_vol2];
   std::vector<int> vol_IEN_2( eIEN[phy_index_vol_2] );
   const int nlocbas_3d_2 {ele_nlocbas[phy_index_vol_2]};
   const int numcel_2 = phy_3d_nElem[index_vol2];
-  SYS_T::print_exit_if( VEC_T::get_size(vol_IEN_2) != nlocbas_3d_2 * numcel_2,
+  SYS_T::print_fatal_if( VEC_T::get_size(vol_IEN_2) != nlocbas_3d_2 * numcel_2,
       "Error: Gmsh_FileIO::write_interior_vtp, vol_2 IEN size wrong. \n");
 
   std::string ele_2d {};
@@ -210,7 +210,7 @@ void Gmsh_FileIO::write_interior_vtp( const std::string &vtp_filename,
     ele_3d = static_cast<std::string>("hexahedron");
   }
   else
-    SYS_T::print_exit("Error: Gmsh_FileIO::write_interior_vtp, element types of surface and volume donnot match. \n");
+    SYS_T::print_fatal("Error: Gmsh_FileIO::write_interior_vtp, element types of surface and volume donnot match. \n");
 
   // bcpt stores the global nodal indices in ascending order
   std::vector<int> bcpt( sur_ien_global );
@@ -353,7 +353,7 @@ void Gmsh_FileIO::write_interior_vtp( const std::string &vtp_filename,
       sur_pt, sur_ien, input_vtk_data );
   }
   else
-    SYS_T::print_exit("Error: Gmsh_FileIO::write_interior_vtp, undefined element type. \n");
+    SYS_T::print_fatal("Error: Gmsh_FileIO::write_interior_vtp, undefined element type. \n");
   
   mytimer->Stop();
   std::cout<<"      Time taken "<<mytimer->get_sec()<<" sec. \n";
@@ -375,10 +375,10 @@ void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
 void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
   const int &index_sur, const int &index_vol, const bool &isf2e ) const
 {
-  SYS_T::print_exit_if( index_sur >= num_phy_domain_2d || index_sur < 0,
+  SYS_T::print_fatal_if( index_sur >= num_phy_domain_2d || index_sur < 0,
       "Error: Gmsh_FileIO::write_vtp, surface index is wrong. \n");
 
-  SYS_T::print_exit_if( index_vol >= num_phy_domain_3d || index_vol < 0,
+  SYS_T::print_fatal_if( index_vol >= num_phy_domain_3d || index_vol < 0,
       "Error: Gmsh_FileIO::write_vtp, volume index is wrong. \n");
 
   std::cout<<"=== Gmsh_FileIO::write_vtp for "
@@ -411,11 +411,11 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
   const int nlocbas_3d {ele_nlocbas[phy_index_vol]};
 
   const int bcnumcl = phy_2d_nElem[index_sur];
-  SYS_T::print_exit_if( VEC_T::get_size(sur_ien_global) != nlocbas_2d * bcnumcl,
+  SYS_T::print_fatal_if( VEC_T::get_size(sur_ien_global) != nlocbas_2d * bcnumcl,
       "Error: Gmsh_FileIO::write_vtp, sur IEN size wrong. \n" );
 
   const int numcel = phy_3d_nElem[index_vol];
-  SYS_T::print_exit_if( VEC_T::get_size(vol_IEN) != nlocbas_3d * numcel,
+  SYS_T::print_fatal_if( VEC_T::get_size(vol_IEN) != nlocbas_3d * numcel,
       "Error: Gmsh_FileIO::write_vtp, vol IEN size wrong. \n");
 
   std::string ele_2d {};
@@ -431,7 +431,7 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
     ele_3d = static_cast<std::string>("hexahedron");
   }
   else
-    SYS_T::print_exit("Error: Gmsh_FileIO::write_vtp, element types of surface and volume donnot match. \n");
+    SYS_T::print_fatal("Error: Gmsh_FileIO::write_vtp, element types of surface and volume donnot match. \n");
 
   // bcpt stores the global node index
   std::vector<int> bcpt( sur_ien_global );
@@ -538,7 +538,7 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
       sur_pt, sur_ien, input_vtk_data );
   }
   else
-    SYS_T::print_exit("Error: Gmsh_FileIO::write_vtp, undefined element type. \n");
+    SYS_T::print_fatal("Error: Gmsh_FileIO::write_vtp, undefined element type. \n");
 
   mytimer->Stop();
   std::cout<<"      Time taken "<<mytimer->get_sec()<<" sec. \n";
@@ -560,7 +560,7 @@ void Gmsh_FileIO::write_each_vtu( const std::vector<std::string> name_list) cons
   std::cout<<"=== Gmsh_FileIO::write_each_vtu.\n";
   std::cout<<"--- There are "<<num_phy_domain_3d<<" 3D physical domains.\n";
 
-  SYS_T::print_exit_if(VEC_T::get_size(name_list) != num_phy_domain_3d,
+  SYS_T::print_fatal_if(VEC_T::get_size(name_list) != num_phy_domain_3d,
     "Error: Gmsh_FileIO::write_each_vtu, the number of files should match the number of 3d domains");
 
   SYS_T::Timer * mytimer = new SYS_T::Timer();
@@ -636,7 +636,7 @@ void Gmsh_FileIO::write_each_vtu( const std::vector<std::string> name_list) cons
         phy_3d_nElem[ ii ], local_coor, domain_IEN, input_vtk_data, true);
     }
     else
-      SYS_T::print_exit("Error: Gmsh_FileIO::write_each_vtu, undefined element type of domain %d. \n", phy_3d_index[ii] + 1);
+      SYS_T::print_fatal("Error: Gmsh_FileIO::write_each_vtu, undefined element type of domain %d. \n", phy_3d_index[ii] + 1);
 
     mytimer->Stop();
 
@@ -687,7 +687,7 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
     for(int jj=0; jj<phy_3d_nElem[ii]; ++jj)
       wtag.push_back(ii);
 
-    SYS_T::print_exit_if(ele_type[phy_3d_index[ii]] != wElemtype, 
+    SYS_T::print_fatal_if(ele_type[phy_3d_index[ii]] != wElemtype, 
       "Error: Gmsh_FileIO::write_vtu, 3d domain use different elements. \n" );
   }
 
@@ -716,7 +716,7 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
       wIEN, input_vtk_data, isXML ); 
   }
   else
-    SYS_T::print_exit("Error: Gmsh_FileIO::write_vtu, undefined element type. \n" );
+    SYS_T::print_fatal("Error: Gmsh_FileIO::write_vtu, undefined element type. \n" );
 
   mytimer->Stop();
   std::cout<<"    Time taken "<<mytimer->get_sec()<<" sec. \n";
@@ -726,26 +726,26 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
 void Gmsh_FileIO::check_FSI_ordering( const std::string &phy1,
     const std::string &phy2 ) const
 {
-  SYS_T::print_exit_if( num_phy_domain_3d != 2, "Error: Gmsh_FileIO FSI mesh should contain only 2 physical domains.\n");
+  SYS_T::print_fatal_if( num_phy_domain_3d != 2, "Error: Gmsh_FileIO FSI mesh should contain only 2 physical domains.\n");
 
   const std::string name0 = phy_3d_name[ 0 ];
   const std::string name1 = phy_3d_name[ 1 ];
 
-  SYS_T::print_exit_if( name0.compare(phy1), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 0 should be fluid domain.\n" );
-  SYS_T::print_exit_if( name1.compare(phy2), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 1 should be solid domain.\n" );
+  SYS_T::print_fatal_if( name0.compare(phy1), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 0 should be fluid domain.\n" );
+  SYS_T::print_fatal_if( name1.compare(phy2), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 1 should be solid domain.\n" );
 }
 
 void Gmsh_FileIO::write_tri_h5( const int &index_2d, 
     const std::vector<int> &index_1d ) const
 {
   // Perform basic logical checks
-  SYS_T::print_exit_if( index_2d >= num_phy_domain_2d || index_2d < 0,
+  SYS_T::print_fatal_if( index_2d >= num_phy_domain_2d || index_2d < 0,
       "Error: Gmsh_FileIO::write_2d_h5, surface index is wrong. \n");
 
   const unsigned int num_1d_edge = index_1d.size();
 
   for(unsigned int ii=0; ii<num_1d_edge; ++ii)
-    SYS_T::print_exit_if( index_1d[ii] >= num_phy_domain_1d || index_1d[ii] < 0,
+    SYS_T::print_fatal_if( index_1d[ii] >= num_phy_domain_1d || index_1d[ii] < 0,
         "Error: Gmsh_FileIO::write_2d_h5, edge index is wrong. \n");
 
   // Open an HDF5 file
@@ -906,13 +906,13 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
     const std::vector<int> &index_2d ) const
 {
   // Perform basic index boundary check
-  SYS_T::print_exit_if( index_3d >= num_phy_domain_3d || index_3d < 0,
+  SYS_T::print_fatal_if( index_3d >= num_phy_domain_3d || index_3d < 0,
       "Error: Gmsh_FileIO::write_tet_h5, surface index is wrong.\n");
 
   const unsigned int num_2d_face = index_2d.size();
 
   for(unsigned int ii=0; ii<num_2d_face; ++ii)
-    SYS_T::print_exit_if( index_2d[ii] >= num_phy_domain_2d || index_2d[ii] < 0,
+    SYS_T::print_fatal_if( index_2d[ii] >= num_phy_domain_2d || index_2d[ii] < 0,
         "Error: Gmsh_FileIO::write_tet_h5, face index is wrong. \n");
 
   // Open an HDF5 file
@@ -1064,13 +1064,13 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
     const std::vector<int> &index_2d_need_facemap ) const
 {
   // Perform basic index boundary check
-  SYS_T::print_exit_if( index_3d >= num_phy_domain_3d || index_3d < 0,
+  SYS_T::print_fatal_if( index_3d >= num_phy_domain_3d || index_3d < 0,
       "Error: Gmsh_FileIO::write_tet_h5, surface index is wrong.\n");
 
   const unsigned int num_2d_face = index_2d.size();
 
   for(unsigned int ii=0; ii<num_2d_face; ++ii)
-    SYS_T::print_exit_if( index_2d[ii] >= num_phy_domain_2d || index_2d[ii] < 0,
+    SYS_T::print_fatal_if( index_2d[ii] >= num_phy_domain_2d || index_2d[ii] < 0,
         "Error: Gmsh_FileIO::write_tet_h5, face index is wrong. \n");
 
   // Open an HDF5 file
@@ -1241,7 +1241,7 @@ void Gmsh_FileIO::update_FSI_nodal_ordering()
   // Now clean the snode vector to save memory
   VEC_T::clean( snode );
 
-  SYS_T::print_exit_if( static_cast<int>( new2old.size() ) != num_node, "Error: Gmsh_FildIO::update_FSI_nodal_ordering the number of nodes in the first two sub-domain does match the num_node!\n" );
+  SYS_T::print_fatal_if( static_cast<int>( new2old.size() ) != num_node, "Error: Gmsh_FildIO::update_FSI_nodal_ordering the number of nodes in the first two sub-domain does match the num_node!\n" );
 
   // Now generate the old2new mapping
   std::vector<int> old2new( num_node, 0 );
@@ -1277,7 +1277,7 @@ void Gmsh_FileIO::update_FSI_nodal_ordering()
 
 void Gmsh_FileIO::update_quadratic_tet_IEN( const int &index_3d )
 {
-  SYS_T::print_exit_if(index_3d < 0 || index_3d >= num_phy_domain_3d,
+  SYS_T::print_fatal_if(index_3d < 0 || index_3d >= num_phy_domain_3d,
       "Error: input index_3d is out of range.\n");
 
   const int domain_index = phy_3d_index[ index_3d ];
@@ -1286,7 +1286,7 @@ void Gmsh_FileIO::update_quadratic_tet_IEN( const int &index_3d )
 
   const int nlocbas = ele_nlocbas[ domain_index ];
 
-  SYS_T::print_exit_if(nlocbas != 10,
+  SYS_T::print_fatal_if(nlocbas != 10,
       "Error: Gmsh_FileIO updata_quadratic_tet_IEN only works for 10-node quadratic element. \n");
 
   std::cout<<"=== Gmsh_FileIO::update_quadratic_tet_IEN for "<<phy_3d_name[index_3d]<<std::endl;;
@@ -1302,7 +1302,7 @@ void Gmsh_FileIO::update_quadratic_tet_IEN( const int &index_3d )
 
 void Gmsh_FileIO::update_quadratic_hex_IEN( const int &index_3d )
 {
-  SYS_T::print_exit_if(index_3d < 0 || index_3d >= num_phy_domain_3d,
+  SYS_T::print_fatal_if(index_3d < 0 || index_3d >= num_phy_domain_3d,
       "Error: input index_3d is out of range.\n");
 
   const int domain_index = phy_3d_index[ index_3d ];
@@ -1311,7 +1311,7 @@ void Gmsh_FileIO::update_quadratic_hex_IEN( const int &index_3d )
 
   const int nlocbas = ele_nlocbas[ domain_index ];
 
-  SYS_T::print_exit_if(nlocbas != 27 && nlocbas != 20, "Error: Gmsh_FileIO updata_quadratic_hex_IEN only works for 27-node or 20-node quadratic element. \n");
+  SYS_T::print_fatal_if(nlocbas != 27 && nlocbas != 20, "Error: Gmsh_FileIO updata_quadratic_hex_IEN only works for 27-node or 20-node quadratic element. \n");
 
   // Now updating the eIEN array
   for(int ee=0; ee<ne; ++ee)
@@ -1357,10 +1357,10 @@ void Gmsh_FileIO::update_quadratic_hex_IEN( const int &index_3d )
 void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
     const int &index_sur, const int &index_vol, const bool &isf2e ) const
 {
-  SYS_T::print_exit_if( index_sur >= num_phy_domain_2d || index_sur < 0,
+  SYS_T::print_fatal_if( index_sur >= num_phy_domain_2d || index_sur < 0,
       "Error: Gmsh_FileIO::write_quadratic_sur_vtu, surface index is wrong. \n");
 
-  SYS_T::print_exit_if( index_vol >= num_phy_domain_3d || index_vol < 0,
+  SYS_T::print_fatal_if( index_vol >= num_phy_domain_3d || index_vol < 0,
       "Error: Gmsh_FileIO::write_quadratic_sur_vtu, volume index is wrong. \n");
 
   std::cout<<"=== Gmsh_FileIO::write_quadratic_sur_vtu for "
@@ -1406,7 +1406,7 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
     ele_3d = static_cast<std::string>("hexahedron");
   }
   else
-    SYS_T::print_exit("Error: Gmsh_FileIO::write_quadratic_sur_vtu, element types of surface and volume donnot match. \n");
+    SYS_T::print_fatal("Error: Gmsh_FileIO::write_quadratic_sur_vtu, element types of surface and volume donnot match. \n");
 
   // surface mesh ien copied from eIEN
   std::vector<int> sur_ien_global( eIEN[phy_index_sur] );
@@ -1415,7 +1415,7 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
   std::vector<int> bcpt( sur_ien_global );
   const int bcnumcl = phy_2d_nElem[index_sur];
 
-  SYS_T::print_exit_if( VEC_T::get_size(sur_ien_global) != nlocbas_2d * bcnumcl,
+  SYS_T::print_fatal_if( VEC_T::get_size(sur_ien_global) != nlocbas_2d * bcnumcl,
       "Error: Gmsh_FileIO::write_quadratic_sur_vtu, sur IEN size wrong. \n" );
 
   VEC_T::sort_unique_resize( bcpt ); // unique ascending order nodes
@@ -1437,7 +1437,7 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
   std::vector<int> vol_IEN( eIEN[phy_index_vol] );
   const int numcel = phy_3d_nElem[index_vol];
 
-  SYS_T::print_exit_if( int( vol_IEN.size() ) != nlocbas_3d * numcel,
+  SYS_T::print_fatal_if( int( vol_IEN.size() ) != nlocbas_3d * numcel,
       "Error: Gmsh_FileIO::write_quadratic_sur_vtu, vol IEN size wrong. \n");
 
   // generate local triangle IEN array
@@ -1517,7 +1517,7 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
       sur_pt, sur_ien, input_vtk_data );
   }
   else
-    SYS_T::print_exit("Error: Gmsh_FileIO::write_quadratic_sur_vtu, undefined element type. \n");
+    SYS_T::print_fatal("Error: Gmsh_FileIO::write_quadratic_sur_vtu, undefined element type. \n");
 
   mytimer->Stop();
   std::cout<<"      Time taken "<<mytimer->get_sec()<<" sec. \n";
@@ -1540,11 +1540,11 @@ void Gmsh_FileIO::read_msh2(std::ifstream &infile)
   std::string sline;
 
   getline(infile, sline); 
-  SYS_T::print_exit_if(sline.compare("$EndMeshFormat") != 0, 
+  SYS_T::print_fatal_if(sline.compare("$EndMeshFormat") != 0, 
       "Error: .msh format third line should be $EndMeshFormat. \n");
   
   getline(infile, sline);
-  SYS_T::print_exit_if(sline.compare("$PhysicalNames") != 0, 
+  SYS_T::print_fatal_if(sline.compare("$PhysicalNames") != 0, 
       "Error: .msh format fourth line should be $PhysicalNames. \n");
   
   sstrm.clear();
@@ -1577,17 +1577,17 @@ void Gmsh_FileIO::read_msh2(std::ifstream &infile)
   VEC_T::sort_unique_resize(temp_phy_idx);
   for(int ii=0; ii<num_phy_domain; ++ii)
   {
-    SYS_T::print_exit_if(temp_phy_idx[ii] != static_cast<int>(ii), 
+    SYS_T::print_fatal_if(temp_phy_idx[ii] != static_cast<int>(ii), 
       "Error: in the .msh file, the physical domain index should be in the rage [1, num_phy_domain]. \n");
   }
 
   // file syntax $EndPhysicalNames $Nodes 
   getline(infile, sline); 
-  SYS_T::print_exit_if(sline.compare("$EndPhysicalNames") != 0, 
+  SYS_T::print_fatal_if(sline.compare("$EndPhysicalNames") != 0, 
       "Error: .msh format line should be $EndPhysicalNames. \n");
   
   getline(infile, sline);
-  SYS_T::print_exit_if(sline.compare("$Nodes") != 0, 
+  SYS_T::print_fatal_if(sline.compare("$Nodes") != 0, 
       "Error: .msh format line should be $Nodes. \n");
   
   // get the number of nodes
@@ -1603,7 +1603,7 @@ void Gmsh_FileIO::read_msh2(std::ifstream &infile)
     int nidx; // node index
     sstrm >> nidx;
   
-    SYS_T::print_exit_if( nidx != ii+1, "Error: .msh file, the nodal index should be in the range [1, num_node]. \n");
+    SYS_T::print_fatal_if( nidx != ii+1, "Error: .msh file, the nodal index should be in the range [1, num_node]. \n");
 
     sstrm >> node[ii*3];
     sstrm >> node[ii*3+1];
@@ -1612,11 +1612,11 @@ void Gmsh_FileIO::read_msh2(std::ifstream &infile)
 
   // file syntax $EndNodes, $Elements
   getline(infile, sline); 
-  SYS_T::print_exit_if(sline.compare("$EndNodes") != 0, 
+  SYS_T::print_fatal_if(sline.compare("$EndNodes") != 0, 
       "Error: .msh format line should be $EndNodes. \n");
   
   getline(infile, sline);
-  SYS_T::print_exit_if(sline.compare("$Elements") != 0, 
+  SYS_T::print_fatal_if(sline.compare("$Elements") != 0, 
       "Error: .msh format line should be $Elements. \n");
 
   // get the number of elements
@@ -1646,7 +1646,7 @@ void Gmsh_FileIO::read_msh2(std::ifstream &infile)
     
     // number of tag has to be 2, physical tag and geometrical tag,
     // based on the Gmsh default setting.
-    SYS_T::print_exit_if( num_tag!=2,
+    SYS_T::print_fatal_if( num_tag!=2,
         "Error: .msh file number of tag for element is not 2.\n");
 
     // The pre-defined const array in the beginning of the constructor
@@ -1670,7 +1670,7 @@ void Gmsh_FileIO::read_msh2(std::ifstream &infile)
     }
     else 
     {
-      SYS_T::print_exit_if( ele_type[phy_tag-1] != etype,
+      SYS_T::print_fatal_if( ele_type[phy_tag-1] != etype,
         "Error: the physical domain have mixed type of elements. \n" );
     }
     
@@ -1692,11 +1692,11 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile)
   std::string sline;
 
     getline(infile, sline); 
-  SYS_T::print_exit_if(sline.compare("$EndMeshFormat") != 0, 
+  SYS_T::print_fatal_if(sline.compare("$EndMeshFormat") != 0, 
       "Error: .msh format third line should be $EndMeshFormat. \n");
   
   getline(infile, sline);
-  SYS_T::print_exit_if(sline.compare("$PhysicalNames") != 0, 
+  SYS_T::print_fatal_if(sline.compare("$PhysicalNames") != 0, 
       "Error: .msh format fourth line should be $PhysicalNames. \n");
 
   getline(infile, sline); sstrm.str(sline); sstrm>>num_phy_domain;
@@ -1724,11 +1724,11 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile)
 
   // file syntax $EndPhysicalNames $Nodes 
   getline(infile, sline); 
-  SYS_T::print_exit_if(sline.compare("$EndPhysicalNames") != 0, 
+  SYS_T::print_fatal_if(sline.compare("$EndPhysicalNames") != 0, 
       "Error: .msh format line should be $EndPhysicalNames. \n");
   
   getline(infile, sline);
-  SYS_T::print_exit_if(sline.compare("$Entities") != 0, 
+  SYS_T::print_fatal_if(sline.compare("$Entities") != 0, 
       "Error: .msh format line should be $Entities. \n");
 
   // get the number of original points, curves, surfaces and volumes
@@ -1767,7 +1767,7 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile)
     else
     {
       // here we suppose one entity belongs to at most one physical group
-      SYS_T::print_exit_if( num_phy_tag != 1,
+      SYS_T::print_fatal_if( num_phy_tag != 1,
         "Error: .msh file number of physical tag for a curve is not 1.\n");
       sstrm >> PhyTag;
       curvePhyTag[curve] = PhyTag;
@@ -1796,7 +1796,7 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile)
     else
     {
       // here we suppose one entity belongs to at most one physical group
-      SYS_T::print_exit_if( num_phy_tag != 1,
+      SYS_T::print_fatal_if( num_phy_tag != 1,
         "Error: .msh file number of physical tag for a surface is not 1.\n");
       sstrm >> PhyTag;
       surfacePhyTag[surface] = PhyTag;
@@ -1825,7 +1825,7 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile)
     else
     {
       // here we suppose one entity belongs to at most one physical group
-      SYS_T::print_exit_if( num_phy_tag != 1,
+      SYS_T::print_fatal_if( num_phy_tag != 1,
         "Error: .msh file number of physical tag for a volume is not 1.\n");
       sstrm >> PhyTag;
       volumePhyTag[volume] = PhyTag;
@@ -1833,12 +1833,12 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile)
   }
 
   getline(infile, sline);
-  SYS_T::print_exit_if(sline.compare("$EndEntities") != 0, 
+  SYS_T::print_fatal_if(sline.compare("$EndEntities") != 0, 
     "Error: .msh format line should be $EndEntities. \n");
 
   // here we suppose there is no partitioned entities, the next line should be '$Nodes'
   getline(infile, sline);
-  SYS_T::print_exit_if(sline.compare("$Nodes") != 0, 
+  SYS_T::print_fatal_if(sline.compare("$Nodes") != 0, 
      "Error: .msh format line should be $Nodes. \n");
   
   // get the number of nodes
@@ -1857,7 +1857,7 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile)
     sstrm >> entity_dim; sstrm >> entity_tag; sstrm >> parametric; sstrm >> num_node_in_block;
 
     // here we suppose parametric = 0, then there is no <u>, <v>, <w>
-    SYS_T::print_exit_if( parametric != 0, 
+    SYS_T::print_fatal_if( parametric != 0, 
       "Error: .msh file, the third parameter of nodal blocks should be 0 in block %d.\n", block);
 
     // here we suppose the nodal index should be in [1, num_node]
@@ -1866,7 +1866,7 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile)
       sstrm.clear(); getline(infile, sline); sstrm.str(sline);
       int nidx;
       sstrm >> nidx;
-      SYS_T::print_exit_if( nidx != recorded_node_num + ii + 1, 
+      SYS_T::print_fatal_if( nidx != recorded_node_num + ii + 1, 
         "Error: .msh file, the nodal index should be in the range [1, num_node]. \n");
     }
 
@@ -1885,16 +1885,16 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile)
   }
   
   // check
-  SYS_T::print_exit_if( recorded_node_num != num_node, 
+  SYS_T::print_fatal_if( recorded_node_num != num_node, 
     "Error: .msh file, the number of recorded nodes does not match with the number of nodes . \n");
 
   // file syntax $EndNodes, $Elements
   getline(infile, sline); 
-  SYS_T::print_exit_if(sline.compare("$EndNodes") != 0, 
+  SYS_T::print_fatal_if(sline.compare("$EndNodes") != 0, 
       "Error: .msh format line should be $EndNodes. \n");
   
   getline(infile, sline);
-  SYS_T::print_exit_if(sline.compare("$Elements") != 0, 
+  SYS_T::print_fatal_if(sline.compare("$Elements") != 0, 
       "Error: .msh format line should be $Elements. \n");
 
   // get the number of elements
@@ -1943,7 +1943,7 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile)
       phy_tag = volumePhyTag[geo_index];
     }
     else
-      SYS_T::print_exit( "Error: .msh file, the dimension of element should be 1, 2 or 3.\n" );
+      SYS_T::print_fatal( "Error: .msh file, the dimension of element should be 1, 2 or 3.\n" );
 
     // Record the number of basis function (element type) in 
     // the physical domain. If there are different type element in the
@@ -1955,7 +1955,7 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile)
     }
     else 
     {
-      SYS_T::print_exit_if( ele_type[phy_tag-1] != etype,
+      SYS_T::print_fatal_if( ele_type[phy_tag-1] != etype,
         "Error: the physical domain have mixed type of elements. \n" );
     }
 
@@ -1981,7 +1981,7 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile)
   }
 
   // check
-  SYS_T::print_exit_if( recorded_ele_num != num_elem, 
+  SYS_T::print_fatal_if( recorded_ele_num != num_elem, 
     "Error: .msh file, the number of recorded elements does not match with the number of elements. \n");
 
   // here we suppose there is no periodic condition, so the next line is the end of .msh file
