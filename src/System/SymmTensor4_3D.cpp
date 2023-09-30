@@ -400,21 +400,21 @@ void SymmTensor4_3D::TenPMult( const Tensor4_3D &P )
   for(int ii=0; ii<21; ++ii) ten[ii] = temp[ii];
 }
 
-SymmTensor4_3D gen_ST4_zero()
+SymmTensor4_3D STen4::gen_zero()
 {
   constexpr std::array<double,21> temp {{ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }};
   return SymmTensor4_3D(temp);
 }
 
-SymmTensor4_3D gen_ST4_symm_id()
+SymmTensor4_3D STen4::gen_symm_id()
 {
   constexpr std::array<double,21> temp {{ 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.5, 0.0, 0.5 }};
   return SymmTensor4_3D(temp);
 }
 
-SymmTensor4_3D gen_ST4_Ptilde( const SymmTensor2_3D &invC )
+SymmTensor4_3D STen4::gen_Ptilde( const SymmTensor2_3D &invC )
 {     
-  SymmTensor4_3D out = gen_ST4_zero();
+  SymmTensor4_3D out = STen4::gen_zero();
   out.add_SymmProduct( 1.0, invC, invC );
   out.add_OutProduct( -1.0/3.0, invC );
   return out;

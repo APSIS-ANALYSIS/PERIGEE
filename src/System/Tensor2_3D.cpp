@@ -357,19 +357,19 @@ void Tensor2_3D::find_eigen_vector( const double &eta, Vector_3 &v,
 
     s1 = a;
 
-    double val = VEC3_T::dot_product(s1, b);
+    double val = Vec3::dot_product(s1, b);
     b -= val * s1;
 
-    val = VEC3_T::dot_product(s1, c);
+    val = Vec3::dot_product(s1, c);
     c -= val * s1;
 
     if( b.norm2() >= c.norm2() )
     {
-      b.normalize(); s2 = b; v = VEC3_T::cross_product(s1,s2);
+      b.normalize(); s2 = b; v = Vec3::cross_product(s1,s2);
     }
     else
     {
-      c.normalize(); s2 = c; v = VEC3_T::cross_product(s1,s2);
+      c.normalize(); s2 = c; v = Vec3::cross_product(s1,s2);
     }
   }
   else if( len_b >= len_a && len_b >= len_c )
@@ -378,19 +378,19 @@ void Tensor2_3D::find_eigen_vector( const double &eta, Vector_3 &v,
 
     s1 = b;
 
-    double val = VEC3_T::dot_product(s1, a);
+    double val = Vec3::dot_product(s1, a);
     a -= val * s1;
 
-    val = VEC3_T::dot_product(s1, c);
+    val = Vec3::dot_product(s1, c);
     c -= val * s1;
 
     if( a.norm2() >= c.norm2() )
     {
-      a.normalize(); s2 = a; v = VEC3_T::cross_product(s1, s2);
+      a.normalize(); s2 = a; v = Vec3::cross_product(s1, s2);
     }
     else
     {
-      c.normalize(); s2 = c; v = VEC3_T::cross_product(s1, s2);
+      c.normalize(); s2 = c; v = Vec3::cross_product(s1, s2);
     }
   }
   else
@@ -399,19 +399,19 @@ void Tensor2_3D::find_eigen_vector( const double &eta, Vector_3 &v,
 
     s1 = c;
 
-    double val = VEC3_T::dot_product(s1, a);
+    double val = Vec3::dot_product(s1, a);
     a -= val * s1;
 
-    val = VEC3_T::dot_product(s1, b);
+    val = Vec3::dot_product(s1, b);
     b -= val * s1;
 
     if(a.norm2() >= b.norm2())
     {
-      a.normalize(); s2 = a; v = VEC3_T::cross_product(s1, s2);
+      a.normalize(); s2 = a; v = Vec3::cross_product(s1, s2);
     }
     else
     {
-      b.normalize(); s2 = b; v = VEC3_T::cross_product(s1, s2);
+      b.normalize(); s2 = b; v = Vec3::cross_product(s1, s2);
     }
   }
 }
@@ -480,9 +480,9 @@ int Tensor2_3D::eigen_decomp( double &eta1, double &eta2, double &eta3,
     find_eigen_vector(eta1, v1, v2, v3);
 
     // Form the reduced matrix
-    const double A22 = VecMatVec(v2,v2) - frac13_tr * VEC3_T::dot_product(v2, v2);
-    const double A23 = VecMatVec(v2,v3) - frac13_tr * VEC3_T::dot_product(v2, v3);
-    const double A33 = VecMatVec(v3,v3) - frac13_tr * VEC3_T::dot_product(v3, v3);
+    const double A22 = VecMatVec(v2,v2) - frac13_tr * Vec3::dot_product(v2, v2);
+    const double A23 = VecMatVec(v2,v3) - frac13_tr * Vec3::dot_product(v2, v3);
+    const double A33 = VecMatVec(v3,v3) - frac13_tr * Vec3::dot_product(v3, v3);
 
     const double diff_2233 = A22 - A33;
     if( diff_2233 >= 0.0 )
@@ -508,14 +508,14 @@ int Tensor2_3D::eigen_decomp( double &eta1, double &eta2, double &eta3,
       if( v2.norm2() >= v3.norm2() )
       {
         v2.normalize();               // w1 
-        v2 = VEC3_T::cross_product( v1, v2 ); // v2 = w1 x v1
-        v3 = VEC3_T::cross_product( v1, v2 ); // v3 = v1 x v2
+        v2 = Vec3::cross_product( v1, v2 ); // v2 = w1 x v1
+        v3 = Vec3::cross_product( v1, v2 ); // v3 = v1 x v2
       }
       else
       {
         v3.normalize();               // w1 
-        v2 = VEC3_T::cross_product( v1, v3 ); // v2 = w1 x v1
-        v3 = VEC3_T::cross_product( v1, v2 ); // v3 = v1 x v2
+        v2 = Vec3::cross_product( v1, v3 ); // v2 = w1 x v1
+        v3 = Vec3::cross_product( v1, v2 ); // v3 = v1 x v2
       }
 
       // Shift back from deviatoric to the original matrix eigenvalues
@@ -559,7 +559,7 @@ Tensor2_3D operator*( const double &val, const Tensor2_3D &input )
       val * input(6), val * input(7), val * input(8) );
 }
 
-Tensor2_3D inverse( const Tensor2_3D &input )
+Tensor2_3D Ten2::inverse( const Tensor2_3D &input )
 {
   const double invdet = 1.0 / input.det();
 
@@ -574,7 +574,7 @@ Tensor2_3D inverse( const Tensor2_3D &input )
     invdet * (input(0) * input(4) - input(1) * input(3)) );
 }
 
-Tensor2_3D cofactor( const Tensor2_3D &input )
+Tensor2_3D Ten2::cofactor( const Tensor2_3D &input )
 {
   return Tensor2_3D( (input(4) * input(8) - input(5) * input(7)),
       (input(5) * input(6) - input(3) * input(8)),
@@ -587,21 +587,21 @@ Tensor2_3D cofactor( const Tensor2_3D &input )
       (input(0) * input(4) - input(1) * input(3)) );
 }
 
-Tensor2_3D transpose( const Tensor2_3D &input )
+Tensor2_3D Ten2::transpose( const Tensor2_3D &input )
 {
   return Tensor2_3D( input(0), input(3), input(6),
       input(1), input(4), input(7),
       input(2), input(5), input(8) );
 }
 
-Tensor2_3D gen_identity_matrix()
+Tensor2_3D Ten2::gen_id()
 {
   return Tensor2_3D( 1.0, 0.0, 0.0,
       0.0, 1.0, 0.0,
       0.0, 0.0, 1.0 );
 }
 
-Tensor2_3D gen_zero_matrix()
+Tensor2_3D Ten2::gen_zero()
 {
   return Tensor2_3D( 0.0, 0.0, 0.0,
       0.0, 0.0, 0.0,

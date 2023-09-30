@@ -197,17 +197,20 @@ Tensor2_3D operator*( const SymmTensor2_3D &left, const SymmTensor2_3D &right );
 
 SymmTensor2_3D operator*( const double &val, const SymmTensor2_3D &input );
 
-// Return the inverse of the input matrix
-SymmTensor2_3D inverse( const SymmTensor2_3D &input );
+namespace STen2
+{
+  // Return the inverse of the input matrix
+  SymmTensor2_3D inverse( const SymmTensor2_3D &input );
 
-// Generate the right Cauchy-Green tensor C = F^T F
-SymmTensor2_3D gen_right_Cauchy_Green( const Tensor2_3D &input );
+  // Generate the right Cauchy-Green tensor C = F^T F
+  SymmTensor2_3D gen_right_Cauchy_Green( const Tensor2_3D &input );
 
-// Generate the left Cauchy-Green tensor b = F F^T
-SymmTensor2_3D gen_left_Cauchy_Green( const Tensor2_3D &input );
+  // Generate the left Cauchy-Green tensor b = F F^T
+  SymmTensor2_3D gen_left_Cauchy_Green( const Tensor2_3D &input );
 
-// Convert a regular matrix to its symmetric part
-// output = 0.5 x ( source + source_transpose )
-SymmTensor2_3D gen_symm_part( const Tensor2_3D &input );
+  // Convert a regular matrix to its symmetric part
+  // output = 0.5 x ( source + source_transpose )
+  SymmTensor2_3D gen_symm_part( const Tensor2_3D &input );
+}
 
 #endif
