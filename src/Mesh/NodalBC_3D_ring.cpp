@@ -75,7 +75,7 @@ NodalBC_3D_ring::NodalBC_3D_ring(
           radial_vec.normalize();
 
           Vector_3 normal_vec = Vector_3( outnormal[3*ii], outnormal[3*ii+1], outnormal[3*ii+2] );
-          Vector_3 tan_vec    = cross_product( normal_vec, radial_vec );
+          Vector_3 tan_vec    = Vec3::cross_product( normal_vec, radial_vec );
           tan_vec.normalize();
 
           Q[9*ii+0] = normal_vec.x(); Q[9*ii+1] = normal_vec.y(); Q[9*ii+2] = normal_vec.z();

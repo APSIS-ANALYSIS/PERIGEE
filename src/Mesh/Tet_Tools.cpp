@@ -342,7 +342,7 @@ Vector_3 TET_T::get_out_normal( const std::string &file,
       vol_ctrlPts[3*trn[2]+1] - vol_ctrlPts[3*trn[0]+1],
       vol_ctrlPts[3*trn[2]+2] - vol_ctrlPts[3*trn[0]+2] );
 
-  Vector_3 outVec = cross_product( l01, l02 );
+  Vector_3 outVec = Vec3::cross_product( l01, l02 );
 
   outVec.normalize();
 
@@ -642,7 +642,7 @@ namespace TET_T
   double Tet4::get_diameter() const
   {
     double r;
-    MATH_T::get_tet_sphere_info( pts[0], pts[1], pts[2], pts[3], r );
+    FE_T::get_tet_sphere_info( pts[0], pts[1], pts[2], pts[3], r );
 
     return 2.0 * r;
   }

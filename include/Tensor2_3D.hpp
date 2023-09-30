@@ -9,13 +9,11 @@
 //                   mat[3], mat[4], mat[5]
 //                   mat[6], mat[7], mat[8]
 //
-// Note: This is adopted from a previous implementation 
-//                   Matrix_double_3by3_Array.hpp.
-// The difference is that we do not intend to implement the LU factorization in
-// this class; this means that we do not have the pivoting flag array and the 
-// inverse diagonal array in this class. If needed, one can implement a 
-// LU-factorization in this class with pivoting and LU factorized matrix as an
-// output.
+// Note: We do not intend to implement the LU factorization in this class; this
+// means that we do not have the pivoting flag array in this class. If one wants
+// to solve a small dense matrix problem efficiently, one should refer to the
+// matrix class implemented in Math_Tools.hpp. This class is used primarily for
+// material modeling.
 //
 // Author: Ju Liu
 // Date: June 21 2016
@@ -36,7 +34,7 @@ class Tensor2_3D
         const double &a21, const double &a22, const double &a23,
         const double &a31, const double &a32, const double &a33 );
 
-    // Generate a matrix made by 3 vectors [ vec1 | vec2 | vec3 ]
+    // Generate a matrix made by 3 column vectors [ vec1 | vec2 | vec3 ]
     Tensor2_3D ( const Vector_3 &vec1, const Vector_3 &vec2, const Vector_3 &vec3 );
     
     // Destructor
@@ -45,8 +43,6 @@ class Tensor2_3D
     // Copy
     void copy( const Tensor2_3D &source );    
     
-    void copy( const double source[9] );
-
     // Assignment operator
     Tensor2_3D& operator= (const Tensor2_3D &source);
 
@@ -274,19 +270,22 @@ Tensor2_3D operator*( const Tensor2_3D &left, const Tensor2_3D &right );
 // Return the scalar scaling of matrix
 Tensor2_3D operator*( const double &val, const Tensor2_3D &input );
 
-// Return the inverse of the input matrix
-Tensor2_3D inverse( const Tensor2_3D &input );
+namespace Ten2
+{
+  // Return the inverse of the input matrix
+  Tensor2_3D inverse( const Tensor2_3D &input );
 
-// Return the cofactor of input matrix which is J input^(-T)
-Tensor2_3D cofactor( const Tensor2_3D &input );
+  // Return the cofactor of input matrix which is J input^(-T)
+  Tensor2_3D cofactor( const Tensor2_3D &input );
 
-// Return the transpose of input matrix
-Tensor2_3D transpose( const Tensor2_3D &input );
+  // Return the transpose of input matrix
+  Tensor2_3D transpose( const Tensor2_3D &input );
 
-// Return an identity matrix
-Tensor2_3D gen_identity_matrix();
+  // Return an identity matrix
+  Tensor2_3D gen_id();
 
-// Return a zero matrix
-Tensor2_3D gen_zero_matrix();
+  // Return a zero matrix
+  Tensor2_3D gen_zero();
+}
 
 #endif

@@ -29,7 +29,6 @@
 // Date Created: Jan. 8 2021.
 // ==================================================================
 #include "FEAElement.hpp"
-#include "Math_Tools.hpp"
 
 class FEAElement_Triangle6_membrane : public FEAElement
 {
@@ -90,16 +89,14 @@ class FEAElement_Triangle6_membrane : public FEAElement
     virtual Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const;
 
     // If the triangle nodes are NOT arranged in any particular order,
-    // use an interior node to define the outward direction. 
-    virtual void get_normal_out( const int &quaindex,
-        const double &sur_pt_x, const double &sur_pt_y, const double &sur_pt_z,
-        const double &intpt_x, const double &intpt_y, const double &intpt_z,
-        double &nx, double &ny, double &nz, double &len ) const;
+    // use an interior node to define the outward direction.
+    virtual Vector_3 get_normal_out( const int &quaindex, const Vector_3 &sur_pt,
+        const Vector_3 &int_pt, double &len ) const;
 
     virtual double get_detJac(const int &quaindex) const {return detJac[quaindex];}
 
   private:
-    const int nLocBas, numQuapts;
+    const int numQuapts;
 
     // Container for R0, R1, R2, R3, R4, R5
     // 0 <= ii < 6 x numQuapts
@@ -114,7 +111,7 @@ class FEAElement_Triangle6_membrane : public FEAElement
     std::vector< Tensor2_3D > Q;
 
     // Unit normal vector components, each of length numQuapts
-    double * unx, * uny, * unz;
+    std::vector<Vector_3> un;
 
     // Container for rotated *lamina* 2D Jacobian and its inverse
     // dx_dr : 0             <= ii < 4 * numQuapts

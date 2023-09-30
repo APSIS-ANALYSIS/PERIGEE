@@ -14,6 +14,8 @@
 #include <sys/stat.h>
 #include "petsc.h"
 
+#define PETSC_SILENCE_DEPRECATION_WARNINGS_3_19_0
+
   // ================================================================
   // The following are used for backward compatibility like PetscDefined(USE_DEBUG).
   // ================================================================

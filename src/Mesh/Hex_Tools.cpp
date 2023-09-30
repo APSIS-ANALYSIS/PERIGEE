@@ -386,7 +386,7 @@ Vector_3 HEX_T::get_out_normal( const std::string &file,
                        vol_ctrlPts[3*qun[3] + 1] - vol_ctrlPts[3*qun[0] + 1],
                        vol_ctrlPts[3*qun[3] + 2] - vol_ctrlPts[3*qun[0] + 2] );
 
-  Vector_3 outVec = cross_product( l01, l03 );
+  Vector_3 outVec = Vec3::cross_product( l01, l03 );
 
   outVec.normalize();
 
@@ -500,12 +500,12 @@ namespace HEX_T
 
   double Hex8::get_volume() const
   {
-    TET_T::Tet4 tet1(std::array<Vector_3, 4> {pts[0], pts[1], pts[3], pts[7]});
-    TET_T::Tet4 tet2(std::array<Vector_3, 4> {pts[0], pts[4], pts[1], pts[7]});
-    TET_T::Tet4 tet3(std::array<Vector_3, 4> {pts[1], pts[4], pts[5], pts[7]});
-    TET_T::Tet4 tet4(std::array<Vector_3, 4> {pts[1], pts[2], pts[3], pts[7]});
-    TET_T::Tet4 tet5(std::array<Vector_3, 4> {pts[1], pts[5], pts[6], pts[7]});
-    TET_T::Tet4 tet6(std::array<Vector_3, 4> {pts[1], pts[6], pts[2], pts[7]});
+    TET_T::Tet4 tet1(std::array<Vector_3, 4> {{pts[0], pts[1], pts[3], pts[7]}});
+    TET_T::Tet4 tet2(std::array<Vector_3, 4> {{pts[0], pts[4], pts[1], pts[7]}});
+    TET_T::Tet4 tet3(std::array<Vector_3, 4> {{pts[1], pts[4], pts[5], pts[7]}});
+    TET_T::Tet4 tet4(std::array<Vector_3, 4> {{pts[1], pts[2], pts[3], pts[7]}});
+    TET_T::Tet4 tet5(std::array<Vector_3, 4> {{pts[1], pts[5], pts[6], pts[7]}});
+    TET_T::Tet4 tet6(std::array<Vector_3, 4> {{pts[1], pts[6], pts[2], pts[7]}});
 
     return tet1.get_volume() + tet2.get_volume() + tet3.get_volume() + tet4.get_volume() + tet5.get_volume() + tet6.get_volume();
   }
@@ -607,6 +607,7 @@ void HEX_T::hexmesh_check(const std::vector<double> &cpts,
   cout<<"- number of distorted element : "<<num_dist_elem<<endl;
   cout<<"- number of element with aspect ratio larger than "<<crit_aspect_ratio<<" : "<<num_aspt_elem<<endl;
   std::cout<<"==================================\n";
+
 }
 
 // EOF
