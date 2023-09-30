@@ -105,7 +105,7 @@ class Vector_3
 // calculate a scalar product of a input vector
 Vector_3 operator*( const double &val, const Vector_3 &source );
 
-namespace VEC3_T
+namespace Vec3
 {
   // calculate the distance between two vector by L2 norm
   double dist( const Vector_3 &a, const Vector_3 &b );

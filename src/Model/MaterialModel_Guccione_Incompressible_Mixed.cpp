@@ -27,7 +27,7 @@ MaterialModel_Guccione_Incompressible_Mixed::MaterialModel_Guccione_Incompressib
   }
  
   // f x s / || f x s || = n 
-  n = VEC3_T::cross_product( f, s );
+  n = Vec3::cross_product( f, s );
   n.normalize();
 
   // Define the roatation matrix R
@@ -77,7 +77,7 @@ MaterialModel_Guccione_Incompressible_Mixed::MaterialModel_Guccione_Incompressib
   }
 
   // f x s / || f x s || = n
-  n = VEC3_T::cross_product( f, s );
+  n = Vec3::cross_product( f, s );
   n.normalize();
 
   // Define the roatation matrix R
@@ -129,7 +129,7 @@ void MaterialModel_Guccione_Incompressible_Mixed::get_PK(
     const Tensor2_3D &F, Tensor2_3D &P, Tensor2_3D &S ) const
 {
   Tensor2_3D C; C.MatMultTransposeLeft(F);
-  Tensor2_3D Cinv = inverse(C);
+  Tensor2_3D Cinv = Ten2::inverse(C);
   const double trC = C.tr();
   const double trC2 = C.MatContraction( C );
   const double detF = F.det();
@@ -174,7 +174,7 @@ void MaterialModel_Guccione_Incompressible_Mixed::get_PK_Stiffness(
     const Tensor2_3D &F, Tensor2_3D &P, Tensor2_3D &S, Tensor4_3D &CC ) const
 {
   Tensor2_3D C; C.MatMultTransposeLeft(F);
-  Tensor2_3D Cinv = inverse(C);
+  Tensor2_3D Cinv = Ten2::inverse(C);
   const double trC = C.tr();
   const double trC2 = C.MatContraction( C );
   const double detF = F.det();

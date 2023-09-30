@@ -67,7 +67,7 @@ void FEAElement_Triangle6_3D_der0::buildBasis( const IQuadPts * const &quad,
       dx_ds += Vector_3( ctrl_x[ii] * Rs[ii], ctrl_y[ii] * Rs[ii], ctrl_z[ii] * Rs[ii] );
     }
 
-    un[qua] = VEC3_T::cross_product( dx_dr, dx_ds );
+    un[qua] = Vec3::cross_product( dx_dr, dx_ds );
     detJac[qua] = un[qua].normalize();
   }
 }
@@ -108,7 +108,7 @@ Vector_3 FEAElement_Triangle6_3D_der0::get_normal_out( const int &qua,
   const Vector_3 mm = sur_pt - int_pt;
 
   // Do inner product with the normal vector
-  const double mdotn = VEC3_T::dot_product( mm, un[qua] );
+  const double mdotn = Vec3::dot_product( mm, un[qua] );
 
   SYS_T::print_fatal_if( std::abs(mdotn) < 1.0e-10, "Warning: FEAElement_Triangle3_3D_der0::get_normal_out, the element might be ill-shaped.\n");
 

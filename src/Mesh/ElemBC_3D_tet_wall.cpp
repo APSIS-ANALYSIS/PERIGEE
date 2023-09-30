@@ -97,7 +97,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 
     locator -> FindClosestPoint(&pt[0], &cl_pt[0], cell, cellId, subId, dist); 
 
-    radius[ii] = VEC3_T::dist( Vector_3(pt[0], pt[1], pt[2]), Vector_3(cl_pt[0], cl_pt[1], cl_pt[2]) );
+    radius[ii] = Vec3::dist( Vector_3(pt[0], pt[1], pt[2]), Vector_3(cl_pt[0], cl_pt[1], cl_pt[2]) );
     thickness[ii] = radius[ii] * thickness2radius_combined; 
 
     springconst[ii]  = springconst_combined;
@@ -214,7 +214,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 
         locator -> FindClosestPoint(&pp[0], &cl_pt[0], cell, cellId, subId, dist);
 
-        radius[idx] = VEC3_T::dist( Vector_3(pp[0], pp[1], pp[2]), Vector_3(cl_pt[0], cl_pt[1], cl_pt[2]) );
+        radius[idx] = Vec3::dist( Vector_3(pp[0], pp[1], pp[2]), Vector_3(cl_pt[0], cl_pt[1], cl_pt[2]) );
         thickness[idx] = radius[idx] * thickness2radiusList[ii];
 
         springconst[idx]  = springconstList[ii];
