@@ -10,11 +10,6 @@
 
 int main(int argc, char *argv[])
 { 
-  std::string myname {};
-
-  SYS_T::get_option_string("-name", myname, argc, argv);
-
-  std::cout << myname << std::endl;
 
   return EXIT_SUCCESS;
 }

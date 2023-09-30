@@ -459,20 +459,6 @@ namespace SYS_T
     if(flg) outdata = char_outdata;
   }
 
-  inline void get_option_string( const char * const &name, std::string &outdata,
-                                 const int &argc, char **argv)
-  {
-    for (int ii {1}; ii < argc-1; ++ii)
-    {
-        if (strcmp(name, *(argv+ii)) == 0)
-        {
-            outdata = *(argv+ii+1);
-            return;
-        }
-    }
-    print_fatal("Error: SYS_T::get_option_string, cannot find argument %s.\n", name);
-  }
-
   inline void InsertFileYAML( const std::string &filename, const bool &require )
   {
 #if PETSC_VERSION_GE(3,15,0)
