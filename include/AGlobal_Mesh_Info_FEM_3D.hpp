@@ -57,6 +57,8 @@ class AGlobal_Mesh_Info_FEM_3D : public IAGlobal_Mesh_Info
   private:
     int xdegree, ydegree, zdegree;
     int nElem, nFunc, nLocBas, probDim, elemType;
+    
+    AGlobal_Mesh_Info_FEM_3D() = delete;
 };
 
 #endif
