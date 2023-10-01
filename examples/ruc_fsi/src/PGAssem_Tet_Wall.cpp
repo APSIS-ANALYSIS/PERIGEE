@@ -187,7 +187,7 @@ void PGAssem_Tet_Wall::RingBC_KG(
         const Tensor2_3D QT = ringnbc_part->get_rotation_matrix( pos );
 
         // Skew-to-global transformation matrix
-        const Tensor2_3D Q = transpose( QT );
+        const Tensor2_3D Q = Ten2::transpose( QT );
 
         for( int jj = dof-1; jj < ncol; jj += dof )
         {

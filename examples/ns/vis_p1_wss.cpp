@@ -165,7 +165,7 @@ int main( int argc, char * argv[] )
         v_ctrlPts[3*trn[2]+1] - v_ctrlPts[3*trn[0]+1],
         v_ctrlPts[3*trn[2]+2] - v_ctrlPts[3*trn[0]+2] ); 
 
-    Vector_3 ou = VEC3_T::cross_product( l01, l02 );
+    Vector_3 ou = Vec3::cross_product( l01, l02 );
 
     tri_area[ee] = 0.5 * ou.normalize();
 
@@ -173,7 +173,7 @@ int main( int argc, char * argv[] )
         v_ctrlPts[interior_node[ee]*3+1] - v_ctrlPts[3*trn[0]+1],
         v_ctrlPts[interior_node[ee]*3+2] - v_ctrlPts[3*trn[0]+2] );
 
-    const double out_dot_in = VEC3_T::dot_product( ou, inw );
+    const double out_dot_in = Vec3::dot_product( ou, inw );
 
     // if in case the normal points inside, multiply by -1
     if( out_dot_in > 0 ) ou *= -1.0;

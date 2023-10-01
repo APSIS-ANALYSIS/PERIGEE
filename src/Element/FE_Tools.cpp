@@ -89,13 +89,13 @@ void FE_T::L2Proj_DGP1_3D( const double * const &f,
 Vector_3 FE_T::get_n_from_t( const Vector_3 &tan, const Vector_3 &p0, const Vector_3 &p1 )
 {
   const Vector_3 mm = p0 - p1;
-  const double mdt = VEC3_T::dot_product( mm, tan );
-  const double tdt = VEC3_T::dot_product( tan, tan );
+  const double mdt = Vec3::dot_product( mm, tan );
+  const double tdt = Vec3::dot_product( tan, tan );
   const double fac = mdt / tdt;
 
   const Vector_3 nn = mm - fac * tan;
 
-  return VEC3_T::normalize(nn);
+  return Vec3::normalize(nn);
 }
 
 void FE_T::get_tet_sphere_info( const double &x0, const double &x1,
@@ -327,7 +327,7 @@ namespace FE_T
 
   std::array<double, 3> Matrix_double_3by3_Array::LU_solve( const std::array<double, 3> &bb ) const
   {
-    std::array<double, 3> xx { bb[pp[0]], bb[pp[1]], bb[pp[2]] };
+    std::array<double, 3> xx {{ bb[pp[0]], bb[pp[1]], bb[pp[2]] }};
 
     xx[1] = xx[1] - mat[3] * xx[0];
     xx[2] = xx[2] - mat[6] * xx[0] - mat[7] * xx[1];
@@ -496,7 +496,7 @@ namespace FE_T
 
   std::array<double, 6> Matrix_double_6by6_Array::LU_solve( const std::array<double, 6> &rhs ) const
   {
-    std::array<double, 6> xx { rhs[pp[0]], rhs[pp[1]], rhs[pp[2]], rhs[pp[3]], rhs[pp[4]], rhs[pp[5]] };
+    std::array<double, 6> xx {{ rhs[pp[0]], rhs[pp[1]], rhs[pp[2]], rhs[pp[3]], rhs[pp[4]], rhs[pp[5]] }};
 
     xx[1] = xx[1] - Mat[6]  * xx[0];
     xx[2] = xx[2] - Mat[12] * xx[0] - Mat[13] * xx[1];

@@ -49,7 +49,7 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
     -ctrl_z[0] + ctrl_z[2]);
 
   // vec(un) = vec(dx_dr) x vec(dx_ds)
-  un = VEC3_T::cross_product( dx_dr, dx_ds );
+  un = Vec3::cross_product( dx_dr, dx_ds );
   un.normalize();
 
   // ======= Global-to-local rotation matrix =======
@@ -61,7 +61,7 @@ void FEAElement_Triangle3_membrane::buildBasis( const IQuadPts * const &quad,
   e_a.normalize();
 
   // e_b = vec(un) x e_a / || vec(un) x e_a ||
-  Vector_3 e_b = VEC3_T::cross_product( un, e_a );
+  Vector_3 e_b = Vec3::cross_product( un, e_a );
   e_b.normalize();
 
   // e_l1 = sqrt(2)/2 * (e_a - e_b)
@@ -169,7 +169,7 @@ Vector_3 FEAElement_Triangle3_membrane::get_normal_out( const int &quaindex,
   const Vector_3 mm = sur_pt - int_pt;
 
   // Dot product of the defined vector with the calculated normal vector
-  const double mdotn = VEC3_T::dot_product( mm, un );
+  const double mdotn = Vec3::dot_product( mm, un );
 
   SYS_T::print_fatal_if( std::abs(mdotn) < 1.0e-10, "Warning: FEAElement_Triangle3_membrane::get_normal_out, the element might be ill-shaped.\n");
 
