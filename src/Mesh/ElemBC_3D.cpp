@@ -3,9 +3,9 @@
 ElemBC_3D::ElemBC_3D( const int &elemtype ) 
 : elem_type( elemtype ), num_ebc( 0 )
 {
-  num_node     = nullptr;
-  num_cell     = nullptr;
-  cell_nLocBas = nullptr;
+  num_node.clear();
+  num_cell.clear();
+  cell_nLocBas.clear();
 
   pt_xyz.clear();
   sur_ien.clear();
@@ -19,9 +19,9 @@ ElemBC_3D::ElemBC_3D( const std::vector<std::string> &vtkfileList,
     const int &elemtype ) : elem_type( elemtype ), 
   num_ebc( static_cast<int>( vtkfileList.size() ) )
 {
-  num_node     = new int [num_ebc];
-  num_cell     = new int [num_ebc];
-  cell_nLocBas = new int [num_ebc];
+  num_node.resize(num_ebc);  
+  num_cell.resize(num_ebc);
+  cell_nLocBas.resize(num_ebc);
 
   pt_xyz.resize(num_ebc);
   sur_ien.resize(num_ebc);
@@ -56,9 +56,6 @@ ElemBC_3D::ElemBC_3D( const std::vector<std::string> &vtkfileList,
 
 ElemBC_3D::~ElemBC_3D()
 {
-  delete [] num_node; num_node = nullptr;
-  delete [] num_cell; num_cell = nullptr;
-  delete [] cell_nLocBas; cell_nLocBas = nullptr;
 }
 
 void ElemBC_3D::print_info() const
