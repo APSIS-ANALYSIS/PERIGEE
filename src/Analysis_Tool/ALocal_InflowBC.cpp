@@ -72,9 +72,14 @@ ALocal_InflowBC::ALocal_InflowBC(
     if(num_local_cell[nbc_id] > 0)
     {
       const std::vector<double> temp_xyz = h5r->read_doubleVector( subgroup_name.c_str(), "local_pt_xyz" );
+
+      ASSERT( VEC_T::get_size(temp_xyz) == num_local_node[nbc_id]*3, "Error: ALocal_InflowBC local_pt_xyz format is wrong.\n");
+
       local_pt_xyz[nbc_id] = std::vector<Vector_3> (num_local_node[nbc_id], Vector_3{ 0, 0, 0 });
+      
       for(int ii {0}; ii < num_local_node[nbc_id]; ++ii)
         local_pt_xyz[nbc_id][ii] = Vector_3{ temp_xyz[3 * ii], temp_xyz[3 * ii + 1], temp_xyz[3 * ii + 2] };
+      
       local_tri_ien[nbc_id]  = h5r->read_intVector(    subgroup_name.c_str(), "local_tri_ien" );
       local_node_pos[nbc_id] = h5r->read_intVector(    subgroup_name.c_str(), "local_node_pos" );
     }
