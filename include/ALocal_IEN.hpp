@@ -105,7 +105,10 @@ class ALocal_IEN
     // The LIEN array may be enriched due to use of non-isoparametric elements.
     // Users should check if one uses a derived class.
     // ------------------------------------------------------------------------
-    std::vector<int> LIEN; 
+    std::vector<int> LIEN {};
+
+    // Disallow default constructor
+    ALocal_IEN() = delete;
 };
 
 #endif

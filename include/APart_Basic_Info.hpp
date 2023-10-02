@@ -38,12 +38,10 @@ class APart_Basic_Info
     virtual void print_info() const;
   
   private:
-    // --------------------------------------------------------------
-    // Disallow the default constructor
-    // --------------------------------------------------------------
-    APart_Basic_Info(){};  
-
     int cpu_rank, cpu_size;
+    
+    // Disallow the default constructor
+    APart_Basic_Info() = delete; 
 };
 
 #endif
