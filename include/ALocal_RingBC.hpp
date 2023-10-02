@@ -64,19 +64,23 @@ class ALocal_RingBC
 
     // If Num_LD > 0, store the global indices of the local Dirichlet nodes 
     // of the ring BC type
-    std::vector<int> LDN;
+    std::vector<int> LDN {};
 
     // If Num_LD > 0, store corresponding cap ID, which ranges [0, num_caps)
     // vector length is Num_LD
-    std::vector<int> local_cap_id;
+    std::vector<int> local_cap_id {};
 
     // Each cap's unit normal vector
     // vector length is num_caps
-    std::vector<Vector_3> outnormal;
+    std::vector<Vector_3> outnormal {};
 
     // Each cap's rotation matrix for skew boundary conditions
     // vector length is num_caps
-    std::vector<Tensor2_3D> Q;
+    std::vector<Tensor2_3D> Q {};
+    
+    // ------------------------------------------------------------------------
+    // Disallow default constructor
+    ALocal_RingBC() = delete;
 };
 
 #endif
