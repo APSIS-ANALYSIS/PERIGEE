@@ -213,6 +213,10 @@ class ALocal_InflowBC
     // local_to_global array
     // num_nbc x num_local_node[ii]
     std::vector< std::vector<int> > local_node_pos;
+  
+    // ------------------------------------------------------------------------ 
+    // Disallow default constructor 
+    ALocal_InflowBC() = delete; 
 };
 
 #endif
