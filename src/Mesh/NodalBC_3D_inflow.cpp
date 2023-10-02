@@ -356,7 +356,7 @@ void NodalBC_3D_inflow::reset501IEN_outwardnormal( const IIEN * const &VIEN )
       const int node_t[3] { get_ien(nbcid, ee, 0), get_ien(nbcid, ee, 1), get_ien(nbcid, ee, 2) };
 
       // The triangle mesh node's volumetric index
-      const std::vector<int> node_t_gi = { get_global_node(nbcid, node_t[0]), 
+      const std::vector<int> node_t_gi { get_global_node(nbcid, node_t[0]), 
         get_global_node(nbcid, node_t[1]), get_global_node(nbcid, node_t[2]) };
 
       // cell ee's global/volumetric index  
@@ -510,8 +510,8 @@ void NodalBC_3D_inflow::reset601IEN_outwardnormal( const IIEN * const &VIEN )
       const int node_q[4] { get_ien(nbcid, ee, 0), get_ien(nbcid, ee, 1),  get_ien(nbcid, ee, 2), get_ien(nbcid, ee, 3) };  
 
       // The quad mesh node's volumetric index
-      const std::vector<int> node_q_gi = { get_global_node(nbcid, node_q[0]), get_global_node(nbcid, node_q[1]),  
-                                           get_global_node(nbcid, node_q[2]), get_global_node(nbcid, node_q[3]) }; 
+      const std::vector<int> node_q_gi { get_global_node(nbcid, node_q[0]), get_global_node(nbcid, node_q[1]),  
+                                         get_global_node(nbcid, node_q[2]), get_global_node(nbcid, node_q[3]) }; 
 
       // cell ee's global/volumetric index  
       const int cell_gi = get_global_cell(nbcid, ee);
