@@ -353,65 +353,53 @@ void Tensor2_3D::find_eigen_vector( const double &eta, Vector_3 &v,
 
   if( len_a >= len_b && len_a >= len_c )
   {
-    a.normalize(); // a is s1 now
+    s1 = Vec3::normalize(a); // s1 = a/|a|
 
-    s1 = a;
+    b -= Vec3::dot_product(s1, b) * s1;
 
-    double val = Vec3::dot_product(s1, b);
-    b -= val * s1;
-
-    val = Vec3::dot_product(s1, c);
-    c -= val * s1;
+    c -= Vec3::dot_product(s1, c) * s1;
 
     if( b.norm2() >= c.norm2() )
     {
-      b.normalize(); s2 = b; v = Vec3::cross_product(s1,s2);
+      s2 = Vec3::normalize(b); v = Vec3::cross_product(s1, s2);
     }
     else
     {
-      c.normalize(); s2 = c; v = Vec3::cross_product(s1,s2);
+      s2 = Vec3::normalize(c); v = Vec3::cross_product(s1, s2);
     }
   }
   else if( len_b >= len_a && len_b >= len_c )
   {
-    b.normalize(); // b is s1 now
+    s1 = Vec3::normalize(b); // s1 = b/|b|
 
-    s1 = b;
+    a -= Vec3::dot_product(s1, a) * s1;
 
-    double val = Vec3::dot_product(s1, a);
-    a -= val * s1;
-
-    val = Vec3::dot_product(s1, c);
-    c -= val * s1;
+    c -= Vec3::dot_product(s1, c) * s1;
 
     if( a.norm2() >= c.norm2() )
     {
-      a.normalize(); s2 = a; v = Vec3::cross_product(s1, s2);
+      s2 = Vec3::normalize(a); v = Vec3::cross_product(s1, s2);
     }
     else
     {
-      c.normalize(); s2 = c; v = Vec3::cross_product(s1, s2);
+      s2 = Vec3::normalize(c); v = Vec3::cross_product(s1, s2);
     }
   }
   else
   {
-    c.normalize(); // c is s1 now
+    s1 = Vec3::normalize(c); // s1 = c/|c|
 
-    s1 = c;
+    a -= Vec3::dot_product(s1, a) * s1;
 
-    double val = Vec3::dot_product(s1, a);
-    a -= val * s1;
-
-    val = Vec3::dot_product(s1, b);
-    b -= val * s1;
+    b -= Vec3::dot_product(s1, b) * s1;
 
     if(a.norm2() >= b.norm2())
     {
-      a.normalize(); s2 = a; v = Vec3::cross_product(s1, s2);
+      s2 = Vec3::normalize(a); v = Vec3::cross_product(s1, s2);
     }
     else
     {
-      b.normalize(); s2 = b; v = Vec3::cross_product(s1, s2);
+      s2 = Vec3::normalize(b); v = Vec3::cross_product(s1, s2);
     }
   }
 }
