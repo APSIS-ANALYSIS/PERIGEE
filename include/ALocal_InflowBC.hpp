@@ -99,7 +99,7 @@ class ALocal_InflowBC
     // 0 <= ii < num_local_node[nbc_id]
     // Note: make sure num_local_cell[nbc_id] > 0 before using this get function
     // ------------------------------------------------------------------------
-    virtual double get_local_pt_xyz( const int &nbc_id, const int &ii) const
+    virtual Vector_3 get_local_pt_xyz( const int &nbc_id, const int &ii) const
     {return local_pt_xyz[nbc_id][ii];}
 
     // ------------------------------------------------------------------------
