@@ -184,8 +184,8 @@ int main(int argc, char *argv[])
     {
       std::cout<<"the lumen outlet eLement:"<<ee<<std::endl;
 
-      const double qua_r = 0.31;
-      const double qua_s = 0.65;
+      const double qua_r = 0.5;
+      const double qua_s = 0.5;
 
       const double Rr[4] { qua_s - 1.0, 1.0 - qua_s, qua_s, -qua_s };
       const double Rs[4] { qua_r - 1.0, -qua_r, qua_r, 1.0 - qua_r };
