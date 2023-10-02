@@ -1722,6 +1722,16 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile)
     phy_name.push_back(pname);
   }
 
+  // Check the phy_index is within the rage
+  // Make sure the physical domain index is in the range [1, num_phy_domain].
+  std::vector<int> temp_phy_idx( phy_index );
+  VEC_T::sort_unique_resize(temp_phy_idx);
+  for(int ii=0; ii<num_phy_domain; ++ii)
+  {
+    SYS_T::print_fatal_if(temp_phy_idx[ii] != static_cast<int>(ii), 
+      "Error: in the .msh file, the physical domain index should be in the rage [1, num_phy_domain]. \n");
+  }
+
   // file syntax $EndPhysicalNames $Nodes 
   getline(infile, sline); 
   SYS_T::print_fatal_if(sline.compare("$EndPhysicalNames") != 0, 
