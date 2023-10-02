@@ -99,7 +99,7 @@ EBC_Partition_FEM::EBC_Partition_FEM( const IPart * const &part,
       {
         int temp_node = ebc->get_ien(ii, local_elem[jj], kk);
         int temp_npos = VEC_T::get_pos( local_cell_node, temp_node );
-        SYS_T::print_exit_if( temp_npos < 0, 
+        SYS_T::print_fatal_if( temp_npos < 0, 
             "Error: EBC_Partition_FEM, local_cell_node is incomplete. \n" );
         local_tri_ien[ii][jj*cell_nLocBas[ii] + kk] = temp_npos;
       }
