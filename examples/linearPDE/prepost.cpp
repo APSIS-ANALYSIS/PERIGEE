@@ -70,11 +70,11 @@ int main( int argc, char * argv[] )
       mesh = new Mesh_Tet(nFunc, nElem, 2);
       break;
     default:
-      SYS_T::print_exit("Error: elemType %d is not supported.\n", elemType);
+      SYS_T::print_fatal("Error: elemType %d is not supported.\n", elemType);
       break;
   }
 
-  SYS_T::print_exit_if( IEN->get_nLocBas() != mesh->get_nLocBas(), "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", mesh->get_nLocBas(), IEN->get_nLocBas()); 
+  SYS_T::print_fatal_if( IEN->get_nLocBas() != mesh->get_nLocBas(), "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", mesh->get_nLocBas(), IEN->get_nLocBas()); 
 
   mesh -> print_info();
 
