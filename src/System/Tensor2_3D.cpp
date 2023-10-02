@@ -428,9 +428,9 @@ double Tensor2_3D::J3() const
 }
 
 int Tensor2_3D::eigen_decomp( double &eta1, double &eta2, double &eta3,
-           Vector_3 &v1, Vector_3 &v2, Vector_3 &v3 ) const
+    Vector_3 &v1, Vector_3 &v2, Vector_3 &v3 ) const
 {
-  const double frac13 = 1.0 / 3.0;
+  constexpr double frac13 = 1.0 / 3.0;
   const double frac13_tr = tr() * frac13; // value used to shift the eigenvalue
 
   const double mJ2 = J2();
@@ -489,19 +489,19 @@ int Tensor2_3D::eigen_decomp( double &eta1, double &eta2, double &eta3,
       v2 = (*this) * v2;
       v2 -= (frac13_tr + eta2) * temp;
 
-      temp.copy(v3);
+      temp = v3;
       v3 = (*this) * v3; 
       v3 -= (frac13_tr + eta2) * temp;
 
       if( v2.norm2() >= v3.norm2() )
       {
-        v2.normalize();               // w1 
+        v2.normalize();                     // w1 
         v2 = Vec3::cross_product( v1, v2 ); // v2 = w1 x v1
         v3 = Vec3::cross_product( v1, v2 ); // v3 = v1 x v2
       }
       else
       {
-        v3.normalize();               // w1 
+        v3.normalize();                     // w1 
         v2 = Vec3::cross_product( v1, v3 ); // v2 = w1 x v1
         v3 = Vec3::cross_product( v1, v2 ); // v3 = v1 x v2
       }
