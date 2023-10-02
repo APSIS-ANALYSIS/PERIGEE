@@ -243,7 +243,7 @@ class Tensor2_3D
     // This implements the algorithm documented in
     // CMAME 2008 v197 4007-4015, sec 2.4
     // It will return an eigenvector v for this eigenvalue,
-    // and two additional vectors s1 s2; v-s1-s2 forms a orthonormal basis.
+    // and two additional vectors s1 s2; v-s1-s2 forms orthonormal bases.
     // ------------------------------------------------------------------------
     void find_eigen_vector( const double &eta, Vector_3 &v,
         Vector_3 &s1, Vector_3 &s2 ) const;
