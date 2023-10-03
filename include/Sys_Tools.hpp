@@ -152,7 +152,7 @@ namespace SYS_T
   {
     int mpi_flag {-1};
     MPI_Initialized(&mpi_flag);
-    if{mpi_flag}
+    if( mpi_flag )
     {
       if( !get_MPI_rank() )
       {
@@ -161,6 +161,7 @@ namespace SYS_T
         (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
         va_end(Argp);
       }
+      MPI_Barrier(PETSC_COMM_WORLD);
     }
     else
     {
