@@ -223,7 +223,7 @@ void QuadPts_Gauss_1D::compute_npts()
       long double p2 = 0.;
       for (unsigned int j=0; j<n; ++j)
       {
-        long double p3 = p2;
+        const long double p3 = p2;
         p2 = p1;
         p1 = ((2.*j+1.)*z*p2-j*p3)/(j+1);
       }
@@ -232,11 +232,11 @@ void QuadPts_Gauss_1D::compute_npts()
     }
     while (std::abs(p1/pp) > tolerance);
 
-    double x = .5*z;
+    const double x = .5*z;
     qp[i-1] = .5-x;
     qp[n-i] = .5+x;
 
-    double w = 1./((1.-z*z)*pp*pp);
+    const double w = 1./((1.-z*z)*pp*pp);
     qw[i-1] = w;
     qw[n-i] = w;
   }
