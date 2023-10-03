@@ -519,10 +519,9 @@ namespace SYS_T
   inline void print_system_info()
   {
     commPrint("The current data is %s and the current time is %s.\n", get_date().c_str(), get_time().c_str());
-    commPrint("The size of int is %d byte.\n", sizeof(int) );
-    commPrint("The size of double is %d byte.\n", sizeof(double) );
-    commPrint("The size of long double is %d byte.\n", sizeof(long double) );
+    commPrint("In the current system, the sizes of int, double, and long double are %zu byte, %zu byte, and %zu byte, resp.\n", sizeof(int), sizeof(double), sizeof(long double) );
   }
+
 }
 
 #endif
