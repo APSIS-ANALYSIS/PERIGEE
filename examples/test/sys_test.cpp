@@ -10,6 +10,9 @@
 
 int main(int argc, char *argv[])
 {
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+  SYS_T::print_perigee_art();
+  PetscFinalize();
   return EXIT_SUCCESS;
 }
 
