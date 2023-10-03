@@ -7,7 +7,7 @@
 //
 // Date Created: Sep 7 2023
 // ==================================================================
-#include "QuadPts_Gauss.hpp"
+#include "QuadPts_Gauss_1D.hpp"
 
 class QuadPts_Gauss_Hex : public IQuadPts
 {

@@ -1,10 +1,10 @@
-#include "QuadPts_Gauss.hpp"
+#include "QuadPts_Gauss_1D.hpp"
 
-QuadPts_Gauss::QuadPts_Gauss( const int &in_num_pts, const double &min, 
+QuadPts_Gauss_1D::QuadPts_Gauss_1D( const int &in_num_pts, const double &min, 
     const double &max ) : num_pts(in_num_pts)
 {
   // Make sure that min < max
-  SYS_T::print_fatal_if( min >= max, "Error: QuadPts_Gauss, the given range of quadrature domain is incorrect.\n");
+  SYS_T::print_fatal_if( min >= max, "Error: QuadPts_Gauss_1D, the given range of quadrature domain is incorrect.\n");
 
   // Make sure that the containers are empty
   qp.clear(); qw.clear();
@@ -168,12 +168,12 @@ QuadPts_Gauss::QuadPts_Gauss( const int &in_num_pts, const double &min,
   }
 }
 
-QuadPts_Gauss::~QuadPts_Gauss()
+QuadPts_Gauss_1D::~QuadPts_Gauss_1D()
 {
   VEC_T::clean(qp); VEC_T::clean(qw);
 }
 
-void QuadPts_Gauss::print_info() const
+void QuadPts_Gauss_1D::print_info() const
 {
   std::cout<<"====== Gauss Points ======="<<std::endl;
   std::cout<<"Num of pt = "<<num_pts<<std::endl;
@@ -185,7 +185,7 @@ void QuadPts_Gauss::print_info() const
   std::cout<<"=========================="<<std::endl;
 }
 
-void QuadPts_Gauss::compute_npts()
+void QuadPts_Gauss_1D::compute_npts()
 {
   const unsigned int n = num_pts;
   const unsigned int m = (num_pts + 1) / 2;
