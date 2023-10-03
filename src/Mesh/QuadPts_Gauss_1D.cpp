@@ -194,16 +194,11 @@ void QuadPts_Gauss_1D::compute_npts()
 
   const long double long_double_eps = static_cast<long double>(std::numeric_limits<long double>::epsilon()), double_eps = static_cast<long double>(std::numeric_limits<double>::epsilon());
 
-  // now check whether long double is more
-  // accurate than double, and set
-  // tolerances accordingly. generate a one
-  // that really is generated at run-time
-  // and is not optimized away by the
-  // compiler. that makes sure that the
-  // tolerance is set at run-time with the
-  // current behavior, not at compile-time
-  // (not doing so leads to trouble with
-  // valgrind for example).
+  // now check whether long double is more accurate than double, and set
+  // tolerances accordingly. generate a one that really is generated at run-time
+  // and is not optimized away by the compiler. that makes sure that the
+  // tolerance is set at run-time with the current behavior, not at compile-time
+  // (not doing so leads to trouble with valgrind for example).
   volatile long double runtime_one = 1.0;
   const long double tolerance
     = (runtime_one + long_double_eps != runtime_one
@@ -218,18 +213,17 @@ void QuadPts_Gauss_1D::compute_npts()
   {
     long double z = std::cos(MATH_T::PI * (i-.25)/(n+.5));
 
-    long double pp;
-    long double p1, p2, p3;
+    long double pp {1.0}, p1 {1.0};
 
     // Newton iteration
     do
     {
       // compute L_n (z)
       p1 = 1.;
-      p2 = 0.;
+      long double p2 = 0.;
       for (unsigned int j=0; j<n; ++j)
       {
-        p3 = p2;
+        long double p3 = p2;
         p2 = p1;
         p1 = ((2.*j+1.)*z*p2-j*p3)/(j+1);
       }
