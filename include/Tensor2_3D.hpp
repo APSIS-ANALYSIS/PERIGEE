@@ -231,6 +231,8 @@ class Tensor2_3D
     // return 2 if there are two identical eigenvalues, the most distinct one is
     // eta_1 and eta_1's associated eigenvector is v1
     // return 3 if all three are distinct
+    // Note: this function is applicable to symmetric tensors only. Yet, we do
+    // not perform symmetry check within this function.
     // ------------------------------------------------------------------------
     int eigen_decomp( double &eta1, double &eta2, double &eta3,
        Vector_3 &v1, Vector_3 &v2, Vector_3 &v3 ) const;

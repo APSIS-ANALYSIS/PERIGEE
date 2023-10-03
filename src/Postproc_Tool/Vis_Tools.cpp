@@ -198,7 +198,6 @@ void VIS_T::writepvdFile_Init( const std::string &pvdFName )
   pvdFile.close();
 }
 
-
 void VIS_T::writepvdFile( const std::string &baseName,
     const std::string &pre_pvtuname, const int &rank, const int &size,
     const double &sol_time, const bool &isXML )
