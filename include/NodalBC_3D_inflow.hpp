@@ -182,7 +182,7 @@ class NodalBC_3D_inflow : public INodalBC
 
     // number of nodes and cells on each surface. Length num_nbc.
     // Note: num_node[ii] does not equal num_dir_nodes[ii] in this class.
-    // nLocBas[ii] is either 3, 6, 4 or 9.
+    // nLocBas[ii] is 3, 6, 4 or 9.
     std::vector<int> num_node, num_cell, nLocBas;
 
     // IEN for each surface.
