@@ -39,6 +39,13 @@
 
 namespace SYS_T
 {
+  // Return the OS environmental variable
+  inline std::string get_Env_Var( const std::string &key )
+  {
+    const char * val = std::getenv( key.c_str() );
+    return val == nullptr ? std::string("") : std::string(val);
+  }
+
   // Return the rank of the CPU
   inline PetscMPIInt get_MPI_rank()
   {
@@ -518,8 +525,10 @@ namespace SYS_T
 
   inline void print_system_info()
   {
-    commPrint("The current data is %s and the current time is %s.\n", get_date().c_str(), get_time().c_str());
-    commPrint("In the current system, the sizes of int, double, and long double are %zu byte, %zu byte, and %zu byte, resp.\n", sizeof(int), sizeof(double), sizeof(long double) );
+    commPrint("Date: %s and time: %s.\n", get_date().c_str(), get_time().c_str());
+    commPrint("Machine: %s \n", get_Env_Var("MACHINE_NAME").c_str());
+    commPrint("User: %s \n", get_Env_Var("USER").c_str());
+    commPrint("The sizes of int, double, and long double are %zu byte, %zu byte, and %zu byte, resp.\n", sizeof(int), sizeof(double), sizeof(long double) );
   }
 
 }
