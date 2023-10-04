@@ -8,9 +8,9 @@ QuadPts_Gauss_Quad::QuadPts_Gauss_Quad( const int &in_num_pts_x,
 {
   qp.clear(); qw.clear();
 
-  // Use QuadPts_Gauss to generate a rule in 1D with in_num_pts_1d points
-  const QuadPts_Gauss qpg1d_x( in_num_pts_x, x_min, x_max );
-  const QuadPts_Gauss qpg1d_y( in_num_pts_y, y_min, y_max );
+  // Use QuadPts_Gauss_1D to generate a rule in 1D with in_num_pts_1d points
+  const QuadPts_Gauss_1D qpg1d_x( in_num_pts_x, x_min, x_max );
+  const QuadPts_Gauss_1D qpg1d_y( in_num_pts_y, y_min, y_max );
 
   for(int jj=0; jj<in_num_pts_y; ++jj)
   {
