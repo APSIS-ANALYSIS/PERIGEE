@@ -29,7 +29,7 @@ ElemBC_3D_outflow::ElemBC_3D_outflow(
     double ectrl_x[3]{}; double ectrl_y[3]{}; double ectrl_z[3]{};
     int node_idx[3]{}; double R[3]{};
 
-    for( int fid=0; fid < num_ebc; ++fid )
+    for( int fid=0; fid<num_ebc; ++fid )
     {
       for( int ee=0; ee<num_cell[fid]; ++ee )
       {
@@ -75,7 +75,7 @@ ElemBC_3D_outflow::ElemBC_3D_outflow(
     double ectrl_x[6]{}; double ectrl_y[6]{}; double ectrl_z[6]{};
     int node_idx[6]{}; double R[6]{};
     
-    for( int fid=0; fid < num_ebc; ++fid )
+    for( int fid=0; fid<num_ebc; ++fid )
     {
       for( int ee=0; ee<num_cell[fid]; ++ee )
       {
@@ -112,7 +112,7 @@ ElemBC_3D_outflow::ElemBC_3D_outflow(
     double ectrl_x[4]{}; double ectrl_y[4]{}; double ectrl_z[4]{};
     int node_idx[4]{}; double R[4]{};
 
-    for( int fid=0; fid < num_ebc; ++fid )
+    for( int fid=0; fid<num_ebc; ++fid )
     {
       for( int ee=0; ee<num_cell[fid]; ++ee )
       {
@@ -163,7 +163,7 @@ ElemBC_3D_outflow::ElemBC_3D_outflow(
     double ectrl_x[9]{}; double ectrl_y[9]{}; double ectrl_z[9]{};
     int node_idx[9]{}; double R[9]{};  
     
-    for( int fid=0; fid < num_ebc; ++fid )
+    for( int fid=0; fid<num_ebc; ++fid )
     {
       for( int ee=0; ee<num_cell[fid]; ++ee )
       {
