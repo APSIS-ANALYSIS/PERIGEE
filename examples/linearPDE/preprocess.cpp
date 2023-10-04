@@ -33,11 +33,15 @@ int main( int argc, char * argv[] )
   int in_ncommon = 2;
   bool isDualGraph = true;
   
+  // ADD DOF AS A PARAMETER
+
+  // NEED TO ABANDON THIS
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
   
   SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: preprocessor needs to be run in serial.\n");
   
   // Get the command line arguments
+  // NEED TO USE YAML
   SYS_T::GetOptionInt(   "-cpu_size",          cpu_size);
   SYS_T::GetOptionInt(   "-in_ncommon",        in_ncommon);
   SYS_T::GetOptionInt(   "-elem_type",         elemType);
@@ -82,6 +86,7 @@ int main( int argc, char * argv[] )
 
   IMesh * mesh = nullptr;
 
+  // ADD 601 602
   switch( elemType )
   {
     case 501:
@@ -190,6 +195,7 @@ int main( int argc, char * argv[] )
 
   delete mytimer;
   delete ebc; delete global_part; delete mnindex; delete IEN; delete mesh;
+  // NEED TO ABANDON THIS
   PetscFinalize();
   return EXIT_SUCCESS;
 }
