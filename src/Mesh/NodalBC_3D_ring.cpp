@@ -60,7 +60,7 @@ NodalBC_3D_ring::NodalBC_3D_ring(
     int num_outline_pts = 0;
     for(unsigned int jj=0; jj<gnode.size(); ++jj)
     {
-      SYS_T::print_exit_if( gnode[jj]<0, "Error: negative nodal index on cap %d! \n", ii);
+      SYS_T::print_fatal_if( gnode[jj]<0, "Error: negative nodal index on cap %d! \n", ii);
 
       if( VEC_T::is_invec( wall_gnode, gnode[jj]) )
       {
@@ -88,7 +88,7 @@ NodalBC_3D_ring::NodalBC_3D_ring(
     }
 
     // Detect usage of the sv exterior surface (containing caps) as the wall surface
-    SYS_T::print_exit_if( num_outline_pts == numpts, "Error: Cap %d has %d outline nodes and %d total nodes. This is likely due to an improper wall mesh.\n", ii, num_outline_pts, numpts );
+    SYS_T::print_fatal_if( num_outline_pts == numpts, "Error: Cap %d has %d outline nodes and %d total nodes. This is likely due to an improper wall mesh.\n", ii, num_outline_pts, numpts );
   }
 
   num_dir_nodes = dir_nodes.size(); 
@@ -103,7 +103,7 @@ NodalBC_3D_ring::NodalBC_3D_ring(
   std::cout<<"     is generated ";
   if(ring_bc_type == 0) std::cout<<"for fully clamped case (ring_bc_type = 0).\n";
   else if(ring_bc_type == 1) std::cout<<"for in-plane motion (ring_bc_type = 1).\n";
-  else SYS_T::print_exit("Error: NodalBC_3D_ring does not allow this ring_bc_type!\n");
+  else SYS_T::print_fatal("Error: NodalBC_3D_ring does not allow this ring_bc_type!\n");
 }
 
 Vector_3 NodalBC_3D_ring::compute_cap_centroid( const std::vector<double> &pts ) const

@@ -240,7 +240,7 @@ int main(int argc, char *argv[])
 
       // Ensure the vtp is valid
       if (!branch_poly) {
-          SYS_T::print_exit_if( !branch_poly, "Error: SV_T:: Invalid branch centerline vtp from containers. \n");
+          SYS_T::print_fatal_if( !branch_poly, "Error: SV_T:: Invalid branch centerline vtp from containers. \n");
           continue;
       }
 
@@ -255,7 +255,7 @@ int main(int argc, char *argv[])
       }
 
       if (!dataArray) {
-          SYS_T::print_exit_if( !dataArray, "Error: SV_T:: 'radius_' data array not found in dataset. \n");
+          SYS_T::print_fatal_if( !dataArray, "Error: SV_T:: 'radius_' data array not found in dataset. \n");
           continue;
       }
 

@@ -6,19 +6,19 @@ void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
     const std::vector<int> &ien_array )
 {
   // Check the input data compatibility
-  SYS_T::print_exit_if(VEC_T::get_size(pt) != 3*numpts,
+  SYS_T::print_fatal_if(VEC_T::get_size(pt) != 3*numpts,
     "Error: TET_T::gen_tet_grid point vector size does not match the number of points. \n");
 
   // detect the element type
   int nlocbas = -1;
   if( int(ien_array.size()) == 4*numcels ) nlocbas = 4;
   else if( int(ien_array.size()) == 10*numcels ) nlocbas = 10;
-  else SYS_T::print_exit("Error: TET_T::gen_tet_grid ien array size does not match the number of cells. \n");
+  else SYS_T::print_fatal("Error: TET_T::gen_tet_grid ien array size does not match the number of cells. \n");
 
   // Check the connectivity array
   std::vector<int> temp = ien_array;
   VEC_T::sort_unique_resize(temp);
-  SYS_T::print_exit_if(VEC_T::get_size(temp) != numpts,
+  SYS_T::print_fatal_if(VEC_T::get_size(temp) != numpts,
     "Error: TET_T::gen_tet_grid numpts does not match the number of unique points in the ien array. Please re-organize the input. \n");
   VEC_T::clean(temp);
 
@@ -84,7 +84,7 @@ void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
 
     cl -> Delete();
   }
-  else SYS_T::print_exit("Error: TET_T::gen_tet_grid unknown local basis number.\n");
+  else SYS_T::print_fatal("Error: TET_T::gen_tet_grid unknown local basis number.\n");
 
   // Add the asepct-ratio to grid_w
   grid_w -> GetCellData() -> AddArray( edge_aspect_ratio );
@@ -108,7 +108,7 @@ void TET_T::write_tet_grid( const std::string &filename,
 
   VEC_T::sort_unique_resize( name_list );
 
-  SYS_T::print_exit_if( name_list.size() != IOdata.size(), "Error: In TET_T::write_tet_grid, there are %d data in the IOdata that have the same name.\n", IOdata.size() - name_list.size() + 1 );
+  SYS_T::print_fatal_if( name_list.size() != IOdata.size(), "Error: In TET_T::write_tet_grid, there are %d data in the IOdata that have the same name.\n", IOdata.size() - name_list.size() + 1 );
   
   // We add the IOdata for VTK
   for( auto data : IOdata )
@@ -118,7 +118,7 @@ void TET_T::write_tet_grid( const std::string &filename,
     else if( data.get_object() == AssociateObject::Cell )
       VTK_T::add_int_CellData( grid_w, data.get_data(), data.get_name() );
     else
-      SYS_T::print_exit( "Error: In TET_T::write_tet_grid, there is an unknown object type in DataVecStr %s", data.get_name().c_str() );
+      SYS_T::print_fatal( "Error: In TET_T::write_tet_grid, there is an unknown object type in DataVecStr %s", data.get_name().c_str() );
   }
 
   // Write the prepared grid_w to a vtu or vtk file on disk
@@ -145,7 +145,7 @@ void TET_T::write_triangle_grid( const std::string &filename,
 
   VEC_T::sort_unique_resize( name_list );
 
-  SYS_T::print_exit_if( name_list.size() != IOdata.size(), "Error: In TET_T::write_triangle_grid, there are %d data in the IOdata that have the same name.\n", IOdata.size() - name_list.size() + 1 );
+  SYS_T::print_fatal_if( name_list.size() != IOdata.size(), "Error: In TET_T::write_triangle_grid, there are %d data in the IOdata that have the same name.\n", IOdata.size() - name_list.size() + 1 );
 
 // We add the IOdata for VTK
   for( auto data : IOdata )
@@ -155,7 +155,7 @@ void TET_T::write_triangle_grid( const std::string &filename,
     else if( data.get_object() == AssociateObject::Cell )
       VTK_T::add_int_CellData( grid_w, data.get_data(), data.get_name() );
     else
-      SYS_T::print_exit( "Error: In TET_T::write_triangle_grid, there is an unknown object type in DataVecStr %s", data.get_name().c_str() );
+      SYS_T::print_fatal( "Error: In TET_T::write_triangle_grid, there is an unknown object type in DataVecStr %s", data.get_name().c_str() );
   }
 
   // Write the prepared grid_w to a vtu or vtk file on disk
@@ -170,10 +170,10 @@ void TET_T::gen_triangle_grid( vtkPolyData * const &grid_w,
     const std::vector<int> &ien_array )
 {
   // check the input data compatibility
-  SYS_T::print_exit_if(VEC_T::get_size(pt) != 3*numpts,
+  SYS_T::print_fatal_if(VEC_T::get_size(pt) != 3*numpts,
     "Error: TET_T::gen_triangle_grid point vector size does not match the number of points. \n");
 
-  SYS_T::print_exit_if(VEC_T::get_size(ien_array) != 3*numcels,
+  SYS_T::print_fatal_if(VEC_T::get_size(ien_array) != 3*numcels,
     "Error: TET_T::gen_triangle_grid ien array size does not match the number of cells. \n");
 
   // 1. nodal points
@@ -222,7 +222,7 @@ void TET_T::write_quadratic_triangle_grid( const std::string &filename,
 
   VEC_T::sort_unique_resize( name_list );
 
-  SYS_T::print_exit_if( name_list.size() != IOdata.size(), "Error: In TET_T::write_quadratic_triangle_grid, there are %d data in the IOdata that have the same name.\n", IOdata.size() - name_list.size() + 1 );
+  SYS_T::print_fatal_if( name_list.size() != IOdata.size(), "Error: In TET_T::write_quadratic_triangle_grid, there are %d data in the IOdata that have the same name.\n", IOdata.size() - name_list.size() + 1 );
 
 // We add the IOdata for VTK
   for( auto data : IOdata )
@@ -232,7 +232,7 @@ void TET_T::write_quadratic_triangle_grid( const std::string &filename,
     else if( data.get_object() == AssociateObject::Cell )
       VTK_T::add_int_CellData( grid_w, data.get_data(), data.get_name() );
     else
-      SYS_T::print_exit( "Error: In TET_T::write_quadratic_triangle_grid, there is an unknown object type in DataVecStr %s", data.get_name().c_str() );
+      SYS_T::print_fatal( "Error: In TET_T::write_quadratic_triangle_grid, there is an unknown object type in DataVecStr %s", data.get_name().c_str() );
   }
 
   // Write the prepared grid_w to a vtu file on disk
@@ -247,10 +247,10 @@ void TET_T::gen_quadratic_triangle_grid( vtkUnstructuredGrid * const &grid_w,
     const std::vector<int> &ien_array )
 {
   // check the input data compatibility
-  SYS_T::print_exit_if(VEC_T::get_size(pt) != 3*numpts,
+  SYS_T::print_fatal_if(VEC_T::get_size(pt) != 3*numpts,
     "Error: TET_T::gen_quadratic_triangle_grid point vector size does not match the number of points. \n");
 
-  SYS_T::print_exit_if(VEC_T::get_size(ien_array) != 6*numcels, "Error: TET_T::gen_quadratic_quadratic_triangle_grid ien array size does not match the number of cells. \n");
+  SYS_T::print_fatal_if(VEC_T::get_size(ien_array) != 6*numcels, "Error: TET_T::gen_quadratic_quadratic_triangle_grid ien array size does not match the number of cells. \n");
 
   // 1. nodal points
   vtkPoints * ppt = vtkPoints::New(); 
@@ -319,7 +319,7 @@ Vector_3 TET_T::get_out_normal( const std::string &file,
 
   const int tete0 = gelem[0]; // triangle's associated tet element indices
 
-  SYS_T::print_exit_if(tete0 == -1, "Error: TET_T::get_out_normal requires the element indices for the vtp file.\n");
+  SYS_T::print_fatal_if(tete0 == -1, "Error: TET_T::get_out_normal requires the element indices for the vtp file.\n");
 
   const int ten[4] { vol_ien->get_IEN(tete0, 0), vol_ien->get_IEN(tete0, 1), 
     vol_ien->get_IEN(tete0, 2), vol_ien->get_IEN(tete0, 3) };
@@ -331,7 +331,7 @@ Vector_3 TET_T::get_out_normal( const std::string &file,
     else node_check += 1;
   }
 
-  SYS_T::print_exit_if(node_check!=3, "Error: TET_T::get_out_normal, the associated tet element is incompatible with the triangle element. \n");
+  SYS_T::print_fatal_if(node_check!=3, "Error: TET_T::get_out_normal, the associated tet element is incompatible with the triangle element. \n");
 
   // make cross line-0-1 and line-0-2
   const Vector_3 l01( vol_ctrlPts[3*trn[1]] - vol_ctrlPts[3*trn[0]],
@@ -631,7 +631,7 @@ namespace TET_T
 
     int sum = flg[0] + flg[1] + flg[2] + flg[3];
 
-    SYS_T::print_exit_if( sum != 3, "Error: Tet4::get_face_id input is not a proper face of this element. \n");
+    SYS_T::print_fatal_if( sum != 3, "Error: Tet4::get_face_id input is not a proper face of this element. \n");
 
     int loc = 0;
     while( flg[loc] ) loc+=1;

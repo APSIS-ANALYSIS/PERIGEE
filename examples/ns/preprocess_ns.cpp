@@ -171,11 +171,11 @@ int main( int argc, char * argv[] )
       mesh = new Mesh_Tet(nFunc, nElem, 2);
       break;
     default:
-      SYS_T::print_exit("Error: elemType %d is not supported.\n", elemType);
+      SYS_T::print_fatal("Error: elemType %d is not supported.\n", elemType);
       break;
   }
 
-  SYS_T::print_exit_if( IEN->get_nLocBas() != mesh->get_nLocBas(), "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", mesh->get_nLocBas(), IEN->get_nLocBas());
+  SYS_T::print_fatal_if( IEN->get_nLocBas() != mesh->get_nLocBas(), "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", mesh->get_nLocBas(), IEN->get_nLocBas());
 
   mesh -> print_info();
   
@@ -186,7 +186,7 @@ int main( int argc, char * argv[] )
         isDualGraph, mesh, IEN, "epart", "npart" );
   else if(cpu_size == 1)
     global_part = new Global_Part_Serial( mesh, "epart", "npart" );
-  else SYS_T::print_exit("ERROR: wrong cpu_size: %d \n", cpu_size);
+  else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
 
   // Generate the new nodal numbering
   Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, mesh->get_nFunc());
