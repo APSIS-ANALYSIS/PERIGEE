@@ -190,11 +190,10 @@ ElemBC_3D_outflow::ElemBC_3D_outflow(
     } // loop over outlet surfaces
     delete quads; delete elems;
   }
-  else SYS_T::print_exit("Error: ElemBC_3D_outflow constructor: unknown element type.\n");
+  else SYS_T::print_fatal("Error: ElemBC_3D_outflow constructor: unknown element type.\n");
 
   std::cout<<"     ElemBC_3D_outflow intNA vector generated.\n";
 }
-
 
 ElemBC_3D_outflow::~ElemBC_3D_outflow()
 {
@@ -202,7 +201,6 @@ ElemBC_3D_outflow::~ElemBC_3D_outflow()
 
   VEC_T::clean( intNA );
 }
-
 
 void ElemBC_3D_outflow::print_info() const
 {

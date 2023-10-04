@@ -330,7 +330,7 @@ void NodalBC_3D_inflow::resetSurIEN_outwardnormal( const IIEN * const &VIEN )
     reset601IEN_outwardnormal(VIEN);     
   else if(elem_type == 602)
     reset602IEN_outwardnormal(VIEN);  
-  else SYS_T::print_exit("Error: NodalBC_3D_inflow::resetSurIEN_outwardnormal function: unknown element type.\n");
+  else SYS_T::print_fatal("Error: NodalBC_3D_inflow::resetSurIEN_outwardnormal function: unknown element type.\n");
 }
 
 void NodalBC_3D_inflow::reset501IEN_outwardnormal( const IIEN * const &VIEN )
@@ -466,7 +466,7 @@ void NodalBC_3D_inflow::reset502IEN_outwardnormal( const IIEN * const &VIEN )
           pos5 = VEC_T::get_pos(node_t_gi, tet_n[4]);
           break;
         default:
-          SYS_T::print_exit("Error: NodalBC_3D_inflow::reset502IEN_outwardnormal function: tet_face_id is out of range. \n");
+          SYS_T::print_fatal("Error: NodalBC_3D_inflow::reset502IEN_outwardnormal function: tet_face_id is out of range. \n");
           break;
       }
       ASSERT(pos0 >=0 && pos0 <=5, "Error: NodalBC_3D_inflow::reset502IEN_outwardnormal function logical error.\n" ); 
@@ -559,7 +559,7 @@ void NodalBC_3D_inflow::reset601IEN_outwardnormal( const IIEN * const &VIEN )
           pos3 = VEC_T::get_pos(node_q_gi, hex_n[3]); 
           break;          
         default:
-          SYS_T::print_exit("Error: NodalBC_3D_inflow::reset601IEN_outwardnormal function: hex_face_id is out of range. \n");
+          SYS_T::print_fatal("Error: NodalBC_3D_inflow::reset601IEN_outwardnormal function: hex_face_id is out of range. \n");
           break;
       }
       ASSERT(pos0 >=0 && pos0 <=3, "Error: NodalBC_3D_inflow::reset601IEN_outwardnormal function logical error.\n" );
@@ -678,7 +678,7 @@ void NodalBC_3D_inflow::reset602IEN_outwardnormal( const IIEN * const &VIEN )
           pos8 = VEC_T::get_pos(node_q_gi, hex_n[20]); 
           break;         
         default:
-          SYS_T::print_exit("Error: NodalBC_3D_inflow::reset602IEN_outwardnormal function: hex_face_id is out of range. \n");
+          SYS_T::print_fatal("Error: NodalBC_3D_inflow::reset602IEN_outwardnormal function: hex_face_id is out of range. \n");
           break;
       }
       ASSERT(pos0 >=0 && pos0 <=8, "Error: NodalBC_3D_inflow::reset602IEN_outwardnormal function logical error.\n" );
