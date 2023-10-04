@@ -340,7 +340,7 @@ int main( int argc, char * argv[] )
     // --------------------------------------------------------------------------
   }
 
-  wall_ebc -> resetSurIEN_outwardnormal( IEN );
+  wall_ebc -> resetTriIEN_outwardnormal( IEN );
   // --------------------------------------------------------------------------
 
   // Start partition the mesh for each cpu_rank 
