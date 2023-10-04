@@ -75,7 +75,7 @@ void MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_PK(
     const Tensor2_3D &F, Tensor2_3D &P, Tensor2_3D &S ) const
 {
   Tensor2_3D C; C.MatMultTransposeLeft(F);
-  Tensor2_3D Cinv = inverse(C);
+  Tensor2_3D Cinv = Ten2::inverse(C);
   
   const double detFm0d67 = std::pow( F.det(), mpt67 );
 
@@ -94,7 +94,7 @@ void MaterialModel_StVenant_Kirchhoff_M94_Mixed::get_PK_Stiffness(
     const Tensor2_3D &F, Tensor2_3D &P, Tensor2_3D &S, Tensor4_3D &CC ) const
 {
   Tensor2_3D C; C.MatMultTransposeLeft(F);
-  Tensor2_3D Cinv = inverse(C);
+  Tensor2_3D Cinv = Ten2::inverse(C);
   
   const double detFm0d67 = std::pow(F.det(), mpt67);
   const double CdC = C.MatContraction(C);

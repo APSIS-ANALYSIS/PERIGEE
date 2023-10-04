@@ -194,8 +194,8 @@ int main(int argc, char *argv[])
     Vector_3 solid_vec(solid_pt[0],solid_pt[1],solid_pt[2]);
 
     // ===== Compute the distance from solid point to the closest point =====
-    double dist_lu_to_s = dist(lumen_closest_solid_vec,solid_vec);
-    double dist_ti_to_s = dist(tissue_closest_solid_vec,solid_vec);
+    double dist_lu_to_s = Vec3::dist(lumen_closest_solid_vec,solid_vec);
+    double dist_ti_to_s = Vec3::dist(tissue_closest_solid_vec,solid_vec);
 
     // ===== Get the surface normal from the closest point =====
     Vector_3 lumen_nor_vec;
@@ -240,7 +240,7 @@ int main(int argc, char *argv[])
 
       // Ensure the vtp is valid
       if (!branch_poly) {
-          SYS_T::print_exit_if( !branch_poly, "Error: SV_T:: Invalid branch centerline vtp from containers. \n");
+          SYS_T::print_fatal_if( !branch_poly, "Error: SV_T:: Invalid branch centerline vtp from containers. \n");
           continue;
       }
 
@@ -255,7 +255,7 @@ int main(int argc, char *argv[])
       }
 
       if (!dataArray) {
-          SYS_T::print_exit_if( !dataArray, "Error: SV_T:: 'radius_' data array not found in dataset. \n");
+          SYS_T::print_fatal_if( !dataArray, "Error: SV_T:: 'radius_' data array not found in dataset. \n");
           continue;
       }
 
@@ -280,7 +280,7 @@ int main(int argc, char *argv[])
 
 
       // ===== Compute the distance from solid point to the closest centerline =====
-      double dist_center_to_s = dist(centerline_closest_solid_vec,solid_vec);
+      double dist_center_to_s = Vec3::dist(centerline_closest_solid_vec,solid_vec);
       
       // ===== Update when the relative distance has a smaller value =====
       if ((dist_center_to_s / dataArray->GetComponent(id_centerline_closest_solid_pt, 0)) < dist_relevant[ii])
@@ -303,11 +303,11 @@ int main(int argc, char *argv[])
     Vector_3 loc_c_vec;
 
     // ===== Computes the circumferential direction vecters ===== 
-    loc_c_vec.copy(cross_product(temp_l_vec, loc_r_vec));
+    loc_c_vec.copy(Vec3::cross_product(temp_l_vec, loc_r_vec));
     loc_c_vec.normalize();
 
     // ===== Computes the correct longitudinal direction vecters ===== 
-    loc_l_vec.copy(cross_product(loc_r_vec, loc_c_vec));
+    loc_l_vec.copy(Vec3::cross_product(loc_r_vec, loc_c_vec));
     loc_l_vec.normalize();
 
     loc_l_vec_array->InsertTuple3(ii, loc_l_vec.x(), loc_l_vec.y(), loc_l_vec.z());

@@ -68,7 +68,7 @@ void MaterialModel_NeoHookean_ST91::get_PK( const Tensor2_3D &F,
     Tensor2_3D &P, Tensor2_3D &S ) const
 {
   Tensor2_3D C; C.MatMultTransposeLeft(F);
-  Tensor2_3D Cinv = inverse(C);
+  Tensor2_3D Cinv = Ten2::inverse(C);
   const double detF = F.det();
   const double detFm0d67 = std::pow(detF, mpt67);
 
@@ -84,7 +84,7 @@ void MaterialModel_NeoHookean_ST91::get_PK_Stiffness( const Tensor2_3D &F,
   const Tensor2_3D I( 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 );
 
   Tensor2_3D C; C.MatMultTransposeLeft(F);
-  Tensor2_3D Cinv = inverse(C);
+  Tensor2_3D Cinv = Ten2::inverse(C);
   const double detF = F.det();
   const double detF2 = detF * detF;
   const double detFm0d67 = std::pow(detF, mpt67);

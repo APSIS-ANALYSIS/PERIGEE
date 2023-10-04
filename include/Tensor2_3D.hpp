@@ -231,6 +231,8 @@ class Tensor2_3D
     // return 2 if there are two identical eigenvalues, the most distinct one is
     // eta_1 and eta_1's associated eigenvector is v1
     // return 3 if all three are distinct
+    // Note: this function is applicable to symmetric tensors only. Yet, we do
+    // not perform symmetry check within this function.
     // ------------------------------------------------------------------------
     int eigen_decomp( double &eta1, double &eta2, double &eta3,
        Vector_3 &v1, Vector_3 &v2, Vector_3 &v3 ) const;
@@ -243,7 +245,7 @@ class Tensor2_3D
     // This implements the algorithm documented in
     // CMAME 2008 v197 4007-4015, sec 2.4
     // It will return an eigenvector v for this eigenvalue,
-    // and two additional vectors s1 s2; v-s1-s2 forms a orthonormal basis.
+    // and two additional vectors s1 s2; v-s1-s2 forms orthonormal bases.
     // ------------------------------------------------------------------------
     void find_eigen_vector( const double &eta, Vector_3 &v,
         Vector_3 &s1, Vector_3 &s2 ) const;
@@ -270,19 +272,22 @@ Tensor2_3D operator*( const Tensor2_3D &left, const Tensor2_3D &right );
 // Return the scalar scaling of matrix
 Tensor2_3D operator*( const double &val, const Tensor2_3D &input );
 
-// Return the inverse of the input matrix
-Tensor2_3D inverse( const Tensor2_3D &input );
+namespace Ten2
+{
+  // Return the inverse of the input matrix
+  Tensor2_3D inverse( const Tensor2_3D &input );
 
-// Return the cofactor of input matrix which is J input^(-T)
-Tensor2_3D cofactor( const Tensor2_3D &input );
+  // Return the cofactor of input matrix which is J input^(-T)
+  Tensor2_3D cofactor( const Tensor2_3D &input );
 
-// Return the transpose of input matrix
-Tensor2_3D transpose( const Tensor2_3D &input );
+  // Return the transpose of input matrix
+  Tensor2_3D transpose( const Tensor2_3D &input );
 
-// Return an identity matrix
-Tensor2_3D gen_identity_matrix();
+  // Return an identity matrix
+  Tensor2_3D gen_id();
 
-// Return a zero matrix
-Tensor2_3D gen_zero_matrix();
+  // Return a zero matrix
+  Tensor2_3D gen_zero();
+}
 
 #endif

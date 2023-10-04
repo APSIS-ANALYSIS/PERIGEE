@@ -50,7 +50,7 @@ double FEAElement_Tet_P2_P1::get_h( const double * const &ctrl_x,
 {
   double x,y,z,r;
 
-  MATH_T::get_tet_sphere_info(
+  FE_T::get_tet_sphere_info(
       ctrl_x[0], ctrl_x[1], ctrl_x[2], ctrl_x[3],
       ctrl_y[0], ctrl_y[1], ctrl_y[2], ctrl_y[3],
       ctrl_z[0], ctrl_z[1], ctrl_z[2], ctrl_z[3],
@@ -203,7 +203,7 @@ void FEAElement_Tet_P2_P1::buildBasis( const IQuadPts * const &quad,
       zt += ctrl_z[ii] * dR_dt[ii];
     }
 
-    Matrix_double_3by3_Array mdrdx(xr, xs, xt, yr, ys, yt, zr, zs, zt);
+    FE_T::Matrix_double_3by3_Array mdrdx(xr, xs, xt, yr, ys, yt, zr, zs, zt);
 
     detJac[qua] = mdrdx.det();
 

@@ -8,7 +8,6 @@
 // Author: Ju Liu
 // Date Created: May 1 2021
 // ============================================================================
-#include "Sys_Tools.hpp"
 #include "Vec_Tools.hpp"
 #include "Math_Tools.hpp"
 #include "ICVFlowRate.hpp"
@@ -30,6 +29,7 @@ class CVFlowRate_Steady : public ICVFlowRate
 
   private:
     int num_nbc;
+    
     std::vector<double> flowrate;
 };
 

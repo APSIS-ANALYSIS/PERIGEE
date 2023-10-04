@@ -71,7 +71,15 @@ ALocal_InflowBC::ALocal_InflowBC(
     // load its geometrical info 
     if(num_local_cell[nbc_id] > 0)
     {
-      local_pt_xyz[nbc_id]   = h5r->read_doubleVector( subgroup_name.c_str(), "local_pt_xyz" );
+      const std::vector<double> temp_xyz = h5r->read_doubleVector( subgroup_name.c_str(), "local_pt_xyz" );
+
+      ASSERT( VEC_T::get_size(temp_xyz) == num_local_node[nbc_id]*3, "Error: ALocal_InflowBC local_pt_xyz format is wrong.\n");
+
+      local_pt_xyz[nbc_id] = std::vector<Vector_3> (num_local_node[nbc_id], Vector_3{ 0, 0, 0 });
+      
+      for(int ii {0}; ii < num_local_node[nbc_id]; ++ii)
+        local_pt_xyz[nbc_id][ii] = Vector_3{ temp_xyz[3 * ii], temp_xyz[3 * ii + 1], temp_xyz[3 * ii + 2] };
+      
       local_tri_ien[nbc_id]  = h5r->read_intVector(    subgroup_name.c_str(), "local_tri_ien" );
       local_node_pos[nbc_id] = h5r->read_intVector(    subgroup_name.c_str(), "local_node_pos" );
     }
@@ -111,21 +119,14 @@ double ALocal_InflowBC::get_radius( const int &nbc_id,
   // inflow boundary points (i.e. Num_LD = 0 ).
   SYS_T::print_fatal_if( num_out_bc_pts[nbc_id] == 0, "Error: ALocal_InflowBC::get_radius, this function can only be called in sub-domains which contains the inflow boundary node.\n");
 
-  const double x = pt.x();
-  const double y = pt.y();
-  const double z = pt.z();
-
-  const double rc = MATH_T::norm2( x-centroid[nbc_id](0), y-centroid[nbc_id](1),
-      z-centroid[nbc_id](2) );
+  const double rc = Vec3::dist( pt, centroid[nbc_id] );
 
   // Now loop over the boundary points to find rb.
-  double rb = MATH_T::norm2(x-outline_pts[nbc_id][0], y-outline_pts[nbc_id][1], 
-      z-outline_pts[nbc_id][2]);
+  double rb = Vec3::dist( pt, Vector_3( outline_pts[nbc_id][0], outline_pts[nbc_id][1], outline_pts[nbc_id][2]) );
 
   for(int ii=1; ii<num_out_bc_pts[nbc_id]; ++ii)
   {
-    double newdist = MATH_T::norm2(x-outline_pts[nbc_id][3*ii],
-        y-outline_pts[nbc_id][3*ii+1], z-outline_pts[nbc_id][3*ii+2]);
+    double newdist = Vec3::dist( pt, Vector_3( outline_pts[nbc_id][3*ii], outline_pts[nbc_id][3*ii+1], outline_pts[nbc_id][3*ii+2]) );
 
     if(newdist < rb) rb = newdist;
   }
@@ -140,9 +141,9 @@ void ALocal_InflowBC::get_ctrlPts_xyz( const int &nbc_id,
   for(int jj=0; jj<cell_nLocBas[nbc_id]; ++jj)
   {
     const int pos = local_tri_ien[nbc_id][ cell_nLocBas[nbc_id]*eindex+jj ];
-    ctrl_x[jj] = local_pt_xyz[nbc_id][3*pos+0];
-    ctrl_y[jj] = local_pt_xyz[nbc_id][3*pos+1];
-    ctrl_z[jj] = local_pt_xyz[nbc_id][3*pos+2];
+    ctrl_x[jj] = local_pt_xyz[nbc_id][pos].x();
+    ctrl_y[jj] = local_pt_xyz[nbc_id][pos].y();
+    ctrl_z[jj] = local_pt_xyz[nbc_id][pos].z();
   }
 }
 

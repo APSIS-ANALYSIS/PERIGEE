@@ -6,7 +6,7 @@ void HEX_T::gen_hex_grid( vtkUnstructuredGrid * const &grid_w,
     const std::vector<int> &ien_array )
 {
   // Check the input data compatibility
-  SYS_T::print_exit_if( int(pt.size()) != 3*numpts,
+  SYS_T::print_fatal_if( int(pt.size()) != 3*numpts,
     "Error: HEX_T::gen_hex_grid point, vector size does not match the number of points. \n" );
 
   // detect the element type
@@ -16,13 +16,13 @@ void HEX_T::gen_hex_grid( vtkUnstructuredGrid * const &grid_w,
   else if ( int(ien_array.size()) == 27*numcels ) 
     nlocbas = 27;
   else
-    SYS_T::print_exit("Error: HEX_T::gen_hex_grid, ien array size does not match the number of cells. \n");
+    SYS_T::print_fatal("Error: HEX_T::gen_hex_grid, ien array size does not match the number of cells. \n");
   // Now we donnot consider the serendipity elements i.e. 8-node quadrilateral and 20-node hexahedron.
 
   // Check the connectivity array
   std::vector<int> temp = ien_array;
   VEC_T::sort_unique_resize(temp);
-  SYS_T::print_exit_if( int(temp.size()) != numpts,
+  SYS_T::print_fatal_if( int(temp.size()) != numpts,
   "Error: HEX_T::gen_hex_grid, numpts does not match the number of unique points in the ien array. Please re-organize the input. \n" );
   VEC_T::clean(temp);
 
@@ -89,7 +89,7 @@ void HEX_T::gen_hex_grid( vtkUnstructuredGrid * const &grid_w,
     cl -> Delete();
   }
   else
-    SYS_T::print_exit("Error: HEX_T::gen_hex_grid, unknown local basis number.\n");
+    SYS_T::print_fatal("Error: HEX_T::gen_hex_grid, unknown local basis number.\n");
 
   // Add the asepct-ratio to grid_w
   grid_w -> GetCellData() -> AddArray( edge_aspect_ratio );
@@ -113,7 +113,7 @@ void HEX_T::write_hex_grid( const std::string &filename,
 
   VEC_T::sort_unique_resize( name_list );
 
-  SYS_T::print_exit_if( name_list.size() != IOdata.size(),
+  SYS_T::print_fatal_if( name_list.size() != IOdata.size(),
     "Error: In HEX_T::write_hex_grid, there are %d data in the IOdata that have the same name.\n", IOdata.size() - name_list.size() + 1 );
   
   // We need to assign GlobalNodeID if the user does not provide it explicitly
@@ -146,7 +146,7 @@ void HEX_T::write_hex_grid( const std::string &filename,
     else if( data.get_object() == AssociateObject::Cell )
       VTK_T::add_int_CellData( grid_w, data.get_data(), data.get_name() );
     else
-      SYS_T::print_exit( "Error: In HEX_T::write_hex_grid, there is an unknown object type in DataVecStr %s", data.get_name().c_str() );
+      SYS_T::print_fatal( "Error: In HEX_T::write_hex_grid, there is an unknown object type in DataVecStr %s", data.get_name().c_str() );
   }
 
   // Write the prepared grid_w to a vtu or vtk file on disk
@@ -161,10 +161,10 @@ void HEX_T::gen_quad_grid( vtkPolyData * const &grid_w,
     const std::vector<int> &ien_array )
 {
   // check the input data compatibility
-  SYS_T::print_exit_if(VEC_T::get_size(pt) != 3*numpts, 
+  SYS_T::print_fatal_if(VEC_T::get_size(pt) != 3*numpts, 
     "Error: HEX_T::gen_quad_grid, point vector size does not match the number of points. \n");
 
-  SYS_T::print_exit_if(VEC_T::get_size(ien_array) != 4*numcels,
+  SYS_T::print_fatal_if(VEC_T::get_size(ien_array) != 4*numcels,
     "Error: HEX_T::gen_quad_grid, ien array size does not match the number of cells. \n");
 
   // 1. nodal points
@@ -214,7 +214,7 @@ void HEX_T::write_quad_grid( const std::string &filename,
 
   VEC_T::sort_unique_resize( name_list );
 
-  SYS_T::print_exit_if( name_list.size() != IOdata.size(),
+  SYS_T::print_fatal_if( name_list.size() != IOdata.size(),
     "Error: In HEX_T::write_quad_grid, there are %d data in the IOdata that have the same name.\n", IOdata.size() - name_list.size() + 1 );
 
 // We add the IOdata for VTK
@@ -225,7 +225,7 @@ void HEX_T::write_quad_grid( const std::string &filename,
     else if( data.get_object() == AssociateObject::Cell )
       VTK_T::add_int_CellData( grid_w, data.get_data(), data.get_name() );
     else
-      SYS_T::print_exit( "Error: In HEX_T::write_quad_grid, there is an unknown object type in DataVecStr %s", data.get_name().c_str() );
+      SYS_T::print_fatal( "Error: In HEX_T::write_quad_grid, there is an unknown object type in DataVecStr %s", data.get_name().c_str() );
   }
 
   // Write the prepared grid_w to a vtu or vtk file on disk
@@ -240,10 +240,10 @@ void HEX_T::gen_quadratic_quad_grid( vtkUnstructuredGrid * const &grid_w,
     const std::vector<int> &ien_array )
 {
   // check the input data compatibility
-  SYS_T::print_exit_if(VEC_T::get_size(pt) != 3*numpts,
+  SYS_T::print_fatal_if(VEC_T::get_size(pt) != 3*numpts,
     "Error: HEX_T::gen_quadratic_quad_grid point, vector size does not match the number of points. \n");
 
-  SYS_T::print_exit_if(VEC_T::get_size(ien_array) != 9*numcels, 
+  SYS_T::print_fatal_if(VEC_T::get_size(ien_array) != 9*numcels, 
     "Error: HEX_T::gen_quadratic_quad_grid, ien array size does not match the number of cells. \n");
 
   // 1. nodal points
@@ -300,7 +300,7 @@ void HEX_T::write_quadratic_quad_grid( const std::string &filename,
 
   VEC_T::sort_unique_resize( name_list );
 
-  SYS_T::print_exit_if( name_list.size() != IOdata.size(),
+  SYS_T::print_fatal_if( name_list.size() != IOdata.size(),
     "Error: In HEX_T::write_quadratic_quad_grid, there are %d data in the IOdata that have the same name.\n", IOdata.size() - name_list.size() + 1 );
 
 // We add the IOdata for VTK
@@ -311,7 +311,7 @@ void HEX_T::write_quadratic_quad_grid( const std::string &filename,
     else if( data.get_object() == AssociateObject::Cell )
       VTK_T::add_int_CellData( grid_w, data.get_data(), data.get_name() );
     else
-      SYS_T::print_exit( "Error: In HEX_T::write_quadratic_quad_grid, there is an unknown object type in DataVecStr %s", data.get_name().c_str() );
+      SYS_T::print_fatal( "Error: In HEX_T::write_quadratic_quad_grid, there is an unknown object type in DataVecStr %s", data.get_name().c_str() );
   }
 
   // Write the prepared grid_w to a vtu file on disk
@@ -357,7 +357,7 @@ Vector_3 HEX_T::get_out_normal( const std::string &file,
 
   const int hexe0 = gelem[0]; // quad's associated hex element indices
 
-  SYS_T::print_exit_if(hexe0 == -1, "Error: HEX_T::get_out_normal the vtp file %s contains -1 for GlobalElementID.\n", file.c_str());
+  SYS_T::print_fatal_if(hexe0 == -1, "Error: HEX_T::get_out_normal the vtp file %s contains -1 for GlobalElementID.\n", file.c_str());
 
   const std::vector<int> hen { vol_ien->get_IEN(hexe0, 0), vol_ien->get_IEN(hexe0, 1), 
                                vol_ien->get_IEN(hexe0, 2), vol_ien->get_IEN(hexe0, 3),
@@ -386,7 +386,7 @@ Vector_3 HEX_T::get_out_normal( const std::string &file,
                        vol_ctrlPts[3*qun[3] + 1] - vol_ctrlPts[3*qun[0] + 1],
                        vol_ctrlPts[3*qun[3] + 2] - vol_ctrlPts[3*qun[0] + 2] );
 
-  Vector_3 outVec = cross_product( l01, l03 );
+  Vector_3 outVec = Vec3::cross_product( l01, l03 );
 
   outVec.normalize();
 
@@ -524,7 +524,7 @@ namespace HEX_T
 
     const int sum = flg[0] + flg[1] + flg[2] + flg[3];
 
-    SYS_T::print_exit_if( sum != 4, "Error: Hex8::find_face_id input dose not belong to this element. \n");
+    SYS_T::print_fatal_if( sum != 4, "Error: Hex8::find_face_id input dose not belong to this element. \n");
 
     int index_pos[4] {};
     index_pos[0] = std::distance( std::begin(gindex), it0 );
@@ -558,7 +558,7 @@ namespace HEX_T
     else
     {
       face_id = -1;
-      SYS_T::print_exit( "Error: Hex8::find_face_id input is not a proper face of this element. \n");
+      SYS_T::print_fatal( "Error: Hex8::find_face_id input is not a proper face of this element. \n");
     }
 
     return face_id;
@@ -607,6 +607,7 @@ void HEX_T::hexmesh_check(const std::vector<double> &cpts,
   cout<<"- number of distorted element : "<<num_dist_elem<<endl;
   cout<<"- number of element with aspect ratio larger than "<<crit_aspect_ratio<<" : "<<num_aspt_elem<<endl;
   std::cout<<"==================================\n";
+
 }
 
 // EOF

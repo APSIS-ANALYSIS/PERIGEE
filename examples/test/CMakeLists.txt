@@ -32,7 +32,6 @@ SET( perigee_source ${perigee_SOURCE_DIR}/../../src )
 SET( perigee_preprocess_lib_src 
   ${perigee_source}/System/PETSc_Tools.cpp
   ${perigee_source}/System/Vector_3.cpp
-  ${perigee_source}/System/Matrix_double_3by3_Array.cpp
   ${perigee_source}/System/Tensor2_3D.cpp
   ${perigee_source}/System/Tensor2_2D.cpp
   ${perigee_source}/System/SymmTensor2_3D.cpp
@@ -40,7 +39,6 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/System/Tensor4_2D.cpp
   ${perigee_source}/System/SymmTensor4_3D.cpp
   ${perigee_source}/System/SV_Tools.cpp
-  ${perigee_source}/System/Math_Tools.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
   ${perigee_source}/System/HDF5_Reader.cpp
   ${perigee_source}/Mesh/Gmsh_FileIO.cpp
@@ -50,6 +48,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/IEN_FEM.cpp
   ${perigee_source}/Mesh/Mesh_Tet.cpp
   ${perigee_source}/Mesh/Part_FEM.cpp
+  ${perigee_source}/Mesh/ElemBC_3D.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet_wall.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet_outflow.cpp
@@ -66,16 +65,20 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Map_Node_Index.cpp
   ${perigee_source}/Mesh/Global_Part_METIS.cpp
   ${perigee_source}/Mesh/Global_Part_Serial.cpp
+  ${perigee_source}/Element/FE_Tools.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
   )
 
 SET( perigee_analysis_lib_src
   ${perigee_source}/System/PETSc_Tools.cpp
-  ${perigee_source}/System/Matrix_double_6by6_Array.cpp
   ${perigee_source}/System/Matrix_PETSc.cpp
   ${perigee_source}/System/Tensor4_3D.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Tet.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_Quad.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_Hex.cpp
   ${perigee_source}/Mesh/QuadPts_debug.cpp
   ${perigee_source}/Analysis_Tool/AGlobal_Mesh_Info_FEM_3D.cpp
   ${perigee_source}/Analysis_Tool/APart_Basic_Info.cpp
@@ -88,15 +91,26 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/ALocal_EBC_wall.cpp
   ${perigee_source}/Analysis_Tool/APart_Node.cpp
   ${perigee_source}/Analysis_Tool/FEANode.cpp
+  ${perigee_source}/Element/FEAElement_Line2_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Line3_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Hex8.cpp
+  ${perigee_source}/Element/FEAElement_Hex27.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
+  ${perigee_source}/Element/FEAElement_Tet_P2_P1.cpp
+  ${perigee_source}/Element/FEAElement_MINI_P1_3D.cpp
+  ${perigee_source}/Element/FEAElement_MINI_P1_2D.cpp
   ${perigee_source}/Element/FEAElement_Tet10.cpp
   ${perigee_source}/Element/FEAElement_Tet10_v2.cpp
   ${perigee_source}/Element/FEAElement_Triangle3.cpp
   ${perigee_source}/Element/FEAElement_Triangle6.cpp
+  ${perigee_source}/Element/FEAElement_Quad4.cpp
+  ${perigee_source}/Element/FEAElement_Quad9.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_membrane.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_membrane.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Quad4_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Quad9_3D_der0.cpp
   ${perigee_source}/Model/GenBC_RCR.cpp
   ${perigee_source}/Model/GenBC_Resistance.cpp
   ${perigee_source}/Model/GenBC_Inductance.cpp
@@ -157,10 +171,12 @@ ADD_EXECUTABLE( sys_test sys_test.cpp )
 ADD_EXECUTABLE( mod_test matmodel_test.cpp )
 ADD_EXECUTABLE( testh5 h5_test.cpp )
 ADD_EXECUTABLE( elem_test elem_test.cpp )
+ADD_EXECUTABLE( elem_imp_test elem_improvement_test.cpp )
 
 TARGET_LINK_LIBRARIES( sys_test perigee_preprocess perigee_analysis )
 TARGET_LINK_LIBRARIES( mod_test perigee_preprocess perigee_analysis )
 TARGET_LINK_LIBRARIES( testh5 perigee_preprocess )
 TARGET_LINK_LIBRARIES( elem_test perigee_analysis )
+TARGET_LINK_LIBRARIES( elem_imp_test perigee_analysis )
 
 # EOF

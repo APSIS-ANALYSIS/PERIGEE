@@ -338,6 +338,8 @@ class ALocal_EBC
     // local cell's corresponding volumetric element indices
     // size: num_ebc x num_local_cell[ii]
     std::vector< std::vector<int> > local_cell_vol_id;
+    
+    ALocal_EBC() = delete; 
 };
 
 #endif

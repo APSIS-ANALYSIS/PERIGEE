@@ -105,7 +105,9 @@ class FEANode
 
   private:
     // The control points' coordinates and weights if used for NURBS
-    std::vector<double> ctrlPts_x, ctrlPts_y, ctrlPts_z, ctrlPts_w;
+    std::vector<double> ctrlPts_x {}, ctrlPts_y {}, ctrlPts_z {}, ctrlPts_w {};
+
+    FEANode() = delete;
 };
 
 #endif

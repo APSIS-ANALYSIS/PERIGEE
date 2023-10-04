@@ -184,7 +184,7 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Residual(
 
     const Tensor2_3D F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
-    const Tensor2_3D invF = inverse( F );
+    const Tensor2_3D invF = Ten2::inverse( F );
 
     const Tensor2_3D DVelo( vx_x, vx_y, vx_z, vy_x, vy_y, vy_z, vz_x, vz_y, vz_z );
 
@@ -200,7 +200,7 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Residual(
         qua_prestress[qua*6+5], qua_prestress[qua*6+1], qua_prestress[qua*6+3],
         qua_prestress[qua*6+4], qua_prestress[qua*6+3], qua_prestress[qua*6+2] );
 
-    P_iso += prestress * cofactor( F );
+    P_iso += prestress * Ten2::cofactor( F );
     // ------------------------------------------------------------------------
 
     const double rho = matmodel->get_rho(p);
@@ -343,7 +343,7 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Tangent_Residual(
 
     const Tensor2_3D F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
-    const Tensor2_3D invF = inverse( F );
+    const Tensor2_3D invF = Ten2::inverse( F );
 
     const Tensor2_3D DVelo( vx_x, vx_y, vx_z, vy_x, vy_y, vy_z, vz_x, vz_y, vz_z );
 
@@ -364,7 +364,7 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Tangent_Residual(
         qua_prestress[qua*6+5], qua_prestress[qua*6+1], qua_prestress[qua*6+3],
         qua_prestress[qua*6+4], qua_prestress[qua*6+3], qua_prestress[qua*6+2] );
 
-    P_iso += prestress * cofactor( F );
+    P_iso += prestress * Ten2::cofactor( F );
     // ------------------------------------------------------------------------
 
     const double rho = matmodel->get_rho(p);
@@ -635,7 +635,7 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Mass_Residual(
 
     const Tensor2_3D F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
-    const Tensor2_3D invF = inverse( F );
+    const Tensor2_3D invF = Ten2::inverse( F );
 
     const Tensor2_3D DVelo( vx_x, vx_y, vx_z, vy_x, vy_y, vy_z, vz_x, vz_y, vz_z );
 
@@ -651,7 +651,7 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Mass_Residual(
         qua_prestress[qua*6+5], qua_prestress[qua*6+1], qua_prestress[qua*6+3],
         qua_prestress[qua*6+4], qua_prestress[qua*6+3], qua_prestress[qua*6+2] );
 
-    P_iso += prestress * cofactor( F );
+    P_iso += prestress * Ten2::cofactor( F );
     // ------------------------------------------------------------------------
 
     double mbeta = matmodel->get_beta(p);

@@ -14,6 +14,8 @@
 #include <sys/stat.h>
 #include "petsc.h"
 
+#define PETSC_SILENCE_DEPRECATION_WARNINGS_3_19_0
+
   // ================================================================
   // The following are used for backward compatibility like PetscDefined(USE_DEBUG).
   // ================================================================
@@ -170,22 +172,10 @@ namespace SYS_T
 
   // 4. Print fatal error message and terminate the MPI process
   inline void print_fatal( const char output[], ... )
-  {
-    if( !get_MPI_rank() )
-    {
-      va_list Argp;
-      va_start(Argp, output);
-      (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
-      va_end(Argp);
-    }
-
-    MPI_Barrier(PETSC_COMM_WORLD);
-    MPI_Abort(PETSC_COMM_WORLD, 1);
-  }
-
-  inline void print_fatal_if( bool a, const char output[], ... )
-  {
-    if( a )
+  { 
+    int mpi_flag {-1};
+    MPI_Initialized(&mpi_flag);
+    if (mpi_flag)
     {
       if( !get_MPI_rank() )
       {
@@ -194,9 +184,46 @@ namespace SYS_T
         (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
         va_end(Argp);
       }
-
       MPI_Barrier(PETSC_COMM_WORLD);
       MPI_Abort(PETSC_COMM_WORLD, 1);
+    }
+    else
+    {
+      va_list Argp;
+      va_start(Argp, output);
+      vfprintf (stderr, output, Argp);
+      va_end(Argp);
+      exit( EXIT_FAILURE );
+    }
+  }
+
+  inline void print_fatal_if( bool a, const char output[], ... )
+  {
+    if( a )
+    {
+      int mpi_flag {-1};
+      MPI_Initialized(&mpi_flag);
+      if (mpi_flag)
+      {
+        if( !get_MPI_rank() )
+        {
+          va_list Argp;
+          va_start(Argp, output);
+          (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
+          va_end(Argp);
+        }
+        MPI_Barrier(PETSC_COMM_WORLD);
+        MPI_Abort(PETSC_COMM_WORLD, 1);
+      }
+      else
+      {
+        va_list Argp;
+        va_start(Argp, output);
+        vfprintf (stderr, output, Argp);
+        va_end(Argp);
+
+        exit( EXIT_FAILURE );
+      }      
     }
   }
 
@@ -231,31 +258,6 @@ namespace SYS_T
       }
 
       MPI_Barrier(PETSC_COMM_WORLD);
-    }
-  }
-
-  // 6. Print exit message printers are used in terminating serial 
-  //    program when the communicator for MPI is not available.
-  inline void print_exit( const char output[], ... )
-  {
-    va_list Argp;
-    va_start(Argp, output);
-    vfprintf (stderr, output, Argp);
-    va_end(Argp);
-
-    exit( EXIT_FAILURE );
-  }
-
-  inline void print_exit_if( bool a, const char output[], ... )
-  {
-    if( a )
-    {
-      va_list Argp;
-      va_start(Argp, output);
-      vfprintf (stderr, output, Argp);
-      va_end(Argp);
-
-      exit( EXIT_FAILURE );
     }
   }
 
