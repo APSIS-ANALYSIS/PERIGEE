@@ -82,7 +82,7 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
       VTK_T::read_vtu_grid( inffileList[ii], num_node[ii], num_cell[ii],
           pt_xyz[ii], tri_ien[ii] );
     }
-    else SYS_T::print_exit("Error: unknown element type.\n");
+    else SYS_T::print_fatal("Error: unknown element type.\n");
 
     global_node[ii] = VTK_T::read_int_PointData(inffileList[ii], "GlobalNodeID");
     global_cell[ii] = VTK_T::read_int_CellData(inffileList[ii], "GlobalElementID");
@@ -90,7 +90,7 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
     // Generate the dir-node list. Nodes belonging to the wall are excluded.
     for(unsigned int jj=0; jj<global_node[ii].size(); ++jj)
     {
-      SYS_T::print_exit_if( global_node[ii][jj]<0, "Error: negative nodal index! \n");
+      SYS_T::print_fatal_if( global_node[ii][jj]<0, "Error: negative nodal index! \n");
 
       if( !VEC_T::is_invec( wall_gnode, global_node[ii][jj]) )
       {
@@ -146,7 +146,7 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
     // mesh contains the inlet surface. This is a common error when
     // adopting sv files, where the user uses the combined exterior surface
     // as the wall mesh. We will throw an error message if detected.
-    SYS_T::print_exit_if( num_out_bc_pts[ii] == num_node[ii], "Error: the number of outline points is %d and the number of total points on the surface is %d. This is likely due to an improper wall mesh. \n", num_out_bc_pts[ii], num_node[ii] );
+    SYS_T::print_fatal_if( num_out_bc_pts[ii] == num_node[ii], "Error: the number of outline points is %d and the number of total points on the surface is %d. This is likely due to an improper wall mesh. \n", num_out_bc_pts[ii], num_node[ii] );
 
     inf_active_area[ii] = 0.0;
     face_area[ii] = 0.0;
@@ -230,7 +230,7 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
         } // end qua-loop
       } // end ee-loop
     }
-    else SYS_T::print_exit("Error: unknown element type.\n");
+    else SYS_T::print_fatal("Error: unknown element type.\n");
 
     delete [] temp_sol; temp_sol = nullptr;
   } // end ii-loop
@@ -239,7 +239,7 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
 
   VEC_T::sort_unique_resize(dir_nodes);
 
-  SYS_T::print_exit_if( num_dir_nodes != dir_nodes.size(), "Error: there are repeated nodes in the inflow file list.\n" );
+  SYS_T::print_fatal_if( num_dir_nodes != dir_nodes.size(), "Error: there are repeated nodes in the inflow file list.\n" );
 
   // Generate ID array
   Create_ID( nFunc );
@@ -312,7 +312,7 @@ void NodalBC_3D_inflow::resetTriIEN_outwardnormal( const IIEN * const &VIEN )
             pos2 = VEC_T::get_pos(node_t_gi, tet_n[1]);
             break;
           default:
-            SYS_T::print_exit("Error: resetTriIEN_outwardnormal : tet_face_id is out of range. \n");
+            SYS_T::print_fatal("Error: resetTriIEN_outwardnormal : tet_face_id is out of range. \n");
             break;
         }
         ASSERT(pos0 >=0 && pos0 <=2, "While elem_type == 501, NodalBC_3D_inflow::resetTriIEN_outwardnormal function error.\n");
@@ -392,7 +392,7 @@ void NodalBC_3D_inflow::resetTriIEN_outwardnormal( const IIEN * const &VIEN )
             pos5 = VEC_T::get_pos(node_t_gi, tet_n[4]);
             break;
           default:
-            SYS_T::print_exit("Error: resetTriIEN_outwardnormal : tet_face_id is out of range. \n");
+            SYS_T::print_fatal("Error: resetTriIEN_outwardnormal : tet_face_id is out of range. \n");
             break;
         }
         ASSERT(pos0 >=0 && pos0 <=5, "While elem_type == 502, NodalBC_3D_inflow::resetTriIEN_outwardnormal function error.\n"); 
@@ -412,7 +412,7 @@ void NodalBC_3D_inflow::resetTriIEN_outwardnormal( const IIEN * const &VIEN )
       delete tetcell;
     }
   }
-  else SYS_T::print_exit("Error: unknown element type.\n");
+  else SYS_T::print_fatal("Error: unknown element type.\n");
 }
 
 // EOF

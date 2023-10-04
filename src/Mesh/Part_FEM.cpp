@@ -20,9 +20,9 @@ Part_FEM::Part_FEM(
   cpu_size = in_cpu_size;
 
   // Check the cpu info
-  SYS_T::print_exit_if(cpu_size < 1, "Error: Part_FEM input cpu_size is wrong! \n");
-  SYS_T::print_exit_if(cpu_rank >= cpu_size, "Error: Part_FEM input cpu_rank is wrong! \n");
-  SYS_T::print_exit_if(cpu_rank < 0, "Error: Part_FEM input cpu_rank is wrong! \n");
+  SYS_T::print_fatal_if(cpu_size < 1, "Error: Part_FEM input cpu_size is wrong! \n");
+  SYS_T::print_fatal_if(cpu_rank >= cpu_size, "Error: Part_FEM input cpu_rank is wrong! \n");
+  SYS_T::print_fatal_if(cpu_rank < 0, "Error: Part_FEM input cpu_rank is wrong! \n");
 
   // Generate group 1, 2, and 5.
   Generate_Partition( mesh, gpart, mnindex, IEN );
