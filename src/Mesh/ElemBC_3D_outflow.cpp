@@ -177,7 +177,7 @@ ElemBC_3D_outflow::ElemBC_3D_outflow(
 
         elems -> buildBasis(quads, ectrl_x, ectrl_y, ectrl_z);
 
-        for(int qua=0; qua<(nqp_quad * nqp_quad); ++qua)
+        for(int qua=0; qua<nqp_quad * nqp_quad; ++qua)
         {
           elems -> get_R(qua, R);
 
