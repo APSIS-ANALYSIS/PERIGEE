@@ -152,7 +152,7 @@ int main( int argc, char * argv[] )
     mytimer->Start();
     
     IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
-        ctrlPts, proc_rank, cpu_size, 1, 1, elemType );
+        ctrlPts, proc_rank, cpu_size, dofNum, dofMat, elemType );
 
     part -> print_part_loadbalance_edgecut();
 
