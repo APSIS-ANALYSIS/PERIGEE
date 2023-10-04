@@ -223,8 +223,8 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
       double eptx[4]{}; double epty[4]{}; double eptz[4]{}; 
       int node_idx[4]{}; double R[4]{};
 
-      const int nqp_quad = 2;                       // num qua points
-      QuadPts_Gauss_Quad quad( nqp_quad );      // quadrature rule
+      const int nqp_quad = 2;                              // num qua points
+      QuadPts_Gauss_Quad quad( nqp_quad );                 // quadrature rule
       FEAElement_Quad4_3D_der0 ele( nqp_quad * nqp_quad ); // element
 
       for(int ee=0; ee<num_cell[ii]; ++ee)
@@ -260,8 +260,8 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
       double eptx[9]{}; double epty[9]{}; double eptz[9]{}; 
       int node_idx[9]{}; double R[9]{};
 
-      const int nqp_quad = 4;                       // num qua points
-      QuadPts_Gauss_Quad quad( nqp_quad );      // quadrature rule
+      const int nqp_quad = 4;                              // num qua points
+      QuadPts_Gauss_Quad quad( nqp_quad );                 // quadrature rule
       FEAElement_Quad9_3D_der0 ele( nqp_quad * nqp_quad ); // element
 
       for(int ee=0; ee<num_cell[ii]; ++ee)
