@@ -40,6 +40,8 @@ class ElemBC_3D_outflow : public ElemBC_3D
     { return intNA[ebc_id]; }
 
   private:
+    // Disallow the default constructor
+    ElemBC_3D_outflow() = delete;
 
     // It stores the surface integral of each nodal basis function on the 
     // outlet surfaces.

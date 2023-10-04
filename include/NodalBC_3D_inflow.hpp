@@ -139,6 +139,9 @@ class NodalBC_3D_inflow : public INodalBC
     virtual void resetSurIEN_outwardnormal( const IIEN * const &VIEN );
 
   private:
+    // Disallow default constructor
+    NodalBC_3D_inflow() = delete;
+    
     // The dirichlet nodes on each inlet surface
     // length num_nbc x num_dir_nodes_on_inlet[ii]
     std::vector< std::vector<unsigned int> > dir_nodes_on_inlet;
