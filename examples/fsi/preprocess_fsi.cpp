@@ -448,7 +448,7 @@ int main( int argc, char * argv[] )
   if( fsiBC_type == 0 || fsiBC_type == 1 )
     ebc = new ElemBC_3D_tet_outflow( sur_f_file_out, outlet_outvec, elemType );
   else if( fsiBC_type == 2 )
-    ebc = new ElemBC_3D_tet( sur_f_file_wall, elemType);
+    ebc = new ElemBC_3D_tet( sur_f_file_wall, elemType );
   else SYS_T::print_fatal("ERROR: uncognized fsiBC type. \n");
 
   ebc -> resetTriIEN_outwardnormal( IEN_v ); // assign outward orientation for triangles
