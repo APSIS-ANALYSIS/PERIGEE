@@ -1724,6 +1724,8 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile)
 
   // Check the phy_index is within the rage
   // Make sure the physical domain index is in the range [1, num_phy_domain].
+  // Note: here our phy_index ranges in [ 0, num_phy_domain-1], as we have made
+  // a correction in above to make it start from zero.
   std::vector<int> temp_phy_idx( phy_index );
   VEC_T::sort_unique_resize(temp_phy_idx);
   for(int ii=0; ii<num_phy_domain; ++ii)
