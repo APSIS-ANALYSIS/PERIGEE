@@ -1351,6 +1351,11 @@ void Gmsh_FileIO::update_quadratic_hex_IEN( const int &index_3d )
       eIEN[domain_index][27 * ee + 23] = temp24;
       eIEN[domain_index][27 * ee + 24] = temp20;
     }
+    else
+    {
+      // for the case of nlocbas = 20, we do not need to extra work for the 7
+      // nodes that are associated with the tri-quadratic element.
+    }
   }
 }
 
