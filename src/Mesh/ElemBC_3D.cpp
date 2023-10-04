@@ -45,7 +45,7 @@ ElemBC_3D::ElemBC_3D( const std::vector<std::string> &vtkfileList,
     else if(elemtype == 602) 
       cell_nLocBas[ii] = 9; // biquadratic quadrangle
     else
-      SYS_T::print_exit("Error: ElemBC_3D constructor: unknown element type. \n");
+      SYS_T::print_fatal("Error: ElemBC_3D constructor: unknown element type. \n");
     
     global_node[ii] = VTK_T::read_int_PointData( vtkfileList[ii], "GlobalNodeID");
     global_cell[ii] = VTK_T::read_int_CellData( vtkfileList[ii], "GlobalElementID");
@@ -89,7 +89,7 @@ void ElemBC_3D::resetSurIEN_outwardnormal( const IIEN * const &VIEN )
     reset601IEN_outwardnormal(VIEN);     
   else if(elem_type == 602)
     reset602IEN_outwardnormal(VIEN);     
-  else SYS_T::print_exit("Error: ElemBC_3D::resetSurIEN_outwardnormal function: unknown element type.\n");
+  else SYS_T::print_fatal("Error: ElemBC_3D::resetSurIEN_outwardnormal function: unknown element type.\n");
 }
 
 void ElemBC_3D::reset501IEN_outwardnormal( const IIEN * const &VIEN )
@@ -144,7 +144,7 @@ void ElemBC_3D::reset501IEN_outwardnormal( const IIEN * const &VIEN )
           pos2 = VEC_T::get_pos(node_t_gi, tet_n[1]);
           break;
         default:
-          SYS_T::print_exit("Error: ElemBC_3D::reset501IEN_outwardnormal function: tet_face_id is out of range. \n");
+          SYS_T::print_fatal("Error: ElemBC_3D::reset501IEN_outwardnormal function: tet_face_id is out of range. \n");
           break;
       }
       ASSERT(pos0 >=0 && pos0 <=2, "Error: ElemBC_3D::reset501IEN_outwardnormal function logical error.\n" );
@@ -225,7 +225,7 @@ void ElemBC_3D::reset502IEN_outwardnormal( const IIEN * const &VIEN )
           pos5 = VEC_T::get_pos(node_t_gi, tet_n[4]);
           break;
         default:
-          SYS_T::print_exit("Error: ElemBC_3D::reset502IEN_outwardnormal function: tet_face_id is out of range. \n");
+          SYS_T::print_fatal("Error: ElemBC_3D::reset502IEN_outwardnormal function: tet_face_id is out of range. \n");
           break;
       }
       ASSERT(pos0 >=0 && pos0 <=5, "Error: ElemBC_3D::reset502IEN_outwardnormal function logical error.\n" ); 
@@ -318,7 +318,7 @@ void ElemBC_3D::reset601IEN_outwardnormal( const IIEN * const &VIEN )
           pos3 = VEC_T::get_pos(node_q_gi, hex_n[3]); 
           break;          
         default:
-          SYS_T::print_exit("Error: ElemBC_3D::reset601IEN_outwardnormal function: hex_face_id is out of range. \n");
+          SYS_T::print_fatal("Error: ElemBC_3D::reset601IEN_outwardnormal function: hex_face_id is out of range. \n");
           break;
       }
       ASSERT(pos0 >=0 && pos0 <=3, "Error: ElemBC_3D::reset601IEN_outwardnormal function logical error.\n" );
@@ -437,7 +437,7 @@ void ElemBC_3D::reset602IEN_outwardnormal( const IIEN * const &VIEN )
           pos8 = VEC_T::get_pos(node_q_gi, hex_n[20]); 
           break;         
         default:
-          SYS_T::print_exit("Error: ElemBC_3D::reset602IEN_outwardnormal function: hex_face_id is out of range. \n");
+          SYS_T::print_fatal("Error: ElemBC_3D::reset602IEN_outwardnormal function: hex_face_id is out of range. \n");
           break;
       }
       ASSERT(pos0 >=0 && pos0 <=8, "Error: ElemBC_3D::reset602IEN_outwardnormal function logical error.\n" );

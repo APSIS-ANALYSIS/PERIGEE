@@ -34,7 +34,6 @@
 // ==================================================================
 #include "Sys_Tools.hpp"
 #include "Vec_Tools.hpp"
-#include "Vector_3.hpp"
 #include "Tensor2_3D.hpp"
 #include "hdf5.h"
 
@@ -184,7 +183,7 @@ class HDF5_Reader
         std::ostringstream ss;
         ss<<"Error: HDF5_Reader::"<<funname
           <<" : status ="<<status<<" !"<<std::endl;
-        SYS_T::print_exit( ss.str().c_str() );
+        SYS_T::print_fatal( ss.str().c_str() );
       }
     }
 };

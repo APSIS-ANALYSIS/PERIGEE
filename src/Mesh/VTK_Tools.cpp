@@ -206,7 +206,7 @@ int VTK_T::read_grid( const std::string &filename,
 
   if(dynamic_cast<vtkPolyData*>(reader->GetOutput()))
   {
-    SYS_T::print_exit_if(fend.compare(".vtp") !=0, "Error: VTK::read_grid, the filename %s does not end with vtp. \n", filename.c_str());
+    SYS_T::print_fatal_if(fend.compare(".vtp") !=0, "Error: VTK::read_grid, the filename %s does not end with vtp. \n", filename.c_str());
     
     file_type = 1; 
 
@@ -214,14 +214,14 @@ int VTK_T::read_grid( const std::string &filename,
   }
   else if(dynamic_cast<vtkUnstructuredGrid*>(reader->GetOutput()))
   {
-    SYS_T::print_exit_if(fend.compare(".vtu") !=0, "Error: VTK::read_grid, the filename %s does not end with vtu. \n", filename.c_str());
+    SYS_T::print_fatal_if(fend.compare(".vtu") !=0, "Error: VTK::read_grid, the filename %s does not end with vtu. \n", filename.c_str());
     
     file_type = 2;
 
     read_vtu_grid(filename, numpts, numcels, pt, ien_array);
   }
   else
-    SYS_T::print_exit("VTK_T::read_grid unknown vtk object type.\n");
+    SYS_T::print_fatal("VTK_T::read_grid unknown vtk object type.\n");
 
   reader -> Delete();
 
@@ -396,7 +396,7 @@ int VTK_T::read_num_pt( const std::string &filename )
     numpts = static_cast<int>( vtkgrid -> GetNumberOfPoints() );
   }
   else
-    SYS_T::print_exit("VTK_T::read_num_pt unknown vtk object type.\n");
+    SYS_T::print_fatal("VTK_T::read_num_pt unknown vtk object type.\n");
 
   reader -> Delete();
 
@@ -423,7 +423,7 @@ int VTK_T::read_num_cl( const std::string &filename )
     numcels = static_cast<int>( vtkgrid -> GetNumberOfCells() );
   }
   else
-    SYS_T::print_exit("VTK_T::read_num_cl unknown vtk object type.\n");
+    SYS_T::print_fatal("VTK_T::read_num_cl unknown vtk object type.\n");
 
   reader -> Delete();
 

@@ -36,12 +36,9 @@
 // Author: Ju Liu
 // Date: Oct. 23 2013
 // ==================================================================
-#include <iostream>
 #include <string>
-#include <vector>
 #include <cstdlib>
 #include <climits>
-#include "Vector_3.hpp"
 #include "Tensor2_3D.hpp"
 #include "hdf5.h"
 
