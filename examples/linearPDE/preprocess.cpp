@@ -118,6 +118,7 @@ int main( int argc, char * argv[] )
   mnindex->write_hdf5("node_mapping");
 
   // Setup Nodal (Dirichlet type) boundary condition(s)
+  // We need assign nbc for each dof, meaning the length of NBC_list == dofNum
   std::vector<std::string> dir_list { "top_vol.vtp", "bot_vol.vtp", "lef_vol.vtp", "rig_vol.vtp", "fro_vol.vtp", "bac_vol.vtp" };
 
   INodalBC * nbc = new NodalBC( dir_list, nFunc );
@@ -127,7 +128,8 @@ int main( int argc, char * argv[] )
   // Setup Elemental (Neumann type) boundary condition(s)
   std::vector<std::string> neu_list {};
   ElemBC * ebc = new ElemBC_3D_tet( neu_list, elemType );
-  
+ 
+  // READ AND SEE IF WE NEED TO USE THE NEW RESET FUNCTION 
   ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
   
   // Start partition the mesh for each cpu_rank
