@@ -208,7 +208,7 @@ class NodalBC_3D_inflow : public INodalBC
         const std::string &wallfile,
         const int &nFunc,
         const std::vector<Vector_3> &in_outnormal,
-        const int &elemtype = 501 );
+        const int &elemtype );
 
     // Reset function for the IEN array of different element types.
     void reset501IEN_outwardnormal( const IIEN * const &VIEN );
