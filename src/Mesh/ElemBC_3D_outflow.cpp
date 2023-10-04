@@ -26,33 +26,29 @@ ElemBC_3D_outflow::ElemBC_3D_outflow(
     IQuadPts * quads = new QuadPts_Gauss_Triangle( nqp_tri );
     FEAElement * elems = new FEAElement_Triangle3_3D_der0( nqp_tri );
 
-    double ectrl_x[3]{}; double ectrl_y[3]{}; double ectrl_z[3]{};
-    int node_idx[3]{}; double R[3]{};
-
     for( int fid=0; fid<num_ebc; ++fid )
     {
       for( int ee=0; ee<num_cell[fid]; ++ee )
       {
-        node_idx[0] = get_ien(fid, ee, 0);
-        node_idx[1] = get_ien(fid, ee, 1);
-        node_idx[2] = get_ien(fid, ee, 2);
+        const int node_idx[3] { get_ien(fid, ee, 0), get_ien(fid, ee, 1), get_ien(fid, ee, 2) };
 
-        ectrl_x[0] = get_pt_xyz(fid, node_idx[0], 0);
-        ectrl_x[1] = get_pt_xyz(fid, node_idx[1], 0);
-        ectrl_x[2] = get_pt_xyz(fid, node_idx[2], 0);
+        const double ectrl_x[3] { get_pt_xyz(fid, node_idx[0], 0),
+          get_pt_xyz(fid, node_idx[1], 0),
+          get_pt_xyz(fid, node_idx[2], 0) };
 
-        ectrl_y[0] = get_pt_xyz(fid, node_idx[0], 1);
-        ectrl_y[1] = get_pt_xyz(fid, node_idx[1], 1);
-        ectrl_y[2] = get_pt_xyz(fid, node_idx[2], 1);
+        const double ectrl_y[3] { get_pt_xyz(fid, node_idx[0], 1),
+          get_pt_xyz(fid, node_idx[1], 1),
+          get_pt_xyz(fid, node_idx[2], 1) };
 
-        ectrl_z[0] = get_pt_xyz(fid, node_idx[0], 2);
-        ectrl_z[1] = get_pt_xyz(fid, node_idx[1], 2);
-        ectrl_z[2] = get_pt_xyz(fid, node_idx[2], 2);
+        const double ectrl_z[3] { get_pt_xyz(fid, node_idx[0], 2),
+          get_pt_xyz(fid, node_idx[1], 2),
+          get_pt_xyz(fid, node_idx[2], 2) };
 
         elems -> buildBasis(quads, ectrl_x, ectrl_y, ectrl_z);
 
         for(int qua=0; qua<nqp_tri; ++qua)
         {
+          double R[3] {};
           elems -> get_R(qua, R);
 
           const double gwts = elems -> get_detJac( qua ) * quads -> get_qw( qua );
