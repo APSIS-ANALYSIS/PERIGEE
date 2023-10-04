@@ -26,22 +26,13 @@ class NodalBC_3D_inflow : public INodalBC
 {
   public:
     // ------------------------------------------------------------------------
-    // Generate the inflow bc given by the inffile.
-    // ------------------------------------------------------------------------
-    NodalBC_3D_inflow( const std::string &inffile,
-        const std::string &wallfile,
-        const int &nFunc,
-        const Vector_3 &in_outnormal,
-        const int &elemtype = 501 );
-
-    // ------------------------------------------------------------------------
     // Generate the inflow bc given by a list of inffiles.
     // ------------------------------------------------------------------------
     NodalBC_3D_inflow( const std::vector<std::string> &inffileList,
         const std::string &wallfile,
         const int &nFunc,
         const std::vector<Vector_3> &in_outnormal,
-        const int &elemtype = 501 );
+        const int &elemtype );
 
     virtual ~NodalBC_3D_inflow() {};
 

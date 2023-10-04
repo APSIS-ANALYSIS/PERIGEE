@@ -1,16 +1,5 @@
 #include "NodalBC_3D_inflow.hpp"
 
-NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
-    const std::string &wallfile, const int &nFunc,
-    const Vector_3 &in_outnormal,
-    const int &elemtype ) : num_nbc( 1 ), elem_type( elemtype )
-{
-  const std::vector<std::string> inffileList { inffile };
-  const std::vector<Vector_3> outnormalList { in_outnormal };
-
-  init( inffileList, wallfile, nFunc, outnormalList, elemtype );
-}
-
 NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileList,
     const std::string &wallfile,
     const int &nFunc,
