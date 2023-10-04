@@ -124,12 +124,12 @@ int main( int argc, char * argv[] )
   mnindex->write_hdf5("node_mapping");
 
   // Setup Nodal (Dirichlet type) boundary condition(s)
-  // We need assign nbc for each dof, meaning the length of NBC_list == dofNum
+  std::vector<INodalBC *> NBC_list( dofNum, nullptr );
   std::vector<std::string> dir_list { "top_vol.vtp", "bot_vol.vtp", "lef_vol.vtp", "rig_vol.vtp", "fro_vol.vtp", "bac_vol.vtp" };
-
-  INodalBC * nbc = new NodalBC( dir_list, nFunc );
   
-  std::vector<INodalBC *> NBC_list { nbc };
+  NBC_list[0] = new NodalBC( dir_list, nFunc );
+  NBC_list[1] = new NodalBC( dir_list, nFunc );
+  NBC_list[2] = new NodalBC( dir_list, nFunc );
 
   // Setup Elemental (Neumann type) boundary condition(s)
   std::vector<std::string> neu_list {};
