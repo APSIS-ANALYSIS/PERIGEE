@@ -96,10 +96,10 @@ int main( int argc, char * argv[] )
       mesh = new Mesh_Tet(nFunc, nElem, 2);
       break;
     case 601:
-      mesh = new Mesh_FEM(nFunc, nElem, 1);
+      mesh = new Mesh_FEM(nFunc, nElem, 8, 1);
       break;
     case 602:
-      mesh = new Mesh_FEM(nFunc, nElem, 2);
+      mesh = new Mesh_FEM(nFunc, nElem, 27, 2);
       break;
     default:
       SYS_T::print_fatal("Error: elemType %d is not supported.\n", elemType);
