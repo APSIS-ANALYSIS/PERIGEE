@@ -250,7 +250,7 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
 
         ele.buildBasis(&quad, eptx, epty, eptz);
 
-        for(int qua=0; qua<(nqp_quad * nqp_quad); ++qua)
+        for(int qua=0; qua<nqp_quad * nqp_quad; ++qua)
         {
           ele.get_R( qua, R );
 
@@ -287,7 +287,7 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
 
         ele.buildBasis(&quad, eptx, epty, eptz);
 
-        for(int qua=0; qua<(nqp_quad * nqp_quad); ++qua)
+        for(int qua=0; qua<nqp_quad * nqp_quad; ++qua)
         {
           ele.get_R( qua, R );
 
