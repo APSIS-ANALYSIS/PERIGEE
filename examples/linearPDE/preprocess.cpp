@@ -48,7 +48,7 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionInt(   "-elem_type",         elemType);
   SYS_T::GetOptionString("-geo_file",          geo_file);
   
-  if( elemType != 501 && elemType !=502 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
+  if( elemType != 501 && elemType != 502 && elemType != 601 && elemType != 602 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
   
   // Print the command line arguments
   std::cout << "==== Command Line Arguments ====" << std::endl;
@@ -87,7 +87,6 @@ int main( int argc, char * argv[] )
 
   IMesh * mesh = nullptr;
 
-  // ADD 601 602
   switch( elemType )
   {
     case 501:
@@ -95,6 +94,12 @@ int main( int argc, char * argv[] )
       break;
     case 502:
       mesh = new Mesh_Tet(nFunc, nElem, 2);
+      break;
+    case 601:
+      mesh = new Mesh_FEM(nFunc, nElem, 1);
+      break;
+    case 602:
+      mesh = new Mesh_FEM(nFunc, nElem, 2);
       break;
     default:
       SYS_T::print_fatal("Error: elemType %d is not supported.\n", elemType);
