@@ -1,7 +1,7 @@
-#ifndef QUADPTS_GAUSS_HPP
-#define QUADPTS_GAUSS_HPP
+#ifndef QUADPTS_GAUSS_1D_HPP
+#define QUADPTS_GAUSS_1D_HPP
 // ============================================================================
-// QuadPts_Gauss.hpp
+// QuadPts_Gauss_1D.hpp
 // This is the class that gives Gauss quadrature rule for the integration on a 
 // domain [min, max] with any number of points.
 //
@@ -12,13 +12,13 @@
 #include "Math_Tools.hpp"
 #include "IQuadPts.hpp"
 
-class QuadPts_Gauss : public IQuadPts
+class QuadPts_Gauss_1D : public IQuadPts
 {
   public:
     // Construct in_num_pts-point rule for [min, max] domain
-    QuadPts_Gauss( const int &in_num_pts, const double &min = 0.0, const double &max = 1.0 );
+    QuadPts_Gauss_1D( const int &in_num_pts, const double &min = 0.0, const double &max = 1.0 );
     
-    virtual ~QuadPts_Gauss();
+    virtual ~QuadPts_Gauss_1D();
 
     virtual void print_info() const;
 

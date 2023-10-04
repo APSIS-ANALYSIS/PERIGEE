@@ -17,10 +17,10 @@ namespace MATH_T
   // Useful Constants:
   // --------------------------------------------------------------------------
   // PI = 3.1415926......
-  constexpr double PI = 3.14159265358979323846264338327950288419716939937510582;
+  constexpr long double PI = 3.14159265358979323846264338327950288419716939937510582;
 
   // E = 2.71828......
-  constexpr double E  = 2.71828182845904523536028747135266249775724709369995957;
+  constexpr long double E  = 2.71828182845904523536028747135266249775724709369995957;
 
   // Compute the binomial coefficient, e.g.
   // n = 0 : 1                  n = 1 : 1 1
@@ -306,16 +306,10 @@ namespace MATH_T
 
           if(pivot_flag)
           {
-            const int int_temp = pp[kk];
-            pp[kk] = pp[max_index];
-            pp[max_index] = int_temp;
+            std::swap( pp[kk] , pp[max_index] );
 
             for(int ii=0; ii<N; ++ii)
-            {
-              const double temp = mat[kk*N+ii];
-              mat[kk*N+ii] = mat[max_index*N+ii];
-              mat[max_index*N+ii] = temp;
-            }
+              std::swap( mat[kk*N+ii] , mat[max_index*N+ii] );
           }
 
           const double invAkk = 1.0 / mat[kk*N+kk];
