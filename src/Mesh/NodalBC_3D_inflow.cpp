@@ -146,15 +146,15 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
 
     if( elemtype == 501 )
     {
-      double eptx[3]{}; double epty[3]{}; double eptz[3]{};
-      int node_idx[3]{}; double R[3]{};
-
       const int nqp_tri = 3;                       // num qua points
       QuadPts_Gauss_Triangle quad( nqp_tri );      // quadrature rule
       FEAElement_Triangle3_3D_der0 ele( nqp_tri ); // element
 
       for(int ee=0; ee<num_cell[ii]; ++ee)
       {
+        double eptx[3]{}; double epty[3]{}; double eptz[3]{};
+        int node_idx[3]{}; 
+
         for(int jj=0; jj<3; ++jj)
         {
           node_idx[jj] = sur_ien[ii][3*ee+jj];
@@ -167,6 +167,7 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
 
         for(int qua=0; qua<nqp_tri; ++qua)
         {
+          double R[3]{};
           ele.get_R( qua, R );
 
           const double gwts = ele.get_detJac(qua) * quad.get_qw(qua);
@@ -183,15 +184,15 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
     }
     else if( elemtype == 502 )
     {
-      double eptx[6]{}; double epty[6]{}; double eptz[6]{}; 
-      int node_idx[6]{}; double R[6]{};
-
       const int nqp_tri = 6;                       // num qua points
       QuadPts_Gauss_Triangle quad( nqp_tri );      // quadrature rule
       FEAElement_Triangle6_3D_der0 ele( nqp_tri ); // element
 
       for(int ee=0; ee<num_cell[ii]; ++ee)
       {
+        double eptx[6]{}; double epty[6]{}; double eptz[6]{}; 
+        int node_idx[6]{};
+
         for(int jj=0; jj<6; ++jj)
         {
           node_idx[jj] = sur_ien[ii][6*ee+jj];
@@ -204,6 +205,7 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
 
         for(int qua=0; qua<nqp_tri; ++qua)
         {
+          double R[6]{};
           ele.get_R( qua, R );
 
           const double gwts = ele.get_detJac(qua) * quad.get_qw(qua);
@@ -220,15 +222,15 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
     }
     else if( elemtype == 601 )
     {
-      double eptx[4]{}; double epty[4]{}; double eptz[4]{}; 
-      int node_idx[4]{}; double R[4]{};
-
       const int nqp_quad = 2;                              // num qua points
       QuadPts_Gauss_Quad quad( nqp_quad );                 // quadrature rule
       FEAElement_Quad4_3D_der0 ele( nqp_quad * nqp_quad ); // element
 
       for(int ee=0; ee<num_cell[ii]; ++ee)
       {
+        double eptx[4]{}; double epty[4]{}; double eptz[4]{}; 
+        int node_idx[4]{};
+
         for(int jj=0; jj<4; ++jj)
         {
           node_idx[jj] = sur_ien[ii][4*ee+jj];
@@ -241,6 +243,7 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
 
         for(int qua=0; qua<nqp_quad * nqp_quad; ++qua)
         {
+          double R[4]{};
           ele.get_R( qua, R );
 
           const double gwts = ele.get_detJac(qua) * quad.get_qw(qua);
@@ -257,15 +260,15 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
     }
     else if( elemtype == 602 )
     {
-      double eptx[9]{}; double epty[9]{}; double eptz[9]{}; 
-      int node_idx[9]{}; double R[9]{};
-
       const int nqp_quad = 4;                              // num qua points
       QuadPts_Gauss_Quad quad( nqp_quad );                 // quadrature rule
       FEAElement_Quad9_3D_der0 ele( nqp_quad * nqp_quad ); // element
 
       for(int ee=0; ee<num_cell[ii]; ++ee)
       {
+        double eptx[9]{}; double epty[9]{}; double eptz[9]{}; 
+        int node_idx[9]{};
+
         for(int jj=0; jj<9; ++jj)
         {
           node_idx[jj] = sur_ien[ii][9*ee+jj];
@@ -278,6 +281,7 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
 
         for(int qua=0; qua<nqp_quad * nqp_quad; ++qua)
         {
+          double R[9]{};
           ele.get_R( qua, R );
 
           const double gwts = ele.get_detJac(qua) * quad.get_qw(qua);
