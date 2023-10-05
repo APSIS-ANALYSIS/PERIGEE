@@ -13,6 +13,7 @@
 #include "Part_FEM.hpp"
 #include "NBC_Partition.hpp"
 #include "EBC_Partition.hpp"
+#include "yaml-cpp/yaml.h"
 
 int main( int argc, char * argv[] )
 {
@@ -38,10 +39,26 @@ int main( int argc, char * argv[] )
   constexpr int dofNum = 3;
   constexpr int dofMat = 3;
 
+  bool is_loadYaml = false;
+  std::string yaml_file("preprocess.yml")
+
   SYS_T::GetOptionBool(  "-is_loadYaml",       is_loadYaml);
   SYS_T::GetOptionString("-yaml_file",         yaml_file);
   
-  if (is_loadYaml) SYS_T::InsertFileYAML( yaml_file,  false );
+  if (is_loadYaml)
+  {
+    if( !SYS_T::file_exist( yaml_file ) )
+    {
+      std::cerr<<"Error: the file "<<yaml_file<<" does not exist. Job killed.\n";
+      return EXIT_FAILURE;
+    }
+
+    YAML::Node paras = YAML::LoadFile( yaml_file );
+    cpu_size   = paras["cpu_size"].as<int>();
+    in_ncommon = paras["in_ncommon"].as<int>();
+    elem_type  = paras["elem_type"].as<int>();
+    geo_file   = paras["geo_file"].as<std::string>();
+  }
 
   // Get the command line arguments
   SYS_T::GetOptionInt(   "-cpu_size",          cpu_size);
