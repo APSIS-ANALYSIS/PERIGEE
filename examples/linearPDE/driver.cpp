@@ -203,6 +203,10 @@ int main(int argc, char *argv[])
   {
     elementv = new FEAElement_Hex8( nqp_vol ); // elem type 601
     elements = new FEAElement_Quad4_3D_der0( nqp_sur );
+    int nqp_vol_1D = std::round( std::cbrt( nqp_vol ) );
+    int nqp_sur_1D = std::round( std::sqrt( nqp_sur ) );
+    quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
+    quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
   }
   else if( GMIptr->get_elemType() == 602 )
   {
@@ -211,6 +215,10 @@ int main(int argc, char *argv[])
 
     elementv = new FEAElement_Hex27( nqp_vol ); // elem type 602
     elements = new FEAElement_Quad9_3D_der0( nqp_sur );
+    int nqp_vol_1D = std::round( std::cbrt( nqp_vol ) );
+    int nqp_sur_1D = std::round( std::sqrt( nqp_sur ) );
+    quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
+    quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
   }
   else SYS_T::print_fatal("Error: Element type not supported.\n");
 
