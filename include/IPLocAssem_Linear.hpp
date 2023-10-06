@@ -245,6 +245,24 @@ class IPLocAssem_Linear
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Load_EBC is not implemented.\n");}
+
+    // ------------------------------------------------------------------------
+    // Perform a part of Robin BC surface integration for elemental BC id ebc_id.
+    // Based on ebc_id, the traction forcing function will be called accordingly
+    // inside the local assembly routine.
+    // \para element: the container for the element, only requires the geometry
+    //                information for the control points, and the quadrature
+    //                info to generate basis function info.
+    // ------------------------------------------------------------------------
+    virtual void Assem_Mass_EBC(
+        const int &ebc_id,
+        const double &time, const double &dt,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: this Assem_Mass_EBC is not implemented.\n");}
 };
 
 #endif

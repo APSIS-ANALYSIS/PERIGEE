@@ -111,6 +111,15 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem_Linear
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
+    
+    virtual void Assem_Mass_EBC(
+        const int &ebc_id,
+        const double &time, const double &dt,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad );
 
   private:
     // Private data
