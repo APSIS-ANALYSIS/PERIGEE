@@ -39,9 +39,10 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem_Linear
       for(int ii=0; ii<vec_size; ++ii) Load[ii] = 0.0;
     }
 
-    virtual void Zero_sur_Load()
+    virtual void Zero_sur_Mass_Load()
     {
       for(int ii=0; ii<sur_size; ++ii) sur_Load[ii] = 0.0;
+      for(int ii=0; ii<sur_size*sur_size; ++ii) sur_Mass[ii] = 0.0;
     }
 
     virtual void Assem_Estimate()

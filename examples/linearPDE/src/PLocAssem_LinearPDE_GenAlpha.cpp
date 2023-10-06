@@ -36,14 +36,16 @@ PLocAssem_LinearPDE_GenAlpha::PLocAssem_LinearPDE_GenAlpha(
   vec_size = nLocBas * dof_mat;
   sur_size = snLocBas * dof_mat;
 
-  Tangent = new PetscScalar[vec_size * vec_size];
-  Residual = new PetscScalar[vec_size];
+  Mass = new PetscScalar[vec_size * vec_size];
+  Stiffness = new PetscScalar[vec_size * vec_size];
+  Load = new PetscScalar[vec_size];
 
-  sur_Residual = new PetscScalar[sur_size];
+  sur_Mass = new PetscScalar[sur_size * sur_size];
+  sur_Load = new PetscScalar[sur_size];
 
-  Zero_Tangent_Residual();
+  Zero_Mass_Stiffness_Load();
 
-  Zero_sur_Residual();
+  Zero_sur_Mass_Load();
 
   if( num_ebc_fun == 0 ) flist = nullptr;
   else flist = new locassem_transport_funs [num_ebc_fun];
@@ -78,7 +80,7 @@ void PLocAssem_LinearPDE_GenAlpha::print_info() const
   SYS_T::print_sep_line();
 }
 
-void PLocAssem_LinearPDE_GenAlpha::Assem_Residual(
+void PLocAssem_LinearPDE_GenAlpha::Assem_Load(
     const double &time, const double &dt,
     const double * const &dot_sol,
     const double * const &sol,
@@ -131,7 +133,7 @@ void PLocAssem_LinearPDE_GenAlpha::Assem_Residual(
 }
 
 
-void PLocAssem_LinearPDE_GenAlpha::Assem_Tangent_Residual(
+void PLocAssem_LinearPDE_GenAlpha::Assem_Stiffness(
     const double &time, const double &dt,
     const double * const &dot_sol,
     const double * const &sol,
@@ -194,7 +196,7 @@ void PLocAssem_LinearPDE_GenAlpha::Assem_Tangent_Residual(
 }
 
 
-void PLocAssem_LinearPDE_GenAlpha::Assem_Mass_Residual(
+void PLocAssem_LinearPDE_GenAlpha::Assem_Mass(
     const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
@@ -246,7 +248,7 @@ void PLocAssem_LinearPDE_GenAlpha::Assem_Mass_Residual(
   } // End-of-quadrature-loop
 }
 
-void PLocAssem_LinearPDE_GenAlpha::Assem_Residual_EBC(
+void PLocAssem_LinearPDE_GenAlpha::Assem_Load_EBC(
         const int &ebc_id,
         const double &time, const double &dt,
         FEAElement * const &element,
