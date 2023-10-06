@@ -70,15 +70,18 @@ PLocAssem_LinearPDE_GenAlpha::~PLocAssem_LinearPDE_GenAlpha()
 void PLocAssem_LinearPDE_GenAlpha::print_info() const
 {
   SYS_T::print_sep_line();
-  SYS_T::commPrint("  Three-dimensional transport equation: \n");
+  SYS_T::commPrint("  Three-dimensional linear problem: \n");
   if(nLocBas == 4)
     SYS_T::commPrint("  FEM: 4-node Tetrahedral element \n");
   else if(nLocBas == 10)
     SYS_T::commPrint("  FEM: 10-node Tetrahedral element \n");
+  else if(nLocBas == 8)
+    SYS_T::commPrint("  FEM: 8-node Hexagonal element \n");
+  else if(nLocBas == 27)
+    SYS_T::commPrint("  FEM: 27-node Hexagonal element \n");
   else SYS_T::print_fatal("Error: unknown elem type.\n");
   SYS_T::commPrint("  Spatial: finite element \n");
   SYS_T::commPrint("  Temporal: Generalized-alpha Method \n");
-  SYS_T::commPrint("  Consistent tangent matrix used. \n");
   SYS_T::print_sep_line();
 }
 
