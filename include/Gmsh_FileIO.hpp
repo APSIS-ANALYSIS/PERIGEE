@@ -1,3 +1,4 @@
+#define _OMP
 #ifndef GMSH_FILEIO_HPP
 #define GMSH_FILEIO_HPP
 // ==================================================================

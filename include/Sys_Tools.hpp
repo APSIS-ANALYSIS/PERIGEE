@@ -488,7 +488,7 @@ namespace SYS_T
 
       void Reset() { startedAt = 0; stoppedAt = 0; }
 
-#ifdef _OPENMP
+#ifdef _OMP
       void Start() { startedAt = omp_get_wtime(); }
       void Stop()  { stoppedAt = omp_get_wtime(); }
       double get_sec() const
@@ -505,7 +505,7 @@ namespace SYS_T
 #endif
 
     private:
-#ifdef _OPENMP
+#ifdef _OMP
       double startedAt, stoppedAt;
 #else
       clock_t startedAt, stoppedAt;
