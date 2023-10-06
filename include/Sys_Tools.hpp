@@ -15,6 +15,8 @@
 #include "petsc.h"
 #include "/opt/homebrew/Cellar/libomp/16.0.6/include/omp.h"
 
+#define PETSC_SILENCE_DEPRECATION_WARNINGS_3_19_0
+
   // ================================================================
   // The following are used for backward compatibility like PetscDefined(USE_DEBUG).
   // ================================================================
@@ -38,6 +40,13 @@
 
 namespace SYS_T
 {
+  // Return the OS environmental variable
+  inline std::string get_Env_Var( const std::string &key )
+  {
+    const char * val = std::getenv( key.c_str() );
+    return val == nullptr ? std::string("") : std::string(val);
+  }
+
   // Return the rank of the CPU
   inline PetscMPIInt get_MPI_rank()
   {
@@ -147,14 +156,26 @@ namespace SYS_T
   }
 
   // 2. print from processor 0, other preprocessors are ignored.
-  //    PetscPrintf() with PETSC_COMM_WORLD is used.
   inline void commPrint(const char output[], ...)
   {
-    if( !get_MPI_rank() )
+    int mpi_flag {-1};
+    MPI_Initialized(&mpi_flag);
+    if( mpi_flag )
+    {
+      if( !get_MPI_rank() )
+      {
+        va_list Argp;
+        va_start(Argp, output);
+        (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
+        va_end(Argp);
+      }
+      MPI_Barrier(PETSC_COMM_WORLD);
+    }
+    else
     {
       va_list Argp;
       va_start(Argp, output);
-      (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
+      vfprintf (stderr, output, Argp);
       va_end(Argp);
     }
   }
@@ -171,24 +192,10 @@ namespace SYS_T
 
   // 4. Print fatal error message and terminate the MPI process
   inline void print_fatal( const char output[], ... )
-  {
-    if( !get_MPI_rank() )
-    {
-      va_list Argp;
-      va_start(Argp, output);
-      (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
-      va_end(Argp);
-    }
-
-    if ( omp_in_parallel() && omp_get_thread_num() != 0 ) exit(0);
-
-    MPI_Barrier(PETSC_COMM_WORLD);
-    MPI_Abort(PETSC_COMM_WORLD, 1);
-  }
-
-  inline void print_fatal_if( bool a, const char output[], ... )
-  {
-    if( a )
+  { 
+    int mpi_flag {-1};
+    MPI_Initialized(&mpi_flag);
+    if (mpi_flag)
     {
       if( !get_MPI_rank() )
       {
@@ -197,9 +204,46 @@ namespace SYS_T
         (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
         va_end(Argp);
       }
-
       MPI_Barrier(PETSC_COMM_WORLD);
       MPI_Abort(PETSC_COMM_WORLD, 1);
+    }
+    else
+    {
+      va_list Argp;
+      va_start(Argp, output);
+      vfprintf (stderr, output, Argp);
+      va_end(Argp);
+      exit( EXIT_FAILURE );
+    }
+  }
+
+  inline void print_fatal_if( bool a, const char output[], ... )
+  {
+    if( a )
+    {
+      int mpi_flag {-1};
+      MPI_Initialized(&mpi_flag);
+      if (mpi_flag)
+      {
+        if( !get_MPI_rank() )
+        {
+          va_list Argp;
+          va_start(Argp, output);
+          (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
+          va_end(Argp);
+        }
+        MPI_Barrier(PETSC_COMM_WORLD);
+        MPI_Abort(PETSC_COMM_WORLD, 1);
+      }
+      else
+      {
+        va_list Argp;
+        va_start(Argp, output);
+        vfprintf (stderr, output, Argp);
+        va_end(Argp);
+
+        exit( EXIT_FAILURE );
+      }      
     }
   }
 
@@ -234,31 +278,6 @@ namespace SYS_T
       }
 
       MPI_Barrier(PETSC_COMM_WORLD);
-    }
-  }
-
-  // 6. Print exit message printers are used in terminating serial 
-  //    program when the communicator for MPI is not available.
-  inline void print_exit( const char output[], ... )
-  {
-    va_list Argp;
-    va_start(Argp, output);
-    vfprintf (stderr, output, Argp);
-    va_end(Argp);
-
-    exit( EXIT_FAILURE );
-  }
-
-  inline void print_exit_if( bool a, const char output[], ... )
-  {
-    if( a )
-    {
-      va_list Argp;
-      va_start(Argp, output);
-      vfprintf (stderr, output, Argp);
-      va_end(Argp);
-
-      exit( EXIT_FAILURE );
     }
   }
 
@@ -515,6 +534,15 @@ namespace SYS_T
   {
     commPrint("======================================================================\n");
   }
+
+  inline void print_system_info()
+  {
+    commPrint("Date: %s and time: %s.\n", get_date().c_str(), get_time().c_str());
+    commPrint("Machine: %s \n", get_Env_Var("MACHINE_NAME").c_str());
+    commPrint("User: %s \n", get_Env_Var("USER").c_str());
+    commPrint("The sizes of int, double, and long double are %zu byte, %zu byte, and %zu byte, resp.\n", sizeof(int), sizeof(double), sizeof(long double) );
+  }
+
 }
 
 #endif

@@ -41,22 +41,22 @@ int main( int argc, char * argv[] )
 
   rr.print();
 
-  /*            test write_Matrix_3x3 and read_Matrix_3x3 functions           */
+  /*            test write_Tensor2_3D and read_Tensor2_3D functions           */
 
   hid_t file2 = H5Fcreate( "test2.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
   
   HDF5_Writer * h5w2 = new HDF5_Writer( file2 );
   
-  Matrix_3x3 mm;
+  Tensor2_3D mm;
   
   mm.gen_rand();
   
-  h5w2 -> write_Matrix_3x3( "mm", mm);
+  h5w2 -> write_Tensor2_3D( "mm", mm);
 
   hid_t group2 = H5Gcreate( file2, "/GROUP2_TEST",
       H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 
-  h5w2 -> write_Matrix_3x3( group2, "mm", mm );
+  h5w2 -> write_Tensor2_3D( group2, "mm", mm );
 
   H5Gclose( group2 );
 
@@ -67,7 +67,7 @@ int main( int argc, char * argv[] )
 
   HDF5_Reader * h5r2 = new HDF5_Reader( file3 );
 
-  Matrix_3x3 rmm = h5r2 -> read_Matrix_3x3( "/GROUP2_TEST", "mm" );
+  Tensor2_3D rmm = h5r2 -> read_Tensor2_3D( "/GROUP2_TEST", "mm" );
 
   delete h5r2; H5Fclose( file3 );
 

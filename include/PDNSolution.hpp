@@ -167,7 +167,7 @@ class PDNSolution
     // ------------------------------------------------------------------------
     friend bool is_layout_equal( const PDNSolution &left, const PDNSolution &right );
 
-  private:
+  protected:
     // ------------------------------------------------------------------------
     // dof_num default value is apart_node -> get_dof, but user may reset its value.
     //     nlocalnode := apart_node -> get_nlocalnode

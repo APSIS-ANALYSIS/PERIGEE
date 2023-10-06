@@ -9,6 +9,7 @@
 // Author: Ju Liu
 // ==================================================================
 #include "Tet_Tools.hpp"
+#include "Hex_Tools.hpp"
 #include "HDF5_Writer.hpp"
 #ifdef _OPENMP
 #include "/opt/homebrew/Cellar/libomp/16.0.6/include/omp.h"
@@ -70,7 +71,7 @@ class Gmsh_FileIO
     void update_FSI_nodal_ordering();
 
     // --------------------------------------------------------------
-    // update the IEN array to accomodate for the VTK ordering for
+    // Update the IEN array to accomodate for the VTK ordering for
     // quadratic tetrahedral elements. For quadratic tetrahedral
     // element, the 8-th and 9-th nodes in Gmsh correspond to the 
     // 9-th and 8-th nodes in VTK format.
@@ -81,7 +82,20 @@ class Gmsh_FileIO
     void update_quadratic_tet_IEN( const int &index_3d );
 
     // --------------------------------------------------------------
-    // write a vtp file for an interior surface between two physical
+    // Update the IEN array to accomodate for the VTK ordering for
+    // quadratic hexahedral elements. For quadratic hexahedral
+    // element, the nodes in Gmsh format correspond to the nodes 
+    // in VTK format as follows:
+    // Gmsh: 0~7 8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
+    // VTK : 0~7 8 11 13  9 16 18 19 17 10 12 14 15 22 23 21 24 20 25 26
+    // \para index_3d : the 3D domain index. so the 
+    //                  eIEN[ phy_3d_index[index_3d]][ ]
+    //                  will be modified.
+    // --------------------------------------------------------------
+    void update_quadratic_hex_IEN( const int &index_3d );
+
+    // --------------------------------------------------------------
+    // Write a vtp file for an interior surface between two physical
     // subdomains, with name surfaceName_vol1Name_vol2Name.vtp
     // The user is responsible to give the correct indices for the
     // surface and the volume such that the surface is in between the
@@ -90,7 +104,7 @@ class Gmsh_FileIO
     // \para index_vol1 : the index for the volume in phy_3d_index array
     // \para index_vol2 : the index for the volume in phy_3d_index array
     // in the output vtp file, two face2elem mapping will be associated
-    // with the face triangle element,
+    // with the surface element,
     // face2elem_1 is associated with the element in index_vol1 domain;
     // face2elem_2 is associated with the element in index_vol2 domain.
     // All element indices are global, which means phy_3d_start_index
@@ -104,12 +118,12 @@ class Gmsh_FileIO
        const int &index_vol1, const int &index_vol2 ) const;
 
     // --------------------------------------------------------------
-    // write a vtp file for a surface associated with a volume mesh
+    // Write a vtp file for a surface associated with a volume mesh
     // with name surfacename_volumename.vtp
     // \para index_sur : the index for the surface in phy_2d_index array
     // \para index_vol : the index for the associated volume
     //                   in phy_3d_index array
-    // The function will check the surface's triangle's associated
+    // The function will check the surface mesh associated
     // volume mesh index and write as its element index.
     // This function is similar to TET_T::tetgenio2vtp.
     // The face2elem writes the global element number that the faces
@@ -130,11 +144,11 @@ class Gmsh_FileIO
         const bool &isf2e = false) const;
   
     // --------------------------------------------------------------
-    // write a vtu file for a surface associated with a volume mesh
+    // Write a vtu file for a surface associated with a volume mesh
     // with name surfacename_volumename.vtu
-    // This function is used specifically for quadratic triangle mesh
-    // and will write the surface mesh into a vtu file. It functionality
-    // is quite close to write_vtp.
+    // This function is used specifically for quadratic triangular or 
+    // quadrilateral mesh and will write the surface mesh into a vtu file.
+    // Its functionality is quite close to write_vtp.
     // --------------------------------------------------------------
     void write_quadratic_sur_vtu( const std::string &vtu_filename,
         const int &index_sur, const int &index_vol, const bool &isf2e = false) const;
@@ -150,14 +164,16 @@ class Gmsh_FileIO
     void write_vtu( const std::string &in_fname, const bool &isXML ) const;
 
     // --------------------------------------------------------------
-    // write a separate vtu file for each physical volumetric domain.
+    // Write a separate vtu file for each physical volumetric domain.
     // E.G. for a FSI problem a fluid and a solid domain will be written;
     //      for a fluid problem, a single fluid domain will be written.
     // --------------------------------------------------------------
+    void write_each_vtu( const std::vector<std::string> name_list) const;
+
     void write_each_vtu() const;
     
     // --------------------------------------------------------------
-    // write a h5 file for the 2D simplex domain with given index : 
+    // Write a h5 file for the 2D simplex domain with given index : 
     // index_2d, and write the 2d domain's line boundaries specified by 
     // the index-list index_1d. Within this write function, we locate 
     // the associated 2d element with each 1d element and write is as an
@@ -168,7 +184,7 @@ class Gmsh_FileIO
     void write_tri_h5(const int &index_2d, const std::vector<int> &index_1d ) const;
 
     // --------------------------------------------------------------
-    // write a h5 file for the 3D simplex domain with given index :
+    // Write a h5 file for the 3D simplex domain with given index :
     // index_3d, and write the 3d domain's surface boundaries specified
     // by the index-list index_2d.
     // index_3d in [ 0, num_phy_domain_3d ),
@@ -177,7 +193,7 @@ class Gmsh_FileIO
     void write_tet_h5( const int &index_3d, const std::vector<int> &index_2d ) const;
 
     // --------------------------------------------------------------
-    // write a h5 file for the 3D simplex domain with given index,
+    // Write a h5 file for the 3D simplex domain with given index,
     // and the index list of the faces that needs a face2element map.
     // index_3d in [ 0 , num_phy_domain_3d ),
     // index_2d in [ 0 , num_phy_domain_2d ),
@@ -191,7 +207,7 @@ class Gmsh_FileIO
         const std::vector<int> &index_2d_need_facemap ) const;
 
   private:
-    Gmsh_FileIO() = delete; // disallow default constructor
+    Gmsh_FileIO() = delete; // Disallow default constructor
 
     const std::string filename; // file = xxx.msh
 
@@ -212,34 +228,34 @@ class Gmsh_FileIO
     const std::array<int,32> elem_nlocbas;
 
     // --------------------------------------------------------------
-    // physical info 
-    // number of physical domains.
+    // Physical info 
+    // The number of physical domains.
     int num_phy_domain;
 
-    // store the names, indices and dimension of each physical groups
+    // Store the names, indices and dimension of each physical groups
     std::vector<std::string> phy_name {};
     std::vector<int> phy_index {};
     std::vector<int> phy_dim {};
 
-    // stores the ii-th domain's number of elements. ii is the physical tag
+    // Stores the ii-th domain's number of elements. ii is the physical tag
     std::vector<int> phy_domain_nElem {};
 
-    // details of the physical domain
-    // the number of 3d, 2d, and 1d domains.
+    // Details of the physical domain
+    // The number of 3d, 2d, and 1d domains.
     // num_phy_domain = num_phy_domain_3d + num_phy_domain_2d
     //                 + num_phy_domain_1d
-    int num_phy_domain_3d, num_phy_domain_2d, num_phy_domain_1d {};
+    int num_phy_domain_3d {}, num_phy_domain_2d {}, num_phy_domain_1d {};
 
-    // the indices (physical tag) of the 1d/2d/3d domains respectively
+    // The indices (physical tag) of the 1d/2d/3d domains respectively
     // {phy_index} = {phy_3d_index} + {phy_2d_index} + {phy_1d_index} 
-    std::vector<int> phy_3d_index, phy_2d_index, phy_1d_index {};
+    std::vector<int> phy_3d_index {}, phy_2d_index {}, phy_1d_index {};
 
-    // the physicla subdomain names of the corresponding phy_xd_index.
-    std::vector<std::string> phy_3d_name, phy_2d_name, phy_1d_name {};
+    // The physical subdomain names of the corresponding phy_xd_index.
+    std::vector<std::string> phy_3d_name {}, phy_2d_name {}, phy_1d_name {};
 
-    // stores the number of 3d/2d/1d element respectively
-    // vector lengths are num_phy_domain_3d/2d/1d respectively
-    std::vector<int> phy_3d_nElem, phy_2d_nElem, phy_1d_nElem {};
+    // Stores the number of 3d/2d/1d element respectively
+    // Vector lengths are num_phy_domain_3d/2d/1d respectively
+    std::vector<int> phy_3d_nElem {}, phy_2d_nElem {}, phy_1d_nElem {};
 
     // Stores the starting index for the 3d/2d volume mesh, with length
     // num_phy_domain_3d/num_phy_domain_2d.
@@ -253,26 +269,26 @@ class Gmsh_FileIO
 
     // --------------------------------------------------------------
     // Geometry info    
-    int num_node; // number of nodal points
+    int num_node; // The number of nodal points
 
     std::vector<double> node {}; // 3 x num_node: x-y-z coordinates
 
-    int num_elem; // number of total elem (2D and 3D together)
+    int num_elem; // The number of total elem (2D and 3D together)
 
-    // size is {num_phy_domain} x { ele_nlocbas[ii] times phy_domain_nElem[ii] }
-    // note: the eIEN values are with nodal indices starting from 0.       
+    // Size is {num_phy_domain} x { ele_nlocbas[ii] times phy_domain_nElem[ii] }
+    // Note: the eIEN values are with nodal indices starting from 0.       
     //       the first argument 0 <= ii < num_phy_domain is the physical tag
     std::vector< std::vector<int> > eIEN {};
 
-    // stores the number of basis functions in each physical domain. 
+    // Stores the number of basis functions in each physical domain. 
     // This implicitly implies that the we use the same type of element 
     // in each physical domain. 
     // ele_nlocbas stores the number of local basis functions in element.
     // the argument 0<= ii < num_phy_domain is the physical tag
     std::vector<int> ele_nlocbas {};
 
-    // stores the element type for each physical subdomain.
-    // the argument 0<= ii < num_phy_domain is the physical tag
+    // Stores the element type for each physical subdomain.
+    // The argument 0<= ii < num_phy_domain is the physical tag
     // its value and the corresponding ele_nlocbas satisfies the ele_nlocbas
     // mapping, which is defined by Gmsh.
     std::vector<int> ele_type {};
@@ -280,14 +296,14 @@ class Gmsh_FileIO
     // --------------------------------------------------------------
     // Private functions for the constructor
     // --------------------------------------------------------------
-    // read the node data and element data in .msh file of v2.2 0 8,
+    // Read the node data and element data in .msh file of v2.2 0 8,
     // then write them in node coordinates array and eIEN array.
     // This function is bound to the constructor of Gmsh_FileIO.
     // --------------------------------------------------------------
     void read_msh2(std::ifstream &infile);
 
     // --------------------------------------------------------------
-    // read the node data and element data in .msh file of v4.1 0 8,
+    // Read the node data and element data in .msh file of v4.1 0 8,
     // then write them in node coordinates array and eIEN array.
     // This function is bound to the constructor of Gmsh_FileIO.
     // --------------------------------------------------------------

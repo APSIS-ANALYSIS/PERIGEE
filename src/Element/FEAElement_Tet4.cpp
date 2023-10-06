@@ -45,20 +45,20 @@ void FEAElement_Tet4::buildBasis( const IQuadPts * const &quad,
     R[qua*4+3] = qua_t;
   }
   
-  Jac[0] = ctrl_x[0] * (-1.0) + ctrl_x[1]; // dx_dr
-  Jac[1] = ctrl_x[0] * (-1.0) + ctrl_x[2]; // dx_ds
-  Jac[2] = ctrl_x[0] * (-1.0) + ctrl_x[3]; // dx_dt
+  Jac[0] = -ctrl_x[0] + ctrl_x[1]; // dx_dr
+  Jac[1] = -ctrl_x[0] + ctrl_x[2]; // dx_ds
+  Jac[2] = -ctrl_x[0] + ctrl_x[3]; // dx_dt
   
-  Jac[3] = ctrl_y[0] * (-1.0) + ctrl_y[1]; // dy_dr
-  Jac[4] = ctrl_y[0] * (-1.0) + ctrl_y[2]; // dy_ds
-  Jac[5] = ctrl_y[0] * (-1.0) + ctrl_y[3]; // dy_dt
+  Jac[3] = -ctrl_y[0] + ctrl_y[1]; // dy_dr
+  Jac[4] = -ctrl_y[0] + ctrl_y[2]; // dy_ds
+  Jac[5] = -ctrl_y[0] + ctrl_y[3]; // dy_dt
 
-  Jac[6] = ctrl_z[0] * (-1.0) + ctrl_z[1]; // dz_dr
-  Jac[7] = ctrl_z[0] * (-1.0) + ctrl_z[2]; // dz_ds
-  Jac[8] = ctrl_z[0] * (-1.0) + ctrl_z[3]; // dz_dt
+  Jac[6] = -ctrl_z[0] + ctrl_z[1]; // dz_dr
+  Jac[7] = -ctrl_z[0] + ctrl_z[2]; // dz_ds
+  Jac[8] = -ctrl_z[0] + ctrl_z[3]; // dz_dt
 
   // Make use of the existing 3x3 matrix tool
-  Matrix_double_3by3_Array mdrdx( Jac[0], Jac[1], Jac[2], Jac[3], Jac[4],
+  FE_T::Matrix_double_3by3_Array mdrdx( Jac[0], Jac[1], Jac[2], Jac[3], Jac[4],
       Jac[5], Jac[6], Jac[7], Jac[8] );
 
   // detJac = det(dx/dr)
@@ -75,17 +75,17 @@ void FEAElement_Tet4::buildBasis( const IQuadPts * const &quad,
   // dt_dx
   Jac[15] = mdrdx(6); Jac[16] = mdrdx(7); Jac[17] = mdrdx(8);
 
-  dR_dx[0] = (-1.0) * Jac[9] - Jac[12] - Jac[15];
+  dR_dx[0] = -Jac[9] - Jac[12] - Jac[15];
   dR_dx[1] = Jac[9];
   dR_dx[2] = Jac[12];
   dR_dx[3] = Jac[15];
 
-  dR_dy[0] = (-1.0) * Jac[10] - Jac[13] - Jac[16];
+  dR_dy[0] = -Jac[10] - Jac[13] - Jac[16];
   dR_dy[1] = Jac[10];
   dR_dy[2] = Jac[13];
   dR_dy[3] = Jac[16];
 
-  dR_dz[0] = (-1.0) * Jac[11] - Jac[14] - Jac[17];
+  dR_dz[0] = -Jac[11] - Jac[14] - Jac[17];
   dR_dz[1] = Jac[11];
   dR_dz[2] = Jac[14];
   dR_dz[3] = Jac[17];
@@ -215,7 +215,7 @@ double FEAElement_Tet4::get_h( const double * const &ctrl_x,
 {
   double x,y,z,r;
 
-  MATH_T::get_tet_sphere_info(
+  FE_T::get_tet_sphere_info(
       ctrl_x[0], ctrl_x[1], ctrl_x[2], ctrl_x[3],
       ctrl_y[0], ctrl_y[1], ctrl_y[2], ctrl_y[3],
       ctrl_z[0], ctrl_z[1], ctrl_z[2], ctrl_z[3],

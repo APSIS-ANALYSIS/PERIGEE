@@ -132,7 +132,9 @@ class APart_Node
     // local_to_global = [ node_loc ] appended by [ node_ghost ].
     // The three vectors have lengths nlocghonode, nlocalnode, nghostnode, resp.
     // ------------------------------------------------------------------------
-    std::vector<int> local_to_global, node_ghost, node_loc;
+    std::vector<int> local_to_global {}, node_ghost {}, node_loc {};
+
+    APart_Node() = delete;
 };
 
 #endif

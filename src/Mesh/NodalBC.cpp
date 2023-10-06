@@ -29,7 +29,7 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
   
     for(unsigned int jj=0; jj<gnode.size(); ++jj)
     {
-      SYS_T::print_exit_if( gnode[jj]<0 || gnode[jj]>=nFunc, "Error: the nodal index %d is not in the range [0, %d)! \n", gnode[jj], nFunc);
+      SYS_T::print_fatal_if( gnode[jj]<0 || gnode[jj]>=nFunc, "Error: the nodal index %d is not in the range [0, %d)! \n", gnode[jj], nFunc);
 
       dir_nodes.push_back( static_cast<unsigned int>( gnode[jj]) );
     }
@@ -97,7 +97,7 @@ void NodalBC::BC_type_1( const std::vector<std::string> &vtkfileList,
 
     for(unsigned int jj=1; jj<gnode.size(); ++jj)
     {
-      SYS_T::print_exit_if( gnode[jj]<0 || gnode[jj]>=nFunc, "Error: the nodal index %d is not in the range [0, %d)! \n", gnode[jj], nFunc);
+      SYS_T::print_fatal_if( gnode[jj]<0 || gnode[jj]>=nFunc, "Error: the nodal index %d is not in the range [0, %d)! \n", gnode[jj], nFunc);
 
       per_slave_nodes.push_back( static_cast<unsigned int>( gnode[jj]) );
       per_master_nodes.push_back( static_cast<unsigned int>(gnode[ 0 ]) );
@@ -113,7 +113,7 @@ void NodalBC::BC_type_1( const std::vector<std::string> &vtkfileList,
 void NodalBC::BC_type_2( const std::vector<std::string> &vtkfileList,
     const int &nFunc )
 {
-  SYS_T::print_exit_if(vtkfileList.size() != 2, "Error: NodalBC::BC_type_2 the number of vtk files is wrong. \n");
+  SYS_T::print_fatal_if(vtkfileList.size() != 2, "Error: NodalBC::BC_type_2 the number of vtk files is wrong. \n");
 
   SYS_T::file_check( vtkfileList[0] );
 
@@ -122,7 +122,7 @@ void NodalBC::BC_type_2( const std::vector<std::string> &vtkfileList,
   dir_nodes.resize( gnode.size() );
   for(unsigned int ii=0; ii<gnode.size(); ++ii)
   {
-    SYS_T::print_exit_if( gnode[ii]<0 || gnode[ii]>=nFunc, "Error: the nodal index %d is not in the range [0, %d)! \n", gnode[ii], nFunc);
+    SYS_T::print_fatal_if( gnode[ii]<0 || gnode[ii]>=nFunc, "Error: the nodal index %d is not in the range [0, %d)! \n", gnode[ii], nFunc);
 
     dir_nodes[ii] = static_cast<unsigned int>( gnode[ii] );
   }
@@ -133,7 +133,7 @@ void NodalBC::BC_type_2( const std::vector<std::string> &vtkfileList,
 
   for(unsigned int jj=1; jj<gnode.size(); ++jj)
   {
-    SYS_T::print_exit_if( gnode[jj]<0 || gnode[jj]>=nFunc, "Error: the nodal index %d is not in the range [0, %d)! \n", gnode[jj], nFunc);
+    SYS_T::print_fatal_if( gnode[jj]<0 || gnode[jj]>=nFunc, "Error: the nodal index %d is not in the range [0, %d)! \n", gnode[jj], nFunc);
 
     per_slave_nodes.push_back( static_cast<unsigned int>( gnode[jj]) );
     per_master_nodes.push_back( static_cast<unsigned int>( gnode[ 0 ]) );
@@ -149,15 +149,15 @@ void NodalBC::BC_type_2( const std::vector<std::string> &vtkfileList,
 void NodalBC::BC_type_3( const std::vector<std::string> &vtkfileList,
     const int &nFunc  )
 {
-  SYS_T::print_exit_if( vtkfileList.size() != 1, "Error: NodalBC::BC_type_3 the number of vtp files is wrong. \n" );
+  SYS_T::print_fatal_if( vtkfileList.size() != 1, "Error: NodalBC::BC_type_3 the number of vtp files is wrong. \n" );
 
   SYS_T::file_check( vtkfileList[0] );
 
   const std::vector<int> gnode = VTK_T::read_int_PointData(vtkfileList[0], "GlobalNodeID");
 
-  SYS_T::print_exit_if( gnode.size() < 1, "Error: the numpts is less than 1 in the vtp file! \n");
+  SYS_T::print_fatal_if( gnode.size() < 1, "Error: the numpts is less than 1 in the vtp file! \n");
 
-  SYS_T::print_exit_if( gnode[0]<0 || gnode[0]>=nFunc, "Error: the nodal index %d is not in the range [0, %d)! \n", gnode[0], nFunc);
+  SYS_T::print_fatal_if( gnode[0]<0 || gnode[0]>=nFunc, "Error: the nodal index %d is not in the range [0, %d)! \n", gnode[0], nFunc);
 
   dir_nodes.resize(1);
   dir_nodes[0] = static_cast<unsigned int>( gnode[0] );

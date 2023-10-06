@@ -24,8 +24,6 @@ PDNSolution_Transport::~PDNSolution_Transport()
 
 void PDNSolution_Transport::Init_zero( const APart_Node * const &pNode )
 {
-  const int nlocalnode = pNode -> get_nlocalnode();
-   
   const double value[1] = { 0.0 };
 
   for(int ii=0; ii<nlocalnode; ++ii)

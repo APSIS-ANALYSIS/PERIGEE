@@ -1,8 +1,15 @@
-#include "QuadPts_Gauss.hpp"
+#include "QuadPts_Gauss_1D.hpp"
 
-QuadPts_Gauss::QuadPts_Gauss( const int &in_num_pts )
-: num_pts(in_num_pts)
+QuadPts_Gauss_1D::QuadPts_Gauss_1D( const int &in_num_pts, const double &min, 
+    const double &max ) : num_pts(in_num_pts)
 {
+  // Make sure that min < max
+  SYS_T::print_fatal_if( min >= max, "Error: QuadPts_Gauss_1D, the given range of quadrature domain is incorrect.\n");
+
+  // Make sure that the containers are empty
+  qp.clear(); qw.clear();
+
+  // Generate the rule for [0, 1] domain
   switch( num_pts )
   {
     case 1:
@@ -150,14 +157,23 @@ QuadPts_Gauss::QuadPts_Gauss( const int &in_num_pts )
   // Reverse the points and weights to make them in ascending order
   std::reverse(qp.begin(), qp.end());
   std::reverse(qw.begin(), qw.end());
+  
+  // Now map the rule to the [min, max] domain via a linear change of interval
+  // x = (max-min) xi + min
+  // see en.wikipedia.org/wiki/Gaussian_quadrature
+  for( int ii =0; ii<num_pts; ++ii )
+  {
+    qp[ii] = (max - min) * qp[ii] + min;
+    qw[ii] = (max - min) * qw[ii];
+  }
 }
 
-QuadPts_Gauss::~QuadPts_Gauss()
+QuadPts_Gauss_1D::~QuadPts_Gauss_1D()
 {
   VEC_T::clean(qp); VEC_T::clean(qw);
 }
 
-void QuadPts_Gauss::print_info() const
+void QuadPts_Gauss_1D::print_info() const
 {
   std::cout<<"====== Gauss Points ======="<<std::endl;
   std::cout<<"Num of pt = "<<num_pts<<std::endl;
@@ -169,7 +185,7 @@ void QuadPts_Gauss::print_info() const
   std::cout<<"=========================="<<std::endl;
 }
 
-void QuadPts_Gauss::compute_npts()
+void QuadPts_Gauss_1D::compute_npts()
 {
   const unsigned int n = num_pts;
   const unsigned int m = (num_pts + 1) / 2;
@@ -178,16 +194,11 @@ void QuadPts_Gauss::compute_npts()
 
   const long double long_double_eps = static_cast<long double>(std::numeric_limits<long double>::epsilon()), double_eps = static_cast<long double>(std::numeric_limits<double>::epsilon());
 
-  // now check whether long double is more
-  // accurate than double, and set
-  // tolerances accordingly. generate a one
-  // that really is generated at run-time
-  // and is not optimized away by the
-  // compiler. that makes sure that the
-  // tolerance is set at run-time with the
-  // current behavior, not at compile-time
-  // (not doing so leads to trouble with
-  // valgrind for example).
+  // now check whether long double is more accurate than double, and set
+  // tolerances accordingly. generate a one that really is generated at run-time
+  // and is not optimized away by the compiler. that makes sure that the
+  // tolerance is set at run-time with the current behavior, not at compile-time
+  // (not doing so leads to trouble with valgrind for example).
   volatile long double runtime_one = 1.0;
   const long double tolerance
     = (runtime_one + long_double_eps != runtime_one
@@ -202,18 +213,17 @@ void QuadPts_Gauss::compute_npts()
   {
     long double z = std::cos(MATH_T::PI * (i-.25)/(n+.5));
 
-    long double pp;
-    long double p1, p2, p3;
+    long double pp {1.0}, p1 {1.0};
 
     // Newton iteration
     do
     {
       // compute L_n (z)
       p1 = 1.;
-      p2 = 0.;
+      long double p2 = 0.;
       for (unsigned int j=0; j<n; ++j)
       {
-        p3 = p2;
+        const long double p3 = p2;
         p2 = p1;
         p1 = ((2.*j+1.)*z*p2-j*p3)/(j+1);
       }
@@ -222,11 +232,11 @@ void QuadPts_Gauss::compute_npts()
     }
     while (std::abs(p1/pp) > tolerance);
 
-    double x = .5*z;
+    const double x = .5*z;
     qp[i-1] = .5-x;
     qp[n-i] = .5+x;
 
-    double w = 1./((1.-z*z)*pp*pp);
+    const double w = 1./((1.-z*z)*pp*pp);
     qw[i-1] = w;
     qw[n-i] = w;
   }

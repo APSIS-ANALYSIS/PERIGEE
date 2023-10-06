@@ -71,7 +71,7 @@ class ALocal_Elem
     // ------------------------------------------------------------------------
     // Global indices of elements that belong to the local CPU.
     // ------------------------------------------------------------------------
-    std::vector<int> elem_loc;
+    std::vector<int> elem_loc {};
     
     // ------------------------------------------------------------------------
     // Flag that determine if the element has an additional tag
@@ -84,7 +84,10 @@ class ALocal_Elem
     //                            tag 1 gives solid element.
     // elem_tag is cleared if isTagged = false
     // ------------------------------------------------------------------------
-    std::vector<int> elem_tag;
+    std::vector<int> elem_tag {};
+
+    // Disallow default constructor
+    ALocal_Elem() = delete;
 };
 
 #endif

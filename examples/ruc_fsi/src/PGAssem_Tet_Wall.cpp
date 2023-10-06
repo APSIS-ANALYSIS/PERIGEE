@@ -145,14 +145,14 @@ void PGAssem_Tet_Wall::RingBC_KG(
       const int dnode = ( col_index[ii] - 3 ) / dof_mat;
       if( ringnbc_part->is_inLDN( dnode, pos ) )
       {    
-        Matrix_3x3 Q = ringnbc_part->get_rotation_matrix( pos );
+        Tensor2_3D Q = ringnbc_part->get_rotation_matrix( pos );
         Q.transpose(); // Skew-to-global transformation matrix
 
         for( int jj = dof-1; jj < nrow; jj += dof )
         {
           if( dnode != ( row_index[jj] - 3 ) / dof_mat )
           {
-            Matrix_3x3 Ke_AB = Matrix_3x3(
+            Tensor2_3D Ke_AB = Tensor2_3D(
               Ke[(jj-2)*ncol + (ii-2)], Ke[(jj-2)*ncol + (ii-1)], Ke[(jj-2)*ncol + ii], 
               Ke[(jj-1)*ncol + (ii-2)], Ke[(jj-1)*ncol + (ii-1)], Ke[(jj-1)*ncol + ii], 
               Ke[(jj-0)*ncol + (ii-2)], Ke[(jj-0)*ncol + (ii-1)], Ke[(jj-0)*ncol + ii]  );
@@ -184,14 +184,14 @@ void PGAssem_Tet_Wall::RingBC_KG(
       if( ringnbc_part->is_inLDN( dnode, pos ) )
       {
         // Global-to-skew transformation matrix
-        const Matrix_3x3 QT = ringnbc_part->get_rotation_matrix( pos );
+        const Tensor2_3D QT = ringnbc_part->get_rotation_matrix( pos );
 
         // Skew-to-global transformation matrix
-        const Matrix_3x3 Q = transpose( QT );
+        const Tensor2_3D Q = Ten2::transpose( QT );
 
         for( int jj = dof-1; jj < ncol; jj += dof )
         {
-          Matrix_3x3 Ke_AB = Matrix_3x3(
+          Tensor2_3D Ke_AB = Tensor2_3D(
             Ke[(ii-2)*ncol + (jj-2)], Ke[(ii-2)*ncol + (jj-1)], Ke[(ii-2)*ncol + jj],
             Ke[(ii-1)*ncol + (jj-2)], Ke[(ii-1)*ncol + (jj-1)], Ke[(ii-1)*ncol + jj],
             Ke[(ii-0)*ncol + (jj-2)], Ke[(ii-0)*ncol + (jj-1)], Ke[(ii-0)*ncol + jj]  );
@@ -390,7 +390,7 @@ void PGAssem_Tet_Wall::Update_Wall_Prestress(
   double * syoungsmod   = new double [snLocBas];
   double * quaprestress = new double [6 * face_nqp];
 
-  std::vector<Matrix_3x3> sigma; sigma.resize( face_nqp );
+  std::vector<Tensor2_3D> sigma( face_nqp, Tensor2_3D() );
 
   sol_wall_disp->GetLocalArray( array_b );
 

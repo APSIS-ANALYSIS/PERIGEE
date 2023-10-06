@@ -68,7 +68,7 @@ int main( int argc, char * argv[] )
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
   // enforce this code is for linear element only
-  SYS_T::print_exit_if( elemType != 501, "Error: element type should be 501 linear tet element.\n");
+  SYS_T::print_fatal_if( elemType != 501, "Error: element type should be 501 linear tet element.\n");
 
   SYS_T::GetOptionString("-sol_bname", sol_bname);
   SYS_T::GetOptionInt("-time_start", time_start);
@@ -149,7 +149,7 @@ int main( int argc, char * argv[] )
       else node_check += 1;
     }
 
-    SYS_T::print_exit_if(node_check!=3, "Error: the associated tet element is incompatible with the triangle element.\n");
+    SYS_T::print_fatal_if(node_check!=3, "Error: the associated tet element is incompatible with the triangle element.\n");
 
     // Record the interior node's coordinates
     interior_node_coord[3*ee+0] = v_ctrlPts[ 3*interior_node[ee] + 0 ];
@@ -165,7 +165,7 @@ int main( int argc, char * argv[] )
         v_ctrlPts[3*trn[2]+1] - v_ctrlPts[3*trn[0]+1],
         v_ctrlPts[3*trn[2]+2] - v_ctrlPts[3*trn[0]+2] ); 
 
-    Vector_3 ou = cross_product( l01, l02 );
+    Vector_3 ou = Vec3::cross_product( l01, l02 );
 
     tri_area[ee] = 0.5 * ou.normalize();
 
@@ -173,7 +173,7 @@ int main( int argc, char * argv[] )
         v_ctrlPts[interior_node[ee]*3+1] - v_ctrlPts[3*trn[0]+1],
         v_ctrlPts[interior_node[ee]*3+2] - v_ctrlPts[3*trn[0]+2] );
 
-    const double out_dot_in = dot_product( ou, inw );
+    const double out_dot_in = Vec3::dot_product( ou, inw );
 
     // if in case the normal points inside, multiply by -1
     if( out_dot_in > 0 ) ou *= -1.0;

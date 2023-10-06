@@ -9,31 +9,31 @@ MaterialModel_Guccione_Incompressible_Mixed::MaterialModel_Guccione_Incompressib
   rho0( in_rho ), Cq(in_C), b_f(in_bf), b_t(in_bt), b_ft(in_bft),
   I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
 {
-  f[0] = fx; f[1] = fy; f[2] = fz;
+  f = Vector_3(fx, fy, fz);
 
   // Check to make sure f is a unit vector
-  if( !MATH_T::equals( MATH_T::norm2(fx,fy,fz), 1.0, 1.0e-12) )
+  if( !MATH_T::equals( f.norm2(), 1.0, 1.0e-12) )
   {
     SYS_T::commPrint("Guccione model, input f vector is not unit.\n");
-    MATH_T::normalize3d(f[0], f[1], f[2]);
+    f.normalize();
   }
 
   // Check to make sure s is a unit vector
-  s[0] = sx; s[1] = sy; s[2] = sz;
-  if( !MATH_T::equals( MATH_T::norm2(sx, sy, sz), 1.0, 1.0e-12) )
+  s = Vector_3(sx, sy, sz);
+  if( !MATH_T::equals( s.norm2(), 1.0, 1.0e-12) )
   {
     SYS_T::commPrint("Guccione model, input s vector is not unit.\n");
-    MATH_T::normalize3d(s[0], s[1], s[2]);
+    s.normalize();
   }
  
   // f x s / || f x s || = n 
-  MATH_T::cross3d( f[0], f[1], f[2], s[0], s[1], s[2], n[0], n[1], n[2] );
-  MATH_T::normalize3d( n[0], n[1], n[2] ); 
+  n = Vec3::cross_product( f, s );
+  n.normalize();
 
   // Define the roatation matrix R
-  R(0,0) = f[0]; R(0,1) = f[1]; R(0,2) = f[2];
-  R(1,0) = s[0]; R(1,1) = s[1]; R(1,2) = s[2];
-  R(2,0) = n[0]; R(2,1) = n[1]; R(2,2) = n[2];
+  R(0,0) = f(0); R(0,1) = f(1); R(0,2) = f(2);
+  R(1,0) = s(0); R(1,1) = s(1); R(1,2) = s(2);
+  R(2,0) = n(0); R(2,1) = n(1); R(2,2) = n(2);
 }
 
 MaterialModel_Guccione_Incompressible_Mixed::MaterialModel_Guccione_Incompressible_Mixed(
@@ -55,35 +55,35 @@ MaterialModel_Guccione_Incompressible_Mixed::MaterialModel_Guccione_Incompressib
   b_ft = h5r -> read_doubleScalar("/", "b_ft");
 
   const std::vector<double> temp_f = h5r -> read_doubleVector( "/", "f" );
-  f[0] = temp_f[0]; f[1] = temp_f[1]; f[2] = temp_f[2];
+  f = Vector_3(temp_f[0], temp_f[1], temp_f[2]);
 
   const std::vector<double> temp_s = h5r -> read_doubleVector( "/", "s" );
-  s[0] = temp_s[0]; s[1] = temp_s[1]; s[2] = temp_s[2];
+  s = Vector_3(temp_s[0], temp_s[1], temp_s[2]);
 
   delete h5r; H5Fclose(h5file);
   
   // Check to make sure f is a unit vector
-  if( !MATH_T::equals( MATH_T::norm2(f[0],f[1],f[2]), 1.0, 1.0e-12) )
+  if( !MATH_T::equals( f.norm2(), 1.0, 1.0e-12) )
   {
     SYS_T::commPrint("Guccione model, input f vector is not unit.\n");
-    MATH_T::normalize3d(f[0], f[1], f[2]);
+    f.normalize();
   }
 
   // Check to make sure s is a unit vector
-  if( !MATH_T::equals( MATH_T::norm2(s[0], s[1], s[2]), 1.0, 1.0e-12) )
+  if( !MATH_T::equals( s.norm2(), 1.0, 1.0e-12) )
   {
     SYS_T::commPrint("Guccione model, input s vector is not unit.\n");
-    MATH_T::normalize3d(s[0], s[1], s[2]);
+    s.normalize();
   }
 
   // f x s / || f x s || = n
-  MATH_T::cross3d( f[0], f[1], f[2], s[0], s[1], s[2], n[0], n[1], n[2] );
-  MATH_T::normalize3d( n[0], n[1], n[2] );
+  n = Vec3::cross_product( f, s );
+  n.normalize();
 
   // Define the roatation matrix R
-  R(0,0) = f[0]; R(0,1) = f[1]; R(0,2) = f[2];
-  R(1,0) = s[0]; R(1,1) = s[1]; R(1,2) = s[2];
-  R(2,0) = n[0]; R(2,1) = n[1]; R(2,2) = n[2];
+  R(0,0) = f(0); R(0,1) = f(1); R(0,2) = f(2);
+  R(1,0) = s(0); R(1,1) = s(1); R(1,2) = s(2);
+  R(2,0) = n(0); R(2,1) = n(1); R(2,2) = n(2);
 }
 
 MaterialModel_Guccione_Incompressible_Mixed::~MaterialModel_Guccione_Incompressible_Mixed()
@@ -97,9 +97,9 @@ void MaterialModel_Guccione_Incompressible_Mixed::print_info() const
   SYS_T::commPrint("\t  Para b_f  = %e \n", b_f);
   SYS_T::commPrint("\t  Para b_t  = %e \n", b_t);
   SYS_T::commPrint("\t  Para b_ft = %e \n", b_ft);
-  SYS_T::commPrint("\t  Fibre dir = [%e %e %e] \n", f[0], f[1], f[2]); 
-  SYS_T::commPrint("\t  Sheet normal dir = [%e %e %e] \n", s[0], s[1], s[2]); 
-  SYS_T::commPrint("\t  Third n dir = [%e %e %e] \n", n[0], n[1], n[2]); 
+  SYS_T::commPrint("\t  Fibre dir = [%e %e %e] \n", f(0), f(1), f(2));
+  SYS_T::commPrint("\t  Sheet normal dir = [%e %e %e] \n", s(0), s(1), s(2));
+  SYS_T::commPrint("\t  Third n dir = [%e %e %e] \n", n(0), n(1), n(2));
 }
 
 void MaterialModel_Guccione_Incompressible_Mixed::write_hdf5( const char * const &fname ) const
@@ -115,8 +115,8 @@ void MaterialModel_Guccione_Incompressible_Mixed::write_hdf5( const char * const
     h5w -> write_doubleScalar("b_f", b_f);
     h5w -> write_doubleScalar("b_t", b_t);
     h5w -> write_doubleScalar("b_ft", b_ft);
-    h5w -> write_doubleVector("f", f, 3);
-    h5w -> write_doubleVector("s", s, 3);
+    h5w -> write_Vector_3("f", f);
+    h5w -> write_Vector_3("s", s);
 
     delete h5w; H5Fclose(file_id);
   }
@@ -126,24 +126,24 @@ void MaterialModel_Guccione_Incompressible_Mixed::write_hdf5( const char * const
 
 
 void MaterialModel_Guccione_Incompressible_Mixed::get_PK( 
-    const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S ) const
+    const Tensor2_3D &F, Tensor2_3D &P, Tensor2_3D &S ) const
 {
-  Matrix_3x3 C; C.MatMultTransposeLeft(F);
-  Matrix_3x3 Cinv( C ); Cinv.inverse();
+  Tensor2_3D C; C.MatMultTransposeLeft(F);
+  Tensor2_3D Cinv = Ten2::inverse(C);
   const double trC = C.tr();
   const double trC2 = C.MatContraction( C );
   const double detF = F.det();
   const double detFm0d67 = std::pow(detF, mpt67);
 
   // E_bar = 0.5 * (J^-2/3 C - I )
-  Matrix_3x3 E_bar( C );
+  Tensor2_3D E_bar( C );
   E_bar.scale(0.5 * detFm0d67); E_bar.AXPY(-0.5, I);
 
   // E* = R^T E_bar R
-  Matrix_3x3 E_star( E_bar ); E_star.MatRot( R );
+  Tensor2_3D E_star( E_bar ); E_star.MatRot( R );
 
   // PxE_bar = E_bar - 1/6 (J^-2/3 C:C  - trC ) C^-1.
-  Matrix_3x3 PxE_bar( E_bar );
+  Tensor2_3D PxE_bar( E_bar );
   PxE_bar.AXPY(-0.5*pt33*(detFm0d67 * trC2 - trC), Cinv);
 
   // Calculate Q
@@ -171,25 +171,24 @@ void MaterialModel_Guccione_Incompressible_Mixed::get_PK(
 
 
 void MaterialModel_Guccione_Incompressible_Mixed::get_PK_Stiffness( 
-    const Matrix_3x3 &F, Matrix_3x3 &P, Matrix_3x3 &S, Tensor4_3D &CC ) const
+    const Tensor2_3D &F, Tensor2_3D &P, Tensor2_3D &S, Tensor4_3D &CC ) const
 {
-  Matrix_3x3 C; C.MatMultTransposeLeft(F);
-  Matrix_3x3 Cinv(C); Cinv.inverse();
-  
+  Tensor2_3D C; C.MatMultTransposeLeft(F);
+  Tensor2_3D Cinv = Ten2::inverse(C);
   const double trC = C.tr();
   const double trC2 = C.MatContraction( C );
   const double detF = F.det();
   const double detFm0d67 = std::pow(detF, mpt67);
 
   // E_bar = 0.5 * (J^-2/3 C - I )
-  Matrix_3x3 E_bar( C );
+  Tensor2_3D E_bar( C );
   E_bar.scale(0.5 * detFm0d67); E_bar.AXPY(-0.5, I);
 
   // E* = R^T E_bar R
-  Matrix_3x3 E_star( E_bar ); E_star.MatRot( R );
+  Tensor2_3D E_star( E_bar ); E_star.MatRot( R );
 
   // PxE_bar = E_bar - 1/6 (J^-2/3 C:C  - trC ) C^-1.
-  Matrix_3x3 PxE_bar( E_bar );
+  Tensor2_3D PxE_bar( E_bar );
   PxE_bar.AXPY(-0.5*pt33*(detFm0d67 * trC2 - trC), Cinv);
 
   // Calculate Q
@@ -248,17 +247,17 @@ void MaterialModel_Guccione_Incompressible_Mixed::get_PK_Stiffness(
 
 
 double MaterialModel_Guccione_Incompressible_Mixed::get_strain_energy( 
-    const Matrix_3x3 &F ) const
+    const Tensor2_3D &F ) const
 {
-  Matrix_3x3 C; C.MatMultTransposeLeft(F);
+  Tensor2_3D C; C.MatMultTransposeLeft(F);
   const double detF = F.det();
   const double detFm0d67 = std::pow(detF, mpt67);
 
   // E_bar = 0.5 * (J^-2/3 C - I )
-  Matrix_3x3 E_bar(C); E_bar.scale(0.5 * detFm0d67); E_bar.AXPY(-0.5, I);
+  Tensor2_3D E_bar(C); E_bar.scale(0.5 * detFm0d67); E_bar.AXPY(-0.5, I);
 
   // E* = R^T E_bar R
-  Matrix_3x3 E_star( E_bar ); E_star.MatRot( R );
+  Tensor2_3D E_star( E_bar ); E_star.MatRot( R );
   
   const double Q = b_f * E_star(0) * E_star(0) + b_t * ( E_star(4) * E_star(4)
       + E_star(8) * E_star(8) + E_star(5) * E_star(5) + E_star(7) * E_star(7) ) 

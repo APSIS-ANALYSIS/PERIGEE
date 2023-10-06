@@ -44,7 +44,6 @@ PDNSolution_V::PDNSolution_V( const APart_Node * const &pNode,
 void PDNSolution_V::Init_zero( const APart_Node * const &pNode )
 {
   double value[3] = {0.0, 0.0, 0.0};
-  const int nlocalnode = pNode -> get_nlocalnode();
 
   for(int ii=0; ii<nlocalnode; ++ii)
   {
@@ -71,8 +70,6 @@ void PDNSolution_V::Init_flow_parabolic( const APart_Node * const &pNode_ptr,
     const FEANode * const &fNode_ptr,
     const ALocal_InflowBC * const &infbc )
 {
-  const int nlocalnode = pNode_ptr->get_nlocalnode();
-
   // First enforce everything to be zero
   for(int ii=0; ii<nlocalnode; ++ii)
   {

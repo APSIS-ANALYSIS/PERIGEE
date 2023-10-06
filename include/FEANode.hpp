@@ -63,7 +63,10 @@ class FEANode
     virtual void get_ctrlPts_xyz( const int &num, const int * const &index, 
         double * const &ctrl_x, double * const &ctrl_y, 
         double * const &ctrl_z ) const;
-    
+
+    virtual std::array<std::vector<double>, 3> get_ctrlPts_xyz( 
+        const std::vector<int> &index ) const;
+
     // ------------------------------------------------------------------------
     // ! Get n control points' x-y-z-w in a batch
     //   Note: Users are responsible for allocating and deallocating memory
@@ -102,7 +105,9 @@ class FEANode
 
   private:
     // The control points' coordinates and weights if used for NURBS
-    std::vector<double> ctrlPts_x, ctrlPts_y, ctrlPts_z, ctrlPts_w;
+    std::vector<double> ctrlPts_x {}, ctrlPts_y {}, ctrlPts_z {}, ctrlPts_w {};
+
+    FEANode() = delete;
 };
 
 #endif
