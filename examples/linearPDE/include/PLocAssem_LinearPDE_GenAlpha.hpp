@@ -143,9 +143,18 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem_Linear
 
     locassem_load_funs * flist;
 
+    typedef double (PLocAssem_LinearPDE_GenAlpha::*locassem_robin_coefficient)( const Vector_3 &pt, const double &time) const;
+    
+    locassem_robin_coefficient * colist;
+
     Vector_3 get_ebc_fun( const int &ebc_id, const Vector_3 &pt, const Vector_3 &nout, const double &tt ) const
     {
       return ((*this).*(flist[ebc_id]))(pt, nout, tt);
+    }
+
+    double get_robin_coefficient( const int &ebc_id, const Vector_3 &pt, const double &tt) const
+    {
+      return ((*this).*(colist[ebc_id]))(pt, tt);
     }
 
     double get_g_0( const Vector_3 &pt, const double &time ) const

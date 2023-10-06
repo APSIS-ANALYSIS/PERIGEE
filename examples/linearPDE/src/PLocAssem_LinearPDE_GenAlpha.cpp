@@ -54,6 +54,9 @@ PLocAssem_LinearPDE_GenAlpha::PLocAssem_LinearPDE_GenAlpha(
   if( num_ebc_fun == 0 ) flist = nullptr;
   else flist = new locassem_load_funs [num_ebc_fun];
 
+  if( num_ebc_fun == 0 ) colist = nullptr;
+  else colist = new locassem_robin_coefficient [num_ebc_fun];
+
   //flist[0] = &PLocAssem_LinearPDE_GenAlpha::get_g_0;
   //flist[1] = &PLocAssem_LinearPDE_GenAlpha::get_g_1;
  
