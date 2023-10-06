@@ -286,7 +286,7 @@ void PLocAssem_LinearPDE_GenAlpha::Assem_Load_EBC(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
-    const Vector_3 gg = get_ebc_fun( ebc_id, coor, curr );
+    const Vector_3 gg = get_ebc_fun( ebc_id, coor, n_out, curr );
 
     const double gwts = surface_area * quad -> get_qw( qua );
 
@@ -300,4 +300,62 @@ void PLocAssem_LinearPDE_GenAlpha::Assem_Load_EBC(
   }
 }
 
+void PLocAssem_LinearPDE_GenAlpha::Assem_Mass_EBC(
+        const int &ebc_id,
+        const double &time, const double &dt,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+{
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  const int face_nqp = quad -> get_num_quadPts();
+
+  Zero_sur_Mass();
+
+  const double curr = time + alpha_f * dt;
+
+  const double row = dof_mat * snLocBas;
+  const double row_mat = dof_mat * row;
+
+  for(int qua=0; qua < face_nqp; ++qua)
+  {
+    const std::vector<double> R = element->get_R(qua);
+
+    double surface_area;
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+
+    Vector_3 coor(0.0, 0.0, 0.0);
+
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      coor.x() += eleCtrlPts_x[ii] * R[ii];
+      coor.y() += eleCtrlPts_y[ii] * R[ii];
+      coor.z() += eleCtrlPts_z[ii] * R[ii];
+    }
+
+    const double coefficient = get_robin_coefficient( ebc_id, coor, curr );
+
+    const double gwts = surface_area * quad -> get_qw( qua );
+
+    for(int A=0; A<snLocBas; ++A)
+    {
+      const double NA = R[A];
+      for( int B=0; B<snLocBas; ++B)
+      {
+        const double NB = R[B];
+        // 11
+        sur_Mass[row_mat*A+dof_mat*B        ] += gwts * coefficient * NA * NB;
+
+        // 22
+        sur_Mass[row_mat*A+row+dof_mat*B+1  ] += gwts * coefficient * NA * NB;
+
+        // 33
+        sur_Mass[row_mat*A+2*row+dof_mat*B+2] += gwts * coefficient * NA * NB;
+      }
+    }
+  }
+}
 // EOF
