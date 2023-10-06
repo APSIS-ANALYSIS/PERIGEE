@@ -34,6 +34,16 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem_Linear
       }
     }
 
+    virtual void Zero_Stiffness()
+    {
+      for(int ii=0; ii<vec_size*vec_size; ++ii) Stiffness[ii] = 0.0;
+    }
+
+    virtual void Zero_Mass()
+    {
+      for(int ii=0; ii<vec_size*vec_size; ++ii) Mass[ii] = 0.0;
+    }
+
     virtual void Zero_Load()
     {
       for(int ii=0; ii<vec_size; ++ii) Load[ii] = 0.0;
