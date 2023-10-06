@@ -120,6 +120,11 @@ class IPLocAssem_Linear
     // --------------------------------------------------------------
     virtual void Zero_Mass() = 0;
 
+    virtual void Zero_sur_Mass()
+    {
+      SYS_T::print_fatal("Error: Zero_sur_Mass is not implemented. \n");
+    }
+
     // -------------------------------------------------------------- 
     // ------------------------------------------------------------------------
     // ! Assign all values in Load vector 0.0
