@@ -1,16 +1,19 @@
 #include "PLocAssem_LinearPDE_GenAlpha.hpp"
 
 PLocAssem_LinearPDE_GenAlpha::PLocAssem_LinearPDE_GenAlpha(
-    const double &in_rho, const double &in_cap, const double &in_kappa,
+    const double &in_Young_modulus, const double &in_Poisson_ratio,
     const TimeMethod_GenAlpha * const &tm_gAlpha,
     const int &in_nlocbas, const int &in_snlocbas, 
     const int &in_num_ebc_fun, const int &in_dof,
     const int &in_dof_mat, const int &elemtype )
-: rho( in_rho ), cap( in_cap ), kappa( in_kappa ),
+: Young_modulus( in_Young_modulus ), Possion_ratio( in_Poisson_ratio ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()), num_ebc_fun( in_num_ebc_fun ),
   dof( in_dof ), dof_mat( in_dof_mat )
 {
+  lambda = Possion_ratio * Young_modulus / (1.0 + Possion_ratio) * (1.0 - 2.0 * Possion_ratio);
+  mu = 0.5 * Young_modulus / (1.0 + Possion_ratio);
+   
   if(elemtype == 501)
   {
     // 501 is linear tet element

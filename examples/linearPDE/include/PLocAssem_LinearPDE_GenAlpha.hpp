@@ -12,7 +12,7 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem_Linear
 {
   public:
     PLocAssem_LinearPDE_GenAlpha( 
-        const double &in_rho, const double &in_cap, const double &in_kappa,
+        const double &in_Young_modulus, const double &in_Poisson_ratio,
         const TimeMethod_GenAlpha * const &tm_gAlpha,
         const int &in_nlocbas, const int &in_snlocbas,
         const int &in_num_ebc_fun, const int &in_dof,
@@ -103,13 +103,14 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem_Linear
 
   private:
     // Private data
-    const double rho, cap, kappa;
+    const double Young_modulus, Possion_ratio;
     const double alpha_f, alpha_m, gamma;
     
     const int num_ebc_fun;
     const int dof, dof_mat;
 
     int nLocBas, snLocBas, vec_size, sur_size;
+    double mu, lambda;
 
     void print_info() const;
 
