@@ -2,6 +2,7 @@
 
 PLocAssem_LinearPDE_GenAlpha::PLocAssem_LinearPDE_GenAlpha(
     const double &in_Young_modulus, const double &in_Poisson_ratio,
+    const double &in_rho,
     const TimeMethod_GenAlpha * const &tm_gAlpha,
     const int &in_nlocbas, const int &in_snlocbas, 
     const int &in_num_ebc_fun, const int &in_dof,
