@@ -52,7 +52,7 @@ PLocAssem_LinearPDE_GenAlpha::PLocAssem_LinearPDE_GenAlpha(
   Zero_sur_Mass_Load();
 
   if( num_ebc_fun == 0 ) flist = nullptr;
-  else flist = new locassem_transport_funs [num_ebc_fun];
+  else flist = new locassem_load_funs [num_ebc_fun];
 
   //flist[0] = &PLocAssem_LinearPDE_GenAlpha::get_g_0;
   //flist[1] = &PLocAssem_LinearPDE_GenAlpha::get_g_1;
