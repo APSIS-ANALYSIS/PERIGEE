@@ -12,6 +12,7 @@
 // ==================================================================
 #include "Math_Tools.hpp"
 #include "Mesh_Tet.hpp"
+#include "Mesh_FEM.hpp"
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
@@ -230,6 +231,12 @@ int main( int argc, char * argv[] )
     case 502:
       mesh = new Mesh_Tet(nFunc, nElem, 2);
       break;
+    case 601:
+      mesh = new Mesh_FEM(nFunc, nElem, 4, 1);
+      break;
+    case 602:
+      mesh = new Mesh_FEM(nFunc, nElem, 9, 2);
+      break;
     default:
       SYS_T::print_fatal("Error: elemType %d is not supported.\n", elemType);
       break;
@@ -253,20 +260,34 @@ int main( int argc, char * argv[] )
 
   // Set up Inflow BC info
   std::vector< Vector_3 > inlet_outvec( sur_file_in.size() );
-  
-  for(unsigned int ii=0; ii<sur_file_in.size(); ++ii)
-    inlet_outvec[ii] = TET_T::get_out_normal( sur_file_in[ii], ctrlPts, IEN );
 
+  // Set up Outflow BC info
+  std::vector< Vector_3 > outlet_outvec( sur_file_out.size() );
+
+  if(elemType==501 || elemType==502)
+  {
+    for(unsigned int ii=0; ii<sur_file_in.size(); ++ii)
+      inlet_outvec[ii] = TET_T::get_out_normal( sur_file_in[ii], ctrlPts, IEN );
+
+    for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
+      outlet_outvec[ii] = TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN );
+  }
+  else if(elemType==601 || elemType==602)
+  {
+    for(unsigned int ii=0; ii<sur_file_in.size(); ++ii)
+      inlet_outvec[ii] = HEX_T::get_out_normal( sur_file_in[ii], ctrlPts, IEN );
+    
+    for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
+      outlet_outvec[ii] = HEX_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN );
+  }
+  else
+    SYS_T::print_fatal("Error: elemType %d is not supported.\n", elemType);
+  
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall,
       nFunc, inlet_outvec, elemType );
   
   InFBC -> resetSurIEN_outwardnormal( IEN ); // assign outward orientation for triangles
 
-  // Set up Outflow BC info
-  std::vector< Vector_3 > outlet_outvec( sur_file_out.size() );
-
-  for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
-    outlet_outvec[ii] = TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN );
 
   ElemBC * ebc = new ElemBC_3D_tet_outflow( sur_file_out, outlet_outvec, elemType );
 
