@@ -13,7 +13,7 @@
 #include <ctime>
 #include <sys/stat.h>
 #include "petsc.h"
-#include "/opt/homebrew/Cellar/libomp/16.0.6/include/omp.h"
+#include "omp.h"
 
 #define PETSC_SILENCE_DEPRECATION_WARNINGS_3_19_0
 
