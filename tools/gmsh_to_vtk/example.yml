@@ -1,5 +1,5 @@
 # ==============================================================================
-# config_example.yml
+# example.yml
 # 
 # This code is used to store information in the gmsh file in order to avoid 
 # manually modifying gmsh2vtk.cpp, which can lead to unwanted errors.
@@ -21,7 +21,7 @@
 # $EndPhysicalNames
 # ......
 # ===============================================================================
-gmsh_file: "cylinder.msh"
+gmsh_file: "cube.msh"
 num_outlet: 1
 
 nbc_face_id: [0, 1]
