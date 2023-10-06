@@ -200,42 +200,34 @@ void PLocAssem_LinearPDE_GenAlpha::Assem_Mass(
   
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  const double curr = 0.0;
+  Zero_Mass();
 
-  Zero_Tangent_Residual();
+  std::vector<double> R(nLocBas, 0.0);
 
-  std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
+  const double row = dof_mat * nLocBas;
+  const double row_mat = dof_mat * row;
 
   for(int qua=0; qua<nqp; ++qua)
   {
-    double u_x = 0.0, u_y = 0.0, u_z = 0.0;
-    Vector_3 coor(0.0, 0.0, 0.0);
-
-    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
-
-    for(int ii=0; ii<nLocBas; ++ii)
-    {
-      u_x += sol[ii]     * dR_dx[ii];
-      u_y += sol[ii]     * dR_dy[ii];
-      u_z += sol[ii]     * dR_dz[ii];
-
-      coor.x() += eleCtrlPts_x[ii] * R[ii];
-      coor.y() += eleCtrlPts_y[ii] * R[ii];
-      coor.z() += eleCtrlPts_z[ii] * R[ii];
-    }
+    element->get_R( qua, &R[0]);
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
-    const double ff = get_f(coor, curr);
-
     for(int A=0; A<nLocBas; ++A)
     {
-      const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
-
-      Residual[A] += gwts * ( kappa * ( NA_x * u_x + NA_y * u_y + NA_z * u_z ) - NA * ff );
-
+      const double NA = R[A];
       for(int B=0; B<nLocBas; ++B)
-        Tangent[nLocBas * A + B] += gwts * rho * cap * R[A] * R[B];
+      {
+        const double NB = R[B];
+        // 11
+        Mass[row_mat*A+dof_mat*B        ] += gwts * rho * NA * NB;
+
+        // 22
+        Mass[row_mat*A+row+dof_mat*B+1  ] += gwts * rho * NA * NB;
+
+        // 33
+        Mass[row_mat*A+2*row+dof_mat*B+2] += gwts * rho * NA * NB;
+      }
     }
   } // End-of-quadrature-loop
 }
