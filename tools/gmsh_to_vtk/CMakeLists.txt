@@ -40,6 +40,7 @@ SET( perigee_lib_src
   ${perigee_source}/System/HDF5_Writer.cpp
   ${perigee_source}/Mesh/VTK_Tools.cpp
   ${perigee_source}/Mesh/Tet_Tools.cpp
+  ${perigee_source}/Mesh/Hex_Tools.cpp
   ${perigee_source}/Mesh/Gmsh_FileIO.cpp
   )
 

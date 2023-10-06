@@ -9,27 +9,16 @@
 
 int main( int argc, char * argv[] )
 {
-  // WE DO NOT NEED THESE
-  std::string gmshFile = "cylinder.msh";
-  int num_outlet = 1;
+  // Get element type from GIO
 
-  for(int ii=1; ii<argc; ++ii)
-  {
-    if( std::string(argv[ii])=="-gmsh_file"  && ii+1<argc) gmshFile=argv[ii+1];
-    if( std::string(argv[ii])=="-num_outlet" && ii+1<argc) num_outlet=std::stoi(argv[ii+1]);   
-  }
+  YAML::Node config = YAML::LoadFile("example.yml");
 
-  std::cout<<" -gmsh_file: "<<gmshFile<<std::endl;
-  std::cout<<" -num_outlet: "<<num_outlet<<std::endl;
-  // ==============
+  std::string gmshFile = config["gmsh_file"].as<std::string>();
+  int num_outlet = config["num_outlet"].as<int>();
 
   Gmsh_FileIO * GIO = new Gmsh_FileIO( gmshFile );
 
   GIO -> print_info();
-
-  // Get element type from GIO
-
-  YAML::Node config = YAML::LoadFile("example.yml");
 
   std::vector<int> nbc_face_id = config["nbc_face_id"].as<std::vector<int>>();
   std::vector<std::string> nbc_face_name = config["nbc_face_name"].as<std::vector<std::string>>();

@@ -21,6 +21,9 @@
 # $EndPhysicalNames
 # ......
 # ===============================================================================
+gmsh_file: "cylinder.msh"
+num_outlet: 1
+
 nbc_face_id: [0, 1]
 nbc_face_name: ["top", "bot"]
 nbc_vol_id: [0, 0]
