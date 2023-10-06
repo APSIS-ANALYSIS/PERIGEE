@@ -21,7 +21,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 : ElemBC_3D_tet( walls_combined, elemtype )
 {
   // num_ebc = 1 per the assumption for wall elem bc
-  const int ebc_id = 0;
+  constexpr int ebc_id = 0;
 
   radius.resize(    num_node[ebc_id] );
   thickness.resize( num_node[ebc_id] );
@@ -63,7 +63,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
 : ElemBC_3D_tet( walls_combined, elemtype )
 {
   // num_ebc = 1 per the assumption for wall elem bc
-  const int ebc_id = 0;
+  constexpr int ebc_id = 0;
 
   radius.resize(    num_node[ebc_id] );
   thickness.resize( num_node[ebc_id] );
@@ -124,7 +124,6 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   std::cout<<"     damping constant cs = " << dampingconst_combined << std::endl;
 }
 
-
 ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const std::string &walls_combined,
     const std::string &centerlines_combined,
@@ -159,7 +158,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   }
   
   // num_ebc = 1 per the assumption for wall elem bc
-  const int ebc_id = 0;
+  constexpr int ebc_id = 0;
  
   std::cout << "     ===> Overwriting background wall properties in \n";
 
@@ -171,15 +170,9 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   for(int ii=0; ii<num_srfs; ++ii)
   {
     if(elemtype == 501)
-    {
-      VTK_T::read_vtp_grid( wallsList[ii], numpts, numcels,
-            pt, ien_array ); 
-    }
+      VTK_T::read_vtp_grid( wallsList[ii], numpts, numcels, pt, ien_array ); 
     else
-    {
-      VTK_T::read_vtu_grid( wallsList[ii], numpts, numcels,
-            pt, ien_array );
-    }
+      VTK_T::read_vtu_grid( wallsList[ii], numpts, numcels, pt, ien_array );
 
     global_node_idx = VTK_T::read_int_PointData(wallsList[ii], "GlobalNodeID");
     global_elem_idx = VTK_T::read_int_CellData(wallsList[ii], "GlobalElementID");
@@ -253,7 +246,6 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     <<", "<<*std::max_element(dampingconst.begin(), dampingconst.end())<<"] \n";
 }
 
-
 ElemBC_3D_tet_wall::~ElemBC_3D_tet_wall()
 {
   VEC_T::clean( radius    );
@@ -262,7 +254,6 @@ ElemBC_3D_tet_wall::~ElemBC_3D_tet_wall()
   VEC_T::clean( springconst  );
   VEC_T::clean( dampingconst );
 }
-
 
 void ElemBC_3D_tet_wall::overwrite_from_vtk(
     const std::string &wallprop_vtk,
@@ -275,7 +266,7 @@ void ElemBC_3D_tet_wall::overwrite_from_vtk(
 
   std::vector<double> wallprop = VTK_T::read_double_PointData( wallprop_vtk, vtk_fieldname );
 
-  const int ebc_id = 0;
+  constexpr int ebc_id = 0;
   for( int ii = 0; ii < num_node[ebc_id]; ++ii )
   {
     // Search for corresponding global node ID in wallprop_vtk
@@ -328,7 +319,6 @@ void ElemBC_3D_tet_wall::overwrite_from_vtk(
   write_vtk(ebc_id, "varwallprop");
 }
 
-
 void ElemBC_3D_tet_wall::print_info() const
 {
   ElemBC_3D_tet::print_info();
@@ -340,9 +330,7 @@ void ElemBC_3D_tet_wall::print_info() const
   VEC_T::print( dampingconst, "wall_dampingconst.txt", '\n');
 }
 
-
-void ElemBC_3D_tet_wall::write_vtk( const int &ebc_id,
-    const std::string &filename ) const
+void ElemBC_3D_tet_wall::write_vtk( const int &ebc_id, const std::string &filename ) const
 {
   if(elem_type == 501)
   {
@@ -370,7 +358,6 @@ void ElemBC_3D_tet_wall::write_vtk( const int &ebc_id,
   }
 }
 
-
 void ElemBC_3D_tet_wall::add_wall_data( vtkPointSet * const &grid_w, const int &ebc_id ) const
 {
   // Add nodal indices
@@ -394,7 +381,6 @@ void ElemBC_3D_tet_wall::add_wall_data( vtkPointSet * const &grid_w, const int &
   // Add damping constant
   VTK_T::add_double_PointData( grid_w, dampingconst, "DampingConstant" );
 }
-
 
 void ElemBC_3D_tet_wall::compute_youngsmod( const double &r, const double &th, double &E )
 {
