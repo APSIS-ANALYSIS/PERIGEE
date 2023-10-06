@@ -33,7 +33,7 @@ class NodalBC_3D_ring : public INodalBC
         const std::vector< Vector_3 > &outlet_outnormal,
         const int &nFunc,
         const int &in_ring_bc_type,
-        const int &elemtype = 501 );
+        const int &elemtype );
 
     virtual ~NodalBC_3D_ring() {};
 

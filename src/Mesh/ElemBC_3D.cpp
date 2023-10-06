@@ -3,9 +3,9 @@
 ElemBC_3D::ElemBC_3D( const int &elemtype ) 
 : elem_type( elemtype ), num_ebc( 0 )
 {
-  num_node     = nullptr;
-  num_cell     = nullptr;
-  cell_nLocBas = nullptr;
+  num_node.clear();
+  num_cell.clear();
+  cell_nLocBas.clear();
 
   pt_xyz.clear();
   sur_ien.clear();
@@ -19,9 +19,9 @@ ElemBC_3D::ElemBC_3D( const std::vector<std::string> &vtkfileList,
     const int &elemtype ) : elem_type( elemtype ), 
   num_ebc( static_cast<int>( vtkfileList.size() ) )
 {
-  num_node     = new int [num_ebc];
-  num_cell     = new int [num_ebc];
-  cell_nLocBas = new int [num_ebc];
+  num_node.resize(num_ebc);  
+  num_cell.resize(num_ebc);
+  cell_nLocBas.resize(num_ebc);
 
   pt_xyz.resize(num_ebc);
   sur_ien.resize(num_ebc);
@@ -55,11 +55,7 @@ ElemBC_3D::ElemBC_3D( const std::vector<std::string> &vtkfileList,
 }
 
 ElemBC_3D::~ElemBC_3D()
-{
-  delete [] num_node; num_node = nullptr;
-  delete [] num_cell; num_cell = nullptr;
-  delete [] cell_nLocBas; cell_nLocBas = nullptr;
-}
+{}
 
 void ElemBC_3D::print_info() const
 {
@@ -108,7 +104,7 @@ void ElemBC_3D::reset501IEN_outwardnormal( const IIEN * const &VIEN )
       const int node_t[3] { get_ien(ebcid, ee, 0), get_ien(ebcid, ee, 1), get_ien(ebcid, ee, 2) };
 
       // The triangle mesh node's volumetric index
-      const std::vector<int> node_t_gi = { get_global_node(ebcid, node_t[0]), 
+      const std::vector<int> node_t_gi { get_global_node(ebcid, node_t[0]), 
         get_global_node(ebcid, node_t[1]), get_global_node(ebcid, node_t[2]) };
 
       // cell ee's global/volumetric index  
@@ -262,8 +258,8 @@ void ElemBC_3D::reset601IEN_outwardnormal( const IIEN * const &VIEN )
       const int node_q[4] { get_ien(ebcid, ee, 0), get_ien(ebcid, ee, 1),  get_ien(ebcid, ee, 2), get_ien(ebcid, ee, 3) };  
 
       // The quad mesh node's volumetric index
-      const std::vector<int> node_q_gi = { get_global_node(ebcid, node_q[0]), get_global_node(ebcid, node_q[1]),  
-                                           get_global_node(ebcid, node_q[2]), get_global_node(ebcid, node_q[3]) }; 
+      const std::vector<int> node_q_gi { get_global_node(ebcid, node_q[0]), get_global_node(ebcid, node_q[1]),  
+                                         get_global_node(ebcid, node_q[2]), get_global_node(ebcid, node_q[3]) }; 
 
       // cell ee's global/volumetric index  
       const int cell_gi = get_global_cell(ebcid, ee);

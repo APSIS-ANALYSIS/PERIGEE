@@ -14,9 +14,9 @@ class ElemBC_3D : public ElemBC
 {
   public:
     // Default constructor: prescribe an elembc class with no surface mesh data.
-    ElemBC_3D( const int &elemtype=501 );
+    ElemBC_3D( const int &elemtype );
 
-    ElemBC_3D( const std::vector<std::string> &vtkfileList, const int &elemtype=501 );
+    ElemBC_3D( const std::vector<std::string> &vtkfileList, const int &elemtype );
 
     virtual ~ElemBC_3D();
 
@@ -117,9 +117,9 @@ class ElemBC_3D : public ElemBC
   protected:
     const int elem_type, num_ebc;
     
-    int * num_node;     // length num_ebc
-    int * num_cell;     // length num_ebc
-    int * cell_nLocBas; // length num_ebc
+    std::vector<int> num_node;     // length num_ebc
+    std::vector<int> num_cell;     // length num_ebc
+    std::vector<int> cell_nLocBas; // length num_ebc
 
     // num_ebc times 3 x num_node[ii] in size
     std::vector< std::vector<double> > pt_xyz;
@@ -134,6 +134,9 @@ class ElemBC_3D : public ElemBC
     std::vector< std::vector<int> > global_cell;
 
     // ------------------------------------------------------------------------
+    // Disallow default constructor
+    ElemBC_3D() = delete;
+
     // Reset function for the IEN array of different element types.
     void reset501IEN_outwardnormal( const IIEN * const &VIEN );
 

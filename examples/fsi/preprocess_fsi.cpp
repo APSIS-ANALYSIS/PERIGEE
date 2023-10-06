@@ -433,9 +433,9 @@ int main( int argc, char * argv[] )
   for(int ii=0; ii<num_inlet; ++ii)
     inlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_in[ii], ctrlPts, IEN_v );
 
-  INodalBC * InFBC = new NodalBC_3D_inflow( sur_f_file_in, sur_f_file_wall, nFunc_v, inlet_outvec );
+  INodalBC * InFBC = new NodalBC_3D_inflow( sur_f_file_in, sur_f_file_wall, nFunc_v, inlet_outvec, elemType );
 
-  InFBC -> resetTriIEN_outwardnormal( IEN_v ); // assign outward orientation for triangles
+  InFBC -> resetSurIEN_outwardnormal( IEN_v ); // assign outward orientation for triangles
   
   // Physical ElemBC
   cout<<"4. Elem boundary for the implicit solver: \n";
@@ -446,9 +446,9 @@ int main( int argc, char * argv[] )
 
   ElemBC * ebc = nullptr;
   if( fsiBC_type == 0 || fsiBC_type == 1 )
-    ebc = new ElemBC_3D_tet_outflow( sur_f_file_out, outlet_outvec );
+    ebc = new ElemBC_3D_tet_outflow( sur_f_file_out, outlet_outvec, elemType );
   else if( fsiBC_type == 2 )
-    ebc = new ElemBC_3D_tet( sur_f_file_wall );
+    ebc = new ElemBC_3D_tet( sur_f_file_wall, elemType );
   else SYS_T::print_fatal("ERROR: uncognized fsiBC type. \n");
 
   ebc -> resetTriIEN_outwardnormal( IEN_v ); // assign outward orientation for triangles
