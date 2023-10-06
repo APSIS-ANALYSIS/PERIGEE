@@ -36,7 +36,7 @@ int main( int argc, char * argv[] )
     double integral = 0.0;
     double integral_qua = 0.0;
 
-    QuadPts_Gauss quad_gauss(num_pts, lower_bound, upper_bound);
+    QuadPts_Gauss_1D quad_gauss(num_pts, lower_bound, upper_bound);
     int count = 0;
     for(int ii = 0; ii<=poly_degree; ++ii)
     {

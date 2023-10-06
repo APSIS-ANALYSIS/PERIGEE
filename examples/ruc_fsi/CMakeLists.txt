@@ -50,6 +50,8 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/NodalBC_3D_ring.cpp
   ${perigee_source}/Mesh/NodalBC_3D_wall.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_1D.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_Quad.cpp
   ${perigee_source}/Mesh/NBC_Partition.cpp
   ${perigee_source}/Mesh/NBC_Partition_inflow.cpp
   ${perigee_source}/Mesh/NBC_Partition_ring.cpp
@@ -62,6 +64,8 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Element/FE_Tools.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Quad4_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Quad9_3D_der0.cpp  
   )
 
 SET( perigee_analysis_lib_src

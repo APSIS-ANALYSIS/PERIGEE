@@ -50,6 +50,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Mesh_Hex.cpp
   ${perigee_source}/Mesh/Part_FEM.cpp
   ${perigee_source}/Mesh/ElemBC_3D.cpp
+  ${perigee_source}/Mesh/ElemBC_3D_outflow.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet_wall.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet_outflow.cpp
@@ -75,7 +76,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/System/PETSc_Tools.cpp
   ${perigee_source}/System/Matrix_PETSc.cpp
   ${perigee_source}/System/Tensor4_3D.cpp
-  ${perigee_source}/Mesh/QuadPts_Gauss.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_1D.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Tet.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Quad.cpp

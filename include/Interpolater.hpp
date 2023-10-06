@@ -231,7 +231,7 @@ class Interpolater
     const int nLocBas;
 
     // Disable empty constructor
-    Interpolater();
+    Interpolater() = delete;
 };
 
 #endif

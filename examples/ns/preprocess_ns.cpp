@@ -214,7 +214,7 @@ int main( int argc, char * argv[] )
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall,
       nFunc, inlet_outvec, elemType );
 
-  InFBC -> resetTriIEN_outwardnormal( IEN ); // assign outward orientation for triangles
+  InFBC -> resetSurIEN_outwardnormal( IEN ); // assign outward orientation for triangles
 
 
   // Setup Elemental Boundary Conditions
