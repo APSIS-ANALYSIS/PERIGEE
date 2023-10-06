@@ -145,50 +145,57 @@ void PLocAssem_LinearPDE_GenAlpha::Assem_Stiffness(
   const int nqp = quad -> get_num_quadPts();
   
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-  
-  const double curr = time + alpha_f * dt;
 
-  Zero_Tangent_Residual();
+  Zero_Stiffness();
 
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
   for(int qua=0; qua<nqp; ++qua)
   {
-    double u_t = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
-    
-    Vector_3 coor(0.0, 0.0, 0.0);
-
-    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
-    
-    for(int ii=0; ii<nLocBas; ++ii)
-    {
-      u_t += dot_sol[ii] * R[ii];
-      u_x += sol[ii]     * dR_dx[ii];
-      u_y += sol[ii]     * dR_dy[ii];
-      u_z += sol[ii]     * dR_dz[ii];
-      
-      coor.x() += eleCtrlPts_x[ii] * R[ii];
-      coor.y() += eleCtrlPts_y[ii] * R[ii];
-      coor.z() += eleCtrlPts_z[ii] * R[ii];
-    }
+    element->get_gradR( qua, &dR_dx[0], &dR_dy[0], &dR_dz[0] );
     
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
-    
-    const double ff = get_f(coor, curr);
+
+    const double row = dof_mat * nLocBas;
+    const double row_mat = dof_mat * row;
 
     for(int A=0; A<nLocBas; ++A)
     {
-      const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
-
-      Residual[A] += gwts * ( NA * (rho * cap * u_t - ff) + kappa * ( NA_x * u_x
-         + NA_y * u_y + NA_z * u_z ) );
+      const double NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
       for(int B=0; B<nLocBas; ++B)
       {
-        const double NB = R[B], NB_x = dR_dx[B], NB_y = dR_dy[B], NB_z = dR_dz[B];
+        const double NB_x = dR_dx[B], NB_y = dR_dy[B], NB_z = dR_dz[B];
 
-        Tangent[nLocBas * A + B] += gwts * ( alpha_m * rho * cap * NA * NB
-           + alpha_f * gamma * dt * kappa * (NA_x * NB_x + NA_y * NB_y + NA_z * NB_z) ); 
+        // 11
+        Stiffness[row_mat*A+dof_mat*B        ] += gwts * ( (2.0 * mu + lambda) * NA_x * NB_x
+            + mu * (NA_y * NB_y + NA_z * NB_z) );
+
+        // 12
+        Stiffness[row_mat*A+dof_mat*B+1      ] += gwts * ( lambda * NA_x * NB_y + mu * NA_y * NB_x );
+
+        // 13
+        Stiffness[row_mat*A+dof_mat*B+2      ] += gwts * ( lambda * NA_x * NB_z + mu * NA_z * NB_x );
+
+        // 21
+        Stiffness[row_mat*A+row+dof_mat*B    ] += gwts * ( lambda * NA_y * NB_x + mu * NA_x * NB_y );
+
+        // 22
+        Stiffness[row_mat*A+row+dof_mat*B+1  ] += gwts * ( (2.0 * mu + lambda) * NA_y * NB_y
+            + mu * (NA_x * NB_x + NA_z * NB_z) );
+
+        // 23
+        Stiffness[row_mat*A+row+dof_mat*B+2  ] += gwts * ( lambda * NA_y * NB_z + mu * NA_z * NB_y );
+
+        // 31
+        Stiffness[row_mat*A+2*row+dof_mat*B  ] += gwts * ( lambda * NA_z * NB_x + mu * NA_x * NB_y );
+
+        // 32
+        Stiffness[row_mat*A+2*row+dof_mat*B+1] += gwts * ( lambda * NA_z * NB_y + mu * NA_y * NB_z );
+
+        // 33
+        Stiffness[row_mat*A+2*row+dof_mat*B+2] += gwts * ( (2.0 * mu + lambda) * NA_z * NB_z
+            + mu * (NA_x * NB_x + NA_y * NB_y) );
       } 
     }
   } // End-of-quadrature-loop
