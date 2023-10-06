@@ -172,16 +172,14 @@ int main(int argc, char *argv[])
       "Error: Assigned CPU number does not match the partition. \n");
 
   SYS_T::commPrint("===> %d processor(s) are assigned for FEM analysis.\n", size);
-  
-  // ===== Quadrature rules =====
-  SYS_T::commPrint("===> Build quadrature rules. \n");
-  IQuadPts * quadv = new QuadPts_Gauss_Tet( nqp_vol );
-  IQuadPts * quads = new QuadPts_Gauss_Triangle( nqp_sur );
 
-  // ===== Finite Element Container =====
+  // ===== Finite Element Container & Quadrature rules=====
   SYS_T::commPrint("===> Setup element container. \n");
+  SYS_T::commPrint("===> Build quadrature rules. \n");
   FEAElement * elementv = nullptr;
   FEAElement * elements = nullptr;
+  IQuadPts * quadv = nullptr;
+  IQuadPts * quads = nullptr;
 
   if( GMIptr->get_elemType() == 501 )
   {
@@ -190,6 +188,8 @@ int main(int argc, char *argv[])
 
     elementv = new FEAElement_Tet4( nqp_vol ); // elem type 501
     elements = new FEAElement_Triangle3_3D_der0( nqp_sur );
+    quadv = new QuadPts_Gauss_Tet( nqp_vol );
+    quads = new QuadPts_Gauss_Triangle( nqp_sur );
   }
   else if( GMIptr->get_elemType() == 502 )
   {
@@ -198,6 +198,8 @@ int main(int argc, char *argv[])
 
     elementv = new FEAElement_Tet10_v2( nqp_vol ); // elem type 502
     elements = new FEAElement_Triangle6_3D_der0( nqp_sur );
+    quadv = new QuadPts_Gauss_Tet( nqp_vol );
+    quads = new QuadPts_Gauss_Triangle( nqp_sur );
   }
   else if( GMIptr->get_elemType() == 601 )
   {
