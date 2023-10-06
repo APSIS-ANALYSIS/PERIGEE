@@ -21,7 +21,7 @@
 #include "NodalBC_3D_inflow.hpp"
 #include "NodalBC_3D_ring.hpp"
 #include "NodalBC_3D_wall.hpp"
-#include "ElemBC_3D_tet_outflow.hpp"
+#include "ElemBC_3D_outflow.hpp"
 #include "ElemBC_3D_tet_wall.hpp"
 #include "NBC_Partition.hpp"
 #include "NBC_Partition_inflow.hpp"
@@ -143,7 +143,7 @@ int main( int argc, char * argv[] )
   SYS_T::file_check(geo_file); cout<<geo_file<<" found. \n";
 
   // If quadratic, all mesh files will be in vtu format
-  if(elemType == 502)
+  if(elemType == 502 || elemType == 602)
   {
     sur_file_wall.erase( sur_file_wall.end()-4, sur_file_wall.end() );
     sur_file_wall += ".vtu";
@@ -156,7 +156,7 @@ int main( int argc, char * argv[] )
 
   for(int ii=0; ii<num_inlet; ++ii)
   {
-    if(elemType == 501 )
+    if(elemType == 501 || elemType == 601)
       sur_file_in[ii] = SYS_T::gen_capfile_name( sur_file_in_base, ii, ".vtp" ); 
     else
       sur_file_in[ii] = SYS_T::gen_capfile_name( sur_file_in_base, ii, ".vtu" ); 
@@ -170,7 +170,7 @@ int main( int argc, char * argv[] )
 
   for(int ii=0; ii<num_outlet; ++ii)
   {
-    if(elemType == 501 )
+    if(elemType == 501 || elemType == 601)
       sur_file_out[ii] = SYS_T::gen_capfile_name( sur_file_out_base, ii, ".vtp" ); 
     else
       sur_file_out[ii] = SYS_T::gen_capfile_name( sur_file_out_base, ii, ".vtu" ); 
@@ -289,9 +289,9 @@ int main( int argc, char * argv[] )
   InFBC -> resetSurIEN_outwardnormal( IEN ); // assign outward orientation for triangles
 
 
-  ElemBC * ebc = new ElemBC_3D_tet_outflow( sur_file_out, outlet_outvec, elemType );
+  ElemBC * ebc = new ElemBC_3D_outflow( sur_file_out, outlet_outvec, elemType );
 
-  ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
+  ebc -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
 
   // Set up Ring BC
   INodalBC * ring_bc = new NodalBC_3D_ring( sur_file_in, inlet_outvec,
