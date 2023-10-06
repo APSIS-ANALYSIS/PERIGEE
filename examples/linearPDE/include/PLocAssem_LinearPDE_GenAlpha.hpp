@@ -5,10 +5,10 @@
 //
 // Date: Oct 6 2023
 // ============================================================================
-#include "IPLocAssem.hpp"
+#include "IPLocAssem_Linear.hpp"
 #include "TimeMethod_GenAlpha.hpp"
 
-class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem
+class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem_Linear
 {
   public:
     PLocAssem_LinearPDE_GenAlpha( 
@@ -24,28 +24,36 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem
 
     virtual int get_dof_mat() const {return dof_mat;}
 
-    virtual void Zero_Tangent_Residual()
+    virtual void Zero_Mass_Stiffness_Load()
     {
-      for(int ii=0; ii<vec_size; ++ii) Residual[ii] = 0.0;
-      for(int ii=0; ii<vec_size*vec_size; ++ii) Tangent[ii] = 0.0;
+      for(int ii=0; ii<vec_size; ++ii) Load[ii] = 0.0;
+      for(int ii=0; ii<vec_size*vec_size; ++ii) 
+      {
+        Mass[ii] = 0.0;
+        Stiffness[ii] = 0.0;
+      }
     }
 
-    virtual void Zero_Residual()
+    virtual void Zero_Load()
     {
-      for(int ii=0; ii<vec_size; ++ii) Residual[ii] = 0.0;
+      for(int ii=0; ii<vec_size; ++ii) Load[ii] = 0.0;
     }
 
-    virtual void Zero_sur_Residual()
+    virtual void Zero_sur_Load()
     {
-      for(int ii=0; ii<sur_size; ++ii) sur_Residual[ii] = 0.0;
+      for(int ii=0; ii<sur_size; ++ii) sur_Load[ii] = 0.0;
     }
 
     virtual void Assem_Estimate()
     {
-      for(int ii=0; ii<vec_size*vec_size; ++ii) Tangent[ii] = 1.0;
+      for(int ii=0; ii<vec_size*vec_size; ++ii) 
+      {
+        Mass[ii] = 1.0
+        Stiffness[ii] = 1.0;
+      }
     }
 
-    virtual void Assem_Residual(
+    virtual void Assem_Load(
         const double &time, const double &dt,
         const double * const &dot_sol,
         const double * const &sol,
@@ -55,7 +63,7 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
-    virtual void Assem_Tangent_Residual(
+    virtual void Assem_Stiffness(
         const double &time, const double &dt,
         const double * const &dot_sol,
         const double * const &sol,
@@ -65,7 +73,7 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
-    virtual void Assem_Mass_Residual(
+    virtual void Assem_Mass(
         const double * const &sol,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
@@ -73,7 +81,7 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
-    virtual void Assem_Residual_EBC(
+    virtual void Assem_Load_EBC(
         const int &ebc_id,
         const double &time, const double &dt,
         FEAElement * const &element,
