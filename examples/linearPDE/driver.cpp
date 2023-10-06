@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 {
   // Number of quadrature points for tets and triangles
   // Suggested values: 5 / 4 for linear, 17 / 13 for quadratic
-  int nqp_tet = 5, nqp_tri = 4;
+  int nqp_vol = 5, nqp_sur = 4;
 
   // generalized-alpha rho_inf
   double genA_rho_inf = 0.5;
@@ -68,8 +68,8 @@ int main(int argc, char *argv[])
   // ===== Read Command Line Arguments =====
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
 
-  SYS_T::GetOptionInt("-nqp_tet", nqp_tet);
-  SYS_T::GetOptionInt("-nqp_tri", nqp_tri);
+  SYS_T::GetOptionInt("-nqp_vol", nqp_vol);
+  SYS_T::GetOptionInt("-nqp_sur", nqp_sur);
   SYS_T::GetOptionReal("-rho_inf", genA_rho_inf);
   SYS_T::GetOptionBool(  "-is_backward_Euler", is_backward_Euler);
   SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
@@ -94,8 +94,8 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionString("-restart_name", restart_name);
 
   // ===== Print Command Line Arguments =====
-  SYS_T::cmdPrint("-nqp_tet:", nqp_tet);
-  SYS_T::cmdPrint("-nqp_tri:", nqp_tri);
+  SYS_T::cmdPrint("-nqp_vol:", nqp_vol);
+  SYS_T::cmdPrint("-nqp_sur:", nqp_sur);
   if( is_backward_Euler )
     SYS_T::commPrint(   "-is_backward_Euler: true \n");
   else
@@ -134,8 +134,8 @@ int main(int argc, char *argv[])
 
     cmdh5w->write_doubleScalar("init_step", initial_step);
     cmdh5w->write_intScalar("sol_record_freq", sol_record_freq);
-    cmdh5w->write_intScalar("nqp_tet", nqp_tet);
-    cmdh5w->write_intScalar("nqp_tri", nqp_tri);
+    cmdh5w->write_intScalar("nqp_vol", nqp_vol);
+    cmdh5w->write_intScalar("nqp_sur", nqp_sur);
 
     delete cmdh5w; H5Fclose(cmd_file_id);
   }
@@ -169,8 +169,8 @@ int main(int argc, char *argv[])
   
   // ===== Quadrature rules =====
   SYS_T::commPrint("===> Build quadrature rules. \n");
-  IQuadPts * quadv = new QuadPts_Gauss_Tet( nqp_tet );
-  IQuadPts * quads = new QuadPts_Gauss_Triangle( nqp_tri );
+  IQuadPts * quadv = new QuadPts_Gauss_Tet( nqp_vol );
+  IQuadPts * quads = new QuadPts_Gauss_Triangle( nqp_sur );
 
   // ===== Finite Element Container =====
   SYS_T::commPrint("===> Setup element container. \n");
@@ -179,19 +179,19 @@ int main(int argc, char *argv[])
 
   if( GMIptr->get_elemType() == 501 )
   {
-    if( nqp_tet > 5 ) SYS_T::commPrint("Warning: the tet element is linear and you are using more than 5 quadrature points.\n");
-    if( nqp_tri > 4 ) SYS_T::commPrint("Warning: the tri element is linear and you are using more than 4 quadrature points.\n");
+    if( nqp_vol > 5 ) SYS_T::commPrint("Warning: the tet element is linear and you are using more than 5 quadrature points.\n");
+    if( nqp_sur > 4 ) SYS_T::commPrint("Warning: the tri element is linear and you are using more than 4 quadrature points.\n");
 
-    elementv = new FEAElement_Tet4( nqp_tet ); // elem type 501
-    elements = new FEAElement_Triangle3_3D_der0( nqp_tri );
+    elementv = new FEAElement_Tet4( nqp_vol ); // elem type 501
+    elements = new FEAElement_Triangle3_3D_der0( nqp_sur );
   }
   else if( GMIptr->get_elemType() == 502 )
   {
-    SYS_T::print_fatal_if( nqp_tet < 29, "Error: not enough quadrature points for tets.\n" );
-    SYS_T::print_fatal_if( nqp_tri < 13, "Error: not enough quadrature points for triangles.\n" );
+    SYS_T::print_fatal_if( nqp_vol < 29, "Error: not enough quadrature points for tets.\n" );
+    SYS_T::print_fatal_if( nqp_sur < 13, "Error: not enough quadrature points for triangles.\n" );
 
-    elementv = new FEAElement_Tet10_v2( nqp_tet ); // elem type 502
-    elements = new FEAElement_Triangle6_3D_der0( nqp_tri );
+    elementv = new FEAElement_Tet10_v2( nqp_vol ); // elem type 502
+    elements = new FEAElement_Triangle6_3D_der0( nqp_sur );
   }
   else SYS_T::print_fatal("Error: Element type not supported.\n");
 
