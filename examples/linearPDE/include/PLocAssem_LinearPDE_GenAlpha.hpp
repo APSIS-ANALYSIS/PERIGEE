@@ -15,13 +15,14 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem
         const double &in_rho, const double &in_cap, const double &in_kappa,
         const TimeMethod_GenAlpha * const &tm_gAlpha,
         const int &in_nlocbas, const int &in_snlocbas,
-        const int &in_num_ebc_fun, const int &elemtype = 501 );
+        const int &in_num_ebc_fun, const int &in_dof,
+        const int &in_dof_mat, const int &elemtype = 501 );
 
     virtual ~PLocAssem_LinearPDE_GenAlpha();
 
-    virtual int get_dof() const {return 1;}
+    virtual int get_dof() const {return dof;}
 
-    virtual int get_dof_mat() const {return 1;}
+    virtual int get_dof_mat() const {return dof_mat;}
 
     virtual void Zero_Tangent_Residual()
     {
@@ -87,6 +88,7 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem
     const double alpha_f, alpha_m, gamma;
     
     const int num_ebc_fun;
+    const int dof, dof_mat;
 
     int nLocBas, snLocBas, vec_size, sur_size;
 
