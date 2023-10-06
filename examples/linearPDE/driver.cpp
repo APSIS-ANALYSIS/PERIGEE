@@ -8,11 +8,17 @@
 #include "ALocal_EBC.hpp"
 #include "ALocal_NBC.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
+#include "QuadPts_Gauss_Quad.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
+#include "QuadPts_Gauss_Hex.hpp"
 #include "FEAElement_Tet4.hpp"
 #include "FEAElement_Tet10_v2.hpp"
+#include "FEAElement_Hex8.hpp"
+#include "FEAElement_Hex27.hpp"
 #include "FEAElement_Triangle3_3D_der0.hpp"
 #include "FEAElement_Triangle6_3D_der0.hpp"
+#include "FEAElement_Quad4_3D_der0.hpp"
+#include "FEAElement_Quad9_3D_der0.hpp"
 #include "PLocAssem_Tet_Transport_GenAlpha.hpp"
 #include "PGAssem_Tet_Transport_GenAlpha.hpp"
 #include "PNonlinear_Transport_Solver.hpp"
@@ -192,6 +198,19 @@ int main(int argc, char *argv[])
 
     elementv = new FEAElement_Tet10_v2( nqp_vol ); // elem type 502
     elements = new FEAElement_Triangle6_3D_der0( nqp_sur );
+  }
+  else if( GMIptr->get_elemType() == 601 )
+  {
+    elementv = new FEAElement_Hex8( nqp_vol ); // elem type 601
+    elements = new FEAElement_Quad4_3D_der0( nqp_sur );
+  }
+  else if( GMIptr->get_elemType() == 602 )
+  {
+    SYS_T::print_fatal_if( nqp_vol < 8, "Error: not enough quadrature points for hex.\n" );
+    SYS_T::print_fatal_if( nqp_sur < 4, "Error: not enough quadrature points for quad.\n" );
+
+    elementv = new FEAElement_Hex27( nqp_vol ); // elem type 602
+    elements = new FEAElement_Quad9_3D_der0( nqp_sur );
   }
   else SYS_T::print_fatal("Error: Element type not supported.\n");
 
