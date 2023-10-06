@@ -13,7 +13,7 @@ PLocAssem_LinearPDE_GenAlpha::PLocAssem_LinearPDE_GenAlpha(
 {
   lambda = Possion_ratio * Young_modulus / (1.0 + Possion_ratio) * (1.0 - 2.0 * Possion_ratio);
   mu = 0.5 * Young_modulus / (1.0 + Possion_ratio);
-   
+
   if(elemtype == 501)
   {
     // 501 is linear tet element
@@ -174,27 +174,9 @@ void PLocAssem_LinearPDE_GenAlpha::Assem_Stiffness(
         Stiffness[row_mat*A+dof_mat*B        ] += gwts * ( (2.0 * mu + lambda) * NA_x * NB_x
             + mu * (NA_y * NB_y + NA_z * NB_z) );
 
-        // 12
-        Stiffness[row_mat*A+dof_mat*B+1      ] += gwts * ( lambda * NA_x * NB_y + mu * NA_y * NB_x );
-
-        // 13
-        Stiffness[row_mat*A+dof_mat*B+2      ] += gwts * ( lambda * NA_x * NB_z + mu * NA_z * NB_x );
-
-        // 21
-        Stiffness[row_mat*A+row+dof_mat*B    ] += gwts * ( lambda * NA_y * NB_x + mu * NA_x * NB_y );
-
         // 22
         Stiffness[row_mat*A+row+dof_mat*B+1  ] += gwts * ( (2.0 * mu + lambda) * NA_y * NB_y
             + mu * (NA_x * NB_x + NA_z * NB_z) );
-
-        // 23
-        Stiffness[row_mat*A+row+dof_mat*B+2  ] += gwts * ( lambda * NA_y * NB_z + mu * NA_z * NB_y );
-
-        // 31
-        Stiffness[row_mat*A+2*row+dof_mat*B  ] += gwts * ( lambda * NA_z * NB_x + mu * NA_x * NB_y );
-
-        // 32
-        Stiffness[row_mat*A+2*row+dof_mat*B+1] += gwts * ( lambda * NA_z * NB_y + mu * NA_y * NB_z );
 
         // 33
         Stiffness[row_mat*A+2*row+dof_mat*B+2] += gwts * ( (2.0 * mu + lambda) * NA_z * NB_z
