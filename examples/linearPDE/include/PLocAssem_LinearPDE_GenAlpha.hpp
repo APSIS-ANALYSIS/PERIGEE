@@ -130,13 +130,13 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem_Linear
       return Vector_3(0.0, 0.0, 0.0); 
     }
 
-    typedef double ( PLocAssem_LinearPDE_GenAlpha::*locassem_transport_funs )( const Vector_3 &pt, const double &t ) const;
+    typedef Vector_3 ( PLocAssem_LinearPDE_GenAlpha::*locassem_transport_funs )( const Vector_3 &pt, const Vector_3 &nout, const double &t ) const;
 
     locassem_transport_funs * flist;
 
-    double get_ebc_fun( const int &ebc_id, const Vector_3 &pt, const double &tt ) const
+    Vector_3 get_ebc_fun( const int &ebc_id, const Vector_3 &pt, const Vector_3 &nout, const double &tt ) const
     {
-      return ((*this).*(flist[ebc_id]))(pt, tt);
+      return ((*this).*(flist[ebc_id]))(pt, nout, tt);
     }
 
     double get_g_0( const Vector_3 &pt, const double &time ) const

@@ -174,10 +174,28 @@ void PLocAssem_LinearPDE_GenAlpha::Assem_Stiffness(
         // 11
         Stiffness[row_mat*A+dof_mat*B        ] += gwts * ( (2.0 * mu + lambda) * NA_x * NB_x
             + mu * (NA_y * NB_y + NA_z * NB_z) );
+        
+        // 12
+        Stiffness[row_mat*A+dof_mat*B+1      ] += gwts * ( lambda * NA_x * NB_y + mu * NA_y * NB_x );
+
+        // 13
+        Stiffness[row_mat*A+dof_mat*B+2      ] += gwts * ( lambda * NA_x * NB_z + mu * NA_z * NB_x );
+
+        // 21
+        Stiffness[row_mat*A+row+dof_mat*B    ] += gwts * ( lambda * NA_y * NB_x + mu * NA_x * NB_y );
 
         // 22
         Stiffness[row_mat*A+row+dof_mat*B+1  ] += gwts * ( (2.0 * mu + lambda) * NA_y * NB_y
             + mu * (NA_x * NB_x + NA_z * NB_z) );
+        
+        // 23
+        Stiffness[row_mat*A+row+dof_mat*B+2  ] += gwts * ( lambda * NA_y * NB_z + mu * NA_z * NB_y );
+
+        // 31
+        Stiffness[row_mat*A+2*row+dof_mat*B  ] += gwts * ( lambda * NA_z * NB_x + mu * NA_x * NB_y );
+
+        // 32
+        Stiffness[row_mat*A+2*row+dof_mat*B+1] += gwts * ( lambda * NA_z * NB_y + mu * NA_y * NB_z );
 
         // 33
         Stiffness[row_mat*A+2*row+dof_mat*B+2] += gwts * ( (2.0 * mu + lambda) * NA_z * NB_z
@@ -245,7 +263,7 @@ void PLocAssem_LinearPDE_GenAlpha::Assem_Load_EBC(
 
   const int face_nqp = quad -> get_num_quadPts();
 
-  Zero_sur_Residual();
+  Zero_sur_Load();
 
   const double curr = time + alpha_f * dt;
 
@@ -265,12 +283,17 @@ void PLocAssem_LinearPDE_GenAlpha::Assem_Load_EBC(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
-    const double gg = get_ebc_fun( ebc_id, coor, curr );
+    const Vector_3 gg = get_ebc_fun( ebc_id, coor, curr );
 
     const double gwts = surface_area * quad -> get_qw( qua );
 
     for(int A=0; A<snLocBas; ++A)
-      sur_Residual[A] -= gwts * R[A] * gg;
+    {
+      const double NA = R[A];
+      sur_Load[dof_mat*A  ] += gwts * NA * gg.x();
+      sur_Load[dof_mat*A+1] += gwts * NA * gg.y();
+      sur_Load[dof_mat*A+2] += gwts * NA * gg.z();
+    }
   }
 }
 
