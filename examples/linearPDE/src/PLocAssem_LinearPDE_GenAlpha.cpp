@@ -58,9 +58,11 @@ PLocAssem_LinearPDE_GenAlpha::PLocAssem_LinearPDE_GenAlpha(
 
 PLocAssem_LinearPDE_GenAlpha::~PLocAssem_LinearPDE_GenAlpha()
 {
-  delete [] Tangent; Tangent = nullptr;
-  delete [] Residual; Residual = nullptr;
-  delete [] sur_Residual; sur_Residual = nullptr;
+  delete [] Mass; Mass = nullptr;
+  delete [] Stiffness; Stiffness = nullptr;
+  delete [] Load; Load = nullptr;
+  delete [] sur_Mass; sur_Mass = nullptr;
+  delete [] sur_Load; sur_Load = nullptr;
 
   if(num_ebc_fun > 0) delete [] flist;
 }
