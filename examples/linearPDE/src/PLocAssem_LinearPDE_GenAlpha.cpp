@@ -1,6 +1,6 @@
-#include "PLocAssem_Tet_Transport_GenAlpha.hpp"
+#include "PLocAssem_LinearPDE_GenAlpha.hpp"
 
-PLocAssem_Tet_Transport_GenAlpha::PLocAssem_Tet_Transport_GenAlpha(
+PLocAssem_LinearPDE_GenAlpha::PLocAssem_LinearPDE_GenAlpha(
     const double &in_rho, const double &in_cap, const double &in_kappa,
     const TimeMethod_GenAlpha * const &tm_gAlpha,
     const int &in_nlocbas, const int &in_snlocbas, 
@@ -36,13 +36,13 @@ PLocAssem_Tet_Transport_GenAlpha::PLocAssem_Tet_Transport_GenAlpha(
   if( num_ebc_fun == 0 ) flist = nullptr;
   else flist = new locassem_transport_funs [num_ebc_fun];
 
-  //flist[0] = &PLocAssem_Tet_Transport_GenAlpha::get_g_0;
-  //flist[1] = &PLocAssem_Tet_Transport_GenAlpha::get_g_1;
+  //flist[0] = &PLocAssem_LinearPDE_GenAlpha::get_g_0;
+  //flist[1] = &PLocAssem_LinearPDE_GenAlpha::get_g_1;
  
   print_info();
 }
 
-PLocAssem_Tet_Transport_GenAlpha::~PLocAssem_Tet_Transport_GenAlpha()
+PLocAssem_LinearPDE_GenAlpha::~PLocAssem_LinearPDE_GenAlpha()
 {
   delete [] Tangent; Tangent = nullptr;
   delete [] Residual; Residual = nullptr;
@@ -51,7 +51,7 @@ PLocAssem_Tet_Transport_GenAlpha::~PLocAssem_Tet_Transport_GenAlpha()
   if(num_ebc_fun > 0) delete [] flist;
 }
 
-void PLocAssem_Tet_Transport_GenAlpha::print_info() const
+void PLocAssem_LinearPDE_GenAlpha::print_info() const
 {
   SYS_T::print_sep_line();
   SYS_T::commPrint("  Three-dimensional transport equation: \n");
@@ -66,7 +66,7 @@ void PLocAssem_Tet_Transport_GenAlpha::print_info() const
   SYS_T::print_sep_line();
 }
 
-void PLocAssem_Tet_Transport_GenAlpha::Assem_Residual(
+void PLocAssem_LinearPDE_GenAlpha::Assem_Residual(
     const double &time, const double &dt,
     const double * const &dot_sol,
     const double * const &sol,
@@ -119,7 +119,7 @@ void PLocAssem_Tet_Transport_GenAlpha::Assem_Residual(
 }
 
 
-void PLocAssem_Tet_Transport_GenAlpha::Assem_Tangent_Residual(
+void PLocAssem_LinearPDE_GenAlpha::Assem_Tangent_Residual(
     const double &time, const double &dt,
     const double * const &dot_sol,
     const double * const &sol,
@@ -182,7 +182,7 @@ void PLocAssem_Tet_Transport_GenAlpha::Assem_Tangent_Residual(
 }
 
 
-void PLocAssem_Tet_Transport_GenAlpha::Assem_Mass_Residual(
+void PLocAssem_LinearPDE_GenAlpha::Assem_Mass_Residual(
     const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
@@ -234,7 +234,7 @@ void PLocAssem_Tet_Transport_GenAlpha::Assem_Mass_Residual(
   } // End-of-quadrature-loop
 }
 
-void PLocAssem_Tet_Transport_GenAlpha::Assem_Residual_EBC(
+void PLocAssem_LinearPDE_GenAlpha::Assem_Residual_EBC(
         const int &ebc_id,
         const double &time, const double &dt,
         FEAElement * const &element,

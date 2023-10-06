@@ -1,23 +1,23 @@
-#ifndef PLOCASSEM_TET_TRANSPORT_GENALPHA_HPP
-#define PLOCASSEM_TET_TRANSPORT_GENALPHA_HPP
+#ifndef PLOCASSEM_LINEARPDE_GENALPHA_HPP
+#define PLOCASSEM_LINEARPDE_GENALPHA_HPP
 // ============================================================================
-// PLocAssem_Tet_Transport_GenAlpha.hpp
+// PLocAssem_LinearPDE_GenAlpha.hpp
 //
-// Date: Jan 21 2022
+// Date: Oct 6 2023
 // ============================================================================
 #include "IPLocAssem.hpp"
 #include "TimeMethod_GenAlpha.hpp"
 
-class PLocAssem_Tet_Transport_GenAlpha : public IPLocAssem
+class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem
 {
   public:
-    PLocAssem_Tet_Transport_GenAlpha( 
+    PLocAssem_LinearPDE_GenAlpha( 
         const double &in_rho, const double &in_cap, const double &in_kappa,
         const TimeMethod_GenAlpha * const &tm_gAlpha,
         const int &in_nlocbas, const int &in_snlocbas,
         const int &in_num_ebc_fun, const int &elemtype = 501 );
 
-    virtual ~PLocAssem_Tet_Transport_GenAlpha();
+    virtual ~PLocAssem_LinearPDE_GenAlpha();
 
     virtual int get_dof() const {return 1;}
 
@@ -105,7 +105,7 @@ class PLocAssem_Tet_Transport_GenAlpha : public IPLocAssem
       return 4*cap*rho*t3*x*y*z*(x - 1)*(y - 1)*(z - 1) - 2*kappa*t4*x*z*(x - 1)*(z - 1) - 2*kappa*t4*y*z*(y - 1)*(z - 1) - 2*kappa*t4*x*y*(x - 1)*(y - 1); 
     }
 
-    typedef double ( PLocAssem_Tet_Transport_GenAlpha::*locassem_transport_funs )( const Vector_3 &pt, const double &t ) const;
+    typedef double ( PLocAssem_LinearPDE_GenAlpha::*locassem_transport_funs )( const Vector_3 &pt, const double &t ) const;
 
     locassem_transport_funs * flist;
 
