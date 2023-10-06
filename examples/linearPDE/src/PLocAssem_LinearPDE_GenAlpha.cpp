@@ -101,25 +101,18 @@ void PLocAssem_LinearPDE_GenAlpha::Assem_Load(
   
   const double curr = time + alpha_f * dt;
 
-  Zero_Residual();
+  Zero_Load();
 
-  std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
+  std::vector<double> R(nLocBas, 0.0);
 
   for(int qua=0; qua<nqp; ++qua)
   {
-    double u_t = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
-
     Vector_3 coor(0.0, 0.0, 0.0);
 
-    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
+    element->get_R( qua, &R[0]);
     
     for(int ii=0; ii<nLocBas; ++ii)
-    {
-      u_t += dot_sol[ii] * R[ii];
-      u_x += sol[ii]     * dR_dx[ii];
-      u_y += sol[ii]     * dR_dy[ii];
-      u_z += sol[ii]     * dR_dz[ii];
-      
+    { 
       coor.x() += eleCtrlPts_x[ii] * R[ii];
       coor.y() += eleCtrlPts_y[ii] * R[ii];
       coor.z() += eleCtrlPts_z[ii] * R[ii];
@@ -127,12 +120,13 @@ void PLocAssem_LinearPDE_GenAlpha::Assem_Load(
     
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
     
-    const double ff = get_f(coor, curr);
+    const Vector_3 f_body = get_f(coor, curr);
 
     for(int A=0; A<nLocBas; ++A)
     {
-      Residual[A] += gwts * ( R[A] * (rho * cap * u_t - ff) + kappa * dR_dx[A] * u_x
-         + kappa * dR_dy[A] * u_y + kappa * dR_dz[A] * u_z ); 
+      Load[dof_mat*A  ] += gwts * R[A] * f_body.x();
+      Load[dof_mat*A+1] += gwts * R[A] * f_body.y();
+      Load[dof_mat*A+2] += gwts * R[A] * f_body.z();
     }
   }
 }

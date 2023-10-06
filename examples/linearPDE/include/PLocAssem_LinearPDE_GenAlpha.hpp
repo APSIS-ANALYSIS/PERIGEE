@@ -103,17 +103,9 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem_Linear
 
     void print_info() const;
 
-    double get_f( const Vector_3 &pt, const double &tt ) const
+    Vector_3 get_f( const Vector_3 &pt, const double &tt ) const
     {
-      //const double pi = MATH_T::PI;
-    
-      const double t3 = tt*tt*tt;
-      const double t4 = t3 * tt;
-      const double x = pt.x();
-      const double y = pt.y();
-      const double z = pt.z();
-
-      return 4*cap*rho*t3*x*y*z*(x - 1)*(y - 1)*(z - 1) - 2*kappa*t4*x*z*(x - 1)*(z - 1) - 2*kappa*t4*y*z*(y - 1)*(z - 1) - 2*kappa*t4*x*y*(x - 1)*(y - 1); 
+      return Vector_3(0.0, 0.0, 0.0); 
     }
 
     typedef double ( PLocAssem_LinearPDE_GenAlpha::*locassem_transport_funs )( const Vector_3 &pt, const double &t ) const;
