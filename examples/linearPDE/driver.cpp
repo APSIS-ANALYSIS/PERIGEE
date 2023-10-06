@@ -26,8 +26,6 @@
 
 int main(int argc, char *argv[])
 {
-  // Number of quadrature points for tets and triangles
-  // Suggested values: 5 / 4 for linear, 17 / 13 for quadratic
   int nqp_vol = 5, nqp_sur = 4;
 
   // generalized-alpha rho_inf
