@@ -36,8 +36,7 @@ INCLUDE(../../conf/system_lib_loading.cmake)
 SET( perigee_source ${perigee_SOURCE_DIR}/../../src )
 SET( perigee_lib_src 
   ${perigee_source}/System/Vector_3.cpp
-  ${perigee_source}/System/Math_Tools.cpp
-  ${perigee_source}/System/Matrix_double_3by3_Array.cpp
+  ${perigee_source}/Element/FE_Tools.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
   ${perigee_source}/Mesh/VTK_Tools.cpp
   ${perigee_source}/Mesh/Tet_Tools.cpp
@@ -54,7 +53,7 @@ INCLUDE_DIRECTORIES( ../../include )
 # MAKE MY OWN LIBRARIES
 # 1. Preprocess libs
 ADD_LIBRARY( perigee-mesh ${perigee_lib_src} )
-TARGET_LINK_LIBRARIES( perigee-mesh ${EXTRA_LINK_LIBS} OpenMP::OpenMP_CXX)
+TARGET_LINK_LIBRARIES( perigee-mesh ${EXTRA_LINK_LIBS} )
 # -------------------------------------------------------------------
 
 # Print compiler setup
@@ -69,6 +68,6 @@ ADD_EXECUTABLE( gmsh2vtk gmsh2vtk.cpp)
 
 # -------------------------------------------------------------------
 # 2. Link libraries
-TARGET_LINK_LIBRARIES( gmsh2vtk ${EXTRA_LINK_LIBS} perigee-mesh OpenMP::OpenMP_CXX)
+TARGET_LINK_LIBRARIES( gmsh2vtk ${EXTRA_LINK_LIBS} perigee-mesh )
 
 #EOF
