@@ -1,15 +1,15 @@
-#ifndef PGASSEM_TET_TRANSPORT_GENALPHA_HPP
-#define PGASSEM_TET_TRANSPORT_GENALPHA_HPP
+#ifndef PGASSEM_LINEARPDE_GENALPHA_HPP
+#define PGASSEM_LINEARPDE_GENALPHA_HPP
 
 #include "IPGAssem.hpp"
 #include "PETSc_Tools.hpp"
 #include "PDNSolution_Transport.hpp"
 
-class PGAssem_Tet_Transport_GenAlpha : public IPGAssem
+class PGAssem_LinearPDE_GenAlpha : public IPGAssem
 {
   public:
     // Constructor for CMM equations
-    PGAssem_Tet_Transport_GenAlpha(
+    PGAssem_LinearPDE_GenAlpha(
         IPLocAssem * const &locassem_ptr,
         const IAGlobal_Mesh_Info * const &agmi_ptr,
         const ALocal_Elem * const &alelem_ptr,
@@ -20,7 +20,7 @@ class PGAssem_Tet_Transport_GenAlpha : public IPGAssem
         const int &in_nz_estimate = 60 );
 
     // Destructor
-    virtual ~PGAssem_Tet_Transport_GenAlpha();
+    virtual ~PGAssem_LinearPDE_GenAlpha();
 
     // Nonzero pattern estimate
     virtual void Assem_nonzero_estimate(
