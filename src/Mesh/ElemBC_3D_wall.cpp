@@ -112,7 +112,6 @@ ElemBC_3D_wall::ElemBC_3D_wall(
   locator -> Delete();
   reader  -> Delete();
 
-
   // Write out vtp's with wall properties
   write_vtk(ebc_id, "varwallprop");
   
