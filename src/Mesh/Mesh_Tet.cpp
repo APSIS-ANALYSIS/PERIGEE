@@ -12,6 +12,12 @@ Mesh_Tet::Mesh_Tet(const int &in_nfunc, const int &in_nelem,
     case 2:
       nLocBas = 10;
       break;
+    case 3:
+      nLocBas = 8;
+      break;
+    case 4:
+      nLocBas = 27;
+      break;      
     default:
       SYS_T::print_fatal("Error: Mesh_Tet, the input value of degree %d is not supported.\n", deg);
       nLocBas = 0;
