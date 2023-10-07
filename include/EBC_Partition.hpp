@@ -47,8 +47,8 @@ class EBC_Partition
     virtual double get_local_cell_node_xyz(const int &ii, const int &jj) const
     {return local_cell_node_xyz[ii][jj];}
 
-    virtual int get_local_tri_ien(const int &ii, const int &jj) const
-    {return local_tri_ien[ii][jj];}
+    virtual int get_local_sur_ien(const int &ii, const int &jj) const
+    {return local_sur_ien[ii][jj];}
 
     virtual int get_local_cell_node_vol_id(const int &ii, const int &jj) const
     {return local_cell_node_vol_id[ii][jj];}
@@ -72,7 +72,7 @@ class EBC_Partition
 
     // local cell's IEN array, 
     // num_ebc x (cell_nLocBas[ii] x num_local_cell[ii]) in size
-    std::vector< std::vector<int> > local_tri_ien;
+    std::vector< std::vector<int> > local_sur_ien;
 
     // local cell node's global index, num_ebc x num_local_cell_node[ii] in size
     // local means local to the CPU's subdomain

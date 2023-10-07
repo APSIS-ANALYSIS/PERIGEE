@@ -14,7 +14,7 @@ NBC_Partition_inflow::NBC_Partition_inflow(
   actarea.resize(num_nbc); facearea.resize(num_nbc);
   outvec.resize(num_nbc);  centroid.resize(num_nbc);
   num_out_bc_pts.resize(num_nbc); outline_pts.resize(num_nbc);
-  cell_nLocBas.resize(num_nbc);      local_tri_ien.resize(num_nbc);
+  cell_nLocBas.resize(num_nbc);      local_sur_ien.resize(num_nbc);
   num_local_node.resize(num_nbc);    num_local_cell.resize(num_nbc);
   local_global_node.resize(num_nbc); local_global_cell.resize(num_nbc);
   local_node_pos.resize(num_nbc);    local_pt_xyz.resize(num_nbc);
@@ -95,7 +95,7 @@ NBC_Partition_inflow::NBC_Partition_inflow(
     }
 
     // create new IEN
-    local_tri_ien[ii].resize( num_local_cell[ii] * cell_nLocBas[ii] );
+    local_sur_ien[ii].resize( num_local_cell[ii] * cell_nLocBas[ii] );
 
     for(int jj=0; jj<num_local_cell[ii]; ++jj)
     {
@@ -103,7 +103,7 @@ NBC_Partition_inflow::NBC_Partition_inflow(
       {
         const int temp_node = nbc -> get_ien( ii, local_elem[jj], kk );
         const int temp_npos = VEC_T::get_pos( local_node, temp_node );
-        local_tri_ien[ii][jj*cell_nLocBas[ii] + kk] = temp_npos;
+        local_sur_ien[ii][jj*cell_nLocBas[ii] + kk] = temp_npos;
       }
     }
   } // end ii-loop over num_nbc
@@ -156,7 +156,7 @@ void NBC_Partition_inflow::write_hdf5( const std::string &FileName ) const
 
     h5w->write_doubleVector( group_id, "local_pt_xyz", local_pt_xyz[ii] );
 
-    h5w->write_intVector( group_id, "local_tri_ien", local_tri_ien[ii] );
+    h5w->write_intVector( group_id, "local_sur_ien", local_sur_ien[ii] );
 
     h5w->write_intVector( group_id, "local_global_node", local_global_node[ii] );
 

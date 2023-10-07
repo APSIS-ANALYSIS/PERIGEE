@@ -73,8 +73,8 @@ class ALocal_EBC
     //   \para 0 <= ii < num_ebc
     //   \para 0 <= jj < cell_nLocBas[ii] x num_local_cell[ii]
     // ------------------------------------------------------------------------
-    virtual int get_local_tri_ien(const int &ii, const int &jj) const
-    {return local_tri_ien[ii][jj];}
+    virtual int get_local_sur_ien(const int &ii, const int &jj) const
+    {return local_sur_ien[ii][jj];}
 
     // ------------------------------------------------------------------------
     // ! get the local cell node's volumetric mesh index
@@ -323,9 +323,9 @@ class ALocal_EBC
     // size: num_ebc x (3 x num_local_cell_node[ii])
     std::vector< std::vector<double> > local_cell_node_xyz;
 
-    // local_tri_ien[ii] gives the local cell's IEN array
+    // local_sur_ien[ii] gives the local cell's IEN array
     // size: num_ebc x (cell_nLocBas[ii] x num_local_cell[ii]) 
-    std::vector< std::vector<int> > local_tri_ien;
+    std::vector< std::vector<int> > local_sur_ien;
 
     // local cell nodes' global indices
     // size: num_ebc x num_local_cell_node[ii]

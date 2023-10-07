@@ -26,7 +26,7 @@ ALocal_InflowBC::ALocal_InflowBC(
   num_local_cell.resize(num_nbc); 
   cell_nLocBas.resize(num_nbc);
   local_pt_xyz.resize(num_nbc); 
-  local_tri_ien.resize(num_nbc); 
+  local_sur_ien.resize(num_nbc); 
   local_node_pos.resize(num_nbc);
 
   std::string groupbase(gname);
@@ -80,13 +80,13 @@ ALocal_InflowBC::ALocal_InflowBC(
       for(int ii {0}; ii < num_local_node[nbc_id]; ++ii)
         local_pt_xyz[nbc_id][ii] = Vector_3{ temp_xyz[3 * ii], temp_xyz[3 * ii + 1], temp_xyz[3 * ii + 2] };
       
-      local_tri_ien[nbc_id]  = h5r->read_intVector(    subgroup_name.c_str(), "local_tri_ien" );
-      local_node_pos[nbc_id] = h5r->read_intVector(    subgroup_name.c_str(), "local_node_pos" );
+      local_sur_ien[nbc_id]  = h5r->read_intVector( subgroup_name.c_str(), "local_sur_ien" );
+      local_node_pos[nbc_id] = h5r->read_intVector( subgroup_name.c_str(), "local_node_pos" );
     }
     else
     {
       local_pt_xyz[nbc_id].clear();
-      local_tri_ien[nbc_id].clear();
+      local_sur_ien[nbc_id].clear();
       local_node_pos[nbc_id].clear();
     }
   } // end nbc_id-loop
@@ -108,7 +108,7 @@ ALocal_InflowBC::~ALocal_InflowBC()
   VEC_T::clean(num_local_cell);
   VEC_T::clean(cell_nLocBas);
   VEC_T::clean(local_pt_xyz);
-  VEC_T::clean(local_tri_ien);
+  VEC_T::clean(local_sur_ien);
   VEC_T::clean(local_node_pos);
 }
 
@@ -140,7 +140,7 @@ void ALocal_InflowBC::get_ctrlPts_xyz( const int &nbc_id,
 {
   for(int jj=0; jj<cell_nLocBas[nbc_id]; ++jj)
   {
-    const int pos = local_tri_ien[nbc_id][ cell_nLocBas[nbc_id]*eindex+jj ];
+    const int pos = local_sur_ien[nbc_id][ cell_nLocBas[nbc_id]*eindex+jj ];
     ctrl_x[jj] = local_pt_xyz[nbc_id][pos].x();
     ctrl_y[jj] = local_pt_xyz[nbc_id][pos].y();
     ctrl_z[jj] = local_pt_xyz[nbc_id][pos].z();
@@ -152,7 +152,7 @@ void ALocal_InflowBC::get_SIEN( const int &nbc_id,
 {
   for(int jj=0; jj<cell_nLocBas[nbc_id]; ++jj)
   {
-    const int pos = local_tri_ien[nbc_id][ cell_nLocBas[nbc_id]*eindex+jj ];
+    const int pos = local_sur_ien[nbc_id][ cell_nLocBas[nbc_id]*eindex+jj ];
     sien[jj] = local_node_pos[nbc_id][pos];
   }
 }
@@ -163,7 +163,7 @@ std::vector<int> ALocal_InflowBC::get_SIEN( const int &nbc_id,
   std::vector<int> out( cell_nLocBas[nbc_id], 0 );
   for(int jj=0; jj<cell_nLocBas[nbc_id]; ++jj)
   {
-    const int pos = local_tri_ien[nbc_id][ cell_nLocBas[nbc_id]*eindex+jj ];
+    const int pos = local_sur_ien[nbc_id][ cell_nLocBas[nbc_id]*eindex+jj ];
     out[jj] = local_node_pos[nbc_id][pos];
   }
   return out;

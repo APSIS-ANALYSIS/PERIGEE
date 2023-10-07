@@ -24,7 +24,7 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
   groupbase.append("/ebcid_");
 
   local_cell_node_xyz.resize(num_ebc);
-  local_tri_ien.resize(num_ebc);
+  local_sur_ien.resize(num_ebc);
   local_cell_node_vol_id.resize(num_ebc);
   local_cell_node_pos.resize(num_ebc);
   local_cell_vol_id.resize(num_ebc);
@@ -38,7 +38,7 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
 
       local_cell_node_xyz[ii] = h5r -> read_doubleVector( subgroup_name.c_str(), "local_cell_node_xyz" );
 
-      local_tri_ien[ii] = h5r -> read_intVector( subgroup_name.c_str(), "local_tri_ien" );
+      local_sur_ien[ii] = h5r -> read_intVector( subgroup_name.c_str(), "local_sur_ien" );
 
       local_cell_node_vol_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "local_cell_node_vol_id" );
 
@@ -49,7 +49,7 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
     else
     {
       local_cell_node_xyz[ii].clear();
-      local_tri_ien[ii].clear();
+      local_sur_ien[ii].clear();
       local_cell_node_vol_id[ii].clear();
       local_cell_node_pos[ii].clear();
       local_cell_vol_id[ii].clear();
@@ -65,7 +65,7 @@ ALocal_EBC::~ALocal_EBC()
   VEC_T::clean( num_local_cell );
   VEC_T::clean( cell_nLocBas );
   VEC_T::clean( local_cell_node_xyz );
-  VEC_T::clean( local_tri_ien );
+  VEC_T::clean( local_sur_ien );
   VEC_T::clean( local_cell_node_vol_id );
   VEC_T::clean( local_cell_node_pos );
   VEC_T::clean( local_cell_vol_id );
@@ -78,7 +78,7 @@ void ALocal_EBC::get_ctrlPts_xyz(const int &ii,
   const int len = cell_nLocBas[ii];
   for(int jj=0; jj<len; ++jj)
   {
-    const int pos = local_tri_ien[ii][len*eindex+jj];
+    const int pos = local_sur_ien[ii][len*eindex+jj];
     ctrl_x[jj] = local_cell_node_xyz[ii][3*pos];
     ctrl_y[jj] = local_cell_node_xyz[ii][3*pos+1];
     ctrl_z[jj] = local_cell_node_xyz[ii][3*pos+2];
@@ -91,7 +91,7 @@ void ALocal_EBC::get_SIEN( const int &ii,
   const int len = cell_nLocBas[ii];
   for(int jj=0; jj<len; ++jj)
   {
-    const int pos = local_tri_ien[ii][len*eindex+jj];
+    const int pos = local_sur_ien[ii][len*eindex+jj];
     sien[jj] = local_cell_node_pos[ii][pos];
   }
 }
@@ -102,7 +102,7 @@ std::vector<int> ALocal_EBC::get_SIEN( const int &ii, const int &eindex ) const
   std::vector<int> out (len, 0);
   for(int jj=0; jj<len; ++jj)
   {
-    const int pos = local_tri_ien[ii][len*eindex+jj];
+    const int pos = local_sur_ien[ii][len*eindex+jj];
     out[jj] = local_cell_node_pos[ii][pos];
   }
   return out;
