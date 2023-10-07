@@ -135,7 +135,6 @@ namespace HEX_T
   //          \para vol_ien, the volume mesh IEN array
   //   Output: outVec, the outward normal vector
   // --------------------------------------------------------------------------
-  // ----------------------------------------------------------------
   Vector_3 get_out_normal( const std::string &file,
       const std::vector<double> &vol_ctrlPts,
       const IIEN * const &vol_ien );
