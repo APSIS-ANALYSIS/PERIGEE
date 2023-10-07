@@ -1,7 +1,7 @@
 #include "PGAssem_LinearPDE_GenAlpha.hpp"
 
 PGAssem_LinearPDE_GenAlpha::PGAssem_LinearPDE_GenAlpha(
-    IPLocAssem * const &locassem_ptr,
+    PLocAssem_LinearPDE_GenAlpha * const &locassem_ptr,
     const IAGlobal_Mesh_Info * const &agmi_ptr,
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &aien_ptr,
@@ -117,7 +117,7 @@ void PGAssem_LinearPDE_GenAlpha::EssBC_G(
 
 void PGAssem_LinearPDE_GenAlpha::Assem_nonzero_estimate(
     const ALocal_Elem * const &alelem_ptr,
-    IPLocAssem * const &lassem_ptr,
+    PLocAssem_LinearPDE_GenAlpha * const &lassem_ptr,
     const ALocal_IEN * const &lien_ptr,
     const ALocal_NBC * const &nbc_part )
 {
@@ -154,7 +154,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_nonzero_estimate(
 
 void PGAssem_LinearPDE_GenAlpha::NatBC_G( 
     const double &curr_time, const double &dt,
-    IPLocAssem * const &lassem_ptr,
+    PLocAssem_LinearPDE_GenAlpha * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_NBC * const &nbc_part,
@@ -199,7 +199,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_residual(
     const double &curr_time,
     const double &dt,
     const ALocal_Elem * const &alelem_ptr,
-    IPLocAssem * const &lassem_ptr,
+    PLocAssem_LinearPDE_GenAlpha * const &lassem_ptr,
     FEAElement * const &elementv,
     FEAElement * const &elements,
     const IQuadPts * const &quad_v,
@@ -269,7 +269,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_tangent_residual(
     const double &curr_time,
     const double &dt,
     const ALocal_Elem * const &alelem_ptr,
-    IPLocAssem * const &lassem_ptr,
+    PLocAssem_LinearPDE_GenAlpha * const &lassem_ptr,
     FEAElement * const &elementv,
     FEAElement * const &elements,
     const IQuadPts * const &quad_v,
@@ -340,7 +340,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_tangent_residual(
 void PGAssem_LinearPDE_GenAlpha::Assem_mass_residual(
     const PDNSolution * const &sol,
     const ALocal_Elem * const &alelem_ptr,
-    IPLocAssem * const &lassem_ptr,
+    PLocAssem_LinearPDE_GenAlpha * const &lassem_ptr,
     FEAElement * const &elementv,
     FEAElement * const &elements,
     const IQuadPts * const &quad_v,

@@ -1,16 +1,25 @@
 #ifndef PGASSEM_LINEARPDE_GENALPHA_HPP
 #define PGASSEM_LINEARPDE_GENALPHA_HPP
 
-#include "IPGAssem.hpp"
 #include "PETSc_Tools.hpp"
 #include "PDNSolution_Transport.hpp"
+#include "APart_Node.hpp"
+#include "ALocal_Elem.hpp"
+#include "IAGlobal_Mesh_Info.hpp"
+#include "FEANode.hpp"
+#include "ALocal_NBC.hpp"
+#include "ALocal_EBC.hpp"
+#include "PLocAssem_LinearPDE_GenAlpha.hpp"
 
-class PGAssem_LinearPDE_GenAlpha : public IPGAssem
+class PGAssem_LinearPDE_GenAlpha
 {
   public:
+    Mat K;
+    Mat F;
+
     // Constructor for CMM equations
     PGAssem_LinearPDE_GenAlpha(
-        IPLocAssem * const &locassem_ptr,
+        PLocAssem_LinearPDE_GenAlpha * const &locassem_ptr,
         const IAGlobal_Mesh_Info * const &agmi_ptr,
         const ALocal_Elem * const &alelem_ptr,
         const ALocal_IEN * const &aien_ptr,
@@ -20,23 +29,23 @@ class PGAssem_LinearPDE_GenAlpha : public IPGAssem
         const int &in_nz_estimate = 60 );
 
     // Destructor
-    virtual ~PGAssem_LinearPDE_GenAlpha();
+    ~PGAssem_LinearPDE_GenAlpha();
 
     // Nonzero pattern estimate
-    virtual void Assem_nonzero_estimate(
+    void Assem_nonzero_estimate(
         const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
+        PLocAssem_LinearPDE_GenAlpha * const &lassem_ptr,
         const ALocal_IEN * const &lien_ptr,
         const ALocal_NBC * const &nbc_part );
 
     // Assembly the residual vector
-    virtual void Assem_residual(
+    void Assem_residual(
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
         const double &curr_time,
         const double &dt,
         const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
+        PLocAssem_LinearPDE_GenAlpha * const &lassem_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
         const IQuadPts * const &quad_v,
@@ -47,13 +56,13 @@ class PGAssem_LinearPDE_GenAlpha : public IPGAssem
         const ALocal_EBC * const &ebc_part );
 
     // Assembly the residual vector and tangent matrix 
-    virtual void Assem_tangent_residual(
+    void Assem_tangent_residual(
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
         const double &curr_time,
         const double &dt,
         const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
+        PLocAssem_LinearPDE_GenAlpha * const &lassem_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
         const IQuadPts * const &quad_v,
@@ -64,10 +73,10 @@ class PGAssem_LinearPDE_GenAlpha : public IPGAssem
         const ALocal_EBC * const &ebc_part );
 
     // Assembly the residual and mass matrix
-    virtual void Assem_mass_residual(
+    void Assem_mass_residual(
         const PDNSolution * const &sol,
         const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
+        PLocAssem_LinearPDE_GenAlpha * const &lassem_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
         const IQuadPts * const &quad_v,
@@ -91,7 +100,7 @@ class PGAssem_LinearPDE_GenAlpha : public IPGAssem
 
     // Natural boundary condition
     void NatBC_G( const double &curr_time, const double &dt,
-        IPLocAssem * const &lassem_ptr,
+        PLocAssem_LinearPDE_GenAlpha * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const ALocal_NBC * const &nbc_part,
