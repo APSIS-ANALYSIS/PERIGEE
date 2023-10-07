@@ -12,6 +12,13 @@
 class PLocAssem_LinearPDE_GenAlpha
 {
   public:
+    PetscScalar * Mass;
+    PetscScalar * Stiffness;
+    PetscScalar * Load;
+
+    PetscScalar * sur_Mass;
+    PetscScalar * sur_Load;
+
     PLocAssem_LinearPDE_GenAlpha( 
         const double &in_Young_modulus, const double &in_Poisson_ratio,
         const double &in_rho,
@@ -132,13 +139,6 @@ class PLocAssem_LinearPDE_GenAlpha
 
     int nLocBas, snLocBas, vec_size, sur_size;
     double mu, lambda;
-
-    PetscScalar * Mass;
-    PetscScalar * Stiffness;
-    PetscScalar * Load;
-
-    PetscScalar * sur_Mass;
-    PetscScalar * sur_Load;
 
     void print_info() const;
 
