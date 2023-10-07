@@ -87,14 +87,14 @@ ElemBC_3D_wall::ElemBC_3D_wall(
   locator -> SetDataSet( centerlineData );
   locator -> BuildLocator();
 
-  double cl_pt[3];
-  vtkGenericCell * cell = vtkGenericCell::New();
-  vtkIdType cellId; int subId; double dist;
-
   for(int ii=0; ii<num_node[ebc_id]; ++ii)
   {
     const double pt[3] {pt_xyz[ebc_id][3*ii], pt_xyz[ebc_id][3*ii+1], pt_xyz[ebc_id][3*ii+2]};
 
+    double cl_pt[3];
+    vtkIdType cellId; int subId; double dist;
+    vtkGenericCell * cell = vtkGenericCell::New();
+    
     locator -> FindClosestPoint(&pt[0], &cl_pt[0], cell, cellId, subId, dist); 
 
     radius[ii] = Vec3::dist( Vector_3(pt[0], pt[1], pt[2]), Vector_3(cl_pt[0], cl_pt[1], cl_pt[2]) );
@@ -104,12 +104,14 @@ ElemBC_3D_wall::ElemBC_3D_wall(
     dampingconst[ii] = dampingconst_combined;
 
     compute_youngsmod(radius[ii], thickness[ii], youngsmod[ii]);
+
+    cell -> Delete();
   }
  
   // clean memory
   locator -> Delete();
   reader  -> Delete();
-  cell    -> Delete();
+
 
   // Write out vtp's with wall properties
   write_vtk(ebc_id, "varwallprop");
@@ -164,11 +166,13 @@ ElemBC_3D_wall::ElemBC_3D_wall(
 
   // Loop over the surfaces (subsets of the whole wall surface)
   // to locally modify the wall property
-  int numpts, numcels;
-  std::vector<double> pt;
-  std::vector<int> ien_array, global_node_idx, global_elem_idx;
+
   for(int ii=0; ii<num_srfs; ++ii)
   {
+    int numpts, numcels;
+    std::vector<double> pt;
+    std::vector<int> ien_array, global_node_idx, global_elem_idx;
+
     VTK_T::read_grid( wallsList[ii], numpts, numcels, pt, ien_array );
 
     global_node_idx = VTK_T::read_int_PointData(wallsList[ii], "GlobalNodeID");
@@ -214,7 +218,7 @@ ElemBC_3D_wall::ElemBC_3D_wall(
         //compute_youngsmod(radius[idx], thickness[idx], youngsmod[idx]);
       }
       else
-        SYS_T::print_fatal( "Error: wallsList does not contain the same global node IDs as walls_combined.\n" );
+        SYS_T::print_fatal( "Error: ElemBC_3D_wall constructor: wallsList does not contain the same global node IDs as walls_combined.\n" );
     }
   
     // clean memory
@@ -224,9 +228,6 @@ ElemBC_3D_wall::ElemBC_3D_wall(
 
     std::cout << "          " << wallsList[ii] << '\n';
   } // End of loop for ii-th wall surface
-
-  VEC_T::clean( pt ); VEC_T::clean( ien_array ); 
-  VEC_T::clean( global_node_idx ); VEC_T::clean( global_elem_idx );
 
   // Write out vtp's with wall properties
   write_vtk(ebc_id, "varwallprop");
@@ -282,7 +283,7 @@ void ElemBC_3D_wall::overwrite_from_vtk(
       else if( type == 3 )
         dampingconst[ii] = wallprop[idx];
       else
-        SYS_T::print_fatal("ERROR: Unknown wallprop type in ElemBC_3D_wall::overwrite_from_vtk().\n");
+        SYS_T::print_fatal("Error: ElemBC_3D_wall::overwrite_from_vtk function: Unknown wallprop type.\n");
     }
   }
 
