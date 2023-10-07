@@ -76,11 +76,7 @@ class PLocAssem_LinearPDE_GenAlpha
 
     void Assem_Estimate()
     {
-      for(int ii=0; ii<vec_size*vec_size; ++ii) 
-      {
-        Mass[ii] = 1.0
-        Stiffness[ii] = 1.0;
-      }
+      for(int ii=0; ii<vec_size*vec_size; ++ii) Stiffness[ii] = 1.0;
     }
 
     void Assem_Load(
