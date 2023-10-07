@@ -86,14 +86,14 @@ ElemBC_3D_wall::ElemBC_3D_wall(
   locator -> SetDataSet( centerlineData );
   locator -> BuildLocator();
 
-  vtkGenericCell * cell = vtkGenericCell::New();
-
   for(int ii=0; ii<num_node[ebc_id]; ++ii)
   {
     const double pt[3] {pt_xyz[ebc_id][3*ii], pt_xyz[ebc_id][3*ii+1], pt_xyz[ebc_id][3*ii+2]};
 
     double cl_pt[3];
     vtkIdType cellId; int subId; double dist;
+
+    vtkGenericCell * cell = vtkGenericCell::New();
     
     locator -> FindClosestPoint(&pt[0], &cl_pt[0], cell, cellId, subId, dist); 
 
@@ -104,12 +104,13 @@ ElemBC_3D_wall::ElemBC_3D_wall(
     dampingconst[ii] = dampingconst_combined;
 
     compute_youngsmod(radius[ii], thickness[ii], youngsmod[ii]);
+
+    cell -> Delete();
   }
  
   // clean memory
   locator -> Delete();
   reader  -> Delete();
-  cell    -> Delete();
 
 
   // Write out vtp's with wall properties
@@ -191,8 +192,6 @@ ElemBC_3D_wall::ElemBC_3D_wall(
     // Data that will be returned by the FindClosestPoint funciton in the
     // for-loop
 
-    vtkGenericCell * cell = vtkGenericCell::New();
-
     for(int jj=0; jj<numpts; ++jj)
     {
       // Search for corresponding global node ID in walls_combined
@@ -207,6 +206,8 @@ ElemBC_3D_wall::ElemBC_3D_wall(
         double cl_pt[3];
         vtkIdType cellId; int subId; double dist;
 
+        vtkGenericCell * cell = vtkGenericCell::New();
+
         locator -> FindClosestPoint(&pp[0], &cl_pt[0], cell, cellId, subId, dist);
 
         radius[idx] = Vec3::dist( Vector_3(pp[0], pp[1], pp[2]), Vector_3(cl_pt[0], cl_pt[1], cl_pt[2]) );
@@ -217,6 +218,8 @@ ElemBC_3D_wall::ElemBC_3D_wall(
 
         youngsmod[idx] = 7.0e6;
         //compute_youngsmod(radius[idx], thickness[idx], youngsmod[idx]);
+
+        cell -> Delete();
       }
       else
         SYS_T::print_fatal( "Error: ElemBC_3D_wall constructor: wallsList does not contain the same global node IDs as walls_combined.\n" );
@@ -225,7 +228,6 @@ ElemBC_3D_wall::ElemBC_3D_wall(
     // clean memory
     locator -> Delete();
     reader  -> Delete();
-    cell    -> Delete();
 
     std::cout << "          " << wallsList[ii] << '\n';
   } // End of loop for ii-th wall surface
@@ -261,15 +263,16 @@ void ElemBC_3D_wall::overwrite_from_vtk(
 {
   SYS_T::file_check( wallprop_vtk );
 
-  std::vector<int> global_node_idx = VTK_T::read_int_PointData( wallprop_vtk, "GlobalNodeID");
-
-  std::vector<double> wallprop = VTK_T::read_double_PointData( wallprop_vtk, vtk_fieldname );
-
   constexpr int ebc_id = 0;
   for( int ii = 0; ii < num_node[ebc_id]; ++ii )
   {
+
+    std::vector<int> global_node_idx = VTK_T::read_int_PointData( wallprop_vtk, "GlobalNodeID");
+
     // Search for corresponding global node ID in wallprop_vtk
     auto it = std::find(global_node_idx.begin(), global_node_idx.end(), global_node[ebc_id][ii]);
+
+    std::vector<double> wallprop = VTK_T::read_double_PointData( wallprop_vtk, vtk_fieldname );
 
     if( it != global_node_idx.end() )
     {
@@ -311,8 +314,6 @@ void ElemBC_3D_wall::overwrite_from_vtk(
         <<", "<<*std::max_element(dampingconst.begin(), dampingconst.end())<<"] \n";
       break;
   }
-
-  VEC_T::clean( wallprop ); VEC_T::clean( global_node_idx );
 
   // Write out vtp's with wall properties
   write_vtk(ebc_id, "varwallprop");
