@@ -13,20 +13,20 @@ int main( int argc, char * argv[] )
 
   YAML::Node config = YAML::LoadFile("example.yml");
 
-  std::string gmshFile = config["gmsh_file"].as<std::string>();
-  int num_outlet = config["num_outlet"].as<int>();
+  const std::string gmshFile = config["gmsh_file"].as<std::string>();
+  const int num_outlet = config["num_outlet"].as<int>();
 
   Gmsh_FileIO * GIO = new Gmsh_FileIO( gmshFile );
 
   GIO -> print_info();
 
-  std::vector<int> nbc_face_id = config["nbc_face_id"].as<std::vector<int>>();
-  std::vector<std::string> nbc_face_name = config["nbc_face_name"].as<std::vector<std::string>>();
-  std::vector<int> nbc_vol_id = config["nbc_vol_id"].as<std::vector<int>>();
+  const std::vector<int> nbc_face_id = config["nbc_face_id"].as<std::vector<int>>();
+  const std::vector<std::string> nbc_face_name = config["nbc_face_name"].as<std::vector<std::string>>();
+  const std::vector<int> nbc_vol_id = config["nbc_vol_id"].as<std::vector<int>>();
 
-  std::vector<int> ebc_face_id = config["ebc_face_id"].as<std::vector<int>>();
-  std::vector<std::string> ebc_face_name = config["ebc_face_name"].as<std::vector<std::string>>();
-  std::vector<int> ebc_vol_id = config["ebc_vol_id"].as<std::vector<int>>();
+  const std::vector<int> ebc_face_id = config["ebc_face_id"].as<std::vector<int>>();
+  const std::vector<std::string> ebc_face_name = config["ebc_face_name"].as<std::vector<std::string>>();
+  const std::vector<int> ebc_vol_id = config["ebc_vol_id"].as<std::vector<int>>();
 
   // if element type is linear tet or hex
   // NEED TO ADD FILENAME TO BE WRITTEN
@@ -40,9 +40,8 @@ int main( int argc, char * argv[] )
   // ... update node numbering and write into vtu (not vtp)
   // else print message
 
-  // PASS THE TWO PARAMETERS FROM YAML FILE AS WELL
-  const std::string wmname("whole_vol");
-  const bool isXML = true;
+  std::string wmname = config["wmname"].as<std::string>();
+  bool isXML = config["isXML"].as<bool>();
   GIO -> write_vtu( wmname, isXML );
 
   delete GIO; 
