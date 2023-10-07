@@ -19,13 +19,13 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem_Linear
         const int &in_num_ebc_fun, const int &in_dof,
         const int &in_dof_mat, const int &elemtype = 501 );
 
-    virtual ~PLocAssem_LinearPDE_GenAlpha();
+    ~PLocAssem_LinearPDE_GenAlpha();
 
-    virtual int get_dof() const {return dof;}
+    int get_dof() const {return dof;}
 
-    virtual int get_dof_mat() const {return dof_mat;}
+    int get_dof_mat() const {return dof_mat;}
 
-    virtual void Zero_Mass_Stiffness_Load()
+    void Zero_Mass_Stiffness_Load()
     {
       for(int ii=0; ii<vec_size; ++ii) Load[ii] = 0.0;
       for(int ii=0; ii<vec_size*vec_size; ++ii) 
@@ -35,38 +35,38 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem_Linear
       }
     }
 
-    virtual void Zero_Stiffness()
+    void Zero_Stiffness()
     {
       for(int ii=0; ii<vec_size*vec_size; ++ii) Stiffness[ii] = 0.0;
     }
 
-    virtual void Zero_Mass()
+    void Zero_Mass()
     {
       for(int ii=0; ii<vec_size*vec_size; ++ii) Mass[ii] = 0.0;
     }
 
-    virtual void Zero_Load()
+    void Zero_Load()
     {
       for(int ii=0; ii<vec_size; ++ii) Load[ii] = 0.0;
     }
 
-    virtual void Zero_sur_Mass_Load()
+    void Zero_sur_Mass_Load()
     {
       for(int ii=0; ii<sur_size; ++ii) sur_Load[ii] = 0.0;
       for(int ii=0; ii<sur_size*sur_size; ++ii) sur_Mass[ii] = 0.0;
     }
 
-    virtual void Zero_sur_Mass()
+    void Zero_sur_Mass()
     {
       for(int ii=0; ii<sur_size*sur_size; ++ii) sur_Mass[ii] = 0.0;
     }
 
-    virtual void Zero_sur_Load()
+    void Zero_sur_Load()
     {
       for(int ii=0; ii<sur_size; ++ii) sur_Load[ii] = 0.0;
     }
 
-    virtual void Assem_Estimate()
+    void Assem_Estimate()
     {
       for(int ii=0; ii<vec_size*vec_size; ++ii) 
       {
@@ -75,7 +75,7 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem_Linear
       }
     }
 
-    virtual void Assem_Load(
+    void Assem_Load(
         const double &time, const double &dt,
         const double * const &dot_sol,
         const double * const &sol,
@@ -85,7 +85,7 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem_Linear
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
-    virtual void Assem_Stiffness(
+    void Assem_Stiffness(
         const double &time, const double &dt,
         const double * const &dot_sol,
         const double * const &sol,
@@ -95,7 +95,7 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem_Linear
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
-    virtual void Assem_Mass(
+    void Assem_Mass(
         const double * const &sol,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
@@ -103,7 +103,7 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem_Linear
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
-    virtual void Assem_Load_EBC(
+    void Assem_Load_EBC(
         const int &ebc_id,
         const double &time, const double &dt,
         FEAElement * const &element,
@@ -112,7 +112,7 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem_Linear
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
     
-    virtual void Assem_Mass_EBC(
+    void Assem_Mass_EBC(
         const int &ebc_id,
         const double &time, const double &dt,
         FEAElement * const &element,
