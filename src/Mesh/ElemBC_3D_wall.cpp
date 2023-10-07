@@ -143,13 +143,13 @@ ElemBC_3D_wall::ElemBC_3D_wall(
 {
   // Check inputs
   SYS_T::print_fatal_if( centerlinesList.size() != wallsList.size(),
-    "ERROR: wallsList and centerlinesList must be of the same length.\n");
+    "Error: ElemBC_3D_wall constructor: wallsList and centerlinesList must be of the same length.\n");
   SYS_T::print_fatal_if( thickness2radiusList.size() != wallsList.size(),
-    "ERROR: wallsList and thickness2radiusList must be of the same length.\n");
+    "Error: ElemBC_3D_wall constructor: wallsList and thickness2radiusList must be of the same length.\n");
   SYS_T::print_fatal_if( springconstList.size() != wallsList.size(),
-    "ERROR: wallsList and springconstList must be of the same length.\n");
+    "Error: ElemBC_3D_wall constructor: wallsList and springconstList must be of the same length.\n");
   SYS_T::print_fatal_if( dampingconstList.size() != wallsList.size(),
-    "ERROR: wallsList and dampingconstList must be of the same length.\n");
+    "Error: ElemBC_3D_wall constructor: wallsList and dampingconstList must be of the same length.\n");
 
   const int num_srfs = static_cast<int>( wallsList.size() );
 
