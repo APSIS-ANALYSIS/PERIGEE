@@ -9,7 +9,7 @@
 #include "FEAElement.hpp"
 #include "ALocal_IEN.hpp"
 
-class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem_Linear
+class PLocAssem_LinearPDE_GenAlpha
 {
   public:
     PLocAssem_LinearPDE_GenAlpha( 
