@@ -191,9 +191,8 @@ ElemBC_3D_wall::ElemBC_3D_wall(
 
     // Data that will be returned by the FindClosestPoint funciton in the
     // for-loop
-    double cl_pt[3];
+
     vtkGenericCell * cell = vtkGenericCell::New();
-    vtkIdType cellId; int subId; double dist;
 
     for(int jj=0; jj<numpts; ++jj)
     {
@@ -205,6 +204,9 @@ ElemBC_3D_wall::ElemBC_3D_wall(
         const int idx = std::distance(global_node[ebc_id].begin(), it);
 
         const double pp[3] {pt_xyz[ebc_id][3*idx], pt_xyz[ebc_id][3*idx+1], pt_xyz[ebc_id][3*idx+2]};
+
+        double cl_pt[3];
+        vtkIdType cellId; int subId; double dist;
 
         locator -> FindClosestPoint(&pp[0], &cl_pt[0], cell, cellId, subId, dist);
 
