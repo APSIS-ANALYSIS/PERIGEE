@@ -87,13 +87,14 @@ ElemBC_3D_wall::ElemBC_3D_wall(
   locator -> SetDataSet( centerlineData );
   locator -> BuildLocator();
 
+  vtkGenericCell * cell = vtkGenericCell::New();
+
   for(int ii=0; ii<num_node[ebc_id]; ++ii)
   {
     const double pt[3] {pt_xyz[ebc_id][3*ii], pt_xyz[ebc_id][3*ii+1], pt_xyz[ebc_id][3*ii+2]};
 
     double cl_pt[3];
     vtkIdType cellId; int subId; double dist;
-    vtkGenericCell * cell = vtkGenericCell::New();
     
     locator -> FindClosestPoint(&pt[0], &cl_pt[0], cell, cellId, subId, dist); 
 
@@ -104,13 +105,12 @@ ElemBC_3D_wall::ElemBC_3D_wall(
     dampingconst[ii] = dampingconst_combined;
 
     compute_youngsmod(radius[ii], thickness[ii], youngsmod[ii]);
-
-    cell -> Delete();
   }
  
   // clean memory
   locator -> Delete();
   reader  -> Delete();
+  cell    -> Delete();
 
 
   // Write out vtp's with wall properties
