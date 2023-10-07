@@ -262,16 +262,15 @@ void ElemBC_3D_wall::overwrite_from_vtk(
 {
   SYS_T::file_check( wallprop_vtk );
 
+  const std::vector<int> global_node_idx = VTK_T::read_int_PointData( wallprop_vtk, "GlobalNodeID");
+  const std::vector<double> wallprop = VTK_T::read_double_PointData( wallprop_vtk, vtk_fieldname );
+  
   constexpr int ebc_id = 0;
+  
   for( int ii = 0; ii < num_node[ebc_id]; ++ii )
   {
-
-    std::vector<int> global_node_idx = VTK_T::read_int_PointData( wallprop_vtk, "GlobalNodeID");
-
     // Search for corresponding global node ID in wallprop_vtk
     auto it = std::find(global_node_idx.begin(), global_node_idx.end(), global_node[ebc_id][ii]);
-
-    std::vector<double> wallprop = VTK_T::read_double_PointData( wallprop_vtk, vtk_fieldname );
 
     if( it != global_node_idx.end() )
     {
