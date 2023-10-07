@@ -170,12 +170,11 @@ ElemBC_3D_wall::ElemBC_3D_wall(
   {
     int numpts, numcels;
     std::vector<double> pt;
-    std::vector<int> ien_array, global_node_idx, global_elem_idx;
+    std::vector<int> ien_array;
 
     VTK_T::read_grid( wallsList[ii], numpts, numcels, pt, ien_array );
 
-    global_node_idx = VTK_T::read_int_PointData(wallsList[ii], "GlobalNodeID");
-    global_elem_idx = VTK_T::read_int_CellData(wallsList[ii], "GlobalElementID");
+    const std::vector<int> global_node_idx = VTK_T::read_int_PointData(wallsList[ii], "GlobalNodeID");
 
     vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
     reader -> SetFileName( centerlinesList[ii].c_str() );
