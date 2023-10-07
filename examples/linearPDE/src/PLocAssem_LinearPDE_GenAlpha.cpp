@@ -138,7 +138,6 @@ void PLocAssem_LinearPDE_GenAlpha::Assem_Load(
   }
 }
 
-
 void PLocAssem_LinearPDE_GenAlpha::Assem_Stiffness(
     const double &time, const double &dt,
     const double * const &dot_sol,
@@ -207,7 +206,6 @@ void PLocAssem_LinearPDE_GenAlpha::Assem_Stiffness(
     }
   } // End-of-quadrature-loop
 }
-
 
 void PLocAssem_LinearPDE_GenAlpha::Assem_Mass(
     const double * const &sol,
