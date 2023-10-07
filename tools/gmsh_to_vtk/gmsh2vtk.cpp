@@ -40,8 +40,8 @@ int main( int argc, char * argv[] )
   // ... update node numbering and write into vtu (not vtp)
   // else print message
 
-  std::string wmname = config["wmname"].as<std::string>();
-  bool isXML = config["isXML"].as<bool>();
+  const std::string wmname = config["wmname"].as<std::string>();
+  const bool isXML = config["isXML"].as<bool>();
   GIO -> write_vtu( wmname, isXML );
 
   delete GIO; 
