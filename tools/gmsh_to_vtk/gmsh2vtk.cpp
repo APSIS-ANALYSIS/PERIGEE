@@ -28,17 +28,34 @@ int main( int argc, char * argv[] )
   const std::vector<std::string> ebc_face_name = config["ebc_face_name"].as<std::vector<std::string>>();
   const std::vector<int> ebc_vol_id = config["ebc_vol_id"].as<std::vector<int>>();
 
-  // if element type is linear tet or hex
-  // NEED TO ADD FILENAME TO BE WRITTEN
-  for( int ii=0; ii<nbc_face_id.size(); ++ii )
-    GIO -> write_vtp( nbc_face_id[ii], nbc_vol_id[ii], false );
+  if( GIO->get_eleType(0)==2 || GIO->get_eleType(0)==3 )
+  {
+    for( int ii=0; ii<nbc_face_id.size(); ++ii )
+      GIO -> write_vtp( nbc_face_id[ii], nbc_vol_id[ii], false );
 
-  for( int ii=0; ii<ebc_face_id.size(); ++ii )
-    GIO -> write_vtp( ebc_face_id[ii], ebc_vol_id[ii], true );
+    for( int ii=0; ii<ebc_face_id.size(); ++ii )
+      GIO -> write_vtp( ebc_face_id[ii], ebc_vol_id[ii], true );
+  }
+  else if( GIO->get_eleType(0)==9 )
+  {
+    GIO -> update_quadratic_tet_IEN(0);
+    for( int ii=0; ii<nbc_face_id.size(); ++ii )
+      GIO -> write_quadratic_sur_vtu( nbc_face_id[ii], nbc_vol_id[ii], false );
 
-  // else if element type is quadratic tet or quadratic hex
-  // ... update node numbering and write into vtu (not vtp)
-  // else print message
+    for( int ii=0; ii<ebc_face_id.size(); ++ii )
+      GIO -> write_quadratic_sur_vtu( ebc_face_id[ii], ebc_vol_id[ii], true );
+  }
+  else if( GIO->get_eleType(0)==10 )
+  {
+    GIO -> update_quadratic_hex_IEN(0);
+    for( int ii=0; ii<nbc_face_id.size(); ++ii )
+      GIO -> write_quadratic_sur_vtu( nbc_face_id[ii], nbc_vol_id[ii], false );
+
+    for( int ii=0; ii<ebc_face_id.size(); ++ii )
+      GIO -> write_quadratic_sur_vtu( ebc_face_id[ii], ebc_vol_id[ii], true );
+  }
+  else
+  { SYS_T::print_fatal("Error: the element type of gmsh file cannot be read. \n"); return 0; }
 
   const std::string wmname = config["wmname"].as<std::string>();
   const bool isXML = config["isXML"].as<bool>();
