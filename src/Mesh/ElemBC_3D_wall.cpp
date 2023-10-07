@@ -10,7 +10,6 @@ ElemBC_3D_wall::ElemBC_3D_wall( const int &elemtype )
   dampingconst.clear();
 }
 
-
 ElemBC_3D_wall::ElemBC_3D_wall(
     const std::string &walls_combined,
     const double &uniform_thickness,
