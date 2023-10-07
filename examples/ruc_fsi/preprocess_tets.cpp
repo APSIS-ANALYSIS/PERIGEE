@@ -21,7 +21,7 @@
 #include "NodalBC_3D_ring.hpp"
 #include "NodalBC_3D_wall.hpp"
 #include "ElemBC_3D_outflow.hpp"
-#include "ElemBC_3D_tet_wall.hpp"
+#include "ElemBC_3D_wall.hpp"
 #include "NBC_Partition.hpp"
 #include "NBC_Partition_inflow.hpp"
 #include "NBC_Partition_ring.hpp"
@@ -297,7 +297,7 @@ int main( int argc, char * argv[] )
   ElemBC * wall_ebc = nullptr;
 
   if( is_uniform_wall )
-    wall_ebc = new ElemBC_3D_tet_wall( walls_combined, wall_thickness, wall_youngsmod,
+    wall_ebc = new ElemBC_3D_wall( walls_combined, wall_thickness, wall_youngsmod,
         wall_springconst, wall_dampingconst, elemType );
   else
   {
@@ -334,7 +334,7 @@ int main( int argc, char * argv[] )
     csList.push_back( 0.0 );
 
     // Initialized with properties in the wallList specified
-    wall_ebc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
+    wall_ebc = new ElemBC_3D_wall( walls_combined, centerlines_combined,
         thickness2radius_combined, wall_springconst, wall_dampingconst, wallsList,
         centerlinesList, thickness2radiusList, ksList, csList, elemType );
     // --------------------------------------------------------------------------

@@ -1,7 +1,7 @@
-#include "ElemBC_3D_tet_wall.hpp"
+#include "ElemBC_3D_wall.hpp"
 
-ElemBC_3D_tet_wall::ElemBC_3D_tet_wall( const int &elemtype )
-: ElemBC_3D_tet( elemtype )
+ElemBC_3D_wall::ElemBC_3D_wall( const int &elemtype )
+: ElemBC_3D( elemtype )
 {
   radius.clear();
   thickness.clear();
@@ -11,14 +11,14 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall( const int &elemtype )
 }
 
 
-ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
+ElemBC_3D_wall::ElemBC_3D_wall(
     const std::string &walls_combined,
     const double &uniform_thickness,
     const double &uniform_youngsmod,
     const double &uniform_springconst,
     const double &uniform_dampingconst,
     const int &elemtype )
-: ElemBC_3D_tet( walls_combined, elemtype )
+: ElemBC_3D( {walls_combined}, elemtype )
 {
   // num_ebc = 1 per the assumption for wall elem bc
   constexpr int ebc_id = 0;
@@ -53,14 +53,14 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   std::cout<<"     damping constant cs = " << uniform_dampingconst << std::endl;
 }
 
-ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
+ElemBC_3D_wall::ElemBC_3D_wall(
     const std::string &walls_combined,
     const std::string &centerlines_combined,
     const double &thickness2radius_combined,
     const double &springconst_combined,
     const double &dampingconst_combined,
     const int &elemtype )
-: ElemBC_3D_tet( walls_combined, elemtype )
+: ElemBC_3D( {walls_combined}, elemtype )
 {
   // num_ebc = 1 per the assumption for wall elem bc
   constexpr int ebc_id = 0;
@@ -114,7 +114,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   // Write out vtp's with wall properties
   write_vtk(ebc_id, "varwallprop");
   
-  std::cout<<"     ElemBC_3D_tet_wall generated from "<<walls_combined<<" and ";
+  std::cout<<"     ElemBC_3D_wall generated from "<<walls_combined<<" and ";
   std::cout<<centerlines_combined<<std::endl;
   std::cout<<"     thickness h ranges in ["<<*std::min_element(thickness.begin(), thickness.end())
     <<" , "<<*std::max_element(thickness.begin(), thickness.end())<<"] \n";
@@ -124,7 +124,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   std::cout<<"     damping constant cs = " << dampingconst_combined << std::endl;
 }
 
-ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
+ElemBC_3D_wall::ElemBC_3D_wall(
     const std::string &walls_combined,
     const std::string &centerlines_combined,
     const double &thickness2radius_combined,
@@ -136,8 +136,8 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     const std::vector<double> &springconstList,
     const std::vector<double> &dampingconstList,
     const int &elemtype )
-: ElemBC_3D_tet_wall( walls_combined, centerlines_combined, thickness2radius_combined,
-                      springconst_combined, dampingconst_combined, elemtype )
+: ElemBC_3D_wall( {walls_combined}, centerlines_combined, thickness2radius_combined,
+                  springconst_combined, dampingconst_combined, elemtype )
 {
   // Check inputs
   SYS_T::print_fatal_if( centerlinesList.size() != wallsList.size(),
@@ -169,10 +169,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   std::vector<int> ien_array, global_node_idx, global_elem_idx;
   for(int ii=0; ii<num_srfs; ++ii)
   {
-    if(elemtype == 501)
-      VTK_T::read_vtp_grid( wallsList[ii], numpts, numcels, pt, ien_array ); 
-    else
-      VTK_T::read_vtu_grid( wallsList[ii], numpts, numcels, pt, ien_array );
+    VTK_T::read_grid( wallsList[ii], numpts, numcels, pt, ien_array );
 
     global_node_idx = VTK_T::read_int_PointData(wallsList[ii], "GlobalNodeID");
     global_elem_idx = VTK_T::read_int_CellData(wallsList[ii], "GlobalElementID");
@@ -234,7 +231,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
   // Write out vtp's with wall properties
   write_vtk(ebc_id, "varwallprop");
   
-  std::cout<<"     ElemBC_3D_tet_wall generated from "<<walls_combined<<" and ";
+  std::cout<<"     ElemBC_3D_wall generated from "<<walls_combined<<" and ";
   std::cout<<centerlines_combined<<std::endl;
   std::cout<<"     thickness h ranges in ["<<*std::min_element(thickness.begin(), thickness.end())
     <<", "<<*std::max_element(thickness.begin(), thickness.end())<<"] \n";
@@ -246,7 +243,7 @@ ElemBC_3D_tet_wall::ElemBC_3D_tet_wall(
     <<", "<<*std::max_element(dampingconst.begin(), dampingconst.end())<<"] \n";
 }
 
-ElemBC_3D_tet_wall::~ElemBC_3D_tet_wall()
+ElemBC_3D_wall::~ElemBC_3D_wall()
 {
   VEC_T::clean( radius    );
   VEC_T::clean( thickness );
@@ -255,7 +252,7 @@ ElemBC_3D_tet_wall::~ElemBC_3D_tet_wall()
   VEC_T::clean( dampingconst );
 }
 
-void ElemBC_3D_tet_wall::overwrite_from_vtk(
+void ElemBC_3D_wall::overwrite_from_vtk(
     const std::string &wallprop_vtk,
     const int &type,
     const std::string &vtk_fieldname )
@@ -285,7 +282,7 @@ void ElemBC_3D_tet_wall::overwrite_from_vtk(
       else if( type == 3 )
         dampingconst[ii] = wallprop[idx];
       else
-        SYS_T::print_fatal("ERROR: Unknown wallprop type in ElemBC_3D_tet_wall::overwrite_from_vtk().\n");
+        SYS_T::print_fatal("ERROR: Unknown wallprop type in ElemBC_3D_wall::overwrite_from_vtk().\n");
     }
   }
 
@@ -319,9 +316,9 @@ void ElemBC_3D_tet_wall::overwrite_from_vtk(
   write_vtk(ebc_id, "varwallprop");
 }
 
-void ElemBC_3D_tet_wall::print_info() const
+void ElemBC_3D_wall::print_info() const
 {
-  ElemBC_3D_tet::print_info();
+  ElemBC_3D::print_info();
 
   VEC_T::print( radius,       "wall_radius.txt",       '\n');
   VEC_T::print( thickness,    "wall_thickness.txt",    '\n');
@@ -330,35 +327,61 @@ void ElemBC_3D_tet_wall::print_info() const
   VEC_T::print( dampingconst, "wall_dampingconst.txt", '\n');
 }
 
-void ElemBC_3D_tet_wall::write_vtk( const int &ebc_id, const std::string &filename ) const
+void ElemBC_3D_wall::write_vtk( const int &ebc_id, const std::string &filename ) const
 {
   if(elem_type == 501)
   {
     vtkPolyData * grid_w = vtkPolyData::New();
 
     TET_T::gen_triangle_grid( grid_w, num_node[ebc_id], num_cell[ebc_id],
-        pt_xyz[ebc_id], tri_ien[ebc_id] );
+        pt_xyz[ebc_id], sur_ien[ebc_id] );
 
     add_wall_data(grid_w, ebc_id);
 
     VTK_T::write_vtkPointSet(filename, grid_w);
     grid_w->Delete();  
   }
-  else
+  else if(elem_type == 502)
   {
     vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
 
     TET_T::gen_quadratic_triangle_grid( grid_w, num_node[ebc_id], num_cell[ebc_id],
-        pt_xyz[ebc_id], tri_ien[ebc_id] );
+        pt_xyz[ebc_id], sur_ien[ebc_id] );
 
     add_wall_data(grid_w, ebc_id);
 
     VTK_T::write_vtkPointSet(filename, grid_w);
     grid_w->Delete();
   }
+  else if(elem_type == 601)
+  {
+    vtkPolyData * grid_w = vtkPolyData::New();
+
+    HEX_T::gen_quad_grid( grid_w, num_node[ebc_id], num_cell[ebc_id],
+        pt_xyz[ebc_id], sur_ien[ebc_id] );
+
+    add_wall_data(grid_w, ebc_id);
+
+    VTK_T::write_vtkPointSet(filename, grid_w);
+    grid_w->Delete(); 
+  }
+  else if(elem_type == 602)
+  {
+    vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
+
+    HEX_T::gen_quadratic_quad_grid( grid_w, num_node[ebc_id], num_cell[ebc_id],
+        pt_xyz[ebc_id], sur_ien[ebc_id] );
+
+    add_wall_data(grid_w, ebc_id);
+
+    VTK_T::write_vtkPointSet(filename, grid_w);
+    grid_w->Delete();    
+  }
+  else
+    SYS_T::print_fatal("Error: ElemBC_3D_wall::write_vtk fucntion: unknown element type. \n");
 }
 
-void ElemBC_3D_tet_wall::add_wall_data( vtkPointSet * const &grid_w, const int &ebc_id ) const
+void ElemBC_3D_wall::add_wall_data( vtkPointSet * const &grid_w, const int &ebc_id ) const
 {
   // Add nodal indices
   VTK_T::add_int_PointData( grid_w, global_node[ebc_id], "GlobalNodeID" );
@@ -382,7 +405,7 @@ void ElemBC_3D_tet_wall::add_wall_data( vtkPointSet * const &grid_w, const int &
   VTK_T::add_double_PointData( grid_w, dampingconst, "DampingConstant" );
 }
 
-void ElemBC_3D_tet_wall::compute_youngsmod( const double &r, const double &th, double &E )
+void ElemBC_3D_wall::compute_youngsmod( const double &r, const double &th, double &E )
 {
   //const double alpha = 13.3, beta = 0.3;
   //const double fluid_density = 1.065;

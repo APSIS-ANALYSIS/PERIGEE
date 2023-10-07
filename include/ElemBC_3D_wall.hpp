@@ -1,9 +1,9 @@
-#ifndef ELEMBC_3D_TET_WALL_HPP
-#define ELEMBC_3D_TET_WALL_HPP
+#ifndef ELEMBC_3D_WALL_HPP
+#define ELEMBC_3D_WALL_HPP
 // ============================================================================
-// ElemBC_3D_tet_wall.hpp
+// ElemBC_3D_wall.hpp
 //
-// A derived class from the ElemBC_3D_tet.hpp
+// A derived class from the ElemBC_3D.hpp
 //
 // This class has additional information of the wall mesh used for the thin-wall
 // approximation in FSI simulations.
@@ -11,17 +11,17 @@
 // Author: Ju Liu, Ingrid S. Lan
 // Date: July 12 2020
 // ============================================================================
-#include "ElemBC_3D_tet.hpp"
+#include "ElemBC_3D.hpp"
 #include "vtkCellLocator.h"
 #include "vtkGenericCell.h"
 
-class ElemBC_3D_tet_wall : public ElemBC_3D_tet
+class ElemBC_3D_wall : public ElemBC_3D
 {
   public:
     // ------------------------------------------------------------------------
     // Constructing an empty wall
     // ------------------------------------------------------------------------
-    ElemBC_3D_tet_wall( const int &elemtype = 501 );
+    ElemBC_3D_wall( const int &elemtype );
     
     // ------------------------------------------------------------------------
     // Constructing wall properties with uniform thickness
@@ -35,12 +35,12 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     // Note: This function is typically used for constructing a simple wall
     //       model without feeding a centerline vtp file.
     // ------------------------------------------------------------------------
-    ElemBC_3D_tet_wall(const std::string &walls_combined,
+    ElemBC_3D_wall(const std::string &walls_combined,
         const double &uniform_thickness,
         const double &uniform_youngsmod,
         const double &uniform_springconst,
         const double &uniform_dampingconst,
-        const int &elemtype = 501 );
+        const int &elemtype);
 
     // ------------------------------------------------------------------------
     //  Constructing wall properties with a single spatial distribution.
@@ -53,12 +53,12 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     //  \para: ks_combined is the  spring constant over the entire wall.
     //  \para: cs_combined is the damping constant over the entire wall.
     // ------------------------------------------------------------------------
-    ElemBC_3D_tet_wall(const std::string &walls_combined,
+    ElemBC_3D_wall(const std::string &walls_combined,
         const std::string &centerlines_combined,
         const double &thickness2radius_combined,
         const double &springconst_combined,
         const double &dampingconst_combined,
-        const int &elemtype = 501 );
+        const int &elemtype);
 
     // ------------------------------------------------------------------------
     //  Constructing wall properties with multiple spatial distributions.
@@ -73,7 +73,7 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
     //  \para: ksList is a vector of corresponding spring constants.
     //  \para: csList is a vector of corresponding damping constants.
     // ------------------------------------------------------------------------
-    ElemBC_3D_tet_wall(const std::string &walls_combined,
+    ElemBC_3D_wall(const std::string &walls_combined,
         const std::string &centerlines_combined,
         const double &thickness2radius_combined,
         const double &springconst_combined,
@@ -83,9 +83,9 @@ class ElemBC_3D_tet_wall : public ElemBC_3D_tet
         const std::vector<double> &thickness2radiusList,
         const std::vector<double> &springconstList,
         const std::vector<double> &dampingconstList,
-        const int &elemtype = 501 );
+        const int &elemtype);
 
-    virtual ~ElemBC_3D_tet_wall();
+    virtual ~ElemBC_3D_wall();
 
     // Overwrite wall properties from a vtp/vtu file by GlobalNodeID. All wall nodes
     // with GlobalNodeIDs that also exist in wallprop_vtk will be overwritten. 
