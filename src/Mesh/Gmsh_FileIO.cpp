@@ -1441,6 +1441,7 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
 
   // tript stores the coordinates of the boundary points
   std::vector<double> sur_pt( 3*bcnumpt, 0.0 );
+  #pragma omp parallel for
   for( int ii=0; ii<bcnumpt; ++ii )
   {
     sur_pt[ii*3]   = node[bcpt[ii]*3] ;
@@ -1473,17 +1474,26 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
     for(int ii=0; ii<bcnumpt; ++ii) bcmap[bcpt[ii]] = 1;
 
     std::vector<int> gelem {};
-    for( int ee=0; ee<numcel; ++ee )
+    #pragma omp parallel
     {
-      int total = 0;
-      for (int jj{0}; jj < nVertex_3d; ++jj)
-        total += bcmap[ vol_IEN[nlocbas_3d * ee + jj] ];
-      if(total >= nVertex_2d) 
-        gelem.push_back(ee);
+      std::vector<int> temp_gelem {};
+      #pragma omp for
+      for( int ee=0; ee<numcel; ++ee )
+      {
+        int total = 0;
+        for (int jj{0}; jj < nVertex_3d; ++jj)
+          total += bcmap[ vol_IEN[nlocbas_3d * ee + jj] ];
+        if(total >= nVertex_2d) 
+          temp_gelem.push_back(ee);
+      }
+      #pragma omp critical
+      VEC_T::insert_end(gelem, temp_gelem);
     }
+    
     delete [] bcmap; bcmap = nullptr;
     std::cout<<"      "<<gelem.size()<<" "<<ele_3d<<"s have faces over the surface. \n";
 
+    #pragma omp parallel for
     for(int ff=0; ff<bcnumcl; ++ff)
     {
       std::vector<int> snode( nVertex_2d, -1 );
