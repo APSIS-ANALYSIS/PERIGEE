@@ -5,8 +5,9 @@
 //
 // Date: Oct 6 2023
 // ============================================================================
-#include "IPLocAssem_Linear.hpp"
 #include "TimeMethod_GenAlpha.hpp"
+#include "FEAElement.hpp"
+#include "ALocal_IEN.hpp"
 
 class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem_Linear
 {
@@ -131,6 +132,13 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem_Linear
 
     int nLocBas, snLocBas, vec_size, sur_size;
     double mu, lambda;
+
+    PetscScalar * Mass;
+    PetscScalar * Stiffness;
+    PetscScalar * Load;
+
+    PetscScalar * sur_Mass;
+    PetscScalar * sur_Load;
 
     void print_info() const;
 
