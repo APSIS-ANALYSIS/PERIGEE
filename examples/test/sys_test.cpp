@@ -12,9 +12,13 @@
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D.hpp"
 #include "ElemBC_3D_outflow.hpp"
+#include "Gmsh_FileIO.hpp"
 
 int main(int argc, char *argv[])
 {
+  Gmsh_FileIO * GIO = new Gmsh_FileIO("untitled.msh");
+  GIO -> test_slave_master();
+
   return EXIT_SUCCESS;
 }
 

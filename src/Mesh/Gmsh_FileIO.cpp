@@ -30,6 +30,13 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
   SYS_T::print_fatal_if(sline.compare("$EndElements") != 0, 
       "Error: .msh format line should be $EndElements. \n");
 
+  // When periodic boundary condition is applied in .geo file
+  getline(infile, sline);
+  if (sline.compare("$Periodic") == 0)
+    read_periodic(infile);
+  else
+    ; // Do nothing, just finished the reading
+
   // Generate the details of the 1d, 2d and 3d info
   num_phy_domain_3d = 0; num_phy_domain_2d = 0; num_phy_domain_1d = 0;
   phy_3d_index.clear(); phy_2d_index.clear(); phy_1d_index.clear();
@@ -2000,8 +2007,58 @@ void Gmsh_FileIO::read_msh4(std::ifstream &infile)
   // check
   SYS_T::print_fatal_if( recorded_ele_num != num_elem, 
     "Error: .msh file, the number of recorded elements does not match with the number of elements. \n");
+}
 
-  // here we suppose there is no periodic condition, so the next line is the end of .msh file
+void Gmsh_FileIO::read_periodic(std::ifstream &infile)
+{
+  std::istringstream sstrm;
+  std::string sline;
+
+  getline(infile, sline); sstrm.str(sline);
+  int numPeriodicLinks;
+  sstrm >> numPeriodicLinks;
+
+  for(int link{0}; link < numPeriodicLinks; ++link)
+  {
+    getline(infile, sline); // skip: entityDim, entityTag, entityTagMaster
+    getline(infile, sline); // skip: numAffine and affine
+
+    sstrm.clear(); getline(infile, sline); sstrm.str(sline);
+    int numCorrespondingNodes;
+    sstrm >> numCorrespondingNodes;
+
+    for(int node_pair{0}; node_pair < numCorrespondingNodes; ++node_pair)
+    {
+      sstrm.clear(); getline(infile, sline); sstrm.str(sline);
+      int nodeTag, nodeTagMaster;
+      sstrm >> nodeTag; sstrm >> nodeTagMaster;
+
+      if(VEC_T::is_invec(per_slave, nodeTag))
+        ; // When we use periodic BC, if a slave node have more than one master, they will follow 
+        // a common primary master. Hence there it is no need to assign more than one master to a slave.
+      else
+      {
+        per_slave.push_back(nodeTag);
+        per_master.push_back(nodeTagMaster);
+      }
+    }
+  }
+
+  // file syntax $EndPeriodic
+  getline(infile, sline);
+  SYS_T::print_fatal_if( sline.compare("$EndPeriodic") != 0, 
+     "Error: .msh format line should be $EndPeriodic. \n");
+
+  // find primary masters
+  for(int &master : per_master)
+    {
+      int pos_as_slave = VEC_T::get_pos(per_slave, master);
+      while(pos_as_slave != -1) // the master is others' slave
+        {
+        master = per_master[pos_as_slave];
+        pos_as_slave = VEC_T::get_pos(per_slave, master);
+        }
+    }
 }
 
 // EOF

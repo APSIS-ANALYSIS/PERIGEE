@@ -203,6 +203,14 @@ class Gmsh_FileIO
         const std::vector<int> &index_2d,
         const std::vector<int> &index_2d_need_facemap ) const;
 
+    // test function to print slaves and masters
+    void test_slave_master()
+    {
+        std::cout << "Slave\t" << "Master\n";
+        for(int ii{0}; ii < VEC_T::get_size(per_slave); ++ii)
+            std::cout << per_slave[ii] << '\t' << per_master[ii] << '\n';
+    }
+
   private:
     Gmsh_FileIO() = delete; // Disallow default constructor
 
@@ -290,6 +298,14 @@ class Gmsh_FileIO
     // mapping, which is defined by Gmsh.
     std::vector<int> ele_type {};
 
+    // Stores the slave nodes' indices if periodic BC is applied
+    std::vector<int> per_slave {};
+
+    //Stores the master nodes' indices if periodic BC is applied
+    std::vector<int> per_master {};
+    // They correspond to slave nodes by the position.
+    // E.g. the master of per_slave[0] is per_master[0].
+
     // --------------------------------------------------------------
     // Private functions for the constructor
     // --------------------------------------------------------------
@@ -305,6 +321,14 @@ class Gmsh_FileIO
     // This function is bound to the constructor of Gmsh_FileIO.
     // --------------------------------------------------------------
     void read_msh4(std::ifstream &infile);
+    // --------------------------------------------------------------
+
+    // --------------------------------------------------------------
+    // Read the master-slave node mapping if periodic BC is applied.
+    // After the reading, all of the masters will be checked and traced
+    // to get the primary masters.
+    // --------------------------------------------------------------
+    void read_periodic(std::ifstream &infile);
     // --------------------------------------------------------------
 };
 
