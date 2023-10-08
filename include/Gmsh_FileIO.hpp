@@ -135,10 +135,11 @@ class Gmsh_FileIO
     // many physical volumetric domain, the face2elem mapping is -1.
     // --------------------------------------------------------------
     void write_vtp(const std::string &vtp_filename,
-        const int &index_sur, const int &index_vol, const bool &isf2e = false) const;
+        const int &index_sur, const int &index_vol,
+        const bool &isf2e = false, const bool &is_slave = false) const;
 
     void write_vtp(const int &index_sur, const int &index_vol,
-        const bool &isf2e = false) const;
+        const bool &isf2e = false, const bool &is_slave = false) const;
   
     // --------------------------------------------------------------
     // Write a vtu file for a surface associated with a volume mesh

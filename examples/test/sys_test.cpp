@@ -16,8 +16,11 @@
 
 int main(int argc, char *argv[])
 {
-  Gmsh_FileIO * GIO = new Gmsh_FileIO("untitled.msh");
+  Gmsh_FileIO * GIO = new Gmsh_FileIO("Periodic.msh");
   GIO -> test_slave_master();
+
+  GIO -> write_vtp(2, 0, true, true);
+  GIO -> write_vtp(4, 0, true, true);
 
   return EXIT_SUCCESS;
 }

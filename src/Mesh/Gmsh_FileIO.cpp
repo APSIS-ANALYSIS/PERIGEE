@@ -380,7 +380,7 @@ void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
 }
 
 void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
-  const int &index_sur, const int &index_vol, const bool &isf2e ) const
+  const int &index_sur, const int &index_vol, const bool &isf2e, const bool &is_slave ) const
 {
   SYS_T::print_fatal_if( index_sur >= num_phy_domain_2d || index_sur < 0,
       "Error: Gmsh_FileIO::write_vtp, surface index is wrong. \n");
@@ -534,6 +534,23 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
   input_vtk_data.push_back({bcpt, "GlobalNodeID", AssociateObject::Node});
   input_vtk_data.push_back({face2elem, "GlobalElementID", AssociateObject::Cell});
 
+  // Write the master nodes' global id
+  if (is_slave)
+  {
+    std::vector<int> master_id ( bcnumpt, -1 );
+    for(int ii{0}; ii < bcnumpt; ++ii)
+    {
+      // The position of slave node in per_slave vector
+      const int pos_slave = VEC_T::get_pos(per_slave, bcpt[ii]);
+      SYS_T::print_fatal_if( pos_slave == -1,
+        "Error: Gmsh_FileIO::write_vtp, node %d of boundary %s is not a slave node.\n", bcpt[ii], phy_2d_name[index_sur].c_str());
+      
+      master_id[ii] = per_master[pos_slave];
+    }
+    std::cout<<"      master-slave mapping generated. \n";
+    input_vtk_data.push_back({master_id, "MasterNodeID", AssociateObject::Node});
+  }
+
   if (nlocbas_2d == 3)
   {
     TET_T::write_triangle_grid( vtp_filename, bcnumpt, bcnumcl,
@@ -553,13 +570,13 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
 }
 
 void Gmsh_FileIO::write_vtp(const int &index_sur, const int &index_vol,
-  const bool &isf2e ) const
+  const bool &isf2e, const bool &is_slave) const
 {
   std::string vtp_file_name(phy_2d_name[index_sur]);
   vtp_file_name += "_";
   vtp_file_name += phy_3d_name[index_vol];
 
-  write_vtp(vtp_file_name, index_sur, index_vol, isf2e);
+  write_vtp(vtp_file_name, index_sur, index_vol, isf2e, is_slave);
 }
 
 void Gmsh_FileIO::write_each_vtu( const std::vector<std::string> name_list) const
@@ -2033,13 +2050,13 @@ void Gmsh_FileIO::read_periodic(std::ifstream &infile)
       int nodeTag, nodeTagMaster;
       sstrm >> nodeTag; sstrm >> nodeTagMaster;
 
-      if(VEC_T::is_invec(per_slave, nodeTag))
+      if(VEC_T::is_invec(per_slave, nodeTag - 1 ))
         ; // When we use periodic BC, if a slave node have more than one master, they will follow 
         // a common primary master. Hence there it is no need to assign more than one master to a slave.
       else
       {
-        per_slave.push_back(nodeTag);
-        per_master.push_back(nodeTagMaster);
+        per_slave.push_back(nodeTag - 1);
+        per_master.push_back(nodeTagMaster - 1);
       }
     }
   }
