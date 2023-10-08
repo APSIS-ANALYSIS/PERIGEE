@@ -173,7 +173,7 @@ TARGET_LINK_LIBRARIES( ruc_tet_3d    perigee_analysis )
 TARGET_LINK_LIBRARIES( wall_solver   perigee_analysis )
 TARGET_LINK_LIBRARIES( prepost       perigee_preprocess )
 TARGET_LINK_LIBRARIES( vis_ruc       perigee_postprocess )
-TARGET_LINK_LIBRARIES( vis_p1_wss    perigee_postprocess ) 
+TARGET_LINK_LIBRARIES( vis_p1_wss    perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_p2_wss    perigee_postprocess )
 
 #TARGET_LINK_LIBRARIES( test perigee_preprocess )
