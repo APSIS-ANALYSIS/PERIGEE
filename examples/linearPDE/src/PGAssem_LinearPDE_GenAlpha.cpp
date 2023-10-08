@@ -346,7 +346,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_stiffness(
   VecAssemblyEnd(F);
 }
 
-void PGAssem_LinearPDE_GenAlpha::Assem_mass_residual(
+void PGAssem_LinearPDE_GenAlpha::Assem_mass(
     const PDNSolution * const &sol,
     const ALocal_Elem * const &alelem_ptr,
     PLocAssem_LinearPDE_GenAlpha * const &lassem_ptr,
@@ -360,14 +360,15 @@ void PGAssem_LinearPDE_GenAlpha::Assem_mass_residual(
     const ALocal_EBC * const &ebc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();
+  const int loc_dof = dof_mat * nLocBas;
 
-  double * array_a = new double [nlgn * 1];
-  double * local_a = new double [nLocBas * 1];
+  double * array_a = new double [nlgn * dof_sol];
+  double * local_a = new double [nLocBas * dof_sol];
   int * IEN_e = new int [nLocBas];
   double * ectrl_x = new double [nLocBas];
   double * ectrl_y = new double [nLocBas];
   double * ectrl_z = new double [nLocBas];
-  PetscInt * row_index = new PetscInt [nLocBas * 1];
+  PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
 
   sol->GetLocalArray( array_a );
 
@@ -379,12 +380,14 @@ void PGAssem_LinearPDE_GenAlpha::Assem_mass_residual(
 
     lassem_ptr->Assem_Mass_Residual( local_a, elementv, ectrl_x, ectrl_y, ectrl_z, quad_v );
 
-    for(int ii=0; ii<nLocBas; ++ii)row_index[ii] = nbc_part -> get_LID(0, IEN_e[ii]);
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      for(int mm=0; mm<dof_mat; ++mm)
+        row_index[dof_mat*ii+mm] = dof_mat * nbc_part -> get_LID(0, IEN_e[ii]) + mm;
+    }
 
-    MatSetValues(K, nLocBas, row_index, nLocBas, row_index,
-        lassem_ptr->Tangent, ADD_VALUES);
-
-    VecSetValues(G, nLocBas, row_index, lassem_ptr->Residual, ADD_VALUES);
+    MatSetValues(M, nLocBas, row_index, nLocBas, row_index,
+        lassem_ptr->Mass, ADD_VALUES);
   }
 
   delete [] array_a; array_a = nullptr;
@@ -398,15 +401,15 @@ void PGAssem_LinearPDE_GenAlpha::Assem_mass_residual(
   // Natural type boundary condition
   NatBC_G( 0.0, 0.0, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
-  VecAssemblyBegin(G);
-  VecAssemblyEnd(G);
+  VecAssemblyBegin(F);
+  VecAssemblyEnd(F);
 
   EssBC_KG( nbc_part );
 
-  MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
-  MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
-  VecAssemblyBegin(G);
-  VecAssemblyEnd(G);
+  MatAssemblyBegin(M, MAT_FINAL_ASSEMBLY);
+  MatAssemblyEnd(M, MAT_FINAL_ASSEMBLY);
+  VecAssemblyBegin(F);
+  VecAssemblyEnd(F);
 }
 
 // EOF

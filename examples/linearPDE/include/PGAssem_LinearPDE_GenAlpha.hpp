@@ -14,8 +14,9 @@
 class PGAssem_LinearPDE_GenAlpha
 {
   public:
+    Mat M;
     Mat K;
-    Mat F;
+    Vec F;
 
     // Constructor for CMM equations
     PGAssem_LinearPDE_GenAlpha(
@@ -73,7 +74,7 @@ class PGAssem_LinearPDE_GenAlpha
         const ALocal_EBC * const &ebc_part );
 
     // Assembly the residual and mass matrix
-    void Assem_mass_residual(
+    void Assem_mass(
         const PDNSolution * const &sol,
         const ALocal_Elem * const &alelem_ptr,
         PLocAssem_LinearPDE_GenAlpha * const &lassem_ptr,
