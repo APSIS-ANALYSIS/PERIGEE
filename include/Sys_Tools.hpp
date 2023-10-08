@@ -173,10 +173,25 @@ namespace SYS_T
     }
     else
     {
+#ifdef _OPENMP
+      if( !omp_get_thread_num() )
+      {
+        va_list Argp;
+        va_start(Argp, output);
+        vfprintf (stderr, output, Argp);
+        va_end(Argp);
+
+        exit( EXIT_FAILURE );
+      }
+      else exit( EXIT_FAILURE );
+#else
       va_list Argp;
       va_start(Argp, output);
       vfprintf (stderr, output, Argp);
       va_end(Argp);
+
+      exit( EXIT_FAILURE );
+#endif
     }
   }
 
