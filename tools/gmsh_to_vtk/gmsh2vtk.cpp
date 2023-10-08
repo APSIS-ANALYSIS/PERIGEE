@@ -69,7 +69,5 @@ int main( int argc, char * argv[] )
   delete GIO;
   return EXIT_SUCCESS;
 }
-  
-  
 
 // EOF
