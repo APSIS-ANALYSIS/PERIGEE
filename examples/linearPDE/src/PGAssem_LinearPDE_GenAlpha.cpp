@@ -52,7 +52,8 @@ PGAssem_LinearPDE_GenAlpha::PGAssem_LinearPDE_GenAlpha(
 
 PGAssem_LinearPDE_GenAlpha::~PGAssem_LinearPDE_GenAlpha()
 {
-  VecDestroy(&G);
+  VecDestroy(&F);
+  MatDestroy(&M);
   MatDestroy(&K);
 }
 
