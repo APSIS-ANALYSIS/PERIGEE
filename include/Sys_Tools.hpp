@@ -219,7 +219,7 @@ namespace SYS_T
 
         exit( EXIT_FAILURE );
       }
-      else { exit( EXIT_FAILURE ); }
+      else exit( EXIT_FAILURE );
 #else
       va_list Argp;
       va_start(Argp, output);
@@ -261,7 +261,7 @@ namespace SYS_T
 
           exit( EXIT_FAILURE );
         }
-        else { exit( EXIT_FAILURE ); }
+        else exit( EXIT_FAILURE );
 #else
         va_list Argp;
         va_start(Argp, output);
