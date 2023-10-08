@@ -335,15 +335,15 @@ void PGAssem_LinearPDE_GenAlpha::Assem_stiffness(
   // Natural type boundary condition
   NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
-  VecAssemblyBegin(G);
-  VecAssemblyEnd(G);
+  VecAssemblyBegin(F);
+  VecAssemblyEnd(F);
 
   EssBC_KG( nbc_part );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
-  VecAssemblyBegin(G);
-  VecAssemblyEnd(G);
+  VecAssemblyBegin(F);
+  VecAssemblyEnd(F);
 }
 
 void PGAssem_LinearPDE_GenAlpha::Assem_mass_residual(
