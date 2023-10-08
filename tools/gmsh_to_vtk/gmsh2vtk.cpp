@@ -30,45 +30,44 @@ int main( int argc, char * argv[] )
   const int num_phy_domain_1d = GIO -> get_num_phy_domain_1d();
   const int num_phy_domain_2d = GIO -> get_num_phy_domain_2d();
   
-  // check whether it is a 3d problem or not 
-  if( num_phy_domain_1d==0 && num_phy_domain_2d>0 )
+  // check whether it is a 3d problem or not
+  SYS_T::print_fatal_if( num_phy_domain_1d != 0 || num_phy_domain_2d <= 0,
+    "ERROR: the number of 1D physical domain should be 0. \n" );
+
+  if( eleType==2 || eleType==3 )
   {
-    if( eleType==2 || eleType==3 )
-    {
-      for( int ii=0; ii<nbc_face_id.size(); ++ii )
-        GIO -> write_vtp( nbc_face_id[ii], nbc_vol_id[ii], false );
+    for( int ii=0; ii<nbc_face_id.size(); ++ii )
+      GIO -> write_vtp( nbc_face_id[ii], nbc_vol_id[ii], false );
 
-      for( int ii=0; ii<ebc_face_id.size(); ++ii )
-        GIO -> write_vtp( ebc_face_id[ii], ebc_vol_id[ii], true );
-    }
-    else if( eleType==9 )
-    {
-      GIO -> update_quadratic_tet_IEN(0);
-      for( int ii=0; ii<nbc_face_id.size(); ++ii )
-        GIO -> write_quadratic_sur_vtu( nbc_face_id[ii], nbc_vol_id[ii], false );
-
-      for( int ii=0; ii<ebc_face_id.size(); ++ii )
-        GIO -> write_quadratic_sur_vtu( ebc_face_id[ii], ebc_vol_id[ii], true );
-    }
-    else if( eleType==10 )
-    {
-      GIO -> update_quadratic_hex_IEN(0);
-      for( int ii=0; ii<nbc_face_id.size(); ++ii )
-        GIO -> write_quadratic_sur_vtu( nbc_face_id[ii], nbc_vol_id[ii], false );
-
-      for( int ii=0; ii<ebc_face_id.size(); ++ii )
-        GIO -> write_quadratic_sur_vtu( ebc_face_id[ii], ebc_vol_id[ii], true );
-    }
-    else SYS_T::print_fatal("Error: the element type of gmsh file cannot be read. \n");
-
-    const std::string wmname = config["wmname"].as<std::string>();
-    const bool isXML = config["isXML"].as<bool>();
-    GIO -> write_vtu( wmname, isXML );
-
-    delete GIO;
-    return EXIT_SUCCESS;
+    for( int ii=0; ii<ebc_face_id.size(); ++ii )
+      GIO -> write_vtp( ebc_face_id[ii], ebc_vol_id[ii], true );
   }
-  else SYS_T::print_fatal( "ERROR: the number of 1D physical domain should be 0." )
+  else if( eleType==9 )
+  {
+    GIO -> update_quadratic_tet_IEN(0);
+    for( int ii=0; ii<nbc_face_id.size(); ++ii )
+      GIO -> write_quadratic_sur_vtu( nbc_face_id[ii], nbc_vol_id[ii], false );
+
+    for( int ii=0; ii<ebc_face_id.size(); ++ii )
+      GIO -> write_quadratic_sur_vtu( ebc_face_id[ii], ebc_vol_id[ii], true );
+  }
+  else if( eleType==10 )
+  {
+    GIO -> update_quadratic_hex_IEN(0);
+    for( int ii=0; ii<nbc_face_id.size(); ++ii )
+      GIO -> write_quadratic_sur_vtu( nbc_face_id[ii], nbc_vol_id[ii], false );
+
+    for( int ii=0; ii<ebc_face_id.size(); ++ii )
+      GIO -> write_quadratic_sur_vtu( ebc_face_id[ii], ebc_vol_id[ii], true );
+  }
+  else SYS_T::print_fatal("Error: the element type of gmsh file cannot be read. \n");
+
+  const std::string wmname = config["wmname"].as<std::string>();
+  const bool isXML = config["isXML"].as<bool>();
+  GIO -> write_vtu( wmname, isXML );
+
+  delete GIO;
+  return EXIT_SUCCESS;
 }
   
   
