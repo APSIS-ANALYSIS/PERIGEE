@@ -12,8 +12,6 @@
 #include "Hex_Tools.hpp"
 #include "HDF5_Writer.hpp"
 #include "Sys_Tools.hpp"
-#include "omp.h"
-
 
 class Gmsh_FileIO
 {
