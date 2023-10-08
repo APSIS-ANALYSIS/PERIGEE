@@ -19,19 +19,19 @@ PGAssem_LinearPDE_GenAlpha::PGAssem_LinearPDE_GenAlpha(
   // the same. This is an assumption in this assembly routine.
   if(num_ebc>0) snLocBas = part_ebc -> get_cell_nLocBas(0);
 
-  const int nlocrow = 1 * pnode_ptr -> get_nlocalnode();
+  const int nlocrow = dof_mat * pnode_ptr -> get_nlocalnode();
 
   // Allocate the sparse matrix K
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
       PETSC_DETERMINE, dof_mat*in_nz_estimate, NULL, dof_mat*in_nz_estimate, NULL, &K);
 
-  // Allocate the vector G
-  VecCreate(PETSC_COMM_WORLD, &G);
-  VecSetSizes(G, nlocrow, PETSC_DECIDE);
+  // Allocate the vector F
+  VecCreate(PETSC_COMM_WORLD, &F);
+  VecSetSizes(F, nlocrow, PETSC_DECIDE);
 
-  VecSetFromOptions(G);
-  VecSet(G, 0.0);
-  VecSetOption(G, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
+  VecSetFromOptions(F);
+  VecSet(F, 0.0);
+  VecSetOption(F, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
   
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();
@@ -122,10 +122,11 @@ void PGAssem_LinearPDE_GenAlpha::Assem_nonzero_estimate(
     const ALocal_NBC * const &nbc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();
+  const int loc_dof = dof_mat * nLocBas;
   
   lassem_ptr->Assem_Estimate();
 
-  PetscInt * row_index = new PetscInt [nLocBas * 1];
+  PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
 
   for(int ee=0; ee<nElem; ++ee)
   {
@@ -133,23 +134,24 @@ void PGAssem_LinearPDE_GenAlpha::Assem_nonzero_estimate(
     {
       const int loc_index = lien_ptr -> get_LIEN(ee, ii);
       
-      row_index[ii] = nbc_part->get_LID( 0, loc_index );
+      for(int mm=0; m<dof_mat; ++ii)
+        row_index[dof_mat * ii + mm] = dof_mat * nbc_part->get_LID( m, loc_index ) + m;
     }
 
-    MatSetValues(K, nLocBas, row_index, nLocBas, row_index, lassem_ptr->Tangent, ADD_VALUES);
+    MatSetValues(K, loc_dof, row_index, loc_dof, row_index, lassem_ptr->Stiffness, ADD_VALUES);
   }
   
   delete [] row_index; row_index = nullptr;
   
-  VecAssemblyBegin(G);
-  VecAssemblyEnd(G);
+  VecAssemblyBegin(F);
+  VecAssemblyEnd(F);
 
   EssBC_KG( nbc_part );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
-  VecAssemblyBegin(G);
-  VecAssemblyEnd(G);
+  VecAssemblyBegin(F);
+  VecAssemblyEnd(F);
 }
 
 void PGAssem_LinearPDE_GenAlpha::NatBC_G( 
