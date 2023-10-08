@@ -180,17 +180,13 @@ namespace SYS_T
         va_start(Argp, output);
         vfprintf (stderr, output, Argp);
         va_end(Argp);
-
-        exit( EXIT_FAILURE );
       }
-      else exit( EXIT_FAILURE );
+      #pragma omp barrier
 #else
       va_list Argp;
       va_start(Argp, output);
       vfprintf (stderr, output, Argp);
       va_end(Argp);
-
-      exit( EXIT_FAILURE );
 #endif
     }
   }
