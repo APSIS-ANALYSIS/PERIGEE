@@ -39,7 +39,7 @@ class PGAssem_LinearPDE_GenAlpha
         const ALocal_NBC * const &nbc_part );
 
     // Assembly the residual vector
-    void Assem_residual(
+    void Assem_Load(
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
         const double &curr_time,
