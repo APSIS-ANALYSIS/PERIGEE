@@ -195,7 +195,7 @@ void PGAssem_LinearPDE_GenAlpha::NatBC_G(
   delete [] srow_index; srow_index = nullptr;
 }
 
-void PGAssem_LinearPDE_GenAlpha::Assem_Load(
+void PGAssem_LinearPDE_GenAlpha::Assem_load(
     const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     const double &curr_time,
@@ -269,7 +269,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_Load(
   VecAssemblyEnd(F);
 }
 
-void PGAssem_LinearPDE_GenAlpha::Assem_tangent_residual(
+void PGAssem_LinearPDE_GenAlpha::Assem_stiffness(
     const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     const double &curr_time,
@@ -286,16 +286,17 @@ void PGAssem_LinearPDE_GenAlpha::Assem_tangent_residual(
     const ALocal_EBC * const &ebc_part)
 {
   const int nElem = alelem_ptr->get_nlocalele();
+  const int loc_dof = dof_mat * nLocBas;
 
-  double * array_a = new double [nlgn * 1];
-  double * array_b = new double [nlgn * 1];
-  double * local_a = new double [nLocBas * 1];
-  double * local_b = new double [nLocBas * 1];
+  double * array_a = new double [nlgn * dof_sol];
+  double * array_b = new double [nlgn * dof_sol];
+  double * local_a = new double [nLocBas * dof_sol];
+  double * local_b = new double [nLocBas * dof_sol];
   int * IEN_e = new int [nLocBas];
   double * ectrl_x = new double [nLocBas];
   double * ectrl_y = new double [nLocBas];
   double * ectrl_z = new double [nLocBas];
-  PetscInt * row_index = new PetscInt [nLocBas * 1];
+  PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
 
   dot_sol -> GetLocalArray( array_a );
   sol     -> GetLocalArray( array_b );
@@ -308,15 +309,17 @@ void PGAssem_LinearPDE_GenAlpha::Assem_tangent_residual(
 
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
-    lassem_ptr->Assem_Tangent_Residual(curr_time, dt, local_a, local_b,
+    lassem_ptr->Assem_Stiffness(curr_time, dt, local_a, local_b,
         elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
 
-    for(int ii=0; ii<nLocBas; ++ii)row_index[ii] = nbc_part->get_LID(0, IEN_e[ii]);
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      for(int mm=0; mm<dof_mat; ++mm)
+        row_index[dof_mat*ii + mm] = dof_mat * nbc_part->get_LID(0, IEN_e[ii]) + mm;
+    }
 
     MatSetValues(K, nLocBas, row_index, nLocBas, row_index,
-        lassem_ptr->Tangent, ADD_VALUES);
-
-    VecSetValues(G, nLocBas, row_index, lassem_ptr->Residual, ADD_VALUES);
+        lassem_ptr->Stiffness, ADD_VALUES);
   }
 
   delete [] array_a; array_a = nullptr;

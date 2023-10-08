@@ -39,7 +39,7 @@ class PGAssem_LinearPDE_GenAlpha
         const ALocal_NBC * const &nbc_part );
 
     // Assembly the load vector
-    void Assem_Load(
+    void Assem_load(
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
         const double &curr_time,
@@ -55,8 +55,8 @@ class PGAssem_LinearPDE_GenAlpha
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
-    // Assembly the residual vector and tangent matrix 
-    void Assem_tangent_residual(
+    // Assembly the stiffness matrix 
+    void Assem_stiffness(
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
         const double &curr_time,
