@@ -38,7 +38,7 @@ class PGAssem_LinearPDE_GenAlpha
         const ALocal_IEN * const &lien_ptr,
         const ALocal_NBC * const &nbc_part );
 
-    // Assembly the residual vector
+    // Assembly the load vector
     void Assem_Load(
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
