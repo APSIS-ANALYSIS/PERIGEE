@@ -54,8 +54,7 @@ int main( int argc, char * argv[] )
     for( int ii=0; ii<ebc_face_id.size(); ++ii )
       GIO -> write_quadratic_sur_vtu( ebc_face_id[ii], ebc_vol_id[ii], true );
   }
-  else
-  { SYS_T::print_fatal("Error: the element type of gmsh file cannot be read. \n"); return 0; }
+  else SYS_T::print_fatal("Error: the element type of gmsh file cannot be read. \n");
 
   const std::string wmname = config["wmname"].as<std::string>();
   const bool isXML = config["isXML"].as<bool>();
