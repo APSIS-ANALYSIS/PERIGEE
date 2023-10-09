@@ -84,12 +84,8 @@ void PGAssem_LinearPDE_GenAlpha::Assem_nonzero_estimate(
   
   delete [] row_index; row_index = nullptr;
   
-  VecAssemblyBegin(F);
-  VecAssemblyEnd(F);
-  MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
-  MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
-  VecAssemblyBegin(F);
-  VecAssemblyEnd(F);
+  MatAssemblyBegin(K);
+  MatAssemblyEnd(K);
 }
 
 void PGAssem_LinearPDE_GenAlpha::NatBC_G( 
@@ -200,8 +196,6 @@ void PGAssem_LinearPDE_GenAlpha::Assem_load(
 
   VecAssemblyBegin(F);
   VecAssemblyEnd(F);
-  VecAssemblyBegin(F);
-  VecAssemblyEnd(F);
 }
 
 void PGAssem_LinearPDE_GenAlpha::Assem_stiffness(
@@ -272,10 +266,8 @@ void PGAssem_LinearPDE_GenAlpha::Assem_stiffness(
 
   VecAssemblyBegin(F);
   VecAssemblyEnd(F);
-  MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
-  MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
-  VecAssemblyBegin(F);
-  VecAssemblyEnd(F);
+  MatAssemblyBegin(K);
+  MatAssemblyEnd(K);
 }
 
 void PGAssem_LinearPDE_GenAlpha::Assem_mass(
@@ -335,10 +327,8 @@ void PGAssem_LinearPDE_GenAlpha::Assem_mass(
 
   VecAssemblyBegin(F);
   VecAssemblyEnd(F);
-  MatAssemblyBegin(M, MAT_FINAL_ASSEMBLY);
-  MatAssemblyEnd(M, MAT_FINAL_ASSEMBLY);
-  VecAssemblyBegin(F);
-  VecAssemblyEnd(F);
+  MatAssemblyBegin(M);
+  MatAssemblyEnd(M);
 }
 
 // EOF
