@@ -13,7 +13,9 @@
 #include <ctime>
 #include <sys/stat.h>
 #include "petsc.h"
+#ifdef USE_OPENMP
 #include "omp.h"
+#endif
 
 #define PETSC_SILENCE_DEPRECATION_WARNINGS_3_19_0
 

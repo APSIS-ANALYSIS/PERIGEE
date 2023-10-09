@@ -10,8 +10,6 @@
 
 #include "Gmsh_FileIO.hpp"
 #include "yaml-cpp/yaml.h"
-#include "omp.h"
-
 #include <iostream>
 #include <fstream>
 #include <string>
