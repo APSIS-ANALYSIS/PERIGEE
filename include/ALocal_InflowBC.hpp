@@ -103,12 +103,12 @@ class ALocal_InflowBC
     {return local_pt_xyz[nbc_id][ii];}
 
     // ------------------------------------------------------------------------
-    // access an element's IEN array by indexing the local_tri_ien array
+    // access an element's IEN array by indexing the local_cell_ien array
     // 0 <= ii < cell_nLocBas[nbc_id] x num_local_cell[nbc_id]
     // Note: make sure num_local_cell[nbc_id] > 0 before using this get function
     // ------------------------------------------------------------------------
-    virtual int get_local_tri_ien( const int &nbc_id, const int &ii ) const
-    {return local_tri_ien[nbc_id][ii];}
+    virtual int get_local_cell_ien( const int &nbc_id, const int &ii ) const
+    {return local_cell_ien[nbc_id][ii];}
 
     // ------------------------------------------------------------------------
     // access an element's IEN array by its local element index and surface element
@@ -116,9 +116,9 @@ class ALocal_InflowBC
     // 0 <= ee < num_local_cell[nbc_id], 0 <= ii < cell_nLocBas[nbc_id]
     // Note: make sure num_local_cell[nbc_id] > 0 before using this get function
     // ------------------------------------------------------------------------
-    virtual int get_local_tri_ien( const int &nbc_id, const int &ee, 
+    virtual int get_local_cell_ien( const int &nbc_id, const int &ee, 
         const int &ii ) const
-    { return local_tri_ien[nbc_id][ee * cell_nLocBas[nbc_id] + ii]; }
+    { return local_cell_ien[nbc_id][ee * cell_nLocBas[nbc_id] + ii]; }
 
     // ------------------------------------------------------------------------
     // get_ctrlPts_xyz: given surface element index eindex, return the
@@ -197,7 +197,7 @@ class ALocal_InflowBC
 
     // Surface IEN array of all local elements
     // num_nbc times (cell_nLocBas[ii] x num_local_cell[ii])
-    std::vector< std::vector<int> > local_tri_ien;
+    std::vector< std::vector<int> > local_cell_ien;
 
     // Indices of all local nodes in the local volumetric partition's
     // local_to_global array

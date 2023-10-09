@@ -178,7 +178,7 @@ class Gmsh_FileIO
     // index_2d in [ 0, num_phy_domain_2d ),
     // index_1d in [ 0, num_phy_domain_1d ).
     // --------------------------------------------------------------
-    void write_tri_h5(const int &index_2d, const std::vector<int> &index_1d ) const;
+    void write_sur_h5(const int &index_2d, const std::vector<int> &index_1d ) const;
 
     // --------------------------------------------------------------
     // Write a h5 file for the 3D simplex domain with given index :
@@ -187,7 +187,7 @@ class Gmsh_FileIO
     // index_3d in [ 0, num_phy_domain_3d ),
     // index_2d in [ 0, num_phy_domain_2d ).
     // --------------------------------------------------------------
-    void write_tet_h5( const int &index_3d, const std::vector<int> &index_2d ) const;
+    void write_vol_h5( const int &index_3d, const std::vector<int> &index_2d ) const;
 
     // --------------------------------------------------------------
     // Write a h5 file for the 3D simplex domain with given index,
@@ -199,7 +199,7 @@ class Gmsh_FileIO
     // face2elem array;
     // otherwise, the face2elem array will be empty. 
     // --------------------------------------------------------------
-    void write_tet_h5( const int &index_3d,
+    void write_vol_h5( const int &index_3d,
         const std::vector<int> &index_2d,
         const std::vector<int> &index_2d_need_facemap ) const;
 
