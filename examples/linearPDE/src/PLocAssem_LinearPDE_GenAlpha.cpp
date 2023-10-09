@@ -11,22 +11,33 @@ PLocAssem_LinearPDE_GenAlpha::PLocAssem_LinearPDE_GenAlpha(
 {
   if(elemtype == 501)
   {
-    // 501 is linear element
+    // 501 is linear tet element
     nLocBas = 4; snLocBas = 3;
   }
   else if(elemtype == 502)
   {
-    // 502 is quadratic element
+    // 502 is quadratic tet element
     nLocBas = 10; snLocBas = 6;
+  }
+  else if(elemtype == 601)
+  {
+    // 601 is tri-linear hex element
+    nLocBas = 8; snLocBas = 4;
+  }
+  else if(elemtype == 602)
+  {
+    // 602 is tri-quadratic hex element
+    nLocBas = 27; snLocBas = 9;
   }
   else SYS_T::print_fatal("Error: unknown elem type.\n");
 
-  vec_size = nLocBas * 1;
-  sur_size = snLocBas * 1;
+  vec_size = nLocBas * 3;
+  sur_size = snLocBas * 3;
 
   Tangent = new PetscScalar[vec_size * vec_size];
   Residual = new PetscScalar[vec_size];
-
+  
+  sur_Tangent = new PetscScalar[sur_size * sur_size];
   sur_Residual = new PetscScalar[sur_size];
 
   Zero_Tangent_Residual();

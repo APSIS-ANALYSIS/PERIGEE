@@ -34,6 +34,12 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem
       for(int ii=0; ii<vec_size; ++ii) Residual[ii] = 0.0;
     }
 
+    virtual void Zero_sur_Tangent_Residual()
+    {
+      for(int ii=0; ii<sur_size; ++ii) sur_Residual[ii] = 0.0;
+      for(int ii=0; ii<sur_size*sur_size; ++ii) sur_Tangent[ii] = 0.0;
+    }
+
     virtual void Zero_sur_Residual()
     {
       for(int ii=0; ii<sur_size; ++ii) sur_Residual[ii] = 0.0;
