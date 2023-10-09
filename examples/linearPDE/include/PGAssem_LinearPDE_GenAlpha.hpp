@@ -93,8 +93,16 @@ class PGAssem_LinearPDE_GenAlpha
 
     int snLocBas;
 
-    // Natural boundary condition
+    // Neumann boundary condition
     void NatBC_L( const double &curr_time, const double &dt,
+        PLocAssem_LinearPDE_GenAlpha * const &lassem_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part );
+    
+    // Part of Robin boundary condition
+    void NatBC_M( const double &curr_time, const double &dt,
         PLocAssem_LinearPDE_GenAlpha * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,

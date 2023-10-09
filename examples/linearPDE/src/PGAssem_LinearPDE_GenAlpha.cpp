@@ -132,6 +132,52 @@ void PGAssem_LinearPDE_GenAlpha::NatBC_L(
   delete [] srow_index; srow_index = nullptr;
 }
 
+void PGAssem_LinearPDE_GenAlpha::NatBC_M( 
+    const double &curr_time, const double &dt,
+    PLocAssem_LinearPDE_GenAlpha * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const ALocal_NBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_part )
+{
+  const int sloc_dof = dof_mat * snLocBas;
+
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
+  PetscInt * srow_index = new PetscInt [dof_mat * snLocBas];
+
+  for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
+  {
+    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+
+    for(int ee=0; ee<num_sele; ++ee)
+    {
+      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
+
+      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+
+      lassem_ptr->Assem_Mass_EBC(ebc_id, curr_time, dt,
+          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+
+      for(int ii=0; ii<snLocBas; ++ii)
+      {
+        for(int mm=0; mm<dof_mat; ++mm)
+          srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(0, LSIEN[ii]) + mm;   
+      }
+
+      MatSetValues(K, sloc_dof, srow_index, sloc_dof, srow_index, lassem_ptr->sur_Mass, ADD_VALUES);
+    }
+  }
+
+  delete [] LSIEN; LSIEN = nullptr;
+  delete [] sctrl_x; sctrl_x = nullptr;
+  delete [] sctrl_y; sctrl_y = nullptr;
+  delete [] sctrl_z; sctrl_z = nullptr;
+  delete [] srow_index; srow_index = nullptr;
+}
+
 void PGAssem_LinearPDE_GenAlpha::Assem_load(
     const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
@@ -261,6 +307,8 @@ void PGAssem_LinearPDE_GenAlpha::Assem_stiffness(
   delete [] ectrl_y; ectrl_y = nullptr;
   delete [] ectrl_z; ectrl_z = nullptr;
   delete [] row_index; row_index = nullptr;
+
+  NatBC_M( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   MatAssemblyBegin(K);
   MatAssemblyEnd(K);
