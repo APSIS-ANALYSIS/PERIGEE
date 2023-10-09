@@ -94,7 +94,7 @@ class PGAssem_LinearPDE_GenAlpha
     int snLocBas;
 
     // Natural boundary condition
-    void NatBC_G( const double &curr_time, const double &dt,
+    void NatBC_L( const double &curr_time, const double &dt,
         PLocAssem_LinearPDE_GenAlpha * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
