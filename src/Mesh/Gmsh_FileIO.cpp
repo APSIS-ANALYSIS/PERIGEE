@@ -735,7 +735,7 @@ void Gmsh_FileIO::check_FSI_ordering( const std::string &phy1,
   SYS_T::print_fatal_if( name1.compare(phy2), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 1 should be solid domain.\n" );
 }
 
-void Gmsh_FileIO::write_tri_h5( const int &index_2d, 
+void Gmsh_FileIO::write_sur_h5( const int &index_2d, 
     const std::vector<int> &index_1d ) const
 {
   // Perform basic logical checks
@@ -805,13 +805,13 @@ void Gmsh_FileIO::write_tri_h5( const int &index_2d,
 
     std::cout<<"      num of bc pt = "<<bcnumpt<<'\n';    
 
-    // tript stores the coordinates of the boundary points 
-    std::vector<double> tript( 3*bcnumpt, 0.0 );
+    // surpt stores the coordinates of the boundary points 
+    std::vector<double> surpt( 3*bcnumpt, 0.0 );
     for( int jj=0; jj<bcnumpt; ++jj )
     {
-      tript[jj*3]   = node[bcpt[jj]*3] ;
-      tript[jj*3+1] = node[bcpt[jj]*3+1] ;
-      tript[jj*3+2] = node[bcpt[jj]*3+2] ;
+      surpt[jj*3]   = node[bcpt[jj]*3] ;
+      surpt[jj*3+1] = node[bcpt[jj]*3+1] ;
+      surpt[jj*3+2] = node[bcpt[jj]*3+2] ;
     } 
 
     // generate a mapper that maps the bc node to 1; other node to 0
@@ -844,11 +844,11 @@ void Gmsh_FileIO::write_tri_h5( const int &index_2d,
     // Locate the surface element that the edge belongs to. In Gmsh,
     // all elements are defined in this way. The edge two end points are
     // the first two points in the IEN array, no mater what the order is.
-    // The triangle's three corner points are the first three points in the
-    // triangle's IEN, no mather how many interior points there are.
+    // The surface element's vertices lay in the front of the surface IEN,
+    // no mather how many interior points there are.
     // Hence, we only need to treat all elements as if they are linear
-    // line/triangle elements. Once the end points match with the corner
-    // points, the edge is on the triangle boundary.
+    // line/triangle/quadrilateral elements. Once the end points match with
+    // the vertices, the edge is on the surface boundary.
     std::vector<int> face2elem(num_1d_cell, -1);
     for(int ff=0; ff<num_1d_cell; ++ff)
     {
@@ -892,7 +892,7 @@ void Gmsh_FileIO::write_tri_h5( const int &index_2d,
     h5w->write_intVector(g_id, "IEN_loc", edge_ien_local);
     h5w->write_intVector(g_id, "pt_idx", bcpt);
     h5w->write_intVector(g_id, "edge2elem", face2elem);
-    h5w->write_doubleVector(g_id, "pt_coor", tript);
+    h5w->write_doubleVector(g_id, "pt_coor", surpt);
 
     H5Gclose(g_id);
   }
