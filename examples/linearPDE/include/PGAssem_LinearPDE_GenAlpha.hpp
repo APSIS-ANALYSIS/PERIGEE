@@ -73,7 +73,7 @@ class PGAssem_LinearPDE_GenAlpha
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part );
 
-    // Assembly the residual and mass matrix
+    // Assembly the mass matrix
     void Assem_mass(
         const PDNSolution * const &sol,
         const ALocal_Elem * const &alelem_ptr,
@@ -92,12 +92,6 @@ class PGAssem_LinearPDE_GenAlpha
     const int nLocBas, dof_mat, num_ebc, nlgn;
 
     int snLocBas;
-
-    // Private function
-    // Essential boundary condition
-    void EssBC_KG( const ALocal_NBC * const &nbc_part );
-
-    void EssBC_G( const ALocal_NBC * const &nbc_part );
 
     // Natural boundary condition
     void NatBC_G( const double &curr_time, const double &dt,
