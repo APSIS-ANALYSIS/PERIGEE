@@ -1571,7 +1571,7 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
       // The position of slave node in per_slave vector
       const int pos_slave = VEC_T::get_pos(per_slave, bcpt[ii]);
       SYS_T::print_fatal_if( pos_slave == -1,
-        "Error: Gmsh_FileIO::write_vtp, node %d of boundary %s is not a slave node.\n", bcpt[ii], phy_2d_name[index_sur].c_str());
+        "Error: Gmsh_FileIO::write_write_quadratic_sur_vtu, node %d of boundary %s is not a slave node.\n", bcpt[ii], phy_2d_name[index_sur].c_str());
       
       master_id[ii] = per_master[pos_slave];
     }
