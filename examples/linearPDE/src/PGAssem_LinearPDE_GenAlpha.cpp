@@ -112,7 +112,7 @@ void PGAssem_LinearPDE_GenAlpha::NatBC_L(
 
       ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
-      lassem_ptr->Assem_Load(ebc_id, curr_time, dt,
+      lassem_ptr->Assem_Load_EBC(ebc_id, curr_time, dt,
           element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
 
       for(int ii=0; ii<snLocBas; ++ii)
