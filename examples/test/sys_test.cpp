@@ -20,8 +20,8 @@ int main(int argc, char *argv[])
   GIO -> test_slave_master();
   GIO -> update_quadratic_tet_IEN(0);
 
-  GIO -> write_quadratic_sur_vtu(2, 0, true, true);
-  GIO -> write_quadratic_sur_vtu(4, 0, true, true);
+  GIO -> write_quadratic_sur_vtu("slave_1", "vol", true, true);
+  GIO -> write_quadratic_sur_vtu("slave_2", "vol", true, true);
 
   return EXIT_SUCCESS;
 }

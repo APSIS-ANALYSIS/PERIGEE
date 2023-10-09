@@ -140,6 +140,13 @@ class Gmsh_FileIO
 
     void write_vtp(const int &index_sur, const int &index_vol,
         const bool &isf2e = false, const bool &is_slave = false) const;
+
+    void write_vtp(const std::string &vtp_filename,
+        const std::string &phy_name_sur, const std::string &phy_name_vol,
+        const bool &isf2e = false, const bool &is_slave = false) const;
+
+    void write_vtp(const std::string &phy_name_sur, const std::string &phy_name_vol,
+        const bool &isf2e = false, const bool &is_slave = false) const;
   
     // --------------------------------------------------------------
     // Write a vtu file for a surface associated with a volume mesh
@@ -154,6 +161,13 @@ class Gmsh_FileIO
 
     void write_quadratic_sur_vtu( const int &index_sur, 
         const int &index_vol, const bool &isf2e = false, const bool &is_slave = false) const;
+
+    void write_quadratic_sur_vtu(const std::string &vtu_filename,
+        const std::string &phy_name_sur, const std::string &phy_name_vol,
+        const bool &isf2e = false, const bool &is_slave = false) const;
+
+    void write_quadratic_sur_vtu(const std::string &phy_name_sur, const std::string &phy_name_vol,
+        const bool &isf2e = false, const bool &is_slave = false) const;
 
     // --------------------------------------------------------------
     // Write a vtu file for all volumetric physical domain together.

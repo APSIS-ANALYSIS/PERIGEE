@@ -579,6 +579,31 @@ void Gmsh_FileIO::write_vtp(const int &index_sur, const int &index_vol,
   write_vtp(vtp_file_name, index_sur, index_vol, isf2e, is_slave);
 }
 
+void Gmsh_FileIO::write_vtp(const std::string &vtp_filename,
+  const std::string &phy_name_sur, const std::string &phy_name_vol,
+  const bool &isf2e, const bool &is_slave) const
+{
+  const int index_sur = VEC_T::get_pos(phy_2d_name, phy_name_sur);
+  SYS_T::print_fatal_if(index_sur == -1,
+    "Error: Gmsh_FileIO::write_vtp, wrong physical name of surface.\n");
+
+  const int index_vol = VEC_T::get_pos(phy_3d_name, phy_name_vol);
+  SYS_T::print_fatal_if(index_vol == -1,
+    "Error: Gmsh_FileIO::write_vtp, wrong physical name of volume.\n");
+
+  write_vtp(vtp_filename, index_sur, index_vol, isf2e, is_slave);
+}
+
+void Gmsh_FileIO::write_vtp(const std::string &phy_name_sur, const std::string &phy_name_vol,
+  const bool &isf2e, const bool &is_slave) const
+{
+  std::string vtp_file_name(phy_name_sur);
+  vtp_file_name += "_";
+  vtp_file_name += phy_name_vol;
+
+  write_vtp(vtp_file_name, phy_name_sur, phy_name_vol, isf2e, is_slave);
+}
+
 void Gmsh_FileIO::write_each_vtu( const std::vector<std::string> name_list) const
 {
   std::cout<<"=== Gmsh_FileIO::write_each_vtu.\n";
@@ -1578,6 +1603,31 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const int &index_sur,
   vtu_file_name += phy_3d_name[index_vol];
 
   write_quadratic_sur_vtu(vtu_file_name, index_sur, index_vol, isf2e, is_slave);
+}
+
+void Gmsh_FileIO::write_quadratic_sur_vtu(const std::string &vtu_filename,
+  const std::string &phy_name_sur, const std::string &phy_name_vol,
+  const bool &isf2e, const bool &is_slave) const
+{
+  const int index_sur = VEC_T::get_pos(phy_2d_name, phy_name_sur);
+  SYS_T::print_fatal_if(index_sur == -1,
+    "Error: Gmsh_FileIO::write_quadratic_sur_vtu, wrong physical name of surface.\n");
+
+  const int index_vol = VEC_T::get_pos(phy_3d_name, phy_name_vol);
+  SYS_T::print_fatal_if(index_vol == -1,
+    "Error: Gmsh_FileIO::write_quadratic_sur_vtu, wrong physical name of volume.\n");
+
+  write_quadratic_sur_vtu(vtu_filename, index_sur, index_vol, isf2e, is_slave);
+}
+
+void Gmsh_FileIO::write_quadratic_sur_vtu(const std::string &phy_name_sur, const std::string &phy_name_vol,
+  const bool &isf2e, const bool &is_slave) const
+{
+  std::string vtu_file_name(phy_name_sur);
+  vtu_file_name += "_";
+  vtu_file_name += phy_name_vol;
+
+  write_quadratic_sur_vtu(vtu_file_name, phy_name_sur, phy_name_vol, isf2e, is_slave);
 }
 
 void Gmsh_FileIO::read_msh2(std::ifstream &infile)
