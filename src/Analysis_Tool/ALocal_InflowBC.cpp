@@ -80,7 +80,7 @@ ALocal_InflowBC::ALocal_InflowBC(
       for(int ii {0}; ii < num_local_node[nbc_id]; ++ii)
         local_pt_xyz[nbc_id][ii] = Vector_3{ temp_xyz[3 * ii], temp_xyz[3 * ii + 1], temp_xyz[3 * ii + 2] };
       
-      local_cell_ien[nbc_id]  = h5r->read_intVector( subgroup_name.c_str(), "local_cell_ien" );
+      local_cell_ien[nbc_id] = h5r->read_intVector( subgroup_name.c_str(), "local_cell_ien" );
       local_node_pos[nbc_id] = h5r->read_intVector( subgroup_name.c_str(), "local_node_pos" );
     }
     else
