@@ -999,7 +999,7 @@ void Gmsh_FileIO::write_vol_h5( const int &index_3d,
     for( int ee=0; ee<num_3d_cell; ++ee )
     {
       int total = 0;
-      for(int jj=0; jj<nLocBas_3d; ++jj)
+      for(int jj=0; jj<nVertex_3d; ++jj)
         total += bcmap[ eIEN[domain_3d_idx][nLocBas_3d*ee+jj] ];
 
       if(total >= nVertex_2d) gelem.push_back(ee);
@@ -1072,26 +1072,26 @@ void Gmsh_FileIO::write_vol_h5( const int &index_3d,
   H5Fclose( file_id ); 
 }
 
-void Gmsh_FileIO::write_tet_h5( const int &index_3d,
+void Gmsh_FileIO::write_vol_h5( const int &index_3d,
     const std::vector<int> &index_2d,
     const std::vector<int> &index_2d_need_facemap ) const
 {
   // Perform basic index boundary check
   SYS_T::print_fatal_if( index_3d >= num_phy_domain_3d || index_3d < 0,
-      "Error: Gmsh_FileIO::write_tet_h5, surface index is wrong.\n");
+      "Error: Gmsh_FileIO::write_vol_h5, surface index is wrong.\n");
 
   const unsigned int num_2d_face = index_2d.size();
 
   for(unsigned int ii=0; ii<num_2d_face; ++ii)
     SYS_T::print_fatal_if( index_2d[ii] >= num_phy_domain_2d || index_2d[ii] < 0,
-        "Error: Gmsh_FileIO::write_tet_h5, face index is wrong. \n");
+        "Error: Gmsh_FileIO::write_vol_h5, face index is wrong. \n");
 
   // Open an HDF5 file
   std::string h5_file_name( "Gmsh_" );
   h5_file_name.append( phy_3d_name[index_3d] );
   h5_file_name.append(".h5");
 
-  std::cout<<"=== Gmsh_FileIO::write_tet_h5 for "
+  std::cout<<"=== Gmsh_FileIO::write_vol_h5 for "
     <<phy_3d_name[index_3d]<<" associated with ";
 
   for(unsigned int ii=0; ii<num_2d_face; ++ii)
@@ -1138,12 +1138,12 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
     std::cout<<"      num of bc pt = "<<bcnumpt<<'\n';
 
     // tript stores the coordinates of the boundary points
-    std::vector<double> tript(3*bcnumpt, 0.0);
+    std::vector<double> surpt(3*bcnumpt, 0.0);
     for( int jj=0; jj<bcnumpt; ++jj )
     {
-      tript[jj*3]   = node[bcpt[jj]*3];
-      tript[jj*3+1] = node[bcpt[jj]*3+1];
-      tript[jj*3+2] = node[bcpt[jj]*3+2];
+      surpt[jj*3]   = node[bcpt[jj]*3];
+      surpt[jj*3+1] = node[bcpt[jj]*3+1];
+      surpt[jj*3+2] = node[bcpt[jj]*3+2];
     }
 
     // Generate a mapper that maps the bc node to 1; other node to 0
@@ -1151,15 +1151,29 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
     for(int jj=0; jj<num_node; ++jj) bcmap[jj] = 0;
     for(int jj=0; jj<bcnumpt; ++jj) bcmap[bcpt[jj]] = 1;
 
+    int nVertex_2d {0}, nVertex_3d {0};
+    if(nLocBas_2d == 3 || nLocBas_2d == 6) // tri-tet
+    {
+      nVertex_2d = 3;
+      nVertex_3d = 4;
+    }
+    else if(nLocBas_2d == 4 || nLocBas_2d == 9) // quad-hex
+    {
+      nVertex_2d = 4;
+      nVertex_3d = 8;
+    }
+    else
+      SYS_T::print_fatal("Error: Gmsh_FileIO::write_vol_h5, unknown element type.\n");
+
     // Generate a list of volume elements that have boundary over the face
     std::vector<int> gelem {};
     for( int ee=0; ee<num_3d_cell; ++ee )
     {
       int total = 0;
-      for(int jj=0; jj<nLocBas_3d; ++jj)
+      for(int jj=0; jj<nVertex_3d; ++jj)
         total += bcmap[ eIEN[domain_3d_idx][nLocBas_3d*ee+jj] ];
 
-      if(total >= 3) gelem.push_back(ee);
+      if(total >= nVertex_2d) gelem.push_back(ee);
     }
     delete [] bcmap; bcmap = nullptr;
     std::cout<<"      "<<gelem.size()<<" elems have face over the boundary.\n";
@@ -1179,25 +1193,24 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
     {
       for(int ff=0; ff<num_2d_cell; ++ff)
       {
-        const int node0 = face_ien_global[ nLocBas_2d * ff + 0 ];
-        const int node1 = face_ien_global[ nLocBas_2d * ff + 1 ];
-        const int node2 = face_ien_global[ nLocBas_2d * ff + 2 ];
+        std::vector<int> sur_node (nVertex_2d, -1); // the vertex indices of a surface element
+        for(int ii{0}; ii < nVertex_2d; ++ii)
+          sur_node[ii] = face_ien_global[ nLocBas_2d * ff + ii ];
         bool gotit = false;
         int ee = -1;
         while( !gotit && ee < int(gelem.size()) - 1 )
         {
           ee += 1;
           const int vol_elem = gelem[ee];
-          int vnode[4] { eIEN[domain_3d_idx][nLocBas_3d * vol_elem + 0],
-                         eIEN[domain_3d_idx][nLocBas_3d * vol_elem + 1],
-                         eIEN[domain_3d_idx][nLocBas_3d * vol_elem + 2],
-                         eIEN[domain_3d_idx][nLocBas_3d * vol_elem + 3] };
-          std::sort(vnode, vnode+4);
+          std::vector<int> vol_node (nVertex_3d, -1); // the vertex indices of a volume element
+          for(int jj{0}; jj < nVertex_3d; ++jj)
+            vol_node[jj] = face_ien_global[ nLocBas_3d * vol_elem + jj ];
+          
+          bool got_all_node = true;
+          for(int ii{0}; ii < nVertex_2d; ++ii)
+            got_all_node = got_all_node && VEC_T::is_invec(vol_node, sur_node[ii]);
 
-          const bool got0 = ( std::find(vnode, vnode+4, node0) != vnode+4 );
-          const bool got1 = ( std::find(vnode, vnode+4, node1) != vnode+4 );
-          const bool got2 = ( std::find(vnode, vnode+4, node2) != vnode+4 );
-          gotit = got0 && got1 && got2;
+          gotit = got_all_node;
         }
         if(gotit)
           face2elem[ff] = gelem[ee] + phy_3d_start_index[index_3d];
@@ -1223,7 +1236,7 @@ void Gmsh_FileIO::write_tet_h5( const int &index_3d,
     h5w->write_intVector(g_id, "IEN_loc", face_ien_local);
     h5w->write_intVector(g_id, "pt_idx", bcpt);
     h5w->write_intVector(g_id, "face2elem", face2elem);
-    h5w->write_doubleVector(g_id, "pt_coor", tript);
+    h5w->write_doubleVector(g_id, "pt_coor", surpt);
 
     H5Gclose(g_id);
   } // End-loop-over-2d-face

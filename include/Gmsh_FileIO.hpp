@@ -199,7 +199,7 @@ class Gmsh_FileIO
     // face2elem array;
     // otherwise, the face2elem array will be empty. 
     // --------------------------------------------------------------
-    void write_tet_h5( const int &index_3d,
+    void write_vol_h5( const int &index_3d,
         const std::vector<int> &index_2d,
         const std::vector<int> &index_2d_need_facemap ) const;
 
