@@ -35,7 +35,7 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
   if (sline.compare("$Periodic") == 0)
     read_periodic(infile);
   else
-    ; // Do nothing, just finished the reading
+    ; // Do nothing, just finish the reading
 
   // Generate the details of the 1d, 2d and 3d info
   num_phy_domain_3d = 0; num_phy_domain_2d = 0; num_phy_domain_1d = 0;
@@ -1384,7 +1384,7 @@ void Gmsh_FileIO::update_quadratic_hex_IEN( const int &index_3d )
 }
 
 void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
-    const int &index_sur, const int &index_vol, const bool &isf2e ) const
+    const int &index_sur, const int &index_vol, const bool &isf2e, const bool &is_slave ) const
 {
   SYS_T::print_fatal_if( index_sur >= num_phy_domain_2d || index_sur < 0,
       "Error: Gmsh_FileIO::write_quadratic_sur_vtu, surface index is wrong. \n");
@@ -1537,6 +1537,23 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
   std::vector<DataVecStr<int>> input_vtk_data {};
   input_vtk_data.push_back({bcpt, "GlobalNodeID", AssociateObject::Node});
   input_vtk_data.push_back({face2elem, "GlobalElementID", AssociateObject::Cell});
+
+  if (is_slave)
+  {
+    std::vector<int> master_id ( bcnumpt, -1 );
+    for(int ii{0}; ii < bcnumpt; ++ii)
+    {
+      // The position of slave node in per_slave vector
+      const int pos_slave = VEC_T::get_pos(per_slave, bcpt[ii]);
+      SYS_T::print_fatal_if( pos_slave == -1,
+        "Error: Gmsh_FileIO::write_vtp, node %d of boundary %s is not a slave node.\n", bcpt[ii], phy_2d_name[index_sur].c_str());
+      
+      master_id[ii] = per_master[pos_slave];
+    }
+    std::cout<<"      master-slave mapping generated. \n";
+    input_vtk_data.push_back({master_id, "MasterNodeID", AssociateObject::Node});
+  }
+
   if (nlocbas_2d == 6){
     TET_T::write_quadratic_triangle_grid( vtu_filename, bcnumpt, bcnumcl,
       sur_pt, sur_ien, input_vtk_data );
@@ -1554,13 +1571,13 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
 }
 
 void Gmsh_FileIO::write_quadratic_sur_vtu( const int &index_sur,
-    const int &index_vol, const bool &isf2e ) const
+    const int &index_vol, const bool &isf2e, const bool &is_slave ) const
 {
   std::string vtu_file_name(phy_2d_name[index_sur]);
   vtu_file_name += "_";
   vtu_file_name += phy_3d_name[index_vol];
 
-  write_quadratic_sur_vtu(vtu_file_name, index_sur, index_vol, isf2e);
+  write_quadratic_sur_vtu(vtu_file_name, index_sur, index_vol, isf2e, is_slave);
 }
 
 void Gmsh_FileIO::read_msh2(std::ifstream &infile)
@@ -2050,13 +2067,15 @@ void Gmsh_FileIO::read_periodic(std::ifstream &infile)
       int nodeTag, nodeTagMaster;
       sstrm >> nodeTag; sstrm >> nodeTagMaster;
 
-      if(VEC_T::is_invec(per_slave, nodeTag - 1 ))
+      if(VEC_T::is_invec(per_slave, nodeTag - 1))
         ; // When we use periodic BC, if a slave node have more than one master, they will follow 
         // a common primary master. Hence there it is no need to assign more than one master to a slave.
       else
       {
         per_slave.push_back(nodeTag - 1);
         per_master.push_back(nodeTagMaster - 1);
+        // Node index of .msh file starts from 1,
+        // but in ien array our node index starts from 0.
       }
     }
   }
