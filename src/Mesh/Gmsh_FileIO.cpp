@@ -492,11 +492,10 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
 #ifdef _OPENMP
           temp_gelem.push_back(ee);
 #else
-          gelem.pushback(ee);
+          gelem.push_back(ee);
 #endif
-
-#ifdef _OPENMP
       }
+#ifdef _OPENMP
       #pragma omp critical
       VEC_T::insert_end(gelem, temp_gelem);
     }

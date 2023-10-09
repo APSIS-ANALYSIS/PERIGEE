@@ -27,7 +27,6 @@ bool compare(std::string& file1Path, std::string& file2Path)
 
     std::string line1, line2;
     int lineNumber = 1;
-
     while (std::getline(file1, line1) && std::getline(file2, line2))
     {
         if (line1 != line2) return false;
@@ -62,7 +61,6 @@ int main(int argc, char *argv[])
     YAML::Node config = YAML::LoadFile(YAML_Lists[kk]);
 
     const std::string gmshFile = config["gmsh_file"].as<std::string>();
-    const int num_outlet = config["num_outlet"].as<int>();
 
     Gmsh_FileIO * GIO = new Gmsh_FileIO( gmshFile );
 
