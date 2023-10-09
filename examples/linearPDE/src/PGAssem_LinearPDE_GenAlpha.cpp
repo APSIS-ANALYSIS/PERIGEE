@@ -49,72 +49,12 @@ PGAssem_LinearPDE_GenAlpha::PGAssem_LinearPDE_GenAlpha(
       PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &K);
 }
 
-
 PGAssem_LinearPDE_GenAlpha::~PGAssem_LinearPDE_GenAlpha()
 {
   VecDestroy(&F);
   MatDestroy(&M);
   MatDestroy(&K);
 }
-
-
-void PGAssem_LinearPDE_GenAlpha::EssBC_KG( 
-    const ALocal_NBC * const &nbc_part )
-{
-  const int field = 0;
-  const int local_dir = nbc_part -> get_Num_LD(field);
-
-  if(local_dir > 0)
-  {
-    for(int ii=0; ii<local_dir; ++ii)
-    {
-      const int row = nbc_part->get_LDN(field, ii) * dof_mat + field;
-
-      VecSetValue(G, row, 0.0, INSERT_VALUES);
-      MatSetValue(K, row, row, 1.0, ADD_VALUES);
-    }
-  }
-
-  const int local_sla = nbc_part->get_Num_LPS(field);
-  if(local_sla > 0)
-  {
-    for(int ii=0; ii<local_sla; ++ii)
-    {
-      const int row = nbc_part->get_LPSN(field, ii) * dof_mat + field;
-      const int col = nbc_part->get_LPMN(field, ii) * dof_mat + field;
-      MatSetValue(K, row, col, 1.0, ADD_VALUES);
-      MatSetValue(K, row, row, -1.0, ADD_VALUES);
-      VecSetValue(G, row, 0.0, INSERT_VALUES);
-    }
-  }
-}
-
-
-void PGAssem_LinearPDE_GenAlpha::EssBC_G( 
-    const ALocal_NBC * const &nbc_part )
-{
-  const int field = 0;
-  const int local_dir = nbc_part->get_Num_LD(field);
-  if( local_dir > 0 )
-  {
-    for(int ii=0; ii<local_dir; ++ii)
-    {
-      const int row = nbc_part->get_LDN(field, ii) * dof_mat + field;
-      VecSetValue(G, row, 0.0, INSERT_VALUES);
-    }
-  }
-
-  const int local_sla = nbc_part->get_Num_LPS(field);
-  if( local_sla > 0 )
-  {
-    for(int ii=0; ii<local_sla; ++ii)
-    {
-      const int row = nbc_part->get_LPSN(field, ii) * dof_mat + field;
-      VecSetValue(G, row, 0.0, INSERT_VALUES);
-    }
-  }
-}
-
 
 void PGAssem_LinearPDE_GenAlpha::Assem_nonzero_estimate(
     const ALocal_Elem * const &alelem_ptr,
@@ -146,9 +86,6 @@ void PGAssem_LinearPDE_GenAlpha::Assem_nonzero_estimate(
   
   VecAssemblyBegin(F);
   VecAssemblyEnd(F);
-
-  EssBC_KG( nbc_part );
-
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
   VecAssemblyBegin(F);
@@ -263,9 +200,6 @@ void PGAssem_LinearPDE_GenAlpha::Assem_load(
 
   VecAssemblyBegin(F);
   VecAssemblyEnd(F);
-
-  EssBC_G( nbc_part );
-
   VecAssemblyBegin(F);
   VecAssemblyEnd(F);
 }
@@ -338,9 +272,6 @@ void PGAssem_LinearPDE_GenAlpha::Assem_stiffness(
 
   VecAssemblyBegin(F);
   VecAssemblyEnd(F);
-
-  EssBC_KG( nbc_part );
-
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
   VecAssemblyBegin(F);
@@ -404,9 +335,6 @@ void PGAssem_LinearPDE_GenAlpha::Assem_mass(
 
   VecAssemblyBegin(F);
   VecAssemblyEnd(F);
-
-  EssBC_KG( nbc_part );
-
   MatAssemblyBegin(M, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(M, MAT_FINAL_ASSEMBLY);
   VecAssemblyBegin(F);
