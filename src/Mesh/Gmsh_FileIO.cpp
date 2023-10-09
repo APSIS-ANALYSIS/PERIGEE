@@ -1031,7 +1031,7 @@ void Gmsh_FileIO::write_vol_h5( const int &index_3d,
         const int vol_elem = gelem[ee];
         std::vector<int> vol_node (nVertex_3d, -1); // the vertex indices of a volume element
         for(int jj{0}; jj < nVertex_3d; ++jj)
-          vol_node[jj] = face_ien_global[ nLocBas_3d * vol_elem + jj ];
+          vol_node[jj] = eIEN[domain_3d_idx][ nLocBas_3d * vol_elem + jj ];
         
         bool got_all_node = true;
         for(int ii{0}; ii < nVertex_2d; ++ii)
@@ -1204,7 +1204,7 @@ void Gmsh_FileIO::write_vol_h5( const int &index_3d,
           const int vol_elem = gelem[ee];
           std::vector<int> vol_node (nVertex_3d, -1); // the vertex indices of a volume element
           for(int jj{0}; jj < nVertex_3d; ++jj)
-            vol_node[jj] = face_ien_global[ nLocBas_3d * vol_elem + jj ];
+            vol_node[jj] = eIEN[domain_3d_idx][ nLocBas_3d * vol_elem + jj ];
           
           bool got_all_node = true;
           for(int ii{0}; ii < nVertex_2d; ++ii)
