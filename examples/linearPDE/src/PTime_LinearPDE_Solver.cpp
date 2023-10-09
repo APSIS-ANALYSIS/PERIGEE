@@ -1,16 +1,16 @@
-#include "PTime_Transport_Solver.hpp"
+#include "PTime_LinearPDE_Solver.hpp"
 
-PTime_Transport_Solver::PTime_Transport_Solver( const std::string &input_name,
+PTime_LinearPDE_Solver::PTime_LinearPDE_Solver( const std::string &input_name,
         const int &input_record_freq, const int &input_renew_tang_freq,
         const double &input_final_time )
 : final_time(input_final_time), sol_record_freq(input_record_freq),
   renew_tang_freq(input_renew_tang_freq), pb_name(input_name)
 {}
 
-PTime_Transport_Solver::~PTime_Transport_Solver()
+PTime_LinearPDE_Solver::~PTime_LinearPDE_Solver()
 {}
 
-void PTime_Transport_Solver::print_info() const
+void PTime_LinearPDE_Solver::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
   SYS_T::commPrint("Time stepping solver setted up:\n");
@@ -21,7 +21,7 @@ void PTime_Transport_Solver::print_info() const
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
-std::string PTime_Transport_Solver::Name_Generator( const int &counter ) const
+std::string PTime_LinearPDE_Solver::Name_Generator( const int &counter ) const
 {
   int aux = 900000000 + counter;
   std::ostringstream temp;
@@ -32,7 +32,7 @@ std::string PTime_Transport_Solver::Name_Generator( const int &counter ) const
   return out_name;
 }
 
-std::string PTime_Transport_Solver::Name_dot_Generator( const int &counter ) const
+std::string PTime_LinearPDE_Solver::Name_dot_Generator( const int &counter ) const
 {
   int aux = 900000000 + counter;
   std::ostringstream temp;
@@ -44,7 +44,7 @@ std::string PTime_Transport_Solver::Name_dot_Generator( const int &counter ) con
   return out_name;
 }
 
-void PTime_Transport_Solver::TM_GenAlpha(
+void PTime_LinearPDE_Solver::TM_GenAlpha(
     const bool &restart_init_assembly_flag,
     const PDNSolution * const &init_dot_sol,
     const PDNSolution * const &init_sol,

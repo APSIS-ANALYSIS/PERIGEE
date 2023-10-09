@@ -1,17 +1,17 @@
-#ifndef PTIME_TRANSPORT_SOLVER_HPP
-#define PTIME_TRANSPORT_SOLVER_HPP
+#ifndef PTIME_LINEARPDE_SOLVER_HPP
+#define PTIME_LINEARPDE_SOLVER_HPP
 
 #include "PDNTimeStep.hpp"
 #include "PNonlinear_Transport_Solver.hpp"
 
-class PTime_Transport_Solver
+class PTime_LinearPDE_Solver
 {
   public:
-    PTime_Transport_Solver( const std::string &input_name,
+    PTime_LinearPDE_Solver( const std::string &input_name,
         const int &input_record_freq, const int &input_renew_tang_freq,
         const double &input_final_time );
 
-    ~PTime_Transport_Solver();
+    ~PTime_LinearPDE_Solver();
 
     void print_info() const;
 
