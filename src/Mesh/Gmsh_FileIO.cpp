@@ -444,7 +444,9 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
 
   // sur_pt stores the coordinates of the boundary points
   std::vector<double> sur_pt(3*bcnumpt, 0.0);
+#ifdef _OPENMP
   #pragma omp parallel for
+#endif
   for( int ii=0; ii<bcnumpt; ++ii )
   {
     sur_pt[ii*3]   = node[bcpt[ii]*3] ;
@@ -475,26 +477,36 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
 
     // use the bcmap to obtain the vol element that has its face on this surface
     std::vector<int> gelem {};
+#ifdef _OPENMP
     #pragma omp parallel
     {
       std::vector<int> temp_gelem {};
-
       #pragma omp for
+#endif
       for( int ee=0; ee<numcel; ++ee )
       {
         int total = 0;
         for (int jj=0; jj < nlocbas_3d; ++jj)
           total += bcmap[ vol_IEN[nlocbas_3d  * ee + jj] ];
         if(total >= nlocbas_2d)
+#ifdef _OPENMP
           temp_gelem.push_back(ee);
+#else
+          gelem.pushback(ee);
+#endif
+
+#ifdef _OPENMP
       }
       #pragma omp critical
       VEC_T::insert_end(gelem, temp_gelem);
     }
+#endif
     delete [] bcmap; bcmap = nullptr;
     std::cout<<"      "<<gelem.size()<<" "<<ele_3d<<"s have faces over the surface. \n";
 
+#ifdef _OPENMP
     #pragma omp parallel for
+#endif
     for(int ff=0; ff<bcnumcl; ++ff)
     {
       std::vector<int> snode( nlocbas_2d, -1);
