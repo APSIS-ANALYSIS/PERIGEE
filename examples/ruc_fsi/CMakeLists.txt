@@ -43,7 +43,6 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Part_FEM.cpp
   ${perigee_source}/Mesh/ElemBC_3D.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet.cpp
-  ${perigee_source}/Mesh/ElemBC_3D_tet_wall.cpp
   ${perigee_source}/Mesh/ElemBC_3D_outflow.cpp
   ${perigee_SOURCE_DIR}/src/NodalBC_3D_CMM.cpp
   ${perigee_source}/Mesh/NodalBC_3D_inflow.cpp
