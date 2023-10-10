@@ -476,12 +476,12 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
 
     // use the bcmap to obtain the vol element that has its face on this surface
     std::vector<int> gelem {};
-#ifdef _OPENMP
-    #pragma omp parallel
+
+    PERIGEE_OMP_PARALLEL
     {
       std::vector<int> temp_gelem {};
       #pragma omp for
-#endif
+
       for( int ee=0; ee<numcel; ++ee )
       {
         int total = 0;
@@ -1483,12 +1483,12 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
     for(int ii=0; ii<bcnumpt; ++ii) bcmap[bcpt[ii]] = 1;
 
     std::vector<int> gelem {};
-#ifdef _OPENMP
-    #pragma omp parallel
+
+    PERIGEE_OMP_PARALLEL
     {
       std::vector<int> temp_gelem {};
       #pragma omp for
-#endif
+
       for( int ee=0; ee<numcel; ++ee )
       {
         int total = 0;
