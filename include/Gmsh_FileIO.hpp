@@ -133,19 +133,20 @@ class Gmsh_FileIO
     // In principle, we suggest that the surface belong to only one
     // volumetric physical domain. In case that a surface spans over
     // many physical volumetric domain, the face2elem mapping is -1.
+    //
+    // The following data will be written as the result:
+    // 'GlobalNodeID': the global indices of nodes;
+    // 'GlobalElementID': the global indices of surface elements;
+    //   ( If periodic boundary conditions are applied in .msh file, and 
+    //   the target surface is one of the slave surfaces: )
+    // 'MasterNodeID': the global indices of the master nodes.
     // --------------------------------------------------------------
     void write_vtp(const std::string &vtp_filename,
         const int &index_sur, const int &index_vol,
         const bool &isf2e = false, const bool &is_slave = false) const;
 
-    void write_vtp(const int &index_sur, const int &index_vol,
-        const bool &isf2e = false, const bool &is_slave = false) const;
-
     void write_vtp(const std::string &vtp_filename,
         const std::string &phy_name_sur, const std::string &phy_name_vol,
-        const bool &isf2e = false, const bool &is_slave = false) const;
-
-    void write_vtp(const std::string &phy_name_sur, const std::string &phy_name_vol,
         const bool &isf2e = false, const bool &is_slave = false) const;
   
     // --------------------------------------------------------------
@@ -159,14 +160,8 @@ class Gmsh_FileIO
         const int &index_sur, const int &index_vol,
         const bool &isf2e = false, const bool &is_slave = false ) const;
 
-    void write_quadratic_sur_vtu( const int &index_sur, 
-        const int &index_vol, const bool &isf2e = false, const bool &is_slave = false) const;
-
     void write_quadratic_sur_vtu(const std::string &vtu_filename,
         const std::string &phy_name_sur, const std::string &phy_name_vol,
-        const bool &isf2e = false, const bool &is_slave = false) const;
-
-    void write_quadratic_sur_vtu(const std::string &phy_name_sur, const std::string &phy_name_vol,
         const bool &isf2e = false, const bool &is_slave = false) const;
 
     // --------------------------------------------------------------
@@ -218,14 +213,6 @@ class Gmsh_FileIO
     void write_tet_h5( const int &index_3d,
         const std::vector<int> &index_2d,
         const std::vector<int> &index_2d_need_facemap ) const;
-
-    // test function to print slaves and masters
-    void test_slave_master()
-    {
-        std::cout << "Slave\t" << "Master\n";
-        for(int ii{0}; ii < VEC_T::get_size(per_slave); ++ii)
-            std::cout << per_slave[ii] << '\t' << per_master[ii] << '\n';
-    }
 
   private:
     Gmsh_FileIO() = delete; // Disallow default constructor
