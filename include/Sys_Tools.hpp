@@ -16,6 +16,11 @@
 #ifdef USE_OPENMP
 #include "omp.h"
 #endif
+#ifdef _OPENMP
+#define PERIGEE_OMP_PARALLEL_FOR _Pragma("omp parallel for")
+#else
+#define PERIGEE_OMP_PARALLEL_FOR
+#endif
 
 #define PETSC_SILENCE_DEPRECATION_WARNINGS_3_19_0
 
