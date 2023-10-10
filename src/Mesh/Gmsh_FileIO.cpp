@@ -487,17 +487,12 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
         for (int jj=0; jj < nlocbas_3d; ++jj)
           total += bcmap[ vol_IEN[nlocbas_3d  * ee + jj] ];
         if(total >= nlocbas_2d)
-#ifdef _OPENMP
           temp_gelem.push_back(ee);
-#else
-          gelem.push_back(ee);
-#endif
       }
-#ifdef _OPENMP
-      #pragma omp critical
+      PERIGEE_OMP_CRITICAL
       VEC_T::insert_end(gelem, temp_gelem);
     }
-#endif
+
     delete [] bcmap; bcmap = nullptr;
     std::cout<<"      "<<gelem.size()<<" "<<ele_3d<<"s have faces over the surface. \n";
 
@@ -1493,17 +1488,12 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
         for (int jj{0}; jj < nVertex_3d; ++jj)
           total += bcmap[ vol_IEN[nlocbas_3d * ee + jj] ];
         if(total >= nVertex_2d) 
-#ifdef _OPENMP
           temp_gelem.push_back(ee);
-#else
-          gelem.push_back(ee);
-#endif
       }
-#ifdef _OPENMP
-      #pragma omp critical
+      PERIGEE_OMP_CRITICAL
       VEC_T::insert_end(gelem, temp_gelem);
     }
-#endif
+
     delete [] bcmap; bcmap = nullptr;
     std::cout<<"      "<<gelem.size()<<" "<<ele_3d<<"s have faces over the surface. \n";
 
