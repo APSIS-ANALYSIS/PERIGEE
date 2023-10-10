@@ -2105,7 +2105,7 @@ void Gmsh_FileIO::read_periodic(std::ifstream &infile)
 
       if(VEC_T::is_invec(per_slave, nodeTag - 1))
         ; // When we use periodic BC, if a slave node have more than one master, they will follow 
-        // a common primary master. Hence there it is no need to assign more than one master to a slave.
+        // a common primary master. Hence there is no need to assign more than one master to a slave.
       else
       {
         per_slave.push_back(nodeTag - 1);
