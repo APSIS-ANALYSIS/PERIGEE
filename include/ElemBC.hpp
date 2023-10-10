@@ -147,9 +147,6 @@ class ElemBC
     virtual void print_info() const
     {SYS_T::commPrint("Warning: print_info is not implemented. \n");}
 
-    virtual void resetTriIEN_outwardnormal( const IIEN * const &VIEN )
-    {SYS_T::print_fatal("Warning: resetTriIEN_outwardnormal is not implemented. \n");}
-    
     virtual void resetSurIEN_outwardnormal( const IIEN * const &VIEN )
     {SYS_T::print_fatal("Warning: resetSurIEN_outwardnormal is not implemented. \n");}
 };

@@ -82,28 +82,27 @@ class ElemBC_3D : public ElemBC
     virtual std::vector<double> get_intNA( const int &ebc_id ) const
     {SYS_T::commPrint("Warning: get_intNA is not implemented.\n"); return {};}
 
-    /*
-    // Access the data in ElemBC_3D_tet_wall, wall thickness used in CMM
+    // Access the data in ElemBC_3D_wall, wall thickness used in CMM
     virtual std::vector<double> get_wall_thickness() const
     {SYS_T::commPrint("Warning: get_wall_thickness is not implemented. \n"); return {};}
 
-    // Access the data in ElemBC_3D_tet_wall, wall youngs modulus used in CMM
+    // Access the data in ElemBC_3D_wall, wall youngs modulus used in CMM
     virtual std::vector<double> get_wall_youngsmod() const
     {SYS_T::commPrint("Warning: get_wall_youngsmod is not implemented. \n"); return {};}
 
-    // Access the data in ElemBC_3D_tet_wall, wall spring constant used in CMM
+    // Access the data in ElemBC_3D_wall, wall spring constant used in CMM
     virtual std::vector<double> get_wall_springconst() const
     {SYS_T::commPrint("Warning: get_wall_springconst is not implemented. \n"); return {};}
 
-    // Access the data in ElemBC_3D_tet_wall, wall damping constant used in CMM
+    // Access the data in ElemBC_3D_wall, wall damping constant used in CMM
     virtual std::vector<double> get_wall_dampingconst() const
     {SYS_T::commPrint("Warning: get_wall_dampingconst is not implemented. \n"); return {};}
 
-    // Access the data in ElemBC_3D_tet_wall, fluid density used for CMM young's modulus
+    // Access the data in ElemBC_3D_wall, fluid density used for CMM young's modulus
     virtual double get_fluid_density() const
     {SYS_T::commPrint("Warning: get_fluid_density is not implemented. \n"); return -1.0;}
 
-    // Overwrite ElemBC_3D_tet_wall properties from a vtp/vtu file
+    // Overwrite ElemBC_3D_wall properties from a vtp/vtu file
     virtual void overwrite_from_vtk( const std::string &wallprop_vtk, 
         const int &type, const std::string &vtk_fieldname )
     {SYS_T::commPrint("Warning: overwrite_from_vtk is not implemented. \n");}
@@ -112,7 +111,6 @@ class ElemBC_3D : public ElemBC
     virtual void write_vtk( const int &ebc_id, 
         const std::string &filename="elembc_surface" ) const
     {SYS_T::commPrint("Warning: write_vtk is not implemented. \n");}
-    */
 
   protected:
     const int elem_type, num_ebc;

@@ -12,7 +12,6 @@
 // ==================================================================
 #include "Math_Tools.hpp"
 #include "Mesh_Tet.hpp"
-#include "Mesh_FEM.hpp"
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
@@ -22,7 +21,7 @@
 #include "NodalBC_3D_ring.hpp"
 #include "NodalBC_3D_wall.hpp"
 #include "ElemBC_3D_outflow.hpp"
-#include "ElemBC_3D_tet_wall.hpp"
+#include "ElemBC_3D_wall.hpp"
 #include "NBC_Partition.hpp"
 #include "NBC_Partition_inflow.hpp"
 #include "NBC_Partition_ring.hpp"
@@ -143,7 +142,7 @@ int main( int argc, char * argv[] )
   SYS_T::file_check(geo_file); cout<<geo_file<<" found. \n";
 
   // If quadratic, all mesh files will be in vtu format
-  if(elemType == 502 || elemType == 602)
+  if(elemType == 502)
   {
     sur_file_wall.erase( sur_file_wall.end()-4, sur_file_wall.end() );
     sur_file_wall += ".vtu";
@@ -156,7 +155,7 @@ int main( int argc, char * argv[] )
 
   for(int ii=0; ii<num_inlet; ++ii)
   {
-    if(elemType == 501 || elemType == 601)
+    if(elemType == 501 )
       sur_file_in[ii] = SYS_T::gen_capfile_name( sur_file_in_base, ii, ".vtp" ); 
     else
       sur_file_in[ii] = SYS_T::gen_capfile_name( sur_file_in_base, ii, ".vtu" ); 
@@ -170,7 +169,7 @@ int main( int argc, char * argv[] )
 
   for(int ii=0; ii<num_outlet; ++ii)
   {
-    if(elemType == 501 || elemType == 601)
+    if(elemType == 501 )
       sur_file_out[ii] = SYS_T::gen_capfile_name( sur_file_out_base, ii, ".vtp" ); 
     else
       sur_file_out[ii] = SYS_T::gen_capfile_name( sur_file_out_base, ii, ".vtu" ); 
@@ -231,12 +230,6 @@ int main( int argc, char * argv[] )
     case 502:
       mesh = new Mesh_Tet(nFunc, nElem, 2);
       break;
-    case 601:
-      mesh = new Mesh_FEM(nFunc, nElem, 4, 1);
-      break;
-    case 602:
-      mesh = new Mesh_FEM(nFunc, nElem, 9, 2);
-      break;
     default:
       SYS_T::print_fatal("Error: elemType %d is not supported.\n", elemType);
       break;
@@ -260,34 +253,20 @@ int main( int argc, char * argv[] )
 
   // Set up Inflow BC info
   std::vector< Vector_3 > inlet_outvec( sur_file_in.size() );
-
-  // Set up Outflow BC info
-  std::vector< Vector_3 > outlet_outvec( sur_file_out.size() );
-
-  if(elemType==501 || elemType==502)
-  {
-    for(unsigned int ii=0; ii<sur_file_in.size(); ++ii)
-      inlet_outvec[ii] = TET_T::get_out_normal( sur_file_in[ii], ctrlPts, IEN );
-
-    for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
-      outlet_outvec[ii] = TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN );
-  }
-  else if(elemType==601 || elemType==602)
-  {
-    for(unsigned int ii=0; ii<sur_file_in.size(); ++ii)
-      inlet_outvec[ii] = HEX_T::get_out_normal( sur_file_in[ii], ctrlPts, IEN );
-    
-    for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
-      outlet_outvec[ii] = HEX_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN );
-  }
-  else
-    SYS_T::print_fatal("Error: elemType %d is not supported.\n", elemType);
   
+  for(unsigned int ii=0; ii<sur_file_in.size(); ++ii)
+    inlet_outvec[ii] = TET_T::get_out_normal( sur_file_in[ii], ctrlPts, IEN );
+
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall,
       nFunc, inlet_outvec, elemType );
   
   InFBC -> resetSurIEN_outwardnormal( IEN ); // assign outward orientation for triangles
 
+  // Set up Outflow BC info
+  std::vector< Vector_3 > outlet_outvec( sur_file_out.size() );
+
+  for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
+    outlet_outvec[ii] = TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN );
 
   ElemBC * ebc = new ElemBC_3D_outflow( sur_file_out, outlet_outvec, elemType );
 
@@ -318,7 +297,7 @@ int main( int argc, char * argv[] )
   ElemBC * wall_ebc = nullptr;
 
   if( is_uniform_wall )
-    wall_ebc = new ElemBC_3D_tet_wall( walls_combined, wall_thickness, wall_youngsmod,
+    wall_ebc = new ElemBC_3D_wall( walls_combined, wall_thickness, wall_youngsmod,
         wall_springconst, wall_dampingconst, elemType );
   else
   {
@@ -355,13 +334,13 @@ int main( int argc, char * argv[] )
     csList.push_back( 0.0 );
 
     // Initialized with properties in the wallList specified
-    wall_ebc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
+    wall_ebc = new ElemBC_3D_wall( walls_combined, centerlines_combined,
         thickness2radius_combined, wall_springconst, wall_dampingconst, wallsList,
         centerlinesList, thickness2radiusList, ksList, csList, elemType );
     // --------------------------------------------------------------------------
   }
 
-  wall_ebc -> resetTriIEN_outwardnormal( IEN );
+  wall_ebc -> resetSurIEN_outwardnormal( IEN );
   // --------------------------------------------------------------------------
 
   // Start partition the mesh for each cpu_rank 
