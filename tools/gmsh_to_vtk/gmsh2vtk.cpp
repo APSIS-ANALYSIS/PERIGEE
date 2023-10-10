@@ -21,10 +21,14 @@ int main( int argc, char * argv[] )
   const std::vector<int> nbc_face_id = config["nbc_face_id"].as<std::vector<int>>();
   const std::vector<std::string> nbc_face_name = config["nbc_face_name"].as<std::vector<std::string>>();
   const std::vector<int> nbc_vol_id = config["nbc_vol_id"].as<std::vector<int>>();
+  const std::vector<std::string> nbc_face_file_name = config["nbc_face_file_name"].as<std::vector<std::string>>();
+  const std::vector<bool> nbc_isXML = config["nbc_isXML"].as<std::vector<bool>>();
 
   const std::vector<int> ebc_face_id = config["ebc_face_id"].as<std::vector<int>>();
   const std::vector<std::string> ebc_face_name = config["ebc_face_name"].as<std::vector<std::string>>();
   const std::vector<int> ebc_vol_id = config["ebc_vol_id"].as<std::vector<int>>();
+  const std::vector<std::string> ebc_face_file_name = config["ebc_face_file_name"].as<std::vector<std::string>>();
+  const std::vector<bool> ebc_isXML = config["ebc_isXML"].as<std::vector<bool>>();
 
   const int eleType = GIO -> get_eleType(0);
   const int num_phy_domain_1d = GIO -> get_num_phy_domain_1d();
@@ -37,10 +41,10 @@ int main( int argc, char * argv[] )
   if( eleType==2 || eleType==3 )
   {
     for( int ii=0; ii<nbc_face_id.size(); ++ii )
-      GIO -> write_vtp( nbc_face_id[ii], nbc_vol_id[ii], false );
+      GIO -> write_vtp( nbc_face_id[ii], nbc_vol_id[ii], nbc_isXML[ii] );
 
     for( int ii=0; ii<ebc_face_id.size(); ++ii )
-      GIO -> write_vtp( ebc_face_id[ii], ebc_vol_id[ii], true );
+      GIO -> write_vtp( ebc_face_id[ii], ebc_vol_id[ii], ebc_isXML[ii] );
   }
   else if( eleType==9 )
   {
