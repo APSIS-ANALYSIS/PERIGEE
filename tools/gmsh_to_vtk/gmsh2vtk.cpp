@@ -13,8 +13,11 @@ int main( int argc, char * argv[] )
   YAML::Node config = YAML::LoadFile("example.yml");
 
   const std::string gmshFile = config["gmsh_file"].as<std::string>();
+  const double isFSI = config["isFSI"].as<bool>();
 
   Gmsh_FileIO * GIO = new Gmsh_FileIO( gmshFile );
+
+  if( isFSI ) GIO -> check_FSI_ordering();
 
   GIO -> print_info();
 
@@ -66,6 +69,7 @@ int main( int argc, char * argv[] )
   }
   else SYS_T::print_fatal("Error: the element type of gmsh file cannot be read. \n");
 
+  if( isFSI ) GIO -> write_each_vtu();
   const std::string wmname = config["wmname"].as<std::string>();
   const bool isXML = config["isXML"].as<bool>();
   GIO -> write_vtu( wmname, isXML );

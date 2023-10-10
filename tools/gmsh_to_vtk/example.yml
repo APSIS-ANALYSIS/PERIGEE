@@ -38,4 +38,6 @@ ebc_isXML: [true, true, true, true]
 wmname: "whole_vol"
 isXML: true
 
+isFSI: false
+
 # EOF
