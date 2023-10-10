@@ -12,17 +12,9 @@
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D.hpp"
 #include "ElemBC_3D_outflow.hpp"
-#include "Gmsh_FileIO.hpp"
 
 int main(int argc, char *argv[])
 {
-  Gmsh_FileIO * GIO = new Gmsh_FileIO("periodic_BC.msh");
-  GIO -> test_slave_master();
-  GIO -> update_quadratic_tet_IEN(0);
-
-  GIO -> write_quadratic_sur_vtu("slave_1", "vol", true, true);
-  GIO -> write_quadratic_sur_vtu("slave_2", "vol", true, true);
-
   return EXIT_SUCCESS;
 }
 
