@@ -2123,14 +2123,14 @@ void Gmsh_FileIO::read_periodic(std::ifstream &infile)
 
   // find primary masters
   for(int &master : per_master)
+  {
+    int pos_as_slave = VEC_T::get_pos(per_slave, master);
+    while(pos_as_slave != -1) // the master is others' slave
     {
-      int pos_as_slave = VEC_T::get_pos(per_slave, master);
-      while(pos_as_slave != -1) // the master is others' slave
-      {
-        master = per_master[pos_as_slave];
-        pos_as_slave = VEC_T::get_pos(per_slave, master);
-      }
+      master = per_master[pos_as_slave];
+      pos_as_slave = VEC_T::get_pos(per_slave, master);
     }
+  }
 }
 
 // EOF
