@@ -19,9 +19,11 @@
 #ifdef _OPENMP
 #define PERIGEE_OMP_PARALLEL_FOR _Pragma("omp parallel for")
 #define PERIGEE_OMP_PARALLEL _Pragma("omp parallel")
+#define PERIGEE_OMP_FOR _Pragma("omp for")
 #else
 #define PERIGEE_OMP_PARALLEL_FOR
 #define PERIGEE_OMP_PARALLEL
+#define PERIGEE_OMP_FOR
 #endif
 
 #define PETSC_SILENCE_DEPRECATION_WARNINGS_3_19_0

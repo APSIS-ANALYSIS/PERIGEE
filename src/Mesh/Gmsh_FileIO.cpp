@@ -480,8 +480,7 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
     PERIGEE_OMP_PARALLEL
     {
       std::vector<int> temp_gelem {};
-      #pragma omp for
-
+      PERIGEE_OMP_FOR
       for( int ee=0; ee<numcel; ++ee )
       {
         int total = 0;
@@ -1487,8 +1486,7 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
     PERIGEE_OMP_PARALLEL
     {
       std::vector<int> temp_gelem {};
-      #pragma omp for
-
+      PERIGEE_OMP_FOR
       for( int ee=0; ee<numcel; ++ee )
       {
         int total = 0;
