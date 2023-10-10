@@ -603,6 +603,7 @@ void Gmsh_FileIO::write_each_vtu( const std::vector<std::string> name_list) cons
 
     // collect those points' coordinates
     std::vector<double> local_coor( 3 * num_local_node , 0.0 );
+    PERIGEE_OMP_PARALLEL_FOR
     for(int jj=0; jj<num_local_node; ++jj )
     {
       local_coor[ 3*jj+0 ] = node[ 3*local_node_idx[jj] + 0 ];
@@ -613,6 +614,7 @@ void Gmsh_FileIO::write_each_vtu( const std::vector<std::string> name_list) cons
     // generate a local IEN
     const int nloc = ele_nlocbas[domain_index];
     std::vector<int> domain_IEN( phy_3d_nElem[ii] * nloc, 0 );
+    PERIGEE_OMP_PARALLEL_FOR
     for(int ee=0; ee<phy_3d_nElem[ii]; ++ee)
     {
       for(int jj=0; jj<nloc; ++jj)
@@ -624,6 +626,7 @@ void Gmsh_FileIO::write_each_vtu( const std::vector<std::string> name_list) cons
 
     // Element index (using the start_eindex)
     std::vector<int> local_cell_idx( phy_3d_nElem[ii], 0 );
+    PERIGEE_OMP_FOR
     for(int ee=0; ee<phy_3d_nElem[ii]; ++ee)
       local_cell_idx[ee] = start_eindex + ee;
 
