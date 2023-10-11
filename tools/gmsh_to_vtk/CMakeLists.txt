@@ -36,12 +36,12 @@ INCLUDE(../../conf/system_lib_loading.cmake)
 SET( perigee_source ${perigee_SOURCE_DIR}/../../src )
 SET( perigee_lib_src 
   ${perigee_source}/System/Vector_3.cpp
-  ${perigee_source}/Element/FE_Tools.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
   ${perigee_source}/Mesh/VTK_Tools.cpp
   ${perigee_source}/Mesh/Tet_Tools.cpp
   ${perigee_source}/Mesh/Hex_Tools.cpp
   ${perigee_source}/Mesh/Gmsh_FileIO.cpp
+  ${perigee_source}/Element/FE_Tools.cpp
   )
 
 # ===============================================
@@ -69,6 +69,6 @@ ADD_EXECUTABLE( gmsh2vtk gmsh2vtk.cpp)
 
 # -------------------------------------------------------------------
 # 2. Link libraries
-TARGET_LINK_LIBRARIES( gmsh2vtk ${EXTRA_LINK_LIBS} perigee-mesh )
+TARGET_LINK_LIBRARIES( gmsh2vtk perigee-mesh )
 
 #EOF
