@@ -20,14 +20,14 @@ In the [preprocessor](preprocess_sv_tets.cpp), one needs to prepare the mesh, as
 * `-sur_file_out_base` specifies the vtp or vtu file for the outlet surfaces. Together with the number of outlets, the code will load sur_file_out_base + xxx.vtp (vtu) from the disk.
 
 The following arguments determine the wall thickness and Young's modulus.
-* `-is_uniform_wall` is a bool argument that determines if we want to have uniform wall properties. It determines which constructor is called for ElemBC_3D_tet_wall. If it is false, the wall properties are determined from a centerline file. The file for the centerline should be named as `centerlines.vtp` and be placed in the preprocessor job folder. The wall thickness is 20 percent of the radius. The Young's modulus is calculated from an empirical formula, which is. defined in ElemBC_3D_tet_wall::compute_youngsmod. If the argument's value is true, use `-wall_thickness` and `-wall_youngsmod` to define the wall thickness and Young's modulus, respectively.
+* `-is_uniform_wall` is a bool argument that determines if we want to have uniform wall properties. It determines which constructor is called for ElemBC_3D_wall. If it is false, the wall properties are determined from a centerline file. The file for the centerline should be named as `centerlines.vtp` and be placed in the preprocessor job folder. The wall thickness is 20 percent of the radius. The Young's modulus is calculated from an empirical formula, which is. defined in ElemBC_3D_wall::compute_youngsmod. If the argument's value is true, use `-wall_thickness` and `-wall_youngsmod` to define the wall thickness and Young's modulus, respectively.
 * `-wall_springconst` and `-wall_dampingconst` define the supporting tissue model's elastic coefficient and damping coefficient, respectively.
 
 We recommend using `-is_uniform_wall NO`, so that one can generate more physiologically realistic wall properties. Note: make sure that the correct centerlines.vtp is placed in the job folder.
 
-So far, the thickness-to-radius ratio, the formula for the Young's modulus, the supporting tissue's two parameters are assumed to take a uniform value. In a more sophsiticated manner, one may set them with different values in different regions of the wall. To do so, one needs to go over the thrid constructor for the ElemBC_3D_tet_wall class.
+So far, the thickness-to-radius ratio, the formula for the Young's modulus, the supporting tissue's two parameters are assumed to take a uniform value. In a more sophsiticated manner, one may set them with different values in different regions of the wall. To do so, one needs to go over the thrid constructor for the ElemBC_3D_wall class.
 
-The constructor of ElemBC_3D_tet_wall class will always write `varwallprop.vtp` as a wall surface file, with wall properties as cell or pint attributes. 
+The constructor of ElemBC_3D_wall class will always write `varwallprop.vtp` as a wall surface file, with wall properties as cell or pint attributes. 
 
 The following argument determines the boundary condition type on the inlet and outlets.
 * `-cmmbc_type` is an integer flag that determines NodalBC_3D_CMM. If it is `0` (default value), the wall is set to be deformable; if it is `1`, the wall is set as a homogeneous boundary meaning the wall is rigid; if it is `2`, the variables in the fluid subdomain is fixed so that one can solve the wall mechanics for prestress.

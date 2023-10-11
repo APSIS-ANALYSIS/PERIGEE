@@ -8,7 +8,7 @@
 #include "Global_Part_Serial.hpp"
 #include "Tet_Tools.hpp"
 #include "NodalBC.hpp"
-#include "ElemBC_3D_tet.hpp"
+#include "ElemBC_3D.hpp"
 #include "Part_FEM.hpp"
 #include "NBC_Partition.hpp"
 #include "EBC_Partition.hpp"
@@ -121,7 +121,7 @@ int main( int argc, char * argv[] )
 
   // Setup Elemental (Neumann type) boundary condition(s)
   std::vector<std::string> neu_list {};
-  ElemBC * ebc = new ElemBC_3D_tet( neu_list, elemType );
+  ElemBC * ebc = new ElemBC_3D( neu_list, elemType );
   
   ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
   

@@ -212,7 +212,7 @@ namespace TET_T
       virtual ~Tet4();
 
       // Changes the gindex array only. It is used to determine
-      // the face index, e.g. in ElemBC_3D_tet4::resetTriIEN_outwardnormal
+      // the face index, e.g. in ElemBC_3D::resetSurIEN_outwardnormal
       // function.
       void reset( const int &ien0, const int &ien1,
           const int &ien2, const int &ien3 );
