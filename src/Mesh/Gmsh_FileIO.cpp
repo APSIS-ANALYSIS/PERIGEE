@@ -626,7 +626,8 @@ void Gmsh_FileIO::write_each_vtu( const std::vector<std::string> name_list) cons
 
     // Element index (using the start_eindex)
     std::vector<int> local_cell_idx( phy_3d_nElem[ii], 0 );
-    PERIGEE_OMP_FOR
+    
+    PERIGEE_OMP_PARALLEL_FOR
     for(int ee=0; ee<phy_3d_nElem[ii]; ++ee)
       local_cell_idx[ee] = start_eindex + ee;
 
