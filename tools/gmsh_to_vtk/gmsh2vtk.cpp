@@ -50,7 +50,13 @@ int main( int argc, char * argv[] )
   if( eleType==2 || eleType==3 )
   {
     for( unsigned int ii=0; ii<nbc_face_id.size(); ++ii )
+    {
+      std::cout<<"nbc_face_name: "<<nbc_face_name[ii]<<'\t'; // the name of the
+                                                             // surface
+                                                             // corresponding to
+                                                             // nbc_face_id in GIO + vol name to vol_id
       GIO -> write_vtp( nbc_face_file_name[ii], nbc_face_id[ii], nbc_vol_id[ii], nbc_isXML[ii] );
+    }
 
     for( unsigned int ii=0; ii<ebc_face_id.size(); ++ii )
       GIO -> write_vtp( ebc_face_file_name[ii], ebc_face_id[ii], ebc_vol_id[ii], ebc_isXML[ii] );
