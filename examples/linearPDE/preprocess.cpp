@@ -3,6 +3,7 @@
 //
 // ============================================================================
 #include "Mesh_Tet.hpp"
+#include "Mesh_FEM.hpp"
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
@@ -12,6 +13,7 @@
 #include "Part_FEM.hpp"
 #include "NBC_Partition.hpp"
 #include "EBC_Partition.hpp"
+#include "yaml-cpp/yaml.h"
 
 int main( int argc, char * argv[] )
 {
@@ -33,17 +35,38 @@ int main( int argc, char * argv[] )
   int in_ncommon = 2;
   bool isDualGraph = true;
   
-  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+  // Define basic problem settings
+  constexpr int dofNum = 3;
+  constexpr int dofMat = 3;
+
+  bool is_loadYaml = false;
+  std::string yaml_file("preprocess.yml")
+
+  SYS_T::GetOptionBool(  "-is_loadYaml",       is_loadYaml);
+  SYS_T::GetOptionString("-yaml_file",         yaml_file);
   
-  SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: preprocessor needs to be run in serial.\n");
-  
+  if (is_loadYaml)
+  {
+    if( !SYS_T::file_exist( yaml_file ) )
+    {
+      std::cerr<<"Error: the file "<<yaml_file<<" does not exist. Job killed.\n";
+      return EXIT_FAILURE;
+    }
+
+    YAML::Node paras = YAML::LoadFile( yaml_file );
+    cpu_size   = paras["cpu_size"].as<int>();
+    in_ncommon = paras["in_ncommon"].as<int>();
+    elem_type  = paras["elem_type"].as<int>();
+    geo_file   = paras["geo_file"].as<std::string>();
+  }
+
   // Get the command line arguments
   SYS_T::GetOptionInt(   "-cpu_size",          cpu_size);
   SYS_T::GetOptionInt(   "-in_ncommon",        in_ncommon);
   SYS_T::GetOptionInt(   "-elem_type",         elemType);
   SYS_T::GetOptionString("-geo_file",          geo_file);
   
-  if( elemType != 501 && elemType !=502 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
+  if( elemType != 501 && elemType != 502 && elemType != 601 && elemType != 602 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
   
   // Print the command line arguments
   std::cout << "==== Command Line Arguments ====" << std::endl;
@@ -90,6 +113,12 @@ int main( int argc, char * argv[] )
     case 502:
       mesh = new Mesh_Tet(nFunc, nElem, 2);
       break;
+    case 601:
+      mesh = new Mesh_FEM(nFunc, nElem, 8, 1);
+      break;
+    case 602:
+      mesh = new Mesh_FEM(nFunc, nElem, 27, 2);
+      break;
     default:
       SYS_T::print_fatal("Error: elemType %d is not supported.\n", elemType);
       break;
@@ -113,17 +142,19 @@ int main( int argc, char * argv[] )
   mnindex->write_hdf5("node_mapping");
 
   // Setup Nodal (Dirichlet type) boundary condition(s)
+  std::vector<INodalBC *> NBC_list( dofNum, nullptr );
   std::vector<std::string> dir_list { "top_vol.vtp", "bot_vol.vtp", "lef_vol.vtp", "rig_vol.vtp", "fro_vol.vtp", "bac_vol.vtp" };
-
-  INodalBC * nbc = new NodalBC( dir_list, nFunc );
   
-  std::vector<INodalBC *> NBC_list { nbc };
+  NBC_list[0] = new NodalBC( dir_list, nFunc );
+  NBC_list[1] = new NodalBC( dir_list, nFunc );
+  NBC_list[2] = new NodalBC( dir_list, nFunc );
 
   // Setup Elemental (Neumann type) boundary condition(s)
   std::vector<std::string> neu_list {};
-  ElemBC * ebc = new ElemBC_3D( neu_list, elemType );
-  
-  ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
+
+  ElemBC * ebc = new ElemBC_3D( neu_list, elemType ); //
+ 
+  ebc -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
   
   // Start partition the mesh for each cpu_rank
   SYS_T::Timer * mytimer = new SYS_T::Timer();
@@ -139,7 +170,7 @@ int main( int argc, char * argv[] )
     mytimer->Start();
     
     IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
-        ctrlPts, proc_rank, cpu_size, 1, 1, elemType );
+        ctrlPts, proc_rank, cpu_size, dofNum, dofMat, elemType );
 
     part -> print_part_loadbalance_edgecut();
 
@@ -190,7 +221,6 @@ int main( int argc, char * argv[] )
 
   delete mytimer;
   delete ebc; delete global_part; delete mnindex; delete IEN; delete mesh;
-  PetscFinalize();
   return EXIT_SUCCESS;
 }
 
