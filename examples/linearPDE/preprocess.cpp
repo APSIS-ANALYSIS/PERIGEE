@@ -7,7 +7,6 @@
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
-#include "Tet_Tools.hpp"
 #include "NodalBC.hpp"
 #include "ElemBC_3D.hpp"
 #include "Part_FEM.hpp"
@@ -24,53 +23,34 @@ int main( int argc, char * argv[] )
   // Define the partition file name 
   const std::string part_file("./apart/part");
 
-  // Element option: 501 linear tet element
-  int elemType = 501;
-
-  // Default names for input geometry files
-  std::string geo_file("./whole_vol.vtu");
-
   // Mesh partition setting
-  int cpu_size = 1;
-  int in_ncommon = 2;
   bool isDualGraph = true;
   
   // Define basic problem settings
-  constexpr int dofNum = 3;
-  constexpr int dofMat = 3;
+  int dofNum = 1;
+  int dofMat = 1;
 
-  bool is_loadYaml = false;
-  std::string yaml_file("preprocess.yml");
+  const std::string yaml_file("preprocess.yml");
 
-  SYS_T::GetOptionBool(  "-is_loadYaml",       is_loadYaml);
-  SYS_T::GetOptionString("-yaml_file",         yaml_file);
-  
-  if (is_loadYaml)
+  // use print_fatal 
+  if( !SYS_T::file_exist( yaml_file ) )
   {
-    if( !SYS_T::file_exist( yaml_file ) )
-    {
-      std::cerr<<"Error: the file "<<yaml_file<<" does not exist. Job killed.\n";
-      return EXIT_FAILURE;
-    }
-
-    YAML::Node paras = YAML::LoadFile( yaml_file );
-    cpu_size   = paras["cpu_size"].as<int>();
-    in_ncommon = paras["in_ncommon"].as<int>();
-    elem_type  = paras["elem_type"].as<int>();
-    geo_file   = paras["geo_file"].as<std::string>();
+    std::cerr<<"Error: the file "<<yaml_file<<" does not exist. Job killed.\n";
+    return EXIT_FAILURE;
   }
 
-  // Get the command line arguments
-  SYS_T::GetOptionInt(   "-cpu_size",          cpu_size);
-  SYS_T::GetOptionInt(   "-in_ncommon",        in_ncommon);
-  SYS_T::GetOptionInt(   "-elem_type",         elemType);
-  SYS_T::GetOptionString("-geo_file",          geo_file);
+  YAML::Node paras = YAML::LoadFile( yaml_file );
   
+  const int cpu_size           = paras["cpu_size"].as<int>();
+  const int in_ncommon         = paras["in_ncommon"].as<int>();
+  const int elemType           = paras["elem_type"].as<int>();
+  const std::string geo_file   = paras["geo_file"].as<std::string>();
+
   if( elemType != 501 && elemType != 502 && elemType != 601 && elemType != 602 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
   
   // Print the command line arguments
   std::cout << "==== Command Line Arguments ====" << std::endl;
-  std::cout << " -elem_type: "   << elemType      << std::endl;
+  std::cout << " -elem_type: "        << elemType          << std::endl;
   std::cout << " -geo_file: "         << geo_file          << std::endl;
   std::cout << " -part_file: "        << part_file         << std::endl;
   std::cout << " -cpu_size: "         << cpu_size          << std::endl;

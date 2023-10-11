@@ -43,16 +43,13 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Part_FEM.cpp
   ${perigee_source}/Mesh/ElemBC_3D.cpp
   ${perigee_source}/Mesh/NodalBC.cpp
-  ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
   ${perigee_source}/Mesh/NBC_Partition.cpp
   ${perigee_source}/Mesh/EBC_Partition.cpp
   ${perigee_source}/Mesh/Map_Node_Index.cpp
   ${perigee_source}/Mesh/Global_Part_METIS.cpp
   ${perigee_source}/Mesh/Global_Part_Serial.cpp
-  ${perigee_source}/Element/FE_Tools.cpp
-  ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
-  ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
-  )
+  ${perigee_source}/Element/FE_Tools.cpp  
+)
 
 SET( perigee_analysis_lib_src
   ${perigee_source}/System/PETSc_Tools.cpp
@@ -101,13 +98,13 @@ ADD_LIBRARY( perigee_preprocess ${perigee_preprocess_lib_src} )
 TARGET_LINK_LIBRARIES( perigee_preprocess ${EXTRA_LINK_LIBS} )
 
 # 2. Analysis libs
-ADD_LIBRARY( perigee_analysis ${perigee_analysis_lib_src} )
-TARGET_LINK_LIBRARIES( perigee_analysis ${EXTRA_LINK_LIBS} perigee_preprocess )
+#ADD_LIBRARY( perigee_analysis ${perigee_analysis_lib_src} )
+#TARGET_LINK_LIBRARIES( perigee_analysis ${EXTRA_LINK_LIBS} perigee_preprocess )
 
 # 3. Postprocess lib
-ADD_LIBRARY( perigee_postprocess ${perigee_postprocess_lib_src} )
-TARGET_LINK_LIBRARIES( perigee_postprocess ${EXTRA_LINK_LIBS} perigee_analysis
-  perigee_preprocess )
+#ADD_LIBRARY( perigee_postprocess ${perigee_postprocess_lib_src} )
+#TARGET_LINK_LIBRARIES( perigee_postprocess ${EXTRA_LINK_LIBS} perigee_analysis
+#  perigee_preprocess )
 # -------------------------------------------------------------------
 
 # Print compiler setup
@@ -117,13 +114,13 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # BUILD THE MAIN DRIVERS
 # ===================================================================
 ADD_EXECUTABLE( preprocess3d preprocess.cpp)
-ADD_EXECUTABLE( transport_3d driver.cpp)
-ADD_EXECUTABLE( prepost prepost.cpp)
-ADD_EXECUTABLE( post_error post_compare_manu.cpp )
+#ADD_EXECUTABLE( transport_3d driver.cpp)
+#ADD_EXECUTABLE( prepost prepost.cpp)
+#ADD_EXECUTABLE( post_error post_compare_manu.cpp )
 
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
-TARGET_LINK_LIBRARIES( transport_3d perigee_analysis )
-TARGET_LINK_LIBRARIES( prepost perigee_preprocess )
-TARGET_LINK_LIBRARIES( post_error perigee_postprocess )
+#TARGET_LINK_LIBRARIES( transport_3d perigee_analysis )
+#TARGET_LINK_LIBRARIES( prepost perigee_preprocess )
+#TARGET_LINK_LIBRARIES( post_error perigee_postprocess )
 
 # EOF
