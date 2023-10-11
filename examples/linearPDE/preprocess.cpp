@@ -40,7 +40,7 @@ int main( int argc, char * argv[] )
   constexpr int dofMat = 3;
 
   bool is_loadYaml = false;
-  std::string yaml_file("preprocess.yml")
+  std::string yaml_file("preprocess.yml");
 
   SYS_T::GetOptionBool(  "-is_loadYaml",       is_loadYaml);
   SYS_T::GetOptionString("-yaml_file",         yaml_file);
