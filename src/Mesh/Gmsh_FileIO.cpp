@@ -1050,8 +1050,10 @@ void Gmsh_FileIO::write_vol_h5( const int &index_3d,
     for(int ff=0; ff<num_2d_cell; ++ff)
     { 
       std::vector<int> sur_node (nVertex_2d, -1); // the vertex indices of a surface element
-      for(int ii{0}; ii < nVertex_2d; ++ii)
-        sur_node[ii] = face_ien_global[ nLocBas_2d * ff + ii ];
+      
+      for(int kk{0}; kk < nVertex_2d; ++kk)
+        sur_node[kk] = face_ien_global[ nLocBas_2d * ff + kk ];
+      
       bool gotit = false;
       int ee = -1;
       while( !gotit && ee < int(gelem.size()) - 1 )
@@ -1063,8 +1065,8 @@ void Gmsh_FileIO::write_vol_h5( const int &index_3d,
           vol_node[jj] = eIEN[domain_3d_idx][ nLocBas_3d * vol_elem + jj ];
         
         bool got_all_node = true;
-        for(int ii{0}; ii < nVertex_2d; ++ii)
-          got_all_node = got_all_node && VEC_T::is_invec(vol_node, sur_node[ii]);
+        for(int kk{0}; kk < nVertex_2d; ++kk)
+          got_all_node = got_all_node && VEC_T::is_invec(vol_node, sur_node[kk]);
 
         gotit = got_all_node;
       }
@@ -1223,8 +1225,9 @@ void Gmsh_FileIO::write_vol_h5( const int &index_3d,
       for(int ff=0; ff<num_2d_cell; ++ff)
       {
         std::vector<int> sur_node (nVertex_2d, -1); // the vertex indices of a surface element
-        for(int ii{0}; ii < nVertex_2d; ++ii)
-          sur_node[ii] = face_ien_global[ nLocBas_2d * ff + ii ];
+        for(int kk{0}; kk < nVertex_2d; ++kk)
+          sur_node[kk] = face_ien_global[ nLocBas_2d * ff + kk ];
+
         bool gotit = false;
         int ee = -1;
         while( !gotit && ee < int(gelem.size()) - 1 )
@@ -1236,8 +1239,8 @@ void Gmsh_FileIO::write_vol_h5( const int &index_3d,
             vol_node[jj] = eIEN[domain_3d_idx][ nLocBas_3d * vol_elem + jj ];
           
           bool got_all_node = true;
-          for(int ii{0}; ii < nVertex_2d; ++ii)
-            got_all_node = got_all_node && VEC_T::is_invec(vol_node, sur_node[ii]);
+          for(int kk{0}; kk < nVertex_2d; ++kk)
+            got_all_node = got_all_node && VEC_T::is_invec(vol_node, sur_node[kk]);
 
           gotit = got_all_node;
         }
