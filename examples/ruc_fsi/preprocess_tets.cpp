@@ -307,7 +307,7 @@ int main( int argc, char * argv[] )
 
     SYS_T::file_check( centerlines_combined ); cout << centerlines_combined << " found. \n";
 
-    //wall_ebc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
+    //wall_ebc = new ElemBC_3D_wall( walls_combined, centerlines_combined,
     //    thickness2radius_combined, wall_springconst, wall_dampingconst, elemType );
 
     // --------------------------------------------------------------------------
