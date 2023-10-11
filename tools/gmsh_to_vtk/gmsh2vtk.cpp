@@ -9,11 +9,17 @@
 
 int main( int argc, char * argv[] )
 {
+  const std::string input_yaml_file("example.yml");
+  
+  SYS_T::print_fatal_if( !SYS_T::file_exist( input_yaml_file ), "ERROR: the file %s does not exist on disk.\n", input_yaml_file.c_str() );
+
   // Get element type from GIO
-  YAML::Node config = YAML::LoadFile("example.yml");
+  YAML::Node config = YAML::LoadFile( input_yaml_file );
 
   const std::string gmshFile = config["gmsh_file"].as<std::string>();
   const double isFSI = config["isFSI"].as<bool>();
+
+  SYS_T::print_fatal_if( !SYS_T::file_exist( gmshFile ), "ERROR: the file %s does not exist on disk.\n", gmshFile.c_str() );
 
   Gmsh_FileIO * GIO = new Gmsh_FileIO( gmshFile );
 
@@ -43,29 +49,29 @@ int main( int argc, char * argv[] )
 
   if( eleType==2 || eleType==3 )
   {
-    for( int ii=0; ii<nbc_face_id.size(); ++ii )
-      GIO -> write_vtp( nbc_face_id[ii], nbc_vol_id[ii], nbc_isXML[ii] );
+    for( unsigned int ii=0; ii<nbc_face_id.size(); ++ii )
+      GIO -> write_vtp( nbc_face_file_name[ii], nbc_face_id[ii], nbc_vol_id[ii], nbc_isXML[ii] );
 
-    for( int ii=0; ii<ebc_face_id.size(); ++ii )
-      GIO -> write_vtp( ebc_face_id[ii], ebc_vol_id[ii], ebc_isXML[ii] );
+    for( unsigned int ii=0; ii<ebc_face_id.size(); ++ii )
+      GIO -> write_vtp( ebc_face_file_name[ii], ebc_face_id[ii], ebc_vol_id[ii], ebc_isXML[ii] );
   }
   else if( eleType==9 )
   {
     GIO -> update_quadratic_tet_IEN(0);
-    for( int ii=0; ii<nbc_face_id.size(); ++ii )
-      GIO -> write_quadratic_sur_vtu( nbc_face_id[ii], nbc_vol_id[ii], false );
+    for( unsigned int ii=0; ii<nbc_face_id.size(); ++ii )
+      GIO -> write_quadratic_sur_vtu( nbc_face_file_name[ii], nbc_face_id[ii], nbc_vol_id[ii], nbc_isXML[ii] );
 
-    for( int ii=0; ii<ebc_face_id.size(); ++ii )
-      GIO -> write_quadratic_sur_vtu( ebc_face_id[ii], ebc_vol_id[ii], true );
+    for( unsigned int ii=0; ii<ebc_face_id.size(); ++ii )
+      GIO -> write_quadratic_sur_vtu( ebc_face_file_name[ii], ebc_face_id[ii], ebc_vol_id[ii], ebc_isXML[ii] );
   }
   else if( eleType==10 )
   {
     GIO -> update_quadratic_hex_IEN(0);
-    for( int ii=0; ii<nbc_face_id.size(); ++ii )
-      GIO -> write_quadratic_sur_vtu( nbc_face_id[ii], nbc_vol_id[ii], false );
+    for( unsigned int ii=0; ii<nbc_face_id.size(); ++ii )
+      GIO -> write_quadratic_sur_vtu( nbc_face_file_name[ii], nbc_face_id[ii], nbc_vol_id[ii], nbc_isXML[ii] );
 
-    for( int ii=0; ii<ebc_face_id.size(); ++ii )
-      GIO -> write_quadratic_sur_vtu( ebc_face_id[ii], ebc_vol_id[ii], true );
+    for( unsigned int ii=0; ii<ebc_face_id.size(); ++ii )
+      GIO -> write_quadratic_sur_vtu( ebc_face_file_name[ii], ebc_face_id[ii], ebc_vol_id[ii], ebc_isXML[ii] );
   }
   else SYS_T::print_fatal("Error: the element type of gmsh file cannot be read. \n");
 
