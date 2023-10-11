@@ -8,10 +8,8 @@
 // Date Created: July 1 2017
 // Author: Ju Liu
 // ==================================================================
-#include "Tet_Tools.hpp"
 #include "Hex_Tools.hpp"
 #include "HDF5_Writer.hpp"
-#include "Sys_Tools.hpp"
 
 class Gmsh_FileIO
 {
