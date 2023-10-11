@@ -19,9 +19,9 @@
 class IGenBC
 {
   public:
-    IGenBC(){};
+    IGenBC() = default;
 
-    virtual ~IGenBC(){};
+    virtual ~IGenBC() = default;
 
     virtual void print_info() const = 0;
 
