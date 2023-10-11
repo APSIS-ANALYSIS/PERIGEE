@@ -13,6 +13,7 @@
 // Author: Ju Liu
 // Date: Oct. 2 2013
 // ==================================================================
+#include "metis.h"
 
 class IGlobal_Part
 {
