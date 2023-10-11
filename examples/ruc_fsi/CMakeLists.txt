@@ -42,9 +42,8 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Mesh_Tet.cpp
   ${perigee_source}/Mesh/Mesh_FEM.cpp
   ${perigee_source}/Mesh/Part_FEM.cpp
-  ${perigee_source}/Mesh/ElemBC_3D_tet.cpp
-  ${perigee_source}/Mesh/ElemBC_3D_wall.cpp
   ${perigee_source}/Mesh/ElemBC_3D.cpp
+  ${perigee_source}/Mesh/ElemBC_3D_wall.cpp
   ${perigee_source}/Mesh/ElemBC_3D_outflow.cpp
   ${perigee_SOURCE_DIR}/src/NodalBC_3D_CMM.cpp
   ${perigee_source}/Mesh/NodalBC_3D_inflow.cpp
@@ -159,8 +158,8 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 # BUILD THE MAIN DRIVERS
 # ===================================================================
-ADD_EXECUTABLE( gmsh_p1_IO    gmsh_p1_process.cpp )
-ADD_EXECUTABLE( gmsh_p2_IO    gmsh_p2_process.cpp )
+#ADD_EXECUTABLE( gmsh_p1_IO    gmsh_p1_process.cpp )
+#ADD_EXECUTABLE( gmsh_p2_IO    gmsh_p2_process.cpp )
 ADD_EXECUTABLE( preprocess3d  preprocess_tets.cpp)
 ADD_EXECUTABLE( wall_solver   wall_solver.cpp)
 ADD_EXECUTABLE( ruc_tet_3d    ruc_driver.cpp)
@@ -172,8 +171,8 @@ ADD_EXECUTABLE( vis_p2_wss    vis_p2_wss.cpp)
 #ADD_EXECUTABLE( test test.cpp )
 #ADD_EXECUTABLE( test_element  test_membrane_element_routine.cpp )
 
-TARGET_LINK_LIBRARIES( gmsh_p1_IO    perigee_preprocess )
-TARGET_LINK_LIBRARIES( gmsh_p2_IO    perigee_preprocess )
+#TARGET_LINK_LIBRARIES( gmsh_p1_IO    perigee_preprocess )
+#TARGET_LINK_LIBRARIES( gmsh_p2_IO    perigee_preprocess )
 TARGET_LINK_LIBRARIES( preprocess3d  perigee_preprocess )
 TARGET_LINK_LIBRARIES( ruc_tet_3d    perigee_analysis )
 TARGET_LINK_LIBRARIES( wall_solver   perigee_analysis )

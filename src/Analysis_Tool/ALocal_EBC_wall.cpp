@@ -93,7 +93,7 @@ void ALocal_EBC_wall::get_thickness( const int &eindex,
   const int nLocBas = cell_nLocBas[0];
   for( int ii = 0; ii < nLocBas; ++ii )
   {
-    const int pos = local_tri_ien[0][nLocBas*eindex + ii]; 
+    const int pos = local_cell_ien[0][nLocBas*eindex + ii]; 
     e_thickness[ii] = thickness[pos];
   }
 }
@@ -105,7 +105,7 @@ void ALocal_EBC_wall::get_youngsmod( const int &eindex,
   const int nLocBas = cell_nLocBas[0];
   for( int ii = 0; ii < nLocBas; ++ii )
   {
-    const int pos = local_tri_ien[0][nLocBas*eindex + ii]; 
+    const int pos = local_cell_ien[0][nLocBas*eindex + ii]; 
     e_youngsmod[ii] = youngsmod[pos];
   }
 }
@@ -117,7 +117,7 @@ void ALocal_EBC_wall::get_springconst( const int &eindex,
   const int nLocBas = cell_nLocBas[0];
   for( int ii = 0; ii < nLocBas; ++ii )
   {
-    const int pos = local_tri_ien[0][nLocBas*eindex + ii]; 
+    const int pos = local_cell_ien[0][nLocBas*eindex + ii]; 
     e_springconst[ii] = springconst[pos];
   }
 }
@@ -129,7 +129,7 @@ void ALocal_EBC_wall::get_dampingconst( const int &eindex,
   const int nLocBas = cell_nLocBas[0];
   for( int ii = 0; ii < nLocBas; ++ii )
   {
-    const int pos = local_tri_ien[0][nLocBas*eindex + ii]; 
+    const int pos = local_cell_ien[0][nLocBas*eindex + ii]; 
     e_dampingconst[ii] = dampingconst[pos];
   }
 }

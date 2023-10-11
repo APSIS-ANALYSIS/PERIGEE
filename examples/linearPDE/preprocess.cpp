@@ -151,9 +151,9 @@ int main( int argc, char * argv[] )
 
   // Setup Elemental (Neumann type) boundary condition(s)
   std::vector<std::string> neu_list {};
+
   ElemBC * ebc = new ElemBC_3D( neu_list, elemType ); //
  
-  // READ AND SEE IF WE NEED TO USE THE NEW RESET FUNCTION 
   ebc -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
   
   // Start partition the mesh for each cpu_rank
