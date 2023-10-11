@@ -14,6 +14,7 @@
 #include "IIEN.hpp"
 #include "IGlobal_Part.hpp"
 #include "HDF5_Writer.hpp"
+#include "metis.h"
 
 class Global_Part_METIS : public IGlobal_Part
 {

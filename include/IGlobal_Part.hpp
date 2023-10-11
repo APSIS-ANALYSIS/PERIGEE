@@ -13,14 +13,13 @@
 // Author: Ju Liu
 // Date: Oct. 2 2013
 // ==================================================================
-#include "metis.h"
 
 class IGlobal_Part
 {
   public:
-    IGlobal_Part(){};
+    IGlobal_Part() = default;
     
-    virtual ~IGlobal_Part(){};
+    virtual ~IGlobal_Part() = default;
 
     virtual idx_t get_epart( const int &ee ) const = 0;
     
