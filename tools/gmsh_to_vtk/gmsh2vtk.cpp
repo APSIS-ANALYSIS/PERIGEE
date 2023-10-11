@@ -51,33 +51,61 @@ int main( int argc, char * argv[] )
   {
     for( unsigned int ii=0; ii<nbc_face_id.size(); ++ii )
     {
-      std::cout<<"nbc_face_name: "<<nbc_face_name[ii]<<'\t'; // the name of the
-                                                             // surface
-                                                             // corresponding to
-                                                             // nbc_face_id in GIO + vol name to vol_id
+      std::cout<<'\n'<<"=== nbc_face_name: "<<nbc_face_name[ii]<<'\t'; 
+      std::cout<<"phy_face_name: "<<GIO->get_phy_name_2d(nbc_face_id[ii])<<" with ";
+      std::cout<<GIO->get_phy_name_3d(nbc_vol_id[ii])<<std::endl;
+       
       GIO -> write_vtp( nbc_face_file_name[ii], nbc_face_id[ii], nbc_vol_id[ii], nbc_isXML[ii] );
     }
 
     for( unsigned int ii=0; ii<ebc_face_id.size(); ++ii )
+    {
+      std::cout<<'\n'<<"=== ebc_face_name: "<<ebc_face_name[ii]<<'\t';
+      std::cout<<"phy_face_name: "<<GIO->get_phy_name_2d(ebc_face_id[ii])<<" with ";
+      std::cout<<GIO->get_phy_name_3d(ebc_vol_id[ii])<<std::endl;
+  
       GIO -> write_vtp( ebc_face_file_name[ii], ebc_face_id[ii], ebc_vol_id[ii], ebc_isXML[ii] );
+    }
   }
   else if( eleType==9 )
   {
     GIO -> update_quadratic_tet_IEN(0);
     for( unsigned int ii=0; ii<nbc_face_id.size(); ++ii )
-      GIO -> write_quadratic_sur_vtu( nbc_face_file_name[ii], nbc_face_id[ii], nbc_vol_id[ii], nbc_isXML[ii] );
+    {
+      std::cout<<'\n'<<"=== nbc_face_name: "<<nbc_face_name[ii]<<'\t'; 
+      std::cout<<"phy_face_name: "<<GIO->get_phy_name_2d(nbc_face_id[ii])<<" with ";
+      std::cout<<GIO->get_phy_name_3d(nbc_vol_id[ii])<<std::endl;
 
+      GIO -> write_quadratic_sur_vtu( nbc_face_file_name[ii], nbc_face_id[ii], nbc_vol_id[ii], nbc_isXML[ii] );
+    }
     for( unsigned int ii=0; ii<ebc_face_id.size(); ++ii )
+    {
+      std::cout<<'\n'<<"=== ebc_face_name: "<<ebc_face_name[ii]<<'\t';
+      std::cout<<"phy_face_name: "<<GIO->get_phy_name_2d(ebc_face_id[ii])<<" with ";
+      std::cout<<GIO->get_phy_name_3d(ebc_vol_id[ii])<<std::endl;
+
       GIO -> write_quadratic_sur_vtu( ebc_face_file_name[ii], ebc_face_id[ii], ebc_vol_id[ii], ebc_isXML[ii] );
+    }
   }
   else if( eleType==10 )
   {
     GIO -> update_quadratic_hex_IEN(0);
     for( unsigned int ii=0; ii<nbc_face_id.size(); ++ii )
-      GIO -> write_quadratic_sur_vtu( nbc_face_file_name[ii], nbc_face_id[ii], nbc_vol_id[ii], nbc_isXML[ii] );
+    {
+      std::cout<<'\n'<<"=== nbc_face_name: "<<nbc_face_name[ii]<<'\t'; 
+      std::cout<<"phy_face_name: "<<GIO->get_phy_name_2d(nbc_face_id[ii])<<" with ";
+      std::cout<<GIO->get_phy_name_3d(nbc_vol_id[ii])<<std::endl;
 
+      GIO -> write_quadratic_sur_vtu( nbc_face_file_name[ii], nbc_face_id[ii], nbc_vol_id[ii], nbc_isXML[ii] );
+    }
     for( unsigned int ii=0; ii<ebc_face_id.size(); ++ii )
+    {
+      std::cout<<'\n'<<"=== ebc_face_name: "<<ebc_face_name[ii]<<'\t';
+      std::cout<<"phy_face_name: "<<GIO->get_phy_name_2d(ebc_face_id[ii])<<" with ";
+      std::cout<<GIO->get_phy_name_3d(ebc_vol_id[ii])<<std::endl;
+
       GIO -> write_quadratic_sur_vtu( ebc_face_file_name[ii], ebc_face_id[ii], ebc_vol_id[ii], ebc_isXML[ii] );
+    }  
   }
   else SYS_T::print_fatal("Error: the element type of gmsh file cannot be read. \n");
 
