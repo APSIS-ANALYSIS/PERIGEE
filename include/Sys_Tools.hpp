@@ -13,6 +13,20 @@
 #include <ctime>
 #include <sys/stat.h>
 #include "petsc.h"
+#ifdef USE_OPENMP
+#include "omp.h"
+#endif
+#ifdef _OPENMP
+#define PERIGEE_OMP_PARALLEL_FOR _Pragma("omp parallel for")
+#define PERIGEE_OMP_PARALLEL _Pragma("omp parallel")
+#define PERIGEE_OMP_FOR _Pragma("omp for")
+#define PERIGEE_OMP_CRITICAL _Pragma("omp critical")
+#else
+#define PERIGEE_OMP_PARALLEL_FOR
+#define PERIGEE_OMP_PARALLEL
+#define PERIGEE_OMP_FOR
+#define PERIGEE_OMP_CRITICAL
+#endif
 
 #define PETSC_SILENCE_DEPRECATION_WARNINGS_3_19_0
 
@@ -172,10 +186,21 @@ namespace SYS_T
     }
     else
     {
+#ifdef _OPENMP
+      if( !omp_get_thread_num() )
+      {
+        va_list Argp;
+        va_start(Argp, output);
+        vfprintf (stderr, output, Argp);
+        va_end(Argp);
+      }
+      #pragma omp barrier
+#else
       va_list Argp;
       va_start(Argp, output);
       vfprintf (stderr, output, Argp);
       va_end(Argp);
+#endif
     }
   }
 
@@ -208,11 +233,25 @@ namespace SYS_T
     }
     else
     {
+#ifdef _OPENMP
+      if( !omp_get_thread_num() )
+      {
+        va_list Argp;
+        va_start(Argp, output);
+        vfprintf (stderr, output, Argp);
+        va_end(Argp);
+
+        exit( EXIT_FAILURE );
+      }
+      else exit( EXIT_FAILURE );
+#else
       va_list Argp;
       va_start(Argp, output);
       vfprintf (stderr, output, Argp);
       va_end(Argp);
+
       exit( EXIT_FAILURE );
+#endif
     }
   }
 
@@ -236,12 +275,25 @@ namespace SYS_T
       }
       else
       {
+#ifdef _OPENMP
+        if( !omp_get_thread_num() )
+        {
+          va_list Argp;
+          va_start(Argp, output);
+          vfprintf (stderr, output, Argp);
+          va_end(Argp);
+
+          exit( EXIT_FAILURE );
+        }
+        else exit( EXIT_FAILURE );
+#else
         va_list Argp;
         va_start(Argp, output);
         vfprintf (stderr, output, Argp);
         va_end(Argp);
 
         exit( EXIT_FAILURE );
+#endif
       }      
     }
   }
@@ -485,19 +537,30 @@ namespace SYS_T
 
       ~Timer() {};
 
-      void Start() {startedAt = clock();}
-
-      void Stop() {stoppedAt = clock();}
-
       void Reset() { startedAt = 0; stoppedAt = 0; }
 
+#ifdef _OPENMP
+      void Start() { startedAt = omp_get_wtime(); }
+      void Stop()  { stoppedAt = omp_get_wtime(); }
+      double get_sec() const
+      {
+        return (stoppedAt - startedAt);
+      }
+#else
+      void Start() { startedAt = clock(); }
+      void Stop()  { stoppedAt = clock(); }
       double get_sec() const
       {
         return (double)(stoppedAt - startedAt)/(double)CLOCKS_PER_SEC;
       }
+#endif
 
     private:
+#ifdef _OPENMP
+      double startedAt, stoppedAt;
+#else
       clock_t startedAt, stoppedAt;
+#endif
   };
 
   // Print ASCII art text for the code
