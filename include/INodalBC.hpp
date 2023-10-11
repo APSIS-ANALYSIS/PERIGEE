@@ -288,8 +288,8 @@ class INodalBC
     // Reset the triangle element's surface IEN so that the outward normal
     // vector is defined.
     // --------------------------------------------------------------
-    virtual void resetTriIEN_outwardnormal( const IIEN * const &VIEN )
-    {SYS_T::print_fatal("Warning: resetTriIEN_outwardnormal is not implemented. \n");}
+    virtual void resetSurIEN_outwardnormal( const IIEN * const &VIEN )
+    {SYS_T::print_fatal("Warning: resetSurIEN_outwardnormal is not implemented. \n");}
 
   protected:
     std::vector<int> ID;

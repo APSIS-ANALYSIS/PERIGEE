@@ -43,11 +43,13 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Hex_Tools.cpp
   ${perigee_source}/Mesh/IEN_FEM.cpp
   ${perigee_source}/Mesh/Mesh_Tet.cpp
-  ${perigee_source}/Mesh/ElemBC_3D_tet.cpp
-  ${perigee_source}/Mesh/ElemBC_3D_tet_outflow.cpp
+  ${perigee_source}/Mesh/ElemBC_3D.cpp
+  ${perigee_source}/Mesh/ElemBC_3D_outflow.cpp
   ${perigee_source}/Mesh/NodalBC.cpp
   ${perigee_source}/Mesh/NodalBC_3D_inflow.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_1D.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_Quad.cpp
   ${perigee_source}/Mesh/NBC_Partition.cpp
   ${perigee_source}/Mesh/NBC_Partition_MF.cpp
   ${perigee_source}/Mesh/NBC_Partition_inflow.cpp
@@ -63,6 +65,8 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Element/FE_Tools.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Quad4_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Quad9_3D_der0.cpp  
   ${perigee_SOURCE_DIR}/src/NodalBC_3D_FSI.cpp
   )
 
@@ -160,7 +164,7 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 # BUILD THE MAIN DRIVERS
 # ===================================================================
-ADD_EXECUTABLE( gmshIO gmsh_process.cpp )
+# ADD_EXECUTABLE( gmshIO gmsh_process.cpp )
 ADD_EXECUTABLE( preprocess_fsi preprocess_fsi.cpp)
 ADD_EXECUTABLE( wall_ps_tet4_3d wall_ps_tet4_driver.cpp)
 ADD_EXECUTABLE( fsi_tet4_3d fsi_driver.cpp)
@@ -171,7 +175,7 @@ ADD_EXECUTABLE( vis_solid vis_solid.cpp )
 ADD_EXECUTABLE( vis_fsi_wss vis_fsi_wss.cpp )
 
 # Link libraries
-TARGET_LINK_LIBRARIES( gmshIO ${EXTRA_LINK_LIBS} perigee_preprocess )
+# TARGET_LINK_LIBRARIES( gmshIO ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( preprocess_fsi ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( wall_ps_tet4_3d ${EXTRA_LINK_LIBS} perigee_analysis )
 TARGET_LINK_LIBRARIES( fsi_tet4_3d ${EXTRA_LINK_LIBS} perigee_analysis )

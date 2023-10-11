@@ -132,12 +132,21 @@ class Gmsh_FileIO
     // In principle, we suggest that the surface belong to only one
     // volumetric physical domain. In case that a surface spans over
     // many physical volumetric domain, the face2elem mapping is -1.
+    //
+    // The following data will be written as the result:
+    // 'GlobalNodeID': the global indices of nodes;
+    // 'GlobalElementID': the global indices of surface elements;
+    //   ( If periodic boundary conditions are applied in .msh file, and 
+    //   the target surface is one of the slave surfaces: )
+    // 'MasterNodeID': the global indices of the master nodes.
     // --------------------------------------------------------------
     void write_vtp(const std::string &vtp_filename,
-        const int &index_sur, const int &index_vol, const bool &isf2e = false) const;
+        const int &index_sur, const int &index_vol,
+        const bool &isf2e = false, const bool &is_slave = false) const;
 
-    void write_vtp(const int &index_sur, const int &index_vol,
-        const bool &isf2e = false) const;
+    void write_vtp(const std::string &vtp_filename,
+        const std::string &phy_name_sur, const std::string &phy_name_vol,
+        const bool &isf2e = false, const bool &is_slave = false) const;
   
     // --------------------------------------------------------------
     // Write a vtu file for a surface associated with a volume mesh
@@ -147,10 +156,12 @@ class Gmsh_FileIO
     // Its functionality is quite close to write_vtp.
     // --------------------------------------------------------------
     void write_quadratic_sur_vtu( const std::string &vtu_filename,
-        const int &index_sur, const int &index_vol, const bool &isf2e = false) const;
+        const int &index_sur, const int &index_vol,
+        const bool &isf2e = false, const bool &is_slave = false ) const;
 
-    void write_quadratic_sur_vtu( const int &index_sur, 
-        const int &index_vol, const bool &isf2e = false) const;
+    void write_quadratic_sur_vtu(const std::string &vtu_filename,
+        const std::string &phy_name_sur, const std::string &phy_name_vol,
+        const bool &isf2e = false, const bool &is_slave = false) const;
 
     // --------------------------------------------------------------
     // Write a vtu file for all volumetric physical domain together.
@@ -177,7 +188,7 @@ class Gmsh_FileIO
     // index_2d in [ 0, num_phy_domain_2d ),
     // index_1d in [ 0, num_phy_domain_1d ).
     // --------------------------------------------------------------
-    void write_tri_h5(const int &index_2d, const std::vector<int> &index_1d ) const;
+    void write_sur_h5(const int &index_2d, const std::vector<int> &index_1d ) const;
 
     // --------------------------------------------------------------
     // Write a h5 file for the 3D simplex domain with given index :
@@ -186,7 +197,7 @@ class Gmsh_FileIO
     // index_3d in [ 0, num_phy_domain_3d ),
     // index_2d in [ 0, num_phy_domain_2d ).
     // --------------------------------------------------------------
-    void write_tet_h5( const int &index_3d, const std::vector<int> &index_2d ) const;
+    void write_vol_h5( const int &index_3d, const std::vector<int> &index_2d ) const;
 
     // --------------------------------------------------------------
     // Write a h5 file for the 3D simplex domain with given index,
@@ -198,7 +209,7 @@ class Gmsh_FileIO
     // face2elem array;
     // otherwise, the face2elem array will be empty. 
     // --------------------------------------------------------------
-    void write_tet_h5( const int &index_3d,
+    void write_vol_h5( const int &index_3d,
         const std::vector<int> &index_2d,
         const std::vector<int> &index_2d_need_facemap ) const;
 
@@ -293,6 +304,14 @@ class Gmsh_FileIO
     // mapping, which is defined by Gmsh.
     std::vector<int> ele_type {};
 
+    // Stores the slave nodes' indices if periodic BC is applied
+    std::vector<int> per_slave {};
+
+    //Stores the master nodes' indices if periodic BC is applied
+    std::vector<int> per_master {};
+    // They correspond to slave nodes by the position.
+    // E.g. the master of per_slave[0] is per_master[0].
+
     // --------------------------------------------------------------
     // Private functions for the constructor
     // --------------------------------------------------------------
@@ -308,6 +327,14 @@ class Gmsh_FileIO
     // This function is bound to the constructor of Gmsh_FileIO.
     // --------------------------------------------------------------
     void read_msh4(std::ifstream &infile);
+    // --------------------------------------------------------------
+
+    // --------------------------------------------------------------
+    // Read the master-slave node mapping if periodic BC is applied.
+    // After the reading, all of the masters will be checked and traced
+    // to get the primary masters.
+    // --------------------------------------------------------------
+    void read_periodic(std::ifstream &infile);
     // --------------------------------------------------------------
 };
 

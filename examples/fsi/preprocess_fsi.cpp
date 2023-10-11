@@ -17,7 +17,7 @@
 #include "NodalBC.hpp"
 #include "NodalBC_3D_FSI.hpp"
 #include "NodalBC_3D_inflow.hpp"
-#include "ElemBC_3D_tet_outflow.hpp"
+#include "ElemBC_3D_outflow.hpp"
 #include "NBC_Partition_MF.hpp"
 #include "NBC_Partition_inflow_MF.hpp"
 #include "EBC_Partition_outflow_MF.hpp"
@@ -433,9 +433,9 @@ int main( int argc, char * argv[] )
   for(int ii=0; ii<num_inlet; ++ii)
     inlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_in[ii], ctrlPts, IEN_v );
 
-  INodalBC * InFBC = new NodalBC_3D_inflow( sur_f_file_in, sur_f_file_wall, nFunc_v, inlet_outvec );
+  INodalBC * InFBC = new NodalBC_3D_inflow( sur_f_file_in, sur_f_file_wall, nFunc_v, inlet_outvec, elemType );
 
-  InFBC -> resetTriIEN_outwardnormal( IEN_v ); // assign outward orientation for triangles
+  InFBC -> resetSurIEN_outwardnormal( IEN_v ); // assign outward orientation for triangles
   
   // Physical ElemBC
   cout<<"4. Elem boundary for the implicit solver: \n";
@@ -444,20 +444,22 @@ int main( int argc, char * argv[] )
   for(int ii=0; ii<num_outlet; ++ii)
     outlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_out[ii], ctrlPts, IEN_v );
 
+  std::vector< std::string > ebclist {sur_f_file_wall};
+
   ElemBC * ebc = nullptr;
   if( fsiBC_type == 0 || fsiBC_type == 1 )
-    ebc = new ElemBC_3D_tet_outflow( sur_f_file_out, outlet_outvec );
+    ebc = new ElemBC_3D_outflow( sur_f_file_out, outlet_outvec, elemType );
   else if( fsiBC_type == 2 )
-    ebc = new ElemBC_3D_tet( sur_f_file_wall );
+    ebc = new ElemBC_3D( ebclist, elemType );
   else SYS_T::print_fatal("ERROR: uncognized fsiBC type. \n");
 
-  ebc -> resetTriIEN_outwardnormal( IEN_v ); // assign outward orientation for triangles
+  ebc -> resetSurIEN_outwardnormal( IEN_v ); // assign outward orientation for triangles
 
   // Mesh solver ElemBC
   cout<<"5. Elem boundary for the mesh solver: \n";
   std::vector<std::string> mesh_ebclist;
   mesh_ebclist.clear();
-  ElemBC * mesh_ebc = new ElemBC_3D_tet( mesh_ebclist );
+  ElemBC * mesh_ebc = new ElemBC_3D( mesh_ebclist, elemType );
   std::cout<<"=================================\n";
   // ----------------------------------------------------------------
 

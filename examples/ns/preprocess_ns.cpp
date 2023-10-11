@@ -14,7 +14,7 @@
 #include "Part_FEM.hpp"
 #include "NodalBC.hpp"
 #include "NodalBC_3D_inflow.hpp"
-#include "ElemBC_3D_tet_outflow.hpp"
+#include "ElemBC_3D_outflow.hpp"
 #include "NBC_Partition.hpp"
 #include "NBC_Partition_inflow.hpp"
 #include "EBC_Partition_outflow.hpp"
@@ -214,7 +214,7 @@ int main( int argc, char * argv[] )
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall,
       nFunc, inlet_outvec, elemType );
 
-  InFBC -> resetTriIEN_outwardnormal( IEN ); // assign outward orientation for triangles
+  InFBC -> resetSurIEN_outwardnormal( IEN ); // assign outward orientation for triangles
 
 
   // Setup Elemental Boundary Conditions
@@ -223,9 +223,9 @@ int main( int argc, char * argv[] )
   for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
     outlet_outvec[ii] = TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN );
 
-  ElemBC * ebc = new ElemBC_3D_tet_outflow( sur_file_out, outlet_outvec, elemType );
+  ElemBC * ebc = new ElemBC_3D_outflow( sur_file_out, outlet_outvec, elemType );
 
-  ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
+  ebc -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
  
   // Start partition the mesh for each cpu_rank 
 

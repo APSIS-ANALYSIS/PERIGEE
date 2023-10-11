@@ -20,8 +20,8 @@
 #include "NodalBC_3D_inflow.hpp"
 #include "NodalBC_3D_ring.hpp"
 #include "NodalBC_3D_wall.hpp"
-#include "ElemBC_3D_tet_outflow.hpp"
-#include "ElemBC_3D_tet_wall.hpp"
+#include "ElemBC_3D_outflow.hpp"
+#include "ElemBC_3D_wall.hpp"
 #include "NBC_Partition.hpp"
 #include "NBC_Partition_inflow.hpp"
 #include "NBC_Partition_ring.hpp"
@@ -260,7 +260,7 @@ int main( int argc, char * argv[] )
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall,
       nFunc, inlet_outvec, elemType );
   
-  InFBC -> resetTriIEN_outwardnormal( IEN ); // assign outward orientation for triangles
+  InFBC -> resetSurIEN_outwardnormal( IEN ); // assign outward orientation for triangles
 
   // Set up Outflow BC info
   std::vector< Vector_3 > outlet_outvec( sur_file_out.size() );
@@ -268,9 +268,9 @@ int main( int argc, char * argv[] )
   for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
     outlet_outvec[ii] = TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN );
 
-  ElemBC * ebc = new ElemBC_3D_tet_outflow( sur_file_out, outlet_outvec, elemType );
+  ElemBC * ebc = new ElemBC_3D_outflow( sur_file_out, outlet_outvec, elemType );
 
-  ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
+  ebc -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
 
   // Set up Ring BC
   INodalBC * ring_bc = new NodalBC_3D_ring( sur_file_in, inlet_outvec,
@@ -297,7 +297,7 @@ int main( int argc, char * argv[] )
   ElemBC * wall_ebc = nullptr;
 
   if( is_uniform_wall )
-    wall_ebc = new ElemBC_3D_tet_wall( walls_combined, wall_thickness, wall_youngsmod,
+    wall_ebc = new ElemBC_3D_wall( walls_combined, wall_thickness, wall_youngsmod,
         wall_springconst, wall_dampingconst, elemType );
   else
   {
@@ -307,7 +307,7 @@ int main( int argc, char * argv[] )
 
     SYS_T::file_check( centerlines_combined ); cout << centerlines_combined << " found. \n";
 
-    //wall_ebc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
+    //wall_ebc = new ElemBC_3D_wall( walls_combined, centerlines_combined,
     //    thickness2radius_combined, wall_springconst, wall_dampingconst, elemType );
 
     // --------------------------------------------------------------------------
@@ -334,13 +334,13 @@ int main( int argc, char * argv[] )
     csList.push_back( 0.0 );
 
     // Initialized with properties in the wallList specified
-    wall_ebc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
+    wall_ebc = new ElemBC_3D_wall( walls_combined, centerlines_combined,
         thickness2radius_combined, wall_springconst, wall_dampingconst, wallsList,
         centerlinesList, thickness2radiusList, ksList, csList, elemType );
     // --------------------------------------------------------------------------
   }
 
-  wall_ebc -> resetTriIEN_outwardnormal( IEN );
+  wall_ebc -> resetSurIEN_outwardnormal( IEN );
   // --------------------------------------------------------------------------
 
   // Start partition the mesh for each cpu_rank 

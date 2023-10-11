@@ -49,9 +49,7 @@ NodalBC_3D_ring::NodalBC_3D_ring(
 
     SYS_T::file_check( cap_files[ii] );
 
-    if ( elemtype == 501 ) VTK_T::read_vtp_grid( cap_files[ii], numpts, numcels, pts, ien );
-    else if ( elemtype == 502 ) VTK_T::read_vtu_grid( cap_files[ii], numpts, numcels, pts, ien );
-    else SYS_T::print_fatal("Error: Nodal_3D_ring unknown element type.\n");
+    VTK_T::read_grid( cap_files[ii], numpts, numcels, pts, ien );
 
     const auto gnode = VTK_T::read_int_PointData(cap_files[ii], "GlobalNodeID");
 

@@ -133,7 +133,7 @@ class ElemBC
     virtual double get_fluid_density() const
     {SYS_T::commPrint("Warning: get_fluid_density is not implemented. \n"); return -1.0;}
  
-    // Overwrite ElemBC_3D_tet_wall properties from a vtp/vtu file
+    // Overwrite ElemBC_3D_wall properties from a vtp/vtu file
     virtual void overwrite_from_vtk( const std::string &wallprop_vtk,
         const int &type, const std::string &vtk_fieldname )
     {SYS_T::commPrint("Warning: overwrite_from_vtk is not implemented. \n");}
@@ -147,9 +147,6 @@ class ElemBC
     virtual void print_info() const
     {SYS_T::commPrint("Warning: print_info is not implemented. \n");}
 
-    virtual void resetTriIEN_outwardnormal( const IIEN * const &VIEN )
-    {SYS_T::print_fatal("Warning: resetTriIEN_outwardnormal is not implemented. \n");}
-    
     virtual void resetSurIEN_outwardnormal( const IIEN * const &VIEN )
     {SYS_T::print_fatal("Warning: resetSurIEN_outwardnormal is not implemented. \n");}
 };

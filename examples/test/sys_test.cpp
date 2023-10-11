@@ -7,6 +7,11 @@
 #include "Vector_3.hpp"
 #include "Tensor4_3D.hpp"
 #include "SymmTensor4_3D.hpp"
+#include "IEN_FEM.hpp"
+#include "NodalBC.hpp"
+#include "NodalBC_3D_inflow.hpp"
+#include "ElemBC_3D.hpp"
+#include "ElemBC_3D_outflow.hpp"
 
 #include "Gmsh_FileIO.hpp"
 #include "yaml-cpp/yaml.h"
@@ -42,11 +47,6 @@ bool compare(std::string& file1Path, std::string& file2Path)
 
 int main(int argc, char *argv[])
 {
-  // PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-  // SYS_T::print_perigee_art();
-  // SYS_T::print_system_info();
-  // PetscFinalize();
-
   std::vector<std::string> YAML_Lists {"cube_tet_p1.yml", "cube_tet_p2.yml", "cube_hex_p1.yml", "cube_hex_p2.yml"};
   std::vector<std::string> ele_type_tag {"tet_p1_", "tet_p2_", "hex_p1_", "hex_p2_"};
   std::vector<std::vector<std::string>> FileLists {

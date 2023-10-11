@@ -1,32 +1,35 @@
-#ifndef ELEMBC_3D_TET_OUTFLOW_HPP
-#define ELEMBC_3D_TET_OUTFLOW_HPP
+#ifndef ELEMBC_3D_OUTFLOW_HPP
+#define ELEMBC_3D_OUTFLOW_HPP
 // ============================================================================
-// ElemBC_3D_tet_outflow.hpp
+// ElemBC_3D_outflow.hpp
 //
-// A derived class from the ElemBC_3D_tet.hpp
+// A derived class from the ElemBC_3D.hpp
 //
 // This class has a vector with length num_node for each ebc id that stores 
 // int_{Gamma} N_A dS
 //
-// Date: Feb. 6 2020
+// Date: Sep. 28 2023
 // ============================================================================
-#include "ElemBC_3D_tet.hpp"
+#include "ElemBC_3D.hpp"
 #include "FEAElement_Triangle3_3D_der0.hpp"
 #include "FEAElement_Triangle6_3D_der0.hpp"
+#include "FEAElement_Quad4_3D_der0.hpp"
+#include "FEAElement_Quad9_3D_der0.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
+#include "QuadPts_Gauss_Quad.hpp"
 
-class ElemBC_3D_tet_outflow : public ElemBC_3D_tet
+class ElemBC_3D_outflow : public ElemBC_3D
 {
   public:
     // Constructor for outlet boundaries that will be associated
     // with reduced order models in the analysis code. 
     // \para vtkfileList: the list of the vtp files for the outlet surfaces
     // \para outlet_normal_vec: the outward normal vectors for the surfaces
-    ElemBC_3D_tet_outflow( const std::vector<std::string> &vtkfileList,
+    ElemBC_3D_outflow( const std::vector<std::string> &vtkfileList,
        const std::vector< Vector_3 > &outlet_normal_vec,
-       const int &elemtype = 501 );
+       const int &elemtype );
 
-    virtual ~ElemBC_3D_tet_outflow();
+    virtual ~ElemBC_3D_outflow();
 
     virtual void print_info() const;
 
@@ -38,7 +41,7 @@ class ElemBC_3D_tet_outflow : public ElemBC_3D_tet
 
   private:
     // Disallow the default constructor
-    ElemBC_3D_tet_outflow() = delete;
+    ElemBC_3D_outflow() = delete;
 
     // It stores the surface integral of each nodal basis function on the 
     // outlet surfaces.

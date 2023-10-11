@@ -39,13 +39,16 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Hex_Tools.cpp
   ${perigee_source}/Mesh/Gmsh_FileIO.cpp
   ${perigee_source}/Mesh/Mesh_Tet.cpp
+  ${perigee_source}/Mesh/Mesh_FEM.cpp
   ${perigee_source}/Mesh/IEN_FEM.cpp
   ${perigee_source}/Mesh/Part_FEM.cpp
-  ${perigee_source}/Mesh/ElemBC_3D_tet.cpp
-  ${perigee_source}/Mesh/ElemBC_3D_tet_outflow.cpp
+  ${perigee_source}/Mesh/ElemBC_3D.cpp
+  ${perigee_source}/Mesh/ElemBC_3D_outflow.cpp
   ${perigee_source}/Mesh/NodalBC.cpp
   ${perigee_source}/Mesh/NodalBC_3D_inflow.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_1D.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_Quad.cpp
   ${perigee_source}/Mesh/NBC_Partition.cpp
   ${perigee_source}/Mesh/NBC_Partition_inflow.cpp
   ${perigee_source}/Mesh/EBC_Partition.cpp
@@ -56,6 +59,8 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Element/FE_Tools.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Quad4_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Quad9_3D_der0.cpp  
   )
 
 SET( perigee_analysis_lib_src
@@ -131,8 +136,8 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 # BUILD THE MAIN DRIVERS
 # ===================================================================
-ADD_EXECUTABLE( gmsh_p1_IO gmsh_p1_process.cpp )
-ADD_EXECUTABLE( gmsh_p2_IO gmsh_p2_process.cpp )
+#ADD_EXECUTABLE( gmsh_p1_IO gmsh_p1_process.cpp )
+#ADD_EXECUTABLE( gmsh_p2_IO gmsh_p2_process.cpp )
 ADD_EXECUTABLE( preprocess3d preprocess_ns.cpp)
 ADD_EXECUTABLE( ns3d ns_driver.cpp)
 ADD_EXECUTABLE( prepost3d prepost_ns.cpp)
@@ -140,8 +145,8 @@ ADD_EXECUTABLE( vis_ns vis_ns.cpp)
 ADD_EXECUTABLE( vis_p1_wss vis_p1_wss.cpp)
 ADD_EXECUTABLE( vis_p2_wss vis_p2_wss.cpp)
 
-TARGET_LINK_LIBRARIES( gmsh_p1_IO perigee_preprocess )
-TARGET_LINK_LIBRARIES( gmsh_p2_IO perigee_preprocess )
+#TARGET_LINK_LIBRARIES( gmsh_p1_IO perigee_preprocess )
+#TARGET_LINK_LIBRARIES( gmsh_p2_IO perigee_preprocess )
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( ns3d perigee_analysis )
 TARGET_LINK_LIBRARIES( prepost3d perigee_preprocess )

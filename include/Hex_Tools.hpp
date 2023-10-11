@@ -135,7 +135,6 @@ namespace HEX_T
   //          \para vol_ien, the volume mesh IEN array
   //   Output: outVec, the outward normal vector
   // --------------------------------------------------------------------------
-  // ----------------------------------------------------------------
   Vector_3 get_out_normal( const std::string &file,
       const std::vector<double> &vol_ctrlPts,
       const IIEN * const &vol_ien );
@@ -188,9 +187,8 @@ namespace HEX_T
 
       virtual ~Hex8();
       
-      // Changes the gindex array only. It is used to determine
-      // the face index, e.g. in ElemBC_3D_hex8::resetQuadIEN_outwardnormal
-      // function.
+      // Changes the gindex array only. It is used to determine the face index, 
+      // e.g. in ElemBC_3D::resetSurIEN_outwardnormal function.
       void reset( const int &ien0, const int &ien1,
           const int &ien2, const int &ien3, const int &ien4,
           const int &ien5, const int &ien6, const int &ien7 );
