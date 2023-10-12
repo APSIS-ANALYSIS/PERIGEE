@@ -1,7 +1,7 @@
 # ==============================================================================
-# example.yml
+# input_gmsh2vtk.yml
 # 
-# This code is used to store information in the gmsh file in order to avoid 
+# This file is used to store information in the gmsh file in order to avoid 
 # manually modifying gmsh2vtk.cpp, which can lead to unwanted errors.
 # Here is an example,
 #

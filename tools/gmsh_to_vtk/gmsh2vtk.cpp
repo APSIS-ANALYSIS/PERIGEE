@@ -9,7 +9,7 @@
 
 int main( int argc, char * argv[] )
 {
-  const std::string input_yaml_file("example.yml");
+  const std::string input_yaml_file("input_gmsh2vtk.yml");
   
   SYS_T::print_fatal_if( !SYS_T::file_exist( input_yaml_file ), "ERROR: the file %s does not exist on disk.\n", input_yaml_file.c_str() );
 
