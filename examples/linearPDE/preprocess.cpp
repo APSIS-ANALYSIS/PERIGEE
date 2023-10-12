@@ -50,7 +50,7 @@ int main( int argc, char * argv[] )
   // Check if the geometry file(s) of Dirichlet BC(s) exists
   for(int ii = 0; ii < dofMat; ++ii)
   {
-    for(int jj = 0; jj < dir_list[ii].size(); ++ii)
+    for(int jj = 0; jj < dir_list[ii].size(); ++jj)
       SYS_T::file_check( dir_list[ii][jj] );
   }
 
