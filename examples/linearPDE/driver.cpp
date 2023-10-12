@@ -20,7 +20,7 @@
 #include "FEAElement_Quad4_3D_der0.hpp"
 #include "FEAElement_Quad9_3D_der0.hpp"
 #include "PLocAssem_Transport_GenAlpha.hpp"
-#include "PGAssem_Tet_Transport_GenAlpha.hpp"
+#include "PGAssem_Transport_GenAlpha.hpp"
 #include "PNonlinear_Transport_Solver.hpp"
 #include "PTime_Transport_Solver.hpp"
 
@@ -304,7 +304,7 @@ int main(int argc, char *argv[])
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
-  IPGAssem * gloAssem_ptr = new PGAssem_Tet_Transport_GenAlpha( locAssem_ptr,
+  IPGAssem * gloAssem_ptr = new PGAssem_Transport_GenAlpha( locAssem_ptr,
       GMIptr, locElem, locIEN, pNode, locnbc, locebc, nz_estimate );  
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
