@@ -28,9 +28,9 @@ class IVisDataPrep
     //   in petsc binary vector and transforms it into the pointArrays,
     //   which corresponds to the data named arrayNames.
     // -------------------------------------------------------------------
-    IVisDataPrep(){};
+    IVisDataPrep() = default;
 
-    virtual ~IVisDataPrep(){};
+    virtual ~IVisDataPrep() = default;
   
     // -------------------------------------------------------------------
     // ! output: pointArrays, should have arrayCompSize for rows, 
@@ -189,20 +189,20 @@ class IVisDataPrep
     // -------------------------------------------------------------------
     // ! the number of types of data we need to visualize
     // -------------------------------------------------------------------
-    int arrayCompSize;
+    int arrayCompSize {};
 
     // -------------------------------------------------------------------
     // ! arrayNames: the names for each type data to be visualized
     //   length : 0 <= ii < arrayCompSize
     // -------------------------------------------------------------------
-    std::vector<std::string> arrayNames;
+    std::vector<std::string> arrayNames {};
 
     // -------------------------------------------------------------------
     // ! arraySizes, should have length of arrayCompSize, it stores
     //   the size of each type data, e.g., 1 is scalar data, 3 is 
     //   3D vector data, etc.
     // -------------------------------------------------------------------
-    std::vector<int> arraySizes;
+    std::vector<int> arraySizes {};
 };
 
 #endif

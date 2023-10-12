@@ -19,7 +19,7 @@
 class INodalBC
 {
   public:
-    INodalBC() {};
+    INodalBC() = default;
 
     virtual ~INodalBC() {VEC_T::clean(ID);}
 

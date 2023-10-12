@@ -38,9 +38,9 @@
 class ElemBC
 {
   public:
-    ElemBC(){};
+    ElemBC() = default;
 
-    virtual ~ElemBC(){};
+    virtual ~ElemBC() = default;
 
     // This returns the number of surface domains that requires boundary
     // integral.
