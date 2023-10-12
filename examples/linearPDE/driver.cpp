@@ -19,7 +19,7 @@
 #include "FEAElement_Triangle6_3D_der0.hpp"
 #include "FEAElement_Quad4_3D_der0.hpp"
 #include "FEAElement_Quad9_3D_der0.hpp"
-#include "PLocAssem_Tet_Transport_GenAlpha.hpp"
+#include "PLocAssem_Transport_GenAlpha.hpp"
 #include "PGAssem_Tet_Transport_GenAlpha.hpp"
 #include "PNonlinear_Transport_Solver.hpp"
 #include "PTime_Transport_Solver.hpp"
@@ -263,10 +263,10 @@ int main(int argc, char *argv[])
   // material parameters
   const double rho = 1.0, cap = 1.0, kap = 1.0;
   
-  IPLocAssem * locAssem_ptr = new PLocAssem_Tet_Transport_GenAlpha(
+  IPLocAssem * locAssem_ptr = new PLocAssem_Transport_GenAlpha(
       rho, cap, kap, tm_galpha_ptr,
       elementv->get_nLocBas(), elements->get_nLocBas(), 
-      locebc -> get_num_ebc(), GMIptr->get_elemType() );
+      locebc -> get_num_ebc());
 
   // ===== Initial condition =====
   PDNSolution * sol = new PDNSolution_Transport( pNode, 0 );
