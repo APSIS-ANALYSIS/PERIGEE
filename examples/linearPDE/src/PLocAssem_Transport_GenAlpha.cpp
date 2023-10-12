@@ -5,13 +5,12 @@ PLocAssem_Transport_GenAlpha::PLocAssem_Transport_GenAlpha(
     const TimeMethod_GenAlpha * const &tm_gAlpha,
     const int &in_nlocbas, const int &in_snlocbas, 
     const int &in_num_ebc_fun )
-: rho( in_rho ), cap( in_cap ), kappa( in_kappa ),
+: rho( in_rho ), cap( in_cap ), kappa( in_kappa ), 
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
-  gamma(tm_gAlpha->get_gamma()), num_ebc_fun( in_num_ebc_fun )
+  gamma(tm_gAlpha->get_gamma()), nLocBas( in_nlocbas ),
+  snLocBas( in_snlocbas ), vec_size( in_nlocbas ), 
+  sur_size( in_snlocbas ), num_ebc_fun( in_num_ebc_fun )
 {
-  vec_size = nLocBas * 1;
-  sur_size = snLocBas * 1;
-
   Tangent = new PetscScalar[vec_size * vec_size];
   Residual = new PetscScalar[vec_size];
   

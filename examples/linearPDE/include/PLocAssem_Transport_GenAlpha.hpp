@@ -92,8 +92,9 @@ class PLocAssem_Transpoet_GenAlpha : public IPLocAssem
     const double alpha_f, alpha_m, gamma;
     
     const int num_ebc_fun;
-
-    int nLocBas, snLocBas, vec_size, sur_size;
+    
+    const int nLocBas, snLocBas;
+    const int vec_size, sur_size;
 
     void print_info() const;
 
