@@ -19,7 +19,7 @@ class NodalBC_3D_wall : public INodalBC
         const std::vector<std::string> &outflow_files,
         const int &nFunc, const int &elemtype );
 
-    virtual ~NodalBC_3D_wall() {};
+    virtual ~NodalBC_3D_wall() = default;
 
     virtual unsigned int get_dir_nodes(const unsigned int &ii) const
     {return dir_nodes[ii];}
@@ -35,11 +35,11 @@ class NodalBC_3D_wall : public INodalBC
     virtual unsigned int get_num_per_nodes() const {return num_per_nodes;}
 
   private:
-    std::vector<unsigned int> dir_nodes;
-    unsigned int num_dir_nodes;
+    std::vector<unsigned int> dir_nodes {};
+    unsigned int num_dir_nodes {};
 
-    std::vector<unsigned int> per_slave_nodes, per_master_nodes;
-    unsigned int num_per_nodes;
+    std::vector<unsigned int> per_slave_nodes {}, per_master_nodes {};
+    unsigned int num_per_nodes {};
 
     NodalBC_3D_wall() = delete;
 };

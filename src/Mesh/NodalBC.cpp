@@ -83,9 +83,6 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
   std::cout<<"Time taken: "<<((float) log_time)/CLOCKS_PER_SEC<<" seconds."<<std::endl; 
 }
 
-NodalBC::~NodalBC()
-{}
-
 void NodalBC::BC_type_1( const std::vector<std::string> &vtkfileList,
     const int &nFunc )
 {
