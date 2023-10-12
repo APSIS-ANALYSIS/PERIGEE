@@ -85,8 +85,8 @@ int main(int argc, char *argv[])
 
   SYS_T::GetOptionInt("-nqp_vol", nqp_vol);
   SYS_T::GetOptionInt("-nqp_sur", nqp_sur);
-  SYS_T::GetOptionInt("-nqp_vol_1d", nqp_vol_1d);
-  SYS_T::GetOptionInt("-nqp_sur_1d", nqp_sur_1d);
+  SYS_T::GetOptionInt("-nqp_vol_1d", nqp_vol_1D);
+  SYS_T::GetOptionInt("-nqp_sur_1d", nqp_sur_1D);
   SYS_T::GetOptionReal("-rho_inf", genA_rho_inf);
   SYS_T::GetOptionBool("-is_backward_Euler", is_backward_Euler);
   SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
