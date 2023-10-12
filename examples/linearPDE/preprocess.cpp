@@ -128,8 +128,8 @@ int main( int argc, char * argv[] )
   }
 
   // Setup Nodal (Dirichlet type) boundary condition(s)
-  std::vector<INodalBC *> NBC_list( dofNum, nullptr );
-  for(int ii = 0; ii < dofNum; ++ii)
+  std::vector<INodalBC *> NBC_list( dofMat, nullptr );
+  for(int ii = 0; ii < dofMat; ++ii)
   {
     NBC_list[ii] = new NodalBC( paras["Dirichlet"][ii].as<std::vector<std::string>>(), nFunc );
   }
@@ -203,7 +203,7 @@ int main( int argc, char * argv[] )
   cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<endl;
 
   // Finalize the code and exit
-  for(auto it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc) delete *it_nbc;
+  for(auto &it_nbc : NBC_list ) delete it_nbc;
 
   delete mytimer;
   delete ebc; delete global_part; delete mnindex; delete IEN; delete mesh;
