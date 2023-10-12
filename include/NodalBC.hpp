@@ -50,7 +50,7 @@ class NodalBC : public INodalBC
     NodalBC( const std::vector<std::string> &vtkfileList,
         const int &nFunc, const int &type );
 
-    virtual ~NodalBC();
+    virtual ~NodalBC() = default;
 
     virtual unsigned int get_dir_nodes(const unsigned int &ii) const
     {return dir_nodes[ii];}
@@ -66,11 +66,11 @@ class NodalBC : public INodalBC
     virtual unsigned int get_num_per_nodes() const {return num_per_nodes;}
 
   private:
-    std::vector<unsigned int> dir_nodes;
-    unsigned int num_dir_nodes;
+    std::vector<unsigned int> dir_nodes {};
+    unsigned int num_dir_nodes {};
 
-    std::vector<unsigned int> per_slave_nodes, per_master_nodes;
-    unsigned int num_per_nodes;
+    std::vector<unsigned int> per_slave_nodes {}, per_master_nodes {};
+    unsigned int num_per_nodes {};
     
     NodalBC() = delete;
 
