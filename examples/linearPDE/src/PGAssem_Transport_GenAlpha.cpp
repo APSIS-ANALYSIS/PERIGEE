@@ -1,6 +1,6 @@
-#include "PGAssem_Tet_Transport_GenAlpha.hpp"
+#include "PGAssem_Transport_GenAlpha.hpp"
 
-PGAssem_Tet_Transport_GenAlpha::PGAssem_Tet_Transport_GenAlpha(
+PGAssem_Transport_GenAlpha::PGAssem_Transport_GenAlpha(
     IPLocAssem * const &locassem_ptr,
     const IAGlobal_Mesh_Info * const &agmi_ptr,
     const ALocal_Elem * const &alelem_ptr,
@@ -50,14 +50,14 @@ PGAssem_Tet_Transport_GenAlpha::PGAssem_Tet_Transport_GenAlpha(
 }
 
 
-PGAssem_Tet_Transport_GenAlpha::~PGAssem_Tet_Transport_GenAlpha()
+PGAssem_Transport_GenAlpha::~PGAssem_Transport_GenAlpha()
 {
   VecDestroy(&G);
   MatDestroy(&K);
 }
 
 
-void PGAssem_Tet_Transport_GenAlpha::EssBC_KG( 
+void PGAssem_Transport_GenAlpha::EssBC_KG( 
     const ALocal_NBC * const &nbc_part )
 {
   const int field = 0;
@@ -89,7 +89,7 @@ void PGAssem_Tet_Transport_GenAlpha::EssBC_KG(
 }
 
 
-void PGAssem_Tet_Transport_GenAlpha::EssBC_G( 
+void PGAssem_Transport_GenAlpha::EssBC_G( 
     const ALocal_NBC * const &nbc_part )
 {
   const int field = 0;
@@ -115,7 +115,7 @@ void PGAssem_Tet_Transport_GenAlpha::EssBC_G(
 }
 
 
-void PGAssem_Tet_Transport_GenAlpha::Assem_nonzero_estimate(
+void PGAssem_Transport_GenAlpha::Assem_nonzero_estimate(
     const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
     const ALocal_IEN * const &lien_ptr,
@@ -152,7 +152,7 @@ void PGAssem_Tet_Transport_GenAlpha::Assem_nonzero_estimate(
   VecAssemblyEnd(G);
 }
 
-void PGAssem_Tet_Transport_GenAlpha::NatBC_G( 
+void PGAssem_Transport_GenAlpha::NatBC_G( 
     const double &curr_time, const double &dt,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
@@ -193,7 +193,7 @@ void PGAssem_Tet_Transport_GenAlpha::NatBC_G(
   delete [] srow_index; srow_index = nullptr;
 }
 
-void PGAssem_Tet_Transport_GenAlpha::Assem_residual(
+void PGAssem_Transport_GenAlpha::Assem_residual(
     const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     const double &curr_time,
@@ -263,7 +263,7 @@ void PGAssem_Tet_Transport_GenAlpha::Assem_residual(
   VecAssemblyEnd(G);
 }
 
-void PGAssem_Tet_Transport_GenAlpha::Assem_tangent_residual(
+void PGAssem_Transport_GenAlpha::Assem_tangent_residual(
     const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     const double &curr_time,
@@ -337,7 +337,7 @@ void PGAssem_Tet_Transport_GenAlpha::Assem_tangent_residual(
   VecAssemblyEnd(G);
 }
 
-void PGAssem_Tet_Transport_GenAlpha::Assem_mass_residual(
+void PGAssem_Transport_GenAlpha::Assem_mass_residual(
     const PDNSolution * const &sol,
     const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
