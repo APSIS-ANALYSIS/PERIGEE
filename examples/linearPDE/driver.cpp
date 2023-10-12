@@ -27,6 +27,7 @@
 int main(int argc, char *argv[])
 {
   int nqp_vol = 5, nqp_sur = 4;
+  int nqp_vol_1D = 2, nqp_sur_1D = 2;
 
   // generalized-alpha rho_inf
   double genA_rho_inf = 0.5;
@@ -62,6 +63,10 @@ int main(int argc, char *argv[])
   double restart_step = 1.0e-3; // restart simulation time step size
   std::string restart_name = "SOL_"; // restart solution base name
 
+  // Yaml options
+  bool is_loadYaml = true;
+  std::string yaml_file("./linearPDE_input.yml");
+
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
   
   const PetscMPIInt rank = SYS_T::get_MPI_rank();
@@ -69,13 +74,21 @@ int main(int argc, char *argv[])
 
   SYS_T::print_perigee_art();
 
+  // ===== Yaml Arguments =====
+  SYS_T::GetOptionBool("-is_loadYaml", is_loadYaml);
+  SYS_T::GetOptionString("-yaml_file", yaml_file);
+
+  if (is_loadYaml) SYS_T::InsertFileYAML( yaml_file,  false );
+
   // ===== Read Command Line Arguments =====
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
 
   SYS_T::GetOptionInt("-nqp_vol", nqp_vol);
   SYS_T::GetOptionInt("-nqp_sur", nqp_sur);
+  SYS_T::GetOptionInt("-nqp_vol_1d", nqp_vol_1d);
+  SYS_T::GetOptionInt("-nqp_sur_1d", nqp_sur_1d);
   SYS_T::GetOptionReal("-rho_inf", genA_rho_inf);
-  SYS_T::GetOptionBool(  "-is_backward_Euler", is_backward_Euler);
+  SYS_T::GetOptionBool("-is_backward_Euler", is_backward_Euler);
   SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
   SYS_T::GetOptionString("-part_file", part_file);
   SYS_T::GetOptionReal("-nl_rtol", nl_rtol);
@@ -100,6 +113,8 @@ int main(int argc, char *argv[])
   // ===== Print Command Line Arguments =====
   SYS_T::cmdPrint("-nqp_vol:", nqp_vol);
   SYS_T::cmdPrint("-nqp_sur:", nqp_sur);
+  SYS_T::cmdPrint("-nqp_vol_1d", nqp_vol_1D);
+  SYS_T::cmdPrint("-nqp_sur_1d", nqp_sur_1D);
   if( is_backward_Euler )
     SYS_T::commPrint(   "-is_backward_Euler: true \n");
   else
@@ -201,26 +216,31 @@ int main(int argc, char *argv[])
   }
   else if( GMIptr->get_elemType() == 601 )
   {
-    elementv = new FEAElement_Hex8( nqp_vol ); // elem type 601
-    elements = new FEAElement_Quad4_3D_der0( nqp_sur );
-    int nqp_vol_1D = std::round( std::cbrt( nqp_vol ) );
-    int nqp_sur_1D = std::round( std::sqrt( nqp_sur ) );
+    SYS_T::print_fatal_if( nqp_vol_1D < 2, "Error: not enough quadrature points for hex.\n" );
+    SYS_T::print_fatal_if( nqp_sur_1D < 1, "Error: not enough quadrature points for quad.\n" );
+
+    elementv = new FEAElement_Hex8( nqp_vol_1D * nqp_vol_1D * nqp_sur_1D ); // elem type 601
+    elements = new FEAElement_Quad4_3D_der0( nqp_sur_1D * nqp_sur_1D );
     quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
     quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
   }
   else if( GMIptr->get_elemType() == 602 )
   {
-    SYS_T::print_fatal_if( nqp_vol < 8, "Error: not enough quadrature points for hex.\n" );
-    SYS_T::print_fatal_if( nqp_sur < 4, "Error: not enough quadrature points for quad.\n" );
+    SYS_T::print_fatal_if( nqp_vol_1D < 4, "Error: not enough quadrature points for hex.\n" );
+    SYS_T::print_fatal_if( nqp_sur_1D < 3, "Error: not enough quadrature points for quad.\n" );
 
-    elementv = new FEAElement_Hex27( nqp_vol ); // elem type 602
-    elements = new FEAElement_Quad9_3D_der0( nqp_sur );
-    int nqp_vol_1D = std::round( std::cbrt( nqp_vol ) );
-    int nqp_sur_1D = std::round( std::sqrt( nqp_sur ) );
+    elementv = new FEAElement_Hex27( nqp_vol_1D * nqp_vol_1D * nqp_sur_1D ); // elem type 602
+    elements = new FEAElement_Quad9_3D_der0( nqp_sur_1D * nqp_sur_1D );
     quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
     quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
   }
   else SYS_T::print_fatal("Error: Element type not supported.\n");
+
+  // print the information of element and quadrature rule
+  elementv->print_info();
+  elements->print_info();
+  quadv->print_info();
+  quads->print_info();
 
   // ===== Generate a sparse matrix for the enforcement of essential BCs
   Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
