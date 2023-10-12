@@ -19,12 +19,6 @@ int main( int argc, char * argv[] )
   SYS_T::execute("rm -rf preprocessor_cmd.h5");
   SYS_T::execute("rm -rf apart");
   SYS_T::execute("mkdir apart");
-  
-  // Define the partition file name 
-  const std::string part_file("./apart/part");
-
-  // Mesh partition setting
-  bool isDualGraph = true;
 
   const std::string yaml_file("preprocess.yml");
 
@@ -38,12 +32,33 @@ int main( int argc, char * argv[] )
   const int elemType           = paras["elem_type"].as<int>();
   const int dofNum             = paras["dof_num"].as<int>();
   const int dofMat             = paras["dof_mat"].as<int>();
+  const bool isDualGraph       = paras["is_dualgraph"].as<bool>();
   const std::string geo_file   = paras["geo_file"].as<std::string>();
+  const std::string part_file  = paras["part_file"].as<std::string>();
+  const std::vector<std::string> neu_list = paras["Neumann"].as<std::vector<std::string>>();
+  const std::vector<std::vector<std::string>> dir_list = paras["Dirichlet"].as<std::vector<std::vector<std::string>>>();
 
+  // Check if the element type is valid
   if( elemType != 501 && elemType != 502 && elemType != 601 && elemType != 602 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
   
+  // Check if the vtu geometry files exist on disk
+  SYS_T::file_check(geo_file);
+  
+  // Check if the dof of Dirichlet BCs equals the dof of matrix problem
+  SYS_T::print_fatal_if( dir_list.size() != dofMat, "Error: the dof of Dirichlet BCs(%d) does not equals the dof of the matrix problem(%d) \n", dir_list.size(), dofMat);
+
+  // Check if the geometry file(s) of Dirichlet BC(s) exists
+  for(int ii = 0; ii < dofMat; ++ii)
+  {
+    for(int jj = 0; jj < dir_list[ii].size(); ++ii)
+      SYS_T::file_check( dir_list[ii][jj] );
+  }
+
+  // Check if the geometry file(s) of Neumann BC(s) exists
+  for(int jj = 0; jj < neu_list.size(); ++jj) SYS_T::file_check( neu_list[jj] );
+  
   // Print the command line arguments
-  std::cout << "==== Command Line Arguments ====" << std::endl;
+  std::cout << "======== Command Line Arguments  ========" << std::endl;
   std::cout << " -elem_type: "        << elemType          << std::endl;
   std::cout << " -geo_file: "         << geo_file          << std::endl;
   std::cout << " -part_file: "        << part_file         << std::endl;
@@ -52,10 +67,21 @@ int main( int argc, char * argv[] )
   std::cout << " -dof_mat: "          << dofMat            << std::endl;
   std::cout << " -in_ncommon: "       << in_ncommon        << std::endl;
   std::cout << " -isDualGraph: "      << isDualGraph       << std::endl;
-  std::cout << "====  Command Line Arguments/ ===="<<std::endl;
-  
-  // Check if the vtu geometry files exist on disk
-  SYS_T::file_check(geo_file); std::cout<<geo_file<<" found. \n";
+  std::cout << "=========================================" << std::endl;
+
+  // Print the boundary conditions
+  std::cout << "====  Dirichlet Boundary Conditions  ====" << std::endl;
+  for(int ii = 0; ii < dir_list.size(); ++ii)
+  {
+    std::cout << "  DOF " << ii << ":" << std::endl;
+    for(int jj = 0; jj < dir_list[ii].size(); ++jj)
+      std::cout << "    " << dir_list[ii][jj] << std::endl;
+  }
+  std::cout << "=========================================" << std::endl;
+  std::cout << "=====  Neumann Boundary Conditions  =====" << std::endl;
+  for(int jj = 0; jj < neu_list.size(); ++jj)
+      std::cout << "    " << neu_list[jj] << std::endl;
+  std::cout << "=========================================" << std::endl;
 
   // Record the problem setting into a HDF5 file: preprocessor_cmd.h5
   hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
@@ -117,29 +143,13 @@ int main( int argc, char * argv[] )
   Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, mesh->get_nFunc());
   mnindex->write_hdf5("node_mapping");
 
-  // Check if the dof of Dirichlet BC(s) equals dofNum
-  SYS_T::print_fatal_if( paras["Dirichlet"].size() != dofNum, "Error: the dof of Dirichlet BCs(%d) does not equals the dof of problem(%d) \n", paras["Dirichlet"].size(), dofNum);
-
-  // Check if the geometry file(s) of Dirichlet BC(s) exists
-  for(int ii = 0; ii < dofNum; ++ii)
-  {
-    for(int jj = 0; jj < paras["Dirichlet"][ii].size(); ++ii)
-      SYS_T::file_check( paras["Dirichlet"][ii][jj].as<std::string>() );
-  }
-
   // Setup Nodal (Dirichlet type) boundary condition(s)
   std::vector<INodalBC *> NBC_list( dofMat, nullptr );
   for(int ii = 0; ii < dofMat; ++ii)
-  {
-    NBC_list[ii] = new NodalBC( paras["Dirichlet"][ii].as<std::vector<std::string>>(), nFunc );
-  }
-
-  // Check if the geometry file(s) of Neumann BC(s) exists
-  for(int jj = 0; jj < paras["Neumann"].size(); ++jj)
-    SYS_T::file_check( paras["Neumann"][jj].as<std::string>() );
+    NBC_list[ii] = new NodalBC( dir_list[ii], nFunc );
   
   // Setup Elemental (Neumann type) boundary condition(s)
-  ElemBC * ebc = new ElemBC_3D( paras["Neumann"].as<std::vector<std::string>>(), elemType );
+  ElemBC * ebc = new ElemBC_3D( neu_list, elemType );
   ebc -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
   
   // Start partition the mesh for each cpu_rank
