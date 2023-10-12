@@ -31,7 +31,7 @@ class DataVecStr
  
     DataVecStr() { data = {}; name = "undefined"; object = AssociateObject::Node; }
 
-    virtual ~DataVecStr() {};
+    virtual ~DataVecStr() = default;
 
     DataVecStr<T>& operator= ( const DataVecStr<T> &input )
     {
