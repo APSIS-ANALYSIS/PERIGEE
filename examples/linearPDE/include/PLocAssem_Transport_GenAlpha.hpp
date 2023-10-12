@@ -15,7 +15,7 @@ class PLocAssem_Transpoet_GenAlpha : public IPLocAssem
         const double &in_rho, const double &in_cap, const double &in_kappa,
         const TimeMethod_GenAlpha * const &tm_gAlpha,
         const int &in_nlocbas, const int &in_snlocbas,
-        const int &in_num_ebc_fun, const int &elemtype = 501 );
+        const int &in_num_ebc_fun );
 
     virtual ~PLocAssem_Transpoet_GenAlpha();
 

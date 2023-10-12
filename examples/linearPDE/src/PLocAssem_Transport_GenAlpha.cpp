@@ -4,33 +4,11 @@ PLocAssem_Transport_GenAlpha::PLocAssem_Transport_GenAlpha(
     const double &in_rho, const double &in_cap, const double &in_kappa,
     const TimeMethod_GenAlpha * const &tm_gAlpha,
     const int &in_nlocbas, const int &in_snlocbas, 
-    const int &in_num_ebc_fun, const int &elemtype )
+    const int &in_num_ebc_fun )
 : rho( in_rho ), cap( in_cap ), kappa( in_kappa ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()), num_ebc_fun( in_num_ebc_fun )
 {
-  if(elemtype == 501)
-  {
-    // 501 is linear tet element
-    nLocBas = 4; snLocBas = 3;
-  }
-  else if(elemtype == 502)
-  {
-    // 502 is quadratic tet element
-    nLocBas = 10; snLocBas = 6;
-  }
-  else if(elemtype == 601)
-  {
-    // 601 is tri-linear hex element
-    nLocBas = 8; snLocBas = 4;
-  }
-  else if(elemtype == 602)
-  {
-    // 602 is tri-quadratic hex element
-    nLocBas = 27; snLocBas = 9;
-  }
-  else SYS_T::print_fatal("Error: unknown elem type.\n");
-
   vec_size = nLocBas * 1;
   sur_size = snLocBas * 1;
 
@@ -69,6 +47,10 @@ void PLocAssem_Transport_GenAlpha::print_info() const
     SYS_T::commPrint("  FEM: 4-node Tetrahedral element \n");
   else if(nLocBas == 10)
     SYS_T::commPrint("  FEM: 10-node Tetrahedral element \n");
+  else if(nLocBas == 8)
+    SYS_T::commPrint("  FEM: 8-node Hexahedral element \n");
+  else if(nLocBas == 27)
+    SYS_T::commPrint("  FEM: 27-node Hexahedral element \n");
   else SYS_T::print_fatal("Error: unknown elem type.\n");
   SYS_T::commPrint("  Spatial: finite element \n");
   SYS_T::commPrint("  Temporal: Generalized-alpha Method \n");
@@ -127,7 +109,6 @@ void PLocAssem_Transport_GenAlpha::Assem_Residual(
     }
   }
 }
-
 
 void PLocAssem_Transport_GenAlpha::Assem_Tangent_Residual(
     const double &time, const double &dt,
@@ -190,7 +171,6 @@ void PLocAssem_Transport_GenAlpha::Assem_Tangent_Residual(
     }
   } // End-of-quadrature-loop
 }
-
 
 void PLocAssem_Transport_GenAlpha::Assem_Mass_Residual(
     const double * const &sol,
