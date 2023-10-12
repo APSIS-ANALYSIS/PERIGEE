@@ -1,27 +1,27 @@
-#ifndef PLOCASSEM_LINEARPDE_GENALPHA_HPP
-#define PLOCASSEM_LINEARPDE_GENALPHA_HPP
+#ifndef PLOCASSEM_TRANSPORT_GENALPHA_HPP
+#define PLOCASSEM_TRANSPORT_GENALPHA_HPP
 // ============================================================================
-// PLocAssem_LinearPDE_GenAlpha.hpp
+// PLocAssem_Transpoet_GenAlpha.hpp
 //
 // Date: Jan 21 2022
 // ============================================================================
 #include "IPLocAssem.hpp"
 #include "TimeMethod_GenAlpha.hpp"
 
-class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem
+class PLocAssem_Transpoet_GenAlpha : public IPLocAssem
 {
   public:
-    PLocAssem_LinearPDE_GenAlpha( 
+    PLocAssem_Transpoet_GenAlpha( 
         const double &in_rho, const double &in_cap, const double &in_kappa,
         const TimeMethod_GenAlpha * const &tm_gAlpha,
         const int &in_nlocbas, const int &in_snlocbas,
         const int &in_num_ebc_fun, const int &elemtype = 501 );
 
-    virtual ~PLocAssem_LinearPDE_GenAlpha();
+    virtual ~PLocAssem_Transpoet_GenAlpha();
 
-    virtual int get_dof() const {return 3;}
+    virtual int get_dof() const {return 1;}
 
-    virtual int get_dof_mat() const {return 3;}
+    virtual int get_dof_mat() const {return 1;}
 
     virtual void Zero_Tangent_Residual()
     {
@@ -37,7 +37,6 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem
     virtual void Zero_sur_Tangent_Residual()
     {
       for(int ii=0; ii<sur_size; ++ii) sur_Residual[ii] = 0.0;
-      for(int ii=0; ii<sur_size*sur_size; ++ii) sur_Tangent[ii] = 0.0;
     }
 
     virtual void Zero_sur_Residual()
@@ -111,7 +110,7 @@ class PLocAssem_LinearPDE_GenAlpha : public IPLocAssem
       return 4*cap*rho*t3*x*y*z*(x - 1)*(y - 1)*(z - 1) - 2*kappa*t4*x*z*(x - 1)*(z - 1) - 2*kappa*t4*y*z*(y - 1)*(z - 1) - 2*kappa*t4*x*y*(x - 1)*(y - 1); 
     }
 
-    typedef double ( PLocAssem_LinearPDE_GenAlpha::*locassem_transport_funs )( const Vector_3 &pt, const double &t ) const;
+    typedef double ( PLocAssem_Transpoet_GenAlpha::*locassem_transport_funs )( const Vector_3 &pt, const double &t ) const;
 
     locassem_transport_funs * flist;
 
