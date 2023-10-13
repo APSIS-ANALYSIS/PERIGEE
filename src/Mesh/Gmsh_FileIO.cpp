@@ -8,6 +8,7 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
   // Set number of threads
 #ifdef _OPENMP
   omp_set_num_threads( PERIGEE_OMP_NUM_THREADS );
+  SYS_T::print_omp_info();
 #endif
 
   // Setup the file instream
