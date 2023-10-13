@@ -15,6 +15,12 @@ Part_FEM::Part_FEM(
   probDim(3), dofNum( in_dofNum ), dofMat( in_dofMat ), 
   elemType(in_elemType)
 {
+  // Set number of threads and  print info of OpenMP
+#ifdef _OPENMP
+  omp_set_num_threads( PERIGEE_OMP_NUM_THREADS );
+  SYS_T::print_omp_info();
+#endif
+
   // Initialize group 3 data
   cpu_rank = in_cpu_rank;
   cpu_size = in_cpu_size;
@@ -157,21 +163,28 @@ void Part_FEM::Generate_Partition( const IMesh * const &mesh,
   std::cout<<"-- proc "<<cpu_rank<<" local element number: "<<elem_loc.size()<<std::endl;
 
   // 2. Reorder node_loc
+  PERIGEE_OMP_PARALLEL_FOR
   for( int ii=0; ii<nlocalnode; ++ii ) 
     node_loc[ii] = mnindex->get_old2new( node_loc[ii] );
 
   // 3. Generate node_tot, which stores the nodes needed by the elements in the subdomain
   std::vector<int> node_tot {};
-  for( int e=0; e<nlocalele; ++e )
+  PERIGEE_OMP_PARALLEL
   {
-    for( int ii=0; ii<nLocBas; ++ii )
+    std::vector<int> temp_node_tot {};
+    PERIGEE_OMP_FOR
+    for( int e=0; e<nlocalele; ++e )
     {
-      int temp_node = IEN->get_IEN(elem_loc[e], ii);
-      temp_node = mnindex->get_old2new(temp_node);
-      node_tot.push_back( temp_node );
+      for( int ii=0; ii<nLocBas; ++ii )
+      {
+        int temp_node = IEN->get_IEN(elem_loc[e], ii);
+        temp_node = mnindex->get_old2new(temp_node);
+        temp_node_tot.push_back( temp_node );
+      }
     }
+    PERIGEE_OMP_CRITICAL
+    VEC_T::insert_end(node_tot, temp_node_tot);
   }
-
   VEC_T::sort_unique_resize( node_tot );
 
   ntotalnode = VEC_T::get_size( node_tot );
@@ -231,6 +244,7 @@ void Part_FEM::Generate_Partition( const IMesh * const &mesh,
   LIEN = new int * [nlocalele];
   for(int ee=0; ee<nlocalele; ++ee) LIEN[ee] = new int [nLocBas];
 
+  PERIGEE_OMP_PARALLEL_FOR
   for(int ee=0; ee<nlocalele; ++ee)
   {
     for(int ii=0; ii<nLocBas; ++ii)
