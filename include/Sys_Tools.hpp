@@ -21,6 +21,7 @@
 #define PERIGEE_OMP_PARALLEL _Pragma("omp parallel")
 #define PERIGEE_OMP_FOR _Pragma("omp for")
 #define PERIGEE_OMP_CRITICAL _Pragma("omp critical")
+#define PERIGEE_OMP_NUM_THREADS 16
 #else
 #define PERIGEE_OMP_PARALLEL_FOR
 #define PERIGEE_OMP_PARALLEL
