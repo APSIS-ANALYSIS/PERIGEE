@@ -165,4 +165,17 @@ TARGET_LINK_LIBRARIES( vis_ns perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_p1_wss perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_p2_wss perigee_postprocess )
 
+# --------------------------------------
+# Link OpenMP libraries to Preprocess
+# --------------------------------------
+SET(OpenMP_ROOT /Users/chongran/lib/lib-omp)
+find_package(OpenMP)
+if(OPENMP_CXX_FOUND)
+  include_directories( ${OpenMP_CXX_INCLUDE_DIR} )
+  TARGET_LINK_LIBRARIES( preprocess3d ${OpenMP_CXX_LIBRARIES} )
+  SET_SOURCE_FILES_PROPERTIES( preprocess3d.cpp COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
+  # SET_TARGET_PROPERTIES( preprocess3d PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP")
+  message(STATUS "Setting CMAKE_CXX_FLAGS for preprocess3d: ${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP")
+endif()
+
 # EOF
