@@ -68,11 +68,12 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 ADD_EXECUTABLE( gmsh2vtk gmsh2vtk.cpp)
 
 # 2. set OpenMP and link it to gmsh2vtk
-set(OpenMP_ROOT /Users/chongran/lib/lib-omp)
+SET(OpenMP_ROOT /Users/chongran/lib/lib-omp)
 find_package(OpenMP)
 if(OPENMP_CXX_FOUND)
+
   include_directories( ${OpenMP_CXX_INCLUDE_DIR} )
-  set(CMAKE_CXX_FLAGS "${OpenMP_CXX_FLAGS} -DUSE_OPENMP")
+  SET(CMAKE_CXX_FLAGS "${OpenMP_CXX_FLAGS} -DUSE_OPENMP")
   TARGET_LINK_LIBRARIES( gmsh2vtk ${OpenMP_CXX_LIBRARIES} )
 endif()
 

@@ -145,6 +145,17 @@ ADD_EXECUTABLE( vis_ns vis_ns.cpp)
 ADD_EXECUTABLE( vis_p1_wss vis_p1_wss.cpp)
 ADD_EXECUTABLE( vis_p2_wss vis_p2_wss.cpp)
 
+# --------------------------------------
+# Link OpenMP libraries to Preprocess
+# --------------------------------------
+SET(OpenMP_ROOT /Users/chongran/lib/lib-omp)
+find_package(OpenMP)
+if(OPENMP_CXX_FOUND)
+  include_directories( ${OpenMP_CXX_INCLUDE_DIR} )
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP")
+  TARGET_LINK_LIBRARIES( perigee_preprocess ${OpenMP_CXX_LIBRARIES} )
+endif()
+
 #TARGET_LINK_LIBRARIES( gmsh_p1_IO perigee_preprocess )
 #TARGET_LINK_LIBRARIES( gmsh_p2_IO perigee_preprocess )
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
