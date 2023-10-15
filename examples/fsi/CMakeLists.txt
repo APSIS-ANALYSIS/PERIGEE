@@ -192,10 +192,8 @@ SET(OpenMP_ROOT /Users/chongran/lib/lib-omp)
 find_package(OpenMP)
 if(OPENMP_CXX_FOUND)
   include_directories( ${OpenMP_CXX_INCLUDE_DIR} )
-  TARGET_LINK_LIBRARIES( preprocess_fsi ${OpenMP_CXX_LIBRARIES} )
-  SET_SOURCE_FILES_PROPERTIES( preprocess_fsi.cpp COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
-  # SET_TARGET_PROPERTIES( preprocess_fsi PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP")
-  message(STATUS "Setting CMAKE_CXX_FLAGS for preprocess_fsi: ${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP")
+  TARGET_LINK_LIBRARIES( perigee_preprocess ${OpenMP_CXX_LIBRARIES} )
 endif()
 
 #EOF
