@@ -28,7 +28,7 @@ NBC_Partition::NBC_Partition( const IPart * const &part,
     } // end jj-loop
 
     Num_LPS[ii] = 0; Num_LPM[ii] = 0;
-
+    PERIGEE_OMP_PARALLEL_FOR
     for(unsigned int jj=0; jj<nbc_list[ii]->get_num_per_nodes(); ++jj)
     {
       unsigned int node_ps = nbc_list[ii]->get_per_slave_nodes(jj);
@@ -59,7 +59,7 @@ NBC_Partition::NBC_Partition( const IPart * const &part,
   const int totnode = part->get_nlocghonode();
 
   LID.resize(totnode * dof);
-
+  PERIGEE_OMP_PARALLEL_FOR
   for(int ii=0; ii<dof; ++ii)
   {
     for(int jj=0; jj<totnode; ++jj)
@@ -69,7 +69,7 @@ NBC_Partition::NBC_Partition( const IPart * const &part,
       LID[ii*totnode + jj] = nbc_list[ii]->get_ID(old_index);
     }
   }
-
+  PERIGEE_OMP_PARALLEL_FOR
   for(int ii=0; ii<dof*totnode; ++ii)
   {
     if(LID[ii] != -1) LID[ii] = mnindex->get_old2new(LID[ii]);
