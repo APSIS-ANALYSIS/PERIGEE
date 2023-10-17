@@ -21,7 +21,6 @@ EBC_Partition_outflow::EBC_Partition_outflow(
       const std::vector<int> old_node_idx = ebc -> get_global_node(ii);
       
       LID_all_face_nodes[ii].resize( old_node_idx.size() * 3 );
-      PERIGEE_OMP_PARALLEL_FOR
       for(unsigned int jj=0; jj<old_node_idx.size(); ++jj)
       {
         int idx = nbc_list[1] -> get_ID( old_node_idx[jj] );
