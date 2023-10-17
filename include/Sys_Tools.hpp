@@ -22,7 +22,6 @@
 #define PERIGEE_OMP_FOR _Pragma("omp for")
 #define PERIGEE_OMP_CRITICAL _Pragma("omp critical")
 #define PERIGEE_OMP_SINGLE _Pragma("omp single")
-#define PERIGEE_OMP_NUM_THREADS 16
 #else
 #define PERIGEE_OMP_PARALLEL_FOR
 #define PERIGEE_OMP_PARALLEL
@@ -344,7 +343,7 @@ namespace SYS_T
       PERIGEE_OMP_SINGLE
       {
         std::cout<<"The number of threads used: "<<omp_get_num_threads()<<'\t';
-        std::cout<<"The number of processors in the machine: ";
+        std::cout<<"The number of processors on your machine: ";
         std::cout<<omp_get_num_procs()<<std::endl;
       }
     }

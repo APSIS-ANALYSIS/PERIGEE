@@ -15,12 +15,6 @@ Part_FEM::Part_FEM(
   probDim(3), dofNum( in_dofNum ), dofMat( in_dofMat ), 
   elemType(in_elemType)
 {
-  // Set number of threads and  print info of OpenMP
-#ifdef _OPENMP
-  omp_set_num_threads( PERIGEE_OMP_NUM_THREADS );
-  SYS_T::print_omp_info();
-#endif
-
   // Initialize group 3 data
   cpu_rank = in_cpu_rank;
   cpu_size = in_cpu_size;
