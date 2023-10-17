@@ -5,12 +5,6 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
     10, 27, 18, 14, 1, 8, 20, 15, 13, 9, 10, 12, 15, 15, 21, 
     4, 5, 6, 20, 35, 56 }}
 {
-  // Set number of threads
-#ifdef _OPENMP
-  omp_set_num_threads( PERIGEE_OMP_NUM_THREADS );
-  SYS_T::print_omp_info();
-#endif
-
   // Setup the file instream
   std::ifstream infile( filename.c_str(), std::ifstream::in );
 

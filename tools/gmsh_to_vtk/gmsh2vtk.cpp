@@ -9,6 +9,12 @@
 
 int main( int argc, char * argv[] )
 {
+    // Set number of threads
+#ifdef _OPENMP
+  omp_set_num_threads( omp_get_num_procs() );
+  SYS_T::print_omp_info();
+#endif
+
   const std::string input_yaml_file("example.yml");
   
   SYS_T::print_fatal_if( !SYS_T::file_exist( input_yaml_file ), "ERROR: the file %s does not exist on disk.\n", input_yaml_file.c_str() );

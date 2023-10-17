@@ -55,6 +55,9 @@ INCLUDE_DIRECTORIES( ../../include )
 # 1. Preprocess libs
 ADD_LIBRARY( perigee-mesh ${perigee_lib_src} )
 TARGET_LINK_LIBRARIES( perigee-mesh ${EXTRA_LINK_LIBS} )
+if(OPENMP_CXX_FOUND)
+  TARGET_LINK_LIBRARIES( perigee-mesh ${OpenMP_CXX_LIBRARIES} )
+endif()
 # -------------------------------------------------------------------
 
 # Print compiler setup
@@ -67,17 +70,8 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # 1.1 Preprocess
 ADD_EXECUTABLE( gmsh2vtk gmsh2vtk.cpp)
 
-# 2. set OpenMP and link it to gmsh2vtk
-SET(OpenMP_ROOT /Users/chongran/lib/lib-omp) # delete this line if using Linux
-find_package(OpenMP)
-if(OPENMP_CXX_FOUND)
-  include_directories( ${OpenMP_CXX_INCLUDE_DIR} )
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP")
-  TARGET_LINK_LIBRARIES( gmsh2vtk ${OpenMP_CXX_LIBRARIES} )
-endif()
-
 # -------------------------------------------------------------------
-# 3. Link libraries
+# 2. Link libraries
 TARGET_LINK_LIBRARIES( gmsh2vtk perigee-mesh )
 
 #EOF
