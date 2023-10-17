@@ -148,6 +148,9 @@ INCLUDE_DIRECTORIES( ./include )
 # 1. Preprocess libs
 ADD_LIBRARY( perigee_preprocess ${perigee_preprocess_lib_src} )
 TARGET_LINK_LIBRARIES( perigee_preprocess ${EXTRA_LINK_LIBS} )
+if(OPENMP_CXX_FOUND)
+  TARGET_LINK_LIBRARIES( perigee_preprocess ${OpenMP_CXX_LIBRARIES} )
+endif()
 
 # 2. Analysis libs
 ADD_LIBRARY( perigee_analysis ${perigee_analysis_lib_src} )
@@ -184,16 +187,5 @@ TARGET_LINK_LIBRARIES( vis_fsi ${EXTRA_LINK_LIBS} perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_fluid ${EXTRA_LINK_LIBS} perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_solid ${EXTRA_LINK_LIBS} perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_fsi_wss ${EXTRA_LINK_LIBS} perigee_postprocess )
-
-# --------------------------------------
-# Link OpenMP libraries to Preprocess
-# --------------------------------------
-SET(OpenMP_ROOT /Users/chongran/lib/lib-omp)
-find_package(OpenMP)
-if(OPENMP_CXX_FOUND)
-  include_directories( ${OpenMP_CXX_INCLUDE_DIR} )
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP")
-  TARGET_LINK_LIBRARIES( perigee_preprocess ${OpenMP_CXX_LIBRARIES} )
-endif()
 
 #EOF
