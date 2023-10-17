@@ -70,6 +70,7 @@ int main( int argc, char * argv[] )
   else if( eleType==9 )
   {
     GIO -> update_quadratic_tet_IEN(0);
+    if( isFSI ) GIO -> update_quadratic_tet_IEN(1);
     for( unsigned int ii=0; ii<nbc_face_id.size(); ++ii )
     {
       std::cout<<'\n'<<"=== nbc_face_name: "<<nbc_face_name[ii]<<'\t'; 
@@ -90,6 +91,7 @@ int main( int argc, char * argv[] )
   else if( eleType==10 )
   {
     GIO -> update_quadratic_hex_IEN(0);
+    if( isFSI ) GIO -> update_quadratic_hex_IEN(1);
     for( unsigned int ii=0; ii<nbc_face_id.size(); ++ii )
     {
       std::cout<<'\n'<<"=== nbc_face_name: "<<nbc_face_name[ii]<<'\t'; 
