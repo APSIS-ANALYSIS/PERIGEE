@@ -45,17 +45,17 @@ int main( int argc, char * argv[] )
   SYS_T::file_check(geo_file);
   
   // Check if the dof of Dirichlet BCs equals the dof of matrix problem
-  SYS_T::print_fatal_if( dir_list.size() != dofMat, "Error: the dof of Dirichlet BCs(%d) does not equals the dof of the matrix problem(%d) \n", dir_list.size(), dofMat);
+  SYS_T::print_fatal_if( static_cast<int>(dir_list.size()) != dofMat, "Error: the dof of Dirichlet BCs(%d) does not equals the dof of the matrix problem(%d) \n", dir_list.size(), dofMat);
 
   // Check if the geometry file(s) of Dirichlet BC(s) exists
   for(int ii = 0; ii < dofMat; ++ii)
   {
-    for(int jj = 0; jj < dir_list[ii].size(); ++jj)
+    for(int jj = 0; jj < static_cast<int>(dir_list[ii].size()); ++jj)
       SYS_T::file_check( dir_list[ii][jj] );
   }
 
   // Check if the geometry file(s) of Neumann BC(s) exists
-  for(int jj = 0; jj < neu_list.size(); ++jj) SYS_T::file_check( neu_list[jj] );
+  for(int jj = 0; jj < static_cast<int>(neu_list.size()); ++jj) SYS_T::file_check( neu_list[jj] );
   
   // Print the command line arguments
   std::cout << "======== Command Line Arguments  ========" << std::endl;
@@ -71,15 +71,15 @@ int main( int argc, char * argv[] )
 
   // Print the boundary conditions
   std::cout << "====  Dirichlet Boundary Conditions  ====" << std::endl;
-  for(int ii = 0; ii < dir_list.size(); ++ii)
+  for(int ii = 0; ii < static_cast<int>(dir_list.size()); ++ii)
   {
     std::cout << "  DOF " << ii << ":" << std::endl;
-    for(int jj = 0; jj < dir_list[ii].size(); ++jj)
+    for(int jj = 0; jj < static_cast<int>(dir_list[ii].size()); ++jj)
       std::cout << "    " << dir_list[ii][jj] << std::endl;
   }
   std::cout << "=========================================" << std::endl;
   std::cout << "=====  Neumann Boundary Conditions  =====" << std::endl;
-  for(int jj = 0; jj < neu_list.size(); ++jj)
+  for(int jj = 0; jj < static_cast<int>(neu_list.size()); ++jj)
       std::cout << "    " << neu_list[jj] << std::endl;
   std::cout << "=========================================" << std::endl;
 
