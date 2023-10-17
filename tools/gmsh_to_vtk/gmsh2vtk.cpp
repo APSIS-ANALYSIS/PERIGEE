@@ -117,7 +117,12 @@ int main( int argc, char * argv[] )
   }
   else SYS_T::print_fatal("Error: the element type of gmsh file cannot be read. \n");
 
-  if( isFSI ) GIO -> write_each_vtu();
+  if( isFSI )
+  {
+    const std::vector<std::string> vtu_file_name_list = config["phy_domain_name_list"].as<std::vector<std::string>>();
+    GIO -> write_each_vtu( vtu_file_name_list );
+  }
+
   const std::string wmname = config["wmname"].as<std::string>();
   const bool isXML = config["isXML"].as<bool>();
   GIO -> write_vtu( wmname, isXML );
