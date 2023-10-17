@@ -148,7 +148,7 @@ ADD_EXECUTABLE( vis_p2_wss vis_p2_wss.cpp)
 # --------------------------------------
 # Link OpenMP libraries to Preprocess
 # --------------------------------------
-SET(OpenMP_ROOT /Users/chongran/lib/lib-omp)
+SET(OpenMP_ROOT /Users/chongran/lib/lib-omp) # delete this line if using Linux
 find_package(OpenMP)
 if(OPENMP_CXX_FOUND)
   include_directories( ${OpenMP_CXX_INCLUDE_DIR} )
