@@ -351,6 +351,16 @@ namespace SYS_T
     std::cout<<"OPENMP is not invoked.\n";
 #endif
   }
+
+  // 5. set the number of threads used in openmp
+  inline void set_omp_num_threads()
+  {
+#ifdef _OPENMP
+    omp_set_num_threads( omp_get_num_procs() );
+#else
+    std::cout<<"No need to set number of threads.\n"<<std::endl;
+#endif
+  }
   
   // ================================================================
   // The following are system functions that access the system info.

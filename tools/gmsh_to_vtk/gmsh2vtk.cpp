@@ -9,11 +9,9 @@
 
 int main( int argc, char * argv[] )
 {
-    // Set number of threads
-#ifdef _OPENMP
-  omp_set_num_threads( omp_get_num_procs() );
+  // Set number of threads and  print info of OpenMP
   SYS_T::print_omp_info();
-#endif
+  SYS_T::set_omp_num_threads();
 
   const std::string input_yaml_file("example.yml");
   

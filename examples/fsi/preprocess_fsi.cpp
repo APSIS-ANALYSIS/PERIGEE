@@ -25,10 +25,8 @@
 int main( int argc, char * argv[] )
 {
   // Set number of threads and  print info of OpenMP
-#ifdef _OPENMP
-  omp_set_num_threads( omp_get_num_procs() );
-#endif
   SYS_T::print_omp_info();
+  SYS_T::set_omp_num_threads();
   
   // Remove previously existing hdf5 files
   if( SYS_T::directory_exist("apart") )
