@@ -342,9 +342,9 @@ namespace SYS_T
     {
       PERIGEE_OMP_SINGLE
       {
-        std::cout<<"The number of threads used: "<<omp_get_num_threads()<<'\t';
-        std::cout<<"The number of processors on your machine: ";
-        std::cout<<omp_get_num_procs()<<std::endl;
+        std::cout<<"The number of threads used: "<<omp_get_num_threads()<<", and ";
+        std::cout<<"the number of processors on the machine: ";
+        std::cout<<omp_get_num_procs()<<".\n";
       }
     }
 #else
