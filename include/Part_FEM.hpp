@@ -20,6 +20,8 @@
 class Part_FEM : public IPart
 {
   public:
+    Part_FEM() = default;
+
     Part_FEM( const IMesh * const &mesh,
         const IGlobal_Part * const &gpart,
         const Map_Node_Index * const &mnindex,
@@ -125,9 +127,6 @@ class Part_FEM : public IPart
         const Map_Node_Index * const &mnindex,
         const IIEN * const &IEN,
         const int &field = 0 );
-    
-    // Disallow default constructor
-    Part_FEM() = delete;
 };
 
 #endif
