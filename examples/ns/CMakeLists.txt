@@ -117,6 +117,10 @@ INCLUDE_DIRECTORIES( ./include )
 # -------------------------------------------------------------------
 # MAKE MY OWN LIBRARIES
 # 1. Preprocess libs
+if(OPENMP_CXX_FOUND)
+  SET_SOURCE_FILES_PROPERTIES( ${perigee_preprocess_lib_src} PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP")
+  SET_SOURCE_FILES_PROPERTIES( preprocess_ns.cpp PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP")
+endif()
 ADD_LIBRARY( perigee_preprocess ${perigee_preprocess_lib_src} )
 TARGET_LINK_LIBRARIES( perigee_preprocess ${EXTRA_LINK_LIBS} )
 if(OPENMP_CXX_FOUND)
