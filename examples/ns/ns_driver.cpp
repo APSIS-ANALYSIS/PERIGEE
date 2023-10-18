@@ -14,11 +14,17 @@
 #include "ALocal_EBC_outflow.hpp"
 #include "ALocal_InflowBC.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
+#include "QuadPts_Gauss_Quad.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
+#include "QuadPts_Gauss_Hex.hpp"
 #include "FEAElement_Tet4.hpp"
 #include "FEAElement_Tet10_v2.hpp"
+#include "FEAElement_Hex8.hpp"
+#include "FEAElement_Hex27.hpp"
 #include "FEAElement_Triangle3_3D_der0.hpp"
 #include "FEAElement_Triangle6_3D_der0.hpp"
+#include "FEAElement_Quad4_3D_der0.hpp"
+#include "FEAElement_Quad9_3D_der0.hpp"
 #include "CVFlowRate_Unsteady.hpp"
 #include "CVFlowRate_Linear2Steady.hpp"
 #include "GenBC_Resistance.hpp"
@@ -35,6 +41,10 @@ int main(int argc, char *argv[])
   // Number of quadrature points for tets and triangles
   // Suggested values: 5 / 4 for linear, 17 / 13 for quadratic
   int nqp_tet = 5, nqp_tri = 4;
+
+  // Number of quadrature points for hexs and quadrangles
+  // Suggested values: 2 / 2 for linear, 4 / 4 for quadratic
+  int nqp_vol_1D = 2, nqp_sur_1D = 2;
 
   // Estimate of the nonzero per row for the sparse matrix
   int nz_estimate = 300;
@@ -109,6 +119,8 @@ int main(int argc, char *argv[])
 
   SYS_T::GetOptionInt("-nqp_tet", nqp_tet);
   SYS_T::GetOptionInt("-nqp_tri", nqp_tri);
+  SYS_T::GetOptionInt("-nqp_vol_1d", nqp_vol_1D);
+  SYS_T::GetOptionInt("-nqp_sur_1d", nqp_sur_1D);
   SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
   SYS_T::GetOptionReal("-bs_beta", bs_beta);
   SYS_T::GetOptionReal("-rho_inf", genA_rho_inf);
@@ -143,6 +155,8 @@ int main(int argc, char *argv[])
   // ===== Print Command Line Arguments =====
   SYS_T::cmdPrint("-nqp_tet:", nqp_tet);
   SYS_T::cmdPrint("-nqp_tri:", nqp_tri);
+  SYS_T::cmdPrint("-nqp_vol_1d", nqp_vol_1D);
+  SYS_T::cmdPrint("-nqp_sur_1d", nqp_sur_1D);
   SYS_T::cmdPrint("-nz_estimate:", nz_estimate);
   SYS_T::cmdPrint("-bs_beta:", bs_beta);
   SYS_T::cmdPrint("-rho_inf:", genA_rho_inf);
@@ -260,15 +274,14 @@ int main(int argc, char *argv[])
 
   inflow_rate_ptr->print_info();
 
-  // ===== Quadrature rules =====
-  SYS_T::commPrint("===> Build quadrature rules. \n");
-  IQuadPts * quadv = new QuadPts_Gauss_Tet( nqp_tet );
-  IQuadPts * quads = new QuadPts_Gauss_Triangle( nqp_tri );
-
-  // ===== Finite Element Container =====
+  // ===== Finite Element Container & Quadrature rules =====
   SYS_T::commPrint("===> Setup element container. \n");
   FEAElement * elementv = nullptr;
   FEAElement * elements = nullptr;
+
+  SYS_T::commPrint("===> Build quadrature rules. \n");
+  IQuadPts * quadv = nullptr;
+  IQuadPts * quads = nullptr;
 
   if( GMIptr->get_elemType() == 501 )
   {
@@ -277,6 +290,8 @@ int main(int argc, char *argv[])
 
     elementv = new FEAElement_Tet4( nqp_tet ); // elem type 501
     elements = new FEAElement_Triangle3_3D_der0( nqp_tri );
+    quadv = new QuadPts_Gauss_Tet( nqp_tet );
+    quads = new QuadPts_Gauss_Triangle( nqp_tri );
   }
   else if( GMIptr->get_elemType() == 502 )
   {
@@ -285,6 +300,28 @@ int main(int argc, char *argv[])
 
     elementv = new FEAElement_Tet10_v2( nqp_tet ); // elem type 502
     elements = new FEAElement_Triangle6_3D_der0( nqp_tri );
+    quadv = new QuadPts_Gauss_Tet( nqp_tet );
+    quads = new QuadPts_Gauss_Triangle( nqp_tri );
+  }
+  else if( GMIptr->get_elemType() == 601 )
+  {
+    SYS_T::print_fatal_if( nqp_vol_1D < 2, "Error: not enough quadrature points for hex.\n" );
+    SYS_T::print_fatal_if( nqp_sur_1D < 1, "Error: not enough quadrature points for quad.\n" );
+
+    elementv = new FEAElement_Hex8( nqp_vol_1D * nqp_vol_1D * nqp_sur_1D ); // elem type 601
+    elements = new FEAElement_Quad4_3D_der0( nqp_sur_1D * nqp_sur_1D );
+    quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
+    quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
+  }
+  else if( GMIptr->get_elemType() == 602 )
+  {
+    SYS_T::print_fatal_if( nqp_vol_1D < 4, "Error: not enough quadrature points for hex.\n" );
+    SYS_T::print_fatal_if( nqp_sur_1D < 3, "Error: not enough quadrature points for quad.\n" );
+
+    elementv = new FEAElement_Hex27( nqp_vol_1D * nqp_vol_1D * nqp_sur_1D ); // elem type 602
+    elements = new FEAElement_Quad9_3D_der0( nqp_sur_1D * nqp_sur_1D );
+    quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
+    quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
   }
   else SYS_T::print_fatal("Error: Element type not supported.\n");
 
