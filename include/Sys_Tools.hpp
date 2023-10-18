@@ -334,10 +334,10 @@ namespace SYS_T
     }
   }
 
-#ifdef _OPENMP
   // 4. print the number of threads used in openmp
   inline void print_omp_info()
   {
+#ifdef _OPENMP
     PERIGEE_OMP_PARALLEL
     {
       PERIGEE_OMP_SINGLE
@@ -347,8 +347,11 @@ namespace SYS_T
         std::cout<<omp_get_num_procs()<<std::endl;
       }
     }
-  }
+#else
+    std::cout<<"OPENMP is not invoked.\n";
 #endif
+  }
+  
   // ================================================================
   // The following are system functions that access the system info.
   // ================================================================
