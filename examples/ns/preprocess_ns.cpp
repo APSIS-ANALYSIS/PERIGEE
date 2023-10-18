@@ -296,7 +296,7 @@ int main( int argc, char * argv[] )
   cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<endl;
 
   // Finalize the code and exit
-  for(auto it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc) delete *it_nbc;
+  for(auto &it_nbc:NBC_list) delete it_nbc;
 
   delete InFBC; delete ebc; delete mytimer;
   delete mnindex; delete global_part; delete mesh; delete IEN;
