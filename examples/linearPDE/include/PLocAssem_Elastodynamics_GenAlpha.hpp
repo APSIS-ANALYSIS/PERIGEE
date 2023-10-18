@@ -52,8 +52,6 @@ class PLocAssem_Elastodynamics_GenAlpha : public IPLocAssem
     virtual void Assem_Residual(
         const double &time, const double &dt,
         const double * const &dot_sol_velo,
-        const double * const &dot_sol_disp,
-        const double * const &sol_velo,
         const double * const &sol_disp,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
@@ -64,8 +62,6 @@ class PLocAssem_Elastodynamics_GenAlpha : public IPLocAssem
     virtual void Assem_Tangent_Residual(
         const double &time, const double &dt,
         const double * const &dot_sol_velo,
-        const double * const &dot_sol_disp,
-        const double * const &sol_velo
         const double * const &sol_disp,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
@@ -74,7 +70,6 @@ class PLocAssem_Elastodynamics_GenAlpha : public IPLocAssem
         const IQuadPts * const &quad );
 
     virtual void Assem_Mass_Residual(
-        const double * const &sol_velo,
         const double * const &sol_disp,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,

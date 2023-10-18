@@ -62,8 +62,6 @@ void PLocAssem_Elastodynamics_GenAlpha::print_info() const
 void PLocAssem_Elastodynamics_GenAlpha::Assem_Residual(
     const double &time, const double &dt,
     const double * const &dot_sol_velo,
-    const double * const &dot_sol_disp,
-    const double * const &sol_velo,
     const double * const &sol_disp,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
@@ -83,13 +81,13 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Residual(
 
   for(int qua=0; qua<nqp; ++qua)
   {
-    double ux_t = 0.0, ux_x = 0.0, ux_y = 0.0, ux_z = 0.0;
-    double uy_t = 0.0, uy_x = 0.0, uy_y = 0.0, uy_z = 0.0;
-    double uz_t = 0.0, uz_x = 0.0, uz_y = 0.0, uz_z = 0.0;
+    double ux_x = 0.0, ux_y = 0.0, ux_z = 0.0;
+    double uy_x = 0.0, uy_y = 0.0, uy_z = 0.0;
+    double uz_x = 0.0, uz_y = 0.0, uz_z = 0.0;
 
-    double vx = 0.0, vx_t = 0.0;
-    double vy = 0.0, vy_t = 0.0;
-    double vz = 0.0, vz_t = 0.0;
+    double vx_t = 0.0;
+    double vy_t = 0.0;
+    double vz_t = 0.0;
 
     Vector_3 coor(0.0, 0.0, 0.0);
 
@@ -98,10 +96,6 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Residual(
     for(int ii=0; ii<nLocBas; ++ii)
     {
       const int ii3 = 3 * ii;
-
-      ux_t += dot_sol_disp[ii3  ] * R[ii];
-      uy_t += dot_sol_disp[ii3+1] * R[ii];
-      uz_t += dot_sol_disp[ii3+2] * R[ii];
 
       ux_x += sol_disp[ii3  ] * dR_dx[ii];
       uy_x += sol_disp[ii3+1] * dR_dx[ii];
@@ -118,10 +112,6 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Residual(
       vx_t += dot_sol_velo[ii3  ] * R[ii];
       vy_t += dot_sol_velo[ii3+1] * R[ii];
       vz_t += dot_sol_velo[ii3+2] * R[ii];
-
-      vx += sol_velo[ii3  ] * R[ii];
-      vy += sol_velo[ii3+1] * R[ii];
-      vz += sol_velo[ii3+2] * R[ii];
       
       coor.x() += eleCtrlPts_x[ii] * R[ii];
       coor.y() += eleCtrlPts_y[ii] * R[ii];
@@ -160,9 +150,7 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Residual(
 void PLocAssem_Elastodynamics_GenAlpha::Assem_Tangent_Residual(
     const double &time, const double &dt,
     const double * const &dot_sol_velo,
-    const double * const &dot_sol_disp,
     const double * const &sol_disp,
-    const double * const &sol_velo,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
@@ -183,13 +171,13 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Tangent_Residual(
 
   for(int qua=0; qua<nqp; ++qua)
   {
-    double ux_t = 0.0, ux_x = 0.0, ux_y = 0.0, ux_z = 0.0;
-    double uy_t = 0.0, uy_x = 0.0, uy_y = 0.0, uy_z = 0.0;
-    double uz_t = 0.0, uz_x = 0.0, uz_y = 0.0, uz_z = 0.0;
+    double ux_x = 0.0, ux_y = 0.0, ux_z = 0.0;
+    double uy_x = 0.0, uy_y = 0.0, uy_z = 0.0;
+    double uz_x = 0.0, uz_y = 0.0, uz_z = 0.0;
 
-    double vx = 0.0, vx_t = 0.0;
-    double vy = 0.0, vy_t = 0.0;
-    double vz = 0.0, vz_t = 0.0;
+    double vx_t = 0.0;
+    double vy_t = 0.0;
+    double vz_t = 0.0;
     
     Vector_3 coor(0.0, 0.0, 0.0);
 
@@ -198,10 +186,6 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Tangent_Residual(
     for(int ii=0; ii<nLocBas; ++ii)
     {
       const int ii3 = 3 * ii;
-
-      ux_t += dot_sol_disp[ii3  ] * R[ii];
-      uy_t += dot_sol_disp[ii3+1] * R[ii];
-      uz_t += dot_sol_disp[ii3+2] * R[ii];
 
       ux_x += sol_disp[ii3  ] * dR_dx[ii];
       uy_x += sol_disp[ii3+1] * dR_dx[ii];
@@ -218,10 +202,6 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Tangent_Residual(
       vx_t += dot_sol_velo[ii3  ] * R[ii];
       vy_t += dot_sol_velo[ii3+1] * R[ii];
       vz_t += dot_sol_velo[ii3+2] * R[ii];
-
-      vx += sol_velo[ii3  ] * R[ii];
-      vy += sol_velo[ii3+1] * R[ii];
-      vz += sol_velo[ii3+2] * R[ii];
       
       coor.x() += eleCtrlPts_x[ii] * R[ii];
       coor.y() += eleCtrlPts_y[ii] * R[ii];
@@ -290,7 +270,6 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Tangent_Residual(
 }
 
 void PLocAssem_Elastodynamics_GenAlpha::Assem_Mass_Residual(
-    const double * const &sol_velo,
     const double * const &sol_disp,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
