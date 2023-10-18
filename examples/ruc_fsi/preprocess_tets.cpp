@@ -30,6 +30,12 @@
 
 int main( int argc, char * argv[] )
 {
+  // Set number of threads and  print info of OpenMP
+#ifdef _OPENMP
+  omp_set_num_threads( omp_get_num_procs() );
+  SYS_T::print_omp_info();
+#endif
+
   // Clean the potentially pre-existing hdf5 files in the job folder
   SYS_T::execute("rm -rf preprocessor_cmd.h5");
   SYS_T::execute("rm -rf apart"); 
