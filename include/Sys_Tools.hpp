@@ -358,7 +358,7 @@ namespace SYS_T
 #ifdef _OPENMP
     omp_set_num_threads( omp_get_num_procs() );
 #else
-    std::cout<<"No need to set number of threads.\n"<<std::endl;
+    std::cout<<"No need to set number of threads.\n";
 #endif
   }
   
