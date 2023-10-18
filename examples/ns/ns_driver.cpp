@@ -32,7 +32,7 @@
 #include "GenBC_Inductance.hpp"
 #include "GenBC_Coronary.hpp"
 #include "GenBC_Pressure.hpp"
-#include "PLocAssem_Tet_VMS_NS_GenAlpha.hpp"
+#include "PLocAssem_VMS_NS_GenAlpha.hpp"
 #include "PGAssem_NS_FEM.hpp"
 #include "PTime_NS_Solver.hpp"
 
@@ -339,7 +339,7 @@ int main(int argc, char *argv[])
   tm_galpha_ptr->print_info();
 
   // ===== Local Assembly routine =====
-  IPLocAssem * locAssem_ptr = new PLocAssem_Tet_VMS_NS_GenAlpha(
+  IPLocAssem * locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha(
       tm_galpha_ptr, GMIptr->get_nLocBas(),
       quadv->get_num_quadPts(), elements->get_nLocBas(),
       fluid_density, fluid_mu, bs_beta, c_ct, c_tauc, GMIptr->get_elemType() );
