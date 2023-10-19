@@ -265,9 +265,9 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Elastodynamics(
     nl_counter += 1;
 
     dot_velo->PlusAX( dot_step, -1.0 );
-    dot_disp->PlusAX( dot_step, - alpha_m / (alpha_f * gamma * dt) );
+    dot_disp->PlusAX( dot_step, - alpha_f * gamma * dt / alpha_m );
     velo->PlusAX( dot_step, - gamma * dt );
-    disp->PlusAX( dot_step, - alpha_m / alpha_f );
+    disp->PlusAX( dot_step, - alpha_f * gamma * gamma * dt * dt / alpha_m );
 
     dot_velo_alpha.PlusAX( dot_step, - alpha_m );
     disp_alpha.PlusAX( dot_step, - alpha_m );
