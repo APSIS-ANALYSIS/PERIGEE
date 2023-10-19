@@ -157,18 +157,18 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     // Private functions
     void print_info() const;
 
-    SymmTensor2_3D get_metric( const std::array<double, 9> &dxi_dx ) const;
+    SymmTensor2_3D get_metric( const std::array<double, 9> &dxi_dx, FEAElement * const &element ) const;
 
     // Return tau_m and tau_c in RB-VMS
     std::array<double, 2> get_tau( const double &dt, 
         const std::array<double, 9> &dxi_dx,
-        const double &u, const double &v, const double &w ) const;
+        const double &u, const double &v, const double &w, FEAElement * const &element ) const;
 
     // Return tau_bar := (v' G v')^-0.5 x rho0, 
     //        which scales like Time x Density
     // Users can refer to Int. J. Numer. Meth. Fluids 2001; 35: 93–116 for more details
     double get_DC( const std::array<double, 9> &dxi_dx,
-        const double &u, const double &v, const double &w ) const;
+        const double &u, const double &v, const double &w, FEAElement * const &element) const;
 
     Vector_3 get_f(const Vector_3 &pt, const double &tt) const
     {

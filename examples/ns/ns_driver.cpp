@@ -340,7 +340,7 @@ int main(int argc, char *argv[])
 
   // ===== Local Assembly routine =====
   IPLocAssem * locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha(
-      tm_galpha_ptr, GMIptr->get_nLocBas(),
+      tm_galpha_ptr, elementv->get_nLocBas(),
       quadv->get_num_quadPts(), elements->get_nLocBas(),
       fluid_density, fluid_mu, bs_beta, c_ct, c_tauc, GMIptr->get_elemType() );
 
