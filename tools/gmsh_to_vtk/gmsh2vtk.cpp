@@ -9,6 +9,10 @@
 
 int main( int argc, char * argv[] )
 {
+  // Set number of threads and  print info of OpenMP
+  SYS_T::print_omp_info();
+  SYS_T::set_omp_num_threads();
+
   const std::string input_yaml_file("input_gmsh2vtk.yml");
   
   SYS_T::print_fatal_if( !SYS_T::file_exist( input_yaml_file ), "ERROR: the file %s does not exist on disk.\n", input_yaml_file.c_str() );
@@ -70,6 +74,7 @@ int main( int argc, char * argv[] )
   else if( eleType==9 )
   {
     GIO -> update_quadratic_tet_IEN(0);
+    if( isFSI ) GIO -> update_quadratic_tet_IEN(1);
     for( unsigned int ii=0; ii<nbc_face_id.size(); ++ii )
     {
       std::cout<<'\n'<<"=== nbc_face_name: "<<nbc_face_name[ii]<<'\t'; 
@@ -90,6 +95,7 @@ int main( int argc, char * argv[] )
   else if( eleType==10 )
   {
     GIO -> update_quadratic_hex_IEN(0);
+    if( isFSI ) GIO -> update_quadratic_hex_IEN(1);
     for( unsigned int ii=0; ii<nbc_face_id.size(); ++ii )
     {
       std::cout<<'\n'<<"=== nbc_face_name: "<<nbc_face_name[ii]<<'\t'; 
@@ -109,7 +115,12 @@ int main( int argc, char * argv[] )
   }
   else SYS_T::print_fatal("Error: the element type of gmsh file cannot be read. \n");
 
-  if( isFSI ) GIO -> write_each_vtu();
+  if( isFSI )
+  {
+    const std::vector<std::string> vtu_file_name_list = config["phy_domain_name_list"].as<std::vector<std::string>>();
+    GIO -> write_each_vtu( vtu_file_name_list );
+  }
+
   const std::string wmname = config["wmname"].as<std::string>();
   const bool isXML = config["isXML"].as<bool>();
   GIO -> write_vtu( wmname, isXML );

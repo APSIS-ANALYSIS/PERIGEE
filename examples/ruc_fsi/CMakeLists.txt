@@ -69,10 +69,14 @@ SET( perigee_preprocess_lib_src
 
 SET( perigee_analysis_lib_src
   ${perigee_source}/System/PETSc_Tools.cpp
+  ${perigee_source}/System/Vector_3.cpp
   ${perigee_source}/System/Tensor2_3D.cpp
   ${perigee_source}/System/Matrix_PETSc.cpp
+  ${perigee_source}/System/HDF5_Writer.cpp
+  ${perigee_source}/System/HDF5_Reader.cpp
   ${perigee_source}/System/SymmTensor2_3D.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Tet.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
   ${perigee_source}/Analysis_Tool/AGlobal_Mesh_Info_FEM_3D.cpp
   ${perigee_source}/Analysis_Tool/APart_Basic_Info.cpp
   ${perigee_source}/Analysis_Tool/ALocal_Elem.cpp
@@ -85,11 +89,14 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/ALocal_EBC_wall.cpp
   ${perigee_source}/Analysis_Tool/APart_Node.cpp
   ${perigee_source}/Analysis_Tool/FEANode.cpp
+  ${perigee_source}/Element/FE_Tools.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
   ${perigee_source}/Element/FEAElement_Tet10_v2.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_membrane.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_membrane.cpp
   ${perigee_source}/Element/FEAElement_Triangle6.cpp  # only for testing
+  ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
   ${perigee_source}/Model/GenBC_RCR.cpp
   ${perigee_source}/Model/GenBC_Resistance.cpp
   ${perigee_source}/Model/GenBC_Inductance.cpp
@@ -114,6 +121,9 @@ SET( perigee_analysis_lib_src
 )
 
 SET( perigee_postprocess_lib_src
+  ${perigee_source}/Mesh/VTK_Tools.cpp
+  ${perigee_source}/Mesh/Tet_Tools.cpp
+  ${perigee_source}/Mesh/Hex_Tools.cpp
   ${perigee_source}/Mesh/QuadPts_vis_tri6.cpp
   ${perigee_source}/Mesh/QuadPts_vis_tet4.cpp
   ${perigee_source}/Mesh/QuadPts_vis_tet10_v2.cpp
@@ -124,10 +134,6 @@ SET( perigee_postprocess_lib_src
   ${perigee_SOURCE_DIR}/src/VTK_Writer_CMM.cpp
   )
 
-#SET( perigee_test_lib_src
-#  ${perigee_source}/Mesh/QuadPts_debug.cpp
-#  )
-  
 INCLUDE_DIRECTORIES( ./include )
 INCLUDE_DIRECTORIES( ../../include )
 
@@ -139,16 +145,11 @@ TARGET_LINK_LIBRARIES( perigee_preprocess ${EXTRA_LINK_LIBS} )
 
 # 2. Analysis libs
 ADD_LIBRARY( perigee_analysis ${perigee_analysis_lib_src} )
-TARGET_LINK_LIBRARIES( perigee_analysis ${EXTRA_LINK_LIBS} perigee_preprocess )
+TARGET_LINK_LIBRARIES( perigee_analysis ${EXTRA_LINK_LIBS} )
 
 # 3. Postprocess lib
 ADD_LIBRARY( perigee_postprocess ${perigee_postprocess_lib_src} )
-TARGET_LINK_LIBRARIES( perigee_postprocess ${EXTRA_LINK_LIBS} perigee_analysis
-  perigee_preprocess )
-
-# 4. Test lib
-#ADD_LIBRARY( perigee_test ${perigee_test_lib_src} )
-#TARGET_LINK_LIBRARIES( perigee_test ${EXTRA_LINK_LIBS} perigee_analysis )
+TARGET_LINK_LIBRARIES( perigee_postprocess ${EXTRA_LINK_LIBS} perigee_analysis )
 # -------------------------------------------------------------------
 
 # Print compiler setup
@@ -165,9 +166,6 @@ ADD_EXECUTABLE( vis_ruc       vis_ruc.cpp)
 ADD_EXECUTABLE( vis_p1_wss    vis_p1_wss.cpp)
 ADD_EXECUTABLE( vis_p2_wss    vis_p2_wss.cpp)
 
-#ADD_EXECUTABLE( test test.cpp )
-#ADD_EXECUTABLE( test_element  test_membrane_element_routine.cpp )
-
 TARGET_LINK_LIBRARIES( preprocess3d  perigee_preprocess )
 TARGET_LINK_LIBRARIES( ruc_tet_3d    perigee_analysis )
 TARGET_LINK_LIBRARIES( wall_solver   perigee_analysis )
@@ -176,7 +174,13 @@ TARGET_LINK_LIBRARIES( vis_ruc       perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_p1_wss    perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_p2_wss    perigee_postprocess )
 
-#TARGET_LINK_LIBRARIES( test perigee_preprocess )
-#TARGET_LINK_LIBRARIES( test_element  perigee_test )
+if(OPENMP_CXX_FOUND)
+  SET_TARGET_PROPERTIES( perigee_preprocess PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
+  SET_TARGET_PROPERTIES( preprocess3d PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
+  TARGET_INCLUDE_DIRECTORIES( perigee_preprocess PRIVATE ${OpenMP_CXX_INCLUDE_DIR} )
+  TARGET_INCLUDE_DIRECTORIES( preprocess3d PRIVATE ${OpenMP_CXX_INCLUDE_DIR} )
+  TARGET_LINK_LIBRARIES( perigee_preprocess ${OpenMP_CXX_LIBRARIES} )
+  TARGET_LINK_LIBRARIES( preprocess3d ${OpenMP_CXX_LIBRARIES} )
+endif()
 
 # EOF

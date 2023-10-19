@@ -21,11 +21,13 @@
 #define PERIGEE_OMP_PARALLEL _Pragma("omp parallel")
 #define PERIGEE_OMP_FOR _Pragma("omp for")
 #define PERIGEE_OMP_CRITICAL _Pragma("omp critical")
+#define PERIGEE_OMP_SINGLE _Pragma("omp single")
 #else
 #define PERIGEE_OMP_PARALLEL_FOR
 #define PERIGEE_OMP_PARALLEL
 #define PERIGEE_OMP_FOR
 #define PERIGEE_OMP_CRITICAL
+#define PERIGEE_OMP_SINGLE
 #endif
 
 #define PETSC_SILENCE_DEPRECATION_WARNINGS_3_19_0
@@ -332,6 +334,32 @@ namespace SYS_T
     }
   }
 
+  // 4. print the number of threads used in openmp
+  inline void print_omp_info()
+  {
+#ifdef _OPENMP
+    PERIGEE_OMP_PARALLEL
+    {
+      PERIGEE_OMP_SINGLE
+      {
+        std::cout<<"The number of threads used: "<<omp_get_num_threads()<<", and ";
+        std::cout<<"the number of processors on the machine: ";
+        std::cout<<omp_get_num_procs()<<".\n";
+      }
+    }
+#else
+    std::cout<<"OpenMP is not invoked.\n";
+#endif
+  }
+
+  // 5. set the number of threads used in openmp
+  inline void set_omp_num_threads()
+  {
+#ifdef _OPENMP
+    omp_set_num_threads( omp_get_num_procs() );
+#endif
+  }
+  
   // ================================================================
   // The following are system functions that access the system info.
   // ================================================================
