@@ -216,10 +216,6 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Elastodynamics(
   dot_disp -> ScaleValue( 1.0/alpha_m );
 
   // Define intermediate solutions
-  PDNSolution * dot_disp_alpha = new PDNSolution( pre_dot_disp ); 
-  dot_disp_alpha -> ScaleValue( 1.0 - alpha_m );
-  dot_disp_alpha -> PlusAX( dot_disp, alpha_m );
-
   PDNSolution * dot_velo_alpha = new PDNSolution( pre_dot_velo );
   dot_velo_alpha -> ScaleValue( 1.0 - alpha_m );
   dot_velo_alpha -> PlusAX( dot_velo, alpha_m );
@@ -227,10 +223,6 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Elastodynamics(
   PDNSolution * disp_alpha = new PDNSolution( pre_disp );
   disp_alpha -> ScaleValue( 1.0 - alpha_f );
   disp_alpha -> PlusAX( disp, alpha_f );
-
-  PDNSolution * velo_alpha = new PDNSolution( pre_velo );
-  velo_alpha -> ScaleValue( 1.0 - alpha_f );
-  velo_alpha -> PlusAX( velo, alpha_f );
 
   // If new_tangent_flag == TRUE, update the tangent matrix;
   // otherwise, use the matrix from the previous time step
@@ -278,8 +270,6 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Elastodynamics(
     disp->PlusAX( dot_step, - alpha_m / alpha_f );
 
     dot_velo_alpha.PlusAX( dot_step, - alpha_m );
-    dot_disp_alpha.PlusAX( dot_step, - alpha_m * alpha_m / (alpha_f *gamma * dt) );
-    velo_alpha.PlusAX( dot_step, - alpha_f * gamma * dt );
     disp_alpha.PlusAX( dot_step, - alpha_m );
 
     // Assembly residual (& tangent if condition satisfied)
