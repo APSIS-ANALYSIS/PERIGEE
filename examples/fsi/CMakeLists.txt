@@ -37,7 +37,6 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/System/Tensor2_3D.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
   ${perigee_source}/System/HDF5_Reader.cpp
-  ${perigee_source}/Mesh/Gmsh_FileIO.cpp
   ${perigee_source}/Mesh/VTK_Tools.cpp
   ${perigee_source}/Mesh/Tet_Tools.cpp
   ${perigee_source}/Mesh/Hex_Tools.cpp
@@ -74,6 +73,7 @@ SET( perigee_preprocess_lib_src
 SET( perigee_analysis_lib_src
   ${perigee_source}/System/PETSc_Tools.cpp
   ${perigee_source}/System/Matrix_PETSc.cpp
+  ${perigee_source}/System/Vector_3.cpp
   ${perigee_source}/System/Tensor2_3D.cpp
   ${perigee_source}/System/SymmTensor2_3D.cpp
   ${perigee_source}/System/Tensor4_3D.cpp
@@ -92,6 +92,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/APart_Node.cpp
   ${perigee_source}/Analysis_Tool/APart_Node_FSI.cpp
   ${perigee_source}/Analysis_Tool/FEANode.cpp
+  ${perigee_source}/Element/FE_Tools.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
   ${perigee_source}/Model/MaterialModel_NeoHookean_M94_Mixed.cpp
@@ -126,6 +127,9 @@ SET( perigee_analysis_lib_src
 
 # 3. Postprocess cpp
 SET( perigee_postprocess_lib_src
+  ${perigee_source}/Mesh/VTK_Tools.cpp
+  ${perigee_source}/Mesh/Tet_Tools.cpp
+  ${perigee_source}/Mesh/Hex_Tools.cpp
   ${perigee_source}/Postproc_Tool/PostVectSolution.cpp
   ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   ${perigee_source}/Postproc_Tool/Interpolater.cpp
@@ -148,13 +152,10 @@ INCLUDE_DIRECTORIES( ./include )
 # 1. Preprocess libs
 ADD_LIBRARY( perigee_preprocess ${perigee_preprocess_lib_src} )
 TARGET_LINK_LIBRARIES( perigee_preprocess ${EXTRA_LINK_LIBS} )
-if(OPENMP_CXX_FOUND)
-  TARGET_LINK_LIBRARIES( perigee_preprocess ${OpenMP_CXX_LIBRARIES} )
-endif()
 
 # 2. Analysis libs
 ADD_LIBRARY( perigee_analysis ${perigee_analysis_lib_src} )
-TARGET_LINK_LIBRARIES( perigee_analysis ${EXTRA_LINK_LIBS} perigee_preprocess )
+TARGET_LINK_LIBRARIES( perigee_analysis ${EXTRA_LINK_LIBS} )
 
 # 3. Postprocess lib
 ADD_LIBRARY( perigee_postprocess ${perigee_postprocess_lib_src} )
@@ -187,5 +188,14 @@ TARGET_LINK_LIBRARIES( vis_fsi ${EXTRA_LINK_LIBS} perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_fluid ${EXTRA_LINK_LIBS} perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_solid ${EXTRA_LINK_LIBS} perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_fsi_wss ${EXTRA_LINK_LIBS} perigee_postprocess )
+
+if(OPENMP_CXX_FOUND)
+  SET_TARGET_PROPERTIES( perigee_preprocess PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
+  SET_TARGET_PROPERTIES( preprocess_fsi PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
+  TARGET_INCLUDE_DIRECTORIES( perigee_preprocess PRIVATE ${OpenMP_CXX_INCLUDE_DIR} )
+  TARGET_INCLUDE_DIRECTORIES( preprocess_fsi PRIVATE ${OpenMP_CXX_INCLUDE_DIR} )
+  TARGET_LINK_LIBRARIES( perigee_preprocess ${OpenMP_CXX_LIBRARIES} )
+  TARGET_LINK_LIBRARIES( preprocess_fsi ${OpenMP_CXX_LIBRARIES} )
+endif()
 
 #EOF
