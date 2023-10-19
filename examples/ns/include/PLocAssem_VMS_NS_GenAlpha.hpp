@@ -168,7 +168,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     //        which scales like Time x Density
     // Users can refer to Int. J. Numer. Meth. Fluids 2001; 35: 93–116 for more details
     double get_DC( const std::array<double, 9> &dxi_dx,
-        const double &u, const double &v, const double &w, FEAElement * const &element) const;
+        const double &u, const double &v, const double &w, FEAElement * const &element ) const;
 
     Vector_3 get_f(const Vector_3 &pt, const double &tt) const
     {

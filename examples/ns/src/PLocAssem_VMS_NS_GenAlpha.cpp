@@ -234,7 +234,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
     // Get the tau_m and tau_c
     const auto dxi_dx = element->get_invJacobian(qua);
 
-    const std::array<double, 2> tau = get_tau(dt, dxi_dx, u, v, w, element);
+    const std::array<double, 2> tau = get_tau( dt, dxi_dx, u, v, w, element );
     const double tau_m = tau[0];
     const double tau_c = tau[1];
 
@@ -407,7 +407,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
     const auto dxi_dx = element->get_invJacobian(qua);
 
-    const std::array<double, 2> tau = get_tau(dt, dxi_dx, u, v, w, element);
+    const std::array<double, 2> tau = get_tau( dt, dxi_dx, u, v, w, element );
     const double tau_m = tau[0];
     const double tau_c = tau[1];
 
