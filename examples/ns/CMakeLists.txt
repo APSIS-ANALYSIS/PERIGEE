@@ -124,16 +124,16 @@ INCLUDE_DIRECTORIES( ./include )
 # -------------------------------------------------------------------
 # MAKE MY OWN LIBRARIES
 # 1. Preprocess libs
-if(OPENMP_CXX_FOUND)
-  SET_SOURCE_FILES_PROPERTIES( ${perigee_preprocess_lib_src} PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP")
-  SET_SOURCE_FILES_PROPERTIES( preprocess_ns.cpp PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP")
-  #SET_SOURCE_FILES_PROPERTIES( ns_driver.cpp PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP")
-endif()
 ADD_LIBRARY( perigee_preprocess ${perigee_preprocess_lib_src} )
-TARGET_LINK_LIBRARIES( perigee_preprocess ${EXTRA_LINK_LIBS} )
 if(OPENMP_CXX_FOUND)
+  TARGET_INCLUDE_DIRECTORIES( perigee_preprocess PRIVATE ${OpenMP_CXX_INCLUDE_DIR} )
+  TARGET_COMPILE_OPTIONS(perigee_preprocess PRIVATE -DUSE_OPENMP ${OpenMP_CXX_FLAGS} )
   TARGET_LINK_LIBRARIES( perigee_preprocess ${OpenMP_CXX_LIBRARIES} )
+  SET_SOURCE_FILES_PROPERTIES( preprocess_ns.cpp PROPERTIES
+    COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP"
+    INCLUDE_DIRECTORIES "${OpenMP_CXX_INCLUDE_DIR}" )
 endif()
+TARGET_LINK_LIBRARIES( perigee_preprocess ${EXTRA_LINK_LIBS} )
 
 # 2. Analysis libs
 ADD_LIBRARY( perigee_analysis ${perigee_analysis_lib_src} )
