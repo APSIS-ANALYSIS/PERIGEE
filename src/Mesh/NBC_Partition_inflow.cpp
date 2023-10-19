@@ -46,7 +46,7 @@ NBC_Partition_inflow::NBC_Partition_inflow(
 
     centroid[ii] = nbc->get_centroid(ii);
 
-    outline_pts[ii].resize( 3*num_out_bc_pts[ii] ); 
+    outline_pts[ii].resize( 3*num_out_bc_pts[ii] );
     for(int jj=0; jj<3*num_out_bc_pts[ii]; ++jj)
       outline_pts[ii][jj] = nbc->get_outline_pts(ii, jj);
 
@@ -81,7 +81,8 @@ NBC_Partition_inflow::NBC_Partition_inflow(
 
     local_pt_xyz[ii].resize(      num_local_node[ii] * 3 );
     local_global_node[ii].resize( num_local_node[ii] );
-    local_node_pos[ii].resize(    num_local_node[ii] ); 
+    local_node_pos[ii].resize(    num_local_node[ii] );
+
     for(int jj=0; jj<num_local_node[ii]; ++jj)
     {
       local_pt_xyz[ii][3*jj+0] = nbc -> get_pt_xyz( ii, local_node[jj], 0 );
@@ -94,7 +95,8 @@ NBC_Partition_inflow::NBC_Partition_inflow(
     }
 
     // create new IEN
-    local_cell_ien[ii].resize( num_local_cell[ii] * cell_nLocBas[ii] ); 
+    local_cell_ien[ii].resize( num_local_cell[ii] * cell_nLocBas[ii] );
+
     for(int jj=0; jj<num_local_cell[ii]; ++jj)
     {
       for(int kk=0; kk<cell_nLocBas[ii]; ++kk)
