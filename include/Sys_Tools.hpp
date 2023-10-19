@@ -348,7 +348,7 @@ namespace SYS_T
       }
     }
 #else
-    std::cout<<"OPENMP is not invoked.\n";
+    std::cout<<"OpenMP is not invoked.\n";
 #endif
   }
 
