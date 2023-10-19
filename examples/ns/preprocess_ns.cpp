@@ -34,6 +34,12 @@ int main( int argc, char * argv[] )
   int elemType = 501;
   int num_outlet = 1;
   int num_inlet = 1;
+
+  // weakBC_type: 0 no weakly enforced Dirichlet bc;
+  //              1 weakly enforced Dirichlet bc in all direction;
+  //              2 strongly enforced in wall-normal direction,
+  //                and weakly enforced in wall-tangent direction
+  int weakBC_type = 0;
   
   // Default names for input geometry files
   std::string geo_file("./whole_vol.vtu");
@@ -65,6 +71,7 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionInt("-num_inlet", num_inlet);
   SYS_T::GetOptionInt("-num_outlet", num_outlet);
   SYS_T::GetOptionInt("-elem_type", elemType);
+  SYS_T::GetOptionInt("-weakbc_type", weakBC_type);
   SYS_T::GetOptionString("-geo_file", geo_file);
   SYS_T::GetOptionString("-sur_file_in_base", sur_file_in_base);
   SYS_T::GetOptionString("-sur_file_wall", sur_file_wall);
@@ -75,6 +82,7 @@ int main( int argc, char * argv[] )
   // Print the command line arguments
   cout<<"==== Command Line Arguments ===="<<endl;
   cout<<" -elem_type: "<<elemType<<endl;
+  cout<<" -weakbc_type: "<<weakBC_type<<endl;
   cout<<" -num_outlet: "<<num_outlet<<endl;
   cout<<" -geo_file: "<<geo_file<<endl;
   cout<<" -sur_file_in_base: "<<sur_file_in_base<<endl;
@@ -142,6 +150,7 @@ int main( int argc, char * argv[] )
   cmdh5w->write_intScalar("dofNum", dofNum);
   cmdh5w->write_intScalar("dofMat", dofMat);
   cmdh5w->write_intScalar("elemType", elemType);
+  cmdh5w->write_intScalar("weakBC_type", weakBC_type);
   cmdh5w->write_string("geo_file", geo_file);
   cmdh5w->write_string("sur_file_in_base", sur_file_in_base);
   cmdh5w->write_string("sur_file_out_base", sur_file_out_base);
@@ -198,8 +207,17 @@ int main( int argc, char * argv[] )
   std::vector<std::string> dir_list {};
   for(int ii=0; ii<num_inlet; ++ii)
     dir_list.push_back( sur_file_in[ii] );
- 
-  dir_list.push_back( sur_file_wall );
+  
+  if (weakBC_type == 0)
+    dir_list.push_back( sur_file_wall );
+  else if (weakBC_type == 1 || weakBC_type == 2)
+  {
+    // Setup Weakly enforced no-slip Boundary Conditions
+    // Unimplemented
+
+  }
+  else
+    SYS_T::print_fatal("Unknown weak BC type.");
 
   NBC_list[0] = new NodalBC( nFunc );
   NBC_list[1] = new NodalBC( dir_list, nFunc );

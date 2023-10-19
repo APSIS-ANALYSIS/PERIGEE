@@ -84,6 +84,7 @@ class PGAssem_NS_FEM : public IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
+        const ALocal_WeakBC * const &wbc_part,
         const IGenBC * const &gbc );
 
     // Assembly the residual vector and tangent matrix 
@@ -105,6 +106,7 @@ class PGAssem_NS_FEM : public IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
+        const ALocal_WeakBC * const &wbc_part,
         const IGenBC * const &gbc );
 
     // Assembly routine for the surface integrals of flow rate and
@@ -199,6 +201,23 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
+
+    // Weak imposition of no-slip boundary condition on wall
+    void Weak_EssBC_KG( const double &dt,
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const ALocal_WeakBC * const &wbc_part);
+
+    void Weak_EssBC_G( const double &dt,
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const ALocal_WeakBC * const &wbc_part);
 
     void GetLocal(const double * const &array, const int * const &IEN,
         double * const &local_array) const

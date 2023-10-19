@@ -24,6 +24,7 @@
 #include "ALocal_InflowBC.hpp"
 #include "ALocal_RingBC.hpp"
 #include "ALocal_EBC.hpp"
+#include "ALocal_WeakBC.hpp"
 #include "IGenBC.hpp"
 #include "Tissue_prestress.hpp"
 
@@ -523,6 +524,28 @@ class IPGAssem
         const Tissue_prestress * const &ps_ptr) 
         {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
+    // Assembly with weak BC
+    virtual void Assem_residual(
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
+        const PDNSolution * const &dot_sol_np1,
+        const PDNSolution * const &sol_np1,
+        const double &curr_time,
+        const double &dt,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const ALocal_WeakBC * const &wbc_part,
+        const IGenBC * const &gbc )
+        {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
+
     // ------------------------------------------------------------------------
     // ! Assem_tangent_residual : assembly tangent matrix and residual vector 
     //                            for 3D problem WITHOUT pre-existing cached 
@@ -770,6 +793,28 @@ class IPGAssem
         const ALocal_EBC * const &ebc_v,
         const ALocal_EBC * const &ebc_p,
         const Tissue_prestress * const &ps_ptr )
+        {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
+
+    // Assembly with weak BC
+    virtual void Assem_tangent_residual(
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
+        const PDNSolution * const &dot_sol_np1,
+        const PDNSolution * const &sol_np1,
+        const double &curr_time,
+        const double &dt,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const ALocal_WeakBC * const &wbc_part,
+        const IGenBC * const &gbc )
         {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
     // --------------------------------------------------------------

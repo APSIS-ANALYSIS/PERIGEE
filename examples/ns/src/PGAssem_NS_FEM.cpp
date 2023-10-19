@@ -267,6 +267,7 @@ void PGAssem_NS_FEM::Assem_residual(
     const FEANode * const &fnode_ptr,
     const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
+    const ALocal_WeakBC * const &wbc_part,
     const IGenBC * const &gbc )
 {
   const int nElem = alelem_ptr->get_nlocalele();
@@ -322,6 +323,10 @@ void PGAssem_NS_FEM::Assem_residual(
   NatBC_Resis_G( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
       nbc_part, ebc_part, gbc );
 
+  // Weak enforced no-slip boundary condition
+  if (wbc_part->get_weakbc_type() > 0)
+    Weak_EssBC_KG(dt, sol_a, sol_b, lassem_ptr, elements, quad_s, wbc_part);
+
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 
@@ -349,6 +354,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     const FEANode * const &fnode_ptr,
     const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
+    const ALocal_WeakBC * const &wbc_part,
     const IGenBC * const &gbc )
 {
   const int nElem = alelem_ptr->get_nlocalele();
@@ -406,6 +412,10 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   // Resistance type boundary condition
   NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
       nbc_part, ebc_part, gbc );
+
+  // Weak enforced no-slip boundary condition
+  if (wbc_part->get_weakbc_type() > 0)
+    Weak_EssBC_KG(dt, sol_a, sol_b, lassem_ptr, elements, quad_s, wbc_part);
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -1009,6 +1019,28 @@ void PGAssem_NS_FEM::NatBC_Resis_KG(
   delete [] sctrl_x; sctrl_x = nullptr;
   delete [] sctrl_y; sctrl_y = nullptr;
   delete [] sctrl_z; sctrl_z = nullptr;
+}
+
+void PGAssem_NS_FEM::Weak_EssBC_KG( const double &dt,
+    const PDNSolution * const &dot_sol,
+    const PDNSolution * const &sol,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const ALocal_WeakBC * const &wbc_part)
+{
+  ; // Unimplemented
+}
+
+void PGAssem_NS_FEM::Weak_EssBC_G( const double &dt,
+    const PDNSolution * const &dot_sol,
+    const PDNSolution * const &sol,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const ALocal_WeakBC * const &wbc_part)
+{
+  ; // Unimplemented
 }
 
 // EOF

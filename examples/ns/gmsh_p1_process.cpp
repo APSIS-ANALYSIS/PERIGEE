@@ -28,11 +28,30 @@ int main( int argc, char * argv[] )
   // Gmsh file should contain only one 3D domain
   const int vol_id = 0;
 
-  GIO -> write_vtp( 0, vol_id, true); // assumed to be wall vtp
-  GIO -> write_vtp( 1, vol_id, true); // assumed to be inlet vtp
+  GIO -> write_vtp("wall_vol", 0, vol_id, true); // assumed to be wall vtp
+  GIO -> write_vtp("inflow_vol_000", 1, vol_id, true); // assumed to be inlet vtp
   
   for(int ii=0; ii<num_outlet; ++ii)
-    GIO -> write_vtp( 2+ii, vol_id, true);
+  {
+    std::string filename {"outflow_vol_"};
+    std::string idx = std::to_string(ii);
+    if(ii < 10)
+    {
+      filename += "00";
+      filename += idx;
+    }
+    else if(ii > 9 && ii < 100)
+    {
+      filename += "0";
+      filename += idx;
+    }
+    else if(ii > 99 && ii < 1000)
+      filename += idx;
+    else
+      SYS_T::print_fatal("Too many outlets.");
+    
+    GIO -> write_vtp(filename, 2+ii, vol_id, true);
+  }
 
   const std::string wmname("whole_vol");
   const bool isXML = true;
