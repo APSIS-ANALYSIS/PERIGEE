@@ -47,7 +47,7 @@ Part_FEM_FSI::Part_FEM_FSI( const IMesh * const &mesh,
     ctrlPts_x_loc.resize(nlocghonode);
     ctrlPts_y_loc.resize(nlocghonode);
     ctrlPts_z_loc.resize(nlocghonode);
-
+    PERIGEE_OMP_PARALLEL_FOR
     for(int ii=0; ii<nlocghonode; ++ii)
     {
       int aux_index = local_to_global[ii]; // new global index
@@ -77,13 +77,23 @@ Part_FEM_FSI::Part_FEM_FSI( const IMesh * const &mesh,
   // Generate the node_loc_fluid/solid
   node_loc_fluid.clear();
   node_loc_solid.clear();
-
-  for(int ii=0; ii<nlocalnode; ++ii)
+  PERIGEE_OMP_PARALLEL
   {
-    if( VEC_T::is_invec(node_f, node_loc_original[ii]) ) node_loc_fluid.push_back(ii);
+    std::vector<int> temp_node_loc_fluid {};
+    std::vector<int> temp_node_loc_solid {};
+    PERIGEE_OMP_FOR
+    for(int ii=0; ii<nlocalnode; ++ii)
+    {
+      if( VEC_T::is_invec(node_f, node_loc_original[ii]) ) temp_node_loc_fluid.push_back(ii);
 
-    if( VEC_T::is_invec(node_s, node_loc_original[ii]) ) node_loc_solid.push_back(ii);
-  } 
+      if( VEC_T::is_invec(node_s, node_loc_original[ii]) ) temp_node_loc_solid.push_back(ii);
+    }
+    PERIGEE_OMP_CRITICAL
+    {
+      VEC_T::insert_end(node_loc_fluid, temp_node_loc_fluid);
+      VEC_T::insert_end(node_loc_solid, temp_node_loc_solid);
+    }
+  }
 
   nlocalnode_fluid = static_cast<int>( node_loc_fluid.size() );
   nlocalnode_solid = static_cast<int>( node_loc_solid.size() );

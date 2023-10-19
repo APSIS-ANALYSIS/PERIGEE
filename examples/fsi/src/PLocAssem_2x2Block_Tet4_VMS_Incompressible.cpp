@@ -118,10 +118,8 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Residual(
 
   for(int qua=0; qua < nqp; ++qua)
   {
-    double p = 0.0, p_t = 0.0, p_x = 0.0, p_y = 0.0, p_z = 0.0;
+    double p = 0.0, p_x = 0.0, p_y = 0.0, p_z = 0.0;
 
-    double ux_t = 0.0, uy_t = 0.0, uz_t = 0.0;
-    double vx   = 0.0, vy   = 0.0, vz   = 0.0;
     double vx_t = 0.0, vy_t = 0.0, vz_t = 0.0;
 
     double ux_x = 0.0, uy_x = 0.0, uz_x = 0.0;
@@ -145,17 +143,9 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Residual(
       p_y += pres[ii] * dR_dy[ii];
       p_z += pres[ii] * dR_dz[ii];
 
-      ux_t += dot_disp[ii*3  ] * R[ii];
-      uy_t += dot_disp[ii*3+1] * R[ii];
-      uz_t += dot_disp[ii*3+2] * R[ii];
-      p_t  += dot_pres[ii]     * R[ii];
       vx_t += dot_velo[ii*3  ] * R[ii];
       vy_t += dot_velo[ii*3+1] * R[ii];
       vz_t += dot_velo[ii*3+2] * R[ii];
-
-      vx   += velo[ii*3  ] * R[ii];
-      vy   += velo[ii*3+1] * R[ii];
-      vz   += velo[ii*3+2] * R[ii];
 
       ux_x += disp[ii*3  ] * dR_dx[ii];
       uy_x += disp[ii*3+1] * dR_dx[ii];
@@ -285,10 +275,8 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Tangent_Residual(
 
   for(int qua=0; qua < nqp; ++qua)
   {
-    double p = 0.0, p_t = 0.0, p_x = 0.0, p_y = 0.0, p_z = 0.0;
+    double p = 0.0, p_x = 0.0, p_y = 0.0, p_z = 0.0;
 
-    double ux_t = 0.0, uy_t = 0.0, uz_t = 0.0;
-    double vx   = 0.0, vy   = 0.0, vz   = 0.0;
     double vx_t = 0.0, vy_t = 0.0, vz_t = 0.0;
 
     double ux_x = 0.0, uy_x = 0.0, uz_x = 0.0;
@@ -312,17 +300,9 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Tangent_Residual(
       p_y += pres[ii] * dR_dy[ii];
       p_z += pres[ii] * dR_dz[ii];
 
-      ux_t += dot_disp[ii*3  ] * R[ii];
-      uy_t += dot_disp[ii*3+1] * R[ii];
-      uz_t += dot_disp[ii*3+2] * R[ii];
-      p_t  += dot_pres[ii]     * R[ii];
       vx_t += dot_velo[ii*3  ] * R[ii];
       vy_t += dot_velo[ii*3+1] * R[ii];
       vz_t += dot_velo[ii*3+2] * R[ii];
-
-      vx   += velo[ii*3  ] * R[ii];
-      vy   += velo[ii*3+1] * R[ii];
-      vz   += velo[ii*3+2] * R[ii];
 
       ux_x += disp[ii*3  ] * dR_dx[ii];
       uy_x += disp[ii*3+1] * dR_dx[ii];
@@ -571,7 +551,7 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Mass_Residual(
 
   for(int qua=0; qua<nqp; ++qua)
   {
-    double p = 0.0, vx = 0.0, vy = 0.0, vz = 0.0;
+    double p = 0.0;
     double ux_x = 0.0, uy_x = 0.0, uz_x = 0.0;
     double ux_y = 0.0, uy_y = 0.0, uz_y = 0.0;
     double ux_z = 0.0, uy_z = 0.0, uz_z = 0.0;
@@ -589,10 +569,6 @@ void PLocAssem_2x2Block_Tet4_VMS_Incompressible::Assem_Mass_Residual(
     for(int ii=0; ii<nLocBas; ++ii)
     {
       p   += pres[ii] * R[ii];
-
-      vx   += velo[ii*3  ] * R[ii];
-      vy   += velo[ii*3+1] * R[ii];
-      vz   += velo[ii*3+2] * R[ii];
 
       ux_x += disp[ii*3  ] * dR_dx[ii];
       uy_x += disp[ii*3+1] * dR_dx[ii];
