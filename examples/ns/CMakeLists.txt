@@ -37,7 +37,6 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/VTK_Tools.cpp
   ${perigee_source}/Mesh/Tet_Tools.cpp
   ${perigee_source}/Mesh/Hex_Tools.cpp
-  ${perigee_source}/Mesh/Gmsh_FileIO.cpp
   ${perigee_source}/Mesh/Mesh_Tet.cpp
   ${perigee_source}/Mesh/Mesh_FEM.cpp
   ${perigee_source}/Mesh/IEN_FEM.cpp
@@ -108,6 +107,9 @@ SET( perigee_analysis_lib_src
   )
 
 SET( perigee_postprocess_lib_src
+  ${perigee_source}/Mesh/VTK_Tools.cpp
+  ${perigee_source}/Mesh/Tet_Tools.cpp
+  ${perigee_source}/Mesh/Hex_Tools.cpp
   ${perigee_source}/Mesh/QuadPts_vis_tri6.cpp
   ${perigee_source}/Mesh/QuadPts_vis_tet4.cpp
   ${perigee_source}/Mesh/QuadPts_vis_tet10_v2.cpp
@@ -125,24 +127,15 @@ INCLUDE_DIRECTORIES( ./include )
 # MAKE MY OWN LIBRARIES
 # 1. Preprocess libs
 ADD_LIBRARY( perigee_preprocess ${perigee_preprocess_lib_src} )
-if(OPENMP_CXX_FOUND)
-  TARGET_INCLUDE_DIRECTORIES( perigee_preprocess PRIVATE ${OpenMP_CXX_INCLUDE_DIR} )
-  TARGET_COMPILE_OPTIONS(perigee_preprocess PRIVATE "-DUSE_OPENMP ${OpenMP_CXX_FLAGS}" )
-  TARGET_LINK_LIBRARIES( perigee_preprocess ${OpenMP_CXX_LIBRARIES} )
-  SET_SOURCE_FILES_PROPERTIES( preprocess_ns.cpp PROPERTIES
-    COMPILE_FLAGS "${OpenMP_CXX_FLAGS} -DUSE_OPENMP"
-    INCLUDE_DIRECTORIES "${OpenMP_CXX_INCLUDE_DIR}" )
-endif()
 TARGET_LINK_LIBRARIES( perigee_preprocess ${EXTRA_LINK_LIBS} )
 
 # 2. Analysis libs
 ADD_LIBRARY( perigee_analysis ${perigee_analysis_lib_src} )
-TARGET_LINK_LIBRARIES( perigee_analysis ${EXTRA_LINK_LIBS} ${OpenMP_CXX_LIBRARIES} )
+TARGET_LINK_LIBRARIES( perigee_analysis ${EXTRA_LINK_LIBS} )
 
 # 3. Postprocess lib
 ADD_LIBRARY( perigee_postprocess ${perigee_postprocess_lib_src} )
-TARGET_LINK_LIBRARIES( perigee_postprocess ${EXTRA_LINK_LIBS} perigee_analysis
-  perigee_preprocess )
+TARGET_LINK_LIBRARIES( perigee_postprocess ${EXTRA_LINK_LIBS} perigee_analysis )
 # -------------------------------------------------------------------
 
 # Print compiler setup
@@ -151,8 +144,6 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 # BUILD THE MAIN DRIVERS
 # ===================================================================
-#ADD_EXECUTABLE( gmsh_p1_IO gmsh_p1_process.cpp )
-#ADD_EXECUTABLE( gmsh_p2_IO gmsh_p2_process.cpp )
 ADD_EXECUTABLE( preprocess3d preprocess_ns.cpp)
 ADD_EXECUTABLE( ns3d ns_driver.cpp)
 ADD_EXECUTABLE( prepost3d prepost_ns.cpp)
@@ -160,13 +151,20 @@ ADD_EXECUTABLE( vis_ns vis_ns.cpp)
 ADD_EXECUTABLE( vis_p1_wss vis_p1_wss.cpp)
 ADD_EXECUTABLE( vis_p2_wss vis_p2_wss.cpp)
 
-#TARGET_LINK_LIBRARIES( gmsh_p1_IO perigee_preprocess )
-#TARGET_LINK_LIBRARIES( gmsh_p2_IO perigee_preprocess )
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( ns3d perigee_analysis )
 TARGET_LINK_LIBRARIES( prepost3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( vis_ns perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_p1_wss perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_p2_wss perigee_postprocess )
+
+if(OPENMP_CXX_FOUND)
+  SET_TARGET_PROPERTIES( perigee_preprocess PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
+  SET_TARGET_PROPERTIES( preprocess3d PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
+  TARGET_INCLUDE_DIRECTORIES( perigee_preprocess PRIVATE ${OpenMP_CXX_INCLUDE_DIR} )
+  TARGET_INCLUDE_DIRECTORIES( preprocess3d PRIVATE ${OpenMP_CXX_INCLUDE_DIR} )
+  TARGET_LINK_LIBRARIES( perigee_preprocess ${OpenMP_CXX_LIBRARIES} )
+  TARGET_LINK_LIBRARIES( preprocess3d ${OpenMP_CXX_LIBRARIES} )
+endif()
 
 # EOF
