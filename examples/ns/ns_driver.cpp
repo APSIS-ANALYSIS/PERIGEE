@@ -32,9 +32,6 @@
 
 int main(int argc, char *argv[])
 {
-  SYS_T::print_omp_info();
-  SYS_T::set_omp_num_threads();
-
   // Number of quadrature points for tets and triangles
   // Suggested values: 5 / 4 for linear, 17 / 13 for quadratic
   int nqp_tet = 5, nqp_tri = 4;
