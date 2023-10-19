@@ -17,9 +17,9 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
   else if(elemtype == 502)
     CI = 60.0;     // 502 is quadratic tet element
   else if(elemtype == 601)
-    CI = 0.0;      // 601 is trilinear hex element
+    CI = 36.0;      // 601 is trilinear hex element
   else if(elemtype == 602)
-    CI = 0.0;      // 602 is triquadratic hex element
+    CI = 60.0;      // 602 is triquadratic hex element
   else SYS_T::print_fatal("Error: unknown elem type.\n");
 
   nLocBas = in_nlocbas; snLocBas = in_snlocbas;
