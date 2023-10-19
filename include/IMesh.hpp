@@ -19,9 +19,9 @@
 class IMesh
 {
   public:
-    IMesh(){};
+    IMesh() = default;
     
-    virtual ~IMesh(){};
+    virtual ~IMesh() = default;
 
     virtual void print_info() const = 0;
 
@@ -38,7 +38,7 @@ class IMesh
     // get_u_degree() return the same value. 
     // ------------------------------------------------------------------------ 
     virtual int get_degree() const
-    {std::cerr<<"Error: IMesh::get_degree is not implemented.\n"; exit(EXIT_FAILURE);}
+    {SYS_T::print_fatal("Error: IMesh::get_degree is not implemented.\n"); return -1;}
     
     virtual int get_nFunc() const = 0;
     

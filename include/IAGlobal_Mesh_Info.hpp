@@ -12,8 +12,8 @@
 class IAGlobal_Mesh_Info
 {
   public:
-    IAGlobal_Mesh_Info(){};
-    virtual ~IAGlobal_Mesh_Info(){};
+    IAGlobal_Mesh_Info() = default;
+    virtual ~IAGlobal_Mesh_Info() = default;
 
     virtual int get_xdegree() const = 0;
     virtual int get_ydegree() const = 0;

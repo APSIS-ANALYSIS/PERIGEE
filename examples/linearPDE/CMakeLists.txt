@@ -34,7 +34,6 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/System/Tensor2_3D.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
   ${perigee_source}/System/HDF5_Reader.cpp
-  ${perigee_source}/Mesh/Gmsh_FileIO.cpp
   ${perigee_source}/Mesh/VTK_Tools.cpp
   ${perigee_source}/Mesh/Tet_Tools.cpp
   ${perigee_source}/Mesh/Hex_Tools.cpp
@@ -125,13 +124,11 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 # BUILD THE MAIN DRIVERS
 # ===================================================================
-ADD_EXECUTABLE( gmsh_IO gmsh_convert.cpp )
 ADD_EXECUTABLE( preprocess3d preprocess.cpp)
 ADD_EXECUTABLE( transport_3d driver.cpp)
 ADD_EXECUTABLE( prepost prepost.cpp)
 ADD_EXECUTABLE( post_error post_compare_manu.cpp )
 
-TARGET_LINK_LIBRARIES( gmsh_IO perigee_preprocess )
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( transport_3d perigee_analysis )
 TARGET_LINK_LIBRARIES( prepost perigee_preprocess )

@@ -35,7 +35,7 @@ class NodalBC_3D_ring : public INodalBC
         const int &in_ring_bc_type,
         const int &elemtype );
 
-    virtual ~NodalBC_3D_ring() {};
+    virtual ~NodalBC_3D_ring() = default;
 
     virtual unsigned int get_dir_nodes(const unsigned int &ii) const
     {return dir_nodes[ii];}

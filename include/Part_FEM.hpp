@@ -20,10 +20,8 @@
 class Part_FEM : public IPart
 {
   public:
-    // Default constructor
-    // The actual construction is in the derived class.
-    Part_FEM(){};
-    
+    Part_FEM() = default;
+
     Part_FEM( const IMesh * const &mesh,
         const IGlobal_Part * const &gpart,
         const Map_Node_Index * const &mnindex,

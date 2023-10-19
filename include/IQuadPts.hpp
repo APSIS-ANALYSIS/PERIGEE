@@ -12,9 +12,9 @@
 class IQuadPts
 {
   public:
-    IQuadPts(){};
+    IQuadPts() = default;
     
-    virtual ~IQuadPts(){};
+    virtual ~IQuadPts() = default;
 
     virtual void print_info() const = 0;
    

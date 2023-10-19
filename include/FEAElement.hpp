@@ -18,10 +18,10 @@ class FEAElement
 {
   public:
     // Constructor
-    FEAElement(){};
+    FEAElement() = default;
     
     // Destructor
-    virtual ~FEAElement(){};
+    virtual ~FEAElement() = default;
 
     // Return this element's dimension
     virtual int get_elemDim() const = 0;

@@ -16,9 +16,9 @@
 class ICVFlowRate
 {
   public:
-    ICVFlowRate(){};
+    ICVFlowRate() = default;
 
-    virtual ~ICVFlowRate(){};
+    virtual ~ICVFlowRate() = default;
 
     virtual double get_flow_rate( const int &nbc_id, const double &time ) const = 0;
 

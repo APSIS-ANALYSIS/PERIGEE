@@ -120,7 +120,7 @@ namespace MATH_T
   // Generate a random double in [min, max] domain for integer and double
   // precision numbers, respectively. 
   // ----------------------------------------------------------------
-  inline double gen_int_rand( const int &min, const int &max )
+  inline int gen_int_rand( const int &min, const int &max )
   {
     std::random_device rd;
     std::mt19937_64 gen( rd() );

@@ -48,9 +48,9 @@
 class IMaterialModel
 {
   public:
-    IMaterialModel(){};
+    IMaterialModel() = default;
     
-    virtual ~IMaterialModel(){};
+    virtual ~IMaterialModel() = default;
 
     virtual void print_info() const = 0;
 
