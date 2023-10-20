@@ -2,7 +2,7 @@
 #define QUADPTS_GAUSS_QUAD_HPP
 // ============================================================================
 // QuadPts_Gauss_Quad.hpp
-// The Gaussian quadrature rule for a quadrelateral domain defined by 
+// The Gaussian quadrature rule for a quadrilateral domain defined by 
 //                  [r_min, r_max] x [s_min, s_max]
 //
 // Date Created: Sep. 7 2023

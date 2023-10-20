@@ -19,7 +19,7 @@
 class EBC_Partition_wall : public EBC_Partition
 {
   public:
-    // The input ElemBC should be ElemBC_3D_tet_wall
+    // The input ElemBC should be ElemBC_3D_wall
     EBC_Partition_wall( const IPart * const &part,
         const Map_Node_Index * const &mnindex,
         const ElemBC * const &ebc );
