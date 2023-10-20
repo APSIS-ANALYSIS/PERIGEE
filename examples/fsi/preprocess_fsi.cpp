@@ -24,6 +24,10 @@
 
 int main( int argc, char * argv[] )
 {
+  // Set number of threads and  print info of OpenMP
+  SYS_T::print_omp_info();
+  SYS_T::set_omp_num_threads();
+  
   // Remove previously existing hdf5 files
   if( SYS_T::directory_exist("apart") )
   {
@@ -250,7 +254,7 @@ int main( int argc, char * argv[] )
   // IEN for the solid element. If the solid element has node on the fluid-solid
   // interface, it will be mapped to the new index, that is nFunc + ii.
   std::vector<int> vecIEN_p ( vecIEN );
-
+  PERIGEE_OMP_PARALLEL_FOR
   for(int ee=0; ee<nElem; ++ee)
   {
     if( phy_tag[ee] == 1 )
@@ -272,32 +276,52 @@ int main( int argc, char * argv[] )
 
   // Generate the list of nodes for fluid and solid
   std::vector<int> v_node_f, v_node_s; v_node_f.clear(); v_node_s.clear();
-
-  for(int ee=0; ee<nElem; ++ee)
+  PERIGEE_OMP_PARALLEL
   {
-    if( phy_tag[ee] == 0 )
+    std::vector<int> temp_v_node_f {};
+    std::vector<int> temp_v_node_s {};
+    PERIGEE_OMP_FOR
+    for(int ee=0; ee<nElem; ++ee)
     {
-      for(int ii=0; ii<4; ++ii) v_node_f.push_back( IEN_v->get_IEN(ee, ii) );
+      if( phy_tag[ee] == 0 )
+      {
+        for(int ii=0; ii<4; ++ii) temp_v_node_f.push_back( IEN_v->get_IEN(ee, ii) );
+      }
+      else
+      {
+        for(int ii=0; ii<4; ++ii) temp_v_node_s.push_back( IEN_v->get_IEN(ee, ii) );
+      }
     }
-    else
+    PERIGEE_OMP_CRITICAL
     {
-      for(int ii=0; ii<4; ++ii) v_node_s.push_back( IEN_v->get_IEN(ee, ii) );
+      VEC_T::insert_end(v_node_f, temp_v_node_f);
+      VEC_T::insert_end(v_node_s, temp_v_node_s);
     }
   }
 
   VEC_T::sort_unique_resize( v_node_f ); VEC_T::sort_unique_resize( v_node_s );
 
   std::vector<int> p_node_f, p_node_s; p_node_f.clear(); p_node_s.clear();
-
-  for(int ee=0; ee<nElem; ++ee)
+  PERIGEE_OMP_PARALLEL
   {
-    if( phy_tag[ee] == 0 )
+    std::vector<int> temp_p_node_f {};
+    std::vector<int> temp_p_node_s {};
+    PERIGEE_OMP_FOR
+    for(int ee=0; ee<nElem; ++ee)
     {
-      for(int ii=0; ii<4; ++ii) p_node_f.push_back( IEN_p->get_IEN(ee, ii) );
+      if( phy_tag[ee] == 0 )
+      {
+        for(int ii=0; ii<4; ++ii) temp_p_node_f.push_back( IEN_p->get_IEN(ee, ii) );
+      }
+      else
+      {
+        for(int ii=0; ii<4; ++ii) temp_p_node_s.push_back( IEN_p->get_IEN(ee, ii) );
+      }
     }
-    else
+    PERIGEE_OMP_CRITICAL
     {
-      for(int ii=0; ii<4; ++ii) p_node_s.push_back( IEN_p->get_IEN(ee, ii) );
+      VEC_T::insert_end(p_node_f, temp_p_node_f);
+      VEC_T::insert_end(p_node_s, temp_p_node_s);
     }
   }
 

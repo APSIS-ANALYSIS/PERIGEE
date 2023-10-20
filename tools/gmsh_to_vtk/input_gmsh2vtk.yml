@@ -39,5 +39,7 @@ wmname: "whole_vol"
 isXML: true
 
 isFSI: false
+# if isFSI is false, comment next line
+# phy_domain_name_list: ["lumen_vol", "tissue_vol"]
 
 # EOF
