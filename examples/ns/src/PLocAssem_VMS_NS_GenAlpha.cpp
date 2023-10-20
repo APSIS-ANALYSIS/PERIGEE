@@ -35,7 +35,7 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
     mm[3] = 0.0; mm[4] = 1.0; mm[5] = 0.0;
     mm[6] = 0.0; mm[7] = 0.0; mm[8] = 1.0;
   }
-  else SYS_T::print_fatal("Error: unknown elem type.\n");
+  else SYS_T::print_fatal("Error: PLocAssem_VMS_NS_GenAlpha constructor: unknown element type.\n");
 
   Tangent = new PetscScalar[vec_size * vec_size];
   Residual = new PetscScalar[vec_size];
