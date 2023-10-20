@@ -25,19 +25,20 @@ PDNSolution_LinearPDE::~PDNSolution_LinearPDE()
 
 void PDNSolution_LinearPDE::Init_zero( const APart_Node * const &pNode )
 {
-  const int dof = pNode->get_dof;
-  const double value[ dof ] = {0.0};
+  int dof = pNode->get_dof();
+  double * value = new double[dof]{};
 
   for(int ii=0; ii<nlocalnode; ++ii)
   {
     const int pos = pNode -> get_node_loc(ii) * dof;
-    int location[dof] = {0};
+    int * location = new int[dof]{};
     for(int ii=0; ii<dof; ++ii)
     {
       location[dof+ii] = pos + ii;
     }
 
-    VecSetValues(solution, 1, location, value, INSERT_VALUES);
+    VecSetValues(solution, dof, location, value, INSERT_VALUES);
+    delete [] location; location = nullptr;
   }
 
   Assembly_GhostUpdate();
@@ -49,6 +50,8 @@ void PDNSolution_LinearPDE::Init_zero( const APart_Node * const &pNode )
     SYS_T::commPrint(ss.str().c_str());
     SYS_T::commPrint("     val = 0.0 \n");
   }
+
+  delete [] value; value = nullptr;
 }
 
 // EOF

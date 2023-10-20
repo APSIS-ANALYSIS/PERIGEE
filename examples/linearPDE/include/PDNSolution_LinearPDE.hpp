@@ -14,7 +14,7 @@ class PDNSolution_LinearPDE : public PDNSolution
   public:
     PDNSolution_LinearPDE( const APart_Node * const &pNode,
         const int &type, const bool &isprint = true,
-        const std::string &in_name );
+        const std::string &in_name = "solution");
 
     virtual ~PDNSolution_LinearPDE();
 
