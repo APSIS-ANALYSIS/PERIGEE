@@ -17,7 +17,7 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
   {  
     if(elemtype == 501)
       CI = 36.0;     // 501 is linear tet element
-    else if(elemtype == 502)
+    else
       CI = 60.0;     // 502 is quadratic tet element
     
     // PHASTA definition 
@@ -30,7 +30,7 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
   {
     if(elemtype == 601)
       CI = 36.0;      // 601 is trilinear hex element
-    else if(elemtype == 602)
+    else
       CI = 60.0;      // 602 is triquadratic hex element
 
     // PHASTA definition 
