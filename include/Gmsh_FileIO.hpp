@@ -136,7 +136,8 @@ class Gmsh_FileIO
     //
     // The following data will be written as the result:
     // 'GlobalNodeID': the global indices of nodes;
-    // 'GlobalElementID': the global indices of surface elements;
+    // 'GlobalElementID': the global indices of volume element where
+    //                    the surface element is attached;
     //   ( If periodic boundary conditions are applied in .msh file, and 
     //   the target surface is one of the slave surfaces: )
     // 'MasterNodeID': the global indices of the master nodes.
