@@ -12,6 +12,10 @@
 
 #include "Sys_Tools.hpp"
 #include "Vector_3.hpp"
+#include "QuadPts_Gauss_Tet.hpp"
+#include "QuadPts_Gauss_Triangle.hpp"
+#include "QuadPts_Gauss_Hex.hpp"
+#include "QuadPts_Gauss_Quad.hpp"
 
 namespace WBC_T
 {
@@ -57,5 +61,98 @@ namespace WBC_T
   }
 
 }
+
+// ----------------------------------------------------------------
+// class QuadPts_on_face : express a triangular quadrature rule on a tet's face
+//                         or express a quadrilateral quadrature rule on a hex's face
+//                         with volume coordinate
+//  
+// Input: \para qp_surface : the quadrature rule of a surface element
+//        \para face_id    : on which face of the volume element
+// ----------------------------------------------------------------
+class QuadPts_on_face : public IQuadPts
+{ 
+  public:
+    // The input IQuadPts should be QuadPts_Gauss_Quad or QuadPts_Gauss_Triangle
+    QuadPts_on_face(IQuadPts * qp_surface, const int &face_id)
+    { 
+      num_pts = qp_surface->get_num_quadPts();
+      dim = qp_surface->get_dim() + 1;
+
+      if(dim == 4) // tet
+      {
+        qp.assign(4 * num_pts, 0.0);
+        switch (face_id)
+        {
+          case 0: // r = 0
+          {
+            for(unsigned int ii{0}; ii < num_pts; ++ii)
+            {
+              qp[4*ii + 1] = qp_surface->get_qp(3*ii + 0);
+              qp[4*ii + 2] = qp_surface->get_qp(3*ii + 1);
+              qp[4*ii + 3] = qp_surface->get_qp(3*ii + 2);
+            }
+          } break;
+          case 1: // s = 0
+          {
+            for(unsigned int ii{0}; ii < num_pts; ++ii)
+            {
+              qp[4*ii + 0] = qp_surface->get_qp(3*ii + 0);
+              qp[4*ii + 2] = qp_surface->get_qp(3*ii + 1);
+              qp[4*ii + 3] = qp_surface->get_qp(3*ii + 2);
+            }
+          } break;
+          case 2: // t = 0
+          {
+            for(unsigned int ii{0}; ii < num_pts; ++ii)
+            {
+              qp[4*ii + 0] = qp_surface->get_qp(3*ii + 0);
+              qp[4*ii + 1] = qp_surface->get_qp(3*ii + 1);
+              qp[4*ii + 3] = qp_surface->get_qp(3*ii + 2);
+            }
+          } break;
+          case 3: // u = 0
+          {
+            for(unsigned int ii{0}; ii < num_pts; ++ii)
+            {
+              qp[4*ii + 0] = qp_surface->get_qp(3*ii + 0);
+              qp[4*ii + 1] = qp_surface->get_qp(3*ii + 1);
+              qp[4*ii + 2] = qp_surface->get_qp(3*ii + 2);
+            }
+          } break;
+          default:
+            SYS_T::print_fatal("Error: QuadPts_on_face, wrong face id for tet.");
+            break;
+        }
+      }
+      else if(dim == 3) // hex
+      {
+        ; // Unimplemented
+      }
+      else
+        SYS_T::print_fatal("Error: QuadPts_on_face, unsupported IQuadPts.\n");
+
+      qw.resize(num_pts);
+      for(unsigned int ii{0}; ii < num_pts; ++ii)
+        qw[ii] = qp_surface->get_qw(ii);
+    }
+
+    ~QuadPts_on_face(){}
+
+    virtual int get_dim() const {return dim;};
+
+    virtual double get_qp(unsigned int ii, unsigned int comp) const
+    {return qp[dim*ii + comp];}
+
+    virtual double get_qw(unsigned int ii) const
+    {return qw[ii];}
+
+  private:
+    int num_pts;
+    std::vector<double> qp {};
+    std::vector<double> qw {};
+
+    int dim;
+};
 
 #endif
