@@ -1,12 +1,13 @@
-#include "PDNSolution_Transport.hpp"
+#include "PDNSolution_LinearPDE.hpp"
 
-PDNSolution_Transport:: PDNSolution_Transport( 
+PDNSolution_LinearPDE:: PDNSolution_LinearPDE( 
     const APart_Node * const &pNode,
     const int &type, const bool &isprint,
     const std::string &in_name )
 : PDNSolution( pNode ), sol_name( in_name ), is_print( isprint )
 {
-  SYS_T::print_fatal_if( pNode->get_dof() != 1, "Error: PDNSolution_Transport : the APart_Node gives wrong dof number. \n");
+  SYS_T::print_fatal_if( pNode->get_dof() != 1 || pNode->get_dof() != 3, 
+    "Error: PDNSolution_LinearPDE : the APart_Node gives wrong dof number. \n");
 
   switch(type)
   {
@@ -14,22 +15,27 @@ PDNSolution_Transport:: PDNSolution_Transport(
       Init_zero( pNode );
       break;
     default:
-      SYS_T::print_fatal("Error: PDNSolution_Transport: No such type of initial condition. \n");
+      SYS_T::print_fatal("Error: PDNSolution_LinearPDE: No such type of initial condition. \n");
       break;
   }
 }
 
-PDNSolution_Transport::~PDNSolution_Transport()
+PDNSolution_LinearPDE::~PDNSolution_LinearPDE()
 {}
 
-void PDNSolution_Transport::Init_zero( const APart_Node * const &pNode )
+void PDNSolution_LinearPDE::Init_zero( const APart_Node * const &pNode )
 {
-  const double value[1] = { 0.0 };
+  const int dof = pNode->get_dof;
+  const double value[ dof ] = {0.0};
 
   for(int ii=0; ii<nlocalnode; ++ii)
   {
-    const int pos = pNode -> get_node_loc(ii);
-    const int location[1] = { pos };
+    const int pos = pNode -> get_node_loc(ii) * dof;
+    int location[dof] = {0};
+    for(int ii=0; ii<dof; ++ii)
+    {
+      location[dof+ii] = pos + ii;
+    }
 
     VecSetValues(solution, 1, location, value, INSERT_VALUES);
   }

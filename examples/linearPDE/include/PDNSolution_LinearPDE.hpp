@@ -1,7 +1,7 @@
-#ifndef PDNSOLUTION_TRANSPORT_HPP
-#define PDNSOLUTION_TRANSPORT_HPP
+#ifndef PDNSOLUTION_LinearPDE_HPP
+#define PDNSOLUTION_LinearPDE_HPP
 // ============================================================================
-// PDNSolution_Transport.hpp
+// PDNSolution_LinearPDE.hpp
 //
 // This is the solution for transport problems with 1 dof per node.
 //
@@ -9,14 +9,14 @@
 // ============================================================================
 #include "PDNSolution.hpp"
 
-class PDNSolution_Transport : public PDNSolution
+class PDNSolution_LinearPDE : public PDNSolution
 {
   public:
-    PDNSolution_Transport( const APart_Node * const &pNode,
+    PDNSolution_LinearPDE( const APart_Node * const &pNode,
         const int &type, const bool &isprint = true,
-        const std::string &in_name = "solution_transport" );
+        const std::string &in_name );
 
-    virtual ~PDNSolution_Transport();
+    virtual ~PDNSolution_LinearPDE();
 
   private:
     const std::string sol_name;
