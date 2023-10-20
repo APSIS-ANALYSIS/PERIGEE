@@ -3,7 +3,7 @@
 
 #include "IPGAssem.hpp"
 #include "PETSc_Tools.hpp"
-#include "PDNSolution_Transport.hpp"
+#include "PDNSolution_LinearPDE.hpp"
 
 class PGAssem_Transport_GenAlpha : public IPGAssem
 {
