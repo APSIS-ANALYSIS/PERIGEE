@@ -215,7 +215,7 @@ int main( int argc, char * argv[] )
       nFunc, inlet_outvec, elemType );
 
   InFBC -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
- 
+
   // Setup Elemental Boundary Conditions
   // Obtain the outward normal vector
   std::vector< Vector_3 > outlet_outvec( sur_file_out.size() );
