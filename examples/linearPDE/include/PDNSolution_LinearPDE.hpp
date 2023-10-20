@@ -3,7 +3,7 @@
 // ============================================================================
 // PDNSolution_LinearPDE.hpp
 //
-// This is the solution for transport problems with 1 dof per node.
+// This is the solution for linear pde problems with prescribed dof per node.
 //
 // Date: Jan 21 2022
 // ============================================================================
