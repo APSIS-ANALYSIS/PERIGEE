@@ -144,6 +144,13 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     // Private data
     const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta;
 
+    // M matrix for tau_m
+    //             mm[0], mm[1], mm[2]
+    // M = coef *  mm[3], mm[4], mm[5]
+    //             mm[6], mm[7], mm[8]
+    double coef;
+    double mm[9]; 
+
     const int nqp; // number of quadrature points
 
     double CI; // Constants for stabilization parameters
@@ -152,23 +159,23 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
     const double Ctauc; // Constant scaling factor for tau_C
 
-    int nLocBas, snLocBas, vec_size, sur_size;
+    const int nLocBas, snLocBas, vec_size, sur_size;
 
     // Private functions
     void print_info() const;
 
-    SymmTensor2_3D get_metric( const std::array<double, 9> &dxi_dx, FEAElement * const &element ) const;
+    SymmTensor2_3D get_metric( const std::array<double, 9> &dxi_dx ) const;
 
     // Return tau_m and tau_c in RB-VMS
     std::array<double, 2> get_tau( const double &dt, 
         const std::array<double, 9> &dxi_dx,
-        const double &u, const double &v, const double &w, FEAElement * const &element ) const;
+        const double &u, const double &v, const double &w ) const;
 
     // Return tau_bar := (v' G v')^-0.5 x rho0, 
     //        which scales like Time x Density
     // Users can refer to Int. J. Numer. Meth. Fluids 2001; 35: 93–116 for more details
     double get_DC( const std::array<double, 9> &dxi_dx,
-        const double &u, const double &v, const double &w, FEAElement * const &element ) const;
+        const double &u, const double &v, const double &w ) const;
 
     Vector_3 get_f(const Vector_3 &pt, const double &tt) const
     {
