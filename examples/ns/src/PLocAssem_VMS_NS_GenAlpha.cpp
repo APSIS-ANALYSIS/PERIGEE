@@ -13,12 +13,10 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
   CT( in_ct ), Ctauc( in_ctauc ), nLocBas( in_nlocbas ), snLocBas( in_snlocbas ),
   vec_size( in_nlocbas * 4 ), sur_size ( in_snlocbas * 4 )
 {
+  // 501 is linear tet element, 502 is quadratic tet element
   if(elemtype == 501 || elemtype == 502)
   {  
-    if(elemtype == 501)
-      CI = 36.0;     // 501 is linear tet element
-    else
-      CI = 60.0;     // 502 is quadratic tet element
+    CI = (elemtype == 501) ? 36.0 : 60.0;
     
     // PHASTA definition 
     coef = 0.6299605249474365;
@@ -26,12 +24,10 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
     mm[3] = 1.0; mm[4] = 2.0; mm[5] = 1.0;
     mm[6] = 1.0; mm[7] = 1.0; mm[8] = 2.0;
   }
+  // 601 is trilinear hex element, 602 is triquadratic hex element
   else if(elemtype == 601 || elemtype == 602)
   {
-    if(elemtype == 601)
-      CI = 36.0;      // 601 is trilinear hex element
-    else
-      CI = 60.0;      // 602 is triquadratic hex element
+    CI = (elemtype == 601) ? 36.0 : 60.0;
 
     // PHASTA definition 
     coef = 1.0;
