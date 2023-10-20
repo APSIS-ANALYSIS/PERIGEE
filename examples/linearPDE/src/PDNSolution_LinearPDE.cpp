@@ -6,7 +6,7 @@ PDNSolution_LinearPDE:: PDNSolution_LinearPDE(
     const std::string &in_name )
 : PDNSolution( pNode ), sol_name( in_name ), is_print( isprint )
 {
-  SYS_T::print_fatal_if( pNode->get_dof() != 1 || pNode->get_dof() != 3, 
+  SYS_T::print_fatal_if( pNode->get_dof() != 1 && pNode->get_dof() != 3, 
     "Error: PDNSolution_LinearPDE : the APart_Node gives wrong dof number. \n");
 
   switch(type)
