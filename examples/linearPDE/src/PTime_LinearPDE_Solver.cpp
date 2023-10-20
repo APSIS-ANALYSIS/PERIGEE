@@ -48,7 +48,7 @@ std::string PTime_LinearPDE_Solver::Name_dot_Generator( const std::string &middl
   return out_name;
 }
 
-void PTime_LinearPDE_Solver::TM_GenAlpha(
+void PTime_LinearPDE_Solver::TM_GenAlpha_Transport(
     const bool &restart_init_assembly_flag,
     const PDNSolution * const &init_dot_sol,
     const PDNSolution * const &init_sol,
