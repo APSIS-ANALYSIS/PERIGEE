@@ -9,9 +9,9 @@ PLocAssem_Elastodynamics_GenAlpha::PLocAssem_Elastodynamics_GenAlpha(
   lambda( in_nu * in_module_E / ((1.0 + in_nu) * (1.0 - 2.0 * in_nu)) ),
   mu( 0.5 * in_module_E / (1.0 + in_nu) ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
-  gamma(tm_gAlpha->get_gamma()), nLocBas( in_nlocbas ),
-  snLocBas( in_snlocbas ), vec_size( 3 * in_nlocbas ), 
-  sur_size( 3 * in_snlocbas ), num_ebc_fun( in_num_ebc_fun )
+  gamma(tm_gAlpha->get_gamma()), num_ebc_fun( in_num_ebc_fun ),
+  nLocBas( in_nlocbas ), snLocBas( in_snlocbas ),
+  vec_size( 3 * in_nlocbas ), sur_size( 3 * in_snlocbas )
 {
   Tangent = new PetscScalar[vec_size * vec_size];
   Residual = new PetscScalar[vec_size];
@@ -233,19 +233,14 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Tangent_Residual(
           + NA_y * lambda * (uy_z + uz_y)
           + NA_z * ((2.0 * mu + lambda) * uz_z + lambda * (ux_x + uy_y))
           - NA * rho * f_body.z() );
-      
-      Tangent[9*nLocBas*A*3*A  ] += NA * rho * alpha_m * NA;
-
-      Tangent[3*nLocBas*(3*A+1)+3*A+1] += NA * rho * alpha_m * NA;
-
-      Tangent[3*nLocBas*(3*A+2)+3*A+2] += NA * rho * alpha_m * NA;
 
       for(int B=0; B<nLocBas; ++B)
       {
         const double NB = R[B], NB_x = dR_dx[B], NB_y = dR_dy[B], NB_z = dR_dz[B];
 
-        Tangent[9*nLocBas*A+3*B  ] += gwts * dd_dv * ((2.0 * mu + lambda) * NA_x * NB_x
-            + lambda * (NA_y * NB_y + NA_z * NB_z));
+        Tangent[9*nLocBas*A+3*B  ] += gwts * (NA * rho * alpha_m * NB 
+            + dd_dv * ((2.0 * mu + lambda) * NA_x * NB_x
+            + lambda * (NA_y * NB_y + NA_z * NB_z)));
 
         Tangent[9*nLocBas*A+3*B+1] += gwts * dd_dv * lambda * (NA_x * NB_y + NA_y * NB_x);
 
@@ -253,8 +248,9 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Tangent_Residual(
 
         Tangent[3*nLocBas*(3*A+1)+3*B  ] += gwts * dd_dv * lambda * (NA_x * NB_y + NA_y * NB_x);
 
-        Tangent[3*nLocBas*(3*A+1)+3*B+1] += gwts * dd_dv * ((2.0 * mu + lambda) * NA_y * NB_y
-            + lambda * (NA_x * NB_x + NA_z * NB_z));
+        Tangent[3*nLocBas*(3*A+1)+3*B+1] += gwts * ( NA * rho * alpha_m * NB 
+            + dd_dv * ((2.0 * mu + lambda) * NA_y * NB_y
+            + lambda * (NA_x * NB_x + NA_z * NB_z)));
 
         Tangent[3*nLocBas*(3*A+1)+3*B+2] += gwts * dd_dv * lambda * (NA_y * NB_z + NA_z * NB_y);
 
@@ -262,8 +258,9 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Tangent_Residual(
 
         Tangent[3*nLocBas*(3*A+2)+3*B+1] += gwts * dd_dv * lambda * (NA_y * NB_z + NA_z * NB_y);
 
-        Tangent[3*nLocBas*(3*A+2)+3*B+2] += gwts * dd_dv * ((2.0 * mu + lambda) * NA_z * NB_z
-            + lambda * (NA_x * NB_x + NA_y * NB_y));     
+        Tangent[3*nLocBas*(3*A+2)+3*B+2] += gwts * (NA * rho * alpha_m * NB 
+            + dd_dv * ((2.0 * mu + lambda) * NA_z * NB_z
+            + lambda * (NA_x * NB_x + NA_y * NB_y)));     
       } 
     }
   } // End-of-quadrature-loop
@@ -299,6 +296,8 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Mass_Residual(
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
+      int ii3 = ii * 3;
+
       ux_x += sol_disp[ii3  ] * dR_dx[ii];
       uy_x += sol_disp[ii3+1] * dR_dx[ii];
       uz_x += sol_disp[ii3+2] * dR_dx[ii];
@@ -344,9 +343,9 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Mass_Residual(
 
       for(int B=0; B<nLocBas; ++B)
       {
-        Tangent[3*nLocBas*(3*A) + 3*B] += gwts * rho0 * NA * R[B];
-        Tangent[3*nLocBas*(3*A+1) + 3*B+1] += gwts * rho0 * NA * R[B];
-        Tangent[3*nLocBas*(3*A+2) + 3*B+2] += gwts * rho0 * NA * R[B];
+        Tangent[3*nLocBas*(3*A) + 3*B] += gwts * rho * NA * R[B];
+        Tangent[3*nLocBas*(3*A+1) + 3*B+1] += gwts * rho * NA * R[B];
+        Tangent[3*nLocBas*(3*A+2) + 3*B+2] += gwts * rho * NA * R[B];
       }
     }
   } // End-of-quadrature-loop

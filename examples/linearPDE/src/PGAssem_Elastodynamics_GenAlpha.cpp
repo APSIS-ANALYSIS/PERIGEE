@@ -89,7 +89,7 @@ void PGAssem_Elastodynamics_GenAlpha::EssBC_KG(
 
 
 void PGAssem_Elastodynamics_GenAlpha::EssBC_G( 
-    const ALocal_NBC * const &nbc_part, const int field )
+    const ALocal_NBC * const &nbc_part, const int &field )
 {
   const int local_dir = nbc_part->get_Num_LD(field);
   if( local_dir > 0 )
@@ -133,7 +133,7 @@ void PGAssem_Elastodynamics_GenAlpha::Assem_nonzero_estimate(
       const int loc_index = lien_ptr -> get_LIEN(ee, ii);
       
       for(int mm=0; mm<dof_mat; ++mm)
-        row_index[dof_mat * ii + mm] = dof_mat * nbc_part->get_LID( m, loc_index ) + m;
+        row_index[dof_mat * ii + mm] = dof_mat * nbc_part->get_LID( mm, loc_index ) + mm;
     }
 
     MatSetValues(K, loc_dof, row_index, loc_dof, row_index, lassem_ptr->Tangent, ADD_VALUES);

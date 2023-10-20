@@ -68,7 +68,7 @@ void PTime_LinearPDE_Solver::TM_GenAlpha_Transport(
     IPLocAssem * const &lassem_ptr,
     IPGAssem * const &gassem_ptr,
     PLinear_Solver_PETSc * const &lsolver_ptr,
-    PNonlinear_Transport_Solver * const &nsolver_ptr ) const
+    PNonlinear_LinearPDE_Solver * const &nsolver_ptr ) const
 {
   PDNSolution * pre_sol = new PDNSolution(*init_sol);
   PDNSolution * cur_sol = new PDNSolution(*init_sol);
@@ -163,7 +163,7 @@ void PTime_LinearPDE_Solver::TM_GenAlpha_Elastodynamics(
     IPLocAssem * const &lassem_ptr,
     IPGAssem * const &gassem_ptr,
     PLinear_Solver_PETSc * const &lsolver_ptr,
-    PNonlinear_Transport_Solver * const &nsolver_ptr ) const
+    PNonlinear_LinearPDE_Solver * const &nsolver_ptr ) const
 {
   PDNSolution * pre_disp = new PDNSolution( init_disp );
   PDNSolution * cur_disp = new PDNSolution( init_disp );
@@ -177,13 +177,13 @@ void PTime_LinearPDE_Solver::TM_GenAlpha_Elastodynamics(
   // If this is a restart run, do not re-write the solution binaries
   if(restart_init_assembly_flag == false)
   {
-    const std::string sol_name = Name_Generator("disp_", time_info->get_index());
+    std::string sol_name = Name_Generator("disp_", time_info->get_index());
     cur_disp->WriteBinary(sol_name.c_str());
 
     sol_name = Name_Generator("velo_", time_info->get_index());
     cur_velo->WriteBinary(sol_name.c_str());
 
-    const std::string sol_dot_name = Name_dot_Generator("disp_", time_info->get_index());
+    std::string sol_dot_name = Name_dot_Generator("disp_", time_info->get_index());
     cur_dot_disp->WriteBinary(sol_dot_name.c_str());
 
     sol_dot_name = Name_dot_Generator("velo_", time_info->get_index());
@@ -232,17 +232,17 @@ void PTime_LinearPDE_Solver::TM_GenAlpha_Elastodynamics(
     // Record solution if meets criteria
     if( time_info->get_index()%sol_record_freq == 0 )
     {
-      const std::string sol_name = Name_Generator("disp_", time_info->get_index());
-    cur_disp->WriteBinary(sol_name.c_str());
+      std::string sol_name = Name_Generator("disp_", time_info->get_index());
+      cur_disp->WriteBinary(sol_name.c_str());
 
-    sol_name = Name_Generator("velo_", time_info->get_index());
-    cur_velo->WriteBinary(sol_name.c_str());
+      sol_name = Name_Generator("velo_", time_info->get_index());
+      cur_velo->WriteBinary(sol_name.c_str());
 
-    const std::string sol_dot_name = Name_dot_Generator("disp_", time_info->get_index());
-    cur_dot_disp->WriteBinary(sol_dot_name.c_str());
+      std::string sol_dot_name = Name_dot_Generator("disp_", time_info->get_index());
+      cur_dot_disp->WriteBinary(sol_dot_name.c_str());
 
-    sol_dot_name = Name_dot_Generator("velo_", time_info->get_index());
-    cur_dot_velo->WriteBinary(sol_dot_name.c_str());
+      sol_dot_name = Name_dot_Generator("velo_", time_info->get_index());
+      cur_dot_velo->WriteBinary(sol_dot_name.c_str());
     }
 
     // Prepare for next time step

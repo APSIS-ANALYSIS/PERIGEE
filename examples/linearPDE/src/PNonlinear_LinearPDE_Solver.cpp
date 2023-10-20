@@ -191,7 +191,7 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Elastodynamics(
     PDNSolution * const &dot_velo,
     PDNSolution * const &disp,
     PDNSolution * const &velo,
-    bool &conv_flag, int &nl_counter )
+    bool &conv_flag, int &nl_counter ) const
 {
   // Initialize the counter and error
   nl_counter = 0;
@@ -230,7 +230,7 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Elastodynamics(
   {
     gassem_ptr->Clear_KG();
 
-    gassem_ptr->Assem_tangent_residual( &dot_velo_alpha, &disp_alpha,
+    gassem_ptr->Assem_tangent_residual( dot_velo_alpha, disp_alpha,
         curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
         quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part );
 
@@ -244,7 +244,7 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Elastodynamics(
   {
     gassem_ptr->Clear_G();
 
-    gassem_ptr->Assem_residual( &dot_velo_alpha, &disp_alpha,
+    gassem_ptr->Assem_residual( dot_velo_alpha, disp_alpha,
         curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
         quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part );
   }
@@ -269,15 +269,15 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Elastodynamics(
     velo->PlusAX( dot_step, - gamma * dt );
     disp->PlusAX( dot_step, - alpha_f * gamma * gamma * dt * dt / alpha_m );
 
-    dot_velo_alpha.PlusAX( dot_step, - alpha_m );
-    disp_alpha.PlusAX( dot_step, - alpha_m );
+    dot_velo_alpha->PlusAX( dot_step, - alpha_m );
+    disp_alpha->PlusAX( dot_step, - alpha_m );
 
     // Assembly residual (& tangent if condition satisfied)
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )
     {
       gassem_ptr->Clear_KG();
 
-      gassem_ptr->Assem_tangent_residual( &dot_velo_alpha, &disp_alpha,
+      gassem_ptr->Assem_tangent_residual( dot_velo_alpha,disp_alpha,
           curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
           quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part );
 
@@ -288,7 +288,7 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Elastodynamics(
     {
       gassem_ptr->Clear_G();
 
-      gassem_ptr->Assem_residual( &dot_velo_alpha, &disp_alpha,
+      gassem_ptr->Assem_residual( dot_velo_alpha, disp_alpha,
           curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
           quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part );
     }
