@@ -5,7 +5,7 @@
 #include "IPGAssem.hpp"
 #include "PLinear_Solver_PETSc.hpp"
 #include "Matrix_PETSc.hpp"
-#include "PDNSolution_Transport.hpp"
+#include "PDNSolution_LinearPDE.hpp"
 
 class PNonlinear_LinearPDE_Solver
 {

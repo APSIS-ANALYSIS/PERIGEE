@@ -19,8 +19,8 @@
 #include "FEAElement_Triangle6_3D_der0.hpp"
 #include "FEAElement_Quad4_3D_der0.hpp"
 #include "FEAElement_Quad9_3D_der0.hpp"
-#include "PLocAssem_Transport_GenAlpha.hpp"
-#include "PGAssem_Transport_GenAlpha.hpp"
+#include "PLocAssem_Elastodynamics_GenAlpha.hpp"
+#include "PGAssem_Elastodynamics_GenAlpha.hpp"
 #include "PNonlinear_LinearPDE_Solver.hpp"
 #include "PTime_LinearPDE_Solver.hpp"
 

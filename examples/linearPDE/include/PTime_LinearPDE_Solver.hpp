@@ -2,7 +2,7 @@
 #define PTIME_LINEARPDE_SOLVER_HPP
 
 #include "PDNTimeStep.hpp"
-#include "PNonlinear_Transport_Solver.hpp"
+#include "PNonlinear_LinearPDE_Solver.hpp"
 
 class PTime_LinearPDE_Solver
 {
@@ -35,7 +35,7 @@ class PTime_LinearPDE_Solver
         IPLocAssem * const &lassem_ptr,
         IPGAssem * const &gassem_ptr,
         PLinear_Solver_PETSc * const &lsolver_ptr,
-        PNonlinear_Transport_Solver * const &nsolver_ptr ) const;
+        PNonlinear_LinearPDE_Solver * const &nsolver_ptr ) const;
     
     void TM_GenAlpha_Elastodynamics(
         const bool &restart_init_assembly_flag,
@@ -59,7 +59,7 @@ class PTime_LinearPDE_Solver
         IPLocAssem * const &lassem_ptr,
         IPGAssem * const &gassem_ptr,
         PLinear_Solver_PETSc * const &lsolver_ptr,
-        PNonlinear_Transport_Solver * const &nsolver_ptr ) const;
+        PNonlinear_LinearPDE_Solver * const &nsolver_ptr ) const;
 
   private:
     const double final_time;
