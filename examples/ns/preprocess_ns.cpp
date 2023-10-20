@@ -45,10 +45,10 @@ int main( int argc, char * argv[] )
 
   const int cpu_size                  = paras["cpu_size"].as<int>();
   const int in_ncommon                = paras["in_ncommon"].as<int>();
+  const bool isDualGraph              = paras["is_dualgraph"].as<bool>();
   const int num_inlet                 = paras["num_inlet"].as<int>();
   const int num_outlet                = paras["num_outlet"].as<int>();
   const int elemType                  = paras["elem_type"].as<int>();
-  const bool isDualGraph              = paras["is_dualgraph"].as<bool>();
   const std::string part_file         = paras["part_file"].as<std::string>();
   const std::string geo_file          = paras["geo_file"].as<std::string>();
   const std::string sur_file_in_base  = paras["sur_file_in_base"].as<std::string>();
@@ -68,7 +68,8 @@ int main( int argc, char * argv[] )
   cout<<" -part_file: "<<part_file<<endl;
   cout<<" -cpu_size: "<<cpu_size<<endl;
   cout<<" -in_ncommon: "<<in_ncommon<<endl;
-  cout<<" -isDualGraph: true \n";
+  if(isDualGraph) cout<<" -isDualGraph: true \n";
+  else cout<<" -isDualGraph: false \n";
   cout<<"---- Problem definition ----\n";
   cout<<" dofNum: "<<dofNum<<endl;
   cout<<" dofMat: "<<dofMat<<endl;
