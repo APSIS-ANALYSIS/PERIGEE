@@ -39,7 +39,7 @@ int main( int argc, char * argv[] )
   const std::string yaml_file("ns_input.yml");
 
   // Check if the yaml file exist on disk
-  SYS_T::file_check(yaml_file); std::cout<<yaml_file<<" found. \n";
+  SYS_T::file_check(yaml_file);
 
   YAML::Node paras = YAML::LoadFile( yaml_file );
 
@@ -300,7 +300,7 @@ int main( int argc, char * argv[] )
   cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<endl;
 
   // Finalize the code and exit
-  for(auto &it_nbc:NBC_list) delete it_nbc;
+  for(auto &it_nbc : NBC_list) delete it_nbc;
 
   delete InFBC; delete ebc; delete mytimer;
   delete mnindex; delete global_part; delete mesh; delete IEN;
