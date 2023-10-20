@@ -1,5 +1,5 @@
 // ============================================================================
-// driver.cpp
+// driver_elastodynamics.cpp
 // ============================================================================
 #include "HDF5_Writer.hpp"
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
@@ -27,7 +27,7 @@
 int main(int argc, char *argv[])
 {
   // material parameters
-  double rho = 1.0, cap = 1.0, kap = 1.0;
+  double rho = 1.0, module_E = 1.0e+7, nu = 0.3;
 
   // number of quadrature points
   int nqp_vol = 5, nqp_sur = 4;
@@ -65,7 +65,8 @@ int main(int argc, char *argv[])
   int restart_index = 0;     // restart solution time index
   double restart_time = 0.0; // restart time
   double restart_step = 1.0e-3; // restart simulation time step size
-  std::string restart_name = "SOL_"; // restart solution base name
+  std::string restart_u_name = "SOL_U_";
+  std::string restart_v_name = "SOL_V_";
 
   // Yaml options
   bool is_loadYaml = true;
@@ -87,8 +88,8 @@ int main(int argc, char *argv[])
   // ===== Read Command Line Arguments =====
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
   SYS_T::GetOptionReal("-rho", rho);
-  SYS_T::GetOptionReal("-cap", cap);
-  SYS_T::GetOptionReal("-kap", kap);
+  SYS_T::GetOptionReal("-youngs_module", module_E);
+  SYS_T::GetOptionReal("-poissons_ratio", nu);
   SYS_T::GetOptionInt("-nqp_vol", nqp_vol);
   SYS_T::GetOptionInt("-nqp_sur", nqp_sur);
   SYS_T::GetOptionInt("-nqp_vol_1d", nqp_vol_1D);
@@ -114,7 +115,8 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionInt("-restart_index", restart_index);
   SYS_T::GetOptionReal("-restart_time", restart_time);
   SYS_T::GetOptionReal("-restart_step", restart_step);
-  SYS_T::GetOptionString("-restart_name", restart_name);
+  SYS_T::GetOptionString("-restart_u_name", restart_u_name);
+  SYS_T::GetOptionString("-restart_v_name", restart_v_name);
 
   // ===== Print Command Line Arguments =====
   SYS_T::cmdPrint("-nqp_vol:", nqp_vol);
@@ -147,7 +149,8 @@ int main(int argc, char *argv[])
     SYS_T::cmdPrint("-restart_index:", restart_index);
     SYS_T::cmdPrint("-restart_time:", restart_time);
     SYS_T::cmdPrint("-restart_step:", restart_step);
-    SYS_T::cmdPrint("-restart_name:", restart_name);
+    SYS_T::cmdPrint("-restart_u_name:", restart_u_name);
+    SYS_T::cmdPrint("-restart_v_name:", restart_v_name);
   }
   else SYS_T::commPrint("-is_restart: false \n");
 
@@ -266,15 +269,19 @@ int main(int argc, char *argv[])
   tm_galpha_ptr->print_info();
 
   // ===== Local Assembly Routine =====
-  IPLocAssem * locAssem_ptr = new PLocAssem_Transport_GenAlpha(
-      rho, cap, kap, tm_galpha_ptr,
+  IPLocAssem * locAssem_ptr = new PLocAssem_Elastodynamics_GenAlpha(
+      rho, module_E, nu, tm_galpha_ptr,
       elementv->get_nLocBas(), elements->get_nLocBas(), 
       locebc -> get_num_ebc());
 
   // ===== Initial condition =====
-  PDNSolution * sol = new PDNSolution_LinearPDE( pNode, 0, "temperature solution" );
+  PDNSolution * disp = new PDNSolution_LinearPDE( pNode, 0, "elastodynamics solution" );
   
-  PDNSolution * dot_sol = new PDNSolution_LinearPDE( pNode, 0, "temperature solution" );
+  PDNSolution * velo = new PDNSolution_LinearPDE( pNode, 0, "elastodynamics solution" );
+
+  PDNSolution * dot_disp = new PDNSolution_LinearPDE( pNode, 0, "elastodynamics solution" );
+
+  PDNSolution * dot_velo = new PDNSolution_LinearPDE( pNode, 0, "elastodynamics solution" );
   
   if( is_restart )
   {
@@ -283,20 +290,30 @@ int main(int argc, char *argv[])
     initial_step  = restart_step;
 
     // Read sol file
-    SYS_T::file_check(restart_name.c_str());
-    sol->ReadBinary(restart_name.c_str());
+    SYS_T::file_check(restart_u_name.c_str());
+    SYS_T::file_check(restart_v_name.c_str());
+
+    disp->ReadBinary(restart_u_name.c_str());
+    velo->ReadBinary(restart_v_name.c_str());
 
     // generate the corresponding dot_sol file name
-    std::string restart_dot_name = "dot_";
-    restart_dot_name.append(restart_name);
+    std::string restart_dot_u_name = "dot_";
+    std::string restart_dot_v_name = "dot_";
+    restart_dot_u_name.append(restart_u_name);
+    restart_dot_v_name.append(restart_v_name);
 
     // Read dot_sol file
-    SYS_T::file_check(restart_dot_name.c_str());
-    dot_sol->ReadBinary(restart_dot_name.c_str());
+    SYS_T::file_check(restart_dot_u_name.c_str());
+    SYS_T::file_check(restart_dot_v_name.c_str());
+
+    dot_disp->ReadBinary(restart_dot_u_name.c_str());
+    dot_velo->ReadBinary(restart_dot_v_name.c_str());
 
     SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
-    SYS_T::commPrint("     restart_name: %s \n", restart_name.c_str());
-    SYS_T::commPrint("     restart_dot_name: %s \n", restart_dot_name.c_str());
+    SYS_T::commPrint("     restart_u_name: %s \n", restart_u_name.c_str());
+    SYS_T::commPrint("     restart_v_name: %s \n", restart_v_name.c_str());
+    SYS_T::commPrint("     restart_dot_u_name: %s \n", restart_dot_u_name.c_str());
+    SYS_T::commPrint("     restart_dot_v_name: %s \n", restart_dot_v_name.c_str());
     SYS_T::commPrint("     restart_time: %e \n", restart_time);
     SYS_T::commPrint("     restart_index: %d \n", restart_index);
     SYS_T::commPrint("     restart_step: %e \n", restart_step);
@@ -307,7 +324,7 @@ int main(int argc, char *argv[])
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
-  IPGAssem * gloAssem_ptr = new PGAssem_Transport_GenAlpha( locAssem_ptr,
+  IPGAssem * gloAssem_ptr = new PGAssem_Elastodynamics_GenAlpha( locAssem_ptr,
       GMIptr, locElem, locIEN, pNode, locnbc, locebc, nz_estimate );  
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
@@ -332,12 +349,15 @@ int main(int argc, char *argv[])
     PCHYPRESetType( preproc, "boomeramg" );
    
     SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n"); 
-    gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_ptr, elementv,
+    gloAssem_ptr->Assem_mass_residual( disp, locElem, locAssem_ptr, elementv,
         elements, quadv, quads, locIEN, fNode, locnbc, locebc );
 
-    lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
+    lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_velo );
   
-    dot_sol -> ScaleValue( -1.0 );
+    dot_velo -> ScaleValue( -1.0 );
+
+    // dot_u = v
+    dot_disp -> Copy( velo );
 
     SYS_T::commPrint("\n===> Consistent initial acceleration is obtained. \n");
     lsolver_acce -> print_info();
@@ -359,24 +379,24 @@ int main(int argc, char *argv[])
       sol_record_freq, ttan_renew_freq, final_time );
 
   tsolver->print_info();
-
   
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-  tsolver->TM_GenAlpha_Transport(is_restart, dot_sol, sol,
-      tm_galpha_ptr, timeinfo, locElem, locIEN, pNode, fNode,
-      locnbc, locebc, pmat, elementv, elements, quadv, quads,
-      locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
+  tsolver->TM_GenAlpha_Elastodynamics(is_restart, dot_disp, 
+      dot_velo, disp, velo, tm_galpha_ptr, timeinfo, locElem,
+      locIEN, pNode, fNode, locnbc, locebc, pmat, elementv,
+      elements, quadv, quads, locAssem_ptr, gloAssem_ptr,
+      lsolver, nsolver);
 
   // ===== Print complete solver info =====
   lsolver -> print_info();
 
   delete tsolver; delete nsolver;
-  delete lsolver; delete gloAssem_ptr; delete dot_sol; delete timeinfo;
+  delete lsolver; delete gloAssem_ptr; delete dot_disp; delete dot_velo; delete timeinfo;
   delete fNode; delete locIEN; delete GMIptr; delete locElem; delete pNode; delete PartBasic;
   delete locnbc; delete locebc; delete quadv; delete quads; delete elementv; delete elements;
-  delete pmat; delete tm_galpha_ptr; delete locAssem_ptr; delete sol;
+  delete pmat; delete tm_galpha_ptr; delete locAssem_ptr; delete disp; delete velo;
   PetscFinalize();
   return EXIT_SUCCESS;
 }
