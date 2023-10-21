@@ -16,6 +16,7 @@
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_Gauss_Hex.hpp"
 #include "QuadPts_Gauss_Quad.hpp"
+#include "FEAElement.hpp"
 
 namespace WBC_T
 {
@@ -60,6 +61,103 @@ namespace WBC_T
     return u_t * (1.0 / (u_p * u_p));   //  tau_B = [u*]^2 / ||u_tan|| = ||u_tan|| / [u+]^2
   }
 
+  // ----------------------------------------------------------------
+  // ! build_face_ctrlpt : Given volume element and face id, get face's
+  //                     : node coordinates
+  // Input: \para ele_type : volume element type
+  //        \para face_id  : the face id (Defined in ElemBC_3D::resetSurIEN_outwardnormal)
+  //        \para vctrl_.  : the ctrl points of volume element
+  // Output: the control points of surface element, corresponding to QuadPts_on_face
+  //         and ElemBC_3D::resetSurIEN_outwardnormal
+  // ----------------------------------------------------------------
+  std::array<std::vector<double>, 3> build_face_ctrlpt( const int &ele_type, const int &face_id,
+    const double * const &vctrl_x, const double * const &vctrl_y, const double * const &vctrl_z )
+  {
+    std::vector<double> fctrl_x {}, fctrl_y {}, fctrl_z {};
+    switch (ele_type)
+    {
+      case 501:
+      {
+        switch (face_id)
+        {
+        case 0:
+        {
+          fctrl_x = std::vector<double> {vctrl_x[3], vctrl_x[1], vctrl_x[2]};
+          fctrl_y = std::vector<double> {vctrl_y[3], vctrl_y[1], vctrl_y[2]};
+          fctrl_z = std::vector<double> {vctrl_z[3], vctrl_z[1], vctrl_z[2]};
+        } break;
+        case 1:
+        {
+          fctrl_x = std::vector<double> {vctrl_x[0], vctrl_x[3], vctrl_x[2]};
+          fctrl_y = std::vector<double> {vctrl_y[0], vctrl_y[3], vctrl_y[2]};
+          fctrl_z = std::vector<double> {vctrl_z[0], vctrl_z[3], vctrl_z[2]};
+        } break;
+        case 2:
+        {
+          fctrl_x = std::vector<double> {vctrl_x[0], vctrl_x[1], vctrl_x[3]};
+          fctrl_y = std::vector<double> {vctrl_y[0], vctrl_y[1], vctrl_y[3]};
+          fctrl_z = std::vector<double> {vctrl_z[0], vctrl_z[1], vctrl_z[3]};
+        } break;
+        case 3:
+        {
+          fctrl_x = std::vector<double> {vctrl_x[0], vctrl_x[2], vctrl_x[1]};
+          fctrl_y = std::vector<double> {vctrl_y[0], vctrl_y[2], vctrl_y[1]};
+          fctrl_z = std::vector<double> {vctrl_z[0], vctrl_z[2], vctrl_z[1]};
+        } break;
+        default:
+          SYS_T::print_fatal("Error: build_face_ctrlpt, wrong face id of a volume element.\n");
+          break;
+        }
+      } break;
+      case 502:
+      {
+        switch (face_id)
+        {
+        case 0:
+        {
+          fctrl_x = std::vector<double> {vctrl_x[3], vctrl_x[1], vctrl_x[2], vctrl_x[5], vctrl_x[9], vctrl_x[8]};
+          fctrl_y = std::vector<double> {vctrl_y[3], vctrl_y[1], vctrl_y[2], vctrl_y[5], vctrl_y[9], vctrl_y[8]};
+          fctrl_z = std::vector<double> {vctrl_z[3], vctrl_z[1], vctrl_z[2], vctrl_z[5], vctrl_z[9], vctrl_z[8]};
+        } break;
+        case 1:
+        {
+          fctrl_x = std::vector<double> {vctrl_x[0], vctrl_x[3], vctrl_x[2], vctrl_x[7], vctrl_x[9], vctrl_x[6]};
+          fctrl_y = std::vector<double> {vctrl_y[0], vctrl_y[3], vctrl_y[2], vctrl_y[7], vctrl_y[9], vctrl_y[6]};
+          fctrl_z = std::vector<double> {vctrl_z[0], vctrl_z[3], vctrl_z[2], vctrl_z[7], vctrl_z[9], vctrl_z[6]};
+        } break;
+        case 2:
+        {
+          fctrl_x = std::vector<double> {vctrl_x[0], vctrl_x[1], vctrl_x[3], vctrl_x[4], vctrl_x[8], vctrl_x[7]};
+          fctrl_y = std::vector<double> {vctrl_y[0], vctrl_y[1], vctrl_y[3], vctrl_y[4], vctrl_y[8], vctrl_y[7]};
+          fctrl_z = std::vector<double> {vctrl_z[0], vctrl_z[1], vctrl_z[3], vctrl_z[4], vctrl_z[8], vctrl_z[7]};
+        } break;
+        case 3:
+        {
+          fctrl_x = std::vector<double> {vctrl_x[0], vctrl_x[2], vctrl_x[1], vctrl_x[6], vctrl_x[5], vctrl_x[4]};
+          fctrl_y = std::vector<double> {vctrl_y[0], vctrl_y[2], vctrl_y[1], vctrl_y[6], vctrl_y[5], vctrl_y[4]};
+          fctrl_z = std::vector<double> {vctrl_z[0], vctrl_z[2], vctrl_z[1], vctrl_z[6], vctrl_z[5], vctrl_z[4]};
+        } break;
+        default:
+          SYS_T::print_fatal("Error: build_face_ctrlpt, wrong face id of a volume element.\n");
+          break;
+        }
+      } break;
+      case 601:
+      {
+        ; // Unimplement
+      } break;
+      case 602:
+      {
+        ; // Unimplement
+      } break;
+      default:
+        SYS_T::print_fatal("Error: build_face_ctrlpt, unknown element type.");
+        break;
+    }
+
+    return std::array<std::vector<double>, 3> {fctrl_x, fctrl_y, fctrl_z};
+  }
+  
 }
 
 // ----------------------------------------------------------------
@@ -84,40 +182,40 @@ class QuadPts_on_face : public IQuadPts
         qp.assign(4 * num_pts, 0.0);
         switch (face_id)
         {
-          case 0: // r = 0
+          case 0: // u = 0 : node3 = node0', node1 = node1', node2 = node2'
           {
             for(unsigned int ii{0}; ii < num_pts; ++ii)
             {
-              qp[4*ii + 1] = qp_surface->get_qp(3*ii + 0);
-              qp[4*ii + 2] = qp_surface->get_qp(3*ii + 1);
-              qp[4*ii + 3] = qp_surface->get_qp(3*ii + 2);
+              qp[4*ii + 0] = qp_surface->get_qp(3*ii + 0);  // r = r'
+              qp[4*ii + 1] = qp_surface->get_qp(3*ii + 1);  // s = s'
+              qp[4*ii + 2] = qp_surface->get_qp(3*ii + 2);  // t = t'
             }
           } break;
-          case 1: // s = 0
+          case 1: // r = 0 : node0 = node0', node3 = node1', node2 = node2'
           {
             for(unsigned int ii{0}; ii < num_pts; ++ii)
             {
-              qp[4*ii + 0] = qp_surface->get_qp(3*ii + 0);
-              qp[4*ii + 2] = qp_surface->get_qp(3*ii + 1);
-              qp[4*ii + 3] = qp_surface->get_qp(3*ii + 2);
+              qp[4*ii + 1] = qp_surface->get_qp(3*ii + 1);  // s = s'
+              qp[4*ii + 2] = qp_surface->get_qp(3*ii + 0);  // t = r'
+              qp[4*ii + 3] = qp_surface->get_qp(3*ii + 2);  // u = t'
             }
           } break;
-          case 2: // t = 0
+          case 2: // s = 0 : node0 = node0', node1 = node1', node3 = node2'
           {
             for(unsigned int ii{0}; ii < num_pts; ++ii)
             {
-              qp[4*ii + 0] = qp_surface->get_qp(3*ii + 0);
-              qp[4*ii + 1] = qp_surface->get_qp(3*ii + 1);
-              qp[4*ii + 3] = qp_surface->get_qp(3*ii + 2);
+              qp[4*ii + 0] = qp_surface->get_qp(3*ii + 0);  // r = r'
+              qp[4*ii + 2] = qp_surface->get_qp(3*ii + 1);  // t = s'
+              qp[4*ii + 3] = qp_surface->get_qp(3*ii + 2);  // u = t'
             }
           } break;
-          case 3: // u = 0
+          case 3: // t = 0 : node0 = node0', node2 = node1', node1 = node2'
           {
             for(unsigned int ii{0}; ii < num_pts; ++ii)
             {
-              qp[4*ii + 0] = qp_surface->get_qp(3*ii + 0);
-              qp[4*ii + 1] = qp_surface->get_qp(3*ii + 1);
-              qp[4*ii + 2] = qp_surface->get_qp(3*ii + 2);
+              qp[4*ii + 0] = qp_surface->get_qp(3*ii + 1);  // r = s'
+              qp[4*ii + 1] = qp_surface->get_qp(3*ii + 0);  // s = r'
+              qp[4*ii + 3] = qp_surface->get_qp(3*ii + 2);  // u = t'
             }
           } break;
           default:

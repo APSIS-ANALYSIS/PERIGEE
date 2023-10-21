@@ -207,7 +207,7 @@ class PGAssem_NS_FEM : public IPGAssem
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
         IPLocAssem * const &lassem_ptr,
-        FEAElement * const &element_s,
+        FEAElement * const &element_v,
         const IQuadPts * const &quad_s,
         const ALocal_WeakBC * const &wbc_part);
 
@@ -215,7 +215,7 @@ class PGAssem_NS_FEM : public IPGAssem
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
         IPLocAssem * const &lassem_ptr,
-        FEAElement * const &element_s,
+        FEAElement * const &element_v,
         const IQuadPts * const &quad_s,
         const ALocal_WeakBC * const &wbc_part);
 

@@ -306,6 +306,10 @@ void PGAssem_NS_FEM::Assem_residual(
     VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
 
+  // Weak enforced no-slip boundary condition
+  if (wbc_part->get_weakbc_type() > 0)
+    Weak_EssBC_KG(dt, sol_a, sol_b, lassem_ptr, elementv, quad_s, wbc_part);
+
   delete [] array_a; array_a = nullptr;
   delete [] array_b; array_b = nullptr;
   delete [] local_a; local_a = nullptr;
@@ -322,10 +326,6 @@ void PGAssem_NS_FEM::Assem_residual(
   // Resistance type boundary condition
   NatBC_Resis_G( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
       nbc_part, ebc_part, gbc );
-
-  // Weak enforced no-slip boundary condition
-  if (wbc_part->get_weakbc_type() > 0)
-    Weak_EssBC_KG(dt, sol_a, sol_b, lassem_ptr, elements, quad_s, wbc_part);
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -396,6 +396,10 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
 
+  // Weak enforced no-slip boundary condition
+  if (wbc_part->get_weakbc_type() > 0)
+    Weak_EssBC_KG(dt, sol_a, sol_b, lassem_ptr, elementv, quad_s, wbc_part);
+
   delete [] array_a; array_a = nullptr;
   delete [] array_b; array_b = nullptr;
   delete [] local_a; local_a = nullptr;
@@ -412,10 +416,6 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   // Resistance type boundary condition
   NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
       nbc_part, ebc_part, gbc );
-
-  // Weak enforced no-slip boundary condition
-  if (wbc_part->get_weakbc_type() > 0)
-    Weak_EssBC_KG(dt, sol_a, sol_b, lassem_ptr, elements, quad_s, wbc_part);
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
