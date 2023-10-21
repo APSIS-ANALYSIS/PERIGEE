@@ -42,8 +42,16 @@ class ElemBC_3D_weak : public ElemBC_3D {
 
     virtual ~ElemBC_3D_weak();
 
+    virtual int get_weak_bc_type() const { return weak_bc_type; };
+
+    virtual double get_C_bI() const { return C_bI; };
+
+    virtual int get_face_id( const int &ebcid, const int &eleid) const { return face_id[ebcid][eleid]; }
+
+    virtual std::vector<double> get_rotation_matrix( const int &ebcid) const { return Q[ebcid]; }
+
     // set the rotation matrix when weak_bc_type = 2
-    void set_Q(const std::vector<int> &wall_node_idx, const std::vector<Tensor2_3D> &Q_at_node);
+    virtual void set_Q(const std::vector<int> &wall_node_idx, const std::vector<Tensor2_3D> &Q_at_node);
 
   private:
     // Weak bc type
