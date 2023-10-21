@@ -30,6 +30,7 @@
 // ============================================================================
 
 #include "ElemBC_3D.hpp"
+#include "Tensor2_3D.hpp"
 
 class ElemBC_3D_weak : public ElemBC_3D {
   public:
@@ -40,6 +41,9 @@ class ElemBC_3D_weak : public ElemBC_3D {
                     const int &elemtype );
 
     virtual ~ElemBC_3D_weak();
+
+    // set the rotation matrix when weak_bc_type = 2
+    void set_Q(const std::vector<int> &wall_node_idx, const std::vector<Tensor2_3D> &Q_at_node);
 
   private:
     // Weak bc type
@@ -54,6 +58,9 @@ class ElemBC_3D_weak : public ElemBC_3D {
 
     // the face id of the volume element
     std::vector< std::vector<int> > face_id;
+
+    // the rotation matrix at each surface node
+    std::vector< std::vector<double> > Q;
 
     // ------------------------------------------------------------------------
     // Disallow default constructor
