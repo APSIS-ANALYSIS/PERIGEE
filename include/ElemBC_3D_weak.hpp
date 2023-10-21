@@ -46,7 +46,7 @@ class ElemBC_3D_weak : public ElemBC_3D {
 
     virtual double get_C_bI() const { return C_bI; };
 
-    virtual int get_face_id( const int &ebcid, const int &eleid) const { return face_id[ebcid][eleid]; }
+    virtual std::vector<int> get_faceID( const int &ebcid) const { return face_id[ebcid]; }
 
     virtual std::vector<double> get_rotation_matrix( const int &ebcid) const { return Q[ebcid]; }
 
