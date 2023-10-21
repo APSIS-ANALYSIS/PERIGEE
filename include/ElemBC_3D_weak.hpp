@@ -36,6 +36,7 @@ class ElemBC_3D_weak : public ElemBC_3D {
     ElemBC_3D_weak( const std::vector<std::string> &vtkfileList,
                     const int &in_weak_bc_type,
                     const double &in_C_bI,
+                    const IIEN * const &VIEN,
                     const int &elemtype );
 
     virtual ~ElemBC_3D_weak();
@@ -50,6 +51,9 @@ class ElemBC_3D_weak : public ElemBC_3D {
 
     // value of coefficient C_bI
     const double C_bI;
+
+    // the face id of the volume element
+    std::vector< std::vector<int> > face_id;
 
     // ------------------------------------------------------------------------
     // Disallow default constructor
