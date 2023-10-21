@@ -211,7 +211,7 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Elastodynamics(
   // get dot_disp by the kinematic equations
   dot_disp -> Copy( pre_dot_disp );
   dot_disp -> ScaleValue( alpha_m-1.0 );
-  dot_disp -> PlusAX( pre_velo, 1-alpha_f );
+  dot_disp -> PlusAX( pre_velo, 1.0-alpha_f );
   dot_disp -> PlusAX( velo, alpha_f );
   dot_disp -> ScaleValue( 1.0/alpha_m );
 
@@ -270,14 +270,14 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Elastodynamics(
     disp->PlusAX( dot_step, - alpha_f * gamma * gamma * dt * dt / alpha_m );
 
     dot_velo_alpha->PlusAX( dot_step, - alpha_m );
-    disp_alpha->PlusAX( dot_step, - alpha_m );
+    disp_alpha->PlusAX( dot_step, - alpha_f * gamma * gamma * dt * dt );
 
     // Assembly residual (& tangent if condition satisfied)
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )
     {
       gassem_ptr->Clear_KG();
 
-      gassem_ptr->Assem_tangent_residual( dot_velo_alpha,disp_alpha,
+      gassem_ptr->Assem_tangent_residual( dot_velo_alpha, disp_alpha,
           curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
           quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part );
 
