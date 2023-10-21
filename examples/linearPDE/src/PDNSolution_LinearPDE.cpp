@@ -34,7 +34,7 @@ void PDNSolution_LinearPDE::Init_zero( const APart_Node * const &pNode )
     int * location = new int[dof]{};
     for(int ii=0; ii<dof; ++ii)
     {
-      location[dof+ii] = pos + ii;
+      location[ii] = pos + ii;
     }
 
     VecSetValues(solution, dof, location, value, INSERT_VALUES);
