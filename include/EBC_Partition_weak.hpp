@@ -1,7 +1,7 @@
 #ifndef EBC_PARTITION_WEAK_HPP
 #define EBC_PARTITION_WEAK_HPP
 // ==================================================================
-// EBC_Partition_wall.hpp
+// EBC_Partition_weak.hpp
 //
 // Element boundary condition partition for the weak imposition of
 // no-slip boundary condition.
@@ -25,6 +25,16 @@ class EBC_Partition_weak : public EBC_Partition
     virtual void write_hdf5( const std::string &FileName ) const;
 
   protected:
+    const int weak_bc_type;
+
+    const double C_bI;
+
+    // stores the volume element id
+    std::vector< std::vector<int> > vol_ele_id;
+
+    // stores the face id of the volume element
+    std::vector< std::vector<int> > ele_face_id;
+
 };
 
 #endif
