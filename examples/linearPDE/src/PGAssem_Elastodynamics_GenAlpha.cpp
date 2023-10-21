@@ -316,7 +316,7 @@ void PGAssem_Elastodynamics_GenAlpha::Assem_tangent_residual(
     for(int ii=0; ii<nLocBas; ++ii)
     {
       for(int mm=0; mm<dof_mat; ++mm)
-        row_index[dof_mat*ii + mm] = dof_mat*nbc_part->get_LID(mm, IEN_e[ii])+mm;
+        row_index[dof_mat*ii + mm] = dof_mat * nbc_part->get_LID(mm, IEN_e[ii]) + mm;
     }
 
     MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
