@@ -4,7 +4,6 @@
 // ALocal_WeakBC.hpp
 //
 // FEM-analysis-use Local subdomain's Weak enforced no-slip Boundary Conditions.
-// It is like a combination of ringBC and EBC.
 //
 // Author: Xuanming Huang
 // Date Created: Oct. 18th 2023
@@ -16,12 +15,10 @@ class ALocal_WeakBC
   public:
     ALocal_WeakBC( const std::string &fileBaseName, const int &cpu_rank );
 
-    virtual ~ALocal_WeakBC(){};
+    virtual ~ALocal_WeakBC();
 
     // Get the type of weak enforced Dirichlet BC
     virtual int get_weakbc_type() const { return weakbc_type; }
-
-
 
   protected:
     // type = 0: the whole wall is set to be strongly no-slip BC
@@ -31,6 +28,29 @@ class ALocal_WeakBC
     //           of wall nodes are set to be weakly essential BC.       
     int weakbc_type;
 
+    // Number of boundaries that assigned weak BC
+    int num_weak_boundary;
+
+    // Coefficient for weak BC
+    int C_bI;
+
+    // num_sur_ele[ii] gives the ii-th weakbc's surface element number.
+    std::vector<int> num_sur_ele {};
+
+    // Store the global volume element id
+    std::vector< std::vector<int> > vol_ele_id;
+
+    // Store the face id of volume element
+    std::vector< std::vector<int> > ele_face_id;
+
+    // num_sur_node[ii] gives the ii-th weakbc's surface node number.
+    std::vector<int> num_sur_node {};
+
+    // Store the global id of surface node
+    std::vector< std::vector<int> > sur_node_id;
+
+    // Store the rotation matrices at nodes
+    std::vector< std::vector<Tensor2_3D> > Q;
 
     // ------------------------------------------------------------------------
     // Disallow default constructor

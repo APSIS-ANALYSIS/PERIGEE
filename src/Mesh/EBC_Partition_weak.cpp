@@ -52,10 +52,10 @@ void EBC_Partition_weak::write_hdf5(const std::string &FileName) const
 
   h5w -> write_intScalar( g_id, "weakBC_type", weak_bc_type );
 
-  h5w -> write_intScalar( g_id, "num_weakBC", num_ebc );
-
   if(weak_bc_type > 0)
   {
+    h5w -> write_intScalar( g_id, "num_weak_boundary", num_ebc );
+
     h5w -> write_doubleScalar( g_id, "C_bI", C_bI );
 
     h5w -> write_intVector( g_id, "num_local_cell", num_local_cell );
