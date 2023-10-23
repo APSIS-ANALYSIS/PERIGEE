@@ -14,15 +14,8 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
   CT( in_ct ), Ctauc( in_ctauc ), nLocBas( in_nlocbas ), snLocBas( in_snlocbas ),
   vec_size( in_nlocbas * 4 ), sur_size ( in_snlocbas * 4 ),
   coef( (elemtype == 501 || elemtype == 502) ? 0.6299605249474365:1.0 ),
-  mm{ (elemtype == 501 || elemtype == 502) ? 2.0:1.0, 
-      (elemtype == 501 || elemtype == 502) ? 1.0:0.0, 
-      (elemtype == 501 || elemtype == 502) ? 1.0:0.0, 
-      (elemtype == 501 || elemtype == 502) ? 1.0:0.0, 
-      (elemtype == 501 || elemtype == 502) ? 2.0:1.0, 
-      (elemtype == 501 || elemtype == 502) ? 1.0:0.0,
-      (elemtype == 501 || elemtype == 502) ? 1.0:0.0, 
-      (elemtype == 501 || elemtype == 502) ? 1.0:0.0, 
-      (elemtype == 501 || elemtype == 502) ? 2.0:1.0 }
+  mm( (elemtype == 501 || elemtype == 502) ? std::array<double, 9>{2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0}:
+                                             std::array<double, 9>{1.0, 0.0, 0.0, 0.0, 1.0 ,0.0, 0.0, 0.0 ,1.0} )
 {
   Tangent = new PetscScalar[vec_size * vec_size];
   Residual = new PetscScalar[vec_size];

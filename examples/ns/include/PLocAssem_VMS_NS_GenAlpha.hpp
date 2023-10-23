@@ -159,7 +159,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     // M = coef *  mm[3], mm[4], mm[5]
     //             mm[6], mm[7], mm[8]
     const double coef;
-    const double mm[9]; 
+    const std::array<double, 9> mm; 
 
     // Private functions
     void print_info() const;
