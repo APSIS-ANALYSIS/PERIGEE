@@ -308,7 +308,7 @@ void PGAssem_NS_FEM::Assem_residual(
 
   // Weak enforced no-slip boundary condition
   if (wbc_part->get_weakbc_type() > 0)
-    Weak_EssBC_KG(dt, sol_a, sol_b, lassem_ptr, elementv, quad_s, wbc_part);
+    Weak_EssBC_KG(curr_time, dt, sol_a, sol_b, lassem_ptr, elementv, elements, quad_s, wbc_part);
 
   delete [] array_a; array_a = nullptr;
   delete [] array_b; array_b = nullptr;
@@ -398,7 +398,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
 
   // Weak enforced no-slip boundary condition
   if (wbc_part->get_weakbc_type() > 0)
-    Weak_EssBC_KG(dt, sol_a, sol_b, lassem_ptr, elementv, quad_s, wbc_part);
+    Weak_EssBC_KG(curr_time, dt, sol_a, sol_b, lassem_ptr, elementv, elements, quad_s, wbc_part);
 
   delete [] array_a; array_a = nullptr;
   delete [] array_b; array_b = nullptr;
@@ -1021,10 +1021,12 @@ void PGAssem_NS_FEM::NatBC_Resis_KG(
   delete [] sctrl_z; sctrl_z = nullptr;
 }
 
-void PGAssem_NS_FEM::Weak_EssBC_KG( const double &dt,
+void PGAssem_NS_FEM::Weak_EssBC_KG(
+    const double &curr_time, const double &dt,
     const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_v,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_WeakBC * const &wbc_part)
@@ -1032,10 +1034,12 @@ void PGAssem_NS_FEM::Weak_EssBC_KG( const double &dt,
   ; // Unimplemented
 }
 
-void PGAssem_NS_FEM::Weak_EssBC_G( const double &dt,
+void PGAssem_NS_FEM::Weak_EssBC_G(
+    const double &curr_time, const double &dt,
     const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_v,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_WeakBC * const &wbc_part)

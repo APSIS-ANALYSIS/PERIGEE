@@ -20,6 +20,8 @@ class ALocal_WeakBC
     // Get the type of weak enforced Dirichlet BC
     virtual int get_weakbc_type() const { return weakbc_type; }
 
+    virtual int get_num_weak_boundary() const { return num_weak_boundary; }
+
     virtual int get_C_bI() const { return C_bI; }
 
     virtual std::vector<int> get_vol_ele_id(const int &ii) { return vol_ele_id[ii]; }

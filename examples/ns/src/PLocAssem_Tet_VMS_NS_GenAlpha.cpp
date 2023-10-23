@@ -1005,4 +1005,32 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_pressure_area(
   }
 }
 
+void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_Weak(
+    const int &weakbc_id,
+    const double &time, const double &dt,
+    FEAElement * const &elementv,
+    FEAElement * const &elements,
+    const double * const &veleCtrlPts_x,
+    const double * const &veleCtrlPts_y,
+    const double * const &veleCtrlPts_z,
+    const IQuadPts * const &quadv,
+    const IQuadPts * const &quads)
+{
+  ; // Unimplemented
+}
+
+void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangential_Residual_Weak(
+    const int &weakbc_id,
+    const double &time, const double &dt,
+    FEAElement * const &elementv,
+    FEAElement * const &elements,
+    const double * const &veleCtrlPts_x,
+    const double * const &veleCtrlPts_y,
+    const double * const &veleCtrlPts_z,
+    const IQuadPts * const &quadv,
+    const IQuadPts * const &quads)
+{
+  ; // Unimplemented
+}
+
 // EOF
