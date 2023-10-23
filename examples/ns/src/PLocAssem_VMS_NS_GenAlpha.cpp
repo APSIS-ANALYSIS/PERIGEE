@@ -10,33 +10,20 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
 : rho0( in_rho ), vis_mu( in_vis_mu ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()), beta(in_beta), nqp(in_nqp),
+  CI( (elemtype == 501 || elemtype == 601) ? 36.0:60.0 ),
   CT( in_ct ), Ctauc( in_ctauc ), nLocBas( in_nlocbas ), snLocBas( in_snlocbas ),
-  vec_size( in_nlocbas * 4 ), sur_size ( in_snlocbas * 4 )
+  vec_size( in_nlocbas * 4 ), sur_size ( in_snlocbas * 4 ),
+  coef( (elemtype == 501 || elemtype == 502) ? 0.6299605249474365:1.0 ),
+  mm{ (elemtype == 501 || elemtype == 502) ? 2.0:1.0, 
+      (elemtype == 501 || elemtype == 502) ? 1.0:0.0, 
+      (elemtype == 501 || elemtype == 502) ? 1.0:0.0, 
+      (elemtype == 501 || elemtype == 502) ? 1.0:0.0, 
+      (elemtype == 501 || elemtype == 502) ? 2.0:1.0, 
+      (elemtype == 501 || elemtype == 502) ? 1.0:0.0,
+      (elemtype == 501 || elemtype == 502) ? 1.0:0.0, 
+      (elemtype == 501 || elemtype == 502) ? 1.0:0.0, 
+      (elemtype == 501 || elemtype == 502) ? 2.0:1.0 }
 {
-  // 501 is linear tet element, 502 is quadratic tet element
-  if(elemtype == 501 || elemtype == 502)
-  {  
-    CI = (elemtype == 501) ? 36.0 : 60.0;
-    
-    // PHASTA definition 
-    coef = 0.6299605249474365;
-    mm[0] = 2.0; mm[1] = 1.0; mm[2] = 1.0;
-    mm[3] = 1.0; mm[4] = 2.0; mm[5] = 1.0;
-    mm[6] = 1.0; mm[7] = 1.0; mm[8] = 2.0;
-  }
-  // 601 is trilinear hex element, 602 is triquadratic hex element
-  else if(elemtype == 601 || elemtype == 602)
-  {
-    CI = (elemtype == 601) ? 36.0 : 60.0;
-
-    // PHASTA definition 
-    coef = 1.0;
-    mm[0] = 1.0; mm[1] = 0.0; mm[2] = 0.0;
-    mm[3] = 0.0; mm[4] = 1.0; mm[5] = 0.0;
-    mm[6] = 0.0; mm[7] = 0.0; mm[8] = 1.0;
-  }
-  else SYS_T::print_fatal("Error: PLocAssem_VMS_NS_GenAlpha constructor: unknown element type.\n");
-
   Tangent = new PetscScalar[vec_size * vec_size];
   Residual = new PetscScalar[vec_size];
 

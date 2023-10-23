@@ -144,22 +144,22 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     // Private data
     const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta;
 
-    // M matrix for tau_m
-    //             mm[0], mm[1], mm[2]
-    // M = coef *  mm[3], mm[4], mm[5]
-    //             mm[6], mm[7], mm[8]
-    double coef;
-    double mm[9]; 
-
     const int nqp; // number of quadrature points
 
-    double CI; // Constants for stabilization parameters
+    const double CI; // Constants for stabilization parameters
     
     const double CT; // Constants for stabilization parameters
 
     const double Ctauc; // Constant scaling factor for tau_C
 
     const int nLocBas, snLocBas, vec_size, sur_size;
+
+    // M matrix for tau_m
+    //             mm[0], mm[1], mm[2]
+    // M = coef *  mm[3], mm[4], mm[5]
+    //             mm[6], mm[7], mm[8]
+    const double coef;
+    const double mm[9]; 
 
     // Private functions
     void print_info() const;
