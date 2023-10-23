@@ -1,8 +1,3 @@
-# Mesh partition setting
-part_file: part
-cpu_size: 2
-in_ncommon: 2
-is_dualgraph: false
 # Element options: 501 linear tet, 502 quadratic tet, 601 trilinear hex, 602 triquadratic hex
 elem_type: 602
 # Numbers of inlets and outlets
@@ -13,3 +8,8 @@ geo_file: whole_vol.vtu
 sur_file_in_base: ./inflow_vol_
 sur_file_wall: ./wall_vol.vtu
 sur_file_out_base: ./outflow_vol_
+# Mesh partition setting
+part_file: part
+cpu_size: 2
+in_ncommon: 2
+is_dualgraph: false

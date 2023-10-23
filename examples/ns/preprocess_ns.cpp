@@ -43,10 +43,6 @@ int main( int argc, char * argv[] )
 
   YAML::Node paras = YAML::LoadFile( yaml_file );
 
-  const std::string part_file         = paras["part_file"].as<std::string>();
-  const int cpu_size                  = paras["cpu_size"].as<int>();
-  const int in_ncommon                = paras["in_ncommon"].as<int>();
-  const bool isDualGraph              = paras["is_dualgraph"].as<bool>();
   const int elemType                  = paras["elem_type"].as<int>();
   const int num_inlet                 = paras["num_inlet"].as<int>();
   const int num_outlet                = paras["num_outlet"].as<int>();
@@ -54,6 +50,10 @@ int main( int argc, char * argv[] )
   const std::string sur_file_in_base  = paras["sur_file_in_base"].as<std::string>();
   const std::string sur_file_wall     = paras["sur_file_wall"].as<std::string>();
   const std::string sur_file_out_base = paras["sur_file_out_base"].as<std::string>();
+  const std::string part_file         = paras["part_file"].as<std::string>();
+  const int cpu_size                  = paras["cpu_size"].as<int>();
+  const int in_ncommon                = paras["in_ncommon"].as<int>();
+  const bool isDualGraph              = paras["is_dualgraph"].as<bool>();
 
   if( elemType != 501 && elemType !=502 && elemType != 601 && elemType != 602 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
 
