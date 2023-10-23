@@ -24,9 +24,11 @@ class ALocal_WeakBC
 
     virtual int get_C_bI() const { return C_bI; }
 
-    virtual std::vector<int> get_part_vol_ele_id(const int &ii) { return part_vol_ele_id[ii]; }
+    virtual int get_num_ele(const int &ii) const { return num_sur_ele[ii]; }
 
-    virtual std::vector<int> get_ele_face_id(const int &ii) { return ele_face_id[ii]; }
+    virtual std::vector<int> get_part_vol_ele_id(const int &ii) const { return part_vol_ele_id[ii]; }
+
+    virtual std::vector<int> get_ele_face_id(const int &ii) const { return ele_face_id[ii]; }
 
   protected:
     // type = 0: the whole wall is set to be strongly no-slip BC

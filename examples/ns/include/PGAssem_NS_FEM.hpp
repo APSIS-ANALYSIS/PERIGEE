@@ -210,6 +210,9 @@ class PGAssem_NS_FEM : public IPGAssem
         FEAElement * const &element_v,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_WeakBC * const &wbc_part);
 
     void Weak_EssBC_G( const double &curr_time, const double &dt,
@@ -219,6 +222,9 @@ class PGAssem_NS_FEM : public IPGAssem
         FEAElement * const &element_v,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_part,
         const ALocal_WeakBC * const &wbc_part);
 
     void GetLocal(const double * const &array, const int * const &IEN,
