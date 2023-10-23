@@ -455,6 +455,31 @@ class IPLocAssem
       return output;
     }
 
+    // virtual function for weak bc
+    virtual void Assem_Residual_Weak(
+        const int &weakbc_id,
+        const double &time, const double &dt,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const double * const &veleCtrlPts_x,
+        const double * const &veleCtrlPts_y,
+        const double * const &veleCtrlPts_z,
+        const IQuadPts * const &quadv,
+        const IQuadPts * const &quads)
+    {SYS_T::commPrint("Warning: this Assem_Residual_Weak is not implemented.\n");}
+
+    virtual void Assem_Tangential_Residual_Weak(
+        const int &weakbc_id,
+        const double &time, const double &dt,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const double * const &veleCtrlPts_x,
+        const double * const &veleCtrlPts_y,
+        const double * const &veleCtrlPts_z,
+        const IQuadPts * const &quadv,
+        const IQuadPts * const &quads)
+    {SYS_T::commPrint("Warning: this Assem_Tangential_Residual_Weak is not implemented.\n");}
+    
 };
 
 #endif
