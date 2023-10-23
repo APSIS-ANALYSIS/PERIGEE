@@ -43,13 +43,13 @@ int main( int argc, char * argv[] )
 
   YAML::Node paras = YAML::LoadFile( yaml_file );
 
+  const std::string part_file         = paras["part_file"].as<std::string>();
   const int cpu_size                  = paras["cpu_size"].as<int>();
   const int in_ncommon                = paras["in_ncommon"].as<int>();
   const bool isDualGraph              = paras["is_dualgraph"].as<bool>();
+  const int elemType                  = paras["elem_type"].as<int>();
   const int num_inlet                 = paras["num_inlet"].as<int>();
   const int num_outlet                = paras["num_outlet"].as<int>();
-  const int elemType                  = paras["elem_type"].as<int>();
-  const std::string part_file         = paras["part_file"].as<std::string>();
   const std::string geo_file          = paras["geo_file"].as<std::string>();
   const std::string sur_file_in_base  = paras["sur_file_in_base"].as<std::string>();
   const std::string sur_file_wall     = paras["sur_file_wall"].as<std::string>();
