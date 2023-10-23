@@ -45,7 +45,7 @@ class ALocal_WeakBC
     // num_sur_ele[ii] gives the ii-th weakbc's surface element number.
     std::vector<int> num_sur_ele {};
 
-    // Store the local volume element id this this part
+    // Store the local volume element id in this part
     std::vector< std::vector<int> > part_vol_ele_id;
 
     // Store the face id of volume element
