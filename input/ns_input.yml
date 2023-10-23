@@ -12,4 +12,4 @@ sur_file_out_base: ./outflow_vol_
 part_file: part
 cpu_size: 2
 in_ncommon: 2
-is_dualgraph: false
+is_dualgraph: true
