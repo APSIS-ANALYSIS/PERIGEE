@@ -10,16 +10,19 @@ weak_bc_type {ebc->get_weak_bc_type()}, C_bI {ebc->get_C_bI()}
   else if(weak_bc_type == 1 || weak_bc_type == 2)
   {
 
-    vol_ele_id.resize(num_ebc);
+    part_vol_ele_id.resize(num_ebc);
     ele_face_id.resize(num_ebc);
     if(weak_bc_type == 2)
       rot_mat.resize(num_ebc);
 
     for(int ii{0}; ii < num_ebc; ++ii)
     {   
-      vol_ele_id[ii].resize(get_num_local_cell(ii));
+      part_vol_ele_id[ii].resize(get_num_local_cell(ii));
       for(int ee{0}; ee < get_num_local_cell(ii); ++ee)
-        vol_ele_id[ii][ee] = ebc -> get_global_cell(ii, ee);
+      {
+        const int global_vol_ele_id = ebc -> get_global_cell(ii, ee);
+        part_vol_ele_id[ii][ee] = part -> get_elemLocIndex(global_vol_ele_id);
+      }
 
       ele_face_id[ii] = ebc -> get_faceID(ii);
 
@@ -36,7 +39,7 @@ weak_bc_type {ebc->get_weak_bc_type()}, C_bI {ebc->get_C_bI()}
 
 EBC_Partition_weak::~EBC_Partition_weak()
 {
-  vol_ele_id.clear();
+  part_vol_ele_id.clear();
   ele_face_id.clear();
 }
 
@@ -73,7 +76,7 @@ void EBC_Partition_weak::write_hdf5(const std::string &FileName) const
       hid_t group_id = H5Gcreate(g_id, subgroup_name.c_str(), 
           H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-      h5w -> write_intVector( group_id, "volume_cell_id", vol_ele_id[ii] );
+      h5w -> write_intVector( group_id, "part_volume_cell_id", part_vol_ele_id[ii] );
 
       h5w -> write_intVector( group_id, "cell_face_id", ele_face_id[ii] );
 

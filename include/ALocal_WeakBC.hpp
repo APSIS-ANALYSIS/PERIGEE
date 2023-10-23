@@ -24,7 +24,7 @@ class ALocal_WeakBC
 
     virtual int get_C_bI() const { return C_bI; }
 
-    virtual std::vector<int> get_vol_ele_id(const int &ii) { return vol_ele_id[ii]; }
+    virtual std::vector<int> get_part_vol_ele_id(const int &ii) { return part_vol_ele_id[ii]; }
 
     virtual std::vector<int> get_ele_face_id(const int &ii) { return ele_face_id[ii]; }
 
@@ -45,8 +45,8 @@ class ALocal_WeakBC
     // num_sur_ele[ii] gives the ii-th weakbc's surface element number.
     std::vector<int> num_sur_ele {};
 
-    // Store the global volume element id
-    std::vector< std::vector<int> > vol_ele_id;
+    // Store the local volume element id this this part
+    std::vector< std::vector<int> > part_vol_ele_id;
 
     // Store the face id of volume element
     std::vector< std::vector<int> > ele_face_id;

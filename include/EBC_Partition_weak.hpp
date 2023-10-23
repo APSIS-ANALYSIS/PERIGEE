@@ -29,8 +29,8 @@ class EBC_Partition_weak : public EBC_Partition
 
     const double C_bI;
 
-    // stores the volume element id
-    std::vector< std::vector<int> > vol_ele_id;
+    // stores the local volume element id in this part
+    std::vector< std::vector<int> > part_vol_ele_id;
 
     // stores the face id of the volume element
     std::vector< std::vector<int> > ele_face_id;

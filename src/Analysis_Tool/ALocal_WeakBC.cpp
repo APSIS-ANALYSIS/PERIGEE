@@ -20,7 +20,7 @@ ALocal_WeakBC::ALocal_WeakBC( const std::string &fileBaseName, const int &cpu_ra
 
     num_sur_ele = h5r -> read_intVector( gname.c_str(), "num_local_cell" ); 
 
-    vol_ele_id.resize(num_weak_boundary);
+    part_vol_ele_id.resize(num_weak_boundary);
 
     ele_face_id.resize(num_weak_boundary);
 
@@ -40,7 +40,7 @@ ALocal_WeakBC::ALocal_WeakBC( const std::string &fileBaseName, const int &cpu_ra
       std::string subgroup_name(groupbase);
       subgroup_name.append( std::to_string(ii) );
 
-      vol_ele_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "vol_cell_id" );
+      part_vol_ele_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "part_vol_cell_id" );
 
       ele_face_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "cell_face_id" );
 
@@ -70,7 +70,7 @@ ALocal_WeakBC::~ALocal_WeakBC()
 
     for(int ii{0}; ii < num_weak_boundary; ++ii)
     {
-      VEC_T::clean( vol_ele_id[ii] );
+      VEC_T::clean( part_vol_ele_id[ii] );
       VEC_T::clean( ele_face_id[ii] );
 
       if(weakbc_type == 2)
