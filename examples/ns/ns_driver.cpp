@@ -244,6 +244,9 @@ int main(int argc, char *argv[])
   // Local sub-domain's elemental bc
   ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
 
+  // Local sub_domain's weak bc
+  ALocal_WeakBC * locwbc = new ALocal_WeakBC(part_file, rank);
+
   // Local sub-domain's nodal indices
   APart_Node * pNode = new APart_Node(part_file, rank);
 
@@ -514,7 +517,7 @@ int main(int argc, char *argv[])
 
   tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol,
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN, fNode,
-      locnbc, locinfnbc, locebc, gbc, pmat, elementv, elements, quadv, quads,
+      locnbc, locinfnbc, locebc, gbc, locwbc, pmat, elementv, elements, quadv, quads,
       locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
 
   // ===== Print complete solver info =====
@@ -522,7 +525,7 @@ int main(int argc, char *argv[])
 
   // ===== Clean Memory =====
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
-  delete locElem; delete locnbc; delete locebc; delete pNode; delete locinfnbc;
+  delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc;
   delete tm_galpha_ptr; delete pmat; delete elementv; delete elements;
   delete quads; delete quadv; delete inflow_rate_ptr; delete gbc; delete timeinfo;
   delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete gloAssem_ptr;

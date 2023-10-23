@@ -54,6 +54,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const ALocal_InflowBC * const &infnbc_part,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc,
+    const ALocal_WeakBC * const &wbc_part,
     const Matrix_PETSc * const &bc_mat,
     FEAElement * const &elementv,
     FEAElement * const &elements,
@@ -121,7 +122,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
     gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol, 
         curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
-        quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc );
+        quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part );
    
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(mat_assem_0_event,0,0,0,0);
@@ -143,7 +144,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
     gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
         curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
-        quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc );
+        quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part );
 
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(vec_assem_0_event,0,0,0,0);

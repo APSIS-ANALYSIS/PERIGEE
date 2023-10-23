@@ -267,8 +267,8 @@ void PGAssem_NS_FEM::Assem_residual(
     const FEANode * const &fnode_ptr,
     const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
-    const ALocal_WeakBC * const &wbc_part,
-    const IGenBC * const &gbc )
+    const IGenBC * const &gbc,
+    const ALocal_WeakBC * const &wbc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
@@ -354,8 +354,8 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     const FEANode * const &fnode_ptr,
     const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
-    const ALocal_WeakBC * const &wbc_part,
-    const IGenBC * const &gbc )
+    const IGenBC * const &gbc,
+    const ALocal_WeakBC * const &wbc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;

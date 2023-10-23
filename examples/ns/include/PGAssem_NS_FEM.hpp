@@ -84,8 +84,8 @@ class PGAssem_NS_FEM : public IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
-        const ALocal_WeakBC * const &wbc_part,
-        const IGenBC * const &gbc );
+        const IGenBC * const &gbc,
+        const ALocal_WeakBC * const &wbc_part );
 
     // Assembly the residual vector and tangent matrix 
     // for the NS equations
@@ -106,8 +106,8 @@ class PGAssem_NS_FEM : public IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
-        const ALocal_WeakBC * const &wbc_part,
-        const IGenBC * const &gbc );
+        const IGenBC * const &gbc,
+        const ALocal_WeakBC * const &wbc_part );
 
     // Assembly routine for the surface integrals of flow rate and
     // pressure
