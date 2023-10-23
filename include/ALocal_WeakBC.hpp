@@ -20,6 +20,12 @@ class ALocal_WeakBC
     // Get the type of weak enforced Dirichlet BC
     virtual int get_weakbc_type() const { return weakbc_type; }
 
+    virtual int get_C_bI() const { return C_bI; }
+
+    virtual std::vector<int> get_vol_ele_id(const int &ii) { return vol_ele_id[ii]; }
+
+    virtual std::vector<int> get_ele_face_id(const int &ii) { return ele_face_id[ii]; }
+
   protected:
     // type = 0: the whole wall is set to be strongly no-slip BC
     // type = 1: all dof of wall nodes are set to be weakly essential BC;

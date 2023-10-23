@@ -15,9 +15,11 @@
 #include "NodalBC.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_outflow.hpp"
+#include "ElemBC_3D_weak.hpp"
 #include "NBC_Partition.hpp"
 #include "NBC_Partition_inflow.hpp"
 #include "EBC_Partition_outflow.hpp"
+#include "EBC_Partition_weak.hpp"
 
 int main( int argc, char * argv[] )
 {
@@ -40,6 +42,8 @@ int main( int argc, char * argv[] )
   //              2 strongly enforced in wall-normal direction,
   //                and weakly enforced in wall-tangent direction
   int weakBC_type = 0;
+  // C_bI: coefficient of weak BC
+  double C_bI = 4.0;
   
   // Default names for input geometry files
   std::string geo_file("./whole_vol.vtu");
@@ -72,6 +76,7 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionInt("-num_outlet", num_outlet);
   SYS_T::GetOptionInt("-elem_type", elemType);
   SYS_T::GetOptionInt("-weakbc_type", weakBC_type);
+  SYS_T::GetOptionReal("-C_bI", C_bI);
   SYS_T::GetOptionString("-geo_file", geo_file);
   SYS_T::GetOptionString("-sur_file_in_base", sur_file_in_base);
   SYS_T::GetOptionString("-sur_file_wall", sur_file_wall);
@@ -83,6 +88,8 @@ int main( int argc, char * argv[] )
   cout<<"==== Command Line Arguments ===="<<endl;
   cout<<" -elem_type: "<<elemType<<endl;
   cout<<" -weakbc_type: "<<weakBC_type<<endl;
+  if(weakBC_type != 0)
+    cout<<"-C_bI: "<<C_bI<<endl;
   cout<<" -num_outlet: "<<num_outlet<<endl;
   cout<<" -geo_file: "<<geo_file<<endl;
   cout<<" -sur_file_in_base: "<<sur_file_in_base<<endl;
@@ -205,17 +212,14 @@ int main( int argc, char * argv[] )
   std::vector<INodalBC *> NBC_list( dofMat, nullptr );
 
   std::vector<std::string> dir_list {};
+  std::vector<std::string> weak_list {};
   for(int ii=0; ii<num_inlet; ++ii)
     dir_list.push_back( sur_file_in[ii] );
   
   if (weakBC_type == 0)
     dir_list.push_back( sur_file_wall );
   else if (weakBC_type == 1 || weakBC_type == 2)
-  {
-    // Setup Weakly enforced no-slip Boundary Conditions
-    // Unimplemented
-
-  }
+    weak_list.push_back( sur_file_wall );
   else
     SYS_T::print_fatal("Unknown weak BC type.");
 
@@ -234,7 +238,6 @@ int main( int argc, char * argv[] )
 
   InFBC -> resetSurIEN_outwardnormal( IEN ); // assign outward orientation for triangles
 
-
   // Setup Elemental Boundary Conditions
   // Obtain the outward normal vector
   std::vector< Vector_3 > outlet_outvec( sur_file_out.size() );
@@ -244,6 +247,9 @@ int main( int argc, char * argv[] )
   ElemBC * ebc = new ElemBC_3D_outflow( sur_file_out, outlet_outvec, elemType );
 
   ebc -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
+
+  // Setup weak BC
+  ElemBC * wbc = new ElemBC_3D_weak( weak_list, weakBC_type, C_bI, IEN, elemType );
  
   // Start partition the mesh for each cpu_rank 
 
@@ -283,6 +289,11 @@ int main( int argc, char * argv[] )
 
     ebcpart -> write_hdf5( part_file );
 
+    // Partition Weak BC and write to h5 file
+    EBC_Partition * wbcpart = new EBC_Partition_weak(part, mnindex, wbc);
+
+    wbcpart -> write_hdf5( part_file );
+
     // Collect partition statistics
     list_nlocalnode.push_back(part->get_nlocalnode());
     list_nghostnode.push_back(part->get_nghostnode());
@@ -291,7 +302,7 @@ int main( int argc, char * argv[] )
     list_ratio_g2l.push_back((double)part->get_nghostnode()/(double) part->get_nlocalnode());
 
     sum_nghostnode += part->get_nghostnode();
-    delete part; delete nbcpart; delete infpart; delete ebcpart; 
+    delete part; delete nbcpart; delete infpart; delete ebcpart; delete wbcpart; 
   }
 
   cout<<"\n===> Mesh Partition Quality: "<<endl;
@@ -311,7 +322,7 @@ int main( int argc, char * argv[] )
   // Finalize the code and exit
   for(auto it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc) delete *it_nbc;
 
-  delete InFBC; delete ebc; delete mytimer;
+  delete InFBC; delete ebc; delete wbc; delete mytimer;
   delete mnindex; delete global_part; delete mesh; delete IEN;
   PetscFinalize();
   return EXIT_SUCCESS;

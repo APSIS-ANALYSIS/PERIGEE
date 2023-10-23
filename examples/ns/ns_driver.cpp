@@ -12,6 +12,7 @@
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
 #include "ALocal_EBC_outflow.hpp"
+#include "ALocal_WeakBC.hpp"
 #include "ALocal_InflowBC.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
@@ -32,6 +33,13 @@
 
 int main(int argc, char *argv[])
 {
+  // ===== Read preprocessor arguments =====
+  hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
+  HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
+  
+  // weak bc type
+  const int weakBC_type  = cmd_h5r -> read_intScalar("/", "weakBC_type");
+
   // Number of quadrature points for tets and triangles
   // Suggested values: 5 / 4 for linear, 17 / 13 for quadratic
   int nqp_tet = 5, nqp_tri = 4;
