@@ -52,8 +52,8 @@ int main( int argc, char * argv[] )
   const std::string part_file         = paras["part_file"].as<std::string>();
   const std::string geo_file          = paras["geo_file"].as<std::string>();
   const std::string sur_file_in_base  = paras["sur_file_in_base"].as<std::string>();
-  const std::string sur_file_out_base = paras["sur_file_out_base"].as<std::string>();
   const std::string sur_file_wall     = paras["sur_file_wall"].as<std::string>();
+  const std::string sur_file_out_base = paras["sur_file_out_base"].as<std::string>();
 
   if( elemType != 501 && elemType !=502 && elemType != 601 && elemType != 602 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
 
