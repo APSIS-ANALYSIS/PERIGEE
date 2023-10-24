@@ -1,7 +1,9 @@
 // prepost.cpp
 #include "HDF5_Reader.hpp"
 #include "Tet_Tools.hpp"
+#include "Hex_Tools.hpp"
 #include "Mesh_Tet.hpp"
+#include "Mesh_FEM.hpp"
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
@@ -39,15 +41,15 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionInt("-in_ncommon", in_ncommon);
   SYS_T::GetOptionBool("-METIS_isDualGraph", isDualGraph);
 
-  cout<<"==== Command Line Arguments ===="<<endl;
-  cout<<" -cpu_size: "<<cpu_size<<endl;
-  cout<<" -in_ncommon: "<<in_ncommon<<endl;
-  if(isDualGraph) cout<<" -METIS_isDualGraph: true \n";
-  else cout<<" -METIS_isDualGraph: false \n";
-  cout<<"----------------------------------\n";
-  cout<<"part_file: "<<part_file<<endl;
-  cout<<"geo_file: "<<geo_file<<endl;
-  cout<<"elemType: "<<elemType<<endl;
+  cout << "==== Command Line Arguments ====" << endl;
+  cout << " -cpu_size: "   << cpu_size   << endl;
+  cout << " -in_ncommon: " << in_ncommon << endl;
+  if(isDualGraph) cout << " -METIS_isDualGraph: true \n";
+  else cout << " -METIS_isDualGraph: false \n";
+  cout << "----------------------------------\n";
+  cout << "part_file: " << part_file << endl;
+  cout << "geo_file: "  << geo_file  << endl;
+  cout << "elemType: "  << elemType  << endl;
 
   // Read the volumetric mesh file from the vtu file: geo_file
   int nFunc, nElem;
@@ -69,12 +71,18 @@ int main( int argc, char * argv[] )
     case 502:
       mesh = new Mesh_Tet(nFunc, nElem, 2);
       break;
+    case 601:
+      mesh = new Mesh_FEM(nFunc, nElem, 8, 1);
+      break;
+    case 602:
+      mesh = new Mesh_FEM(nFunc, nElem, 27, 2);
+      break;
     default:
-      SYS_T::print_fatal("Error: elemType %d is not supported.\n", elemType);
+      SYS_T::print_exit("Error: elemType %d is not supported.\n", elemType);
       break;
   }
 
-  SYS_T::print_fatal_if( IEN->get_nLocBas() != mesh->get_nLocBas(), "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", mesh->get_nLocBas(), IEN->get_nLocBas()); 
+  SYS_T::print_exit_if( IEN->get_nLocBas() != mesh->get_nLocBas(), "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", mesh->get_nLocBas(), IEN->get_nLocBas()); 
 
   mesh -> print_info();
 
@@ -91,17 +99,20 @@ int main( int argc, char * argv[] )
   mnindex->write_hdf5("post_node_mapping");
 
   cout<<"=== Start Partition ... \n";
+
   SYS_T::Timer * mytimer = new SYS_T::Timer();
+
   for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
   {
-    mytimer->Reset(); mytimer->Start();
+    mytimer -> Reset();
+    mytimer -> Start();
 
     IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
         ctrlPts, proc_rank, cpu_size, 1, 1, elemType );
 
-    part->write(part_file.c_str());
-    mytimer->Stop();
-    cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
+    part -> write(part_file.c_str());
+    mytimer -> Stop();
+    cout << "-- proc " << proc_rank << " Time taken: " << mytimer -> get_sec() << " sec. \n";
     delete part;
   }
 
