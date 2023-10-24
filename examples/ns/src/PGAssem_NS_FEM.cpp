@@ -1081,8 +1081,11 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
 
       fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_v, vctrl_x, vctrl_y, vctrl_z);
 
-      // Unimplemented
-      // lassem_ptr->Assem_Residual_WeakBC(...);
+      const int face_id {wbc_part->get_ele_face_id(weakbc_id)[ee]};
+
+      if(wbc_part->get_weakbc_type() == 1)
+        lassem_ptr->Assem_Residual_Weak1(curr_time, dt, local_a, local_b, element_v, element_s,
+          vctrl_x, vctrl_y, vctrl_z, quad_s, face_id, wbc_part->get_C_bI());
 
       for(int ii{0}; ii < nLocBas; ++ii)
       {
@@ -1090,7 +1093,7 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
           row_index[dof_mat*ii + mm] = dof_mat*nbc_part->get_LID(mm, IEN_v[ii]) + mm;
       }
 
-      VecSetValues(G, loc_dof, row_index, lassem_ptr->sur_Residual, ADD_VALUES);
+      VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
     }
   }
 

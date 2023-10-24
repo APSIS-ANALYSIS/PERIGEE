@@ -140,27 +140,31 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
-    virtual void Assem_Residual_Weak(
-        const int &weakbc_id,
+    virtual void Assem_Residual_Weak1(
         const double &time, const double &dt,
+        const double * const &dot_sol,
+        const double * const &sol,
         FEAElement * const &elementv,
         FEAElement * const &elements,
         const double * const &veleCtrlPts_x,
         const double * const &veleCtrlPts_y,
         const double * const &veleCtrlPts_z,
-        const IQuadPts * const &quadv,
-        const IQuadPts * const &quads);
+        const IQuadPts * const &quads,
+        const int &face_id,
+        const double &C_bI);
 
-    virtual void Assem_Tangential_Residual_Weak(
-        const int &weakbc_id,
+    virtual void Assem_Tangential_Residual_Weak1(
         const double &time, const double &dt,
+        const double * const &dot_sol,
+        const double * const &sol,
         FEAElement * const &elementv,
         FEAElement * const &elements,
         const double * const &veleCtrlPts_x,
         const double * const &veleCtrlPts_y,
         const double * const &veleCtrlPts_z,
-        const IQuadPts * const &quadv,
-        const IQuadPts * const &quads);
+        const IQuadPts * const &quads,
+        const int &face_id,
+        const double &C_bI);
 
   private:
     // Private data
@@ -215,9 +219,27 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
       return ((*this).*(flist[ebc_id]))(pt, tt, n_out);
     }
 
-    Vector_3 get_g_weak(const int &node_idx, const double &tt)
+    Vector_3 get_g_weak(const Vector_3 &pt, const double &tt)
     {
       return Vector_3( 0.0, 0.0, 0.0 );
+    }
+
+    // ----------------------------------------------------------------
+    // ! get_h_b : Calculate the coefficient h_b for weak BC
+    // Input: \para dx_dxi : the inverse Jacobian
+    //        \para n_out  : the outward normal 
+    // ----------------------------------------------------------------
+    double get_h_b(const std::array<double, 9> &dx_dxi, const Vector_3 &n_out)
+    {
+      const Tensor2_3D inv_Jac (dx_dxi[0], dx_dxi[1], dx_dxi[2],
+                                dx_dxi[3], dx_dxi[4], dx_dxi[5],
+                                dx_dxi[6], dx_dxi[7], dx_dxi[8]);
+      
+      const Vector_3 temp_vec = inv_Jac.VecMult(n_out);
+
+      const double nT_G_n = temp_vec.dot_product(temp_vec);
+
+      return 2.0 / std::sqrt(nT_G_n);
     }
 
     // ----------------------------------------------------------------

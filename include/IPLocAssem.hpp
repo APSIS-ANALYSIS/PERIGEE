@@ -15,6 +15,7 @@
 // ============================================================================
 #include "FEAElement.hpp"
 #include "ALocal_IEN.hpp"
+#include "WBC_Tools.hpp"
 
 class IPLocAssem
 {
@@ -455,29 +456,33 @@ class IPLocAssem
       return output;
     }
 
-    // virtual function for weak bc
-    virtual void Assem_Residual_Weak(
-        const int &weakbc_id,
+    // virtual function for type 1 weak bc
+    virtual void Assem_Residual_Weak1(
         const double &time, const double &dt,
+        const double * const &dot_sol,
+        const double * const &sol,
         FEAElement * const &elementv,
         FEAElement * const &elements,
         const double * const &veleCtrlPts_x,
         const double * const &veleCtrlPts_y,
         const double * const &veleCtrlPts_z,
-        const IQuadPts * const &quadv,
-        const IQuadPts * const &quads)
+        const IQuadPts * const &quads,
+        const int &face_id,
+        const double &C_bI)
     {SYS_T::commPrint("Warning: this Assem_Residual_Weak is not implemented.\n");}
 
-    virtual void Assem_Tangential_Residual_Weak(
-        const int &weakbc_id,
+    virtual void Assem_Tangential_Residual_Wea1(
         const double &time, const double &dt,
+        const double * const &dot_sol,
+        const double * const &sol,
         FEAElement * const &elementv,
         FEAElement * const &elements,
         const double * const &veleCtrlPts_x,
         const double * const &veleCtrlPts_y,
         const double * const &veleCtrlPts_z,
-        const IQuadPts * const &quadv,
-        const IQuadPts * const &quads)
+        const IQuadPts * const &quads,
+        const int &face_id,
+        const double &C_bI)
     {SYS_T::commPrint("Warning: this Assem_Tangential_Residual_Weak is not implemented.\n");}
     
 };

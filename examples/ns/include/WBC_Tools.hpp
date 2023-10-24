@@ -35,7 +35,7 @@ class QuadPts_on_face : public IQuadPts
 { 
   public:
     // The input IQuadPts should be QuadPts_Gauss_Quad or QuadPts_Gauss_Triangle
-    QuadPts_on_face(IQuadPts * qp_surface, const int &face_id)
+    QuadPts_on_face(const IQuadPts const * qp_surface, const int &face_id)
     { 
       num_pts = qp_surface->get_num_quadPts();
       dim = qp_surface->get_dim() + 1;
@@ -102,11 +102,15 @@ class QuadPts_on_face : public IQuadPts
 
     virtual int get_dim() const {return dim;};
 
+    virtual int get_num_quadPts() const {return num_pts;}
+
     virtual double get_qp(unsigned int ii, unsigned int comp) const
     {return qp[dim*ii + comp];}
 
     virtual double get_qw(unsigned int ii) const
     {return qw[ii];}
+
+    virtual void print_info() const { ;}
 
   private:
     int num_pts;

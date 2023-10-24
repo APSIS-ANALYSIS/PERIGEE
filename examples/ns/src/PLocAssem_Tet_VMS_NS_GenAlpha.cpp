@@ -859,7 +859,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
 
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
-    double u = 0.0, v = 0.0, w = 0.0;;
+    double u = 0.0, v = 0.0, w = 0.0;
     for(int ii=0; ii<snLocBas; ++ii)
     {
       const int ii4 = ii * 4;
@@ -1005,30 +1005,161 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_pressure_area(
   }
 }
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_Weak(
-    const int &weakbc_id,
+void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_Weak1(
     const double &time, const double &dt,
+    const double * const &dot_sol,
+    const double * const &sol,
     FEAElement * const &elementv,
     FEAElement * const &elements,
     const double * const &veleCtrlPts_x,
     const double * const &veleCtrlPts_y,
     const double * const &veleCtrlPts_z,
-    const IQuadPts * const &quadv,
-    const IQuadPts * const &quads)
+    const IQuadPts * const &quads,
+    const int &face_id,
+    const double &C_bI)
 {
-  ; // Unimplemented
+  // Set up the quadrature rule on the face with volume coordinates
+  IQuadPts * quadv = new QuadPts_on_face(quads, face_id);
+
+  // Build the basis function of volume element
+  elementv->buildBasis( quadv, veleCtrlPts_x, veleCtrlPts_y, veleCtrlPts_z );
+
+  // Build the nodes' coordinates of the surface element
+  std::array< std::vector<double>, 3 > sele_ctrlpts = build_face_ctrlpt
+    ( elementv->get_Type(), face_id, veleCtrlPts_x, veleCtrlPts_y, veleCtrlPts_z );
+
+  // Build the basis function of surface element
+  elements->buildBasis( quads, sele_ctrlpts );
+
+  const double curr {time + alpha_f * dt};
+
+  const int face_nqp {quads -> get_num_quadPts()};
+
+  Zero_Residual();
+
+  std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
+
+  for(int qua{0}; qua < face_nqp; ++qua)
+  {
+    elementv->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
+
+    // Calculate surface Jacobian and normal_qua
+    double surface_area {0.0}, inflow_factor {0.0};
+
+    const Vector_3 n_out = elements->get_2d_normal_out(qua, surface_area);
+
+    // Calculate u_qua and grad_u_qua
+    double p {0.0}, u {0.0}, v {0.0}, w {0.0};
+    double u_x {0.0}, v_x {0.0}, w_x {0.0};
+    double u_y {0.0}, v_y {0.0}, w_y {0.0};
+    double u_z {0.0}, v_z {0.0}, w_z {0.0};
+    for(int ii{0}; ii < nLocBas; ++ii)
+    {
+      const int ii4 {ii * 4};
+      p += sol[ii4 + 0] * R[ii];
+      u += sol[ii4 + 1] * R[ii];
+      v += sol[ii4 + 2] * R[ii];
+      w += sol[ii4 + 3] * R[ii];
+
+      u_x += sol[ii4 + 1] * dR_dx[ii];
+      v_x += sol[ii4 + 2] * dR_dx[ii];
+      w_x += sol[ii4 + 3] * dR_dx[ii];
+
+      u_y += sol[ii4 + 1] * dR_dy[ii];
+      v_y += sol[ii4 + 2] * dR_dy[ii];
+      w_y += sol[ii4 + 3] * dR_dy[ii];
+
+      u_z += sol[ii4 + 1] * dR_dz[ii];
+      v_z += sol[ii4 + 2] * dR_dz[ii];
+      w_z += sol[ii4 + 3] * dR_dz[ii];
+    }
+
+    const Vector_3 u_vec (u, v, w);
+    const double u_dot_n = u_vec.dot_product(n_out);
+    if(u_dot_n < 0.0)
+      inflow_factor = u_dot_n;
+    else
+      ; // Initialized inflow_factor = 0.0
+
+    // Calculate the g_qua
+    const std::vector<double> surR = elements->get_R( qua );
+    Vector_3 coor(0.0, 0.0, 0.0);
+    for(int jj{0}; jj < elements->get_nLocBas(); ++jj)
+    {
+      coor.x() += sele_ctrlpts[1][jj] * surR[jj];
+      coor.y() += sele_ctrlpts[2][jj] * surR[jj];
+      coor.z() += sele_ctrlpts[3][jj] * surR[jj];
+    }
+
+    const Vector_3 g_vec = get_g_weak(coor, curr);
+
+    // Calculate h_b and tau_B
+    const auto dxi_dx = elementv->get_invJacobian(qua);
+    const double h_b = get_h_b(dxi_dx, n_out);
+
+    const Vector_3 u_tan = u_vec - u_dot_n * n_out;
+    const double tau_B = get_tau_B(u_tan, h_b / C_bI, vis_mu);
+
+    // Assembly
+    const double gwts = surface_area * quads->get_qw(qua);
+
+    for( int A{0}; A < nLocBas; ++A)
+    {
+      const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
+
+      const int A4 = 4 * A;
+
+      const Vector_3 u_minus_g = u_vec - g_vec;
+
+      Residual[A4] -= gwts * (NA) * u_minus_g.dot_product(n_out);
+
+      Residual[A4 + 1] += gwts * (NA * (u_dot_n * u + p * n_out.x()
+                                  - 2 * vis_mu * u_x * n_out.x() 
+                                  - vis_mu * (u_y + v_x) * n_out.y() 
+                                  - vis_mu * (u_z + w_x) * n_out.z())
+          - (2 * NA_x * n_out.x() + NA_y * n_out.y() + NA_z * n_out.z()) * vis_mu * u_minus_g.x()
+          - NA_y * n_out.x() * vis_mu * u_minus_g.y()
+          - NA_z * n_out.x() * vis_mu * u_minus_g.z()
+          + NA * (tau_B - inflow_factor) * u_minus_g.x()
+          + NA * n_out.x() * (C_bI * vis_mu / h_b - tau_B) * u_minus_g.dot_product(n_out));
+
+      Residual[A4 + 2] += gwts * (NA * (u_dot_n * v + p * n_out.y()
+                                  - vis_mu * (v_x + u_y) * n_out.x()
+                                  - 2 * vis_mu * v_y * n_out.y()
+                                  - vis_mu * (v_z + w_y) * n_out.z())
+          - NA_x * n_out.y() * vis_mu * u_minus_g.x()
+          - (NA_x * n_out.x() + 2 * NA_y * n_out.y() + NA_z * n_out.z()) * vis_mu * u_minus_g.y()
+          - NA_z * n_out.y() * vis_mu * u_minus_g.z()
+          + NA * (tau_B - inflow_factor) * u_minus_g.y()
+          + NA * n_out.y() * (C_bI * vis_mu / h_b - tau_B) * u_minus_g.dot_product(n_out));
+
+      Residual[A4 + 3] += gwts * (NA * (u_dot_n * w + p * n_out.z()
+                                  - vis_mu * (w_x + u_z) * n_out.x()
+                                  - vis_mu * (w_y + v_z) * n_out.y()
+                                  - 2 * vis_mu * w_z * n_out.z())
+          - NA_x * n_out.z() * vis_mu * u_minus_g.x()
+          - NA_y * n_out.z() * vis_mu * u_minus_g.y()
+          - (NA_x * n_out.x() + NA_y * n_out.y() + 2 * NA_z * n_out.z()) * vis_mu * u_minus_g.z()
+          + NA * (tau_B - inflow_factor) * u_minus_g.z()
+          + NA * n_out.z() * (C_bI * vis_mu / h_b - tau_B) * u_minus_g.dot_product(n_out));
+    }
+  }
+
+  delete quadv; quadv = nullptr;
 }
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangential_Residual_Weak(
-    const int &weakbc_id,
+void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangential_Residual_Weak1(
     const double &time, const double &dt,
+    const double * const &dot_sol,
+    const double * const &sol,
     FEAElement * const &elementv,
     FEAElement * const &elements,
     const double * const &veleCtrlPts_x,
     const double * const &veleCtrlPts_y,
     const double * const &veleCtrlPts_z,
-    const IQuadPts * const &quadv,
-    const IQuadPts * const &quads)
+    const IQuadPts * const &quads,
+    const int &face_id,
+    const double &C_bI)
 {
   ; // Unimplemented
 }
