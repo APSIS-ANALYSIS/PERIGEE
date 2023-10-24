@@ -101,6 +101,8 @@ class QuadPts_Gauss_Tet_face : public IQuadPts
       virtual double get_qw(unsigned int ii) const
       {return qw[ii];}
 
+      virtual IQuadPts * get_lower_QP(){return &QP_triangle;}
+
     private:
         const int num_pts;
 
@@ -112,6 +114,8 @@ class QuadPts_Gauss_Tet_face : public IQuadPts
         std::vector<double> qw {};
 
         const int face_id;
+
+        QuadPts_Gauss_Triangle QP_triangle;
 };
 
 #endif
