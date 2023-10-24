@@ -126,10 +126,10 @@ void PTime_LinearPDE_Solver::TM_GenAlpha_Transport(
     // Record solution if meets criteria
     if( time_info->get_index()%sol_record_freq == 0 )
     {
-      const std::string sol_name = Name_Generator("temp", time_info->get_index() );
+      const std::string sol_name = Name_Generator("temp_", time_info->get_index() );
       cur_sol->WriteBinary(sol_name.c_str());
 
-      const std::string sol_dot_name = Name_dot_Generator("temp", time_info->get_index());
+      const std::string sol_dot_name = Name_dot_Generator("temp_", time_info->get_index());
       cur_dot_sol->WriteBinary(sol_dot_name.c_str());
     }
 
