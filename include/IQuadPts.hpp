@@ -54,6 +54,14 @@ class IQuadPts
       SYS_T::print_fatal("Error: IQuadPts::get_qp is not implemented.\n");
       return 0.0;
     }
+
+    // get_boundary_id : returns the boundary id for the quadrature rules
+    //                   on the boundary of element such as QuadPts_Gauss_Tet_face
+    virtual int get_boundary_id() const
+    {
+      SYS_T::print_fatal("Error: IQuadPts::get_boundary is not implemented.\n");
+      return 0.0;
+    }
 };
 
 #endif
