@@ -275,13 +275,13 @@ int main(int argc, char *argv[])
       locebc -> get_num_ebc());
 
   // ===== Initial condition =====
-  PDNSolution * disp = new PDNSolution_LinearPDE( pNode, 0, "elastodynamics solution" );
+  PDNSolution * disp = new PDNSolution_Elastodynamics( pNode, 0 );
   
-  PDNSolution * velo = new PDNSolution_LinearPDE( pNode, 0, "elastodynamics solution" );
+  PDNSolution * velo = new PDNSolution_Elastodynamics( pNode, 0 );
 
-  PDNSolution * dot_disp = new PDNSolution_LinearPDE( pNode, 0, "elastodynamics solution" );
+  PDNSolution * dot_disp = new PDNSolution_Elastodynamics( pNode, 0 );
 
-  PDNSolution * dot_velo = new PDNSolution_LinearPDE( pNode, 0, "elastodynamics solution" );
+  PDNSolution * dot_velo = new PDNSolution_Elastodynamics( pNode, 0 );
   
   if( is_restart )
   {

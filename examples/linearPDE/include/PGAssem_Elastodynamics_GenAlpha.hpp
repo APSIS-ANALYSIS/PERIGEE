@@ -3,7 +3,7 @@
 
 #include "IPGAssem.hpp"
 #include "PETSc_Tools.hpp"
-#include "PDNSolution_LinearPDE.hpp"
+#include "PDNSolution_Elastodynamics.hpp"
 
 class PGAssem_Elastodynamics_GenAlpha : public IPGAssem
 {
