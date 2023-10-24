@@ -24,7 +24,7 @@ int main( int argc, char * argv[] )
   SYS_T::execute("rm -rf apart");
   SYS_T::execute("mkdir apart");
 
-  const std::string yaml_file("linearPDE_input.yml");
+  const std::string yaml_file("preprocess.yml");
 
   // Check if the yaml file exist on disk
   SYS_T::file_check(yaml_file); std::cout<<yaml_file<<" found. \n";
