@@ -469,9 +469,9 @@ class IPLocAssem
         const IQuadPts * const &quads,
         const int &face_id,
         const double &C_bI)
-    {SYS_T::commPrint("Warning: this Assem_Residual_Weak is not implemented.\n");}
+    {SYS_T::commPrint("Warning: this Assem_Residual_Weak1 is not implemented.\n");}
 
-    virtual void Assem_Tangential_Residual_Wea1(
+    virtual void Assem_Tangential_Residual_Weak1(
         const double &time, const double &dt,
         const double * const &dot_sol,
         const double * const &sol,
@@ -483,7 +483,7 @@ class IPLocAssem
         const IQuadPts * const &quads,
         const int &face_id,
         const double &C_bI)
-    {SYS_T::commPrint("Warning: this Assem_Tangential_Residual_Weak is not implemented.\n");}
+    {SYS_T::commPrint("Warning: this Assem_Tangential_Residual_Weak1 is not implemented.\n");}
     
 };
 
