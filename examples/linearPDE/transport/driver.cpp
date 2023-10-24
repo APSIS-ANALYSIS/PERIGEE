@@ -272,9 +272,9 @@ int main(int argc, char *argv[])
       locebc -> get_num_ebc());
 
   // ===== Initial condition =====
-  PDNSolution * sol = new PDNSolution_LinearPDE( pNode, 0, true, "temperature solution" );
+  PDNSolution * sol = new PDNSolution_Transport( pNode, 0 );
   
-  PDNSolution * dot_sol = new PDNSolution_LinearPDE( pNode, 0, true, "temperature solution" );
+  PDNSolution * dot_sol = new PDNSolution_Transport( pNode, 0 );
   
   if( is_restart )
   {
