@@ -32,6 +32,8 @@ int main( int argc, char * argv[] )
 
   std::string geo_file = cmd_h5r -> read_string("/", "geo_file");
   const int elemType   = cmd_h5r -> read_intScalar("/","elemType");
+  const int dofNum     = cmd_h5r -> read_intScalar("/","dof_num");
+  const int dofMat     = cmd_h5r -> read_intScalar("/","dof_mat");
   int in_ncommon       = cmd_h5r -> read_intScalar("/","in_ncommon");
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
@@ -78,11 +80,11 @@ int main( int argc, char * argv[] )
       mesh = new Mesh_FEM(nFunc, nElem, 27, 2);
       break;
     default:
-      SYS_T::print_exit("Error: elemType %d is not supported.\n", elemType);
+      SYS_T::print_fatal("Error: elemType %d is not supported.\n", elemType);
       break;
   }
 
-  SYS_T::print_exit_if( IEN->get_nLocBas() != mesh->get_nLocBas(), "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", mesh->get_nLocBas(), IEN->get_nLocBas()); 
+  SYS_T::print_fatal_if( IEN->get_nLocBas() != mesh->get_nLocBas(), "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", mesh->get_nLocBas(), IEN->get_nLocBas()); 
 
   mesh -> print_info();
 
@@ -108,7 +110,7 @@ int main( int argc, char * argv[] )
     mytimer -> Start();
 
     IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
-        ctrlPts, proc_rank, cpu_size, 1, 1, elemType );
+        ctrlPts, proc_rank, cpu_size, dofNum, dofMat, elemType );
 
     part -> write(part_file.c_str());
     mytimer -> Stop();

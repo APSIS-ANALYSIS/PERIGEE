@@ -96,6 +96,8 @@ int main( int argc, char * argv[] )
   cmdh5w->write_intScalar("elemType", elemType);
   cmdh5w->write_string("geo_file", geo_file);
   cmdh5w->write_string("part_file", part_file);
+  cmdh5w->write_intScalar("dof_num", dofNum);
+  cmdh5w->write_intScalar("dof_mat", dofMat);
 
   delete cmdh5w; H5Fclose(cmd_file_id);
   
