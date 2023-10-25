@@ -236,7 +236,7 @@ class FEAElement
     // product will point in the outward direction with respect to the volume
     // element. To ensure the ordering, some special procedure may need to be
     // performed in the preprocessor to check and order the nodal indices.
-    // See, ElemBC_3D_tet4::resetTriIEN_outwardnormal() function for example
+    // See, ElemBC_3D::resetSurIEN_outwardnormal() function for example
     // for the ordering of a triangle element that belongs to a tetrahedron
     // surface.
     // This function is called in FEAElement_Triangle3_3D_der0.
@@ -279,7 +279,9 @@ class FEAElement
     // This function will not be called in a line element.
     // ------------------------------------------------------------------------
     virtual void buildBasisBoundary( const IQuadPts * const &quad_rule_boundary,
-        const double * const &ctrl_x, const double * const &ctrl_y,
+        const int &boundary_id,
+        const double * const &ctrl_x, 
+        const double * const &ctrl_y,
         const double * const &ctrl_z )
     {SYS_T::commPrint("Warning: buildBoundary is not implemented. \n");}
 };

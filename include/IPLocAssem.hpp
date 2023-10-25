@@ -15,7 +15,6 @@
 // ============================================================================
 #include "FEAElement.hpp"
 #include "ALocal_IEN.hpp"
-#include "WBC_Tools.hpp"
 
 class IPLocAssem
 {
@@ -462,9 +461,8 @@ class IPLocAssem
         const double * const &dot_sol,
         const double * const &sol,
         FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const double * const &veleCtrlPts_x,
-        const double * const &veleCtrlPts_y,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
         const double * const &veleCtrlPts_z,
         const IQuadPts * const &quads,
         const int &face_id,
@@ -476,15 +474,13 @@ class IPLocAssem
         const double * const &dot_sol,
         const double * const &sol,
         FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const double * const &veleCtrlPts_x,
-        const double * const &veleCtrlPts_y,
-        const double * const &veleCtrlPts_z,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
         const IQuadPts * const &quads,
         const int &face_id,
         const double &C_bI)
     {SYS_T::commPrint("Warning: this Assem_Tangential_Residual_Weak1 is not implemented.\n");}
-    
 };
 
 #endif

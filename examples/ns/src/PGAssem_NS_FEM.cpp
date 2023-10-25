@@ -306,11 +306,6 @@ void PGAssem_NS_FEM::Assem_residual(
     VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
 
-  // Weak enforced no-slip boundary condition
-  if (wbc_part->get_weakbc_type() > 0)
-    Weak_EssBC_G(curr_time, dt, sol_a, sol_b, lassem_ptr, elementv, elements, quad_s,
-      lien_ptr, fnode_ptr, nbc_part, wbc_part);
-
   delete [] array_a; array_a = nullptr;
   delete [] array_b; array_b = nullptr;
   delete [] local_a; local_a = nullptr;
@@ -327,6 +322,11 @@ void PGAssem_NS_FEM::Assem_residual(
   // Resistance type boundary condition
   NatBC_Resis_G( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
       nbc_part, ebc_part, gbc );
+
+  // Weak enforced no-slip boundary condition
+  if (wbc_part->get_weakbc_type() > 0)
+    Weak_EssBC_G(curr_time, dt, sol_a, sol_b, lassem_ptr, elementv, quad_s,
+      lien_ptr, fnode_ptr, nbc_part, wbc_part);
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -397,11 +397,6 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
 
-  // Weak enforced no-slip boundary condition
-  if (wbc_part->get_weakbc_type() > 0)
-    Weak_EssBC_KG(curr_time, dt, sol_a, sol_b, lassem_ptr, elementv, elements, quad_s,
-      lien_ptr, fnode_ptr, nbc_part, wbc_part);
-
   delete [] array_a; array_a = nullptr;
   delete [] array_b; array_b = nullptr;
   delete [] local_a; local_a = nullptr;
@@ -418,6 +413,11 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   // Resistance type boundary condition
   NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
       nbc_part, ebc_part, gbc );
+
+  // Weak enforced no-slip boundary condition
+  if (wbc_part->get_weakbc_type() > 0)
+    Weak_EssBC_KG(curr_time, dt, sol_a, sol_b, lassem_ptr, elementv, quad_s,
+      lien_ptr, fnode_ptr, nbc_part, wbc_part);
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -1029,7 +1029,6 @@ void PGAssem_NS_FEM::Weak_EssBC_KG(
     const PDNSolution * const &sol,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_v,
-    FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
@@ -1045,7 +1044,6 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
     const PDNSolution * const &sol,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_v,
-    FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
@@ -1058,9 +1056,9 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
   double * local_a = new double [nLocBas * dof_sol];
   double * local_b = new double [nLocBas * dof_sol];
   int * IEN_v = new int [nLocBas];
-  double *vctrl_x = new double [nLocBas];
-  double *vctrl_y = new double [nLocBas];
-  double *vctrl_z = new double [nLocBas];
+  double * ctrl_x = new double [nLocBas];
+  double * ctrl_y = new double [nLocBas];
+  double * ctrl_z = new double [nLocBas];
   PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
 
   dot_sol->GetLocalArray( array_a );
@@ -1079,13 +1077,13 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
       GetLocal(array_a, IEN_v, local_a);
       GetLocal(array_b, IEN_v, local_b);
 
-      fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_v, vctrl_x, vctrl_y, vctrl_z);
+      fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_v, ctrl_x, ctrl_y, ctrl_z);
 
       const int face_id {wbc_part->get_ele_face_id(weakbc_id)[ee]};
 
       if(wbc_part->get_weakbc_type() == 1)
-        lassem_ptr->Assem_Residual_Weak1(curr_time, dt, local_a, local_b, element_v, element_s,
-          vctrl_x, vctrl_y, vctrl_z, quad_s, face_id, wbc_part->get_C_bI());
+        lassem_ptr->Assem_Residual_Weak1(curr_time, dt, local_a, local_b, element_v,
+          ctrl_x, ctrl_y, ctrl_z, quad_s, face_id, wbc_part->get_C_bI());
 
       for(int ii{0}; ii < nLocBas; ++ii)
       {
@@ -1102,9 +1100,9 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
   delete [] local_a; local_a = nullptr;
   delete [] local_b; local_b = nullptr;
   delete [] IEN_v; IEN_v = nullptr;
-  delete [] vctrl_x; vctrl_x = nullptr;
-  delete [] vctrl_y; vctrl_y = nullptr;
-  delete [] vctrl_z; vctrl_z = nullptr;
+  delete [] ctrl_x; ctrl_x = nullptr;
+  delete [] ctrl_y; ctrl_y = nullptr;
+  delete [] ctrl_z; ctrl_z = nullptr;
   delete [] row_index; row_index = nullptr;
 }
 

@@ -39,6 +39,7 @@
 // Date created: Nov. 3 2019
 // ==================================================================
 #include "FEAElement.hpp"
+#include "FEAElement_Triangle6_3D_der0.hpp"
 #include "FE_Tools.hpp"
 
 class FEAElement_Tet10_v2 : public FEAElement
@@ -129,6 +130,20 @@ class FEAElement_Tet10_v2 : public FEAElement
 
     virtual double get_detJac(const int &quaindex) const {return detJac[quaindex];}
 
+    // Build basis and build the boundary element
+    //   Tet-Face-0 : Node 1 2 3 5 9 8
+    //   Tet-Face-1 : Node 0 3 2 7 9 6
+    //   Tet-Face-2 : Node 0 1 3 4 8 7
+    //   Tet-Face-3 : Node 0 2 1 6 5 4
+    virtual void buildBasisBoundary( const IQuadPts * const &quad_rule_s, const int &face_id,
+        const double * const &ctrl_x,
+        const double * const &ctrl_y,
+        const double * const &ctrl_z );
+
+    // Get the outwardnormal on faces after calling buildBasisBoundary
+    virtual Vector_3 get_2d_normal_out( const int &quaindex, double &area )
+    {return triangle_face->get_2d_normal_out( quaindex, area );}
+
   private:
     const int numQuapts;
 
@@ -146,6 +161,9 @@ class FEAElement_Tet10_v2 : public FEAElement
 
     // detJac : 0 <= ii < numQuapts
     double * detJac;
+
+    FEAElement * triangle_face;
+    bool face_built_flag;
 };
 
 #endif

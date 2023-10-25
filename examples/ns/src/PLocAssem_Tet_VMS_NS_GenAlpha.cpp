@@ -1010,26 +1010,15 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_Weak1(
     const double * const &dot_sol,
     const double * const &sol,
     FEAElement * const &elementv,
-    FEAElement * const &elements,
-    const double * const &veleCtrlPts_x,
-    const double * const &veleCtrlPts_y,
-    const double * const &veleCtrlPts_z,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
     const IQuadPts * const &quads,
     const int &face_id,
     const double &C_bI)
 {
-  // Set up the quadrature rule on the face with volume coordinates
-  IQuadPts * quadv = new QuadPts_on_face(quads, face_id);
-
   // Build the basis function of volume element
-  elementv->buildBasis( quadv, veleCtrlPts_x, veleCtrlPts_y, veleCtrlPts_z );
-
-  // Build the nodes' coordinates of the surface element
-  std::array< std::vector<double>, 3 > sele_ctrlpts = build_face_ctrlpt
-    ( elementv->get_Type(), face_id, veleCtrlPts_x, veleCtrlPts_y, veleCtrlPts_z );
-
-  // Build the basis function of surface element
-  elements->buildBasis( quads, sele_ctrlpts );
+  elementv->buildBasisBoundary( quads, face_id, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   const double curr {time + alpha_f * dt};
 
@@ -1046,7 +1035,9 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_Weak1(
     // Calculate surface Jacobian and normal_qua
     double surface_area {0.0}, inflow_factor {0.0};
 
-    const Vector_3 n_out = elements->get_2d_normal_out(qua, surface_area);
+    const Vector_3 n_out = elementv->get_2d_normal_out(qua, surface_area);
+
+    Vector_3 coor(0.0, 0.0, 0.0);
 
     // Calculate u_qua and grad_u_qua
     double p {0.0}, u {0.0}, v {0.0}, w {0.0};
@@ -1072,6 +1063,10 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_Weak1(
       u_z += sol[ii4 + 1] * dR_dz[ii];
       v_z += sol[ii4 + 2] * dR_dz[ii];
       w_z += sol[ii4 + 3] * dR_dz[ii];
+
+      coor.x() += eleCtrlPts_x[ii];
+      coor.y() += eleCtrlPts_y[ii];
+      coor.z() += eleCtrlPts_z[ii];
     }
 
     const Vector_3 u_vec (u, v, w);
@@ -1082,15 +1077,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_Weak1(
       ; // Initialized inflow_factor = 0.0
 
     // Calculate the g_qua
-    const std::vector<double> surR = elements->get_R( qua );
-    Vector_3 coor(0.0, 0.0, 0.0);
-    for(int jj{0}; jj < elements->get_nLocBas(); ++jj)
-    {
-      coor.x() += sele_ctrlpts[1][jj] * surR[jj];
-      coor.y() += sele_ctrlpts[2][jj] * surR[jj];
-      coor.z() += sele_ctrlpts[3][jj] * surR[jj];
-    }
-
     const Vector_3 g_vec = get_g_weak(coor, curr);
 
     // Calculate h_b and tau_B
@@ -1144,8 +1130,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_Weak1(
           + NA * n_out.z() * (C_bI * vis_mu / h_b - tau_B) * u_minus_g.dot_product(n_out));
     }
   }
-
-  delete quadv; quadv = nullptr;
 }
 
 void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangential_Residual_Weak1(
@@ -1153,10 +1137,9 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangential_Residual_Weak1(
     const double * const &dot_sol,
     const double * const &sol,
     FEAElement * const &elementv,
-    FEAElement * const &elements,
-    const double * const &veleCtrlPts_x,
-    const double * const &veleCtrlPts_y,
-    const double * const &veleCtrlPts_z,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
     const IQuadPts * const &quads,
     const int &face_id,
     const double &C_bI)

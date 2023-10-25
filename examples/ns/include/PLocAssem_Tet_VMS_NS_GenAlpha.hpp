@@ -145,10 +145,9 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
         const double * const &dot_sol,
         const double * const &sol,
         FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const double * const &veleCtrlPts_x,
-        const double * const &veleCtrlPts_y,
-        const double * const &veleCtrlPts_z,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
         const IQuadPts * const &quads,
         const int &face_id,
         const double &C_bI);
@@ -158,10 +157,9 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
         const double * const &dot_sol,
         const double * const &sol,
         FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const double * const &veleCtrlPts_x,
-        const double * const &veleCtrlPts_y,
-        const double * const &veleCtrlPts_z,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
         const IQuadPts * const &quads,
         const int &face_id,
         const double &C_bI);
@@ -282,103 +280,5 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
       
       return u_t * (1.0 / (u_p * u_p));   //  tau_B = [u*]^2 / ||u_tan|| = ||u_tan|| / [u+]^2
     }
-
-    // ----------------------------------------------------------------
-    // ! build_face_ctrlpt : Given volume element and face id, get face's
-    //                     : node coordinates
-    // Input: \para ele_type : volume element type
-    //        \para face_id  : the face id (Defined in ElemBC_3D::resetSurIEN_outwardnormal)
-    //        \para vctrl_.  : the ctrl points of volume element
-    // Output: the control points of surface element, corresponding to QuadPts_on_face
-    //         and ElemBC_3D::resetSurIEN_outwardnormal
-    // ----------------------------------------------------------------
-    std::array<std::vector<double>, 3> build_face_ctrlpt( const int &ele_type, const int &face_id,
-      const double * const &vctrl_x, const double * const &vctrl_y, const double * const &vctrl_z )
-    {
-      std::vector<double> fctrl_x {}, fctrl_y {}, fctrl_z {};
-      switch (ele_type)
-      {
-        case 501:
-        {
-          switch (face_id)
-          {
-          case 0:
-          {
-            fctrl_x = std::vector<double> {vctrl_x[3], vctrl_x[1], vctrl_x[2]};
-            fctrl_y = std::vector<double> {vctrl_y[3], vctrl_y[1], vctrl_y[2]};
-            fctrl_z = std::vector<double> {vctrl_z[3], vctrl_z[1], vctrl_z[2]};
-          } break;
-          case 1:
-          {
-            fctrl_x = std::vector<double> {vctrl_x[0], vctrl_x[3], vctrl_x[2]};
-            fctrl_y = std::vector<double> {vctrl_y[0], vctrl_y[3], vctrl_y[2]};
-            fctrl_z = std::vector<double> {vctrl_z[0], vctrl_z[3], vctrl_z[2]};
-          } break;
-          case 2:
-          {
-            fctrl_x = std::vector<double> {vctrl_x[0], vctrl_x[1], vctrl_x[3]};
-            fctrl_y = std::vector<double> {vctrl_y[0], vctrl_y[1], vctrl_y[3]};
-            fctrl_z = std::vector<double> {vctrl_z[0], vctrl_z[1], vctrl_z[3]};
-          } break;
-          case 3:
-          {
-            fctrl_x = std::vector<double> {vctrl_x[0], vctrl_x[2], vctrl_x[1]};
-            fctrl_y = std::vector<double> {vctrl_y[0], vctrl_y[2], vctrl_y[1]};
-            fctrl_z = std::vector<double> {vctrl_z[0], vctrl_z[2], vctrl_z[1]};
-          } break;
-          default:
-            SYS_T::print_fatal("Error: build_face_ctrlpt, wrong face id of a volume element.\n");
-            break;
-          }
-        } break;
-        case 502:
-        {
-          switch (face_id)
-          {
-          case 0:
-          {
-            fctrl_x = std::vector<double> {vctrl_x[3], vctrl_x[1], vctrl_x[2], vctrl_x[5], vctrl_x[9], vctrl_x[8]};
-            fctrl_y = std::vector<double> {vctrl_y[3], vctrl_y[1], vctrl_y[2], vctrl_y[5], vctrl_y[9], vctrl_y[8]};
-            fctrl_z = std::vector<double> {vctrl_z[3], vctrl_z[1], vctrl_z[2], vctrl_z[5], vctrl_z[9], vctrl_z[8]};
-          } break;
-          case 1:
-          {
-            fctrl_x = std::vector<double> {vctrl_x[0], vctrl_x[3], vctrl_x[2], vctrl_x[7], vctrl_x[9], vctrl_x[6]};
-            fctrl_y = std::vector<double> {vctrl_y[0], vctrl_y[3], vctrl_y[2], vctrl_y[7], vctrl_y[9], vctrl_y[6]};
-            fctrl_z = std::vector<double> {vctrl_z[0], vctrl_z[3], vctrl_z[2], vctrl_z[7], vctrl_z[9], vctrl_z[6]};
-          } break;
-          case 2:
-          {
-            fctrl_x = std::vector<double> {vctrl_x[0], vctrl_x[1], vctrl_x[3], vctrl_x[4], vctrl_x[8], vctrl_x[7]};
-            fctrl_y = std::vector<double> {vctrl_y[0], vctrl_y[1], vctrl_y[3], vctrl_y[4], vctrl_y[8], vctrl_y[7]};
-            fctrl_z = std::vector<double> {vctrl_z[0], vctrl_z[1], vctrl_z[3], vctrl_z[4], vctrl_z[8], vctrl_z[7]};
-          } break;
-          case 3:
-          {
-            fctrl_x = std::vector<double> {vctrl_x[0], vctrl_x[2], vctrl_x[1], vctrl_x[6], vctrl_x[5], vctrl_x[4]};
-            fctrl_y = std::vector<double> {vctrl_y[0], vctrl_y[2], vctrl_y[1], vctrl_y[6], vctrl_y[5], vctrl_y[4]};
-            fctrl_z = std::vector<double> {vctrl_z[0], vctrl_z[2], vctrl_z[1], vctrl_z[6], vctrl_z[5], vctrl_z[4]};
-          } break;
-          default:
-            SYS_T::print_fatal("Error: build_face_ctrlpt, wrong face id of a volume element.\n");
-            break;
-          }
-        } break;
-        case 601:
-        {
-          ; // Unimplement
-        } break;
-        case 602:
-        {
-          ; // Unimplement
-        } break;
-        default:
-          SYS_T::print_fatal("Error: build_face_ctrlpt, unknown element type.");
-          break;
-      }
-
-      return std::array<std::vector<double>, 3> {fctrl_x, fctrl_y, fctrl_z};
-    }
 };
-
 #endif
