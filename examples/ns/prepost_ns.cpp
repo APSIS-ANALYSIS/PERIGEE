@@ -6,8 +6,9 @@
 // Date: Jan. 24 2017
 // ==================================================================
 #include "HDF5_Reader.hpp"
-#include "Tet_Tools.hpp"
+#include "VTK_Tools.hpp"
 #include "Mesh_Tet.hpp"
+#include "Mesh_FEM.hpp"
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
@@ -78,6 +79,12 @@ int main( int argc, char * argv[] )
       break;
     case 502:
       mesh = new Mesh_Tet(nFunc, nElem, 2);
+      break;
+    case 601:
+      mesh = new Mesh_FEM(nFunc, nElem, 8, 1);
+      break;
+    case 602:
+      mesh = new Mesh_FEM(nFunc, nElem, 27, 2);
       break;
     default:
       SYS_T::print_fatal("Error: elemType %d is not supported.\n", elemType);
