@@ -282,6 +282,26 @@ void VIS_T::setHexelem( const int &segs, const int &segt, const int &segu,
   }
 }
 
+void VIS_T::setHexelem( const int &ptid0, const int &ptid1,
+      const int &ptid2, const int &ptid3, const int &ptid4,
+      const int &ptid5, const int &ptid6, const int &ptid7,
+      vtkUnstructuredGrid * gridData )
+{
+  vtkCell * cell = vtkHexahedron::New();
+  
+  cell->GetPointIds()->SetId( 0, ptid0 );
+  cell->GetPointIds()->SetId( 1, ptid1 );
+  cell->GetPointIds()->SetId( 2, ptid2 );
+  cell->GetPointIds()->SetId( 3, ptid3 );
+  cell->GetPointIds()->SetId( 4, ptid4 );
+  cell->GetPointIds()->SetId( 5, ptid5 );
+  cell->GetPointIds()->SetId( 6, ptid6 );
+  cell->GetPointIds()->SetId( 7, ptid7 );
+
+  gridData->InsertNextCell( cell->GetCellType(), cell->GetPointIds() );
+  cell->Delete();
+}
+
 void VIS_T::setTetraelem( const int &ptoffset, vtkUnstructuredGrid * gridData )
 {
   vtkCell * cell = vtkTetra::New();

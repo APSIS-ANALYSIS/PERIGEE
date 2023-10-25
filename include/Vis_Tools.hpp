@@ -118,6 +118,14 @@ namespace VIS_T
   void setHexelem( const int &segs, const int &segt, const int &segu,
       const int &ptoffset, vtkUnstructuredGrid * gridData );
 
+  // ----------------------------------------------------------------
+  // ! setHexelem: build Hexa element connectivity using the specified
+  //                 point index.
+  // ----------------------------------------------------------------
+  void setHexelem( const int &ptid0, const int &ptid1,
+      const int &ptid2, const int &ptid3, const int &ptid4,
+      const int &ptid5, const int &ptid6, const int &ptid7,
+      vtkUnstructuredGrid * gridData );
   // --------------------------------------------------------------
   // ! setQuadelem: build Quad element connectivity with vtkPoints
   //   in element, there are nqp = segs * segt elements; these points 
