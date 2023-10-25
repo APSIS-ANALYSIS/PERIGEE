@@ -6,7 +6,7 @@
 // This is a class that stores the visualization sampling points in
 // a reference hexahedron.
 //
-// We use four points at [1,-1,-1], [1,1,-1], [-1,1,-1], [-1,-1,-1], [1,-1,1], [1,1,1], [-1,1,1], [-1,-1,1].
+// We use four points at [0,0,0], [1,0,0], [1,1,0], [0,1,0], [0,0,1], [1,0,1], [1,1,1], [0,1,1].
 // They are the vertex points of the hexahedron.
 // 
 // Note: We store them like what we did in QuadPts_Gauss_Hex class, so the dim = 3.       
