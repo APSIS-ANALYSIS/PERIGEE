@@ -424,7 +424,7 @@ std::array<double,9> FEAElement_Tet10_v2::get_invJacobian(const int &quaindex) c
 void FEAElement_Tet10_v2::buildBasisBoundary( const IQuadPts * const &quad_s, const int &face_id,
     const double * const &ctrl_x,
     const double * const &ctrl_y,
-    const double * const &ctrl_z)
+    const double * const &ctrl_z )
 {
   // Build the volume element
   const auto quad_v = FE_T::QuadPts_Gauss_on_boundary( this->get_Type(), face_id, quad_s );
