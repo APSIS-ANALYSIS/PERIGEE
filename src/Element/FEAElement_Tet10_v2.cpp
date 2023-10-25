@@ -23,7 +23,7 @@ FEAElement_Tet10_v2::FEAElement_Tet10_v2( const int &in_nqua )
   face_built_flag = false;
   triangle_face = nullptr;
 
-  if (face_built_flag)
+  if ( face_built_flag )
   {
     delete triangle_face;
     triangle_face = nullptr;
@@ -427,11 +427,11 @@ void FEAElement_Tet10_v2::buildBasisBoundary( const IQuadPts * const &quad_s, co
     const double * const &ctrl_z)
 {
   // Build the volume element
-  const auto quad_v = FE_T::QuadPts_Gauss_on_boundary(this->get_Type(), face_id, quad_s);
-  this->buildBasis(&quad_v, ctrl_x, ctrl_y, ctrl_z);
+  const auto quad_v = FE_T::QuadPts_Gauss_on_boundary( this->get_Type(), face_id, quad_s );
+  this->buildBasis( &quad_v, ctrl_x, ctrl_y, ctrl_z );
 
   // If this function has been called and there exists a face element
-  if (face_built_flag)
+  if ( face_built_flag )
   {
     delete triangle_face;
     triangle_face = nullptr;
@@ -440,36 +440,36 @@ void FEAElement_Tet10_v2::buildBasisBoundary( const IQuadPts * const &quad_s, co
   // Build a new face element
   triangle_face = new FEAElement_Triangle6_3D_der0( numQuapts );
 
-  std::vector<double> face_ctrl_x(6, 0.0), face_ctrl_y(6, 0.0), face_ctrl_z(6, 0.0);
+  std::vector<double> face_ctrl_x( 6, 0.0 ), face_ctrl_y( 6, 0.0 ), face_ctrl_z( 6, 0.0 );
 
   switch( face_id )
   {
     case 0:
-      face_ctrl_x = std::vector<double> {ctrl_x[1], ctrl_x[2], ctrl_x[3], ctrl_x[5], ctrl_x[9], ctrl_x[8]};
-      face_ctrl_y = std::vector<double> {ctrl_y[1], ctrl_y[2], ctrl_y[3], ctrl_y[5], ctrl_y[9], ctrl_y[8]};
-      face_ctrl_z = std::vector<double> {ctrl_z[1], ctrl_z[2], ctrl_z[3], ctrl_z[5], ctrl_z[9], ctrl_z[8]};
+      face_ctrl_x = std::vector<double> { ctrl_x[1], ctrl_x[2], ctrl_x[3], ctrl_x[5], ctrl_x[9], ctrl_x[8] };
+      face_ctrl_y = std::vector<double> { ctrl_y[1], ctrl_y[2], ctrl_y[3], ctrl_y[5], ctrl_y[9], ctrl_y[8] };
+      face_ctrl_z = std::vector<double> { ctrl_z[1], ctrl_z[2], ctrl_z[3], ctrl_z[5], ctrl_z[9], ctrl_z[8] };
       break;
 
     case 1:
-      face_ctrl_x = std::vector<double> {ctrl_x[0], ctrl_x[3], ctrl_x[2], ctrl_x[7], ctrl_x[9], ctrl_x[6]};
-      face_ctrl_y = std::vector<double> {ctrl_y[0], ctrl_y[3], ctrl_y[2], ctrl_y[7], ctrl_y[9], ctrl_y[6]};
-      face_ctrl_z = std::vector<double> {ctrl_z[0], ctrl_z[3], ctrl_z[2], ctrl_z[7], ctrl_z[9], ctrl_z[6]};
+      face_ctrl_x = std::vector<double> { ctrl_x[0], ctrl_x[3], ctrl_x[2], ctrl_x[7], ctrl_x[9], ctrl_x[6] };
+      face_ctrl_y = std::vector<double> { ctrl_y[0], ctrl_y[3], ctrl_y[2], ctrl_y[7], ctrl_y[9], ctrl_y[6] };
+      face_ctrl_z = std::vector<double> { ctrl_z[0], ctrl_z[3], ctrl_z[2], ctrl_z[7], ctrl_z[9], ctrl_z[6] };
       break;
 
     case 2:
-      face_ctrl_x = std::vector<double> {ctrl_x[0], ctrl_x[1], ctrl_x[3], ctrl_x[4], ctrl_x[8], ctrl_x[7]};
-      face_ctrl_y = std::vector<double> {ctrl_y[0], ctrl_y[1], ctrl_y[3], ctrl_y[4], ctrl_y[8], ctrl_y[7]};
-      face_ctrl_z = std::vector<double> {ctrl_z[0], ctrl_z[1], ctrl_z[3], ctrl_z[4], ctrl_z[8], ctrl_z[7]};
+      face_ctrl_x = std::vector<double> { ctrl_x[0], ctrl_x[1], ctrl_x[3], ctrl_x[4], ctrl_x[8], ctrl_x[7] };
+      face_ctrl_y = std::vector<double> { ctrl_y[0], ctrl_y[1], ctrl_y[3], ctrl_y[4], ctrl_y[8], ctrl_y[7] };
+      face_ctrl_z = std::vector<double> { ctrl_z[0], ctrl_z[1], ctrl_z[3], ctrl_z[4], ctrl_z[8], ctrl_z[7] };
       break;
 
     case 3:
-      face_ctrl_x = std::vector<double> {ctrl_x[0], ctrl_x[2], ctrl_x[1], ctrl_x[6], ctrl_x[5], ctrl_x[4]};
-      face_ctrl_y = std::vector<double> {ctrl_y[0], ctrl_y[2], ctrl_y[1], ctrl_y[6], ctrl_y[5], ctrl_y[4]};
-      face_ctrl_z = std::vector<double> {ctrl_z[0], ctrl_z[2], ctrl_z[1], ctrl_z[6], ctrl_z[5], ctrl_z[4]};
+      face_ctrl_x = std::vector<double> { ctrl_x[0], ctrl_x[2], ctrl_x[1], ctrl_x[6], ctrl_x[5], ctrl_x[4] };
+      face_ctrl_y = std::vector<double> { ctrl_y[0], ctrl_y[2], ctrl_y[1], ctrl_y[6], ctrl_y[5], ctrl_y[4] };
+      face_ctrl_z = std::vector<double> { ctrl_z[0], ctrl_z[2], ctrl_z[1], ctrl_z[6], ctrl_z[5], ctrl_z[4] };
       break;
 
     default:
-      SYS_T::print_fatal("Error: FEAElment_Tet10_v2::buildBoundaryBasis, wrong face id.\n");
+      SYS_T::print_fatal("Error: FEAElement_Tet10_v2::buildBoundaryBasis, wrong face id.\n");
       break;
   }
 

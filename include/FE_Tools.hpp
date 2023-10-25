@@ -234,7 +234,7 @@ namespace FE_T
     public:
       // Input: \para higher_eleType  : the element type of the higher-dimensional element
       //        \para boundary_id     : the boundary index defined specifically
-      //        \para lower_quad_rule : the quadrature rlue of lower-dimensional element
+      //        \para lower_quad_rule : the quadrature rlue of the lower-dimensional element
       QuadPts_Gauss_on_boundary(const int &higher_elemType, const int &boundary_id, 
           const IQuadPts * const lower_quad_rule);
 
@@ -263,7 +263,6 @@ namespace FE_T
       QuadPts_Gauss_on_boundary() = delete;
   };
       
-
 } // End of FE_T
 
 #endif

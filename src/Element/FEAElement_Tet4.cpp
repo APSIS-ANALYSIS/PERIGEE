@@ -12,7 +12,7 @@ FEAElement_Tet4::~FEAElement_Tet4()
 {
   delete [] R; R = nullptr;
 
-  if (face_built_flag)
+  if ( face_built_flag )
   {
     delete triangle_face;
     triangle_face = nullptr;
@@ -239,11 +239,11 @@ void FEAElement_Tet4::buildBasisBoundary( const IQuadPts * const &quad_s, const 
     const double * const &ctrl_z)
 {
   // Build the volume element
-  const auto quad_v = FE_T::QuadPts_Gauss_on_boundary(this->get_Type(), face_id, quad_s);
-  this->buildBasis(&quad_v, ctrl_x, ctrl_y, ctrl_z);
+  const auto quad_v = FE_T::QuadPts_Gauss_on_boundary( this->get_Type(), face_id, quad_s );
+  this->buildBasis( &quad_v, ctrl_x, ctrl_y, ctrl_z );
 
   // If this function has been called and there exists a face element
-  if (face_built_flag)
+  if ( face_built_flag )
   {
     delete triangle_face;
     triangle_face = nullptr;
@@ -252,36 +252,36 @@ void FEAElement_Tet4::buildBasisBoundary( const IQuadPts * const &quad_s, const 
   // Build a new face element
   triangle_face = new FEAElement_Triangle3_3D_der0( numQuapts );
 
-  std::vector<double> face_ctrl_x(3, 0.0), face_ctrl_y(3, 0.0), face_ctrl_z(3, 0.0);
+  std::vector<double> face_ctrl_x( 3, 0.0 ), face_ctrl_y( 3, 0.0 ), face_ctrl_z( 3, 0.0 );
 
   switch( face_id )
   {
     case 0:
-      face_ctrl_x = std::vector<double> {ctrl_x[1], ctrl_x[2], ctrl_x[3]};
-      face_ctrl_y = std::vector<double> {ctrl_y[1], ctrl_y[2], ctrl_y[3]};
-      face_ctrl_z = std::vector<double> {ctrl_z[1], ctrl_z[2], ctrl_z[3]};
+      face_ctrl_x = std::vector<double> { ctrl_x[1], ctrl_x[2], ctrl_x[3] };
+      face_ctrl_y = std::vector<double> { ctrl_y[1], ctrl_y[2], ctrl_y[3] };
+      face_ctrl_z = std::vector<double> { ctrl_z[1], ctrl_z[2], ctrl_z[3] };
       break;
 
     case 1:
-      face_ctrl_x = std::vector<double> {ctrl_x[0], ctrl_x[3], ctrl_x[2]};
-      face_ctrl_y = std::vector<double> {ctrl_y[0], ctrl_y[3], ctrl_y[2]};
-      face_ctrl_z = std::vector<double> {ctrl_z[0], ctrl_z[3], ctrl_z[2]};
+      face_ctrl_x = std::vector<double> { ctrl_x[0], ctrl_x[3], ctrl_x[2] };
+      face_ctrl_y = std::vector<double> { ctrl_y[0], ctrl_y[3], ctrl_y[2] };
+      face_ctrl_z = std::vector<double> { ctrl_z[0], ctrl_z[3], ctrl_z[2] };
       break;
 
     case 2:
-      face_ctrl_x = std::vector<double> {ctrl_x[0], ctrl_x[1], ctrl_x[3]};
-      face_ctrl_y = std::vector<double> {ctrl_y[0], ctrl_y[1], ctrl_y[3]};
-      face_ctrl_z = std::vector<double> {ctrl_z[0], ctrl_z[1], ctrl_z[3]};
+      face_ctrl_x = std::vector<double> { ctrl_x[0], ctrl_x[1], ctrl_x[3] };
+      face_ctrl_y = std::vector<double> { ctrl_y[0], ctrl_y[1], ctrl_y[3] };
+      face_ctrl_z = std::vector<double> { ctrl_z[0], ctrl_z[1], ctrl_z[3] };
       break;
 
     case 3:
-      face_ctrl_x = std::vector<double> {ctrl_x[0], ctrl_x[2], ctrl_x[1]};
-      face_ctrl_y = std::vector<double> {ctrl_y[0], ctrl_y[2], ctrl_y[1]};
-      face_ctrl_z = std::vector<double> {ctrl_z[0], ctrl_z[2], ctrl_z[1]};
+      face_ctrl_x = std::vector<double> { ctrl_x[0], ctrl_x[2], ctrl_x[1] };
+      face_ctrl_y = std::vector<double> { ctrl_y[0], ctrl_y[2], ctrl_y[1] };
+      face_ctrl_z = std::vector<double> { ctrl_z[0], ctrl_z[2], ctrl_z[1] };
       break;
 
     default:
-      SYS_T::print_fatal("Error: FEAElment_Tet4::buildBoundaryBasis, wrong face id.\n");
+      SYS_T::print_fatal("Error: FEAElement_Tet4::buildBoundaryBasis, wrong face id.\n");
       break;
   }
 
