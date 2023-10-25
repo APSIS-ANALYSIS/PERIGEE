@@ -529,6 +529,95 @@ namespace FE_T
     std::cout<<'\n'<<std::endl;
   }
 
+  QuadPts_Gauss_on_boundary::QuadPts_Gauss_on_boundary(const int &higher_elemType, const int &boundary_id, 
+      const IQuadPts * const lower_quad_rule) : lower_rule(lower_quad_rule)
+  {
+    if(higher_elemType == 501 || higher_elemType == 502) // Tet element
+    {
+      //                     t
+      //                     ^
+      //                     |
+      //                     3
+      //                    /| `.
+      //                   / |    `.
+      //                  /  |       `.
+      //                 /   |          `.
+      //                /    |             `.     
+      //               /     |                `.
+      //              /      |                   `.   
+      //             /      ,0 - - - - - - - - - - -`2 - - -> s
+      //            /     ,'  (u)               ,  "
+      //           /    ,'                ,  "
+      //          /   ,'            ,  "
+      //         /  ,'        ,  "
+      //        / ,'    ,  "
+      //       /,',  "
+      //      1'
+      //    ,'
+      // r * 
+      SYS_T::print_fatal_if( lower_quad_rule -> get_dim() == 3,
+        "FE_T::QuadPts_on_boundary, wrong surface quadrature rule.\n" );
+
+      dim = lower_quad_rule -> get_dim() + 1;
+      qp.assign( 4 * lower_rule->get_num_quadPts(), 0.0 );
+      
+      switch(boundary_id)
+      {
+        case 0: // u = 0 : node1 = node0', node2 = node1', node3 = node2'       //      t                                     s'
+          for(unsigned int ii{0}; ii < lower_rule->get_num_quadPts(); ++ii)     //      ^                                     ^
+          {                                                                     //      3                                     2'
+            qp[4*ii + 0] = lower_quad_rule->get_qp(ii, 2);  // r = t'           //      |  `.                     map         |  `.  
+            qp[4*ii + 1] = lower_quad_rule->get_qp(ii, 0);  // s = r'           //      |     `.                 <----        |     `.
+            qp[4*ii + 2] = lower_quad_rule->get_qp(ii, 1);  // t = s'           //      |        `.                           |        `.
+          }                                                                     //      |           `.                        |           `.
+          break;                                                                //  (r) 1 - - - - - - 2 - - -> s         (t') 0'- - -  - - - 1'- - -> r'
+        
+        case 1: // r = 0 : node0 = node0', node3 = node1', node2 = node2'       //      s                                     s'
+          for(unsigned int ii{0}; ii < lower_rule->get_num_quadPts(); ++ii)     //      ^                                     ^
+          {                                                                     //      2                                     2'
+            qp[4*ii + 1] = lower_quad_rule->get_qp(ii, 1);  // s = s'           //      |  `.                     map         |  `.
+            qp[4*ii + 2] = lower_quad_rule->get_qp(ii, 0);  // t = r'           //      |     `.                 <----        |     `.
+            qp[4*ii + 3] = lower_quad_rule->get_qp(ii, 2);  // u = t'           //      |        `.                           |        `.
+          }                                                                     //      |           `.                        |           `.
+          break;                                                                //  (u) 0 - - - - - - 3 - - -> t         (t') 0'- - -  - - - 1'- - -> r'
+
+        case 2: // s = 0 : node0 = node0', node1 = node1', node3 = node2'       //      t                                     s'
+          for(unsigned int ii{0}; ii < lower_rule->get_num_quadPts(); ++ii)     //      ^                                     ^
+          {                                                                     //      3                                     2'
+            qp[4*ii + 0] = lower_quad_rule->get_qp(ii, 0);  // r = r'           //      |  `.                     map         |  `.
+            qp[4*ii + 2] = lower_quad_rule->get_qp(ii, 1);  // t = s'           //      |     `.                 <----        |     `.
+            qp[4*ii + 3] = lower_quad_rule->get_qp(ii, 2);  // u = t'           //      |        `.                           |        `.
+          }                                                                     //      |           `.                        |           `.
+          break;                                                                //  (u) 0 - - - - - - 1 - - -> r         (t') 0'- - -  - - - 1'- - -> r'
+
+        case 3: // t = 0 : node0 = node0', node2 = node1', node1 = node2'       //      r                                     s'
+          for(unsigned int ii{0}; ii < lower_rule->get_num_quadPts(); ++ii)     //      ^                                     ^
+          {                                                                     //      1                                     2'
+            qp[4*ii + 0] = lower_quad_rule->get_qp(ii, 1);  // r = s'           //      |  `.                     map         |  `.
+            qp[4*ii + 1] = lower_quad_rule->get_qp(ii, 0);  // s = r'           //      |     `.                 <----        |     `.
+            qp[4*ii + 3] = lower_quad_rule->get_qp(ii, 2);  // u = t'           //      |        `.                           |        `.
+          }                                                                     //      |           `.                        |           `.
+          break;                                                                //  (u) 0 - - - - - - 2 - - -> s         (t') 0'- - -  - - - 1'- - -> r'
+
+        default:
+          SYS_T::print_fatal("Error: QuadPts_Gauss_on_boundary, wrong face id input.\n");
+          break;
+      }
+    }
+    else if (higher_elemType == 601 || higher_elemType == 602)
+    {
+      ; // Unimplemented
+    }
+    else
+      SYS_T::print_fatal("Error: FE_T::QuadPts_Gausson_boundary, unknown element type.\n");
+  }
+
+  QuadPts_Gauss_on_boundary::~QuadPts_Gauss_on_boundary()
+  {
+    VEC_T::clean(qp);
+    lower_rule = nullptr;
+  }
+
 }
 
 // EOF
