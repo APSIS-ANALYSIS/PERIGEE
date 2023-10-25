@@ -278,12 +278,10 @@ class FEAElement
     // surface element, it will build a line element.
     // This function will not be called in a line element.
     // ------------------------------------------------------------------------
-    virtual void buildBoundary( const IQuadPts * const &quad_rule,
+    virtual void buildBasisBoundary( const IQuadPts * const &quad_rule_boundary,
         const double * const &ctrl_x, const double * const &ctrl_y,
         const double * const &ctrl_z )
-    {
-      SYS_T::commPrint("Warning: buildBoundary is not implemented. \n");
-    }
+    {SYS_T::commPrint("Warning: buildBoundary is not implemented. \n");}
 };
 
 #endif

@@ -233,11 +233,15 @@ double FEAElement_Tet4::get_h( const double * const &ctrl_x,
   return 2.0 * r;
 }
 
-void FEAElement_Tet4::buildBoundary( const IQuadPts * const &quad_rule,
+void FEAElement_Tet4::buildBasisBoundary( const IQuadPts * const &quad_s, const int &face_id,
     const double * const &ctrl_x,
     const double * const &ctrl_y,
     const double * const &ctrl_z)
 {
+  // Build the volume element
+  const auto quad_v = FE_T::QuadPts_Gauss_on_boundary(this->get_Type(), face_id, quad_s);
+  this->buildBasis(&quad_v, ctrl_x, ctrl_y, ctrl_z);
+
   // If this function has been called and there exists a face element
   if (face_built_flag)
   {
@@ -250,7 +254,7 @@ void FEAElement_Tet4::buildBoundary( const IQuadPts * const &quad_rule,
 
   std::vector<double> face_ctrl_x(3, 0.0), face_ctrl_y(3, 0.0), face_ctrl_z(3, 0.0);
 
-  switch( quad_rule->get_boundary_id() )
+  switch( face_id )
   {
     case 0:
       face_ctrl_x = std::vector<double> {ctrl_x[1], ctrl_x[2], ctrl_x[3]};
@@ -277,12 +281,11 @@ void FEAElement_Tet4::buildBoundary( const IQuadPts * const &quad_rule,
       break;
 
     default:
-      SYS_T::print_fatal("Error: FEAElment_Tet4::buildBoundary, wrong face id.\n");
+      SYS_T::print_fatal("Error: FEAElment_Tet4::buildBoundaryBasis, wrong face id.\n");
       break;
   }
 
-  triangle_face->buildBasis( quad_rule->get_lower_QP(),
-                             &face_ctrl_x[0], &face_ctrl_y[0], &face_ctrl_z[0] );
+  triangle_face->buildBasis( quad_s, &face_ctrl_x[0], &face_ctrl_y[0], &face_ctrl_z[0] );
 
   // Finish building
   face_built_flag = true;
