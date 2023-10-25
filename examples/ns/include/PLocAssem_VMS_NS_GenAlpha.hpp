@@ -21,8 +21,8 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const int &in_nlocbas, const int &in_nqp,
         const int &in_snlocbas, const double &in_rho, 
         const double &in_vis_mu, const double &in_beta,
-        const double &in_ct = 4.0, const double &in_ctauc = 1.0, 
-        const int &elemtype = 501 );
+        const int &elemtype,
+        const double &in_ct = 4.0, const double &in_ctauc = 1.0 );
 
     virtual ~PLocAssem_VMS_NS_GenAlpha();
 
@@ -144,14 +144,12 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     // Private data
     const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta;
 
-    const int nqp; // number of quadrature points
-
-    const double CI; // Constants for stabilization parameters
+    const double CI, CT; // Constants for stabilization parameters
     
-    const double CT; // Constants for stabilization parameters
-
     const double Ctauc; // Constant scaling factor for tau_C
 
+    const int nqp; // number of quadrature points
+    
     const int nLocBas, snLocBas, vec_size, sur_size;
 
     // M matrix for tau_m
@@ -173,7 +171,8 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
     // Return tau_bar := (v' G v')^-0.5 x rho0, 
     //        which scales like Time x Density
-    // Users can refer to Int. J. Numer. Meth. Fluids 2001; 35: 93–116 for more details
+    // Users can refer to Int. J. Numer. Meth. Fluids 2001; 35: 93–116 
+    // for more details
     double get_DC( const std::array<double, 9> &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 

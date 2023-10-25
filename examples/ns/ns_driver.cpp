@@ -342,7 +342,7 @@ int main(int argc, char *argv[])
   IPLocAssem * locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha(
       tm_galpha_ptr, elementv->get_nLocBas(),
       quadv->get_num_quadPts(), elements->get_nLocBas(),
-      fluid_density, fluid_mu, bs_beta, c_ct, c_tauc, GMIptr->get_elemType() );
+      fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc );
 
   // ===== Initial condition =====
   PDNSolution * base = new PDNSolution_NS( pNode, fNode, locinfnbc, 1 );
