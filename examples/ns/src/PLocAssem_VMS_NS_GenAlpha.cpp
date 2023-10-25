@@ -1,34 +1,23 @@
-#include "PLocAssem_Tet_VMS_NS_GenAlpha.hpp"
+#include "PLocAssem_VMS_NS_GenAlpha.hpp"
 
-PLocAssem_Tet_VMS_NS_GenAlpha::PLocAssem_Tet_VMS_NS_GenAlpha(
+PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
         const TimeMethod_GenAlpha * const &tm_gAlpha,
         const int &in_nlocbas, const int &in_nqp,
         const int &in_snlocbas,
         const double &in_rho, const double &in_vis_mu,
-        const double &in_beta, const double &in_ct, 
-        const double &in_ctauc, const int &elemtype )
+        const double &in_beta, const int &elemtype, 
+        const double &in_ct, const double &in_ctauc )
 : rho0( in_rho ), vis_mu( in_vis_mu ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
-  gamma(tm_gAlpha->get_gamma()), beta(in_beta), nqp(in_nqp),
-  CT( in_ct ), Ctauc( in_ctauc )
+  gamma(tm_gAlpha->get_gamma()), beta(in_beta),
+  CI( (elemtype == 501 || elemtype == 601) ? 36.0 : 60.0 ),
+  CT( in_ct ), Ctauc( in_ctauc ),
+  nqp(in_nqp), nLocBas( in_nlocbas ), snLocBas( in_snlocbas ),
+  vec_size( in_nlocbas * 4 ), sur_size ( in_snlocbas * 4 ),
+  coef( (elemtype == 501 || elemtype == 502) ? 0.6299605249474365 : 1.0 ),
+  mm( (elemtype == 501 || elemtype == 502) ? std::array<double, 9>{2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0} :
+                                             std::array<double, 9>{1.0, 0.0, 0.0, 0.0, 1.0 ,0.0, 0.0, 0.0 ,1.0} )
 {
-  if(elemtype == 501)
-  {
-    // 501 is linear element
-    CI = 36.0;
-    nLocBas = 4; snLocBas = 3;
-  }
-  else if(elemtype == 502)
-  {
-    // 502 is quadratic element
-    CI = 60.0;
-    nLocBas = 10; snLocBas = 6;
-  }
-  else SYS_T::print_fatal("Error: unknown elem type.\n");
-
-  vec_size = nLocBas * 4; // dof_per_node = 4
-  sur_size = snLocBas * 4;
-
   Tangent = new PetscScalar[vec_size * vec_size];
   Residual = new PetscScalar[vec_size];
 
@@ -42,7 +31,7 @@ PLocAssem_Tet_VMS_NS_GenAlpha::PLocAssem_Tet_VMS_NS_GenAlpha(
   print_info();
 }
 
-PLocAssem_Tet_VMS_NS_GenAlpha::~PLocAssem_Tet_VMS_NS_GenAlpha()
+PLocAssem_VMS_NS_GenAlpha::~PLocAssem_VMS_NS_GenAlpha()
 {
   delete [] Tangent; Tangent = nullptr; 
   delete [] Residual; Residual = nullptr;
@@ -50,7 +39,7 @@ PLocAssem_Tet_VMS_NS_GenAlpha::~PLocAssem_Tet_VMS_NS_GenAlpha()
   delete [] sur_Residual; sur_Residual = nullptr;
 }
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::print_info() const
+void PLocAssem_VMS_NS_GenAlpha::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
   SYS_T::commPrint("  Three-dimensional Incompressible Navier-Stokes equations: \n");
@@ -58,6 +47,10 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::print_info() const
     SYS_T::commPrint("  FEM: 4-node Tetrahedral element \n");
   else if(nLocBas == 10)
     SYS_T::commPrint("  FEM: 10-node Tetrahedral element \n");
+  else if(nLocBas == 8)
+    SYS_T::commPrint("  FEM: 8-node Hexahedral element \n");
+  else if(nLocBas == 27)
+    SYS_T::commPrint("  FEM: 27-node Hexahedral element \n");
   else SYS_T::print_fatal("Error: unknown elem type.\n");
   SYS_T::commPrint("  Spatial: Residual-based VMS \n");
   SYS_T::commPrint("  Temporal: Generalized-alpha Method \n");
@@ -75,21 +68,18 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::print_info() const
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
-SymmTensor2_3D PLocAssem_Tet_VMS_NS_GenAlpha::get_metric(
+SymmTensor2_3D PLocAssem_VMS_NS_GenAlpha::get_metric(
     const std::array<double, 9> &f ) const
 {
-  // PHASTA definition 
-  const double coef = 0.6299605249474365;
-
-  const double fk0 = 2.0 * f[0] + (f[3] + f[6]);
-  const double fk1 = 2.0 * f[3] + (f[0] + f[6]);
-  const double fk2 = 2.0 * f[6] + (f[0] + f[3]);
-  const double fk3 = 2.0 * f[1] + (f[4] + f[7]);
-  const double fk4 = 2.0 * f[4] + (f[1] + f[7]);
-  const double fk5 = 2.0 * f[7] + (f[1] + f[4]);
-  const double fk6 = 2.0 * f[2] + (f[5] + f[8]);
-  const double fk7 = 2.0 * f[5] + (f[2] + f[8]);
-  const double fk8 = 2.0 * f[8] + (f[2] + f[5]);
+  const double fk0 = mm[0] * f[0] + (mm[1] * f[3] + mm[2] * f[6]);
+  const double fk1 = mm[4] * f[3] + (mm[3] * f[0] + mm[5] * f[6]);
+  const double fk2 = mm[8] * f[6] + (mm[6] * f[0] + mm[7] * f[3]);
+  const double fk3 = mm[0] * f[1] + (mm[1] * f[4] + mm[2] * f[7]);
+  const double fk4 = mm[4] * f[4] + (mm[3] * f[1] + mm[5] * f[7]);
+  const double fk5 = mm[8] * f[7] + (mm[6] * f[1] + mm[7] * f[4]);
+  const double fk6 = mm[0] * f[2] + (mm[1] * f[5] + mm[2] * f[8]);
+  const double fk7 = mm[4] * f[5] + (mm[3] * f[2] + mm[5] * f[8]);
+  const double fk8 = mm[8] * f[8] + (mm[6] * f[2] + mm[7] * f[5]);
 
   return SymmTensor2_3D( coef * ( fk0 * f[0] + fk1 * f[3] + fk2 * f[6] ),
   coef * ( fk3 * f[1] + fk4 * f[4] + fk5 * f[7] ),
@@ -99,7 +89,7 @@ SymmTensor2_3D PLocAssem_Tet_VMS_NS_GenAlpha::get_metric(
   coef * ( fk0 * f[1] + fk1 * f[4] + fk2 * f[7] ) );
 }
 
-std::array<double, 2> PLocAssem_Tet_VMS_NS_GenAlpha::get_tau(
+std::array<double, 2> PLocAssem_VMS_NS_GenAlpha::get_tau(
     const double &dt, const std::array<double, 9> &dxi_dx,
     const double &u, const double &v, const double &w ) const
 {
@@ -115,7 +105,7 @@ std::array<double, 2> PLocAssem_Tet_VMS_NS_GenAlpha::get_tau(
   return {{1.0 / ( rho0 * denom_m ), Ctauc * rho0 * denom_m / G.tr()}};
 }
 
-double PLocAssem_Tet_VMS_NS_GenAlpha::get_DC(
+double PLocAssem_VMS_NS_GenAlpha::get_DC(
     const std::array<double, 9> &dxi_dx,
     const double &u, const double &v, const double &w ) const
 {
@@ -131,7 +121,7 @@ double PLocAssem_Tet_VMS_NS_GenAlpha::get_DC(
   return dc_tau;
 }
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
+void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
     const double &time, const double &dt,
     const double * const &dot_sol,
     const double * const &sol,
@@ -215,7 +205,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
     // Get the tau_m and tau_c
     const auto dxi_dx = element->get_invJacobian(qua);
 
-    const std::array<double, 2> tau = get_tau(dt, dxi_dx, u, v, w);
+    const std::array<double, 2> tau = get_tau( dt, dxi_dx, u, v, w );
     const double tau_m = tau[0];
     const double tau_c = tau[1];
 
@@ -301,7 +291,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual(
   }
 }
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
+void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     const double &time, const double &dt,
     const double * const &dot_sol,
     const double * const &sol,
@@ -388,7 +378,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
     const auto dxi_dx = element->get_invJacobian(qua);
 
-    const std::array<double, 2> tau = get_tau(dt, dxi_dx, u, v, w);
+    const std::array<double, 2> tau = get_tau( dt, dxi_dx, u, v, w );
     const double tau_m = tau[0];
     const double tau_c = tau[1];
 
@@ -665,7 +655,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
   // ----------------------------------------------------------------
 }
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
+void PLocAssem_VMS_NS_GenAlpha::Assem_Mass_Residual(
     const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
@@ -760,7 +750,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
   }
 }
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
+void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_EBC(
     const int &ebc_id,
     const double &time, const double &dt,
     FEAElement * const &element,
@@ -804,7 +794,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
   }
 }
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
+void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
     const int &ebc_id,
     const double &val,
     FEAElement * const &element,
@@ -836,7 +826,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
   }
 }
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
+void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
     const double * const &dot_sol,
     const double * const &sol,
     FEAElement * const &element,
@@ -882,7 +872,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
   }
 }
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
+void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
     const double &dt,
     const double * const &dot_sol,
     const double * const &sol,
@@ -943,7 +933,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
   }
 }
 
-double PLocAssem_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &sol,
+double PLocAssem_VMS_NS_GenAlpha::get_flowrate( const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
@@ -977,7 +967,7 @@ double PLocAssem_Tet_VMS_NS_GenAlpha::get_flowrate( const double * const &sol,
   return flrate;
 }
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::get_pressure_area( 
+void PLocAssem_VMS_NS_GenAlpha::get_pressure_area( 
     const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,

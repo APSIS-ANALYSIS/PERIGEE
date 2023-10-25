@@ -70,8 +70,11 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/System/SymmTensor2_3D.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
   ${perigee_source}/System/HDF5_Reader.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_1D.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Tet.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_Hex.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_Quad.cpp
   ${perigee_source}/Analysis_Tool/AGlobal_Mesh_Info_FEM_3D.cpp
   ${perigee_source}/Analysis_Tool/APart_Basic_Info.cpp
   ${perigee_source}/Analysis_Tool/ALocal_Elem.cpp
@@ -85,8 +88,12 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Element/FE_Tools.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
   ${perigee_source}/Element/FEAElement_Tet10_v2.cpp
+  ${perigee_source}/Element/FEAElement_Hex8.cpp
+  ${perigee_source}/Element/FEAElement_Hex27.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Quad4_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Quad9_3D_der0.cpp  
   ${perigee_source}/Model/GenBC_RCR.cpp
   ${perigee_source}/Model/GenBC_Resistance.cpp
   ${perigee_source}/Model/GenBC_Inductance.cpp
@@ -99,7 +106,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/PDNTimeStep.cpp
   ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
-  ${perigee_SOURCE_DIR}/src/PLocAssem_Tet_VMS_NS_GenAlpha.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_VMS_NS_GenAlpha.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_NS_FEM.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_NS.cpp
   ${perigee_SOURCE_DIR}/src/PNonlinear_NS_Solver.cpp
