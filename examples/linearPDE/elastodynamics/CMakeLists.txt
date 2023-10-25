@@ -100,7 +100,7 @@ SET( perigee_postprocess_lib_src
   ${perigee_source}/Postproc_Tool/PostVectSolution.cpp
   ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   ${perigee_source}/Postproc_Tool/Interpolater.cpp
-  ${perigee_SOURCE_DIR}/../src/Post_error_transport.cpp
+  ${perigee_SOURCE_DIR}/../src/Post_error_elastodynamics.cpp
   )
 
 INCLUDE_DIRECTORIES( ../../../include )
@@ -130,7 +130,7 @@ INCLUDE(../../../conf/message_compiler_setup.cmake)
 ADD_EXECUTABLE( preprocess3d ../preprocess.cpp)
 ADD_EXECUTABLE( elasto_3d driver_elastodynamics.cpp)
 ADD_EXECUTABLE( prepost ../prepost.cpp)
-ADD_EXECUTABLE( post_error ../post_compare_manu.cpp )
+ADD_EXECUTABLE( post_error post_compare_manu.cpp )
 
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( elasto_3d perigee_analysis )
