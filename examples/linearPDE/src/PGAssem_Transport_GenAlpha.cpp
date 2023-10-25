@@ -49,13 +49,11 @@ PGAssem_Transport_GenAlpha::PGAssem_Transport_GenAlpha(
       PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &K);
 }
 
-
 PGAssem_Transport_GenAlpha::~PGAssem_Transport_GenAlpha()
 {
   VecDestroy(&G);
   MatDestroy(&K);
 }
-
 
 void PGAssem_Transport_GenAlpha::EssBC_KG( 
     const ALocal_NBC * const &nbc_part )
@@ -88,7 +86,6 @@ void PGAssem_Transport_GenAlpha::EssBC_KG(
   }
 }
 
-
 void PGAssem_Transport_GenAlpha::EssBC_G( 
     const ALocal_NBC * const &nbc_part )
 {
@@ -113,7 +110,6 @@ void PGAssem_Transport_GenAlpha::EssBC_G(
     }
   }
 }
-
 
 void PGAssem_Transport_GenAlpha::Assem_nonzero_estimate(
     const ALocal_Elem * const &alelem_ptr,

@@ -228,7 +228,7 @@ int main(int argc, char *argv[])
     SYS_T::print_fatal_if( nqp_vol_1D < 2, "Error: not enough quadrature points for hex.\n" );
     SYS_T::print_fatal_if( nqp_sur_1D < 1, "Error: not enough quadrature points for quad.\n" );
 
-    elementv = new FEAElement_Hex8( nqp_vol_1D * nqp_vol_1D * nqp_sur_1D ); // elem type 601
+    elementv = new FEAElement_Hex8( nqp_vol_1D * nqp_vol_1D * nqp_vol_1D ); // elem type 601
     elements = new FEAElement_Quad4_3D_der0( nqp_sur_1D * nqp_sur_1D );
     quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
     quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
     SYS_T::print_fatal_if( nqp_vol_1D < 4, "Error: not enough quadrature points for hex.\n" );
     SYS_T::print_fatal_if( nqp_sur_1D < 3, "Error: not enough quadrature points for quad.\n" );
 
-    elementv = new FEAElement_Hex27( nqp_vol_1D * nqp_vol_1D * nqp_sur_1D ); // elem type 602
+    elementv = new FEAElement_Hex27( nqp_vol_1D * nqp_vol_1D * nqp_vol_1D ); // elem type 602
     elements = new FEAElement_Quad9_3D_der0( nqp_sur_1D * nqp_sur_1D );
     quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
     quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
@@ -290,10 +290,10 @@ int main(int argc, char *argv[])
     initial_step  = restart_step;
 
     // Read sol file
-    SYS_T::file_check(restart_u_name.c_str());
-    SYS_T::file_check(restart_v_name.c_str());
+    SYS_T::file_check(restart_u_name);
+    SYS_T::file_check(restart_v_name);
 
-    disp->ReadBinary(restart_u_name.c_str());
+    disp->ReadBinary(restart_u_name.c_str());//str
     velo->ReadBinary(restart_v_name.c_str());
 
     // generate the corresponding dot_sol file name
@@ -303,8 +303,8 @@ int main(int argc, char *argv[])
     restart_dot_v_name.append(restart_v_name);
 
     // Read dot_sol file
-    SYS_T::file_check(restart_dot_u_name.c_str());
-    SYS_T::file_check(restart_dot_v_name.c_str());
+    SYS_T::file_check(restart_dot_u_name);
+    SYS_T::file_check(restart_dot_v_name);
 
     dot_disp->ReadBinary(restart_dot_u_name.c_str());
     dot_velo->ReadBinary(restart_dot_v_name.c_str());

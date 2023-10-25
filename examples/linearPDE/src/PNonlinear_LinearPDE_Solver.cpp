@@ -10,10 +10,8 @@ PNonlinear_LinearPDE_Solver::PNonlinear_LinearPDE_Solver(
   nrenew_threshold(input_renew_threshold)
 {}
 
-
 PNonlinear_LinearPDE_Solver::~PNonlinear_LinearPDE_Solver()
 {}
-
 
 void PNonlinear_LinearPDE_Solver::print_info() const
 {
@@ -312,4 +310,5 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Elastodynamics(
 
   delete dot_step;
 }
+
 // EOF

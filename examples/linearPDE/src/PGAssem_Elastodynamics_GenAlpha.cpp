@@ -49,13 +49,11 @@ PGAssem_Elastodynamics_GenAlpha::PGAssem_Elastodynamics_GenAlpha(
       PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &K);
 }
 
-
 PGAssem_Elastodynamics_GenAlpha::~PGAssem_Elastodynamics_GenAlpha()
 {
   VecDestroy(&G);
   MatDestroy(&K);
 }
-
 
 void PGAssem_Elastodynamics_GenAlpha::EssBC_KG( 
     const ALocal_NBC * const &nbc_part, const int &field )
@@ -87,7 +85,6 @@ void PGAssem_Elastodynamics_GenAlpha::EssBC_KG(
   }
 }
 
-
 void PGAssem_Elastodynamics_GenAlpha::EssBC_G( 
     const ALocal_NBC * const &nbc_part, const int &field )
 {
@@ -111,7 +108,6 @@ void PGAssem_Elastodynamics_GenAlpha::EssBC_G(
     }
   }
 }
-
 
 void PGAssem_Elastodynamics_GenAlpha::Assem_nonzero_estimate(
     const ALocal_Elem * const &alelem_ptr,

@@ -190,7 +190,8 @@ void PTime_LinearPDE_Solver::TM_GenAlpha_Elastodynamics(
     cur_dot_velo->WriteBinary(sol_dot_name.c_str());
   }
 
-  bool conv_flag, renew_flag;
+  bool conv_flag;
+  bool renew_flag = true;
   int nl_counter = 0;
 
   bool rest_flag = restart_init_assembly_flag;
