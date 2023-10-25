@@ -10,6 +10,7 @@
 // Date Created: Jan 19 2017
 // ==================================================================
 #include "FEAElement.hpp"
+#include "FEAElement_Triangle3_3D_der0.hpp"
 #include "FE_Tools.hpp"
 
 class FEAElement_Tet4 : public FEAElement
@@ -135,6 +136,16 @@ class FEAElement_Tet4 : public FEAElement
     // Get the determinant of the Jacobian matrix
     virtual double get_detJac(const int &quaindex) const {return detJac;}
 
+    // Build the boundary element
+    //   Tet-Face-0 : Node 1 2 3
+    //   Tet-Face-1 : Node 0 3 2
+    //   Tet-Face-2 : Node 0 1 3
+    //   Tet-Face-3 : Node 0 2 1
+    virtual void buildBoundary( const IQuadPts * const &quad_rule,
+        const double * const &ctrl_x,
+        const double * const &ctrl_y,
+        const double * const &ctrl_z );
+
   private:
     // Number of quadrature points
     const int numQuapts;
@@ -151,6 +162,9 @@ class FEAElement_Tet4 : public FEAElement
     double Jac[18]; 
 
     double detJac;
+
+    FEAElement_Triangle3_3D_der0 * triangle_face;
+    bool face_built_flag;
 };
 
 #endif

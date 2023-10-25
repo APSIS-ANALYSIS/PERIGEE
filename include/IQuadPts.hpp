@@ -60,7 +60,7 @@ class IQuadPts
     virtual int get_boundary_id() const
     {
       SYS_T::print_fatal("Error: IQuadPts::get_boundary_id is not implemented.\n");
-      return 0.0;
+      return -1;
     }
 
     // get_lower_QP : returns the quadrature rules with lower dimension

@@ -271,6 +271,19 @@ class FEAElement
       SYS_T::commPrint("Warning: get_normal_out is not implemented. \n");
       return Vector_3();
     }
+
+    // ------------------------------------------------------------------------
+    // Build the boundary element with boundary id from the specific quad_rule.
+    // For a volume element, it will build a surface element, and for a
+    // surface element, it will build a line element.
+    // This function will not be called in a line element.
+    // ------------------------------------------------------------------------
+    virtual void buildBoundary( const IQuadPts * const &quad_rule,
+        const double * const &ctrl_x, const double * const &ctrl_y,
+        const double * const &ctrl_z )
+    {
+      SYS_T::commPrint("Warning: buildBoundary is not implemented. \n");
+    }
 };
 
 #endif
