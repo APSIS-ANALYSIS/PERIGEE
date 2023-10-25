@@ -91,8 +91,6 @@ class QuadPts_Gauss_Tet_face : public IQuadPts
 
       virtual int get_dim() const {return 4;}
 
-      virtual int get_boundary_id() const {return face_id;}
-
       virtual int get_num_quadPts() const {return num_pts;}
 
       virtual double get_qp(unsigned int ii, unsigned int comp) const
@@ -101,21 +99,27 @@ class QuadPts_Gauss_Tet_face : public IQuadPts
       virtual double get_qw(unsigned int ii) const
       {return qw[ii];}
 
-      virtual IQuadPts * get_lower_QP(){return &QP_triangle;}
+      virtual int get_boundary_id() const {return face_id;}
+
+      virtual const IQuadPts * get_lower_QP() const {return &QP_triangle;}
 
     private:
-        const int num_pts;
+      const int num_pts;
 
-        // qp : length 4 * num_pts. Stores the r-s-t-u coordinates of the 
-        //      quadrature points.
-        //      u = 1 - r - s - t
-        // qw : length num_pts. Stores the quadrature weights.
-        std::vector<double> qp {};
-        std::vector<double> qw {};
+      // qp : length 4 * num_pts. Stores the r-s-t-u coordinates of the 
+      //      quadrature points.
+      //      u = 1 - r - s - t
+      // qw : length num_pts. Stores the quadrature weights.
+      std::vector<double> qp {};
+      std::vector<double> qw {};
 
-        const int face_id;
+      const int face_id;
 
-        QuadPts_Gauss_Triangle QP_triangle;
+      QuadPts_Gauss_Triangle QP_triangle;
+
+      // disallow default constructor
+      QuadPts_Gauss_Tet_face() = delete;
+
 };
 
 #endif
