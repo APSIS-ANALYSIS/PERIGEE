@@ -606,7 +606,6 @@ namespace FE_T
     }
     else if (higher_elemType == 601 || higher_elemType == 602) // Hex element
     {
-      //
       //                    t
       //                    ^
       //                    |
@@ -647,7 +646,7 @@ namespace FE_T
           break;                                                                          //    0 -------- 3 - -> s        0'-------- 1'- -> r'
 
         case 1: // t = 1 : node4 = node0', node5 = node1', node6 = node2', node7 = node3' //    s                          s'
-          for(unsigned int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)               //    ^                          ^
+          for(unsigned int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)              //    ^                          ^
           {                                                                               //    |                          |
             qp[3*ii + 0] = lower_rule->get_qp(ii, 0);  // r = r'                          //    7 -------- 6               3'-------- 2'
             qp[3*ii + 1] = lower_rule->get_qp(ii, 1);  // s = s'                          //    |          |        map    |          |
