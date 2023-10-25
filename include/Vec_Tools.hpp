@@ -195,6 +195,20 @@ namespace VEC_T
   }
 
   // --------------------------------------------------------------------------
+  // ! intersection
+  //   return the intersection set of two given vectors
+  // --------------------------------------------------------------------------
+  template<typename T> std::vector<T> intersection( const std::vector<T> &vec_a,
+     const std::vector<T> &vec_b )
+  {
+    std::vector<T> out {};
+    for( const auto &val : vec_a )
+      if( VEC_T::is_invec(vec_b, val) ) out.push_back(val);
+
+    return out;
+  }
+
+  // --------------------------------------------------------------------------
   // ! get_pos
   //   find the position (pos) of the given val such that 
   //                 vec[pos] = val
@@ -252,6 +266,17 @@ namespace VEC_T
     vfile.close();
     std::cout.precision(ss);
   }
+
+  // --------------------------------------------------------------------------
+  // ! erase_pos
+  //   erase the element stored in the vector vec at the position at begin() +
+  //   pos
+  // --------------------------------------------------------------------------
+  template<typename T> void erase_pos( std::vector<T> &vec, const int &pos )
+  {
+    vec.erase( vec.begin() + pos );
+  }
+
 }
 
 #endif
