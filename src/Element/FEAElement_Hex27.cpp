@@ -18,6 +18,8 @@ FEAElement_Hex27::FEAElement_Hex27( const int &in_nqua ) : numQuapts( in_nqua )
   dx_dr = new double [9*numQuapts];
   dr_dx = new double [9*numQuapts];
   detJac = new double [numQuapts];
+
+  quadrilateral_face = nullptr;
 }
 
 FEAElement_Hex27::~FEAElement_Hex27()
@@ -36,6 +38,12 @@ FEAElement_Hex27::~FEAElement_Hex27()
   delete [] dx_dr;     dx_dr = nullptr;
   delete [] dr_dx;     dr_dx = nullptr;
   delete [] detJac;   detJac = nullptr;
+
+  if( face_built_flag )
+  {
+    delete quadrilateral_face;
+    quadrilateral_face = nullptr;
+  }
 }
 
 void FEAElement_Hex27::print_info() const
@@ -535,6 +543,94 @@ std::array<double,9> FEAElement_Hex27::get_invJacobian(const int &quaindex) cons
   return {{ dr_dx[9*quaindex], dr_dx[9*quaindex+1], dr_dx[9*quaindex+2],
     dr_dx[9*quaindex+3], dr_dx[9*quaindex+4], dr_dx[9*quaindex+5],
     dr_dx[9*quaindex+6], dr_dx[9*quaindex+7], dr_dx[9*quaindex+8] }};
+}
+
+void FEAElement_Hex27::buildBasisBoundary( const IQuadPts * const &quad_s, const int &face_id,
+    const double * const &ctrl_x,
+    const double * const &ctrl_y,
+    const double * const &ctrl_z )
+{
+  // Build the volume element
+  const auto quad_v = FE_T::QuadPts_Gauss_on_boundary( this->get_Type(), face_id, quad_s );
+  this->buildBasis( &quad_v, ctrl_x, ctrl_y, ctrl_z );
+
+  // If this function has been called and there exists a face element
+  if ( face_built_flag )
+  {
+    delete quadrilateral_face;
+    quadrilateral_face = nullptr;
+  }
+
+  // Build a new face element
+  quadrilateral_face = new FEAElement_Quad9_3D_der0( numQuapts );
+
+  std::vector<double> face_ctrl_x( 9, 0.0 ), face_ctrl_y( 9, 0.0 ), face_ctrl_z( 9, 0.0 );
+
+  switch( face_id )
+  {
+    case 0:
+      face_ctrl_x = std::vector<double> { ctrl_x[0], ctrl_x[3], ctrl_x[2], ctrl_x[1],
+                                          ctrl_x[11], ctrl_x[10],ctrl_x[9], ctrl_x[8], ctrl_x[24] };
+      face_ctrl_y = std::vector<double> { ctrl_y[0], ctrl_y[3], ctrl_y[2], ctrl_y[1],
+                                          ctrl_y[11], ctrl_y[10],ctrl_y[9], ctrl_y[8], ctrl_y[24] };
+      face_ctrl_z = std::vector<double> { ctrl_z[0], ctrl_z[3], ctrl_z[2], ctrl_z[1],
+                                          ctrl_z[11], ctrl_z[10],ctrl_z[9], ctrl_z[8], ctrl_z[24] };
+      break;
+
+    case 1:
+      face_ctrl_x = std::vector<double> { ctrl_x[4], ctrl_x[5], ctrl_x[6], ctrl_x[7],
+                                          ctrl_x[12], ctrl_x[13],ctrl_x[14], ctrl_x[15], ctrl_x[25] };
+      face_ctrl_y = std::vector<double> { ctrl_y[4], ctrl_y[5], ctrl_y[6], ctrl_y[7],
+                                          ctrl_y[12], ctrl_y[13],ctrl_y[14], ctrl_y[15], ctrl_y[25] };
+      face_ctrl_z = std::vector<double> { ctrl_z[4], ctrl_z[5], ctrl_z[6], ctrl_z[7],
+                                          ctrl_z[12], ctrl_z[13],ctrl_z[14], ctrl_z[15], ctrl_z[25] };
+      break;
+
+    case 2:
+      face_ctrl_x = std::vector<double> { ctrl_x[0], ctrl_x[1], ctrl_x[5], ctrl_x[4],
+                                          ctrl_x[8], ctrl_x[17],ctrl_x[12], ctrl_x[16], ctrl_x[22] };
+      face_ctrl_y = std::vector<double> { ctrl_y[0], ctrl_y[1], ctrl_y[5], ctrl_y[4],
+                                          ctrl_y[8], ctrl_y[17],ctrl_y[12], ctrl_y[16], ctrl_y[22] };
+      face_ctrl_z = std::vector<double> { ctrl_z[0], ctrl_z[1], ctrl_z[5], ctrl_z[4],
+                                          ctrl_z[8], ctrl_z[17],ctrl_z[12], ctrl_z[16], ctrl_z[22] };
+      break;
+
+    case 3:
+      face_ctrl_x = std::vector<double> { ctrl_x[1], ctrl_x[2], ctrl_x[6], ctrl_x[5],
+                                          ctrl_x[9], ctrl_x[18],ctrl_x[13], ctrl_x[17], ctrl_x[21] };
+      face_ctrl_y = std::vector<double> { ctrl_y[1], ctrl_y[2], ctrl_y[6], ctrl_y[5],
+                                          ctrl_y[9], ctrl_y[18],ctrl_y[13], ctrl_y[17], ctrl_y[21] };
+      face_ctrl_z = std::vector<double> { ctrl_z[1], ctrl_z[2], ctrl_z[6], ctrl_z[5],
+                                          ctrl_z[9], ctrl_z[18],ctrl_z[13], ctrl_z[17], ctrl_z[21] };
+      break;
+
+    case 4:
+      face_ctrl_x = std::vector<double> { ctrl_x[3], ctrl_x[7], ctrl_x[6], ctrl_x[2],
+                                          ctrl_x[19], ctrl_x[14],ctrl_x[18], ctrl_x[10], ctrl_x[23] };
+      face_ctrl_y = std::vector<double> { ctrl_y[3], ctrl_y[7], ctrl_y[6], ctrl_y[2],
+                                          ctrl_y[19], ctrl_y[14],ctrl_y[18], ctrl_y[10], ctrl_y[23] };
+      face_ctrl_z = std::vector<double> { ctrl_z[3], ctrl_z[7], ctrl_z[6], ctrl_z[2],
+                                          ctrl_z[19], ctrl_z[14],ctrl_z[18], ctrl_z[10], ctrl_z[23] };
+      break;
+
+    case 5:
+      face_ctrl_x = std::vector<double> { ctrl_x[0], ctrl_x[4], ctrl_x[7], ctrl_x[3],
+                                          ctrl_x[16], ctrl_x[15],ctrl_x[19], ctrl_x[11], ctrl_x[20] };
+      face_ctrl_y = std::vector<double> { ctrl_y[0], ctrl_y[4], ctrl_y[7], ctrl_y[3],
+                                          ctrl_y[16], ctrl_y[15],ctrl_y[19], ctrl_y[11], ctrl_y[20] };
+      face_ctrl_z = std::vector<double> { ctrl_z[0], ctrl_z[4], ctrl_z[7], ctrl_z[3],
+                                          ctrl_z[16], ctrl_z[15],ctrl_z[19], ctrl_z[11], ctrl_z[20] };
+      break;
+
+    default:
+      SYS_T::print_fatal("Error: FEAElement_Hex27::buildBoundaryBasis, wrong face id.\n");
+      break;
+  }
+
+  quadrilateral_face->buildBasis( quad_s, &face_ctrl_x[0], &face_ctrl_y[0], &face_ctrl_z[0] );
+
+  // Finish building
+  face_built_flag = true;
 }
 
 // EOF

@@ -570,7 +570,7 @@ namespace FE_T
             qp[4*ii + 1] = lower_rule->get_qp(ii, 0);  // s = r'                //      |     `.                 <----        |     `.
             qp[4*ii + 2] = lower_rule->get_qp(ii, 1);  // t = s'                //      | front  `.                           |        `.
           }                                                                     //      |           `.                        |           `.
-          break;                                                                //  (r) 1 - - - - - - 2 - - -> s         (t') 0'- - -  - - - 1'- - -> r'
+          break;                                                                //  (r) 1 - - - - - - 2 - - -> s         (t') 0'- - - - - - 1'- - -> r'
         
         case 1: // r = 0 : node0 = node0', node3 = node1', node2 = node2'       //      s                                     s'
           for(unsigned int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)    //      ^                                     ^
@@ -579,7 +579,7 @@ namespace FE_T
             qp[4*ii + 2] = lower_rule->get_qp(ii, 0);  // t = r'                //      |     `.                 <----        |     `.
             qp[4*ii + 3] = lower_rule->get_qp(ii, 2);  // u = t'                //      | back   `.                           |        `.
           }                                                                     //      |           `.                        |           `.
-          break;                                                                //  (u) 0 - - - - - - 3 - - -> t         (t') 0'- - -  - - - 1'- - -> r'
+          break;                                                                //  (u) 0 - - - - - - 3 - - -> t         (t') 0'- - - - - - 1'- - -> r'
 
         case 2: // s = 0 : node0 = node0', node1 = node1', node3 = node2'       //      t                                     s'
           for(unsigned int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)    //      ^                                     ^
@@ -588,7 +588,7 @@ namespace FE_T
             qp[4*ii + 2] = lower_rule->get_qp(ii, 1);  // t = s'                //      |     `.                 <----        |     `.
             qp[4*ii + 3] = lower_rule->get_qp(ii, 2);  // u = t'                //      | left   `.                           |        `.
           }                                                                     //      |           `.                        |           `.
-          break;                                                                //  (u) 0 - - - - - - 1 - - -> r         (t') 0'- - -  - - - 1'- - -> r'
+          break;                                                                //  (u) 0 - - - - - - 1 - - -> r         (t') 0'- - - - - - 1'- - -> r'
 
         case 3: // t = 0 : node0 = node0', node2 = node1', node1 = node2'       //      r                                     s'
           for(unsigned int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)    //      ^                                     ^
@@ -597,7 +597,7 @@ namespace FE_T
             qp[4*ii + 1] = lower_rule->get_qp(ii, 0);  // s = r'                //      |     `.                 <----        |     `.
             qp[4*ii + 3] = lower_rule->get_qp(ii, 2);  // u = t'                //      | bottom `.                           |        `.
           }                                                                     //      |           `.                        |           `.
-          break;                                                                //  (u) 0 - - - - - - 2 - - -> s         (t') 0'- - -  - - - 1'- - -> r'
+          break;                                                                //  (u) 0 - - - - - - 2 - - -> s         (t') 0'- - - - - - 1'- - -> r'
 
         default:
           SYS_T::print_fatal("Error: QuadPts_Gauss_on_boundary, wrong face id input.\n");
