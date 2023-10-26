@@ -8,6 +8,7 @@
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
 #include "Part_FEM.hpp"
+#include "yaml-cpp/yaml.h"
 
 int main( int argc, char * argv[] )
 {
@@ -25,7 +26,7 @@ int main( int argc, char * argv[] )
 
   SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: prepost is a serial program! \n");
 
-  // Read preprocessor command-line arguements recorded in the .h5 file
+  // Read the problem setting recorded in the .h5 file
   hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
@@ -38,10 +39,16 @@ int main( int argc, char * argv[] )
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
-  // The user can specify the new mesh partition options
-  SYS_T::GetOptionInt("-cpu_size", cpu_size);
-  SYS_T::GetOptionInt("-in_ncommon", in_ncommon);
-  SYS_T::GetOptionBool("-METIS_isDualGraph", isDualGraph);
+  // The user can specify the new mesh partition options from the yaml file
+  const std::string yaml_file("prepost.yml");
+
+  SYS_T::file_check(yaml_file); std::cout << yaml_file << " found. \n";
+
+  YAML::Node paras = YAML::LoadFile( yaml_file );
+
+  cpu_size     = paras["cpu_size"].as<int>(); 
+  in_ncommon   = paras["in_ncommon"].as<int>();
+  isDualGraph  = paras["is_dualgraph"].as<bool>();
 
   cout << "==== Command Line Arguments ====" << endl;
   cout << " -cpu_size: "   << cpu_size   << endl;
@@ -49,9 +56,11 @@ int main( int argc, char * argv[] )
   if(isDualGraph) cout << " -METIS_isDualGraph: true \n";
   else cout << " -METIS_isDualGraph: false \n";
   cout << "----------------------------------\n";
-  cout << "part_file: " << part_file << endl;
-  cout << "geo_file: "  << geo_file  << endl;
-  cout << "elemType: "  << elemType  << endl;
+  cout << "-part_file: " << part_file << endl;
+  cout << "-geo_file: "  << geo_file  << endl;
+  cout << "-elemType: "  << elemType  << endl;
+  cout << "-dof_num: "   << dofNum    << endl;
+  cout << "-dof_mat: "   << dofMat    << endl; 
 
   // Read the volumetric mesh file from the vtu file: geo_file
   int nFunc, nElem;
