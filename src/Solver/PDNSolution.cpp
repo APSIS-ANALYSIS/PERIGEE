@@ -230,22 +230,22 @@ void PDNSolution::PrintNoGhost() const
   VecView(solution, PETSC_VIEWER_STDOUT_WORLD);
 }
 
-void PDNSolution::WriteBinary(const char * const &file_name) const
+void PDNSolution::WriteBinary(const std::string &file_name) const
 {
   PetscViewer viewer;
   PetscViewerCreate(PETSC_COMM_WORLD, &viewer);
   PetscViewerSetType(viewer, PETSCVIEWERBINARY);
   PetscViewerFileSetMode(viewer, FILE_MODE_WRITE);
   PetscViewerBinarySkipInfo(viewer);
-  PetscViewerFileSetName(viewer, file_name);
+  PetscViewerFileSetName(viewer, file_name.c_str());
   VecView(solution, viewer);
   PetscViewerDestroy(&viewer);
 }
 
-void PDNSolution::ReadBinary(const char * const &file_name) const
+void PDNSolution::ReadBinary(const std::string &file_name) const
 {
   PetscViewer viewer;
-  PetscViewerBinaryOpen(PETSC_COMM_WORLD, file_name,
+  PetscViewerBinaryOpen(PETSC_COMM_WORLD, file_name.c_str(),
       FILE_MODE_READ, &viewer);
   VecLoad(solution, viewer);
   VecGhostUpdateBegin(solution, INSERT_VALUES, SCATTER_FORWARD);
