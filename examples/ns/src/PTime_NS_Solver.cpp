@@ -97,10 +97,10 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
   if(restart_init_assembly_flag == false)
   {
     sol_name = Name_Generator(time_info->get_index());
-    cur_sol->WriteBinary(sol_name.c_str());
+    cur_sol->WriteBinary(sol_name);
     
     sol_dot_name = Name_dot_Generator(time_info->get_index());
-    cur_dot_sol->WriteBinary(sol_dot_name.c_str());
+    cur_dot_sol->WriteBinary(sol_dot_name);
   }
 
   bool conv_flag, renew_flag;
@@ -145,10 +145,10 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     if( time_info->get_index()%sol_record_freq == 0 )
     {
       sol_name = Name_Generator( time_info->get_index() );
-      cur_sol->WriteBinary(sol_name.c_str());
+      cur_sol->WriteBinary(sol_name);
 
       sol_dot_name = Name_dot_Generator(time_info->get_index());
-      cur_dot_sol->WriteBinary(sol_dot_name.c_str());
+      cur_dot_sol->WriteBinary(sol_dot_name);
     }
 
     // Calculate the flow rate & averaged pressure on all outlets

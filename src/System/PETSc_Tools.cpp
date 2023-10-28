@@ -187,14 +187,14 @@ std::vector<double> PETSc_T::GetLocalArray( const Vec &vv )
   return vv_vector;
 }
 
-void PETSc_T::WriteBinary( const Vec &a, const char * const &file_name )
+void PETSc_T::WriteBinary( const Vec &a, const std::string &file_name )
 {
   PetscViewer viewer;
   PetscViewerCreate(PETSC_COMM_WORLD, &viewer);
   PetscViewerSetType(viewer, PETSCVIEWERBINARY);
   PetscViewerFileSetMode(viewer, FILE_MODE_WRITE);
   PetscViewerBinarySkipInfo(viewer);
-  PetscViewerFileSetName(viewer, file_name);
+  PetscViewerFileSetName(viewer, file_name.c_str());
   VecView(a, viewer);
   PetscViewerDestroy(&viewer);
 }
