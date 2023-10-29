@@ -111,17 +111,17 @@ void PTime_CMM_Solver::TM_CMM_GenAlpha(
   {
     // Write [ (dot) pres, (dot) velo ]
     sol_name = Name_Generator(time_info->get_index());
-    cur_sol->WriteBinary(sol_name.c_str());
+    cur_sol->WriteBinary(sol_name);
     
     sol_dot_name = Name_dot_Generator(time_info->get_index());
-    cur_dot_sol->WriteBinary(sol_dot_name.c_str());
+    cur_dot_sol->WriteBinary(sol_dot_name);
 
     // Write [ (dot) wall disp ]
     sol_wall_disp_name = Name_Generator(time_info->get_index(), "disp_");
-    cur_sol_wall_disp->WriteBinary(sol_wall_disp_name.c_str());
+    cur_sol_wall_disp->WriteBinary(sol_wall_disp_name);
 
     sol_dot_wall_disp_name = Name_dot_Generator(time_info->get_index(), "disp_");
-    cur_dot_sol_wall_disp->WriteBinary(sol_dot_wall_disp_name.c_str());
+    cur_dot_sol_wall_disp->WriteBinary(sol_dot_wall_disp_name);
   }
 
   bool renew_flag;
@@ -169,17 +169,17 @@ void PTime_CMM_Solver::TM_CMM_GenAlpha(
     {
       // Write (dot) pres, (dot) velo
       sol_name = Name_Generator( time_info->get_index() );
-      cur_sol->WriteBinary(sol_name.c_str());
+      cur_sol->WriteBinary(sol_name);
 
       sol_dot_name = Name_dot_Generator(time_info->get_index());
-      cur_dot_sol->WriteBinary(sol_dot_name.c_str());
+      cur_dot_sol->WriteBinary(sol_dot_name);
 
       // Write (dot) wall disp
       sol_wall_disp_name = Name_Generator(time_info->get_index(), "disp_");
-      cur_sol_wall_disp->WriteBinary(sol_wall_disp_name.c_str());
+      cur_sol_wall_disp->WriteBinary(sol_wall_disp_name);
 
       sol_dot_wall_disp_name = Name_dot_Generator(time_info->get_index(), "disp_");
-      cur_dot_sol_wall_disp->WriteBinary(sol_dot_wall_disp_name.c_str());
+      cur_dot_sol_wall_disp->WriteBinary(sol_dot_wall_disp_name);
     }
 
     // Calculate the flow rate & averaged pressure on all outlets
@@ -356,17 +356,17 @@ void PTime_CMM_Solver::TM_Prestress(
     {
       // Write (dot) pres, (dot) velo
       sol_name = Name_Generator( time_info->get_index() );
-      cur_sol->WriteBinary(sol_name.c_str());
+      cur_sol->WriteBinary(sol_name);
 
       sol_dot_name = Name_dot_Generator(time_info->get_index());
-      cur_dot_sol->WriteBinary(sol_dot_name.c_str());
+      cur_dot_sol->WriteBinary(sol_dot_name);
 
       // Write (dot) wall disp
       sol_wall_disp_name = Name_Generator(time_info->get_index(), "disp_");
-      cur_sol_wall_disp->WriteBinary(sol_wall_disp_name.c_str());
+      cur_sol_wall_disp->WriteBinary(sol_wall_disp_name);
 
       sol_dot_wall_disp_name = Name_dot_Generator(time_info->get_index(), "disp_");
-      cur_dot_sol_wall_disp->WriteBinary(sol_dot_wall_disp_name.c_str());
+      cur_dot_sol_wall_disp->WriteBinary(sol_dot_wall_disp_name);
     }
 
     // Prepare for next time step

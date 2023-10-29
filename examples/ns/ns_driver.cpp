@@ -358,16 +358,16 @@ int main(int argc, char *argv[])
     initial_step  = restart_step;
 
     // Read sol file
-    SYS_T::file_check(restart_name.c_str());
-    sol->ReadBinary(restart_name.c_str());
+    SYS_T::file_check(restart_name);
+    sol->ReadBinary(restart_name);
 
     // generate the corresponding dot_sol file name
     std::string restart_dot_name = "dot_";
     restart_dot_name.append(restart_name);
 
     // Read dot_sol file
-    SYS_T::file_check(restart_dot_name.c_str());
-    dot_sol->ReadBinary(restart_dot_name.c_str());
+    SYS_T::file_check(restart_dot_name);
+    dot_sol->ReadBinary(restart_dot_name);
 
     SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
     SYS_T::commPrint("     restart_name: %s \n", restart_name.c_str());
