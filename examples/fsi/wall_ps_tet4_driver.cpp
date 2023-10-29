@@ -324,22 +324,22 @@ int main( int argc, char *argv[] )
   PDNSolution * dot_pres = new PDNSolution_P(pNode_p, 0, true, "dot_pres");
 
   // Read sol file
-  SYS_T::file_check(restart_velo_name.c_str());
-  velo->ReadBinary(restart_velo_name.c_str());
+  SYS_T::file_check(restart_velo_name);
+  velo->ReadBinary(restart_velo_name);
 
-  SYS_T::file_check(restart_pres_name.c_str());
-  pres->ReadBinary(restart_pres_name.c_str());
+  SYS_T::file_check(restart_pres_name);
+  pres->ReadBinary(restart_pres_name);
 
   // Read dot_sol file
   std::string restart_dot_velo_name = "dot_";
   restart_dot_velo_name.append(restart_velo_name);
-  SYS_T::file_check(restart_dot_velo_name.c_str());
-  dot_velo->ReadBinary(restart_dot_velo_name.c_str());
+  SYS_T::file_check(restart_dot_velo_name);
+  dot_velo->ReadBinary(restart_dot_velo_name);
  
   std::string restart_dot_pres_name = "dot_";
   restart_dot_pres_name.append(restart_pres_name);
-  SYS_T::file_check(restart_dot_pres_name.c_str());
-  dot_pres->ReadBinary(restart_dot_pres_name.c_str());
+  SYS_T::file_check(restart_dot_pres_name);
+  dot_pres->ReadBinary(restart_dot_pres_name);
 
   SYS_T::commPrint("===> Read sol from disk as a restart run: \n");
   SYS_T::commPrint("     restart_velo_name:     %s \n", restart_velo_name.c_str());

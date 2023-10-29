@@ -396,24 +396,24 @@ int main( int argc, char *argv[] )
     initial_step  = restart_step;
 
     // Read in pres, velo
-    SYS_T::file_check(restart_name.c_str());
-    sol->ReadBinary(restart_name.c_str());
+    SYS_T::file_check(restart_name);
+    sol->ReadBinary(restart_name);
 
     // Read in dot pres, dot velo
     std::string restart_dot_name = "dot_";
     restart_dot_name.append(restart_name);
-    SYS_T::file_check(restart_dot_name.c_str());
-    dot_sol->ReadBinary(restart_dot_name.c_str());
+    SYS_T::file_check(restart_dot_name);
+    dot_sol->ReadBinary(restart_dot_name);
 
     // Read in wall disp
-    SYS_T::file_check(restart_disp_name.c_str());
-    sol_wall_disp->ReadBinary(restart_disp_name.c_str());
+    SYS_T::file_check(restart_disp_name);
+    sol_wall_disp->ReadBinary(restart_disp_name);
 
     // Read in dot wall disp
     std::string restart_dot_disp_name = "dot_";
     restart_dot_disp_name.append(restart_disp_name);
-    SYS_T::file_check(restart_dot_disp_name.c_str());
-    dot_sol_wall_disp->ReadBinary(restart_dot_disp_name.c_str());
+    SYS_T::file_check(restart_dot_disp_name);
+    dot_sol_wall_disp->ReadBinary(restart_dot_disp_name);
 
     SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
     SYS_T::commPrint("     restart_name: %s \n", restart_name.c_str());
