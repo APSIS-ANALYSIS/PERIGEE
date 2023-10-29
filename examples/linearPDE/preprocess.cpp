@@ -1,6 +1,9 @@
 // ============================================================================
 // preprocess.cpp
+// 
+// This is a preprocessing driver for handling linear differential equations.
 //
+// Author: Xinhai Yue
 // ============================================================================
 #include "Mesh_Tet.hpp"
 #include "Mesh_FEM.hpp"
@@ -49,17 +52,17 @@ int main( int argc, char * argv[] )
   SYS_T::file_check(geo_file);
   
   // Check if the dof of Dirichlet BCs equals the dof of matrix problem
-  SYS_T::print_fatal_if( static_cast<int>(dir_list.size()) != dofMat, "Error: the dof of Dirichlet BCs(%d) does not equals the dof of the matrix problem(%d) \n", dir_list.size(), dofMat);
+  SYS_T::print_fatal_if( VEC_T::get_size(dir_list) != dofMat, "Error: the dof of Dirichlet BCs(%d) does not equals the dof of the matrix problem(%d) \n", dir_list.size(), dofMat);
 
   // Check if the geometry file(s) of Dirichlet BC(s) exists
   for(int ii = 0; ii < dofMat; ++ii)
   {
-    for(int jj = 0; jj < static_cast<int>(dir_list[ii].size()); ++jj)
+    for(int jj = 0; jj < VEC_T::get_size(dir_list[ii]); ++jj)
       SYS_T::file_check( dir_list[ii][jj] );
   }
 
   // Check if the geometry file(s) of Neumann BC(s) exists
-  for(int jj = 0; jj < static_cast<int>(neu_list.size()); ++jj) SYS_T::file_check( neu_list[jj] );
+  for(int jj = 0; jj < VEC_T::get_size(neu_list); ++jj) SYS_T::file_check( neu_list[jj] );
   
   // Print the command line arguments
   std::cout << "======== Command Line Arguments  ========" << std::endl;
@@ -75,15 +78,15 @@ int main( int argc, char * argv[] )
 
   // Print the boundary conditions
   std::cout << "====  Dirichlet Boundary Conditions  ====" << std::endl;
-  for(int ii = 0; ii < static_cast<int>(dir_list.size()); ++ii)
+  for(int ii = 0; ii < VEC_T::get_size(dir_list); ++ii)
   {
     std::cout << "  DOF " << ii << ":" << std::endl;
-    for(int jj = 0; jj < static_cast<int>(dir_list[ii].size()); ++jj)
+    for(int jj = 0; jj < VEC_T::get_size(dir_list[ii]); ++jj)
       std::cout << "    " << dir_list[ii][jj] << std::endl;
   }
   std::cout << "=========================================" << std::endl;
   std::cout << "=====  Neumann Boundary Conditions  =====" << std::endl;
-  for(int jj = 0; jj < static_cast<int>(neu_list.size()); ++jj)
+  for(int jj = 0; jj < VEC_T::get_size(neu_list); ++jj)
       std::cout << "    " << neu_list[jj] << std::endl;
   std::cout << "=========================================" << std::endl;
 
@@ -204,6 +207,8 @@ int main( int argc, char * argv[] )
     delete part; delete ebcpart; delete nbcpart;
   }
   
+  delete mytimer;
+  
   cout<<"\n===> Mesh Partition Quality: "<<endl;
   cout<<"The largest ghost / local node ratio is: "<<VEC_T::max(list_ratio_g2l)<<endl;
   cout<<"The smallest ghost / local node ratio is: "<<VEC_T::min(list_ratio_g2l)<<endl;
@@ -221,7 +226,6 @@ int main( int argc, char * argv[] )
   // Finalize the code and exit
   for(auto &it_nbc : NBC_list ) delete it_nbc;
 
-  delete mytimer;
   delete ebc; delete global_part; delete mnindex; delete IEN; delete mesh;
   return EXIT_SUCCESS;
 }
