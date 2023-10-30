@@ -4,19 +4,14 @@ FEAElement_Tet4::FEAElement_Tet4( const int &in_nqua ) : numQuapts( in_nqua )
 {
   R = new double [4 * numQuapts];
 
-  face_built_flag = false;
-  triangle_face = nullptr;
+  triangle_face = new FEAElement_Triangle3_3D_der0( numQuapts );
 }
 
 FEAElement_Tet4::~FEAElement_Tet4()
 {
   delete [] R; R = nullptr;
 
-  if ( face_built_flag )
-  {
-    delete triangle_face;
-    triangle_face = nullptr;
-  }
+  delete triangle_face; triangle_face = nullptr;
 }
 
 void FEAElement_Tet4::print_info() const
@@ -233,7 +228,7 @@ double FEAElement_Tet4::get_h( const double * const &ctrl_x,
   return 2.0 * r;
 }
 
-void FEAElement_Tet4::buildBasisBoundary( const IQuadPts * const &quad_s, const int &face_id,
+void FEAElement_Tet4::buildBasis( const IQuadPts * const &quad_s, const int &face_id,
     const double * const &ctrl_x,
     const double * const &ctrl_y,
     const double * const &ctrl_z )
@@ -241,16 +236,6 @@ void FEAElement_Tet4::buildBasisBoundary( const IQuadPts * const &quad_s, const 
   // Build the volume element
   const auto quad_v = FE_T::QuadPts_Gauss_on_boundary( this->get_Type(), face_id, quad_s );
   this->buildBasis( &quad_v, ctrl_x, ctrl_y, ctrl_z );
-
-  // If this function has been called and there exists a face element
-  if ( face_built_flag )
-  {
-    delete triangle_face;
-    triangle_face = nullptr;
-  }
-
-  // Build a new face element
-  triangle_face = new FEAElement_Triangle3_3D_der0( numQuapts );
 
   std::vector<double> face_ctrl_x( 3, 0.0 ), face_ctrl_y( 3, 0.0 ), face_ctrl_z( 3, 0.0 );
 
@@ -286,9 +271,6 @@ void FEAElement_Tet4::buildBasisBoundary( const IQuadPts * const &quad_s, const 
   }
 
   triangle_face->buildBasis( quad_s, &face_ctrl_x[0], &face_ctrl_y[0], &face_ctrl_z[0] );
-
-  // Finish building
-  face_built_flag = true;
 }
 
 // EOF

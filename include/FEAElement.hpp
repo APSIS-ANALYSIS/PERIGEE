@@ -278,7 +278,7 @@ class FEAElement
     // surface element, it will build a line element.
     // This function will not be called in a line element.
     // ------------------------------------------------------------------------
-    virtual void buildBasisBoundary( const IQuadPts * const &quad_rule_boundary,
+    virtual void buildBasis( const IQuadPts * const &quad_rule_boundary,
         const int &boundary_id,
         const double * const &ctrl_x, 
         const double * const &ctrl_y,

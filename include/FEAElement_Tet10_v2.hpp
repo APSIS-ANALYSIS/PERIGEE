@@ -135,12 +135,12 @@ class FEAElement_Tet10_v2 : public FEAElement
     //   Tet-Face-1 : Node 0 3 2 7 9 6
     //   Tet-Face-2 : Node 0 1 3 4 8 7
     //   Tet-Face-3 : Node 0 2 1 6 5 4
-    virtual void buildBasisBoundary( const IQuadPts * const &quad_rule_s, const int &face_id,
+    virtual void buildBasis( const IQuadPts * const &quad_rule_s, const int &face_id,
         const double * const &ctrl_x,
         const double * const &ctrl_y,
         const double * const &ctrl_z );
 
-    // Get the outwardnormal on faces after calling buildBasisBoundary
+    // Get the outwardnormal on faces
     virtual Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const
     {return triangle_face->get_2d_normal_out( quaindex, area );}
 
@@ -163,7 +163,6 @@ class FEAElement_Tet10_v2 : public FEAElement
     double * detJac;
 
     FEAElement * triangle_face;
-    bool face_built_flag;
 };
 
 #endif

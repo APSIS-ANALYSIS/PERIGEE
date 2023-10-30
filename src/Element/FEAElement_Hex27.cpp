@@ -19,7 +19,7 @@ FEAElement_Hex27::FEAElement_Hex27( const int &in_nqua ) : numQuapts( in_nqua )
   dr_dx = new double [9*numQuapts];
   detJac = new double [numQuapts];
 
-  quadrilateral_face = nullptr;
+  quadrilateral_face = new FEAElement_Quad9_3D_der0( numQuapts );
 }
 
 FEAElement_Hex27::~FEAElement_Hex27()
@@ -39,11 +39,7 @@ FEAElement_Hex27::~FEAElement_Hex27()
   delete [] dr_dx;     dr_dx = nullptr;
   delete [] detJac;   detJac = nullptr;
 
-  if( face_built_flag )
-  {
-    delete quadrilateral_face;
-    quadrilateral_face = nullptr;
-  }
+  delete quadrilateral_face; quadrilateral_face = nullptr;
 }
 
 void FEAElement_Hex27::print_info() const
@@ -545,7 +541,7 @@ std::array<double,9> FEAElement_Hex27::get_invJacobian(const int &quaindex) cons
     dr_dx[9*quaindex+6], dr_dx[9*quaindex+7], dr_dx[9*quaindex+8] }};
 }
 
-void FEAElement_Hex27::buildBasisBoundary( const IQuadPts * const &quad_s, const int &face_id,
+void FEAElement_Hex27::buildBasis( const IQuadPts * const &quad_s, const int &face_id,
     const double * const &ctrl_x,
     const double * const &ctrl_y,
     const double * const &ctrl_z )
@@ -553,16 +549,6 @@ void FEAElement_Hex27::buildBasisBoundary( const IQuadPts * const &quad_s, const
   // Build the volume element
   const auto quad_v = FE_T::QuadPts_Gauss_on_boundary( this->get_Type(), face_id, quad_s );
   this->buildBasis( &quad_v, ctrl_x, ctrl_y, ctrl_z );
-
-  // If this function has been called and there exists a face element
-  if ( face_built_flag )
-  {
-    delete quadrilateral_face;
-    quadrilateral_face = nullptr;
-  }
-
-  // Build a new face element
-  quadrilateral_face = new FEAElement_Quad9_3D_der0( numQuapts );
 
   std::vector<double> face_ctrl_x( 9, 0.0 ), face_ctrl_y( 9, 0.0 ), face_ctrl_z( 9, 0.0 );
 
@@ -628,9 +614,6 @@ void FEAElement_Hex27::buildBasisBoundary( const IQuadPts * const &quad_s, const
   }
 
   quadrilateral_face->buildBasis( quad_s, &face_ctrl_x[0], &face_ctrl_y[0], &face_ctrl_z[0] );
-
-  // Finish building
-  face_built_flag = true;
 }
 
 // EOF

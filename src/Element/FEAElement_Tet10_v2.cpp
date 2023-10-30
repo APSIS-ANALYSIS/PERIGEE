@@ -20,14 +20,7 @@ FEAElement_Tet10_v2::FEAElement_Tet10_v2( const int &in_nqua )
   dr_dx = new double [9*numQuapts];
   detJac = new double [numQuapts];
 
-  face_built_flag = false;
-  triangle_face = nullptr;
-
-  if ( face_built_flag )
-  {
-    delete triangle_face;
-    triangle_face = nullptr;
-  }
+  triangle_face = new FEAElement_Triangle6_3D_der0( numQuapts );
 }
 
 FEAElement_Tet10_v2::~FEAElement_Tet10_v2()
@@ -46,6 +39,8 @@ FEAElement_Tet10_v2::~FEAElement_Tet10_v2()
   delete [] dx_dr;     dx_dr = nullptr;
   delete [] dr_dx;     dr_dx = nullptr;
   delete [] detJac;   detJac = nullptr;
+
+  delete triangle_face; triangle_face = nullptr;
 }
 
 void FEAElement_Tet10_v2::print_info() const
@@ -421,7 +416,7 @@ std::array<double,9> FEAElement_Tet10_v2::get_invJacobian(const int &quaindex) c
     dr_dx[9*quaindex+6], dr_dx[9*quaindex+7], dr_dx[9*quaindex+8] }};
 }
 
-void FEAElement_Tet10_v2::buildBasisBoundary( const IQuadPts * const &quad_s, const int &face_id,
+void FEAElement_Tet10_v2::buildBasis( const IQuadPts * const &quad_s, const int &face_id,
     const double * const &ctrl_x,
     const double * const &ctrl_y,
     const double * const &ctrl_z )
@@ -429,16 +424,6 @@ void FEAElement_Tet10_v2::buildBasisBoundary( const IQuadPts * const &quad_s, co
   // Build the volume element
   const auto quad_v = FE_T::QuadPts_Gauss_on_boundary( this->get_Type(), face_id, quad_s );
   this->buildBasis( &quad_v, ctrl_x, ctrl_y, ctrl_z );
-
-  // If this function has been called and there exists a face element
-  if ( face_built_flag )
-  {
-    delete triangle_face;
-    triangle_face = nullptr;
-  }
-
-  // Build a new face element
-  triangle_face = new FEAElement_Triangle6_3D_der0( numQuapts );
 
   std::vector<double> face_ctrl_x( 6, 0.0 ), face_ctrl_y( 6, 0.0 ), face_ctrl_z( 6, 0.0 );
 
@@ -474,9 +459,6 @@ void FEAElement_Tet10_v2::buildBasisBoundary( const IQuadPts * const &quad_s, co
   }
 
   triangle_face->buildBasis( quad_s, &face_ctrl_x[0], &face_ctrl_y[0], &face_ctrl_z[0] );
-
-  // Finish building
-  face_built_flag = true;
 }
 
 // EOF

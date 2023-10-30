@@ -1018,7 +1018,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_Weak1(
     const double &C_bI)
 {
   // Build the basis function of volume element
-  elementv->buildBasisBoundary( quads, face_id, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  elementv->buildBasis( quads, face_id, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   const double curr {time + alpha_f * dt};
 
