@@ -112,7 +112,7 @@ void VTK_Writer_NS::writeOutput(
         IEN_e[16], IEN_e[17], IEN_e[18], IEN_e[19], IEN_e[20], IEN_e[21],
         IEN_e[22], IEN_e[23], IEN_e[24], IEN_e[25], IEN_e[26], gridData );
     else SYS_T::print_fatal("Error: unknown element type.\n");
-    
+
     // Mesh partition info
     anaprocId->InsertNextValue( epart_map[ lelem_ptr->get_elem_loc(ee) ] );
   }
