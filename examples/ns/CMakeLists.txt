@@ -121,6 +121,7 @@ SET( perigee_postprocess_lib_src
   ${perigee_source}/Mesh/QuadPts_vis_tet4.cpp
   ${perigee_source}/Mesh/QuadPts_vis_quad4.cpp
   ${perigee_source}/Mesh/QuadPts_vis_hex8.cpp
+  ${perigee_source}/Mesh/QuadPts_vis_hex27.cpp
   ${perigee_source}/Mesh/QuadPts_vis_tet10_v2.cpp
   ${perigee_source}/Postproc_Tool/PostVectSolution.cpp
   ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
