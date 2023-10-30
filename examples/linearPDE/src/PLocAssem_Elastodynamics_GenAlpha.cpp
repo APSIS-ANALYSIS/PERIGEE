@@ -85,9 +85,7 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Residual(
     double uy_x = 0.0, uy_y = 0.0, uy_z = 0.0;
     double uz_x = 0.0, uz_y = 0.0, uz_z = 0.0;
 
-    double vx_t = 0.0;
-    double vy_t = 0.0;
-    double vz_t = 0.0;
+    double vx_t = 0.0, vy_t = 0.0, vz_t = 0.0;
 
     Vector_3 coor(0.0, 0.0, 0.0);
 
@@ -175,9 +173,7 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Tangent_Residual(
     double uy_x = 0.0, uy_y = 0.0, uy_z = 0.0;
     double uz_x = 0.0, uz_y = 0.0, uz_z = 0.0;
 
-    double vx_t = 0.0;
-    double vy_t = 0.0;
-    double vz_t = 0.0;
+    double vx_t = 0.0, vy_t = 0.0, vz_t = 0.0;
     
     Vector_3 coor(0.0, 0.0, 0.0);
 
@@ -343,7 +339,7 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Mass_Residual(
 
       for(int B=0; B<nLocBas; ++B)
       {
-        Tangent[3*nLocBas*(3*A) + 3*B] += gwts * rho * NA * R[B];
+        Tangent[3*nLocBas*(3*A) + 3*B    ] += gwts * rho * NA * R[B];
         Tangent[3*nLocBas*(3*A+1) + 3*B+1] += gwts * rho * NA * R[B];
         Tangent[3*nLocBas*(3*A+2) + 3*B+2] += gwts * rho * NA * R[B];
       }

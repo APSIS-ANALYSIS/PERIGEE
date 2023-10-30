@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionBool("-is_loadYaml", is_loadYaml);
   SYS_T::GetOptionString("-yaml_file", yaml_file);
 
-  if (is_loadYaml) SYS_T::InsertFileYAML( yaml_file,  false );
+ if(is_loadYaml) SYS_T::InsertFileYAML( yaml_file,  false );
 
   // ===== Read Command Line Arguments =====
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
