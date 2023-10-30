@@ -15,7 +15,7 @@
 #include "NodalBC.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_outflow.hpp"
-#include "ElemBC_3D_weak.hpp"
+#include "ElemBC_3D_wall_turbulence.hpp"
 #include "NBC_Partition.hpp"
 #include "NBC_Partition_inflow.hpp"
 #include "EBC_Partition_outflow.hpp"
@@ -249,7 +249,7 @@ int main( int argc, char * argv[] )
   ebc -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
 
   // Setup weak BC
-  ElemBC * wbc = new ElemBC_3D_weak( weak_list, weakBC_type, C_bI, IEN, elemType );
+  ElemBC * wbc = new ElemBC_3D_wall_turbulence( weak_list, weakBC_type, C_bI, IEN, elemType );
  
   // Start partition the mesh for each cpu_rank 
 

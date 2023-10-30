@@ -1,11 +1,10 @@
-#ifndef ELEMBC_3D_WEAK_HPP
-#define ELEMBC_3D_WEAK_HPP
+#ifndef ELEMBC_3D_WALL_TURBULENCE_HPP
+#define ELEMBC_3D_WALL_TURBULENCE_HPP
 // ============================================================================
-// ElemBC_3D_weak.hpp
+// ElemBC_3D_wall_turbulence.hpp
 //
 // This is an instantation of ElemBC_3D for weakly enforced Dirichlet boundary 
-// condition on the wall of a fluid domain or on a moving interface of two
-// fluid domains.
+// condition on the wall with 'the law of the wall' applied.
 //
 // Since the surface integral involves the first order derivative of basis function,
 // we will use the local ien of volume element that has faces on the surface.
@@ -26,23 +25,22 @@
 // ============================================================================
 
 #include "ElemBC_3D.hpp"
-#include "Tensor2_3D.hpp"
 
-class ElemBC_3D_weak : public ElemBC_3D {
+class ElemBC_3D_wall_turbulence : public ElemBC_3D {
   public:
-    ElemBC_3D_weak( const std::vector<std::string> &vtkfileList,
+    ElemBC_3D_wall_turbulence( const std::vector<std::string> &vtkfileList,
                     const int &in_weak_bc_type,
                     const double &in_C_bI,
                     const IIEN * const &VIEN,
                     const int &elemtype );
 
-    virtual ~ElemBC_3D_weak();
+    virtual ~ElemBC_3D_wall_turbulence();
 
     virtual int get_weak_bc_type() const { return weak_bc_type; };
 
     virtual double get_C_bI() const { return C_bI; };
 
-    virtual std::vector<int> get_faceID( const int &ebcid) const { return face_id[ebcid]; }
+    virtual std::vector<int> get_faceID() const { return face_id; }
 
   private:
     // Weak bc type
@@ -56,11 +54,11 @@ class ElemBC_3D_weak : public ElemBC_3D {
     const double C_bI;
 
     // the face id of the volume element
-    std::vector< std::vector<int> > face_id;
+    std::vector<int> face_id;
 
     // ------------------------------------------------------------------------
     // Disallow default constructor
-    ElemBC_3D_weak() = delete;
+    ElemBC_3D_wall_turbulence() = delete;
      
 };
 
