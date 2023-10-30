@@ -146,7 +146,7 @@ class FEAElement_Tet4 : public FEAElement
         const double * const &ctrl_y,
         const double * const &ctrl_z );
 
-    // Get the outwardnormal on faces after calling buildBasisBoundary
+    // Get the outwardnormal on faces
     virtual Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const
     {return triangle_face->get_2d_normal_out( quaindex, area );}
 
