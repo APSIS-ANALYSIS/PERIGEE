@@ -37,5 +37,4 @@ class QuadPts_vis_hex8 : public IQuadPts
     double qw[8];
 };
 
-
 #endif

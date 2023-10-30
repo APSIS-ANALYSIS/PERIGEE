@@ -17,10 +17,8 @@ QuadPts_vis_hex8::QuadPts_vis_hex8()
   qw[6] = 0.5; qw[7] = 0.5;
 }
 
-
 QuadPts_vis_hex8::~QuadPts_vis_hex8()
 {}
-
 
 void QuadPts_vis_hex8::print_info() const
 {
@@ -30,6 +28,5 @@ void QuadPts_vis_hex8::print_info() const
         qw[ii], qp[3*ii], qp[3*ii+1], qp[3*ii+2]);
   SYS_T::commPrint("========================================= \n");
 }
-
 
 // EOF
