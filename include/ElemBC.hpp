@@ -133,21 +133,17 @@ class ElemBC
     virtual double get_fluid_density() const
     {SYS_T::commPrint("Warning: get_fluid_density is not implemented. \n"); return -1.0;}
 
-    // Access the data in ElemBC_3D_weak, weak BC type
+    // Access the data in ElemBC_3D_wall_turbulence, weak BC type
     virtual int get_weak_bc_type() const
     {SYS_T::commPrint("Warning: get_weak_bC_type is not implemented. \n"); return -1;}
 
-    // Access the data in ElemBC_3D_weak, coefficient used in weak BC
+    // Access the data in ElemBC_3D_wall_turbulence, coefficient used in weak BC
     virtual double get_C_bI() const
     {SYS_T::commPrint("Warning: get_C_bI is not implemented. \n"); return 0.0;}
 
-    // Access the data in ElemBC_3D_weak, face id of volume element used in weak BC
-    virtual std::vector<int> get_faceID( const int &ebcid) const
+    // Access the data in ElemBC_3D_wall_turbulence, face id of volume element
+    virtual std::vector<int> get_faceID() const
     {SYS_T::commPrint("Warning: get_face_id is not implemented. \n"); return {};}
-
-    // Access the data in ElemBC_3D_weak, rotation matrices at nodes used in weak BC
-    virtual std::vector<double> get_rotation_matrix( const int &ebcid) const
-    {SYS_T::commPrint("Warning: get_rotation_matrix is not implemented. \n"); return {};}
  
     // Overwrite ElemBC_3D_tet_wall properties from a vtp/vtu file
     virtual void overwrite_from_vtk( const std::string &wallprop_vtk,

@@ -19,7 +19,7 @@
 #include "NBC_Partition.hpp"
 #include "NBC_Partition_inflow.hpp"
 #include "EBC_Partition_outflow.hpp"
-#include "EBC_Partition_weak.hpp"
+#include "EBC_Partition_wall_turbulence.hpp"
 
 int main( int argc, char * argv[] )
 {
@@ -290,7 +290,7 @@ int main( int argc, char * argv[] )
     ebcpart -> write_hdf5( part_file );
 
     // Partition Weak BC and write to h5 file
-    EBC_Partition * wbcpart = new EBC_Partition_weak(part, mnindex, wbc);
+    EBC_Partition * wbcpart = new EBC_Partition_wall_turbulence(part, mnindex, wbc);
 
     wbcpart -> write_hdf5( part_file );
 
