@@ -35,9 +35,6 @@ class EBC_Partition_weak : public EBC_Partition
     // stores the face id of the volume element
     std::vector< std::vector<int> > ele_face_id;
 
-    // stores the rotation matrix
-    std::vector< std::vector<double> > rot_mat;
-
 };
 
 #endif

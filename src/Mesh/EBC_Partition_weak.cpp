@@ -12,8 +12,6 @@ weak_bc_type {ebc->get_weak_bc_type()}, C_bI {ebc->get_C_bI()}
 
     part_vol_ele_id.resize(num_ebc);
     ele_face_id.resize(num_ebc);
-    if(weak_bc_type == 2)
-      rot_mat.resize(num_ebc);
 
     for(int ii{0}; ii < num_ebc; ++ii)
     {   
@@ -25,9 +23,6 @@ weak_bc_type {ebc->get_weak_bc_type()}, C_bI {ebc->get_C_bI()}
       }
 
       ele_face_id[ii] = ebc -> get_faceID(ii);
-
-      if(weak_bc_type == 2)
-        rot_mat[ii] = ebc -> get_rotation_matrix(ii);
     }
   }
   else
@@ -63,9 +58,6 @@ void EBC_Partition_weak::write_hdf5(const std::string &FileName) const
 
     h5w -> write_intVector( g_id, "num_local_cell", num_local_cell );
 
-    if(weak_bc_type == 2)
-      h5w -> write_intVector( g_id, "num_local_cell_node", num_local_cell_node );
-
     const std::string groupbase("weakBCid_");
 
     for(int ii{0}; ii < num_ebc; ++ii)
@@ -80,13 +72,6 @@ void EBC_Partition_weak::write_hdf5(const std::string &FileName) const
 
       h5w -> write_intVector( group_id, "cell_face_id", ele_face_id[ii] );
 
-      if(weak_bc_type == 2)
-      {
-        h5w -> write_intVector( group_id, "global_node_id", local_cell_node_vol_id[ii] );
-
-        h5w -> write_doubleVector( group_id, "node_rotation_matrix", rot_mat[ii] );
-      }
-      
       H5Gclose( group_id );
     }
   }

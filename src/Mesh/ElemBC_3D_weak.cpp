@@ -66,28 +66,3 @@ ElemBC_3D_weak::~ElemBC_3D_weak()
 {
   face_id.clear();
 }
-
-void ElemBC_3D_weak::set_Q(const std::vector<int> &wall_node_idx, const std::vector<Tensor2_3D> &Q_at_node)
-{
-  if(weak_bc_type != 2)
-  {
-    SYS_T::commPrint("No need to set rotation matrices at nodes.\n");
-    return;
-  }
-  else
-  {
-    Q.resize(num_ebc);
-    for(int ebcid {0}; ebcid < num_ebc; ++ebcid)
-    {
-      Q[ebcid].resize(9 * num_node[ebcid]);
-      for(int node{0}; node < num_node[ebcid]; ++node)
-      {
-        // The location of node in the wall_node_idx vector
-        const int location = VEC_T::get_pos(wall_node_idx, global_node[ebcid][node]);
-
-        for(int comp{0}; comp < 9; ++comp)
-            Q[ebcid][9 * node + comp] = Q_at_node[location](comp);
-      }
-    }
-  }
-}

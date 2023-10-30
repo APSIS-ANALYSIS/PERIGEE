@@ -17,10 +17,6 @@
 //    in local assembly.
 // 3. Face id of the volume element, we will use the face id and the local ien of
 //    volume element to build the quadrature rule and the basis;
-// For type 2 weak BC:
-// 4. Number of surface nodes;
-// 5. Global id of surface nodes;
-// 6. Rotation matrices at each surface node.
 //
 // To be distinguished from other ElemBC_3D, it uses EBC_Partition_weak to 
 // write h5 file and serves a unique ALocal_WeakBC object.
@@ -48,11 +44,6 @@ class ElemBC_3D_weak : public ElemBC_3D {
 
     virtual std::vector<int> get_faceID( const int &ebcid) const { return face_id[ebcid]; }
 
-    virtual std::vector<double> get_rotation_matrix( const int &ebcid) const { return Q[ebcid]; }
-
-    // set the rotation matrix when weak_bc_type = 2
-    virtual void set_Q(const std::vector<int> &wall_node_idx, const std::vector<Tensor2_3D> &Q_at_node);
-
   private:
     // Weak bc type
     // type = 0 : strongly no-slip bc in all direction (do nothing)
@@ -66,9 +57,6 @@ class ElemBC_3D_weak : public ElemBC_3D {
 
     // the face id of the volume element
     std::vector< std::vector<int> > face_id;
-
-    // the rotation matrix at each surface node
-    std::vector< std::vector<double> > Q;
 
     // ------------------------------------------------------------------------
     // Disallow default constructor

@@ -24,15 +24,6 @@ ALocal_WeakBC::ALocal_WeakBC( const std::string &fileBaseName, const int &cpu_ra
 
     ele_face_id.resize(num_weak_boundary);
 
-    if(weakbc_type == 2)
-    {
-      num_sur_node = h5r -> read_intVector( gname.c_str(), "num_local_cell_node" );
-
-      sur_node_id.resize(num_weak_boundary);
-
-      Q.resize(num_weak_boundary);
-    }
-
     const std::string groupbase("weakBCid_");
 
     for(int ii{0}; ii < num_weak_boundary; ++ii)
@@ -43,18 +34,6 @@ ALocal_WeakBC::ALocal_WeakBC( const std::string &fileBaseName, const int &cpu_ra
       part_vol_ele_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "part_vol_cell_id" );
 
       ele_face_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "cell_face_id" );
-
-      if(weakbc_type == 2)
-      {
-        sur_node_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "global_node_id" );
-
-        const std::vector<double> temp_Q = h5r -> read_doubleVector( subgroup_name.c_str(), "node_rotation_matrix" );
-
-        for(int node{0}; node < num_sur_node[ii]; ++node)
-          Q[ii][node] = Tensor2_3D ( temp_Q[9 * node + 0], temp_Q[9 * node + 1], temp_Q[9 * node + 2],
-                                     temp_Q[9 * node + 3], temp_Q[9 * node + 4], temp_Q[9 * node + 5],
-                                     temp_Q[9 * node + 6], temp_Q[9 * node + 7], temp_Q[9 * node + 8] ); 
-      }
     }
   }
 
@@ -72,12 +51,6 @@ ALocal_WeakBC::~ALocal_WeakBC()
     {
       VEC_T::clean( part_vol_ele_id[ii] );
       VEC_T::clean( ele_face_id[ii] );
-
-      if(weakbc_type == 2)
-      {
-        VEC_T::clean( sur_node_id[ii] );
-        VEC_T::clean( Q[ii] );
-      }
     }
   }
 }
