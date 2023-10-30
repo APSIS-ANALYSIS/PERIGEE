@@ -33,6 +33,7 @@ Part_FEM::Part_FEM(
   ctrlPts_y_loc.resize(nlocghonode);
   ctrlPts_z_loc.resize(nlocghonode);
 
+  PERIGEE_OMP_PARALLEL_FOR
   for(int ii=0; ii<nlocghonode; ++ii)
   {
     int aux_index = local_to_global[ii]; // new global index
