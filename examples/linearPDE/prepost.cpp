@@ -1,7 +1,13 @@
+// ============================================================================
 // prepost.cpp
+// 
+// This is a prepost driver for handling linear differential equations.
+//
+// Author: Chi Ding
+// Email:  am-dight@outlook.com 
+// ============================================================================
 #include "HDF5_Reader.hpp"
-#include "Tet_Tools.hpp"
-#include "Hex_Tools.hpp"
+#include "VTK_Tools.hpp"
 #include "Mesh_Tet.hpp"
 #include "Mesh_FEM.hpp"
 #include "IEN_FEM.hpp"
@@ -21,14 +27,10 @@ int main( int argc, char * argv[] )
 
   int cpu_size = 1;
   bool isDualGraph = true;
-
-  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-
-  SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: prepost is a serial program! \n");
-
+  
   // Read the problem setting recorded in the .h5 file
   hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
-
+ 
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
 
   std::string geo_file = cmd_h5r -> read_string("/", "geo_file");
@@ -38,7 +40,7 @@ int main( int argc, char * argv[] )
   int in_ncommon       = cmd_h5r -> read_intScalar("/","in_ncommon");
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
-
+ 
   // The user can specify the new mesh partition options from the yaml file
   const std::string yaml_file("prepost.yml");
 
@@ -128,7 +130,6 @@ int main( int argc, char * argv[] )
   }
 
   delete mytimer; delete global_part; delete mnindex; delete IEN; delete mesh;
-  PetscFinalize();
   return EXIT_SUCCESS;
 }
 
