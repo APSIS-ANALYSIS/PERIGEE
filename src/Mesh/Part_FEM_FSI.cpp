@@ -15,55 +15,12 @@ Part_FEM_FSI::Part_FEM_FSI( const IMesh * const &mesh,
     const int &in_dof,
     const int &in_start_idx,
     const bool &in_is_geo_field ) 
-: Part_FEM(), start_idx( in_start_idx ), is_geo_field(in_is_geo_field)
+: Part_FEM( mesh, gpart, mnindex, IEN, ctrlPts, in_cpu_rank, in_cpu_size, in_dof, -1, in_elemType), 
+  start_idx( in_start_idx ), is_geo_field(in_is_geo_field)
 {
-  nElem = mesh->get_nElem(); 
-  nFunc = mesh->get_nFunc();
-  sDegree = mesh->get_s_degree(); 
-  tDegree = mesh->get_t_degree();
-  uDegree = mesh->get_u_degree(); 
-  nLocBas = mesh->get_nLocBas();
-  probDim = 3; 
-  elemType = in_elemType;
-  cpu_rank = in_cpu_rank;
-  cpu_size = in_cpu_size;
-
-  // We set dofMat and dofNum to negative numbers, as they are not needed
-  dofMat = -1;
-  dofNum = in_dof;
-
-  // Check the cpu info
-  SYS_T::print_fatal_if(cpu_size < 1, "Error: Part_FEM_FSI input cpu_size is wrong! \n");
-  SYS_T::print_fatal_if(cpu_rank >= cpu_size, "Error: Part_FEM_FSI input cpu_rank is wrong! \n");
-  SYS_T::print_fatal_if(cpu_rank < 0, "Error: Part_FEM_FSI input cpu_rank is wrong! \n");
-
-  // Generate group 1, 2, and 5.
-  Generate_Partition( mesh, gpart, mnindex, IEN, field );
-
-  // Generate group 6 if this field is geometry
-  if( is_geo_field )
-  {
-    // local copy of control points
-    ctrlPts_x_loc.resize(nlocghonode);
-    ctrlPts_y_loc.resize(nlocghonode);
-    ctrlPts_z_loc.resize(nlocghonode);
-    PERIGEE_OMP_PARALLEL_FOR
-    for(int ii=0; ii<nlocghonode; ++ii)
-    {
-      int aux_index = local_to_global[ii]; // new global index
-      aux_index = mnindex->get_new2old(aux_index); // back to old global index
-      ctrlPts_x_loc[ii] = ctrlPts[3*aux_index + 0];
-      ctrlPts_y_loc[ii] = ctrlPts[3*aux_index + 1];
-      ctrlPts_z_loc[ii] = ctrlPts[3*aux_index + 2];
-    }
-
-    VEC_T::shrink2fit(ctrlPts_x_loc);
-    VEC_T::shrink2fit(ctrlPts_y_loc);
-    VEC_T::shrink2fit(ctrlPts_z_loc);
-
-    std::cout<<"-- proc "<<cpu_rank<<" Local control points generated. \n";
-  }
-  else
+  // If this field is not associated with the geometry, then we clean the
+  // control points
+  if( is_geo_field == false )
   {
     ctrlPts_x_loc.clear();
     ctrlPts_y_loc.clear();
@@ -77,6 +34,7 @@ Part_FEM_FSI::Part_FEM_FSI( const IMesh * const &mesh,
   // Generate the node_loc_fluid/solid
   node_loc_fluid.clear();
   node_loc_solid.clear();
+
   PERIGEE_OMP_PARALLEL
   {
     std::vector<int> temp_node_loc_fluid {};
@@ -95,8 +53,8 @@ Part_FEM_FSI::Part_FEM_FSI( const IMesh * const &mesh,
     }
   }
 
-  nlocalnode_fluid = static_cast<int>( node_loc_fluid.size() );
-  nlocalnode_solid = static_cast<int>( node_loc_solid.size() );
+  nlocalnode_fluid = VEC_T::get_size( node_loc_fluid );
+  nlocalnode_solid = VEC_T::get_size( node_loc_solid );
 }
 
 Part_FEM_FSI::~Part_FEM_FSI()
