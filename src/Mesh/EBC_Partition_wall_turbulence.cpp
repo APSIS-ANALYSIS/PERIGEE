@@ -19,7 +19,7 @@ weak_bc_type {ebc->get_weak_bc_type()}, C_bI {ebc->get_C_bI()}
       ele_face_id = ebc -> get_faceID();
   }
   else
-    SYS_T::print_fatal("Error: EBC_Partition_weak, unknown weak bc type.\n");
+    SYS_T::print_fatal("Error: EBC_Partition_wall_turbulence, unknown weak bc type.\n");
 }
 
 EBC_Partition_wall_turbulence::~EBC_Partition_wall_turbulence()

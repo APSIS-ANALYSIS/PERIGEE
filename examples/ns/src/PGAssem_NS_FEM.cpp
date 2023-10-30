@@ -1064,35 +1064,31 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
   dot_sol->GetLocalArray( array_a );
   sol->GetLocalArray( array_b );
 
-  const int num_wbc {wbc_part->get_num_weak_boundary()};
-  for(int weakbc_id{0}; weakbc_id < num_wbc; ++weakbc_id)
+  const int num_wele {wbc_part->get_num_ele()};
+
+  for(int ee{0}; ee < num_wele; ++ee)
   {
-    const int num_wele {wbc_part->get_num_ele(weakbc_id)};
+    const int local_ee_index {wbc_part->get_part_vol_ele_id(ee)};
 
-    for(int ee{0}; ee < num_wele; ++ee)
+    lien_ptr->get_LIEN(local_ee_index, IEN_v);
+    GetLocal(array_a, IEN_v, local_a);
+    GetLocal(array_b, IEN_v, local_b);
+
+    fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_v, ctrl_x, ctrl_y, ctrl_z);
+
+    const int face_id {wbc_part->get_ele_face_id(ee)};
+
+    if(wbc_part->get_weakbc_type() == 1)
+      lassem_ptr->Assem_Residual_Weak1(curr_time, dt, local_a, local_b, element_v,
+        ctrl_x, ctrl_y, ctrl_z, quad_s, face_id, wbc_part->get_C_bI());
+
+    for(int ii{0}; ii < nLocBas; ++ii)
     {
-      const int local_ee_index {wbc_part->get_part_vol_ele_id(weakbc_id)[ee]};
-
-      lien_ptr->get_LIEN(local_ee_index, IEN_v);
-      GetLocal(array_a, IEN_v, local_a);
-      GetLocal(array_b, IEN_v, local_b);
-
-      fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_v, ctrl_x, ctrl_y, ctrl_z);
-
-      const int face_id {wbc_part->get_ele_face_id(weakbc_id)[ee]};
-
-      if(wbc_part->get_weakbc_type() == 1)
-        lassem_ptr->Assem_Residual_Weak1(curr_time, dt, local_a, local_b, element_v,
-          ctrl_x, ctrl_y, ctrl_z, quad_s, face_id, wbc_part->get_C_bI());
-
-      for(int ii{0}; ii < nLocBas; ++ii)
-      {
-        for(int mm{0}; mm < dof_mat; ++mm)
-          row_index[dof_mat*ii + mm] = dof_mat*nbc_part->get_LID(mm, IEN_v[ii]) + mm;
-      }
-
-      VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+      for(int mm{0}; mm < dof_mat; ++mm)
+        row_index[dof_mat*ii + mm] = dof_mat*nbc_part->get_LID(mm, IEN_v[ii]) + mm;
     }
+
+    VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
 
   delete [] array_a; array_a = nullptr;
