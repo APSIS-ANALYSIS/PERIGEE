@@ -24,7 +24,7 @@ void QuadPts_vis_hex8::print_info() const
 {
   SYS_T::commPrint("\n===== Visualization Points for Hex8 ===== \n");
   for(int ii=0; ii<8; ++ii)
-    PetscPrintf(PETSC_COMM_WORLD, "%e, %e, %e, %e \n", 
+    SYS_T::commPrint("%e, %e, %e, %e \n", 
         qw[ii], qp[3*ii], qp[3*ii+1], qp[3*ii+2]);
   SYS_T::commPrint("========================================= \n");
 }
