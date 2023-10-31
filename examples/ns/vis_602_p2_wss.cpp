@@ -128,7 +128,7 @@ int main( int argc, char * argv[] )
 
   std::vector<int> interior_node{}; 
 
-  std::vector<double> interior_node_coord(3*18*nElem, 0.0); // 18 means that each wall surface element has 18 interior nodes
+  std::vector<double> interior_node_coord(3*4*nElem, 0.0); // 4 means that each wall surface element has 4 interior nodes
 
   std::vector<int> interior_node_local_index{};
 
@@ -279,13 +279,13 @@ int main( int argc, char * argv[] )
       std::vector< Vector_3 > outnormal( nLocBas, Vector_3(0.0, 0.0, 0.0) );
 
       // For each nodal point, calculate the outward normal vector using the
-      // triangle element. The quad element's ii-th basis corresponds to the
+      // biquadratic quad element. The quad element's ii-th basis corresponds to the
       // hex element's id_range[ii]-th basis
       for(int ii=0; ii<nLocBas; ++ii)
       {
         double len;
         const Vector_3 sur_pt( ectrl_x[ii], ectrl_y[ii], ectrl_z[ii] );
-        const Vector_3 int_pt( interior_node_coord[3*(18*ee + 11)+0], interior_node_coord[3*(18*ee + 11)+1], interior_node_coord[3*(18*ee + 11)+2] );
+        const Vector_3 int_pt( interior_node_coord[3*(4*ee)+0], interior_node_coord[3*(4*ee)+1], interior_node_coord[3*(4*ee)+2] );
 
         // id_range[ii] 's outward normal
         outnormal[ii] = element_quad9 -> get_normal_out( ii, sur_pt, int_pt, len );
