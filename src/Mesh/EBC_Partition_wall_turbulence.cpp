@@ -9,14 +9,16 @@ weak_bc_type {ebc->get_weak_bc_type()}, C_bI {ebc->get_C_bI()}
     ;   // do nothing
   else if(weak_bc_type == 1 || weak_bc_type == 2)
   {
-    part_vol_ele_id.resize(get_num_local_cell(0));
-      for(int ee{0}; ee < get_num_local_cell(0); ++ee)
+    for(int ee{0}; ee < get_num_local_cell(0); ++ee)
+    {
+      const int global_vol_ele_id = ebc -> get_global_cell(0, ee);
+      const int loc_id = part -> get_elemLocIndex(global_vol_ele_id);
+      if( loc_id != -1 )
       {
-        const int global_vol_ele_id = ebc -> get_global_cell(0, ee);
-        part_vol_ele_id[ee] = part -> get_elemLocIndex(global_vol_ele_id);
+        part_vol_ele_id.push_back( loc_id );
+        ele_face_id.push_back( ebc -> get_faceID(ee) );
       }
-
-      ele_face_id = ebc -> get_faceID();
+    }
   }
   else
     SYS_T::print_fatal("Error: EBC_Partition_wall_turbulence, unknown weak bc type.\n");

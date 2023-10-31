@@ -40,7 +40,7 @@ class ElemBC_3D_wall_turbulence : public ElemBC_3D {
 
     virtual double get_C_bI() const { return C_bI; };
 
-    virtual std::vector<int> get_faceID() const { return face_id; }
+    virtual int get_faceID( const int &cell_index ) const { return face_id[cell_index]; }
 
   private:
     // Weak bc type

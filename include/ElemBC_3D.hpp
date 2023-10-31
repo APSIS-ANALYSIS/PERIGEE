@@ -111,8 +111,8 @@ class ElemBC_3D : public ElemBC
     {SYS_T::commPrint("Warning: get_C_bI is not implemented. \n"); return 0.0;}
 
     // Access the data in ElemBC_3D_weak, face id of volume element used in weak BC
-    virtual std::vector<int> get_faceID( const int &ebcid) const
-    {SYS_T::commPrint("Warning: get_face_id is not implemented. \n"); return {};}
+    virtual int get_faceID( const int &cell_index ) const
+    {SYS_T::commPrint("Warning: get_face_id is not implemented. \n"); return -1;}
 
     // Access the data in ElemBC_3D_weak, rotation matrices at nodes used in weak BC
     virtual std::vector<double> get_rotation_matrix( const int &ebcid) const

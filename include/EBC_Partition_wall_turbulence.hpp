@@ -30,10 +30,10 @@ class EBC_Partition_wall_turbulence : public EBC_Partition
     const double C_bI;
 
     // stores the local volume element id in this part
-    std::vector<int> part_vol_ele_id;
+    std::vector<int> part_vol_ele_id {};
 
     // stores the face id of the volume element
-    std::vector<int> ele_face_id;
+    std::vector<int> ele_face_id {};
 
 };
 

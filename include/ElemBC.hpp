@@ -142,7 +142,7 @@ class ElemBC
     {SYS_T::commPrint("Warning: get_C_bI is not implemented. \n"); return 0.0;}
 
     // Access the data in ElemBC_3D_wall_turbulence, face id of volume element
-    virtual std::vector<int> get_faceID() const
+    virtual int get_faceID( const int &cell_index ) const
     {SYS_T::commPrint("Warning: get_face_id is not implemented. \n"); return {};}
  
     // Overwrite ElemBC_3D_tet_wall properties from a vtp/vtu file
