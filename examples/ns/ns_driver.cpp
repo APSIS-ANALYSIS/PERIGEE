@@ -39,8 +39,6 @@ int main(int argc, char *argv[])
   
   // weak bc type
   const int weakBC_type  = cmd_h5r -> read_intScalar("/", "weakBC_type");
-  if(weakBC_type > 0)
-    SYS_T::commPrint("weakBC_type: %d \n", weakBC_type);
 
   // Number of quadrature points for tets and triangles
   // Suggested values: 5 / 4 for linear, 17 / 13 for quadratic
@@ -160,6 +158,9 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-fl_mu:", fluid_mu);
   SYS_T::cmdPrint("-c_tauc:", c_tauc);
   SYS_T::cmdPrint("-c_ct:", c_ct);
+
+  if(weakBC_type > 0)
+    SYS_T::commPrint("weakBC_type: %d \n", weakBC_type);
 
   // if inflow file exists, print the file name
   // otherwise, print the parameter for linear2steady inflow setting

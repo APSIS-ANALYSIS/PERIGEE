@@ -8,7 +8,7 @@ ALocal_WeakBC::ALocal_WeakBC( const std::string &fileBaseName, const int &cpu_ra
 
   HDF5_Reader * h5r = new HDF5_Reader( file_id );
 
-  const std::string gname("/weak");
+  const std::string gname("weak");
 
   weakbc_type = h5r -> read_intScalar( gname.c_str(), "weakBC_type" );
 
@@ -18,7 +18,7 @@ ALocal_WeakBC::ALocal_WeakBC( const std::string &fileBaseName, const int &cpu_ra
 
     num_sur_ele = h5r -> read_intScalar( gname.c_str(), "num_local_cell" );
 
-    part_vol_ele_id = h5r -> read_intVector( gname.c_str(), "part_vol_cell_id" );
+    part_vol_ele_id = h5r -> read_intVector( gname.c_str(), "part_volume_cell_id" );
 
     ele_face_id = h5r -> read_intVector( gname.c_str(), "cell_face_id" );
   }
