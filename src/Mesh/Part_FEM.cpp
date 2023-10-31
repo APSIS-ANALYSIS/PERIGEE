@@ -11,7 +11,8 @@ Part_FEM::Part_FEM(
 : nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),
   sDegree( mesh->get_s_degree() ), tDegree( mesh->get_t_degree() ),
   uDegree( mesh->get_u_degree() ), nLocBas( mesh->get_nLocBas() ),
-  probDim(3), dofNum( fp->get_dofNum() ), elemType(in_elemType)
+  probDim(3), dofNum( fp->get_dofNum() ), elemType(in_elemType),
+  is_geo_field( fp->get_is_geo_field() )
 {
   // Initialize group 3 data
   cpu_rank = in_cpu_rank;
@@ -26,39 +27,48 @@ Part_FEM::Part_FEM(
   Generate_Partition( mesh, gpart, mnindex, IEN, fp->get_id() );
 
   // Generate group 6
-  // local copy of control points
-  ctrlPts_x_loc.resize(nlocghonode);
-  ctrlPts_y_loc.resize(nlocghonode);
-  ctrlPts_z_loc.resize(nlocghonode);
-
-  PERIGEE_OMP_PARALLEL_FOR
-  for(int ii=0; ii<nlocghonode; ++ii)
+  // local copy of control points for field that is tagged as geo_field
+  if( is_geo_field == true )
   {
-    int aux_index = local_to_global[ii];         // new global index
-    aux_index = mnindex->get_new2old(aux_index); // back to old global index
-    ctrlPts_x_loc[ii] = ctrlPts[3*aux_index + 0];
-    ctrlPts_y_loc[ii] = ctrlPts[3*aux_index + 1];
-    ctrlPts_z_loc[ii] = ctrlPts[3*aux_index + 2];
+    ctrlPts_x_loc.resize(nlocghonode);
+    ctrlPts_y_loc.resize(nlocghonode);
+    ctrlPts_z_loc.resize(nlocghonode);
+
+    PERIGEE_OMP_PARALLEL_FOR
+    for(int ii=0; ii<nlocghonode; ++ii)
+    {
+      int aux_index = local_to_global[ii];         // new global index
+      aux_index = mnindex->get_new2old(aux_index); // back to old global index
+      ctrlPts_x_loc[ii] = ctrlPts[3*aux_index + 0];
+      ctrlPts_y_loc[ii] = ctrlPts[3*aux_index + 1];
+      ctrlPts_z_loc[ii] = ctrlPts[3*aux_index + 2];
+    }
+
+    VEC_T::shrink2fit(ctrlPts_x_loc);
+    VEC_T::shrink2fit(ctrlPts_y_loc);
+    VEC_T::shrink2fit(ctrlPts_z_loc);
+
+    std::cout<<"-- proc "<<cpu_rank<<" Local control points generated. \n";
   }
-
-  VEC_T::shrink2fit(ctrlPts_x_loc);
-  VEC_T::shrink2fit(ctrlPts_y_loc);
-  VEC_T::shrink2fit(ctrlPts_z_loc);
-
-  std::cout<<"-- proc "<<cpu_rank<<" Local control points generated. \n";
+  else
+  {
+    ctrlPts_x_loc.clear();
+    ctrlPts_y_loc.clear();
+    ctrlPts_z_loc.clear();
+  }
 }
 
 Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
 {
   const std::string fName = SYS_T::gen_partfile_name( inputfileName, in_cpu_rank );
-  
+
   hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
   HDF5_Reader * h5r = new HDF5_Reader( file_id );
- 
+
   // local elements 
   elem_loc = h5r->read_intVector( "Local_Elem", "elem_loc" );
   nlocalele = h5r->read_intScalar( "Local_Elem", "nlocalele" );
-  
+
   // local node
   nlocalnode  = h5r->read_intScalar("Local_Node", "nlocalnode");
   nghostnode  = h5r->read_intScalar("Local_Node", "nghostnode");
@@ -77,11 +87,11 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
 
   // Part info
   cpu_rank = h5r->read_intScalar("Part_Info", "cpu_rank");
-  
+
   SYS_T::print_fatal_if( cpu_rank != in_cpu_rank, "Error: Part_FEM::cpu_rank is inconsistent.\n");
-  
+
   cpu_size = h5r->read_intScalar("Part_Info", "cpu_size");
-  
+
   // global mesh info
   std::vector<int> vdeg = h5r -> read_intVector("Global_Mesh_Info", "degree");
 
@@ -101,7 +111,7 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
   SYS_T::print_fatal_if( num_row != nlocalele, "Error: Part_FEM::LIEN size does not match the number of element. \n");
 
   SYS_T::print_fatal_if( num_col != nLocBas, "Error: Part_FEM::LIEN size does not match the value of nLocBas. \n");
-  
+
   LIEN = new int * [nlocalele];
   for(int ee=0; ee<nlocalele; ++ee) LIEN[ee] = new int [nLocBas];
 
@@ -156,8 +166,8 @@ void Part_FEM::Generate_Partition( const IMesh * const &mesh,
 
   // 2. Reorder node_loc
   PERIGEE_OMP_PARALLEL_FOR
-  for( int ii=0; ii<nlocalnode; ++ii ) 
-    node_loc[ii] = mnindex->get_old2new( node_loc[ii] );
+    for( int ii=0; ii<nlocalnode; ++ii ) 
+      node_loc[ii] = mnindex->get_old2new( node_loc[ii] );
 
   // 3. Generate node_tot, which stores the nodes needed by the elements in the subdomain
   std::vector<int> node_tot {};
@@ -165,17 +175,17 @@ void Part_FEM::Generate_Partition( const IMesh * const &mesh,
   {
     std::vector<int> temp_node_tot {};
     PERIGEE_OMP_FOR
-    for( int e=0; e<nlocalele; ++e )
-    {
-      for( int ii=0; ii<nLocBas; ++ii )
+      for( int e=0; e<nlocalele; ++e )
       {
-        int temp_node = IEN->get_IEN(elem_loc[e], ii);
-        temp_node = mnindex->get_old2new(temp_node);
-        temp_node_tot.push_back( temp_node );
+        for( int ii=0; ii<nLocBas; ++ii )
+        {
+          int temp_node = IEN->get_IEN(elem_loc[e], ii);
+          temp_node = mnindex->get_old2new(temp_node);
+          temp_node_tot.push_back( temp_node );
+        }
       }
-    }
     PERIGEE_OMP_CRITICAL
-    VEC_T::insert_end(node_tot, temp_node_tot);
+      VEC_T::insert_end(node_tot, temp_node_tot);
   }
   VEC_T::sort_unique_resize( node_tot );
 
@@ -237,22 +247,22 @@ void Part_FEM::Generate_Partition( const IMesh * const &mesh,
   for(int ee=0; ee<nlocalele; ++ee) LIEN[ee] = new int [nLocBas];
 
   PERIGEE_OMP_PARALLEL_FOR
-  for(int ee=0; ee<nlocalele; ++ee)
-  {
-    for(int ii=0; ii<nLocBas; ++ii)
+    for(int ee=0; ee<nlocalele; ++ee)
     {
-      const int global_index = mnindex->get_old2new( IEN->get_IEN(elem_loc[ee], ii) );
-      const auto lien_ptr = find( local_to_global.begin(), local_to_global.end(), global_index );
-
-      if(lien_ptr == local_to_global.end())
+      for(int ii=0; ii<nLocBas; ++ii)
       {
-        std::cerr<<"ERROR: Failed to generate LIEN array for "<<global_index<<std::endl;
-        exit(EXIT_FAILURE);
-      }
+        const int global_index = mnindex->get_old2new( IEN->get_IEN(elem_loc[ee], ii) );
+        const auto lien_ptr = find( local_to_global.begin(), local_to_global.end(), global_index );
 
-      LIEN[ee][ii] = lien_ptr - local_to_global.begin();
+        if(lien_ptr == local_to_global.end())
+        {
+          std::cerr<<"ERROR: Failed to generate LIEN array for "<<global_index<<std::endl;
+          exit(EXIT_FAILURE);
+        }
+
+        LIEN[ee][ii] = lien_ptr - local_to_global.begin();
+      }
     }
-  }
 
   std::cout<<"-- proc "<<cpu_rank<<" LIEN generated. \n";
 }
