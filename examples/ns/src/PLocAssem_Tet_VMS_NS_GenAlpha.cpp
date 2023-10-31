@@ -1007,7 +1007,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::get_pressure_area(
 
 void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_Weak1(
     const double &time, const double &dt,
-    const double * const &dot_sol,
     const double * const &sol,
     FEAElement * const &elementv,
     const double * const &eleCtrlPts_x,
@@ -1134,7 +1133,6 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_Weak1(
 
 void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangential_Residual_Weak1(
     const double &time, const double &dt,
-    const double * const &dot_sol,
     const double * const &sol,
     FEAElement * const &elementv,
     const double * const &eleCtrlPts_x,

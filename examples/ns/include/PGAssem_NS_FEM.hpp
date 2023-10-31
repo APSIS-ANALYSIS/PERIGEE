@@ -204,7 +204,6 @@ class PGAssem_NS_FEM : public IPGAssem
 
     // Weak imposition of no-slip boundary condition on wall
     void Weak_EssBC_KG( const double &curr_time, const double &dt,
-        const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_v,
@@ -215,7 +214,6 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_WeakBC * const &wbc_part);
 
     void Weak_EssBC_G( const double &curr_time, const double &dt,
-        const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_v,

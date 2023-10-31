@@ -142,7 +142,6 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
 
     virtual void Assem_Residual_Weak1(
         const double &time, const double &dt,
-        const double * const &dot_sol,
         const double * const &sol,
         FEAElement * const &elementv,
         const double * const &eleCtrlPts_x,
@@ -154,7 +153,6 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
 
     virtual void Assem_Tangential_Residual_Weak1(
         const double &time, const double &dt,
-        const double * const &dot_sol,
         const double * const &sol,
         FEAElement * const &elementv,
         const double * const &eleCtrlPts_x,

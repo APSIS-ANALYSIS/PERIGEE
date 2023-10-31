@@ -458,7 +458,6 @@ class IPLocAssem
     // virtual function for type 1 weak bc
     virtual void Assem_Residual_Weak1(
         const double &time, const double &dt,
-        const double * const &dot_sol,
         const double * const &sol,
         FEAElement * const &elementv,
         const double * const &eleCtrlPts_x,
@@ -471,7 +470,6 @@ class IPLocAssem
 
     virtual void Assem_Tangential_Residual_Weak1(
         const double &time, const double &dt,
-        const double * const &dot_sol,
         const double * const &sol,
         FEAElement * const &elementv,
         const double * const &eleCtrlPts_x,
