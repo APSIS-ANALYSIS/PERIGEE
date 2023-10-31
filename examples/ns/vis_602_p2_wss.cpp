@@ -171,7 +171,7 @@ int main( int argc, char * argv[] )
   }
 
   SYS_T::print_fatal_if(VEC_T::get_size(interior_node)!=4*nElem, "Error: the length of the interior_node vector is incorrect.\n");
-  SYS_T::print_fatal_if(VEC_T::get_size(interior_node_local_index)!=4*nElem, "Error: the length of the surface_node_local_index vector is incorrect.\n");
+  SYS_T::print_fatal_if(VEC_T::get_size(interior_node_local_index)!=4*nElem, "Error: the length of the interior_node_local_index vector is incorrect.\n");
 
   // Volumetric element visualization sampling point 
   IQuadPts * quad = new QuadPts_vis_hex27();

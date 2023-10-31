@@ -12,7 +12,7 @@
 #include "FEAElement_Hex8.hpp"
 #include "FEAElement_Quad4_3D_der0.hpp"
 
-// void range_generator( const int &ii, std::vector<int> &surface_id_range );
+void range_generator( const int &ii, const int &jj, const int &kk, const int &ll, std::vector<int> &surface_id_range );
 
 std::vector<int> ReadNodeMapping( const char * const &node_mapping_file,
     const char * const &mapping_type, const int &node_size );
@@ -130,8 +130,7 @@ int main( int argc, char * argv[] )
 
   std::vector<double> interior_node_coord(3*4*nElem, 0.0); // 4 means that each wall surface element has 4 interior nodes
 
-  // It stores the local indices of nodes on the wall surface
-  std::vector<int> surface_node_local_index{};
+  std::vector<int> interior_node_local_index{};
 
   for(int ee=0; ee<nElem; ++ee)
   {
@@ -149,37 +148,29 @@ int main( int argc, char * argv[] )
       const bool gotnode = VEC_T::is_invec( quadn, hexn[ii] );
   
       if(!gotnode) 
+      { 
         interior_node.push_back(hexn[ii]); // interior node's global volumetric mesh nodal index
-      else 
-      {
-        node_check += 1;
-        surface_node_local_index.push_back(ii); // the local indices of nodes on the wall surface
+        interior_node_local_index.push_back(ii); // the local indices of nodes on the wall surface
       }
+      else 
+        node_check += 1;
     }
 
     SYS_T::print_fatal_if(node_check!=4, "Error: the associated hex element is incompatible with the quad element.\n");
 
     // Now we have found the interior node's volumetric mesh index, record its
     // spatial xyz coordinate
-    interior_node_coord[3*(4*ee  )+0] = v_ctrlPts[ 3*interior_node[4*ee    ] + 0 ];
-    interior_node_coord[3*(4*ee  )+1] = v_ctrlPts[ 3*interior_node[4*ee    ] + 1 ];
-    interior_node_coord[3*(4*ee  )+2] = v_ctrlPts[ 3*interior_node[4*ee    ] + 2 ];
-
-    interior_node_coord[3*(4*ee+1)+0] = v_ctrlPts[ 3*interior_node[4*ee + 1] + 0 ];
-    interior_node_coord[3*(4*ee+1)+1] = v_ctrlPts[ 3*interior_node[4*ee + 1] + 1 ];
-    interior_node_coord[3*(4*ee+1)+2] = v_ctrlPts[ 3*interior_node[4*ee + 1] + 2 ];
-
-    interior_node_coord[3*(4*ee+2)+0] = v_ctrlPts[ 3*interior_node[4*ee + 2] + 0 ];
-    interior_node_coord[3*(4*ee+2)+1] = v_ctrlPts[ 3*interior_node[4*ee + 2] + 1 ];
-    interior_node_coord[3*(4*ee+2)+2] = v_ctrlPts[ 3*interior_node[4*ee + 2] + 2 ];
-
-    interior_node_coord[3*(4*ee+3)+0] = v_ctrlPts[ 3*interior_node[4*ee + 3] + 0 ];
-    interior_node_coord[3*(4*ee+3)+1] = v_ctrlPts[ 3*interior_node[4*ee + 3] + 1 ];
-    interior_node_coord[3*(4*ee+3)+2] = v_ctrlPts[ 3*interior_node[4*ee + 3] + 2 ];  
+    for (int ii=0; ii<4; ++ii)
+    {
+      for (int jj=0; jj<3; ++jj)
+      {
+        interior_node_coord[3*(4*ee + ii )+jj] = v_ctrlPts[ 3*interior_node[4*ee + ii] + jj ];
+      }
+    }
   }
  
   SYS_T::print_fatal_if(VEC_T::get_size(interior_node)!=4*nElem, "Error: the length of the interior_node vector is incorrect.\n");
-  SYS_T::print_fatal_if(VEC_T::get_size(surface_node_local_index)!=4*nElem, "Error: the length of the surface_node_local_index vector is incorrect.\n");
+  SYS_T::print_fatal_if(VEC_T::get_size(interior_node_local_index)!=4*nElem, "Error: the length of the interior_node_local_index vector is incorrect.\n");
 
   // Volumetric element visualization sampling point 
   IQuadPts * quad = new QuadPts_vis_hex8();
@@ -264,6 +255,10 @@ int main( int argc, char * argv[] )
       // Construct the trilinear hexahedron element
       element -> buildBasis(quad, v_ectrl_x, v_ectrl_y, v_ectrl_z);
 
+      // Obtain the local indices of nodes on the wall surface
+      std::vector<int> id_range;
+      range_generator( interior_node_local_index[4*ee], interior_node_local_index[4*ee + 1], interior_node_local_index[4*ee + 2], interior_node_local_index[4*ee + 3], id_range );
+
       // Obtain the control point coordinates for this element
       double * ectrl_x = new double [nLocBas];
       double * ectrl_y = new double [nLocBas];
@@ -271,9 +266,9 @@ int main( int argc, char * argv[] )
 
       for(int ii=0; ii<nLocBas; ++ii)
       {
-        ectrl_x[ii] = v_ctrlPts[ 3*v_vecIEN[v_nLocBas * ee_vol_id + surface_node_local_index[nLocBas*ee+ii] ] + 0 ];
-        ectrl_y[ii] = v_ctrlPts[ 3*v_vecIEN[v_nLocBas * ee_vol_id + surface_node_local_index[nLocBas*ee+ii] ] + 1 ];
-        ectrl_z[ii] = v_ctrlPts[ 3*v_vecIEN[v_nLocBas * ee_vol_id + surface_node_local_index[nLocBas*ee+ii] ] + 2 ];
+        ectrl_x[ii] = v_ctrlPts[ 3*v_vecIEN[v_nLocBas * ee_vol_id + id_range[ii] ] + 0 ];
+        ectrl_y[ii] = v_ctrlPts[ 3*v_vecIEN[v_nLocBas * ee_vol_id + id_range[ii] ] + 1 ];
+        ectrl_z[ii] = v_ctrlPts[ 3*v_vecIEN[v_nLocBas * ee_vol_id + id_range[ii] ] + 2 ];
       }
 
       // Build a basis based on the visualization sampling point for wall
@@ -283,8 +278,8 @@ int main( int argc, char * argv[] )
       std::vector< Vector_3 > outnormal( nLocBas, Vector_3(0.0, 0.0, 0.0) );
 
       // For each nodal point, calculate the outward normal vector using the
-      // triangle element. The quad element's ii-th basis corresponds to the
-      // hex element's surface_node_local_index[nLocBas*ee+ii]-th basis
+      // bilinear quad element. The quad element's ii-th basis corresponds to the
+      // hex element's id_range[ii]-th basis
       for(int ii=0; ii<nLocBas; ++ii)
       {
         double len;
@@ -313,7 +308,7 @@ int main( int argc, char * argv[] )
       for(int qua=0; qua<nLocBas; ++qua)
       {
         // Obtain the 10 basis function's value at the wall boundary points
-        element -> get_gradR( surface_node_local_index[nLocBas*ee+qua], Rx, Ry, Rz );
+        element -> get_gradR( id_range[qua], Rx, Ry, Rz );
 
         double ux = 0.0, uy = 0.0, uz = 0.0;
         double vx = 0.0, vy = 0.0, vz = 0.0;
@@ -350,8 +345,8 @@ int main( int argc, char * argv[] )
         const double wss_z = fluid_mu * ( az - b * nz );
 
         const int quad4_local_id = get_quad4_local_id( ectrl_x, ectrl_y, ectrl_z,
-            nLocBas, v_ectrl_x[ surface_node_local_index[nLocBas*ee+qua] ], v_ectrl_y[ surface_node_local_index[nLocBas*ee+qua] ], 
-            v_ectrl_z[ surface_node_local_index[nLocBas*ee+qua] ], 1.0e-8 );
+            nLocBas, v_ectrl_x[ id_range[qua] ], v_ectrl_y[ id_range[qua] ], 
+            v_ectrl_z[ id_range[qua] ], 1.0e-8 );
        
         const int quad4_global_id = vecIEN[nLocBas * ee + quad4_local_id];
 
@@ -404,48 +399,66 @@ int main( int argc, char * argv[] )
   return EXIT_SUCCESS;
 }
 
-// void range_generator( const int &ii, std::vector<int> &surface_id_range )
-// {
-//   surface_id_range.resize(4);
-//   switch (ii)
-//   {
-//     case 0:
-//       surface_id_range[0] = 1;
-//       surface_id_range[1] = 2;
-//       surface_id_range[2] = 3;
-//       surface_id_range[3] = 5;
-//       surface_id_range[4] = 9;
-//       surface_id_range[5] = 8;
-//       break;
-//     case 1:
-//       surface_id_range[0] = 0;
-//       surface_id_range[1] = 2;
-//       surface_id_range[2] = 3;
-//       surface_id_range[3] = 6;
-//       surface_id_range[4] = 9;
-//       surface_id_range[5] = 7;
-//       break;
-//     case 2:
-//       surface_id_range[0] = 0;
-//       surface_id_range[1] = 1;
-//       surface_id_range[2] = 3;
-//       surface_id_range[3] = 4;
-//       surface_id_range[4] = 8;
-//       surface_id_range[5] = 7;
-//       break;
-//     case 3:
-//       surface_id_range[0] = 0;
-//       surface_id_range[1] = 1;
-//       surface_id_range[2] = 2;
-//       surface_id_range[3] = 4;
-//       surface_id_range[4] = 5;
-//       surface_id_range[5] = 6;
-//       break;
-//     default:
-//       SYS_T::print_fatal("Error: the interior node index is wrong!\n");
-//       break;
-//   }
-// }
+void range_generator( const int &ii, const int &jj, const int &kk, const int &ll, std::vector<int> &surface_id_range )
+{
+  surface_id_range.resize(4);
+
+  int interior_id_range[4] {ii, jj, kk, ll};
+
+  std::sort(interior_id_range, interior_id_range + 4);
+
+  const int zeroth[4] {0,1,2,3};
+  const int first [4] {4,5,6,7};
+  const int second[4] {0,1,4,5};
+  const int third [4] {1,2,5,6};
+  const int fourth[4] {2,3,6,7};
+  const int fifth [4] {0,3,4,7};
+
+  if (std::equal(interior_id_range, interior_id_range + 4, zeroth))
+  {
+    surface_id_range[0] = 4;
+    surface_id_range[1] = 5;
+    surface_id_range[2] = 6;
+    surface_id_range[3] = 7;
+  }
+  else if(std::equal(interior_id_range, interior_id_range + 4, first))
+  {
+    surface_id_range[0] = 0;
+    surface_id_range[1] = 3;
+    surface_id_range[2] = 2;
+    surface_id_range[3] = 1;
+  }
+  else if(std::equal(interior_id_range, interior_id_range + 4, second))
+  {
+    surface_id_range[0] = 2;
+    surface_id_range[1] = 3;
+    surface_id_range[2] = 7;
+    surface_id_range[3] = 6;
+  }
+  else if(std::equal(interior_id_range, interior_id_range + 4, third))
+  {
+    surface_id_range[0] = 0;
+    surface_id_range[1] = 4;
+    surface_id_range[2] = 7;
+    surface_id_range[3] = 3;
+  }
+  else if(std::equal(interior_id_range, interior_id_range + 4, fourth))
+  {
+    surface_id_range[0] = 0;
+    surface_id_range[1] = 1;
+    surface_id_range[2] = 5;
+    surface_id_range[3] = 4;
+  }
+  else if(std::equal(interior_id_range, interior_id_range + 4, fifth))
+  {
+    surface_id_range[0] = 1;
+    surface_id_range[1] = 2;
+    surface_id_range[2] = 6;
+    surface_id_range[3] = 5;
+  }
+  else
+    SYS_T::print_fatal("Error: the interior node index is wrong!\n");
+}
 
 std::vector<int> ReadNodeMapping( const char * const &node_mapping_file,
     const char * const &mapping_type, const int &node_size )
