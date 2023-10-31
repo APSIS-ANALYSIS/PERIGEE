@@ -158,7 +158,6 @@ int main( int argc, char * argv[] )
 
     SYS_T::print_fatal_if(node_check!=4, "Error: the associated hex element is incompatible with the quad element.\n");
     
-
     // Now we have found the interior node's volumetric mesh index, record its
     // spatial xyz coordinate
     for (int ii=0; ii<4; ++ii)
@@ -399,7 +398,6 @@ int main( int argc, char * argv[] )
   PetscFinalize();
   return EXIT_SUCCESS;
 }
-
 
 void range_generator( const int &ii, const int &jj, const int &kk, const int &ll, std::vector<int> &surface_id_range )
 {
