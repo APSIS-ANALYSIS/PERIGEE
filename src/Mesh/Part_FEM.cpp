@@ -7,7 +7,7 @@ Part_FEM::Part_FEM(
     const IIEN * const &IEN,
     const std::vector<double> &ctrlPts,
     const int &in_cpu_rank, const int &in_cpu_size,
-    const int &in_dofNum, const int &in_elemType )
+    const int &in_dofNum, const int &in_elemType, const int &field )
 : nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),
   sDegree( mesh->get_s_degree() ), tDegree( mesh->get_t_degree() ),
   uDegree( mesh->get_u_degree() ), nLocBas( mesh->get_nLocBas() ),
@@ -23,7 +23,7 @@ Part_FEM::Part_FEM(
   SYS_T::print_fatal_if(cpu_rank < 0, "Error: Part_FEM input cpu_rank is wrong! \n");
 
   // Generate group 1, 2, and 5.
-  Generate_Partition( mesh, gpart, mnindex, IEN );
+  Generate_Partition( mesh, gpart, mnindex, IEN, field );
 
   // Generate group 6
   // local copy of control points
@@ -34,7 +34,7 @@ Part_FEM::Part_FEM(
   PERIGEE_OMP_PARALLEL_FOR
   for(int ii=0; ii<nlocghonode; ++ii)
   {
-    int aux_index = local_to_global[ii]; // new global index
+    int aux_index = local_to_global[ii];         // new global index
     aux_index = mnindex->get_new2old(aux_index); // back to old global index
     ctrlPts_x_loc[ii] = ctrlPts[3*aux_index + 0];
     ctrlPts_y_loc[ii] = ctrlPts[3*aux_index + 1];
