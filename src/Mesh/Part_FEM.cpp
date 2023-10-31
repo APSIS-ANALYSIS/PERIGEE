@@ -12,7 +12,9 @@ Part_FEM::Part_FEM(
   sDegree( mesh->get_s_degree() ), tDegree( mesh->get_t_degree() ),
   uDegree( mesh->get_u_degree() ), nLocBas( mesh->get_nLocBas() ),
   probDim(3), dofNum( fp->get_dofNum() ), elemType(in_elemType),
-  is_geo_field( fp->get_is_geo_field() )
+  field_id( fp->get_id() ),
+  is_geo_field( fp->get_is_geo_field() ),
+  field_name( fp->get_name() )
 {
   // Initialize group 3 data
   cpu_rank = in_cpu_rank;
@@ -24,7 +26,7 @@ Part_FEM::Part_FEM(
   SYS_T::print_fatal_if(cpu_rank < 0, "Error: Part_FEM input cpu_rank is wrong! \n");
 
   // Generate group 1, 2, and 5.
-  Generate_Partition( mesh, gpart, mnindex, IEN, fp->get_id() );
+  Generate_Partition( mesh, gpart, mnindex, IEN, field_id );
 
   // Generate group 6
   // local copy of control points for field that is tagged as geo_field

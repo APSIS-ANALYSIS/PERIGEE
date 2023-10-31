@@ -112,10 +112,14 @@ class Part_FEM : public IPart
     int ** LIEN;
 
     // 6. local point coordinates (i.e. control point geometry)
-    const bool is_geo_field; // tag for geometry-related field
     std::vector<double> ctrlPts_x_loc {};
     std::vector<double> ctrlPts_y_loc {};
     std::vector<double> ctrlPts_z_loc {};
+
+    // 7. Field info
+    const int field_id;
+    const bool is_geo_field; // tag for geometry-related field
+    const std::string field_name;
 
     // ------------------------------------------------------------------------
     // Function
