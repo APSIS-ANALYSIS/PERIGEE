@@ -9,7 +9,7 @@ weak_bc_type {ebc->get_weak_bc_type()}, C_bI {ebc->get_C_bI()}
     ;   // do nothing
   else if(weak_bc_type == 1 || weak_bc_type == 2)
   {
-    for(int ee{0}; ee < get_num_local_cell(0); ++ee)
+    for(int ee{0}; ee < ebc->get_num_cell(0); ++ee)
     {
       const int global_vol_ele_id = ebc -> get_global_cell(0, ee);
       const int loc_id = part -> get_elemLocIndex(global_vol_ele_id);
