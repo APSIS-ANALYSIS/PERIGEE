@@ -7,11 +7,11 @@ Part_FEM::Part_FEM(
     const IIEN * const &IEN,
     const std::vector<double> &ctrlPts,
     const int &in_cpu_rank, const int &in_cpu_size,
-    const int &in_dofNum, const int &in_elemType, const int &field )
+    const int &in_elemType, const Field_Property &fp )
 : nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),
   sDegree( mesh->get_s_degree() ), tDegree( mesh->get_t_degree() ),
   uDegree( mesh->get_u_degree() ), nLocBas( mesh->get_nLocBas() ),
-  probDim(3), dofNum( in_dofNum ), elemType(in_elemType)
+  probDim(3), dofNum( fp->get_dofNum() ), elemType(in_elemType)
 {
   // Initialize group 3 data
   cpu_rank = in_cpu_rank;
@@ -23,7 +23,7 @@ Part_FEM::Part_FEM(
   SYS_T::print_fatal_if(cpu_rank < 0, "Error: Part_FEM input cpu_rank is wrong! \n");
 
   // Generate group 1, 2, and 5.
-  Generate_Partition( mesh, gpart, mnindex, IEN, field );
+  Generate_Partition( mesh, gpart, mnindex, IEN, fp->get_id() );
 
   // Generate group 6
   // local copy of control points

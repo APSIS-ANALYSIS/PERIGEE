@@ -13,6 +13,7 @@
 #include "IPart.hpp"
 #include "Map_Node_Index.hpp"
 #include "IIEN.hpp"
+#include "Field_Property.hpp"
 
 class Part_FEM : public IPart
 {
@@ -23,8 +24,8 @@ class Part_FEM : public IPart
         const IIEN * const &IEN,
         const std::vector<double> &ctrlPts,
         const int &in_cpu_rank, const int &in_cpu_size,
-        const int &in_dofNum, const int &in_elemType, 
-        const int &field = 0 );
+        const int &in_elemType, 
+        const Field_Property &in_fp );
 
     // Constructor that load the partition info from h5 file on disk
     Part_FEM( const std::string &fileName, const int &in_cpu_rank );
