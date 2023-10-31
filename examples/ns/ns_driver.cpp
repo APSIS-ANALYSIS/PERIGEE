@@ -39,6 +39,8 @@ int main(int argc, char *argv[])
   
   // weak bc type
   const int weakBC_type  = cmd_h5r -> read_intScalar("/", "weakBC_type");
+  if(weakBC_type > 0)
+    SYS_T::commPrint("weakBC_type: %d \n", weakBC_type);
 
   // Number of quadrature points for tets and triangles
   // Suggested values: 5 / 4 for linear, 17 / 13 for quadratic

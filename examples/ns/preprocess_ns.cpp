@@ -89,7 +89,7 @@ int main( int argc, char * argv[] )
   cout<<" -elem_type: "<<elemType<<endl;
   cout<<" -weakbc_type: "<<weakBC_type<<endl;
   if(weakBC_type != 0)
-    cout<<"-C_bI: "<<C_bI<<endl;
+    cout<<" -C_bI: "<<C_bI<<endl;
   cout<<" -num_outlet: "<<num_outlet<<endl;
   cout<<" -geo_file: "<<geo_file<<endl;
   cout<<" -sur_file_in_base: "<<sur_file_in_base<<endl;
