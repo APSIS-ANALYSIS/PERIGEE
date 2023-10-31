@@ -26,8 +26,7 @@ class Part_FEM : public IPart
         const IIEN * const &IEN,
         const std::vector<double> &ctrlPts,
         const int &in_cpu_rank, const int &in_cpu_size,
-        const int &in_dofNum, const int &in_dofMat,
-        const int &in_elemType );
+        const int &in_dofNum, const int &in_elemType );
 
     // Constructor that load the partition info from h5 file on disk
     Part_FEM( const std::string &fileName, const int &in_cpu_rank );
@@ -108,7 +107,7 @@ class Part_FEM : public IPart
 
     // 4. global mesh info
     int nElem, nFunc, sDegree, tDegree, uDegree, nLocBas;
-    int probDim, dofNum, dofMat, elemType;
+    int probDim, dofNum, elemType;
 
     // 5. LIEN
     int ** LIEN;

@@ -7,13 +7,11 @@ Part_FEM::Part_FEM(
     const IIEN * const &IEN,
     const std::vector<double> &ctrlPts,
     const int &in_cpu_rank, const int &in_cpu_size,
-    const int &in_dofNum, const int &in_dofMat,
-    const int &in_elemType )
+    const int &in_dofNum, const int &in_elemType )
 : nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),
   sDegree( mesh->get_s_degree() ), tDegree( mesh->get_t_degree() ),
   uDegree( mesh->get_u_degree() ), nLocBas( mesh->get_nLocBas() ),
-  probDim(3), dofNum( in_dofNum ), dofMat( in_dofMat ), 
-  elemType(in_elemType)
+  probDim(3), dofNum( in_dofNum ), elemType(in_elemType)
 {
   // Initialize group 3 data
   cpu_rank = in_cpu_rank;
@@ -95,7 +93,6 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
   probDim  = h5r -> read_intScalar("Global_Mesh_Info", "probDim");
   elemType = h5r -> read_intScalar("Global_Mesh_Info", "elemType");
   dofNum   = h5r -> read_intScalar("Global_Mesh_Info", "dofNum");
-  dofMat   = h5r -> read_intScalar("Global_Mesh_Info", "dofMat");
 
   // LIEN
   int num_row, num_col;
@@ -307,7 +304,6 @@ void Part_FEM::write( const std::string &inputFileName ) const
 
   h5w->write_intScalar( group_id_3, "probDim", probDim );
   h5w->write_intScalar( group_id_3, "dofNum", dofNum );
-  h5w->write_intScalar( group_id_3, "dofMat", dofMat );
   h5w->write_intScalar( group_id_3, "elemType", elemType );
 
   H5Gclose( group_id_3 );
