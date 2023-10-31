@@ -222,8 +222,7 @@ int main( int argc, char * argv[] )
     name_to_read.append(time_index.str());
     name_to_write.append(time_index.str());
 
-    PetscPrintf(PETSC_COMM_WORLD, "Time %d: Read %s and Write %s \n",
-        time, name_to_read.c_str(), name_to_write.c_str() );
+    SYS_T::commPrint("Time %d: Read %s and Write %s \n", time, name_to_read.c_str(), name_to_write.c_str());
 
     // Read the solution vector and renumber them based on the nodal mappings
     const auto sol = ReadPETSc_Vec( name_to_read, analysis_new2old, v_nFunc*dof, dof );
@@ -501,7 +500,7 @@ std::vector<int> ReadNodeMapping( const char * const &node_mapping_file,
 
   if( data_rank != 1)
   {
-    PetscPrintf(PETSC_COMM_SELF, "Error: the node mapping file has wrong format. \n");
+    SYS_T::commPrint("Error: the node mapping file has wrong format. \n");
     MPI_Abort(PETSC_COMM_WORLD, 1);
   }
 
@@ -515,7 +514,7 @@ std::vector<int> ReadNodeMapping( const char * const &node_mapping_file,
 
   if( int(dSize) != node_size )
   {
-    PetscPrintf(PETSC_COMM_SELF, "Error: the allocated array has wrong size! \n");
+    SYS_T::commPrint("Error: the allocated array has wrong size! \n");
     MPI_Abort(PETSC_COMM_WORLD, 1);
   }
 
@@ -552,8 +551,7 @@ std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
   VecGetSize(sol_temp, &get_sol_temp_size);
   if( get_sol_temp_size != vec_size )
   {
-    PetscPrintf(PETSC_COMM_SELF,
-        "The solution size %d is not compatible with the size %d given by partition file! \n",
+    SYS_T::commPrint("The solution size %d is not compatible with the size %d given by partition file! \n",
         get_sol_temp_size, vec_size);
     MPI_Abort(PETSC_COMM_WORLD, 1);
   }
