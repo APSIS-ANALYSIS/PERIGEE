@@ -32,20 +32,21 @@ class Field_Property
 
     int get_dofNum() const {return dofNum;}
 
-    bool get_is_geo_field() const {return is_geo_flag;}
+    bool get_is_geo_field() const {return is_geo_field;}
 
     std::string get_name() const {return name;}
 
     friend std::ostream& operator<< (std::ostream& out, const Field_Property &val)
     {
-      out<<"Field name :"<<val.get_name()<<'\t';
-      out<<"Field ID :"<<val.get_id()<<'\t';
-      out<<"Field associated number of DOFs :"<<val.get_dofNum()<<'\t';
-      
+      out<<"Field name: "<<val.get_name()<<'\n';
+      out<<"Field ID: "<<val.get_id()<<'\n';
+      out<<"Field associated number of DOFs: "<<val.get_dofNum()<<'\n';
+     
+      out<<"Field associated with geometry: ";
       if(val.get_is_geo_field() == true)
-        out<<" and it is a geo field.\n";
+        out<<" YES.\n";
       else
-        out<<" and it is NOT geo field.\n";
+        out<<" NO.\n";
       
       return out;
     }
