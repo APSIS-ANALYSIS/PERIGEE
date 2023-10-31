@@ -468,7 +468,7 @@ class IPLocAssem
         const double &C_bI)
     {SYS_T::commPrint("Warning: this Assem_Residual_Weak1 is not implemented.\n");}
 
-    virtual void Assem_Tangential_Residual_Weak1(
+    virtual void Assem_Tangent_Residual_Weak1(
         const double &time, const double &dt,
         const double * const &sol,
         FEAElement * const &elementv,

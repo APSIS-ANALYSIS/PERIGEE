@@ -1034,7 +1034,52 @@ void PGAssem_NS_FEM::Weak_EssBC_KG(
     const ALocal_NBC * const &nbc_part,
     const ALocal_WeakBC * const &wbc_part)
 {
-  ; // Unimplemented
+  const int loc_dof {dof_mat * nLocBas};
+  double * array_b = new double [nlgn * dof_sol];
+  double * local_b = new double [nLocBas * dof_sol];
+  int * IEN_v = new int [nLocBas];
+  double * ctrl_x = new double [nLocBas];
+  double * ctrl_y = new double [nLocBas];
+  double * ctrl_z = new double [nLocBas];
+  PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
+
+  sol->GetLocalArray( array_b );
+
+  const int num_wele {wbc_part->get_num_ele()};
+
+  for(int ee{0}; ee < num_wele; ++ee)
+  {
+    const int local_ee_index {wbc_part->get_part_vol_ele_id(ee)};
+
+    lien_ptr->get_LIEN(local_ee_index, IEN_v);
+    GetLocal(array_b, IEN_v, local_b);
+
+    fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_v, ctrl_x, ctrl_y, ctrl_z);
+
+    const int face_id {wbc_part->get_ele_face_id(ee)};
+
+    if(wbc_part->get_weakbc_type() == 1)
+      lassem_ptr->Assem_Tangent_Residual_Weak1(curr_time, dt, local_b, element_v,
+        ctrl_x, ctrl_y, ctrl_z, quad_s, face_id, wbc_part->get_C_bI());
+
+    for(int ii{0}; ii < nLocBas; ++ii)
+    {
+      for(int mm{0}; mm < dof_mat; ++mm)
+        row_index[dof_mat*ii + mm] = dof_mat*nbc_part->get_LID(mm, IEN_v[ii]) + mm;
+    }
+
+    MatSetValues(K, loc_dof, row_index, loc_dof, row_index, lassem_ptr->Tangent, ADD_VALUES);
+
+    VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+  }
+
+  delete [] array_b; array_b = nullptr;
+  delete [] local_b; local_b = nullptr;
+  delete [] IEN_v; IEN_v = nullptr;
+  delete [] ctrl_x; ctrl_x = nullptr;
+  delete [] ctrl_y; ctrl_y = nullptr;
+  delete [] ctrl_z; ctrl_z = nullptr;
+  delete [] row_index; row_index = nullptr;
 }
 
 void PGAssem_NS_FEM::Weak_EssBC_G(

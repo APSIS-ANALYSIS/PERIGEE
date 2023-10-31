@@ -1027,13 +1027,13 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_Weak1(
 
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
-  for(int qua{0}; qua < face_nqp; ++qua)
+  for(int qua {0}; qua < face_nqp; ++qua)
   {
     elementv->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
 
-    // Calculate surface Jacobian and normal_qua
     double surface_area {0.0}, inflow_factor {0.0};
 
+    // Calculate surface Jacobian and normal_qua
     const Vector_3 n_out = elementv->get_2d_normal_out(qua, surface_area);
 
     Vector_3 coor(0.0, 0.0, 0.0);
@@ -1043,7 +1043,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_Weak1(
     double u_x {0.0}, v_x {0.0}, w_x {0.0};
     double u_y {0.0}, v_y {0.0}, w_y {0.0};
     double u_z {0.0}, v_z {0.0}, w_z {0.0};
-    for(int ii{0}; ii < nLocBas; ++ii)
+    for(int ii {0}; ii < nLocBas; ++ii)
     {
       const int ii4 {ii * 4};
       p += sol[ii4 + 0] * R[ii];
@@ -1088,7 +1088,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_Weak1(
     // Assembly
     const double gwts = surface_area * quads->get_qw(qua);
 
-    for( int A{0}; A < nLocBas; ++A)
+    for( int A {0}; A < nLocBas; ++A)
     {
       const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
@@ -1096,9 +1096,9 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_Weak1(
 
       const Vector_3 u_minus_g = u_vec - g_vec;
 
-      Residual[A4] -= gwts * (NA) * u_minus_g.dot_product(n_out);
+      Residual[A4] += gwts * (-1.0) * NA * u_minus_g.dot_product(n_out);
 
-      Residual[A4 + 1] += gwts * (NA * (u_dot_n * u + p * n_out.x()
+      Residual[A4 + 1] += gwts * ( NA * (u_dot_n * u + p * n_out.x()
                                   - 2 * vis_mu * u_x * n_out.x() 
                                   - vis_mu * (u_y + v_x) * n_out.y() 
                                   - vis_mu * (u_z + w_x) * n_out.z())
@@ -1106,9 +1106,9 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_Weak1(
           - NA_y * n_out.x() * vis_mu * u_minus_g.y()
           - NA_z * n_out.x() * vis_mu * u_minus_g.z()
           + NA * (tau_B - inflow_factor) * u_minus_g.x()
-          + NA * n_out.x() * (C_bI * vis_mu / h_b - tau_B) * u_minus_g.dot_product(n_out));
+          + NA * n_out.x() * (C_bI * vis_mu / h_b - tau_B) * u_minus_g.dot_product(n_out) );
 
-      Residual[A4 + 2] += gwts * (NA * (u_dot_n * v + p * n_out.y()
+      Residual[A4 + 2] += gwts * ( NA * (u_dot_n * v + p * n_out.y()
                                   - vis_mu * (v_x + u_y) * n_out.x()
                                   - 2 * vis_mu * v_y * n_out.y()
                                   - vis_mu * (v_z + w_y) * n_out.z())
@@ -1116,9 +1116,9 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_Weak1(
           - (NA_x * n_out.x() + 2 * NA_y * n_out.y() + NA_z * n_out.z()) * vis_mu * u_minus_g.y()
           - NA_z * n_out.y() * vis_mu * u_minus_g.z()
           + NA * (tau_B - inflow_factor) * u_minus_g.y()
-          + NA * n_out.y() * (C_bI * vis_mu / h_b - tau_B) * u_minus_g.dot_product(n_out));
+          + NA * n_out.y() * (C_bI * vis_mu / h_b - tau_B) * u_minus_g.dot_product(n_out) );
 
-      Residual[A4 + 3] += gwts * (NA * (u_dot_n * w + p * n_out.z()
+      Residual[A4 + 3] += gwts * ( NA * (u_dot_n * w + p * n_out.z()
                                   - vis_mu * (w_x + u_z) * n_out.x()
                                   - vis_mu * (w_y + v_z) * n_out.y()
                                   - 2 * vis_mu * w_z * n_out.z())
@@ -1126,12 +1126,12 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_Weak1(
           - NA_y * n_out.z() * vis_mu * u_minus_g.y()
           - (NA_x * n_out.x() + NA_y * n_out.y() + 2 * NA_z * n_out.z()) * vis_mu * u_minus_g.z()
           + NA * (tau_B - inflow_factor) * u_minus_g.z()
-          + NA * n_out.z() * (C_bI * vis_mu / h_b - tau_B) * u_minus_g.dot_product(n_out));
-    }
-  }
+          + NA * n_out.z() * (C_bI * vis_mu / h_b - tau_B) * u_minus_g.dot_product(n_out) );
+    } // A-loop
+  } // qua-loop
 }
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangential_Residual_Weak1(
+void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_Weak1(
     const double &time, const double &dt,
     const double * const &sol,
     FEAElement * const &elementv,
@@ -1142,7 +1142,221 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangential_Residual_Weak1(
     const int &face_id,
     const double &C_bI)
 {
-  ; // Unimplemented
+  elementv->buildBasis( quads, face_id, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  const double curr {time + alpha_f * dt};
+
+  const double dd_dv {alpha_f * gamma * dt};
+
+  const int face_nqp {quads -> get_num_quadPts()};
+
+  Zero_Tangent_Residual();
+
+  std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
+
+  for(int qua {0}; qua < face_nqp; ++qua)
+  {
+    elementv->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
+
+    double surface_area {0.0}, inflow_factor {0.0};
+    int inflow_flag {0};
+
+    // Calculate surface Jacobian and normal_qua
+    const Vector_3 n_out = elementv->get_2d_normal_out(qua, surface_area);
+
+    Vector_3 coor(0.0, 0.0, 0.0);
+
+    // Calculate u_qua and grad_u_qua
+    double p {0.0}, u {0.0}, v {0.0}, w {0.0};
+    double u_x {0.0}, v_x {0.0}, w_x {0.0};
+    double u_y {0.0}, v_y {0.0}, w_y {0.0};
+    double u_z {0.0}, v_z {0.0}, w_z {0.0};
+    for(int ii {0}; ii < nLocBas; ++ii)
+    {
+      const int ii4 {ii * 4};
+      p += sol[ii4 + 0] * R[ii];
+      u += sol[ii4 + 1] * R[ii];
+      v += sol[ii4 + 2] * R[ii];
+      w += sol[ii4 + 3] * R[ii];
+
+      u_x += sol[ii4 + 1] * dR_dx[ii];
+      v_x += sol[ii4 + 2] * dR_dx[ii];
+      w_x += sol[ii4 + 3] * dR_dx[ii];
+
+      u_y += sol[ii4 + 1] * dR_dy[ii];
+      v_y += sol[ii4 + 2] * dR_dy[ii];
+      w_y += sol[ii4 + 3] * dR_dy[ii];
+
+      u_z += sol[ii4 + 1] * dR_dz[ii];
+      v_z += sol[ii4 + 2] * dR_dz[ii];
+      w_z += sol[ii4 + 3] * dR_dz[ii];
+
+      coor.x() += eleCtrlPts_x[ii];
+      coor.y() += eleCtrlPts_y[ii];
+      coor.z() += eleCtrlPts_z[ii];
+    }
+
+    const Vector_3 u_vec (u, v, w);
+    const double u_dot_n = u_vec.dot_product(n_out);
+    if(u_dot_n < 0.0)
+    {
+      inflow_factor = u_dot_n;
+      inflow_flag = 1;
+    }
+    else
+      ; // Initialized inflow_factor = 0.0, inflow_flag = 0
+
+    // Calculate the g_qua
+    const Vector_3 g_vec = get_g_weak(coor, curr);
+
+    // Calculate h_b and tau_B
+    const auto dxi_dx = elementv->get_invJacobian(qua);
+    const double h_b = get_h_b(dxi_dx, n_out);
+
+    const Vector_3 u_tan = u_vec - u_dot_n * n_out;
+    const double tau_B = get_tau_B(u_tan, h_b / C_bI, vis_mu);
+
+    // Assembly
+    const double gwts = surface_area * quads->get_qw(qua);
+
+    for( int A {0}; A < nLocBas; ++A)
+    {
+      const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
+
+      const int A4 = 4 * A;
+
+      const Vector_3 u_minus_g = u_vec - g_vec;
+
+      Residual[A4] += gwts * (-1.0) * NA * u_minus_g.dot_product(n_out);
+
+      Residual[A4 + 1] += gwts * ( NA * (u_dot_n * u + p * n_out.x()
+                                  - 2 * vis_mu * u_x * n_out.x() 
+                                  - vis_mu * (u_y + v_x) * n_out.y() 
+                                  - vis_mu * (u_z + w_x) * n_out.z())
+          - (2 * NA_x * n_out.x() + NA_y * n_out.y() + NA_z * n_out.z()) * vis_mu * u_minus_g.x()
+          - NA_y * n_out.x() * vis_mu * u_minus_g.y()
+          - NA_z * n_out.x() * vis_mu * u_minus_g.z()
+          + NA * (tau_B - inflow_factor) * u_minus_g.x()
+          + NA * n_out.x() * (C_bI * vis_mu / h_b - tau_B) * u_minus_g.dot_product(n_out) );
+
+      Residual[A4 + 2] += gwts * ( NA * (u_dot_n * v + p * n_out.y()
+                                  - vis_mu * (v_x + u_y) * n_out.x()
+                                  - 2 * vis_mu * v_y * n_out.y()
+                                  - vis_mu * (v_z + w_y) * n_out.z())
+          - NA_x * n_out.y() * vis_mu * u_minus_g.x()
+          - (NA_x * n_out.x() + 2 * NA_y * n_out.y() + NA_z * n_out.z()) * vis_mu * u_minus_g.y()
+          - NA_z * n_out.y() * vis_mu * u_minus_g.z()
+          + NA * (tau_B - inflow_factor) * u_minus_g.y()
+          + NA * n_out.y() * (C_bI * vis_mu / h_b - tau_B) * u_minus_g.dot_product(n_out) );
+
+      Residual[A4 + 3] += gwts * ( NA * (u_dot_n * w + p * n_out.z()
+                                  - vis_mu * (w_x + u_z) * n_out.x()
+                                  - vis_mu * (w_y + v_z) * n_out.y()
+                                  - 2 * vis_mu * w_z * n_out.z())
+          - NA_x * n_out.z() * vis_mu * u_minus_g.x()
+          - NA_y * n_out.z() * vis_mu * u_minus_g.y()
+          - (NA_x * n_out.x() + NA_y * n_out.y() + 2 * NA_z * n_out.z()) * vis_mu * u_minus_g.z()
+          + NA * (tau_B - inflow_factor) * u_minus_g.z()
+          + NA * n_out.z() * (C_bI * vis_mu / h_b - tau_B) * u_minus_g.dot_product(n_out) );
+
+      for (int B {0}; B < nLocBas; ++B )
+      {
+        const double NB = R[B], NB_x = dR_dx[B], NB_y = dR_dy[B], NB_z = dR_dz[B];
+
+        const double NANB = NA * NB;
+
+        const double common_coef = gwts * dd_dv;
+
+        const double penalty_wall = C_bI * vis_mu / h_b - tau_B;
+
+        const int B4 = 4 * B, nLocBas4 = 4 * nLocBas;
+
+        // K11
+        // Tangent[nLocBas4 * A4 + B4] += 0;
+
+        // K12
+        Tangent[nLocBas4 * A4 + B4 + 1] += common_coef * (-1.0) * NANB * n_out.x();
+
+        // K13
+        Tangent[nLocBas4 * A4 + B4 + 2] += common_coef * (-1.0) * NANB * n_out.y();
+
+        // K14
+        Tangent[nLocBas4 * A4 + B4 + 3] += common_coef * (-1.0) * NANB * n_out.z();
+
+        // K21
+        Tangent[nLocBas4 * (A4 + 1) + B4] += common_coef * NANB * n_out.x();
+
+        // K22
+        Tangent[nLocBas4 * (A4 + 1) + B4 + 1] += common_coef * ( NANB * (n_out.x() * u + u_dot_n)
+            - vis_mu * NA * (2 * n_out.x() * NB_x + n_out.y() * NB_y + n_out.z() * NB_z)
+            - vis_mu * NB * (2 * n_out.x() * NA_x + n_out.y() * NA_y + n_out.z() * NA_z)
+            - NANB * (inflow_flag * u_minus_g.x() * n_out.x() + inflow_factor)
+            + NANB * (tau_B + n_out.x() * n_out.x() * penalty_wall) );
+
+        // K23
+        Tangent[nLocBas4 * (A4 + 1) + B4 + 2] += common_coef * ( NANB * n_out.y() * u
+            - vis_mu * NA * n_out.y() * NB_x
+            - vis_mu * NB * n_out.x() * NA_y
+            - NANB * inflow_flag * u_minus_g.x() * n_out.y()
+            + NANB * n_out.x() * n_out.y() * penalty_wall );
+
+        // K24
+        Tangent[nLocBas4 * (A4 + 1) + B4 + 3] += common_coef * ( NANB * n_out.z() * u
+            - vis_mu * NA * n_out.z() * NB_x
+            - vis_mu * NB * n_out.x() * NA_z
+            - NANB * inflow_flag * u_minus_g.x() * n_out.z()
+            + NANB * n_out.x() * n_out.z() * penalty_wall );
+
+        // K31
+        Tangent[nLocBas4 * (A4 + 2) + B4] += common_coef * NANB * n_out.y();
+
+        // K32
+        Tangent[nLocBas4 * (A4 + 2) + B4 + 1] += common_coef * ( NANB * n_out.x() * v
+            - vis_mu * NA * n_out.x() * NB_y
+            - vis_mu * NB * n_out.y() * NA_x
+            - NANB * inflow_flag * u_minus_g.y() * n_out.x()
+            + NANB * n_out.x() * n_out.y() * penalty_wall );
+
+        // K33
+        Tangent[nLocBas4 * (A4 + 2) + B4 + 2] += common_coef * ( NANB * (n_out.y() * v + u_dot_n)
+            - vis_mu * NA * (n_out.x() * NB_x + 2 * n_out.y() * NB_y + n_out.z() * NB_z)
+            - vis_mu * NB * (n_out.x() * NA_x + 2 * n_out.y() * NA_y + n_out.z() * NA_z)
+            - NANB * (inflow_flag * u_minus_g.y() * n_out.y() + inflow_factor)
+            + NANB * (tau_B + n_out.y() * n_out.y() * penalty_wall) );
+        
+        // K34
+        Tangent[nLocBas4 * (A4 + 2) + B4 + 3] += common_coef * ( NANB * n_out.z() * v
+            - vis_mu * NA * n_out.z() * NB_y
+            - vis_mu * NB * n_out.y() * NA_z
+            - NANB * inflow_flag * u_minus_g.y() * n_out.z()
+            + NANB * n_out.y() * n_out.z() * penalty_wall );
+
+        // K41
+        Tangent[nLocBas4 * (A4 + 3) + B4] += common_coef * NANB * n_out.z();
+
+        // K42
+        Tangent[nLocBas4 * (A4 + 3) + B4 + 1] += common_coef * ( NANB * n_out.x() * w
+            - vis_mu * NA * n_out.x() * NB_z
+            - vis_mu * NB * n_out.z() * NA_x
+            - NANB * inflow_flag * u_minus_g.z() * n_out.x()
+            + NANB * n_out.x() * n_out.z() * penalty_wall );
+
+        // K43
+        Tangent[nLocBas4 * (A4 + 3) + B4 + 2] += common_coef * ( NANB * n_out.y() * w
+            - vis_mu * NA * n_out.y() * NB_z
+            - vis_mu * NB * n_out.z() * NA_y
+            - NANB * inflow_flag * u_minus_g.z() * n_out.y()
+            + NANB * n_out.y() * n_out.z() * penalty_wall );
+
+        // K44
+        Tangent[nLocBas4 * (A4 + 3) + B4 + 3] += common_coef * ( NANB * (n_out.z() * w + u_dot_n)
+            - vis_mu * NA * (n_out.x() * NB_x + n_out.y() * NB_y + 2 * n_out.z() * NB_z)
+            - vis_mu * NB * (n_out.x() * NA_x + n_out.y() * NA_y + 2 * n_out.z() * NA_z)
+            - NANB * (inflow_flag * u_minus_g.z() * n_out.z() + inflow_factor)
+            + NANB * (tau_B + n_out.z() * n_out.z() * penalty_wall) );
+      } // B-loop
+    } // A-loop
+  } // qua-loop
 }
 
 // EOF

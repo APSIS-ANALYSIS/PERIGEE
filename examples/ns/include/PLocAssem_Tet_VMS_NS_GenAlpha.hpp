@@ -151,7 +151,7 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
         const int &face_id,
         const double &C_bI);
 
-    virtual void Assem_Tangential_Residual_Weak1(
+    virtual void Assem_Tangent_Residual_Weak1(
         const double &time, const double &dt,
         const double * const &sol,
         FEAElement * const &elementv,
