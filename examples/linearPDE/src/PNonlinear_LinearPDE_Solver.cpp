@@ -200,18 +200,19 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Elastodynamics(
   const double alpha_m = tmga_ptr->get_alpha_m();
   const double alpha_f = tmga_ptr->get_alpha_f();
 
-  // Same-Y predictor
-  disp -> Copy( pre_disp );
+  // Same-Velocity predictor
   velo -> Copy( pre_velo );
-
   dot_velo -> Copy( pre_dot_velo ); dot_velo -> ScaleValue( (gamma-1.0)/gamma );
 
   // get dot_disp by the kinematic equations
   dot_disp -> Copy( pre_dot_disp );
   dot_disp -> ScaleValue( alpha_m-1.0 );
-  dot_disp -> PlusAX( pre_velo, 1.0-alpha_f );
-  dot_disp -> PlusAX( velo, alpha_f );
+  dot_disp -> PlusAX( pre_velo, 1.0 );
   dot_disp -> ScaleValue( 1.0/alpha_m );
+
+  disp -> Copy( pre_disp );
+  disp -> PlusAX( pre_dot_disp, dt - gamma * dt / alpha_m );
+  disp -> PlusAX( pre_velo, gamma * dt / alpha_m );
 
   // Define intermediate solutions
   PDNSolution * dot_velo_alpha = new PDNSolution( pre_dot_velo );
