@@ -28,8 +28,8 @@ Part_FEM::Part_FEM(
   // Generate group 1, 2, and 5.
   Generate_Partition( mesh, gpart, mnindex, IEN, field_id );
 
-  // Generate group 6
-  // local copy of control points for field that is tagged as geo_field
+  // Generate group 6, if the field is tagged as is_geo_field == true
+  // local copy of control points
   if( is_geo_field == true )
   {
     ctrlPts_x_loc.resize(nlocghonode);
@@ -317,6 +317,10 @@ void Part_FEM::write( const std::string &inputFileName ) const
   h5w->write_intScalar( group_id_3, "probDim", probDim );
   h5w->write_intScalar( group_id_3, "dofNum", dofNum );
   h5w->write_intScalar( group_id_3, "elemType", elemType );
+
+  h5w->write_intScalar( group_id_3, "field_id", field_id );
+  h5w->write_intScalar( group_id_3, "is_geo_field", (is_geo_field ? 1 : 0) );
+  h5w->write_string( group_id_3, "field_name", field_name );
 
   H5Gclose( group_id_3 );
 
