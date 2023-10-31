@@ -406,7 +406,7 @@ int main(int argc, char *argv[])
     PCHYPRESetType( preproc, "boomeramg" );
 
     gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_ptr, elementv,
-        elements, quadv, quads, locIEN, fNode, locnbc, locebc );
+        elements, quadv, quads, locIEN, fNode, locnbc, locebc, locwbc );
 
     lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
 

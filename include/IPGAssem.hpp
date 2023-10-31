@@ -293,6 +293,21 @@ class IPGAssem
         const Tissue_prestress * const &ps_ptr )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
+    virtual void Assem_mass_residual(
+        const PDNSolution * const &sol_a,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const ALocal_WeakBC * const &wbc_part )
+    {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
+
     // ------------------------------------------------------------------------
     // ! Assem_residual : assembly residual vector for 3D problem WITHOUT
     //                    pre-existing cached quadrature info.

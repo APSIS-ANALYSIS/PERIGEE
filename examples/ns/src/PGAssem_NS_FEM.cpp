@@ -194,7 +194,8 @@ void PGAssem_NS_FEM::Assem_mass_residual(
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
     const ALocal_NBC * const &nbc_part,
-    const ALocal_EBC * const &ebc_part )
+    const ALocal_EBC * const &ebc_part,
+    const ALocal_WeakBC * const &wbc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
@@ -228,6 +229,37 @@ void PGAssem_NS_FEM::Assem_mass_residual(
         lassem_ptr->Tangent, ADD_VALUES);
 
     VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+  }
+
+  if(wbc_part->get_weakbc_type() > 0)
+  {
+    const int num_wele {wbc_part->get_num_ele()};
+
+    for(int ee{0}; ee < num_wele; ++ee)
+    {
+      const int local_ee_index {wbc_part->get_part_vol_ele_id(ee)};
+
+      lien_ptr->get_LIEN(local_ee_index, IEN_e);
+      GetLocal(array_a, IEN_e, local_a);
+
+      fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
+
+      const int face_id {wbc_part->get_ele_face_id(ee)};
+
+      if(wbc_part->get_weakbc_type() == 1)
+        lassem_ptr->Assem_Residual_Weak1(0, 0, local_a, elementv,
+          ectrl_x, ectrl_y, ectrl_z, quad_s, face_id, wbc_part->get_C_bI());
+
+      for(int ii{0}; ii < nLocBas; ++ii)
+      {
+        for(int mm{0}; mm < dof_mat; ++mm)
+          row_index[dof_mat*ii + mm] = dof_mat*nbc_part->get_LID(mm, IEN_e[ii]) + mm;
+      }
+
+      MatSetValues(K, loc_dof, row_index, loc_dof, row_index, lassem_ptr->Tangent, ADD_VALUES);
+
+      VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+    }
   }
 
   delete [] array_a; array_a = nullptr;

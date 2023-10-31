@@ -64,7 +64,8 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part );
+        const ALocal_EBC * const &ebc_part,
+        const ALocal_WeakBC * const &wbc_part );
 
     // Assembly the residual vector for the NS equations
     virtual void Assem_residual(
