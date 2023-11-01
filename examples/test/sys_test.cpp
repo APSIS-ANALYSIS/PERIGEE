@@ -12,14 +12,9 @@
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D.hpp"
 #include "ElemBC_3D_outflow.hpp"
-#include "Field_Property.hpp"
 
 int main(int argc, char *argv[])
 {
-  Field_Property test(-1, 5, false, "kitty");
-
-  std::cout<<test<<std::endl;
-
   return EXIT_SUCCESS;
 }
 

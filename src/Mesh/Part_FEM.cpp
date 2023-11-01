@@ -129,9 +129,12 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
   }
 
   // control points
-  ctrlPts_x_loc = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_x_loc");
-  ctrlPts_y_loc = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_y_loc");
-  ctrlPts_z_loc = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_z_loc");
+  if( is_geo_field == true )
+  {
+    ctrlPts_x_loc = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_x_loc");
+    ctrlPts_y_loc = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_y_loc");
+    ctrlPts_z_loc = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_z_loc");
+  }
 
   delete h5r; H5Fclose( file_id );
 }
