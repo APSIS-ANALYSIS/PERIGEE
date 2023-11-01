@@ -325,21 +325,6 @@ namespace MATH_T
         is_fac = true;
       }
 
-      double det() const
-      {
-        Matrix_Dense<N> copy = *this;
-        copy.LU_fac();
-        double result = 1.0;
-        for(int ii {0}; ii < N; ++ii)
-        {
-          if (std::abs(copy(ii, ii)) < 1.0e-16)
-            return 0.0;
-          else
-            result *= copy(ii, ii);
-        }
-        return result;
-      }
-
       // ----------------------------------------------------------------------
       // with LU factorization performed, solve a linear problem with given RHS
       // users are responsible for allocating the b and x arrays.
