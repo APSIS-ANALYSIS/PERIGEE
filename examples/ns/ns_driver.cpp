@@ -39,6 +39,8 @@ int main(int argc, char *argv[])
   
   // weak bc type
   const int weakBC_type  = cmd_h5r -> read_intScalar("/", "weakBC_type");
+  // Coefficient for weak bc
+  double C_bI = 4.0;
 
   // Number of quadrature points for tets and triangles
   // Suggested values: 5 / 4 for linear, 17 / 13 for quadratic
@@ -147,6 +149,7 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-restart_time", restart_time);
   SYS_T::GetOptionReal("-restart_step", restart_step);
   SYS_T::GetOptionString("-restart_name", restart_name);
+  SYS_T::GetOptionReal("-C_bI", C_bI);
 
   // ===== Print Command Line Arguments =====
   SYS_T::cmdPrint("-nqp_tet:", nqp_tet);
@@ -160,7 +163,10 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-c_ct:", c_ct);
 
   if(weakBC_type > 0)
-    SYS_T::commPrint("weakBC_type: %d \n", weakBC_type);
+  {
+    SYS_T::cmdPrint("weakBC_type:", weakBC_type);
+    SYS_T::cmdPrint("-C_bI:", C_bI);
+  }
 
   // if inflow file exists, print the file name
   // otherwise, print the parameter for linear2steady inflow setting
@@ -248,7 +254,7 @@ int main(int argc, char *argv[])
   ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
 
   // Local sub_domain's weak bc
-  ALocal_WeakBC * locwbc = new ALocal_WeakBC(part_file, rank);
+  ALocal_WeakBC * locwbc = new ALocal_WeakBC(part_file, rank, C_bI);
 
   // Local sub-domain's nodal indices
   APart_Node * pNode = new APart_Node(part_file, rank);

@@ -1,8 +1,8 @@
 #include "ElemBC_3D_wall_turbulence.hpp"
 
 ElemBC_3D_wall_turbulence::ElemBC_3D_wall_turbulence( const std::vector<std::string> &vtkfileList,
-    const int &in_weak_bc_type, const double &in_C_bI, const IIEN * const &VIEN, const int &elemtype )
-: ElemBC_3D ( vtkfileList, elemtype ), weak_bc_type {in_weak_bc_type}, C_bI {in_C_bI}
+    const int &in_weak_bc_type, const IIEN * const &VIEN, const int &elemtype )
+: ElemBC_3D ( vtkfileList, elemtype ), weak_bc_type {in_weak_bc_type}
 {
   SYS_T::print_fatal_if(VEC_T::get_size(vtkfileList) > 1,
     "Error, ElemBC_3D_wall_turbulence: The number of wall file should not be more than 1.\n");

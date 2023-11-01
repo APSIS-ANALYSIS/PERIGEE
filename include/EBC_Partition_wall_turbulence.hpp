@@ -27,8 +27,6 @@ class EBC_Partition_wall_turbulence : public EBC_Partition
   protected:
     const int weak_bc_type;
 
-    const double C_bI;
-
     // stores the local volume element id in this part
     std::vector<int> part_vol_ele_id {};
 

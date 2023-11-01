@@ -30,15 +30,12 @@ class ElemBC_3D_wall_turbulence : public ElemBC_3D {
   public:
     ElemBC_3D_wall_turbulence( const std::vector<std::string> &vtkfileList,
                     const int &in_weak_bc_type,
-                    const double &in_C_bI,
                     const IIEN * const &VIEN,
                     const int &elemtype );
 
     virtual ~ElemBC_3D_wall_turbulence();
 
     virtual int get_weak_bc_type() const { return weak_bc_type; };
-
-    virtual double get_C_bI() const { return C_bI; };
 
     virtual int get_faceID( const int &cell_index ) const { return face_id[cell_index]; }
 
@@ -49,9 +46,6 @@ class ElemBC_3D_wall_turbulence : public ElemBC_3D {
     // type = 2 : strongly no-slip bc in wall-normal direction,
     //            and weakly no-slip bc in wall-tangent direction
     const int weak_bc_type;
-
-    // value of coefficient C_bI
-    const double C_bI;
 
     // the face id of the volume element
     std::vector<int> face_id;

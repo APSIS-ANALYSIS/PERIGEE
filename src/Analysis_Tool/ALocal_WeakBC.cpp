@@ -1,6 +1,7 @@
 #include "ALocal_WeakBC.hpp"
 
-ALocal_WeakBC::ALocal_WeakBC( const std::string &fileBaseName, const int &cpu_rank) : weakbc_type {0}
+ALocal_WeakBC::ALocal_WeakBC( const std::string &fileBaseName, const int &cpu_rank, const double &in_C_bI)
+: weakbc_type {0}, C_bI {in_C_bI}
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
@@ -14,8 +15,6 @@ ALocal_WeakBC::ALocal_WeakBC( const std::string &fileBaseName, const int &cpu_ra
 
   if (weakbc_type > 0)
   {
-    C_bI = h5r -> read_doubleScalar( gname.c_str(), "C_bI" );
-
     num_sur_ele = h5r -> read_intScalar( gname.c_str(), "num_local_cell" );
 
     part_vol_ele_id = h5r -> read_intVector( gname.c_str(), "part_volume_cell_id" );

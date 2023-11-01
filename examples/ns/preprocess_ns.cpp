@@ -42,8 +42,6 @@ int main( int argc, char * argv[] )
   //              2 strongly enforced in wall-normal direction,
   //                and weakly enforced in wall-tangent direction
   int weakBC_type = 0;
-  // C_bI: coefficient of weak BC
-  double C_bI = 4.0;
   
   // Default names for input geometry files
   std::string geo_file("./whole_vol.vtu");
@@ -76,7 +74,6 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionInt("-num_outlet", num_outlet);
   SYS_T::GetOptionInt("-elem_type", elemType);
   SYS_T::GetOptionInt("-weakbc_type", weakBC_type);
-  SYS_T::GetOptionReal("-C_bI", C_bI);
   SYS_T::GetOptionString("-geo_file", geo_file);
   SYS_T::GetOptionString("-sur_file_in_base", sur_file_in_base);
   SYS_T::GetOptionString("-sur_file_wall", sur_file_wall);
@@ -88,8 +85,6 @@ int main( int argc, char * argv[] )
   cout<<"==== Command Line Arguments ===="<<endl;
   cout<<" -elem_type: "<<elemType<<endl;
   cout<<" -weakbc_type: "<<weakBC_type<<endl;
-  if(weakBC_type != 0)
-    cout<<" -C_bI: "<<C_bI<<endl;
   cout<<" -num_outlet: "<<num_outlet<<endl;
   cout<<" -geo_file: "<<geo_file<<endl;
   cout<<" -sur_file_in_base: "<<sur_file_in_base<<endl;
@@ -249,7 +244,7 @@ int main( int argc, char * argv[] )
   ebc -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
 
   // Setup weak BC
-  ElemBC * wbc = new ElemBC_3D_wall_turbulence( weak_list, weakBC_type, C_bI, IEN, elemType );
+  ElemBC * wbc = new ElemBC_3D_wall_turbulence( weak_list, weakBC_type, IEN, elemType );
  
   // Start partition the mesh for each cpu_rank 
 

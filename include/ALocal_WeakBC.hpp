@@ -13,7 +13,7 @@
 class ALocal_WeakBC
 {
   public:
-    ALocal_WeakBC( const std::string &fileBaseName, const int &cpu_rank );
+    ALocal_WeakBC( const std::string &fileBaseName, const int &cpu_rank, const double &in_C_bI );
 
     virtual ~ALocal_WeakBC();
 
@@ -37,7 +37,7 @@ class ALocal_WeakBC
     int weakbc_type;
 
     // Coefficient for weak BC
-    double C_bI;
+    const double C_bI;
 
     // stores the number of surface elements.
     int num_sur_ele;
