@@ -361,7 +361,7 @@ int main( int argc, char * argv[] )
     mytimer->Start();
 
     IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
-        ctrlPts, proc_rank, cpu_size, dofNum, dofMat, elemType );
+        ctrlPts, proc_rank, cpu_size, elemType, {0, dofNum, true, "RUC"} );
     mytimer->Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
