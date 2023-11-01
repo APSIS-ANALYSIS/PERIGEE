@@ -18,6 +18,10 @@
 
 int main( int argc, char * argv[] )
 {
+  // Set number of threads and  print info of OpenMP
+  SYS_T::print_omp_info();
+  SYS_T::set_omp_num_threads();
+  
   // Clean the existing part hdf5 files
   SYS_T::execute("rm -rf ppart");
   SYS_T::execute("mkdir ppart");
