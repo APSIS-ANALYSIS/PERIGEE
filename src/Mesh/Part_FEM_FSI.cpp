@@ -12,7 +12,7 @@ Part_FEM_FSI::Part_FEM_FSI( const IMesh * const &mesh,
     const int &in_cpu_size,
     const int &in_elemType,
     const int &in_start_idx,
-    const Field_Property * const &fp ) 
+    const Field_Property &fp ) 
 : Part_FEM( mesh, gpart, mnindex, IEN, ctrlPts, in_cpu_rank, in_cpu_size, in_elemType, fp ), 
   start_idx( in_start_idx )
 {

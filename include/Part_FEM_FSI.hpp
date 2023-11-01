@@ -28,7 +28,7 @@ class Part_FEM_FSI : public Part_FEM
         const int &in_cpu_size,
         const int &in_elemType,
         const int &in_start_idx,
-        const Field_Property * const &in_fp );
+        const Field_Property &in_fp );
 
     virtual ~Part_FEM_FSI();
 
