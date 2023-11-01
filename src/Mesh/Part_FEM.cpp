@@ -11,8 +11,8 @@ Part_FEM::Part_FEM(
 : nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),
   sDegree( mesh->get_s_degree() ), tDegree( mesh->get_t_degree() ),
   uDegree( mesh->get_u_degree() ), nLocBas( mesh->get_nLocBas() ),
-  probDim(3), dofNum( fp->get_dofNum() ), elemType(in_elemType),
-  field_id( fp->get_id() ),
+  probDim(3), elemType(in_elemType),
+  field_id( fp->get_id() ), dofNum( fp->get_dofNum() ),
   is_geo_field( fp->get_is_geo_field() ),
   field_name( fp->get_name() )
 {

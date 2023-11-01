@@ -106,7 +106,7 @@ class Part_FEM : public IPart
 
     // 4. global mesh info
     int nElem, nFunc, sDegree, tDegree, uDegree, nLocBas;
-    int probDim, dofNum, elemType;
+    int probDim, elemType;
 
     // 5. LIEN
     int ** LIEN;
@@ -117,7 +117,7 @@ class Part_FEM : public IPart
     std::vector<double> ctrlPts_z_loc {};
 
     // 7. Field info
-    int field_id;
+    int field_id, dofNum;
     bool is_geo_field; // tag is true for geometry-related field
     std::string field_name;
 
