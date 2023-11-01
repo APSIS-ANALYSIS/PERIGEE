@@ -1,9 +1,9 @@
 // ==================================================================
-// vis_601_p1_wss.cpp
+// vis_602_p2_wss.cpp
 //
 // WSS visualization for eight-node hex elements.
 //
-// Date: Oct 24 2023
+// Date: Oct 30 2023
 // ==================================================================
 #include "Hex_Tools.hpp"
 #include "QuadPts_vis_quad9.hpp"
