@@ -35,7 +35,6 @@ int main( int argc, char * argv[] )
   std::string geo_file = cmd_h5r -> read_string("/", "geo_file");
   const int elemType = cmd_h5r -> read_intScalar("/","elemType");
   const int dofNum = cmd_h5r -> read_intScalar("/","dofNum");
-  const int dofMat   = cmd_h5r -> read_intScalar("/","dofMat");
   int in_ncommon = cmd_h5r -> read_intScalar("/","in_ncommon");
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
