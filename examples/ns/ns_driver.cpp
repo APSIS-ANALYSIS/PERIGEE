@@ -267,9 +267,9 @@ int main(int argc, char *argv[])
 
   // If inflow file exist, load it
   // otherwise, call the linear incremental flow rate to reach a steady flow
-  if( SYS_T::file_exist( inflow_file ) )
-    inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
-  else
+  // if( SYS_T::file_exist( inflow_file ) )
+  //   inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
+  // else
     inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_file );
 
   inflow_rate_ptr->print_info();
