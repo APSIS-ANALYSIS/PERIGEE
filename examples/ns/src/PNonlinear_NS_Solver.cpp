@@ -163,6 +163,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     
     // solve the equation K dot_step = G
     lsolver_ptr->Solve( gassem_ptr->G, dot_step );
+    SYS_T::commPrint("----Debug Solve---- \n");
 
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(lin_solve_event,0,0,0,0);
@@ -189,7 +190,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
       gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
           curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
-          quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc );
+          quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part );
 
 #ifdef PETSC_USE_LOG
       PetscLogEventEnd(mat_assem_1_event,0,0,0,0);
@@ -208,7 +209,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
       gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
           curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
-          quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc );
+          quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part );
 
 #ifdef PETSC_USE_LOG
       PetscLogEventEnd(vec_assem_1_event,0,0,0,0);
