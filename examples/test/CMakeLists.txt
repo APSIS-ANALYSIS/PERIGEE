@@ -49,6 +49,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Mesh_Tet.cpp
   ${perigee_source}/Mesh/Mesh_FEM.cpp
   ${perigee_source}/Mesh/Part_FEM.cpp
+  ${perigee_source}/Mesh/Part_FEM_FSI.cpp
   ${perigee_source}/Mesh/ElemBC_3D.cpp
   ${perigee_source}/Mesh/ElemBC_3D_outflow.cpp
   ${perigee_source}/Mesh/ElemBC_3D_wall.cpp

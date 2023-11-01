@@ -13,8 +13,8 @@ Part_FEM_FSI::Part_FEM_FSI( const IMesh * const &mesh,
     const int &in_elemType,
     const int &in_start_idx,
     const Field_Property * const &fp ) 
-: Part_FEM( mesh, gpart, mnindex, IEN, ctrlPts, in_cpu_rank, in_cpu_size, in_dof, in_elemType, fp ), 
-  start_idx( in_start_idx ), is_geo_field(in_is_geo_field)
+: Part_FEM( mesh, gpart, mnindex, IEN, ctrlPts, in_cpu_rank, in_cpu_size, in_elemType, fp ), 
+  start_idx( in_start_idx )
 {
   // Generate the local array tagging the element's property.
   elem_phy_tag.resize( nlocalele );
