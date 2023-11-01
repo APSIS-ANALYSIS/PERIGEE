@@ -158,7 +158,7 @@ int main( int argc, char * argv[] )
       else node_check += 1;
     }
 
-    SYS_T::print_fatal_if(node_check!=3, "Error: the associated tet element is incompatible with the triangle element.\n");
+    SYS_T::print_fatal_if(node_check != 3, "Error: the associated tet element is incompatible with the triangle element.\n");
 
     // Now we have found the interior node's volumetric mesh index, record its
     // spatial xyz coordinate
@@ -250,7 +250,7 @@ int main( int argc, char * argv[] )
       element -> buildBasis(quad, v_ectrl_x, v_ectrl_y, v_ectrl_z);
 
       // Obtain the local indices of nodes on the wall surface
-      std::vector<int> id_range;
+      std::vector<int> id_range{};
       range_generator( interior_node_local_index[ee], id_range );
 
       // Obtain the control point coordinates for this element

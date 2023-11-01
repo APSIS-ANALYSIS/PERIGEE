@@ -156,7 +156,7 @@ int main( int argc, char * argv[] )
         node_check += 1;
     }
 
-    SYS_T::print_fatal_if(node_check!=4, "Error: the associated hex element is incompatible with the quad element.\n");
+    SYS_T::print_fatal_if(node_check != 4, "Error: the associated hex element is incompatible with the quad element.\n");
 
     // Now we have found the interior node's volumetric mesh index, record its
     // spatial xyz coordinate
@@ -169,8 +169,8 @@ int main( int argc, char * argv[] )
     }
   }
  
-  SYS_T::print_fatal_if(VEC_T::get_size(interior_node)!=4*nElem, "Error: the length of the interior_node vector is incorrect.\n");
-  SYS_T::print_fatal_if(VEC_T::get_size(interior_node_local_index)!=4*nElem, "Error: the length of the interior_node_local_index vector is incorrect.\n");
+  SYS_T::print_fatal_if(VEC_T::get_size(interior_node) != 4*nElem, "Error: the length of the interior_node vector is incorrect.\n");
+  SYS_T::print_fatal_if(VEC_T::get_size(interior_node_local_index) != 4*nElem, "Error: the length of the interior_node_local_index vector is incorrect.\n");
 
   // Volumetric element visualization sampling point 
   IQuadPts * quad = new QuadPts_vis_hex8();
@@ -255,7 +255,7 @@ int main( int argc, char * argv[] )
       element -> buildBasis(quad, v_ectrl_x, v_ectrl_y, v_ectrl_z);
 
       // Obtain the local indices of nodes on the wall surface
-      std::vector<int> id_range;
+      std::vector<int> id_range{};
       range_generator( interior_node_local_index[4*ee], interior_node_local_index[4*ee + 1], interior_node_local_index[4*ee + 2], interior_node_local_index[4*ee + 3], id_range );
 
       // Obtain the control point coordinates for this element

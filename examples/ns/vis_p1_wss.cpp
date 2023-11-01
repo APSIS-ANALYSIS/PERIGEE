@@ -149,7 +149,7 @@ int main( int argc, char * argv[] )
       else node_check += 1;
     }
 
-    SYS_T::print_fatal_if(node_check!=3, "Error: the associated tet element is incompatible with the triangle element.\n");
+    SYS_T::print_fatal_if(node_check != 3, "Error: the associated tet element is incompatible with the triangle element.\n");
 
     // Record the interior node's coordinates
     interior_node_coord[3*ee+0] = v_ctrlPts[ 3*interior_node[ee] + 0 ];
