@@ -7,7 +7,7 @@ Part_FEM::Part_FEM(
     const IIEN * const &IEN,
     const std::vector<double> &ctrlPts,
     const int &in_cpu_rank, const int &in_cpu_size,
-    const int &in_elemType, const Field_Property &fp )
+    const int &in_elemType, const Field_Property * const &fp )
 : nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),
   sDegree( mesh->get_s_degree() ), tDegree( mesh->get_t_degree() ),
   uDegree( mesh->get_u_degree() ), nLocBas( mesh->get_nLocBas() ),
@@ -105,6 +105,12 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
   probDim  = h5r -> read_intScalar("Global_Mesh_Info", "probDim");
   elemType = h5r -> read_intScalar("Global_Mesh_Info", "elemType");
   dofNum   = h5r -> read_intScalar("Global_Mesh_Info", "dofNum");
+  field_id = h5r -> read_intScalar("Global_Mesh_Info", "field_id");
+  field_name = h5r -> read_string("Global_Mesh_Info", "field_name" );
+  
+  const int temp = h5r -> read_intScalar("Global_Mesh_Info", "is_geo_field");
+  if(temp == 1) is_geo_field = true;
+  else is_geo_field = false;
 
   // LIEN
   int num_row, num_col;
@@ -168,8 +174,8 @@ void Part_FEM::Generate_Partition( const IMesh * const &mesh,
 
   // 2. Reorder node_loc
   PERIGEE_OMP_PARALLEL_FOR
-    for( int ii=0; ii<nlocalnode; ++ii ) 
-      node_loc[ii] = mnindex->get_old2new( node_loc[ii] );
+  for( int ii=0; ii<nlocalnode; ++ii ) 
+    node_loc[ii] = mnindex->get_old2new( node_loc[ii] );
 
   // 3. Generate node_tot, which stores the nodes needed by the elements in the subdomain
   std::vector<int> node_tot {};
@@ -177,17 +183,17 @@ void Part_FEM::Generate_Partition( const IMesh * const &mesh,
   {
     std::vector<int> temp_node_tot {};
     PERIGEE_OMP_FOR
-      for( int e=0; e<nlocalele; ++e )
+    for( int e=0; e<nlocalele; ++e )
+    {
+      for( int ii=0; ii<nLocBas; ++ii )
       {
-        for( int ii=0; ii<nLocBas; ++ii )
-        {
-          int temp_node = IEN->get_IEN(elem_loc[e], ii);
-          temp_node = mnindex->get_old2new(temp_node);
-          temp_node_tot.push_back( temp_node );
-        }
+        int temp_node = IEN->get_IEN(elem_loc[e], ii);
+        temp_node = mnindex->get_old2new(temp_node);
+        temp_node_tot.push_back( temp_node );
       }
+    }
     PERIGEE_OMP_CRITICAL
-      VEC_T::insert_end(node_tot, temp_node_tot);
+    VEC_T::insert_end(node_tot, temp_node_tot);
   }
   VEC_T::sort_unique_resize( node_tot );
 
@@ -249,22 +255,22 @@ void Part_FEM::Generate_Partition( const IMesh * const &mesh,
   for(int ee=0; ee<nlocalele; ++ee) LIEN[ee] = new int [nLocBas];
 
   PERIGEE_OMP_PARALLEL_FOR
-    for(int ee=0; ee<nlocalele; ++ee)
+  for(int ee=0; ee<nlocalele; ++ee)
+  {
+    for(int ii=0; ii<nLocBas; ++ii)
     {
-      for(int ii=0; ii<nLocBas; ++ii)
+      const int global_index = mnindex->get_old2new( IEN->get_IEN(elem_loc[ee], ii) );
+      const auto lien_ptr = find( local_to_global.begin(), local_to_global.end(), global_index );
+
+      if(lien_ptr == local_to_global.end())
       {
-        const int global_index = mnindex->get_old2new( IEN->get_IEN(elem_loc[ee], ii) );
-        const auto lien_ptr = find( local_to_global.begin(), local_to_global.end(), global_index );
-
-        if(lien_ptr == local_to_global.end())
-        {
-          std::cerr<<"ERROR: Failed to generate LIEN array for "<<global_index<<std::endl;
-          exit(EXIT_FAILURE);
-        }
-
-        LIEN[ee][ii] = lien_ptr - local_to_global.begin();
+        std::cerr<<"ERROR: Failed to generate LIEN array for "<<global_index<<std::endl;
+        exit(EXIT_FAILURE);
       }
+
+      LIEN[ee][ii] = lien_ptr - local_to_global.begin();
     }
+  }
 
   std::cout<<"-- proc "<<cpu_rank<<" LIEN generated. \n";
 }
@@ -348,13 +354,16 @@ void Part_FEM::write( const std::string &inputFileName ) const
   H5Gclose( group_id_5 );
 
   // group 6: control points
-  hid_t group_id_6 = H5Gcreate(file_id, "/ctrlPts_loc", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  if( is_geo_field == true )
+  {
+    hid_t group_id_6 = H5Gcreate(file_id, "/ctrlPts_loc", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-  h5w -> write_doubleVector( group_id_6, "ctrlPts_x_loc", ctrlPts_x_loc );
-  h5w -> write_doubleVector( group_id_6, "ctrlPts_y_loc", ctrlPts_y_loc );
-  h5w -> write_doubleVector( group_id_6, "ctrlPts_z_loc", ctrlPts_z_loc );
+    h5w -> write_doubleVector( group_id_6, "ctrlPts_x_loc", ctrlPts_x_loc );
+    h5w -> write_doubleVector( group_id_6, "ctrlPts_y_loc", ctrlPts_y_loc );
+    h5w -> write_doubleVector( group_id_6, "ctrlPts_z_loc", ctrlPts_z_loc );
 
-  H5Gclose( group_id_6 );
+    H5Gclose( group_id_6 );
+  }
 
   // Finish writing, clean up
   delete h5w;

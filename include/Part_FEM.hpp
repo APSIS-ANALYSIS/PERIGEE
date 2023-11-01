@@ -25,7 +25,7 @@ class Part_FEM : public IPart
         const std::vector<double> &ctrlPts,
         const int &in_cpu_rank, const int &in_cpu_size,
         const int &in_elemType, 
-        const Field_Property &in_fp );
+        const Field_Property * const &in_fp );
 
     // Constructor that load the partition info from h5 file on disk
     Part_FEM( const std::string &fileName, const int &in_cpu_rank );
@@ -117,9 +117,9 @@ class Part_FEM : public IPart
     std::vector<double> ctrlPts_z_loc {};
 
     // 7. Field info
-    const int field_id;
-    const bool is_geo_field; // tag for geometry-related field
-    const std::string field_name;
+    int field_id;
+    bool is_geo_field; // tag is true for geometry-related field
+    std::string field_name;
 
     // ------------------------------------------------------------------------
     // Function
