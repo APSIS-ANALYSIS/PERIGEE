@@ -30,7 +30,7 @@ int main( int argc, char * argv[] )
   
   // Read the problem setting recorded in the .h5 file
   hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
- 
+
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
 
   std::string geo_file = cmd_h5r -> read_string("/", "geo_file");
@@ -40,7 +40,7 @@ int main( int argc, char * argv[] )
   int in_ncommon       = cmd_h5r -> read_intScalar("/","in_ncommon");
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
- 
+
   // The user can specify the new mesh partition options from the yaml file
   const std::string yaml_file("prepost.yml");
 
