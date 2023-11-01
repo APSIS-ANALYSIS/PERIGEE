@@ -11,22 +11,11 @@ Part_FEM_FSI::Part_FEM_FSI( const IMesh * const &mesh,
     const int &in_cpu_rank, 
     const int &in_cpu_size,
     const int &in_elemType,
-    const int &field,
-    const int &in_dof,
     const int &in_start_idx,
-    const bool &in_is_geo_field ) 
-: Part_FEM( mesh, gpart, mnindex, IEN, ctrlPts, in_cpu_rank, in_cpu_size, in_dof, in_elemType, field ), 
+    const Field_Property * const &fp ) 
+: Part_FEM( mesh, gpart, mnindex, IEN, ctrlPts, in_cpu_rank, in_cpu_size, in_dof, in_elemType, fp ), 
   start_idx( in_start_idx ), is_geo_field(in_is_geo_field)
 {
-  // If this field is not associated with the geometry, then we clean the
-  // control points
-  if( is_geo_field == false )
-  {
-    ctrlPts_x_loc.clear();
-    ctrlPts_y_loc.clear();
-    ctrlPts_z_loc.clear();
-  }
-
   // Generate the local array tagging the element's property.
   elem_phy_tag.resize( nlocalele );
   for(int ii=0; ii<nlocalele; ++ii) elem_phy_tag[ii] = phytag[ elem_loc[ii] ];
