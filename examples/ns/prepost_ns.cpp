@@ -106,7 +106,7 @@ int main( int argc, char * argv[] )
   {
     mytimer->Reset(); mytimer->Start();
     IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
-        ctrlPts, proc_rank, proc_size, dofNum, dofMat, elemType );
+        ctrlPts, proc_rank, proc_size, elemType, {0, dofNum, true, "NS"} );
     part->write(part_file.c_str());
     mytimer->Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";

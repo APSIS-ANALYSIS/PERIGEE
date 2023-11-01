@@ -7,14 +7,14 @@ Part_FEM::Part_FEM(
     const IIEN * const &IEN,
     const std::vector<double> &ctrlPts,
     const int &in_cpu_rank, const int &in_cpu_size,
-    const int &in_elemType, const Field_Property * const &fp )
+    const int &in_elemType, const Field_Property &fp )
 : nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),
   sDegree( mesh->get_s_degree() ), tDegree( mesh->get_t_degree() ),
   uDegree( mesh->get_u_degree() ), nLocBas( mesh->get_nLocBas() ),
   probDim(3), elemType(in_elemType),
-  field_id( fp->get_id() ), dofNum( fp->get_dofNum() ),
-  is_geo_field( fp->get_is_geo_field() ),
-  field_name( fp->get_name() )
+  field_id( fp.get_id() ), dofNum( fp.get_dofNum() ),
+  is_geo_field( fp.get_is_geo_field() ),
+  field_name( fp.get_name() )
 {
   // Initialize group 3 data
   cpu_rank = in_cpu_rank;

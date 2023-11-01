@@ -25,7 +25,7 @@ class Part_FEM : public IPart
         const std::vector<double> &ctrlPts,
         const int &in_cpu_rank, const int &in_cpu_size,
         const int &in_elemType, 
-        const Field_Property * const &in_fp );
+        const Field_Property &in_fp );
 
     // Constructor that load the partition info from h5 file on disk
     Part_FEM( const std::string &fileName, const int &in_cpu_rank );
