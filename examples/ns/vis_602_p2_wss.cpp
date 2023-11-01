@@ -1,7 +1,7 @@
 // ==================================================================
 // vis_602_p2_wss.cpp
 //
-// WSS visualization for eight-node hex elements.
+// WSS visualization for 27-node hex elements.
 //
 // Date: Oct 30 2023
 // ==================================================================
