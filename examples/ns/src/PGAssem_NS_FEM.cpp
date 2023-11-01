@@ -256,8 +256,6 @@ void PGAssem_NS_FEM::Assem_mass_residual(
           row_index[dof_mat*ii + mm] = dof_mat*nbc_part->get_LID(mm, IEN_e[ii]) + mm;
       }
 
-      MatSetValues(K, loc_dof, row_index, loc_dof, row_index, lassem_ptr->Tangent, ADD_VALUES);
-
       VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
     }
   }
