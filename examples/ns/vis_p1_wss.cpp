@@ -169,7 +169,7 @@ int main( int argc, char * argv[] )
 
     tri_area[ee] = 0.5 * ou.normalize();
 
-    const Vector_3 inw( v_ctrlPts[interior_node[ee]*3]   - v_ctrlPts[3*trn[0]],
+    const Vector_3 inw( v_ctrlPts[interior_node[ee]*3] - v_ctrlPts[3*trn[0]],
         v_ctrlPts[interior_node[ee]*3+1] - v_ctrlPts[3*trn[0]+1],
         v_ctrlPts[interior_node[ee]*3+2] - v_ctrlPts[3*trn[0]+2] );
 
