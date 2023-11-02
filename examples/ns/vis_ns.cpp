@@ -111,12 +111,12 @@ int main( int argc, char * argv[] )
   else if( GMIptr->get_elemType() == 601 )
   {
     quad = new QuadPts_vis_hex8();
-    element = new FEAElement_Hex8( (quad-> get_num_quadPts())*(quad-> get_num_quadPts())*(quad-> get_num_quadPts()) );
+    element = new FEAElement_Hex8( quad-> get_num_quadPts() );
   }
   else if( GMIptr->get_elemType() == 602 )
   {
     quad = new QuadPts_vis_hex27();
-    element = new FEAElement_Hex27( (quad-> get_num_quadPts())*(quad-> get_num_quadPts())*(quad-> get_num_quadPts()) );
+    element = new FEAElement_Hex27( quad-> get_num_quadPts() );
   }
   else SYS_T::print_fatal( "Error: unsupported element type \n" );
 
