@@ -26,7 +26,7 @@ class IQuadPts
     virtual int get_num_quadPts_x() const
     {
       SYS_T::print_fatal("Error: IQuadPts::get_num_quadPts_x is not implemented.\n");
-      return 0.0;
+      return -1;
     }
 
     // get_num_quadPts_y : returns the number of quadrature points in y-direction
@@ -34,7 +34,7 @@ class IQuadPts
     virtual int get_num_quadPts_y() const
     {
       SYS_T::print_fatal("Error: IQuadPts::get_num_quadPts_y is not implemented.\n");
-      return 0.0;
+      return -1;
     }
 
     // get_num_quadPts_z : returns the number of quadrature points in z-direction
@@ -42,7 +42,7 @@ class IQuadPts
     virtual int get_num_quadPts_z() const
     {
       SYS_T::print_fatal("Error: IQuadPts::get_num_quadPts_z is not implemented.\n");
-      return 0.0;
+      return -1;
     }
 
     // get_dim : returns the quadrature rule's dimension, e.g.

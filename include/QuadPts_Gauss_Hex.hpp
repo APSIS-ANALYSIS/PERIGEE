@@ -48,11 +48,7 @@ class QuadPts_Gauss_Hex : public IQuadPts
     {return qw[ii];}
 
   private:
-    const int num_pts;
-
-    const int num_pts_x;
-    const int num_pts_y;
-    const int num_pts_z;
+    const int num_pts, num_pts_x, num_pts_y, num_pts_z;
 
     // qp : length 3 * num_pts. Stores the r-s-t coordinates of the 
     //      quadrature points.
