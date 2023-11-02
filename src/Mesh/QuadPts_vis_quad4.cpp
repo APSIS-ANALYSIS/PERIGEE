@@ -1,11 +1,7 @@
 #include "QuadPts_vis_quad4.hpp"
 
 QuadPts_vis_quad4::QuadPts_vis_quad4()
-: num_pts( 2 )
 {
-  qp.resize( 2 * num_pts * num_pts );
-  qw.resize( num_pts * num_pts );
-
   qp[0] = 0.0;  qp[1] = 0.0;  
   qp[2] = 1.0;  qp[3] = 0.0;
   qp[4] = 1.0;  qp[5] = 1.0;

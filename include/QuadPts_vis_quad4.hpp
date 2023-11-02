@@ -20,9 +20,11 @@ class QuadPts_vis_quad4 : public IQuadPts
 
     virtual void print_info() const;
 
+    // it stores the coordinate of the quadrature points 
+    // in the sequence of r-s, so the dim is 2
     virtual int get_dim() const {return 2;}
 
-    virtual int get_num_quadPts() const {return num_pts;}
+    virtual int get_num_quadPts() const {return 2;}
 
     virtual double get_qp(unsigned int ii, unsigned int comp) const
     {return qp[2*ii+comp];}
@@ -31,13 +33,8 @@ class QuadPts_vis_quad4 : public IQuadPts
     {return qw[ii];}
 
   private:
-    const int num_pts;
-
-    // qp : size 2 x num_pts. it stores the coordinate of the
-    //      quadrature points in the sequence of r-s
-    // qw : size num_pts. it stores the quadrature weights for the
-    //      point.
-    std::vector<double> qp, qw;
+    double qp[8];
+    double qw[4];
 };
 
 #endif
