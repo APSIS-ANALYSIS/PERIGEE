@@ -32,6 +32,10 @@ class QuadPts_Gauss_Quad : public IQuadPts
 
     virtual int get_num_quadPts() const {return num_pts;}
 
+    virtual int get_num_quadPts_x() const {return num_pts_x;}
+
+    virtual int get_num_quadPts_y() const {return num_pts_y;}
+
     virtual double get_qp(unsigned int ii, unsigned int comp) const
     {return qp[2*ii+comp];}
 
@@ -39,6 +43,9 @@ class QuadPts_Gauss_Quad : public IQuadPts
 
   private:
     const int num_pts;
+
+    const int num_pts_x;
+    const int num_pts_y;
 
     // qp : length 2 x num_pts. Stores the r-s coordinates of the
     //      quadrature points.

@@ -5,7 +5,8 @@ QuadPts_Gauss_Hex::QuadPts_Gauss_Hex( const int &in_num_pts_x,
     const double &x_min, const double &x_max,
     const double &y_min, const double &y_max,
     const double &z_min, const double &z_max )
-: num_pts( in_num_pts_x * in_num_pts_y * in_num_pts_z )
+: num_pts( in_num_pts_x * in_num_pts_y * in_num_pts_z ),
+  num_pts_x( in_num_pts_x ), num_pts_y( in_num_pts_y ), num_pts_z( in_num_pts_z )
 {
   qp.clear(); qw.clear();
 

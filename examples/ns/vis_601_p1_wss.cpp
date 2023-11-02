@@ -21,20 +21,20 @@ std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
     const std::vector<int> &nodemap,
     const int &vec_size, const int &in_dof );
 
-int get_quad4_local_id( const double * const &coor_x,
+int get_quad_local_id( const double * const &coor_x,
     const double * const &coor_y,
     const double * const &coor_z,
     const int &len,
     const double &x, const double &y, const double &z,
     const double &tol = 1.0e-8 );
 
-void write_quad4_grid_wss( const std::string &filename,
+void write_quad_grid_wss( const std::string &filename,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt,
     const std::vector<int> &ien_array,
     const std::vector< Vector_3 > &wss_on_node );
 
-void write_quad4_grid_tawss_osi( const std::string &filename,
+void write_quad_grid_tawss_osi( const std::string &filename,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt,
     const std::vector<int> &ien_array,
@@ -177,7 +177,7 @@ int main( int argc, char * argv[] )
 
   quad -> print_info();
 
-  FEAElement * element = new FEAElement_Hex8( (quad-> get_num_quadPts())*(quad-> get_num_quadPts())*(quad-> get_num_quadPts()) );
+  FEAElement * element = new FEAElement_Hex8( quad-> get_num_quadPts() );
 
   double * v_ectrl_x = new double [v_nLocBas];
   double * v_ectrl_y = new double [v_nLocBas];
@@ -186,15 +186,15 @@ int main( int argc, char * argv[] )
   double * esol_v  = new double [v_nLocBas];
   double * esol_w  = new double [v_nLocBas];
 
-  IQuadPts * quad_quad4_vis = new QuadPts_vis_quad4();
+  IQuadPts * quad_vis = new QuadPts_vis_quad4();
 
-  quad_quad4_vis -> print_info();
+  quad_vis -> print_info();
 
-  IQuadPts * quad_quad4_gau = new QuadPts_Gauss_Quad( quad_quad4_vis->get_num_quadPts() );
+  IQuadPts * quad_gau = new QuadPts_Gauss_Quad( quad_vis->get_num_quadPts_x(), quad_vis->get_num_quadPts_y() );
 
-  quad_quad4_gau -> print_info();
+  quad_gau -> print_info();
 
-  FEAElement * element_quad4 = new FEAElement_Quad4_3D_der0( (quad_quad4_vis->get_num_quadPts())*(quad_quad4_vis->get_num_quadPts()) );
+  FEAElement * element_quad = new FEAElement_Quad4_3D_der0( quad_vis->get_num_quadPts() );
 
   // Read the mappings of the nodal indices
   const std::vector<int> analysis_new2old = ReadNodeMapping("node_mapping.h5", "new_2_old", v_nFunc );
@@ -272,7 +272,7 @@ int main( int argc, char * argv[] )
 
       // Build a basis based on the visualization sampling point for wall
       // quad element
-      element_quad4 -> buildBasis(quad_quad4_vis, ectrl_x, ectrl_y, ectrl_z);
+      element_quad -> buildBasis(quad_vis, ectrl_x, ectrl_y, ectrl_z);
 
       std::vector< Vector_3 > outnormal( nLocBas, Vector_3(0.0, 0.0, 0.0) );
 
@@ -285,16 +285,16 @@ int main( int argc, char * argv[] )
         const Vector_3 sur_pt( ectrl_x[ii], ectrl_y[ii], ectrl_z[ii] );
         const Vector_3 int_pt( interior_node_coord[3*(4*ee)+0], interior_node_coord[3*(4*ee)+1], interior_node_coord[3*(4*ee)+2] );
 
-        // surface_node_local_index[nLocBas*ee+ii] 's outward normal
-        outnormal[ii] = element_quad4 -> get_normal_out( ii, sur_pt, int_pt, len );
+        // id_range[ii] 's outward normal
+        outnormal[ii] = element_quad -> get_normal_out( ii, sur_pt, int_pt, len );
       }
 
       // Now calcualte the element surface area
-      element_quad4 -> buildBasis( quad_quad4_gau, ectrl_x, ectrl_y, ectrl_z );
+      element_quad -> buildBasis( quad_gau, ectrl_x, ectrl_y, ectrl_z );
 
-      double quad4_area = 0.0;
-      for(int qua=0; qua<quad_quad4_gau->get_num_quadPts(); ++qua)
-        quad4_area += element_quad4->get_detJac(qua) * quad_quad4_gau->get_qw(qua);
+      double quad_area = 0.0;
+      for(int qua=0; qua<quad_gau->get_num_quadPts(); ++qua)
+        quad_area += element_quad->get_detJac(qua) * quad_gau->get_qw(qua);
 
       for(int ii=0; ii<nLocBas; ++ii)
       {
@@ -343,14 +343,14 @@ int main( int argc, char * argv[] )
         const double wss_y = fluid_mu * ( ay - b * ny );
         const double wss_z = fluid_mu * ( az - b * nz );
 
-        const int quad4_local_id = get_quad4_local_id( ectrl_x, ectrl_y, ectrl_z,
+        const int quad_local_id = get_quad_local_id( ectrl_x, ectrl_y, ectrl_z,
             nLocBas, v_ectrl_x[ id_range[qua] ], v_ectrl_y[ id_range[qua] ], 
             v_ectrl_z[ id_range[qua] ], 1.0e-8 );
        
-        const int quad4_global_id = vecIEN[nLocBas * ee + quad4_local_id];
+        const int quad_global_id = vecIEN[nLocBas * ee + quad_local_id];
 
-        wss_ave[ quad4_global_id ]   += quad4_area * Vector_3(wss_x, wss_y, wss_z);
-        node_area[ quad4_global_id ] += quad4_area;
+        wss_ave[ quad_global_id ]   += quad_area * Vector_3(wss_x, wss_y, wss_z);
+        node_area[ quad_global_id ] += quad_area;
 
       } // loop over the sampling points (on surface)
 
@@ -361,7 +361,7 @@ int main( int argc, char * argv[] )
     for(int ii=0; ii<nFunc; ++ii) wss_ave[ii] *= (1.0 / node_area[ii]);
 
     // Write the wall shear stress at this time instance
-    write_quad4_grid_wss( name_to_write, nFunc, nElem, ctrlPts, vecIEN, wss_ave );
+    write_quad_grid_wss( name_to_write, nFunc, nElem, ctrlPts, vecIEN, wss_ave );
 
     for(int ii=0; ii<nFunc; ++ii)
     {
@@ -386,13 +386,13 @@ int main( int argc, char * argv[] )
 
   // write the TAWSS and OSI
   std::string tawss_osi_file("SOL_TAWSS_OSI" );
-  write_quad4_grid_tawss_osi( tawss_osi_file, nFunc, nElem, ctrlPts, vecIEN, tawss, osi );
+  write_quad_grid_tawss_osi( tawss_osi_file, nFunc, nElem, ctrlPts, vecIEN, tawss, osi );
 
   delete [] v_ectrl_x; delete [] v_ectrl_y; delete [] v_ectrl_z;
   delete [] esol_u; delete [] esol_v; delete [] esol_w;
   delete [] Rx; delete [] Ry; delete [] Rz; 
   delete quad; delete element;
-  delete quad_quad4_vis; delete quad_quad4_gau; delete element_quad4;
+  delete quad_vis; delete quad_gau; delete element_quad;
 
   PetscFinalize();
   return EXIT_SUCCESS;
@@ -552,7 +552,7 @@ std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
   return sol;
 }
 
-int get_quad4_local_id( const double * const &coor_x,
+int get_quad_local_id( const double * const &coor_x,
     const double * const &coor_y,
     const double * const &coor_z,
     const int &len,
@@ -571,12 +571,12 @@ int get_quad4_local_id( const double * const &coor_x,
     if(dist < tol) return ii;
   }
 
-  SYS_T::print_fatal("Error in get_quad4_local_id.\n");
+  SYS_T::print_fatal("Error in get_quad_local_id.\n");
 
   return -1;
 }
 
-void write_quad4_grid_wss( const std::string &filename,
+void write_quad_grid_wss( const std::string &filename,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt,
     const std::vector<int> &ien_array,
@@ -596,7 +596,7 @@ void write_quad4_grid_wss( const std::string &filename,
   grid_w->Delete();
 }
 
-void write_quad4_grid_tawss_osi( const std::string &filename,
+void write_quad_grid_tawss_osi( const std::string &filename,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt,
     const std::vector<int> &ien_array,

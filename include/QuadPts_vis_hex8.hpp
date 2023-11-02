@@ -23,9 +23,18 @@ class QuadPts_vis_hex8 : public IQuadPts
 
     virtual void print_info() const;
 
+    // it stores the coordinate of the quadrature points 
+    // in the sequence of x-y-z, so the dim is 4
     virtual int get_dim() const {return 3;}
 
-    virtual int get_num_quadPts() const {return 2;}
+    // num_pts = num_pts_x x num_pts_y x num_pts_z
+    virtual int get_num_quadPts() const {return 8;}
+
+    virtual int get_num_quadPts_x() const {return 2;}
+
+    virtual int get_num_quadPts_y() const {return 2;}
+
+    virtual int get_num_quadPts_z() const {return 2;}
 
     virtual double get_qp(unsigned int ii, unsigned int comp) const 
     {return qp[3*ii+comp];}

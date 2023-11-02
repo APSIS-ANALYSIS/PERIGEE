@@ -21,10 +21,15 @@ class QuadPts_vis_quad4 : public IQuadPts
     virtual void print_info() const;
 
     // it stores the coordinate of the quadrature points 
-    // in the sequence of r-s, so the dim is 2
+    // in the sequence of x-y, so the dim is 2
     virtual int get_dim() const {return 2;}
 
-    virtual int get_num_quadPts() const {return 2;}
+    // num_pts = num_pts_x x num_pts_y
+    virtual int get_num_quadPts() const {return 4;}
+
+    virtual int get_num_quadPts_x() const {return 2;}
+
+    virtual int get_num_quadPts_y() const {return 2;}
 
     virtual double get_qp(unsigned int ii, unsigned int comp) const
     {return qp[2*ii+comp];}

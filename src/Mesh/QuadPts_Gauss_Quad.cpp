@@ -4,7 +4,7 @@ QuadPts_Gauss_Quad::QuadPts_Gauss_Quad( const int &in_num_pts_x,
     const int &in_num_pts_y, 
     const double &x_min, const double &x_max, 
     const double &y_min, const double &y_max )
-: num_pts( in_num_pts_x * in_num_pts_y )
+: num_pts( in_num_pts_x * in_num_pts_y ), num_pts_x( in_num_pts_x ), num_pts_y( in_num_pts_y )
 {
   qp.clear(); qw.clear();
 
