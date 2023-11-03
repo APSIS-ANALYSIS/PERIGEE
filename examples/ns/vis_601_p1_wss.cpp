@@ -255,7 +255,7 @@ int main( int argc, char * argv[] )
       element -> buildBasis(quad, v_ectrl_x, v_ectrl_y, v_ectrl_z);
 
       // Obtain the local indices of nodes on the wall surface
-      std::vector<int> id_range = range_generator( interior_node_local_index[4*ee], interior_node_local_index[4*ee + 1], interior_node_local_index[4*ee + 2], interior_node_local_index[4*ee + 3] );
+      const std::vector<int> id_range = range_generator( interior_node_local_index[4*ee], interior_node_local_index[4*ee + 1], interior_node_local_index[4*ee + 2], interior_node_local_index[4*ee + 3] );
 
       // Obtain the control point coordinates for this element
       double * ectrl_x = new double [nLocBas];
