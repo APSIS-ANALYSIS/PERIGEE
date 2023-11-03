@@ -53,6 +53,8 @@ void PLocAssem_Elastodynamics_GenAlpha::print_info() const
   else if(nLocBas == 27)
     SYS_T::commPrint("  FEM: 27-node Hexahedral element \n");
   else SYS_T::print_fatal("Error: unknown elem type.\n");
+  SYS_T::commPrint("  Young's modulus: %e \n", module_E);
+  SYS_T::commPrint("  Poisson's ratio: %e \n", nu);
   SYS_T::commPrint("  Spatial: finite element \n");
   SYS_T::commPrint("  Temporal: Generalized-alpha Method \n");
   SYS_T::commPrint("  Consistent tangent matrix used. \n");
