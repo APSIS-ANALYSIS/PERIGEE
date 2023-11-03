@@ -259,9 +259,9 @@ int main( int argc, char * argv[] )
 
       for(int ii=0; ii<nLocBas; ++ii)
       {
-        ectrl_x[ii] = v_ctrlPts[ 3*v_vecIEN[v_nLocBas * ee_vol_id + id_range[ii] ] + 0 ];
-        ectrl_y[ii] = v_ctrlPts[ 3*v_vecIEN[v_nLocBas * ee_vol_id + id_range[ii] ] + 1 ];
-        ectrl_z[ii] = v_ctrlPts[ 3*v_vecIEN[v_nLocBas * ee_vol_id + id_range[ii] ] + 2 ];
+        ectrl_x[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii ] + 0 ];
+        ectrl_y[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii ] + 1 ];
+        ectrl_z[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii ] + 2 ];
       }
 
       // Build a basis based on the visualization sampling point for wall
@@ -289,13 +289,6 @@ int main( int argc, char * argv[] )
       double tri_area = 0.0;
       for(int qua=0; qua<quad_tri_gau->get_num_quadPts(); ++qua)
         tri_area += element_tri->get_detJac(qua) * quad_tri_gau->get_qw(qua);
-
-      for(int ii=0; ii<nLocBas; ++ii)
-      {
-        ectrl_x[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii ] + 0 ];
-        ectrl_y[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii ] + 1 ];
-        ectrl_z[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii ] + 2 ];
-      }
 
       // Loop over the 6 sampling points on the wall quadratic triangle element
       for(int qua=0; qua<nLocBas; ++qua)
