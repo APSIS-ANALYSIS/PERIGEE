@@ -102,6 +102,15 @@ void VTK_Writer_NS::writeOutput(
       VIS_T::setQuadTetraelem( IEN_e[0], IEN_e[1], IEN_e[2], IEN_e[3], 
           IEN_e[4], IEN_e[5], IEN_e[6], IEN_e[7], IEN_e[8], IEN_e[9],
           gridData );
+    else if( elemptr->get_Type() == 601 )
+      VIS_T::setHexelem( IEN_e[0], IEN_e[1], IEN_e[2], IEN_e[3], 
+        IEN_e[4], IEN_e[5], IEN_e[6], IEN_e[7], gridData );
+    else if( elemptr->get_Type() == 602 )
+      VIS_T::setTriQuadHexelem( IEN_e[0], IEN_e[1], IEN_e[2], IEN_e[3], 
+        IEN_e[4], IEN_e[5], IEN_e[6], IEN_e[7], IEN_e[8], IEN_e[9],
+        IEN_e[10], IEN_e[11], IEN_e[12], IEN_e[13], IEN_e[14], IEN_e[15],
+        IEN_e[16], IEN_e[17], IEN_e[18], IEN_e[19], IEN_e[20], IEN_e[21],
+        IEN_e[22], IEN_e[23], IEN_e[24], IEN_e[25], IEN_e[26], gridData );
     else SYS_T::print_fatal("Error: unknown element type.\n");
 
     // Mesh partition info

@@ -21,9 +21,11 @@ class QuadPts_vis_tri6 : public IQuadPts
 
     virtual void print_info() const;
 
+    // it stores the area coordinate of the quadrature points 
+    // in the sequence of r-s-t, so the dim is 3
     virtual int get_dim() const {return 3;}
 
-    virtual int get_num_quadPts() const {return num_pts;}
+    virtual int get_num_quadPts() const {return 6;}
 
     virtual double get_qp(unsigned int ii, unsigned int comp) const
     {return qp[3*ii+comp];}
@@ -32,14 +34,8 @@ class QuadPts_vis_tri6 : public IQuadPts
     {return qw[ii];}
 
   private:
-    const int num_pts;
-
-    // qp : size 3 x num_pts. it stores the area coordinate of the
-    //      quadrature points in the sequence of r-s-t,
-    //      t = 1 - r - s.
-    // qw : size num_pts. it stores the quadrature weights for the
-    //      point.
-    std::vector<double> qp, qw;
+    double qp[18];
+    double qw[6];
 };
 
 #endif

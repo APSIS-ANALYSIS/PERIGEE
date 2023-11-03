@@ -1,11 +1,7 @@
 #include "QuadPts_vis_tri6.hpp"
 
 QuadPts_vis_tri6::QuadPts_vis_tri6()
-: num_pts( 6 )
 {
-  qp.resize( 3 * num_pts );
-  qw.resize( num_pts );
-
   qp[0] = 0.0;  qp[1] = 0.0;  qp[2] = 1.0;
   qp[3] = 1.0;  qp[4] = 0.0;  qp[5] = 0.0;
   qp[6] = 0.0;  qp[7] = 1.0;  qp[8] = 0.0;
@@ -21,11 +17,9 @@ QuadPts_vis_tri6::QuadPts_vis_tri6()
   qw[5] = 0.5 / 6.0;
 }
 
-
 QuadPts_vis_tri6::~QuadPts_vis_tri6()
 {
 }
-
 
 void QuadPts_vis_tri6::print_info() const
 {

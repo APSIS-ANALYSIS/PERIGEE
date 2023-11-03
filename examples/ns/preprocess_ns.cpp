@@ -36,7 +36,7 @@ int main( int argc, char * argv[] )
   constexpr int dofMat = 4; // degree-of-freedom in the matrix problem
 
   // Yaml options
-  const std::string yaml_file("ns_input.yml");
+  const std::string yaml_file("ns_preprocess.yml");
 
   // Check if the yaml file exist on disk
   SYS_T::file_check(yaml_file);
