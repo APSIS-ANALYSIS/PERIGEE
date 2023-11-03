@@ -12,7 +12,7 @@
 #include "FEAElement_Tet10_v2.hpp"
 #include "FEAElement_Triangle6_3D_der0.hpp"
 
-void range_generator( const int &ii, std::vector<int> &surface_id_range );
+std::vector<int> range_generator( const int &ii );
 
 std::vector<int> ReadNodeMapping( const char * const &node_mapping_file,
     const char * const &mapping_type, const int &node_size );
@@ -250,8 +250,7 @@ int main( int argc, char * argv[] )
       element -> buildBasis(quad, v_ectrl_x, v_ectrl_y, v_ectrl_z);
 
       // Obtain the local indices of nodes on the wall surface
-      std::vector<int> id_range{};
-      range_generator( interior_node_local_index[ee], id_range );
+      const std::vector<int> id_range = range_generator( interior_node_local_index[ee] );
 
       // Obtain the control point coordinates for this element
       double * ectrl_x = new double [nLocBas];
@@ -394,9 +393,9 @@ int main( int argc, char * argv[] )
 }
 
 
-void range_generator( const int &ii, std::vector<int> &surface_id_range )
+std::vector<int> range_generator( const int &ii )
 {
-  surface_id_range.resize(6);
+  std::vector<int> surface_id_range(6, -1);
   switch (ii)
   {
     case 0:
@@ -435,6 +434,8 @@ void range_generator( const int &ii, std::vector<int> &surface_id_range )
       SYS_T::print_fatal("Error: the interior node index is wrong!\n");
       break;
   }
+  
+  return surface_id_range;
 }
 
 std::vector<int> ReadNodeMapping( const char * const &node_mapping_file,
