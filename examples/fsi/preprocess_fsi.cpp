@@ -495,16 +495,16 @@ int main( int argc, char * argv[] )
     mytimer->Start();
 
     IPart * part_p = new Part_FEM_FSI( mesh_p, global_part, mnindex_p, IEN_p,
-        ctrlPts, phy_tag, p_node_f, p_node_s,
-        proc_rank, cpu_size, elemType, 0, dof_fields[0], start_idx_p[proc_rank], false );
+        ctrlPts, phy_tag, p_node_f, p_node_s, proc_rank, cpu_size, elemType, 
+        start_idx_p[proc_rank], {0, dof_fields[0], false, "pressure"} );
 
     part_p -> print_part_loadbalance_edgecut();
     
     part_p -> write( part_file_p );
 
     IPart * part_v = new Part_FEM_FSI( mesh_v, global_part, mnindex_v, IEN_v,
-        ctrlPts, phy_tag, v_node_f, v_node_s,
-        proc_rank, cpu_size, elemType, 1, dof_fields[1], start_idx_v[proc_rank], true );
+        ctrlPts, phy_tag, v_node_f, v_node_s, proc_rank, cpu_size, elemType, 
+        start_idx_v[proc_rank], { 1, dof_fields[1], true, "velocity"} );
 
     part_v -> print_part_loadbalance_edgecut();
 

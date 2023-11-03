@@ -27,10 +27,8 @@ class Part_FEM_FSI : public Part_FEM
         const int &in_cpu_rank, 
         const int &in_cpu_size,
         const int &in_elemType,
-        const int &field,
-        const int &in_dof,
         const int &in_start_idx,
-        const bool &in_is_geo_field );
+        const Field_Property &in_fp );
 
     virtual ~Part_FEM_FSI();
 
@@ -53,9 +51,6 @@ class Part_FEM_FSI : public Part_FEM
 
     // DOF mapper
     const int start_idx;
-
-    // Flag that determines if the field is a geometry field
-    const bool is_geo_field;
 };
 
 #endif

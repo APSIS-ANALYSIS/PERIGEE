@@ -325,21 +325,6 @@ namespace MATH_T
         is_fac = true;
       }
 
-      double det() const
-      {
-        Matrix_Dense<N> copy = *this;
-        copy.LU_fac();
-        double result = 1.0;
-        for(int ii {0}; ii < N; ++ii)
-        {
-          if (std::abs(copy(ii, ii)) < 1.0e-16)
-            return 0.0;
-          else
-            result *= copy(ii, ii);
-        }
-        return result;
-      }
-
       // ----------------------------------------------------------------------
       // with LU factorization performed, solve a linear problem with given RHS
       // users are responsible for allocating the b and x arrays.
@@ -482,9 +467,9 @@ namespace MATH_T
       // Assignment operator
       Matrix_SymPos_Dense<N>& operator= (const Matrix_SymPos_Dense<N> &source)
       {
-        this->operator=(source);
-        return *this;             
-      }    
+        Matrix_Dense<N>::operator=(source);
+        return *this;
+      }
 
       // ----------------------------------------------------------------------
       // Perform LDL^t transformation. The mat object will be replace by the 
@@ -518,7 +503,7 @@ namespace MATH_T
       // With the LDLt_fac() function performed, solve a linear problem with 
       // the given RHS.
       // ----------------------------------------------------------------------
-      std::array<double, N>  LDLt_solve( std::array<double, N> &bb ) const
+      std::array<double, N> LDLt_solve( std::array<double, N> &bb ) const
       {
         std::array<double, N> xx {};
 
