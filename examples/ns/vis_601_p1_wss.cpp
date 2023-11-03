@@ -12,7 +12,7 @@
 #include "FEAElement_Hex8.hpp"
 #include "FEAElement_Quad4_3D_der0.hpp"
 
-void range_generator( const int &ii, const int &jj, const int &kk, const int &ll, std::vector<int> &surface_id_range );
+std::vector<int> range_generator( const int &ii, const int &jj, const int &kk, const int &ll );
 
 std::vector<int> ReadNodeMapping( const char * const &node_mapping_file,
     const char * const &mapping_type, const int &node_size );
@@ -255,8 +255,7 @@ int main( int argc, char * argv[] )
       element -> buildBasis(quad, v_ectrl_x, v_ectrl_y, v_ectrl_z);
 
       // Obtain the local indices of nodes on the wall surface
-      std::vector<int> id_range{};
-      range_generator( interior_node_local_index[4*ee], interior_node_local_index[4*ee + 1], interior_node_local_index[4*ee + 2], interior_node_local_index[4*ee + 3], id_range );
+      std::vector<int> id_range = range_generator( interior_node_local_index[4*ee], interior_node_local_index[4*ee + 1], interior_node_local_index[4*ee + 2], interior_node_local_index[4*ee + 3] );
 
       // Obtain the control point coordinates for this element
       double * ectrl_x = new double [nLocBas];
@@ -265,9 +264,9 @@ int main( int argc, char * argv[] )
 
       for(int ii=0; ii<nLocBas; ++ii)
       {
-        ectrl_x[ii] = v_ctrlPts[ 3*v_vecIEN[v_nLocBas * ee_vol_id + id_range[ii] ] + 0 ];
-        ectrl_y[ii] = v_ctrlPts[ 3*v_vecIEN[v_nLocBas * ee_vol_id + id_range[ii] ] + 1 ];
-        ectrl_z[ii] = v_ctrlPts[ 3*v_vecIEN[v_nLocBas * ee_vol_id + id_range[ii] ] + 2 ];
+        ectrl_x[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii ] + 0 ];
+        ectrl_y[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii ] + 1 ];
+        ectrl_z[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii ] + 2 ];
       }
 
       // Build a basis based on the visualization sampling point for wall
@@ -295,13 +294,6 @@ int main( int argc, char * argv[] )
       double quad_area = 0.0;
       for(int qua=0; qua<quad_gau->get_num_quadPts(); ++qua)
         quad_area += element_quad->get_detJac(qua) * quad_gau->get_qw(qua);
-
-      for(int ii=0; ii<nLocBas; ++ii)
-      {
-        ectrl_x[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii ] + 0 ];
-        ectrl_y[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii ] + 1 ];
-        ectrl_z[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii ] + 2 ];
-      }
 
       // Loop over the 4 sampling points on the wall bilinear quadrangle element
       for(int qua=0; qua<nLocBas; ++qua)
@@ -398,9 +390,9 @@ int main( int argc, char * argv[] )
   return EXIT_SUCCESS;
 }
 
-void range_generator( const int &ii, const int &jj, const int &kk, const int &ll, std::vector<int> &surface_id_range )
+std::vector<int> range_generator( const int &ii, const int &jj, const int &kk, const int &ll )
 {
-  surface_id_range.resize(4);
+  std::vector<int> surface_id_range(4, -1);
 
   int interior_id_range[4] {ii, jj, kk, ll};
 
@@ -457,6 +449,8 @@ void range_generator( const int &ii, const int &jj, const int &kk, const int &ll
   }
   else
     SYS_T::print_fatal("Error: the interior node index is wrong!\n");
+
+  return surface_id_range;
 }
 
 std::vector<int> ReadNodeMapping( const char * const &node_mapping_file,

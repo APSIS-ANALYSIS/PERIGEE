@@ -392,7 +392,6 @@ int main( int argc, char * argv[] )
   return EXIT_SUCCESS;
 }
 
-
 std::vector<int> range_generator( const int &ii )
 {
   std::vector<int> surface_id_range(6, -1);
@@ -530,7 +529,6 @@ std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
 
   return sol;
 }
-
 
 int get_tri_local_id( const double * const &coor_x,
     const double * const &coor_y,
