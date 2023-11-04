@@ -2,12 +2,24 @@
 
 Vector_3 POST_ERROR_E::exact_disp( const double &x, const double &y, const double &z, const double &time )
 {
-  return Vector_3(0.0, 0.0, 0.0);
+  const double ux = aa*x*sin(w*x)*sin(w*y)*sin(w*z)*time;
+  const double uy = aa*y*sin(w*x)*sin(w*y)*sin(w*z)*time;
+  const double uz = aa*z*sin(w*x)*sin(w*y)*sin(w*z)*time;
+  return Vector_3(ux, uy, uz);
 }
 
 Tensor2_3D POST_ERROR_E::exact_grad_disp( const double &x, const double &y, const double &z, const double &time )
 {
-  return Tensor2_3D(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  const double ux_x = aa*time*sin(w*x)*sin(w*y)*sin(w*z) + aa*time*w*x*cos(w*x)*sin(w*y)*sin(w*z);
+  const double ux_y = aa*time*w*x*cos(w*y)*sin(w*x)*sin(w*z);
+  const double ux_z = aa*time*w*x*cos(w*z)*sin(w*x)*sin(w*y);
+  const double uy_x = aa*time*w*y*cos(w*x)*sin(w*y)*sin(w*z);
+  const double uy_y = aa*time*sin(w*x)*sin(w*y)*sin(w*z) + aa*time*w*y*cos(w*y)*sin(w*x)*sin(w*z);
+  const double uy_z = aa*time*w*y*cos(w*z)*sin(w*x)*sin(w*y);
+  const double uz_x = aa*time*w*z*cos(w*x)*sin(w*y)*sin(w*z);
+  const double uz_y = aa*time*w*z*cos(w*y)*sin(w*x)*sin(w*z);
+  const double uz_z = aa*time*sin(w*x)*sin(w*y)*sin(w*z) + aa*time*w*z*cos(w*z)*sin(w*x)*sin(w*y);
+  return Tensor2_3D(ux_x, ux_y, ux_z, uy_x, uy_y, uy_z, uz_x, uz_y, uz_z);
 }
 
 double POST_ERROR_E::get_manu_sol_error(
@@ -32,7 +44,7 @@ double POST_ERROR_E::get_manu_sol_error(
     double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
     Vector_3 sol(0.0, 0.0, 0.0);
 
-    for(int ii=0; ii<element-> get_nLocBas(); ++ii)
+    for(int ii=0; ii<element->get_nLocBas(); ++ii)
     {
       coor_x += ectrlPts_x[ii] * R[ii];
       coor_y += ectrlPts_y[ii] * R[ii];

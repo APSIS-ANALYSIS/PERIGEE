@@ -100,7 +100,15 @@ class PLocAssem_Elastodynamics_GenAlpha : public IPLocAssem
 
     Vector_3 get_f( const Vector_3 &pt, const double &tt ) const
     {
-      return Vector_3(0.0, 0.0, 0.0);
+      const double x = pt.x();
+      const double y = pt.y();
+      const double z = pt.z();
+      const double aa = 1.0e-4;
+      const double w = 3.141592653589793;
+      const double fx = -aa*tt*w*(4*lambda*cos(w*x)*sin(w*y)*sin(w*z) + 6*mu*cos(w*x)*sin(w*y)*sin(w*z) - lambda*w*x*sin(w*x)*sin(w*y)*sin(w*z) - 4*mu*w*x*sin(w*x)*sin(w*y)*sin(w*z) + lambda*w*y*cos(w*x)*cos(w*y)*sin(w*z) + lambda*w*z*cos(w*x)*cos(w*z)*sin(w*y) + mu*w*y*cos(w*x)*cos(w*y)*sin(w*z) + mu*w*z*cos(w*x)*cos(w*z)*sin(w*y));
+      const double fy = -aa*tt*w*(4*lambda*cos(w*y)*sin(w*x)*sin(w*z) + 6*mu*cos(w*y)*sin(w*x)*sin(w*z) - lambda*w*y*sin(w*x)*sin(w*y)*sin(w*z) - 4*mu*w*y*sin(w*x)*sin(w*y)*sin(w*z) + lambda*w*x*cos(w*x)*cos(w*y)*sin(w*z) + mu*w*x*cos(w*x)*cos(w*y)*sin(w*z) + lambda*w*z*cos(w*y)*cos(w*z)*sin(w*x) + mu*w*z*cos(w*y)*cos(w*z)*sin(w*x));
+      const double fz = -aa*tt*w*(4*lambda*cos(w*z)*sin(w*x)*sin(w*y) + 6*mu*cos(w*z)*sin(w*x)*sin(w*y) - lambda*w*z*sin(w*x)*sin(w*y)*sin(w*z) - 4*mu*w*z*sin(w*x)*sin(w*y)*sin(w*z) + lambda*w*x*cos(w*x)*cos(w*z)*sin(w*y) + lambda*w*y*cos(w*y)*cos(w*z)*sin(w*x) + mu*w*x*cos(w*x)*cos(w*z)*sin(w*y) + mu*w*y*cos(w*y)*cos(w*z)*sin(w*x));
+      return Vector_3(fx, fy, fz);
     }
 
     typedef Vector_3 ( PLocAssem_Elastodynamics_GenAlpha::*locassem_transport_funs )
