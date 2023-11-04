@@ -17,7 +17,7 @@
 int main( int argc, char * argv[] )
 {
   int nqp_tet = 29; // 4 (2), 5 (3), 17 (5), or 29 (6)
-  int nqp_hex_1D = 2;
+  int nqp_hex_1D = 4;
 
   double sol_time = 1.0;
   std::string sol_name("SOL_900000000");
