@@ -254,7 +254,7 @@ int main( int argc, char * argv[] )
       // Construct the trilinear hexahedron element
       element -> buildBasis(quad, v_ectrl_x, v_ectrl_y, v_ectrl_z);
 
-      // Obtain the local indices of nodes on the wall surface
+      // Obtain the local indices of nodes on the wall surface based on the local indices of the four interior nodes
       const std::vector<int> id_range = range_generator( interior_node_local_index[4*ee], interior_node_local_index[4*ee + 1], interior_node_local_index[4*ee + 2], interior_node_local_index[4*ee + 3] );
 
       // Obtain the control point coordinates for this element
@@ -262,11 +262,13 @@ int main( int argc, char * argv[] )
       double * ectrl_y = new double [nLocBas];
       double * ectrl_z = new double [nLocBas];
 
+      // Here the coordinates of the control points on the wall are obtained via the v_vecIEN
+      // Note that their order is determined by the id_range
       for(int ii=0; ii<nLocBas; ++ii)
       {
-        ectrl_x[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii ] + 0 ];
-        ectrl_y[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii ] + 1 ];
-        ectrl_z[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii ] + 2 ];
+        ectrl_x[ii] = v_ctrlPts[ 3*v_vecIEN[v_nLocBas * ee_vol_id + id_range[ii] ] + 0 ];
+        ectrl_y[ii] = v_ctrlPts[ 3*v_vecIEN[v_nLocBas * ee_vol_id + id_range[ii] ] + 1 ];
+        ectrl_z[ii] = v_ctrlPts[ 3*v_vecIEN[v_nLocBas * ee_vol_id + id_range[ii] ] + 2 ];
       }
 
       // Build a basis based on the visualization sampling point for wall
@@ -295,10 +297,19 @@ int main( int argc, char * argv[] )
       for(int qua=0; qua<quad_gau->get_num_quadPts(); ++qua)
         quad_area += element_quad->get_detJac(qua) * quad_gau->get_qw(qua);
 
+      // Here the coordinates of the control points read through the surface-IEN 
+      // are just used to find out their global number on the wall
+      for(int ii=0; ii<nLocBas; ++ii)
+      {
+        ectrl_x[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii ] + 0 ];
+        ectrl_y[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii ] + 1 ];
+        ectrl_z[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii ] + 2 ];
+      }
+
       // Loop over the 4 sampling points on the wall bilinear quadrangle element
       for(int qua=0; qua<nLocBas; ++qua)
       {
-        // Obtain the 10 basis function's value at the wall boundary points
+        // Obtain the 8 basis function's value at the wall boundary points
         element -> get_gradR( id_range[qua], Rx, Ry, Rz );
 
         double ux = 0.0, uy = 0.0, uz = 0.0;
