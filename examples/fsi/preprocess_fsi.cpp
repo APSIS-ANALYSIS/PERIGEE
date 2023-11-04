@@ -9,6 +9,7 @@
 // ============================================================================
 #include "Math_Tools.hpp"
 #include "Mesh_Tet.hpp"
+#include "Mesh_FEM.hpp"
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
@@ -37,7 +38,7 @@ int main( int argc, char * argv[] )
   SYS_T::execute("mkdir apart");
 
   // Define basic settings
-  const int elemType = 501; // first order simplicial element
+  int elemType = 501; // first order simplicial element
   const int num_fields = 2; // Two fields : pressure + velocity/displacement
   const std::vector<int> dof_fields {1, 3}; // pressure 1 ; velocity/displacement 3
 
@@ -97,6 +98,7 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionInt(   "-ringBC_type",         ringBC_type);
   SYS_T::GetOptionInt(   "-num_outlet",          num_outlet);
   SYS_T::GetOptionInt(   "-num_inlet",           num_inlet);
+  SYS_T::GetOptionInt(   "-elem_type",           elemType);
   SYS_T::GetOptionString("-geo_file",            geo_file);
   SYS_T::GetOptionString("-geo_f_file",          geo_f_file);
   SYS_T::GetOptionString("-geo_s_file",          geo_s_file);
@@ -257,15 +259,30 @@ int main( int argc, char * argv[] )
   PERIGEE_OMP_PARALLEL_FOR
   for(int ee=0; ee<nElem; ++ee)
   {
-    if( phy_tag[ee] == 1 )
+    if(phy_tag[ee] == 1)
     {
-      // In solid element, loop over its IEN and correct if the node is on the
-      // interface
-      for(int ii=0; ii<4; ++ii)
+      if(elemType == 501)
       {
-        const int pos = VEC_T::get_pos( wall_node_id, vecIEN_p[ee*4 +ii] );
-        if( pos >=0 ) vecIEN_p[ee*4+ii] = nFunc_v + pos;     
+        // In solid element, loop over its IEN and correct if the node is on the
+        // interface
+        for(int ii=0; ii<4; ++ii)
+        {
+          const int pos = VEC_T::get_pos( wall_node_id, vecIEN_p[ee*4 +ii] );
+          if( pos >=0 ) vecIEN_p[ee*4+ii] = nFunc_v + pos;     
+        }
       }
+      else if(elemType == 601)
+      {
+        // In solid element, loop over its IEN and correct if the node is on the
+        // interface
+        for(int ii=0; ii<8; ++ii)
+        {
+          const int pos = VEC_T::get_pos( wall_node_id, vecIEN_p[ee*8 +ii] );
+          if( pos >=0 ) vecIEN_p[ee*8+ii] = nFunc_v + pos;     
+        }
+      }
+      else
+        SYS_T::print_fatal("Error: unknown element type occurs when generating a new IEN array for the pressure variable. \n");
     }
   }
 
@@ -285,11 +302,29 @@ int main( int argc, char * argv[] )
     {
       if( phy_tag[ee] == 0 )
       {
-        for(int ii=0; ii<4; ++ii) temp_v_node_f.push_back( IEN_v->get_IEN(ee, ii) );
+        if(elemType == 501)
+        {
+          for(int ii=0; ii<4; ++ii) temp_v_node_f.push_back( IEN_v->get_IEN(ee, ii) );
+        }
+        else if(elemType == 601)
+        {
+          for(int ii=0; ii<8; ++ii) temp_v_node_f.push_back( IEN_v->get_IEN(ee, ii) );
+        }
+        else
+          SYS_T::print_fatal("Error: unknown element type occurs when generating the list of velocity nodes for fluid. \n");
       }
       else
       {
-        for(int ii=0; ii<4; ++ii) temp_v_node_s.push_back( IEN_v->get_IEN(ee, ii) );
+        if(elemType == 501)
+        {
+          for(int ii=0; ii<4; ++ii) temp_v_node_s.push_back( IEN_v->get_IEN(ee, ii) );
+        }
+        else if(elemType == 601)
+        {
+          for(int ii=0; ii<8; ++ii) temp_v_node_s.push_back( IEN_v->get_IEN(ee, ii) );
+        }
+        else
+          SYS_T::print_fatal("Error: unknown element type occurs when generating the list of velocity nodes for solid. \n");
       }
     }
     PERIGEE_OMP_CRITICAL
@@ -311,11 +346,29 @@ int main( int argc, char * argv[] )
     {
       if( phy_tag[ee] == 0 )
       {
-        for(int ii=0; ii<4; ++ii) temp_p_node_f.push_back( IEN_p->get_IEN(ee, ii) );
+        if(elemType == 501)
+        {
+          for(int ii=0; ii<4; ++ii) temp_p_node_f.push_back( IEN_p->get_IEN(ee, ii) );
+        }
+        else if(elemType == 601)
+        {
+          for(int ii=0; ii<8; ++ii) temp_p_node_f.push_back( IEN_p->get_IEN(ee, ii) );
+        }
+        else
+          SYS_T::print_fatal("Error: unknown element type occurs when generating the list of pressure nodes for fluid. \n");
       }
       else
       {
-        for(int ii=0; ii<4; ++ii) temp_p_node_s.push_back( IEN_p->get_IEN(ee, ii) );
+        if(elemType == 501)
+        {
+          for(int ii=0; ii<4; ++ii) temp_p_node_s.push_back( IEN_p->get_IEN(ee, ii) );
+        }
+        else if(elemType == 601)
+        {
+          for(int ii=0; ii<8; ++ii) temp_p_node_s.push_back( IEN_p->get_IEN(ee, ii) );
+        }
+        else
+          SYS_T::print_fatal("Error: unknown element type occurs when generating the list of pressure nodes for solid. \n");
       }
     }
     PERIGEE_OMP_CRITICAL
@@ -331,14 +384,39 @@ int main( int argc, char * argv[] )
   if( isPrintMeshQual )
   {
     std::cout<<"Check the mesh quality... \n";
-    TET_T::tetmesh_check( ctrlPts, IEN_v, nElem, critical_val_aspect_ratio );
+    if(elemType == 501)
+    {
+      TET_T::tetmesh_check( ctrlPts, IEN_v, nElem, critical_val_aspect_ratio );
+    }
+    else if(elemType == 601)
+    {
+      HEX_T::hexmesh_check( ctrlPts, IEN_v, nElem, critical_val_aspect_ratio );
+    }
+    else
+      SYS_T::print_fatal("Error: unknown element type occurs when checking the mesh of kinematics. \n");
   }
 
-  // Generate the mesh for kinematics
-  IMesh * mesh_v = new Mesh_Tet(nFunc_v, nElem, 1);
+  IMesh * mesh_v = nullptr;
+  IMesh * mesh_p = nullptr;
 
-  // Generate the mesh for pressure (discontinuous over interface)
-  IMesh * mesh_p = new Mesh_Tet(nFunc_p, nElem, 1);
+  switch( elemType )
+  {
+    case 501:
+      // Generate the mesh for kinematics
+      mesh_v = new Mesh_Tet(nFunc_v, nElem, 1);
+      // Generate the mesh for pressure (discontinuous over interface)
+      mesh_p = new Mesh_Tet(nFunc_p, nElem, 1);
+      break;
+    case 601:
+      // Generate the mesh for kinematics
+      mesh_v = new Mesh_FEM(nFunc_v, nElem, 8, 1);
+      // Generate the mesh for pressure (discontinuous over interface)
+      mesh_p = new Mesh_FEM(nFunc_p, nElem, 27, 2);
+      break;   
+    default:
+      SYS_T::print_fatal("Error: elemType %d is not supported.\n", elemType);
+      break;
+  }
 
   std::vector<IMesh const *> mlist;
   mlist.push_back(mesh_p); mlist.push_back(mesh_v);
@@ -454,8 +532,18 @@ int main( int argc, char * argv[] )
   // InflowBC info
   std::cout<<"3. Inflow cap surfaces: \n";
   std::vector<Vector_3> inlet_outvec( num_inlet );
-  for(int ii=0; ii<num_inlet; ++ii)
-    inlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_in[ii], ctrlPts, IEN_v );
+  if(elemType == 501)
+  {
+    for(int ii=0; ii<num_inlet; ++ii)
+      inlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_in[ii], ctrlPts, IEN_v );
+  }
+  else if(elemType == 601)
+  {
+    for(int ii=0; ii<num_inlet; ++ii)
+      inlet_outvec[ii] = HEX_T::get_out_normal( sur_f_file_in[ii], ctrlPts, IEN_v );
+  }
+  else
+    SYS_T::print_fatal("Error: unknown element type occurs when obtaining the outward normal vector for the inflow boundary condition. \n");
 
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_f_file_in, sur_f_file_wall, nFunc_v, inlet_outvec, elemType );
 
@@ -465,8 +553,18 @@ int main( int argc, char * argv[] )
   cout<<"4. Elem boundary for the implicit solver: \n";
   std::vector< Vector_3 > outlet_outvec( num_outlet );
 
-  for(int ii=0; ii<num_outlet; ++ii)
-    outlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_out[ii], ctrlPts, IEN_v );
+  if(elemType == 501)
+  {
+    for(int ii=0; ii<num_outlet; ++ii)
+      outlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_out[ii], ctrlPts, IEN_v );
+  }
+  else if(elemType == 601)
+  {
+    for(int ii=0; ii<num_outlet; ++ii)
+      outlet_outvec[ii] = HEX_T::get_out_normal( sur_f_file_out[ii], ctrlPts, IEN_v );    
+  }
+  else
+    SYS_T::print_fatal("Error: unknown element type occurs when obtaining the outward normal vector for the elemental boundary conditions. \n");
 
   std::vector< std::string > ebclist {sur_f_file_wall};
 
@@ -551,11 +649,11 @@ int main( int argc, char * argv[] )
   }
 
   // Clean up the memory
-  for(auto it_nbc=NBC_list_v.begin(); it_nbc != NBC_list_v.end(); ++it_nbc) delete *it_nbc;
+  for(auto &it_nbc : NBC_list_v) delete it_nbc;
   
-  for(auto it_nbc=NBC_list_p.begin(); it_nbc != NBC_list_p.end(); ++it_nbc) delete *it_nbc;
+  for(auto &it_nbc : NBC_list_p) delete it_nbc;
 
-  for(auto it_nbc=meshBC_list.begin(); it_nbc != meshBC_list.end(); ++it_nbc) delete *it_nbc;
+  for(auto &it_nbc : meshBC_list) delete it_nbc;
 
   delete ebc; delete InFBC; delete mesh_ebc; 
   delete mnindex_p; delete mnindex_v; delete mesh_p; delete mesh_v; 
