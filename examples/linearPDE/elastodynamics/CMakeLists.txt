@@ -131,11 +131,13 @@ ADD_EXECUTABLE( preprocess3d ../preprocess.cpp)
 ADD_EXECUTABLE( elasto_3d driver_elastodynamics.cpp)
 ADD_EXECUTABLE( prepost ../prepost.cpp)
 ADD_EXECUTABLE( post_error post_compare_manu.cpp )
+ADD_EXECUTABLE( vis_elasto_3d vis_elastodynamics.cpp )
 
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( elasto_3d perigee_analysis )
 TARGET_LINK_LIBRARIES( prepost perigee_preprocess )
 TARGET_LINK_LIBRARIES( post_error perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_elasto_3d perigee_postprocess )
 
 if(OPENMP_CXX_FOUND)
   SET_TARGET_PROPERTIES( perigee_preprocess PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
