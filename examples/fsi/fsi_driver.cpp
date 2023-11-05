@@ -10,9 +10,13 @@
 #include "ALocal_Elem.hpp"
 #include "ALocal_EBC_outflow.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
+#include "QuadPts_Gauss_Quad.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
+#include "QuadPts_Gauss_Hex.hpp"
 #include "FEAElement_Triangle3_3D_der0.hpp"
+#include "FEAElement_Quad4_3D_der0.hpp"
 #include "FEAElement_Tet4.hpp"
+#include "FEAElement_Hex8.hpp"
 #include "CVFlowRate_Unsteady.hpp"
 #include "CVFlowRate_Linear2Steady.hpp"
 #include "CVFlowRate_Steady.hpp"
@@ -38,7 +42,11 @@
 
 int main(int argc, char *argv[])
 {
+  // Number of quadrature points for tet and triangle
   int nqp_tet = 5, nqp_tri = 4;
+
+  // Number of quadrature points for hex and quadrangle
+  int nqp_vol_1D = 2, nqp_sur_1D = 2;
 
   // Estimate the nonzero per row for the sparse matrix
   int nz_estimate = 300;
@@ -135,6 +143,8 @@ int main(int argc, char *argv[])
 
   SYS_T::GetOptionInt(   "-nqp_tet",           nqp_tet);
   SYS_T::GetOptionInt(   "-nqp_tri",           nqp_tri);
+  SYS_T::GetOptionInt(   "-nqp_vol_1d",        nqp_vol_1D);
+  SYS_T::GetOptionInt(   "-nqp_sur_1d",        nqp_sur_1D);
   SYS_T::GetOptionInt(   "-nz_estimate",       nz_estimate);
   SYS_T::GetOptionReal(  "-bs_beta",           bs_beta);
   SYS_T::GetOptionReal(  "-rho_inf",           genA_rho_inf);
@@ -175,6 +185,8 @@ int main(int argc, char *argv[])
   // ===== Print the command line argumetn on screen =====
   SYS_T::cmdPrint("-nqp_tet:", nqp_tet);
   SYS_T::cmdPrint("-nqp_tri:", nqp_tri);
+  SYS_T::cmdPrint("-nqp_vol_1d", nqp_vol_1D);
+  SYS_T::cmdPrint("-nqp_sur_1d", nqp_sur_1D);
   SYS_T::cmdPrint("-nz_estimate:", nz_estimate);
   SYS_T::cmdPrint("-bs_beta:", bs_beta);
   SYS_T::cmdPrint("-fl_density:", fluid_density);
@@ -343,14 +355,36 @@ int main(int argc, char *argv[])
   SYS_T::print_fatal_if(locinfnbc->get_num_nbc() != inflow_rate_ptr->get_num_nbc(),
       "Error: ALocal_InflowBC number of faces does not match with that in ICVFlowRate.\n");
 
-  // ===== Quadrature rules and FEM container =====
-  SYS_T::commPrint("===> Build quadrature rules. \n");
-  IQuadPts * quadv = new QuadPts_Gauss_Tet( nqp_tet );
-  IQuadPts * quads = new QuadPts_Gauss_Triangle( nqp_tri );
-
+  // ===== Finite Element Container & Quadrature rules =====
   SYS_T::commPrint("===> Setup element container. \n");
-  FEAElement * elementv = new FEAElement_Tet4( nqp_tet );
-  FEAElement * elements = new FEAElement_Triangle3_3D_der0( nqp_tri );
+  FEAElement * elementv = nullptr;
+  FEAElement * elements = nullptr;
+
+  SYS_T::commPrint("===> Build quadrature rules. \n");
+  IQuadPts * quadv = nullptr;
+  IQuadPts * quads = nullptr;
+
+  if( GMIptr->get_elemType() == 501 )
+  {
+    if( nqp_tet > 5 ) SYS_T::commPrint("Warning: the tet element is linear and you are using more than 5 quadrature points.\n");
+    if( nqp_tri > 4 ) SYS_T::commPrint("Warning: the tri element is linear and you are using more than 4 quadrature points.\n");
+
+    elementv = new FEAElement_Tet4( nqp_tet ); // elem type 501
+    elements = new FEAElement_Triangle3_3D_der0( nqp_tri );
+    quadv = new QuadPts_Gauss_Tet( nqp_tet );
+    quads = new QuadPts_Gauss_Triangle( nqp_tri );
+  }
+  else if( GMIptr->get_elemType() == 601 )
+  {
+    SYS_T::print_fatal_if( nqp_vol_1D < 2, "Error: not enough quadrature points for hex.\n" );
+    SYS_T::print_fatal_if( nqp_sur_1D < 1, "Error: not enough quadrature points for quad.\n" );
+
+    elementv = new FEAElement_Hex8( nqp_vol_1D * nqp_vol_1D * nqp_vol_1D ); // elem type 601
+    elements = new FEAElement_Quad4_3D_der0( nqp_sur_1D * nqp_sur_1D );
+    quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
+    quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
+  }
+  else SYS_T::print_fatal("Error: Element type not supported.\n");
 
   // ===== Generate the IS for pres and velo =====
   const int idx_v_start = HDF5_T::read_intScalar( SYS_T::gen_partfile_name(part_v_file, rank).c_str(), "/DOF_mapper", "start_idx" );

@@ -82,6 +82,9 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/System/HDF5_Reader.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Tet.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_1D.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_Quad.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_Hex.cpp
   ${perigee_source}/Analysis_Tool/AGlobal_Mesh_Info_FEM_3D.cpp
   ${perigee_source}/Analysis_Tool/APart_Basic_Info.cpp
   ${perigee_source}/Analysis_Tool/ALocal_Elem.cpp
@@ -95,7 +98,9 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/FEANode.cpp
   ${perigee_source}/Element/FE_Tools.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Quad4_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
+  ${perigee_source}/Element/FEAElement_Hex8.cpp
   ${perigee_source}/Model/MaterialModel_NeoHookean_M94_Mixed.cpp
   ${perigee_source}/Model/MaterialModel_NeoHookean_Incompressible_Mixed.cpp
   ${perigee_source}/Model/Tissue_prestress.cpp
@@ -171,7 +176,7 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 ADD_EXECUTABLE( preprocess_fsi preprocess_fsi.cpp)
 ADD_EXECUTABLE( wall_ps_tet4_3d wall_ps_tet4_driver.cpp)
-ADD_EXECUTABLE( fsi_tet4_3d fsi_driver.cpp)
+ADD_EXECUTABLE( fsi3d fsi_driver.cpp)
 ADD_EXECUTABLE( prepostproc prepost.cpp)
 ADD_EXECUTABLE( vis_fsi vis_driver.cpp )
 ADD_EXECUTABLE( vis_fluid vis_fluid.cpp )
@@ -181,7 +186,7 @@ ADD_EXECUTABLE( vis_fsi_wss vis_fsi_wss.cpp )
 # Link libraries
 TARGET_LINK_LIBRARIES( preprocess_fsi ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( wall_ps_tet4_3d ${EXTRA_LINK_LIBS} perigee_analysis )
-TARGET_LINK_LIBRARIES( fsi_tet4_3d ${EXTRA_LINK_LIBS} perigee_analysis )
+TARGET_LINK_LIBRARIES( fsi3d ${EXTRA_LINK_LIBS} perigee_analysis )
 TARGET_LINK_LIBRARIES( prepostproc ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( vis_fsi ${EXTRA_LINK_LIBS} perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_fluid ${EXTRA_LINK_LIBS} perigee_postprocess )
