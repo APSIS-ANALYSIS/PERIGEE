@@ -384,6 +384,9 @@ int main( int argc, char * argv[] )
       break;
   }
 
+  SYS_T::print_fatal_if( IEN_v->get_nLocBas() != mesh_v->get_nLocBas(), "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", mesh_v->get_nLocBas(), IEN_v->get_nLocBas() );
+  SYS_T::print_fatal_if( IEN_p->get_nLocBas() != mesh_p->get_nLocBas(), "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", mesh_p->get_nLocBas(), IEN_p->get_nLocBas() );
+
   std::vector<IMesh const *> mlist;
   mlist.push_back(mesh_p); mlist.push_back(mesh_v);
 
