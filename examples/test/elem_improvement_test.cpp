@@ -93,7 +93,7 @@ int main( int argc, char * argv[] )
   std::cout << std::fixed << std::setprecision(16) << out_n(1) << std::endl;
   std::cout << std::fixed << std::setprecision(16) << out_n(2) << std::endl;
 
-  delete line_elem; delete R; delete quad;
+  delete line_elem; delete[] R; delete quad;
   PetscFinalize();
   return EXIT_SUCCESS;
 }

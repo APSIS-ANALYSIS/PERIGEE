@@ -32,31 +32,33 @@ int main( int argc, char * argv[] )
   // compatible with the VTK IEN node ordering
   GIO -> update_quadratic_tet_IEN( vol_id );
 
-  // Write the surface mesh into vtu files
-  GIO -> write_quadratic_sur_vtu("wall_vol", 0, vol_id, true); // assumed to be wall vtp
-  GIO -> write_quadratic_sur_vtu("inflow_vol_000", 1, vol_id, true); // assumed to be wall vtp
+  GIO -> write_quadratic_sur_vtu("testface_vol", 0, vol_id, true);
+
+  // // Write the surface mesh into vtu files
+  // GIO -> write_quadratic_sur_vtu("wall_vol", 0, vol_id, true); // assumed to be wall vtp
+  // GIO -> write_quadratic_sur_vtu("inflow_vol_000", 1, vol_id, true); // assumed to be wall vtp
   
-    for(int ii=0; ii<num_outlet; ++ii)
-  {
-    std::string filename {"outflow_vol_"};
-    std::string idx = std::to_string(ii);
-    if(ii < 10)
-    {
-      filename += "00";
-      filename += idx;
-    }
-    else if(ii > 9 && ii < 100)
-    {
-      filename += "0";
-      filename += idx;
-    }
-    else if(ii > 99 && ii < 1000)
-      filename += idx;
-    else
-      SYS_T::print_fatal("Too many outlets.");
+  //   for(int ii=0; ii<num_outlet; ++ii)
+  // {
+  //   std::string filename {"outflow_vol_"};
+  //   std::string idx = std::to_string(ii);
+  //   if(ii < 10)
+  //   {
+  //     filename += "00";
+  //     filename += idx;
+  //   }
+  //   else if(ii > 9 && ii < 100)
+  //   {
+  //     filename += "0";
+  //     filename += idx;
+  //   }
+  //   else if(ii > 99 && ii < 1000)
+  //     filename += idx;
+  //   else
+  //     SYS_T::print_fatal("Too many outlets.");
     
-    GIO -> write_quadratic_sur_vtu(filename, 2+ii, vol_id, true);
-  }
+  //   GIO -> write_quadratic_sur_vtu(filename, 2+ii, vol_id, true);
+  // }
 
   const std::string wmname("whole_vol");
   const bool isXML = true;

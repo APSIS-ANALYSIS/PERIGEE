@@ -47,12 +47,14 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Hex_Tools.cpp
   ${perigee_source}/Mesh/IEN_FEM.cpp
   ${perigee_source}/Mesh/Mesh_Tet.cpp
+  ${perigee_source}/Mesh/Mesh_FEM.cpp
   ${perigee_source}/Mesh/Part_FEM.cpp
   ${perigee_source}/Mesh/ElemBC_3D.cpp
   ${perigee_source}/Mesh/ElemBC_3D_outflow.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet.cpp
   ${perigee_source}/Mesh/ElemBC_3D_wall.cpp
   ${perigee_source}/Mesh/ElemBC_3D_tet_outflow.cpp
+  ${perigee_source}/Mesh/ElemBC_3D_wall_turbulence.cpp
   ${perigee_source}/Mesh/NodalBC.cpp
   ${perigee_source}/Mesh/NodalBC_3D_inflow.cpp
   ${perigee_source}/Mesh/NodalBC_3D_ring.cpp
@@ -63,12 +65,15 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/EBC_Partition.cpp
   ${perigee_source}/Mesh/EBC_Partition_wall.cpp
   ${perigee_source}/Mesh/EBC_Partition_outflow.cpp
+  ${perigee_source}/Mesh/EBC_Partition_wall_turbulence.cpp
   ${perigee_source}/Mesh/Map_Node_Index.cpp
   ${perigee_source}/Mesh/Global_Part_METIS.cpp
   ${perigee_source}/Mesh/Global_Part_Serial.cpp
   ${perigee_source}/Element/FE_Tools.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Quad4_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Quad9_3D_der0.cpp
   )
 
 SET( perigee_analysis_lib_src
@@ -90,6 +95,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/ALocal_EBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_EBC_outflow.cpp
   ${perigee_source}/Analysis_Tool/ALocal_EBC_wall.cpp
+  ${perigee_source}/Analysis_Tool/ALocal_WeakBC.cpp
   ${perigee_source}/Analysis_Tool/APart_Node.cpp
   ${perigee_source}/Analysis_Tool/FEANode.cpp
   ${perigee_source}/Element/FEAElement_Line2_3D_der0.cpp
