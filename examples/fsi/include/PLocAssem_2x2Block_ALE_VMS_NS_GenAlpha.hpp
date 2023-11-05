@@ -187,6 +187,13 @@ class PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
     const int nLocBas, snLocBas;
     const int vec_size_0, vec_size_1, sur_size_0;
 
+    // M matrix for tau_m
+    //             mm[0], mm[1], mm[2]
+    // M = coef *  mm[3], mm[4], mm[5]
+    //             mm[6], mm[7], mm[8]
+    const double coef;
+    const std::array<double, 9> mm; 
+
     void print_info() const;
 
     // The metric tensor for tetrahedron needs to be modified.

@@ -9,7 +9,9 @@ PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha(
   gamma(tm_gAlpha->get_gamma()), beta(in_beta), CI(36.0), CT(4.0),
   nLocBas(in_nlocbas), snLocBas(in_snlocbas),
   vec_size_0( nLocBas * 3 ), vec_size_1( nLocBas ), 
-  sur_size_0( snLocBas * 3 )
+  sur_size_0( snLocBas * 3 ), coef( (in_nlocbas == 4) ? 0.6299605249474365 : 1.0 ),
+  mm( (in_nlocbas == 4) ? std::array<double, 9>{2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0} :
+                          std::array<double, 9>{1.0, 0.0, 0.0, 0.0, 1.0 ,0.0, 0.0, 0.0 ,1.0} )
 {
   Tangent00 = new PetscScalar[vec_size_0 * vec_size_0];
   Tangent01 = new PetscScalar[vec_size_0 * vec_size_1];
@@ -49,7 +51,10 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::print_info() const
 {
   SYS_T::print_sep_line();
   SYS_T::commPrint("  Three-dimensional Incompressible Navier-Stokes equations: \n");
-  SYS_T::commPrint("  FEM: 4-node Tetrahedral \n");
+  if(nLocBas == 4)
+    SYS_T::commPrint("  FEM: 4-node Tetrahedral element \n");
+  else if(nLocBas == 8)
+    SYS_T::commPrint("  FEM: 8-node Hexahedral element \n");
   SYS_T::commPrint("  Spatial: ALE-VMS \n");
   SYS_T::commPrint("  Temporal: Generalized-alpha Method \n");
   SYS_T::commPrint("  Density rho = %e \n", rho0);
@@ -69,25 +74,22 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::print_info() const
 SymmTensor2_3D PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::get_metric(
     const std::array<double, 9> &f ) const
 {
-  // PHASTA definition 
-  const double coef = 0.6299605249474365;
+  const double fk0 = mm[0] * f[0] + (mm[1] * f[3] + mm[2] * f[6]);
+  const double fk1 = mm[4] * f[3] + (mm[3] * f[0] + mm[5] * f[6]);
+  const double fk2 = mm[8] * f[6] + (mm[6] * f[0] + mm[7] * f[3]);
+  const double fk3 = mm[0] * f[1] + (mm[1] * f[4] + mm[2] * f[7]);
+  const double fk4 = mm[4] * f[4] + (mm[3] * f[1] + mm[5] * f[7]);
+  const double fk5 = mm[8] * f[7] + (mm[6] * f[1] + mm[7] * f[4]);
+  const double fk6 = mm[0] * f[2] + (mm[1] * f[5] + mm[2] * f[8]);
+  const double fk7 = mm[4] * f[5] + (mm[3] * f[2] + mm[5] * f[8]);
+  const double fk8 = mm[8] * f[8] + (mm[6] * f[2] + mm[7] * f[5]);
 
-  const double fk0 = 2.0 * f[0] + (f[3] + f[6]);
-  const double fk1 = 2.0 * f[3] + (f[0] + f[6]);
-  const double fk2 = 2.0 * f[6] + (f[0] + f[3]);
-  const double fk3 = 2.0 * f[1] + (f[4] + f[7]);
-  const double fk4 = 2.0 * f[4] + (f[1] + f[7]);
-  const double fk5 = 2.0 * f[7] + (f[1] + f[4]);
-  const double fk6 = 2.0 * f[2] + (f[5] + f[8]);
-  const double fk7 = 2.0 * f[5] + (f[2] + f[8]);
-  const double fk8 = 2.0 * f[8] + (f[2] + f[5]);
-
-  return SymmTensor2_3D(coef * ( fk0 * f[0] + fk1 * f[3] + fk2 * f[6] ),
+  return SymmTensor2_3D( coef * ( fk0 * f[0] + fk1 * f[3] + fk2 * f[6] ),
   coef * ( fk3 * f[1] + fk4 * f[4] + fk5 * f[7] ),
   coef * ( fk6 * f[2] + fk7 * f[5] + fk8 * f[8] ),
   coef * ( fk3 * f[2] + fk4 * f[5] + fk5 * f[8] ),
   coef * ( fk0 * f[2] + fk1 * f[5] + fk2 * f[8] ),
-  coef * ( fk0 * f[1] + fk1 * f[4] + fk2 * f[7] ));
+  coef * ( fk0 * f[1] + fk1 * f[4] + fk2 * f[7] ) );
 }
 
 std::array<double, 2> PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::get_tau(
