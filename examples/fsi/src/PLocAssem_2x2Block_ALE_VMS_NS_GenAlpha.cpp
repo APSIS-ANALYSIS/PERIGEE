@@ -137,8 +137,8 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Residual(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
-  double curPt_x[4], curPt_y[4], curPt_z[4];
+  double R[nLocBas], dR_dx[nLocBas], dR_dy[nLocBas], dR_dz[nLocBas];
+  double curPt_x[nLocBas], curPt_y[nLocBas], curPt_z[nLocBas];
 
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, nLocBas, curPt_x, curPt_y, curPt_z);
 
@@ -298,8 +298,8 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
-  double curPt_x[4], curPt_y[4], curPt_z[4];
+  double R[nLocBas], dR_dx[nLocBas], dR_dy[nLocBas], dR_dz[nLocBas];
+  double curPt_x[nLocBas], curPt_y[nLocBas], curPt_z[nLocBas];
 
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, nLocBas, curPt_x, curPt_y, curPt_z);
 
@@ -641,8 +641,8 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Mass_Residual(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
-  double curPt_x[4], curPt_y[4], curPt_z[4];
+  double R[nLocBas], dR_dx[nLocBas], dR_dy[nLocBas], dR_dz[nLocBas];
+  double curPt_x[nLocBas], curPt_y[nLocBas], curPt_z[nLocBas];
 
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, nLocBas, curPt_x, curPt_y, curPt_z);
 
@@ -741,7 +741,7 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  double curPt_x[3], curPt_y[3], curPt_z[3];
+  double curPt_x[snLocBas], curPt_y[snLocBas], curPt_z[snLocBas];
 
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas, curPt_x, curPt_y, curPt_z);
 
@@ -788,7 +788,7 @@ double PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::get_flowrate(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  double curPt_x[3], curPt_y[3], curPt_z[3];
+  double curPt_x[snLocBas], curPt_y[snLocBas], curPt_z[snLocBas];
 
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas, curPt_x, curPt_y, curPt_z);
 
@@ -830,7 +830,7 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::get_pressure_area(
     const IQuadPts * const &quad,
     double &pressure, double &area )
 {
-  double curPt_x[3], curPt_y[3], curPt_z[3];
+  double curPt_x[snLocBas], curPt_y[snLocBas], curPt_z[snLocBas];
 
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas, curPt_x, curPt_y, curPt_z);
 
@@ -862,7 +862,7 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  double curPt_x[3], curPt_y[3], curPt_z[3];
+  double curPt_x[snLocBas], curPt_y[snLocBas], curPt_z[snLocBas];
 
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas, curPt_x, curPt_y, curPt_z);
 
@@ -899,7 +899,7 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  double curPt_x[3], curPt_y[3], curPt_z[3];
+  double curPt_x[snLocBas], curPt_y[snLocBas], curPt_z[snLocBas];
 
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas, curPt_x, curPt_y, curPt_z);
 
@@ -958,7 +958,7 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  double curPt_x[3], curPt_y[3], curPt_z[3];
+  double curPt_x[snLocBas], curPt_y[snLocBas], curPt_z[snLocBas];
 
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas, curPt_x, curPt_y, curPt_z);
 

@@ -132,7 +132,7 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Residual(
 
     Vector_3 coor(0.0, 0.0, 0.0);
 
-    double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
+    double R[nLocBas], dR_dx[nLocBas], dR_dy[nLocBas], dR_dz[nLocBas];
 
     element->get_R_gradR( qua, R, dR_dx, dR_dy, dR_dz );
 
@@ -289,7 +289,7 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Tangent_Residual(
 
     Vector_3 coor(0.0, 0.0, 0.0);
 
-    double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
+    double R[nLocBas], dR_dx[nLocBas], dR_dy[nLocBas], dR_dz[nLocBas];
     
     element->get_R_gradR(qua, R, dR_dx, dR_dy, dR_dz);
 
@@ -562,7 +562,7 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Mass_Residual(
 
     Vector_3 coor(0.0, 0.0, 0.0);
 
-    double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
+    double R[nLocBas], dR_dx[nLocBas], dR_dy[nLocBas], dR_dz[nLocBas];
 
     element->get_R_gradR(qua, R, dR_dx, dR_dy, dR_dz);
 
@@ -757,7 +757,7 @@ std::vector<Tensor2_3D> PLocAssem_2x2Block_VMS_Incompressible::get_Wall_CauchySt
 
   for( int qua = 0; qua < nqp; ++qua )
   {
-    double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
+    double R[nLocBas], dR_dx[nLocBas], dR_dy[nLocBas], dR_dz[nLocBas];
 
     element->get_R_gradR( qua, R, dR_dx, dR_dy, dR_dz );
 
