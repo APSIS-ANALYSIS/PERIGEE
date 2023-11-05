@@ -15,16 +15,18 @@
 #include "FEAElement_Tet10_v2.hpp"
 #include "FEAElement_Hex8.hpp"
 #include "FEAElement_Hex27.hpp"
+#include "VisDataPrep_Elastodynamics.hpp"
+#include "VTK_Writer_Elastodynamics.hpp"
 
 int main( int argc, char * argv[] ) 
 { 
   const std::string element_part_file = "epart.h5";
   const std::string anode_mapping_file = "node_mapping.h5";
   const std::string pnode_mapping_file = "post_node_mapping.h5";
-  const std::string part_file="postpart";
+  const std::string part_file="./ppart/part";
   constexpr int dof = 3;
 
-  std::string sol_bname("SOL_");
+  std::string sol_bname("SOL_disp_");
   std::string out_bname = sol_bname;
   int time_start = 0, time_step = 1, time_end = 1;
   bool isXML = true, isRestart = false;
@@ -120,12 +122,51 @@ int main( int argc, char * argv[] )
   // Print the sampling points on screen
   quad -> print_info();
 
+  // Create the visualization data object
+  IVisDataPrep * visprep = new VisDataPrep_Elastodynamics();
 
+  visprep->print_info();
 
+  // Allocate the container to store the solution values into physical fields.
+  double ** solArrays = new double * [visprep->get_ptarray_size()];
+  for(int ii=0; ii<visprep->get_ptarray_size(); ++ii)
+    solArrays[ii] = new double [pNode->get_nlocghonode() * visprep->get_ptarray_comp_length(ii)];
 
+  // VTK writer 
+  VTK_Writer_Elastodynamics * vtk_w = new VTK_Writer_Elastodynamics( GMIptr->get_nElem(), 
+      GMIptr->get_nLocBas(), element_part_file );
+  
+  std::ostringstream time_index;
 
+  for(int time = time_start; time<=time_end; time+= time_step)
+  {
+    std::string name_to_read(sol_bname);
+    std::string name_to_write(out_bname);
+    time_index.str("");
+    time_index<< 900000000 + time;
+    name_to_read.append(time_index.str());
+    name_to_write.append(time_index.str());
 
+    SYS_T::commPrint("Time %d: Read %s and Write %s \n",
+        time, name_to_read.c_str(), name_to_write.c_str() );
 
+    visprep->get_pointArray(name_to_read, anode_mapping_file, pnode_mapping_file,
+        pNode, GMIptr->get_nFunc(), dof, solArrays);
+
+    vtk_w->writeOutput( fNode, locIEN, locElem,
+        visprep, element, quad, solArrays,
+        rank, size, time * dt, sol_bname, out_bname, name_to_write, isXML );
+  }
+
+  MPI_Barrier(PETSC_COMM_WORLD);
+
+  // ===== Clean the memory =====
+  for(int ii=0; ii<visprep->get_ptarray_size(); ++ii)
+    delete [] solArrays[ii];
+  delete [] solArrays;
+  
+  delete fNode; delete locIEN; delete GMIptr; delete PartBasic; delete locElem;
+  delete pNode; delete quad; delete element; delete visprep; delete vtk_w;
 
   PetscFinalize();
   return EXIT_SUCCESS;
