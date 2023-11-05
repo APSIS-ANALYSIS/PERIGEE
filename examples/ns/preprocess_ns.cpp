@@ -55,7 +55,7 @@ int main( int argc, char * argv[] )
   const int in_ncommon                = paras["in_ncommon"].as<int>();
   const bool isDualGraph              = paras["is_dualgraph"].as<bool>();
 
-  if( elemType != 501 && elemType !=502 && elemType != 601 && elemType != 602 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
+  if( elemType != 501 && elemType != 502 && elemType != 601 && elemType != 602 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
 
   // Print the command line arguments
   cout<<"==== Command Line Arguments ===="<<endl;

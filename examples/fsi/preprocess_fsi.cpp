@@ -22,6 +22,7 @@
 #include "NBC_Partition_MF.hpp"
 #include "NBC_Partition_inflow_MF.hpp"
 #include "EBC_Partition_outflow_MF.hpp"
+#include "yaml-cpp/yaml.h"
 
 int main( int argc, char * argv[] )
 {
@@ -38,86 +39,51 @@ int main( int argc, char * argv[] )
   SYS_T::execute("mkdir apart");
 
   // Define basic settings
-  int elemType = 501; // first order simplicial element
-  const int num_fields = 2; // Two fields : pressure + velocity/displacement
+  constexpr int num_fields = 2; // Two fields : pressure + velocity/displacement
   const std::vector<int> dof_fields {1, 3}; // pressure 1 ; velocity/displacement 3
 
-  // Input files
-  std::string geo_file("./whole_vol.vtu");
-
-  std::string geo_f_file("./lumen_vol.vtu");
-  std::string geo_s_file("./tissue_vol.vtu");
-
-  std::string sur_f_file_wall("./lumen_wall_vol.vtp");
-  std::string sur_f_file_in_base( "./lumen_inlet_vol_" );
-  std::string sur_f_file_out_base("./lumen_outlet_vol_");
-
-  std::string sur_s_file_interior_wall("./tissue_interior_wall_vol.vtp");
-
-  std::string sur_s_file_wall("./tissue_wall_vol.vtp");
-  std::string sur_s_file_in_base( "./tissue_inlet_vol_" );
-  std::string sur_s_file_out_base("./tissue_outlet_vol_");
-
-  int num_outlet = 1, num_inlet = 1;
-
-  const std::string part_file_p("./apart/part_p");
-  const std::string part_file_v("./apart/part_v");
-
-  // fsiBC_type : 0 deformable wall, 1 rigid wall, 2 prestress generation
-  int fsiBC_type = 0;
-
-  // ringBC_type : 0 fully clamped, 1 in-plane motion allowed
-  int ringBC_type = 0;
-
-  // Mesh partition setting
-  int cpu_size = 1;
-  int in_ncommon = 2;
-  bool isDualGraph = true;
-
-  bool isReload = false;
-
-  bool isPrintMeshQual = true;
-  double critical_val_aspect_ratio = 3.5;
-
   // Yaml options
-  bool is_loadYaml = true;
-  std::string yaml_file("./options_pre.yml");
+  const std::string yaml_file("fsi_preprocess.yml");
 
-  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+  // Check if the yaml file exist on disk
+  SYS_T::file_check(yaml_file);
 
-  SYS_T::GetOptionBool(  "-is_loadYaml",         is_loadYaml);
-  SYS_T::GetOptionString("-yaml_file",           yaml_file);
+  YAML::Node paras = YAML::LoadFile( yaml_file );
 
-  SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: preprocessor needs to be run in serial.\n");
+  const int elemType                          = paras["elem_type"].as<int>();
+  const int fsiBC_type                        = paras["fsiBC_type"].as<int>();
+  const int ringBC_type                       = paras["ringBC_type"].as<int>();
+  const int num_inlet                         = paras["num_inlet"].as<int>();
+  const int num_outlet                        = paras["num_outlet"].as<int>();
+  const std::string geo_file                  = paras["geo_file"].as<std::string>();
+  const std::string geo_f_file                = paras["geo_f_file"].as<std::string>();
+  const std::string geo_s_file                = paras["geo_s_file"].as<std::string>();
 
-  if(is_loadYaml) SYS_T::InsertFileYAML( yaml_file,  false );
+  const std::string sur_f_file_wall           = paras["sur_f_file_wall"].as<std::string>();
+  const std::string sur_f_file_in_base        = paras["sur_f_file_in_base"].as<std::string>();
+  const std::string sur_f_file_out_base       = paras["sur_f_file_out_base"].as<std::string>();
 
-  SYS_T::GetOptionInt(   "-cpu_size",            cpu_size);
-  SYS_T::GetOptionInt(   "-in_ncommon",          in_ncommon);
-  SYS_T::GetOptionInt(   "-fsiBC_type",          fsiBC_type);
-  SYS_T::GetOptionInt(   "-ringBC_type",         ringBC_type);
-  SYS_T::GetOptionInt(   "-num_outlet",          num_outlet);
-  SYS_T::GetOptionInt(   "-num_inlet",           num_inlet);
-  SYS_T::GetOptionInt(   "-elem_type",           elemType);
-  SYS_T::GetOptionString("-geo_file",            geo_file);
-  SYS_T::GetOptionString("-geo_f_file",          geo_f_file);
-  SYS_T::GetOptionString("-geo_s_file",          geo_s_file);
-  SYS_T::GetOptionString("-sur_f_file_wall",     sur_f_file_wall);
-  SYS_T::GetOptionString("-sur_s_file_wall",     sur_s_file_wall);
-  SYS_T::GetOptionString("-sur_s_file_int_wall", sur_s_file_interior_wall);
-  SYS_T::GetOptionString("-sur_f_file_in_base",  sur_f_file_in_base);
-  SYS_T::GetOptionString("-sur_f_file_out_base", sur_f_file_out_base);
-  SYS_T::GetOptionString("-sur_s_file_in_base",  sur_s_file_in_base);
-  SYS_T::GetOptionString("-sur_s_file_out_base", sur_s_file_out_base);
-  SYS_T::GetOptionBool(  "-isReload",            isReload);
-  SYS_T::GetOptionBool(  "-isDualGraph",         isDualGraph);
-  SYS_T::GetOptionBool(  "-isPrintMeshQual",     isPrintMeshQual);
-  SYS_T::GetOptionReal(  "-critical_val_aspect_ratio", critical_val_aspect_ratio);
+  const std::string sur_s_file_interior_wall  = paras["sur_s_file_interior_wall"].as<std::string>();
+  const std::string sur_s_file_wall           = paras["sur_s_file_wall"].as<std::string>();
+  const std::string sur_s_file_in_base        = paras["sur_s_file_in_base"].as<std::string>();
+  const std::string sur_s_file_out_base       = paras["sur_s_file_out_base"].as<std::string>();
 
+  const std::string part_file_p               = paras["part_file_p"].as<std::string>();
+  const std::string part_file_v               = paras["part_file_v"].as<std::string>();
+  const int cpu_size                          = paras["cpu_size"].as<int>();
+  const int in_ncommon                        = paras["in_ncommon"].as<int>();
+  const bool isDualGraph                      = paras["is_dualgraph"].as<bool>();
+  const bool isReload                         = paras["is_reload"].as<bool>();
+
+  const bool isPrintMeshQual                  = paras["is_printmeshqual"].as<bool>();
+  const double critical_val_aspect_ratio      = paras["critical_val_aspect_ratio"].as<double>();
+
+  SYS_T::print_fatal_if( elemType != 501 && elemType != 601 , "ERROR: unknown element type %d.\n", elemType );
   SYS_T::print_fatal_if( fsiBC_type != 0 && fsiBC_type != 1 && fsiBC_type != 2, "Error: fsiBC_type should be 0, 1, or 2.\n" );
-  SYS_T::print_fatal_if( ringBC_type != 0 && ringBC_type != 1, "Error: ringBC_type should be 0 or 1.\n" );
+  SYS_T::print_fatal_if( ringBC_type != 0, "Error: ringBC_type should be 0.\n" );
 
   std::cout<<"===== Command Line Arguments ====="<<std::endl;
+  std::cout<<" -elem_type: "          <<elemType           <<std::endl;
   std::cout<<" -fsiBC_type: "         <<fsiBC_type         <<std::endl;
   std::cout<<" -ringBC_type: "        <<ringBC_type        <<std::endl;
   std::cout<<" -num_inlet: "          <<num_inlet          <<std::endl;
@@ -658,7 +624,7 @@ int main( int argc, char * argv[] )
   delete ebc; delete InFBC; delete mesh_ebc; 
   delete mnindex_p; delete mnindex_v; delete mesh_p; delete mesh_v; 
   delete IEN_p; delete IEN_v; delete mytimer; delete global_part; 
-  PetscFinalize();
+
   cout<<"===> Preprocessing completes successfully!\n";
   return EXIT_SUCCESS;
 }
