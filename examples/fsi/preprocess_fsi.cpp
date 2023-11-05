@@ -377,7 +377,7 @@ int main( int argc, char * argv[] )
       // Generate the mesh for kinematics
       mesh_v = new Mesh_FEM(nFunc_v, nElem, 8, 1);
       // Generate the mesh for pressure (discontinuous over interface)
-      mesh_p = new Mesh_FEM(nFunc_p, nElem, 27, 2);
+      mesh_p = new Mesh_FEM(nFunc_p, nElem, 8, 1);
       break;   
     default:
       SYS_T::print_fatal("Error: elemType %d is not supported.\n", elemType);
