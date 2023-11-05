@@ -1,6 +1,6 @@
-#include "PLocAssem_Tet4_FSI_Mesh_Laplacian.hpp"
+#include "PLocAssem_FSI_Mesh_Laplacian.hpp"
 
-PLocAssem_Tet4_FSI_Mesh_Laplacian::PLocAssem_Tet4_FSI_Mesh_Laplacian()
+PLocAssem_FSI_Mesh_Laplacian::PLocAssem_FSI_Mesh_Laplacian()
 : num_ebc_fun(0), nLocBas(4), vec_size(12)
 {
   Tangent = new PetscScalar[vec_size * vec_size];
@@ -14,13 +14,13 @@ PLocAssem_Tet4_FSI_Mesh_Laplacian::PLocAssem_Tet4_FSI_Mesh_Laplacian()
   print_info();
 }
 
-PLocAssem_Tet4_FSI_Mesh_Laplacian::~PLocAssem_Tet4_FSI_Mesh_Laplacian()
+PLocAssem_FSI_Mesh_Laplacian::~PLocAssem_FSI_Mesh_Laplacian()
 {
   delete [] Tangent; delete [] Residual; Tangent = nullptr; Residual = nullptr;
   if(num_ebc_fun > 0) delete [] flist;
 }
 
-void PLocAssem_Tet4_FSI_Mesh_Laplacian::print_info() const
+void PLocAssem_FSI_Mesh_Laplacian::print_info() const
 {
   SYS_T::print_sep_line();
   PetscPrintf(PETSC_COMM_WORLD, "  Three-dimensional Laplacian equation: \n");
@@ -29,23 +29,23 @@ void PLocAssem_Tet4_FSI_Mesh_Laplacian::print_info() const
   SYS_T::print_sep_line();
 }
 
-void PLocAssem_Tet4_FSI_Mesh_Laplacian::Zero_Tangent_Residual()
+void PLocAssem_FSI_Mesh_Laplacian::Zero_Tangent_Residual()
 {
   for(int ii=0; ii<vec_size; ++ii) Residual[ii] = 0.0;
   for(int ii=0; ii<vec_size * vec_size; ++ii) Tangent[ii] = 0.0;
 }
 
-void PLocAssem_Tet4_FSI_Mesh_Laplacian::Zero_Residual()
+void PLocAssem_FSI_Mesh_Laplacian::Zero_Residual()
 {
   for(int ii=0; ii<vec_size; ++ii) Residual[ii] = 0.0;
 }
 
-void PLocAssem_Tet4_FSI_Mesh_Laplacian::Assem_Estimate()
+void PLocAssem_FSI_Mesh_Laplacian::Assem_Estimate()
 {
   for(int ii=0; ii<vec_size * vec_size; ++ii) Tangent[ii] = 1.0;
 }
 
-void PLocAssem_Tet4_FSI_Mesh_Laplacian::Assem_Tangent_Residual(
+void PLocAssem_FSI_Mesh_Laplacian::Assem_Tangent_Residual(
     const double &time, const double &dt,
     const double * const &vec_a,
     const double * const &vec_b,
@@ -121,7 +121,7 @@ void PLocAssem_Tet4_FSI_Mesh_Laplacian::Assem_Tangent_Residual(
   }
 }
 
-void PLocAssem_Tet4_FSI_Mesh_Laplacian::Assem_Residual(
+void PLocAssem_FSI_Mesh_Laplacian::Assem_Residual(
     const double &time, const double &dt,
     const double * const &vec_a,
     const double * const &vec_b,

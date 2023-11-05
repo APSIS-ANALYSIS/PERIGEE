@@ -27,11 +27,11 @@
 #include "GenBC_Pressure.hpp"
 #include "MaterialModel_NeoHookean_M94_Mixed.hpp"
 #include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
-#include "PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha.hpp"
-#include "PLocAssem_2x2Block_Tet4_VMS_Incompressible.hpp"
-#include "PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity.hpp"
-#include "PLocAssem_Tet4_FSI_Mesh_Elastostatic.hpp"
-#include "PLocAssem_Tet4_FSI_Mesh_Laplacian.hpp"
+#include "PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha.hpp"
+#include "PLocAssem_2x2Block_VMS_Incompressible.hpp"
+#include "PLocAssem_2x2Block_VMS_Hyperelasticity.hpp"
+#include "PLocAssem_FSI_Mesh_Elastostatic.hpp"
+#include "PLocAssem_FSI_Mesh_Laplacian.hpp"
 #include "PGAssem_FSI.hpp"
 #include "PGAssem_Mesh.hpp"
 #include "PTime_FSI_Solver.hpp"
@@ -432,7 +432,7 @@ int main(int argc, char *argv[])
   tm_galpha_ptr->print_info();
 
   // ===== Local assembly =====
-  IPLocAssem_2x2Block * locAssem_fluid_ptr = new PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha(
+  IPLocAssem_2x2Block * locAssem_fluid_ptr = new PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha(
       tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas(), 
       fluid_density, fluid_mu, bs_beta );
 
@@ -443,21 +443,21 @@ int main(int argc, char *argv[])
   {
     matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( solid_density, solid_E );
 
-    locAssem_solid_ptr = new PLocAssem_2x2Block_Tet4_VMS_Incompressible(
+    locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Incompressible(
         matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
   }
   else
   {
     matmodel = new MaterialModel_NeoHookean_M94_Mixed( solid_density, solid_E, solid_nu );
 
-    locAssem_solid_ptr = new PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity(
+    locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Hyperelasticity(
         matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
   }
 
   matmodel -> write_hdf5(); // record model parameter on disk
 
   // Pseudo elastic mesh motion
-  IPLocAssem * locAssem_mesh_ptr = new PLocAssem_Tet4_FSI_Mesh_Laplacian();
+  IPLocAssem * locAssem_mesh_ptr = new PLocAssem_FSI_Mesh_Laplacian();
   
   // ===== Initial condition =====
   PDNSolution * base = new PDNSolution_V( pNode_v, fNode, locinfnbc, 1, true, "base" ); 

@@ -117,11 +117,11 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/PDNTimeStep.cpp
   ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
-  ${perigee_SOURCE_DIR}/src/PLocAssem_Tet4_FSI_Mesh_Elastostatic.cpp
-  ${perigee_SOURCE_DIR}/src/PLocAssem_Tet4_FSI_Mesh_Laplacian.cpp
-  ${perigee_SOURCE_DIR}/src/PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha.cpp
-  ${perigee_SOURCE_DIR}/src/PLocAssem_2x2Block_Tet4_VMS_Incompressible.cpp
-  ${perigee_SOURCE_DIR}/src/PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_FSI_Mesh_Elastostatic.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_FSI_Mesh_Laplacian.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_2x2Block_VMS_Incompressible.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_2x2Block_VMS_Hyperelasticity.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_V.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_P.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_Mesh.cpp

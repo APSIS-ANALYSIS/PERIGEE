@@ -1,6 +1,6 @@
-#include "PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity.hpp"
+#include "PLocAssem_2x2Block_VMS_Hyperelasticity.hpp"
 
-PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity(
+PLocAssem_2x2Block_VMS_Hyperelasticity::PLocAssem_2x2Block_VMS_Hyperelasticity(
     IMaterialModel * const &in_matmodel,
     const TimeMethod_GenAlpha * const &tm_gAlpha,
     const int &in_nlocbas, const int &in_snlocbas )
@@ -29,7 +29,7 @@ PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::PLocAssem_2x2Block_Tet4_VMS_Hyperel
 }
 
 
-PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::~PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity()
+PLocAssem_2x2Block_VMS_Hyperelasticity::~PLocAssem_2x2Block_VMS_Hyperelasticity()
 {
   delete [] Tangent00; Tangent00 = nullptr;
   delete [] Tangent01; Tangent01 = nullptr;
@@ -43,7 +43,7 @@ PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::~PLocAssem_2x2Block_Tet4_VMS_Hypere
 }
 
 
-void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::print_info() const
+void PLocAssem_2x2Block_VMS_Hyperelasticity::print_info() const
 {
   SYS_T::print_sep_line();
   SYS_T::commPrint("  Three-dimensional Hyper-elastic solid model:\n");
@@ -55,7 +55,7 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::print_info() const
 }
 
 
-std::array<double, 2> PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::get_tau( 
+std::array<double, 2> PLocAssem_2x2Block_VMS_Hyperelasticity::get_tau( 
     const double &dt, const double &Jin, const double &dx ) const
 {
   const double mu = matmodel->get_elastic_mu();
@@ -66,7 +66,7 @@ std::array<double, 2> PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::get_tau(
 }
 
 
-void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Zero_Tangent_Residual()
+void PLocAssem_2x2Block_VMS_Hyperelasticity::Zero_Tangent_Residual()
 {
   for(int ii=0; ii<vec_size_0; ++ii) Residual0[ii] = 0.0;
   for(int ii=0; ii<vec_size_1; ++ii) Residual1[ii] = 0.0;
@@ -78,14 +78,14 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Zero_Tangent_Residual()
 }
 
 
-void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Zero_Residual()
+void PLocAssem_2x2Block_VMS_Hyperelasticity::Zero_Residual()
 {
   for(int ii=0; ii<vec_size_0; ++ii) Residual0[ii] = 0.0;
   for(int ii=0; ii<vec_size_1; ++ii) Residual1[ii] = 0.0;
 }
 
 
-void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Estimate()
+void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Estimate()
 {
   for(int ii=0; ii<vec_size_0 * vec_size_0; ++ii) Tangent00[ii] = 1.0;
   for(int ii=0; ii<vec_size_0 * vec_size_1; ++ii) Tangent01[ii] = 1.0;
@@ -93,7 +93,7 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Estimate()
   for(int ii=0; ii<vec_size_1 * vec_size_1; ++ii) Tangent11[ii] = 1.0;
 }
 
-void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Residual(
+void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Residual(
     const double &time, const double &dt,
     const double * const &dot_disp,
     const double * const &dot_velo,
@@ -247,7 +247,7 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Residual(
   }
 }
 
-void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Tangent_Residual(
+void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Tangent_Residual(
         const double &time, const double &dt,
         const double * const &dot_disp,
         const double * const &dot_velo,
@@ -561,7 +561,7 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Tangent_Residual(
   } // Finish Loop-qua
 }
 
-void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Mass_Residual(
+void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Mass_Residual(
     const double * const &disp,
     const double * const &velo,
     const double * const &pres,
@@ -693,7 +693,7 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Mass_Residual(
   } // Finish loop-qua
 }
 
-void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Residual_EBC(
+void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Residual_EBC(
     const int &ebc_id,
     const double &time, const double &dt,
     FEAElement * const &element,
@@ -736,7 +736,7 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Residual_EBC(
   }
 }
 
-void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Residual_Interior_Wall_EBC(
+void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Residual_Interior_Wall_EBC(
     const double &time,
     const double * const &pres,
     FEAElement * const &element,
@@ -770,7 +770,7 @@ void PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::Assem_Residual_Interior_Wall_E
   }
 }
 
-std::vector<Tensor2_3D> PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::get_Wall_CauchyStress(
+std::vector<Tensor2_3D> PLocAssem_2x2Block_VMS_Hyperelasticity::get_Wall_CauchyStress(
     const double * const &disp,
     const double * const &pres,
     FEAElement * const &element,

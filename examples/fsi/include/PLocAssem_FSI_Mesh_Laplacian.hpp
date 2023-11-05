@@ -1,7 +1,7 @@
-#ifndef PLOCASSEM_TET4_FSI_MESH_LAPLACIAN_HPP
-#define PLOCASSEM_TET4_FSI_MESH_LAPLACIAN_HPP
+#ifndef PLOCASSEM_FSI_MESH_LAPLACIAN_HPP
+#define PLOCASSEM_FSI_MESH_LAPLACIAN_HPP
 // ==================================================================
-// PLocAssem_Tet4_FSI_Mesh_Laplacian.hpp
+// PLocAssem_FSI_Mesh_Laplacian.hpp
 //
 // This is the local assembly routine for the mesh motion in FSI
 // problem using the harmonic extension of the solid displacement.
@@ -11,12 +11,12 @@
 // ==================================================================
 #include "IPLocAssem.hpp"
 
-class PLocAssem_Tet4_FSI_Mesh_Laplacian : public IPLocAssem
+class PLocAssem_FSI_Mesh_Laplacian : public IPLocAssem
 {
   public:
-    PLocAssem_Tet4_FSI_Mesh_Laplacian();
+    PLocAssem_FSI_Mesh_Laplacian();
 
-    virtual ~PLocAssem_Tet4_FSI_Mesh_Laplacian();
+    virtual ~PLocAssem_FSI_Mesh_Laplacian();
 
     virtual int get_dof() const {return 3;}
 
@@ -61,7 +61,7 @@ class PLocAssem_Tet4_FSI_Mesh_Laplacian : public IPLocAssem
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad )
-    {SYS_T::print_fatal("Error: PLocAssem_Tet4_FSI_Mesh_Laplacian::Assem_Mass_Residual is not implemented. \n");}
+    {SYS_T::print_fatal("Error: PLocAssem_FSI_Mesh_Laplacian::Assem_Mass_Residual is not implemented. \n");}
 
 
     virtual void Assem_Residual_EBC(
@@ -74,7 +74,7 @@ class PLocAssem_Tet4_FSI_Mesh_Laplacian : public IPLocAssem
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad )
-    {SYS_T::print_fatal("Error: PLocAssem_Tet4_FSI_Mesh_Laplacian::Assem_Residual_EBC is not implemented. \n");}
+    {SYS_T::print_fatal("Error: PLocAssem_FSI_Mesh_Laplacian::Assem_Residual_EBC is not implemented. \n");}
 
   private:
     const int num_ebc_fun, nLocBas, vec_size;
@@ -94,7 +94,7 @@ class PLocAssem_Tet4_FSI_Mesh_Laplacian : public IPLocAssem
       gx = 0.0; gy = 0.0; gz = 0.0;
     }
 
-    typedef void ( PLocAssem_Tet4_FSI_Mesh_Laplacian::*locassem_fsi_mesh_lap_funs )( const double &x, const double &y, const double &z,
+    typedef void ( PLocAssem_FSI_Mesh_Laplacian::*locassem_fsi_mesh_lap_funs )( const double &x, const double &y, const double &z,
         const double &t, const double &nx, const double &ny,
         const double &nz, double &gx, double &gy, double &gz ) const;
 

@@ -1,7 +1,7 @@
-#ifndef PLOCASSEM_TET4_FSI_MESH_ELASTOSTATIC_HPP
-#define PLOCASSEM_TET4_FSI_MESH_ELASTOSTATIC_HPP
+#ifndef PLOCASSEM_FSI_MESH_ELASTOSTATIC_HPP
+#define PLOCASSEM_FSI_MESH_ELASTOSTATIC_HPP
 // ==================================================================
-// PLocAssem_Tet4_FSI_Mesh_Elastostatic.hpp
+// PLocAssem_FSI_Mesh_Elastostatic.hpp
 //
 // This is the local assembly routine for the mesh motion in FSI 
 // using the elastostatic equations to update the fluid domain.
@@ -23,13 +23,13 @@
 // ==================================================================
 #include "IPLocAssem.hpp"
 
-class PLocAssem_Tet4_FSI_Mesh_Elastostatic : public IPLocAssem
+class PLocAssem_FSI_Mesh_Elastostatic : public IPLocAssem
 {
   public:
-    PLocAssem_Tet4_FSI_Mesh_Elastostatic( const double &in_mat_E, 
+    PLocAssem_FSI_Mesh_Elastostatic( const double &in_mat_E, 
         const double &in_mat_nu );
 
-    virtual ~PLocAssem_Tet4_FSI_Mesh_Elastostatic();
+    virtual ~PLocAssem_FSI_Mesh_Elastostatic();
 
     virtual int get_dof() const {return 3;}
 
@@ -56,7 +56,7 @@ class PLocAssem_Tet4_FSI_Mesh_Elastostatic : public IPLocAssem
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad )
-    {SYS_T::print_fatal("Error: PLocAssem_Tet4_FSI_Mesh_Laplacian::Assem_Residual is not implemented. \n");}
+    {SYS_T::print_fatal("Error: PLocAssem_FSI_Mesh_Laplacian::Assem_Residual is not implemented. \n");}
 
     virtual void Assem_Tangent_Residual(
         const double &time, const double &dt,
@@ -75,7 +75,7 @@ class PLocAssem_Tet4_FSI_Mesh_Elastostatic : public IPLocAssem
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad )
-    {SYS_T::print_fatal("Error: PLocAssem_Tet4_FSI_Mesh_Laplacian::Assem_Mass_Residual is not implemented. \n");}
+    {SYS_T::print_fatal("Error: PLocAssem_FSI_Mesh_Laplacian::Assem_Mass_Residual is not implemented. \n");}
 
     virtual void Assem_Residual_EBC(
         const int &ebc_id,
@@ -87,7 +87,7 @@ class PLocAssem_Tet4_FSI_Mesh_Elastostatic : public IPLocAssem
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad )
-    {SYS_T::print_fatal("Error: PLocAssem_Tet4_FSI_Mesh_Laplacian::Assem_Residual_EBC is not implemented. \n");}
+    {SYS_T::print_fatal("Error: PLocAssem_FSI_Mesh_Laplacian::Assem_Residual_EBC is not implemented. \n");}
 
   private:
     const double E, nu, lambda, mu, kappa;

@@ -16,8 +16,8 @@
 #include "FEAElement_Tet4.hpp"
 #include "MaterialModel_NeoHookean_M94_Mixed.hpp"
 #include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
-#include "PLocAssem_2x2Block_Tet4_VMS_Incompressible.hpp"
-#include "PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity.hpp"
+#include "PLocAssem_2x2Block_VMS_Incompressible.hpp"
+#include "PLocAssem_2x2Block_VMS_Hyperelasticity.hpp"
 #include "PTime_FSI_Solver.hpp"
 
 int main( int argc, char *argv[] )
@@ -285,14 +285,14 @@ int main( int argc, char *argv[] )
     {
       matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( "material_model.h5" );
 
-      locAssem_solid_ptr = new PLocAssem_2x2Block_Tet4_VMS_Incompressible(
+      locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Incompressible(
           matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
     }
     else
     {
       matmodel = new MaterialModel_NeoHookean_M94_Mixed( "material_model.h5" );
 
-      locAssem_solid_ptr = new PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity(
+      locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Hyperelasticity(
           matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
     }
   }
@@ -302,14 +302,14 @@ int main( int argc, char *argv[] )
     {
       matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( solid_density, solid_E );
 
-      locAssem_solid_ptr = new PLocAssem_2x2Block_Tet4_VMS_Incompressible(
+      locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Incompressible(
           matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
     }
     else
     {
       matmodel = new MaterialModel_NeoHookean_M94_Mixed( solid_density, solid_E, solid_nu );
 
-      locAssem_solid_ptr = new PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity(
+      locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Hyperelasticity(
           matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
     }
   }

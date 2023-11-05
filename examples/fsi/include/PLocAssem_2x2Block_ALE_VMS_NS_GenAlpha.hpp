@@ -1,7 +1,7 @@
-#ifndef PLOCASSEM_2x2BLOCK_TET4_ALE_VMS_NS_GENALPHA_HPP
-#define PLOCASSEM_2x2BLOCK_TET4_ALE_VMS_NS_GENALPHA_HPP
+#ifndef PLOCASSEM_2x2BLOCK_ALE_VMS_NS_GENALPHA_HPP
+#define PLOCASSEM_2x2BLOCK_ALE_VMS_NS_GENALPHA_HPP
 // ============================================================================
-// PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha.hpp
+// PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha.hpp
 //
 // This is a local assembly routine for ALE-VMS formulation of the 3D
 // Navier-Stokes equations with Generalized-alpha for time stepping.
@@ -13,16 +13,16 @@
 #include "TimeMethod_GenAlpha.hpp"
 #include "SymmTensor2_3D.hpp"
 
-class PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
+class PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
 {
   public:
-    PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha(
+    PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha(
         const TimeMethod_GenAlpha * const &tm_gAlpha,
         const int &in_nlocbas, const int &in_snlocbas,
         const double &in_rho, const double &in_vis_mu,
         const double &in_beta );
 
-    virtual ~PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha();
+    virtual ~PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha();
 
     virtual int get_dof_0() const {return 3;}
 
@@ -216,10 +216,10 @@ class PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
     }
 
     // Define Natural BC functions
-    typedef Vector_3 ( PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::*locassem_2x2block_tet4_ale_vms_ns_funs )( 
+    typedef Vector_3 ( PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::*locassem_2x2block_ale_vms_ns_funs )( 
         const Vector_3 &pt, const double &tt, const Vector_3 &n_out ) const;
 
-    locassem_2x2block_tet4_ale_vms_ns_funs * flist;
+    locassem_2x2block_ale_vms_ns_funs * flist;
 
     Vector_3 get_ebc_fun( const int &ebc_id,
         const Vector_3 &pt, const double &tt, const Vector_3 &n_out ) const

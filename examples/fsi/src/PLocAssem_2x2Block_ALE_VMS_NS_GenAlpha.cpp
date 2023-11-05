@@ -1,6 +1,6 @@
-#include "PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha.hpp"
+#include "PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha.hpp"
 
-PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha(
+PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha(
     const TimeMethod_GenAlpha * const &tm_gAlpha,
     const int &in_nlocbas, const int &in_snlocbas,
     const double &in_rho, const double &in_vis_mu, const double &in_beta )
@@ -29,7 +29,7 @@ PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::PLocAssem_2x2Block_Tet4_ALE_VMS_NS_
   print_info();
 }
 
-PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::~PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha()
+PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::~PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha()
 {
   delete [] Tangent00; Tangent00 = nullptr;
   delete [] Tangent01; Tangent01 = nullptr;
@@ -45,7 +45,7 @@ PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::~PLocAssem_2x2Block_Tet4_ALE_VMS_NS
 }
 
 
-void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::print_info() const
+void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::print_info() const
 {
   SYS_T::print_sep_line();
   SYS_T::commPrint("  Three-dimensional Incompressible Navier-Stokes equations: \n");
@@ -66,7 +66,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::print_info() const
   SYS_T::print_sep_line();
 }
 
-SymmTensor2_3D PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::get_metric(
+SymmTensor2_3D PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::get_metric(
     const std::array<double, 9> &f ) const
 {
   // PHASTA definition 
@@ -90,7 +90,7 @@ SymmTensor2_3D PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::get_metric(
   coef * ( fk0 * f[1] + fk1 * f[4] + fk2 * f[7] ));
 }
 
-std::array<double, 2> PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::get_tau(
+std::array<double, 2> PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::get_tau(
     const double &dt, const std::array<double, 9> &dxi_dx,
     const double &u, const double &v, const double &w ) const
 {
@@ -108,7 +108,7 @@ std::array<double, 2> PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::get_tau(
   return {{1.0 / (rho0 * denom_m ), rho0 * denom_m / G.tr()}};
 }
 
-double PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::get_DC(
+double PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::get_DC(
     const std::array<double, 9> &dxi_dx,
     const double &u, const double &v, const double &w ) const
 {
@@ -123,7 +123,7 @@ double PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::get_DC(
   return dc_tau;
 }
 
-void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual(
+void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Residual(
     const double &time, const double &dt,
     const double * const &dot_disp,
     const double * const &dot_velo,
@@ -284,7 +284,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual(
   }
 }
 
-void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
+void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     const double &time, const double &dt,
     const double * const &dot_disp,
     const double * const &dot_velo,
@@ -631,7 +631,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
   } // qua-loop
 }
 
-void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Mass_Residual(
+void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Mass_Residual(
     const double * const &disp,
     const double * const &velo,
     const double * const &pres,
@@ -731,7 +731,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Mass_Residual(
   }
 }
 
-void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC(
+void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC(
     const int &ebc_id,
     const double &time, const double &dt,
     const double * const &disp,
@@ -779,7 +779,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC(
   }
 }
 
-double PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::get_flowrate( 
+double PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::get_flowrate( 
     const double * const &disp,
     const double * const &velo,
     FEAElement * const &element,
@@ -820,7 +820,7 @@ double PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::get_flowrate(
   return flrate;
 }
 
-void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::get_pressure_area( 
+void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::get_pressure_area( 
     const double * const &disp,
     const double * const &pres,
     FEAElement * const &element,
@@ -853,7 +853,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::get_pressure_area(
   }
 }
 
-void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
+void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
     const double &val,
     const double * const &disp,
     FEAElement * const &element,
@@ -889,7 +889,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
   }
 }
 
-void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
+void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
     const double * const &dot_disp,
     const double * const &disp,
     const double * const &velo,
@@ -947,7 +947,7 @@ void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
   }
 }
 
-void PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
+void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
     const double &dt,
     const double * const &dot_disp,
     const double * const &disp,

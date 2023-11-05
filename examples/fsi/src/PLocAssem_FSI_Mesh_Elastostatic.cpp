@@ -1,6 +1,6 @@
-#include "PLocAssem_Tet4_FSI_Mesh_Elastostatic.hpp"
+#include "PLocAssem_FSI_Mesh_Elastostatic.hpp"
 
-PLocAssem_Tet4_FSI_Mesh_Elastostatic::PLocAssem_Tet4_FSI_Mesh_Elastostatic(
+PLocAssem_FSI_Mesh_Elastostatic::PLocAssem_FSI_Mesh_Elastostatic(
     const double &in_mat_E, const double &in_mat_nu )
 : E(in_mat_E), nu(in_mat_nu), lambda( nu * E / ((1+nu) * (1-2.0*nu)) ),
   mu( E/(2.0+2.0*nu) ), kappa( lambda + 2.0 * mu / 3.0 ),
@@ -14,12 +14,12 @@ PLocAssem_Tet4_FSI_Mesh_Elastostatic::PLocAssem_Tet4_FSI_Mesh_Elastostatic(
   print_info();
 }
 
-PLocAssem_Tet4_FSI_Mesh_Elastostatic::~PLocAssem_Tet4_FSI_Mesh_Elastostatic()
+PLocAssem_FSI_Mesh_Elastostatic::~PLocAssem_FSI_Mesh_Elastostatic()
 {
   delete [] Tangent; delete [] Residual; Tangent = nullptr; Residual = nullptr;
 }
 
-void PLocAssem_Tet4_FSI_Mesh_Elastostatic::print_info() const
+void PLocAssem_FSI_Mesh_Elastostatic::print_info() const
 {
   SYS_T::commPrint("  Three-dimensional Elastostatic equation: \n");
   SYS_T::commPrint("  Spatial: Galerkin Finite element \n");
@@ -34,23 +34,23 @@ void PLocAssem_Tet4_FSI_Mesh_Elastostatic::print_info() const
 }
 
 
-void PLocAssem_Tet4_FSI_Mesh_Elastostatic::Zero_Tangent_Residual()
+void PLocAssem_FSI_Mesh_Elastostatic::Zero_Tangent_Residual()
 {
   for(int ii=0; ii<vec_size; ++ii) Residual[ii] = 0.0;
   for(int ii=0; ii<vec_size * vec_size; ++ii) Tangent[ii] = 0.0;
 }
 
-void PLocAssem_Tet4_FSI_Mesh_Elastostatic::Zero_Residual()
+void PLocAssem_FSI_Mesh_Elastostatic::Zero_Residual()
 {
   for(int ii=0; ii<vec_size; ++ii) Residual[ii] = 0.0;
 }
 
-void PLocAssem_Tet4_FSI_Mesh_Elastostatic::Assem_Estimate()
+void PLocAssem_FSI_Mesh_Elastostatic::Assem_Estimate()
 {
   for(int ii=0; ii<vec_size * vec_size; ++ii) Tangent[ii] = 1.0;
 }
 
-void PLocAssem_Tet4_FSI_Mesh_Elastostatic::get_currPts(
+void PLocAssem_FSI_Mesh_Elastostatic::get_currPts(
     const double * const &ept_x, const double * const &ept_y,
     const double * const &ept_z, const double * const &sol,
     double * const &cur_x, double * const &cur_y,
@@ -64,7 +64,7 @@ void PLocAssem_Tet4_FSI_Mesh_Elastostatic::get_currPts(
   }
 }
 
-void PLocAssem_Tet4_FSI_Mesh_Elastostatic::Assem_Tangent_Residual(
+void PLocAssem_FSI_Mesh_Elastostatic::Assem_Tangent_Residual(
     const double &time, const double &dt,
     const double * const &vec_a,
     const double * const &vec_b,
