@@ -63,7 +63,7 @@ void PLocAssem_FSI_Mesh_Laplacian::Assem_Tangent_Residual(
   
   const double curr = time;
   
-  double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
+  double R[nLocBas], dR_dx[nLocBas], dR_dy[nLocBas], dR_dz[nLocBas];
 
   for(int qua=0; qua<nqp; ++qua)
   {
@@ -139,7 +139,7 @@ void PLocAssem_FSI_Mesh_Laplacian::Assem_Residual(
 
   const double curr = time;
   
-  double R[4], dR_dx[4], dR_dy[4], dR_dz[4];
+  double R[nLocBas], dR_dx[nLocBas], dR_dy[nLocBas], dR_dz[nLocBas];
 
   for(int qua=0; qua<nqp; ++qua)
   {

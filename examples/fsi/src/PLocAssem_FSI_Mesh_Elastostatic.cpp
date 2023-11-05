@@ -74,7 +74,7 @@ void PLocAssem_FSI_Mesh_Elastostatic::Assem_Tangent_Residual(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  double curPt_x[4], curPt_y[4], curPt_z[4];
+  double curPt_x[nLocBas], curPt_y[nLocBas], curPt_z[nLocBas];
 
   // vec_a passes the previous time step displacement.
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, vec_a, curPt_x, curPt_y, curPt_z );
@@ -88,7 +88,7 @@ void PLocAssem_FSI_Mesh_Elastostatic::Assem_Tangent_Residual(
 
   Zero_Tangent_Residual();
 
-  double dR_dx[4], dR_dy[4], dR_dz[4];
+  double dR_dx[nLocBas], dR_dy[nLocBas], dR_dz[nLocBas];
 
   for( int qua=0; qua<nqp; ++qua )
   {
