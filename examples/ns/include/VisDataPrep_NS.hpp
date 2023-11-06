@@ -15,7 +15,7 @@ class VisDataPrep_NS : public IVisDataPrep
   public:
     VisDataPrep_NS();
 
-    virtual ~VisDataPrep_NS();
+    virtual ~VisDataPrep_NS() = default;
 
     // Return the number of physical fields to be read from solution
     // vector
