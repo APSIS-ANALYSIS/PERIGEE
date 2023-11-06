@@ -13,9 +13,6 @@ VisDataPrep_Elastodynamics::VisDataPrep_Elastodynamics()
   pt_array_len.push_back(3);
 }
 
-VisDataPrep_Elastodynamics::~VisDataPrep_Elastodynamics()
-{}
-
 void VisDataPrep_Elastodynamics::get_pointArray(
     const std::string solution_file_name,
     const std::string analysis_node_mapping_file,

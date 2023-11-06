@@ -14,7 +14,7 @@ class VisDataPrep_Elastodynamics : public IVisDataPrep
   public:
     VisDataPrep_Elastodynamics();
 
-    virtual ~VisDataPrep_Elastodynamics();
+    virtual ~VisDataPrep_Elastodynamics() = default;
 
     // Return the number of physical fields to be read from solution
     // vector

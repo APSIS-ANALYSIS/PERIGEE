@@ -22,7 +22,7 @@ class VTK_Writer_Elastodynamics
     VTK_Writer_Elastodynamics( const int &in_nelem, const int &in_nlocbas, 
         const std::string &epart_file );
 
-    ~VTK_Writer_Elastodynamics();
+    ~VTK_Writer_Elastodynamics() = default;
     
     void writeOutput(
         const FEANode * const &fnode_ptr,
