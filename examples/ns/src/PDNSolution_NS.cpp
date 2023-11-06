@@ -44,9 +44,6 @@ PDNSolution_NS::PDNSolution_NS(
   }
 }
 
-PDNSolution_NS::~PDNSolution_NS()
-{}
-
 void PDNSolution_NS::Init_zero(const APart_Node * const &pNode_ptr)
 {
   const double value[4] = {0.0, 0.0, 0.0, 0.0};

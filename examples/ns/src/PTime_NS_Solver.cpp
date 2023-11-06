@@ -7,9 +7,6 @@ PTime_NS_Solver::PTime_NS_Solver(
   renew_tang_freq(input_renew_tang_freq), pb_name(input_name)
 {}
 
-PTime_NS_Solver::~PTime_NS_Solver()
-{}
-
 std::string PTime_NS_Solver::Name_Generator(const int &counter) const
 {
   int aux = 900000000 + counter;
