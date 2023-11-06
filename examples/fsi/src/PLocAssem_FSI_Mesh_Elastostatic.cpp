@@ -4,7 +4,7 @@ PLocAssem_FSI_Mesh_Elastostatic::PLocAssem_FSI_Mesh_Elastostatic(
     const double &in_mat_E, const double &in_mat_nu, const int &in_nlocbas )
 : E(in_mat_E), nu(in_mat_nu), lambda( nu * E / ((1+nu) * (1-2.0*nu)) ),
   mu( E/(2.0+2.0*nu) ), kappa( lambda + 2.0 * mu / 3.0 ),
-  nLocBas(in_nlocbas), vec_size(3*in_nlocbas)
+  nLocBas(in_nlocbas), vec_size(in_nlocbas*3)
 {
   Tangent = new PetscScalar[vec_size * vec_size];
   Residual = new PetscScalar[vec_size];

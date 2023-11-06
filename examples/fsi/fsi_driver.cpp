@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
   // solid properties
   double solid_density = 1.0;
   double solid_E = 2.0e6;
-  double solid_nu = 0.45;
+  double solid_nu = 0.5;
 
   // mesh motion elasticity solver parameters
   double mesh_E  = 1.0;

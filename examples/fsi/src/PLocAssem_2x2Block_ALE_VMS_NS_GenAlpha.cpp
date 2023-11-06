@@ -8,8 +8,8 @@ PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha(
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()), beta(in_beta), CI(36.0), CT(4.0),
   nLocBas(in_nlocbas), snLocBas(in_snlocbas),
-  vec_size_0( nLocBas * 3 ), vec_size_1( nLocBas ), 
-  sur_size_0( snLocBas * 3 ), coef( (in_nlocbas == 4) ? 0.6299605249474365 : 1.0 ),
+  vec_size_0( in_nlocbas * 3 ), vec_size_1( in_nlocbas ), 
+  sur_size_0( in_snlocbas * 3 ), coef( (in_nlocbas == 4) ? 0.6299605249474365 : 1.0 ),
   mm( (in_nlocbas == 4) ? std::array<double, 9>{2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0} :
                           std::array<double, 9>{1.0, 0.0, 0.0, 0.0, 1.0 ,0.0, 0.0, 0.0 ,1.0} )
 {
