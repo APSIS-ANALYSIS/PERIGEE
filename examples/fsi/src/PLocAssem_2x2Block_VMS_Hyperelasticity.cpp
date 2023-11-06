@@ -28,7 +28,6 @@ PLocAssem_2x2Block_VMS_Hyperelasticity::PLocAssem_2x2Block_VMS_Hyperelasticity(
   print_info();
 }
 
-
 PLocAssem_2x2Block_VMS_Hyperelasticity::~PLocAssem_2x2Block_VMS_Hyperelasticity()
 {
   delete [] Tangent00; Tangent00 = nullptr;
@@ -42,18 +41,20 @@ PLocAssem_2x2Block_VMS_Hyperelasticity::~PLocAssem_2x2Block_VMS_Hyperelasticity(
   delete [] sur_Residual0; sur_Residual0 = nullptr;
 }
 
-
 void PLocAssem_2x2Block_VMS_Hyperelasticity::print_info() const
 {
   SYS_T::print_sep_line();
   SYS_T::commPrint("  Three-dimensional Hyper-elastic solid model:\n");
+  if(nLocBas == 4)
+    SYS_T::commPrint("  FEM: 4-node Tetrahedral element \n");
+  else if(nLocBas == 8)
+    SYS_T::commPrint("  FEM: 8-node Hexahedral element \n");
   SYS_T::commPrint("  Spatial: Finite element with VMS stabilization \n");
   SYS_T::commPrint("  Temporal: Generalized-alpha method \n");
   SYS_T::commPrint("  Solid density rho0 = %e g/cm3\n", rho0);
   matmodel->print_info();
   SYS_T::print_sep_line();
 }
-
 
 std::array<double, 2> PLocAssem_2x2Block_VMS_Hyperelasticity::get_tau( 
     const double &dt, const double &Jin, const double &dx ) const
@@ -65,7 +66,6 @@ std::array<double, 2> PLocAssem_2x2Block_VMS_Hyperelasticity::get_tau(
   return {{0.000 * dt_ka * Jin / rho0, 0.000 * dx * c_max * rho0 / Jin}};
 }
 
-
 void PLocAssem_2x2Block_VMS_Hyperelasticity::Zero_Tangent_Residual()
 {
   for(int ii=0; ii<vec_size_0; ++ii) Residual0[ii] = 0.0;
@@ -76,7 +76,6 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Zero_Tangent_Residual()
   for(int ii=0; ii<vec_size_1 * vec_size_0; ++ii) Tangent10[ii] = 0.0;
   for(int ii=0; ii<vec_size_1 * vec_size_1; ++ii) Tangent11[ii] = 0.0;
 }
-
 
 void PLocAssem_2x2Block_VMS_Hyperelasticity::Zero_Residual()
 {

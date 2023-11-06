@@ -22,6 +22,10 @@ PLocAssem_FSI_Mesh_Elastostatic::~PLocAssem_FSI_Mesh_Elastostatic()
 void PLocAssem_FSI_Mesh_Elastostatic::print_info() const
 {
   SYS_T::commPrint("  Three-dimensional Elastostatic equation: \n");
+  if(nLocBas == 4)
+    SYS_T::commPrint("  FEM: 4-node Tetrahedral element \n");
+  else if(nLocBas == 8)
+    SYS_T::commPrint("  FEM: 8-node Hexahedral element \n");
   SYS_T::commPrint("  Spatial: Galerkin Finite element \n");
   SYS_T::commPrint("  This solver is for mesh motion in the fluid sub-domain for FSI problems.\n");
   SYS_T::commPrint("  Young's Modulus E  = %e \n", E);
@@ -32,7 +36,6 @@ void PLocAssem_FSI_Mesh_Elastostatic::print_info() const
   SYS_T::commPrint("  Note: Element stiffening is applied. \n");
   SYS_T::print_sep_line();
 }
-
 
 void PLocAssem_FSI_Mesh_Elastostatic::Zero_Tangent_Residual()
 {

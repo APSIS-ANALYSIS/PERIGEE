@@ -45,6 +45,10 @@ void PLocAssem_2x2Block_VMS_Incompressible::print_info() const
 {
   SYS_T::print_sep_line();
   SYS_T::commPrint("  Three-dimensional Hyper-elastic solid model:\n");
+  if(nLocBas == 4)
+    SYS_T::commPrint("  FEM: 4-node Tetrahedral element \n");
+  else if(nLocBas == 8)
+    SYS_T::commPrint("  FEM: 8-node Hexahedral element \n");
   SYS_T::commPrint("  Spatial: Finite element with VMS stabilization \n");
   SYS_T::commPrint("  Temporal: Generalized-alpha method \n");
   SYS_T::commPrint("  Solid density rho0 = %e g/cm3\n", rho0);

@@ -23,9 +23,13 @@ PLocAssem_FSI_Mesh_Laplacian::~PLocAssem_FSI_Mesh_Laplacian()
 void PLocAssem_FSI_Mesh_Laplacian::print_info() const
 {
   SYS_T::print_sep_line();
-  PetscPrintf(PETSC_COMM_WORLD, "  Three-dimensional Laplacian equation: \n");
-  PetscPrintf(PETSC_COMM_WORLD, "  Spatial: Galerkin Finite element \n");
-  PetscPrintf(PETSC_COMM_WORLD, "  This solver is for the fluid sub-domain mesh motion in FSI problems.\n");
+  SYS_T::commPrint("  Three-dimensional Laplacian equation: \n");
+  if(nLocBas == 4)
+    SYS_T::commPrint("  FEM: 4-node Tetrahedral element \n");
+  else if(nLocBas == 8)
+    SYS_T::commPrint("  FEM: 8-node Hexahedral element \n");
+  SYS_T::commPrint("  Spatial: Galerkin Finite element \n");
+  SYS_T::commPrint("  This solver is for the fluid sub-domain mesh motion in FSI problems.\n");
   SYS_T::print_sep_line();
 }
 

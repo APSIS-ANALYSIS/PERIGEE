@@ -46,7 +46,6 @@ PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::~PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha(
   delete [] sur_Residual0; sur_Residual0 = nullptr;
 }
 
-
 void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::print_info() const
 {
   SYS_T::print_sep_line();
