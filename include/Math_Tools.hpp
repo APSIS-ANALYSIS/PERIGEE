@@ -344,7 +344,7 @@ namespace MATH_T
       // with LU factorization performed, solve a linear problem with given RHS
       // users are responsible for allocating the b and x arrays.
       // ----------------------------------------------------------------------
-      std::array<double, N> LU_solve( std::array<double, N> &bb ) const
+      std::array<double, N> LU_solve( const std::array<double, N> &bb ) const
       {
         std::array<double, N> xx {};
         for(int ii=0; ii<N; ++ii) xx[ii] = bb[pp[ii]];
@@ -518,7 +518,7 @@ namespace MATH_T
       // With the LDLt_fac() function performed, solve a linear problem with 
       // the given RHS.
       // ----------------------------------------------------------------------
-      std::array<double, N> LDLt_solve( std::array<double, N> &bb ) const
+      std::array<double, N> LDLt_solve( const std::array<double, N> &bb ) const
       {
         std::array<double, N> xx {};
 
