@@ -14,7 +14,7 @@
 class PLocAssem_FSI_Mesh_Laplacian : public IPLocAssem
 {
   public:
-    PLocAssem_FSI_Mesh_Laplacian();
+    PLocAssem_FSI_Mesh_Laplacian( const int &in_nlocbas );
 
     virtual ~PLocAssem_FSI_Mesh_Laplacian();
 

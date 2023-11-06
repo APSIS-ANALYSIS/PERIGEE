@@ -27,7 +27,7 @@ class PLocAssem_FSI_Mesh_Elastostatic : public IPLocAssem
 {
   public:
     PLocAssem_FSI_Mesh_Elastostatic( const double &in_mat_E, 
-        const double &in_mat_nu );
+        const double &in_mat_nu, const int &in_nlocbas );
 
     virtual ~PLocAssem_FSI_Mesh_Elastostatic();
 

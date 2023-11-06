@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
   // solid properties
   double solid_density = 1.0;
   double solid_E = 2.0e6;
-  double solid_nu = 0.5;
+  double solid_nu = 0.45;
 
   // mesh motion elasticity solver parameters
   double mesh_E  = 1.0;
@@ -457,7 +457,7 @@ int main(int argc, char *argv[])
   matmodel -> write_hdf5(); // record model parameter on disk
 
   // Pseudo elastic mesh motion
-  IPLocAssem * locAssem_mesh_ptr = new PLocAssem_FSI_Mesh_Laplacian();
+  IPLocAssem * locAssem_mesh_ptr = new PLocAssem_FSI_Mesh_Laplacian( elementv -> get_nLocBas() );
   
   // ===== Initial condition =====
   PDNSolution * base = new PDNSolution_V( pNode_v, fNode, locinfnbc, 1, true, "base" ); 

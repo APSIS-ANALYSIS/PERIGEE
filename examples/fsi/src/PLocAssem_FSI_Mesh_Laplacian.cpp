@@ -1,7 +1,7 @@
 #include "PLocAssem_FSI_Mesh_Laplacian.hpp"
 
-PLocAssem_FSI_Mesh_Laplacian::PLocAssem_FSI_Mesh_Laplacian()
-: num_ebc_fun(0), nLocBas(4), vec_size(12)
+PLocAssem_FSI_Mesh_Laplacian::PLocAssem_FSI_Mesh_Laplacian( const int &in_nlocbas )
+: num_ebc_fun(0), nLocBas(in_nlocbas), vec_size(3*in_nlocbas)
 {
   Tangent = new PetscScalar[vec_size * vec_size];
   Residual = new PetscScalar[vec_size];
