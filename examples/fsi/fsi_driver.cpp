@@ -270,6 +270,8 @@ int main(int argc, char *argv[])
     cmdh5w->write_intScalar(     "sol_record_freq", sol_record_freq);
     cmdh5w->write_intScalar(     "nqp_tri",         nqp_tri);
     cmdh5w->write_intScalar(     "nqp_tet",         nqp_tet);
+    cmdh5w->write_intScalar(     "nqp_sur_1d",      nqp_sur_1D);
+    cmdh5w->write_intScalar(     "nqp_vol_1d",      nqp_vol_1D);
     cmdh5w->write_string(        "lpn_file",        lpn_file);
     cmdh5w->write_intScalar(     "inflow_type",     inflow_type);
     cmdh5w->write_string(        "inflow_file",     inflow_file);
@@ -319,7 +321,13 @@ int main(int argc, char *argv[])
 
   ALocal_EBC * mesh_locebc = new ALocal_EBC(part_v_file, rank, "/mesh_ebc");
 
-  Tissue_prestress * ps_data = new Tissue_prestress(locElem, nqp_tet, rank, is_load_ps, "./ps_data/prestress");
+  Tissue_prestress * ps_data = nullptr;
+
+  if( GMIptr->get_elemType() == 501 )
+    ps_data = new Tissue_prestress(locElem, nqp_tet, rank, is_load_ps, "./ps_data/prestress");
+  else if( GMIptr->get_elemType() == 601 )
+    ps_data = new Tissue_prestress(locElem, nqp_vol_1D * nqp_vol_1D * nqp_vol_1D, rank, is_load_ps, "./ps_data/prestress");
+  else SYS_T::print_fatal("Error: Element type not supported when initializing the Tissue_prestress class.\n");
 
   // Group APart_Node and ALocal_NBC into a vector
   std::vector<APart_Node *> pNode_list { pNode_v, pNode_p };

@@ -8,8 +8,8 @@ PLocAssem_2x2Block_VMS_Incompressible::PLocAssem_2x2Block_VMS_Incompressible(
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()),
   nLocBas( in_nlocbas ), snLocBas( in_snlocbas ), 
-  vec_size_0( in_nlocbas * 3 ), vec_size_1( in_nlocbas ),
-  sur_size_0( in_snlocbas * 3 ),
+  vec_size_0( nLocBas * 3 ), vec_size_1( nLocBas ),
+  sur_size_0( snLocBas * 3 ),
   matmodel( in_matmodel )
 {
   Tangent00 = new PetscScalar[vec_size_0 * vec_size_0];
@@ -623,7 +623,7 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Mass_Residual(
 
     P_iso += prestress * Ten2::cofactor( F );
     // ------------------------------------------------------------------------
-    
+
     double mbeta = matmodel->get_beta(p);
 
     // use 1.0 in case of fully incompressible. 
