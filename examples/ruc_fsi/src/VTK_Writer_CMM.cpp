@@ -7,11 +7,6 @@ VTK_Writer_CMM::VTK_Writer_CMM( const int &in_nelem,
   VIS_T::read_epart( epart_file, nElem, epart_map );
 }
 
-VTK_Writer_CMM::~VTK_Writer_CMM()
-{
-  VEC_T::clean( epart_map );
-}
-
 void VTK_Writer_CMM::writeOutput(
     const FEANode * const &fnode_ptr,
     const ALocal_IEN * const &lien_ptr,

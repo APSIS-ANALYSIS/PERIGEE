@@ -23,7 +23,7 @@ class VTK_Writer_CMM
     VTK_Writer_CMM( const int &in_nelem, const int &in_nlocbas, 
         const std::string &epart_file );
 
-    ~VTK_Writer_CMM();
+    ~VTK_Writer_CMM() = default;
     
     void writeOutput(
         const FEANode * const &fnode_ptr,

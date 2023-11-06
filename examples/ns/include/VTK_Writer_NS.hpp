@@ -23,7 +23,7 @@ class VTK_Writer_NS
     VTK_Writer_NS( const int &in_nelem, const int &in_nlocbas, 
         const std::string &epart_file );
 
-    ~VTK_Writer_NS();
+    ~VTK_Writer_NS() = default;
     
     void writeOutput(
         const FEANode * const &fnode_ptr,
