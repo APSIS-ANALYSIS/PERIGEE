@@ -277,6 +277,19 @@ namespace MATH_T
         return *this;             
       }     
 
+      virtual Matrix_Dense<N>& operator= (const Matrix_SymPos_Dense<N> &source)
+      {
+        if(this == &source) return *this;
+
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = source(ii);
+
+        for(int ii=0; ii<N; ++ii) pp[ii] = ii;
+
+        is_fac = source.get_is_fac();
+
+        return *this;             
+      }
+
       int get_size() const {return N;}
 
       bool get_is_fac() const {return is_fac;}
