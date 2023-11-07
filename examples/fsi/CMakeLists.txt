@@ -140,6 +140,7 @@ SET( perigee_postprocess_lib_src
   ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   ${perigee_source}/Postproc_Tool/Interpolater.cpp
   ${perigee_source}/Mesh/QuadPts_vis_tet4.cpp
+  ${perigee_source}/Mesh/QuadPts_vis_quad4.cpp
   ${perigee_source}/Mesh/QuadPts_vis_hex8.cpp
   ${perigee_SOURCE_DIR}/src/VisDataPrep_FSI.cpp
   ${perigee_SOURCE_DIR}/src/VisDataPrep_ALE_NS.cpp
@@ -184,6 +185,7 @@ ADD_EXECUTABLE( vis_fluid vis_fluid.cpp )
 ADD_EXECUTABLE( vis_solid vis_solid.cpp )
 ADD_EXECUTABLE( vis_fsi_wss vis_fsi_wss.cpp )
 ADD_EXECUTABLE( vis_501_fsi_wss vis_501_fsi_wss.cpp )
+ADD_EXECUTABLE( vis_601_fsi_wss vis_601_fsi_wss.cpp )
 
 # Link libraries
 TARGET_LINK_LIBRARIES( preprocess_fsi ${EXTRA_LINK_LIBS} perigee_preprocess )
@@ -195,6 +197,7 @@ TARGET_LINK_LIBRARIES( vis_fluid ${EXTRA_LINK_LIBS} perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_solid ${EXTRA_LINK_LIBS} perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_fsi_wss ${EXTRA_LINK_LIBS} perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_501_fsi_wss ${EXTRA_LINK_LIBS} perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_601_fsi_wss ${EXTRA_LINK_LIBS} perigee_postprocess )
 
 if(OPENMP_CXX_FOUND)
   SET_TARGET_PROPERTIES( perigee_preprocess PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )

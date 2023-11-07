@@ -134,8 +134,8 @@ int main( int argc, char * argv[] )
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    std::vector<int> quadn { global_node_idx[ vecIEN[nLocBas*ee+0] ], global_node_idx[ vecIEN[nLocBas*ee+1] ], 
-                             global_node_idx[ vecIEN[nLocBas*ee+2] ], global_node_idx[ vecIEN[nLocBas*ee+3] ] };
+    const std::vector<int> quadn { global_node_idx[ vecIEN[nLocBas*ee+0] ], global_node_idx[ vecIEN[nLocBas*ee+1] ], 
+                                   global_node_idx[ vecIEN[nLocBas*ee+2] ], global_node_idx[ vecIEN[nLocBas*ee+3] ] };
     
     const int hexn[8] { v_vecIEN[ global_ele_idx[ee]*v_nLocBas+0 ], v_vecIEN[ global_ele_idx[ee]*v_nLocBas+1 ],
                         v_vecIEN[ global_ele_idx[ee]*v_nLocBas+2 ], v_vecIEN[ global_ele_idx[ee]*v_nLocBas+3 ],

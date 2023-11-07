@@ -134,8 +134,8 @@ int main( int argc, char * argv[] )
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    std::vector<int> quadn { global_node_idx[ vecIEN[nLocBas*ee+0] ], global_node_idx[ vecIEN[nLocBas*ee+1] ], 
-                             global_node_idx[ vecIEN[nLocBas*ee+2] ], global_node_idx[ vecIEN[nLocBas*ee+3] ] };
+    const std::vector<int> quadn { global_node_idx[ vecIEN[nLocBas*ee+0] ], global_node_idx[ vecIEN[nLocBas*ee+1] ], 
+                                   global_node_idx[ vecIEN[nLocBas*ee+2] ], global_node_idx[ vecIEN[nLocBas*ee+3] ] };
     
     const int hexn[8] { v_vecIEN[ global_ele_idx[ee]*v_nLocBas+0 ], v_vecIEN[ global_ele_idx[ee]*v_nLocBas+1 ],
                         v_vecIEN[ global_ele_idx[ee]*v_nLocBas+2 ], v_vecIEN[ global_ele_idx[ee]*v_nLocBas+3 ],
@@ -331,7 +331,7 @@ int main( int argc, char * argv[] )
           wz += esol_w[ii] * Rz[ii];
         }
 
-        // obtain the hex element's surface_node_local_index[nLocBas*ee+qua] node's outward normal vector 
+        // obtain the hex element's id_range[qua] node's outward normal vector 
         const double nx = outnormal[qua].x();
         const double ny = outnormal[qua].y();
         const double nz = outnormal[qua].z();
