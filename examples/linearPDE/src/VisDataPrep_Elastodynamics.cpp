@@ -3,14 +3,17 @@
 VisDataPrep_Elastodynamics::VisDataPrep_Elastodynamics()
 {
   // Data to be written
-  arrayCompSize = 1;
+  arrayCompSize = 2;
 
   arrayNames.push_back("Displacement");
   arraySizes.push_back(3);
+  arrayNames.push_back("CauchyStress");
+  arraySizes.push_back(6);
 
   // Data to be read
   pt_array_len.clear();
   pt_array_len.push_back(3);
+  pt_array_len.push_back(6);
 }
 
 void VisDataPrep_Elastodynamics::get_pointArray(
