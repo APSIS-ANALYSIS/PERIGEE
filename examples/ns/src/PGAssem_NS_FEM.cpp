@@ -1,4 +1,8 @@
 #include "PGAssem_NS_FEM.hpp"
+#include "FEAElement_Tet4.hpp"
+#include "FEAElement_Tet10_v2.hpp"
+#include "FEAElement_Hex8.hpp"
+#include "FEAElement_Hex27.hpp"
 
 PGAssem_NS_FEM::PGAssem_NS_FEM(
     IPLocAssem * const &locassem_ptr,
@@ -1075,6 +1079,26 @@ void PGAssem_NS_FEM::Weak_EssBC_KG(
 
   sol->GetLocalArray( array_b );
 
+  FEAElement * temp_element_v = nullptr;
+  switch(element_v -> get_Type())
+  {
+    case 501:
+      temp_element_v = new FEAElement_Tet4( quad_s -> get_num_quadPts() );
+      break;
+    case 502:
+      temp_element_v = new FEAElement_Tet10_v2( quad_s -> get_num_quadPts() );
+      break;
+    case 601:
+      temp_element_v = new FEAElement_Hex8( quad_s -> get_num_quadPts() );
+      break;
+    case 602:
+      temp_element_v = new FEAElement_Hex27( quad_s -> get_num_quadPts() );
+      break;
+    default:
+      SYS_T::print_fatal("Error: Unknown element type.\n");
+      break;
+  }
+
   const int num_wele {wbc_part->get_num_ele()};
 
   for(int ee{0}; ee < num_wele; ++ee)
@@ -1089,7 +1113,7 @@ void PGAssem_NS_FEM::Weak_EssBC_KG(
     const int face_id {wbc_part->get_ele_face_id(ee)};
 
     if(wbc_part->get_weakbc_type() == 1)
-      lassem_ptr->Assem_Tangent_Residual_Weak1(curr_time, dt, local_b, element_v,
+      lassem_ptr->Assem_Tangent_Residual_Weak1(curr_time, dt, local_b, temp_element_v,
         ctrl_x, ctrl_y, ctrl_z, quad_s, face_id, wbc_part->get_C_bI());
 
     for(int ii{0}; ii < nLocBas; ++ii)
@@ -1103,6 +1127,7 @@ void PGAssem_NS_FEM::Weak_EssBC_KG(
     VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
 
+  delete temp_element_v; temp_element_v = nullptr;
   delete [] array_b; array_b = nullptr;
   delete [] local_b; local_b = nullptr;
   delete [] IEN_v; IEN_v = nullptr;
@@ -1134,6 +1159,26 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
 
   sol->GetLocalArray( array_b );
 
+  FEAElement * temp_element_v = nullptr;
+  switch(element_v -> get_Type())
+  {
+    case 501:
+      temp_element_v = new FEAElement_Tet4( quad_s -> get_num_quadPts() );
+      break;
+    case 502:
+      temp_element_v = new FEAElement_Tet10_v2( quad_s -> get_num_quadPts() );
+      break;
+    case 601:
+      temp_element_v = new FEAElement_Hex8( quad_s -> get_num_quadPts() );
+      break;
+    case 602:
+      temp_element_v = new FEAElement_Hex27( quad_s -> get_num_quadPts() );
+      break;
+    default:
+      SYS_T::print_fatal("Error: Unknown element type.\n");
+      break;
+  }
+
   const int num_wele {wbc_part->get_num_ele()};
 
   for(int ee{0}; ee < num_wele; ++ee)
@@ -1148,7 +1193,7 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
     const int face_id {wbc_part->get_ele_face_id(ee)};
 
     if(wbc_part->get_weakbc_type() == 1)
-      lassem_ptr->Assem_Residual_Weak1(curr_time, dt, local_b, element_v,
+      lassem_ptr->Assem_Residual_Weak1(curr_time, dt, local_b, temp_element_v,
         ctrl_x, ctrl_y, ctrl_z, quad_s, face_id, wbc_part->get_C_bI());
 
     for(int ii{0}; ii < nLocBas; ++ii)
@@ -1160,6 +1205,7 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
     VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
 
+  delete temp_element_v; temp_element_v = nullptr;
   delete [] array_b; array_b = nullptr;
   delete [] local_b; local_b = nullptr;
   delete [] IEN_v; IEN_v = nullptr;

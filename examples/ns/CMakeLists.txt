@@ -83,6 +83,8 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/FEANode.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
   ${perigee_source}/Element/FEAElement_Tet10_v2.cpp
+  ${perigee_source}/Element/FEAElement_Hex8.cpp
+  ${perigee_source}/Element/FEAElement_Hex27.cpp
   ${perigee_source}/Model/GenBC_RCR.cpp
   ${perigee_source}/Model/GenBC_Resistance.cpp
   ${perigee_source}/Model/GenBC_Inductance.cpp
