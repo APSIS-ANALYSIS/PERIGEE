@@ -36,7 +36,9 @@ int main( int argc, char * argv[] )
 
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
 
-  double dt = cmd_h5r -> read_doubleScalar("/","init_step");
+  double dt       = cmd_h5r -> read_doubleScalar("/","init_step");
+  double module_E = cmd_h5r -> read_doubleScalar("/","youngs_module");
+  double nu       = cmd_h5r -> read_doubleScalar("/","poissons_ratio");
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
@@ -134,7 +136,7 @@ int main( int argc, char * argv[] )
 
   // VTK writer 
   VTK_Writer_Elastodynamics * vtk_w = new VTK_Writer_Elastodynamics( GMIptr->get_nElem(), 
-      GMIptr->get_nLocBas(), element_part_file );
+      GMIptr->get_nLocBas(), element_part_file, module_E, nu );
   
   std::ostringstream time_index;
 

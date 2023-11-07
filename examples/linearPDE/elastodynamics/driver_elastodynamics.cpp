@@ -164,6 +164,8 @@ int main(int argc, char *argv[])
     cmdh5w->write_intScalar("sol_record_freq", sol_record_freq);
     cmdh5w->write_intScalar("nqp_vol", nqp_vol);
     cmdh5w->write_intScalar("nqp_sur", nqp_sur);
+    cmdh5w->write_doubleScalar("youngs_module", module_E);
+    cmdh5w->write_doubleScalar("poissons_ratio", nu);
 
     delete cmdh5w; H5Fclose(cmd_file_id);
   }
