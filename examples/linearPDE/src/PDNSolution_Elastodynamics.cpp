@@ -19,9 +19,6 @@ PDNSolution_Elastodynamics:: PDNSolution_Elastodynamics(
   }
 }
 
-PDNSolution_Elastodynamics::~PDNSolution_Elastodynamics()
-{}
-
 void PDNSolution_Elastodynamics::Init_zero( const APart_Node * const &pNode )
 {
   const double value[3] = { 0.0, 0.0, 0.0 };
