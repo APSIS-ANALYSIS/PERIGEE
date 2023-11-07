@@ -248,7 +248,7 @@ int main( int argc, char * argv[] )
         }
       }
       else
-        SYS_T::print_fatal("Error: unknown element type occurs when generating a new IEN array for the pressure variable. \n");
+        SYS_T::print_fatal("Error: elemType %d is not supported when generating a new IEN array for the pressure variable. \n", elemType);
     }
   }
 
@@ -277,7 +277,7 @@ int main( int argc, char * argv[] )
           for(int ii=0; ii<8; ++ii) temp_v_node_f.push_back( IEN_v->get_IEN(ee, ii) );
         }
         else
-          SYS_T::print_fatal("Error: unknown element type occurs when generating the list of velocity nodes for fluid. \n");
+          SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of velocity nodes for fluid during the preprocessing. \n", elemType);
       }
       else
       {
@@ -290,7 +290,7 @@ int main( int argc, char * argv[] )
           for(int ii=0; ii<8; ++ii) temp_v_node_s.push_back( IEN_v->get_IEN(ee, ii) );
         }
         else
-          SYS_T::print_fatal("Error: unknown element type occurs when generating the list of velocity nodes for solid. \n");
+          SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of velocity nodes for solid during the preprocessing. \n", elemType);
       }
     }
     PERIGEE_OMP_CRITICAL
@@ -321,7 +321,7 @@ int main( int argc, char * argv[] )
           for(int ii=0; ii<8; ++ii) temp_p_node_f.push_back( IEN_p->get_IEN(ee, ii) );
         }
         else
-          SYS_T::print_fatal("Error: unknown element type occurs when generating the list of pressure nodes for fluid. \n");
+          SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of pressure nodes for fluid during the preprocessing. \n", elemType);
       }
       else
       {
@@ -334,7 +334,7 @@ int main( int argc, char * argv[] )
           for(int ii=0; ii<8; ++ii) temp_p_node_s.push_back( IEN_p->get_IEN(ee, ii) );
         }
         else
-          SYS_T::print_fatal("Error: unknown element type occurs when generating the list of pressure nodes for solid. \n");
+          SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of pressure nodes for solid during the preprocessing. \n", elemType);
       }
     }
     PERIGEE_OMP_CRITICAL
@@ -359,7 +359,7 @@ int main( int argc, char * argv[] )
       HEX_T::hexmesh_check( ctrlPts, IEN_v, nElem, critical_val_aspect_ratio );
     }
     else
-      SYS_T::print_fatal("Error: unknown element type occurs when checking the mesh of kinematics. \n");
+      SYS_T::print_fatal("Error: elemType %d is not supported when checking the mesh of kinematics. \n", elemType);
   }
 
   IMesh * mesh_v = nullptr;
@@ -380,7 +380,7 @@ int main( int argc, char * argv[] )
       mesh_p = new Mesh_FEM(nFunc_p, nElem, 8, 1);
       break;   
     default:
-      SYS_T::print_fatal("Error: elemType %d is not supported.\n", elemType);
+      SYS_T::print_fatal("Error: elemType %d is not supported when generating the mesh.\n", elemType);
       break;
   }
 
@@ -512,7 +512,7 @@ int main( int argc, char * argv[] )
       inlet_outvec[ii] = HEX_T::get_out_normal( sur_f_file_in[ii], ctrlPts, IEN_v );
   }
   else
-    SYS_T::print_fatal("Error: unknown element type occurs when obtaining the outward normal vector for the inflow boundary condition. \n");
+    SYS_T::print_fatal("Error: elemType %d is not supported when obtaining the outward normal vector for the inflow boundary condition. \n", elemType);
 
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_f_file_in, sur_f_file_wall, nFunc_v, inlet_outvec, elemType );
 
@@ -533,7 +533,7 @@ int main( int argc, char * argv[] )
       outlet_outvec[ii] = HEX_T::get_out_normal( sur_f_file_out[ii], ctrlPts, IEN_v );    
   }
   else
-    SYS_T::print_fatal("Error: unknown element type occurs when obtaining the outward normal vector for the elemental boundary conditions. \n");
+    SYS_T::print_fatal("Error: elemType %d is not supported when obtaining the outward normal vector for the elemental boundary conditions. \n", elemType);
 
   std::vector< std::string > ebclist {sur_f_file_wall};
 
