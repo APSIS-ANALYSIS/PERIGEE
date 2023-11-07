@@ -17,8 +17,12 @@
 
 int main( int argc, char * argv[] )
 {
+  // Set number of threads and  print info of OpenMP
+  SYS_T::print_omp_info();
+  SYS_T::set_omp_num_threads();
+
   // clean the potentially pre-existing postpart h5 files
-  if( SYS_T::directory_exist("apart") )
+  if( SYS_T::directory_exist("ppart") )
   {
     std::cout<<"Clean the folder ppart.\n";
     SYS_T::execute("rm -rf ppart");
