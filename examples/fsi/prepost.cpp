@@ -6,8 +6,9 @@
 // Date: Jan 16 2022
 // ==================================================================
 #include "HDF5_Reader.hpp"
-#include "Tet_Tools.hpp"
+#include "VTK_Tools.hpp"
 #include "Mesh_Tet.hpp"
+#include "Mesh_FEM.hpp"
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
@@ -95,15 +96,28 @@ int main( int argc, char * argv[] )
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    if( phy_tag[ee] == 1 )
+    if(phy_tag[ee] == 1)
     {
       // In solid element, loop over its IEN and correct if the node is on the
       // interface
-      for(int ii=0; ii<4; ++ii)
-      {
-        const int pos = VEC_T::get_pos( wall_node_id, vecIEN_p[ee*4 +ii] );
-        if( pos >=0 ) vecIEN_p[ee*4+ii] = nFunc_v + pos;
+      if(elemType == 501)
+      {  
+        for(int ii=0; ii<4; ++ii)
+        {
+          const int pos = VEC_T::get_pos( wall_node_id, vecIEN_p[ee*4+ii] );
+          if( pos >=0 ) vecIEN_p[ee*4+ii] = nFunc_v + pos;
+        }
       }
+      else if(elemType == 601)
+      {
+        for(int ii=0; ii<8; ++ii)
+        {
+          const int pos = VEC_T::get_pos( wall_node_id, vecIEN_p[ee*8+ii] );
+          if( pos >=0 ) vecIEN_p[ee*8+ii] = nFunc_v + pos;     
+        }
+      }
+      else
+        SYS_T::print_fatal("Error: elemType %d is not supported when generating a new IEN array for the pressure variable. \n", elemType);
     }
   }
 
@@ -117,13 +131,31 @@ int main( int argc, char * argv[] )
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    if( phy_tag[ee] == 0 )
+    if(phy_tag[ee] == 0)
     {
-      for(int ii=0; ii<4; ++ii) v_node_f.push_back( IEN_v->get_IEN(ee, ii) );
+      if(elemType == 501)
+      {
+        for(int ii=0; ii<4; ++ii) v_node_f.push_back( IEN_v->get_IEN(ee, ii) );
+      }
+      else if(elemType == 601)
+      {
+        for(int ii=0; ii<8; ++ii) v_node_f.push_back( IEN_v->get_IEN(ee, ii) );        
+      }
+      else
+        SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of velocity nodes for fluid during the pre-postprocessing. \n", elemType);
     }
     else
     {
-      for(int ii=0; ii<4; ++ii) v_node_s.push_back( IEN_v->get_IEN(ee, ii) );
+      if(elemType == 501)
+      {
+        for(int ii=0; ii<4; ++ii) v_node_s.push_back( IEN_v->get_IEN(ee, ii) );
+      }
+      else if(elemType == 601)
+      {
+        for(int ii=0; ii<8; ++ii) v_node_s.push_back( IEN_v->get_IEN(ee, ii) );   
+      }
+      else
+        SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of velocity nodes for solid during the pre-postprocessing. \n", elemType);
     }
   }
 
@@ -133,23 +165,56 @@ int main( int argc, char * argv[] )
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    if( phy_tag[ee] == 0 )
+    if(phy_tag[ee] == 0)
     {
-      for(int ii=0; ii<4; ++ii) p_node_f.push_back( IEN_p->get_IEN(ee, ii) );
+      if(elemType == 501)
+      {
+        for(int ii=0; ii<4; ++ii) p_node_f.push_back( IEN_p->get_IEN(ee, ii) );    
+      }
+      else if(elemType == 601)
+      {
+        for(int ii=0; ii<8; ++ii) p_node_f.push_back( IEN_p->get_IEN(ee, ii) );
+      }
+      else
+        SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of pressure nodes for fluid during the pre-postprocessing. \n", elemType);
     }
     else
     {
-      for(int ii=0; ii<4; ++ii) p_node_s.push_back( IEN_p->get_IEN(ee, ii) );
+      if(elemType == 501)
+      {
+        for(int ii=0; ii<4; ++ii) p_node_s.push_back( IEN_p->get_IEN(ee, ii) );       
+      }
+      else if(elemType == 601)
+      {
+        for(int ii=0; ii<8; ++ii) p_node_s.push_back( IEN_p->get_IEN(ee, ii) );            
+      }
+      else
+        SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of pressure nodes for solid during the pre-postprocessing. \n", elemType);        
     }
   }
 
   VEC_T::sort_unique_resize( p_node_f ); VEC_T::sort_unique_resize( p_node_s );
 
   // Generate the mesh for kinematics
-  IMesh * mesh_v = new Mesh_Tet(nFunc_v, nElem, 1);
+  IMesh * mesh_v = nullptr;
 
   // Generate the mesh for pressure (discontinuous over interface)
-  IMesh * mesh_p = new Mesh_Tet(nFunc_p, nElem, 1);
+  IMesh * mesh_p = nullptr;
+
+  switch( elemType )
+  {
+    case 501:
+      mesh_v = new Mesh_Tet(nFunc_v, nElem, 1);
+      mesh_p = new Mesh_Tet(nFunc_p, nElem, 1);
+      break;
+    case 601:
+      mesh_v = new Mesh_FEM(nFunc_v, nElem, 8, 1);
+      mesh_p = new Mesh_FEM(nFunc_p, nElem, 8, 1);
+      break;
+    default:
+      SYS_T::print_fatal("Error: elemType %d is not supported when generating the mesh.\n", elemType);
+      break;
+  }
 
   std::vector<IMesh const *> mlist;
   mlist.push_back(mesh_p); mlist.push_back(mesh_v);

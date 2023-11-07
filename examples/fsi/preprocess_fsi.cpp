@@ -227,23 +227,21 @@ int main( int argc, char * argv[] )
   {
     if(phy_tag[ee] == 1)
     {
+      // In solid element, loop over its IEN and correct if the node is on the
+      // interface
       if(elemType == 501)
       {
-        // In solid element, loop over its IEN and correct if the node is on the
-        // interface
         for(int ii=0; ii<4; ++ii)
         {
-          const int pos = VEC_T::get_pos( wall_node_id, vecIEN_p[ee*4 +ii] );
+          const int pos = VEC_T::get_pos( wall_node_id, vecIEN_p[ee*4+ii] );
           if( pos >=0 ) vecIEN_p[ee*4+ii] = nFunc_v + pos;     
         }
       }
       else if(elemType == 601)
       {
-        // In solid element, loop over its IEN and correct if the node is on the
-        // interface
         for(int ii=0; ii<8; ++ii)
         {
-          const int pos = VEC_T::get_pos( wall_node_id, vecIEN_p[ee*8 +ii] );
+          const int pos = VEC_T::get_pos( wall_node_id, vecIEN_p[ee*8+ii] );
           if( pos >=0 ) vecIEN_p[ee*8+ii] = nFunc_v + pos;     
         }
       }
@@ -362,21 +360,20 @@ int main( int argc, char * argv[] )
       SYS_T::print_fatal("Error: elemType %d is not supported when checking the mesh of kinematics. \n", elemType);
   }
 
+  // Generate the mesh for kinematics
   IMesh * mesh_v = nullptr;
+  
+  // Generate the mesh for pressure (discontinuous over interface)
   IMesh * mesh_p = nullptr;
 
   switch( elemType )
   {
     case 501:
-      // Generate the mesh for kinematics
       mesh_v = new Mesh_Tet(nFunc_v, nElem, 1);
-      // Generate the mesh for pressure (discontinuous over interface)
       mesh_p = new Mesh_Tet(nFunc_p, nElem, 1);
       break;
     case 601:
-      // Generate the mesh for kinematics
       mesh_v = new Mesh_FEM(nFunc_v, nElem, 8, 1);
-      // Generate the mesh for pressure (discontinuous over interface)
       mesh_p = new Mesh_FEM(nFunc_p, nElem, 8, 1);
       break;   
     default:
