@@ -1,16 +1,16 @@
 #ifndef PART_FEM_FSI_HPP
 #define PART_FEM_FSI_HPP
-// ==================================================================
+// ============================================================================
 // Part_FEM_FSI.hpp
 //
-// Object: Partition 3D tet mesh into subdomains. The
-//         mesh contains sub-domains that has a physical tag.
-//         In the partitioned file, there will be a physical tag, an
-//         integer array with the length equaling to the number of 
+// Object: Partition 3D tet mesh into subdomains. 
+//         The mesh is partitioned into sub-domains that are tagged with a 
+//         physical tag. In the partitioned file, there will be a physical tag,
+//         which is an integer array with the length equaling to the number of 
 //         local elements.
 //
 // Date Created: July 27 2017
-// ==================================================================
+// ============================================================================
 #include "Part_FEM.hpp"
 
 class Part_FEM_FSI : public Part_FEM
