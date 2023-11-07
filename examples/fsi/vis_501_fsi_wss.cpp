@@ -1,7 +1,7 @@
 // ============================================================================
-// vis_601_fsi_wss.cpp
+// vis_501_fsi_wss.cpp
 //
-// This is the visualization driver for WSS.
+// WSS visualization for 4-node tet elements.
 //
 // Date: Nov 7 2023
 // ============================================================================
@@ -101,14 +101,42 @@ int main( int argc, char * argv[] )
   VTK_T::read_vtp_grid( wall_file, nFunc, nElem, ctrlPts, vecIEN );
 
   // They store the coordinates of the control points before deformation
-  std::vector<double> v_ctrlPts_origin(v_ctrlPts);
-  std::vector<double> ctrlPts_origin(ctrlPts);
+  const std::vector<double> v_ctrlPts_origin(v_ctrlPts);
+  const std::vector<double> ctrlPts_origin(ctrlPts);
 
   const std::vector<int> global_node_idx = VTK_T::read_int_PointData(wall_file, "GlobalNodeID");
   const std::vector<int> global_ele_idx = VTK_T::read_int_CellData(wall_file, "GlobalElementID");
 
   cout<<"Wall mesh contains "<<nElem<<" elements and "<<nFunc<<" vertices.\n";
 
+  // Each surface triangle element requires an additional node: interior_node
+  std::vector<int> interior_node( nElem, 0 );
+
+  // Identify the interior node for surface elements
+  for(int ee=0; ee<nElem; ++ee)
+  {
+    std::vector<int> trn(3, 0);
+    int ten[4];
+
+    trn[0] = global_node_idx[ vecIEN[3*ee+0] ];
+    trn[1] = global_node_idx[ vecIEN[3*ee+1] ];
+    trn[2] = global_node_idx[ vecIEN[3*ee+2] ];
+
+    ten[0] = v_vecIEN[ global_ele_idx[ee]*4+0 ];
+    ten[1] = v_vecIEN[ global_ele_idx[ee]*4+1 ];
+    ten[2] = v_vecIEN[ global_ele_idx[ee]*4+2 ];
+    ten[3] = v_vecIEN[ global_ele_idx[ee]*4+3 ];
+
+    int node_check = 0;
+    for(int ii=0; ii<4; ++ii)
+    {
+      if( !VEC_T::is_invec( trn, ten[ii] ) ) interior_node[ee] = ten[ii];
+      else node_check += 1;
+    }
+
+    SYS_T::print_fatal_if(node_check!=3, "Error: the associated tet element is incompatible with the triangle element.\n");
+  }
+ 
   // Sampling points and element container
   IQuadPts * quad = new QuadPts_vis_tet4();
 
@@ -169,9 +197,6 @@ int main( int argc, char * argv[] )
       ctrlPts[3*ii+2] += disp_sol[3*global_node_idx[ii]+2];
     }
 
-    // Each surface triangle element requires an additional node: interior_node
-    std::vector<int> interior_node( nElem, 0 );
-
     // Interior nodes's xyz coordinates
     std::vector<double> interior_node_coord( 3*nElem, 0.0 );
 
@@ -185,25 +210,10 @@ int main( int argc, char * argv[] )
     for(int ee=0; ee<nElem; ++ee)
     {
       std::vector<int> trn(3, 0);
-      int ten[4];
 
       trn[0] = global_node_idx[ vecIEN[3*ee+0] ];
       trn[1] = global_node_idx[ vecIEN[3*ee+1] ];
       trn[2] = global_node_idx[ vecIEN[3*ee+2] ];
-
-      ten[0] = v_vecIEN[ global_ele_idx[ee]*4+0 ];
-      ten[1] = v_vecIEN[ global_ele_idx[ee]*4+1 ];
-      ten[2] = v_vecIEN[ global_ele_idx[ee]*4+2 ];
-      ten[3] = v_vecIEN[ global_ele_idx[ee]*4+3 ];
-
-      int node_check = 0;
-      for(int ii=0; ii<4; ++ii)
-      {
-        if( !VEC_T::is_invec( trn, ten[ii] ) ) interior_node[ee] = ten[ii];
-        else node_check += 1;
-      }
-
-      SYS_T::print_fatal_if(node_check!=3, "Error: the associated tet element is incompatible with the triangle element.\n");
 
       // Record the interior node's coordinates
       interior_node_coord[3*ee+0] = v_ctrlPts[ 3*interior_node[ee] + 0 ];

@@ -49,8 +49,8 @@ int main( int argc, char * argv[] )
   int time_step = 1;
   int time_end = 1;
 
-  const int nLocBas = 9;
-  const int v_nLocBas = 27;
+  constexpr int nLocBas = 9;
+  constexpr int v_nLocBas = 27;
 
   constexpr int dof = 4; 
 
