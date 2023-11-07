@@ -140,10 +140,11 @@ SET( perigee_postprocess_lib_src
   ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   ${perigee_source}/Postproc_Tool/Interpolater.cpp
   ${perigee_source}/Mesh/QuadPts_vis_tet4.cpp
+  ${perigee_source}/Mesh/QuadPts_vis_hex8.cpp
   ${perigee_SOURCE_DIR}/src/VisDataPrep_FSI.cpp
   ${perigee_SOURCE_DIR}/src/VisDataPrep_ALE_NS.cpp
   ${perigee_SOURCE_DIR}/src/VisDataPrep_Hyperelastic.cpp
-  ${perigee_SOURCE_DIR}/src/VTK_Writer_FSI_Tet4.cpp
+  ${perigee_SOURCE_DIR}/src/VTK_Writer_FSI.cpp
   )
 
 # ===============================================

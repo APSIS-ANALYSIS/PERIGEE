@@ -1,18 +1,18 @@
-#include "VTK_Writer_FSI_Tet4.hpp"
+#include "VTK_Writer_FSI.hpp"
 
-VTK_Writer_FSI_Tet4::VTK_Writer_FSI_Tet4( const int &in_nelem,
-    const std::string &epart_file ) : nLocBas(4), nElem(in_nelem)
+VTK_Writer_FSI::VTK_Writer_FSI( const int &in_nelem,
+    const int &in_nlocbas, const std::string &epart_file ) : nLocBas(in_nlocbas), nElem(in_nelem)
 {
   VIS_T::read_epart( epart_file, nElem, epart_map );
 }
 
 
-VTK_Writer_FSI_Tet4::~VTK_Writer_FSI_Tet4()
+VTK_Writer_FSI::~VTK_Writer_FSI()
 {
   VEC_T::clean(epart_map);
 }
 
-void VTK_Writer_FSI_Tet4::interpolateJ( const int * const &ptid,
+void VTK_Writer_FSI::interpolateJ( const int * const &ptid,
     const std::vector<double> &inputData,
     const FEAElement * const &elem,
     vtkDoubleArray * const &vtkData )
@@ -46,7 +46,7 @@ void VTK_Writer_FSI_Tet4::interpolateJ( const int * const &ptid,
   }
 }
 
-void VTK_Writer_FSI_Tet4::writeOutput(
+void VTK_Writer_FSI::writeOutput(
         const FEANode * const &fnode_ptr,
         const ALocal_IEN * const &lien_v,
         const ALocal_IEN * const &lien_p,
@@ -62,8 +62,17 @@ void VTK_Writer_FSI_Tet4::writeOutput(
         const std::string &outputName,
         const bool &isXML )
 {
-  // This routine requires nqp = 4
-  SYS_T::print_fatal_if(quad->get_num_quadPts() != 4, "Error: VTK_Writer_Tet4 requires 4 quadrature points.\n");
+  if(nLocBas == 4)  // elemType 501
+  {
+    // This routine requires nqp = 4
+    SYS_T::print_fatal_if(quad->get_num_quadPts() != 4, "Error: VTK_Writer requires 4 quadrature points for Tet4.\n");
+  }
+  else if(nLocBas == 8)  // elemType 601
+  {
+    // This routine requires nqp = 8
+    SYS_T::print_fatal_if(quad->get_num_quadPts() != 8, "Error: VTK_Writer requires 4 quadrature points for Hex8.\n");    
+  }
+  else SYS_T::print_fatal( "Error: VTK_Writer_FSI::writeOutput function: unsupported element type \n" );
 
   Interpolater intep( nLocBas );
 
@@ -107,7 +116,7 @@ void VTK_Writer_FSI_Tet4::writeOutput(
     const std::vector<int> IEN_v = lien_v -> get_LIEN( ee );
     const std::vector<int> IEN_p = lien_p -> get_LIEN( ee );
 
-    double ectrl_x[4], ectrl_y[4], ectrl_z[4];
+    double ectrl_x[nLocBas], ectrl_y[nLocBas], ectrl_z[nLocBas];
 
     fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
 
@@ -156,7 +165,12 @@ void VTK_Writer_FSI_Tet4::writeOutput(
     intep.interpolateVTKData( asize, &IEN_p[0], inputInfo, elemptr, dataVecs[3] );
 
     // Set mesh connectivity
-    VIS_T::setTetraelem( IEN_p[0], IEN_p[1], IEN_p[2], IEN_p[3], gridData ); 
+    if( elemptr->get_Type() == 501 )
+      VIS_T::setTetraelem( IEN_p[0], IEN_p[1], IEN_p[2], IEN_p[3], gridData );
+    else if( elemptr->get_Type() == 601 )
+      VIS_T::setHexelem( IEN_p[0], IEN_p[1], IEN_p[2], IEN_p[3], 
+        IEN_p[4], IEN_p[5], IEN_p[6], IEN_p[7], gridData );
+    else SYS_T::print_fatal("Error: unknown element type.\n");
 
     // Analysis mesh partition
     const int e_global = lelem_ptr->get_elem_loc(ee);
@@ -199,12 +213,11 @@ void VTK_Writer_FSI_Tet4::writeOutput(
   VIS_T::writeVisFile( gridData, outputBName, outputName, rank, size, sol_time, isXML );
 
   // Clean gridData
-  PetscPrintf(PETSC_COMM_WORLD, "-- Clean gridData object.\n");
+  SYS_T::commPrint("-- Clean gridData object.\n");
   gridData->Delete();
 }
 
-
-void VTK_Writer_FSI_Tet4::writeOutput_fluid(
+void VTK_Writer_FSI::writeOutput_fluid(
     const FEANode * const &fnode_ptr,
     const ALocal_IEN * const &lien_v,
     const ALocal_IEN * const &lien_p,
@@ -222,7 +235,7 @@ void VTK_Writer_FSI_Tet4::writeOutput_fluid(
     const bool &isXML )
 {
   // This routine requires nqp = 4
-  SYS_T::print_fatal_if(quad->get_num_quadPts() != 4, "Error: VTK_Writer_Tet4 requires 4 quadrature points.\n");
+  SYS_T::print_fatal_if(quad->get_num_quadPts() != 4, "Error: VTK_Writer requires 4 quadrature points for Tet4.\n");
 
   Interpolater intep( nLocBas );
 
@@ -277,7 +290,7 @@ void VTK_Writer_FSI_Tet4::writeOutput_fluid(
       const std::vector<int> IEN_v = lien_v -> get_LIEN(ee);
       const std::vector<int> IEN_p = lien_p -> get_LIEN(ee);
 
-      double ectrl_x[4], ectrl_y[4], ectrl_z[4];
+      double ectrl_x[nLocBas], ectrl_y[nLocBas], ectrl_z[nLocBas];
 
       fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
 
@@ -429,7 +442,7 @@ void VTK_Writer_FSI_Tet4::writeOutput_fluid(
 }
 
 
-void VTK_Writer_FSI_Tet4::writeOutput_solid_cur(
+void VTK_Writer_FSI::writeOutput_solid_cur(
     const FEANode * const &fnode_ptr,
     const ALocal_IEN * const &lien_v,
     const ALocal_IEN * const &lien_p,
@@ -447,7 +460,7 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_cur(
     const bool &isXML )
 {
   // This routine requires nqp = 4
-  SYS_T::print_fatal_if(quad->get_num_quadPts() != 4, "Error: VTK_Writer_Tet4 requires 4 quadrature points.\n");
+  SYS_T::print_fatal_if(quad->get_num_quadPts() != 4, "Error: VTK_Writer requires 4 quadrature points for Tet4.\n");
 
   Interpolater intep( nLocBas );
 
@@ -487,7 +500,7 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_cur(
       const std::vector<int> IEN_v = lien_v -> get_LIEN(ee);
       const std::vector<int> IEN_p = lien_p -> get_LIEN(ee);
 
-      double ectrl_x[4], ectrl_y[4], ectrl_z[4];
+      double ectrl_x[nLocBas], ectrl_y[nLocBas], ectrl_z[nLocBas];
 
       fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
 
@@ -580,7 +593,7 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_cur(
   gridData->Delete();
 }
 
-void VTK_Writer_FSI_Tet4::writeOutput_solid_ref(
+void VTK_Writer_FSI::writeOutput_solid_ref(
     const FEANode * const &fnode_ptr,
     const ALocal_IEN * const &lien_v,
     const ALocal_IEN * const &lien_p,
@@ -598,7 +611,7 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_ref(
     const bool &isXML )
 {
   // This routine requires nqp = 4
-  SYS_T::print_fatal_if(quad->get_num_quadPts() != 4, "Error: VTK_Writer_Tet4 requires 4 quadrature points.\n");
+  SYS_T::print_fatal_if(quad->get_num_quadPts() != 4, "Error: VTK_Writer requires 4 quadrature points for Tet4.\n");
 
   Interpolater intep( nLocBas );
 
@@ -638,7 +651,7 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_ref(
       const std::vector<int> IEN_v = lien_v -> get_LIEN(ee);
       const std::vector<int> IEN_p = lien_p -> get_LIEN(ee);
 
-      double ectrl_x[4], ectrl_y[4], ectrl_z[4];
+      double ectrl_x[nLocBas], ectrl_y[nLocBas], ectrl_z[nLocBas];
 
       fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
 
