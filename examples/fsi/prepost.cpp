@@ -322,7 +322,6 @@ int main( int argc, char * argv[] )
   // Clean up Memory
   delete mnindex_p; delete mnindex_v; delete mesh_p; delete mesh_v;
   delete IEN_p; delete IEN_v; delete mytimer; delete global_part;
-  PetscFinalize();
   return EXIT_SUCCESS;
 }
 
