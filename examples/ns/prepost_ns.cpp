@@ -21,10 +21,6 @@ int main( int argc, char * argv[] )
   int sysret = system("rm -rf postpart_p*.h5");
   SYS_T::print_fatal_if(sysret != 0, "ERROR: system call failed. \n");
 
-  const std::string part_file("postpart");
-  int cpu_size = 1;
-  bool isDualGraph = true;
-  
   // Read preprocessor command-line arguements recorded in the .h5 file
   hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
@@ -45,9 +41,10 @@ int main( int argc, char * argv[] )
 
   YAML::Node paras = YAML::LoadFile( yaml_file );
 
-  cpu_size = paras["cpu_size"].as<int>();
+  const int cpu_size = paras["cpu_size"].as<int>();
   in_ncommon = paras["in_ncommon"].as<int>();
-  isDualGraph = paras["is_dualgraph"].as<bool>();  
+  const bool isDualGraph = paras["is_dualgraph"].as<bool>();  
+  const std::string part_file = paras["part_file"].as<std::string>();
 
   cout<<"==== Command Line Arguments ===="<<endl;
   cout<<" -cpu_size: "<<cpu_size<<endl;
@@ -59,7 +56,7 @@ int main( int argc, char * argv[] )
   cout<<"geo_file: "<<geo_file<<endl;
   cout<<"elemType: "<<elemType<<endl;
   cout<<"dof_num: "<<dofNum<<endl;
-  cout<<"dof_mat: "<< dofMat<<endl;
+  cout<<"dof_mat: "<<dofMat<<endl;
 
   // Read the geo_file
   int nFunc, nElem;

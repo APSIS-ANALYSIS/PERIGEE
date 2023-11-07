@@ -2,4 +2,5 @@
 cpu_size: 4
 in_ncommon: 2
 is_dualgraph: true
-part_file: postpart
+part_file_p: ./ppart/postpart_p
+part_file_v: ./ppart/postpart_v

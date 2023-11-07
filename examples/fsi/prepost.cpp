@@ -13,6 +13,7 @@
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
 #include "Part_FEM_FSI.hpp"
+#include "yaml-cpp/yaml.h"
 
 int main( int argc, char * argv[] )
 {
@@ -25,18 +26,8 @@ int main( int argc, char * argv[] )
 
   SYS_T::execute("mkdir ppart");
 
-  const std::string part_file_p("./ppart/postpart_p");
-  const std::string part_file_v("./ppart/postpart_v");
-
   const int num_fields = 2; // Two fields : pressure + velocity/displacement
   const std::vector<int> dof_fields {1, 3}; // pressure 1 ; velocity/displacement 3
-
-  int cpu_size = 1;
-  bool isDualGraph = true;
-
-  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-  
-  SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: preprocessor is a serial program! \n");
 
   hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
@@ -49,17 +40,26 @@ int main( int argc, char * argv[] )
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
-  SYS_T::GetOptionInt("-cpu_size", cpu_size);
-  SYS_T::GetOptionInt("-in_ncommon", in_ncommon);
-  SYS_T::GetOptionBool("-METIS_isDualGraph", isDualGraph);
+  // The user can specify the new mesh partition options from the yaml file
+  const std::string yaml_file("fsi_prepost.yml");
+
+  SYS_T::file_check(yaml_file);
+
+  YAML::Node paras = YAML::LoadFile( yaml_file );
+
+  const int cpu_size = paras["cpu_size"].as<int>();
+  in_ncommon = paras["in_ncommon"].as<int>();
+  const bool isDualGraph = paras["is_dualgraph"].as<bool>();
+  const std::string part_file_v = paras["part_file_v"].as<std::string>();
+  const std::string part_file_p = paras["part_file_p"].as<std::string>();
 
   cout<<"==== Command Line Arguments ===="<<endl;
   cout<<" -part_file_v: "<<part_file_v<<endl;
   cout<<" -part_file_p: "<<part_file_p<<endl;
   cout<<" -cpu_size: "<<cpu_size<<endl;
   cout<<" -in_ncommon: "<<in_ncommon<<endl;
-  if(isDualGraph) cout<<" -METIS_isDualGraph: true \n";
-  else cout<<" -METIS_isDualGraph: false \n";
+  if(isDualGraph) cout<<" -is_dualgraph: true \n";
+  else cout<<" -is_dualgraph: false \n";
   cout<<"----------------------------------\n";
   cout<<"geo_file: "<<geo_file<<endl;
   cout<<"sur_s_file_interior_wall: "<<sur_s_file_interior_wall<<endl;
