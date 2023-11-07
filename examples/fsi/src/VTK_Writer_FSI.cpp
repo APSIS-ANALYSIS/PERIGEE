@@ -234,8 +234,17 @@ void VTK_Writer_FSI::writeOutput_fluid(
     const std::string &outputName,
     const bool &isXML )
 {
-  // This routine requires nqp = 4
-  SYS_T::print_fatal_if(quad->get_num_quadPts() != 4, "Error: VTK_Writer requires 4 quadrature points for Tet4.\n");
+  if(nLocBas == 4)  // elemType 501
+  {
+    // This routine requires nqp = 4
+    SYS_T::print_fatal_if(quad->get_num_quadPts() != 4, "Error: VTK_Writer requires 4 quadrature points for Tet4.\n");
+  }
+  else if(nLocBas == 8)  // elemType 601
+  {
+    // This routine requires nqp = 8
+    SYS_T::print_fatal_if(quad->get_num_quadPts() != 8, "Error: VTK_Writer requires 4 quadrature points for Hex8.\n");    
+  }
+  else SYS_T::print_fatal( "Error: VTK_Writer_FSI::writeOutput_fluid function: unsupported element type \n" );
 
   Interpolater intep( nLocBas );
 
@@ -296,7 +305,9 @@ void VTK_Writer_FSI::writeOutput_fluid(
 
       elemptr->buildBasis( quad, ectrl_x, ectrl_y, ectrl_z );
 
-      const int IEN_f[4] = { fien[ee*4+0], fien[ee*4+1], fien[ee*4+2], fien[ee*4+3] };
+      int IEN_f[nLocBas]{};
+
+      for(int ii=0; ii<nLocBas; ++ii) IEN_f[ii] = fien[ee * nLocBas + ii]; 
 
       // Interpolate data and assign to dataVecs
       std::vector<double> inputInfo; inputInfo.clear();
@@ -374,7 +385,12 @@ void VTK_Writer_FSI::writeOutput_fluid(
       }
 
       // Set mesh connectivity
-      VIS_T::setTetraelem( IEN_f[0], IEN_f[1], IEN_f[2], IEN_f[3], gridData );
+      if( elemptr->get_Type() == 501 )
+        VIS_T::setTetraelem( IEN_f[0], IEN_f[1], IEN_f[2], IEN_f[3], gridData );
+      else if( elemptr->get_Type() == 601 )
+        VIS_T::setHexelem( IEN_f[0], IEN_f[1], IEN_f[2], IEN_f[3], 
+          IEN_f[4], IEN_f[5], IEN_f[6], IEN_f[7], gridData );
+      else SYS_T::print_fatal("Error: unknown element type.\n");
 
       // Analysis mesh partition
       const int e_global = lelem_ptr->get_elem_loc(ee);
