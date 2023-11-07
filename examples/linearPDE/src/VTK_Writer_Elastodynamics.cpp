@@ -1,8 +1,11 @@
 #include "VTK_Writer_Elastodynamics.hpp"
 
 VTK_Writer_Elastodynamics::VTK_Writer_Elastodynamics( const int &in_nelem,
-    const int &in_nlocbas, const std::string &epart_file )
-: nLocBas( in_nlocbas ), nElem( in_nelem ) 
+    const int &in_nlocbas, const std::string &epart_file,
+    const double &in_module_E, const double &in_nu )
+: nLocBas( in_nlocbas ), nElem( in_nelem ),
+lambda( in_nu * in_module_E / ((1.0 + in_nu) * (1.0 - 2.0 * in_nu)) ),
+mu( 0.5 * in_module_E / (1.0 + in_nu) )
 {
   VIS_T::read_epart( epart_file, nElem, epart_map );
 }
@@ -66,7 +69,6 @@ void VTK_Writer_Elastodynamics::writeOutput(
     std::vector<double> inputInfo; inputInfo.clear();
     
     // Interpolate velocity vector
-    inputInfo.clear();
     int asize = vdata_ptr->get_arraySizes(0);
     for(int jj=0; jj<nLocBas; ++jj)
     {
@@ -76,6 +78,8 @@ void VTK_Writer_Elastodynamics::writeOutput(
     }
     intep.interpolateVTKData( asize, &IEN_e[0], &inputInfo[0],
         elemptr, dataVecs[0] );
+
+    interpolateCauchy( &IEN_e[0], &inputInfo[0], elemptr, dataVecs[1] );
 
     // Set mesh connectivity
     if( elemptr->get_Type() == 501 )
@@ -132,6 +136,55 @@ void VTK_Writer_Elastodynamics::writeOutput(
   // Clean gridData
   PetscPrintf(PETSC_COMM_WORLD, "-- Clean gridData object.\n");
   gridData->Delete();
+}
+
+void VTK_Writer_Elastodynamics::interpolateCauchy( const int * const &ptid,
+    const double * const &inputData, FEAElement * const &elem,
+    vtkDoubleArray * const &vtkData)
+{
+  Interpolater intep( nLocBas );
+
+  const double l2mu = lambda + 2.0 * mu;
+
+  const int nqp = elem->get_numQuapts();
+
+  double * ux = new double [nLocBas];
+  double * uy = new double [nLocBas];
+  double * uz = new double [nLocBas];
+
+  std::vector<double> ux_x, ux_y, ux_z, uy_x, uy_y, uy_z, uz_x, uz_y, uz_z;
+
+  for(int ii=0; ii<nLocBas; ++ii)
+  {
+    ux[ii] = inputData[ii*3];
+    uy[ii] = inputData[ii*3+1];
+    uz[ii] = inputData[ii*3+2];
+  }
+
+  intep.interpolateFE_Grad(ux, elem, ux_x, ux_y, ux_z);
+  intep.interpolateFE_Grad(uy, elem, uy_x, uy_y, uy_z);
+  intep.interpolateFE_Grad(uz, elem, uz_x, uz_y, uz_z);
+
+  double sigma_xx = 0.0, sigma_yy = 0.0, sigma_zz = 0.0;
+  double sigma_xy = 0.0, sigma_xz = 0.0, sigma_yz = 0.0;
+
+  for(int ii=0; ii<nqp; ++ii)
+  {
+    sigma_xx = l2mu * ux_x[ii] + mu * (uy_y[ii] + uz_z[ii]);
+    sigma_yy = l2mu * uy_y[ii] + mu * (ux_x[ii] + uz_z[ii]);
+    sigma_zz = l2mu * uz_z[ii] + mu * (uy_y[ii] + ux_x[ii]);
+    sigma_xy = mu * ( ux_y[ii] + uy_x[ii] );
+    sigma_xz = mu * ( ux_z[ii] + uz_x[ii] );
+    sigma_yz = mu * ( uy_z[ii] + uz_y[ii] );
+    vtkData->InsertComponent(ptid[ii], 0, sigma_xx);
+    vtkData->InsertComponent(ptid[ii], 1, sigma_yy);
+    vtkData->InsertComponent(ptid[ii], 2, sigma_zz);
+    vtkData->InsertComponent(ptid[ii], 3, sigma_xy);
+    vtkData->InsertComponent(ptid[ii], 4, sigma_yz);
+    vtkData->InsertComponent(ptid[ii], 5, sigma_xz);
+  }
+
+  delete [] ux; delete [] uy; delete [] uz;
 }
 
 // EOF

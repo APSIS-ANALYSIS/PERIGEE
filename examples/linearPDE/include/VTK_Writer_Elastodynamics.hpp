@@ -20,7 +20,7 @@ class VTK_Writer_Elastodynamics
 {
   public:
     VTK_Writer_Elastodynamics( const int &in_nelem, const int &in_nlocbas, 
-        const std::string &epart_file );
+        const std::string &epart_file, const double &in_module_E, const double &in_nu );
 
     ~VTK_Writer_Elastodynamics() = default;
     
@@ -41,8 +41,13 @@ class VTK_Writer_Elastodynamics
 
   private:
     const int nLocBas, nElem;
+    const double lambda, mu;
 
     std::vector<int> epart_map;
+
+    void interpolateCauchy( const int * const &ptid,
+        const double * const &inputData, FEAElement * const &elem,
+        vtkDoubleArray * const &vtkData_x );
 };
 
 #endif
