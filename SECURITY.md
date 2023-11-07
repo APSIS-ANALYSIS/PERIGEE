@@ -1,6 +1,6 @@
 # Security Policy
 
-If you encounter a potential security vulnerability in this project, please report it to us at liujuy@gmail.com. We will work with you to verify and patch the vulnerability.
+If you encounter a potential security vulnerability in this project, please report it to us at liujuy at gmail dot com. We will work with you to verify and patch the vulnerability.
 
 When reporting issues, please provide the following information:
 
