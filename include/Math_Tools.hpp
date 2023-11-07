@@ -196,6 +196,9 @@ namespace MATH_T
   //
   // Ref. Numerical Linear Algebra by L.N. Trefethen and D. Bau, III, SIAM.
   // ==========================================================================
+
+  template<int N> class Matrix_SymPos_Dense;   // declare template Matrix_SymPos_Dense
+
   template<int N> class Matrix_Dense
   {
     public:
@@ -280,7 +283,6 @@ namespace MATH_T
       virtual Matrix_Dense<N>& operator= (const Matrix_SymPos_Dense<N> &source)
       {
         if(this == &source) return *this;
-
         for(int ii=0; ii<N*N; ++ii) mat[ii] = source(ii);
 
         for(int ii=0; ii<N; ++ii) pp[ii] = ii;
@@ -440,12 +442,26 @@ namespace MATH_T
     public:
       Matrix_SymPos_Dense()
       {
-        // TO BE FILLED
+        ASSERT(N>=1, "Matrix_SymPos_Dense<N> Error: The matrix size N must be positive.\n");      
+
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = 0.0;
+        for(int ii=0; ii<N; ++ii)
+        {
+          mat[ii*N+ii] = 1.0;
+        }
+        is_fac = false;
       }
 
       Matrix_SymPos_Dense(const std::array<double,N*N> &input)
       {
-        // TO BE FILLED
+        ASSERT(N>=1, "Matrix_SymPos_Dense<N> Error: The matrix size N must be positive.\n");      
+        
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = input[ii];
+
+        // Check the symmetry of the matrix
+        check_symm();
+
+        is_fac = false;
       }
 
       // ----------------------------------------------------------------------
@@ -458,8 +474,6 @@ namespace MATH_T
         
         // Check the symmetry of the matrix
         check_symm();
-
-        for(int ii=0; ii<N; ++ii) this->pp[ii] = input.get_p(ii); 
 
         this->is_fac = input.get_is_fac();
       }
