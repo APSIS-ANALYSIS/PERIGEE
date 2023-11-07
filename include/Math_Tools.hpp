@@ -422,20 +422,24 @@ namespace MATH_T
   //
   // Ref. Shufang Xu, Numerical Linear Algebra, Peking Univ.
   // ==========================================================================
-  template<int N> class Matrix_SymPos_Dense : public Matrix_Dense <N>
+  template<int N> class Matrix_SymPos_Dense
   {
     public:
-      Matrix_SymPos_Dense() : Matrix_Dense<N>()
-      {}
+      Matrix_SymPos_Dense()
+      {
+        // TO BE FILLED
+      }
 
-      Matrix_SymPos_Dense(const std::array<double,N*N> &input) : Matrix_Dense<N>(input)
-      {}
+      Matrix_SymPos_Dense(const std::array<double,N*N> &input)
+      {
+        // TO BE FILLED
+      }
 
       // ----------------------------------------------------------------------
       // We assume that the input matrix are the symmetry positive definite matrix
       // and we do not check this in the constructor 
       // ----------------------------------------------------------------------
-      Matrix_SymPos_Dense( const Matrix_Dense<N> &input ) : Matrix_Dense<N>()
+      Matrix_SymPos_Dense( const Matrix_Dense<N> &input )
       { 
         for(int ii=0; ii<N*N; ++ii) this->mat[ii] = input(ii);
         
@@ -464,10 +468,51 @@ namespace MATH_T
         }
       }
 
+      void print_info() const
+      {
+        std::cout<<"N ="<<N<<'\n';
+        std::cout<<"Matrix :\n";
+        int counter = -1;
+        for(int ii=0; ii<N; ++ii)
+        {
+          for(int jj=0; jj<N; ++jj)
+            std::cout<<mat[++counter]<<'\t';
+          std::cout<<'\n';
+        }
+
+        if(is_fac)
+          std::cout<<"Matrix is factorized.\n";
+        else
+          std::cout<<"Matrix is NOT factorized.\n";
+      }
+
+      void gen_rand(const double &min = -1.0, const double &max = 1.0)
+      {
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = gen_double_rand(min, max);
+      }
+
+      double& operator()(const int &index) {return mat[index];}
+
+      const double& operator()(const int &index) const {return mat[index];}
+
+      double& operator()(const int &ii, const int &jj) {return mat[N*ii+jj];}
+
+      const double& operator()(const int &ii, const int &jj) const {return mat[N*ii+jj];}
+      
+      int get_size() const {return N;}
+
+      bool get_is_fac() const {return is_fac;}
+
       // Assignment operator
       Matrix_SymPos_Dense<N>& operator= (const Matrix_SymPos_Dense<N> &source)
       {
-        Matrix_Dense<N>::operator=(source);
+        // self-assignment guard
+        if(this == &source) return *this;
+
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = source(ii);
+
+        is_fac = source.get_is_fac();
+
         return *this;
       }
 
@@ -524,6 +569,26 @@ namespace MATH_T
         }
         return xx;
       }
+
+      std::array<double,N> Mult( const std::array<double,N> &input ) const
+      {
+        ASSERT(is_fac == false, "Error: the matrix has been factroized.\n");
+        std::array<double,N> out {};
+        for(int ii=0; ii<N; ++ii)
+        {
+          out[ii] = 0.0;
+          for(int jj=0; jj<N; ++jj)
+            out[ii] += mat[N*ii+jj] * input[jj];
+        }
+        return out;
+      }
+
+    private:
+      // container for the matrix
+      double mat[N*N];
+
+      // bool variable indicate if the matrix has been LU factorized.
+      bool is_fac;
   };
 
 } // End of Math_T
