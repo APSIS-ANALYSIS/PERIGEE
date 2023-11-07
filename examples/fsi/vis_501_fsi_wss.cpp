@@ -19,6 +19,13 @@ void write_triangle_grid_wss( const std::string &filename,
     const std::vector<int> &ien_array,
     const std::vector< Vector_3 > &wss_on_node );
 
+void write_triangle_grid_tawss_osi( const std::string &filename,
+    const int &numpts, const int &numcels,
+    const std::vector<double> &pt,
+    const std::vector<int> &ien_array,
+    const std::vector<double> &tawss,
+    const std::vector<double> &osi );
+
 int main( int argc, char * argv[] )
 {
   const int dof_v = 3;
@@ -112,6 +119,13 @@ int main( int argc, char * argv[] )
   // Read the node mappings
   const std::vector<int> analysis_new2old = HDF5_T::read_intVector( "node_mapping_v.h5",
       "/", "new_2_old" );
+
+  // Container for TAWSS & OSI
+  std::vector<double> tawss( nFunc, 0.0 ); 
+  std::vector<double> osi( nFunc, 0.0 ); 
+  std::vector< Vector_3 > osi_top( nFunc, Vector_3(0.0, 0.0, 0.0) );
+
+  const double inv_T = 1.0 / ( static_cast<double>((time_end - time_start)/time_step) + 1.0 );
 
   for(int time = time_start; time <= time_end; time += time_step)
   {
@@ -283,9 +297,10 @@ int main( int argc, char * argv[] )
         wss_ave[ trn[qua] ].z() += wss_z * tri_area[ee];
 
         node_area[ trn[qua] ] += tri_area[ee];
-      }
-    }
+      } // Loop over the three surface points 
+    } // Loop over surface elements
 
+    // Do the averaging by dividing by the area owned by this node
     for(int ii=0; ii<nFunc; ++ii)
     {
       wss_ave[ii].x() /= node_area[ii];
@@ -296,7 +311,28 @@ int main( int argc, char * argv[] )
     // write the wall shear stress at this time instance
     write_triangle_grid_wss( name_to_write, nFunc, nElem, ctrlPts, vecIEN, wss_ave );
 
+    for(int ii=0; ii<nFunc; ++ii)
+    {
+      tawss[ii]   += inv_T * wss_ave[ii].norm2();
+      osi_top[ii] += inv_T * wss_ave[ii];
+    } 
+
+  }// Loop over each time instance
+
+  for(int ii=0; ii<nFunc; ++ii)
+  {
+    const double mag = osi_top[ii].norm2();
+
+    // We will disallow very small tawss in the osi calculation
+    if( std::abs(tawss[ii]) > 1.0e-12 )
+      osi[ii] = 0.5 * (1.0 - mag / tawss[ii] );
+    else
+      osi[ii] = 0.0;
   }
+
+  // write time averaged wss and osi
+  std::string tawss_osi_file("SOL_TAWSS_OSI" );
+  write_triangle_grid_tawss_osi( tawss_osi_file, nFunc, nElem, ctrlPts, vecIEN, tawss, osi );
 
   delete quad; delete element;
   PetscFinalize();
@@ -358,6 +394,30 @@ void write_triangle_grid_wss( const std::string &filename,
 
   VTK_T::add_Vector3_PointData( grid_w, wss_on_node, "WSS" ); 
 
+  VTK_T::write_vtkPointSet(filename, grid_w);
+
+  grid_w->Delete();
+}
+
+void write_triangle_grid_tawss_osi( const std::string &filename,
+    const int &numpts, const int &numcels,
+    const std::vector<double> &pt,
+    const std::vector<int> &ien_array,
+    const std::vector<double> &tawss,
+    const std::vector<double> &osi )
+{
+  vtkPolyData * grid_w = vtkPolyData::New();
+
+  // generate the triangle grid
+  TET_T::gen_triangle_grid(grid_w, numpts, numcels, pt, ien_array);
+
+  // write tawss
+  VTK_T::add_double_PointData(grid_w, tawss, "TAWSS");
+
+  // write osi 
+  VTK_T::add_double_PointData(grid_w, osi, "OSI");
+  
+  // write vtp
   VTK_T::write_vtkPointSet(filename, grid_w);
 
   grid_w->Delete();
