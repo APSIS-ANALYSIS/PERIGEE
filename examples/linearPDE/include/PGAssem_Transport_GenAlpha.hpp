@@ -1,15 +1,15 @@
-#ifndef PGASSEM_TRANSPORT_GENALPHA_HPP
-#define PGASSEM_TRANSPORT_GENALPHA_HPP
+#ifndef PGASSEM_ELASTODYNAMICS_GENALPHA_HPP
+#define PGASSEM_ELASTODYNAMICS_GENALPHA_HPP
 
 #include "IPGAssem.hpp"
 #include "PETSc_Tools.hpp"
-#include "PDNSolution_Transport.hpp"
+#include "PDNSolution_Elastodynamics.hpp"
 
-class PGAssem_Transport_GenAlpha : public IPGAssem
+class PGAssem_Elastodynamics_GenAlpha : public IPGAssem
 {
   public:
     // Constructor for CMM equations
-    PGAssem_Transport_GenAlpha(
+    PGAssem_Elastodynamics_GenAlpha(
         IPLocAssem * const &locassem_ptr,
         const IAGlobal_Mesh_Info * const &agmi_ptr,
         const ALocal_Elem * const &alelem_ptr,
@@ -20,7 +20,7 @@ class PGAssem_Transport_GenAlpha : public IPGAssem
         const int &in_nz_estimate = 60 );
 
     // Destructor
-    virtual ~PGAssem_Transport_GenAlpha();
+    virtual ~PGAssem_Elastodynamics_GenAlpha();
 
     // Nonzero pattern estimate
     virtual void Assem_nonzero_estimate(
@@ -85,9 +85,9 @@ class PGAssem_Transport_GenAlpha : public IPGAssem
 
     // Private function
     // Essential boundary condition
-    void EssBC_KG( const ALocal_NBC * const &nbc_part );
+    void EssBC_KG( const ALocal_NBC * const &nbc_part, const int &field );
 
-    void EssBC_G( const ALocal_NBC * const &nbc_part );
+    void EssBC_G( const ALocal_NBC * const &nbc_part, const int &field );
 
     // Natural boundary condition
     void NatBC_G( const double &curr_time, const double &dt,
@@ -100,9 +100,14 @@ class PGAssem_Transport_GenAlpha : public IPGAssem
     void GetLocal( const double * const &array, const int * const &IEN,
         double * const &local_array ) const
     {
-      for(int ii=0; ii<nLocBas; ++ii) local_array[ii] = array[ IEN[ii] ];
+      for(int ii=0; ii<nLocBas; ++ii)
+      {
+        const int offset1 = ii * 3;
+        const int offset2 = IEN[ii] * 3;
+        for(int jj=0; jj<3; ++jj)
+          local_array[offset1 + jj] = array[offset2 + jj];
+      }
     }
-
 };
 
 #endif
