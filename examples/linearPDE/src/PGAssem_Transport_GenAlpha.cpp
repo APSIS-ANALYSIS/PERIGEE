@@ -19,7 +19,7 @@ PGAssem_Transport_GenAlpha::PGAssem_Transport_GenAlpha(
   // the same. This is an assumption in this assembly routine.
   if(num_ebc>0) snLocBas = part_ebc -> get_cell_nLocBas(0);
 
-  const int nlocrow = 1 * pnode_ptr -> get_nlocalnode();
+  const int nlocrow = dof_mat * pnode_ptr -> get_nlocalnode();
 
   // Allocate the sparse matrix K
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
