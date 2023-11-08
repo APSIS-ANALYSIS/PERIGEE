@@ -4,8 +4,8 @@ VTK_Writer_Elastodynamics::VTK_Writer_Elastodynamics( const int &in_nelem,
     const int &in_nlocbas, const std::string &epart_file,
     const double &in_module_E, const double &in_nu )
 : nLocBas( in_nlocbas ), nElem( in_nelem ),
-lambda( in_nu * in_module_E / ((1.0 + in_nu) * (1.0 - 2.0 * in_nu)) ),
-mu( 0.5 * in_module_E / (1.0 + in_nu) )
+  lambda( in_nu * in_module_E / ((1.0 + in_nu) * (1.0 - 2.0 * in_nu)) ),
+  mu( 0.5 * in_module_E / (1.0 + in_nu) )
 {
   VIS_T::read_epart( epart_file, nElem, epart_map );
 }
