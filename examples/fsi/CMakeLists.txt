@@ -177,7 +177,7 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # BUILD THE MAIN DRIVERS
 # ===================================================================
 ADD_EXECUTABLE( preprocess_fsi preprocess_fsi.cpp)
-ADD_EXECUTABLE( wall_ps_tet4_3d wall_ps_tet4_driver.cpp)
+ADD_EXECUTABLE( wall_ps3d wall_ps_driver.cpp)
 ADD_EXECUTABLE( fsi3d fsi_driver.cpp)
 ADD_EXECUTABLE( prepostproc prepost.cpp)
 ADD_EXECUTABLE( vis_fsi vis_driver.cpp )
@@ -189,7 +189,7 @@ ADD_EXECUTABLE( vis_601_fsi_wss vis_601_fsi_wss.cpp )
 
 # Link libraries
 TARGET_LINK_LIBRARIES( preprocess_fsi ${EXTRA_LINK_LIBS} perigee_preprocess )
-TARGET_LINK_LIBRARIES( wall_ps_tet4_3d ${EXTRA_LINK_LIBS} perigee_analysis )
+TARGET_LINK_LIBRARIES( wall_ps3d ${EXTRA_LINK_LIBS} perigee_analysis )
 TARGET_LINK_LIBRARIES( fsi3d ${EXTRA_LINK_LIBS} perigee_analysis )
 TARGET_LINK_LIBRARIES( prepostproc ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( vis_fsi ${EXTRA_LINK_LIBS} perigee_postprocess )
