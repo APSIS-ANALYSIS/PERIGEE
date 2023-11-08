@@ -12,9 +12,9 @@ PTime_NS_Solver::~PTime_NS_Solver()
 
 std::string PTime_NS_Solver::Name_Generator(const int &counter) const
 {
-  int aux = 900000000 + counter;
   std::ostringstream temp;
-  temp<<aux;
+  temp.str("");
+  temp<<900000000 + counter;
 
   std::string out_name(pb_name);
   out_name.append(temp.str());
@@ -23,9 +23,9 @@ std::string PTime_NS_Solver::Name_Generator(const int &counter) const
 
 std::string PTime_NS_Solver::Name_dot_Generator(const int &counter) const
 {
-  int aux = 900000000 + counter;
   std::ostringstream temp;
-  temp<<aux;
+  temp.str("");
+  temp<<900000000 + counter;
 
   std::string out_name("dot_");
   out_name.append(pb_name);
