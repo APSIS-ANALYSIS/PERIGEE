@@ -1,7 +1,8 @@
 #include "VTK_Writer_FSI.hpp"
 
 VTK_Writer_FSI::VTK_Writer_FSI( const int &in_nelem,
-    const int &in_nlocbas, const std::string &epart_file ) : nLocBas(in_nlocbas), nElem(in_nelem)
+    const int &in_nlocbas, const std::string &epart_file )
+: nLocBas(in_nlocbas), nElem(in_nelem)
 {
   VIS_T::read_epart( epart_file, nElem, epart_map );
 }
