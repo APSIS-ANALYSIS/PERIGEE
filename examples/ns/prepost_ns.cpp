@@ -58,7 +58,6 @@ int main( int argc, char * argv[] )
   cout<<"geo_file: "<<geo_file<<endl;
   cout<<"elemType: "<<elemType<<endl;
   cout<<"dof_num: "<<dofNum<<endl;
-  cout<<"dof_mat: "<< dofMat<<endl;
 
   // Read the geo_file
   int nFunc, nElem;
