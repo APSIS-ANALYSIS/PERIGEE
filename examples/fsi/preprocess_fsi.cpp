@@ -362,7 +362,7 @@ int main( int argc, char * argv[] )
 
   // Generate the mesh for kinematics
   IMesh * mesh_v = nullptr;
-  
+
   // Generate the mesh for pressure (discontinuous over interface)
   IMesh * mesh_p = nullptr;
 
