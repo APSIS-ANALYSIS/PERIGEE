@@ -288,6 +288,10 @@ namespace Ten2
 
   // Return a zero matrix
   Tensor2_3D gen_zero();
+
+  // Return the exponential of the input matrix
+  // exp(X) = sum_{k=0}^{infty} 1/(k!) X^k
+  Tensor2_3D exp( const Tensor2_3D &input );
 }
 
 #endif
