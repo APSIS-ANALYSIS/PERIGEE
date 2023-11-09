@@ -598,22 +598,22 @@ Tensor2_3D Ten2::gen_zero()
 
 Tensor2_3D Ten2::exp( const Tensor2_3D &input )
 {
-  double nn = 0;
-  long double nn_fac = 0;
+  double nn = 0.0;
+  long double nn_fac = 1.0;
 
   Tensor2_3D input_pow = Ten2::gen_id();
   Tensor2_3D input_exp = Ten2::gen_id();
 
   do
   {
-    nn += 1;
-    nn_fac *= nn;
+      nn += 1.0;
+      nn_fac *= nn;
 
-    const Tensor2_3D temp = input_pow * input;
-    input_pow = temp;
-    input_exp += ( 1.0/nn_fac ) * input_pow;
+      const Tensor2_3D temp = input_pow * input;
+      input_pow = temp;
+      input_exp += ( 1.0/nn_fac ) * input_pow;
 
-  }while( std::sqrt( input_exp.MatContraction(input_exp) ) / nn_fac >= 1.0e-16 );
+  }while( std::sqrt( input_pow.MatContraction(input_pow) ) / nn_fac >= 1.0e-16 );
 
   return input_exp;
 }

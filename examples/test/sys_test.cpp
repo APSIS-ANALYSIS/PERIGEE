@@ -15,10 +15,10 @@
 
 int main(int argc, char *argv[])
 {
-    // this is generated in Matlab
-    const Tensor2_3D ten( 0.568873553,  -0.0731582749, -0.339563073,
-                          0.429856977,  -0.601316877,  -0.496976585,
-                          0.845131427,   0.74886152,    0.0903972708 );
+  // this is generated in Matlab
+  const Tensor2_3D ten( 0.568873553, -0.0731582749, -0.339563073,
+                        0.429856977, -0.601316877,  -0.496976585,
+                        0.845131427, 0.74886152,  0.0903972708 );
 
   const Tensor2_3D exp_ten = Ten2::exp( ten );
 
@@ -27,8 +27,12 @@ int main(int argc, char *argv[])
                                    0.189309087643618,   0.402886186985805,  -0.413651194701286,
                                    1.229091404984139,   0.483920828565943,   0.751727074987770 );
 
-  if( exp_ten.is_identical(exp_ten_matlab), 1.0e-16 ) std::cout<<"The differnece is less than 1.0e-16!"<<std::endl;
-  else std::cout<<"ERROR: the difference is larger than 1.0e-16!"<<std::endl;
+  std::cout<<"expm(X) = \n";
+  exp_ten_matlab.print();
+  std::cout<<"\nexp(X) = \n";
+  exp_ten.print();
+  if( exp_ten.is_identical(exp_ten_matlab, 1.0e-15) ) std::cout<<"\nThe differnece is less than 1.0e-15!"<<std::endl;
+  else std::cout<<"\nERROR: the difference is larger than 1.0e-15!"<<std::endl;
   return EXIT_SUCCESS;
 }
 
