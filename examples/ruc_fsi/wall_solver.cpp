@@ -74,8 +74,12 @@ int main( int argc, char *argv[] )
 
   delete pcmd_h5r; H5Fclose(prepcmd_file);
 
+#if PETSC_VERSION_LT(3,19,0)
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-  
+#else
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULLPTR);
+#endif
+
   SYS_T::print_fatal_if( cmmBC_type != 2, "Error: cmmBC_type is NOT 2, please check the preprocessor. \n");
   
   const PetscMPIInt rank = SYS_T::get_MPI_rank();
