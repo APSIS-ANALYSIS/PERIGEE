@@ -282,7 +282,6 @@ namespace MATH_T
 
       virtual Matrix_Dense<N>& operator= (const Matrix_SymPos_Dense<N> &source)
       {
-        if(this == &source) return *this;
         for(int ii=0; ii<N*N; ++ii) mat[ii] = source(ii);
 
         for(int ii=0; ii<N; ++ii) pp[ii] = ii;
