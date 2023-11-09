@@ -1,9 +1,9 @@
-#ifndef PLOCASSEM_2X2BLOCK_TET4_VMS_HYPERELASTICITY_HPP
-#define PLOCASSEM_2X2BLOCK_TET4_VMS_HYPERELASTICITY_HPP
+#ifndef PLOCASSEM_2X2BLOCK_VMS_HYPERELASTICITY_HPP
+#define PLOCASSEM_2X2BLOCK_VMS_HYPERELASTICITY_HPP
 // ============================================================================
-// PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity.hpp
+// PLocAssem_2x2Block_VMS_Hyperelasticity.hpp
 //
-// This is the local assembly for compressible hyperelasticity using tet4
+// This is the local assembly for compressible hyperelasticity using tet4 or hex8
 // elements and VMS formulation.
 //
 // Author: Ju Liu
@@ -13,15 +13,15 @@
 #include "IMaterialModel.hpp"
 #include "TimeMethod_GenAlpha.hpp"
 
-class PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity : public IPLocAssem_2x2Block
+class PLocAssem_2x2Block_VMS_Hyperelasticity : public IPLocAssem_2x2Block
 {
   public:
-    PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity(
+    PLocAssem_2x2Block_VMS_Hyperelasticity(
         IMaterialModel * const &in_matmodel,
         const TimeMethod_GenAlpha * const &tm_gAlpha,
         const int &in_nlocbas, const int &in_snlocbas );
 
-    virtual ~PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity();
+    virtual ~PLocAssem_2x2Block_VMS_Hyperelasticity();
 
     virtual int get_dof_0() const {return 3;}
 
@@ -137,7 +137,7 @@ class PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity : public IPLocAssem_2x2Block
 
     // Use pointers to the member functions to facilitate the automatic
     // treatment of ebc surface integration.
-    typedef Vector_3 ( PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity::*locassem_2x2block_vms_comp_ela_fem_funs )( 
+    typedef Vector_3 ( PLocAssem_2x2Block_VMS_Hyperelasticity::*locassem_2x2block_vms_comp_ela_fem_funs )( 
         const Vector_3 &pt, const double &tt, const Vector_3 &n_out) const;
 
     locassem_2x2block_vms_comp_ela_fem_funs * flist;

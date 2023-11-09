@@ -1,18 +1,19 @@
-#include "VTK_Writer_FSI_Tet4.hpp"
+#include "VTK_Writer_FSI.hpp"
 
-VTK_Writer_FSI_Tet4::VTK_Writer_FSI_Tet4( const int &in_nelem,
-    const std::string &epart_file ) : nLocBas(4), nElem(in_nelem)
+VTK_Writer_FSI::VTK_Writer_FSI( const int &in_nelem,
+    const int &in_nlocbas, const std::string &epart_file )
+: nLocBas(in_nlocbas), nElem(in_nelem)
 {
   VIS_T::read_epart( epart_file, nElem, epart_map );
 }
 
 
-VTK_Writer_FSI_Tet4::~VTK_Writer_FSI_Tet4()
+VTK_Writer_FSI::~VTK_Writer_FSI()
 {
   VEC_T::clean(epart_map);
 }
 
-void VTK_Writer_FSI_Tet4::interpolateJ( const int * const &ptid,
+void VTK_Writer_FSI::interpolateJ( const int * const &ptid,
     const std::vector<double> &inputData,
     const FEAElement * const &elem,
     vtkDoubleArray * const &vtkData )
@@ -46,7 +47,7 @@ void VTK_Writer_FSI_Tet4::interpolateJ( const int * const &ptid,
   }
 }
 
-void VTK_Writer_FSI_Tet4::writeOutput(
+void VTK_Writer_FSI::writeOutput(
         const FEANode * const &fnode_ptr,
         const ALocal_IEN * const &lien_v,
         const ALocal_IEN * const &lien_p,
@@ -62,8 +63,17 @@ void VTK_Writer_FSI_Tet4::writeOutput(
         const std::string &outputName,
         const bool &isXML )
 {
-  // This routine requires nqp = 4
-  SYS_T::print_fatal_if(quad->get_num_quadPts() != 4, "Error: VTK_Writer_Tet4 requires 4 quadrature points.\n");
+  if(nLocBas == 4)  // elemType 501
+  {
+    // This routine requires nqp = 4
+    SYS_T::print_fatal_if(quad->get_num_quadPts() != 4, "Error: VTK_Writer requires 4 quadrature points for Tet4.\n");
+  }
+  else if(nLocBas == 8)  // elemType 601
+  {
+    // This routine requires nqp = 8
+    SYS_T::print_fatal_if(quad->get_num_quadPts() != 8, "Error: VTK_Writer requires 8 quadrature points for Hex8.\n");    
+  }
+  else SYS_T::print_fatal( "Error: VTK_Writer_FSI::writeOutput function: unsupported element type \n" );
 
   Interpolater intep( nLocBas );
 
@@ -107,11 +117,11 @@ void VTK_Writer_FSI_Tet4::writeOutput(
     const std::vector<int> IEN_v = lien_v -> get_LIEN( ee );
     const std::vector<int> IEN_p = lien_p -> get_LIEN( ee );
 
-    double ectrl_x[4], ectrl_y[4], ectrl_z[4];
+    std::vector<double> ectrl_x(nLocBas, 0.0), ectrl_y(nLocBas, 0.0), ectrl_z(nLocBas, 0.0);
 
-    fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
+    fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0]);
 
-    elemptr->buildBasis( quad, ectrl_x, ectrl_y, ectrl_z );
+    elemptr->buildBasis( quad, &ectrl_x[0], &ectrl_y[0], &ectrl_z[0] );
 
     // Interpolate data and assign to dataVecs
     std::vector<double> inputInfo; inputInfo.clear();
@@ -128,7 +138,7 @@ void VTK_Writer_FSI_Tet4::writeOutput(
     intep.interpolateVTKData( asize, &IEN_p[0], inputInfo, elemptr, dataVecs[0] );
 
     // use displacement to update points
-    intep.interpolateVTKPts( &IEN_p[0], ectrl_x, ectrl_y, ectrl_z, inputInfo, elemptr, points);
+    intep.interpolateVTKPts( &IEN_p[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], inputInfo, elemptr, points);
 
     // Interpolate detF
     interpolateJ( &IEN_p[0], inputInfo, elemptr, dataVecs[1] );
@@ -156,7 +166,12 @@ void VTK_Writer_FSI_Tet4::writeOutput(
     intep.interpolateVTKData( asize, &IEN_p[0], inputInfo, elemptr, dataVecs[3] );
 
     // Set mesh connectivity
-    VIS_T::setTetraelem( IEN_p[0], IEN_p[1], IEN_p[2], IEN_p[3], gridData ); 
+    if( elemptr->get_Type() == 501 )
+      VIS_T::setTetraelem( IEN_p[0], IEN_p[1], IEN_p[2], IEN_p[3], gridData );
+    else if( elemptr->get_Type() == 601 )
+      VIS_T::setHexelem( IEN_p[0], IEN_p[1], IEN_p[2], IEN_p[3], 
+        IEN_p[4], IEN_p[5], IEN_p[6], IEN_p[7], gridData );
+    else SYS_T::print_fatal("Error: unknown element type.\n");
 
     // Analysis mesh partition
     const int e_global = lelem_ptr->get_elem_loc(ee);
@@ -199,12 +214,11 @@ void VTK_Writer_FSI_Tet4::writeOutput(
   VIS_T::writeVisFile( gridData, outputBName, outputName, rank, size, sol_time, isXML );
 
   // Clean gridData
-  PetscPrintf(PETSC_COMM_WORLD, "-- Clean gridData object.\n");
+  SYS_T::commPrint("-- Clean gridData object.\n");
   gridData->Delete();
 }
 
-
-void VTK_Writer_FSI_Tet4::writeOutput_fluid(
+void VTK_Writer_FSI::writeOutput_fluid(
     const FEANode * const &fnode_ptr,
     const ALocal_IEN * const &lien_v,
     const ALocal_IEN * const &lien_p,
@@ -221,8 +235,17 @@ void VTK_Writer_FSI_Tet4::writeOutput_fluid(
     const std::string &outputName,
     const bool &isXML )
 {
-  // This routine requires nqp = 4
-  SYS_T::print_fatal_if(quad->get_num_quadPts() != 4, "Error: VTK_Writer_Tet4 requires 4 quadrature points.\n");
+  if(nLocBas == 4)  // elemType 501
+  {
+    // This routine requires nqp = 4
+    SYS_T::print_fatal_if(quad->get_num_quadPts() != 4, "Error: VTK_Writer requires 4 quadrature points for Tet4.\n");
+  }
+  else if(nLocBas == 8)  // elemType 601
+  {
+    // This routine requires nqp = 8
+    SYS_T::print_fatal_if(quad->get_num_quadPts() != 8, "Error: VTK_Writer requires 8 quadrature points for Hex8.\n");    
+  }
+  else SYS_T::print_fatal( "Error: VTK_Writer_FSI::writeOutput_fluid function: unsupported element type \n" );
 
   Interpolater intep( nLocBas );
 
@@ -277,13 +300,15 @@ void VTK_Writer_FSI_Tet4::writeOutput_fluid(
       const std::vector<int> IEN_v = lien_v -> get_LIEN(ee);
       const std::vector<int> IEN_p = lien_p -> get_LIEN(ee);
 
-      double ectrl_x[4], ectrl_y[4], ectrl_z[4];
+      std::vector<double> ectrl_x(nLocBas, 0.0), ectrl_y(nLocBas, 0.0), ectrl_z(nLocBas, 0.0);
 
-      fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
+      fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0]);
 
-      elemptr->buildBasis( quad, ectrl_x, ectrl_y, ectrl_z );
+      elemptr->buildBasis( quad, &ectrl_x[0], &ectrl_y[0], &ectrl_z[0] );
 
-      const int IEN_f[4] = { fien[ee*4+0], fien[ee*4+1], fien[ee*4+2], fien[ee*4+3] };
+      std::vector<int> IEN_f(nLocBas, 0.0);
+
+      for(int ii=0; ii<nLocBas; ++ii) IEN_f[ii] = fien[ee * nLocBas + ii]; 
 
       // Interpolate data and assign to dataVecs
       std::vector<double> inputInfo; inputInfo.clear();
@@ -297,10 +322,10 @@ void VTK_Writer_FSI_Tet4::writeOutput_fluid(
       }
 
       // displacement interpolation
-      intep.interpolateVTKData( asize, IEN_f, inputInfo, elemptr, dataVecs[0] );
+      intep.interpolateVTKData( asize, &IEN_f[0], inputInfo, elemptr, dataVecs[0] );
 
       // use displacement to update points
-      intep.interpolateVTKPts( IEN_f, ectrl_x, ectrl_y, ectrl_z, inputInfo, elemptr, points );
+      intep.interpolateVTKPts( &IEN_f[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], inputInfo, elemptr, points );
 
       // Interpolate the pressure scalar
       inputInfo.clear();
@@ -311,7 +336,7 @@ void VTK_Writer_FSI_Tet4::writeOutput_fluid(
         for(int kk=0; kk<asize; ++kk)
           inputInfo.push_back( pointArrays[1][pt_index * asize + kk ] );
       }
-      intep.interpolateVTKData( asize, IEN_f, inputInfo, elemptr, dataVecs[1] );
+      intep.interpolateVTKData( asize, &IEN_f[0], inputInfo, elemptr, dataVecs[1] );
 
       // Interpolate the velocity vector
       inputInfo.clear();
@@ -322,7 +347,7 @@ void VTK_Writer_FSI_Tet4::writeOutput_fluid(
         for(int kk=0; kk<asize; ++kk)
           inputInfo.push_back( pointArrays[2][pt_index * asize + kk ] );
       }
-      intep.interpolateVTKData( asize, IEN_f, inputInfo, elemptr, dataVecs[2] );
+      intep.interpolateVTKData( asize, &IEN_f[0], inputInfo, elemptr, dataVecs[2] );
       
       // Interpolate for velocity gradient
       std::vector<double> input_u, input_v, input_w;
@@ -361,7 +386,12 @@ void VTK_Writer_FSI_Tet4::writeOutput_fluid(
       }
 
       // Set mesh connectivity
-      VIS_T::setTetraelem( IEN_f[0], IEN_f[1], IEN_f[2], IEN_f[3], gridData );
+      if( elemptr->get_Type() == 501 )
+        VIS_T::setTetraelem( IEN_f[0], IEN_f[1], IEN_f[2], IEN_f[3], gridData );
+      else if( elemptr->get_Type() == 601 )
+        VIS_T::setHexelem( IEN_f[0], IEN_f[1], IEN_f[2], IEN_f[3], 
+          IEN_f[4], IEN_f[5], IEN_f[6], IEN_f[7], gridData );
+      else SYS_T::print_fatal("Error: unknown element type.\n");
 
       // Analysis mesh partition
       const int e_global = lelem_ptr->get_elem_loc(ee);
@@ -429,7 +459,7 @@ void VTK_Writer_FSI_Tet4::writeOutput_fluid(
 }
 
 
-void VTK_Writer_FSI_Tet4::writeOutput_solid_cur(
+void VTK_Writer_FSI::writeOutput_solid_cur(
     const FEANode * const &fnode_ptr,
     const ALocal_IEN * const &lien_v,
     const ALocal_IEN * const &lien_p,
@@ -446,8 +476,17 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_cur(
     const std::string &outputName,
     const bool &isXML )
 {
-  // This routine requires nqp = 4
-  SYS_T::print_fatal_if(quad->get_num_quadPts() != 4, "Error: VTK_Writer_Tet4 requires 4 quadrature points.\n");
+  if(nLocBas == 4)  // elemType 501
+  {
+    // This routine requires nqp = 4
+    SYS_T::print_fatal_if(quad->get_num_quadPts() != 4, "Error: VTK_Writer requires 4 quadrature points for Tet4.\n");
+  }
+  else if(nLocBas == 8)  // elemType 601
+  {
+    // This routine requires nqp = 8
+    SYS_T::print_fatal_if(quad->get_num_quadPts() != 8, "Error: VTK_Writer requires 8 quadrature points for Hex8.\n");    
+  }
+  else SYS_T::print_fatal( "Error: VTK_Writer_FSI::writeOutput_solid_cur function: unsupported element type \n" );
 
   Interpolater intep( nLocBas );
 
@@ -487,13 +526,15 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_cur(
       const std::vector<int> IEN_v = lien_v -> get_LIEN(ee);
       const std::vector<int> IEN_p = lien_p -> get_LIEN(ee);
 
-      double ectrl_x[4], ectrl_y[4], ectrl_z[4];
+      std::vector<double> ectrl_x(nLocBas, 0.0), ectrl_y(nLocBas, 0.0), ectrl_z(nLocBas, 0.0);
 
-      fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
+      fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0]);
 
-      elemptr->buildBasis( quad, ectrl_x, ectrl_y, ectrl_z );
+      elemptr->buildBasis( quad, &ectrl_x[0], &ectrl_y[0], &ectrl_z[0] );
 
-      const int IEN_s[4] = { sien[ee*4+0], sien[ee*4+1], sien[ee*4+2], sien[ee*4+3] };
+      std::vector<int> IEN_s(nLocBas, 0.0);
+
+      for(int ii=0; ii<nLocBas; ++ii) IEN_s[ii] = sien[ee * nLocBas + ii];
 
       // Interpolate data and assign to dataVecs
       std::vector<double> inputInfo; inputInfo.clear();
@@ -507,13 +548,13 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_cur(
       }
 
       // displacement interpolation
-      intep.interpolateVTKData( asize, IEN_s, inputInfo, elemptr, dataVecs[0] );
+      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[0] );
 
       // use displacement to update points
-      intep.interpolateVTKPts( IEN_s, ectrl_x, ectrl_y, ectrl_z, inputInfo, elemptr, points );
+      intep.interpolateVTKPts( &IEN_s[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], inputInfo, elemptr, points );
 
       // Interpolate detF
-      interpolateJ( IEN_s, inputInfo, elemptr, dataVecs[1] );
+      interpolateJ( &IEN_s[0], inputInfo, elemptr, dataVecs[1] );
 
       // Interpolate the pressure scalar
       inputInfo.clear();
@@ -524,7 +565,7 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_cur(
         for(int kk=0; kk<asize; ++kk)
           inputInfo.push_back( pointArrays[1][pt_index * asize + kk ] );
       }
-      intep.interpolateVTKData( asize, IEN_s, inputInfo, elemptr, dataVecs[2] ); 
+      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[2] ); 
       
       // Interpolate the velocity vector
       inputInfo.clear();
@@ -535,10 +576,15 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_cur(
         for(int kk=0; kk<asize; ++kk)
           inputInfo.push_back( pointArrays[2][pt_index * asize + kk ] );
       }
-      intep.interpolateVTKData( asize, IEN_s, inputInfo, elemptr, dataVecs[3] );
+      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[3] );
       
       // Set mesh connectivity
-      VIS_T::setTetraelem( IEN_s[0], IEN_s[1], IEN_s[2], IEN_s[3], gridData );
+      if( elemptr->get_Type() == 501 )
+        VIS_T::setTetraelem( IEN_s[0], IEN_s[1], IEN_s[2], IEN_s[3], gridData );
+      else if( elemptr->get_Type() == 601 )
+        VIS_T::setHexelem( IEN_s[0], IEN_s[1], IEN_s[2], IEN_s[3], 
+          IEN_s[4], IEN_s[5], IEN_s[6], IEN_s[7], gridData );
+      else SYS_T::print_fatal("Error: unknown element type.\n");
 
       // Analysis mesh partition
       const int e_global = lelem_ptr->get_elem_loc(ee);
@@ -580,7 +626,7 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_cur(
   gridData->Delete();
 }
 
-void VTK_Writer_FSI_Tet4::writeOutput_solid_ref(
+void VTK_Writer_FSI::writeOutput_solid_ref(
     const FEANode * const &fnode_ptr,
     const ALocal_IEN * const &lien_v,
     const ALocal_IEN * const &lien_p,
@@ -597,8 +643,17 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_ref(
     const std::string &outputName,
     const bool &isXML )
 {
-  // This routine requires nqp = 4
-  SYS_T::print_fatal_if(quad->get_num_quadPts() != 4, "Error: VTK_Writer_Tet4 requires 4 quadrature points.\n");
+  if(nLocBas == 4)  // elemType 501
+  {
+    // This routine requires nqp = 4
+    SYS_T::print_fatal_if(quad->get_num_quadPts() != 4, "Error: VTK_Writer requires 4 quadrature points for Tet4.\n");
+  }
+  else if(nLocBas == 8)  // elemType 601
+  {
+    // This routine requires nqp = 8
+    SYS_T::print_fatal_if(quad->get_num_quadPts() != 8, "Error: VTK_Writer requires 8 quadrature points for Hex8.\n");    
+  }
+  else SYS_T::print_fatal( "Error: VTK_Writer_FSI::writeOutput_solid_cur function: unsupported element type \n" );
 
   Interpolater intep( nLocBas );
 
@@ -638,13 +693,15 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_ref(
       const std::vector<int> IEN_v = lien_v -> get_LIEN(ee);
       const std::vector<int> IEN_p = lien_p -> get_LIEN(ee);
 
-      double ectrl_x[4], ectrl_y[4], ectrl_z[4];
+      std::vector<double> ectrl_x(nLocBas, 0.0), ectrl_y(nLocBas, 0.0), ectrl_z(nLocBas, 0.0);
 
-      fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
+      fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0]);
 
-      elemptr->buildBasis( quad, ectrl_x, ectrl_y, ectrl_z );
+      elemptr->buildBasis( quad, &ectrl_x[0], &ectrl_y[0], &ectrl_z[0] );
 
-      const int IEN_s[4] = { sien[ee*4+0], sien[ee*4+1], sien[ee*4+2], sien[ee*4+3] };
+      std::vector<int> IEN_s(nLocBas, 0.0);
+
+      for(int ii=0; ii<nLocBas; ++ii) IEN_s[ii] = sien[ee * nLocBas + ii];
 
       // Interpolate data and assign to dataVecs
       std::vector<double> inputInfo; inputInfo.clear();
@@ -658,10 +715,10 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_ref(
       }
 
       // displacement interpolation
-      intep.interpolateVTKData( asize, IEN_s, inputInfo, elemptr, dataVecs[0] );
+      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[0] );
 
       // interpolate the coordinates of the points
-      intep.interpolateVTKPts( IEN_s, ectrl_x, ectrl_y, ectrl_z, elemptr, points );
+      intep.interpolateVTKPts( &IEN_s[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], elemptr, points );
 
       // Interpolate the pressure scalar
       inputInfo.clear();
@@ -672,7 +729,7 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_ref(
         for(int kk=0; kk<asize; ++kk)
           inputInfo.push_back( pointArrays[1][pt_index * asize + kk ] );
       }
-      intep.interpolateVTKData( asize, IEN_s, inputInfo, elemptr, dataVecs[1] ); 
+      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[1] ); 
      
       // Interpolate the velocity vector
       inputInfo.clear();
@@ -683,10 +740,15 @@ void VTK_Writer_FSI_Tet4::writeOutput_solid_ref(
         for(int kk=0; kk<asize; ++kk)
           inputInfo.push_back( pointArrays[2][pt_index * asize + kk ] );
       }
-      intep.interpolateVTKData( asize, IEN_s, inputInfo, elemptr, dataVecs[2] );
+      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[2] );
       
       // Set mesh connectivity
-      VIS_T::setTetraelem( IEN_s[0], IEN_s[1], IEN_s[2], IEN_s[3], gridData );
+      if( elemptr->get_Type() == 501 )
+        VIS_T::setTetraelem( IEN_s[0], IEN_s[1], IEN_s[2], IEN_s[3], gridData );
+      else if( elemptr->get_Type() == 601 )
+        VIS_T::setHexelem( IEN_s[0], IEN_s[1], IEN_s[2], IEN_s[3], 
+          IEN_s[4], IEN_s[5], IEN_s[6], IEN_s[7], gridData );
+      else SYS_T::print_fatal("Error: unknown element type.\n");
 
       // Analysis mesh partition
       const int e_global = lelem_ptr->get_elem_loc(ee);

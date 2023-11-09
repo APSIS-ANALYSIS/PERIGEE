@@ -17,14 +17,14 @@
 
 int main( int argc, char * argv[] )
 {
+  // Set number of threads and  print info of OpenMP
+  SYS_T::print_omp_info();
+  SYS_T::set_omp_num_threads();
+  
   // Clean the existing part hdf5 files
   int sysret = system("rm -rf postpart_p*.h5");
   SYS_T::print_fatal_if(sysret != 0, "ERROR: system call failed. \n");
 
-  const std::string part_file("postpart");
-  int cpu_size = 1;
-  bool isDualGraph = true;
-  
   // Read preprocessor command-line arguements recorded in the .h5 file
   hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
@@ -44,9 +44,10 @@ int main( int argc, char * argv[] )
 
   YAML::Node paras = YAML::LoadFile( yaml_file );
 
-  cpu_size = paras["cpu_size"].as<int>();
+  const int cpu_size = paras["cpu_size"].as<int>();
   in_ncommon = paras["in_ncommon"].as<int>();
-  isDualGraph = paras["is_dualgraph"].as<bool>();  
+  const bool isDualGraph = paras["is_dualgraph"].as<bool>();  
+  const std::string part_file = paras["part_file"].as<std::string>();
 
   cout<<"==== Command Line Arguments ===="<<endl;
   cout<<" -cpu_size: "<<cpu_size<<endl;

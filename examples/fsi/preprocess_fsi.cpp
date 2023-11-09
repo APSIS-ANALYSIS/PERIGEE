@@ -9,6 +9,7 @@
 // ============================================================================
 #include "Math_Tools.hpp"
 #include "Mesh_Tet.hpp"
+#include "Mesh_FEM.hpp"
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
@@ -21,6 +22,7 @@
 #include "NBC_Partition_MF.hpp"
 #include "NBC_Partition_inflow_MF.hpp"
 #include "EBC_Partition_outflow_MF.hpp"
+#include "yaml-cpp/yaml.h"
 
 int main( int argc, char * argv[] )
 {
@@ -37,85 +39,51 @@ int main( int argc, char * argv[] )
   SYS_T::execute("mkdir apart");
 
   // Define basic settings
-  const int elemType = 501; // first order simplicial element
-  const int num_fields = 2; // Two fields : pressure + velocity/displacement
+  constexpr int num_fields = 2; // Two fields : pressure + velocity/displacement
   const std::vector<int> dof_fields {1, 3}; // pressure 1 ; velocity/displacement 3
 
-  // Input files
-  std::string geo_file("./whole_vol.vtu");
-
-  std::string geo_f_file("./lumen_vol.vtu");
-  std::string geo_s_file("./tissue_vol.vtu");
-
-  std::string sur_f_file_wall("./lumen_wall_vol.vtp");
-  std::string sur_f_file_in_base( "./lumen_inlet_vol_" );
-  std::string sur_f_file_out_base("./lumen_outlet_vol_");
-
-  std::string sur_s_file_interior_wall("./tissue_interior_wall_vol.vtp");
-
-  std::string sur_s_file_wall("./tissue_wall_vol.vtp");
-  std::string sur_s_file_in_base( "./tissue_inlet_vol_" );
-  std::string sur_s_file_out_base("./tissue_outlet_vol_");
-
-  int num_outlet = 1, num_inlet = 1;
-
-  const std::string part_file_p("./apart/part_p");
-  const std::string part_file_v("./apart/part_v");
-
-  // fsiBC_type : 0 deformable wall, 1 rigid wall, 2 prestress generation
-  int fsiBC_type = 0;
-
-  // ringBC_type : 0 fully clamped, 1 in-plane motion allowed
-  int ringBC_type = 0;
-
-  // Mesh partition setting
-  int cpu_size = 1;
-  int in_ncommon = 2;
-  bool isDualGraph = true;
-
-  bool isReload = false;
-
-  bool isPrintMeshQual = true;
-  double critical_val_aspect_ratio = 3.5;
-
   // Yaml options
-  bool is_loadYaml = true;
-  std::string yaml_file("./options_pre.yml");
+  const std::string yaml_file("fsi_preprocess.yml");
 
-  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+  // Check if the yaml file exist on disk
+  SYS_T::file_check(yaml_file);
 
-  SYS_T::GetOptionBool(  "-is_loadYaml",         is_loadYaml);
-  SYS_T::GetOptionString("-yaml_file",           yaml_file);
+  YAML::Node paras = YAML::LoadFile( yaml_file );
 
-  SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: preprocessor needs to be run in serial.\n");
+  const int elemType                          = paras["elem_type"].as<int>();
+  const int fsiBC_type                        = paras["fsiBC_type"].as<int>();
+  const int ringBC_type                       = paras["ringBC_type"].as<int>();
+  const int num_inlet                         = paras["num_inlet"].as<int>();
+  const int num_outlet                        = paras["num_outlet"].as<int>();
+  const std::string geo_file                  = paras["geo_file"].as<std::string>();
+  const std::string geo_f_file                = paras["geo_f_file"].as<std::string>();
+  const std::string geo_s_file                = paras["geo_s_file"].as<std::string>();
 
-  if(is_loadYaml) SYS_T::InsertFileYAML( yaml_file,  false );
+  const std::string sur_f_file_wall           = paras["sur_f_file_wall"].as<std::string>();
+  const std::string sur_f_file_in_base        = paras["sur_f_file_in_base"].as<std::string>();
+  const std::string sur_f_file_out_base       = paras["sur_f_file_out_base"].as<std::string>();
 
-  SYS_T::GetOptionInt(   "-cpu_size",            cpu_size);
-  SYS_T::GetOptionInt(   "-in_ncommon",          in_ncommon);
-  SYS_T::GetOptionInt(   "-fsiBC_type",          fsiBC_type);
-  SYS_T::GetOptionInt(   "-ringBC_type",         ringBC_type);
-  SYS_T::GetOptionInt(   "-num_outlet",          num_outlet);
-  SYS_T::GetOptionInt(   "-num_inlet",           num_inlet);
-  SYS_T::GetOptionString("-geo_file",            geo_file);
-  SYS_T::GetOptionString("-geo_f_file",          geo_f_file);
-  SYS_T::GetOptionString("-geo_s_file",          geo_s_file);
-  SYS_T::GetOptionString("-sur_f_file_wall",     sur_f_file_wall);
-  SYS_T::GetOptionString("-sur_s_file_wall",     sur_s_file_wall);
-  SYS_T::GetOptionString("-sur_s_file_int_wall", sur_s_file_interior_wall);
-  SYS_T::GetOptionString("-sur_f_file_in_base",  sur_f_file_in_base);
-  SYS_T::GetOptionString("-sur_f_file_out_base", sur_f_file_out_base);
-  SYS_T::GetOptionString("-sur_s_file_in_base",  sur_s_file_in_base);
-  SYS_T::GetOptionString("-sur_s_file_out_base", sur_s_file_out_base);
-  SYS_T::GetOptionBool(  "-isReload",            isReload);
-  SYS_T::GetOptionBool(  "-isDualGraph",         isDualGraph);
-  SYS_T::GetOptionBool(  "-isPrintMeshQual",     isPrintMeshQual);
-  SYS_T::GetOptionReal(  "-critical_val_aspect_ratio", critical_val_aspect_ratio);
+  const std::string sur_s_file_interior_wall  = paras["sur_s_file_interior_wall"].as<std::string>();
+  const std::string sur_s_file_wall           = paras["sur_s_file_wall"].as<std::string>();
+  const std::string sur_s_file_in_base        = paras["sur_s_file_in_base"].as<std::string>();
+  const std::string sur_s_file_out_base       = paras["sur_s_file_out_base"].as<std::string>();
 
+  const std::string part_file_p               = paras["part_file_p"].as<std::string>();
+  const std::string part_file_v               = paras["part_file_v"].as<std::string>();
+  const int cpu_size                          = paras["cpu_size"].as<int>();
+  const int in_ncommon                        = paras["in_ncommon"].as<int>();
+  const bool isDualGraph                      = paras["is_dualgraph"].as<bool>();
+  const bool isReload                         = paras["is_reload"].as<bool>();
+
+  const bool isPrintMeshQual                  = paras["is_printmeshqual"].as<bool>();
+  const double critical_val_aspect_ratio      = paras["critical_val_aspect_ratio"].as<double>();
+
+  SYS_T::print_fatal_if( elemType != 501 && elemType != 601 , "ERROR: unknown element type %d.\n", elemType );
   SYS_T::print_fatal_if( fsiBC_type != 0 && fsiBC_type != 1 && fsiBC_type != 2, "Error: fsiBC_type should be 0, 1, or 2.\n" );
-  SYS_T::print_fatal_if( ringBC_type != 0 && ringBC_type != 1, "Error: ringBC_type should be 0 or 1.\n" );
+  SYS_T::print_fatal_if( ringBC_type != 0, "Error: ringBC_type should be 0.\n" );
 
   std::cout<<"===== Command Line Arguments ====="<<std::endl;
+  std::cout<<" -elem_type: "          <<elemType           <<std::endl;
   std::cout<<" -fsiBC_type: "         <<fsiBC_type         <<std::endl;
   std::cout<<" -ringBC_type: "        <<ringBC_type        <<std::endl;
   std::cout<<" -num_inlet: "          <<num_inlet          <<std::endl;
@@ -257,15 +225,28 @@ int main( int argc, char * argv[] )
   PERIGEE_OMP_PARALLEL_FOR
   for(int ee=0; ee<nElem; ++ee)
   {
-    if( phy_tag[ee] == 1 )
+    if(phy_tag[ee] == 1)
     {
       // In solid element, loop over its IEN and correct if the node is on the
       // interface
-      for(int ii=0; ii<4; ++ii)
+      if(elemType == 501)
       {
-        const int pos = VEC_T::get_pos( wall_node_id, vecIEN_p[ee*4 +ii] );
-        if( pos >=0 ) vecIEN_p[ee*4+ii] = nFunc_v + pos;     
+        for(int ii=0; ii<4; ++ii)
+        {
+          const int pos = VEC_T::get_pos( wall_node_id, vecIEN_p[ee*4+ii] );
+          if( pos >=0 ) vecIEN_p[ee*4+ii] = nFunc_v + pos;     
+        }
       }
+      else if(elemType == 601)
+      {
+        for(int ii=0; ii<8; ++ii)
+        {
+          const int pos = VEC_T::get_pos( wall_node_id, vecIEN_p[ee*8+ii] );
+          if( pos >=0 ) vecIEN_p[ee*8+ii] = nFunc_v + pos;     
+        }
+      }
+      else
+        SYS_T::print_fatal("Error: elemType %d is not supported when generating a new IEN array for the pressure variable. \n", elemType);
     }
   }
 
@@ -285,11 +266,29 @@ int main( int argc, char * argv[] )
     {
       if( phy_tag[ee] == 0 )
       {
-        for(int ii=0; ii<4; ++ii) temp_v_node_f.push_back( IEN_v->get_IEN(ee, ii) );
+        if(elemType == 501)
+        {
+          for(int ii=0; ii<4; ++ii) temp_v_node_f.push_back( IEN_v->get_IEN(ee, ii) );
+        }
+        else if(elemType == 601)
+        {
+          for(int ii=0; ii<8; ++ii) temp_v_node_f.push_back( IEN_v->get_IEN(ee, ii) );
+        }
+        else
+          SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of velocity nodes for fluid during the preprocessing. \n", elemType);
       }
       else
       {
-        for(int ii=0; ii<4; ++ii) temp_v_node_s.push_back( IEN_v->get_IEN(ee, ii) );
+        if(elemType == 501)
+        {
+          for(int ii=0; ii<4; ++ii) temp_v_node_s.push_back( IEN_v->get_IEN(ee, ii) );
+        }
+        else if(elemType == 601)
+        {
+          for(int ii=0; ii<8; ++ii) temp_v_node_s.push_back( IEN_v->get_IEN(ee, ii) );
+        }
+        else
+          SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of velocity nodes for solid during the preprocessing. \n", elemType);
       }
     }
     PERIGEE_OMP_CRITICAL
@@ -311,11 +310,29 @@ int main( int argc, char * argv[] )
     {
       if( phy_tag[ee] == 0 )
       {
-        for(int ii=0; ii<4; ++ii) temp_p_node_f.push_back( IEN_p->get_IEN(ee, ii) );
+        if(elemType == 501)
+        {
+          for(int ii=0; ii<4; ++ii) temp_p_node_f.push_back( IEN_p->get_IEN(ee, ii) );
+        }
+        else if(elemType == 601)
+        {
+          for(int ii=0; ii<8; ++ii) temp_p_node_f.push_back( IEN_p->get_IEN(ee, ii) );
+        }
+        else
+          SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of pressure nodes for fluid during the preprocessing. \n", elemType);
       }
       else
       {
-        for(int ii=0; ii<4; ++ii) temp_p_node_s.push_back( IEN_p->get_IEN(ee, ii) );
+        if(elemType == 501)
+        {
+          for(int ii=0; ii<4; ++ii) temp_p_node_s.push_back( IEN_p->get_IEN(ee, ii) );
+        }
+        else if(elemType == 601)
+        {
+          for(int ii=0; ii<8; ++ii) temp_p_node_s.push_back( IEN_p->get_IEN(ee, ii) );
+        }
+        else
+          SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of pressure nodes for solid during the preprocessing. \n", elemType);
       }
     }
     PERIGEE_OMP_CRITICAL
@@ -331,14 +348,41 @@ int main( int argc, char * argv[] )
   if( isPrintMeshQual )
   {
     std::cout<<"Check the mesh quality... \n";
-    TET_T::tetmesh_check( ctrlPts, IEN_v, nElem, critical_val_aspect_ratio );
+    if(elemType == 501)
+    {
+      TET_T::tetmesh_check( ctrlPts, IEN_v, nElem, critical_val_aspect_ratio );
+    }
+    else if(elemType == 601)
+    {
+      HEX_T::hexmesh_check( ctrlPts, IEN_v, nElem, critical_val_aspect_ratio );
+    }
+    else
+      SYS_T::print_fatal("Error: elemType %d is not supported when checking the mesh of kinematics. \n", elemType);
   }
 
   // Generate the mesh for kinematics
-  IMesh * mesh_v = new Mesh_Tet(nFunc_v, nElem, 1);
+  IMesh * mesh_v = nullptr;
 
   // Generate the mesh for pressure (discontinuous over interface)
-  IMesh * mesh_p = new Mesh_Tet(nFunc_p, nElem, 1);
+  IMesh * mesh_p = nullptr;
+
+  switch( elemType )
+  {
+    case 501:
+      mesh_v = new Mesh_Tet(nFunc_v, nElem, 1);
+      mesh_p = new Mesh_Tet(nFunc_p, nElem, 1);
+      break;
+    case 601:
+      mesh_v = new Mesh_FEM(nFunc_v, nElem, 8, 1);
+      mesh_p = new Mesh_FEM(nFunc_p, nElem, 8, 1);
+      break;   
+    default:
+      SYS_T::print_fatal("Error: elemType %d is not supported when generating the mesh.\n", elemType);
+      break;
+  }
+
+  SYS_T::print_fatal_if( IEN_v->get_nLocBas() != mesh_v->get_nLocBas(), "Error: the nLocBas from the mesh_v %d and the IEN_v %d classes do not match. \n", mesh_v->get_nLocBas(), IEN_v->get_nLocBas() );
+  SYS_T::print_fatal_if( IEN_p->get_nLocBas() != mesh_p->get_nLocBas(), "Error: the nLocBas from the mesh_p %d and the IEN_p %d classes do not match. \n", mesh_p->get_nLocBas(), IEN_p->get_nLocBas() );
 
   std::vector<IMesh const *> mlist;
   mlist.push_back(mesh_p); mlist.push_back(mesh_v);
@@ -454,8 +498,18 @@ int main( int argc, char * argv[] )
   // InflowBC info
   std::cout<<"3. Inflow cap surfaces: \n";
   std::vector<Vector_3> inlet_outvec( num_inlet );
-  for(int ii=0; ii<num_inlet; ++ii)
-    inlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_in[ii], ctrlPts, IEN_v );
+  if(elemType == 501)
+  {
+    for(int ii=0; ii<num_inlet; ++ii)
+      inlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_in[ii], ctrlPts, IEN_v );
+  }
+  else if(elemType == 601)
+  {
+    for(int ii=0; ii<num_inlet; ++ii)
+      inlet_outvec[ii] = HEX_T::get_out_normal( sur_f_file_in[ii], ctrlPts, IEN_v );
+  }
+  else
+    SYS_T::print_fatal("Error: elemType %d is not supported when obtaining the outward normal vector for the inflow boundary condition. \n", elemType);
 
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_f_file_in, sur_f_file_wall, nFunc_v, inlet_outvec, elemType );
 
@@ -465,8 +519,18 @@ int main( int argc, char * argv[] )
   cout<<"4. Elem boundary for the implicit solver: \n";
   std::vector< Vector_3 > outlet_outvec( num_outlet );
 
-  for(int ii=0; ii<num_outlet; ++ii)
-    outlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_out[ii], ctrlPts, IEN_v );
+  if(elemType == 501)
+  {
+    for(int ii=0; ii<num_outlet; ++ii)
+      outlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_out[ii], ctrlPts, IEN_v );
+  }
+  else if(elemType == 601)
+  {
+    for(int ii=0; ii<num_outlet; ++ii)
+      outlet_outvec[ii] = HEX_T::get_out_normal( sur_f_file_out[ii], ctrlPts, IEN_v );    
+  }
+  else
+    SYS_T::print_fatal("Error: elemType %d is not supported when obtaining the outward normal vector for the elemental boundary conditions. \n", elemType);
 
   std::vector< std::string > ebclist {sur_f_file_wall};
 
@@ -551,16 +615,16 @@ int main( int argc, char * argv[] )
   }
 
   // Clean up the memory
-  for(auto it_nbc=NBC_list_v.begin(); it_nbc != NBC_list_v.end(); ++it_nbc) delete *it_nbc;
+  for(auto &it_nbc : NBC_list_v) delete it_nbc;
   
-  for(auto it_nbc=NBC_list_p.begin(); it_nbc != NBC_list_p.end(); ++it_nbc) delete *it_nbc;
+  for(auto &it_nbc : NBC_list_p) delete it_nbc;
 
-  for(auto it_nbc=meshBC_list.begin(); it_nbc != meshBC_list.end(); ++it_nbc) delete *it_nbc;
+  for(auto &it_nbc : meshBC_list) delete it_nbc;
 
   delete ebc; delete InFBC; delete mesh_ebc; 
   delete mnindex_p; delete mnindex_v; delete mesh_p; delete mesh_v; 
   delete IEN_p; delete IEN_v; delete mytimer; delete global_part; 
-  PetscFinalize();
+
   cout<<"===> Preprocessing completes successfully!\n";
   return EXIT_SUCCESS;
 }
