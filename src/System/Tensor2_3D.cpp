@@ -598,8 +598,8 @@ Tensor2_3D Ten2::gen_zero()
 
 Tensor2_3D Ten2::exp( const Tensor2_3D &input )
 {
-  int nn = 0;
-  long int nn_fac = 0;
+  double nn = 0;
+  long double nn_fac = 0;
 
   Tensor2_3D input_pow = Ten2::gen_id();
   Tensor2_3D input_exp = Ten2::gen_id();
