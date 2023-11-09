@@ -606,12 +606,12 @@ Tensor2_3D Ten2::exp( const Tensor2_3D &input )
 
   do
   {
-      nn += 1.0;
-      nn_fac *= nn;
+    nn += 1.0;
+    nn_fac *= nn;
 
-      const Tensor2_3D temp = input_pow * input;
-      input_pow = temp;
-      input_exp += ( 1.0/nn_fac ) * input_pow;
+    const Tensor2_3D temp = input_pow * input;
+    input_pow = temp;
+    input_exp += ( 1.0/nn_fac ) * input_pow;
 
   }while( std::sqrt( input_pow.MatContraction(input_pow) ) / nn_fac >= 1.0e-16 );
 
