@@ -84,6 +84,7 @@ A fluid-structure interaction simulation of a pulmonary model is performed using
 ### C++
 * [www.learncpp.com](http://www.learncpp.com).
 * [Google C++ Style](https://google.github.io/styleguide/cppguide.html).
+* [C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines)
 
 ## Contact
 Dr. Ju Liu, liujuy@gmail.com, liuj36@sustech.edu.cn

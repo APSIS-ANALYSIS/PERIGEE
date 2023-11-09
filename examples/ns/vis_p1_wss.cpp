@@ -149,7 +149,7 @@ int main( int argc, char * argv[] )
       else node_check += 1;
     }
 
-    SYS_T::print_fatal_if(node_check!=3, "Error: the associated tet element is incompatible with the triangle element.\n");
+    SYS_T::print_fatal_if(node_check != 3, "Error: the associated tet element is incompatible with the triangle element.\n");
 
     // Record the interior node's coordinates
     interior_node_coord[3*ee+0] = v_ctrlPts[ 3*interior_node[ee] + 0 ];
@@ -169,7 +169,7 @@ int main( int argc, char * argv[] )
 
     tri_area[ee] = 0.5 * ou.normalize();
 
-    const Vector_3 inw( v_ctrlPts[interior_node[ee]*3]   - v_ctrlPts[3*trn[0]],
+    const Vector_3 inw( v_ctrlPts[interior_node[ee]*3] - v_ctrlPts[3*trn[0]],
         v_ctrlPts[interior_node[ee]*3+1] - v_ctrlPts[3*trn[0]+1],
         v_ctrlPts[interior_node[ee]*3+2] - v_ctrlPts[3*trn[0]+2] );
 
@@ -350,7 +350,7 @@ std::vector<int> ReadNodeMapping( const char * const &node_mapping_file,
 
   if( data_rank != 1)
   {
-    PetscPrintf(PETSC_COMM_SELF, "Error: the node mapping file has wrong format. \n");
+    SYS_T::commPrint("Error: the node mapping file has wrong format. \n");
     MPI_Abort(PETSC_COMM_WORLD, 1);
   }
 
@@ -364,7 +364,7 @@ std::vector<int> ReadNodeMapping( const char * const &node_mapping_file,
 
   if( int(dSize) != node_size )
   {
-    PetscPrintf(PETSC_COMM_SELF, "Error: the allocated array has wrong size! \n");
+    SYS_T::commPrint("Error: the allocated array has wrong size! \n");
     MPI_Abort(PETSC_COMM_WORLD, 1);
   }
 
@@ -400,8 +400,7 @@ std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
   VecGetSize(sol_temp, &get_sol_temp_size);
   if( get_sol_temp_size != vec_size )
   {
-    PetscPrintf(PETSC_COMM_SELF,
-        "The solution size %d is not compatible with the size %d given by partition file! \n",
+    SYS_T::commPrint("The solution size %d is not compatible with the size %d given by partition file! \n",
         get_sol_temp_size, vec_size);
     MPI_Abort(PETSC_COMM_WORLD, 1);
   }

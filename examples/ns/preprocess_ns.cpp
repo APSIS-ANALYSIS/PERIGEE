@@ -36,7 +36,7 @@ int main( int argc, char * argv[] )
   constexpr int dofMat = 4; // degree-of-freedom in the matrix problem
 
   // Yaml options
-  const std::string yaml_file("ns_input.yml");
+  const std::string yaml_file("ns_preprocess.yml");
 
   // Check if the yaml file exist on disk
   SYS_T::file_check(yaml_file);
@@ -251,7 +251,7 @@ int main( int argc, char * argv[] )
     mytimer->Reset();
     mytimer->Start();
     IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
-        ctrlPts, proc_rank, cpu_size, dofNum, dofMat, elemType );
+        ctrlPts, proc_rank, cpu_size, elemType, {0, dofNum, true, "NS"} );
     mytimer->Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
