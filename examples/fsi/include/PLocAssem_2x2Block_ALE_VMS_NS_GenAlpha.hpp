@@ -20,7 +20,7 @@ class PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
         const TimeMethod_GenAlpha * const &tm_gAlpha,
         const int &in_nlocbas, const int &in_snlocbas,
         const double &in_rho, const double &in_vis_mu,
-        const double &in_beta );
+        const double &in_beta, const int &elemtype );
 
     virtual ~PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha();
 

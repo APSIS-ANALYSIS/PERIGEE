@@ -440,7 +440,7 @@ int main(int argc, char *argv[])
   // ===== Local assembly =====
   IPLocAssem_2x2Block * locAssem_fluid_ptr = new PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha(
       tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas(), 
-      fluid_density, fluid_mu, bs_beta );
+      fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType() );
 
   IMaterialModel * matmodel = nullptr;
   IPLocAssem_2x2Block * locAssem_solid_ptr = nullptr;
