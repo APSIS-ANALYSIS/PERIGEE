@@ -77,25 +77,25 @@ void PLocAssem_FSI_Mesh_Elastostatic::Assem_Tangent_Residual(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  double curPt_x[nLocBas], curPt_y[nLocBas], curPt_z[nLocBas];
+  std::vector<double> curPt_x(nLocBas, 0.0), curPt_y(nLocBas, 0.0), curPt_z(nLocBas, 0.0);
 
   // vec_a passes the previous time step displacement.
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, vec_a, curPt_x, curPt_y, curPt_z );
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, vec_a, &curPt_x[0], &curPt_y[0], &curPt_z[0]);
 
   const int nqp = quad -> get_num_quadPts();
 
   // Because the call of get_currPts, this basis is at tilde(x)
-  element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
+  element->buildBasis( quad, &curPt_x[0], &curPt_y[0], &curPt_z[0] );
 
   const double l2mu = lambda + 2.0 * mu;
 
   Zero_Tangent_Residual();
 
-  double dR_dx[nLocBas], dR_dy[nLocBas], dR_dz[nLocBas];
+  std::vector<double> dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
   for( int qua=0; qua<nqp; ++qua )
   {
-    element->get_gradR(qua, dR_dx, dR_dy, dR_dz);
+    element->get_gradR(qua, &dR_dx[0], &dR_dy[0], &dR_dz[0]);
     const double detJac = element->get_detJac(qua);
 
     double ux = 0.0, uy = 0.0, uz = 0.0;

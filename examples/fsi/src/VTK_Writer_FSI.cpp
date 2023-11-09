@@ -117,11 +117,11 @@ void VTK_Writer_FSI::writeOutput(
     const std::vector<int> IEN_v = lien_v -> get_LIEN( ee );
     const std::vector<int> IEN_p = lien_p -> get_LIEN( ee );
 
-    double ectrl_x[nLocBas], ectrl_y[nLocBas], ectrl_z[nLocBas];
+    std::vector<double> ectrl_x(nLocBas, 0.0), ectrl_y(nLocBas, 0.0), ectrl_z(nLocBas, 0.0);
 
-    fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
+    fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0]);
 
-    elemptr->buildBasis( quad, ectrl_x, ectrl_y, ectrl_z );
+    elemptr->buildBasis( quad, &ectrl_x[0], &ectrl_y[0], &ectrl_z[0] );
 
     // Interpolate data and assign to dataVecs
     std::vector<double> inputInfo; inputInfo.clear();
@@ -138,7 +138,7 @@ void VTK_Writer_FSI::writeOutput(
     intep.interpolateVTKData( asize, &IEN_p[0], inputInfo, elemptr, dataVecs[0] );
 
     // use displacement to update points
-    intep.interpolateVTKPts( &IEN_p[0], ectrl_x, ectrl_y, ectrl_z, inputInfo, elemptr, points);
+    intep.interpolateVTKPts( &IEN_p[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], inputInfo, elemptr, points);
 
     // Interpolate detF
     interpolateJ( &IEN_p[0], inputInfo, elemptr, dataVecs[1] );
@@ -300,13 +300,13 @@ void VTK_Writer_FSI::writeOutput_fluid(
       const std::vector<int> IEN_v = lien_v -> get_LIEN(ee);
       const std::vector<int> IEN_p = lien_p -> get_LIEN(ee);
 
-      double ectrl_x[nLocBas], ectrl_y[nLocBas], ectrl_z[nLocBas];
+      std::vector<double> ectrl_x(nLocBas, 0.0), ectrl_y(nLocBas, 0.0), ectrl_z(nLocBas, 0.0);
 
-      fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
+      fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0]);
 
-      elemptr->buildBasis( quad, ectrl_x, ectrl_y, ectrl_z );
+      elemptr->buildBasis( quad, &ectrl_x[0], &ectrl_y[0], &ectrl_z[0] );
 
-      int IEN_f[nLocBas]{};
+      std::vector<int> IEN_f(nLocBas, 0.0);
 
       for(int ii=0; ii<nLocBas; ++ii) IEN_f[ii] = fien[ee * nLocBas + ii]; 
 
@@ -322,10 +322,10 @@ void VTK_Writer_FSI::writeOutput_fluid(
       }
 
       // displacement interpolation
-      intep.interpolateVTKData( asize, IEN_f, inputInfo, elemptr, dataVecs[0] );
+      intep.interpolateVTKData( asize, &IEN_f[0], inputInfo, elemptr, dataVecs[0] );
 
       // use displacement to update points
-      intep.interpolateVTKPts( IEN_f, ectrl_x, ectrl_y, ectrl_z, inputInfo, elemptr, points );
+      intep.interpolateVTKPts( &IEN_f[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], inputInfo, elemptr, points );
 
       // Interpolate the pressure scalar
       inputInfo.clear();
@@ -336,7 +336,7 @@ void VTK_Writer_FSI::writeOutput_fluid(
         for(int kk=0; kk<asize; ++kk)
           inputInfo.push_back( pointArrays[1][pt_index * asize + kk ] );
       }
-      intep.interpolateVTKData( asize, IEN_f, inputInfo, elemptr, dataVecs[1] );
+      intep.interpolateVTKData( asize, &IEN_f[0], inputInfo, elemptr, dataVecs[1] );
 
       // Interpolate the velocity vector
       inputInfo.clear();
@@ -347,7 +347,7 @@ void VTK_Writer_FSI::writeOutput_fluid(
         for(int kk=0; kk<asize; ++kk)
           inputInfo.push_back( pointArrays[2][pt_index * asize + kk ] );
       }
-      intep.interpolateVTKData( asize, IEN_f, inputInfo, elemptr, dataVecs[2] );
+      intep.interpolateVTKData( asize, &IEN_f[0], inputInfo, elemptr, dataVecs[2] );
       
       // Interpolate for velocity gradient
       std::vector<double> input_u, input_v, input_w;
@@ -526,13 +526,13 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
       const std::vector<int> IEN_v = lien_v -> get_LIEN(ee);
       const std::vector<int> IEN_p = lien_p -> get_LIEN(ee);
 
-      double ectrl_x[nLocBas], ectrl_y[nLocBas], ectrl_z[nLocBas];
+      std::vector<double> ectrl_x(nLocBas, 0.0), ectrl_y(nLocBas, 0.0), ectrl_z(nLocBas, 0.0);
 
-      fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
+      fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0]);
 
-      elemptr->buildBasis( quad, ectrl_x, ectrl_y, ectrl_z );
+      elemptr->buildBasis( quad, &ectrl_x[0], &ectrl_y[0], &ectrl_z[0] );
 
-      int IEN_s[nLocBas]{};
+      std::vector<int> IEN_s(nLocBas, 0.0);
 
       for(int ii=0; ii<nLocBas; ++ii) IEN_s[ii] = sien[ee * nLocBas + ii];
 
@@ -548,13 +548,13 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
       }
 
       // displacement interpolation
-      intep.interpolateVTKData( asize, IEN_s, inputInfo, elemptr, dataVecs[0] );
+      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[0] );
 
       // use displacement to update points
-      intep.interpolateVTKPts( IEN_s, ectrl_x, ectrl_y, ectrl_z, inputInfo, elemptr, points );
+      intep.interpolateVTKPts( &IEN_s[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], inputInfo, elemptr, points );
 
       // Interpolate detF
-      interpolateJ( IEN_s, inputInfo, elemptr, dataVecs[1] );
+      interpolateJ( &IEN_s[0], inputInfo, elemptr, dataVecs[1] );
 
       // Interpolate the pressure scalar
       inputInfo.clear();
@@ -565,7 +565,7 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
         for(int kk=0; kk<asize; ++kk)
           inputInfo.push_back( pointArrays[1][pt_index * asize + kk ] );
       }
-      intep.interpolateVTKData( asize, IEN_s, inputInfo, elemptr, dataVecs[2] ); 
+      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[2] ); 
       
       // Interpolate the velocity vector
       inputInfo.clear();
@@ -576,7 +576,7 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
         for(int kk=0; kk<asize; ++kk)
           inputInfo.push_back( pointArrays[2][pt_index * asize + kk ] );
       }
-      intep.interpolateVTKData( asize, IEN_s, inputInfo, elemptr, dataVecs[3] );
+      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[3] );
       
       // Set mesh connectivity
       if( elemptr->get_Type() == 501 )
@@ -693,13 +693,13 @@ void VTK_Writer_FSI::writeOutput_solid_ref(
       const std::vector<int> IEN_v = lien_v -> get_LIEN(ee);
       const std::vector<int> IEN_p = lien_p -> get_LIEN(ee);
 
-      double ectrl_x[nLocBas], ectrl_y[nLocBas], ectrl_z[nLocBas];
+      std::vector<double> ectrl_x(nLocBas, 0.0), ectrl_y(nLocBas, 0.0), ectrl_z(nLocBas, 0.0);
 
-      fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
+      fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0]);
 
-      elemptr->buildBasis( quad, ectrl_x, ectrl_y, ectrl_z );
+      elemptr->buildBasis( quad, &ectrl_x[0], &ectrl_y[0], &ectrl_z[0] );
 
-      int IEN_s[nLocBas]{};
+      std::vector<int> IEN_s(nLocBas, 0.0);
 
       for(int ii=0; ii<nLocBas; ++ii) IEN_s[ii] = sien[ee * nLocBas + ii];
 
@@ -715,10 +715,10 @@ void VTK_Writer_FSI::writeOutput_solid_ref(
       }
 
       // displacement interpolation
-      intep.interpolateVTKData( asize, IEN_s, inputInfo, elemptr, dataVecs[0] );
+      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[0] );
 
       // interpolate the coordinates of the points
-      intep.interpolateVTKPts( IEN_s, ectrl_x, ectrl_y, ectrl_z, elemptr, points );
+      intep.interpolateVTKPts( &IEN_s[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], elemptr, points );
 
       // Interpolate the pressure scalar
       inputInfo.clear();
@@ -729,7 +729,7 @@ void VTK_Writer_FSI::writeOutput_solid_ref(
         for(int kk=0; kk<asize; ++kk)
           inputInfo.push_back( pointArrays[1][pt_index * asize + kk ] );
       }
-      intep.interpolateVTKData( asize, IEN_s, inputInfo, elemptr, dataVecs[1] ); 
+      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[1] ); 
      
       // Interpolate the velocity vector
       inputInfo.clear();
@@ -740,7 +740,7 @@ void VTK_Writer_FSI::writeOutput_solid_ref(
         for(int kk=0; kk<asize; ++kk)
           inputInfo.push_back( pointArrays[2][pt_index * asize + kk ] );
       }
-      intep.interpolateVTKData( asize, IEN_s, inputInfo, elemptr, dataVecs[2] );
+      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[2] );
       
       // Set mesh connectivity
       if( elemptr->get_Type() == 501 )

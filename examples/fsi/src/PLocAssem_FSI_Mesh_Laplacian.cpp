@@ -67,11 +67,11 @@ void PLocAssem_FSI_Mesh_Laplacian::Assem_Tangent_Residual(
   
   const double curr = time;
   
-  double R[nLocBas], dR_dx[nLocBas], dR_dy[nLocBas], dR_dz[nLocBas];
+  std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
   for(int qua=0; qua<nqp; ++qua)
   {
-    element->get_R_gradR(qua, R, dR_dx, dR_dy, dR_dz);
+    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
     
     double ux = 0.0, uy = 0.0, uz = 0.0;
     double vx = 0.0, vy = 0.0, vz = 0.0;
@@ -143,11 +143,11 @@ void PLocAssem_FSI_Mesh_Laplacian::Assem_Residual(
 
   const double curr = time;
   
-  double R[nLocBas], dR_dx[nLocBas], dR_dy[nLocBas], dR_dz[nLocBas];
+  std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
   for(int qua=0; qua<nqp; ++qua)
   {
-    element->get_R_gradR(qua, R, dR_dx, dR_dy, dR_dz);
+    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
     
     double ux = 0.0, uy = 0.0, uz = 0.0;
     double vx = 0.0, vy = 0.0, vz = 0.0;

@@ -325,13 +325,11 @@ int main(int argc, char *argv[])
 
   ALocal_EBC * mesh_locebc = new ALocal_EBC(part_v_file, rank, "/mesh_ebc");
 
-  Tissue_prestress * ps_data = nullptr;
+  const int nqp_vol { (GMIptr->get_elemType() == 501) ? nqp_tet : (nqp_vol_1D * nqp_vol_1D * nqp_vol_1D) };
 
-  if( GMIptr->get_elemType() == 501 )
-    ps_data = new Tissue_prestress(locElem, nqp_tet, rank, is_load_ps, "./ps_data/prestress");
-  else if( GMIptr->get_elemType() == 601 )
-    ps_data = new Tissue_prestress(locElem, nqp_vol_1D * nqp_vol_1D * nqp_vol_1D, rank, is_load_ps, "./ps_data/prestress");
-  else SYS_T::print_fatal("Error: Element type not supported when initializing the Tissue_prestress class.\n");
+  const int nqp_sur { (GMIptr->get_elemType() == 501) ? nqp_tri : (nqp_sur_1D * nqp_sur_1D) };
+
+  Tissue_prestress * ps_data = new Tissue_prestress(locElem, nqp_vol, rank, is_load_ps, "./ps_data/prestress");
 
   // Group APart_Node and ALocal_NBC into a vector
   std::vector<APart_Node *> pNode_list { pNode_v, pNode_p };
@@ -378,21 +376,21 @@ int main(int argc, char *argv[])
 
   if( GMIptr->get_elemType() == 501 )
   {
-    if( nqp_tet > 5 ) SYS_T::commPrint("Warning: the tet element is linear and you are using more than 5 quadrature points.\n");
-    if( nqp_tri > 4 ) SYS_T::commPrint("Warning: the tri element is linear and you are using more than 4 quadrature points.\n");
+    if( nqp_vol > 5 ) SYS_T::commPrint("Warning: the tet element is linear and you are using more than 5 quadrature points.\n");
+    if( nqp_sur > 4 ) SYS_T::commPrint("Warning: the tri element is linear and you are using more than 4 quadrature points.\n");
 
-    elementv = new FEAElement_Tet4( nqp_tet ); // elem type 501
-    elements = new FEAElement_Triangle3_3D_der0( nqp_tri );
-    quadv = new QuadPts_Gauss_Tet( nqp_tet );
-    quads = new QuadPts_Gauss_Triangle( nqp_tri );
+    elementv = new FEAElement_Tet4( nqp_vol ); // elem type 501
+    elements = new FEAElement_Triangle3_3D_der0( nqp_sur );
+    quadv = new QuadPts_Gauss_Tet( nqp_vol );
+    quads = new QuadPts_Gauss_Triangle( nqp_sur );
   }
   else if( GMIptr->get_elemType() == 601 )
   {
     SYS_T::print_fatal_if( nqp_vol_1D < 2, "Error: not enough quadrature points for hex.\n" );
     SYS_T::print_fatal_if( nqp_sur_1D < 1, "Error: not enough quadrature points for quad.\n" );
 
-    elementv = new FEAElement_Hex8( nqp_vol_1D * nqp_vol_1D * nqp_vol_1D ); // elem type 601
-    elements = new FEAElement_Quad4_3D_der0( nqp_sur_1D * nqp_sur_1D );
+    elementv = new FEAElement_Hex8( nqp_vol ); // elem type 601
+    elements = new FEAElement_Quad4_3D_der0( nqp_sur );
     quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
     quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
   }
@@ -446,7 +444,7 @@ int main(int argc, char *argv[])
   // ===== Local assembly =====
   IPLocAssem_2x2Block * locAssem_fluid_ptr = new PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha(
       tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas(), 
-      fluid_density, fluid_mu, bs_beta );
+      fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType() );
 
   IMaterialModel * matmodel = nullptr;
   IPLocAssem_2x2Block * locAssem_solid_ptr = nullptr;
