@@ -41,8 +41,13 @@ PGAssem_Wall_Prestress::PGAssem_Wall_Prestress(
   VecSetOption(G, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
 
   // Create matrix with routh preallocation
+#if PETSC_VERSION_LT(3,19,0)
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
       PETSC_DETERMINE, 4*in_nz_estimate, PETSC_NULL, 4*in_nz_estimate, PETSC_NULL, &K);
+#else
+  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
+      PETSC_DETERMINE, 4*in_nz_estimate, PETSC_NULLPTR, 4*in_nz_estimate, PETSC_NULLPTR, &K);
+#endif
 
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();
