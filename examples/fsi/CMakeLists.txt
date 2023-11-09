@@ -42,6 +42,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Hex_Tools.cpp
   ${perigee_source}/Mesh/IEN_FEM.cpp
   ${perigee_source}/Mesh/Mesh_Tet.cpp
+  ${perigee_source}/Mesh/Mesh_FEM.cpp
   ${perigee_source}/Mesh/ElemBC_3D.cpp
   ${perigee_source}/Mesh/ElemBC_3D_outflow.cpp
   ${perigee_source}/Mesh/NodalBC.cpp
@@ -81,6 +82,9 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/System/HDF5_Reader.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Tet.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_1D.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_Quad.cpp
+  ${perigee_source}/Mesh/QuadPts_Gauss_Hex.cpp
   ${perigee_source}/Analysis_Tool/AGlobal_Mesh_Info_FEM_3D.cpp
   ${perigee_source}/Analysis_Tool/APart_Basic_Info.cpp
   ${perigee_source}/Analysis_Tool/ALocal_Elem.cpp
@@ -94,7 +98,9 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/FEANode.cpp
   ${perigee_source}/Element/FE_Tools.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Quad4_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
+  ${perigee_source}/Element/FEAElement_Hex8.cpp
   ${perigee_source}/Model/MaterialModel_NeoHookean_M94_Mixed.cpp
   ${perigee_source}/Model/MaterialModel_NeoHookean_Incompressible_Mixed.cpp
   ${perigee_source}/Model/Tissue_prestress.cpp
@@ -111,11 +117,11 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/PDNTimeStep.cpp
   ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
-  ${perigee_SOURCE_DIR}/src/PLocAssem_Tet4_FSI_Mesh_Elastostatic.cpp
-  ${perigee_SOURCE_DIR}/src/PLocAssem_Tet4_FSI_Mesh_Laplacian.cpp
-  ${perigee_SOURCE_DIR}/src/PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha.cpp
-  ${perigee_SOURCE_DIR}/src/PLocAssem_2x2Block_Tet4_VMS_Incompressible.cpp
-  ${perigee_SOURCE_DIR}/src/PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_FSI_Mesh_Elastostatic.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_FSI_Mesh_Laplacian.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_2x2Block_VMS_Incompressible.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_2x2Block_VMS_Hyperelasticity.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_V.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_P.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_Mesh.cpp
@@ -134,10 +140,12 @@ SET( perigee_postprocess_lib_src
   ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   ${perigee_source}/Postproc_Tool/Interpolater.cpp
   ${perigee_source}/Mesh/QuadPts_vis_tet4.cpp
+  ${perigee_source}/Mesh/QuadPts_vis_quad4.cpp
+  ${perigee_source}/Mesh/QuadPts_vis_hex8.cpp
   ${perigee_SOURCE_DIR}/src/VisDataPrep_FSI.cpp
   ${perigee_SOURCE_DIR}/src/VisDataPrep_ALE_NS.cpp
   ${perigee_SOURCE_DIR}/src/VisDataPrep_Hyperelastic.cpp
-  ${perigee_SOURCE_DIR}/src/VTK_Writer_FSI_Tet4.cpp
+  ${perigee_SOURCE_DIR}/src/VTK_Writer_FSI.cpp
   )
 
 # ===============================================
@@ -169,23 +177,27 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # BUILD THE MAIN DRIVERS
 # ===================================================================
 ADD_EXECUTABLE( preprocess_fsi preprocess_fsi.cpp)
-ADD_EXECUTABLE( wall_ps_tet4_3d wall_ps_tet4_driver.cpp)
-ADD_EXECUTABLE( fsi_tet4_3d fsi_driver.cpp)
+ADD_EXECUTABLE( wall_ps3d wall_ps_driver.cpp)
+ADD_EXECUTABLE( fsi3d fsi_driver.cpp)
 ADD_EXECUTABLE( prepostproc prepost.cpp)
 ADD_EXECUTABLE( vis_fsi vis_driver.cpp )
 ADD_EXECUTABLE( vis_fluid vis_fluid.cpp )
 ADD_EXECUTABLE( vis_solid vis_solid.cpp )
 ADD_EXECUTABLE( vis_fsi_wss vis_fsi_wss.cpp )
+ADD_EXECUTABLE( vis_501_fsi_wss vis_501_fsi_wss.cpp )
+ADD_EXECUTABLE( vis_601_fsi_wss vis_601_fsi_wss.cpp )
 
 # Link libraries
 TARGET_LINK_LIBRARIES( preprocess_fsi ${EXTRA_LINK_LIBS} perigee_preprocess )
-TARGET_LINK_LIBRARIES( wall_ps_tet4_3d ${EXTRA_LINK_LIBS} perigee_analysis )
-TARGET_LINK_LIBRARIES( fsi_tet4_3d ${EXTRA_LINK_LIBS} perigee_analysis )
+TARGET_LINK_LIBRARIES( wall_ps3d ${EXTRA_LINK_LIBS} perigee_analysis )
+TARGET_LINK_LIBRARIES( fsi3d ${EXTRA_LINK_LIBS} perigee_analysis )
 TARGET_LINK_LIBRARIES( prepostproc ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( vis_fsi ${EXTRA_LINK_LIBS} perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_fluid ${EXTRA_LINK_LIBS} perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_solid ${EXTRA_LINK_LIBS} perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_fsi_wss ${EXTRA_LINK_LIBS} perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_501_fsi_wss ${EXTRA_LINK_LIBS} perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_601_fsi_wss ${EXTRA_LINK_LIBS} perigee_postprocess )
 
 if(OPENMP_CXX_FOUND)
   SET_TARGET_PROPERTIES( perigee_preprocess PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )

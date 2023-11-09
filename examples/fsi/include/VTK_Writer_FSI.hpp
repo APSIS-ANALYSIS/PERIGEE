@@ -1,10 +1,10 @@
-#ifndef VTK_WRITER_FSI_TET4_HPP
-#define VTK_WRITER_FSI_TET4_HPP
+#ifndef VTK_WRITER_FSI_HPP
+#define VTK_WRITER_FSI_HPP
 // ============================================================================
-// VTK_Writer_FSI_Tet4.hpp
+// VTK_Writer_FSI.hpp
 //
 // This is a class designed for the visualization of FSI problems based on
-// linear tet element.
+// linear tet element and trilinear hex element.
 //
 // Date: Jan 17 2022
 // ============================================================================
@@ -17,13 +17,14 @@
 #include "vtkIntArray.h"
 #include "vtkCellData.h"
 
-class VTK_Writer_FSI_Tet4
+class VTK_Writer_FSI
 {
   public:
-    VTK_Writer_FSI_Tet4( const int &in_nelem,
+    VTK_Writer_FSI( const int &in_nelem,
+        const int &in_nlocbas, 
         const std::string &epart_file );
 
-    ~VTK_Writer_FSI_Tet4();
+    ~VTK_Writer_FSI();
 
     // Write the fluid and solid domain together in a unified continuum body
     void writeOutput(

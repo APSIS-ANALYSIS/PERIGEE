@@ -10,9 +10,11 @@
 #include "ALocal_Elem.hpp"
 #include "APart_Node_FSI.hpp"
 #include "QuadPts_vis_tet4.hpp"
+#include "QuadPts_vis_hex8.hpp"
 #include "FEAElement_Tet4.hpp"
+#include "FEAElement_Hex8.hpp"
 #include "VisDataPrep_Hyperelastic.hpp"  
-#include "VTK_Writer_FSI_Tet4.hpp"   
+#include "VTK_Writer_FSI.hpp"   
 
 int main ( int argc , char * argv[] )
 {
@@ -77,14 +79,14 @@ int main ( int argc , char * argv[] )
   SYS_T::cmdPrint("-time_step:", time_step);
   SYS_T::cmdPrint("-time_end:", time_end);
   SYS_T::cmdPrint("-dt:",dt);
-  if(isXML) PetscPrintf(PETSC_COMM_WORLD, "-xml: true \n");
-  else PetscPrintf(PETSC_COMM_WORLD, "-xml: false \n");
+  if(isXML) SYS_T::commPrint("-xml: true \n");
+  else SYS_T::commPrint("-xml: false \n");
 
-  if(isRef) PetscPrintf(PETSC_COMM_WORLD, "-ref: true \n");
-  else PetscPrintf(PETSC_COMM_WORLD, "-ref: false \n");
+  if(isRef) SYS_T::commPrint("-ref: true \n");
+  else SYS_T::commPrint("-ref: false \n");
 
-  if(isClean) PetscPrintf(PETSC_COMM_WORLD, "-clean: true \n");
-  else PetscPrintf(PETSC_COMM_WORLD, "-clean: false \n");
+  if(isClean) SYS_T::commPrint("-clean: true \n");
+  else SYS_T::commPrint("-clean: false \n");
 
   // If demand cleaning, remove all previous visualization files
   if( isClean )
@@ -113,11 +115,24 @@ int main ( int argc , char * argv[] )
   APart_Node * pNode_v = new APart_Node(part_v_file, rank);
   APart_Node * pNode_p = new APart_Node(part_p_file, rank);
 
-  IQuadPts * quad = new QuadPts_vis_tet4();
+  // Allocate the quadrature rule and element container
+  IQuadPts * quad = nullptr;
+  FEAElement * element = nullptr; 
+
+  // We assume that the same element type is used for pressure and velocity
+  if( GMIptr_v->get_elemType() == 501 )
+  {
+    quad = new QuadPts_vis_tet4();
+    element = new FEAElement_Tet4( quad-> get_num_quadPts() );
+  }
+  else if( GMIptr_v->get_elemType() == 601 )
+  {
+    quad = new QuadPts_vis_hex8();
+    element = new FEAElement_Hex8( quad-> get_num_quadPts() );
+  }
+  else SYS_T::print_fatal( "Error: unsupported element type \n" );
 
   quad -> print_info();
-
-  FEAElement * element = new FEAElement_Tet4( quad-> get_num_quadPts() );
 
   // For the solid subdomain, we need to prepare a mapping from the
   // FSI nodal index to the solid subdomain nodal index
@@ -146,8 +161,8 @@ int main ( int argc , char * argv[] )
   pointArrays[1] = new double [pNode_p->get_nlocghonode() * 1];
   pointArrays[2] = new double [pNode_v->get_nlocghonode() * 3];
 
-  VTK_Writer_FSI_Tet4 * vtk_w = new VTK_Writer_FSI_Tet4(
-      GMIptr_v->get_nElem(), element_part_file );  
+  VTK_Writer_FSI * vtk_w = new VTK_Writer_FSI( GMIptr_v->get_nElem(),
+      element->get_nLocBas(), element_part_file );  
 
   std::ostringstream time_index;
 

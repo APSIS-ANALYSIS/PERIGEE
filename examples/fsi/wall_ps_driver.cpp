@@ -12,12 +12,16 @@
 #include "PGAssem_Wall_Prestress.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
+#include "QuadPts_Gauss_Quad.hpp"
+#include "QuadPts_Gauss_Hex.hpp"
 #include "FEAElement_Triangle3_3D_der0.hpp"
+#include "FEAElement_Quad4_3D_der0.hpp"
 #include "FEAElement_Tet4.hpp"
+#include "FEAElement_Hex8.hpp"
 #include "MaterialModel_NeoHookean_M94_Mixed.hpp"
 #include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
-#include "PLocAssem_2x2Block_Tet4_VMS_Incompressible.hpp"
-#include "PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity.hpp"
+#include "PLocAssem_2x2Block_VMS_Incompressible.hpp"
+#include "PLocAssem_2x2Block_VMS_Hyperelasticity.hpp"
 #include "PTime_FSI_Solver.hpp"
 
 int main( int argc, char *argv[] )
@@ -67,9 +71,11 @@ int main( int argc, char *argv[] )
 
   HDF5_Reader * cmd_h5r = new HDF5_Reader( solver_cmd_file );
 
-  const int nqp_tet  = cmd_h5r -> read_intScalar(    "/", "nqp_tet");
-  const int nqp_tri  = cmd_h5r -> read_intScalar(    "/", "nqp_tri");
-  const double sl_nu = cmd_h5r -> read_doubleScalar( "/", "sl_nu");
+  const int nqp_tet     = cmd_h5r -> read_intScalar(    "/", "nqp_tet");
+  const int nqp_tri     = cmd_h5r -> read_intScalar(    "/", "nqp_tri");
+  const int nqp_vol_1D  = cmd_h5r -> read_intScalar(    "/", "nqp_vol_1d");
+  const int nqp_sur_1D  = cmd_h5r -> read_intScalar(    "/", "nqp_sur_1d");
+  const double sl_nu    = cmd_h5r -> read_doubleScalar( "/", "sl_nu");
 
   delete cmd_h5r; H5Fclose(solver_cmd_file);
 
@@ -79,6 +85,7 @@ int main( int argc, char *argv[] )
   const std::string part_v_file = pcmd_h5r -> read_string(    "/", "part_file_v" );
   const std::string part_p_file = pcmd_h5r -> read_string(    "/", "part_file_p" );
   const int fsiBC_type          = pcmd_h5r -> read_intScalar( "/", "fsiBC_type" );
+  const int elemType            = pcmd_h5r -> read_intScalar("/","elemType");
 
   delete pcmd_h5r; H5Fclose(prepcmd_file);
 
@@ -211,7 +218,14 @@ int main( int argc, char *argv[] )
 
   ALocal_NBC * locnbc_p = new ALocal_NBC(part_p_file, rank, "/nbc/MF");
 
-  Tissue_prestress * ps_data = new Tissue_prestress(locElem, nqp_tet, rank, is_load_ps, ps_file_name);  
+  Tissue_prestress * ps_data = nullptr;
+
+  if( elemType == 501 )
+    ps_data = new Tissue_prestress(locElem, nqp_tet, rank, is_load_ps, ps_file_name);
+  else if( elemType == 601 )
+    ps_data = new Tissue_prestress(locElem, nqp_vol_1D * nqp_vol_1D * nqp_vol_1D, rank, is_load_ps, ps_file_name);
+  else SYS_T::print_fatal("Error: Element type not supported when initializing the Tissue_prestress class.\n");
+ 
   SYS_T::commPrint("===> Mesh HDF5 files are read from disk.\n");
 
   // Group APart_Node and ALocal_NBC into a vector
@@ -229,12 +243,30 @@ int main( int argc, char *argv[] )
 
   // ===== Quadrature rules and FEM container =====
   SYS_T::commPrint("===> Build quadrature rules. \n");
-  IQuadPts * quadv = new QuadPts_Gauss_Tet( nqp_tet );
-  IQuadPts * quads = new QuadPts_Gauss_Triangle( nqp_tri );
+  IQuadPts * quadv = nullptr;
+  IQuadPts * quads = nullptr;
 
   SYS_T::commPrint("===> Setup element container. \n");
-  FEAElement * elementv = new FEAElement_Tet4( nqp_tet );
-  FEAElement * elements = new FEAElement_Triangle3_3D_der0( nqp_tri );
+  FEAElement * elementv = nullptr;
+  FEAElement * elements = nullptr;
+
+  if( elemType == 501 )
+  {
+    quadv = new QuadPts_Gauss_Tet( nqp_tet );
+    quads = new QuadPts_Gauss_Triangle( nqp_tri );
+
+    elementv = new FEAElement_Tet4( nqp_tet );
+    elements = new FEAElement_Triangle3_3D_der0( nqp_tri );
+  }
+  else if( elemType == 601 )
+  {
+    quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
+    quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
+
+    elementv = new FEAElement_Hex8( nqp_vol_1D * nqp_vol_1D * nqp_vol_1D );
+    elements = new FEAElement_Quad4_3D_der0( nqp_sur_1D * nqp_sur_1D );
+  }
+  else SYS_T::print_fatal("Error: Element type not supported.\n");
 
   // ===== Generate the IS for pres and velo =====
   const int idx_v_start = HDF5_T::read_intScalar( SYS_T::gen_partfile_name(part_v_file, rank).c_str(), "/DOF_mapper", "start_idx" );
@@ -285,14 +317,14 @@ int main( int argc, char *argv[] )
     {
       matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( "material_model.h5" );
 
-      locAssem_solid_ptr = new PLocAssem_2x2Block_Tet4_VMS_Incompressible(
+      locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Incompressible(
           matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
     }
     else
     {
       matmodel = new MaterialModel_NeoHookean_M94_Mixed( "material_model.h5" );
 
-      locAssem_solid_ptr = new PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity(
+      locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Hyperelasticity(
           matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
     }
   }
@@ -302,14 +334,14 @@ int main( int argc, char *argv[] )
     {
       matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( solid_density, solid_E );
 
-      locAssem_solid_ptr = new PLocAssem_2x2Block_Tet4_VMS_Incompressible(
+      locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Incompressible(
           matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
     }
     else
     {
       matmodel = new MaterialModel_NeoHookean_M94_Mixed( solid_density, solid_E, solid_nu );
 
-      locAssem_solid_ptr = new PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity(
+      locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Hyperelasticity(
           matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
     }
   }

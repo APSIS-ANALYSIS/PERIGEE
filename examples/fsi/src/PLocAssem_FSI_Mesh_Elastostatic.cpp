@@ -1,10 +1,10 @@
-#include "PLocAssem_Tet4_FSI_Mesh_Elastostatic.hpp"
+#include "PLocAssem_FSI_Mesh_Elastostatic.hpp"
 
-PLocAssem_Tet4_FSI_Mesh_Elastostatic::PLocAssem_Tet4_FSI_Mesh_Elastostatic(
-    const double &in_mat_E, const double &in_mat_nu )
+PLocAssem_FSI_Mesh_Elastostatic::PLocAssem_FSI_Mesh_Elastostatic(
+    const double &in_mat_E, const double &in_mat_nu, const int &in_nlocbas )
 : E(in_mat_E), nu(in_mat_nu), lambda( nu * E / ((1+nu) * (1-2.0*nu)) ),
   mu( E/(2.0+2.0*nu) ), kappa( lambda + 2.0 * mu / 3.0 ),
-  nLocBas(4), vec_size(12)
+  nLocBas(in_nlocbas), vec_size(nLocBas*3)
 {
   Tangent = new PetscScalar[vec_size * vec_size];
   Residual = new PetscScalar[vec_size];
@@ -14,14 +14,18 @@ PLocAssem_Tet4_FSI_Mesh_Elastostatic::PLocAssem_Tet4_FSI_Mesh_Elastostatic(
   print_info();
 }
 
-PLocAssem_Tet4_FSI_Mesh_Elastostatic::~PLocAssem_Tet4_FSI_Mesh_Elastostatic()
+PLocAssem_FSI_Mesh_Elastostatic::~PLocAssem_FSI_Mesh_Elastostatic()
 {
   delete [] Tangent; delete [] Residual; Tangent = nullptr; Residual = nullptr;
 }
 
-void PLocAssem_Tet4_FSI_Mesh_Elastostatic::print_info() const
+void PLocAssem_FSI_Mesh_Elastostatic::print_info() const
 {
   SYS_T::commPrint("  Three-dimensional Elastostatic equation: \n");
+  if(nLocBas == 4)
+    SYS_T::commPrint("  FEM: 4-node Tetrahedral element \n");
+  else if(nLocBas == 8)
+    SYS_T::commPrint("  FEM: 8-node Hexahedral element \n");
   SYS_T::commPrint("  Spatial: Galerkin Finite element \n");
   SYS_T::commPrint("  This solver is for mesh motion in the fluid sub-domain for FSI problems.\n");
   SYS_T::commPrint("  Young's Modulus E  = %e \n", E);
@@ -33,24 +37,23 @@ void PLocAssem_Tet4_FSI_Mesh_Elastostatic::print_info() const
   SYS_T::print_sep_line();
 }
 
-
-void PLocAssem_Tet4_FSI_Mesh_Elastostatic::Zero_Tangent_Residual()
+void PLocAssem_FSI_Mesh_Elastostatic::Zero_Tangent_Residual()
 {
   for(int ii=0; ii<vec_size; ++ii) Residual[ii] = 0.0;
   for(int ii=0; ii<vec_size * vec_size; ++ii) Tangent[ii] = 0.0;
 }
 
-void PLocAssem_Tet4_FSI_Mesh_Elastostatic::Zero_Residual()
+void PLocAssem_FSI_Mesh_Elastostatic::Zero_Residual()
 {
   for(int ii=0; ii<vec_size; ++ii) Residual[ii] = 0.0;
 }
 
-void PLocAssem_Tet4_FSI_Mesh_Elastostatic::Assem_Estimate()
+void PLocAssem_FSI_Mesh_Elastostatic::Assem_Estimate()
 {
   for(int ii=0; ii<vec_size * vec_size; ++ii) Tangent[ii] = 1.0;
 }
 
-void PLocAssem_Tet4_FSI_Mesh_Elastostatic::get_currPts(
+void PLocAssem_FSI_Mesh_Elastostatic::get_currPts(
     const double * const &ept_x, const double * const &ept_y,
     const double * const &ept_z, const double * const &sol,
     double * const &cur_x, double * const &cur_y,
@@ -64,7 +67,7 @@ void PLocAssem_Tet4_FSI_Mesh_Elastostatic::get_currPts(
   }
 }
 
-void PLocAssem_Tet4_FSI_Mesh_Elastostatic::Assem_Tangent_Residual(
+void PLocAssem_FSI_Mesh_Elastostatic::Assem_Tangent_Residual(
     const double &time, const double &dt,
     const double * const &vec_a,
     const double * const &vec_b,
@@ -74,7 +77,7 @@ void PLocAssem_Tet4_FSI_Mesh_Elastostatic::Assem_Tangent_Residual(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  double curPt_x[4], curPt_y[4], curPt_z[4];
+  double curPt_x[nLocBas], curPt_y[nLocBas], curPt_z[nLocBas];
 
   // vec_a passes the previous time step displacement.
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, vec_a, curPt_x, curPt_y, curPt_z );
@@ -88,7 +91,7 @@ void PLocAssem_Tet4_FSI_Mesh_Elastostatic::Assem_Tangent_Residual(
 
   Zero_Tangent_Residual();
 
-  double dR_dx[4], dR_dy[4], dR_dz[4];
+  double dR_dx[nLocBas], dR_dy[nLocBas], dR_dz[nLocBas];
 
   for( int qua=0; qua<nqp; ++qua )
   {
