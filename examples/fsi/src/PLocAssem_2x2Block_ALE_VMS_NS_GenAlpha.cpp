@@ -138,12 +138,12 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Residual(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  double R[nLocBas], dR_dx[nLocBas], dR_dy[nLocBas], dR_dz[nLocBas];
-  double curPt_x[nLocBas], curPt_y[nLocBas], curPt_z[nLocBas];
+  std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
+  std::vector<double> curPt_x(nLocBas, 0.0), curPt_y(nLocBas, 0.0), curPt_z(nLocBas, 0.0);
 
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, nLocBas, curPt_x, curPt_y, curPt_z);
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, nLocBas, &curPt_x[0], &curPt_y[0], &curPt_z[0]);
 
-  element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
+  element->buildBasis( quad, &curPt_x[0], &curPt_y[0], &curPt_z[0] );
 
   const double two_mu = 2.0 * vis_mu;
 
@@ -162,7 +162,7 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Residual(
     double mu = 0.0, mv = 0.0, mw = 0.0; // mesh velocity, i.e. hat-v
     Vector_3 coor(0.0, 0.0, 0.0);
 
-    element->get_R_gradR( qua, R, dR_dx, dR_dy, dR_dz );
+    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
