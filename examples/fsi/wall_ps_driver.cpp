@@ -218,13 +218,11 @@ int main( int argc, char *argv[] )
 
   ALocal_NBC * locnbc_p = new ALocal_NBC(part_p_file, rank, "/nbc/MF");
 
-  Tissue_prestress * ps_data = nullptr;
+  const int nqp_vol { (elemType == 501) ? nqp_tet : (nqp_vol_1D * nqp_vol_1D * nqp_vol_1D) };
 
-  if( elemType == 501 )
-    ps_data = new Tissue_prestress(locElem, nqp_tet, rank, is_load_ps, ps_file_name);
-  else if( elemType == 601 )
-    ps_data = new Tissue_prestress(locElem, nqp_vol_1D * nqp_vol_1D * nqp_vol_1D, rank, is_load_ps, ps_file_name);
-  else SYS_T::print_fatal("Error: Element type not supported when initializing the Tissue_prestress class.\n");
+  const int nqp_sur { (elemType == 501) ? nqp_tri : (nqp_sur_1D * nqp_sur_1D) };
+
+  Tissue_prestress * ps_data = new Tissue_prestress(locElem, nqp_vol, rank, is_load_ps, ps_file_name);
  
   SYS_T::commPrint("===> Mesh HDF5 files are read from disk.\n");
 
@@ -252,19 +250,19 @@ int main( int argc, char *argv[] )
 
   if( elemType == 501 )
   {
-    quadv = new QuadPts_Gauss_Tet( nqp_tet );
-    quads = new QuadPts_Gauss_Triangle( nqp_tri );
+    quadv = new QuadPts_Gauss_Tet( nqp_vol );
+    quads = new QuadPts_Gauss_Triangle( nqp_sur );
 
-    elementv = new FEAElement_Tet4( nqp_tet );
-    elements = new FEAElement_Triangle3_3D_der0( nqp_tri );
+    elementv = new FEAElement_Tet4( nqp_vol );
+    elements = new FEAElement_Triangle3_3D_der0( nqp_sur );
   }
   else if( elemType == 601 )
   {
     quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
     quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
 
-    elementv = new FEAElement_Hex8( nqp_vol_1D * nqp_vol_1D * nqp_vol_1D );
-    elements = new FEAElement_Quad4_3D_der0( nqp_sur_1D * nqp_sur_1D );
+    elementv = new FEAElement_Hex8( nqp_vol );
+    elements = new FEAElement_Quad4_3D_der0( nqp_sur );
   }
   else SYS_T::print_fatal("Error: Element type not supported.\n");
 
