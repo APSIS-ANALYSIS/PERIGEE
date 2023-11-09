@@ -306,7 +306,7 @@ void VTK_Writer_FSI::writeOutput_fluid(
 
       elemptr->buildBasis( quad, ectrl_x, ectrl_y, ectrl_z );
 
-      int IEN_f[nLocBas]{};
+      int IEN_f[nLocBas];
 
       for(int ii=0; ii<nLocBas; ++ii) IEN_f[ii] = fien[ee * nLocBas + ii]; 
 
@@ -532,7 +532,7 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
 
       elemptr->buildBasis( quad, ectrl_x, ectrl_y, ectrl_z );
 
-      int IEN_s[nLocBas]{};
+      int IEN_s[nLocBas];
 
       for(int ii=0; ii<nLocBas; ++ii) IEN_s[ii] = sien[ee * nLocBas + ii];
 
@@ -699,7 +699,7 @@ void VTK_Writer_FSI::writeOutput_solid_ref(
 
       elemptr->buildBasis( quad, ectrl_x, ectrl_y, ectrl_z );
 
-      int IEN_s[nLocBas]{};
+      int IEN_s[nLocBas];
 
       for(int ii=0; ii<nLocBas; ++ii) IEN_s[ii] = sien[ee * nLocBas + ii];
 
