@@ -445,9 +445,7 @@ namespace MATH_T
 
         for(int ii=0; ii<N*N; ++ii) mat[ii] = 0.0;
         for(int ii=0; ii<N; ++ii)
-        {
           mat[ii*N+ii] = 1.0;
-        }
         is_fac = false;
       }
 
