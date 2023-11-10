@@ -317,24 +317,7 @@ namespace SYS_T
     }
   }
 
-  // 5. Print message (without termination the code) under conditions
-  inline void print_message_if( bool a, const char output[], ... )
-  {
-    if( a )
-    {
-      if( !get_MPI_rank() )
-      {
-        va_list Argp;
-        va_start(Argp, output);
-        (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
-        va_end(Argp);
-      }
-
-      MPI_Barrier(PETSC_COMM_WORLD);
-    }
-  }
-
-  // 4. print the number of threads used in openmp
+  // 5. print the number of threads used in openmp
   inline void print_omp_info()
   {
 #ifdef _OPENMP
