@@ -193,14 +193,14 @@ namespace SYS_T
       {
         va_list Argp;
         va_start(Argp, output);
-        vfprintf (stderr, output, Argp);
+        vfprintf(stdout, output, Argp);
         va_end(Argp);
       }
       #pragma omp barrier
 #else
       va_list Argp;
       va_start(Argp, output);
-      vfprintf (stderr, output, Argp);
+      vfprintf(stdout, output, Argp);
       va_end(Argp);
 #endif
     }
