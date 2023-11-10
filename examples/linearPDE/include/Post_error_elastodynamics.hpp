@@ -18,7 +18,7 @@ namespace POST_ERROR_E
 
   Tensor2_3D exact_grad_disp( const double &x, const double &y, const double &z, const double &time );
 
-  double get_manu_sol_error(
+  double get_manu_sol_errorL2(
       const double &time,
       const double * const &solux,
       const double * const &soluy,
