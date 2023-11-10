@@ -515,6 +515,13 @@ namespace MATH_T
       void gen_rand(const double &min = -1.0, const double &max = 1.0)
       {
         for(int ii=0; ii<N*N; ++ii) mat[ii] = gen_double_rand(min, max);
+
+        // symmetrize the random matrix: upper triangular part follows the lower
+        // triangular part
+        for(int ii=0; ii<N-1; ++ii)
+        {
+          for(int jj=ii+1; jj<N; ++jj) mat[ii*N+jj] = mat[jj*N+ii];
+        }
       }
 
       double& operator()(const int &index) {return mat[index];}
