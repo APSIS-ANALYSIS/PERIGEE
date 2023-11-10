@@ -134,7 +134,7 @@ void VTK_Writer_Elastodynamics::writeOutput(
       rank, size, sol_time, isXML );
 
   // Clean gridData
-  PetscPrintf(PETSC_COMM_WORLD, "-- Clean gridData object.\n");
+  SYS_T::commPrint("-- Clean gridData object.\n");
   gridData->Delete();
 }
 
