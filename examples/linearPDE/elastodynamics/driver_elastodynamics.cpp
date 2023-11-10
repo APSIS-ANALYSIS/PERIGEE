@@ -295,8 +295,8 @@ int main(int argc, char *argv[])
     SYS_T::file_check(restart_u_name);
     SYS_T::file_check(restart_v_name);
 
-    disp->ReadBinary(restart_u_name.c_str());//str
-    velo->ReadBinary(restart_v_name.c_str());
+    disp->ReadBinary(restart_u_name);//str
+    velo->ReadBinary(restart_v_name);
 
     // generate the corresponding dot_sol file name
     std::string restart_dot_u_name = "dot_";
@@ -308,8 +308,8 @@ int main(int argc, char *argv[])
     SYS_T::file_check(restart_dot_u_name);
     SYS_T::file_check(restart_dot_v_name);
 
-    dot_disp->ReadBinary(restart_dot_u_name.c_str());
-    dot_velo->ReadBinary(restart_dot_v_name.c_str());
+    dot_disp->ReadBinary(restart_dot_u_name);
+    dot_velo->ReadBinary(restart_dot_v_name);
 
     SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
     SYS_T::commPrint("     restart_u_name: %s \n", restart_u_name.c_str());
