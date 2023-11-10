@@ -10,15 +10,11 @@ PGAssem_Elastodynamics_GenAlpha::PGAssem_Elastodynamics_GenAlpha(
     const ALocal_EBC * const &part_ebc,
     const int &in_nz_estimate )
 : nLocBas( agmi_ptr->get_nLocBas() ),
+  snLocBas( part_ebc -> get_cell_nLocBas(0) ),
   dof_mat( locassem_ptr->get_dof_mat() ),
   num_ebc( part_ebc->get_num_ebc() ),
-  nlgn( pnode_ptr->get_nlocghonode() ),
-  snLocBas( 0 )
+  nlgn( pnode_ptr->get_nlocghonode() )
 {
-  // Make sure that the surface element's number of local basis are
-  // the same. This is an assumption in this assembly routine.
-  if(num_ebc>0) snLocBas = part_ebc -> get_cell_nLocBas(0);
-
   const int nlocrow = dof_mat * pnode_ptr -> get_nlocalnode();
 
   // Allocate the sparse matrix K

@@ -79,9 +79,7 @@ class PGAssem_Elastodynamics_GenAlpha : public IPGAssem
 
   private:
     // Private data
-    const int nLocBas, dof_mat, num_ebc, nlgn;
-
-    int snLocBas;
+    const int nLocBas, snLocBas, dof_mat, num_ebc, nlgn;
 
     // Private function
     // Essential boundary condition
