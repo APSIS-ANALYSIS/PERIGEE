@@ -446,8 +446,8 @@ namespace MATH_T
         ASSERT(N>=1, "Matrix_SymPos_Dense<N> Error: The matrix size N must be positive.\n");      
 
         for(int ii=0; ii<N*N; ++ii) mat[ii] = 0.0;
-        for(int ii=0; ii<N; ++ii)
-          mat[ii*N+ii] = 1.0;
+        for(int ii=0; ii<N; ++ii) mat[ii*N+ii] = 1.0;
+        
         is_fac = false;
       }
 
