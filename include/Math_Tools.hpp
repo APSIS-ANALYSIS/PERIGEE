@@ -196,6 +196,11 @@ namespace MATH_T
   //
   // Ref. Numerical Linear Algebra by L.N. Trefethen and D. Bau, III, SIAM.
   // ==========================================================================
+  
+  // forward declaration of the template class Matrix_SymPos_Dense
+  // needed for the implementation of equal operator in Matrix_Dense
+  template<int N> class Matrix_SymPos_Dense;   
+
   template<int N> class Matrix_Dense
   {
     public:
@@ -276,6 +281,17 @@ namespace MATH_T
 
         return *this;             
       }     
+
+      virtual Matrix_Dense<N>& operator= (const Matrix_SymPos_Dense<N> &source)
+      {
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = source(ii);
+
+        for(int ii=0; ii<N; ++ii) pp[ii] = ii;
+
+        is_fac = source.get_is_fac();
+
+        return *this;             
+      }
 
       int get_size() const {return N;}
 
@@ -422,29 +438,43 @@ namespace MATH_T
   //
   // Ref. Shufang Xu, Numerical Linear Algebra, Peking Univ.
   // ==========================================================================
-  template<int N> class Matrix_SymPos_Dense : public Matrix_Dense <N>
+  template<int N> class Matrix_SymPos_Dense
   {
     public:
-      Matrix_SymPos_Dense() : Matrix_Dense<N>()
-      {}
+      Matrix_SymPos_Dense()
+      {
+        ASSERT(N>=1, "Matrix_SymPos_Dense<N> Error: The matrix size N must be positive.\n");      
 
-      Matrix_SymPos_Dense(const std::array<double,N*N> &input) : Matrix_Dense<N>(input)
-      {}
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = 0.0;
+        for(int ii=0; ii<N; ++ii) mat[ii*N+ii] = 1.0;
+        
+        is_fac = false;
+      }
+
+      Matrix_SymPos_Dense(const std::array<double,N*N> &input)
+      {
+        ASSERT(N>=1, "Matrix_SymPos_Dense<N> Error: The matrix size N must be positive.\n");      
+        
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = input[ii];
+
+        // Check the symmetry of the matrix
+        check_symm();
+
+        is_fac = false;
+      }
 
       // ----------------------------------------------------------------------
       // We assume that the input matrix are the symmetry positive definite matrix
       // and we do not check this in the constructor 
       // ----------------------------------------------------------------------
-      Matrix_SymPos_Dense( const Matrix_Dense<N> &input ) : Matrix_Dense<N>()
+      Matrix_SymPos_Dense( const Matrix_Dense<N> &input )
       { 
-        for(int ii=0; ii<N*N; ++ii) this->mat[ii] = input(ii);
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = input(ii);
         
         // Check the symmetry of the matrix
         check_symm();
 
-        for(int ii=0; ii<N; ++ii) this->pp[ii] = input.get_p(ii); 
-
-        this->is_fac = input.get_is_fac();
+        is_fac = input.get_is_fac();
       }
 
       virtual ~Matrix_SymPos_Dense() {};
@@ -458,16 +488,64 @@ namespace MATH_T
         {
           for(int jj=0; jj<ii; ++jj)
           {
-            if( !MATH_T::equals( this->mat[ii*N+jj], this->mat[jj*N+ii], 1.0e-15) ) 
+            if( !MATH_T::equals( mat[ii*N+jj], mat[jj*N+ii], 1.0e-15) ) 
               std::cout<<"error: Matrix_SymPos entry ("<<ii<<","<<jj<<") does not match entry ("<<jj<<","<<ii<<"). \n";
           }
         }
       }
 
+      void print_info() const
+      {
+        std::cout<<"N ="<<N<<'\n';
+        std::cout<<"Matrix :\n";
+        int counter = -1;
+        for(int ii=0; ii<N; ++ii)
+        {
+          for(int jj=0; jj<N; ++jj)
+            std::cout<<mat[++counter]<<'\t';
+          std::cout<<'\n';
+        }
+
+        if(is_fac)
+          std::cout<<"Matrix is factorized.\n";
+        else
+          std::cout<<"Matrix is NOT factorized.\n";
+      }
+
+      void gen_rand(const double &min = -1.0, const double &max = 1.0)
+      {
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = gen_double_rand(min, max);
+
+        // symmetrize the random matrix: upper triangular part follows the lower
+        // triangular part
+        for(int ii=0; ii<N-1; ++ii)
+        {
+          for(int jj=ii+1; jj<N; ++jj) mat[ii*N+jj] = mat[jj*N+ii];
+        }
+      }
+
+      double& operator()(const int &index) {return mat[index];}
+
+      const double& operator()(const int &index) const {return mat[index];}
+
+      double& operator()(const int &ii, const int &jj) {return mat[N*ii+jj];}
+
+      const double& operator()(const int &ii, const int &jj) const {return mat[N*ii+jj];}
+      
+      int get_size() const {return N;}
+
+      bool get_is_fac() const {return is_fac;}
+
       // Assignment operator
       Matrix_SymPos_Dense<N>& operator= (const Matrix_SymPos_Dense<N> &source)
       {
-        Matrix_Dense<N>::operator=(source);
+        // self-assignment guard
+        if(this == &source) return *this;
+
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = source(ii);
+
+        is_fac = source.get_is_fac();
+
         return *this;
       }
 
@@ -484,19 +562,19 @@ namespace MATH_T
         for(int jj=0; jj<N; ++jj)
         {
           const int Njj = jj * N;
-          for(int kk=0; kk<jj; ++kk) v[kk] = this->mat[Njj+kk] * this->mat[kk*N+kk];
+          for(int kk=0; kk<jj; ++kk) v[kk] = mat[Njj+kk] * mat[kk*N+kk];
 
-          for(int kk=0; kk<jj; ++kk) this->mat[Njj+jj] -= v[kk] * this->mat[Njj+kk];
+          for(int kk=0; kk<jj; ++kk) mat[Njj+jj] -= v[kk] * mat[Njj+kk];
 
           for(int ii=jj+1; ii<N; ++ii)
           {
-            for(int kk=0; kk<jj; ++kk) this->mat[N*ii+jj] -= this->mat[ii*N+kk] * v[kk];
+            for(int kk=0; kk<jj; ++kk) mat[N*ii+jj] -= mat[ii*N+kk] * v[kk];
 
-            this->mat[N*ii+jj] *= 1.0 / this->mat[Njj+jj];
+            mat[N*ii+jj] /= mat[Njj+jj];
           }
         }
 
-        this->is_fac = true;
+        is_fac = true;
       }
 
       // ----------------------------------------------------------------------
@@ -511,19 +589,38 @@ namespace MATH_T
         for(int ii=0; ii<N; ++ii)
         {
           xx[ii] = bb[ii];
-          for(int jj=0; jj<ii; ++jj) xx[ii] -= this->mat[ii*N+jj] * xx[jj];
+          for(int jj=0; jj<ii; ++jj) xx[ii] -= mat[ii*N+jj] * xx[jj];
         }
 
         // Solve for D z = y;
-        for(int ii=0; ii<N; ++ii) xx[ii] *= 1.0 / this->mat[ii*N+ii];
+        for(int ii=0; ii<N; ++ii) xx[ii] *= 1.0 / mat[ii*N+ii];
 
         // Solve L^t x = z
         for(int ii=N-2; ii>=0; --ii)
         {
-          for(int jj=ii+1; jj<N; ++jj) xx[ii] -= this->mat[jj*N+ii] * xx[jj];
+          for(int jj=ii+1; jj<N; ++jj) xx[ii] -= mat[jj*N+ii] * xx[jj];
         }
         return xx;
       }
+
+      std::array<double,N> Mult( const std::array<double,N> &input ) const
+      {
+        ASSERT(is_fac == false, "Error: the matrix has been factroized.\n");
+        std::array<double,N> out {};
+        for(int ii=0; ii<N; ++ii)
+        {
+          out[ii] = 0.0;
+          for(int jj=0; jj<N; ++jj) out[ii] += mat[N*ii+jj] * input[jj];
+        }
+        return out;
+      }
+
+    private:
+      // container for the matrix
+      double mat[N*N];
+
+      // bool variable indicate if the matrix has been LU factorized.
+      bool is_fac;
   };
 
 } // End of Math_T
