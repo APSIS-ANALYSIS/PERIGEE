@@ -196,8 +196,10 @@ namespace MATH_T
   //
   // Ref. Numerical Linear Algebra by L.N. Trefethen and D. Bau, III, SIAM.
   // ==========================================================================
-
-  template<int N> class Matrix_SymPos_Dense;   // declare template Matrix_SymPos_Dense
+  
+  // forward declaration of the template class Matrix_SymPos_Dense
+  // needed for the implementation of equal operator in Matrix_Dense
+  template<int N> class Matrix_SymPos_Dense;   
 
   template<int N> class Matrix_Dense
   {
