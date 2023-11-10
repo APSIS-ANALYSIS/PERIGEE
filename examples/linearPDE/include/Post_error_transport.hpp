@@ -15,7 +15,7 @@ namespace POST_ERROR_T
 
   double exact_sol_dz( const double &x, const double &y, const double &z, const double &time );
 
-  double get_manu_sol_error(
+  double get_manu_sol_errorL2(
       const double &time,
       const double * const &solu,
       const FEAElement * const &element,

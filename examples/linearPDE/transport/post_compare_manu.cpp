@@ -73,7 +73,7 @@ int main( int argc, char * argv[] )
     pSolu -> get_esol( 0, 4, IEN_e, loc_sol );
 
     // Calculate the error
-    subdomain_l2 += POST_ERROR_T::get_manu_sol_error(
+    subdomain_l2 += POST_ERROR_T::get_manu_sol_errorL2(
       sol_time, loc_sol, elementv, ectrl_x, ectrl_y, ectrl_z, quadv );
 
     subdomain_H1 += POST_ERROR_T::get_manu_sol_errorH1(
