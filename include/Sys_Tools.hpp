@@ -335,7 +335,7 @@ namespace SYS_T
 #endif
   }
 
-  // 5. set the number of threads used in openmp
+  // 6. set the number of threads used in openmp
   inline void set_omp_num_threads()
   {
 #ifdef _OPENMP
