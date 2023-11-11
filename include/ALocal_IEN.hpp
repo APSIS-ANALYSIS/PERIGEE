@@ -6,8 +6,8 @@
 // Local IEN array for Analysis code.
 // This class stores the IEN array for volumetric elements. The IEN array is 
 // stored in a one-dimensional vector, with stride length nLocBas. For the ee-th
-// element, its ii-th node has volumetric mesh node index LIEN[ ee * nLocBas +
-// ii ].
+// element, its ii-th node has volumetric mesh node index 
+//                    LIEN[ ee * nLocBas + ii ].
 //
 // Author: Ju Liu
 // Date: Nov. 10th 2013
@@ -26,7 +26,7 @@ class ALocal_IEN
     // ------------------------------------------------------------------------
     // ! Destructor
     // ------------------------------------------------------------------------
-    virtual ~ALocal_IEN();
+    virtual ~ALocal_IEN() = default;
 
     // ------------------------------------------------------------------------
     // ! Get stride length
