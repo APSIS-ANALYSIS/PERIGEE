@@ -8,6 +8,8 @@
 // stored in a one-dimensional vector, with stride length nLocBas. For the ee-th
 // element, its ii-th node has volumetric mesh node index 
 //                    LIEN[ ee * nLocBas + ii ].
+// Local means the IEN array returns the nodal indices in the local_to_global
+// array, that is the local + ghost nodes belonging to the CPU subdomain.
 //
 // Author: Ju Liu
 // Date: Nov. 10th 2013
