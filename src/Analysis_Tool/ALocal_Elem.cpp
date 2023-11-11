@@ -22,12 +22,6 @@ ALocal_Elem::ALocal_Elem(const std::string &fileBaseName, const int &cpu_rank)
   delete h5r; H5Fclose( file_id );
 }
 
-ALocal_Elem::~ALocal_Elem()
-{
-  VEC_T::clean(elem_loc);
-  VEC_T::clean(elem_tag);
-}
-
 int ALocal_Elem::get_nlocalele( const int &tag_val ) const
 {
   if( isTagged )
