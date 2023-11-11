@@ -14,9 +14,6 @@ APart_Basic_Info::APart_Basic_Info( const std::string &fileBaseName,
   delete h5r; H5Fclose( file_id );
 }
 
-APart_Basic_Info::~APart_Basic_Info()
-{}
-
 void APart_Basic_Info::print_info() const
 {
   PetscSynchronizedPrintf(PETSC_COMM_WORLD, "Basic Partition Information: \n");

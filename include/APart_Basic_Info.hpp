@@ -29,7 +29,7 @@ class APart_Basic_Info
     // --------------------------------------------------------------
     APart_Basic_Info( const std::string &fbasename, const int &in_rank = 0 );
 
-    virtual ~APart_Basic_Info();
+    virtual ~APart_Basic_Info() = default;
 
     virtual int get_cpu_rank() const {return cpu_rank;}
     
