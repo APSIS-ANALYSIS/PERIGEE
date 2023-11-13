@@ -1,5 +1,10 @@
 // ============================================================================
 // driver_elastodynamics.cpp
+// 
+// Finite element code for 3D elastodynamics equations using non-overshoot
+// generalized alpha time stepping.
+//
+// Date: Oct. 24 2023
 // ============================================================================
 #include "HDF5_Writer.hpp"
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
@@ -20,7 +25,7 @@
 #include "FEAElement_Quad4_3D_der0.hpp"
 #include "FEAElement_Quad9_3D_der0.hpp"
 #include "PLocAssem_Elastodynamics_GenAlpha.hpp"
-#include "PGAssem_Elastodynamics_GenAlpha.hpp"
+#include "PGAssem_LinearPDE_GenAlpha.hpp"
 #include "PNonlinear_LinearPDE_Solver.hpp"
 #include "PTime_LinearPDE_Solver.hpp"
 
@@ -326,7 +331,7 @@ int main(int argc, char *argv[])
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
-  IPGAssem * gloAssem_ptr = new PGAssem_Elastodynamics_GenAlpha( locAssem_ptr,
+  IPGAssem * gloAssem_ptr = new PGAssem_LinearPDE_GenAlpha( locAssem_ptr,
       GMIptr, locElem, locIEN, pNode, locnbc, locebc, nz_estimate );  
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
