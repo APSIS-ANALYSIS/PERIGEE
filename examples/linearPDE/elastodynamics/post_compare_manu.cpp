@@ -1,5 +1,10 @@
+// ==================================================================
 // post_compare_manu.cpp
-
+//
+// Error analysis code for 3D elastodynamics.
+//
+// Data: Oct. 25 2023
+// ==================================================================
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
 #include "ALocal_Elem.hpp"
