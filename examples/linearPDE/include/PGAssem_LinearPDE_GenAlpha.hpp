@@ -1,15 +1,16 @@
-#ifndef PGASSEM_ELASTODYNAMICS_GENALPHA_HPP
-#define PGASSEM_ELASTODYNAMICS_GENALPHA_HPP
+#ifndef PGASSEM_LINEARPDE_GENALPHA_HPP
+#define PGASSEM_LINEARPDE_GENALPHA_HPP
 
 #include "IPGAssem.hpp"
 #include "PETSc_Tools.hpp"
 #include "PDNSolution_Elastodynamics.hpp"
+#include "PDNSolution_Transport.hpp"
 
-class PGAssem_Elastodynamics_GenAlpha : public IPGAssem
+class PGAssem_LinearPDE_GenAlpha : public IPGAssem
 {
   public:
     // Constructor for CMM equations
-    PGAssem_Elastodynamics_GenAlpha(
+    PGAssem_LinearPDE_GenAlpha(
         IPLocAssem * const &locassem_ptr,
         const IAGlobal_Mesh_Info * const &agmi_ptr,
         const ALocal_Elem * const &alelem_ptr,
@@ -20,7 +21,7 @@ class PGAssem_Elastodynamics_GenAlpha : public IPGAssem
         const int &in_nz_estimate = 60 );
 
     // Destructor
-    virtual ~PGAssem_Elastodynamics_GenAlpha();
+    virtual ~PGAssem_LinearPDE_GenAlpha();
 
     // Nonzero pattern estimate
     virtual void Assem_nonzero_estimate(
@@ -100,9 +101,9 @@ class PGAssem_Elastodynamics_GenAlpha : public IPGAssem
     {
       for(int ii=0; ii<nLocBas; ++ii)
       {
-        const int offset1 = ii * 3;
-        const int offset2 = IEN[ii] * 3;
-        for(int jj=0; jj<3; ++jj)
+        const int offset1 = ii * dof_mat;
+        const int offset2 = IEN[ii] * dof_mat;
+        for(int jj=0; jj<dof_mat; ++jj)
           local_array[offset1 + jj] = array[offset2 + jj];
       }
     }
