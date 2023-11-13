@@ -1,6 +1,12 @@
 #ifndef POST_ERROR_TRANSPORT_HPP
 #define POST_ERROR_TRANSPORT_HPP
-
+// ==================================================================
+// Post_error_transport.hpp
+// 
+// Error analysis namespace for transport equations
+//
+// Date: Oct. 26 2023
+// ==================================================================
 #include "FEAElement.hpp"
 #include "IQuadPts.hpp"
 #include "Math_Tools.hpp"
