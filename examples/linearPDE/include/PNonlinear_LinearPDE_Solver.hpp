@@ -1,6 +1,12 @@
 #ifndef PNONLINEAR_LINEARPDE_SOLVER_HPP
 #define PNONLINEAR_LINEARPDE_SOLVER_HPP
-
+// ==================================================================
+// PNonlinear_LinearPDE_Solver.hpp
+// 
+// Parallel nonlinear solver for linear PDE. 
+//
+// Date: Oct. 23 2023
+// ==================================================================
 #include "TimeMethod_GenAlpha.hpp"
 #include "IPGAssem.hpp"
 #include "PLinear_Solver_PETSc.hpp"
@@ -51,7 +57,11 @@ class PNonlinear_LinearPDE_Solver
         PDNSolution * const &dot_sol,
         PDNSolution * const &sol,
         bool &conv_flag, int &nl_counter ) const;
-    
+
+    // --------------------------------------------------------------
+    // GenAlpha_Solve_Elastodynamics:
+    // This is a solver for elastodynamics equation.
+    // --------------------------------------------------------------
     void GenAlpha_Solve_Elastodynamics(
         const bool &new_tangent_flag,
         const double &curr_time,
@@ -90,7 +100,6 @@ class PNonlinear_LinearPDE_Solver
     {PetscPrintf(PETSC_COMM_WORLD,
         "  === NR ite: %d, r_error: %e, a_error: %e \n",
         count, rel_err, abs_err);}
-
 
 };
 
