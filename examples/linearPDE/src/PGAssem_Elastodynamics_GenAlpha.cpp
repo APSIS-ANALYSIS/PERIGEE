@@ -10,11 +10,15 @@ PGAssem_Elastodynamics_GenAlpha::PGAssem_Elastodynamics_GenAlpha(
     const ALocal_EBC * const &part_ebc,
     const int &in_nz_estimate )
 : nLocBas( agmi_ptr->get_nLocBas() ),
-  snLocBas( part_ebc -> get_cell_nLocBas(0) ),
   dof_mat( locassem_ptr->get_dof_mat() ),
   num_ebc( part_ebc->get_num_ebc() ),
+  snLocBas( num_ebc>0 ? part_ebc -> get_cell_nLocBas(0) : 0 ),
   nlgn( pnode_ptr->get_nlocghonode() )
 {
+  // Make sure the data structure is compatible
+  SYS_T::print_fatal_if(dof_mat != part_nbc->get_dof_LID(),
+      "PGAssem_NS_FEM::dof_mat != part_nbc->get_dof_LID(). \n");
+  
   const int nlocrow = dof_mat * pnode_ptr -> get_nlocalnode();
 
   // Allocate the sparse matrix K
