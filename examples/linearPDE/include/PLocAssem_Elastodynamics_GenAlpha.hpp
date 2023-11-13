@@ -3,7 +3,9 @@
 // ============================================================================
 // PLocAssem_Elastodynamics_GenAlpha.hpp
 //
-// Date: Jan 21 2022
+// Parallel Local Assembly routine for Gen-alpha based elastodynamics solver
+//
+// Date: Oct. 25 2023
 // ============================================================================
 #include "IPLocAssem.hpp"
 #include "TimeMethod_GenAlpha.hpp"
