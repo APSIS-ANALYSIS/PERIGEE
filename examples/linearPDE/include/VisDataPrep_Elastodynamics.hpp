@@ -3,7 +3,8 @@
 // ==================================================================
 // VisDataPrep_Elastodynamics.hpp
 //
-// This is the data preparation for visualizing linear PDE problems.
+// This is the data preparation for visualizing elastodynamics 
+// problems.
 //
 // Date Created: Nov. 5 2023
 // ==================================================================
