@@ -1,6 +1,12 @@
 #ifndef POST_ERROR_ELASTODYNAMICS_HPP
 #define POST_ERROR_ELASTODYNAMICS_HPP
-
+// ==================================================================
+// Post_error_elastodynamics.hpp
+// 
+// Error analysis namespace for elastodynamics equations
+//
+// Date: Oct. 26 2023
+// ==================================================================
 #include "FEAElement.hpp"
 #include "IQuadPts.hpp"
 #include "Math_Tools.hpp"
