@@ -1,6 +1,6 @@
-#include "PGAssem_Elastodynamics_GenAlpha.hpp"
+#include "PGAssem_LinearPDE_GenAlpha.hpp"
 
-PGAssem_Elastodynamics_GenAlpha::PGAssem_Elastodynamics_GenAlpha(
+PGAssem_LinearPDE_GenAlpha::PGAssem_LinearPDE_GenAlpha(
     IPLocAssem * const &locassem_ptr,
     const IAGlobal_Mesh_Info * const &agmi_ptr,
     const ALocal_Elem * const &alelem_ptr,
@@ -49,13 +49,13 @@ PGAssem_Elastodynamics_GenAlpha::PGAssem_Elastodynamics_GenAlpha(
       PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &K);
 }
 
-PGAssem_Elastodynamics_GenAlpha::~PGAssem_Elastodynamics_GenAlpha()
+PGAssem_LinearPDE_GenAlpha::~PGAssem_LinearPDE_GenAlpha()
 {
   VecDestroy(&G);
   MatDestroy(&K);
 }
 
-void PGAssem_Elastodynamics_GenAlpha::EssBC_KG( 
+void PGAssem_LinearPDE_GenAlpha::EssBC_KG( 
     const ALocal_NBC * const &nbc_part, const int &field )
 {
   const int local_dir = nbc_part -> get_Num_LD(field);
@@ -85,7 +85,7 @@ void PGAssem_Elastodynamics_GenAlpha::EssBC_KG(
   }
 }
 
-void PGAssem_Elastodynamics_GenAlpha::EssBC_G( 
+void PGAssem_LinearPDE_GenAlpha::EssBC_G( 
     const ALocal_NBC * const &nbc_part, const int &field )
 {
   const int local_dir = nbc_part->get_Num_LD(field);
@@ -109,14 +109,13 @@ void PGAssem_Elastodynamics_GenAlpha::EssBC_G(
   }
 }
 
-void PGAssem_Elastodynamics_GenAlpha::Assem_nonzero_estimate(
+void PGAssem_LinearPDE_GenAlpha::Assem_nonzero_estimate(
     const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
     const ALocal_IEN * const &lien_ptr,
     const ALocal_NBC * const &nbc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();
-  const int loc_dof = dof_mat * nLocBas;
   
   lassem_ptr->Assem_Estimate();
 
@@ -132,7 +131,7 @@ void PGAssem_Elastodynamics_GenAlpha::Assem_nonzero_estimate(
         row_index[dof_mat * ii + mm] = dof_mat * nbc_part->get_LID( mm, loc_index ) + mm;
     }
 
-    MatSetValues(K, loc_dof, row_index, loc_dof, row_index, lassem_ptr->Tangent, ADD_VALUES);
+    MatSetValues(K, dof_mat * nLocBas, row_index, dof_mat * nLocBas, row_index, lassem_ptr->Tangent, ADD_VALUES);
   }
   
   delete [] row_index; row_index = nullptr;
@@ -148,7 +147,7 @@ void PGAssem_Elastodynamics_GenAlpha::Assem_nonzero_estimate(
   VecAssemblyEnd(G);
 }
 
-void PGAssem_Elastodynamics_GenAlpha::NatBC_G( 
+void PGAssem_LinearPDE_GenAlpha::NatBC_G( 
     const double &curr_time, const double &dt,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
@@ -192,7 +191,7 @@ void PGAssem_Elastodynamics_GenAlpha::NatBC_G(
   delete [] srow_index; srow_index = nullptr;
 }
 
-void PGAssem_Elastodynamics_GenAlpha::Assem_residual(
+void PGAssem_LinearPDE_GenAlpha::Assem_residual(
     const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     const double &curr_time,
@@ -209,12 +208,11 @@ void PGAssem_Elastodynamics_GenAlpha::Assem_residual(
     const ALocal_EBC * const &ebc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();
-  const int loc_dof = dof_mat * nLocBas;
 
-  double * array_a = new double [nlgn * 3];
-  double * array_b = new double [nlgn * 3];
-  double * local_a = new double [nLocBas * 3];
-  double * local_b = new double [nLocBas * 3];
+  double * array_a = new double [nlgn * dof_mat];
+  double * array_b = new double [nlgn * dof_mat];
+  double * local_a = new double [nLocBas * dof_mat];
+  double * local_b = new double [nLocBas * dof_mat];
   int * IEN_e = new int [nLocBas];
   double * ectrl_x = new double [nLocBas];
   double * ectrl_y = new double [nLocBas];
@@ -241,7 +239,7 @@ void PGAssem_Elastodynamics_GenAlpha::Assem_residual(
         row_index[dof_mat*ii+mm] = dof_mat * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
     }
 
-    VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+    VecSetValues(G, dof_mat * nLocBas, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
 
   delete [] array_a; array_a = nullptr;
@@ -266,7 +264,7 @@ void PGAssem_Elastodynamics_GenAlpha::Assem_residual(
   VecAssemblyEnd(G);
 }
 
-void PGAssem_Elastodynamics_GenAlpha::Assem_tangent_residual(
+void PGAssem_LinearPDE_GenAlpha::Assem_tangent_residual(
     const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     const double &curr_time,
@@ -283,12 +281,11 @@ void PGAssem_Elastodynamics_GenAlpha::Assem_tangent_residual(
     const ALocal_EBC * const &ebc_part)
 {
   const int nElem = alelem_ptr->get_nlocalele();
-  const int loc_dof = dof_mat * nLocBas;
 
-  double * array_a = new double [nlgn * 3];
-  double * array_b = new double [nlgn * 3];
-  double * local_a = new double [nLocBas * 3];
-  double * local_b = new double [nLocBas * 3];
+  double * array_a = new double [nlgn * dof_mat];
+  double * array_b = new double [nlgn * dof_mat];
+  double * local_a = new double [nLocBas * dof_mat];
+  double * local_b = new double [nLocBas * dof_mat];
   int * IEN_e = new int [nLocBas];
   double * ectrl_x = new double [nLocBas];
   double * ectrl_y = new double [nLocBas];
@@ -315,10 +312,10 @@ void PGAssem_Elastodynamics_GenAlpha::Assem_tangent_residual(
         row_index[dof_mat*ii + mm] = dof_mat * nbc_part->get_LID(mm, IEN_e[ii]) + mm;
     }
 
-    MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
+    MatSetValues(K, dof_mat * nLocBas, row_index, dof_mat * nLocBas, row_index,
         lassem_ptr->Tangent, ADD_VALUES);
 
-    VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+    VecSetValues(G, dof_mat * nLocBas, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
 
   delete [] array_a; array_a = nullptr;
@@ -345,7 +342,7 @@ void PGAssem_Elastodynamics_GenAlpha::Assem_tangent_residual(
   VecAssemblyEnd(G);
 }
 
-void PGAssem_Elastodynamics_GenAlpha::Assem_mass_residual(
+void PGAssem_LinearPDE_GenAlpha::Assem_mass_residual(
     const PDNSolution * const &sol,
     const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
@@ -359,10 +356,9 @@ void PGAssem_Elastodynamics_GenAlpha::Assem_mass_residual(
     const ALocal_EBC * const &ebc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();
-  const int loc_dof = dof_mat * nLocBas;
 
-  double * array_a = new double [nlgn * 3];
-  double * local_a = new double [nLocBas * 3];
+  double * array_a = new double [nlgn * dof_mat];
+  double * local_a = new double [nLocBas * dof_mat];
   int * IEN_e = new int [nLocBas];
   double * ectrl_x = new double [nLocBas];
   double * ectrl_y = new double [nLocBas];
@@ -385,10 +381,10 @@ void PGAssem_Elastodynamics_GenAlpha::Assem_mass_residual(
         row_index[dof_mat*ii+mm] = dof_mat * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
     }
 
-    MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
+    MatSetValues(K, dof_mat * nLocBas, row_index, dof_mat * nLocBas, row_index,
         lassem_ptr->Tangent, ADD_VALUES);
 
-    VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+    VecSetValues(G, dof_mat * nLocBas, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
 
   delete [] array_a; array_a = nullptr;
