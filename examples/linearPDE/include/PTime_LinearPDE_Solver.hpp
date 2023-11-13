@@ -1,6 +1,12 @@
 #ifndef PTIME_LINEARPDE_SOLVER_HPP
 #define PTIME_LINEARPDE_SOLVER_HPP
-
+// ==================================================================
+// PTime_LinearPDE_Solver.hpp
+//
+// Parallel time solver for linear PDE.
+//
+// Date: Oct. 26 2023
+// ==================================================================
 #include "PDNTimeStep.hpp"
 #include "PNonlinear_LinearPDE_Solver.hpp"
 
@@ -73,6 +79,5 @@ class PTime_LinearPDE_Solver
     std::string Name_dot_Generator( const std::string &middle_name,
         const int &counter ) const;
 };
-
 
 #endif
