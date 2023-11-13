@@ -3,6 +3,8 @@
 // ============================================================================
 // PLocAssem_Transport_GenAlpha.hpp
 //
+// Parallel Local Assembly routine for Gen-alpha based transport solver。
+//
 // Date: Jan 21 2022
 // ============================================================================
 #include "IPLocAssem.hpp"
