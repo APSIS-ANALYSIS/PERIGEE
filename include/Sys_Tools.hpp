@@ -304,16 +304,42 @@ namespace SYS_T
   {
     if( !a )
     {
-      if( !get_MPI_rank() )
+      int mpi_flag {-1};
+      MPI_Initialized(&mpi_flag);
+      if (mpi_flag)
       {
+        if( !get_MPI_rank() )
+        {
+          va_list Argp;
+          va_start(Argp, output);
+          (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
+          va_end(Argp);
+        }
+        MPI_Barrier(PETSC_COMM_WORLD);
+        MPI_Abort(PETSC_COMM_WORLD, 1);
+      }
+      else
+      {
+#ifdef _OPENMP
+        if( !omp_get_thread_num() )
+        {
+          va_list Argp;
+          va_start(Argp, output);
+          vfprintf (stderr, output, Argp);
+          va_end(Argp);
+
+          exit( EXIT_FAILURE );
+        }
+        else exit( EXIT_FAILURE );
+#else
         va_list Argp;
         va_start(Argp, output);
-        (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
+        vfprintf (stderr, output, Argp);
         va_end(Argp);
-      }
 
-      MPI_Barrier(PETSC_COMM_WORLD);
-      MPI_Abort(PETSC_COMM_WORLD, 1);
+        exit( EXIT_FAILURE );
+#endif
+      }      
     }
   }
 
