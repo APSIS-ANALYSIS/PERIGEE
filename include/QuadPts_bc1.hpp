@@ -7,7 +7,6 @@
 //
 // Date: June 15 2015
 // ==================================================================
-#include "Vec_Tools.hpp"
 #include "IQuadPts.hpp"
 
 class QuadPts_bc1 : public IQuadPts
@@ -21,12 +20,8 @@ class QuadPts_bc1 : public IQuadPts
     {
       std::cout<<std::endl;
       std::cout<<"====== BC 1 Points ======"<<std::endl;
-      for(int ii=0; ii<num_pts; ++ii)
-        std::cout<<qp[ii]<<'\t';
-      std::cout<<std::endl;
-      for(int ii=0; ii<num_pts; ++ii)
-        std::cout<<qw[ii]<<'\t';
-      std::cout<<std::endl;
+      std::cout<<1.0<<'\n';
+      std::cout<<1.0<<'\n';
       std::cout<<"========================="<<std::endl;
     }
 
