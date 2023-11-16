@@ -3,9 +3,6 @@
 Interpolater::Interpolater( const int &in_nlocbas ) : nLocBas( in_nlocbas )
 {}
 
-Interpolater::~Interpolater()
-{}
-
 void Interpolater::print_info() const
 {
   std::cout<<"Interpolater: \n";

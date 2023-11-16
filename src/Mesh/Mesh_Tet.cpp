@@ -19,9 +19,6 @@ Mesh_Tet::Mesh_Tet(const int &in_nfunc, const int &in_nelem,
   }
 }
 
-Mesh_Tet::~Mesh_Tet()
-{}
-
 void Mesh_Tet::print_info() const
 {
   std::cout<<"======= Mesh_Tet ======="<<std::endl;

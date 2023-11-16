@@ -27,7 +27,7 @@ class Interpolater
     // ------------------------------------------------------------------------
     Interpolater( const int &in_nlocbas );
     
-    virtual ~Interpolater();
+    virtual ~Interpolater() = default;
     
     // print the basic info on screen.
     void print_info() const;
