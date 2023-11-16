@@ -18,9 +18,6 @@ QuadPts_vis_tet10::QuadPts_vis_tet10()
   for(int ii=0; ii<10; ++ii) qw[ii] = weight;
 }
 
-QuadPts_vis_tet10::~QuadPts_vis_tet10()
-{}
-
 void QuadPts_vis_tet10::print_info() const
 {
   SYS_T::commPrint("\n===== Visualization Points for Tet10 ===== \n");

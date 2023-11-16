@@ -24,7 +24,7 @@ class QuadPts_vis_tet10_v2 : public IQuadPts
   public:
     QuadPts_vis_tet10_v2();
 
-    virtual ~QuadPts_vis_tet10_v2();
+    virtual ~QuadPts_vis_tet10_v2() = default;
 
     virtual void print_info() const;
 

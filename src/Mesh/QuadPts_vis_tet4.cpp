@@ -11,11 +11,6 @@ QuadPts_vis_tet4::QuadPts_vis_tet4()
   qw[2] = 0.25 / 6.0; qw[3] = 0.25 / 6.0;
 }
 
-
-QuadPts_vis_tet4::~QuadPts_vis_tet4()
-{}
-
-
 void QuadPts_vis_tet4::print_info() const
 {
   SYS_T::commPrint("\n===== Visualization Points for Tet4 ===== \n");
