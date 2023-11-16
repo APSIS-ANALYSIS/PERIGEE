@@ -2,7 +2,7 @@
 
 QuadPts_debug::QuadPts_debug( const std::vector<double> &in_qp, 
     const std::vector<double> &in_qw, const int &in_dim )
-: num_pts( VEC_T::get_size(in_qp) ), dim( in_dim ), qp( in_qp ), qw( in_qw )
+: num_pts( VEC_T::get_size(in_qw) ), dim( in_dim ), qp( in_qp ), qw( in_qw )
 {
   SYS_T::print_fatal_if( qp.size() != dim*qw.size(), 
       "Error: QuadPts_debug, input vector does not have the same length.\n");

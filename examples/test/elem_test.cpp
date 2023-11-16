@@ -320,7 +320,7 @@ int main( int argc, char * argv[] )
   FEAElement_Hex27 hex_27(1);
   std::vector<double> in_qp{{0.52572, 0.33891, 0.12345}};
   std::vector<double> in_qw{{1}};
-  QuadPts_debug * quad_debug = new QuadPts_debug(3, 1, in_qp, in_qw );
+  QuadPts_debug * quad_debug = new QuadPts_debug(in_qp, in_qw, 3);
   hex_27.buildBasis(quad_debug, ctrl_x_hex_27, ctrl_y_hex_27, ctrl_z_hex_27);
   double tol = 1e-14;
   bool isSame_R = true;
@@ -447,7 +447,7 @@ int main( int argc, char * argv[] )
   infile.close();
   FEAElement_Quad9 quad_9(1);
   std::vector<double> in_qp_quad{{0.2, 0.3}};
-  QuadPts_debug * quad_debug_quad = new QuadPts_debug(2, 1, in_qp_quad, in_qw );
+  QuadPts_debug * quad_debug_quad = new QuadPts_debug(in_qp_quad, in_qw, 2);
   quad_9.buildBasis(quad_debug_quad, ctrl_x_quad_9, ctrl_y_quad_9);
   isSame_R = true;
   isSame_dR_dx = true;
