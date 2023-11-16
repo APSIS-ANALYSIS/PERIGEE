@@ -135,6 +135,9 @@ int main( int argc, char * argv[] )
   delete [] ectrl_x; ectrl_x = nullptr;
   delete [] ectrl_y; ectrl_y = nullptr;
   delete [] ectrl_z; ectrl_z = nullptr;
+  delete [] loc_disp_x; loc_disp_x = nullptr;
+  delete [] loc_disp_y; loc_disp_y = nullptr;
+  delete [] loc_disp_z; loc_disp_z = nullptr;
   PetscFinalize();
   return EXIT_SUCCESS;
 }
