@@ -41,9 +41,6 @@ QuadPts_vis_hex27::QuadPts_vis_hex27()
   qw[24] = 0.5; qw[25] = 0.5; qw[26] = 0.5;
 }
 
-QuadPts_vis_hex27::~QuadPts_vis_hex27()
-{}
-
 void QuadPts_vis_hex27::print_info() const
 {
   SYS_T::commPrint("\n===== Visualization Points for Hex27 ===== \n");

@@ -17,9 +17,6 @@ QuadPts_vis_hex8::QuadPts_vis_hex8()
   qw[6] = 0.5; qw[7] = 0.5;
 }
 
-QuadPts_vis_hex8::~QuadPts_vis_hex8()
-{}
-
 void QuadPts_vis_hex8::print_info() const
 {
   SYS_T::commPrint("\n===== Visualization Points for Hex8 ===== \n");

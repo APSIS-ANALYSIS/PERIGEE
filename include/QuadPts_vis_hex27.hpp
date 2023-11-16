@@ -22,7 +22,8 @@ class QuadPts_vis_hex27 : public IQuadPts
 {
   public:
     QuadPts_vis_hex27();
-    virtual ~QuadPts_vis_hex27();
+    
+    virtual ~QuadPts_vis_hex27() = default;
 
     virtual void print_info() const;
 

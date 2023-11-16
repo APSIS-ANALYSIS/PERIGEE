@@ -19,7 +19,8 @@ class QuadPts_vis_hex8 : public IQuadPts
 {
   public:
     QuadPts_vis_hex8();
-    virtual ~QuadPts_vis_hex8();
+    
+    virtual ~QuadPts_vis_hex8() = default;
 
     virtual void print_info() const;
 
