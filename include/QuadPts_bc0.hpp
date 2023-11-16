@@ -7,29 +7,31 @@
 //
 // Date: June 15 2015
 // ==================================================================
-#include "Vec_Tools.hpp"
 #include "IQuadPts.hpp"
 
 class QuadPts_bc0 : public IQuadPts
 {
   public:
-    QuadPts_bc0();
-    virtual ~QuadPts_bc0();
+    QuadPts_bc0() = default;
 
-    virtual void print_info() const;
+    virtual ~QuadPts_bc0() = default;
+
+    virtual void print_info() const
+    {
+      std::cout<<std::endl;
+      std::cout<<"====== BC 0 Points ======"<<std::endl;
+      std::cout<<0.0<<'\n';
+      std::cout<<1.0<<'\n';
+      std::cout<<"========================="<<std::endl;
+    }
 
     virtual int get_dim() const {return 1;}
 
-    virtual int get_num_quadPts() const {return num_pts;}
+    virtual int get_num_quadPts() const {return 1;}
 
-    virtual double get_qp(unsigned int ii) const {return qp[ii];}
+    virtual double get_qp(unsigned int ii) const {return 0.0;}
 
-    virtual double get_qw(unsigned int ii) const {return qw[ii];}
-
-  private:
-    int num_pts;
-
-    std::vector<double> qp, qw;
+    virtual double get_qw(unsigned int ii) const {return 1.0;}
 };
 
 #endif
