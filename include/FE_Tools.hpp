@@ -112,7 +112,7 @@ namespace FE_T
           const double &a33 );
 
       // Destructor
-      ~Matrix_double_3by3_Array();
+      ~Matrix_double_3by3_Array() = default;
 
       // Assignment operator
       Matrix_double_3by3_Array& operator= (const Matrix_double_3by3_Array &input);
@@ -207,7 +207,7 @@ namespace FE_T
           const double &ff, const double &gg, const double &hh,
           const double &ii);
 
-      ~Matrix_double_6by6_Array();
+      ~Matrix_double_6by6_Array() = default;
 
       void LU_fac();
 
