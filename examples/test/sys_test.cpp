@@ -16,7 +16,7 @@
 
 int main(int argc, char *argv[])
 {
-  QuadPts_debug test(1, {0.5}, {1.2});
+  QuadPts_debug test({0.5, 0.4, 0.6, 0.77}, {1.2, 2.2}, 2);
 
   test.print_info();
 
