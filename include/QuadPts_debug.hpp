@@ -14,13 +14,10 @@
 class QuadPts_debug : public IQuadPts
 {
   public:
-    QuadPts_debug( const int &len, const std::vector<double> &in_qp,
-        const std::vector<double> &in_qw );
+    QuadPts_debug( const std::vector<double> &in_qp,
+        const std::vector<double> &in_qw, const int &in_dim = 1 );
 
-    QuadPts_debug( const int &in_dim, const int &in_numpt, 
-        const std::vector<double> &in_qp, const std::vector<double> &in_qw );
-
-    virtual ~QuadPts_debug();
+    virtual ~QuadPts_debug() = default;
 
     virtual void print_info() const;
 

@@ -12,9 +12,14 @@
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D.hpp"
 #include "ElemBC_3D_outflow.hpp"
+#include "QuadPts_debug.hpp"
 
 int main(int argc, char *argv[])
 {
+  QuadPts_debug test(1, {0.5}, {1.2});
+
+  test.print_info();
+
   return EXIT_SUCCESS;
 }
 
