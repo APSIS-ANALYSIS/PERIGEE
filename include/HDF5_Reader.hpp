@@ -51,7 +51,7 @@ class HDF5_Reader
     // --------------------------------------------------------------
     // ! ~HDF5_Reader : Destructor.
     // --------------------------------------------------------------
-    virtual ~HDF5_Reader();
+    virtual ~HDF5_Reader() = default;
 
     // --------------------------------------------------------------
     // !check_data: return a bool value that determines if the data

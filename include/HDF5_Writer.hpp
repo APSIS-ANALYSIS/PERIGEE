@@ -53,7 +53,7 @@ class HDF5_Writer
     // --------------------------------------------------------------
     HDF5_Writer( const hid_t &in_file_id );
     
-    virtual ~HDF5_Writer();
+    virtual ~HDF5_Writer() = default;
   
     // --------------------------------------------------------------
     // Scalar writer 
