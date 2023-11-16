@@ -3,7 +3,9 @@
 // ============================================================================
 // PLocAssem_Elastodynamics_GenAlpha.hpp
 //
-// Date: Jan 21 2022
+// Parallel Local Assembly routine for Gen-alpha based elastodynamics solver
+//
+// Date: Oct. 25 2023
 // ============================================================================
 #include "IPLocAssem.hpp"
 #include "TimeMethod_GenAlpha.hpp"
@@ -111,14 +113,14 @@ class PLocAssem_Elastodynamics_GenAlpha : public IPLocAssem
       return Vector_3(fx, fy, fz);
     }
 
-    typedef Vector_3 ( PLocAssem_Elastodynamics_GenAlpha::*locassem_transport_funs )
+    typedef Vector_3 ( PLocAssem_Elastodynamics_GenAlpha::*locassem_elastodynamics_funs )
         ( const Vector_3 &pt, const double &t, const Vector_3 &n_out ) const;
 
-    locassem_transport_funs * flist;
+    locassem_elastodynamics_funs * flist;
 
     Vector_3 get_ebc_fun( const int &ebc_id, const Vector_3 &pt, const double &tt, const Vector_3 &n_out ) const
     {
-      return Vector_3(0.0, 0.0, 0.0);
+      return ((*this).*(flist[ebc_id]))(pt, tt, n_out);
     }
 
     Vector_3 get_g_0( const Vector_3 &pt, const double &time, const Vector_3 &n_out ) const

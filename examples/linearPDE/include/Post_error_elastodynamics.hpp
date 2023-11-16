@@ -1,6 +1,12 @@
 #ifndef POST_ERROR_ELASTODYNAMICS_HPP
 #define POST_ERROR_ELASTODYNAMICS_HPP
-
+// ==================================================================
+// Post_error_elastodynamics.hpp
+// 
+// Error analysis namespace for elastodynamics equations
+//
+// Date: Oct. 26 2023
+// ==================================================================
 #include "FEAElement.hpp"
 #include "IQuadPts.hpp"
 #include "Math_Tools.hpp"
@@ -18,7 +24,7 @@ namespace POST_ERROR_E
 
   Tensor2_3D exact_grad_disp( const double &x, const double &y, const double &z, const double &time );
 
-  double get_manu_sol_error(
+  double get_manu_sol_errorL2(
       const double &time,
       const double * const &solux,
       const double * const &soluy,

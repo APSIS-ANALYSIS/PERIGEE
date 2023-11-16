@@ -1,5 +1,10 @@
 // ============================================================================
 // driver_elastodynamics.cpp
+// 
+// Finite element code for 3D elastodynamics equations using non-overshoot
+// generalized alpha time stepping.
+//
+// Date: Oct. 24 2023
 // ============================================================================
 #include "HDF5_Writer.hpp"
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
@@ -20,7 +25,7 @@
 #include "FEAElement_Quad4_3D_der0.hpp"
 #include "FEAElement_Quad9_3D_der0.hpp"
 #include "PLocAssem_Elastodynamics_GenAlpha.hpp"
-#include "PGAssem_Elastodynamics_GenAlpha.hpp"
+#include "PGAssem_LinearPDE_GenAlpha.hpp"
 #include "PNonlinear_LinearPDE_Solver.hpp"
 #include "PTime_LinearPDE_Solver.hpp"
 
@@ -299,8 +304,8 @@ int main(int argc, char *argv[])
     SYS_T::file_check(restart_u_name);
     SYS_T::file_check(restart_v_name);
 
-    disp->ReadBinary(restart_u_name.c_str());//str
-    velo->ReadBinary(restart_v_name.c_str());
+    disp->ReadBinary(restart_u_name);//str
+    velo->ReadBinary(restart_v_name);
 
     // generate the corresponding dot_sol file name
     std::string restart_dot_u_name = "dot_";
@@ -312,8 +317,8 @@ int main(int argc, char *argv[])
     SYS_T::file_check(restart_dot_u_name);
     SYS_T::file_check(restart_dot_v_name);
 
-    dot_disp->ReadBinary(restart_dot_u_name.c_str());
-    dot_velo->ReadBinary(restart_dot_v_name.c_str());
+    dot_disp->ReadBinary(restart_dot_u_name);
+    dot_velo->ReadBinary(restart_dot_v_name);
 
     SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
     SYS_T::commPrint("     restart_u_name: %s \n", restart_u_name.c_str());
@@ -330,7 +335,7 @@ int main(int argc, char *argv[])
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
-  IPGAssem * gloAssem_ptr = new PGAssem_Elastodynamics_GenAlpha( locAssem_ptr,
+  IPGAssem * gloAssem_ptr = new PGAssem_LinearPDE_GenAlpha( locAssem_ptr,
       GMIptr, locElem, locIEN, pNode, locnbc, locebc, nz_estimate );  
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");

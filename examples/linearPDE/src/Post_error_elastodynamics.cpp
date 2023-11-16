@@ -22,7 +22,7 @@ Tensor2_3D POST_ERROR_E::exact_grad_disp( const double &x, const double &y, cons
   return Tensor2_3D(ux_x, ux_y, ux_z, uy_x, uy_y, uy_z, uz_x, uz_y, uz_z);
 }
 
-double POST_ERROR_E::get_manu_sol_error(
+double POST_ERROR_E::get_manu_sol_errorL2(
     const double &time,
     const double * const &solux,
     const double * const &soluy,

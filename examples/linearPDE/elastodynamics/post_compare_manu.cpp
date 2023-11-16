@@ -1,5 +1,10 @@
+// ==================================================================
 // post_compare_manu.cpp
-
+//
+// Error analysis code for 3D elastodynamics.
+//
+// Data: Oct. 25 2023
+// ==================================================================
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
 #include "ALocal_Elem.hpp"
@@ -111,7 +116,7 @@ int main( int argc, char * argv[] )
     pSolu -> get_esol( 2, elementv->get_nLocBas(), IEN_e, loc_disp_z );
 
     // Calculate the error
-    subdomain_l2 += POST_ERROR_E::get_manu_sol_error(
+    subdomain_l2 += POST_ERROR_E::get_manu_sol_errorL2(
       sol_time, loc_disp_x, loc_disp_y, loc_disp_z, elementv, ectrl_x, ectrl_y, ectrl_z, quadv );
 
     subdomain_H1 += POST_ERROR_E::get_manu_sol_errorH1(
@@ -134,6 +139,9 @@ int main( int argc, char * argv[] )
   delete [] ectrl_x; ectrl_x = nullptr;
   delete [] ectrl_y; ectrl_y = nullptr;
   delete [] ectrl_z; ectrl_z = nullptr;
+  delete [] loc_disp_x; loc_disp_x = nullptr;
+  delete [] loc_disp_y; loc_disp_y = nullptr;
+  delete [] loc_disp_z; loc_disp_z = nullptr;
   PetscFinalize();
   return EXIT_SUCCESS;
 }

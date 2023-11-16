@@ -23,7 +23,7 @@ PLocAssem_Elastodynamics_GenAlpha::PLocAssem_Elastodynamics_GenAlpha(
   Zero_sur_Residual();
 
   if( num_ebc_fun == 0 ) flist = nullptr;
-  else flist = new locassem_transport_funs [num_ebc_fun];
+  else flist = new locassem_elastodynamics_funs [num_ebc_fun];
 
   //flist[0] = &PLocAssem_Elastodynamics_GenAlpha::get_g_0;
   //flist[1] = &PLocAssem_Elastodynamics_GenAlpha::get_g_1;

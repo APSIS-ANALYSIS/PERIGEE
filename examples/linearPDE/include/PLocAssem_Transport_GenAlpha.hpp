@@ -3,6 +3,8 @@
 // ============================================================================
 // PLocAssem_Transport_GenAlpha.hpp
 //
+// Parallel Local Assembly routine for Gen-alpha based transport solver。
+//
 // Date: Jan 21 2022
 // ============================================================================
 #include "IPLocAssem.hpp"
@@ -117,8 +119,7 @@ class PLocAssem_Transport_GenAlpha : public IPLocAssem
 
     double get_ebc_fun( const int &ebc_id, const Vector_3 &pt, const double &tt ) const
     {
-      //return ((*this).*(flist[ebc_id]))(pt, tt);
-      return 0.0;
+      return ((*this).*(flist[ebc_id]))(pt, tt);
     }
 
     double get_g_0( const Vector_3 &pt, const double &time ) const

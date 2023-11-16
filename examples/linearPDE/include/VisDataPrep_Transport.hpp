@@ -1,21 +1,20 @@
-#ifndef VISDATAPREP_ELASTODYNAMICS_HPP
-#define VISDATAPREP_ELASTODYNAMICS_HPP
+#ifndef VISDATAPREP_TRANSPORT_HPP
+#define VISDATAPREP_TRANSPORT_HPP
 // ==================================================================
-// VisDataPrep_Elastodynamics.hpp
+// VisDataPrep_Transport.hpp
 //
-// This is the data preparation for visualizing elastodynamics 
-// problems.
+// This is the data preparation for visualizing transport problems.
 //
-// Date Created: Nov. 5 2023
+// Date Created: Nov. 13 2023
 // ==================================================================
 #include "IVisDataPrep.hpp"
 
-class VisDataPrep_Elastodynamics : public IVisDataPrep
+class VisDataPrep_Transport : public IVisDataPrep
 {
   public:
-    VisDataPrep_Elastodynamics();
+    VisDataPrep_Transport();
 
-    virtual ~VisDataPrep_Elastodynamics() = default;
+    virtual ~VisDataPrep_Transport() = default;
 
     // Return the number of physical fields to be read from solution
     // vector

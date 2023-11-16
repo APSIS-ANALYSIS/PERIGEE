@@ -88,7 +88,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
   ${perigee_SOURCE_DIR}/../src/PDNSolution_Transport.cpp
   ${perigee_SOURCE_DIR}/../src/PLocAssem_Transport_GenAlpha.cpp
-  ${perigee_SOURCE_DIR}/../src/PGAssem_Transport_GenAlpha.cpp
+  ${perigee_SOURCE_DIR}/../src/PGAssem_LinearPDE_GenAlpha.cpp
   ${perigee_SOURCE_DIR}/../src/PNonlinear_LinearPDE_Solver.cpp
   ${perigee_SOURCE_DIR}/../src/PTime_LinearPDE_Solver.cpp
   )
@@ -97,10 +97,14 @@ SET( perigee_postprocess_lib_src
   ${perigee_source}/Mesh/QuadPts_vis_tri6.cpp
   ${perigee_source}/Mesh/QuadPts_vis_tet4.cpp
   ${perigee_source}/Mesh/QuadPts_vis_tet10_v2.cpp
+  ${perigee_source}/Mesh/QuadPts_vis_hex8.cpp
+  ${perigee_source}/Mesh/QuadPts_vis_hex27.cpp
   ${perigee_source}/Postproc_Tool/PostVectSolution.cpp
   ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   ${perigee_source}/Postproc_Tool/Interpolater.cpp
   ${perigee_SOURCE_DIR}/../src/Post_error_transport.cpp
+  ${perigee_SOURCE_DIR}/../src/VisDataPrep_Transport.cpp
+  ${perigee_SOURCE_DIR}/../src/VTK_Writer_Transport.cpp
   )
 
 INCLUDE_DIRECTORIES( ../../../include )
@@ -131,11 +135,13 @@ ADD_EXECUTABLE( preprocess3d ../preprocess.cpp)
 ADD_EXECUTABLE( transport_3d driver.cpp)
 ADD_EXECUTABLE( prepost ../prepost.cpp)
 ADD_EXECUTABLE( post_error post_compare_manu.cpp )
+ADD_EXECUTABLE( vis_transport_3d vis_transport.cpp )
 
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( transport_3d perigee_analysis )
 TARGET_LINK_LIBRARIES( prepost perigee_preprocess )
 TARGET_LINK_LIBRARIES( post_error perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_transport_3d perigee_postprocess )
 
 if(OPENMP_CXX_FOUND)
   SET_TARGET_PROPERTIES( perigee_preprocess PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
