@@ -20,7 +20,7 @@ void QuadPts_debug::print_info() const
   for(int ii=0; ii<num_pts; ++ii)
     std::cout<<qw[ii]<<'\t';
   std::cout<<std::endl;
-  std::cout<<"========================="<<std::endl;
+  std::cout<<"=========================="<<std::endl;
 }
 
 // EOF

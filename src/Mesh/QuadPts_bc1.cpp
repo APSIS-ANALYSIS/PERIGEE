@@ -1,16 +1,5 @@
 #include "QuadPts_bc1.hpp"
 
-QuadPts_bc1::QuadPts_bc1()
-{
-  num_pts = 1;
-  qp.push_back(1.0);
-
-  qw.push_back(1.0);
-}
-
-QuadPts_bc1::~QuadPts_bc1()
-{}
-
 void QuadPts_bc1::print_info() const
 {
   std::cout<<std::endl;
@@ -23,6 +12,5 @@ void QuadPts_bc1::print_info() const
   std::cout<<std::endl;
   std::cout<<"========================="<<std::endl;
 }
-
 
 // EOF
