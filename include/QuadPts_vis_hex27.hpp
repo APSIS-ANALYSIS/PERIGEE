@@ -21,11 +21,17 @@
 class QuadPts_vis_hex27 : public IQuadPts
 {
   public:
-    QuadPts_vis_hex27();
+    QuadPts_vis_hex27() = default;
     
     virtual ~QuadPts_vis_hex27() = default;
 
-    virtual void print_info() const;
+    virtual void print_info() const
+    {
+      SYS_T::commPrint("\n===== Visualization Points for Hex27 ===== \n");
+      for(int ii=0; ii<27; ++ii)
+        SYS_T::commPrint("%e, %e, %e, %e \n", qw[ii], qp[3*ii], qp[3*ii+1], qp[3*ii+2]);
+      SYS_T::commPrint("========================================= \n");
+    }
 
     // it stores the coordinate of the quadrature points 
     // in the sequence of x-y-z, so the dim is 3
@@ -46,8 +52,43 @@ class QuadPts_vis_hex27 : public IQuadPts
     virtual double get_qw(unsigned int ii) const {return qw[ii];}
 
   private:
-    double qp[81];
-    double qw[27];
+    const double qp[81] { 0.0, 0.0, 0.0, 
+        1.0, 0.0, 0.0, 
+        1.0, 1.0, 0.0,
+        0.0, 1.0, 0.0, 
+        0.0, 0.0, 1.0,
+        1.0, 0.0, 1.0,
+        1.0, 1.0, 1.0,
+        0.0, 1.0, 1.0,
+        0.5, 0.0, 0.0, 
+        1.0, 0.5, 0.0, 
+        0.5, 1.0, 0.0,
+        0.0, 0.5, 0.0, 
+        0.5, 0.0, 1.0,
+        1.0, 0.5, 1.0,
+        0.5, 1.0, 1.0,
+        0.0, 0.5, 1.0,
+        0.0, 0.0, 0.5, 
+        1.0, 0.0, 0.5, 
+        1.0, 1.0, 0.5,
+        0.0, 1.0, 0.5, 
+        0.0, 0.5, 0.5,
+        1.0, 0.5, 0.5,
+        0.5, 0.0, 0.5,
+        0.5, 1.0, 0.5, 
+        0.5, 0.5, 0.0, 
+        0.5, 0.5, 1.0, 
+        0.5, 0.5, 0.5 };
+
+    const double qw[27] { 0.5, 0.5, 0.5, 
+      0.5, 0.5, 0.5, 
+      0.5, 0.5, 0.5, 
+      0.5, 0.5, 0.5,
+      0.5, 0.5, 0.5, 
+      0.5, 0.5, 0.5,
+      0.5, 0.5, 0.5, 
+      0.5, 0.5, 0.5,
+      0.5, 0.5, 0.5 };
 };
 
 #endif
