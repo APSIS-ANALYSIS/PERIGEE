@@ -13,9 +13,6 @@ QuadPts_vis_quad4::QuadPts_vis_quad4()
   qw[3] = 0.5;
 }
 
-QuadPts_vis_quad4::~QuadPts_vis_quad4()
-{}
-
 void QuadPts_vis_quad4::print_info() const
 {
    SYS_T::commPrint("\n===== Visualization Points for Quad4 ===== \n");
