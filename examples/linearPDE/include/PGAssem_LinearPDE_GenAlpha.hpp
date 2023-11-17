@@ -80,7 +80,7 @@ class PGAssem_LinearPDE_GenAlpha : public IPGAssem
 
   private:
     // Private data
-    const int nLocBas, snLocBas, dof_mat, num_ebc, nlgn;
+    const int num_ebc, nLocBas, snLocBas, dof_mat, nlgn;
 
     // Private function
     // Essential boundary condition

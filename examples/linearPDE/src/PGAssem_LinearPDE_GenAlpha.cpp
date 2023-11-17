@@ -9,10 +9,10 @@ PGAssem_LinearPDE_GenAlpha::PGAssem_LinearPDE_GenAlpha(
     const ALocal_NBC * const &part_nbc,
     const ALocal_EBC * const &part_ebc,
     const int &in_nz_estimate )
-: nLocBas( agmi_ptr->get_nLocBas() ),
-  dof_mat( locassem_ptr->get_dof_mat() ),
-  num_ebc( part_ebc->get_num_ebc() ),
+: num_ebc( part_ebc->get_num_ebc() ),
+  nLocBas( agmi_ptr->get_nLocBas() ),
   snLocBas( num_ebc>0 ? part_ebc -> get_cell_nLocBas(0) : 0 ),
+  dof_mat( locassem_ptr->get_dof_mat() ),
   nlgn( pnode_ptr->get_nlocghonode() )
 {
   // Make sure the data structure is compatible
