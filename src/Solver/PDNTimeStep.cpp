@@ -13,9 +13,6 @@ PDNTimeStep::PDNTimeStep( const int &input_index, const double &input_time,
   time_step_history.push_back(time_step);
 }
 
-PDNTimeStep::~PDNTimeStep()
-{}
-
 void PDNTimeStep::TimeIncrement()
 {
   time = time + time_step;

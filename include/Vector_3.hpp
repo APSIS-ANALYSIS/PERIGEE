@@ -31,7 +31,7 @@ class Vector_3
 
     Vector_3( const double &v0, const double &v1, const double &v2 );
 
-    ~Vector_3();
+    ~Vector_3() = default;
 
     // Copy
     void copy( const Vector_3 &source );

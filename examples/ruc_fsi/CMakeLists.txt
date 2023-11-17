@@ -124,9 +124,6 @@ SET( perigee_postprocess_lib_src
   ${perigee_source}/Mesh/VTK_Tools.cpp
   ${perigee_source}/Mesh/Tet_Tools.cpp
   ${perigee_source}/Mesh/Hex_Tools.cpp
-  ${perigee_source}/Mesh/QuadPts_vis_tri6.cpp
-  ${perigee_source}/Mesh/QuadPts_vis_tet4.cpp
-  ${perigee_source}/Mesh/QuadPts_vis_tet10_v2.cpp
   ${perigee_source}/Postproc_Tool/PostVectSolution.cpp
   ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   ${perigee_source}/Postproc_Tool/Interpolater.cpp

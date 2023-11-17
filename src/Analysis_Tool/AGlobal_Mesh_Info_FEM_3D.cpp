@@ -53,9 +53,6 @@ AGlobal_Mesh_Info_FEM_3D::AGlobal_Mesh_Info_FEM_3D(
   elemType = elemType + 10;
 }
 
-AGlobal_Mesh_Info_FEM_3D::~AGlobal_Mesh_Info_FEM_3D()
-{}
-
 void AGlobal_Mesh_Info_FEM_3D::print_info() const
 {
   std::cout<<"AGlobal_Mesh_Info_FEM_3D:"<<std::endl;

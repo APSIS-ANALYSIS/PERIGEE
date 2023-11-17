@@ -18,10 +18,16 @@
 class QuadPts_vis_hex8 : public IQuadPts
 {
   public:
-    QuadPts_vis_hex8();
-    virtual ~QuadPts_vis_hex8();
+    QuadPts_vis_hex8() = default;
+    
+    virtual ~QuadPts_vis_hex8() = default;
 
-    virtual void print_info() const;
+    virtual void print_info() const
+    {
+      SYS_T::commPrint("\n===== Visualization Points for Hex8 ===== \n");
+      IQuadPts::print_info();
+      SYS_T::commPrint("========================================= \n");
+    }
 
     // it stores the coordinate of the quadrature points 
     // in the sequence of x-y-z, so the dim is 4
@@ -39,11 +45,11 @@ class QuadPts_vis_hex8 : public IQuadPts
     virtual double get_qp(unsigned int ii, unsigned int comp) const 
     {return qp[3*ii+comp];}
 
-    virtual double get_qw(unsigned int ii) const {return qw[ii];}
+    virtual double get_qw(unsigned int ii) const {return 0.5;}
 
   private:
-    double qp[24];
-    double qw[8];
+    const double qp[24] {0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0,
+      0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0 };
 };
 
 #endif

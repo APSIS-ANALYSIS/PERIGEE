@@ -8,17 +8,21 @@
 // We use [0.0, 0.0], [1.0, 0.0], [0.0, 1.0], [1.0, 1.0].
 // These are the vertex points for the quad elements.
 // ==================================================================
-#include <vector>
 #include "IQuadPts.hpp"
 
 class QuadPts_vis_quad4 : public IQuadPts
 {
   public:
-    QuadPts_vis_quad4();
+    QuadPts_vis_quad4() = default;
 
-    virtual ~QuadPts_vis_quad4();
+    virtual ~QuadPts_vis_quad4() = default;
 
-    virtual void print_info() const;
+    virtual void print_info() const
+    {
+      SYS_T::commPrint("\n===== Visualization Points for Quad4 ===== \n");
+      IQuadPts::print_info();
+      SYS_T::commPrint("========================================== \n");
+    }
 
     // it stores the coordinate of the quadrature points 
     // in the sequence of x-y, so the dim is 2
@@ -34,12 +38,10 @@ class QuadPts_vis_quad4 : public IQuadPts
     virtual double get_qp(unsigned int ii, unsigned int comp) const
     {return qp[2*ii+comp];}
 
-    virtual double get_qw(unsigned int ii) const
-    {return qw[ii];}
+    virtual double get_qw(unsigned int ii) const {return 0.5;}
 
   private:
-    double qp[8];
-    double qw[4];
+    const double qp[8] { 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0 };
 };
 
 #endif

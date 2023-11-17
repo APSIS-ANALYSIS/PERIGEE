@@ -32,7 +32,7 @@ class QuadPts_Gauss_Triangle : public IQuadPts
   public:
     QuadPts_Gauss_Triangle( const int &in_num_pts );
     
-    virtual ~QuadPts_Gauss_Triangle();
+    virtual ~QuadPts_Gauss_Triangle() = default;
 
     virtual void print_info() const;
 

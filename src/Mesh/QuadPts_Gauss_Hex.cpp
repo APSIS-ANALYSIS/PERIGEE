@@ -38,11 +38,6 @@ QuadPts_Gauss_Hex::QuadPts_Gauss_Hex( const int &in_num_pts_1d,
     x_min, x_max, y_min, y_max, z_min, z_max)
 {}
 
-QuadPts_Gauss_Hex::~QuadPts_Gauss_Hex()
-{
-  VEC_T::clean(qp); VEC_T::clean(qw);
-}
-
 void QuadPts_Gauss_Hex::print_info() const
 {
   SYS_T::commPrint("====== Gauss Points for Hexagon =======\n");

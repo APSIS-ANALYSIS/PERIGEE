@@ -31,7 +31,7 @@ class Tensor2_2D
         const double &a21, const double &a22 );
 
     // Destructor
-    ~Tensor2_2D();
+    ~Tensor2_2D() = default;
 
     // Copy
     void copy( const Tensor2_2D &source );

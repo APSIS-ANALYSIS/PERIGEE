@@ -37,7 +37,7 @@ class Tensor4_3D
     Tensor4_3D( const std::array<double, 81> &source );
 
     // Destructor
-    ~Tensor4_3D();
+    ~Tensor4_3D() = default;
    
     // Assignment operator
     Tensor4_3D& operator= (const Tensor4_3D &source);

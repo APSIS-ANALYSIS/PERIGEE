@@ -101,20 +101,6 @@ EBC_Partition::EBC_Partition( const IPart * const &part,
   } // end loop over num_ebc
 }
 
-
-EBC_Partition::~EBC_Partition()
-{
-  VEC_T::clean( num_local_cell_node );
-  VEC_T::clean( num_local_cell );
-  VEC_T::clean( cell_nLocBas );
-  VEC_T::clean( local_cell_node_xyz );
-  VEC_T::clean( local_cell_ien );
-  VEC_T::clean( local_cell_node_vol_id );
-  VEC_T::clean( local_cell_node );
-  VEC_T::clean( local_cell_node_pos );
-  VEC_T::clean( local_cell_vol_id );
-}
-
 void EBC_Partition::write_hdf5( const std::string &FileName, 
     const std::string &GroupName ) const
 {

@@ -300,12 +300,6 @@ QuadPts_Gauss_Triangle::QuadPts_Gauss_Triangle( const int &in_num_pts ) : num_pt
   for(int ii=0; ii<num_pts; ++ii) qw[ii] *= 0.5;
 }
 
-QuadPts_Gauss_Triangle::~QuadPts_Gauss_Triangle()
-{
-  VEC_T::clean(qp);
-  VEC_T::clean(qw);
-}
-
 void QuadPts_Gauss_Triangle::print_info() const
 {
   SYS_T::commPrint("====== Gauss Points for Triangle =======\n");

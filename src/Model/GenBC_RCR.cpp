@@ -82,9 +82,6 @@ GenBC_RCR::GenBC_RCR( const std::string &lpn_filename, const int &in_N,
   }
 }
 
-GenBC_RCR::~GenBC_RCR()
-{}
-
 void GenBC_RCR::print_info() const
 {
   SYS_T::print_sep_line();

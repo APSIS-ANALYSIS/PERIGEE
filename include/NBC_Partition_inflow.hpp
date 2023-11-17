@@ -27,7 +27,7 @@ class NBC_Partition_inflow
         const Map_Node_Index * const &mnindex,
         const INodalBC * const &nbc );
 
-    virtual ~NBC_Partition_inflow();
+    virtual ~NBC_Partition_inflow() = default;
 
     virtual void write_hdf5( const std::string &FileName ) const;
 

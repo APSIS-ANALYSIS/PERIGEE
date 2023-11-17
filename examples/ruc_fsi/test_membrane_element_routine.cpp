@@ -104,7 +104,7 @@ int main( int argc, char * argv[] )
   }
   else SYS_T::print_fatal("Error: unknown elem type.\n");
  
-  IQuadPts * quad = new QuadPts_debug(dim, numpt, in_qp, in_qw);
+  IQuadPts * quad = new QuadPts_debug(in_qp, in_qw, dim);
 
   quad -> print_info();
 

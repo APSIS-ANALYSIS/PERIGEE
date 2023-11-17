@@ -182,9 +182,6 @@ namespace FE_T
     pp[0] = 0; pp[1] = 1; pp[2] = 2; 
   }
 
-  Matrix_double_3by3_Array::~Matrix_double_3by3_Array()
-  {}
-
   Matrix_double_3by3_Array& Matrix_double_3by3_Array::operator= (
       const Matrix_double_3by3_Array &input )
   {
@@ -449,9 +446,6 @@ namespace FE_T
 
     pp[0] = 0; pp[1] = 1; pp[2] = 2; pp[3] = 3; pp[4] = 4; pp[5] = 5;
   }
-
-  Matrix_double_6by6_Array::~Matrix_double_6by6_Array()
-  {}
 
   void Matrix_double_6by6_Array::LU_fac()
   {

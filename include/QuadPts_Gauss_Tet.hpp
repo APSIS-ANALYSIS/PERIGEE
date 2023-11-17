@@ -25,7 +25,7 @@ class QuadPts_Gauss_Tet : public IQuadPts
   public:
     QuadPts_Gauss_Tet( const int &in_num_pts );
 
-    virtual ~QuadPts_Gauss_Tet();
+    virtual ~QuadPts_Gauss_Tet() = default;
 
     virtual void print_info() const;
 

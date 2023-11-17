@@ -38,7 +38,7 @@ class Tensor2_3D
     Tensor2_3D ( const Vector_3 &vec1, const Vector_3 &vec2, const Vector_3 &vec3 );
     
     // Destructor
-    ~Tensor2_3D();
+    ~Tensor2_3D() = default;
 
     // Copy
     void copy( const Tensor2_3D &source );    

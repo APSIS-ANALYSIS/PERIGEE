@@ -15,9 +15,6 @@ Vector_3::Vector_3( const double &v0, const double &v1, const double &v2 )
   vec[0] = v0; vec[1] = v1; vec[2] = v2;
 }
 
-Vector_3::~Vector_3()
-{}
-
 void Vector_3::copy( const Vector_3 &source )
 {
   vec[0] = source(0); vec[1] = source(1); vec[2] = source(2);
