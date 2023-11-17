@@ -1,5 +1,10 @@
 // ============================================================================
-// driver.cpp
+// driver_elastodynamics.cpp
+// 
+// Finite element code for 3D elastodynamics equations using non-overshoot
+// generalized alpha time stepping.
+//
+// Date: Oct. 24 2023
 // ============================================================================
 #include "HDF5_Writer.hpp"
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
@@ -19,14 +24,19 @@
 #include "FEAElement_Triangle6_3D_der0.hpp"
 #include "FEAElement_Quad4_3D_der0.hpp"
 #include "FEAElement_Quad9_3D_der0.hpp"
-#include "PLocAssem_Tet_Transport_GenAlpha.hpp"
-#include "PGAssem_Tet_Transport_GenAlpha.hpp"
-#include "PNonlinear_Transport_Solver.hpp"
-#include "PTime_Transport_Solver.hpp"
+#include "PLocAssem_Elastodynamics_GenAlpha.hpp"
+#include "PGAssem_LinearPDE_GenAlpha.hpp"
+#include "PNonlinear_LinearPDE_Solver.hpp"
+#include "PTime_LinearPDE_Solver.hpp"
 
 int main(int argc, char *argv[])
 {
+  // material parameters
+  double rho = 1.0, module_E = 1.0e+7, nu = 0.3;
+
+  // number of quadrature points
   int nqp_vol = 5, nqp_sur = 4;
+  int nqp_vol_1D = 2, nqp_sur_1D = 2;
 
   // generalized-alpha rho_inf
   double genA_rho_inf = 0.5;
@@ -60,22 +70,41 @@ int main(int argc, char *argv[])
   int restart_index = 0;     // restart solution time index
   double restart_time = 0.0; // restart time
   double restart_step = 1.0e-3; // restart simulation time step size
-  std::string restart_name = "SOL_"; // restart solution base name
+  std::string restart_u_name = "SOL_U_";
+  std::string restart_v_name = "SOL_V_";
 
+  // Yaml options
+  bool is_loadYaml = true;
+  std::string yaml_file("./linearPDE_input.yml");
+
+#if PETSC_VERSION_LT(3,19,0)
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+#else
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULLPTR);
+#endif
   
   const PetscMPIInt rank = SYS_T::get_MPI_rank();
   const PetscMPIInt size = SYS_T::get_MPI_size();
 
   SYS_T::print_perigee_art();
 
+  // ===== Yaml Arguments =====
+  SYS_T::GetOptionBool("-is_loadYaml", is_loadYaml);
+  SYS_T::GetOptionString("-yaml_file", yaml_file);
+
+ if(is_loadYaml) SYS_T::InsertFileYAML( yaml_file,  false );
+
   // ===== Read Command Line Arguments =====
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
-
+  SYS_T::GetOptionReal("-rho", rho);
+  SYS_T::GetOptionReal("-youngs_module", module_E);
+  SYS_T::GetOptionReal("-poissons_ratio", nu);
   SYS_T::GetOptionInt("-nqp_vol", nqp_vol);
   SYS_T::GetOptionInt("-nqp_sur", nqp_sur);
+  SYS_T::GetOptionInt("-nqp_vol_1d", nqp_vol_1D);
+  SYS_T::GetOptionInt("-nqp_sur_1d", nqp_sur_1D);
   SYS_T::GetOptionReal("-rho_inf", genA_rho_inf);
-  SYS_T::GetOptionBool(  "-is_backward_Euler", is_backward_Euler);
+  SYS_T::GetOptionBool("-is_backward_Euler", is_backward_Euler);
   SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
   SYS_T::GetOptionString("-part_file", part_file);
   SYS_T::GetOptionReal("-nl_rtol", nl_rtol);
@@ -95,11 +124,14 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionInt("-restart_index", restart_index);
   SYS_T::GetOptionReal("-restart_time", restart_time);
   SYS_T::GetOptionReal("-restart_step", restart_step);
-  SYS_T::GetOptionString("-restart_name", restart_name);
+  SYS_T::GetOptionString("-restart_u_name", restart_u_name);
+  SYS_T::GetOptionString("-restart_v_name", restart_v_name);
 
   // ===== Print Command Line Arguments =====
   SYS_T::cmdPrint("-nqp_vol:", nqp_vol);
   SYS_T::cmdPrint("-nqp_sur:", nqp_sur);
+  SYS_T::cmdPrint("-nqp_vol_1d", nqp_vol_1D);
+  SYS_T::cmdPrint("-nqp_sur_1d", nqp_sur_1D);
   if( is_backward_Euler )
     SYS_T::commPrint(   "-is_backward_Euler: true \n");
   else
@@ -126,7 +158,8 @@ int main(int argc, char *argv[])
     SYS_T::cmdPrint("-restart_index:", restart_index);
     SYS_T::cmdPrint("-restart_time:", restart_time);
     SYS_T::cmdPrint("-restart_step:", restart_step);
-    SYS_T::cmdPrint("-restart_name:", restart_name);
+    SYS_T::cmdPrint("-restart_u_name:", restart_u_name);
+    SYS_T::cmdPrint("-restart_v_name:", restart_v_name);
   }
   else SYS_T::commPrint("-is_restart: false \n");
 
@@ -140,6 +173,8 @@ int main(int argc, char *argv[])
     cmdh5w->write_intScalar("sol_record_freq", sol_record_freq);
     cmdh5w->write_intScalar("nqp_vol", nqp_vol);
     cmdh5w->write_intScalar("nqp_sur", nqp_sur);
+    cmdh5w->write_doubleScalar("youngs_module", module_E);
+    cmdh5w->write_doubleScalar("poissons_ratio", nu);
 
     delete cmdh5w; H5Fclose(cmd_file_id);
   }
@@ -201,26 +236,31 @@ int main(int argc, char *argv[])
   }
   else if( GMIptr->get_elemType() == 601 )
   {
-    elementv = new FEAElement_Hex8( nqp_vol ); // elem type 601
-    elements = new FEAElement_Quad4_3D_der0( nqp_sur );
-    int nqp_vol_1D = std::round( std::cbrt( nqp_vol ) );
-    int nqp_sur_1D = std::round( std::sqrt( nqp_sur ) );
+    SYS_T::print_fatal_if( nqp_vol_1D < 2, "Error: not enough quadrature points for hex.\n" );
+    SYS_T::print_fatal_if( nqp_sur_1D < 1, "Error: not enough quadrature points for quad.\n" );
+
+    elementv = new FEAElement_Hex8( nqp_vol_1D * nqp_vol_1D * nqp_vol_1D ); // elem type 601
+    elements = new FEAElement_Quad4_3D_der0( nqp_sur_1D * nqp_sur_1D );
     quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
     quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
   }
   else if( GMIptr->get_elemType() == 602 )
   {
-    SYS_T::print_fatal_if( nqp_vol < 8, "Error: not enough quadrature points for hex.\n" );
-    SYS_T::print_fatal_if( nqp_sur < 4, "Error: not enough quadrature points for quad.\n" );
+    SYS_T::print_fatal_if( nqp_vol_1D < 4, "Error: not enough quadrature points for hex.\n" );
+    SYS_T::print_fatal_if( nqp_sur_1D < 3, "Error: not enough quadrature points for quad.\n" );
 
-    elementv = new FEAElement_Hex27( nqp_vol ); // elem type 602
-    elements = new FEAElement_Quad9_3D_der0( nqp_sur );
-    int nqp_vol_1D = std::round( std::cbrt( nqp_vol ) );
-    int nqp_sur_1D = std::round( std::sqrt( nqp_sur ) );
+    elementv = new FEAElement_Hex27( nqp_vol_1D * nqp_vol_1D * nqp_vol_1D ); // elem type 602
+    elements = new FEAElement_Quad9_3D_der0( nqp_sur_1D * nqp_sur_1D );
     quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
     quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
   }
   else SYS_T::print_fatal("Error: Element type not supported.\n");
+
+  // print the information of element and quadrature rule
+  elementv->print_info();
+  elements->print_info();
+  quadv->print_info();
+  quads->print_info();
 
   // ===== Generate a sparse matrix for the enforcement of essential BCs
   Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
@@ -240,18 +280,19 @@ int main(int argc, char *argv[])
   tm_galpha_ptr->print_info();
 
   // ===== Local Assembly Routine =====
-  // material parameters
-  const double rho = 1.0, cap = 1.0, kap = 1.0;
-  
-  IPLocAssem * locAssem_ptr = new PLocAssem_Tet_Transport_GenAlpha(
-      rho, cap, kap, tm_galpha_ptr,
+  IPLocAssem * locAssem_ptr = new PLocAssem_Elastodynamics_GenAlpha(
+      rho, module_E, nu, tm_galpha_ptr,
       elementv->get_nLocBas(), elements->get_nLocBas(), 
-      locebc -> get_num_ebc(), GMIptr->get_elemType() );
+      locebc -> get_num_ebc());
 
   // ===== Initial condition =====
-  PDNSolution * sol = new PDNSolution_Transport( pNode, 0 );
+  PDNSolution * disp = new PDNSolution_Elastodynamics( pNode, 0 );
   
-  PDNSolution * dot_sol = new PDNSolution_Transport( pNode, 0 );
+  PDNSolution * velo = new PDNSolution_Elastodynamics( pNode, 0 );
+
+  PDNSolution * dot_disp = new PDNSolution_Elastodynamics( pNode, 0 );
+
+  PDNSolution * dot_velo = new PDNSolution_Elastodynamics( pNode, 0 );
   
   if( is_restart )
   {
@@ -260,20 +301,30 @@ int main(int argc, char *argv[])
     initial_step  = restart_step;
 
     // Read sol file
-    SYS_T::file_check(restart_name.c_str());
-    sol->ReadBinary(restart_name.c_str());
+    SYS_T::file_check(restart_u_name);
+    SYS_T::file_check(restart_v_name);
+
+    disp->ReadBinary(restart_u_name);//str
+    velo->ReadBinary(restart_v_name);
 
     // generate the corresponding dot_sol file name
-    std::string restart_dot_name = "dot_";
-    restart_dot_name.append(restart_name);
+    std::string restart_dot_u_name = "dot_";
+    std::string restart_dot_v_name = "dot_";
+    restart_dot_u_name.append(restart_u_name);
+    restart_dot_v_name.append(restart_v_name);
 
     // Read dot_sol file
-    SYS_T::file_check(restart_dot_name.c_str());
-    dot_sol->ReadBinary(restart_dot_name.c_str());
+    SYS_T::file_check(restart_dot_u_name);
+    SYS_T::file_check(restart_dot_v_name);
+
+    dot_disp->ReadBinary(restart_dot_u_name);
+    dot_velo->ReadBinary(restart_dot_v_name);
 
     SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
-    SYS_T::commPrint("     restart_name: %s \n", restart_name.c_str());
-    SYS_T::commPrint("     restart_dot_name: %s \n", restart_dot_name.c_str());
+    SYS_T::commPrint("     restart_u_name: %s \n", restart_u_name.c_str());
+    SYS_T::commPrint("     restart_v_name: %s \n", restart_v_name.c_str());
+    SYS_T::commPrint("     restart_dot_u_name: %s \n", restart_dot_u_name.c_str());
+    SYS_T::commPrint("     restart_dot_v_name: %s \n", restart_dot_v_name.c_str());
     SYS_T::commPrint("     restart_time: %e \n", restart_time);
     SYS_T::commPrint("     restart_index: %d \n", restart_index);
     SYS_T::commPrint("     restart_step: %e \n", restart_step);
@@ -284,7 +335,7 @@ int main(int argc, char *argv[])
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
-  IPGAssem * gloAssem_ptr = new PGAssem_Tet_Transport_GenAlpha( locAssem_ptr,
+  IPGAssem * gloAssem_ptr = new PGAssem_LinearPDE_GenAlpha( locAssem_ptr,
       GMIptr, locElem, locIEN, pNode, locnbc, locebc, nz_estimate );  
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
@@ -309,12 +360,15 @@ int main(int argc, char *argv[])
     PCHYPRESetType( preproc, "boomeramg" );
    
     SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n"); 
-    gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_ptr, elementv,
+    gloAssem_ptr->Assem_mass_residual( disp, locElem, locAssem_ptr, elementv,
         elements, quadv, quads, locIEN, fNode, locnbc, locebc );
 
-    lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
+    lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_velo );
   
-    dot_sol -> ScaleValue( -1.0 );
+    dot_velo -> ScaleValue( -1.0 );
+
+    // dot_u = v
+    dot_disp -> Copy( velo );
 
     SYS_T::commPrint("\n===> Consistent initial acceleration is obtained. \n");
     lsolver_acce -> print_info();
@@ -326,34 +380,34 @@ int main(int argc, char *argv[])
   PLinear_Solver_PETSc * lsolver = new PLinear_Solver_PETSc();
   
   // ===== Nonlinear solver context =====
-  PNonlinear_Transport_Solver * nsolver = new PNonlinear_Transport_Solver(
+  PNonlinear_LinearPDE_Solver * nsolver = new PNonlinear_LinearPDE_Solver(
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
   nsolver->print_info();
 
   // ===== Temporal solver context =====
-  PTime_Transport_Solver * tsolver = new PTime_Transport_Solver( sol_bName,
+  PTime_LinearPDE_Solver * tsolver = new PTime_LinearPDE_Solver( sol_bName,
       sol_record_freq, ttan_renew_freq, final_time );
 
   tsolver->print_info();
-
   
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-  tsolver->TM_GenAlpha(is_restart, dot_sol, sol,
-      tm_galpha_ptr, timeinfo, locElem, locIEN, pNode, fNode,
-      locnbc, locebc, pmat, elementv, elements, quadv, quads,
-      locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
+  tsolver->TM_GenAlpha_Elastodynamics(is_restart, dot_disp, 
+      dot_velo, disp, velo, tm_galpha_ptr, timeinfo, locElem,
+      locIEN, pNode, fNode, locnbc, locebc, pmat, elementv,
+      elements, quadv, quads, locAssem_ptr, gloAssem_ptr,
+      lsolver, nsolver);
 
   // ===== Print complete solver info =====
   lsolver -> print_info();
 
   delete tsolver; delete nsolver;
-  delete lsolver; delete gloAssem_ptr; delete dot_sol; delete timeinfo;
+  delete lsolver; delete gloAssem_ptr; delete dot_disp; delete dot_velo; delete timeinfo;
   delete fNode; delete locIEN; delete GMIptr; delete locElem; delete pNode; delete PartBasic;
   delete locnbc; delete locebc; delete quadv; delete quads; delete elementv; delete elements;
-  delete pmat; delete tm_galpha_ptr; delete locAssem_ptr; delete sol;
+  delete pmat; delete tm_galpha_ptr; delete locAssem_ptr; delete disp; delete velo;
   PetscFinalize();
   return EXIT_SUCCESS;
 }

@@ -24,7 +24,7 @@ double POST_ERROR_T::exact_sol_dz( const double &x, const double &y, const doubl
   return time * time * time * time * x*(x-1)*y*(y-1)*(2.0*z-1);
 }
 
-double POST_ERROR_T::get_manu_sol_error(
+double POST_ERROR_T::get_manu_sol_errorL2(
     const double &time,
     const double * const &solu,
     const FEAElement * const &element,

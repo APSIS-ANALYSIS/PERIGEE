@@ -128,16 +128,14 @@ QuadPts_Gauss_Tet::~QuadPts_Gauss_Tet()
 
 void QuadPts_Gauss_Tet::print_info() const
 {
-  std::cout<<std::endl;
-  std::cout<<"====== Gauss Points for Tetrahedron ======="<<std::endl;
-  std::cout<<"Num of pt = "<<num_pts<<std::endl;
-  std::cout<<"qp.size() = "<<qp.size()<<std::endl;
-  std::cout<<"qw.size() = "<<qw.size()<<std::endl;
+  SYS_T::commPrint("====== Gauss Points for Tetrahedron =======\n");
+  SYS_T::commPrint("Number of points = %d\n", num_pts);
+  SYS_T::commPrint("qp.size() = %d\n", qp.size());
+  SYS_T::commPrint("qw.size() = %d\n", qw.size());
   for(int ii=0; ii<num_pts; ++ii)
-    std::cout<<std::setprecision(16)<<qp[4*ii]
-      <<'\t'<<qp[4*ii+1]<<'\t'<<qp[4*ii+2]
-      <<'\t'<<qp[4*ii+3]<<'\t'<<qw[ii]<<'\n';
-  std::cout<<"==========================================="<<std::endl;
+    SYS_T::commPrint("  %.15f %.15f %.15f %.15f %.15f\n", 
+        qp[4*ii], qp[4*ii+1], qp[4*ii+2], qp[4*ii+3], qw[ii]);
+  SYS_T::commPrint("===========================================\n");
 }
 
 std::vector<double> QuadPts_Gauss_Tet::gen_permutations(const double &a,

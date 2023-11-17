@@ -39,7 +39,11 @@ int main( int argc, char * argv[] )
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
   // ===== Initialize the MPI run =====
+#if PETSC_VERSION_LT(3,19,0)
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+#else
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULLPTR);
+#endif
 
   PetscMPIInt rank = SYS_T::get_MPI_rank();
   PetscMPIInt size = SYS_T::get_MPI_size();
