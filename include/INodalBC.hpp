@@ -19,9 +19,9 @@
 class INodalBC
 {
   public:
-    INodalBC() {};
+    INodalBC() = default;
 
-    virtual ~INodalBC() {VEC_T::clean(ID);}
+    virtual ~INodalBC() = default;
 
     // ------------------------------------------------------------------------
     // get_dir_nodes returns the ii-th dirichlet node's global nodal index.
@@ -292,7 +292,7 @@ class INodalBC
     {SYS_T::print_fatal("Warning: resetSurIEN_outwardnormal is not implemented. \n");}
 
   protected:
-    std::vector<int> ID;
+    std::vector<int> ID {};
 
     // ------------------------------------------------------------------------
     // Create_ID() will generate the ID array based on get_dir_nodes and

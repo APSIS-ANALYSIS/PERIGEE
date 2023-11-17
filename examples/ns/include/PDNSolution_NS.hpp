@@ -25,7 +25,7 @@ class PDNSolution_NS : public PDNSolution
     PDNSolution_NS( const APart_Node * const &pNode, 
         const int &type, const bool &isprint = true );
 
-    virtual ~PDNSolution_NS();
+    virtual ~PDNSolution_NS() = default;
 
     // case 0 : generate full zero solution
     void Init_zero( const APart_Node * const &pNode_ptr );

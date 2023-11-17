@@ -36,9 +36,9 @@
 class IPart
 {
   public:
-    IPart(){};
+    IPart() = default;
     
-    virtual ~IPart(){};
+    virtual ~IPart() = default;
 
     // Pure virtual function: Write the partition into HDF5 files
     virtual void write( const std::string &inputFileName ) const = 0;

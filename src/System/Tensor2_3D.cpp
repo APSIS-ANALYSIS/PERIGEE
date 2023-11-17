@@ -30,9 +30,6 @@ Tensor2_3D::Tensor2_3D(
   mat[6] = vec1(2); mat[7] = vec2(2); mat[8] = vec3(2);
 }
 
-Tensor2_3D::~Tensor2_3D()
-{}
-
 bool Tensor2_3D::is_identical( const Tensor2_3D &source, const double &tol ) const
 {
   for(int ii=0; ii<9; ++ii) 
@@ -594,6 +591,27 @@ Tensor2_3D Ten2::gen_zero()
   return Tensor2_3D( 0.0, 0.0, 0.0,
       0.0, 0.0, 0.0,
       0.0, 0.0, 0.0 );
+}
+
+Tensor2_3D Ten2::exp( const Tensor2_3D &input )
+{
+  double nn = 0.0;
+  double nn_fac = 1.0;
+
+  Tensor2_3D input_pow = Ten2::gen_id();
+  Tensor2_3D input_exp = Ten2::gen_id();
+
+  do
+  {
+    nn += 1.0;
+    nn_fac *= nn;
+
+    input_pow = input_pow * input;
+    input_exp += ( 1.0/nn_fac ) * input_pow;
+
+  }while( std::sqrt( input_pow.MatContraction(input_pow) ) / nn_fac >= 1.0e-16 );
+
+  return input_exp;
 }
 
 // EOF

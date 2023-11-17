@@ -20,13 +20,13 @@
 class EBC_Partition_outflow : public EBC_Partition
 {
   public:
-    // The input ElemBC should be ElemBC_3D_tet4_outflow
+    // The input ElemBC should be ElemBC_3D_outflow
     EBC_Partition_outflow( const IPart * const &part,
         const Map_Node_Index * const &mnindex,
         const ElemBC * const &ebc,
         const std::vector<INodalBC *> &nbc_list );
 
-    virtual ~EBC_Partition_outflow();
+    virtual ~EBC_Partition_outflow() = default;
 
     // write the data to hdf5 file in group /ebc/ebcid_xxx, 
     // xxx is the ebc_id

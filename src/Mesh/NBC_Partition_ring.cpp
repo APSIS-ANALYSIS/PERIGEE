@@ -42,9 +42,6 @@ NBC_Partition_ring::NBC_Partition_ring(
   }
 }
 
-NBC_Partition_ring::~NBC_Partition_ring()
-{}
-
 void NBC_Partition_ring::write_hdf5( const std::string &FileName ) const
 {
   std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );

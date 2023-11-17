@@ -451,6 +451,8 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
 
   // sur_pt stores the coordinates of the boundary points
   std::vector<double> sur_pt(3*bcnumpt, 0.0);
+
+  PERIGEE_OMP_PARALLEL_FOR
   for( int ii=0; ii<bcnumpt; ++ii )
   {
     sur_pt[ii*3]   = node[bcpt[ii]*3] ;
@@ -481,17 +483,27 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
 
     // use the bcmap to obtain the vol element that has its face on this surface
     std::vector<int> gelem {};
-    for( int ee=0; ee<numcel; ++ee )
+
+    PERIGEE_OMP_PARALLEL
     {
-      int total = 0;
-      for (int jj{0}; jj < nlocbas_3d; ++jj)
-        total += bcmap[ vol_IEN[nlocbas_3d  * ee + jj] ];
-      if(total >= nlocbas_2d)
-        gelem.push_back(ee);
+      std::vector<int> temp_gelem {};
+      PERIGEE_OMP_FOR
+      for( int ee=0; ee<numcel; ++ee )
+      {
+        int total = 0;
+        for (int jj=0; jj < nlocbas_3d; ++jj)
+          total += bcmap[ vol_IEN[nlocbas_3d  * ee + jj] ];
+        if(total >= nlocbas_2d)
+          temp_gelem.push_back(ee);
+      }
+      PERIGEE_OMP_CRITICAL
+      VEC_T::insert_end(gelem, temp_gelem);
     }
+
     delete [] bcmap; bcmap = nullptr;
     std::cout<<"      "<<gelem.size()<<" "<<ele_3d<<"s have faces over the surface. \n";
 
+    PERIGEE_OMP_PARALLEL_FOR
     for(int ff=0; ff<bcnumcl; ++ff)
     {
       std::vector<int> snode( nlocbas_2d, -1);
@@ -620,6 +632,7 @@ void Gmsh_FileIO::write_each_vtu( const std::vector<std::string> name_list) cons
 
     // collect those points' coordinates
     std::vector<double> local_coor( 3 * num_local_node , 0.0 );
+    PERIGEE_OMP_PARALLEL_FOR
     for(int jj=0; jj<num_local_node; ++jj )
     {
       local_coor[ 3*jj+0 ] = node[ 3*local_node_idx[jj] + 0 ];
@@ -630,6 +643,7 @@ void Gmsh_FileIO::write_each_vtu( const std::vector<std::string> name_list) cons
     // generate a local IEN
     const int nloc = ele_nlocbas[domain_index];
     std::vector<int> domain_IEN( phy_3d_nElem[ii] * nloc, 0 );
+    PERIGEE_OMP_PARALLEL_FOR
     for(int ee=0; ee<phy_3d_nElem[ii]; ++ee)
     {
       for(int jj=0; jj<nloc; ++jj)
@@ -641,6 +655,8 @@ void Gmsh_FileIO::write_each_vtu( const std::vector<std::string> name_list) cons
 
     // Element index (using the start_eindex)
     std::vector<int> local_cell_idx( phy_3d_nElem[ii], 0 );
+    
+    PERIGEE_OMP_PARALLEL_FOR
     for(int ee=0; ee<phy_3d_nElem[ii]; ++ee)
       local_cell_idx[ee] = start_eindex + ee;
 
@@ -1050,8 +1066,10 @@ void Gmsh_FileIO::write_vol_h5( const int &index_3d,
     for(int ff=0; ff<num_2d_cell; ++ff)
     { 
       std::vector<int> sur_node (nVertex_2d, -1); // the vertex indices of a surface element
-      for(int ii{0}; ii < nVertex_2d; ++ii)
-        sur_node[ii] = face_ien_global[ nLocBas_2d * ff + ii ];
+      
+      for(int kk {0}; kk < nVertex_2d; ++kk)
+        sur_node[kk] = face_ien_global[ nLocBas_2d * ff + kk ];
+      
       bool gotit = false;
       int ee = -1;
       while( !gotit && ee < int(gelem.size()) - 1 )
@@ -1059,12 +1077,12 @@ void Gmsh_FileIO::write_vol_h5( const int &index_3d,
         ee += 1;
         const int vol_elem = gelem[ee];
         std::vector<int> vol_node (nVertex_3d, -1); // the vertex indices of a volume element
-        for(int jj{0}; jj < nVertex_3d; ++jj)
+        for(int jj {0}; jj < nVertex_3d; ++jj)
           vol_node[jj] = eIEN[domain_3d_idx][ nLocBas_3d * vol_elem + jj ];
         
         bool got_all_node = true;
-        for(int ii{0}; ii < nVertex_2d; ++ii)
-          got_all_node = got_all_node && VEC_T::is_invec(vol_node, sur_node[ii]);
+        for(int kk {0}; kk < nVertex_2d; ++kk)
+          got_all_node = got_all_node && VEC_T::is_invec(vol_node, sur_node[kk]);
 
         gotit = got_all_node;
       }
@@ -1223,8 +1241,9 @@ void Gmsh_FileIO::write_vol_h5( const int &index_3d,
       for(int ff=0; ff<num_2d_cell; ++ff)
       {
         std::vector<int> sur_node (nVertex_2d, -1); // the vertex indices of a surface element
-        for(int ii{0}; ii < nVertex_2d; ++ii)
-          sur_node[ii] = face_ien_global[ nLocBas_2d * ff + ii ];
+        for(int kk {0}; kk < nVertex_2d; ++kk)
+          sur_node[kk] = face_ien_global[ nLocBas_2d * ff + kk ];
+
         bool gotit = false;
         int ee = -1;
         while( !gotit && ee < int(gelem.size()) - 1 )
@@ -1232,12 +1251,12 @@ void Gmsh_FileIO::write_vol_h5( const int &index_3d,
           ee += 1;
           const int vol_elem = gelem[ee];
           std::vector<int> vol_node (nVertex_3d, -1); // the vertex indices of a volume element
-          for(int jj{0}; jj < nVertex_3d; ++jj)
+          for(int jj {0}; jj < nVertex_3d; ++jj)
             vol_node[jj] = eIEN[domain_3d_idx][ nLocBas_3d * vol_elem + jj ];
           
           bool got_all_node = true;
-          for(int ii{0}; ii < nVertex_2d; ++ii)
-            got_all_node = got_all_node && VEC_T::is_invec(vol_node, sur_node[ii]);
+          for(int kk {0}; kk < nVertex_2d; ++kk)
+            got_all_node = got_all_node && VEC_T::is_invec(vol_node, sur_node[kk]);
 
           gotit = got_all_node;
         }
@@ -1486,6 +1505,8 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
 
   // tript stores the coordinates of the boundary points
   std::vector<double> sur_pt( 3*bcnumpt, 0.0 );
+
+  PERIGEE_OMP_PARALLEL_FOR
   for( int ii=0; ii<bcnumpt; ++ii )
   {
     sur_pt[ii*3]   = node[bcpt[ii]*3] ;
@@ -1518,17 +1539,28 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
     for(int ii=0; ii<bcnumpt; ++ii) bcmap[bcpt[ii]] = 1;
 
     std::vector<int> gelem {};
-    for( int ee=0; ee<numcel; ++ee )
+
+    PERIGEE_OMP_PARALLEL
     {
-      int total = 0;
-      for (int jj{0}; jj < nVertex_3d; ++jj)
-        total += bcmap[ vol_IEN[nlocbas_3d * ee + jj] ];
-      if(total >= nVertex_2d) 
-        gelem.push_back(ee);
+      std::vector<int> temp_gelem {};
+      PERIGEE_OMP_FOR
+      for( int ee=0; ee<numcel; ++ee )
+      {
+        int total = 0;
+        for (int jj{0}; jj < nVertex_3d; ++jj)
+          total += bcmap[ vol_IEN[nlocbas_3d * ee + jj] ];
+        if(total >= nVertex_2d) 
+          temp_gelem.push_back(ee);
+      }
+      PERIGEE_OMP_CRITICAL
+      VEC_T::insert_end(gelem, temp_gelem);
     }
+
     delete [] bcmap; bcmap = nullptr;
     std::cout<<"      "<<gelem.size()<<" "<<ele_3d<<"s have faces over the surface. \n";
 
+
+    PERIGEE_OMP_PARALLEL_FOR
     for(int ff=0; ff<bcnumcl; ++ff)
     {
       std::vector<int> snode( nVertex_2d, -1 );

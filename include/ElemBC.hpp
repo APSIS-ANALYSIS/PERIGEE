@@ -38,9 +38,9 @@
 class ElemBC
 {
   public:
-    ElemBC(){};
+    ElemBC() = default;
 
-    virtual ~ElemBC(){};
+    virtual ~ElemBC() = default;
 
     // This returns the number of surface domains that requires boundary
     // integral.
@@ -133,7 +133,7 @@ class ElemBC
     virtual double get_fluid_density() const
     {SYS_T::commPrint("Warning: get_fluid_density is not implemented. \n"); return -1.0;}
  
-    // Overwrite ElemBC_3D_tet_wall properties from a vtp/vtu file
+    // Overwrite ElemBC_3D_wall properties from a vtp/vtu file
     virtual void overwrite_from_vtk( const std::string &wallprop_vtk,
         const int &type, const std::string &vtk_fieldname )
     {SYS_T::commPrint("Warning: overwrite_from_vtk is not implemented. \n");}

@@ -19,7 +19,7 @@ class CVFlowRate_Steady : public ICVFlowRate
 
     CVFlowRate_Steady( const int &input_num_nbc, const double &in_flowrate );
 
-    virtual ~CVFlowRate_Steady();
+    virtual ~CVFlowRate_Steady() = default;
 
     virtual double get_flow_rate(const int &nbc_id, const double &time) const;
 

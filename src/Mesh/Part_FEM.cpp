@@ -7,13 +7,14 @@ Part_FEM::Part_FEM(
     const IIEN * const &IEN,
     const std::vector<double> &ctrlPts,
     const int &in_cpu_rank, const int &in_cpu_size,
-    const int &in_dofNum, const int &in_dofMat,
-    const int &in_elemType )
+    const int &in_elemType, const Field_Property &fp )
 : nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),
   sDegree( mesh->get_s_degree() ), tDegree( mesh->get_t_degree() ),
   uDegree( mesh->get_u_degree() ), nLocBas( mesh->get_nLocBas() ),
-  probDim(3), dofNum( in_dofNum ), dofMat( in_dofMat ), 
-  elemType(in_elemType)
+  probDim(3), elemType(in_elemType),
+  field_id( fp.get_id() ), dofNum( fp.get_dofNum() ),
+  is_geo_field( fp.get_is_geo_field() ),
+  field_name( fp.get_name() )
 {
   // Initialize group 3 data
   cpu_rank = in_cpu_rank;
@@ -25,41 +26,51 @@ Part_FEM::Part_FEM(
   SYS_T::print_fatal_if(cpu_rank < 0, "Error: Part_FEM input cpu_rank is wrong! \n");
 
   // Generate group 1, 2, and 5.
-  Generate_Partition( mesh, gpart, mnindex, IEN );
+  Generate_Partition( mesh, gpart, mnindex, IEN, field_id );
 
-  // Generate group 6
+  // Generate group 6, if the field is tagged as is_geo_field == true
   // local copy of control points
-  ctrlPts_x_loc.resize(nlocghonode);
-  ctrlPts_y_loc.resize(nlocghonode);
-  ctrlPts_z_loc.resize(nlocghonode);
-
-  for(int ii=0; ii<nlocghonode; ++ii)
+  if( is_geo_field == true )
   {
-    int aux_index = local_to_global[ii]; // new global index
-    aux_index = mnindex->get_new2old(aux_index); // back to old global index
-    ctrlPts_x_loc[ii] = ctrlPts[3*aux_index + 0];
-    ctrlPts_y_loc[ii] = ctrlPts[3*aux_index + 1];
-    ctrlPts_z_loc[ii] = ctrlPts[3*aux_index + 2];
+    ctrlPts_x_loc.resize(nlocghonode);
+    ctrlPts_y_loc.resize(nlocghonode);
+    ctrlPts_z_loc.resize(nlocghonode);
+
+    PERIGEE_OMP_PARALLEL_FOR
+    for(int ii=0; ii<nlocghonode; ++ii)
+    {
+      int aux_index = local_to_global[ii];         // new global index
+      aux_index = mnindex->get_new2old(aux_index); // back to old global index
+      ctrlPts_x_loc[ii] = ctrlPts[3*aux_index + 0];
+      ctrlPts_y_loc[ii] = ctrlPts[3*aux_index + 1];
+      ctrlPts_z_loc[ii] = ctrlPts[3*aux_index + 2];
+    }
+
+    VEC_T::shrink2fit(ctrlPts_x_loc);
+    VEC_T::shrink2fit(ctrlPts_y_loc);
+    VEC_T::shrink2fit(ctrlPts_z_loc);
+
+    std::cout<<"-- proc "<<cpu_rank<<" Local control points generated. \n";
   }
-
-  VEC_T::shrink2fit(ctrlPts_x_loc);
-  VEC_T::shrink2fit(ctrlPts_y_loc);
-  VEC_T::shrink2fit(ctrlPts_z_loc);
-
-  std::cout<<"-- proc "<<cpu_rank<<" Local control points generated. \n";
+  else
+  {
+    ctrlPts_x_loc.clear();
+    ctrlPts_y_loc.clear();
+    ctrlPts_z_loc.clear();
+  }
 }
 
 Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
 {
   const std::string fName = SYS_T::gen_partfile_name( inputfileName, in_cpu_rank );
-  
+
   hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
   HDF5_Reader * h5r = new HDF5_Reader( file_id );
- 
+
   // local elements 
   elem_loc = h5r->read_intVector( "Local_Elem", "elem_loc" );
   nlocalele = h5r->read_intScalar( "Local_Elem", "nlocalele" );
-  
+
   // local node
   nlocalnode  = h5r->read_intScalar("Local_Node", "nlocalnode");
   nghostnode  = h5r->read_intScalar("Local_Node", "nghostnode");
@@ -78,11 +89,11 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
 
   // Part info
   cpu_rank = h5r->read_intScalar("Part_Info", "cpu_rank");
-  
+
   SYS_T::print_fatal_if( cpu_rank != in_cpu_rank, "Error: Part_FEM::cpu_rank is inconsistent.\n");
-  
+
   cpu_size = h5r->read_intScalar("Part_Info", "cpu_size");
-  
+
   // global mesh info
   std::vector<int> vdeg = h5r -> read_intVector("Global_Mesh_Info", "degree");
 
@@ -94,7 +105,12 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
   probDim  = h5r -> read_intScalar("Global_Mesh_Info", "probDim");
   elemType = h5r -> read_intScalar("Global_Mesh_Info", "elemType");
   dofNum   = h5r -> read_intScalar("Global_Mesh_Info", "dofNum");
-  dofMat   = h5r -> read_intScalar("Global_Mesh_Info", "dofMat");
+  field_id = h5r -> read_intScalar("Global_Mesh_Info", "field_id");
+  field_name = h5r -> read_string("Global_Mesh_Info", "field_name" );
+  
+  const int temp = h5r -> read_intScalar("Global_Mesh_Info", "is_geo_field");
+  if(temp == 1) is_geo_field = true;
+  else is_geo_field = false;
 
   // LIEN
   int num_row, num_col;
@@ -103,7 +119,7 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
   SYS_T::print_fatal_if( num_row != nlocalele, "Error: Part_FEM::LIEN size does not match the number of element. \n");
 
   SYS_T::print_fatal_if( num_col != nLocBas, "Error: Part_FEM::LIEN size does not match the value of nLocBas. \n");
-  
+
   LIEN = new int * [nlocalele];
   for(int ee=0; ee<nlocalele; ++ee) LIEN[ee] = new int [nLocBas];
 
@@ -113,9 +129,12 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
   }
 
   // control points
-  ctrlPts_x_loc = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_x_loc");
-  ctrlPts_y_loc = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_y_loc");
-  ctrlPts_z_loc = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_z_loc");
+  if( is_geo_field == true )
+  {
+    ctrlPts_x_loc = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_x_loc");
+    ctrlPts_y_loc = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_y_loc");
+    ctrlPts_z_loc = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_z_loc");
+  }
 
   delete h5r; H5Fclose( file_id );
 }
@@ -157,21 +176,28 @@ void Part_FEM::Generate_Partition( const IMesh * const &mesh,
   std::cout<<"-- proc "<<cpu_rank<<" local element number: "<<elem_loc.size()<<std::endl;
 
   // 2. Reorder node_loc
+  PERIGEE_OMP_PARALLEL_FOR
   for( int ii=0; ii<nlocalnode; ++ii ) 
     node_loc[ii] = mnindex->get_old2new( node_loc[ii] );
 
   // 3. Generate node_tot, which stores the nodes needed by the elements in the subdomain
   std::vector<int> node_tot {};
-  for( int e=0; e<nlocalele; ++e )
+  PERIGEE_OMP_PARALLEL
   {
-    for( int ii=0; ii<nLocBas; ++ii )
+    std::vector<int> temp_node_tot {};
+    PERIGEE_OMP_FOR
+    for( int e=0; e<nlocalele; ++e )
     {
-      int temp_node = IEN->get_IEN(elem_loc[e], ii);
-      temp_node = mnindex->get_old2new(temp_node);
-      node_tot.push_back( temp_node );
+      for( int ii=0; ii<nLocBas; ++ii )
+      {
+        int temp_node = IEN->get_IEN(elem_loc[e], ii);
+        temp_node = mnindex->get_old2new(temp_node);
+        temp_node_tot.push_back( temp_node );
+      }
     }
+    PERIGEE_OMP_CRITICAL
+    VEC_T::insert_end(node_tot, temp_node_tot);
   }
-
   VEC_T::sort_unique_resize( node_tot );
 
   ntotalnode = VEC_T::get_size( node_tot );
@@ -231,6 +257,7 @@ void Part_FEM::Generate_Partition( const IMesh * const &mesh,
   LIEN = new int * [nlocalele];
   for(int ee=0; ee<nlocalele; ++ee) LIEN[ee] = new int [nLocBas];
 
+  PERIGEE_OMP_PARALLEL_FOR
   for(int ee=0; ee<nlocalele; ++ee)
   {
     for(int ii=0; ii<nLocBas; ++ii)
@@ -298,8 +325,11 @@ void Part_FEM::write( const std::string &inputFileName ) const
 
   h5w->write_intScalar( group_id_3, "probDim", probDim );
   h5w->write_intScalar( group_id_3, "dofNum", dofNum );
-  h5w->write_intScalar( group_id_3, "dofMat", dofMat );
   h5w->write_intScalar( group_id_3, "elemType", elemType );
+
+  h5w->write_intScalar( group_id_3, "field_id", field_id );
+  h5w->write_intScalar( group_id_3, "is_geo_field", (is_geo_field ? 1 : 0) );
+  h5w->write_string( group_id_3, "field_name", field_name );
 
   H5Gclose( group_id_3 );
 
@@ -327,13 +357,16 @@ void Part_FEM::write( const std::string &inputFileName ) const
   H5Gclose( group_id_5 );
 
   // group 6: control points
-  hid_t group_id_6 = H5Gcreate(file_id, "/ctrlPts_loc", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  if( is_geo_field == true )
+  {
+    hid_t group_id_6 = H5Gcreate(file_id, "/ctrlPts_loc", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-  h5w -> write_doubleVector( group_id_6, "ctrlPts_x_loc", ctrlPts_x_loc );
-  h5w -> write_doubleVector( group_id_6, "ctrlPts_y_loc", ctrlPts_y_loc );
-  h5w -> write_doubleVector( group_id_6, "ctrlPts_z_loc", ctrlPts_z_loc );
+    h5w -> write_doubleVector( group_id_6, "ctrlPts_x_loc", ctrlPts_x_loc );
+    h5w -> write_doubleVector( group_id_6, "ctrlPts_y_loc", ctrlPts_y_loc );
+    h5w -> write_doubleVector( group_id_6, "ctrlPts_z_loc", ctrlPts_z_loc );
 
-  H5Gclose( group_id_6 );
+    H5Gclose( group_id_6 );
+  }
 
   // Finish writing, clean up
   delete h5w;

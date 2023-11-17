@@ -23,7 +23,12 @@ int main( int argc, char * argv[] )
   int cpu_size = 1;
   bool isDualGraph = true;
 
+#if PETSC_VERSION_LT(3,19,0)
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+#else
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULLPTR);
+#endif
+  
   SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: prepost is a serial program! \n");
 
   hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
@@ -33,7 +38,6 @@ int main( int argc, char * argv[] )
   const std::string geo_file = cmd_h5r -> read_string("/", "geo_file");
   const int elemType = cmd_h5r -> read_intScalar("/","elemType");
   const int dofNum = cmd_h5r -> read_intScalar("/","dofNum");
-  const int dofMat   = cmd_h5r -> read_intScalar("/","dofMat");
   int in_ncommon = cmd_h5r -> read_intScalar("/","in_ncommon");
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
@@ -104,7 +108,7 @@ int main( int argc, char * argv[] )
   {
     mytimer->Reset(); mytimer->Start();
     IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
-        ctrlPts, proc_rank, cpu_size, dofNum, dofMat, elemType );
+        ctrlPts, proc_rank, cpu_size, elemType, {0, dofNum, true, "RUC"} );
     part->write(part_file.c_str());
     mytimer->Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";

@@ -28,7 +28,7 @@ class SymmTensor2_3D
         const double &m3, const double &m4, const double &m5 );
 
     // Destructor
-    ~SymmTensor2_3D();
+    ~SymmTensor2_3D() = default;
 
     // Assignment operator
     SymmTensor2_3D& operator= (const SymmTensor2_3D &source);

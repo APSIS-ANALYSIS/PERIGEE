@@ -22,9 +22,6 @@ ALocal_IEN::ALocal_IEN( const std::string &fileBaseName, const int &cpu_rank )
   SYS_T::print_fatal_if( num_col != nLocBas, "Error: ALocal_IEN::LIEN size does not match the value of nLocBas. \n");
 }
 
-ALocal_IEN::~ALocal_IEN()
-{}
-
 void ALocal_IEN::print_info() const
 {
   std::cout<<"ALocal_IEN: \n";

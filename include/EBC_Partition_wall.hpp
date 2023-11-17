@@ -19,12 +19,12 @@
 class EBC_Partition_wall : public EBC_Partition
 {
   public:
-    // The input ElemBC should be ElemBC_3D_tet_wall
+    // The input ElemBC should be ElemBC_3D_wall
     EBC_Partition_wall( const IPart * const &part,
         const Map_Node_Index * const &mnindex,
         const ElemBC * const &ebc );
 
-    virtual ~EBC_Partition_wall();
+    virtual ~EBC_Partition_wall() = default;
 
     // write the data to hdf5 file in folder /ebc_wall 
     virtual void write_hdf5( const std::string &FileName ) const;

@@ -47,12 +47,12 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Hex_Tools.cpp
   ${perigee_source}/Mesh/IEN_FEM.cpp
   ${perigee_source}/Mesh/Mesh_Tet.cpp
+  ${perigee_source}/Mesh/Mesh_FEM.cpp
   ${perigee_source}/Mesh/Part_FEM.cpp
+  ${perigee_source}/Mesh/Part_FEM_FSI.cpp
   ${perigee_source}/Mesh/ElemBC_3D.cpp
   ${perigee_source}/Mesh/ElemBC_3D_outflow.cpp
-  ${perigee_source}/Mesh/ElemBC_3D_tet.cpp
   ${perigee_source}/Mesh/ElemBC_3D_wall.cpp
-  ${perigee_source}/Mesh/ElemBC_3D_tet_outflow.cpp
   ${perigee_source}/Mesh/NodalBC.cpp
   ${perigee_source}/Mesh/NodalBC_3D_inflow.cpp
   ${perigee_source}/Mesh/NodalBC_3D_ring.cpp
@@ -136,9 +136,6 @@ SET( perigee_analysis_lib_src
   )
 
 SET( perigee_postprocess_lib_src
-  ${perigee_source}/Mesh/QuadPts_vis_tri6.cpp
-  ${perigee_source}/Mesh/QuadPts_vis_tet4.cpp
-  ${perigee_source}/Mesh/QuadPts_vis_tet10_v2.cpp
   ${perigee_source}/Postproc_Tool/PostVectSolution.cpp
   ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   ${perigee_source}/Postproc_Tool/Interpolater.cpp
@@ -170,14 +167,10 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 ADD_EXECUTABLE( sys_test sys_test.cpp )
 ADD_EXECUTABLE( mod_test matmodel_test.cpp )
-ADD_EXECUTABLE( testh5 h5_test.cpp )
 ADD_EXECUTABLE( elem_test elem_test.cpp )
-ADD_EXECUTABLE( elem_imp_test elem_improvement_test.cpp )
 
 TARGET_LINK_LIBRARIES( sys_test perigee_preprocess perigee_analysis )
 TARGET_LINK_LIBRARIES( mod_test perigee_preprocess perigee_analysis )
-TARGET_LINK_LIBRARIES( testh5 perigee_preprocess )
 TARGET_LINK_LIBRARIES( elem_test perigee_analysis )
-TARGET_LINK_LIBRARIES( elem_imp_test perigee_analysis )
 
 # EOF

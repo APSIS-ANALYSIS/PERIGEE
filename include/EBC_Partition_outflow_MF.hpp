@@ -18,7 +18,7 @@
 class EBC_Partition_outflow_MF : public EBC_Partition
 {
   public:
-    // The input ElemBC should be ElemBC_3D_tet4_outflow
+    // The input ElemBC should be ElemBC_3D_outflow
     EBC_Partition_outflow_MF( const IPart * const &part,
         const Map_Node_Index * const &mnindex,
         const ElemBC * const &ebc,

@@ -21,7 +21,7 @@ class ALocal_Elem
     // ------------------------------------------------------------------------
     // Destructor
     // ------------------------------------------------------------------------
-    virtual ~ALocal_Elem();
+    virtual ~ALocal_Elem() = default;
 
     // ------------------------------------------------------------------------
     // Return the element index based on the local element index.

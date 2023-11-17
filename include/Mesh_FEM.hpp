@@ -17,7 +17,7 @@ class Mesh_FEM : public IMesh
     Mesh_FEM(const int &in_nfunc, const int &in_nelem, 
         const int &in_nlocbas, const int &in_deg);
 
-    virtual ~Mesh_FEM();
+    virtual ~Mesh_FEM() = default;
 
     virtual void print_info() const;
 

@@ -168,11 +168,6 @@ QuadPts_Gauss_1D::QuadPts_Gauss_1D( const int &in_num_pts, const double &min,
   }
 }
 
-QuadPts_Gauss_1D::~QuadPts_Gauss_1D()
-{
-  VEC_T::clean(qp); VEC_T::clean(qw);
-}
-
 void QuadPts_Gauss_1D::print_info() const
 {
   std::cout<<"====== Gauss Points ======="<<std::endl;

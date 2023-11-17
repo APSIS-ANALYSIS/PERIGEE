@@ -1,0 +1,45 @@
+# ==============================================================================
+# input_gmsh2vtk.yml
+# 
+# This file is used to store information in the gmsh file in order to avoid 
+# manually modifying gmsh2vtk.cpp, which can lead to unwanted errors.
+# Here is an example,
+#
+# example.msh:
+# $MeshFormat
+# 2.2 0 8
+# $EndMeshFormat
+# $PhysicalNames
+# 7                      face_id       vol_id
+# 2 1 "top"                 0             0
+# 2 2 "bot"                 1             0
+# 2 3 "lef"                 2             0
+# 2 4 "rig"                 3             0
+# 2 5 "fro"                 4             0
+# 2 6 "bac"                 5             0
+# 3 7 "vol"                 /             0
+# $EndPhysicalNames
+# ......
+# ===============================================================================
+gmsh_file: "cube.msh"
+
+nbc_face_id: [0, 1]
+nbc_face_name: ["top", "bot"]
+nbc_vol_id: [0, 0]
+nbc_face_file_name: ["test_top", "test_bot"]
+nbc_isXML: [false, false]
+
+ebc_face_id: [ 2, 3, 4, 5 ]
+ebc_face_name: [ "lef", "rig", "fro", "bac" ]
+ebc_vol_id: [0, 0, 0, 0]
+ebc_face_file_name: ["test_lef", "test_rig", "test_fro", "test_bac"]
+ebc_isXML: [true, true, true, true]
+
+wmname: "whole_vol"
+isXML: true
+
+isFSI: false
+# if isFSI is false, comment next line
+# phy_domain_name_list: ["lumen_vol", "tissue_vol"]
+
+# EOF

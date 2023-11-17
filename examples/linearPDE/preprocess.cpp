@@ -1,62 +1,94 @@
 // ============================================================================
 // preprocess.cpp
+// 
+// This is a preprocessing driver for handling linear differential equations.
 //
+// Author: Xinhai Yue
 // ============================================================================
 #include "Mesh_Tet.hpp"
+#include "Mesh_FEM.hpp"
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
-#include "Tet_Tools.hpp"
 #include "NodalBC.hpp"
-#include "ElemBC_3D_tet.hpp"
+#include "ElemBC_3D.hpp"
 #include "Part_FEM.hpp"
 #include "NBC_Partition.hpp"
 #include "EBC_Partition.hpp"
+#include "yaml-cpp/yaml.h"
 
 int main( int argc, char * argv[] )
 {
+  // Set number of threads and  print info of OpenMP
+  SYS_T::print_omp_info();
+  SYS_T::set_omp_num_threads();
+
   SYS_T::execute("rm -rf preprocessor_cmd.h5");
   SYS_T::execute("rm -rf apart");
   SYS_T::execute("mkdir apart");
-  
-  // Define the partition file name 
-  const std::string part_file("./apart/part");
 
-  // Element option: 501 linear tet element
-  int elemType = 501;
+  const std::string yaml_file("preprocess.yml");
 
-  // Default names for input geometry files
-  std::string geo_file("./whole_vol.vtu");
+  // Check if the yaml file exist on disk
+  SYS_T::file_check(yaml_file); std::cout<<yaml_file<<" found. \n";
 
-  // Mesh partition setting
-  int cpu_size = 1;
-  int in_ncommon = 2;
-  bool isDualGraph = true;
+  YAML::Node paras = YAML::LoadFile( yaml_file ); 
   
-  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+  const int cpu_size           = paras["cpu_size"].as<int>();
+  const int in_ncommon         = paras["in_ncommon"].as<int>();
+  const int elemType           = paras["elem_type"].as<int>();
+  const int dofNum             = paras["dof_num"].as<int>();
+  const int dofMat             = paras["dof_mat"].as<int>();
+  const bool isDualGraph       = paras["is_dualgraph"].as<bool>();
+  const std::string geo_file   = paras["geo_file"].as<std::string>();
+  const std::string part_file  = paras["part_file"].as<std::string>();
+  const std::vector<std::string> neu_list = paras["Neumann"].as<std::vector<std::string>>();
+  const std::vector<std::vector<std::string>> dir_list = paras["Dirichlet"].as<std::vector<std::vector<std::string>>>();
+
+  // Check if the element type is valid
+  if( elemType != 501 && elemType != 502 && elemType != 601 && elemType != 602 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
   
-  SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: preprocessor needs to be run in serial.\n");
+  // Check if the vtu geometry files exist on disk
+  SYS_T::file_check(geo_file);
   
-  // Get the command line arguments
-  SYS_T::GetOptionInt(   "-cpu_size",          cpu_size);
-  SYS_T::GetOptionInt(   "-in_ncommon",        in_ncommon);
-  SYS_T::GetOptionInt(   "-elem_type",         elemType);
-  SYS_T::GetOptionString("-geo_file",          geo_file);
-  
-  if( elemType != 501 && elemType !=502 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
+  // Check if the dof of Dirichlet BCs equals the dof of matrix problem
+  SYS_T::print_fatal_if( VEC_T::get_size(dir_list) != dofMat, "Error: the dof of Dirichlet BCs(%d) does not equals the dof of the matrix problem(%d) \n", dir_list.size(), dofMat);
+
+  // Check if the geometry file(s) of Dirichlet BC(s) exists
+  for(int ii = 0; ii < dofMat; ++ii)
+  {
+    for(int jj = 0; jj < VEC_T::get_size(dir_list[ii]); ++jj)
+      SYS_T::file_check( dir_list[ii][jj] );
+  }
+
+  // Check if the geometry file(s) of Neumann BC(s) exists
+  for(int jj = 0; jj < VEC_T::get_size(neu_list); ++jj) SYS_T::file_check( neu_list[jj] );
   
   // Print the command line arguments
-  std::cout << "==== Command Line Arguments ====" << std::endl;
-  std::cout << " -elem_type: "   << elemType      << std::endl;
+  std::cout << "======== Command Line Arguments  ========" << std::endl;
+  std::cout << " -elem_type: "        << elemType          << std::endl;
   std::cout << " -geo_file: "         << geo_file          << std::endl;
   std::cout << " -part_file: "        << part_file         << std::endl;
   std::cout << " -cpu_size: "         << cpu_size          << std::endl;
+  std::cout << " -dof_num: "          << dofNum            << std::endl;
+  std::cout << " -dof_mat: "          << dofMat            << std::endl;
   std::cout << " -in_ncommon: "       << in_ncommon        << std::endl;
-  std::cout << " -isDualGraph: true \n";
-  std::cout << "====  Command Line Arguments/ ===="<<std::endl;
-  
-  // Check if the vtu geometry files exist on disk
-  SYS_T::file_check(geo_file); std::cout<<geo_file<<" found. \n";
+  std::cout << " -isDualGraph: "      << isDualGraph       << std::endl;
+  std::cout << "=========================================" << std::endl;
+
+  // Print the boundary conditions
+  std::cout << "====  Dirichlet Boundary Conditions  ====" << std::endl;
+  for(int ii = 0; ii < VEC_T::get_size(dir_list); ++ii)
+  {
+    std::cout << "  DOF " << ii << ":" << std::endl;
+    for(int jj = 0; jj < VEC_T::get_size(dir_list[ii]); ++jj)
+      std::cout << "    " << dir_list[ii][jj] << std::endl;
+  }
+  std::cout << "=========================================" << std::endl;
+  std::cout << "=====  Neumann Boundary Conditions  =====" << std::endl;
+  for(int jj = 0; jj < VEC_T::get_size(neu_list); ++jj)
+      std::cout << "    " << neu_list[jj] << std::endl;
+  std::cout << "=========================================" << std::endl;
 
   // Record the problem setting into a HDF5 file: preprocessor_cmd.h5
   hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
@@ -67,6 +99,8 @@ int main( int argc, char * argv[] )
   cmdh5w->write_intScalar("elemType", elemType);
   cmdh5w->write_string("geo_file", geo_file);
   cmdh5w->write_string("part_file", part_file);
+  cmdh5w->write_intScalar("dof_num", dofNum);
+  cmdh5w->write_intScalar("dof_mat", dofMat);
 
   delete cmdh5w; H5Fclose(cmd_file_id);
   
@@ -89,6 +123,12 @@ int main( int argc, char * argv[] )
       break;
     case 502:
       mesh = new Mesh_Tet(nFunc, nElem, 2);
+      break;
+    case 601:
+      mesh = new Mesh_FEM(nFunc, nElem, 8, 1);
+      break;
+    case 602:
+      mesh = new Mesh_FEM(nFunc, nElem, 27, 2);
       break;
     default:
       SYS_T::print_fatal("Error: elemType %d is not supported.\n", elemType);
@@ -113,17 +153,13 @@ int main( int argc, char * argv[] )
   mnindex->write_hdf5("node_mapping");
 
   // Setup Nodal (Dirichlet type) boundary condition(s)
-  std::vector<std::string> dir_list { "top_vol.vtp", "bot_vol.vtp", "lef_vol.vtp", "rig_vol.vtp", "fro_vol.vtp", "bac_vol.vtp" };
-
-  INodalBC * nbc = new NodalBC( dir_list, nFunc );
+  std::vector<INodalBC *> NBC_list( dofMat, nullptr );
+  for(int ii = 0; ii < dofMat; ++ii)
+    NBC_list[ii] = new NodalBC( dir_list[ii], nFunc );
   
-  std::vector<INodalBC *> NBC_list { nbc };
-
   // Setup Elemental (Neumann type) boundary condition(s)
-  std::vector<std::string> neu_list {};
-  ElemBC * ebc = new ElemBC_3D_tet( neu_list, elemType );
-  
-  ebc -> resetTriIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
+  ElemBC * ebc = new ElemBC_3D( neu_list, elemType );
+  ebc -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
   
   // Start partition the mesh for each cpu_rank
   SYS_T::Timer * mytimer = new SYS_T::Timer();
@@ -139,7 +175,7 @@ int main( int argc, char * argv[] )
     mytimer->Start();
     
     IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
-        ctrlPts, proc_rank, cpu_size, 1, 1, elemType );
+        ctrlPts, proc_rank, cpu_size, elemType, {0, dofNum, true, "linearPDE"} );
 
     part -> print_part_loadbalance_edgecut();
 
@@ -171,6 +207,8 @@ int main( int argc, char * argv[] )
     delete part; delete ebcpart; delete nbcpart;
   }
   
+  delete mytimer;
+  
   cout<<"\n===> Mesh Partition Quality: "<<endl;
   cout<<"The largest ghost / local node ratio is: "<<VEC_T::max(list_ratio_g2l)<<endl;
   cout<<"The smallest ghost / local node ratio is: "<<VEC_T::min(list_ratio_g2l)<<endl;
@@ -186,11 +224,9 @@ int main( int argc, char * argv[] )
   cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<endl;
 
   // Finalize the code and exit
-  for(auto it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc) delete *it_nbc;
+  for(auto &it_nbc : NBC_list ) delete it_nbc;
 
-  delete mytimer;
   delete ebc; delete global_part; delete mnindex; delete IEN; delete mesh;
-  PetscFinalize();
   return EXIT_SUCCESS;
 }
 

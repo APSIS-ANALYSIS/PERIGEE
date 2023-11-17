@@ -18,10 +18,10 @@ class FEAElement
 {
   public:
     // Constructor
-    FEAElement(){};
+    FEAElement() = default;
     
     // Destructor
-    virtual ~FEAElement(){};
+    virtual ~FEAElement() = default;
 
     // Return this element's dimension
     virtual int get_elemDim() const = 0;
@@ -236,7 +236,7 @@ class FEAElement
     // product will point in the outward direction with respect to the volume
     // element. To ensure the ordering, some special procedure may need to be
     // performed in the preprocessor to check and order the nodal indices.
-    // See, ElemBC_3D_tet4::resetTriIEN_outwardnormal() function for example
+    // See, ElemBC_3D::resetSurIEN_outwardnormal() function for example
     // for the ordering of a triangle element that belongs to a tetrahedron
     // surface.
     // This function is called in FEAElement_Triangle3_3D_der0.

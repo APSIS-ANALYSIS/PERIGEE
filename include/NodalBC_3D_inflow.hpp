@@ -34,7 +34,7 @@ class NodalBC_3D_inflow : public INodalBC
         const std::vector<Vector_3> &in_outnormal,
         const int &elemtype );
 
-    virtual ~NodalBC_3D_inflow() {};
+    virtual ~NodalBC_3D_inflow() = default;
 
     virtual unsigned int get_dir_nodes(const unsigned int &ii) const
     {return dir_nodes[ii];}

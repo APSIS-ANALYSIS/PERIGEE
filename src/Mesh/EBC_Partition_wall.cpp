@@ -54,15 +54,6 @@ EBC_Partition_wall::EBC_Partition_wall(
   num_local_node_on_sur = static_cast<int>( local_node_on_sur_pos.size() );
 }
 
-EBC_Partition_wall::~EBC_Partition_wall()
-{
-  VEC_T::clean( part_thickness    );
-  VEC_T::clean( part_youngsmod    );
-  VEC_T::clean( part_springconst  );
-  VEC_T::clean( part_dampingconst );
-  VEC_T::clean( local_node_on_sur_pos );
-}
-
 void EBC_Partition_wall::write_hdf5( const std::string &FileName ) const
 {
   // Call base class writer to write base class data at ebc_wall folder

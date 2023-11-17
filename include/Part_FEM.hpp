@@ -7,31 +7,25 @@
 //         subdomain in hdf5 file format.
 //
 // Date: Jan. 12 2017
-// Modified on May 22 2017: I added a new constructor to handle the 
-//         cases for dofNum is not the dof for the matrix problem in
-//         the implicit solver.
 // ============================================================================
 #include "Vec_Tools.hpp"
 #include "IMesh.hpp"
 #include "IPart.hpp"
 #include "Map_Node_Index.hpp"
 #include "IIEN.hpp"
+#include "Field_Property.hpp"
 
 class Part_FEM : public IPart
 {
   public:
-    // Default constructor
-    // The actual construction is in the derived class.
-    Part_FEM(){};
-    
     Part_FEM( const IMesh * const &mesh,
         const IGlobal_Part * const &gpart,
         const Map_Node_Index * const &mnindex,
         const IIEN * const &IEN,
         const std::vector<double> &ctrlPts,
         const int &in_cpu_rank, const int &in_cpu_size,
-        const int &in_dofNum, const int &in_dofMat,
-        const int &in_elemType );
+        const int &in_elemType, 
+        const Field_Property &in_fp );
 
     // Constructor that load the partition info from h5 file on disk
     Part_FEM( const std::string &fileName, const int &in_cpu_rank );
@@ -112,7 +106,7 @@ class Part_FEM : public IPart
 
     // 4. global mesh info
     int nElem, nFunc, sDegree, tDegree, uDegree, nLocBas;
-    int probDim, dofNum, dofMat, elemType;
+    int probDim, elemType;
 
     // 5. LIEN
     int ** LIEN;
@@ -122,13 +116,20 @@ class Part_FEM : public IPart
     std::vector<double> ctrlPts_y_loc {};
     std::vector<double> ctrlPts_z_loc {};
 
+    // 7. Field info
+    int field_id, dofNum;
+    bool is_geo_field; // tag is true for geometry-related field
+    std::string field_name;
+
     // ------------------------------------------------------------------------
     // Function
     void Generate_Partition( const IMesh * const &mesh,
         const IGlobal_Part * const &gpart,
         const Map_Node_Index * const &mnindex,
         const IIEN * const &IEN,
-        const int &field = 0 );
+        const int &field );
+    
+    Part_FEM() = delete;
 };
 
 #endif

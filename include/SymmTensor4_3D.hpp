@@ -54,7 +54,7 @@ class SymmTensor4_3D
 
     SymmTensor4_3D( const std::array<double,21> &source );
 
-    ~SymmTensor4_3D();
+    ~SymmTensor4_3D() = default;
 
     // Convert the symmetric tensor to a full tensor
     Tensor4_3D convert_to_full() const;
