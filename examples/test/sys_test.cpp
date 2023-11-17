@@ -15,6 +15,7 @@
 #include "QuadPts_debug.hpp"
 #include "QuadPts_vis_quad4.hpp"
 #include "QuadPts_vis_quad9.hpp"
+#include "QuadPts_Gauss_Tet.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -23,6 +24,10 @@ int main(int argc, char *argv[])
 
   test4.print_info();
   test9.print_info();
+
+  QuadPts_Gauss_Tet a(5);
+
+  a.print_info();
 
   return EXIT_SUCCESS;
 }

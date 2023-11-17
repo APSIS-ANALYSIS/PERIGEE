@@ -121,11 +121,6 @@ QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( const int &in_num_pts ) : num_pts( in_num_
   for(int ii=0; ii<num_pts; ++ii) qw[ii] /= 6.0;
 }
 
-QuadPts_Gauss_Tet::~QuadPts_Gauss_Tet()
-{
-  VEC_T::clean(qp); VEC_T::clean(qw);
-}
-
 void QuadPts_Gauss_Tet::print_info() const
 {
   SYS_T::commPrint("====== Gauss Points for Tetrahedron =======\n");
