@@ -1,7 +1,7 @@
 #ifndef QUADPTS_VIS_QUAD9_HPP
 #define QUADPTS_VIS_QUAD9_HPP
 // ==================================================================
-// QuadPts_vis_quad4.hpp
+// QuadPts_vis_quad9.hpp
 //
 // This is a class of quadrature points for 9 node quad element.
 //
@@ -9,17 +9,22 @@
 //        [0.5, 0.0], [1.0, 0.5], [0.5, 1.0], [0.0, 0.5], [0.5, 0.5]
 // These are the vertex points for the quad elements.
 // ==================================================================
-#include <vector>
 #include "IQuadPts.hpp"
 
 class QuadPts_vis_quad9 : public IQuadPts
 {
   public:
-    QuadPts_vis_quad9();
+    QuadPts_vis_quad9() = default;
 
-    virtual ~QuadPts_vis_quad9();
+    virtual ~QuadPts_vis_quad9() = default;
 
-    virtual void print_info() const;
+    virtual void print_info() const
+    {
+      SYS_T::commPrint("\n===== Visualization Points for Quad9 ===== \n");
+      for(int ii=0; ii<9; ++ii)
+        SYS_T::commPrint("%e, %e, %e \n", qw[ii], qp[2*ii], qp[2*ii+1]);
+      SYS_T::commPrint("========================================== \n");
+    }
 
     // it stores the coordinate of the quadrature points 
     // in the sequence of x-y, so the dim is 2
@@ -39,8 +44,8 @@ class QuadPts_vis_quad9 : public IQuadPts
     {return qw[ii];}
 
   private:
-    double qp[18];
-    double qw[9];
+    const double qp[18] {0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.5, 0.0, 1.0, 0.5, 0.5, 1.0, 0.0, 0.5, 0.5, 0.5};
+    const double qw[9] {0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5};
 };
 
 #endif
