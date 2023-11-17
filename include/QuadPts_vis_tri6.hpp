@@ -9,17 +9,23 @@
 //        [0.5 , 0.0], [0.5 , 0.5], [0.0 , 0.5].
 // These are the vertex points for the quadratic triangle elements.
 // ==================================================================
-#include <vector>
 #include "IQuadPts.hpp"
 
 class QuadPts_vis_tri6 : public IQuadPts
 {
   public:
-    QuadPts_vis_tri6();
+    QuadPts_vis_tri6() = default;
 
-    virtual ~QuadPts_vis_tri6();
+    virtual ~QuadPts_vis_tri6() = default;
 
-    virtual void print_info() const;
+    virtual void print_info() const
+    {
+      SYS_T::commPrint("\n===== Visualization Points for Tri6 ===== \n");
+      for(int ii=0; ii<6; ++ii)
+        SYS_T::commPrint("%e, %e, %e, %e \n",
+            qw[ii], qp[3*ii], qp[3*ii+1], qp[3*ii+2]);
+      SYS_T::commPrint("========================================= \n");
+    }
 
     // it stores the area coordinate of the quadrature points 
     // in the sequence of r-s-t, so the dim is 3
@@ -30,12 +36,15 @@ class QuadPts_vis_tri6 : public IQuadPts
     virtual double get_qp(unsigned int ii, unsigned int comp) const
     {return qp[3*ii+comp];}
 
-    virtual double get_qw(unsigned int ii) const
-    {return qw[ii];}
+    virtual double get_qw(unsigned int ii) const {return 0.5/6.0;}
 
   private:
-    double qp[18];
-    double qw[6];
+    const double qp[18] { 0.0, 0.0, 1.0,
+      1.0, 0.0, 0.0,
+      0.0, 1.0, 0.0,
+      0.5, 0.0, 0.5,
+      0.5, 0.5, 0.0,
+      0.0, 0.5, 0.5 };
 };
 
 #endif
