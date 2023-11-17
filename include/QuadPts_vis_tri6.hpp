@@ -23,7 +23,7 @@ class QuadPts_vis_tri6 : public IQuadPts
       SYS_T::commPrint("\n===== Visualization Points for Tri6 ===== \n");
       for(int ii=0; ii<6; ++ii)
         SYS_T::commPrint("%e, %e, %e, %e \n",
-            qw[ii], qp[3*ii], qp[3*ii+1], qp[3*ii+2]);
+            get_qw(ii), qp[3*ii], qp[3*ii+1], qp[3*ii+2]);
       SYS_T::commPrint("========================================= \n");
     }
 

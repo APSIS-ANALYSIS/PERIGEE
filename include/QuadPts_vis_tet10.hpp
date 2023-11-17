@@ -31,7 +31,7 @@ class QuadPts_vis_tet10 : public IQuadPts
       SYS_T::commPrint("\n===== Visualization Points for Tet10 ===== \n");
       for(int ii=0; ii<10; ++ii)
         SYS_T::commPrint("%e, %e, %e, %e, %e \n",
-            qw[ii], qp[4*ii], qp[4*ii+1], qp[4*ii+2], qp[4*ii+3]);
+            get_qw(ii), qp[4*ii], qp[4*ii+1], qp[4*ii+2], qp[4*ii+3]);
       SYS_T::commPrint("========================================= \n");
     }
 
