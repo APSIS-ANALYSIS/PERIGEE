@@ -24,7 +24,7 @@ class QuadPts_Gauss_Quad : public IQuadPts
         const double &r_min = 0.0, const double &r_max = 1.0, 
         const double &s_min = 0.0, const double &s_max = 1.0 );
    
-    virtual ~QuadPts_Gauss_Quad();
+    virtual ~QuadPts_Gauss_Quad() = default;
 
     virtual void print_info() const;
 

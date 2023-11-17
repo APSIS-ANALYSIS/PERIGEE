@@ -31,12 +31,6 @@ QuadPts_Gauss_Quad::QuadPts_Gauss_Quad( const int &in_num_pts_1d,
 : QuadPts_Gauss_Quad(in_num_pts_1d, in_num_pts_1d, x_min, x_max, y_min, y_max)
 {}
 
-QuadPts_Gauss_Quad::~QuadPts_Gauss_Quad()
-{
-  VEC_T::clean(qp);
-  VEC_T::clean(qw);
-}
-
 void QuadPts_Gauss_Quad::print_info() const
 {
   SYS_T::commPrint("====== Gauss Points for Quad =======\n");

@@ -18,7 +18,7 @@ class QuadPts_Gauss_1D : public IQuadPts
     // Construct in_num_pts-point rule for [min, max] domain
     QuadPts_Gauss_1D( const int &in_num_pts, const double &min = 0.0, const double &max = 1.0 );
     
-    virtual ~QuadPts_Gauss_1D();
+    virtual ~QuadPts_Gauss_1D() = default;
 
     virtual void print_info() const;
 
