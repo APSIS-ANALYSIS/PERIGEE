@@ -94,24 +94,6 @@ ALocal_InflowBC::ALocal_InflowBC(
   delete h5r; H5Fclose( file_id );
 }
 
-ALocal_InflowBC::~ALocal_InflowBC()
-{
-  VEC_T::clean(Num_LD); 
-  VEC_T::clean(LDN);
-  VEC_T::clean(outnormal); 
-  VEC_T::clean(act_area); 
-  VEC_T::clean(ful_area);
-  VEC_T::clean(num_out_bc_pts); 
-  VEC_T::clean(outline_pts);
-  VEC_T::clean(centroid);
-  VEC_T::clean(num_local_node); 
-  VEC_T::clean(num_local_cell);
-  VEC_T::clean(cell_nLocBas);
-  VEC_T::clean(local_pt_xyz);
-  VEC_T::clean(local_cell_ien);
-  VEC_T::clean(local_node_pos);
-}
-
 double ALocal_InflowBC::get_radius( const int &nbc_id,
     const Vector_3 &pt ) const
 {

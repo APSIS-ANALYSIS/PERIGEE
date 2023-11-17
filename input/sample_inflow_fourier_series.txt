@@ -1,9 +1,0 @@
-# This is the inflow file
-# first line is [num_of_mode w period]
-2 3.14 1.0
-
-# second line is coef_a with length num_mode+1
-1.0e2 0.0 0.0
-
-# thirid line is coef_b with length num_mode+1
-0.0 0.0 0.0
