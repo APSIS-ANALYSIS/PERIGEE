@@ -29,7 +29,11 @@ int main( int argc, char * argv[] )
   std::string part_file("./ppart/part");
   const int dof = 1;
 
+#if PETSC_VERSION_LT(3,19,0)
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+#else
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULLPTR);
+#endif
 
   SYS_T::GetOptionString("-sol_name", sol_name);
   SYS_T::GetOptionReal("-sol_time",   sol_time);

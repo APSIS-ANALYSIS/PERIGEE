@@ -77,7 +77,11 @@ int main(int argc, char *argv[])
   bool is_loadYaml = true;
   std::string yaml_file("./linearPDE_input.yml");
 
+#if PETSC_VERSION_LT(3,19,0)
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+#else
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULLPTR);
+#endif
   
   const PetscMPIInt rank = SYS_T::get_MPI_rank();
   const PetscMPIInt size = SYS_T::get_MPI_size();

@@ -5,8 +5,14 @@ Matrix_PETSc::Matrix_PETSc( const int &loc_row, const int &loc_col,
 : lm( loc_row ), ln( loc_col ), is_set(false)
 {
   SYS_T::commPrint("===> PETSc: MatCreateAIJ called. \n");
+
+#if PETSC_VERSION_LT(3,19,0)
   MatCreateAIJ(PETSC_COMM_WORLD, loc_row, loc_col, PETSC_DECIDE, PETSC_DECIDE, 
       dnz, PETSC_NULL, onz, PETSC_NULL, &K);
+#else
+  MatCreateAIJ(PETSC_COMM_WORLD, loc_row, loc_col, PETSC_DECIDE, PETSC_DECIDE, 
+      dnz, PETSC_NULLPTR, onz, PETSC_NULLPTR, &K);
+#endif
 
   MatGetSize(K, &gm, &gn);
 }
@@ -15,8 +21,14 @@ Matrix_PETSc::Matrix_PETSc( const int &loc_row, const int &dnz, const int &onz )
 : lm( loc_row ), ln( loc_row ), is_set(false)
 {
   SYS_T::commPrint("===> PETSc: MatCreateAIJ called. \n");
+
+#if PETSC_VERSION_LT(3,19,0)
   MatCreateAIJ(PETSC_COMM_WORLD, loc_row, loc_row, PETSC_DECIDE, PETSC_DECIDE, 
       dnz, PETSC_NULL, onz, PETSC_NULL, &K);
+#else
+  MatCreateAIJ(PETSC_COMM_WORLD, loc_row, loc_row, PETSC_DECIDE, PETSC_DECIDE, 
+      dnz, PETSC_NULLPTR, onz, PETSC_NULLPTR, &K);
+#endif
 
   MatGetSize(K, &gm, &gn);
 }
@@ -29,8 +41,13 @@ Matrix_PETSc::Matrix_PETSc(const APart_Node * const &pnode_ptr,
   lm = pnode_ptr->get_nlocalnode() * pnode_ptr->get_dof();
   ln = lm;
   
+#if PETSC_VERSION_LT(3,19,0)
   MatCreateAIJ(PETSC_COMM_WORLD, lm, ln, PETSC_DECIDE, PETSC_DECIDE, 
       dnz, PETSC_NULL, onz, PETSC_NULL, &K);
+#else
+  MatCreateAIJ(PETSC_COMM_WORLD, lm, ln, PETSC_DECIDE, PETSC_DECIDE, 
+      dnz, PETSC_NULLPTR, onz, PETSC_NULLPTR, &K);
+#endif
 
   MatGetSize(K, &gm, &gn);
 }
@@ -44,8 +61,13 @@ Matrix_PETSc::Matrix_PETSc(const APart_Node * const &pnode_ptr,
   lm = pnode_ptr->get_nlocalnode() * bc_part->get_dof_LID();
   ln = lm;
   
+#if PETSC_VERSION_LT(3,19,0)
   MatCreateAIJ(PETSC_COMM_WORLD, lm, ln, PETSC_DECIDE, PETSC_DECIDE, 
       dnz, PETSC_NULL, onz, PETSC_NULL, &K);
+#else
+  MatCreateAIJ(PETSC_COMM_WORLD, lm, ln, PETSC_DECIDE, PETSC_DECIDE, 
+      dnz, PETSC_NULLPTR, onz, PETSC_NULLPTR, &K);
+#endif
 
   MatGetSize(K, &gm, &gn);
 }
