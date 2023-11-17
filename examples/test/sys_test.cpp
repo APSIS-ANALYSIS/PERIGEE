@@ -14,12 +14,15 @@
 #include "ElemBC_3D_outflow.hpp"
 #include "QuadPts_debug.hpp"
 #include "QuadPts_vis_quad4.hpp"
+#include "QuadPts_vis_quad9.hpp"
 
 int main(int argc, char *argv[])
 {
-  QuadPts_vis_quad4 test{};
+  QuadPts_vis_quad4 test4{};
+  QuadPts_vis_quad9 test9{};
 
-  test.print_info();
+  test4.print_info();
+  test9.print_info();
 
   return EXIT_SUCCESS;
 }
