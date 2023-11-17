@@ -33,8 +33,7 @@ class QuadPts_vis_hex27 : public IQuadPts
     virtual void print_info() const
     {
       SYS_T::commPrint("\n===== Visualization Points for Hex27 ===== \n");
-      for(int ii=0; ii<27; ++ii)
-        SYS_T::commPrint("%e, %e, %e, %e \n", qw[ii], qp[3*ii], qp[3*ii+1], qp[3*ii+2]);
+      IQuadPts::print_info();
       SYS_T::commPrint("========================================= \n");
     }
 
@@ -54,7 +53,7 @@ class QuadPts_vis_hex27 : public IQuadPts
     virtual double get_qp(unsigned int ii, unsigned int comp) const 
     {return qp[3*ii+comp];}
 
-    virtual double get_qw(unsigned int ii) const {return qw[ii];}
+    virtual double get_qw(unsigned int ii) const {return 0.5;}
 
   private:
     const double qp[81] { 0.0, 0.0, 0.0, 
@@ -84,16 +83,6 @@ class QuadPts_vis_hex27 : public IQuadPts
         0.5, 0.5, 0.0, 
         0.5, 0.5, 1.0, 
         0.5, 0.5, 0.5 };
-
-    const double qw[27] { 0.5, 0.5, 0.5, 
-      0.5, 0.5, 0.5, 
-      0.5, 0.5, 0.5, 
-      0.5, 0.5, 0.5,
-      0.5, 0.5, 0.5, 
-      0.5, 0.5, 0.5,
-      0.5, 0.5, 0.5, 
-      0.5, 0.5, 0.5,
-      0.5, 0.5, 0.5 };
 };
 
 #endif

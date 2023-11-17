@@ -20,8 +20,7 @@ class QuadPts_vis_quad4 : public IQuadPts
     virtual void print_info() const
     {
       SYS_T::commPrint("\n===== Visualization Points for Quad4 ===== \n");
-      for(int ii=0; ii<4; ++ii)
-        SYS_T::commPrint("%e, %e, %e \n", qw[ii], qp[2*ii], qp[2*ii+1]);
+      IQuadPts::print_info();
       SYS_T::commPrint("========================================== \n");
     }
 
@@ -39,12 +38,10 @@ class QuadPts_vis_quad4 : public IQuadPts
     virtual double get_qp(unsigned int ii, unsigned int comp) const
     {return qp[2*ii+comp];}
 
-    virtual double get_qw(unsigned int ii) const
-    {return qw[ii];}
+    virtual double get_qw(unsigned int ii) const {return 0.5;}
 
   private:
     const double qp[8] { 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0 };
-    const double qw[4] { 0.5, 0.5, 0.5, 0.5 };
 };
 
 #endif
