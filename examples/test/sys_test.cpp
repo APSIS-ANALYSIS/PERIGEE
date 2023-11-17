@@ -13,10 +13,11 @@
 #include "ElemBC_3D.hpp"
 #include "ElemBC_3D_outflow.hpp"
 #include "QuadPts_debug.hpp"
+#include "QuadPts_vis_quad4.hpp"
 
 int main(int argc, char *argv[])
 {
-  QuadPts_debug test({0.5, 0.4, 0.6, 0.77}, {1.2, 2.2}, 2);
+  QuadPts_vis_quad4 test{};
 
   test.print_info();
 
