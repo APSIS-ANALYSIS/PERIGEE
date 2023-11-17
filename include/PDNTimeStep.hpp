@@ -18,7 +18,7 @@ class PDNTimeStep
     PDNTimeStep( const int &input_index, const double &input_time,
         const double &input_step );
 
-    ~PDNTimeStep();
+    ~PDNTimeStep() = default;
 
     // Functions that give access to the class member data
     double get_time() const {return time;}

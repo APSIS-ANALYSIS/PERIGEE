@@ -27,7 +27,7 @@ class Tensor4_2D
     Tensor4_2D( const Tensor4_2D &source );
 
     // Destructor
-    ~Tensor4_2D();
+    ~Tensor4_2D() = default;
 
     // Parenthesis operator: access through a single index
     double& operator()(const int &index) {return ten[index];}
