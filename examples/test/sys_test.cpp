@@ -13,6 +13,7 @@
 #include "ElemBC_3D.hpp"
 #include "ElemBC_3D_outflow.hpp"
 #include "QuadPts_debug.hpp"
+#include "QuadPts_vis_tet4.hpp"
 #include "QuadPts_vis_quad4.hpp"
 #include "QuadPts_vis_quad9.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
@@ -29,6 +30,8 @@ int main(int argc, char *argv[])
 
   a.print_info();
 
+  QuadPts_vis_tet4 b{};
+  b.print_info();
   return EXIT_SUCCESS;
 }
 
