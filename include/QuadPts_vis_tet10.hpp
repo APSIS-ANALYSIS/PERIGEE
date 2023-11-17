@@ -22,7 +22,7 @@
 class QuadPts_vis_tet10 : public IQuadPts
 {
   public:
-    QuadPts_vis_tet10();
+    QuadPts_vis_tet10() = default;
 
     virtual ~QuadPts_vis_tet10() = default;
 
