@@ -78,19 +78,6 @@ NBC_Partition::NBC_Partition( const IPart * const &part,
   VEC_T::shrink2fit( LID );
 }
 
-NBC_Partition::~NBC_Partition()
-{
-  VEC_T::clean(LID);
-  VEC_T::clean(LDN);
-  VEC_T::clean(LPSN);
-  VEC_T::clean(LPMN);
-  VEC_T::clean(LocalMaster);
-  VEC_T::clean(LocalMasterSlave);
-  VEC_T::clean(Num_LD);
-  VEC_T::clean(Num_LPS);
-  VEC_T::clean(Num_LPM);
-}
-
 void NBC_Partition::write_hdf5( const std::string &FileName, 
     const std::string &GroupName ) const
 {

@@ -109,9 +109,6 @@ NBC_Partition_inflow::NBC_Partition_inflow(
   } // end ii-loop over num_nbc
 }
 
-NBC_Partition_inflow::~NBC_Partition_inflow()
-{}
-
 void NBC_Partition_inflow::write_hdf5( const std::string &FileName ) const
 {
   std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
