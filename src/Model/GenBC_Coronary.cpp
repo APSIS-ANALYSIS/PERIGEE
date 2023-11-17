@@ -205,9 +205,6 @@ GenBC_Coronary::GenBC_Coronary( const std::string &lpn_filename,
   }
 }
 
-GenBC_Coronary::~GenBC_Coronary()
-{}
-
 void GenBC_Coronary::print_info() const
 {
   SYS_T::commPrint( "===> Coronary model: N = %d, h = %e, num_ebc = %d \n", N, h, num_ebc );

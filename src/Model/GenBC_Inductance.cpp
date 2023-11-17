@@ -72,11 +72,6 @@ GenBC_Inductance::GenBC_Inductance( const std::string &lpn_filename )
   }
 }
 
-
-GenBC_Inductance::~GenBC_Inductance()
-{}
-
-
 void GenBC_Inductance::print_info() const
 {
   SYS_T::commPrint("===> GenBC_Inductance : \n");

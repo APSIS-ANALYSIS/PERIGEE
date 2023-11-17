@@ -72,9 +72,6 @@ GenBC_Resistance::GenBC_Resistance( const std::string &lpn_filename )
   }
 }
 
-GenBC_Resistance::~GenBC_Resistance()
-{}
-
 void GenBC_Resistance::print_info() const
 {
   SYS_T::commPrint("===> GenBC_Resistance : \n");

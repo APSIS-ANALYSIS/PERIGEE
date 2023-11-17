@@ -52,7 +52,7 @@ class GenBC_Coronary : public IGenBC
     GenBC_Coronary( const std::string &lpn_filename, const int &in_N, const double &dt3d,
         const int &in_index, const std::string &in_lpn_sol_file="lpn_coronary_sol.txt" );
 
-    virtual ~GenBC_Coronary();
+    virtual ~GenBC_Coronary() = default;
 
     virtual void print_info() const;
 

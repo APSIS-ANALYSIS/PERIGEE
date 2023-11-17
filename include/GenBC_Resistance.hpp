@@ -19,7 +19,7 @@ class GenBC_Resistance : public IGenBC
   public:
     GenBC_Resistance( const std::string &lpn_filename );
 
-    virtual ~GenBC_Resistance();
+    virtual ~GenBC_Resistance() = default;
 
     virtual void print_info() const;
 

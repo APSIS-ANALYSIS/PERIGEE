@@ -17,7 +17,7 @@ class GenBC_Pressure : public IGenBC
   public:
     GenBC_Pressure( const std::string &pres_file_name, const double &init_time );
 
-    virtual ~GenBC_Pressure();
+    virtual ~GenBC_Pressure() = default;
 
     virtual void print_info() const;
 

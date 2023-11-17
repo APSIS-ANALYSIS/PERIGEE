@@ -20,7 +20,7 @@ class GenBC_Inductance : public IGenBC
   public:
     GenBC_Inductance( const std::string &lpn_filename );
 
-    virtual ~GenBC_Inductance();
+    virtual ~GenBC_Inductance() = default;
 
     virtual void print_info() const;
 
