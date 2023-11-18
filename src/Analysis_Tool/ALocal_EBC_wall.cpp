@@ -76,16 +76,6 @@ ALocal_EBC_wall::ALocal_EBC_wall( const std::string &fileBaseName,
   delete h5r; H5Fclose( file_id );
 }
 
-ALocal_EBC_wall::~ALocal_EBC_wall()
-{
-  VEC_T::clean( thickness     );
-  VEC_T::clean( youngsmod     );
-  VEC_T::clean( springconst   );
-  VEC_T::clean( dampingconst  );
-  VEC_T::clean( qua_prestress );
-  VEC_T::clean( local_node_on_sur_pos );
-}
-
 void ALocal_EBC_wall::get_thickness( const int &eindex,
     double * const &e_thickness ) const
 {

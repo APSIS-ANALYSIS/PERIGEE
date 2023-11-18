@@ -31,7 +31,7 @@ class APart_Node
     // ------------------------------------------------------------------------
     // Destructor    
     // ------------------------------------------------------------------------
-    virtual ~APart_Node();
+    virtual ~APart_Node() = default;
 
     // ------------------------------------------------------------------------
     // This returns dofNum in the preprocessor, the total number of dof.

@@ -85,7 +85,7 @@ class ElemBC_3D_wall : public ElemBC_3D
         const std::vector<double> &dampingconstList,
         const int &elemtype);
 
-    virtual ~ElemBC_3D_wall();
+    virtual ~ElemBC_3D_wall() = default;
 
     // Overwrite wall properties from a vtp/vtu file by GlobalNodeID. All wall nodes
     // with GlobalNodeIDs that also exist in wallprop_vtk will be overwritten. 

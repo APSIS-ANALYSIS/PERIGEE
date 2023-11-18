@@ -39,20 +39,6 @@ ALocal_EBC_outflow::ALocal_EBC_outflow( const std::string &fileBaseName,
   delete h5r; H5Fclose( file_id );
 }
 
-ALocal_EBC_outflow::~ALocal_EBC_outflow()
-{
-  for(int ii=0; ii<num_ebc; ++ii)
-  {
-    VEC_T::clean( intNA[ii] );
-    VEC_T::clean( LID[ii] );
-  }
-  
-  VEC_T::clean(intNA);
-  VEC_T::clean(LID);
-  VEC_T::clean(outvec);
-  VEC_T::clean(num_face_nodes);
-}
-
 void ALocal_EBC_outflow::print_info() const
 {
   SYS_T::commPrint("---- ALocal_EBC_outflow: \n");

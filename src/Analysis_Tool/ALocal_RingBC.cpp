@@ -49,13 +49,6 @@ ALocal_RingBC::ALocal_RingBC(
   delete h5r; H5Fclose( file_id );
 }
 
-ALocal_RingBC::~ALocal_RingBC()
-{
-  VEC_T::clean( LDN          );
-  VEC_T::clean( local_cap_id );
-  VEC_T::clean( outnormal    );
-}
-
 bool ALocal_RingBC::is_inLDN( const int &ii, int &pos ) const
 {
   if( VEC_T::is_invec(LDN, ii) )
