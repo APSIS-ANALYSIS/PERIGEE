@@ -101,6 +101,9 @@ namespace VTK_T
   std::vector<double> read_double_PointData( const std::string &filename, 
       const std::string &dataname );
 
+  std::vector<Vector_3> read_Vector3_PointData( const std::string &filename,
+      const std::string &dataname );
+
   // ----------------------------------------------------------------
   // ! read_num_pt: read the number of points from either a .vtp or a .vtu file.
   // Input: \para filename the vtk file name
