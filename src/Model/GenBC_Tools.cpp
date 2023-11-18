@@ -49,13 +49,19 @@ int GENBC_T::get_genbc_file_type( const std::string &lpn_filename )
       || bc_type.compare("CORONARY") == 0 )
   {
     return 4;
-  }      
+  }
   else if( bc_type.compare("Pressure") ==0
       || bc_type.compare("pressure") == 0
       || bc_type.compare("PRESSURE") == 0 )
   {
     return 5;
-  }      
+  }
+  else if( bc_type.compare("Absorbing") ==0
+      || bc_type.compare("absorbing") == 0
+      || bc_type.compare("ABSORBING") == 0 )
+  {
+    return 6;
+  }
   else
   {
     return 0;

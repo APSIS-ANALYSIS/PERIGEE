@@ -109,6 +109,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Model/GenBC_Inductance.cpp
   ${perigee_source}/Model/GenBC_Coronary.cpp
   ${perigee_source}/Model/GenBC_Pressure.cpp
+  ${perigee_source}/Model/GenBC_Absorbing.cpp
   ${perigee_source}/Model/GenBC_Tools.cpp
   ${perigee_source}/Model/CVFlowRate_Steady.cpp
   ${perigee_source}/Model/CVFlowRate_Unsteady.cpp

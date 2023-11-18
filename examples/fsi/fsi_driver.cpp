@@ -25,6 +25,7 @@
 #include "GenBC_Inductance.hpp"
 #include "GenBC_Coronary.hpp"
 #include "GenBC_Pressure.hpp"
+#include "GenBC_Absorbing.hpp"
 #include "MaterialModel_NeoHookean_M94_Mixed.hpp"
 #include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
 #include "PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha.hpp"
@@ -539,6 +540,8 @@ int main(int argc, char *argv[])
     gbc = new GenBC_Coronary( lpn_file, 1000, initial_step, initial_index );
   else if( GENBC_T::get_genbc_file_type( lpn_file ) == 5  )
     gbc = new GenBC_Pressure( lpn_file, initial_time );
+  else if ( GENBC_T::get_genbc_file_type( lpn_file ) == 6)
+    gbc = new GenBC_Absorbing( lpn_file, solid_E, solid_nu );
   else
     SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
 
@@ -666,8 +669,15 @@ int main(int argc, char *argv[])
     const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
         disp, pres, locAssem_fluid_ptr, elements, quads, locebc_v, locebc_p, ff );
 
+    
     // set the gbc initial conditions using the 3D data
-    gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
+    if (GENBC_T::get_genbc_file_type( lpn_file ) != 6)
+      gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
+    else
+    {
+      const double face_area = gloAssem_ptr -> Assem_surface_area(
+        disp, locAssem_fluid_ptr, elements, quads, locebc_v, ff); // use ebc_v to get_ctrlPts_xyz
+    }
 
     const double dot_lpn_flowrate = dot_face_flrate;
     const double lpn_flowrate = face_flrate;
@@ -692,6 +702,11 @@ int main(int argc, char *argv[])
       }
 
       ofile.close();
+    }
+
+    if ( GENBC_T::get_genbc_file_type( lpn_file ) == 6)
+    {
+
     }
   }
 
