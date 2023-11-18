@@ -62,6 +62,8 @@ GenBC_Absorbing::GenBC_Absorbing( const std::string &lpn_filename,
     para_beta[ebc_id] = thickness * (solid_E / (1 - solid_nu * solid_nu)) / (radius * radius);
 
     initial_outlet_area[ebc_id] = MATH_T::PI * radius * radius;
+
+    current_outlet_area[ebc_id] = initial_outlet_area[ebc_id];
   }
 
   // Finish reading the file and close it
@@ -79,10 +81,10 @@ void GenBC_Absorbing::print_info() const
   }
 }
 
-double GenBC_Absorbing::get_P( const int &ii, const double &dot_Q, const double &Area,
+double GenBC_Absorbing::get_P( const int &ii, const double &dot_Q, const double &Q,
     const double &time) const
 {
-  return para_beta[ii] * (std::sqrt(Area) - std::sqrt(initial_outlet_area[ii])) / MATH_T::PI;
+  return para_beta[ii] * (std::sqrt(current_outlet_area[ii]) - std::sqrt(initial_outlet_area[ii])) / MATH_T::PI;
 }
 
 // EOF

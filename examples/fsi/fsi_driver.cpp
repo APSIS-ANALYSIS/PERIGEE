@@ -671,13 +671,8 @@ int main(int argc, char *argv[])
 
     
     // set the gbc initial conditions using the 3D data
-    if (GENBC_T::get_genbc_file_type( lpn_file ) != 6)
+    if(GENBC_T::get_genbc_file_type( lpn_file ) != 6)
       gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
-    else
-    {
-      const double face_area = gloAssem_ptr -> Assem_surface_area(
-        disp, locAssem_fluid_ptr, elements, quads, locebc_v, ff); // use ebc_v to get_ctrlPts_xyz
-    }
 
     const double dot_lpn_flowrate = dot_face_flrate;
     const double lpn_flowrate = face_flrate;

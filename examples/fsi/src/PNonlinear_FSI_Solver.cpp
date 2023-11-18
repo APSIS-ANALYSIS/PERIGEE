@@ -115,7 +115,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     const ALocal_NBC * const &nbc_mesh,
     const ALocal_EBC * const &ebc_part,
     const ALocal_EBC * const &ebc_mesh,
-    const IGenBC * const &gbc,
+    IGenBC * const &gbc,
     const Matrix_PETSc * const &bc_mat,
     const Matrix_PETSc * const &bc_mesh_mat,
     FEAElement * const &elementv,
@@ -344,6 +344,15 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
 #ifdef PETSC_USE_LOG
     PetscLogEventBegin(assem_event_1, 0,0,0,0);
 #endif
+
+    // Update absorbing BC here
+    for(int ebc_id{0}; ebc_id < ebc_part -> get_num_ebc(); ++ebc_id)
+    {
+      const double current_area = gassem_ptr -> Assem_surface_area(
+        disp, lassem_fluid_ptr, elements, quad_s, ebc_part, ebc_id);
+
+      gbc -> reset_initial_sol(ebc_id, current_area, 0.0, 0.0, false);
+    }
 
     // Assemble residual & tangent
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_thred )

@@ -43,8 +43,7 @@ class GenBC_Absorbing : public IGenBC
       return 0.0;
     }  // Banned
 
-    // Note: Here the input flowrate Q is replaced by current area!
-    virtual double get_P( const int &ii, const double &dot_Q, const double &Area,
+    virtual double get_P( const int &ii, const double &dot_Q, const double &Q,
         const double &time) const;
 
     virtual double get_P0( const int &ii ) const
@@ -52,11 +51,12 @@ class GenBC_Absorbing : public IGenBC
       return 0.0;
     }   // Banned
 
+    // Update the current_outlet_area in the nonlinear solver
     virtual void reset_initial_sol( const int &ii, const double &in_Area,
         const double &in_P_0, const double &curr_time, const bool &is_restart )
     {
-      return;
-    }   // Banned
+      current_outlet_area[ii] = in_Area;
+    }
 
   private:
     int num_ebc;
@@ -66,6 +66,9 @@ class GenBC_Absorbing : public IGenBC
 
     // Initial outlet area A0 of each outlet. length num_ebc
     std::vector<double> initial_outlet_area;
+
+    // Current outlet area A in each nonlinear iteration step. length num_ebc
+    std::vector<double> current_outlet_area;
 };
 
 #endif

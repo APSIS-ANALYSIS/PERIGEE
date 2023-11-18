@@ -233,7 +233,8 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
       const double lpn_pressure = gbc -> get_P( face, dot_lpn_flowrate, lpn_flowrate, time_info->get_time() );
 
       // Update the initial values in genbc
-      gbc -> reset_initial_sol( face, lpn_flowrate, lpn_pressure, time_info->get_time(), false );
+      // gbc -> reset_initial_sol( face, lpn_flowrate, lpn_pressure, time_info->get_time(), false );
+      // For absorbing BC, update in the nonlinear solver
 
       if( SYS_T::get_MPI_rank() == 0 )
       {
