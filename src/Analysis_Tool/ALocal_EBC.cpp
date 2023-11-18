@@ -59,18 +59,6 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
   delete h5r; H5Fclose( file_id );
 }
 
-ALocal_EBC::~ALocal_EBC()
-{
-  VEC_T::clean( num_local_cell_node );
-  VEC_T::clean( num_local_cell );
-  VEC_T::clean( cell_nLocBas );
-  VEC_T::clean( local_cell_node_xyz );
-  VEC_T::clean( local_cell_ien );
-  VEC_T::clean( local_cell_node_vol_id );
-  VEC_T::clean( local_cell_node_pos );
-  VEC_T::clean( local_cell_vol_id );
-}
-
 void ALocal_EBC::get_ctrlPts_xyz(const int &ii,
     const int &eindex, double * const &ctrl_x,
     double * const &ctrl_y, double * const &ctrl_z ) const
