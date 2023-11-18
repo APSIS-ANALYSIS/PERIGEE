@@ -749,6 +749,54 @@ double PGAssem_FSI::Assem_surface_ave_pressure(
   return sum_pres / sum_area;
 }
 
+double PGAssem_FSI::Assem_surface_area(
+    const PDNSolution * const &disp,
+    IPLocAssem_2x2Block * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const ALocal_EBC * const &ebc_part,
+    const int &ebc_id )
+{
+  const std::vector<double> array_d = disp -> GetLocalArray();
+
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
+
+  const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+
+  double val_area = 0.0;
+
+  for(int ee=0; ee<num_sele; ++ee)
+  {
+    const std::vector<int> LSIEN = ebc_part -> get_SIEN( ebc_id, ee );
+
+    ebc_part -> get_ctrlPts_xyz( ebc_id, ee, sctrl_x, sctrl_y, sctrl_z );
+    
+    const std::vector<double> local_d = GetLocal( array_d, LSIEN, snLocBas, 3 );
+
+    // let the value in local_v be 1.0 and use the get_
+    const std::vector<double> local_p ( VEC_T::get_size(local_d), 1.0 );
+
+    double ele_pres, ele_area;
+   
+    lassem_ptr -> get_pressure_area( &local_d[0], &local_p[0], element_s, sctrl_x,
+        sctrl_y, sctrl_z, quad_s, ele_pres, ele_area);
+
+    // only need area
+    val_area += ele_area;
+  }
+
+  delete [] sctrl_x; delete [] sctrl_y; delete [] sctrl_z;
+  sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
+
+  double sum_area = 0.0;
+
+  MPI_Allreduce(&val_area, &sum_area, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+
+  return sum_area;
+}
+
 double PGAssem_FSI::Assem_surface_ave_pressure(
     const PDNSolution * const &disp,
     const PDNSolution * const &pres,

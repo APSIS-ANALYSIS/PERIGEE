@@ -832,6 +832,19 @@ class IPGAssem
       return 0.0;
     }
 
+    // Assem_surface_area
+    virtual double Assem_surface_area(
+        const PDNSolution * const &disp,
+        IPLocAssem_2x2Block * const &lassem_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const ALocal_EBC * const &ebc_part,
+        const int &ebc_id )
+    {
+      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_area is not implemented. \n");
+      return 0.0;
+    }
+
 
     // Assem_surface_ave_pressure
     // Performs surface integral to calculated the pressure integrated
