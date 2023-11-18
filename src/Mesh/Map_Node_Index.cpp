@@ -48,11 +48,6 @@ Map_Node_Index::Map_Node_Index( const char * const &fileName )
   std::cout<<std::endl<<"=== Node index mapping loaded.\n";
 }
 
-Map_Node_Index::~Map_Node_Index()
-{
-  VEC_T::clean(old_2_new); VEC_T::clean(new_2_old);
-}
-
 void Map_Node_Index::print_info() const
 {
   std::cout<<std::endl;
