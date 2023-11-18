@@ -845,7 +845,6 @@ class IPGAssem
       return 0.0;
     }
 
-
     // Assem_surface_ave_pressure
     // Performs surface integral to calculated the pressure integrated
     // over the surface as well as the surface area. Return the

@@ -775,7 +775,7 @@ double PGAssem_FSI::Assem_surface_area(
     
     const std::vector<double> local_d = GetLocal( array_d, LSIEN, snLocBas, 3 );
 
-    // let the value in local_v be 1.0 and use the get_
+    // let the value in local_p be 1.0 and use the get_pressure_area
     const std::vector<double> local_p ( VEC_T::get_size(local_d), 1.0 );
 
     double ele_pres, ele_area;
