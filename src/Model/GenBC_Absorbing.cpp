@@ -59,18 +59,13 @@ GenBC_Absorbing::GenBC_Absorbing( const std::string &lpn_filename,
     }
 
     // calculate beta and outlet area
-    para_beta[ebc_id] = thickness * (solid_E / (1 - solid_nu)) / (radius * radius);
+    para_beta[ebc_id] = thickness * (solid_E / (1 - solid_nu * solid_nu)) / (radius * radius);
 
     initial_outlet_area[ebc_id] = MATH_T::PI * radius * radius;
   }
 
   // Finish reading the file and close it
   reader.close();
-
-  // Initialize P0 by setting it to be get_P at time = 0.0 (would be zero)
-  P0.resize( num_ebc );
-  for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
-    P0[ebc_id] = get_P( ebc_id, initial_outlet_area[ebc_id], 0.0, 0.0 );
 }
 
 void GenBC_Absorbing::print_info() const

@@ -49,15 +49,14 @@ class GenBC_Absorbing : public IGenBC
 
     virtual double get_P0( const int &ii ) const
     {
-      return P0[ii];
-    }
+      return 0.0;
+    }   // Banned
 
-    // Note: Here the input flowrate Q is replaced by current area!
     virtual void reset_initial_sol( const int &ii, const double &in_Area,
         const double &in_P_0, const double &curr_time, const bool &is_restart )
     {
-      P0[ii] = get_P(ii, in_Area, 0.0, curr_time);
-    }
+      return;
+    }   // Banned
 
   private:
     int num_ebc;
@@ -67,10 +66,6 @@ class GenBC_Absorbing : public IGenBC
 
     // Initial outlet area A0 of each outlet. length num_ebc
     std::vector<double> initial_outlet_area;
-
-    // Vectors storing the P0 on each outlet surface, or physically the pressure
-    // in the previous time step. length num_ebc
-    std::vector<double> P0;
 };
 
 #endif
