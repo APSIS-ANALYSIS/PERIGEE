@@ -417,6 +417,36 @@ void HDF5_Writer::write_Vector_3( const char * const &data_name, const Vector_3 
   }
 }
 
+void HDF5_Writer::write_Vector3_Vector( const hid_t &group_id, const char * const &data_name,
+    const std::vector<Vector_3> &value ) const
+{
+  // First convert the input vector to a double vector
+  const int vec_size = value.size();
+  std::vector<double> val( vec_size*3 );
+  for(int ii=0; ii<vec_size; ++ii)
+  {
+    val[ii*3+0] = value[ii].x();
+    val[ii*3+1] = value[ii].y();
+    val[ii*3+2] = value[ii].z();
+  }
+
+  hsize_t dims[2]; dims[0] = vec_size; dims[1] = 3;
+
+  if(dims[0] > 0)
+  {
+    hid_t dataspace = H5Screate_simple(2, dims, NULL);
+    hid_t dataset   = H5Dcreate( group_id, data_name, H5T_NATIVE_DOUBLE,
+	dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+    herr_t status = H5Dwrite( dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
+	H5P_DEFAULT, &val[0] );
+
+    check_error(status, "write_Vector3_Vector");
+
+    H5Dclose( dataset );
+    H5Sclose( dataspace );
+  }
+}
+
 void HDF5_Writer::write_Tensor2_3D( const hid_t &group_id, const char * const &data_name,
     const Tensor2_3D &value ) const
 {
