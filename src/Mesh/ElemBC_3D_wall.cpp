@@ -242,15 +242,6 @@ ElemBC_3D_wall::ElemBC_3D_wall(
     <<", "<<*std::max_element(dampingconst.begin(), dampingconst.end())<<"] \n";
 }
 
-ElemBC_3D_wall::~ElemBC_3D_wall()
-{
-  VEC_T::clean( radius    );
-  VEC_T::clean( thickness );
-  VEC_T::clean( youngsmod );
-  VEC_T::clean( springconst  );
-  VEC_T::clean( dampingconst );
-}
-
 void ElemBC_3D_wall::overwrite_from_vtk(
     const std::string &wallprop_vtk,
     const int &type,

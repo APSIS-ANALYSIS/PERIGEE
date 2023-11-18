@@ -29,13 +29,6 @@ APart_Node::APart_Node( const std::string &fbasename, const int &rank )
   delete h5r; H5Fclose( file_id );
 }
 
-APart_Node::~APart_Node()
-{
-  VEC_T::clean(local_to_global);
-  VEC_T::clean(node_ghost);
-  VEC_T::clean(node_loc);
-}
-
 void APart_Node::print_info() const
 {
   std::cout<<"cpu "<<cpu_rank<<" node info: \n";

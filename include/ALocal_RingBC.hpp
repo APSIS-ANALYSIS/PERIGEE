@@ -15,7 +15,7 @@ class ALocal_RingBC
   public:
     ALocal_RingBC( const std::string &fileBaseName, const int &cpu_rank );
 
-    virtual ~ALocal_RingBC();
+    virtual ~ALocal_RingBC() = default;
 
     // Get the type of ring nodal BC
     virtual int get_ringbc_type() const { return ringbc_type; }
