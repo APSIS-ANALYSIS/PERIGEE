@@ -624,7 +624,7 @@ int main(int argc, char *argv[])
 
     gloAssem_ptr->Assem_mass_residual( disp, velo, pres, locElem, locAssem_fluid_ptr,
         locAssem_solid_ptr, elementv, elements, quadv, quads, locIEN_v, locIEN_p, 
-        fNode, locnbc_v, locnbc_p, locebc_v, ps_data );
+        fNode, locnbc_v, locnbc_p, locebc_v, ps_data, tp_data );
 
     Vec proj_vp, proj_v, proj_p;
     VecDuplicate( gloAssem_ptr->G, &proj_vp );
