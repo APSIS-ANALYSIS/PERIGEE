@@ -28,7 +28,7 @@ GenBC_Absorbing::GenBC_Absorbing( const std::string &lpn_filename,
 
   if( bc_type.compare("Absorbing") == 0 || bc_type.compare("ABSORBING") == 0 || bc_type.compare("absorbing") == 0)
   {
-    para_beta.resize(num_ebc); initial_outlet_area.resize(num_ebc);
+    para_beta.resize(num_ebc); initial_outlet_area.resize(num_ebc); P0.resize(num_ebc);
   }
   else
     SYS_T::print_fatal( "GenBC_Absorbing Error: BC type in %s should be Absorbing.\n", lpn_filename.c_str() );
@@ -48,10 +48,10 @@ GenBC_Absorbing::GenBC_Absorbing( const std::string &lpn_filename,
         SYS_T::print_fatal_if( face_id != ebc_id, "GenBC_Pressure Error: ebc in %s should be listed in ascending order.\n", lpn_filename.c_str() );
 
         sstrm >> radius;
-        SYS_T::print_fatal_if(radius <=0, "GenBC_Absorbing Error: Radius of ebc_id %d should be greater than 0.\n", ebc_id);
+        SYS_T::print_fatal_if(radius <= 0, "GenBC_Absorbing Error: Radius of ebc_id %d should be greater than 0.\n", ebc_id);
 
         sstrm >> thickness;
-        SYS_T::print_fatal_if(radius <=0, "GenBC_Absorbing Error: Thickness of ebc_id %d should be greater than 0.\n", ebc_id);
+        SYS_T::print_fatal_if(thickness <= 0, "GenBC_Absorbing Error: Thickness of ebc_id %d should be greater than 0.\n", ebc_id);
 
         sstrm.clear();
         break;
