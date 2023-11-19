@@ -478,10 +478,23 @@ int main( int argc, char * argv[] )
   // that in the velocity mesh.
   NBC_list_p[0] = new NodalBC_3D_FSI( geo_f_file, nFunc_p, fsiBC_type );
 
-  for( int ii=0; ii<3; ++ii )
-    NBC_list_v[ii] = new NodalBC_3D_FSI( geo_f_file, geo_s_file, sur_f_file_wall, 
-        sur_s_file_wall, sur_f_file_in, sur_f_file_out, sur_s_file_in, sur_s_file_out, 
-        nFunc_v, ii, ringBC_type, fsiBC_type );
+  // for( int ii=0; ii<3; ++ii )
+  //   NBC_list_v[ii] = new NodalBC_3D_FSI( geo_f_file, geo_s_file, sur_f_file_wall, 
+  //       sur_s_file_wall, sur_f_file_in, sur_f_file_out, sur_s_file_in, sur_s_file_out, 
+  //       nFunc_v, ii, ringBC_type, fsiBC_type );
+  
+  // for coronary artery benckmark
+  NBC_list_v[1] = new NodalBC_3D_FSI( geo_f_file, geo_s_file, sur_f_file_wall, 
+      sur_s_file_wall, sur_f_file_in, sur_f_file_out, { }, { }, 
+      nFunc_v, 1, ringBC_type, fsiBC_type );
+
+  NBC_list_v[2] = new NodalBC_3D_FSI( geo_f_file, geo_s_file, sur_f_file_wall, 
+      sur_s_file_wall, sur_f_file_in, sur_f_file_out, sur_s_file_in, sur_s_file_out, 
+      nFunc_v, 2, ringBC_type, fsiBC_type );
+
+  NBC_list_v[3] = new NodalBC_3D_FSI( geo_f_file, geo_s_file, sur_f_file_wall, 
+      sur_s_file_wall, sur_f_file_in, sur_f_file_out, { }, { }, 
+      nFunc_v, 3, ringBC_type, fsiBC_type );
 
   // Mesh solver NodalBC
   std::cout<<"2. Nodal boundary condition for the mesh motion: \n";

@@ -57,6 +57,9 @@ class NodalBC_3D_FSI : public INodalBC
     NodalBC_3D_FSI() {};
 
     std::vector<unsigned int> get_vtk_nodal_id( const std::vector<std::string> &vtk_file_list_name ) const;
+
+    // For coronary artery benchmark, assume ringBC_type = 0
+    std::vector<unsigned int> CA_benchmark_BC( const std::vector<std::string> &vtk_file_list_name ) const;
 };
 
 #endif

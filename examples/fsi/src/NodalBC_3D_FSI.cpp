@@ -26,8 +26,11 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
         if(ringBC_type == 0)
         {
           dir_nodes = get_vtk_nodal_id( fluid_inlet_files );
-          VEC_T::insert_end( dir_nodes, get_vtk_nodal_id( solid_inlet_files ) );
-          VEC_T::insert_end( dir_nodes, get_vtk_nodal_id( solid_outlet_files ) );
+          // VEC_T::insert_end( dir_nodes, get_vtk_nodal_id( solid_inlet_files ) );
+          // VEC_T::insert_end( dir_nodes, get_vtk_nodal_id( solid_outlet_files ) );
+          // For coronary artery benchmark:
+          VEC_T::insert_end( dir_nodes, CA_benchmark_BC( solid_inlet_files ) );
+          VEC_T::insert_end( dir_nodes, CA_benchmark_BC( solid_outlet_files ) );
           VEC_T::sort_unique_resize( dir_nodes );
 
           std::cout<<"===> NodalBC_3D_FSI for deformable wall (fsiBC_type = 0) with cap surface \n";
@@ -133,6 +136,41 @@ std::vector<unsigned int> NodalBC_3D_FSI::get_vtk_nodal_id( const std::vector<st
     SYS_T::file_check( vtkfile );
 
     VEC_T::insert_end( output, VEC_T::cast_to_unsigned_int( VTK_T::read_int_PointData( vtkfile, "GlobalNodeID" ) ) );
+  }
+
+  return output;
+}
+
+std::vector<unsigned int> NodalBC_3D_FSI::CA_benchmark_BC( const std::vector<std::string> &vtkfileList ) const
+{
+  std::vector<unsigned int> output {};
+
+  for( const auto &vtkfile : vtkfileList )
+  {
+    SYS_T::file_check( vtkfile );
+    std::vector<int> node_y0 {};
+
+    // read all node id
+    const std::vector<int> node_id = VTK_T::read_int_PointData( vtkfile, "GlobalNodeID" );
+
+    // read all node xyz
+    int num_node, num_cell;
+    std::vector<int> ien;
+    std::vector<double> node_xyz {};
+
+    VTK_T::read_grid( vtkfile, num_node, num_cell, node_xyz, ien );
+
+    // select the node that y=0
+    for(int ii{0}; ii < num_node; ++ii)
+    {
+      const double y_value = node_xyz[3*ii + 1];
+
+      if(std::abs(y_value) < 1.0e-15)
+        node_y0.push_back(node_id[ii]);
+    }
+
+    // add them to output
+    VEC_T::insert_end( output, VEC_T::cast_to_unsigned_int( node_y0 ) );
   }
 
   return output;
