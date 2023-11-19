@@ -19,6 +19,7 @@
 #include "FEAElement_Hex8.hpp"
 #include "CVFlowRate_Unsteady.hpp"
 #include "CVFlowRate_Linear2Steady.hpp"
+#include "CVFlowRate_Cosine2Steady.hpp"
 #include "CVFlowRate_Steady.hpp"
 #include "GenBC_Resistance.hpp"
 #include "GenBC_RCR.hpp"
@@ -356,6 +357,7 @@ int main(int argc, char *argv[])
     inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file );
   else if( inflow_type == 1 )
     inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_file );
+    // inflow_rate_ptr = new CVFlowRate_Cosine2Steady( inflow_thd_time, inflow_file );
   else if( inflow_type == 2 )
     inflow_rate_ptr = new CVFlowRate_Steady( inflow_file );
   else
@@ -541,7 +543,7 @@ int main(int argc, char *argv[])
   else if( GENBC_T::get_genbc_file_type( lpn_file ) == 5  )
     gbc = new GenBC_Pressure( lpn_file, initial_time );
   else if ( GENBC_T::get_genbc_file_type( lpn_file ) == 6)
-    gbc = new GenBC_Absorbing( lpn_file, solid_E, solid_nu );
+    gbc = new GenBC_Absorbing( lpn_file, 1.2e6, 0.49 );
   else
     SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
 

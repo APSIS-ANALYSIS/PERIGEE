@@ -363,7 +363,7 @@ void PGAssem_FSI::Assem_Residual(
   row_id_v = nullptr; row_id_p = nullptr;
 
   // Backflow stabilization
-  BackFlow_G( dot_disp, disp, velo, lassem_f_ptr, elements, quad_s, nbc_v, ebc_part );
+  // BackFlow_G( dot_disp, disp, velo, lassem_f_ptr, elements, quad_s, nbc_v, ebc_part );
 
   // Resistance BC for G
   NatBC_Resis_G( curr_time, dt, disp_np1, dot_velo_np1, velo_np1, lassem_f_ptr, elements, quad_s,
@@ -489,7 +489,7 @@ void PGAssem_FSI::Assem_Tangent_Residual(
   row_id_v = nullptr; row_id_p = nullptr;
 
   // Backflow stabilization
-  BackFlow_KG( dt, dot_disp, disp, velo, lassem_f_ptr, elements, quad_s, nbc_v, ebc_part );
+  // BackFlow_KG( dt, dot_disp, disp, velo, lassem_f_ptr, elements, quad_s, nbc_v, ebc_part );
 
   // Resistance BC for G
   NatBC_Resis_KG( curr_time, dt, disp_np1, dot_velo_np1, velo_np1, lassem_f_ptr, elements, quad_s,
