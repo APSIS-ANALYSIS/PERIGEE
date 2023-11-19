@@ -43,7 +43,7 @@ class GenBC_Absorbing : public IGenBC
       return 0.0;
     }  // Banned
 
-    virtual double get_P( const int &ii, const double &dot_Q, const double &Q,
+    virtual double get_P( const int &ii, const double &dot_Q, const double &in_Area,
         const double &time) const;
 
     virtual double get_P0( const int &ii ) const
@@ -55,7 +55,7 @@ class GenBC_Absorbing : public IGenBC
     virtual void reset_initial_sol( const int &ii, const double &in_Area,
         const double &in_P_0, const double &curr_time, const bool &is_restart )
     {
-      current_outlet_area[ii] = in_Area;
+      P0[ii] = get_P(ii, 0.0, in_Area, 0.0);
     }
 
   private:
@@ -67,8 +67,8 @@ class GenBC_Absorbing : public IGenBC
     // Initial outlet area A0 of each outlet. length num_ebc
     std::vector<double> initial_outlet_area;
 
-    // Current outlet area A in each nonlinear iteration step. length num_ebc
-    std::vector<double> current_outlet_area;
+    // P0. length num_ebc
+    std::vector<double> P0;
 };
 
 #endif

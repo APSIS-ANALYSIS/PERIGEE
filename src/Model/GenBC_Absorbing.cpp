@@ -63,7 +63,7 @@ GenBC_Absorbing::GenBC_Absorbing( const std::string &lpn_filename,
 
     initial_outlet_area[ebc_id] = MATH_T::PI * radius * radius;
 
-    current_outlet_area[ebc_id] = initial_outlet_area[ebc_id];
+    P0[ebc_id] = 0;
   }
 
   // Finish reading the file and close it
@@ -81,10 +81,10 @@ void GenBC_Absorbing::print_info() const
   }
 }
 
-double GenBC_Absorbing::get_P( const int &ii, const double &dot_Q, const double &Q,
+double GenBC_Absorbing::get_P( const int &ii, const double &dot_Q, const double &in_Area,
     const double &time) const
 {
-  return para_beta[ii] * (std::sqrt(current_outlet_area[ii]) - std::sqrt(initial_outlet_area[ii])) / MATH_T::PI;
+  return para_beta[ii] * (std::sqrt(in_Area) - std::sqrt(initial_outlet_area[ii])) / MATH_T::PI;
 }
 
 // EOF

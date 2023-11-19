@@ -913,17 +913,23 @@ void PGAssem_FSI::NatBC_Resis_G( const double &curr_time, const double &dt,
 
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
-    // Calculate dot flow rate for face with ebc_id
-    const double dot_flrate = Assem_surface_flowrate( disp, dot_velo, lassem_f_ptr,
-        element_s, quad_s, ebc_part, ebc_id );
+    // // Calculate dot flow rate for face with ebc_id
+    // const double dot_flrate = Assem_surface_flowrate( disp, dot_velo, lassem_f_ptr,
+    //     element_s, quad_s, ebc_part, ebc_id );
 
-    // Calculate flow rate for face with ebc_id
-    const double flrate = Assem_surface_flowrate( disp, velo, lassem_f_ptr,
-        element_s, quad_s, ebc_part, ebc_id );
+    // // Calculate flow rate for face with ebc_id
+    // const double flrate = Assem_surface_flowrate( disp, velo, lassem_f_ptr,
+    //     element_s, quad_s, ebc_part, ebc_id );
+
+    // for absorbing BC
+    const double current_area = Assem_surface_area( disp, lassem_f_ptr, element_s,
+        quad_s, ebc_part, ebc_id);
 
     // Get the pressure value on the outlet surfaces
     const double P_n   = gbc -> get_P0( ebc_id );
-    const double P_np1 = gbc -> get_P( ebc_id, dot_flrate, flrate, curr_time + dt );
+    // const double P_np1 = gbc -> get_P( ebc_id, dot_flrate, flrate, curr_time + dt );
+    // for absorbing BC
+    const double P_np1 = gbc -> get_P( ebc_id, 0.0, current_area, 0.0 );
 
     // P_n+alpha_f
     const double val = P_n + lassem_f_ptr->get_model_para_1() * (P_np1 - P_n);
