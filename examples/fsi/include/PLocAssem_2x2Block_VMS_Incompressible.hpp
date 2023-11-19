@@ -85,7 +85,10 @@ class PLocAssem_2x2Block_VMS_Incompressible : public IPLocAssem_2x2Block
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const double * const &qua_prestress,
-        const IQuadPts * const &quad );
+        const IQuadPts * const &quad,
+       	const std::vector<Vector_3> &eleBasis_r,
+        const std::vector<Vector_3> &eleBasis_l,
+        const std::vector<Vector_3> &eleBasis_c );
 
     virtual void Assem_Residual_EBC(
         const int &ebc_id,
