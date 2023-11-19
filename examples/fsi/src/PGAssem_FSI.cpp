@@ -1017,7 +1017,7 @@ void PGAssem_FSI::NatBC_Resis_KG( const double &curr_time, const double &dt,
     // P_n+alpha_f
     const double resis_val = P_n + a_f * (P_np1 - P_n);
 
-    const double coef = resis_val;
+    const double coef = dd_dv * resis_val;
 
     // // Get m := dP/dQ
     // const double m_val = gbc -> get_m( ebc_id, dot_flrate, flrate );
