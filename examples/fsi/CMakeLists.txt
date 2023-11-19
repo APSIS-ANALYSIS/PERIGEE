@@ -104,6 +104,8 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Element/FEAElement_Hex8.cpp
   ${perigee_source}/Model/MaterialModel_NeoHookean_M94_Mixed.cpp
   ${perigee_source}/Model/MaterialModel_NeoHookean_Incompressible_Mixed.cpp
+  ${perigee_source}/Model/MaterialModel_GOH06_Incompressible_Mixed.cpp
+  ${perigee_source}/Model/MaterialModel_GOH06_ST91_Mixed.cpp
   ${perigee_source}/Model/Tissue_prestress.cpp
   ${perigee_source}/Model/GenBC_RCR.cpp
   ${perigee_source}/Model/GenBC_Resistance.cpp
@@ -179,7 +181,7 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 ADD_EXECUTABLE( preprocess_fsi preprocess_fsi_tissue.cpp)
 ADD_EXECUTABLE( wall_ps3d wall_ps_driver.cpp)
-ADD_EXECUTABLE( fsi3d fsi_driver.cpp)
+ADD_EXECUTABLE( fsi3d fsi_driver_tissue.cpp)
 ADD_EXECUTABLE( prepostproc prepost.cpp)
 ADD_EXECUTABLE( vis_fsi vis_driver.cpp )
 ADD_EXECUTABLE( vis_fluid vis_fluid.cpp )
