@@ -996,29 +996,37 @@ void PGAssem_FSI::NatBC_Resis_KG( const double &curr_time, const double &dt,
 
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
-    // Calculate dot flow rate for face with ebc_id
-    const double dot_flrate = Assem_surface_flowrate( disp, dot_velo, lassem_f_ptr,
-        element_s, quad_s, ebc_part, ebc_id );
+    // // Calculate dot flow rate for face with ebc_id
+    // const double dot_flrate = Assem_surface_flowrate( disp, dot_velo, lassem_f_ptr,
+    //     element_s, quad_s, ebc_part, ebc_id );
 
-    // Calculate flow rate for face with ebc_id
-    const double flrate = Assem_surface_flowrate( disp, velo, lassem_f_ptr,
-        element_s, quad_s, ebc_part, ebc_id );
+    // // Calculate flow rate for face with ebc_id
+    // const double flrate = Assem_surface_flowrate( disp, velo, lassem_f_ptr,
+    //     element_s, quad_s, ebc_part, ebc_id );
+
+    // for absorbing BC
+    const double current_area = Assem_surface_area( disp, lassem_f_ptr, element_s,
+        quad_s, ebc_part, ebc_id);
 
     // Get the pressure value on the outlet surfaces
     const double P_n   = gbc -> get_P0( ebc_id );
-    const double P_np1 = gbc -> get_P( ebc_id, dot_flrate, flrate, curr_time + dt );
+    // const double P_np1 = gbc -> get_P( ebc_id, dot_flrate, flrate, curr_time + dt );
+    // for absorbing BC
+    const double P_np1 = gbc -> get_P( ebc_id, 0.0, current_area, 0.0 );
 
     // P_n+alpha_f
     const double resis_val = P_n + a_f * (P_np1 - P_n);
 
-    // Get m := dP/dQ
-    const double m_val = gbc -> get_m( ebc_id, dot_flrate, flrate );
+    const double coef = resis_val;
 
-    // Get n := dP/d(dot_Q)
-    const double n_val = gbc -> get_n( ebc_id, dot_flrate, flrate );
+    // // Get m := dP/dQ
+    // const double m_val = gbc -> get_m( ebc_id, dot_flrate, flrate );
 
-    // Define alpha_f x n + alpha_f x gamma x dt x m
-    const double coef = a_f * n_val + dd_dv * m_val;
+    // // Get n := dP/d(dot_Q)
+    // const double n_val = gbc -> get_n( ebc_id, dot_flrate, flrate );
+
+    // // Define alpha_f x n + alpha_f x gamma x dt x m
+    // const double coef = a_f * n_val + dd_dv * m_val;
 
     const int num_face_nodes = ebc_part -> get_num_face_nodes(ebc_id);
 
