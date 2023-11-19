@@ -62,6 +62,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Global_Part_Reload.cpp
   ${perigee_source}/Mesh/Part_FEM.cpp
   ${perigee_source}/Mesh/Part_FEM_FSI.cpp
+  ${perigee_source}/Mesh/Part_FEM_FSI_Tissue.cpp
   ${perigee_source}/Element/FE_Tools.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
@@ -176,7 +177,7 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 # BUILD THE MAIN DRIVERS
 # ===================================================================
-ADD_EXECUTABLE( preprocess_fsi preprocess_fsi.cpp)
+ADD_EXECUTABLE( preprocess_fsi preprocess_fsi_tissue.cpp)
 ADD_EXECUTABLE( wall_ps3d wall_ps_driver.cpp)
 ADD_EXECUTABLE( fsi3d fsi_driver.cpp)
 ADD_EXECUTABLE( prepostproc prepost.cpp)
