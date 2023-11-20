@@ -208,6 +208,7 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Residual(
     const double invFDV_t = invF.MatTContraction(DVelo); // invF_Ii V_i,I
 
     Tensor2_3D P_iso, S_iso;
+    matmodel->update_fibre_dir(basis_r, basis_l, basis_c);
     matmodel->get_PK(F, P_iso, S_iso);
 
     // ------------------------------------------------------------------------
@@ -386,6 +387,7 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Tangent_Residual(
 
     Tensor2_3D P_iso, S_iso;
     Tensor4_3D AA_iso;
+    matmodel->update_fibre_dir(basis_r, basis_l, basis_c);
     matmodel->get_PK_FFStiffness(F, P_iso, S_iso, AA_iso);
 
     // ------------------------------------------------------------------------
@@ -662,6 +664,7 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Mass_Residual(
     const double invFDV_t = invF.MatTContraction(DVelo);
 
     Tensor2_3D P_iso, S_iso;
+    matmodel->update_fibre_dir(basis_r, basis_l, basis_c);
     matmodel->get_PK(F, P_iso, S_iso);
 
     // ------------------------------------------------------------------------
