@@ -14,7 +14,7 @@
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
 #include "Global_Part_Reload.hpp"
-#include "Part_FEM_FSI.hpp"
+#include "Part_FEM_FSI_Tissue.hpp"
 #include "NodalBC.hpp"
 #include "NodalBC_3D_FSI.hpp"
 #include "NodalBC_3D_inflow.hpp"
@@ -394,6 +394,22 @@ int main( int argc, char * argv[] )
   std::cout<<"Solid domain: "<<v_node_s.size()<<" nodes.\n";
   std::cout<<"Fluid-Solid interface: "<<nFunc_interface<<" nodes.\n";
 
+  // --------------------------------------------------------------------------
+  // Read the geometry file for the solid domain, generate the list of direction
+  // basis vectors of the nodes. The list includes radial, longitudinal, and
+  // circumferential basis, denoting by r, l, and c, respectively.
+  std::vector<int> solid_node_id = VTK_T::read_int_PointData(geo_s_file, "GlobalNodeID");
+  std::vector<Vector_3> basis_r = VTK_T::read_Vector3_PointData(geo_s_file, "radial_basis");
+  std::vector<Vector_3> basis_l = VTK_T::read_Vector3_PointData(geo_s_file, "longitudinal_basis");
+  std::vector<Vector_3> basis_c = VTK_T::read_Vector3_PointData(geo_s_file, "circumferential_basis");
+
+  SYS_T::print_fatal_if(v_node_s != solid_node_id, "ERROR: GlobalNodeID for solid geometry file is not equal to the whole FSI domain.");
+  SYS_T::print_fatal_if(solid_node_id.size() != basis_r.size(), "ERROR: radial_basis is not matched.");
+  SYS_T::print_fatal_if(solid_node_id.size() != basis_l.size(), "ERROR: longitudinal_basis is not matched.");
+  SYS_T::print_fatal_if(solid_node_id.size() != basis_c.size(), "ERROR: circumferential_basis is not matched.");
+  std::cout<<"=== Direction basis vectors generated.\n";
+  // --------------------------------------------------------------------------
+
   std::vector<IIEN const *> ienlist;
   ienlist.push_back(IEN_p); ienlist.push_back(IEN_v);
 
@@ -566,9 +582,9 @@ int main( int argc, char * argv[] )
     
     part_p -> write( part_file_p );
 
-    IPart * part_v = new Part_FEM_FSI( mesh_v, global_part, mnindex_v, IEN_v,
-        ctrlPts, phy_tag, v_node_f, v_node_s, proc_rank, cpu_size, elemType, 
-        start_idx_v[proc_rank], { 1, dof_fields[1], true, "velocity"} );
+    IPart * part_v = new Part_FEM_FSI_Tissue( mesh_v, global_part, mnindex_v, IEN_v,
+        ctrlPts, phy_tag, v_node_f, v_node_s, basis_r, basis_l, basis_c,
+	proc_rank, cpu_size, elemType, start_idx_v[proc_rank], { 1, dof_fields[1], true, "velocity"} );
 
     part_v -> print_part_loadbalance_edgecut();
 
