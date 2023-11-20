@@ -806,7 +806,7 @@ int main(int argc, char *argv[])
   delete GMIptr; delete PartBasic; delete locElem; delete fNode; delete pNode_v; delete pNode_p;
   delete locinfnbc; delete locnbc_v; delete locnbc_p; delete mesh_locnbc; 
   delete locebc_v; delete locebc_p; delete mesh_locebc; 
-  delete locIEN_v; delete locIEN_p; delete ps_data;
+  delete locIEN_v; delete locIEN_p; delete ps_data; delete tp_data;
   PetscFinalize();
   return EXIT_SUCCESS;
 }
