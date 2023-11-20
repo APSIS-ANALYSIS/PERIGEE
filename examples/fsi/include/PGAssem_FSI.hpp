@@ -93,7 +93,8 @@ class PGAssem_FSI : public IPGAssem
         const ALocal_NBC * const &nbc_p,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
-        const Tissue_prestress * const &ps_ptr );
+        const Tissue_prestress * const &ps_ptr,
+        const Tissue_property * const &tp_ptr );
 
     virtual void Assem_Tangent_Residual(
         const double &curr_time, const double &dt,
@@ -120,7 +121,8 @@ class PGAssem_FSI : public IPGAssem
         const ALocal_NBC * const &nbc_p,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
-        const Tissue_prestress * const &ps_ptr );
+        const Tissue_prestress * const &ps_ptr,
+        const Tissue_property * const &tp_ptr );
 
     // Assembly routine for the surface integrals for flow rates
     // and averaged pressure
