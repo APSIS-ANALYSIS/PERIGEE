@@ -287,4 +287,20 @@ double MaterialModel_GOH06_ST91_Mixed::get_dbeta_dp( const double &p ) const
   return -pk / ( kappa*kappa*std::pow(pk*pk+1.0, 1.5) );
 }
 
+void MaterialModel_GOH06_ST91_Mixed::update_fibre_dir( const Vector_3 &basis_r,
+  const Vector_3 &basis_l, const Vector_3 &basis_c )
+{
+  Vector_3 temp_a1;
+  temp_a1 += a1(0) * basis_r;
+  temp_a1 += a1(1) * basis_c;
+  temp_a1 += a1(2) * basis_l;
+  a1 = temp_a1;
+
+  Vector_3 temp_a2;
+  temp_a2 += a2(0) * basis_r;
+  temp_a2 += a2(1) * basis_c;
+  temp_a2 += a2(2) * basis_l;
+  a2 = temp_a2;
+}
+
 // EOF
