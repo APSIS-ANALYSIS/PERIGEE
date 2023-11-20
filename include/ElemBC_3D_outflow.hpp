@@ -29,7 +29,7 @@ class ElemBC_3D_outflow : public ElemBC_3D
        const std::vector< Vector_3 > &outlet_normal_vec,
        const int &elemtype );
 
-    virtual ~ElemBC_3D_outflow();
+    virtual ~ElemBC_3D_outflow() = default;
 
     virtual void print_info() const;
 

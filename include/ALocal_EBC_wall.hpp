@@ -21,7 +21,7 @@ class ALocal_EBC_wall : public ALocal_EBC
         const std::string &gname = "ebc_wall",
         const std::string &in_ps_filebasename = "./prestress/prestress" );
 
-    virtual ~ALocal_EBC_wall();
+    virtual ~ALocal_EBC_wall() = default;
 
     virtual void print_info() const;
 

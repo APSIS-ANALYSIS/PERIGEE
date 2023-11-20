@@ -22,7 +22,7 @@ class ALocal_EBC
     ALocal_EBC( const std::string &fileBaseName, const int &cpu_rank, 
         const std::string &gname="/ebc" );
 
-    virtual ~ALocal_EBC();
+    virtual ~ALocal_EBC() = default;
 
     virtual void print_info() const
     {

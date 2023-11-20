@@ -16,7 +16,7 @@ class Mesh_Tet : public IMesh
   public:
     Mesh_Tet(const int &in_nFunc, const int &in_nElem, const int &in_deg);
 
-    virtual ~Mesh_Tet();
+    virtual ~Mesh_Tet() = default;
 
     virtual void print_info() const;
 

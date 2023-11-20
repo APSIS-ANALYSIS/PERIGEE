@@ -81,7 +81,11 @@ int main( int argc, char * argv[] )
   bool is_loadYaml = true;
   std::string yaml_file("./options_pre.yml");
 
+#if PETSC_VERSION_LT(3,19,0)
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+#else
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULLPTR);
+#endif
 
   SYS_T::GetOptionBool(  "-is_loadYaml",       is_loadYaml);
   SYS_T::GetOptionString("-yaml_file",         yaml_file);

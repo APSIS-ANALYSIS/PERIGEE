@@ -16,7 +16,7 @@ class PDNSolution_Transport : public PDNSolution
         const int &type, const bool &isprint = true,
         const std::string &in_name = "solution_transport" );
 
-    virtual ~PDNSolution_Transport();
+    virtual ~PDNSolution_Transport() = default;
 
   private:
     const std::string sol_name;
@@ -24,7 +24,6 @@ class PDNSolution_Transport : public PDNSolution
 
     // case 0 : generate a full zero solution
     void Init_zero( const APart_Node * const &pNode_ptr );
-
 };
 
 #endif

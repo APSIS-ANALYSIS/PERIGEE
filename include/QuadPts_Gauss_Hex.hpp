@@ -27,7 +27,7 @@ class QuadPts_Gauss_Hex : public IQuadPts
         const double &s_min = 0.0, const double &s_max = 1.0,
         const double &t_min = 0.0, const double &t_max = 1.0 );
 
-    virtual ~QuadPts_Gauss_Hex();
+    virtual ~QuadPts_Gauss_Hex() = default;
 
     virtual void print_info() const;
 

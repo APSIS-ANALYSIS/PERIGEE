@@ -25,7 +25,7 @@ class AGlobal_Mesh_Info_FEM_3D : public IAGlobal_Mesh_Info
     AGlobal_Mesh_Info_FEM_3D( const std::string &fileBaseName,
         const int &cpu_rank, const int &num_enrich_node );
     
-    virtual ~AGlobal_Mesh_Info_FEM_3D();
+    virtual ~AGlobal_Mesh_Info_FEM_3D() = default;
 
     // Get the polynomial degree for the discretization method. For
     // unstructured mesh, the three function should return the same

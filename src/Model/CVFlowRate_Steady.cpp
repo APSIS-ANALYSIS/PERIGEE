@@ -155,10 +155,6 @@ CVFlowRate_Steady::CVFlowRate_Steady( const int &in_num_nbc, const double &in_fl
   MPI_Barrier(PETSC_COMM_WORLD);
 }
 
-CVFlowRate_Steady::~CVFlowRate_Steady()
-{
-}
-
 double CVFlowRate_Steady::get_flow_rate(const int &nbc_id , const double &time) const
 {
   return flowrate[nbc_id];

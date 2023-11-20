@@ -19,9 +19,6 @@ PDNSolution_Transport:: PDNSolution_Transport(
   }
 }
 
-PDNSolution_Transport::~PDNSolution_Transport()
-{}
-
 void PDNSolution_Transport::Init_zero( const APart_Node * const &pNode )
 {
   const double value[1] = { 0.0 };

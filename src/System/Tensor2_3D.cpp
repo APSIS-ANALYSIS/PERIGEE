@@ -30,9 +30,6 @@ Tensor2_3D::Tensor2_3D(
   mat[6] = vec1(2); mat[7] = vec2(2); mat[8] = vec3(2);
 }
 
-Tensor2_3D::~Tensor2_3D()
-{}
-
 bool Tensor2_3D::is_identical( const Tensor2_3D &source, const double &tol ) const
 {
   for(int ii=0; ii<9; ++ii) 

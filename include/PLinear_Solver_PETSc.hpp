@@ -89,7 +89,11 @@ class PLinear_Solver_PETSc
     int get_ksp_maxits() const
     { 
       int mits; 
+#if PETSC_VERSION_LT(3,19,0)
       KSPGetTolerances(ksp, PETSC_NULL, PETSC_NULL, PETSC_NULL, &mits);
+#else
+      KSPGetTolerances(ksp, PETSC_NULLPTR, PETSC_NULLPTR, PETSC_NULLPTR, &mits);
+#endif
       return mits;
     }
 

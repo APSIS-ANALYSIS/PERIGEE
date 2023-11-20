@@ -158,10 +158,6 @@ CVFlowRate_Linear2Steady::CVFlowRate_Linear2Steady( const double &in_thred_time,
   MPI_Barrier(PETSC_COMM_WORLD);
 }
 
-
-CVFlowRate_Linear2Steady::~CVFlowRate_Linear2Steady()
-{}
-
 double CVFlowRate_Linear2Steady::get_flow_rate( const int &nbc_id,
     const double &time ) const
 {

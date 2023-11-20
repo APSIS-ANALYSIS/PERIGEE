@@ -18,9 +18,6 @@ Tensor2_2D::Tensor2_2D( const double &a11, const double &a12,
   mat[2] = a21; mat[3] = a22;
 }
 
-Tensor2_2D::~Tensor2_2D()
-{}
-
 void Tensor2_2D::copy( const Tensor2_2D &source )
 {
   mat[0] = source(0);

@@ -22,11 +22,16 @@
 class QuadPts_vis_tet10 : public IQuadPts
 {
   public:
-    QuadPts_vis_tet10();
+    QuadPts_vis_tet10() = default;
 
-    virtual ~QuadPts_vis_tet10();
+    virtual ~QuadPts_vis_tet10() = default;
 
-    virtual void print_info() const;
+    virtual void print_info() const
+    {
+      SYS_T::commPrint("\n===== Visualization Points for Tet10 ===== \n");
+      IQuadPts::print_info();
+      SYS_T::commPrint("========================================= \n");
+    }
 
     virtual int get_dim() const {return 4;}
 
@@ -35,11 +40,19 @@ class QuadPts_vis_tet10 : public IQuadPts
     virtual double get_qp(unsigned int ii, unsigned int comp) const
     {return qp[4*ii+comp];}
 
-    virtual double get_qw(unsigned int ii) const {return qw[ii];}
+    virtual double get_qw(unsigned int ii) const {return 0.1/6.0;}
 
   private:
-    double qp[40];
-    double qw[10];
+    const double qp[40] { 0.0, 0.0, 0.0, 1.0,
+      1.0, 0.0, 0.0, 0.0,
+      0.0, 1.0, 0.0, 0.0,
+      0.0, 0.0, 1.0, 0.0,
+      0.5, 0.0, 0.0, 0.5,
+      0.5, 0.5, 0.0, 0.0,
+      0.0, 0.5, 0.0, 0.5,
+      0.0, 0.0, 0.5, 0.5,
+      0.0, 0.5, 0.5, 0.0,
+      0.5, 0.0, 0.5, 0.0 };
 };
 
 #endif

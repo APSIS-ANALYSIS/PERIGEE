@@ -15,7 +15,7 @@ class QuadPts_vis : public IQuadPts
 {
   public:
     QuadPts_vis( const int &input_num_pts );
-    virtual ~QuadPts_vis();
+    virtual ~QuadPts_vis() = default;
 
     virtual void print_info() const;
     virtual int get_dim() const {return 1;}

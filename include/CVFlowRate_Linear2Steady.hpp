@@ -29,7 +29,7 @@ class CVFlowRate_Linear2Steady : public ICVFlowRate
     CVFlowRate_Linear2Steady( const double &in_thred_time, 
         const std::string &filename );
 
-    virtual ~CVFlowRate_Linear2Steady();
+    virtual ~CVFlowRate_Linear2Steady() = default;
 
     virtual double get_flow_rate( const int &nbc_id, const double &time ) const;
 

@@ -69,7 +69,7 @@ class TimeMethod_GenAlpha
     // --------------------------------------------------------------
     TimeMethod_GenAlpha( const double &input_spectral, const bool &is_2ndorder );   
 
-    ~TimeMethod_GenAlpha();
+    ~TimeMethod_GenAlpha() = default;
 
     // Functions give access to the method parameter
     double get_alpha_m() const {return alpha_m;}

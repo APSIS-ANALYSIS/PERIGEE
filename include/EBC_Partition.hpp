@@ -22,7 +22,7 @@ class EBC_Partition
         const Map_Node_Index * const &mnindex,
         const ElemBC * const &ebc );
 
-    virtual ~EBC_Partition();
+    virtual ~EBC_Partition() = default;
 
     // Write the data to hdf5 file in group /GroupName
     virtual void write_hdf5( const std::string &FileName,

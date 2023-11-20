@@ -30,8 +30,6 @@
 #define PERIGEE_OMP_SINGLE
 #endif
 
-#define PETSC_SILENCE_DEPRECATION_WARNINGS_3_19_0
-
 // ================================================================
 // The following are used for backward compatibility like PetscDefined(USE_DEBUG).
 // ================================================================
@@ -498,8 +496,10 @@ namespace SYS_T
   {
 #if PETSC_VERSION_LT(3,7,0)
     PetscOptionsGetReal(PETSC_NULL, name, &outdata, PETSC_NULL);
-#else
+#elif PETSC_VERSION_LT(3,19,0)
     PetscOptionsGetReal(PETSC_NULL, PETSC_NULL, name, &outdata, PETSC_NULL);
+#else
+    PetscOptionsGetReal(PETSC_NULLPTR, PETSC_NULLPTR, name, &outdata, PETSC_NULLPTR);
 #endif
   }
 
@@ -507,8 +507,10 @@ namespace SYS_T
   {
 #if PETSC_VERSION_LT(3,7,0)
     PetscOptionsGetInt(PETSC_NULL, name, &outdata, PETSC_NULL);
-#else
+#elif PETSC_VERSION_LT(3,19,0)
     PetscOptionsGetInt(PETSC_NULL, PETSC_NULL, name, &outdata, PETSC_NULL);
+#else
+    PetscOptionsGetInt(PETSC_NULLPTR, PETSC_NULLPTR, name, &outdata, PETSC_NULLPTR);
 #endif
   }
 
@@ -518,8 +520,10 @@ namespace SYS_T
     PetscBool flg;
 #if PETSC_VERSION_LT(3,7,0)
     PetscOptionsGetBool(PETSC_NULL, name, &pdata, &flg);
-#else
+#elif PETSC_VERSION_LT(3,19,0)
     PetscOptionsGetBool(PETSC_NULL, PETSC_NULL, name, &pdata, &flg);
+#else
+    PetscOptionsGetBool(PETSC_NULLPTR, PETSC_NULLPTR, name, &pdata, &flg);
 #endif
     if(flg)
     {
@@ -536,8 +540,10 @@ namespace SYS_T
     char char_outdata[PETSC_MAX_PATH_LEN];
 #if PETSC_VERSION_LT(3,7,0)
     PetscOptionsGetString(PETSC_NULL, name, char_outdata, PETSC_MAX_PATH_LEN, &flg);
-#else
+#elif PETSC_VERSION_LT(3,19,0)
     PetscOptionsGetString(PETSC_NULL, PETSC_NULL, name, char_outdata, PETSC_MAX_PATH_LEN, &flg);
+#else
+    PetscOptionsGetString(PETSC_NULLPTR, PETSC_NULLPTR, name, char_outdata, PETSC_MAX_PATH_LEN, &flg);
 #endif
     if(flg) outdata = char_outdata;
   }

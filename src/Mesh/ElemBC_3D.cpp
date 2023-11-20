@@ -54,9 +54,6 @@ ElemBC_3D::ElemBC_3D( const std::vector<std::string> &vtkfileList,
   std::cout<<"     is generated. \n";
 }
 
-ElemBC_3D::~ElemBC_3D()
-{}
-
 void ElemBC_3D::print_info() const
 {
   std::cout<<"========================= \n";

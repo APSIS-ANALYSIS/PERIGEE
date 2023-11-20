@@ -6,9 +6,14 @@
 // This is a class that stores the visualization sampling points in
 // a reference hexahedron.
 //
-// We use four points at [0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [1.0, 1.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 1.0], [1.0, 1.0, 1.0], [0.0, 1.0, 1.0],
-//                       [0.5, 0.0, 0.0], [1.0, 0.5, 0.0], [0.5, 1.0, 0.0], [0.0, 0.5, 0.0], [0.5, 0.0, 1.0], [1.0, 0.5, 1.0], [0.5, 1.0, 1.0], [0.0, 0.5, 1.0],
-//                       [0.0, 0.0, 0.5], [1.0, 0.0, 0.5], [1.0, 1.0, 0.5], [0.0, 1.0, 0.5], [0.0, 0.5, 0.5], [1.0, 0.5, 0.5], [0.5, 0.0, 0.5], [0.5, 1.0, 0.5],
+// We use four points at [0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [1.0, 1.0, 0.0], 
+//                       [0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 1.0], 
+//                       [1.0, 1.0, 1.0], [0.0, 1.0, 1.0], [0.5, 0.0, 0.0], 
+//                       [1.0, 0.5, 0.0], [0.5, 1.0, 0.0], [0.0, 0.5, 0.0], 
+//                       [0.5, 0.0, 1.0], [1.0, 0.5, 1.0], [0.5, 1.0, 1.0], 
+//                       [0.0, 0.5, 1.0], [0.0, 0.0, 0.5], [1.0, 0.0, 0.5], 
+//                       [1.0, 1.0, 0.5], [0.0, 1.0, 0.5], [0.0, 0.5, 0.5], 
+//                       [1.0, 0.5, 0.5], [0.5, 0.0, 0.5], [0.5, 1.0, 0.5],
 //                       [0.5, 0.5, 0.0], [0.5, 0.5, 1.0], [0.5, 0.5, 0.5] 
 // They are the vertex points of the hexahedron.
 // 
@@ -21,10 +26,16 @@
 class QuadPts_vis_hex27 : public IQuadPts
 {
   public:
-    QuadPts_vis_hex27();
-    virtual ~QuadPts_vis_hex27();
+    QuadPts_vis_hex27() = default;
+    
+    virtual ~QuadPts_vis_hex27() = default;
 
-    virtual void print_info() const;
+    virtual void print_info() const
+    {
+      SYS_T::commPrint("\n===== Visualization Points for Hex27 ===== \n");
+      IQuadPts::print_info();
+      SYS_T::commPrint("========================================= \n");
+    }
 
     // it stores the coordinate of the quadrature points 
     // in the sequence of x-y-z, so the dim is 3
@@ -42,11 +53,36 @@ class QuadPts_vis_hex27 : public IQuadPts
     virtual double get_qp(unsigned int ii, unsigned int comp) const 
     {return qp[3*ii+comp];}
 
-    virtual double get_qw(unsigned int ii) const {return qw[ii];}
+    virtual double get_qw(unsigned int ii) const {return 0.5;}
 
   private:
-    double qp[81];
-    double qw[27];
+    const double qp[81] { 0.0, 0.0, 0.0, 
+        1.0, 0.0, 0.0, 
+        1.0, 1.0, 0.0,
+        0.0, 1.0, 0.0, 
+        0.0, 0.0, 1.0,
+        1.0, 0.0, 1.0,
+        1.0, 1.0, 1.0,
+        0.0, 1.0, 1.0,
+        0.5, 0.0, 0.0, 
+        1.0, 0.5, 0.0, 
+        0.5, 1.0, 0.0,
+        0.0, 0.5, 0.0, 
+        0.5, 0.0, 1.0,
+        1.0, 0.5, 1.0,
+        0.5, 1.0, 1.0,
+        0.0, 0.5, 1.0,
+        0.0, 0.0, 0.5, 
+        1.0, 0.0, 0.5, 
+        1.0, 1.0, 0.5,
+        0.0, 1.0, 0.5, 
+        0.0, 0.5, 0.5,
+        1.0, 0.5, 0.5,
+        0.5, 0.0, 0.5,
+        0.5, 1.0, 0.5, 
+        0.5, 0.5, 0.0, 
+        0.5, 0.5, 1.0, 
+        0.5, 0.5, 0.5 };
 };
 
 #endif

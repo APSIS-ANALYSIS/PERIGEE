@@ -27,7 +27,7 @@ class NBC_Partition
        const Map_Node_Index * const &mnindex,
        const std::vector<INodalBC *> &nbc_list );
 
-    virtual ~NBC_Partition();
+    virtual ~NBC_Partition() = default;
 
     // ------------------------------------------------------------------------
     // write_hdf5 : write the nodal bc info into the part file, under

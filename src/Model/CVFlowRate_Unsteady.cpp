@@ -124,14 +124,6 @@ CVFlowRate_Unsteady::CVFlowRate_Unsteady( const std::string &filename )
   MPI_Barrier(PETSC_COMM_WORLD);
 }
 
-
-CVFlowRate_Unsteady::~CVFlowRate_Unsteady()
-{
-  VEC_T::clean(coef_a); VEC_T::clean(coef_b);
-  VEC_T::clean(num_of_mode); VEC_T::clean(w); VEC_T::clean(period);
-}
-
-
 double CVFlowRate_Unsteady::get_flow_rate( const int &nbc_id,
     const double &time ) const
 {

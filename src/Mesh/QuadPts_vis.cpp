@@ -6,9 +6,9 @@ QuadPts_vis::QuadPts_vis( const int &input_num_pts )
 
   SYS_T::print_fatal_if( (num_pts<2) , "Error: the number of visualization sampling points is less than 2. \n" );
 
-  double step = 1.0 / (num_pts - 1);
+  const double step = 1.0 / (num_pts - 1);
 
-  double weight = 1.0 / num_pts;
+  const double weight = 1.0 / num_pts;
 
   qp.push_back(0.0);
   qw.push_back(weight);
@@ -22,11 +22,6 @@ QuadPts_vis::QuadPts_vis( const int &input_num_pts )
   VEC_T::shrink2fit(qp);
   VEC_T::shrink2fit(qw);
 }
-
-
-QuadPts_vis::~QuadPts_vis()
-{}
-
 
 void QuadPts_vis::print_info() const
 {

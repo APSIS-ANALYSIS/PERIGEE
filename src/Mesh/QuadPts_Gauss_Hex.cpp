@@ -38,23 +38,16 @@ QuadPts_Gauss_Hex::QuadPts_Gauss_Hex( const int &in_num_pts_1d,
     x_min, x_max, y_min, y_max, z_min, z_max)
 {}
 
-QuadPts_Gauss_Hex::~QuadPts_Gauss_Hex()
-{
-  VEC_T::clean(qp); VEC_T::clean(qw);
-}
-
 void QuadPts_Gauss_Hex::print_info() const
 {
-  std::cout<<std::endl;
-  std::cout<<"====== Gauss Points for Hexagon ======="<<std::endl;
-  std::cout<<"Num of pt = "<<num_pts<<std::endl;
-  std::cout<<"qp.size() = "<<qp.size()<<std::endl;
-  std::cout<<"qw.size() = "<<qw.size()<<std::endl;
+  SYS_T::commPrint("====== Gauss Points for Hexagon =======\n");
+  SYS_T::commPrint("Number of points = %d\n", num_pts);
+  SYS_T::commPrint("qp.size() = %d\n", qp.size());
+  SYS_T::commPrint("qw.size() = %d\n", qw.size());
   for(int ii=0; ii<num_pts; ++ii)
-    std::cout<<std::setprecision(16)
-      <<'\t'<<qp[3*ii  ]<<'\t'<<qp[3*ii+1]
-      <<'\t'<<qp[3*ii+2]<<'\t'<<qw[ii]<<'\n';
-  std::cout<<"==========================================="<<std::endl;
+    SYS_T::commPrint("  %.15f %.15f %.15f %.15f\n", 
+        qp[3*ii], qp[3*ii+1], qp[3*ii+2], qw[ii]);
+  SYS_T::commPrint("=======================================\n");
 }
 
 // EOF

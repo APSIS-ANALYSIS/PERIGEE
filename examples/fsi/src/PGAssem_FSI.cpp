@@ -44,8 +44,13 @@ PGAssem_FSI::PGAssem_FSI(
   SYS_T::commPrint("     Empirical nonzero estimate: %d \n", in_nz_estimate);
   
   // Create matrix with routh preallocation
+#if PETSC_VERSION_LT(3,19,0)
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
       PETSC_DETERMINE, 4*in_nz_estimate, PETSC_NULL, 4*in_nz_estimate, PETSC_NULL, &K);
+#else
+  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
+      PETSC_DETERMINE, 4*in_nz_estimate, PETSC_NULLPTR, 4*in_nz_estimate, PETSC_NULLPTR, &K);
+#endif
 
   // Create vector
   VecCreate(PETSC_COMM_WORLD, &G);

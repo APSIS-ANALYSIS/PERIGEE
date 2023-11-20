@@ -4,9 +4,6 @@ HDF5_Writer::HDF5_Writer( const hid_t &in_file_id )
 : file_id(in_file_id)
 {}
 
-HDF5_Writer::~HDF5_Writer()
-{}
-
 void HDF5_Writer::write_intScalar( const hid_t &group_id,
     const char * const &data_name, const int &value ) const
 {

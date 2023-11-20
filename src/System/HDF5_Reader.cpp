@@ -4,9 +4,6 @@ HDF5_Reader::HDF5_Reader( const hid_t &in_file_id )
 : file_id(in_file_id)
 {}
 
-HDF5_Reader::~HDF5_Reader()
-{}
-
 bool HDF5_Reader::check_data( const char * const &name ) const
 {
   return H5Lexists(file_id, name, H5P_DEFAULT);

@@ -2,7 +2,11 @@
 
 int main( int argc, char * argv[] )
 {
+#if PETSC_VERSION_LT(3,19,0)
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+#else
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULLPTR);
+#endif
 
   IMaterialModel * model = new MaterialModel_Guccione_Incompressible_Mixed(
       2.1, 3.3, 22.0, -11.2, 15.2, 0.5, 0.3, 0.2, -0.2, 0.3, 0.6 );

@@ -225,13 +225,6 @@ ElemBC_3D_outflow::ElemBC_3D_outflow(
   std::cout<<"     ElemBC_3D_outflow intNA vector generated.\n";
 }
 
-ElemBC_3D_outflow::~ElemBC_3D_outflow()
-{
-  for(int ii=0; ii<num_ebc; ++ii) VEC_T::clean( intNA[ii] );
-
-  VEC_T::clean( intNA );
-}
-
 void ElemBC_3D_outflow::print_info() const
 {
   ElemBC_3D::print_info();

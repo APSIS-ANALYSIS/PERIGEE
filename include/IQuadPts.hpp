@@ -16,7 +16,28 @@ class IQuadPts
     
     virtual ~IQuadPts() = default;
 
-    virtual void print_info() const = 0;
+    virtual void print_info() const
+    {
+      if( get_dim() == 4 )
+      {
+        for(int ii=0; ii<get_num_quadPts(); ++ii) SYS_T::commPrint( "%d \t qw = %e \t qp = [%e \t %e \t %e \t %e] \n", 
+            get_qw(ii), get_qp(ii,0), get_qp(ii,1), get_qp(ii,2), get_qp(ii,3) );
+      }
+      else if( get_dim() == 3 )
+      {
+        for(int ii=0; ii<get_num_quadPts(); ++ii) SYS_T::commPrint( "%d \t qw = %e \t qp = [%e \t %e \t %e] \n", 
+            get_qw(ii), get_qp(ii,0), get_qp(ii,1), get_qp(ii,2) );
+      }
+      else if( get_dim() == 2 )
+      {
+        for(int ii=0; ii<get_num_quadPts(); ++ii) SYS_T::commPrint( "%d \t qw = %e \t qp = [%e \t %e] \n", 
+            get_qw(ii), get_qp(ii,0), get_qp(ii,1) );
+      }
+      else
+      {
+        SYS_T::print_fatal("Error: get_dim() = %d has not been implemented.\n", get_dim() );
+      }
+    }
    
     // ------------------------------------------------------------------------
     // get_num_quadPts : returns the number of quadrature points 
