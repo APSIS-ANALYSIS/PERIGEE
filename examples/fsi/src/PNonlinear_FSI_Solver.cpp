@@ -123,6 +123,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
     const Tissue_prestress * const &ps_ptr,
+    const Tissue_property * const &tp_ptr,
     IPLocAssem_2x2Block * const &lassem_fluid_ptr,
     IPLocAssem_2x2Block * const &lassem_solid_ptr,
     IPLocAssem * const &lassem_mesh_ptr,
@@ -225,7 +226,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
         disp_alpha, velo_alpha, pres_alpha, dot_velo, velo, disp,
         alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr,
         elementv, elements, quad_v, quad_s, lien_v, lien_p,
-        feanode_ptr, nbc_v, nbc_p, ebc_part, gbc, ps_ptr );
+        feanode_ptr, nbc_v, nbc_p, ebc_part, gbc, ps_ptr, tp_ptr );
 
     SYS_T::commPrint("  --- M updated");
     lsolver_ptr->SetOperator(gassem_ptr->K);
@@ -239,7 +240,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
         disp_alpha, velo_alpha, pres_alpha, dot_velo, velo, disp,
         alelem_ptr, lassem_fluid_ptr, lassem_solid_ptr,
         elementv, elements, quad_v, quad_s, lien_v, lien_p,
-        feanode_ptr, nbc_v, nbc_p, ebc_part, gbc, ps_ptr );
+        feanode_ptr, nbc_v, nbc_p, ebc_part, gbc, ps_ptr, tp_ptr );
   }
 
 #ifdef PETSC_USE_LOG
