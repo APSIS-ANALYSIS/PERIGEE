@@ -133,7 +133,7 @@ class PLocAssem_2x2Block_VMS_Hyperelasticity : public IPLocAssem_2x2Block
     const int nLocBas, snLocBas, vec_size_0, vec_size_1, sur_size_0;
     
     // useful tensors for the material model
-    const IMaterialModel * const matmodel;
+    IMaterialModel * const matmodel;
 
     void print_info() const;
 
