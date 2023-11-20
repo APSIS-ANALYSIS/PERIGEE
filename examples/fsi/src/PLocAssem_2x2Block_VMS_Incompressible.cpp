@@ -108,7 +108,10 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Residual(
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
     const double * const &qua_prestress,
-    const IQuadPts * const &quad )
+    const IQuadPts * const &quad,
+    const std::vector<Vector_3> &eleBasis_r,
+    const std::vector<Vector_3> &eleBasis_l,
+    const std::vector<Vector_3> &eleBasis_c )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -135,6 +138,10 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Residual(
     double vx_z = 0.0, vy_z = 0.0, vz_z = 0.0;
 
     Vector_3 coor(0.0, 0.0, 0.0);
+
+    Vector_3 basis_r(0.0, 0.0, 0.0);
+    Vector_3 basis_l(0.0, 0.0, 0.0);
+    Vector_3 basis_c(0.0, 0.0, 0.0);
 
     std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
@@ -178,6 +185,14 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Residual(
       coor.x() += eleCtrlPts_x[ii] * R[ii];
       coor.y() += eleCtrlPts_y[ii] * R[ii];
       coor.z() += eleCtrlPts_z[ii] * R[ii];
+
+      basis_r += R[ii] * eleBasis_r[ii];
+      basis_l += R[ii] * eleBasis_l[ii];
+      basis_c += R[ii] * eleBasis_c[ii];
+
+      basis_r = Vec3::normalize( basis_r );
+      basis_l = Vec3::normalize( basis_l );
+      basis_c = Vec3::normalize( basis_c );
     }
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
@@ -261,7 +276,10 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Tangent_Residual(
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const double * const &qua_prestress,
-        const IQuadPts * const &quad )
+        const IQuadPts * const &quad,
+        const std::vector<Vector_3> &eleBasis_r,
+        const std::vector<Vector_3> &eleBasis_l,
+        const std::vector<Vector_3> &eleBasis_c )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -292,6 +310,10 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Tangent_Residual(
     double vx_z = 0.0, vy_z = 0.0, vz_z = 0.0;
 
     Vector_3 coor(0.0, 0.0, 0.0);
+
+    Vector_3 basis_r(0.0, 0.0, 0.0);
+    Vector_3 basis_l(0.0, 0.0, 0.0);
+    Vector_3 basis_c(0.0, 0.0, 0.0);
 
     std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
@@ -335,6 +357,14 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Tangent_Residual(
       coor.x() += eleCtrlPts_x[ii] * R[ii];
       coor.y() += eleCtrlPts_y[ii] * R[ii];
       coor.z() += eleCtrlPts_z[ii] * R[ii];
+
+      basis_r += R[ii] * eleBasis_r[ii];
+      basis_l += R[ii] * eleBasis_l[ii];
+      basis_c += R[ii] * eleBasis_c[ii];
+
+      basis_r = Vec3::normalize( basis_r );
+      basis_l = Vec3::normalize( basis_l );
+      basis_c = Vec3::normalize( basis_c );
     }
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
