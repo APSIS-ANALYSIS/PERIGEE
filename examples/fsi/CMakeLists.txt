@@ -177,9 +177,9 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 # BUILD THE MAIN DRIVERS
 # ===================================================================
-ADD_EXECUTABLE( preprocess_fsi preprocess_fsi_tissue.cpp)
+ADD_EXECUTABLE( preprocess_fsi preprocess_fsi.cpp)
 ADD_EXECUTABLE( wall_ps3d wall_ps_driver.cpp)
-ADD_EXECUTABLE( fsi3d fsi_driver_tissue.cpp)
+ADD_EXECUTABLE( fsi3d fsi_driver.cpp)
 ADD_EXECUTABLE( prepostproc prepost.cpp)
 ADD_EXECUTABLE( vis_fsi vis_driver.cpp )
 ADD_EXECUTABLE( vis_fluid vis_fluid.cpp )
