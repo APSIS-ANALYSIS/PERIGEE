@@ -485,7 +485,7 @@ int main( int argc, char * argv[] )
   
   // for coronary artery benckmark
   NBC_list_v[0] = new NodalBC_3D_FSI( geo_f_file, geo_s_file, sur_f_file_wall, 
-      sur_s_file_wall, sur_f_file_in, sur_f_file_out, { }, { }, 
+      sur_s_file_wall, sur_f_file_in, sur_f_file_out, { }, sur_s_file_out, 
       nFunc_v, 0, ringBC_type, fsiBC_type );
 
   NBC_list_v[1] = new NodalBC_3D_FSI( geo_f_file, geo_s_file, sur_f_file_wall, 
@@ -493,7 +493,7 @@ int main( int argc, char * argv[] )
       nFunc_v, 1, ringBC_type, fsiBC_type );
 
   NBC_list_v[2] = new NodalBC_3D_FSI( geo_f_file, geo_s_file, sur_f_file_wall, 
-      sur_s_file_wall, sur_f_file_in, sur_f_file_out, { }, { }, 
+      sur_s_file_wall, sur_f_file_in, sur_f_file_out, sur_s_file_in, { }, 
       nFunc_v, 2, ringBC_type, fsiBC_type );
 
   // Mesh solver NodalBC

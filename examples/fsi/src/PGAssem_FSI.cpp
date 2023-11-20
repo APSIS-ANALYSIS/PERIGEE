@@ -981,9 +981,9 @@ void PGAssem_FSI::NatBC_Resis_KG( const double &curr_time, const double &dt,
 
   const double a_f = lassem_f_ptr->get_model_para_1();
 
-  const double a_gamma = lassem_f_ptr->get_model_para_2();
+  // const double a_gamma = lassem_f_ptr->get_model_para_2();
 
-  const double dd_dv = dt * a_f * a_gamma;
+  // const double dd_dv = dt * a_f * a_gamma;
 
   const std::vector<double> array_d = disp -> GetLocalArray();
 
@@ -1017,7 +1017,7 @@ void PGAssem_FSI::NatBC_Resis_KG( const double &curr_time, const double &dt,
     // P_n+alpha_f
     const double resis_val = P_n + a_f * (P_np1 - P_n);
 
-    const double coef = dd_dv * resis_val;
+    const double coef = 0;
 
     // // Get m := dP/dQ
     // const double m_val = gbc -> get_m( ebc_id, dot_flrate, flrate );

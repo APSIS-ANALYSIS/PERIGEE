@@ -28,9 +28,19 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
           dir_nodes = get_vtk_nodal_id( fluid_inlet_files );
           // VEC_T::insert_end( dir_nodes, get_vtk_nodal_id( solid_inlet_files ) );
           // VEC_T::insert_end( dir_nodes, get_vtk_nodal_id( solid_outlet_files ) );
+
           // For coronary artery benchmark:
-          VEC_T::insert_end( dir_nodes, CA_benchmark_BC( solid_inlet_files ) );
-          VEC_T::insert_end( dir_nodes, CA_benchmark_BC( solid_outlet_files ) );
+          if(comp == 0) // fix x-direction disp of solid outlet
+            VEC_T::insert_end( dir_nodes, get_vtk_nodal_id( solid_outlet_files ) );
+          else if(comp == 1)  // fix y-direction disp of redlines
+          {
+            VEC_T::insert_end( dir_nodes, CA_benchmark_BC( solid_inlet_files ) );
+            VEC_T::insert_end( dir_nodes, CA_benchmark_BC( solid_outlet_files ) );
+          }
+          else if(comp == 2) // fix z-direction disp of solid inlet
+            VEC_T::insert_end( dir_nodes, get_vtk_nodal_id( solid_inlet_files ) );
+          else
+            ;
           VEC_T::sort_unique_resize( dir_nodes );
 
           std::cout<<"===> NodalBC_3D_FSI for deformable wall (fsiBC_type = 0) with cap surface \n";
