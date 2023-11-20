@@ -781,7 +781,7 @@ int main(int argc, char *argv[])
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN_v, locIEN_p, 
       pNode_v, pNode_p, fNode, locnbc_v, locnbc_p, locinfnbc, mesh_locnbc, 
       locebc_v, locebc_p, mesh_locebc, 
-      gbc, pmat, mmat, elementv, elements, quadv, quads, ps_data,
+      gbc, pmat, mmat, elementv, elements, quadv, quads, ps_data, tp_data,
       locAssem_fluid_ptr, locAssem_solid_ptr, locAssem_mesh_ptr,
       gloAssem_ptr, gloAssem_mesh_ptr, lsolver, mesh_lsolver, nsolver);
 
