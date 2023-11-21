@@ -362,6 +362,9 @@ void PGAssem_NS_FEM::Assem_residual(
     Weak_EssBC_G(curr_time, dt, sol_b, lassem_ptr, elementv, quad_s,
       lien_ptr, fnode_ptr, nbc_part, wbc_part);
 
+  // For Poiseuille flow
+  NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 
@@ -452,6 +455,9 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   if (wbc_part->get_weakbc_type() > 0)
     Weak_EssBC_KG(curr_time, dt, sol_b, lassem_ptr, elementv, quad_s,
       lien_ptr, fnode_ptr, nbc_part, wbc_part);
+
+  // For Poiseuille flow
+  NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
