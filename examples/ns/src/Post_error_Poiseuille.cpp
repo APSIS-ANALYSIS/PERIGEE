@@ -129,3 +129,44 @@ double POST_ERROR_P::get_manu_sol_u_errorH1(
 
   return errorH1;
 }
+
+double POST_ERROR_P::get_exact_sol_u_normH2(
+    const FEAElement * const &element,
+    const double * const &ectrlPts_x,
+    const double * const &ectrlPts_y,
+    const double * const &ectrlPts_z,
+    const IQuadPts * const &quad,
+    const double &Q,
+    const double &Radius )
+{
+  double normH2 = 0.0;
+
+  for(int qua=0; qua<quad->get_num_quadPts(); ++qua)
+  {
+    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
+
+    const std::vector<double> R = element -> get_R( qua );
+    
+    double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
+
+    for(int ii=0; ii<element-> get_nLocBas(); ++ii)
+    {
+      coor_x += ectrlPts_x[ii] * R[ii];
+      coor_y += ectrlPts_y[ii] * R[ii];
+      coor_z += ectrlPts_z[ii] * R[ii];
+    }
+
+    const Vector_3 exact = exact_sol_u( coor_x, coor_y, coor_z, Q, Radius );
+    const Vector_3 exact_dx = exact_sol_u_dx( coor_x, coor_y, coor_z, Q, Radius );
+    const Vector_3 exact_dy = exact_sol_u_dy( coor_x, coor_y, coor_z, Q, Radius );
+    const Vector_3 exact_dz = exact_sol_u_dz( coor_x, coor_y, coor_z, Q, Radius );
+
+    normH2 += exact_dx.dot_product(exact_dx) * gwts 
+	     + exact_dy.dot_product(exact_dy) * gwts 
+	     + exact_dz.dot_product(exact_dz) * gwts 
+	     + exact.dot_product(exact) * gwts
+       + 2 * (-2 * Q / (MATH_T::PI * Radius * Radius * Radius * Radius)) * (-2 * Q / (MATH_T::PI * Radius * Radius * Radius * Radius)) * gwts; // non-trivial second order derivative
+  }
+
+  return normH2;
+}

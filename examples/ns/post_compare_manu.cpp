@@ -69,6 +69,7 @@ int main( int argc, char * argv[] )
 
   double subdomain_l2 = 0.0;
   double subdomain_H1 = 0.0;
+  double subdomain_exactH2 = 0.0;
   double meshsize = 0.0;
 
   for(int ee=0; ee<locElem->get_nlocalele(); ++ee)
@@ -91,17 +92,23 @@ int main( int argc, char * argv[] )
 
     subdomain_H1 += POST_ERROR_P::get_manu_sol_u_errorH1(
       loc_sol_ux, loc_sol_uy, loc_sol_uz, elementv, ectrl_x, ectrl_y, ectrl_z, quadv, FlowRate, Radius );
+
+    subdomain_exactH2 += POST_ERROR_P::get_exact_sol_u_normH2(
+      elementv, ectrl_x, ectrl_y, ectrl_z, quadv, FlowRate, Radius );
   }
   
-  double l2_error = 0.0; double H1_error = 0.0;
+  double l2_error = 0.0; double H1_error = 0.0; double H2_exact = 0.0;
   MPI_Reduce(&subdomain_l2, &l2_error, 1, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
   l2_error = std::sqrt( l2_error );
  
   MPI_Reduce(&subdomain_H1, &H1_error, 1, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
   H1_error = std::sqrt( H1_error );
 
-  SYS_T::commPrint("Error in L2 norm is : %e \n", l2_error);
-  SYS_T::commPrint("Error in H1 norm is : %e \n", H1_error);
+  MPI_Reduce(&subdomain_exactH2, &H2_exact, 1, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
+  H2_exact = std::sqrt( H2_exact );
+
+  SYS_T::commPrint("Relative error in L2 norm is : %e \n", l2_error/H2_exact);
+  SYS_T::commPrint("Relative error in H1 norm is : %e \n", H1_error/H2_exact);
   SYS_T::commPrint("Meshsize is : %e \n", meshsize);
 
   delete elementv; delete quadv; delete locElem; delete pNode;

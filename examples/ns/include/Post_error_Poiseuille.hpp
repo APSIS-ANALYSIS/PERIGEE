@@ -83,6 +83,15 @@ namespace POST_ERROR_P
       const IQuadPts * const &quad,
       const double &Q,
       const double &Radius );
+
+  double get_exact_sol_u_normH2(
+      const FEAElement * const &element,
+      const double * const &ectrlPts_x,
+      const double * const &ectrlPts_y,
+      const double * const &ectrlPts_z,
+      const IQuadPts * const &quad,
+      const double &Q,
+      const double &Radius );
 }
 
 #endif
