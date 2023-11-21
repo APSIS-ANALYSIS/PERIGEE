@@ -66,8 +66,10 @@ int main( int argc, char * argv[] )
   int IEN_e[4];
   double ectrl_x[4], ectrl_y[4], ectrl_z[4];
   double loc_sol_ux[4], loc_sol_uy[4], loc_sol_uz[4];
+
   double subdomain_l2 = 0.0;
   double subdomain_H1 = 0.0;
+  double meshsize = 0.0;
 
   for(int ee=0; ee<locElem->get_nlocalele(); ++ee)
   {
@@ -75,6 +77,9 @@ int main( int argc, char * argv[] )
     fNode -> get_ctrlPts_xyz( 4, IEN_e, ectrl_x, ectrl_y, ectrl_z );
 
     elementv -> buildBasis( quadv, ectrl_x, ectrl_y, ectrl_z );
+    const double hh = elementv -> get_h( ectrl_x, ectrl_y, ectrl_z );
+    if(hh > meshsize)
+        meshsize = hh;
     
     pSolu -> get_esol( 1, 4, IEN_e, loc_sol_ux );
     pSolu -> get_esol( 2, 4, IEN_e, loc_sol_uy );
@@ -97,6 +102,7 @@ int main( int argc, char * argv[] )
 
   SYS_T::commPrint("Error in L2 norm is : %e \n", l2_error);
   SYS_T::commPrint("Error in H1 norm is : %e \n", H1_error);
+  SYS_T::commPrint("Meshsize is : %e \n", meshsize);
 
   delete elementv; delete quadv; delete locElem; delete pNode;
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
