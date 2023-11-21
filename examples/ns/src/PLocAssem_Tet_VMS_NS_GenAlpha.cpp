@@ -39,6 +39,9 @@ PLocAssem_Tet_VMS_NS_GenAlpha::PLocAssem_Tet_VMS_NS_GenAlpha(
 
   Zero_sur_Tangent_Residual();
 
+  flist = new locassem_tet_vms_ns_funs[1];
+  flist[0] = &PLocAssem_Tet_VMS_NS_GenAlpha::get_Poiseuille_traction;
+
   print_info();
 }
 
@@ -48,6 +51,8 @@ PLocAssem_Tet_VMS_NS_GenAlpha::~PLocAssem_Tet_VMS_NS_GenAlpha()
   delete [] Residual; Residual = nullptr;
   delete [] sur_Tangent; sur_Tangent = nullptr;
   delete [] sur_Residual; sur_Residual = nullptr;
+
+  delete [] flist;
 }
 
 void PLocAssem_Tet_VMS_NS_GenAlpha::print_info() const

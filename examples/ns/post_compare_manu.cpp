@@ -17,7 +17,7 @@ int main( int argc, char * argv[] )
   std::string part_file("./part");
   const int dof = 4;
 
-  double FlowRate = 0.125663706144; // 0.04 * PI
+  double FlowRate = 0.04 * MATH_T::PI; // 0.04 * PI
   double Radius = 0.1;
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);

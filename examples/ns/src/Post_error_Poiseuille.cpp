@@ -9,12 +9,12 @@ double POST_ERROR_P::exact_sol_uz( const double &x, const double &y, const doubl
 
 double POST_ERROR_P::exact_sol_duz_dx( const double &x, const double &y, const double &z, const double &Q, const double &R )
 {
-    return -2 * Q * x / (MATH_T::PI * R * R * R * R);
+    return -4 * Q * x / (MATH_T::PI * R * R * R * R);
 }
 
 double POST_ERROR_P::exact_sol_duz_dy( const double &x, const double &y, const double &z, const double &Q, const double &R )
 {
-    return -2 * Q * y / (MATH_T::PI * R * R * R * R);
+    return -4 * Q * y / (MATH_T::PI * R * R * R * R);
 }
 
 double POST_ERROR_P::get_manu_sol_u_error(
@@ -165,7 +165,7 @@ double POST_ERROR_P::get_exact_sol_u_normH2(
 	     + exact_dy.dot_product(exact_dy) * gwts 
 	     + exact_dz.dot_product(exact_dz) * gwts 
 	     + exact.dot_product(exact) * gwts
-       + 2 * (-2 * Q / (MATH_T::PI * Radius * Radius * Radius * Radius)) * (-2 * Q / (MATH_T::PI * Radius * Radius * Radius * Radius)) * gwts; // non-trivial second order derivative
+       + 2 * (-4 * Q / (MATH_T::PI * Radius * Radius * Radius * Radius)) * (-4 * Q / (MATH_T::PI * Radius * Radius * Radius * Radius)) * gwts; // non-trivial second order derivative
   }
 
   return normH2;
