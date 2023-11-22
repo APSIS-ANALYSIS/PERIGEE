@@ -108,6 +108,10 @@ class MaterialModel_GOH06_Incompressible_Mixed : public IMaterialModel
 
     // unit vector for fibre direction in the ref domain    
     Vector_3 a1, a2;
+
+    // unit vector for fibre direction difined on the basis vector 
+    // e1 = [1, 0, 0], e2 = [0, 1, 0], and e3 = [0, 0, 1]
+    Vector_3 a01, a02;
 };
 
 #endif
