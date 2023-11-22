@@ -671,7 +671,6 @@ int main(int argc, char *argv[])
     const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
         disp, pres, locAssem_fluid_ptr, elements, quads, locebc_v, locebc_p, ff );
 
-    
     // set the gbc initial conditions using the 3D data
     if(GENBC_T::get_genbc_file_type( lpn_file ) != 6)
       gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );

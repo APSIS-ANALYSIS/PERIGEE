@@ -363,7 +363,7 @@ void PGAssem_FSI::Assem_Residual(
   row_id_v = nullptr; row_id_p = nullptr;
 
   // Backflow stabilization
-  // BackFlow_G( dot_disp, disp, velo, lassem_f_ptr, elements, quad_s, nbc_v, ebc_part );
+  BackFlow_G( dot_disp, disp, velo, lassem_f_ptr, elements, quad_s, nbc_v, ebc_part );
 
   // Resistance BC for G
   NatBC_Resis_G( curr_time, dt, disp_np1, dot_velo_np1, velo_np1, lassem_f_ptr, elements, quad_s,
@@ -489,7 +489,7 @@ void PGAssem_FSI::Assem_Tangent_Residual(
   row_id_v = nullptr; row_id_p = nullptr;
 
   // Backflow stabilization
-  // BackFlow_KG( dt, dot_disp, disp, velo, lassem_f_ptr, elements, quad_s, nbc_v, ebc_part );
+  BackFlow_KG( dt, dot_disp, disp, velo, lassem_f_ptr, elements, quad_s, nbc_v, ebc_part );
 
   // Resistance BC for G
   NatBC_Resis_KG( curr_time, dt, disp_np1, dot_velo_np1, velo_np1, lassem_f_ptr, elements, quad_s,
@@ -913,23 +913,23 @@ void PGAssem_FSI::NatBC_Resis_G( const double &curr_time, const double &dt,
 
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
-    // // Calculate dot flow rate for face with ebc_id
-    // const double dot_flrate = Assem_surface_flowrate( disp, dot_velo, lassem_f_ptr,
-    //     element_s, quad_s, ebc_part, ebc_id );
+    // Calculate dot flow rate for face with ebc_id
+    const double dot_flrate = Assem_surface_flowrate( disp, dot_velo, lassem_f_ptr,
+        element_s, quad_s, ebc_part, ebc_id );
 
-    // // Calculate flow rate for face with ebc_id
-    // const double flrate = Assem_surface_flowrate( disp, velo, lassem_f_ptr,
-    //     element_s, quad_s, ebc_part, ebc_id );
+    // Calculate flow rate for face with ebc_id
+    const double flrate = Assem_surface_flowrate( disp, velo, lassem_f_ptr,
+        element_s, quad_s, ebc_part, ebc_id );
 
-    // for absorbing BC
-    const double current_area = Assem_surface_area( disp, lassem_f_ptr, element_s,
-        quad_s, ebc_part, ebc_id);
+    // // for absorbing BC
+    // const double current_area = Assem_surface_area( disp, lassem_f_ptr, element_s,
+    //     quad_s, ebc_part, ebc_id);
 
     // Get the pressure value on the outlet surfaces
     const double P_n   = gbc -> get_P0( ebc_id );
-    // const double P_np1 = gbc -> get_P( ebc_id, dot_flrate, flrate, curr_time + dt );
-    // for absorbing BC
-    const double P_np1 = gbc -> get_P( ebc_id, 0.0, current_area, 0.0 );
+    const double P_np1 = gbc -> get_P( ebc_id, dot_flrate, flrate, curr_time + dt );
+    // // for absorbing BC
+    // const double P_np1 = gbc -> get_P( ebc_id, 0.0, current_area, 0.0 );
 
     // P_n+alpha_f
     const double val = P_n + lassem_f_ptr->get_model_para_1() * (P_np1 - P_n);
@@ -981,9 +981,9 @@ void PGAssem_FSI::NatBC_Resis_KG( const double &curr_time, const double &dt,
 
   const double a_f = lassem_f_ptr->get_model_para_1();
 
-  // const double a_gamma = lassem_f_ptr->get_model_para_2();
+  const double a_gamma = lassem_f_ptr->get_model_para_2();
 
-  // const double dd_dv = dt * a_f * a_gamma;
+  const double dd_dv = dt * a_f * a_gamma;
 
   const std::vector<double> array_d = disp -> GetLocalArray();
 
@@ -996,37 +996,37 @@ void PGAssem_FSI::NatBC_Resis_KG( const double &curr_time, const double &dt,
 
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
-    // // Calculate dot flow rate for face with ebc_id
-    // const double dot_flrate = Assem_surface_flowrate( disp, dot_velo, lassem_f_ptr,
-    //     element_s, quad_s, ebc_part, ebc_id );
+    // Calculate dot flow rate for face with ebc_id
+    const double dot_flrate = Assem_surface_flowrate( disp, dot_velo, lassem_f_ptr,
+        element_s, quad_s, ebc_part, ebc_id );
 
-    // // Calculate flow rate for face with ebc_id
-    // const double flrate = Assem_surface_flowrate( disp, velo, lassem_f_ptr,
-    //     element_s, quad_s, ebc_part, ebc_id );
+    // Calculate flow rate for face with ebc_id
+    const double flrate = Assem_surface_flowrate( disp, velo, lassem_f_ptr,
+        element_s, quad_s, ebc_part, ebc_id );
 
-    // for absorbing BC
-    const double current_area = Assem_surface_area( disp, lassem_f_ptr, element_s,
-        quad_s, ebc_part, ebc_id);
+    // // for absorbing BC
+    // const double current_area = Assem_surface_area( disp, lassem_f_ptr, element_s,
+    //     quad_s, ebc_part, ebc_id);
 
     // Get the pressure value on the outlet surfaces
     const double P_n   = gbc -> get_P0( ebc_id );
-    // const double P_np1 = gbc -> get_P( ebc_id, dot_flrate, flrate, curr_time + dt );
-    // for absorbing BC
-    const double P_np1 = gbc -> get_P( ebc_id, 0.0, current_area, 0.0 );
+    const double P_np1 = gbc -> get_P( ebc_id, dot_flrate, flrate, curr_time + dt );
+    // // for absorbing BC
+    // const double P_np1 = gbc -> get_P( ebc_id, 0.0, current_area, 0.0 );
 
     // P_n+alpha_f
     const double resis_val = P_n + a_f * (P_np1 - P_n);
 
-    const double coef = 0;
+    // const double coef = 0;
 
-    // // Get m := dP/dQ
-    // const double m_val = gbc -> get_m( ebc_id, dot_flrate, flrate );
+    // Get m := dP/dQ
+    const double m_val = gbc -> get_m( ebc_id, dot_flrate, flrate );
 
-    // // Get n := dP/d(dot_Q)
-    // const double n_val = gbc -> get_n( ebc_id, dot_flrate, flrate );
+    // Get n := dP/d(dot_Q)
+    const double n_val = gbc -> get_n( ebc_id, dot_flrate, flrate );
 
-    // // Define alpha_f x n + alpha_f x gamma x dt x m
-    // const double coef = a_f * n_val + dd_dv * m_val;
+    // Define alpha_f x n + alpha_f x gamma x dt x m
+    const double coef = a_f * n_val + dd_dv * m_val;
 
     const int num_face_nodes = ebc_part -> get_num_face_nodes(ebc_id);
 
