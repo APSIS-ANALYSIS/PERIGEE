@@ -76,11 +76,28 @@ class MaterialModel_GOH06_ST91_Mixed : public IMaterialModel
         const Vector_3 &basis_c );
 
   private:
+    // useful constants
     const double pt33, mpt67, pi;
-    double rho0, E, nu, lambda, mu, kappa;
+
+    // density
+    double rho0;
+
+    // groud matrix parameters 
+    double E, nu, lambda, mu, kappa;
+
+    // fibre direction: f_theta, f_phi in radians
     double f1_the, f1_phi, f2_the, f2_phi;
+
+    // fibre elastic parameter
+    // fkd is the dispresion parameter ranging from 0 to 1/3
     double fk1, fk2, fkd;
+
+    // unit vector for fibre direction in the ref domain    
     Vector_3 a1, a2;
+
+    // unit vector for fibre direction difined on the basis vector 
+    // e1 = [1, 0, 0], e2 = [0, 1, 0], and e3 = [0, 0, 1]
+    Vector_3 a01, a02;
 };
 
 #endif
