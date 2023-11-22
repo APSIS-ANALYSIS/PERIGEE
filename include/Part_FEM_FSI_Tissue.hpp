@@ -42,9 +42,9 @@ class Part_FEM_FSI_Tissue : public Part_FEM_FSI
     // and circumferential directions, respectively.
     std::vector<Vector_3> loc_basis_r, loc_basis_l, loc_basis_c;
 
-    // A vector with length of nlocghonode, mapping from the total local nodes
-    // to the local solid nodes. When here goes a solid node, the mapping
-    // returns the local solid node index, otherwise return -1.
+    // A vector with length of nlocghonode, mapping from the total local+ghost nodes
+    // to the solid local+ghost nodes. If node [ii] is a solid node, the mapping
+    // records the corresponding index of the loc_basis std::vector, otherwise return -1.
     std::vector<int> node_locgho_solid;
     int nlocghonode_s;
 };
