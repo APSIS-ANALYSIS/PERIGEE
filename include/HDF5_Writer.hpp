@@ -40,6 +40,7 @@
 #include <cstdlib>
 #include <climits>
 #include "Tensor2_3D.hpp"
+#include "Vec_Tools.hpp"
 #include "hdf5.h"
 
 class HDF5_Writer
