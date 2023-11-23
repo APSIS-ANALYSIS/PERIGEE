@@ -18,9 +18,6 @@ Tissue_property::Tissue_property( const std::string &fileBaseName, const int &ra
   delete h5r; H5Fclose( file_id );
 }
 
-Tissue_property::~Tissue_property()
-{}
-
 Vector_3 Tissue_property::get_basis_r( const int &nn ) const
 {
   const int index = node_locgho_solid[nn];
@@ -56,6 +53,5 @@ void Tissue_property::print_info() const
   std::cout<<"\n basis_c: \n";
   for(int ii=0; ii<size; ii++) basis_c[ii].print();
 }
-
 
 // EOF

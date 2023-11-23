@@ -19,7 +19,7 @@ class Tissue_property
   public:
     Tissue_property( const std::string &fileBaseName, const int &rank );
 
-    virtual ~Tissue_property();
+    virtual ~Tissue_property() = default;
 
     // ------------------------------------------------------------------------
     // Input: nn the index of local_to_global, including local nodes and ghost nodes. 
