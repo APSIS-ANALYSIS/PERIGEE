@@ -521,7 +521,7 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Tangent_Residual(
           (alpha_m * tau_c * mbeta - dd_dv*(1.0 - tau_c*dmbeta*p_t));
 
         const double mass_entry = gwts * NA * rho * detF * NB * alpha_m;
-HDF5_Writer
+
         Tangent00[3*nLocBas*(3*A+0)+3*B+0] += mass_entry 
           + gwts * dd_dv * tau_c * detF * GradNA_invF[0] * GradNB_invF[0];
 
