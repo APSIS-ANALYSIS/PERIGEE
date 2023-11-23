@@ -250,9 +250,9 @@ void PGAssem_FSI::Assem_mass_residual(
 
       for(int ii=0; ii<nLocBas; ++ii)
       {
-	ebasis_r[ii] = tp_ptr -> get_basis_r(IEN_v[ii]);
-	ebasis_l[ii] = tp_ptr -> get_basis_l(IEN_v[ii]);
-	ebasis_c[ii] = tp_ptr -> get_basis_c(IEN_v[ii]);
+        ebasis_r[ii] = tp_ptr -> get_basis_r(IEN_v[ii]);
+        ebasis_l[ii] = tp_ptr -> get_basis_l(IEN_v[ii]);
+        ebasis_c[ii] = tp_ptr -> get_basis_c(IEN_v[ii]);
       }
 
       lassem_s_ptr->Assem_Mass_Residual(&local_d[0], &local_v[0], &local_p[0], elementv, 
@@ -372,14 +372,14 @@ void PGAssem_FSI::Assem_Residual(
 
       for(int ii=0; ii<nLocBas; ++ii)
       {
-	ebasis_r[ii] = tp_ptr -> get_basis_r(IEN_v[ii]);
-	ebasis_l[ii] = tp_ptr -> get_basis_l(IEN_v[ii]);
-	ebasis_c[ii] = tp_ptr -> get_basis_c(IEN_v[ii]);
+        ebasis_r[ii] = tp_ptr -> get_basis_r(IEN_v[ii]);
+        ebasis_l[ii] = tp_ptr -> get_basis_l(IEN_v[ii]);
+        ebasis_c[ii] = tp_ptr -> get_basis_c(IEN_v[ii]);
       }
 
       lassem_s_ptr -> Assem_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], &local_dot_p[0],
           &local_d[0], &local_v[0], &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v,
-	  ebasis_r, ebasis_l, ebasis_c );
+          ebasis_r, ebasis_l, ebasis_c );
 
       VecSetValues(G, 3*nLocBas, row_id_v, lassem_s_ptr->Residual0, ADD_VALUES);
       VecSetValues(G,   nLocBas, row_id_p, lassem_s_ptr->Residual1, ADD_VALUES);
@@ -505,14 +505,14 @@ void PGAssem_FSI::Assem_Tangent_Residual(
 
       for(int ii=0; ii<nLocBas; ++ii)
       {
-	ebasis_r[ii] = tp_ptr -> get_basis_r(IEN_v[ii]);
-	ebasis_l[ii] = tp_ptr -> get_basis_l(IEN_v[ii]);
-	ebasis_c[ii] = tp_ptr -> get_basis_c(IEN_v[ii]);
+        ebasis_r[ii] = tp_ptr -> get_basis_r(IEN_v[ii]);
+        ebasis_l[ii] = tp_ptr -> get_basis_l(IEN_v[ii]);
+        ebasis_c[ii] = tp_ptr -> get_basis_c(IEN_v[ii]);
       }
 
       lassem_s_ptr -> Assem_Tangent_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], &local_dot_p[0],
           &local_d[0], &local_v[0], &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v,
-	  ebasis_r, ebasis_l, ebasis_c );
+          ebasis_r, ebasis_l, ebasis_c );
 
       MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_s_ptr->Tangent00, ADD_VALUES);
 

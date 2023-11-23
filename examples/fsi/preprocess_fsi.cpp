@@ -398,10 +398,10 @@ int main( int argc, char * argv[] )
   // Read the geometry file for the solid domain, generate the list of direction
   // basis vectors of the nodes. The list includes radial, longitudinal, and
   // circumferential basis, denoting by r, l, and c, respectively.
-  std::vector<int> solid_node_id = VTK_T::read_int_PointData(geo_s_file, "GlobalNodeID");
-  std::vector<Vector_3> basis_r = VTK_T::read_Vector3_PointData(geo_s_file, "radial_basis");
-  std::vector<Vector_3> basis_l = VTK_T::read_Vector3_PointData(geo_s_file, "longitudinal_basis");
-  std::vector<Vector_3> basis_c = VTK_T::read_Vector3_PointData(geo_s_file, "circumferential_basis");
+  const std::vector<int> solid_node_id = VTK_T::read_int_PointData(geo_s_file, "GlobalNodeID");
+  const std::vector<Vector_3> basis_r  = VTK_T::read_Vector3_PointData(geo_s_file, "radial_basis");
+  const std::vector<Vector_3> basis_l  = VTK_T::read_Vector3_PointData(geo_s_file, "longitudinal_basis");
+  const std::vector<Vector_3> basis_c  = VTK_T::read_Vector3_PointData(geo_s_file, "circumferential_basis");
 
   SYS_T::print_fatal_if(v_node_s != solid_node_id, "ERROR: GlobalNodeID for solid geometry file is not equal to the whole FSI domain.");
   SYS_T::print_fatal_if(solid_node_id.size() != basis_r.size(), "ERROR: radial_basis is not matched.");
