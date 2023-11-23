@@ -189,11 +189,11 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Residual(
       basis_r += R[ii] * eleBasis_r[ii];
       basis_l += R[ii] * eleBasis_l[ii];
       basis_c += R[ii] * eleBasis_c[ii];
-
-      basis_r = Vec3::normalize( basis_r );
-      basis_l = Vec3::normalize( basis_l );
-      basis_c = Vec3::normalize( basis_c );
     }
+
+    basis_r = Vec3::normalize( basis_r );
+    basis_l = Vec3::normalize( basis_l );
+    basis_c = Vec3::normalize( basis_c );
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
@@ -362,11 +362,11 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Tangent_Residual(
       basis_r += R[ii] * eleBasis_r[ii];
       basis_l += R[ii] * eleBasis_l[ii];
       basis_c += R[ii] * eleBasis_c[ii];
-
-      basis_r = Vec3::normalize( basis_r );
-      basis_l = Vec3::normalize( basis_l );
-      basis_c = Vec3::normalize( basis_c );
     }
+    
+    basis_r = Vec3::normalize( basis_r );
+    basis_l = Vec3::normalize( basis_l );
+    basis_c = Vec3::normalize( basis_c );
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
@@ -644,11 +644,11 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Mass_Residual(
       basis_r += R[ii] * eleBasis_r[ii];
       basis_l += R[ii] * eleBasis_l[ii];
       basis_c += R[ii] * eleBasis_c[ii];
-
-      basis_r = Vec3::normalize( basis_r );
-      basis_l = Vec3::normalize( basis_l );
-      basis_c = Vec3::normalize( basis_c );
     }
+    
+    basis_r = Vec3::normalize( basis_r );
+    basis_l = Vec3::normalize( basis_l );
+    basis_c = Vec3::normalize( basis_c );
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
     
