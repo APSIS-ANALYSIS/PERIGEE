@@ -1,20 +1,18 @@
 #include "Post_error_Poiseuille.hpp"
 
-double POST_ERROR_P::exact_sol_uz( const double &x, const double &y, const double &z, const double &Q, const double &R )
+double POST_ERROR_P::exact_sol_uz( const double &x, const double &y, const double &z, const double &coef, const double &R )
 {
-    double r_square = x * x + y * y;
-
-    return (2 * Q / (MATH_T::PI * R * R) - 2 * Q * r_square / (MATH_T::PI * R * R * R * R));
+    return coef * R * R - coef * x * x - coef * y * y;
 }
 
-double POST_ERROR_P::exact_sol_duz_dx( const double &x, const double &y, const double &z, const double &Q, const double &R )
+double POST_ERROR_P::exact_sol_duz_dx( const double &x, const double &y, const double &z, const double &coef )
 {
-    return -4 * Q * x / (MATH_T::PI * R * R * R * R);
+    return -2 * coef * x;
 }
 
-double POST_ERROR_P::exact_sol_duz_dy( const double &x, const double &y, const double &z, const double &Q, const double &R )
+double POST_ERROR_P::exact_sol_duz_dy( const double &x, const double &y, const double &z, const double &coef)
 {
-    return -4 * Q * y / (MATH_T::PI * R * R * R * R);
+    return -2 * coef * y;
 }
 
 double POST_ERROR_P::get_manu_sol_u_error(
@@ -26,8 +24,10 @@ double POST_ERROR_P::get_manu_sol_u_error(
       const double * const &ectrlPts_y,
       const double * const &ectrlPts_z,
       const IQuadPts * const &quad,
-      const double &Q,
-      const double &Radius )
+      const double &fl_mu,
+      const double &Radius,
+      const double &Length,
+      const double &P_diff )
 {
   double error = 0.0;
 
@@ -52,7 +52,9 @@ double POST_ERROR_P::get_manu_sol_u_error(
       sol.z()+= solu_uz[ii]    * R[ii];
     }
 
-    const Vector_3 exact = exact_sol_u( coor_x, coor_y, coor_z, Q, Radius );
+    const double coefficent = 0.25 * P_diff / (fl_mu * Length);
+
+    const Vector_3 exact = exact_sol_u( coor_x, coor_y, coor_z, coefficent, Radius );
     
     error += (sol - exact).dot_product(sol - exact) * gwts;
   }
@@ -69,8 +71,10 @@ double POST_ERROR_P::get_manu_sol_u_errorH1(
       const double * const &ectrlPts_y,
       const double * const &ectrlPts_z,
       const IQuadPts * const &quad,
-      const double &Q,
-      const double &Radius )
+      const double &fl_mu,
+      const double &Radius,
+      const double &Length,
+      const double &P_diff )
 {
   double errorH1 = 0.0;
 
@@ -116,10 +120,12 @@ double POST_ERROR_P::get_manu_sol_u_errorH1(
       sol_dy.z() += solu_uz[ii] * R_dy[ii];
     }
 
-    const Vector_3 exact = exact_sol_u( coor_x, coor_y, coor_z, Q, Radius );
-    const Vector_3 exact_dx = exact_sol_u_dx( coor_x, coor_y, coor_z, Q, Radius );
-    const Vector_3 exact_dy = exact_sol_u_dy( coor_x, coor_y, coor_z, Q, Radius );
-    const Vector_3 exact_dz = exact_sol_u_dz( coor_x, coor_y, coor_z, Q, Radius );
+    const double coefficent = 0.25 * P_diff / (fl_mu * Length);
+
+    const Vector_3 exact = exact_sol_u( coor_x, coor_y, coor_z, coefficent, Radius );
+    const Vector_3 exact_dx = exact_sol_u_dx( coor_x, coor_y, coor_z, coefficent );
+    const Vector_3 exact_dy = exact_sol_u_dy( coor_x, coor_y, coor_z, coefficent );
+    const Vector_3 exact_dz = exact_sol_u_dz( coor_x, coor_y, coor_z, coefficent );
 
     errorH1 += (sol_dx - exact_dx).dot_product(sol_dx - exact_dx) * gwts 
 	     + (sol_dy - exact_dy).dot_product(sol_dy - exact_dy) * gwts 
@@ -136,8 +142,10 @@ double POST_ERROR_P::get_exact_sol_u_normH2(
     const double * const &ectrlPts_y,
     const double * const &ectrlPts_z,
     const IQuadPts * const &quad,
-    const double &Q,
-    const double &Radius )
+    const double &fl_mu,
+    const double &Radius,
+    const double &Length,
+    const double &P_diff )
 {
   double normH2 = 0.0;
 
@@ -156,16 +164,18 @@ double POST_ERROR_P::get_exact_sol_u_normH2(
       coor_z += ectrlPts_z[ii] * R[ii];
     }
 
-    const Vector_3 exact = exact_sol_u( coor_x, coor_y, coor_z, Q, Radius );
-    const Vector_3 exact_dx = exact_sol_u_dx( coor_x, coor_y, coor_z, Q, Radius );
-    const Vector_3 exact_dy = exact_sol_u_dy( coor_x, coor_y, coor_z, Q, Radius );
-    const Vector_3 exact_dz = exact_sol_u_dz( coor_x, coor_y, coor_z, Q, Radius );
+    const double coefficent = 0.25 * P_diff / (fl_mu * Length);
+
+    const Vector_3 exact = exact_sol_u( coor_x, coor_y, coor_z, coefficent, Radius );
+    const Vector_3 exact_dx = exact_sol_u_dx( coor_x, coor_y, coor_z, coefficent );
+    const Vector_3 exact_dy = exact_sol_u_dy( coor_x, coor_y, coor_z, coefficent );
+    const Vector_3 exact_dz = exact_sol_u_dz( coor_x, coor_y, coor_z, coefficent );
 
     normH2 += exact_dx.dot_product(exact_dx) * gwts 
 	     + exact_dy.dot_product(exact_dy) * gwts 
 	     + exact_dz.dot_product(exact_dz) * gwts 
 	     + exact.dot_product(exact) * gwts
-       + 2 * (-4 * Q / (MATH_T::PI * Radius * Radius * Radius * Radius)) * (-4 * Q / (MATH_T::PI * Radius * Radius * Radius * Radius)) * gwts; // non-trivial second order derivative
+       + 8 * coefficent * coefficent * gwts; // non-trivial second order derivative
   }
 
   return normH2;

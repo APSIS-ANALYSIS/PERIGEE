@@ -218,27 +218,18 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
 
     Vector_3 get_Poiseuille_traction(const Vector_3 &pt, const double &tt, const Vector_3 &n_out) const
     {
-      const double pi = MATH_T::PI;
-      const double Q = 0.04 * pi; // stable flowrate
-      const double Radius = 0.1; // radius
+      const double delta_P = 153.6; // pressure
+      const double Length = 1.2; // tube length
       const double fl_mu = 4.0e-2; // viscosity
 
-      double time_ratio = 0.0;
-      if(tt < 0.2)  // -inflow_thd_time
-        time_ratio = tt / 0.2;  // linearly increasing inflow
-      else
-        time_ratio = 1.0;
-
-      // ux = 0, uy = 0, uz = 2Q * (R^2 - x^2 - y^2) / (pi * R^4);
+      // ux = 0, uy = 0, uz = delta_P * (R^2 - x^2 - y^2) / (4 * fl_mu * L);
       const double x = pt.x(), y = pt.y();
 
       Tensor2_3D velo_grad ( 0.0, 0.0, 0.0,
                              0.0, 0.0, 0.0, 
-                             -4 * Q * x / (pi * Radius * Radius * Radius * Radius),
-                             -4 * Q * y / (pi * Radius * Radius * Radius * Radius),
+                             -delta_P * x / (2 * fl_mu * Length),
+                             -delta_P * y / (2 * fl_mu * Length),
                              0.0);
-      
-      velo_grad *= time_ratio;
 
       Tensor2_3D velo_grad_T = velo_grad;
       velo_grad_T.transpose();

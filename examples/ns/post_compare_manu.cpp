@@ -17,20 +17,26 @@ int main( int argc, char * argv[] )
   std::string part_file("./part");
   const int dof = 4;
 
-  double FlowRate = 0.04 * MATH_T::PI; // 0.04 * PI
+  double fl_mu = 4.0e-2;
   double Radius = 0.1;
+  double Length = 1.2;
+  double P_diff = 153.6;
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
   SYS_T::GetOptionString("-sol_name", sol_name);
   SYS_T::GetOptionReal("-sol_time",   sol_time);
-  SYS_T::GetOptionReal("-flowrate",   FlowRate);
+  SYS_T::GetOptionReal("-fl_mu",      fl_mu);
   SYS_T::GetOptionReal("-radius",     Radius);
+  SYS_T::GetOptionReal("-length",     Length);
+  SYS_T::GetOptionReal("-P_diff",     P_diff);
 
   SYS_T::cmdPrint("-sol_name:", sol_name);
   SYS_T::cmdPrint("-sol_time:", sol_time);
-  SYS_T::cmdPrint("-flowrate:", FlowRate);
+  SYS_T::cmdPrint("-fl_mu:",    fl_mu);
   SYS_T::cmdPrint("-radius:",   Radius);
+  SYS_T::cmdPrint("-length:",   Length);
+  SYS_T::cmdPrint("-P_diff:",   P_diff);
 
   SYS_T::file_check(sol_name.c_str());
 
@@ -88,13 +94,15 @@ int main( int argc, char * argv[] )
 
     // Calculate the error
     subdomain_l2 += POST_ERROR_P::get_manu_sol_u_error(
-      loc_sol_ux, loc_sol_uy, loc_sol_uz, elementv, ectrl_x, ectrl_y, ectrl_z, quadv, FlowRate, Radius );
+      loc_sol_ux, loc_sol_uy, loc_sol_uz, elementv, ectrl_x, ectrl_y, ectrl_z, quadv,
+      fl_mu, Radius, Length, P_diff );
 
     subdomain_H1 += POST_ERROR_P::get_manu_sol_u_errorH1(
-      loc_sol_ux, loc_sol_uy, loc_sol_uz, elementv, ectrl_x, ectrl_y, ectrl_z, quadv, FlowRate, Radius );
+      loc_sol_ux, loc_sol_uy, loc_sol_uz, elementv, ectrl_x, ectrl_y, ectrl_z, quadv,
+      fl_mu, Radius, Length, P_diff );
 
     subdomain_exactH2 += POST_ERROR_P::get_exact_sol_u_normH2(
-      elementv, ectrl_x, ectrl_y, ectrl_z, quadv, FlowRate, Radius );
+      elementv, ectrl_x, ectrl_y, ectrl_z, quadv, fl_mu, Radius, Length, P_diff );
   }
   
   double l2_error = 0.0; double H1_error = 0.0; double H2_exact = 0.0;
