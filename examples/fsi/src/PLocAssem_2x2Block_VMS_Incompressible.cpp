@@ -265,22 +265,22 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Residual(
 }
 
 void PLocAssem_2x2Block_VMS_Incompressible::Assem_Tangent_Residual(
-        const double &time, const double &dt,
-        const double * const &dot_disp,
-        const double * const &dot_velo,
-        const double * const &dot_pres,
-        const double * const &disp,
-        const double * const &velo,
-        const double * const &pres,
-        FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const double * const &qua_prestress,
-        const IQuadPts * const &quad,
-        const std::vector<Vector_3> &eleBasis_r,
-        const std::vector<Vector_3> &eleBasis_l,
-        const std::vector<Vector_3> &eleBasis_c )
+    const double &time, const double &dt,
+    const double * const &dot_disp,
+    const double * const &dot_velo,
+    const double * const &dot_pres,
+    const double * const &disp,
+    const double * const &velo,
+    const double * const &pres,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const double * const &qua_prestress,
+    const IQuadPts * const &quad,
+    const std::vector<Vector_3> &eleBasis_r,
+    const std::vector<Vector_3> &eleBasis_l,
+    const std::vector<Vector_3> &eleBasis_c )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -567,18 +567,18 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Tangent_Residual(
 }
 
 void PLocAssem_2x2Block_VMS_Incompressible::Assem_Mass_Residual(
-        const double * const &disp,
-        const double * const &velo,
-        const double * const &pres,
-        FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const double * const &qua_prestress,
-        const IQuadPts * const &quad,
-        const std::vector<Vector_3> &eleBasis_r,
-        const std::vector<Vector_3> &eleBasis_l,
-        const std::vector<Vector_3> &eleBasis_c )
+    const double * const &disp,
+    const double * const &velo,
+    const double * const &pres,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const double * const &qua_prestress,
+    const IQuadPts * const &quad,
+    const std::vector<Vector_3> &eleBasis_r,
+    const std::vector<Vector_3> &eleBasis_l,
+    const std::vector<Vector_3> &eleBasis_c )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
