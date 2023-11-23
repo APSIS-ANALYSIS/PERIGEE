@@ -46,9 +46,6 @@ Part_FEM_FSI_Tissue::Part_FEM_FSI_Tissue( const IMesh * const &mesh,
   std::cout<<"-- proc "<<cpu_rank<<" Local direction basis vectors generated. \n";
 }
 
-Part_FEM_FSI_Tissue::~Part_FEM_FSI_Tissue()
-{}
-
 void Part_FEM_FSI_Tissue::write( const std::string &inputFileName ) const
 {
   // ------------------------------------------------------

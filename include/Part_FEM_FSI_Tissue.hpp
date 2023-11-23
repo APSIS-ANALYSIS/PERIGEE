@@ -25,15 +25,15 @@ class Part_FEM_FSI_Tissue : public Part_FEM_FSI
         const std::vector<int> &node_f,
         const std::vector<int> &node_s,
         const std::vector<Vector_3> &basis_r,
-	const std::vector<Vector_3> &basis_l,
-	const std::vector<Vector_3> &basis_c,
+        const std::vector<Vector_3> &basis_l,
+        const std::vector<Vector_3> &basis_c,
         const int &in_cpu_rank, 
         const int &in_cpu_size,
         const int &in_elemType,
         const int &in_start_idx,
         const Field_Property &in_fp );
 
-    virtual ~Part_FEM_FSI_Tissue();
+    virtual ~Part_FEM_FSI_Tissue() = default;
 
     virtual void write( const std::string &inputFileName ) const;
 
