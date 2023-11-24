@@ -292,8 +292,8 @@ class IPGAssem
 
     // Special-purpose functions for GOH06 material models, where tissue property is needed.
     virtual void Assem_mass_residual(
-	const PDNSolution * const &disp,
-	const PDNSolution * const &velo,
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
         const PDNSolution * const &pres,
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem_2x2Block * const &lassem_f_ptr,
