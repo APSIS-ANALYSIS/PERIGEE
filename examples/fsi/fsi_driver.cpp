@@ -356,8 +356,8 @@ int main(int argc, char *argv[])
   if( inflow_type == 0 )
     inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file );
   else if( inflow_type == 1 )
-    inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_file );
-    // inflow_rate_ptr = new CVFlowRate_Cosine2Steady( inflow_thd_time, inflow_file );
+    // inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_file );
+    inflow_rate_ptr = new CVFlowRate_Cosine2Steady( inflow_thd_time, inflow_file );
   else if( inflow_type == 2 )
     inflow_rate_ptr = new CVFlowRate_Steady( inflow_file );
   else
@@ -698,11 +698,6 @@ int main(int argc, char *argv[])
       }
 
       ofile.close();
-    }
-
-    if ( GENBC_T::get_genbc_file_type( lpn_file ) == 6)
-    {
-
     }
   }
 
