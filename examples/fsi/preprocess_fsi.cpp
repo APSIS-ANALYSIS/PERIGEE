@@ -400,13 +400,13 @@ int main( int argc, char * argv[] )
   // circumferential basis, denoting by r, l, and c, respectively.
   const std::vector<int> solid_node_id = VTK_T::read_int_PointData(geo_s_file, "GlobalNodeID");
   const std::vector<Vector_3> basis_r  = VTK_T::read_Vector_3_PointData(geo_s_file, "radial_basis");
-  const std::vector<Vector_3> basis_l  = VTK_T::read_Vector_3_PointData(geo_s_file, "longitudinal_basis");
   const std::vector<Vector_3> basis_c  = VTK_T::read_Vector_3_PointData(geo_s_file, "circumferential_basis");
+  const std::vector<Vector_3> basis_l  = VTK_T::read_Vector_3_PointData(geo_s_file, "longitudinal_basis");
 
   SYS_T::print_fatal_if(v_node_s != solid_node_id, "ERROR: GlobalNodeID for solid geometry file is not equal to the whole FSI domain.");
   SYS_T::print_fatal_if(solid_node_id.size() != basis_r.size(), "ERROR: radial_basis is not matched.");
-  SYS_T::print_fatal_if(solid_node_id.size() != basis_l.size(), "ERROR: longitudinal_basis is not matched.");
   SYS_T::print_fatal_if(solid_node_id.size() != basis_c.size(), "ERROR: circumferential_basis is not matched.");
+  SYS_T::print_fatal_if(solid_node_id.size() != basis_l.size(), "ERROR: longitudinal_basis is not matched.");
   std::cout<<"=== Direction basis vectors generated.\n";
   // --------------------------------------------------------------------------
 
@@ -583,7 +583,7 @@ int main( int argc, char * argv[] )
     part_p -> write( part_file_p );
 
     IPart * part_v = new Part_FEM_FSI_Tissue( mesh_v, global_part, mnindex_v, IEN_v,
-        ctrlPts, phy_tag, v_node_f, v_node_s, basis_r, basis_l, basis_c,
+        ctrlPts, phy_tag, v_node_f, v_node_s, basis_r, basis_c, basis_l,
 	proc_rank, cpu_size, elemType, start_idx_v[proc_rank], { 1, dof_fields[1], true, "velocity"} );
 
     part_v -> print_part_loadbalance_edgecut();
