@@ -9,8 +9,8 @@ Part_FEM_FSI_Tissue::Part_FEM_FSI_Tissue( const IMesh * const &mesh,
     const std::vector<int> &node_f,
     const std::vector<int> &node_s,
     const std::vector<Vector_3> &basis_r,
-    const std::vector<Vector_3> &basis_l,
     const std::vector<Vector_3> &basis_c,
+    const std::vector<Vector_3> &basis_l,
     const int &in_cpu_rank, 
     const int &in_cpu_size,
     const int &in_elemType,
@@ -21,8 +21,8 @@ Part_FEM_FSI_Tissue::Part_FEM_FSI_Tissue( const IMesh * const &mesh,
   // Generate the node_locgho_solid
   node_locgho_solid.resize(nlocghonode);
   loc_basis_r.clear();
-  loc_basis_l.clear();
   loc_basis_c.clear();
+  loc_basis_l.clear();
 
   int index = 0;
   for(int ii=0; ii<nlocghonode; ++ii)
@@ -36,8 +36,8 @@ Part_FEM_FSI_Tissue::Part_FEM_FSI_Tissue( const IMesh * const &mesh,
 
       const int pos = VEC_T::get_pos( node_s, aux_index );
       loc_basis_r.push_back( basis_r[pos] );
-      loc_basis_l.push_back( basis_l[pos] );
       loc_basis_c.push_back( basis_c[pos] );
+      loc_basis_l.push_back( basis_l[pos] );
     }
     else node_locgho_solid[ii] = -1;
   }
@@ -64,8 +64,8 @@ void Part_FEM_FSI_Tissue::write( const std::string &inputFileName ) const
   h5w -> write_intScalar( group_id_8, "nlocghonode_s", nlocghonode_s );
   h5w -> write_intVector( group_id_8, "node_locgho_solid", node_locgho_solid );
   h5w -> write_Vector_3_Vector( group_id_8, "loc_basis_r", loc_basis_r );
-  h5w -> write_Vector_3_Vector( group_id_8, "loc_basis_l", loc_basis_l );
   h5w -> write_Vector_3_Vector( group_id_8, "loc_basis_c", loc_basis_c );
+  h5w -> write_Vector_3_Vector( group_id_8, "loc_basis_l", loc_basis_l );
 
   H5Gclose( group_id_8 );
 

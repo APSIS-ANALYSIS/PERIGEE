@@ -25,8 +25,8 @@ class Part_FEM_FSI_Tissue : public Part_FEM_FSI
         const std::vector<int> &node_f,
         const std::vector<int> &node_s,
         const std::vector<Vector_3> &basis_r,
-        const std::vector<Vector_3> &basis_l,
         const std::vector<Vector_3> &basis_c,
+        const std::vector<Vector_3> &basis_l,
         const int &in_cpu_rank, 
         const int &in_cpu_size,
         const int &in_elemType,
@@ -38,9 +38,9 @@ class Part_FEM_FSI_Tissue : public Part_FEM_FSI
     virtual void write( const std::string &inputFileName ) const;
 
   protected:
-    // local direction vecters. Letters r, l, and c denotes the radial, longitudinal,
-    // and circumferential directions, respectively.
-    std::vector<Vector_3> loc_basis_r, loc_basis_l, loc_basis_c;
+    // local direction vecters. Letters r, c, and l denotes the radial, circumferential,
+    // and longitudinal directions, respectively.
+    std::vector<Vector_3> loc_basis_r, loc_basis_c, loc_basis_l;
 
     // A vector with length of nlocghonode, mapping from the total local+ghost nodes
     // to the solid local+ghost nodes. If node [ii] is a solid node, the mapping
