@@ -214,7 +214,7 @@ Vector_3 HDF5_Reader::read_Vector_3( const char * const &group_name,
   return out;
 }
 
-std::vector<Vector_3> HDF5_Reader::read_Vector3_Vector( const char * const &group_name,
+std::vector<Vector_3> HDF5_Reader::read_Vector_3_Vector( const char * const &group_name,
     const char * const &data_name ) const
 {
   const std::vector<double> ddata = read_doubleVector( group_name, data_name );

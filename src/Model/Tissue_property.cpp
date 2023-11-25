@@ -11,9 +11,9 @@ Tissue_property::Tissue_property( const std::string &fileBaseName, const int &ra
 
   nlocghonode_s = h5r -> read_intScalar("directionBasis_loc", "nlocghonode_s");
   node_locgho_solid = h5r -> read_intVector("directionBasis_loc", "node_locgho_solid");
-  basis_r = h5r -> read_Vector3_Vector("directionBasis_loc", "loc_basis_r");
-  basis_l = h5r -> read_Vector3_Vector("directionBasis_loc", "loc_basis_l");
-  basis_c = h5r -> read_Vector3_Vector("directionBasis_loc", "loc_basis_c");
+  basis_r = h5r -> read_Vector_3_Vector("directionBasis_loc", "loc_basis_r");
+  basis_l = h5r -> read_Vector_3_Vector("directionBasis_loc", "loc_basis_l");
+  basis_c = h5r -> read_Vector_3_Vector("directionBasis_loc", "loc_basis_c");
 
   delete h5r; H5Fclose( file_id );
 }
