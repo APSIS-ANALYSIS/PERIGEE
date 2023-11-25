@@ -86,8 +86,8 @@ class MaterialModel_GOH06_Incompressible_Mixed : public IMaterialModel
     // e1 = [1, 0, 0], e2 = [0, 1, 0], and e3 = [0, 0, 1].
     // And the input vector basis_r, basis_c, and basis_l correspond to e1, e2, and e3,
     // respectively.
-    virtual void update_fibre_dir( const Vector_3 &basis_r, const Vector_3 &basis_l,
-        const Vector_3 &basis_c );
+    virtual void update_fibre_dir( const Vector_3 &basis_r, const Vector_3 &basis_c,
+        const Vector_3 &basis_l );
 
   private:
     // useful constants

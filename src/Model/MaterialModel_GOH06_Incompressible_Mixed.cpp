@@ -275,7 +275,7 @@ Vector_3 MaterialModel_GOH06_Incompressible_Mixed::get_fibre_dir( const int &dir
 }
 
 void MaterialModel_GOH06_Incompressible_Mixed::update_fibre_dir( const Vector_3 &basis_r,
-  const Vector_3 &basis_l, const Vector_3 &basis_c )
+  const Vector_3 &basis_c, const Vector_3 &basis_l )
 {
   a1 = a01(0) * basis_r + a01(1) * basis_c + a01(2) * basis_l;
   a2 = a02(0) * basis_r + a02(1) * basis_c + a02(2) * basis_l;
