@@ -63,9 +63,9 @@ void Part_FEM_FSI_Tissue::write( const std::string &inputFileName ) const
 
   h5w -> write_intScalar( group_id_8, "nlocghonode_s", nlocghonode_s );
   h5w -> write_intVector( group_id_8, "node_locgho_solid", node_locgho_solid );
-  h5w -> write_Vector3_Vector( group_id_8, "loc_basis_r", loc_basis_r );
-  h5w -> write_Vector3_Vector( group_id_8, "loc_basis_l", loc_basis_l );
-  h5w -> write_Vector3_Vector( group_id_8, "loc_basis_c", loc_basis_c );
+  h5w -> write_Vector_3_Vector( group_id_8, "loc_basis_r", loc_basis_r );
+  h5w -> write_Vector_3_Vector( group_id_8, "loc_basis_l", loc_basis_l );
+  h5w -> write_Vector_3_Vector( group_id_8, "loc_basis_c", loc_basis_c );
 
   H5Gclose( group_id_8 );
 
