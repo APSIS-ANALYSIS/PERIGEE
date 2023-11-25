@@ -217,28 +217,13 @@ Vector_3 HDF5_Reader::read_Vector_3( const char * const &group_name,
 std::vector<Vector_3> HDF5_Reader::read_Vector3_Vector( const char * const &group_name,
     const char * const &data_name ) const
 {
-  hid_t drank;
-  hsize_t * ddims;
-  double * ddata;
-
-  read_doubleArray( group_name, data_name, drank, ddims, ddata );
-
-  if( drank != 2 || ddims[1] != 3 )
-  {
-    std::ostringstream oss;
-    oss<<"Error: HDF5_Reader::read_Vector_3_Vector read data at "<<group_name;
-    oss<<" with name "<<data_name<<" is not a Vector_3 vector! \n";
-    SYS_T::print_fatal( oss.str().c_str() );
-  }
-
-  const int vec_size = ddims[0];
-
+  const std::vector<double> ddata = read_doubleVector( group_name, data_name );
+  const int vec_size = VEC_T::get_size(ddata) / 3;
   std::vector<Vector_3> out( vec_size );
 
   for(int ii=0; ii<vec_size; ++ii)
     out[ii] = Vector_3( ddata[ii*3+0], ddata[ii*3+1], ddata[ii*3+2] );
 
-  delete [] ddims; delete [] ddata; ddims = nullptr; ddata = nullptr;
   return out;
 }
 
