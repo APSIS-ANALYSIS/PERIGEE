@@ -243,20 +243,20 @@ void PGAssem_FSI::Assem_mass_residual(
       const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
 
       // For solid element, the direction basis includes 3 Vector_3 for each node.
-      // ebasis_r, ebasis_l, and ebasis_c are vectors of length nLocBas.
+      // ebasis_r, ebasis_c, and ebasis_l are vectors of length nLocBas.
       std::vector<Vector_3> ebasis_r(nLocBas);
-      std::vector<Vector_3> ebasis_l(nLocBas);
       std::vector<Vector_3> ebasis_c(nLocBas);
+      std::vector<Vector_3> ebasis_l(nLocBas);
 
       for(int ii=0; ii<nLocBas; ++ii)
       {
         ebasis_r[ii] = tp_ptr -> get_basis_r(IEN_v[ii]);
-        ebasis_l[ii] = tp_ptr -> get_basis_l(IEN_v[ii]);
         ebasis_c[ii] = tp_ptr -> get_basis_c(IEN_v[ii]);
+        ebasis_l[ii] = tp_ptr -> get_basis_l(IEN_v[ii]);
       }
 
       lassem_s_ptr->Assem_Mass_Residual(&local_d[0], &local_v[0], &local_p[0], elementv, 
-          ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v, ebasis_r, ebasis_l, ebasis_c);
+          ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v, ebasis_r, ebasis_c, ebasis_l);
 
       MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_s_ptr->Tangent00, ADD_VALUES);
 
@@ -365,21 +365,21 @@ void PGAssem_FSI::Assem_Residual(
       const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
 
       // For solid element, the direction basis includes 3 Vector_3 for each node.
-      // ebasis_r, ebasis_l, and ebasis_c are vectors of length nLocBas.
+      // ebasis_r, ebasis_c, and ebasis_l are vectors of length nLocBas.
       std::vector<Vector_3> ebasis_r(nLocBas);
-      std::vector<Vector_3> ebasis_l(nLocBas);
       std::vector<Vector_3> ebasis_c(nLocBas);
+      std::vector<Vector_3> ebasis_l(nLocBas);
 
       for(int ii=0; ii<nLocBas; ++ii)
       {
         ebasis_r[ii] = tp_ptr -> get_basis_r(IEN_v[ii]);
-        ebasis_l[ii] = tp_ptr -> get_basis_l(IEN_v[ii]);
         ebasis_c[ii] = tp_ptr -> get_basis_c(IEN_v[ii]);
+        ebasis_l[ii] = tp_ptr -> get_basis_l(IEN_v[ii]);
       }
 
       lassem_s_ptr -> Assem_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], &local_dot_p[0],
           &local_d[0], &local_v[0], &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v,
-          ebasis_r, ebasis_l, ebasis_c );
+          ebasis_r, ebasis_c, ebasis_l );
 
       VecSetValues(G, 3*nLocBas, row_id_v, lassem_s_ptr->Residual0, ADD_VALUES);
       VecSetValues(G,   nLocBas, row_id_p, lassem_s_ptr->Residual1, ADD_VALUES);
@@ -498,21 +498,21 @@ void PGAssem_FSI::Assem_Tangent_Residual(
       const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
 
       // For solid element, the direction basis includes 3 Vector_3 for each node.
-      // ebasis_r, ebasis_l, and ebasis_c are vectors of length nLocBas.
+      // ebasis_r, ebasis_c, and ebasis_l are vectors of length nLocBas.
       std::vector<Vector_3> ebasis_r(nLocBas);
-      std::vector<Vector_3> ebasis_l(nLocBas);
       std::vector<Vector_3> ebasis_c(nLocBas);
+      std::vector<Vector_3> ebasis_l(nLocBas);
 
       for(int ii=0; ii<nLocBas; ++ii)
       {
         ebasis_r[ii] = tp_ptr -> get_basis_r(IEN_v[ii]);
-        ebasis_l[ii] = tp_ptr -> get_basis_l(IEN_v[ii]);
         ebasis_c[ii] = tp_ptr -> get_basis_c(IEN_v[ii]);
+        ebasis_l[ii] = tp_ptr -> get_basis_l(IEN_v[ii]);
       }
 
       lassem_s_ptr -> Assem_Tangent_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], &local_dot_p[0],
           &local_d[0], &local_v[0], &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v,
-          ebasis_r, ebasis_l, ebasis_c );
+          ebasis_r, ebasis_c, ebasis_l );
 
       MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_s_ptr->Tangent00, ADD_VALUES);
 

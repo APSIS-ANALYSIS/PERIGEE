@@ -107,8 +107,8 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Residual(
     const double * const &qua_prestress,
     const IQuadPts * const &quad,
     const std::vector<Vector_3> &eleBasis_r,
-    const std::vector<Vector_3> &eleBasis_l,
-    const std::vector<Vector_3> &eleBasis_c )
+    const std::vector<Vector_3> &eleBasis_c,
+    const std::vector<Vector_3> &eleBasis_l )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -136,8 +136,8 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Residual(
     Vector_3 coor(0.0, 0.0, 0.0);
 
     Vector_3 basis_r(0.0, 0.0, 0.0);
-    Vector_3 basis_l(0.0, 0.0, 0.0);
     Vector_3 basis_c(0.0, 0.0, 0.0);
+    Vector_3 basis_l(0.0, 0.0, 0.0);
 
     std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
@@ -184,13 +184,13 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Residual(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
 
       basis_r += R[ii] * eleBasis_r[ii];
-      basis_l += R[ii] * eleBasis_l[ii];
       basis_c += R[ii] * eleBasis_c[ii];
+      basis_l += R[ii] * eleBasis_l[ii];
     }
 
     basis_r = Vec3::normalize( basis_r );
-    basis_l = Vec3::normalize( basis_l );
     basis_c = Vec3::normalize( basis_c );
+    basis_l = Vec3::normalize( basis_l );
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
@@ -276,8 +276,8 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Tangent_Residual(
     const double * const &qua_prestress,
     const IQuadPts * const &quad,
     const std::vector<Vector_3> &eleBasis_r,
-    const std::vector<Vector_3> &eleBasis_l,
-    const std::vector<Vector_3> &eleBasis_c )
+    const std::vector<Vector_3> &eleBasis_c,
+    const std::vector<Vector_3> &eleBasis_l )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -310,8 +310,8 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Tangent_Residual(
     Vector_3 coor(0.0, 0.0, 0.0);
 
     Vector_3 basis_r(0.0, 0.0, 0.0);
-    Vector_3 basis_l(0.0, 0.0, 0.0);
     Vector_3 basis_c(0.0, 0.0, 0.0);
+    Vector_3 basis_l(0.0, 0.0, 0.0);
 
     std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
   
@@ -358,13 +358,13 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Tangent_Residual(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
 
       basis_r += R[ii] * eleBasis_r[ii];
-      basis_l += R[ii] * eleBasis_l[ii];
       basis_c += R[ii] * eleBasis_c[ii];
+      basis_l += R[ii] * eleBasis_l[ii];
     }
 
     basis_r = Vec3::normalize( basis_r );
-    basis_l = Vec3::normalize( basis_l );
     basis_c = Vec3::normalize( basis_c );
+    basis_l = Vec3::normalize( basis_l );
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
@@ -602,8 +602,8 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Mass_Residual(
     const double * const &qua_prestress,
     const IQuadPts * const &quad,
     const std::vector<Vector_3> &eleBasis_r,
-    const std::vector<Vector_3> &eleBasis_l,
-    const std::vector<Vector_3> &eleBasis_c )
+    const std::vector<Vector_3> &eleBasis_c,
+    const std::vector<Vector_3> &eleBasis_l )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -627,8 +627,8 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Mass_Residual(
     Vector_3 coor(0.0, 0.0, 0.0);
 
     Vector_3 basis_r(0.0, 0.0, 0.0);
-    Vector_3 basis_l(0.0, 0.0, 0.0);
     Vector_3 basis_c(0.0, 0.0, 0.0);
+    Vector_3 basis_l(0.0, 0.0, 0.0);
 
     std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
     element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
@@ -666,13 +666,13 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Mass_Residual(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
 
       basis_r += R[ii] * eleBasis_r[ii];
-      basis_l += R[ii] * eleBasis_l[ii];
       basis_c += R[ii] * eleBasis_c[ii];
+      basis_l += R[ii] * eleBasis_l[ii];
     }
 
     basis_r = Vec3::normalize( basis_r );
-    basis_l = Vec3::normalize( basis_l );
     basis_c = Vec3::normalize( basis_c );
+    basis_l = Vec3::normalize( basis_l );
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 

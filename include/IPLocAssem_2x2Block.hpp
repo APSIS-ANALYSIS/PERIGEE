@@ -186,8 +186,8 @@ class IPLocAssem_2x2Block
         const double * const &qua_prestress,
         const IQuadPts * const &quad,
         const std::vector<Vector_3> &eleBasis_r,
-        const std::vector<Vector_3> &eleBasis_l,
-        const std::vector<Vector_3> &eleBasis_c )
+        const std::vector<Vector_3> &eleBasis_c,
+        const std::vector<Vector_3> &eleBasis_l )
     {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Residual is not implemented. \n");}
 
     // Assembly the two Residuals and the four matrice blocks.
@@ -249,8 +249,8 @@ class IPLocAssem_2x2Block
         const double * const &qua_prestress,
         const IQuadPts * const &quad,
         const std::vector<Vector_3> &eleBasis_r,
-        const std::vector<Vector_3> &eleBasis_l,
-        const std::vector<Vector_3> &eleBasis_c )
+        const std::vector<Vector_3> &eleBasis_c,
+        const std::vector<Vector_3> &eleBasis_l )
     {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Tangent_Residual is not implemented. \n");}
 
     // Assembly the two Residuals and the four matrice blocks for mass matrices.
@@ -298,8 +298,8 @@ class IPLocAssem_2x2Block
         const double * const &qua_prestress,
         const IQuadPts * const &quad,
         const std::vector<Vector_3> &eleBasis_r,
-        const std::vector<Vector_3> &eleBasis_l,
-        const std::vector<Vector_3> &eleBasis_c )
+        const std::vector<Vector_3> &eleBasis_c,
+        const std::vector<Vector_3> &eleBasis_l )
     {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Mass_Residual is not implemented. \n");}
 
     // Perform surface integration for elemental BC id ebc_id.
