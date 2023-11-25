@@ -28,9 +28,9 @@ class Tissue_property
     // ------------------------------------------------------------------------
     virtual Vector_3 get_basis_r( const int &nn ) const;
 
-    virtual Vector_3 get_basis_l( const int &nn ) const;
-
     virtual Vector_3 get_basis_c( const int &nn ) const;
+
+    virtual Vector_3 get_basis_l( const int &nn ) const;
 
     // ------------------------------------------------------------------------
     // ! Print the info for this class.
@@ -54,10 +54,10 @@ class Tissue_property
     std::vector<int> node_locgho_solid;
 
     // ------------------------------------------------------------------------
-    // The direction basis vectors. Letters r, l, and c denote radial, longitudinal,
-    // and circumferential, respectively. 
+    // The direction basis vectors. Letters r, c, and l denote radial, circumferential,
+    // and longitudinal, respectively. 
     // ------------------------------------------------------------------------
-    std::vector< Vector_3 > basis_r, basis_l, basis_c;
+    std::vector< Vector_3 > basis_r, basis_c, basis_l;
 };
 
 #endif
