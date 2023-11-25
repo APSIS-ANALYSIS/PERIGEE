@@ -101,7 +101,7 @@ namespace VTK_T
   std::vector<double> read_double_PointData( const std::string &filename, 
       const std::string &dataname );
 
-  std::vector<Vector_3> read_Vector3_PointData( const std::string &filename,
+  std::vector<Vector_3> read_Vector_3_PointData( const std::string &filename,
       const std::string &dataname );
 
   // ----------------------------------------------------------------

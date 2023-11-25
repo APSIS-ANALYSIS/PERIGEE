@@ -376,7 +376,7 @@ std::vector<double> VTK_T::read_double_PointData( const std::string &filename,
   return data;
 }
 
-std::vector<Vector_3> VTK_T::read_Vector3_PointData( const std::string &filename,
+std::vector<Vector_3> VTK_T::read_Vector_3_PointData( const std::string &filename,
     const std::string &dataname )
 {
   vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
@@ -400,7 +400,7 @@ std::vector<Vector_3> VTK_T::read_Vector3_PointData( const std::string &filename
     numpts = static_cast<int>( vtkgrid -> GetNumberOfPoints() );
   }
   else
-    SYS_T::print_fatal("VTK_T::read_Vector3_PointData unknown vtk object type.\n");
+    SYS_T::print_fatal("VTK_T::read_Vector_3_PointData unknown vtk object type.\n");
 
   vtkDataArray * pd = pointdata->GetScalars( dataname.c_str() );
 
