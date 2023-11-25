@@ -68,7 +68,7 @@ class MaterialModel_GOH06_ST91_Mixed : public IMaterialModel
     virtual Vector_3 get_fibre_dir( const int &dir ) const;
 
     // Update fibre direction by input direction basis for each point.
-    // Notice that the original fibre direction a1 and a2 are difined on the basis vector
+    // Notice that the original fibre direction a1 and a2 are defined on the basis vector
     // e1 = [1, 0, 0], e2 = [0, 1, 0], and e3 = [0, 0, 1].
     // And the input vector basis_r, basis_c, and basis_l correspond to e1, e2, and e3,
     // respectively.
@@ -89,13 +89,13 @@ class MaterialModel_GOH06_ST91_Mixed : public IMaterialModel
     double f1_the, f1_phi, f2_the, f2_phi;
 
     // fibre elastic parameter
-    // fkd is the dispresion parameter ranging from 0 to 1/3
+    // fkd is the dispersion parameter ranging from 0 to 1/3
     double fk1, fk2, fkd;
 
     // unit vector for fibre direction in the ref domain    
     Vector_3 a1, a2;
 
-    // unit vector for fibre direction difined on the basis vector 
+    // unit vector for fibre direction defined on the basis vector 
     // e1 = [1, 0, 0], e2 = [0, 1, 0], and e3 = [0, 0, 1]
     Vector_3 a01, a02;
 };
