@@ -101,6 +101,12 @@ namespace VTK_T
   std::vector<double> read_double_PointData( const std::string &filename, 
       const std::string &dataname );
 
+  // ----------------------------------------------------------------
+  // read Vector_3 point data from file in solid vtu file.
+  // Input: \para filename the solid vtu file name
+  //        \para dataname the data property name
+  // Output: \para data the Vector_3 data associated with point
+  // ----------------------------------------------------------------
   std::vector<Vector_3> read_Vector_3_PointData( const std::string &filename,
       const std::string &dataname );
 
