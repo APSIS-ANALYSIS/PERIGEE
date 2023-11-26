@@ -296,7 +296,8 @@ void PGAssem_Wall_Prestress::Assem_Residual(
     const ALocal_NBC * const &nbc_p,
     const ALocal_EBC * const &ebc_v,
     const ALocal_EBC * const &ebc_p,
-    const Tissue_prestress * const &ps_ptr )
+    const Tissue_prestress * const &ps_ptr, 
+    const Tissue_property * const &tp_ptr )
 {
   const int nElem = alelem_ptr->get_nlocalele();
 
@@ -344,9 +345,22 @@ void PGAssem_Wall_Prestress::Assem_Residual(
     {
       const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
 
+      // For solid element, the direction basis includes 3 Vector_3 for each node.
+      // ebasis_r, ebasis_c, and ebasis_l are vectors of length nLocBas.
+      std::vector<Vector_3> ebasis_r(nLocBas);
+      std::vector<Vector_3> ebasis_c(nLocBas);
+      std::vector<Vector_3> ebasis_l(nLocBas);
+
+      for(int ii=0; ii<nLocBas; ++ii)
+      {
+        ebasis_r[ii] = tp_ptr -> get_basis_r(IEN_v[ii]);
+        ebasis_c[ii] = tp_ptr -> get_basis_c(IEN_v[ii]);
+        ebasis_l[ii] = tp_ptr -> get_basis_l(IEN_v[ii]);
+      }
+
       lassem_s_ptr -> Assem_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], 
           &local_dot_p[0], &local_d[0], &local_v[0], &local_p[0], elementv, 
-          ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v );
+          ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v, ebasis_r, ebasis_c, ebasis_l );
 
       VecSetValues(G, 3*nLocBas, row_id_v, lassem_s_ptr->Residual0, ADD_VALUES);
       VecSetValues(G,   nLocBas, row_id_p, lassem_s_ptr->Residual1, ADD_VALUES);
@@ -389,7 +403,8 @@ void PGAssem_Wall_Prestress::Assem_Tangent_Residual(
     const ALocal_NBC * const &nbc_p,
     const ALocal_EBC * const &ebc_v,
     const ALocal_EBC * const &ebc_p,
-    const Tissue_prestress * const &ps_ptr )
+    const Tissue_prestress * const &ps_ptr, 
+    const Tissue_property * const &tp_ptr )
 {
   const int nElem = alelem_ptr->get_nlocalele();
 
@@ -438,9 +453,22 @@ void PGAssem_Wall_Prestress::Assem_Tangent_Residual(
     {
       const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
 
+      // For solid element, the direction basis includes 3 Vector_3 for each node.
+      // ebasis_r, ebasis_c, and ebasis_l are vectors of length nLocBas.
+      std::vector<Vector_3> ebasis_r(nLocBas);
+      std::vector<Vector_3> ebasis_c(nLocBas);
+      std::vector<Vector_3> ebasis_l(nLocBas);
+
+      for(int ii=0; ii<nLocBas; ++ii)
+      {
+        ebasis_r[ii] = tp_ptr -> get_basis_r(IEN_v[ii]);
+        ebasis_c[ii] = tp_ptr -> get_basis_c(IEN_v[ii]);
+        ebasis_l[ii] = tp_ptr -> get_basis_l(IEN_v[ii]);
+      }
+
       lassem_s_ptr -> Assem_Tangent_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0],
           &local_dot_p[0], &local_d[0], &local_v[0], &local_p[0], elementv,
-          ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v );
+          ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v, ebasis_r, ebasis_c, ebasis_l );
 
       MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_s_ptr->Tangent00, ADD_VALUES);
 
@@ -481,7 +509,8 @@ void PGAssem_Wall_Prestress::Update_Wall_Prestress(
     const ALocal_IEN * const &lien_v,
     const ALocal_IEN * const &lien_p,
     const FEANode * const &fnode_ptr,
-    Tissue_prestress * const &ps_ptr ) const
+    Tissue_prestress * const &ps_ptr, 
+    const Tissue_property * const &tp_ptr ) const
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int nqp   = quadv -> get_num_quadPts();
@@ -503,8 +532,21 @@ void PGAssem_Wall_Prestress::Update_Wall_Prestress(
       const std::vector<double> local_d = GetLocal( array_d, IEN_v, nLocBas, 3 );
       const std::vector<double> local_p = GetLocal( array_p, IEN_p, nLocBas, 1 );
 
+      // For solid element, the direction basis includes 3 Vector_3 for each node.
+      // ebasis_r, ebasis_c, and ebasis_l are vectors of length nLocBas.
+      std::vector<Vector_3> ebasis_r(nLocBas);
+      std::vector<Vector_3> ebasis_c(nLocBas);
+      std::vector<Vector_3> ebasis_l(nLocBas);
+
+      for(int ii=0; ii<nLocBas; ++ii)
+      {
+        ebasis_r[ii] = tp_ptr -> get_basis_r(IEN_v[ii]);
+        ebasis_c[ii] = tp_ptr -> get_basis_c(IEN_v[ii]);
+        ebasis_l[ii] = tp_ptr -> get_basis_l(IEN_v[ii]);
+      }
+
       const std::vector<Tensor2_3D> sigma = lassem_s_ptr -> get_Wall_CauchyStress( &local_d[0], 
-          &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, quadv );
+          &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, quadv, ebasis_r, ebasis_l, ebasis_c );
 
       for( int qua = 0; qua < nqp; ++qua )
       {

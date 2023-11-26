@@ -57,7 +57,8 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const ALocal_NBC * const &nbc_p,
         const ALocal_EBC * const &ebc_v,
         const ALocal_EBC * const &ebc_p,
-        const Tissue_prestress * const &ps_ptr );
+        const Tissue_prestress * const &ps_ptr,
+        const Tissue_property * const &tp_ptr );
 
     virtual void Assem_Tangent_Residual(
         const double &curr_time,
@@ -81,7 +82,8 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const ALocal_NBC * const &nbc_p,
         const ALocal_EBC * const &ebc_v,
         const ALocal_EBC * const &ebc_p,
-        const Tissue_prestress * const &ps_ptr );
+        const Tissue_prestress * const &ps_ptr,
+        const Tissue_property * const &tp_ptr );
 
     virtual void Update_Wall_Prestress(
         const PDNSolution * const &disp,
@@ -93,7 +95,8 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const ALocal_IEN * const &lien_v,
         const ALocal_IEN * const &lien_p,
         const FEANode * const &fnode_ptr,
-        Tissue_prestress * const &ps_ptr ) const;
+        Tissue_prestress * const &ps_ptr,
+	const Tissue_property * const &tp_ptr ) const;
 
   private:
     const int nLocBas, snLocBas, num_ebc, nlgn_v, nlgn_p;
