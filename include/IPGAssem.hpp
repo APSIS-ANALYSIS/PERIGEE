@@ -26,6 +26,7 @@
 #include "ALocal_EBC.hpp"
 #include "IGenBC.hpp"
 #include "Tissue_prestress.hpp"
+#include "Tissue_property.hpp"
 
 class IPGAssem
 {
@@ -129,7 +130,6 @@ class IPGAssem
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part )
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
-
 
     // Nonzero pattern estimate for the NS equations
     virtual void Assem_nonzero_estimate(
@@ -237,7 +237,6 @@ class IPGAssem
         const ALocal_EBC * const &ebc_part )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
-
     // Assemble mass matrix and residual vector for CMM with ring BC
     virtual void Assem_mass_residual(
         const PDNSolution * const &sol_a,
@@ -253,7 +252,6 @@ class IPGAssem
         const ALocal_RingBC * const &ringnbc_part,
         const ALocal_EBC * const &ebc_part )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
-
 
     virtual void Assem_mass_residual(
         const PDNSolution * const &sol_a,
@@ -292,6 +290,28 @@ class IPGAssem
         const Tissue_prestress * const &ps_ptr )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
+    // Special-purpose functions for GOH06 material models, where tissue property is needed.
+    virtual void Assem_mass_residual(
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
+        const PDNSolution * const &pres,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem_2x2Block * const &lassem_f_ptr,
+        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_v,
+        const ALocal_IEN * const &lien_p,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_v,
+        const ALocal_NBC * const &nbc_p,
+        const ALocal_EBC * const &ebc_part,
+        const Tissue_prestress * const &ps_ptr,
+	const Tissue_property * const &tp_ptr )
+    {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
+
     // ------------------------------------------------------------------------
     // ! Assem_residual : assembly residual vector for 3D problem WITHOUT
     //                    pre-existing cached quadrature info.
@@ -313,7 +333,6 @@ class IPGAssem
         const ALocal_EBC * const &ebc_part )
     {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
-
     virtual void Assem_residual(
         const PDNSolution * const &sol_a,
         const PDNSolution * const &sol_b,
@@ -334,7 +353,6 @@ class IPGAssem
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
-
     virtual void Assem_residual(
         const PDNSolution * const &sol_a,
         const PDNSolution * const &sol_b,
@@ -354,7 +372,6 @@ class IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
-
 
     // Assemble residual for the CMM equations with ring BC
     virtual void Assem_residual(
@@ -381,7 +398,6 @@ class IPGAssem
         const IGenBC * const &gbc )
         {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
-
     virtual void Assem_residual(
         const PDNSolution * const &sol_a,
         const PDNSolution * const &sol_b,
@@ -400,7 +416,6 @@ class IPGAssem
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part )
     {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
-
 
     virtual void Assem_residual(
         const PDNSolution * const &sol_a,
@@ -422,7 +437,6 @@ class IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
-
 
     virtual void Assem_residual(
         const PDNSolution * const &sol_a,
@@ -446,7 +460,6 @@ class IPGAssem
         const IGenBC * const &gbc,
         const Tissue_prestress * const &ps_ptr )
         {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
-
 
     virtual void Assem_residual(
         const PDNSolution * const &sol_a,
@@ -497,6 +510,36 @@ class IPGAssem
         const Tissue_prestress * const &ps_ptr )
         {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
+    // Special for GOH06 material models, where tissue property is needed.
+    virtual void Assem_Residual(
+        const double &curr_time, const double &dt,
+        const PDNSolution * const &dot_disp,
+        const PDNSolution * const &dot_velo,
+        const PDNSolution * const &dot_pres,
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
+        const PDNSolution * const &pres,
+        const PDNSolution * const &dot_velo_np1,
+        const PDNSolution * const &velo_np1,
+        const PDNSolution * const &disp_np1,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem_2x2Block * const &lassem_f_ptr,
+        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_v,
+        const ALocal_IEN * const &lien_p,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_v,
+        const ALocal_NBC * const &nbc_p,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc,
+        const Tissue_prestress * const &ps_ptr,
+	const Tissue_property * const &tp_ptr )
+        {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
+
     // Assembly in the prestress generation
     virtual void Assem_Residual(
         const double &curr_time,
@@ -520,7 +563,34 @@ class IPGAssem
         const ALocal_NBC * const &nbc_p,
         const ALocal_EBC * const &ebc_v,
         const ALocal_EBC * const &ebc_p,
-        const Tissue_prestress * const &ps_ptr) 
+        const Tissue_prestress * const &ps_ptr )
+        {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
+
+    // Special for GOH06 material models, where tissue property is needed.
+    virtual void Assem_Residual(
+        const double &curr_time,
+        const double &dt,
+        const PDNSolution * const &dot_disp,
+        const PDNSolution * const &dot_velo,
+        const PDNSolution * const &dot_pres,
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
+        const PDNSolution * const &pres,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_v,
+        const ALocal_IEN * const &lien_p,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_v,
+        const ALocal_NBC * const &nbc_p,
+        const ALocal_EBC * const &ebc_v,
+        const ALocal_EBC * const &ebc_p,
+        const Tissue_prestress * const &ps_ptr,
+	const Tissue_property * const &tp_ptr ) 
         {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
     // ------------------------------------------------------------------------
@@ -545,7 +615,6 @@ class IPGAssem
         const ALocal_EBC * const &ebc_part )
     {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
-
     virtual void Assem_tangent_residual(
         const PDNSolution * const &sol_a,
         const PDNSolution * const &sol_b,
@@ -566,7 +635,6 @@ class IPGAssem
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
-
     virtual void Assem_tangent_residual(
         const PDNSolution * const &sol_a,
         const PDNSolution * const &sol_b,
@@ -586,7 +654,6 @@ class IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
-
 
     // Assemble the residual vector and tangent matrix for CMM with ring BC
     virtual void Assem_tangent_residual(
@@ -613,7 +680,6 @@ class IPGAssem
         const IGenBC * const &gbc )
         {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
-
     virtual void Assem_tangent_residual(
         const PDNSolution * const &sol_a,
         const PDNSolution * const &sol_b,
@@ -629,7 +695,6 @@ class IPGAssem
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part )
     {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
-
 
     virtual void Assem_tangent_residual(
         const PDNSolution * const &sol_a,
@@ -649,7 +714,6 @@ class IPGAssem
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part )
     {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
-
 
     virtual void Assem_tangent_residual(
         const PDNSolution * const &sol_a,
@@ -671,7 +735,6 @@ class IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
-
 
     virtual void Assem_tangent_residual(
         const PDNSolution * const &sol_a,
@@ -695,7 +758,6 @@ class IPGAssem
         const IGenBC * const &gbc,
         const Tissue_prestress * const &ps_ptr )
         {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
-
 
     virtual void Assem_tangent_residual(
         const PDNSolution * const &sol_a,
@@ -746,6 +808,36 @@ class IPGAssem
         const Tissue_prestress * const &ps_ptr )
         {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
+    // Special for GOH06 material models, where tissue property is needed.
+    virtual void Assem_Tangent_Residual(
+        const double &curr_time, const double &dt,
+        const PDNSolution * const &dot_disp,
+        const PDNSolution * const &dot_velo,
+        const PDNSolution * const &dot_pres,
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
+        const PDNSolution * const &pres,
+        const PDNSolution * const &dot_velo_np1,
+        const PDNSolution * const &velo_np1,
+        const PDNSolution * const &disp_np1,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem_2x2Block * const &lassem_f_ptr,
+        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_v,
+        const ALocal_IEN * const &lien_p,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_v,
+        const ALocal_NBC * const &nbc_p,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc,
+        const Tissue_prestress * const &ps_ptr,
+	const Tissue_property * const &tp_ptr )
+        {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
+
     // Assembly in prestress generation
     virtual void Assem_Tangent_Residual(
         const double &curr_time,
@@ -770,6 +862,33 @@ class IPGAssem
         const ALocal_EBC * const &ebc_v,
         const ALocal_EBC * const &ebc_p,
         const Tissue_prestress * const &ps_ptr )
+        {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
+
+    // Special for GOH06 material models, where tissue property is needed.
+    virtual void Assem_Tangent_Residual(
+        const double &curr_time,
+        const double &dt,
+        const PDNSolution * const &dot_disp,
+        const PDNSolution * const &dot_velo,
+        const PDNSolution * const &dot_pres,
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
+        const PDNSolution * const &pres,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_v,
+        const ALocal_IEN * const &lien_p,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_v,
+        const ALocal_NBC * const &nbc_p,
+        const ALocal_EBC * const &ebc_v,
+        const ALocal_EBC * const &ebc_p,
+        const Tissue_prestress * const &ps_ptr,
+        const Tissue_property * const &tp_ptr )
         {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
     // --------------------------------------------------------------
@@ -928,6 +1047,21 @@ class IPGAssem
         Tissue_prestress * const &ps_ptr ) const
     {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
 
+    // Update solid prestress at all volumetric quadrature points (in tet4_fsi)
+    // Special for GOH06 material models, where tissue property is needed. 
+    virtual void Update_Wall_Prestress(
+        const PDNSolution * const &disp,
+        const PDNSolution * const &pres,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        FEAElement * const &elementv,
+        const IQuadPts * const &quadv,
+        const ALocal_IEN * const &lien_v,
+        const ALocal_IEN * const &lien_p,
+        const FEANode * const &fnode_ptr,
+        Tissue_prestress * const &ps_ptr, 
+	const Tissue_property * const &tp_ptr ) const
+    {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
 };
 
 #endif

@@ -376,6 +376,48 @@ std::vector<double> VTK_T::read_double_PointData( const std::string &filename,
   return data;
 }
 
+std::vector<Vector_3> VTK_T::read_Vector_3_PointData( const std::string &filename,
+    const std::string &dataname )
+{
+  vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
+  reader -> SetFileName( filename.c_str() );
+  reader -> Update();
+
+  vtkPointData * pointdata = nullptr;
+  int numpts = -1;
+
+  // Downcasting will return null if fails
+  if(dynamic_cast<vtkPolyData*>(reader->GetOutput()))
+  {
+    vtkPolyData * vtkgrid = reader -> GetPolyDataOutput ();
+    pointdata = vtkgrid->GetPointData();
+    numpts = static_cast<int>( vtkgrid -> GetNumberOfPoints() );
+  }
+  else if(dynamic_cast<vtkUnstructuredGrid*>(reader->GetOutput()))
+  {
+    vtkUnstructuredGrid * vtkgrid = reader -> GetUnstructuredGridOutput();
+    pointdata = vtkgrid->GetPointData();
+    numpts = static_cast<int>( vtkgrid -> GetNumberOfPoints() );
+  }
+  else
+    SYS_T::print_fatal("VTK_T::read_Vector_3_PointData unknown vtk object type.\n");
+
+  vtkDataArray * pd = pointdata->GetScalars( dataname.c_str() );
+
+  std::vector<Vector_3> data( numpts );
+  for(int ii=0; ii<numpts; ++ii)
+  {
+    const double data_x = static_cast<double>( pd->GetComponent(ii, 0) );
+    const double data_y = static_cast<double>( pd->GetComponent(ii, 1) );
+    const double data_z = static_cast<double>( pd->GetComponent(ii, 2) );
+    data[ii] = Vector_3( data_x, data_y, data_z );
+  }
+
+  reader -> Delete();
+
+  return data;
+}
+
 int VTK_T::read_num_pt( const std::string &filename )
 {
   vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();

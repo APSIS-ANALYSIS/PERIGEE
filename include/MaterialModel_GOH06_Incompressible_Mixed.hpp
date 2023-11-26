@@ -81,6 +81,14 @@ class MaterialModel_GOH06_Incompressible_Mixed : public IMaterialModel
 
     virtual Vector_3 get_fibre_dir( const int &dir ) const;
 
+    // Update fibre direction by input direction basis for each point.
+    // Notice that the original fibre direction a1 and a2 are defined on the basis vector
+    // e1 = [1, 0, 0], e2 = [0, 1, 0], and e3 = [0, 0, 1].
+    // And the input vector basis_r, basis_c, and basis_l correspond to e1, e2, and e3,
+    // respectively.
+    virtual void update_fibre_dir( const Vector_3 &basis_r, const Vector_3 &basis_c,
+        const Vector_3 &basis_l );
+
   private:
     // useful constants
     const double pt33, mpt67, pi;
@@ -100,6 +108,10 @@ class MaterialModel_GOH06_Incompressible_Mixed : public IMaterialModel
 
     // unit vector for fibre direction in the ref domain    
     Vector_3 a1, a2;
+
+    // unit vector for fibre direction defined on the basis vector 
+    // e1 = [1, 0, 0], e2 = [0, 1, 0], and e3 = [0, 0, 1]
+    Vector_3 a01, a02;
 };
 
 #endif

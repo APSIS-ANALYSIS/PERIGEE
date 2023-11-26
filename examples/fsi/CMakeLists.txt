@@ -62,6 +62,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Global_Part_Reload.cpp
   ${perigee_source}/Mesh/Part_FEM.cpp
   ${perigee_source}/Mesh/Part_FEM_FSI.cpp
+  ${perigee_source}/Mesh/Part_FEM_FSI_Tissue.cpp
   ${perigee_source}/Element/FE_Tools.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
@@ -103,7 +104,10 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Element/FEAElement_Hex8.cpp
   ${perigee_source}/Model/MaterialModel_NeoHookean_M94_Mixed.cpp
   ${perigee_source}/Model/MaterialModel_NeoHookean_Incompressible_Mixed.cpp
+  ${perigee_source}/Model/MaterialModel_GOH06_Incompressible_Mixed.cpp
+  ${perigee_source}/Model/MaterialModel_GOH06_ST91_Mixed.cpp
   ${perigee_source}/Model/Tissue_prestress.cpp
+  ${perigee_source}/Model/Tissue_property.cpp
   ${perigee_source}/Model/GenBC_RCR.cpp
   ${perigee_source}/Model/GenBC_Resistance.cpp
   ${perigee_source}/Model/GenBC_Inductance.cpp

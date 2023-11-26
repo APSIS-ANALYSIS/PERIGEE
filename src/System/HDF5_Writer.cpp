@@ -130,7 +130,7 @@ void HDF5_Writer::write_doubleScalar( const char * const &data_name,
 void HDF5_Writer::write_intVector( const hid_t & group_id,
     const char * const &data_name, const std::vector<int> &value ) const
 {
-  hsize_t dims[1]; dims[0] = value.size();
+  hsize_t dims[1]; dims[0] = VEC_T::get_size(value);
   if(dims[0] > 0)
   {
     hid_t dataspace, dataset;
@@ -152,7 +152,7 @@ void HDF5_Writer::write_intVector( const hid_t & group_id,
 void HDF5_Writer::write_intVector( const char * const &data_name, 
     const std::vector<int> &value ) const
 {
-  hsize_t dims[1]; dims[0] = value.size();
+  hsize_t dims[1]; dims[0] = VEC_T::get_size(value);
   if(dims[0] > 0)
   {
     hid_t dataspace, dataset;
@@ -174,7 +174,7 @@ void HDF5_Writer::write_intVector( const char * const &data_name,
 void HDF5_Writer::write_uintVector( const hid_t & group_id,
     const char * const &data_name, const std::vector<unsigned int> &value ) const
 {
-  hsize_t dims[1]; dims[0] = value.size();
+  hsize_t dims[1]; dims[0] = VEC_T::get_size(value);
   if(dims[0] > 0)
   {
     hid_t dataspace, dataset;
@@ -330,7 +330,7 @@ void HDF5_Writer::write_doubleVector( const char * const &data_name,
 void HDF5_Writer::write_doubleVector( const hid_t & group_id,
     const char * const &data_name, const std::vector<double> &value ) const
 {
-  hsize_t dims[1]; dims[0] = value.size();
+  hsize_t dims[1]; dims[0] = VEC_T::get_size(value);
   if(dims[0] > 0)
   {
     hid_t dataspace, dataset;
@@ -352,7 +352,7 @@ void HDF5_Writer::write_doubleVector( const hid_t & group_id,
 void HDF5_Writer::write_doubleVector( const char * const &data_name, 
     const std::vector<double> &value ) const
 {
-  hsize_t dims[1]; dims[0] = value.size();
+  hsize_t dims[1]; dims[0] = VEC_T::get_size(value);
   if(dims[0] > 0)
   {
     hid_t dataspace, dataset;
@@ -414,6 +414,22 @@ void HDF5_Writer::write_Vector_3( const char * const &data_name, const Vector_3 
   }
 }
 
+void HDF5_Writer::write_Vector_3_Vector( const hid_t &group_id, const char * const &data_name,
+    const std::vector<Vector_3> &value ) const
+{
+  // First convert the input vector to a double vector
+  const int vec_size = VEC_T::get_size(value);
+  std::vector<double> val( vec_size*3 );
+  for(int ii=0; ii<vec_size; ++ii)
+  {
+    val[ii*3+0] = value[ii].x();
+    val[ii*3+1] = value[ii].y();
+    val[ii*3+2] = value[ii].z();
+  }
+
+  write_doubleVector( group_id, data_name, val );
+}
+
 void HDF5_Writer::write_Tensor2_3D( const hid_t &group_id, const char * const &data_name,
     const Tensor2_3D &value ) const
 {
@@ -462,13 +478,13 @@ void HDF5_Writer::write_intMatrix( const hid_t &group_id,
     const int &row_num, const int &col_num ) const
 {
   hsize_t dims[2]; dims[0] = row_num; dims[1] = col_num;
-  if( int(value.size()) != row_num * col_num )
+  if( VEC_T::get_size(value) != row_num * col_num )
   {
     std::cerr<<"ERROR: the matrix size is incompatible with the given row/column size. \n";
     exit(1);
   }
 
-  if(value.size() > 0)
+  if(VEC_T::get_size(value) > 0)
   {
     hid_t dataspace, dataset;
     herr_t status;
@@ -491,13 +507,13 @@ void HDF5_Writer::write_doubleMatrix( const hid_t &group_id,
     const int &row_num, const int &col_num ) const
 {
   hsize_t dims[2]; dims[0] = row_num; dims[1] = col_num;
-  if( int(value.size()) != row_num * col_num )
+  if( VEC_T::get_size(value) != row_num * col_num )
   {
     std::cerr<<"ERROR: the matrix size is incompatible with the given row/column size. \n";
     exit(1);
   }
 
-  if(value.size() > 0)
+  if(VEC_T::get_size(value) > 0)
   {
     hid_t dataspace, dataset;
     herr_t status;

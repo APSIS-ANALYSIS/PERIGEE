@@ -105,7 +105,10 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Residual(
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
     const double * const &qua_prestress,
-    const IQuadPts * const &quad )
+    const IQuadPts * const &quad,
+    const std::vector<Vector_3> &eleBasis_r,
+    const std::vector<Vector_3> &eleBasis_c,
+    const std::vector<Vector_3> &eleBasis_l )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -131,6 +134,10 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Residual(
     double vx_z = 0.0, vy_z = 0.0, vz_z = 0.0;
 
     Vector_3 coor(0.0, 0.0, 0.0);
+
+    Vector_3 basis_r(0.0, 0.0, 0.0);
+    Vector_3 basis_c(0.0, 0.0, 0.0);
+    Vector_3 basis_l(0.0, 0.0, 0.0);
 
     std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
@@ -175,7 +182,15 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Residual(
       coor.x() += eleCtrlPts_x[ii] * R[ii];
       coor.y() += eleCtrlPts_y[ii] * R[ii];
       coor.z() += eleCtrlPts_z[ii] * R[ii];
+
+      basis_r += R[ii] * eleBasis_r[ii];
+      basis_c += R[ii] * eleBasis_c[ii];
+      basis_l += R[ii] * eleBasis_l[ii];
     }
+
+    basis_r = Vec3::normalize( basis_r );
+    basis_c = Vec3::normalize( basis_c );
+    basis_l = Vec3::normalize( basis_l );
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
@@ -190,7 +205,7 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Residual(
     const double invFDV_t = invF.MatTContraction(DVelo); // invF_Ii V_i,I
 
     Tensor2_3D P_iso, S_iso;
-
+    matmodel->update_fibre_dir(basis_r, basis_c, basis_l);
     matmodel->get_PK(F, P_iso, S_iso);
 
     // ------------------------------------------------------------------------
@@ -247,19 +262,22 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Residual(
 }
 
 void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Tangent_Residual(
-        const double &time, const double &dt,
-        const double * const &dot_disp,
-        const double * const &dot_velo,
-        const double * const &dot_pres,
-        const double * const &disp,
-        const double * const &velo,
-        const double * const &pres,
-        FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const double * const &qua_prestress,
-        const IQuadPts * const &quad )
+    const double &time, const double &dt,
+    const double * const &dot_disp,
+    const double * const &dot_velo,
+    const double * const &dot_pres,
+    const double * const &disp,
+    const double * const &velo,
+    const double * const &pres,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const double * const &qua_prestress,
+    const IQuadPts * const &quad,
+    const std::vector<Vector_3> &eleBasis_r,
+    const std::vector<Vector_3> &eleBasis_c,
+    const std::vector<Vector_3> &eleBasis_l )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -290,6 +308,10 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Tangent_Residual(
     double vx_z = 0.0, vy_z = 0.0, vz_z = 0.0;
 
     Vector_3 coor(0.0, 0.0, 0.0);
+
+    Vector_3 basis_r(0.0, 0.0, 0.0);
+    Vector_3 basis_c(0.0, 0.0, 0.0);
+    Vector_3 basis_l(0.0, 0.0, 0.0);
 
     std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
   
@@ -334,7 +356,15 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Tangent_Residual(
       coor.x() += eleCtrlPts_x[ii] * R[ii];
       coor.y() += eleCtrlPts_y[ii] * R[ii];
       coor.z() += eleCtrlPts_z[ii] * R[ii];
+
+      basis_r += R[ii] * eleBasis_r[ii];
+      basis_c += R[ii] * eleBasis_c[ii];
+      basis_l += R[ii] * eleBasis_l[ii];
     }
+
+    basis_r = Vec3::normalize( basis_r );
+    basis_c = Vec3::normalize( basis_c );
+    basis_l = Vec3::normalize( basis_l );
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
@@ -355,6 +385,7 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Tangent_Residual(
 
     Tensor2_3D P_iso, S_iso;
     Tensor4_3D AA_iso;
+    matmodel->update_fibre_dir(basis_r, basis_c, basis_l);
     matmodel->get_PK_FFStiffness(F, P_iso, S_iso, AA_iso);
     
     // ------------------------------------------------------------------------
@@ -569,7 +600,10 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Mass_Residual(
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
     const double * const &qua_prestress,
-    const IQuadPts * const &quad )
+    const IQuadPts * const &quad,
+    const std::vector<Vector_3> &eleBasis_r,
+    const std::vector<Vector_3> &eleBasis_c,
+    const std::vector<Vector_3> &eleBasis_l )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -591,6 +625,10 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Mass_Residual(
     double vx_z = 0.0, vy_z = 0.0, vz_z = 0.0;
 
     Vector_3 coor(0.0, 0.0, 0.0);
+
+    Vector_3 basis_r(0.0, 0.0, 0.0);
+    Vector_3 basis_c(0.0, 0.0, 0.0);
+    Vector_3 basis_l(0.0, 0.0, 0.0);
 
     std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
     element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
@@ -626,7 +664,15 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Mass_Residual(
       coor.x() += eleCtrlPts_x[ii] * R[ii];
       coor.y() += eleCtrlPts_y[ii] * R[ii];
       coor.z() += eleCtrlPts_z[ii] * R[ii];
+
+      basis_r += R[ii] * eleBasis_r[ii];
+      basis_c += R[ii] * eleBasis_c[ii];
+      basis_l += R[ii] * eleBasis_l[ii];
     }
+
+    basis_r = Vec3::normalize( basis_r );
+    basis_c = Vec3::normalize( basis_c );
+    basis_l = Vec3::normalize( basis_l );
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
@@ -642,6 +688,7 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Mass_Residual(
     const double invFDV_t = invF.MatTContraction(DVelo);
 
     Tensor2_3D P_iso, S_iso;
+    matmodel->update_fibre_dir(basis_r, basis_c, basis_l);
     matmodel->get_PK(F, P_iso, S_iso);
     
     // ------------------------------------------------------------------------
@@ -776,7 +823,10 @@ std::vector<Tensor2_3D> PLocAssem_2x2Block_VMS_Hyperelasticity::get_Wall_CauchyS
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad ) const
+    const IQuadPts * const &quad,
+    const std::vector<Vector_3> &eleBasis_r,
+    const std::vector<Vector_3> &eleBasis_c,
+    const std::vector<Vector_3> &eleBasis_l) const
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -795,6 +845,10 @@ std::vector<Tensor2_3D> PLocAssem_2x2Block_VMS_Hyperelasticity::get_Wall_CauchyS
     double ux_y = 0.0, uy_y = 0.0, uz_y = 0.0;
     double ux_z = 0.0, uy_z = 0.0, uz_z = 0.0;
 
+    Vector_3 basis_r(0.0, 0.0, 0.0);
+    Vector_3 basis_c(0.0, 0.0, 0.0);
+    Vector_3 basis_l(0.0, 0.0, 0.0);
+
     for(int ii=0; ii<nLocBas; ++ii)
     {
       pp   += pres[ii] * R[ii];
@@ -810,10 +864,19 @@ std::vector<Tensor2_3D> PLocAssem_2x2Block_VMS_Hyperelasticity::get_Wall_CauchyS
       ux_z += disp[ii*3+0] * dR_dz[ii];
       uy_z += disp[ii*3+1] * dR_dz[ii];
       uz_z += disp[ii*3+2] * dR_dz[ii];
+
+      basis_r += R[ii] * eleBasis_r[ii];
+      basis_c += R[ii] * eleBasis_c[ii];
+      basis_l += R[ii] * eleBasis_l[ii];
     }
+
+    basis_r = Vec3::normalize( basis_r );
+    basis_c = Vec3::normalize( basis_c );
+    basis_l = Vec3::normalize( basis_l );
 
     const Tensor2_3D F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
+    matmodel->update_fibre_dir(basis_r, basis_c, basis_l);
     stress[qua] = matmodel -> get_Cauchy_stress( F );
 
     stress[qua].xx() -= pp;

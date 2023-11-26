@@ -214,6 +214,19 @@ Vector_3 HDF5_Reader::read_Vector_3( const char * const &group_name,
   return out;
 }
 
+std::vector<Vector_3> HDF5_Reader::read_Vector_3_Vector( const char * const &group_name,
+    const char * const &data_name ) const
+{
+  const std::vector<double> ddata = read_doubleVector( group_name, data_name );
+  const int vec_size = VEC_T::get_size(ddata) / 3;
+  std::vector<Vector_3> out( vec_size );
+
+  for(int ii=0; ii<vec_size; ++ii)
+    out[ii] = Vector_3( ddata[ii*3+0], ddata[ii*3+1], ddata[ii*3+2] );
+
+  return out;
+}
+
 Tensor2_3D HDF5_Reader::read_Tensor2_3D( const char * const &group_name,
     const char * const &data_name ) const
 {

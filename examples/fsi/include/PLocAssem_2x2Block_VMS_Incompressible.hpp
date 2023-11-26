@@ -59,7 +59,10 @@ class PLocAssem_2x2Block_VMS_Incompressible : public IPLocAssem_2x2Block
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const double * const &qua_prestress,
-        const IQuadPts * const &quad );
+        const IQuadPts * const &quad,
+        const std::vector<Vector_3> &eleBasis_r,
+        const std::vector<Vector_3> &eleBasis_c,
+        const std::vector<Vector_3> &eleBasis_l );
 
     virtual void Assem_Tangent_Residual(
         const double &time, const double &dt,
@@ -74,7 +77,10 @@ class PLocAssem_2x2Block_VMS_Incompressible : public IPLocAssem_2x2Block
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const double * const &qua_prestress,
-        const IQuadPts * const &quad );
+        const IQuadPts * const &quad,
+        const std::vector<Vector_3> &eleBasis_r,
+        const std::vector<Vector_3> &eleBasis_c,
+        const std::vector<Vector_3> &eleBasis_l );
 
     virtual void Assem_Mass_Residual(
         const double * const &disp,
@@ -85,7 +91,10 @@ class PLocAssem_2x2Block_VMS_Incompressible : public IPLocAssem_2x2Block
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const double * const &qua_prestress,
-        const IQuadPts * const &quad );
+        const IQuadPts * const &quad,
+       	const std::vector<Vector_3> &eleBasis_r,
+        const std::vector<Vector_3> &eleBasis_c,
+        const std::vector<Vector_3> &eleBasis_l );
 
     virtual void Assem_Residual_EBC(
         const int &ebc_id,
@@ -116,7 +125,10 @@ class PLocAssem_2x2Block_VMS_Incompressible : public IPLocAssem_2x2Block
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad ) const;
+        const IQuadPts * const &quad,
+        const std::vector<Vector_3> &eleBasis_r,
+        const std::vector<Vector_3> &eleBasis_c,
+        const std::vector<Vector_3> &eleBasis_l ) const;
 
   private:
     const double rho0, alpha_f, alpha_m, gamma;
@@ -126,7 +138,7 @@ class PLocAssem_2x2Block_VMS_Incompressible : public IPLocAssem_2x2Block
     const int nLocBas, snLocBas, vec_size_0, vec_size_1, sur_size_0;
 
     // useful tensors for the material model
-    const IMaterialModel * const matmodel;
+    IMaterialModel * const matmodel;
 
     void print_info() const;
 

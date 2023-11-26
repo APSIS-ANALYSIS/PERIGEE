@@ -94,6 +94,12 @@ class HDF5_Reader
         const char * const &data_name ) const;
 
     // --------------------------------------------------------------
+    // ! read_Vector_3_Vector : output the vector<Vector_3> object.
+    // --------------------------------------------------------------
+    std::vector<Vector_3> read_Vector_3_Vector( const char * const &group_name,
+        const char * const &data_name ) const;
+
+    // --------------------------------------------------------------
     // ! read_Tensor2_3D : output the Tensor2_3D object.
     // --------------------------------------------------------------
     Tensor2_3D read_Tensor2_3D( const char * const &group_name,
