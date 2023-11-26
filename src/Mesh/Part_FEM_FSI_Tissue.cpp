@@ -35,6 +35,8 @@ Part_FEM_FSI_Tissue::Part_FEM_FSI_Tissue( const IMesh * const &mesh,
       index += 1;
 
       const int pos = VEC_T::get_pos( node_s, aux_index );
+      // get the position of the old global index in the solid nodes vector, and use it to
+      // read the global basis vector information
       loc_basis_r.push_back( basis_r[pos] );
       loc_basis_c.push_back( basis_c[pos] );
       loc_basis_l.push_back( basis_l[pos] );

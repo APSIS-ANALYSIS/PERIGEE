@@ -4,12 +4,16 @@
 // Part_FEM_FSI_Tissue.hpp
 //
 // Object: Partition 3D tet mesh into subdomains. 
-//         The mesh is partitioned into sub-domains that are tagged with a 
-//         physical tag. In the partitioned file, there will be a physical tag,
-//         which is an integer array with the length equaling to the number of 
-//         local elements.
+//         The mesh is partitioned into sub-domains that are tagged with three 
+//         local basis vectors denoting the radial, circumferential, and
+//         longitudinal directions, as well as a mapping from global solid node
+//         IEN to the index of the vector that recording the local basis vectors.
+//         In the partitioned file, there will be the loc_basisr/c/l vectors 
+//         with the length equaling to the number of local+ghost solid nodes, 
+//         and the mapping with the length equaling to the number of local+ghost 
+//         nodes.
 //
-// Date Created: July 27 2017
+// Date Created: Nov. 23 2023
 // ============================================================================
 #include "Part_FEM_FSI.hpp"
 
