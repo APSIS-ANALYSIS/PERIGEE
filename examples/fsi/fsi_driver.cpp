@@ -9,7 +9,6 @@
 #include "APart_Basic_Info.hpp"
 #include "ALocal_Elem.hpp"
 #include "ALocal_EBC_outflow.hpp"
-#include "Tissue_property.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_Gauss_Quad.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
@@ -38,7 +37,6 @@
 #include "PGAssem_FSI.hpp"
 #include "PGAssem_Mesh.hpp"
 #include "PTime_FSI_Solver.hpp"
-
 #include "PDNTimeStep.hpp"
 #include "PETSc_Tools.hpp"
 #include "APart_Node_FSI.hpp"
