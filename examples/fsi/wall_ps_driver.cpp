@@ -20,6 +20,8 @@
 #include "FEAElement_Hex8.hpp"
 #include "MaterialModel_NeoHookean_M94_Mixed.hpp"
 #include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
+#include "MaterialModel_GOH06_ST91_Mixed.hpp"
+#include "MaterialModel_GOH06_Incompressible_Mixed.hpp"
 #include "PLocAssem_2x2Block_VMS_Incompressible.hpp"
 #include "PLocAssem_2x2Block_VMS_Hyperelasticity.hpp"
 #include "PTime_FSI_Solver.hpp"
@@ -64,6 +66,14 @@ int main( int argc, char *argv[] )
   double solid_density = 1.0;
   double solid_E = 2.0e6;
   double solid_nu = 0.5;
+  double solid_mu = 6.67e5;
+  double solid_f1the = 40.02;
+  double solid_f1phi = 0.0;
+  double solid_f2the = -40.02;
+  double solid_f2phi = 0.0;
+  double solid_fk1 = 9.966e5;
+  double solid_fk2 = 524.6;
+  double solid_fkd = 0.333;
 
   // We assume that a 3D solver has been called (to generate the wall traction)
   // and a suite of command line arguments has been saved to disk
@@ -143,6 +153,14 @@ int main( int argc, char *argv[] )
   SYS_T::GetOptionReal(  "-sl_density",          solid_density);
   SYS_T::GetOptionReal(  "-sl_E",                solid_E);
   SYS_T::GetOptionReal(  "-sl_nu",               solid_nu);
+  SYS_T::GetOptionReal(  "-sl_mu",             solid_mu);
+  SYS_T::GetOptionReal(  "-sl_f1the",          solid_f1the);
+  SYS_T::GetOptionReal(  "-sl_f1phi",          solid_f1phi);
+  SYS_T::GetOptionReal(  "-sl_f2the",          solid_f2the);
+  SYS_T::GetOptionReal(  "-sl_f2phi",          solid_f2phi);
+  SYS_T::GetOptionReal(  "-sl_fk1",            solid_fk1);
+  SYS_T::GetOptionReal(  "-sl_fk2",            solid_fk2);
+  SYS_T::GetOptionReal(  "-sl_fkd",            solid_fkd);
 
   // ===== Print Command Line Arguments =====
   SYS_T::cmdPrint(      "part_v_file:",          part_v_file);
@@ -183,6 +201,14 @@ int main( int argc, char *argv[] )
     SYS_T::cmdPrint(     "-sl_density:",         solid_density);
     SYS_T::cmdPrint(     "-sl_E:",               solid_E);
     SYS_T::cmdPrint(     "-sl_nu:",              solid_nu);
+    SYS_T::cmdPrint(     "-sl_mu:",              solid_mu);
+    SYS_T::cmdPrint(     "-sl_f1the:",           solid_f1the);
+    SYS_T::cmdPrint(     "-sl_f1phi:",           solid_f1phi);
+    SYS_T::cmdPrint(     "-sl_f2the:",           solid_f2the);
+    SYS_T::cmdPrint(     "-sl_f2phi:",           solid_f2phi);
+    SYS_T::cmdPrint(     "-sl_fk1:",             solid_fk1);
+    SYS_T::cmdPrint(     "-sl_fk2:",             solid_fk2);
+    SYS_T::cmdPrint(     "-sl_fkd:",             solid_fkd);
   }
 
   // ====== Record important parameters ======
@@ -227,6 +253,8 @@ int main( int argc, char *argv[] )
   const int nqp_sur { (elemType == 501) ? nqp_tri : (nqp_sur_1D * nqp_sur_1D) };
 
   Tissue_prestress * ps_data = new Tissue_prestress(locElem, nqp_vol, rank, is_load_ps, ps_file_name);
+
+  Tissue_property * tp_data = new Tissue_property(part_v_file, rank);
  
   SYS_T::commPrint("===> Mesh HDF5 files are read from disk.\n");
 
@@ -317,14 +345,14 @@ int main( int argc, char *argv[] )
   {
     if( sl_nu == 0.5 )
     {
-      matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( "material_model.h5" );
+      matmodel = new MaterialModel_GOH06_Incompressible_Mixed( "material_model.h5" );
 
       locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Incompressible(
           matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
     }
     else
     {
-      matmodel = new MaterialModel_NeoHookean_M94_Mixed( "material_model.h5" );
+      matmodel = new MaterialModel_GOH06_ST91_Mixed( "material_model.h5" );
 
       locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Hyperelasticity(
           matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
@@ -334,14 +362,16 @@ int main( int argc, char *argv[] )
   {
     if( solid_nu == 0.5 )
     {
-      matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( solid_density, solid_E );
+      matmodel = new MaterialModel_GOH06_Incompressible_Mixed( solid_density, solid_mu,
+        solid_f1the, solid_f1phi, solid_f2the, solid_f2phi, solid_fk1, solid_fk2, solid_fkd );
 
       locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Incompressible(
           matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
     }
     else
     {
-      matmodel = new MaterialModel_NeoHookean_M94_Mixed( solid_density, solid_E, solid_nu );
+      matmodel = new MaterialModel_GOH06_ST91_Mixed( solid_density, solid_E, solid_nu,
+        solid_f1the, solid_f1phi, solid_f2the, solid_f2phi, solid_fk1, solid_fk2, solid_fkd );
 
       locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Hyperelasticity(
           matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
@@ -422,7 +452,7 @@ int main( int argc, char *argv[] )
       dot_disp, dot_velo, dot_pres, disp, velo, pres, tm_galpha_ptr,
       timeinfo, locElem, locIEN_v, locIEN_p, pNode_v, pNode_p, fNode,
       locnbc_v, locnbc_p, locebc_v, locebc_p, pmat, elementv, elements,
-      quadv, quads, ps_data, locAssem_solid_ptr, gloAssem_ptr, lsolver, nsolver );
+      quadv, quads, ps_data, tp_data, locAssem_solid_ptr, gloAssem_ptr, lsolver, nsolver );
 
   // ===== Record the wall prestress to h5 file =====
   ps_data -> write_prestress_hdf5();
@@ -432,7 +462,7 @@ int main( int argc, char *argv[] )
   delete fNode; delete locIEN_v; delete locIEN_p; delete PartBasic; delete locElem;
   delete pNode_v; delete pNode_p; delete locebc_v; delete locebc_p; 
   delete locnbc_v; delete locnbc_p;
-  delete ps_data; delete quadv; delete quads; delete elementv; delete elements;
+  delete ps_data; delete tp_data; delete quadv; delete quads; delete elementv; delete elements;
   delete pmat; delete tm_galpha_ptr; delete matmodel; delete locAssem_solid_ptr;
   delete velo; delete disp; delete pres; delete dot_velo; delete dot_disp; delete dot_pres;
   delete timeinfo; delete gloAssem_ptr; delete lsolver; delete nsolver; delete tsolver;
