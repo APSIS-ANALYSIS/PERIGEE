@@ -434,6 +434,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
     Tissue_prestress * const &ps_ptr,
+    const Tissue_property * const &tp_ptr,
     IPLocAssem_2x2Block * const &lassem_solid_ptr,
     IPGAssem * const &gassem_ptr,
     PLinear_Solver_PETSc * const &lsolver_ptr,
@@ -511,7 +512,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
         dot_disp_alpha, dot_velo_alpha, dot_pres_alpha,
         disp_alpha, velo_alpha, pres_alpha,
         alelem_ptr, lassem_solid_ptr, elementv, elements, quad_v, quad_s, 
-        lien_v, lien_p, feanode_ptr, nbc_v, nbc_p, ebc_v, ebc_p, ps_ptr );
+        lien_v, lien_p, feanode_ptr, nbc_v, nbc_p, ebc_v, ebc_p, ps_ptr, tp_ptr );
 
     SYS_T::commPrint("  --- M updated");
     lsolver_ptr->SetOperator(gassem_ptr->K);
@@ -524,7 +525,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
         dot_disp_alpha, dot_velo_alpha, dot_pres_alpha,
         disp_alpha, velo_alpha, pres_alpha,
         alelem_ptr, lassem_solid_ptr, elementv, elements, quad_v, quad_s, 
-        lien_v, lien_p, feanode_ptr, nbc_v, nbc_p, ebc_v, ebc_p, ps_ptr );
+        lien_v, lien_p, feanode_ptr, nbc_v, nbc_p, ebc_v, ebc_p, ps_ptr, tp_ptr );
   }
 
   VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
@@ -572,7 +573,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
           dot_disp_alpha, dot_velo_alpha, dot_pres_alpha,
           disp_alpha, velo_alpha, pres_alpha,
           alelem_ptr, lassem_solid_ptr, elementv, elements, quad_v, quad_s,
-          lien_v, lien_p, feanode_ptr, nbc_v, nbc_p, ebc_v, ebc_p, ps_ptr );
+          lien_v, lien_p, feanode_ptr, nbc_v, nbc_p, ebc_v, ebc_p, ps_ptr, tp_ptr );
 
       SYS_T::commPrint("  --- M updated");
       lsolver_ptr->SetOperator(gassem_ptr->K);
@@ -585,7 +586,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
           dot_disp_alpha, dot_velo_alpha, dot_pres_alpha,
           disp_alpha, velo_alpha, pres_alpha,
           alelem_ptr, lassem_solid_ptr, elementv, elements, quad_v, quad_s,
-          lien_v, lien_p, feanode_ptr, nbc_v, nbc_p, ebc_v, ebc_p, ps_ptr );
+          lien_v, lien_p, feanode_ptr, nbc_v, nbc_p, ebc_v, ebc_p, ps_ptr, tp_ptr );
     }
 
     VecNorm(gassem_ptr->G, NORM_2, &residual_norm);
@@ -604,7 +605,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
   // --------------------------------------------------------------------------
   // Calculate teh Cauchy stress in solid element and update the prestress
   gassem_ptr -> Update_Wall_Prestress( disp, pres, alelem_ptr, lassem_solid_ptr, elementv,
-      quad_v, lien_v, lien_p, feanode_ptr, ps_ptr );
+      quad_v, lien_v, lien_p, feanode_ptr, ps_ptr, tp_ptr );
 
   const double solid_disp_norm = disp -> Norm_inf();
 

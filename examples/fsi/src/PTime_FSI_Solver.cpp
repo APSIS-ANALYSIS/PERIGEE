@@ -315,6 +315,7 @@ void PTime_FSI_Solver::TM_FSI_Prestress(
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
     Tissue_prestress * const &ps_ptr,
+    const Tissue_property * const &tp_ptr,
     IPLocAssem_2x2Block * const &lassem_solid_ptr,
     IPGAssem * const &gassem_ptr,
     PLinear_Solver_PETSc * const &lsolver_ptr,
@@ -374,7 +375,7 @@ void PTime_FSI_Solver::TM_FSI_Prestress(
         pre_dot_disp, pre_dot_velo, pre_dot_pres, pre_disp, pre_velo, pre_pres,
         tmga_ptr, alelem_ptr, lien_v, lien_p, feanode_ptr, pnode_v, pnode_p,
         nbc_v, nbc_p, ebc_v, ebc_p, bc_mat, elementv, elements, quad_v, quad_s,
-        ps_ptr, lassem_solid_ptr, gassem_ptr, lsolver_ptr,
+        ps_ptr, tp_ptr, lassem_solid_ptr, gassem_ptr, lsolver_ptr,
         cur_dot_disp, cur_dot_velo, cur_dot_pres, cur_disp, cur_velo, cur_pres,
         prestress_conv_flag, nl_counter );
 
