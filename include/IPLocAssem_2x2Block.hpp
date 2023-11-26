@@ -407,6 +407,24 @@ class IPLocAssem_2x2Block
       return output;
     }
 
+    // Special for GOH06 material models, where node direction basis is needed.
+    virtual std::vector<Tensor2_3D> get_Wall_CauchyStress(
+        const double * const &disp,
+        const double * const &pres,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad,
+        const std::vector<Vector_3> &eleBasis_r,
+        const std::vector<Vector_3> &eleBasis_l,
+        const std::vector<Vector_3> &eleBasis_c ) const
+    {
+      SYS_T::commPrint("Warning: get_CauchyStress() is not implemented. \n");
+      std::vector<Tensor2_3D> output; output.clear();
+      return output;
+    }
+
     virtual double get_model_para_1() const
     {
       SYS_T::commPrint("Warning: get_model_para_1() is not implemented. \n");

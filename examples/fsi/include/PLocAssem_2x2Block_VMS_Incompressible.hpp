@@ -125,7 +125,10 @@ class PLocAssem_2x2Block_VMS_Incompressible : public IPLocAssem_2x2Block
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad ) const;
+        const IQuadPts * const &quad,
+        const std::vector<Vector_3> &eleBasis_r,
+        const std::vector<Vector_3> &eleBasis_c,
+        const std::vector<Vector_3> &eleBasis_l ) const;
 
   private:
     const double rho0, alpha_f, alpha_m, gamma;
