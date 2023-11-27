@@ -501,12 +501,15 @@ int main( int argc, char * argv[] )
   std::vector<INodalBC *> meshBC_list( 3, nullptr );
 
   std::vector<std::string> meshdir_file_list { geo_s_file };
-  VEC_T::insert_end( meshdir_file_list, sur_f_file_in );
-  VEC_T::insert_end( meshdir_file_list, sur_f_file_out );
+  std::vector<std::string> meshdir_file_x = meshdir_file_list;
+  std::vector<std::string> meshdir_file_z = meshdir_file_list;
 
-  meshBC_list[0] = new NodalBC( meshdir_file_list, nFunc_v );
+  VEC_T::insert_end( meshdir_file_z, sur_f_file_in );
+  VEC_T::insert_end( meshdir_file_x, sur_f_file_out );
+
+  meshBC_list[0] = new NodalBC( meshdir_file_x, nFunc_v );
   meshBC_list[1] = new NodalBC( meshdir_file_list, nFunc_v );
-  meshBC_list[2] = new NodalBC( meshdir_file_list, nFunc_v );
+  meshBC_list[2] = new NodalBC( meshdir_file_z, nFunc_v );
 
   // InflowBC info
   std::cout<<"3. Inflow cap surfaces: \n";
