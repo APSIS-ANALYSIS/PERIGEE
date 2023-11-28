@@ -115,9 +115,9 @@ double POST_ERROR_P::get_manu_sol_u_errorH1(
       sol_dy.y() += solu_uy[ii] * R_dy[ii];
       sol_dy.z() += solu_uz[ii] * R_dy[ii];
 
-      sol_dy.x() += solu_ux[ii] * R_dy[ii];
-      sol_dy.y() += solu_uy[ii] * R_dy[ii];
-      sol_dy.z() += solu_uz[ii] * R_dy[ii];
+      sol_dz.x() += solu_ux[ii] * R_dz[ii];
+      sol_dz.y() += solu_uy[ii] * R_dz[ii];
+      sol_dz.z() += solu_uz[ii] * R_dz[ii];
     }
 
     const double coefficent = 0.25 * P_diff / (fl_mu * Length);
