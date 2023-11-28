@@ -9,7 +9,6 @@
 // Date: Oct. 10 2017
 // Author: Ju Liu
 // ============================================================================
-#include <array>
 #include "HDF5_Writer.hpp"
 #include "ALocal_Elem.hpp"
 
@@ -20,7 +19,7 @@ class Tissue_prestress
        const int &in_cpu_rank, const bool &load_from_file,
        const std::string &in_ps_fName = "prestress" );
 
-    virtual ~Tissue_prestress();
+    virtual ~Tissue_prestress() = default;
 
     // ------------------------------------------------------------------------
     // Input: ee the element index
