@@ -227,6 +227,9 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
       const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
           cur_disp, cur_pres, lassem_fluid_ptr, elements, quad_s, ebc_v, ebc_p, face);
 
+      const double face_area = gassem_ptr -> Assem_surface_area(
+          cur_disp, lassem_fluid_ptr, elements, quad_s, ebc_v, face );
+
       // Calculate 0D pressure from LPN model
       const double dot_lpn_flowrate = dot_face_flrate;
       const double lpn_flowrate = face_flrate;
@@ -234,16 +237,12 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
       
       // Update the initial values in genbc
       gbc -> reset_initial_sol( face, lpn_flowrate, lpn_pressure, time_info->get_time(), false );
-      // // For absorbing BC
-      // const double current_area = gassem_ptr -> Assem_surface_area(
-      //     cur_disp, lassem_fluid_ptr, elements, quad_s, ebc_v, face);
-      // gbc -> reset_initial_sol( face, current_area, 0.0, 0.0, false );
 
       if( SYS_T::get_MPI_rank() == 0 )
       {
         std::ofstream ofile;
         ofile.open( ebc_v->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
-        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
+        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\t'<<face_area<<'\n';
         ofile.close();
       }
 

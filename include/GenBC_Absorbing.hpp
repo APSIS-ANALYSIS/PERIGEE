@@ -10,6 +10,8 @@
 // where R is the radius of outlet and h_s, E, nu is the thickness, Young's modulus
 // and the Poisson's ratio of the solid structure, refering to https://doi.org/10.1137/060678439
 //
+// In this file, the modified version is applied refering to https://doi.org/10.1002/cnm.2756
+//
 // Author: Xuanming Huang
 // Date Created: Nov. 17 2023
 // ============================================================================
@@ -21,8 +23,8 @@ class GenBC_Absorbing : public IGenBC
 {
   public:
     // In the lpn_file, the following data should be input for each outlet:
-    // ebc_id / initial flow radius / initial thickness
-    GenBC_Absorbing( const std::string &lpn_file, const double &solid_E, const double &solid_nu );
+    // ebc_id / initial thickness / inital A0 / steady A_bar / steady P_ref / initial P0
+    GenBC_Absorbing( const std::string &lpn_file, const double &solid_E, const double &solid_nu, const double &in_fl_density );
 
     virtual ~GenBC_Absorbing() = default;
 
@@ -43,32 +45,49 @@ class GenBC_Absorbing : public IGenBC
       return 0.0;
     }  // Banned
 
-    virtual double get_P( const int &ii, const double &dot_Q, const double &in_Area,
-        const double &time) const;
+    virtual double get_P( const int &ii, const double &dot_Q, const double &Q,
+        const double &time) const
+    {
+      return P[ii];
+    }
 
     virtual double get_P0( const int &ii ) const
     {
-      return 0.0;
-    }   // Banned
+      return P0[ii];
+    }
 
     // Update the current_outlet_area in the nonlinear solver
-    virtual void reset_initial_sol( const int &ii, const double &in_Area,
+    virtual void reset_initial_sol( const int &ii, const double &in_Q_0,
         const double &in_P_0, const double &curr_time, const bool &is_restart )
     {
-      P0[ii] = get_P(ii, 0.0, in_Area, 0.0);
+      if(!is_restart) // n > 0
+        P0[ii] = P[ii];
+      else
+        ; // Do nothing because P0 has been initialized by initial_P0 from lpn file
+
+      P[ii] = set_P(ii, in_Q_0); // Use Q_n to calculate P_n+1
     }
 
   private:
     int num_ebc;
 
-    // Parameter beta of each outlet. length num_ebc
-    std::vector<double> para_beta;
+    // Parameter ( t*E*pi / ( (1-mu^2) * sqrt(A0) ) ) of each outlet. length num_ebc
+    std::vector<double> para_1;
 
-    // Initial outlet area A0 of each outlet. length num_ebc
-    std::vector<double> initial_outlet_area;
+    // Parameter ( sqrt(fl_density/8) / A_bar ) of each outlet. length num_ebc
+    std::vector<double> para_2;
 
-    // P0. length num_ebc
+    // Steady-state outlet pressure P_ref. length num_ebc
+    std::vector<double> P_ref;
+
+    // P_n. length num_ebc
     std::vector<double> P0;
+
+    // P_n+1. length num_ebc
+    std::vector<double> P;
+
+    // calculate P_n+1 with Q_n
+    virtual double set_P( const int &ii, const double &Q0 ) const;
 };
 
 #endif

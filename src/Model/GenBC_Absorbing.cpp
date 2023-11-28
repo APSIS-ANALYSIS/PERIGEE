@@ -1,7 +1,7 @@
 #include "GenBC_Absorbing.hpp"
 
 GenBC_Absorbing::GenBC_Absorbing( const std::string &lpn_filename,
-    const double &solid_E, const double &solid_nu )
+    const double &solid_E, const double &solid_nu, const double &in_fl_density )
 {
   SYS_T::file_check( lpn_filename ); // make sure the file is on the disk
 
@@ -28,7 +28,8 @@ GenBC_Absorbing::GenBC_Absorbing( const std::string &lpn_filename,
 
   if( bc_type.compare("Absorbing") == 0 || bc_type.compare("ABSORBING") == 0 || bc_type.compare("absorbing") == 0)
   {
-    para_beta.resize(num_ebc); initial_outlet_area.resize(num_ebc); P0.resize(num_ebc);
+    para_1.resize(num_ebc); para_2.resize(num_ebc);
+    P_ref.resize(num_ebc); P0.resize(num_ebc); P.resize(num_ebc);
   }
   else
     SYS_T::print_fatal( "GenBC_Absorbing Error: BC type in %s should be Absorbing.\n", lpn_filename.c_str() );
@@ -36,7 +37,7 @@ GenBC_Absorbing::GenBC_Absorbing( const std::string &lpn_filename,
   // Read in initial radius and initial thickness per ebc
   for(int ebc_id=0; ebc_id<num_ebc; ++ebc_id)
   { 
-    double radius {0}, thickness {0};
+    double A0 {0}, A_bar {0}, thickness {0};
     while( std::getline(reader, sline) )
     {
       // face_id num_of_mode w period
@@ -47,23 +48,28 @@ GenBC_Absorbing::GenBC_Absorbing( const std::string &lpn_filename,
         sstrm >> face_id;
         SYS_T::print_fatal_if( face_id != ebc_id, "GenBC_Pressure Error: ebc in %s should be listed in ascending order.\n", lpn_filename.c_str() );
 
-        sstrm >> radius;
-        SYS_T::print_fatal_if(radius <= 0, "GenBC_Absorbing Error: Radius of ebc_id %d should be greater than 0.\n", ebc_id);
-
         sstrm >> thickness;
         SYS_T::print_fatal_if(thickness <= 0, "GenBC_Absorbing Error: Thickness of ebc_id %d should be greater than 0.\n", ebc_id);
+
+        sstrm >> A0;
+        SYS_T::print_fatal_if(A0 <= 0, "GenBC_Absorbing Error: Initial surface area of ebc_id %d should be greater than 0.\n", ebc_id);
+
+        sstrm >> A_bar;
+        SYS_T::print_fatal_if(A_bar <= 0, "GenBC_Absorbing Error: Steady-state surface area of ebc_id %d should be greater than 0.\n", ebc_id);
+
+        sstrm >> P_ref[ebc_id];
+
+        sstrm >> P0[ebc_id];
 
         sstrm.clear();
         break;
       }
     }
 
-    // calculate beta and outlet area
-    para_beta[ebc_id] = thickness * (solid_E / (1 - solid_nu * solid_nu)) / (radius * radius);
+    // calculate parameters
+    para_1[ebc_id] = thickness * (solid_E / (1 - solid_nu * solid_nu)) * MATH_T::PI / std::sqrt(A0);
 
-    initial_outlet_area[ebc_id] = MATH_T::PI * radius * radius;
-
-    P0[ebc_id] = 0;
+    para_2[ebc_id] = std::sqrt(in_fl_density / 8) * (1.0 / A_bar);
   }
 
   // Finish reading the file and close it
@@ -77,14 +83,15 @@ void GenBC_Absorbing::print_info() const
   for(int ii=0; ii<num_ebc; ++ii)
   {
     SYS_T::commPrint("     ebc_id = %d", ii);
-    SYS_T::commPrint(" beta = %e, Initial surface area =%e \n", para_beta[ii], initial_outlet_area[ii]);
+    SYS_T::commPrint(" Parameter 1 = %e, Parameter 2 =  %e, P_ref = %e\n",
+      para_1[ii], para_2[ii], P_ref[ii]);
   }
 }
 
-double GenBC_Absorbing::get_P( const int &ii, const double &dot_Q, const double &in_Area,
-    const double &time) const
+double GenBC_Absorbing::set_P( const int &ii, const double &Q0) const
 {
-  return para_beta[ii] * (std::sqrt(in_Area) - std::sqrt(initial_outlet_area[ii])) / MATH_T::PI;
+  const double temp = (para_2[ii] * Q0 + std::sqrt(para_1[ii]));
+  return (temp * temp - para_1[ii] + P_ref[ii]);
 }
 
 // EOF

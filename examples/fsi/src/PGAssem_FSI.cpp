@@ -1004,15 +1004,9 @@ void PGAssem_FSI::NatBC_Resis_KG( const double &curr_time, const double &dt,
     const double flrate = Assem_surface_flowrate( disp, velo, lassem_f_ptr,
         element_s, quad_s, ebc_part, ebc_id );
 
-    // // for absorbing BC
-    // const double current_area = Assem_surface_area( disp, lassem_f_ptr, element_s,
-    //     quad_s, ebc_part, ebc_id);
-
     // Get the pressure value on the outlet surfaces
     const double P_n   = gbc -> get_P0( ebc_id );
     const double P_np1 = gbc -> get_P( ebc_id, dot_flrate, flrate, curr_time + dt );
-    // // for absorbing BC
-    // const double P_np1 = gbc -> get_P( ebc_id, 0.0, current_area, 0.0 );
 
     // P_n+alpha_f
     const double resis_val = P_n + a_f * (P_np1 - P_n);

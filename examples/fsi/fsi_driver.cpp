@@ -543,7 +543,7 @@ int main(int argc, char *argv[])
   else if( GENBC_T::get_genbc_file_type( lpn_file ) == 5  )
     gbc = new GenBC_Pressure( lpn_file, initial_time );
   else if ( GENBC_T::get_genbc_file_type( lpn_file ) == 6)
-    gbc = new GenBC_Absorbing( lpn_file, 1.2e6, 0.49 );
+    gbc = new GenBC_Absorbing( lpn_file, 1.2e6, 0.49, fluid_density);
   else
     SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
 
@@ -671,9 +671,11 @@ int main(int argc, char *argv[])
     const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
         disp, pres, locAssem_fluid_ptr, elements, quads, locebc_v, locebc_p, ff );
 
+    const double face_area = gloAssem_ptr -> Assem_surface_area(
+      disp, locAssem_fluid_ptr, elements, quads, locebc_v, ff );
+
     // set the gbc initial conditions using the 3D data
-    if(GENBC_T::get_genbc_file_type( lpn_file ) != 6)
-      gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
+    gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
 
     const double dot_lpn_flowrate = dot_face_flrate;
     const double lpn_flowrate = face_flrate;
@@ -693,8 +695,8 @@ int main(int argc, char *argv[])
       // if this is NOT a restart run, record the initial values
       if( !is_restart )
       {
-        ofile<<"Time-index"<<'\t'<<"Time"<<'\t'<<"Flow-rate"<<'\t'<<"Face-averaged-pressure"<<'\t'<<"Reduced-model-pressure"<<'\n';
-        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
+        ofile<<"Time-index"<<'\t'<<"Time"<<'\t'<<"Flow-rate"<<'\t'<<"Face-averaged-pressure"<<'\t'<<"Reduced-model-pressure"<<'\t'<<"Face-area"<<'\n';
+        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\t'<<face_area<<'\n';
       }
 
       ofile.close();
