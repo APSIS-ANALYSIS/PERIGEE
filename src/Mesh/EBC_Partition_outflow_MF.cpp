@@ -66,18 +66,6 @@ EBC_Partition_outflow_MF::EBC_Partition_outflow_MF(
   }
 }
 
-EBC_Partition_outflow_MF::~EBC_Partition_outflow_MF()
-{
-  for(int ii=0; ii<num_ebc; ++ii)
-  {
-    VEC_T::clean( face_int_NA[ii] );
-    VEC_T::clean( LID_all_face_nodes[ii] );
-  }
-  VEC_T::clean( face_int_NA );
-  VEC_T::clean( LID_all_face_nodes );
-  VEC_T::clean( outvec );
-}
-
 void EBC_Partition_outflow_MF::write_hdf5( const std::string &FileName,
     const std::string &GroupName ) const
 {
