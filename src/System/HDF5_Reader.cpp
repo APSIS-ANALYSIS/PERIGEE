@@ -219,6 +219,7 @@ std::vector<Vector_3> HDF5_Reader::read_Vector_3_Vector( const char * const &gro
 {
   const std::vector<double> ddata = read_doubleVector( group_name, data_name );
   const int vec_size = VEC_T::get_size(ddata) / 3;
+  SYS_T::print_fatal_if(vec_size * 3 != VEC_T::get_size(ddata), "Error: HDF5_Reader::read_Vector_3_Vector, Wrong size of data %s. \n", data_name);
   std::vector<Vector_3> out( vec_size );
 
   for(int ii=0; ii<vec_size; ++ii)
