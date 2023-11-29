@@ -417,8 +417,8 @@ class IPLocAssem_2x2Block
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad,
         const std::vector<Vector_3> &eleBasis_r,
-        const std::vector<Vector_3> &eleBasis_l,
-        const std::vector<Vector_3> &eleBasis_c ) const
+        const std::vector<Vector_3> &eleBasis_c,
+        const std::vector<Vector_3> &eleBasis_l ) const
     {
       SYS_T::commPrint("Warning: get_CauchyStress() is not implemented. \n");
       std::vector<Tensor2_3D> output; output.clear();
