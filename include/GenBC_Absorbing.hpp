@@ -23,7 +23,7 @@ class GenBC_Absorbing : public IGenBC
 {
   public:
     // In the lpn_file, the following data should be input for each outlet:
-    // ebc_id / initial thickness / inital A0 / steady A_bar / steady P_ref / initial P0
+    // ebc_id / initial thickness / referential A0 / steady A_bar / steady P_steady / quasi-steady Q_steady-1 / restarting P0
     GenBC_Absorbing( const std::string &lpn_file, const double &solid_E, const double &solid_nu, const double &in_fl_density );
 
     virtual ~GenBC_Absorbing() = default;
@@ -63,7 +63,7 @@ class GenBC_Absorbing : public IGenBC
       if(!is_restart) // n > 0
         P0[ii] = P[ii];
       else
-        ; // Do nothing because P0 has been initialized by initial_P0 from lpn file
+        ; // Do nothing because P0 has been initialized by restarting_P0 from lpn file
 
       P[ii] = set_P(ii, in_Q_0); // Use Q_n to calculate P_n+1
     }
@@ -77,7 +77,7 @@ class GenBC_Absorbing : public IGenBC
     // Parameter ( sqrt(fl_density/8) / A_bar ) of each outlet. length num_ebc
     std::vector<double> para_2;
 
-    // Steady-state outlet pressure P_ref. length num_ebc
+    // P_ref. It is not equal to steady-state P_out. length num_ebc
     std::vector<double> P_ref;
 
     // P_n. length num_ebc

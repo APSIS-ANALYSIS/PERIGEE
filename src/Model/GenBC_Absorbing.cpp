@@ -37,7 +37,7 @@ GenBC_Absorbing::GenBC_Absorbing( const std::string &lpn_filename,
   // Read in initial radius and initial thickness per ebc
   for(int ebc_id=0; ebc_id<num_ebc; ++ebc_id)
   { 
-    double A0 {0}, A_bar {0}, thickness {0};
+    double thickness {0}, A0 {0}, A_bar {0}, P_steady {0}, Q_quasi_steady {0} ;
     while( std::getline(reader, sline) )
     {
       // face_id num_of_mode w period
@@ -57,7 +57,9 @@ GenBC_Absorbing::GenBC_Absorbing( const std::string &lpn_filename,
         sstrm >> A_bar;
         SYS_T::print_fatal_if(A_bar <= 0, "GenBC_Absorbing Error: Steady-state surface area of ebc_id %d should be greater than 0.\n", ebc_id);
 
-        sstrm >> P_ref[ebc_id];
+        sstrm >> P_steady;
+
+        sstrm >> Q_quasi_steady;
 
         sstrm >> P0[ebc_id];
 
@@ -67,9 +69,13 @@ GenBC_Absorbing::GenBC_Absorbing( const std::string &lpn_filename,
     }
 
     // calculate parameters
-    para_1[ebc_id] = thickness * (solid_E / (1 - solid_nu * solid_nu)) * MATH_T::PI / std::sqrt(A0);
+    para_1[ebc_id] = thickness * (solid_E * MATH_T::PI / ((1 - solid_nu * solid_nu)) * std::sqrt(A0)) ;
 
     para_2[ebc_id] = std::sqrt(in_fl_density / 8) * (1.0 / A_bar);
+
+    // calculate P_ref
+    const double temp = (para_2[ebc_id] * Q_quasi_steady + std::sqrt(para_1[ebc_id]));
+    P_ref[ebc_id] = P_steady - temp * temp + para_1[ebc_id];
   }
 
   // Finish reading the file and close it
