@@ -93,34 +93,21 @@ void PDNSolution_V::Init_flow_parabolic( const APart_Node * const &pNode_ptr,
     // parabolic flow profile
     if( infbc->get_Num_LD( nbc_id ) > 0)
     {
-      for(int ii=0; ii < infbc->get_Num_LD( nbc_id ); ++ii)
+      for(int ii=0; ii<nlocalnode; ++ii)
       {
-        const int pos = infbc -> get_LDN( nbc_id, ii ) * 3;
-        const int location[3] = { pos, pos + 1, pos + 2 };
-        
-        const Vector_3 pt = infbc -> get_local_pt_xyz( nbc_id, ii );
-        const double r = infbc -> get_radius( nbc_id, pt );
-        const double vel = vmax * (1.0 - r*r);
+        if( infbc->is_inLDN( nbc_id, pNode_ptr->get_node_loc(ii) ) )
+        {
+          const int pos = pNode_ptr->get_node_loc(ii) * 3;
+          const int location[3] = { pos, pos + 1, pos + 2 };
 
-        const double value[3] = { vel * out_nx, vel * out_ny, vel * out_nz };
+          const Vector_3 pt = fNode_ptr -> get_ctrlPts_xyz(ii);
+          const double r =  infbc -> get_radius( nbc_id, pt );
+          const double vel = vmax * (1.0 - r*r);
 
-        VecSetValues(solution, 3, location, value, INSERT_VALUES);
+          const double value[3] = { vel * out_nx, vel * out_ny, vel * out_nz };
 
-      // for(int ii=0; ii<nlocalnode; ++ii)
-      // {
-      //   if( infbc->is_inLDN( nbc_id, pNode_ptr->get_node_loc(ii) ) )
-      //   {
-      //     const int pos = pNode_ptr->get_node_loc(ii) * 3;
-      //     const int location[3] = { pos, pos + 1, pos + 2 };
-
-      //     const Vector_3 pt = fNode_ptr -> get_ctrlPts_xyz(ii);
-      //     const double r =  infbc -> get_radius( nbc_id, pt );
-      //     const double vel = vmax * (1.0 - r*r);
-
-      //     const double value[3] = { vel * out_nx, vel * out_ny, vel * out_nz };
-
-      //     VecSetValues(solution, 3, location, value, INSERT_VALUES);
-      //   }
+          VecSetValues(solution, 3, location, value, INSERT_VALUES);
+        }
       }
     }
   }
