@@ -546,7 +546,7 @@ void PGAssem_Wall_Prestress::Update_Wall_Prestress(
       }
 
       const std::vector<Tensor2_3D> sigma = lassem_s_ptr -> get_Wall_CauchyStress( &local_d[0], 
-          &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, quadv, ebasis_r, ebasis_l, ebasis_c );
+          &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, quadv, ebasis_r, ebasis_c, ebasis_l );
 
       for( int qua = 0; qua < nqp; ++qua )
       {
