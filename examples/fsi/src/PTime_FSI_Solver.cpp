@@ -109,7 +109,9 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     IPGAssem * const &gassem_mesh_ptr,
     PLinear_Solver_PETSc * const &lsolver_ptr,
     PLinear_Solver_PETSc * const &lsolver_mesh_ptr,
-    const PNonlinear_FSI_Solver * const &nsolver_ptr ) const
+    const PNonlinear_FSI_Solver * const &nsolver_ptr,
+    std::vector<double> &curr_inlet_area,
+    std::vector<Vector_3> &curr_inlet_centroid ) const
 {
   PDNSolution * pre_dot_disp = new PDNSolution( init_dot_disp );
   PDNSolution * pre_dot_velo = new PDNSolution( init_dot_velo );
@@ -182,7 +184,7 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
         lassem_fluid_ptr, lassem_solid_ptr, lassem_mesh_ptr,
         gassem_ptr, gassem_mesh_ptr, lsolver_ptr, lsolver_mesh_ptr,
         cur_dot_disp, cur_dot_velo, cur_dot_pres, cur_disp, cur_velo, cur_pres, 
-        conv_flag, nl_counter );
+        conv_flag, nl_counter, curr_inlet_area, curr_inlet_centroid);
 
     time_info->TimeIncrement();
 
@@ -261,11 +263,22 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
       const double inlet_face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
           cur_disp, cur_pres, lassem_fluid_ptr, elements, quad_s, infnbc, face );
 
+      const double inlet_face_area = gassem_ptr -> Assem_surface_area(
+          cur_disp, lassem_fluid_ptr, elements, quad_s, infnbc, face );
+
+      curr_inlet_area[face] = inlet_face_area;
+
+      const Vector_3 inlet_centroid = gassem_ptr -> get_centroid(
+          cur_disp, infnbc, face );
+      
+      curr_inlet_centroid[face] = inlet_centroid;
+
       if( SYS_T::get_MPI_rank() == 0 )
       {
         std::ofstream ofile;
         ofile.open( infnbc->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
-        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
+        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\t'
+             <<inlet_face_area<<'\t'<<inlet_centroid.x()<<'\t'<<inlet_centroid.y()<<'\t'<<inlet_centroid.z()<<'\n';
         ofile.close();
       }
       MPI_Barrier(PETSC_COMM_WORLD);

@@ -76,7 +76,9 @@ class PNonlinear_FSI_Solver
         PDNSolution * const &disp,
         PDNSolution * const &velo,
         PDNSolution * const &pres,
-        bool &conv_flag, int &nl_counter ) const;
+        bool &conv_flag, int &nl_counter,
+        const std::vector<double> inflow_area,
+        const std::vector<Vector_3> inlet_centroid ) const;
 
     void GenAlpha_Seg_solve_Prestress(
         const bool &new_tangent_flag,

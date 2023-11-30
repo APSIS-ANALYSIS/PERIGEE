@@ -846,6 +846,87 @@ double PGAssem_FSI::Assem_surface_ave_pressure(
   return sum_pres / sum_area;
 }
 
+double PGAssem_FSI::Assem_surface_area(
+    const PDNSolution * const &disp,
+    IPLocAssem_2x2Block * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const ALocal_InflowBC * const &infbc_part,
+    const int &nbc_id )
+{
+  const std::vector<double> array_d = disp -> GetLocalArray();
+
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
+
+  const int num_sele = infbc_part -> get_num_local_cell(nbc_id);
+
+  double val_area = 0.0;
+
+  for(int ee=0; ee<num_sele; ++ee)
+  {
+    const std::vector<int> LSIEN = infbc_part -> get_SIEN( nbc_id, ee );
+
+    infbc_part -> get_ctrlPts_xyz( nbc_id, ee, sctrl_x, sctrl_y, sctrl_z );
+
+    const std::vector<double> local_d = GetLocal( array_d, LSIEN, snLocBas, 3 );
+
+    // let the value in local_p be 1.0 and use the get_pressure_area
+    const std::vector<double> local_p ( VEC_T::get_size(local_d), 1.0 );
+
+    double ele_pres, ele_area;
+
+    lassem_ptr-> get_pressure_area( &local_d[0], &local_p[0], element_s, sctrl_x, sctrl_y,
+        sctrl_z, quad_s, ele_pres, ele_area);
+
+    val_area += ele_area;
+  }
+
+  delete [] sctrl_x; delete [] sctrl_y; delete [] sctrl_z;
+  sctrl_x = nullptr; sctrl_y = nullptr; sctrl_z = nullptr;
+
+  double sum_area = 0.0;
+
+  MPI_Allreduce(&val_area, &sum_area, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+
+  return sum_area;
+}
+
+Vector_3 PGAssem_FSI::get_centroid(
+    const PDNSolution * const &disp,
+    const ALocal_InflowBC * const &infbc_part,
+    const int &nbc_id )
+{
+  const std::vector<double> array_d = disp -> GetLocalArray();
+
+  double sum_x {0.0}, sum_y {0.0}, sum_z {0.0};
+  int num_node {infbc_part -> get_num_local_node(nbc_id)};
+
+  for(int ii{0}; ii < num_node; ++ii)
+  {
+    Vector_3 local_pt = infbc_part -> get_local_pt_xyz(nbc_id, ii);
+
+    double disp_x = array_d[infbc_part -> get_local_node_pos(nbc_id, ii) * 3];
+    double disp_y = array_d[infbc_part -> get_local_node_pos(nbc_id, ii) * 3 + 1];
+    double disp_z = array_d[infbc_part -> get_local_node_pos(nbc_id, ii) * 3 + 2];
+
+    sum_x += local_pt.x() + disp_x;
+    sum_y += local_pt.y() + disp_y;
+    sum_z += local_pt.z() + disp_z;
+  }
+
+  double total_x {0.0}, total_y {0.0}, total_z {0.0};
+  int total_node {0};
+
+  MPI_Allreduce(&sum_x, &total_x, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+  MPI_Allreduce(&sum_y, &total_y, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+  MPI_Allreduce(&sum_z, &total_z, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+  MPI_Allreduce(&num_node, &total_node, 1, MPI_INT, MPI_SUM, PETSC_COMM_WORLD);
+
+  return Vector_3 (total_x / total_node, total_y / total_node, total_z / total_node);
+}
+
 void PGAssem_FSI::NatBC_G( const double &curr_time, const double &dt,
     const PDNSolution * const &disp,
     IPLocAssem_2x2Block * const &lassem_f_ptr,

@@ -705,6 +705,9 @@ int main(int argc, char *argv[])
   if( rank == 0 ) gbc -> write_0D_sol ( initial_index, initial_time );
 
   // ===== Inlet data recording files =====
+  std::vector<double> curr_inlet_area (locinfnbc -> get_num_nbc(), 0.0);
+  std::vector<Vector_3> curr_inlet_centroid (locinfnbc -> get_num_nbc(), Vector_3 (0, 0, 0));
+
   for(int ff=0; ff<locinfnbc->get_num_nbc(); ++ff)
   {
     const double inlet_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
@@ -712,6 +715,16 @@ int main(int argc, char *argv[])
 
     const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
         disp, pres, locAssem_fluid_ptr, elements, quads, locinfnbc, ff );
+
+    const double inlet_face_area = gloAssem_ptr -> Assem_surface_area(
+        disp, locAssem_fluid_ptr, elements, quads, locinfnbc, ff );
+
+    curr_inlet_area[ff] = inlet_face_area;
+
+    const Vector_3 inlet_centroid = gloAssem_ptr -> get_centroid(
+        disp, locinfnbc, ff );
+
+    curr_inlet_centroid[ff] = inlet_centroid;
 
     if( rank == 0 )
     {
@@ -723,8 +736,9 @@ int main(int argc, char *argv[])
 
       if( !is_restart )
       {
-        ofile<<"Time-index"<<'\t'<<"Time"<<'\t'<<"Flow-rate"<<'\t'<<"Face-averaged-pressure"<<'\n';
-        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
+        ofile<<"Time-index"<<'\t'<<"Time"<<'\t'<<"Flow-rate"<<'\t'<<"Face-averaged-pressure"<<'\t'<<"Face-area"<<'\t'<< "Face-centroid"<<'\n';
+        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\t'
+             <<inlet_face_area<<'\t'<<inlet_centroid.x()<<'\t'<<inlet_centroid.y()<<'\t'<<inlet_centroid.z()<<'\n';
       }
 
       ofile.close();
@@ -754,7 +768,8 @@ int main(int argc, char *argv[])
       locebc_v, locebc_p, mesh_locebc, 
       gbc, pmat, mmat, elementv, elements, quadv, quads, ps_data,
       locAssem_fluid_ptr, locAssem_solid_ptr, locAssem_mesh_ptr,
-      gloAssem_ptr, gloAssem_mesh_ptr, lsolver, mesh_lsolver, nsolver);
+      gloAssem_ptr, gloAssem_mesh_ptr, lsolver, mesh_lsolver, nsolver,
+      curr_inlet_area, curr_inlet_centroid);
 
 #ifdef PETSC_USE_LOG
   PetscLogEventEnd(tsolver_event,0,0,0,0);

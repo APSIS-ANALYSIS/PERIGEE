@@ -845,6 +845,27 @@ class IPGAssem
       return 0.0;
     }
 
+    virtual double Assem_surface_area(
+        const PDNSolution * const &disp,
+        IPLocAssem_2x2Block * const &lassem_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const ALocal_InflowBC * const &infbc_part,
+        const int &nbc_id )
+    {
+      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_area is not implemented. \n");
+      return 0.0;
+    }
+
+    virtual Vector_3 get_centroid(
+        const PDNSolution * const &disp,
+        const ALocal_InflowBC * const &infbc_part,
+        const int &nbc_id )
+    {
+      SYS_T::commPrint("Warning: IPGAssem::get_centroid is not implemented. \n");
+      return Vector_3 (0.0, 0.0, 0.0);
+    }
+
     // Assem_surface_ave_pressure
     // Performs surface integral to calculated the pressure integrated
     // over the surface as well as the surface area. Return the

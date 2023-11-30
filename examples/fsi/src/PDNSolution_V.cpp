@@ -21,6 +21,9 @@ PDNSolution_V::PDNSolution_V( const APart_Node * const &pNode,
 PDNSolution_V::PDNSolution_V( const APart_Node * const &pNode,
     const FEANode * const &fNode,
     const ALocal_InflowBC * const &infbc,
+    const PDNSolution * const &curr_disp,
+    const std::vector<double> &curr_area,
+    const std::vector<Vector_3> &curr_centroid,
     const int &type, const bool &isprint,
     const std::string &in_name )
 : PDNSolution( pNode ), sol_name( in_name ), is_print( isprint )
@@ -33,7 +36,7 @@ PDNSolution_V::PDNSolution_V( const APart_Node * const &pNode,
       Init_zero( pNode );
       break;
     case 1:
-      Init_flow_parabolic( pNode, fNode, infbc );
+      Init_flow_parabolic( pNode, infbc, curr_disp, curr_area, curr_centroid );
       break;
     default:
       SYS_T::print_fatal("Error: PDNSolution_V: No such type of initial condition. \n");
@@ -67,8 +70,10 @@ void PDNSolution_V::Init_zero( const APart_Node * const &pNode )
 }
 
 void PDNSolution_V::Init_flow_parabolic( const APart_Node * const &pNode_ptr,
-    const FEANode * const &fNode_ptr,
-    const ALocal_InflowBC * const &infbc )
+    const ALocal_InflowBC * const &infbc,
+    const PDNSolution * const &curr_disp,
+    const std::vector<double> &curr_area,
+    const std::vector<Vector_3> &curr_centroid )
 {
   // First enforce everything to be zero
   for(int ii=0; ii<nlocalnode; ++ii)
@@ -84,7 +89,7 @@ void PDNSolution_V::Init_flow_parabolic( const APart_Node * const &pNode_ptr,
 
   for(int nbc_id = 0; nbc_id < num_nbc; ++nbc_id)
   {
-    const double vmax = 2.0 / infbc->get_fularea( nbc_id );
+    const double vmax = 2.0 / curr_area[nbc_id];
     const double out_nx = infbc->get_outvec( nbc_id ).x();
     const double out_ny = infbc->get_outvec( nbc_id ).y();
     const double out_nz = infbc->get_outvec( nbc_id ).z();
@@ -93,15 +98,40 @@ void PDNSolution_V::Init_flow_parabolic( const APart_Node * const &pNode_ptr,
     // parabolic flow profile
     if( infbc->get_Num_LD( nbc_id ) > 0)
     {
-      for(int ii=0; ii<nlocalnode; ++ii)
+      const std::vector<double> local_d = curr_disp -> GetLocalArray();
+
+      std::vector<Vector_3> curr_inlet_points ( infbc->get_num_local_node(nbc_id), Vector_3(0, 0, 0) );
+      std::vector<int> LD_loc_tag ( infbc->get_num_local_node(nbc_id),  -1 );
+
+      for(int jj=0; jj<infbc->get_num_local_node(nbc_id); ++jj)
+      {   
+        // Update all inlet points
+        Vector_3 pt = infbc->get_local_pt_xyz(nbc_id, jj);
+
+        const int pt_pos = infbc->get_local_node_pos(nbc_id, jj);
+
+        pt.x() += local_d[3 * pt_pos    ];
+        pt.y() += local_d[3 * pt_pos + 1];
+        pt.z() += local_d[3 * pt_pos + 2];
+
+        curr_inlet_points[jj] = pt;
+
+        // pick out LD point
+        if( infbc->is_inLDN( nbc_id, pNode_ptr->get_node_loc(pt_pos)) )
+          LD_loc_tag[jj] = pNode_ptr->get_node_loc(pt_pos);
+      }
+
+      // Apply inflow BC at LD points
+      for(int ii=0; ii <infbc->get_num_local_node(nbc_id); ++ii)
       {
-        if( infbc->is_inLDN( nbc_id, pNode_ptr->get_node_loc(ii) ) )
+        if(LD_loc_tag[ii] != -1)
         {
-          const int pos = pNode_ptr->get_node_loc(ii) * 3;
+          const int pos = LD_loc_tag[ii];
           const int location[3] = { pos, pos + 1, pos + 2 };
 
-          const Vector_3 pt = fNode_ptr -> get_ctrlPts_xyz(ii);
-          const double r =  infbc -> get_radius( nbc_id, pt );
+          const Vector_3 pt = curr_inlet_points[ii];
+
+          const double r = get_curr_radius(curr_inlet_points, pt, curr_centroid[nbc_id]);
           const double vel = vmax * (1.0 - r*r);
 
           const double value[3] = { vel * out_nx, vel * out_ny, vel * out_nz };
@@ -122,13 +152,31 @@ void PDNSolution_V::Init_flow_parabolic( const APart_Node * const &pNode_ptr,
     for(int nbc_id=0; nbc_id < num_nbc; ++nbc_id)
     {
       SYS_T::commPrint("     -- nbc_id = %d \n", nbc_id);
-      SYS_T::commPrint("        max speed %e.\n", 2.0 / infbc->get_fularea( nbc_id ) );
+      SYS_T::commPrint("        max speed %e.\n", 2.0 / curr_area[nbc_id] );
       SYS_T::commPrint("        active area is %e.\n", infbc->get_actarea(nbc_id) );
-      SYS_T::commPrint("        full area is %e.\n", infbc->get_fularea(nbc_id) );
+      SYS_T::commPrint("        full area is %e (%e).\n", infbc->get_fularea(nbc_id), curr_area[nbc_id] );
       SYS_T::commPrint("        outward normal direction [%e %e %e].\n",
           infbc->get_outvec( nbc_id ).x(), infbc->get_outvec( nbc_id ).y(), infbc->get_outvec( nbc_id ).z() );
     }
   }
+}
+
+double PDNSolution_V::get_curr_radius( const std::vector<Vector_3> &all_inlet_pt,
+    const Vector_3 &target_pt,
+    const Vector_3 &centroid)
+{
+  const double rc = Vec3::dist(target_pt, centroid);
+
+  double rb = Vec3::dist(target_pt, all_inlet_pt[0]);
+
+  for(int ii=1; ii<VEC_T::get_size(all_inlet_pt); ++ii)
+  {
+    const double newdist = Vec3::dist(target_pt, all_inlet_pt[ii]);
+
+    if(newdist < rb) rb = newdist;
+  }
+
+  return rc / (rb + rc);
 }
 
 // EOF

@@ -144,6 +144,11 @@ class ALocal_InflowBC
 
     virtual std::vector<int> get_SIEN( const int &nbc_id, const int &eindex ) const;
 
+    virtual int get_local_node_pos( const int &nbc_id, const int &nindex ) const
+    {
+      return local_cell_ien[nbc_id][nindex];
+    }
+
     // ------------------------------------------------------------------------
     // Generate filename Inlet_data.txt for inlet data
     // ------------------------------------------------------------------------

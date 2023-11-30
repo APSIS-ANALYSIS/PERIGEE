@@ -169,6 +169,20 @@ class PGAssem_FSI : public IPGAssem
         const ALocal_EBC * const &ebc_part,
         const int &ebc_id );
 
+    // (of inlet)
+    virtual double Assem_surface_area(
+        const PDNSolution * const &disp,
+        IPLocAssem_2x2Block * const &lassem_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const ALocal_InflowBC * const &infbc_part,
+        const int &nbc_id );
+
+    virtual Vector_3 get_centroid(
+        const PDNSolution * const &disp,
+        const ALocal_InflowBC * const &infbc_part,
+        const int &nbc_id );
+
   private:
     const int nLocBas, snLocBas, num_ebc, nlgn_v, nlgn_p;
 
