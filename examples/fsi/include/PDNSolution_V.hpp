@@ -53,7 +53,7 @@ class PDNSolution_V : public PDNSolution
         const std::vector<double> &curr_area,
         const std::vector<Vector_3> &curr_centroid );
 
-    double get_curr_radius( const std::vector<Vector_3> &all_inlet_pt,
+    double get_curr_radius( const std::vector<Vector_3> &outline_pt,
         const Vector_3 &target_pt,
         const Vector_3 &centroid);
 };

@@ -100,8 +100,10 @@ void PDNSolution_V::Init_flow_parabolic( const APart_Node * const &pNode_ptr,
     {
       const std::vector<double> local_d = curr_disp -> GetLocalArray();
 
-      std::vector<Vector_3> curr_inlet_points ( infbc->get_num_local_node(nbc_id), Vector_3(0, 0, 0) );
-      std::vector<int> LD_loc_tag ( infbc->get_num_local_node(nbc_id),  -1 );
+      std::vector<Vector_3> inner_points {};
+      std::vector<Vector_3> ring_points {};
+
+      std::vector<int> LD_loc_tag {};
 
       for(int jj=0; jj<infbc->get_num_local_node(nbc_id); ++jj)
       {   
@@ -114,30 +116,30 @@ void PDNSolution_V::Init_flow_parabolic( const APart_Node * const &pNode_ptr,
         pt.y() += local_d[3 * pt_pos + 1];
         pt.z() += local_d[3 * pt_pos + 2];
 
-        curr_inlet_points[jj] = pt;
-
         // pick out LD point
         if( infbc->is_inLDN( nbc_id, pNode_ptr->get_node_loc(pt_pos)) )
-          LD_loc_tag[jj] = pNode_ptr->get_node_loc(pt_pos);
+        {
+          inner_points.push_back(pt);
+          LD_loc_tag.push_back(pNode_ptr->get_node_loc(pt_pos));
+        }
+        else
+          ring_points.push_back(pt);
       }
 
       // Apply inflow BC at LD points
-      for(int ii=0; ii <infbc->get_num_local_node(nbc_id); ++ii)
+      for(int ii=0; ii < VEC_T::get_size(LD_loc_tag); ++ii)
       {
-        if(LD_loc_tag[ii] != -1)
-        {
-          const int pos = LD_loc_tag[ii];
-          const int location[3] = { pos, pos + 1, pos + 2 };
+        const int pos = LD_loc_tag[ii];
+        const int location[3] = { pos, pos + 1, pos + 2 };
 
-          const Vector_3 pt = curr_inlet_points[ii];
+        const Vector_3 pt = inner_points[ii];
 
-          const double r = get_curr_radius(curr_inlet_points, pt, curr_centroid[nbc_id]);
-          const double vel = vmax * (1.0 - r*r);
+        const double r = get_curr_radius(ring_points, pt, curr_centroid[nbc_id]);
+        const double vel = vmax * (1.0 - r*r);
 
-          const double value[3] = { vel * out_nx, vel * out_ny, vel * out_nz };
+        const double value[3] = { vel * out_nx, vel * out_ny, vel * out_nz };
 
-          VecSetValues(solution, 3, location, value, INSERT_VALUES);
-        }
+        VecSetValues(solution, 3, location, value, INSERT_VALUES);
       }
     }
   }
@@ -161,17 +163,17 @@ void PDNSolution_V::Init_flow_parabolic( const APart_Node * const &pNode_ptr,
   }
 }
 
-double PDNSolution_V::get_curr_radius( const std::vector<Vector_3> &all_inlet_pt,
+double PDNSolution_V::get_curr_radius( const std::vector<Vector_3> &outline_pt,
     const Vector_3 &target_pt,
     const Vector_3 &centroid)
 {
   const double rc = Vec3::dist(target_pt, centroid);
 
-  double rb = Vec3::dist(target_pt, all_inlet_pt[0]);
+  double rb = Vec3::dist(target_pt, outline_pt[0]);
 
-  for(int ii=1; ii<VEC_T::get_size(all_inlet_pt); ++ii)
+  for(int ii=1; ii<VEC_T::get_size(outline_pt); ++ii)
   {
-    const double newdist = Vec3::dist(target_pt, all_inlet_pt[ii]);
+    const double newdist = Vec3::dist(target_pt, outline_pt[ii]);
 
     if(newdist < rb) rb = newdist;
   }
