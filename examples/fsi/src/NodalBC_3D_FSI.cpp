@@ -25,7 +25,6 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
       {
         if(ringBC_type == 0)
         {
-          dir_nodes = get_vtk_nodal_id( fluid_inlet_files );
           // VEC_T::insert_end( dir_nodes, get_vtk_nodal_id( solid_inlet_files ) );
           // VEC_T::insert_end( dir_nodes, get_vtk_nodal_id( solid_outlet_files ) );
 
@@ -38,7 +37,10 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
             VEC_T::insert_end( dir_nodes, CA_benchmark_BC( solid_outlet_files ) );
           }
           else if(comp == 2) // fix z-direction disp of solid inlet
+          {
+            dir_nodes = get_vtk_nodal_id( fluid_inlet_files );
             VEC_T::insert_end( dir_nodes, get_vtk_nodal_id( solid_inlet_files ) );
+          }
           else
             ;
           VEC_T::sort_unique_resize( dir_nodes );
