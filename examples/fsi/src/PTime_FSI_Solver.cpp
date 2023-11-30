@@ -72,7 +72,6 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     const bool &restart_init_assembly_flag,
     const IS &is_v,
     const IS &is_p,
-    const PDNSolution * const &sol_base,
     const PDNSolution * const &init_dot_disp,
     const PDNSolution * const &init_dot_velo,
     const PDNSolution * const &init_dot_pres,
@@ -174,7 +173,7 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
 
     bool conv_flag;
     nsolver_ptr->GenAlpha_Seg_solve_FSI( renew_flag, time_info->get_time(),
-        time_info->get_step(), is_v, is_p, sol_base, 
+        time_info->get_step(), is_v, is_p, 
         pre_dot_disp, pre_dot_velo, pre_dot_pres, pre_disp, pre_velo, pre_pres, 
         tmga_ptr, flr_ptr, alelem_ptr, lien_v, lien_p, feanode_ptr, pnode_v, pnode_p, 
         nbc_v, nbc_p, infnbc,

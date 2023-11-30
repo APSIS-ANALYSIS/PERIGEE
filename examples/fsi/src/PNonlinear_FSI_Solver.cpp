@@ -94,7 +94,6 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     const double &dt,
     const IS &is_v,
     const IS &is_p,
-    const PDNSolution * const &sol_base,
     const PDNSolution * const &pre_dot_disp,
     const PDNSolution * const &pre_dot_velo,
     const PDNSolution * const &pre_dot_pres,
@@ -205,10 +204,14 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
   disp           -> PlusAX( Delta_dot_disp, gamma * dt );
   dot_disp_alpha -> PlusAX( Delta_dot_disp, alpha_m );
   disp_alpha     -> PlusAX( Delta_dot_disp, alpha_f * gamma * dt );
-  
+
+  PDNSolution * sol_base = new PDNSolution_V( pnode_v, feanode_ptr, infnbc_part, 1, true, "base" );
+
   // Update inflow boundary values
   rescale_inflow_value( curr_time + dt,           infnbc_part, flr_ptr, sol_base, velo );
   rescale_inflow_value( curr_time + alpha_f * dt, infnbc_part, flr_ptr, sol_base, velo_alpha );
+
+  delete sol_base;
 
 #ifdef PETSC_USE_LOG
   PetscLogEventBegin(assem_event_0, 0,0,0,0);

@@ -25,7 +25,6 @@ class PTime_FSI_Solver
         const bool &restart_init_assembly_flag,
         const IS &is_v,
         const IS &is_p,
-        const PDNSolution * const &sol_base,
         const PDNSolution * const &init_dot_disp,
         const PDNSolution * const &init_dot_velo,
         const PDNSolution * const &init_dot_pres,

@@ -472,9 +472,7 @@ int main(int argc, char *argv[])
   // Pseudo elastic mesh motion
   IPLocAssem * locAssem_mesh_ptr = new PLocAssem_FSI_Mesh_Laplacian( elementv -> get_nLocBas() );
   
-  // ===== Initial condition =====
-  PDNSolution * base = new PDNSolution_V( pNode_v, fNode, locinfnbc, 1, true, "base" ); 
-  
+  // ===== Initial condition ===== 
   PDNSolution * velo = new PDNSolution_V(pNode_v, 0, true, "velo");
   PDNSolution * disp = new PDNSolution_V(pNode_v, 0, true, "disp");
   PDNSolution * pres = new PDNSolution_P(pNode_p, 0, true, "pres");
@@ -749,7 +747,7 @@ int main(int argc, char *argv[])
   PetscLogEventBegin(tsolver_event, 0,0,0,0);
 #endif
 
-  tsolver->TM_FSI_GenAlpha(is_restart, is_velo, is_pres, base, 
+  tsolver->TM_FSI_GenAlpha(is_restart, is_velo, is_pres, 
       dot_disp, dot_velo, dot_pres, disp, velo, pres, 
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN_v, locIEN_p, 
       pNode_v, pNode_p, fNode, locnbc_v, locnbc_p, locinfnbc, mesh_locnbc, 
@@ -771,7 +769,7 @@ int main(int argc, char *argv[])
   delete gloAssem_ptr; delete gloAssem_mesh_ptr;
   delete timeinfo; delete gbc;
   delete pres; delete dot_pres;
-  delete base; delete dot_velo; delete dot_disp; delete velo; delete disp;
+  delete dot_velo; delete dot_disp; delete velo; delete disp;
   delete locAssem_mesh_ptr; delete matmodel; delete locAssem_fluid_ptr;
   delete locAssem_solid_ptr; delete pmat; delete mmat; delete tm_galpha_ptr;
   ISDestroy(&is_velo); ISDestroy(&is_pres);

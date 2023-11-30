@@ -35,7 +35,6 @@ class PNonlinear_FSI_Solver
         const double &dt,
         const IS &is_v,
         const IS &is_p,
-        const PDNSolution * const &sol_base,
         const PDNSolution * const &pre_dot_disp,
         const PDNSolution * const &pre_dot_velo,
         const PDNSolution * const &pre_dot_pres,
