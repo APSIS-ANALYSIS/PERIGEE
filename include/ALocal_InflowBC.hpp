@@ -146,7 +146,7 @@ class ALocal_InflowBC
 
     virtual int get_local_node_pos( const int &nbc_id, const int &nindex ) const
     {
-      return local_cell_ien[nbc_id][nindex];
+      return local_node_pos[nbc_id][nindex];
     }
 
     // ------------------------------------------------------------------------

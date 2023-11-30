@@ -129,7 +129,7 @@ void PDNSolution_V::Init_flow_parabolic( const APart_Node * const &pNode_ptr,
       // Apply inflow BC at LD points
       for(int ii=0; ii < VEC_T::get_size(LD_loc_tag); ++ii)
       {
-        const int pos = LD_loc_tag[ii];
+        const int pos = LD_loc_tag[ii] * 3;
         const int location[3] = { pos, pos + 1, pos + 2 };
 
         const Vector_3 pt = inner_points[ii];
