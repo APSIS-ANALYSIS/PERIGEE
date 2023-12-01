@@ -166,6 +166,12 @@ class INodalBC
       return -1;
     }
 
+    virtual int get_outline_pts_loc(const int &nbc_id, const int &ii) const
+    {
+      SYS_T::print_fatal("Error: INodalBC::get_outline_loc is not implemented.\n");
+      return -1;
+    }
+
     // ------------------------------------------------------------------------
     // get_face_area() return inflow cap surface face area
     // ------------------------------------------------------------------------

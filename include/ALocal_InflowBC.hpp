@@ -147,8 +147,14 @@ class ALocal_InflowBC
     virtual int get_local_node_pos( const int &nbc_id, const int &nindex ) const
     {return local_node_pos[nbc_id][nindex];}
 
-    virtual std::vector<int> get_outline ( const int &nbc_id ) const
-    {return outline_pts_id[nbc_id];}
+    virtual int get_num_outline_pt( const int &nbc_id ) const
+    {return VEC_T::get_size(outline_pts_part_tag[nbc_id]);}
+
+    virtual int get_outline_part_tag ( const int &nbc_id, const int &ii ) const
+    {return outline_pts_part_tag[nbc_id][ii];}
+
+    virtual int get_outline_loc_tag ( const int &nbc_id, const int &ii ) const
+    {return outline_pts_loc[nbc_id][ii];}
 
     // ------------------------------------------------------------------------
     // Generate filename Inlet_data.txt for inlet data
@@ -191,7 +197,8 @@ class ALocal_InflowBC
     // num_nbc x num_out_bc_pts[ii]
     std::vector< std::vector<double> > outline_pts;
 
-    std::vector< std::vector<int> > outline_pts_id;
+    std::vector< std::vector<int> > outline_pts_part_tag;
+    std::vector< std::vector<int> > outline_pts_loc;
 
     // Centroid point's coordinates. Length num_nbc
     std::vector<Vector_3> centroid;

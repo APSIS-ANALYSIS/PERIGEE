@@ -13,7 +13,8 @@ NBC_Partition_inflow::NBC_Partition_inflow(
 
   actarea.resize(num_nbc); facearea.resize(num_nbc);
   outvec.resize(num_nbc);  centroid.resize(num_nbc);
-  num_out_bc_pts.resize(num_nbc); outline_pts.resize(num_nbc); outline_pts_id.resize(num_nbc);
+  num_out_bc_pts.resize(num_nbc); outline_pts.resize(num_nbc);
+  outline_pts_id.resize(num_nbc); outline_pts_part_tag.resize(num_nbc); outline_pts_loc.resize(num_nbc);
   cell_nLocBas.resize(num_nbc);      local_cell_ien.resize(num_nbc);
   num_local_node.resize(num_nbc);    num_local_cell.resize(num_nbc);
   local_global_node.resize(num_nbc); local_global_cell.resize(num_nbc);
@@ -49,10 +50,6 @@ NBC_Partition_inflow::NBC_Partition_inflow(
     outline_pts[ii].resize( 3*num_out_bc_pts[ii] );
     for(int jj=0; jj<3*num_out_bc_pts[ii]; ++jj)
       outline_pts[ii][jj] = nbc->get_outline_pts(ii, jj);
-    
-    outline_pts_id[ii].resize( num_out_bc_pts[ii] );
-    for(int jj=0; jj<num_out_bc_pts[ii]; ++jj)
-      outline_pts_id[ii][jj] = mnindex -> get_old2new(nbc -> get_outline_pts_id(ii, jj));
 
     // Record the geometrical info of the inlet in this CPU
     cell_nLocBas[ii] = nbc -> get_nLocBas(ii);
@@ -96,6 +93,20 @@ NBC_Partition_inflow::NBC_Partition_inflow(
       local_global_node[ii][jj] = nbc -> get_global_node( ii, local_node[jj] );
 
       local_node_pos[ii][jj] = part->get_nodeLocGhoIndex( mnindex->get_old2new(local_global_node[ii][jj]) );
+    }
+
+    outline_pts_id[ii].resize( num_out_bc_pts[ii] );
+    outline_pts_part_tag[ii].assign( num_out_bc_pts[ii], -1 );
+    outline_pts_loc[ii].assign( num_out_bc_pts[ii], -1 );
+    for(int jj=0; jj<num_out_bc_pts[ii]; ++jj)
+    {
+      int node_index = mnindex -> get_old2new(nbc -> get_outline_pts_id(ii, jj));
+      outline_pts_id[ii][jj] = node_index;
+      if(part->isNodeInPart(node_index))
+      {
+        outline_pts_part_tag[ii][jj] = part->get_cpu_rank();
+        outline_pts_loc[ii][jj] = local_node_pos[ii][nbc -> get_outline_pts_loc(ii, jj)];
+      }
     }
 
     // create new IEN
@@ -156,6 +167,10 @@ void NBC_Partition_inflow::write_hdf5( const std::string &FileName ) const
     h5w->write_doubleVector( group_id, "outline_pts", outline_pts[ii] );
 
     h5w->write_intVector( group_id, "outline_pts_global_id", outline_pts_id[ii] );
+
+    h5w->write_intVector( group_id, "outline_pts_part_tag", outline_pts_part_tag[ii] );
+
+    h5w->write_intVector( group_id, "ourline_pts_loc", outline_pts_loc[ii] );
 
     h5w->write_doubleVector( group_id, "local_pt_xyz", local_pt_xyz[ii] );
 

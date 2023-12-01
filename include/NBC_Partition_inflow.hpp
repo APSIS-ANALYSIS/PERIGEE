@@ -59,6 +59,8 @@ class NBC_Partition_inflow
     std::vector< std::vector<double> > outline_pts;
 
     std::vector< std::vector<int> > outline_pts_id;
+    std::vector< std::vector<int> > outline_pts_part_tag;
+    std::vector< std::vector<int> > outline_pts_loc;
 
     // number of local node / cell, element number of nodes. Length num_nbc
     std::vector<int> num_local_node, num_local_cell, cell_nLocBas;

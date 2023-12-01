@@ -21,7 +21,8 @@ ALocal_InflowBC::ALocal_InflowBC(
   ful_area.resize(num_nbc); 
   num_out_bc_pts.resize(num_nbc);
   outline_pts.resize(num_nbc);
-  outline_pts_id.resize(num_nbc);
+  outline_pts_part_tag.resize(num_nbc);
+  outline_pts_loc.resize(num_nbc);
   centroid.resize(num_nbc); 
   num_local_node.resize(num_nbc); 
   num_local_cell.resize(num_nbc); 
@@ -47,13 +48,15 @@ ALocal_InflowBC::ALocal_InflowBC(
     {
       LDN[nbc_id]            = h5r -> read_intVector(    subgroup_name.c_str(), "LDN" );
       outline_pts[nbc_id]    = h5r -> read_doubleVector( subgroup_name.c_str(), "outline_pts" );
-      outline_pts_id[nbc_id] = h5r -> read_intVector(    subgroup_name.c_str(), "outline_pts_global_id" );
+      outline_pts_part_tag[nbc_id] = h5r -> read_intVector( subgroup_name.c_str(), "outline_pts_part_tag" );
+      outline_pts_loc[nbc_id]= h5r -> read_intVector(    subgroup_name.c_str(), "ourline_pts_loc" );
     }
     else
     {
       LDN[nbc_id].clear();
       outline_pts[nbc_id].clear();
-      outline_pts_id[nbc_id].clear();
+      outline_pts_part_tag[nbc_id].clear();
+      outline_pts_loc[nbc_id].clear();
     }
     
     SYS_T::print_fatal_if( Num_LD[nbc_id] != static_cast<int>( LDN[nbc_id].size() ), "Error: the LDN vector size does not match with the value of Num_LD.\n" );
