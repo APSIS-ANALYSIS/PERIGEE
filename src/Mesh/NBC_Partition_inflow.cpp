@@ -52,9 +52,7 @@ NBC_Partition_inflow::NBC_Partition_inflow(
     
     outline_pts_id[ii].resize( num_out_bc_pts[ii] );
     for(int jj=0; jj<num_out_bc_pts[ii]; ++jj)
-    {
-      outline_pts_id[ii][jj] = nbc -> get_outline_pts_id(ii, jj);
-    }
+      outline_pts_id[ii][jj] = mnindex -> get_old2new(nbc -> get_outline_pts_id(ii, jj));
 
     // Record the geometrical info of the inlet in this CPU
     cell_nLocBas[ii] = nbc -> get_nLocBas(ii);
