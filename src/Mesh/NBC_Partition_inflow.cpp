@@ -13,7 +13,7 @@ NBC_Partition_inflow::NBC_Partition_inflow(
 
   actarea.resize(num_nbc); facearea.resize(num_nbc);
   outvec.resize(num_nbc);  centroid.resize(num_nbc);
-  num_out_bc_pts.resize(num_nbc); outline_pts.resize(num_nbc); outline_pts_loc_id.resize(num_nbc);
+  num_out_bc_pts.resize(num_nbc); outline_pts.resize(num_nbc); outline_pts_id.resize(num_nbc);
   cell_nLocBas.resize(num_nbc);      local_cell_ien.resize(num_nbc);
   num_local_node.resize(num_nbc);    num_local_cell.resize(num_nbc);
   local_global_node.resize(num_nbc); local_global_cell.resize(num_nbc);
@@ -50,10 +50,10 @@ NBC_Partition_inflow::NBC_Partition_inflow(
     for(int jj=0; jj<3*num_out_bc_pts[ii]; ++jj)
       outline_pts[ii][jj] = nbc->get_outline_pts(ii, jj);
     
-    outline_pts_loc_id[ii].resize( num_out_bc_pts[ii] );
+    outline_pts_id[ii].resize( num_out_bc_pts[ii] );
     for(int jj=0; jj<num_out_bc_pts[ii]; ++jj)
     {
-      outline_pts_loc_id[ii][jj] = nbc -> get_outline_pts_loc_id(ii, jj);
+      outline_pts_id[ii][jj] = nbc -> get_outline_pts_id(ii, jj);
     }
 
     // Record the geometrical info of the inlet in this CPU
@@ -157,7 +157,7 @@ void NBC_Partition_inflow::write_hdf5( const std::string &FileName ) const
 
     h5w->write_doubleVector( group_id, "outline_pts", outline_pts[ii] );
 
-    h5w->write_intVector( group_id, "outline_pts_loc_id", outline_pts_loc_id[ii] );
+    h5w->write_intVector( group_id, "outline_pts_global_id", outline_pts_id[ii] );
 
     h5w->write_doubleVector( group_id, "local_pt_xyz", local_pt_xyz[ii] );
 

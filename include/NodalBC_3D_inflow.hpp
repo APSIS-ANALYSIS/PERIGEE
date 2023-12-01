@@ -77,8 +77,8 @@ class NodalBC_3D_inflow : public INodalBC
     {return outline_pts[nbc_id][ii];}
 
     // ii ranges from 0 to num_out_bc_pts[nbc_id]
-    virtual int get_outline_pts_loc_id(const int &nbc_id, const int &ii) const
-    {return outline_pts_loc_id[nbc_id][ii];}
+    virtual int get_outline_pts_id(const int &nbc_id, const int &ii) const
+    {return outline_pts_id[nbc_id][ii];}
 
     // Access to the face area
     virtual double get_face_area(const int &nbc_id) const {return face_area[nbc_id];}
@@ -182,7 +182,7 @@ class NodalBC_3D_inflow : public INodalBC
     // num_nbc times ( 3 x num_out_bc_pts[ii] ) in size.
     std::vector< std::vector<double> > outline_pts;
 
-    std::vector< std::vector<int> > outline_pts_loc_id;
+    std::vector< std::vector<int> > outline_pts_id;
 
     // It stores the surface integral of each nodal basis function on
     // the inlet surface.
