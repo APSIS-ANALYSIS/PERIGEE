@@ -902,7 +902,7 @@ void PGAssem_FSI::Current_inlet(
 {
   const std::vector<double> array_d = disp -> GetLocalArray();
 
-  double * xyz = new double[3] {0.0};
+  double xyz[3] = {0.0};
   int num_node {infbc_part -> get_num_local_node(nbc_id)};
 
   for(int ii{0}; ii < num_node; ++ii)
@@ -919,7 +919,7 @@ void PGAssem_FSI::Current_inlet(
   }
 
   const int num_ring_pt {infbc_part -> get_num_outline_pt(nbc_id)};
-  double * ring_xyz = new double[3 * num_ring_pt] {0.0};
+  double ring_xyz[3 * num_ring_pt] = {0.0};
 
   for(int jj{0}; jj < num_ring_pt; ++jj)
   {
@@ -938,9 +938,9 @@ void PGAssem_FSI::Current_inlet(
       ; // Do nothing if the ring point is not in this part.
   }
 
-  double * sum_xyz = new double[3] {0.0};
+  double sum_xyz[3] = {0.0};
   int total_node {0};
-  double * all_ring_xyz = new double[3 * num_ring_pt] {0.0};
+  double all_ring_xyz[num_ring_pt] = {0.0};
 
   MPI_Allreduce(&xyz, &sum_xyz, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
   MPI_Allreduce(&num_node, &total_node, 1, MPI_INT, MPI_SUM, PETSC_COMM_WORLD);
@@ -953,8 +953,6 @@ void PGAssem_FSI::Current_inlet(
   if(VEC_T::get_size(inlet_ring) != num_ring_pt) inlet_ring.resize(num_ring_pt);
   for(int jj{0}; jj < num_ring_pt; ++jj)
     inlet_ring[jj] = Vector_3 (all_ring_xyz[3*jj], all_ring_xyz[3*jj+1], all_ring_xyz[3*jj+2]);
-
-  delete[] all_ring_xyz; delete[] ring_xyz; delete[] sum_xyz; delete[] xyz;
 
   return;
 }
