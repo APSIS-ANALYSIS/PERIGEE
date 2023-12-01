@@ -27,6 +27,7 @@ class PDNSolution_V : public PDNSolution
         const PDNSolution * const &curr_disp,
         const std::vector<double> &curr_area,
         const std::vector<Vector_3> &curr_centroid,
+        const std::vector<std::vector<Vector_3>> &curr_ring,
         const int &type, const bool &isprint = false,
         const std::string &in_name = "solution_kinematics" );
 
@@ -51,7 +52,8 @@ class PDNSolution_V : public PDNSolution
         const ALocal_InflowBC * const &infbc,
         const PDNSolution * const &curr_disp,
         const std::vector<double> &curr_area,
-        const std::vector<Vector_3> &curr_centroid );
+        const std::vector<Vector_3> &curr_centroid,
+        const std::vector<std::vector<Vector_3>> &curr_ring );
 
     double get_curr_radius( const std::vector<Vector_3> &outline_pt,
         const Vector_3 &target_pt,

@@ -136,8 +136,9 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     PDNSolution * const &velo,
     PDNSolution * const &pres,
     bool &conv_flag, int &nl_counter,
-    const std::vector<double> inlet_area,
-    const std::vector<Vector_3> inlet_centroid ) const
+    const std::vector<double> &inlet_area,
+    const std::vector<Vector_3> &inlet_centroid,
+    const std::vector<std::vector<Vector_3>> &inlet_ring) const
 {
 #ifdef PETSC_USE_LOG
   PetscLogEvent assem_event_0, assem_event_1, assem_event_2;
@@ -170,7 +171,9 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
   velo -> Copy( pre_velo );
   pres -> Copy( pre_pres );
 
-  PDNSolution * sol_base = new PDNSolution_V( pnode_v, feanode_ptr, infnbc_part, disp, inlet_area, inlet_centroid, 1, false, "base" );
+  PDNSolution * sol_base = new PDNSolution_V( pnode_v, feanode_ptr, infnbc_part,
+                                              disp, inlet_area, inlet_centroid, inlet_ring,
+                                              1, false, "base" );
 
   // Define intermediate solutions
   PDNSolution * dot_disp_alpha = new PDNSolution( pre_dot_disp ); 

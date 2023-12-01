@@ -24,6 +24,7 @@ PDNSolution_V::PDNSolution_V( const APart_Node * const &pNode,
     const PDNSolution * const &curr_disp,
     const std::vector<double> &curr_area,
     const std::vector<Vector_3> &curr_centroid,
+    const std::vector<std::vector<Vector_3>> &curr_ring,
     const int &type, const bool &isprint,
     const std::string &in_name )
 : PDNSolution( pNode ), sol_name( in_name ), is_print( isprint )
@@ -36,7 +37,7 @@ PDNSolution_V::PDNSolution_V( const APart_Node * const &pNode,
       Init_zero( pNode );
       break;
     case 1:
-      Init_flow_parabolic( pNode, infbc, curr_disp, curr_area, curr_centroid );
+      Init_flow_parabolic( pNode, infbc, curr_disp, curr_area, curr_centroid, curr_ring );
       break;
     default:
       SYS_T::print_fatal("Error: PDNSolution_V: No such type of initial condition. \n");
@@ -73,7 +74,8 @@ void PDNSolution_V::Init_flow_parabolic( const APart_Node * const &pNode_ptr,
     const ALocal_InflowBC * const &infbc,
     const PDNSolution * const &curr_disp,
     const std::vector<double> &curr_area,
-    const std::vector<Vector_3> &curr_centroid )
+    const std::vector<Vector_3> &curr_centroid,
+    const std::vector<std::vector<Vector_3>> &curr_ring )
 {
   // First enforce everything to be zero
   for(int ii=0; ii<nlocalnode; ++ii)
@@ -131,7 +133,7 @@ void PDNSolution_V::Init_flow_parabolic( const APart_Node * const &pNode_ptr,
 
         const Vector_3 pt = inner_points[ii];
 
-        const double r = get_curr_radius({}, pt, curr_centroid[nbc_id]);
+        const double r = get_curr_radius(curr_ring[nbc_id], pt, curr_centroid[nbc_id]);
         const double vel = vmax * (1.0 - r*r);
 
         const double value[3] = { vel * out_nx, vel * out_ny, vel * out_nz };

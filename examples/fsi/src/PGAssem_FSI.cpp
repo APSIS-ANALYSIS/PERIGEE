@@ -902,7 +902,7 @@ void PGAssem_FSI::Current_inlet(
 {
   const std::vector<double> array_d = disp -> GetLocalArray();
 
-  double * xyz = new double[3] {0.0, 0.0, 0.0};
+  double * xyz = new double[3] {0.0};
   int num_node {infbc_part -> get_num_local_node(nbc_id)};
 
   for(int ii{0}; ii < num_node; ++ii)
@@ -918,17 +918,43 @@ void PGAssem_FSI::Current_inlet(
     xyz[2] += local_pt.z() + disp_z;
   }
 
-  double sum_xyz[3] {0.0, 0.0, 0.0};
+  const int num_ring_pt {infbc_part -> get_num_outline_pt(nbc_id)};
+  double * ring_xyz = new double[3 * num_ring_pt] {0.0};
+
+  for(int jj{0}; jj < num_ring_pt; ++jj)
+  {
+    if(infbc_part->get_outline_part_tag(nbc_id, jj) != -1)  // The ring point is in this part.
+    {
+      SYS_T::print_fatal_if(infbc_part->get_outline_loc(nbc_id, jj) == -1, "Error: PGAssem::Current_inlet.\n");
+
+      const Vector_3 init_pt = infbc_part->get_outline_pt(nbc_id, jj); // Initial coordinates
+
+      // Current coordinates
+      ring_xyz[3 * jj    ] += (init_pt.x() + array_d[infbc_part->get_outline_loc(nbc_id, jj) * 3]); 
+      ring_xyz[3 * jj + 1] += (init_pt.y() + array_d[infbc_part->get_outline_loc(nbc_id, jj) * 3 + 1]);
+      ring_xyz[3 * jj + 2] += (init_pt.z() + array_d[infbc_part->get_outline_loc(nbc_id, jj) * 3 + 2]);
+    }
+    else
+      ; // Do nothing if the ring point is not in this part.
+  }
+
+  double * sum_xyz = new double[3] {0.0};
   int total_node {0};
+  double * all_ring_xyz = new double[3 * num_ring_pt] {0.0};
 
   MPI_Allreduce(&xyz, &sum_xyz, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
   MPI_Allreduce(&num_node, &total_node, 1, MPI_INT, MPI_SUM, PETSC_COMM_WORLD);
+  MPI_Allreduce(&ring_xyz, &all_ring_xyz, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
 
   inlet_centroid.x() = sum_xyz[0] / total_node;
   inlet_centroid.y() = sum_xyz[1] / total_node;
   inlet_centroid.z() = sum_xyz[2] / total_node;
 
-  delete[] xyz;
+  if(VEC_T::get_size(inlet_ring) != num_ring_pt) inlet_ring.resize(num_ring_pt);
+  for(int jj{0}; jj < num_ring_pt; ++jj)
+    inlet_ring[jj] = Vector_3 (all_ring_xyz[3*jj], all_ring_xyz[3*jj+1], all_ring_xyz[3*jj+2]);
+
+  delete[] all_ring_xyz; delete[] ring_xyz; delete[] sum_xyz; delete[] xyz;
 
   return;
 }

@@ -185,7 +185,7 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
         lassem_fluid_ptr, lassem_solid_ptr, lassem_mesh_ptr,
         gassem_ptr, gassem_mesh_ptr, lsolver_ptr, lsolver_mesh_ptr,
         cur_dot_disp, cur_dot_velo, cur_dot_pres, cur_disp, cur_velo, cur_pres, 
-        conv_flag, nl_counter, curr_inlet_area, curr_inlet_centroid);
+        conv_flag, nl_counter, curr_inlet_area, curr_inlet_centroid, curr_inlet_ring);
 
     time_info->TimeIncrement();
 

@@ -156,7 +156,7 @@ class ALocal_InflowBC
     virtual int get_outline_part_tag ( const int &nbc_id, const int &ii ) const
     {return outline_pts_part_tag[nbc_id][ii];}
 
-    virtual int get_outline_loc_tag ( const int &nbc_id, const int &ii ) const
+    virtual int get_outline_loc ( const int &nbc_id, const int &ii ) const
     {return outline_pts_loc[nbc_id][ii];}
 
     // ------------------------------------------------------------------------
