@@ -49,7 +49,7 @@ ALocal_InflowBC::ALocal_InflowBC(
       LDN[nbc_id]            = h5r -> read_intVector(    subgroup_name.c_str(), "LDN" );
       outline_pts[nbc_id]    = h5r -> read_doubleVector( subgroup_name.c_str(), "outline_pts" );
       outline_pts_part_tag[nbc_id] = h5r -> read_intVector( subgroup_name.c_str(), "outline_pts_part_tag" );
-      outline_pts_loc[nbc_id]= h5r -> read_intVector(    subgroup_name.c_str(), "ourline_pts_loc" );
+      outline_pts_loc[nbc_id]= h5r -> read_intVector(    subgroup_name.c_str(), "outline_pts_loc" );
     }
     else
     {

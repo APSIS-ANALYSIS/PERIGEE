@@ -105,7 +105,7 @@ NBC_Partition_inflow::NBC_Partition_inflow(
       if(part->isNodeInPart(node_index))
       {
         outline_pts_part_tag[ii][jj] = part->get_cpu_rank();
-        outline_pts_loc[ii][jj] = local_node_pos[ii][nbc -> get_outline_pts_loc(ii, jj)];
+        outline_pts_loc[ii][jj] = local_node_pos[ii][local_node[nbc -> get_outline_pts_loc(ii, jj)]];
       }
     }
 
@@ -170,7 +170,7 @@ void NBC_Partition_inflow::write_hdf5( const std::string &FileName ) const
 
     h5w->write_intVector( group_id, "outline_pts_part_tag", outline_pts_part_tag[ii] );
 
-    h5w->write_intVector( group_id, "ourline_pts_loc", outline_pts_loc[ii] );
+    h5w->write_intVector( group_id, "outline_pts_loc", outline_pts_loc[ii] );
 
     h5w->write_doubleVector( group_id, "local_pt_xyz", local_pt_xyz[ii] );
 
