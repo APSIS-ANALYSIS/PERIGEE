@@ -178,10 +178,12 @@ class PGAssem_FSI : public IPGAssem
         const ALocal_InflowBC * const &infbc_part,
         const int &nbc_id );
 
-    virtual Vector_3 get_centroid(
+    virtual void Current_inlet(
         const PDNSolution * const &disp,
         const ALocal_InflowBC * const &infbc_part,
-        const int &nbc_id );
+        const int &nbc_id,
+        Vector_3 &centroid,
+        std::vector<Vector_3> &inlet_ring);
 
   private:
     const int nLocBas, snLocBas, num_ebc, nlgn_v, nlgn_p;

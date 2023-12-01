@@ -707,6 +707,7 @@ int main(int argc, char *argv[])
   // ===== Inlet data recording files =====
   std::vector<double> curr_inlet_area (locinfnbc -> get_num_nbc(), 0.0);
   std::vector<Vector_3> curr_inlet_centroid (locinfnbc -> get_num_nbc(), Vector_3 (0, 0, 0));
+  std::vector<std::vector<Vector_3>> curr_inlet_ring(locinfnbc -> get_num_nbc(), std::vector<Vector_3> {});
 
   for(int ff=0; ff<locinfnbc->get_num_nbc(); ++ff)
   {
@@ -721,10 +722,8 @@ int main(int argc, char *argv[])
 
     curr_inlet_area[ff] = inlet_face_area;
 
-    const Vector_3 inlet_centroid = gloAssem_ptr -> get_centroid(
-        disp, locinfnbc, ff );
-
-    curr_inlet_centroid[ff] = inlet_centroid;
+    gloAssem_ptr -> Current_inlet(
+      disp, locinfnbc, ff, curr_inlet_centroid[ff], curr_inlet_ring[ff]);
 
     if( rank == 0 )
     {
@@ -736,9 +735,8 @@ int main(int argc, char *argv[])
 
       if( !is_restart )
       {
-        ofile<<"Time-index"<<'\t'<<"Time"<<'\t'<<"Flow-rate"<<'\t'<<"Face-averaged-pressure"<<'\t'<<"Face-area"<<'\t'<< "Face-centroid"<<'\n';
-        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\t'
-             <<inlet_face_area<<'\t'<<inlet_centroid.x()<<'\t'<<inlet_centroid.y()<<'\t'<<inlet_centroid.z()<<'\n';
+        ofile<<"Time-index"<<'\t'<<"Time"<<'\t'<<"Flow-rate"<<'\t'<<"Face-averaged-pressure"<<'\t'<<"Face-area"<<'\n';
+        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\t'<<inlet_face_area<<'\n';
       }
 
       ofile.close();
@@ -769,7 +767,7 @@ int main(int argc, char *argv[])
       gbc, pmat, mmat, elementv, elements, quadv, quads, ps_data,
       locAssem_fluid_ptr, locAssem_solid_ptr, locAssem_mesh_ptr,
       gloAssem_ptr, gloAssem_mesh_ptr, lsolver, mesh_lsolver, nsolver,
-      curr_inlet_area, curr_inlet_centroid);
+      curr_inlet_area, curr_inlet_centroid, curr_inlet_ring);
 
 #ifdef PETSC_USE_LOG
   PetscLogEventEnd(tsolver_event,0,0,0,0);

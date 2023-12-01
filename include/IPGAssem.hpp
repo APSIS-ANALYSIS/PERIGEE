@@ -857,13 +857,14 @@ class IPGAssem
       return 0.0;
     }
 
-    virtual Vector_3 get_centroid(
+    virtual void Current_inlet(
         const PDNSolution * const &disp,
         const ALocal_InflowBC * const &infbc_part,
-        const int &nbc_id )
+        const int &nbc_id,
+        Vector_3 &inlet_centroid,
+        std::vector<Vector_3> &inlet_ring )
     {
-      SYS_T::commPrint("Warning: IPGAssem::get_centroid is not implemented. \n");
-      return Vector_3 (0.0, 0.0, 0.0);
+      SYS_T::commPrint("Warning: IPGAssem::Current_inlet is not implemented. \n");
     }
 
     // Assem_surface_ave_pressure

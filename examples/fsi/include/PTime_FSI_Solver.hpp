@@ -64,7 +64,8 @@ class PTime_FSI_Solver
         PLinear_Solver_PETSc * const &lsolver_mesh_ptr,
         const PNonlinear_FSI_Solver * const &nsolver_ptr,
         std::vector<double> &curr_inlet_area,
-        std::vector<Vector_3> &curr_inlet_centroid ) const;
+        std::vector<Vector_3> &curr_inlet_centroid,
+        std::vector<std::vector<Vector_3>> &curr_inlet_ring ) const;
 
     void TM_FSI_Prestress(
         const bool &is_record_sol_flag,

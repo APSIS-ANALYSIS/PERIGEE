@@ -893,14 +893,16 @@ double PGAssem_FSI::Assem_surface_area(
   return sum_area;
 }
 
-Vector_3 PGAssem_FSI::get_centroid(
+void PGAssem_FSI::Current_inlet(
     const PDNSolution * const &disp,
     const ALocal_InflowBC * const &infbc_part,
-    const int &nbc_id )
+    const int &nbc_id,
+    Vector_3 &inlet_centroid,
+    std::vector<Vector_3> &inlet_ring )
 {
   const std::vector<double> array_d = disp -> GetLocalArray();
 
-  double sum_x {0.0}, sum_y {0.0}, sum_z {0.0};
+  double * xyz = new double[3] {0.0, 0.0, 0.0};
   int num_node {infbc_part -> get_num_local_node(nbc_id)};
 
   for(int ii{0}; ii < num_node; ++ii)
@@ -911,20 +913,24 @@ Vector_3 PGAssem_FSI::get_centroid(
     double disp_y = array_d[infbc_part -> get_local_node_pos(nbc_id, ii) * 3 + 1];
     double disp_z = array_d[infbc_part -> get_local_node_pos(nbc_id, ii) * 3 + 2];
 
-    sum_x += local_pt.x() + disp_x;
-    sum_y += local_pt.y() + disp_y;
-    sum_z += local_pt.z() + disp_z;
+    xyz[0] += local_pt.x() + disp_x;
+    xyz[1] += local_pt.y() + disp_y;
+    xyz[2] += local_pt.z() + disp_z;
   }
 
-  double total_x {0.0}, total_y {0.0}, total_z {0.0};
+  double sum_xyz[3] {0.0, 0.0, 0.0};
   int total_node {0};
 
-  MPI_Allreduce(&sum_x, &total_x, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
-  MPI_Allreduce(&sum_y, &total_y, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
-  MPI_Allreduce(&sum_z, &total_z, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+  MPI_Allreduce(&xyz, &sum_xyz, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
   MPI_Allreduce(&num_node, &total_node, 1, MPI_INT, MPI_SUM, PETSC_COMM_WORLD);
 
-  return Vector_3 (total_x / total_node, total_y / total_node, total_z / total_node);
+  inlet_centroid.x() = sum_xyz[0] / total_node;
+  inlet_centroid.y() = sum_xyz[1] / total_node;
+  inlet_centroid.z() = sum_xyz[2] / total_node;
+
+  delete[] xyz;
+
+  return;
 }
 
 void PGAssem_FSI::NatBC_G( const double &curr_time, const double &dt,
