@@ -148,7 +148,7 @@ class ALocal_InflowBC
     {return local_node_pos[nbc_id][nindex];}
 
     virtual int get_num_outline_pt( const int &nbc_id ) const
-    {return VEC_T::get_size(outline_pts_part_tag[nbc_id]);}
+    {return num_out_bc_pts[nbc_id];}
 
     virtual Vector_3 get_outline_pt( const int &nbc_id, const int &ii ) const
     {return Vector_3 (outline_pts[nbc_id][3*ii], outline_pts[nbc_id][3*ii+1], outline_pts[nbc_id][3*ii+2]);}

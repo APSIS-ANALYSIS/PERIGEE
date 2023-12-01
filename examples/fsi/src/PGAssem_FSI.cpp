@@ -940,11 +940,11 @@ void PGAssem_FSI::Current_inlet(
 
   double sum_xyz[3] = {0.0};
   int total_node {0};
-  double all_ring_xyz[num_ring_pt] = {0.0};
+  double all_ring_xyz[3 * num_ring_pt] = {0.0};
 
-  MPI_Allreduce(&xyz, &sum_xyz, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+  MPI_Allreduce(&xyz, &sum_xyz, 3, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
   MPI_Allreduce(&num_node, &total_node, 1, MPI_INT, MPI_SUM, PETSC_COMM_WORLD);
-  MPI_Allreduce(&ring_xyz, &all_ring_xyz, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+  MPI_Allreduce(&ring_xyz, &all_ring_xyz, 3 * num_ring_pt, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
 
   inlet_centroid.x() = sum_xyz[0] / total_node;
   inlet_centroid.y() = sum_xyz[1] / total_node;

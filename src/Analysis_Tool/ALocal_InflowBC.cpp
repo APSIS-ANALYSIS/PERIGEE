@@ -47,16 +47,10 @@ ALocal_InflowBC::ALocal_InflowBC(
     if( Num_LD[nbc_id] > 0 )
     {
       LDN[nbc_id]            = h5r -> read_intVector(    subgroup_name.c_str(), "LDN" );
-      outline_pts[nbc_id]    = h5r -> read_doubleVector( subgroup_name.c_str(), "outline_pts" );
-      outline_pts_part_tag[nbc_id] = h5r -> read_intVector( subgroup_name.c_str(), "outline_pts_part_tag" );
-      outline_pts_loc[nbc_id]= h5r -> read_intVector(    subgroup_name.c_str(), "outline_pts_loc" );
     }
     else
     {
       LDN[nbc_id].clear();
-      outline_pts[nbc_id].clear();
-      outline_pts_part_tag[nbc_id].clear();
-      outline_pts_loc[nbc_id].clear();
     }
     
     SYS_T::print_fatal_if( Num_LD[nbc_id] != static_cast<int>( LDN[nbc_id].size() ), "Error: the LDN vector size does not match with the value of Num_LD.\n" );
@@ -64,7 +58,10 @@ ALocal_InflowBC::ALocal_InflowBC(
     // Basic geometrical quantities of the nbc_id-th inlet surface
     act_area[nbc_id]       = h5r -> read_doubleScalar( subgroup_name.c_str(), "Inflow_active_area" );
     ful_area[nbc_id]       = h5r -> read_doubleScalar( subgroup_name.c_str(), "Inflow_full_area" );
+    outline_pts[nbc_id]    = h5r -> read_doubleVector( subgroup_name.c_str(), "outline_pts" );
     num_out_bc_pts[nbc_id] = h5r -> read_intScalar(    subgroup_name.c_str(), "num_out_bc_pts" );
+    outline_pts_part_tag[nbc_id] = h5r -> read_intVector( subgroup_name.c_str(), "outline_pts_part_tag" );
+    outline_pts_loc[nbc_id]= h5r -> read_intVector(    subgroup_name.c_str(), "outline_pts_loc" );
     centroid[nbc_id]       = h5r -> read_Vector_3(     subgroup_name.c_str(), "centroid" );
     outnormal[nbc_id]      = h5r -> read_Vector_3(     subgroup_name.c_str(), "Outward_normal_vector" );
 
