@@ -101,7 +101,6 @@ void PDNSolution_V::Init_flow_parabolic( const APart_Node * const &pNode_ptr,
       const std::vector<double> local_d = curr_disp -> GetLocalArray();
 
       std::vector<Vector_3> inner_points {};
-      std::vector<Vector_3> ring_points {};
 
       std::vector<int> LD_loc_tag {};
 
@@ -122,8 +121,6 @@ void PDNSolution_V::Init_flow_parabolic( const APart_Node * const &pNode_ptr,
           inner_points.push_back(pt);
           LD_loc_tag.push_back(pNode_ptr->get_node_loc(pt_pos));
         }
-        else
-          ring_points.push_back(pt);
       }
 
       // Apply inflow BC at LD points
@@ -134,7 +131,7 @@ void PDNSolution_V::Init_flow_parabolic( const APart_Node * const &pNode_ptr,
 
         const Vector_3 pt = inner_points[ii];
 
-        const double r = get_curr_radius(ring_points, pt, curr_centroid[nbc_id]);
+        const double r = get_curr_radius({}, pt, curr_centroid[nbc_id]);
         const double vel = vmax * (1.0 - r*r);
 
         const double value[3] = { vel * out_nx, vel * out_ny, vel * out_nz };

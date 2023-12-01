@@ -55,8 +55,10 @@ class NBC_Partition_inflow
     std::vector<Vector_3> centroid;
 
     // coordinates of the boundary points
-    // num_nbc x num_out_bc_pts[ii]
+    // num_nbc x 3 x num_out_bc_pts[ii]
     std::vector< std::vector<double> > outline_pts;
+
+    std::vector< std::vector<int> > outline_pts_loc_id;
 
     // number of local node / cell, element number of nodes. Length num_nbc
     std::vector<int> num_local_node, num_local_cell, cell_nLocBas;

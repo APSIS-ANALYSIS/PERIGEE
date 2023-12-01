@@ -145,9 +145,10 @@ class ALocal_InflowBC
     virtual std::vector<int> get_SIEN( const int &nbc_id, const int &eindex ) const;
 
     virtual int get_local_node_pos( const int &nbc_id, const int &nindex ) const
-    {
-      return local_node_pos[nbc_id][nindex];
-    }
+    {return local_node_pos[nbc_id][nindex];}
+
+    virtual std::vector<int> get_outline ( const int &nbc_id ) const
+    {return outline_pts_loc_id[nbc_id];}
 
     // ------------------------------------------------------------------------
     // Generate filename Inlet_data.txt for inlet data
@@ -189,6 +190,8 @@ class ALocal_InflowBC
     // Coordinates of the outer boundary points
     // num_nbc x num_out_bc_pts[ii]
     std::vector< std::vector<double> > outline_pts;
+
+    std::vector< std::vector<int> > outline_pts_loc_id;
 
     // Centroid point's coordinates. Length num_nbc
     std::vector<Vector_3> centroid;
