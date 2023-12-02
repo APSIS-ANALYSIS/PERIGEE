@@ -197,6 +197,10 @@ class IMaterialModel
       return Vector_3();
     }
 
+    virtual void update_fibre_dir( const Vector_3 &basis_r, const Vector_3 &basis_c, const Vector_3 &basis_l )
+    {
+      SYS_T::commPrint("Warning: IMaterialModel::update_fibre_dir() is not implemented. \n");
+    }
 };
 
 #endif

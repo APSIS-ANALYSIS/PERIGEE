@@ -81,6 +81,8 @@ class MaterialModel_GOH06_Incompressible_Mixed : public IMaterialModel
 
     virtual Vector_3 get_fibre_dir( const int &dir ) const;
 
+    virtual void update_fibre_dir( const Vector_3 &basis_r, const Vector_3 &basis_c, const Vector_3 &basis_l );
+
   private:
     // useful constants
     const double pt33, mpt67, pi;
@@ -100,6 +102,7 @@ class MaterialModel_GOH06_Incompressible_Mixed : public IMaterialModel
 
     // unit vector for fibre direction in the ref domain    
     Vector_3 a1, a2;
+    Vector_3 a01, a02;
 };
 
 #endif

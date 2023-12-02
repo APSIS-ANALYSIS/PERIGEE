@@ -67,12 +67,14 @@ class MaterialModel_GOH06_ST91_Mixed : public IMaterialModel
 
     virtual Vector_3 get_fibre_dir( const int &dir ) const;
 
+    virtual void update_fibre_dir( const Vector_3 &basis_r, const Vector_3 &basis_c, const Vector_3 &basis_l );
+
   private:
     const double pt33, mpt67, pi;
     double rho0, E, nu, lambda, mu, kappa;
     double f1_the, f1_phi, f2_the, f2_phi;
     double fk1, fk2, fkd;
-    Vector_3 a1, a2;
+    Vector_3 a1, a2, a01, a02;
 };
 
 #endif

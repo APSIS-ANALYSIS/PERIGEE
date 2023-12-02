@@ -192,6 +192,39 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Residual(
 
     const double invFDV_t = invF.MatTContraction(DVelo); // invF_Ii V_i,I
 
+    // ------------------------------------------------------------------------
+    // analytical basis vectors
+    Vector_3 basis_r(0.0, 0.0, 0.0);
+    Vector_3 basis_c(0.0, 0.0, 0.0);
+    Vector_3 basis_l(0.0, 0.0, 0.0);
+    const double x1 = coor.x();
+    const double y1 = coor.y();
+    const double z1 = coor.z();
+
+    if(x1 < 0.0)
+    {
+      const double x0 = - sqrt( 1.0 / (1 + z1*z1/x1/x1) );
+      const double y0 = 0.0;
+      const double z0 = z1 / x1 * x0;
+
+      basis_r = Vec3::normalize( Vector_3( x1-x0, y1-y0, z1-z0 ) );
+      basis_l = Vec3::normalize( Vector_3( - z1, 0.0, x1 ) );
+      basis_c = Vec3::cross_product(basis_l, basis_r);
+    }
+    else
+    {
+      const double x0 = x1;
+      const double y0 = 0.0;
+      const double z0 = 1.0;
+
+      basis_r = Vec3::normalize( Vector_3( x1-x0, y1-y0, z1-z0 ) );
+      basis_l = Vector_3( 1.0, 0.0, 0.0 );
+      basis_c = Vec3::cross_product(basis_l, basis_r);
+    }
+
+    matmodel->update_fibre_dir(basis_r, basis_c, basis_l);
+    // ------------------------------------------------------------------------
+
     Tensor2_3D P_iso, S_iso;
     matmodel->get_PK(F, P_iso, S_iso);
 
@@ -353,6 +386,39 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Tangent_Residual(
     invF.VecMultT( p_x, p_y, p_z, GradP_invF[0], GradP_invF[1], GradP_invF[2] ); // p_I invF_ii = p,i
 
     const double invFDV_t = invF.MatTContraction(DVelo); // invF_Ii V_i,I
+
+    // ------------------------------------------------------------------------
+    // analytical basis vectors
+    Vector_3 basis_r(0.0, 0.0, 0.0);
+    Vector_3 basis_c(0.0, 0.0, 0.0);
+    Vector_3 basis_l(0.0, 0.0, 0.0);
+    const double x1 = coor.x();
+    const double y1 = coor.y();
+    const double z1 = coor.z();
+
+    if(x1 < 0.0)
+    {
+      const double x0 = - sqrt( 1.0 / (1 + z1*z1/x1/x1) );
+      const double y0 = 0.0;
+      const double z0 = z1 / x1 * x0;
+
+      basis_r = Vec3::normalize( Vector_3( x1-x0, y1-y0, z1-z0 ) );
+      basis_l = Vec3::normalize( Vector_3( - z1, 0.0, x1 ) );
+      basis_c = Vec3::cross_product(basis_l, basis_r);
+    }
+    else
+    {
+      const double x0 = x1;
+      const double y0 = 0.0;
+      const double z0 = 1.0;
+
+      basis_r = Vec3::normalize( Vector_3( x1-x0, y1-y0, z1-z0 ) );
+      basis_l = Vector_3( 1.0, 0.0, 0.0 );
+      basis_c = Vec3::cross_product(basis_l, basis_r);
+    }
+
+    matmodel->update_fibre_dir(basis_r, basis_c, basis_l);
+    // ------------------------------------------------------------------------
 
     Tensor2_3D P_iso, S_iso;
     Tensor4_3D AA_iso;
@@ -615,6 +681,39 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Mass_Residual(
 
     // invF_Ii DV_i,I = v_i,i = div v
     const double invFDV_t = invF.MatTContraction(DVelo);
+
+    // ------------------------------------------------------------------------
+    // analytical basis vectors
+    Vector_3 basis_r(0.0, 0.0, 0.0);
+    Vector_3 basis_c(0.0, 0.0, 0.0);
+    Vector_3 basis_l(0.0, 0.0, 0.0);
+    const double x1 = coor.x();
+    const double y1 = coor.y();
+    const double z1 = coor.z();
+
+    if(x1 < 0.0)
+    {
+      const double x0 = - sqrt( 1.0 / (1 + z1*z1/x1/x1) );
+      const double y0 = 0.0;
+      const double z0 = z1 / x1 * x0;
+
+      basis_r = Vec3::normalize( Vector_3( x1-x0, y1-y0, z1-z0 ) );
+      basis_l = Vec3::normalize( Vector_3( - z1, 0.0, x1 ) );
+      basis_c = Vec3::cross_product(basis_l, basis_r);
+    }
+    else
+    {
+      const double x0 = x1;
+      const double y0 = 0.0;
+      const double z0 = 1.0;
+
+      basis_r = Vec3::normalize( Vector_3( x1-x0, y1-y0, z1-z0 ) );
+      basis_l = Vector_3( 1.0, 0.0, 0.0 );
+      basis_c = Vec3::cross_product(basis_l, basis_r);
+    }
+
+    matmodel->update_fibre_dir(basis_r, basis_c, basis_l);
+    // ------------------------------------------------------------------------
 
     Tensor2_3D P_iso, S_iso;
     matmodel->get_PK(F, P_iso, S_iso);

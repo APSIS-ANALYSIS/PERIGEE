@@ -20,6 +20,14 @@ MaterialModel_GOH06_ST91_Mixed::MaterialModel_GOH06_ST91_Mixed(
   a2(0) = sin(f2_the) * cos(f2_phi);
   a2(1) = sin(f2_the) * sin(f2_phi);
   a2(2) = cos(f2_the);
+  
+  a01(0) = sin(f1_the) * cos(f1_phi);
+  a01(1) = sin(f1_the) * sin(f1_phi);
+  a01(2) = cos(f1_the);
+
+  a02(0) = sin(f2_the) * cos(f2_phi);
+  a02(1) = sin(f2_the) * sin(f2_phi);
+  a02(2) = cos(f2_the);
 }
 
 MaterialModel_GOH06_ST91_Mixed::MaterialModel_GOH06_ST91_Mixed(
@@ -56,6 +64,14 @@ MaterialModel_GOH06_ST91_Mixed::MaterialModel_GOH06_ST91_Mixed(
   a2(0) = sin(f2_the) * cos(f2_phi);
   a2(1) = sin(f2_the) * sin(f2_phi);
   a2(2) = cos(f2_the);
+  
+  a01(0) = sin(f1_the) * cos(f1_phi);
+  a01(1) = sin(f1_the) * sin(f1_phi);
+  a01(2) = cos(f1_the);
+
+  a02(0) = sin(f2_the) * cos(f2_phi);
+  a02(1) = sin(f2_the) * sin(f2_phi);
+  a02(2) = cos(f2_the);
 }
 
 MaterialModel_GOH06_ST91_Mixed::~MaterialModel_GOH06_ST91_Mixed()
@@ -285,6 +301,13 @@ double MaterialModel_GOH06_ST91_Mixed::get_dbeta_dp( const double &p ) const
 {
   const double pk = p / kappa;
   return -pk / ( kappa*kappa*std::pow(pk*pk+1.0, 1.5) );
+}
+
+void MaterialModel_GOH06_ST91_Mixed::update_fibre_dir( const Vector_3 &basis_r,
+    const Vector_3 &basis_c, const Vector_3 &basis_l )
+{
+  a1 = a01(0) * basis_r + a01(1) * basis_c + a01(2) * basis_l;
+  a2 = a02(0) * basis_r + a02(1) * basis_c + a02(2) * basis_l;
 }
 
 // EOF
