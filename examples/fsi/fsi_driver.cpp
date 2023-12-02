@@ -714,6 +714,8 @@ int main(int argc, char *argv[])
     const double inlet_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
         disp, velo, locAssem_fluid_ptr, elements, quads, locinfnbc, ff );
 
+    locinfnbc -> adjust_correction_factor(ff, inflow_rate_ptr->get_flow_rate(ff, timeinfo->get_time()), inlet_face_flrate);
+
     const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
         disp, pres, locAssem_fluid_ptr, elements, quads, locinfnbc, ff );
 

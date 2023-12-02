@@ -159,6 +159,24 @@ class ALocal_InflowBC
     virtual int get_outline_loc ( const int &nbc_id, const int &ii ) const
     {return outline_pts_loc[nbc_id][ii];}
 
+    virtual double get_correction_factor( const int &nbc_id ) const
+    {return correction_factor[nbc_id];}
+
+    virtual void adjust_correction_factor( const int & nbc_id, const double &Q_planned, const double &Q_calculated)
+    {
+      if (std::abs(Q_planned) > 1e-4 && std::abs(Q_calculated) > 1e-4)
+      {
+        const double rel_error = (Q_calculated / Q_planned - 1);
+        if (std::abs(rel_error) > 1e-6)
+        {
+          const double factor = (Q_planned / Q_calculated);
+          correction_factor[nbc_id] = std::abs(factor);
+        }
+      }
+      else
+        return;
+    }
+
     // ------------------------------------------------------------------------
     // Generate filename Inlet_data.txt for inlet data
     // ------------------------------------------------------------------------
@@ -221,6 +239,9 @@ class ALocal_InflowBC
     // local_to_global array
     // num_nbc x num_local_node[ii]
     std::vector< std::vector<int> > local_node_pos;
+
+    // Length: num_nbc
+    std::vector<double> correction_factor;
   
     // ------------------------------------------------------------------------ 
     // Disallow default constructor 

@@ -30,6 +30,7 @@ ALocal_InflowBC::ALocal_InflowBC(
   local_pt_xyz.resize(num_nbc); 
   local_cell_ien.resize(num_nbc); 
   local_node_pos.resize(num_nbc);
+  correction_factor.assign(num_nbc, 1.0);
 
   std::string groupbase(gname);
   groupbase.append("/nbcid_");

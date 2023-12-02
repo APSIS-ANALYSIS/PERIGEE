@@ -89,7 +89,7 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     const FEANode * const &feanode_ptr,
     const ALocal_NBC * const &nbc_v,
     const ALocal_NBC * const &nbc_p,
-    const ALocal_InflowBC * const &infnbc,
+    ALocal_InflowBC * const &infnbc,
     const ALocal_NBC * const &nbc_mesh,
     const ALocal_EBC * const &ebc_v,
     const ALocal_EBC * const &ebc_p,
@@ -260,6 +260,8 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     {
       const double inlet_face_flrate = gassem_ptr -> Assem_surface_flowrate(
           cur_disp, cur_velo, lassem_fluid_ptr, elements, quad_s, infnbc, face );
+
+      infnbc -> adjust_correction_factor(face, flr_ptr->get_flow_rate(face, time_info->get_time()), inlet_face_flrate);
 
       const double inlet_face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
           cur_disp, cur_pres, lassem_fluid_ptr, elements, quad_s, infnbc, face );

@@ -51,7 +51,7 @@ class PNonlinear_FSI_Solver
         const APart_Node * const &pnode_p,
         const ALocal_NBC * const &nbc_v,
         const ALocal_NBC * const &nbc_p,
-        const ALocal_InflowBC * const &infnbc_part,
+        ALocal_InflowBC * const &infnbc_part,
         const ALocal_NBC * const &nbc_mesh,
         const ALocal_EBC * const &ebc_part,
         const ALocal_EBC * const &ebc_mesh_part,
@@ -142,7 +142,7 @@ class PNonlinear_FSI_Solver
         PDNSolution * const &output ) const;
 
     void rescale_inflow_value( const double &stime,
-        const ALocal_InflowBC * const &infbc,
+        ALocal_InflowBC * const &infbc,
         const ICVFlowRate * const &flrate,
         const PDNSolution * const &sol_base,
         PDNSolution * const &sol ) const;
