@@ -277,7 +277,8 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
       {
         std::ofstream ofile;
         ofile.open( infnbc->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
-        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\t'<<inlet_face_area<<'\n';
+        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\t'<<inlet_face_area<<'\t'
+             <<flr_ptr->get_flow_rate(face, time_info->get_time())<<'\n';
         ofile.close();
       }
       MPI_Barrier(PETSC_COMM_WORLD);

@@ -164,13 +164,13 @@ class ALocal_InflowBC
 
     virtual void adjust_correction_factor( const int & nbc_id, const double &Q_planned, const double &Q_calculated)
     {
-      if (std::abs(Q_planned) > 1e-4 && std::abs(Q_calculated) > 1e-4)
+      if (std::abs(Q_planned) > 1e-9 && std::abs(Q_calculated) > 1e-9)
       {
-        const double rel_error = (Q_calculated / Q_planned - 1);
-        if (std::abs(rel_error) > 1e-6)
+        const double abs_error = Q_calculated - Q_planned;
+        if (std::abs(abs_error) > 1e-8)
         {
           const double factor = (Q_planned / Q_calculated);
-          correction_factor[nbc_id] = std::abs(factor);
+          correction_factor[nbc_id] = correction_factor[nbc_id] * std::abs(factor);
         }
       }
       else

@@ -737,8 +737,9 @@ int main(int argc, char *argv[])
 
       if( !is_restart )
       {
-        ofile<<"Time-index"<<'\t'<<"Time"<<'\t'<<"Flow-rate"<<'\t'<<"Face-averaged-pressure"<<'\t'<<"Face-area"<<'\n';
-        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\t'<<inlet_face_area<<'\n';
+        ofile<<"Time-index"<<'\t'<<"Time"<<'\t'<<"Flow-rate"<<'\t'<<"Face-averaged-pressure"<<'\t'<<"Face-area"<<'\t'<<"Planned-inflow"<<'\n';
+        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\t'<<inlet_face_area<<'\t'
+             <<inflow_rate_ptr->get_flow_rate(ff, timeinfo->get_time())<<'\n';
       }
 
       ofile.close();
