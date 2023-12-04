@@ -105,7 +105,7 @@ NBC_Partition_inflow::NBC_Partition_inflow(
       if(part->isNodeInPart(node_index))
       {
         outline_pts_part_tag[ii][jj] = part->get_cpu_rank();
-        outline_pts_loc[ii][jj] = local_node_pos[ii][VEC_T::get_pos(local_node, nbc -> get_outline_pts_loc(ii, jj))];
+        outline_pts_loc[ii][jj] = part->get_nodeLocIndex(node_index);
       }
     }
 

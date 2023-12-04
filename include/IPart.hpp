@@ -84,6 +84,9 @@ class IPart
     virtual bool isNodeInPart(const int &gloindex) const
     {SYS_T::print_fatal("Error: isNodeInPart is not implemented. \n"); return false;}
 
+    virtual int get_nodeLocIndex(const int &gloindex) const
+    {SYS_T::print_fatal("Error: get_nodeLocIndex is not implemented. \n"); return 0;}
+
     virtual int get_elemLocIndex(const int &gloindex) const
     {SYS_T::print_fatal("Error: get_elemLocIndex is not implemented. \n"); return 0;}
 
