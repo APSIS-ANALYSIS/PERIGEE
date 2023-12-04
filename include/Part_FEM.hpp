@@ -39,6 +39,9 @@ class Part_FEM : public IPart
     
     virtual bool isNodeInPart(const int &gloindex) const
     {return VEC_T::is_invec(node_loc, gloindex);}
+
+    virtual int get_nodeLocIndex(const int &gloindex) const
+    {return VEC_T::get_pos(node_loc, gloindex);}
    
     // Determine the position of a given index in the elem_loc array 
     virtual int get_elemLocIndex(const int &gloindex) const

@@ -42,7 +42,6 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
   outline_pts.resize(    num_nbc );
   num_out_bc_pts.resize( num_nbc );
   outline_pts_id.resize( num_nbc );
-  outline_pts_loc.resize(num_nbc );
 
   inf_active_area.resize( num_nbc );
   face_area.resize(       num_nbc );
@@ -129,7 +128,6 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
         outline_pts[ii].push_back( pt_xyz[ii][3*jj+2] );
 
         outline_pts_id[ii].push_back( global_node[ii][jj] );
-        outline_pts_loc[ii].push_back( jj );
       }
     }
 
