@@ -195,7 +195,12 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
 
     Vector_3 get_f(const Vector_3 &pt, const double &tt) const
     {
-      return Vector_3( 0.0, 0.0, 0.0 );
+      const double x = pt.x(), y = pt.y(), R = 0.1, v_ave = 3.0, fl_mu = 4.0e-2, fl_density = 1.0;
+      const double r = std::sqrt(x*x + y*y);
+      const double dp_dz = -1000.0;
+
+      double fz = 5.0 * v_ave * fl_mu * (3 * r) / (R*R*R * fl_density) + dp_dz / fl_density;
+      return Vector_3( 0.0, 0.0, fz );
     }
 
     Vector_3 get_H1(const Vector_3 &pt, const double &tt, 
