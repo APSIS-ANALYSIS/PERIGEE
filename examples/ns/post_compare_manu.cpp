@@ -7,6 +7,7 @@
 #include "FEAElement_Tet4.hpp"
 #include "PostVectSolution.hpp"
 #include "Post_error_Poiseuille.hpp"
+#include "Post_error_Cubic.hpp"
 
 int main( int argc, char * argv[] )
 {
@@ -17,26 +18,29 @@ int main( int argc, char * argv[] )
   std::string part_file("./part");
   const int dof = 4;
 
-  double fl_mu = 4.0e-2;
+  // double fl_mu = 4.0e-2;
+  double V_ave = 3.0;
   double Radius = 0.1;
-  double Length = 1.2;
-  double P_diff = 153.6;
+  // double Length = 1.2;
+  // double P_diff = 153.6;
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 
   SYS_T::GetOptionString("-sol_name", sol_name);
   SYS_T::GetOptionReal("-sol_time",   sol_time);
-  SYS_T::GetOptionReal("-fl_mu",      fl_mu);
+  // SYS_T::GetOptionReal("-fl_mu",      fl_mu);
+  SYS_T::GetOptionReal("-velo",       V_ave);
   SYS_T::GetOptionReal("-radius",     Radius);
-  SYS_T::GetOptionReal("-length",     Length);
-  SYS_T::GetOptionReal("-P_diff",     P_diff);
+  // SYS_T::GetOptionReal("-length",     Length);
+  // SYS_T::GetOptionReal("-P_diff",     P_diff);
 
   SYS_T::cmdPrint("-sol_name:", sol_name);
   SYS_T::cmdPrint("-sol_time:", sol_time);
-  SYS_T::cmdPrint("-fl_mu:",    fl_mu);
+  // SYS_T::cmdPrint("-fl_mu:",    fl_mu);
+  SYS_T::cmdPrint("-velo",      V_ave);
   SYS_T::cmdPrint("-radius:",   Radius);
-  SYS_T::cmdPrint("-length:",   Length);
-  SYS_T::cmdPrint("-P_diff:",   P_diff);
+  // SYS_T::cmdPrint("-length:",   Length);
+  // SYS_T::cmdPrint("-P_diff:",   P_diff);
 
   SYS_T::file_check(sol_name.c_str());
 
@@ -93,16 +97,16 @@ int main( int argc, char * argv[] )
     pSolu -> get_esol( 3, 4, IEN_e, loc_sol_uz );
 
     // Calculate the error
-    subdomain_l2 += POST_ERROR_P::get_manu_sol_u_error(
+    subdomain_l2 += POST_ERROR_C::get_manu_sol_u_error(
       loc_sol_ux, loc_sol_uy, loc_sol_uz, elementv, ectrl_x, ectrl_y, ectrl_z, quadv,
-      fl_mu, Radius, Length, P_diff );
+      V_ave, Radius );
 
-    subdomain_H1 += POST_ERROR_P::get_manu_sol_u_errorH1(
+    subdomain_H1 += POST_ERROR_C::get_manu_sol_u_errorH1(
       loc_sol_ux, loc_sol_uy, loc_sol_uz, elementv, ectrl_x, ectrl_y, ectrl_z, quadv,
-      fl_mu, Radius, Length, P_diff );
+      V_ave, Radius );
 
-    subdomain_exactH2 += POST_ERROR_P::get_exact_sol_u_normH2(
-      elementv, ectrl_x, ectrl_y, ectrl_z, quadv, fl_mu, Radius, Length, P_diff );
+    subdomain_exactH2 += POST_ERROR_C::get_exact_sol_u_normH2(
+      elementv, ectrl_x, ectrl_y, ectrl_z, quadv, V_ave, Radius );
   }
   
   double l2_error = 0.0; double H1_error = 0.0; double H2_exact = 0.0;

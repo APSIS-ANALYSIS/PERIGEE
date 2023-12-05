@@ -39,9 +39,8 @@ PLocAssem_Tet_VMS_NS_GenAlpha::PLocAssem_Tet_VMS_NS_GenAlpha(
 
   Zero_sur_Tangent_Residual();
 
-  flist = new locassem_tet_vms_ns_funs[2];
-  flist[0] = &PLocAssem_Tet_VMS_NS_GenAlpha::get_Poiseuille_traction;
-  flist[1] = &PLocAssem_Tet_VMS_NS_GenAlpha::get_Poiseuille_traction;
+  flist = new locassem_tet_vms_ns_funs[1];
+  flist[0] = &PLocAssem_Tet_VMS_NS_GenAlpha::get_cubic_velo_traction;
 
   print_info();
 }

@@ -114,6 +114,7 @@ SET( perigee_postprocess_lib_src
   ${perigee_SOURCE_DIR}/src/VisDataPrep_NS.cpp
   ${perigee_SOURCE_DIR}/src/VTK_Writer_NS.cpp
   ${perigee_SOURCE_DIR}/src/Post_error_Poiseuille.cpp
+  ${perigee_SOURCE_DIR}/src/Post_error_Cubic.cpp
   )
 
 INCLUDE_DIRECTORIES( ../../include )

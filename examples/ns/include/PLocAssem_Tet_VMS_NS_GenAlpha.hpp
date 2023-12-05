@@ -241,6 +241,35 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
       return S * n_out;
     }
 
+    Vector_3 get_cubic_velo_traction(const Vector_3 &pt, const double &tt, const Vector_3 &n_out) const
+    {
+      const double Q = 0.03 * MATH_T::PI; // 0.03 * pi, v_ave = 3
+      const double R = 0.1;
+
+      const double A = R * R * MATH_T::PI; // area
+      const double fl_mu = 4.0e-2;
+
+      // ux = 0, uy = 0, uz = v_max * (1 - r^3 / R^3);
+      const double x = pt.x(), y = pt.y();
+      const double v_max = (5 * Q/ (3 * A));
+      const double ra = std::sqrt(x * x + y * y);
+
+      Tensor2_3D velo_grad ( 0.0, 0.0, 0.0,
+                             0.0, 0.0, 0.0, 
+                             -3 * v_max * x * ra / (R * R * R),
+                             -3 * v_max * y * ra / (R * R * R),
+                             0.0);
+
+      Tensor2_3D velo_grad_T = velo_grad;
+      velo_grad_T.transpose();
+
+      Tensor2_3D S = velo_grad + velo_grad_T;
+
+      S *= fl_mu;
+      
+      return S * n_out;
+    }
+
     Vector_3 get_g_weak(const Vector_3 &pt, const double &tt)
     {
       return Vector_3( 0.0, 0.0, 0.0 );
