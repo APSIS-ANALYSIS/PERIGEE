@@ -29,7 +29,7 @@ int main( int argc, char * argv[] )
   const int vol_id = 0;
 
   GIO -> write_vtp("wall_vol", 0, vol_id, true); // assumed to be wall vtp
-  GIO -> write_vtp("outflow_vol_001", 1, vol_id, true); // assumed to be inlet vtp
+  GIO -> write_vtp("inflow_vol_000", 1, vol_id, true); // assumed to be inlet vtp
   GIO -> write_vtp("outflow_vol_000", 2, vol_id, true); // assumed to be outlet vtp
 
   const std::string wmname("whole_vol");
