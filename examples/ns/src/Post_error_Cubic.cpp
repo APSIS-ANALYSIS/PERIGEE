@@ -130,9 +130,9 @@ double POST_ERROR_C::get_manu_sol_u_errorH1(
       sol_dy.y() += solu_uy[ii] * R_dy[ii];
       sol_dy.z() += solu_uz[ii] * R_dy[ii];
 
-      sol_dy.x() += solu_ux[ii] * R_dz[ii];
-      sol_dy.y() += solu_uy[ii] * R_dz[ii];
-      sol_dy.z() += solu_uz[ii] * R_dz[ii];
+      sol_dz.x() += solu_ux[ii] * R_dz[ii];
+      sol_dz.y() += solu_uy[ii] * R_dz[ii];
+      sol_dz.z() += solu_uz[ii] * R_dz[ii];
     }
 
     const Vector_3 exact = exact_sol_u( coor_x, coor_y, coor_z, V_average, Radius );
