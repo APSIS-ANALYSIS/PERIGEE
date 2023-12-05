@@ -22,6 +22,7 @@ PDNSolution_NS::PDNSolution_NS(
       break;
     case 3:
       Init_flow_cubic( pNode, fNode_ptr, infbc );
+      break;
     default:
       SYS_T::print_fatal("Error: PDNSolution_NS: No such type of initional condition.\n");
       break;
