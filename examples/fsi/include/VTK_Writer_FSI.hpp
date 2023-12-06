@@ -106,6 +106,17 @@ class VTK_Writer_FSI
         const std::vector<double> &inputData,
         const FEAElement * const &elem,
         vtkDoubleArray * const &vtkData );
+
+    // --------------------------------------------------------------
+    // Interpolate invariant J_4 at sampling points
+    // --------------------------------------------------------------
+    void interpolateJ4( const int * const &ptid,
+        const double * const &ctrlPts_x,
+        const double * const &ctrlPts_y,
+        const double * const &ctrlPts_z,
+        const std::vector<double> &inputData,
+        const FEAElement * const &elem,
+        vtkDoubleArray * const &vtkData );
 };
 
 #endif

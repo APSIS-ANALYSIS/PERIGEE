@@ -47,6 +47,90 @@ void VTK_Writer_FSI::interpolateJ( const int * const &ptid,
   }
 }
 
+void VTK_Writer_FSI::interpolateJ4( const int * const &ptid,
+    const double * const &ctrlPts_x, 
+    const double * const &ctrlPts_y, 
+    const double * const &ctrlPts_z,
+    const std::vector<double> &inputData,
+    const FEAElement * const &elem,
+    vtkDoubleArray * const &vtkData )
+{
+  // interpolate reference points
+  Interpolater intep( nLocBas );
+  
+  std::vector<double> ref_x, ref_y, ref_z;
+  
+  intep.interpolateFE(ctrlPts_x, ctrlPts_y, ctrlPts_z, elem, ref_x, ref_y, ref_z);
+
+  // interpolate dispacment
+  std::vector<double> u (nLocBas, 0.0), v (nLocBas, 0.0), w (nLocBas, 0.0);
+
+  for(int ii=0; ii<nLocBas; ++ii)
+  {
+    u[ii] = inputData[ii*3];
+    v[ii] = inputData[ii*3+1];
+    w[ii] = inputData[ii*3+2];
+  }
+
+  std::vector<double> ux, uy, uz, vx, vy, vz, wx, wy, wz;
+
+  intep.interpolateFE_Grad(u, elem, ux, uy, uz);
+  intep.interpolateFE_Grad(v, elem, vx, vy, vz);
+  intep.interpolateFE_Grad(w, elem, wx, wy, wz);
+
+  const int nqp = elem->get_numQuapts();
+  for(int ii=0; ii<nqp; ++ii)
+  {
+    // calculate fibre direction vector
+    Vector_3 basis_r(0.0, 0.0, 0.0);
+    Vector_3 basis_c(0.0, 0.0, 0.0);
+    Vector_3 basis_l(0.0, 0.0, 0.0);
+    const double x1 = ref_x[ii];
+    const double y1 = ref_y[ii];
+    const double z1 = ref_z[ii];
+
+    if(x1 < 0.0)
+    {
+      const double x0 = - sqrt( 1.0 / (1 + z1*z1/x1/x1) );
+      const double y0 = 0.0;
+      const double z0 = z1 / x1 * x0;
+
+      basis_r = Vec3::normalize( Vector_3( x1-x0, y1-y0, z1-z0 ) );
+      basis_l = Vec3::normalize( Vector_3( - z1, 0.0, x1 ) );
+      basis_c = Vec3::cross_product(basis_l, basis_r);
+    }
+    else
+    {
+      const double x0 = x1;
+      const double y0 = 0.0;
+      const double z0 = 1.0;
+
+      basis_r = Vec3::normalize( Vector_3( x1-x0, y1-y0, z1-z0 ) );
+      basis_l = Vector_3( 1.0, 0.0, 0.0 );
+      basis_c = Vec3::cross_product(basis_l, basis_r);
+    }
+
+    // a1 = sin(41.0) * cos(90.0) * basis_r + sin(41.0) * sin(90.0) * basis_c + cos(41.0) * basis_l;
+    // a2 = sin(-41.0) * cos(90.0) * basis_r + sin(-41.0) * sin(90.0) * basis_c + cos(-41.0) * basis_l;
+    const Vector_3 a1 = 0.65606 * basis_c + 0.75471 * basis_l;
+    const Vector_3 a2 = -0.65606 * basis_c + 0.75471 * basis_l;
+
+    // F
+    const Tensor2_3D F( ux[ii] + 1.0, uy[ii],       uz[ii],
+                  vx[ii],       vy[ii] + 1.0, vz[ii],
+                  wx[ii],       wy[ii],       wz[ii] + 1.0 );
+    // C
+    Tensor2_3D C; C.MatMultTransposeLeft(F);
+
+    // J_4 = (a x a) : C
+    const double a1Ca1 = C.VecMatVec(a1, a1);
+    const double a2Ca2 = C.VecMatVec(a1, a1);
+
+    vtkData->InsertComponent( ptid[ii], 0, a1Ca1 );
+    vtkData->InsertComponent( ptid[ii], 1, a2Ca2 );
+  }
+}
+
 void VTK_Writer_FSI::writeOutput(
         const FEANode * const &fnode_ptr,
         const ALocal_IEN * const &lien_v,
@@ -502,7 +586,7 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
 
   // Check if the number of visualization quantities equal a given number
   // I will have to manually interpolate these quantities in the for-loop
-  if(numDArrays != 4) SYS_T::print_fatal("Error: vdata size numDArrays != 4. \n");
+  if(numDArrays != 5) SYS_T::print_fatal("Error: vdata size numDArrays != 5. \n");
 
   // dataVecs is the holder of the interpolated data
   vtkDoubleArray ** dataVecs = new vtkDoubleArray * [numDArrays];
@@ -555,6 +639,9 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
 
       // Interpolate detF
       interpolateJ( &IEN_s[0], inputInfo, elemptr, dataVecs[1] );
+
+      // Interpolate J_4 for fibre reinforce model
+      interpolateJ4( &IEN_s[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], inputInfo, elemptr, dataVecs[4] );
 
       // Interpolate the pressure scalar
       inputInfo.clear();
