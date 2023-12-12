@@ -269,7 +269,7 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Elastodynamics(
     disp->PlusAX( dot_step, - alpha_f * gamma * gamma * dt * dt / alpha_m );
 
     dot_velo_alpha->PlusAX( dot_step, - alpha_m );
-    disp_alpha->PlusAX( dot_step, - alpha_f * gamma * gamma * dt * dt );
+    disp_alpha->PlusAX( dot_step, - alpha_f * alpha_f * gamma * gamma * dt * dt / alpha_m);
 
     // Assembly residual (& tangent if condition satisfied)
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )
