@@ -5,8 +5,8 @@
 // Quasi-incompressible Gasser-Odgen-Holzapfel model. The model's
 // volumetric part is based on the Simo-Taylor91 penalization. The
 // isochoric isotropic part is the same as the GOH06_Incompressible.
-// The anisotropic part is modified by raplacing the modified right
-// Cauchy-Green tensor by the right Cauchy-Green tensor. This ideal 
+// The anisotropic part is modified by replacing the modified right
+// Cauchy-Green tensor by the right Cauchy-Green tensor. This idea 
 // is from Nolan et al. J Mech Behav Biomed Mater 39 (2014) 48-60
 //
 // Auther: Xinhai Yue
