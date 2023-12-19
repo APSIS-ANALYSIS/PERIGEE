@@ -56,9 +56,6 @@ MaterialModel_GOH14_ST91_Mixed::MaterialModel_GOH14_ST91_Mixed(
   a2(2) = cos(f2_the);
 }
 
-MaterialModel_GOH14_ST91_Mixed::~MaterialModel_GOH14_ST91_Mixed()
-{}
-
 void MaterialModel_GOH14_ST91_Mixed::print_info() const
 {
   SYS_T::commPrint("\t  MaterialModel_GOH14_ST91_Mixed: \n");

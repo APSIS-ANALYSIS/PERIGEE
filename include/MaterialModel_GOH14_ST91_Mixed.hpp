@@ -27,7 +27,7 @@ class MaterialModel_GOH14_ST91_Mixed : public IMaterialModel
     MaterialModel_GOH14_ST91_Mixed(
         const char * const &fname = "material_model.h5" );
 
-    virtual ~MaterialModel_GOH14_ST91_Mixed();
+    virtual ~MaterialModel_GOH14_ST91_Mixed() = default;
 
     virtual void print_info() const;
 
