@@ -170,9 +170,9 @@ void VTK_Writer_Elastodynamics::interpolateCauchy( const int * const &ptid,
 
   for(int ii=0; ii<nqp; ++ii)
   {
-    sigma_xx = l2mu * ux_x[ii] + mu * (uy_y[ii] + uz_z[ii]);
-    sigma_yy = l2mu * uy_y[ii] + mu * (ux_x[ii] + uz_z[ii]);
-    sigma_zz = l2mu * uz_z[ii] + mu * (uy_y[ii] + ux_x[ii]);
+    sigma_xx = l2mu * ux_x[ii] + lambda * (uy_y[ii] + uz_z[ii]);
+    sigma_yy = l2mu * uy_y[ii] + lambda * (ux_x[ii] + uz_z[ii]);
+    sigma_zz = l2mu * uz_z[ii] + lambda * (uy_y[ii] + ux_x[ii]);
     sigma_xy = mu * ( ux_y[ii] + uy_x[ii] );
     sigma_xz = mu * ( ux_z[ii] + uz_x[ii] );
     sigma_yz = mu * ( uy_z[ii] + uz_y[ii] );
