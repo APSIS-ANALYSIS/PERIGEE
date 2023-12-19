@@ -6,13 +6,11 @@ MaterialModel_GOH14_ST91_Mixed::MaterialModel_GOH14_ST91_Mixed(
     const double &in_f2the, const double &in_f2phi,
     const double &in_fk1, const double &in_fk2,
     const double &in_fkd )
-: pt33( 1.0 / 3.0 ), mpt67( -2.0 * pt33 ), pi( MATH_T::PI ),
-  rho0( in_rho ), E(in_E), nu(in_nu), lambda( nu * E / ((1+nu) * (1-2.0*nu)) ),
+: rho0( in_rho ), E(in_E), nu(in_nu), lambda( nu * E / ((1+nu) * (1-2.0*nu)) ),
   mu( E/(2.0+2.0*nu) ), kappa( lambda + 2.0 * mu / 3.0 ),
-  f1_the( in_f1the*pi/180.0 ), f1_phi( in_f1phi*pi/180.0 ),
-  f2_the( in_f2the*pi/180.0 ), f2_phi( in_f2phi*pi/180.0 ),
-  fk1(in_fk1), fk2(in_fk2), fkd(in_fkd),
-  I(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+  f1_the( in_f1the*MATH_T::PI/180.0 ), f1_phi( in_f1phi*MATH_T::PI/180.0 ),
+  f2_the( in_f2the*MATH_T::PI/180.0 ), f2_phi( in_f2phi*MATH_T::PI/180.0 ),
+  fk1(in_fk1), fk2(in_fk2), fkd(in_fkd)
 {
   a1(0) = sin(f1_the) * cos(f1_phi);
   a1(1) = sin(f1_the) * sin(f1_phi);
@@ -25,7 +23,6 @@ MaterialModel_GOH14_ST91_Mixed::MaterialModel_GOH14_ST91_Mixed(
 
 MaterialModel_GOH14_ST91_Mixed::MaterialModel_GOH14_ST91_Mixed(
     const char * const &fname )
-: pt33( 1.0 / 3.0 ), mpt67( -2.0 * pt33 ), pi( MATH_T::PI )
 {
   hid_t h5file = H5Fopen(fname, H5F_ACC_RDONLY, H5P_DEFAULT);
 
@@ -64,27 +61,27 @@ MaterialModel_GOH14_ST91_Mixed::~MaterialModel_GOH14_ST91_Mixed()
 
 void MaterialModel_GOH14_ST91_Mixed::print_info() const
 {
-  PetscPrintf(PETSC_COMM_WORLD, "\t  MaterialModel_GOH14_ST91_Mixed: \n");
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Ground Matrix Neo-Hookean: \n");
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Young's Modulus E  = %e \n", E);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Possion's ratio nu = %e \n", nu);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Shear modulus mu   = %e \n", mu);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Lame coeff lambda  = %e \n", lambda);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Bulk modulus kappa = %e \n", kappa);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Fibre Fung: \n");
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Angle theta_1 (deg)= %e \n", f1_the*180/pi);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Angle phi_1 (deg)  = %e \n", f1_phi*180/pi);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Angle theta_1 (rad)= %e \n", f1_the);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Angle phi_1 (rad)  = %e \n", f1_phi);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Angle theta_2 (deg)= %e \n", f2_the*180/pi);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Angle phi_2 (deg)  = %e \n", f2_phi*180/pi);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Angle theta_2 (rad)= %e \n", f2_the);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Angle phi_2 (rad)  = %e \n", f2_phi);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  a1: [ %e , %e , %e ] \n", a1(0), a1(1), a1(2));
-  PetscPrintf(PETSC_COMM_WORLD, "\t  a2: [ %e , %e , %e ] \n", a2(0), a2(1), a2(2));
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Fibre k1   = %e \n", fk1);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Fibre k2   = %e \n", fk2);
-  PetscPrintf(PETSC_COMM_WORLD, "\t  Fibre k_dispersion = %e \n", fkd);
+  SYS_T::commPrint("\t  MaterialModel_GOH14_ST91_Mixed: \n");
+  SYS_T::commPrint("\t  Ground Matrix Neo-Hookean: \n");
+  SYS_T::commPrint("\t  Young's Modulus E  = %e \n", E);
+  SYS_T::commPrint("\t  Possion's ratio nu = %e \n", nu);
+  SYS_T::commPrint("\t  Shear modulus mu   = %e \n", mu);
+  SYS_T::commPrint("\t  Lame coeff lambda  = %e \n", lambda);
+  SYS_T::commPrint("\t  Bulk modulus kappa = %e \n", kappa);
+  SYS_T::commPrint("\t  Fibre Fung: \n");
+  SYS_T::commPrint("\t  Angle theta_1 (deg)= %e \n", f1_the*180/MATH_T::PI);
+  SYS_T::commPrint("\t  Angle phi_1 (deg)  = %e \n", f1_phi*180/MATH_T::PI);
+  SYS_T::commPrint("\t  Angle theta_1 (rad)= %e \n", f1_the);
+  SYS_T::commPrint("\t  Angle phi_1 (rad)  = %e \n", f1_phi);
+  SYS_T::commPrint("\t  Angle theta_2 (deg)= %e \n", f2_the*180/MATH_T::PI);
+  SYS_T::commPrint("\t  Angle phi_2 (deg)  = %e \n", f2_phi*180/MATH_T::PI);
+  SYS_T::commPrint("\t  Angle theta_2 (rad)= %e \n", f2_the);
+  SYS_T::commPrint("\t  Angle phi_2 (rad)  = %e \n", f2_phi);
+  SYS_T::commPrint("\t  a1: [ %e , %e , %e ] \n", a1(0), a1(1), a1(2));
+  SYS_T::commPrint("\t  a2: [ %e , %e , %e ] \n", a2(0), a2(1), a2(2));
+  SYS_T::commPrint("\t  Fibre k1   = %e \n", fk1);
+  SYS_T::commPrint("\t  Fibre k2   = %e \n", fk2);
+  SYS_T::commPrint("\t  Fibre k_dispersion = %e \n", fkd);
 }
 
 void MaterialModel_GOH14_ST91_Mixed::write_hdf5( const char * const &fname ) const
@@ -121,7 +118,7 @@ void MaterialModel_GOH14_ST91_Mixed::get_PK(
   Tensor2_3D C; C.MatMultTransposeLeft(F);
   Tensor2_3D Cinv = Ten2::inverse(C);
   const double trC = C.tr();
-  const double detFm0d67 = std::pow(F.det(), mpt67);
+  const double detFm0d67 = std::pow(F.det(), - 2.0 / 3.0);
 
   const double a1Ca1 = C.VecMatVec(a1, a1);
   const double a2Ca2 = C.VecMatVec(a2, a2);
@@ -133,7 +130,7 @@ void MaterialModel_GOH14_ST91_Mixed::get_PK(
   const double dfpsi2 = fk1 * fE2 * std::exp( fk2 * fE2 * fE2 );
 
   // P : I = I - 1/3 trC C^-1
-  Tensor2_3D PxI(Cinv); PxI.scale( (-1.0) * pt33 * trC );
+  Tensor2_3D PxI(Cinv); PxI.scale( (-1.0) * trC / 3.0 );
   PxI.AXPI( 1.0 );
 
   Tensor2_3D PxH1; Tensor2_3D PxH2;
@@ -164,7 +161,8 @@ void MaterialModel_GOH14_ST91_Mixed::get_PK_Stiffness(
   Tensor2_3D C; C.MatMultTransposeLeft(F);
   Tensor2_3D Cinv = Ten2::inverse(C);
   const double trC = C.tr();
-  const double detFm0d67 = std::pow(F.det(), mpt67);
+  const double detFm0d67 = std::pow(F.det(), - 2.0 / 3.0);
+  const Tensor2_3D I = Ten2::gen_id();
 
   const double a1Ca1 = C.VecMatVec(a1, a1);
   const double a2Ca2 = C.VecMatVec(a2, a2);
@@ -176,7 +174,7 @@ void MaterialModel_GOH14_ST91_Mixed::get_PK_Stiffness(
   const double dfpsi2 = fk1 * fE2 * std::exp( fk2 * fE2 * fE2 );
 
   // P : I = I - 1/3 trC C^-1
-  Tensor2_3D PxI(Cinv); PxI.scale( (-1.0) * pt33 * trC );
+  Tensor2_3D PxI(Cinv); PxI.scale( (-1.0) * trC / 3.0 );
   PxI.AXPI( 1.0 );
 
   Tensor2_3D PxH1; Tensor2_3D PxH2;
@@ -208,7 +206,7 @@ void MaterialModel_GOH14_ST91_Mixed::get_PK_Stiffness(
   CC.add_OutProduct(4.0 * d2fpsi1, PxH1, PxH1);
   CC.add_OutProduct(4.0 * d2fpsi2, PxH2, PxH2);
 
-  const double val = mpt67 * mu * detFm0d67;
+  const double val = - 2.0 * mu * detFm0d67 / 3.0;
 
   CC.add_OutProduct(val, PxI, Cinv);
   CC.add_OutProduct(val, Cinv, I);
@@ -219,7 +217,7 @@ double MaterialModel_GOH14_ST91_Mixed::get_strain_energy(const Tensor2_3D &F ) c
 {
   Tensor2_3D C; C.MatMultTransposeLeft(F);
   const double trC = C.tr();
-  const double detFm0d67 = std::pow(F.det(), mpt67);
+  const double detFm0d67 = std::pow(F.det(), - 2.0 / 3.0);
 
   const double a1Ca1 = C.VecMatVec(a1, a1);
   const double a2Ca2 = C.VecMatVec(a2, a2);
