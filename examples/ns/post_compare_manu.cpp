@@ -119,6 +119,9 @@ int main( int argc, char * argv[] )
   MPI_Reduce(&subdomain_exactH2, &H2_exact, 1, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
   H2_exact = std::sqrt( H2_exact );
 
+  SYS_T::commPrint("Absolute error in L2 norm is : %e \n", l2_error);
+  SYS_T::commPrint("Absolute error in H1 norm is : %e \n", H1_error);
+
   SYS_T::commPrint("Relative error in L2 norm is : %e \n", l2_error/H2_exact);
   SYS_T::commPrint("Relative error in H1 norm is : %e \n", H1_error/H2_exact);
   SYS_T::commPrint("Meshsize is : %e \n", meshsize);

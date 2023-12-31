@@ -236,7 +236,7 @@ void PDNSolution_NS::Init_flow_cubic( const APart_Node * const &pNode_ptr,
     //             5/3 x flow rate (1.0) / surface area
     // Here I use the unit flow rate, and the actual flow rate is adjusted
     // based on the CVFlowRate class.
-    const double vmax = 5 / (3 * infbc->get_fularea(nbc_id));
+    const double vmax = 5 / (3 * MATH_T::PI * 0.01);
     
     const double out_nx = infbc->get_outvec(nbc_id).x();
     const double out_ny = infbc->get_outvec(nbc_id).y();
@@ -253,7 +253,10 @@ void PDNSolution_NS::Init_flow_cubic( const APart_Node * const &pNode_ptr,
           const int location[4] = { pos, pos + 1, pos +2, pos + 3 };
 
           const Vector_3 pt = fNode_ptr -> get_ctrlPts_xyz(ii);
-          const double r =  infbc -> get_radius( nbc_id, pt );
+          const double x = fNode_ptr->get_ctrlPts_x(ii);
+          const double y = fNode_ptr->get_ctrlPts_y(ii);
+          // const double r =  infbc -> get_radius( nbc_id, pt );
+          const double r = std::sqrt(x*x + y*y) / 0.1;
 
           const double vel = vmax * (1.0 - r*r*r);
 

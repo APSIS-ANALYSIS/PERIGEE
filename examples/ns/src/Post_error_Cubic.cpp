@@ -188,7 +188,7 @@ double POST_ERROR_C::get_exact_sol_u_normH2(
 	     + exact_dy.dot_product(exact_dy) * gwts 
 	     + exact_dz.dot_product(exact_dz) * gwts 
 	     + exact.dot_product(exact) * gwts
-         + (uz_dxdx * uz_dxdx + uz_dydy * uz_dydy + uz_dxdy * uz_dxdy) * gwts; // non-trivial second order derivative
+       + (uz_dxdx * uz_dxdx + uz_dydy * uz_dydy + 2 * uz_dxdy * uz_dxdy) * gwts; // non-trivial second order derivative
   }
 
   return normH2;
