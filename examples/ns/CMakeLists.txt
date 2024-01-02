@@ -113,8 +113,6 @@ SET( perigee_postprocess_lib_src
   ${perigee_source}/Postproc_Tool/Interpolater.cpp
   ${perigee_SOURCE_DIR}/src/VisDataPrep_NS.cpp
   ${perigee_SOURCE_DIR}/src/VTK_Writer_NS.cpp
-  ${perigee_SOURCE_DIR}/src/Post_error_Poiseuille.cpp
-  ${perigee_SOURCE_DIR}/src/Post_error_Cubic.cpp
   )
 
 INCLUDE_DIRECTORIES( ../../include )
@@ -150,7 +148,6 @@ ADD_EXECUTABLE( prepost3d prepost_ns.cpp)
 ADD_EXECUTABLE( vis_ns vis_ns.cpp)
 ADD_EXECUTABLE( vis_p1_wss vis_p1_wss.cpp)
 ADD_EXECUTABLE( vis_p2_wss vis_p2_wss.cpp)
-ADD_EXECUTABLE( post_error post_compare_manu.cpp )
 
 TARGET_LINK_LIBRARIES( gmsh_p1_IO perigee_preprocess )
 TARGET_LINK_LIBRARIES( gmsh_p2_IO perigee_preprocess )
@@ -160,6 +157,5 @@ TARGET_LINK_LIBRARIES( prepost3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( vis_ns perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_p1_wss perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_p2_wss perigee_postprocess )
-TARGET_LINK_LIBRARIES( post_error perigee_postprocess )
 
 # EOF

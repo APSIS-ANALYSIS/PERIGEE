@@ -195,12 +195,7 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
 
     Vector_3 get_f(const Vector_3 &pt, const double &tt) const
     {
-      const double x = pt.x(), y = pt.y(), R = 0.1, v_ave = 3.0, fl_mu = 4.0e-2, fl_density = 1.0;
-      const double r = std::sqrt(x*x + y*y);
-      const double dp_dz = -1000.0;
-
-      double fz = 5.0 * v_ave * fl_mu * (3 * r) / (R*R*R * fl_density) + dp_dz / fl_density;
-      return Vector_3( 0.0, 0.0, fz );
+      return Vector_3( 0.0, 0.0, 0.0 );
     }
 
     Vector_3 get_H1(const Vector_3 &pt, const double &tt, 
@@ -219,60 +214,6 @@ class PLocAssem_Tet_VMS_NS_GenAlpha : public IPLocAssem
         const double &tt, const Vector_3 &n_out ) const
     {
       return ((*this).*(flist[ebc_id]))(pt, tt, n_out);
-    }
-
-    Vector_3 get_Poiseuille_traction(const Vector_3 &pt, const double &tt, const Vector_3 &n_out) const
-    {
-      const double delta_P = 153.6; // pressure
-      const double Length = 1.2; // tube length
-      const double fl_mu = 4.0e-2; // viscosity
-
-      // ux = 0, uy = 0, uz = delta_P * (R^2 - x^2 - y^2) / (4 * fl_mu * L);
-      const double x = pt.x(), y = pt.y();
-
-      Tensor2_3D velo_grad ( 0.0, 0.0, 0.0,
-                             0.0, 0.0, 0.0, 
-                             -delta_P * x / (2 * fl_mu * Length),
-                             -delta_P * y / (2 * fl_mu * Length),
-                             0.0);
-
-      Tensor2_3D velo_grad_T = velo_grad;
-      velo_grad_T.transpose();
-
-      Tensor2_3D S = velo_grad + velo_grad_T;
-
-      S *= fl_mu;
-      
-      return S * n_out;
-    }
-
-    Vector_3 get_cubic_velo_traction(const Vector_3 &pt, const double &tt, const Vector_3 &n_out) const
-    {
-      const double Q = 0.03 * MATH_T::PI; // 0.03 * pi, v_ave = 3
-      const double R = 0.1;
-
-      const double A = R * R * MATH_T::PI; // area
-      const double fl_mu = 4.0e-2;
-
-      // ux = 0, uy = 0, uz = v_max * (1 - r^3 / R^3);
-      const double x = pt.x(), y = pt.y();
-      const double v_max = (5 * Q/ (3 * A));
-      const double ra = std::sqrt(x * x + y * y);
-
-      Tensor2_3D velo_grad ( 0.0, 0.0, 0.0,
-                             0.0, 0.0, 0.0, 
-                             -3 * v_max * x * ra / (R * R * R),
-                             -3 * v_max * y * ra / (R * R * R),
-                             0.0);
-
-      Tensor2_3D velo_grad_T = velo_grad;
-      velo_grad_T.transpose();
-
-      Tensor2_3D S = velo_grad + velo_grad_T;
-
-      S *= fl_mu;
-      
-      return S * n_out;
     }
 
     Vector_3 get_g_weak(const Vector_3 &pt, const double &tt)

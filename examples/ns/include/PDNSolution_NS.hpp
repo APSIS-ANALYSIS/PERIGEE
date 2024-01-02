@@ -41,11 +41,6 @@ class PDNSolution_NS : public PDNSolution
     void Init_pipe_parabolic( const APart_Node * const &pNode_ptr,
         const FEANode * const &fNode_ptr );
 
-    // v = v_max * (1 - r^3 / R^3), v_max = 5/3 * v_ave
-    void Init_flow_cubic( const APart_Node * const &pNode_ptr, 
-        const FEANode * const &fNode_ptr,
-        const ALocal_InflowBC * const &infbc );
-
   private:
     const bool is_print;
 };
